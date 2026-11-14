@@ -65,10 +65,10 @@ fn discard_all_removes_the_emptied_folders_and_undo_brings_them_back() {
     let (mut term, _config) = launch(root, "pty-discard-folders");
 
     let screen = term
-        .wait_for("the header trash", STEP, |s| s.contains(" \u{2716}"))
+        .wait_for("the header trash", STEP, |s| s.contains(" \u{2717}"))
         .unwrap_or_else(|e| panic!("{e}"));
     term.wait_for_mouse_capture(STEP).unwrap();
-    let (col, row) = screen.find(" \u{2716}").unwrap();
+    let (col, row) = screen.find(" \u{2717}").unwrap();
     term.click(col + 1, row).unwrap();
     term.wait_for("the confirm modal", STEP, |s| {
         s.contains("Discard") && s.contains("Cancel")

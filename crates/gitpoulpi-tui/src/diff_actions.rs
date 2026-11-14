@@ -1587,7 +1587,7 @@ mod tests {
                 assert_eq!(state.selection_anchor, None, "{label}: consumed");
 
                 // One changed row, by explicit range (what the hovered
-                // row's `✖ Discard` passes): inline, the addition row
+                // row's `✗ Discard` passes): inline, the addition row
                 // alone; split, the paired row holds both.
                 let changed = (header..rendered.rows.len())
                     .find(|&r| rendered.rows[r].lines.iter().flatten().any(|&i| i == 2))

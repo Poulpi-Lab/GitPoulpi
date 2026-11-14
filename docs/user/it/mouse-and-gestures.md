@@ -307,7 +307,7 @@ il ref selezionato e il branch corrente.
   comprimerla.
 - **Clicca Percorso o Albero** per scegliere un elenco piatto o cartelle. **Clicca
   Comprimi tutto** o **Espandi tutto** per comprimere ogni cartella.
-- **Clicca `✖`** a sinistra del titolo per scartare tutte le modifiche (chiede
+- **Clicca `✗`** a sinistra del titolo per scartare tutte le modifiche (chiede
   prima). **Clicca `✦`** a destra per spiegare le modifiche con l'IA.
 - **Clic destro su un file** per il suo menu: stage, scarta, ignora, LFS, stash del
   file, cronologia, blame, apri in un programma esterno, copia il percorso, crea
@@ -358,7 +358,7 @@ Vedi [Stage e commit](staging-and-committing.md).
 - **Passa il mouse su un hunk** per mostrare **Stage dell'hunk** o **Unstage
   dell'hunk**, e **Scarta l'hunk**.
 - **Passa il mouse su una riga modificata** per mostrare i suoi pulsanti **+ Stage**,
-  **− Unstage** e **✖ Scarta** all'estremità destra della riga.
+  **− Unstage** e **✗ Scarta** all'estremità destra della riga.
 - **Clic destro su una riga** per il menu dell'hunk: stage, unstage o scarta l'hunk
   o le righe selezionate, cronologia del file, blame, copia.
 - **Clicca la minimappa** per portare la vista su quella riga. Tieni premuto il

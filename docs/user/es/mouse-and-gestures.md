@@ -318,7 +318,7 @@ rama actual.
   staged`) para plegarla.
 - **Haz clic en Ruta o Árbol** para elegir una lista plana o carpetas. **Haz clic
   en Contraer todo** o **Expandir todo** para plegar todas las carpetas.
-- **Haz clic en `✖`** a la izquierda del título para descartar todos los cambios
+- **Haz clic en `✗`** a la izquierda del título para descartar todos los cambios
   (pregunta antes). **Haz clic en `✦`** a la derecha para explicar los cambios
   con IA.
 - **Clic derecho en un archivo** para ver su menú: stage, descartar, ignorar, LFS,
@@ -374,7 +374,7 @@ Consulta [Stage y commit](staging-and-committing.md).
 - **Pasa el puntero sobre un hunk** para mostrar **Stage hunk** o **Unstage
   hunk**, y **Descartar hunk**.
 - **Pasa el puntero sobre una línea cambiada** para mostrar sus propios botones
-  **+ Stage**, **− Quitar** y **✖ Descartar** en el extremo derecho de la fila.
+  **+ Stage**, **− Quitar** y **✗ Descartar** en el extremo derecho de la fila.
 - **Clic derecho en una línea** para ver el menú del hunk: stage, unstage o
   descartar el hunk o las líneas seleccionadas, historial del archivo, blame,
   copiar.

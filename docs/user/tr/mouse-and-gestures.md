@@ -309,7 +309,7 @@ Bırak...` palet komutu, seçili ref ve geçerli dal için menüyü açar.
   Dosyalar`) **tıklayın**.
 - Düz bir liste veya klasörler seçmek için **Yol veya Ağaç'a tıklayın**. Her
   klasörü katlamak için **Tümünü Daralt veya Tümünü Genişlet'e tıklayın**.
-- Tüm değişiklikleri atmak için başlığın solundaki **`✖`'e tıklayın** (önce
+- Tüm değişiklikleri atmak için başlığın solundaki **`✗`'e tıklayın** (önce
   sorar). Değişiklikleri YZ ile açıklamak için sağdaki **`✦`'e tıklayın**.
 - Menüsü için **bir dosyaya sağ tıklayın**: stage, at, yok say, LFS, dosyayı
   stash'le, geçmiş, blame, harici bir programda aç, yolu kopyala, yama oluştur,
@@ -356,7 +356,7 @@ Bkz. [Stage'leme ve commit'leme](staging-and-committing.md).
 - Dosyayı kapatmak için başlıktaki **`✕`'e tıklayın**.
 - **Hunk'ı Stage'le** veya **Hunk'ı Unstage'le** ile **Hunk'ı At**'ı göstermek
   için bir hunk'ın **üzerine gelin**.
-- Satırın sağ ucunda kendi **+ Stage'le**, **− Unstage'le** ve **✖ At**
+- Satırın sağ ucunda kendi **+ Stage'le**, **− Unstage'le** ve **✗ At**
   düğmelerini göstermek için değişen bir satırın **üzerine gelin**.
 - Hunk menüsü için **bir satıra sağ tıklayın**: hunk'ı veya seçili satırları
   stage'le, unstage'le ya da at, dosya geçmişi, blame, kopyala.

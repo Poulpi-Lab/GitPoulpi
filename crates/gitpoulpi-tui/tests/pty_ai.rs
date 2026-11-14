@@ -1021,10 +1021,10 @@ fn the_header_trash_confirms_a_discard_and_the_explain_button_explains() {
 
     let screen = term
         .wait_for("the header with both buttons", STEP, |s| {
-            s.contains(" \u{2716}") && s.contains(" \u{2726} ") && s.contains("file change")
+            s.contains(" \u{2717}") && s.contains(" \u{2726} ") && s.contains("file change")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let (tc, tr) = screen.find(" \u{2716}").unwrap();
+    let (tc, tr) = screen.find(" \u{2717}").unwrap();
     let (title_col, title_row) = screen.find("file change").unwrap();
     assert_eq!(tr, title_row, "same header row");
     assert!(tc < title_col, "the trash is left of the title");

@@ -288,7 +288,7 @@ Sağ panel, Log'daki seçimi izler.
 **Çalışma değişiklikleri** (WIP satırı seçiliyken):
 
 - `main üzerinde 4 dosya değişikliği` gibi bir başlık. Çakışmalı bir merge
-  sırasında çakışan dosya sayısını da ekler. Soldaki kırmızı `✖` tüm
+  sırasında çakışan dosya sayısını da ekler. Soldaki kırmızı `✗` tüm
   değişiklikleri atar (önce sorar). YZ açıkken sağdaki `✦` değişiklikleri
   açıklar.
 - **Yol** veya **Ağaç** (düz bir liste veya klasörler, `m`), **Tümünü Daralt** ve

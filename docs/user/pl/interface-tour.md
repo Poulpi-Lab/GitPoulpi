@@ -273,7 +273,7 @@ Prawy panel podąża za zaznaczeniem w Logu.
 **Zmiany robocze** (zaznaczony jest wiersz WIP):
 
 - Tytuł, taki jak `4 file changes on main`. Podczas merge z konfliktami dodaje
-  liczbę plików z konfliktami. Czerwone `✖` po lewej odrzuca wszystkie
+  liczbę plików z konfliktami. Czerwone `✗` po lewej odrzuca wszystkie
   zmiany (najpierw pyta). Gdy AI jest włączone, `✦` po prawej wyjaśnia
   zmiany.
 - **Ścieżka** lub **Drzewo** (płaska lista albo foldery, `m`), **Zwiń

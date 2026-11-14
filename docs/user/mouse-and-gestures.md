@@ -300,7 +300,7 @@ Branch...` opens the menu for the selected ref and the current branch.
 - **Click a section title** (`Unstaged Files`, `Staged Files`) to fold it.
 - **Click Path or Tree** to choose a flat list or folders. **Click Collapse
   all** or **Expand all** to fold every folder.
-- **Click `✖`** at the left of the title to discard all changes (asks
+- **Click `✗`** at the left of the title to discard all changes (asks
   first). **Click `✦`** at the right to explain the changes with AI.
 - **Right-click a file** for its menu: stage, discard, ignore, LFS, stash
   the file, history, blame, open in an external program, copy the path,
@@ -349,7 +349,7 @@ See [Staging and committing](staging-and-committing.md).
 - **Hover a hunk** to show **Stage hunk** or **Unstage hunk**, and
   **Discard hunk**.
 - **Hover a changed line** to show its own **+ Stage**, **− Unstage** and
-  **✖ Discard** buttons at the right end of the row.
+  **✗ Discard** buttons at the right end of the row.
 - **Right-click a line** for the hunk menu: stage, unstage or discard the hunk
   or the selected lines, file history, blame, copy.
 - **Click the minimap** to move the view to that line. Hold the button down

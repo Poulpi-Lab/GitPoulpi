@@ -293,7 +293,7 @@ sélectionnée et la branche courante.
   replier.
 - **Cliquez sur Chemins ou Arbre** pour choisir une liste plate ou des dossiers.
   **Cliquez sur Tout replier** ou **Tout déplier** pour replier chaque dossier.
-- **Cliquez sur `✖`** à gauche du titre pour abandonner toutes les modifications
+- **Cliquez sur `✗`** à gauche du titre pour abandonner toutes les modifications
   (demande d'abord). **Cliquez sur `✦`** à droite pour expliquer les modifications
   avec l'IA.
 - **Clic droit sur un fichier** pour son menu : stage, abandon, ignorer, LFS, stasher
@@ -343,7 +343,7 @@ Voir [Stage et commit](staging-and-committing.md).
 - **Survolez un hunk** pour afficher **Stage du hunk** ou **Unstage du hunk**, et
   **Abandonner le hunk**.
 - **Survolez une ligne modifiée** pour afficher ses propres boutons **+ Stage**, **−
-  Unstage** et **✖ Abandonner** à l'extrémité droite de la ligne.
+  Unstage** et **✗ Abandonner** à l'extrémité droite de la ligne.
 - **Clic droit sur une ligne** pour le menu du hunk : stager, unstager ou abandonner
   le hunk ou les lignes sélectionnées, historique du fichier, blame, copier.
 - **Cliquez sur la minimap** pour déplacer la vue à cette ligne. Maintenez le bouton

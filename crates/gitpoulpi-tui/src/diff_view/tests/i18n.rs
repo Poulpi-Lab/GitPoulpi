@@ -81,7 +81,7 @@ fn hunk_and_line_buttons_are_french_and_cut_the_code_not_the_label() {
         assert_eq!(DiffSource::Unstaged.hunk_label(), Some(stage));
         assert_eq!(DiffSource::Staged.hunk_label(), Some(unstage));
         assert_eq!(interaction::discard_hunk_label(), "Abandonner le hunk");
-        assert_eq!(interaction::line_discard_label(), "\u{2716} Abandonner");
+        assert_eq!(interaction::line_discard_label(), "\u{2717} Abandonner");
         // The width of a button is its display width, accents included.
         let mut lines = vec![Line::from("x".repeat(10))];
         let placed =

@@ -294,7 +294,7 @@ grenen.
 - **Klicka på Sökväg eller Träd** för att välja en platt lista eller mappar.
   **Klicka på Fäll ihop alla** eller **Fäll ut alla** för att fälla ihop eller ut
   varje mapp.
-- **Klicka på `✖`** till vänster om titeln för att förkasta alla ändringar
+- **Klicka på `✗`** till vänster om titeln för att förkasta alla ändringar
   (frågar först). **Klicka på `✦`** till höger för att förklara ändringarna med
   AI.
 - **Högerklicka på en fil** för dess meny: stage, förkasta, ignorera, LFS, stasha
@@ -346,7 +346,7 @@ Se [Stage och commit](staging-and-committing.md).
 - **Peka på en hunk** för att visa **Stage hunk** eller **Unstage hunk**, och
   **Förkasta hunk**.
 - **Peka på en ändrad rad** för att visa dess egna knappar **+ Stage**,
-  **− Unstage** och **✖ Förkasta** längst till höger på raden.
+  **− Unstage** och **✗ Förkasta** längst till höger på raden.
 - **Högerklicka på en rad** för hunkmenyn: stage, unstage eller förkasta hunken
   eller de markerade raderna, filhistorik, blame, kopiera.
 - **Klicka på minikartan** för att flytta vyn till den raden. Håll knappen nedtryckt

@@ -44,7 +44,7 @@ pub(crate) fn line_unstage_label() -> String {
     )
 }
 pub(crate) fn line_discard_label() -> String {
-    format!("\u{2716} {}", msg::LINE_DISCARD.get())
+    format!("\u{2717} {}", msg::LINE_DISCARD.get())
 }
 
 /// Paints `buttons` (label, color) side by side, one blank column apart,
@@ -212,7 +212,7 @@ pub(crate) enum DiffBodyButton {
     /// changed lines (two in Split, where a removal and its addition
     /// share a row). Carries the row, like `HitTarget::DiffRow`.
     Line(usize),
-    /// `✖ Discard` on a hovered changed row, Unstaged half only.
+    /// `✗ Discard` on a hovered changed row, Unstaged half only.
     DiscardLine(usize),
 }
 
@@ -243,7 +243,7 @@ impl DiffBodyButton {
 ///   every row of a whole-file layout each frame.
 /// - on the changed row under the mouse (never the keyboard cursor: the
 ///   keys already act on it), `+ Stage` / `− Unstage` and, Unstaged half
-///   only, `✖ Discard`.
+///   only, `✗ Discard`.
 ///
 /// `inner` is the diff block's inner rect; `state.scroll`/`cursor` have
 /// already been clamped against `render`.

@@ -591,7 +591,7 @@ and a scratch repository.
   zoom, fast wheel; ref-to-commit connector in both renderers (thinner than
   lanes, passes under them, ends at the ring); Log pixel avatars (corners match
   the selection/hover band, no picture left on the wrong row while scrolling).
-- Glyph widths in a real font stack: `✎ ★ ☆ ⋮ ⎇ □ ┄ ↠ ⊞ ✖ ▾ ⋯`, `📁 📂` not
+- Glyph widths in a real font stack: `✎ ★ ☆ ⋮ ⎇ □ ┄ ↠ ⊞ ✗ ▾ ⋯`, `📁 📂` not
   flipping monochrome on a bold row, `Soloing 1/N` title clean.
 - Mouse: stash Pop/Apply/Drop from the sidebar menu, the third pane's file menu,
   list scrollbar thumb drags (incl. the Log with its header), ref drag-and-drop
@@ -677,7 +677,7 @@ without the fix; keep it that way.
 
 ### Buttons are real buttons, never bracketed text
 
-- A clickable control is drawn through the button widget (`dialog_kit::button` / `button_style`: ` label ` padded on the button fill, hover, focus and disabled looks, registered in the pointer map as a hand), never as `[ Edit ]`, `[+ Add]`, `[✖]` or `[ 1 ▾]`. The only brackets left are the checkbox marks `[x]` / `[ ]` (`dialog_kit::checkbox_mark`), which are hand controls like the buttons, and key hints inside a label (`Tree [m]`). `button_audit_tests.rs` scans the source and every catalog for bracketed labels and fails on one; a new surface that draws its own buttons registers each rect with `pointer_map::hand` (a button over a text area otherwise shows the I-beam: the prompt editor's snippet buttons did).
+- A clickable control is drawn through the button widget (`dialog_kit::button` / `button_style`: ` label ` padded on the button fill, hover, focus and disabled looks, registered in the pointer map as a hand), never as `[ Edit ]`, `[+ Add]`, `[✗]` or `[ 1 ▾]`. The only brackets left are the checkbox marks `[x]` / `[ ]` (`dialog_kit::checkbox_mark`), which are hand controls like the buttons, and key hints inside a label (`Tree [m]`). `button_audit_tests.rs` scans the source and every catalog for bracketed labels and fails on one; a new surface that draws its own buttons registers each rect with `pointer_map::hand` (a button over a text area otherwise shows the I-beam: the prompt editor's snippet buttons did).
 - A page that keeps its own hit list (the Integrations page) registers it once per frame (`register_pointer`, reversed: the list is first-wins, the map last-wins) and hands the same rects to the `Ctrl+N` badges (`nav_hits`), so a control cannot have a click without a badge. Hit rects that are painted off-screen and windowed (its scroll) are converted before they are registered.
 - A multi-line field with its own scrollbar (the Radar's Namespaces) paints the bar from a `scrollbar::Track` and keeps the track for the mouse (`BarDrag`): arrows step, the thumb drags, the track jumps. A bar drawn by hand cannot be pressed.
 

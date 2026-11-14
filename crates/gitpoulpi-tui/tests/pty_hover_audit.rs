@@ -137,10 +137,10 @@ fn discard_all_is_a_cross_clear_of_the_chevron_and_lights_up() {
     let repo = fixture();
     let (mut term, _config) = launch(repo.root(), "pty-hover-trash");
     let screen = term
-        .wait_for("the header trash", STEP, |s| s.contains(" \u{2716}"))
+        .wait_for("the header trash", STEP, |s| s.contains(" \u{2717}"))
         .unwrap_or_else(|e| panic!("{e}"));
     term.wait_for_mouse_capture(STEP).unwrap();
-    let (col, row) = screen.find(" \u{2716}").unwrap();
+    let (col, row) = screen.find(" \u{2717}").unwrap();
     let (chev, chev_row) = screen.find("\u{203A}").expect("the Status pane's chevron");
     assert_eq!(chev_row, row, "chevron and button share the header row");
     assert!(

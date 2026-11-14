@@ -245,7 +245,7 @@ Het rechterpaneel volgt de selectie in de Log.
 **Lokale wijzigingen** (de WIP-rij is geselecteerd):
 
 - Een titel als `4 bestandswijzigingen op main`. Tijdens een merge met conflicten komt er het
-  aantal conflicterende bestanden bij. Een rode `✖` links verwerpt alle wijzigingen (vraagt
+  aantal conflicterende bestanden bij. Een rode `✗` links verwerpt alle wijzigingen (vraagt
   eerst). Met AI aan legt een `✦` rechts de wijzigingen uit.
 - **Pad** of **Boom** (een platte lijst of mappen, `m`), **Alles inklappen** en **Alle
   bestanden tonen** (`a`).

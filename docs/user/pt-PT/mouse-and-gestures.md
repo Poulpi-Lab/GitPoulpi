@@ -317,7 +317,7 @@ a ref selecionada e a branch atual.
 - **Clique em Caminho ou Árvore** para escolher uma lista plana ou pastas.
   **Clique em Recolher tudo** ou **Expandir tudo** para recolher todas as
   pastas.
-- **Clique em `✖`** à esquerda do título para descartar todas as alterações
+- **Clique em `✗`** à esquerda do título para descartar todas as alterações
   (pergunta primeiro). **Clique em `✦`** à direita para explicar as alterações
   com IA.
 - **Clique com o botão direito num ficheiro** para ver o seu menu: stage,
@@ -372,7 +372,7 @@ Veja [Stage e commit](staging-and-committing.md).
 - **Passe o ponteiro por um hunk** para mostrar **Stage hunk** ou **Unstage
   hunk**, e **Descartar hunk**.
 - **Passe o ponteiro por uma linha alterada** para mostrar os seus próprios
-  botões **+ Stage**, **− Unstage** e **✖ Descartar** na extremidade direita da
+  botões **+ Stage**, **− Unstage** e **✗ Descartar** na extremidade direita da
   linha.
 - **Clique com o botão direito numa linha** para ver o menu do hunk: stage,
   unstage ou descartar o hunk ou as linhas selecionadas, histórico do ficheiro,

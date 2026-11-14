@@ -293,7 +293,7 @@ a aktuální větev.
   sbalení.
 - **Klikněte na Cesta nebo Strom** pro plochý seznam nebo složky. **Klikněte na
   Sbalit vše** nebo **Rozbalit vše** pro sbalení všech složek.
-- **Klikněte na `✖`** vlevo od názvu pro zahození všech změn (nejdřív se
+- **Klikněte na `✗`** vlevo od názvu pro zahození všech změn (nejdřív se
   zeptá). **Klikněte na `✦`** vpravo pro vysvětlení změn pomocí AI.
 - **Pravým tlačítkem na soubor** otevřete jeho nabídku: stage, zahodit, ignorovat,
   LFS, stash souboru, historie, blame, otevřít v externím programu, kopírovat
@@ -343,7 +343,7 @@ Viz [Stagování a commitování](staging-and-committing.md).
 - **Najeďte na hunk** pro zobrazení **Stage hunk** nebo **Unstage hunk** a
   **Zahodit hunk**.
 - **Najeďte na změněný řádek** pro zobrazení jeho vlastních tlačítek **+ Stage**,
-  **− Unstage** a **✖ Zahodit** na pravém konci řádku.
+  **− Unstage** a **✗ Zahodit** na pravém konci řádku.
 - **Pravým tlačítkem na řádek** otevřete nabídku hunku: stage, unstage nebo
   zahodit hunk či vybrané řádky, historie souboru, blame, kopírovat.
 - **Klikněte na minimapu** pro přesun zobrazení na daný řádek. Podržte tlačítko

@@ -383,7 +383,7 @@ pub(crate) enum DiffStageAction {
     /// header's `Discard hunk`) - Unstaged half only, always confirmed.
     DiscardHunk,
     /// Revert the selected lines, or the line under the cursor (`X`, or a
-    /// hovered row's `✖ Discard`) - Unstaged half only, confirmed.
+    /// hovered row's `✗ Discard`) - Unstaged half only, confirmed.
     DiscardLines,
 }
 

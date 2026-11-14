@@ -128,7 +128,7 @@ fn x_discards_the_hunk_under_the_cursor_after_confirming() {
     assert!(nothing_staged(repo.root()));
 }
 
-/// Hovering a changed line reveals its `✖ Discard` button; clicking it
+/// Hovering a changed line reveals its `✗ Discard` button; clicking it
 /// asks first, and `y` removes exactly that added line - its removed
 /// twin (`l15`) is a different line and stays removed.
 #[test]
@@ -143,11 +143,11 @@ fn a_changed_lines_hover_discard_button_discards_that_line_only() {
     term.move_to(col, row).unwrap();
     let hovered = term
         .wait_for("the line's own Discard button", STEP, |s| {
-            s.line(row).contains("CHANGED-MIDDLE") && s.line(row).contains("\u{2716} Discard")
+            s.line(row).contains("CHANGED-MIDDLE") && s.line(row).contains("\u{2717} Discard")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (bcol, brow) = hovered
-        .find_all("\u{2716} Discard")
+        .find_all("\u{2717} Discard")
         .into_iter()
         .find(|&(_, r)| r == row)
         .expect("predicate just matched");

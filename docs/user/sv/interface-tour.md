@@ -280,7 +280,7 @@ Högerpanelen följer markeringen i Log.
 **Lokala ändringar** (WIP-raden är markerad):
 
 - En rubrik som `4 filändringar på main`. Under en merge med konflikter lägger
-  den till antalet filer i konflikt. Ett rött `✖` till vänster förkastar alla
+  den till antalet filer i konflikt. Ett rött `✗` till vänster förkastar alla
   ändringar (frågar först). När AI är på förklarar ett `✦` till höger
   ändringarna.
 - **Sökväg** eller **Träd** (en platt lista eller mappar, `m`), **Fäll ihop

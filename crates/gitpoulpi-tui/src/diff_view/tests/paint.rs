@@ -107,7 +107,7 @@ fn the_visible_window_paints_cursor_and_button_at_window_rows() {
 
 /// On the Unstaged half the hovered hunk's header
 /// carries `Discard hunk` beside `Stage hunk`, and the hovered changed
-/// row its own `✖ Discard` and `+ Stage` - each rect exactly where
+/// row its own `✗ Discard` and `+ Stage` - each rect exactly where
 /// its label was painted. The Staged half gets no discard at all, and
 /// a context row no row buttons.
 #[test]

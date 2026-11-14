@@ -274,7 +274,7 @@ Le volet de droite suit la sélection dans le Log.
 **Modifications locales** (la ligne WIP est sélectionnée) :
 
 - Un titre comme `4 file changes on main`. Pendant un merge en conflit, il ajoute
-  le nombre de fichiers en conflit. Un `✖` rouge à gauche abandonne tous les
+  le nombre de fichiers en conflit. Un `✗` rouge à gauche abandonne tous les
   modifications (demande d'abord). Quand l'IA est activée, un `✦` à droite
   explique les modifications.
 - **Chemins** ou **Arbre** (une liste plate ou des dossiers, `m`), **Tout

@@ -23,11 +23,12 @@ pub(crate) fn status_bulk_button_rect(area: Rect, title: &str, bulk: &str) -> Op
 pub(crate) fn discard_all_label() -> &'static str {
     gitpoulpi_i18n::msg::status_list::DISCARD_ALL.get()
 }
-/// The header's red discard button: a heavy cross (U+2716, text-default, so
-/// it carries the danger color; VS15 asks for the text presentation like
-/// the hide-in-graph eye) on the button fill, padded by a cell each side (no brackets): the button is 3 wide.
+/// The header's red discard button: a ballot cross (U+2717, the same glyph as
+/// every delete/discard entry of the menus), padded by a cell each side (no
+/// brackets): the button is 3 wide. Not U+2716: kitty drew it with the colour
+/// emoji font (Noto Color Emoji ignores VS15 there), which left only a red sliver.
 /// (A wastebasket was tried; it does not render in every terminal font.)
-pub(crate) const DISCARD_GLYPH: &str = " \u{2716}\u{FE0E} ";
+pub(crate) const DISCARD_GLYPH: &str = " \u{2717} ";
 
 /// The glyph [`render_status_header_buttons`] paints for the button.
 pub(crate) fn discard_glyph() -> &'static str {

@@ -289,7 +289,7 @@ bieżącą gałąź...` otwiera menu dla zaznaczonego refa i bieżącej gałęzi
 - **Kliknij tytuł sekcji** (`Pliki unstaged`, `Pliki staged`), by ją zwinąć.
 - **Kliknij Ścieżka lub Drzewo**, by wybrać płaską listę lub foldery. **Kliknij Zwiń
   wszystko** lub **Rozwiń wszystko**, by zwinąć każdy folder.
-- **Kliknij `✖`** po lewej stronie tytułu, by odrzucić wszystkie zmiany (pyta
+- **Kliknij `✗`** po lewej stronie tytułu, by odrzucić wszystkie zmiany (pyta
   najpierw). **Kliknij `✦`** po prawej, by wyjaśnić zmiany przez AI.
 - **Kliknij plik prawym przyciskiem**, by zobaczyć jego menu: stage, odrzucenie, ignorowanie, LFS, stash
   pliku, historia, blame, otwarcie w zewnętrznym programie, kopiowanie ścieżki,
@@ -340,7 +340,7 @@ Zob. [Stage i commity](staging-and-committing.md).
 - **Najedź na hunk**, by pokazać **Stage hunk** lub **Unstage hunk** oraz
   **Odrzuć hunk**.
 - **Najedź na zmienioną linię**, by pokazać jej własne przyciski **+ Stage**, **− Unstage** i
-  **✖ Odrzuć** na prawym końcu wiersza.
+  **✗ Odrzuć** na prawym końcu wiersza.
 - **Kliknij linię prawym przyciskiem**, by zobaczyć menu hunka: stage, unstage lub odrzucenie hunka
   albo zaznaczonych linii, historia pliku, blame, kopiowanie.
 - **Kliknij minimapę**, by przenieść widok do tej linii. Przytrzymaj przycisk

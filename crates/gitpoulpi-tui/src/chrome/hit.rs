@@ -222,7 +222,7 @@ pub(crate) enum HitTarget {
     /// A button inside the Diff view's body, revealed on hover exactly
     /// like the third pane's per-row button: a hunk header's `Stage Hunk`
     /// / `Unstage Hunk` / `Discard Hunk`, or a hovered changed row's
-    /// `+ Stage` / `− Unstage` / `✖ Discard`. A hunk
+    /// `+ Stage` / `− Unstage` / `✗ Discard`. A hunk
     /// button carries the hunk's own id - the number the backend's diff
     /// gave it - rather than a row index, because that is what
     /// `StageTarget::Hunk` names and it survives the re-render the

@@ -310,7 +310,7 @@ a ref selecionada e a branch atual.
   recolhê-la.
 - **Clique em Caminho ou Árvore** para escolher uma lista plana ou pastas. **Clique
   em Recolher tudo** ou **Expandir tudo** para recolher cada pasta.
-- **Clique em `✖`** à esquerda do título para descartar todas as alterações
+- **Clique em `✗`** à esquerda do título para descartar todas as alterações
   (pergunta antes). **Clique em `✦`** à direita para explicar as alterações com a
   IA.
 - **Clique com o botão direito em um arquivo** para ver o menu: stage, descartar, ignorar, LFS,
@@ -361,7 +361,7 @@ Veja [Stage e commit](staging-and-committing.md).
 - **Passe o mouse sobre um hunk** para mostrar **Stage hunk** ou **Unstage hunk**, e
   **Descartar hunk**.
 - **Passe o mouse sobre uma linha alterada** para mostrar os botões próprios dela
-  **+ Stage**, **− Unstage** e **✖ Descartar** na extremidade direita da linha.
+  **+ Stage**, **− Unstage** e **✗ Descartar** na extremidade direita da linha.
 - **Clique com o botão direito em uma linha** para o menu do hunk: stage, unstage ou descartar o
   hunk ou as linhas selecionadas, histórico do arquivo, blame, copiar.
 - **Clique no minimapa** para mover a vista até aquela linha. Mantenha o botão

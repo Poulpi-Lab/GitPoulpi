@@ -232,7 +232,7 @@ fn the_header_has_a_red_trash_far_left_and_an_explain_sparkle_far_right() {
     // it and the button, so one cannot be clicked for the other.
     assert_eq!(d.x, 4);
     assert!(
-        buf[(d.x + 1, 0)].symbol().starts_with('\u{2716}'),
+        buf[(d.x + 1, 0)].symbol().starts_with('\u{2717}'),
         "the heavy cross, which every font draws"
     );
     assert_eq!(d.width, 3);

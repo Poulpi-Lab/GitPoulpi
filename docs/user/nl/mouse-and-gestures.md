@@ -273,7 +273,7 @@ voor de geselecteerde ref en de huidige branch.
   klappen.
 - **Klik op Pad of Boom** om een platte lijst of mappen te kiezen. **Klik op Alles
   inklappen** of **Alles uitklappen** om elke map in of uit te klappen.
-- **Klik op `✖`** links van de titel om alle wijzigingen te verwerpen (vraagt eerst).
+- **Klik op `✗`** links van de titel om alle wijzigingen te verwerpen (vraagt eerst).
   **Klik op `✦`** rechts om de wijzigingen met AI uit te leggen.
 - **Klik met rechts op een bestand** voor zijn menu: stagen, verwerpen, negeren, LFS, het
   bestand stashen, geschiedenis, blame, openen in een extern programma, het pad kopiëren,
@@ -324,7 +324,7 @@ Zie [Stagen en committen](staging-and-committing.md).
 - **Wijs een hunk aan** om **Hunk stagen** of **Hunk unstagen**, en **Hunk verwerpen** te
   tonen.
 - **Wijs een gewijzigde regel aan** om haar eigen knoppen **+ Stage**, **− Unstage** en
-  **✖ Verwerpen** aan het rechteruiteinde van de rij te tonen.
+  **✗ Verwerpen** aan het rechteruiteinde van de rij te tonen.
 - **Klik met rechts op een regel** voor het hunkmenu: de hunk of de geselecteerde regels
   stagen, unstagen of verwerpen, bestandsgeschiedenis, blame, kopiëren.
 - **Klik op de minimap** om het zicht naar die regel te verplaatsen. Houd de knop ingedrukt

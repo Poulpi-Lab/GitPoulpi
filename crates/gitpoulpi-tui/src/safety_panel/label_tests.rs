@@ -84,6 +84,7 @@ fn sample(kind: K) -> Option<&'static str> {
 const WITHOUT_WORDS: &[K] = &[
     // Journaled, but their catalog words wait for the translators.
     K::ApplyCommit,
+    K::BranchSetRemotes,
     K::StashFromCommit,
     K::Init,
     K::Fetch,

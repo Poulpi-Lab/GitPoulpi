@@ -67,7 +67,11 @@ start at the top, and jump to the reference pages when you need them.
     What passes through tmux, zellij, screen, herdr and terminal panes:
     **[Multiplexers](multiplexers.md)**.
 
-Also: **[Branching workflows](branching-workflows.md)**, the Git Flow, GitHub
+Also: **[Several remotes for one branch](multiple-remotes.md)**: push targets and pull
+sources, the Remotes dialog, Push to all or to selected remotes, resolving a remote that
+moved, Continue after a conflict, the CLI and a plain-git alias.
+
+**[Branching workflows](branching-workflows.md)**, the Git Flow, GitHub
 Flow, GitLab Flow and Trunk-based presets or your own bases, branch name patterns
 and topic types (`gitpoulpi flow ...`).
 

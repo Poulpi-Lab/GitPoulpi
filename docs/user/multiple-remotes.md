@@ -1,4 +1,4 @@
-**English**
+**English** · [Čeština](cs/multiple-remotes.md) · [Deutsch](de/multiple-remotes.md) · [Español](es/multiple-remotes.md) · [Français](fr/multiple-remotes.md) · [Italiano](it/multiple-remotes.md) · [日本語](ja/multiple-remotes.md) · [한국어](ko/multiple-remotes.md) · [Nederlands](nl/multiple-remotes.md) · [Polski](pl/multiple-remotes.md) · [Português (Brasil)](pt-BR/multiple-remotes.md) · [Português (Portugal)](pt-PT/multiple-remotes.md) · [Русский](ru/multiple-remotes.md) · [Svenska](sv/multiple-remotes.md) · [Türkçe](tr/multiple-remotes.md) · [Українська](uk/multiple-remotes.md) · [简体中文](zh-CN/multiple-remotes.md)
 
 # Several remotes for one branch
 

@@ -37,6 +37,9 @@ pub(crate) struct RefPill {
     pub(crate) combined_remote: bool,
     /// For a tag: where it lives (`tag_where_ui`); `None` for a branch.
     pub(crate) tag_where: Option<gitpoulpi_core::domain::TagWhere>,
+    /// For a local branch with extra push targets: where each remote
+    /// stands (the `⇉3` badge, `multi_remote_badge`).
+    pub(crate) multi_remote: Option<Vec<gitpoulpi_core::domain::RemoteTargetState>>,
 }
 
 impl RefPill {
@@ -84,19 +87,26 @@ pub(crate) fn ref_pills_for_commit(
     commit: Oid,
     refs: &[gitpoulpi_core::domain::Ref],
 ) -> Vec<RefPill> {
-    let mut locals: Vec<(String, bool)> = Vec::new();
+    type LocalEntry = (
+        String,
+        bool,
+        Option<Vec<gitpoulpi_core::domain::RemoteTargetState>>,
+    );
+    let mut locals: Vec<LocalEntry> = Vec::new();
     let mut remotes: Vec<(String, String)> = Vec::new(); // (remote alias, branch name)
     let mut tags: Vec<(String, Option<gitpoulpi_core::domain::TagWhere>)> = Vec::new();
     for r in refs.iter().filter(|r| r.target == commit) {
         match &r.kind {
-            RefKind::LocalBranch { name } => locals.push((name.clone(), r.is_head)),
+            RefKind::LocalBranch { name } => {
+                locals.push((name.clone(), r.is_head, r.multi_remote.clone()))
+            }
             RefKind::RemoteBranch { remote, name } => remotes.push((remote.clone(), name.clone())),
             RefKind::Tag { name } => tags.push((name.clone(), r.tag_where())),
         }
     }
 
     let mut pills = Vec::with_capacity(locals.len() + remotes.len() + tags.len());
-    for (name, is_head) in locals {
+    for (name, is_head, multi_remote) in locals {
         let combined_remote = if let Some(pos) = remotes.iter().position(|(_, rn)| *rn == name) {
             remotes.remove(pos);
             true
@@ -109,6 +119,7 @@ pub(crate) fn ref_pills_for_commit(
             checked_out: is_head,
             combined_remote,
             tag_where: None,
+            multi_remote,
         });
     }
     for (_remote, name) in remotes {
@@ -123,6 +134,7 @@ pub(crate) fn ref_pills_for_commit(
             checked_out: false,
             combined_remote: false,
             tag_where: None,
+            multi_remote: None,
         });
     }
     for (name, tag_where) in tags {
@@ -132,6 +144,7 @@ pub(crate) fn ref_pills_for_commit(
             checked_out: false,
             combined_remote: false,
             tag_where,
+            multi_remote: None,
         });
     }
     pills.sort_by_key(|p| (p.priority(), p.name.clone()));
@@ -254,12 +267,27 @@ pub(crate) fn ref_pill_spans(
     } else {
         display_width(" ") + display_width(" ") + display_width(&overflow) + display_width(" ")
     };
-    let chrome_width = display_width(" ")
+    let base_chrome = display_width(" ")
         + display_width(checkmark)
         + display_width(" ")
         + display_width(&icon)
         + display_width(" ")
         + overflow_chrome;
+    // The remotes badge (`\u{21c9}3`) of a branch with extra push targets: its
+    // own chip (a plain gap, then ` \u{21c9}3 `) before `+n`, and the first thing
+    // dropped when the name would otherwise have to be cut.
+    let remotes = first
+        .multi_remote
+        .as_deref()
+        .filter(|t| !t.is_empty() && popup_fill_width.is_none())
+        .map(crate::multi_remote_badge::compact_form)
+        .filter(|badge| {
+            base_chrome + display_width(badge) + 3 + display_width(&first.name) <= max_width
+        });
+    let chrome_width = base_chrome
+        + remotes
+            .as_deref()
+            .map_or(0, |badge| display_width(badge) + 3);
     let name_budget = max_width.saturating_sub(chrome_width).max(1);
     let name = truncate_with_ellipsis(&first.name, name_budget);
     let label = format!(" {checkmark}{name} {icon} ");
@@ -281,6 +309,14 @@ pub(crate) fn ref_pill_spans(
         style = style.add_modifier(Modifier::BOLD);
     }
     let mut spans = vec![Span::styled(label, style)];
+    if let (Some(badge), Some(targets)) = (remotes, first.multi_remote.as_deref()) {
+        let tint = crate::multi_remote_badge::color(crate::multi_remote_badge::health(targets));
+        spans.push(Span::raw(" ")); // uncolored gap between the chips
+        spans.push(Span::styled(
+            format!(" {badge} "),
+            Style::default().bg(tint).fg(contrasting_fg(tint)),
+        ));
+    }
     if !overflow.is_empty() {
         spans.push(Span::raw(" ")); // uncolored gap between the two chips
         spans.push(Span::styled(
@@ -326,6 +362,7 @@ pub(crate) fn ghost_pill_spans(
 mod tests {
     use super::*;
     use crate::graph::LANE_PALETTE;
+    use gitpoulpi_core::domain::RemoteRelation;
 
     fn pill(name: &str, kind: RefRowKind, checked_out: bool) -> RefPill {
         RefPill {
@@ -334,6 +371,7 @@ mod tests {
             checked_out,
             combined_remote: false,
             tag_where: None,
+            multi_remote: None,
         }
     }
 
@@ -614,5 +652,96 @@ mod tests {
             anchor_fill[..=anchor_edge].iter().all(|f| *f),
             "no holes inside the anchor row's colored block: {anchor_fill:?}"
         );
+    }
+    fn multi_pill(name: &str, targets: Vec<(&str, RemoteRelation)>) -> RefPill {
+        let mut p = pill(name, RefRowKind::Local, true);
+        p.multi_remote = Some(
+            targets
+                .into_iter()
+                .map(|(r, rel)| crate::multi_remote_badge::tests::target(r, rel))
+                .collect(),
+        );
+        p
+    }
+
+    fn badge_span<'a>(spans: &'a [Span<'static>]) -> Option<&'a Span<'static>> {
+        spans.iter().find(|s| s.content.contains('\u{21c9}'))
+    }
+
+    #[test]
+    fn a_branch_with_extra_targets_wears_a_coloured_badge_before_the_overflow_count() {
+        use gitpoulpi_core::domain::RemoteRelation as R;
+        for (rel, want) in [
+            (R::UpToDate, th().status.success),
+            (R::LocalAhead(1), th().status.warning),
+            (
+                R::Diverged {
+                    ahead: 1,
+                    behind: 1,
+                },
+                th().status.danger,
+            ),
+        ] {
+            let mut pills = vec![
+                multi_pill("main", vec![("origin", R::UpToDate), ("gitlab", rel)]),
+                pill("v1.0", RefRowKind::Tag, false),
+            ];
+            pills[0].checked_out = false;
+            let spans = ref_pill_spans(&pills, 60, LANE_PALETTE[0], None);
+            let (text, _) = render_spans(&spans);
+            let badge = text.find('\u{21c9}').expect("the badge is drawn");
+            assert!(text.contains("\u{21c9}2"), "{text}");
+            assert!(badge < text.find("+1").unwrap(), "badge before +n: {text}");
+            assert_eq!(badge_span(&spans).unwrap().style.bg, Some(want), "{rel:?}");
+        }
+    }
+
+    #[test]
+    fn the_badge_is_the_first_thing_dropped_when_the_name_would_be_cut() {
+        use gitpoulpi_core::domain::RemoteRelation as R;
+        let mut pills = vec![multi_pill(
+            "feature/login",
+            vec![("origin", R::UpToDate), ("gitlab", R::UpToDate)],
+        )];
+        pills[0].checked_out = false;
+        let mut plain = pill("feature/login", RefRowKind::Local, false);
+        plain.checked_out = false;
+        let (plain_text, _) = render_spans(&ref_pill_spans(&[plain], 80, LANE_PALETTE[0], None));
+        // With room for the name only: no badge, the name stays whole.
+        let tight = display_width(&plain_text);
+        let spans = ref_pill_spans(&pills, tight, LANE_PALETTE[0], None);
+        let (text, _) = render_spans(&spans);
+        assert!(!text.contains('\u{21c9}'), "{text}");
+        assert!(text.contains("feature/login"), "{text}");
+        // Room for the name and the badge: both.
+        let roomy = tight + display_width("\u{21c9}2") + 3;
+        let (text, _) = render_spans(&ref_pill_spans(&pills, roomy, LANE_PALETTE[0], None));
+        assert!(
+            text.contains("\u{21c9}2") && text.contains("feature/login"),
+            "{text}"
+        );
+        // One column short of that: the badge goes, not the name.
+        let (text, _) = render_spans(&ref_pill_spans(&pills, roomy - 1, LANE_PALETTE[0], None));
+        assert!(!text.contains('\u{21c9}'), "{text}");
+        assert!(text.contains("feature/login"), "{text}");
+        // No extra targets, no badge.
+        let plain = vec![pill("feature/login", RefRowKind::Local, false)];
+        let (text, _) = render_spans(&ref_pill_spans(&plain, roomy, LANE_PALETTE[0], None));
+        assert!(!text.contains('\u{21c9}'), "{text}");
+    }
+
+    #[test]
+    fn an_open_popup_hides_the_badge_so_the_block_stays_in_its_column() {
+        use gitpoulpi_core::domain::RemoteRelation as R;
+        let pills = vec![
+            multi_pill(
+                "main",
+                vec![("origin", R::UpToDate), ("gitlab", R::UpToDate)],
+            ),
+            pill("dev", RefRowKind::Local, false),
+        ];
+        let (text, filled) = render_spans(&ref_pill_spans(&pills, 40, LANE_PALETTE[0], Some(40)));
+        assert!(!text.contains('\u{21c9}'), "{text}");
+        assert!(filled.len() <= 40);
     }
 }

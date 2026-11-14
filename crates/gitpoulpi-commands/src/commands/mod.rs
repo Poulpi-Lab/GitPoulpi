@@ -33,6 +33,7 @@ mod branch;
 pub(crate) mod conflicts;
 mod flow;
 pub(crate) mod flow_run;
+mod group_run;
 #[cfg(feature = "lfs")]
 mod lfs;
 #[cfg(feature = "mermaid")]
@@ -1339,9 +1340,35 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
         }
 
         Commands::Pull {
+            all_sources: true,
+            mode,
+            autostash,
+            branch,
+            resolve,
+            no_preflight,
+            ..
+        } => {
+            group_run::run_group(
+                session,
+                group_run::Group {
+                    mode: gitpoulpi_core::domain::GroupMode::Pull,
+                    branch,
+                    to: Vec::new(),
+                    resolve,
+                    no_preflight,
+                    tags: false,
+                    yes: false,
+                    autostash,
+                    pull_mode: Some(mode),
+                },
+            )
+            .await
+        }
+        Commands::Pull {
             remote,
             mode,
             autostash,
+            ..
         } => {
             let opts = PullOptions {
                 mode: match mode {
@@ -1371,10 +1398,37 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
         }
 
         Commands::Push {
+            branch,
+            all_targets,
+            to,
+            resolve,
+            no_preflight,
+            tags,
+            yes,
+            ..
+        } if all_targets || !to.is_empty() => {
+            group_run::run_group(
+                session,
+                group_run::Group {
+                    mode: gitpoulpi_core::domain::GroupMode::Push,
+                    branch,
+                    to,
+                    resolve,
+                    no_preflight,
+                    tags,
+                    yes,
+                    autostash: false,
+                    pull_mode: None,
+                },
+            )
+            .await
+        }
+        Commands::Push {
             remote,
             branch,
             set_upstream,
             force_with_lease,
+            ..
         } => {
             let remote = default_remote(session, remote).await?;
             let opts = PushOptions {

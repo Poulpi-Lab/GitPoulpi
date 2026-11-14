@@ -317,3 +317,82 @@ async fn remote_group_status_reads_each_remote_from_local_refs() {
         rig.stop().await;
     }
 }
+
+fn set_default_targets(repo: &FixtureRepo, targets: &[&str]) {
+    let path = gitpoulpi_session::RepoState::path_for(
+        repo.root(),
+        gitpoulpi_config::DEFAULT_REPO_DATA_LOCATION,
+    );
+    let mut state = gitpoulpi_session::RepoState::load(&path).unwrap_or_default();
+    state.preferences.default_push_targets = targets.iter().map(|t| t.to_string()).collect();
+    state.save(&path).unwrap();
+}
+
+#[tokio::test]
+async fn the_first_push_of_a_branch_copies_the_repository_default_targets() {
+    for (name, backend) in backends() {
+        let repo = three_remotes();
+        repo.git(&["checkout", "-q", "-b", "feat"]);
+        // The upstream's own remote and an unknown one are left out.
+        set_default_targets(&repo, &["origin", "gitlab", "nowhere", "backup"]);
+        let mut rig = Rig::new(backend, repo).await;
+        rig.ok(
+            OperationKind::Push,
+            json!({ "remote": "origin", "opts": { "set_upstream": true } }),
+        )
+        .await;
+        assert_eq!(
+            rig.all("branch.feat.gitpoulpi-push-to"),
+            vec!["gitlab", "backup"],
+            "{name}"
+        );
+        assert_eq!(rig.all("branch.feat.remote"), vec!["origin"], "{name}");
+
+        // A branch that already has an upstream keeps its own targets.
+        rig.ok(
+            OperationKind::BranchSetRemotes,
+            json!({ "branch": "feat", "push_to": ["backup"] }),
+        )
+        .await;
+        rig.ok(
+            OperationKind::Push,
+            json!({ "remote": "origin", "opts": { "set_upstream": true } }),
+        )
+        .await;
+        assert_eq!(
+            rig.all("branch.feat.gitpoulpi-push-to"),
+            vec!["backup"],
+            "{name}"
+        );
+        rig.stop().await;
+    }
+}
+
+#[tokio::test]
+async fn a_branch_created_with_tracking_gets_the_default_targets_and_none_without() {
+    for (name, backend) in backends() {
+        let repo = three_remotes();
+        let mut rig = Rig::new(backend, repo).await;
+        rig.ok(
+            OperationKind::BranchCreateTracking,
+            json!({ "local_name": "plain", "upstream": "origin/main" }),
+        )
+        .await;
+        assert!(
+            rig.all("branch.plain.gitpoulpi-push-to").is_empty(),
+            "{name}: no default configured"
+        );
+        set_default_targets(&rig.repo, &["gitlab"]);
+        rig.ok(
+            OperationKind::BranchCreateTracking,
+            json!({ "local_name": "tracked", "upstream": "origin/main" }),
+        )
+        .await;
+        assert_eq!(
+            rig.all("branch.tracked.gitpoulpi-push-to"),
+            vec!["gitlab"],
+            "{name}"
+        );
+        rig.stop().await;
+    }
+}

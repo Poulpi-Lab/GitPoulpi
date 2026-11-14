@@ -26,6 +26,9 @@ pub(crate) enum HitTarget {
     Prompt(crate::prompt_dialog::PromptPart),
     /// The `+` on the REMOTE section's header: Add remote.
     AddRemoteButton,
+    /// The remotes badge of a local branch with extra push targets in the
+    /// Refs sidebar (`multi_remote_badge`): opens that branch's remotes.
+    RefRemotesBadge(String),
     /// The Status pane's "Git LFS is not installed" banner: opens the
     /// install page (the palette's `LFS: Open install page` is its
     /// keyboard twin).
@@ -553,6 +556,7 @@ pub(crate) fn desired_cursor_shape(
             | HitTarget::RewordForm(_)
             | HitTarget::Prompt(_)
             | HitTarget::AddRemoteButton
+            | HitTarget::RefRemotesBadge(_)
             | HitTarget::LfsInstallLink
             | HitTarget::Gear
             | HitTarget::About

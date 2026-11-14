@@ -156,7 +156,23 @@ pub(super) async fn dispatch_network_plain(
                 .get("opts")
                 .and_then(|v| serde_json::from_value(v.clone()).ok())
                 .unwrap_or_default();
-            to_json!(backend.push(&repo, &remote, &opts).await)
+            // The first push of a branch (it has no upstream yet and this
+            // one records it) also gives it the repository's default extra
+            // push targets. Not journaled: it belongs to the push, which is
+            // never undone.
+            let first_upstream = if opts.set_upstream {
+                opts.branch
+                    .clone()
+                    .or_else(|| crate::remote_keys::head_branch(backend, &repo))
+                    .filter(|b| !crate::remote_keys::has_upstream(backend, &repo, b))
+            } else {
+                None
+            };
+            let pushed = backend.push(&repo, &remote, &opts).await;
+            if let (Some(branch), Ok(_)) = (&first_upstream, &pushed) {
+                crate::remote_keys::apply_default_targets(backend, &repo, branch, &remote);
+            }
+            to_json!(pushed)
         }
         // A rewrite pushed back: every ref with its own recorded lease, one
         // atomic push per remote. A refusal is a per-ref status in the

@@ -261,6 +261,7 @@ The merge conflict editor ([Resolving merge conflicts](merge-conflicts.md)). Set
 |---|---|---|
 | `git.pull_mode` | `"merge"` | What Pull (button, `Ctrl+G p`, `Git: Pull`) does: `merge` (fast-forward when possible), `ff_only`, `rebase`. Always passed to git explicitly. The old `fetch_all` reads as `merge`. |
 | `git.push_behavior` | `"direct"` | `direct` pushes to the default remote; `ask` shows the remote menu first. |
+| `git.push_group_preflight` | `true` | Before pushing a branch to several remotes, check every target first (`ls-remote`, plus a fetch of that remote only when it differs), so a problem on a later remote is found before the first push. |
 | `git.merge_fast_forward` | `"never"` | What a merge you start (branch menu, drag and drop, palette, `gitpoulpi merge`) does when the branch could be fast-forwarded: `never` always makes a merge commit (`--no-ff`), `allowed` fast-forwards when possible (git's default, `merge.ff` applies), `only` fast-forwards or refuses. A repository's own choice (Settings > Merge options, `merge_fast_forward` in its `repo-state.toml`) wins; the CLI's `--ff`, `--no-ff` and `--ff-only` win over both. Live. |
 | `git.default_encoding` | `"utf-8"` | Encoding for text that is **not** valid UTF-8 (file contents, blame, diffs, commit messages without an `encoding` header): any WHATWG label (`windows-1252`, `shift_jis`, ...). Display only; staging never re-encodes. A repository can override it. |
 | `git.lfs_enabled` | `true` | Show and drive Git LFS. A repository can override it. See [Git LFS](lfs.md). |

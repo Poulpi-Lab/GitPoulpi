@@ -633,6 +633,11 @@ inherited = "（继承）"
 lfs_not_checked = "（尚未检查）"
 lfs_autofix_filters = { git = "在 {$pull} 和 {$push} 之前安装 LFS 过滤器", local = "在{$pull}和{$push}之前安装 LFS 过滤器" }
 lfs_autofix_filters_help = { git = "在使用 Git LFS 的仓库中 {$pull} 或 {$push} 之前，如果缺少 LFS 过滤器或钩子，就运行 `git lfs install --local`（只改该仓库自己的配置，绝不改全局配置），让传输能处理大文件。状态栏会提示。需要 git-lfs。", local = "在使用 Git LFS 的仓库中{$pull}或{$push}之前，如果缺少 LFS 过滤器或钩子，就运行 `git lfs install --local`（只改该仓库自己的配置，绝不改全局配置），让传输能处理大文件。状态栏会提示。需要 git-lfs。" }
+push_group_preflight = "Check every remote before a {$push}"
+push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
+default_push_targets = "Extra {$push} targets for new branches"
+default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
+default_push_targets_none = "(no remote configured)"
 
 [settings_screen]
 title = "设置 - Tab：分区/设置 │ Enter：更改"
@@ -2532,6 +2537,7 @@ log_columns_fit_all = "按内容调整所有列宽度"
 log_scroll_left = "向左滚动各列"
 log_scroll_right = "向右滚动各列"
 log_columns_layout = "横向滚动或适应窗格"
+refs_remotes = "Branch: Edit its Remotes"
 
 
 [keymap_ctx]
@@ -4039,6 +4045,7 @@ rewrite_9 = "打开“大小”标签页并分析历史：最大的文件和文�
 rewrite_host_howto = { git = "说明如何让重写通过受主机保护的分支：解除保护、以新名称 {$push}，或重建仓库；不会替你执行任何操作", local = "说明如何让重写通过受主机保护的分支：解除保护、以新名称{$push}，或重建仓库；不会替你执行任何操作" }
 rewrite_ai_rules = "用 AI 根据你的描述创建重写规则（不会预览也不会应用任何内容）"
 log_columns_2 = "在各列保持宽度时横向滚动 Log 的列（即列选择器、设置中选择的“横向滚动”布局，或选中某列时按 s）；在“适应窗格”布局中，所有列都适应窗格"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} 或右键"
@@ -9670,3 +9677,16 @@ aborted = "Grouped {$push} aborted."
 running = "Grouped {$push}..."
 # context: question before aborting a paused grouped push; {branch} is the local branch, {remote} the remote whose merge or rebase stopped
 abort_confirm = "Abort the grouped {$push} of {branch} (stopped on {remote})?\nThe {$merge} or {$rebase} in progress is thrown away. What was already sent stays."
+[multi_remote]
+state_new = "new"
+state_gone = "gone"
+state_unrelated = "unrelated"
+tip_title = "Remotes of {branch}"
+tip_in_sync = "{remote}: in sync"
+tip_ahead = "{remote}: {n} ahead"
+tip_behind = "{remote}: {n} behind"
+tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
+tip_new = "{remote}: no copy of this branch yet"
+tip_unrelated = "{remote}: no common history"
+tip_gone = "{remote}: no longer configured"
+tip_open_hint = "Click to edit the remotes of this branch"

@@ -120,6 +120,56 @@ pub enum RemoteGroupAction {
         #[arg(long)]
         branch: Option<String>,
     },
+    /// What a grouped push (or, with `--pull`, a grouped pull) would do,
+    /// remote by remote: where each stands, the suggested action and the
+    /// others allowed. Asks the remotes (`ls-remote`, a fetch of the ones
+    /// whose tip is unknown) unless `--no-preflight`; changes nothing.
+    Plan {
+        /// The branch (default: the current one).
+        #[arg(long)]
+        branch: Option<String>,
+        /// Plan a push to exactly these remotes (`<remote>` or
+        /// `<remote>:<dst>`, repeatable) instead of the configured targets.
+        #[arg(long = "to", conflicts_with = "pull")]
+        to: Vec<String>,
+        /// Plan the grouped pull (the primary and the pull sources).
+        #[arg(long)]
+        pull: bool,
+        /// Do not ask the remotes: use the remote-tracking refs as they are.
+        #[arg(long)]
+        no_preflight: bool,
+    },
+    /// Resume the saved grouped run once its merge or rebase is concluded
+    /// (never automatic). Answers a `needs_resolution` with `--resolve`.
+    Continue {
+        /// The saved run's id, to be sure it is still the one meant.
+        #[arg(long)]
+        run: Option<String>,
+        /// `REMOTE=push|ff|merge|rebase|force|skip` (repeatable): the
+        /// decision for a remote the previous answer asked about.
+        #[arg(long = "resolve")]
+        resolve: Vec<String>,
+        /// Confirm the force pushes named by `--resolve`.
+        #[arg(long)]
+        yes: bool,
+        /// The branch (default: the current one); only read with `--resolve`.
+        #[arg(long)]
+        branch: Option<String>,
+    },
+    /// Drop the saved grouped run: aborts the merge or rebase it started.
+    /// Pushes already done stay.
+    Abort {
+        /// The saved run's id, to be sure it is still the one meant.
+        #[arg(long)]
+        run: Option<String>,
+    },
+    /// Run again the targets of the saved run that failed, were canceled
+    /// mid-push or were never attempted.
+    Retry {
+        /// The saved run's id, to be sure it is still the one meant.
+        #[arg(long)]
+        run: Option<String>,
+    },
 }
 
 #[cfg(feature = "worktree")]

@@ -51,6 +51,13 @@ gitpoulpi --json branch upstream add gitlab[:dst] [--pull]   # extra push target
 gitpoulpi --json checkout feature --autostash
 gitpoulpi --json pull --mode ff-only
 gitpoulpi --json push -u
+gitpoulpi --json push --all-targets         # primary + extra push targets: plans, runs when every remote is a plain push (exit 0);
+                                            # exit 3 {"needs_resolution": {plan}} = nothing changed, decide per remote:
+gitpoulpi --json push --all-targets --resolve gitlab=merge --resolve backup=skip   # push|ff|merge|rebase|force|skip; force also needs --yes (else exit 3)
+gitpoulpi --json push --to gitlab --to backup:feat-x   # one-off selection, config untouched; same plan/--resolve/run
+                                            # exit 4 = a remote failed (see targets[].status; `remote-group retry`) or a merge stopped on conflicts ("stopped"):
+                                            # resolve and conclude the merge (`conflicts ...`), then `remote-group continue` (never automatic) or `remote-group abort`
+gitpoulpi --json remote-group plan [--pull] # read the plan alone; `pull --all-sources` pulls the primary + pull sources the same way
 gitpoulpi --json rebase-plan main          # build a plan, then:
 gitpoulpi --json rebase main --interactive --plan plan.json
 gitpoulpi --json split-source HEAD~1       # number a commit's hunks, then:

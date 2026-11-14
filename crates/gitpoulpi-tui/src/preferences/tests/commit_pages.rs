@@ -311,3 +311,62 @@ fn the_global_fast_forward_row_defaults_to_never() {
         .expect("the global row");
     assert!(matches!(row.control, Control::Choice { index: 0, .. }));
 }
+
+#[test]
+fn the_git_page_has_a_checkbox_per_remote_for_new_branch_push_targets() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state_at(dir.path(), "GitAndEncoding");
+    // No remote: a heading and a note, nothing to tick.
+    let none = st.fields();
+    assert!(none
+        .iter()
+        .any(|f| f.label == "Extra push targets for new branches"));
+    assert!(none.iter().any(|f| f.label == "(no remote configured)"));
+
+    st.set_remote_names(&["origin".into(), "gitlab".into(), "backup".into()]);
+    let labels: Vec<String> = st.fields().iter().map(|f| f.label.clone()).collect();
+    let heading = labels
+        .iter()
+        .position(|l| l == "Extra push targets for new branches")
+        .unwrap();
+    assert_eq!(
+        &labels[heading + 1..heading + 4],
+        ["origin", "gitlab", "backup"]
+    );
+    assert!(!toggled(&st, "gitlab"));
+
+    // Ticking saves into the repository's own data, in the remotes' order.
+    select(&mut st, "backup");
+    st.activate();
+    select(&mut st, "gitlab");
+    st.activate();
+    assert!(toggled(&st, "gitlab") && toggled(&st, "backup") && !toggled(&st, "origin"));
+    assert_eq!(saved(dir.path()).default_push_targets, ["gitlab", "backup"]);
+    // Unticking removes it; an empty list is not written at all.
+    select(&mut st, "gitlab");
+    st.activate();
+    select(&mut st, "backup");
+    st.activate();
+    assert!(saved(dir.path()).default_push_targets.is_empty());
+    let raw = std::fs::read_to_string(RepoState::path_for(dir.path(), ".gitpoulpi")).unwrap();
+    assert!(!raw.contains("default_push_targets"), "{raw}");
+}
+
+#[test]
+fn the_group_preflight_row_is_a_global_toggle_on_by_default_and_saved_to_config() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state_at(dir.path(), "GitAndEncoding");
+    assert!(toggled(&st, "Check every remote before a push"));
+    let help = st
+        .fields()
+        .iter()
+        .find(|f| f.label.starts_with("Check every remote"))
+        .and_then(|f| f.help.clone())
+        .unwrap();
+    assert!(help.contains("third remote"), "{help}");
+    select(&mut st, "Check every remote");
+    st.activate();
+    assert!(!toggled(&st, "Check every remote before a push"));
+    let raw = std::fs::read_to_string(dir.path().join("config.toml")).unwrap();
+    assert!(raw.contains("push_group_preflight = false"), "{raw}");
+}

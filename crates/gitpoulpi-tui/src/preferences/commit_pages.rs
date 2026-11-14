@@ -247,6 +247,19 @@ impl PreferencesState {
             RepoField::TemplateApply => prefs.template_apply = Some(value),
             RepoField::TemplateStripComments => prefs.template_strip_comments = Some(value),
             RepoField::ConflictDetection => prefs.conflict_detection = Some(value),
+            RepoField::PushTarget(i) => {
+                let Some(remote) = self.remote_names.get(i).cloned() else {
+                    return;
+                };
+                let targets = &mut prefs.default_push_targets;
+                targets.retain(|t| *t != remote);
+                if value {
+                    targets.push(remote);
+                    // Keep the order of the remotes, which is the push order.
+                    let names = &self.remote_names;
+                    targets.sort_by_key(|t| names.iter().position(|n| n == t));
+                }
+            }
             _ => return,
         }
         self.write_repo_state();

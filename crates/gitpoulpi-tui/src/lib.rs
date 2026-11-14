@@ -301,6 +301,7 @@ mod message_links;
 #[cfg(feature = "hosting")]
 mod meta_picker;
 mod modes;
+mod multi_remote_badge;
 mod open_in_bar;
 #[cfg(test)]
 mod open_time_bench;

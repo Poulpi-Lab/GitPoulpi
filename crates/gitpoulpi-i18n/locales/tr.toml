@@ -634,6 +634,11 @@ inherited = "(devralınan)"
 lfs_not_checked = "(henüz denetlenmedi)"
 lfs_autofix_filters = "{$pull} ve {$push} öncesinde LFS filtrelerini kur"
 lfs_autofix_filters_help = "Git LFS kullanan bir depoda {$pull} veya {$push} öncesinde LFS filtreleri ya da hook'lar eksikse `git lfs install --local` çalıştırır (yalnızca deponun kendi yapılandırması, asla genel olan değil); böylece aktarım büyük dosyaları işler. Durum çubuğu bunu bildirir. git-lfs gerekir."
+push_group_preflight = "Check every remote before a {$push}"
+push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
+default_push_targets = "Extra {$push} targets for new branches"
+default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
+default_push_targets_none = "(no remote configured)"
 
 [settings_screen]
 title = "Ayarlar - Tab: bölümler/ayarlar │ Enter: değiştir"
@@ -2533,6 +2538,7 @@ log_columns_fit_all = "Tüm Sütunları İçeriğe Sığdır"
 log_scroll_left = "Sütunları Sola Kaydır"
 log_scroll_right = "Sütunları Sağa Kaydır"
 log_columns_layout = "Yana Kaydır veya Bölmeye Sığdır"
+refs_remotes = "Branch: Edit its Remotes"
 
 
 [keymap_ctx]
@@ -4039,6 +4045,7 @@ rewrite_9 = "Boyut sekmesini açar ve geçmişi analiz eder: en büyük dosyalar
 rewrite_host_howto = { git = "yeniden yazılan geçmişin barındırıcının koruduğu bir daldan nasıl geçirileceğini açıklar: korumayı kaldırın, yeni bir adla push edin veya depoyu yeniden oluşturun; sizin yerinize hiçbir şey yapılmaz", local = "yeniden yazılan geçmişin barındırıcının koruduğu bir daldan nasıl geçirileceğini açıklar: korumayı kaldırın, yeni bir adla gönderin veya depoyu yeniden oluşturun; sizin yerinize hiçbir şey yapılmaz" }
 rewrite_ai_rules = "açıklamanızdan YZ ile yeniden yazma kurallarını oluşturur (hiçbir şey önizlenmez veya uygulanmaz)"
 log_columns_2 = "sütunlar genişliklerini koruyorsa Log'un sütunlarını yana kaydır (sütun seçicide, Ayarlar'da ya da bir sütun seçiliyken s ile seçilen Yana kaydır düzeni); sığdırma düzeninde her sütun bölmeye sığar"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} veya sağ tık"
@@ -9673,3 +9680,16 @@ aborted = "Grouped {$push} aborted."
 running = "Grouped {$push}..."
 # context: question before aborting a paused grouped push; {branch} is the local branch, {remote} the remote whose merge or rebase stopped
 abort_confirm = "Abort the grouped {$push} of {branch} (stopped on {remote})?\nThe {$merge} or {$rebase} in progress is thrown away. What was already sent stays."
+[multi_remote]
+state_new = "new"
+state_gone = "gone"
+state_unrelated = "unrelated"
+tip_title = "Remotes of {branch}"
+tip_in_sync = "{remote}: in sync"
+tip_ahead = "{remote}: {n} ahead"
+tip_behind = "{remote}: {n} behind"
+tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
+tip_new = "{remote}: no copy of this branch yet"
+tip_unrelated = "{remote}: no common history"
+tip_gone = "{remote}: no longer configured"
+tip_open_hint = "Click to edit the remotes of this branch"

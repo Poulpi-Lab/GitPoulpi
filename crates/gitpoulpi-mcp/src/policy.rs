@@ -9,6 +9,9 @@ use crate::registry::ToolSpec;
 const READ_ONLY: &[&[&str]] = &[
     &["status"],
     &["remote-group", "status"],
+    // Asks the remotes (ls-remote, a selective fetch) and answers what a
+    // grouped push or pull would do; changes no ref.
+    &["remote-group", "plan"],
     // Pages of a reflog / of the commits no ref reaches.
     &["reflog"],
     &["lost-commits"],
@@ -156,6 +159,11 @@ const DESTRUCTIVE: &[&[&str]] = &[
     &["index-lock", "remove"],
     &["conflicts", "skip"],
     &["rebase"],
+    // Drops the saved grouped run and aborts the merge or rebase it started.
+    &["remote-group", "abort"],
+    // Resumes the saved run: pushes to every remote, and with `--resolve
+    // REMOTE=force --yes` force-pushes (with leases), like `push`.
+    &["remote-group", "continue"],
     // Branching workflow actions that merge, rebase and delete (undoable,
     // except what they push or open on the host).
     &["flow", "finish"],
@@ -439,6 +447,8 @@ mod tests {
             "reset",
             "rm_file",
             "push",
+            "remote_group_abort",
+            "remote_group_continue",
             "undo",
             "redo",
             "reflog_restore",
@@ -466,7 +476,7 @@ mod tests {
             .map(|s| s.name)
             .collect();
         got.sort();
-        assert_eq!(got.len(), 39, "destructive set changed: {got:?}");
+        assert_eq!(got.len(), 41, "destructive set changed: {got:?}");
     }
 
     #[cfg(feature = "full")]

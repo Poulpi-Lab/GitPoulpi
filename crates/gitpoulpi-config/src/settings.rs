@@ -170,6 +170,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "git.lfs_enabled",
     "git.lfs_autofix_filters",
     "git.push_behavior",
+    "git.push_group_preflight",
     "git.merge_fast_forward",
     "ssh.key_type",
     "ssh.private_key_path",
@@ -576,6 +577,12 @@ mod tests {
         assert!(Config::default().git.lfs_enabled);
         assert!(Settings::key_is_implemented("git.lfs_autofix_filters"));
         assert!(Config::default().git.lfs_autofix_filters);
+    }
+
+    #[test]
+    fn the_push_group_preflight_is_implemented_and_on_by_default() {
+        assert!(Settings::key_is_implemented("git.push_group_preflight"));
+        assert!(Config::default().git.push_group_preflight);
     }
 
     #[test]

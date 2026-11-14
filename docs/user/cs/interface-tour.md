@@ -203,8 +203,10 @@ jejich velikost.
 - **LOKÁLNÍ**: vaše větve ve složkách podle `/` (`feature/`, `fix/`). Zatržítko
   označuje přepnutou větev. Složky můžete v Nastavení vypnout.
 - **REMOTE**: každý remote s jeho větvemi pod ním.
-- **WORKTREES**: propojené worktree, pokud nějaké jsou. Dvojitým kliknutím
-  otevřete worktree na vlastní kartě.
+- **WORKTREES**: propojené worktrees, pokud nějaké jsou (nebo pokud jste sekci
+  zobrazili). Tlačítko **+** v jejím záhlaví worktree vytvoří; dvojitým kliknutím
+  otevřete worktree na vlastní kartě, pravým tlačítkem na něm získáte Otevřít v,
+  Merge a Odebrat. Viz [Worktrees](worktrees.md).
 - **STASHES**: vaše stashe. Kliknutím pravým tlačítkem zobrazíte **Pop**,
   **Apply** a **Drop**.
 - **TAGS**: vaše tagy, ve složkách dělených podle `/` jako větve (`releases/`, `backups/`). Šipka znamená, že tag je i na remote.

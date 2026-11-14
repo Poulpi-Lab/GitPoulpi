@@ -166,7 +166,8 @@ tlačítko nebo zaškrtávací políčko je použijete.
 
 - **Kliknutím** na řádek ho vyberete. **Dvojklikem** na lokální větev nebo tag
   ji přepnete (checkout). **Dvojklikem** na worktree nebo submodul ho otevřete
-  na kartě.
+  na kartě. Tlačítko **+** v záhlaví WORKTREES worktree vytvoří; pravým
+  tlačítkem na worktree získáte Otevřít na nové kartě, Otevřít v, Merge a Odebrat ([Worktrees](worktrees.md)).
 - **Najeďte** na řádek, aby se vlevo zobrazila ikona. **Kliknutím** na ni ref
   v Logu skryjete, nebo znovu zobrazíte. Při zapnutém **Solo** na stejném
   místě dáte ref do solo. Na řádku složky ikona působí na každý ref ve složce.

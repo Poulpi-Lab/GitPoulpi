@@ -515,7 +515,9 @@ Upravuje seznam tlačítka **Otevřít v** v záhlaví. Karta **Obecné** obsahu
 tlačítka složky **Konec a cd sem**, **Výchozí položku** a **Obnovit zjištěné výchozí
 hodnoty**. Karta **Položky** je [seznam](#seznamy) (každá položka má popisek a
 příkaz): **+ Přidat ▾** nabízí předvolby a **Vlastní** a výchozí položka je
-označena `★`. Pole vybrané položky zahrnují tlačítko **Vyzkoušet**. Viz [Otevřít v](open-in.md).
+označena `★`. Pole vybrané položky zahrnují **Může otevřít worktree** (ve výchozím
+stavu zaškrtnuto: položka se nabízí v nabídce Otevřít v u řádku worktree, viz
+[Worktrees](worktrees.md)) a tlačítko **Vyzkoušet**. Viz [Otevřít v](open-in.md).
 
 První řádek, **Sledovat složku aktivní karty**, má dvě hodnoty:
 

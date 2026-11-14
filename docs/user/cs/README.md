@@ -71,6 +71,8 @@ budete potřebovat.
     Co projde přes tmux, zellij, screen, herdr a panely terminálu:
     **[Multiplexery](multiplexers.md)**.
 
+Také: **[Worktrees](worktrees.md)**: vytváření, otevírání, merge a odebírání propojených worktrees.
+
 Také: **[Několik remote pro jednu větev](multiple-remotes.md)**: cíle push a zdroje
 pull, dialog Remote, Push na všechny nebo vybrané remote, řešení remote, který se posunul,
 Pokračovat po konfliktu, CLI a alias pro obyčejný git.

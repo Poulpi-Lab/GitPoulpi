@@ -643,6 +643,7 @@ die Standardtasten.
 | Git: Pull-Optionen... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push an Remote... |  |
+| Git: Push to Selected Remotes... |  |
 | Git: Force-Push (mit Lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remote: Remote hinzufügen... |  |

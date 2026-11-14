@@ -9786,7 +9786,7 @@ run_problems = "Some remotes failed. Retry them, or close."
 # context: key hints of the selection step
 hint_select = "Up/Down move  Space tick  m remember  Enter next  Esc close"
 # context: key hints of the plan step
-hint_plan = "Up/Down row  Left/Right action  Enter list  s skip  t tags  f again  Ctrl+Enter run  Esc close"
+hint_plan = "Up/Down row  Left/Right action  Enter list  s skip  t {$tags}  f again  Ctrl+Enter run  Esc close"
 # context: key hints of the progress step
 hint_run = "Esc close  r retry failed"
 # context: text of the strip over the Log while a grouped push waits for the conflicts of a remote to be resolved; {remote} is that remote

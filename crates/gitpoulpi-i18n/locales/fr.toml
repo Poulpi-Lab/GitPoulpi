@@ -3132,7 +3132,7 @@ git_push = "Git : {$Push}"
 git_push_to_remote = "Git : {$Push} vers un distant..."
 git_force_push_with_lease = { git = "Git : {$Push} forcé (avec lease)...", local = "Git : Pousser de force (avec lease)..." }
 git_remotes_of_branch = "Git : Remotes de la branche..."
-git_push_to_selected_remotes = "Git : {$Push} vers des distants choisis..."
+git_push_to_selected_remotes = "Git : {$Push} vers des distants choisis..."
 remote_add_remote = "Distant : Ajouter un distant..."
 remote_remove_remote = "Distant : Supprimer un distant..."
 remote_edit_remote = "Distant : Modifier un distant..."
@@ -9676,7 +9676,7 @@ run_problems = "Certains distants ont échoué. Réessayez-les, ou fermez."
 # context: key hints of the selection step
 hint_select = "Haut/Bas déplacer  Espace cocher  m mémoriser  Entrée suivant  Échap fermer"
 # context: key hints of the plan step
-hint_plan = "Haut/Bas ligne  Gauche/Droite action  Entrée liste  s ignorer  t tags  f relancer  Ctrl+Entrée lancer  Échap fermer"
+hint_plan = "Haut/Bas ligne  Gauche/Droite action  Entrée liste  s ignorer  t {$tags}  f relancer  Ctrl+Entrée lancer  Échap fermer"
 # context: key hints of the progress step
 hint_run = "Échap fermer  r réessayer"
 # context: text of the strip over the Log while a grouped push waits for the conflicts of a remote to be resolved; {remote} is that remote

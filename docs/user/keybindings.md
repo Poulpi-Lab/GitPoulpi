@@ -648,6 +648,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Git: Pull Options... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push to Remote... |  |
+| Git: Push to Selected Remotes... |  |
 | Git: Force Push (with lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remote: Add Remote... |  |

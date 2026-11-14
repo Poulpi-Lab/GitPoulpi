@@ -646,6 +646,7 @@ As teclas são as padrão.
 | Git: opções de pull... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push para um remoto... |  |
+| Git: Push to Selected Remotes... |  |
 | Git: force push (com lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remoto: adicionar remoto... |  |

@@ -650,6 +650,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Git : Options de pull... |  |
 | Git : Push | `Ctrl+G P` |
 | Git : Push vers un distant... |  |
+| Git : Push vers des distants choisis... |  |
 | Git : Push forcé (avec lease)... |  |
 | Git : Remotes de la branche... |  |
 | Distant : Ajouter un distant... |  |

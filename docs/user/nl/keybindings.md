@@ -652,6 +652,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Git: Pull-opties... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Pushen naar remote... |  |
+| Git: Push to Selected Remotes... |  |
 | Git: Force push (met lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remote: Remote toevoegen... |  |

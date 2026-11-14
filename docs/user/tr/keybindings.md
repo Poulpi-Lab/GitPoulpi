@@ -648,6 +648,7 @@ Tuşlar varsayılanlardır.
 | Git: Pull Seçenekleri... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Uzak Depoya Push Et... |  |
+| Git: Push to Selected Remotes... |  |
 | Git: Force Push (lease ile)... |  |
 | Git: Remotes of Branch... |  |
 | Remote: Uzak Depo Ekle... |  |

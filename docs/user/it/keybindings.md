@@ -652,6 +652,7 @@ applicano. I tasti sono quelli predefiniti.
 | Git: Opzioni di pull... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push verso un remoto... |  |
+| Git: Push to Selected Remotes... |  |
 | Git: Force push (con lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remoto: Aggiungi remoto... |  |

@@ -614,6 +614,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Git: Pullのオプション... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: リモートへPush... |  |
+| Git: Push to Selected Remotes... |  |
 | Git: 強制Push（リース付き）... |  |
 | Git: Remotes of Branch... |  |
 | リモート: リモートを追加... |  |

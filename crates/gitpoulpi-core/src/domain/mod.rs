@@ -18,6 +18,7 @@ mod reflog;
 mod refs;
 mod remote_group;
 mod remote_group_plan;
+mod remote_group_run;
 mod repo;
 mod repo_auth;
 mod restore;
@@ -102,6 +103,11 @@ pub use remote_group::{
 pub use remote_group_plan::{
     classify, normalize_url, suggest, GroupAction, GroupMode, PlannedTarget, RelationFacts,
     RemoteClass, RemoteGroupPlan, RemoteGroupPlanRequest, SuggestContext, Suggestion,
+};
+pub use remote_group_run::{
+    GroupResume, GroupRunStatus, Integration, PendingGroup, RemoteGroupOutcome,
+    RemoteGroupRunRequest, RunTarget, StateTarget, StoppedAt, StoppedOp, TargetResult,
+    TargetStatus, REMOTE_GROUP_STATE_VERSION,
 };
 pub use repo::{
     CommitGraph, CommitNode, DiscoveredRepo, Oid, Remote, RepoId, RepoRef, WorkingTree,

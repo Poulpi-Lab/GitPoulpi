@@ -446,7 +446,10 @@ async fn dispatch_network_authed(
     }
     if !matches!(
         request.command,
-        OperationKind::FetchRefAsBranch | OperationKind::Pull | OperationKind::FlowRun
+        OperationKind::FetchRefAsBranch
+            | OperationKind::Pull
+            | OperationKind::FlowRun
+            | OperationKind::RemoteGroupRun
     ) {
         return dispatch_network_plain(backend, request, events).await;
     }

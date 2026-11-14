@@ -123,6 +123,13 @@ pub enum OperationKind {
     /// each against the fresh state and suggests an action per row. Changes
     /// no branch; the fetch moves tracking refs (see `domain::remote_group_plan`).
     RemoteGroupPlan,
+    /// Run a grouped push or pull of one branch over its remotes
+    /// (`domain::remote_group_run`): integrations first, then the pushes
+    /// one remote at a time, each with its own status. The local part (a
+    /// fast-forward, merge or rebase) is one journaled entry like
+    /// `FlowRun`; the pushes are never undone. A conflict leaves a saved
+    /// run that `resume` continues (never automatically) or aborts.
+    RemoteGroupRun,
     /// Move a local branch forward to a commit, only if that is a
     /// fast-forward (see `GitBackend::fast_forward`).
     FastForward,
@@ -848,7 +855,7 @@ impl OperationKind {
             K::ComposeCommits => OpTraits::NONE.journaled().pushed_risk(),
             // Pushes, deletes remote branches and merges: network (async),
             // journaled by hand around the run, can stop on a conflict.
-            K::FlowRun => OpTraits::NONE
+            K::FlowRun | K::RemoteGroupRun => OpTraits::NONE
                 .network()
                 .can_conflict()
                 .journaled()
@@ -859,7 +866,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 182] = [
+    pub const ALL: [OperationKind; 183] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -909,6 +916,7 @@ impl OperationKind {
         OperationKind::BranchSetRemotes,
         OperationKind::RemoteGroupStatus,
         OperationKind::RemoteGroupPlan,
+        OperationKind::RemoteGroupRun,
         OperationKind::FastForward,
         OperationKind::WorktreeAdd,
         OperationKind::PatchCreate,

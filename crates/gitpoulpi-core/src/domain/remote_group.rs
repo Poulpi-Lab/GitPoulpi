@@ -297,6 +297,10 @@ pub struct RemoteGroupStatus {
     pub remotes: BranchRemotes,
     /// Primary first, then the push targets, then pull-only sources.
     pub targets: Vec<RemoteTargetState>,
+    /// The saved grouped run of this worktree, when one waits (stopped on
+    /// conflicts, canceled, or with targets to retry).
+    #[serde(default)]
+    pub pending: Option<super::PendingGroup>,
 }
 
 #[cfg(test)]

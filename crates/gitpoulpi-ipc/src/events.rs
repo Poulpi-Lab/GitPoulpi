@@ -68,6 +68,16 @@ pub enum Event {
         dest: PathBuf,
         progress: CloneProgress,
     },
+    /// A grouped push or pull moved one of its targets: `status` is
+    /// `Integrating` or `Pushing` while it works, then its final status.
+    /// Broadcast like every event, so the TUI, the CLI's `--watch` and other
+    /// windows all see the per-remote rows of run `run_id`.
+    RemoteGroupProgress {
+        repo: RepoId,
+        run_id: String,
+        remote: String,
+        status: gitpoulpi_core::domain::TargetStatus,
+    },
     /// A Git LFS fetch, pull or push is in flight. Broadcast like
     /// [`Event::CloneProgress`]; `operation` says which (`LfsFetch`,
     /// `LfsPull` or `LfsPush`). The operation's own reply, followed by a

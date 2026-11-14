@@ -387,7 +387,10 @@ pub fn finish_record(
                     );
                     entry.remote_refs = flow_remote.clone();
                 }
-                if request.command == OperationKind::FlowRun {
+                if matches!(
+                    request.command,
+                    OperationKind::FlowRun | OperationKind::RemoteGroupRun
+                ) {
                     entry.effect =
                         flow_effect(before.head.as_ref(), after.head.as_ref(), &after.refs);
                 }

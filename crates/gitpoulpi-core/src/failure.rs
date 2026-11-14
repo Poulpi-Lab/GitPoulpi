@@ -121,7 +121,8 @@ impl ErrorDetail {
 
 /// What kind of failure git's message describes. The frontends map each to
 /// a sentence and, where one exists, an action.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum FailureKind {
     /// The remote has commits this branch lacks: pull first.
     NonFastForward,

@@ -277,9 +277,20 @@ pub(super) fn capture_before(
         // A workflow action: the refs (heads and tags) before, HEAD, and the
         // config of every branch it may touch; the run's own result is
         // diffed against this.
-        OperationKind::FlowRun => {
-            let branches = crate::flow::involved_branches(backend, repo, &request.args);
-            let scope = RefScope::default();
+        OperationKind::FlowRun | OperationKind::RemoteGroupRun => {
+            let (branches, scope) = if request.command == OperationKind::FlowRun {
+                (
+                    crate::flow::involved_branches(backend, repo, &request.args),
+                    RefScope::default(),
+                )
+            } else {
+                // A grouped run moves local branches only: the fetches of a
+                // pull must not be "undone" as ref changes.
+                (
+                    crate::remote_group::involved_branches(repo, &request.args),
+                    RefScope::heads(),
+                )
+            };
             let snap = crate::journal_snap::ref_snapshot(backend, repo, &scope)?;
             for branch in &branches {
                 let tip = snap.refs.get(&head_ref(branch)).copied();

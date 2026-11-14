@@ -33,6 +33,12 @@ pub enum Error {
     #[error("{} rejected the push of {}: {}", .0.remote, .0.branch, reject_reason(.0))]
     PushRejected(PushRejection),
 
+    /// A grouped push or pull of `branch` is saved (stopped on conflicts,
+    /// canceled or with targets to retry): continue, retry or abort it
+    /// (`resume`) instead of starting another. Nothing was changed.
+    #[error("a grouped push or pull of {branch} is waiting (run {run_id}): continue or abort it first")]
+    RemoteGroupPending { branch: String, run_id: String },
+
     /// A fast-forward-only pull found the branch and its upstream
     /// diverged, or `GitBackend::fast_forward` found the branch and its
     /// target diverged. Nothing was changed.
@@ -418,6 +424,10 @@ fn rebase_reason(refusal: RebaseRefusal) -> &'static str {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum TypedError {
     PushRejected(PushRejection),
+    RemoteGroupPending {
+        branch: String,
+        run_id: String,
+    },
     NotFastForward,
     RewordRefused(RewordRefusal),
     SplitRefused(SplitRefusal),
@@ -481,6 +491,12 @@ impl Error {
     pub fn typed(&self) -> Option<TypedError> {
         match self {
             Error::PushRejected(r) => Some(TypedError::PushRejected(r.clone())),
+            Error::RemoteGroupPending { branch, run_id } => {
+                Some(TypedError::RemoteGroupPending {
+                    branch: branch.clone(),
+                    run_id: run_id.clone(),
+                })
+            }
             Error::NotFastForward => Some(TypedError::NotFastForward),
             Error::RewordRefused(r) => Some(TypedError::RewordRefused(*r)),
             Error::SplitRefused(r) => Some(TypedError::SplitRefused(*r)),
@@ -585,6 +601,9 @@ impl Error {
     pub fn from_typed(typed: TypedError) -> Self {
         match typed {
             TypedError::PushRejected(r) => Error::PushRejected(r),
+            TypedError::RemoteGroupPending { branch, run_id } => {
+                Error::RemoteGroupPending { branch, run_id }
+            }
             TypedError::NotFastForward => Error::NotFastForward,
             TypedError::RewordRefused(r) => Error::RewordRefused(r),
             TypedError::SplitRefused(r) => Error::SplitRefused(r),

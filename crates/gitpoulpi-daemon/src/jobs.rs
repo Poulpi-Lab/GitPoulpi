@@ -91,7 +91,7 @@ fn policy_for(kind: OperationKind) -> Policy {
         K::LfsCheckout => Policy::QueuedOnly(NotCancellableReason::RewritingFiles),
         // Multi-step: the flow runner looks at the cancel request between
         // steps and stops there; the step running finishes.
-        K::FlowRun => Policy::Steps,
+        K::FlowRun | K::RemoteGroupRun => Policy::Steps,
         // A preview only writes a temporary pack: stop it at any moment, it
         // leaves nothing behind (the sink breaks, the run directory goes).
         K::RewritePreview => Policy::Free,
@@ -128,6 +128,7 @@ fn label_for(request: &Request) -> String {
         K::FetchAll => "Fetching all remotes".into(),
         K::FetchRefspec | K::FetchRefAsBranch => format!("Fetching from {remote}"),
         K::RemoteGroupPlan => "Checking the remotes of a branch".into(),
+        K::RemoteGroupRun => "Running a grouped push or pull".into(),
         K::RemoteAccessCheck => format!("Testing the connection to {remote}"),
         K::RepoAuthTest => "Testing the connection of every remote".into(),
         K::Pull => "Pulling".into(),
@@ -864,6 +865,18 @@ pub(crate) async fn enter_point(phase: &str) {
 /// The step after the point of no return failed having changed nothing.
 pub(crate) fn leave_point(phase: &str) {
     let _ = CURRENT.try_with(|c| c.registry.leave_point(c.id, phase));
+}
+
+/// Resolves when cancel is requested for the job this work runs as; never
+/// outside a job. For work that races one in-flight step against a cancel
+/// (a grouped push), whatever the job's own policy.
+pub(crate) async fn cancel_requested_in_job() {
+    if let Ok(mut rx) = CURRENT.try_with(|c| c.cancel.clone()) {
+        if rx.wait_for(|requested| *requested).await.is_ok() {
+            return;
+        }
+    }
+    std::future::pending::<()>().await;
 }
 
 /// Cancel was requested for the job this work runs as (a workflow looks

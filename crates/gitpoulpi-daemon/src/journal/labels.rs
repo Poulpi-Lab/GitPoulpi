@@ -178,6 +178,7 @@ pub(super) fn label_for(request: &Request) -> String {
         }
         OperationKind::Pull => "Pull".to_string(),
         OperationKind::FlowRun => crate::flow::label(request),
+        OperationKind::RemoteGroupRun => crate::remote_group::label(request),
         OperationKind::ComposeCommits => {
             let n = request
                 .args

@@ -169,7 +169,12 @@ pub fn status(backend: &dyn GitBackend, repo: &RepoRef, branch: &str) -> Result<
     let mut remotes = parse_branch_remotes(&entries, branch);
     remotes.note_missing(&known);
     let targets = states(backend, repo, &refs, local, &remotes, &known);
-    Ok(RemoteGroupStatus { remotes, targets })
+    let pending = crate::remote_group::pending_of(backend, repo);
+    Ok(RemoteGroupStatus {
+        remotes,
+        targets,
+        pending,
+    })
 }
 
 type Memo = HashMap<PathBuf, (u64, Vec<(String, Vec<RemoteTargetState>)>)>;

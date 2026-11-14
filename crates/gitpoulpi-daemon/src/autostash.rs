@@ -69,6 +69,7 @@ fn blocked_word(request: &Request) -> Option<&'static str> {
         OperationKind::Undo => "undo",
         OperationKind::Redo => "redo",
         OperationKind::FlowRun => flow_word(request)?,
+        OperationKind::RemoteGroupRun => group_word(request)?,
         _ => return None,
     })
 }
@@ -81,6 +82,16 @@ fn flow_word(request: &Request) -> Option<&'static str> {
         .get("resume")
         .is_none_or(Value::is_null)
         .then_some("workflow action")
+}
+
+/// A grouped push or pull is blocked while an auto-stash is pending, except
+/// resuming or aborting one.
+fn group_word(request: &Request) -> Option<&'static str> {
+    request
+        .args
+        .get("resume")
+        .is_none_or(Value::is_null)
+        .then_some("grouped push or pull")
 }
 
 /// The refusal for a blocked operation while the repository has a pending
@@ -311,6 +322,7 @@ fn operation_word(request: &Request) -> Option<&'static str> {
         OperationKind::Rebase => Some("rebase"),
         OperationKind::Pull => Some("pull"),
         OperationKind::FlowRun => Some("workflow action"),
+        OperationKind::RemoteGroupRun => Some("grouped push or pull"),
         _ => None,
     }
 }

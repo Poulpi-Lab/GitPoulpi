@@ -278,9 +278,13 @@ pub(super) fn after_state(
                 label: None,
             })
         }
-        OperationKind::FlowRun => {
-            let after =
-                crate::journal_snap::ref_snapshot(backend, repo, &RefScope::default()).ok()?;
+        OperationKind::FlowRun | OperationKind::RemoteGroupRun => {
+            let scope = if request.command == OperationKind::FlowRun {
+                RefScope::default()
+            } else {
+                RefScope::heads()
+            };
+            let after = crate::journal_snap::ref_snapshot(backend, repo, &scope).ok()?;
             let refs = diff_snapshots(before.snapshot.as_ref()?, &after);
             let mut config = Vec::new();
             for (section, old) in &before.sections {
@@ -300,8 +304,12 @@ pub(super) fn after_state(
             }
             // A start does not name its branch in the request: the one it
             // created is in the diff.
-            let mut label = crate::flow::label(request);
-            if arg_str(request, "branch").is_none() {
+            let mut label = if request.command == OperationKind::RemoteGroupRun {
+                crate::remote_group::label(request)
+            } else {
+                crate::flow::label(request)
+            };
+            if request.command == OperationKind::FlowRun && arg_str(request, "branch").is_none() {
                 if let Some(created) = refs
                     .iter()
                     .find(|c| c.old.is_none() && c.name.starts_with("refs/heads/"))

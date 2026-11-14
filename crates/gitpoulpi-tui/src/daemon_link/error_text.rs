@@ -41,6 +41,12 @@ pub(crate) fn typed_text(typed: &TypedError) -> String {
                 }
             },
         ),
+        // English until the catalogs get words for it (the grouped-push UI slice).
+        TypedError::RemoteGroupPending { branch, run_id } => CoreError::RemoteGroupPending {
+            branch: branch.clone(),
+            run_id: run_id.clone(),
+        }
+        .to_string(),
         TypedError::NotFastForward => msg::typed_error::NOT_FAST_FORWARD.get().to_string(),
         TypedError::RewordRefused(r) => msg::typed_error::reword_refused(match r {
             RewordRefusal::NotOnCurrentBranch => msg::typed_error::REWORD_NOT_ON_BRANCH,

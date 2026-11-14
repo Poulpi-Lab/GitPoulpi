@@ -174,12 +174,12 @@ En un commit sin ref, pasar el puntero por su fila muestra además, en la column
 **Remotos.** El `+` del título REMOTAS añade uno; haz clic derecho en el nombre de
 un remoto para hacer fetch, copiar su enlace web, convertirlo en el remoto por
 defecto, ocultarlo del grafo, editar sus URL o eliminarlo. **Ocultar un remoto**
-(el ojo de su fila, *Ocultar remoto del grafo* del menú o `Remoto: Ocultar remoto en el grafo...`
+(el ⊙ de su fila, *Ocultar remoto del grafo* del menú o `Remoto: Ocultar remoto en el grafo...`
 en la paleta) oculta todas las ramas que tiene ahora o que reciba después, y los
 commits que solo él alcanza salen del Log: la forma de explorar una historia sin la
 de un remoto de archivo ajeno; se recupera con *Mostrar remoto en el grafo*. Mostrar
 un remoto también muestra las ramas suyas que se habían ocultado una a una. Una rama
-de un remoto oculto lo dice en la línea de estado si se usa su ojo: muestra primero el remoto.
+de un remoto oculto lo dice en la línea de estado si se pulsa su ⊙: muestra primero el remoto.
 
 **Stashes.** **Stash** hace stash de todo (archivos sin seguimiento incluidos);
 `Ctrl+G m` pide antes un mensaje (con la IA activada, `Ctrl+G` dentro de ese

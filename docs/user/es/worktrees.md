@@ -23,29 +23,47 @@ El **+** del encabezado de WORKTREES (teclado: `+` en la sección; paleta:
 **Refs: Crear worktree...**) abre un menú:
 
 - **Desde la rama actual**: la rama ya tiene checkout en la carpeta principal,
-  así que el diálogo propone una rama nueva sobre ella (`<rama>-wt`).
+  así que el diálogo propone una rama nueva sobre ella (`worktree-<id>`).
 - **Desde commit: selección**: en gris hasta que se selecciona un commit en el
-  Log. El worktree empieza desacoplado en ese punto, salvo que pongas nombre a
-  una rama nueva.
-- **Elegir una rama...**: el diálogo se abre sobre su lista **Ref**.
+  Log. El diálogo propone una rama nueva `worktree-<id>` que empieza ahí; vacía
+  el campo de la rama para un worktree desacoplado.
+- **Elegir una rama...**: el diálogo se abre sobre su lista **Rama del
+  worktree**, para abrir una rama que ya existe.
 
 La paleta tiene las mismas tres (**Refs: Crear worktree desde la rama actual**,
 **Git: Crear worktree en el commit seleccionado...**, **Refs: Crear worktree
 eligiendo una rama**). Las entradas anteriores siguen funcionando: **Crear
 worktree desde...** en el menú de una rama, un tag o un commit.
 
-El diálogo lo propone todo y te deja cambiarlo:
+El diálogo lo propone todo y te deja cambiarlo. El **Nombre** y la rama nueva
+empiezan como `worktree-<id>`, donde `<id>` son 8 dígitos hexadecimales
+aleatorios (los mismos para ambos), así que dos worktrees nunca chocan.
 
 | Campo | Significado |
 |---|---|
-| **Nombre** | De él se construye el nombre de la carpeta. Se propone a partir de la rama o del id corto. |
+| **Nombre** | De él se construye el nombre de la carpeta. **Nombre de rama** (`Alt+N`) lo pone en `worktree-<rama>`: las barras pasan a `-` y la palabra no se duplica (`worktree-foo` y `feature/worktree-x` conservan la suya, `feature/login` da `worktree-feature-login`). |
 | **Carpeta** | Una carpeta hermana del repositorio, `<repositorio>-<nombre>`. Sigue al Nombre hasta que escribes en Carpeta; **Examinar** elige dónde. |
-| **Ref** | La rama o el commit desde el que empieza el worktree (una lista; escribe para buscar). Cambiarla propone un Nombre nuevo. |
-| **Rama nueva** | Vacío hace checkout de la rama de Ref ahí (o deja HEAD desacoplado en un commit). Obligatoria cuando la rama ya tiene checkout. |
+| **Ref** | Dónde empieza una rama *nueva*: una rama o un commit (una lista; escribe para buscar). No se usa, y lo dice, mientras hay elegida una rama existente. |
+| **Rama del worktree** | Un campo con dos significados, indicados debajo. Un nombre que no es una rama local crea una rama nueva desde Ref (**rama nueva desde main**). Una rama local sin checkout en otro sitio (elígela en la lista o escribe su nombre) se activa ahí tal cual (**hace checkout de esta rama**). La primera fila de la lista, o un campo vacío, hace checkout de la rama de Ref (o deja HEAD desacoplado en un commit); se rechaza cuando esa rama ya tiene checkout. |
+| **Regenerar** | `Alt+R`. Saca un `<id>` nuevo y sustituye el Nombre y la rama por él, salvo lo que escribiste tú (un Nombre o una rama escritos se conservan) y una rama existente (nunca se sustituye). Un Nombre de **Nombre de rama** o de la IA cuenta como generado. |
+| **Nombrar con IA** | Solo con la IA activada (ver abajo). |
 | **Abrir el nuevo worktree en una pestaña** | Activado por defecto. |
 
-Una carpeta que no está vacía, un nombre no válido o una rama que ya existe se
-indican en la propia línea del diálogo, y **Crear** sigue en gris.
+Una carpeta que no está vacía, un nombre no válido, un nombre de rama que git
+rechaza o una rama que tiene otro worktree se indican en la propia línea del
+diálogo, y **Crear** sigue en gris.
+
+### Poner nombre con IA
+
+Con la [IA](ai.md) activada, **Nombrar con IA** (`Alt+A`) abre un cuadro dentro
+del diálogo: *Describe la función, el error o la tarea*. **Nombrar** pide al
+modelo un nombre corto de worktree y un nombre de rama que siga los nombres de
+rama del propio repositorio (`feature/`, `fix/`, kebab-case en minúsculas).
+Rellenan el Nombre (como `worktree-<nombre>`) y el campo de la rama, que se
+pueden seguir editando; un nombre de rama que ya existe recibe el sufijo `-2`
+para que la respuesta nunca haga un checkout en silencio. El cuadro muestra el
+estado de espera, **Detener** (o `Esc`) cancela, y un fallo se muestra dentro
+del diálogo. Solo se envían tu descripción y los nombres de las ramas locales.
 
 ## El menú de la fila
 
@@ -107,5 +125,7 @@ tampoco forma parte del historial.
 `gitpoulpi worktree changes <path>` lista los cambios sin confirmar de un
 worktree. `gitpoulpi worktree remove <path> [--force] [--commit-message M
 [--commit-branch B]] [--stash-message M] [--delete-branch]` lo elimina; las
-herramientas MCP son `worktree_changes` y `worktree_remove`. Consulta la
-[referencia de la CLI](cli-reference.md).
+herramientas MCP son `worktree_changes` y `worktree_remove`. `gitpoulpi ai
+worktree-name --describe "<tarea>"` imprime los nombres de worktree y de rama
+que propone la IA (`{ name, worktree, branch }`) y no crea nada; la herramienta
+MCP es `ai_worktree_name`. Consulta la [referencia de la CLI](cli-reference.md).

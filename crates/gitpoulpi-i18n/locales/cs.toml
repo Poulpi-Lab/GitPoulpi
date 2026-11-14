@@ -633,11 +633,11 @@ inherited = "(zděděno)"
 lfs_not_checked = "(zatím nezjištěno)"
 lfs_autofix_filters = { git = "Instalovat filtry LFS před pull a push", local = "Instalovat filtry LFS před stažením a odesláním" }
 lfs_autofix_filters_help = { git = "Před pull nebo push v repozitáři používajícím Git LFS spustí `git lfs install --local`, pokud chybí jeho filtry LFS nebo hooky (jen vlastní konfigurace repozitáře, nikdy globální), aby přenos zvládl velké soubory. Stavový řádek to oznámí. Vyžaduje git-lfs.", local = "Před stažením nebo odesláním v repozitáři používajícím Git LFS spustí `git lfs install --local`, pokud chybí jeho filtry LFS nebo hooky (jen vlastní konfigurace repozitáře, nikdy globální), aby přenos zvládl velké soubory. Stavový řádek to oznámí. Vyžaduje git-lfs." }
-push_group_preflight = "Check every remote before a {$push}"
-push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
-default_push_targets = "Extra {$push} targets for new branches"
-default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
-default_push_targets_none = "(no remote configured)"
+push_group_preflight = { git = "Zkontrolovat všechny remote před push", local = "Zkontrolovat všechny remote před odesláním" }
+push_group_preflight_help = { git = "Před push větve, která má další cíle push, se nejdřív podívá na všechny remote (rychlý dotaz a stažení z remote jen tehdy, když se liší), takže problém na třetím remote se ukáže dřív, než začne první push. Vypnuto: push na jednotlivé remote postupně a hlášení, co se stalo.", local = "Před odesláním větve, která má další cíle odeslání, se nejdřív podívá na všechny remote (rychlý dotaz a stažení z remote jen tehdy, když se liší), takže problém na třetím remote se ukáže dřív, než začne první odeslání. Vypnuto: odeslání na jednotlivé remote postupně a hlášení, co se stalo." }
+default_push_targets = "Další cíle {$push_noun} pro nové větve"
+default_push_targets_help = { git = "Jen tento repozitář. Zaškrtněte remote, na které nová větev kromě svého upstreamu také pushuje. Zkopírují se do větve, až poprvé dostane upstream (první push, který ho nastaví, nebo větev vytvořená ze vzdálené větve). Už existující větve se nemění: upravíte je v dialogu Remote dané větve.", local = "Jen tento repozitář. Zaškrtněte remote, na která se nová větev kromě svého upstreamu také odesílá. Zkopírují se do větve, až poprvé dostane upstream (první odeslání, které ho nastaví, nebo větev vytvořená ze vzdálené větve). Už existující větve se nemění: upravíte je v dialogu Remote dané větve." }
+default_push_targets_none = "(žádný remote není nastaven)"
 
 [settings_screen]
 title = "Nastavení - Tab: sekce/nastavení │ Enter: změnit"
@@ -883,7 +883,7 @@ push_branch = "{$Push} {name}"
 start_pr = "Založit {$pr} z {name}..."
 fetch = "{$Fetch}"
 # context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
-remotes_of = "Remotes of {name}..."
+remotes_of = "Remote větve {name}..."
 rename = "Přejmenovat {name}..."
 delete = "Smazat {name}..."
 delete_both = "Smazat {first} a {second}..."
@@ -2207,23 +2207,23 @@ host_not_recognized = "hostitel remote nebyl rozpoznán"
 link_branch = "odkaz na větev"
 link_commit = "odkaz na commit"
 # context: menu row of the Push dropdown: push the branch to its upstream and every extra push target; {remotes} lists them, comma separated
-push_to_all = "{$Push} to all ({remotes})"
+push_to_all = "{$Push} do všech ({remotes})"
 # context: menu row: push the branch to one remote only; {remote} is that remote
-push_to_only = "{$Push} to {remote} only"
+push_to_only = "{$Push} jen do {remote}"
 # context: menu row: opens the dialog where the remotes of this one push are ticked
-push_to_selected = "{$Push} to selected remotes..."
+push_to_selected = "{$Push} do vybraných remote..."
 # context: menu row of the Push dropdown that opens the dialog of the remotes a branch pushes to and pulls from; {branch} is the branch
-remotes_of = "Remotes of {branch}..."
+remotes_of = "Remote větve {branch}..."
 # context: menu row of the Pull dropdown: pull the upstream and every extra pull source; {remotes} lists them, joined with +
-pull_from_all = "{$Pull} from all sources ({remotes})"
+pull_from_all = "{$Pull} ze všech zdrojů ({remotes})"
 # context: menu row: pull from one remote only, once; {remote} is that remote
-pull_from_only = "{$Pull} from {remote} only"
+pull_from_only = "{$Pull} jen z {remote}"
 # context: status line while a push to several remotes starts; {branch} is the branch, {remotes} the remote names
-pushing_to_all = { git = "pushing {branch} to {remotes}...", local = "pushing {branch} to {remotes}..." }
+pushing_to_all = { git = "push větve {branch} do {remotes}...", local = "odesílání větve {branch} do {remotes}..." }
 # context: status line while a pull from several remotes starts; {branch} is the branch, {remotes} the remote names
-pulling_from_all = { git = "pulling {branch} from {remotes}...", local = "pulling {branch} from {remotes}..." }
+pulling_from_all = { git = "pull větve {branch} z {remotes}...", local = "stahování větve {branch} z {remotes}..." }
 # context: status line: the branch has no remote to pull from; {branch} is the branch
-no_pull_remote = "{branch} has no remote to {$pull} from"
+no_pull_remote = "Větev {branch} nemá žádný remote pro {$pull_noun}"
 
 [keymap_action]
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
@@ -2554,7 +2554,7 @@ log_columns_fit_all = "Přizpůsobit všechny sloupce obsahu"
 log_scroll_left = "Posunout sloupce doleva"
 log_scroll_right = "Posunout sloupce doprava"
 log_columns_layout = "Posouvat do stran nebo přizpůsobit panelu"
-refs_remotes = "Branch: Edit its Remotes"
+refs_remotes = "Větev: upravit její remote"
 
 
 [keymap_ctx]
@@ -3144,8 +3144,8 @@ git_pull_options = { git = "Git: Možnosti pullu...", local = "Git: Možnosti st
 git_push = { git = "Git: Push", local = "Git: Odeslat" }
 git_push_to_remote = { git = "Git: Push do remote...", local = "Git: Odeslat do remote..." }
 git_force_push_with_lease = { git = "Git: Force push (s lease)...", local = "Git: Vynucené odeslání (s lease)..." }
-git_remotes_of_branch = "Git: Remotes of Branch..."
-git_push_to_selected_remotes = "Git: {$Push} to Selected Remotes..."
+git_remotes_of_branch = "Git: Remote větve..."
+git_push_to_selected_remotes = "Git: {$Push} do vybraných remote..."
 remote_add_remote = "Remote: Přidat remote..."
 remote_remove_remote = "Remote: Odebrat remote..."
 remote_edit_remote = "Remote: Upravit remote..."
@@ -3653,27 +3653,27 @@ view_log_scroll_left = "Zobrazení: Log: Posunout sloupce doleva"
 view_log_scroll_right = "Zobrazení: Log: Posunout sloupce doprava"
 view_log_columns_layout = "Zobrazení: Log: Přepnout posouvání sloupců do stran"
 # context: palette command: push to the upstream and every extra push target
-git_push_to_all_targets = "Git: {$Push} to All Targets"
+git_push_to_all_targets = "Git: {$Push} do všech cílů"
 # context: palette command: pull the upstream and every extra pull source
-git_pull_from_all_sources = "Git: {$Pull} from All Sources"
+git_pull_from_all_sources = "Git: {$Pull} ze všech zdrojů"
 # context: palette command: opens a list of remotes, pulls from the chosen one once
-git_pull_from_one_remote = "Git: {$Pull} from One Remote..."
+git_pull_from_one_remote = "Git: {$Pull} z jednoho remote..."
 # context: palette command: reopens the progress window of the last push to several remotes
-git_show_grouped_push = "Git: Show Grouped {$Push}"
+git_show_grouped_push = "Git: Zobrazit {$push_noun} do více remote"
 # context: palette command: goes on with the push to several remotes that paused on conflicts
-git_continue_grouped_push = "Git: Continue Grouped {$Push}"
+git_continue_grouped_push = "Git: Pokračovat v {$push_noun} do více remote"
 # context: palette command: abandons the push to several remotes that paused on conflicts
-git_abort_grouped_push = "Git: Abort Grouped {$Push}"
+git_abort_grouped_push = "Git: Zrušit {$push_noun} do více remote"
 # context: palette command: tries again the remotes that failed in the last push to several remotes
-git_retry_failed_pushes = "Git: Retry Failed Pushes"
+git_retry_failed_pushes = "Git: Zopakovat {$push_noun} na remote, která selhala"
 # context: palette: why a command is grayed out
-why_no_grouped_push = "there is no grouped {$push} to show"
+why_no_grouped_push = { git = "není co zobrazit: žádný push do více remote neproběhl", local = "není co zobrazit: žádné odeslání do více remote neproběhlo" }
 # context: palette: why a command is grayed out
-why_group_not_paused = "no grouped {$push} is waiting on conflicts"
+why_group_not_paused = { git = "žádný push do více remote nečeká na konflikty", local = "žádné odeslání do více remote nečeká na konflikty" }
 # context: palette: why Continue is grayed out
-why_group_not_ready = "resolve and conclude the conflicts first"
+why_group_not_ready = "nejdřív vyřešte a dokončete konflikty"
 # context: palette: why a command is grayed out
-why_nothing_to_retry = "no remote failed in the last grouped {$push}"
+why_nothing_to_retry = "v posledním {$push_noun} do více remote žádný remote neselhal"
 
 [help_section]
 rewrite = "Přepis historie"
@@ -4083,7 +4083,7 @@ rewrite_9 = "otevře kartu Velikost a analyzuje historii: největší soubory a 
 rewrite_host_howto = "vysvětlí, jak prosadit přepis přes větev, kterou hostitel chrání: zrušit ochranu, {$push} pod novým názvem, nebo vytvořit repozitář znovu; nic se za vás neprovede"
 rewrite_ai_rules = "vytvoří pravidla přepisu podle vašeho popisu pomocí AI (nic se nezobrazí v náhledu ani nepoužije)"
 log_columns_2 = "posouvejte sloupce Logu do stran, když si drží své šířky (rozložení Posouvat do stran, které se volí ve výběru sloupců, v Nastavení nebo klávesou s při vybraném sloupci); v rozložení Přizpůsobit panelu se každý sloupec vejde do panelu"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "upraví remote vybrané lokální větve (její upstream a další cíle {$push_noun}): klávesová obdoba kliknutí na odznak remote v jejím řádku"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} nebo pravé tlačítko"
@@ -5512,7 +5512,7 @@ no_longer = "{path} už není submodul"
 [combo]
 type_to_search = "pište pro hledání"
 # context: placeholder of the search line of a dropdown that also accepts typed text
-type_to_use_own = "type your own value"
+type_to_use_own = "zadejte vlastní hodnotu"
 loading = "načítání..."
 no_match = "žádná shoda"
 use_value = "Použít „{value}“"
@@ -5840,11 +5840,11 @@ palette_create_desktop = "Spouštěč: Vytvořit zástupce na ploše"
 palette_remove = "Spouštěč: Odebrat zástupce"
 icons_updated = "zástupci spouštěčů aktualizováni"
 alias = "Alias příkazu"
-alias_help = "Krátký příkaz, kterým se GitPoulpi spouští z terminálu, například gp. Jen písmena, číslice, - _ a . Alias nebo funkce shellu stejného názvu má přednost a odsud ji nelze zjistit (oh-my-zsh definuje gp sám)."
+alias_help = "Krátký příkaz, kterým se GitPoulpi spouští z terminálu, například gp. Zadejte do seznamu libovolný název a použijete vlastní. Jen písmena, číslice, - _ a . Alias nebo funkce shellu stejného názvu má přednost a odsud ji nelze zjistit (oh-my-zsh definuje gp sám)."
 alias_none = "Žádný"
 alias_status = "Stav aliasu"
 alias_add = "Alias nové karty"
-alias_add_help = "Druhý krátký příkaz, například gpa, který otevře aktuální složku jako novou kartu již spuštěného GitPoulpi (gitpoulpi --add), místo aby spustil další. Pokud žádný neběží, spustí GitPoulpi jako obvykle. Tlačítko „Vytvořit“ ho vytvoří spolu s aliasem příkazu výše. Stejná pravidla pro název."
+alias_add_help = "Druhý krátký příkaz, například gpa, který otevře aktuální složku jako novou kartu již spuštěného GitPoulpi (gitpoulpi --add), místo aby spustil další. Pokud žádný neběží, spustí GitPoulpi jako obvykle. Tlačítko „Vytvořit“ ho vytvoří spolu s aliasem příkazu výše. Zadejte do seznamu libovolný název a použijete vlastní. Stejná pravidla pro název."
 alias_add_status = "Stav (nová karta)"
 alias_set_name = "výše zadejte název"
 alias_bad_space = "název obsahuje mezeru"
@@ -6498,7 +6498,7 @@ branch_rename = "Přejmenovat větev {old} na {new}"
 upstream_set = "Nastavit upstream větve {branch} na {upstream}"
 upstream_unset = "Zrušit upstream větve {branch}"
 # context: undo history row: the push targets and pull sources of a branch were changed; {branch} is the local branch
-remotes_set = "Set remotes of {branch}"
+remotes_set = "Nastavit remote větve {branch}"
 config_set = "Nastavit {key} na {value}"
 config_unset = "Zrušit nastavení {key}"
 sparse_set = "Nastavit částečný checkout"
@@ -9630,229 +9630,229 @@ none = "v této zprávě není žádný odkaz"
 
 [branch_remotes]
 # context: title of the dialog that lists every remote a branch pushes to and pulls from; {branch} is the local branch
-title = "Remotes of {branch}"
+title = "Remote větve {branch}"
 # context: label before the list that picks the upstream (the remote branch the local branch tracks)
 upstream_label = "Upstream"
 # context: table heading: a configured remote's name
 col_remote = "Remote"
 # context: table heading: the branch's name on that remote
-col_branch = "Branch"
+col_branch = "Větev"
 # context: table heading over a checkbox: the branch is also pushed to that remote
 col_push = "{$Push}"
 # context: table heading over a checkbox: a pull also takes the new commits of that remote
-col_pull = "{$Pull} too"
+col_pull = "{$Pull} také"
 # context: table heading: how the local branch stands against that remote (ahead, behind, in sync)
-col_state = "State"
+col_state = "Stav"
 # context: cell in the Pull too column of the upstream's own row: the upstream is always pulled
 pull_upstream = "upstream"
 # context: state cell: the remote's copy and the local branch are the same commit
-state_in_sync = "in sync"
+state_in_sync = "synchronní"
 # context: state cell: the remote has no copy of the branch yet
-state_new = "new"
+state_new = "nová"
 # context: state cell: the remote's copy shares no history with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "nesouvisí"
 # context: state cell of a remote that is not used by the branch
 state_none = "-"
 # context: row of a remote the branch still mentions but the repository no longer has
-gone = "remote gone"
+gone = "remote zmizel"
 # context: button on a gone row: forget that remote for this branch
-remove_button = "Remove"
+remove_button = "Odebrat"
 # context: warning under the table; {first} and {second} are two remote names with the same address
-same_url = "{first} and {second} {$push} to the same URL."
+same_url = "{first} a {second} mají stejnou URL pro {$push_noun}."
 # context: button: changes the branch name used on the selected remote
-rename_button = "Rename on remote..."
+rename_button = "Přejmenovat na remote..."
 # context: button: the branch tracks no upstream any more
-unset_button = "Unset upstream"
+unset_button = "Zrušit upstream"
 # context: primary button of the dialog
-apply_button = "Apply"
+apply_button = "Použít"
 # context: shown while the dialog reads the branch's remotes
-loading = "Reading the remotes..."
+loading = "Čtení remote..."
 # context: title of the small dialog that asks for the branch's name on one remote; {remote} is the remote
-rename_title = "Branch name on {remote}"
+rename_title = "Název větve na {remote}"
 # context: placeholder of that dialog's field
-rename_placeholder = "Branch name on the remote"
+rename_placeholder = "Název větve na remote"
 # context: primary button of that dialog
-rename_set = "Set"
+rename_set = "Nastavit"
 # context: inline error of that dialog when the field is empty
-rename_empty = "Type a branch name."
+rename_empty = "Zadejte název větve."
 # context: inline error when Rename is used on the upstream's own row
-rename_upstream_row = "The upstream's branch name is chosen in the list above."
+rename_upstream_row = "Název větve upstreamu se volí v seznamu výše."
 # context: inline error when Rename is used with nothing to rename
-rename_no_row = "Select a remote's row first."
+rename_no_row = "Nejprve vyberte řádek remote."
 # context: key hints under the table; keep the key names (Space, p, r, Del, Enter)
-keys_hint = "Space {$Push}, p {$Pull} too, r Rename, Del Remove, Enter Apply"
+keys_hint = "Space {$Push}, p {$Pull} také, r Přejmenovat, Del Odebrat, Enter Použít"
 # context: status line while the change is sent; {branch} is the local branch
-applying = "setting the remotes of {branch}..."
+applying = "nastavování remote větve {branch}..."
 # context: status line once the daemon applied the change; {branch} is the local branch
-remotes_set = "remotes of {branch} updated"
+remotes_set = "remote větve {branch} aktualizovány"
 
 [push_group]
 # context: title of the dialog that asks which remotes to push a branch to (one push only); {branch} is the local branch
-title_select = "{$Push} {branch} to selected remotes"
+title_select = "{$Push} {branch} do vybraných remote"
 # context: title of the dialog that shows how a branch stands against each remote before a grouped push; {n} is the number of remotes, {branch} the local branch
-title_plan = { one = "{$Push} {branch} to {n} remote", other = "{$Push} {branch} to {n} remotes" }
+title_plan = { one = "{$Push} {branch} do {n} remote", few = "{$Push} {branch} do {n} remote", other = "{$Push} {branch} do {n} remote" }
 # context: title of the dialog while a grouped push runs or after it ended; {branch} is the local branch
 title_run = "{$Push} {branch}"
 # context: line under the title; {branch} is the local branch, {sha} the short id of its tip
-local_at = "Local {branch} at {sha}"
+local_at = "Lokální {branch} na {sha}"
 # context: help line over the list of remotes to push to
-select_hint = "Pick the remotes this {$push} goes to. Nothing is saved unless you tick Remember."
+select_hint = "Zvolte remote pro {$push_noun}. Nic se neuloží, dokud nezaškrtnete „Zapamatovat pro tuto větev“."
 # context: checkbox: store the picked remotes as the branch's push targets
-remember = "Remember for this branch"
+remember = "Zapamatovat pro tuto větev"
 # context: shown under the list when no remote is ticked
-select_none = "Tick at least one remote."
+select_none = "Zaškrtněte alespoň jeden remote."
 # context: shown while the daemon asks the remotes about the branch
-loading = "Asking the remotes..."
+loading = "Dotazování remote..."
 # context: table heading: the remote's name
 col_remote = "Remote"
 # context: table heading: how the local branch stands against the remote
-col_state = "State"
+col_state = "Stav"
 # context: table heading: what the run does with that remote
-col_action = "Action"
+col_action = "Akce"
 # context: state of a remote that already has the same commit
-state_up_to_date = "up to date"
+state_up_to_date = "aktuální"
 # context: state of a remote that only misses local commits
-state_ready = "ready"
+state_ready = "připravená"
 # context: state of a remote that has no copy of the branch yet
-state_new = "new"
+state_new = "nová"
 # context: state of a remote that has commits the local branch lacks
-state_behind = "behind"
+state_behind = "pozadu"
 # context: state of a remote whose history and the local branch's both moved
-state_diverged = "diverged"
+state_diverged = "rozešlá"
 # context: state of a remote whose commits are older copies of rebased or amended local commits
-state_rewritten = "rewritten"
+state_rewritten = "přepsaná"
 # context: state of a remote whose history shares nothing with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "nesouvisí"
 # context: state of a remote whose host refused the branch earlier (protected branch)
-state_refused = "refused"
+state_refused = "odmítnutá"
 # context: state of a remote that could not be asked
-state_unreachable = "not reachable"
+state_unreachable = "nedostupný"
 # context: state of a remote that is no longer configured
-state_missing = "gone"
+state_missing = "zmizel"
 # context: note on a remote that points at the same repository as an earlier row; {other} is that earlier remote
-same_as = "same repository as {other}"
+same_as = "stejný repozitář jako {other}"
 # context: action: send the local commits to the remote
 action_push = "{$Push}"
 # context: action: move the local branch forward to the remote's commit; {remote} is the remote
-action_fast_forward = "Fast-forward from {remote}"
+action_fast_forward = "Fast-forward z {remote}"
 # context: action: combine the remote's commits into the local branch, then send; {remote} is the remote
-action_merge = "{$Merge} from {remote}"
+action_merge = "{$Merge} z {remote}"
 # context: action: replay the local commits on top of the remote's, then send; {remote} is the remote
-action_rebase = "{$Rebase} onto {remote}"
+action_rebase = "{$Rebase} na {remote}"
 # context: action: overwrite the remote's branch, refused if it moved since the plan
-action_force = "Force {$push} (lease)"
+action_force = "Vynutit {$push_noun} (lease)"
 # context: action: leave this remote out
-action_skip = "Skip"
+action_skip = "Přeskočit"
 # context: line under a row whose merge would conflict; {n} is the number of files, {files} their names
-conflicts = { one = "{$merge} would conflict in {n} file: {files}", other = "{$merge} would conflict in {n} files: {files}" }
+conflicts = { one = "Při {$merge_noun} by vznikl konflikt v {n} souboru: {files}", few = "Při {$merge_noun} by vznikl konflikt v {n} souborech: {files}", other = "Při {$merge_noun} by vznikl konflikt v {n} souborech: {files}" }
 # context: checkbox: also send the tags that no remote has yet
-tags = "Also {$push} the {$tags} not sent yet"
+tags = "{$Push} také dosud neodeslané {$tags}"
 # context: summary line under the table; {steps} is the list of steps
-then_line = "Then: {steps}."
+then_line = "Potom: {steps}."
 # context: summary line when every row is skipped or already up to date
-then_nothing = "Then: nothing to do."
+then_nothing = "Potom: není co dělat."
 # context: separator between steps in the summary line
 then_join = ", "
 # context: step of the summary line; {remote} is the remote
-step_fast_forward = "fast-forward from {remote}"
+step_fast_forward = "fast-forward z {remote}"
 # context: step of the summary line; {remote} is the remote
-step_merge = "{$merge} {remote}"
+step_merge = "{$merge} z {remote}"
 # context: step of the summary line; {remote} is the remote
-step_rebase = "{$rebase} onto {remote}"
+step_rebase = "{$rebase} na {remote}"
 # context: step of the summary line; {n} is the number of remotes
-step_push = { one = "{$push} to {n} remote", other = "{$push} to {n} remotes" }
+step_push = { one = "{$push} do {n} remote", few = "{$push} do {n} remote", other = "{$push} do {n} remote" }
 # context: warning under the summary when a row force-pushes; {n} is the number of commits that disappear, {remote} the remote
-force_note = { one = "Force {$push} replaces {n} {$commit} on {remote}.", other = "Force {$push} replaces {n} {$commits} on {remote}." }
+force_note = { one = "Při vynuceném {$push_noun} bude na {remote} nahrazen {n} commit.", few = "Při vynuceném {$push_noun} budou na {remote} nahrazeny {n} commity.", other = "Při vynuceném {$push_noun} bude na {remote} nahrazeno {n} commitů." }
 # context: warning under the summary when rows rebase while other remotes already hold the local commits; {remotes} are those remotes
-rebase_warn = "A {$rebase} rewrites the local {$commits}: {remotes} will then need a force {$push}."
+rebase_warn = "{$Rebase} přepíše lokální commity: na {remotes} bude pak nutné vynutit {$push_noun}."
 # context: confirmation question before a force push; {n} is the number of remote commits replaced, {branch} the branch, {remotes} the remote names
-force_confirm = { one = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commit} on the remote is replaced. Not undoable.", other = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commits} on the remotes are replaced. Not undoable." }
+force_confirm = { one = "Vynutit {$push_noun} větve {branch} do {remotes}?\nS lease: na remote bude nahrazen {n} commit. Nelze vrátit zpět.", few = "Vynutit {$push_noun} větve {branch} do {remotes}?\nS lease: na remote budou nahrazeny {n} commity. Nelze vrátit zpět.", other = "Vynutit {$push_noun} větve {branch} do {remotes}?\nS lease: na remote bude nahrazeno {n} commitů. Nelze vrátit zpět." }
 # context: button: ask the remotes again
-btn_fetch_again = "{$Fetch} again"
+btn_fetch_again = "Znovu {$fetch}"
 # context: button: set every row that has a problem to Skip
-btn_skip_problems = "Skip problems"
+btn_skip_problems = "Přeskočit problémy"
 # context: button: close the dialog without running
-btn_cancel = "Cancel"
+btn_cancel = "Zrušit"
 # context: button: run the grouped push
-btn_run = "Run"
+btn_run = "Spustit"
 # context: button: go to the next step
-btn_next = "Next"
+btn_next = "Další"
 # context: button: close the dialog (the run goes on)
-btn_close = "Close"
+btn_close = "Zavřít"
 # context: button: try the failed remotes again
-btn_retry = "Retry failed"
+btn_retry = "Zopakovat neúspěšné"
 # context: progress row: the remote took the commits
-run_pushed = "sent"
+run_pushed = "odesláno"
 # context: progress row: the remote got a new branch
-run_created = "created"
+run_created = "vytvořeno"
 # context: progress row: nothing to send
-run_up_to_date = "up to date"
+run_up_to_date = "aktuální"
 # context: progress row: the local branch moved forward
-run_fast_forwarded = "fast-forwarded"
+run_fast_forwarded = "posunuto vpřed"
 # context: progress row: the remote's commits were combined into the local branch with a new commit
-run_merged = "combined"
+run_merged = "sloučeno"
 # context: progress row: the local commits were replayed on the remote's
-run_rebased = "replayed"
+run_rebased = "přehráno"
 # context: progress row: the remote's commits were taken in
-run_integrated = "taken in"
+run_integrated = "převzato"
 # context: progress row: left out
-run_skipped = "skipped"
+run_skipped = "přeskočeno"
 # context: progress row: the remote's commits are being combined with the local branch
-run_merging = "combining"
+run_merging = "slučování"
 # context: progress row: sending in progress
-run_pushing = "sending"
+run_pushing = "odesílání"
 # context: progress row: not started yet
-run_waiting = "waiting"
+run_waiting = "čeká"
 # context: progress row: failed; {why} is the reason
-run_failed = "failed: {why}"
+run_failed = "selhalo: {why}"
 # context: progress row: the remote refused; {why} is the reason
-run_rejected = "refused: {why}"
+run_rejected = "odmítnuto: {why}"
 # context: progress row: the run was canceled while this remote was in flight
-run_unknown = "unknown (canceled)"
+run_unknown = "neznámé (zrušeno)"
 # context: progress row: the remote is not configured
-run_missing = "remote missing"
+run_missing = "remote chybí"
 # context: line under the progress rows while the run is going
-run_going = "Closing this window does not stop the run."
+run_going = "Zavření tohoto okna běh nezastaví."
 # context: line under the progress rows when the run ended well
-run_done = "Done."
+run_done = "Hotovo."
 # context: line under the progress rows when some remotes failed
-run_problems = "Some remotes failed. Retry them, or close."
+run_problems = "Některé remote selhaly. Zopakujte je, nebo okno zavřete."
 # context: key hints of the selection step
-hint_select = "Up/Down move  Space tick  m remember  Enter next  Esc close"
+hint_select = "Nahoru/Dolů pohyb  Space zaškrtnout  m zapamatovat  Enter další  Esc zavřít"
 # context: key hints of the plan step
-hint_plan = "Up/Down row  Left/Right action  Enter list  s skip  t {$tags}  f again  Ctrl+Enter run  Esc close"
+hint_plan = "Nahoru/Dolů řádek  Vlevo/Vpravo akce  Enter seznam  s přeskočit  t {$tags}  f znovu  Ctrl+Enter spustit  Esc zavřít"
 # context: key hints of the progress step
-hint_run = "Esc close  r retry failed"
+hint_run = "Esc zavřít  r zopakovat neúspěšné"
 # context: text of the strip over the Log while a grouped push waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting = "Grouped {$push} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting = "Pozastaveno ({remote}): {$push_noun} do více remote. Vyřešte a dokončete konflikty, potom Pokračovat."
 # context: text of the strip when the conflicts are resolved and the run can go on; {remote} is that remote
-strip_ready = "Grouped {$push} paused ({remote}): resolved. Continue to {$push}."
+strip_ready = "Pozastaveno ({remote}): {$push_noun} do více remote. Konflikty jsou vyřešeny, lze pokračovat."
 # context: strip button: go on with the grouped push
-strip_continue = "Continue"
+strip_continue = "Pokračovat"
 # context: strip button: abort the merge or rebase of the grouped push and drop it
-strip_abort = "Abort group"
+strip_abort = "Zrušit skupinu"
 # context: status line after the grouped push was aborted
-aborted = "Grouped {$push} aborted."
+aborted = "Zrušeno: {$push_noun} do více remote."
 # context: status line while a grouped push runs
-running = "Grouped {$push}..."
+running = "Probíhá {$push_noun} do více remote..."
 # context: question before aborting a paused grouped push; {branch} is the local branch, {remote} the remote whose merge or rebase stopped
-abort_confirm = "Abort the grouped {$push} of {branch} (stopped on {remote})?\nThe {$merge} or {$rebase} in progress is thrown away. What was already sent stays."
+abort_confirm = "Zrušit {$push_noun} větve {branch} do více remote (zastaveno na {remote})?\nPrávě probíhající operace ({$merge_noun} nebo {$rebase_noun}) se zahodí. Co už je na remote, tam zůstane."
 # context: title of the dialog that shows how a branch stands against each remote before a grouped pull; {n} is the number of remotes, {branch} the local branch
-title_pull_plan = { one = "{$Pull} {branch} from {n} remote", other = "{$Pull} {branch} from {n} remotes" }
+title_pull_plan = { one = "{$Pull} {branch} z {n} remote", few = "{$Pull} {branch} z {n} remote", other = "{$Pull} {branch} z {n} remote" }
 # context: text of the strip over the Log while a grouped pull waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting_pull = "Grouped {$pull} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting_pull = "Pozastaveno ({remote}): {$pull_noun} z více remote. Vyřešte a dokončete konflikty, potom Pokračovat."
 # context: text of the strip when the conflicts are resolved and the grouped pull can go on; {remote} is that remote
-strip_ready_pull = "Grouped {$pull} paused ({remote}): resolved. Continue to {$pull}."
+strip_ready_pull = "Pozastaveno ({remote}): {$pull_noun} z více remote. Konflikty jsou vyřešeny, lze pokračovat."
 [multi_remote]
-state_new = "new"
-state_gone = "gone"
-state_unrelated = "unrelated"
-tip_title = "Remotes of {branch}"
-tip_in_sync = "{remote}: in sync"
-tip_ahead = "{remote}: {n} ahead"
-tip_behind = "{remote}: {n} behind"
-tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
-tip_new = "{remote}: no copy of this branch yet"
-tip_unrelated = "{remote}: no common history"
-tip_gone = "{remote}: no longer configured"
-tip_open_hint = "Click to edit the remotes of this branch"
+state_new = "nová"
+state_gone = "zmizel"
+state_unrelated = "nesouvisí"
+tip_title = "Remote větve {branch}"
+tip_in_sync = "{remote}: synchronní"
+tip_ahead = "{remote}: {n} napřed"
+tip_behind = "{remote}: {n} pozadu"
+tip_diverged = "{remote}: rozešlá ({ahead} napřed, {behind} pozadu)"
+tip_new = "{remote}: zatím žádná kopie této větve"
+tip_unrelated = "{remote}: žádná společná historie"
+tip_gone = "{remote}: už není nastaven"
+tip_open_hint = "Kliknutím upravíte remote této větve"

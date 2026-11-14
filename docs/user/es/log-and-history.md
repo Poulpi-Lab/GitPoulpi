@@ -112,7 +112,7 @@ entradas más útiles:
 | Merge, Rebase sobre | Hace merge de esta ref en la rama con checkout, o rebase de la rama con checkout sobre ella |
 | Fast-forward `<branch>` a `<current>` / `<current>` a `<branch>` | Avanza una rama cuando es un fast-forward; si no, queda atenuada con el motivo (`divergen, no es un avance rápido`) |
 | Crear worktree desde... | Abre un worktree vinculado en su propia pestaña |
-| Pull, Push, Fetch, Definir upstream... | Operaciones de red sobre esa rama |
+| Pull, Push, Fetch, Remotos de <rama>... | Operaciones de red sobre esa rama (Remotos de <rama>... abre el upstream más una casilla Push y una Pull también por remoto) |
 | Ocultar / Mostrar en el grafo, Solo | Solo visualización; ocultan o ponen en solo una ref (ocultar también quita los commits que solo esa ref alcanza) sin tocar el repositorio |
 | Renombrar, Eliminar | Eliminar pregunta antes; también se puede eliminar su gemela remota |
 | Copiar nombre de la rama, Copiar enlace de la rama en el remoto | Al portapapeles |

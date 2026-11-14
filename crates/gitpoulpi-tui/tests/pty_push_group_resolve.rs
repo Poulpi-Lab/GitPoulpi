@@ -136,9 +136,37 @@ fn a_diverged_remote_merges_stops_on_the_conflict_and_continue_finishes_the_push
     );
     assert!(
         !paused.contains("Continue to push"),
-        "Continue is not offered while the conflict is open:\n{}",
+        "the strip does not say it can continue while the conflict is open:\n{}",
         paused.text()
     );
+    // Continue is always on the strip (owner decision), greyed and inert
+    // until the conflict is concluded.
+    let (cc, cr) = strip_button(&paused, "Continue");
+    let grey = paused.cell(cc + 1, cr).unwrap().bg.clone();
+    let abort = strip_button(&paused, "Abort group");
+    assert_ne!(
+        paused.cell(abort.0 + 1, abort.1).unwrap().bg,
+        grey,
+        "Abort group is live, Continue is greyed"
+    );
+    term.click(cc + 1, cr).unwrap();
+    std::thread::sleep(Duration::from_millis(600));
+    let after = term.screen();
+    assert!(
+        after.contains("Grouped push paused (gitlab)") && !after.contains("Done."),
+        "a press on the greyed Continue does nothing:\n{}",
+        after.text()
+    );
+    // Its palette twin says why it cannot run yet.
+    term.send_keys("C-p").unwrap();
+    term.send_text("Continue Grouped Push").unwrap();
+    term.wait_for("the palette graying Continue with its reason", STEP, |s| {
+        s.contains("Command Palette (1/") && s.contains("resolve and conclude the conflicts first")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Escape").unwrap();
+    term.wait_for_text_to_go("Command Palette", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     assert!(
         repo.try_git(&["rev-parse", "-q", "--verify", "MERGE_HEAD"])
             .is_some_and(|s| !s.trim().is_empty()),
@@ -166,6 +194,11 @@ fn a_diverged_remote_merges_stops_on_the_conflict_and_continue_finishes_the_push
         repo.git(&["rev-parse", "HEAD"]).trim()
     );
     let (c, r) = strip_button(&ready, "Continue");
+    assert_ne!(
+        ready.cell(c + 1, r).unwrap().bg,
+        grey,
+        "Continue lit up once the conflict was concluded"
+    );
     term.click(c + 1, r).unwrap();
     let seen = std::cell::RefCell::new(Vec::<String>::new());
     let done = term

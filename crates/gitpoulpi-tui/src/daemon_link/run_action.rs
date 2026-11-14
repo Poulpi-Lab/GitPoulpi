@@ -396,6 +396,33 @@ async fn dispatch(
                 Err(e) => Err(e),
             }
         }
+        // A grouped push or pull: the outcome (rows, conflicts, a plan to
+        // decide again) goes to the push-group dialog and the paused strip;
+        // the status line only gets the daemon's one-line account.
+        Action::RemoteGroupRun(_)
+        | Action::RemoteGroupContinue { .. }
+        | Action::RemoteGroupAbort { .. }
+        | Action::RemoteGroupRetry { .. } => {
+            let request = action.group_request().unwrap_or_default();
+            let args = serde_json::to_value(&request).unwrap_or_default();
+            match conn
+                .call::<gitpoulpi_core::domain::RemoteGroupOutcome>(
+                    OperationKind::RemoteGroupRun,
+                    args,
+                )
+                .await
+            {
+                Ok(outcome) => {
+                    crate::push_group_ui::on_outcome(&conn.repo.root, &outcome);
+                    let _ = action_message_tx.send_notify(outcome.message.clone());
+                    Ok(())
+                }
+                Err(e) => {
+                    crate::push_group_ui::on_failed(&conn.repo.root, &error_text::error_text(&e));
+                    Err(e)
+                }
+            }
+        }
         Action::PullThenPush { remote, branch } => {
             let pulled = conn
                 .call::<gitpoulpi_core::domain::PullOutcome>(

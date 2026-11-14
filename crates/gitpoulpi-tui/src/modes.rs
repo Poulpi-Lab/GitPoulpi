@@ -288,7 +288,12 @@ impl ConfirmAction {
     pub(crate) fn label(&self) -> String {
         use gitpoulpi_i18n::msg::confirm_button as b;
         let word = match self {
-            ConfirmAction::Destructive(PendingDestructive::ForcePush { .. }) => b::FORCE_PUSH,
+            ConfirmAction::Destructive(
+                PendingDestructive::ForcePush { .. } | PendingDestructive::GroupForcePush { .. },
+            ) => b::FORCE_PUSH,
+            ConfirmAction::Destructive(PendingDestructive::GroupAbort { .. }) => {
+                gitpoulpi_i18n::msg::push_group::STRIP_ABORT
+            }
             ConfirmAction::Destructive(PendingDestructive::RemoveRemote(_)) => b::REMOVE,
             ConfirmAction::Destructive(_) => b::DELETE,
             ConfirmAction::CloseTab(_) => b::CLOSE_TAB,
@@ -464,6 +469,16 @@ pub(crate) enum PendingDestructive {
         /// diverged dialog, see `RemoteUiAction::ForcePush`).
         after_fetch: bool,
     },
+    /// A grouped push with at least one force push (with lease): confirmed
+    /// naming the remotes and the commits they lose, then run as written.
+    GroupForcePush {
+        request: Box<gitpoulpi_core::domain::RemoteGroupRunRequest>,
+    },
+    /// Abort the merge or rebase of a paused grouped push (the strip's
+    /// "Abort group"); pushes already done stay.
+    GroupAbort {
+        run_id: String,
+    },
     /// Break somebody else's Git LFS lock on a file. It changes what
     /// *other people* see (their lock disappears), so it is confirmed.
     LfsForceUnlock {
@@ -522,6 +537,10 @@ impl PendingDestructive {
                 remote,
                 path,
                 force: true,
+            },
+            PendingDestructive::GroupForcePush { request } => Action::RemoteGroupRun(request),
+            PendingDestructive::GroupAbort { run_id } => Action::RemoteGroupAbort {
+                expect_run_id: Some(run_id),
             },
             PendingDestructive::ForcePush {
                 remote,

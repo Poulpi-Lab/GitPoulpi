@@ -5458,6 +5458,8 @@ no_longer = "{path} больше не подмодуль"
 
 [combo]
 type_to_search = "введите для поиска"
+# context: placeholder of the search line of a dropdown that also accepts typed text
+type_to_use_own = "type your own value"
 loading = "загрузка..."
 no_match = "нет совпадений"
 use_value = "Использовать «{value}»"

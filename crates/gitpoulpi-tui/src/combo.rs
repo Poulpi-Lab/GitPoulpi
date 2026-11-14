@@ -699,7 +699,12 @@ impl Combo {
         if search {
             let line = if self.query.is_empty() {
                 (
-                    gitpoulpi_i18n::msg::combo::TYPE_TO_SEARCH.get().to_string(),
+                    if self.allow_custom {
+                        gitpoulpi_i18n::msg::combo::TYPE_TO_USE_OWN.get()
+                    } else {
+                        gitpoulpi_i18n::msg::combo::TYPE_TO_SEARCH.get()
+                    }
+                    .to_string(),
                     th().ui.muted,
                 )
             } else {
@@ -906,6 +911,29 @@ mod tests {
             c.on_key(key(KeyCode::Char(ch)));
         }
         assert!(c.custom_row().is_none(), "a known option is not custom");
+    }
+
+    fn popup_text(c: &mut Combo) -> String {
+        let bounds = Rect::new(0, 0, 40, 20);
+        let mut buf = Buffer::empty(bounds);
+        c.render_field(&mut buf, Rect::new(2, 1, 30, 1), false, false);
+        c.render_popup(&mut buf, bounds);
+        screen(&buf)
+    }
+
+    #[test]
+    fn a_custom_combo_hints_that_typing_is_allowed() {
+        let hint = gitpoulpi_i18n::msg::combo::TYPE_TO_USE_OWN.get();
+        let mut c = combo(2).with_custom();
+        c.open();
+        assert!(popup_text(&mut c).contains(hint));
+        c.on_key(key(KeyCode::Char('g')));
+        assert!(!popup_text(&mut c).contains(hint), "gone once typing");
+        let mut plain = combo(2).with_search();
+        plain.open();
+        let text = popup_text(&mut plain);
+        assert!(!text.contains(hint), "no hint without allow_custom");
+        assert!(text.contains(gitpoulpi_i18n::msg::combo::TYPE_TO_SEARCH.get()));
     }
 
     #[test]

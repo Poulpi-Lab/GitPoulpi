@@ -5469,6 +5469,8 @@ no_longer = "{path} är inte längre en submodul"
 
 [combo]
 type_to_search = "skriv för att söka"
+# context: placeholder of the search line of a dropdown that also accepts typed text
+type_to_use_own = "type your own value"
 loading = "laddar..."
 no_match = "ingen träff"
 use_value = "Använd ”{value}”"

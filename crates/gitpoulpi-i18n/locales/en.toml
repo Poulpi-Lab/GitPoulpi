@@ -6687,6 +6687,8 @@ no_longer = "{path} is no longer a submodule"
 [combo]
 # context: placeholder of the search line in a dropdown
 type_to_search = "type to search"
+# context: placeholder of the search line of a dropdown that also accepts typed text
+type_to_use_own = "type your own value"
 loading = "loading..."
 no_match = "no match"
 # context: dropdown row that accepts what was typed as a custom value
@@ -7128,11 +7130,11 @@ palette_create_desktop = "Launcher: Create Desktop Shortcut"
 palette_remove = "Launcher: Remove Shortcuts"
 icons_updated = "launcher shortcuts updated"
 alias = "Command alias"
-alias_help = "The short command that starts GitPoulpi from a terminal, for example gp. Letters, digits, - _ and . only. A shell alias or function of the same name wins over it and cannot be seen from here (oh-my-zsh defines gp itself)."
+alias_help = "The short command that starts GitPoulpi from a terminal, for example gp. Type any name in the list to use your own. Letters, digits, - _ and . only. A shell alias or function of the same name wins over it and cannot be seen from here (oh-my-zsh defines gp itself)."
 alias_none = "None"
 alias_status = "Alias status"
 alias_add = "Add-tab alias"
-alias_add_help = "A second short command, for example gpa, that opens the current folder as a new tab of the GitPoulpi that is already running (gitpoulpi --add) instead of starting another one. With none running it starts GitPoulpi as usual. Create makes it together with the command alias above. Same name rules."
+alias_add_help = "A second short command, for example gpa, that opens the current folder as a new tab of the GitPoulpi that is already running (gitpoulpi --add) instead of starting another one. With none running it starts GitPoulpi as usual. Create makes it together with the command alias above. Type any name in the list to use your own. Same name rules."
 alias_add_status = "Add-tab status"
 alias_set_name = "type a name above"
 alias_bad_space = "the name has a space"

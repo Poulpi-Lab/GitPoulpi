@@ -5461,6 +5461,8 @@ no_longer = "{path} já não é um submódulo"
 
 [combo]
 type_to_search = "escreva para pesquisar"
+# context: placeholder of the search line of a dropdown that also accepts typed text
+type_to_use_own = "type your own value"
 loading = "a carregar..."
 no_match = "sem resultado"
 use_value = "Usar “{value}”"

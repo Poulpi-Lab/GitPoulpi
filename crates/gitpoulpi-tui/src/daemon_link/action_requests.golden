@@ -74,22 +74,22 @@
   FetchRefAsBranch {"branch":"pr-7","remote":"origin","remote_ref":"pull/7/head"}
   Checkout {"target":{"Branch":"pr-7"}}
   ok: true
-== Pull(PullOptions { mode: FastForwardOnly, remote: Some("origin") })
-  Pull {"opts":{"mode":"fast_forward_only","remote":"origin"}}
+== Pull(PullOptions { mode: FastForwardOnly, remote: Some("origin"), remote_branch: None })
+  Pull {"opts":{"mode":"fast_forward_only","remote":"origin","remote_branch":null}}
   message: already up to date
   ok: true
-== Push { remote: "origin", opts: PushOptions { force_with_lease: false, set_upstream: true, branch: Some("main") } }
-  Push {"opts":{"branch":"main","force_with_lease":false,"set_upstream":true},"remote":"origin"}
+== Push { remote: "origin", opts: PushOptions { force_with_lease: false, set_upstream: true, branch: Some("main"), lease: None, remote_branch: None } }
+  Push {"opts":{"branch":"main","force_with_lease":false,"lease":null,"remote_branch":null,"set_upstream":true},"remote":"origin"}
   message: pushed main to origin
   ok: true
 == PullThenPush { remote: "origin", branch: "main" }
-  Pull {"opts":{"mode":"merge","remote":"origin"}}
-  Push {"opts":{"branch":"main","force_with_lease":false,"set_upstream":false},"remote":"origin"}
+  Pull {"opts":{"mode":"merge","remote":"origin","remote_branch":null}}
+  Push {"opts":{"branch":"main","force_with_lease":false,"lease":null,"remote_branch":null,"set_upstream":false},"remote":"origin"}
   message: pushed main to origin
   ok: true
 == FetchThenForcePush { remote: "origin", branch: "main" }
   Fetch {"opts":{"prune":false,"prune_tags":false},"remote":"origin"}
-  Push {"opts":{"branch":"main","force_with_lease":true,"set_upstream":false},"remote":"origin"}
+  Push {"opts":{"branch":"main","force_with_lease":true,"lease":null,"remote_branch":null,"set_upstream":false},"remote":"origin"}
   message: force-pushed (with lease) main to origin
   ok: true
 == CheckoutBranch("topic")

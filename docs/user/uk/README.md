@@ -73,7 +73,11 @@ GitPoulpi - це клієнт Git для термінала з графом comm
     Що проходить через tmux, zellij, screen, herdr і панелі терміналів:
     **[Мультиплексори](multiplexers.md)**.
 
-Також: **[Робочі процеси гілок](branching-workflows.md)**: шаблони Git Flow, GitHub
+Також: **[Кілька remote для однієї гілки](multiple-remotes.md)**: цілі push і джерела
+pull, діалог Remote, Push на всі або вибрані remote, розбір remote, що пішов уперед,
+«Продовжити» після конфлікту, CLI і псевдонім на звичайному git.
+
+**[Робочі процеси гілок](branching-workflows.md)**: шаблони Git Flow, GitHub
 Flow, GitLab Flow і Trunk-based або ваші власні базові гілки, шаблони назв гілок і
 типи гілок (`gitpoulpi flow ...`).
 

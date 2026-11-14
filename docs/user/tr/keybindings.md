@@ -206,6 +206,7 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `refs` | `hosting_edit` | Pull Request: Barındırıcıda Düzenle | `e` |
 | `refs` | `new_pull_request` | Pull Request'ler: Yeni Oluştur | `n` |
 | `refs` | `add_remote` | Uzak Depolar: Uzak Depo Ekle | `+` |
+| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
 | `diff` | `close` | Diff Görünümünü Kapat | `q` |
 | `diff` | `edit` | Çalışma Ağacında Düzenle | `e` |
 | `diff` | `lfs_raw` | LFS: Kart veya Ham İşaretçi | `r` |

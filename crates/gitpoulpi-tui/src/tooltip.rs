@@ -60,6 +60,8 @@ pub(crate) enum TooltipKey {
     TagWhere(u64),
     /// The author's name in the commit-detail pane: its email.
     CommitAuthor,
+    /// The remotes badge of a Refs row (`multi_remote_badge::hover_key`).
+    RefRemotes(u64),
 }
 
 // The email behind the commit-detail author name, set by the paint walk

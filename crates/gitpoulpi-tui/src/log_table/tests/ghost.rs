@@ -86,6 +86,7 @@ fn ghost(name: &str) -> crate::graph::GhostRef {
             checked_out: false,
             combined_remote: false,
             tag_where: None,
+            multi_remote: None,
         },
         remote: None,
         deleted_in: None,

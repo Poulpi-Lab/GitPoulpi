@@ -408,6 +408,9 @@ pub(super) enum RepoField {
     TemplateStripComments,
     /// Conflict prevention page: detection on for this repository.
     ConflictDetection,
+    /// Git page: the remote at this index of the repository's remotes is an
+    /// extra push target of new branches (`default_push_targets`).
+    PushTarget(usize),
 }
 
 impl RepoField {

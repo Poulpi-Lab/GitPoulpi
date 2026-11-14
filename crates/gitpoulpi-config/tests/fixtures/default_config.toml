@@ -137,6 +137,7 @@ lfs_enabled = true
 lfs_autofix_filters = true
 pull_mode = "merge"
 push_behavior = "direct"
+push_group_preflight = true
 merge_fast_forward = "never"
 
 [mcp]

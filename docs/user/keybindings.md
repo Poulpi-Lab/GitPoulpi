@@ -204,6 +204,7 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `refs` | `hosting_edit` | Pull Request: Edit on the Host | `e` |
 | `refs` | `new_pull_request` | Pull Requests: Create One | `n` |
 | `refs` | `add_remote` | Remotes: Add a Remote | `+` |
+| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
 | `diff` | `close` | Close the Diff | `q` |
 | `diff` | `edit` | Edit in Working Directory | `e` |
 | `diff` | `lfs_raw` | LFS: Card or Raw Pointer | `r` |

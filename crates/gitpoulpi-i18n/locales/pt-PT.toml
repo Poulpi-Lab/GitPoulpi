@@ -633,6 +633,11 @@ inherited = "(herdado)"
 lfs_not_checked = "(ainda não verificado)"
 lfs_autofix_filters = "Instalar os filtros LFS antes de {$pull} e {$push}"
 lfs_autofix_filters_help = { git = "Antes de um {$pull} ou {$push} num repositório que usa Git LFS, executa `git lfs install --local` se os filtros LFS ou os hooks estiverem em falta (configuração própria do repositório, nunca a global), para que a transferência trate dos ficheiros grandes. A barra de estado avisa. Requer git-lfs.", local = "Antes de puxar ou enviar num repositório que usa Git LFS, executa `git lfs install --local` se os filtros LFS ou os hooks estiverem em falta (configuração própria do repositório, nunca a global), para que a transferência trate dos ficheiros grandes. A barra de estado avisa. Requer git-lfs." }
+push_group_preflight = "Check every remote before a {$push}"
+push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
+default_push_targets = "Extra {$push} targets for new branches"
+default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
+default_push_targets_none = "(no remote configured)"
 
 [settings_screen]
 title = "Definições - Tab: secções/opções │ Enter: alterar"
@@ -2531,6 +2536,7 @@ log_columns_fit_all = "Ajustar todas as colunas ao conteúdo"
 log_scroll_left = "Deslocar as colunas para a esquerda"
 log_scroll_right = "Deslocar as colunas para a direita"
 log_columns_layout = "Deslocamento lateral ou ajuste ao painel"
+refs_remotes = "Branch: Edit its Remotes"
 
 
 [keymap_ctx]
@@ -4036,6 +4042,7 @@ rewrite_9 = "abre o separador Tamanho e analisa o histórico: os maiores ficheir
 rewrite_host_howto = "explica como fazer passar uma reescrita por uma branch que o alojamento protege: levantar a proteção, fazer um {$push_noun} com um novo nome ou recriar o repositório; nada é feito por si"
 rewrite_ai_rules = "cria as regras de reescrita a partir da sua descrição com IA (nada é pré-visualizado nem aplicado)"
 log_columns_2 = "deslocar lateralmente as colunas do Log quando mantêm as suas larguras (a disposição Deslocamento lateral, escolhida no seletor de colunas, nas Definições ou com s quando uma coluna está escolhida); na disposição ajustada, cada coluna cabe no painel"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} ou botão direito"
@@ -9639,3 +9646,17 @@ keys_hint = "Space {$Push}, p {$Pull} too, r Rename, Del Remove, Enter Apply"
 applying = "setting the remotes of {branch}..."
 # context: status line once the daemon applied the change; {branch} is the local branch
 remotes_set = "remotes of {branch} updated"
+
+[multi_remote]
+state_new = "new"
+state_gone = "gone"
+state_unrelated = "unrelated"
+tip_title = "Remotes of {branch}"
+tip_in_sync = "{remote}: in sync"
+tip_ahead = "{remote}: {n} ahead"
+tip_behind = "{remote}: {n} behind"
+tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
+tip_new = "{remote}: no copy of this branch yet"
+tip_unrelated = "{remote}: no common history"
+tip_gone = "{remote}: no longer configured"
+tip_open_hint = "Click to edit the remotes of this branch"

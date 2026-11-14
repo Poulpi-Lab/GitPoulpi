@@ -88,6 +88,11 @@ pub struct GitConfig {
     pub pull_mode: PullButtonMode,
     /// Live: whether Push goes straight to the default remote or asks.
     pub push_behavior: PushBehavior,
+    /// Live: before a push to a branch's several remotes, look at every
+    /// target first (`ls-remote`, then a fetch of that remote only when it
+    /// differs) so a problem on the third remote is found before the first
+    /// push. Off: push to each target in turn and report what happened.
+    pub push_group_preflight: bool,
     /// Live: whether a merge the user starts may fast-forward: `never`
     /// (always a merge commit, the default), `allowed` (git's own default)
     /// or `only`. A repository's Merge options page overrides it.
@@ -104,6 +109,7 @@ impl Default for GitConfig {
             lfs_autofix_filters: true,
             pull_mode: PullButtonMode::default(),
             push_behavior: PushBehavior::default(),
+            push_group_preflight: true,
             merge_fast_forward: MergeFastForward::default(),
         }
     }

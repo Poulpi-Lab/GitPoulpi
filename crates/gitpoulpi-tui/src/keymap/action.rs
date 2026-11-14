@@ -534,6 +534,7 @@ actions! {
     RefsHostingEdit => (Refs, "refs.hosting_edit", REFS_HOSTING_EDIT, ["e"], @Hosting),
     RefsNewPullRequest => (Refs, "refs.new_pull_request", REFS_NEW_PULL_REQUEST, ["n"], @Hosting),
     RefsAddRemote => (Refs, "refs.add_remote", REFS_ADD_REMOTE, ["+"]),
+    RefsRemotes => (Refs, "refs.remotes", REFS_REMOTES, ["u"]),
     // ---- diff view ----
     DiffClose => (Diff, "diff.close", DIFF_CLOSE, ["q"]),
     DiffEdit => (Diff, "diff.edit", DIFF_EDIT, ["e"]),

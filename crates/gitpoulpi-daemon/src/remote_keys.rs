@@ -65,6 +65,89 @@ pub fn set_remotes(
     backend.set_config_section(repo, &section, &new)
 }
 
+/// The repository's "Extra push targets for new branches"
+/// (`RepoPreferences::default_push_targets`).
+fn default_targets(repo: &RepoRef) -> Vec<String> {
+    gitpoulpi_session::RepoState::load(&crate::autostash::state_path(repo))
+        .map(|s| s.preferences.default_push_targets)
+        .unwrap_or_default()
+}
+
+/// Whether `branch` has an upstream configured right now.
+pub fn has_upstream(backend: &dyn GitBackend, repo: &RepoRef, branch: &str) -> bool {
+    backend
+        .config_section(repo, &section_of(branch))
+        .map(|e| e.iter().any(|(k, _)| k == "remote"))
+        .unwrap_or(false)
+}
+
+/// The local branch a push without an explicit one acts on: HEAD's.
+pub fn head_branch(backend: &dyn GitBackend, repo: &RepoRef) -> Option<String> {
+    backend
+        .refs(repo)
+        .ok()?
+        .into_iter()
+        .find_map(|r| match r.kind {
+            RefKind::LocalBranch { name } if r.is_head => Some(name),
+            _ => None,
+        })
+}
+
+/// The remote an upstream spelled `<remote>/<branch>` names, the longest
+/// configured one first (a remote name may hold a slash).
+pub fn remote_of_upstream(upstream: &str, known: &[String]) -> Option<String> {
+    known
+        .iter()
+        .filter(|r| {
+            upstream
+                .strip_prefix(r.as_str())
+                .is_some_and(|rest| rest.starts_with('/'))
+        })
+        .max_by_key(|r| r.len())
+        .cloned()
+}
+
+/// Copies the repository's default extra push targets into `branch`'s keys
+/// when it has none yet, leaving out its upstream remote and any remote
+/// that is not configured. Best effort: a failure here never fails the push
+/// or the branch creation it follows.
+pub fn apply_default_targets(
+    backend: &dyn GitBackend,
+    repo: &RepoRef,
+    branch: &str,
+    primary: &str,
+) {
+    let wanted = default_targets(repo);
+    if wanted.is_empty() {
+        return;
+    }
+    let Ok(entries) = backend.config_section(repo, &section_of(branch)) else {
+        return;
+    };
+    let current = parse_branch_remotes(&entries, branch);
+    if !current.push_to.is_empty() {
+        return;
+    }
+    let Ok(known) = remote_names(backend, repo) else {
+        return;
+    };
+    let mut push_to: Vec<String> = Vec::new();
+    for r in wanted {
+        if r != primary && known.contains(&r) && !push_to.contains(&r) {
+            push_to.push(r);
+        }
+    }
+    if push_to.is_empty() {
+        return;
+    }
+    let pull_from: Vec<String> = current
+        .pull_from
+        .iter()
+        .map(|t| t.to_value(branch))
+        .collect();
+    let _ = set_remotes(backend, repo, branch, &push_to, &pull_from);
+}
+
 /// Where one target stands against its remote-tracking ref in `refs`.
 fn state_of(
     backend: &dyn GitBackend,
@@ -155,7 +238,7 @@ fn states(
     out
 }
 
-fn remote_names(backend: &dyn GitBackend, repo: &RepoRef) -> Result<Vec<String>> {
+pub(crate) fn remote_names(backend: &dyn GitBackend, repo: &RepoRef) -> Result<Vec<String>> {
     Ok(backend.remotes(repo)?.into_iter().map(|r| r.name).collect())
 }
 

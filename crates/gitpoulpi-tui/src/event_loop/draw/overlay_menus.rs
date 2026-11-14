@@ -377,6 +377,44 @@ pub(in crate::event_loop) fn draw_overlay_menus(
             }
         }
     }
+    // The remotes badge of a Refs row: one line per remote.
+    if let Some(HitTarget::RefRemotesBadge(branch)) = hovered_target.as_ref() {
+        let targets = refs_for_pills
+            .iter()
+            .find_map(|r| match (&r.kind, &r.multi_remote) {
+                (gitpoulpi_core::domain::RefKind::LocalBranch { name }, Some(t))
+                    if name == branch =>
+                {
+                    Some(t.as_slice())
+                }
+                _ => None,
+            });
+        if let Some(targets) = targets {
+            if tooltip.visible(
+                crate::tooltip::TooltipKey::RefRemotes(crate::multi_remote_badge::hover_key(
+                    branch,
+                )),
+                now,
+                tooltip_blocked,
+            ) {
+                if let Some((rect, _)) = frame_hits
+                    .iter()
+                    .find(|(_, t)| Some(t) == hovered_target.as_ref())
+                {
+                    tooltip_painted = Some(crate::tooltip::paint_box(
+                        frame,
+                        frame.area(),
+                        rect.x,
+                        rect.y + 1,
+                        crate::multi_remote_badge::tooltip_lines(branch, targets)
+                            .into_iter()
+                            .map(Line::from)
+                            .collect(),
+                    ));
+                }
+            }
+        }
+    }
     // A sidebar branch under a workflow: type, parent, how far behind it.
     if let Some((key, lines, col, row)) = crate::flow::view::hover_tooltip() {
         if tooltip.visible(

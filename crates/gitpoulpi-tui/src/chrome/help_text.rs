@@ -173,6 +173,7 @@ pub(crate) const HELP_TEXT: &[HelpEntry] = &[
     Item(keys!(""), msg::help_text::REFS_PANE_17),
     Item(keys!("{refs.reveal}"), msg::help_text::REFS_PANE_18),
     Item(keys!("{refs.mark_drop} / {refs.drop_marked}"), msg::help_text::REFS_PANE_19),
+    Item(keys!("{refs.remotes}"), msg::help_text::REFS_PANE_20),
     Item(
         keys!("{refs.expand_all} / {refs.collapse_all} / {refs.expand_below} / {refs.collapse_below}"),
         msg::tree_fold::HELP_FOLDS,

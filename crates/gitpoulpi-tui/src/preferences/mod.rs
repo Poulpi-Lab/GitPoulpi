@@ -290,6 +290,9 @@ pub(crate) struct PreferencesState {
     repo_config: std::collections::BTreeMap<String, Option<String>>,
     repo_config_version: u64,
     repo_config_requests: Vec<(String, Option<String>)>,
+    /// The repository's remotes, for the Git page's "Extra push targets for
+    /// new branches" rows (pushed in by the event loop).
+    remote_names: Vec<String>,
     sidebar_rows: Vec<(u16, usize)>,
     field_rows: Vec<(u16, usize)>,
     /// The left edge of the pane the field rows were painted in (the body,
@@ -581,6 +584,7 @@ impl PreferencesState {
             lfs_program: None,
             lfs_init_requested: false,
             repo_config: Default::default(),
+            remote_names: Vec::new(),
             repo_config_version: 0,
             repo_config_requests: Vec::new(),
             sidebar_rows: Vec::new(),
@@ -676,6 +680,13 @@ impl PreferencesState {
             self.repo_config_version = version;
             self.repo_config = values.clone();
             self.template_follow_config();
+        }
+    }
+
+    /// The repository's remote names, for the extra-push-target rows.
+    pub(crate) fn set_remote_names(&mut self, names: &[String]) {
+        if self.remote_names != names {
+            self.remote_names = names.to_vec();
         }
     }
 

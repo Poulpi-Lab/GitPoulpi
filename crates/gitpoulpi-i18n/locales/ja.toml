@@ -633,6 +633,11 @@ inherited = "（継承）"
 lfs_not_checked = "（未確認）"
 lfs_autofix_filters = "{$pull}・{$push}の前に LFS フィルターをインストール"
 lfs_autofix_filters_help = "Git LFS を使うリポジトリで{$pull}や{$push}をする前に、LFS フィルターやフック（そのリポジトリ自身の設定のみ。グローバル設定は変更しません）が無ければ `git lfs install --local` を実行し、大きなファイルを正しく転送します。実行するとステータスバーに表示します。git-lfs が必要です。"
+push_group_preflight = "Check every remote before a {$push}"
+push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
+default_push_targets = "Extra {$push} targets for new branches"
+default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
+default_push_targets_none = "(no remote configured)"
 
 [settings_screen]
 title = "設定 - Tab：セクション/項目 │ Enter：変更"
@@ -2533,6 +2538,7 @@ log_columns_fit_all = "全列を内容に合わせる"
 log_scroll_left = "列を左へスクロール"
 log_scroll_right = "列を右へスクロール"
 log_columns_layout = "横スクロール／ペインに合わせる"
+refs_remotes = "Branch: Edit its Remotes"
 
 
 [keymap_ctx]
@@ -4038,6 +4044,7 @@ rewrite_9 = "「サイズ」タブを開いて履歴を分析します。最大�
 rewrite_host_howto = "ホストが保護しているブランチに書き換えを通す方法を説明します（保護の一時解除、別名での{$push}、リポジトリの作り直し）。何も自動では行いません"
 rewrite_ai_rules = "説明から AI で書き換えルールを作成します（プレビューも適用も行いません）"
 log_columns_2 = "列が幅を保つとき、Logの列を横にスクロールします（列の選択画面、設定、または列を選んだ状態での s で選ぶ「横スクロール」レイアウト）。「ペインに合わせる」レイアウトでは、すべての列がペインに収まります"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} または右クリック"
@@ -9517,3 +9524,17 @@ keys_hint = "Space {$Push}, p {$Pull} too, r Rename, Del Remove, Enter Apply"
 applying = "setting the remotes of {branch}..."
 # context: status line once the daemon applied the change; {branch} is the local branch
 remotes_set = "remotes of {branch} updated"
+
+[multi_remote]
+state_new = "new"
+state_gone = "gone"
+state_unrelated = "unrelated"
+tip_title = "Remotes of {branch}"
+tip_in_sync = "{remote}: in sync"
+tip_ahead = "{remote}: {n} ahead"
+tip_behind = "{remote}: {n} behind"
+tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
+tip_new = "{remote}: no copy of this branch yet"
+tip_unrelated = "{remote}: no common history"
+tip_gone = "{remote}: no longer configured"
+tip_open_hint = "Click to edit the remotes of this branch"

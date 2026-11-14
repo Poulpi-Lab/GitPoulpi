@@ -203,8 +203,8 @@ mod tests {
             })
             .unwrap();
         let buf = terminal.backend().buffer();
-        let octopus = ABOUT_LABEL.chars().next().unwrap().to_string();
-        assert_eq!(buf[(1, 0)].symbol(), octopus, "title bar octopus");
+        let octopus = ABOUT_LABEL.chars().nth(1).unwrap().to_string();
+        assert_eq!(buf[(2, 0)].symbol(), octopus, "title bar octopus");
         assert_eq!(buf[(0, 2)].symbol(), octopus, "emoji row");
     }
 }

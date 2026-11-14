@@ -573,25 +573,69 @@ fn the_search_button_drops_its_label_then_gives_way_before_the_gear() {
         .all(|(_, t)| *t != HitTarget::GlobalSearchButton));
 }
 
-/// Emoji fallback (no picture protocol): the whole "octopus + blank" label
-/// carries the hover background, like every other title bar button.
+/// Picture path: the sprite's two cells sit in the middle, and both blanks
+/// around them carry the hover background.
 #[test]
-fn the_about_button_emoji_label_is_filled_on_hover_across_all_its_cells() {
+fn the_about_button_picture_is_centered_with_a_hover_blank_on_each_side() {
+    use crate::terminal_image::{Capability, CellSize, Protocol};
+    crate::title_logo::init(Capability {
+        protocol: Protocol::Iterm2,
+        cell: CellSize {
+            width: 9,
+            height: 21,
+        },
+    });
+    let mut terminal = ratatui::Terminal::new(ratatui::backend::TestBackend::new(12, 1)).unwrap();
+    let mut hits = Vec::new();
+    let mut next = 0;
+    // The frame's own buffer: the picture's reserved cells are `skip`, so the
+    // backend never receives them.
+    let mut buf = ratatui::buffer::Buffer::empty(Rect::new(0, 0, 12, 1));
+    terminal
+        .draw(|frame| {
+            next = render_about_button(frame, 1, 0, true, &mut hits);
+            buf = frame.buffer_mut().clone();
+        })
+        .unwrap();
+    let hover_bg = plain_button_style(true).bg;
+    assert_eq!(next, 5);
+    assert_eq!(hits, vec![(Rect::new(1, 0, 4, 1), HitTarget::About)]);
+    for x in [1u16, 4] {
+        assert_eq!(buf[(x, 0)].symbol(), " ", "blank at {x}");
+        assert_eq!(buf[(x, 0)].style().bg, hover_bg, "blank at {x} on hover");
+    }
+    // The reserved picture cells are the two in the middle, not the emoji.
+    for x in [2u16, 3] {
+        assert_ne!(buf[(x, 0)].symbol(), "\u{1F419}", "cell {x}");
+        assert_eq!(Some(buf[(x, 0)].bg), hover_bg, "picture cell {x}");
+    }
+}
+
+/// Emoji fallback (no picture protocol): the label is centered (one blank on
+/// each side of the octopus) and the whole of it carries the hover
+/// background, like every other title bar button.
+#[test]
+fn the_about_button_emoji_label_is_centered_and_filled_on_hover_across_all_its_cells() {
     let width = display_width(ABOUT_LABEL) as u16;
+    assert_eq!(width, 4);
     for hovered in [false, true] {
         let mut terminal =
             ratatui::Terminal::new(ratatui::backend::TestBackend::new(12, 1)).unwrap();
+        let mut hits = Vec::new();
         terminal
             .draw(|frame| {
-                let mut hits = Vec::new();
                 render_about_button(frame, 1, 0, hovered, &mut hits);
             })
             .unwrap();
         let buf = terminal.backend().buffer();
         let hover_bg = plain_button_style(true).bg;
-        // Cell 2 is the emoji's continuation: ratatui leaves it blank and the
+        assert_eq!(buf[(1, 0)].symbol(), " ", "blank before the octopus");
+        assert_eq!(buf[(2, 0)].symbol(), "\u{1F419}", "octopus in the middle");
+        assert_eq!(buf[(4, 0)].symbol(), " ", "blank after the octopus");
+        assert_eq!(hits, vec![(Rect::new(1, 0, 4, 1), HitTarget::About)]);
+        // Cell 3 is the emoji's continuation: ratatui leaves it blank and the
         // terminal paints the glyph's two columns with the first cell's bg.
-        for x in (1..1 + width).filter(|&x| x != 2) {
+        for x in (1..1 + width).filter(|&x| x != 3) {
             let bg = buf[(x, 0)].style().bg;
             if hovered {
                 assert_eq!(bg, hover_bg, "cell {x} on hover");

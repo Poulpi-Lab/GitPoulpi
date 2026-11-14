@@ -410,7 +410,7 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
         let mut about_chars = about_key.chars();
         if let (Some(c), None) = (about_chars.next(), about_chars.next()) {
             if let Some((rect, _)) = frame_hits.iter().find(|(_, t)| *t == HitTarget::About) {
-                let below = Rect::new(rect.x.saturating_sub(1), rect.y + 1, 3, 1);
+                let below = Rect::new(rect.x, rect.y + 1, 3, 1);
                 render_navigation_badges(frame, &[(below, c)]);
             }
         }

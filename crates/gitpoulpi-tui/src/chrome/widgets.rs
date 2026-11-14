@@ -425,8 +425,9 @@ pub(crate) fn render_search_button(
 
 /// The octopus at the title bar's left, before the title: opens About.
 /// Emoji presentation on purpose (the maintainer asked for the color 🐙); two
-/// cells wide plus one blank, which the hit rect covers.
-pub(crate) const ABOUT_LABEL: &str = "\u{1F419} ";
+/// cells wide with one blank on each side (like the other title bar buttons'
+/// padding), which the hit rect covers.
+pub(crate) const ABOUT_LABEL: &str = " \u{1F419} ";
 
 /// Paints the octopus at `(x, y)` and registers it; returns the column after
 /// it.
@@ -442,17 +443,19 @@ pub(crate) fn render_about_button(
     if frame.area().right() >= x + width
         && crate::title_logo::render(
             frame.buffer_mut(),
-            Rect::new(x, y, 2, 1),
+            Rect::new(x + 1, y, 2, 1),
             crate::about::way_index(),
             hovered.then(|| plain_button_style(true).bg).flatten(),
         )
     {
         // The picture takes the emoji's two cells (and paints the hover
-        // background under itself); the blank after it keeps the highlight.
-        frame.render_clipped(
-            Paragraph::new(Span::styled(" ", plain_button_style(hovered))),
-            Rect::new(x + 2, y, 1, 1),
-        );
+        // background under itself); a blank on each side keeps the highlight.
+        for bx in [x, x + 3] {
+            frame.render_clipped(
+                Paragraph::new(Span::styled(" ", plain_button_style(hovered))),
+                Rect::new(bx, y, 1, 1),
+            );
+        }
     } else {
         frame.render_clipped(
             Paragraph::new(Line::from(Span::styled(

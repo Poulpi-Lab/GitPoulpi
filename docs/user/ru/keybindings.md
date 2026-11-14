@@ -654,16 +654,16 @@ stage_file = "z"
 | Git: параметры pull... |  |
 | Git: push | `Ctrl+G P` |
 | Git: push на remote... |  |
-| Git: Push to Selected Remotes... |  |
-| Git: Push to All Targets |  |
-| Git: Pull from All Sources |  |
-| Git: Pull from One Remote... |  |
-| Git: Show Grouped Push |  |
-| Git: Continue Grouped Push |  |
-| Git: Abort Grouped Push |  |
-| Git: Retry Failed Pushes |  |
+| Git: Push в выбранные remote... |  |
+| Git: Push во все цели |  |
+| Git: Pull из всех источников |  |
+| Git: Pull из одного remote... |  |
+| Git: показать групповой push |  |
+| Git: продолжить групповой push |  |
+| Git: прервать групповой push |  |
+| Git: повторить неудачные push |  |
 | Git: force push (с lease)... |  |
-| Git: Remotes of Branch... |  |
+| Git: Remote ветки... |  |
 | Remote: добавить remote... |  |
 | Remote: удалить remote... |  |
 | Remote: изменить remote... |  |

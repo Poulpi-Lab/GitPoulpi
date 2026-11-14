@@ -209,8 +209,10 @@ la bordure entre deux sections pour les redimensionner.
   `fix/`). Une coche indique la branche extraite. Vous pouvez désactiver les
   dossiers dans les Paramètres.
 - **DISTANTES** : les branches de chaque dépôt distant, rangées sous son nom.
-- **WORKTREES** : les worktrees liés, s'il y en a. Double-cliquez sur l'un pour
-  l'ouvrir dans son propre onglet.
+- **WORKTREES** : les worktrees liés, s'il y en a (ou quand vous avez affiché la
+  section). Le **+** de son en-tête en crée un ; double-cliquez sur un worktree
+  pour l'ouvrir dans son propre onglet, clic droit pour Ouvrir dans, Merge et
+  Retirer. Voir [Worktrees](worktrees.md).
 - **STASHES** : vos stashes. Clic droit sur l'un pour **Pop**, **Appliquer** et
   **Supprimer**.
 - **TAGS** : vos tags, rangés en dossiers découpés sur `/` comme les branches (`releases/`, `backups/`). Une flèche signifie que le tag est aussi sur le distant.

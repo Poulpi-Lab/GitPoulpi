@@ -523,7 +523,7 @@ Modifie la liste du bouton **Ouvrir dans** de la barre de titre. L'onglet **Gén
 contient les boutons de dossier **Quitter & cd ici**, l'**Entrée par défaut** et **Restaurer les
 valeurs détectées**. L'onglet **Entrées** est une [liste](#listes) (un libellé et une commande
 chacune) : **+ Ajouter ▾** propose les préréglages et **Entrée personnalisée**, et l'entrée par défaut est marquée `★`. Les champs de l'entrée
-sélectionnée comprennent un bouton **Tester**. Voir [Ouvrir dans](open-in.md).
+sélectionnée comprennent **Peut ouvrir un worktree** (coché par défaut : l'entrée est proposée dans le menu Ouvrir dans d'une ligne de worktree, voir [Worktrees](worktrees.md)) et un bouton **Tester**. Voir [Ouvrir dans](open-in.md).
 
 La première ligne, **Suivre le dossier de l'onglet actif**, a deux valeurs :
 

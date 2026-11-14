@@ -488,6 +488,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Volet gauche : Afficher/masquer Locales |  |
 | Volet gauche : Afficher/masquer Distants |  |
 | Volet gauche : Afficher/masquer Worktrees |  |
+| Barre latérale : Afficher la section Worktrees |  |
 | Volet gauche : Afficher/masquer Stashes |  |
 | Volet gauche : Afficher/masquer Tags |  |
 | Volet gauche : Afficher/masquer Pull requests |  |
@@ -531,6 +532,12 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Refs : Reflog de la branche sélectionnée... |  |
 | Refs : Ouvrir une pull request depuis la branche sélectionnée... |  |
 | Refs : Ouvrir le worktree dans un onglet | `Enter / double-clic` |
+| Refs : Ouvrir le worktree dans... |  |
+| Refs : Merge de la branche du worktree dans... |  |
+| Refs : Retirer le worktree... |  |
+| Refs : Créer un worktree... | `+` |
+| Refs : Créer un worktree depuis la branche courante |  |
+| Refs : Créer un worktree en choisissant une branche |  |
 | Refs : Mettre à jour le sous-module (sélection) |  |
 | Refs : Initialiser le sous-module (sélection) |  |
 | Refs : Ouvrir le sous-module dans un onglet | `Enter / double-clic` |

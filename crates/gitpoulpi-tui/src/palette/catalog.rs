@@ -98,6 +98,11 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::ToggleSidebarSection(SidebarSection::Worktrees),
     ),
     entry(
+        msg::palette::SIDEBAR_SHOW_WORKTREES,
+        "",
+        PaletteCommand::ShowWorktreesSection,
+    ),
+    entry(
         msg::palette::SIDEBAR_TOGGLE_STASHES,
         "",
         PaletteCommand::ToggleSidebarSection(SidebarSection::Stashes),
@@ -312,6 +317,36 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         msg::palette::REFS_OPEN_WORKTREE_IN_TAB,
         msg::palette::SHORTCUT_ENTER_OR_DOUBLE_CLICK,
         PaletteCommand::OpenWorktreeInTab,
+    ),
+    entry(
+        msg::palette::REFS_OPEN_WORKTREE_IN,
+        "",
+        PaletteCommand::WorktreeOpenInSelected,
+    ),
+    entry(
+        msg::palette::REFS_MERGE_WORKTREE_BRANCH_INTO,
+        "",
+        PaletteCommand::WorktreeMergeSelected,
+    ),
+    entry(
+        msg::palette::REFS_REMOVE_WORKTREE,
+        "",
+        PaletteCommand::WorktreeRemoveSelected,
+    ),
+    entry(
+        msg::palette::REFS_CREATE_WORKTREE,
+        "+",
+        PaletteCommand::CreateWorktreeMenu,
+    ),
+    entry(
+        msg::palette::REFS_CREATE_WORKTREE_FROM_CURRENT_BRANCH,
+        "",
+        PaletteCommand::CreateWorktreeFromCurrentBranch,
+    ),
+    entry(
+        msg::palette::REFS_CREATE_WORKTREE_CHOOSING_A_BRANCH,
+        "",
+        PaletteCommand::CreateWorktreeChooseBranch,
     ),
     entry(
         msg::palette::REFS_SUBMODULE_UPDATE_SELECTED,

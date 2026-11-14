@@ -178,9 +178,9 @@ impl WindowState {
                     );
                 }
                 None => {
-                    self.last_message = Some(
-                        gitpoulpi_i18n::msg::worktree_manage::not_listed(path.display()),
-                    );
+                    self.last_message = Some(gitpoulpi_i18n::msg::worktree_manage::not_listed(
+                        path.display(),
+                    ));
                 }
             }
         }

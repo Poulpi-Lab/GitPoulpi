@@ -479,6 +479,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 왼쪽 창: 로컬 브랜치 표시/숨기기 |  |
 | 왼쪽 창: 리모트 표시/숨기기 |  |
 | 왼쪽 창: Worktree 표시/숨기기 |  |
+| Sidebar: Show Worktrees Section |  |
 | 왼쪽 창: Stashes 표시/숨기기 |  |
 | 왼쪽 창: Tags 표시/숨기기 |  |
 | 왼쪽 창: Pull requests 표시/숨기기 |  |
@@ -522,6 +523,12 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Refs: 선택한 브랜치의 Reflog... |  |
 | Refs: 선택한 브랜치에서 Pull request 시작... |  |
 | Refs: 워크트리를 탭으로 열기 | `Enter / 더블 클릭` |
+| Refs: Open Worktree In... |  |
+| Refs: Merge Worktree Branch Into... |  |
+| Refs: Remove Worktree... |  |
+| Refs: Create Worktree... | `+` |
+| Refs: Create Worktree from Current Branch |  |
+| Refs: Create Worktree Choosing a Branch |  |
 | Refs: 서브모듈 업데이트 (선택) |  |
 | Refs: 서브모듈 초기화 (선택) |  |
 | Refs: 서브모듈을 탭으로 열기 | `Enter / 더블 클릭` |

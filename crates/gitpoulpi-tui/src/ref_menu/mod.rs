@@ -104,6 +104,11 @@ pub(crate) enum RefContextAction {
     /// Remove the worktree (a confirmation that also offers to save its
     /// changes).
     WorktreeRemove,
+    /// The WORKTREES header's `+` menu: a worktree on the current branch,
+    /// on the Log's selected commit, or on a branch chosen in the dialog.
+    WorktreeNewHead,
+    WorktreeNewCommit,
+    WorktreeNewChoose,
     /// Open the Reflog view on this local branch: where it was before.
     Reflog,
     /// Start a pull request from this local branch:
@@ -179,6 +184,37 @@ pub(crate) fn worktree_menu_entries(
         rows.extend(more);
     }
     rows
+}
+
+/// The menu of the WORKTREES header's `+`. "From the selected commit" is
+/// grayed (with the reason) while the Log has no commit selected.
+#[cfg(feature = "worktree")]
+pub(crate) fn worktree_plus_entries(
+    commit_selected: bool,
+) -> Vec<context_menu::Entry<RefContextAction>> {
+    use context_menu::Entry;
+    use gitpoulpi_i18n::msg::worktree_manage as m;
+    vec![
+        Entry::action(
+            glyph_label("\u{229E}", m::PLUS_HEAD.get()),
+            RefContextAction::WorktreeNewHead,
+        ),
+        if commit_selected {
+            Entry::action(
+                glyph_label("\u{229E}", m::PLUS_COMMIT.get()),
+                RefContextAction::WorktreeNewCommit,
+            )
+        } else {
+            Entry::disabled(
+                glyph_label("\u{229E}", m::PLUS_COMMIT.get()),
+                m::SELECT_A_COMMIT.get(),
+            )
+        },
+        Entry::action(
+            glyph_label("\u{229E}", m::PLUS_CHOOSE.get()),
+            RefContextAction::WorktreeNewChoose,
+        ),
+    ]
 }
 
 /// One cell of a ref, as its Copy submenu offers it.

@@ -875,6 +875,7 @@ impl WindowState {
                         .selected()
                         .is_some_and(|i| i < self.stashes_result.as_deref().unwrap_or(&[]).len()),
                 selected_worktree: self.active_ref_section == SidebarSection::Worktrees
+                    && linked_worktree_count(self.worktrees_result.as_deref().unwrap_or(&[])) > 0
                     && self
                         .sidebar_states
                         .state(SidebarSection::Worktrees)

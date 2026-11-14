@@ -424,7 +424,7 @@ duplicate_name = "{name} (복사본)"
 
 [settings_open_in]
 worktree = "Can open a worktree"
-worktree_help = "Offer this entry in the Open in menu of a worktree (right-click a row of the WORKTREES section). It runs with the worktree's folder as ${{cwd}}. Terminals, editors and file managers are on by default."
+worktree_help = "Offer this entry in the Open in menu of a worktree (right-click a row of the WORKTREES section). It runs with the worktree's folder as ${{cwd}}. Every entry is checked by default: untick the ones that make no sense on a folder."
 list_title = "항목"
 section_title = "열기 위치"
 default_entry = "기본 항목"
@@ -2932,6 +2932,14 @@ env_timeout = "에이전트 자체의 요청 시간 제한(ms)"
 env_offline = "시작 시 네트워크 호출 없음"
 
 [palette]
+sidebar_show_worktrees = "Sidebar: Show Worktrees Section"
+refs_open_worktree_in = "Refs: Open Worktree In..."
+refs_merge_worktree_branch_into = { git = "Refs: Merge Worktree Branch Into...", local = "Refs: Merge Worktree Branch Into..." }
+refs_remove_worktree = { git = "Refs: Remove Worktree...", local = "Refs: Remove Worktree..." }
+# context: opens the + menu of the WORKTREES section
+refs_create_worktree = { git = "Refs: Create Worktree...", local = "Refs: Create Worktree..." }
+refs_create_worktree_from_current_branch = { git = "Refs: Create Worktree from Current Branch", local = "Refs: Create Worktree from Current Branch" }
+refs_create_worktree_choosing_a_branch = { git = "Refs: Create Worktree Choosing a Branch", local = "Refs: Create Worktree Choosing a Branch" }
 # context: palette command; shows or hides the commit list column left of the diff, File View, Blame and Editor
 view_toggle_commit_column = "보기: {$Commit} 열 전환"
 view_column_off = "보기: {$Commit} 열: 숨기기"
@@ -9881,6 +9889,22 @@ tip_open_hint = "Click to edit the remotes of this branch"
 
 
 [worktree_manage]
+# context: hover label of the + on the WORKTREES header
+plus_tip = { git = "Create worktree", local = "Create worktree" }
+# context: title of the menu the + opens
+plus_title = { git = "New worktree", local = "New worktree" }
+# context: menu row: create a worktree
+plus_head = "From the current branch"
+# context: menu row: create a worktree
+plus_commit = "From the selected commit"
+# context: menu row: create a worktree on a branch picked in the dialog
+plus_choose = "Choose a branch..."
+select_a_commit = { git = "Select a commit in the Log first", local = "Select a commit in the Log first" }
+select_a_worktree = { git = "Select a worktree in the Refs pane first", local = "Select a worktree in the Refs pane first" }
+main_cannot_be_removed = { git = "The main worktree cannot be removed", local = "The main worktree cannot be removed" }
+no_head = "This repository has no commit yet"
+# context: hint line of the empty WORKTREES section
+empty_hint = { git = "No worktree yet: + to create one", local = "No worktree yet: + to create one" }
 # context: context menu row of a worktree
 menu_open_tab = "Open in a new tab"
 # context: submenu of a worktree row: the Open in entries

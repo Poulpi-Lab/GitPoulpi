@@ -166,6 +166,55 @@ pub(crate) fn default_worktree_path(repo_root: &Path, label: &str) -> PathBuf {
     parent.join(format!("{name}-{safe}"))
 }
 
+/// The seed of "From the current branch": the checked-out branch cannot be
+/// checked out twice, so the dialog proposes a new branch on it (`<b>-wt`,
+/// numbered when taken); a detached HEAD starts a detached worktree there.
+pub(crate) fn seed_from_head(
+    refs: &[gitpoulpi_core::domain::Ref],
+    worktrees: &[gitpoulpi_core::domain::Worktree],
+) -> Option<WorktreeSeed> {
+    use gitpoulpi_core::domain::RefKind;
+    let taken = |name: &str| {
+        refs.iter()
+            .any(|r| matches!(&r.kind, RefKind::LocalBranch { name: n } if n == name))
+    };
+    if let Some(head) = refs.iter().find(|r| r.is_head) {
+        if let RefKind::LocalBranch { name } = &head.kind {
+            let mut proposal = format!("{name}-wt");
+            let mut n = 2;
+            while taken(&proposal) {
+                proposal = format!("{name}-wt{n}");
+                n += 1;
+            }
+            return Some(WorktreeSeed {
+                start: WorktreeStart::Branch(name.clone()),
+                label: name.clone(),
+                new_branch: proposal,
+                branch_busy: true,
+            });
+        }
+    }
+    // Detached: the main worktree's HEAD.
+    let _ = worktrees;
+    let oid = crate::refs_sidebar::head_oid(refs)?;
+    Some(WorktreeSeed {
+        start: WorktreeStart::Commit(oid),
+        label: short(oid),
+        new_branch: String::new(),
+        branch_busy: false,
+    })
+}
+
+/// The seed of "Choose a branch...": the dialog opens on its Ref list.
+pub(crate) fn seed_to_choose(
+    refs: &[gitpoulpi_core::domain::Ref],
+    worktrees: &[gitpoulpi_core::domain::Worktree],
+) -> Option<WorktreeSeed> {
+    let mut seed = seed_from_head(refs, worktrees)?;
+    seed.new_branch.clear();
+    Some(seed)
+}
+
 /// The Ref combobox's value for a start.
 fn choice_value(start: &WorktreeStart) -> String {
     match start {
@@ -182,6 +231,7 @@ impl WorktreeDialog {
 
     /// The dialog for `seed` with no other branch to choose from (the ref
     /// stays what the seed says). Tests and the stub-compatible entry.
+    #[cfg(test)]
     pub(crate) fn new(seed: WorktreeSeed, repo_root: &Path) -> Self {
         Self::with_choices(seed, repo_root, Vec::new(), false)
     }
@@ -302,6 +352,18 @@ impl WorktreeDialog {
     /// The Ref combobox picked `value` (`b:<branch>` or `c:<oid>`).
     fn pick_ref(&mut self, value: &str) {
         if let Some(branch) = value.strip_prefix("b:") {
+            // The seed's own proposed branch name belongs to the seed's start:
+            // another branch is checked out as it is.
+            if self.seed.start != WorktreeStart::Branch(branch.to_string())
+                && !self.seed.new_branch.is_empty()
+                && self.new_branch == self.seed.new_branch
+            {
+                self.new_branch.clear();
+            } else if self.seed.start == WorktreeStart::Branch(branch.to_string())
+                && self.new_branch.is_empty()
+            {
+                self.new_branch = self.seed.new_branch.clone();
+            }
             self.start = WorktreeStart::Branch(branch.to_string());
             self.branch_busy = self
                 .branches
@@ -489,7 +551,10 @@ impl WorktreeDialog {
         }
         let shift = key.modifiers.contains(KeyModifiers::SHIFT);
         if self.focus == WtFocus::Ref
-            && matches!(key.code, KeyCode::Enter | KeyCode::Char(' ') | KeyCode::Down)
+            && matches!(
+                key.code,
+                KeyCode::Enter | KeyCode::Char(' ') | KeyCode::Down
+            )
         {
             self.combo.open();
             return WorktreeOutcome::Stay;
@@ -676,9 +741,7 @@ impl WorktreeDialog {
         label(buf, y, msg::worktree::NEW_BRANCH.get());
         let branch = Rect::new(field_x, y, field_w, 1);
         let placeholder = match &self.start {
-            WorktreeStart::Branch(b) if !self.branch_busy => {
-                msg::worktree::branch_hint_checkout(b)
-            }
+            WorktreeStart::Branch(b) if !self.branch_busy => msg::worktree::branch_hint_checkout(b),
             WorktreeStart::Branch(_) => msg::worktree::BRANCH_HINT_REQUIRED.get().into(),
             WorktreeStart::Commit(_) => msg::worktree::BRANCH_HINT_DETACHED.get().into(),
         };

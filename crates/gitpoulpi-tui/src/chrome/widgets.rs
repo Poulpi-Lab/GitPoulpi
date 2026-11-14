@@ -273,6 +273,31 @@ pub(crate) fn render_add_remote_button(
     );
 }
 
+/// The WORKTREES header's `+` (create a worktree), drawn exactly like the
+/// REMOTE one.
+pub(crate) fn render_add_worktree_button(
+    frame: &mut Frame,
+    area: Rect,
+    section_title_width: u16,
+    hovered: bool,
+    header_hovered: bool,
+    hits: &mut Vec<(Rect, HitTarget)>,
+) {
+    render_header_plus(
+        frame,
+        area,
+        section_title_width,
+        &format!(
+            " + {} ",
+            gitpoulpi_i18n::msg::worktree_manage::PLUS_TIP.get()
+        ),
+        hovered,
+        header_hovered,
+        HitTarget::AddWorktreeButton,
+        hits,
+    );
+}
+
 /// A sidebar section header's `+`: the REMOTE one (Add remote), and the
 /// PULL REQUESTS / ISSUES ones (New pull request / New issue), all drawn
 /// by this one function so the glyph, color, alignment and hover

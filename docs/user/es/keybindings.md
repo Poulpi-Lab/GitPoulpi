@@ -208,7 +208,7 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `refs` | `hosting_edit` | Pull request: editar en el host | `e` |
 | `refs` | `new_pull_request` | Pull requests: crear una | `n` |
 | `refs` | `add_remote` | Remotos: Añadir un remoto | `+` |
-| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
+| `refs` | `remotes` | Rama: Editar sus remotos | `u` |
 | `diff` | `close` | Cerrar el diff | `q` |
 | `diff` | `edit` | Editar en el directorio de trabajo | `e` |
 | `diff` | `lfs_raw` | LFS: Tarjeta o puntero en bruto | `r` |
@@ -491,6 +491,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Panel izquierdo: Mostrar u ocultar ramas locales |  |
 | Panel izquierdo: Mostrar u ocultar remotos |  |
 | Panel izquierdo: Mostrar u ocultar worktrees |  |
+| Sidebar: Show Worktrees Section |  |
 | Panel izquierdo: Mostrar u ocultar stashes |  |
 | Panel izquierdo: Mostrar u ocultar tags |  |
 | Panel izquierdo: Mostrar u ocultar pull requests |  |
@@ -534,6 +535,12 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Refs: Reflog de la rama seleccionada... |  |
 | Refs: Iniciar pull request desde la rama seleccionada... |  |
 | Refs: Abrir worktree en una pestaña | `Enter / doble clic` |
+| Refs: Open Worktree In... |  |
+| Refs: Merge Worktree Branch Into... |  |
+| Refs: Remove Worktree... |  |
+| Refs: Create Worktree... | `+` |
+| Refs: Create Worktree from Current Branch |  |
+| Refs: Create Worktree Choosing a Branch |  |
 | Refs: Actualizar submódulo (seleccionado) |  |
 | Refs: Inicializar submódulo (seleccionado) |  |
 | Refs: Abrir submódulo en una pestaña | `Enter / doble clic` |

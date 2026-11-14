@@ -471,6 +471,21 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         // `selected_ref_leaf` only resolves ref sections.
         // A submodule's menu (Update / Init / Open), anchored
         // on its row: the keyboard twin of its right-click.
+        #[cfg(feature = "worktree")]
+        _ if km.is(Bind::GlobalContextMenu, &key)
+            && *cx.focus == Focus::Refs
+            && *cx.active_ref_section == SidebarSection::Worktrees =>
+        {
+            commands::worktrees::open_row_menu(cx);
+        }
+        // `+` in WORKTREES: the header `+`'s keyboard twin, the create menu.
+        #[cfg(feature = "worktree")]
+        _ if km.is(Bind::RefsAddRemote, &key)
+            && *cx.focus == Focus::Refs
+            && *cx.active_ref_section == SidebarSection::Worktrees =>
+        {
+            commands::run_command(cx, PaletteCommand::CreateWorktreeMenu);
+        }
         _ if km.is(Bind::GlobalContextMenu, &key)
             && *cx.focus == Focus::Refs
             && *cx.active_ref_section == SidebarSection::Submodules =>

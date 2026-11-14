@@ -614,6 +614,29 @@ pub(super) fn handle(
                     ));
                 }
             }
+            // A worktree row: Open in a new tab / Open in / Merge /
+            // Remove. Its identity is its folder.
+            #[cfg(feature = "worktree")]
+            None if section == SidebarSection::Worktrees => {
+                let list = cx.worktrees_result.as_deref().unwrap_or(&[]).to_vec();
+                if linked_worktree_count(&list) > 0 {
+                    let state = cx.sidebar_states.state_mut(section);
+                    if let Some(i) = row_to_index(area, state.offset(), 1, row, list.len()) {
+                        cx.sidebar_states.select(section, Some(i));
+                        let wt = &list[i];
+                        *cx.open_menu = OpenMenu::Ref((
+                            section,
+                            wt.path.display().to_string(),
+                            ContextMenu::new(
+                                crate::worktree_remove_dialog::dir_name(&wt.path),
+                                crate::ref_menu::worktree_menu_entries(wt),
+                                col,
+                                row,
+                            ),
+                        ));
+                    }
+                }
+            }
             // Stashes carry their id as the row
             // identity; worktrees are read-only
             // and get no menu at all.

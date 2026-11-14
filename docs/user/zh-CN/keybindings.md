@@ -190,7 +190,7 @@ stage_file = "z"
 | `refs` | `hosting_edit` | pull request：在托管平台上编辑 | `e` |
 | `refs` | `new_pull_request` | pull request：创建 | `n` |
 | `refs` | `add_remote` | 远程：添加远程 | `+` |
-| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
+| `refs` | `remotes` | 分支：编辑其远程 | `u` |
 | `diff` | `close` | 关闭 Diff | `q` |
 | `diff` | `edit` | 在工作区中编辑 | `e` |
 | `diff` | `lfs_raw` | LFS：卡片或原始指针 | `r` |
@@ -452,6 +452,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 左侧窗格：显示/隐藏本地分支 |  |
 | 左侧窗格：显示/隐藏远程 |  |
 | 左侧窗格：显示/隐藏 Worktree |  |
+| Sidebar: Show Worktrees Section |  |
 | 左侧窗格：显示/隐藏 Stashes |  |
 | 左侧窗格：显示/隐藏 Tags |  |
 | 左侧窗格：显示/隐藏 Pull requests |  |
@@ -495,6 +496,12 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 引用：所选分支的 Reflog… |  |
 | 引用：从所选分支发起 pull request… |  |
 | 引用：在标签页中打开 worktree | `Enter / 双击` |
+| Refs: Open Worktree In... |  |
+| Refs: Merge Worktree Branch Into... |  |
+| Refs: Remove Worktree... |  |
+| Refs: Create Worktree... | `+` |
+| Refs: Create Worktree from Current Branch |  |
+| Refs: Create Worktree Choosing a Branch |  |
 | 引用：更新子模块（所选） |  |
 | 引用：初始化子模块（所选） |  |
 | 引用：在标签页中打开子模块 | `Enter / 双击` |

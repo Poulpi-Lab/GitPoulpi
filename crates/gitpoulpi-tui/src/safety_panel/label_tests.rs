@@ -109,6 +109,7 @@ const WITHOUT_WORDS: &[K] = &[
     K::IndexLockRemove,
     K::BranchDeleteRemote,
     K::WorktreeAdd,
+    K::WorktreeRemove,
     K::TagPush,
     K::TagDeleteRemote,
     K::TagFetch,

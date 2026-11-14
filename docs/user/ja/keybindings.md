@@ -190,7 +190,7 @@ stage_file = "z"
 | `refs` | `hosting_edit` | Pull Request：ホストで編集 | `e` |
 | `refs` | `new_pull_request` | Pull Request：新規作成 | `n` |
 | `refs` | `add_remote` | リモート：リモートを追加 | `+` |
-| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
+| `refs` | `remotes` | ブランチ: リモートを編集 | `u` |
 | `diff` | `close` | Diffを閉じる | `q` |
 | `diff` | `edit` | 作業ツリーで編集 | `e` |
 | `diff` | `lfs_raw` | LFS：カードまたは生のポインター | `r` |
@@ -452,6 +452,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | サイドバー: ローカルブランチの表示/非表示 |  |
 | サイドバー: リモートの表示/非表示 |  |
 | サイドバー: worktree の表示/非表示 |  |
+| Sidebar: Show Worktrees Section |  |
 | サイドバー: Stashesの表示/非表示 |  |
 | サイドバー: Tagsの表示/非表示 |  |
 | サイドバー: Pull requestの表示/非表示 |  |
@@ -495,6 +496,12 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Refs: 選択中のブランチの Reflog... |  |
 | Refs: 選択中のブランチからPull Requestを開始... |  |
 | Refs: Worktree をタブで開く | `Enter / ダブルクリック` |
+| Refs: Open Worktree In... |  |
+| Refs: Merge Worktree Branch Into... |  |
+| Refs: Remove Worktree... |  |
+| Refs: Create Worktree... | `+` |
+| Refs: Create Worktree from Current Branch |  |
+| Refs: Create Worktree Choosing a Branch |  |
 | Refs: サブモジュールを更新（選択中） |  |
 | Refs: サブモジュールを初期化（選択中） |  |
 | Refs: サブモジュールをタブで開く | `Enter / ダブルクリック` |

@@ -424,7 +424,7 @@ duplicate_name = "{name} (copie)"
 
 [settings_open_in]
 worktree = "Peut ouvrir un worktree"
-worktree_help = "Propose cette entrée dans le menu Ouvrir dans d'un worktree (clic droit sur une ligne de la section WORKTREES). Elle s'exécute avec le dossier du worktree comme ${{cwd}}. Les terminaux, éditeurs et gestionnaires de fichiers sont cochés par défaut."
+worktree_help = "Propose cette entrée dans le menu Ouvrir dans d'un worktree (clic droit sur une ligne de la section WORKTREES). Elle s'exécute avec le dossier du worktree comme ${{cwd}}. Toutes les entrées sont cochées par défaut : décochez celles qui n'ont pas de sens sur un dossier."
 list_title = "Entrées"
 section_title = "Ouvrir dans"
 default_entry = "Entrée par défaut"
@@ -2937,6 +2937,14 @@ env_timeout = "Délai d'attente propre à l'agent pour une requête (ms)"
 env_offline = "Aucun appel réseau au démarrage"
 
 [palette]
+sidebar_show_worktrees = { git = "Barre latérale : Afficher la section Worktrees", local = "Barre latérale : Afficher la section Arbres de travail" }
+refs_open_worktree_in = "Refs : Ouvrir le worktree dans..."
+refs_merge_worktree_branch_into = { git = "Refs : Merge de la branche du worktree dans...", local = "Refs : Fusionner la branche de l'arbre de travail dans..." }
+refs_remove_worktree = { git = "Refs : Retirer le worktree...", local = "Refs : Retirer l'arbre de travail..." }
+# context: opens the + menu of the WORKTREES section
+refs_create_worktree = { git = "Refs : Créer un worktree...", local = "Refs : Créer un arbre de travail..." }
+refs_create_worktree_from_current_branch = { git = "Refs : Créer un worktree depuis la branche courante", local = "Refs : Créer un arbre de travail depuis la branche courante" }
+refs_create_worktree_choosing_a_branch = { git = "Refs : Créer un worktree en choisissant une branche", local = "Refs : Créer un arbre de travail en choisissant une branche" }
 # context: palette command; shows or hides the commit list column left of the diff, File View, Blame and Editor
 view_toggle_commit_column = "Affichage : Afficher ou masquer la colonne des {$commits}"
 view_column_off = "Affichage : Colonne des {$commits} : Masquer"
@@ -9774,6 +9782,22 @@ tip_open_hint = "Cliquez pour modifier les distants de cette branche"
 
 
 [worktree_manage]
+# context: hover label of the + on the WORKTREES header
+plus_tip = { git = "Créer un worktree", local = "Créer un arbre de travail" }
+# context: title of the menu the + opens
+plus_title = { git = "Nouveau worktree", local = "Nouvel arbre de travail" }
+# context: menu row: create a worktree
+plus_head = "Depuis la branche courante"
+# context: menu row: create a worktree
+plus_commit = { git = "Depuis le commit sélectionné", local = "Depuis la validation sélectionnée" }
+# context: menu row: create a worktree on a branch picked in the dialog
+plus_choose = "Choisir une branche..."
+select_a_commit = { git = "Sélectionnez d'abord un commit dans le Log", local = "Sélectionnez d'abord une validation dans le Log" }
+select_a_worktree = { git = "Sélectionnez d'abord un worktree dans le volet Refs", local = "Sélectionnez d'abord un arbre de travail dans le volet Refs" }
+main_cannot_be_removed = { git = "Le worktree principal ne peut pas être retiré", local = "L'arbre de travail principal ne peut pas être retiré" }
+no_head = "Ce dépôt n'a pas encore de commit"
+# context: hint line of the empty WORKTREES section
+empty_hint = { git = "Aucun worktree : + pour en créer un", local = "Aucun arbre de travail : + pour en créer un" }
 # context: context menu row of a worktree
 menu_open_tab = "Ouvrir dans un nouvel onglet"
 # context: submenu of a worktree row: the Open in entries

@@ -615,6 +615,7 @@ impl RepoDialogs {
 
     /// Opens Create worktree for `seed`, proposing a folder beside
     /// `repo_root`.
+    #[cfg(test)]
     pub(crate) fn open_worktree(&mut self, seed: WorktreeSeed, repo_root: &Path) {
         self.open_worktree_with(seed, repo_root, Vec::new(), false);
     }

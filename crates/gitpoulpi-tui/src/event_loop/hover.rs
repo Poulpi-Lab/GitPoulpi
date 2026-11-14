@@ -40,6 +40,10 @@ impl Hover<'_> {
         matches!(self.0, Some(HitTarget::AddRemoteButton))
     }
 
+    pub(super) fn add_worktree(self) -> bool {
+        matches!(self.0, Some(HitTarget::AddWorktreeButton))
+    }
+
     /// The Refs outer block's right-aligned title button.
     pub(super) fn refs_title_button(self) -> bool {
         matches!(

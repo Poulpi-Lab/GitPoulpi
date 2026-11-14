@@ -203,7 +203,7 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `refs` | `hosting_edit` | Pull Request: Auf dem Host bearbeiten | `e` |
 | `refs` | `new_pull_request` | Pull Requests: Einen erstellen | `n` |
 | `refs` | `add_remote` | Remotes: Ein Remote hinzufügen | `+` |
-| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
+| `refs` | `remotes` | Branch: Remotes bearbeiten | `u` |
 | `diff` | `close` | Diff schließen | `q` |
 | `diff` | `edit` | Im Arbeitsverzeichnis bearbeiten | `e` |
 | `diff` | `lfs_raw` | LFS: Karte oder Rohzeiger | `r` |
@@ -481,6 +481,7 @@ die Standardtasten.
 | Seitenleiste: Lokale Branches ein-/ausblenden |  |
 | Seitenleiste: Remotes ein-/ausblenden |  |
 | Seitenleiste: Worktrees ein-/ausblenden |  |
+| Sidebar: Show Worktrees Section |  |
 | Seitenleiste: Stashes ein-/ausblenden |  |
 | Seitenleiste: Tags ein-/ausblenden |  |
 | Seitenleiste: Pull Requests ein-/ausblenden |  |
@@ -524,6 +525,12 @@ die Standardtasten.
 | Refs: Reflog des ausgewählten Branches... |  |
 | Refs: Pull Request aus ausgewähltem Branch starten... |  |
 | Refs: Worktree in Tab öffnen | `Enter / Doppelklick` |
+| Refs: Open Worktree In... |  |
+| Refs: Merge Worktree Branch Into... |  |
+| Refs: Remove Worktree... |  |
+| Refs: Create Worktree... | `+` |
+| Refs: Create Worktree from Current Branch |  |
+| Refs: Create Worktree Choosing a Branch |  |
 | Refs: Submodul aktualisieren (ausgewählt) |  |
 | Refs: Submodul initialisieren (ausgewählt) |  |
 | Refs: Submodul in Tab öffnen | `Enter / Doppelklick` |

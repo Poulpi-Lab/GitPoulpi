@@ -226,9 +226,7 @@ impl WorktreeRemoveDialog {
                 let mut candidates: Vec<(String, Oid)> = Vec::new();
                 if let Some(up) = &tip.upstream {
                     if let Some(r) = refs.iter().find(|r| match &r.kind {
-                        RefKind::RemoteBranch { remote, name } => {
-                            format!("{remote}/{name}") == *up
-                        }
+                        RefKind::RemoteBranch { remote, name } => format!("{remote}/{name}") == *up,
                         _ => false,
                     }) {
                         candidates.push((up.clone(), r.target));
@@ -245,7 +243,8 @@ impl WorktreeRemoveDialog {
                     if name == branch || candidates.iter().any(|(n, _)| *n == name) {
                         continue;
                     }
-                    if let Some((_, r)) = local_branches(&refs).into_iter().find(|(n, _)| *n == name)
+                    if let Some((_, r)) =
+                        local_branches(&refs).into_iter().find(|(n, _)| *n == name)
                     {
                         candidates.push((name, r.target));
                     }
@@ -309,11 +308,6 @@ impl WorktreeRemoveDialog {
         }
     }
 
-    /// The worktree this dialog is about.
-    pub(crate) fn path(&self) -> &Path {
-        &self.wt.path
-    }
-
     pub(crate) fn nav_targets(&self) -> Vec<(Rect, (u16, u16))> {
         dialog_kit::nav_cells(self.hits.iter().map(|(r, _)| *r))
     }
@@ -346,7 +340,11 @@ impl WorktreeRemoveDialog {
             .wt
             .branch
             .as_deref()
-            .and_then(|b| local_branches(&self.refs).into_iter().find(|(n, _)| *n == b))
+            .and_then(|b| {
+                local_branches(&self.refs)
+                    .into_iter()
+                    .find(|(n, _)| *n == b)
+            })
             .map(|(_, r)| r.target);
         for probe in &mut self.probes {
             if let Some(reply) = &probe.reply {
@@ -601,7 +599,8 @@ impl WorktreeRemoveDialog {
             Stage::Merge => {
                 let len = self.targets.len();
                 if len > 0 {
-                    self.target = (self.target as isize + delta).clamp(0, len as isize - 1) as usize;
+                    self.target =
+                        (self.target as isize + delta).clamp(0, len as isize - 1) as usize;
                 }
             }
             _ => {
@@ -837,21 +836,18 @@ impl WorktreeRemoveDialog {
             }
             Stage::Merge => {
                 let own = self.wt.branch.clone().unwrap_or_default();
-                dialog_kit::put(
-                    buf,
-                    inner.x,
-                    y,
-                    &msg::merge_pick(&own),
-                    inner.width,
-                    text,
-                );
+                dialog_kit::put(buf, inner.x, y, &msg::merge_pick(&own), inner.width, text);
                 y += 1;
                 let rows = (list_bottom.saturating_sub(y)).min(10).max(2) as usize;
                 let body = Rect::new(inner.x, y, inner.width, rows as u16);
                 self.paint_targets(buf, body, &mut hits);
                 y += rows as u16;
                 if let Some(target) = self.targets.get(self.target) {
-                    let note = match self.worktrees.iter().find(|w| w.branch.as_deref() == Some(target)) {
+                    let note = match self
+                        .worktrees
+                        .iter()
+                        .find(|w| w.branch.as_deref() == Some(target))
+                    {
                         Some(w) => msg::merge_checked_out(target, w.path.display()),
                         None => msg::merge_not_checked_out(target),
                     };
@@ -965,30 +961,34 @@ impl WorktreeRemoveDialog {
         hits: &mut Vec<(Rect, Focus)>,
     ) -> u16 {
         let muted = Style::default().fg(th().ui.muted).bg(th().ui.panel);
-        let label_w = [
-            msg::COMMIT_FIELD,
-            msg::STASH_FIELD,
-            msg::BRANCH_FIELD,
-        ]
-        .iter()
-        .map(|m| crate::display_width(m.get()) as u16 + 2)
-        .max()
-        .unwrap_or(14);
+        let label_w = [msg::COMMIT_FIELD, msg::STASH_FIELD, msg::BRANCH_FIELD]
+            .iter()
+            .map(|m| crate::display_width(m.get()) as u16 + 2)
+            .max()
+            .unwrap_or(14);
         let field_x = inner.x + label_w;
         let field_w = inner.width.saturating_sub(label_w);
         let field = |buf: &mut Buffer,
-                         y: u16,
-                         label: &str,
-                         value: &str,
-                         hint: &str,
-                         id: Focus,
-                         edit: &crate::text_edit::FieldEditor<Focus>,
-                         hover: Option<Focus>,
-                         focus: Focus,
-                         hits: &mut Vec<(Rect, Focus)>| {
+                     y: u16,
+                     label: &str,
+                     value: &str,
+                     hint: &str,
+                     id: Focus,
+                     edit: &crate::text_edit::FieldEditor<Focus>,
+                     hover: Option<Focus>,
+                     focus: Focus,
+                     hits: &mut Vec<(Rect, Focus)>| {
             dialog_kit::put(buf, inner.x, y, label, label_w, muted);
             let r = Rect::new(field_x, y, field_w, 1);
-            dialog_kit::text_input(buf, r, value, hint, focus == id, hover == Some(id), (edit, id));
+            dialog_kit::text_input(
+                buf,
+                r,
+                value,
+                hint,
+                focus == id,
+                hover == Some(id),
+                (edit, id),
+            );
             hits.push((r, id));
         };
         field(

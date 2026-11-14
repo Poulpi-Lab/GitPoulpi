@@ -446,7 +446,14 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         // as the delta instead of a hard-coded `±1`.
         KeyCode::Up | KeyCode::Char('k') => match *cx.focus {
             Focus::Refs => {
-                let wt_len = cx.worktrees_result.as_deref().unwrap_or(&[]).len();
+                let wt_len = {
+                    let list = cx.worktrees_result.as_deref().unwrap_or(&[]);
+                    if linked_worktree_count(list) == 0 {
+                        0
+                    } else {
+                        list.len()
+                    }
+                };
                 let st_len = cx.stashes_result.as_deref().unwrap_or(&[]).len();
                 move_sidebar_selection(
                     &mut *cx.active_ref_section,
@@ -493,7 +500,14 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         },
         KeyCode::Down | KeyCode::Char('j') => match *cx.focus {
             Focus::Refs => {
-                let wt_len = cx.worktrees_result.as_deref().unwrap_or(&[]).len();
+                let wt_len = {
+                    let list = cx.worktrees_result.as_deref().unwrap_or(&[]);
+                    if linked_worktree_count(list) == 0 {
+                        0
+                    } else {
+                        list.len()
+                    }
+                };
                 let st_len = cx.stashes_result.as_deref().unwrap_or(&[]).len();
                 move_sidebar_selection(
                     &mut *cx.active_ref_section,

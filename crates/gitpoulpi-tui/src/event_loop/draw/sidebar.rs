@@ -334,6 +334,7 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
         match section.ref_kind() {
             Some(kind) => rows_of(kind).len() as u16,
             None => match section {
+                SidebarSection::Worktrees if linked_worktree_count(worktrees) == 0 => 1,
                 SidebarSection::Worktrees => worktrees.len() as u16,
                 SidebarSection::Stashes => stashes.len() as u16,
                 SidebarSection::Submodules => submodules_result.len() as u16,
@@ -432,6 +433,14 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
         let mut badge_hits: Vec<(usize, u16, u16, String)> = Vec::new();
         let items: Vec<ListItem> = if !expanded {
             Vec::new()
+        } else if section == SidebarSection::Worktrees && linked_worktree_count(worktrees) == 0 {
+            // Shown on request in a repository with no linked worktree: the
+            // hint, and the header's `+` creates the first one.
+            vec![ListItem::new(format!(
+                "  {}",
+                gitpoulpi_i18n::msg::worktree_manage::EMPTY_HINT.get()
+            ))
+            .style(Style::default().fg(th().ui.muted))]
         } else if section == SidebarSection::Worktrees {
             // Read-only listing. The main worktree is marked
             // rather than hidden -- it's the one you're looking
@@ -790,6 +799,11 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
         let icon = section.icon();
         let total = match kind_opt {
             Some(_) => names.len(),
+            None if section == SidebarSection::Worktrees
+                && linked_worktree_count(worktrees) == 0 =>
+            {
+                0
+            }
             None => section_row_count(section) as usize,
         };
         let section_title = if soloing && kind_opt.is_some() {
@@ -811,7 +825,10 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
         };
         // The rows the pointer can light: none for a collapsed section or the
         // "none" placeholder line.
-        let hover_len = if !expanded || (kind_opt.is_some() && rows.is_empty()) {
+        let hover_len = if !expanded
+            || (kind_opt.is_some() && rows.is_empty())
+            || (section == SidebarSection::Worktrees && linked_worktree_count(worktrees) == 0)
+        {
             0
         } else {
             items.len()
@@ -948,6 +965,16 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
                 section_title_width,
                 hover(hovered_target).add_remote(),
                 *hovered_target == Some(HitTarget::RefsSectionHeader(SidebarSection::Remote)),
+                &mut *frame_hits,
+            );
+        }
+        if section == SidebarSection::Worktrees && crate::build_features::WORKTREE {
+            render_add_worktree_button(
+                frame,
+                area,
+                section_title_width,
+                hover(hovered_target).add_worktree(),
+                *hovered_target == Some(HitTarget::RefsSectionHeader(SidebarSection::Worktrees)),
                 &mut *frame_hits,
             );
         }

@@ -323,6 +323,10 @@ pub(super) fn handle(
             );
             return Ok(Flow::Handled);
         }
+        Some(HitTarget::AddWorktreeButton) => {
+            commands::worktrees::open_plus_menu(cx, col, row + 1);
+            return Ok(Flow::Handled);
+        }
         Some(HitTarget::AddRemoteButton) => {
             cx.remote_ui.form = Some(RemoteForm::add(cx.remote_ui.names()));
             return Ok(Flow::Handled);

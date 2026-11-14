@@ -90,6 +90,13 @@ fn every_mouse_affordance_maps_to_a_palette_command() {
                 PaletteCommand::FastForwardCurrentToSelected
             }
             RefContextAction::CreateWorktree => PaletteCommand::CreateWorktreeFromSelectedRef,
+            RefContextAction::WorktreeOpenTab => PaletteCommand::OpenWorktreeInTab,
+            RefContextAction::WorktreeOpenWith(_) => PaletteCommand::WorktreeOpenInSelected,
+            RefContextAction::WorktreeMerge => PaletteCommand::WorktreeMergeSelected,
+            RefContextAction::WorktreeRemove => PaletteCommand::WorktreeRemoveSelected,
+            RefContextAction::WorktreeNewHead => PaletteCommand::CreateWorktreeFromCurrentBranch,
+            RefContextAction::WorktreeNewCommit => PaletteCommand::CreateWorktreeAtSelectedCommit,
+            RefContextAction::WorktreeNewChoose => PaletteCommand::CreateWorktreeChooseBranch,
             RefContextAction::Reflog => PaletteCommand::ReflogSelectedBranch,
             RefContextAction::Drop(_) => PaletteCommand::DropSelectedRefOnCurrent,
             RefContextAction::ToggleSidebarSection(s) => PaletteCommand::ToggleSidebarSection(s),

@@ -481,7 +481,7 @@ die Standardtasten.
 | Seitenleiste: Lokale Branches ein-/ausblenden |  |
 | Seitenleiste: Remotes ein-/ausblenden |  |
 | Seitenleiste: Worktrees ein-/ausblenden |  |
-| Sidebar: Show Worktrees Section |  |
+| Seitenleiste: Abschnitt Worktrees anzeigen |  |
 | Seitenleiste: Stashes ein-/ausblenden |  |
 | Seitenleiste: Tags ein-/ausblenden |  |
 | Seitenleiste: Pull Requests ein-/ausblenden |  |
@@ -525,12 +525,12 @@ die Standardtasten.
 | Refs: Reflog des ausgewählten Branches... |  |
 | Refs: Pull Request aus ausgewähltem Branch starten... |  |
 | Refs: Worktree in Tab öffnen | `Enter / Doppelklick` |
-| Refs: Open Worktree In... |  |
-| Refs: Merge Worktree Branch Into... |  |
-| Refs: Remove Worktree... |  |
-| Refs: Create Worktree... | `+` |
-| Refs: Create Worktree from Current Branch |  |
-| Refs: Create Worktree Choosing a Branch |  |
+| Refs: Worktree öffnen in... |  |
+| Refs: Merge des Worktree-Branches in... |  |
+| Refs: Worktree entfernen... |  |
+| Refs: Worktree erstellen... | `+` |
+| Refs: Worktree aus aktuellem Branch erstellen |  |
+| Refs: Worktree mit Branch-Auswahl erstellen |  |
 | Refs: Submodul aktualisieren (ausgewählt) |  |
 | Refs: Submodul initialisieren (ausgewählt) |  |
 | Refs: Submodul in Tab öffnen | `Enter / Doppelklick` |

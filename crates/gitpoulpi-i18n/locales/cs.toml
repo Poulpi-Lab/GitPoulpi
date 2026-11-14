@@ -423,8 +423,8 @@ list_title = "Profily"
 duplicate_name = "{name} (kopie)"
 
 [settings_open_in]
-worktree = "Can open a worktree"
-worktree_help = "Offer this entry in the Open in menu of a worktree (right-click a row of the WORKTREES section). It runs with the worktree's folder as ${{cwd}}. Every entry is checked by default: untick the ones that make no sense on a folder."
+worktree = "Může otevřít worktree"
+worktree_help = "Nabídnout tuto položku v nabídce Otevřít v u worktree (pravé tlačítko na řádku sekce WORKTREES). Spustí se se složkou worktree jako ${{cwd}}. Ve výchozím stavu je zaškrtnutá každá položka: odškrtněte ty, které na složce nedávají smysl."
 list_title = "Položky"
 section_title = "Otevřít v"
 default_entry = "Výchozí položka"
@@ -1228,19 +1228,19 @@ bad_branch = "{name} není platný název větve"
 
 [worktree]
 # context: field label: the name of the new worktree, the folder name is built from it
-name = "Name"
+name = "Název"
 # context: placeholder
-name_hint = "the folder is named after it"
-need_name = "give the worktree a name"
-bad_name = "the name cannot contain slashes (the Folder field takes a path)"
+name_hint = "složka se jmenuje podle něj"
+need_name = "pojmenujte worktree"
+bad_name = "název nesmí obsahovat lomítka (pole Složka přijímá cestu)"
 # context: field label: the branch or commit the worktree starts from
 ref_field = "Ref"
 # context: placeholder
-ref_hint = "choose a branch"
+ref_hint = "vyberte větev"
 # context: combobox entry: the commit the dialog was opened on; {label} what the user clicked (a tag, a remote branch, a short id), {id} the short id
-commit_choice = { git = "commit {label} ({id})", local = "commit {label} ({id})" }
-branch_exists = "the branch {b} already exists: pick it in Ref or choose another name"
-is_a_file = "{path} is a file, not a folder"
+commit_choice = { git = "{$commit} {label} ({id})", local = "{$commit} {label} ({id})" }
+branch_exists = "větev {b} už existuje: vyberte ji v poli Ref nebo zvolte jiný název"
+is_a_file = "{path} je soubor, ne složka"
 title = { git = "Vytvořit worktree z {label}", local = "Vytvořit worktree z {label}" }
 folder = "Složka"
 folder_hint = "nová nebo prázdná složka"
@@ -2933,14 +2933,14 @@ env_timeout = "Vlastní časový limit agenta na požadavek (ms)"
 env_offline = "Bez síťových volání při startu"
 
 [palette]
-sidebar_show_worktrees = "Sidebar: Show Worktrees Section"
-refs_open_worktree_in = "Refs: Open Worktree In..."
-refs_merge_worktree_branch_into = { git = "Refs: Merge Worktree Branch Into...", local = "Refs: Merge Worktree Branch Into..." }
-refs_remove_worktree = { git = "Refs: Remove Worktree...", local = "Refs: Remove Worktree..." }
+sidebar_show_worktrees = "Levý panel: Zobrazit sekci Worktrees"
+refs_open_worktree_in = "Refs: Otevřít worktree v..."
+refs_merge_worktree_branch_into = { git = "Refs: Merge větve worktree do...", local = "Refs: Sloučit větev worktree do..." }
+refs_remove_worktree = { git = "Refs: Odebrat worktree...", local = "Refs: Odebrat worktree..." }
 # context: opens the + menu of the WORKTREES section
-refs_create_worktree = { git = "Refs: Create Worktree...", local = "Refs: Create Worktree..." }
-refs_create_worktree_from_current_branch = { git = "Refs: Create Worktree from Current Branch", local = "Refs: Create Worktree from Current Branch" }
-refs_create_worktree_choosing_a_branch = { git = "Refs: Create Worktree Choosing a Branch", local = "Refs: Create Worktree Choosing a Branch" }
+refs_create_worktree = { git = "Refs: Vytvořit worktree...", local = "Refs: Vytvořit worktree..." }
+refs_create_worktree_from_current_branch = { git = "Refs: Vytvořit worktree z aktuální větve", local = "Refs: Vytvořit worktree z aktuální větve" }
+refs_create_worktree_choosing_a_branch = { git = "Refs: Vytvořit worktree s výběrem větve", local = "Refs: Vytvořit worktree s výběrem větve" }
 # context: palette command; shows or hides the commit list column left of the diff, File View, Blame and Editor
 view_toggle_commit_column = "Zobrazení: Přepnout sloupec commitů"
 view_column_off = "Zobrazení: Sloupec commitů: skrýt"
@@ -4997,11 +4997,11 @@ desc_rebasing_step = { git = "rebase {branch} na {onto} · krok {k}/{n}", local 
 
 [link]
 # context: {path} is the folder of the removed worktree
-worktree_removed = "removed worktree {path}"
-worktree_removed_branch_deleted = "removed worktree {path} and deleted branch {branch} (Undo brings the branch back)"
-worktree_removed_branch_kept = "removed worktree {path}; branch {branch} was kept: {why}"
-worktree_stashed = { git = "changes stashed", local = "changes stashed" }
-worktree_committed = { git = "changes committed as {id}", local = "changes committed as {id}" }
+worktree_removed = "worktree {path} odebrán"
+worktree_removed_branch_deleted = "worktree {path} odebrán a větev {branch} smazána (Zpět větev vrátí)"
+worktree_removed_branch_kept = "worktree {path} odebrán; větev {branch} zůstala: {why}"
+worktree_stashed = { git = "změny stashnuty", local = "změny odloženy" }
+worktree_committed = { git = "změny commitnuty jako {id}", local = "změny commitnuty jako {id}" }
 amend_done = "{id} upraven, nyní {now} (předchozí špička {previous}: Zpět ji obnoví)"
 act_staging_file = { git = "staging {name}...", local = "přidávání {name} do indexu..." }
 act_unstaging_file = { git = "unstaging {name}...", local = "odebírání {name} z indexu..." }
@@ -9890,89 +9890,89 @@ tip_open_hint = "Kliknutím upravíte remote této větve"
 
 [worktree_manage]
 # context: hover label of the + on the WORKTREES header
-plus_tip = { git = "Create worktree", local = "Create worktree" }
+plus_tip = { git = "Vytvořit worktree", local = "Vytvořit worktree" }
 # context: title of the menu the + opens
-plus_title = { git = "New worktree", local = "New worktree" }
+plus_title = { git = "Nový worktree", local = "Nový worktree" }
 # context: menu row: create a worktree
-plus_head = "From the current branch"
+plus_head = "Z aktuální větve"
 # context: menu row: create a worktree
-plus_commit = "From the selected commit"
+plus_commit = "Z vybraného commitu"
 # context: menu row: create a worktree on a branch picked in the dialog
-plus_choose = "Choose a branch..."
-select_a_commit = { git = "Select a commit in the Log first", local = "Select a commit in the Log first" }
-select_a_worktree = { git = "Select a worktree in the Refs pane first", local = "Select a worktree in the Refs pane first" }
-main_cannot_be_removed = { git = "The main worktree cannot be removed", local = "The main worktree cannot be removed" }
-no_head = "This repository has no commit yet"
+plus_choose = "Vybrat větev..."
+select_a_commit = { git = "Nejdřív vyberte commit v Logu", local = "Nejdřív vyberte commit v Logu" }
+select_a_worktree = { git = "Nejdřív vyberte worktree v panelu Refs", local = "Nejdřív vyberte worktree v panelu Refs" }
+main_cannot_be_removed = { git = "Hlavní worktree nelze odebrat", local = "Hlavní worktree nelze odebrat" }
+no_head = "Tento repozitář ještě nemá žádný commit"
 # context: hint line of the empty WORKTREES section
-empty_hint = { git = "No worktree yet: + to create one", local = "No worktree yet: + to create one" }
+empty_hint = { git = "Zatím žádný worktree: + ho vytvoří", local = "Zatím žádný worktree: + ho vytvoří" }
 # context: context menu row of a worktree
-menu_open_tab = "Open in a new tab"
+menu_open_tab = "Otevřít na nové kartě"
 # context: submenu of a worktree row: the Open in entries
-menu_open_in = "Open in"
-menu_open_in_none = "Open in (no entry yet)"
-menu_open_in_none_why = "No Open in entry is marked Can open a worktree: Settings > Open in"
-menu_merge = { git = "Merge {branch} into...", local = "Merge {branch} into..." }
-menu_remove = { git = "Remove worktree...", local = "Remove worktree..." }
-not_listed = { git = "{path} is not a worktree of this repository any more", local = "{path} is not a worktree of this repository any more" }
-removing = { git = "removing worktree {path}...", local = "removing worktree {path}..." }
-merging = { git = "merging {branch}...", local = "merging {branch}..." }
+menu_open_in = "Otevřít v"
+menu_open_in_none = "Otevřít v (zatím žádná položka)"
+menu_open_in_none_why = "Žádná položka Otevřít v není označena Může otevřít worktree: Nastavení > Otevřít v"
+menu_merge = { git = "{$Merge} {branch} do...", local = "{$Merge} {branch} do..." }
+menu_remove = { git = "Odebrat worktree...", local = "Odebrat worktree..." }
+not_listed = { git = "{path} už není worktree tohoto repozitáře", local = "{path} už není worktree tohoto repozitáře" }
+removing = { git = "odebírání worktree {path}...", local = "odebírání worktree {path}..." }
+merging = { git = "{$merge_noun} {branch}...", local = "{$merge_noun} {branch}..." }
 # context: dialog title; {name} is the folder name of the worktree; a worktree is a second checked-out copy of the repository
-remove_title = { git = "Remove worktree {name}", local = "Remove worktree {name}" }
+remove_title = { git = "Odebrat worktree {name}", local = "Odebrat worktree {name}" }
 # context: dialog title; {branch} is a branch name
-merge_title = { git = "Merge {branch} into another branch", local = "Merge {branch} into another branch" }
-loading = "Checking the worktree..."
-clean_text = "Remove {path}? Its folder is deleted. The branch {branch} stays."
-clean_text_detached = "Remove {path}? Its folder is deleted. It is on a detached HEAD, so no branch is affected."
+merge_title = { git = "{$Merge} {branch} do jiné větve", local = "{$Merge} {branch} do jiné větve" }
+loading = "Kontrola worktree..."
+clean_text = "Odebrat {path}? Jeho složka se smaže. Větev {branch} zůstane."
+clean_text_detached = "Odebrat {path}? Je na odpojeném HEAD, takže se žádná větev nedotkne."
 # context: plural: {n} changes of the worktree at {path}
-dirty_count = { one = "{n} uncommitted change in {path}", other = "{n} uncommitted changes in {path}" }
+dirty_count = { one = "{n} necommitnutá změna v {path}", few = "{n} necommitnuté změny v {path}", other = "{n} necommitnutých změn v {path}" }
 # context: plural: {n} changes that would be lost
-force_text = { one = "Remove {path} and discard its {n} uncommitted change? This cannot be undone.", other = "Remove {path} and discard its {n} uncommitted changes? This cannot be undone." }
+force_text = { one = "Odebrat {path} a zahodit jeho {n} necommitnutou změnu? Nelze vrátit zpět.", few = "Odebrat {path} a zahodit jeho {n} necommitnuté změny? Nelze vrátit zpět.", other = "Odebrat {path} a zahodit jeho {n} necommitnutých změn? Nelze vrátit zpět." }
 # context: field label
-commit_field = "Commit message"
+commit_field = "Zpráva {$commit}u"
 # context: placeholder
-commit_hint = "describe the changes"
+commit_hint = "popište změny"
 # context: field label
-stash_field = "Stash message"
-stash_note = "The stash is shared with the main repository: pop it there later."
+stash_field = "Zpráva {$stash}"
+stash_note = "{$Stash} je sdílený s hlavním repozitářem: obnovíte ho tam později."
 # context: field label: the branch to create for the commit
-branch_field = "Branch"
+branch_field = "Větev"
 # context: placeholder
-branch_hint = "HEAD is detached: name a branch for the commit"
-need_message = "write a commit message"
-need_branch = "name a branch for the commit (HEAD is detached)"
-delete_branch = "Also delete branch {branch} (merged into {into})"
-branch_not_merged = "Branch {branch} is not merged: it stays."
+branch_hint = "HEAD je odpojený: pojmenujte větev pro {$commit}"
+need_message = "napište zprávu {$commit}u"
+need_branch = "pojmenujte větev pro {$commit} (HEAD je odpojený)"
+delete_branch = "Smazat také větev {branch} (její {$merge_noun} do {into} proběhl)"
+branch_not_merged = { git = "Větev {branch} není mergnutá: zůstane.", local = "Větev {branch} není sloučená: zůstane." }
 # context: button
-commit_remove = { git = "Commit and remove", local = "Commit and remove" }
+commit_remove = { git = "Commit a odebrat", local = "Commit a odebrat" }
 # context: button
-stash_remove = { git = "Stash and remove", local = "Stash and remove" }
+stash_remove = { git = "{$Stash} a odebrat", local = "{$Stash} a odebrat" }
 # context: button: open the worktree in a tab to commit its changes there
-open_to_commit = "Open to commit"
+open_to_commit = "Otevřít a commitnout"
 # context: button: discards the changes
-remove_anyway = "Remove anyway"
+remove_anyway = "Přesto odebrat"
 # context: button
-remove = "Remove"
+remove = "Odebrat"
 # context: button
-cancel = "Cancel"
+cancel = "Zrušit"
 # context: button
-back = "Back"
+back = "Zpět"
 # context: button
-force_yes = "Discard changes and remove"
+force_yes = "Zahodit změny a odebrat"
 # context: button
-merge_then_remove = { git = "Merge into... then remove", local = "Merge into... then remove" }
+merge_then_remove = { git = "{$Merge} do... a odebrat", local = "{$Merge} do... a odebrat" }
 # context: button
-merge_run = { git = "Merge", local = "Merge" }
+merge_run = { git = "{$Merge}", local = "{$Merge}" }
 # context: button
-merge_remove_run = { git = "Merge and remove", local = "Merge and remove" }
-merge_pick = "Merge {branch} into:"
-merge_checked_out = "{target} is checked out in {path}: the merge runs there."
-merge_not_checked_out = "{target} is not checked out in any worktree: check it out first."
-merge_gone = "the branch {branch} no longer exists"
-merge_none = "There is no other local branch to merge into."
-detached_no_merge = "a detached worktree has no branch to merge"
+merge_remove_run = { git = "{$Merge} a odebrat", local = "{$Merge} a odebrat" }
+merge_pick = "{$Merge} {branch} do:"
+merge_checked_out = "{target} je přepnuta v {path}: {$merge} proběhne tam."
+merge_not_checked_out = "{target} není přepnuta v žádném worktree: nejdřív ji přepněte."
+merge_gone = "větev {branch} už neexistuje"
+merge_none = "Neexistuje žádná jiná místní větev, do které by šlo {$merge}."
+detached_no_merge = "odpojený worktree nemá větev k {$merge_noun}"
 # context: default stash message; {name} is the worktree folder
-stash_default = "WIP on {name}"
+stash_default = "WIP v {name}"
 # context: key hint
-hint_next = "next"
+hint_next = "další"
 # context: key hint
-hint_default = "run"
+hint_default = "spustit"

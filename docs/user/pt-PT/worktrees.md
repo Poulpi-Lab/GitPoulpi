@@ -23,29 +23,47 @@ O **+** no cabeçalho de WORKTREES (teclado: `+` na secção; paleta: **Refs:
 criar worktree...**) abre um menu:
 
 - **A partir da branch atual**: a branch está em checkout na pasta principal,
-  por isso o diálogo propõe uma nova branch sobre ela (`<branch>-wt`).
+  por isso o diálogo propõe uma nova branch sobre ela (`worktree-<id>`).
 - **A partir do commit selecionado**: fica a cinzento até haver um commit
-  selecionado no Log. O worktree começa aí com HEAD desanexado, a menos que dê
-  nome a uma nova branch.
-- **Escolher uma branch...**: o diálogo abre na sua lista **Ref**.
+  selecionado no Log. O diálogo propõe uma nova branch `worktree-<id>` a começar
+  aí; esvazie o campo da branch para um worktree com HEAD desanexado.
+- **Escolher uma branch...**: o diálogo abre na sua lista **Branch do worktree**,
+  para abrir uma branch que já existe.
 
 A paleta tem os mesmos três (**Refs: criar worktree a partir da branch atual**,
 **Git: criar worktree no commit selecionado...**, **Refs: criar worktree
 escolhendo uma branch**). As entradas mais antigas continuam a funcionar:
 **Criar worktree a partir de...** no menu de uma branch, tag ou commit.
 
-O diálogo propõe tudo e deixa-o alterar:
+O diálogo propõe tudo e deixa-o alterar. O **Nome** e a nova branch começam
+ambos como `worktree-<id>`, em que `<id>` são 8 dígitos hexadecimais aleatórios
+(os mesmos para os dois), pelo que dois worktrees nunca colidem.
 
 | Campo | Significado |
 |---|---|
-| **Nome** | A pasta é construída a partir dele. Proposto a partir da branch ou do id curto. |
+| **Nome** | A pasta é construída a partir dele. **Nome da branch** (`Alt+N`) define-o como `worktree-<branch>`: as barras passam a `-` e a palavra não é duplicada (`worktree-foo` e `feature/worktree-x` mantêm o seu nome, `feature/login` dá `worktree-feature-login`). |
 | **Pasta** | Vizinha do repositório, `<repositório>-<nome>`. Acompanha o Nome até escrever na Pasta; **Procurar** escolhe onde. |
-| **Ref** | A branch ou o commit de onde o worktree parte (uma lista; escreva para pesquisar). Mudá-la propõe um novo Nome. |
-| **Nova branch** | Vazio faz checkout da branch da Ref lá (ou desanexa num commit). Obrigatório quando a branch já está em checkout. |
+| **Ref** | Onde começa uma branch *nova*: uma branch ou um commit (uma lista; escreva para pesquisar). Não é usada, e di-lo, enquanto está escolhida uma branch existente. |
+| **Branch do worktree** | Um campo, dois significados, indicados por baixo dele. Um nome que não é uma branch local cria uma nova branch a partir da Ref (**nova branch a partir de main**). Uma branch local que não está em checkout noutro lado (escolha-a na lista ou escreva o nome) fica em checkout lá tal como está (**faz checkout desta branch**). A primeira linha da lista, ou um campo vazio, faz checkout da branch da Ref (ou desanexa num commit); é recusado quando essa branch já está em checkout. |
+| **Gerar outro** | `Alt+R`. Sorteia um novo `<id>` e substitui o Nome e a branch por ele, exceto o que escreveu você (um Nome ou uma branch que escreveu fica) e uma branch existente (nunca é substituída). Um Nome de **Nome da branch** ou da IA conta como gerado. |
+| **Nomear com IA** | Só com a IA ligada (veja abaixo). |
 | **Abrir o novo worktree como separador** | Ligado por predefinição. |
 
-Uma pasta que não está vazia, um nome inválido ou uma branch que já existe são
-indicados na linha do próprio diálogo, e **Criar** fica a cinzento.
+Uma pasta que não está vazia, um nome inválido, um nome de branch que o git
+recusa ou uma branch que outro worktree tem são indicados na linha do próprio
+diálogo, e **Criar** fica a cinzento.
+
+### Nomear com IA
+
+Com a [IA](ai.md) ligada, **Nomear com IA** (`Alt+A`) abre uma caixa dentro do
+diálogo: *Descreva a funcionalidade, o erro ou a tarefa*. **Nomear** pede ao
+modelo um nome curto de worktree e um nome de branch que segue os nomes de
+branches do próprio repositório (`feature/`, `fix/`, kebab-case em minúsculas).
+Preenchem o Nome (como `worktree-<nome>`) e o campo da branch, ainda editáveis;
+um nome de branch que já existe recebe o sufixo `-2`, para a resposta nunca
+fazer checkout de algo em silêncio. A caixa mostra o estado de ocupado,
+**Parar** (ou `Esc`) cancela, e uma falha aparece dentro do diálogo. Só são
+enviados a sua descrição e os nomes das branches locais.
 
 ## O menu da linha
 
@@ -107,5 +125,7 @@ faz parte do histórico.
 `gitpoulpi worktree changes <path>` lista as alterações por registar de um
 worktree. `gitpoulpi worktree remove <path> [--force] [--commit-message M
 [--commit-branch B]] [--stash-message M] [--delete-branch]` remove-o; as
-ferramentas MCP são `worktree_changes` e `worktree_remove`. Veja a
-[referência da CLI](cli-reference.md).
+ferramentas MCP são `worktree_changes` e `worktree_remove`. `gitpoulpi ai
+worktree-name --describe "<tarefa>"` imprime os nomes de worktree e de branch
+que a IA propõe (`{ name, worktree, branch }`) e não cria nada; a ferramenta
+MCP é `ai_worktree_name`. Veja a [referência da CLI](cli-reference.md).

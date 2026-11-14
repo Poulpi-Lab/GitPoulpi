@@ -633,11 +633,11 @@ inherited = "(overgenomen)"
 lfs_not_checked = "(nog niet gecontroleerd)"
 lfs_autofix_filters = "LFS-filters installeren vóór {$pull} en {$push}"
 lfs_autofix_filters_help = "Vóór een {$pull} of {$push} in een repository met Git LFS wordt `git lfs install --local` uitgevoerd als de LFS-filters of de hooks ontbreken (alleen de eigen configuratie van de repository, nooit de globale), zodat de overdracht de grote bestanden afhandelt. De statusbalk meldt het. Vereist git-lfs."
-push_group_preflight = "Check every remote before a {$push}"
-push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
-default_push_targets = "Extra {$push} targets for new branches"
-default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
-default_push_targets_none = "(no remote configured)"
+push_group_preflight = "Elke remote controleren vóór een {$push}"
+push_group_preflight_help = "Vóór een {$push} van een branch met extra {$push}-doelen eerst elke remote bekijken (een snelle query, en alleen een download van die remote als die afwijkt), zodat een probleem op de derde remote zichtbaar is voordat de eerste {$push} begint. Uit: {$push} naar elke remote om beurten en melden wat er gebeurde."
+default_push_targets = "Extra {$push}-doelen voor nieuwe branches"
+default_push_targets_help = "Alleen deze repository. Vink de remotes aan waarnaar een nieuwe branch naast zijn upstream ook {$push}t. Ze worden naar de branch gekopieerd zodra die voor het eerst een upstream krijgt (een eerste {$push} die er een instelt, of een branch die is gemaakt vanaf een remote branch). Bestaande branches blijven ongewijzigd: wijzig ze in het dialoogvenster Remotes van de branch."
+default_push_targets_none = "(geen remote geconfigureerd)"
 
 [settings_screen]
 title = "Instellingen - Tab: secties/instellingen │ Enter: wijzigen"
@@ -883,7 +883,7 @@ push_branch = "{$Push} {name}"
 start_pr = "{$Pr} starten vanaf {name}..."
 fetch = "{$Fetch}"
 # context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
-remotes_of = "Remotes of {name}..."
+remotes_of = "Remotes van {name}..."
 rename = "{name} hernoemen..."
 delete = "{name} verwijderen..."
 delete_both = "{first} en {second} verwijderen..."
@@ -2208,23 +2208,23 @@ host_not_recognized = "remote host niet herkend"
 link_branch = "link naar de branch"
 link_commit = "link naar de commit"
 # context: menu row of the Push dropdown: push the branch to its upstream and every extra push target; {remotes} lists them, comma separated
-push_to_all = "{$Push} to all ({remotes})"
+push_to_all = "{$Push} naar alle ({remotes})"
 # context: menu row: push the branch to one remote only; {remote} is that remote
-push_to_only = "{$Push} to {remote} only"
+push_to_only = "{$Push} alleen naar {remote}"
 # context: menu row: opens the dialog where the remotes of this one push are ticked
-push_to_selected = "{$Push} to selected remotes..."
+push_to_selected = "{$Push} naar geselecteerde remotes..."
 # context: menu row of the Push dropdown that opens the dialog of the remotes a branch pushes to and pulls from; {branch} is the branch
-remotes_of = "Remotes of {branch}..."
+remotes_of = "Remotes van {branch}..."
 # context: menu row of the Pull dropdown: pull the upstream and every extra pull source; {remotes} lists them, joined with +
-pull_from_all = "{$Pull} from all sources ({remotes})"
+pull_from_all = "{$Pull} van alle bronnen ({remotes})"
 # context: menu row: pull from one remote only, once; {remote} is that remote
-pull_from_only = "{$Pull} from {remote} only"
+pull_from_only = "{$Pull} alleen van {remote}"
 # context: status line while a push to several remotes starts; {branch} is the branch, {remotes} the remote names
-pushing_to_all = { git = "pushing {branch} to {remotes}...", local = "pushing {branch} to {remotes}..." }
+pushing_to_all = { git = "{branch} pushen naar {remotes}...", local = "{branch} pushen naar {remotes}..." }
 # context: status line while a pull from several remotes starts; {branch} is the branch, {remotes} the remote names
-pulling_from_all = { git = "pulling {branch} from {remotes}...", local = "pulling {branch} from {remotes}..." }
+pulling_from_all = { git = "{branch} pullen van {remotes}...", local = "{branch} pullen van {remotes}..." }
 # context: status line: the branch has no remote to pull from; {branch} is the branch
-no_pull_remote = "{branch} has no remote to {$pull} from"
+no_pull_remote = "{branch} heeft geen remote om van te {$pull}en"
 
 [keymap_action]
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
@@ -2555,7 +2555,7 @@ log_columns_fit_all = "Alle kolommen aan inhoud aanpassen"
 log_scroll_left = "Kolommen naar links scrollen"
 log_scroll_right = "Kolommen naar rechts scrollen"
 log_columns_layout = "Zijwaarts scrollen of aan paneel aanpassen"
-refs_remotes = "Branch: Edit its Remotes"
+refs_remotes = "Branch: remotes bewerken"
 
 
 [keymap_ctx]
@@ -3145,8 +3145,8 @@ git_pull_options = "Git: Pull-opties..."
 git_push = "Git: Push"
 git_push_to_remote = "Git: Pushen naar remote..."
 git_force_push_with_lease = "Git: Force push (met lease)..."
-git_remotes_of_branch = "Git: Remotes of Branch..."
-git_push_to_selected_remotes = "Git: {$Push} to Selected Remotes..."
+git_remotes_of_branch = "Git: Remotes van branch..."
+git_push_to_selected_remotes = "Git: {$Push} naar geselecteerde remotes..."
 remote_add_remote = "Remote: Remote toevoegen..."
 remote_remove_remote = "Remote: Remote verwijderen..."
 remote_edit_remote = "Remote: Remote bewerken..."
@@ -3654,27 +3654,27 @@ view_log_scroll_left = "Weergave: Log: Kolommen naar links scrollen"
 view_log_scroll_right = "Weergave: Log: Kolommen naar rechts scrollen"
 view_log_columns_layout = "Weergave: Log: Zijwaarts scrollen van de kolommen aan- of uitzetten"
 # context: palette command: push to the upstream and every extra push target
-git_push_to_all_targets = "Git: {$Push} to All Targets"
+git_push_to_all_targets = "Git: {$Push} naar alle doelen"
 # context: palette command: pull the upstream and every extra pull source
-git_pull_from_all_sources = "Git: {$Pull} from All Sources"
+git_pull_from_all_sources = "Git: {$Pull} van alle bronnen"
 # context: palette command: opens a list of remotes, pulls from the chosen one once
-git_pull_from_one_remote = "Git: {$Pull} from One Remote..."
+git_pull_from_one_remote = "Git: {$Pull} van één remote..."
 # context: palette command: reopens the progress window of the last push to several remotes
-git_show_grouped_push = "Git: Show Grouped {$Push}"
+git_show_grouped_push = "Git: Gegroepeerde {$Push} tonen"
 # context: palette command: goes on with the push to several remotes that paused on conflicts
-git_continue_grouped_push = "Git: Continue Grouped {$Push}"
+git_continue_grouped_push = "Git: Gegroepeerde {$Push} voortzetten"
 # context: palette command: abandons the push to several remotes that paused on conflicts
-git_abort_grouped_push = "Git: Abort Grouped {$Push}"
+git_abort_grouped_push = "Git: Gegroepeerde {$Push} afbreken"
 # context: palette command: tries again the remotes that failed in the last push to several remotes
-git_retry_failed_pushes = "Git: Retry Failed Pushes"
+git_retry_failed_pushes = "Git: Mislukte pushes opnieuw proberen"
 # context: palette: why a command is grayed out
-why_no_grouped_push = "there is no grouped {$push} to show"
+why_no_grouped_push = "er is geen gegroepeerde {$push} om te tonen"
 # context: palette: why a command is grayed out
-why_group_not_paused = "no grouped {$push} is waiting on conflicts"
+why_group_not_paused = "geen gegroepeerde {$push} wacht op conflicten"
 # context: palette: why Continue is grayed out
-why_group_not_ready = "resolve and conclude the conflicts first"
+why_group_not_ready = "los de conflicten eerst op en rond ze af"
 # context: palette: why a command is grayed out
-why_nothing_to_retry = "no remote failed in the last grouped {$push}"
+why_nothing_to_retry = "geen remote is mislukt in de laatste gegroepeerde {$push}"
 
 [help_section]
 rewrite = "Geschiedenis herschrijven"
@@ -4084,7 +4084,7 @@ rewrite_9 = "opent het tabblad Grootte en analyseert de geschiedenis: de grootst
 rewrite_host_howto = "legt uit hoe je een herschrijving door een branch krijgt die de host beschermt: de bescherming opheffen, {$push} onder een nieuwe naam, of de repository opnieuw aanmaken; er wordt niets voor je gedaan"
 rewrite_ai_rules = "maakt met AI de herschrijfregels op basis van je beschrijving (er wordt geen voorbeeld getoond en niets toegepast)"
 log_columns_2 = "de kolommen van de Log zijwaarts scrollen als ze hun breedte behouden (de indeling Zijwaarts scrollen, te kiezen in de kolomkeuze, in de Instellingen of met s terwijl een kolom gekozen is); bij de indeling Aanpassen past elke kolom in het paneel"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "de remotes van de geselecteerde lokale branch bewerken (zijn upstream en extra {$push}-doelen): het toetsenbordequivalent van klikken op het remotes-label op zijn rij"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} of rechtsklik"
@@ -5513,7 +5513,7 @@ no_longer = "{path} is geen submodule meer"
 [combo]
 type_to_search = "typ om te zoeken"
 # context: placeholder of the search line of a dropdown that also accepts typed text
-type_to_use_own = "type your own value"
+type_to_use_own = "typ je eigen waarde"
 loading = "laden..."
 no_match = "geen treffer"
 use_value = "\"{value}\" gebruiken"
@@ -5841,11 +5841,11 @@ palette_create_desktop = "Starter: Bureaublad-snelkoppeling maken"
 palette_remove = "Starter: Snelkoppelingen verwijderen"
 icons_updated = "snelkoppelingen bijgewerkt"
 alias = "Opdrachtalias"
-alias_help = "De korte opdracht waarmee GitPoulpi vanuit een terminal start, bijvoorbeeld gp. Alleen letters, cijfers, - _ en . zijn toegestaan. Een shell-alias of -functie met dezelfde naam gaat voor en is van hieruit niet te zien (oh-my-zsh definieert zelf gp)."
+alias_help = "De korte opdracht waarmee GitPoulpi vanuit een terminal start, bijvoorbeeld gp. Typ een willekeurige naam in de lijst om je eigen te gebruiken. Alleen letters, cijfers, - _ en . zijn toegestaan. Een shell-alias of -functie met dezelfde naam gaat voor en is van hieruit niet te zien (oh-my-zsh definieert zelf gp)."
 alias_none = "Geen"
 alias_status = "Status van alias"
 alias_add = "Alias nieuw tabblad"
-alias_add_help = "Een tweede korte opdracht, bijvoorbeeld gpa, die de huidige map als nieuw tabblad opent in het al draaiende GitPoulpi (gitpoulpi --add) in plaats van een tweede te starten. Draait er geen, dan start ze GitPoulpi zoals gewoonlijk. Aanmaken maakt haar samen met het opdrachtalias hierboven. Dezelfde naamregels."
+alias_add_help = "Een tweede korte opdracht, bijvoorbeeld gpa, die de huidige map als nieuw tabblad opent in het al draaiende GitPoulpi (gitpoulpi --add) in plaats van een tweede te starten. Draait er geen, dan start ze GitPoulpi zoals gewoonlijk. Aanmaken maakt haar samen met het opdrachtalias hierboven. Typ een willekeurige naam in de lijst om je eigen te gebruiken. Dezelfde naamregels."
 alias_add_status = "Status (nieuw tabblad)"
 alias_set_name = "typ hierboven een naam"
 alias_bad_space = "de naam bevat een spatie"
@@ -6500,7 +6500,7 @@ branch_rename = "Branch {old} hernoemen naar {new}"
 upstream_set = "Upstream van {branch} instellen op {upstream}"
 upstream_unset = "Upstream van {branch} wissen"
 # context: undo history row: the push targets and pull sources of a branch were changed; {branch} is the local branch
-remotes_set = "Set remotes of {branch}"
+remotes_set = "Remotes van {branch} instellen"
 config_set = "{key} instellen op {value}"
 config_unset = "{key} wissen"
 sparse_set = "Gedeeltelijke checkout instellen"
@@ -9505,7 +9505,7 @@ none = "geen link in dit bericht"
 
 [branch_remotes]
 # context: title of the dialog that lists every remote a branch pushes to and pulls from; {branch} is the local branch
-title = "Remotes of {branch}"
+title = "Remotes van {branch}"
 # context: label before the list that picks the upstream (the remote branch the local branch tracks)
 upstream_label = "Upstream"
 # context: table heading: a configured remote's name
@@ -9515,219 +9515,219 @@ col_branch = "Branch"
 # context: table heading over a checkbox: the branch is also pushed to that remote
 col_push = "{$Push}"
 # context: table heading over a checkbox: a pull also takes the new commits of that remote
-col_pull = "{$Pull} too"
+col_pull = "Ook {$Pull}"
 # context: table heading: how the local branch stands against that remote (ahead, behind, in sync)
-col_state = "State"
+col_state = "Status"
 # context: cell in the Pull too column of the upstream's own row: the upstream is always pulled
 pull_upstream = "upstream"
 # context: state cell: the remote's copy and the local branch are the same commit
-state_in_sync = "in sync"
+state_in_sync = "gelijk"
 # context: state cell: the remote has no copy of the branch yet
-state_new = "new"
+state_new = "nieuw"
 # context: state cell: the remote's copy shares no history with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "niet verwant"
 # context: state cell of a remote that is not used by the branch
 state_none = "-"
 # context: row of a remote the branch still mentions but the repository no longer has
-gone = "remote gone"
+gone = "remote verdwenen"
 # context: button on a gone row: forget that remote for this branch
-remove_button = "Remove"
+remove_button = "Verwijderen"
 # context: warning under the table; {first} and {second} are two remote names with the same address
-same_url = "{first} and {second} {$push} to the same URL."
+same_url = "{first} en {second} {$push}en naar dezelfde URL."
 # context: button: changes the branch name used on the selected remote
-rename_button = "Rename on remote..."
+rename_button = "Hernoemen op remote..."
 # context: button: the branch tracks no upstream any more
-unset_button = "Unset upstream"
+unset_button = "Upstream wissen"
 # context: primary button of the dialog
-apply_button = "Apply"
+apply_button = "Toepassen"
 # context: shown while the dialog reads the branch's remotes
-loading = "Reading the remotes..."
+loading = "De remotes lezen..."
 # context: title of the small dialog that asks for the branch's name on one remote; {remote} is the remote
-rename_title = "Branch name on {remote}"
+rename_title = "Branchnaam op {remote}"
 # context: placeholder of that dialog's field
-rename_placeholder = "Branch name on the remote"
+rename_placeholder = "Branchnaam op de remote"
 # context: primary button of that dialog
-rename_set = "Set"
+rename_set = "Instellen"
 # context: inline error of that dialog when the field is empty
-rename_empty = "Type a branch name."
+rename_empty = "Typ een branchnaam."
 # context: inline error when Rename is used on the upstream's own row
-rename_upstream_row = "The upstream's branch name is chosen in the list above."
+rename_upstream_row = "De branchnaam van de upstream kies je in de lijst hierboven."
 # context: inline error when Rename is used with nothing to rename
-rename_no_row = "Select a remote's row first."
+rename_no_row = "Selecteer eerst de rij van een remote."
 # context: key hints under the table; keep the key names (Space, p, r, Del, Enter)
-keys_hint = "Space {$Push}, p {$Pull} too, r Rename, Del Remove, Enter Apply"
+keys_hint = "Space {$Push}, p ook {$Pull}, r Hernoemen, Del Verwijderen, Enter Toepassen"
 # context: status line while the change is sent; {branch} is the local branch
-applying = "setting the remotes of {branch}..."
+applying = "remotes van {branch} instellen..."
 # context: status line once the daemon applied the change; {branch} is the local branch
-remotes_set = "remotes of {branch} updated"
+remotes_set = "remotes van {branch} bijgewerkt"
 
 [push_group]
 # context: title of the dialog that asks which remotes to push a branch to (one push only); {branch} is the local branch
-title_select = "{$Push} {branch} to selected remotes"
+title_select = "{$Push} {branch} naar geselecteerde remotes"
 # context: title of the dialog that shows how a branch stands against each remote before a grouped push; {n} is the number of remotes, {branch} the local branch
-title_plan = { one = "{$Push} {branch} to {n} remote", other = "{$Push} {branch} to {n} remotes" }
+title_plan = { one = "{$Push} {branch} naar {n} remote", other = "{$Push} {branch} naar {n} remotes" }
 # context: title of the dialog while a grouped push runs or after it ended; {branch} is the local branch
 title_run = "{$Push} {branch}"
 # context: line under the title; {branch} is the local branch, {sha} the short id of its tip
-local_at = "Local {branch} at {sha}"
+local_at = "Lokaal {branch} op {sha}"
 # context: help line over the list of remotes to push to
-select_hint = "Pick the remotes this {$push} goes to. Nothing is saved unless you tick Remember."
+select_hint = "Kies de remotes waarnaar deze {$push} gaat. Er wordt niets opgeslagen tenzij je Onthouden aanvinkt."
 # context: checkbox: store the picked remotes as the branch's push targets
-remember = "Remember for this branch"
+remember = "Onthouden voor deze branch"
 # context: shown under the list when no remote is ticked
-select_none = "Tick at least one remote."
+select_none = "Vink minstens één remote aan."
 # context: shown while the daemon asks the remotes about the branch
-loading = "Asking the remotes..."
+loading = "De remotes bevragen..."
 # context: table heading: the remote's name
 col_remote = "Remote"
 # context: table heading: how the local branch stands against the remote
-col_state = "State"
+col_state = "Status"
 # context: table heading: what the run does with that remote
-col_action = "Action"
+col_action = "Actie"
 # context: state of a remote that already has the same commit
-state_up_to_date = "up to date"
+state_up_to_date = "actueel"
 # context: state of a remote that only misses local commits
-state_ready = "ready"
+state_ready = "klaar"
 # context: state of a remote that has no copy of the branch yet
-state_new = "new"
+state_new = "nieuw"
 # context: state of a remote that has commits the local branch lacks
-state_behind = "behind"
+state_behind = "achter"
 # context: state of a remote whose history and the local branch's both moved
-state_diverged = "diverged"
+state_diverged = "uiteengelopen"
 # context: state of a remote whose commits are older copies of rebased or amended local commits
-state_rewritten = "rewritten"
+state_rewritten = "herschreven"
 # context: state of a remote whose history shares nothing with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "niet verwant"
 # context: state of a remote whose host refused the branch earlier (protected branch)
-state_refused = "refused"
+state_refused = "geweigerd"
 # context: state of a remote that could not be asked
-state_unreachable = "not reachable"
+state_unreachable = "niet bereikbaar"
 # context: state of a remote that is no longer configured
-state_missing = "gone"
+state_missing = "verdwenen"
 # context: note on a remote that points at the same repository as an earlier row; {other} is that earlier remote
-same_as = "same repository as {other}"
+same_as = "zelfde repository als {other}"
 # context: action: send the local commits to the remote
 action_push = "{$Push}"
 # context: action: move the local branch forward to the remote's commit; {remote} is the remote
-action_fast_forward = "Fast-forward from {remote}"
+action_fast_forward = "Fast-forward vanaf {remote}"
 # context: action: combine the remote's commits into the local branch, then send; {remote} is the remote
-action_merge = "{$Merge} from {remote}"
+action_merge = "{$Merge} van {remote}"
 # context: action: replay the local commits on top of the remote's, then send; {remote} is the remote
-action_rebase = "{$Rebase} onto {remote}"
+action_rebase = "{$Rebase} op {remote}"
 # context: action: overwrite the remote's branch, refused if it moved since the plan
-action_force = "Force {$push} (lease)"
+action_force = "Force {$push} (met lease)"
 # context: action: leave this remote out
-action_skip = "Skip"
+action_skip = "Overslaan"
 # context: line under a row whose merge would conflict; {n} is the number of files, {files} their names
-conflicts = { one = "{$merge} would conflict in {n} file: {files}", other = "{$merge} would conflict in {n} files: {files}" }
+conflicts = { one = "{$merge} geeft een conflict in {n} bestand: {files}", other = "{$merge} geeft conflicten in {n} bestanden: {files}" }
 # context: checkbox: also send the tags that no remote has yet
-tags = "Also {$push} the {$tags} not sent yet"
+tags = "Ook de {$tags} {$push}en die nog niet zijn verstuurd"
 # context: summary line under the table; {steps} is the list of steps
-then_line = "Then: {steps}."
+then_line = "Daarna: {steps}."
 # context: summary line when every row is skipped or already up to date
-then_nothing = "Then: nothing to do."
+then_nothing = "Daarna: niets te doen."
 # context: separator between steps in the summary line
 then_join = ", "
 # context: step of the summary line; {remote} is the remote
-step_fast_forward = "fast-forward from {remote}"
+step_fast_forward = "fast-forward van {remote}"
 # context: step of the summary line; {remote} is the remote
-step_merge = "{$merge} {remote}"
+step_merge = "{$merge} van {remote}"
 # context: step of the summary line; {remote} is the remote
-step_rebase = "{$rebase} onto {remote}"
+step_rebase = "{$rebase} op {remote}"
 # context: step of the summary line; {n} is the number of remotes
-step_push = { one = "{$push} to {n} remote", other = "{$push} to {n} remotes" }
+step_push = { one = "{$push} naar {n} remote", other = "{$push} naar {n} remotes" }
 # context: warning under the summary when a row force-pushes; {n} is the number of commits that disappear, {remote} the remote
-force_note = { one = "Force {$push} replaces {n} {$commit} on {remote}.", other = "Force {$push} replaces {n} {$commits} on {remote}." }
+force_note = { one = "Force {$push} vervangt {n} {$commit} op {remote}.", other = "Force {$push} vervangt {n} {$commits} op {remote}." }
 # context: warning under the summary when rows rebase while other remotes already hold the local commits; {remotes} are those remotes
-rebase_warn = "A {$rebase} rewrites the local {$commits}: {remotes} will then need a force {$push}."
+rebase_warn = "Een {$rebase} herschrijft de lokale {$commits}: {remotes} hebben daarna een force {$push} nodig."
 # context: confirmation question before a force push; {n} is the number of remote commits replaced, {branch} the branch, {remotes} the remote names
-force_confirm = { one = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commit} on the remote is replaced. Not undoable.", other = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commits} on the remotes are replaced. Not undoable." }
+force_confirm = { one = "Force {$push} {branch} naar {remotes}?\nMet lease: {n} {$commit} op de remote wordt vervangen. Niet ongedaan te maken.", other = "Force {$push} {branch} naar {remotes}?\nMet lease: {n} {$commits} op de remotes worden vervangen. Niet ongedaan te maken." }
 # context: button: ask the remotes again
-btn_fetch_again = "{$Fetch} again"
+btn_fetch_again = "Opnieuw {$fetch}en"
 # context: button: set every row that has a problem to Skip
-btn_skip_problems = "Skip problems"
+btn_skip_problems = "Problemen overslaan"
 # context: button: close the dialog without running
-btn_cancel = "Cancel"
+btn_cancel = "Annuleren"
 # context: button: run the grouped push
-btn_run = "Run"
+btn_run = "Uitvoeren"
 # context: button: go to the next step
-btn_next = "Next"
+btn_next = "Volgende"
 # context: button: close the dialog (the run goes on)
-btn_close = "Close"
+btn_close = "Sluiten"
 # context: button: try the failed remotes again
-btn_retry = "Retry failed"
+btn_retry = "Mislukte opnieuw"
 # context: progress row: the remote took the commits
-run_pushed = "sent"
+run_pushed = "verstuurd"
 # context: progress row: the remote got a new branch
-run_created = "created"
+run_created = "aangemaakt"
 # context: progress row: nothing to send
-run_up_to_date = "up to date"
+run_up_to_date = "actueel"
 # context: progress row: the local branch moved forward
-run_fast_forwarded = "fast-forwarded"
+run_fast_forwarded = "fast-forward toegepast"
 # context: progress row: the remote's commits were combined into the local branch with a new commit
-run_merged = "combined"
+run_merged = "samengevoegd"
 # context: progress row: the local commits were replayed on the remote's
-run_rebased = "replayed"
+run_rebased = "afgespeeld"
 # context: progress row: the remote's commits were taken in
-run_integrated = "taken in"
+run_integrated = "overgenomen"
 # context: progress row: left out
-run_skipped = "skipped"
+run_skipped = "overgeslagen"
 # context: progress row: the remote's commits are being combined with the local branch
-run_merging = "combining"
+run_merging = "samenvoegen"
 # context: progress row: sending in progress
-run_pushing = "sending"
+run_pushing = "versturen"
 # context: progress row: not started yet
-run_waiting = "waiting"
+run_waiting = "wachtend"
 # context: progress row: failed; {why} is the reason
-run_failed = "failed: {why}"
+run_failed = "mislukt: {why}"
 # context: progress row: the remote refused; {why} is the reason
-run_rejected = "refused: {why}"
+run_rejected = "geweigerd: {why}"
 # context: progress row: the run was canceled while this remote was in flight
-run_unknown = "unknown (canceled)"
+run_unknown = "onbekend (afgebroken)"
 # context: progress row: the remote is not configured
-run_missing = "remote missing"
+run_missing = "remote ontbreekt"
 # context: line under the progress rows while the run is going
-run_going = "Closing this window does not stop the run."
+run_going = "Dit venster sluiten stopt de uitvoering niet."
 # context: line under the progress rows when the run ended well
-run_done = "Done."
+run_done = "Klaar."
 # context: line under the progress rows when some remotes failed
-run_problems = "Some remotes failed. Retry them, or close."
+run_problems = "Sommige remotes zijn mislukt. Probeer ze opnieuw of sluit het venster."
 # context: key hints of the selection step
-hint_select = "Up/Down move  Space tick  m remember  Enter next  Esc close"
+hint_select = "↑/↓ bewegen  Space aanvinken  m onthouden  Enter volgende  Esc sluiten"
 # context: key hints of the plan step
-hint_plan = "Up/Down row  Left/Right action  Enter list  s skip  t {$tags}  f again  Ctrl+Enter run  Esc close"
+hint_plan = "↑/↓ rij  ←/→ actie  Enter lijst  s overslaan  t {$tags}  f opnieuw  Ctrl+Enter uitvoeren  Esc sluiten"
 # context: key hints of the progress step
-hint_run = "Esc close  r retry failed"
+hint_run = "Esc sluiten  r mislukte opnieuw"
 # context: text of the strip over the Log while a grouped push waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting = "Grouped {$push} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting = "Gegroepeerde {$push} gepauzeerd ({remote}): los op en rond af, dan Doorgaan."
 # context: text of the strip when the conflicts are resolved and the run can go on; {remote} is that remote
-strip_ready = "Grouped {$push} paused ({remote}): resolved. Continue to {$push}."
+strip_ready = "Gegroepeerde {$push} gepauzeerd ({remote}): opgelost. Doorgaan met {$push}."
 # context: strip button: go on with the grouped push
-strip_continue = "Continue"
+strip_continue = "Doorgaan"
 # context: strip button: abort the merge or rebase of the grouped push and drop it
-strip_abort = "Abort group"
+strip_abort = "Groep afbreken"
 # context: status line after the grouped push was aborted
-aborted = "Grouped {$push} aborted."
+aborted = "Gegroepeerde {$push} afgebroken."
 # context: status line while a grouped push runs
-running = "Grouped {$push}..."
+running = "Gegroepeerde {$push}..."
 # context: question before aborting a paused grouped push; {branch} is the local branch, {remote} the remote whose merge or rebase stopped
-abort_confirm = "Abort the grouped {$push} of {branch} (stopped on {remote})?\nThe {$merge} or {$rebase} in progress is thrown away. What was already sent stays."
+abort_confirm = "De gegroepeerde {$push} van {branch} afbreken (gestopt bij {remote})?\nDe lopende {$merge} of {$rebase} wordt weggegooid. Wat al is verstuurd, blijft."
 # context: title of the dialog that shows how a branch stands against each remote before a grouped pull; {n} is the number of remotes, {branch} the local branch
-title_pull_plan = { one = "{$Pull} {branch} from {n} remote", other = "{$Pull} {branch} from {n} remotes" }
+title_pull_plan = { one = "{$Pull} {branch} van {n} remote", other = "{$Pull} {branch} van {n} remotes" }
 # context: text of the strip over the Log while a grouped pull waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting_pull = "Grouped {$pull} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting_pull = "Gegroepeerde {$pull} gepauzeerd ({remote}): los op en rond af, dan Doorgaan."
 # context: text of the strip when the conflicts are resolved and the grouped pull can go on; {remote} is that remote
-strip_ready_pull = "Grouped {$pull} paused ({remote}): resolved. Continue to {$pull}."
+strip_ready_pull = "Gegroepeerde {$pull} gepauzeerd ({remote}): opgelost. Doorgaan met {$pull}."
 [multi_remote]
-state_new = "new"
-state_gone = "gone"
-state_unrelated = "unrelated"
-tip_title = "Remotes of {branch}"
-tip_in_sync = "{remote}: in sync"
-tip_ahead = "{remote}: {n} ahead"
-tip_behind = "{remote}: {n} behind"
-tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
-tip_new = "{remote}: no copy of this branch yet"
-tip_unrelated = "{remote}: no common history"
-tip_gone = "{remote}: no longer configured"
-tip_open_hint = "Click to edit the remotes of this branch"
+state_new = "nieuw"
+state_gone = "verdwenen"
+state_unrelated = "niet verwant"
+tip_title = "Remotes van {branch}"
+tip_in_sync = "{remote}: gelijk"
+tip_ahead = "{remote}: {n} voor"
+tip_behind = "{remote}: {n} achter"
+tip_diverged = "{remote}: uiteengelopen ({ahead} voor, {behind} achter)"
+tip_new = "{remote}: nog geen kopie van deze branch"
+tip_unrelated = "{remote}: geen gemeenschappelijke geschiedenis"
+tip_gone = "{remote}: niet meer geconfigureerd"
+tip_open_hint = "Klik om de remotes van deze branch te bewerken"

@@ -29,7 +29,7 @@ mod model;
 mod render;
 mod strip;
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;
 
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -513,6 +513,10 @@ pub(crate) fn tick(root: &Path, head_branch: Option<&str>) {
         }
     });
 }
+
+/// The dialog is process-wide: tests that open it take turns.
+#[cfg(test)]
+pub(crate) static TEST_SERIAL: Mutex<()> = Mutex::new(());
 
 #[cfg(test)]
 pub(crate) fn reset_for_tests() {

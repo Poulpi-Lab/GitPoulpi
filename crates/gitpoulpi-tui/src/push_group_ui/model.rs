@@ -267,9 +267,10 @@ impl PlanRow {
                 && self.t.relation != RemoteRelation::UpToDate)
     }
 
-    /// Commits a force push replaces on the remote.
+    /// Commits a force push takes off the remote: the ones it has and local
+    /// lacks (for a rewritten branch they are older copies of local commits).
     pub fn replaced(&self) -> u32 {
-        self.t.remote_unmatched.unwrap_or(self.t.behind)
+        self.t.behind
     }
 }
 

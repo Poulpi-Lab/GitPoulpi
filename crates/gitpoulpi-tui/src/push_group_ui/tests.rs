@@ -8,11 +8,8 @@ use gitpoulpi_core::domain::{
 use ratatui::backend::TestBackend;
 use ratatui::Terminal;
 
-/// The dialog is process-wide: tests that open it take turns.
-static SERIAL: Mutex<()> = Mutex::new(());
-
 fn serial() -> std::sync::MutexGuard<'static, ()> {
-    let guard = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    let guard = TEST_SERIAL.lock().unwrap_or_else(|e| e.into_inner());
     reset_for_tests();
     guard
 }
@@ -515,4 +512,83 @@ fn a_click_on_the_run_button_and_on_a_combo_row_work_from_the_paint() {
         panic!("{actions:?}");
     };
     assert_eq!(req.targets[1].action, A::Skip);
+}
+
+/// Opens one state of the dialog for the layout guard (`i18n_layout_tests`):
+/// 0 the selection, 1 a plan with every kind of row, 2 the loading plan,
+/// 3 a progress view with a row in each state.
+pub(crate) fn open_for_layout(which: usize) {
+    reset_for_tests();
+    let queue = RawQueue::default();
+    set_requester(queue.requester());
+    std::mem::forget(queue);
+    match which {
+        0 => {
+            let s = select_with(
+                &[
+                    ("origin", true),
+                    ("gitlab", true),
+                    ("a-rather-long-remote-name", false),
+                ],
+                Some("origin"),
+            );
+            with(|c| c.open(Path::new("/repo"), "feature", Step::Select(s)));
+        }
+        1 => {
+            let mut clash = planned(
+                "gitlab",
+                RemoteRelation::Diverged {
+                    ahead: 12,
+                    behind: 3,
+                },
+                A::MergeFrom,
+                &[A::MergeFrom, A::RebaseOnto, A::ForceWithLease, A::Skip],
+            );
+            clash.conflicts = vec!["src/a-long-file-name.rs".into(), "docs/b.md".into()];
+            let mut mirror = planned(
+                "a-rather-long-remote-name",
+                RemoteRelation::Diverged {
+                    ahead: 4,
+                    behind: 4,
+                },
+                A::ForceWithLease,
+                &[A::ForceWithLease, A::Skip],
+            );
+            mirror.rewritten = true;
+            let mut down = planned("down", RemoteRelation::Absent, A::Skip, &[A::Skip]);
+            down.error = Some("no route".into());
+            open_plan_with(plan_of(vec![
+                planned(
+                    "origin",
+                    RemoteRelation::LocalAhead(2),
+                    A::Push,
+                    &[A::Push, A::Skip],
+                ),
+                clash,
+                planned(
+                    "backup",
+                    RemoteRelation::RemoteAhead(3),
+                    A::FastForwardFrom,
+                    &[A::FastForwardFrom, A::Skip],
+                ),
+                mirror,
+                down,
+            ]));
+        }
+        2 => {
+            with(|c| {
+                c.open(
+                    Path::new("/repo"),
+                    "feature",
+                    Step::Plan(PlanView::loading(Reply::pending(), None, false)),
+                );
+            });
+        }
+        _ => {
+            open_plan_with(three_ready());
+            let _ = on_key(ctrl(KeyCode::Enter));
+            on_progress("r", "origin", TargetStatus::Pushed { created: false });
+            on_progress("r", "gitlab", TargetStatus::Integrating);
+        }
+    }
 }

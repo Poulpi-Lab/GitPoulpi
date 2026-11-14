@@ -1033,6 +1033,7 @@ fn remotes_dialog_fixture() -> crate::prompt_dialog::PromptDialog {
             ),
             state("oldbox", TargetRole::PushTo, RemoteRelation::Absent, true),
         ],
+        pending: None,
     };
     let mut dialog = crate::prompt_dialog::PromptDialog::branch_remotes(
         "feature",

@@ -269,7 +269,11 @@ fn status(gone: bool) -> RemoteGroupStatus {
             ..state("oldbox", TargetRole::PushTo, RemoteRelation::Absent)
         });
     }
-    RemoteGroupStatus { remotes, targets }
+    RemoteGroupStatus {
+        remotes,
+        targets,
+        pending: None,
+    }
 }
 
 /// The dialog for `feature` with the daemon's answer already in.

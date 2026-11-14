@@ -650,16 +650,16 @@ Tangenterna är standardvärdena.
 | Git: Pull-alternativ... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push till remote... |  |
-| Git: Push to Selected Remotes... |  |
-| Git: Push to All Targets |  |
-| Git: Pull from All Sources |  |
-| Git: Pull from One Remote... |  |
-| Git: Show Grouped Push |  |
-| Git: Continue Grouped Push |  |
-| Git: Abort Grouped Push |  |
-| Git: Retry Failed Pushes |  |
+| Git: Push till valda remotes... |  |
+| Git: Push till alla mål |  |
+| Git: Pull från alla källor |  |
+| Git: Pull från en remote... |  |
+| Git: Visa gruppens Push |  |
+| Git: Fortsätt gruppens Push |  |
+| Git: Avbryt gruppens Push |  |
+| Git: Försök igen med misslyckade pushar |  |
 | Git: Force push (med lease)... |  |
-| Git: Remotes of Branch... |  |
+| Git: Remotes för gren... |  |
 | Remote: Lägg till remote... |  |
 | Remote: Ta bort remote... |  |
 | Remote: Redigera remote... |  |

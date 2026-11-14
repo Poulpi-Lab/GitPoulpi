@@ -187,7 +187,7 @@ pub(crate) fn worktree_menu_entries(
     }
     if !wt.is_main {
         more.push(Entry::danger(
-            glyph_label("\u{2716}", m::MENU_REMOVE.get()),
+            glyph_label("\u{2717}", m::MENU_REMOVE.get()),
             RefContextAction::WorktreeRemove,
         ));
     }

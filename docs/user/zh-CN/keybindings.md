@@ -614,16 +614,16 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Git：Pull 选项… |  |
 | Git：Push | `Ctrl+G P` |
 | Git：Push 到远程… |  |
-| Git: Push to Selected Remotes... |  |
-| Git: Push to All Targets |  |
-| Git: Pull from All Sources |  |
-| Git: Pull from One Remote... |  |
-| Git: Show Grouped Push |  |
-| Git: Continue Grouped Push |  |
-| Git: Abort Grouped Push |  |
-| Git: Retry Failed Pushes |  |
+| Git：Push 到所选远程… |  |
+| Git：Push 到所有目标 |  |
+| Git：从所有来源 Pull |  |
+| Git：从一个远程 Pull… |  |
+| Git：显示分组 Push |  |
+| Git：继续分组 Push |  |
+| Git：中止分组 Push |  |
+| Git：重试失败的 push |  |
 | Git：强制 Push（带 lease）… |  |
-| Git: Remotes of Branch... |  |
+| Git：分支的远程… |  |
 | 远程：添加远程… |  |
 | 远程：移除远程… |  |
 | 远程：编辑远程… |  |

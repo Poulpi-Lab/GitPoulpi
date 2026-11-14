@@ -64,7 +64,7 @@ Log 是 GitPoulpi 的中心：整个历史以图的形式呈现，每个分支�
 | Merge、Rebase 到 | 把它 merge 到已检出的分支，或把已检出的分支 rebase 到该引用上 |
 | Fast-forward `<branch>` 到 `<current>` / `<current>` 到 `<branch>` | 在可 fast-forward 时前移分支；否则为灰色并给出原因（`diverged, not a fast-forward`） |
 | 从…创建 worktree | 在它自己的标签页中打开一个关联的 worktree |
-| Pull、Push、Fetch、设置上游… | 针对该分支的网络操作 |
+| Pull、Push、Fetch、<分支> 的远程… | 针对该分支的网络操作（<分支> 的远程… 会设置 upstream，并为每个远程提供 Push 和 也 Pull 复选框） |
 | 在图中隐藏 / 显示、单独显示 | 仅限显示；它们隐藏或单独显示引用（隐藏还会去掉只有该引用能到达的 commit），而不触碰仓库 |
 | 重命名、删除 | 删除会先询问；远程的对应分支也可以删除 |
 | 复制分支名、复制远程上分支的链接 | 复制到剪贴板 |

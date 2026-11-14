@@ -238,6 +238,7 @@ merge 冲突编辑器（[解决 merge 冲突](merge-conflicts.md)）。设置 > 
 |---|---|---|
 | `git.pull_mode` | `"merge"` | Pull（按钮、`Ctrl+G p`、`Git：Pull`）的行为：`merge`（可能时快进）、`ff_only`、`rebase`。始终显式传给 git。旧的 `fetch_all` 按 `merge` 读取。 |
 | `git.push_behavior` | `"direct"` | `direct` push 到默认远程；`ask` 会先显示远程菜单。 |
+| `git.push_group_preflight` | `true` | 把分支 push 到多个远程之前，先检查每个目标（`ls-remote`，仅当该远程有差异时才再 fetch 它），这样后面某个远程上的问题会在第一次 push 之前就被发现。 |
 | `git.merge_fast_forward` | `"never"` | 当分支本可 fast-forward 时，你发起的 merge（分支菜单、拖放、命令面板、`gitpoulpi merge`）怎么做：`never` 始终生成 merge commit（`--no-ff`），`allowed` 可能时 fast-forward（git 的默认行为，`merge.ff` 生效），`only` 只 fast-forward，否则拒绝。仓库自己的选择（设置 > Merge 选项，其 `repo-state.toml` 中的 `merge_fast_forward`）优先；CLI 的 `--ff`、`--no-ff` 和 `--ff-only` 优先于两者。实时生效。 |
 | `git.default_encoding` | `"utf-8"` | **不是**有效 UTF-8 的文本（文件内容、blame、diff、没有 `encoding` 头的 commit 消息）所用的编码：任何 WHATWG 标签（`windows-1252`、`shift_jis` 等）。仅用于显示；stage 时绝不会重新编码。仓库可以覆盖它。 |
 | `git.lfs_enabled` | `true` | 显示并驱动 Git LFS。仓库可以覆盖它。参见 [Git LFS](lfs.md)。 |

@@ -32,7 +32,9 @@ GitPoulpi 是一个终端 Git 客户端，拥有可点击的 commit 图、命令
     哪个终端最适合 GitPoulpi：**[选择终端](terminals.md)**。
     哪些内容能穿过 tmux、zellij、screen、herdr 和终端窗格：**[多路复用器](multiplexers.md)**。
 
-另见：**[分支工作流](branching-workflows.md)**，Git Flow、GitHub Flow、GitLab Flow 和 Trunk-based 预设，或你自己的基础分支、分支名称模式和主题类型（`gitpoulpi flow ...`）。
+另见：**[一个分支对应多个远程](multiple-remotes.md)**：push 目标和 pull 来源、“远程”对话框、Push 到全部或所选远程、处理已移动的远程、冲突之后继续、CLI 和普通 git 的别名。
+
+**[分支工作流](branching-workflows.md)**，Git Flow、GitHub Flow、GitLab Flow 和 Trunk-based 预设，或你自己的基础分支、分支名称模式和主题类型（`gitpoulpi flow ...`）。
 
 **[重写历史](history-rewrite.md)**：重写工作台（`Ctrl+G Shift+H`），可跨多个 commit 重写作者、日期、消息和文件内容，支持预览、Lua 脚本和一次撤销。
 

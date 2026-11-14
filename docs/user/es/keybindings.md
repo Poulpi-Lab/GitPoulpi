@@ -653,16 +653,16 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Git: Opciones de pull... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push a un remoto... |  |
-| Git: Push to Selected Remotes... |  |
-| Git: Push to All Targets |  |
-| Git: Pull from All Sources |  |
-| Git: Pull from One Remote... |  |
-| Git: Show Grouped Push |  |
-| Git: Continue Grouped Push |  |
-| Git: Abort Grouped Push |  |
-| Git: Retry Failed Pushes |  |
+| Git: Push a remotos seleccionados... |  |
+| Git: Push a todos los destinos |  |
+| Git: Pull de todas las fuentes |  |
+| Git: Pull de un remoto... |  |
+| Git: Mostrar push agrupado |  |
+| Git: Continuar push agrupado |  |
+| Git: Abortar push agrupado |  |
+| Git: Reintentar remotos fallidos |  |
 | Git: Force push (con lease)... |  |
-| Git: Remotes of Branch... |  |
+| Git: Remotos de la rama... |  |
 | Remoto: Añadir remoto... |  |
 | Remoto: Quitar remoto... |  |
 | Remoto: Editar remoto... |  |

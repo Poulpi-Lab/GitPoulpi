@@ -3121,6 +3121,7 @@ git_push = "Git: {$Push}"
 git_push_to_remote = { git = "Git: リモートへ{$Push}...", local = "Git: リモートへ{$Push}..." }
 git_force_push_with_lease = { git = "Git: 強制{$Push}（リース付き）...", local = "Git: 強制{$Push}（リース付き）..." }
 git_remotes_of_branch = "Git: Remotes of Branch..."
+git_push_to_selected_remotes = "Git: {$Push} to Selected Remotes..."
 remote_add_remote = "リモート: リモートを追加..."
 remote_remove_remote = "リモート: リモートを削除..."
 remote_edit_remote = "リモート: リモートを編集..."
@@ -9517,3 +9518,151 @@ keys_hint = "Space {$Push}, p {$Pull} too, r Rename, Del Remove, Enter Apply"
 applying = "setting the remotes of {branch}..."
 # context: status line once the daemon applied the change; {branch} is the local branch
 remotes_set = "remotes of {branch} updated"
+
+[push_group]
+# context: title of the dialog that asks which remotes to push a branch to (one push only); {branch} is the local branch
+title_select = "{$Push} {branch} to selected remotes"
+# context: title of the dialog that shows how a branch stands against each remote before a grouped push; {n} is the number of remotes, {branch} the local branch
+title_plan = { one = "{$Push} {branch} to {n} remote", other = "{$Push} {branch} to {n} remotes" }
+# context: title of the dialog while a grouped push runs or after it ended; {branch} is the local branch
+title_run = "{$Push} {branch}"
+# context: line under the title; {branch} is the local branch, {sha} the short id of its tip
+local_at = "Local {branch} at {sha}"
+# context: help line over the list of remotes to push to
+select_hint = "Pick the remotes this {$push} goes to. Nothing is saved unless you tick Remember."
+# context: checkbox: store the picked remotes as the branch's push targets
+remember = "Remember for this branch"
+# context: shown under the list when no remote is ticked
+select_none = "Tick at least one remote."
+# context: shown while the daemon asks the remotes about the branch
+loading = "Asking the remotes..."
+# context: table heading: the remote's name
+col_remote = "Remote"
+# context: table heading: how the local branch stands against the remote
+col_state = "State"
+# context: table heading: what the run does with that remote
+col_action = "Action"
+# context: state of a remote that already has the same commit
+state_up_to_date = "up to date"
+# context: state of a remote that only misses local commits
+state_ready = "ready"
+# context: state of a remote that has no copy of the branch yet
+state_new = "new"
+# context: state of a remote that has commits the local branch lacks
+state_behind = "behind"
+# context: state of a remote whose history and the local branch's both moved
+state_diverged = "diverged"
+# context: state of a remote whose commits are older copies of rebased or amended local commits
+state_rewritten = "rewritten"
+# context: state of a remote whose history shares nothing with the local branch
+state_unrelated = "unrelated"
+# context: state of a remote whose host refused the branch earlier (protected branch)
+state_refused = "refused"
+# context: state of a remote that could not be asked
+state_unreachable = "not reachable"
+# context: state of a remote that is no longer configured
+state_missing = "gone"
+# context: note on a remote that points at the same repository as an earlier row; {other} is that earlier remote
+same_as = "same repository as {other}"
+# context: action: send the local commits to the remote
+action_push = "{$Push}"
+# context: action: move the local branch forward to the remote's commit; {remote} is the remote
+action_fast_forward = "Fast-forward from {remote}"
+# context: action: combine the remote's commits into the local branch, then send; {remote} is the remote
+action_merge = "{$Merge} from {remote}"
+# context: action: replay the local commits on top of the remote's, then send; {remote} is the remote
+action_rebase = "{$Rebase} onto {remote}"
+# context: action: overwrite the remote's branch, refused if it moved since the plan
+action_force = "Force {$push} (lease)"
+# context: action: leave this remote out
+action_skip = "Skip"
+# context: line under a row whose merge would conflict; {n} is the number of files, {files} their names
+conflicts = { one = "{$merge} would conflict in {n} file: {files}", other = "{$merge} would conflict in {n} files: {files}" }
+# context: checkbox: also send the tags that no remote has yet
+tags = "Also {$push} the {$tags} not sent yet"
+# context: summary line under the table; {steps} is the list of steps
+then_line = "Then: {steps}."
+# context: summary line when every row is skipped or already up to date
+then_nothing = "Then: nothing to do."
+# context: separator between steps in the summary line
+then_join = ", "
+# context: step of the summary line; {remote} is the remote
+step_fast_forward = "fast-forward from {remote}"
+# context: step of the summary line; {remote} is the remote
+step_merge = "{$merge} {remote}"
+# context: step of the summary line; {remote} is the remote
+step_rebase = "{$rebase} onto {remote}"
+# context: step of the summary line; {n} is the number of remotes
+step_push = { one = "{$push} to {n} remote", other = "{$push} to {n} remotes" }
+# context: warning under the summary when a row force-pushes; {n} is the number of commits that disappear, {remote} the remote
+force_note = { one = "Force {$push} replaces {n} {$commit} on {remote}.", other = "Force {$push} replaces {n} {$commits} on {remote}." }
+# context: warning under the summary when rows rebase while other remotes already hold the local commits; {remotes} are those remotes
+rebase_warn = "A {$rebase} rewrites the local {$commits}: {remotes} will then need a force {$push}."
+# context: confirmation question before a force push; {n} is the number of remote commits replaced, {branch} the branch, {remotes} the remote names
+force_confirm = { one = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commit} on the remote is replaced. Not undoable.", other = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commits} on the remotes are replaced. Not undoable." }
+# context: button: ask the remotes again
+btn_fetch_again = "{$Fetch} again"
+# context: button: set every row that has a problem to Skip
+btn_skip_problems = "Skip problems"
+# context: button: close the dialog without running
+btn_cancel = "Cancel"
+# context: button: run the grouped push
+btn_run = "Run"
+# context: button: go to the next step
+btn_next = "Next"
+# context: button: close the dialog (the run goes on)
+btn_close = "Close"
+# context: button: try the failed remotes again
+btn_retry = "Retry failed"
+# context: progress row: the remote took the commits
+run_pushed = "sent"
+# context: progress row: the remote got a new branch
+run_created = "created"
+# context: progress row: nothing to send
+run_up_to_date = "up to date"
+# context: progress row: the local branch moved forward
+run_fast_forwarded = "fast-forwarded"
+# context: progress row: the remote's commits were combined into the local branch with a new commit
+run_merged = "combined"
+# context: progress row: the local commits were replayed on the remote's
+run_rebased = "replayed"
+# context: progress row: the remote's commits were taken in
+run_integrated = "taken in"
+# context: progress row: left out
+run_skipped = "skipped"
+# context: progress row: the remote's commits are being combined with the local branch
+run_merging = "combining"
+# context: progress row: sending in progress
+run_pushing = "sending"
+# context: progress row: not started yet
+run_waiting = "waiting"
+# context: progress row: failed; {why} is the reason
+run_failed = "failed: {why}"
+# context: progress row: the remote refused; {why} is the reason
+run_rejected = "refused: {why}"
+# context: progress row: the run was canceled while this remote was in flight
+run_unknown = "unknown (canceled)"
+# context: progress row: the remote is not configured
+run_missing = "remote missing"
+# context: line under the progress rows while the run is going
+run_going = "Closing this window does not stop the run."
+# context: line under the progress rows when the run ended well
+run_done = "Done."
+# context: line under the progress rows when some remotes failed
+run_problems = "Some remotes failed. Retry them, or close."
+# context: key hints of the selection step
+hint_select = "Up/Down move  Space tick  Enter next  Esc close"
+# context: key hints of the plan step
+hint_plan = "Up/Down row  Left/Right action  Enter list  s skip  f again  Ctrl+Enter run  Esc close"
+# context: key hints of the progress step
+hint_run = "Esc close  r retry failed"
+# context: text of the strip over the Log while a grouped push waits for the conflicts of a remote to be resolved; {remote} is that remote
+strip_waiting = "Grouped {$push} paused ({remote}): resolve and conclude, then Continue."
+# context: text of the strip when the conflicts are resolved and the run can go on; {remote} is that remote
+strip_ready = "Grouped {$push} paused ({remote}): resolved. Continue to {$push}."
+# context: strip button: go on with the grouped push
+strip_continue = "Continue"
+# context: strip button: abort the merge or rebase of the grouped push and drop it
+strip_abort = "Abort group"
+# context: status line after the grouped push was aborted
+aborted = "Grouped {$push} aborted."

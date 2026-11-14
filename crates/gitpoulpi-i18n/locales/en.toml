@@ -854,7 +854,7 @@ lfs_autofix_filters_help = "Before a {$pull} or {$push} in a repository that use
 push_group_preflight = "Check every remote before a {$push}"
 push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
 default_push_targets = "Extra {$push} targets for new branches"
-default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
+default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: change them in the Remotes dialog of the branch."
 default_push_targets_none = "(no remote configured)"
 
 [settings_screen]

@@ -1320,8 +1320,11 @@ blank frames on a locked session; that is not worked around.
   persists. No accounts, no OAuth: personal tokens only.
 - **Speed is the point.** Every action feels instant and shows in-flight
   feedback past about 150 ms (`docs/developer/perf-budgets.md`).
-- **Glyphs: avoid emoji presentation.** A text-default emoji such as 👁 needs
-  VS15 (U+FE0E), or WezTerm draws it in colour.
+- **Glyphs: no emoji-capable characters in one-cell icons.** VS15 (U+FE0E) is
+  not enough: kitty and WezTerm drew the eye U+1F441 and the cross U+2716 from
+  the colour emoji font anyway, and a terminal cannot tell which font it used
+  (both advance one cell). Pick symbols with no emoji presentation (✗ U+2717,
+  ⊙ U+2299, ⊘ U+2298): they always fall back to a text font.
 - **New user-visible TUI strings go in the i18n catalogs** in all shipped
   languages, source-control words as `{$term}` tokens (`docs/developer/i18n.md`). The
   `no_new_hard_coded_ui_strings` lint fails on any flagged literal; mark

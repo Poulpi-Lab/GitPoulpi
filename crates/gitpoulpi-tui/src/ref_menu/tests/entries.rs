@@ -35,18 +35,14 @@ fn the_context_menu_labels_use_no_variation_selectors() {
         SidebarSection::Tags,
         SidebarSection::Stashes,
     ] {
-        // `Hide in graph` predates the rule and keeps its U+1F441;
-        // it is checked by `ref_menu_entries`' own callers, so only
-        // the newer rows are asserted here.
-        let entries: Vec<_> =
-            ref_menu_entries(section, "x", &MenuContext::default(), false, false, false)
-                .into_iter()
-                .filter(|e| {
-                    !matches!(e, context_menu::Entry::Action { action, .. }
-                if matches!(action, RefContextAction::ToggleHideInGraph))
-                })
-                .collect();
-        check(&entries);
+        check(&ref_menu_entries(
+            section,
+            "x",
+            &MenuContext::default(),
+            false,
+            false,
+            false,
+        ));
     }
 }
 

@@ -90,12 +90,13 @@ compile_error!(
 /// Defined before the `mod` declarations below: a `macro_rules!` macro is
 /// only in scope textually after its definition.
 macro_rules! hide_in_graph_icon {
-    // U+FE0E (VARIATION SELECTOR-15) asks for the *text* (monochrome)
-    // presentation explicitly: keeping the cell non-bold was not enough, WezTerm
-    // still drew the color emoji while a ref was being dragged. Zero-width, so
-    // the icon stays one cell.
+    // U+2299 (CIRCLED DOT OPERATOR): a plain text symbol with no emoji
+    // presentation, so every terminal draws it from a text font. The eye
+    // (U+1F441 + VS15) it replaced is emoji-capable: kitty and WezTerm drew it
+    // with the colour emoji font whatever VS15 asked. Pairs with the hidden
+    // mark U+2298 (circled slash).
     () => {
-        "\u{1F441}\u{FE0E}"
+        "\u{2299}"
     };
 }
 

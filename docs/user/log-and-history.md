@@ -180,13 +180,13 @@ hovered commit** turns it off; nothing is drawn where the Ref column is too narr
 
 **Remotes.** The `+` in the REMOTE title adds one; right-click a remote's
 name to fetch it, copy its web link, make it the default remote, hide it from
-the graph, edit its URLs or remove it. **Hiding a remote** (its row's eye, the
+the graph, edit its URLs or remove it. **Hiding a remote** (its row's ⊙, the
 menu's *Hide remote from graph*, or `Remote: Hide Remote in Graph...` in the
 palette) hides every branch it has now or gets later, and the commits only it
 reaches leave the Log: the way to browse one history without the history of an unrelated
 archive remote; bring it back with *Show remote in graph*. Showing a
 remote also shows the branches of it that were hidden one by one. A branch of a
-hidden remote says so on the status line when you click its eye: show the remote
+hidden remote says so on the status line when you click its ⊙: show the remote
 first.
 
 **Stashes.** **Stash** stashes everything (untracked files included);

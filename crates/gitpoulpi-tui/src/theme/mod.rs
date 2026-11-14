@@ -167,11 +167,10 @@ pub(crate) fn file_status_color(status: gitpoulpi_core::domain::FileStatus) -> C
 /// See `hide_in_graph_icon!` (defined at the top of `lib.rs`, where
 /// `macro_rules!` has to be to reach `ref_context_actions`).
 ///
-/// `\u{1F441}` (EYE) is a *text*-default emoji (Emoji_Presentation=No),
-/// which this project otherwise avoids: WezTerm on Windows drew it
-/// monochrome on a plain row but in color on the selected row, because the
-/// selection's BOLD sent the lookup down the bold font's fallback chain.
-/// The fix is at the cause: **the cell holding this glyph is never bold.**
+/// U+2299 (circled dot), a text symbol with no emoji presentation. It used to
+/// be the eye U+1F441 + VS15, which terminals drew from the colour emoji font
+/// (WezTerm on the bold selected row, kitty everywhere once Noto Color Emoji
+/// covered it). The cell holding this glyph is still never bold.
 /// The Refs lists' highlight carries no BOLD (the selected row bolds its
 /// *name* span itself), and the context menu draws no highlight at all.
 /// Pinned by `the_hide_eye_is_never_bold_even_on_the_selected_row`.

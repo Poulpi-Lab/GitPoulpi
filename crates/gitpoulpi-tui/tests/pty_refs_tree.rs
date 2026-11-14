@@ -371,9 +371,8 @@ fn a_hidden_ref_shows_the_circled_slash_never_bold_even_when_selected() {
     );
 }
 
-/// The hide eye: U+1F441 followed by VS15, which asks for its monochrome
-/// text presentation (WezTerm drew the color emoji while dragging).
-const EYE: &str = "\u{1F441}\u{FE0E}";
+/// The hide mark: U+2299, a text symbol (it replaced the emoji-capable eye).
+const EYE: &str = "\u{2299}";
 
 /// Dragging a branch in the Refs pane must not turn the hover eye into its
 /// color emoji: no eye cell is ever bold, whatever the drag paints over the

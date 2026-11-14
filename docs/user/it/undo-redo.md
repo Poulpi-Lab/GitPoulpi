@@ -256,7 +256,9 @@ anche il branch remoto è annullabile nel suo insieme.
 - **Interrompere un rebase**: l'annullamento non è offerto (un rebase sposta i branch
   e conserva un proprio stato; l'interruzione è essa stessa la via del ritorno). Interrompere un
   **merge, cherry-pick o revert** *viene* registrato, vedi sopra.
-- **Creare un worktree**, **creare un file patch**, clone, init, azioni di hosting
+- **Creare un worktree**, **rimuovere un worktree** (ciò che ha salvato prima resta:
+  il commit, lo stash; il branch eliminato insieme è registrato nel journal, quindi
+  Annulla riporta indietro il branch, non la cartella), **creare un file patch**, clone, init, azioni di hosting
   (pull request, issue) e chiamate all'IA: non fanno parte della cronologia del
   repository.
 - **Creare un nuovo file vuoto** dal menu del file, la rimozione automatica dei file

@@ -68,7 +68,11 @@ läsordning: börja överst och hoppa till referenssidorna när du behöver dem.
     Vad som går igenom tmux, zellij, screen, herdr och terminalpaneler:
     **[Multiplexers](multiplexers.md)**.
 
-Också: **[Grenarbetsflöden](branching-workflows.md)**, förinställningarna Git Flow, GitHub
+Också: **[Flera remotes för en gren](multiple-remotes.md)**: push-mål och pull-källor, dialogen
+Remotes, Push till alla eller till valda remotes, lösa en remote som flyttat sig, Fortsätt efter en
+konflikt, CLI och ett rent git-alias.
+
+**[Grenarbetsflöden](branching-workflows.md)**, förinställningarna Git Flow, GitHub
 Flow, GitLab Flow och Trunk-based eller dina egna baser, grennamnsmönster och
 grentyper (`gitpoulpi flow ...`).
 

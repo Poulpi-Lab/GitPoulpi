@@ -113,7 +113,7 @@ posterna:
 | Merge, Rebase på | Mergar den in i, eller gör rebase av, den utcheckade grenen på den här reffen |
 | Fast-forward `<gren>` till `<aktuell>` / `<aktuell>` till `<gren>` | Flyttar en gren framåt när det är en fast-forward; annars nedtonad med orsaken (`divergerat, ingen fast-forward`) |
 | Skapa worktree från... | Öppnar en länkad worktree i en egen flik |
-| Pull, Push, Fetch, Ange upstream... | Nätverksoperationer på den grenen |
+| Pull, Push, Fetch, Remotes för <gren>... | Nätverksoperationer på den grenen (Remotes för <gren>... anger upstream, plus en kryssruta Push och Pull också per remote) |
 | Dölj / Visa i grafen, Solo | Bara visning; de döljer eller soloar en ref (att dölja tar också bort commits som bara den refen når) utan att röra repositoryt |
 | Byt namn på, Ta bort | Ta bort frågar först; en remote-tvilling kan också tas bort |
 | Kopiera grennamn, Kopiera länk till grenen på remote | Till urklipp |

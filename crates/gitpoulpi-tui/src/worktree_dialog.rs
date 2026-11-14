@@ -401,9 +401,7 @@ impl WorktreeDialog {
     /// What an empty branch field means, as the list's first row.
     fn no_branch_label(&self) -> String {
         match &self.start {
-            WorktreeStart::Branch(b) if !self.branch_busy => {
-                msg::worktree::branch_hint_checkout(b)
-            }
+            WorktreeStart::Branch(b) if !self.branch_busy => msg::worktree::branch_hint_checkout(b),
             WorktreeStart::Branch(_) => msg::worktree::BRANCH_HINT_REQUIRED.get().into(),
             WorktreeStart::Commit(_) => msg::worktree::BRANCH_HINT_DETACHED.get().into(),
         }
@@ -1669,7 +1667,11 @@ mod tests {
         dialog.on_key(alt('r'));
         assert_eq!(dialog.name, "worktree-00000002");
         assert_eq!(dialog.branch, "worktree-00000002");
-        assert!(dialog.path.ends_with("repo-worktree-00000002"), "{}", dialog.path);
+        assert!(
+            dialog.path.ends_with("repo-worktree-00000002"),
+            "{}",
+            dialog.path
+        );
 
         // A name typed by hand stays; the generated branch still changes.
         ids(&["00000003", "00000004"]);
@@ -2007,7 +2009,10 @@ mod tests {
         assert_eq!(dialog.on_key(key(KeyCode::Esc)), WorktreeOutcome::StopAi);
 
         // The answer: Name as worktree-<slug>, the branch as a new branch.
-        assert!(dialog.ai_done(Ok(("crash-on-empty-config".into(), "fix/empty-config".into()))));
+        assert!(dialog.ai_done(Ok((
+            "crash-on-empty-config".into(),
+            "fix/empty-config".into()
+        ))));
         assert_eq!(dialog.name, "worktree-crash-on-empty-config");
         assert_eq!(dialog.branch, "fix/empty-config");
         assert!(dialog.path.ends_with("repo-worktree-crash-on-empty-config"));

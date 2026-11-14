@@ -200,7 +200,9 @@ fn generated_names(text: &str) -> Vec<String> {
         let id: String = text[at + 9..].chars().take(8).collect();
         let after = text[at + 9..].chars().nth(8);
         if id.len() == 8
-            && id.chars().all(|c| c.is_ascii_digit() || ('a'..='f').contains(&c))
+            && id
+                .chars()
+                .all(|c| c.is_ascii_digit() || ('a'..='f').contains(&c))
             && !after.is_some_and(|c| c.is_ascii_alphanumeric())
         {
             out.push(format!("worktree-{id}"));
@@ -226,7 +228,11 @@ fn plus_menu_creates_from_the_current_branch_with_default_name_and_folder() {
     let name = names[0].clone();
     assert!(names.iter().all(|n| *n == name), "{names:?}");
     term.send_keys("Enter").unwrap();
-    let created = fx.root.parent().unwrap().join(format!("{repo_name}-{name}"));
+    let created = fx
+        .root
+        .parent()
+        .unwrap()
+        .join(format!("{repo_name}-{name}"));
     wait_until("the worktree is created", || {
         worktree_list(&fx.root).contains(&format!("{repo_name}-{name}"))
     });
@@ -266,7 +272,12 @@ fn the_palette_creates_from_the_current_branch_and_chooses_a_branch() {
     wait_until("the worktree on other", || {
         worktree_list(&fx.root).contains("branch refs/heads/other")
     });
-    let _ = std::fs::remove_dir_all(fx.root.parent().unwrap().join(format!("{repo_name}-{name}")));
+    let _ = std::fs::remove_dir_all(
+        fx.root
+            .parent()
+            .unwrap()
+            .join(format!("{repo_name}-{name}")),
+    );
 }
 
 #[test]

@@ -114,10 +114,7 @@ fn name_and_branch(screen: &Screen) -> (String, String) {
             .next()
             .unwrap_or_else(|| panic!("no generated name in {line:?}"))
     };
-    (
-        first(line_of("Name   ")),
-        first(line_of("Worktree branch")),
-    )
+    (first(line_of("Name   ")), first(line_of("Worktree branch")))
 }
 
 fn wait_dialog_text(term: &Terminal, what: &str, needle: &str) {
@@ -163,7 +160,12 @@ fn the_dialog_opens_with_the_same_generated_name_and_branch_and_regenerate_chang
         worktree_list(&fx.root).contains(&format!("branch refs/heads/{name3}"))
     });
     assert!(worktree_list(&fx.root).contains(&format!("{repo_name}-{name3}")));
-    let _ = std::fs::remove_dir_all(fx.root.parent().unwrap().join(format!("{repo_name}-{name3}")));
+    let _ = std::fs::remove_dir_all(
+        fx.root
+            .parent()
+            .unwrap()
+            .join(format!("{repo_name}-{name3}")),
+    );
 }
 
 #[test]
@@ -177,10 +179,18 @@ fn an_existing_branch_is_checked_out_and_name_after_branch_names_the_worktree_af
         term.send_keys("Tab").unwrap();
     }
     term.send_keys("Enter").unwrap();
-    wait_dialog_text(&term, "the branch list", "required: the branch is already checked out");
+    wait_dialog_text(
+        &term,
+        "the branch list",
+        "required: the branch is already checked out",
+    );
     term.send_text("other").unwrap();
     term.send_keys("Enter").unwrap();
-    wait_dialog_text(&term, "the existing branch is chosen", "checks out this branch");
+    wait_dialog_text(
+        &term,
+        "the existing branch is chosen",
+        "checks out this branch",
+    );
     // The Name did not follow: still generated until we ask.
     assert!(!generated_names(&term.text()).is_empty());
 
@@ -193,7 +203,11 @@ fn an_existing_branch_is_checked_out_and_name_after_branch_names_the_worktree_af
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let repo_name = fx.root.file_name().unwrap().to_string_lossy().into_owned();
-    wait_dialog_text(&term, "the folder follows", &format!("{repo_name}-worktree-other"));
+    wait_dialog_text(
+        &term,
+        "the folder follows",
+        &format!("{repo_name}-worktree-other"),
+    );
 
     // Create: `other` is checked out in the new worktree.
     term.send_keys("Tab").unwrap(); // Regenerate
@@ -202,7 +216,8 @@ fn an_existing_branch_is_checked_out_and_name_after_branch_names_the_worktree_af
     term.send_keys("Enter").unwrap();
     wait_until("the worktree on other", || {
         let list = worktree_list(&fx.root);
-        list.contains("branch refs/heads/other") && list.contains(&format!("{repo_name}-worktree-other"))
+        list.contains("branch refs/heads/other")
+            && list.contains(&format!("{repo_name}-worktree-other"))
     });
     let _ = std::fs::remove_dir_all(
         fx.root
@@ -230,11 +245,15 @@ fn a_branch_that_already_says_worktree_keeps_its_name_without_doubling_it() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("M-n").unwrap();
-    term.wait_for("the name is the branch, not worktree-worktree-foo", STEP, |s| {
-        s.text()
-            .lines()
-            .any(|l| l.contains("Name   ") && l.contains("worktree-foo"))
-    })
+    term.wait_for(
+        "the name is the branch, not worktree-worktree-foo",
+        STEP,
+        |s| {
+            s.text()
+                .lines()
+                .any(|l| l.contains("Name   ") && l.contains("worktree-foo"))
+        },
+    )
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
         !term.text().contains("worktree-worktree-foo"),
@@ -264,7 +283,8 @@ mod ai {
 
     /// What the agent answers. Plain words only (the Windows stand-in echoes
     /// it through `cmd`).
-    const ANSWER: &[&str] = &["{\"name\": \"Empty Config Crash\", \"branch\": \"fix/empty-config\"}"];
+    const ANSWER: &[&str] =
+        &["{\"name\": \"Empty Config Crash\", \"branch\": \"fix/empty-config\"}"];
 
     #[test]
     fn the_ai_button_names_the_worktree_and_the_branch_from_a_description() {

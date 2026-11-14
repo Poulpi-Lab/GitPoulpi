@@ -165,7 +165,8 @@ mod tests {
 
     #[test]
     fn fences_and_prose_around_the_object_are_tolerated() {
-        let n = parse("Sure!\n```json\n{\"name\":\"a-b\",\"branch\":\"feature/a-b\"}\n```").unwrap();
+        let n =
+            parse("Sure!\n```json\n{\"name\":\"a-b\",\"branch\":\"feature/a-b\"}\n```").unwrap();
         assert_eq!((n.name.as_str(), n.branch.as_str()), ("a-b", "feature/a-b"));
     }
 

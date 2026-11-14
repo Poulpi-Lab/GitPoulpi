@@ -121,4 +121,3 @@ impl crate::dialog_kit::Dismiss for WorktreeDialog {
         &mut self.close
     }
 }
-

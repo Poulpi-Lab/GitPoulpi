@@ -647,16 +647,16 @@ zastosowania. Klawisze są domyślne.
 | Git: Opcje pull... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push do zdalnego... |  |
-| Git: Push to Selected Remotes... |  |
-| Git: Push to All Targets |  |
-| Git: Pull from All Sources |  |
-| Git: Pull from One Remote... |  |
-| Git: Show Grouped Push |  |
-| Git: Continue Grouped Push |  |
-| Git: Abort Grouped Push |  |
-| Git: Retry Failed Pushes |  |
+| Git: Push do wybranych zdalnych... |  |
+| Git: Push do wszystkich celów |  |
+| Git: Pull ze wszystkich źródeł |  |
+| Git: Pull z jednego zdalnego... |  |
+| Git: Pokaż grupowy push |  |
+| Git: Kontynuuj grupowy push |  |
+| Git: Przerwij grupowy push |  |
+| Git: Ponów nieudane pushe |  |
 | Git: Force push (z lease)... |  |
-| Git: Remotes of Branch... |  |
+| Git: Zdalne gałęzi... |  |
 | Zdalne: Dodaj zdalne... |  |
 | Zdalne: Usuń zdalne... |  |
 | Zdalne: Edytuj zdalne... |  |

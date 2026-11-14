@@ -72,7 +72,11 @@ przechodź wtedy, gdy będą potrzebne.
     Co przechodzi przez tmux, zellij, screen, herdr i panele terminala:
     **[Multipleksery](multiplexers.md)**.
 
-Także: **[Przepływy pracy z gałęziami](branching-workflows.md)**, gotowe szablony
+Także: **[Kilka zdalnych dla jednej gałęzi](multiple-remotes.md)**: cele push i źródła pull,
+okno Zdalne gałęzi, Push do wszystkich lub do wybranych zdalnych, rozstrzyganie zdalnego,
+które się przesunęło, Kontynuuj po konflikcie, CLI i alias zwykłego gita.
+
+**[Przepływy pracy z gałęziami](branching-workflows.md)**, gotowe szablony
 Git Flow, GitHub Flow, GitLab Flow i Trunk-based albo własne bazy, wzorce nazw
 gałęzi i typy gałęzi tematycznych (`gitpoulpi flow ...`).
 

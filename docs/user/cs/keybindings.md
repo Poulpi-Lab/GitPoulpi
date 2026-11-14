@@ -486,7 +486,7 @@ Klávesy jsou výchozí.
 | Levý panel: Zobrazit/skrýt lokální větve |  |
 | Levý panel: Zobrazit/skrýt remote |  |
 | Levý panel: Zobrazit/skrýt worktrees |  |
-| Sidebar: Show Worktrees Section |  |
+| Levý panel: Zobrazit sekci Worktrees |  |
 | Levý panel: Zobrazit/skrýt Stashes |  |
 | Levý panel: Zobrazit/skrýt Tags |  |
 | Levý panel: Zobrazit/skrýt Pull requesty |  |
@@ -530,12 +530,12 @@ Klávesy jsou výchozí.
 | Refs: Reflog vybrané větve... |  |
 | Refs: Založit pull request z vybrané větve... |  |
 | Refs: Otevřít worktree na kartě | `Enter / dvojklik` |
-| Refs: Open Worktree In... |  |
-| Refs: Merge Worktree Branch Into... |  |
-| Refs: Remove Worktree... |  |
-| Refs: Create Worktree... | `+` |
-| Refs: Create Worktree from Current Branch |  |
-| Refs: Create Worktree Choosing a Branch |  |
+| Refs: Otevřít worktree v... |  |
+| Refs: Merge větve worktree do... |  |
+| Refs: Odebrat worktree... |  |
+| Refs: Vytvořit worktree... | `+` |
+| Refs: Vytvořit worktree z aktuální větve |  |
+| Refs: Vytvořit worktree s výběrem větve |  |
 | Refs: Aktualizovat submodul (vybraný) |  |
 | Refs: Inicializovat submodul (vybraný) |  |
 | Refs: Otevřít submodul na kartě | `Enter / dvojklik` |

@@ -153,6 +153,8 @@ Hunky a řádky se číslují tak, jak je číslují `gitpoulpi --json diff`.
 | `tag fetch <name> [--remote R]` | Stáhne jeden tag z remote (ve výchozím stavu z toho, který ho má), např. tag s `where: remote`. Nikdy nepřepíše lokální tag na jiném commitu. |
 | `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tagy na remote (bez názvů: každý tag, který žádný remote nemá). Smazání tagu na remote lze vrátit (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Propojené worktrees. |
+| `worktree changes <path>` | Necommitnuté změny worktree (`path`, `untracked`); prázdné, když je čistý. |
+| `worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` | Odebere propojený worktree. Worktree s necommitnutými změnami se odmítne, pokud není zadáno `--force` (změny se ztratí), `--commit-message` (nejdřív je commitne na jeho větvi) nebo `--stash-message` (nejdřív je stashne, včetně nesledovaných). `--delete-branch` smaže i jeho větev (zaznamenáno v žurnálu). Samotné odebrání vrátit zpět nelze. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Submoduly ([Submoduly](submodules.md)). |
 
 `--autostash` uloží do stash místní změny, které operaci blokují, provede ji a

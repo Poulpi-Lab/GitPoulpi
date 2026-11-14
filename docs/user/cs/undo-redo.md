@@ -251,7 +251,9 @@ větev, lze vrátit jako celek.
 - **Přerušení rebase**: zpět se pro něj nenabízí (rebase posouvá větve a drží
   vlastní stav; přerušení je samo cestou zpět). Přerušení **merge,
   cherry-picku nebo revertu** se *zaznamenává*, viz výše.
-- **Vytvoření worktree**, **vytvoření souboru patche**, clone, init, akce
+- **Vytvoření worktree**, **odebrání worktree** (to, co se předtím uložilo,
+  zůstane: commit, stash; větev smazaná spolu s ním je v žurnálu, takže Zpět
+  vrátí větev, ne složku), **vytvoření souboru patche**, clone, init, akce
   hostingu (pull requesty, issues) a volání AI: nejsou součástí historie
   repozitáře.
 - **Vytvoření nového prázdného souboru** z nabídky souboru, automatické

@@ -9795,7 +9795,7 @@ plus_choose = "Choisir une branche..."
 select_a_commit = { git = "Sélectionnez d'abord un commit dans le Log", local = "Sélectionnez d'abord une validation dans le Log" }
 select_a_worktree = { git = "Sélectionnez d'abord un worktree dans le volet Refs", local = "Sélectionnez d'abord un arbre de travail dans le volet Refs" }
 main_cannot_be_removed = { git = "Le worktree principal ne peut pas être retiré", local = "L'arbre de travail principal ne peut pas être retiré" }
-no_head = "Ce dépôt n'a pas encore de commit"
+no_head = { git = "Ce dépôt n'a pas encore de commit", local = "Ce dépôt n'a pas encore de validation" }
 # context: hint line of the empty WORKTREES section
 empty_hint = { git = "Aucun worktree : + pour en créer un", local = "Aucun arbre de travail : + pour en créer un" }
 # context: context menu row of a worktree
@@ -9830,11 +9830,11 @@ stash_note = { git = "Le stash est partagé avec le dépôt principal : récupé
 # context: field label: the branch to create for the commit
 branch_field = "Branche"
 # context: placeholder
-branch_hint = "HEAD est détaché : nommez une branche pour le commit"
+branch_hint = { git = "HEAD est détaché : nommez une branch pour le commit", local = "HEAD est détaché : nommez une branche pour la validation" }
 need_message = { git = "écrivez un message de commit", local = "écrivez un message de validation" }
-need_branch = "nommez une branche pour le commit (HEAD est détaché)"
-delete_branch = "Supprimer aussi la branche {branch} (fusionnée dans {into})"
-branch_not_merged = "La branche {branch} n'est pas fusionnée : elle reste."
+need_branch = { git = "nommez une branch pour le commit (HEAD est détaché)", local = "nommez une branche pour la validation (HEAD est détaché)" }
+delete_branch = { git = "Supprimer aussi la branch {branch} (mergée dans {into})", local = "Supprimer aussi la branche {branch} (fusionnée dans {into})" }
+branch_not_merged = { git = "La branch {branch} n'est pas mergée : elle reste.", local = "La branche {branch} n'est pas fusionnée : elle reste." }
 # context: button
 commit_remove = { git = "Commit puis retirer", local = "Valider puis retirer" }
 # context: button
@@ -9858,11 +9858,11 @@ merge_run = { git = "Merge", local = "Fusionner" }
 # context: button
 merge_remove_run = { git = "Merge puis retirer", local = "Fusionner puis retirer" }
 merge_pick = { git = "Merge de {branch} dans :", local = "Fusionner {branch} dans :" }
-merge_checked_out = "{target} est extraite dans {path} : la fusion s'y fait."
+merge_checked_out = { git = "{target} est checked out dans {path} : le merge s'y fait.", local = "{target} est extraite dans {path} : la fusion s'y fait." }
 merge_not_checked_out = "{target} n'est extraite dans aucun worktree : extrayez-la d'abord."
 merge_gone = "la branche {branch} n'existe plus"
-merge_none = "Il n'y a pas d'autre branche locale où fusionner."
-detached_no_merge = "un worktree détaché n'a pas de branche à fusionner"
+merge_none = { git = "Il n'y a pas d'autre branch locale où merger.", local = "Il n'y a pas d'autre branche locale où fusionner." }
+detached_no_merge = { git = "un worktree détaché n'a pas de branch à merger", local = "un arbre de travail détaché n'a pas de branche à fusionner" }
 # context: default stash message; {name} is the worktree folder
 stash_default = "WIP sur {name}"
 # context: key hint

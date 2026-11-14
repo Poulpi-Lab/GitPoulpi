@@ -8,6 +8,8 @@ use crate::registry::ToolSpec;
 
 const READ_ONLY: &[&[&str]] = &[
     &["status"],
+    // The uncommitted changes of a worktree: a question.
+    &["worktree", "changes"],
     &["remote-group", "status"],
     // Asks the remotes (ls-remote, a selective fetch) and answers what a
     // grouped push or pull would do; changes no ref.
@@ -120,6 +122,8 @@ const READ_ONLY: &[&[&str]] = &[
 ];
 
 const DESTRUCTIVE: &[&[&str]] = &[
+    // Removes a worktree folder (what is not saved first is lost; not undoable).
+    &["worktree", "remove"],
     // Every undo is redoable, but it moves refs and HEAD back (and undoing a
     // remote branch or tag deletion pushes it back to the server): gated like
     // `reset`.
@@ -465,6 +469,7 @@ mod tests {
             "rewrite_purge",
             "session_delete",
             "workspace_delete",
+            "worktree_remove",
         ] {
             let s = spec(name);
             assert!(s.destructive, "{name} must be destructive");
@@ -476,7 +481,7 @@ mod tests {
             .map(|s| s.name)
             .collect();
         got.sort();
-        assert_eq!(got.len(), 41, "destructive set changed: {got:?}");
+        assert_eq!(got.len(), 42, "destructive set changed: {got:?}");
     }
 
     #[cfg(feature = "full")]

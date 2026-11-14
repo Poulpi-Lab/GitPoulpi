@@ -351,7 +351,7 @@ impl PreferencesState {
                     self.leave_strip();
                     return;
                 }
-                let next = (at + delta).clamp(0, selectable.len() as isize - 1) as usize;
+                let next = (at + delta).clamp(0, (selectable.len() as isize - 1).max(0)) as usize;
                 self.field = selectable[next];
                 self.quantity_focus_reset();
             }

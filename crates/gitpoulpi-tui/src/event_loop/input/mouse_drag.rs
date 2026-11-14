@@ -71,7 +71,7 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
                     let line = minimap::line_at(
                         rect,
                         *cx.diff_rendered_len,
-                        row.clamp(rect.y, rect.bottom().saturating_sub(1)),
+                        row.min(rect.bottom().saturating_sub(1)).max(rect.y),
                     );
                     s.scroll = minimap::top_for(line, *cx.diff_rendered_len, viewport);
                 }

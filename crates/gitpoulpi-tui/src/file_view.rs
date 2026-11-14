@@ -245,7 +245,7 @@ impl FileInsight {
             return;
         }
         let next = self.selected as isize + delta;
-        self.selected = next.clamp(0, len as isize - 1) as usize;
+        self.selected = next.clamp(0, (len as isize - 1).max(0)) as usize;
         self.clamp(viewport);
     }
 

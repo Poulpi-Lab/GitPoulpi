@@ -876,8 +876,8 @@ impl<K: Copy + PartialEq> FieldEditor<K> {
         col: u16,
         row: u16,
     ) -> usize {
-        let col = col.clamp(rect.x, rect.right().saturating_sub(1)) - rect.x;
-        let row = row.clamp(rect.y, rect.bottom().saturating_sub(1)) - rect.y;
+        let col = col.min(rect.right().saturating_sub(1)).max(rect.x) - rect.x;
+        let row = row.min(rect.bottom().saturating_sub(1)).max(rect.y) - rect.y;
         let caret = self.caret(id).cloned().unwrap_or_default();
         text_field::offset_at(
             text,

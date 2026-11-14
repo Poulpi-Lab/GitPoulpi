@@ -221,7 +221,8 @@ impl WorkspacesPage {
         if len == 0 {
             return;
         }
-        self.selected = (self.selected as isize + delta).clamp(0, len as isize - 1) as usize;
+        self.selected =
+            (self.selected as isize + delta).clamp(0, (len as isize - 1).max(0)) as usize;
         self.follow = true;
     }
 

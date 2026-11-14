@@ -177,10 +177,8 @@ pub(crate) fn compute_divider1_pct(
     divider2_pct: u16,
 ) -> u16 {
     let pct = raw_divider_pct(col, panes_area_x, panes_area_width);
-    pct.clamp(
-        MIN_PANE_PERCENT,
-        divider2_pct.saturating_sub(MIN_PANE_PERCENT),
-    )
+    pct.max(MIN_PANE_PERCENT)
+        .min(divider2_pct.saturating_sub(MIN_PANE_PERCENT))
 }
 
 /// The keyboard's way to drag a pane divider: one notch of the Refs or the
@@ -235,7 +233,8 @@ pub(crate) fn compute_divider2_pct(
     divider1_pct: u16,
 ) -> u16 {
     let pct = raw_divider_pct(col, panes_area_x, panes_area_width);
-    pct.clamp(divider1_pct + MIN_PANE_PERCENT, 100 - MIN_PANE_PERCENT)
+    pct.max(divider1_pct + MIN_PANE_PERCENT)
+        .min(100 - MIN_PANE_PERCENT)
 }
 
 /// Refs / Log / Status, split by the two divider percentages. The one place
@@ -497,6 +496,19 @@ pub(crate) fn persist_pane_layout(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A pane too small for both minimums used to hand `clamp` min > max,
+    /// which panics; the upper bound now wins.
+    #[test]
+    fn dividers_never_panic_when_the_bounds_cross() {
+        for width in [0, 1, 2, 5] {
+            for other in [0, 1, MIN_PANE_PERCENT, 99, 100] {
+                let _ = compute_divider1_pct(3, 0, width, other);
+                let _ = compute_divider2_pct(3, 0, width, other);
+            }
+        }
+        assert!(compute_divider1_pct(0, 0, 80, 0) <= MIN_PANE_PERCENT);
+    }
 
     #[test]
     fn the_log_keeps_its_right_pane_state_across_a_view() {

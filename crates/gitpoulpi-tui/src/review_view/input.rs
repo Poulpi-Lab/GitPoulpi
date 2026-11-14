@@ -510,7 +510,7 @@ impl ReviewView {
         if n == 0 {
             return;
         }
-        let at = (self.file_sel as isize + delta).clamp(0, n as isize - 1) as usize;
+        let at = (self.file_sel as isize + delta).clamp(0, (n as isize - 1).max(0)) as usize;
         self.select_file(at);
     }
 
@@ -881,7 +881,7 @@ impl ReviewView {
                 if n > 0 {
                     let at = (self.file_sel as isize)
                         .saturating_add(delta)
-                        .clamp(0, n as isize - 1);
+                        .clamp(0, (n as isize - 1).max(0));
                     self.select_file(at as usize);
                 }
             }

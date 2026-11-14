@@ -401,7 +401,7 @@ impl KeybindingsPage {
             .iter()
             .position(|i| *i == self.selected)
             .unwrap_or(0) as isize;
-        let next = (at + delta).clamp(0, visible.len() as isize - 1) as usize;
+        let next = (at + delta).clamp(0, (visible.len() as isize - 1).max(0)) as usize;
         self.selected = visible[next];
         self.keep_in_view();
     }

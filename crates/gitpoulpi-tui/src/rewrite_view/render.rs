@@ -1095,7 +1095,7 @@ impl RewriteView {
         match &field.value {
             FieldValue::Choice { options, index: at } => {
                 let text = options.get(*at).map(|m| m.get()).unwrap_or("");
-                let w = (display_width(text) as u16 + 5).clamp(14, value_w);
+                let w = (display_width(text) as u16 + 5).max(14).min(value_w);
                 ui.combo(
                     Rect::new(value_x, y, w, 1),
                     text,

@@ -649,7 +649,7 @@ impl RewriteView {
                 .set((s.scroll.get() as isize + delta).max(0) as usize);
             return;
         }
-        s.cursor = (s.cursor as isize + delta).clamp(0, n as isize - 1) as usize;
+        s.cursor = (s.cursor as isize + delta).clamp(0, (n as isize - 1).max(0)) as usize;
         s.follow.set(true);
     }
 

@@ -600,7 +600,7 @@ impl WorktreeRemoveDialog {
                 let len = self.targets.len();
                 if len > 0 {
                     self.target =
-                        (self.target as isize + delta).clamp(0, len as isize - 1) as usize;
+                        (self.target as isize + delta).clamp(0, (len as isize - 1).max(0)) as usize;
                 }
             }
             _ => {

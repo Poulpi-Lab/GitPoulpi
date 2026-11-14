@@ -232,7 +232,9 @@ pub(crate) fn render(frame: &mut Frame) {
     let selected = selection(&jobs);
     let rows = lines(&jobs);
     let want_w = area.width.saturating_sub(4).min(110);
-    let want_h = (rows.len() as u16 + 9).clamp(11, area.height.saturating_sub(2).min(30));
+    let want_h = (rows.len() as u16 + 9)
+        .max(11)
+        .min(area.height.saturating_sub(2).min(30));
     let rect = WIN.place(area, dialog_kit::centered(area, want_w, want_h));
     let buf = frame.buffer_mut();
     dialog_kit::panel(buf, rect, m::TITLE.get());

@@ -236,7 +236,8 @@ impl IntegrationsPage {
         // The popup hangs from where its field is drawn now.
         if let Some(field) = self.scroll.radar_field {
             let y = (i32::from(field.y) - top as i32)
-                .clamp(i32::from(window.y), i32::from(window.bottom()) - 1);
+                .min(i32::from(window.bottom()) - 1)
+                .max(i32::from(window.y));
             self.radar_combo
                 .set_anchor(Rect::new(field.x, y as u16, field.width, 1));
         }

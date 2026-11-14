@@ -302,14 +302,17 @@ impl BoardView {
             return;
         }
         let at = self.sel_row().unwrap_or(0) as isize;
-        let to = at.saturating_add(delta).clamp(0, list.len() as isize - 1);
+        let to = at
+            .saturating_add(delta)
+            .clamp(0, (list.len() as isize - 1).max(0));
         self.select(self.sel_col, Some(to as usize));
     }
 
     /// Left / Right: the neighbouring column, on the card nearest the same
     /// row (an empty column holds no selection).
     fn step_column(&mut self, delta: isize) {
-        let to = (self.sel_col as isize + delta).clamp(0, self.columns.len() as isize - 1) as usize;
+        let to = (self.sel_col as isize + delta).clamp(0, (self.columns.len() as isize - 1).max(0))
+            as usize;
         if to == self.sel_col {
             return;
         }

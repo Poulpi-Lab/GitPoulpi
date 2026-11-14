@@ -633,11 +633,11 @@ inherited = "（继承）"
 lfs_not_checked = "（尚未检查）"
 lfs_autofix_filters = { git = "在 {$pull} 和 {$push} 之前安装 LFS 过滤器", local = "在{$pull}和{$push}之前安装 LFS 过滤器" }
 lfs_autofix_filters_help = { git = "在使用 Git LFS 的仓库中 {$pull} 或 {$push} 之前，如果缺少 LFS 过滤器或钩子，就运行 `git lfs install --local`（只改该仓库自己的配置，绝不改全局配置），让传输能处理大文件。状态栏会提示。需要 git-lfs。", local = "在使用 Git LFS 的仓库中{$pull}或{$push}之前，如果缺少 LFS 过滤器或钩子，就运行 `git lfs install --local`（只改该仓库自己的配置，绝不改全局配置），让传输能处理大文件。状态栏会提示。需要 git-lfs。" }
-push_group_preflight = "Check every remote before a {$push}"
-push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
-default_push_targets = "Extra {$push} targets for new branches"
-default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
-default_push_targets_none = "(no remote configured)"
+push_group_preflight = { git = "{$push} 前检查每个远程", local = "{$push}前检查每个远程" }
+push_group_preflight_help = { git = "在 {$push} 带有额外 {$push} 目标的分支之前，先查看每个远程（一次快速查询，仅当该远程有差异时才从中下载），这样第三个远程上的问题会在第一次 {$push} 开始之前就显示出来。关闭后：依次向每个远程 {$push}，并报告结果。", local = "在{$push}带有额外{$push}目标的分支之前，先查看每个远程（一次快速查询，仅当该远程有差异时才从中下载），这样第三个远程上的问题会在第一次{$push}开始之前就显示出来。关闭后：依次向每个远程{$push}，并报告结果。" }
+default_push_targets = { git = "新分支的额外 {$push} 目标", local = "新分支的额外{$push}目标" }
+default_push_targets_help = { git = "仅限此仓库。勾选新分支除其 upstream 之外还要 {$push} 到的远程。它们会在分支首次获得 upstream 时复制到该分支（首次设置 upstream 的 {$push}，或从远程分支创建的分支）。已存在的分支不会改变：请在该分支的“远程”对话框中修改。", local = "仅限此仓库。勾选新分支除其上游之外还要{$push}到的远程。它们会在分支首次获得上游时复制到该分支（首次设置上游的{$push}，或从远程分支创建的分支）。已存在的分支不会改变：请在该分支的“远程”对话框中修改。" }
+default_push_targets_none = "（未配置远程）"
 
 [settings_screen]
 title = "设置 - Tab：分区/设置 │ Enter：更改"
@@ -883,7 +883,7 @@ push_branch = "{$Push} {name}"
 start_pr = { git = "从 {name} 发起 {$pr}…", local = "从 {name} 发起{$pr}…" }
 fetch = "{$Fetch}"
 # context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
-remotes_of = "Remotes of {name}..."
+remotes_of = "{name} 的远程…"
 rename = "重命名 {name}…"
 delete = "删除 {name}…"
 delete_both = "删除 {first} 和 {second}…"
@@ -2207,23 +2207,23 @@ host_not_recognized = "无法识别远程主机"
 link_branch = "分支链接"
 link_commit = { git = "{$commit} 链接", local = "提交链接" }
 # context: menu row of the Push dropdown: push the branch to its upstream and every extra push target; {remotes} lists them, comma separated
-push_to_all = "{$Push} to all ({remotes})"
+push_to_all = { git = "{$Push} 到全部（{remotes}）", local = "{$Push}到全部（{remotes}）" }
 # context: menu row: push the branch to one remote only; {remote} is that remote
-push_to_only = "{$Push} to {remote} only"
+push_to_only = { git = "仅 {$Push} 到 {remote}", local = "仅{$Push}到 {remote}" }
 # context: menu row: opens the dialog where the remotes of this one push are ticked
-push_to_selected = "{$Push} to selected remotes..."
+push_to_selected = { git = "{$Push} 到所选远程…", local = "{$Push}到所选远程…" }
 # context: menu row of the Push dropdown that opens the dialog of the remotes a branch pushes to and pulls from; {branch} is the branch
-remotes_of = "Remotes of {branch}..."
+remotes_of = "{branch} 的远程…"
 # context: menu row of the Pull dropdown: pull the upstream and every extra pull source; {remotes} lists them, joined with +
-pull_from_all = "{$Pull} from all sources ({remotes})"
+pull_from_all = { git = "从全部来源 {$Pull}（{remotes}）", local = "从全部来源{$Pull}（{remotes}）" }
 # context: menu row: pull from one remote only, once; {remote} is that remote
-pull_from_only = "{$Pull} from {remote} only"
+pull_from_only = "仅从 {remote} {$Pull}"
 # context: status line while a push to several remotes starts; {branch} is the branch, {remotes} the remote names
-pushing_to_all = { git = "pushing {branch} to {remotes}...", local = "pushing {branch} to {remotes}..." }
+pushing_to_all = { git = "正在将 {branch} {$push} 到 {remotes}…", local = "正在将 {branch} {$push}到 {remotes}…" }
 # context: status line while a pull from several remotes starts; {branch} is the branch, {remotes} the remote names
-pulling_from_all = { git = "pulling {branch} from {remotes}...", local = "pulling {branch} from {remotes}..." }
+pulling_from_all = "正在从 {remotes} {$pull} {branch}…"
 # context: status line: the branch has no remote to pull from; {branch} is the branch
-no_pull_remote = "{branch} has no remote to {$pull} from"
+no_pull_remote = { git = "{branch} 没有可 {$pull} 的远程", local = "{branch} 没有可{$pull}的远程" }
 
 [keymap_action]
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
@@ -2554,7 +2554,7 @@ log_columns_fit_all = "按内容调整所有列宽度"
 log_scroll_left = "向左滚动各列"
 log_scroll_right = "向右滚动各列"
 log_columns_layout = "横向滚动或适应窗格"
-refs_remotes = "Branch: Edit its Remotes"
+refs_remotes = "分支：编辑其远程"
 
 
 [keymap_ctx]
@@ -3142,8 +3142,8 @@ git_pull_options = { git = "Git：{$Pull} 选项…", local = "Git：{$Pull}选�
 git_push = "Git：{$Push}"
 git_push_to_remote = { git = "Git：{$Push} 到远程…", local = "Git：{$Push}到远程…" }
 git_force_push_with_lease = { git = "Git：强制 {$Push}（带 lease）…", local = "Git：强制{$Push}（带 lease）…" }
-git_remotes_of_branch = "Git: Remotes of Branch..."
-git_push_to_selected_remotes = "Git: {$Push} to Selected Remotes..."
+git_remotes_of_branch = "Git：分支的远程…"
+git_push_to_selected_remotes = { git = "Git：{$Push} 到所选远程…", local = "Git：{$Push}到所选远程…" }
 remote_add_remote = "远程：添加远程…"
 remote_remove_remote = "远程：移除远程…"
 remote_edit_remote = "远程：编辑远程…"
@@ -3653,27 +3653,27 @@ view_log_scroll_left = "视图：Log：向左滚动各列"
 view_log_scroll_right = "视图：Log：向右滚动各列"
 view_log_columns_layout = "视图：Log：切换各列的横向滚动"
 # context: palette command: push to the upstream and every extra push target
-git_push_to_all_targets = "Git: {$Push} to All Targets"
+git_push_to_all_targets = { git = "Git：{$Push} 到所有目标", local = "Git：{$Push}到所有目标" }
 # context: palette command: pull the upstream and every extra pull source
-git_pull_from_all_sources = "Git: {$Pull} from All Sources"
+git_pull_from_all_sources = { git = "Git：从所有来源 {$Pull}", local = "Git：从所有来源{$Pull}" }
 # context: palette command: opens a list of remotes, pulls from the chosen one once
-git_pull_from_one_remote = "Git: {$Pull} from One Remote..."
+git_pull_from_one_remote = { git = "Git：从一个远程 {$Pull}…", local = "Git：从一个远程{$Pull}…" }
 # context: palette command: reopens the progress window of the last push to several remotes
-git_show_grouped_push = "Git: Show Grouped {$Push}"
+git_show_grouped_push = { git = "Git：显示分组 {$Push}", local = "Git：显示分组{$Push}" }
 # context: palette command: goes on with the push to several remotes that paused on conflicts
-git_continue_grouped_push = "Git: Continue Grouped {$Push}"
+git_continue_grouped_push = { git = "Git：继续分组 {$Push}", local = "Git：继续分组{$Push}" }
 # context: palette command: abandons the push to several remotes that paused on conflicts
-git_abort_grouped_push = "Git: Abort Grouped {$Push}"
+git_abort_grouped_push = { git = "Git：中止分组 {$Push}", local = "Git：中止分组{$Push}" }
 # context: palette command: tries again the remotes that failed in the last push to several remotes
-git_retry_failed_pushes = "Git: Retry Failed Pushes"
+git_retry_failed_pushes = { git = "Git：重试失败的 {$push}", local = "Git：重试失败的{$push}" }
 # context: palette: why a command is grayed out
-why_no_grouped_push = "there is no grouped {$push} to show"
+why_no_grouped_push = { git = "没有可显示的分组 {$push}", local = "没有可显示的分组{$push}" }
 # context: palette: why a command is grayed out
-why_group_not_paused = "no grouped {$push} is waiting on conflicts"
+why_group_not_paused = { git = "没有正在等待冲突解决的分组 {$push}", local = "没有正在等待冲突解决的分组{$push}" }
 # context: palette: why Continue is grayed out
-why_group_not_ready = "resolve and conclude the conflicts first"
+why_group_not_ready = "请先解决并完成冲突"
 # context: palette: why a command is grayed out
-why_nothing_to_retry = "no remote failed in the last grouped {$push}"
+why_nothing_to_retry = { git = "上一次分组 {$push} 中没有失败的远程", local = "上一次分组{$push}中没有失败的远程" }
 
 [help_section]
 rewrite = "重写历史"
@@ -4084,7 +4084,7 @@ rewrite_9 = "打开“大小”标签页并分析历史：最大的文件和文�
 rewrite_host_howto = { git = "说明如何让重写通过受主机保护的分支：解除保护、以新名称 {$push}，或重建仓库；不会替你执行任何操作", local = "说明如何让重写通过受主机保护的分支：解除保护、以新名称{$push}，或重建仓库；不会替你执行任何操作" }
 rewrite_ai_rules = "用 AI 根据你的描述创建重写规则（不会预览也不会应用任何内容）"
 log_columns_2 = "在各列保持宽度时横向滚动 Log 的列（即列选择器、设置中选择的“横向滚动”布局，或选中某列时按 s）；在“适应窗格”布局中，所有列都适应窗格"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = { git = "编辑所选本地分支的远程（其 upstream 和额外的 {$push} 目标）：相当于点击其行上远程徽标的键盘操作", local = "编辑所选本地分支的远程（其上游和额外的{$push}目标）：相当于点击其行上远程徽标的键盘操作" }
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} 或右键"
@@ -5515,7 +5515,7 @@ no_longer = "{path} 已不再是子模块"
 [combo]
 type_to_search = "输入以搜索"
 # context: placeholder of the search line of a dropdown that also accepts typed text
-type_to_use_own = "type your own value"
+type_to_use_own = "输入你自己的值"
 loading = "加载中…"
 no_match = "无匹配"
 use_value = "使用“{value}”"
@@ -5843,11 +5843,11 @@ palette_create_desktop = "启动器：创建桌面快捷方式"
 palette_remove = "启动器：移除快捷方式"
 icons_updated = "启动器快捷方式已更新"
 alias = "命令别名"
-alias_help = "在终端中启动 GitPoulpi 的简短命令，例如 gp。只能使用字母、数字、- _ 和 .。同名的 shell 别名或函数会优先于它，而且在这里看不到（oh-my-zsh 自己就定义了 gp）。"
+alias_help = "在终端中启动 GitPoulpi 的简短命令，例如 gp。在列表中输入任意名称即可使用你自己的名称。只能使用字母、数字、- _ 和 .。同名的 shell 别名或函数会优先于它，而且在这里看不到（oh-my-zsh 自己就定义了 gp）。"
 alias_none = "无"
 alias_status = "别名状态"
 alias_add = "新标签页别名"
-alias_add_help = "第二个简短命令，例如 gpa，它会把当前文件夹作为新标签页在已运行的 GitPoulpi 中打开（gitpoulpi --add），而不是再启动一个。没有正在运行的则照常启动 GitPoulpi。点击“创建”时会与上面的命令别名一起创建。名称规则相同。"
+alias_add_help = "第二个简短命令，例如 gpa，它会把当前文件夹作为新标签页在已运行的 GitPoulpi 中打开（gitpoulpi --add），而不是再启动一个。没有正在运行的则照常启动 GitPoulpi。点击“创建”时会与上面的命令别名一起创建。在列表中输入任意名称即可使用你自己的名称。名称规则相同。"
 alias_add_status = "新标签页别名状态"
 alias_set_name = "请先在上方输入名称"
 alias_bad_space = "名称中含有空格"
@@ -6502,7 +6502,7 @@ branch_rename = "将分支 {old} 重命名为 {new}"
 upstream_set = { git = "将 {branch} 的 upstream 设为 {upstream}", local = "将 {branch} 的上游设为 {upstream}" }
 upstream_unset = { git = "取消设置 {branch} 的 upstream", local = "取消设置 {branch} 的上游" }
 # context: undo history row: the push targets and pull sources of a branch were changed; {branch} is the local branch
-remotes_set = "Set remotes of {branch}"
+remotes_set = "设置 {branch} 的远程"
 config_set = "将 {key} 设为 {value}"
 config_unset = "取消设置 {key}"
 sparse_set = "设置稀疏检出"
@@ -9507,229 +9507,229 @@ none = "此消息中没有链接"
 
 [branch_remotes]
 # context: title of the dialog that lists every remote a branch pushes to and pulls from; {branch} is the local branch
-title = "Remotes of {branch}"
+title = "{branch} 的远程"
 # context: label before the list that picks the upstream (the remote branch the local branch tracks)
-upstream_label = "Upstream"
+upstream_label = { git = "Upstream", local = "上游" }
 # context: table heading: a configured remote's name
-col_remote = "Remote"
+col_remote = "远程"
 # context: table heading: the branch's name on that remote
-col_branch = "Branch"
+col_branch = "分支"
 # context: table heading over a checkbox: the branch is also pushed to that remote
 col_push = "{$Push}"
 # context: table heading over a checkbox: a pull also takes the new commits of that remote
-col_pull = "{$Pull} too"
+col_pull = { git = "也 {$Pull}", local = "也{$Pull}" }
 # context: table heading: how the local branch stands against that remote (ahead, behind, in sync)
-col_state = "State"
+col_state = "状态"
 # context: cell in the Pull too column of the upstream's own row: the upstream is always pulled
-pull_upstream = "upstream"
+pull_upstream = { git = "upstream", local = "上游" }
 # context: state cell: the remote's copy and the local branch are the same commit
-state_in_sync = "in sync"
+state_in_sync = "已同步"
 # context: state cell: the remote has no copy of the branch yet
-state_new = "new"
+state_new = "新建"
 # context: state cell: the remote's copy shares no history with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "无关"
 # context: state cell of a remote that is not used by the branch
 state_none = "-"
 # context: row of a remote the branch still mentions but the repository no longer has
-gone = "remote gone"
+gone = "远程已不存在"
 # context: button on a gone row: forget that remote for this branch
-remove_button = "Remove"
+remove_button = "移除"
 # context: warning under the table; {first} and {second} are two remote names with the same address
-same_url = "{first} and {second} {$push} to the same URL."
+same_url = { git = "{first} 和 {second} {$push} 到同一个 URL。", local = "{first} 和 {second} {$push}到同一个 URL。" }
 # context: button: changes the branch name used on the selected remote
-rename_button = "Rename on remote..."
+rename_button = "在远程上重命名…"
 # context: button: the branch tracks no upstream any more
-unset_button = "Unset upstream"
+unset_button = { git = "取消设置 upstream", local = "取消设置上游" }
 # context: primary button of the dialog
-apply_button = "Apply"
+apply_button = "应用"
 # context: shown while the dialog reads the branch's remotes
-loading = "Reading the remotes..."
+loading = "正在读取远程…"
 # context: title of the small dialog that asks for the branch's name on one remote; {remote} is the remote
-rename_title = "Branch name on {remote}"
+rename_title = "{remote} 上的分支名"
 # context: placeholder of that dialog's field
-rename_placeholder = "Branch name on the remote"
+rename_placeholder = "远程上的分支名"
 # context: primary button of that dialog
-rename_set = "Set"
+rename_set = "设置"
 # context: inline error of that dialog when the field is empty
-rename_empty = "Type a branch name."
+rename_empty = "请输入分支名。"
 # context: inline error when Rename is used on the upstream's own row
-rename_upstream_row = "The upstream's branch name is chosen in the list above."
+rename_upstream_row = { git = "upstream 的分支名请在上方列表中选择。", local = "上游的分支名请在上方列表中选择。" }
 # context: inline error when Rename is used with nothing to rename
-rename_no_row = "Select a remote's row first."
+rename_no_row = "请先选择某个远程的行。"
 # context: key hints under the table; keep the key names (Space, p, r, Del, Enter)
-keys_hint = "Space {$Push}, p {$Pull} too, r Rename, Del Remove, Enter Apply"
+keys_hint = { git = "Space {$Push}，p 也 {$Pull}，r 重命名，Del 移除，Enter 应用", local = "Space {$Push}，p 也{$Pull}，r 重命名，Del 移除，Enter 应用" }
 # context: status line while the change is sent; {branch} is the local branch
-applying = "setting the remotes of {branch}..."
+applying = "正在设置 {branch} 的远程…"
 # context: status line once the daemon applied the change; {branch} is the local branch
-remotes_set = "remotes of {branch} updated"
+remotes_set = "{branch} 的远程已更新"
 
 [push_group]
 # context: title of the dialog that asks which remotes to push a branch to (one push only); {branch} is the local branch
-title_select = "{$Push} {branch} to selected remotes"
+title_select = { git = "将 {branch} {$push} 到所选远程", local = "将 {branch} {$push}到所选远程" }
 # context: title of the dialog that shows how a branch stands against each remote before a grouped push; {n} is the number of remotes, {branch} the local branch
-title_plan = { one = "{$Push} {branch} to {n} remote", other = "{$Push} {branch} to {n} remotes" }
+title_plan = { one = { git = "将 {branch} {$push} 到 {n} 个远程", local = "将 {branch} {$push}到 {n} 个远程" }, other = { git = "将 {branch} {$push} 到 {n} 个远程", local = "将 {branch} {$push}到 {n} 个远程" } }
 # context: title of the dialog while a grouped push runs or after it ended; {branch} is the local branch
 title_run = "{$Push} {branch}"
 # context: line under the title; {branch} is the local branch, {sha} the short id of its tip
-local_at = "Local {branch} at {sha}"
+local_at = "本地 {branch} 位于 {sha}"
 # context: help line over the list of remotes to push to
-select_hint = "Pick the remotes this {$push} goes to. Nothing is saved unless you tick Remember."
+select_hint = { git = "选择本次 {$push} 要发往的远程。除非勾选“为此分支记住”，否则不会保存任何内容。", local = "选择本次{$push}要发往的远程。除非勾选“为此分支记住”，否则不会保存任何内容。" }
 # context: checkbox: store the picked remotes as the branch's push targets
-remember = "Remember for this branch"
+remember = "为此分支记住"
 # context: shown under the list when no remote is ticked
-select_none = "Tick at least one remote."
+select_none = "请至少勾选一个远程。"
 # context: shown while the daemon asks the remotes about the branch
-loading = "Asking the remotes..."
+loading = "正在询问各远程…"
 # context: table heading: the remote's name
-col_remote = "Remote"
+col_remote = "远程"
 # context: table heading: how the local branch stands against the remote
-col_state = "State"
+col_state = "状态"
 # context: table heading: what the run does with that remote
-col_action = "Action"
+col_action = "操作"
 # context: state of a remote that already has the same commit
-state_up_to_date = "up to date"
+state_up_to_date = "已是最新"
 # context: state of a remote that only misses local commits
-state_ready = "ready"
+state_ready = "就绪"
 # context: state of a remote that has no copy of the branch yet
-state_new = "new"
+state_new = "新建"
 # context: state of a remote that has commits the local branch lacks
-state_behind = "behind"
+state_behind = "落后"
 # context: state of a remote whose history and the local branch's both moved
-state_diverged = "diverged"
+state_diverged = "已分叉"
 # context: state of a remote whose commits are older copies of rebased or amended local commits
-state_rewritten = "rewritten"
+state_rewritten = "已改写"
 # context: state of a remote whose history shares nothing with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "无关"
 # context: state of a remote whose host refused the branch earlier (protected branch)
-state_refused = "refused"
+state_refused = "被拒绝"
 # context: state of a remote that could not be asked
-state_unreachable = "not reachable"
+state_unreachable = "无法连接"
 # context: state of a remote that is no longer configured
-state_missing = "gone"
+state_missing = "已不存在"
 # context: note on a remote that points at the same repository as an earlier row; {other} is that earlier remote
-same_as = "same repository as {other}"
+same_as = "与 {other} 是同一个仓库"
 # context: action: send the local commits to the remote
 action_push = "{$Push}"
 # context: action: move the local branch forward to the remote's commit; {remote} is the remote
-action_fast_forward = "Fast-forward from {remote}"
+action_fast_forward = { git = "从 {remote} fast-forward", local = "从 {remote} 快进" }
 # context: action: combine the remote's commits into the local branch, then send; {remote} is the remote
-action_merge = "{$Merge} from {remote}"
+action_merge = "从 {remote} {$Merge}"
 # context: action: replay the local commits on top of the remote's, then send; {remote} is the remote
-action_rebase = "{$Rebase} onto {remote}"
+action_rebase = { git = "{$Rebase} 到 {remote} 上", local = "{$Rebase}到 {remote} 上" }
 # context: action: overwrite the remote's branch, refused if it moved since the plan
-action_force = "Force {$push} (lease)"
+action_force = { git = "强制 {$push}（lease）", local = "强制{$push}（lease）" }
 # context: action: leave this remote out
-action_skip = "Skip"
+action_skip = "跳过"
 # context: line under a row whose merge would conflict; {n} is the number of files, {files} their names
-conflicts = { one = "{$merge} would conflict in {n} file: {files}", other = "{$merge} would conflict in {n} files: {files}" }
+conflicts = { one = { git = "{$merge} 将在 {n} 个文件中产生冲突：{files}", local = "{$merge}将在 {n} 个文件中产生冲突：{files}" }, other = { git = "{$merge} 将在 {n} 个文件中产生冲突：{files}", local = "{$merge}将在 {n} 个文件中产生冲突：{files}" } }
 # context: checkbox: also send the tags that no remote has yet
-tags = "Also {$push} the {$tags} not sent yet"
+tags = { git = "同时 {$push} 尚未发送的 {$tags}", local = "同时{$push}尚未发送的{$tags}" }
 # context: summary line under the table; {steps} is the list of steps
-then_line = "Then: {steps}."
+then_line = "随后：{steps}。"
 # context: summary line when every row is skipped or already up to date
-then_nothing = "Then: nothing to do."
+then_nothing = "随后：无需操作。"
 # context: separator between steps in the summary line
-then_join = ", "
+then_join = "，"
 # context: step of the summary line; {remote} is the remote
-step_fast_forward = "fast-forward from {remote}"
+step_fast_forward = { git = "从 {remote} fast-forward", local = "从 {remote} 快进" }
 # context: step of the summary line; {remote} is the remote
 step_merge = "{$merge} {remote}"
 # context: step of the summary line; {remote} is the remote
-step_rebase = "{$rebase} onto {remote}"
+step_rebase = { git = "{$rebase} 到 {remote} 上", local = "{$rebase}到 {remote} 上" }
 # context: step of the summary line; {n} is the number of remotes
-step_push = { one = "{$push} to {n} remote", other = "{$push} to {n} remotes" }
+step_push = { one = { git = "{$push} 到 {n} 个远程", local = "{$push}到 {n} 个远程" }, other = { git = "{$push} 到 {n} 个远程", local = "{$push}到 {n} 个远程" } }
 # context: warning under the summary when a row force-pushes; {n} is the number of commits that disappear, {remote} the remote
-force_note = { one = "Force {$push} replaces {n} {$commit} on {remote}.", other = "Force {$push} replaces {n} {$commits} on {remote}." }
+force_note = { one = { git = "强制 {$push} 会替换 {remote} 上的 {n} 个 {$commit}。", local = "强制{$push}会替换 {remote} 上的 {n} 个{$commit}。" }, other = { git = "强制 {$push} 会替换 {remote} 上的 {n} 个 {$commits}。", local = "强制{$push}会替换 {remote} 上的 {n} 个{$commits}。" } }
 # context: warning under the summary when rows rebase while other remotes already hold the local commits; {remotes} are those remotes
-rebase_warn = "A {$rebase} rewrites the local {$commits}: {remotes} will then need a force {$push}."
+rebase_warn = { git = "{$rebase} 会改写本地 {$commits}：之后 {remotes} 将需要强制 {$push}。", local = "{$rebase}会改写本地{$commits}：之后 {remotes} 将需要强制{$push}。" }
 # context: confirmation question before a force push; {n} is the number of remote commits replaced, {branch} the branch, {remotes} the remote names
-force_confirm = { one = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commit} on the remote is replaced. Not undoable.", other = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commits} on the remotes are replaced. Not undoable." }
+force_confirm = { one = { git = "将 {branch} 强制 {$push} 到 {remotes}？\n带 lease：远程上的 {n} 个 {$commit} 将被替换。无法撤销。", local = "将 {branch} 强制{$push}到 {remotes}？\n带 lease：远程上的 {n} 个{$commit}将被替换。无法撤销。" }, other = { git = "将 {branch} 强制 {$push} 到 {remotes}？\n带 lease：远程上的 {n} 个 {$commits} 将被替换。无法撤销。", local = "将 {branch} 强制{$push}到 {remotes}？\n带 lease：远程上的 {n} 个{$commits}将被替换。无法撤销。" } }
 # context: button: ask the remotes again
-btn_fetch_again = "{$Fetch} again"
+btn_fetch_again = { git = "再次 {$fetch}", local = "再次{$fetch}" }
 # context: button: set every row that has a problem to Skip
-btn_skip_problems = "Skip problems"
+btn_skip_problems = "跳过有问题的"
 # context: button: close the dialog without running
-btn_cancel = "Cancel"
+btn_cancel = "取消"
 # context: button: run the grouped push
-btn_run = "Run"
+btn_run = "运行"
 # context: button: go to the next step
-btn_next = "Next"
+btn_next = "下一步"
 # context: button: close the dialog (the run goes on)
-btn_close = "Close"
+btn_close = "关闭"
 # context: button: try the failed remotes again
-btn_retry = "Retry failed"
+btn_retry = "重试失败项"
 # context: progress row: the remote took the commits
-run_pushed = "sent"
+run_pushed = "已发送"
 # context: progress row: the remote got a new branch
-run_created = "created"
+run_created = "已创建"
 # context: progress row: nothing to send
-run_up_to_date = "up to date"
+run_up_to_date = "已是最新"
 # context: progress row: the local branch moved forward
-run_fast_forwarded = "fast-forwarded"
+run_fast_forwarded = { git = "已 fast-forward", local = "已快进" }
 # context: progress row: the remote's commits were combined into the local branch with a new commit
-run_merged = "combined"
+run_merged = "已合并"
 # context: progress row: the local commits were replayed on the remote's
-run_rebased = "replayed"
+run_rebased = "已重放"
 # context: progress row: the remote's commits were taken in
-run_integrated = "taken in"
+run_integrated = "已并入"
 # context: progress row: left out
-run_skipped = "skipped"
+run_skipped = "已跳过"
 # context: progress row: the remote's commits are being combined with the local branch
-run_merging = "combining"
+run_merging = "正在合并"
 # context: progress row: sending in progress
-run_pushing = "sending"
+run_pushing = "正在发送"
 # context: progress row: not started yet
-run_waiting = "waiting"
+run_waiting = "等待中"
 # context: progress row: failed; {why} is the reason
-run_failed = "failed: {why}"
+run_failed = "失败：{why}"
 # context: progress row: the remote refused; {why} is the reason
-run_rejected = "refused: {why}"
+run_rejected = "被拒绝：{why}"
 # context: progress row: the run was canceled while this remote was in flight
-run_unknown = "unknown (canceled)"
+run_unknown = "未知（已取消）"
 # context: progress row: the remote is not configured
-run_missing = "remote missing"
+run_missing = "远程不存在"
 # context: line under the progress rows while the run is going
-run_going = "Closing this window does not stop the run."
+run_going = "关闭此窗口不会停止运行。"
 # context: line under the progress rows when the run ended well
-run_done = "Done."
+run_done = "完成。"
 # context: line under the progress rows when some remotes failed
-run_problems = "Some remotes failed. Retry them, or close."
+run_problems = "部分远程失败。请重试，或关闭。"
 # context: key hints of the selection step
-hint_select = "Up/Down move  Space tick  m remember  Enter next  Esc close"
+hint_select = "Up/Down 移动  Space 勾选  m 记住  Enter 下一步  Esc 关闭"
 # context: key hints of the plan step
-hint_plan = "Up/Down row  Left/Right action  Enter list  s skip  t {$tags}  f again  Ctrl+Enter run  Esc close"
+hint_plan = { git = "Up/Down 选行  Left/Right 操作  Enter 列表  s 跳过  t {$tags}  f 再次 {$fetch}  Ctrl+Enter 运行  Esc 关闭", local = "Up/Down 选行  Left/Right 操作  Enter 列表  s 跳过  t {$tags}  f 再次{$fetch}  Ctrl+Enter 运行  Esc 关闭" }
 # context: key hints of the progress step
-hint_run = "Esc close  r retry failed"
+hint_run = "Esc 关闭  r 重试失败项"
 # context: text of the strip over the Log while a grouped push waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting = "Grouped {$push} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting = { git = "分组 {$push} 已暂停（{remote}）：请解决并完成冲突，然后点击“继续”。", local = "分组{$push}已暂停（{remote}）：请解决并完成冲突，然后点击“继续”。" }
 # context: text of the strip when the conflicts are resolved and the run can go on; {remote} is that remote
-strip_ready = "Grouped {$push} paused ({remote}): resolved. Continue to {$push}."
+strip_ready = { git = "分组 {$push} 已暂停（{remote}）：已解决。点击“继续”以 {$push}。", local = "分组{$push}已暂停（{remote}）：已解决。点击“继续”以{$push}。" }
 # context: strip button: go on with the grouped push
-strip_continue = "Continue"
+strip_continue = "继续"
 # context: strip button: abort the merge or rebase of the grouped push and drop it
-strip_abort = "Abort group"
+strip_abort = "中止分组"
 # context: status line after the grouped push was aborted
-aborted = "Grouped {$push} aborted."
+aborted = { git = "已中止分组 {$push}。", local = "已中止分组{$push}。" }
 # context: status line while a grouped push runs
-running = "Grouped {$push}..."
+running = { git = "正在进行分组 {$push}…", local = "正在进行分组{$push}…" }
 # context: question before aborting a paused grouped push; {branch} is the local branch, {remote} the remote whose merge or rebase stopped
-abort_confirm = "Abort the grouped {$push} of {branch} (stopped on {remote})?\nThe {$merge} or {$rebase} in progress is thrown away. What was already sent stays."
+abort_confirm = { git = "中止 {branch} 的分组 {$push}（停在 {remote}）？\n正在进行的 {$merge} 或 {$rebase} 将被丢弃。已发送的内容保持不变。", local = "中止 {branch} 的分组{$push}（停在 {remote}）？\n正在进行的{$merge}或{$rebase}将被丢弃。已发送的内容保持不变。" }
 # context: title of the dialog that shows how a branch stands against each remote before a grouped pull; {n} is the number of remotes, {branch} the local branch
-title_pull_plan = { one = "{$Pull} {branch} from {n} remote", other = "{$Pull} {branch} from {n} remotes" }
+title_pull_plan = { one = { git = "从 {n} 个远程 {$pull} {branch}", local = "从 {n} 个远程{$pull} {branch}" }, other = { git = "从 {n} 个远程 {$pull} {branch}", local = "从 {n} 个远程{$pull} {branch}" } }
 # context: text of the strip over the Log while a grouped pull waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting_pull = "Grouped {$pull} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting_pull = { git = "分组 {$pull} 已暂停（{remote}）：请解决并完成冲突，然后点击“继续”。", local = "分组{$pull}已暂停（{remote}）：请解决并完成冲突，然后点击“继续”。" }
 # context: text of the strip when the conflicts are resolved and the grouped pull can go on; {remote} is that remote
-strip_ready_pull = "Grouped {$pull} paused ({remote}): resolved. Continue to {$pull}."
+strip_ready_pull = { git = "分组 {$pull} 已暂停（{remote}）：已解决。点击“继续”以 {$pull}。", local = "分组{$pull}已暂停（{remote}）：已解决。点击“继续”以{$pull}。" }
 [multi_remote]
-state_new = "new"
-state_gone = "gone"
-state_unrelated = "unrelated"
-tip_title = "Remotes of {branch}"
-tip_in_sync = "{remote}: in sync"
-tip_ahead = "{remote}: {n} ahead"
-tip_behind = "{remote}: {n} behind"
-tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
-tip_new = "{remote}: no copy of this branch yet"
-tip_unrelated = "{remote}: no common history"
-tip_gone = "{remote}: no longer configured"
-tip_open_hint = "Click to edit the remotes of this branch"
+state_new = "新建"
+state_gone = "已不存在"
+state_unrelated = "无关"
+tip_title = "{branch} 的远程"
+tip_in_sync = "{remote}：已同步"
+tip_ahead = "{remote}：领先 {n}"
+tip_behind = "{remote}：落后 {n}"
+tip_diverged = "{remote}：已分叉（领先 {ahead}，落后 {behind}）"
+tip_new = "{remote}：还没有此分支的副本"
+tip_unrelated = "{remote}：没有共同历史"
+tip_gone = "{remote}：已不再配置"
+tip_open_hint = "点击编辑此分支的远程"

@@ -596,7 +596,11 @@ pub(crate) fn pull_action(
         (None, None) => unreachable!("handled above"),
     };
     Ok((
-        Action::Pull(PullOptions { mode, remote }),
+        Action::Pull(PullOptions {
+            mode,
+            remote,
+            ..PullOptions::default()
+        }),
         msg::pulling_from(from, &head.name),
     ))
 }
@@ -610,6 +614,7 @@ pub(crate) fn push_action(remote: &str, branch: &HeadBranch, force_with_lease: b
             force_with_lease,
             set_upstream: branch.upstream.is_none(),
             branch: Some(branch.name.clone()),
+            ..PushOptions::default()
         },
     }
 }

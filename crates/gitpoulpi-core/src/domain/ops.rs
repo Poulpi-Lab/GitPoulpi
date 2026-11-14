@@ -641,6 +641,10 @@ pub struct PullOptions {
     /// branch's configured upstream - what a branch with no upstream
     /// needs. `None` is plain `git pull`: the upstream.
     pub remote: Option<String>,
+    /// With `remote`: pull this branch of it instead of the same-named
+    /// one (a branch published under another name). `None` keeps the
+    /// local branch name.
+    pub remote_branch: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -669,6 +673,26 @@ pub struct PushOptions {
     pub set_upstream: bool,
     /// The local branch to push. `None` is the checked-out branch.
     pub branch: Option<String>,
+    /// An explicit lease, overriding the bare one `force_with_lease`
+    /// asks for. `None` with `force_with_lease: true` means
+    /// [`PushLease::Tracking`].
+    pub lease: Option<PushLease>,
+    /// The destination branch name on the remote when it differs from
+    /// the local one (`refs/heads/<branch>:refs/heads/<remote_branch>`).
+    pub remote_branch: Option<String>,
+}
+
+/// What a leased force push expects the remote branch to hold.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum PushLease {
+    /// Whatever our remote-tracking ref holds now (a bare
+    /// `--force-with-lease`).
+    Tracking,
+    /// Exactly this commit (`--force-with-lease=<ref>:<oid>`): a fetch
+    /// between the decision and the push cannot widen the lease.
+    Expect(Oid),
+    /// The branch must not exist yet (`--force-with-lease=<ref>:`).
+    Absent,
 }
 
 /// Why a remote refused a push, when it is a refusal the user can act on
@@ -683,6 +707,16 @@ pub enum PushRejectReason {
     /// other than where our remote-tracking ref said: someone pushed
     /// since our last fetch, and the lease protected their work.
     StaleLease,
+    /// The host's branch protection refused the push (protected branch,
+    /// force push not allowed). The remote's own words are in the
+    /// rejection's `detail`.
+    ProtectedByHost,
+    /// Any other `[remote rejected]`: a pre-receive hook, permissions.
+    /// The remote's own words are in the rejection's `detail`.
+    RemoteRefused,
+    /// A reason a newer peer knows and this one does not.
+    #[serde(other)]
+    Unknown,
 }
 
 /// A push the remote rejected, typed so a frontend can offer "pull

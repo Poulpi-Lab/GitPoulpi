@@ -33,6 +33,12 @@ pub(crate) fn typed_text(typed: &TypedError) -> String {
             match r.reason {
                 PushRejectReason::NonFastForward => msg::typed_error::PUSH_NON_FAST_FORWARD,
                 PushRejectReason::StaleLease => msg::typed_error::PUSH_STALE_LEASE,
+                // English until the catalogs get words for it.
+                PushRejectReason::ProtectedByHost
+                | PushRejectReason::RemoteRefused
+                | PushRejectReason::Unknown => {
+                    return CoreError::PushRejected(r.clone()).to_string();
+                }
             },
         ),
         TypedError::NotFastForward => msg::typed_error::NOT_FAST_FORWARD.get().to_string(),

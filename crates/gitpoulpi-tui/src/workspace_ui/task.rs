@@ -375,6 +375,7 @@ pub(crate) fn bulk(session: String, kind: Bulk, name: String, repos: Vec<PathBuf
                         let opts = PullOptions {
                             mode: PullMode::FastForwardOnly,
                             remote: None,
+                            ..PullOptions::default()
                         };
                         conn.call(
                             Some(path),

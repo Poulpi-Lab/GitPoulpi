@@ -9,7 +9,7 @@
 use gitpoulpi_core::domain::{remote_tag_mirror_ref, Oid, PushRejection, RepoRef, UndoRefusal};
 use gitpoulpi_core::{Error, Result};
 
-use crate::network::rejection_reason;
+use crate::history::push::rejection_reason;
 use crate::process::{run_full_async, run_status_async, run_with_stdin};
 
 fn check(remote: &str, full_ref: &str) -> Result<()> {
@@ -89,7 +89,7 @@ pub async fn remote_ref_update(
     }
     let out = run_full_async(&repo.root, &args).await?;
     if !out.success {
-        if let Some(reason) = rejection_reason(&out.stdout) {
+        if let Some(reason) = rejection_reason(&out.stdout, &out.stderr) {
             let detail = match crate::process::failed_with(&args, out.exit_code, &out.stderr) {
                 Error::Git { detail, .. } => Some(detail),
                 _ => None,

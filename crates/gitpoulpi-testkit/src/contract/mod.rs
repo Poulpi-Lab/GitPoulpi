@@ -24,6 +24,7 @@ mod predict;
 mod pull_split;
 mod reflog;
 mod remote_access;
+mod remote_group;
 mod remotes_network;
 mod rewrite;
 mod rewrite_analyze;
@@ -67,6 +68,7 @@ pub use predict::*;
 pub use pull_split::*;
 pub use reflog::*;
 pub use remote_access::*;
+pub use remote_group::*;
 pub use remotes_network::*;
 pub use rewrite::*;
 pub use rewrite_analyze::*;
@@ -405,6 +407,12 @@ macro_rules! for_each_contract_check {
             check_push_for_review_pushes_head_to_the_review_ref,
             check_a_diverged_push_is_a_typed_rejection,
             check_force_push_is_always_with_lease,
+            check_push_lease_expect_overwrites_only_the_expected_tip,
+            check_push_lease_absent_creates_and_refuses_an_existing_branch,
+            check_push_to_a_differently_named_remote_branch,
+            check_push_refused_by_a_pre_receive_hook_is_remote_refused,
+            check_pull_from_a_named_remote_and_branch,
+            check_cherry_counts_ignore_rebased_copies,
             check_pull_modes_on_a_diverged_branch,
             check_pull_fast_forwards_and_accepts_an_explicit_remote,
             check_a_split_pull_matches_the_one_step_pull_when_behind,
@@ -762,6 +770,7 @@ mod meta_tests {
             include_str!("workflow.rs"),
             include_str!("network_auth.rs"),
             include_str!("remote_access.rs"),
+            include_str!("remote_group.rs"),
             include_str!("mod.rs"),
         ]
         .concat();

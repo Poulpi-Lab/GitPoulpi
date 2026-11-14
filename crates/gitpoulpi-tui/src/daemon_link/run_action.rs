@@ -387,6 +387,7 @@ async fn dispatch(
                             force_with_lease: true,
                             set_upstream: false,
                             branch: Some(branch),
+                            ..PushOptions::default()
                         },
                         action_message_tx,
                     )
@@ -402,6 +403,7 @@ async fn dispatch(
                     serde_json::json!({ "opts": PullOptions {
                     mode: gitpoulpi_core::domain::PullMode::Merge,
                     remote: Some(remote.clone()),
+                    ..PullOptions::default()
                 } }),
                 )
                 .await;

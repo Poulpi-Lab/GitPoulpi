@@ -24,6 +24,7 @@ mod predict;
 mod pull_split;
 mod reflog;
 mod remote_access;
+mod remote_keys;
 mod remotes_network;
 mod rewrite;
 mod rewrite_analyze;
@@ -67,6 +68,7 @@ pub use predict::*;
 pub use pull_split::*;
 pub use reflog::*;
 pub use remote_access::*;
+pub use remote_keys::*;
 pub use remotes_network::*;
 pub use rewrite::*;
 pub use rewrite_analyze::*;
@@ -291,6 +293,9 @@ macro_rules! for_each_contract_check {
             check_log_all_refs_skips_gitpoulpi_namespace,
             check_config_section_roundtrip,
             check_remote_config_sections_and_dependents,
+            check_branch_rename_and_delete_carry_gitpoulpi_remote_keys,
+            check_remote_rename_and_remove_rewrite_push_targets_and_pull_sources,
+            check_set_config_section_keeps_multivalued_keys_in_order,
             check_stash_store_and_paths,
             check_index_tree_and_restore,
             check_snapshot_round_trips_untracked_binary_exec_and_links,
@@ -762,6 +767,7 @@ mod meta_tests {
             include_str!("workflow.rs"),
             include_str!("network_auth.rs"),
             include_str!("remote_access.rs"),
+            include_str!("remote_keys.rs"),
             include_str!("mod.rs"),
         ]
         .concat();

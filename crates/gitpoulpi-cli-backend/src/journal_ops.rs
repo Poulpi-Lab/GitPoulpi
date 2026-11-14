@@ -333,7 +333,7 @@ pub fn check_section(section: &str) -> Result<()> {
 }
 
 /// The local config as `(key, value)` pairs, in file order.
-fn local_entries(repo: &RepoRef) -> Result<Vec<(String, String)>> {
+pub(crate) fn local_entries(repo: &RepoRef) -> Result<Vec<(String, String)>> {
     let (_, raw) = run_lenient(&repo.root, &["config", "--local", "--list", "-z"])?;
     Ok(raw
         .split('\0')
@@ -377,12 +377,21 @@ pub fn remote_dependents(repo: &RepoRef, remote: &str) -> Result<Vec<String>> {
 
 /// [`remote_dependents`] over already-read config entries (git2 shares it).
 pub fn dependents_in(entries: &[(String, String)], remote: &str) -> Vec<String> {
+    // `branch.<b>.remote` (git's upstream) and GitPoulpi's extra push
+    // targets / pull sources, whose values are `<remote>[:<branch>]`.
     let mut out: Vec<String> = entries
         .iter()
-        .filter(|(key, value)| {
-            key.starts_with("branch.") && key.ends_with(".remote") && value == remote
+        .filter_map(|(key, value)| {
+            if key.starts_with("branch.") && key.ends_with(".remote") && value == remote {
+                Some(key[..key.len() - ".remote".len()].to_string())
+            } else if gitpoulpi_core::domain::is_remote_group_key(key)
+                && gitpoulpi_core::domain::value_remote(value) == remote
+            {
+                key.rsplit_once('.').map(|(section, _)| section.to_string())
+            } else {
+                None
+            }
         })
-        .map(|(key, _)| key[..key.len() - ".remote".len()].to_string())
         .collect();
     out.sort();
     out.dedup();

@@ -55,6 +55,7 @@ impl TestRepoBuilder {
         annotated_tag(name: &str);
         with_origin();
         with_remote(name: &str);
+        push_targets(branch: &str, targets: &[&str]);
         with_submodule(path: &str);
         with_lfs();
         lfs_track(pattern: &str);

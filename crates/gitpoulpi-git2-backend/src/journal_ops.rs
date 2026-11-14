@@ -237,8 +237,10 @@ pub fn set_config_section(
         }
     }
     for (key, _) in read_section(&config, section)? {
-        // `remove` drops every value of a multivar key; a second remove of
-        // the same key is then a harmless "not found".
+        // A multivar key is not unique, so a plain `remove` refuses it:
+        // drop every value by pattern. A second removal of the same key
+        // (listed once per value) is then a harmless "not found".
+        let _ = config.remove_multivar(&key, ".*");
         let _ = config.remove(&key);
     }
     let mut seen: Vec<&str> = Vec::new();

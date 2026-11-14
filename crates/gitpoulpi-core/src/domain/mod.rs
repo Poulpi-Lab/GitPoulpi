@@ -93,6 +93,11 @@ pub use refs::{
     parse_remote_tag_mirror_ref, remote_tag_mirror_ref, Ref, RefKind, RefVisibility, TagSync,
     TagWhere, REMOTE_TAG_MIRROR_PREFIX,
 };
+pub use remote_group::{
+    drop_remote_in, entries_with_remotes, is_remote_group_key, parse_branch_remotes,
+    rename_remote_in, value_remote, BranchRemotes, RemoteGroupStatus, RemoteRelation,
+    RemoteTargetState, TargetRef, TargetRole, PULL_FROM_VARIABLE, PUSH_TO_VARIABLE,
+};
 pub use repo::{
     CommitGraph, CommitNode, DiscoveredRepo, Oid, Remote, RepoId, RepoRef, WorkingTree,
 };
@@ -100,11 +105,6 @@ pub use repo_auth::{
     command_sha256, ActiveIdentity, AuthOverride, HttpsAuth, HttpsIdentity, IdentityVia,
     RemoteIdentity, RepoAuthProfile, RepoAuthSetArgs, RepoAuthTestArgs, RepoAuthView, SshAuth,
     SshIdentity, COMMAND_NEEDS_PERSON,
-};
-pub use remote_group::{
-    drop_remote_in, entries_with_remotes, is_remote_group_key, parse_branch_remotes,
-    rename_remote_in, value_remote, BranchRemotes, RemoteGroupStatus, RemoteRelation,
-    RemoteTargetState, TargetRef, TargetRole, PULL_FROM_VARIABLE, PUSH_TO_VARIABLE,
 };
 pub use restore::{RestoreItem, RestoreItemKind, RestoreOffer, RestoreOutcome};
 pub use rewrite::RewriteRefusal;

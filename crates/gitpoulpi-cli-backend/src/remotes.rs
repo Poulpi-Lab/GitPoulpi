@@ -61,6 +61,9 @@ pub fn remote_rename(repo: &RepoRef, old_name: &str, new_name: &str) -> Result<(
     let mirror = mirror_refs_of(repo, old_name, &names)?;
 
     run(&repo.root, &["remote", "rename", "--", old_name, new_name])?;
+    rewrite_group_keys(repo, |entries| {
+        gitpoulpi_core::domain::rename_remote_in(entries, old_name, new_name)
+    })?;
 
     let mut script = String::new();
     for (old_ref, tag, oid) in &mirror {
@@ -89,6 +92,9 @@ pub fn remote_remove(repo: &RepoRef, name: &str) -> Result<()> {
     let mirror = mirror_refs_of(repo, name, &names)?;
 
     run(&repo.root, &["remote", "remove", name])?;
+    rewrite_group_keys(repo, |entries| {
+        gitpoulpi_core::domain::drop_remote_in(entries, name)
+    })?;
 
     let mut script = String::new();
     for (refname, _, oid) in &mirror {
@@ -99,6 +105,50 @@ pub fn remote_remove(repo: &RepoRef, name: &str) -> Result<()> {
     // remote declared without one (a lone `pushurl`) leaves its branches.
     let listed: Vec<String> = remotes(repo)?.into_iter().map(|r| r.name).collect();
     sweep_leftover(repo, name, &listed)?;
+    Ok(())
+}
+
+/// Applies `change` to GitPoulpi's per-branch push-target / pull-source
+/// keys (`gitpoulpi-push-to`, `gitpoulpi-pull-from`) and writes back only
+/// the branches whose keys changed, in order. Git's own `remote rename` /
+/// `remove` rewrite `branch.<b>.remote` but know nothing of these.
+fn rewrite_group_keys(
+    repo: &RepoRef,
+    change: impl Fn(&[(String, String)]) -> Vec<(String, String)>,
+) -> Result<()> {
+    use gitpoulpi_core::domain::is_remote_group_key;
+    let all = crate::journal_ops::local_entries(repo)?;
+    let ours: Vec<(String, String)> = all
+        .into_iter()
+        .filter(|(k, _)| is_remote_group_key(k))
+        .collect();
+    let new = change(&ours);
+    if new == ours {
+        return Ok(());
+    }
+    // Rewritten per (branch, variable): unset all its values, add the new.
+    let mut keys: Vec<&str> = ours.iter().map(|(k, _)| k.as_str()).collect();
+    keys.sort_unstable();
+    keys.dedup();
+    for key in keys {
+        let before: Vec<&String> = ours
+            .iter()
+            .filter(|(k, _)| k == key)
+            .map(|(_, v)| v)
+            .collect();
+        let after: Vec<&String> = new
+            .iter()
+            .filter(|(k, _)| k == key)
+            .map(|(_, v)| v)
+            .collect();
+        if before == after {
+            continue;
+        }
+        run(&repo.root, &["config", "--local", "--unset-all", key])?;
+        for value in after {
+            run(&repo.root, &["config", "--local", "--add", key, value])?;
+        }
+    }
     Ok(())
 }
 

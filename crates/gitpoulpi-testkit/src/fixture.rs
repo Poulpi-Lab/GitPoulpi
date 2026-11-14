@@ -977,6 +977,16 @@ impl FixtureRepoBuilder {
             )
     }
 
+    /// Writes `branch`'s extra push targets (`gitpoulpi-push-to`, one
+    /// value per entry, `<remote>` or `<remote>:<branch>`), in order.
+    pub fn push_targets(mut self, branch: &str, targets: &[&str]) -> Result<Self> {
+        let key = format!("branch.{branch}.gitpoulpi-push-to");
+        for target in targets {
+            self.run(&["config", "--add", &key, target])?;
+        }
+        Ok(self)
+    }
+
     /// A lightweight tag at the current commit.
     pub fn tag(mut self, name: &str) -> Result<Self> {
         self.run(&["tag", name])?;

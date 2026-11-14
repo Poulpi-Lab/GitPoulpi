@@ -11,11 +11,11 @@ use std::hash::{Hash, Hasher};
 use std::path::PathBuf;
 use std::sync::{Mutex, OnceLock};
 
+use gitpoulpi_core::domain::RepoRef;
 use gitpoulpi_core::domain::{
     entries_with_remotes, parse_branch_remotes, BranchRemotes, Ref, RefKind, RemoteGroupStatus,
     RemoteRelation, RemoteTargetState, TargetRef, TargetRole,
 };
-use gitpoulpi_core::domain::RepoRef;
 use gitpoulpi_core::{Error, GitBackend, Result};
 
 fn section_of(branch: &str) -> String {
@@ -47,11 +47,7 @@ pub fn set_remotes(
     let mut remotes = parse_branch_remotes(&entries, branch);
     remotes.push_to = parse(push_to)?;
     remotes.pull_from = parse(pull_from)?;
-    let known: Vec<String> = backend
-        .remotes(repo)?
-        .into_iter()
-        .map(|r| r.name)
-        .collect();
+    let known: Vec<String> = backend.remotes(repo)?.into_iter().map(|r| r.name).collect();
     for t in remotes.push_to.iter().chain(&remotes.pull_from) {
         if !known.contains(&t.remote) {
             return Err(Error::Backend(format!("no such remote: {}", t.remote)));
@@ -76,7 +72,9 @@ fn state_of(
     known: &[String],
 ) -> RemoteTargetState {
     let tracking = refs.iter().find(|r| match &r.kind {
-        RefKind::RemoteBranch { remote, name } => *remote == target.remote && *name == target.branch,
+        RefKind::RemoteBranch { remote, name } => {
+            *remote == target.remote && *name == target.branch
+        }
         _ => false,
     });
     let relation = match tracking {
@@ -161,11 +159,7 @@ fn remote_names(backend: &dyn GitBackend, repo: &RepoRef) -> Result<Vec<String>>
 }
 
 /// The `RemoteGroupStatus` read.
-pub fn status(
-    backend: &dyn GitBackend,
-    repo: &RepoRef,
-    branch: &str,
-) -> Result<RemoteGroupStatus> {
+pub fn status(backend: &dyn GitBackend, repo: &RepoRef, branch: &str) -> Result<RemoteGroupStatus> {
     let refs = backend.refs(repo)?;
     let local = refs
         .iter()

@@ -244,6 +244,8 @@ mod text_history;
 mod text_select;
 #[cfg(feature = "worktree")]
 mod worktree_dialog;
+#[cfg(feature = "worktree")]
+mod worktree_remove_dialog;
 #[cfg(not(feature = "worktree"))]
 #[path = "worktree_dialog_stub.rs"]
 mod worktree_dialog;

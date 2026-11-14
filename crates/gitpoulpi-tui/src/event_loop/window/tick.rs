@@ -69,6 +69,15 @@ impl WindowState {
             self.last_message = Some(note);
         }
         self.sync_external_tabs();
+        // "Open to commit" from the Remove worktree dialog: this window is
+        // the worktree it asked for, so the commit message takes the caret.
+        #[cfg(feature = "worktree")]
+        if crate::worktree_remove_dialog::take_commit_focus(&self.repo.root) {
+            self.right_panel = RightPanel::Status;
+            self.right_pane_collapsed = false;
+            self.focus = Focus::Status;
+            self.composer_focus = Some(ComposerField::Summary);
+        }
         // `workspaces.toml` edited from a shell or the CLI.
         crate::workspace_ui::watch::poll(&self.session);
         self.agent_view_tick();

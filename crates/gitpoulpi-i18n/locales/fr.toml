@@ -4986,6 +4986,12 @@ desc_rebasing = { git = "rebase de {branch} sur {onto}", local = "rebasage de {b
 desc_rebasing_step = { git = "rebase de {branch} sur {onto} · étape {k}/{n}", local = "rebasage de {branch} sur {onto} · étape {k}/{n}" }
 
 [link]
+# context: {path} is the folder of the removed worktree
+worktree_removed = { git = "worktree {path} retiré", local = "arbre de travail {path} retiré" }
+worktree_removed_branch_deleted = { git = "worktree {path} retiré et branche {branch} supprimée (Annuler la rétablit)", local = "arbre de travail {path} retiré et branche {branch} supprimée (Annuler la rétablit)" }
+worktree_removed_branch_kept = { git = "worktree {path} retiré ; la branche {branch} est conservée : {why}", local = "arbre de travail {path} retiré ; la branche {branch} est conservée : {why}" }
+worktree_stashed = { git = "modifications mises en stash", local = "modifications remisées" }
+worktree_committed = { git = "modifications commitées en {id}", local = "modifications validées en {id}" }
 amend_done = "{id} modifié, devenu {now} (ancien sommet {previous} : Annuler le rétablit)"
 act_staging_file = { git = "stage de {name}...", local = "indexation de {name}..." }
 act_unstaging_file = { git = "unstage de {name}...", local = "désindexation de {name}..." }
@@ -9749,3 +9755,68 @@ tip_new = "{remote} : pas encore de copie de cette branche"
 tip_unrelated = "{remote} : aucun historique commun"
 tip_gone = "{remote} : n'est plus configuré"
 tip_open_hint = "Cliquez pour modifier les distants de cette branche"
+
+
+[worktree_manage]
+removing = { git = "retrait du worktree {path}...", local = "retrait de l'arbre de travail {path}..." }
+merging = { git = "merge de {branch}...", local = "fusion de {branch}..." }
+# context: dialog title; {name} is the folder name of the worktree; a worktree is a second checked-out copy of the repository
+remove_title = { git = "Retirer le worktree {name}", local = "Retirer l'arbre de travail {name}" }
+# context: dialog title; {branch} is a branch name
+merge_title = { git = "Merge de {branch} dans une autre branche", local = "Fusionner {branch} dans une autre branche" }
+loading = { git = "Vérification du worktree...", local = "Vérification de l'arbre de travail..." }
+clean_text = { git = "Retirer {path} ? Son dossier est supprimé. La branche {branch} reste.", local = "Retirer {path} ? Son dossier est supprimé. La branche {branch} reste." }
+clean_text_detached = "Retirer {path} ? Son dossier est supprimé. Il est sur un HEAD détaché : aucune branche n'est touchée."
+# context: plural: {n} changes of the worktree at {path}
+dirty_count = { one = { git = "{n} modification non commitée dans {path}", local = "{n} modification non validée dans {path}" }, other = { git = "{n} modifications non commitées dans {path}", local = "{n} modifications non validées dans {path}" } }
+# context: plural: {n} changes that would be lost
+force_text = { one = { git = "Retirer {path} et abandonner sa {n} modification non commitée ? C'est irréversible.", local = "Retirer {path} et abandonner sa {n} modification non validée ? C'est irréversible." }, other = { git = "Retirer {path} et abandonner ses {n} modifications non commitées ? C'est irréversible.", local = "Retirer {path} et abandonner ses {n} modifications non validées ? C'est irréversible." } }
+# context: field label
+commit_field = { git = "Message de commit", local = "Message de validation" }
+# context: placeholder
+commit_hint = "décrivez les modifications"
+# context: field label
+stash_field = { git = "Message du stash", local = "Message de la remise" }
+stash_note = { git = "Le stash est partagé avec le dépôt principal : récupérez-le (pop) là-bas ensuite.", local = "La remise est partagée avec le dépôt principal : récupérez-la là-bas ensuite." }
+# context: field label: the branch to create for the commit
+branch_field = "Branche"
+# context: placeholder
+branch_hint = "HEAD est détaché : nommez une branche pour le commit"
+need_message = { git = "écrivez un message de commit", local = "écrivez un message de validation" }
+need_branch = "nommez une branche pour le commit (HEAD est détaché)"
+delete_branch = "Supprimer aussi la branche {branch} (fusionnée dans {into})"
+branch_not_merged = "La branche {branch} n'est pas fusionnée : elle reste."
+# context: button
+commit_remove = { git = "Commit puis retirer", local = "Valider puis retirer" }
+# context: button
+stash_remove = { git = "Stash puis retirer", local = "Remiser puis retirer" }
+# context: button: open the worktree in a tab to commit its changes there
+open_to_commit = { git = "Ouvrir pour commiter", local = "Ouvrir pour valider" }
+# context: button: discards the changes
+remove_anyway = "Retirer quand même"
+# context: button
+remove = "Retirer"
+# context: button
+cancel = "Annuler"
+# context: button
+back = "Retour"
+# context: button
+force_yes = "Abandonner les modifications et retirer"
+# context: button
+merge_then_remove = { git = "Merge dans... puis retirer", local = "Fusionner dans... puis retirer" }
+# context: button
+merge_run = { git = "Merge", local = "Fusionner" }
+# context: button
+merge_remove_run = { git = "Merge puis retirer", local = "Fusionner puis retirer" }
+merge_pick = { git = "Merge de {branch} dans :", local = "Fusionner {branch} dans :" }
+merge_checked_out = "{target} est extraite dans {path} : la fusion s'y fait."
+merge_not_checked_out = "{target} n'est extraite dans aucun worktree : extrayez-la d'abord."
+merge_gone = "la branche {branch} n'existe plus"
+merge_none = "Il n'y a pas d'autre branche locale où fusionner."
+detached_no_merge = "un worktree détaché n'a pas de branche à fusionner"
+# context: default stash message; {name} is the worktree folder
+stash_default = "WIP sur {name}"
+# context: key hint
+hint_next = "suivant"
+# context: key hint
+hint_default = "exécuter"

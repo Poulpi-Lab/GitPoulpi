@@ -4973,6 +4973,12 @@ desc_rebasing = { git = "{branch} rebasen op {onto}", local = "{branch} rebasen 
 desc_rebasing_step = { git = "{branch} rebasen op {onto} · stap {k}/{n}", local = "{branch} rebasen op {onto} · stap {k}/{n}" }
 
 [link]
+# context: {path} is the folder of the removed worktree
+worktree_removed = "removed worktree {path}"
+worktree_removed_branch_deleted = "removed worktree {path} and deleted branch {branch} (Undo brings the branch back)"
+worktree_removed_branch_kept = "removed worktree {path}; branch {branch} was kept: {why}"
+worktree_stashed = { git = "changes stashed", local = "changes stashed" }
+worktree_committed = { git = "changes committed as {id}", local = "changes committed as {id}" }
 amend_done = "{id} gewijzigd, nu {now} (vorige top {previous}: Ongedaan maken zet hem terug)"
 act_staging_file = "{name} stagen..."
 act_unstaging_file = "{name} unstagen..."
@@ -9731,3 +9737,68 @@ tip_new = "{remote}: no copy of this branch yet"
 tip_unrelated = "{remote}: no common history"
 tip_gone = "{remote}: no longer configured"
 tip_open_hint = "Click to edit the remotes of this branch"
+
+
+[worktree_manage]
+removing = { git = "removing worktree {path}...", local = "removing worktree {path}..." }
+merging = { git = "merging {branch}...", local = "merging {branch}..." }
+# context: dialog title; {name} is the folder name of the worktree; a worktree is a second checked-out copy of the repository
+remove_title = { git = "Remove worktree {name}", local = "Remove worktree {name}" }
+# context: dialog title; {branch} is a branch name
+merge_title = { git = "Merge {branch} into another branch", local = "Merge {branch} into another branch" }
+loading = "Checking the worktree..."
+clean_text = "Remove {path}? Its folder is deleted. The branch {branch} stays."
+clean_text_detached = "Remove {path}? Its folder is deleted. It is on a detached HEAD, so no branch is affected."
+# context: plural: {n} changes of the worktree at {path}
+dirty_count = { one = "{n} uncommitted change in {path}", other = "{n} uncommitted changes in {path}" }
+# context: plural: {n} changes that would be lost
+force_text = { one = "Remove {path} and discard its {n} uncommitted change? This cannot be undone.", other = "Remove {path} and discard its {n} uncommitted changes? This cannot be undone." }
+# context: field label
+commit_field = "Commit message"
+# context: placeholder
+commit_hint = "describe the changes"
+# context: field label
+stash_field = "Stash message"
+stash_note = "The stash is shared with the main repository: pop it there later."
+# context: field label: the branch to create for the commit
+branch_field = "Branch"
+# context: placeholder
+branch_hint = "HEAD is detached: name a branch for the commit"
+need_message = "write a commit message"
+need_branch = "name a branch for the commit (HEAD is detached)"
+delete_branch = "Also delete branch {branch} (merged into {into})"
+branch_not_merged = "Branch {branch} is not merged: it stays."
+# context: button
+commit_remove = { git = "Commit and remove", local = "Commit and remove" }
+# context: button
+stash_remove = { git = "Stash and remove", local = "Stash and remove" }
+# context: button: open the worktree in a tab to commit its changes there
+open_to_commit = "Open to commit"
+# context: button: discards the changes
+remove_anyway = "Remove anyway"
+# context: button
+remove = "Remove"
+# context: button
+cancel = "Cancel"
+# context: button
+back = "Back"
+# context: button
+force_yes = "Discard changes and remove"
+# context: button
+merge_then_remove = { git = "Merge into... then remove", local = "Merge into... then remove" }
+# context: button
+merge_run = { git = "Merge", local = "Merge" }
+# context: button
+merge_remove_run = { git = "Merge and remove", local = "Merge and remove" }
+merge_pick = "Merge {branch} into:"
+merge_checked_out = "{target} is checked out in {path}: the merge runs there."
+merge_not_checked_out = "{target} is not checked out in any worktree: check it out first."
+merge_gone = "the branch {branch} no longer exists"
+merge_none = "There is no other local branch to merge into."
+detached_no_merge = "a detached worktree has no branch to merge"
+# context: default stash message; {name} is the worktree folder
+stash_default = "WIP on {name}"
+# context: key hint
+hint_next = "next"
+# context: key hint
+hint_default = "run"

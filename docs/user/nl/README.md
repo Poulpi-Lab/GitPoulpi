@@ -70,7 +70,11 @@ je ze nodig hebt.
     Wat er door tmux, zellij, screen, herdr en terminalpanes heen komt:
     **[Multiplexers](multiplexers.md)**.
 
-Ook: **[Branchingworkflows](branching-workflows.md)**, de voorinstellingen Git
+Ook: **[Meerdere remotes voor één branch](multiple-remotes.md)**: push-doelen en pull-bronnen,
+het dialoogvenster Remotes, Push naar alle of geselecteerde remotes, een remote oplossen die is
+doorgegaan, Doorgaan na een conflict, de CLI en een plain-git-alias.
+
+**[Branchingworkflows](branching-workflows.md)**, de voorinstellingen Git
 Flow, GitHub Flow, GitLab Flow en Trunk-based of je eigen basisbranches,
 naampatronen voor branches en branchtypen (`gitpoulpi flow ...`).
 

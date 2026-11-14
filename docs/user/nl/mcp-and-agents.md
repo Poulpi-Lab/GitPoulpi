@@ -241,6 +241,11 @@ verplaatst alleen je venster; *propose* opent een dialoogvenster dat jij bevesti
 | `branch_set_upstream` | `gitpoulpi branch set-upstream` | write |
 | `branch_track` | `gitpoulpi branch track` | write |
 | `branch_unset_upstream` | `gitpoulpi branch unset-upstream` | write |
+| `branch_upstream_add` | `gitpoulpi branch upstream add` | write |
+| `branch_upstream_list` | `gitpoulpi branch upstream list` | read |
+| `branch_upstream_primary` | `gitpoulpi branch upstream primary` | write |
+| `branch_upstream_pull` | `gitpoulpi branch upstream pull` | write |
+| `branch_upstream_remove` | `gitpoulpi branch upstream remove` | write |
 | `checkout` | `gitpoulpi checkout` | write |
 | `cherry_pick` | `gitpoulpi cherry-pick` | write |
 | `clone` | `gitpoulpi clone` | write, network |
@@ -371,6 +376,11 @@ verplaatst alleen je venster; *propose* opent een dialoogvenster dat jij bevesti
 | `remote_remove` | `gitpoulpi remote remove` | destructive |
 | `remote_rename` | `gitpoulpi remote rename` | write |
 | `remote_set_url` | `gitpoulpi remote set-url` | write |
+| `remote_group_abort` | `gitpoulpi remote-group abort` | destructive |
+| `remote_group_continue` | `gitpoulpi remote-group continue` | destructive, network |
+| `remote_group_plan` | `gitpoulpi remote-group plan` | read, network |
+| `remote_group_retry` | `gitpoulpi remote-group retry` | write, network |
+| `remote_group_status` | `gitpoulpi remote-group status` | read |
 | `repo_close` | `gitpoulpi repo close` | write |
 | `repo_discover` | `gitpoulpi repo discover` | read |
 | `repo_init` | `gitpoulpi repo init` | write |

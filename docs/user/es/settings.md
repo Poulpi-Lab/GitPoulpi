@@ -527,7 +527,9 @@ Edita la lista del botón **Abrir en** de la barra de título. La pestaña
 predeterminada** y **Restaurar valores detectados**. La pestaña **Entradas** es
 una [lista](#listas) (cada una con una etiqueta y un comando): **+ Añadir ▾**
 ofrece los preajustes y **Personalizada**, y la entrada predeterminada lleva la
-marca `★`. Los campos de la entrada seleccionada incluyen un botón **Probar**.
+marca `★`. Los campos de la entrada seleccionada incluyen **Puede abrir un worktree**
+(marcada por defecto: la entrada se ofrece en el menú Abrir en de la fila de un
+worktree, consulta [Worktrees](worktrees.md)) y un botón **Probar**.
 Consulta [Abrir en](open-in.md).
 
 La primera fila, **Seguir la carpeta de la pestaña activa**, tiene dos valores:

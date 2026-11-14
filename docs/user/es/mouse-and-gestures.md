@@ -185,7 +185,9 @@ las demás `▸`, y un clic en una va allí. En **Clonar** e **Init**: haz clic 
 
 - **Clic** en una fila para seleccionarla. **Doble clic** en una rama local o en un
   tag para hacer checkout. **Doble clic** en un worktree o en un submódulo para
-  abrirlo en una pestaña.
+  abrirlo en una pestaña. El **+** del encabezado de WORKTREES crea un worktree;
+  clic derecho en un worktree para Abrir en una pestaña nueva, Abrir en, Merge y
+  Eliminar ([Worktrees](worktrees.md)).
 - **Pasa el puntero** sobre una fila para mostrar el icono de su izquierda. **Haz
   clic** en él para ocultar la ref en el Log, o para mostrarla de nuevo. Mientras
   **Solo** está activado, ese mismo lugar pone la ref en solo. En una fila de

@@ -248,7 +248,9 @@ la rama remota se puede deshacer en conjunto.
 - **Abortar un rebase**: no se ofrece deshacerlo (un rebase mueve ramas y guarda su propio
   estado; el propio abort es la vía de vuelta). Abortar un **merge, cherry-pick o revert** *sí*
   se registra, consulta más arriba.
-- **Crear un worktree**, **crear un archivo de parche**, clone, init, acciones de alojamiento
+- **Crear un worktree**, **eliminar un worktree** (lo que se guardó antes se queda: el
+  commit, el stash; la rama que se borra con él queda en el diario, así que Deshacer devuelve
+  la rama, no la carpeta), **crear un archivo de parche**, clone, init, acciones de alojamiento
   (pull requests, issues) y llamadas a la IA: no forman parte del historial del repositorio.
 - **Crear un archivo vacío nuevo** desde el menú del archivo, la eliminación automática de
   archivos `*.orig` tras un merge y guardar un archivo en el editor integrado no se registran.

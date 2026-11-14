@@ -4041,7 +4041,7 @@ rewrite_9 = "apre la scheda Dimensioni e analizza la cronologia: i file e le car
 rewrite_host_howto = "spiega come far passare una riscrittura su un branch protetto dall'host: togliere la protezione, fare un {$push_noun} con un nuovo nome o ricreare il repository; non viene fatto nulla al posto tuo"
 rewrite_ai_rules = "crea le regole di riscrittura dalla tua descrizione con l'IA (nulla viene mostrato in anteprima né applicato)"
 log_columns_2 = "scorri lateralmente le colonne del Log quando mantengono le loro larghezze (la disposizione Scorri lateralmente, scelta nel selettore delle colonne, nelle Impostazioni o con s mentre una colonna è scelta); nella disposizione adattata ogni colonna sta nel pannello"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra push targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} o clic destro"

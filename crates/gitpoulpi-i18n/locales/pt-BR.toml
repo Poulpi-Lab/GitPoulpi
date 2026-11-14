@@ -4041,7 +4041,7 @@ rewrite_9 = "abre a aba Tamanho e analisa o histórico: os maiores arquivos e pa
 rewrite_host_howto = { git = "explica como fazer uma reescrita passar por uma branch que o host protege: suspender a proteção, fazer push com outro nome de branch ou recriar o repositório; nada é feito por você", local = "explica como fazer uma reescrita passar por uma branch que o host protege: suspender a proteção, enviar com outro nome de branch ou recriar o repositório; nada é feito por você" }
 rewrite_ai_rules = "cria com IA as regras de reescrita a partir da sua descrição (nenhuma prévia é gerada e nada é aplicado)"
 log_columns_2 = "rolar as colunas do Log para os lados quando mantêm suas larguras (a disposição Rolar para os lados, escolhida no seletor de colunas, em Configurações ou com s enquanto uma coluna está escolhida); na disposição ajustada, todas as colunas cabem no painel"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra push targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} ou botão direito"

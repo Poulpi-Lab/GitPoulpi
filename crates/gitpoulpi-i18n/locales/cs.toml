@@ -4041,7 +4041,7 @@ rewrite_9 = "otevře kartu Velikost a analyzuje historii: největší soubory a 
 rewrite_host_howto = "vysvětlí, jak prosadit přepis přes větev, kterou hostitel chrání: zrušit ochranu, {$push} pod novým názvem, nebo vytvořit repozitář znovu; nic se za vás neprovede"
 rewrite_ai_rules = "vytvoří pravidla přepisu podle vašeho popisu pomocí AI (nic se nezobrazí v náhledu ani nepoužije)"
 log_columns_2 = "posouvejte sloupce Logu do stran, když si drží své šířky (rozložení Posouvat do stran, které se volí ve výběru sloupců, v Nastavení nebo klávesou s při vybraném sloupci); v rozložení Přizpůsobit panelu se každý sloupec vejde do panelu"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra push targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} nebo pravé tlačítko"

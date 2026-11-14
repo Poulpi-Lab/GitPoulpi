@@ -4035,7 +4035,7 @@ rewrite_9 = "открывает вкладку «Размер» и анализ�
 rewrite_host_howto = { git = "объясняет, как провести переписывание через ветку, защищённую хостингом: снять защиту, сделать push под новым именем или пересоздать репозиторий; сам ничего не делает", local = "объясняет, как провести переписывание через ветку, защищённую хостингом: снять защиту, отправить под новым именем или пересоздать репозиторий; сам ничего не делает" }
 rewrite_ai_rules = "создаёт правила переписывания по вашему описанию с помощью ИИ (без предпросмотра и без применения)"
 log_columns_2 = "прокручивать колонки Log вбок, когда они сохраняют свою ширину (раскладка «Прокрутка вбок», выбирается в списке колонок, в Настройках или клавишей s при выбранной колонке); в раскладке «По размеру панели» все колонки умещаются в панель"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra push targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} или правый щелчок"

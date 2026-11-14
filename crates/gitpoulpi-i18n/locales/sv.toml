@@ -4044,7 +4044,7 @@ rewrite_9 = "öppnar fliken Storlek och analyserar historiken: de största filer
 rewrite_host_howto = "förklarar hur du får en omskrivning förbi en gren som värden skyddar: häv skyddet, gör en {$push_noun} under ett nytt namn eller skapa repositoryt på nytt; ingenting görs åt dig"
 rewrite_ai_rules = "skapar omskrivningsreglerna utifrån din beskrivning med AI (inget förhandsgranskas eller tillämpas)"
 log_columns_2 = "rulla Logs kolumner i sidled när de behåller sina bredder (layouten Rulla i sidled, vald i kolumnväljaren, i Inställningar eller med s medan en kolumn är vald); i layouten Anpassa ryms varje kolumn i rutan"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra push targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} eller högerklick"

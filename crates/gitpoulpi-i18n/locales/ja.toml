@@ -4042,7 +4042,7 @@ rewrite_9 = "「サイズ」タブを開いて履歴を分析します。最大�
 rewrite_host_howto = "ホストが保護しているブランチに書き換えを通す方法を説明します（保護の一時解除、別名での{$push}、リポジトリの作り直し）。何も自動では行いません"
 rewrite_ai_rules = "説明から AI で書き換えルールを作成します（プレビューも適用も行いません）"
 log_columns_2 = "列が幅を保つとき、Logの列を横にスクロールします（列の選択画面、設定、または列を選んだ状態での s で選ぶ「横スクロール」レイアウト）。「ペインに合わせる」レイアウトでは、すべての列がペインに収まります"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra push targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} または右クリック"

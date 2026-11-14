@@ -4040,7 +4040,7 @@ rewrite_9 = "otwiera kartę Rozmiar i analizuje historię: największe pliki i f
 rewrite_host_howto = { git = "wyjaśnia, jak przepchnąć przepisaną historię przez gałąź chronioną przez hosta: zdjąć ochronę, zrobić push pod nową nazwą albo utworzyć repozytorium od nowa; niczego nie robi za ciebie", local = "wyjaśnia, jak przepchnąć przepisaną historię przez gałąź chronioną przez hosta: zdjąć ochronę, wypchnąć pod nową nazwą albo utworzyć repozytorium od nowa; niczego nie robi za ciebie" }
 rewrite_ai_rules = "tworzy z AI reguły przepisania na podstawie twojego opisu (niczego nie podgląda ani nie stosuje)"
 log_columns_2 = "przewijaj kolumny Logu w poziomie, gdy zachowują swoje szerokości (układ Przewijaj w poziomie, wybierany w oknie wyboru kolumn, w Ustawieniach lub klawiszem s przy wybranej kolumnie); w układzie dopasowanym każda kolumna mieści się w panelu"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra push targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} lub prawy przycisk"

@@ -4042,7 +4042,7 @@ rewrite_9 = "Boyut sekmesini açar ve geçmişi analiz eder: en büyük dosyalar
 rewrite_host_howto = { git = "yeniden yazılan geçmişin barındırıcının koruduğu bir daldan nasıl geçirileceğini açıklar: korumayı kaldırın, yeni bir adla push edin veya depoyu yeniden oluşturun; sizin yerinize hiçbir şey yapılmaz", local = "yeniden yazılan geçmişin barındırıcının koruduğu bir daldan nasıl geçirileceğini açıklar: korumayı kaldırın, yeni bir adla gönderin veya depoyu yeniden oluşturun; sizin yerinize hiçbir şey yapılmaz" }
 rewrite_ai_rules = "açıklamanızdan YZ ile yeniden yazma kurallarını oluşturur (hiçbir şey önizlenmez veya uygulanmaz)"
 log_columns_2 = "sütunlar genişliklerini koruyorsa Log'un sütunlarını yana kaydır (sütun seçicide, Ayarlar'da ya da bir sütun seçiliyken s ile seçilen Yana kaydır düzeni); sığdırma düzeninde her sütun bölmeye sığar"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra push targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} veya sağ tık"

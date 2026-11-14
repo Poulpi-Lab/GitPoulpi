@@ -4043,7 +4043,7 @@ rewrite_9 = "öffnet den Tab Größe und analysiert den Verlauf: die größten D
 rewrite_host_howto = "erklärt, wie ein Umschreiben durch einen Branch kommt, den der Host schützt: den Schutz aufheben, den Verlauf per {$Push} unter neuem Namen veröffentlichen oder das Repository neu anlegen; es wird nichts für Sie erledigt"
 rewrite_ai_rules = "erstellt mit KI die Umschreib-Regeln aus Ihrer Beschreibung (es wird nichts in der Vorschau gezeigt oder angewendet)"
 log_columns_2 = "die Spalten des Logs seitlich scrollen, wenn sie ihre Breiten behalten (das Layout Seitlich scrollen, gewählt in der Spaltenauswahl, in den Einstellungen oder mit s bei gewählter Spalte); im Layout Anpassen passt jede Spalte in den Bereich"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra push targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} oder Rechtsklick"

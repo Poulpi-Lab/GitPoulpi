@@ -4040,7 +4040,7 @@ rewrite_9 = "크기 탭을 열고 기록을 분석합니다: 가장 큰 파일�
 rewrite_host_howto = "호스트가 보호하는 브랜치에서 다시 쓴 기록을 통과시키는 방법을 설명합니다: 보호 해제, 새 이름으로 {$push}, 저장소 다시 만들기 중 하나이며 대신 실행해 주지는 않습니다"
 rewrite_ai_rules = "설명을 바탕으로 AI가 다시 쓰기 규칙을 만듦 (미리보기도 적용도 하지 않음)"
 log_columns_2 = "열이 너비를 유지할 때 Log의 열을 옆으로 스크롤합니다(열 선택기나 설정에서, 또는 열을 고른 상태에서 s로 고르는 옆으로 스크롤 배치). 창에 맞춤 배치에서는 모든 열이 창에 맞춰집니다"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra push targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} 또는 오른쪽 클릭"

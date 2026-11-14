@@ -473,9 +473,11 @@ commit 그래프를 그리는 방법과 Log가 불러오는 commit 수입니다.
 | **Git 백엔드** | `git2`(libgit2, 기본값) 또는 `system`(설치된 `git`). 전역. 변경 이후에 시작하는 데몬부터 적용됩니다. |
 | **Pull 버튼** | Pull 버튼의 동작: merge(가능하면 fast-forward), fast-forward만, 또는 rebase. 전역. `▾` 항목은 이를 바꾸지 않습니다. |
 | **Push 버튼** | **바로**는 즉시 push하고, **묻기**는 먼저 리모트 메뉴를 표시합니다. 전역. |
+| **push 전에 모든 리모트 확인** | 기본값은 켜짐(`git.push_group_preflight`). 추가 push 대상이 있는 브랜치를 push하기 전에 모든 리모트를 먼저 살펴봅니다(빠른 조회이며, 해당 리모트와 다를 때만 내려받습니다). 그래서 세 번째 리모트의 문제가 첫 push가 시작되기 전에 드러납니다. 끄면 리모트마다 차례로 push하고 결과를 알려 줍니다. 전역. |
 | **Merge fast-forward** | 직접 시작하는 merge에서 브랜치를 그저 fast-forward할 수 있을 때의 동작: **never**(기본값)는 항상 merge commit을 만들고, **allowed**는 가능하면 fast-forward하며(git 자체 기본값), **only**는 fast-forward하거나 거부합니다. 전역(`git.merge_fast_forward`)이며 저장소는 [Merge 옵션](#저장소별-merge-옵션) 페이지에서 덮어쓸 수 있습니다. |
 | **기본 인코딩** | **유효한 UTF-8이 아닌** 텍스트(파일 내용, blame, diff, commit 메시지)를 표시할 때 쓰는 인코딩. 페이지에는 전역 행과 이 저장소의 행이 있으며 저장소 행이 우선합니다. 유효한 UTF-8은 다시 디코딩하지 않으며, 스테이징은 아무것도 다시 인코딩하지 않습니다. |
 | **core.autocrlf**, **core.eol** | 이 저장소 자체의 git 설정. 이 행은 저장소의 git 구성에 `core.autocrlf` 또는 `core.eol`을 씁니다. **(상속됨)**은 저장소 값을 제거하므로 전역 git 구성이 적용됩니다. `Ctrl+Z`는 이전 값을 복원합니다. CLI 대응 명령은 `gitpoulpi repo-config`입니다. |
+| **새 브랜치의 추가 push 대상** | 이 저장소에만 적용: 이 제목 아래에 저장소의 리모트마다 체크박스 하나가 있습니다. 체크한 리모트는 브랜치가 처음 업스트림을 갖게 되는 순간(업스트림을 설정하는 첫 push 또는 리모트 브랜치에서 만든 브랜치) 모든 새 브랜치의 업스트림 외 추가 push 대상이 됩니다. 선택은 브랜치 자신의 `gitpoulpi-push-to` 키로 복사되므로 이미 있는 브랜치는 바뀌지 않습니다. 그것들은 Refs 행의 **리모트** 배지(또는 행에서 `u`)로 편집하세요. 저장소의 데이터에 저장됩니다(`repo-state.toml`의 `default_push_targets`). |
 | **Git LFS** | 인터페이스에 Git LFS를 표시합니다. [Git LFS](lfs.md)를 참고하세요. |
 | **pull·push 전에 LFS 필터 설치** | pull 또는 push 전에, 저장소가 LFS를 쓰는데 필터가 없으면 `git lfs install --local`을 실행합니다. |
 | **git-lfs 프로그램** | 감지된 `git-lfs` 프로그램(읽기 전용). |

@@ -256,6 +256,7 @@ merge 충돌 편집기([merge 충돌 해결](merge-conflicts.md))입니다. 설�
 |---|---|---|
 | `git.pull_mode` | `"merge"` | Pull(버튼, `Ctrl+G p`, `Git: Pull`)이 하는 일: `merge`(가능하면 fast-forward), `ff_only`, `rebase`. 항상 git에 명시적으로 전달됩니다. 예전 `fetch_all`은 `merge`로 읽힙니다. |
 | `git.push_behavior` | `"direct"` | `direct`는 기본 리모트로 push합니다. `ask`는 먼저 리모트 메뉴를 표시합니다. |
+| `git.push_group_preflight` | `true` | 브랜치를 여러 리모트로 push하기 전에 모든 대상을 먼저 확인합니다(`ls-remote`, 그리고 해당 리모트와 다를 때만 fetch). 그래서 뒤쪽 리모트의 문제가 첫 push 전에 발견됩니다. |
 | `git.merge_fast_forward` | `"never"` | 직접 시작하는 merge(브랜치 메뉴, 드래그 앤 드롭, 팔레트, `gitpoulpi merge`)에서 브랜치를 fast-forward할 수 있을 때의 동작: `never`는 항상 merge commit을 만들고(`--no-ff`), `allowed`는 가능하면 fast-forward하며(git 기본값, `merge.ff`가 적용됨), `only`는 fast-forward하거나 거부합니다. 저장소 자체의 선택(설정 > Merge 옵션, 그 `repo-state.toml`의 `merge_fast_forward`)이 우선하며, CLI의 `--ff`, `--no-ff`, `--ff-only`는 둘 다보다 우선합니다. 즉시 적용됩니다. |
 | `git.default_encoding` | `"utf-8"` | 유효한 UTF-8이 **아닌** 텍스트(파일 내용, blame, diff, `encoding` 헤더가 없는 commit 메시지)의 인코딩: 모든 WHATWG 레이블(`windows-1252`, `shift_jis`, ...). 표시 전용이며 스테이징은 다시 인코딩하지 않습니다. 저장소가 재정의할 수 있습니다. |
 | `git.lfs_enabled` | `true` | Git LFS를 표시하고 제어합니다. 저장소가 재정의할 수 있습니다. [Git LFS](lfs.md)를 참고하세요. |

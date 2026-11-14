@@ -205,6 +205,7 @@ prefiksem (`Ctrl+G s`).
 | `refs` | `hosting_edit` | Pull request: Edytuj na hoście | `e` |
 | `refs` | `new_pull_request` | Pull requesty: Utwórz | `n` |
 | `refs` | `add_remote` | Zdalne: Dodaj zdalne | `+` |
+| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
 | `diff` | `close` | Zamknij diff | `q` |
 | `diff` | `edit` | Edytuj w drzewie roboczym | `e` |
 | `diff` | `lfs_raw` | LFS: Karta lub surowy wskaźnik | `r` |

@@ -190,6 +190,7 @@ stage_file = "z"
 | `refs` | `hosting_edit` | pull request：在托管平台上编辑 | `e` |
 | `refs` | `new_pull_request` | pull request：创建 | `n` |
 | `refs` | `add_remote` | 远程：添加远程 | `+` |
+| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
 | `diff` | `close` | 关闭 Diff | `q` |
 | `diff` | `edit` | 在工作区中编辑 | `e` |
 | `diff` | `lfs_raw` | LFS：卡片或原始指针 | `r` |

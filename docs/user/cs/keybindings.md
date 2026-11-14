@@ -205,6 +205,7 @@ předponou (`Ctrl+G s`).
 | `refs` | `hosting_edit` | Pull request: Upravit u hostitele | `e` |
 | `refs` | `new_pull_request` | Pull requesty: Vytvořit | `n` |
 | `refs` | `add_remote` | Remotes: Přidat remote | `+` |
+| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
 | `diff` | `close` | Zavřít diff | `q` |
 | `diff` | `edit` | Upravit v pracovním adresáři | `e` |
 | `diff` | `lfs_raw` | LFS: Karta nebo surový ukazatel | `r` |

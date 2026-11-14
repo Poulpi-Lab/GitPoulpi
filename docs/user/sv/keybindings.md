@@ -206,6 +206,7 @@ Varje tangent du kan binda om, med id:t som används i
 | `refs` | `hosting_edit` | Pull request: redigera på värden | `e` |
 | `refs` | `new_pull_request` | Pull requests: skapa en | `n` |
 | `refs` | `add_remote` | Remotes: lägg till en remote | `+` |
+| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
 | `diff` | `close` | Stäng diff | `q` |
 | `diff` | `edit` | Redigera i arbetskatalogen | `e` |
 | `diff` | `lfs_raw` | LFS: kort eller rå pekare | `r` |

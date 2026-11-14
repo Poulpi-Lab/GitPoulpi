@@ -207,6 +207,7 @@ préfixe (`Ctrl+G s`).
 | `refs` | `hosting_edit` | Pull request : modifier sur l'hébergeur | `e` |
 | `refs` | `new_pull_request` | Pull requests : en créer une | `n` |
 | `refs` | `add_remote` | Distants : ajouter un distant | `+` |
+| `refs` | `remotes` | Branche : modifier ses distants | `u` |
 | `diff` | `close` | Fermer le diff | `q` |
 | `diff` | `edit` | Modifier dans le dossier de travail | `e` |
 | `diff` | `lfs_raw` | LFS : carte ou pointeur brut | `r` |

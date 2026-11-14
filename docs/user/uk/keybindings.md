@@ -202,6 +202,7 @@ stage_file = "z"
 | `refs` | `hosting_edit` | Pull request: змінити на хостингу | `e` |
 | `refs` | `new_pull_request` | Створити pull request | `n` |
 | `refs` | `add_remote` | Remotes: додати remote | `+` |
+| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
 | `diff` | `close` | Закрити diff | `q` |
 | `diff` | `edit` | Змінити в робочій папці | `e` |
 | `diff` | `lfs_raw` | LFS: картка чи сирий вказівник | `r` |

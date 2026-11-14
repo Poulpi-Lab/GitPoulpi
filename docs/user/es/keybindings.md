@@ -208,6 +208,7 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `refs` | `hosting_edit` | Pull request: editar en el host | `e` |
 | `refs` | `new_pull_request` | Pull requests: crear una | `n` |
 | `refs` | `add_remote` | Remotos: Añadir un remoto | `+` |
+| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
 | `diff` | `close` | Cerrar el diff | `q` |
 | `diff` | `edit` | Editar en el directorio de trabajo | `e` |
 | `diff` | `lfs_raw` | LFS: Tarjeta o puntero en bruto | `r` |

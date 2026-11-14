@@ -207,6 +207,7 @@ prefix getoond (`Ctrl+G s`).
 | `refs` | `hosting_edit` | Pull request: bewerken op de host | `e` |
 | `refs` | `new_pull_request` | Pull requests: er een maken | `n` |
 | `refs` | `add_remote` | Remotes: een remote toevoegen | `+` |
+| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
 | `diff` | `close` | Diff sluiten | `q` |
 | `diff` | `edit` | Bewerken in werkmap | `e` |
 | `diff` | `lfs_raw` | LFS: kaart of ruwe pointer | `r` |

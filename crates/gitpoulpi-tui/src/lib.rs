@@ -292,6 +292,7 @@ mod log_inline_ref;
 mod log_menu;
 mod log_multiselect;
 mod log_pills;
+mod multi_remote_badge;
 mod log_table;
 mod markdown_lite;
 #[cfg_attr(not(feature = "mermaid"), path = "mermaid_popup_stub.rs")]

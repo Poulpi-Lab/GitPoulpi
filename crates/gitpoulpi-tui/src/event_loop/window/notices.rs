@@ -56,6 +56,7 @@ impl WindowState {
             // The page shows git's own values; a pick goes to the daemon
             // (journaled, so Undo restores the old one).
             prefs.set_repo_config(&self.repo_config, self.repo_config_version);
+            prefs.set_remote_names(&self.remote_names);
             for (key, value) in prefs.take_repo_config_requests() {
                 self.link
                     .submit_action(Action::SetRepoConfig { key, value });

@@ -310,6 +310,17 @@ pub(super) fn handle(
             cx.remote_ui.open_pull_menu(c, r);
             return Ok(Flow::Handled);
         }
+        Some(HitTarget::RefRemotesBadge(branch)) => {
+            *cx.focus = Focus::Refs;
+            *cx.active_ref_section = SidebarSection::Local;
+            *cx.last_message = crate::multi_remote_badge::open_branch_remotes(
+                &*cx.remote_ui,
+                cx.refs_result.as_deref().unwrap_or(&[]),
+                branch,
+                &mut *cx.input_mode,
+            );
+            return Ok(Flow::Handled);
+        }
         Some(HitTarget::AddRemoteButton) => {
             cx.remote_ui.form = Some(RemoteForm::add(cx.remote_ui.names()));
             return Ok(Flow::Handled);

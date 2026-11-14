@@ -777,6 +777,12 @@ impl PreferencesState {
                 },
             )
             .with_help(msg::settings_git::PUSH_BEHAVIOR_HELP.get()),
+            Field::global(
+                msg::settings_git::PUSH_GROUP_PREFLIGHT.get(),
+                "git.push_group_preflight",
+                Control::Toggle(git.push_group_preflight),
+            )
+            .with_help(msg::settings_git::PUSH_GROUP_PREFLIGHT_HELP.get()),
             Field::heading(&msg::settings_git::repo_heading(&self.repo_label)),
             Field::repo(
                 msg::settings_git::DEFAULT_ENCODING.get(),
@@ -812,6 +818,26 @@ impl PreferencesState {
                 msg::settings_git::CORE_EOL_HELP.get(),
             ),
         ];
+        // Extra push targets for new branches: a checkbox per remote.
+        fields.push(Field::heading(msg::settings_git::DEFAULT_PUSH_TARGETS.get()));
+        if self.remote_names.is_empty() {
+            fields.push(Field::plain(
+                msg::settings_git::DEFAULT_PUSH_TARGETS_NONE.get(),
+                Control::Info(String::new()),
+                Target::None,
+            ));
+        }
+        for (i, remote) in self.remote_names.iter().enumerate() {
+            fields.push(
+                Field::repo(
+                    remote,
+                    RepoField::PushTarget(i),
+                    Control::Toggle(prefs.default_push_targets.contains(remote)),
+                )
+                .live()
+                .with_help(msg::settings_git::DEFAULT_PUSH_TARGETS_HELP.get()),
+            );
+        }
         // The LFS rows exist only in a build that has LFS.
         if crate::build_features::LFS {
             fields.extend([

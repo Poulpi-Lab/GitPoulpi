@@ -118,6 +118,22 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
     let name_slot = &mut *ctx.name_slot;
     let empty_refs_for_head = Vec::new();
     let checked_out = checked_out_branch_name(refs_result.as_ref().unwrap_or(&empty_refs_for_head));
+    // The local branches with extra push targets, by name: the remotes badge.
+    let multi_by_name: std::collections::HashMap<&str, &[gitpoulpi_core::domain::RemoteTargetState]> =
+        refs_result
+            .as_ref()
+            .ok()
+            .map(|refs| {
+                refs.iter()
+                    .filter_map(|r| match (&r.kind, &r.multi_remote) {
+                        (gitpoulpi_core::domain::RefKind::LocalBranch { name }, Some(t)) => {
+                            Some((name.as_str(), t.as_slice()))
+                        }
+                        _ => None,
+                    })
+                    .collect()
+            })
+            .unwrap_or_default();
     let empty_groups = RefsGroups::default();
     let ref_groups = refs_result
         .as_ref()
@@ -409,6 +425,9 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
                 .fg(th().ui.muted)
                 .add_modifier(Modifier::BOLD)
         };
+        // `(row index, column offset from the section's left edge, width,
+        // branch)` of every remotes badge drawn this frame.
+        let mut badge_hits: Vec<(usize, u16, u16, String)> = Vec::new();
         let items: Vec<ListItem> = if !expanded {
             Vec::new()
         } else if section == SidebarSection::Worktrees {
@@ -641,10 +660,30 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
                             } else {
                                 " "
                             };
-                            let name = truncate_with_ellipsis(
-                                display_name,
-                                area.width.saturating_sub(4 + row.depth() as u16 * 2) as usize,
-                            );
+                            // A branch with extra push targets keeps room for the
+                            // compact badge (`⇉3`): the name gives way, not the badge.
+                            let multi = (kind == RefRowKind::Local)
+                                .then(|| multi_by_name.get(full_name.as_str()).copied())
+                                .flatten();
+                            let prefix = 4 + row.depth() as usize * 2;
+                            let inner_room = (area.width.saturating_sub(2) as usize)
+                                .saturating_sub(prefix);
+                            let name_room =
+                                area.width.saturating_sub(4 + row.depth() as u16 * 2) as usize;
+                            let name = match multi {
+                                Some(t) => truncate_with_ellipsis(
+                                    display_name,
+                                    inner_room
+                                        .saturating_sub(
+                                            display_width(
+                                                &crate::multi_remote_badge::compact_form(t),
+                                            ) + 1,
+                                        )
+                                        .clamp(1, name_room),
+                                ),
+                                None => truncate_with_ellipsis(display_name, name_room),
+                            };
+                            let name_width = display_width(&name);
                             let (kind_color, _) = ref_style(kind);
                             let mut style = if is_hidden {
                                 Style::default().fg(th().ui.muted)
@@ -701,6 +740,22 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
                                 Span::raw(" "),
                                 Span::styled(name, style),
                             ];
+                            if let Some(targets) = multi {
+                                let room = inner_room.saturating_sub(name_width + 1);
+                                if let Some(text) = crate::multi_remote_badge::fit(targets, room) {
+                                    badge_hits.push((
+                                        row_index,
+                                        (1 + prefix + name_width + 1) as u16,
+                                        display_width(&text) as u16,
+                                        full_name.clone(),
+                                    ));
+                                    let tint = crate::multi_remote_badge::color(
+                                        crate::multi_remote_badge::health(targets),
+                                    );
+                                    spans.push(Span::raw(" "));
+                                    spans.push(Span::styled(text, Style::default().fg(tint)));
+                                }
+                            }
                             if let Some(place) = place {
                                 spans.push(Span::styled(
                                     format!(" {}", crate::tag_where_ui::glyph(place)),
@@ -863,6 +918,24 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
                     );
                     field_editor.drawn(MainField::RefName, text_rect, false);
                     name_slot.mark(NameSpot::Refs);
+                }
+            }
+        }
+        // The remotes badges of the visible rows: hit targets registered
+        // before the section header's band (inner first), over the row.
+        {
+            let offset = sidebar_render_state.offset();
+            for (index, dx, width, branch) in badge_hits.drain(..) {
+                if index >= offset && index < offset + sidebar_visible {
+                    frame_hits.push((
+                        Rect::new(
+                            area.x + dx,
+                            area.y + 1 + (index - offset) as u16,
+                            width,
+                            1,
+                        ),
+                        HitTarget::RefRemotesBadge(branch),
+                    ));
                 }
             }
         }

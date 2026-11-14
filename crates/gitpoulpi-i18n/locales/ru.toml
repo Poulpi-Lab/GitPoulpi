@@ -635,6 +635,11 @@ inherited = "(унаследовано)"
 lfs_not_checked = "(ещё не проверено)"
 lfs_autofix_filters = { git = "Устанавливать фильтры LFS перед {$pull} и {$push}", local = "Устанавливать фильтры LFS перед получением и отправкой" }
 lfs_autofix_filters_help = { git = "Перед {$pull} или {$push} в репозитории с Git LFS запускает `git lfs install --local`, если его фильтров или хуков LFS нет (только в собственной конфигурации репозитория, не в глобальной), чтобы передача обработала большие файлы. Строка состояния сообщит, если это произошло. Нужен git-lfs.", local = "Перед получением или отправкой в репозитории с Git LFS запускает `git lfs install --local`, если его фильтров или хуков LFS нет (только в собственной конфигурации репозитория, не в глобальной), чтобы передача обработала большие файлы. Строка состояния сообщит, если это произошло. Нужен git-lfs." }
+push_group_preflight = "Check every remote before a {$push}"
+push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
+default_push_targets = "Extra {$push} targets for new branches"
+default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
+default_push_targets_none = "(no remote configured)"
 
 [settings_screen]
 title = "Настройки - Tab: разделы/параметры │ Enter: изменить"
@@ -2522,6 +2527,7 @@ log_columns_fit_all = "Подогнать все колонки под соде�
 log_scroll_left = "Прокрутить колонки влево"
 log_scroll_right = "Прокрутить колонки вправо"
 log_columns_layout = "Прокрутка вбок или по размеру панели"
+refs_remotes = "Branch: Edit its Remotes"
 
 
 [keymap_ctx]
@@ -4029,6 +4035,7 @@ rewrite_9 = "открывает вкладку «Размер» и анализ�
 rewrite_host_howto = { git = "объясняет, как провести переписывание через ветку, защищённую хостингом: снять защиту, сделать push под новым именем или пересоздать репозиторий; сам ничего не делает", local = "объясняет, как провести переписывание через ветку, защищённую хостингом: снять защиту, отправить под новым именем или пересоздать репозиторий; сам ничего не делает" }
 rewrite_ai_rules = "создаёт правила переписывания по вашему описанию с помощью ИИ (без предпросмотра и без применения)"
 log_columns_2 = "прокручивать колонки Log вбок, когда они сохраняют свою ширину (раскладка «Прокрутка вбок», выбирается в списке колонок, в Настройках или клавишей s при выбранной колонке); в раскладке «По размеру панели» все колонки умещаются в панель"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra push targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} или правый щелчок"
@@ -9587,3 +9594,17 @@ key_next = "д"
 key_cancel = "м"
 # context: status line; the message in view holds no web address to open
 none = "в этом сообщении нет ссылок"
+
+[multi_remote]
+state_new = "new"
+state_gone = "gone"
+state_unrelated = "unrelated"
+tip_title = "Remotes of {branch}"
+tip_in_sync = "{remote}: in sync"
+tip_ahead = "{remote}: {n} ahead"
+tip_behind = "{remote}: {n} behind"
+tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
+tip_new = "{remote}: no copy of this branch yet"
+tip_unrelated = "{remote}: no common history"
+tip_gone = "{remote}: no longer configured"
+tip_open_hint = "Click to edit the remotes of this branch"

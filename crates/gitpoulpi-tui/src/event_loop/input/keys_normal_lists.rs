@@ -640,6 +640,31 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         {
             cx.remote_ui.form = Some(RemoteForm::add(cx.remote_ui.names()));
         }
+        // `u` on a local branch: its remotes (upstream and extra push
+        // targets), the keyboard twin of clicking the remotes badge.
+        _ if km.is(Bind::RefsRemotes, &key)
+            && *cx.focus == Focus::Refs
+            && *cx.active_ref_section == SidebarSection::Local =>
+        {
+            let leaf = selected_ref_leaf(
+                &*cx.refs_result,
+                &*cx.refs_filter,
+                *cx.active_ref_section,
+                cx.sidebar_states.state(*cx.active_ref_section).selected(),
+                *cx.hierarchical_refs,
+                &*cx.collapsed_ref_folders,
+                &*cx.remote_names,
+            );
+            *cx.last_message = match leaf {
+                Some(branch) => crate::multi_remote_badge::open_branch_remotes(
+                    &*cx.remote_ui,
+                    cx.refs_result.as_deref().unwrap_or(&[]),
+                    &branch,
+                    &mut *cx.input_mode,
+                ),
+                None => Some(msg::input::SELECT_BRANCH_TAG_REMOTE.get().into()),
+            };
+        }
         // Opens the selected file's (or, in the Unstaged
         // tree, folder's) context menu
         // from the keyboard, anchored on its own row.

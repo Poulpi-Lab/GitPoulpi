@@ -633,6 +633,11 @@ inherited = "(dziedziczone)"
 lfs_not_checked = "(jeszcze nie sprawdzono)"
 lfs_autofix_filters = { git = "Instaluj filtry LFS przed pull i push", local = "Instaluj filtry LFS przed ściąganiem i wypychaniem" }
 lfs_autofix_filters_help = { git = "Przed pull lub push w repozytorium używającym Git LFS uruchamia `git lfs install --local`, jeśli brakuje jego filtrów LFS lub hooków (tylko własna konfiguracja repozytorium, nigdy globalna), aby transfer obsłużył duże pliki. Pasek stanu o tym informuje. Wymaga git-lfs.", local = "Przed ściąganiem lub wypychaniem w repozytorium używającym Git LFS uruchamia `git lfs install --local`, jeśli brakuje jego filtrów LFS lub hooków (tylko własna konfiguracja repozytorium, nigdy globalna), aby transfer obsłużył duże pliki. Pasek stanu o tym informuje. Wymaga git-lfs." }
+push_group_preflight = "Check every remote before a {$push}"
+push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
+default_push_targets = "Extra {$push} targets for new branches"
+default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
+default_push_targets_none = "(no remote configured)"
 
 [settings_screen]
 title = "Ustawienia - Tab: sekcje/ustawienia │ Enter: zmień"
@@ -2529,6 +2534,7 @@ log_columns_fit_all = "Dopasuj wszystkie kolumny do zawartości"
 log_scroll_left = "Przewiń kolumny w lewo"
 log_scroll_right = "Przewiń kolumny w prawo"
 log_columns_layout = "Przewijanie w poziomie lub dopasowanie do panelu"
+refs_remotes = "Branch: Edit its Remotes"
 
 
 [keymap_ctx]
@@ -4034,6 +4040,7 @@ rewrite_9 = "otwiera kartę Rozmiar i analizuje historię: największe pliki i f
 rewrite_host_howto = { git = "wyjaśnia, jak przepchnąć przepisaną historię przez gałąź chronioną przez hosta: zdjąć ochronę, zrobić push pod nową nazwą albo utworzyć repozytorium od nowa; niczego nie robi za ciebie", local = "wyjaśnia, jak przepchnąć przepisaną historię przez gałąź chronioną przez hosta: zdjąć ochronę, wypchnąć pod nową nazwą albo utworzyć repozytorium od nowa; niczego nie robi za ciebie" }
 rewrite_ai_rules = "tworzy z AI reguły przepisania na podstawie twojego opisu (niczego nie podgląda ani nie stosuje)"
 log_columns_2 = "przewijaj kolumny Logu w poziomie, gdy zachowują swoje szerokości (układ Przewijaj w poziomie, wybierany w oknie wyboru kolumn, w Ustawieniach lub klawiszem s przy wybranej kolumnie); w układzie dopasowanym każda kolumna mieści się w panelu"
+refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra push targets): the keyboard twin of clicking the remotes badge on its row"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} lub prawy przycisk"
@@ -9452,3 +9459,17 @@ key_next = "d"
 key_cancel = "a"
 # context: status line; the message in view holds no web address to open
 none = "brak linku w tym opisie"
+
+[multi_remote]
+state_new = "new"
+state_gone = "gone"
+state_unrelated = "unrelated"
+tip_title = "Remotes of {branch}"
+tip_in_sync = "{remote}: in sync"
+tip_ahead = "{remote}: {n} ahead"
+tip_behind = "{remote}: {n} behind"
+tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
+tip_new = "{remote}: no copy of this branch yet"
+tip_unrelated = "{remote}: no common history"
+tip_gone = "{remote}: no longer configured"
+tip_open_hint = "Click to edit the remotes of this branch"

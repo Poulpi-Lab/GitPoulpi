@@ -37,6 +37,9 @@ pub(crate) struct RefPill {
     pub(crate) combined_remote: bool,
     /// For a tag: where it lives (`tag_where_ui`); `None` for a branch.
     pub(crate) tag_where: Option<gitpoulpi_core::domain::TagWhere>,
+    /// For a local branch with extra push targets: where each remote
+    /// stands (the `⇉3` badge, `multi_remote_badge`).
+    pub(crate) multi_remote: Option<Vec<gitpoulpi_core::domain::RemoteTargetState>>,
 }
 
 impl RefPill {
@@ -84,19 +87,22 @@ pub(crate) fn ref_pills_for_commit(
     commit: Oid,
     refs: &[gitpoulpi_core::domain::Ref],
 ) -> Vec<RefPill> {
-    let mut locals: Vec<(String, bool)> = Vec::new();
+    type LocalEntry = (String, bool, Option<Vec<gitpoulpi_core::domain::RemoteTargetState>>);
+    let mut locals: Vec<LocalEntry> = Vec::new();
     let mut remotes: Vec<(String, String)> = Vec::new(); // (remote alias, branch name)
     let mut tags: Vec<(String, Option<gitpoulpi_core::domain::TagWhere>)> = Vec::new();
     for r in refs.iter().filter(|r| r.target == commit) {
         match &r.kind {
-            RefKind::LocalBranch { name } => locals.push((name.clone(), r.is_head)),
+            RefKind::LocalBranch { name } => {
+                locals.push((name.clone(), r.is_head, r.multi_remote.clone()))
+            }
             RefKind::RemoteBranch { remote, name } => remotes.push((remote.clone(), name.clone())),
             RefKind::Tag { name } => tags.push((name.clone(), r.tag_where())),
         }
     }
 
     let mut pills = Vec::with_capacity(locals.len() + remotes.len() + tags.len());
-    for (name, is_head) in locals {
+    for (name, is_head, multi_remote) in locals {
         let combined_remote = if let Some(pos) = remotes.iter().position(|(_, rn)| *rn == name) {
             remotes.remove(pos);
             true
@@ -109,6 +115,7 @@ pub(crate) fn ref_pills_for_commit(
             checked_out: is_head,
             combined_remote,
             tag_where: None,
+            multi_remote,
         });
     }
     for (_remote, name) in remotes {
@@ -123,6 +130,7 @@ pub(crate) fn ref_pills_for_commit(
             checked_out: false,
             combined_remote: false,
             tag_where: None,
+            multi_remote: None,
         });
     }
     for (name, tag_where) in tags {
@@ -132,6 +140,7 @@ pub(crate) fn ref_pills_for_commit(
             checked_out: false,
             combined_remote: false,
             tag_where,
+            multi_remote: None,
         });
     }
     pills.sort_by_key(|p| (p.priority(), p.name.clone()));
@@ -254,12 +263,27 @@ pub(crate) fn ref_pill_spans(
     } else {
         display_width(" ") + display_width(" ") + display_width(&overflow) + display_width(" ")
     };
-    let chrome_width = display_width(" ")
+    let base_chrome = display_width(" ")
         + display_width(checkmark)
         + display_width(" ")
         + display_width(&icon)
         + display_width(" ")
         + overflow_chrome;
+    // The remotes badge (`\u{21c9}3`) of a branch with extra push targets: its
+    // own chip (a plain gap, then ` \u{21c9}3 `) before `+n`, and the first thing
+    // dropped when the name would otherwise have to be cut.
+    let remotes = first
+        .multi_remote
+        .as_deref()
+        .filter(|t| !t.is_empty() && popup_fill_width.is_none())
+        .map(crate::multi_remote_badge::compact_form)
+        .filter(|badge| {
+            base_chrome + display_width(badge) + 3 + display_width(&first.name) <= max_width
+        });
+    let chrome_width = base_chrome
+        + remotes
+            .as_deref()
+            .map_or(0, |badge| display_width(badge) + 3);
     let name_budget = max_width.saturating_sub(chrome_width).max(1);
     let name = truncate_with_ellipsis(&first.name, name_budget);
     let label = format!(" {checkmark}{name} {icon} ");
@@ -281,6 +305,14 @@ pub(crate) fn ref_pill_spans(
         style = style.add_modifier(Modifier::BOLD);
     }
     let mut spans = vec![Span::styled(label, style)];
+    if let (Some(badge), Some(targets)) = (remotes, first.multi_remote.as_deref()) {
+        let tint = crate::multi_remote_badge::color(crate::multi_remote_badge::health(targets));
+        spans.push(Span::raw(" ")); // uncolored gap between the chips
+        spans.push(Span::styled(
+            format!(" {badge} "),
+            Style::default().bg(tint).fg(contrasting_fg(tint)),
+        ));
+    }
     if !overflow.is_empty() {
         spans.push(Span::raw(" ")); // uncolored gap between the two chips
         spans.push(Span::styled(
@@ -334,6 +366,7 @@ mod tests {
             checked_out,
             combined_remote: false,
             tag_where: None,
+            multi_remote: None,
         }
     }
 

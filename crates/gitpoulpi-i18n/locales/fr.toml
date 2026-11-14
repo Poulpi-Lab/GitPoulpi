@@ -636,7 +636,7 @@ lfs_autofix_filters_help = { git = "Avant un {$pull} ou un {$push} dans un dép�
 push_group_preflight = "Vérifier chaque distant avant un {$push}"
 push_group_preflight_help = "Avant un {$push} d'une branche qui a des cibles de {$push} supplémentaires, regarde d'abord chaque distant (une requête rapide, plus un téléchargement de ce distant seulement quand il diffère), pour qu'un problème sur le troisième distant apparaisse avant le début du premier {$push}. Désactivé : {$push} vers chaque distant à tour de rôle, puis le compte rendu."
 default_push_targets = "Cibles de {$push} supplémentaires pour les nouvelles branches"
-default_push_targets_help = "Ce dépôt seulement. Cochez les distants vers lesquels une nouvelle branche fait aussi un {$push}, en plus de son amont. Ils sont copiés dans la branche quand elle reçoit son premier amont (un premier {$push} qui le définit, ou une branche créée depuis une branche distante). Les branches existantes ne changent pas : utilisez leur dialogue Définir l'amont..."
+default_push_targets_help = "Ce dépôt seulement. Cochez les distants vers lesquels une nouvelle branche fait aussi un {$push}, en plus de son amont. Ils sont copiés dans la branche quand elle reçoit son premier amont (un premier {$push} qui le définit, ou une branche créée depuis une branche distante). Les branches existantes ne changent pas : utilisez leur dialogue Distants de la branche..."
 default_push_targets_none = "(aucun distant configuré)"
 
 [settings_screen]
@@ -888,7 +888,7 @@ push_branch = "{$Push} {name}"
 start_pr = "Démarrer une {$pr} depuis {name}..."
 fetch = "{$Fetch}"
 # context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
-remotes_of = "Remotes de {name}..."
+remotes_of = "Distants de {name}..."
 rename = "Renommer {name}..."
 delete = "Supprimer {name}..."
 delete_both = "Supprimer {first} et {second}..."
@@ -9523,7 +9523,7 @@ none = "aucun lien dans ce message"
 
 [branch_remotes]
 # context: title of the dialog that lists every remote a branch pushes to and pulls from; {branch} is the local branch
-title = "Dépôts distants de {branch}"
+title = "Distants de {branch}"
 # context: label before the list that picks the upstream (the remote branch the local branch tracks)
 upstream_label = "Amont"
 # context: table heading: a configured remote's name

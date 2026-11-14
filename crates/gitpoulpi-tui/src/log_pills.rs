@@ -87,7 +87,11 @@ pub(crate) fn ref_pills_for_commit(
     commit: Oid,
     refs: &[gitpoulpi_core::domain::Ref],
 ) -> Vec<RefPill> {
-    type LocalEntry = (String, bool, Option<Vec<gitpoulpi_core::domain::RemoteTargetState>>);
+    type LocalEntry = (
+        String,
+        bool,
+        Option<Vec<gitpoulpi_core::domain::RemoteTargetState>>,
+    );
     let mut locals: Vec<LocalEntry> = Vec::new();
     let mut remotes: Vec<(String, String)> = Vec::new(); // (remote alias, branch name)
     let mut tags: Vec<(String, Option<gitpoulpi_core::domain::TagWhere>)> = Vec::new();
@@ -670,7 +674,13 @@ mod tests {
         for (rel, want) in [
             (R::UpToDate, th().status.success),
             (R::LocalAhead(1), th().status.warning),
-            (R::Diverged { ahead: 1, behind: 1 }, th().status.danger),
+            (
+                R::Diverged {
+                    ahead: 1,
+                    behind: 1,
+                },
+                th().status.danger,
+            ),
         ] {
             let mut pills = vec![
                 multi_pill("main", vec![("origin", R::UpToDate), ("gitlab", rel)]),
@@ -706,7 +716,10 @@ mod tests {
         // Room for the name and the badge: both.
         let roomy = tight + display_width("\u{21c9}2") + 3;
         let (text, _) = render_spans(&ref_pill_spans(&pills, roomy, LANE_PALETTE[0], None));
-        assert!(text.contains("\u{21c9}2") && text.contains("feature/login"), "{text}");
+        assert!(
+            text.contains("\u{21c9}2") && text.contains("feature/login"),
+            "{text}"
+        );
         // One column short of that: the badge goes, not the name.
         let (text, _) = render_spans(&ref_pill_spans(&pills, roomy - 1, LANE_PALETTE[0], None));
         assert!(!text.contains('\u{21c9}'), "{text}");
@@ -721,7 +734,10 @@ mod tests {
     fn an_open_popup_hides_the_badge_so_the_block_stays_in_its_column() {
         use gitpoulpi_core::domain::RemoteRelation as R;
         let pills = vec![
-            multi_pill("main", vec![("origin", R::UpToDate), ("gitlab", R::UpToDate)]),
+            multi_pill(
+                "main",
+                vec![("origin", R::UpToDate), ("gitlab", R::UpToDate)],
+            ),
             pill("dev", RefRowKind::Local, false),
         ];
         let (text, filled) = render_spans(&ref_pill_spans(&pills, 40, LANE_PALETTE[0], Some(40)));

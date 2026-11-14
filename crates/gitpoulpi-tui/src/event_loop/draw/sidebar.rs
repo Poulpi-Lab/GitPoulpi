@@ -119,21 +119,23 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
     let empty_refs_for_head = Vec::new();
     let checked_out = checked_out_branch_name(refs_result.as_ref().unwrap_or(&empty_refs_for_head));
     // The local branches with extra push targets, by name: the remotes badge.
-    let multi_by_name: std::collections::HashMap<&str, &[gitpoulpi_core::domain::RemoteTargetState]> =
-        refs_result
-            .as_ref()
-            .ok()
-            .map(|refs| {
-                refs.iter()
-                    .filter_map(|r| match (&r.kind, &r.multi_remote) {
-                        (gitpoulpi_core::domain::RefKind::LocalBranch { name }, Some(t)) => {
-                            Some((name.as_str(), t.as_slice()))
-                        }
-                        _ => None,
-                    })
-                    .collect()
-            })
-            .unwrap_or_default();
+    let multi_by_name: std::collections::HashMap<
+        &str,
+        &[gitpoulpi_core::domain::RemoteTargetState],
+    > = refs_result
+        .as_ref()
+        .ok()
+        .map(|refs| {
+            refs.iter()
+                .filter_map(|r| match (&r.kind, &r.multi_remote) {
+                    (gitpoulpi_core::domain::RefKind::LocalBranch { name }, Some(t)) => {
+                        Some((name.as_str(), t.as_slice()))
+                    }
+                    _ => None,
+                })
+                .collect()
+        })
+        .unwrap_or_default();
     let empty_groups = RefsGroups::default();
     let ref_groups = refs_result
         .as_ref()
@@ -666,8 +668,8 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
                                 .then(|| multi_by_name.get(full_name.as_str()).copied())
                                 .flatten();
                             let prefix = 4 + row.depth() as usize * 2;
-                            let inner_room = (area.width.saturating_sub(2) as usize)
-                                .saturating_sub(prefix);
+                            let inner_room =
+                                (area.width.saturating_sub(2) as usize).saturating_sub(prefix);
                             let name_room =
                                 area.width.saturating_sub(4 + row.depth() as u16 * 2) as usize;
                             let name = match multi {
@@ -928,12 +930,7 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
             for (index, dx, width, branch) in badge_hits.drain(..) {
                 if index >= offset && index < offset + sidebar_visible {
                     frame_hits.push((
-                        Rect::new(
-                            area.x + dx,
-                            area.y + 1 + (index - offset) as u16,
-                            width,
-                            1,
-                        ),
+                        Rect::new(area.x + dx, area.y + 1 + (index - offset) as u16, width, 1),
                         HitTarget::RefRemotesBadge(branch),
                     ));
                 }

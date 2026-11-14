@@ -78,10 +78,14 @@ pub fn has_upstream(backend: &dyn GitBackend, repo: &RepoRef, branch: &str) -> b
 
 /// The local branch a push without an explicit one acts on: HEAD's.
 pub fn head_branch(backend: &dyn GitBackend, repo: &RepoRef) -> Option<String> {
-    backend.refs(repo).ok()?.into_iter().find_map(|r| match r.kind {
-        RefKind::LocalBranch { name } if r.is_head => Some(name),
-        _ => None,
-    })
+    backend
+        .refs(repo)
+        .ok()?
+        .into_iter()
+        .find_map(|r| match r.kind {
+            RefKind::LocalBranch { name } if r.is_head => Some(name),
+            _ => None,
+        })
 }
 
 /// The remote an upstream spelled `<remote>/<branch>` names, the longest
@@ -131,7 +135,11 @@ pub fn apply_default_targets(
     if push_to.is_empty() {
         return;
     }
-    let pull_from: Vec<String> = current.pull_from.iter().map(|t| t.to_value(branch)).collect();
+    let pull_from: Vec<String> = current
+        .pull_from
+        .iter()
+        .map(|t| t.to_value(branch))
+        .collect();
     let _ = set_remotes(backend, repo, branch, &push_to, &pull_from);
 }
 

@@ -379,12 +379,16 @@ pub(in crate::event_loop) fn draw_overlay_menus(
     }
     // The remotes badge of a Refs row: one line per remote.
     if let Some(HitTarget::RefRemotesBadge(branch)) = hovered_target.as_ref() {
-        let targets = refs_for_pills.iter().find_map(|r| match (&r.kind, &r.multi_remote) {
-            (gitpoulpi_core::domain::RefKind::LocalBranch { name }, Some(t)) if name == branch => {
-                Some(t.as_slice())
-            }
-            _ => None,
-        });
+        let targets = refs_for_pills
+            .iter()
+            .find_map(|r| match (&r.kind, &r.multi_remote) {
+                (gitpoulpi_core::domain::RefKind::LocalBranch { name }, Some(t))
+                    if name == branch =>
+                {
+                    Some(t.as_slice())
+                }
+                _ => None,
+            });
         if let Some(targets) = targets {
             if tooltip.visible(
                 crate::tooltip::TooltipKey::RefRemotes(crate::multi_remote_badge::hover_key(

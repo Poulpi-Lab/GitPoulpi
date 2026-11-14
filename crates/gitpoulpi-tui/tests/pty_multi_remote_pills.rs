@@ -136,9 +136,15 @@ fn the_badge_shows_in_the_refs_row_and_the_log_pill_with_the_states_colour() {
         // The Refs row paints the glyph in the state's colour, the Log pill
         // puts it on a chip of that colour.
         let cell = screen.cell(refs_col, refs_row).unwrap();
-        assert_eq!(cell.fg, colour, "Refs badge colour for state {i}: {row_text}");
+        assert_eq!(
+            cell.fg, colour,
+            "Refs badge colour for state {i}: {row_text}"
+        );
         if let Some(&(log_col, log_row)) = found.get(1) {
-            assert!(refs_col < log_col, "Refs row left of the Log pill: {found:?}");
+            assert!(
+                refs_col < log_col,
+                "Refs row left of the Log pill: {found:?}"
+            );
             let pill = screen.cell(log_col, log_row).unwrap();
             assert_eq!(pill.bg, colour, "Log pill chip colour for state {i}");
         }

@@ -108,7 +108,10 @@ pub(crate) fn narrow_form(targets: &[RemoteTargetState]) -> String {
         match t.relation {
             RemoteRelation::LocalAhead(n) => ahead = ahead.max(n),
             RemoteRelation::RemoteAhead(n) => behind = behind.max(n),
-            RemoteRelation::Diverged { ahead: a, behind: b } => {
+            RemoteRelation::Diverged {
+                ahead: a,
+                behind: b,
+            } => {
                 ahead = ahead.max(a);
                 behind = behind.max(b);
             }
@@ -196,7 +199,11 @@ pub(crate) fn open_branch_remotes(
             remote_ui.open_upstream_prompt(&head, refs, input_mode);
             None
         }
-        None => Some(gitpoulpi_i18n::msg::remotes::SELECT_LOCAL_BRANCH.get().into()),
+        None => Some(
+            gitpoulpi_i18n::msg::remotes::SELECT_LOCAL_BRANCH
+                .get()
+                .into(),
+        ),
     }
 }
 

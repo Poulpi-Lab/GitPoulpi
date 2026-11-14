@@ -151,7 +151,10 @@ fn a_wide_row_lists_the_remotes_and_a_narrow_one_keeps_the_count() {
     let (wide, _) = draw(refs.clone(), 70);
     let text = row_with(&wide, "feat");
     assert!(text.contains("feat"), "{text}");
-    assert!(text.contains("origin \u{2191}2 \u{b7} gitlab = \u{b7} backup ="), "{text}");
+    assert!(
+        text.contains("origin \u{2191}2 \u{b7} gitlab = \u{b7} backup ="),
+        "{text}"
+    );
     let main = row_with(&wide, "main");
     assert!(!main.contains(GLYPH), "a plain branch has no badge: {main}");
 
@@ -162,7 +165,10 @@ fn a_wide_row_lists_the_remotes_and_a_narrow_one_keeps_the_count() {
 
     let (tiny, _) = draw(refs, 16);
     let text = row_with(&tiny, "feat");
-    assert!(text.contains("\u{21c9}3"), "the compact count is the last form: {text}");
+    assert!(
+        text.contains("\u{21c9}3"),
+        "the compact count is the last form: {text}"
+    );
 }
 
 #[test]
@@ -173,13 +179,19 @@ fn the_badge_is_green_yellow_or_red_by_state() {
             th().status.success,
         ),
         (
-            three(RemoteRelation::LocalAhead(1), RemoteRelation::RemoteAhead(1)),
+            three(
+                RemoteRelation::LocalAhead(1),
+                RemoteRelation::RemoteAhead(1),
+            ),
             th().status.warning,
         ),
         (
             three(
                 RemoteRelation::UpToDate,
-                RemoteRelation::Diverged { ahead: 1, behind: 2 },
+                RemoteRelation::Diverged {
+                    ahead: 1,
+                    behind: 2,
+                },
             ),
             th().status.danger,
         ),

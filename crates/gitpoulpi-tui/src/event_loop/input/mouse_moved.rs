@@ -203,9 +203,11 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io
             (Some(HitTarget::CommitAuthorName), _) => {
                 Some(crate::tooltip::TooltipKey::CommitAuthor)
             }
-            (Some(HitTarget::RefRemotesBadge(branch)), _) => Some(
-                crate::tooltip::TooltipKey::RefRemotes(crate::multi_remote_badge::hover_key(branch)),
-            ),
+            (Some(HitTarget::RefRemotesBadge(branch)), _) => {
+                Some(crate::tooltip::TooltipKey::RefRemotes(
+                    crate::multi_remote_badge::hover_key(branch),
+                ))
+            }
             (Some(HitTarget::Toolbar(b @ (ToolbarButton::Undo | ToolbarButton::Redo))), _) => Some(
                 crate::tooltip::TooltipKey::UndoRedo(undo_redo_direction(*b)),
             ),

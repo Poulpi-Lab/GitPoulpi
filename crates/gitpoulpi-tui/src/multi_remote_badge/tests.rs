@@ -16,7 +16,13 @@ pub(crate) fn target(remote: &str, relation: RemoteRelation) -> RemoteTargetStat
 fn sample() -> Vec<RemoteTargetState> {
     vec![
         target("origin", RemoteRelation::LocalAhead(2)),
-        target("gitlab", RemoteRelation::Diverged { ahead: 2, behind: 1 }),
+        target(
+            "gitlab",
+            RemoteRelation::Diverged {
+                ahead: 2,
+                behind: 1,
+            },
+        ),
         target("backup", RemoteRelation::Absent),
     ]
 }
@@ -51,7 +57,10 @@ fn the_most_informative_form_that_fits_wins_and_none_fits_nothing() {
     assert!(wide > narrow && narrow > compact);
     assert_eq!(fit(&t, wide).as_deref(), Some(wide_form(&t).as_str()));
     assert_eq!(fit(&t, wide - 1).as_deref(), Some(narrow_form(&t).as_str()));
-    assert_eq!(fit(&t, narrow - 1).as_deref(), Some(compact_form(&t).as_str()));
+    assert_eq!(
+        fit(&t, narrow - 1).as_deref(),
+        Some(compact_form(&t).as_str())
+    );
     assert_eq!(fit(&t, compact - 1), None);
     assert_eq!(fit(&[], 80), None);
 }
@@ -71,7 +80,13 @@ fn the_colour_follows_the_worst_remote() {
     assert_eq!(health(&fresh), Health::Pending);
 
     let mut bad = some.clone();
-    bad.push(target("c", RemoteRelation::Diverged { ahead: 1, behind: 1 }));
+    bad.push(target(
+        "c",
+        RemoteRelation::Diverged {
+            ahead: 1,
+            behind: 1,
+        },
+    ));
     assert_eq!(health(&bad), Health::Diverged);
     assert_eq!(color(Health::Diverged), th().status.danger);
     let mut unrelated = ok;
@@ -87,10 +102,16 @@ fn the_tooltip_lists_each_remote_in_words() {
     let lines = tooltip_lines("feat", &sample());
     assert_eq!(lines.len(), 1 + 3 + 1, "{lines:?}");
     assert!(lines[0].contains("feat"), "{lines:?}");
-    assert!(lines[1].contains("origin") && lines[1].contains("2 ahead"), "{lines:?}");
+    assert!(
+        lines[1].contains("origin") && lines[1].contains("2 ahead"),
+        "{lines:?}"
+    );
     assert!(
         lines[2].contains("gitlab") && lines[2].contains("diverged"),
         "{lines:?}"
     );
-    assert!(lines[3].contains("backup") && lines[3].contains("no copy"), "{lines:?}");
+    assert!(
+        lines[3].contains("backup") && lines[3].contains("no copy"),
+        "{lines:?}"
+    );
 }

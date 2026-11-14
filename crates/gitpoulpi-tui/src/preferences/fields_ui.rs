@@ -819,7 +819,9 @@ impl PreferencesState {
             ),
         ];
         // Extra push targets for new branches: a checkbox per remote.
-        fields.push(Field::heading(msg::settings_git::DEFAULT_PUSH_TARGETS.get()));
+        fields.push(Field::heading(
+            msg::settings_git::DEFAULT_PUSH_TARGETS.get(),
+        ));
         if self.remote_names.is_empty() {
             fields.push(Field::plain(
                 msg::settings_git::DEFAULT_PUSH_TARGETS_NONE.get(),

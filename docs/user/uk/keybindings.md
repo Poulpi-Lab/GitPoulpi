@@ -480,7 +480,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Ліва панель: показати або сховати локальні гілки |  |
 | Ліва панель: показати або сховати remote |  |
 | Ліва панель: показати або сховати worktree |  |
-| Sidebar: Show Worktrees Section |  |
+| Ліва панель: показати розділ Worktrees |  |
 | Ліва панель: показати або сховати Stashes |  |
 | Ліва панель: показати або сховати Tags |  |
 | Ліва панель: показати або сховати Pull requests |  |
@@ -524,12 +524,12 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Refs: Reflog вибраної гілки... |  |
 | Refs: створити pull request з вибраної гілки... |  |
 | Refs: відкрити worktree у вкладці | `Enter / подвійне клацання` |
-| Refs: Open Worktree In... |  |
-| Refs: Merge Worktree Branch Into... |  |
-| Refs: Remove Worktree... |  |
-| Refs: Create Worktree... | `+` |
-| Refs: Create Worktree from Current Branch |  |
-| Refs: Create Worktree Choosing a Branch |  |
+| Refs: відкрити worktree в... |  |
+| Refs: merge гілки worktree в... |  |
+| Refs: видалити worktree... |  |
+| Refs: створити worktree... | `+` |
+| Refs: створити worktree з поточної гілки |  |
+| Refs: створити worktree, вибравши гілку |  |
 | Refs: оновити підмодуль (вибраний) |  |
 | Refs: ініціалізувати підмодуль (вибраний) |  |
 | Refs: відкрити підмодуль у вкладці | `Enter / подвійне клацання` |

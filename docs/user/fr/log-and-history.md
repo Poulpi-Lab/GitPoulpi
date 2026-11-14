@@ -123,7 +123,7 @@ menu. Les entrées les plus utiles :
 | Merge, Rebase sur | Fait un merge de cette ref dans la branche extraite, ou un rebase de la branche extraite sur elle |
 | Fast-forward `<branche>` vers `<courante>` / `<courante>` vers `<branche>` | Avance une branche quand c'est un fast-forward ; sinon grisé avec la raison (`diverged, not a fast-forward`) |
 | Créer un worktree depuis... | Ouvre un worktree lié dans son propre onglet |
-| Pull, Push, Fetch, Définir l'amont... | Opérations réseau sur cette branche |
+| Pull, Push, Fetch, Distants de la branche... | Opérations réseau sur cette branche (Distants de la branche... ouvre « Distants de <branche> » : l'amont plus une case Push et une case Pull aussi par distant) |
 | Masquer / Afficher dans le graphe, Solo | Affichage seulement ; masquent ou mettent en solo une ref (masquer retire aussi les commits que seule cette ref atteint) sans toucher au dépôt |
 | Renommer, Supprimer | Supprimer demande d'abord ; son jumeau distant peut aussi être supprimé |
 | Copier le nom de la branche, Copier le lien de la branche sur le distant | Vers le presse-papiers |

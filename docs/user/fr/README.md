@@ -74,7 +74,11 @@ vous en avez besoin.
     Ce qui passe dans tmux, zellij, screen, herdr et les panneaux de terminal :
     **[Multiplexeurs](multiplexers.md)**.
 
-Aussi : **[Workflows de branches](branching-workflows.md)**, les modèles prédéfinis Git Flow, GitHub
+Aussi : **[Plusieurs distants pour une branche](multiple-remotes.md)** : cibles de push et sources de
+pull, le dialogue des distants, Push vers tous les distants ou vers des distants choisis, résoudre un
+distant qui a bougé, Continuer après un conflit, la CLI et un alias git seul.
+
+**[Workflows de branches](branching-workflows.md)**, les modèles prédéfinis Git Flow, GitHub
 Flow, GitLab Flow et Trunk-based ou vos propres bases, modèles de nom de branche
 et types de branche (`gitpoulpi flow ...`).
 

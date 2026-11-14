@@ -64,6 +64,7 @@ fn action_label(action: AiAction) -> &'static str {
         AiAction::SplitCommit => action_msg::ACTION_SPLIT_COMMIT,
         AiAction::RewriteScript => rewrite_msg::ACTION,
         AiAction::RewriteRules => gitpoulpi_i18n::msg::rewrite_rules_ai::ACTION,
+        AiAction::WorktreeName => action_msg::ACTION_WORKTREE_NAME,
     }
     .get()
 }
@@ -161,6 +162,13 @@ pub(crate) enum AiRequest {
         description: String,
         context: RulesCtx,
     },
+    /// A worktree name and a branch name for a described task; `branches`
+    /// are the repository's local branch names, so the answer follows
+    /// their conventions. Only fills the Create worktree dialog's fields.
+    WorktreeName {
+        description: String,
+        branches: Vec<String>,
+    },
 }
 
 impl AiRequest {
@@ -175,6 +183,7 @@ impl AiRequest {
             AiRequest::SplitCommit { .. } => AiAction::SplitCommit,
             AiRequest::RewriteScript { .. } => AiAction::RewriteScript,
             AiRequest::RewriteRules { .. } => AiAction::RewriteRules,
+            AiRequest::WorktreeName { .. } => AiAction::WorktreeName,
         }
     }
 }
@@ -200,6 +209,15 @@ pub(crate) enum AiAnswer {
     RewriteScript(Box<RewriteScriptOutcome>),
     /// The rules, scope and settings the model proposed (data only).
     RewriteRules(Box<RulesProposal>),
+    /// The worktree name (a slug) and the branch name, both valid.
+    WorktreeName(AiNames),
+}
+
+/// What the worktree naming answered (see [`gitpoulpi_ai::worktree_name`]).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct AiNames {
+    pub(crate) name: String,
+    pub(crate) branch: String,
 }
 
 /// How a request ended.
@@ -315,6 +333,13 @@ impl AiUi {
         self.run
             .as_ref()
             .is_some_and(|r| matches!(r.request, AiRequest::PullRequest { .. }))
+    }
+
+    /// A worktree naming is the running request.
+    pub(crate) fn running_worktree_name(&self) -> bool {
+        self.run
+            .as_ref()
+            .is_some_and(|r| matches!(r.request, AiRequest::WorktreeName { .. }))
     }
 
     /// A conflict-resolution suggestion is the running request.
@@ -806,6 +831,12 @@ async fn execute(
         } => rewrite_rules(&config, &session, &repo, &description, &context)
             .await
             .map(|p| AiAnswer::RewriteRules(Box::new(p))),
+        AiRequest::WorktreeName {
+            description,
+            branches,
+        } => worktree_name(&config, &session, &repo, &description, &branches)
+            .await
+            .map(AiAnswer::WorktreeName),
         AiRequest::PullRequest { source, target } => {
             pull_request(&config, &session, &repo, &source, &target)
                 .await
@@ -868,7 +899,12 @@ fn prepare_with(
 /// Actions whose request the generic "What is sent" dialog shows. The two
 /// history-rewrite dialogs show their own before they ask.
 fn previewed(action: AiAction) -> bool {
-    !matches!(action, AiAction::RewriteScript | AiAction::RewriteRules)
+    // The worktree naming sends what the user typed in its own dialog and
+    // branch names: nothing from the changes.
+    !matches!(
+        action,
+        AiAction::RewriteScript | AiAction::RewriteRules | AiAction::WorktreeName
+    )
 }
 
 /// The byte budget for a diff of `bytes`: `ai.limits.diff_bytes`, or no limit
@@ -1436,6 +1472,23 @@ async fn stash_message(config: &AiConfig, session: &str, repo: &RepoRef) -> Resu
     let prompt = prompts::stash_message(&diff, budget);
     let answer = job.run(&prompt).await.map_err(|e| e.to_string())?;
     parse::stash_message(&answer).map_err(|e| e.to_string())
+}
+
+async fn worktree_name(
+    config: &AiConfig,
+    session: &str,
+    repo: &RepoRef,
+    description: &str,
+    branches: &[String],
+) -> Result<AiNames, String> {
+    let job = prepare(config, session, repo, AiAction::WorktreeName)?;
+    let names = gitpoulpi_ai::worktree_name::suggest(&job, description, branches)
+        .await
+        .map_err(|e| e.to_string())?;
+    Ok(AiNames {
+        name: names.name,
+        branch: names.branch,
+    })
 }
 
 async fn explain(

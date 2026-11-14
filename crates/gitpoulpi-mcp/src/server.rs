@@ -56,6 +56,7 @@ fn is_open_world(name: &str) -> bool {
             | "ai_split_plan"
             | "ai_rewrite_script"
             | "ai_rewrite_rules"
+            | "ai_worktree_name"
             | "hosting_edit_url"
             | "flow_start"
             | "flow_finish"

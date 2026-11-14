@@ -74,6 +74,7 @@ pub fn base_prompt(action: AiAction) -> &'static str {
         AiAction::CodeReview => review::BASE_PROMPT,
         AiAction::RewriteScript => REWRITE_SCRIPT_BASE_PROMPT,
         AiAction::RewriteRules => rewrite_rules::base_prompt_static(),
+        AiAction::WorktreeName => crate::worktree_name::BASE_PROMPT,
         AiAction::SplitCommit => {
             "You split one git commit into several smaller, logical commits. You get the \
              original message and the changes as numbered pieces: H<n> is one hunk, F<n> a \

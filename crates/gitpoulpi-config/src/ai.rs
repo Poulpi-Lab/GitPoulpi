@@ -63,10 +63,13 @@ pub enum AiAction {
     /// description (the workbench's "Create Rules with AI"). It only fills
     /// the workbench: it never previews or applies anything.
     RewriteRules,
+    /// Names a new worktree and its branch from a description of the task
+    /// (the Create worktree dialog's ✦). It only fills two fields.
+    WorktreeName,
 }
 
 impl AiAction {
-    pub const ALL: [AiAction; 10] = [
+    pub const ALL: [AiAction; 11] = [
         Self::CommitMessage,
         Self::ExplainChanges,
         Self::StashMessage,
@@ -77,6 +80,7 @@ impl AiAction {
         Self::SplitCommit,
         Self::RewriteScript,
         Self::RewriteRules,
+        Self::WorktreeName,
     ];
 
     /// The snake_case key used in `config.toml` and on the CLI.
@@ -92,6 +96,7 @@ impl AiAction {
             Self::SplitCommit => "split_commit",
             Self::RewriteScript => "rewrite_script",
             Self::RewriteRules => "rewrite_rules",
+            Self::WorktreeName => "worktree_name",
         }
     }
 
@@ -111,6 +116,7 @@ impl AiAction {
             Self::SplitCommit => "Split commit",
             Self::RewriteScript => "History rewrite script",
             Self::RewriteRules => "History rewrite rules",
+            Self::WorktreeName => "Worktree name",
         }
     }
 }
@@ -784,6 +790,7 @@ pub struct AiActions {
     pub split_commit: AiActionSettings,
     pub rewrite_script: AiActionSettings,
     pub rewrite_rules: AiActionSettings,
+    pub worktree_name: AiActionSettings,
 }
 
 impl AiActions {
@@ -799,6 +806,7 @@ impl AiActions {
             AiAction::SplitCommit => &self.split_commit,
             AiAction::RewriteScript => &self.rewrite_script,
             AiAction::RewriteRules => &self.rewrite_rules,
+            AiAction::WorktreeName => &self.worktree_name,
         }
     }
 
@@ -814,6 +822,7 @@ impl AiActions {
             AiAction::SplitCommit => &mut self.split_commit,
             AiAction::RewriteScript => &mut self.rewrite_script,
             AiAction::RewriteRules => &mut self.rewrite_rules,
+            AiAction::WorktreeName => &mut self.worktree_name,
         }
     }
 }

@@ -589,6 +589,36 @@ async fn rewrite_rules(
     Ok(out)
 }
 
+/// `ai worktree-name`: a worktree name and a branch name for a task.
+#[cfg(feature = "worktree")]
+async fn worktree_name(
+    session: &mut Session,
+    ctx: &mut Ctx,
+    describe: &str,
+) -> Result<Emitted, String> {
+    use gitpoulpi_core::domain::{Ref, RefKind};
+    if describe.trim().is_empty() {
+        return Err("describe the task with --describe".into());
+    }
+    let job = ctx.job(session, AiAction::WorktreeName)?;
+    let refs: Vec<Ref> = session.call(OperationKind::Refs, json!({})).await?;
+    let branches: Vec<String> = refs
+        .iter()
+        .filter_map(|r| match &r.kind {
+            RefKind::LocalBranch { name } => Some(name.clone()),
+            _ => None,
+        })
+        .collect();
+    let names = gitpoulpi_ai::worktree_name::suggest(&job, describe, &branches)
+        .await
+        .map_err(|e| e.to_string())?;
+    let worktree = gitpoulpi_core::domain::worktree_name_after_branch(&names.name);
+    Ok(emitted(
+        json!({ "name": names.name, "worktree": worktree, "branch": names.branch }),
+        format!("{worktree}  (branch {})", names.branch),
+    ))
+}
+
 pub(crate) async fn run(
     session: &mut Session,
     action: AiCommand,
@@ -620,6 +650,8 @@ async fn run_action(
             ))
         }
         AiCommand::Prompt { action } => prompt(session, &action),
+        #[cfg(feature = "worktree")]
+        AiCommand::WorktreeName { describe } => worktree_name(session, ctx, &describe).await,
         // Answered from files, before a daemon is involved (`is_local`).
         AiCommand::ReviewContext { .. } => Err("`ai review-context` runs without a daemon".into()),
         AiCommand::Trust {

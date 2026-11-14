@@ -32,6 +32,7 @@ pub mod review;
 pub mod review_context;
 mod rules_answer;
 pub mod vars;
+pub mod worktree_name;
 
 use std::sync::Arc;
 

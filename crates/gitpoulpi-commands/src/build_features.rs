@@ -110,10 +110,15 @@ pub const FLAGS: [(&str, bool); 27] = [
 ];
 
 /// Whether this build has the feature an AI action belongs to: the two
-/// history rewrite actions are the History workbench's.
+/// history rewrite actions are the History workbench's, the worktree name
+/// is the worktrees'.
 pub fn ai_action_offered(action: gitpoulpi_config::AiAction) -> bool {
     use gitpoulpi_config::AiAction as A;
-    !matches!(action, A::RewriteScript | A::RewriteRules) || HISTORY_REWRITE
+    match action {
+        A::RewriteScript | A::RewriteRules => HISTORY_REWRITE,
+        A::WorktreeName => WORKTREE,
+        _ => true,
+    }
 }
 
 /// `ai.enabled` in the config AND the feature built.

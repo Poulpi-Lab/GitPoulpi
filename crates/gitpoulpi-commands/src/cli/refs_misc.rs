@@ -444,6 +444,19 @@ pub enum AiCommand {
         #[arg(long)]
         context: bool,
     },
+    #[cfg(feature = "worktree")]
+    /// Print the worktree name and branch name the AI proposes for a task
+    /// ("fix the crash when the config is empty"): `{ name, worktree,
+    /// branch }`, where `worktree` is the name the Create worktree dialog
+    /// would fill (`worktree-<name>`) and `branch` follows the repository's
+    /// own branch naming. Creates nothing: pass them to `worktree add`.
+    /// Sends only your description and the local branch names. Needs
+    /// `ai.enabled = true`.
+    WorktreeName {
+        /// The feature, bug or task, in your own words.
+        #[arg(long, value_name = "TEXT")]
+        describe: String,
+    },
     /// Print the system prompt an AI action sends for this repository, level
     /// by level: the built-in base, the global instructions, the workspace's
     /// (the one in `GITPOULPI_WORKSPACE` if it holds the repository, else the

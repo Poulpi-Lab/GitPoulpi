@@ -44,7 +44,7 @@ use crate::review_view::{ReviewEffect, ReviewTarget, ReviewView};
 use crate::safety_panel::{PanelEffect, PanelOutcome, SafetyPanel};
 use crate::sparse_dialog::{sparse_rect, SparseDialog, SparseOutcome};
 use crate::workspace_ui::dialog::{rect as workspace_rect, Outcome as WsOutcome, WorkspaceDialog};
-use crate::worktree_dialog::{worktree_rect, WorktreeDialog, WorktreeOutcome};
+use crate::worktree_dialog::{WorktreeDialog, WorktreeOutcome};
 
 /// The last folder a picker chose, across windows (the management tab is
 /// its own window, restarted on every visit): the next picker, and the
@@ -198,6 +198,16 @@ pub(crate) enum DialogEffect {
     /// loop starts the AI request for this branch pair.
     #[cfg_attr(not(feature = "hosting"), allow(dead_code))]
     GeneratePullRequest { source: String, target: String },
+    /// The Create worktree dialog's ✦: the event loop starts the AI request
+    /// that names the worktree and its branch.
+    #[cfg_attr(not(feature = "ai"), allow(dead_code))]
+    NameWorktree {
+        description: String,
+        branches: Vec<String>,
+    },
+    /// Stop the running worktree naming (Stop, Esc, closing the dialog).
+    #[cfg_attr(not(feature = "ai"), allow(dead_code))]
+    StopWorktreeAi,
     /// A workspace walk's line for the Home page's footer (`None` = over).
     WorkspaceProgress(Option<String>),
 }
@@ -862,6 +872,26 @@ impl RepoDialogs {
         }
     }
 
+    /// Whether the Create worktree dialog is the open dialog.
+    pub(crate) fn worktree_open(&self) -> bool {
+        matches!(self.dialog, Some(RepoDialog::Worktree { .. }))
+    }
+
+    /// AI went on or off, or a request ended: the Create worktree dialog's
+    /// ✦ button follows (called every tick).
+    pub(crate) fn sync_worktree_ai(&mut self, enabled: bool, running: bool) {
+        if let Some(RepoDialog::Worktree { form, .. }) = self.dialog.as_mut() {
+            form.sync_ai(enabled, running);
+        }
+    }
+
+    /// The AI's names for the open Create worktree dialog: `(slug, branch)`.
+    pub(crate) fn worktree_named(&mut self, result: Result<(String, String), String>) {
+        if let Some(RepoDialog::Worktree { form, .. }) = self.dialog.as_mut() {
+            form.ai_done(result);
+        }
+    }
+
     /// Whether the pull request form is the open dialog.
     pub(crate) fn pull_request_open(&self) -> bool {
         #[cfg(feature = "hosting")]
@@ -1192,7 +1222,10 @@ impl RepoDialogs {
             },
             RepoDialog::Worktree { form, picker } => match picker {
                 Some(p) => (p, picker_rect(area)),
-                None => (form.as_mut(), worktree_rect(area)),
+                None => {
+                    let rect = form.rect(area);
+                    (form.as_mut(), rect)
+                }
             },
             #[cfg(feature = "worktree")]
             RepoDialog::WorktreeRemove(form) => {
@@ -1618,6 +1651,14 @@ impl RepoDialogs {
                 self.dialog = None;
                 None
             }
+            WorktreeOutcome::NameWithAi {
+                description,
+                branches,
+            } => Some(DialogEffect::NameWorktree {
+                description,
+                branches,
+            }),
+            WorktreeOutcome::StopAi => Some(DialogEffect::StopWorktreeAi),
             WorktreeOutcome::Browse(start) => {
                 let cwd = std::env::current_dir().unwrap_or_default();
                 let start = Self::browse_start(&start, &cwd);
@@ -2250,7 +2291,7 @@ impl RepoDialogs {
                 }
             }
             Some(RepoDialog::Worktree { form, picker }) => {
-                form.render(worktree_rect(area), buf);
+                form.render(form.rect(area), buf);
                 if let Some(picker) = picker {
                     picker.render(picker_rect(area), buf);
                 }
@@ -2358,6 +2399,7 @@ pub(crate) fn apply_dialog_effect(effect: DialogEffect, ctx: &mut TabCtx) -> Opt
         // Started by the event loop's `apply_effect!`, which owns the AI
         // worker; nothing to do here.
         DialogEffect::GeneratePullRequest { .. } => None,
+        DialogEffect::NameWorktree { .. } | DialogEffect::StopWorktreeAi => None,
         // Handled by the event loop's `apply_effect`.
         DialogEffect::CheckoutPullRequest(_) => None,
         DialogEffect::Open(path) => ctx.switcher_action(repo_switcher::SwitcherAction::Open(path)),
@@ -2601,11 +2643,21 @@ mod tests {
                 opts,
                 open_tab,
             }) => {
-                assert_eq!(path, tmp.path().join("repo-feature"));
+                // The folder is named after the generated `worktree-<id>`.
+                assert_eq!(path.parent(), Some(tmp.path()));
+                let leaf = path.file_name().unwrap().to_string_lossy().into_owned();
+                assert!(
+                    gitpoulpi_core::domain::is_generated_worktree_name(
+                        leaf.strip_prefix("repo-").unwrap_or(&leaf)
+                    ),
+                    "{leaf}"
+                );
+                // The branch the dialog was opened on is checked out as it is.
                 assert_eq!(
                     opts.start,
                     gitpoulpi_core::domain::WorktreeStart::Branch("feature".into())
                 );
+                assert_eq!(opts.new_branch, None);
                 assert!(open_tab);
             }
             other => panic!("expected AddWorktree, got {other:?}"),

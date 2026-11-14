@@ -42,6 +42,11 @@ pub(crate) enum WorktreeOutcome {
         opts: WorktreeAddOptions,
         open_tab: bool,
     },
+    NameWithAi {
+        description: String,
+        branches: Vec<String>,
+    },
+    StopAi,
 }
 
 #[derive(Debug, Clone)]
@@ -79,6 +84,16 @@ impl WorktreeDialog {
 
     pub(crate) fn set_parent(&mut self, _dir: &Path) {}
 
+    pub(crate) fn rect(&self, frame: Rect) -> Rect {
+        frame
+    }
+
+    pub(crate) fn sync_ai(&mut self, _enabled: bool, _running: bool) {}
+
+    pub(crate) fn ai_done(&mut self, _result: Result<(String, String), String>) -> bool {
+        false
+    }
+
     pub(crate) fn paste(&mut self, _text: &str) {}
 
     /// Any key closes the (never opened) dialog.
@@ -105,8 +120,4 @@ impl crate::dialog_kit::Dismiss for WorktreeDialog {
     fn close_hit_mut(&mut self) -> &mut crate::dialog_kit::CloseHit {
         &mut self.close
     }
-}
-
-pub(crate) fn worktree_rect(frame: Rect) -> Rect {
-    frame
 }

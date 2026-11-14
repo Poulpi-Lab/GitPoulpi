@@ -22,28 +22,47 @@ The **+** on the WORKTREES header (keyboard: `+` in the section; palette:
 **Refs: Create Worktree...**) opens a menu:
 
 - **From the current branch**: the branch is checked out in the main folder,
-  so the dialog proposes a new branch on it (`<branch>-wt`).
+  so the dialog proposes a new branch on it (`worktree-<id>`).
 - **From the selected commit**: grayed until a commit is selected in the Log.
-  The worktree starts detached there unless you name a new branch.
-- **Choose a branch...**: the dialog opens on its **Ref** list.
+  The dialog proposes a new branch `worktree-<id>` starting there; clear the
+  branch field for a detached worktree.
+- **Choose a branch...**: the dialog opens on its **Worktree branch** list, to
+  open a branch that already exists.
 
 The palette has the same three (**Refs: Create Worktree from Current Branch**,
 **Git: Create Worktree at Selected Commit**, **Refs: Create Worktree Choosing a
 Branch**). The older entries still work: **Create worktree from...** in a
 branch, tag or commit menu.
 
-The dialog proposes everything and lets you change it:
+The dialog proposes everything and lets you change it. The **Name** and the
+new branch both start as `worktree-<id>`, where `<id>` is 8 random hex digits
+(the same for both), so two worktrees never collide.
 
 | Field | Meaning |
 |---|---|
-| **Name** | The folder name is built from it. Proposed from the branch or the short id. |
+| **Name** | The folder name is built from it. **Name after branch** (`Alt+N`) sets it to `worktree-<branch>`: slashes become `-`, and the word is not doubled (`worktree-foo` and `feature/worktree-x` keep their own, `feature/login` gives `worktree-feature-login`). |
 | **Folder** | A sibling of the repository, `<repository>-<name>`. It follows the Name until you type in the Folder; **Browse** chooses where. |
-| **Ref** | The branch or commit the worktree starts from (a list; type to search). Changing it proposes a new Name. |
-| **New branch** | Empty checks the Ref's branch out there (or detaches on a commit). Required when the branch is checked out already. |
+| **Ref** | Where a *new* branch starts: a branch or a commit (a list; type to search). It is not used, and says so, while an existing branch is chosen. |
+| **Worktree branch** | One field, two meanings, said under it. A name that is not a local branch creates a new branch from the Ref (**new branch from main**). A local branch not checked out elsewhere (pick it in the list, or type its name) is checked out there as it is (**checks out this branch**). The first row of the list, or an empty field, checks the Ref's branch out (or detaches on a commit); it is refused when that branch is checked out already. |
+| **Regenerate** | `Alt+R`. Draws a new `<id>` and replaces the Name and the branch with it, except what you typed yourself (a Name or a branch you wrote stays) and an existing branch (never replaced). A Name from **Name after branch** or from the AI counts as generated. |
+| **Name with AI** | Only while AI is on (see below). |
 | **Open the new worktree as a tab** | On by default. |
 
-A folder that is not empty, an invalid name or a branch that already exists is
-reported on the dialog's own line, and **Create** stays grayed.
+A folder that is not empty, an invalid name, a branch name git refuses or a
+branch another worktree has is reported on the dialog's own line, and
+**Create** stays grayed.
+
+### Naming with AI
+
+With [AI](ai.md) turned on, **Name with AI** (`Alt+A`) opens a box inside the
+dialog: *Describe the feature, bug or task*. **Name it** asks the model for a
+short worktree name and a branch name that follows the repository's own
+branch names (`feature/`, `fix/`, lowercase kebab-case). They fill the Name
+(as `worktree-<name>`) and the branch field, still editable; a branch name that
+already exists gets a `-2` suffix so the answer never silently checks
+something out. The box shows the busy state, **Stop** (or `Esc`) cancels, and
+a failure is shown inside the dialog. Only your description and the local branch
+names are sent.
 
 ## The row's menu
 
@@ -102,5 +121,7 @@ part of the history either.
 `gitpoulpi worktree changes <path>` lists the uncommitted changes of a
 worktree. `gitpoulpi worktree remove <path> [--force] [--commit-message M
 [--commit-branch B]] [--stash-message M] [--delete-branch]` removes it; the
-MCP tools are `worktree_changes` and `worktree_remove`. See the
-[CLI reference](cli-reference.md).
+MCP tools are `worktree_changes` and `worktree_remove`. `gitpoulpi ai
+worktree-name --describe "<task>"` prints the worktree and branch names the AI
+proposes (`{ name, worktree, branch }`) and creates nothing; the MCP tool is
+`ai_worktree_name`. See the [CLI reference](cli-reference.md).

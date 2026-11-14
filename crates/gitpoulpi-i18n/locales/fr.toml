@@ -1243,12 +1243,10 @@ ref_field = "Réf"
 ref_hint = "choisissez une branche"
 # context: combobox entry: the commit the dialog was opened on; {label} what the user clicked (a tag, a remote branch, a short id), {id} the short id
 commit_choice = { git = "commit {label} ({id})", local = "validation {label} ({id})" }
-branch_exists = "la branche {b} existe déjà : choisissez-la dans Réf ou prenez un autre nom"
 is_a_file = "{path} est un fichier, pas un dossier"
 title = { git = "Créer un worktree depuis {label}", local = "Créer un arbre de travail depuis {label}" }
 folder = "Dossier"
 folder_hint = "un dossier neuf ou vide"
-new_branch = "Nouvelle branche"
 branch_hint_checkout = "vide = y extraire {b}"
 branch_hint_required = "obligatoire : la branche est déjà extraite"
 branch_hint_detached = "vide = HEAD détaché"
@@ -1261,6 +1259,22 @@ choose_folder = { git = "choisissez le dossier du worktree", local = "choisissez
 not_absolute = "le dossier doit être un chemin complet (Parcourir en propose un)"
 not_empty = "{path} n'est pas vide"
 already_checked_out = "{label} est déjà extraite - nommez une nouvelle branche"
+branch_field = "Branche du worktree"
+hint_new_branch = "nouvelle branche depuis {r}"
+hint_existing_branch = "extrait cette branche"
+ref_unused = "inutilisé : la branche existante est extraite telle quelle"
+name_after_branch = "Nom d'après la branche"
+regenerate = "Régénérer"
+ai_button = "Nommer avec l'IA"
+ai_describe = "Décrivez la fonctionnalité, le bug ou la tâche"
+ai_describe_hint = "ex. corriger le plantage quand le fichier de config est vide"
+ai_run = "Nommer"
+ai_stop = "Arrêter"
+ai_hide = "Masquer"
+ai_working = "l'IA réfléchit..."
+ai_need_text = "décrivez d'abord le travail à faire"
+ai_failed = "IA : {why}"
+need_branch = "saisissez ou choisissez d'abord une branche"
 
 [repo_dialogs]
 # context: status line after opening the provider's web form
@@ -2935,6 +2949,10 @@ env_no_color = "Pas de codes couleur dans la sortie"
 env_permissions = "Ce que l'agent peut faire sans demander"
 env_timeout = "Délai d'attente propre à l'agent pour une requête (ms)"
 env_offline = "Aucun appel réseau au démarrage"
+title_worktree_name = { git = "Noms de worktree", local = "Noms d'arbre de travail" }
+profile_help_worktree_name = { git = "Le profil que GitPoulpi utilisera pour nommer un nouveau worktree et sa branche à partir d'une description.", local = "Le profil que GitPoulpi utilisera pour nommer un nouvel arbre de travail et sa branche à partir d'une description." }
+repo_profile_help_worktree_name = { git = "Le profil utilisé dans ce dépôt pour nommer un nouveau worktree et sa branche.", local = "Le profil utilisé dans ce dépôt pour nommer un nouvel arbre de travail et sa branche." }
+action_worktree_name = { git = "Nom de worktree", local = "Nom d'arbre de travail" }
 
 [palette]
 sidebar_show_worktrees = { git = "Barre latérale : Afficher la section Worktrees", local = "Barre latérale : Afficher la section Arbres de travail" }

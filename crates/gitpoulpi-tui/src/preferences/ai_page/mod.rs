@@ -110,6 +110,7 @@ impl AiSection {
             Self::Action(AiAction::SplitCommit) => msg::TITLE_SPLIT_COMMIT,
             Self::Action(AiAction::RewriteScript) => gitpoulpi_i18n::msg::rewrite_ai::TITLE,
             Self::Action(AiAction::RewriteRules) => gitpoulpi_i18n::msg::rewrite_rules_ai::TITLE,
+            Self::Action(AiAction::WorktreeName) => msg::TITLE_WORKTREE_NAME,
         }
         .get()
     }
@@ -126,6 +127,8 @@ impl AiSection {
             (AiAction::SplitCommit, false) => msg::PROFILE_HELP_SPLIT_COMMIT,
             (AiAction::RewriteScript, false) => gitpoulpi_i18n::msg::rewrite_ai::PROFILE_HELP,
             (AiAction::RewriteRules, false) => gitpoulpi_i18n::msg::rewrite_rules_ai::PROFILE_HELP,
+            (AiAction::WorktreeName, false) => msg::PROFILE_HELP_WORKTREE_NAME,
+            (AiAction::WorktreeName, true) => msg::REPO_PROFILE_HELP_WORKTREE_NAME,
             (AiAction::ConflictResolve, false) => msg::PROFILE_HELP_CONFLICT_RESOLVE,
             (AiAction::CodeReview, false) => {
                 gitpoulpi_i18n::msg::review_ai::PROFILE_HELP_CODE_REVIEW
@@ -415,6 +418,7 @@ fn action_label(action: AiAction) -> &'static str {
         AiAction::SplitCommit => msg::ACTION_SPLIT_COMMIT,
         AiAction::RewriteScript => gitpoulpi_i18n::msg::rewrite_ai::ACTION,
         AiAction::RewriteRules => gitpoulpi_i18n::msg::rewrite_rules_ai::ACTION,
+        AiAction::WorktreeName => msg::ACTION_WORKTREE_NAME,
         AiAction::ConflictResolve => msg::ACTION_CONFLICT_RESOLVE,
         AiAction::CodeReview => gitpoulpi_i18n::msg::review_ai::ACTION_CODE_REVIEW,
     }

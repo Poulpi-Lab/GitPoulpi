@@ -15,6 +15,7 @@ const TOOLS: &[(&str, &str, bool)] = &[
     ("ai_split_plan", "read", true),
     ("ai_rewrite_script", "read", true),
     ("ai_rewrite_rules", "read", true),
+    ("ai_worktree_name", "read", true),
     ("ai_prompt", "read", false),
     // Shows, or with a setting flag saves, the `[ai.review]` defaults.
     ("ai_review_context", "write", false),
@@ -375,6 +376,7 @@ fn the_audited_fixes_hold() {
         "ai_split_plan",
         "ai_rewrite_script",
         "ai_rewrite_rules",
+        "ai_worktree_name",
     ] {
         assert!(is_open_world(name), "{name}");
     }

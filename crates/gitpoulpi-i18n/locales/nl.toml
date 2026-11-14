@@ -1238,12 +1238,10 @@ ref_field = "Ref"
 ref_hint = "kies een branch"
 # context: combobox entry: the commit the dialog was opened on; {label} what the user clicked (a tag, a remote branch, a short id), {id} the short id
 commit_choice = { git = "commit {label} ({id})", local = "commit {label} ({id})" }
-branch_exists = "de branch {b} bestaat al: kies hem bij Ref of kies een andere naam"
 is_a_file = "{path} is een bestand, geen map"
 title = { git = "Worktree maken van {label}", local = "Worktree maken van {label}" }
 folder = "Map"
 folder_hint = "een nieuwe of lege map"
-new_branch = "Nieuwe branch"
 branch_hint_checkout = "leeg = {b} daar uitchecken"
 branch_hint_required = "vereist: de branch is al uitgecheckt"
 branch_hint_detached = "leeg = losgekoppelde HEAD"
@@ -1256,6 +1254,22 @@ choose_folder = { git = "kies de map voor de worktree", local = "kies de map voo
 not_absolute = "de map moet een volledig pad zijn (Bladeren kiest er een)"
 not_empty = "{path} is niet leeg"
 already_checked_out = "{label} is al uitgecheckt - geef een nieuwe branch een naam"
+branch_field = "Worktree branch"
+hint_new_branch = "new branch from {r}"
+hint_existing_branch = "checks out this branch"
+ref_unused = "not used: the existing branch is checked out as it is"
+name_after_branch = "Name after branch"
+regenerate = "Regenerate"
+ai_button = "Name with AI"
+ai_describe = "Describe the feature, bug or task"
+ai_describe_hint = "e.g. fix the crash when the config file is empty"
+ai_run = "Name it"
+ai_stop = "Stop"
+ai_hide = "Hide"
+ai_working = "asking the AI..."
+ai_need_text = "describe the work first"
+ai_failed = "AI: {why}"
+need_branch = "type or pick a branch first"
 
 [repo_dialogs]
 # context: status line after opening the provider's web form
@@ -2932,6 +2946,10 @@ env_no_color = "Geen kleurcodes in de uitvoer"
 env_permissions = "Hoeveel de agent mag doen zonder te vragen"
 env_timeout = "Eigen time-out van de agent per verzoek (ms)"
 env_offline = "Geen netwerkaanroepen bij het starten"
+title_worktree_name = "Worktree names"
+profile_help_worktree_name = "The profile GitPoulpi will use to name a new worktree and its branch from a description."
+repo_profile_help_worktree_name = "The profile used in this repository to name a new worktree and its branch."
+action_worktree_name = "Worktree name"
 
 [palette]
 sidebar_show_worktrees = "Linkerpaneel: Worktrees-sectie tonen"

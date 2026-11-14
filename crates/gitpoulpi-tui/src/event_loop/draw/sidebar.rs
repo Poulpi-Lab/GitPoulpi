@@ -690,7 +690,11 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
                                                 &crate::multi_remote_badge::compact_form(t),
                                             ) + 1,
                                         )
-                                        .clamp(1, name_room),
+                                        // `max` then `min`, never `clamp`: a sidebar too
+                                        // narrow for any name has `name_room == 0`, and
+                                        // `clamp(1, 0)` panics the UI thread.
+                                        .max(1)
+                                        .min(name_room),
                                 ),
                                 None => truncate_with_ellipsis(display_name, name_room),
                             };

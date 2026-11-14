@@ -63,7 +63,10 @@ GitPoulpi は、クリックできる commit グラフ、コマンドパレッ�
     tmux、zellij、screen、herdr、ターミナルのペインを通るもの：
     **[マルチプレクサ](multiplexers.md)**。
 
-そのほか：**[ブランチワークフロー](branching-workflows.md)**。Git Flow、GitHub Flow、GitLab Flow、
+そのほか：**[1 つのブランチに複数のリモート](multiple-remotes.md)**：push 先と pull 元、リモートのダイアログ、
+すべてまたは選択したリモートへの Push、動いたリモートの解決、競合後の続行、CLI、素の git のエイリアス。
+
+**[ブランチワークフロー](branching-workflows.md)**。Git Flow、GitHub Flow、GitLab Flow、
 トランクベースのプリセット、または独自のベースブランチ、ブランチ名のパターン、トピックの種類
 （`gitpoulpi flow ...`）。
 

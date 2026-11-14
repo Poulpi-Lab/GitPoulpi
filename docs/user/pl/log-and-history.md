@@ -116,7 +116,7 @@ menu. Najprzydatniejsze pozycje:
 | Merge, Rebase na | Scala ten ref z bieżącą gałęzią albo robi rebase bieżącej gałęzi na ten ref |
 | Fast-forward `<branch>` do `<current>` / `<current>` do `<branch>` | Przesuwa gałąź do przodu, gdy da się to zrobić fast-forwardem; inaczej jest wyszarzone z powodem (`rozbieżne, to nie fast-forward`) |
 | Utwórz worktree z... | Otwiera dołączony worktree we własnej karcie |
-| Pull, Push, Fetch, Ustaw upstream... | Operacje sieciowe na tej gałęzi |
+| Pull, Push, Fetch, Zdalne gałęzi <branch>... | Operacje sieciowe na tej gałęzi (Zdalne gałęzi <branch>... ustawia upstream oraz pola Push i Pull też dla każdego zdalnego) |
 | Ukryj / Pokaż w grafie, Solo | Tylko wyświetlanie; ukrywają lub izolują ref (ukrycie usuwa też commity osiągalne tylko przez ten ref) bez dotykania repozytorium |
 | Zmień nazwę, Usuń | Usuń najpierw pyta; można usunąć także zdalny odpowiednik |
 | Kopiuj nazwę gałęzi, Kopiuj link do gałęzi na zdalnym | Do schowka systemowego |

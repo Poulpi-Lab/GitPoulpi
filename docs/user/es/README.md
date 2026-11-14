@@ -74,7 +74,11 @@ necesites.
     Qué pasa a través de tmux, zellij, screen, herdr y los paneles de terminal:
     **[Multiplexores](multiplexers.md)**.
 
-Además: **[Flujos de trabajo de ramas](branching-workflows.md)**, las plantillas Git
+Además: **[Varios remotos para una rama](multiple-remotes.md)**: destinos de push y
+fuentes de pull, el diálogo Remotos, Push a todos o a remotos seleccionados, resolver un
+remoto que se movió, Continuar tras un conflicto, la CLI y un alias de git a secas.
+
+**[Flujos de trabajo de ramas](branching-workflows.md)**, las plantillas Git
 Flow, GitHub Flow, GitLab Flow y Trunk-based, o tus propias bases, patrones de
 nombre de rama y tipos de rama (`gitpoulpi flow ...`).
 

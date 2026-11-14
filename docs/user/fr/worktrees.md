@@ -24,11 +24,12 @@ Créer un worktree...**) ouvre un menu :
 
 - **Depuis la branche courante** : la branche est extraite dans le dossier
   principal, donc la boîte de dialogue propose une nouvelle branche dessus
-  (`<branche>-wt`).
+  (`worktree-<id>`).
 - **Depuis le commit sélectionné** : grisé tant qu'aucun commit n'est sélectionné
-  dans le Log. Le worktree démarre détaché à cet endroit, sauf si vous nommez une
-  nouvelle branche.
-- **Choisir une branche...** : la boîte de dialogue s'ouvre sur sa liste **Réf**.
+  dans le Log. La boîte de dialogue propose une nouvelle branche `worktree-<id>`
+  qui part de là ; videz le champ de la branche pour un worktree détaché.
+- **Choisir une branche...** : la boîte de dialogue s'ouvre sur sa liste **Branche
+  du worktree**, pour ouvrir une branche qui existe déjà.
 
 La palette propose les mêmes trois (**Refs : Créer un worktree depuis la branche
 courante**, **Git : Créer un worktree sur le commit sélectionné...**, **Refs :
@@ -36,18 +37,36 @@ Créer un worktree en choisissant une branche**). Les anciennes entrées
 fonctionnent toujours : **Créer un worktree depuis...** dans le menu d'une
 branche, d'un tag ou d'un commit.
 
-La boîte de dialogue propose tout et vous laisse tout changer :
+La boîte de dialogue propose tout et vous laisse tout changer. Le **Nom** et la
+nouvelle branche commencent tous deux par `worktree-<id>`, où `<id>` est formé de 8
+chiffres hexadécimaux aléatoires (les mêmes pour les deux), si bien que deux
+worktrees ne se heurtent jamais.
 
 | Champ | Signification |
 |---|---|
-| **Nom** | Le nom dont le dossier est tiré. Proposé à partir de la branche ou de l'identifiant court. |
+| **Nom** | Le nom dont le dossier est tiré. **Nom d'après la branche** (`Alt+N`) le met à `worktree-<branche>` : les barres obliques deviennent `-` et le mot n'est pas doublé (`worktree-foo` et `feature/worktree-x` gardent le leur, `feature/login` donne `worktree-feature-login`). |
 | **Dossier** | Un voisin du dépôt, `<dépôt>-<nom>`. Il suit le Nom tant que vous ne tapez rien dans Dossier ; **Parcourir...** choisit l'emplacement. |
-| **Réf** | La branche ou le commit d'où part le worktree (une liste ; tapez pour chercher). La changer propose un nouveau Nom. |
-| **Nouvelle branche** | Vide, elle extrait la branche de la Réf à cet endroit (ou détache sur un commit). Obligatoire quand la branche est déjà extraite. |
+| **Réf** | L'endroit d'où part une *nouvelle* branche : une branche ou un commit (une liste ; tapez pour chercher). Elle n'est pas utilisée, et le dit, tant qu'une branche existante est choisie. |
+| **Branche du worktree** | Un champ, deux sens, indiqués dessous. Un nom qui n'est pas une branche locale crée une nouvelle branche depuis la Réf (**nouvelle branche depuis main**). Une branche locale qui n'est extraite nulle part ailleurs (choisissez-la dans la liste, ou tapez son nom) est extraite là telle quelle (**extrait cette branche**). La première ligne de la liste, ou un champ vide, extrait la branche de la Réf (ou détache sur un commit) ; c'est refusé quand cette branche est déjà extraite. |
+| **Régénérer** | `Alt+R`. Tire un nouvel `<id>` et en refait le Nom et la branche, sauf ce que vous avez tapé vous-même (un Nom ou une branche écrits restent) et une branche existante (jamais remplacée). Un Nom issu de **Nom d'après la branche** ou de l'IA compte comme généré. |
+| **Nommer avec l'IA** | Seulement quand l'IA est activée (voir ci-dessous). |
 | **Ouvrir le nouveau worktree dans un onglet** | Activé par défaut. |
 
-Un dossier non vide, un nom invalide ou une branche qui existe déjà sont signalés
-sur la ligne propre de la boîte de dialogue, et **Créer** reste grisé.
+Un dossier non vide, un nom invalide, un nom de branche que git refuse ou une
+branche qu'un autre worktree a déjà sont signalés sur la ligne propre de la boîte
+de dialogue, et **Créer** reste grisé.
+
+### Nommer avec l'IA
+
+Quand l'[IA](ai.md) est activée, **Nommer avec l'IA** (`Alt+A`) ouvre une zone dans
+la boîte de dialogue : *Décrivez la fonctionnalité, le bug ou la tâche*. **Nommer**
+demande au modèle un nom de worktree court et un nom de branche qui suit les noms de
+branches du dépôt (`feature/`, `fix/`, kebab-case en minuscules). Ils remplissent le
+Nom (sous la forme `worktree-<nom>`) et le champ de la branche, toujours modifiables ;
+un nom de branche qui existe déjà reçoit le suffixe `-2`, pour que la réponse
+n'extraie jamais quelque chose en silence. La zone affiche l'état occupé, **Arrêter**
+(ou `Échap`) annule, et un échec s'affiche dans la boîte de dialogue. Seules sont envoyées votre
+description et les noms des branches locales.
 
 ## Le menu d'une ligne
 
@@ -108,5 +127,7 @@ worktree ne fait pas non plus partie de l'historique.
 `gitpoulpi worktree changes <path>` liste les modifications non commitées d'un
 worktree. `gitpoulpi worktree remove <path> [--force] [--commit-message M
 [--commit-branch B]] [--stash-message M] [--delete-branch]` le retire ; les
-outils MCP sont `worktree_changes` et `worktree_remove`. Voir la
-[référence de la CLI](cli-reference.md).
+outils MCP sont `worktree_changes` et `worktree_remove`. `gitpoulpi ai
+worktree-name --describe "<tâche>"` affiche le nom de worktree et le nom de branche
+que l'IA propose (`{ name, worktree, branch }`) sans rien créer ; l'outil MCP est
+`ai_worktree_name`. Voir la [référence de la CLI](cli-reference.md).

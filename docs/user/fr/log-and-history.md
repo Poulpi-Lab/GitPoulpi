@@ -184,14 +184,14 @@ Sur un commit sans ref, survoler sa ligne affiche aussi, dans la colonne Ref, un
 
 **Remotes.** Le `+` dans le titre DISTANTES en ajoute un ; clic droit sur le nom
 d'un remote pour le fetcher, copier son lien web, en faire le remote par défaut,
-le masquer du graphe, modifier ses URL ou le retirer. **Masquer un remote** (l'œil
+le masquer du graphe, modifier ses URL ou le retirer. **Masquer un remote** (le ⊙
 de sa ligne, l'entrée de menu *Masquer le distant du graphe*, ou `Distant : Masquer
 le distant du graphe...` dans la palette) masque toutes les branches qu'il a ou
 aura, et les commits que seul lui atteint quittent le Log : le moyen de parcourir
 un historique sans celui d'un remote d'archive sans rapport, et de le ramener avec
 *Afficher le distant dans le graphe*. Afficher un remote affiche aussi ses branches
 qui avaient été masquées une par une. Une branche d'un remote masqué le dit sur la
-ligne d'état si l'on clique son œil : affichez d'abord le remote.
+ligne d'état si l'on clique son ⊙ : affichez d'abord le remote.
 
 **Stashes.** **Stash** fait un stash de tout (fichiers non suivis compris) ;
 `Ctrl+G m` demande d'abord un message (avec l'IA activée, `Ctrl+G` dans cette

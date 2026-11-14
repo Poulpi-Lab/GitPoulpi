@@ -643,3 +643,62 @@ pub(crate) fn open_for_layout(which: usize) {
         }
     }
 }
+
+/// Only a plain push (or a skipped twin) runs without a decision; a pull
+/// takes fast-forwards and, unless the mode is fast-forward only, merges.
+#[test]
+fn only_plain_rows_run_unattended() {
+    let _s = serial();
+    let view = PlanView::from_plan(three_ready(), false);
+    assert!(view.unattended());
+    let diverged = plan_of(vec![
+        planned(
+            "origin",
+            RemoteRelation::LocalAhead(1),
+            A::Push,
+            &[A::Push, A::Skip],
+        ),
+        planned(
+            "gitlab",
+            RemoteRelation::Diverged { ahead: 1, behind: 1 },
+            A::MergeFrom,
+            &[A::MergeFrom, A::Skip],
+        ),
+    ]);
+    assert!(!PlanView::from_plan(diverged, false).unattended());
+    let mut twin = planned("gitlab", RemoteRelation::UpToDate, A::Skip, &[A::Skip]);
+    twin.same_url_as = Some("origin".into());
+    let with_twin = plan_of(vec![
+        planned(
+            "origin",
+            RemoteRelation::LocalAhead(1),
+            A::Push,
+            &[A::Push, A::Skip],
+        ),
+        twin,
+    ]);
+    assert!(PlanView::from_plan(with_twin, false).unattended());
+    let mut unreachable = planned("origin", RemoteRelation::LocalAhead(1), A::Skip, &[A::Skip]);
+    unreachable.error = Some("no route".into());
+    assert!(!PlanView::from_plan(plan_of(vec![unreachable]), false).unattended());
+
+    let mut pull = plan_of(vec![
+        planned(
+            "origin",
+            RemoteRelation::RemoteAhead(1),
+            A::FastForwardFrom,
+            &[A::FastForwardFrom, A::Skip],
+        ),
+        planned(
+            "gitlab",
+            RemoteRelation::Diverged { ahead: 1, behind: 1 },
+            A::MergeFrom,
+            &[A::MergeFrom, A::RebaseOnto, A::Skip],
+        ),
+    ]);
+    pull.mode = GroupMode::Pull;
+    let mut view = PlanView::from_plan(pull, false);
+    assert!(view.unattended(), "merge and fast-forward are plain pulls");
+    view.ff_only = true;
+    assert!(!view.unattended(), "ff-only never merges by itself");
+}

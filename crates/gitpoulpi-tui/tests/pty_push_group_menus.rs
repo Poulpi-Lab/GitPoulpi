@@ -258,3 +258,35 @@ fn the_palette_continue_abort_and_retry_are_grayed_out_without_a_waiting_group()
             .unwrap_or_else(|e| panic!("{e}"));
     }
 }
+
+/// A one-remote push of a branch with targets that the remote refuses
+/// (non-fast-forward) opens the push group dialog with the remote's merge
+/// default, not the single-remote "has diverged" menu.
+#[test]
+fn a_rejected_push_of_a_branch_with_targets_opens_the_push_group_dialog() {
+    let repo = fixture(true);
+    repo.push_from_elsewhere_to("gitlab", "feature", "gitlab moved");
+    let mut term = launch(&repo, "pty-push-menus-rejected");
+    let screen = term.screen();
+    let (c, r) = push_arrow(&screen);
+    term.click(c, r).unwrap();
+    let menu = term
+        .wait_for("the Push dropdown", STEP, |s| {
+            s.contains("Push to gitlab only")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let (c, r) = item(&menu, "Push to gitlab only");
+    term.click(c + 3, r).unwrap();
+    let plan = term
+        .wait_for("the plan with gitlab's merge default", STEP, |s| {
+            s.contains("Push feature to 3 remotes")
+                && s.contains("Merge from gitlab")
+                && !s.contains("Asking the remotes")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(
+        !plan.contains("Pull (merge), then push"),
+        "the single-remote diverged menu is not shown:\n{}",
+        plan.text()
+    );
+}

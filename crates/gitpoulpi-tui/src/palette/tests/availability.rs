@@ -413,3 +413,58 @@ fn only_the_app_wide_commands_work_over_the_settings_screen() {
         Some(gitpoulpi_i18n::msg::palette::WHY_CLOSE_SETTINGS_FIRST.get())
     );
 }
+
+/// The grouped push's keyboard twins follow the saved or last run: Show
+/// needs a run, Continue a paused one whose conflicts are concluded, Abort a
+/// paused one, Retry a finished one with something to retry.
+#[test]
+fn the_grouped_push_commands_follow_the_pending_group() {
+    use crate::push_group_ui::GroupState;
+    let base = PaletteContext {
+        has_remotes: true,
+        ..PaletteContext::default()
+    };
+    let with = |group: GroupState| PaletteContext { group, ..base };
+    let none = GroupState::default();
+    for c in [
+        PaletteCommand::ShowGroupedPush,
+        PaletteCommand::ContinueGroupedPush,
+        PaletteCommand::AbortGroupedPush,
+        PaletteCommand::RetryFailedPushes,
+    ] {
+        assert!(unavailable_reason(c, with(none)).is_some(), "{c:?}");
+    }
+    let paused = GroupState {
+        run: true,
+        paused: true,
+        ready: false,
+        retry: false,
+    };
+    assert_eq!(
+        unavailable_reason(PaletteCommand::ShowGroupedPush, with(paused)),
+        None
+    );
+    assert_eq!(
+        unavailable_reason(PaletteCommand::AbortGroupedPush, with(paused)),
+        None
+    );
+    assert!(unavailable_reason(PaletteCommand::ContinueGroupedPush, with(paused)).is_some());
+    let ready = GroupState {
+        ready: true,
+        ..paused
+    };
+    assert_eq!(
+        unavailable_reason(PaletteCommand::ContinueGroupedPush, with(ready)),
+        None
+    );
+    let failed = GroupState {
+        run: true,
+        retry: true,
+        ..none
+    };
+    assert_eq!(
+        unavailable_reason(PaletteCommand::RetryFailedPushes, with(failed)),
+        None
+    );
+    assert!(unavailable_reason(PaletteCommand::AbortGroupedPush, with(failed)).is_some());
+}

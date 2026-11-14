@@ -95,7 +95,7 @@ commit에 연결됨). stash는 만들어진 commit 옆의 레인 위에 작은 �
 | merge, rebase 위로 | 이 ref를 체크아웃된 브랜치에 merge하거나, 체크아웃된 브랜치를 이 ref 위로 rebase합니다 |
 | `<branch>`을(를) `<current>`(으)로 fast-forward / `<current>`을(를) `<branch>`(으)로 fast-forward | fast-forward가 가능할 때 브랜치를 앞으로 옮깁니다. 아니면 이유와 함께 회색이 됩니다(`갈라졌으므로 fast-forward 불가`) |
 | worktree 만들기... | 연결된 워크트리를 자체 탭에서 엽니다 |
-| pull, push, fetch, 업스트림 설정... | 해당 브랜치에 대한 네트워크 작업 |
+| pull, push, fetch, <branch>의 리모트... | 해당 브랜치에 대한 네트워크 작업(<branch>의 리모트...는 업스트림을 설정하며, 리모트마다 Push와 함께 Pull 체크박스도 있음) |
 | 그래프에서 숨기기 / 표시, 솔로 | 표시만 바꿉니다. 저장소는 건드리지 않고 ref를 숨기거나 솔로합니다(숨기면 그 ref만 닿는 commit도 빠집니다) |
 | 이름 변경, 삭제 | 삭제는 먼저 확인합니다. 대응하는 리모트 브랜치도 함께 삭제할 수 있습니다 |
 | 브랜치 이름 복사, 리모트의 브랜치 링크 복사 | 클립보드로 복사 |

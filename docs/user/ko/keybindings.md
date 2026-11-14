@@ -641,16 +641,16 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Git: Pull 옵션... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: 리모트로 Push... |  |
-| Git: Push to Selected Remotes... |  |
-| Git: Push to All Targets |  |
-| Git: Pull from All Sources |  |
-| Git: Pull from One Remote... |  |
-| Git: Show Grouped Push |  |
-| Git: Continue Grouped Push |  |
-| Git: Abort Grouped Push |  |
-| Git: Retry Failed Pushes |  |
+| Git: 선택한 리모트로 Push... |  |
+| Git: 모든 대상으로 Push |  |
+| Git: 모든 소스에서 Pull |  |
+| Git: 리모트 하나에서 Pull... |  |
+| Git: 그룹 Push 보기 |  |
+| Git: 그룹 Push 계속 |  |
+| Git: 그룹 Push 중단 |  |
+| Git: 실패한 Push 재시도 |  |
 | Git: 강제 Push (lease 사용)... |  |
-| Git: Remotes of Branch... |  |
+| Git: 브랜치의 리모트... |  |
 | 리모트: 리모트 추가... |  |
 | 리모트: 리모트 제거... |  |
 | 리모트: 리모트 편집... |  |

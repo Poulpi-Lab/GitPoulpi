@@ -116,7 +116,7 @@ girdiler:
 | Merge, Rebase üstüne | Checkout yapılmış dalı bu ref'e merge eder veya bu ref'in üstüne rebase eder |
 | Fast-forward: `<dal>` → `<geçerli>` / `<geçerli>` → `<dal>` | Bu bir fast-forward ise bir dalı ileri taşır; değilse nedeniyle birlikte grileşir (`ayrışmış, fast-forward değil`) |
 | Worktree oluştur: ... | Bağlı bir worktree'yi kendi sekmesinde açar |
-| Pull, Push, Fetch, upstream'i ayarla... | O dal üzerinde ağ işlemleri |
+| Pull, Push, Fetch, <dal> dalının uzak depoları... | O dal üzerinde ağ işlemleri (<dal> dalının uzak depoları... upstream'i ayarlar, ayrıca her uzak depo için bir Push ve bir Pull da onay kutusu sunar) |
 | Grafikte gizle / göster, Solo | Yalnızca görüntü; depoya dokunmadan bir ref'i gizler (gizlemek yalnızca o ref'in ulaştığı commit'leri de çıkarır) veya solo yapar |
 | Adını değiştir, Sil | Sil önce sorar; uzak karşılığı da silinebilir |
 | Dal adını kopyala, Uzak depodaki dal bağlantısını kopyala | Panoya |

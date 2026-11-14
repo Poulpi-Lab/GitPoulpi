@@ -72,7 +72,11 @@ başvuru sayfalarına atlayın.
     tmux, zellij, screen, herdr ve terminal panellerinden nelerin geçtiği:
     **[Çoklayıcılar](multiplexers.md)**.
 
-Ayrıca: **[Dal iş akışları](branching-workflows.md)**, Git Flow, GitHub Flow, GitLab
+Ayrıca: **[Bir dal için birden çok uzak depo](multiple-remotes.md)**: push hedefleri ve pull kaynakları,
+Uzak depolar penceresi, tüm uzak depolara veya seçililere Push, ilerleyen bir uzak depoyu çözme, çakışmadan sonra
+Devam, CLI ve düz git takma adı.
+
+**[Dal iş akışları](branching-workflows.md)**, Git Flow, GitHub Flow, GitLab
 Flow ve Trunk-based hazır şablonları veya kendi temel dallarınız, dal adı desenleri
 ve konu türleri (`gitpoulpi flow ...`).
 

@@ -469,9 +469,11 @@ commit 图如何绘制，以及 Log 加载多少个 commit。图配色位于 **�
 | **Git 后端** | `git2`（libgit2，默认）或 `system`（你已安装的 `git`）。全局。对更改之后启动的守护进程生效。 |
 | **Pull 按钮** | Pull 按钮的行为：merge（可能时快进）、仅快进，或 rebase。全局。`▾` 菜单中的各项不会改变它。 |
 | **Push 按钮** | **直接** 立即 push；**询问** 先显示远程菜单。全局。 |
+| **push 前检查每个远程** | 默认开启（`git.push_group_preflight`）。在 push 有额外 push 目标的分支之前，先查看每个远程（一次快速查询，仅当该远程有差异时才从中下载），这样第三个远程上的问题会在第一次 push 开始之前就显示出来。关闭后：依次向每个远程 push，并报告结果。全局。 |
 | **Merge fast-forward** | 当分支本可直接 fast-forward 时，你发起的 merge 怎么做：**never**（默认）始终生成 merge commit，**allowed** 可能时 fast-forward（git 自己的默认行为），**only** 只 fast-forward，否则拒绝。全局（`git.merge_fast_forward`）；仓库可在其 [Merge 选项](#仓库专属merge-选项)页中覆盖它。 |
 | **默认编码** | 用于显示 **不是有效 UTF-8** 的文本的编码：文件内容、blame、diff 和 commit 消息。该页有一个全局行和一个此仓库的行；仓库行优先。有效的 UTF-8 绝不会被重新解码，stage 也绝不会重新编码任何内容。 |
 | **core.autocrlf**、**core.eol** | 此仓库自己的 git 设置。该行会把 `core.autocrlf` 或 `core.eol` 写入仓库的 git 配置。**（继承）** 会移除仓库的值，于是你的全局 git 配置生效。`Ctrl+Z` 恢复之前的值。对应的 CLI 命令是 `gitpoulpi repo-config`。 |
+| **新分支的额外 push 目标** | 仅限此仓库：在这个标题下，仓库的每个远程各有一个复选框。勾选的远程会成为每个新分支的额外 push 目标（除其 upstream 之外），时间点是该分支首次获得 upstream 时（首次设置它的 push，或从远程分支创建的分支）。这个选择会复制到分支自己的 `gitpoulpi-push-to` 键中，所以已存在的分支不会改变：请在它们 Refs 行的 **远程** 徽标上（或在该行按 `u`）编辑。保存在仓库的数据中（`repo-state.toml` 里的 `default_push_targets`）。 |
 | **Git LFS** | 在界面中显示 Git LFS。参见 [Git LFS](lfs.md)。 |
 | **在 pull 和 push 之前安装 LFS 过滤器** | 在 pull 或 push 之前，当仓库使用 LFS 而其过滤器缺失时，运行 `git lfs install --local`。 |
 | **git-lfs 程序** | 检测到的 `git-lfs` 程序（只读）。 |

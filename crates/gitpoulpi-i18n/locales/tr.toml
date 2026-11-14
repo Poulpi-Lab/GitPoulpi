@@ -634,11 +634,11 @@ inherited = "(devralınan)"
 lfs_not_checked = "(henüz denetlenmedi)"
 lfs_autofix_filters = "{$pull} ve {$push} öncesinde LFS filtrelerini kur"
 lfs_autofix_filters_help = "Git LFS kullanan bir depoda {$pull} veya {$push} öncesinde LFS filtreleri ya da hook'lar eksikse `git lfs install --local` çalıştırır (yalnızca deponun kendi yapılandırması, asla genel olan değil); böylece aktarım büyük dosyaları işler. Durum çubuğu bunu bildirir. git-lfs gerekir."
-push_group_preflight = "Check every remote before a {$push}"
-push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
-default_push_targets = "Extra {$push} targets for new branches"
-default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
-default_push_targets_none = "(no remote configured)"
+push_group_preflight = "Her uzak depoyu {$push_noun} öncesinde denetle"
+push_group_preflight_help = "Ek {$push} hedefleri olan bir dalı {$push_noun} öncesinde önce her uzak depoya bakılır (hızlı bir sorgu; o uzak depodan indirme yalnızca farklıysa yapılır), böylece üçüncü uzak depodaki bir sorun ilk {$push_noun} başlamadan görünür. Kapalıyken her uzak depoya sırayla {$push} yapılır ve olanlar bildirilir."
+default_push_targets = "Yeni dallar için ek {$push} hedefleri"
+default_push_targets_help = "Yalnızca bu depo için. Yeni bir dalın upstream'inin yanında {$push} yaptığı uzak depoları işaretleyin. Dal ilk kez bir upstream aldığında (bunu ayarlayan ilk {$push_noun} veya bir uzak daldan oluşturulan dal) dala kopyalanırlar. Var olan dallar değişmez: onları dalın Uzak depolar penceresinden değiştirin."
+default_push_targets_none = "(yapılandırılmış uzak depo yok)"
 
 [settings_screen]
 title = "Ayarlar - Tab: bölümler/ayarlar │ Enter: değiştir"
@@ -884,7 +884,7 @@ push_branch = "{$Push}: {name}"
 start_pr = "{name} dalından {$pr} başlat..."
 fetch = "{$Fetch}"
 # context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
-remotes_of = "Remotes of {name}..."
+remotes_of = "{name} dalının uzak depoları..."
 rename = "{name} adını değiştir..."
 delete = "Sil: {name}..."
 delete_both = "Sil: {first} ve {second}..."
@@ -2208,23 +2208,23 @@ host_not_recognized = "uzak depo barındırıcısı tanınmadı"
 link_branch = "dalın bağlantısı"
 link_commit = "commit'in bağlantısı"
 # context: menu row of the Push dropdown: push the branch to its upstream and every extra push target; {remotes} lists them, comma separated
-push_to_all = "{$Push} to all ({remotes})"
+push_to_all = "{$Push}: tümüne ({remotes})"
 # context: menu row: push the branch to one remote only; {remote} is that remote
-push_to_only = "{$Push} to {remote} only"
+push_to_only = "{$Push}: yalnızca {remote}"
 # context: menu row: opens the dialog where the remotes of this one push are ticked
-push_to_selected = "{$Push} to selected remotes..."
+push_to_selected = "{$Push}: seçili uzak depolara..."
 # context: menu row of the Push dropdown that opens the dialog of the remotes a branch pushes to and pulls from; {branch} is the branch
-remotes_of = "Remotes of {branch}..."
+remotes_of = "{branch} dalının uzak depoları..."
 # context: menu row of the Pull dropdown: pull the upstream and every extra pull source; {remotes} lists them, joined with +
-pull_from_all = "{$Pull} from all sources ({remotes})"
+pull_from_all = "{$Pull}: tüm kaynaklardan ({remotes})"
 # context: menu row: pull from one remote only, once; {remote} is that remote
-pull_from_only = "{$Pull} from {remote} only"
+pull_from_only = "{$Pull}: yalnızca {remote}"
 # context: status line while a push to several remotes starts; {branch} is the branch, {remotes} the remote names
-pushing_to_all = { git = "pushing {branch} to {remotes}...", local = "pushing {branch} to {remotes}..." }
+pushing_to_all = { git = "{branch} dalı {remotes} uzak depolarına push ediliyor...", local = "{branch} dalı {remotes} uzak depolarına gönderiliyor..." }
 # context: status line while a pull from several remotes starts; {branch} is the branch, {remotes} the remote names
-pulling_from_all = { git = "pulling {branch} from {remotes}...", local = "pulling {branch} from {remotes}..." }
+pulling_from_all = { git = "{branch} dalı {remotes} uzak depolarından pull ediliyor...", local = "{branch} dalı {remotes} uzak depolarından çekiliyor..." }
 # context: status line: the branch has no remote to pull from; {branch} is the branch
-no_pull_remote = "{branch} has no remote to {$pull} from"
+no_pull_remote = "{branch} dalının {$pull} yapılacak bir uzak deposu yok"
 
 [keymap_action]
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
@@ -2555,7 +2555,7 @@ log_columns_fit_all = "Tüm Sütunları İçeriğe Sığdır"
 log_scroll_left = "Sütunları Sola Kaydır"
 log_scroll_right = "Sütunları Sağa Kaydır"
 log_columns_layout = "Yana Kaydır veya Bölmeye Sığdır"
-refs_remotes = "Branch: Edit its Remotes"
+refs_remotes = "Dal: Uzak Depolarını Düzenle"
 
 
 [keymap_ctx]
@@ -3145,8 +3145,8 @@ git_pull_options = { git = "Git: Pull Seçenekleri...", local = "Git: Çekme Se�
 git_push = { git = "Git: Push", local = "Git: Gönder" }
 git_push_to_remote = { git = "Git: Uzak Depoya Push Et...", local = "Git: Uzak Depoya Gönder..." }
 git_force_push_with_lease = { git = "Git: Force Push (lease ile)...", local = "Git: Zorla Gönder (lease ile)..." }
-git_remotes_of_branch = "Git: Remotes of Branch..."
-git_push_to_selected_remotes = "Git: {$Push} to Selected Remotes..."
+git_remotes_of_branch = "Git: Dalın Uzak Depoları..."
+git_push_to_selected_remotes = "Git: {$Push} Seçili Uzak Depolara..."
 remote_add_remote = "Remote: Uzak Depo Ekle..."
 remote_remove_remote = "Remote: Uzak Depoyu Kaldır..."
 remote_edit_remote = "Remote: Uzak Depoyu Düzenle..."
@@ -3654,27 +3654,27 @@ view_log_scroll_left = "Görünüm: Log: Sütunları Sola Kaydır"
 view_log_scroll_right = "Görünüm: Log: Sütunları Sağa Kaydır"
 view_log_columns_layout = "Görünüm: Log: Sütunlar için Yana Kaydırmayı Aç/Kapat"
 # context: palette command: push to the upstream and every extra push target
-git_push_to_all_targets = "Git: {$Push} to All Targets"
+git_push_to_all_targets = "Git: {$Push} Tüm Hedeflere"
 # context: palette command: pull the upstream and every extra pull source
-git_pull_from_all_sources = "Git: {$Pull} from All Sources"
+git_pull_from_all_sources = "Git: {$Pull} Tüm Kaynaklardan"
 # context: palette command: opens a list of remotes, pulls from the chosen one once
-git_pull_from_one_remote = "Git: {$Pull} from One Remote..."
+git_pull_from_one_remote = "Git: {$Pull} Tek Bir Uzak Depodan..."
 # context: palette command: reopens the progress window of the last push to several remotes
-git_show_grouped_push = "Git: Show Grouped {$Push}"
+git_show_grouped_push = "Git: Toplu {$Push} İşlemini Göster"
 # context: palette command: goes on with the push to several remotes that paused on conflicts
-git_continue_grouped_push = "Git: Continue Grouped {$Push}"
+git_continue_grouped_push = "Git: Toplu {$Push} İşlemine Devam Et"
 # context: palette command: abandons the push to several remotes that paused on conflicts
-git_abort_grouped_push = "Git: Abort Grouped {$Push}"
+git_abort_grouped_push = "Git: Toplu {$Push} İşlemini İptal Et"
 # context: palette command: tries again the remotes that failed in the last push to several remotes
-git_retry_failed_pushes = "Git: Retry Failed Pushes"
+git_retry_failed_pushes = "Git: Başarısız {$Push} İşlemlerini Yeniden Dene"
 # context: palette: why a command is grayed out
-why_no_grouped_push = "there is no grouped {$push} to show"
+why_no_grouped_push = "gösterilecek toplu {$push} işlemi yok"
 # context: palette: why a command is grayed out
-why_group_not_paused = "no grouped {$push} is waiting on conflicts"
+why_group_not_paused = "çakışmaları bekleyen toplu {$push} işlemi yok"
 # context: palette: why Continue is grayed out
-why_group_not_ready = "resolve and conclude the conflicts first"
+why_group_not_ready = "önce çakışmaları çözün ve tamamlayın"
 # context: palette: why a command is grayed out
-why_nothing_to_retry = "no remote failed in the last grouped {$push}"
+why_nothing_to_retry = "son toplu {$push} işleminde başarısız olan uzak depo yok"
 
 [help_section]
 rewrite = "Geçmişi yeniden yaz"
@@ -4084,7 +4084,7 @@ rewrite_9 = "Boyut sekmesini açar ve geçmişi analiz eder: en büyük dosyalar
 rewrite_host_howto = { git = "yeniden yazılan geçmişin barındırıcının koruduğu bir daldan nasıl geçirileceğini açıklar: korumayı kaldırın, yeni bir adla push edin veya depoyu yeniden oluşturun; sizin yerinize hiçbir şey yapılmaz", local = "yeniden yazılan geçmişin barındırıcının koruduğu bir daldan nasıl geçirileceğini açıklar: korumayı kaldırın, yeni bir adla gönderin veya depoyu yeniden oluşturun; sizin yerinize hiçbir şey yapılmaz" }
 rewrite_ai_rules = "açıklamanızdan YZ ile yeniden yazma kurallarını oluşturur (hiçbir şey önizlenmez veya uygulanmaz)"
 log_columns_2 = "sütunlar genişliklerini koruyorsa Log'un sütunlarını yana kaydır (sütun seçicide, Ayarlar'da ya da bir sütun seçiliyken s ile seçilen Yana kaydır düzeni); sığdırma düzeninde her sütun bölmeye sığar"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "seçili yerel dalın uzak depolarını (upstream'ini ve ek {$push} hedeflerini) düzenler: satırındaki uzak depo rozetine tıklamanın klavye karşılığı"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} veya sağ tık"
@@ -5518,7 +5518,7 @@ no_longer = "{path} artık bir alt modül değil"
 [combo]
 type_to_search = "aramak için yaz"
 # context: placeholder of the search line of a dropdown that also accepts typed text
-type_to_use_own = "type your own value"
+type_to_use_own = "kendi değerinizi yazın"
 loading = "yükleniyor..."
 no_match = "eşleşme yok"
 use_value = "\"{value}\" kullan"
@@ -5846,11 +5846,11 @@ palette_create_desktop = "Başlatıcı: Masaüstü Kısayolu Oluştur"
 palette_remove = "Başlatıcı: Kısayolları Kaldır"
 icons_updated = "başlatıcı kısayolları güncellendi"
 alias = "Komut takma adı"
-alias_help = "GitPoulpi'yi terminalden başlatan kısa komut, örneğin gp. Yalnızca harf, rakam, - _ ve . kullanılabilir. Aynı adlı bir kabuk takma adı veya işlevi bunun önüne geçer ve buradan görülemez (oh-my-zsh gp'yi kendisi tanımlar)."
+alias_help = "GitPoulpi'yi terminalden başlatan kısa komut, örneğin gp. Kendi adınızı kullanmak için listeye istediğiniz adı yazın. Yalnızca harf, rakam, - _ ve . kullanılabilir. Aynı adlı bir kabuk takma adı veya işlevi bunun önüne geçer ve buradan görülemez (oh-my-zsh gp'yi kendisi tanımlar)."
 alias_none = "Yok"
 alias_status = "Takma ad durumu"
 alias_add = "Yeni sekme takma adı"
-alias_add_help = "Zaten çalışan GitPoulpi'de geçerli klasörü yeni sekme olarak açan (gitpoulpi --add), yenisini başlatmayan ikinci bir kısa komut, örneğin gpa. Hiçbiri çalışmıyorsa GitPoulpi'yi her zamanki gibi başlatır. Oluştur, bunu yukarıdaki komut takma adıyla birlikte oluşturur. Ad kuralları aynıdır."
+alias_add_help = "Zaten çalışan GitPoulpi'de geçerli klasörü yeni sekme olarak açan (gitpoulpi --add), yenisini başlatmayan ikinci bir kısa komut, örneğin gpa. Hiçbiri çalışmıyorsa GitPoulpi'yi her zamanki gibi başlatır. Oluştur, bunu yukarıdaki komut takma adıyla birlikte oluşturur. Kendi adınızı kullanmak için listeye istediğiniz adı yazın. Ad kuralları aynıdır."
 alias_add_status = "Yeni sekme durumu"
 alias_set_name = "yukarıya bir ad yazın"
 alias_bad_space = "adda boşluk var"
@@ -6505,7 +6505,7 @@ branch_rename = "{old} dalının adını {new} yap"
 upstream_set = "{branch} dalının upstream'ini {upstream} yap"
 upstream_unset = "{branch} dalının upstream'ini kaldır"
 # context: undo history row: the push targets and pull sources of a branch were changed; {branch} is the local branch
-remotes_set = "Set remotes of {branch}"
+remotes_set = "{branch} dalının uzak depoları ayarlandı"
 config_set = "{key} değerini {value} yap"
 config_unset = "{key} ayarını kaldır"
 sparse_set = "Kısmi checkout'u ayarla"
@@ -9510,229 +9510,229 @@ none = "bu mesajda bağlantı yok"
 
 [branch_remotes]
 # context: title of the dialog that lists every remote a branch pushes to and pulls from; {branch} is the local branch
-title = "Remotes of {branch}"
+title = "{branch} dalının uzak depoları"
 # context: label before the list that picks the upstream (the remote branch the local branch tracks)
 upstream_label = "Upstream"
 # context: table heading: a configured remote's name
-col_remote = "Remote"
+col_remote = "Uzak depo"
 # context: table heading: the branch's name on that remote
-col_branch = "Branch"
+col_branch = "Dal"
 # context: table heading over a checkbox: the branch is also pushed to that remote
 col_push = "{$Push}"
 # context: table heading over a checkbox: a pull also takes the new commits of that remote
-col_pull = "{$Pull} too"
+col_pull = "{$Pull} da"
 # context: table heading: how the local branch stands against that remote (ahead, behind, in sync)
-col_state = "State"
+col_state = "Durum"
 # context: cell in the Pull too column of the upstream's own row: the upstream is always pulled
 pull_upstream = "upstream"
 # context: state cell: the remote's copy and the local branch are the same commit
-state_in_sync = "in sync"
+state_in_sync = "eşit"
 # context: state cell: the remote has no copy of the branch yet
-state_new = "new"
+state_new = "yeni"
 # context: state cell: the remote's copy shares no history with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "ilgisiz"
 # context: state cell of a remote that is not used by the branch
 state_none = "-"
 # context: row of a remote the branch still mentions but the repository no longer has
-gone = "remote gone"
+gone = "uzak depo yok"
 # context: button on a gone row: forget that remote for this branch
-remove_button = "Remove"
+remove_button = "Kaldır"
 # context: warning under the table; {first} and {second} are two remote names with the same address
-same_url = "{first} and {second} {$push} to the same URL."
+same_url = "{first} ve {second} aynı URL'ye {$push} yapıyor."
 # context: button: changes the branch name used on the selected remote
-rename_button = "Rename on remote..."
+rename_button = "Uzakta yeniden adlandır..."
 # context: button: the branch tracks no upstream any more
-unset_button = "Unset upstream"
+unset_button = "Upstream'i kaldır"
 # context: primary button of the dialog
-apply_button = "Apply"
+apply_button = "Uygula"
 # context: shown while the dialog reads the branch's remotes
-loading = "Reading the remotes..."
+loading = "Uzak depolar okunuyor..."
 # context: title of the small dialog that asks for the branch's name on one remote; {remote} is the remote
-rename_title = "Branch name on {remote}"
+rename_title = "{remote} üzerindeki dal adı"
 # context: placeholder of that dialog's field
-rename_placeholder = "Branch name on the remote"
+rename_placeholder = "Uzak depodaki dal adı"
 # context: primary button of that dialog
-rename_set = "Set"
+rename_set = "Ayarla"
 # context: inline error of that dialog when the field is empty
-rename_empty = "Type a branch name."
+rename_empty = "Bir dal adı yazın."
 # context: inline error when Rename is used on the upstream's own row
-rename_upstream_row = "The upstream's branch name is chosen in the list above."
+rename_upstream_row = "Upstream'in dal adı yukarıdaki listeden seçilir."
 # context: inline error when Rename is used with nothing to rename
-rename_no_row = "Select a remote's row first."
+rename_no_row = "Önce bir uzak depo satırı seçin."
 # context: key hints under the table; keep the key names (Space, p, r, Del, Enter)
-keys_hint = "Space {$Push}, p {$Pull} too, r Rename, Del Remove, Enter Apply"
+keys_hint = "Space {$Push}, p {$Pull} da, r Yeniden adlandır, Del Kaldır, Enter Uygula"
 # context: status line while the change is sent; {branch} is the local branch
-applying = "setting the remotes of {branch}..."
+applying = "{branch} dalının uzak depoları ayarlanıyor..."
 # context: status line once the daemon applied the change; {branch} is the local branch
-remotes_set = "remotes of {branch} updated"
+remotes_set = "{branch} dalının uzak depoları güncellendi"
 
 [push_group]
 # context: title of the dialog that asks which remotes to push a branch to (one push only); {branch} is the local branch
-title_select = "{$Push} {branch} to selected remotes"
+title_select = "{$Push}: {branch} → seçili uzak depolar"
 # context: title of the dialog that shows how a branch stands against each remote before a grouped push; {n} is the number of remotes, {branch} the local branch
-title_plan = { one = "{$Push} {branch} to {n} remote", other = "{$Push} {branch} to {n} remotes" }
+title_plan = { one = "{$Push}: {branch} → {n} uzak depo", other = "{$Push}: {branch} → {n} uzak depo" }
 # context: title of the dialog while a grouped push runs or after it ended; {branch} is the local branch
-title_run = "{$Push} {branch}"
+title_run = "{$Push}: {branch}"
 # context: line under the title; {branch} is the local branch, {sha} the short id of its tip
-local_at = "Local {branch} at {sha}"
+local_at = "Yerel {branch} dalı, {sha} üzerinde"
 # context: help line over the list of remotes to push to
-select_hint = "Pick the remotes this {$push} goes to. Nothing is saved unless you tick Remember."
+select_hint = "Bu {$push_noun} işleminin gideceği uzak depoları seçin. Anımsa'yı işaretlemedikçe hiçbir şey kaydedilmez."
 # context: checkbox: store the picked remotes as the branch's push targets
-remember = "Remember for this branch"
+remember = "Bu dal için anımsa"
 # context: shown under the list when no remote is ticked
-select_none = "Tick at least one remote."
+select_none = "En az bir uzak depo işaretleyin."
 # context: shown while the daemon asks the remotes about the branch
-loading = "Asking the remotes..."
+loading = "Uzak depolara soruluyor..."
 # context: table heading: the remote's name
-col_remote = "Remote"
+col_remote = "Uzak depo"
 # context: table heading: how the local branch stands against the remote
-col_state = "State"
+col_state = "Durum"
 # context: table heading: what the run does with that remote
-col_action = "Action"
+col_action = "Eylem"
 # context: state of a remote that already has the same commit
-state_up_to_date = "up to date"
+state_up_to_date = "güncel"
 # context: state of a remote that only misses local commits
-state_ready = "ready"
+state_ready = "hazır"
 # context: state of a remote that has no copy of the branch yet
-state_new = "new"
+state_new = "yeni"
 # context: state of a remote that has commits the local branch lacks
-state_behind = "behind"
+state_behind = "geride"
 # context: state of a remote whose history and the local branch's both moved
-state_diverged = "diverged"
+state_diverged = "ayrışmış"
 # context: state of a remote whose commits are older copies of rebased or amended local commits
-state_rewritten = "rewritten"
+state_rewritten = "yeniden yazılmış"
 # context: state of a remote whose history shares nothing with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "ilgisiz"
 # context: state of a remote whose host refused the branch earlier (protected branch)
-state_refused = "refused"
+state_refused = "reddedildi"
 # context: state of a remote that could not be asked
-state_unreachable = "not reachable"
+state_unreachable = "ulaşılamıyor"
 # context: state of a remote that is no longer configured
-state_missing = "gone"
+state_missing = "yok"
 # context: note on a remote that points at the same repository as an earlier row; {other} is that earlier remote
-same_as = "same repository as {other}"
+same_as = "{other} ile aynı depo"
 # context: action: send the local commits to the remote
 action_push = "{$Push}"
 # context: action: move the local branch forward to the remote's commit; {remote} is the remote
-action_fast_forward = "Fast-forward from {remote}"
+action_fast_forward = "{remote} üzerinden fast-forward"
 # context: action: combine the remote's commits into the local branch, then send; {remote} is the remote
-action_merge = "{$Merge} from {remote}"
+action_merge = "{$Merge}: {remote}"
 # context: action: replay the local commits on top of the remote's, then send; {remote} is the remote
-action_rebase = "{$Rebase} onto {remote}"
+action_rebase = "{$Rebase}: {remote} üzerine"
 # context: action: overwrite the remote's branch, refused if it moved since the plan
-action_force = "Force {$push} (lease)"
+action_force = "Zorla {$push} (lease)"
 # context: action: leave this remote out
-action_skip = "Skip"
+action_skip = "Atla"
 # context: line under a row whose merge would conflict; {n} is the number of files, {files} their names
-conflicts = { one = "{$merge} would conflict in {n} file: {files}", other = "{$merge} would conflict in {n} files: {files}" }
+conflicts = { one = "{$merge} {n} dosyada çakışır: {files}", other = "{$merge} {n} dosyada çakışır: {files}" }
 # context: checkbox: also send the tags that no remote has yet
-tags = "Also {$push} the {$tags} not sent yet"
+tags = "Henüz gönderilmemiş {$tags} da {$push} et"
 # context: summary line under the table; {steps} is the list of steps
-then_line = "Then: {steps}."
+then_line = "Sonra: {steps}."
 # context: summary line when every row is skipped or already up to date
-then_nothing = "Then: nothing to do."
+then_nothing = "Sonra: yapılacak bir şey yok."
 # context: separator between steps in the summary line
 then_join = ", "
 # context: step of the summary line; {remote} is the remote
-step_fast_forward = "fast-forward from {remote}"
+step_fast_forward = "{remote} üzerinden fast-forward"
 # context: step of the summary line; {remote} is the remote
-step_merge = "{$merge} {remote}"
+step_merge = "{$merge}: {remote}"
 # context: step of the summary line; {remote} is the remote
-step_rebase = "{$rebase} onto {remote}"
+step_rebase = "{$rebase}: {remote} üzerine"
 # context: step of the summary line; {n} is the number of remotes
-step_push = { one = "{$push} to {n} remote", other = "{$push} to {n} remotes" }
+step_push = { one = "{n} uzak depoya {$push}", other = "{n} uzak depoya {$push}" }
 # context: warning under the summary when a row force-pushes; {n} is the number of commits that disappear, {remote} the remote
-force_note = { one = "Force {$push} replaces {n} {$commit} on {remote}.", other = "Force {$push} replaces {n} {$commits} on {remote}." }
+force_note = { one = "Zorla {$push}, {remote} üzerindeki {n} {$commit} öğesinin yerine geçer.", other = "Zorla {$push}, {remote} üzerindeki {n} {$commits} öğesinin yerine geçer." }
 # context: warning under the summary when rows rebase while other remotes already hold the local commits; {remotes} are those remotes
-rebase_warn = "A {$rebase} rewrites the local {$commits}: {remotes} will then need a force {$push}."
+rebase_warn = "{$Rebase} yerel {$commits} yeniden yazar: {remotes} için sonra force {$push} gerekir."
 # context: confirmation question before a force push; {n} is the number of remote commits replaced, {branch} the branch, {remotes} the remote names
-force_confirm = { one = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commit} on the remote is replaced. Not undoable.", other = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commits} on the remotes are replaced. Not undoable." }
+force_confirm = { one = "{branch} dalı {remotes} uzak depolarına zorla {$push} edilsin mi?\nLease ile: uzak depodaki {n} {$commit} değiştirilir. Geri alınamaz.", other = "{branch} dalı {remotes} uzak depolarına zorla {$push} edilsin mi?\nLease ile: uzak depolardaki {n} {$commits} değiştirilir. Geri alınamaz." }
 # context: button: ask the remotes again
-btn_fetch_again = "{$Fetch} again"
+btn_fetch_again = "Yeniden {$fetch}"
 # context: button: set every row that has a problem to Skip
-btn_skip_problems = "Skip problems"
+btn_skip_problems = "Sorunluları atla"
 # context: button: close the dialog without running
-btn_cancel = "Cancel"
+btn_cancel = "İptal"
 # context: button: run the grouped push
-btn_run = "Run"
+btn_run = "Çalıştır"
 # context: button: go to the next step
-btn_next = "Next"
+btn_next = "İleri"
 # context: button: close the dialog (the run goes on)
-btn_close = "Close"
+btn_close = "Kapat"
 # context: button: try the failed remotes again
-btn_retry = "Retry failed"
+btn_retry = "Başarısızları yeniden dene"
 # context: progress row: the remote took the commits
-run_pushed = "sent"
+run_pushed = "gönderildi"
 # context: progress row: the remote got a new branch
-run_created = "created"
+run_created = "oluşturuldu"
 # context: progress row: nothing to send
-run_up_to_date = "up to date"
+run_up_to_date = "güncel"
 # context: progress row: the local branch moved forward
-run_fast_forwarded = "fast-forwarded"
+run_fast_forwarded = "fast-forward yapıldı"
 # context: progress row: the remote's commits were combined into the local branch with a new commit
-run_merged = "combined"
+run_merged = "birleştirildi"
 # context: progress row: the local commits were replayed on the remote's
-run_rebased = "replayed"
+run_rebased = "yeniden uygulandı"
 # context: progress row: the remote's commits were taken in
-run_integrated = "taken in"
+run_integrated = "alındı"
 # context: progress row: left out
-run_skipped = "skipped"
+run_skipped = "atlandı"
 # context: progress row: the remote's commits are being combined with the local branch
-run_merging = "combining"
+run_merging = "birleştiriliyor"
 # context: progress row: sending in progress
-run_pushing = "sending"
+run_pushing = "gönderiliyor"
 # context: progress row: not started yet
-run_waiting = "waiting"
+run_waiting = "bekliyor"
 # context: progress row: failed; {why} is the reason
-run_failed = "failed: {why}"
+run_failed = "başarısız: {why}"
 # context: progress row: the remote refused; {why} is the reason
-run_rejected = "refused: {why}"
+run_rejected = "reddedildi: {why}"
 # context: progress row: the run was canceled while this remote was in flight
-run_unknown = "unknown (canceled)"
+run_unknown = "bilinmiyor (iptal edildi)"
 # context: progress row: the remote is not configured
-run_missing = "remote missing"
+run_missing = "uzak depo yok"
 # context: line under the progress rows while the run is going
-run_going = "Closing this window does not stop the run."
+run_going = "Bu pencereyi kapatmak işlemi durdurmaz."
 # context: line under the progress rows when the run ended well
-run_done = "Done."
+run_done = "Bitti."
 # context: line under the progress rows when some remotes failed
-run_problems = "Some remotes failed. Retry them, or close."
+run_problems = "Bazı uzak depolar başarısız oldu. Yeniden deneyin veya kapatın."
 # context: key hints of the selection step
-hint_select = "Up/Down move  Space tick  m remember  Enter next  Esc close"
+hint_select = "Yukarı/Aşağı gez  Space işaretle  m anımsa  Enter ileri  Esc kapat"
 # context: key hints of the plan step
-hint_plan = "Up/Down row  Left/Right action  Enter list  s skip  t {$tags}  f again  Ctrl+Enter run  Esc close"
+hint_plan = "Yukarı/Aşağı satır  Sol/Sağ eylem  Enter liste  s atla  t {$tags}  f yeniden  Ctrl+Enter çalıştır  Esc kapat"
 # context: key hints of the progress step
-hint_run = "Esc close  r retry failed"
+hint_run = "Esc kapat  r başarısızları dene"
 # context: text of the strip over the Log while a grouped push waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting = "Grouped {$push} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting = "Toplu {$push} duraklatıldı ({remote}): çözün ve tamamlayın, sonra Devam."
 # context: text of the strip when the conflicts are resolved and the run can go on; {remote} is that remote
-strip_ready = "Grouped {$push} paused ({remote}): resolved. Continue to {$push}."
+strip_ready = "Toplu {$push} duraklatıldı ({remote}): çözüldü. {$push} için Devam."
 # context: strip button: go on with the grouped push
-strip_continue = "Continue"
+strip_continue = "Devam"
 # context: strip button: abort the merge or rebase of the grouped push and drop it
-strip_abort = "Abort group"
+strip_abort = "Grubu iptal et"
 # context: status line after the grouped push was aborted
-aborted = "Grouped {$push} aborted."
+aborted = "Toplu {$push} iptal edildi."
 # context: status line while a grouped push runs
-running = "Grouped {$push}..."
+running = "Toplu {$push}..."
 # context: question before aborting a paused grouped push; {branch} is the local branch, {remote} the remote whose merge or rebase stopped
-abort_confirm = "Abort the grouped {$push} of {branch} (stopped on {remote})?\nThe {$merge} or {$rebase} in progress is thrown away. What was already sent stays."
+abort_confirm = "{branch} dalının toplu {$push} işlemi iptal edilsin mi ({remote} üzerinde durdu)?\nDevam eden {$merge} veya {$rebase} atılır. Önceden gönderilenler kalır."
 # context: title of the dialog that shows how a branch stands against each remote before a grouped pull; {n} is the number of remotes, {branch} the local branch
-title_pull_plan = { one = "{$Pull} {branch} from {n} remote", other = "{$Pull} {branch} from {n} remotes" }
+title_pull_plan = { one = "{$Pull}: {branch} ← {n} uzak depo", other = "{$Pull}: {branch} ← {n} uzak depo" }
 # context: text of the strip over the Log while a grouped pull waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting_pull = "Grouped {$pull} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting_pull = "Toplu {$pull} duraklatıldı ({remote}): çözün ve tamamlayın, sonra Devam."
 # context: text of the strip when the conflicts are resolved and the grouped pull can go on; {remote} is that remote
-strip_ready_pull = "Grouped {$pull} paused ({remote}): resolved. Continue to {$pull}."
+strip_ready_pull = "Toplu {$pull} duraklatıldı ({remote}): çözüldü. {$pull} için Devam."
 [multi_remote]
-state_new = "new"
-state_gone = "gone"
-state_unrelated = "unrelated"
-tip_title = "Remotes of {branch}"
-tip_in_sync = "{remote}: in sync"
-tip_ahead = "{remote}: {n} ahead"
-tip_behind = "{remote}: {n} behind"
-tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
-tip_new = "{remote}: no copy of this branch yet"
-tip_unrelated = "{remote}: no common history"
-tip_gone = "{remote}: no longer configured"
-tip_open_hint = "Click to edit the remotes of this branch"
+state_new = "yeni"
+state_gone = "yok"
+state_unrelated = "ilgisiz"
+tip_title = "{branch} dalının uzak depoları"
+tip_in_sync = "{remote}: eşit"
+tip_ahead = "{remote}: {n} önde"
+tip_behind = "{remote}: {n} geride"
+tip_diverged = "{remote}: ayrışmış ({ahead} önde, {behind} geride)"
+tip_new = "{remote}: bu dalın henüz kopyası yok"
+tip_unrelated = "{remote}: ortak geçmiş yok"
+tip_gone = "{remote}: artık yapılandırılmamış"
+tip_open_hint = "Bu dalın uzak depolarını düzenlemek için tıklayın"

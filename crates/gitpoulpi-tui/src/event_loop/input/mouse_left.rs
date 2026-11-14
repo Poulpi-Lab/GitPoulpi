@@ -317,6 +317,7 @@ pub(super) fn handle(
                 &*cx.remote_ui,
                 cx.refs_result.as_deref().unwrap_or(&[]),
                 branch,
+                &cx.link.activity_handle().raw.requester(),
                 &mut *cx.input_mode,
             );
             return Ok(Flow::Handled);

@@ -145,7 +145,7 @@ pub fn apply_default_targets(
         .iter()
         .map(|t| t.to_value(branch))
         .collect();
-    let _ = set_remotes(backend, repo, branch, &push_to, &pull_from);
+    let _ = set_remotes(backend, repo, branch, None, (&push_to, &pull_from));
 }
 
 /// Where one target stands against its remote-tracking ref in `refs`.

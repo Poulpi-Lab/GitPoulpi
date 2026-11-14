@@ -192,11 +192,12 @@ pub(crate) fn open_branch_remotes(
     remote_ui: &crate::remotes_ui::RemoteUi,
     refs: &[gitpoulpi_core::domain::Ref],
     branch: &str,
+    requester: &crate::daemon_link::Requester,
     input_mode: &mut crate::modes::InputMode,
 ) -> Option<String> {
     match crate::remotes_ui::local_branch(refs, branch) {
         Some(head) => {
-            remote_ui.open_upstream_prompt(&head, refs, input_mode);
+            remote_ui.open_upstream_prompt(&head, refs, requester, input_mode);
             None
         }
         None => Some(

@@ -660,6 +660,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                     &*cx.remote_ui,
                     cx.refs_result.as_deref().unwrap_or(&[]),
                     &branch,
+                    &cx.link.activity_handle().raw.requester(),
                     &mut *cx.input_mode,
                 ),
                 None => Some(msg::input::SELECT_BRANCH_TAG_REMOTE.get().into()),

@@ -646,7 +646,7 @@ As teclas são as padrão.
 | Git: Push | `Ctrl+G P` |
 | Git: Push para um remoto... |  |
 | Git: force push (com lease)... |  |
-| Git: definir upstream... |  |
+| Git: Remotes of Branch... |  |
 | Remoto: adicionar remoto... |  |
 | Remoto: remover remoto... |  |
 | Remoto: editar remoto... |  |

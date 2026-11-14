@@ -614,7 +614,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Git：Push | `Ctrl+G P` |
 | Git：Push 到远程… |  |
 | Git：强制 Push（带 lease）… |  |
-| Git：设置 upstream… |  |
+| Git: Remotes of Branch... |  |
 | 远程：添加远程… |  |
 | 远程：移除远程… |  |
 | 远程：编辑远程… |  |

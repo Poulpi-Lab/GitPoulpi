@@ -653,7 +653,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Git: Push | `Ctrl+G P` |
 | Git: Push a un remoto... |  |
 | Git: Force push (con lease)... |  |
-| Git: Definir upstream... |  |
+| Git: Remotes of Branch... |  |
 | Remoto: Añadir remoto... |  |
 | Remoto: Quitar remoto... |  |
 | Remoto: Editar remoto... |  |

@@ -650,7 +650,7 @@ Tangenterna är standardvärdena.
 | Git: Push | `Ctrl+G P` |
 | Git: Push till remote... |  |
 | Git: Force push (med lease)... |  |
-| Git: Ange upstream... |  |
+| Git: Remotes of Branch... |  |
 | Remote: Lägg till remote... |  |
 | Remote: Ta bort remote... |  |
 | Remote: Redigera remote... |  |

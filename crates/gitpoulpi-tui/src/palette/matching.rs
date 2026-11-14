@@ -35,7 +35,7 @@ fn search_alias(command: &PaletteCommand) -> &'static str {
     match command {
         PaletteCommand::OpenPreferences => "preferences",
         // The command was `Git: Set Upstream...`: the old name still finds it.
-        PaletteCommand::SetUpstream => "git: set upstream",
+        PaletteCommand::SetUpstream => "git: set upstream", // i18n-english
         _ => "",
     }
 }

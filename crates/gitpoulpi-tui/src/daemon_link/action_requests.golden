@@ -314,6 +314,10 @@
   BranchSetUpstream {"branch":"topic","upstream":null}
   message: topic tracks nothing
   ok: true
+== BranchSetRemotes { branch: "topic", upstream: Some("gitlab/topic"), push_to: ["gitlab", "backup:x"], pull_from: ["gitlab"] }
+  BranchSetRemotes {"branch":"topic","pull_from":["gitlab"],"push_to":["gitlab","backup:x"],"upstream":"gitlab/topic"}
+  message: remotes of topic updated
+  ok: true
 == FastForward { branch: "topic", target: Oid([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]), target_label: "origin/topic" }
   FastForward {"branch":"topic","target":"0909090909090909090909090909090909090909"}
   message: topic already contains origin/topic

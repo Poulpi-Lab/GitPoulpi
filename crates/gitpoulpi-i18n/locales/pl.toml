@@ -9485,7 +9485,7 @@ gone = "remote gone"
 # context: button on a gone row: forget that remote for this branch
 remove_button = "Remove"
 # context: warning under the table; {first} and {second} are two remote names with the same address
-same_url = "{first} and {second} push to the same URL."
+same_url = "{first} and {second} {$push} to the same URL."
 # context: button: changes the branch name used on the selected remote
 rename_button = "Rename on remote..."
 # context: button: the branch tracks no upstream any more
@@ -9509,7 +9509,7 @@ rename_upstream_row = "The upstream's branch name is chosen in the list above."
 # context: inline error when Rename is used with nothing to rename
 rename_no_row = "Select a remote's row first."
 # context: key hints under the table; keep the key names (Space, p, r, Del, Enter)
-keys_hint = "Space Push, p Pull too, r Rename, Del Remove, Enter Apply"
+keys_hint = "Space {$Push}, p {$Pull} too, r Rename, Del Remove, Enter Apply"
 # context: status line while the change is sent; {branch} is the local branch
 applying = "setting the remotes of {branch}..."
 # context: status line once the daemon applied the change; {branch} is the local branch

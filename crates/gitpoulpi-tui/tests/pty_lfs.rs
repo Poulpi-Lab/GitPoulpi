@@ -295,14 +295,14 @@ fn the_palette_untracks_a_pattern_picked_from_the_list() {
     term.wait_for("the untrack dialog listing *.psd", STEP, |s| {
         s.contains("Stop tracking with Git LFS")
             && !s.contains("Command Palette")
-            && s.contains("\u{2315} type to search")
+            && s.contains("\u{2315} type your own value")
             && !s.contains("no match")
     })
     .unwrap_or_else(|e| panic!("{e}"));
     // Enter picks the highlighted pattern, a second Enter confirms.
     term.send_keys("Enter").unwrap();
     term.wait_for("the pattern chosen, the list closed", STEP, |s| {
-        s.contains("Untrack") && !s.contains("type to search")
+        s.contains("Untrack") && !s.contains("type your own value")
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Enter").unwrap();

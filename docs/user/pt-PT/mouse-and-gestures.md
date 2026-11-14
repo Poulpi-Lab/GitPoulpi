@@ -182,7 +182,9 @@ nele, e clique num botão ou numa caixa de verificação para a usar.
 
 - **Clique** numa linha para a selecionar. **Clique duplo** numa branch local
   ou numa tag para fazer checkout. **Clique duplo** num worktree ou num
-  submódulo para o abrir num separador.
+  submódulo para o abrir num separador. O **+** no cabeçalho de WORKTREES cria
+  um worktree; clique direito num worktree para Abrir em novo separador, Abrir
+  em, Merge e Remover ([Worktrees](worktrees.md)).
 - **Passe o ponteiro** por uma linha para mostrar o ícone à sua esquerda.
   **Clique** nele para ocultar a ref no Log, ou para a mostrar de novo. Enquanto
   o **Solo** está ligado, o mesmo sítio põe a ref em solo. Numa linha de pasta,

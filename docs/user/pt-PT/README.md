@@ -71,6 +71,8 @@ para as páginas de referência quando precisar delas.
     O que passa pelo tmux, zellij, screen, herdr e painéis de terminal:
     **[Multiplexadores](multiplexers.md)**.
 
+Também: **[Worktrees](worktrees.md)**: criar, abrir, fazer merge e remover worktrees ligados.
+
 Também: **[Vários remotos para uma branch](multiple-remotes.md)**: destinos de push e
 fontes de pull, o diálogo Remotos, Push para todos ou para remotos selecionados, resolver um remoto
 que avançou, Continuar depois de um conflito, a CLI e um alias de git simples.

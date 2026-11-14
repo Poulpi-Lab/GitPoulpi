@@ -273,7 +273,9 @@ annulable en bloc.
   des branches et garde son propre état ; l'abandon est lui-même le chemin du
   retour). Abandonner un **merge, cherry-pick ou revert** *est* enregistré, voir
   plus haut.
-- **Créer un worktree**, **créer un fichier de patch**, cloner, init, actions
+- **Créer un worktree**, **retirer un worktree** (ce qui a été sauvegardé avant
+  reste : le commit, le stash ; la branche supprimée avec lui est journalisée,
+  donc Annuler rend la branche, pas le dossier), **créer un fichier de patch**, cloner, init, actions
   d'hébergeur (pull requests, tickets) et appels IA : ils ne font pas partie de
   l'historique du dépôt.
 - **Créer un nouveau fichier vide** depuis le menu du fichier, la suppression

@@ -155,6 +155,8 @@ sha court). Les hunks et les lignes sont numérotés comme les numérote
 | `tag fetch <name> [--remote R]` | Récupérer un tag depuis un remote (celui qui l'a, par défaut), par exemple un tag `where: remote`. N'écrase jamais un tag local qui pointe sur un autre commit. |
 | `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tags sur un remote (sans noms : chaque tag qu'aucun remote n'a). En supprimer un sur un remote est annulable (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Worktrees liés. |
+| `worktree changes <path>` | Les modifications non commitées d'un worktree (`path`, `untracked`) ; vide s'il est propre. |
+| `worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` | Retire un worktree lié. Un worktree avec des modifications non commitées est refusé, sauf avec `--force` (elles sont perdues), `--commit-message` (les commite d'abord sur sa branche) ou `--stash-message` (les met d'abord en stash, non suivies comprises). `--delete-branch` supprime aussi sa branche (journalisé). Le retrait lui-même n'est pas annulable. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Sous-modules ([Sous-modules](submodules.md)). |
 
 `--autostash` stashe les modifications locales qui bloquent l'opération, la lance et

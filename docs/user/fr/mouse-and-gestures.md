@@ -167,7 +167,9 @@ taper, et cliquez sur un bouton ou une case à cocher pour l'utiliser.
 
 - **Cliquez** sur une ligne pour la sélectionner. **Double-cliquez** sur une branche
   locale ou un tag pour l'extraire. **Double-cliquez** sur un worktree ou un
-  sous-module pour l'ouvrir dans un onglet.
+  sous-module pour l'ouvrir dans un onglet. Le **+** de l'en-tête WORKTREES crée
+  un worktree ; clic droit sur un worktree pour Ouvrir dans un nouvel onglet,
+  Ouvrir dans, Merge et Retirer ([Worktrees](worktrees.md)).
 - **Survolez** une ligne pour afficher l'icône à sa gauche. **Cliquez** dessus pour
   masquer la ref dans le Log, ou la réafficher. Quand **Solo** est actif, le même
   endroit met la ref en solo. Sur une ligne de dossier, l'icône agit sur chaque ref du

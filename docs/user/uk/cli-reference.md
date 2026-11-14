@@ -153,6 +153,8 @@ Hunk'и та рядки нумеруються так, як їх нумерує 
 | `tag fetch <name> [--remote R]` | Завантажує один tag із remote (типово з того, що його має), наприклад tag із `where: remote`. Ніколи не перезаписує локальний tag на іншому коміті. |
 | `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tag'и у віддаленому репозиторії (без імен: кожен tag, якого немає в жодному віддаленому). Видалення такого у віддаленому репозиторії можна скасувати (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Пов'язані worktree. |
+| `worktree changes <path>` | Незакомічені зміни worktree (`path`, `untracked`); порожньо, коли він чистий. |
+| `worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` | Видаляє пов'язаний worktree. Той, що має незакомічені зміни, відхиляється, якщо немає `--force` (зміни втрачаються), `--commit-message` (спершу закомітити їх на його гілці) або `--stash-message` (спершу сховати їх у stash, разом із невідстежуваними). `--delete-branch` додатково видаляє його гілку (журналюється). Саме видалення не скасовується. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Підмодулі ([Підмодулі](submodules.md)). |
 
 `--autostash` ховає в stash локальні зміни, що блокують операцію, виконує її й

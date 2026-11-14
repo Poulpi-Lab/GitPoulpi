@@ -17,7 +17,7 @@ use super::*;
 
 /// A refusal a caller can tell from a failure: `{"refused": {reason,
 /// message}}`, exit code 2.
-fn refused(reason: &str, message: impl Into<String>) -> Emitted {
+pub(super) fn refused(reason: &str, message: impl Into<String>) -> Emitted {
     let message = message.into();
     let mut out = emitted(
         json!({ "refused": { "reason": reason, "message": message } }),
@@ -28,7 +28,7 @@ fn refused(reason: &str, message: impl Into<String>) -> Emitted {
 }
 
 /// `--branch`, else the checked-out branch; `None` when HEAD is detached.
-async fn branch_or_current(
+pub(super) async fn branch_or_current(
     session: &mut Session,
     branch: Option<String>,
 ) -> Result<Option<String>, String> {
@@ -44,14 +44,17 @@ async fn branch_or_current(
         }))
 }
 
-fn detached() -> Emitted {
+pub(super) fn detached() -> Emitted {
     refused(
         "detached_head",
         "HEAD is detached: name the branch with --branch",
     )
 }
 
-async fn status(session: &mut Session, branch: &str) -> Result<RemoteGroupStatus, String> {
+pub(super) async fn status(
+    session: &mut Session,
+    branch: &str,
+) -> Result<RemoteGroupStatus, String> {
     session
         .call(
             OperationKind::RemoteGroupStatus,
@@ -289,5 +292,6 @@ pub(super) async fn remote_group(
             let st = status(session, &branch).await?;
             status_emitted(&branch, &st)
         }
+        other => super::group_run::remote_group(session, other).await,
     }
 }

@@ -18,8 +18,7 @@ use crate::scrollbar::{BarDrag, Track};
 
 /// The things a click or a key can land on, from the paint walk.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(super) enum Part {
-    Close,
+pub(crate) enum Part {
     /// A row band (select the row).
     Row(u8),
     /// A selection row's checkbox.
@@ -32,19 +31,19 @@ pub(super) enum Part {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(super) enum Btn {
+pub(crate) enum Btn {
     Next,
     Cancel,
     FetchAgain,
     SkipProblems,
     Run,
-    Close,
     Retry,
+    Close,
 }
 
 /// The scrolling state of one table.
 #[derive(Default)]
-pub(super) struct Scroll {
+pub(crate) struct Scroll {
     pub top: Cell<usize>,
     pub viewport: Cell<usize>,
     pub bar: Cell<Option<Track>>,
@@ -55,7 +54,7 @@ pub(super) struct Scroll {
 // Step 1: which remotes
 // ---------------------------------------------------------------------
 
-pub(super) struct SelRow {
+pub(crate) struct SelRow {
     pub remote: String,
     /// The branch's name on that remote.
     pub dest: String,
@@ -65,7 +64,7 @@ pub(super) struct SelRow {
     pub primary: bool,
 }
 
-pub(super) struct Select {
+pub(crate) struct Select {
     pub remotes: Option<Reply<Vec<Remote>>>,
     pub status: Option<Reply<RemoteGroupStatus>>,
     names: Option<Vec<Remote>>,
@@ -196,7 +195,7 @@ impl Select {
 // Step 2: the plan
 // ---------------------------------------------------------------------
 
-pub(super) struct PlanRow {
+pub(crate) struct PlanRow {
     pub t: PlannedTarget,
     pub chosen: GroupAction,
     pub combo: Combo,
@@ -274,7 +273,7 @@ impl PlanRow {
     }
 }
 
-pub(super) fn action_key(a: GroupAction) -> &'static str {
+pub(crate) fn action_key(a: GroupAction) -> &'static str {
     match a {
         GroupAction::Push => "push",
         GroupAction::FastForwardFrom => "ff",
@@ -285,7 +284,7 @@ pub(super) fn action_key(a: GroupAction) -> &'static str {
     }
 }
 
-pub(super) fn action_from_key(key: &str) -> Option<GroupAction> {
+pub(crate) fn action_from_key(key: &str) -> Option<GroupAction> {
     [
         GroupAction::Push,
         GroupAction::FastForwardFrom,
@@ -298,7 +297,7 @@ pub(super) fn action_from_key(key: &str) -> Option<GroupAction> {
     .find(|a| action_key(*a) == key)
 }
 
-pub(super) fn action_label(a: GroupAction, remote: &str) -> String {
+pub(crate) fn action_label(a: GroupAction, remote: &str) -> String {
     match a {
         GroupAction::Push => msg::ACTION_PUSH.get().to_string(),
         GroupAction::FastForwardFrom => msg::action_fast_forward(remote),
@@ -309,7 +308,7 @@ pub(super) fn action_label(a: GroupAction, remote: &str) -> String {
     }
 }
 
-pub(super) struct PlanView {
+pub(crate) struct PlanView {
     /// `None` once the plan is in.
     pub reply: Option<Reply<RemoteGroupPlan>>,
     pub error: Option<String>,
@@ -471,7 +470,7 @@ impl PlanView {
 }
 
 /// The state cell of a plan row: its words and what colour says about it.
-pub(super) fn state_text(t: &PlannedTarget) -> (String, StateTone) {
+pub(crate) fn state_text(t: &PlannedTarget) -> (String, StateTone) {
     let counts = |a: u32, b: u32| {
         let mut out = String::new();
         if a > 0 {
@@ -529,7 +528,7 @@ pub(super) fn state_text(t: &PlannedTarget) -> (String, StateTone) {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(super) enum StateTone {
+pub(crate) enum StateTone {
     Good,
     Warn,
     Bad,
@@ -617,7 +616,7 @@ impl RunState {
 }
 
 /// One progress row's words: (glyph, text, tone).
-pub(super) fn run_row_text(row: &RunRow) -> (&'static str, String, StateTone) {
+pub(crate) fn run_row_text(row: &RunRow) -> (&'static str, String, StateTone) {
     let (glyph, text, tone) = run_row_base(row);
     match row.integrated {
         Some(i) if tone == StateTone::Good && row.status != Some(TargetStatus::UpToDate) => {
@@ -703,7 +702,7 @@ fn run_row_base(row: &RunRow) -> (&'static str, String, StateTone) {
 
 /// The integration word for a final status where the target was combined
 /// (a merge, a rebase, a fast-forward) rather than only pushed.
-pub(super) fn integrated_text(i: gitpoulpi_core::domain::Integration) -> String {
+pub(crate) fn integrated_text(i: gitpoulpi_core::domain::Integration) -> String {
     use gitpoulpi_core::domain::Integration as I;
     match i {
         I::FastForwarded => msg::RUN_FAST_FORWARDED.get().to_string(),

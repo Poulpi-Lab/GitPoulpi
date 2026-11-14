@@ -176,6 +176,7 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::Push
         | PaletteCommand::PushToRemote
         | PaletteCommand::ForcePushWithLease
+        | PaletteCommand::PushToSelectedRemotes
         | PaletteCommand::SetUpstream
         | PaletteCommand::AddRemote
         | PaletteCommand::RemoveRemote

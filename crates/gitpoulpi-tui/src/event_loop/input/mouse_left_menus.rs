@@ -559,6 +559,9 @@ pub(super) fn handle(
             AutoStashBannerButton::StartOver => PaletteCommand::AutoStashStartOver,
         };
         commands::run_command(cx, cmd);
+    } else if let Some(HitTarget::PushGroupStrip(button)) = &hit {
+        let effect = crate::push_group_ui::strip_click(cx.repo_root, *button);
+        crate::push_group_ui::apply(effect, cx.link, &mut *cx.input_mode);
     } else if let Some(HitTarget::ConflictBadge) = &hit {
         commands::run_command(cx, PaletteCommand::ConflictsShow);
     } else if let Some(HitTarget::Toolbar(button)) = &hit {

@@ -174,6 +174,8 @@ pub(in crate::event_loop) fn draw_overlay_menus(
     crate::tag_delete_dialog::render(frame);
     // The sensitive-files question of a refused stage, the same way.
     crate::stage_guard_dialog::render(frame);
+    // The grouped push dialog (selection, plan, progress), the same way.
+    crate::push_group_ui::render(frame);
     // The predicted conflicts popup, the same way.
     crate::conflict_popup::render(frame);
     // Copy as Mermaid gitGraph, the same way.
@@ -250,6 +252,7 @@ pub(in crate::event_loop) fn draw_overlay_menus(
         || crate::revert_mainline::is_open()
         || crate::tag_delete_dialog::is_open()
         || crate::stage_guard_dialog::is_open()
+        || crate::push_group_ui::is_open()
         || crate::ai_sent_dialog::is_open()
         || crate::ai_limit_dialog::is_open()
         || crate::link_confirm::is_open()

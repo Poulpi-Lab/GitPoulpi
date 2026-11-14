@@ -721,6 +721,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::Push
         | C::PushToRemote
         | C::ForcePushWithLease
+        | C::PushToSelectedRemotes
         | C::SetUpstream
         | C::PushAllUnpushedTags
         | C::RemoveRemote

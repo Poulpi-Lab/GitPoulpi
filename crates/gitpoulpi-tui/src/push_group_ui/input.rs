@@ -9,7 +9,7 @@ use crossterm::event::{
 use gitpoulpi_core::domain::{GroupAction, OperationKind};
 use gitpoulpi_i18n::msg::push_group as msg;
 
-use super::model::{action_from_key, Btn, Part, Phase, PlanView};
+use super::model::{action_from_key, Btn, Part, Phase};
 use super::{Core, Dlg, Effect, Step};
 use crate::combo::ComboOutcome;
 use crate::daemon_link::Action;
@@ -326,12 +326,12 @@ impl Core {
             }
         }
         // The table's scrollbar.
-        let (scroll, len) = match &mut dlg.step {
-            Step::Select(s) => (Some(&s.scroll), s.rows.len()),
-            Step::Plan(p) => (Some(&p.scroll), p.rows.len()),
+        let (mut scroll, len) = match &mut dlg.step {
+            Step::Select(s) => (Some(&mut s.scroll), s.rows.len()),
+            Step::Plan(p) => (Some(&mut p.scroll), p.rows.len()),
             Step::Run => (None, 0),
         };
-        if let Some(scroll) = scroll {
+        if let Some(scroll) = scroll.as_deref_mut() {
             if let Some(top) = scroll
                 .drag
                 .on_mouse(scroll.bar.get(), mouse, len, scroll.top.get())
@@ -384,7 +384,6 @@ impl Core {
         };
         match (part, &mut dlg.step) {
             (Part::Button(btn), _) => return self.press(btn),
-            (Part::Close, _) => self.dlg = None,
             (Part::Row(i), Step::Select(s)) => s.cursor = usize::from(i),
             (Part::Row(i), Step::Plan(p)) => p.cursor = usize::from(i),
             (Part::Check(i), Step::Select(s)) => {
@@ -407,5 +406,3 @@ impl Core {
     }
 }
 
-#[allow(dead_code)]
-fn _plan_unused(_: &PlanView) {}

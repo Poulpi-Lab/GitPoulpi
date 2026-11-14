@@ -458,6 +458,15 @@ impl WindowState {
         // `gitpoulpi refs hide|show|solo` (or another TUI) changed the
         // filter: reload it. The graph cache keys on the sets, so the Log
         // relays out by itself.
+        crate::push_group_ui::tick(
+            &self.repo.root,
+            self.refs_result
+                .as_ref()
+                .ok()
+                .and_then(|refs| crate::remotes_ui::head_branch(refs))
+                .as_ref()
+                .map(|h| h.name.as_str()),
+        );
         if self.link.take_pending_auto_stash_changed() {
             self.pending_auto_stash = crate::autostash_banner::load(&self.repo.root);
         }

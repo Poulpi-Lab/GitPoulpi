@@ -49,7 +49,7 @@ use crate::modes::{ConfirmAction, InputMode, PendingDestructive};
 
 use model::{Part, Phase, PlanView, RunRow, RunState, Select};
 
-pub(crate) use strip::StripButton;
+pub(crate) use strip::{click as strip_click, render as render_strip, visible as strip_visible, StripButton};
 
 const WIN: dialog_kit::Win = dialog_kit::Win::movable("push_group");
 
@@ -148,6 +148,8 @@ impl PushGroupUi {
 
     /// The plan step for `branch` (`None` targets: the configured primary
     /// plus push targets).
+    // Entered by the Push / Pull menus (a later slice); tested here.
+    #[allow(dead_code)]
     pub(crate) fn open_plan(root: &Path, branch: &str, targets: Option<Vec<TargetRef>>) {
         with(|c| {
             let Some(requester) = c.requester.clone() else {
@@ -160,6 +162,8 @@ impl PushGroupUi {
 
     /// Reopens the progress view of the last run (closed or still going).
     /// `false` when there is none.
+    // Entered by the jobs indicator and a palette command (a later slice).
+    #[allow(dead_code)]
     pub(crate) fn open_progress() -> bool {
         with(|c| c.open_progress())
     }

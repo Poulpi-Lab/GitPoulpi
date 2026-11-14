@@ -405,6 +405,7 @@ async fn dispatch(
         | Action::RemoteGroupRetry { .. } => {
             let request = action.group_request().unwrap_or_default();
             let args = serde_json::to_value(&request).unwrap_or_default();
+            crate::push_group_ui::on_started(&conn.repo.root, &request);
             match conn
                 .call::<gitpoulpi_core::domain::RemoteGroupOutcome>(
                     OperationKind::RemoteGroupRun,

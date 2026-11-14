@@ -973,6 +973,11 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::PushToRemote,
     ),
     entry(
+        msg::palette::GIT_PUSH_TO_SELECTED_REMOTES,
+        "",
+        PaletteCommand::PushToSelectedRemotes,
+    ),
+    entry(
         msg::palette::GIT_FORCE_PUSH_WITH_LEASE,
         "",
         PaletteCommand::ForcePushWithLease,

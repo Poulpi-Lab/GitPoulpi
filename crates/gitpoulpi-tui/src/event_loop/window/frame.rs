@@ -690,6 +690,7 @@ impl WindowState {
                         conflict_count: self.conflicts.len(),
                         index_lock: &self.index_lock,
                         pending_auto_stash: &self.pending_auto_stash,
+                        repo_root: &self.repo_root,
                         conflict_prediction: &conflict_prediction,
                         refs_filter_area: self.refs_filter_area,
                         repo_tabs: &self.repo_tabs,

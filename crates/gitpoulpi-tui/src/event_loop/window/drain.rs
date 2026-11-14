@@ -139,6 +139,7 @@ impl WindowState {
                 && !crate::ai_limit_dialog::is_open()
                 && !crate::link_confirm::is_open()
                 && !crate::stage_guard_dialog::is_open()
+                && !crate::push_group_ui::is_open()
                 && !crate::activity_log::is_open()
                 && !crate::trust_dialog::is_open()
                 && !crate::jobs_ui::panel_open()
@@ -232,6 +233,7 @@ impl WindowState {
                             || crate::trust_dialog::is_open()
                             // The sensitive-files question: 1 and 2 answer it.
                             || crate::stage_guard_dialog::is_open()
+                            || crate::push_group_ui::is_open()
                             || self.remote_ui.is_open()
                             // The encoding dropdown's search line types digits
                             // (`1252`), never a count.
@@ -286,7 +288,8 @@ impl WindowState {
                     if crate::ai_sent_dialog::is_open()
                         || crate::ai_limit_dialog::is_open()
                         || crate::link_confirm::is_open()
-                        || crate::stage_guard_dialog::is_open() => {}
+                        || crate::stage_guard_dialog::is_open()
+                        || crate::push_group_ui::is_open() => {}
                 // A pasted token goes into Preferences' Integrations form.
                 Event::Paste(text) if self.preferences.is_some() => {
                     if let Some(prefs) = self.preferences.as_mut() {

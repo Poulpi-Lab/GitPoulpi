@@ -379,7 +379,7 @@ confirm.
 | `remote_remove` | `gitpoulpi remote remove` | destructive |
 | `remote_rename` | `gitpoulpi remote rename` | write |
 | `remote_set_url` | `gitpoulpi remote set-url` | write |
-| `remote_group_status` | `gitpoulpi remote-group status` | write |
+| `remote_group_status` | `gitpoulpi remote-group status` | read |
 | `repo_close` | `gitpoulpi repo close` | write |
 | `repo_discover` | `gitpoulpi repo discover` | read |
 | `repo_init` | `gitpoulpi repo init` | write |

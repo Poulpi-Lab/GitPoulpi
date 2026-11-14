@@ -64,6 +64,8 @@ GitPoulpi는 클릭할 수 있는 commit 그래프, 명령 팔레트, 호스팅 
     GitPoulpi를 가장 잘 보여 주는 터미널: **[터미널 고르기](terminals.md)**.
     tmux, zellij, screen, herdr, 터미널 창을 통과하는 것: **[멀티플렉서](multiplexers.md)**.
 
+추가: **[워크트리](worktrees.md)**: 연결된 워크트리 만들기, 열기, merge, 제거.
+
 추가: **[한 브랜치에 여러 리모트](multiple-remotes.md)**: push 대상과 pull 소스, 리모트 대화상자, 모두 또는 선택한 리모트로 Push, 움직인 리모트 해결, 충돌 뒤 계속, CLI와 순정 git alias.
 
 **[브랜치 워크플로](branching-workflows.md)**. Git Flow, GitHub Flow, GitLab Flow,

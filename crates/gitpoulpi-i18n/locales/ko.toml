@@ -423,8 +423,8 @@ list_title = "프로필"
 duplicate_name = "{name} (복사본)"
 
 [settings_open_in]
-worktree = "Can open a worktree"
-worktree_help = "Offer this entry in the Open in menu of a worktree (right-click a row of the WORKTREES section). It runs with the worktree's folder as ${{cwd}}. Every entry is checked by default: untick the ones that make no sense on a folder."
+worktree = "워크트리 열기 가능"
+worktree_help = "이 항목을 워크트리의 열기 위치 메뉴에 표시합니다(워크트리 섹션의 행을 오른쪽 클릭). 워크트리 폴더를 ${{cwd}}로 하여 실행됩니다. 기본적으로 모든 항목이 선택되어 있으니 폴더에 맞지 않는 항목은 선택을 해제하세요."
 list_title = "항목"
 section_title = "열기 위치"
 default_entry = "기본 항목"
@@ -1227,19 +1227,19 @@ bad_branch = "{name}은(는) 올바른 브랜치 이름이 아닙니다"
 
 [worktree]
 # context: field label: the name of the new worktree, the folder name is built from it
-name = "Name"
+name = "이름"
 # context: placeholder
-name_hint = "the folder is named after it"
-need_name = "give the worktree a name"
-bad_name = "the name cannot contain slashes (the Folder field takes a path)"
+name_hint = "폴더 이름이 이 이름을 따릅니다"
+need_name = "워크트리 이름을 입력하세요"
+bad_name = "이름에 슬래시를 쓸 수 없습니다 (폴더 필드에는 경로를 입력합니다)"
 # context: field label: the branch or commit the worktree starts from
 ref_field = "Ref"
 # context: placeholder
-ref_hint = "choose a branch"
+ref_hint = "브랜치를 선택하세요"
 # context: combobox entry: the commit the dialog was opened on; {label} what the user clicked (a tag, a remote branch, a short id), {id} the short id
-commit_choice = { git = "commit {label} ({id})", local = "commit {label} ({id})" }
-branch_exists = "the branch {b} already exists: pick it in Ref or choose another name"
-is_a_file = "{path} is a file, not a folder"
+commit_choice = "{$commit} {label} ({id})"
+branch_exists = "브랜치 {b}이(가) 이미 있습니다: Ref에서 선택하거나 다른 이름을 입력하세요"
+is_a_file = "{path}은(는) 폴더가 아니라 파일입니다"
 title = { git = "{label}에서 worktree 만들기", local = "{label}에서 워크트리 만들기" }
 folder = "폴더"
 folder_hint = "새 폴더 또는 빈 폴더"
@@ -2932,14 +2932,14 @@ env_timeout = "에이전트 자체의 요청 시간 제한(ms)"
 env_offline = "시작 시 네트워크 호출 없음"
 
 [palette]
-sidebar_show_worktrees = "Sidebar: Show Worktrees Section"
-refs_open_worktree_in = "Refs: Open Worktree In..."
-refs_merge_worktree_branch_into = { git = "Refs: Merge Worktree Branch Into...", local = "Refs: Merge Worktree Branch Into..." }
-refs_remove_worktree = { git = "Refs: Remove Worktree...", local = "Refs: Remove Worktree..." }
+sidebar_show_worktrees = "왼쪽 창: 워크트리 섹션 표시"
+refs_open_worktree_in = "Refs: 워크트리를 열 위치..."
+refs_merge_worktree_branch_into = "Refs: 워크트리 브랜치를 다른 브랜치로 {$merge}..."
+refs_remove_worktree = "Refs: 워크트리 제거..."
 # context: opens the + menu of the WORKTREES section
-refs_create_worktree = { git = "Refs: Create Worktree...", local = "Refs: Create Worktree..." }
-refs_create_worktree_from_current_branch = { git = "Refs: Create Worktree from Current Branch", local = "Refs: Create Worktree from Current Branch" }
-refs_create_worktree_choosing_a_branch = { git = "Refs: Create Worktree Choosing a Branch", local = "Refs: Create Worktree Choosing a Branch" }
+refs_create_worktree = "Refs: 워크트리 만들기..."
+refs_create_worktree_from_current_branch = "Refs: 현재 브랜치에서 워크트리 만들기"
+refs_create_worktree_choosing_a_branch = "Refs: 브랜치를 골라 워크트리 만들기"
 # context: palette command; shows or hides the commit list column left of the diff, File View, Blame and Editor
 view_toggle_commit_column = "보기: {$Commit} 열 전환"
 view_column_off = "보기: {$Commit} 열: 숨기기"
@@ -4996,11 +4996,11 @@ desc_rebasing_step = { git = "{branch}을(를) {onto} 위로 rebase 중 · 단�
 
 [link]
 # context: {path} is the folder of the removed worktree
-worktree_removed = "removed worktree {path}"
-worktree_removed_branch_deleted = "removed worktree {path} and deleted branch {branch} (Undo brings the branch back)"
-worktree_removed_branch_kept = "removed worktree {path}; branch {branch} was kept: {why}"
-worktree_stashed = { git = "changes stashed", local = "changes stashed" }
-worktree_committed = { git = "changes committed as {id}", local = "changes committed as {id}" }
+worktree_removed = "워크트리 {path}을(를) 제거했습니다"
+worktree_removed_branch_deleted = "워크트리 {path}을(를) 제거하고 브랜치 {branch}을(를) 삭제했습니다 (실행 취소하면 브랜치가 돌아옵니다)"
+worktree_removed_branch_kept = "워크트리 {path}을(를) 제거했습니다. 브랜치 {branch}은(는) 유지됨: {why}"
+worktree_stashed = "변경 사항을 {$stash}에 저장했습니다"
+worktree_committed = "변경 사항을 {$commit}했습니다: {id}"
 amend_done = "{id}을(를) 수정했습니다. 이제 {now}입니다 (이전 끝 {previous}: 실행 취소로 복원)"
 act_staging_file = "{name} {$stage} 중..."
 act_unstaging_file = "{name} {$unstage} 중..."
@@ -9890,89 +9890,89 @@ tip_open_hint = "클릭하여 이 브랜치의 리모트 편집"
 
 [worktree_manage]
 # context: hover label of the + on the WORKTREES header
-plus_tip = { git = "Create worktree", local = "Create worktree" }
+plus_tip = "워크트리 만들기"
 # context: title of the menu the + opens
-plus_title = { git = "New worktree", local = "New worktree" }
+plus_title = "새 워크트리"
 # context: menu row: create a worktree
-plus_head = "From the current branch"
+plus_head = "현재 브랜치에서"
 # context: menu row: create a worktree
-plus_commit = "From the selected commit"
+plus_commit = "선택한 {$commit}에서"
 # context: menu row: create a worktree on a branch picked in the dialog
-plus_choose = "Choose a branch..."
-select_a_commit = { git = "Select a commit in the Log first", local = "Select a commit in the Log first" }
-select_a_worktree = { git = "Select a worktree in the Refs pane first", local = "Select a worktree in the Refs pane first" }
-main_cannot_be_removed = { git = "The main worktree cannot be removed", local = "The main worktree cannot be removed" }
-no_head = "This repository has no commit yet"
+plus_choose = "브랜치 선택..."
+select_a_commit = "먼저 Log에서 {$commit} 하나를 선택하세요"
+select_a_worktree = "먼저 Refs 창에서 워크트리를 선택하세요"
+main_cannot_be_removed = "메인 워크트리는 제거할 수 없습니다"
+no_head = "이 저장소에는 {$commit} 기록이 아직 없습니다"
 # context: hint line of the empty WORKTREES section
-empty_hint = { git = "No worktree yet: + to create one", local = "No worktree yet: + to create one" }
+empty_hint = "워크트리 없음: +로 만들기"
 # context: context menu row of a worktree
-menu_open_tab = "Open in a new tab"
+menu_open_tab = "새 탭에서 열기"
 # context: submenu of a worktree row: the Open in entries
-menu_open_in = "Open in"
-menu_open_in_none = "Open in (no entry yet)"
-menu_open_in_none_why = "No Open in entry is marked Can open a worktree: Settings > Open in"
-menu_merge = { git = "Merge {branch} into...", local = "Merge {branch} into..." }
-menu_remove = { git = "Remove worktree...", local = "Remove worktree..." }
-not_listed = { git = "{path} is not a worktree of this repository any more", local = "{path} is not a worktree of this repository any more" }
-removing = { git = "removing worktree {path}...", local = "removing worktree {path}..." }
-merging = { git = "merging {branch}...", local = "merging {branch}..." }
+menu_open_in = "열기 위치"
+menu_open_in_none = "열기 위치 (항목 없음)"
+menu_open_in_none_why = "워크트리 열기 가능으로 표시된 열기 위치 항목이 없습니다: 설정 > 열기 위치"
+menu_merge = "{branch}을(를) 다음으로 {$merge}..."
+menu_remove = "워크트리 제거..."
+not_listed = "{path}은(는) 더 이상 이 저장소의 워크트리가 아닙니다"
+removing = "워크트리 {path} 제거 중..."
+merging = "{branch} {$merge} 중..."
 # context: dialog title; {name} is the folder name of the worktree; a worktree is a second checked-out copy of the repository
-remove_title = { git = "Remove worktree {name}", local = "Remove worktree {name}" }
+remove_title = "워크트리 {name} 제거"
 # context: dialog title; {branch} is a branch name
-merge_title = { git = "Merge {branch} into another branch", local = "Merge {branch} into another branch" }
-loading = "Checking the worktree..."
-clean_text = "Remove {path}? Its folder is deleted. The branch {branch} stays."
-clean_text_detached = "Remove {path}? Its folder is deleted. It is on a detached HEAD, so no branch is affected."
+merge_title = "{branch}을(를) 다른 브랜치로 {$merge}"
+loading = "워크트리 확인 중..."
+clean_text = "{path}을(를) 제거할까요? 폴더가 삭제됩니다. 브랜치 {branch}은(는) 유지됩니다."
+clean_text_detached = "{path}을(를) 제거할까요? 폴더가 삭제됩니다. 분리된 HEAD이므로 영향받는 브랜치는 없습니다."
 # context: plural: {n} changes of the worktree at {path}
-dirty_count = { one = "{n} uncommitted change in {path}", other = "{n} uncommitted changes in {path}" }
+dirty_count = { one = "{path}에 {$commit}하지 않은 변경 {n}개", other = "{path}에 {$commit}하지 않은 변경 {n}개" }
 # context: plural: {n} changes that would be lost
-force_text = { one = "Remove {path} and discard its {n} uncommitted change? This cannot be undone.", other = "Remove {path} and discard its {n} uncommitted changes? This cannot be undone." }
+force_text = { one = "{path}을(를) 제거하고 {$commit}하지 않은 변경 {n}개를 버릴까요? 되돌릴 수 없습니다.", other = "{path}을(를) 제거하고 {$commit}하지 않은 변경 {n}개를 버릴까요? 되돌릴 수 없습니다." }
 # context: field label
-commit_field = "Commit message"
+commit_field = "{$Commit} 메시지"
 # context: placeholder
-commit_hint = "describe the changes"
+commit_hint = "변경 내용을 설명하세요"
 # context: field label
-stash_field = "Stash message"
-stash_note = "The stash is shared with the main repository: pop it there later."
+stash_field = "{$Stash} 메시지"
+stash_note = "{$Stash} 목록은 메인 저장소와 공유되므로 나중에 거기서 꺼내 쓰면 됩니다."
 # context: field label: the branch to create for the commit
-branch_field = "Branch"
+branch_field = "브랜치"
 # context: placeholder
-branch_hint = "HEAD is detached: name a branch for the commit"
-need_message = "write a commit message"
-need_branch = "name a branch for the commit (HEAD is detached)"
-delete_branch = "Also delete branch {branch} (merged into {into})"
-branch_not_merged = "Branch {branch} is not merged: it stays."
+branch_hint = "HEAD가 분리됨: {$commit}에 쓸 브랜치 이름을 입력하세요"
+need_message = "{$commit} 메시지를 입력하세요"
+need_branch = "{$commit}에 쓸 브랜치 이름을 입력하세요 (HEAD가 분리됨)"
+delete_branch = "브랜치 {branch}도 삭제 ({into}에 {$merge}됨)"
+branch_not_merged = "브랜치 {branch}은(는) {$merge}되지 않았으므로 유지됩니다."
 # context: button
-commit_remove = { git = "Commit and remove", local = "Commit and remove" }
+commit_remove = "{$Commit} 후 제거"
 # context: button
-stash_remove = { git = "Stash and remove", local = "Stash and remove" }
+stash_remove = "{$Stash} 후 제거"
 # context: button: open the worktree in a tab to commit its changes there
-open_to_commit = "Open to commit"
+open_to_commit = "열어서 {$commit}하기"
 # context: button: discards the changes
-remove_anyway = "Remove anyway"
+remove_anyway = "그래도 제거"
 # context: button
-remove = "Remove"
+remove = "제거"
 # context: button
-cancel = "Cancel"
+cancel = "취소"
 # context: button
-back = "Back"
+back = "뒤로"
 # context: button
-force_yes = "Discard changes and remove"
+force_yes = "변경 버리고 제거"
 # context: button
-merge_then_remove = { git = "Merge into... then remove", local = "Merge into... then remove" }
+merge_then_remove = "{$Merge} 후 제거..."
 # context: button
-merge_run = { git = "Merge", local = "Merge" }
+merge_run = "{$Merge}"
 # context: button
-merge_remove_run = { git = "Merge and remove", local = "Merge and remove" }
-merge_pick = "Merge {branch} into:"
-merge_checked_out = "{target} is checked out in {path}: the merge runs there."
-merge_not_checked_out = "{target} is not checked out in any worktree: check it out first."
-merge_gone = "the branch {branch} no longer exists"
-merge_none = "There is no other local branch to merge into."
-detached_no_merge = "a detached worktree has no branch to merge"
+merge_remove_run = "{$Merge} 후 제거"
+merge_pick = "{branch}을(를) 다음으로 {$merge}:"
+merge_checked_out = "{target}은(는) {path}에 체크아웃되어 있습니다: 거기서 {$merge}합니다."
+merge_not_checked_out = "{target}은(는) 어떤 워크트리에도 체크아웃되어 있지 않습니다: 먼저 체크아웃하세요."
+merge_gone = "브랜치 {branch}이(가) 더 이상 없습니다"
+merge_none = "{$merge}할 다른 로컬 브랜치가 없습니다."
+detached_no_merge = "분리된 워크트리에는 {$merge}할 브랜치가 없습니다"
 # context: default stash message; {name} is the worktree folder
 stash_default = "WIP on {name}"
 # context: key hint
-hint_next = "next"
+hint_next = "다음"
 # context: key hint
-hint_default = "run"
+hint_default = "실행"

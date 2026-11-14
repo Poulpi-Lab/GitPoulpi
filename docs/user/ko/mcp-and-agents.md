@@ -478,6 +478,8 @@ CLI 명령마다 도구가 하나씩 있으며, 이름은 경로를 `_`로 이�
 | `workspace_show` | `gitpoulpi workspace show` | read |
 | `worktree_add` | `gitpoulpi worktree add` | write |
 | `worktree_list` | `gitpoulpi worktree list` | read |
+| `worktree_changes` | `gitpoulpi worktree changes` | read |
+| `worktree_remove` | `gitpoulpi worktree remove` | destructive |
 
 Not exposed as tools:
 

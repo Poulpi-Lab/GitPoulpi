@@ -202,8 +202,10 @@ dwiema sekcjami, aby zmienić ich rozmiar.
   `fix/`). Znacznik wyboru oznacza bieżącą gałąź. Foldery można
   wyłączyć w Ustawieniach.
 - **ZDALNE**: każde zdalne repozytorium z jego gałęziami pod spodem.
-- **WORKTREES**: powiązane worktree, jeśli są. Kliknij jedno dwukrotnie, aby
-  otworzyć je we własnej karcie.
+- **WORKTREES**: powiązane worktree, jeśli są (albo gdy pokazałeś sekcję).
+  Przycisk **+** w jej nagłówku tworzy nowe; kliknij worktree dwukrotnie, aby
+  otworzyć je we własnej karcie, kliknij je prawym przyciskiem, aby zobaczyć
+  Otwórz w, Merge i Usuń. Zob. [Worktree](worktrees.md).
 - **STASHES**: stashe. Kliknij jeden prawym przyciskiem, aby zobaczyć
   **Pop**, **Zastosuj** i **Drop**.
 - **TAGS**: tagi, w folderach wydzielanych po `/` tak jak gałęzie (`releases/`,

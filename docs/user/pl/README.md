@@ -72,6 +72,8 @@ przechodź wtedy, gdy będą potrzebne.
     Co przechodzi przez tmux, zellij, screen, herdr i panele terminala:
     **[Multipleksery](multiplexers.md)**.
 
+Także: **[Worktree](worktrees.md)**: tworzenie, otwieranie, scalanie i usuwanie powiązanych worktree.
+
 Także: **[Kilka zdalnych dla jednej gałęzi](multiple-remotes.md)**: cele push i źródła pull,
 okno Zdalne gałęzi, Push do wszystkich lub do wybranych zdalnych, rozstrzyganie zdalnego,
 które się przesunęło, Kontynuuj po konflikcie, CLI i alias zwykłego gita.

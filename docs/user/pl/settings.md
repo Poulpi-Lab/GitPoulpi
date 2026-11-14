@@ -523,7 +523,9 @@ przyciski folderu **Zakończ i cd tutaj**, **Wpis domyślny** i **Przywróć wyk
 ustawienia domyślne**. Karta **Wpisy** to [lista](#listy) (każdy wpis z etykietą
 i poleceniem): **+ Dodaj ▾** oferuje ustawienia wstępne i pozycję **Własny**,
 a wpis domyślny jest oznaczony `★`. Pola zaznaczonego wpisu
-zawierają przycisk **Testuj**. Zob. [Otwórz w](open-in.md).
+zawierają pole **Może otwierać worktree** (domyślnie zaznaczone: wpis jest
+oferowany w menu Otwórz w wiersza worktree, zob. [Worktree](worktrees.md))
+oraz przycisk **Testuj**. Zob. [Otwórz w](open-in.md).
 
 Pierwszy wiersz, **Podążaj za folderem aktywnej karty**, ma dwie wartości:
 

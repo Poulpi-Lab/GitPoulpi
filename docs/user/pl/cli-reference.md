@@ -154,6 +154,8 @@ Hunki i linie są numerowane tak, jak numeruje je `gitpoulpi --json diff`.
 | `tag fetch <name> [--remote R]` | Pobiera jeden tag ze zdalnego (domyślnie tego, które go ma), np. tag z `where: remote`. Nigdy nie nadpisuje lokalnego tagu wskazującego inny commit. |
 | `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tagi na zdalnym repozytorium (bez nazw: każdy tag, którego nie ma żadne zdalne repozytorium). Usunięcie tagu na zdalnym repozytorium można cofnąć (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Powiązane worktree. |
+| `worktree changes <path>` | Niezatwierdzone zmiany worktree (`path`, `untracked`); puste, gdy jest czyste. |
+| `worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` | Usuwa powiązane worktree. To z niezatwierdzonymi zmianami jest odrzucane, chyba że podano `--force` (zmiany przepadają), `--commit-message` (najpierw commit na jego gałęzi) albo `--stash-message` (najpierw stash, także nieśledzonych). `--delete-branch` kasuje też jego gałąź (zapisane w dzienniku). Samego usunięcia nie można cofnąć. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Submoduły ([Submoduły](submodules.md)). |
 
 `--autostash` robi stash lokalnych zmian blokujących operację, wykonuje ją

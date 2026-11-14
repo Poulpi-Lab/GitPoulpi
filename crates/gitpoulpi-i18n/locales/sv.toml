@@ -884,7 +884,6 @@ pull = "{$Pull}"
 push_branch = "{$Push} {name}"
 start_pr = "Starta en {$pr} från {name}..."
 fetch = { git = "Fetch", local = "Hämta" }
-set_upstream = { git = "Ange upstream för {name}...", local = "Ange upstream för {name}..." }
 # context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
 remotes_of = "Remotes of {name}..."
 rename = "Byt namn på {name}..."
@@ -2209,6 +2208,24 @@ saving_remote = "sparar remoten {name}..."
 host_not_recognized = "remote-värden känns inte igen"
 link_branch = "länk till grenen"
 link_commit = { git = "länk till commiten", local = "länk till incheckningen" }
+# context: menu row of the Push dropdown: push the branch to its upstream and every extra push target; {remotes} lists them, comma separated
+push_to_all = "{$Push} to all ({remotes})"
+# context: menu row: push the branch to one remote only; {remote} is that remote
+push_to_only = "{$Push} to {remote} only"
+# context: menu row: opens the dialog where the remotes of this one push are ticked
+push_to_selected = "{$Push} to selected remotes..."
+# context: menu row of the Push dropdown that opens the dialog of the remotes a branch pushes to and pulls from; {branch} is the branch
+remotes_of = "Remotes of {branch}..."
+# context: menu row of the Pull dropdown: pull the upstream and every extra pull source; {remotes} lists them, joined with +
+pull_from_all = "{$Pull} from all sources ({remotes})"
+# context: menu row: pull from one remote only, once; {remote} is that remote
+pull_from_only = "{$Pull} from {remote} only"
+# context: status line while a push to several remotes starts; {branch} is the branch, {remotes} the remote names
+pushing_to_all = { git = "pushing {branch} to {remotes}...", local = "pushing {branch} to {remotes}..." }
+# context: status line while a pull from several remotes starts; {branch} is the branch, {remotes} the remote names
+pulling_from_all = { git = "pulling {branch} from {remotes}...", local = "pulling {branch} from {remotes}..." }
+# context: status line: the branch has no remote to pull from; {branch} is the branch
+no_pull_remote = "{branch} has no remote to {$pull} from"
 
 [keymap_action]
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
@@ -3638,6 +3655,28 @@ view_log_column_fit_all = "Vy: Log-kolumn: anpassa alla kolumner efter innehåll
 view_log_scroll_left = "Vy: Log: rulla kolumnerna åt vänster"
 view_log_scroll_right = "Vy: Log: rulla kolumnerna åt höger"
 view_log_columns_layout = "Vy: Log: växla rullning i sidled för kolumnerna"
+# context: palette command: push to the upstream and every extra push target
+git_push_to_all_targets = "Git: {$Push} to All Targets"
+# context: palette command: pull the upstream and every extra pull source
+git_pull_from_all_sources = "Git: {$Pull} from All Sources"
+# context: palette command: opens a list of remotes, pulls from the chosen one once
+git_pull_from_one_remote = "Git: {$Pull} from One Remote..."
+# context: palette command: reopens the progress window of the last push to several remotes
+git_show_grouped_push = "Git: Show Grouped {$Push}"
+# context: palette command: goes on with the push to several remotes that paused on conflicts
+git_continue_grouped_push = "Git: Continue Grouped {$Push}"
+# context: palette command: abandons the push to several remotes that paused on conflicts
+git_abort_grouped_push = "Git: Abort Grouped {$Push}"
+# context: palette command: tries again the remotes that failed in the last push to several remotes
+git_retry_failed_pushes = "Git: Retry Failed Pushes"
+# context: palette: why a command is grayed out
+why_no_grouped_push = "there is no grouped {$push} to show"
+# context: palette: why a command is grayed out
+why_group_not_paused = "no grouped {$push} is waiting on conflicts"
+# context: palette: why Continue is grayed out
+why_group_not_ready = "resolve and conclude the conflicts first"
+# context: palette: why a command is grayed out
+why_nothing_to_retry = "no remote failed in the last grouped {$push}"
 
 [help_section]
 rewrite = "Skriv om historiken"
@@ -9509,8 +9548,6 @@ unset_button = "Unset upstream"
 apply_button = "Apply"
 # context: shown while the dialog reads the branch's remotes
 loading = "Reading the remotes..."
-# context: inline error when Apply is pressed while a gone row is left; {remote} is its name
-gone_first = "{remote} no longer exists: remove its row first (Del)."
 # context: title of the small dialog that asks for the branch's name on one remote; {remote} is the remote
 rename_title = "Branch name on {remote}"
 # context: placeholder of that dialog's field
@@ -9681,6 +9718,14 @@ aborted = "Grouped {$push} aborted."
 running = "Grouped {$push}..."
 # context: question before aborting a paused grouped push; {branch} is the local branch, {remote} the remote whose merge or rebase stopped
 abort_confirm = "Abort the grouped {$push} of {branch} (stopped on {remote})?\nThe {$merge} or {$rebase} in progress is thrown away. What was already sent stays."
+# context: title of the dialog that shows how a branch stands against each remote before a grouped pull; {n} is the number of remotes, {branch} the local branch
+title_pull_plan = { one = "{$Pull} {branch} from {n} remote", other = "{$Pull} {branch} from {n} remotes" }
+# context: text of the strip over the Log while a grouped pull waits for the conflicts of a remote to be resolved; {remote} is that remote
+strip_waiting_pull = "Grouped {$pull} paused ({remote}): resolve and conclude, then Continue."
+# context: text of the strip when the conflicts are resolved and the grouped pull can go on; {remote} is that remote
+strip_ready_pull = "Grouped {$pull} paused ({remote}): resolved. Continue to {$pull}."
+# context: tooltip of the grayed Continue button of the strip: the conflicts are not concluded yet
+strip_continue_blocked = "Resolve and conclude the conflicts first."
 [multi_remote]
 state_new = "new"
 state_gone = "gone"

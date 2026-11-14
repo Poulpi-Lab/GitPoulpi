@@ -47,6 +47,14 @@ fn config_prefers_rebase() -> bool {
         .unwrap_or(false)
 }
 
+/// `git.push_group_preflight` in the ambient config (on when it cannot be
+/// read): `--no-preflight` turns it off for one call, never on.
+fn config_preflight() -> bool {
+    gitpoulpi_config::Settings::resolve_ambient()
+        .map(|s| s.config().git.push_group_preflight)
+        .unwrap_or(true)
+}
+
 fn action_word(a: GroupAction) -> &'static str {
     match a {
         GroupAction::Push => "push",
@@ -310,7 +318,7 @@ pub(super) async fn run_group(session: &mut Session, g: Group) -> Result<Emitted
             branch: branch.clone(),
             mode: g.mode,
             targets,
-            preflight: !g.no_preflight,
+            preflight: !g.no_preflight && config_preflight(),
             prefer_rebase,
             refused: Vec::new(),
         },
@@ -438,7 +446,7 @@ pub(super) async fn remote_group(
                     branch,
                     mode,
                     targets,
-                    preflight: !no_preflight,
+                    preflight: !no_preflight && config_preflight(),
                     prefer_rebase: config_prefers_rebase(),
                     refused: Vec::new(),
                 },
@@ -488,7 +496,7 @@ pub(super) async fn remote_group(
                         branch: pending.branch.clone(),
                         mode: pending.mode,
                         targets: Some(refs),
-                        preflight: true,
+                        preflight: config_preflight(),
                         prefer_rebase: req.prefer_rebase,
                         refused: Vec::new(),
                     },

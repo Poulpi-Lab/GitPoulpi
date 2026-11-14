@@ -887,7 +887,6 @@ pull = "{$Pull}"
 push_branch = "{$Push} {name}"
 start_pr = "Démarrer une {$pr} depuis {name}..."
 fetch = "{$Fetch}"
-set_upstream = { git = "Définir l'upstream de {name}...", local = "Définir l'amont de {name}..." }
 # context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
 remotes_of = "Remotes de {name}..."
 rename = "Renommer {name}..."
@@ -2211,6 +2210,24 @@ saving_remote = "enregistrement du distant {name}..."
 host_not_recognized = "hôte du distant non reconnu"
 link_branch = "lien de la branche"
 link_commit = { git = "lien du commit", local = "lien de la validation" }
+# context: menu row of the Push dropdown: push the branch to its upstream and every extra push target; {remotes} lists them, comma separated
+push_to_all = "{$Push} vers tous ({remotes})"
+# context: menu row: push the branch to one remote only; {remote} is that remote
+push_to_only = "{$Push} vers {remote} seulement"
+# context: menu row: opens the dialog where the remotes of this one push are ticked
+push_to_selected = "{$Push} vers des distants choisis..."
+# context: menu row of the Push dropdown that opens the dialog of the remotes a branch pushes to and pulls from; {branch} is the branch
+remotes_of = "Distants de {branch}..."
+# context: menu row of the Pull dropdown: pull the upstream and every extra pull source; {remotes} lists them, joined with +
+pull_from_all = "{$Pull} depuis toutes les sources ({remotes})"
+# context: menu row: pull from one remote only, once; {remote} is that remote
+pull_from_only = "{$Pull} depuis {remote} seulement"
+# context: status line while a push to several remotes starts; {branch} is the branch, {remotes} the remote names
+pushing_to_all = { git = "push de {branch} vers {remotes}...", local = "poussée de {branch} vers {remotes}..." }
+# context: status line while a pull from several remotes starts; {branch} is the branch, {remotes} the remote names
+pulling_from_all = { git = "pull de {remotes} dans {branch}...", local = "tirage de {remotes} dans {branch}..." }
+# context: status line: the branch has no remote to pull from; {branch} is the branch
+no_pull_remote = "{branch} n'a aucun distant où faire un {$pull}"
 
 [keymap_action]
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
@@ -3639,6 +3656,28 @@ view_log_column_fit_all = "Affichage : Colonne du Log : Ajuster toutes les col
 view_log_scroll_left = "Affichage : Log : Faire défiler les colonnes vers la gauche"
 view_log_scroll_right = "Affichage : Log : Faire défiler les colonnes vers la droite"
 view_log_columns_layout = "Affichage : Log : Activer ou désactiver le défilement latéral des colonnes"
+# context: palette command: push to the upstream and every extra push target
+git_push_to_all_targets = "Git : {$Push} vers toutes les cibles"
+# context: palette command: pull the upstream and every extra pull source
+git_pull_from_all_sources = "Git : {$Pull} depuis toutes les sources"
+# context: palette command: opens a list of remotes, pulls from the chosen one once
+git_pull_from_one_remote = "Git : {$Pull} depuis un seul distant..."
+# context: palette command: reopens the progress window of the last push to several remotes
+git_show_grouped_push = "Git : Afficher le {$Push} groupé"
+# context: palette command: goes on with the push to several remotes that paused on conflicts
+git_continue_grouped_push = "Git : Continuer le {$Push} groupé"
+# context: palette command: abandons the push to several remotes that paused on conflicts
+git_abort_grouped_push = "Git : Abandonner le {$Push} groupé"
+# context: palette command: tries again the remotes that failed in the last push to several remotes
+git_retry_failed_pushes = "Git : Relancer les envois échoués"
+# context: palette: why a command is grayed out
+why_no_grouped_push = "aucun {$push} groupé à afficher"
+# context: palette: why a command is grayed out
+why_group_not_paused = "aucun {$push} groupé n'attend la résolution de conflits"
+# context: palette: why Continue is grayed out
+why_group_not_ready = "résolvez et concluez d'abord les conflits"
+# context: palette: why a command is grayed out
+why_nothing_to_retry = "aucun distant n'a échoué lors du dernier {$push} groupé"
 
 [help_section]
 rewrite = "Réécrire l'historique"
@@ -9521,8 +9560,6 @@ unset_button = "Retirer l'amont"
 apply_button = "Appliquer"
 # context: shown while the dialog reads the branch's remotes
 loading = "Lecture des distants..."
-# context: inline error when Apply is pressed while a gone row is left; {remote} is its name
-gone_first = "{remote} n'existe plus : retirez d'abord sa ligne (Suppr)."
 # context: title of the small dialog that asks for the branch's name on one remote; {remote} is the remote
 rename_title = "Nom de la branche sur {remote}"
 # context: placeholder of that dialog's field
@@ -9693,6 +9730,14 @@ aborted = { git = "Push groupé abandonné.", local = "Envoi groupé abandonné.
 running = { git = "Push groupé...", local = "Envoi groupé..." }
 # context: question before aborting a paused grouped push; {branch} is the local branch, {remote} the remote whose merge or rebase stopped
 abort_confirm = { git = "Abandonner le push groupé de {branch} (arrêté sur {remote}) ?\nLe merge ou rebase en cours est annulé. Ce qui est déjà envoyé reste.", local = "Abandonner l'envoi groupé de {branch} (arrêté sur {remote}) ?\nLa fusion ou le rebasage en cours est annulé. Ce qui est déjà envoyé reste." }
+# context: title of the dialog that shows how a branch stands against each remote before a grouped pull; {n} is the number of remotes, {branch} the local branch
+title_pull_plan = { one = "{$Pull} de {n} distant dans {branch}", other = "{$Pull} de {n} distants dans {branch}" }
+# context: text of the strip over the Log while a grouped pull waits for the conflicts of a remote to be resolved; {remote} is that remote
+strip_waiting_pull = "{$Pull} groupé en pause ({remote}) : résolvez et concluez, puis Continuer."
+# context: text of the strip when the conflicts are resolved and the grouped pull can go on; {remote} is that remote
+strip_ready_pull = "{$Pull} groupé en pause ({remote}) : résolu. Continuer le {$pull}."
+# context: tooltip of the grayed Continue button of the strip: the conflicts are not concluded yet
+strip_continue_blocked = "Résolvez et concluez d'abord les conflits."
 [multi_remote]
 state_new = "nouveau"
 state_gone = "absent"

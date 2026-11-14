@@ -120,7 +120,7 @@ dela. As entradas mais úteis:
 | Merge, Rebase sobre | Faz merge dela em, ou rebase da branch em checkout sobre, esta ref |
 | Fast-forward de `<branch>` até `<atual>` / de `<atual>` até `<branch>` | Avança uma branch quando isso é um fast-forward; senão fica acinzentado com o motivo (`divergiram, não é um fast-forward`) |
 | Criar worktree a partir de... | Abre um worktree vinculado em sua própria aba |
-| Pull, Push, Fetch, Definir upstream... | Operações de rede nessa branch |
+| Pull, Push, Fetch, Remotos de <branch>... | Operações de rede nessa branch (Remotos de <branch>... abre o diálogo de remotos: o upstream mais uma caixa Push e uma Pull também por remoto; veja [Vários remotos para uma branch](multiple-remotes.md)) |
 | Ocultar / Mostrar no grafo, Solo | Só exibição; ocultam ou isolam uma ref (ocultar também tira os commits que só essa ref alcança) sem tocar no repositório |
 | Renomear, Excluir | Excluir pergunta antes; também é possível excluir a gêmea remota |
 | Copiar nome da branch, Copiar link da branch no remoto | Para a área de transferência |

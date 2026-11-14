@@ -113,7 +113,7 @@ v Logu) otevřete jeho nabídku. Nejužitečnější položky:
 | Merge, Rebase | Provede merge tohoto refu do přepnuté větve, nebo rebase přepnuté větve na tento ref |
 | Fast-forward `<větev>` na `<aktuální>` / `<aktuální>` na `<větev>` | Posune větev dopředu, je-li to fast-forward; jinak je zašedlá s důvodem (`rozešlo se, není to fast-forward`) |
 | Vytvořit worktree z... | Otevře propojený worktree na vlastní kartě |
-| Pull, Push, Fetch, Nastavit upstream... | Síťové operace nad danou větví |
+| Pull, Push, Fetch, Remote větve <větev>... | Síťové operace nad danou větví (Remote větve <větev>... nastaví upstream a navíc políčka Push a Pull také pro každý remote) |
 | Skrýt v grafu / Zobrazit v grafu, Solo | Jen zobrazení; ref skryjí nebo označí jako solo (skrytím zmizí i commity, kterých dosáhne jen ten ref), aniž by se repozitáře dotkly |
 | Přejmenovat, Smazat | Smazání se nejdřív zeptá; lze smazat i vzdáleného dvojníka |
 | Kopírovat název větve, Kopírovat odkaz na větev na remote | Do schránky |

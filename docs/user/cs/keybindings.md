@@ -648,16 +648,16 @@ Klávesy jsou výchozí.
 | Git: Možnosti pullu... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push do remote... |  |
-| Git: Push to Selected Remotes... |  |
-| Git: Push to All Targets |  |
-| Git: Pull from All Sources |  |
-| Git: Pull from One Remote... |  |
-| Git: Show Grouped Push |  |
-| Git: Continue Grouped Push |  |
-| Git: Abort Grouped Push |  |
-| Git: Retry Failed Pushes |  |
+| Git: Push do vybraných remote... |  |
+| Git: Push do všech cílů |  |
+| Git: Pull ze všech zdrojů |  |
+| Git: Pull z jednoho remote... |  |
+| Git: Zobrazit push do více remote |  |
+| Git: Pokračovat v push do více remote |  |
+| Git: Zrušit push do více remote |  |
+| Git: Zopakovat push na remote, která selhala |  |
 | Git: Force push (s lease)... |  |
-| Git: Remotes of Branch... |  |
+| Git: Remote větve... |  |
 | Remote: Přidat remote... |  |
 | Remote: Odebrat remote... |  |
 | Remote: Upravit remote... |  |

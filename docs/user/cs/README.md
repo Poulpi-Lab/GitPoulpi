@@ -71,9 +71,12 @@ budete potřebovat.
     Co projde přes tmux, zellij, screen, herdr a panely terminálu:
     **[Multiplexery](multiplexers.md)**.
 
-Také: **[Workflow větvení](branching-workflows.md)**, předvolby Git Flow, GitHub
+Také: **[Několik remote pro jednu větev](multiple-remotes.md)**: cíle push a zdroje
+pull, dialog Remote, Push na všechny nebo vybrané remote, řešení remote, který se posunul,
+Pokračovat po konfliktu, CLI a alias pro obyčejný git.
+
+**[Workflow větvení](branching-workflows.md)**, předvolby Git Flow, GitHub
 Flow, GitLab Flow a Trunk-based nebo vlastní základní větve, vzory názvů větví
-a typy tématických větví (`gitpoulpi flow ...`).
 
 **[Přepis historie](history-rewrite.md)**: nástroj pro přepis (`Ctrl+G Shift+H`),
 který přepisuje autory, data, zprávy a obsah souborů v mnoha commitech, s náhledem,

@@ -423,8 +423,8 @@ list_title = "配置"
 duplicate_name = "{name}（副本）"
 
 [settings_open_in]
-worktree = "Can open a worktree"
-worktree_help = "Offer this entry in the Open in menu of a worktree (right-click a row of the WORKTREES section). It runs with the worktree's folder as ${{cwd}}. Every entry is checked by default: untick the ones that make no sense on a folder."
+worktree = { git = "可打开 worktree", local = "可打开工作树" }
+worktree_help = { git = "在 worktree 的“打开方式”菜单（右键 WORKTREE 分区中的某一行）中提供此条目，运行时以该 worktree 的文件夹作为 ${{cwd}}。默认每个条目都已勾选：请取消勾选那些对文件夹没有意义的条目。", local = "在工作树的“打开方式”菜单（右键 工作树 分区中的某一行）中提供此条目，运行时以该工作树的文件夹作为 ${{cwd}}。默认每个条目都已勾选：请取消勾选那些对文件夹没有意义的条目。" }
 list_title = "条目"
 detecting = "正在检测已安装的应用…"
 section_title = "打开方式"
@@ -1227,19 +1227,19 @@ bad_branch = "{name} 不是有效的分支名"
 
 [worktree]
 # context: field label: the name of the new worktree, the folder name is built from it
-name = "Name"
+name = "名称"
 # context: placeholder
-name_hint = "the folder is named after it"
-need_name = "give the worktree a name"
-bad_name = "the name cannot contain slashes (the Folder field takes a path)"
+name_hint = "文件夹以它命名"
+need_name = { git = "请为 worktree 命名", local = "请为工作树命名" }
+bad_name = "名称不能包含斜杠（路径请填在“文件夹”字段中）"
 # context: field label: the branch or commit the worktree starts from
-ref_field = "Ref"
+ref_field = "引用"
 # context: placeholder
-ref_hint = "choose a branch"
+ref_hint = "选择一个分支"
 # context: combobox entry: the commit the dialog was opened on; {label} what the user clicked (a tag, a remote branch, a short id), {id} the short id
-commit_choice = { git = "commit {label} ({id})", local = "commit {label} ({id})" }
-branch_exists = "the branch {b} already exists: pick it in Ref or choose another name"
-is_a_file = "{path} is a file, not a folder"
+commit_choice = { git = "{$commit} {label}（{id}）", local = "{$commit} {label}（{id}）" }
+branch_exists = "分支 {b} 已存在：请在“引用”中选择它，或换一个名称"
+is_a_file = "{path} 是文件，不是文件夹"
 title = { git = "从 {label} 创建 worktree", local = "从 {label} 创建工作树" }
 folder = "文件夹"
 folder_hint = "一个新的或空的文件夹"
@@ -2933,14 +2933,14 @@ env_timeout = "代理自身的请求超时（毫秒）"
 env_offline = "启动时不发起网络调用"
 
 [palette]
-sidebar_show_worktrees = "Sidebar: Show Worktrees Section"
-refs_open_worktree_in = "Refs: Open Worktree In..."
-refs_merge_worktree_branch_into = { git = "Refs: Merge Worktree Branch Into...", local = "Refs: Merge Worktree Branch Into..." }
-refs_remove_worktree = { git = "Refs: Remove Worktree...", local = "Refs: Remove Worktree..." }
+sidebar_show_worktrees = { git = "左侧窗格：显示 worktree 分区", local = "左侧窗格：显示工作树分区" }
+refs_open_worktree_in = { git = "引用：worktree 的打开方式…", local = "引用：工作树的打开方式…" }
+refs_merge_worktree_branch_into = { git = "引用：将 worktree 的分支 {$merge} 到…", local = "引用：将工作树的分支{$merge}到…" }
+refs_remove_worktree = { git = "引用：移除 worktree…", local = "引用：移除工作树…" }
 # context: opens the + menu of the WORKTREES section
-refs_create_worktree = { git = "Refs: Create Worktree...", local = "Refs: Create Worktree..." }
-refs_create_worktree_from_current_branch = { git = "Refs: Create Worktree from Current Branch", local = "Refs: Create Worktree from Current Branch" }
-refs_create_worktree_choosing_a_branch = { git = "Refs: Create Worktree Choosing a Branch", local = "Refs: Create Worktree Choosing a Branch" }
+refs_create_worktree = { git = "引用：创建 worktree…", local = "引用：创建工作树…" }
+refs_create_worktree_from_current_branch = { git = "引用：从当前分支创建 worktree", local = "引用：从当前分支创建工作树" }
+refs_create_worktree_choosing_a_branch = { git = "引用：选择分支创建 worktree", local = "引用：选择分支创建工作树" }
 # context: palette command; shows or hides the commit list column left of the diff, File View, Blame and Editor
 view_toggle_commit_column = { git = "视图：切换 {$Commit} 列", local = "视图：切换{$Commit}列" }
 view_column_off = { git = "视图：{$Commit} 列：隐藏", local = "视图：{$Commit}列：隐藏" }
@@ -4999,11 +4999,11 @@ desc_rebasing_step = { git = "正在将 {branch} {$rebase} 到 {onto} · 第 {k}
 
 [link]
 # context: {path} is the folder of the removed worktree
-worktree_removed = "removed worktree {path}"
-worktree_removed_branch_deleted = "removed worktree {path} and deleted branch {branch} (Undo brings the branch back)"
-worktree_removed_branch_kept = "removed worktree {path}; branch {branch} was kept: {why}"
-worktree_stashed = { git = "changes stashed", local = "changes stashed" }
-worktree_committed = { git = "changes committed as {id}", local = "changes committed as {id}" }
+worktree_removed = { git = "已移除 worktree {path}", local = "已移除工作树 {path}" }
+worktree_removed_branch_deleted = { git = "已移除 worktree {path} 并删除分支 {branch}（撤销可找回该分支）", local = "已移除工作树 {path} 并删除分支 {branch}（撤销可找回该分支）" }
+worktree_removed_branch_kept = { git = "已移除 worktree {path}；分支 {branch} 已保留：{why}", local = "已移除工作树 {path}；分支 {branch} 已保留：{why}" }
+worktree_stashed = { git = "更改已 {$stash}", local = "更改已{$stash}" }
+worktree_committed = { git = "更改已 {$commit} 为 {id}", local = "更改已{$commit}为 {id}" }
 amend_done = "{id} 已修订，现在是 {now}（之前的末端 {previous}：撤销即可恢复）"
 act_staging_file = { git = "正在 {$stage} {name}…", local = "正在暂存 {name}…" }
 act_unstaging_file = { git = "正在 {$unstage} {name}…", local = "正在取消暂存 {name}…" }
@@ -9767,89 +9767,89 @@ tip_open_hint = "点击编辑此分支的远程"
 
 [worktree_manage]
 # context: hover label of the + on the WORKTREES header
-plus_tip = { git = "Create worktree", local = "Create worktree" }
+plus_tip = { git = "创建 worktree", local = "创建工作树" }
 # context: title of the menu the + opens
-plus_title = { git = "New worktree", local = "New worktree" }
+plus_title = { git = "新建 worktree", local = "新建工作树" }
 # context: menu row: create a worktree
-plus_head = "From the current branch"
+plus_head = "从当前分支"
 # context: menu row: create a worktree
-plus_commit = "From the selected commit"
+plus_commit = { git = "从所选 {$commit}", local = "从所选{$commit}" }
 # context: menu row: create a worktree on a branch picked in the dialog
-plus_choose = "Choose a branch..."
-select_a_commit = { git = "Select a commit in the Log first", local = "Select a commit in the Log first" }
-select_a_worktree = { git = "Select a worktree in the Refs pane first", local = "Select a worktree in the Refs pane first" }
-main_cannot_be_removed = { git = "The main worktree cannot be removed", local = "The main worktree cannot be removed" }
-no_head = "This repository has no commit yet"
+plus_choose = "选择分支…"
+select_a_commit = { git = "请先在 Log 窗格中选择一个 {$commit}", local = "请先在 Log 窗格中选择一个{$commit}" }
+select_a_worktree = { git = "请先在引用窗格中选择一个 worktree", local = "请先在引用窗格中选择一个工作树" }
+main_cannot_be_removed = { git = "不能移除主 worktree", local = "不能移除主工作树" }
+no_head = { git = "此仓库还没有 {$commit}", local = "此仓库还没有{$commit}" }
 # context: hint line of the empty WORKTREES section
-empty_hint = { git = "No worktree yet: + to create one", local = "No worktree yet: + to create one" }
+empty_hint = { git = "还没有 worktree：按 + 创建", local = "还没有工作树：按 + 创建" }
 # context: context menu row of a worktree
-menu_open_tab = "Open in a new tab"
+menu_open_tab = "在新标签页中打开"
 # context: submenu of a worktree row: the Open in entries
-menu_open_in = "Open in"
-menu_open_in_none = "Open in (no entry yet)"
-menu_open_in_none_why = "No Open in entry is marked Can open a worktree: Settings > Open in"
-menu_merge = { git = "Merge {branch} into...", local = "Merge {branch} into..." }
-menu_remove = { git = "Remove worktree...", local = "Remove worktree..." }
-not_listed = { git = "{path} is not a worktree of this repository any more", local = "{path} is not a worktree of this repository any more" }
-removing = { git = "removing worktree {path}...", local = "removing worktree {path}..." }
-merging = { git = "merging {branch}...", local = "merging {branch}..." }
+menu_open_in = "打开方式"
+menu_open_in_none = "打开方式（暂无条目）"
+menu_open_in_none_why = { git = "没有“打开方式”条目被标记为“可打开 worktree”：设置 > 打开方式", local = "没有“打开方式”条目被标记为“可打开工作树”：设置 > 打开方式" }
+menu_merge = { git = "将 {branch} {$merge} 到…", local = "将 {branch} {$merge}到…" }
+menu_remove = { git = "移除 worktree…", local = "移除工作树…" }
+not_listed = { git = "{path} 不再是此仓库的 worktree", local = "{path} 不再是此仓库的工作树" }
+removing = { git = "正在移除 worktree {path}…", local = "正在移除工作树 {path}…" }
+merging = { git = "正在 {$merge} {branch}…", local = "正在{$merge} {branch}…" }
 # context: dialog title; {name} is the folder name of the worktree; a worktree is a second checked-out copy of the repository
-remove_title = { git = "Remove worktree {name}", local = "Remove worktree {name}" }
+remove_title = { git = "移除 worktree {name}", local = "移除工作树 {name}" }
 # context: dialog title; {branch} is a branch name
-merge_title = { git = "Merge {branch} into another branch", local = "Merge {branch} into another branch" }
-loading = "Checking the worktree..."
-clean_text = "Remove {path}? Its folder is deleted. The branch {branch} stays."
-clean_text_detached = "Remove {path}? Its folder is deleted. It is on a detached HEAD, so no branch is affected."
+merge_title = { git = "将 {branch} {$merge} 到另一个分支", local = "将 {branch} {$merge}到另一个分支" }
+loading = { git = "正在检查 worktree…", local = "正在检查工作树…" }
+clean_text = "移除 {path}？其文件夹将被删除，分支 {branch} 保留。"
+clean_text_detached = "移除 {path}？其文件夹将被删除。它处于 detached HEAD，因此不影响任何分支。"
 # context: plural: {n} changes of the worktree at {path}
-dirty_count = { one = "{n} uncommitted change in {path}", other = "{n} uncommitted changes in {path}" }
+dirty_count = { one = { git = "{path} 中有 {n} 处未 {$commit} 的更改", local = "{path} 中有 {n} 处未{$commit}的更改" }, other = { git = "{path} 中有 {n} 处未 {$commit} 的更改", local = "{path} 中有 {n} 处未{$commit}的更改" } }
 # context: plural: {n} changes that would be lost
-force_text = { one = "Remove {path} and discard its {n} uncommitted change? This cannot be undone.", other = "Remove {path} and discard its {n} uncommitted changes? This cannot be undone." }
+force_text = { one = { git = "移除 {path} 并丢弃其 {n} 处未 {$commit} 的更改？此操作无法撤销。", local = "移除 {path} 并丢弃其 {n} 处未{$commit}的更改？此操作无法撤销。" }, other = { git = "移除 {path} 并丢弃其 {n} 处未 {$commit} 的更改？此操作无法撤销。", local = "移除 {path} 并丢弃其 {n} 处未{$commit}的更改？此操作无法撤销。" } }
 # context: field label
-commit_field = "Commit message"
+commit_field = { git = "{$Commit} 消息", local = "{$Commit}消息" }
 # context: placeholder
-commit_hint = "describe the changes"
+commit_hint = "描述这些更改"
 # context: field label
-stash_field = "Stash message"
-stash_note = "The stash is shared with the main repository: pop it there later."
+stash_field = { git = "{$Stash} 消息", local = "{$Stash}消息" }
+stash_note = { git = "{$Stash} 与主仓库共用：之后请在主仓库中 {$pop} 它。", local = "{$Stash}与主仓库共用：之后请在主仓库中{$pop}它。" }
 # context: field label: the branch to create for the commit
-branch_field = "Branch"
+branch_field = "分支"
 # context: placeholder
-branch_hint = "HEAD is detached: name a branch for the commit"
-need_message = "write a commit message"
-need_branch = "name a branch for the commit (HEAD is detached)"
-delete_branch = "Also delete branch {branch} (merged into {into})"
-branch_not_merged = "Branch {branch} is not merged: it stays."
+branch_hint = { git = "HEAD 已分离：请为该 {$commit} 指定一个分支名", local = "HEAD 已分离：请为该{$commit}指定一个分支名" }
+need_message = { git = "请填写 {$commit} 消息", local = "请填写{$commit}消息" }
+need_branch = { git = "请为该 {$commit} 指定一个分支名（HEAD 已分离）", local = "请为该{$commit}指定一个分支名（HEAD 已分离）" }
+delete_branch = { git = "同时删除分支 {branch}（已 {$merge} 到 {into}）", local = "同时删除分支 {branch}（已{$merge}到 {into}）" }
+branch_not_merged = { git = "分支 {branch} 尚未 {$merge}：将保留。", local = "分支 {branch} 尚未{$merge}：将保留。" }
 # context: button
-commit_remove = { git = "Commit and remove", local = "Commit and remove" }
+commit_remove = { git = "{$Commit} 并移除", local = "{$Commit}并移除" }
 # context: button
-stash_remove = { git = "Stash and remove", local = "Stash and remove" }
+stash_remove = { git = "{$Stash} 并移除", local = "{$Stash}并移除" }
 # context: button: open the worktree in a tab to commit its changes there
-open_to_commit = "Open to commit"
+open_to_commit = { git = "打开以 {$commit}", local = "打开以{$commit}" }
 # context: button: discards the changes
-remove_anyway = "Remove anyway"
+remove_anyway = "仍然移除"
 # context: button
-remove = "Remove"
+remove = "移除"
 # context: button
-cancel = "Cancel"
+cancel = "取消"
 # context: button
-back = "Back"
+back = "返回"
 # context: button
-force_yes = "Discard changes and remove"
+force_yes = "放弃更改并移除"
 # context: button
-merge_then_remove = { git = "Merge into... then remove", local = "Merge into... then remove" }
+merge_then_remove = { git = "{$Merge} 到…后移除", local = "{$Merge}到…后移除" }
 # context: button
-merge_run = { git = "Merge", local = "Merge" }
+merge_run = { git = "{$Merge}", local = "{$Merge}" }
 # context: button
-merge_remove_run = { git = "Merge and remove", local = "Merge and remove" }
-merge_pick = "Merge {branch} into:"
-merge_checked_out = "{target} is checked out in {path}: the merge runs there."
-merge_not_checked_out = "{target} is not checked out in any worktree: check it out first."
-merge_gone = "the branch {branch} no longer exists"
-merge_none = "There is no other local branch to merge into."
-detached_no_merge = "a detached worktree has no branch to merge"
+merge_remove_run = { git = "{$Merge} 并移除", local = "{$Merge}并移除" }
+merge_pick = { git = "将 {branch} {$merge} 到：", local = "将 {branch} {$merge}到：" }
+merge_checked_out = { git = "{target} 已在 {path} 中检出：将在那里执行 {$merge}。", local = "{target} 已在 {path} 中检出：将在那里执行{$merge}。" }
+merge_not_checked_out = { git = "{target} 没有在任何 worktree 中检出：请先检出它。", local = "{target} 没有在任何工作树中检出：请先检出它。" }
+merge_gone = "分支 {branch} 已不存在"
+merge_none = { git = "没有其他可以 {$merge} 到的本地分支。", local = "没有其他可以{$merge}到的本地分支。" }
+detached_no_merge = { git = "处于 detached 状态的 worktree 没有可 {$merge} 的分支", local = "处于 detached 状态的工作树没有可{$merge}的分支" }
 # context: default stash message; {name} is the worktree folder
 stash_default = "WIP on {name}"
 # context: key hint
-hint_next = "next"
+hint_next = "下一步"
 # context: key hint
-hint_default = "run"
+hint_default = "执行"

@@ -128,6 +128,8 @@
 | `tag fetch <name> [--remote R]` | 从某个远程（默认是拥有它的那个）fetch 一个 tag，例如 `where: remote` 的 tag。绝不会覆盖指向其他 commit 的本地 tag。 |
 | `tag push [names...] [--remote R]`、`tag delete-remote <name> [--remote R]` | 远程上的 tag（不给名称：push 所有尚无远程拥有的 tag）。在远程上删除 tag 是可以撤销的（`undo --yes`）。 |
 | `worktree list`、`worktree add <path> <start> [-b BRANCH]` | 关联的 worktree。 |
+| `worktree changes <path>` | worktree 的未提交更改（`path`、`untracked`）；干净时为空。 |
+| `worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` | 移除一个关联的 worktree。有未提交更改的会被拒绝，除非使用 `--force`（更改会丢失）、`--commit-message`（先把更改提交到它的分支）或 `--stash-message`（先把更改连同未跟踪文件一起 stash）。`--delete-branch` 还会删除它的分支（有日志）。移除本身无法撤销。 |
 | `submodule list`、`submodule init [paths]`、`submodule update [paths] [--init] [--recursive]` | 子模块（[子模块](submodules.md)）。 |
 
 `--autostash` 会把阻碍该操作的本地更改 stash 起来，运行操作，然后弹出 stash，不论 `general.auto_stash` 如何设置（[Auto-stash](log-and-history.md#自动-stash)）。

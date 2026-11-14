@@ -195,10 +195,16 @@ fn an_upstream() {
 fn a_branch_name_on_a_remote() {
     let repo = fixture(false);
     let (mut term, _c) = launch(&repo, "pty-slnt-remote-branch");
-    palette(&mut term, "Git: Remotes of Branch", "Git: Remotes of Branch...");
+    palette(
+        &mut term,
+        "Git: Remotes of Branch",
+        "Git: Remotes of Branch...",
+    );
     term.send_keys("Enter").unwrap();
     term.wait_for("the Remotes dialog with its list open", STEP, |s| {
-        s.contains("Remotes of feature") && s.contains("origin/main") && !s.contains("Command Palette")
+        s.contains("Remotes of feature")
+            && s.contains("origin/main")
+            && !s.contains("Command Palette")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // Esc closes the list, Tab walks to the table, `r` renames its first row.

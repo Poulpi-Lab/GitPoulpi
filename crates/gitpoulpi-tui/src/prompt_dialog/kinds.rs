@@ -3,8 +3,8 @@
 use super::*;
 use crate::combo::ComboOption;
 use gitpoulpi_core::domain::{Ref, RefKind, Remote};
-use gitpoulpi_i18n::msg::prompt_dialog as msg;
 use gitpoulpi_i18n::msg::branch_remotes as msg_br;
+use gitpoulpi_i18n::msg::prompt_dialog as msg;
 
 impl PromptDialog {
     /// `Ctrl+G m` and the palette's `Stash With Message...`: an optional

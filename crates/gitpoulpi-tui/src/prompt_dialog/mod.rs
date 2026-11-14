@@ -28,9 +28,9 @@ use crossterm::event::{KeyCode, KeyEvent, MouseButton, MouseEvent, MouseEventKin
 use super::*;
 use crate::dialog_kit::{self, CloseHit, DiscardGuard, Dismiss, DismissAction, DismissKind, Guard};
 use crate::keymap::Action as Bind;
+use gitpoulpi_i18n::msg::branch_remotes as msg_br;
 use gitpoulpi_i18n::msg::input as msg_input;
 use gitpoulpi_i18n::msg::prompt_dialog as msg;
-use gitpoulpi_i18n::msg::branch_remotes as msg_br;
 use gitpoulpi_i18n::msg::remotes as msg_remotes;
 
 /// The dialog's focusable parts, in Tab order.
@@ -546,9 +546,10 @@ impl PromptDialog {
             PromptPart::Extra(0) => self.rename_selected(),
             PromptPart::Extra(_) => self.unset_upstream(),
             // A row's own controls are the table's business (`on_mouse`).
-            PromptPart::Row(_) | PromptPart::Push(_) | PromptPart::Pull(_) | PromptPart::Remove(_) => {
-                PromptOutcome::Stay
-            }
+            PromptPart::Row(_)
+            | PromptPart::Push(_)
+            | PromptPart::Pull(_)
+            | PromptPart::Remove(_) => PromptOutcome::Stay,
         }
     }
 

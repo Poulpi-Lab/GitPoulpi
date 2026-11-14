@@ -104,7 +104,10 @@ impl RemotesPane {
                 .iter()
                 .map(|r| {
                     let url = r.push_url.as_deref().unwrap_or(&r.fetch_url);
-                    (r.name.clone(), Some(normalized(url)).filter(|u| !u.is_empty()))
+                    (
+                        r.name.clone(),
+                        Some(normalized(url)).filter(|u| !u.is_empty()),
+                    )
                 })
                 .collect(),
             known: remotes.iter().map(|r| r.name.clone()).collect(),
@@ -157,7 +160,9 @@ impl RemotesPane {
     }
 
     fn is_primary(&self, row: &Row) -> bool {
-        self.primary.as_ref().is_some_and(|p| p.remote == row.remote)
+        self.primary
+            .as_ref()
+            .is_some_and(|p| p.remote == row.remote)
     }
 
     /// The row's destination as shown: the upstream's branch for the
@@ -297,7 +302,8 @@ impl RemotesPane {
         let (mut push, mut pull) = self.lists();
         push.sort();
         pull.sort();
-        let upstream_changed = chosen_upstream.is_some() && chosen_upstream != self.initial_upstream;
+        let upstream_changed =
+            chosen_upstream.is_some() && chosen_upstream != self.initial_upstream;
         if !upstream_changed && (push.clone(), pull.clone()) == self.initial {
             return Ok(None);
         }

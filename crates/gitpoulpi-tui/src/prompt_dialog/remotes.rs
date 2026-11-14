@@ -284,7 +284,10 @@ impl PromptDialog {
         } else {
             ButtonState::Disabled
         };
-        hits.push((button(buf, x, by, apply_label, apply_state), PromptPart::Submit));
+        hits.push((
+            button(buf, x, by, apply_label, apply_state),
+            PromptPart::Submit,
+        ));
         let mut x = inner.x;
         for part in self.extra_parts() {
             let label = match part {

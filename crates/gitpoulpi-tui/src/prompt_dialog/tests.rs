@@ -467,10 +467,16 @@ fn renaming_the_upstream_row_is_refused_inside_the_dialog() {
 fn a_gone_remote_blocks_apply_until_its_row_is_removed() {
     let mut dialog = remotes_dialog(Some("origin/feature"), true);
     let (all, hits) = paint(&dialog);
-    assert!(all.contains("remote gone") && all.contains("oldbox"), "{all}");
+    assert!(
+        all.contains("remote gone") && all.contains("oldbox"),
+        "{all}"
+    );
     assert!(hits.iter().any(|(_, p)| matches!(p, PromptPart::Remove(_))));
     assert_eq!(dialog.on_key(key(KeyCode::Enter)), PromptOutcome::Stay);
-    assert!(dialog.error.as_deref().is_some_and(|e| e.contains("oldbox")));
+    assert!(dialog
+        .error
+        .as_deref()
+        .is_some_and(|e| e.contains("oldbox")));
     // Down to the gone row (the last), Del removes it.
     for _ in 0..4 {
         dialog.on_key(key(KeyCode::Down));
@@ -502,7 +508,10 @@ fn two_remotes_with_one_address_get_a_warning() {
     dialog.on_key(key(KeyCode::Down));
     dialog.on_key(key(KeyCode::Char(' ')));
     let (all, _) = paint(&dialog);
-    assert!(all.contains("fork and mirror push to the same URL"), "{all}");
+    assert!(
+        all.contains("fork and mirror push to the same URL"),
+        "{all}"
+    );
 }
 
 #[test]

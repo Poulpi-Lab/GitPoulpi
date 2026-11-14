@@ -27,9 +27,10 @@ fn state_cell(row: &Row) -> (String, Color) {
         RemoteRelation::UpToDate => (msg::STATE_IN_SYNC.get().to_string(), th().status.success),
         RemoteRelation::LocalAhead(n) => (format!("\u{2191}{n}"), th().status.warning),
         RemoteRelation::RemoteAhead(n) => (format!("\u{2193}{n}"), th().status.warning),
-        RemoteRelation::Diverged { ahead, behind } => {
-            (format!("\u{2191}{ahead} \u{2193}{behind}"), th().status.danger)
-        }
+        RemoteRelation::Diverged { ahead, behind } => (
+            format!("\u{2191}{ahead} \u{2193}{behind}"),
+            th().status.danger,
+        ),
         RemoteRelation::Absent => (msg::STATE_NEW.get().to_string(), th().ui.muted),
         RemoteRelation::Unrelated => (msg::STATE_UNRELATED.get().to_string(), th().status.danger),
     }
@@ -90,14 +91,14 @@ impl RemotesPane {
                 .unwrap_or(0)
                 .min(NAME_MAX) as u16
         };
-        let mut rw = widest(&|r| display_width(&r.remote), &msg::COL_REMOTE.get());
+        let mut rw = widest(&|r| display_width(&r.remote), msg::COL_REMOTE.get());
         let mut bw = widest(
             &|r| display_width(self.dest_shown(r)),
-            &msg::COL_BRANCH.get(),
+            msg::COL_BRANCH.get(),
         );
-        let pw = (display_width(&msg::COL_PUSH.get()) as u16).max(4);
-        let lw = (display_width(&msg::COL_PULL.get()) as u16)
-            .max(display_width(&msg::PULL_UPSTREAM.get()) as u16)
+        let pw = (display_width(msg::COL_PUSH.get()) as u16).max(4);
+        let lw = (display_width(msg::COL_PULL.get()) as u16)
+            .max(display_width(msg::PULL_UPSTREAM.get()) as u16)
             .max(4);
         let fixed = |rw: u16, bw: u16| 2 + rw + GAP + bw + GAP + pw + GAP + lw + GAP;
         let state_min = 10u16;
@@ -117,13 +118,20 @@ impl RemotesPane {
 
         // Headings.
         let mut head = |x: u16, w: u16, text: &str| {
-            put(buf, x, rect.y, &truncate_with_ellipsis(text, w as usize), w, muted);
+            put(
+                buf,
+                x,
+                rect.y,
+                &truncate_with_ellipsis(text, w as usize),
+                w,
+                muted,
+            );
         };
-        head(x_remote, rw, &msg::COL_REMOTE.get());
-        head(x_branch, bw, &msg::COL_BRANCH.get());
-        head(x_push, pw, &msg::COL_PUSH.get());
-        head(x_pull, lw, &msg::COL_PULL.get());
-        head(x_state, state_w, &msg::COL_STATE.get());
+        head(x_remote, rw, msg::COL_REMOTE.get());
+        head(x_branch, bw, msg::COL_BRANCH.get());
+        head(x_push, pw, msg::COL_PUSH.get());
+        head(x_pull, lw, msg::COL_PULL.get());
+        head(x_state, state_w, msg::COL_STATE.get());
 
         let hovered_at = |part: PromptPart| hovered == Some(part);
         // Visible rows by index (no list window helper: the bar below owns the offset).
@@ -143,8 +151,19 @@ impl RemotesPane {
             let text = Style::default().fg(th().ui.text).bg(bg);
             let dim = Style::default().fg(th().ui.muted).bg(bg);
             if i == self.cursor {
-                let color = if focused { th().ui.accent } else { th().ui.muted };
-                put(buf, rect.x, y, "\u{258C}", 1, Style::default().fg(color).bg(bg));
+                let color = if focused {
+                    th().ui.accent
+                } else {
+                    th().ui.muted
+                };
+                put(
+                    buf,
+                    rect.x,
+                    y,
+                    "\u{258C}",
+                    1,
+                    Style::default().fg(color).bg(bg),
+                );
             }
             let primary = self.is_primary(row);
             let name_style = if row.gone {
@@ -166,20 +185,20 @@ impl RemotesPane {
                     x_push,
                     y,
                     &truncate_with_ellipsis(
-                        &msg::GONE.get(),
+                        msg::GONE.get(),
                         (x_state + state_w).saturating_sub(x_push) as usize,
                     ),
                     (x_state + state_w).saturating_sub(x_push),
                     Style::default().fg(th().status.warning).bg(bg),
                 );
                 let label = msg::REMOVE_BUTTON.get();
-                let w = dialog_kit::button_width(&label);
+                let w = dialog_kit::button_width(label);
                 if width >= w + 2 {
                     let rect_b = button(
                         buf,
                         rect.x + width - w,
                         y,
-                        &label,
+                        label,
                         ButtonState::Normal {
                             hovered: hovered_at(PromptPart::Remove(idx)),
                             focused: false,
@@ -212,7 +231,7 @@ impl RemotesPane {
                 hits.push((push_rect, PromptPart::Push(idx)));
             }
             if primary {
-                put(buf, x_pull, y, &msg::PULL_UPSTREAM.get(), lw, dim);
+                put(buf, x_pull, y, msg::PULL_UPSTREAM.get(), lw, dim);
             } else {
                 let pull_rect = checkbox(
                     buf,

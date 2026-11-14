@@ -204,7 +204,7 @@ As teclas depois de um prefixo aparecem com o prefixo (`Ctrl+G s`).
 | `refs` | `hosting_edit` | Pull request: editar no host | `e` |
 | `refs` | `new_pull_request` | Pull requests: criar uma | `n` |
 | `refs` | `add_remote` | Remotos: adicionar um remoto | `+` |
-| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
+| `refs` | `remotes` | Branch: editar seus remotos | `u` |
 | `diff` | `close` | Fechar o diff | `q` |
 | `diff` | `edit` | Editar no diretório de trabalho | `e` |
 | `diff` | `lfs_raw` | LFS: cartão ou ponteiro bruto | `r` |

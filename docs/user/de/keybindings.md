@@ -203,7 +203,7 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `refs` | `hosting_edit` | Pull Request: Auf dem Host bearbeiten | `e` |
 | `refs` | `new_pull_request` | Pull Requests: Einen erstellen | `n` |
 | `refs` | `add_remote` | Remotes: Ein Remote hinzufügen | `+` |
-| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
+| `refs` | `remotes` | Branch: Remotes bearbeiten | `u` |
 | `diff` | `close` | Diff schließen | `q` |
 | `diff` | `edit` | Im Arbeitsverzeichnis bearbeiten | `e` |
 | `diff` | `lfs_raw` | LFS: Karte oder Rohzeiger | `r` |

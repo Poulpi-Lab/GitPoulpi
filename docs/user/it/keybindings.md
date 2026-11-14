@@ -207,7 +207,7 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `refs` | `hosting_edit` | Pull request: modifica sull'host | `e` |
 | `refs` | `new_pull_request` | Pull request: creane una | `n` |
 | `refs` | `add_remote` | Remoti: aggiungi un remoto | `+` |
-| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
+| `refs` | `remotes` | Branch: modifica i suoi remoti | `u` |
 | `diff` | `close` | Chiudi il diff | `q` |
 | `diff` | `edit` | Modifica nella directory di lavoro | `e` |
 | `diff` | `lfs_raw` | LFS: scheda o puntatore grezzo | `r` |

@@ -659,7 +659,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Git : Abandonner le Push groupé |  |
 | Git : Relancer les envois échoués |  |
 | Git : Push forcé (avec lease)... |  |
-| Git : Remotes de la branche... |  |
+| Git : Distants de la branche... |  |
 | Distant : Ajouter un distant... |  |
 | Distant : Supprimer un distant... |  |
 | Distant : Modifier un distant... |  |

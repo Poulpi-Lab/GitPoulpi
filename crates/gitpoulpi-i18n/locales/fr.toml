@@ -3148,7 +3148,7 @@ git_pull_options = { git = "Git : Options de {$pull}...", local = "Git : Optio
 git_push = "Git : {$Push}"
 git_push_to_remote = "Git : {$Push} vers un distant..."
 git_force_push_with_lease = { git = "Git : {$Push} forcé (avec lease)...", local = "Git : Pousser de force (avec lease)..." }
-git_remotes_of_branch = "Git : Remotes de la branche..."
+git_remotes_of_branch = "Git : Distants de la branche..."
 git_push_to_selected_remotes = "Git : {$Push} vers des distants choisis..."
 remote_add_remote = "Distant : Ajouter un distant..."
 remote_remove_remote = "Distant : Supprimer un distant..."

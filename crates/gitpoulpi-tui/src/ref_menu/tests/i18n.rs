@@ -59,7 +59,7 @@ fn the_french_ref_menu_fits_and_keeps_git_words_in_english_by_default() {
         "Créer un worktree depuis feature...",
         "Push feature",
         "Démarrer une pull request depuis feature...",
-        "Remotes de feature...",
+        "Distants de feature...",
         "Renommer feature...",
         "Supprimer feature et origin/feature",
         "Masquer dans le graphe",
@@ -83,7 +83,7 @@ fn translate_git_terms_switches_the_ref_menu_to_the_local_vocabulary() {
         "Rebaser main sur feature",
         "Avance rapide de feature vers main",
         "Pousser feature",
-        "Remotes de feature...",
+        "Distants de feature...",
     ] {
         assert!(screen.contains(expected), "missing {expected:?}:\n{screen}");
     }

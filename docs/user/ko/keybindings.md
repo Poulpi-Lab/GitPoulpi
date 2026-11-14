@@ -202,7 +202,7 @@ stage_file = "z"
 | `refs` | `hosting_edit` | Pull request: 호스트에서 편집 | `e` |
 | `refs` | `new_pull_request` | Pull request: 새로 만들기 | `n` |
 | `refs` | `add_remote` | 리모트: 리모트 추가 | `+` |
-| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
+| `refs` | `remotes` | 브랜치: 리모트 편집 | `u` |
 | `diff` | `close` | Diff 닫기 | `q` |
 | `diff` | `edit` | 작업 트리에서 편집 | `e` |
 | `diff` | `lfs_raw` | LFS: 카드 또는 원본 포인터 | `r` |

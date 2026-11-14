@@ -190,7 +190,7 @@ stage_file = "z"
 | `refs` | `hosting_edit` | Pull Request：ホストで編集 | `e` |
 | `refs` | `new_pull_request` | Pull Request：新規作成 | `n` |
 | `refs` | `add_remote` | リモート：リモートを追加 | `+` |
-| `refs` | `remotes` | Branch: Edit its Remotes | `u` |
+| `refs` | `remotes` | ブランチ: リモートを編集 | `u` |
 | `diff` | `close` | Diffを閉じる | `q` |
 | `diff` | `edit` | 作業ツリーで編集 | `e` |
 | `diff` | `lfs_raw` | LFS：カードまたは生のポインター | `r` |

@@ -158,6 +158,9 @@ impl WindowState {
             {
                 continue;
             }
+            // An event earlier in this drain may have selected the WIP row:
+            // the next one must see the working-changes pane it shows.
+            self.normalize_right_panel();
             // An event earlier in this drain may have opened or closed
             // the File View; the next one must see the column it left.
             sync_central_view(

@@ -633,3 +633,38 @@ fn the_commit_files_filter_shows_a_match_inside_a_folded_folder_and_gives_the_fo
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
+
+/// A click on the WIP row leaves the right pane on the commit detail until
+/// the frame's own normalisation puts the working changes back. An event
+/// already queued behind that click (here a right-click, in one write with it,
+/// as under load) must not see the transient pane and be dropped.
+#[test]
+fn a_right_click_queued_behind_the_wip_row_click_still_opens_the_menu() {
+    use xtask::pty::mouse::{press, release, Button};
+    let repo = files_fixture();
+    let config = tempfile::tempdir().unwrap();
+    let mut term = launch_files(repo.root(), "tree-fold-files-queued", config.path());
+    let (wip_col, wip_row) = term
+        .wait_for_text("\u{25CC}", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (col, row) = term
+        .wait_for_text("z.txt", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    let last_row = ["x.txt", "y.txt", "z.txt"]
+        .iter()
+        .filter_map(|l| term.screen().find(l).map(|(_, r)| r))
+        .max()
+        .unwrap_or(row);
+    let both = format!(
+        "{}{}{}{}",
+        press(Button::Left, wip_col, wip_row),
+        release(Button::Left, wip_col, wip_row),
+        press(Button::Right, col + 1, last_row + 1),
+        release(Button::Right, col + 1, last_row + 1),
+    );
+    term.send_text(&both).unwrap();
+    term.wait_for("the empty-area menu", STEP, |s| {
+        menu_row(s, "Expand all").is_some() && menu_row(s, "Collapse all").is_some()
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+}

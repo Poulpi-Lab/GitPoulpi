@@ -35,6 +35,28 @@ pub(in crate::event_loop) fn poll_timeout(
 }
 
 impl WindowState {
+    /// The WIP row is not a commit, so selecting it -- by any path -- shows
+    /// the working-changes pane, never an empty commit detail. Every handler
+    /// that moved the selection set `CommitDetail`; this is applied on top of
+    /// them once per frame AND before each input event of a drain, so an
+    /// event queued behind a click on the WIP row (a right-click, a key) never
+    /// sees the transient `CommitDetail` the click left until the next frame.
+    /// See `right_panel_for_log_selection`. Returns whether the WIP row is the
+    /// selection.
+    pub(in crate::event_loop) fn normalize_right_panel(&mut self) -> bool {
+        self.refresh_compare();
+        // A comparison with the WIP row in it is the commit-detail view's:
+        // its files are the answer, not the working-changes composer.
+        let wip_selected =
+            wip_row_selected(&self.status_result, &self.log_state) && self.compare.is_none();
+        let normalized = right_panel_for_log_selection(self.right_panel, wip_selected);
+        if normalized != self.right_panel {
+            self.right_panel = normalized;
+            self.commit_file_focus = false;
+        }
+        wip_selected
+    }
+
     /// Runs the timers and polls, then settles the state this frame will draw.
     pub(in crate::event_loop) fn tick(&mut self) -> FrameInputs {
         self.note_message();
@@ -548,20 +570,7 @@ impl WindowState {
             crate::tag_where_ui::install(refs);
         }
 
-        // The WIP row is not a commit, so selecting it -- by any path --
-        // shows the working-changes pane, never an empty commit detail.
-        // Applied here, once, over every handler that moved the selection
-        // and set `CommitDetail`. See `right_panel_for_log_selection`.
-        self.refresh_compare();
-        // A comparison with the WIP row in it is the commit-detail view's:
-        // its files are the answer, not the working-changes composer.
-        let wip_selected =
-            wip_row_selected(&self.status_result, &self.log_state) && self.compare.is_none();
-        let normalized = right_panel_for_log_selection(self.right_panel, wip_selected);
-        if normalized != self.right_panel {
-            self.right_panel = normalized;
-            self.commit_file_focus = false;
-        }
+        let wip_selected = self.normalize_right_panel();
         // The WIP row becoming selected restores a collapsed Status
         // pane -- Changed files and the composer live nowhere else. Same
         // "applied once, on top of every path that could select it"

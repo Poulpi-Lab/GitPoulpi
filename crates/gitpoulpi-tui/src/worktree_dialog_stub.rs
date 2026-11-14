@@ -19,6 +19,14 @@ pub(crate) struct WorktreeSeed {
     pub(crate) branch_busy: bool,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct BranchChoice {
+    pub(crate) name: String,
+    pub(crate) busy: bool,
+}
+
+pub(crate) fn ask_to_pick_ref() {}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum WtFocus {
     Create,
@@ -54,6 +62,19 @@ impl WorktreeDialog {
             focus: WtFocus::Create,
             close: Default::default(),
         }
+    }
+
+    pub(crate) fn with_choices(
+        seed: WorktreeSeed,
+        repo_root: &Path,
+        _branches: Vec<BranchChoice>,
+        _pick_ref: bool,
+    ) -> Self {
+        Self::new(seed, repo_root)
+    }
+
+    pub(crate) fn take_pick_ref() -> bool {
+        false
     }
 
     pub(crate) fn set_parent(&mut self, _dir: &Path) {}

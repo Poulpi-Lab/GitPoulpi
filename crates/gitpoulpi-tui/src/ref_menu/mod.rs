@@ -94,6 +94,21 @@ pub(crate) enum RefContextAction {
     FastForwardCurrentToThis,
     /// Open Create worktree on this branch or tag.
     CreateWorktree,
+    /// A WORKTREES row (`full_name` is the worktree's folder): open it as a
+    /// tab, like a double click.
+    WorktreeOpenTab,
+    /// Run the `n`th "Open in" entry on the worktree's folder.
+    WorktreeOpenWith(u16),
+    /// Merge the worktree's branch into another branch (a picker).
+    WorktreeMerge,
+    /// Remove the worktree (a confirmation that also offers to save its
+    /// changes).
+    WorktreeRemove,
+    /// The WORKTREES header's `+` menu: a worktree on the current branch,
+    /// on the Log's selected commit, or on a branch chosen in the dialog.
+    WorktreeNewHead,
+    WorktreeNewCommit,
+    WorktreeNewChoose,
     /// Open the Reflog view on this local branch: where it was before.
     Reflog,
     /// Start a pull request from this local branch:
@@ -119,6 +134,87 @@ pub(crate) enum RefContextAction {
     Fold(crate::tree_fold::TreeFold),
     /// The section menu's way on to the show/hide checklist.
     OpenSectionsChecklist,
+}
+
+/// The context menu of a WORKTREES row: Open in a new tab, the Open in
+/// submenu (the entries marked "Can open a worktree"), Merge into... (a
+/// worktree on a branch) and Remove worktree... (never the main one).
+#[cfg(feature = "worktree")]
+pub(crate) fn worktree_menu_entries(
+    wt: &gitpoulpi_core::domain::Worktree,
+) -> Vec<context_menu::Entry<RefContextAction>> {
+    use context_menu::Entry;
+    use gitpoulpi_i18n::msg::worktree_manage as m;
+    let mut rows = vec![Entry::action(
+        glyph_label("\u{2197}", m::MENU_OPEN_TAB.get()),
+        RefContextAction::WorktreeOpenTab,
+    )];
+    let tools = crate::tab_dir::worktree_entries();
+    rows.push(if tools.is_empty() {
+        Entry::disabled(
+            glyph_label("\u{25B6}", m::MENU_OPEN_IN_NONE.get()),
+            m::MENU_OPEN_IN_NONE_WHY.get(),
+        )
+    } else {
+        Entry::submenu(
+            glyph_label("\u{25B6}", m::MENU_OPEN_IN.get()),
+            tools
+                .into_iter()
+                .map(|(i, label)| {
+                    Entry::action(label, RefContextAction::WorktreeOpenWith(i as u16))
+                })
+                .collect(),
+        )
+    });
+    let mut more = Vec::new();
+    if let Some(branch) = wt.branch.as_deref() {
+        more.push(Entry::action(
+            glyph_label("\u{2933}", m::menu_merge(branch)),
+            RefContextAction::WorktreeMerge,
+        ));
+    }
+    if !wt.is_main {
+        more.push(Entry::danger(
+            glyph_label("\u{2716}", m::MENU_REMOVE.get()),
+            RefContextAction::WorktreeRemove,
+        ));
+    }
+    if !more.is_empty() {
+        rows.push(Entry::Separator);
+        rows.extend(more);
+    }
+    rows
+}
+
+/// The menu of the WORKTREES header's `+`. "From the selected commit" is
+/// grayed (with the reason) while the Log has no commit selected.
+#[cfg(feature = "worktree")]
+pub(crate) fn worktree_plus_entries(
+    commit_selected: bool,
+) -> Vec<context_menu::Entry<RefContextAction>> {
+    use context_menu::Entry;
+    use gitpoulpi_i18n::msg::worktree_manage as m;
+    vec![
+        Entry::action(
+            glyph_label("\u{229E}", m::PLUS_HEAD.get()),
+            RefContextAction::WorktreeNewHead,
+        ),
+        if commit_selected {
+            Entry::action(
+                glyph_label("\u{229E}", m::PLUS_COMMIT.get()),
+                RefContextAction::WorktreeNewCommit,
+            )
+        } else {
+            Entry::disabled(
+                glyph_label("\u{229E}", m::PLUS_COMMIT.get()),
+                m::SELECT_A_COMMIT.get(),
+            )
+        },
+        Entry::action(
+            glyph_label("\u{229E}", m::PLUS_CHOOSE.get()),
+            RefContextAction::WorktreeNewChoose,
+        ),
+    ]
 }
 
 /// One cell of a ref, as its Copy submenu offers it.

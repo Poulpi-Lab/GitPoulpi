@@ -472,6 +472,17 @@ impl GitBackend for SystemGitBackend {
     ) -> Result<Worktree> {
         worktrees::worktree_add(repo, path, opts)
     }
+    fn worktree_changes(&self, repo: &RepoRef, path: &Path) -> Result<Vec<WorktreeChange>> {
+        worktrees::worktree_changes(repo, path)
+    }
+    fn worktree_remove(
+        &self,
+        repo: &RepoRef,
+        path: &Path,
+        opts: &WorktreeRemoveOptions,
+    ) -> Result<WorktreeRemoved> {
+        worktrees::worktree_remove(repo, path, opts)
+    }
     fn patch_create(
         &self,
         repo: &RepoRef,

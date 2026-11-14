@@ -31,6 +31,10 @@ use crate::launch;
 pub struct OpenInEntry {
     pub label: String,
     pub command: String,
+    /// "Can open a worktree": the entry is offered in a worktree's own
+    /// Open in menu. Absent = checked.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub worktree: Option<bool>,
 }
 
 impl OpenInEntry {
@@ -38,7 +42,14 @@ impl OpenInEntry {
         Self {
             label: label.into(),
             command: command.into(),
+            worktree: None,
         }
+    }
+
+    /// Whether the worktree menu offers this entry: the "Can open a
+    /// worktree" box, checked unless the user cleared it.
+    pub fn can_open_worktree(&self) -> bool {
+        self.worktree.unwrap_or(true)
     }
 }
 
@@ -912,6 +923,21 @@ pub fn default_index(entries: &[OpenInEntry], default_label: &str) -> usize {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn an_entry_can_open_a_worktree_unless_the_box_was_cleared() {
+        assert!(OpenInEntry::new("Editor", "code ${cwd}").can_open_worktree());
+        assert!(OpenInEntry::new("Web", "xdg-open ${web_url}").can_open_worktree());
+        let mut off = OpenInEntry::new("Web", "xdg-open ${web_url}");
+        off.worktree = Some(false);
+        assert!(!off.can_open_worktree());
+        // An old config has no key: checked. The flag round-trips through TOML
+        // only when it was set.
+        let old: OpenInEntry = toml::from_str("label = \"A\"\ncommand = \"a\"").unwrap();
+        assert!(old.can_open_worktree());
+        assert!(!toml::to_string(&old).unwrap().contains("worktree"));
+        assert!(toml::to_string(&off).unwrap().contains("worktree = false"));
+    }
     use std::collections::HashMap;
 
     const VARS: OpenInVars = OpenInVars {

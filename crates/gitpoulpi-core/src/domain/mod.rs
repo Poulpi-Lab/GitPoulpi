@@ -83,7 +83,8 @@ pub use ops::{
     PlanCommit, PullMode, PullOptions, PullOutcome, PushLease, PushOptions, PushOutcome,
     PushRejectReason, PushRejection, RebaseAction, RebaseOptions, RebaseOutcome, RebasePlanDraft,
     RebaseRefusal, RebaseState, RebaseStep, ResetMode, RevertOutcome, RewordOutcome, RewordRefusal,
-    SparseState, TagSelection, WorktreeAddOptions, WorktreeStart, FETCH_REFSPEC_NAMESPACE,
+    SparseState, TagSelection, WorktreeAddOptions, WorktreeChange, WorktreeCommit,
+    WorktreeRemoveOptions, WorktreeRemoved, WorktreeStart, FETCH_REFSPEC_NAMESPACE,
 };
 pub use ref_filter::{visible_tips, RefFilter};
 pub use reflog::{

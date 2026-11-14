@@ -30,6 +30,7 @@ fn hover_style_for(target: &HitTarget) -> HoverKind {
             Required("prompt_dialog::PromptDialog::render(hovered): Cancel / primary buttons")
         }
         HitTarget::AddRemoteButton => Required("plain_button_style, plain at rest (item 15)"),
+        HitTarget::AddWorktreeButton => Required("plain_button_style, plain at rest (item 15)"),
         HitTarget::RefRemotesBadge(_) => NotApplicable(
             "a badge inside a Refs row, which lights as a whole; the pointing hand and \
              the tooltip are its hover",
@@ -404,6 +405,7 @@ fn sample_hit_targets() -> Vec<HitTarget> {
         HitTarget::RewordForm(RewordPart::Cancel),
         HitTarget::Prompt(crate::prompt_dialog::PromptPart::Cancel),
         HitTarget::AddRemoteButton,
+        HitTarget::AddWorktreeButton,
         HitTarget::RefRemotesBadge(String::new()),
         HitTarget::LfsInstallLink,
         HitTarget::Gear,

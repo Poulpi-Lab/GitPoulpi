@@ -464,7 +464,10 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         C::FastForwardCurrentToSelected => (!(ctx.selected_local_branch
             || ctx.selected_remote_branch))
             .then_some(msg::palette::WHY_SELECT_A_LOCAL_OR_REMOTE_BRANCH_IN_THE_REFS_PANE.get()),
-        C::OpenWorktreeInTab => (!ctx.selected_worktree)
+        C::OpenWorktreeInTab
+        | C::WorktreeOpenInSelected
+        | C::WorktreeMergeSelected
+        | C::WorktreeRemoveSelected => (!ctx.selected_worktree)
             .then_some(msg::palette::WHY_SELECT_A_WORKTREE_IN_THE_REFS_PANE_S_WORKTREES.get()),
         C::SubmoduleUpdateSelected | C::SubmoduleInitSelected | C::SubmoduleOpenSelected => (!ctx
             .selected_submodule)
@@ -1039,6 +1042,10 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::FocusRefsFilter
         | C::FocusRefsSection(_)
         | C::SidebarSectionsMenu
+        | C::ShowWorktreesSection
+        | C::CreateWorktreeMenu
+        | C::CreateWorktreeFromCurrentBranch
+        | C::CreateWorktreeChooseBranch
         | C::ToggleSidebarSection(_)
         | C::ResetSidebarSections
         | C::UseSidebarSectionsForAll

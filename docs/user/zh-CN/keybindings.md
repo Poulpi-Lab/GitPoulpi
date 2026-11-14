@@ -452,6 +452,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 左侧窗格：显示/隐藏本地分支 |  |
 | 左侧窗格：显示/隐藏远程 |  |
 | 左侧窗格：显示/隐藏 Worktree |  |
+| Sidebar: Show Worktrees Section |  |
 | 左侧窗格：显示/隐藏 Stashes |  |
 | 左侧窗格：显示/隐藏 Tags |  |
 | 左侧窗格：显示/隐藏 Pull requests |  |
@@ -495,6 +496,12 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 引用：所选分支的 Reflog… |  |
 | 引用：从所选分支发起 pull request… |  |
 | 引用：在标签页中打开 worktree | `Enter / 双击` |
+| Refs: Open Worktree In... |  |
+| Refs: Merge Worktree Branch Into... |  |
+| Refs: Remove Worktree... |  |
+| Refs: Create Worktree... | `+` |
+| Refs: Create Worktree from Current Branch |  |
+| Refs: Create Worktree Choosing a Branch |  |
 | 引用：更新子模块（所选） |  |
 | 引用：初始化子模块（所选） |  |
 | 引用：在标签页中打开子模块 | `Enter / 双击` |

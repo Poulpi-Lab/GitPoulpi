@@ -1130,6 +1130,87 @@ async fn dispatch(
             )
             .await
         }
+        Action::WorktreeRemove {
+            path,
+            opts,
+            delete_branch,
+        } => {
+            let shown = path.display().to_string();
+            let removed = conn
+                .call::<gitpoulpi_core::domain::WorktreeRemoved>(
+                    OperationKind::WorktreeRemove,
+                    serde_json::json!({ "path": path, "opts": opts }),
+                )
+                .await?;
+            let mut message = l::worktree_removed(&shown);
+            if let Some(branch) = &delete_branch {
+                // The worktree is gone, so git lets the branch go: the one
+                // journaled delete, exactly the Refs menu's.
+                match conn
+                    .call::<()>(
+                        OperationKind::BranchDelete,
+                        serde_json::json!({ "name": branch }),
+                    )
+                    .await
+                {
+                    Ok(()) => message = l::worktree_removed_branch_deleted(&shown, branch),
+                    Err(e) => {
+                        message = l::worktree_removed_branch_kept(&shown, branch, e.to_string());
+                    }
+                }
+            }
+            if removed.stashed {
+                message = format!("{message} - {}", l::WORKTREE_STASHED.get());
+            }
+            if let Some(commit) = removed.commit {
+                message = format!("{message} - {}", l::worktree_committed(short(commit)));
+            }
+            let _ = action_message_tx.send_notify(message);
+            Ok(())
+        }
+        Action::WorktreeMerge {
+            worktree,
+            from,
+            then_remove,
+        } => {
+            let other = LinkConn {
+                repo: RepoRef::from_root(&worktree),
+                ..conn.clone()
+            };
+            Box::pin(dispatch(
+                &other,
+                Action::Merge(*from),
+                action_error_tx,
+                action_message_tx,
+                push_rejected_tx,
+                activity,
+            ))
+            .await?;
+            let Some((path, delete_branch)) = then_remove else {
+                return Ok(());
+            };
+            // A conflicted merge stays for the conflict flow: nothing is
+            // removed until it is concluded.
+            let conflicts = other
+                .call::<Vec<ConflictEntry>>(OperationKind::ConflictEntries, serde_json::json!({}))
+                .await?;
+            if !conflicts.is_empty() {
+                return Ok(());
+            }
+            Box::pin(dispatch(
+                conn,
+                Action::WorktreeRemove {
+                    path,
+                    opts: Default::default(),
+                    delete_branch,
+                },
+                action_error_tx,
+                action_message_tx,
+                push_rejected_tx,
+                activity,
+            ))
+            .await
+        }
         Action::PatchCreate { source, dest } => {
             reported::<PatchCreated>(
                 conn,

@@ -484,6 +484,7 @@ As teclas são as predefinidas.
 | Painel esquerdo: mostrar/ocultar branches locais |  |
 | Painel esquerdo: mostrar/ocultar remotos |  |
 | Painel esquerdo: mostrar/ocultar worktrees |  |
+| Sidebar: Show Worktrees Section |  |
 | Painel esquerdo: mostrar/ocultar stashes |  |
 | Painel esquerdo: mostrar/ocultar tags |  |
 | Painel esquerdo: mostrar/ocultar pull requests |  |
@@ -527,6 +528,12 @@ As teclas são as predefinidas.
 | Refs: Reflog da branch selecionada... |  |
 | Refs: iniciar pull request a partir da branch selecionada... |  |
 | Refs: abrir worktree num separador | `Enter / clique duplo` |
+| Refs: Open Worktree In... |  |
+| Refs: Merge Worktree Branch Into... |  |
+| Refs: Remove Worktree... |  |
+| Refs: Create Worktree... | `+` |
+| Refs: Create Worktree from Current Branch |  |
+| Refs: Create Worktree Choosing a Branch |  |
 | Refs: atualizar submódulo (selecionado) |  |
 | Refs: inicializar submódulo (selecionado) |  |
 | Refs: abrir submódulo num separador | `Enter / clique duplo` |

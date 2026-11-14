@@ -26,6 +26,8 @@ pub(crate) enum HitTarget {
     Prompt(crate::prompt_dialog::PromptPart),
     /// The `+` on the REMOTE section's header: Add remote.
     AddRemoteButton,
+    /// The `+` on the WORKTREES section's header: the create menu.
+    AddWorktreeButton,
     /// The remotes badge of a local branch with extra push targets in the
     /// Refs sidebar (`multi_remote_badge`): opens that branch's remotes.
     RefRemotesBadge(String),
@@ -556,6 +558,7 @@ pub(crate) fn desired_cursor_shape(
             | HitTarget::RewordForm(_)
             | HitTarget::Prompt(_)
             | HitTarget::AddRemoteButton
+            | HitTarget::AddWorktreeButton
             | HitTarget::RefRemotesBadge(_)
             | HitTarget::LfsInstallLink
             | HitTarget::Gear

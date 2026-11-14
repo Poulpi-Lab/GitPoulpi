@@ -81,6 +81,7 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::FastForward
         | K::FetchRefAsBranch
         | K::WorktreeAdd
+        | K::WorktreeRemove
         | K::RemoteGroupRun
         | K::FlowRun => Family::Branch,
         K::TagCreate
@@ -172,6 +173,7 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::Remotes
         | K::LeftoverRemotes
         | K::Worktrees
+        | K::WorktreeChanges
         | K::Submodules
         | K::Resolve
         | K::MergeBase
@@ -521,6 +523,7 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         | K::IndexLockRemove
         | K::BranchDeleteRemote
         | K::WorktreeAdd
+        | K::WorktreeRemove
         | K::TagPush
         | K::TagDeleteRemote
         | K::TagFetch
@@ -549,6 +552,7 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         | K::Remotes
         | K::LeftoverRemotes
         | K::Worktrees
+        | K::WorktreeChanges
         | K::Submodules
         | K::Resolve
         | K::MergeBase

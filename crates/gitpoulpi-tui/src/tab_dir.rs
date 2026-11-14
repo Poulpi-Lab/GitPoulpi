@@ -411,6 +411,19 @@ pub(crate) fn entries() -> Vec<String> {
         .collect()
 }
 
+/// The "Open in" entries that may open a worktree (the entry's "Can open a
+/// worktree" box), as (index, label): what a worktree row's Open in menu lists.
+#[cfg(feature = "worktree")]
+pub(crate) fn worktree_entries() -> Vec<(usize, String)> {
+    open_in_state()
+        .entries
+        .iter()
+        .enumerate()
+        .filter(|(_, e)| e.can_open_worktree())
+        .map(|(i, e)| (i, e.label.clone()))
+        .collect()
+}
+
 /// The index of the default entry (`ui.open_in_default`, else the first).
 #[allow(dead_code)] // the chrome slice marks it and runs it from the palette
 pub(crate) fn default_index() -> usize {

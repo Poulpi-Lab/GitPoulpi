@@ -503,6 +503,83 @@ pub(crate) fn apply_ref_context_action(
                 }
             };
         }
+        #[cfg(feature = "worktree")]
+        RefContextAction::WorktreeNewHead | RefContextAction::WorktreeNewChoose => {
+            let refs = refs_result.as_deref().unwrap_or(&[]);
+            let choose = action == RefContextAction::WorktreeNewChoose;
+            let seed = if choose {
+                crate::worktree_dialog::seed_to_choose(refs, worktrees)
+            } else {
+                crate::worktree_dialog::seed_from_head(refs, worktrees)
+            };
+            match seed {
+                Some(seed) => {
+                    if choose {
+                        crate::worktree_dialog::ask_to_pick_ref();
+                    }
+                    *worktree_seed = Some(seed);
+                }
+                None => {
+                    *last_message = Some(
+                        gitpoulpi_i18n::msg::worktree_manage::NO_HEAD
+                            .get()
+                            .to_string(),
+                    )
+                }
+            }
+        }
+        #[cfg(feature = "worktree")]
+        RefContextAction::WorktreeNewCommit => {
+            match crate::log_table::selected_log_commit(log_result, log_state, log_order) {
+                Some(commit) => {
+                    *worktree_seed = Some(WorktreeSeed {
+                        start: gitpoulpi_core::domain::WorktreeStart::Commit(commit),
+                        label: gitpoulpi_core::domain::short(commit),
+                        new_branch: String::new(),
+                        branch_busy: false,
+                    });
+                }
+                None => {
+                    *last_message = Some(
+                        gitpoulpi_i18n::msg::worktree_manage::SELECT_A_COMMIT
+                            .get()
+                            .to_string(),
+                    )
+                }
+            }
+        }
+        #[cfg(feature = "worktree")]
+        RefContextAction::WorktreeOpenTab => {
+            *open_in_tab = Some(std::path::PathBuf::from(&full_name));
+        }
+        #[cfg(feature = "worktree")]
+        RefContextAction::WorktreeOpenWith(index) => {
+            *last_message = Some(
+                match crate::tab_dir::run_open_in(
+                    usize::from(index),
+                    std::path::Path::new(&full_name),
+                ) {
+                    Ok(done) => done,
+                    Err(why) => why,
+                },
+            );
+        }
+        #[cfg(feature = "worktree")]
+        RefContextAction::WorktreeMerge => crate::worktree_remove_dialog::ask(
+            crate::worktree_remove_dialog::Request::Merge(std::path::PathBuf::from(&full_name)),
+        ),
+        #[cfg(feature = "worktree")]
+        RefContextAction::WorktreeRemove => crate::worktree_remove_dialog::ask(
+            crate::worktree_remove_dialog::Request::Remove(std::path::PathBuf::from(&full_name)),
+        ),
+        #[cfg(not(feature = "worktree"))]
+        RefContextAction::WorktreeNewHead
+        | RefContextAction::WorktreeNewCommit
+        | RefContextAction::WorktreeNewChoose
+        | RefContextAction::WorktreeOpenTab
+        | RefContextAction::WorktreeOpenWith(_)
+        | RefContextAction::WorktreeMerge
+        | RefContextAction::WorktreeRemove => {}
         RefContextAction::StartPullRequest => {
             let refs = refs_result.as_deref().unwrap_or(&[]);
             *last_message = Some(start_pull_request_now(

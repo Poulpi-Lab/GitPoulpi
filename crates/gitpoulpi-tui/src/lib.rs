@@ -247,6 +247,8 @@ mod worktree_dialog;
 #[cfg(not(feature = "worktree"))]
 #[path = "worktree_dialog_stub.rs"]
 mod worktree_dialog;
+#[cfg(feature = "worktree")]
+mod worktree_remove_dialog;
 
 // The main window: the event loop (`event_loop::run_in_repo`) and the
 // helpers it calls, grouped by pane or concern. Each module starts with

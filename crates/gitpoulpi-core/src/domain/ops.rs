@@ -190,6 +190,48 @@ pub struct WorktreeAddOptions {
     pub new_branch: Option<String>,
 }
 
+/// One uncommitted change of a worktree, as `git status` lists it
+/// (see [`crate::GitBackend::worktree_changes`]).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct WorktreeChange {
+    /// Path relative to the worktree, `/`-separated.
+    pub path: String,
+    /// Not tracked by git (and not ignored).
+    pub untracked: bool,
+}
+
+/// Commit every change of the worktree on its branch before removing it.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct WorktreeCommit {
+    pub message: String,
+    /// A detached worktree has no branch to commit on: this names the
+    /// branch created at HEAD there first. Ignored on a branch.
+    pub branch: Option<String>,
+}
+
+/// The arguments of [`crate::GitBackend::worktree_remove`] besides the path.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct WorktreeRemoveOptions {
+    /// Remove even with uncommitted changes (they are lost).
+    pub force: bool,
+    /// Stage and commit every change first (tracked and untracked,
+    /// `.gitignore` respected), then remove.
+    pub commit: Option<WorktreeCommit>,
+    /// Stash every change first (`git stash push -u`, with this message), then
+    /// remove. The stash stack is shared by all worktrees of the repository.
+    pub stash: Option<String>,
+}
+
+/// What [`crate::GitBackend::worktree_remove`] did.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct WorktreeRemoved {
+    pub path: std::path::PathBuf,
+    /// The commit made first, if asked.
+    pub commit: Option<Oid>,
+    /// A stash was made first.
+    pub stashed: bool,
+}
+
 /// What [`crate::GitBackend::patch_create`] turns into a patch file.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PatchSource {

@@ -342,6 +342,19 @@
   WorktreeAdd {"opts":{"new_branch":"new","start":{"Branch":"topic"}},"path":"../wt"}
   message: added worktree ../wt (detached HEAD)
   ok: true
+== WorktreeRemove { path: "../wt", opts: WorktreeRemoveOptions { force: false, commit: Some(WorktreeCommit { message: "save", branch: None }), stash: None }, delete_branch: Some("topic") }
+  WorktreeRemove {"opts":{"commit":{"branch":null,"message":"save"},"force":false,"stash":null},"path":"../wt"}
+  BranchDelete {"name":"topic"}
+  message: removed worktree ../wt and deleted branch topic (Undo brings the branch back) - changes committed as 0202020
+  ok: true
+== WorktreeMerge { worktree: "../main", from: Ref { kind: LocalBranch { name: "topic" }, target: Oid([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]), visibility: Shown, is_head: false, upstream: None, tag_sync: None, multi_remote: None }, then_remove: Some(("../wt", Some("topic"))) }
+  Merge {"from":{"is_head":false,"kind":{"LocalBranch":{"name":"topic"}},"multi_remote":null,"tag_sync":null,"target":"0909090909090909090909090909090909090909","upstream":null,"visibility":"Shown"},"opts":{"fast_forward_only":false,"ff":null,"message":null,"no_commit":false,"no_ff":false,"squash":false}}
+  ConflictEntries {}
+  WorktreeRemove {"opts":{"commit":null,"force":false,"stash":null},"path":"../wt"}
+  BranchDelete {"name":"topic"}
+  message: already up to date
+  message: removed worktree ../wt and deleted branch topic (Undo brings the branch back) - changes committed as 0202020
+  ok: true
 == PatchCreate { source: Commits([Oid([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]), Oid([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])]), dest: "out.patch" }
   PatchCreate {"dest":"out.patch","source":{"Commits":["0101010101010101010101010101010101010101","0202020202020202020202020202020202020202"]}}
   message: wrote 2 commits to out.patch

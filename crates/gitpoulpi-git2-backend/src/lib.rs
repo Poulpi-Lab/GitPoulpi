@@ -929,6 +929,13 @@ impl GitBackend for Git2Backend {
             path: &Path,
             opts: &WorktreeAddOptions,
         ) -> Result<Worktree>;
+        fn worktree_changes(&self, repo: &RepoRef, path: &Path) -> Result<Vec<WorktreeChange>>;
+        fn worktree_remove(
+            &self,
+            repo: &RepoRef,
+            path: &Path,
+            opts: &WorktreeRemoveOptions,
+        ) -> Result<WorktreeRemoved>;
         /// `CliFallback`: `git format-patch`/`git diff --binary`/`git apply`
         /// are the sources of truth for a patch's exact bytes (base85 binary
         /// hunks, CRLF preservation); one implementation, the CLI's.

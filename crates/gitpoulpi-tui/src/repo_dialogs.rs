@@ -63,7 +63,7 @@ fn remember_folder(dir: &Path) {
 
 /// The open dialog. Init and Clone can have the folder picker open over
 /// them (their Browse button).
-#[cfg_attr(not(feature = "worktree"), allow(clippy::large_enum_variant))]
+#[allow(clippy::large_enum_variant)]
 pub(crate) enum RepoDialog {
     Browse(FolderPicker),
     Init {
@@ -76,9 +76,12 @@ pub(crate) enum RepoDialog {
     },
     /// Create worktree (a repository tab's ref / commit menus), with the picker over it for Browse.
     Worktree {
-        form: WorktreeDialog,
+        form: Box<WorktreeDialog>,
         picker: Option<FolderPicker>,
     },
+    /// Remove a worktree, or choose where to merge its branch.
+    #[cfg(feature = "worktree")]
+    WorktreeRemove(Box<crate::worktree_remove_dialog::WorktreeRemoveDialog>),
     /// Start a pull request: the token-
     /// holding path only - no token opens a browser URL directly and
     /// never reaches this. No picker: nothing here names a folder.
@@ -154,6 +157,23 @@ pub(crate) enum DialogEffect {
         path: PathBuf,
         opts: gitpoulpi_core::domain::WorktreeAddOptions,
         open_tab: bool,
+    },
+    /// Remove worktree was confirmed (with whatever saves its changes).
+    #[cfg(feature = "worktree")]
+    RemoveWorktree {
+        path: PathBuf,
+        opts: gitpoulpi_core::domain::WorktreeRemoveOptions,
+        delete_branch: Option<String>,
+    },
+    /// "Open to commit": the worktree as a tab, commit message focused.
+    #[cfg(feature = "worktree")]
+    OpenWorktreeToCommit(PathBuf),
+    /// Merge a worktree's branch into the branch checked out at `into`.
+    #[cfg(feature = "worktree")]
+    MergeWorktree {
+        into: PathBuf,
+        from: gitpoulpi_core::domain::Ref,
+        then_remove: Option<(PathBuf, Option<String>)>,
     },
     /// Create patch was submitted: the event loop sends it to the daemon.
     CreatePatch {
@@ -595,11 +615,38 @@ impl RepoDialogs {
 
     /// Opens Create worktree for `seed`, proposing a folder beside
     /// `repo_root`.
+    #[cfg(test)]
     pub(crate) fn open_worktree(&mut self, seed: WorktreeSeed, repo_root: &Path) {
+        self.open_worktree_with(seed, repo_root, Vec::new(), false);
+    }
+
+    /// [`Self::open_worktree`] with the branches the Ref combobox lists;
+    /// `pick_ref` opens it on that list ("Choose a branch...").
+    pub(crate) fn open_worktree_with(
+        &mut self,
+        seed: WorktreeSeed,
+        repo_root: &Path,
+        branches: Vec<crate::worktree_dialog::BranchChoice>,
+        pick_ref: bool,
+    ) {
         self.dialog = Some(RepoDialog::Worktree {
-            form: WorktreeDialog::new(seed, repo_root),
+            form: Box::new(WorktreeDialog::with_choices(
+                seed, repo_root, branches, pick_ref,
+            )),
             picker: None,
         });
+    }
+
+    /// Opens Remove worktree (or the merge picker) for `seed`.
+    #[cfg(feature = "worktree")]
+    pub(crate) fn open_worktree_remove(
+        &mut self,
+        seed: crate::worktree_remove_dialog::Seed,
+        requester: &crate::daemon_link::Requester,
+    ) {
+        self.dialog = Some(RepoDialog::WorktreeRemove(Box::new(
+            crate::worktree_remove_dialog::WorktreeRemoveDialog::new(seed, requester),
+        )));
     }
 
     /// Opens Start a pull request's form for `seed` - reached only when
@@ -922,6 +969,8 @@ impl RepoDialogs {
             #[cfg(feature = "hosting")]
             RepoDialog::IssueFlow(_) => None,
             RepoDialog::Sparse(_) | RepoDialog::Safety(_) | RepoDialog::Flow(_) => None,
+            #[cfg(feature = "worktree")]
+            RepoDialog::WorktreeRemove(_) => None,
         }
     }
 
@@ -950,6 +999,8 @@ impl RepoDialogs {
             Some(RepoDialog::Init { form, .. }) => form.nav_targets(),
             Some(RepoDialog::Clone { form, .. }) => form.nav_targets(),
             Some(RepoDialog::Worktree { form, .. }) => form.nav_targets(),
+            #[cfg(feature = "worktree")]
+            Some(RepoDialog::WorktreeRemove(form)) => form.nav_targets(),
             Some(RepoDialog::Workspace { form, .. }) => form.nav_targets(),
             Some(RepoDialog::Sparse(form)) => form.nav_targets(),
             Some(RepoDialog::Safety(panel)) => panel.nav_targets(),
@@ -1030,6 +1081,11 @@ impl RepoDialogs {
                     let outcome = form.on_key(key);
                     self.on_worktree(outcome)
                 }
+                #[cfg(feature = "worktree")]
+                Some(RepoDialog::WorktreeRemove(form)) => {
+                    let outcome = form.on_key(key);
+                    self.on_worktree_remove(outcome)
+                }
                 Some(RepoDialog::Workspace { form, .. }) => {
                     let outcome = form.on_key(key);
                     self.on_workspace(outcome)
@@ -1091,6 +1147,8 @@ impl RepoDialogs {
                 Some(RepoDialog::Init { form, .. }) => form.paste(text),
                 Some(RepoDialog::Clone { form, .. }) => form.paste(text),
                 Some(RepoDialog::Worktree { form, .. }) => form.paste(text),
+                #[cfg(feature = "worktree")]
+                Some(RepoDialog::WorktreeRemove(form)) => form.paste(text),
                 Some(RepoDialog::Workspace { form, .. }) => form.paste(text),
                 Some(RepoDialog::Sparse(form)) => form.paste(text),
                 Some(RepoDialog::Flow(form)) => form.paste(text),
@@ -1134,8 +1192,12 @@ impl RepoDialogs {
             },
             RepoDialog::Worktree { form, picker } => match picker {
                 Some(p) => (p, picker_rect(area)),
-                None => (form, worktree_rect(area)),
+                None => (form.as_mut(), worktree_rect(area)),
             },
+            #[cfg(feature = "worktree")]
+            RepoDialog::WorktreeRemove(form) => {
+                (form.as_mut(), crate::worktree_remove_dialog::rect(area))
+            }
             RepoDialog::Workspace { form, picker } => match picker {
                 Some(p) => (p, picker_rect(area)),
                 None => (form.as_mut(), workspace_rect(area)),
@@ -1219,6 +1281,11 @@ impl RepoDialogs {
                 Some(RepoDialog::Worktree { form, .. }) => {
                     let outcome = form.on_mouse(mouse);
                     self.on_worktree(outcome)
+                }
+                #[cfg(feature = "worktree")]
+                Some(RepoDialog::WorktreeRemove(form)) => {
+                    let outcome = form.on_mouse(mouse);
+                    self.on_worktree_remove(outcome)
                 }
                 Some(RepoDialog::Workspace { form, .. }) => {
                     let outcome = form.on_mouse(mouse);
@@ -1361,6 +1428,8 @@ impl RepoDialogs {
                     #[cfg(feature = "hosting")]
                     Some(RepoDialog::IssueFlow(_)) => {}
                     Some(RepoDialog::Sparse(_) | RepoDialog::Safety(_) | RepoDialog::Flow(_)) => {}
+                    #[cfg(feature = "worktree")]
+                    Some(RepoDialog::WorktreeRemove(_)) => {}
                     Some(RepoDialog::ApplyPatch(_)) => {
                         remember_folder(dir.parent().unwrap_or(&dir));
                         self.dialog = None;
@@ -1575,6 +1644,49 @@ impl RepoDialogs {
                     path,
                     opts,
                     open_tab,
+                })
+            }
+        }
+    }
+
+    #[cfg(feature = "worktree")]
+    fn on_worktree_remove(
+        &mut self,
+        outcome: crate::worktree_remove_dialog::RemoveOutcome,
+    ) -> Option<DialogEffect> {
+        use crate::worktree_remove_dialog::RemoveOutcome as O;
+        match outcome {
+            O::Stay => None,
+            O::Cancel => {
+                self.dialog = None;
+                None
+            }
+            O::Remove {
+                path,
+                opts,
+                delete_branch,
+            } => {
+                self.dialog = None;
+                Some(DialogEffect::RemoveWorktree {
+                    path,
+                    opts,
+                    delete_branch,
+                })
+            }
+            O::OpenToCommit(path) => {
+                self.dialog = None;
+                Some(DialogEffect::OpenWorktreeToCommit(path))
+            }
+            O::Merge {
+                into,
+                from,
+                then_remove,
+            } => {
+                self.dialog = None;
+                Some(DialogEffect::MergeWorktree {
+                    into,
+                    from,
+                    then_remove,
                 })
             }
         }
@@ -2143,6 +2255,10 @@ impl RepoDialogs {
                     picker.render(picker_rect(area), buf);
                 }
             }
+            #[cfg(feature = "worktree")]
+            Some(RepoDialog::WorktreeRemove(form)) => {
+                form.render(crate::worktree_remove_dialog::rect(area), buf);
+            }
             #[cfg(feature = "hosting")]
             Some(RepoDialog::PullRequest { form }) => {
                 form.render(pull_request_rect(area), buf);
@@ -2272,6 +2388,43 @@ pub(crate) fn apply_dialog_effect(effect: DialogEffect, ctx: &mut TabCtx) -> Opt
             let shown = path.display().to_string();
             ctx.link.submit_action(Action::WorktreeAdd { path, opts });
             Some(msg::repo_dialogs::creating_worktree(shown))
+        }
+        #[cfg(feature = "worktree")]
+        DialogEffect::RemoveWorktree {
+            path,
+            opts,
+            delete_branch,
+        } => {
+            let shown = path.display().to_string();
+            ctx.link.submit_action(Action::WorktreeRemove {
+                path,
+                opts: Box::new(opts),
+                delete_branch,
+            });
+            Some(msg::worktree_manage::removing(shown))
+        }
+        #[cfg(feature = "worktree")]
+        DialogEffect::OpenWorktreeToCommit(path) => {
+            crate::worktree_remove_dialog::want_commit_focus(&path);
+            ctx.dialogs.close();
+            ctx.switcher_action(repo_switcher::SwitcherAction::Open(path))
+        }
+        #[cfg(feature = "worktree")]
+        DialogEffect::MergeWorktree {
+            into,
+            from,
+            then_remove,
+        } => {
+            let branch = match &from.kind {
+                gitpoulpi_core::domain::RefKind::LocalBranch { name } => name.clone(),
+                _ => String::new(),
+            };
+            ctx.link.submit_action(Action::WorktreeMerge {
+                worktree: into,
+                from: Box::new(from),
+                then_remove,
+            });
+            Some(msg::worktree_manage::merging(branch))
         }
         DialogEffect::CreatePatch { source, dest } => {
             let shown = dest.display().to_string();

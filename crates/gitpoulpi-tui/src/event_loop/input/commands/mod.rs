@@ -22,6 +22,7 @@ mod pane;
 mod refs;
 mod shared;
 mod sidebar_sections;
+pub(in crate::event_loop) mod worktrees;
 
 use crate::event_loop::*;
 pub(in crate::event_loop) use blame::{run as run_blame_op, save_width as save_blame_width};
@@ -36,8 +37,9 @@ pub(in crate::event_loop) use guides::{
 };
 pub(in crate::event_loop) use pane::*;
 pub(in crate::event_loop) use shared::*;
+#[allow(unused_imports)]
 pub(in crate::event_loop) use sidebar_sections::{
-    apply as apply_sidebar_sections_action, open_menu as open_sidebar_sections_menu,
+    apply as apply_sidebar_sections_action, open_menu as open_sidebar_sections_menu, show_worktrees,
 };
 
 /// What the loop does after a command ran.
@@ -147,7 +149,14 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::ToggleSectionCollapse
         | PaletteCommand::ToggleHierarchy => refs::run(cx, cmd, &sel_ref),
         PaletteCommand::RefsFold(..) | PaletteCommand::FilesFold(..) => folds::run(cx, cmd),
-        PaletteCommand::SidebarSectionsMenu
+        PaletteCommand::WorktreeOpenInSelected
+        | PaletteCommand::WorktreeMergeSelected
+        | PaletteCommand::WorktreeRemoveSelected
+        | PaletteCommand::CreateWorktreeMenu
+        | PaletteCommand::CreateWorktreeFromCurrentBranch
+        | PaletteCommand::CreateWorktreeChooseBranch => worktrees::run(cx, cmd),
+        PaletteCommand::ShowWorktreesSection
+        | PaletteCommand::SidebarSectionsMenu
         | PaletteCommand::ToggleSidebarSection(..)
         | PaletteCommand::ResetSidebarSections
         | PaletteCommand::UseSidebarSectionsForAll => sidebar_sections::run(cx, cmd),

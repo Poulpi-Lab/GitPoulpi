@@ -53,7 +53,14 @@ pub(super) fn handle(
         // click -- a click just selects the row.
         if let Some((section, area)) = hit_section.filter(|(s, _)| s.ref_kind().is_none()) {
             let len = match section {
-                SidebarSection::Worktrees => cx.worktrees_result.as_deref().unwrap_or(&[]).len(),
+                SidebarSection::Worktrees => {
+                    let list = cx.worktrees_result.as_deref().unwrap_or(&[]);
+                    if linked_worktree_count(list) == 0 {
+                        0
+                    } else {
+                        list.len()
+                    }
+                }
                 SidebarSection::Stashes => cx.stashes_result.as_deref().unwrap_or(&[]).len(),
                 SidebarSection::Submodules => cx.submodules_result.len(),
                 _ => 0,

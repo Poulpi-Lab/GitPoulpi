@@ -2,7 +2,8 @@ use super::{head_oid, rev};
 use crate::TestRepoBuilder;
 use gitpoulpi_core::domain::{
     CheckoutTarget, CommitOptions, HeadState, InitOptions, LogOptions, Oid, RefScope, RefUpdate,
-    StageTarget, StashId, UndoRefusal, WorktreeAddOptions, WorktreeStart,
+    StageTarget, StashId, UndoRefusal, WorktreeAddOptions, WorktreeCommit, WorktreeRemoveOptions,
+    WorktreeStart,
 };
 use gitpoulpi_core::{Error, GitBackend};
 
@@ -1480,4 +1481,211 @@ pub fn check_convert_files(backend: &dyn GitBackend) {
             .convert_files(&repo_ref, &[bad.to_string()], ConvertOp::Eol(Eol::Lf))
             .is_err());
     }
+}
+
+/// Removing a worktree: a clean one goes; the main one, an unknown path
+/// and a dirty one (no way to save the changes) are refused and leave
+/// everything where it was; `force` discards the changes.
+pub fn check_worktree_remove_clean_dirty_and_refusals(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .with_initial()
+        .branch("feature")
+        .checkout("main")
+        .build();
+    let repo_ref = repo.repo_ref();
+    let base = repo.root().parent().unwrap().to_path_buf();
+    let add = |name: &str, branch: &str| {
+        let path = base.join(name);
+        backend
+            .worktree_add(
+                &repo_ref,
+                &path,
+                &WorktreeAddOptions {
+                    start: WorktreeStart::Branch(branch.into()),
+                    new_branch: None,
+                },
+            )
+            .unwrap();
+        path
+    };
+    let clean = add("wt-clean", "feature");
+    assert!(backend
+        .worktree_changes(&repo_ref, &clean)
+        .unwrap()
+        .is_empty());
+    let removed = backend
+        .worktree_remove(&repo_ref, &clean, &Default::default())
+        .unwrap();
+    assert_eq!(removed.commit, None);
+    assert!(!removed.stashed);
+    assert!(!clean.exists());
+    assert_eq!(backend.worktrees(&repo_ref).unwrap().len(), 1);
+    assert_eq!(
+        rev(&repo, "feature"),
+        rev(&repo, "main"),
+        "the branch stays"
+    );
+
+    // The main worktree and a stranger are refused.
+    assert!(backend
+        .worktree_remove(&repo_ref, repo.root(), &Default::default())
+        .is_err());
+    assert!(backend
+        .worktree_remove(&repo_ref, &base.join("nope"), &Default::default())
+        .is_err());
+    assert!(repo.root().exists());
+
+    // Dirty: a tracked edit and an untracked file.
+    let dirty = add("wt-dirty", "feature");
+    std::fs::write(dirty.join("initial.txt"), "edited\n").unwrap();
+    std::fs::write(dirty.join("new.txt"), "new\n").unwrap();
+    let changes = backend.worktree_changes(&repo_ref, &dirty).unwrap();
+    let names: Vec<(&str, bool)> = changes
+        .iter()
+        .map(|c| (c.path.as_str(), c.untracked))
+        .collect();
+    assert_eq!(names, vec![("initial.txt", false), ("new.txt", true)]);
+    let refused = backend.worktree_remove(&repo_ref, &dirty, &Default::default());
+    assert!(
+        matches!(refused, Err(gitpoulpi_core::Error::DirtyWorkingTree { .. })),
+        "{refused:?}"
+    );
+    assert!(dirty.join("new.txt").exists(), "a refusal changes nothing");
+
+    // Force discards them.
+    backend
+        .worktree_remove(
+            &repo_ref,
+            &dirty,
+            &WorktreeRemoveOptions {
+                force: true,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+    assert!(!dirty.exists());
+    assert!(backend.stashes(&repo_ref).unwrap().is_empty());
+}
+
+/// Commit and remove: every change (untracked too) lands as one commit on
+/// the worktree's branch, visible from the main repository, and the folder
+/// is gone. A detached worktree needs a branch name for it.
+pub fn check_worktree_remove_commits_first(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .with_initial()
+        .branch("feature")
+        .checkout("main")
+        .build();
+    let repo_ref = repo.repo_ref();
+    let base = repo.root().parent().unwrap().to_path_buf();
+    let path = base.join("wt-commit");
+    backend
+        .worktree_add(
+            &repo_ref,
+            &path,
+            &WorktreeAddOptions {
+                start: WorktreeStart::Branch("feature".into()),
+                new_branch: None,
+            },
+        )
+        .unwrap();
+    std::fs::write(path.join("initial.txt"), "edited\n").unwrap();
+    std::fs::write(path.join("new.txt"), "new\n").unwrap();
+    let removed = backend
+        .worktree_remove(
+            &repo_ref,
+            &path,
+            &WorktreeRemoveOptions {
+                commit: Some(WorktreeCommit {
+                    message: "save work".into(),
+                    branch: None,
+                }),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+    assert!(!path.exists());
+    let tip = rev(&repo, "feature");
+    assert_eq!(removed.commit, Some(tip));
+    assert_eq!(
+        repo.git(&["log", "-1", "--format=%s", "feature"]),
+        "save work"
+    );
+    assert_eq!(repo.git(&["show", "feature:new.txt"]), "new");
+
+    // Detached: no branch to commit on.
+    let detached = base.join("wt-detached");
+    backend
+        .worktree_add(
+            &repo_ref,
+            &detached,
+            &WorktreeAddOptions {
+                start: WorktreeStart::Commit(rev(&repo, "main")),
+                new_branch: None,
+            },
+        )
+        .unwrap();
+    std::fs::write(detached.join("d.txt"), "d\n").unwrap();
+    let commit = |branch: Option<&str>| WorktreeRemoveOptions {
+        commit: Some(WorktreeCommit {
+            message: "d".into(),
+            branch: branch.map(str::to_string),
+        }),
+        ..Default::default()
+    };
+    assert!(backend
+        .worktree_remove(&repo_ref, &detached, &commit(None))
+        .is_err());
+    assert!(detached.join("d.txt").exists(), "refused before any change");
+    backend
+        .worktree_remove(&repo_ref, &detached, &commit(Some("rescued")))
+        .unwrap();
+    assert!(!detached.exists());
+    assert_eq!(repo.git(&["show", "rescued:d.txt"]), "d");
+}
+
+/// Stash and remove: the stash (untracked file included) stays in the
+/// shared stash list, the folder is gone.
+pub fn check_worktree_remove_stashes_first(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .with_initial()
+        .branch("feature")
+        .checkout("main")
+        .build();
+    let repo_ref = repo.repo_ref();
+    let path = repo.root().parent().unwrap().join("wt-stash");
+    backend
+        .worktree_add(
+            &repo_ref,
+            &path,
+            &WorktreeAddOptions {
+                start: WorktreeStart::Branch("feature".into()),
+                new_branch: None,
+            },
+        )
+        .unwrap();
+    std::fs::write(path.join("initial.txt"), "edited\n").unwrap();
+    std::fs::write(path.join("untracked.txt"), "u\n").unwrap();
+    let removed = backend
+        .worktree_remove(
+            &repo_ref,
+            &path,
+            &WorktreeRemoveOptions {
+                stash: Some("WIP on wt-stash".into()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+    assert!(removed.stashed);
+    assert!(!path.exists());
+    let stashes = backend.stashes(&repo_ref).unwrap();
+    assert_eq!(stashes.len(), 1);
+    assert!(
+        stashes[0].message.contains("WIP on wt-stash"),
+        "{stashes:?}"
+    );
+    assert_eq!(
+        repo.git(&["ls-tree", "-r", "--name-only", "stash@{0}^3"]),
+        "untracked.txt"
+    );
 }

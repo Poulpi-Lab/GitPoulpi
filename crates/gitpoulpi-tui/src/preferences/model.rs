@@ -380,6 +380,8 @@ pub(super) enum OpenInTarget {
     Command,
     /// The variable chips: append one to the command.
     Chips,
+    /// "Can open a worktree" (a checkbox).
+    Worktree,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -154,6 +154,8 @@ Hunks and lines are numbered as `gitpoulpi --json diff` numbers them.
 | `tag fetch <name> [--remote R]` | Fetch one tag from a remote (the one that has it by default), e.g. a `where: remote` tag. Never overwrites a local tag at another commit. |
 | `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tags on a remote (no names: every tag no remote has). Deleting one on a remote is undoable (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Linked worktrees. |
+| `worktree changes <path>` | The uncommitted changes of a worktree (`path`, `untracked`); empty when clean. |
+| `worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` | Removes a linked worktree. One with uncommitted changes is refused unless `--force` (they are lost), `--commit-message` (commit them on its branch first) or `--stash-message` (stash them, untracked included, first). `--delete-branch` also deletes its branch (journaled). The removal itself is not undoable. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Submodules ([Submodules](submodules.md)). |
 
 `--autostash` stashes local changes that block the operation, runs it and pops

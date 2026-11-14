@@ -878,6 +878,113 @@ fn worktree_add_on_a_new_branch_a_branch_and_a_commit_then_list() {
     assert!(listed[0].is_main);
 }
 
+/// `worktree changes` lists what is uncommitted; `worktree remove` refuses a
+/// dirty worktree, commits or stashes first on request, and with
+/// `--delete-branch` also deletes the (merged) branch.
+#[test]
+fn worktree_changes_and_remove_with_commit_stash_and_branch_delete() {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("initial")
+        .unwrap()
+        .branch("feature")
+        .unwrap()
+        .branch("done")
+        .unwrap()
+        .checkout("main")
+        .unwrap()
+        .build();
+    let session = "cli-test-worktree-remove";
+    let base = repo.root().parent().unwrap().to_path_buf();
+    let add = |name: &str, branch: &str| -> std::path::PathBuf {
+        let path = base.join(name);
+        run_json(
+            repo.root(),
+            session,
+            &["worktree", "add", &path.to_string_lossy(), branch],
+        );
+        path
+    };
+
+    // Dirty: refused, nothing moves.
+    let dirty = add("wt-dirty", "feature");
+    std::fs::write(dirty.join("new.txt"), "new\n").unwrap();
+    let changes: Vec<gitpoulpi_core::domain::WorktreeChange> = parse(run_json(
+        repo.root(),
+        session,
+        &["worktree", "changes", &dirty.to_string_lossy()],
+    ));
+    assert_eq!(changes.len(), 1);
+    assert_eq!(changes[0].path, "new.txt");
+    assert!(changes[0].untracked);
+    let output = Command::cargo_bin("gitpoulpi")
+        .unwrap()
+        .env("GITPOULPI_CONFIG_DIR", isolated_config_dir())
+        .args(["--json", "--session", session])
+        .args(["--repo", &repo.root().to_string_lossy()])
+        .args(["worktree", "remove", &dirty.to_string_lossy()])
+        .current_dir(repo.root())
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    let refused: Value = serde_json::from_slice(&output.stdout).expect("error output was not JSON");
+    assert!(refused["error"].is_string(), "{refused}");
+    assert!(dirty.join("new.txt").exists());
+
+    // Commit first: the commit lands on the branch, the folder goes.
+    let removed: gitpoulpi_core::domain::WorktreeRemoved = parse(run_json(
+        repo.root(),
+        session,
+        &[
+            "worktree",
+            "remove",
+            &dirty.to_string_lossy(),
+            "--commit-message",
+            "save it",
+        ],
+    ));
+    assert!(removed.commit.is_some());
+    assert!(!dirty.exists());
+    assert_eq!(
+        repo.git(&["log", "-1", "--format=%s", "feature"]),
+        "save it"
+    );
+
+    // Stash first.
+    let stashy = add("wt-stash", "feature");
+    std::fs::write(stashy.join("u.txt"), "u\n").unwrap();
+    let removed: gitpoulpi_core::domain::WorktreeRemoved = parse(run_json(
+        repo.root(),
+        session,
+        &[
+            "worktree",
+            "remove",
+            &stashy.to_string_lossy(),
+            "--stash-message",
+            "parked",
+        ],
+    ));
+    assert!(removed.stashed);
+    assert!(!stashy.exists());
+    assert!(repo.git(&["stash", "list"]).contains("parked"));
+
+    // A clean worktree whose branch is merged: remove with its branch.
+    let clean = add("wt-done", "done");
+    let value = run_json(
+        repo.root(),
+        session,
+        &[
+            "worktree",
+            "remove",
+            &clean.to_string_lossy(),
+            "--delete-branch",
+        ],
+    );
+    assert_eq!(value["deleted_branch"], "done", "{value}");
+    assert!(!clean.exists());
+    assert!(repo.git(&["branch", "--list", "done"]).trim().is_empty());
+}
+
 #[test]
 fn reset_moves_head_back() {
     let repo = FixtureRepoBuilder::new()

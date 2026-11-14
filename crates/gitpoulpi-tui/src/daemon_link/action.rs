@@ -489,6 +489,25 @@ pub enum Action {
         path: PathBuf,
         opts: WorktreeAddOptions,
     },
+    /// Remove a linked worktree (`GitBackend::worktree_remove`), then, with
+    /// `delete_branch`, delete its branch with the journaled branch delete
+    /// (one Undo brings the branch back; the folder stays gone).
+    WorktreeRemove {
+        path: PathBuf,
+        opts: Box<gitpoulpi_core::domain::WorktreeRemoveOptions>,
+        delete_branch: Option<String>,
+    },
+    /// Merge `from` (a local branch) into whatever is checked out in the
+    /// worktree at `worktree`: the ordinary merge request, sent for that
+    /// worktree's repository instead of this window's. With `then_remove`
+    /// (the path of the merged branch's own worktree and whether to delete
+    /// its branch too), that worktree is removed once the merge landed
+    /// without conflicts.
+    WorktreeMerge {
+        worktree: PathBuf,
+        from: Box<Ref>,
+        then_remove: Option<(PathBuf, Option<String>)>,
+    },
     /// Write a patch file (`GitBackend::patch_create`).
     PatchCreate {
         source: PatchSource,

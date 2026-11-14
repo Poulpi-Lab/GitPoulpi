@@ -486,6 +486,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Left pane: Show/Hide Local Branches |  |
 | Left pane: Show/Hide Remotes |  |
 | Left pane: Show/Hide Worktrees |  |
+| Sidebar: Show Worktrees Section |  |
 | Left pane: Show/Hide Stashes |  |
 | Left pane: Show/Hide Tags |  |
 | Left pane: Show/Hide Pull requests |  |
@@ -529,6 +530,12 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Refs: Reflog of the Selected Branch... |  |
 | Refs: Start a Pull Request from Selected Branch... |  |
 | Refs: Open Worktree in Tab | `Enter / double-click` |
+| Refs: Open Worktree In... |  |
+| Refs: Merge Worktree Branch Into... |  |
+| Refs: Remove Worktree... |  |
+| Refs: Create Worktree... | `+` |
+| Refs: Create Worktree from Current Branch |  |
+| Refs: Create Worktree Choosing a Branch |  |
 | Refs: Submodule Update (Selected) |  |
 | Refs: Submodule Init (Selected) |  |
 | Refs: Submodule Open in Tab | `Enter / double-click` |

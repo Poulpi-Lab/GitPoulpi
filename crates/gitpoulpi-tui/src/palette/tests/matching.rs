@@ -211,6 +211,13 @@ fn worktree_and_submodule_commands_are_tagged() {
     let worktree = [
         C::CreateWorktreeFromSelectedRef,
         C::OpenWorktreeInTab,
+        C::WorktreeOpenInSelected,
+        C::WorktreeMergeSelected,
+        C::WorktreeRemoveSelected,
+        C::CreateWorktreeMenu,
+        C::CreateWorktreeFromCurrentBranch,
+        C::CreateWorktreeChooseBranch,
+        C::ShowWorktreesSection,
         C::CreateWorktreeAtSelectedCommit,
         C::FocusRefsSection(SidebarSection::Worktrees),
     ];

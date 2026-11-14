@@ -187,6 +187,24 @@ pub(crate) enum PaletteCommand {
     /// (focusing its tab when it already has one) - the double-click's
     /// keyboard twin.
     OpenWorktreeInTab,
+    /// Run an "Open in" entry on the selected worktree's folder (the entries
+    /// marked "Can open a worktree"): a small menu at the row.
+    WorktreeOpenInSelected,
+    /// Merge the selected worktree's branch into another branch.
+    WorktreeMergeSelected,
+    /// Remove the selected worktree (a confirmation that also offers to save
+    /// its changes).
+    WorktreeRemoveSelected,
+    /// The Worktrees header's `+`: from the current branch, from the
+    /// selected commit, or choosing a branch.
+    CreateWorktreeMenu,
+    /// Create worktree from the current branch (the dialog proposes a new
+    /// branch: the current one is checked out already).
+    CreateWorktreeFromCurrentBranch,
+    /// Create worktree, opening the dialog on its Ref list.
+    CreateWorktreeChooseBranch,
+    /// Show the Worktrees section, even in a repository with no worktree.
+    ShowWorktreesSection,
     /// Update the Submodules section's selected submodule (cloning it when
     /// it is not cloned yet).
     SubmoduleUpdateSelected,
@@ -915,6 +933,13 @@ pub(crate) const fn command_requires(
         }
         PaletteCommand::CreateWorktreeFromSelectedRef
         | PaletteCommand::OpenWorktreeInTab
+        | PaletteCommand::WorktreeOpenInSelected
+        | PaletteCommand::WorktreeMergeSelected
+        | PaletteCommand::WorktreeRemoveSelected
+        | PaletteCommand::CreateWorktreeMenu
+        | PaletteCommand::CreateWorktreeFromCurrentBranch
+        | PaletteCommand::CreateWorktreeChooseBranch
+        | PaletteCommand::ShowWorktreesSection
         | PaletteCommand::CreateWorktreeAtSelectedCommit
         | PaletteCommand::FocusRefsSection(SidebarSection::Worktrees) => {
             Some(crate::build_features::Feature::Worktree)

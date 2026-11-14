@@ -125,7 +125,64 @@ impl WindowState {
         // A Create worktree menu row or palette command asked for the
         // dialog (`WorktreeSeed`); it is `repo_dialogs`' to show.
         if let Some(seed) = self.worktree_seed.take() {
-            self.repo_dialogs.open_worktree(seed, &self.repo.root);
+            let worktrees = self.worktrees_result.as_deref().unwrap_or(&[]);
+            let refs = self.refs_result.as_deref().unwrap_or(&[]);
+            let branches: Vec<crate::worktree_dialog::BranchChoice> = refs
+                .iter()
+                .filter_map(|r| match &r.kind {
+                    gitpoulpi_core::domain::RefKind::LocalBranch { name } => {
+                        Some(crate::worktree_dialog::BranchChoice {
+                            name: name.clone(),
+                            busy: r.is_head
+                                || worktrees.iter().any(|w| w.branch.as_deref() == Some(name)),
+                        })
+                    }
+                    _ => None,
+                })
+                .collect();
+            self.repo_dialogs.open_worktree_with(
+                seed,
+                &self.repo.root,
+                branches,
+                crate::worktree_dialog::WorktreeDialog::take_pick_ref(),
+            );
+        }
+        // A worktree row's Remove / Merge into...: the dialog needs this
+        // window's refs, worktrees and daemon link.
+        #[cfg(feature = "worktree")]
+        if let Some(request) = crate::worktree_remove_dialog::take_request() {
+            use crate::worktree_remove_dialog::{Mode, Request, Seed};
+            let (path, mode) = match request {
+                Request::Remove(p) => (p, Mode::Remove),
+                Request::Merge(p) => (p, Mode::Merge),
+            };
+            let worktrees = self.worktrees_result.as_deref().unwrap_or(&[]).to_vec();
+            let canonical =
+                |p: &std::path::Path| std::fs::canonicalize(p).unwrap_or_else(|_| p.to_path_buf());
+            match worktrees
+                .iter()
+                .find(|w| canonical(&w.path) == canonical(&path))
+                .cloned()
+            {
+                Some(worktree) => {
+                    let refs = self.refs_result.as_deref().unwrap_or(&[]).to_vec();
+                    let requester = self.link.activity_handle().raw.requester();
+                    self.repo_dialogs.open_worktree_remove(
+                        Seed {
+                            worktree,
+                            worktrees,
+                            refs,
+                            mode,
+                        },
+                        &requester,
+                    );
+                }
+                None => {
+                    self.last_message = Some(gitpoulpi_i18n::msg::worktree_manage::not_listed(
+                        path.display(),
+                    ));
+                }
+            }
         }
         // Start a pull request asked for the form dialog (a matched
         // integration had a usable token); with no token the action

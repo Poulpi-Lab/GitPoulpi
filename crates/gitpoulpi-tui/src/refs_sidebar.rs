@@ -32,6 +32,11 @@ pub(crate) enum SidebarSection {
     /// section heights (keyed by position) of the sections before it keep
     /// their meaning.
     Submodules,
+    /// Not a pane: the mark "show WORKTREES although the repository has no
+    /// linked worktree yet" in the hidden set (persisted as
+    /// `worktrees_empty`). Absent from [`SidebarSection::ORDER`]. Without
+    /// the mark the section stays hidden in such a repository, as before.
+    WorktreesEmpty,
 }
 
 impl SidebarSection {
@@ -67,6 +72,7 @@ impl SidebarSection {
             SidebarSection::PullRequests => "PULL REQUESTS",
             SidebarSection::Issues => "ISSUES",
             SidebarSection::Submodules => "SUBMODULES",
+            SidebarSection::WorktreesEmpty => "WORKTREES (EMPTY)",
         }
     }
     // i18n-scan: on
@@ -84,6 +90,7 @@ impl SidebarSection {
             SidebarSection::PullRequests => m::SECTION_PULL_REQUESTS,
             SidebarSection::Issues => m::SECTION_ISSUES,
             SidebarSection::Submodules => m::SECTION_SUBMODULES,
+            SidebarSection::WorktreesEmpty => m::SECTION_WORKTREES,
         }
         .get()
     }
@@ -98,6 +105,7 @@ impl SidebarSection {
             SidebarSection::PullRequests => PULL_REQUEST_ICON,
             SidebarSection::Issues => ISSUE_ICON,
             SidebarSection::Submodules => SUBMODULE_ICON,
+            SidebarSection::WorktreesEmpty => WORKTREE_ICON,
         }
     }
 
@@ -123,7 +131,8 @@ impl SidebarSection {
             | SidebarSection::Stashes
             | SidebarSection::PullRequests
             | SidebarSection::Issues
-            | SidebarSection::Submodules => None,
+            | SidebarSection::Submodules
+            | SidebarSection::WorktreesEmpty => None,
         }
     }
 }
@@ -161,6 +170,8 @@ pub(crate) fn visible_sections_with(
 ) -> Vec<SidebarSection> {
     let available =
         available_sections(linked_worktree_count, stash_count, hosting, submodule_count);
+    let marked = hidden.contains(&SidebarSection::WorktreesEmpty);
+    let hidden = effective_hidden(hidden, linked_worktree_count);
     let shown: Vec<SidebarSection> = available
         .iter()
         .copied()
@@ -169,7 +180,13 @@ pub(crate) fn visible_sections_with(
     // The pane never goes blank: a config that hides everything that exists
     // here (or sections that vanished under the hidden ones) shows them all.
     if shown.is_empty() {
+        // Everything is shown, except WORKTREES where it is empty and was not
+        // asked for: that default is not the user's hiding.
+        let default_hidden = effective_hidden(&HashSet::new(), linked_worktree_count);
         available
+            .into_iter()
+            .filter(|s| !default_hidden.contains(s) || marked)
+            .collect()
     } else {
         shown
     }
@@ -178,7 +195,7 @@ pub(crate) fn visible_sections_with(
 /// Every section that exists in this repository right now, whatever the user
 /// hid: what the show/hide menu can act on.
 pub(crate) fn available_sections(
-    linked_worktree_count: usize,
+    _linked_worktree_count: usize,
     stash_count: usize,
     hosting: (bool, bool),
     submodule_count: usize,
@@ -186,9 +203,10 @@ pub(crate) fn available_sections(
     SidebarSection::ORDER
         .into_iter()
         .filter(|s| match s {
-            SidebarSection::Worktrees => {
-                crate::build_features::WORKTREE && linked_worktree_count > 0
-            }
+            // Always offered (the show/hide list and "Show Worktrees
+            // section" reach it); `effective_hidden` keeps it out of a
+            // repository without linked worktrees until the user shows it.
+            SidebarSection::Worktrees => crate::build_features::WORKTREE,
             SidebarSection::Stashes => stash_count > 0,
             SidebarSection::PullRequests => hosting.0,
             SidebarSection::Issues => hosting.1,
@@ -211,6 +229,7 @@ impl SidebarSection {
             SidebarSection::PullRequests => "pull_requests",
             SidebarSection::Issues => "issues",
             SidebarSection::Submodules => "submodules",
+            SidebarSection::WorktreesEmpty => "worktrees_empty",
         }
     }
     // i18n-scan: on
@@ -226,7 +245,49 @@ impl SidebarSection {
     }
 
     pub(crate) fn from_config_name(name: &str) -> Option<Self> {
-        Self::ORDER.into_iter().find(|s| s.config_name() == name)
+        Self::ORDER
+            .into_iter()
+            .chain([SidebarSection::WorktreesEmpty])
+            .find(|s| s.config_name() == name)
+    }
+}
+
+/// The set the pane is painted from: the stored one, where WORKTREES counts
+/// as hidden in a repository with no linked worktree unless the user showed
+/// it there ([`SidebarSection::WorktreesEmpty`] in the set). The mark never
+/// leaves the stored set.
+pub(crate) fn effective_hidden(
+    hidden: &HashSet<SidebarSection>,
+    linked_worktree_count: usize,
+) -> HashSet<SidebarSection> {
+    let mut out = hidden.clone();
+    if linked_worktree_count == 0 && !hidden.contains(&SidebarSection::WorktreesEmpty) {
+        out.insert(SidebarSection::Worktrees);
+    }
+    out.remove(&SidebarSection::WorktreesEmpty);
+    out
+}
+
+/// Flips WORKTREES in the stored set the way the user sees it: with linked
+/// worktrees the section's own entry, without any the "shown while empty"
+/// mark. `show` is what the user asked for.
+pub(crate) fn set_worktrees_shown(
+    hidden: &mut HashSet<SidebarSection>,
+    linked_worktree_count: usize,
+    show: bool,
+) {
+    if linked_worktree_count == 0 {
+        if show {
+            hidden.insert(SidebarSection::WorktreesEmpty);
+        } else {
+            hidden.remove(&SidebarSection::WorktreesEmpty);
+        }
+        // The plain entry would hide it the day a worktree exists.
+        hidden.remove(&SidebarSection::Worktrees);
+    } else if show {
+        hidden.remove(&SidebarSection::Worktrees);
+    } else {
+        hidden.insert(SidebarSection::Worktrees);
     }
 }
 
@@ -242,6 +303,7 @@ pub(crate) fn hidden_from_names(names: &[String]) -> HashSet<SidebarSection> {
 pub(crate) fn hidden_to_names(hidden: &HashSet<SidebarSection>) -> Vec<String> {
     SidebarSection::ORDER
         .into_iter()
+        .chain([SidebarSection::WorktreesEmpty])
         .filter(|s| hidden.contains(s))
         .map(|s| s.config_name().to_string())
         .collect()
@@ -307,6 +369,7 @@ impl SidebarStates {
             SidebarSection::PullRequests => &self.pulls,
             SidebarSection::Issues => &self.issues,
             SidebarSection::Submodules => &self.submodules,
+            SidebarSection::WorktreesEmpty => &self.worktrees,
         }
     }
 
@@ -320,6 +383,7 @@ impl SidebarStates {
             SidebarSection::PullRequests => &mut self.pulls,
             SidebarSection::Issues => &mut self.issues,
             SidebarSection::Submodules => &mut self.submodules,
+            SidebarSection::WorktreesEmpty => &mut self.worktrees,
         }
     }
 
@@ -2060,6 +2124,30 @@ mod tests {
                 SidebarSection::Tags
             ]
         );
+    }
+
+    #[test]
+    fn worktrees_stay_hidden_without_linked_ones_until_shown_on_purpose() {
+        let none = HashSet::new();
+        assert!(!visible_sections_with(0, 0, (false, false), 0, &none)
+            .contains(&SidebarSection::Worktrees));
+        let mut shown = HashSet::new();
+        set_worktrees_shown(&mut shown, 0, true);
+        assert!(visible_sections_with(0, 0, (false, false), 0, &shown)
+            .contains(&SidebarSection::Worktrees));
+        // The mark survives the file: stored as `worktrees_empty`.
+        assert_eq!(hidden_to_names(&shown), vec!["worktrees_empty"]);
+        assert_eq!(hidden_from_names(&["worktrees_empty".to_string()]), shown);
+        // With linked worktrees the plain rule applies and the mark is inert.
+        assert!(visible_sections_with(1, 0, (false, false), 0, &shown)
+            .contains(&SidebarSection::Worktrees));
+        let mut hidden = HashSet::new();
+        set_worktrees_shown(&mut hidden, 1, false);
+        assert!(!visible_sections_with(1, 0, (false, false), 0, &hidden)
+            .contains(&SidebarSection::Worktrees));
+        // Hiding it again where it is empty drops the mark.
+        set_worktrees_shown(&mut shown, 0, false);
+        assert!(shown.is_empty());
     }
 
     #[test]

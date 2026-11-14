@@ -275,6 +275,8 @@ pub fn operation_label(kind: OperationKind) -> String {
         K::SetRepoConfig => "Change repository setting",
         K::RepoAuthTest => "Test repository sign-in",
         K::WorktreeAdd => "Add worktree",
+        K::WorktreeChanges => "List worktree changes",
+        K::WorktreeRemove => "Remove worktree",
         K::ResolveConflict => "Resolve conflict",
         K::FlowRun => "Run workflow",
         K::LfsPull => "LFS pull",

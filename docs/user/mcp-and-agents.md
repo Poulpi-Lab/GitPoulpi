@@ -491,7 +491,9 @@ confirm.
 | `workspace_set_profile` | `gitpoulpi workspace set-profile` | write |
 | `workspace_show` | `gitpoulpi workspace show` | read |
 | `worktree_add` | `gitpoulpi worktree add` | write |
+| `worktree_changes` | `gitpoulpi worktree changes` | read |
 | `worktree_list` | `gitpoulpi worktree list` | read |
+| `worktree_remove` | `gitpoulpi worktree remove` | destructive |
 
 Not exposed as tools:
 

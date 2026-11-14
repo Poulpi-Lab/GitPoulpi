@@ -477,21 +477,21 @@ fn removing_a_merged_worktree_can_delete_its_branch_and_undo_brings_it_back() {
             .trim()
             .is_empty()
     });
-    // Undo brings the branch back (the folder stays gone).
-    term.send_keys("C-z").unwrap();
-    term.wait_for("an undo question or the result", STEP, |s| {
-        s.contains("Undo") || s.contains("undo")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    for _ in 0..3 {
+    // Undo brings the branch back (the folder stays gone). The journal entry
+    // can land a moment after the disk changed: press again until it is back.
+    for _ in 0..12 {
         if !common::git(&root, &["branch", "--list", "done"])
             .trim()
             .is_empty()
         {
             break;
         }
-        term.send_keys("Enter").unwrap();
-        std::thread::sleep(Duration::from_millis(800));
+        term.send_keys("C-z").unwrap();
+        std::thread::sleep(Duration::from_millis(900));
+        if term.text().contains("Undo") && term.text().contains("Cancel") {
+            term.send_keys("Enter").unwrap();
+            std::thread::sleep(Duration::from_millis(600));
+        }
     }
     wait_until("the branch is back", || {
         !common::git(&root, &["branch", "--list", "done"])

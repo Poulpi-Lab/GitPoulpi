@@ -46,6 +46,8 @@ gitpoulpi --json lost-commits               # then, to get one's work back witho
 gitpoulpi --json apply-commit <rev>        # its changes onto the working tree, all or nothing (fails: nothing changed); undoable
 gitpoulpi --json stash from-commit <rev> [-m "rescued"]   # or keep them as a stash; working tree untouched; undoable
 gitpoulpi --json branch create feature HEAD~1
+gitpoulpi --json branch upstream list      # a branch's primary upstream + extra push targets / pull sources, each ahead/behind (no network)
+gitpoulpi --json branch upstream add gitlab[:dst] [--pull]   # extra push target (also remove, pull <r> --on|--off, primary <r/b>); undoable; exit 2 = refused
 gitpoulpi --json checkout feature --autostash
 gitpoulpi --json pull --mode ff-only
 gitpoulpi --json push -u

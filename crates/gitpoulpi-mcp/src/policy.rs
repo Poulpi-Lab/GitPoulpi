@@ -8,6 +8,7 @@ use crate::registry::ToolSpec;
 
 const READ_ONLY: &[&[&str]] = &[
     &["status"],
+    &["remote-group", "status"],
     // Pages of a reflog / of the commits no ref reaches.
     &["reflog"],
     &["lost-commits"],

@@ -221,7 +221,7 @@ pub fn folder_menu_status() -> FolderMenuReport {
 
 fn managers_lines(verb: &str, done: &[folder_menu::Manager]) -> Vec<String> {
     if done.is_empty() {
-        vec![format!("nothing to {verb}")] // i18n-english
+        vec![format!("nothing was {verb}")] // i18n-english
     } else {
         done.iter()
             .map(|m| format!("{verb}: {}", m.as_str())) // i18n-english
@@ -245,5 +245,20 @@ pub fn os_name() -> &'static str {
         Os::Windows => "windows",
         Os::Macos => "macos",
         Os::Linux => "linux",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn nothing_done_reads_as_a_sentence_for_every_verb() {
+        for verb in ["installed", "removed"] {
+            assert_eq!(
+                managers_lines(verb, &[]),
+                vec![format!("nothing was {verb}")]
+            );
+        }
     }
 }

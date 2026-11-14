@@ -52,6 +52,7 @@ mod stash;
 mod submodule;
 mod tag;
 mod undo;
+mod upstream;
 #[cfg(feature = "worktree")]
 mod worktree;
 
@@ -910,6 +911,7 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
             }
         },
         Commands::Remote { action } => remote(session, action).await,
+        Commands::RemoteGroup { action } => upstream::remote_group(session, action).await,
         Commands::SshCommand { action } => ssh_command(session, action).await,
         Commands::RepoAuth { action } => repo_auth::repo_auth(session, action).await,
         Commands::RepoConfig { action } => repo_config(session, action).await,

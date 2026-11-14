@@ -878,6 +878,8 @@ push_branch = "{$Push} {name}"
 start_pr = { git = "从 {name} 发起 {$pr}…", local = "从 {name} 发起{$pr}…" }
 fetch = "{$Fetch}"
 set_upstream = { git = "设置 {name} 的 upstream…", local = "设置 {name} 的上游…" }
+# context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
+remotes_of = "Remotes of {name}..."
 rename = "重命名 {name}…"
 delete = "删除 {name}…"
 delete_both = "删除 {first} 和 {second}…"

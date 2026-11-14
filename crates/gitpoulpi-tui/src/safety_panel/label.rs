@@ -192,6 +192,7 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::Workflow
         | K::FlowPlan
         | K::RemoteGroupStatus
+        | K::RemoteGroupPlan
         | K::SparseStatus
         | K::Conflicts
         | K::ConflictEntries
@@ -568,6 +569,7 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         | K::Workflow
         | K::FlowPlan
         | K::RemoteGroupStatus
+        | K::RemoteGroupPlan
         | K::SparseStatus
         | K::Conflicts
         | K::ConflictEntries

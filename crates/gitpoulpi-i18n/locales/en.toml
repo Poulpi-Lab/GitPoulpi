@@ -1151,6 +1151,8 @@ start_pr = "Start a {$pr} from {name}..."
 fetch = "{$Fetch}"
 # context: ref menu row; {name} is the branch; the upstream is the remote branch it tracks
 set_upstream = { git = "Set upstream of {name}...", local = "Set upstream of {name}..." }
+# context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
+remotes_of = "Remotes of {name}..."
 # context: ref menu row; {name} is the branch
 rename = "Rename {name}..."
 # context: ref menu row (destructive); {name} is the branch, tag or remote branch

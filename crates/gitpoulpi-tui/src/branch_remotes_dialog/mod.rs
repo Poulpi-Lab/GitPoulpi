@@ -282,22 +282,15 @@ impl RemotesPane {
         (push, pull)
     }
 
-    /// The first gone row left in the table.
-    fn gone_left(&self) -> Option<&Row> {
-        self.rows.iter().find(|r| r.gone)
-    }
-
     /// What Apply sends: `Ok(None)` when nothing changed, `Err` with the
-    /// reason Apply is refused.
+    /// reason Apply is refused. Gone rows are not written back: Apply drops
+    /// their entries, so they never block it.
     pub(crate) fn request(
         &self,
         chosen_upstream: Option<String>,
     ) -> Result<Option<crate::daemon_link::Action>, String> {
         if !self.is_ready() {
             return Err(msg::LOADING.get().to_string());
-        }
-        if let Some(gone) = self.gone_left() {
-            return Err(msg::gone_first(&gone.remote));
         }
         let (mut push, mut pull) = self.lists();
         push.sort();

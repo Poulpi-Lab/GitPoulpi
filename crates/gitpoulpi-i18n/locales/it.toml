@@ -878,6 +878,8 @@ push_branch = { git = "{$Push} di {name}", local = "Invia {name}" }
 start_pr = "Avvia una {$pr} da {name}..."
 fetch = "{$Fetch}"
 set_upstream = "Imposta l'upstream di {name}..."
+# context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
+remotes_of = "Remotes of {name}..."
 rename = "Rinomina {name}..."
 delete = "Elimina {name}..."
 delete_both = "Elimina {first} e {second}..."

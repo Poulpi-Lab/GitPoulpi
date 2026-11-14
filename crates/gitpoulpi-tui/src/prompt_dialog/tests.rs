@@ -464,7 +464,7 @@ fn renaming_the_upstream_row_is_refused_inside_the_dialog() {
 }
 
 #[test]
-fn a_gone_remote_blocks_apply_until_its_row_is_removed() {
+fn a_gone_remote_never_blocks_apply_and_its_entries_are_dropped() {
     let mut dialog = remotes_dialog(Some("origin/feature"), true);
     let (all, hits) = paint(&dialog);
     assert!(
@@ -472,20 +472,9 @@ fn a_gone_remote_blocks_apply_until_its_row_is_removed() {
         "{all}"
     );
     assert!(hits.iter().any(|(_, p)| matches!(p, PromptPart::Remove(_))));
-    assert_eq!(dialog.on_key(key(KeyCode::Enter)), PromptOutcome::Stay);
-    assert!(dialog
-        .error
-        .as_deref()
-        .is_some_and(|e| e.contains("oldbox")));
-    // Down to the gone row (the last), Del removes it.
-    for _ in 0..4 {
-        dialog.on_key(key(KeyCode::Down));
-    }
-    dialog.on_key(key(KeyCode::Delete));
-    let (all, _) = paint(&dialog);
-    assert!(!all.contains("oldbox"), "{all}");
+    // Apply without touching the gone row: it is simply not written back.
     let PromptOutcome::Submit(actions, _) = dialog.on_key(key(KeyCode::Enter)) else {
-        panic!("removing the stale entry is a change");
+        panic!("a gone row does not block Apply");
     };
     assert_eq!(
         actions,
@@ -496,6 +485,13 @@ fn a_gone_remote_blocks_apply_until_its_row_is_removed() {
             pull_from: vec!["fork".into()],
         }]
     );
+    // Del still removes the row from the table.
+    for _ in 0..4 {
+        dialog.on_key(key(KeyCode::Down));
+    }
+    dialog.on_key(key(KeyCode::Delete));
+    let (all, _) = paint(&dialog);
+    assert!(!all.contains("oldbox"), "{all}");
 }
 
 #[test]

@@ -879,6 +879,8 @@ push_branch = "{$Push} {name}"
 start_pr = "Почати {$pr} з {name}..."
 fetch = "{$Fetch}"
 set_upstream = { git = "Задати upstream для {name}...", local = "Задати upstream для {name}..." }
+# context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
+remotes_of = "Remotes of {name}..."
 rename = "Перейменувати {name}..."
 delete = "Видалити {name}..."
 delete_both = "Видалити {first} і {second}..."

@@ -880,6 +880,8 @@ push_branch = "{$Push} {name}"
 start_pr = "Starta en {$pr} från {name}..."
 fetch = { git = "Fetch", local = "Hämta" }
 set_upstream = { git = "Ange upstream för {name}...", local = "Ange upstream för {name}..." }
+# context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
+remotes_of = "Remotes of {name}..."
 rename = "Byt namn på {name}..."
 delete = "Ta bort {name}..."
 delete_both = "Ta bort {first} och {second}..."

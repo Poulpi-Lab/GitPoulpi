@@ -879,6 +879,8 @@ push_branch = "{$Push}: {name}"
 start_pr = "{name} dalından {$pr} başlat..."
 fetch = "{$Fetch}"
 set_upstream = { git = "{name} upstream'ini ayarla...", local = "{name} upstream'ini ayarla..." }
+# context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
+remotes_of = "Remotes of {name}..."
 rename = "{name} adını değiştir..."
 delete = "Sil: {name}..."
 delete_both = "Sil: {first} ve {second}..."

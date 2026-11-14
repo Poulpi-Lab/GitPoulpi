@@ -878,6 +878,8 @@ push_branch = "{$Push} {name}"
 start_pr = "Založit {$pr} z {name}..."
 fetch = "{$Fetch}"
 set_upstream = { git = "Nastavit upstream pro {name}...", local = "Nastavit upstream pro {name}..." }
+# context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
+remotes_of = "Remotes of {name}..."
 rename = "Přejmenovat {name}..."
 delete = "Smazat {name}..."
 delete_both = "Smazat {first} a {second}..."

@@ -135,6 +135,7 @@ pub(super) async fn branch(session: &mut Session, action: BranchAction) -> Resul
             };
             Ok(emitted(to_value(&outcome)?, human))
         }
+        BranchAction::Upstream { action } => super::upstream::upstream(session, action).await,
         BranchAction::List => {
             let refs = all_refs(session).await?;
             let branches: Vec<&Ref> = refs

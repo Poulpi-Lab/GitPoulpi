@@ -878,6 +878,8 @@ push_branch = "{$Push} {name}"
 start_pr = "{name}에서 {$pr} 시작..."
 fetch = "{$Fetch}"
 set_upstream = "{name}의 업스트림 설정..."
+# context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
+remotes_of = "Remotes of {name}..."
 rename = "{name} 이름 변경..."
 delete = "{name} 삭제..."
 delete_both = "{first} 및 {second} 삭제..."

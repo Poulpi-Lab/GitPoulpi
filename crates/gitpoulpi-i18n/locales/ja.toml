@@ -878,6 +878,8 @@ push_branch = { git = "{name} を{$push}", local = "{name} を{$push}" }
 start_pr = { git = "{name} から{$pr}を開始...", local = "{name} から{$pr}を開始..." }
 fetch = "{$Fetch}"
 set_upstream = { git = "{name} のアップストリームを設定...", local = "{name} のアップストリームを設定..." }
+# context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
+remotes_of = "Remotes of {name}..."
 rename = "{name} の名前を変更..."
 delete = "{name} を削除..."
 delete_both = "{first} と {second} を削除..."

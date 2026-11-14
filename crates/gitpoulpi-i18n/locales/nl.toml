@@ -878,6 +878,8 @@ push_branch = "{$Push} {name}"
 start_pr = "{$Pr} starten vanaf {name}..."
 fetch = "{$Fetch}"
 set_upstream = { git = "Upstream van {name} instellen...", local = "Upstream van {name} instellen..." }
+# context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
+remotes_of = "Remotes of {name}..."
 rename = "{name} hernoemen..."
 delete = "{name} verwijderen..."
 delete_both = "{first} en {second} verwijderen..."

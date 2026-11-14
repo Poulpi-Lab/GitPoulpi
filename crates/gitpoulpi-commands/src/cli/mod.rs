@@ -43,9 +43,9 @@ pub use refs_misc::WorktreeAction;
 pub use refs_misc::{
     AliasAction, AutoStashAction, BranchAction, ConfigAction, DaemonAction, DesktopAction,
     FolderMenuAction, OnOff, PatchAction, PathAction, PullModeArg, ReflogModeArg, RefsAction,
-    RemoteAction, RepoAction, RepoConfigAction, ResetModeArg, ReviewFlags, RunInRepoArg,
-    SessionAction, ShortcutAction, SparseAction, SshCommandAction, StashAction, TagAction,
-    ThemeAction,
+    RemoteAction, RemoteGroupAction, RepoAction, RepoConfigAction, ResetModeArg, ReviewFlags,
+    RunInRepoArg, SessionAction, ShortcutAction, SparseAction, SshCommandAction, StashAction,
+    TagAction, ThemeAction, UpstreamAction,
 };
 pub use repo_auth::RepoAuthAction;
 #[cfg(feature = "history-rewrite")]
@@ -946,6 +946,12 @@ pub enum Commands {
     Remote {
         #[command(subcommand)]
         action: RemoteAction,
+    },
+    /// A branch with several remotes (extra push targets, pull sources):
+    /// where it stands against each. See `branch upstream` to change them.
+    RemoteGroup {
+        #[command(subcommand)]
+        action: RemoteGroupAction,
     },
     #[cfg(feature = "lfs")]
     /// Git LFS: large files stored outside the repository's history.

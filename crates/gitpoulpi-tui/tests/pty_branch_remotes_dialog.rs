@@ -251,10 +251,10 @@ fn the_refs_row_menu_opens_it_and_the_mouse_toggles_both_boxes() {
     term.right_click(col + 6, row).unwrap();
     let menu = term
         .wait_for("the Refs row menu", STEP, |s| {
-            s.contains("Set upstream of feature...")
+            s.contains("Remotes of feature...")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = menu.find("Set upstream of feature...").unwrap();
+    let (c, r) = menu.find("Remotes of feature...").unwrap();
     term.click(c + 1, r).unwrap();
     let screen = wait_dialog(&term);
     let marks = marks_of(&screen, "gitlab");
@@ -306,10 +306,10 @@ fn the_pill_menu_opens_it_and_rename_on_remote_sets_the_branch_name() {
     term.right_click(col + 1, row).unwrap();
     let menu = term
         .wait_for("the pill menu", STEP, |s| {
-            s.contains("Set upstream of feature...")
+            s.contains("Remotes of feature...")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = menu.find("Set upstream of feature...").unwrap();
+    let (c, r) = menu.find("Remotes of feature...").unwrap();
     term.click(c + 1, r).unwrap();
     let screen = wait_dialog(&term);
     move_rows(&mut term, 0, index_of(&screen, "backup"));

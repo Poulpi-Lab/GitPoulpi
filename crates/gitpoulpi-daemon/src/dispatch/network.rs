@@ -325,6 +325,9 @@ pub(super) async fn dispatch_network_plain(
         }
         // The workflow actions: git steps, hooks and pushes in one run.
         OperationKind::FlowRun => crate::flow::run(backend, &repo, args).await,
+        OperationKind::RemoteGroupPlan => {
+            crate::remote_group::plan_read(backend, &repo, args).await
+        }
         other => {
             return err(
                 request.id,

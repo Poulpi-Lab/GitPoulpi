@@ -146,7 +146,8 @@ het te gebruiken.
 
 - **Klik** op een rij om haar te selecteren. **Dubbelklik** op een lokale branch of een tag
   om hem uit te checken. **Dubbelklik** op een worktree of een submodule om hem in een
-  tabblad te openen.
+  tabblad te openen. De **+** op de kop WORKTREES maakt een worktree; klik met rechts op een
+  worktree voor Openen in een nieuw tabblad, Openen in, Merge en Verwijderen ([Worktrees](worktrees.md)).
 - **Wijs** een rij **aan** om het pictogram links ervan te tonen. **Klik** erop om de ref in de
   Log te verbergen, of weer te tonen. Staat **Solo** aan, dan soloot dezelfde plek de ref.
   Op een maprij werkt het pictogram op elke ref in de map.

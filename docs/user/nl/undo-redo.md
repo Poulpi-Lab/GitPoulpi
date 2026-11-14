@@ -258,7 +258,10 @@ workflow-afronding die ook de remote branch verwijdert, is als geheel ongedaan t
   rebase verplaatst branches en houdt zijn eigen toestand; het afbreken is zelf
   de weg terug). Een **merge, cherry-pick of revert** afbreken wordt *wel*
   vastgelegd, zie hierboven.
-- **Een worktree maken**, **een patchbestand maken**, clone, init,
+- **Een worktree maken**, **een worktree verwijderen** (wat eerst is bewaard,
+  blijft: de commit, de stash; de branch die ermee is verwijderd, wordt
+  gejournaald, dus Ongedaan maken brengt de branch terug, niet de map),
+  **een patchbestand maken**, clone, init,
   hostingacties (pull requests, issues) en AI-aanroepen: ze maken geen deel uit
   van de geschiedenis van de repository.
 - **Een nieuw leeg bestand maken** vanuit het bestandsmenu, het automatisch

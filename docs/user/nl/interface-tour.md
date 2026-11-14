@@ -183,8 +183,9 @@ secties om ze van grootte te veranderen.
 - **LOKAAL**: je branches, in mappen gesplitst op `/` (`feature/`, `fix/`). Een vinkje toont
   de uitgecheckte branch. Je kunt de mappen in de Instellingen uitzetten.
 - **REMOTE**: elke remote, met zijn branches eronder.
-- **WORKTREES**: gekoppelde worktrees, als die er zijn. Dubbelklik op een om hem in een eigen
-  tabblad te openen.
+- **WORKTREES**: gekoppelde worktrees, als die er zijn (of als je de sectie hebt getoond). De
+  **+** op de kop maakt er een; dubbelklik op een worktree om hem in een eigen tabblad te
+  openen, klik met rechts voor Openen in, Merge en Verwijderen. Zie [Worktrees](worktrees.md).
 - **STASHES**: je stashes. Klik met rechts op een voor **Pop**, **Apply** en **Drop**.
 - **TAGS**: je tags, in mappen gesplitst op `/` zoals branches (`releases/`, `backups/`). Een pijl betekent dat de tag ook op de remote staat.
 - **PULL REQUESTS** en **ISSUES**: nadat je een hostingaccount hebt verbonden en de

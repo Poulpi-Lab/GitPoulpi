@@ -512,8 +512,9 @@ op de pagina **Weergave**.
 Bewerkt de lijst van de knop **Openen in** in de titelbalk. Het tabblad **Algemeen** bevat de
 knoppen **Afsluiten & cd hier**, het **Standaarditem** en **Gedetecteerde standaardwaarden herstellen**.
 Het tabblad **Items** (elk een naam en een opdracht) is een [lijst](#lijsten): **+ Toevoegen ▾** biedt de voorinstellingen en
-**Eigen**, en het standaarditem is gemarkeerd met `★`. De velden van het geselecteerde item bevatten een
-knop **Testen**. Zie [Openen in](open-in.md).
+**Eigen**, en het standaarditem is gemarkeerd met `★`. De velden van het geselecteerde item bevatten **Kan een worktree openen** (standaard
+aangevinkt: het item staat in het menu Openen in van een worktree-rij, zie
+[Worktrees](worktrees.md)) en een knop **Testen**. Zie [Openen in](open-in.md).
 
 De eerste rij, **De map van het actieve tabblad volgen**, heeft twee waarden:
 

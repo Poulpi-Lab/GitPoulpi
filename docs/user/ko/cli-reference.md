@@ -128,6 +128,8 @@
 | `tag fetch <name> [--remote R]` | 리모트(기본값은 그 tag를 가진 리모트)에서 tag 하나를 fetch합니다. 예: `where: remote`인 tag. 다른 commit을 가리키는 로컬 tag는 절대 덮어쓰지 않습니다. |
 | `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | 리모트의 tag(이름이 없으면 어느 리모트에도 없는 모든 tag). 리모트에서의 삭제는 실행 취소할 수 있습니다(`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | 연결된 worktree. |
+| `worktree changes <path>` | 워크트리에서 commit하지 않은 변경 사항(`path`, `untracked`). 깨끗하면 비어 있습니다. |
+| `worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` | 연결된 워크트리를 제거합니다. commit하지 않은 변경 사항이 있으면 `--force`(변경 사항 손실), `--commit-message`(먼저 그 브랜치에 commit) 또는 `--stash-message`(먼저 추적되지 않는 파일까지 stash)가 없으면 거부됩니다. `--delete-branch`는 그 브랜치도 삭제합니다(저널에 기록됨). 제거 자체는 실행 취소할 수 없습니다. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | 서브모듈([서브모듈](submodules.md)). |
 
 `--autostash`는 작업을 막는 로컬 변경 사항을 stash하고, 작업을 실행한 뒤 stash를 pop합니다. `general.auto_stash` 설정과 무관하게 동작합니다([자동 stash](log-and-history.md#자동-stash)).

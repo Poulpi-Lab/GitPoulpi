@@ -642,16 +642,16 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Git: параметри Pull... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push на remote... |  |
-| Git: Push to Selected Remotes... |  |
-| Git: Push to All Targets |  |
-| Git: Pull from All Sources |  |
-| Git: Pull from One Remote... |  |
-| Git: Show Grouped Push |  |
-| Git: Continue Grouped Push |  |
-| Git: Abort Grouped Push |  |
-| Git: Retry Failed Pushes |  |
+| Git: Push на вибрані remote... |  |
+| Git: Push на всі цілі |  |
+| Git: Pull з усіх джерел |  |
+| Git: Pull з одного remote... |  |
+| Git: Показати груповий Push |  |
+| Git: Продовжити груповий Push |  |
+| Git: Скасувати груповий Push |  |
+| Git: Повторити невдалий Push |  |
 | Git: force push (із lease)... |  |
-| Git: Remotes of Branch... |  |
+| Git: Remote гілки... |  |
 | Remote: додати remote... |  |
 | Remote: видалити remote... |  |
 | Remote: змінити remote... |  |

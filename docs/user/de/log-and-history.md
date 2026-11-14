@@ -114,7 +114,7 @@ Einträge:
 | Merge, Rebase auf | Merget diese Ref in den ausgecheckten Branch oder rebased den ausgecheckten Branch auf sie |
 | Fast-Forward `<Branch>` auf `<aktuell>` / `<aktuell>` auf `<Branch>` | Schiebt einen Branch vor, wenn das ein Fast-Forward ist; sonst ausgegraut mit dem Grund (`diverged, not a fast-forward`) |
 | Worktree erstellen aus... | Öffnet einen verknüpften Worktree in einem eigenen Tab |
-| Pull, Push, Fetch, Upstream setzen... | Netzwerkvorgänge auf diesem Branch |
+| Pull, Push, Fetch, Remotes von <Branch>... | Netzwerkvorgänge auf diesem Branch (Remotes von <Branch>... setzt den Upstream, dazu je Remote ein Kontrollkästchen Push und Auch Pull) |
 | Im Graphen ausblenden / zeigen, Solo | Nur Anzeige; blenden eine Ref aus (das Ausblenden nimmt auch die Commits mit, die nur diese Ref erreicht) oder stellen sie solo, ohne das Repository zu berühren |
 | Umbenennen, Löschen | Löschen fragt vorher; ein Remote-Zwilling kann ebenfalls gelöscht werden |
 | Branch-Namen kopieren, Link zum Branch auf dem Remote kopieren | In die Zwischenablage |

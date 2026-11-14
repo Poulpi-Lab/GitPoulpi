@@ -47,6 +47,79 @@ pub enum BranchAction {
         target: Option<String>,
     },
     List,
+    /// A branch's several remotes: the primary upstream plus extra push
+    /// targets and opt-in pull sources, kept in its own config section.
+    Upstream {
+        #[command(subcommand)]
+        action: UpstreamAction,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum UpstreamAction {
+    /// The branch's primary upstream, its extra push targets and pull
+    /// sources, each with where it stands (ahead, behind, relation) from
+    /// the remote-tracking refs as they are. Reads only, no network.
+    List {
+        /// The branch (default: the current one).
+        #[arg(long)]
+        branch: Option<String>,
+    },
+    /// Add `<remote>[:<dst>]` as an extra push target (`<dst>` is the
+    /// branch name on that remote, default the same name). Undoable.
+    Add {
+        /// `<remote>` or `<remote>:<dst>`.
+        target: String,
+        /// The branch (default: the current one).
+        #[arg(long)]
+        branch: Option<String>,
+        /// Also make it a pull source.
+        #[arg(long)]
+        pull: bool,
+    },
+    /// Remove every extra push target and pull source naming `<remote>`.
+    /// The primary upstream is left alone (use `unset-upstream`). Undoable.
+    Remove {
+        remote: String,
+        /// The branch (default: the current one).
+        #[arg(long)]
+        branch: Option<String>,
+    },
+    /// Turn `<remote>[:<dst>]` on or off as a pull source: a plain pull
+    /// then integrates it too.
+    Pull {
+        /// `<remote>` or `<remote>:<branch>`.
+        target: String,
+        /// Make it a pull source.
+        #[arg(long, conflicts_with = "off", required_unless_present = "off")]
+        on: bool,
+        /// Stop pulling from it.
+        #[arg(long)]
+        off: bool,
+        /// The branch (default: the current one).
+        #[arg(long)]
+        branch: Option<String>,
+    },
+    /// Set the primary upstream (`origin/main`): the same request as
+    /// `branch set-upstream`.
+    Primary {
+        upstream: String,
+        /// The branch (default: the current one).
+        #[arg(long)]
+        branch: Option<String>,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum RemoteGroupAction {
+    /// Where the current branch (or `--branch`) stands against each of its
+    /// remotes: primary upstream, extra push targets, pull sources. Reads
+    /// only, no network.
+    Status {
+        /// The branch (default: the current one).
+        #[arg(long)]
+        branch: Option<String>,
+    },
 }
 
 #[cfg(feature = "worktree")]

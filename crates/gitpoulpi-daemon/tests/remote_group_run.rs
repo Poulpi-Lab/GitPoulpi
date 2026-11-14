@@ -1064,6 +1064,9 @@ async fn cancel_between_targets_keeps_what_was_pushed_and_the_rest_not_attempted
         wait_for("origin pushed", || {
             repo.git_in_remote(&["rev-parse", "refs/heads/main"]).trim() == want
         });
+        // The ref moves a moment before the push process ends: let origin's
+        // push finish, then cancel inside gitlab's delay.
+        tokio::time::sleep(Duration::from_millis(250)).await;
         let job = conn.running_job(OperationKind::RemoteGroupRun).await;
         conn.call(OperationKind::JobCancel, json!({ "id": job }))
             .await;

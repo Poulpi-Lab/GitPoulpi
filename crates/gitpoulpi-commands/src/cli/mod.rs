@@ -927,21 +927,64 @@ pub enum Commands {
         /// stash (what `general.auto_stash = "always"` does).
         #[arg(long)]
         autostash: bool,
+        /// Pull the primary upstream and every pull source of the branch
+        /// (see `branch upstream pull`), each with `--mode`. Plans first:
+        /// anything but a fast-forward or the mode's own integration asks
+        /// for `--resolve` (exit 3, nothing changed). A stop on conflicts
+        /// exits 4 with `stopped`; resume with `remote-group continue`.
+        #[arg(long, conflicts_with = "remote")]
+        all_sources: bool,
+        /// With `--all-sources`: the branch (default: the current one).
+        #[arg(long, requires = "all_sources")]
+        branch: Option<String>,
+        /// With `--all-sources`: `REMOTE=ff|merge|rebase|skip` (repeatable),
+        /// the decision for a remote the plan asked about.
+        #[arg(long = "resolve", requires = "all_sources")]
+        resolve: Vec<String>,
+        /// With `--all-sources`: do not ask the remotes first.
+        #[arg(long, requires = "all_sources")]
+        no_preflight: bool,
     },
     Push {
         /// Omitted: the repository's default remote (see `remote default`).
-        #[arg(long)]
+        #[arg(long, conflicts_with_all = ["all_targets", "to"])]
         remote: Option<String>,
         /// The local branch to push; the checked-out one when omitted.
         #[arg(long)]
         branch: Option<String>,
         /// Record `<remote>/<branch>` as the branch's upstream.
-        #[arg(long, short = 'u')]
+        #[arg(long, short = 'u', conflicts_with_all = ["all_targets", "to"])]
         set_upstream: bool,
         /// Overwrite the remote branch, only if it is where our last fetch
         /// saw it. There is no plain `--force`.
-        #[arg(long)]
+        #[arg(long, conflicts_with_all = ["all_targets", "to"])]
         force_with_lease: bool,
+        /// Push to the primary upstream and every extra push target of the
+        /// branch (see `branch upstream add`). Plans first: when every
+        /// remote is a plain push or up to date it runs, otherwise it answers
+        /// `needs_resolution` (exit 3, nothing changed). Exit 4: some remote
+        /// failed or a merge stopped on conflicts (`stopped`).
+        #[arg(long)]
+        all_targets: bool,
+        /// Push to exactly these remotes (`<remote>` or `<remote>:<dst>`,
+        /// repeatable) for this push only; the config is not changed. Same
+        /// plan, `--resolve` and run as `--all-targets`.
+        #[arg(long = "to")]
+        to: Vec<String>,
+        /// `REMOTE=push|ff|merge|rebase|force|skip` (repeatable): the
+        /// decision for a remote the plan asked about.
+        #[arg(long = "resolve")]
+        resolve: Vec<String>,
+        /// Do not ask the remotes first (use the remote-tracking refs).
+        #[arg(long)]
+        no_preflight: bool,
+        /// Also push the unpushed tags to every remote that took the branch.
+        #[arg(long)]
+        tags: bool,
+        /// Confirm a force push chosen with `--resolve REMOTE=force`.
+        /// Without it such a push changes nothing and exits with code 3.
+        #[arg(long)]
+        yes: bool,
     },
     Remote {
         #[command(subcommand)]

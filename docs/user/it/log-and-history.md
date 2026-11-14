@@ -117,7 +117,7 @@ più utili:
 | Merge, Rebase su | Fa il merge di questo ref nel branch attivo, o il rebase del branch attivo su questo ref |
 | Fast-forward di `<branch>` a `<current>` / di `<current>` a `<branch>` | Sposta in avanti un branch quando è un fast-forward; altrimenti è grigia con il motivo (`divergente, non è un fast-forward`) |
 | Crea un worktree da... | Apre un worktree collegato in una scheda propria |
-| Pull, Push, Fetch, Imposta l'upstream... | Operazioni di rete su quel branch |
+| Pull, Push, Fetch, Remoti di <branch>... | Operazioni di rete su quel branch (Remoti di <branch>... imposta l'upstream, più una casella Push e una Pull anche per ogni remoto) |
 | Nascondi / Mostra nel grafo, Solo | Solo visualizzazione; nascondono o mettono in solo un ref (nascondere toglie anche i commit raggiunti solo da quel ref) senza toccare il repository |
 | Rinomina, Elimina | Elimina chiede prima; si può eliminare anche il gemello remoto |
 | Copia il nome del branch, Copia il link del branch sul remoto | Negli appunti |

@@ -492,7 +492,7 @@ stage_file = "z"
 | Левая панель: показать/скрыть локальные ветки |  |
 | Левая панель: показать/скрыть Remote |  |
 | Левая панель: показать/скрыть Worktrees |  |
-| Sidebar: Show Worktrees Section |  |
+| Левая панель: показать раздел Worktrees |  |
 | Левая панель: показать/скрыть Stashes |  |
 | Левая панель: показать/скрыть Tags |  |
 | Левая панель: показать/скрыть Pull requests |  |
@@ -536,12 +536,12 @@ stage_file = "z"
 | Refs: Reflog выбранной ветки... |  |
 | Refs: создать pull request из выбранной ветки... |  |
 | Refs: открыть worktree во вкладке | `Enter / двойной щелчок` |
-| Refs: Open Worktree In... |  |
-| Refs: Merge Worktree Branch Into... |  |
-| Refs: Remove Worktree... |  |
-| Refs: Create Worktree... | `+` |
-| Refs: Create Worktree from Current Branch |  |
-| Refs: Create Worktree Choosing a Branch |  |
+| Refs: открыть worktree в... |  |
+| Refs: merge ветки worktree в... |  |
+| Refs: удалить worktree... |  |
+| Refs: создать worktree... | `+` |
+| Refs: создать worktree из текущей ветки |  |
+| Refs: создать worktree с выбором ветки |  |
 | Refs: обновить подмодуль (выбранный) |  |
 | Refs: инициализировать подмодуль (выбранный) |  |
 | Refs: открыть подмодуль во вкладке | `Enter / двойной щелчок` |

@@ -424,8 +424,8 @@ list_title = "Профили"
 duplicate_name = "{name} (копия)"
 
 [settings_open_in]
-worktree = "Can open a worktree"
-worktree_help = "Offer this entry in the Open in menu of a worktree (right-click a row of the WORKTREES section). It runs with the worktree's folder as ${{cwd}}. Every entry is checked by default: untick the ones that make no sense on a folder."
+worktree = "Можно открыть worktree"
+worktree_help = "Показывать эту запись в меню «Открыть в» для worktree (правый щелчок по строке раздела WORKTREES). Она запускается с папкой worktree в качестве ${{cwd}}. По умолчанию отмечены все записи: снимите отметку с тех, что не подходят для папки."
 list_title = "Записи"
 detecting = "Поиск установленных приложений..."
 section_title = "Открыть в"
@@ -1230,19 +1230,19 @@ bad_branch = "{name} - недопустимое имя ветки"
 
 [worktree]
 # context: field label: the name of the new worktree, the folder name is built from it
-name = "Name"
+name = "Имя"
 # context: placeholder
-name_hint = "the folder is named after it"
-need_name = "give the worktree a name"
-bad_name = "the name cannot contain slashes (the Folder field takes a path)"
+name_hint = "по нему называется папка"
+need_name = "задайте имя для worktree"
+bad_name = "имя не должно содержать косых черт (путь указывается в поле «Папка»)"
 # context: field label: the branch or commit the worktree starts from
-ref_field = "Ref"
+ref_field = "Ссылка"
 # context: placeholder
-ref_hint = "choose a branch"
+ref_hint = "выберите ветку"
 # context: combobox entry: the commit the dialog was opened on; {label} what the user clicked (a tag, a remote branch, a short id), {id} the short id
-commit_choice = { git = "commit {label} ({id})", local = "commit {label} ({id})" }
-branch_exists = "the branch {b} already exists: pick it in Ref or choose another name"
-is_a_file = "{path} is a file, not a folder"
+commit_choice = { git = "{$commit} {label} ({id})", local = "{$commit} {label} ({id})" }
+branch_exists = "ветка {b} уже существует: выберите её в поле «Ссылка» или задайте другое имя"
+is_a_file = "{path} - это файл, а не папка"
 title = { git = "Создать worktree из {label}", local = "Создать worktree из {label}" }
 folder = "Папка"
 folder_hint = "новая или пустая папка"
@@ -2926,14 +2926,14 @@ env_timeout = "Собственный тайм-аут агента на запр
 env_offline = "Без сетевых вызовов при запуске"
 
 [palette]
-sidebar_show_worktrees = "Sidebar: Show Worktrees Section"
-refs_open_worktree_in = "Refs: Open Worktree In..."
-refs_merge_worktree_branch_into = { git = "Refs: Merge Worktree Branch Into...", local = "Refs: Merge Worktree Branch Into..." }
-refs_remove_worktree = { git = "Refs: Remove Worktree...", local = "Refs: Remove Worktree..." }
+sidebar_show_worktrees = "Левая панель: показать раздел Worktrees"
+refs_open_worktree_in = "Refs: открыть worktree в..."
+refs_merge_worktree_branch_into = { git = "Refs: {$merge} ветки worktree в...", local = "Refs: слить ветку worktree в..." }
+refs_remove_worktree = { git = "Refs: удалить worktree...", local = "Refs: удалить worktree..." }
 # context: opens the + menu of the WORKTREES section
-refs_create_worktree = { git = "Refs: Create Worktree...", local = "Refs: Create Worktree..." }
-refs_create_worktree_from_current_branch = { git = "Refs: Create Worktree from Current Branch", local = "Refs: Create Worktree from Current Branch" }
-refs_create_worktree_choosing_a_branch = { git = "Refs: Create Worktree Choosing a Branch", local = "Refs: Create Worktree Choosing a Branch" }
+refs_create_worktree = { git = "Refs: создать worktree...", local = "Refs: создать worktree..." }
+refs_create_worktree_from_current_branch = { git = "Refs: создать worktree из текущей ветки", local = "Refs: создать worktree из текущей ветки" }
+refs_create_worktree_choosing_a_branch = { git = "Refs: создать worktree с выбором ветки", local = "Refs: создать worktree с выбором ветки" }
 # context: palette command; shows or hides the commit list column left of the diff, File View, Blame and Editor
 view_toggle_commit_column = { git = "Вид: показать или скрыть колонку commit'ов", local = "Вид: показать или скрыть колонку коммитов" }
 view_column_off = { git = "Вид: колонка commit'ов: скрыть", local = "Вид: колонка коммитов: скрыть" }
@@ -4992,11 +4992,11 @@ desc_rebasing_step = { git = "rebase {branch} на {onto} · шаг {k}/{n}", lo
 
 [link]
 # context: {path} is the folder of the removed worktree
-worktree_removed = "removed worktree {path}"
-worktree_removed_branch_deleted = "removed worktree {path} and deleted branch {branch} (Undo brings the branch back)"
-worktree_removed_branch_kept = "removed worktree {path}; branch {branch} was kept: {why}"
-worktree_stashed = { git = "changes stashed", local = "changes stashed" }
-worktree_committed = { git = "changes committed as {id}", local = "changes committed as {id}" }
+worktree_removed = "worktree {path} удалён"
+worktree_removed_branch_deleted = "worktree {path} удалён, ветка {branch} удалена (Отменить вернёт ветку)"
+worktree_removed_branch_kept = "worktree {path} удалён; ветка {branch} сохранена: {why}"
+worktree_stashed = { git = "изменения убраны в {$stash}", local = "изменения убраны в {$stash}" }
+worktree_committed = { git = "изменения сохранены в {$commit} {id}", local = "изменения сохранены в {$commit} {id}" }
 amend_done = "{id} изменён, теперь {now} (прежняя вершина {previous}: Отмена вернёт её)"
 act_staging_file = { git = "staging {name}...", local = "добавление {name} в индекс..." }
 act_unstaging_file = { git = "unstaging {name}...", local = "удаление {name} из индекса..." }
@@ -9901,89 +9901,89 @@ tip_open_hint = "Щёлкните, чтобы изменить remote этой �
 
 [worktree_manage]
 # context: hover label of the + on the WORKTREES header
-plus_tip = { git = "Create worktree", local = "Create worktree" }
+plus_tip = { git = "Создать worktree", local = "Создать worktree" }
 # context: title of the menu the + opens
-plus_title = { git = "New worktree", local = "New worktree" }
+plus_title = { git = "Новый worktree", local = "Новый worktree" }
 # context: menu row: create a worktree
-plus_head = "From the current branch"
+plus_head = "Из текущей ветки"
 # context: menu row: create a worktree
-plus_commit = "From the selected commit"
+plus_commit = "Из выбранного {$commit}"
 # context: menu row: create a worktree on a branch picked in the dialog
-plus_choose = "Choose a branch..."
-select_a_commit = { git = "Select a commit in the Log first", local = "Select a commit in the Log first" }
-select_a_worktree = { git = "Select a worktree in the Refs pane first", local = "Select a worktree in the Refs pane first" }
-main_cannot_be_removed = { git = "The main worktree cannot be removed", local = "The main worktree cannot be removed" }
-no_head = "This repository has no commit yet"
+plus_choose = "Выбрать ветку..."
+select_a_commit = { git = "Сначала выберите {$commit} в Log", local = "Сначала выберите {$commit} в Log" }
+select_a_worktree = { git = "Сначала выберите worktree в панели Refs", local = "Сначала выберите worktree в панели Refs" }
+main_cannot_be_removed = { git = "Основной worktree удалить нельзя", local = "Основной worktree удалить нельзя" }
+no_head = "В репозитории пока нет ни одного {$commit}"
 # context: hint line of the empty WORKTREES section
-empty_hint = { git = "No worktree yet: + to create one", local = "No worktree yet: + to create one" }
+empty_hint = { git = "Worktree пока нет: + создаёт новый", local = "Worktree пока нет: + создаёт новый" }
 # context: context menu row of a worktree
-menu_open_tab = "Open in a new tab"
+menu_open_tab = "Открыть в новой вкладке"
 # context: submenu of a worktree row: the Open in entries
-menu_open_in = "Open in"
-menu_open_in_none = "Open in (no entry yet)"
-menu_open_in_none_why = "No Open in entry is marked Can open a worktree: Settings > Open in"
-menu_merge = { git = "Merge {branch} into...", local = "Merge {branch} into..." }
-menu_remove = { git = "Remove worktree...", local = "Remove worktree..." }
-not_listed = { git = "{path} is not a worktree of this repository any more", local = "{path} is not a worktree of this repository any more" }
-removing = { git = "removing worktree {path}...", local = "removing worktree {path}..." }
-merging = { git = "merging {branch}...", local = "merging {branch}..." }
+menu_open_in = "Открыть в"
+menu_open_in_none = "Открыть в (записей пока нет)"
+menu_open_in_none_why = "Ни одна запись «Открыть в» не отмечена как «Можно открыть worktree»: Настройки > Открыть в"
+menu_merge = { git = "{$Merge} {branch} в...", local = "Слить {branch} в..." }
+menu_remove = { git = "Удалить worktree...", local = "Удалить worktree..." }
+not_listed = { git = "{path} больше не worktree этого репозитория", local = "{path} больше не worktree этого репозитория" }
+removing = { git = "удаление worktree {path}...", local = "удаление worktree {path}..." }
+merging = { git = "{$merge} {branch}...", local = "слияние {branch}..." }
 # context: dialog title; {name} is the folder name of the worktree; a worktree is a second checked-out copy of the repository
-remove_title = { git = "Remove worktree {name}", local = "Remove worktree {name}" }
+remove_title = { git = "Удалить worktree {name}", local = "Удалить worktree {name}" }
 # context: dialog title; {branch} is a branch name
-merge_title = { git = "Merge {branch} into another branch", local = "Merge {branch} into another branch" }
-loading = "Checking the worktree..."
-clean_text = "Remove {path}? Its folder is deleted. The branch {branch} stays."
-clean_text_detached = "Remove {path}? Its folder is deleted. It is on a detached HEAD, so no branch is affected."
+merge_title = { git = "{$Merge} {branch} в другую ветку", local = "Слить {branch} в другую ветку" }
+loading = "Проверка worktree..."
+clean_text = "Удалить {path}? Его папка будет удалена. Ветка {branch} останется."
+clean_text_detached = "Удалить {path}? Его папка будет удалена. HEAD отсоединён, поэтому ни одна ветка не затрагивается."
 # context: plural: {n} changes of the worktree at {path}
-dirty_count = { one = "{n} uncommitted change in {path}", other = "{n} uncommitted changes in {path}" }
+dirty_count = { one = "{n} незафиксированное изменение в {path}", few = "{n} незафиксированных изменения в {path}", many = "{n} незафиксированных изменений в {path}", other = "{n} незафиксированных изменений в {path}" }
 # context: plural: {n} changes that would be lost
-force_text = { one = "Remove {path} and discard its {n} uncommitted change? This cannot be undone.", other = "Remove {path} and discard its {n} uncommitted changes? This cannot be undone." }
+force_text = { one = "Удалить {path} и отбросить {n} незафиксированное изменение? Это нельзя отменить.", few = "Удалить {path} и отбросить {n} незафиксированных изменения? Это нельзя отменить.", many = "Удалить {path} и отбросить {n} незафиксированных изменений? Это нельзя отменить.", other = "Удалить {path} и отбросить {n} незафиксированных изменений? Это нельзя отменить." }
 # context: field label
-commit_field = "Commit message"
+commit_field = "{$Commit}: сообщение"
 # context: placeholder
-commit_hint = "describe the changes"
+commit_hint = "опишите изменения"
 # context: field label
-stash_field = "Stash message"
-stash_note = "The stash is shared with the main repository: pop it there later."
+stash_field = "{$Stash}: сообщение"
+stash_note = "{$Stash} общий с основным репозиторием: достаньте его оттуда позже."
 # context: field label: the branch to create for the commit
-branch_field = "Branch"
+branch_field = "Ветка"
 # context: placeholder
-branch_hint = "HEAD is detached: name a branch for the commit"
-need_message = "write a commit message"
-need_branch = "name a branch for the commit (HEAD is detached)"
-delete_branch = "Also delete branch {branch} (merged into {into})"
-branch_not_merged = "Branch {branch} is not merged: it stays."
+branch_hint = "HEAD отсоединён: задайте ветку для {$commit}"
+need_message = "напишите сообщение для {$commit}"
+need_branch = "задайте ветку для {$commit} (HEAD отсоединён)"
+delete_branch = "Также удалить ветку {branch} (её {$merge} в {into} выполнено)"
+branch_not_merged = "Ветка {branch}: {$merge} не выполнено, она останется."
 # context: button
-commit_remove = { git = "Commit and remove", local = "Commit and remove" }
+commit_remove = { git = "{$Commit} и удалить", local = "Коммит и удалить" }
 # context: button
-stash_remove = { git = "Stash and remove", local = "Stash and remove" }
+stash_remove = { git = "{$Stash} и удалить", local = "Стэш и удалить" }
 # context: button: open the worktree in a tab to commit its changes there
-open_to_commit = "Open to commit"
+open_to_commit = "Открыть для {$commit}"
 # context: button: discards the changes
-remove_anyway = "Remove anyway"
+remove_anyway = "Всё равно удалить"
 # context: button
-remove = "Remove"
+remove = "Удалить"
 # context: button
-cancel = "Cancel"
+cancel = "Отмена"
 # context: button
-back = "Back"
+back = "Назад"
 # context: button
-force_yes = "Discard changes and remove"
+force_yes = "Отбросить изменения и удалить"
 # context: button
-merge_then_remove = { git = "Merge into... then remove", local = "Merge into... then remove" }
+merge_then_remove = { git = "{$Merge} в... и удалить", local = "Слить в... и удалить" }
 # context: button
-merge_run = { git = "Merge", local = "Merge" }
+merge_run = { git = "{$Merge}", local = "Слить" }
 # context: button
-merge_remove_run = { git = "Merge and remove", local = "Merge and remove" }
-merge_pick = "Merge {branch} into:"
-merge_checked_out = "{target} is checked out in {path}: the merge runs there."
-merge_not_checked_out = "{target} is not checked out in any worktree: check it out first."
-merge_gone = "the branch {branch} no longer exists"
-merge_none = "There is no other local branch to merge into."
-detached_no_merge = "a detached worktree has no branch to merge"
+merge_remove_run = { git = "{$Merge} и удалить", local = "Слить и удалить" }
+merge_pick = "{$Merge} {branch} в:"
+merge_checked_out = "{target} активна в {path}: {$merge} выполнится там."
+merge_not_checked_out = "{target} не активна ни в одном worktree: сначала сделайте checkout."
+merge_gone = "ветки {branch} больше нет"
+merge_none = "Нет другой локальной ветки для {$merge}."
+detached_no_merge = "у отсоединённого worktree нет ветки для {$merge}"
 # context: default stash message; {name} is the worktree folder
-stash_default = "WIP on {name}"
+stash_default = "WIP на {name}"
 # context: key hint
-hint_next = "next"
+hint_next = "далее"
 # context: key hint
-hint_default = "run"
+hint_default = "выполнить"

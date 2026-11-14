@@ -260,6 +260,9 @@ fn hover_style_for(target: &HitTarget) -> HoverKind {
         HitTarget::AutoStashBanner(_) => Required(
             "autostash_banner::render(hovered) - Pop now/Show stash/Drop light with              plain_button_style(true); autostash_banner's render test",
         ),
+        HitTarget::PushGroupStrip(_) => Required(
+            "push_group_ui::strip::render(hovered) - Continue/Abort group light with plain_button_style(true); the strip's render test",
+        ),
         HitTarget::ConflictBadge => Required(
             "conflict_badge::render(hovered) - the button lights with plain_button_style(true); conflict_badge's render test",
         ),
@@ -495,6 +498,7 @@ fn sample_hit_targets() -> Vec<HitTarget> {
         HitTarget::Rewrite(crate::rewrite_view::RewriteHit::Apply),
         HitTarget::RebaseBanner(crate::rebase_banner::RebaseBannerButton::Abort),
         HitTarget::AutoStashBanner(crate::autostash_banner::AutoStashBannerButton::Drop),
+        HitTarget::PushGroupStrip(crate::push_group_ui::StripButton::Abort),
         HitTarget::ConflictBadge,
         HitTarget::OperationBanner(crate::operation_banner::OperationBannerButton::Abort),
         HitTarget::StuckBanner(crate::stuck_banner::StuckBannerButton::AmAbort),

@@ -406,6 +406,9 @@ pub(crate) enum HitTarget {
     /// Pop now / Show stash / Drop on the pending auto-stash strip
     /// (`autostash_banner.rs`).
     AutoStashBanner(crate::autostash_banner::AutoStashBannerButton),
+    /// Continue / Abort group on the paused grouped-push strip
+    /// (`push_group_ui/strip.rs`).
+    PushGroupStrip(crate::push_group_ui::StripButton),
     /// The proactive conflict badge's button (`conflict_badge.rs`): opens the
     /// predicted conflicts, like the palette's Conflicts: Show predicted
     /// conflicts.
@@ -623,6 +626,7 @@ pub(crate) fn desired_cursor_shape(
             | HitTarget::StuckBanner(_)
             | HitTarget::MergeEditorButton
             | HitTarget::AutoStashBanner(_)
+            | HitTarget::PushGroupStrip(_)
             | HitTarget::ConflictBadge
             | HitTarget::RepoTab(_)
             | HitTarget::VirtualHand,

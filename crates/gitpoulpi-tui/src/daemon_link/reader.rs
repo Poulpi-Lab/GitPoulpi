@@ -91,6 +91,16 @@ pub(super) async fn read_loop(
             })) if changed == repo_id => {
                 lfs_gate.set_progress(operation, progress);
             }
+            // A grouped push moved one of its targets: the push-group dialog's
+            // rows (also while it is closed, so reopening shows the truth).
+            Some(ServerMessage::Event(Event::RemoteGroupProgress {
+                repo: changed,
+                run_id,
+                remote,
+                status,
+            })) if changed == repo_id => {
+                crate::push_group_ui::on_progress(&run_id, &remote, status);
+            }
             // A history rewrite preview's progress: kept for the workbench
             // to read each frame (latest value wins).
             Some(ServerMessage::Event(Event::RewriteProgress {

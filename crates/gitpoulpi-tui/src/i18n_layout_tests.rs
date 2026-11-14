@@ -1091,3 +1091,34 @@ fn the_remotes_dialog_holds_its_layout() {
         }
     });
 }
+
+// ------------------------------------------------------ grouped push dialog
+
+/// The grouped push dialog's steps (selection, plan with every kind of row,
+/// loading, progress) in every language, both vocabularies and both widths.
+#[test]
+fn the_push_group_dialog_holds_its_layout_in_every_language() {
+    let _serial = crate::push_group_ui::TEST_SERIAL
+        .lock()
+        .unwrap_or_else(|e| e.into_inner());
+    each_setting(|lang, terms, width| {
+        for which in 0..4 {
+            let what = label(
+                &format!("push group dialog step {which}"),
+                lang,
+                terms,
+                width,
+            );
+            crate::push_group_ui::tests::open_for_layout(which);
+            let buf = draw(width, HEIGHT, crate::push_group_ui::render);
+            check_buffer(&what, &buf);
+            let text = screen_text(&buf);
+            assert!(
+                !text.contains("{$") && !text.contains("{branch}") && !text.contains("{n}"),
+                "{what}\n{text}"
+            );
+            assert!(text.contains('\u{256D}'), "{what}: the dialog drew\n{text}");
+        }
+    });
+    crate::push_group_ui::reset_for_tests();
+}

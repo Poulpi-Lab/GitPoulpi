@@ -654,6 +654,7 @@ stage_file = "z"
 | Git: параметры pull... |  |
 | Git: push | `Ctrl+G P` |
 | Git: push на remote... |  |
+| Git: Push to Selected Remotes... |  |
 | Git: force push (с lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remote: добавить remote... |  |

@@ -160,6 +160,23 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
             *cx.log_follow = true;
             *cx.composer_focus = Some(ComposerField::WipSummary);
         }
+        // The one-off grouped push: the selection step of the push-group
+        // dialog for the checked-out branch.
+        PaletteCommand::PushToSelectedRemotes => {
+            match cx
+                .refs_result
+                .as_ref()
+                .ok()
+                .and_then(|refs| crate::remotes_ui::head_branch(refs))
+            {
+                Some(head) => {
+                    crate::push_group_ui::PushGroupUi::open_selection(cx.repo_root, &head.name)
+                }
+                None => {
+                    *cx.last_message = Some(msg::remotes::DETACHED_PUSH.get().into());
+                }
+            }
+        }
         // Every sync and remote command, in
         // one place (`remotes_ui.rs`), so the
         // palette cannot drift from the

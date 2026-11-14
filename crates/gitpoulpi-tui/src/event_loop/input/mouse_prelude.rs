@@ -473,6 +473,16 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
         }
         return Ok(None);
     }
+    // The grouped push dialog is modal the same way.
+    if crate::push_group_ui::is_open() && matches!(*cx.input_mode, InputMode::Normal) {
+        *cx.hovered_target = None;
+        *cx.hovered_tab_index = None;
+        *cx.hovered_close_tab = None;
+        *cx.hovered_status_row = None;
+        let effect = crate::push_group_ui::on_mouse(mouse);
+        crate::push_group_ui::apply(effect, cx.link, &mut *cx.input_mode);
+        return Ok(None);
+    }
     // An editor status menu (encoding, line breaks, indentation) is modal
     // the same way: it owns the mouse, a click away closes it and is
     // consumed, and nothing behind it hovers.

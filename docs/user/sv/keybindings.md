@@ -650,6 +650,7 @@ Tangenterna är standardvärdena.
 | Git: Pull-alternativ... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push till remote... |  |
+| Git: Push to Selected Remotes... |  |
 | Git: Force push (med lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remote: Lägg till remote... |  |

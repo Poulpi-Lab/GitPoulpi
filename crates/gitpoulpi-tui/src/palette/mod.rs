@@ -314,6 +314,9 @@ pub(crate) enum PaletteCommand {
     PushToRemote,
     /// Force push the checked-out branch, `--force-with-lease`, confirmed.
     ForcePushWithLease,
+    /// The one-off grouped push: pick the remotes, see the plan, run
+    /// (`push_group_ui`).
+    PushToSelectedRemotes,
     /// Choose, type or unset the upstream of the selected local branch,
     /// else of the checked-out one.
     SetUpstream,

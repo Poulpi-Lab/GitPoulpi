@@ -42,6 +42,7 @@ pub(in crate::event_loop) struct OverlaysDrawCtx<'a> {
     pub(in crate::event_loop) conflict_count: usize,
     pub(in crate::event_loop) index_lock: &'a Option<gitpoulpi_core::domain::IndexLock>,
     pub(in crate::event_loop) pending_auto_stash: &'a Option<gitpoulpi_session::PendingAutoStash>,
+    pub(in crate::event_loop) repo_root: &'a std::path::Path,
     /// The predicted conflicts to badge (`conflict_badge`), already checked
     /// against the HEAD that is checked out.
     pub(in crate::event_loop) conflict_prediction:
@@ -99,6 +100,7 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
     let conflict_count = ctx.conflict_count;
     let index_lock = ctx.index_lock;
     let pending_auto_stash = ctx.pending_auto_stash;
+    let repo_root = ctx.repo_root;
     let conflict_prediction = ctx.conflict_prediction;
     let refs_filter_area = ctx.refs_filter_area;
     let repo_tabs = ctx.repo_tabs;
@@ -917,10 +919,30 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
             frame_hits.splice(0..0, front);
         }
     }
+    // A grouped push paused on conflicts: the same kind of strip, on the next
+    // free border row.
+    let group_paused = crate::push_group_ui::strip_visible(repo_root);
+    if central_view == CentralView::Log && group_paused {
+        let slot = usize::from(top_taken) + usize::from(pending_auto_stash.is_some());
+        if let Some(strip) = crate::operation_banner::strip_rect(log_area, slot) {
+            let hovered_button = match &hovered_target {
+                Some(HitTarget::PushGroupStrip(button)) => Some(*button),
+                _ => None,
+            };
+            let front: Vec<(Rect, HitTarget)> =
+                crate::push_group_ui::render_strip(frame, strip, repo_root, hovered_button)
+                    .into_iter()
+                    .map(|(rect, button)| (rect, HitTarget::PushGroupStrip(button)))
+                    .collect();
+            frame_hits.splice(0..0, front);
+        }
+    }
     // The stale `index.lock` strip takes the next free row (a second banner
     // is the last one the Log's borders have room for).
     if central_view == CentralView::Log {
-        let slot = usize::from(top_taken) + usize::from(pending_auto_stash.is_some());
+        let slot = usize::from(top_taken)
+            + usize::from(pending_auto_stash.is_some())
+            + usize::from(group_paused);
         if let (Some(lock), Some(strip)) = (
             index_lock.as_ref().filter(|l| l.stale),
             crate::operation_banner::strip_rect(log_area, slot),
@@ -942,6 +964,7 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
     if central_view == CentralView::Log {
         let slot = usize::from(top_taken)
             + usize::from(pending_auto_stash.is_some())
+            + usize::from(group_paused)
             + usize::from(index_lock.as_ref().is_some_and(|l| l.stale));
         if let (Some(prediction), Some(strip)) = (
             conflict_prediction,

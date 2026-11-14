@@ -353,6 +353,16 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         return Ok(Flow::Handled);
     }
 
+    // The grouped push dialog owns the keyboard.
+    if key.kind == KeyEventKind::Press
+        && matches!(*cx.input_mode, InputMode::Normal)
+        && crate::push_group_ui::is_open()
+    {
+        let effect = crate::push_group_ui::on_key(key);
+        crate::push_group_ui::apply(effect, cx.link, &mut *cx.input_mode);
+        return Ok(Flow::Handled);
+    }
+
     // The repository menu (tab menu, management row menu)
     // owns the keyboard while open, swallowing what it does
     // not use -- the rule every context menu here follows.

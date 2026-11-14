@@ -453,6 +453,28 @@ pub enum Action {
         push_to: Vec<String>,
         pull_from: Vec<String>,
     },
+    /// A grouped push or pull over several remotes (`OperationKind::
+    /// RemoteGroupRun`): the decisions the push-group dialog collected.
+    /// The outcome goes to `push_group_ui::on_outcome`, never to a status
+    /// line only.
+    RemoteGroupRun(Box<gitpoulpi_core::domain::RemoteGroupRunRequest>),
+    /// Go on with the saved grouped run once the conflicts it stopped on
+    /// are resolved and concluded. `targets` are fresh decisions (a
+    /// `needs_resolution` answer); never sent automatically.
+    RemoteGroupContinue {
+        expect_run_id: Option<String>,
+        targets: Vec<gitpoulpi_core::domain::RunTarget>,
+        prefer_rebase: bool,
+    },
+    /// Abort the merge or rebase the saved grouped run started and drop it.
+    RemoteGroupAbort {
+        expect_run_id: Option<String>,
+    },
+    /// Run the saved grouped run's failed targets again.
+    RemoteGroupRetry {
+        expect_run_id: Option<String>,
+        prefer_rebase: bool,
+    },
     /// Move the local branch `branch` forward to `target`, only if that
     /// is a fast-forward (`GitBackend::fast_forward`). `target_label` is
     /// what the status line calls the target (`main`, `origin/main`).
@@ -718,6 +740,41 @@ impl Action {
         })
     }
 
+    /// The `RemoteGroupRun` request of a grouped-run action.
+    pub(super) fn group_request(&self) -> Option<gitpoulpi_core::domain::RemoteGroupRunRequest> {
+        use gitpoulpi_core::domain::{GroupResume, RemoteGroupRunRequest};
+        Some(match self {
+            Action::RemoteGroupRun(req) => (**req).clone(),
+            Action::RemoteGroupContinue {
+                expect_run_id,
+                targets,
+                prefer_rebase,
+            } => RemoteGroupRunRequest {
+                targets: targets.clone(),
+                resume: Some(GroupResume::Continue),
+                expect_run_id: expect_run_id.clone(),
+                prefer_rebase: *prefer_rebase,
+                ..Default::default()
+            },
+            Action::RemoteGroupAbort { expect_run_id } => RemoteGroupRunRequest {
+                resume: Some(GroupResume::Abort),
+                expect_run_id: expect_run_id.clone(),
+                ..Default::default()
+            },
+            Action::RemoteGroupRetry {
+                expect_run_id,
+                prefer_rebase,
+            } => RemoteGroupRunRequest {
+                retry: true,
+                resume: Some(GroupResume::Continue),
+                expect_run_id: expect_run_id.clone(),
+                prefer_rebase: *prefer_rebase,
+                ..Default::default()
+            },
+            _ => return None,
+        })
+    }
+
     /// What this action is, for an error that reached the window without the
     /// daemon's own account of the operation (the link was lost, an older
     /// daemon): the operation it sends, or the action's own name.
@@ -809,6 +866,10 @@ impl Action {
             | Action::PushForReview { .. }
             | Action::FetchThenForcePush { .. } => plain(l::ACT_PUSHING),
             Action::PullThenPush { .. } => plain(l::ACT_PULLING_PUSHING),
+            Action::RemoteGroupRun(_)
+            | Action::RemoteGroupContinue { .. }
+            | Action::RemoteGroupAbort { .. }
+            | Action::RemoteGroupRetry { .. } => plain(gitpoulpi_i18n::msg::push_group::RUNNING),
             Action::CheckoutBranch(_) | Action::CheckoutCommit(_) | Action::CheckoutThen { .. } => {
                 plain(l::ACT_CHECKING_OUT)
             }
@@ -891,6 +952,10 @@ impl Action {
                 | Action::PushForReview { .. }
                 | Action::PullThenPush { .. }
                 | Action::FetchThenForcePush { .. }
+                | Action::RemoteGroupRun(_)
+                | Action::RemoteGroupContinue { .. }
+                | Action::RemoteGroupAbort { .. }
+                | Action::RemoteGroupRetry { .. }
                 | Action::TagPush { .. }
                 | Action::TagDeleteRemote { .. }
                 | Action::TagDeleteBoth { .. }

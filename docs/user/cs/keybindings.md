@@ -648,6 +648,7 @@ Klávesy jsou výchozí.
 | Git: Možnosti pullu... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push do remote... |  |
+| Git: Push to Selected Remotes... |  |
 | Git: Force push (s lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remote: Přidat remote... |  |

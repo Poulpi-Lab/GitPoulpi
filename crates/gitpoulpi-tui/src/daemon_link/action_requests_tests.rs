@@ -330,6 +330,32 @@ fn every_action() -> Vec<Action> {
             push_to: vec![s("gitlab"), s("backup:x")],
             pull_from: vec![s("gitlab")],
         },
+        Action::RemoteGroupRun(Box::new(gitpoulpi_core::domain::RemoteGroupRunRequest {
+            branch: s("topic"),
+            mode: gitpoulpi_core::domain::GroupMode::Push,
+            targets: vec![gitpoulpi_core::domain::RunTarget {
+                remote: s("origin"),
+                branch: s("topic"),
+                action: gitpoulpi_core::domain::GroupAction::ForceWithLease,
+                lease: Some(oid(2)),
+                absent: false,
+            }],
+            tags: true,
+            prefer_rebase: true,
+            ..Default::default()
+        })),
+        Action::RemoteGroupContinue {
+            expect_run_id: Some(s("run-1")),
+            targets: Vec::new(),
+            prefer_rebase: false,
+        },
+        Action::RemoteGroupAbort {
+            expect_run_id: Some(s("run-1")),
+        },
+        Action::RemoteGroupRetry {
+            expect_run_id: None,
+            prefer_rebase: true,
+        },
         Action::FastForward {
             branch: s("topic"),
             target: oid(9),
@@ -399,6 +425,14 @@ fn answer(command: OperationKind) -> serde_json::Value {
         OperationKind::CherryPick => json!({ "Completed": [Oid([7; 20])] }),
         OperationKind::Revert => json!("Conflicted"),
         OperationKind::Commit => json!(Oid([1; 20])),
+        OperationKind::RemoteGroupRun => json!({
+            "run_id": "run-1",
+            "branch": "topic",
+            "mode": "push",
+            "status": "done",
+            "targets": [],
+            "message": "pushed to 1 remote",
+        }),
         OperationKind::AddToGitignore => json!(true),
         OperationKind::ComposeCommits | OperationKind::LfsTrack | OperationKind::LfsUntrack => {
             json!([])

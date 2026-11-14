@@ -641,6 +641,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Git: Pull 옵션... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: 리모트로 Push... |  |
+| Git: Push to Selected Remotes... |  |
 | Git: 강제 Push (lease 사용)... |  |
 | Git: Remotes of Branch... |  |
 | 리모트: 리모트 추가... |  |

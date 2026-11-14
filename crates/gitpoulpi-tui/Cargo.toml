@@ -123,6 +123,8 @@ ratatui.workspace = true
 tokio.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+# `worktree_dialog`: the random id of a generated worktree name.
+getrandom = "0.4"
 png.workspace = true
 arboard.workspace = true
 # Author-avatar decoding (`avatar::decode`) and fetching (`avatar::fetch`).

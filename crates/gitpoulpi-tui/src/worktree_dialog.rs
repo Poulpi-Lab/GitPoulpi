@@ -1,36 +1,46 @@
 //! The Create worktree dialog: a linked worktree
-//! (`git worktree add`) from a branch or a commit, optionally on a new
-//! branch, optionally opened as a tab.
+//! (`git worktree add`) from a branch or a commit, on a new branch or on an
+//! existing one, optionally opened as a tab.
 //!
 //! ```text
-//! ╭ Create worktree from feature ────────────────────────────────╮
-//! │  Name          feature█                                      │
-//! │  Folder        C:\Projets\GitPoulpi-feature     [ Browse… ]  │
-//! │  Ref           feature                                  ▾    │
-//! │  New branch    (empty = check feature out there)             │
-//! │                [x] Open the new worktree as a tab            │
+//! ╭ Create worktree from main ───────────────────────────────────╮
+//! │  Name            worktree-1a2b3c4d    [ Name after branch ]  │
+//! │  Folder          C:\Projets\GitPoulpi-worktree-1a2b3c4d      │
+//! │  Ref             main                                 ▾      │
+//! │  Worktree branch worktree-1a2b3c4d      ▾     [ Regenerate ] │
+//! │                  new branch from main     [ ✦ Name with AI ] │
 //! │                                                              │
-//! │  Will create C:\Projets\GitPoulpi-feature on feature         │
+//! │  [x] Open the new worktree as a tab                          │
+//! │  Will create C:\Projets\GitPoulpi-worktree-1a2b3c4d on ...   │
 //! │  Tab next · Enter create               [ Cancel ] [ Create ] │
 //! ╰──────────────────────────────────────────────────────────────╯
 //! ```
 //!
-//! The Name proposes the Folder (a sibling of the repository named
-//! `<repo>-<name>`) until the Folder is edited by hand; the Ref is a
-//! combobox of the local branches plus the commit the dialog was opened
-//! on, and changing it re-proposes the Name (until that was typed over
-//! too).
+//! **Names.** The Name and the new branch both start as `worktree-<id>`
+//! (8 random hex digits, the same for both). The Folder follows the Name
+//! until it is edited by hand. The *Worktree branch* is one field with two
+//! meanings: a name that is not a local branch creates a new branch from the
+//! Ref; the name of a local branch that is not checked out elsewhere checks
+//! that branch out as it is (the Ref is then unused, and says so).
+//! "Name after branch" sets the Name to `worktree-<branch>` (no doubled
+//! word), "Regenerate" draws a new id (see [`WorktreeDialog::regenerate`]
+//! for what it replaces) and the ✦ button opens a box in the dialog where
+//! the work is described, so the AI names both (never the status line).
 //!
 //! Pure, like `init_dialog`: validation, keys, clicks and drawing. The
-//! owner (`repo_dialogs`) opens the shared folder picker for Browse and
-//! turns [`WorktreeOutcome::Submit`] into a daemon action.
+//! owner (`repo_dialogs`) opens the shared folder picker for Browse, hands
+//! [`WorktreeOutcome::NameWithAi`] to the AI worker and turns
+//! [`WorktreeOutcome::Submit`] into a daemon action.
 
 use crate::th;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
-use gitpoulpi_core::domain::{short, WorktreeAddOptions, WorktreeStart};
+use gitpoulpi_core::domain::{
+    short, worktree_generated_name, worktree_id, worktree_name_after_branch, WorktreeAddOptions,
+    WorktreeStart,
+};
 use gitpoulpi_i18n::msg;
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
@@ -49,7 +59,8 @@ pub(crate) struct WorktreeSeed {
     /// What the dialog calls the start: `feature`, `origin/feature`,
     /// `v1.0`, `a1b2c3d`.
     pub(crate) label: String,
-    /// The New branch field's first value (`""` = no new branch).
+    /// A branch name the caller wants for the worktree (a remote branch's
+    /// local name); empty = the dialog proposes `worktree-<id>`.
     pub(crate) new_branch: String,
     /// The start branch is already checked out in a worktree, so git
     /// would refuse to check it out again: a new branch is required.
@@ -64,38 +75,34 @@ pub(crate) struct BranchChoice {
     pub(crate) busy: bool,
 }
 
-/// The next dialog opens with the Ref combobox open ("Choose a branch...").
+/// The next dialog opens with the branch combobox open ("Choose a branch...").
 static PICK_REF: AtomicBool = AtomicBool::new(false);
 
 /// "Choose a branch...": the dialog the next `worktree_seed` opens starts
-/// on its Ref combobox.
+/// on its Worktree branch list.
 pub(crate) fn ask_to_pick_ref() {
     PICK_REF.store(true, Ordering::Relaxed);
 }
 
-/// The dialog's focusable parts, in `Tab` order.
+/// The dialog's focusable parts.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum WtFocus {
     Name,
+    NameAfter,
     Path,
     Browse,
     Ref,
-    NewBranch,
+    Branch,
+    Regenerate,
+    /// The ✦ button that opens or closes the description box.
+    AiToggle,
+    Describe,
+    AiRun,
+    AiHide,
     OpenTab,
     Create,
     Cancel,
 }
-
-const ORDER: [WtFocus; 8] = [
-    WtFocus::Name,
-    WtFocus::Path,
-    WtFocus::Browse,
-    WtFocus::Ref,
-    WtFocus::NewBranch,
-    WtFocus::OpenTab,
-    WtFocus::Create,
-    WtFocus::Cancel,
-];
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum WorktreeOutcome {
@@ -109,6 +116,15 @@ pub(crate) enum WorktreeOutcome {
         opts: WorktreeAddOptions,
         open_tab: bool,
     },
+    /// Ask the AI to name the worktree and its branch for `description`;
+    /// `branches` are the repository's local branch names (the prompt shows
+    /// them so the answer follows their style).
+    NameWithAi {
+        description: String,
+        branches: Vec<String>,
+    },
+    /// Stop the AI request that is running.
+    StopAi,
 }
 
 #[derive(Debug, Clone)]
@@ -118,21 +134,34 @@ pub(crate) struct WorktreeDialog {
     pub(crate) name: String,
     /// The new worktree's folder.
     pub(crate) path: String,
-    pub(crate) new_branch: String,
+    /// The Worktree branch field: a new branch's name, an existing local
+    /// branch to check out, or empty (check the Ref out as it is).
+    pub(crate) branch: String,
     pub(crate) open_tab: bool,
     pub(crate) focus: WtFocus,
     pub(crate) message: Option<String>,
     pub(crate) hover: Option<WtFocus>,
-    /// Name still follows the Ref, Folder still follows the Name.
-    name_auto: bool,
+    /// The Name was typed by hand: Regenerate leaves it alone.
+    name_typed: bool,
+    /// The branch name was typed by hand (or came from the caller): Regenerate
+    /// leaves it alone. An existing branch is never replaced either.
+    branch_typed: bool,
+    /// The Folder still follows the Name.
     path_auto: bool,
     repo_root: PathBuf,
-    /// Where the worktree starts now (the Ref combobox's choice).
+    /// Where a new branch starts (the Ref combobox's choice).
     start: WorktreeStart,
     /// Whether the start branch is checked out elsewhere already.
     branch_busy: bool,
     branches: Vec<BranchChoice>,
     combo: Combo,
+    branch_combo: Combo,
+    /// AI is on (the host tells it every tick): the ✦ button exists.
+    ai: bool,
+    ai_open: bool,
+    ai_text: String,
+    ai_running: bool,
+    ai_error: Option<String>,
     hits: Vec<(Rect, WtFocus)>,
     close: dialog_kit::CloseHit,
     /// What the fields held when the dialog opened (dirty = different).
@@ -166,30 +195,44 @@ pub(crate) fn default_worktree_path(repo_root: &Path, label: &str) -> PathBuf {
     parent.join(format!("{name}-{safe}"))
 }
 
+#[cfg(test)]
+thread_local! {
+    /// Ids the next dialogs draw instead of random ones (newest last).
+    static TEST_IDS: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
+}
+
+/// A fresh 8-hex-digit id for a generated name.
+fn next_id() -> String {
+    #[cfg(test)]
+    if let Some(id) = TEST_IDS.with(|ids| ids.borrow_mut().pop()) {
+        return id;
+    }
+    let mut bytes = [0u8; 4];
+    if getrandom::fill(&mut bytes).is_err() {
+        // No OS randomness: the clock still differs between two draws.
+        let nanos = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_or(0, |d| d.subsec_nanos());
+        bytes = nanos.to_le_bytes();
+    }
+    worktree_id(bytes)
+}
+
 /// The seed of "From the current branch": the checked-out branch cannot be
-/// checked out twice, so the dialog proposes a new branch on it (`<b>-wt`,
-/// numbered when taken); a detached HEAD starts a detached worktree there.
+/// checked out twice, so the dialog proposes a new branch on it (the
+/// dialog names it `worktree-<id>`); a detached HEAD starts a detached
+/// worktree there.
 pub(crate) fn seed_from_head(
     refs: &[gitpoulpi_core::domain::Ref],
     worktrees: &[gitpoulpi_core::domain::Worktree],
 ) -> Option<WorktreeSeed> {
     use gitpoulpi_core::domain::RefKind;
-    let taken = |name: &str| {
-        refs.iter()
-            .any(|r| matches!(&r.kind, RefKind::LocalBranch { name: n } if n == name))
-    };
     if let Some(head) = refs.iter().find(|r| r.is_head) {
         if let RefKind::LocalBranch { name } = &head.kind {
-            let mut proposal = format!("{name}-wt");
-            let mut n = 2;
-            while taken(&proposal) {
-                proposal = format!("{name}-wt{n}");
-                n += 1;
-            }
             return Some(WorktreeSeed {
                 start: WorktreeStart::Branch(name.clone()),
                 label: name.clone(),
-                new_branch: proposal,
+                new_branch: String::new(),
                 branch_busy: true,
             });
         }
@@ -205,14 +248,12 @@ pub(crate) fn seed_from_head(
     })
 }
 
-/// The seed of "Choose a branch...": the dialog opens on its Ref list.
+/// The seed of "Choose a branch...": the dialog opens on its branch list.
 pub(crate) fn seed_to_choose(
     refs: &[gitpoulpi_core::domain::Ref],
     worktrees: &[gitpoulpi_core::domain::Worktree],
 ) -> Option<WorktreeSeed> {
-    let mut seed = seed_from_head(refs, worktrees)?;
-    seed.new_branch.clear();
-    Some(seed)
+    seed_from_head(refs, worktrees)
 }
 
 /// The Ref combobox's value for a start.
@@ -222,6 +263,10 @@ fn choice_value(start: &WorktreeStart) -> String {
         WorktreeStart::Commit(oid) => format!("c:{}", oid.to_hex()),
     }
 }
+
+/// Dialog heights: the default, and with the description box open.
+const HEIGHT: u16 = 16;
+const HEIGHT_AI: u16 = 22;
 
 impl WorktreeDialog {
     /// What `Ctrl+N` badges: every field and button.
@@ -237,24 +282,33 @@ impl WorktreeDialog {
     }
 
     /// The dialog for `seed`, whose Ref combobox lists `branches` and, when
-    /// the seed starts on a commit, that commit. `pick_ref` opens it
-    /// focused on the Ref, its list open.
+    /// the seed starts on a commit, that commit. `pick_ref` opens the
+    /// Worktree branch list ("Choose a branch...").
     pub(crate) fn with_choices(
         seed: WorktreeSeed,
         repo_root: &Path,
         branches: Vec<BranchChoice>,
         pick_ref: bool,
     ) -> Self {
+        let generated = worktree_generated_name(&next_id());
+        // What the branch field starts with: a branch the caller chose to
+        // open (not checked out elsewhere) is checked out as it is, a name
+        // the caller proposed stays, anything else gets the generated name.
+        let (branch, branch_typed) = match &seed.start {
+            WorktreeStart::Branch(b) if !seed.branch_busy => (b.clone(), true),
+            WorktreeStart::Commit(_) if !seed.new_branch.is_empty() => {
+                (seed.new_branch.clone(), true)
+            }
+            _ => (generated.clone(), false),
+        };
         let mut dialog = Self {
-            name: String::new(),
+            name: generated,
             path: String::new(),
-            new_branch: seed.new_branch.clone(),
+            branch,
             focus: if pick_ref {
-                WtFocus::Ref
-            } else if seed.branch_busy {
-                WtFocus::NewBranch
+                WtFocus::Branch
             } else {
-                WtFocus::Path
+                WtFocus::Name
             },
             start: seed.start.clone(),
             branch_busy: seed.branch_busy,
@@ -262,21 +316,29 @@ impl WorktreeDialog {
             open_tab: true,
             message: None,
             hover: None,
-            name_auto: true,
+            name_typed: false,
+            branch_typed,
             path_auto: true,
             repo_root: repo_root.to_path_buf(),
             branches,
             combo: Combo::new(msg::worktree::REF_HINT.get()),
+            branch_combo: Combo::new(msg::worktree::BRANCH_FIELD.get()),
+            ai: false,
+            ai_open: false,
+            ai_text: String::new(),
+            ai_running: false,
+            ai_error: None,
             hits: Vec::new(),
             close: Default::default(),
             pristine: String::new(),
             edit: Default::default(),
         };
         dialog.build_combo();
-        dialog.derive_name();
+        dialog.build_branch_combo();
+        dialog.derive_path();
         dialog.pristine = dialog.signature();
         if pick_ref {
-            dialog.combo.open();
+            dialog.branch_combo.open();
         }
         dialog
     }
@@ -313,32 +375,73 @@ impl WorktreeDialog {
         self.combo.select(Some(choice_value(&self.start)));
     }
 
-    /// The proposed name for the current start (and new branch).
-    fn proposed_name(&self) -> String {
-        if !self.new_branch.trim().is_empty() {
-            return folder_safe(self.new_branch.trim());
+    /// The Worktree branch list: "no branch" (the Ref as it is), then the
+    /// local branches not checked out elsewhere; a typed name that is not
+    /// listed is a new branch (`with_custom`).
+    fn build_branch_combo(&mut self) {
+        let mut options = vec![ComboOption::new(self.no_branch_label(), String::new())];
+        let mut seen = std::collections::HashSet::new();
+        for b in self.branches.iter().filter(|b| !b.busy) {
+            if seen.insert(b.name.clone()) {
+                options.push(ComboOption::new(b.name.clone(), b.name.clone()));
+            }
         }
+        if let WorktreeStart::Branch(b) = &self.seed.start {
+            if !self.seed.branch_busy && seen.insert(b.clone()) {
+                options.push(ComboOption::new(b.clone(), b.clone()));
+            }
+        }
+        self.branch_combo = Combo::new(msg::worktree::BRANCH_FIELD.get())
+            .with_search()
+            .with_custom();
+        self.branch_combo.set_options(options);
+        self.branch_combo.select(Some(self.branch.clone()));
+    }
+
+    /// What an empty branch field means, as the list's first row.
+    fn no_branch_label(&self) -> String {
         match &self.start {
-            WorktreeStart::Branch(b) => folder_safe(b),
+            WorktreeStart::Branch(b) if !self.branch_busy => {
+                msg::worktree::branch_hint_checkout(b)
+            }
+            WorktreeStart::Branch(_) => msg::worktree::BRANCH_HINT_REQUIRED.get().into(),
+            WorktreeStart::Commit(_) => msg::worktree::BRANCH_HINT_DETACHED.get().into(),
+        }
+    }
+
+    /// Whether `name` is a local branch: `Some(busy)` (checked out in
+    /// another worktree) or `None` (not a branch here: a new one).
+    fn branch_status(&self, name: &str) -> Option<bool> {
+        if let Some(b) = self.branches.iter().find(|b| b.name == name) {
+            return Some(b.busy);
+        }
+        match &self.seed.start {
+            WorktreeStart::Branch(b) if b == name => Some(self.seed.branch_busy),
+            _ => None,
+        }
+    }
+
+    /// The branch field names an existing local branch that can be checked
+    /// out: the Ref does not matter then.
+    fn checks_out_existing(&self) -> bool {
+        let branch = self.branch.trim();
+        !branch.is_empty() && self.branch_status(branch) == Some(false)
+    }
+
+    /// What the new branch starts from, worded.
+    fn start_label(&self) -> String {
+        match &self.start {
+            WorktreeStart::Branch(b) => b.clone(),
             WorktreeStart::Commit(oid) => {
                 if matches!(&self.seed.start, WorktreeStart::Commit(s) if s == oid)
                     && !self.seed.label.is_empty()
                 {
-                    folder_safe(&self.seed.label)
+                    self.seed.label.clone()
                 } else {
                     short(*oid)
                 }
             }
         }
-    }
-
-    /// Re-proposes the Name (while it was not typed) and the Folder (while
-    /// it was not typed).
-    fn derive_name(&mut self) {
-        if self.name_auto {
-            self.name = self.proposed_name();
-        }
-        self.derive_path();
     }
 
     fn derive_path(&mut self) {
@@ -349,21 +452,18 @@ impl WorktreeDialog {
         }
     }
 
-    /// The Ref combobox picked `value` (`b:<branch>` or `c:<oid>`).
+    /// Sets the branch field (and the list's selection).
+    fn set_branch(&mut self, branch: String, typed: bool) {
+        self.branch_combo.select(Some(branch.clone()));
+        self.branch = branch;
+        self.branch_typed = typed;
+        self.message = None;
+    }
+
+    /// The Ref combobox picked `value` (`b:<branch>` or `c:<oid>`): where a
+    /// new branch starts. Names do not follow it.
     fn pick_ref(&mut self, value: &str) {
         if let Some(branch) = value.strip_prefix("b:") {
-            // The seed's own proposed branch name belongs to the seed's start:
-            // another branch is checked out as it is.
-            if self.seed.start != WorktreeStart::Branch(branch.to_string())
-                && !self.seed.new_branch.is_empty()
-                && self.new_branch == self.seed.new_branch
-            {
-                self.new_branch.clear();
-            } else if self.seed.start == WorktreeStart::Branch(branch.to_string())
-                && self.new_branch.is_empty()
-            {
-                self.new_branch = self.seed.new_branch.clone();
-            }
             self.start = WorktreeStart::Branch(branch.to_string());
             self.branch_busy = self
                 .branches
@@ -376,14 +476,64 @@ impl WorktreeDialog {
         {
             self.start = self.seed.start.clone();
             self.branch_busy = false;
-            // A remote branch seeds its own new branch: back to it.
-            if self.new_branch.trim().is_empty() {
-                self.new_branch = self.seed.new_branch.clone();
-            }
         }
         self.combo.select(Some(choice_value(&self.start)));
         self.message = None;
-        self.derive_name();
+        // "no branch" now means something else.
+        let keep = self.branch.clone();
+        let open = self.branch_combo.is_open();
+        self.build_branch_combo();
+        self.branch_combo.select(Some(keep));
+        if open {
+            self.branch_combo.open();
+        }
+    }
+
+    /// The Worktree branch list picked or typed a value.
+    fn branch_outcome(&mut self, outcome: ComboOutcome) {
+        match outcome {
+            ComboOutcome::Picked(value) => self.set_branch(value, false),
+            ComboOutcome::Custom(text) => self.set_branch(text.trim().to_string(), true),
+            _ => {}
+        }
+    }
+
+    /// "Name after branch": the Name becomes `worktree-<branch>` (no
+    /// doubled word), the Folder follows.
+    fn name_after_branch(&mut self) {
+        let name = worktree_name_after_branch(&self.branch);
+        if name.is_empty() {
+            self.message = Some(msg::worktree::NEED_BRANCH.get().into());
+            return;
+        }
+        self.name = name;
+        self.name_typed = false;
+        self.derive_path();
+        self.message = None;
+    }
+
+    /// "Regenerate": a new `worktree-<id>`. What it replaces:
+    ///
+    /// * the **Name**, unless it was typed by hand (a name from "Name after
+    ///   branch", from the AI or from a previous Regenerate is replaced);
+    /// * the **branch**, only when it is a generated or AI-proposed new
+    ///   branch name: never one the user typed (or the caller proposed), nor
+    ///   an existing branch, nor an empty field.
+    ///
+    /// The Folder follows the Name as always.
+    pub(crate) fn regenerate(&mut self) {
+        let generated = worktree_generated_name(&next_id());
+        if !self.name_typed {
+            self.name = generated.clone();
+            self.derive_path();
+        }
+        let replaceable = !self.branch.trim().is_empty()
+            && !self.branch_typed
+            && self.branch_status(self.branch.trim()).is_none();
+        if replaceable {
+            self.set_branch(generated, false);
+        }
+        self.message = None;
     }
 
     fn signature(&self) -> String {
@@ -391,7 +541,7 @@ impl WorktreeDialog {
             "{}\n{}\n{}\n{}\n{}",
             self.name,
             self.path,
-            self.new_branch,
+            self.branch,
             choice_value(&self.start),
             self.open_tab
         )
@@ -420,7 +570,7 @@ impl WorktreeDialog {
         if std::fs::read_dir(&path).is_ok_and(|mut d| d.next().is_some()) {
             return Err(msg::worktree::not_empty(path.display()));
         }
-        let branch = self.new_branch.trim();
+        let branch = self.branch.trim();
         if branch.is_empty() {
             if self.branch_busy {
                 let label = match &self.start {
@@ -429,18 +579,149 @@ impl WorktreeDialog {
                 };
                 return Err(msg::worktree::already_checked_out(label));
             }
-        } else if let Some(reason) = branch_name_error(branch) {
-            return Err(reason);
-        } else if self.branches.iter().any(|b| b.name == branch) {
-            return Err(msg::worktree::branch_exists(branch));
+            return Ok((
+                path,
+                WorktreeAddOptions {
+                    start: self.start.clone(),
+                    new_branch: None,
+                },
+            ));
         }
-        Ok((
-            path,
-            WorktreeAddOptions {
-                start: self.start.clone(),
-                new_branch: (!branch.is_empty()).then(|| branch.to_string()),
-            },
-        ))
+        match self.branch_status(branch) {
+            // An existing branch another worktree has: git would refuse.
+            Some(true) => Err(msg::worktree::already_checked_out(branch)),
+            // An existing branch: checked out as it is, whatever the Ref.
+            Some(false) => Ok((
+                path,
+                WorktreeAddOptions {
+                    start: WorktreeStart::Branch(branch.to_string()),
+                    new_branch: None,
+                },
+            )),
+            None => {
+                if let Some(reason) = branch_name_error(branch) {
+                    return Err(reason);
+                }
+                Ok((
+                    path,
+                    WorktreeAddOptions {
+                        start: self.start.clone(),
+                        new_branch: Some(branch.to_string()),
+                    },
+                ))
+            }
+        }
+    }
+
+    /// The parts `Tab` visits, in order.
+    fn order(&self) -> Vec<WtFocus> {
+        let mut order = vec![
+            WtFocus::Name,
+            WtFocus::NameAfter,
+            WtFocus::Path,
+            WtFocus::Browse,
+            WtFocus::Ref,
+            WtFocus::Branch,
+            WtFocus::Regenerate,
+        ];
+        if self.ai {
+            order.push(WtFocus::AiToggle);
+            if self.ai_open {
+                order.extend([WtFocus::Describe, WtFocus::AiRun, WtFocus::AiHide]);
+            }
+        }
+        order.extend([WtFocus::OpenTab, WtFocus::Create, WtFocus::Cancel]);
+        order
+    }
+
+    /// AI went on or off, or its request ended without an answer for us:
+    /// the ✦ button and the busy state follow (called every tick).
+    pub(crate) fn sync_ai(&mut self, enabled: bool, running: bool) {
+        self.ai = enabled;
+        if !enabled {
+            self.ai_open = false;
+            self.ai_running = false;
+        } else if self.ai_running && !running {
+            self.ai_running = false;
+        }
+        if !self.order().contains(&self.focus) {
+            self.focus = WtFocus::Name;
+        }
+    }
+
+    /// The AI answered (`Ok((slug, branch))`) or failed. The Name becomes
+    /// `worktree-<slug>` (no doubled word) and the branch field the new
+    /// branch, both still editable and replaceable by Regenerate. A branch
+    /// that already exists is made unique, so the answer never silently
+    /// checks something out. Returns whether the dialog was waiting for it.
+    pub(crate) fn ai_done(&mut self, result: Result<(String, String), String>) -> bool {
+        if !self.ai_running {
+            return false;
+        }
+        self.ai_running = false;
+        match result {
+            Ok((slug, branch)) => {
+                let mut unique = branch.clone();
+                let mut n = 2;
+                while self.branch_status(&unique).is_some() {
+                    unique = format!("{branch}-{n}");
+                    n += 1;
+                }
+                self.name = worktree_name_after_branch(&slug);
+                self.name_typed = false;
+                self.derive_path();
+                self.set_branch(unique, false);
+                self.ai_open = false;
+                self.ai_error = None;
+                self.focus = WtFocus::Name;
+            }
+            // Canceled: nothing to report.
+            Err(why) if why == "canceled" => self.ai_error = None,
+            Err(why) => self.ai_error = Some(msg::worktree::ai_failed(why)),
+        }
+        true
+    }
+
+    fn start_ai(&mut self) -> WorktreeOutcome {
+        if self.ai_running {
+            return WorktreeOutcome::StopAi;
+        }
+        let description = self.ai_text.trim().to_string();
+        if description.is_empty() {
+            self.ai_error = Some(msg::worktree::AI_NEED_TEXT.get().into());
+            return WorktreeOutcome::Stay;
+        }
+        self.ai_error = None;
+        self.ai_running = true;
+        let mut branches: Vec<String> = self.branches.iter().map(|b| b.name.clone()).collect();
+        if let WorktreeStart::Branch(b) = &self.seed.start {
+            if !branches.contains(b) {
+                branches.push(b.clone());
+            }
+        }
+        WorktreeOutcome::NameWithAi {
+            description,
+            branches,
+        }
+    }
+
+    /// Opens or closes the description box (hiding it stops a request).
+    fn toggle_ai(&mut self) -> WorktreeOutcome {
+        self.ai_open = !self.ai_open;
+        if self.ai_open {
+            self.focus = WtFocus::Describe;
+            return WorktreeOutcome::Stay;
+        }
+        if self.focus == WtFocus::Describe
+            || self.focus == WtFocus::AiRun
+            || self.focus == WtFocus::AiHide
+        {
+            self.focus = WtFocus::AiToggle;
+        }
+        if self.ai_running {
+            return WorktreeOutcome::StopAi;
+        }
+        WorktreeOutcome::Stay
     }
 
     fn field_parts(
@@ -453,7 +734,7 @@ impl WorktreeDialog {
         let field = match focus {
             WtFocus::Name => Some(&mut self.name),
             WtFocus::Path => Some(&mut self.path),
-            WtFocus::NewBranch => Some(&mut self.new_branch),
+            WtFocus::Describe => Some(&mut self.ai_text),
             _ => None,
         };
         self.edit.sync(field.is_some().then_some(focus));
@@ -465,11 +746,11 @@ impl WorktreeDialog {
         self.message = None;
         match field {
             WtFocus::Name => {
-                self.name_auto = false;
+                self.name_typed = true;
                 self.derive_path();
             }
             WtFocus::Path => self.path_auto = false,
-            WtFocus::NewBranch => self.derive_name(),
+            WtFocus::Describe => self.ai_error = None,
             _ => {}
         }
     }
@@ -484,7 +765,7 @@ impl WorktreeDialog {
             .unwrap_or_else(|| "worktree".into());
         self.path = dir.join(leaf).display().to_string();
         self.path_auto = false;
-        self.focus = WtFocus::NewBranch;
+        self.focus = WtFocus::Branch;
         self.message = None;
     }
 
@@ -493,7 +774,15 @@ impl WorktreeDialog {
             self.combo.paste(text);
             return;
         }
-        let clean: String = text.chars().filter(|c| !c.is_control()).collect();
+        if self.branch_combo.is_open() {
+            self.branch_combo.paste(text);
+            return;
+        }
+        let clean: String = text
+            .chars()
+            .map(|c| if c == '\n' || c == '\r' { ' ' } else { c })
+            .filter(|c| !c.is_control())
+            .collect();
         let focus = self.focus;
         if let (edit, Some((id, field))) = self.field_parts() {
             edit.caret_mut(id).insert(field, &clean);
@@ -530,37 +819,125 @@ impl WorktreeDialog {
                 WorktreeOutcome::Stay
             }
             WtFocus::Ref => {
-                self.combo.open();
+                if !self.checks_out_existing() {
+                    self.combo.open();
+                }
                 WorktreeOutcome::Stay
             }
+            WtFocus::Branch => {
+                self.branch_combo.open();
+                WorktreeOutcome::Stay
+            }
+            WtFocus::NameAfter => {
+                self.name_after_branch();
+                WorktreeOutcome::Stay
+            }
+            WtFocus::Regenerate => {
+                self.regenerate();
+                WorktreeOutcome::Stay
+            }
+            WtFocus::AiToggle => self.toggle_ai(),
+            WtFocus::AiRun => self.start_ai(),
+            WtFocus::AiHide => {
+                self.focus = WtFocus::AiToggle;
+                self.ai_open = false;
+                if self.ai_running {
+                    WorktreeOutcome::StopAi
+                } else {
+                    WorktreeOutcome::Stay
+                }
+            }
             _ => self.submit(),
-        }
-    }
-
-    fn combo_outcome(&mut self, outcome: ComboOutcome) {
-        if let ComboOutcome::Picked(value) = outcome {
-            self.pick_ref(&value);
         }
     }
 
     pub(crate) fn on_key(&mut self, key: KeyEvent) -> WorktreeOutcome {
         if self.combo.is_open() {
             let outcome = self.combo.on_key(key);
-            self.combo_outcome(outcome);
+            if let ComboOutcome::Picked(value) = outcome {
+                self.pick_ref(&value);
+            }
+            return WorktreeOutcome::Stay;
+        }
+        if self.branch_combo.is_open() {
+            let outcome = self.branch_combo.on_key(key);
+            self.branch_outcome(outcome);
             return WorktreeOutcome::Stay;
         }
         let shift = key.modifiers.contains(KeyModifiers::SHIFT);
+        // The buttons' fixed Alt twins (shown on their labels).
+        if key.modifiers.contains(KeyModifiers::ALT) {
+            match key.code {
+                KeyCode::Char('n' | 'N') => return self.activate(WtFocus::NameAfter),
+                KeyCode::Char('r' | 'R') => return self.activate(WtFocus::Regenerate),
+                KeyCode::Char('a' | 'A') if self.ai => return self.activate(WtFocus::AiToggle),
+                _ => {}
+            }
+        }
         if self.focus == WtFocus::Ref
             && matches!(
                 key.code,
                 KeyCode::Enter | KeyCode::Char(' ') | KeyCode::Down
             )
         {
-            self.combo.open();
-            return WorktreeOutcome::Stay;
+            return self.activate(WtFocus::Ref);
+        }
+        if self.focus == WtFocus::Branch {
+            match key.code {
+                KeyCode::Enter | KeyCode::Char(' ') | KeyCode::Down => {
+                    return self.activate(WtFocus::Branch)
+                }
+                // Typing on the field starts the list's search line, where
+                // a name that is not a branch is offered as a new one.
+                KeyCode::Char(_)
+                    if !key
+                        .modifiers
+                        .intersects(KeyModifiers::CONTROL | KeyModifiers::ALT) =>
+                {
+                    self.branch_combo.open();
+                    let outcome = self.branch_combo.on_key(key);
+                    self.branch_outcome(outcome);
+                    return WorktreeOutcome::Stay;
+                }
+                _ => {}
+            }
         }
         let focus = self.focus;
-        if let (edit, Some((id, field))) = self.field_parts() {
+        if focus == WtFocus::Describe {
+            if key.code == KeyCode::Esc {
+                // Esc leaves the box (stopping a request), not the dialog.
+                let stop = self.ai_running;
+                self.ai_open = false;
+                self.focus = WtFocus::AiToggle;
+                return if stop {
+                    WorktreeOutcome::StopAi
+                } else {
+                    WorktreeOutcome::Stay
+                };
+            }
+            if let (edit, Some((id, field))) = self.field_parts() {
+                // Enter is a newline here (Tab leaves the field).
+                if key.code == KeyCode::Enter {
+                    edit.caret_mut(id).insert(field, "\n");
+                    self.edited(focus);
+                    return WorktreeOutcome::Stay;
+                }
+                if edit.claims(id, field, &key, true) {
+                    let result = edit.on_key(id, field, &key, true);
+                    match result {
+                        crate::text_edit::KeyEdit::Edited => self.edited(focus),
+                        crate::text_edit::KeyEdit::Copy(s) | crate::text_edit::KeyEdit::Cut(s) => {
+                            self.message = Some(crate::clipboard::copy_shared(
+                                msg::pull_request::NOUN_SELECTION.get(),
+                                &s,
+                            ));
+                        }
+                        _ => {}
+                    }
+                    return WorktreeOutcome::Stay;
+                }
+            }
+        } else if let (edit, Some((id, field))) = self.field_parts() {
             if let Some((result, copied)) = edit.dialog_key(id, field, &key) {
                 if result == crate::text_edit::KeyEdit::Edited {
                     self.edited(focus);
@@ -572,23 +949,30 @@ impl WorktreeDialog {
             }
         }
         match key.code {
-            KeyCode::Esc => return WorktreeOutcome::Cancel,
+            KeyCode::Esc => {
+                // A running request stops first; the dialog stays.
+                if self.ai_running {
+                    return WorktreeOutcome::StopAi;
+                }
+                return WorktreeOutcome::Cancel;
+            }
             KeyCode::Tab | KeyCode::BackTab | KeyCode::Down | KeyCode::Up => {
+                let order = self.order();
                 let forward =
                     matches!(key.code, KeyCode::Down) || (key.code == KeyCode::Tab && !shift);
-                let at = ORDER.iter().position(|f| *f == self.focus).unwrap_or(0);
+                let at = order.iter().position(|f| *f == self.focus).unwrap_or(0);
                 let next = if forward {
-                    (at + 1) % ORDER.len()
+                    (at + 1) % order.len()
                 } else {
-                    (at + ORDER.len() - 1) % ORDER.len()
+                    (at + order.len() - 1) % order.len()
                 };
-                self.focus = ORDER[next];
+                self.focus = order[next];
             }
             _ if crate::keymap::current().is(crate::keymap::Action::DialogBrowse, &key) => {
                 return self.browse()
             }
-            // Enter on the checkbox toggles it like Space; anywhere else
-            // it is the dialog's default button (`activate`).
+            // Enter on a button or the checkbox does what a click does;
+            // on a field it is the dialog's default button (`activate`).
             KeyCode::Enter => return self.activate(self.focus),
             KeyCode::Char(' ') if self.field_parts().1.is_none() => {
                 return self.activate(self.focus)
@@ -610,7 +994,14 @@ impl WorktreeDialog {
     pub(crate) fn on_mouse(&mut self, mouse: MouseEvent) -> WorktreeOutcome {
         if self.combo.is_open() {
             let outcome = self.combo.on_mouse(mouse);
-            self.combo_outcome(outcome);
+            if let ComboOutcome::Picked(value) = outcome {
+                self.pick_ref(&value);
+            }
+            return WorktreeOutcome::Stay;
+        }
+        if self.branch_combo.is_open() {
+            let outcome = self.branch_combo.on_mouse(mouse);
+            self.branch_outcome(outcome);
             return WorktreeOutcome::Stay;
         }
         let hit = dialog_kit::hit_at(&self.hits, mouse.column, mouse.row);
@@ -622,14 +1013,7 @@ impl WorktreeDialog {
             MouseEventKind::Down(MouseButton::Left) => {
                 if let Some(part) = hit {
                     self.focus = part;
-                    if matches!(
-                        part,
-                        WtFocus::Browse
-                            | WtFocus::Create
-                            | WtFocus::Cancel
-                            | WtFocus::OpenTab
-                            | WtFocus::Ref
-                    ) {
+                    if !matches!(part, WtFocus::Name | WtFocus::Path | WtFocus::Describe) {
                         return self.activate(part);
                     }
                     self.field_mouse(mouse);
@@ -638,6 +1022,25 @@ impl WorktreeDialog {
             _ => {}
         }
         WorktreeOutcome::Stay
+    }
+
+    /// The dialog's rectangle in `frame`: taller while the description box
+    /// is open.
+    pub(crate) fn rect(&self, frame: Rect) -> Rect {
+        let height = if self.ai_open { HEIGHT_AI } else { HEIGHT };
+        WIN.place(
+            frame,
+            dialog_kit::centered(frame, frame.width.saturating_sub(4).min(90), height),
+        )
+    }
+
+    /// A button label with its Alt twin when the dialog is wide enough.
+    fn labelled(&self, label: &str, key: char, wide: bool) -> String {
+        if wide {
+            format!("{label} {}", dialog_kit::alt_key(Key::Char(key)))
+        } else {
+            label.to_string()
+        }
     }
 
     pub(crate) fn render(&mut self, rect: Rect, buf: &mut Buffer) {
@@ -661,12 +1064,13 @@ impl WorktreeDialog {
             self.hits = hits;
             return;
         }
+        let wide = inner.width >= 76;
         // The widest label plus a gap (14 at least), whatever the language.
         let label_w: u16 = [
             msg::worktree::NAME,
             msg::worktree::FOLDER,
             msg::worktree::REF_FIELD,
-            msg::worktree::NEW_BRANCH,
+            msg::worktree::BRANCH_FIELD,
         ]
         .iter()
         .map(|m| crate::display_width(m.get()) as u16 + 2)
@@ -686,10 +1090,18 @@ impl WorktreeDialog {
         let field_x = inner.x + label_w;
         let browse_w = dialog_kit::button_width(msg::dialog::BROWSE.get());
         let field_w = inner.width.saturating_sub(label_w);
+        let normal = |part: WtFocus, hover: Option<WtFocus>, focus: WtFocus| ButtonState::Normal {
+            hovered: hover == Some(part),
+            focused: focus == part,
+        };
 
+        // Name, with "Name after branch" at its right.
         let mut y = inner.y;
         label(buf, y, msg::worktree::NAME.get());
-        let name = Rect::new(field_x, y, field_w, 1);
+        let after_label = self.labelled(msg::worktree::NAME_AFTER_BRANCH.get(), 'n', wide);
+        let after_w = dialog_kit::button_width(&after_label);
+        let name_w = field_w.saturating_sub(after_w + 1).max(8);
+        let name = Rect::new(field_x, y, name_w, 1);
         dialog_kit::text_input(
             buf,
             name,
@@ -700,6 +1112,16 @@ impl WorktreeDialog {
             (&self.edit, WtFocus::Name),
         );
         hits.push((name, WtFocus::Name));
+        if name.right() + 1 + after_w <= inner.right() {
+            let after = dialog_kit::button(
+                buf,
+                name.right() + 1,
+                y,
+                &after_label,
+                normal(WtFocus::NameAfter, self.hover, self.focus),
+            );
+            hits.push((after, WtFocus::NameAfter));
+        }
 
         y += 2;
         label(buf, y, msg::worktree::FOLDER.get());
@@ -718,49 +1140,193 @@ impl WorktreeDialog {
             path.right() + 1,
             y,
             msg::dialog::BROWSE.get(),
-            ButtonState::Normal {
-                hovered: self.hover == Some(WtFocus::Browse),
-                focused: self.focus == WtFocus::Browse,
-            },
+            normal(WtFocus::Browse, self.hover, self.focus),
         );
         hits.push((browse, WtFocus::Browse));
         hits.push((path, WtFocus::Path));
 
+        // Ref: the start of a new branch; unused while an existing branch
+        // is chosen, and it says so.
         y += 2;
         label(buf, y, msg::worktree::REF_FIELD.get());
         let ref_rect = Rect::new(field_x, y, field_w, 1);
-        self.combo.render_field(
-            buf,
-            ref_rect,
-            self.focus == WtFocus::Ref,
-            self.hover == Some(WtFocus::Ref),
-        );
+        if self.checks_out_existing() {
+            let bg = crate::input_bg(false, false);
+            dialog_kit::fill(buf, ref_rect, Style::default().bg(bg));
+            dialog_kit::put(
+                buf,
+                ref_rect.x + 1,
+                y,
+                msg::worktree::REF_UNUSED.get(),
+                ref_rect.width.saturating_sub(1),
+                Style::default().fg(th().ui.disabled).bg(bg),
+            );
+        } else {
+            self.combo.render_field(
+                buf,
+                ref_rect,
+                self.focus == WtFocus::Ref,
+                self.hover == Some(WtFocus::Ref),
+            );
+        }
         hits.push((ref_rect, WtFocus::Ref));
 
+        // The branch, with Regenerate at its right.
         y += 2;
-        label(buf, y, msg::worktree::NEW_BRANCH.get());
-        let branch = Rect::new(field_x, y, field_w, 1);
-        let placeholder = match &self.start {
-            WorktreeStart::Branch(b) if !self.branch_busy => msg::worktree::branch_hint_checkout(b),
-            WorktreeStart::Branch(_) => msg::worktree::BRANCH_HINT_REQUIRED.get().into(),
-            WorktreeStart::Commit(_) => msg::worktree::BRANCH_HINT_DETACHED.get().into(),
-        };
-        dialog_kit::text_input(
+        label(buf, y, msg::worktree::BRANCH_FIELD.get());
+        let regen_label = self.labelled(msg::worktree::REGENERATE.get(), 'r', wide);
+        let regen_w = dialog_kit::button_width(&regen_label);
+        let branch_w = field_w.saturating_sub(regen_w + 1).max(8);
+        let branch = Rect::new(field_x, y, branch_w, 1);
+        self.branch_combo.render_field(
             buf,
             branch,
-            &self.new_branch,
-            &placeholder,
-            self.focus == WtFocus::NewBranch,
-            self.hover == Some(WtFocus::NewBranch),
-            (&self.edit, WtFocus::NewBranch),
+            self.focus == WtFocus::Branch,
+            self.hover == Some(WtFocus::Branch),
         );
-        hits.push((branch, WtFocus::NewBranch));
+        hits.push((branch, WtFocus::Branch));
+        if branch.right() + 1 + regen_w <= inner.right() {
+            let regen = dialog_kit::button(
+                buf,
+                branch.right() + 1,
+                y,
+                &regen_label,
+                normal(WtFocus::Regenerate, self.hover, self.focus),
+            );
+            hits.push((regen, WtFocus::Regenerate));
+        }
 
-        y += 2;
-        let open_tab = dialog_kit::checkbox(
+        // What the branch field means now, and the ✦ button at its right.
+        y += 1;
+        let hint = if self.branch.trim().is_empty() {
+            String::new()
+        } else if self.checks_out_existing() {
+            msg::worktree::HINT_EXISTING_BRANCH.get().to_string()
+        } else if self.branch_status(self.branch.trim()).is_none() {
+            msg::worktree::hint_new_branch(self.start_label())
+        } else {
+            String::new()
+        };
+        let mut hint_room = field_w;
+        if self.ai {
+            let ai_label = format!(
+                "{} {}",
+                crate::theme::AI_SPARK,
+                self.labelled(msg::worktree::AI_BUTTON.get(), 'a', wide)
+            );
+            let w = dialog_kit::button_width(&ai_label);
+            let x = inner.right().saturating_sub(w);
+            let rect = dialog_kit::button(
+                buf,
+                x,
+                y,
+                &ai_label,
+                normal(WtFocus::AiToggle, self.hover, self.focus),
+            );
+            // The sparkle keeps the AI purple, as on every AI control.
+            for col in rect.x..rect.right() {
+                if let Some(cell) = buf.cell_mut((col, rect.y)) {
+                    if cell.symbol() == crate::theme::AI_SPARK {
+                        cell.set_fg(th().status.ai);
+                    }
+                }
+            }
+            hits.push((rect, WtFocus::AiToggle));
+            hint_room = x.saturating_sub(field_x + 1);
+        }
+        dialog_kit::put(
             buf,
             field_x,
             y,
+            &crate::tail_fit(&hint, hint_room as usize),
+            hint_room,
+            Style::default().fg(th().ui.muted).bg(th().ui.panel),
+        );
+
+        let bottom = inner.y + inner.height;
+        let plan_y = bottom.saturating_sub(3);
+        let check_y = plan_y.saturating_sub(2);
+
+        // The description box, between the hint and the checkbox.
+        if self.ai && self.ai_open {
+            let top = y + 1;
+            dialog_kit::put(
+                buf,
+                inner.x,
+                top,
+                msg::worktree::AI_DESCRIBE.get(),
+                inner.width,
+                Style::default().fg(th().ui.muted).bg(th().ui.panel),
+            );
+            let room = check_y.saturating_sub(top + 1);
+            let area_h = room.saturating_sub(2).clamp(1, 3);
+            let area = Rect::new(inner.x, top + 1, inner.width, area_h);
+            dialog_kit::text_area(
+                buf,
+                area,
+                &self.ai_text,
+                msg::worktree::AI_DESCRIBE_HINT.get(),
+                self.focus == WtFocus::Describe,
+                self.hover == Some(WtFocus::Describe),
+                (&self.edit, WtFocus::Describe),
+            );
+            hits.push((area, WtFocus::Describe));
+            let by = area.bottom();
+            let run_label = if self.ai_running {
+                msg::worktree::AI_STOP.get()
+            } else {
+                msg::worktree::AI_RUN.get()
+            };
+            let run = dialog_kit::button(
+                buf,
+                inner.x,
+                by,
+                run_label,
+                ButtonState::Primary {
+                    hovered: self.hover == Some(WtFocus::AiRun),
+                    focused: self.focus == WtFocus::AiRun,
+                },
+            );
+            hits.push((run, WtFocus::AiRun));
+            let hide = dialog_kit::button(
+                buf,
+                run.right() + 1,
+                by,
+                msg::worktree::AI_HIDE.get(),
+                normal(WtFocus::AiHide, self.hover, self.focus),
+            );
+            hits.push((hide, WtFocus::AiHide));
+            let status_x = hide.right() + 2;
+            let status_room = inner.right().saturating_sub(status_x);
+            if self.ai_running {
+                dialog_kit::put(
+                    buf,
+                    status_x,
+                    by,
+                    &format!(
+                        "{} {}",
+                        crate::theme::AI_SPARK,
+                        msg::worktree::AI_WORKING.get()
+                    ),
+                    status_room,
+                    Style::default().fg(th().status.ai).bg(th().ui.panel),
+                );
+            } else if let Some(error) = &self.ai_error {
+                dialog_kit::put(
+                    buf,
+                    status_x,
+                    by,
+                    error,
+                    status_room,
+                    Style::default().fg(th().status.danger).bg(th().ui.panel),
+                );
+            }
+        }
+
+        let open_tab = dialog_kit::checkbox(
+            buf,
+            field_x,
+            check_y,
             field_w,
             msg::worktree::OPEN_TAB.get(),
             self.open_tab,
@@ -771,8 +1337,6 @@ impl WorktreeDialog {
         );
         hits.push((open_tab, WtFocus::OpenTab));
 
-        let bottom = inner.y + inner.height;
-        let plan_y = bottom.saturating_sub(3);
         let plan = self.plan();
         match &plan {
             Ok((path, opts)) => {
@@ -834,10 +1398,7 @@ impl WorktreeDialog {
             cancel_x,
             footer,
             msg::dialog::CANCEL.get(),
-            ButtonState::Normal {
-                hovered: self.hover == Some(WtFocus::Cancel),
-                focused: self.focus == WtFocus::Cancel,
-            },
+            normal(WtFocus::Cancel, self.hover, self.focus),
         );
         let create = dialog_kit::button(
             buf,
@@ -872,8 +1433,9 @@ impl WorktreeDialog {
             ],
         );
         self.hits = hits;
-        // The Ref list hangs over everything else.
+        // The lists hang over everything else.
         self.combo.render_popup(buf, buf.area);
+        self.branch_combo.render_popup(buf, buf.area);
     }
 }
 
@@ -892,22 +1454,19 @@ impl dialog_kit::Dismiss for WorktreeDialog {
     }
 }
 
-pub(crate) fn worktree_rect(frame: Rect) -> Rect {
-    WIN.place(
-        frame,
-        dialog_kit::centered(frame, frame.width.saturating_sub(4).min(90), 16),
-    )
-}
-
 const WIN: dialog_kit::Win = dialog_kit::Win::movable("worktree");
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use gitpoulpi_core::domain::Oid;
+    use gitpoulpi_core::domain::{is_generated_worktree_name, Oid};
 
     fn key(code: KeyCode) -> KeyEvent {
         KeyEvent::new(code, KeyModifiers::NONE)
+    }
+
+    fn alt(c: char) -> KeyEvent {
+        KeyEvent::new(KeyCode::Char(c), KeyModifiers::ALT)
     }
 
     fn seed(start: WorktreeStart, label: &str, busy: bool) -> WorktreeSeed {
@@ -919,43 +1478,326 @@ mod tests {
         }
     }
 
+    /// The next dialogs draw these ids (in this order).
+    fn ids(list: &[&str]) {
+        TEST_IDS.with(|ids| {
+            let mut ids = ids.borrow_mut();
+            ids.clear();
+            ids.extend(list.iter().rev().map(|s| s.to_string()));
+        });
+    }
+
+    fn two_branches() -> Vec<BranchChoice> {
+        vec![
+            BranchChoice {
+                name: "main".into(),
+                busy: true,
+            },
+            BranchChoice {
+                name: "other".into(),
+                busy: false,
+            },
+            BranchChoice {
+                name: "feature/login".into(),
+                busy: false,
+            },
+        ]
+    }
+
+    fn on_main(root: &Path) -> WorktreeDialog {
+        WorktreeDialog::with_choices(
+            seed(WorktreeStart::Branch("main".into()), "main", true),
+            root,
+            two_branches(),
+            false,
+        )
+    }
+
+    fn type_into(dialog: &mut WorktreeDialog, focus: WtFocus, text: &str) {
+        dialog.focus = focus;
+        for c in text.chars() {
+            dialog.on_key(key(KeyCode::Char(c)));
+        }
+    }
+
     #[test]
-    fn it_proposes_a_sibling_folder_named_after_the_start() {
+    fn it_opens_with_the_same_generated_name_for_the_worktree_and_the_branch() {
         let tmp = tempfile::tempdir().unwrap();
-        let root = tmp.path().join("GitPoulpi");
-        let dialog = WorktreeDialog::new(
-            seed(
-                WorktreeStart::Branch("feature/login".into()),
-                "feature/login",
-                false,
-            ),
-            &root,
-        );
+        let root = tmp.path().join("repo");
+        // Real randomness: eight lowercase hex digits, the same for both.
+        let dialog = on_main(&root);
+        assert!(is_generated_worktree_name(&dialog.name), "{}", dialog.name);
+        assert_eq!(dialog.branch, dialog.name);
         assert_eq!(
             PathBuf::from(&dialog.path),
-            tmp.path().join("GitPoulpi-feature-login")
+            tmp.path().join(format!("repo-{}", dialog.name))
         );
-        let (path, opts) = dialog.plan().unwrap();
-        assert_eq!(path, tmp.path().join("GitPoulpi-feature-login"));
-        assert_eq!(opts.start, WorktreeStart::Branch("feature/login".into()));
+        // Two dialogs do not share an id.
+        assert_ne!(on_main(&root).name, dialog.name);
+        let (_, opts) = dialog.plan().unwrap();
+        assert_eq!(opts.new_branch.as_deref(), Some(dialog.name.as_str()));
+        assert_eq!(opts.start, WorktreeStart::Branch("main".into()));
+    }
+
+    #[test]
+    fn a_branch_the_caller_opens_is_checked_out_as_it_is() {
+        let tmp = tempfile::tempdir().unwrap();
+        ids(&["0a0a0a0a"]);
+        let dialog = WorktreeDialog::with_choices(
+            seed(WorktreeStart::Branch("other".into()), "other", false),
+            &tmp.path().join("repo"),
+            two_branches(),
+            false,
+        );
+        // The Name keeps its default; the branch field shows the branch.
+        assert_eq!(dialog.name, "worktree-0a0a0a0a");
+        assert_eq!(dialog.branch, "other");
+        assert!(dialog.checks_out_existing());
+        let (_, opts) = dialog.plan().unwrap();
+        assert_eq!(opts.start, WorktreeStart::Branch("other".into()));
         assert_eq!(opts.new_branch, None);
     }
 
     #[test]
-    fn enter_submits_with_the_new_branch_and_the_tab_choice() {
+    fn a_commit_gets_a_generated_branch_unless_the_caller_names_one() {
+        let tmp = tempfile::tempdir().unwrap();
+        let oid = Oid::from_hex(&"c".repeat(40)).unwrap();
+        ids(&["11111111", "22222222"]);
+        let dialog = WorktreeDialog::with_choices(
+            seed(WorktreeStart::Commit(oid), "ccccccc", false),
+            &tmp.path().join("repo"),
+            two_branches(),
+            false,
+        );
+        assert_eq!(dialog.branch, "worktree-11111111");
+        let (_, opts) = dialog.plan().unwrap();
+        assert_eq!(opts.start, WorktreeStart::Commit(oid));
+        assert_eq!(opts.new_branch.as_deref(), Some("worktree-11111111"));
+        assert!(dialog
+            .combo
+            .options
+            .iter()
+            .any(|o| o.value == format!("c:{}", oid.to_hex())));
+        // A remote branch's local name stays, and Regenerate keeps it.
+        let mut remote = WorktreeDialog::with_choices(
+            WorktreeSeed {
+                new_branch: "feature".into(),
+                ..seed(WorktreeStart::Commit(oid), "origin/feature", false)
+            },
+            &tmp.path().join("repo"),
+            two_branches(),
+            false,
+        );
+        assert_eq!(remote.branch, "feature");
+        remote.regenerate();
+        assert_eq!(remote.branch, "feature");
+        // Clearing the branch makes the worktree detached.
+        remote.set_branch(String::new(), true);
+        let (_, opts) = remote.plan().unwrap();
+        assert_eq!(opts.new_branch, None);
+        assert_eq!(opts.start, WorktreeStart::Commit(oid));
+    }
+
+    #[test]
+    fn the_folder_follows_the_name_until_the_folder_is_edited() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path().join("repo");
+        ids(&["aaaaaaaa"]);
+        let mut dialog = on_main(&root);
+        assert_eq!(
+            PathBuf::from(&dialog.path),
+            tmp.path().join("repo-worktree-aaaaaaaa")
+        );
+        // Typing in Name re-proposes the Folder.
+        type_into(&mut dialog, WtFocus::Name, "-2");
+        assert_eq!(dialog.name, "worktree-aaaaaaaa-2");
+        assert_eq!(
+            PathBuf::from(&dialog.path),
+            tmp.path().join("repo-worktree-aaaaaaaa-2")
+        );
+        // Editing the Folder by hand stops the sync for good.
+        type_into(&mut dialog, WtFocus::Path, "x");
+        let edited = dialog.path.clone();
+        assert!(edited.ends_with("aaaaaaaa-2x"), "{edited}");
+        type_into(&mut dialog, WtFocus::Name, "y");
+        assert_eq!(
+            dialog.path, edited,
+            "the Folder was edited: Name no longer moves it"
+        );
+    }
+
+    #[test]
+    fn name_after_branch_uses_the_branch_without_doubling_the_word() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dialog = on_main(&tmp.path().join("repo"));
+        // An existing branch with a slash.
+        dialog.set_branch("feature/login".into(), false);
+        dialog.activate(WtFocus::NameAfter);
+        assert_eq!(dialog.name, "worktree-feature-login");
+        assert_eq!(
+            PathBuf::from(&dialog.path),
+            tmp.path().join("repo-worktree-feature-login")
+        );
+        // The word is already there: used as it is.
+        for (branch, name) in [
+            ("worktree-foo", "worktree-foo"),
+            ("worktree", "worktree"),
+            ("topic/worktree-x", "topic-worktree-x"),
+            ("topic", "worktree-topic"),
+        ] {
+            dialog.set_branch(branch.into(), true);
+            dialog.on_key(alt('n'));
+            assert_eq!(dialog.name, name, "{branch}");
+        }
+        // No branch: nothing to name it after.
+        dialog.set_branch(String::new(), true);
+        dialog.activate(WtFocus::NameAfter);
+        assert!(dialog.message.is_some());
+        assert_eq!(dialog.name, "worktree-topic");
+    }
+
+    #[test]
+    fn regenerate_replaces_only_what_was_generated() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path().join("repo");
+
+        // Both generated: both change, the same way, and the Folder follows.
+        ids(&["00000001", "00000002"]);
+        let mut dialog = on_main(&root);
+        assert_eq!(dialog.name, "worktree-00000001");
+        assert_eq!(dialog.branch, "worktree-00000001");
+        dialog.on_key(alt('r'));
+        assert_eq!(dialog.name, "worktree-00000002");
+        assert_eq!(dialog.branch, "worktree-00000002");
+        assert!(dialog.path.ends_with("repo-worktree-00000002"), "{}", dialog.path);
+
+        // A name typed by hand stays; the generated branch still changes.
+        ids(&["00000003", "00000004"]);
+        let mut dialog = on_main(&root);
+        type_into(&mut dialog, WtFocus::Name, "-mine");
+        dialog.activate(WtFocus::Regenerate);
+        assert_eq!(dialog.name, "worktree-00000003-mine");
+        assert_eq!(dialog.branch, "worktree-00000004");
+
+        // A branch typed by hand stays; the generated name changes.
+        ids(&["00000005", "00000006"]);
+        let mut dialog = on_main(&root);
+        dialog.set_branch("my-topic".into(), true);
+        dialog.activate(WtFocus::Regenerate);
+        assert_eq!(dialog.name, "worktree-00000006");
+        assert_eq!(dialog.branch, "my-topic");
+
+        // An existing branch is never replaced (even if nobody "typed" it).
+        ids(&["00000007", "00000008"]);
+        let mut dialog = on_main(&root);
+        dialog.set_branch("other".into(), false);
+        dialog.activate(WtFocus::Regenerate);
+        assert_eq!(dialog.branch, "other");
+        assert_eq!(dialog.name, "worktree-00000008");
+
+        // A name from "Name after branch" is replaced like a generated one.
+        ids(&["00000009", "0000000a"]);
+        let mut dialog = on_main(&root);
+        dialog.set_branch("other".into(), false);
+        dialog.activate(WtFocus::NameAfter);
+        assert_eq!(dialog.name, "worktree-other");
+        dialog.activate(WtFocus::Regenerate);
+        assert_eq!(dialog.name, "worktree-0000000a");
+    }
+
+    #[test]
+    fn the_branch_list_picks_an_existing_branch_or_makes_a_new_one() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dialog = on_main(&tmp.path().join("repo"));
+        // The list holds "no branch" and the branches free to check out.
+        let values: Vec<&str> = dialog
+            .branch_combo
+            .options
+            .iter()
+            .map(|o| o.value.as_str())
+            .collect();
+        assert_eq!(values, ["", "other", "feature/login"]);
+        // Picking `other` checks it out: the Ref says it is not used.
+        dialog.branch_outcome(ComboOutcome::Picked("other".into()));
+        assert_eq!(dialog.branch, "other");
+        assert!(dialog.checks_out_existing());
+        let (_, opts) = dialog.plan().unwrap();
+        assert_eq!(opts.start, WorktreeStart::Branch("other".into()));
+        assert_eq!(opts.new_branch, None);
+        // The Ref does not open while it is unused.
+        dialog.focus = WtFocus::Ref;
+        dialog.on_key(key(KeyCode::Enter));
+        assert!(!dialog.combo.is_open());
+        // A typed name is a new branch from the Ref.
+        dialog.branch_outcome(ComboOutcome::Custom(" topic/new ".into()));
+        assert_eq!(dialog.branch, "topic/new");
+        assert!(!dialog.checks_out_existing());
+        let (_, opts) = dialog.plan().unwrap();
+        assert_eq!(opts.start, WorktreeStart::Branch("main".into()));
+        assert_eq!(opts.new_branch.as_deref(), Some("topic/new"));
+        // A branch another worktree has cannot be checked out twice.
+        dialog.branch_outcome(ComboOutcome::Custom("main".into()));
+        assert!(dialog.plan().unwrap_err().contains("already checked out"));
+        // Not a valid name.
+        dialog.branch_outcome(ComboOutcome::Custom("bad name".into()));
+        assert!(dialog
+            .plan()
+            .unwrap_err()
+            .contains("not a valid branch name"));
+    }
+
+    #[test]
+    fn typing_on_the_branch_field_opens_its_list_with_the_search() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dialog = on_main(&tmp.path().join("repo"));
+        dialog.focus = WtFocus::Branch;
+        dialog.on_key(key(KeyCode::Char('o')));
+        assert!(dialog.branch_combo.is_open());
+        for c in "th".chars() {
+            dialog.on_key(key(KeyCode::Char(c)));
+        }
+        // Enter picks the first match: `other`.
+        dialog.on_key(key(KeyCode::Enter));
+        assert_eq!(dialog.branch, "other");
+        assert!(!dialog.branch_combo.is_open());
+    }
+
+    #[test]
+    fn choosing_a_ref_moves_where_a_new_branch_starts_and_nothing_else() {
+        let tmp = tempfile::tempdir().unwrap();
+        ids(&["12121212"]);
+        let mut dialog = on_main(&tmp.path().join("repo"));
+        dialog.pick_ref("b:other");
+        assert_eq!(dialog.start, WorktreeStart::Branch("other".into()));
+        assert_eq!(dialog.name, "worktree-12121212");
+        assert_eq!(dialog.branch, "worktree-12121212");
+        let (_, opts) = dialog.plan().unwrap();
+        assert_eq!(opts.start, WorktreeStart::Branch("other".into()));
+        assert_eq!(opts.new_branch.as_deref(), Some("worktree-12121212"));
+    }
+
+    #[test]
+    fn the_ref_on_a_busy_branch_still_asks_for_a_branch_when_the_field_is_empty() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dialog = on_main(&tmp.path().join("repo"));
+        dialog.set_branch(String::new(), true);
+        assert!(dialog.plan().unwrap_err().contains("name a new branch"));
+        dialog.pick_ref("b:other");
+        let (_, opts) = dialog.plan().unwrap();
+        assert_eq!(opts.start, WorktreeStart::Branch("other".into()));
+        assert_eq!(opts.new_branch, None);
+    }
+
+    #[test]
+    fn enter_submits_with_the_branch_and_the_tab_choice() {
         let tmp = tempfile::tempdir().unwrap();
         let oid = Oid::from_hex(&"a".repeat(40)).unwrap();
         let mut dialog = WorktreeDialog::new(
             seed(WorktreeStart::Commit(oid), "aaaaaaa", false),
             tmp.path(),
         );
-        dialog.focus = WtFocus::NewBranch;
-        for c in "topic".chars() {
-            dialog.on_key(key(KeyCode::Char(c)));
-        }
-        // Tab to the checkbox, Space unticks it.
-        dialog.on_key(key(KeyCode::Tab));
-        assert_eq!(dialog.focus, WtFocus::OpenTab);
+        dialog.set_branch("topic".into(), true);
+        dialog.focus = WtFocus::OpenTab;
         dialog.on_key(key(KeyCode::Char(' ')));
         assert!(!dialog.open_tab);
         dialog.focus = WtFocus::Create;
@@ -974,41 +1816,35 @@ mod tests {
         let tmp = tempfile::tempdir().unwrap();
         std::fs::create_dir(tmp.path().join("full")).unwrap();
         std::fs::write(tmp.path().join("full").join("x"), "x").unwrap();
-
-        // The checked-out branch needs a new branch name.
-        let mut busy = WorktreeDialog::new(
-            seed(WorktreeStart::Branch("main".into()), "main", true),
-            tmp.path(),
-        );
-        assert_eq!(busy.focus, WtFocus::NewBranch);
-        assert!(busy.plan().unwrap_err().contains("name a new branch"));
-        busy.focus = WtFocus::Create;
-        assert_eq!(busy.on_key(key(KeyCode::Enter)), WorktreeOutcome::Stay);
-        assert!(busy.message.as_deref().unwrap().contains("new branch"));
-
-        let mut dialog = WorktreeDialog::new(
+        let mut dialog = WorktreeDialog::with_choices(
             seed(WorktreeStart::Branch("feature".into()), "feature", false),
             tmp.path(),
+            Vec::new(),
+            false,
         );
         dialog.path = tmp.path().join("full").display().to_string();
         assert!(dialog.plan().unwrap_err().contains("not empty"));
+        dialog.focus = WtFocus::Create;
+        assert_eq!(dialog.on_key(key(KeyCode::Enter)), WorktreeOutcome::Stay);
+        assert!(dialog.message.as_deref().unwrap().contains("not empty"));
         dialog.path = "relative".into();
         assert!(dialog.plan().unwrap_err().contains("full path"));
-        dialog.path = tmp.path().join("ok").display().to_string();
-        dialog.new_branch = "bad name".into();
-        assert!(dialog
-            .plan()
-            .unwrap_err()
-            .contains("not a valid branch name"));
+        dialog.name = "a/b".into();
+        assert!(dialog.plan().unwrap_err().contains("slashes"));
+        dialog.name = String::new();
+        assert!(dialog.plan().unwrap_err().contains("name"));
+        let file = tmp.path().join("file");
+        std::fs::write(&file, "x").unwrap();
+        dialog.name = "ok".into();
+        dialog.path = file.display().to_string();
+        assert!(dialog.plan().unwrap_err().contains("is a file"));
     }
 
     #[test]
     fn browse_starts_at_the_folders_parent_and_keeps_the_name() {
         let tmp = tempfile::tempdir().unwrap();
-        let mut dialog = WorktreeDialog::new(
-            seed(WorktreeStart::Branch("feature".into()), "feature", false),
-            &tmp.path().join("repo"),
-        );
+        ids(&["abcdef01"]);
+        let mut dialog = on_main(&tmp.path().join("repo"));
         assert_eq!(
             dialog.on_key(KeyEvent::new(KeyCode::Char('b'), KeyModifiers::CONTROL)),
             WorktreeOutcome::Browse(tmp.path().to_path_buf())
@@ -1016,26 +1852,55 @@ mod tests {
         dialog.set_parent(&tmp.path().join("elsewhere"));
         assert_eq!(
             PathBuf::from(&dialog.path),
-            tmp.path().join("elsewhere").join("repo-feature")
+            tmp.path().join("elsewhere").join("repo-worktree-abcdef01")
         );
+    }
+
+    #[test]
+    fn the_seed_for_the_current_branch_is_busy_and_proposes_no_name_of_its_own() {
+        use gitpoulpi_core::domain::{Ref, RefKind};
+        let branch = |name: &str, head: bool| Ref {
+            kind: RefKind::LocalBranch { name: name.into() },
+            target: Oid([1; 20]),
+            visibility: Default::default(),
+            is_head: head,
+            upstream: None,
+            tag_sync: None,
+            multi_remote: None,
+        };
+        let refs = vec![branch("main", true), branch("main-wt", false)];
+        let seed = seed_from_head(&refs, &[]).unwrap();
+        assert_eq!(seed.start, WorktreeStart::Branch("main".into()));
+        assert_eq!(seed.new_branch, "", "the dialog proposes worktree-<id>");
+        assert!(seed.branch_busy);
+        assert_eq!(seed_to_choose(&refs, &[]).unwrap(), seed);
     }
 
     #[test]
     fn it_renders_and_every_button_is_where_it_is_hit() {
         let tmp = tempfile::tempdir().unwrap();
         for width in [72u16, 140] {
-            let mut dialog = WorktreeDialog::new(
+            ids(&["feedbeef"]);
+            let mut dialog = WorktreeDialog::with_choices(
                 seed(WorktreeStart::Branch("feature".into()), "feature", false),
                 &tmp.path().join("repo"),
+                Vec::new(),
+                false,
             );
+            dialog.sync_ai(true, false);
             let mut buf = Buffer::empty(Rect::new(0, 0, width, 30));
-            let rect = worktree_rect(buf.area);
+            let rect = dialog.rect(buf.area);
             dialog.render(rect, &mut buf);
             let text = dialog_kit::buffer_text(&buf);
             for needle in [
                 "Create worktree from feature",
                 "Folder",
-                "New branch",
+                "Worktree branch",
+                "Name after branch",
+                "Regenerate",
+                "Name with AI",
+                "checks out this branch",
+                "not used",
                 "Open the new worktree as a tab",
                 "Will create",
                 "Browse",
@@ -1062,6 +1927,13 @@ mod tests {
                 WorktreeOutcome::Stay
             );
             assert!(!dialog.open_tab, "a click on the checkbox toggles it");
+            // Name after branch: `feature` is the branch field's value.
+            dialog.on_mouse(at(&dialog, WtFocus::NameAfter));
+            assert_eq!(dialog.name, "worktree-feature");
+            // Regenerate leaves the caller's branch and renames the Name.
+            dialog.on_mouse(at(&dialog, WtFocus::Regenerate));
+            assert_ne!(dialog.name, "worktree-feature");
+            assert_eq!(dialog.branch, "feature");
             assert!(matches!(
                 dialog.on_mouse(at(&dialog, WtFocus::Create)),
                 WorktreeOutcome::Submit { .. }
@@ -1073,139 +1945,149 @@ mod tests {
         }
     }
 
-    fn type_into(dialog: &mut WorktreeDialog, focus: WtFocus, text: &str) {
-        dialog.focus = focus;
-        for c in text.chars() {
-            dialog.on_key(key(KeyCode::Char(c)));
-        }
-    }
-
-    fn two_branches() -> Vec<BranchChoice> {
-        vec![
-            BranchChoice {
-                name: "main".into(),
-                busy: true,
-            },
-            BranchChoice {
-                name: "other".into(),
-                busy: false,
-            },
-        ]
+    /// Draws the dialog and finds `part`'s rect.
+    fn drawn(dialog: &mut WorktreeDialog, part: WtFocus) -> Rect {
+        let mut buf = Buffer::empty(Rect::new(0, 0, 140, 40));
+        let rect = dialog.rect(buf.area);
+        dialog.render(rect, &mut buf);
+        dialog.hits.iter().find(|(_, p)| *p == part).unwrap().0
     }
 
     #[test]
-    fn the_folder_follows_the_name_until_the_folder_is_edited() {
+    fn the_ai_button_exists_only_while_ai_is_on() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dialog = on_main(&tmp.path().join("repo"));
+        assert!(!dialog.order().contains(&WtFocus::AiToggle));
+        dialog.sync_ai(true, false);
+        assert!(dialog.order().contains(&WtFocus::AiToggle));
+        dialog.activate(WtFocus::AiToggle);
+        assert_eq!(dialog.focus, WtFocus::Describe);
+        assert!(dialog.order().contains(&WtFocus::Describe));
+        // Switched off while open: the box goes and the focus moves.
+        dialog.sync_ai(false, false);
+        assert!(!dialog.ai_open);
+        assert_eq!(dialog.focus, WtFocus::Name);
+        // The box makes the dialog taller.
+        let frame = Rect::new(0, 0, 140, 40);
+        let closed = dialog.rect(frame).height;
+        dialog.sync_ai(true, false);
+        dialog.activate(WtFocus::AiToggle);
+        assert!(dialog.rect(frame).height > closed);
+    }
+
+    #[test]
+    fn describing_the_work_asks_the_ai_and_the_answer_fills_both_fields() {
         let tmp = tempfile::tempdir().unwrap();
         let root = tmp.path().join("repo");
-        let mut dialog = WorktreeDialog::with_choices(
-            seed(WorktreeStart::Branch("other".into()), "other", false),
-            &root,
-            two_branches(),
-            false,
-        );
-        assert_eq!(dialog.name, "other");
-        assert_eq!(PathBuf::from(&dialog.path), tmp.path().join("repo-other"));
-        // Typing in Name re-proposes the Folder.
-        type_into(&mut dialog, WtFocus::Name, "-2");
-        assert_eq!(dialog.name, "other-2");
-        assert_eq!(PathBuf::from(&dialog.path), tmp.path().join("repo-other-2"));
-        // Editing the Folder by hand stops the sync for good.
-        type_into(&mut dialog, WtFocus::Path, "x");
-        let edited = dialog.path.clone();
-        assert!(edited.ends_with("repo-other-2x"), "{edited}");
-        type_into(&mut dialog, WtFocus::Name, "y");
-        assert_eq!(
-            dialog.path, edited,
-            "the Folder was edited: Name no longer moves it"
-        );
-    }
-
-    #[test]
-    fn changing_the_ref_re_proposes_the_name_and_checks_the_busy_branch() {
-        let tmp = tempfile::tempdir().unwrap();
-        let root = tmp.path().join("repo");
-        let mut dialog = WorktreeDialog::with_choices(
-            seed(WorktreeStart::Branch("main".into()), "main", true),
-            &root,
-            two_branches(),
-            false,
-        );
-        assert!(dialog.plan().unwrap_err().contains("name a new branch"));
-        dialog.pick_ref("b:other");
-        assert_eq!(dialog.start, WorktreeStart::Branch("other".into()));
-        assert_eq!(dialog.name, "other");
-        assert_eq!(PathBuf::from(&dialog.path), tmp.path().join("repo-other"));
-        let (path, opts) = dialog.plan().unwrap();
-        assert_eq!(path, tmp.path().join("repo-other"));
-        assert_eq!(opts.start, WorktreeStart::Branch("other".into()));
-        assert_eq!(opts.new_branch, None);
-        // A hand-typed Name is not replaced by the next ref.
-        type_into(&mut dialog, WtFocus::Name, "!");
-        dialog.pick_ref("b:main");
-        assert_eq!(dialog.name, "other!");
-    }
-
-    #[test]
-    fn the_commit_the_dialog_was_opened_on_is_a_choice_and_gets_a_short_name() {
-        let tmp = tempfile::tempdir().unwrap();
-        let oid = Oid::from_hex(&"c".repeat(40)).unwrap();
-        let dialog = WorktreeDialog::with_choices(
-            seed(WorktreeStart::Commit(oid), "ccccccc", false),
-            &tmp.path().join("repo"),
-            two_branches(),
-            false,
-        );
-        assert_eq!(dialog.name, "ccccccc");
-        assert!(dialog
-            .combo
-            .options
-            .iter()
-            .any(|o| o.value == format!("c:{}", oid.to_hex())));
-        let (_, opts) = dialog.plan().unwrap();
-        assert_eq!(opts.start, WorktreeStart::Commit(oid));
-        assert_eq!(opts.new_branch, None, "detached unless a branch is named");
-    }
-
-    #[test]
-    fn the_seed_for_the_current_branch_proposes_a_free_new_branch() {
-        use gitpoulpi_core::domain::{Ref, RefKind};
-        let branch = |name: &str, head: bool| Ref {
-            kind: RefKind::LocalBranch { name: name.into() },
-            target: Oid([1; 20]),
-            visibility: Default::default(),
-            is_head: head,
-            upstream: None,
-            tag_sync: None,
-            multi_remote: None,
+        let mut dialog = on_main(&root);
+        dialog.sync_ai(true, false);
+        // Nothing described yet: an inline reason, no request.
+        dialog.activate(WtFocus::AiToggle);
+        assert_eq!(dialog.activate(WtFocus::AiRun), WorktreeOutcome::Stay);
+        assert!(dialog.ai_error.is_some());
+        // Alt+A twin, typed text (Enter is a newline), then the button.
+        type_into(&mut dialog, WtFocus::Describe, "fix the crash");
+        dialog.on_key(key(KeyCode::Enter));
+        type_into(&mut dialog, WtFocus::Describe, "on empty config");
+        assert_eq!(dialog.ai_text, "fix the crash\non empty config");
+        let out = dialog.activate(WtFocus::AiRun);
+        let WorktreeOutcome::NameWithAi {
+            description,
+            branches,
+        } = out
+        else {
+            panic!("{out:?}")
         };
-        let refs = vec![branch("main", true), branch("main-wt", false)];
-        let seed = seed_from_head(&refs, &[]).unwrap();
-        assert_eq!(seed.start, WorktreeStart::Branch("main".into()));
-        assert_eq!(seed.new_branch, "main-wt2", "the first proposal was taken");
-        assert!(seed.branch_busy);
-        assert_eq!(seed_to_choose(&refs, &[]).unwrap().new_branch, "");
+        assert_eq!(description, "fix the crash\non empty config");
+        assert_eq!(branches, ["main", "other", "feature/login"]);
+        assert!(dialog.ai_running);
+        // The same button now stops it; Esc stops it without closing.
+        assert_eq!(dialog.activate(WtFocus::AiRun), WorktreeOutcome::StopAi);
+        dialog.focus = WtFocus::Name;
+        assert_eq!(dialog.on_key(key(KeyCode::Esc)), WorktreeOutcome::StopAi);
+
+        // The answer: Name as worktree-<slug>, the branch as a new branch.
+        assert!(dialog.ai_done(Ok(("crash-on-empty-config".into(), "fix/empty-config".into()))));
+        assert_eq!(dialog.name, "worktree-crash-on-empty-config");
+        assert_eq!(dialog.branch, "fix/empty-config");
+        assert!(dialog.path.ends_with("repo-worktree-crash-on-empty-config"));
+        assert!(!dialog.ai_open && !dialog.ai_running);
+        let (_, opts) = dialog.plan().unwrap();
+        assert_eq!(opts.new_branch.as_deref(), Some("fix/empty-config"));
+        // An answer nobody asked for is dropped.
+        assert!(!dialog.ai_done(Ok(("x".into(), "y".into()))));
+        // The AI's names are replaceable by Regenerate (not "typed").
+        dialog.activate(WtFocus::Regenerate);
+        assert!(is_generated_worktree_name(&dialog.name));
+        assert!(is_generated_worktree_name(&dialog.branch));
     }
 
     #[test]
-    fn validation_says_why_inline() {
+    fn an_ai_answer_never_silently_checks_out_an_existing_branch() {
         let tmp = tempfile::tempdir().unwrap();
-        let mut dialog = WorktreeDialog::with_choices(
-            seed(WorktreeStart::Branch("other".into()), "other", false),
-            &tmp.path().join("repo"),
-            two_branches(),
-            false,
-        );
-        dialog.name = "a/b".into();
-        assert!(dialog.plan().unwrap_err().contains("slashes"));
-        dialog.name = String::new();
-        assert!(dialog.plan().unwrap_err().contains("name"));
-        dialog.name = "ok".into();
-        dialog.new_branch = "main".into();
-        assert!(dialog.plan().unwrap_err().contains("already exists"));
-        let file = tmp.path().join("file");
-        std::fs::write(&file, "x").unwrap();
-        dialog.new_branch.clear();
-        dialog.path = file.display().to_string();
-        assert!(dialog.plan().unwrap_err().contains("is a file"));
+        let mut dialog = on_main(&tmp.path().join("repo"));
+        dialog.sync_ai(true, false);
+        dialog.ai_text = "x".into();
+        dialog.activate(WtFocus::AiToggle);
+        dialog.activate(WtFocus::AiRun);
+        dialog.ai_done(Ok(("worktree-thing".into(), "other".into())));
+        assert_eq!(dialog.branch, "other-2");
+        assert_eq!(dialog.name, "worktree-thing");
+        assert!(!dialog.checks_out_existing());
+    }
+
+    #[test]
+    fn an_ai_failure_is_an_inline_error_and_a_cancel_is_silent() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dialog = on_main(&tmp.path().join("repo"));
+        dialog.sync_ai(true, false);
+        dialog.ai_text = "x".into();
+        dialog.activate(WtFocus::AiToggle);
+        dialog.activate(WtFocus::AiRun);
+        let before = (dialog.name.clone(), dialog.branch.clone());
+        assert!(dialog.ai_done(Err("no profile".into())));
+        assert_eq!(dialog.ai_error.as_deref(), Some("AI: no profile"));
+        assert_eq!((dialog.name.clone(), dialog.branch.clone()), before);
+        assert!(dialog.ai_open, "the box stays open to try again");
+        let run = drawn(&mut dialog, WtFocus::AiRun);
+        assert!(run.width > 0);
+        dialog.activate(WtFocus::AiRun);
+        assert!(dialog.ai_done(Err("canceled".into())));
+        assert_eq!(dialog.ai_error, None);
+        // The request ending behind our back (the host says so) frees it.
+        dialog.activate(WtFocus::AiRun);
+        dialog.sync_ai(true, false);
+        assert!(!dialog.ai_running);
+    }
+
+    #[test]
+    fn the_description_box_draws_and_its_buttons_are_hit() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dialog = on_main(&tmp.path().join("repo"));
+        dialog.sync_ai(true, false);
+        dialog.activate(WtFocus::AiToggle);
+        // The placeholder shows while the box is not the focused field.
+        dialog.focus = WtFocus::Name;
+        let mut buf = Buffer::empty(Rect::new(0, 0, 100, 40));
+        let rect = dialog.rect(buf.area);
+        dialog.render(rect, &mut buf);
+        let text = dialog_kit::buffer_text(&buf);
+        for needle in [
+            "Describe the feature, bug or task",
+            "e.g. fix the crash",
+            "Name it",
+            "Hide",
+        ] {
+            assert!(text.contains(needle), "{needle}\n{text}");
+        }
+        let hide = drawn(&mut dialog, WtFocus::AiHide);
+        dialog.on_mouse(MouseEvent {
+            kind: MouseEventKind::Down(MouseButton::Left),
+            column: hide.x + 1,
+            row: hide.y,
+            modifiers: KeyModifiers::NONE,
+        });
+        assert!(!dialog.ai_open);
+        assert_eq!(dialog.focus, WtFocus::AiToggle);
     }
 }

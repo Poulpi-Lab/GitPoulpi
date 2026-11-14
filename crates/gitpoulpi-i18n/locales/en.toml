@@ -1732,7 +1732,7 @@ branch_field = "Worktree branch"
 # context: hint under the branch field; {r} is the branch or commit the new branch starts from
 hint_new_branch = "new branch from {r}"
 # context: hint under the branch field: the name is a branch that already exists
-hint_existing_branch = "checks out this existing branch"
+hint_existing_branch = "checks out this branch"
 # context: shown in place of the Ref choice when an existing branch is chosen
 ref_unused = "not used: the existing branch is checked out as it is"
 # context: button: sets the worktree name from the branch name

@@ -443,6 +443,10 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         if !cx.repo_dialogs.pull_request_open() && cx.ai_ui.running_pull_request() {
             cx.ai_ui.cancel();
         }
+        // Closing the dialog stops a naming still running.
+        if !cx.repo_dialogs.worktree_open() && cx.ai_ui.running_worktree_name() {
+            cx.ai_ui.cancel();
+        }
         if !cx.repo_dialogs.is_open() {
             refresh_management(cx.session, &mut *cx.management);
         }

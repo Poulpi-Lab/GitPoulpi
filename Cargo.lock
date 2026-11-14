@@ -1585,6 +1585,7 @@ dependencies = [
  "async-trait",
  "crossterm",
  "encoding_rs",
+ "getrandom 0.4.3",
  "gif",
  "gitpoulpi-ai",
  "gitpoulpi-cli-backend",

@@ -266,6 +266,9 @@ impl WindowState {
             // The Remotes dialog reads the branch's remotes from the daemon.
             dialog.poll();
         }
+        // The Create worktree dialog's ✦ follows AI on / off and the running state.
+        self.repo_dialogs
+            .sync_worktree_ai(self.ai_ui.enabled(), self.ai_ui.running_worktree_name());
         if let Some(outcome) = self.ai_ui.poll() {
             // A failed job is a card (the status line is cleared below).
             if let AiOutcome::Done(_, Err(why)) = &outcome {
@@ -420,6 +423,16 @@ impl WindowState {
                     self.ai_ui.fill_popup(Err(why.clone()));
                     self.last_message = Some(String::new());
                 }
+                AiOutcome::Done(_, Ok(AiAnswer::WorktreeName(names))) => {
+                    self.repo_dialogs
+                        .worktree_named(Ok((names.name, names.branch)));
+                    self.last_message = Some(String::new());
+                }
+                AiOutcome::Done(AiRequest::WorktreeName { .. }, Err(why)) => {
+                    // Shown inside the dialog, not on the status line.
+                    self.repo_dialogs.worktree_named(Err(why.clone()));
+                    self.last_message = Some(String::new());
+                }
                 AiOutcome::Done(_, Err(_)) => {
                     self.last_message = Some(String::new());
                 }
@@ -439,6 +452,9 @@ impl WindowState {
                     if matches!(request, AiRequest::PullRequest { .. }) {
                         self.repo_dialogs
                             .pull_request_generated(Err("canceled".into()));
+                    }
+                    if matches!(request, AiRequest::WorktreeName { .. }) {
+                        self.repo_dialogs.worktree_named(Err("canceled".into()));
                     }
                     self.last_message =
                         Some(gitpoulpi_i18n::msg::window::AI_CANCELED.get().to_string());

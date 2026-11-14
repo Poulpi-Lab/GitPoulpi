@@ -23,6 +23,29 @@ pub(in crate::event_loop) fn apply_effect(cx: &mut CommandCtx<'_>, effect: Dialo
                     .unwrap_or_else(|| msg::input::COULD_NOT_START.get().to_string())));
             }
         }
+        DialogEffect::NameWorktree {
+            description,
+            branches,
+        } => {
+            cx.ai_ui.start_into(
+                cx.session,
+                cx.repo,
+                AiRequest::WorktreeName {
+                    description,
+                    branches,
+                },
+                &mut *cx.last_message,
+            );
+            // Not started (AI off, another request running): the dialog
+            // must not stay "asking".
+            if !cx.ai_ui.running_worktree_name() {
+                cx.repo_dialogs.worktree_named(Err(cx
+                    .last_message
+                    .take()
+                    .unwrap_or_else(|| msg::input::COULD_NOT_START.get().to_string())));
+            }
+        }
+        DialogEffect::StopWorktreeAi => cx.ai_ui.cancel(),
         DialogEffect::OpenIntegrations => {
             super::apply_card_command(cx, crate::activity_log::Command::OpenIntegrations);
         }

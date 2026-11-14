@@ -488,7 +488,7 @@ Tangenterna är standardvärdena.
 | Sidopanel: Visa/dölj lokala grenar |  |
 | Sidopanel: Visa/dölj remotes |  |
 | Sidopanel: Visa/dölj worktrees |  |
-| Sidebar: Show Worktrees Section |  |
+| Sidopanel: Visa avsnittet Worktrees |  |
 | Sidopanel: Visa/dölj stashes |  |
 | Sidopanel: Visa/dölj tags |  |
 | Sidopanel: Visa/dölj pull requests |  |
@@ -532,12 +532,12 @@ Tangenterna är standardvärdena.
 | Refs: Reflog för vald gren... |  |
 | Refs: Starta en pull request från vald gren... |  |
 | Refs: Öppna worktree i flik | `Enter / dubbelklick` |
-| Refs: Open Worktree In... |  |
-| Refs: Merge Worktree Branch Into... |  |
-| Refs: Remove Worktree... |  |
-| Refs: Create Worktree... | `+` |
-| Refs: Create Worktree from Current Branch |  |
-| Refs: Create Worktree Choosing a Branch |  |
+| Refs: Öppna worktree i... |  |
+| Refs: Merge worktreens gren i... |  |
+| Refs: Ta bort worktree... |  |
+| Refs: Skapa worktree... | `+` |
+| Refs: Skapa worktree från aktuell gren |  |
+| Refs: Skapa worktree och välj en gren |  |
 | Refs: Uppdatera submodul (vald) |  |
 | Refs: Initiera submodul (vald) |  |
 | Refs: Öppna submodul i flik | `Enter / dubbelklick` |

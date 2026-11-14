@@ -68,6 +68,8 @@ läsordning: börja överst och hoppa till referenssidorna när du behöver dem.
     Vad som går igenom tmux, zellij, screen, herdr och terminalpaneler:
     **[Multiplexers](multiplexers.md)**.
 
+Också: **[Worktrees](worktrees.md)**: skapa, öppna, merga och ta bort länkade worktrees.
+
 Också: **[Flera remotes för en gren](multiple-remotes.md)**: push-mål och pull-källor, dialogen
 Remotes, Push till alla eller till valda remotes, lösa en remote som flyttat sig, Fortsätt efter en
 konflikt, CLI och ett rent git-alias.

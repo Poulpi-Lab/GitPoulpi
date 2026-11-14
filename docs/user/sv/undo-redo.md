@@ -257,7 +257,10 @@ arbetsflödes avslut som också tar bort remote-grenen går att ångra som helhe
 - **Att avbryta en rebase**: ångra erbjuds inte för den (en rebase flyttar grenar
   och har sitt eget tillstånd; avbrottet är självt vägen tillbaka). Att avbryta
   en **merge, cherry-pick eller revert** *registreras*, se ovan.
-- **Att skapa en worktree**, **att skapa en patchfil**, clone, init,
+- **Att skapa en worktree**, **att ta bort en worktree** (det som sparades
+  först finns kvar: commiten, stashen; grenen som raderades samtidigt
+  journalförs, så Ångra ger tillbaka grenen, inte mappen), **att skapa en
+  patchfil**, clone, init,
   värdtjänståtgärder (pull requests, ärenden) och AI-anrop: de ingår inte i
   repositoryts historik.
 - **Att skapa en ny tom fil** från filmenyn, den automatiska borttagningen av

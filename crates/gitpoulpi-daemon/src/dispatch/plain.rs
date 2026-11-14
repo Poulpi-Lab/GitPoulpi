@@ -408,7 +408,21 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
         OperationKind::BranchCreateTracking => {
             let local_name: String = arg_or_err!(args, "local_name", request.id);
             let upstream: String = arg_or_err!(args, "upstream", request.id);
-            to_json!(backend.branch_create_tracking(&repo, &local_name, &upstream))
+            let created = backend.branch_create_tracking(&repo, &local_name, &upstream);
+            if created.is_ok() {
+                if let Ok(known) = crate::remote_keys::remote_names(backend, &repo) {
+                    if let Some(primary) = crate::remote_keys::remote_of_upstream(&upstream, &known)
+                    {
+                        crate::remote_keys::apply_default_targets(
+                            backend,
+                            &repo,
+                            &local_name,
+                            &primary,
+                        );
+                    }
+                }
+            }
+            to_json!(created)
         }
         OperationKind::BranchDelete => {
             let name: String = arg_or_err!(args, "name", request.id);

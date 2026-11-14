@@ -72,7 +72,11 @@ GitPoulpi - Git-клиент для терминала с интерактивн
     Что проходит через tmux, zellij, screen, herdr и панели терминалов:
     **[Мультиплексоры](multiplexers.md)**.
 
-Также: **[Рабочие процессы ветвления](branching-workflows.md)** - шаблоны Git Flow, GitHub Flow, GitLab Flow и
+Также: **[Несколько remote для одной ветки](multiple-remotes.md)**: цели push и источники pull,
+диалог Remote, Push во все remote или в выбранные, разбор remote, который ушёл вперёд, «Продолжить»
+после конфликта, CLI и алиас на обычном git.
+
+**[Рабочие процессы ветвления](branching-workflows.md)** - шаблоны Git Flow, GitHub Flow, GitLab Flow и
 Trunk-based или собственные базовые ветки, шаблоны имён веток и типы веток (`gitpoulpi flow ...`).
 
 **[Переписывание истории](history-rewrite.md)**: окно переписывания (`Ctrl+G Shift+H`),

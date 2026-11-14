@@ -23,11 +23,12 @@ Das **+** in der Überschrift von WORKTREES (Tastatur: `+` im Abschnitt; Palette
 **Refs: Worktree erstellen...**) öffnet ein Menü:
 
 - **Aus dem aktuellen Branch**: Der Branch ist im Hauptordner ausgecheckt, daher
-  schlägt der Dialog einen neuen Branch darauf vor (`<Branch>-wt`).
+  schlägt der Dialog einen neuen Branch darauf vor (`worktree-<id>`).
 - **Aus dem ausgewählten Commit**: ausgegraut, bis im Log ein Commit ausgewählt
-  ist. Der Worktree startet dort losgelöst, außer Sie benennen einen neuen
-  Branch.
-- **Branch wählen...**: Der Dialog öffnet sich auf seiner Liste **Ref**.
+  ist. Der Dialog schlägt einen neuen Branch `worktree-<id>` vor, der dort
+  startet; leeren Sie das Branch-Feld für einen losgelösten Worktree.
+- **Branch wählen...**: Der Dialog öffnet sich auf seiner Liste **Worktree-Branch**,
+  um einen schon vorhandenen Branch zu öffnen.
 
 Die Palette hat dieselben drei (**Refs: Worktree aus aktuellem Branch
 erstellen**, **Git: Worktree am ausgewählten Commit erstellen...**, **Refs:
@@ -35,19 +36,36 @@ Worktree mit Branch-Auswahl erstellen**). Die älteren Einträge funktionieren
 weiterhin: **Worktree aus ... erstellen...** im Menü eines Branches, Tags oder
 Commits.
 
-Der Dialog schlägt alles vor und lässt Sie es ändern:
+Der Dialog schlägt alles vor und lässt Sie es ändern. **Name** und neuer Branch
+beginnen beide als `worktree-<id>`, wobei `<id>` 8 zufällige Hexziffern sind
+(bei beiden dieselben), sodass zwei Worktrees nie kollidieren.
 
 | Feld | Bedeutung |
 |---|---|
-| **Name** | Der Ordnername wird daraus gebildet. Vorgeschlagen aus dem Branch oder der Kurz-ID. |
+| **Name** | Der Ordnername wird daraus gebildet. **Name nach Branch** (`Alt+N`) setzt ihn auf `worktree-<Branch>`: Schrägstriche werden zu `-`, und das Wort wird nicht verdoppelt (`worktree-foo` und `feature/worktree-x` behalten ihren eigenen, `feature/login` ergibt `worktree-feature-login`). |
 | **Ordner** | Ein Nachbar des Repositorys, `<Repository>-<Name>`. Er folgt dem Namen, bis Sie im Feld Ordner selbst tippen; **Durchsuchen** wählt den Ort. |
-| **Ref** | Der Branch oder Commit, ab dem der Worktree startet (eine Liste; zum Suchen tippen). Eine Änderung schlägt einen neuen Namen vor. |
-| **Neuer Branch** | Leer checkt den Branch der Ref dort aus (oder löst sich auf einem Commit). Pflicht, wenn der Branch bereits ausgecheckt ist. |
+| **Ref** | Wo ein *neuer* Branch startet: ein Branch oder ein Commit (eine Liste; zum Suchen tippen). Sie wird nicht verwendet, und das steht dort, solange ein vorhandener Branch gewählt ist. |
+| **Worktree-Branch** | Ein Feld, zwei Bedeutungen, darunter benannt. Ein Name, der kein lokaler Branch ist, erstellt einen neuen Branch ab der Ref (**neuer Branch ab main**). Ein lokaler Branch, der anderswo nicht ausgecheckt ist (in der Liste wählen oder seinen Namen tippen), wird dort unverändert ausgecheckt (**checkt diesen Branch aus**). Die erste Zeile der Liste oder ein leeres Feld checkt den Branch der Ref aus (oder löst sich auf einem Commit); es wird abgelehnt, wenn dieser Branch bereits ausgecheckt ist. |
+| **Neu würfeln** | `Alt+R`. Würfelt eine neue `<id>` und ersetzt damit Name und Branch, außer was Sie selbst getippt haben (ein von Ihnen geschriebener Name oder Branch bleibt) und einen vorhandenen Branch (wird nie ersetzt). Ein Name aus **Name nach Branch** oder von der KI gilt als erzeugt. |
+| **Name per KI** | Nur bei eingeschalteter KI (siehe unten). |
 | **Den neuen Worktree als Tab öffnen** | Standardmäßig an. |
 
-Ein Ordner, der nicht leer ist, ein ungültiger Name oder ein Branch, den es
-schon gibt, wird in der eigenen Zeile des Dialogs gemeldet, und **Erstellen**
-bleibt ausgegraut.
+Ein Ordner, der nicht leer ist, ein ungültiger Name, ein Branch-Name, den Git
+ablehnt, oder ein Branch, den ein anderer Worktree hat, wird in der eigenen Zeile
+des Dialogs gemeldet, und **Erstellen** bleibt ausgegraut.
+
+### Mit KI benennen
+
+Bei eingeschalteter [KI](ai.md) öffnet **Name per KI** (`Alt+A`) ein Feld im
+Dialog: *Feature, Bug oder Aufgabe beschreiben*. **Benennen** bittet das Modell
+um einen kurzen Worktree-Namen und einen Branch-Namen, der den eigenen
+Branch-Namen des Repositorys folgt (`feature/`, `fix/`, Kleinbuchstaben mit
+Bindestrichen). Sie füllen den Namen (als `worktree-<name>`) und das Branch-Feld,
+weiter bearbeitbar; ein Branch-Name, den es schon gibt, bekommt das Suffix `-2`,
+damit die Antwort nie stillschweigend etwas auscheckt. Das Feld zeigt den
+Zustand „beschäftigt“, **Stopp** (oder `Esc`) bricht ab, und ein Fehler wird im
+Dialog angezeigt. Gesendet werden nur Ihre Beschreibung und die Namen der
+lokalen Branches.
 
 ## Das Menü der Zeile
 
@@ -110,5 +128,7 @@ den Ordner). Das Erstellen eines Worktrees gehört ebenfalls nicht zum Verlauf.
 `gitpoulpi worktree changes <path>` listet die nicht committeten Änderungen eines
 Worktrees auf. `gitpoulpi worktree remove <path> [--force] [--commit-message M
 [--commit-branch B]] [--stash-message M] [--delete-branch]` entfernt ihn; die
-MCP-Tools heißen `worktree_changes` und `worktree_remove`. Siehe die
-[CLI-Referenz](cli-reference.md).
+MCP-Tools heißen `worktree_changes` und `worktree_remove`. `gitpoulpi ai
+worktree-name --describe "<task>"` gibt die Worktree- und Branch-Namen aus, die die
+KI vorschlägt (`{ name, worktree, branch }`), und erstellt nichts; das MCP-Tool ist
+`ai_worktree_name`. Siehe die [CLI-Referenz](cli-reference.md).

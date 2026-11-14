@@ -176,7 +176,7 @@ Bei einem Commit ohne Ref zeigt das Überfahren seiner Zeile außerdem eine blas
 **Remotes.** Das `+` im Titel REMOTE fügt eines hinzu; Rechtsklick auf den Namen
 eines Remotes, um es zu fetchen, seinen Weblink zu kopieren, es zum Standard-Remote
 zu machen, es im Graph auszublenden, seine URLs zu bearbeiten oder es zu
-entfernen. **Ein Remote ausblenden** (das Auge seiner Zeile, im Menü *Remote im Graph ausblenden* oder in der Palette `Remote: Remote im Graph ausblenden...`) blendet jeden Branch aus, den es jetzt hat oder später bekommt, und die Commits, die nur es erreicht, verlassen das Log: so durchsuchen Sie einen Verlauf ohne den eines fremden Archiv-Remotes und holen ihn mit *Remote im Graph einblenden* zurück. Das Einblenden eines Remotes zeigt auch die Branches von ihm wieder, die einzeln ausgeblendet waren. Ein Branch eines ausgeblendeten Remotes sagt das in der Statuszeile, wenn sein Auge benutzt wird: Blenden Sie zuerst das Remote ein.
+entfernen. **Ein Remote ausblenden** (das ⊙ seiner Zeile, im Menü *Remote im Graph ausblenden* oder in der Palette `Remote: Remote im Graph ausblenden...`) blendet jeden Branch aus, den es jetzt hat oder später bekommt, und die Commits, die nur es erreicht, verlassen das Log: so durchsuchen Sie einen Verlauf ohne den eines fremden Archiv-Remotes und holen ihn mit *Remote im Graph einblenden* zurück. Das Einblenden eines Remotes zeigt auch die Branches von ihm wieder, die einzeln ausgeblendet waren. Ein Branch eines ausgeblendeten Remotes sagt das in der Statuszeile, wenn sein ⊙ benutzt wird: Blenden Sie zuerst das Remote ein.
 
 **Stashes.** **Stash** stasht alles (unversionierte Dateien eingeschlossen);
 `Ctrl+G m` fragt zuerst nach einer Nachricht (bei eingeschalteter KI schlägt

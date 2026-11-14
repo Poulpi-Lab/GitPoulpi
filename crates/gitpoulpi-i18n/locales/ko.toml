@@ -5461,6 +5461,8 @@ no_longer = "{path}은(는) 더 이상 서브모듈이 아닙니다"
 
 [combo]
 type_to_search = "입력하여 검색"
+# context: placeholder of the search line of a dropdown that also accepts typed text
+type_to_use_own = "type your own value"
 loading = "불러오는 중..."
 no_match = "일치 항목 없음"
 use_value = "\"{value}\" 사용"

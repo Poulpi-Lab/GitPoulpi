@@ -175,10 +175,22 @@ impl FixtureRepo {
     /// repository last saw. The fixture's own remote-tracking refs stay put
     /// until a backend fetches.
     pub fn push_from_elsewhere(&self, branch: &str, message: &str) {
-        let remote = self
-            .remote
-            .as_ref()
-            .expect("this fixture was not built with_origin()");
+        self.push_from_elsewhere_to("origin", branch, message);
+    }
+
+    /// [`Self::push_from_elsewhere`] for any remote of the fixture:
+    /// `origin` (`with_origin`) or one made by `with_remote(name)`. The
+    /// branch must already exist on that remote.
+    pub fn push_from_elsewhere_to(&self, remote_name: &str, branch: &str, message: &str) {
+        let remote = if remote_name == "origin" {
+            self.remote.as_ref()
+        } else {
+            self.extra_remotes
+                .iter()
+                .find(|(n, _)| n == remote_name)
+                .map(|(_, p)| p)
+        }
+        .unwrap_or_else(|| panic!("this fixture has no remote `{remote_name}`"));
         let parent = self._dir.path();
         let mut n = 0;
         let scratch = loop {
@@ -859,6 +871,32 @@ impl FixtureRepoBuilder {
             .open(&config_path)?;
         file.write_all(section.as_bytes())?;
         self.extra_remotes.push((name.to_string(), remote));
+        Ok(self)
+    }
+
+    /// Installs `script` (a shell script body, `#!/bin/sh` is prepended) as
+    /// the `pre-receive` hook of the bare remote `remote` (`origin` or a
+    /// `with_remote` name), so a push to it can be made to refuse. Needs
+    /// `sh` on the machine running the test.
+    pub fn with_pre_receive_hook(self, remote: &str, script: &str) -> Result<Self> {
+        let path = if remote == "origin" {
+            self.remote.clone()
+        } else {
+            self.extra_remotes
+                .iter()
+                .find(|(n, _)| n == remote)
+                .map(|(_, p)| p.clone())
+        }
+        .unwrap_or_else(|| panic!("this fixture has no remote `{remote}`"));
+        let hooks = path.join("hooks");
+        std::fs::create_dir_all(&hooks)?;
+        let hook = hooks.join("pre-receive");
+        std::fs::write(&hook, format!("#!/bin/sh\n{script}\n"))?;
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&hook, std::fs::Permissions::from_mode(0o755))?;
+        }
         Ok(self)
     }
 

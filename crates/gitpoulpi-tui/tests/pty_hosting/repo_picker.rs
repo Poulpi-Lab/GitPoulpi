@@ -348,7 +348,7 @@ fn picking_from_a_combo_popup_over_the_generate_button_never_starts_ai() {
     // The host's repositories are listed, and a row lies over the button.
     term.wait_for("the popup drawn over the button", STEP, |s| {
         !s.line(gy).contains("Generate title and description")
-            && s.contains("type to search")
+            && s.contains("type your own value")
             && s.line(gy).contains("team/tool")
     })
     .unwrap_or_else(|e| panic!("{e}"));

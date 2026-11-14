@@ -23,7 +23,7 @@ mod objects;
 mod pack;
 mod plumbing;
 mod purge;
-mod push;
+pub(crate) mod push;
 mod refs;
 mod rules;
 mod scan;

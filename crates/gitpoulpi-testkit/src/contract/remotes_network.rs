@@ -1910,7 +1910,14 @@ pub fn check_pull_modes_on_a_diverged_branch(backend: &dyn GitBackend) {
         repo
     };
     let pull = |repo: &crate::FixtureRepo, mode: PullMode| {
-        block_on(backend.pull(&repo.repo_ref(), &PullOptions { mode, remote: None }))
+        block_on(backend.pull(
+            &repo.repo_ref(),
+            &PullOptions {
+                mode,
+                remote: None,
+                remote_branch: None,
+            },
+        ))
     };
 
     let repo = build();
@@ -1961,6 +1968,7 @@ pub fn check_pull_fast_forwards_and_accepts_an_explicit_remote(backend: &dyn Git
         &PullOptions {
             mode: PullMode::FastForwardOnly,
             remote: Some("origin".into()),
+            ..PullOptions::default()
         },
     ))
     .expect("pull from an explicit remote");
@@ -2030,6 +2038,7 @@ pub fn check_a_failed_network_operation_carries_detail_without_secrets(backend: 
         &PullOptions {
             mode: PullMode::Merge,
             remote: Some("origin".into()),
+            ..PullOptions::default()
         },
     ))
     .expect_err("pulling from a closed port must fail");

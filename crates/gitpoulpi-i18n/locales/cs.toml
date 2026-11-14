@@ -5462,6 +5462,8 @@ no_longer = "{path} už není submodul"
 
 [combo]
 type_to_search = "pište pro hledání"
+# context: placeholder of the search line of a dropdown that also accepts typed text
+type_to_use_own = "type your own value"
 loading = "načítání..."
 no_match = "žádná shoda"
 use_value = "Použít „{value}“"

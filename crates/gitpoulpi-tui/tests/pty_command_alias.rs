@@ -297,3 +297,65 @@ fn pick_the_name_in_the_combobox_then_add_and_remove_gitpoulpi_on_path() {
     });
     let _ = term.stop();
 }
+
+// Discoverability: the open alias list says typing is allowed, and a typed
+// name is picked through its `Use "name"` row (Enter) and saved.
+#[test]
+fn the_alias_list_hints_that_a_name_can_be_typed_and_saves_it() {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit(MESSAGE)
+        .unwrap()
+        .build();
+    let config = tempfile::tempdir().unwrap();
+    let home = tempfile::tempdir().unwrap();
+    std::fs::write(
+        config.path().join("config.toml"),
+        "[ui]\ngraph_renderer = \"text\"\n",
+    )
+    .unwrap();
+    let mut term = common::launch(repo.root())
+        .session("command-alias-typed")
+        .config_dir(config.path())
+        .env("GITPOULPI_DESKTOP_NO_HOOKS", "1")
+        .scratch_home(home.path())
+        .size(200, 70)
+        .no_exit_pause()
+        .ready(MESSAGE)
+        .spawn();
+
+    palette(&mut term, "command alias", "Launcher: Create Command Alias");
+    term.wait_for("the page on the alias row", STEP, |s| {
+        s.contains("Command alias") && common::choice_at(s, "None").is_some()
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.act_until(
+        "the alias list with its hint",
+        Duration::from_secs(5),
+        STEP,
+        |t| {
+            if let Some((vc, vr)) = common::choice_at(&t.screen(), "None") {
+                t.click(vc + 1, vr)?;
+            }
+            Ok(())
+        },
+        |s| s.contains("\u{2713} None") && s.contains("type your own value"),
+    )
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+
+    term.send_text("gpx").unwrap();
+    term.wait_for("the Use row", STEP, |s| {
+        s.contains("Use \"gpx\"") && !s.contains("type your own value")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Enter").unwrap();
+    term.wait_for("the row shows gpx", STEP, |s| {
+        common::choice_at(s, "gpx").is_some()
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    wait_until("config.toml keeps the typed name", &term, || {
+        std::fs::read_to_string(config.path().join("config.toml"))
+            .is_ok_and(|t| t.contains("command_alias = \"gpx\""))
+    });
+    let _ = term.stop();
+}

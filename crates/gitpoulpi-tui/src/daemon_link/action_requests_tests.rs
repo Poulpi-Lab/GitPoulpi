@@ -123,6 +123,7 @@ fn every_action() -> Vec<Action> {
         Action::Pull(PullOptions {
             mode: PullMode::FastForwardOnly,
             remote: Some(s("origin")),
+            ..PullOptions::default()
         }),
         Action::Push {
             remote: s("origin"),
@@ -130,6 +131,7 @@ fn every_action() -> Vec<Action> {
                 force_with_lease: false,
                 set_upstream: true,
                 branch: Some(s("main")),
+                ..PushOptions::default()
             },
         },
         Action::PullThenPush {

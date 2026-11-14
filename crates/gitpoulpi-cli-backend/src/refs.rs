@@ -320,6 +320,27 @@ pub fn merge_base(repo: &RepoRef, a: Oid, b: Oid) -> Result<Option<Oid>> {
 }
 
 /// See `GitBackend::ahead_behind`.
+pub fn cherry_counts(repo: &RepoRef, local: Oid, remote: Oid) -> Result<(u32, u32)> {
+    let range = format!("{}...{}", local.to_hex(), remote.to_hex());
+    let raw = run(
+        &repo.root,
+        &[
+            "rev-list",
+            "--cherry-pick",
+            "--left-right",
+            "--count",
+            &range,
+        ],
+    )?;
+    let mut counts = raw.split_whitespace().map(|n| n.parse::<u32>());
+    match (counts.next(), counts.next()) {
+        (Some(Ok(l)), Some(Ok(r))) => Ok((l, r)),
+        _ => Err(Error::Backend(format!(
+            "unexpected `rev-list --count` output: {raw:?}"
+        ))),
+    }
+}
+
 pub fn ahead_behind(repo: &RepoRef, tip: Oid, base: Oid) -> Result<(u32, u32)> {
     let range = format!("{}...{}", tip.to_hex(), base.to_hex());
     let raw = run(&repo.root, &["rev-list", "--left-right", "--count", &range])?;

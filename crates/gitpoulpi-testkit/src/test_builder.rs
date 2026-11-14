@@ -56,6 +56,7 @@ impl TestRepoBuilder {
         with_origin();
         with_remote(name: &str);
         push_targets(branch: &str, targets: &[&str]);
+        with_pre_receive_hook(remote: &str, script: &str);
         with_submodule(path: &str);
         with_lfs();
         lfs_track(pattern: &str);

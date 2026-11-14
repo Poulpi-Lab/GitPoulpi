@@ -5465,6 +5465,8 @@ no_longer = "{path} 已不再是子模块"
 
 [combo]
 type_to_search = "输入以搜索"
+# context: placeholder of the search line of a dropdown that also accepts typed text
+type_to_use_own = "type your own value"
 loading = "加载中…"
 no_match = "无匹配"
 use_value = "使用“{value}”"

@@ -5468,6 +5468,8 @@ no_longer = "{path} artık bir alt modül değil"
 
 [combo]
 type_to_search = "aramak için yaz"
+# context: placeholder of the search line of a dropdown that also accepts typed text
+type_to_use_own = "type your own value"
 loading = "yükleniyor..."
 no_match = "eşleşme yok"
 use_value = "\"{value}\" kullan"

@@ -19,7 +19,7 @@ use gitpoulpi_core::domain::rewrite::{
     PushRefResult, PushRefStatus, PushRewritten, PushRewrittenOutcome, PushState, PushedRef,
     RefChange, PUSHED_FILE,
 };
-use gitpoulpi_core::domain::{Oid, RepoRef};
+use gitpoulpi_core::domain::{Oid, PushRejectReason, RepoRef};
 use gitpoulpi_core::Result;
 
 use super::{git_dir, store};
@@ -323,6 +323,30 @@ fn says_protected(text: &str) -> bool {
         || text.contains("tf402455")
         || text.contains("pushes to this branch are not permitted")
         || text.contains("branch restriction")
+}
+
+/// The one reading of a failed single-ref push, shared with the plain push
+/// (`network::push`) so the two cannot diverge: the first refused ref of
+/// `porcelain` as a typed reason, `stderr` being the remote's own words.
+pub(crate) fn rejection_reason(porcelain: &str, stderr: &str) -> Option<PushRejectReason> {
+    parse(porcelain)
+        .iter()
+        .filter(|line| line.flag == '!')
+        .find_map(|line| {
+            let (status, _) = classify(line, false, stderr);
+            match status {
+                PushRefStatus::RejectedProtectedByHost => Some(PushRejectReason::ProtectedByHost),
+                PushRefStatus::RejectedRemoteMoved => {
+                    if line.summary.to_ascii_lowercase().contains("stale info") {
+                        Some(PushRejectReason::StaleLease)
+                    } else {
+                        Some(PushRejectReason::NonFastForward)
+                    }
+                }
+                PushRefStatus::RejectedOther => Some(PushRejectReason::RemoteRefused),
+                _ => None,
+            }
+        })
 }
 
 fn classify(line: &PorcelainLine, dry_run: bool, stderr: &str) -> (PushRefStatus, Option<String>) {

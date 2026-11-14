@@ -373,6 +373,9 @@ impl GitBackend for SystemGitBackend {
     fn ahead_behind(&self, repo: &RepoRef, tip: Oid, base: Oid) -> Result<(u32, u32)> {
         refs::ahead_behind(repo, tip, base)
     }
+    fn cherry_counts(&self, repo: &RepoRef, local: Oid, remote: Oid) -> Result<(u32, u32)> {
+        refs::cherry_counts(repo, local, remote)
+    }
     fn predict_merge_conflicts(
         &self,
         repo: &RepoRef,

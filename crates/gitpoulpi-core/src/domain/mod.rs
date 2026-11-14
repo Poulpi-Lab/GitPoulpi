@@ -17,6 +17,7 @@ mod ref_filter;
 mod reflog;
 mod refs;
 mod remote_group;
+mod remote_group_plan;
 mod repo;
 mod repo_auth;
 mod restore;
@@ -97,6 +98,10 @@ pub use remote_group::{
     drop_remote_in, entries_with_remotes, is_remote_group_key, parse_branch_remotes,
     rename_remote_in, value_remote, BranchRemotes, RemoteGroupStatus, RemoteRelation,
     RemoteTargetState, TargetRef, TargetRole, PULL_FROM_VARIABLE, PUSH_TO_VARIABLE,
+};
+pub use remote_group_plan::{
+    classify, normalize_url, suggest, GroupAction, GroupMode, PlannedTarget, RelationFacts,
+    RemoteClass, RemoteGroupPlan, RemoteGroupPlanRequest, SuggestContext, Suggestion,
 };
 pub use repo::{
     CommitGraph, CommitNode, DiscoveredRepo, Oid, Remote, RepoId, RepoRef, WorkingTree,

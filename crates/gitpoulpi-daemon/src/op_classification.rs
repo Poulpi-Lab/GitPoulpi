@@ -56,6 +56,7 @@ const GOLDEN: &[(OperationKind, &str, &str)] = &[
     (K::BranchSetUpstream, "J", "REFS|LOG"),
     (K::BranchSetRemotes, "J", "REFS|LOG"),
     (K::RemoteGroupStatus, "R", "ALL"),
+    (K::RemoteGroupPlan, "NS", "ALL"),
     (K::FastForward, "J", "ALL"),
     (K::WorktreeAdd, "", "REFS|LOG|WORKTREES"),
     (K::PatchCreate, "R", "ALL"),

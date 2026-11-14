@@ -242,6 +242,7 @@ pub fn operation_label(kind: OperationKind) -> String {
         K::BranchSetUpstream => "Set upstream",
         K::BranchSetRemotes => "Set remotes",
         K::RemoteGroupStatus => "Remote group status",
+        K::RemoteGroupPlan => "Plan a grouped push or pull",
         K::TagCreate => "Create tag",
         K::TagDelete => "Delete tag",
         K::TagDeleteRemote => "Delete remote tag",

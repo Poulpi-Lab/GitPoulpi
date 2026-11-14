@@ -127,6 +127,7 @@ fn label_for(request: &Request) -> String {
         K::Fetch => format!("Fetching {remote}"),
         K::FetchAll => "Fetching all remotes".into(),
         K::FetchRefspec | K::FetchRefAsBranch => format!("Fetching from {remote}"),
+        K::RemoteGroupPlan => "Checking the remotes of a branch".into(),
         K::RemoteAccessCheck => format!("Testing the connection to {remote}"),
         K::RepoAuthTest => "Testing the connection of every remote".into(),
         K::Pull => "Pulling".into(),
@@ -216,6 +217,7 @@ fn dedupe_for(request: &Request) -> Dedupe {
         },
         K::FetchAll
         | K::FetchRefspec
+        | K::RemoteGroupPlan
         | K::Pull
         | K::Push
         | K::PushForReview

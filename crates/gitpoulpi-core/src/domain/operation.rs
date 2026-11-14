@@ -118,6 +118,11 @@ pub enum OperationKind {
     /// Read a branch's remotes (primary, push targets, pull sources) and
     /// where each stands, from local refs only: no network.
     RemoteGroupStatus,
+    /// Plan a grouped push or pull of one branch over its remotes: asks each
+    /// target (`ls-remote`), fetches only the remotes that need it, classifies
+    /// each against the fresh state and suggests an action per row. Changes
+    /// no branch; the fetch moves tracking refs (see `domain::remote_group_plan`).
+    RemoteGroupPlan,
     /// Move a local branch forward to a commit, only if that is a
     /// fast-forward (see `GitBackend::fast_forward`).
     FastForward,
@@ -794,6 +799,7 @@ impl OperationKind {
             K::Fetch
             | K::FetchAll
             | K::FetchRefspec
+            | K::RemoteGroupPlan
             | K::Push
             | K::PushForReview
             | K::RewritePush => OpTraits::NONE.network().shared_network(),
@@ -853,7 +859,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 181] = [
+    pub const ALL: [OperationKind; 182] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -902,6 +908,7 @@ impl OperationKind {
         OperationKind::BranchSetUpstream,
         OperationKind::BranchSetRemotes,
         OperationKind::RemoteGroupStatus,
+        OperationKind::RemoteGroupPlan,
         OperationKind::FastForward,
         OperationKind::WorktreeAdd,
         OperationKind::PatchCreate,

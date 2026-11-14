@@ -85,6 +85,7 @@ const WITHOUT_WORDS: &[K] = &[
     // Journaled, but their catalog words wait for the translators.
     K::ApplyCommit,
     K::BranchSetRemotes,
+    K::RemoteGroupPlan,
     K::StashFromCommit,
     K::Init,
     K::Fetch,

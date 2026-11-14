@@ -37,6 +37,7 @@ pub(in crate::event_loop) use guides::{
 };
 pub(in crate::event_loop) use pane::*;
 pub(in crate::event_loop) use shared::*;
+#[allow(unused_imports)]
 pub(in crate::event_loop) use sidebar_sections::{
     apply as apply_sidebar_sections_action, open_menu as open_sidebar_sections_menu, show_worktrees,
 };

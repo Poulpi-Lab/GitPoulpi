@@ -425,6 +425,8 @@ list_title = "Profiler"
 duplicate_name = "{name} (kopia)"
 
 [settings_open_in]
+worktree = "Can open a worktree"
+worktree_help = "Offer this entry in the Open in menu of a worktree (right-click a row of the WORKTREES section). It runs with the worktree's folder as ${{cwd}}. Terminals, editors and file managers are on by default."
 list_title = "Poster"
 detecting = "Söker efter installerade appar..."
 section_title = "Öppna i"
@@ -1226,6 +1228,20 @@ reserved = "{name} är ett reserverat namn i Windows"
 bad_branch = "{name} är inget giltigt grennamn"
 
 [worktree]
+# context: field label: the name of the new worktree, the folder name is built from it
+name = "Name"
+# context: placeholder
+name_hint = "the folder is named after it"
+need_name = "give the worktree a name"
+bad_name = "the name cannot contain slashes (the Folder field takes a path)"
+# context: field label: the branch or commit the worktree starts from
+ref_field = "Ref"
+# context: placeholder
+ref_hint = "choose a branch"
+# context: combobox entry: the commit the dialog was opened on; {label} what the user clicked (a tag, a remote branch, a short id), {id} the short id
+commit_choice = { git = "commit {label} ({id})", local = "commit {label} ({id})" }
+branch_exists = "the branch {b} already exists: pick it in Ref or choose another name"
+is_a_file = "{path} is a file, not a folder"
 title = { git = "Skapa worktree från {label}", local = "Skapa worktree från {label}" }
 folder = "Mapp"
 folder_hint = "en ny eller tom mapp"
@@ -9746,6 +9762,15 @@ tip_open_hint = "Click to edit the remotes of this branch"
 
 
 [worktree_manage]
+# context: context menu row of a worktree
+menu_open_tab = "Open in a new tab"
+# context: submenu of a worktree row: the Open in entries
+menu_open_in = "Open in"
+menu_open_in_none = "Open in (no entry yet)"
+menu_open_in_none_why = "No Open in entry is marked Can open a worktree: Settings > Open in"
+menu_merge = { git = "Merge {branch} into...", local = "Merge {branch} into..." }
+menu_remove = { git = "Remove worktree...", local = "Remove worktree..." }
+not_listed = { git = "{path} is not a worktree of this repository any more", local = "{path} is not a worktree of this repository any more" }
 removing = { git = "removing worktree {path}...", local = "removing worktree {path}..." }
 merging = { git = "merging {branch}...", local = "merging {branch}..." }
 # context: dialog title; {name} is the folder name of the worktree; a worktree is a second checked-out copy of the repository

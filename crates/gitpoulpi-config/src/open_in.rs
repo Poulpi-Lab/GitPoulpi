@@ -31,6 +31,10 @@ use crate::launch;
 pub struct OpenInEntry {
     pub label: String,
     pub command: String,
+    /// "Can open a worktree": the entry is offered in a worktree's own
+    /// Open in menu. Absent = decided by the command ([`takes_a_folder`]).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub worktree: Option<bool>,
 }
 
 impl OpenInEntry {
@@ -38,8 +42,25 @@ impl OpenInEntry {
         Self {
             label: label.into(),
             command: command.into(),
+            worktree: None,
         }
     }
+
+    /// Whether the worktree menu offers this entry: the checkbox when it
+    /// was set, else whether the command takes a folder.
+    pub fn can_open_worktree(&self) -> bool {
+        self.worktree
+            .unwrap_or_else(|| takes_a_folder(&self.command))
+    }
+}
+
+/// A command that is handed the folder (`${cwd}`, `${repo}` or the legacy
+/// `{repo}`): terminals, editors and file managers. One that only opens a
+/// web page (`${web_url}`) or names no folder cannot open a worktree.
+pub fn takes_a_folder(command: &str) -> bool {
+    ["${cwd}", "${repo}", "{repo}"]
+        .iter()
+        .any(|v| command.contains(v))
 }
 
 /// The operating systems presets and detection distinguish.

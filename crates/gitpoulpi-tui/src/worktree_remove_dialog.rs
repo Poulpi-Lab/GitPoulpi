@@ -1206,3 +1206,28 @@ pub(crate) fn take_commit_focus(root: &Path) -> bool {
         _ => false,
     }
 }
+
+/// What a worktree row's menu or the palette asks the window to open.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum Request {
+    /// Remove the worktree at this folder.
+    Remove(PathBuf),
+    /// Merge the branch of the worktree at this folder into another one.
+    Merge(PathBuf),
+}
+
+static REQUESTS: std::sync::Mutex<Vec<Request>> = std::sync::Mutex::new(Vec::new());
+
+/// A menu row or palette command asks for a dialog; the window opens it on
+/// its next tick (it owns the daemon link the dialog needs).
+pub(crate) fn ask(request: Request) {
+    if let Ok(mut held) = REQUESTS.lock() {
+        held.push(request);
+    }
+    crate::redraw::poke();
+}
+
+pub(crate) fn take_request() -> Option<Request> {
+    let mut held = REQUESTS.lock().ok()?;
+    (!held.is_empty()).then(|| held.remove(0))
+}

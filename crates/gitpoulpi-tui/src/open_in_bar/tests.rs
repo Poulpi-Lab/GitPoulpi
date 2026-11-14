@@ -13,6 +13,7 @@ fn install(labels: &[&str]) {
                 .map(|l| OpenInEntry {
                     label: (*l).into(),
                     command: "true".into(),
+                    worktree: None,
                 })
                 .collect(),
         ),

@@ -143,6 +143,14 @@ impl PreferencesState {
                 )
                 .with_help(t::COMMAND_HELP.get()),
             );
+            fields.push(
+                Field::plain(
+                    t::WORKTREE.get(),
+                    Control::Toggle(entry.can_open_worktree()),
+                    Target::OpenIn(OpenInTarget::Worktree),
+                )
+                .with_help(t::WORKTREE_HELP.get()),
+            );
             fields.push(Field::plain(
                 t::INSERT_VARIABLE.get(),
                 Control::Chips(VARIABLES.iter().map(|v| v.to_string()).collect()),
@@ -317,6 +325,16 @@ impl PreferencesState {
             _ => {}
         }
         true
+    }
+
+    /// The "Can open a worktree" box of the selected entry.
+    pub(super) fn open_in_set_worktree(&mut self, value: bool) {
+        let mut list = self.open_in_list();
+        let Some(sel) = self.open_in_selected(&list) else {
+            return;
+        };
+        list[sel].worktree = Some(value);
+        self.open_in_apply(list);
     }
 
     /// A variable chip: appended to the selected entry's command.

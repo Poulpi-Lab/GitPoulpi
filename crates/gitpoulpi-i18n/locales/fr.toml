@@ -423,6 +423,8 @@ list_title = "Profils"
 duplicate_name = "{name} (copie)"
 
 [settings_open_in]
+worktree = "Peut ouvrir un worktree"
+worktree_help = "Propose cette entrée dans le menu Ouvrir dans d'un worktree (clic droit sur une ligne de la section WORKTREES). Elle s'exécute avec le dossier du worktree comme ${{cwd}}. Les terminaux, éditeurs et gestionnaires de fichiers sont cochés par défaut."
 list_title = "Entrées"
 section_title = "Ouvrir dans"
 default_entry = "Entrée par défaut"
@@ -1229,6 +1231,20 @@ reserved = "{name} est un nom réservé sous Windows"
 bad_branch = "{name} n'est pas un nom de branche valide"
 
 [worktree]
+# context: field label: the name of the new worktree, the folder name is built from it
+name = "Nom"
+# context: placeholder
+name_hint = "le dossier en porte le nom"
+need_name = "donnez un nom au worktree"
+bad_name = "le nom ne peut pas contenir de barre oblique (le champ Dossier prend un chemin)"
+# context: field label: the branch or commit the worktree starts from
+ref_field = "Réf"
+# context: placeholder
+ref_hint = "choisissez une branche"
+# context: combobox entry: the commit the dialog was opened on; {label} what the user clicked (a tag, a remote branch, a short id), {id} the short id
+commit_choice = { git = "commit {label} ({id})", local = "validation {label} ({id})" }
+branch_exists = "la branche {b} existe déjà : choisissez-la dans Réf ou prenez un autre nom"
+is_a_file = "{path} est un fichier, pas un dossier"
 title = { git = "Créer un worktree depuis {label}", local = "Créer un arbre de travail depuis {label}" }
 folder = "Dossier"
 folder_hint = "un dossier neuf ou vide"
@@ -9758,6 +9774,15 @@ tip_open_hint = "Cliquez pour modifier les distants de cette branche"
 
 
 [worktree_manage]
+# context: context menu row of a worktree
+menu_open_tab = "Ouvrir dans un nouvel onglet"
+# context: submenu of a worktree row: the Open in entries
+menu_open_in = "Ouvrir dans"
+menu_open_in_none = "Ouvrir dans (aucune entrée)"
+menu_open_in_none_why = "Aucune entrée Ouvrir dans n'est cochée Peut ouvrir un worktree : Réglages > Ouvrir dans"
+menu_merge = { git = "Merge de {branch} dans...", local = "Fusionner {branch} dans..." }
+menu_remove = { git = "Retirer le worktree...", local = "Retirer l'arbre de travail..." }
+not_listed = { git = "{path} n'est plus un worktree de ce dépôt", local = "{path} n'est plus un arbre de travail de ce dépôt" }
 removing = { git = "retrait du worktree {path}...", local = "retrait de l'arbre de travail {path}..." }
 merging = { git = "merge de {branch}...", local = "fusion de {branch}..." }
 # context: dialog title; {name} is the folder name of the worktree; a worktree is a second checked-out copy of the repository

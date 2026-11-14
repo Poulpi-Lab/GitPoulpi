@@ -254,6 +254,7 @@ impl PreferencesState {
                 self.write_repo_state();
             }
             Target::Repo(field) => self.commit_repo_toggle(*field, value),
+            Target::OpenIn(model::OpenInTarget::Worktree) => self.open_in_set_worktree(value),
             Target::Workflow(t) => self.wf_commit_bool(*t, value),
             Target::RepoAuth(t) => self.ra_commit_bool(*t, value),
             Target::Ai(t) => self.ai_commit_bool(*t, value),

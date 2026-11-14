@@ -616,8 +616,20 @@ impl RepoDialogs {
     /// Opens Create worktree for `seed`, proposing a folder beside
     /// `repo_root`.
     pub(crate) fn open_worktree(&mut self, seed: WorktreeSeed, repo_root: &Path) {
+        self.open_worktree_with(seed, repo_root, Vec::new(), false);
+    }
+
+    /// [`Self::open_worktree`] with the branches the Ref combobox lists;
+    /// `pick_ref` opens it on that list ("Choose a branch...").
+    pub(crate) fn open_worktree_with(
+        &mut self,
+        seed: WorktreeSeed,
+        repo_root: &Path,
+        branches: Vec<crate::worktree_dialog::BranchChoice>,
+        pick_ref: bool,
+    ) {
         self.dialog = Some(RepoDialog::Worktree {
-            form: WorktreeDialog::new(seed, repo_root),
+            form: WorktreeDialog::with_choices(seed, repo_root, branches, pick_ref),
             picker: None,
         });
     }

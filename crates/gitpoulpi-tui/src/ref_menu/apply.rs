@@ -503,6 +503,35 @@ pub(crate) fn apply_ref_context_action(
                 }
             };
         }
+        #[cfg(feature = "worktree")]
+        RefContextAction::WorktreeOpenTab => {
+            *open_in_tab = Some(std::path::PathBuf::from(&full_name));
+        }
+        #[cfg(feature = "worktree")]
+        RefContextAction::WorktreeOpenWith(index) => {
+            *last_message = Some(
+                match crate::tab_dir::run_open_in(
+                    usize::from(index),
+                    std::path::Path::new(&full_name),
+                ) {
+                    Ok(done) => done,
+                    Err(why) => why,
+                },
+            );
+        }
+        #[cfg(feature = "worktree")]
+        RefContextAction::WorktreeMerge => crate::worktree_remove_dialog::ask(
+            crate::worktree_remove_dialog::Request::Merge(std::path::PathBuf::from(&full_name)),
+        ),
+        #[cfg(feature = "worktree")]
+        RefContextAction::WorktreeRemove => crate::worktree_remove_dialog::ask(
+            crate::worktree_remove_dialog::Request::Remove(std::path::PathBuf::from(&full_name)),
+        ),
+        #[cfg(not(feature = "worktree"))]
+        RefContextAction::WorktreeOpenTab
+        | RefContextAction::WorktreeOpenWith(_)
+        | RefContextAction::WorktreeMerge
+        | RefContextAction::WorktreeRemove => {}
         RefContextAction::StartPullRequest => {
             let refs = refs_result.as_deref().unwrap_or(&[]);
             *last_message = Some(start_pull_request_now(

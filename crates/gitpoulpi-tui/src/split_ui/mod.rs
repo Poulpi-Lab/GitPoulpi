@@ -647,12 +647,13 @@ impl SplitForm {
         } else {
             self.anchor = None;
         }
-        self.row_cursor = (self.row_cursor as isize + delta).clamp(0, len as isize - 1) as usize;
+        self.row_cursor =
+            (self.row_cursor as isize + delta).clamp(0, (len as isize - 1).max(0)) as usize;
     }
 
     fn move_part_cursor(&mut self, delta: isize) {
-        self.part_cursor =
-            (self.part_cursor as isize + delta).clamp(0, self.parts.len() as isize - 1) as usize;
+        self.part_cursor = (self.part_cursor as isize + delta)
+            .clamp(0, (self.parts.len() as isize - 1).max(0)) as usize;
     }
 
     pub(crate) fn toggle_pane(&mut self) {

@@ -1037,7 +1037,8 @@ fn paint_crates(
         s.crates_offset = s.crates_offset.min(all.len().saturating_sub(page));
         s.crates_sel = s
             .crates_sel
-            .clamp(s.crates_offset, (s.crates_offset + page).saturating_sub(1))
+            .min((s.crates_offset + page).saturating_sub(1))
+            .max(s.crates_offset)
             .min(all.len().saturating_sub(1));
         s.crates_offset
     });
@@ -1197,7 +1198,17 @@ mod logo {
         let cell = CELL.with(|c| *c.borrow()).unwrap_or(CellSize::FALLBACK);
         let cols =
             ((u32::from(area.height) * cell.height + cell.width / 2) / cell.width.max(1)) as u16;
-        Rect::new(area.x, area.y, cols.clamp(2, area.width), area.height)
+        Rect::new(area.x, area.y, cols.max(2).min(area.width), area.height)
+    }
+
+    /// A zero- or one-cell-wide area made `clamp(2, width)` panic.
+    #[cfg(test)]
+    #[test]
+    fn pixel_area_survives_a_tiny_area() {
+        for (w, h) in [(0, 0), (0, 5), (1, 1), (1, 9)] {
+            let r = pixel_area(Rect::new(0, 0, w, h));
+            assert!(r.width <= w);
+        }
     }
 
     fn half_blocks(buf: &mut Buffer, area: Rect, bitmap: &Bitmap) {

@@ -945,7 +945,7 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                                 let line = crate::minimap::line_at(
                                     rect,
                                     insight.len(),
-                                    row.clamp(rect.y, rect.bottom().saturating_sub(1)),
+                                    row.min(rect.bottom().saturating_sub(1)).max(rect.y),
                                 );
                                 let top = crate::minimap::top_for(line, insight.len(), viewport);
                                 insight.scroll(top as isize - insight.offset as isize, viewport);

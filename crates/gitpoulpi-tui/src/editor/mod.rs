@@ -701,7 +701,8 @@ impl Editor {
     fn offset_at_cell(&self, col: u16, row: u16) -> usize {
         let ta = self.text_area;
         let r = row
-            .clamp(ta.y, ta.bottom().saturating_sub(1))
+            .min(ta.bottom().saturating_sub(1))
+            .max(ta.y)
             .saturating_sub(ta.y);
         let line = (self.top + r as usize).min(self.doc.line_count() - 1);
         let c = col.saturating_sub(ta.x) as usize;

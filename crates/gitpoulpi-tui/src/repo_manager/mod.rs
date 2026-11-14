@@ -514,7 +514,7 @@ impl RepoManager {
         if len == 0 {
             return;
         }
-        let next = (self.selected as isize + delta).clamp(0, len as isize - 1);
+        let next = (self.selected as isize + delta).clamp(0, (len as isize - 1).max(0));
         self.selected = next as usize;
         self.follow = true;
     }

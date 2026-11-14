@@ -226,7 +226,7 @@ impl FolderPicker {
                 return None;
             }
             let from = at.map(|a| a as isize).unwrap_or(-1);
-            let to = (from + delta).clamp(0, selectable.len() as isize - 1) as usize;
+            let to = (from + delta).clamp(0, (selectable.len() as isize - 1).max(0)) as usize;
             Some(selectable[to])
         };
         match key.code {
@@ -260,7 +260,7 @@ impl FolderPicker {
                 return None;
             }
             let from = sel.map(|s| s as isize).unwrap_or(-1);
-            Some((from + delta).clamp(0, n as isize - 1) as usize)
+            Some((from + delta).clamp(0, (n as isize - 1).max(0)) as usize)
         };
         match key.code {
             KeyCode::Up => self.content_sel = move_to(self.content_sel, -1),

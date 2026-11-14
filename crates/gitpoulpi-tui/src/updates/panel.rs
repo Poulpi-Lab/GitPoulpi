@@ -669,7 +669,9 @@ pub(crate) fn render(frame: &mut Frame) {
     let button_lines = button_rows(&labels, inner_w);
     // Border, blank, body, blank, buttons, notice, hint, border.
     let chrome = 6 + button_lines.len() as u16;
-    let want_h = (rows.len() as u16 + chrome).clamp(chrome + 3, area.height.saturating_sub(2));
+    let want_h = (rows.len() as u16 + chrome)
+        .max(chrome + 3)
+        .min(area.height.saturating_sub(2));
     let rect = WIN.place(area, dialog_kit::centered(area, want_w, want_h));
     let buf = frame.buffer_mut();
     dialog_kit::panel(buf, rect, msg::PANEL_TITLE.get());

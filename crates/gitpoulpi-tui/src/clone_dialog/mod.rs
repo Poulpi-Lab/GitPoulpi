@@ -689,7 +689,8 @@ impl CloneDialog {
             self.repo_cursor = 0;
             return;
         }
-        self.repo_cursor = (self.repo_cursor as i32 + delta).clamp(0, len as i32 - 1) as usize;
+        self.repo_cursor =
+            (self.repo_cursor as i32 + delta).clamp(0, (len as i32 - 1).max(0)) as usize;
         self.reveal_cursor(&rows);
     }
 

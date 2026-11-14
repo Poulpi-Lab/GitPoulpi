@@ -674,7 +674,7 @@ pub(crate) fn move_cursor(state: &mut DiffViewState, delta: isize, len: usize, v
         state.cursor = 0;
         return;
     }
-    let target = (state.cursor as isize + delta).clamp(0, len as isize - 1) as usize;
+    let target = (state.cursor as isize + delta).clamp(0, (len as isize - 1).max(0)) as usize;
     state.cursor = target;
     follow_cursor(state, len, view_height);
 }

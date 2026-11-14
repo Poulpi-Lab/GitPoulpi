@@ -390,7 +390,7 @@ impl ComposeForm {
             return;
         }
         let at = rows.iter().position(|r| *r == self.selected).unwrap_or(0) as isize;
-        let next = (at + delta).clamp(0, rows.len() as isize - 1) as usize;
+        let next = (at + delta).clamp(0, (rows.len() as isize - 1).max(0)) as usize;
         self.selected = rows[next];
     }
 

@@ -349,7 +349,7 @@ pub(crate) fn move_index(current: Option<usize>, len: usize, delta: i32) -> Opti
         return None;
     }
     let current = current.unwrap_or(0) as i32;
-    Some((current + delta).clamp(0, len as i32 - 1) as usize)
+    Some((current + delta).clamp(0, (len as i32 - 1).max(0)) as usize)
 }
 
 /// A string's terminal-column width (via ratatui/unicode-width), not its

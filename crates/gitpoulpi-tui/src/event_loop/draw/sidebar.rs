@@ -936,6 +936,7 @@ mod tests {
                 is_head: false,
                 upstream: None,
                 tag_sync: Default::default(),
+                multi_remote: None,
             })
             .collect();
         let dir = tempfile::tempdir().unwrap();
@@ -1048,6 +1049,7 @@ mod tests {
                 is_head: false,
                 upstream: None,
                 tag_sync: Default::default(),
+                multi_remote: None,
             })
             .collect();
         let draw = |collapsed: crate::refs_tree::CollapsedFolders| -> String {
@@ -1161,6 +1163,7 @@ mod tests {
                 is_head: false,
                 upstream: None,
                 tag_sync: Default::default(),
+                multi_remote: None,
             })
             .collect();
         let worktrees: Vec<Worktree> = ["main", "feature"]

@@ -24,6 +24,7 @@ fn branch(name: &str, target: u8, is_head: bool, upstream: Option<&str>) -> Ref 
         is_head,
         upstream: upstream.map(str::to_string),
         tag_sync: None,
+        multi_remote: None,
     }
 }
 
@@ -38,6 +39,7 @@ fn remote(remote: &str, name: &str, target: u8) -> Ref {
         is_head: false,
         upstream: None,
         tag_sync: None,
+        multi_remote: None,
     }
 }
 

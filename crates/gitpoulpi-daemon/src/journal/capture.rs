@@ -200,7 +200,7 @@ pub(super) fn capture_before(
             let key = arg_str(request, "key").unwrap_or_default();
             capture_sections(backend, repo, &mut before, &[key])?;
         }
-        OperationKind::BranchSetUpstream => {
+        OperationKind::BranchSetUpstream | OperationKind::BranchSetRemotes => {
             let branch = arg_str(request, "branch").unwrap_or_default();
             capture_sections(backend, repo, &mut before, &[branch_section(&branch)])?;
         }

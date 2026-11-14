@@ -159,6 +159,7 @@ fn the_key_follows_branch_moves_and_ignores_tags() {
         is_head: head,
         upstream: None,
         tag_sync: None,
+        multi_remote: None,
     };
     let tag = |target: Oid| Ref {
         kind: RefKind::Tag { name: "v1".into() },
@@ -167,6 +168,7 @@ fn the_key_follows_branch_moves_and_ignores_tags() {
         is_head: false,
         upstream: None,
         tag_sync: None,
+        multi_remote: None,
     };
     let a = [local("feature", oid(1), true)];
     let moved = [local("feature", oid(2), true)];

@@ -8,6 +8,7 @@ fn local_branch(name: &str, upstream: Option<&str>) -> Ref {
         is_head: false,
         upstream: upstream.map(str::to_string),
         tag_sync: None,
+        multi_remote: None,
     }
 }
 
@@ -111,6 +112,7 @@ fn default_target_prefers_a_remote_head_then_main_then_master() {
             is_head: false,
             upstream: None,
             tag_sync: None,
+            multi_remote: None,
         },
         Ref {
             kind: RefKind::RemoteBranch {
@@ -122,6 +124,7 @@ fn default_target_prefers_a_remote_head_then_main_then_master() {
             is_head: false,
             upstream: None,
             tag_sync: None,
+            multi_remote: None,
         },
     ];
     assert_eq!(
@@ -139,6 +142,7 @@ fn default_target_prefers_a_remote_head_then_main_then_master() {
         is_head: false,
         upstream: None,
         tag_sync: None,
+        multi_remote: None,
     }];
     assert_eq!(
         default_target(&with_master, "origin").as_deref(),

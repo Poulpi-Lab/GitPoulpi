@@ -80,6 +80,7 @@ fn a_refs_copy_rows_read_its_own_cells() {
             is_head: false,
             upstream: None,
             tag_sync: None,
+            multi_remote: None,
         },
     ]);
     assert_eq!(

@@ -43,6 +43,7 @@ mod tests {
             is_head: false,
             upstream: None,
             tag_sync: None,
+            multi_remote: None,
         }
     }
 

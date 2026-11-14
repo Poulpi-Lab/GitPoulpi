@@ -51,6 +51,7 @@ pub(super) fn label_for(request: &Request) -> String {
             Some(upstream) => format!("Set upstream of {} to {upstream}", arg("branch")),
             None => format!("Unset upstream of {}", arg("branch")),
         },
+        OperationKind::BranchSetRemotes => format!("Set remotes of {}", arg("branch")),
         OperationKind::SetRepoConfig => match arg_str(request, "value") {
             Some(value) => format!("Set {} to {value}", arg("key")),
             None => format!("Unset {}", arg("key")),

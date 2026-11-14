@@ -59,6 +59,7 @@ fn make_conflicted_repo() -> (gitpoulpi_testkit::FixtureRepo, SystemGitBackend) 
                 is_head: false,
                 upstream: None,
                 tag_sync: None,
+                multi_remote: None,
             },
             &MergeOptions::default(),
         )

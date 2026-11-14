@@ -51,6 +51,7 @@ fn local_branch_at(name: &str, target: Oid) -> Ref {
         is_head: false,
         upstream: None,
         tag_sync: None,
+        multi_remote: None,
     }
 }
 

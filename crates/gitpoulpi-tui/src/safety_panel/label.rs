@@ -77,6 +77,7 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::BranchDeleteRemote
         | K::BranchRename
         | K::BranchSetUpstream
+        | K::BranchSetRemotes
         | K::FastForward
         | K::FetchRefAsBranch
         | K::WorktreeAdd
@@ -190,6 +191,7 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::RepoConfig
         | K::Workflow
         | K::FlowPlan
+        | K::RemoteGroupStatus
         | K::SparseStatus
         | K::Conflicts
         | K::ConflictEntries
@@ -564,6 +566,8 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         | K::RepoConfig
         | K::Workflow
         | K::FlowPlan
+        | K::RemoteGroupStatus
+        | K::BranchSetRemotes
         | K::SparseStatus
         | K::Conflicts
         | K::ConflictEntries

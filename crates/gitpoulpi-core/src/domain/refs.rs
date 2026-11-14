@@ -41,6 +41,12 @@ pub struct Ref {
     /// has it" and must render differently.
     #[serde(default)]
     pub tag_sync: Option<TagSync>,
+    /// For a local branch with GitPoulpi extra push targets or pull
+    /// sources (`gitpoulpi-push-to` / `gitpoulpi-pull-from` in its config
+    /// section): where each of its remotes stands. `None` for every other
+    /// ref and for a branch without those keys. Filled by the daemon.
+    #[serde(default)]
+    pub multi_remote: Option<Vec<super::RemoteTargetState>>,
 }
 
 /// The ref namespace GitPoulpi keeps its *remote tag* bookkeeping in.

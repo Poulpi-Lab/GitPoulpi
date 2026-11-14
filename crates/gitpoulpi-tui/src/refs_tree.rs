@@ -1268,6 +1268,7 @@ mod checkout_tests {
             is_head,
             upstream: upstream.map(str::to_string),
             tag_sync: None,
+            multi_remote: None,
         }
     }
 
@@ -1282,6 +1283,7 @@ mod checkout_tests {
             is_head: false,
             upstream: None,
             tag_sync: None,
+            multi_remote: None,
         }
     }
 

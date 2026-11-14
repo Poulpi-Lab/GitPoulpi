@@ -25,6 +25,7 @@ mod merge_policy;
 mod op_classification;
 mod opstate;
 mod ref_visibility;
+mod remote_keys;
 mod repo_auth;
 mod resolved_record;
 mod rewrite_runs;

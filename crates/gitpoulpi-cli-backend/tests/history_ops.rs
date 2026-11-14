@@ -34,6 +34,7 @@ fn branch_ref(name: &str, target: gitpoulpi_core::domain::Oid) -> Ref {
         upstream: None,
         // A branch, so it has no tag-sync state by definition.
         tag_sync: None,
+        multi_remote: None,
     }
 }
 

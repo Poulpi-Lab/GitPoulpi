@@ -14,6 +14,7 @@ pub(crate) fn tag(name: &str, at: u8, local: bool, pushed: &[&str], differs: &[&
             differs_on: differs.iter().map(|s| s.to_string()).collect(),
             local,
         }),
+        multi_remote: None,
     }
 }
 

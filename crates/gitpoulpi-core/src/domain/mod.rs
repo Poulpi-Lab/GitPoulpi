@@ -16,6 +16,7 @@ mod ops;
 mod ref_filter;
 mod reflog;
 mod refs;
+mod remote_group;
 mod repo;
 mod repo_auth;
 mod restore;
@@ -99,6 +100,11 @@ pub use repo_auth::{
     command_sha256, ActiveIdentity, AuthOverride, HttpsAuth, HttpsIdentity, IdentityVia,
     RemoteIdentity, RepoAuthProfile, RepoAuthSetArgs, RepoAuthTestArgs, RepoAuthView, SshAuth,
     SshIdentity, COMMAND_NEEDS_PERSON,
+};
+pub use remote_group::{
+    drop_remote_in, entries_with_remotes, is_remote_group_key, parse_branch_remotes,
+    rename_remote_in, value_remote, BranchRemotes, RemoteGroupStatus, RemoteRelation,
+    RemoteTargetState, TargetRef, TargetRole, PULL_FROM_VARIABLE, PUSH_TO_VARIABLE,
 };
 pub use restore::{RestoreItem, RestoreItemKind, RestoreOffer, RestoreOutcome};
 pub use rewrite::RewriteRefusal;

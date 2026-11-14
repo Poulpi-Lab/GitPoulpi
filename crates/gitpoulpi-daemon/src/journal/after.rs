@@ -236,6 +236,7 @@ pub(super) fn after_state(
         }
         OperationKind::BranchCreateTracking
         | OperationKind::BranchSetUpstream
+        | OperationKind::BranchSetRemotes
         | OperationKind::SetRepoConfig
         | OperationKind::FetchRefAsBranch => {
             let mut refs = Vec::new();

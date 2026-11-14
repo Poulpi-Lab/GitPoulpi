@@ -96,6 +96,7 @@ pub fn refs(repo: &RepoRef) -> Result<Vec<Ref>> {
             is_head,
             upstream,
             tag_sync: None,
+            multi_remote: None,
         });
     }
 
@@ -254,6 +255,7 @@ pub fn apply_tag_sync(refs: &mut Vec<Ref>, mirror: &BTreeMap<String, Vec<(String
             is_head: false,
             upstream: None,
             tag_sync: Some(sync),
+            multi_remote: None,
         });
     }
 }

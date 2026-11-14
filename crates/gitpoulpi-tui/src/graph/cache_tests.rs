@@ -61,6 +61,7 @@ impl World {
             visibility: Default::default(),
             upstream: None,
             tag_sync: None,
+            multi_remote: None,
         };
         World {
             log: Ok(history(n)),

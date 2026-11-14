@@ -111,6 +111,13 @@ pub enum OperationKind {
     /// Set or clear a local branch's upstream (see
     /// `GitBackend::branch_set_upstream`).
     BranchSetUpstream,
+    /// Replace a local branch's extra push targets and pull sources
+    /// (`gitpoulpi-push-to` / `gitpoulpi-pull-from` in its config section,
+    /// see `domain::remote_group`). Journaled like `BranchSetUpstream`.
+    BranchSetRemotes,
+    /// Read a branch's remotes (primary, push targets, pull sources) and
+    /// where each stands, from local refs only: no network.
+    RemoteGroupStatus,
     /// Move a local branch forward to a commit, only if that is a
     /// fast-forward (see `GitBackend::fast_forward`).
     FastForward,
@@ -634,6 +641,7 @@ impl OperationKind {
             | K::CommitStats
             | K::Search
             | K::Refs
+            | K::RemoteGroupStatus
             | K::Stashes
             | K::Remotes
             | K::LeftoverRemotes
@@ -718,6 +726,7 @@ impl OperationKind {
             | K::BranchDelete
             | K::BranchRename
             | K::BranchSetUpstream
+            | K::BranchSetRemotes
             | K::TagCreate
             | K::TagDelete
             | K::TagAnnotate => OpTraits::NONE
@@ -844,7 +853,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 179] = [
+    pub const ALL: [OperationKind; 181] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -891,6 +900,8 @@ impl OperationKind {
         OperationKind::BranchDeleteRemote,
         OperationKind::BranchRename,
         OperationKind::BranchSetUpstream,
+        OperationKind::BranchSetRemotes,
+        OperationKind::RemoteGroupStatus,
         OperationKind::FastForward,
         OperationKind::WorktreeAdd,
         OperationKind::PatchCreate,

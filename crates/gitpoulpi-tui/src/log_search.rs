@@ -386,6 +386,7 @@ mod tests {
             is_head: false,
             upstream: None,
             tag_sync: None,
+            multi_remote: None,
         }];
         assert_eq!(find_matches(&nodes(), &refs, "release"), vec![2]);
     }

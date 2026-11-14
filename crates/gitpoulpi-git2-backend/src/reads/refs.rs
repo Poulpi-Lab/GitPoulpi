@@ -73,6 +73,7 @@ pub fn refs(repo: &RepoRef) -> Result<Vec<Ref>> {
                 is_head: head_branch.as_deref() == Some(branch),
                 upstream,
                 tag_sync: None,
+                multi_remote: None,
             });
         } else if let Some(rest) = name.strip_prefix("refs/remotes/") {
             if let Some((remote, branch)) =
@@ -88,6 +89,7 @@ pub fn refs(repo: &RepoRef) -> Result<Vec<Ref>> {
                     is_head: false,
                     upstream: None,
                     tag_sync: None,
+                    multi_remote: None,
                 });
             }
         } else if let Some(tag) = name.strip_prefix("refs/tags/") {
@@ -105,6 +107,7 @@ pub fn refs(repo: &RepoRef) -> Result<Vec<Ref>> {
                 upstream: None,
                 // Filled in below, once every mirror ref has been seen.
                 tag_sync: None,
+                multi_remote: None,
             });
         }
     }

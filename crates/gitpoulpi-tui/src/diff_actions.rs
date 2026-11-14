@@ -1059,6 +1059,7 @@ mod tests {
             is_head: true,
             upstream: None,
             tag_sync: None,
+            multi_remote: None,
         }];
 
         let on_commit = DiffViewState::for_commit(commit, 0, PathBuf::from("f.txt"));

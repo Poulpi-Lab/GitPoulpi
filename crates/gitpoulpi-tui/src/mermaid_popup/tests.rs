@@ -46,6 +46,7 @@ fn refs() -> Vec<Ref> {
         is_head: head,
         upstream: None,
         tag_sync: None,
+        multi_remote: None,
     };
     vec![
         r(
@@ -205,6 +206,7 @@ fn the_preview_scrolls_with_the_keys_and_the_wheel() {
         is_head: true,
         upstream: None,
         tag_sync: None,
+        multi_remote: None,
     };
     // One commit selected: the run from it up to HEAD, sixty commits.
     open(&g, &[head], &[], oid(1)).unwrap();

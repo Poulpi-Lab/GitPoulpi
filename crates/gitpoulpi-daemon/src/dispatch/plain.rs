@@ -161,7 +161,14 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
             let ids: Vec<gitpoulpi_core::domain::Oid> = arg_or_err!(args, "ids", request.id);
             to_json!(backend.commit_stats(&repo, &ids))
         }
-        OperationKind::Refs => to_json!(backend.refs(&repo)),
+        OperationKind::Refs => to_json!(backend.refs(&repo).map(|mut refs| {
+            crate::remote_keys::decorate_refs(backend, &repo, &mut refs);
+            refs
+        })),
+        OperationKind::RemoteGroupStatus => {
+            let branch: String = arg_or_err!(args, "branch", request.id);
+            to_json!(crate::remote_keys::status(backend, &repo, &branch))
+        }
         OperationKind::Remotes => to_json!(backend.remotes(&repo)),
         OperationKind::LeftoverRemotes => to_json!(backend.leftover_remotes(&repo)),
         OperationKind::SshCommand => to_json!(backend.ssh_command(&repo)),
@@ -420,6 +427,23 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
                 .and_then(|v| serde_json::from_value(v.clone()).ok())
                 .flatten();
             to_json!(backend.branch_set_upstream(&repo, &branch, upstream.as_deref()))
+        }
+        // `push_to` / `pull_from`: config values, `<remote>` or
+        // `<remote>:<branch>`; absent means none.
+        OperationKind::BranchSetRemotes => {
+            let branch: String = arg_or_err!(args, "branch", request.id);
+            let list = |key: &str| -> Vec<String> {
+                args.get(key)
+                    .and_then(|v| serde_json::from_value(v.clone()).ok())
+                    .unwrap_or_default()
+            };
+            to_json!(crate::remote_keys::set_remotes(
+                backend,
+                &repo,
+                &branch,
+                &list("push_to"),
+                &list("pull_from")
+            ))
         }
         OperationKind::FastForward => {
             let branch: String = arg_or_err!(args, "branch", request.id);

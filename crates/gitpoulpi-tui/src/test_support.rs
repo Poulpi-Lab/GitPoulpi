@@ -28,6 +28,7 @@ pub(crate) fn local_branch_at(name: &str, target: Oid) -> gitpoulpi_core::domain
         is_head: false,
         upstream: None,
         tag_sync: None,
+        multi_remote: None,
     }
 }
 
@@ -46,5 +47,6 @@ pub(crate) fn remote_branch_at(
         is_head: false,
         upstream: None,
         tag_sync: None,
+        multi_remote: None,
     }
 }

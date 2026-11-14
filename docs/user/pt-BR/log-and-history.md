@@ -179,13 +179,13 @@ Em um commit sem ref, passar o ponteiro na linha também mostra, na coluna Ref, 
 
 **Remotos.** O `+` no título REMOTO adiciona um; clique com o botão direito no nome
 de um remoto para fazer fetch dele, copiar seu link web, torná-lo o remoto padrão,
-ocultá-lo do grafo, editar suas URLs ou removê-lo. **Ocultar um remoto** (o olho da
+ocultá-lo do grafo, editar suas URLs ou removê-lo. **Ocultar um remoto** (o ⊙ da
 linha dele, *Ocultar remoto do grafo* no menu, ou `Remoto: ocultar remoto no grafo...`
 na paleta) oculta todas as branches que ele tem agora ou vier a ter, e os commits que
 só ele alcança saem do Log: a forma de navegar por um histórico sem o histórico de um
 remoto de arquivo sem relação; traga-o de volta com *Mostrar remoto no grafo*. Mostrar
 um remoto também mostra as branches dele que tinham sido ocultadas uma a uma. Uma
-branch de um remoto oculto avisa na linha de status se o olho dela for usado: mostre
+branch de um remoto oculto avisa na linha de status se o ⊙ dela for usado: mostre
 o remoto primeiro.
 
 **Stashes.** **Stash** faz stash de tudo (arquivos não rastreados inclusos);

@@ -13,7 +13,7 @@ it anyway (it then reads "No worktree yet: + to create one"), use the palette
 command **Sidebar: Show Worktrees Section**, tick **WORKTREES** in the
 sidebar's show/hide list (right-click a section header), or run any of the
 create commands below. GitPoulpi remembers it for that repository (see
-**Sidebar sections apply to** in [Settings](settings.md)); another repository
+**Left pane sections** in [Settings](settings.md)); another repository
 without worktrees still starts with the section hidden.
 
 ## Creating a worktree

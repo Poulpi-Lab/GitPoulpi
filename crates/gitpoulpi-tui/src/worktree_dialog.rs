@@ -1114,7 +1114,10 @@ mod tests {
         let edited = dialog.path.clone();
         assert!(edited.ends_with("repo-other-2x"), "{edited}");
         type_into(&mut dialog, WtFocus::Name, "y");
-        assert_eq!(dialog.path, edited, "the Folder was edited: Name no longer moves it");
+        assert_eq!(
+            dialog.path, edited,
+            "the Folder was edited: Name no longer moves it"
+        );
     }
 
     #[test]

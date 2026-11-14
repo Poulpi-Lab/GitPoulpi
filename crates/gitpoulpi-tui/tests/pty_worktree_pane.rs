@@ -43,7 +43,14 @@ fn fixture(config_toml: &str) -> Fx {
     let wt = dir.path().join("wt-folder");
     common::git_ok(
         &root,
-        &["worktree", "add", "-q", "-b", "feature-x", &wt.to_string_lossy()],
+        &[
+            "worktree",
+            "add",
+            "-q",
+            "-b",
+            "feature-x",
+            &wt.to_string_lossy(),
+        ],
     );
     common::git_ok(&wt, &["config", "user.name", "T"]);
     common::git_ok(&wt, &["config", "user.email", "t@example.com"]);
@@ -188,7 +195,7 @@ fn row_menu(term: &mut Terminal, name: &str) {
 
 fn the_dialog_proposes_name_and_folder(term: &Terminal, name: &str, folder: &str) {
     let text = term.text();
-    assert!(text.contains(&format!("Name")), "{text}");
+    assert!(text.contains("Name"), "{text}");
     assert!(text.contains(name), "{text}");
     assert!(text.contains(folder), "{text}");
 }
@@ -207,7 +214,11 @@ fn plus_menu_creates_from_the_current_branch_with_default_name_and_folder() {
     let repo_name = fx.root.file_name().unwrap().to_string_lossy().into_owned();
     the_dialog_proposes_name_and_folder(&term, "main-wt", &format!("{repo_name}-main-wt"));
     term.send_keys("Enter").unwrap();
-    let created = fx.root.parent().unwrap().join(format!("{repo_name}-main-wt"));
+    let created = fx
+        .root
+        .parent()
+        .unwrap()
+        .join(format!("{repo_name}-main-wt"));
     wait_until("the worktree is created", || {
         worktree_list(&fx.root).contains(&format!("{repo_name}-main-wt"))
     });
@@ -328,11 +339,7 @@ fn removing_a_clean_worktree_asks_and_removes_it() {
         s.contains("Remove worktree wt-folder") && s.contains("is not merged")
     });
     // The branch is not merged into main: no checkbox.
-    assert!(
-        term.text().contains("is not merged"),
-        "{}",
-        term.text()
-    );
+    assert!(term.text().contains("is not merged"), "{}", term.text());
     assert!(!term.text().contains("Also delete branch"));
     click_text(&mut term, " Remove  ", "removed", |_| !fx.wt.exists());
     assert!(!worktree_list(&fx.root).contains("wt-folder"));
@@ -362,14 +369,18 @@ fn a_dirty_worktree_offers_commit_stash_open_and_a_forced_removal() {
         s.contains("and discard its")
     });
     assert!(fx.wt.exists(), "nothing is removed before the confirmation");
-    click_text(&mut term, "Back", "back", |s| s.contains("Commit and remove"));
+    click_text(&mut term, "Back", "back", |s| {
+        s.contains("Commit and remove")
+    });
     // Stash and remove: the stash holds the untracked file.
-    click_text(&mut term, "Stash and remove", "removed", |_| !fx.wt.exists());
+    click_text(&mut term, "Stash and remove", "removed", |_| {
+        !fx.wt.exists()
+    });
     wait_until("the stash exists", || {
         common::git(&fx.root, &["stash", "list"]).contains("WIP on wt-folder")
     });
     assert_eq!(
-        common::git(&fx.root, &["ls-tree", "-r", "--name-only", "stash@{0}^3"]),
+        common::git_trimmed(&fx.root, &["ls-tree", "-r", "--name-only", "stash@{0}^3"]),
         "scratch.txt"
     );
 }
@@ -386,15 +397,20 @@ fn commit_and_remove_leaves_the_commit_on_the_branch() {
     });
     // The message field has the keyboard.
     term.send_text("park the scratch").unwrap();
-    term.wait_for("the message typed", STEP, |s| s.contains("park the scratch"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.wait_for("the message typed", STEP, |s| {
+        s.contains("park the scratch")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
         !common::status_line_text(&term.screen()).contains("park the scratch"),
         "the status line never types"
     );
-    click_text(&mut term, "Commit and remove", "removed", |_| !fx.wt.exists());
+    click_text(&mut term, "Commit and remove", "removed", |_| {
+        !fx.wt.exists()
+    });
     wait_until("the commit is on the branch", || {
-        common::git_trimmed(&fx.root, &["log", "-1", "--format=%s", "feature-x"]) == "park the scratch"
+        common::git_trimmed(&fx.root, &["log", "-1", "--format=%s", "feature-x"])
+            == "park the scratch"
     });
 }
 
@@ -424,7 +440,11 @@ fn merging_a_worktree_branch_into_main_lands_on_main() {
         s.contains("Merge feature-x into:") && s.contains("the merge runs there")
     });
     click_text(&mut term, " Merge  ", "merged", |_| {
-        common::git_try(&fx.root, &["merge-base", "--is-ancestor", "feature-x", "main"]).is_some()
+        common::git_try(
+            &fx.root,
+            &["merge-base", "--is-ancestor", "feature-x", "main"],
+        )
+        .is_some()
     });
     assert!(fx.wt.exists(), "merging does not remove the worktree");
 }
@@ -434,7 +454,10 @@ fn removing_a_merged_worktree_can_delete_its_branch_and_undo_brings_it_back() {
     let (repo, root) = repo();
     let dir = tempfile::tempdir().unwrap();
     let wt = dir.path().join("wt-done");
-    common::git_ok(&root, &["worktree", "add", "-q", "-b", "done", &wt.to_string_lossy()]);
+    common::git_ok(
+        &root,
+        &["worktree", "add", "-q", "-b", "done", &wt.to_string_lossy()],
+    );
     let config = tempfile::tempdir().unwrap();
     let mut term = launch(&root, "pty-wt-delete-branch", config.path());
     wait_section(&mut term);
@@ -443,10 +466,16 @@ fn removing_a_merged_worktree_can_delete_its_branch_and_undo_brings_it_back() {
         s.contains("Also delete branch done")
     });
     // Checked by default: just Remove.
-    assert!(term.text().contains("[x] Also delete branch done"), "{}", term.text());
+    assert!(
+        term.text().contains("[x] Also delete branch done"),
+        "{}",
+        term.text()
+    );
     click_text(&mut term, " Remove  ", "removed", |_| !wt.exists());
     wait_until("the branch is deleted", || {
-        common::git(&root, &["branch", "--list", "done"]).trim().is_empty()
+        common::git(&root, &["branch", "--list", "done"])
+            .trim()
+            .is_empty()
     });
     // Undo brings the branch back (the folder stays gone).
     term.send_keys("C-z").unwrap();
@@ -455,14 +484,19 @@ fn removing_a_merged_worktree_can_delete_its_branch_and_undo_brings_it_back() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     for _ in 0..3 {
-        if !common::git(&root, &["branch", "--list", "done"]).trim().is_empty() {
+        if !common::git(&root, &["branch", "--list", "done"])
+            .trim()
+            .is_empty()
+        {
             break;
         }
         term.send_keys("Enter").unwrap();
         std::thread::sleep(Duration::from_millis(800));
     }
     wait_until("the branch is back", || {
-        !common::git(&root, &["branch", "--list", "done"]).trim().is_empty()
+        !common::git(&root, &["branch", "--list", "done"])
+            .trim()
+            .is_empty()
     });
     assert!(!wt.exists());
     drop(repo);
@@ -480,7 +514,11 @@ fn the_section_is_hidden_without_worktrees_and_shown_empty_on_demand() {
         "hidden when the repository has no worktree:\n{}",
         term.text()
     );
-    palette(&mut term, "Show Worktrees", "Sidebar: Show Worktrees Section");
+    palette(
+        &mut term,
+        "Show Worktrees",
+        "Sidebar: Show Worktrees Section",
+    );
     term.wait_for("the empty section", STEP, |s| {
         s.contains("WORKTREES") && s.contains("No worktree yet: + to create one")
     })

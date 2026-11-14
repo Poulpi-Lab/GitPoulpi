@@ -494,7 +494,7 @@ pub enum Action {
     /// (one Undo brings the branch back; the folder stays gone).
     WorktreeRemove {
         path: PathBuf,
-        opts: gitpoulpi_core::domain::WorktreeRemoveOptions,
+        opts: Box<gitpoulpi_core::domain::WorktreeRemoveOptions>,
         delete_branch: Option<String>,
     },
     /// Merge `from` (a local branch) into whatever is checked out in the
@@ -505,7 +505,7 @@ pub enum Action {
     /// without conflicts.
     WorktreeMerge {
         worktree: PathBuf,
-        from: Ref,
+        from: Box<Ref>,
         then_remove: Option<(PathBuf, Option<String>)>,
     },
     /// Write a patch file (`GitBackend::patch_create`).

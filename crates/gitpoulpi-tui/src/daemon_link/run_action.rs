@@ -1179,7 +1179,7 @@ async fn dispatch(
             };
             Box::pin(dispatch(
                 &other,
-                Action::Merge(from),
+                Action::Merge(*from),
                 action_error_tx,
                 action_message_tx,
                 push_rejected_tx,

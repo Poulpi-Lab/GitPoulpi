@@ -370,19 +370,19 @@ fn every_action() -> Vec<Action> {
         },
         Action::WorktreeRemove {
             path: path("../wt"),
-            opts: gitpoulpi_core::domain::WorktreeRemoveOptions {
+            opts: Box::new(gitpoulpi_core::domain::WorktreeRemoveOptions {
                 force: false,
                 commit: Some(gitpoulpi_core::domain::WorktreeCommit {
                     message: s("save"),
                     branch: None,
                 }),
                 stash: None,
-            },
+            }),
             delete_branch: Some(s("topic")),
         },
         Action::WorktreeMerge {
             worktree: path("../main"),
-            from: a_ref(),
+            from: Box::new(a_ref()),
             then_remove: Some((path("../wt"), Some(s("topic")))),
         },
         Action::PatchCreate {

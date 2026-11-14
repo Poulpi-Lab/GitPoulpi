@@ -63,7 +63,7 @@ fn remember_folder(dir: &Path) {
 
 /// The open dialog. Init and Clone can have the folder picker open over
 /// them (their Browse button).
-#[cfg_attr(not(feature = "worktree"), allow(clippy::large_enum_variant))]
+#[allow(clippy::large_enum_variant)]
 pub(crate) enum RepoDialog {
     Browse(FolderPicker),
     Init {
@@ -76,7 +76,7 @@ pub(crate) enum RepoDialog {
     },
     /// Create worktree (a repository tab's ref / commit menus), with the picker over it for Browse.
     Worktree {
-        form: WorktreeDialog,
+        form: Box<WorktreeDialog>,
         picker: Option<FolderPicker>,
     },
     /// Remove a worktree, or choose where to merge its branch.
@@ -630,7 +630,9 @@ impl RepoDialogs {
         pick_ref: bool,
     ) {
         self.dialog = Some(RepoDialog::Worktree {
-            form: WorktreeDialog::with_choices(seed, repo_root, branches, pick_ref),
+            form: Box::new(WorktreeDialog::with_choices(
+                seed, repo_root, branches, pick_ref,
+            )),
             picker: None,
         });
     }
@@ -1190,7 +1192,7 @@ impl RepoDialogs {
             },
             RepoDialog::Worktree { form, picker } => match picker {
                 Some(p) => (p, picker_rect(area)),
-                None => (form, worktree_rect(area)),
+                None => (form.as_mut(), worktree_rect(area)),
             },
             #[cfg(feature = "worktree")]
             RepoDialog::WorktreeRemove(form) => {
@@ -2396,7 +2398,7 @@ pub(crate) fn apply_dialog_effect(effect: DialogEffect, ctx: &mut TabCtx) -> Opt
             let shown = path.display().to_string();
             ctx.link.submit_action(Action::WorktreeRemove {
                 path,
-                opts,
+                opts: Box::new(opts),
                 delete_branch,
             });
             Some(msg::worktree_manage::removing(shown))
@@ -2419,7 +2421,7 @@ pub(crate) fn apply_dialog_effect(effect: DialogEffect, ctx: &mut TabCtx) -> Opt
             };
             ctx.link.submit_action(Action::WorktreeMerge {
                 worktree: into,
-                from,
+                from: Box::new(from),
                 then_remove,
             });
             Some(msg::worktree_manage::merging(branch))

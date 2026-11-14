@@ -945,7 +945,10 @@ fn worktree_changes_and_remove_with_commit_stash_and_branch_delete() {
     ));
     assert!(removed.commit.is_some());
     assert!(!dirty.exists());
-    assert_eq!(repo.git(&["log", "-1", "--format=%s", "feature"]), "save it");
+    assert_eq!(
+        repo.git(&["log", "-1", "--format=%s", "feature"]),
+        "save it"
+    );
 
     // Stash first.
     let stashy = add("wt-stash", "feature");
@@ -979,10 +982,7 @@ fn worktree_changes_and_remove_with_commit_stash_and_branch_delete() {
     );
     assert_eq!(value["deleted_branch"], "done", "{value}");
     assert!(!clean.exists());
-    assert!(repo
-        .git(&["branch", "--list", "done"])
-        .trim()
-        .is_empty());
+    assert!(repo.git(&["branch", "--list", "done"]).trim().is_empty());
 }
 
 #[test]

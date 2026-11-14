@@ -819,7 +819,7 @@ impl WorktreeRemoveDialog {
             Stage::Dirty => {
                 dialog_kit::put(buf, inner.x, y, &self.dirty_text(), inner.width, text);
                 y += 1;
-                let rows = (list_bottom.saturating_sub(y)).min(8).max(2) as usize;
+                let rows = (list_bottom.saturating_sub(y)).clamp(2, 8) as usize;
                 let body = Rect::new(inner.x, y, inner.width, rows as u16);
                 self.paint_changes(buf, body, &mut hits);
                 y += rows as u16 + 1;
@@ -844,7 +844,7 @@ impl WorktreeRemoveDialog {
                 let own = self.wt.branch.clone().unwrap_or_default();
                 dialog_kit::put(buf, inner.x, y, &msg::merge_pick(&own), inner.width, text);
                 y += 1;
-                let rows = (list_bottom.saturating_sub(y)).min(10).max(2) as usize;
+                let rows = (list_bottom.saturating_sub(y)).clamp(2, 10) as usize;
                 let body = Rect::new(inner.x, y, inner.width, rows as u16);
                 self.paint_targets(buf, body, &mut hits);
                 y += rows as u16;
@@ -1328,7 +1328,9 @@ mod tests {
         d.commit_msg = "  save it ".into();
         match d.activate(Focus::CommitRemove) {
             RemoveOutcome::Remove {
-                opts, delete_branch, ..
+                opts,
+                delete_branch,
+                ..
             } => {
                 let commit = opts.commit.unwrap();
                 assert_eq!(commit.message, "save it");
@@ -1425,9 +1427,15 @@ mod tests {
             d.render(rect(area), &mut buf);
             let text = dialog_kit::buffer_text(&buf);
             assert!(text.contains(needle), "{stage:?}:\n{text}");
-            assert!(text.contains("Cancel") || stage == Stage::Force, "{stage:?}");
+            assert!(
+                text.contains("Cancel") || stage == Stage::Force,
+                "{stage:?}"
+            );
             for (r, _) in &d.hits {
-                assert!(r.right() <= rect(area).right(), "{stage:?}: {r:?} spills out");
+                assert!(
+                    r.right() <= rect(area).right(),
+                    "{stage:?}: {r:?} spills out"
+                );
             }
         }
     }

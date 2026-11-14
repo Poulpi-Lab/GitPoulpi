@@ -34,6 +34,24 @@ fn row_is(screen: &xtask::pty::Screen, label: &str, value: &str) -> bool {
     })
 }
 
+/// The selection left the row the Settings page opened on (the terminal
+/// combobox, whose label is painted with the selection background) and went to
+/// the File manager buttons. The palette command moves it only once every
+/// Launcher-page job (terminal probe, tool reads) has ended, which can be
+/// after the rows already read "created"; a key sent before that still goes to
+/// the combobox and opens its list instead of pressing Remove.
+fn selection_left_the_first_row(screen: &xtask::pty::Screen) -> bool {
+    let bg_at = |label: &str| {
+        let (c, r) = screen.find(label)?;
+        screen.cell(c, r).map(|x| x.bg)
+    };
+    match (bg_at("Detected"), bg_at("Terminal for shortcuts")) {
+        (Some(rest), Some(first)) => rest == first,
+        (Some(_), None) => true,
+        _ => false,
+    }
+}
+
 /// A copy of the TUI in `install`, with `helper` (a dummy) beside it.
 fn install_copy(install: &Path, helper: &str) -> PathBuf {
     let built = Path::new(env!("CARGO_BIN_EXE_gitpoulpi-tui"));
@@ -74,6 +92,12 @@ fn install_from_the_palette(term: &mut Terminal) {
 /// focused first). Retried while the screen does not move: a key sent into a
 /// torn frame is still handled, but a lost one would hang the wait.
 fn remove_with_the_keyboard(term: &mut Terminal, done: impl Fn(&xtask::pty::Screen) -> bool) {
+    term.wait_for(
+        "the selection on the buttons",
+        STEP,
+        selection_left_the_first_row,
+    )
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Right").unwrap();
     term.send_keys("Enter").unwrap();
     term.wait_for("the removal question", STEP, |s| {

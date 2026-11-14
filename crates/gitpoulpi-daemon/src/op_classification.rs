@@ -60,6 +60,8 @@ const GOLDEN: &[(OperationKind, &str, &str)] = &[
     (K::RemoteGroupRun, "NCJP", "ALL"),
     (K::FastForward, "J", "ALL"),
     (K::WorktreeAdd, "", "REFS|LOG|WORKTREES"),
+    (K::WorktreeChanges, "R", "ALL"),
+    (K::WorktreeRemove, "", "REFS|LOG|STASHES|WORKTREES"),
     (K::PatchCreate, "R", "ALL"),
     (K::PatchApply, "", "ALL"),
     (K::ApplyCommit, "", "ALL"),

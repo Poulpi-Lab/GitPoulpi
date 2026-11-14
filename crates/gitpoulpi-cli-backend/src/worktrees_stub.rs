@@ -5,7 +5,9 @@
 
 use std::path::Path;
 
-use gitpoulpi_core::domain::{RepoRef, Worktree, WorktreeAddOptions};
+use gitpoulpi_core::domain::{
+    RepoRef, Worktree, WorktreeAddOptions, WorktreeChange, WorktreeRemoveOptions, WorktreeRemoved,
+};
 use gitpoulpi_core::{Error, Result};
 
 fn not_built<T>() -> Result<T> {
@@ -19,5 +21,17 @@ pub fn worktrees(_repo: &RepoRef) -> Result<Vec<Worktree>> {
 }
 
 pub fn worktree_add(_repo: &RepoRef, _path: &Path, _opts: &WorktreeAddOptions) -> Result<Worktree> {
+    not_built()
+}
+
+pub fn worktree_changes(_repo: &RepoRef, _path: &Path) -> Result<Vec<WorktreeChange>> {
+    not_built()
+}
+
+pub fn worktree_remove(
+    _repo: &RepoRef,
+    _path: &Path,
+    _opts: &WorktreeRemoveOptions,
+) -> Result<WorktreeRemoved> {
     not_built()
 }

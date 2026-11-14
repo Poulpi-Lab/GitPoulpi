@@ -15,6 +15,7 @@ use crate::domain::{
     RemoteAccessOptions, RemoteAccessReport, RepoRef, ResetMode, ResolveOptions, RevertOutcome,
     RewordOutcome, Snapshot, SparseState, SplitCommit, SplitOutcome, SplitSource, StageTarget,
     Stash, StashId, Submodule, SubmoduleUpdateOptions, WorkingTree, Worktree, WorktreeAddOptions,
+    WorktreeChange, WorktreeRemoveOptions, WorktreeRemoved,
 };
 use crate::Result;
 
@@ -590,6 +591,25 @@ pub trait GitBackend: Send + Sync {
         path: &Path,
         opts: &WorktreeAddOptions,
     ) -> Result<Worktree>;
+
+    /// The uncommitted changes of the worktree at `path` (tracked and
+    /// untracked, not ignored), in path order. Empty when it is clean.
+    fn worktree_changes(&self, repo: &RepoRef, path: &Path) -> Result<Vec<WorktreeChange>>;
+
+    /// Removes the linked worktree at `path` (`git worktree remove`).
+    ///
+    /// The main worktree is refused. A worktree with uncommitted changes
+    /// is refused unless `opts.force`, or unless `opts.commit` / `opts.stash`
+    /// first saves them (commit on the worktree's branch, or a
+    /// `stash push -u`); a refusal leaves the worktree untouched. A
+    /// locked worktree is refused. Not journaled: removing the folder
+    /// cannot be undone, but a commit or stash made first stays.
+    fn worktree_remove(
+        &self,
+        repo: &RepoRef,
+        path: &Path,
+        opts: &WorktreeRemoveOptions,
+    ) -> Result<WorktreeRemoved>;
 
     /// Writes `source` out as a patch file at `dest` (`git format-patch`
     /// for commits/ranges, `git diff HEAD --binary` for the working

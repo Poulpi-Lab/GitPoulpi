@@ -6,6 +6,7 @@ use gitpoulpi_core::domain::{
     ConflictResolution, DiffTarget, DiscardTarget, InitOptions, InteractiveRebase, LfsInstallScope,
     LfsTrackOptions, LogOptions, MergeOptions, Oid, OperationKind, PatchSource, RebaseOptions,
     ResetMode, StageTarget, StashId, SubmoduleUpdateOptions, WorktreeAddOptions,
+    WorktreeRemoveOptions,
 };
 use gitpoulpi_core::GitBackend;
 use gitpoulpi_ipc::Request;
@@ -474,6 +475,15 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
             let path: PathBuf = arg_or_err!(args, "path", request.id);
             let opts: WorktreeAddOptions = arg_or_err!(args, "opts", request.id);
             to_json!(backend.worktree_add(&repo, &path, &opts))
+        }
+        OperationKind::WorktreeChanges => {
+            let path: PathBuf = arg_or_err!(args, "path", request.id);
+            to_json!(backend.worktree_changes(&repo, &path))
+        }
+        OperationKind::WorktreeRemove => {
+            let path: PathBuf = arg_or_err!(args, "path", request.id);
+            let opts: WorktreeRemoveOptions = arg_or_err!(args, "opts", request.id);
+            to_json!(backend.worktree_remove(&repo, &path, &opts))
         }
         OperationKind::PatchCreate => {
             let source: PatchSource = arg_or_err!(args, "source", request.id);

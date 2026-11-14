@@ -632,6 +632,9 @@ macro_rules! for_each_worktree_check {
             check_worktrees_includes_main_when_there_are_no_linked_ones,
             check_worktree_add_on_a_new_branch_an_existing_branch_and_a_commit,
             check_worktree_add_refusals_leave_no_worktree,
+            check_worktree_remove_clean_dirty_and_refusals,
+            check_worktree_remove_commits_first,
+            check_worktree_remove_stashes_first,
             check_outside_diff_sees_worktrees_added_and_removed,
         }
     };

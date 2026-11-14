@@ -136,6 +136,12 @@ pub enum OperationKind {
     /// Add a linked worktree at a path, on a branch or a commit (see
     /// `GitBackend::worktree_add`).
     WorktreeAdd,
+    /// The uncommitted changes of a linked worktree (see
+    /// `GitBackend::worktree_changes`). A read.
+    WorktreeChanges,
+    /// Remove a linked worktree, optionally saving its changes first
+    /// (see `GitBackend::worktree_remove`). Not undoable.
+    WorktreeRemove,
     /// Write a patch file from one or more commits, a commit range, or
     /// the working tree (see `GitBackend::patch_create`). A read: it
     /// writes to an arbitrary destination file, never to the repository.
@@ -658,6 +664,7 @@ impl OperationKind {
             | K::Remotes
             | K::LeftoverRemotes
             | K::Worktrees
+            | K::WorktreeChanges
             | K::Submodules
             | K::Resolve
             | K::MergeBase
@@ -754,6 +761,12 @@ impl OperationKind {
             K::WorktreeAdd => {
                 OpTraits::NONE.scope(ChangeScope::REFS | ChangeScope::LOG | ChangeScope::WORKTREES)
             }
+            K::WorktreeRemove => OpTraits::NONE.scope(
+                ChangeScope::REFS
+                    | ChangeScope::LOG
+                    | ChangeScope::STASHES
+                    | ChangeScope::WORKTREES,
+            ),
             K::TagPush => OpTraits::NONE
                 .network()
                 .shared_network()
@@ -866,7 +879,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 183] = [
+    pub const ALL: [OperationKind; 185] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -919,6 +932,8 @@ impl OperationKind {
         OperationKind::RemoteGroupRun,
         OperationKind::FastForward,
         OperationKind::WorktreeAdd,
+        OperationKind::WorktreeChanges,
+        OperationKind::WorktreeRemove,
         OperationKind::PatchCreate,
         OperationKind::PatchApply,
         OperationKind::ApplyCommit,

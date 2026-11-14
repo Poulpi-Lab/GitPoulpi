@@ -57,7 +57,7 @@ pub(crate) fn requires_feature(request: &Request) -> Option<&'static str> {
         | K::LfsLocks
         | K::LfsLock
         | K::LfsUnlock => Some("lfs"),
-        K::Worktrees | K::WorktreeAdd => Some("worktree"),
+        K::Worktrees | K::WorktreeAdd | K::WorktreeChanges | K::WorktreeRemove => Some("worktree"),
         K::Submodules | K::SubmoduleInit | K::SubmoduleUpdate => Some("submodule"),
         _ => None,
     }

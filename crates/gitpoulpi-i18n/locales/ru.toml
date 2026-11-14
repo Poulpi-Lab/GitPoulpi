@@ -635,11 +635,11 @@ inherited = "(унаследовано)"
 lfs_not_checked = "(ещё не проверено)"
 lfs_autofix_filters = { git = "Устанавливать фильтры LFS перед {$pull} и {$push}", local = "Устанавливать фильтры LFS перед получением и отправкой" }
 lfs_autofix_filters_help = { git = "Перед {$pull} или {$push} в репозитории с Git LFS запускает `git lfs install --local`, если его фильтров или хуков LFS нет (только в собственной конфигурации репозитория, не в глобальной), чтобы передача обработала большие файлы. Строка состояния сообщит, если это произошло. Нужен git-lfs.", local = "Перед получением или отправкой в репозитории с Git LFS запускает `git lfs install --local`, если его фильтров или хуков LFS нет (только в собственной конфигурации репозитория, не в глобальной), чтобы передача обработала большие файлы. Строка состояния сообщит, если это произошло. Нужен git-lfs." }
-push_group_preflight = "Check every remote before a {$push}"
-push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
-default_push_targets = "Extra {$push} targets for new branches"
-default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
-default_push_targets_none = "(no remote configured)"
+push_group_preflight = { git = "Проверять все remote перед push", local = "Проверять все remote перед отправкой" }
+push_group_preflight_help = { git = "Перед push ветки с дополнительными целями push сначала проверяется каждый remote (быстрый запрос и загрузка с remote только если он отличается), чтобы проблема на третьем remote была видна до начала первого push. Выключено: push на каждый remote по очереди и отчёт о результатах.", local = "Перед отправкой ветки с дополнительными целями отправки сначала проверяется каждый remote (быстрый запрос и загрузка с remote только если он отличается), чтобы проблема на третьем remote была видна до начала первой отправки. Выключено: отправка на каждый remote по очереди и отчёт о результатах." }
+default_push_targets = { git = "Дополнительные цели push для новых веток", local = "Дополнительные цели отправки для новых веток" }
+default_push_targets_help = { git = "Только этот репозиторий. Отметьте remote, на которые новая ветка делает push, помимо своего upstream. Они копируются в ветку, когда она впервые получает upstream (первый push, который его задаёт, или ветка, созданная из ветки remote). Уже существующие ветки не меняются: меняйте их в диалоге «Remote ветки».", local = "Только этот репозиторий. Отметьте remote, на которые новая ветка тоже отправляет изменения, помимо своего upstream. Они копируются в ветку, когда она впервые получает upstream (первая отправка, которая его задаёт, или ветка, созданная из ветки remote). Уже существующие ветки не меняются: меняйте их в диалоге «Remote ветки»." }
+default_push_targets_none = "(remote не настроены)"
 
 [settings_screen]
 title = "Настройки - Tab: разделы/параметры │ Enter: изменить"
@@ -885,7 +885,7 @@ push_branch = "{$Push} {name}"
 start_pr = "Создать {$pr} из {name}..."
 fetch = "{$Fetch}"
 # context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
-remotes_of = "Remotes of {name}..."
+remotes_of = "Remote ветки {name}..."
 rename = "Переименовать {name}..."
 delete = "Удалить {name}..."
 delete_both = "Удалить {first} и {second}..."
@@ -2199,23 +2199,23 @@ host_not_recognized = "хост remote не распознан"
 link_branch = "ссылка на ветку"
 link_commit = { git = "ссылка на commit", local = "ссылка на коммит" }
 # context: menu row of the Push dropdown: push the branch to its upstream and every extra push target; {remotes} lists them, comma separated
-push_to_all = "{$Push} to all ({remotes})"
+push_to_all = "{$Push} во все ({remotes})"
 # context: menu row: push the branch to one remote only; {remote} is that remote
-push_to_only = "{$Push} to {remote} only"
+push_to_only = "{$Push} только в {remote}"
 # context: menu row: opens the dialog where the remotes of this one push are ticked
-push_to_selected = "{$Push} to selected remotes..."
+push_to_selected = "{$Push} в выбранные remote..."
 # context: menu row of the Push dropdown that opens the dialog of the remotes a branch pushes to and pulls from; {branch} is the branch
-remotes_of = "Remotes of {branch}..."
+remotes_of = "Remote ветки {branch}..."
 # context: menu row of the Pull dropdown: pull the upstream and every extra pull source; {remotes} lists them, joined with +
-pull_from_all = "{$Pull} from all sources ({remotes})"
+pull_from_all = "{$Pull} из всех источников ({remotes})"
 # context: menu row: pull from one remote only, once; {remote} is that remote
-pull_from_only = "{$Pull} from {remote} only"
+pull_from_only = "{$Pull} только из {remote}"
 # context: status line while a push to several remotes starts; {branch} is the branch, {remotes} the remote names
-pushing_to_all = { git = "pushing {branch} to {remotes}...", local = "pushing {branch} to {remotes}..." }
+pushing_to_all = { git = "push {branch} в {remotes}...", local = "отправка {branch} в {remotes}..." }
 # context: status line while a pull from several remotes starts; {branch} is the branch, {remotes} the remote names
-pulling_from_all = { git = "pulling {branch} from {remotes}...", local = "pulling {branch} from {remotes}..." }
+pulling_from_all = { git = "pull {branch} из {remotes}...", local = "получение {branch} из {remotes}..." }
 # context: status line: the branch has no remote to pull from; {branch} is the branch
-no_pull_remote = "{branch} has no remote to {$pull} from"
+no_pull_remote = "у {branch} нет remote, откуда можно {$pull}"
 
 [keymap_action]
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
@@ -2546,7 +2546,7 @@ log_columns_fit_all = "Подогнать все колонки под соде�
 log_scroll_left = "Прокрутить колонки влево"
 log_scroll_right = "Прокрутить колонки вправо"
 log_columns_layout = "Прокрутка вбок или по размеру панели"
-refs_remotes = "Branch: Edit its Remotes"
+refs_remotes = "Ветка: изменить её remote"
 
 
 [keymap_ctx]
@@ -3137,8 +3137,8 @@ git_pull_options = { git = "Git: параметры pull...", local = "Git: па
 git_push = { git = "Git: push", local = "Git: отправить" }
 git_push_to_remote = { git = "Git: push на remote...", local = "Git: отправить на remote..." }
 git_force_push_with_lease = { git = "Git: force push (с lease)...", local = "Git: принудительно отправить (с lease)..." }
-git_remotes_of_branch = "Git: Remotes of Branch..."
-git_push_to_selected_remotes = "Git: {$Push} to Selected Remotes..."
+git_remotes_of_branch = "Git: Remote ветки..."
+git_push_to_selected_remotes = "Git: {$Push} в выбранные remote..."
 remote_add_remote = "Remote: добавить remote..."
 remote_remove_remote = "Remote: удалить remote..."
 remote_edit_remote = "Remote: изменить remote..."
@@ -3646,27 +3646,27 @@ view_log_scroll_left = "Вид: Log: прокрутить колонки вле�
 view_log_scroll_right = "Вид: Log: прокрутить колонки вправо"
 view_log_columns_layout = "Вид: Log: переключить прокрутку колонок вбок"
 # context: palette command: push to the upstream and every extra push target
-git_push_to_all_targets = "Git: {$Push} to All Targets"
+git_push_to_all_targets = "Git: {$Push} во все цели"
 # context: palette command: pull the upstream and every extra pull source
-git_pull_from_all_sources = "Git: {$Pull} from All Sources"
+git_pull_from_all_sources = "Git: {$Pull} из всех источников"
 # context: palette command: opens a list of remotes, pulls from the chosen one once
-git_pull_from_one_remote = "Git: {$Pull} from One Remote..."
+git_pull_from_one_remote = "Git: {$Pull} из одного remote..."
 # context: palette command: reopens the progress window of the last push to several remotes
-git_show_grouped_push = "Git: Show Grouped {$Push}"
+git_show_grouped_push = { git = "Git: показать групповой push", local = "Git: показать групповую отправку" }
 # context: palette command: goes on with the push to several remotes that paused on conflicts
-git_continue_grouped_push = "Git: Continue Grouped {$Push}"
+git_continue_grouped_push = { git = "Git: продолжить групповой push", local = "Git: продолжить групповую отправку" }
 # context: palette command: abandons the push to several remotes that paused on conflicts
-git_abort_grouped_push = "Git: Abort Grouped {$Push}"
+git_abort_grouped_push = { git = "Git: прервать групповой push", local = "Git: прервать групповую отправку" }
 # context: palette command: tries again the remotes that failed in the last push to several remotes
-git_retry_failed_pushes = "Git: Retry Failed Pushes"
+git_retry_failed_pushes = { git = "Git: повторить неудачные push", local = "Git: повторить неудачные отправки" }
 # context: palette: why a command is grayed out
-why_no_grouped_push = "there is no grouped {$push} to show"
+why_no_grouped_push = { git = "нет группового push для показа", local = "нет групповой отправки для показа" }
 # context: palette: why a command is grayed out
-why_group_not_paused = "no grouped {$push} is waiting on conflicts"
+why_group_not_paused = { git = "групповой push не ждёт разрешения конфликтов", local = "групповая отправка не ждёт разрешения конфликтов" }
 # context: palette: why Continue is grayed out
-why_group_not_ready = "resolve and conclude the conflicts first"
+why_group_not_ready = "сначала разрешите и завершите конфликты"
 # context: palette: why a command is grayed out
-why_nothing_to_retry = "no remote failed in the last grouped {$push}"
+why_nothing_to_retry = { git = "в последнем групповом push ни один remote не завершился ошибкой", local = "в последней групповой отправке ни один remote не завершился ошибкой" }
 
 [help_section]
 rewrite = "Переписывание истории"
@@ -4077,7 +4077,7 @@ rewrite_9 = "открывает вкладку «Размер» и анализ�
 rewrite_host_howto = { git = "объясняет, как провести переписывание через ветку, защищённую хостингом: снять защиту, сделать push под новым именем или пересоздать репозиторий; сам ничего не делает", local = "объясняет, как провести переписывание через ветку, защищённую хостингом: снять защиту, отправить под новым именем или пересоздать репозиторий; сам ничего не делает" }
 rewrite_ai_rules = "создаёт правила переписывания по вашему описанию с помощью ИИ (без предпросмотра и без применения)"
 log_columns_2 = "прокручивать колонки Log вбок, когда они сохраняют свою ширину (раскладка «Прокрутка вбок», выбирается в списке колонок, в Настройках или клавишей s при выбранной колонке); в раскладке «По размеру панели» все колонки умещаются в панель"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = { git = "изменить remote выбранной локальной ветки (её upstream и дополнительные цели push): клавиатурный аналог щелчка по значку remote в её строке", local = "изменить remote выбранной локальной ветки (её upstream и дополнительные цели отправки): клавиатурный аналог щелчка по значку remote в её строке" }
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} или правый щелчок"
@@ -5508,7 +5508,7 @@ no_longer = "{path} больше не подмодуль"
 [combo]
 type_to_search = "введите для поиска"
 # context: placeholder of the search line of a dropdown that also accepts typed text
-type_to_use_own = "type your own value"
+type_to_use_own = "введите своё значение"
 loading = "загрузка..."
 no_match = "нет совпадений"
 use_value = "Использовать «{value}»"
@@ -5837,11 +5837,11 @@ palette_create_desktop = "Лаунчер: создать ярлык на раб�
 palette_remove = "Лаунчер: удалить ярлыки"
 icons_updated = "ярлыки обновлены"
 alias = "Псевдоним команды"
-alias_help = "Короткая команда запуска GitPoulpi из терминала, например gp. Только буквы, цифры, - _ и . Псевдоним или функция оболочки с тем же именем имеет приоритет и отсюда не виден (oh-my-zsh сам определяет gp)."
+alias_help = "Короткая команда запуска GitPoulpi из терминала, например gp. Введите в списке любое имя, чтобы использовать своё. Только буквы, цифры, - _ и . Псевдоним или функция оболочки с тем же именем имеет приоритет и отсюда не виден (oh-my-zsh сам определяет gp)."
 alias_none = "Нет"
 alias_status = "Состояние псевдонима"
 alias_add = "Псевдоним новой вкладки"
-alias_add_help = "Вторая короткая команда, например gpa, которая открывает текущую папку новой вкладкой уже запущенного GitPoulpi (gitpoulpi --add) вместо запуска ещё одного. Если ни один не запущен, она запускает GitPoulpi как обычно. Кнопка «Создать» создаёт её вместе с псевдонимом команды выше. Правила имени те же."
+alias_add_help = "Вторая короткая команда, например gpa, которая открывает текущую папку новой вкладкой уже запущенного GitPoulpi (gitpoulpi --add) вместо запуска ещё одного. Если ни один не запущен, она запускает GitPoulpi как обычно. Кнопка «Создать» создаёт её вместе с псевдонимом команды выше. Введите в списке любое имя, чтобы использовать своё. Правила имени те же."
 alias_add_status = "Состояние (новая вкладка)"
 alias_set_name = "введите имя выше"
 alias_bad_space = "в имени есть пробел"
@@ -6507,7 +6507,7 @@ branch_rename = "Переименовать ветку {old} в {new}"
 upstream_set = "Задать upstream для {branch}: {upstream}"
 upstream_unset = "Сбросить upstream для {branch}"
 # context: undo history row: the push targets and pull sources of a branch were changed; {branch} is the local branch
-remotes_set = "Set remotes of {branch}"
+remotes_set = "Изменены remote ветки {branch}"
 config_set = "Задать {key}: {value}"
 config_unset = "Сбросить {key}"
 sparse_set = "Задать sparse checkout"
@@ -9641,229 +9641,229 @@ none = "в этом сообщении нет ссылок"
 
 [branch_remotes]
 # context: title of the dialog that lists every remote a branch pushes to and pulls from; {branch} is the local branch
-title = "Remotes of {branch}"
+title = "Remote ветки {branch}"
 # context: label before the list that picks the upstream (the remote branch the local branch tracks)
 upstream_label = "Upstream"
 # context: table heading: a configured remote's name
 col_remote = "Remote"
 # context: table heading: the branch's name on that remote
-col_branch = "Branch"
+col_branch = "Ветка"
 # context: table heading over a checkbox: the branch is also pushed to that remote
 col_push = "{$Push}"
 # context: table heading over a checkbox: a pull also takes the new commits of that remote
-col_pull = "{$Pull} too"
+col_pull = "и {$Pull}"
 # context: table heading: how the local branch stands against that remote (ahead, behind, in sync)
-col_state = "State"
+col_state = "Состояние"
 # context: cell in the Pull too column of the upstream's own row: the upstream is always pulled
 pull_upstream = "upstream"
 # context: state cell: the remote's copy and the local branch are the same commit
-state_in_sync = "in sync"
+state_in_sync = "синхронно"
 # context: state cell: the remote has no copy of the branch yet
-state_new = "new"
+state_new = "новая"
 # context: state cell: the remote's copy shares no history with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "несвязана"
 # context: state cell of a remote that is not used by the branch
 state_none = "-"
 # context: row of a remote the branch still mentions but the repository no longer has
-gone = "remote gone"
+gone = "remote удалён"
 # context: button on a gone row: forget that remote for this branch
-remove_button = "Remove"
+remove_button = "Убрать"
 # context: warning under the table; {first} and {second} are two remote names with the same address
-same_url = "{first} and {second} {$push} to the same URL."
+same_url = { git = "{first} и {second}: push на один и тот же URL.", local = "{first} и {second}: отправка на один и тот же URL." }
 # context: button: changes the branch name used on the selected remote
-rename_button = "Rename on remote..."
+rename_button = "Переименовать на remote..."
 # context: button: the branch tracks no upstream any more
-unset_button = "Unset upstream"
+unset_button = "Сбросить upstream"
 # context: primary button of the dialog
-apply_button = "Apply"
+apply_button = "Применить"
 # context: shown while the dialog reads the branch's remotes
-loading = "Reading the remotes..."
+loading = "Чтение remote..."
 # context: title of the small dialog that asks for the branch's name on one remote; {remote} is the remote
-rename_title = "Branch name on {remote}"
+rename_title = "Имя ветки на {remote}"
 # context: placeholder of that dialog's field
-rename_placeholder = "Branch name on the remote"
+rename_placeholder = "Имя ветки на remote"
 # context: primary button of that dialog
-rename_set = "Set"
+rename_set = "Задать"
 # context: inline error of that dialog when the field is empty
-rename_empty = "Type a branch name."
+rename_empty = "Введите имя ветки."
 # context: inline error when Rename is used on the upstream's own row
-rename_upstream_row = "The upstream's branch name is chosen in the list above."
+rename_upstream_row = "Имя ветки upstream выбирается в списке выше."
 # context: inline error when Rename is used with nothing to rename
-rename_no_row = "Select a remote's row first."
+rename_no_row = "Сначала выберите строку remote."
 # context: key hints under the table; keep the key names (Space, p, r, Del, Enter)
-keys_hint = "Space {$Push}, p {$Pull} too, r Rename, Del Remove, Enter Apply"
+keys_hint = "Space {$Push}, p и {$Pull}, r Переименовать, Del Убрать, Enter Применить"
 # context: status line while the change is sent; {branch} is the local branch
-applying = "setting the remotes of {branch}..."
+applying = "задаются remote ветки {branch}..."
 # context: status line once the daemon applied the change; {branch} is the local branch
-remotes_set = "remotes of {branch} updated"
+remotes_set = "remote ветки {branch} обновлены"
 
 [push_group]
 # context: title of the dialog that asks which remotes to push a branch to (one push only); {branch} is the local branch
-title_select = "{$Push} {branch} to selected remotes"
+title_select = "{$Push} {branch} в выбранные remote"
 # context: title of the dialog that shows how a branch stands against each remote before a grouped push; {n} is the number of remotes, {branch} the local branch
-title_plan = { one = "{$Push} {branch} to {n} remote", other = "{$Push} {branch} to {n} remotes" }
+title_plan = { one = "{$Push} {branch} в {n} remote", few = "{$Push} {branch} в {n} remote", many = "{$Push} {branch} в {n} remote", other = "{$Push} {branch} в {n} remote" }
 # context: title of the dialog while a grouped push runs or after it ended; {branch} is the local branch
 title_run = "{$Push} {branch}"
 # context: line under the title; {branch} is the local branch, {sha} the short id of its tip
-local_at = "Local {branch} at {sha}"
+local_at = "Локально {branch} на {sha}"
 # context: help line over the list of remotes to push to
-select_hint = "Pick the remotes this {$push} goes to. Nothing is saved unless you tick Remember."
+select_hint = { git = "Выберите remote для этого push. Ничего не сохраняется, пока не отмечено «Запомнить для этой ветки».", local = "Выберите remote для этой отправки. Ничего не сохраняется, пока не отмечено «Запомнить для этой ветки»." }
 # context: checkbox: store the picked remotes as the branch's push targets
-remember = "Remember for this branch"
+remember = "Запомнить для этой ветки"
 # context: shown under the list when no remote is ticked
-select_none = "Tick at least one remote."
+select_none = "Отметьте хотя бы один remote."
 # context: shown while the daemon asks the remotes about the branch
-loading = "Asking the remotes..."
+loading = "Опрос remote..."
 # context: table heading: the remote's name
 col_remote = "Remote"
 # context: table heading: how the local branch stands against the remote
-col_state = "State"
+col_state = "Состояние"
 # context: table heading: what the run does with that remote
-col_action = "Action"
+col_action = "Действие"
 # context: state of a remote that already has the same commit
-state_up_to_date = "up to date"
+state_up_to_date = "актуален"
 # context: state of a remote that only misses local commits
-state_ready = "ready"
+state_ready = "готов"
 # context: state of a remote that has no copy of the branch yet
-state_new = "new"
+state_new = "новая"
 # context: state of a remote that has commits the local branch lacks
-state_behind = "behind"
+state_behind = "позади"
 # context: state of a remote whose history and the local branch's both moved
-state_diverged = "diverged"
+state_diverged = "разошлись"
 # context: state of a remote whose commits are older copies of rebased or amended local commits
-state_rewritten = "rewritten"
+state_rewritten = "переписана"
 # context: state of a remote whose history shares nothing with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "несвязана"
 # context: state of a remote whose host refused the branch earlier (protected branch)
-state_refused = "refused"
+state_refused = "отклонена"
 # context: state of a remote that could not be asked
-state_unreachable = "not reachable"
+state_unreachable = "недоступен"
 # context: state of a remote that is no longer configured
-state_missing = "gone"
+state_missing = "удалён"
 # context: note on a remote that points at the same repository as an earlier row; {other} is that earlier remote
-same_as = "same repository as {other}"
+same_as = "тот же репозиторий, что {other}"
 # context: action: send the local commits to the remote
 action_push = "{$Push}"
 # context: action: move the local branch forward to the remote's commit; {remote} is the remote
-action_fast_forward = "Fast-forward from {remote}"
+action_fast_forward = "Fast-forward из {remote}"
 # context: action: combine the remote's commits into the local branch, then send; {remote} is the remote
-action_merge = "{$Merge} from {remote}"
+action_merge = "{$Merge} из {remote}"
 # context: action: replay the local commits on top of the remote's, then send; {remote} is the remote
-action_rebase = "{$Rebase} onto {remote}"
+action_rebase = "{$Rebase} на {remote}"
 # context: action: overwrite the remote's branch, refused if it moved since the plan
-action_force = "Force {$push} (lease)"
+action_force = { git = "Force push (lease)", local = "Принудительно отправить (lease)" }
 # context: action: leave this remote out
-action_skip = "Skip"
+action_skip = "Пропустить"
 # context: line under a row whose merge would conflict; {n} is the number of files, {files} their names
-conflicts = { one = "{$merge} would conflict in {n} file: {files}", other = "{$merge} would conflict in {n} files: {files}" }
+conflicts = { one = { git = "При merge будет конфликт в {n} файле: {files}", local = "При слиянии будет конфликт в {n} файле: {files}" }, few = { git = "При merge будет конфликт в {n} файлах: {files}", local = "При слиянии будет конфликт в {n} файлах: {files}" }, many = { git = "При merge будет конфликт в {n} файлах: {files}", local = "При слиянии будет конфликт в {n} файлах: {files}" }, other = { git = "При merge будет конфликт в {n} файлах: {files}", local = "При слиянии будет конфликт в {n} файлах: {files}" } }
 # context: checkbox: also send the tags that no remote has yet
-tags = "Also {$push} the {$tags} not sent yet"
+tags = { git = "Также push для tag'ов, ещё не отправленных", local = "Также отправить теги, ещё не отправленные" }
 # context: summary line under the table; {steps} is the list of steps
-then_line = "Then: {steps}."
+then_line = "Затем: {steps}."
 # context: summary line when every row is skipped or already up to date
-then_nothing = "Then: nothing to do."
+then_nothing = "Затем: ничего делать не нужно."
 # context: separator between steps in the summary line
 then_join = ", "
 # context: step of the summary line; {remote} is the remote
-step_fast_forward = "fast-forward from {remote}"
+step_fast_forward = "fast-forward из {remote}"
 # context: step of the summary line; {remote} is the remote
 step_merge = "{$merge} {remote}"
 # context: step of the summary line; {remote} is the remote
-step_rebase = "{$rebase} onto {remote}"
+step_rebase = "{$rebase} на {remote}"
 # context: step of the summary line; {n} is the number of remotes
-step_push = { one = "{$push} to {n} remote", other = "{$push} to {n} remotes" }
+step_push = { one = { git = "push в {n} remote", local = "отправка в {n} remote" }, few = { git = "push в {n} remote", local = "отправка в {n} remote" }, many = { git = "push в {n} remote", local = "отправка в {n} remote" }, other = { git = "push в {n} remote", local = "отправка в {n} remote" } }
 # context: warning under the summary when a row force-pushes; {n} is the number of commits that disappear, {remote} the remote
-force_note = { one = "Force {$push} replaces {n} {$commit} on {remote}.", other = "Force {$push} replaces {n} {$commits} on {remote}." }
+force_note = { one = { git = "Force push заменяет {n} commit на {remote}.", local = "Принудительная отправка заменяет {n} коммит на {remote}." }, few = { git = "Force push заменяет {n} commit'а на {remote}.", local = "Принудительная отправка заменяет {n} коммита на {remote}." }, many = { git = "Force push заменяет {n} commit'ов на {remote}.", local = "Принудительная отправка заменяет {n} коммитов на {remote}." }, other = { git = "Force push заменяет {n} commit'ов на {remote}.", local = "Принудительная отправка заменяет {n} коммитов на {remote}." } }
 # context: warning under the summary when rows rebase while other remotes already hold the local commits; {remotes} are those remotes
-rebase_warn = "A {$rebase} rewrites the local {$commits}: {remotes} will then need a force {$push}."
+rebase_warn = { git = "Rebase перепишет локальные commit'ы: для {remotes} потребуется force push.", local = "Перебазирование перепишет локальные коммиты: для {remotes} потребуется принудительная отправка." }
 # context: confirmation question before a force push; {n} is the number of remote commits replaced, {branch} the branch, {remotes} the remote names
-force_confirm = { one = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commit} on the remote is replaced. Not undoable.", other = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commits} on the remotes are replaced. Not undoable." }
+force_confirm = { one = { git = "Force push {branch} в {remotes}?\nС lease: на remote будет заменён {n} commit. Отменить нельзя.", local = "Принудительно отправить {branch} в {remotes}?\nС lease: на remote будет заменён {n} коммит. Отменить нельзя." }, few = { git = "Force push {branch} в {remotes}?\nС lease: на remote будут заменены {n} commit'а. Отменить нельзя.", local = "Принудительно отправить {branch} в {remotes}?\nС lease: на remote будут заменены {n} коммита. Отменить нельзя." }, many = { git = "Force push {branch} в {remotes}?\nС lease: на remote будет заменено {n} commit'ов. Отменить нельзя.", local = "Принудительно отправить {branch} в {remotes}?\nС lease: на remote будет заменено {n} коммитов. Отменить нельзя." }, other = { git = "Force push {branch} в {remotes}?\nС lease: на remote будет заменено {n} commit'ов. Отменить нельзя.", local = "Принудительно отправить {branch} в {remotes}?\nС lease: на remote будет заменено {n} коммитов. Отменить нельзя." } }
 # context: button: ask the remotes again
-btn_fetch_again = "{$Fetch} again"
+btn_fetch_again = "{$Fetch} снова"
 # context: button: set every row that has a problem to Skip
-btn_skip_problems = "Skip problems"
+btn_skip_problems = "Пропустить проблемные"
 # context: button: close the dialog without running
-btn_cancel = "Cancel"
+btn_cancel = "Отмена"
 # context: button: run the grouped push
-btn_run = "Run"
+btn_run = "Запустить"
 # context: button: go to the next step
-btn_next = "Next"
+btn_next = "Далее"
 # context: button: close the dialog (the run goes on)
-btn_close = "Close"
+btn_close = "Закрыть"
 # context: button: try the failed remotes again
-btn_retry = "Retry failed"
+btn_retry = "Повторить неудачные"
 # context: progress row: the remote took the commits
-run_pushed = "sent"
+run_pushed = "отправлено"
 # context: progress row: the remote got a new branch
-run_created = "created"
+run_created = "создана"
 # context: progress row: nothing to send
-run_up_to_date = "up to date"
+run_up_to_date = "актуален"
 # context: progress row: the local branch moved forward
-run_fast_forwarded = "fast-forwarded"
+run_fast_forwarded = "fast-forward"
 # context: progress row: the remote's commits were combined into the local branch with a new commit
-run_merged = "combined"
+run_merged = "объединено"
 # context: progress row: the local commits were replayed on the remote's
-run_rebased = "replayed"
+run_rebased = "перенесено"
 # context: progress row: the remote's commits were taken in
-run_integrated = "taken in"
+run_integrated = "принято"
 # context: progress row: left out
-run_skipped = "skipped"
+run_skipped = "пропущено"
 # context: progress row: the remote's commits are being combined with the local branch
-run_merging = "combining"
+run_merging = "объединение"
 # context: progress row: sending in progress
-run_pushing = "sending"
+run_pushing = "отправка"
 # context: progress row: not started yet
-run_waiting = "waiting"
+run_waiting = "ожидание"
 # context: progress row: failed; {why} is the reason
-run_failed = "failed: {why}"
+run_failed = "ошибка: {why}"
 # context: progress row: the remote refused; {why} is the reason
-run_rejected = "refused: {why}"
+run_rejected = "отклонено: {why}"
 # context: progress row: the run was canceled while this remote was in flight
-run_unknown = "unknown (canceled)"
+run_unknown = "неизвестно (отменено)"
 # context: progress row: the remote is not configured
-run_missing = "remote missing"
+run_missing = "remote отсутствует"
 # context: line under the progress rows while the run is going
-run_going = "Closing this window does not stop the run."
+run_going = "Закрытие окна не останавливает запуск."
 # context: line under the progress rows when the run ended well
-run_done = "Done."
+run_done = "Готово."
 # context: line under the progress rows when some remotes failed
-run_problems = "Some remotes failed. Retry them, or close."
+run_problems = "Некоторые remote завершились с ошибкой. Повторите или закройте."
 # context: key hints of the selection step
-hint_select = "Up/Down move  Space tick  m remember  Enter next  Esc close"
+hint_select = "Up/Down выбор  Space отметить  m запомнить  Enter далее  Esc закрыть"
 # context: key hints of the plan step
-hint_plan = "Up/Down row  Left/Right action  Enter list  s skip  t {$tags}  f again  Ctrl+Enter run  Esc close"
+hint_plan = "Up/Down строка  Left/Right действие  Enter список  s пропуск  t {$tags}  f снова  Ctrl+Enter запуск  Esc закрыть"
 # context: key hints of the progress step
-hint_run = "Esc close  r retry failed"
+hint_run = "Esc закрыть  r повторить неудачные"
 # context: text of the strip over the Log while a grouped push waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting = "Grouped {$push} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting = { git = "Групповой push приостановлен ({remote}): разрешите конфликты, завершите, затем «Продолжить».", local = "Групповая отправка приостановлена ({remote}): разрешите конфликты, завершите, затем «Продолжить»." }
 # context: text of the strip when the conflicts are resolved and the run can go on; {remote} is that remote
-strip_ready = "Grouped {$push} paused ({remote}): resolved. Continue to {$push}."
+strip_ready = { git = "Групповой push приостановлен ({remote}): конфликты разрешены. Нажмите «Продолжить», чтобы выполнить push.", local = "Групповая отправка приостановлена ({remote}): конфликты разрешены. Нажмите «Продолжить», чтобы отправить." }
 # context: strip button: go on with the grouped push
-strip_continue = "Continue"
+strip_continue = "Продолжить"
 # context: strip button: abort the merge or rebase of the grouped push and drop it
-strip_abort = "Abort group"
+strip_abort = "Прервать группу"
 # context: status line after the grouped push was aborted
-aborted = "Grouped {$push} aborted."
+aborted = { git = "Групповой push прерван.", local = "Групповая отправка прервана." }
 # context: status line while a grouped push runs
-running = "Grouped {$push}..."
+running = { git = "Групповой push...", local = "Групповая отправка..." }
 # context: question before aborting a paused grouped push; {branch} is the local branch, {remote} the remote whose merge or rebase stopped
-abort_confirm = "Abort the grouped {$push} of {branch} (stopped on {remote})?\nThe {$merge} or {$rebase} in progress is thrown away. What was already sent stays."
+abort_confirm = { git = "Прервать групповой push {branch} (остановлен на {remote})?\nВыполняемые merge или rebase отбрасываются. Уже отправленное остаётся.", local = "Прервать групповую отправку {branch} (остановлена на {remote})?\nВыполняемое слияние или перебазирование отбрасывается. Уже отправленное остаётся." }
 # context: title of the dialog that shows how a branch stands against each remote before a grouped pull; {n} is the number of remotes, {branch} the local branch
-title_pull_plan = { one = "{$Pull} {branch} from {n} remote", other = "{$Pull} {branch} from {n} remotes" }
+title_pull_plan = { one = "{$Pull} {branch} из {n} remote", few = "{$Pull} {branch} из {n} remote", many = "{$Pull} {branch} из {n} remote", other = "{$Pull} {branch} из {n} remote" }
 # context: text of the strip over the Log while a grouped pull waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting_pull = "Grouped {$pull} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting_pull = { git = "Групповой pull приостановлен ({remote}): разрешите конфликты, завершите, затем «Продолжить».", local = "Групповое получение изменений приостановлено ({remote}): разрешите конфликты, завершите, затем «Продолжить»." }
 # context: text of the strip when the conflicts are resolved and the grouped pull can go on; {remote} is that remote
-strip_ready_pull = "Grouped {$pull} paused ({remote}): resolved. Continue to {$pull}."
+strip_ready_pull = { git = "Групповой pull приостановлен ({remote}): конфликты разрешены. Нажмите «Продолжить», чтобы выполнить pull.", local = "Групповое получение изменений приостановлено ({remote}): конфликты разрешены. Нажмите «Продолжить», чтобы подтянуть изменения." }
 [multi_remote]
-state_new = "new"
-state_gone = "gone"
-state_unrelated = "unrelated"
-tip_title = "Remotes of {branch}"
-tip_in_sync = "{remote}: in sync"
-tip_ahead = "{remote}: {n} ahead"
-tip_behind = "{remote}: {n} behind"
-tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
-tip_new = "{remote}: no copy of this branch yet"
-tip_unrelated = "{remote}: no common history"
-tip_gone = "{remote}: no longer configured"
-tip_open_hint = "Click to edit the remotes of this branch"
+state_new = "новая"
+state_gone = "удалён"
+state_unrelated = "несвязана"
+tip_title = "Remote ветки {branch}"
+tip_in_sync = "{remote}: синхронно"
+tip_ahead = "{remote}: впереди на {n}"
+tip_behind = "{remote}: позади на {n}"
+tip_diverged = "{remote}: разошлись ({ahead} впереди, {behind} позади)"
+tip_new = "{remote}: копии этой ветки ещё нет"
+tip_unrelated = "{remote}: нет общей истории"
+tip_gone = "{remote}: больше не настроен"
+tip_open_hint = "Щёлкните, чтобы изменить remote этой ветки"

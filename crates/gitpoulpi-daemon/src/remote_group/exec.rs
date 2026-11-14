@@ -75,19 +75,17 @@ fn in_progress(repo: &RepoRef) -> Option<String> {
 }
 
 fn local_branch(backend: &dyn GitBackend, repo: &RepoRef, branch: &str) -> Option<Ref> {
-    backend.refs(repo).ok()?.into_iter().find(
-        |r| matches!(&r.kind, RefKind::LocalBranch { name } if name == branch),
-    )
+    backend
+        .refs(repo)
+        .ok()?
+        .into_iter()
+        .find(|r| matches!(&r.kind, RefKind::LocalBranch { name } if name == branch))
 }
 
 /// Whether the saved run could go on right now (the readiness flag): nothing
 /// in progress, nothing unmerged, and, for a stopped run, the branch checked
 /// out with its tip containing the stopped remote's tip.
-pub(super) fn ready_to_continue(
-    backend: &dyn GitBackend,
-    repo: &RepoRef,
-    st: &GroupState,
-) -> bool {
+pub(super) fn ready_to_continue(backend: &dyn GitBackend, repo: &RepoRef, st: &GroupState) -> bool {
     if in_progress(repo).is_some() {
         return false;
     }
@@ -184,10 +182,7 @@ async fn start(
             continue;
         }
         seen.push((&t.remote, &t.branch));
-        let merging = matches!(
-            t.action,
-            GroupAction::MergeFrom | GroupAction::RebaseOnto
-        );
+        let merging = matches!(t.action, GroupAction::MergeFrom | GroupAction::RebaseOnto);
         // A pull integrates into HEAD; a merge or rebase needs the branch
         // checked out. Refused before anything changed.
         if !local.is_head
@@ -340,7 +335,11 @@ fn abort(
         note = "the merge or rebase was aborted; ".to_string();
     }
     state::clear(repo);
-    let done = st.targets.iter().filter(|t| t.result.status.is_ok()).count();
+    let done = st
+        .targets
+        .iter()
+        .filter(|t| t.result.status.is_ok())
+        .count();
     let local_tip = local_branch(backend, repo, &st.branch).map(|r| r.target);
     Ok(RemoteGroupOutcome {
         run_id: st.run_id,
@@ -455,11 +454,12 @@ impl Exec<'_> {
             self.set_status(i, TargetStatus::Unknown);
             self.changed = true;
         }
-        let progressed = self
-            .st
-            .targets
-            .iter()
-            .any(|t| !matches!(t.result.status, TargetStatus::NotAttempted | TargetStatus::Skipped));
+        let progressed = self.st.targets.iter().any(|t| {
+            !matches!(
+                t.result.status,
+                TargetStatus::NotAttempted | TargetStatus::Skipped
+            )
+        });
         if self.changed || progressed {
             self.save();
         }
@@ -494,7 +494,24 @@ impl Exec<'_> {
             }
             crate::jobs::set_phase(&format!("integrate {remote} ({}/{total})", i + 1));
             self.emit(i, TargetStatus::Integrating);
-            match self.integrate_one(i).await {
+            let mut attempt = self.integrate_one(i).await;
+            // A fast-forward that an earlier integration of this run made
+            // impossible (each source was ahead alone; after the first, the
+            // second has diverged) is the merge the user's pull mode means.
+            if matches!(
+                &attempt,
+                Err(Stop::Fail {
+                    kind: FailureKind::NonFastForward,
+                    ..
+                })
+            ) && action == GroupAction::FastForwardFrom
+                && self.changed
+            {
+                self.st.targets[i].decision.action = GroupAction::MergeFrom;
+                self.st.targets[i].result.action = GroupAction::MergeFrom;
+                attempt = self.integrate_one(i).await;
+            }
+            match attempt {
                 Ok(how) => {
                     if how != Integration::UpToDate {
                         self.changed = true;
@@ -583,9 +600,7 @@ impl Exec<'_> {
             })
         });
         tracking.unwrap_or(Ref {
-            kind: RefKind::Tag {
-                name: tip.to_hex(),
-            },
+            kind: RefKind::Tag { name: tip.to_hex() },
             target: tip,
             visibility: Default::default(),
             is_head: false,

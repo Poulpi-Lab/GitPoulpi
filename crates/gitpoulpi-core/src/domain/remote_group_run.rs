@@ -13,8 +13,8 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::remote_group_plan::{GroupAction, GroupMode, PlannedTarget};
 use super::remote_group::RemoteRelation;
+use super::remote_group_plan::{GroupAction, GroupMode, PlannedTarget};
 use super::{Oid, PushRejectReason};
 use crate::failure::FailureKind;
 

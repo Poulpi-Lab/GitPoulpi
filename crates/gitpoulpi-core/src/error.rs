@@ -36,7 +36,9 @@ pub enum Error {
     /// A grouped push or pull of `branch` is saved (stopped on conflicts,
     /// canceled or with targets to retry): continue, retry or abort it
     /// (`resume`) instead of starting another. Nothing was changed.
-    #[error("a grouped push or pull of {branch} is waiting (run {run_id}): continue or abort it first")]
+    #[error(
+        "a grouped push or pull of {branch} is waiting (run {run_id}): continue or abort it first"
+    )]
     RemoteGroupPending { branch: String, run_id: String },
 
     /// A fast-forward-only pull found the branch and its upstream
@@ -491,12 +493,10 @@ impl Error {
     pub fn typed(&self) -> Option<TypedError> {
         match self {
             Error::PushRejected(r) => Some(TypedError::PushRejected(r.clone())),
-            Error::RemoteGroupPending { branch, run_id } => {
-                Some(TypedError::RemoteGroupPending {
-                    branch: branch.clone(),
-                    run_id: run_id.clone(),
-                })
-            }
+            Error::RemoteGroupPending { branch, run_id } => Some(TypedError::RemoteGroupPending {
+                branch: branch.clone(),
+                run_id: run_id.clone(),
+            }),
             Error::NotFastForward => Some(TypedError::NotFastForward),
             Error::RewordRefused(r) => Some(TypedError::RewordRefused(*r)),
             Error::SplitRefused(r) => Some(TypedError::SplitRefused(*r)),

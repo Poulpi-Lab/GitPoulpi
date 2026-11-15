@@ -375,10 +375,10 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `reword` | `deeper` | Modificar o histórico mais a fundo | `Alt+H` |
 | `composer` | `commit` | Commit pelo compositor | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Inserir uma referência de issue | `Alt+R` |
-| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
-| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
-| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
+| `md_editor` | `preview` | Editor de Markdown: alternar entre Escrever e Prévia | `Alt+P` |
+| `md_editor` | `split` | Editor de Markdown: alternar a vista lado a lado | `Alt+L` |
+| `md_editor` | `submit` | Editor de Markdown: enviar o texto | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Editor de Markdown: escrever com IA | `Alt+E` |
 | `dialog` | `browse` | Procurar uma pasta | `Ctrl+B` |
 | `dialog` | `sources` | Ir para as origens do clone | `Alt+S` |
 | `dialog` | `submit` | Enviar o formulário de pull request | `Ctrl+S` |
@@ -830,7 +830,7 @@ As teclas são as predefinidas.
 | Radar: afixar ou desafixar | `p` |
 | Radar: adiar... | `z` |
 | Radar: rever pedido... | `e` |
-| Radar: Open Issue Conversation | `i` |
+| Radar: abrir a conversa da issue | `i` |
 | Radar: rever através da API |  |
 | Radar: clonar e rever... |  |
 | Radar: editar responsáveis... |  |
@@ -972,30 +972,30 @@ As teclas são as predefinidas.
 | Quadro: definir etiquetas das colunas... | `c` |
 | Quadro: atualizar | `r` |
 | Quadro: fechar | `Esc` |
-| Conversation: Back |  |
-| Conversation: Refresh | `F5` |
-| Conversation: Load Older Entries | `m` |
-| Conversation: Previous Entry | `Up` |
-| Conversation: Next Entry | `Down` |
-| Conversation: Next Unread Entry | `n` |
-| Conversation: Reply to Entry | `r` |
-| Conversation: Quote Entry | `Q` |
-| Conversation: New Comment | `c` |
-| Conversation: Links of Entry... | `l` |
-| Conversation: Open Diagram of Entry | `g` |
-| Conversation: Copy Link of Entry | `y` |
-| Conversation: Open in Browser | `o` |
-| Conversation: Edit Comment | `e` |
-| Conversation: Delete Comment | `d` |
-| Conversation: Show or Hide Events | `v` |
-| Conversation: Toggle Write and Preview |  |
-| Conversation: Toggle the Split View |  |
-| Conversation: Send the Comment |  |
-| Conversation: Toggle Internal Note |  |
-| Conversation: Close | `Esc` |
-| Markdown Editor: Write with AI |  |
-| Markdown Editor: Refresh the AI Context |  |
-| Hosting: Open Issue Conversation... |  |
+| Conversa: voltar |  |
+| Conversa: atualizar | `F5` |
+| Conversa: carregar entradas mais antigas | `m` |
+| Conversa: entrada anterior | `Up` |
+| Conversa: entrada seguinte | `Down` |
+| Conversa: próxima entrada nova | `n` |
+| Conversa: responder à entrada | `r` |
+| Conversa: citar a entrada | `Q` |
+| Conversa: novo comentário | `c` |
+| Conversa: ligações da entrada... | `l` |
+| Conversa: abrir o diagrama da entrada | `g` |
+| Conversa: copiar a ligação da entrada | `y` |
+| Conversa: abrir no navegador | `o` |
+| Conversa: editar comentário | `e` |
+| Conversa: eliminar comentário | `d` |
+| Conversa: mostrar ou ocultar eventos | `v` |
+| Conversa: alternar entre Escrever e Prévia |  |
+| Conversa: alternar a vista lado a lado |  |
+| Conversa: enviar o comentário |  |
+| Conversa: alternar nota interna |  |
+| Conversa: fechar | `Esc` |
+| Editor de Markdown: escrever com IA |  |
+| Editor de Markdown: atualizar o contexto da IA |  |
+| Alojamento: abrir a conversa de uma issue... |  |
 | Revisão: ✦ redigir revisão... | `s` |
 | Revisão: aceitar sugestão | `y` |
 | Revisão: editar e aceitar sugestão... | `w` |
@@ -1505,7 +1505,7 @@ ISSUES. Consulte [Alojamento e gestores de issues](hosting-integration.md#5-pull
 
 | Tecla | Ação |
 |---|---|
-| `Enter` | Abrir a linha selecionada no navegador. Numa linha `Religar`: abrir as Definições nesse perfil |
+| `Enter` | Abrir a linha selecionada: uma issue (e um pedido no Azure DevOps ou no Bitbucket) como [conversa](hosting-integration.md#5c-conversas), um pull request na [revisão](review.md) nos hosts que a têm, tudo o resto no navegador. Numa linha `Religar`: abrir as Definições nesse perfil |
 | `Space` | Expandir ou recolher a secção |
 | `v` | Abrir o filtro da secção. Pull requests: Abertos, Merged / fechados, Todos. Issues: Abertas, Atribuídas a mim, Fechadas, Todas |
 | `n` | Secção de pull requests: criar um pull request. Secção ISSUES: nova issue. (O botão `+` do cabeçalho) |
@@ -1513,7 +1513,7 @@ ISSUES. Consulte [Alojamento e gestores de issues](hosting-integration.md#5-pull
 | `Enter` na linha de pesquisa | Escrever no campo de pesquisa. `Enter`, `Tab` ou `Esc` sai dele; `Ctrl+U` limpa-o |
 | `Enter` no cabeçalho de um grupo | Recolher ou expandir o grupo (*Meus pull requests*, *Atribuídos a mim*, *A aguardar minha revisão*, *Todos os pull requests*) |
 | `Enter` na linha do filtro, do fornecedor ou do repositório | Abrir essa lista pendente. A lista de fornecedores termina com **Nenhum (desvincular este repositório)** |
-| `.`, ou um clique com o botão direito | O menu da linha: abrir no navegador, copiar URL ou número, fazer checkout da branch de origem (pull requests); criar uma branch a partir da issue (issues) |
+| `.`, ou um clique com o botão direito | O menu da linha: abrir a conversa, abrir no navegador, copiar URL ou número, fazer checkout da branch de origem (pull requests); criar uma branch a partir da issue (issues) |
 
 ### O quadro de issues
 
@@ -1526,7 +1526,7 @@ abaixo é também um comando da paleta (**Quadro: ...**).
 | Setas | Selecionar um cartão (`Up`, `Down`) ou a coluna vizinha (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` saltam na coluna |
 | `Shift+Left`, `Shift+Right` | Mover o cartão selecionado para a coluna anterior ou seguinte |
 | `m` | **Mover cartão para...**: uma lista das colunas |
-| `Enter` | Abrir a issue (a nota, para uma issue local; a página do host nos outros casos) |
+| `Enter` | Abrir a [conversa](hosting-integration.md#5c-conversas) da issue (a página do host onde o host não tem nenhuma para ler) |
 | `e`, `.` | Editar responsáveis, etiquetas ou marco; o menu do cartão |
 | `n` | Nova issue na coluna selecionada |
 | `a`, `l`, `M`, `/` | Filtrar por responsável, etiqueta, marco, texto. `x` limpa os filtros |
@@ -1536,6 +1536,43 @@ abaixo é também um comando da paleta (**Quadro: ...**).
 
 Rato: arraste um cartão para outra coluna para o mover, clique num cartão para o selecionar, clique duas vezes para o abrir, clique com o botão direito para
 o menu do cartão, roda para deslocar uma coluna, `Shift`+roda (ou a barra sob o quadro) para deslocar as colunas.
+
+### A caixa de texto Markdown e a vista de conversa
+
+Cada caixa cujo texto vai para um host (um comentário, uma resposta, um resumo de revisão, a descrição de uma nova issue
+ou de um pull request) é a mesma caixa de texto. As suas teclas estão na tabela `md_editor` acima e podem ser reatribuídas.
+
+| Tecla | Ação |
+|---|---|
+| `Alt+P` | Alternar **Escrever** e **Prévia** (a partir de **Lado a lado** vai para a Prévia) |
+| `Alt+L` | **Lado a lado** ligado, ou de volta a Escrever (precisa de uma janela com 100 colunas) |
+| `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` | Enviar o texto (o botão do próprio formulário faz o mesmo) |
+| `Alt+E` | **Escrever com IA**: abre ou fecha o painel sob a barra de modos (só com a IA ativa) |
+| `Alt+R` | Só o compositor de commits: inserir uma referência de issue |
+| `Alt+W` | Os formulários de nova issue e de novo pull request: criar na própria página web do fornecedor |
+| `Esc` | No painel de **Escrever com IA**: parar um rascunho em curso, senão fechar o painel |
+
+Na [vista de conversa](hosting-integration.md#5c-conversas) de uma issue ou de um pedido (linhas da paleta
+*Conversa: ...*; as linhas com tecla estão na lista da paleta acima):
+
+| Tecla | Ação |
+|---|---|
+| `r` | Responder à entrada selecionada (no seu tópico, ou com o seu texto citado num host sem tópicos) |
+| `Q` | Citar a entrada selecionada num novo comentário |
+| `c` | Novo comentário |
+| `e`, `d` | Editar, eliminar um dos seus comentários |
+| `Alt+I` | Na caixa de comentário: **Nota interna** (GitLab, Redmine) |
+| `l`, `y`, `o` | Ligações da entrada, copiar o seu endereço, abri-la no navegador |
+| `n` | Próxima entrada nova |
+| `v`, `m`, `F5` | Mostrar ou ocultar eventos, carregar entradas mais antigas, atualizar |
+| `g` | Abrir o diagrama da entrada (um bloco `mermaid`) |
+| `Alt+Esquerda`, `Backspace` | Voltar pela pilha de itens abertos a partir de referências |
+| `Tab` | Cronologia, caixa de comentário, botões do cabeçalho |
+| `q`, `Esc` | Fechar |
+
+No Radar, `i` abre a conversa de uma linha de issue.
+
+Numa linha de pull request ou de issue das secções da barra lateral, `Enter` abre a conversa e `o` abre a linha no navegador.
 
 ### Flow (fluxos de trabalho de branches)
 

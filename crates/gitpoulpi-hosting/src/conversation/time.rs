@@ -40,6 +40,7 @@ pub(crate) fn iso_secs(text: &str) -> Option<i64> {
 
 /// Hosts keep no "edited" flag on a plain comment: it counts as edited when
 /// it was updated more than two seconds after it was created.
+#[allow(dead_code)] // unused by a Gerrit-only build.
 pub(crate) fn is_edited(created_at: &str, updated_at: Option<&str>) -> bool {
     match (iso_secs(created_at), updated_at.and_then(iso_secs)) {
         (Some(c), Some(u)) => u > c + 2,

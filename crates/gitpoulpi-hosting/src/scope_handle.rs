@@ -7,8 +7,10 @@ use std::sync::Arc;
 use crate::scope::{installed, RepoScopes};
 
 #[derive(Clone, Default)]
+#[allow(dead_code)] // unused by a Gerrit-only build.
 pub(crate) struct ScopeHandle(Option<Arc<dyn RepoScopes>>);
 
+#[allow(dead_code)]
 impl ScopeHandle {
     #[cfg(test)]
     pub(crate) fn injected(scopes: Arc<dyn RepoScopes>) -> Self {

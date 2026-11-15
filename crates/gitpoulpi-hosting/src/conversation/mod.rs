@@ -15,8 +15,6 @@
 
 pub mod caps;
 #[cfg(any(
-    feature = "github",
-    feature = "gitlab",
     feature = "gitea",
     feature = "azure-devops",
     feature = "bitbucket",

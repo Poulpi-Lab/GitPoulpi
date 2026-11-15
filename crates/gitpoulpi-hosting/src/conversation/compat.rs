@@ -92,6 +92,7 @@ pub(crate) fn sort_by_time(entries: &mut [TimelineEntry]) {
 /// Where the token comes from: the repository's token command when it acts
 /// for this project, else the integration profile's own. The flag says
 /// whether the command is in use (its user is then not the profile's).
+#[allow(dead_code)] // Gerrit alone (a feature subset) has no token command.
 pub(crate) fn token_source(
     scopes: &crate::scope_handle::ScopeHandle,
     integration_id: &str,

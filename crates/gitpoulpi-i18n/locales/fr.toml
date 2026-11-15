@@ -2595,6 +2595,9 @@ log_scroll_left = "Faire défiler les colonnes vers la gauche"
 log_scroll_right = "Faire défiler les colonnes vers la droite"
 log_columns_layout = "Défilement latéral ou ajustement au volet"
 refs_remotes = "Branche : modifier ses distants"
+md_editor_preview = "Éditeur Markdown\u00a0: basculer entre Écrire et Aperçu"
+md_editor_split = "Éditeur Markdown\u00a0: afficher ou masquer la vue côte à côte"
+md_editor_submit = "Éditeur Markdown\u00a0: envoyer le texte"
 
 
 [keymap_ctx]
@@ -2631,6 +2634,7 @@ integrations = "Paramètres : page Intégrations"
 activity_log = "Fenêtre du journal d'activité"
 palette = "Commandes de la palette"
 split = { git = "Éditeur de scission de commit", local = "Éditeur de scission de validation" }
+md_editor = "Éditeur Markdown (commentaires, descriptions, résumés)"
 
 [keymap_conflict]
 already_bound = "{chord} est déjà {action} ({ctx})"
@@ -9904,3 +9908,23 @@ stash_default = "WIP sur {name}"
 hint_next = "suivant"
 # context: key hint
 hint_default = "exécuter"
+
+[md_render]
+alert_note = "Note"
+alert_tip = "Astuce"
+alert_important = "Important"
+alert_warning = "Attention"
+alert_caution = "Prudence"
+
+[md_editor]
+mode_write = "Écrire"
+mode_preview = "Aperçu"
+mode_split = "Côte à côte"
+split_needs_width = "Côte à côte demande une fenêtre de 100 colonnes."
+preview_updating = "mise à jour..."
+preview_empty = "Rien à prévisualiser pour l'instant."
+sent_as = "Envoyé en {markup}"
+discard_title = "Abandonner ce texte\u00a0?"
+discard_body = "Ce que vous avez écrit sera perdu."
+hint_preview = "Aperçu"
+hint_split = "Côte à côte"

@@ -2591,6 +2591,9 @@ log_scroll_left = "Scorri le colonne a sinistra"
 log_scroll_right = "Scorri le colonne a destra"
 log_columns_layout = "Scorri lateralmente o adatta al pannello"
 refs_remotes = "Branch: modifica i suoi remoti"
+md_editor_preview = "Markdown Editor: Toggle Write and Preview"
+md_editor_split = "Markdown Editor: Toggle the Split View"
+md_editor_submit = "Markdown Editor: Send the Text"
 
 
 [keymap_ctx]
@@ -2627,6 +2630,7 @@ integrations = "Impostazioni: pagina Integrazioni"
 activity_log = "Finestra del Registro attività"
 palette = "Comandi della palette"
 split = "Editor di divisione del {$commit}"
+md_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [keymap_conflict]
 already_bound = "{chord} è già {action} ({ctx})"
@@ -9885,3 +9889,23 @@ stash_default = "WIP su {name}"
 hint_next = "avanti"
 # context: key hint
 hint_default = "esegui"
+
+[md_render]
+alert_note = "Note"
+alert_tip = "Tip"
+alert_important = "Important"
+alert_warning = "Warning"
+alert_caution = "Caution"
+
+[md_editor]
+mode_write = "Write"
+mode_preview = "Preview"
+mode_split = "Split"
+split_needs_width = "Split needs a window 100 columns wide."
+preview_updating = "updating..."
+preview_empty = "Nothing to preview yet."
+sent_as = "Sent as {markup}"
+discard_title = "Discard this text?"
+discard_body = "What you wrote will be lost."
+hint_preview = "Preview"
+hint_split = "Split"

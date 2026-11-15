@@ -35,10 +35,13 @@ use crate::th;
 /// Index into [`Doc::links`].
 pub(crate) type LinkId = usize;
 
-/// Where a link goes. Only web addresses are ever offered.
+/// Where a link goes. Only web addresses are ever offered; `xref` keeps what
+/// the reference meant (an item of the repository, a commit, a person) for
+/// the callers that open those in the app.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct LinkTarget {
     pub(crate) url: String,
+    pub(crate) xref: Option<gitpoulpi_hosting::xrefs::XrefTarget>,
 }
 
 /// How a run of text is drawn.
@@ -108,10 +111,11 @@ pub(crate) struct Doc {
     pub(crate) links: Vec<LinkTarget>,
 }
 
-/// What references resolve against (the repository's linked sources).
+/// What references resolve against: the host the text came from and the
+/// repository's linked sources (`gitpoulpi_hosting::xrefs`).
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub(crate) struct Context {
-    pub(crate) bases: crate::issue_tokens::TokenBases,
+    pub(crate) xrefs: gitpoulpi_hosting::xrefs::XrefContext,
 }
 
 /// Longest code block shown, and longest total code per document.
@@ -144,26 +148,10 @@ pub(crate) fn is_banned(c: char) -> bool {
         )
 }
 
-// TODO: switch to `gitpoulpi_hosting::markup::sanitize` once that slice merges.
-/// Strips what must not reach the terminal (see [`is_banned`]) plus combining
-/// marks with no base to sit on. `\r` is dropped (`\r\n` becomes `\n`).
-pub(crate) fn sanitize(text: &str) -> String {
-    let mut out = String::with_capacity(text.len());
-    let mut prev: Option<char> = None;
-    for c in text.chars() {
-        if c == '\r' || is_banned(c) {
-            continue;
-        }
-        let lone_mark =
-            layout::cw(c) == 0 && !c.is_control() && prev.is_none_or(char::is_whitespace);
-        if lone_mark {
-            continue;
-        }
-        out.push(c);
-        prev = Some(c);
-    }
-    out
-}
+/// Strips what must not reach the terminal: controls, the emoji and joiner
+/// machinery, bidirectional overrides and lone combining marks (the shared
+/// hygiene of every imported text, `markup::sanitize`).
+pub(crate) use gitpoulpi_hosting::markup::sanitize;
 
 /// The style of a [`Look`] over `base` (the surrounding text's style).
 pub(crate) fn look_style(look: Look, base: Style) -> Style {

@@ -963,7 +963,7 @@ fn a_refused_reply_gives_the_words_back() {
     r.view.call.as_mut().unwrap().rx = rx;
     r.view.poll();
     let c = r.view.compose.as_ref().expect("the box is back");
-    assert_eq!(c.text, "lost?");
+    assert_eq!(c.text(), "lost?");
     assert!(r.screen().contains("could not send: host said no"));
 }
 

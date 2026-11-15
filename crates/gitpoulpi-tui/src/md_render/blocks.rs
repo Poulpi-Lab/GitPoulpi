@@ -141,13 +141,15 @@ fn loose_lists(events: &[Event]) -> HashSet<usize> {
 }
 
 fn alert_label(kind: BlockQuoteKind) -> &'static str {
+    use gitpoulpi_i18n::msg::md_render as m;
     match kind {
-        BlockQuoteKind::Note => "Note", // i18n-english: the alert keyword of the host
-        BlockQuoteKind::Tip => "Tip",   // i18n-english: the alert keyword of the host
-        BlockQuoteKind::Important => "Important", // i18n-english: the alert keyword of the host
-        BlockQuoteKind::Warning => "Warning", // i18n-english: the alert keyword of the host
-        BlockQuoteKind::Caution => "Caution", // i18n-english: the alert keyword of the host
+        BlockQuoteKind::Note => m::ALERT_NOTE,
+        BlockQuoteKind::Tip => m::ALERT_TIP,
+        BlockQuoteKind::Important => m::ALERT_IMPORTANT,
+        BlockQuoteKind::Warning => m::ALERT_WARNING,
+        BlockQuoteKind::Caution => m::ALERT_CAUTION,
     }
+    .get()
 }
 
 fn decode_entities(s: &str) -> String {

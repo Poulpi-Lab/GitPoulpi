@@ -2593,6 +2593,9 @@ log_scroll_left = "Spalten nach links scrollen"
 log_scroll_right = "Spalten nach rechts scrollen"
 log_columns_layout = "Seitlich scrollen oder an Bereich anpassen"
 refs_remotes = "Branch: Remotes bearbeiten"
+md_editor_preview = "Markdown Editor: Toggle Write and Preview"
+md_editor_split = "Markdown Editor: Toggle the Split View"
+md_editor_submit = "Markdown Editor: Send the Text"
 
 
 [keymap_ctx]
@@ -2629,6 +2632,7 @@ integrations = "Einstellungen: Integrationen"
 activity_log = "Aktivitätsprotokoll-Fenster"
 palette = "Palette-Befehle"
 split = "Aufteilungseditor für {$commit}"
+md_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [keymap_conflict]
 already_bound = "{chord} ist bereits {action} ({ctx})"
@@ -10019,3 +10023,23 @@ stash_default = "WIP on {name}"
 hint_next = "weiter"
 # context: key hint
 hint_default = "ausführen"
+
+[md_render]
+alert_note = "Note"
+alert_tip = "Tip"
+alert_important = "Important"
+alert_warning = "Warning"
+alert_caution = "Caution"
+
+[md_editor]
+mode_write = "Write"
+mode_preview = "Preview"
+mode_split = "Split"
+split_needs_width = "Split needs a window 100 columns wide."
+preview_updating = "updating..."
+preview_empty = "Nothing to preview yet."
+sent_as = "Sent as {markup}"
+discard_title = "Discard this text?"
+discard_body = "What you wrote will be lost."
+hint_preview = "Preview"
+hint_split = "Split"

@@ -2590,6 +2590,9 @@ log_scroll_left = "Przewiń kolumny w lewo"
 log_scroll_right = "Przewiń kolumny w prawo"
 log_columns_layout = "Przewijanie w poziomie lub dopasowanie do panelu"
 refs_remotes = "Gałąź: edytuj jej zdalne"
+md_editor_preview = "Markdown Editor: Toggle Write and Preview"
+md_editor_split = "Markdown Editor: Toggle the Split View"
+md_editor_submit = "Markdown Editor: Send the Text"
 
 
 [keymap_ctx]
@@ -2626,6 +2629,7 @@ integrations = "Ustawienia: Strona Integracji"
 activity_log = "Okno Dziennika aktywności"
 palette = "Polecenia palety"
 split = { git = "Edytor podziału commita", local = "Edytor podziału zatwierdzenia" }
+md_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [keymap_conflict]
 already_bound = "{chord} uruchamia już {action} ({ctx})"
@@ -9887,3 +9891,23 @@ stash_default = "WIP w {name}"
 hint_next = "dalej"
 # context: key hint
 hint_default = "uruchom"
+
+[md_render]
+alert_note = "Note"
+alert_tip = "Tip"
+alert_important = "Important"
+alert_warning = "Warning"
+alert_caution = "Caution"
+
+[md_editor]
+mode_write = "Write"
+mode_preview = "Preview"
+mode_split = "Split"
+split_needs_width = "Split needs a window 100 columns wide."
+preview_updating = "updating..."
+preview_empty = "Nothing to preview yet."
+sent_as = "Sent as {markup}"
+discard_title = "Discard this text?"
+discard_body = "What you wrote will be lost."
+hint_preview = "Preview"
+hint_split = "Split"

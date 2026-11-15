@@ -2590,6 +2590,9 @@ log_scroll_left = "열을 왼쪽으로 스크롤"
 log_scroll_right = "열을 오른쪽으로 스크롤"
 log_columns_layout = "옆으로 스크롤 / 창에 맞춤"
 refs_remotes = "브랜치: 리모트 편집"
+md_editor_preview = "Markdown Editor: Toggle Write and Preview"
+md_editor_split = "Markdown Editor: Toggle the Split View"
+md_editor_submit = "Markdown Editor: Send the Text"
 
 
 [keymap_ctx]
@@ -2626,6 +2629,7 @@ integrations = "설정: 연동 페이지"
 activity_log = "활동 로그 창"
 palette = "팔레트 명령"
 split = "{$Commit} 분할 편집기"
+md_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [keymap_conflict]
 already_bound = "{chord}은(는) 이미 {action}({ctx})에 지정되어 있습니다"
@@ -10011,3 +10015,23 @@ stash_default = "WIP on {name}"
 hint_next = "다음"
 # context: key hint
 hint_default = "실행"
+
+[md_render]
+alert_note = "Note"
+alert_tip = "Tip"
+alert_important = "Important"
+alert_warning = "Warning"
+alert_caution = "Caution"
+
+[md_editor]
+mode_write = "Write"
+mode_preview = "Preview"
+mode_split = "Split"
+split_needs_width = "Split needs a window 100 columns wide."
+preview_updating = "updating..."
+preview_empty = "Nothing to preview yet."
+sent_as = "Sent as {markup}"
+discard_title = "Discard this text?"
+discard_body = "What you wrote will be lost."
+hint_preview = "Preview"
+hint_split = "Split"

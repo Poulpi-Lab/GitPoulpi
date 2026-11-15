@@ -2592,6 +2592,9 @@ log_scroll_left = "Sütunları Sola Kaydır"
 log_scroll_right = "Sütunları Sağa Kaydır"
 log_columns_layout = "Yana Kaydır veya Bölmeye Sığdır"
 refs_remotes = "Dal: Uzak Depolarını Düzenle"
+md_editor_preview = "Markdown Editor: Toggle Write and Preview"
+md_editor_split = "Markdown Editor: Toggle the Split View"
+md_editor_submit = "Markdown Editor: Send the Text"
 
 
 [keymap_ctx]
@@ -2628,6 +2631,7 @@ integrations = "Ayarlar: Entegrasyonlar sayfası"
 activity_log = "Etkinlik Günlüğü penceresi"
 palette = "Palet komutları"
 split = "{$commit} bölme düzenleyicisi"
+md_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [keymap_conflict]
 already_bound = "{chord} zaten {action} ({ctx})"
@@ -9891,3 +9895,23 @@ stash_default = "{name} üzerinde WIP"
 hint_next = "sonraki"
 # context: key hint
 hint_default = "çalıştır"
+
+[md_render]
+alert_note = "Note"
+alert_tip = "Tip"
+alert_important = "Important"
+alert_warning = "Warning"
+alert_caution = "Caution"
+
+[md_editor]
+mode_write = "Write"
+mode_preview = "Preview"
+mode_split = "Split"
+split_needs_width = "Split needs a window 100 columns wide."
+preview_updating = "updating..."
+preview_empty = "Nothing to preview yet."
+sent_as = "Sent as {markup}"
+discard_title = "Discard this text?"
+discard_body = "What you wrote will be lost."
+hint_preview = "Preview"
+hint_split = "Split"

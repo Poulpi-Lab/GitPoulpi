@@ -614,7 +614,24 @@ impl ReviewView {
                 )
             }
         };
-        self.compose = Some(ComposeBox::new(purpose, title, about, text));
+        // New texts keep a draft per target; edits of an existing text do not.
+        let target_key = match &purpose {
+            ComposeFor::Conversation => Some("conversation".to_string()),
+            ComposeFor::Reply { thread_id } => Some(format!("reply:{thread_id}")),
+            ComposeFor::Line { path, line, .. } => Some(format!("line:{path}:{line}")),
+            _ => None,
+        };
+        let draft_key = target_key.filter(|_| text.is_empty()).map(|k| {
+            crate::md_editor::draft::key(&[
+                &self.target.integration.id,
+                &self.target.project,
+                &format!("pr#{}", self.target.number),
+                &k,
+            ])
+        });
+        let ctx = self.target.md_context();
+        self.compose =
+            Some(ComposeBox::new(purpose, title, about, text).for_target(ctx, draft_key));
     }
 
     fn finish_compose(&mut self, purpose: ComposeFor, text: String) {

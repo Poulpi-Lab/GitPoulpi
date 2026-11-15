@@ -2583,6 +2583,9 @@ log_scroll_left = "Прокрутить колонки влево"
 log_scroll_right = "Прокрутить колонки вправо"
 log_columns_layout = "Прокрутка вбок или по размеру панели"
 refs_remotes = "Ветка: изменить её remote"
+md_editor_preview = "Markdown Editor: Toggle Write and Preview"
+md_editor_split = "Markdown Editor: Toggle the Split View"
+md_editor_submit = "Markdown Editor: Send the Text"
 
 
 [keymap_ctx]
@@ -2619,6 +2622,7 @@ integrations = "Настройки: страница Интеграции"
 activity_log = "Окно журнала активности"
 palette = "Команды палитры"
 split = { git = "Редактор разделения commit'а", local = "Редактор разделения коммита" }
+md_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [keymap_conflict]
 already_bound = "{chord} уже назначено: {action} ({ctx})"
@@ -10022,3 +10026,23 @@ stash_default = "WIP на {name}"
 hint_next = "далее"
 # context: key hint
 hint_default = "выполнить"
+
+[md_render]
+alert_note = "Note"
+alert_tip = "Tip"
+alert_important = "Important"
+alert_warning = "Warning"
+alert_caution = "Caution"
+
+[md_editor]
+mode_write = "Write"
+mode_preview = "Preview"
+mode_split = "Split"
+split_needs_width = "Split needs a window 100 columns wide."
+preview_updating = "updating..."
+preview_empty = "Nothing to preview yet."
+sent_as = "Sent as {markup}"
+discard_title = "Discard this text?"
+discard_body = "What you wrote will be lost."
+hint_preview = "Preview"
+hint_split = "Split"

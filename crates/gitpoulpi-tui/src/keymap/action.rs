@@ -35,6 +35,9 @@ pub(crate) enum Ctx {
     Rewrite,
     Reword,
     Composer,
+    /// The shared Markdown composer (Write / Preview / Split) of the
+    /// review box, the review summary, the issue form and the PR body.
+    MdEditor,
     Dialog,
     FolderPicker,
     Preferences,
@@ -75,6 +78,7 @@ impl Ctx {
         Ctx::Rewrite,
         Ctx::Reword,
         Ctx::Composer,
+        Ctx::MdEditor,
         Ctx::Dialog,
         Ctx::FolderPicker,
         Ctx::Preferences,
@@ -115,6 +119,7 @@ impl Ctx {
                 | Ctx::Split
                 | Ctx::Rewrite
                 | Ctx::Reword
+                | Ctx::MdEditor
                 | Ctx::Dialog
                 | Ctx::FolderPicker
                 | Ctx::Preferences
@@ -134,6 +139,7 @@ impl Ctx {
                 | Ctx::Compose
                 | Ctx::Reword
                 | Ctx::Composer
+                | Ctx::MdEditor
                 | Ctx::Dialog
                 | Ctx::FolderPicker
                 | Ctx::Preferences
@@ -170,6 +176,7 @@ impl Ctx {
             Ctx::Rewrite => t::REWRITE,
             Ctx::Reword => t::REWORD,
             Ctx::Composer => t::COMPOSER,
+            Ctx::MdEditor => t::MD_EDITOR,
             Ctx::Dialog => t::DIALOG,
             Ctx::FolderPicker => t::FOLDER_PICKER,
             Ctx::Preferences => t::PREFERENCES,
@@ -208,6 +215,7 @@ impl Ctx {
             Ctx::Rewrite => "rewrite",
             Ctx::Reword => "reword",
             Ctx::Composer => "composer",
+            Ctx::MdEditor => "md_editor",
             Ctx::Dialog => "dialog",
             Ctx::FolderPicker => "folder_picker",
             Ctx::Preferences => "preferences",
@@ -713,6 +721,9 @@ actions! {
     RewordDeeper => (Reword, "reword.deeper", REWORD_DEEPER, ["Alt+H"], @HistoryRewrite),
     ComposerCommit => (Composer, "composer.commit", COMPOSER_COMMIT, ["Ctrl+Enter", "Alt+Enter"]),
     ComposerInsertIssueRef => (Composer, "composer.insert_issue_ref", COMPOSER_INSERT_ISSUE_REF, ["Alt+R"], @Hosting),
+    MdEditorPreview => (MdEditor, "md_editor.preview", MD_EDITOR_PREVIEW, ["Alt+P"], @Hosting),
+    MdEditorSplit => (MdEditor, "md_editor.split", MD_EDITOR_SPLIT, ["Alt+L"], @Hosting),
+    MdEditorSubmit => (MdEditor, "md_editor.submit", MD_EDITOR_SUBMIT, ["Ctrl+Enter", "Ctrl+S", "Alt+Enter"], @Hosting),
     DialogBrowse => (Dialog, "dialog.browse", DIALOG_BROWSE, ["Ctrl+B"]),
     DialogSources => (Dialog, "dialog.sources", DIALOG_SOURCES, ["Alt+S"]),
     DialogSubmit => (Dialog, "dialog.submit", DIALOG_SUBMIT, ["Ctrl+S"]),

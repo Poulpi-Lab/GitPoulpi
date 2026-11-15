@@ -56,10 +56,15 @@ impl DiscardGuard {
 
     /// Opens "Discard changes?" (Keep editing is the safe default button).
     pub(crate) fn ask(&mut self) {
+        self.ask_with(msg::TITLE.get(), msg::BODY.get());
+    }
+
+    /// [`DiscardGuard::ask`] with the form's own wording.
+    pub(crate) fn ask_with(&mut self, title: &str, body: &str) {
         self.confirm = Some(
             Confirm::new(
-                msg::TITLE.get(),
-                msg::BODY.get(),
+                title,
+                body,
                 vec![
                     (msg::KEEP.get().to_string(), Choice::Keep),
                     (msg::DISCARD.get().to_string(), Choice::Discard),

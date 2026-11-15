@@ -930,12 +930,21 @@ impl ReviewView {
         }
         let summary = (self.ai_on() && !self.sug.summary.trim().is_empty())
             .then(|| self.sug.summary.trim().to_string());
-        self.finish = Some(FinishDialog::new(
-            h.detail.capabilities,
-            self.pending.len(),
-            summary,
-            &h.detail.vote_labels,
-        ));
+        let draft_key = crate::md_editor::draft::key(&[
+            &self.target.integration.id,
+            &self.target.project,
+            &format!("pr#{}", self.target.number),
+            "finish",
+        ]);
+        self.finish = Some(
+            FinishDialog::new(
+                h.detail.capabilities,
+                self.pending.len(),
+                summary,
+                &h.detail.vote_labels,
+            )
+            .for_target(self.target.md_context(), draft_key),
+        );
     }
 
     fn submit_review(&mut self, event: ReviewEvent, body: String, votes: Vec<(String, i32)>) {

@@ -433,15 +433,17 @@ fn left_tabs_are_a_column_and_every_interaction_works() {
         "{}",
         term.text()
     );
-    let s = term.screen();
-    let (_, mr) = wait_tab(&mut term, "moonbase", true, 0);
-    let (_, cr) = wait_tab(&mut term, "comet", true, 0);
-    let (_, or) = wait_tab(&mut term, "orbit", true, 0);
-    assert!(
-        mr < cr && cr < or,
-        "the column follows the order\n{}",
-        s.text()
-    );
+    // The session file is written before the column is redrawn: wait for a
+    // screen that shows the new order.
+    let s = term
+        .wait_for("the column in the new order", STEP, |s| {
+            let row = |name| tab_pos(s, name, true, 0).map(|(_, r)| r);
+            matches!(
+                (row("moonbase"), row("comet"), row("orbit")),
+                (Some(mr), Some(cr), Some(or)) if mr < cr && cr < or
+            )
+        })
+        .unwrap_or_else(|e| panic!("the column follows the order: {e}\n{}", term.text()));
     let _ = title_has(&s, "orbit");
     term.stop().unwrap();
 }

@@ -105,7 +105,12 @@ fn moving_the_pin_creates_the_key_profile_and_unsets_core_ssh_command() {
     );
     assert_eq!(pinned(&repo), PIN, "showing the pin changes nothing");
 
-    let (col, row) = common::scroll_settings_to(&mut term, " Move into GitPoulpi ", STEP);
+    common::scroll_settings_to(&mut term, " Move into GitPoulpi ", STEP);
+    // The page may still be scrolling: a click at a position seen mid-scroll
+    // lands on the row that moved there (the Hosting rows sit right below).
+    let (col, row) = term
+        .wait_for_settled_text(" Move into GitPoulpi ", Duration::from_millis(500), STEP)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.click(col + 1, row).unwrap();
     // The status line is at the foot of the page.
     common::scroll_settings_to(

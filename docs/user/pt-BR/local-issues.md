@@ -21,6 +21,16 @@ ao mesmo tempo, e as listas acompanham.
 
 Nada é vinculado sozinho: como toda fonte de issues, ela é opcional por repositório.
 
+## Comentários em uma nota
+
+`Enter` na linha de uma nota na seção ISSUES, ou no cartão dela, abre a sua conversa: o texto da nota e depois os
+comentários. Os comentários ficam no próprio arquivo da nota, em uma seção final `## Comments`, uma entrada
+`### <autor> - <hora UTC>` para cada um (uma editada acrescenta `(edited <hora>)`). Nada acima desse título é tocado,
+então o Obsidian e um shell leem e editam o mesmo arquivo. Você pode escrever, editar e excluir os comentários do autor
+local (o `local.me` do perfil, senão o usuário conectado, o nome que *Atribuídas a mim* usa); os de mais ninguém. A
+caixa é o editor Markdown de sempre, com prévia, e *Escrevendo como <nome> (nota local)* nomeia o autor. Nada vai pela
+rede. Uma nota com um título `## Comments` que você escreveu à mão é lida como tal.
+
 ## As notas
 
 Uma nota por issue, chamada `<id>-<slug>.md` (`12-crash-on-empty-name.md`), com um bloco de frontmatter:
@@ -46,6 +56,35 @@ Markdown livre. O GitPoulpi nunca reescreve o corpo.
 - A leitura é tolerante: uma nota sem `id` o toma do nome do arquivo, uma nota sem `status` é `todo`, uma nota
   sem frontmatter toma o título do primeiro `# título`. Um arquivo que não é uma issue (`readme.md`) é ignorado.
 - Um status é texto livre. **Aberta** quer dizer "não está no status de concluída".
+
+### Comentários em uma nota
+
+Um comentário em uma nota é escrito na própria nota, em uma última seção `## Comments` (sem rede, e ele se lê bem no
+Obsidian):
+
+```markdown
+(o texto da nota)
+
+## Comments
+
+### kai - 2026-11-15T10:00:00Z
+First comment, **any Markdown**.
+
+### ann - 2026-11-15T11:30:00Z (edited 2026-11-15T12:00:00Z)
+Second one.
+```
+
+- Uma entrada começa em uma linha que é exatamente `### <autor> - <hora UTC>`, com ` (edited <hora UTC>)` depois de uma
+  edição; o texto dela vai até a próxima entrada. A seção é o último título `## Comments` fora de um bloco de código e
+  vai até o fim do arquivo, então não escreva nada depois dela.
+- Uma linha de comentário que seria lida como uma entrada ou como o título é guardada com uma barra invertida na frente
+  (`\### ...`, que o Markdown mostra como o mesmo texto) e lida de volta sem ela.
+- Publicar acrescenta no fim e deixa tudo acima byte a byte (inclusive as quebras de linha); uma edição ou exclusão
+  reescreve só a seção. Uma publicação também move o `updated` da nota (uma nota sem frontmatter não recebe nenhum).
+- O autor é o autor local do perfil (o "eu" das configurações de Issues locais). Você só pode editar ou excluir os seus
+  próprios comentários; o id de um comentário é a hora e o autor dele, e duas publicações no mesmo segundo se distinguem
+  adiantando a segunda em um segundo.
+- Não há respostas, comentários internos nem histórico de eventos em uma nota.
 
 ## O que você pode fazer
 
@@ -102,7 +141,7 @@ Se você trabalha sozinho, ou em uma equipe que guarda as suas issues junto do c
   `Shift+Left` / `Shift+Right`, ou com **Quadro: mover cartão para...** (`m`), uma lista suspensa das colunas. O cartão se move na
   hora; o `status` da nota é reescrito como em [a seção das notas](#as-notas), nada mais no arquivo. Se a gravação
   falhar, o cartão volta e o erro aparece na linha de status.
-- **Abra** um cartão com `Enter` ou um clique duplo (a nota abre no seu programa padrão para `.md`). `e` edita os seus
+- **Abra** um cartão com `Enter` ou um clique duplo: a [conversa](hosting-integration.md#5c-conversas) da nota abre na janela, com o texto da nota e os seus comentários (o **Abrir nota** do menu do cartão abre o arquivo no seu programa padrão para `.md`). `e` edita os seus
   responsáveis, rótulos ou marco, `.` ou um clique com o botão direito abre o menu do cartão, `n` inicia uma nova issue na coluna
   selecionada (o formulário volta ao quadro quando se fecha).
 - **Filtre** por responsável (`a`), rótulo (`l`), marco (`M`) ou texto (`/`); `x` os limpa. Os filtros são

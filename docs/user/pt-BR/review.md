@@ -57,6 +57,16 @@ no código e as revisões já enviadas, da mais antiga para a mais nova, cada um
 caixa de resposta: clique nela ou pressione **`c`** para escrever um comentário na conversa. **Este é publicado
 na hora**, e a caixa avisa isso.
 
+A caixa de comentário (também a caixa de uma resposta, de um comentário em uma linha e do resumo de **Finalizar revisão**) é o
+editor Markdown compartilhado com [a visão de conversa](hosting-integration.md#escrever): **Escrever**, **Prévia** (`Alt+P`) e
+**Lado a lado** (`Alt+L`, em uma janela de 100 colunas); `Ctrl+Enter` (também `Ctrl+S`, `Alt+Enter`) envia e, onde a IA está ligada,
+`Alt+E` abre **Escrever com IA** ([o capítulo de IA](ai.md#ajuda-de-escrita-em-um-host)). A prévia mostra o texto como o host o
+mostrará, referências incluídas (`#7`, `!12`, `ABC-12`, ids de commit); um texto não enviado é guardado por solicitação. O texto da
+descrição e o da conversa usam o mesmo renderizador, então Markdown, tabelas, alertas e referências ficam iguais aqui
+e na visão de conversa de uma issue. Citar, editar ou excluir um comentário já publicado, e as notas internas,
+pertencem à visão de conversa das issues e das solicitações em hosts sem revisão (veja
+[Conversas](hosting-integration.md#5c-conversas)); aqui só os seus comentários pendentes podem ser editados.
+
 ### Arquivos
 
 Os arquivos alterados à esquerda (letra de status, `+adicionadas -removidas`, uma contagem `●n` de threads abertas, uma

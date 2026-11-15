@@ -194,16 +194,20 @@ fn identity_json(identity: &PostingIdentity) -> Value {
     out
 }
 
-/// Who a post is made as, in one word: the login, or what the identity says
-/// while the login is unknown, else who the host says wrote it.
+/// Who a post is made as, in one word: the identity's login (the configured
+/// "Post as" name for an App bot), else who the host says wrote the comment,
+/// else what the identity says about itself.
 fn posted_as(identity: Option<&PostingIdentity>, comment: &Comment) -> String {
+    let author = comment.author.login.trim();
     identity
-        .and_then(|i| {
-            i.login
-                .clone()
-                .or_else(|| Some(i.display.clone()).filter(|d| !d.is_empty()))
+        .and_then(|i| i.login.clone())
+        .or_else(|| (!author.is_empty() && author != "ghost").then(|| author.to_string()))
+        .or_else(|| {
+            identity
+                .map(|i| i.display.clone())
+                .filter(|d| !d.is_empty())
         })
-        .unwrap_or_else(|| comment.author.login.clone())
+        .unwrap_or_default()
 }
 
 fn actor_json(actor: &Actor) -> Value {

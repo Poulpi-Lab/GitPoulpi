@@ -73,6 +73,11 @@ const READ_ONLY: &[&[&str]] = &[
     &["hosting", "review", "diff"],
     &["hosting", "file"],
     &["hosting", "review", "threads"],
+    // The whole conversation of an issue or a request: reads the host and
+    // posts nothing. `markdown` only cleans text and finds its references.
+    &["hosting", "issue", "comments"],
+    &["hosting", "review", "conversation"],
+    &["hosting", "markdown"],
     // Asks the model, prints the suggestions; posts nothing.
     &["hosting", "review", "suggest"],
     &["hosting", "issues"],
@@ -190,6 +195,11 @@ const DESTRUCTIVE: &[&[&str]] = &[
     &["hosting", "integrations", "remove"],
     &["hosting", "logout"],
     &["hosting", "ssh-key", "delete"],
+    // Deletes a comment on the host for good: nothing here brings it back.
+    // (Posting and editing are plain mutations: outward, but the comment can
+    // be edited or deleted again.)
+    &["hosting", "issue", "comment-delete"],
+    &["hosting", "review", "comment-delete"],
     // Removes a named session's saved tabs and layout.
     &["session", "delete"],
     // Removes a workspace (its repositories are untouched).

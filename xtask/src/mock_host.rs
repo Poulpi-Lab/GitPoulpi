@@ -41,6 +41,7 @@
 //! and [`http::serve`], the tiny HTTP loop `pty_hosting/mock.rs` reuses).
 
 mod account;
+pub mod conversation;
 pub mod flow;
 pub mod gerrit;
 mod gitea;
@@ -417,6 +418,10 @@ fn route(
         .unwrap_or((request.target.as_str(), ""));
     if request.headers.to_lowercase().contains("revoked") {
         return (401, r#"{"message":"401 Unauthorized"}"#.into());
+    }
+    // Conversations: timelines, comments and the token's identity.
+    if let Some(reply) = conversation::route(request, path, port) {
+        return reply;
     }
     // Code review of one request per side (pull request #9 / merge request !58).
     if let Some(reply) = review::route(request, path, port) {

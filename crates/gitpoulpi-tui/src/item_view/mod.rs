@@ -296,7 +296,9 @@ impl ItemView {
     // -- state the owner and the palette read ----------------------------------
 
     pub(crate) fn busy(&self) -> bool {
-        self.conv.spinning() || self.conv.relaying()
+        // A read in flight keeps the frame rate up so its spinner can appear
+        // once it has run past 150 ms (the timer's quiet reads do not count).
+        self.conv.busy() && !self.conv.is_quiet()
     }
 
     /// When the view next wants a frame without input (the 60 s refresh).
@@ -410,7 +412,7 @@ impl ItemView {
         self.conv.poll();
         self.ensure_composer();
         if self.auto_refreshes() && !self.conv.busy() && self.conv.since_fresh() >= AUTO_REFRESH {
-            self.conv.refresh();
+            self.conv.refresh_quietly();
         }
         ItemEffect::None
     }

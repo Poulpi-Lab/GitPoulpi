@@ -1265,6 +1265,20 @@ mod tests {
     }
 
     #[test]
+    fn conversation_goes_to_the_cli_and_the_tui_and_has_its_own_flag() {
+        let f = Choices::all(&avail()).features();
+        assert!(f.contains(&"gitpoulpi-cli/conversation".to_string()));
+        assert!(f.contains(&"gitpoulpi-tui/conversation".to_string()));
+        assert!(
+            !f.contains(&"gitpoulpi-mcp/conversation".to_string()),
+            "the MCP server has no conversation view"
+        );
+        let off = parse(&["--no-conversation"]).unwrap();
+        assert!(!off.choices.features().iter().any(|x| x.contains("conversation")));
+        assert!(parse(&[]).unwrap().choices.summary().contains("conversation"));
+    }
+
+    #[test]
     fn carved_out_features_go_to_every_binary_and_have_their_own_flags() {
         let all = Choices::all(&avail());
         for feat in [

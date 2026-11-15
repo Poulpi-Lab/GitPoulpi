@@ -207,13 +207,15 @@ fn send_is_greyed_with_its_reason_and_nothing_is_posted() {
     let effect = r
         .view
         .on_key(KeyEvent::new(KeyCode::Enter, KeyModifiers::CONTROL));
-    assert_eq!(
-        effect,
-        ItemEffect::Message(gitpoulpi_i18n::msg::item_view::WHY_WRITING_LATER.get().into())
-    );
+    assert_eq!(effect, ItemEffect::None);
+    let why = gitpoulpi_i18n::msg::item_view::WHY_WRITING_LATER.get();
+    assert_eq!(r.view.message.as_deref(), Some(why));
+    r.view.message = None;
     let (rect, _) = *r.view.hits.iter().find(|(_, h)| *h == Hit::Send).unwrap();
-    let effect = r.view.on_mouse(click(rect.x, rect.y));
-    assert!(matches!(effect, ItemEffect::Message(_)));
+    assert_eq!(r.view.on_mouse(click(rect.x, rect.y)), ItemEffect::None);
+    assert_eq!(r.view.message.as_deref(), Some(why), "the button answers with the reason");
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(screen.contains(why), "the reason is drawn in the view: {screen}");
     assert_eq!(r.shared.lock().unwrap().writes, 0, "nothing was posted");
 }
 
@@ -271,10 +273,8 @@ fn a_reference_opens_in_the_view_and_back_returns() {
     assert_eq!(r.view.on_key(KeyEvent::new(KeyCode::Left, KeyModifiers::ALT)), ItemEffect::None);
     assert_eq!(r.view.depth(), 0);
     assert_eq!(r.view.target.reference, "#142");
-    assert!(matches!(
-        r.view.on_key(key(KeyCode::Backspace)),
-        ItemEffect::Message(_)
-    ));
+    assert_eq!(r.view.on_key(key(KeyCode::Backspace)), ItemEffect::None);
+    assert!(r.view.message.is_some(), "nothing to go back to says so");
 }
 
 #[test]

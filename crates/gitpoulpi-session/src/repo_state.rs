@@ -611,6 +611,29 @@ mod tests {
     /// Saving state must not make the repository dirty: the state
     /// directory lives in the working tree.
     #[test]
+    fn the_seen_conversations_round_trip_and_keep_the_most_recent_visits() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = RepoState::path_for(dir.path(), ".gitpoulpi");
+        let mut state = RepoState::default();
+        let key = conversation_key("gh", "o/r", "issue", 7);
+        assert_eq!(key, "gh|o/r|issue#7");
+        state.mark_conversation_seen(&key, "2026-11-12T10:00:00Z", "c9", 100);
+        state.mark_conversation_seen(&key, "2026-11-13T10:00:00Z", "c10", 200);
+        assert_eq!(state.conversation_seen[&key].at, "2026-11-13T10:00:00Z");
+        for n in 0..210 {
+            state.mark_conversation_seen(&format!("k{n}"), "t", "i", 1000 + n);
+        }
+        assert_eq!(state.conversation_seen.len(), 200);
+        assert!(!state.conversation_seen.contains_key(&key), "the oldest visit goes first");
+        assert!(state.conversation_seen.contains_key("k209"));
+        state.conversation_events = Some(false);
+        state.save(&path).unwrap();
+        let back = RepoState::load(&path).unwrap();
+        assert_eq!(back.conversation_seen, state.conversation_seen);
+        assert_eq!(back.conversation_events, Some(false));
+    }
+
+    #[test]
     fn trusted_scripts_round_trip_and_are_keyed_by_hash() {
         let dir = tempfile::tempdir().unwrap();
         let path = RepoState::path_for(dir.path(), ".gitpoulpi");

@@ -92,6 +92,10 @@ pub(crate) struct Conversation {
     cache_dir: Option<std::path::PathBuf>,
     factory: Arc<dyn crate::hosting_task::ClientFactory>,
     started: Instant,
+    /// When the running read began, and whether it is a quiet one (the
+    /// timer's: no spinner).
+    busy_since: Instant,
+    quiet: bool,
     pub(crate) load: Load,
     pub(crate) header: Option<ItemHeader>,
     pub(crate) entries: Vec<TimelineEntry>,
@@ -147,6 +151,8 @@ impl Conversation {
             cache_dir,
             factory,
             started: Instant::now(),
+            busy_since: Instant::now(),
+            quiet: false,
             load: Load::Loading,
             header: None,
             entries: Vec::new(),
@@ -187,6 +193,8 @@ impl Conversation {
     // -- reads ---------------------------------------------------------------
 
     fn start(&mut self, mode: worker::Mode) {
+        self.busy_since = Instant::now();
+        self.quiet = false;
         self.rx = Some(worker::start(
             Arc::clone(&self.factory),
             self.source.clone(),
@@ -204,6 +212,15 @@ impl Conversation {
         self.start(worker::Mode::Refresh);
     }
 
+    /// [`Conversation::refresh`] for the timer: nothing shows while it runs.
+    pub(crate) fn refresh_quietly(&mut self) {
+        if self.rx.is_some() {
+            return;
+        }
+        self.start(worker::Mode::Refresh);
+        self.quiet = true;
+    }
+
     /// Reads the window before the one held.
     pub(crate) fn load_older(&mut self) {
         if self.rx.is_some() {
@@ -215,6 +232,11 @@ impl Conversation {
         }
     }
 
+    /// The running read is the timer's.
+    pub(crate) fn is_quiet(&self) -> bool {
+        self.quiet && self.layout_rx.is_none()
+    }
+
     /// A read is running.
     pub(crate) fn busy(&self) -> bool {
         self.rx.is_some() || self.layout_rx.is_some()
@@ -222,11 +244,7 @@ impl Conversation {
 
     /// The spinner moves: a read has run past [`SPIN_AFTER`].
     pub(crate) fn spinning(&self) -> bool {
-        self.rx.is_some() && self.started_busy().elapsed() >= SPIN_AFTER
-    }
-
-    fn started_busy(&self) -> Instant {
-        self.started
+        self.rx.is_some() && !self.quiet && self.busy_since.elapsed() >= SPIN_AFTER
     }
 
     pub(crate) fn spinner(&self) -> char {

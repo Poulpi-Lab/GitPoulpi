@@ -48,8 +48,25 @@ impl ItemView {
         }
     }
 
+    /// A message stays in the view's own last row: the status line under the
+    /// frame is not where the eyes are.
+    fn note(&mut self, effect: ItemEffect) -> ItemEffect {
+        match effect {
+            ItemEffect::Message(text) => {
+                self.message = Some(text);
+                ItemEffect::None
+            }
+            other => other,
+        }
+    }
+
     pub(crate) fn on_key(&mut self, key: KeyEvent) -> ItemEffect {
         self.message = None;
+        let effect = self.key_inner(key);
+        self.note(effect)
+    }
+
+    fn key_inner(&mut self, key: KeyEvent) -> ItemEffect {
         if let Some(verdict) = self.guard.key(key) {
             return self.verdict(verdict);
         }
@@ -317,6 +334,11 @@ impl ItemView {
     }
 
     pub(crate) fn on_mouse(&mut self, mouse: MouseEvent) -> ItemEffect {
+        let effect = self.mouse_inner(mouse);
+        self.note(effect)
+    }
+
+    fn mouse_inner(&mut self, mouse: MouseEvent) -> ItemEffect {
         if let Some(v) = self.guard.mouse(mouse) {
             return self.verdict(v);
         }
@@ -392,6 +414,12 @@ impl ItemView {
     // -- the palette ------------------------------------------------------------------------
 
     pub(crate) fn run(&mut self, cmd: ItemCmd) -> ItemEffect {
+        self.message = None;
+        let effect = self.run_inner(cmd);
+        self.note(effect)
+    }
+
+    fn run_inner(&mut self, cmd: ItemCmd) -> ItemEffect {
         if let Some(why) = cmd.unavailable(Some(self.avail())) {
             return ItemEffect::Message(why.to_string());
         }

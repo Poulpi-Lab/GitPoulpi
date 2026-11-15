@@ -115,7 +115,7 @@ pub fn plan(all_langs: &[String], quick: bool) -> Vec<Run> {
         return out;
     }
     let full = Choices::all(all_langs);
-    let toggles: [Toggle; 28] = [
+    let toggles: [Toggle; 29] = [
         ("github", |c| c.integrations.retain(|i| i != "github")),
         ("gitlab", |c| c.integrations.retain(|i| i != "gitlab")),
         ("azure-devops", |c| {

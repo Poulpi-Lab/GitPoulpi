@@ -222,7 +222,14 @@ pub(crate) fn conversation(
             key: ItemKey::issue(142),
         },
         cache,
-        md_render::Context::default(),
+        md_render::Context {
+            xrefs: gitpoulpi_hosting::xrefs::XrefContext {
+                family: Some(gitpoulpi_config::ApiFamily::Gitlab),
+                web_base: "https://gitlab.example.com".into(),
+                project: "g/p".into(),
+                ..Default::default()
+            },
+        },
         seen.map(str::to_string),
         true,
     )

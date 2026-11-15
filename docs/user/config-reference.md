@@ -50,7 +50,7 @@ applies at once (or at the next refresh, fetch or Settings close).
 | `general.auto_prune_tags` | `false` | A fetch also deletes the local tags the remote has deleted (only tags that were on it; a tag you never pushed is kept). Git 2.41+. |
 | `general.hosting_refresh_minutes` | `5` | Refresh of the pull request / issue lists and the toolbar chip, 0 to 120; `0` = only on demand and on events. |
 | `general.hosting_refresh_unit` | `"auto"` | The unit Settings shows the refresh in: `minutes`, `hours` or `auto`, read like `general.auto_fetch_interval_unit`. Display only. |
-| `general.hosting_post_as` | `""` | The name messages to a host are posted as when the repository's token is a bot's (a GitHub App token), e.g. `my-app[bot]`: shown in every composer and used to recognise your own comments. Empty: asked from the host, else learned from the first post. A repository can override it (Settings, repository SSH and credentials). |
+| `general.hosting_post_as` | `""` | The name messages to a host are posted as when the repository's token is a bot's (a GitHub App token), e.g. `my-app[bot]`: shown in every composer and used to recognize your own comments. Empty: asked from the host, else learned from the first post. A repository can override it (Settings, repository SSH and credentials). |
 | `general.keep_submodules_up_to_date` | `false` | After a checkout or pull, `git submodule update --init --recursive` when a submodule is out of step. See [Submodules](submodules.md). |
 | `general.default_branch_name` | `"main"` | First branch of a repository created with Init; empty lets git decide. Renames nothing. |
 | `general.delete_orig_files_after_merge` | `false` | After a merge that lands, delete the `*.orig` backup files. |

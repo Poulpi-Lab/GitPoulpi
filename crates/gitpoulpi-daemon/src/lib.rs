@@ -11,6 +11,8 @@ mod dispatch;
 mod encoding;
 mod flow;
 mod grants;
+#[cfg(feature = "hosting")]
+pub mod hosting_scope;
 mod jobs;
 pub mod join;
 mod journal;

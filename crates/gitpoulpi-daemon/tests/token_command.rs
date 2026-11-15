@@ -187,6 +187,7 @@ fn token_command(argv: &[impl AsRef<str>], hosts: &[&str]) -> RepoAuthProfile {
             username: None,
             hosts: hosts.iter().map(|s| s.to_string()).collect(),
             cache_minutes: None,
+            use_for_hosting: false,
             confirmed_sha256: None,
             script_sha256: None,
             confirmed_at: None,

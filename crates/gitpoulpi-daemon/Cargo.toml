@@ -28,6 +28,7 @@ gitpoulpi-config.workspace = true
 gitpoulpi-session.workspace = true
 gitpoulpi-hosting = { workspace = true, optional = true }
 gitpoulpi-secrets = { workspace = true, optional = true }
+async-trait.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

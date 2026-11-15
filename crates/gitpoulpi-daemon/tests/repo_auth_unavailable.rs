@@ -115,6 +115,7 @@ async fn a_profile_that_cannot_be_used_refuses_the_transfer() {
             username: None,
             hosts: vec![],
             cache_minutes: None,
+            use_for_hosting: false,
             confirmed_sha256: None,
             script_sha256: None,
             confirmed_at: None,

@@ -479,6 +479,16 @@ fn overrides(root: &Path, profile: &RepoAuthProfile) -> Vec<AuthOverride> {
     out
 }
 
+fn use_for_hosting(https: &HttpsAuth) -> bool {
+    matches!(
+        https,
+        HttpsAuth::TokenCommand {
+            use_for_hosting: true,
+            ..
+        }
+    )
+}
+
 /// Pins the command of a helper or token-command source being stored. Only a
 /// request with `confirm: true` (a person: the TUI after its dialog, the CLI
 /// when it may trust, never an agent's MCP) pins a new or changed command; the
@@ -512,7 +522,12 @@ fn settle_command(
     let carried = stored
         .as_ref()
         .is_some_and(|stored| command_trust::carry_confirmation(root, https, stored));
-    if carried {
+    // Sending the repository's hosting calls through the command changes who
+    // acts on the host: only a person turns that on or off.
+    let hosting_changed = stored
+        .as_ref()
+        .is_some_and(|stored| use_for_hosting(stored) != use_for_hosting(https));
+    if carried && !hosting_changed {
         return Ok(());
     }
     Err(Error::NeedsConfirmation(

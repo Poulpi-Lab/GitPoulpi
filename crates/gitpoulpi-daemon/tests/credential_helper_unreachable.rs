@@ -60,6 +60,7 @@ async fn a_helper_that_never_reaches_the_daemon_is_named_as_such() {
             username: None,
             hosts: vec![server.host()],
             cache_minutes: None,
+            use_for_hosting: false,
             confirmed_sha256: None,
             script_sha256: None,
             confirmed_at: None,

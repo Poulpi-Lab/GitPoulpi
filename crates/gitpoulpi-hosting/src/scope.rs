@@ -62,6 +62,7 @@ pub fn acts_as_bot(integration_id: &str, project: &str) -> bool {
 }
 
 /// The refusal of an assignment into a blocked repository.
+#[cfg_attr(not(feature = "hosting"), allow(dead_code))]
 pub(crate) fn refuse() -> Error {
     Error::AssignmentBlocked
 }
@@ -73,6 +74,7 @@ pub fn is_app_installation_token(token: &str) -> bool {
 }
 
 /// `owner/repo` of an API URL of the form `<api>/repos/<owner>/<repo>/...`.
+#[cfg_attr(not(feature = "github"), allow(dead_code))]
 pub(crate) fn github_project_of(url: &str) -> Option<String> {
     let path = url.split(['?', '#']).next()?;
     let (_, rest) = path.split_once("/repos/")?;

@@ -428,6 +428,7 @@ async fn an_integrations_key_is_resolved_at_each_transfer() {
             enabled: true,
             local: None,
             radar: None,
+            markup: Default::default(),
         };
         gitpoulpi_config::set_list_in_file(
             &config_dir().join("config.toml"),

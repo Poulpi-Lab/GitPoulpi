@@ -494,6 +494,44 @@ pub struct Integration {
     /// `hosting radar` fetch for this profile. Absent means all off.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub radar: Option<IntegrationRadar>,
+    /// The text format a Redmine server is configured with: what its
+    /// comments are read as and what is written back. Other kinds ignore it.
+    #[serde(default, skip_serializing_if = "RedmineMarkup::is_default")]
+    pub markup: RedmineMarkup,
+}
+
+/// How a Redmine server formats text (Administration > Settings >
+/// General > Text formatting). The API does not say, so the profile does.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RedmineMarkup {
+    /// Redmine's historical default.
+    #[default]
+    Textile,
+    Markdown,
+}
+
+impl RedmineMarkup {
+    pub const ALL: [RedmineMarkup; 2] = [Self::Textile, Self::Markdown];
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Textile => "textile",
+            Self::Markdown => "markdown",
+        }
+    }
+
+    pub fn is_default(&self) -> bool {
+        *self == Self::default()
+    }
+
+    /// The other one (what a cycling control does).
+    pub fn toggled(self) -> Self {
+        match self {
+            Self::Textile => Self::Markdown,
+            Self::Markdown => Self::Textile,
+        }
+    }
 }
 
 /// What to do with a request whose repository is not cloned.
@@ -713,6 +751,7 @@ impl Integration {
             enabled: true,
             local: None,
             radar: None,
+            markup: RedmineMarkup::default(),
         }
     }
 

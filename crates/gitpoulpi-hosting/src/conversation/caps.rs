@@ -78,4 +78,132 @@ impl ConversationCaps {
             max_body: Some(1_000_000),
         }
     }
+
+    /// An issue tracker: its items are issues only, so a pull request has
+    /// no conversation here.
+    fn tracker(kind: ItemKind, caps: Self) -> Self {
+        if kind == ItemKind::Issue {
+            caps
+        } else {
+            Self::NONE
+        }
+    }
+
+    /// Jira (Cloud and Data Center): a flat comment list, edit and delete
+    /// of one's own, the changelog as events. Comments are read as wiki
+    /// markup (shown as Markdown); `write_flavor` is what goes on the wire:
+    /// the user types Markdown and it is converted to wiki. Internal
+    /// comments need a project role the profile does not know, so they
+    /// cannot be posted.
+    pub fn jira(kind: ItemKind) -> Self {
+        Self::tracker(
+            kind,
+            Self {
+                read: true,
+                comment: true,
+                edit_own: true,
+                delete_own: true,
+                events: true,
+                read_flavor: MarkupFlavor::Gfm,
+                write_flavor: MarkupFlavor::JiraWiki,
+                max_body: Some(32_767),
+                ..Self::NONE
+            },
+        )
+    }
+
+    /// Linear: comments reply to a parent, the issue history is the events.
+    pub fn linear(kind: ItemKind) -> Self {
+        Self::tracker(
+            kind,
+            Self {
+                read: true,
+                comment: true,
+                reply_in_thread: true,
+                edit_own: true,
+                delete_own: true,
+                events: true,
+                read_flavor: MarkupFlavor::Gfm,
+                write_flavor: MarkupFlavor::Gfm,
+                ..Self::NONE
+            },
+        )
+    }
+
+    /// YouTrack: a flat comment list. The activity stream is not read, so
+    /// there are no events.
+    pub fn youtrack(kind: ItemKind) -> Self {
+        Self::tracker(
+            kind,
+            Self {
+                read: true,
+                comment: true,
+                edit_own: true,
+                delete_own: true,
+                read_flavor: MarkupFlavor::YoutrackMd,
+                write_flavor: MarkupFlavor::YoutrackMd,
+                ..Self::NONE
+            },
+        )
+    }
+
+    /// Redmine: journals are the comments and the events; private notes
+    /// exist; a comment can be edited (Redmine 5+) but never deleted.
+    /// `textile`: the server formats text as Textile, so what the user
+    /// types as Markdown is converted for it.
+    pub fn redmine(kind: ItemKind, textile: bool) -> Self {
+        Self::tracker(
+            kind,
+            Self {
+                read: true,
+                comment: true,
+                edit_own: true,
+                events: true,
+                internal_notes: true,
+                read_flavor: MarkupFlavor::Gfm,
+                write_flavor: if textile {
+                    MarkupFlavor::Textile
+                } else {
+                    MarkupFlavor::Gfm
+                },
+                ..Self::NONE
+            },
+        )
+    }
+
+    /// Trello: the comments of a card, the moves between lists as events.
+    pub fn trello(kind: ItemKind) -> Self {
+        Self::tracker(
+            kind,
+            Self {
+                read: true,
+                comment: true,
+                edit_own: true,
+                delete_own: true,
+                events: true,
+                read_flavor: MarkupFlavor::TrelloMd,
+                write_flavor: MarkupFlavor::TrelloMd,
+                max_body: Some(16_384),
+                ..Self::NONE
+            },
+        )
+    }
+
+    /// A folder of Markdown notes: comments live in the note file itself.
+    /// No network, no events, and only the local author's comments can be
+    /// edited or deleted.
+    pub fn local_markdown(kind: ItemKind) -> Self {
+        Self::tracker(
+            kind,
+            Self {
+                read: true,
+                comment: true,
+                edit_own: true,
+                delete_own: true,
+                read_flavor: MarkupFlavor::ObsidianMd,
+                write_flavor: MarkupFlavor::ObsidianMd,
+                ..Self::NONE
+            },
+        )
+    }
 }

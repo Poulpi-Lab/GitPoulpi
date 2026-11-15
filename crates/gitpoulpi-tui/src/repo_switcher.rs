@@ -1356,6 +1356,7 @@ mod tests {
             more_hovered: false,
             chip: None,
             radar: None,
+            markup: Default::default(),
             workspaces: None,
             notes: None,
             scroll: BarScroll::default(),

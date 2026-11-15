@@ -5,6 +5,9 @@
 //! takes a personal access token (Bearer).
 
 mod client;
+mod conversation;
+#[cfg(test)]
+mod conversation_tests;
 mod jql;
 mod map;
 pub mod spec;

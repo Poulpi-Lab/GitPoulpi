@@ -16,8 +16,26 @@
 pub mod caps;
 pub mod identity;
 pub mod model;
-#[cfg(any(feature = "github", feature = "gitlab"))]
+#[cfg(any(
+    feature = "github",
+    feature = "gitlab",
+    feature = "jira",
+    feature = "linear",
+    feature = "youtrack",
+    feature = "redmine",
+    feature = "trello",
+    feature = "local-issues"
+))]
 pub(crate) mod time;
+#[cfg(any(
+    feature = "jira",
+    feature = "linear",
+    feature = "youtrack",
+    feature = "redmine",
+    feature = "trello",
+    feature = "local-issues"
+))]
+pub(crate) mod tracker;
 
 pub use caps::ConversationCaps;
 pub use identity::{IdentityKind, PostingIdentity, TokenSource};

@@ -10,6 +10,9 @@
 //! has only a UUID); the New-issue form's "list" is the workflow **state**.
 
 mod client;
+mod conversation;
+#[cfg(test)]
+mod conversation_tests;
 mod map;
 mod queries;
 pub mod spec;

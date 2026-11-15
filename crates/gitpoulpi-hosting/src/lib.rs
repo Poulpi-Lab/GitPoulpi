@@ -55,6 +55,8 @@ mod gitlab_flow;
 mod gitlab_meta;
 pub mod http;
 mod integration;
+pub mod markup;
+pub mod xrefs;
 #[cfg(feature = "hosting")]
 pub mod issue_flow;
 #[cfg(feature = "jira")]

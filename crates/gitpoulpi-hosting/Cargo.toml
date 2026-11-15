@@ -51,6 +51,7 @@ minisign-verify.workspace = true
 # Security notices: the `affected` ranges are semver requirements.
 semver = "1"
 regex.workspace = true
+pulldown-cmark = { workspace = true, features = ["html"] }
 toml.workspace = true
 url.workspace = true
 serde.workspace = true

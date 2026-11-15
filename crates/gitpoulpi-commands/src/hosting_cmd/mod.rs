@@ -536,6 +536,32 @@ async fn run_issue_conversation(
     conversation::run(env, ipc, &target, key, op).await
 }
 
+/// The conversation of `reference` as `hosting issue comments` /
+/// `hosting review conversation` print it (without the system events), for
+/// `ai hosting-reply --item`: a reference starting with `!` is a pull or
+/// merge request, any other an issue, in the repository's linked source.
+#[cfg(feature = "ai")]
+pub(crate) async fn read_conversation_json(
+    ipc: &mut Session,
+    reference: &str,
+) -> Result<serde_json::Value, String> {
+    let env = HostingEnv::ambient()?;
+    let (kind, which) = if reference.trim_start().starts_with('!') {
+        (ItemKind::PullRequest, Which::Pulls)
+    } else {
+        (ItemKind::Issue, Which::Issues)
+    };
+    let target = repo_target(&env, ipc, None, which).await?;
+    let key = conversation::parse_item(kind, target.integration.kind.family(), reference)?;
+    let op = conversation::Op::Read {
+        limit: None,
+        older: None,
+        events: false,
+    };
+    let emitted = trust_answer(conversation::run(&env, Some(ipc), &target, key, op).await)?;
+    Ok(emitted.json)
+}
+
 /// A comment or reply with no text is refused before any request.
 fn required_body(body: String) -> Result<String, String> {
     if body.trim().is_empty() {

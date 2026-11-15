@@ -3867,6 +3867,7 @@ pull_requests_and_2 = "{$Pr}-Zeile: auf der Webseite des Hosters bearbeiten (der
 pull_requests_and_3 = { git = "(Abschnitt {$PRS}) einen erstellen - das + der Kopfzeile", local = "(Abschnitt {$PRS}) eine erstellen - das + der Kopfzeile" }
 pull_requests_and_4 = "das Menü der Zeile: öffnen, URL / Nummer kopieren, Quell-Branch auschecken, seine Commits ansehen, Branch aus einem Issue erstellen"
 pull_requests_and_5 = "den Filter wählen (Offen, Meine, Review angefragt, Alle / Mir zugewiesen); der Chip der Symbolleiste (GL !53, GH #12) öffnet die verknüpfte Anfrage, Rechtsklick für sein Menü; „+ {$pr_abbr}“ startet eine für einen gepushten Branch"
+pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
 refs_pane_1 = { git = "das Menü der ausgewählten Ref öffnen: Checkout, ausblenden/Solo, Merge, Rebase, Fast-Forward, Pull / Push / Fetch, Upstream festlegen, Worktree erstellen, {$Pr} starten, umbenennen, löschen, Kopieren (Name / vollständige Ref / Ziel-SHA)", local = "das Menü der ausgewählten Ref öffnen: Checkout, ausblenden/Solo, Zusammenführen, Rebase, Fast-Forward, Holen / Hochladen / Abrufen, Upstream festlegen, Worktree erstellen, {$Pr} starten, umbenennen, löschen, Kopieren (Name / vollständige Ref / Ziel-SHA)" }
 refs_pane_2 = "Fast-Forward <Branch> auf <aktuell> / <aktuell> auf <Branch> (Menü oder Palette): bewegt einen Branch nur vorwärts; ausgegraut, mit Begründung, wenn es kein Fast-Forward ist"
 refs_pane_3 = "Worktree aus <Ref> erstellen... (Menü eines Branches, Tags oder Commits): ein Dialog - Ordner (Durchsuchen / {{dialog.browse}}), optional ein neuer Branch, [x] als Tab öffnen (Leertaste schaltet um)"
@@ -10248,6 +10249,7 @@ why_no_edit = "this host does not let you edit comments"
 why_no_delete = "this host does not let you delete comments"
 why_not_yours = "only your own comments can be changed"
 why_empty = "write something first"
+why_too_long = "the text is longer than the host takes"
 why_no_conversation = "this item has no conversation to read here, open it in the browser"
 noun_link = "link"
 nothing_to_open = "nothing to open"

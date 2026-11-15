@@ -29,6 +29,8 @@ compile_error!(
 
 #[cfg_attr(not(feature = "ai"), path = "ai_cmd_stub.rs")]
 mod ai_cmd;
+#[cfg(all(feature = "ai", feature = "hosting"))]
+pub(crate) mod ai_conversation;
 #[cfg(feature = "ai")]
 pub(crate) mod ai_repo;
 #[cfg(feature = "ai")]

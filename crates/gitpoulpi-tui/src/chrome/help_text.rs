@@ -153,6 +153,7 @@ pub(crate) const HELP_TEXT: &[HelpEntry] = &[
     Item(keys!("{refs.new_pull_request}"), msg::help_text::PULL_REQUESTS_AND_3),
     Item(Msg(msg::help_keys::PULL_REQUESTS_AND_4_KEYS), msg::help_text::PULL_REQUESTS_AND_4),
     Item(Msg(msg::help_keys::PULL_REQUESTS_AND_5_KEYS), msg::help_text::PULL_REQUESTS_AND_5),
+    Item(keys!("{refs.solo}"), msg::help_text::PULL_REQUESTS_AND_6),
     Sec(msg::help_section::REFS_PANE),
     Item(Msg(msg::help_keys::REFS_PANE_1_KEYS), msg::help_text::REFS_PANE_1),
     Item(keys!(""), msg::help_text::REFS_PANE_2),

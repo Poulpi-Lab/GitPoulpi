@@ -3868,6 +3868,7 @@ pull_requests_and_2 = "{$pr}-rad: redigera den på värdens webbplats (radens pe
 pull_requests_and_3 = "(avsnittet {$PRS}) skapa en - rubrikens +"
 pull_requests_and_4 = { git = "radens meny: öppna, kopiera URL / nummer, checka ut källgrenen, visa dess commits, skapa en gren från ett ärende", local = "radens meny: öppna, kopiera URL / nummer, checka ut källgrenen, visa dess incheckningar, skapa en gren från ett ärende" }
 pull_requests_and_5 = "välj filter (Öppna, Mina, Granskning begärd, Alla / Tilldelade mig); verktygsfältets chip (GL !53, GH #12) öppnar den länkade begäran, högerklicka för dess meny; ”+ {$pr_abbr}” startar en för en pushad gren"
+pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
 refs_pane_1 = { git = "öppna vald refs meny: checkout, dölj/solo, merge, rebase, fast-forward, pull / push / fetch, ange upstream, skapa worktree, starta en {$pr}, byt namn, ta bort, Kopiera (namn / fullständig ref / mål-SHA)", local = "öppna vald refs meny: checkout, dölj/solo, sammanslagning, rebase, fast-forward, pull / push / hämta, ange upstream, skapa worktree, starta en {$pr}, byt namn, ta bort, Kopiera (namn / fullständig ref / mål-SHA)" }
 refs_pane_2 = "Fast-forward <gren> till <aktuell> / <aktuell> till <gren> (meny eller palett): flyttar bara en gren framåt; gråad, med orsak, när det inte är en fast-forward"
 refs_pane_3 = { git = "Skapa worktree från <ref>... (gren, tag eller en commits meny): en dialog - mapp (Bläddra / {{dialog.browse}}), valfri ny gren, [x] öppna den som flik (Mellanslag växlar)", local = "Skapa worktree från <ref>... (gren, tagg eller en inchecknings meny): en dialog - mapp (Bläddra / {{dialog.browse}}), valfri ny gren, [x] öppna den som flik (Mellanslag växlar)" }
@@ -10121,6 +10122,7 @@ why_no_edit = "this host does not let you edit comments"
 why_no_delete = "this host does not let you delete comments"
 why_not_yours = "only your own comments can be changed"
 why_empty = "write something first"
+why_too_long = "the text is longer than the host takes"
 why_no_conversation = "this item has no conversation to read here, open it in the browser"
 noun_link = "link"
 nothing_to_open = "nothing to open"

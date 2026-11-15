@@ -2713,7 +2713,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     .requires(crate::build_features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_OPEN_DIAGRAM,
-        "m",
+        "g",
         PaletteCommand::Item(crate::item_cmd::ItemCmd::OpenDiagram),
     )
     .requires(crate::build_features::Feature::Mermaid),

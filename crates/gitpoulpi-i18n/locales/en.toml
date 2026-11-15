@@ -4806,11 +4806,12 @@ git_actions_then_21 = "edit the selected commit's message - see \"Editing a comm
 git_actions_then_22 = "cherry-pick the selected commit onto HEAD"
 git_actions_then_23 = "revert the selected commit (asks first)"
 git_actions_then_24 = "reset the branch to the selected commit, mixed (soft and hard are palette-only; hard asks first)"
-pull_requests_and_1 = "open the row in the browser; \"Reconnect\" opens Settings on the profile"
+pull_requests_and_1 = "open the row (its conversation where the host has one, else the browser); \"Reconnect\" opens Settings on the profile"
 pull_requests_and_2 = "{$pr} row: edit it on the host's website (the row's pencil); the palette has the checked-out branch's twin"
 pull_requests_and_3 = "({$PRS} section) create one - the header's +"
 pull_requests_and_4 = "the row's menu: open, copy URL / number, check out the source branch, view its commits, create a branch from an issue"
 pull_requests_and_5 = "choose the filter (Open, Mine, Review requested, All / Assigned to me); the toolbar chip (GL !53, GH #12) opens the linked request, right-click for its menu; \"+ {$pr_abbr}\" starts one for a pushed branch"
+pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
 refs_pane_1 = "open the selected ref's menu: check out, hide/solo, merge, rebase, fast-forward, pull / push / fetch, set upstream, create worktree, start a {$pr}, rename, delete, Copy (name / full ref / target SHA)"
 refs_pane_2 = "Fast-forward <branch> to <current> / <current> to <branch> (menu or palette): moves a branch forward only; grayed out, with the reason, when it is not a fast-forward"
 refs_pane_3 = "Create worktree from <ref>... (branch, tag, or a commit's menu): a dialog - folder (Browse / {{dialog.browse}}), optional new branch, [x] open it as a tab (Space toggles)"
@@ -12604,6 +12605,8 @@ why_no_delete = "this host does not let you delete comments"
 why_not_yours = "only your own comments can be changed"
 # context: why Send does nothing. Width budget: 40 cells
 why_empty = "write something first"
+# context: why Send does nothing. Width budget: 40 cells
+why_too_long = "the text is longer than the host takes"
 # context: status line: the item has no conversation to read in the app. Width budget: 80 cells
 why_no_conversation = "this item has no conversation to read here, open it in the browser"
 # context: what was copied: a link, in 'Copied link: ...'. Width budget: 12 cells

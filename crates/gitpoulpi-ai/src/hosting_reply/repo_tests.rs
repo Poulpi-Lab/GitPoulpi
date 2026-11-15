@@ -456,6 +456,32 @@ fn a_consecutive_issue_in_the_same_repository_rebuilds_only_its_new_parts() {
 }
 
 #[test]
+fn turning_redaction_on_does_not_find_the_context_cached_with_it_off() {
+    let reader = Fake::new();
+    let mut cache = ContextCache::new(30);
+    let mut sessions = SessionStore::new();
+    let ask =
+        |reader: &Fake, cache: &mut ContextCache, sessions: &mut SessionStore, redact: bool| {
+            let mut r = plain_request("see src/secret.rs");
+            let mut s = setup(reader, cache, sessions);
+            s.privacy.redact_secrets = redact;
+            block_on(read_repository(http_job(), &mut r, &mut s)).unwrap();
+            context_of(&r)
+        };
+    let open = ask(&reader, &mut cache, &mut sessions, false);
+    assert!(open.block().text.contains(TOKEN), "redaction was off");
+    let again = ask(&reader, &mut cache, &mut sessions, false);
+    assert_eq!(again.reused_parts(), again.parts.len(), "same settings hit");
+    let masked = ask(&reader, &mut cache, &mut sessions, true);
+    let text = masked.block().text;
+    assert!(
+        !text.contains(TOKEN),
+        "the cached clear text leaked: {text}"
+    );
+    assert_eq!(masked.reused_parts(), 0, "rebuilt under the new settings");
+}
+
+#[test]
 fn a_new_head_and_refresh_both_rebuild() {
     let reader = Fake::new();
     let mut cache = ContextCache::new(30);

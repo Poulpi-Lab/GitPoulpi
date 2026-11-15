@@ -3865,6 +3865,7 @@ pull_requests_and_2 = "рядок {$pr}: змінити на сайті хост
 pull_requests_and_3 = "(розділ {$PRS}) створити - + у заголовку"
 pull_requests_and_4 = { git = "меню рядка: відкрити, копіювати URL / номер, checkout вихідної гілки, переглянути її commit'и, створити гілку з issue", local = "меню рядка: відкрити, копіювати URL / номер, checkout вихідної гілки, переглянути її коміти, створити гілку з issue" }
 pull_requests_and_5 = "вибрати фільтр («Відкриті», «Мої {$prs}», «Чекають мого рев'ю», «Усі» / «Призначені мені»); чип на панелі (GL !53, GH #12) відкриває пов'язаний запит, праве клацання - його меню; «+ {$pr_abbr}» створює запит для надісланої гілки"
+pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
 refs_pane_1 = { git = "відкрити меню вибраного ref: checkout, hide/solo, merge, rebase, fast-forward, pull / push / fetch, задати upstream, створити worktree, створити {$pr}, перейменувати, видалити, Копіювати (назва / повний ref / SHA цілі)", local = "відкрити меню вибраного ref: checkout, hide/solo, злиття, перебазування, перемотування, отримання / надсилання / завантаження, задати upstream, створити worktree, створити запит на злиття, перейменувати, видалити, Копіювати (назва / повний ref / SHA цілі)" }
 refs_pane_2 = "Fast-forward <гілка> до <поточної> / <поточної> до <гілки> (меню чи палітра): лише посуває гілку вперед; сіре, з причиною, якщо це не fast-forward"
 refs_pane_3 = { git = "Створити worktree з <ref>... (гілка, tag чи меню commit'у): діалог - папка (Огляд / {{dialog.browse}}), необов'язкова нова гілка, [x] відкрити як вкладку (Space перемикає)", local = "Створити worktree з <ref>... (гілка, тег чи меню коміту): діалог - папка (Огляд / {{dialog.browse}}), необов'язкова нова гілка, [x] відкрити як вкладку (Space перемикає)" }
@@ -10119,6 +10120,7 @@ why_no_edit = "this host does not let you edit comments"
 why_no_delete = "this host does not let you delete comments"
 why_not_yours = "only your own comments can be changed"
 why_empty = "write something first"
+why_too_long = "the text is longer than the host takes"
 why_no_conversation = "this item has no conversation to read here, open it in the browser"
 noun_link = "link"
 nothing_to_open = "nothing to open"

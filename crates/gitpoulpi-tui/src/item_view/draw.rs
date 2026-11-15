@@ -350,7 +350,7 @@ impl ItemView {
         let send_reason = self.send_reason();
         if let Some(md) = self.md.as_mut() {
             md.set_sent_as(match write_flavor {
-                Some(f @ (MarkupFlavor::JiraWiki | MarkupFlavor::Textile)) => {
+                Some(f @ (MarkupFlavor::JiraWiki | MarkupFlavor::Textile | MarkupFlavor::Html)) => {
                     Some(flavor_name(f).to_string())
                 }
                 _ => None,
@@ -362,6 +362,17 @@ impl ItemView {
         let mut left = rect.x + 1;
         if let Some(f) = write_flavor {
             let used = dialog_kit::put(buf, left, y, flavor_name(f), rect.width / 3, muted());
+            left = used.right() + 2;
+        }
+        // The host's length limit, with how much of it the text uses.
+        if let Some(max) = self.max_body() {
+            let count = format!("{} / {max}", self.body_chars());
+            let style = if self.over_limit() {
+                Style::default().fg(th().status.danger).bg(th().ui.panel)
+            } else {
+                muted()
+            };
+            let used = dialog_kit::put(buf, left, y, &count, rect.width / 3, style);
             left = used.right() + 2;
         }
         let hovered = |h: Hit| self.hover == Some(h);

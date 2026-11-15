@@ -449,10 +449,29 @@ impl ItemView {
         if self.md.as_ref().is_none_or(|e| e.is_blank()) {
             return Some(m::WHY_EMPTY.get());
         }
+        if self.over_limit() {
+            return Some(m::WHY_TOO_LONG.get());
+        }
         if !self.composer_dirty() {
             return Some(m::WHY_UNCHANGED.get());
         }
         None
+    }
+
+    /// The characters the host takes in one comment, when it says.
+    pub(super) fn max_body(&self) -> Option<usize> {
+        self.conv.caps.as_ref().and_then(|c| c.max_body)
+    }
+
+    /// How many characters the composer holds.
+    pub(super) fn body_chars(&self) -> usize {
+        self.md.as_ref().map_or(0, |e| e.text().chars().count())
+    }
+
+    /// The text is longer than the host takes (the CLI refuses the same
+    /// before any request).
+    pub(super) fn over_limit(&self) -> bool {
+        self.max_body().is_some_and(|max| self.body_chars() > max)
     }
 
     pub(crate) fn avail(&self) -> ItemAvail {

@@ -3866,6 +3866,7 @@ pull_requests_and_2 = "{$pr}-rij: bewerken op de site van de host (het potlood v
 pull_requests_and_3 = "(sectie {$PRS}) er een maken - de + van de kop"
 pull_requests_and_4 = "het menu van de rij: openen, URL / nummer kopiëren, bronbranch uitchecken, zijn commits tonen, een branch maken van een issue"
 pull_requests_and_5 = "het filter kiezen (Open, Mijn, Review gevraagd, Alle / Aan mij toegewezen); de werkbalkchip (GL !53, GH #12) opent het gekoppelde verzoek, rechtsklik voor zijn menu; \"+ {$pr_abbr}\" start er een voor een gepushte branch"
+pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
 refs_pane_1 = { git = "het menu van de geselecteerde ref openen: checkout, verbergen/solo, merge, rebase, fast-forward, pull / push / fetch, upstream instellen, worktree maken, een {$pr} starten, hernoemen, verwijderen, Kopiëren (naam / volledige ref / doel-SHA)", local = "het menu van de geselecteerde ref openen: checkout, verbergen/solo, samenvoeging, rebase, fast-forward, pull / push / ophalen, upstream instellen, worktree maken, een {$pr} starten, hernoemen, verwijderen, Kopiëren (naam / volledige ref / doel-SHA)" }
 refs_pane_2 = "<branch> fast-forwarden naar <huidige> / <huidige> naar <branch> (menu of palet): verplaatst een branch alleen vooruit; grijs, met de reden, als het geen fast-forward is"
 refs_pane_3 = { git = "Worktree maken van <ref>... (menu van branch, tag of commit): een dialoog - map (Bladeren / {{dialog.browse}}), optionele nieuwe branch, [x] als tabblad openen (Spatie wisselt)", local = "Worktree maken van <ref>... (menu van branch, label of commit): een dialoog - map (Bladeren / {{dialog.browse}}), optionele nieuwe branch, [x] als tabblad openen (Spatie wisselt)" }
@@ -10115,6 +10116,7 @@ why_no_edit = "this host does not let you edit comments"
 why_no_delete = "this host does not let you delete comments"
 why_not_yours = "only your own comments can be changed"
 why_empty = "write something first"
+why_too_long = "the text is longer than the host takes"
 why_no_conversation = "this item has no conversation to read here, open it in the browser"
 noun_link = "link"
 nothing_to_open = "nothing to open"

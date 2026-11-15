@@ -345,6 +345,33 @@ impl HostingUi {
 
     /// The default action of a row (Enter, click on a control,
     /// double-click on an item).
+    /// `o` on a pull request or issue row: the row's page in the browser
+    /// (Enter opens the conversation where the host has one). The key is
+    /// the Refs pane's "solo" key, which means nothing on these rows.
+    pub(crate) fn open_row_in_browser(
+        &mut self,
+        list: HostingList,
+        index: usize,
+        clipboard: &mut crate::clipboard::Clipboard,
+    ) -> HostingEffect {
+        let url = match self.rows(list).get(index) {
+            Some(HostingRow::Pull(_, i)) => self
+                .linked_snapshot()
+                .and_then(|s| s.prs.get(*i))
+                .map(|pr| pr.web_url.clone()),
+            Some(HostingRow::Issue(i)) => self
+                .snapshot
+                .as_ref()
+                .and_then(|s| s.issues.get(*i))
+                .map(|issue| issue.web_url.clone()),
+            _ => None,
+        };
+        match url.filter(|u| !u.is_empty()) {
+            Some(url) => self.run(HostingAction::OpenUrl(url), clipboard),
+            None => HostingEffect::None,
+        }
+    }
+
     pub(crate) fn activate_row(
         &mut self,
         list: HostingList,

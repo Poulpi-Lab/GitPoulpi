@@ -3866,6 +3866,7 @@ pull_requests_and_2 = "{$pr}の行：ホストのサイトで編集（行の鉛�
 pull_requests_and_3 = "（{$PRS}セクション）新規作成 - 見出しの +"
 pull_requests_and_4 = { git = "行のメニュー：開く、URL / 番号のコピー、ソースブランチのチェックアウト、その{$commit}の表示、Issue からのブランチ作成", local = "行のメニュー：開く、URL / 番号のコピー、ソースブランチのチェックアウト、そのコミットの表示、Issue からのブランチ作成" }
 pull_requests_and_5 = "絞り込みを選択（オープン、自分、レビュー依頼、すべて / 自分に割り当て）。ツールバーのチップ（GL !53、GH #12）は関連するリクエストを開き、右クリックでメニュー。「+ {$pr_abbr}」は{$push}済みのブランチのリクエストを開始します"
+pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
 refs_pane_1 = { git = "選択中の参照のメニューを開く：チェックアウト、非表示/ソロ、{$merge}、{$rebase}、早送り、{$pull} / {$push} / {$fetch}、アップストリーム設定、worktree 作成、{$pr}の開始、名前変更、削除、コピー（名前 / 完全な参照 / 対象 SHA）", local = "選択中の参照のメニューを開く：チェックアウト、非表示/ソロ、{$merge}、{$rebase}、早送り、{$pull} / {$push} / {$fetch}、アップストリーム設定、ワークツリー作成、{$pr}の開始、名前変更、削除、コピー（名前 / 完全な参照 / 対象 SHA）" }
 refs_pane_2 = "<ブランチ> を <現在> に / <現在> を <ブランチ> に早送り（メニューまたはパレット）：ブランチを前に進めるだけです。早送りできない場合は理由付きでグレー表示されます"
 refs_pane_3 = { git = "<参照> から worktree を作成...（ブランチ、{$tag}、または{$commit}のメニュー）：ダイアログで、フォルダー（参照 / {{dialog.browse}}）、任意の新規ブランチ、[x] タブで開く（Space で切り替え）を指定します", local = "<参照> からワークツリーを作成...（ブランチ、{$tag}、または{$commit}のメニュー）：ダイアログで、フォルダー（参照 / {{dialog.browse}}）、任意の新規ブランチ、[x] タブで開く（Space で切り替え）を指定します" }
@@ -10117,6 +10118,7 @@ why_no_edit = "this host does not let you edit comments"
 why_no_delete = "this host does not let you delete comments"
 why_not_yours = "only your own comments can be changed"
 why_empty = "write something first"
+why_too_long = "the text is longer than the host takes"
 why_no_conversation = "this item has no conversation to read here, open it in the browser"
 noun_link = "link"
 nothing_to_open = "nothing to open"

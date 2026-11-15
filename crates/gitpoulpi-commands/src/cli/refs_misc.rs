@@ -462,8 +462,10 @@ pub enum AiCommand {
     /// comment, an answer in a thread (`--reply-to`), a comment on a line of
     /// code (`--path`), a review summary (`--review-summary`), or the
     /// description of a new issue (`--issue-title`). The conversation is read
-    /// from `--conversation` (the JSON a `hosting` conversation command prints:
-    /// `header` and `entries`); the AI sees the item, the thread, the recent
+    /// from `--conversation` (the JSON `hosting issue comments --json` or
+    /// `hosting review conversation --json` prints, so
+    /// `hosting issue comments 7 --json | ai hosting-reply --conversation -`
+    /// works) or fetched by `--item`; the AI sees the item, the thread, the recent
     /// comments within `ai.limits.hosting_reply_context_bytes` and your
     /// `--hint`. **It only drafts: the answer is `{ draft, posted: false, ... }`
     /// and nothing is posted, edited or deleted**; posting is a separate
@@ -471,15 +473,22 @@ pub enum AiCommand {
     /// `ai.hosting_reply.base_prompt` (edit it in Settings > AI). Needs
     /// `ai.enabled = true`.
     HostingReply {
-        /// The conversation as JSON: a file, `-` for standard input, or the
-        /// JSON itself. Not for `--issue-title`.
+        /// The conversation as JSON, as a `hosting` conversation command
+        /// prints it: a file, `-` for standard input, or the JSON itself. Not
+        /// for `--issue-title`.
         #[arg(
             long,
             value_name = "FILE|-|JSON",
-            required_unless_present = "issue_title",
-            conflicts_with = "issue_title"
+            required_unless_present_any = ["issue_title", "item"],
+            conflicts_with_all = ["issue_title", "item"]
         )]
         conversation: Option<String>,
+        /// The issue or pull request to answer, read from the host itself in
+        /// the repository's linked source (`7` or `#7` an issue, `!7` a pull
+        /// request): the same conversation `hosting issue comments 7 --json`
+        /// prints, without the system events. Instead of `--conversation`.
+        #[arg(long, value_name = "REF", conflicts_with = "issue_title")]
+        item: Option<String>,
         /// Answer in the thread with this id (a code thread, a comment or a
         /// discussion).
         #[arg(

@@ -335,7 +335,7 @@ review_mode = "ask"       # ask | clone | api
 | `ai.enabled` | `false` | スイッチです。オフの場合、AI に関するものはどこにも表示されず、何も送信されません。 |
 | `ai.default_profile` | `"default"` | アクションがプロファイルを指定しないときに使うプロファイルの ID です。 |
 | `ai.global_instructions` | `""` | すべてのアクションのプロンプトに追加されるテキストです。`${repo}`、`${uilang}` などを使えます（[AI > プロンプト変数](ai.md#プロンプト変数)を参照）。アクションごとの指示とリポジトリの指示も同様です。 |
-| `ai.actions.<action>.profile` | `""` | 1 つのアクションのプロファイルです。空は既定を使います。アクション：`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`。ワークスペース（`workspaces.toml` の `[workspace.ai_instructions]` と `[workspace.ai_overrides.<action>]`）とリポジトリは、これらの指示に追加したり置き換えたりできます：[AI](ai.md#指示)を参照してください。 |
+| `ai.actions.<action>.profile` | `""` | 1 つのアクションのプロファイルです。空は既定を使います。アクション：`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`。ワークスペース（`workspaces.toml` の `[workspace.ai_instructions]` と `[workspace.ai_overrides.<action>]`）とリポジトリは、これらの指示に追加したり置き換えたりできます：[AI](ai.md#指示)を参照してください。 |
 | `ai.actions.<action>.instructions` | `""` | そのアクションだけに追加されるテキストです。 |
 | `ai.review.run_in_repository` | `"profile"` | `profile`、`yes`、`no`：コードレビューのドラフトのローカルエージェントが、その実行でリポジトリ内で作業するかどうか（AI プロファイルの `workdir` より優先）。リポジトリ固有の値も設定できます（`gitpoulpi ai review-context --repo`）。[AI > レビューのコンテキスト](ai.md#レビューのコンテキスト)を参照してください。 |
 | `ai.review.include_claude_md` | `true` | コードレビューのドラフトにリポジトリの `CLAUDE.md` を渡します（ルート、リクエストの対象ブランチで読み取り。8 KB で切り詰め）。 |
@@ -350,7 +350,7 @@ review_mode = "ask"       # ask | clone | api
 | `ai.limits.review_threads_bytes` | `6000` | すでにあるレビューコメントの一覧（モデルが繰り返さないように渡されます）の最大バイト数。超えると、*切り詰めて送信*は一覧を切り詰めます。範囲は同じです。 |
 | `ai.limits.review_context_file_bytes` | `8192` | コードレビューに渡す 1 つのプロジェクトコンテキストファイル（`CLAUDE.md`、`AGENTS.md`、追加ファイル）の最大バイト数。超えると、*切り詰めて送信*はそのファイルを注記つきで短くします。範囲は同じです。 |
 | `ai.limits.review_context_bytes` | `16384` | すべてのコンテキストファイルを合わせた最大バイト数。超えると、*切り詰めて送信*は上限をまたぐファイルを短くし、それ以降のファイルを除外します。範囲は同じです。 |
-| `ai.sent_preview.<action>` | `true` | アクションごとに 1 つのキー（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`）：リクエストを送る前に「送信する内容」を表示します。ダイアログの「今後表示しない」が `false` を書き込み、設定 > AI > *送信前に内容を表示...* でオンに戻せます。 |
+| `ai.sent_preview.<action>` | `true` | アクションごとに 1 つのキー（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`）：リクエストを送る前に「送信する内容」を表示します。ダイアログの「今後表示しない」が `false` を書き込み、設定 > AI > *送信前に内容を表示...* でオンに戻せます。 |
 
 リポジトリ固有の `[preferences.ai_review]` テーブル（`repo-state.toml` 内、またはクローンしていないリポジトリでは `remote-reviews.toml` のエントリ）にも同じキーを指定でき（すべて省略可能）、加えて `no_extra_file = true` があります。これは `ai.review.extra_file` の内容にかかわらず、そのリポジトリでは追加ファイルを使いません。未設定のキー、未設定の `extra_file`、存在しない `no_extra_file` は全体の値を継承します。`extra_file` にファイルを設定するとスイッチが解除され、逆の場合も同様です。
 
@@ -503,7 +503,7 @@ stage_file = "z"
 | `hosting_integration` | ここに固定された `[[integrations]]` のプロファイル | `gitpoulpi hosting use --id` |
 | `pulls_source`、`issues_source` | PR / Issue の一覧が読むプロバイダーのプロジェクトで、`{ integration, project, filter }` の形です。`filter` は省略可能で、プロバイダー固有の追加条件（Jira の JQL の断片、Azure の WIQL の条件、Trello のリスト名）を一覧のクエリに AND で加えます。GitHub と GitLab は無視します。 | サイドバーのセクション、`gitpoulpi hosting link` |
 | `ref_visibility` | 非表示 / ソロ表示の参照 | Refs サイドバー、`gitpoulpi refs hide\|show\|solo` |
-| `hidden_remotes` | グラフからまるごと非表示にしたリモート（すべてのブランチ。あとで fetch したものも） | リモートの目のアイコンとメニュー、`gitpoulpi refs hide --remote` |
+| `hidden_remotes` | グラフからまるごと非表示にしたリモート（すべてのブランチ。あとで fetch したものも） | リモートの ⊙ とメニュー、`gitpoulpi refs hide --remote` |
 | `folds`、`collapsed_*_ref_folders` | 折りたたんだサイドバーのセクションと、ブランチおよびタグのフォルダー。`[folds]` には、`status_folders`（Unstaged / Staged のファイルツリーの折りたたんだフォルダー）と `commit_folders`（commit の変更ファイルツリーの折りたたんだフォルダーで、すべての commit で共通）も含まれ、それぞれ最大 500 パスで、古いものから捨てられます | サイドバー、ファイルツリー |
 | `pending_auto_stash` | GitPoulpi が作成し、まだ戻していない stash | デーモンが書き込みます。[自動 stash](log-and-history.md)を参照 |
 

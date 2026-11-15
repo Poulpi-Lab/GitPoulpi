@@ -32,6 +32,15 @@ pub enum Event {
     RefVisibilityChanged {
         repo: RepoId,
     },
+    /// A comment on an issue or a pull request was posted, edited or deleted
+    /// by a client that makes its hosting calls in its own process (the CLI
+    /// or the MCP server; `OperationKind::NotifyHostingChange`). An open item
+    /// view or review of `item` re-reads its conversation to follow. The
+    /// daemon never talks to the host itself.
+    HostingItemChanged {
+        repo: RepoId,
+        change: HostingChangeArgs,
+    },
     /// The repository's authentication profile (`repo-auth.toml`) was set or
     /// cleared through the daemon. Re-read it (`RepoAuthGet`) to follow.
     RepoAuthChanged {
@@ -166,4 +175,36 @@ pub enum Event {
         viewer: crate::ui::ViewerId,
         raise_id: u64,
     },
+}
+
+/// Which kind of item a [`HostingChangeArgs`] is about.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum HostingItemKind {
+    Issue,
+    PullRequest,
+}
+
+/// What happened to the item's conversation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum HostingChange {
+    Posted,
+    Edited,
+    Deleted,
+}
+
+/// Args of `OperationKind::NotifyHostingChange` and the payload of
+/// [`Event::HostingItemChanged`]: which item of which integration's project,
+/// and what changed. `id` is the provider's own key (a Jira key, a Trello
+/// card id, a Linear uuid) when the number does not name the item.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HostingChangeArgs {
+    pub integration_id: String,
+    pub project: String,
+    pub kind: HostingItemKind,
+    pub number: u64,
+    #[serde(default)]
+    pub id: String,
+    pub change: HostingChange,
 }

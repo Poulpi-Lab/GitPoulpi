@@ -289,13 +289,15 @@ async fn build_show(ipc: &mut Session, what: UiShowAction) -> Result<Built, Stri
             repo: default_repo(ipc)?,
             name,
         },
-        UiShowAction::Pr { number } => UiIntent::ShowHosting {
+        UiShowAction::Pr { number, view } => UiIntent::ShowHosting {
             repo: default_repo(ipc)?,
             item: HostingItem::Pr(number.into()),
+            view: view.into(),
         },
-        UiShowAction::Issue { number } => UiIntent::ShowHosting {
+        UiShowAction::Issue { number, view } => UiIntent::ShowHosting {
             repo: default_repo(ipc)?,
             item: HostingItem::Issue(number.into()),
+            view: view.into(),
         },
         UiShowAction::Wip {
             path,

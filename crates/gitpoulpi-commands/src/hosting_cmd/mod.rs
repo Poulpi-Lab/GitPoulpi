@@ -12,6 +12,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use gitpoulpi_core::domain::{CloneOptions, OperationKind, RepoRef};
+use gitpoulpi_hosting::conversation::ItemKind;
 use gitpoulpi_hosting::{
     pull_request_edit_url, pull_request_web_url, DefaultTokenSource, HostedProject, HttpTransport,
     Integration, IssueFilter, MetaKind, PrFilter, TokenSource,
@@ -28,6 +29,7 @@ use crate::repo_cmd::Emitted;
 mod assignment;
 #[cfg(feature = "board")]
 mod board_cmd;
+mod conversation;
 pub mod flow_issue;
 mod integrations;
 mod keys;
@@ -227,6 +229,15 @@ pub fn needs_daemon(action: &HostingAction) -> bool {
     if let HostingAction::Review { action } = action {
         return action.project().is_none();
     }
+    // The same for the conversation of an issue, and `markdown` reads nothing.
+    if let HostingAction::Issue { action } = action {
+        if action.project().is_some() {
+            return false;
+        }
+    }
+    if matches!(action, HostingAction::Markdown(_)) {
+        return false;
+    }
     matches!(
         action,
         HostingAction::Clone { .. }
@@ -291,6 +302,9 @@ async fn run_review_with(
         | ReviewAction::SubmitChange { id, .. }
         | ReviewAction::Abandon { id, .. }
         | ReviewAction::Suggest { id, .. } => id.clone(),
+        ReviewAction::Conversation(a) => a.id.clone(),
+        ReviewAction::CommentEdit(a) => a.id.clone(),
+        ReviewAction::CommentDelete(a) => a.id.clone(),
     };
     let target = match (action.project(), ipc.as_deref_mut()) {
         (Some(project), _) => review_api::project_target(env, id.as_deref(), project)?,
@@ -298,6 +312,43 @@ async fn run_review_with(
         (None, None) => return Err("not inside a git repository (pass --project)".to_string()),
     };
     match action {
+        ReviewAction::Conversation(a) => {
+            let key = conversation::parse_item(
+                ItemKind::PullRequest,
+                target.integration.kind.family(),
+                &a.reference,
+            )?;
+            let op = conversation::Op::Read {
+                limit: a.limit,
+                older: a.older,
+                events: !a.no_events,
+            };
+            conversation::run(env, ipc, &target, key, op).await
+        }
+        ReviewAction::CommentEdit(a) => {
+            let key = conversation::parse_item(
+                ItemKind::PullRequest,
+                target.integration.kind.family(),
+                &a.reference,
+            )?;
+            let body = required_body(read_issue_body(a.body, a.body_file)?)?;
+            let op = conversation::Op::Edit {
+                comment_id: a.comment_id,
+                body,
+            };
+            conversation::run(env, ipc, &target, key, op).await
+        }
+        ReviewAction::CommentDelete(a) => {
+            let key = conversation::parse_item(
+                ItemKind::PullRequest,
+                target.integration.kind.family(),
+                &a.reference,
+            )?;
+            let op = conversation::Op::Delete {
+                comment_id: a.comment_id,
+            };
+            conversation::run(env, ipc, &target, key, op).await
+        }
         ReviewAction::Show {
             number,
             patch_set,
@@ -328,7 +379,7 @@ async fn run_review_with(
             ..
         } => {
             let body = required_body(read_issue_body(body, body_file)?)?;
-            review::comment(env, &target, number, body).await
+            review::comment(env, ipc, &target, number, body).await
         }
         ReviewAction::Reply {
             number,
@@ -338,7 +389,7 @@ async fn run_review_with(
             ..
         } => {
             let body = required_body(read_issue_body(body, body_file)?)?;
-            review::reply(env, &target, number, &thread, body).await
+            review::reply(env, ipc, &target, number, &thread, body).await
         }
         ReviewAction::Resolve {
             number,
@@ -410,6 +461,79 @@ async fn run_review_with(
             review::suggest(env, ipc, &target, number, remote, run, send_all).await
         }
     }
+}
+
+/// `hosting issue comments|comment|comment-edit|comment-delete`: in the
+/// current repository's linked issue source, or with `--project` against the
+/// host alone.
+async fn run_issue_conversation(
+    env: &HostingEnv,
+    mut ipc: Option<&mut Session>,
+    action: IssueAction,
+) -> Result<Emitted, String> {
+    use conversation::Op;
+    let (reference, id, project, op) = match action {
+        IssueAction::Comments(a) => (
+            a.reference,
+            a.id,
+            a.project,
+            Op::Read {
+                limit: a.limit,
+                older: a.older,
+                events: !a.no_events,
+            },
+        ),
+        IssueAction::Comment(a) => {
+            let body = required_body(read_issue_body(a.body, a.body_file)?)?;
+            (
+                a.reference,
+                a.id,
+                a.project,
+                Op::Post {
+                    body,
+                    reply_to: a.reply_to,
+                    internal: a.internal,
+                },
+            )
+        }
+        IssueAction::CommentEdit(a) => {
+            let body = required_body(read_issue_body(a.body, a.body_file)?)?;
+            (
+                a.reference,
+                a.id,
+                a.project,
+                Op::Edit {
+                    comment_id: a.comment_id,
+                    body,
+                },
+            )
+        }
+        IssueAction::CommentDelete(a) => (
+            a.reference,
+            a.id,
+            a.project,
+            Op::Delete {
+                comment_id: a.comment_id,
+            },
+        ),
+        _ => unreachable!("only the conversation actions get here"),
+    };
+    let target = match (project, ipc.as_deref_mut()) {
+        (Some(project), _) => conversation::issue_project_target(env, id.as_deref(), &project)?,
+        (None, Some(ipc)) => repo_target(env, ipc, id.as_deref(), Which::Issues).await?,
+        (None, None) => return Err("not inside a git repository (pass --project)".to_string()),
+    };
+    let key = conversation::parse_item(
+        ItemKind::Issue,
+        target.integration.kind.family(),
+        &reference,
+    )?;
+    let ipc = if target.linked || !target.remote.is_empty() {
+        ipc
+    } else {
+        None
+    };
+    conversation::run(env, ipc, &target, key, op).await
 }
 
 /// A comment or reply with no text is refused before any request.
@@ -579,6 +703,9 @@ async fn run_local_inner(env: &HostingEnv, action: HostingAction) -> Result<Emit
             refresh,
         } => radar::run_radar(env, ids, what, include_drafts, refresh).await,
         HostingAction::File(args) => review_api::file(env, args).await,
+        HostingAction::Markdown(args) => conversation::markdown(env, args),
+        // Only a named project gets here (`needs_daemon`).
+        HostingAction::Issue { action } => run_issue_conversation(env, None, action).await,
         // Only a named project gets here (`needs_daemon`).
         HostingAction::Review { action } => run_review_local(env, action).await,
 
@@ -588,7 +715,6 @@ async fn run_local_inner(env: &HostingEnv, action: HostingAction) -> Result<Emit
         | HostingAction::PrForBranch { .. }
         | HostingAction::CheckoutPr { .. }
         | HostingAction::Issues { .. }
-        | HostingAction::Issue { .. }
         | HostingAction::Open { .. }
         | HostingAction::Refs { .. }
         | HostingAction::EditUrl { .. }
@@ -661,6 +787,15 @@ async fn run_via_daemon_inner(
             let target = repo_target(env, ipc, id.as_deref(), Which::Pulls).await?;
             let ask = EditAsk::new(meta, add_reviewer, remove_reviewer);
             return edit(env, &target, number, MetaKind::PullRequest, ask).await;
+        }
+        HostingAction::Issue {
+            action:
+                action @ (IssueAction::Comments(_)
+                | IssueAction::Comment(_)
+                | IssueAction::CommentEdit(_)
+                | IssueAction::CommentDelete(_)),
+        } => {
+            return run_issue_conversation(env, Some(ipc), action).await;
         }
         HostingAction::Issue {
             action: IssueAction::Edit { number, meta, id },

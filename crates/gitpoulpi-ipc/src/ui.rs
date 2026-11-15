@@ -72,6 +72,17 @@ pub enum HostingItem {
     Issue(u64),
 }
 
+/// Which view of a pull request or issue `ShowHosting` opens.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum HostingView {
+    /// Select the row (what `ShowHosting` always did).
+    #[default]
+    Details,
+    /// Open the item's conversation (its comments and events).
+    Conversation,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum DiffSide {
@@ -263,6 +274,10 @@ pub enum UiIntent {
     ShowHosting {
         repo: RepoId,
         item: HostingItem,
+        /// What to open: the item's details (the default, and what an older
+        /// client sends) or its conversation.
+        #[serde(default)]
+        view: HostingView,
     },
     ShowWip {
         repo: RepoId,
@@ -754,6 +769,7 @@ mod tests {
             UiIntent::ShowHosting {
                 repo: repo(),
                 item: HostingItem::Pr(7),
+                view: HostingView::Conversation,
             },
             UiIntent::ShowWip {
                 repo: repo(),

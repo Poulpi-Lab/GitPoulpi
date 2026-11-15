@@ -367,6 +367,127 @@ pub enum HostingAction {
     /// no clone: text as is, other bytes as base64 (`encoding`). Exit 1 and
     /// an error when the file does not exist at that revision.
     File(FileArgs),
+    /// What an issue or pull request text is once cleaned and read the way
+    /// the app reads it: control sequences removed, the references in it
+    /// (`#12`, `@login`, commit ids, links) found and the text wrapped to a
+    /// width. Reads nothing from the host and changes nothing.
+    Markdown(MarkdownArgs),
+}
+
+/// The arguments of `hosting markdown`.
+#[derive(Debug, clap::Args)]
+pub struct MarkdownArgs {
+    /// The text.
+    #[arg(long, conflicts_with = "body_file")]
+    pub body: Option<String>,
+    /// Read the text from this file (`-` reads stdin).
+    #[arg(long)]
+    pub body_file: Option<std::path::PathBuf>,
+    /// Which kind of item the text belongs to (`#12` is an issue or a
+    /// request on some hosts).
+    #[arg(long = "for", value_enum, default_value_t = MarkdownFor::Issue)]
+    pub for_item: MarkdownFor,
+    /// Wrap the lines to this many columns (default 80).
+    #[arg(long)]
+    pub width: Option<usize>,
+    /// The integration whose grammar the references follow (see `hosting
+    /// list`). Without it only links and plain references resolve.
+    #[arg(long)]
+    pub id: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
+pub enum MarkdownFor {
+    Issue,
+    Pr,
+}
+
+/// `hosting issue comments` and `hosting review conversation`: reads the
+/// whole timeline of an issue or a request, newest window first.
+#[derive(Debug, clap::Args)]
+pub struct ConvReadArgs {
+    /// The item: a number (`142`, `#142`, `!12`) or the tracker's own key
+    /// (`ABC-12`, `ENG-7`, a Trello card id or short link).
+    pub reference: String,
+    /// Print at most this many entries (the newest). The window the host
+    /// answers holds up to 300; the ones left out are counted in
+    /// `trimmed_older`.
+    #[arg(long)]
+    pub limit: Option<usize>,
+    /// The `older` cursor of the previous answer: loads the window before it.
+    #[arg(long)]
+    pub older: Option<String>,
+    /// Leave out the system events (labels, assignments, state changes).
+    #[arg(long)]
+    pub no_events: bool,
+    /// Read a project that is not the current repository (no clone needed).
+    #[arg(long)]
+    pub project: Option<String>,
+    /// Which integration (see `hosting issues`).
+    #[arg(long)]
+    pub id: Option<String>,
+}
+
+/// `hosting issue comment`: posts a comment, or replies in a discussion.
+#[derive(Debug, clap::Args)]
+pub struct ConvPostArgs {
+    /// The item (see `comments`).
+    pub reference: String,
+    /// The comment (markdown).
+    #[arg(long, conflicts_with = "body_file")]
+    pub body: Option<String>,
+    /// Read the comment from this file (`-` reads stdin).
+    #[arg(long)]
+    pub body_file: Option<std::path::PathBuf>,
+    /// Answer this discussion (its `discussion_id` from `comments`) instead
+    /// of posting a new comment.
+    #[arg(long)]
+    pub reply_to: Option<String>,
+    /// Only the project's members see it (GitLab).
+    #[arg(long)]
+    pub internal: bool,
+    /// Post on a project that is not the current repository.
+    #[arg(long)]
+    pub project: Option<String>,
+    /// Which integration (see `hosting issues`).
+    #[arg(long)]
+    pub id: Option<String>,
+}
+
+/// `comment-edit`: changes one of your own comments.
+#[derive(Debug, clap::Args)]
+pub struct ConvEditArgs {
+    /// The item (see `comments`).
+    pub reference: String,
+    /// The comment's id, as `comments` prints it.
+    pub comment_id: String,
+    /// The new text (markdown).
+    #[arg(long, conflicts_with = "body_file")]
+    pub body: Option<String>,
+    /// Read the new text from this file (`-` reads stdin).
+    #[arg(long)]
+    pub body_file: Option<std::path::PathBuf>,
+    /// The project, when it is not the current repository.
+    #[arg(long)]
+    pub project: Option<String>,
+    /// Which integration (see `hosting issues`).
+    #[arg(long)]
+    pub id: Option<String>,
+}
+
+/// `comment-delete`: removes one of your own comments for good.
+#[derive(Debug, clap::Args)]
+pub struct ConvDeleteArgs {
+    /// The item (see `comments`).
+    pub reference: String,
+    /// The comment's id, as `comments` prints it.
+    pub comment_id: String,
+    /// The project, when it is not the current repository.
+    #[arg(long)]
+    pub project: Option<String>,
+    /// Which integration (see `hosting issues`).
+    #[arg(long)]
+    pub id: Option<String>,
 }
 
 /// The arguments of `hosting file` (their own struct: a flat variant per
@@ -413,6 +534,16 @@ pub struct IssueMetaArgs {
 /// What `hosting review` does.
 #[derive(Debug, Subcommand)]
 pub enum ReviewAction {
+    /// The whole conversation of a pull/merge request: comments, reviews,
+    /// code threads and events, oldest to newest, newest window first
+    /// (`--older` for the one before). Read-only.
+    Conversation(ConvReadArgs),
+    /// Edits one of your own comments on a pull/merge request. Outward
+    /// action.
+    CommentEdit(ConvEditArgs),
+    /// Deletes one of your own comments on a pull/merge request, for good.
+    /// Outward action.
+    CommentDelete(ConvDeleteArgs),
     /// Reads one pull/merge request for review: description, head and base
     /// commits, merge state, checks, what the host lets a review do
     /// (`capabilities`) and its changed files. The diff itself comes from
@@ -710,6 +841,9 @@ impl ReviewAction {
             | ReviewAction::Resolve { project, .. }
             | ReviewAction::Submit { project, .. }
             | ReviewAction::Suggest { project, .. } => project.as_deref(),
+            ReviewAction::Conversation(a) => a.project.as_deref(),
+            ReviewAction::CommentEdit(a) => a.project.as_deref(),
+            ReviewAction::CommentDelete(a) => a.project.as_deref(),
             ReviewAction::Fetch { .. }
             | ReviewAction::Push { .. }
             | ReviewAction::SubmitChange { .. }
@@ -903,6 +1037,19 @@ pub enum BoardAction {
 
 #[derive(Debug, Subcommand)]
 pub enum IssueAction {
+    /// The whole conversation of an issue: its description, comments and
+    /// events, with who posts as whom and what the host lets you do
+    /// (`capabilities`). Read-only; pages of up to 300 entries (`--older`).
+    Comments(ConvReadArgs),
+    /// Posts a comment on an issue, or answers a discussion with
+    /// `--reply-to`. Outward action: it is posted at once, as the identity
+    /// the token has (`posted_as`), and cannot be undone here.
+    Comment(ConvPostArgs),
+    /// Edits one of your own comments on an issue. Outward action.
+    CommentEdit(ConvEditArgs),
+    /// Deletes one of your own comments on an issue, for good. Outward
+    /// action.
+    CommentDelete(ConvDeleteArgs),
     /// Opens an issue on the project the repository's ISSUES source is
     /// linked to (`hosting link issues`), or the one `--id` resolves from
     /// the remote. Outward action: it posts to the host.
@@ -1038,4 +1185,19 @@ pub enum SshKeyAction {
         #[arg(long)]
         id: Option<String>,
     },
+}
+
+impl IssueAction {
+    /// The `--project` of a conversation action: it then runs against the
+    /// host alone, with no repository. Every other issue action is about the
+    /// current repository's linked project.
+    pub fn project(&self) -> Option<&str> {
+        match self {
+            IssueAction::Comments(a) => a.project.as_deref(),
+            IssueAction::Comment(a) => a.project.as_deref(),
+            IssueAction::CommentEdit(a) => a.project.as_deref(),
+            IssueAction::CommentDelete(a) => a.project.as_deref(),
+            _ => None,
+        }
+    }
 }

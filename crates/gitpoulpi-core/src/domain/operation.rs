@@ -506,6 +506,13 @@ pub enum OperationKind {
     /// `GitBackend` call) so it can broadcast `Event::RefVisibilityChanged`.
     /// A mutation of GitPoulpi state, not of the repository.
     SetRefVisibility,
+    /// A client (the CLI or the MCP server) posted, edited or deleted a
+    /// comment on an issue or a pull request in its own process: tells the
+    /// daemon so it can broadcast `Event::HostingItemChanged` and an open
+    /// item view refreshes. Args `{ integration_id, project, item, change }`.
+    /// No repository effect, not journaled, not undoable (the host's
+    /// comment is outward).
+    NotifyHostingChange,
     /// Daemon-control pseudo-operation sent by a TUI window: register or
     /// refresh this connection as a *viewer* (the window an agent's "show
     /// it to the user" intents are routed to). Args `{ viewer, info }`.
@@ -847,7 +854,7 @@ impl OperationKind {
             K::SparseSet | K::SparseDisable => OpTraits::NONE
                 .scope(ChangeScope::INDEX | ChangeScope::WORKTREE | ChangeScope::CONFIG),
             // A display filter only: no git state moved.
-            K::SetRefVisibility => OpTraits::NONE.scope(ChangeScope::NONE),
+            K::SetRefVisibility | K::NotifyHostingChange => OpTraits::NONE.scope(ChangeScope::NONE),
             K::ResolveConflict | K::ConflictUnresolve => OpTraits::NONE
                 .can_conflict()
                 .scope(ChangeScope::INDEX | ChangeScope::WORKTREE | ChangeScope::CONFLICTS),
@@ -879,7 +886,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 185] = [
+    pub const ALL: [OperationKind; 186] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -1058,6 +1065,7 @@ impl OperationKind {
         OperationKind::LostCommits,
         OperationKind::Shutdown,
         OperationKind::SetRefVisibility,
+        OperationKind::NotifyHostingChange,
         OperationKind::UiAttach,
         OperationKind::UiPresence,
         OperationKind::UiReport,

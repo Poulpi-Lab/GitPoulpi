@@ -25,7 +25,8 @@ pub use help_lang::{
 pub use hosting::BoardAction;
 #[cfg(feature = "hosting")]
 pub use hosting::{
-    FileArgs, HostingAction, IntegrationsAction, IssueAction, IssueMetaArgs, LinkKind, OpenKind,
+    ConvDeleteArgs, ConvEditArgs, ConvPostArgs, ConvReadArgs, FileArgs, HostingAction,
+    IntegrationsAction, IssueAction, IssueMetaArgs, LinkKind, MarkdownArgs, MarkdownFor, OpenKind,
     RadarWhat, RemoteReviewArg, ReviewAction, ReviewEventArg, SshKeyAction, StateArg,
 };
 pub use job::JobAction;
@@ -50,7 +51,7 @@ pub use refs_misc::{
 pub use repo_auth::RepoAuthAction;
 #[cfg(feature = "history-rewrite")]
 pub use rewrite::{RewriteAction, RewriteRecipeArgs, RewriteScriptAction};
-pub use ui::{UiAction, UiProposeAction, UiShowAction};
+pub use ui::{HostingViewArg, UiAction, UiProposeAction, UiShowAction};
 #[cfg(feature = "global-search")]
 pub use workspace::SearchKindArg;
 #[cfg(feature = "workspaces")]

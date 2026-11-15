@@ -1,5 +1,21 @@
 use clap::Subcommand;
 
+/// The `--view` of `ui show pr|issue`.
+#[derive(Debug, Clone, Copy, clap::ValueEnum)]
+pub enum HostingViewArg {
+    Details,
+    Conversation,
+}
+
+impl From<HostingViewArg> for gitpoulpi_ipc::ui::HostingView {
+    fn from(v: HostingViewArg) -> Self {
+        match v {
+            HostingViewArg::Details => Self::Details,
+            HostingViewArg::Conversation => Self::Conversation,
+        }
+    }
+}
+
 /// `gitpoulpi ui ...`. Every leaf is view-only (`policy.rs` lists them as
 /// such for the MCP server), except `propose`, its own gated class.
 #[derive(Debug, Subcommand)]
@@ -165,9 +181,19 @@ pub enum UiShowAction {
         name: String,
     },
     /// Select a pull request / merge request in the sidebar.
-    Pr { number: u32 },
+    Pr {
+        number: u32,
+        /// What to open: the details (default) or the conversation.
+        #[arg(long, value_enum, default_value_t = HostingViewArg::Details)]
+        view: HostingViewArg,
+    },
     /// Select an issue in the sidebar.
-    Issue { number: u32 },
+    Issue {
+        number: u32,
+        /// What to open: the details (default) or the conversation.
+        #[arg(long, value_enum, default_value_t = HostingViewArg::Details)]
+        view: HostingViewArg,
+    },
     /// Show the working-tree changes (the WIP row).
     Wip {
         /// Select this file's row.

@@ -439,6 +439,7 @@ fn show_hosting_answers_hosting_not_linked_and_never_links() {
         let out = rig.show(UiIntent::ShowHosting {
             repo: rig.repo(),
             item,
+            view: Default::default(),
         });
         let UiOutcome::Refused { reason } = out else {
             panic!("expected Refused, got {out:?}");

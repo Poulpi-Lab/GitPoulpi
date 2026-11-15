@@ -16,7 +16,7 @@ pub mod ui;
 
 pub use auth::{Endpoint, Token};
 pub use client::{Client, CALL_TIMEOUT};
-pub use events::Event;
+pub use events::{Event, HostingChange, HostingChangeArgs, HostingItemKind};
 pub use jobs::{JobInfo, JobState, CANCEL_ON_DISCONNECT};
 pub use protocol::{
     DaemonInfo, DaemonKind, Request, Response, ResponseError, ServerMessage, ShutdownArgs,

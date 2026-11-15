@@ -435,10 +435,12 @@ impl WorkspaceSearch {
             SearchTarget::PullRequest { number } => UiIntent::ShowHosting {
                 repo: id,
                 item: HostingItem::Pr(*number),
+                view: Default::default(),
             },
             SearchTarget::Issue { number } => UiIntent::ShowHosting {
                 repo: id,
                 item: HostingItem::Issue(*number),
+                view: Default::default(),
             },
         })
     }

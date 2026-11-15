@@ -210,6 +210,7 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::RepoAuthSet
         | K::RepoAuthClear
         | K::RepoAuthTest
+        | K::NotifyHostingChange
         | K::Hello
         | K::CredentialGrant
         | K::JournalState
@@ -590,6 +591,7 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         | K::RepoAuthSet
         | K::RepoAuthClear
         | K::RepoAuthTest
+        | K::NotifyHostingChange
         | K::Hello
         | K::CredentialGrant
         | K::JournalState

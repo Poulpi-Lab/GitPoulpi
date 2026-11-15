@@ -186,6 +186,7 @@ const GOLDEN: &[(OperationKind, &str, &str)] = &[
     (K::LostCommits, "R", "ALL"),
     (K::Shutdown, "", "ALL"),
     (K::SetRefVisibility, "", "NONE"),
+    (K::NotifyHostingChange, "", "NONE"),
     (K::UiAttach, "", "NONE"),
     (K::UiPresence, "", "NONE"),
     (K::UiReport, "", "NONE"),

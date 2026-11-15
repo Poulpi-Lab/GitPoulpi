@@ -227,7 +227,8 @@ mod tests {
         assert_eq!(
             describe(&UiIntent::ShowHosting {
                 repo: gitpoulpi_core::domain::RepoId("/r".into()),
-                item: HostingItem::Pr(7)
+                item: HostingItem::Pr(7),
+                view: Default::default(),
             }),
             "pull request #7"
         );

@@ -246,7 +246,8 @@ fn hosting_caches_are_matched_locally_and_a_prefix_narrows() {
         search.go_intent(),
         Some(UiIntent::ShowHosting {
             repo: search.scope().repos[1].repo.id.clone(),
-            item: HostingItem::Issue(7)
+            item: HostingItem::Issue(7),
+            view: Default::default(),
         })
     );
 }

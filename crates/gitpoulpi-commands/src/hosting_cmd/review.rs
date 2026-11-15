@@ -193,17 +193,36 @@ pub(super) async fn threads(
     })
 }
 
-/// `review comment`.
+/// `review comment`. A host whose review client has no comment method of its
+/// own (Azure DevOps, Bitbucket) is served by the conversation methods
+/// through its capabilities: the same request the TUI sends.
 pub(super) async fn comment(
     env: &HostingEnv,
+    ipc: Option<&mut Session>,
     target: &RepoTarget,
     number: u64,
     body: String,
 ) -> Result<Emitted, String> {
-    let posted = client_for_target(env, target)?
-        .add_comment(&target.project, number, &body)
-        .await
-        .map_err(|e| e.to_string())?;
+    let client = client_for_target(env, target)?;
+    let posted = match client.add_comment(&target.project, number, &body).await {
+        Ok(posted) => posted,
+        Err(gitpoulpi_hosting::Error::Unsupported(_)) => {
+            let op = super::conversation::Op::Post {
+                body,
+                reply_to: None,
+                internal: false,
+            };
+            return super::conversation::run(
+                env,
+                ipc,
+                target,
+                gitpoulpi_hosting::conversation::ItemKey::pull_request(number),
+                op,
+            )
+            .await;
+        }
+        Err(e) => return Err(e.to_string()),
+    };
     let mut out = merge(target_json(target), "number", json!(number));
     out["comment"] = json_of(&posted)?;
     Ok(Emitted {
@@ -216,15 +235,35 @@ pub(super) async fn comment(
 /// `review reply`.
 pub(super) async fn reply(
     env: &HostingEnv,
+    ipc: Option<&mut Session>,
     target: &RepoTarget,
     number: u64,
     thread: &str,
     body: String,
 ) -> Result<Emitted, String> {
-    let posted = client_for_target(env, target)?
+    let client = client_for_target(env, target)?;
+    let posted = match client
         .reply_to_thread(&target.project, number, thread, &body)
         .await
-        .map_err(|e| e.to_string())?;
+    {
+        Ok(posted) => posted,
+        Err(gitpoulpi_hosting::Error::Unsupported(_)) => {
+            let op = super::conversation::Op::Post {
+                body,
+                reply_to: Some(thread.to_string()),
+                internal: false,
+            };
+            return super::conversation::run(
+                env,
+                ipc,
+                target,
+                gitpoulpi_hosting::conversation::ItemKey::pull_request(number),
+                op,
+            )
+            .await;
+        }
+        Err(e) => return Err(e.to_string()),
+    };
     let mut out = merge(target_json(target), "number", json!(number));
     out["thread"] = json!(thread);
     out["comment"] = json_of(&posted)?;

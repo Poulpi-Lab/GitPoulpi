@@ -1010,6 +1010,40 @@ async fn handle_control(
             let _ = internal_shutdown_tx.send(()).await;
             Some(Flow::Stop)
         }
+        // A client made a hosting comment call in its own process: pass it on
+        // so an open item view follows. No repository state, no lock.
+        OperationKind::NotifyHostingChange => {
+            let result = match (
+                request.repo.clone(),
+                serde_json::from_value::<gitpoulpi_ipc::HostingChangeArgs>(request.args.clone()),
+            ) {
+                (Some(repo), Ok(change)) => {
+                    let _ = events_tx.send(Event::HostingItemChanged { repo, change });
+                    Ok(serde_json::Value::Null)
+                }
+                (None, _) => Err(gitpoulpi_ipc::ResponseError {
+                    message: "NotifyHostingChange needs a repository".to_string(),
+                    unsupported: false,
+                    kind: None,
+                    detail: None,
+                    context: None,
+                    auth_required: false,
+                }),
+                (_, Err(e)) => Err(gitpoulpi_ipc::ResponseError {
+                    message: format!("invalid arguments: {e}"),
+                    unsupported: false,
+                    kind: None,
+                    detail: None,
+                    context: None,
+                    auth_required: false,
+                }),
+            };
+            let sent = out_tx
+                .send(ServerMessage::Response(Response { request_id, result }))
+                .await
+                .is_ok();
+            Some(if sent { Flow::Continue } else { Flow::Stop })
+        }
         _ => None,
     }
 }

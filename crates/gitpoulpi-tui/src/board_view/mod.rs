@@ -110,6 +110,7 @@ pub(crate) enum BoardEffect {
     /// Park the board and open the New issue form for it.
     NewIssue(Box<IssueSeed>, NewIn),
     /// Park the board and open the card's conversation.
+    #[cfg_attr(not(feature = "conversation"), allow(dead_code))]
     Item(Box<crate::item_view::ItemTarget>),
 }
 

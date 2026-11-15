@@ -160,6 +160,21 @@ impl IssueDialog {
         self.ai_title = Some(title);
     }
 
+    /// What the palette may ask of the description's AI help (`None`: it has
+    /// none, or a question or picker is open over the form).
+    pub(crate) fn composer_avail(&self) -> Option<crate::composer_cmd::ComposerAvail> {
+        if self.guard.is_open() || self.meta.is_open() {
+            return None;
+        }
+        self.md.composer_avail(true)
+    }
+
+    /// Runs a palette row on the description's AI help.
+    pub(crate) fn run_composer(&mut self, cmd: crate::composer_cmd::ComposerCmd) -> Option<String> {
+        self.focus = IssueFocus::Body;
+        self.md.run_composer(cmd)
+    }
+
     pub(crate) fn new(seed: IssueSeed) -> Self {
         let draft_key =
             crate::md_editor::draft::key(&[&seed.integration.id, &seed.project, "new-issue"]);

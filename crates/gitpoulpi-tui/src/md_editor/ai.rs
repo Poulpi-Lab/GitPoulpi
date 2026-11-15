@@ -674,6 +674,21 @@ impl AiHelp {
         self.edit.reset();
     }
 
+    /// "Refresh context": the button and the palette row.
+    pub(crate) fn refresh_context(&mut self) {
+        if let Some(root) = self.scope.root.as_deref() {
+            ai_context::forget(root);
+        }
+        self.context_line = None;
+        self.note = Note::Info(msg::AI_REFRESHED.get().to_string());
+    }
+
+    /// Why Refresh context has nothing to do (`None`: the repository is
+    /// read, so there is a context to forget).
+    pub(crate) fn refresh_reason(&self) -> Option<&'static str> {
+        (!self.repo_on()).then_some(msg::WHY_NO_REPO_READ.get())
+    }
+
     fn activate(&mut self, part: AiPart) -> AiKey {
         match part {
             AiPart::Improve => {
@@ -699,11 +714,7 @@ impl AiHelp {
                 AiKey::Handled
             }
             AiPart::Refresh => {
-                if let Some(root) = self.scope.root.as_deref() {
-                    ai_context::forget(root);
-                }
-                self.context_line = None;
-                self.note = Note::Info(msg::AI_REFRESHED.get().to_string());
+                self.refresh_context();
                 AiKey::Handled
             }
             AiPart::Recent(i) => {

@@ -301,6 +301,22 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             #[cfg(not(feature = "hosting"))]
             let _ = cmd;
         }
+        PaletteCommand::Composer(cmd) => {
+            let said = if cx
+                .management
+                .as_ref()
+                .is_some_and(|m| m.radar.hosts_review() || m.radar.hosts_item())
+            {
+                cx.management
+                    .as_mut()
+                    .and_then(|m| m.radar.run_composer(cmd))
+            } else {
+                cx.repo_dialogs.run_composer(cmd)
+            };
+            if let Some(said) = said {
+                *cx.last_message = Some(said);
+            }
+        }
         PaletteCommand::Item(cmd) => {
             // The conversation hosted over the Radar answers before the
             // dialogs do.

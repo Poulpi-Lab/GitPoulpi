@@ -157,6 +157,21 @@ impl PullRequestDialog {
         self.ai_branches = Some(branches);
     }
 
+    /// What the palette may ask of the description's AI help (`None`: it has
+    /// none, or a menu or question is open over the form).
+    pub(crate) fn composer_avail(&self) -> Option<crate::composer_cmd::ComposerAvail> {
+        if self.guard.is_open() || self.open_combo().is_some() || self.meta.is_open() {
+            return None;
+        }
+        self.md.composer_avail(true)
+    }
+
+    /// Runs a palette row on the description's AI help.
+    pub(crate) fn run_composer(&mut self, cmd: crate::composer_cmd::ComposerCmd) -> Option<String> {
+        self.focus = PrFocus::Body;
+        self.md.run_composer(cmd)
+    }
+
     /// Tells the description's AI help which branches are chosen now.
     pub(super) fn sync_ai_branches(&self) {
         let Some(cell) = &self.ai_branches else {

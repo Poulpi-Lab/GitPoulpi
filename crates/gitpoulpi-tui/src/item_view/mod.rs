@@ -402,6 +402,21 @@ impl ItemView {
             && self.delete_ask.is_none()
     }
 
+    /// What the palette may ask of the composer's AI help (`None`: it has
+    /// none, or a menu or question is open over the view).
+    pub(crate) fn composer_avail(&self) -> Option<crate::composer_cmd::ComposerAvail> {
+        if self.menu.is_some() || self.guard.is_open() || self.delete_ask.is_some() {
+            return None;
+        }
+        self.md.as_ref().and_then(|e| e.composer_avail(false))
+    }
+
+    /// Runs a palette row on the composer's AI help.
+    pub(crate) fn run_composer(&mut self, cmd: crate::composer_cmd::ComposerCmd) -> Option<String> {
+        self.focus = Focus::Composer;
+        self.md.as_mut().and_then(|e| e.run_composer(cmd))
+    }
+
     /// Why Send does nothing now (`None`: it would send).
     pub(super) fn send_reason(&self) -> Option<&'static str> {
         use gitpoulpi_i18n::msg::item_view as m;

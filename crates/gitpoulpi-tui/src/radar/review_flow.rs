@@ -241,7 +241,21 @@ impl RadarUi {
 
     /// The palette may open over the review (no box or picker is up in it).
     pub(crate) fn review_takes_palette(&self) -> bool {
-        self.api_review.as_ref().is_some_and(|v| v.takes_palette())
+        self.api_review
+            .as_ref()
+            .is_some_and(|v| v.takes_palette() || v.composer_avail().is_some())
+    }
+
+    /// What the palette may ask of the AI help of the review's open box.
+    pub(crate) fn review_composer_avail(&self) -> Option<crate::composer_cmd::ComposerAvail> {
+        self.api_review.as_ref().and_then(|v| v.composer_avail())
+    }
+
+    pub(crate) fn run_review_composer(
+        &mut self,
+        cmd: crate::composer_cmd::ComposerCmd,
+    ) -> Option<String> {
+        self.api_review.as_mut().and_then(|v| v.run_composer(cmd))
     }
 
     pub(crate) fn review_avail(&self) -> Option<ReviewAvail> {

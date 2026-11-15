@@ -57,6 +57,17 @@ impl ItemView {
         match *self {}
     }
 
+    pub(crate) fn composer_avail(&self) -> Option<crate::composer_cmd::ComposerAvail> {
+        match *self {}
+    }
+
+    pub(crate) fn run_composer(
+        &mut self,
+        _cmd: crate::composer_cmd::ComposerCmd,
+    ) -> Option<String> {
+        match *self {}
+    }
+
     pub(crate) fn avail(&self) -> ItemAvail {
         match *self {}
     }

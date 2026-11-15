@@ -5305,6 +5305,11 @@ resolve_first = "resolva antes os conflitos"
 plan_invalid_twice = "o plano foi inválido duas vezes ({error})"
 no_changes_stash = "não há alterações para {$stash}"
 nothing_to_explain = "não há nada a explicar"
+repo_read_failed = "could not read the repository ({what}): {why}"
+repo_what_files = "the file list"
+repo_what_search = "the search"
+repo_what_diff = { git = "the diff of the {$pr}", local = "the diff of the {$pr}" }
+code_source_gone = "the code source is gone"
 
 [ui_intent]
 tab = "separador {name}"
@@ -10122,6 +10127,10 @@ ai_keys = "Enter writes, Esc closes"
 ai_pick_branches = "Pick the branches first."
 ai_needs_repository = "Writing this description needs the repository: open it first."
 ai_job = "Writing a draft with AI"
+palette_refresh_context = "Markdown Editor: Refresh the AI Context"
+why_no_composer = "no text box with the AI writing help is open"
+why_no_repo_read = "tick \"Let the AI read the repository\" first"
+why_text_box_open = "close this text box first (only its AI commands work here)"
 
 [ai_hosting_reply]
 base_prompt_label = "Base prompt"
@@ -10280,3 +10289,4 @@ delete_failed = "not deleted: {why}"
 palette_quote = "Conversation: Quote Entry"
 palette_toggle_internal = "Conversation: Toggle Internal Note"
 why_unchanged = "nothing changed yet"
+flavor_plain_text = "Plain text"

@@ -313,6 +313,7 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::Review(_)
         | PaletteCommand::Board(_)
         | PaletteCommand::Item(_)
+        | PaletteCommand::Composer(_)
         | PaletteCommand::Flow(_)
         | PaletteCommand::Redo
         | PaletteCommand::Refresh

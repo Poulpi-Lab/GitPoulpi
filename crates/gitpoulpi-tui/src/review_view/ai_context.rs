@@ -91,7 +91,11 @@ impl ContextSource for ViewContext {
         let pending = self
             .source
             .lock()
-            .map_err(|_| "the code source is gone".to_string())? // i18n-english
+            .map_err(|_| {
+                gitpoulpi_i18n::msg::ai_ui::CODE_SOURCE_GONE
+                    .get()
+                    .to_string()
+            })?
             .blob(self.base, path);
         loop {
             if let Some(answer) = pending.take() {

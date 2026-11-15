@@ -598,6 +598,9 @@ pub(crate) enum PaletteCommand {
     /// An action of the open conversation of an issue or a request
     /// (`item_view`).
     Item(crate::item_cmd::ItemCmd),
+    /// An action of the AI writing help of the open text box
+    /// (`composer_cmd`).
+    Composer(crate::composer_cmd::ComposerCmd),
     /// A branching-workflow command (`flow::cmd`): the `Flow ▾` menu, Start,
     /// Finish, Sync, Promote, Set parent, the grouping toggle, its Settings.
     Flow(crate::flow::FlowCmd),
@@ -932,6 +935,7 @@ pub(crate) const fn command_requires(
         | PaletteCommand::Hosting(HostingCommand::OpenIssueConversation) => {
             Some(crate::build_features::Feature::Conversation)
         }
+        PaletteCommand::Composer(_) => Some(crate::build_features::Feature::Ai),
         PaletteCommand::CopySelectedAsMermaid => Some(crate::build_features::Feature::Mermaid),
         PaletteCommand::WorkspaceSearch => Some(crate::build_features::Feature::GlobalSearch),
         PaletteCommand::Workspace(_) => Some(crate::build_features::Feature::Workspaces),
@@ -1348,6 +1352,7 @@ impl PaletteCommand {
                 | PaletteCommand::AiSplitSelectedCommit
                 | PaletteCommand::AiExplainWip
                 | PaletteCommand::AiComposeCommits
+                | PaletteCommand::Composer(_)
                 | PaletteCommand::Merge(crate::merge_view::MergeCmd::AiSuggest)
                 | PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::ScriptAi)
                 | PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::RulesAi)

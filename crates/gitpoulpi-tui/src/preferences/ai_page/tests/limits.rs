@@ -85,6 +85,11 @@ fn every_cap_has_a_row_with_todays_default() {
         ),
         ("Largest context file in a review (bytes)", 8_192),
         ("Largest context in a review, all files (bytes)", 16_384),
+        ("Largest conversation to send for a reply (bytes)", 49_152),
+        ("Largest repository file for a reply (bytes)", 8_192),
+        ("Largest repository map for a reply (bytes)", 6_144),
+        ("Most search hits per term for a reply", 20),
+        ("Most search terms for a reply", 8),
     ];
     let heading = fields
         .iter()

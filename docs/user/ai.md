@@ -290,6 +290,7 @@ hover or highlight it.
 | **History rewrite script** | In the [history rewrite workbench](history-rewrite.md#write-a-script-with-ai): the `✦ Write with AI...` button of the Script editor, or palette `Rewrite: Write a Script with AI...`. A dialog shows exactly what will be sent; the script lands in the editor, marked, and is never run or applied for you. | `ai rewrite-script "<instruction>" [--sample N]` (prints) |
 | **History rewrite rules** | In the [history rewrite workbench](history-rewrite.md#create-rules-with-ai): the `✦ Create Rules with AI...` button, `Alt+I`, or palette `Rewrite: Create Rules with AI...`. A multi-line dialog shows exactly what will be sent; the rules and settings land in the workbench and nothing is previewed or applied for you. | `ai rewrite-rules "<description>" [--context]` (prints) |
 | **Worktree name** | In the [Create worktree dialog](worktrees.md#naming-with-ai): the `✦ Name with AI` button or `Alt+A` opens a box where you describe the feature, bug or task; the model names the worktree and its branch after the repository's own branch names, and both land in the dialog's fields for you to edit. Only your description and the local branch names are sent, so it has no "what is sent" dialog. | `ai worktree-name --describe "<task>"` (prints) |
+| **Reply on a host** and **Issue description** | Settings > AI and the CLI only for now: the composer's `✦` comes later. They draft a comment, an answer in a thread, a review comment or summary, or a new issue's description. See [Writing help on a host](#writing-help-on-a-host). | `ai hosting-reply` (prints a draft) |
 | **Commit composer** | The WIP row's menu *Compose commits (AI)...*, `Ctrl+G C`, palette `AI: Compose Commits From Working Changes...` | |
 
 `Esc` cancels a running request (a local agent's process is killed).
@@ -370,6 +371,39 @@ and an entry that cannot be used is listed with the reason while the valid ones 
 rule is never created this way. Optionally the scope, the branch and tag names and the authors of
 the newest commits go along (a box, off by default, shown in the "what is sent" pane). The profile
 and instructions are the *History rewrite rules* ones in Settings > AI.
+
+### Writing help on a host
+
+*Reply on a host* drafts a comment, an answer in a thread, a comment on a line of code or the summary of a
+review; *Issue description* drafts the description of a new issue. **The AI only drafts**: the text is
+printed (or, later, put in the composer) for you to read, edit and post yourself. Nothing in this feature
+posts, edits or deletes anything on a host, and the CLI and MCP answer says `"posted": false`.
+
+What the model is given: the item's title, state and description, the thread you answer, the recent
+comments (newest first, within `ai.limits.hosting_reply_context_bytes`, 49152 by default), what you want
+in this answer (`--hint`, typed at the moment of use) and, to improve your own text, your draft
+(`--draft`). Everything other people wrote is marked as untrusted data in the request, so an instruction
+hidden in a comment is not followed. Over the limit the oldest comments are left out first and the cut is
+reported in `truncated` (`--send-all` lifts the limit). **The AI does not read the repository** yet:
+`--read-repo` is refused with "not built yet", and the defaults under *Repository access* in Settings > AI
+(`ai.hosting_reply.read_repository`, **off by default**, `reuse_agent_session`, `context_ttl_minutes`) only
+prepare that.
+
+**Your own base prompt.** The instructions both actions start from are editable: *Settings > AI > Replies
+on a host > Base prompt* (`ai.hosting_reply.base_prompt`). Empty uses the built-in prompt, which asks for
+the text only, in the host's markup and in the conversation's language unless your hint says otherwise.
+Your global, workspace and repository instructions still follow it. `ai prompt --action hosting_reply`
+prints the layers.
+
+```
+gitpoulpi hosting ... --json > conversation.json          # a page: header and entries
+gitpoulpi ai hosting-reply --conversation conversation.json --hint "say I will look tomorrow"
+gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
+gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"
+```
+
+`--conversation` takes a file, `-` for standard input, or the JSON itself. The conversation commands that
+print such a page come with the conversation CLI.
 
 ## Where the key goes
 
@@ -464,6 +498,11 @@ room, lower them to keep requests small.
 | `review_threads_bytes` | 6000 | The review comments that already exist |
 | `review_context_file_bytes` | 8192 | One project context file of a review (`CLAUDE.md`, `AGENTS.md`, the extra file) |
 | `review_context_bytes` | 16384 | All the context files of a review together |
+| `hosting_reply_context_bytes` | 49152 | The item and conversation given to a drafted reply |
+| `hosting_reply_file_bytes` | 8192 | One repository file given to a drafted reply (reserved: the repository is not read yet) |
+| `hosting_reply_map_bytes` | 6144 | The repository map given to a drafted reply (reserved) |
+| `hosting_reply_hits_per_term` | 20 | Search hits kept per term (reserved; 1 to 200) |
+| `hosting_reply_terms` | 8 | Search terms looked up (reserved; 1 to 50) |
 
 **Nothing is cut silently.** When an input is over its limit the request waits
 and *Over the AI limit* lists what is over: which part (the diff, a file, the

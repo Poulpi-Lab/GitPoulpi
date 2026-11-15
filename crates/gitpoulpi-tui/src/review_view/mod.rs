@@ -456,6 +456,14 @@ impl ReviewView {
             .count()
     }
 
+    /// Whether the repository blocks assignment.
+    pub(super) fn assignment_blocked(&self) -> bool {
+        gitpoulpi_hosting::scope::assignment_blocked(
+            &self.target.integration.id,
+            &self.target.project,
+        )
+    }
+
     pub(super) fn can_edit_meta(&self) -> bool {
         self.host.is_some() && crate::meta_picker::supports(self.target.integration.kind)
     }
@@ -863,6 +871,14 @@ impl ReviewView {
     // -- the metadata pickers ---------------------------------------------------------
 
     pub(super) fn open_meta(&mut self, field: MetaField) {
+        if field == MetaField::Assignees && self.assignment_blocked() {
+            self.message = Some(
+                gitpoulpi_i18n::msg::hosting_ui::WHY_ASSIGNMENT_BLOCKED
+                    .get()
+                    .to_string(),
+            );
+            return;
+        }
         if !self.can_edit_meta() {
             self.message = Some(msg::WHY_NO_META.get().to_string());
             return;
@@ -967,6 +983,7 @@ impl ReviewView {
             on_pending: self.pending_at_cursor().is_some() && self.tab == Tab::Files,
             pending: self.pending.len(),
             can_edit_meta: self.can_edit_meta(),
+            assignment_blocked: self.assignment_blocked(),
             patch_sets: self.has_patch_sets(),
             can_submit: self.host.as_ref().is_some_and(|h| h.detail.can_submit),
             can_abandon: self.host.as_ref().is_some_and(|h| h.detail.can_abandon),

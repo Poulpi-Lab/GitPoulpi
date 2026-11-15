@@ -333,6 +333,14 @@ impl BoardView {
         self.spec.source.movable()
     }
 
+    /// Whether the repository blocks assignment.
+    pub(super) fn assignment_blocked(&self) -> bool {
+        gitpoulpi_hosting::scope::assignment_blocked(
+            &self.target.seed.integration.id,
+            &self.target.seed.project,
+        )
+    }
+
     pub(super) fn can_edit_meta(&self) -> bool {
         crate::meta_picker::supports(self.target.seed.integration.kind)
     }
@@ -648,6 +656,14 @@ impl BoardView {
             self.message = Some(msg::WHY_NO_CARD.get().to_string());
             return;
         };
+        if field == MetaField::Assignees && self.assignment_blocked() {
+            self.message = Some(
+                gitpoulpi_i18n::msg::hosting_ui::WHY_ASSIGNMENT_BLOCKED
+                    .get()
+                    .to_string(),
+            );
+            return;
+        }
         if !self.can_edit_meta()
             || !crate::meta_picker::supports_field(self.target.seed.integration.kind, field)
         {
@@ -729,6 +745,7 @@ impl BoardView {
             has_left: row.is_some() && self.sel_col > 0,
             has_right: row.is_some() && self.sel_col + 1 < self.columns.len(),
             can_edit_meta: self.can_edit_meta(),
+            assignment_blocked: self.assignment_blocked(),
             label_columns: self.label_columns(),
             filtered: !self.filter.is_empty(),
         }

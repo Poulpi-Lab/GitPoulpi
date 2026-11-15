@@ -28,6 +28,8 @@ pub(crate) struct ReviewAvail {
     pub(crate) on_pending: bool,
     pub(crate) pending: usize,
     pub(crate) can_edit_meta: bool,
+    /// The repository blocks assignment.
+    pub(crate) assignment_blocked: bool,
     /// The request has patch sets to choose from (Gerrit).
     pub(crate) patch_sets: bool,
     /// The server says the change can be submitted now (Gerrit).
@@ -199,6 +201,9 @@ impl ReviewCmd {
             }
             Self::FinishReview => (!a.loaded).then_some(msg::NOT_LOADED.get()),
             Self::DiscardReview => (a.pending == 0).then_some(msg::WHY_NO_PENDING.get()),
+            Self::EditAssignees if a.assignment_blocked => {
+                Some(gitpoulpi_i18n::msg::hosting_ui::WHY_ASSIGNMENT_BLOCKED.get())
+            }
             Self::EditAssignees | Self::EditReviewers | Self::EditLabels | Self::SetMilestone => {
                 (!a.can_edit_meta).then_some(msg::WHY_NO_META.get())
             }

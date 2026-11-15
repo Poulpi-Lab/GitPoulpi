@@ -19,6 +19,8 @@ pub(crate) struct BoardAvail {
     pub(crate) has_right: bool,
     /// The provider takes assignee / label / milestone edits.
     pub(crate) can_edit_meta: bool,
+    /// The repository blocks assignment.
+    pub(crate) assignment_blocked: bool,
     /// The source forms its columns from labels (the label set can be set).
     pub(crate) label_columns: bool,
     /// Some filter is on.
@@ -75,6 +77,9 @@ impl BoardCmd {
                 } else {
                     None
                 }
+            }
+            Self::EditAssignees if a.has_card && a.assignment_blocked => {
+                Some(gitpoulpi_i18n::msg::hosting_ui::WHY_ASSIGNMENT_BLOCKED.get())
             }
             Self::EditAssignees | Self::EditLabels | Self::SetMilestone => {
                 if !a.has_card {

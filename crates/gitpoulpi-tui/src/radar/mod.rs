@@ -1044,6 +1044,13 @@ impl RadarUi {
                 self.say(msg::radar::msg_unsnoozed(Self::describe(&item)))
             }
             Act::EditAssignees | Act::EditReviewers | Act::EditLabels | Act::SetMilestone => {
+                if act == Act::EditAssignees && Self::assignment_blocked(&item) {
+                    return self.say(
+                        gitpoulpi_i18n::msg::hosting_ui::WHY_ASSIGNMENT_BLOCKED
+                            .get()
+                            .to_string(),
+                    );
+                }
                 match item.kind {
                     ItemKind::Wip => self.say(msg::radar::MSG_SELECT_ROW.get().to_string()),
                     _ if !item.meta => self.say(msg::meta_picker::UNSUPPORTED.get().to_string()),
@@ -1071,6 +1078,13 @@ impl RadarUi {
         let keep = self.snooze_for;
         self.close_popups();
         self.snooze_for = keep;
+    }
+
+    /// Whether the item's repository blocks assignment.
+    fn assignment_blocked(item: &Item) -> bool {
+        item.repo
+            .as_deref()
+            .is_some_and(gitpoulpi_daemon::hosting_scope::assignment_blocked)
     }
 
     fn open_repo(&mut self, item: &Item, pending: Option<Pending>) -> Outcome {
@@ -1185,7 +1199,12 @@ impl RadarUi {
             } else {
                 &[Act::EditAssignees, Act::EditLabels, Act::SetMilestone]
             };
-            out.extend(acts.iter().map(|a| Entry::action(act_label(*a), *a)));
+            let blocked = Self::assignment_blocked(item);
+            out.extend(
+                acts.iter()
+                    .filter(|a| !(blocked && **a == Act::EditAssignees))
+                    .map(|a| Entry::action(act_label(*a), *a)),
+            );
         }
         out.push(Entry::Separator);
         out.push(Entry::action(

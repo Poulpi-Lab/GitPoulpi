@@ -759,3 +759,35 @@ fn a_short_column_has_no_bar() {
     paint(&mut r.view);
     assert!(r.view.col_bars.is_empty());
 }
+
+/// A repository that blocks assignment: the board's "Edit assignees" is
+/// grayed with the same reason as the forms and the palette, and the key
+/// says so instead of opening the picker. The other metadata stays.
+#[test]
+fn a_blocked_repository_grays_the_assign_command_with_the_reason() {
+    const WHY: &str = "assignment is blocked in this repository";
+    let mut r = rig();
+    wait_for(&mut r.view, |v| v.load_rx.is_none());
+    paint(&mut r.view);
+    gitpoulpi_daemon::hosting_scope::register(r.dir.path(), "corp", "g/p");
+    let open = Some(r.view.avail());
+    assert_ne!(BoardCmd::EditAssignees.unavailable(open), Some(WHY));
+
+    let state_dir = gitpoulpi_config::Settings::resolve_ambient()
+        .map(|s| s.config().session.per_repo_state_dir.clone())
+        .unwrap_or_else(|_| gitpoulpi_config::DEFAULT_REPO_DATA_LOCATION.to_string());
+    gitpoulpi_session::RepoState {
+        assignment_blocked: true,
+        ..Default::default()
+    }
+    .save(&gitpoulpi_session::RepoState::path_for(
+        r.dir.path(),
+        &state_dir,
+    ))
+    .unwrap();
+    let blocked = Some(r.view.avail());
+    assert_eq!(BoardCmd::EditAssignees.unavailable(blocked), Some(WHY));
+    assert_ne!(BoardCmd::EditLabels.unavailable(blocked), Some(WHY));
+    r.view.run(BoardCmd::EditAssignees);
+    assert_eq!(r.view.message.as_deref(), Some(WHY));
+}

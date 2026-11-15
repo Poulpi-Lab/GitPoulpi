@@ -10082,7 +10082,6 @@ ai_ctx_agent = "O agente leu o repositório (HEAD {head})"
 ai_ctx_session_started = "Sessão do agente iniciada"
 # context: status: the local agent continued its session from the previous draft. Width budget: 30 cells
 ai_ctx_session_continued = "Sessão do agente continuada"
-# context: the reason that checkbox is disabled, shown in parentheses after it. Width budget: 24 cells
 # context: label before the list of instructions typed before. Width budget: 12 cells
 ai_recent = "Recentes"
 # context: shown after that label when the list is empty. Width budget: 24 cells

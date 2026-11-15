@@ -22,28 +22,46 @@ Tlačítko **+** v záhlaví WORKTREES (klávesnice: `+` v sekci; paleta:
 **Refs: Vytvořit worktree...**) otevře nabídku:
 
 - **Z aktuální větve**: větev je přepnutá v hlavní složce, proto dialog navrhne
-  na ní novou větev (`<větev>-wt`).
-- **Z vybraného commitu**: zašedlé, dokud v Logu není vybraný commit. Worktree
-  tam začíná odpojený, pokud nepojmenujete novou větev.
-- **Vybrat větev...**: dialog se otevře na seznamu **Ref**.
+  na ní novou větev (`worktree-<id>`).
+- **Z vybraného commitu**: zašedlé, dokud v Logu není vybraný commit. Dialog
+  navrhne novou větev `worktree-<id>`, která tam začíná; pro odpojený worktree
+  pole větve vymažte.
+- **Vybrat větev...**: dialog se otevře na seznamu **Větev worktree**, aby šlo
+  otevřít už existující větev.
 
 Paleta má stejné tři (**Refs: Vytvořit worktree z aktuální větve**,
 **Git: Vytvořit worktree ve vybraném commitu...**, **Refs: Vytvořit worktree s
 výběrem větve**). Starší položky fungují dál: **Vytvořit worktree z...** v nabídce
 větve, tagu nebo commitu.
 
-Dialog všechno navrhne a nechá vás to změnit:
+Dialog všechno navrhne a nechá vás to změnit. **Název** i nová větev začínají
+jako `worktree-<id>`, kde `<id>` je 8 náhodných šestnáctkových číslic (u obou
+stejné), takže se dva worktrees nikdy nesrazí.
 
 | Pole | Význam |
 |---|---|
-| **Název** | Z něj se sestaví název složky. Navrhne se z větve nebo z krátkého id. |
+| **Název** | Z něj se sestaví název složky. **Podle větve** (`Alt+N`) ho nastaví na `worktree-<větev>`: lomítka se změní na `-` a slovo se neduplikuje (`worktree-foo` a `feature/worktree-x` si ponechají svůj název, `feature/login` dá `worktree-feature-login`). |
 | **Složka** | Sourozenec repozitáře, `<repozitář>-<název>`. Sleduje Název, dokud do pole Složka nezačnete psát; **Procházet...** vybere umístění. |
-| **Ref** | Větev nebo commit, od kterého worktree začíná (seznam; hledá se psaním). Změna navrhne nový Název. |
-| **Nová větev** | Prázdné přepne tam větev z Ref (nebo odpojí HEAD na commitu). Povinné, když je větev už přepnutá. |
+| **Ref** | Kde začíná *nová* větev: větev nebo commit (seznam; hledá se psaním). Nepoužije se a říká to, dokud je vybraná existující větev. |
+| **Větev worktree** | Jedno pole, dva významy, uvedené pod ním. Název, který není lokální větev, vytvoří novou větev z Ref (**nová větev z main**). Lokální větev, která není přepnutá jinde (vyberte ji v seznamu nebo napište její název), se tam přepne tak, jak je (**přepne tuto větev**). První řádek seznamu nebo prázdné pole přepne větev z Ref (nebo odpojí HEAD na commitu); odmítne se, když je tato větev už přepnutá. |
+| **Znovu vygenerovat** | `Alt+R`. Vylosuje nové `<id>` a nahradí jím Název a větev, kromě toho, co jste napsali sami (Název nebo větev, kterou jste napsali, zůstane), a existující větve (ta se nikdy nenahradí). Název z **Podle větve** nebo od AI se počítá jako vygenerovaný. |
+| **Pojmenovat pomocí AI** | Jen při zapnuté AI (viz níže). |
 | **Otevřít nový worktree na kartě** | Ve výchozím stavu zapnuto. |
 
-Neprázdná složka, neplatný název nebo větev, která už existuje, se oznámí na
-vlastním řádku dialogu a **Vytvořit** zůstane zašedlé.
+Neprázdná složka, neplatný název, název větve, který git odmítá, nebo větev,
+kterou má jiný worktree, se oznámí na vlastním řádku dialogu a **Vytvořit**
+zůstane zašedlé.
+
+### Pojmenování pomocí AI
+
+Při zapnuté [AI](ai.md) otevře **Pojmenovat pomocí AI** (`Alt+A`) uvnitř dialogu
+pole: *Popište funkci, chybu nebo úkol*. **Pojmenovat** požádá model o krátký
+název worktree a název větve podle názvů větví v samotném repozitáři (`feature/`,
+`fix/`, malá písmena, kebab-case). Vyplní se jimi Název (jako `worktree-<název>`)
+a pole větve, které lze dál upravit; název větve, který už existuje, dostane
+příponu `-2`, aby odpověď nikdy nepřepnula něco potichu. Pole ukazuje stav
+zaneprázdnění, **Zastavit** (nebo `Esc`) ho zruší a selhání se zobrazí uvnitř
+dialogu. Odesílá se jen váš popis a názvy lokálních větví.
 
 ## Nabídka řádku
 
@@ -99,4 +117,7 @@ zůstane: commit je na své větvi, stash v seznamu. Smazání větve, které p�
 `gitpoulpi worktree changes <path>` vypíše necommitnuté změny worktree.
 `gitpoulpi worktree remove <path> [--force] [--commit-message M
 [--commit-branch B]] [--stash-message M] [--delete-branch]` ho odebere; nástroje MCP
-jsou `worktree_changes` a `worktree_remove`. Viz [Referenční příručka CLI](cli-reference.md).
+MCP jsou `worktree_changes` a `worktree_remove`. `gitpoulpi ai
+worktree-name --describe "<úkol>"` vypíše názvy worktree a větve, které AI
+navrhuje (`{ name, worktree, branch }`), a nic nevytvoří; nástroj MCP je
+`ai_worktree_name`. Viz [Referenční příručka CLI](cli-reference.md).

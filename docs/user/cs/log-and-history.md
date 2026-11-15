@@ -176,12 +176,12 @@ U commitu bez refu se při najetí na jeho řádek ve sloupci Ref také zobrazí
 **Remote.** `+` v záhlaví REMOTE jeden přidá; kliknutím pravým tlačítkem na
 název remote ho můžete fetchnout, zkopírovat jeho webový odkaz, nastavit jako
 výchozí, skrýt ho v grafu, upravit jeho URL nebo odebrat. **Skrytí remote**
-(oko na jeho řádku, položka nabídky *Skrýt remote v grafu*, nebo `Remote: Skrýt
+(⊙ na jeho řádku, položka nabídky *Skrýt remote v grafu*, nebo `Remote: Skrýt
 remote v grafu...` v paletě) skryje každou větev, kterou má nyní nebo později
 získá, a commity, kterých dosáhne jen on, z Logu zmizí: způsob, jak
 procházet jednu historii bez historie nesouvisejícího archivního remote; vrátíte
 ho položkou *Zobrazit remote v grafu*. Zobrazení remote zobrazí i jeho větve,
-které byly skryty jednotlivě. Větev skrytého remote to při použití jejího oka
+které byly skryty jednotlivě. Větev skrytého remote to při kliknutí na její ⊙
 řekne na stavovém řádku: nejdřív zobrazte remote.
 
 **Stashe.** **Stash** odloží vše (včetně nesledovaných souborů); `Ctrl+G m`

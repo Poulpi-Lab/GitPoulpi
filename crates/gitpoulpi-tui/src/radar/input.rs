@@ -259,6 +259,9 @@ impl RadarUi {
             KeyCode::Char('C') => self.command(RadarCommand::Column(ColumnCmd::Pick)),
             KeyCode::Char('c') => self.run(Act::Checkout),
             KeyCode::Char('e') if crate::build_features::REVIEW => self.run(Act::Review),
+            KeyCode::Char('i') if crate::build_features::CONVERSATION => {
+                self.run(Act::Conversation)
+            }
             KeyCode::Char('t') => self.run(Act::Worktree),
             KeyCode::Char('s') => self.run(Act::Show),
             KeyCode::Char('n') => self.run(Act::StartWork),

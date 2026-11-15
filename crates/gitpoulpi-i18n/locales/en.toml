@@ -12230,3 +12230,241 @@ discard_body = "What you wrote will be lost."
 hint_preview = "Preview"
 # context: footer hint of the Markdown editor, after the key that toggles Split. Width budget: 14 cells
 hint_split = "Split"
+
+[conversation_ui]
+# context: tag after the name of an author that is a bot account. Width budget: 6 cells
+bot = "bot"
+# context: tag after a comment's time: it was changed after it was posted. Width budget: 10 cells
+edited = "edited"
+# context: tag on a comment only project members can see. Width budget: 10 cells
+internal = "internal"
+# context: tag on an entry newer than the user's last visit. Width budget: 8 cells
+new = "new"
+# context: start of the headline of a conversation about a piece of code. Width budget: 10 cells
+thread = "Thread"
+# context: state of a code thread that was resolved. Width budget: 12 cells
+resolved = "resolved"
+# context: state of a code thread that is still open. Width budget: 14 cells
+unresolved = "unresolved"
+# context: state of a code thread whose code has changed since. Width budget: 12 cells
+outdated = "outdated"
+# context: button on the selected comment: answer it. Width budget: 12 cells
+btn_reply = "Reply"
+# context: button on the selected comment: change your own comment. Width budget: 12 cells
+btn_edit = "Edit"
+# context: button on the selected comment: delete your own comment. Width budget: 12 cells
+btn_delete = "Delete"
+# context: button on the selected comment: lists the links in it. Width budget: 10 cells
+btn_links = "Links"
+# context: verdict of a submitted review, after the reviewer's name. Width budget: 20 cells
+review_approved = "approved"
+# context: verdict of a submitted review, after the reviewer's name. Width budget: 26 cells
+review_changes = "requested changes"
+# context: verdict of a submitted review, after the reviewer's name. Width budget: 20 cells
+review_commented = "reviewed"
+# context: verdict of a review that was dismissed. Width budget: 20 cells
+review_dismissed = "dismissed"
+# context: event line, after the actor's name. Width budget: 30 cells
+ev_opened = "opened this"
+# context: event line, after the actor's name. Width budget: 30 cells
+ev_closed = "closed this"
+# context: event line, after the actor's name. Width budget: 30 cells
+ev_reopened = "reopened this"
+# context: event line, after the actor's name; {$pr} is the pull or merge request. Width budget: 40 cells
+ev_merged = "merged this {$pr}"
+# context: event line, after the actor's name; {labels} are the added labels. Width budget: 50 cells
+ev_label_added = "added the label {labels}"
+# context: event line, after the actor's name; {labels} are the removed labels. Width budget: 50 cells
+ev_label_removed = "removed the label {labels}"
+# context: event line, after the actor's name; the labels that were added and removed. Width budget: 60 cells
+ev_label_changed = "added {added} and removed {removed} labels"
+# context: event line, after the actor's name; {who} are the new assignees. Width budget: 50 cells
+ev_assigned = "assigned {who}"
+# context: event line, after the actor's name; {who} are the people removed as assignees. Width budget: 50 cells
+ev_unassigned = "unassigned {who}"
+# context: event line, after the actor's name; people added and removed as assignees. Width budget: 60 cells
+ev_assignees_changed = "assigned {added} and unassigned {removed}"
+# context: event line, after the actor's name; the old and the new title. Width budget: 60 cells
+ev_renamed = "renamed this from {from} to {to}"
+# context: event line, after the actor's name: commits were added to the request. Width budget: 40 cells
+ev_pushed = { one = "added {n} {$commit}", other = "added {n} {$commits}" }
+# context: event line, after the actor's name: commits were added to the request; {head} is the new tip. Width budget: 50 cells
+ev_pushed_head = { one = "added {n} {$commit} (now {head})", other = "added {n} {$commits} (now {head})" }
+# context: event line, after the actor's name; {from} names where it was mentioned. Width budget: 50 cells
+ev_referenced = "mentioned this in {from}"
+# context: event line, after the actor's name; the old and the new status. Width budget: 50 cells
+ev_status = "changed the status from {from} to {to}"
+# context: event line, after the actor's name; {who} is the reviewer asked. Width budget: 50 cells
+ev_review_requested = "requested a review from {who}"
+
+[item_view]
+# context: shown while the conversation is read from the host. Width budget: 40 cells
+loading = "Loading the conversation..."
+# context: error; {why} is the host's message. Width budget: 70 cells
+load_failed = "could not load the conversation: {why}"
+# context: error when a background read ended without an answer. Width budget: 50 cells
+load_stopped = "the conversation could not be read"
+# context: shown when the host has no conversation to read for the item. Width budget: 70 cells
+not_readable = "This host does not offer a conversation for this item here."
+# context: shown after the conversation failed to load. Width budget: 40 cells
+retry_hint = "Press F5 to try again."
+# context: shown when the window is too small for the conversation. Width budget: 50 cells
+too_small = "The window is too small for the conversation."
+# context: after the author's name above the description. Width budget: 20 cells
+opened_this = "opened this"
+# context: header line: {author} opened the item on {date}. Width budget: 50 cells
+opened_by = "opened by {author} on {date}"
+# context: header line: how many comments the item has. Width budget: 18 cells
+comments_n = { one = "{n} comment", other = "{n} comments" }
+# context: shown under the author of an item that has no description. Width budget: 30 cells
+no_description = "No description."
+# context: button above the timeline: reads the older entries. Width budget: 26 cells
+load_older = "Load older"
+# context: button above the timeline: {n} older entries are known. Width budget: 34 cells
+load_older_n = "Load older ({n} more)"
+# context: banner: the host cannot be reached, the saved copy is shown; {age} is how old it is (3 min ago), {why} the error. Width budget: 90 cells
+offline_banner = "Offline: showing the copy saved {age} ({why})"
+# context: banner: the host cannot be reached, the saved copy is shown; {why} is the error. Width budget: 80 cells
+offline_banner_unknown = "Offline: showing the saved copy ({why})"
+# context: how old a saved copy is. Width budget: 14 cells
+age_now = "just now"
+# context: how old a saved copy is. Width budget: 14 cells
+age_minutes = "{n} min ago"
+# context: how old a saved copy is. Width budget: 14 cells
+age_hours = "{n} h ago"
+# context: how old a saved copy is. Width budget: 16 cells
+age_days = { one = "{n} day ago", other = "{n} days ago" }
+# context: button of the header: back to the item the view came from. Width budget: 10 cells
+btn_back = "Back"
+# context: button of the header: read the conversation again. Width budget: 12 cells
+btn_refresh = "Refresh"
+# context: button of the header: open the item's page on the host. Width budget: 28 cells
+btn_browser = "Open in browser"
+# context: checkbox of the header: show the system events (labels, status changes). Width budget: 26 cells
+show_events = "Show events"
+# context: shown while the conversation is read again. Width budget: 16 cells
+refreshing = "Refreshing..."
+# context: who a comment would be posted as; {name} is the account of the profile's token. Width budget: 60 cells
+posting_as_profile = "Posting as {name} (personal token)"
+# context: who a comment would be posted as; {name} is the account of the repository's token command (a bot). Width budget: 70 cells
+posting_as_command = "Posting as {name} (repository token command)"
+# context: who a comment in a local note would be written as. Width budget: 60 cells
+writing_as_local = "Writing as {name} (local note)"
+# context: shown when who a comment would be posted as is not known yet. Width budget: 80 cells
+posting_unknown = "Who you would post as is not known yet. Set Post as in Settings."
+# context: shown in place of the posting line when the host takes no comments. Width budget: 70 cells
+read_only_note = "Read only: this host does not take comments from here."
+# context: title of the comment box under the timeline. Width budget: 24 cells
+new_comment = "New comment"
+# context: placeholder of the comment box. Width budget: 40 cells
+composer_placeholder = "Write a comment (Markdown)..."
+# context: button under the comment box: post the comment. Width budget: 10 cells
+btn_send = "Send"
+# context: button under the comment box: put the box away. Width budget: 10 cells
+btn_cancel = "Cancel"
+# context: footer hint after the arrow keys. Width budget: 10 cells
+hint_move = "move"
+# context: footer hint after the reply key. Width budget: 10 cells
+hint_reply = "reply"
+# context: footer hint after the new comment key. Width budget: 12 cells
+hint_comment = "comment"
+# context: footer hint after the links key. Width budget: 8 cells
+hint_links = "links"
+# context: footer hint after the next unread key. Width budget: 14 cells
+hint_unread = "next unread"
+# context: footer hint after the open in browser key. Width budget: 12 cells
+hint_browser = "browser"
+# context: footer hint after the back key. Width budget: 8 cells
+hint_back = "back"
+# context: footer hint after the Esc key. Width budget: 8 cells
+hint_close = "close"
+# context: why a palette row does nothing. Width budget: 50 cells
+why_no_view = "no conversation is open"
+# context: why Back does nothing. Width budget: 50 cells
+why_no_back = "there is nothing to go back to"
+# context: why a row does nothing. Width budget: 50 cells
+why_not_loaded = "the conversation is still loading"
+# context: why Load older does nothing. Width budget: 50 cells
+why_no_older = "there are no older entries"
+# context: why Next unread does nothing. Width budget: 50 cells
+why_no_unread = "nothing new since your last visit"
+# context: why a comment box row does nothing. Width budget: 60 cells
+why_no_composer = "this host does not take comments from here"
+# context: why the links list does nothing. Width budget: 50 cells
+why_no_links = "the selected entry has no links"
+# context: why copying or opening does nothing. Width budget: 50 cells
+why_no_url = "this entry has no page on the host"
+# context: why the events checkbox does nothing. Width budget: 50 cells
+why_no_events = "this host does not list events"
+# context: why Reply does nothing. Width budget: 60 cells
+why_no_reply = "this host does not take a reply to this entry"
+# context: why a post does nothing. Width budget: 50 cells
+why_offline = "the host cannot be reached"
+# context: why a post does nothing. Width budget: 60 cells
+why_no_comment = "this host does not take comments from here"
+# context: why Edit does nothing. Width budget: 60 cells
+why_no_edit = "this host does not let you edit comments"
+# context: why Delete does nothing. Width budget: 60 cells
+why_no_delete = "this host does not let you delete comments"
+# context: why Edit or Delete does nothing. Width budget: 60 cells
+why_not_yours = "only your own comments can be changed"
+# context: why Send, Edit or Delete does nothing for now. Width budget: 60 cells
+why_writing_later = "writing from this view is not available yet"
+# context: why Send does nothing. Width budget: 40 cells
+why_empty = "write something first"
+# context: status line: the item has no conversation to read in the app. Width budget: 80 cells
+why_no_conversation = "this item has no conversation to read here, open it in the browser"
+# context: what was copied: a link, in 'Copied link: ...'. Width budget: 12 cells
+noun_link = "link"
+# context: status line: a link has no address. Width budget: 40 cells
+nothing_to_open = "nothing to open"
+# context: row of the links list: an issue; {key} is its reference. Width budget: 40 cells
+link_issue = "issue {key}"
+# context: row of the links list: a pull or merge request; {key} is its reference. Width budget: 40 cells
+link_request = "{$pr} {key}"
+# context: row of the links list: a commit; {sha} is its abbreviated id. Width budget: 40 cells
+link_commit = "{$commit} {sha}"
+# context: row menu entry: read the issue or request in the app. Width budget: 30 cells
+open_conversation = "Open conversation"
+# context: title of the list of issues offered by the palette command. Width budget: 40 cells
+menu_pick_conversation = "Open conversation"
+# context: command palette entry
+palette_open_conversation = "Hosting: Open Issue Conversation..."
+# context: command palette entry: acts on the selected Radar row
+palette_radar_conversation = "Radar: Open Issue Conversation"
+# context: command palette entry
+palette_back = "Conversation: Back"
+# context: command palette entry
+palette_refresh = "Conversation: Refresh"
+# context: command palette entry
+palette_load_older = "Conversation: Load Older Entries"
+# context: command palette entry
+palette_prev_entry = "Conversation: Previous Entry"
+# context: command palette entry
+palette_next_entry = "Conversation: Next Entry"
+# context: command palette entry
+palette_next_unread = "Conversation: Next Unread Entry"
+# context: command palette entry
+palette_reply = "Conversation: Reply to Entry"
+# context: command palette entry
+palette_new_comment = "Conversation: New Comment"
+# context: command palette entry: lists the links of the selected entry
+palette_links = "Conversation: Links of Entry..."
+# context: command palette entry
+palette_copy_link = "Conversation: Copy Link of Entry"
+# context: command palette entry
+palette_open_browser = "Conversation: Open in Browser"
+# context: command palette entry
+palette_edit = "Conversation: Edit Comment"
+# context: command palette entry
+palette_delete = "Conversation: Delete Comment"
+# context: command palette entry
+palette_toggle_events = "Conversation: Show or Hide Events"
+# context: command palette entry
+palette_toggle_preview = "Conversation: Toggle Write and Preview"
+# context: command palette entry
+palette_toggle_split = "Conversation: Toggle the Split View"
+# context: command palette entry
+palette_send = "Conversation: Send the Comment"
+# context: command palette entry
+palette_close = "Conversation: Close"

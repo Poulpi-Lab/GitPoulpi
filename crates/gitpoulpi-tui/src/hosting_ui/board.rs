@@ -28,6 +28,7 @@ impl HostingUi {
                 query,
                 repo_root: self.repo_root.clone(),
                 labels,
+                bases: self.token_bases(),
             })
         }
         #[cfg(not(feature = "board"))]

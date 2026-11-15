@@ -142,6 +142,7 @@ pub(crate) enum HostingCommand {
     OpenInObsidian,
     CreateObsidianBase,
     OpenBoard,
+    OpenIssueConversation,
     PushForReview,
 }
 

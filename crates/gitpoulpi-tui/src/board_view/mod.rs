@@ -63,6 +63,9 @@ pub(crate) struct BoardTarget {
     pub(crate) repo_root: PathBuf,
     /// The labels that are the columns of a host board, in order.
     pub(crate) labels: Vec<String>,
+    /// The repository's linked sources: what `#N` means in a card's
+    /// conversation.
+    pub(crate) bases: gitpoulpi_hosting::refs::RefContext,
 }
 
 impl BoardTarget {
@@ -106,6 +109,8 @@ pub(crate) enum BoardEffect {
     OpenUrl(String),
     /// Park the board and open the New issue form for it.
     NewIssue(Box<IssueSeed>, NewIn),
+    /// Park the board and open the card's conversation.
+    Item(Box<crate::item_view::ItemTarget>),
 }
 
 /// Which filter combobox.

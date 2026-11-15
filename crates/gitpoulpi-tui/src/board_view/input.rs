@@ -56,6 +56,23 @@ impl BoardView {
     }
 
     fn open_card(&mut self) -> BoardEffect {
+        #[cfg(feature = "conversation")]
+        if let Some(issue) = self.selected_issue() {
+            let kind = self.target.seed.integration.kind;
+            if crate::item_view::supports_issues(kind) {
+                return BoardEffect::Item(Box::new(crate::item_view::ItemTarget {
+                    integration: self.target.seed.integration.clone(),
+                    all: self.target.all.clone(),
+                    project: self.target.seed.project.clone(),
+                    key: crate::item_view::issue_key(kind, issue),
+                    reference: issue.iid_label.clone(),
+                    title: issue.title.clone(),
+                    web_url: issue.web_url.clone(),
+                    repo_root: Some(self.target.repo_root.clone()),
+                    bases: self.target.bases.clone(),
+                }));
+            }
+        }
         match self.selected_issue().map(|i| i.web_url.clone()) {
             Some(url) if !url.is_empty() => BoardEffect::OpenUrl(url),
             _ => {

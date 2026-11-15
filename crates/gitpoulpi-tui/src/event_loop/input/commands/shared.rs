@@ -750,6 +750,10 @@ pub(in crate::event_loop) fn apply_hosting_effect(cx: &mut CommandCtx<'_>, effec
             cx.repo_dialogs.open_board(*target);
         }
         #[cfg(feature = "hosting")]
+        HostingEffect::Item(target) => {
+            cx.repo_dialogs.open_item(*target);
+        }
+        #[cfg(feature = "hosting")]
         HostingEffect::PushForReview { remote, branch } => {
             *cx.last_message = Some(msg::hosting_ui::sending_for_review(&branch));
             cx.link.submit_action(Action::PushForReview {

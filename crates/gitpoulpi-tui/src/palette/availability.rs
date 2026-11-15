@@ -26,6 +26,8 @@ pub(crate) struct PaletteContext {
     pub(crate) review: Option<crate::review_cmd::ReviewAvail>,
     /// What the open Kanban board allows (`None`: no board is open).
     pub(crate) board: Option<crate::board_cmd::BoardAvail>,
+    /// What the open conversation allows (`None`: none is open).
+    pub(crate) item: Option<crate::item_cmd::ItemAvail>,
     pub(crate) in_refs_pane: bool,
     pub(crate) in_diff_view: bool,
     /// File View / Blame / History is open in the central column.
@@ -362,6 +364,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         C::Safety(cmd) => cmd.unavailable(ctx.safety_tab),
         C::Review(cmd) => cmd.unavailable(ctx.review),
         C::Board(cmd) => cmd.unavailable(ctx.board),
+        C::Item(cmd) => cmd.unavailable(ctx.item),
         C::Flow(cmd) => cmd.unavailable(),
         C::UndoOffer => (!ctx.undo_offer).then_some(msg::undo_safety::WHY_NO_OFFER.get()),
 
@@ -899,6 +902,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
                     | Act::EditLabels
                     | Act::SetMilestone
                     | Act::Review
+                    | Act::Conversation
                     | Act::ReviewApi
                     | Act::CloneReview,
                 )

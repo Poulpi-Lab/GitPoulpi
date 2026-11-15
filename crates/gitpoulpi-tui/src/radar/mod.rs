@@ -1067,6 +1067,15 @@ impl RadarUi {
                     ),
                 }
             }
+            Act::Conversation => match item.kind {
+                ItemKind::Issue if crate::build_features::CONVERSATION => self.open_repo(
+                    &item,
+                    Some(Pending::Conversation {
+                        number: item.number,
+                    }),
+                ),
+                _ => self.say(gitpoulpi_i18n::msg::item_view::WHY_NO_CONVERSATION.get().to_string()),
+            },
             Act::Review | Act::ReviewApi | Act::CloneReview => self.review(item, act),
             Act::Link | Act::Reconnect | Act::TurnOn | Act::FitColumn(_) | Act::FitAllColumns => {
                 Outcome::None
@@ -1182,6 +1191,12 @@ impl RadarUi {
                 }
             }
             ItemKind::Issue if cloned => {
+                if crate::build_features::CONVERSATION {
+                    out.push(Entry::action(
+                        act_label(Act::Conversation),
+                        Act::Conversation,
+                    ));
+                }
                 out.push(Entry::action(act_label(Act::Show), Act::Show));
                 out.push(Entry::action(act_label(Act::StartWork), Act::StartWork));
             }

@@ -595,6 +595,9 @@ pub(crate) enum PaletteCommand {
     Review(crate::review_cmd::ReviewCmd),
     /// An action of the open Kanban board (`board_view`).
     Board(crate::board_cmd::BoardCmd),
+    /// An action of the open conversation of an issue or a request
+    /// (`item_view`).
+    Item(crate::item_cmd::ItemCmd),
     /// A branching-workflow command (`flow::cmd`): the `Flow ▾` menu, Start,
     /// Finish, Sync, Promote, Set parent, the grouping toggle, its Settings.
     Flow(crate::flow::FlowCmd),
@@ -915,12 +918,18 @@ pub(crate) const fn command_requires(
             | crate::radar::Act::ReviewApi
             | crate::radar::Act::CloneReview,
         )) => Some(crate::build_features::Feature::Review),
+        PaletteCommand::Radar(crate::radar::RadarCommand::Act(crate::radar::Act::Conversation)) => {
+            Some(crate::build_features::Feature::Conversation)
+        }
         PaletteCommand::Radar(_) => Some(crate::build_features::Feature::Radar),
         PaletteCommand::Review(_) | PaletteCommand::Hosting(HostingCommand::ReviewPullRequest) => {
             Some(crate::build_features::Feature::Review)
         }
         PaletteCommand::Board(_) | PaletteCommand::Hosting(HostingCommand::OpenBoard) => {
             Some(crate::build_features::Feature::Board)
+        }
+        PaletteCommand::Item(_) | PaletteCommand::Hosting(HostingCommand::OpenIssueConversation) => {
+            Some(crate::build_features::Feature::Conversation)
         }
         PaletteCommand::CopySelectedAsMermaid => Some(crate::build_features::Feature::Mermaid),
         PaletteCommand::WorkspaceSearch => Some(crate::build_features::Feature::GlobalSearch),

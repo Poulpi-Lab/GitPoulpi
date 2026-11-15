@@ -33,6 +33,7 @@ pub(crate) enum BoardEffect {
     Message(String),
     OpenUrl(String),
     NewIssue(Box<IssueSeed>, NewIn),
+    Item(Box<crate::item_view::ItemTarget>),
 }
 
 /// Never open in this build.

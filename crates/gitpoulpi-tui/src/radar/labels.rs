@@ -21,6 +21,7 @@ pub(crate) fn act_label(act: Act) -> &'static str {
         Act::EditLabels => msg::radar::ACT_EDIT_LABELS.get(),
         Act::SetMilestone => msg::radar::ACT_SET_MILESTONE.get(),
         Act::Review => msg::radar::ACT_REVIEW.get(),
+        Act::Conversation => gitpoulpi_i18n::msg::item_view::OPEN_CONVERSATION.get(),
         Act::ReviewApi => msg::radar::CHOICE_API.get(),
         Act::CloneReview => msg::radar::CHOICE_CLONE.get(),
         Act::TurnOn => msg::radar::ACT_TURN_ON.get(),

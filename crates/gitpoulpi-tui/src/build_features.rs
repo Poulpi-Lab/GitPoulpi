@@ -22,13 +22,14 @@ pub enum Feature {
     Mermaid,
     Board,
     Review,
+    Conversation,
     HistoryRewrite,
     GlobalSearch,
     Workspaces,
 }
 
 impl Feature {
-    pub const ALL: [Feature; 14] = [
+    pub const ALL: [Feature; 15] = [
         Feature::Ai,
         Feature::Hosting,
         Feature::Mcp,
@@ -40,6 +41,7 @@ impl Feature {
         Feature::Mermaid,
         Feature::Board,
         Feature::Review,
+        Feature::Conversation,
         Feature::HistoryRewrite,
         Feature::GlobalSearch,
         Feature::Workspaces,
@@ -59,6 +61,7 @@ impl Feature {
             Feature::Mermaid => MERMAID,
             Feature::Board => BOARD,
             Feature::Review => REVIEW,
+            Feature::Conversation => CONVERSATION,
             Feature::HistoryRewrite => HISTORY_REWRITE,
             Feature::GlobalSearch => GLOBAL_SEARCH,
             Feature::Workspaces => WORKSPACES,
@@ -79,6 +82,7 @@ impl Feature {
             Feature::Mermaid => "mermaid",
             Feature::Board => "board",
             Feature::Review => "review",
+            Feature::Conversation => "conversation",
             Feature::HistoryRewrite => "history-rewrite",
             Feature::GlobalSearch => "global-search",
             Feature::Workspaces => "workspaces",
@@ -110,6 +114,7 @@ pub const RADAR: bool = cfg!(all(feature = "radar", feature = "hosting"));
 pub const MERMAID: bool = cfg!(feature = "mermaid");
 pub const BOARD: bool = cfg!(all(feature = "board", feature = "hosting"));
 pub const REVIEW: bool = cfg!(all(feature = "review", feature = "hosting"));
+pub const CONVERSATION: bool = cfg!(all(feature = "conversation", feature = "hosting"));
 pub const HISTORY_REWRITE: bool = cfg!(feature = "history-rewrite");
 pub const GLOBAL_SEARCH: bool = cfg!(feature = "global-search");
 pub const WORKSPACES: bool = cfg!(feature = "workspaces");
@@ -172,7 +177,7 @@ pub fn kind_built(kind: gitpoulpi_config::IntegrationKind) -> bool {
 }
 
 /// The user-facing feature table, in `--version` order.
-pub const FLAGS: [(&str, bool); 26] = [
+pub const FLAGS: [(&str, bool); 27] = [
     ("ai", AI),
     ("github", GITHUB),
     ("gitlab", GITLAB),
@@ -196,6 +201,7 @@ pub const FLAGS: [(&str, bool); 26] = [
     ("mermaid", MERMAID),
     ("board", BOARD),
     ("review", REVIEW),
+    ("conversation", CONVERSATION),
     ("history-rewrite", HISTORY_REWRITE),
     ("global-search", GLOBAL_SEARCH),
     ("workspaces", WORKSPACES),
@@ -440,7 +446,7 @@ mod tests {
             assert!(Feature::ALL.iter().all(|f| f.built()));
             let text = long_version();
             assert!(text.contains(
-                "features: ai github gitlab azure-devops bitbucket jira trello gitea linear youtrack redmine gerrit local-issues mcp lfs worktree submodule avatar-fetch image-view radar mermaid board review history-rewrite global-search workspaces"
+                "features: ai github gitlab azure-devops bitbucket jira trello gitea linear youtrack redmine gerrit local-issues mcp lfs worktree submodule avatar-fetch image-view radar mermaid board review conversation history-rewrite global-search workspaces"
             ));
             assert!(!text.contains("custom build"));
         }
@@ -586,6 +592,7 @@ mod tests {
         assert_eq!(RADAR, cfg!(feature = "radar") && HOSTING);
         assert_eq!(BOARD, cfg!(feature = "board") && HOSTING);
         assert_eq!(REVIEW, cfg!(feature = "review") && HOSTING);
+        assert_eq!(CONVERSATION, cfg!(feature = "conversation") && HOSTING);
         assert_eq!(MERMAID, cfg!(feature = "mermaid"));
     }
 

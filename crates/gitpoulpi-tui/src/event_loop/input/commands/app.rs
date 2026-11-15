@@ -301,6 +301,14 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             #[cfg(not(feature = "hosting"))]
             let _ = cmd;
         }
+        PaletteCommand::Item(cmd) => {
+            #[cfg(feature = "hosting")]
+            if let Some(effect) = cx.repo_dialogs.run_item(cmd) {
+                super::super::menu_actions::apply_effect(cx, effect);
+            }
+            #[cfg(not(feature = "hosting"))]
+            let _ = cmd;
+        }
         // The window opens the dialog, menu or page at its next notice pass
         // (it owns the seed's data: refs, tags, issues).
         PaletteCommand::Flow(cmd) => crate::flow::request(cmd),

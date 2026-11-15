@@ -266,6 +266,8 @@ mod button_bar;
 mod cell_text;
 mod chrome;
 mod commit_detail;
+#[cfg(all(feature = "hosting", feature = "conversation"))]
+mod conversation_ui;
 #[cfg(test)]
 mod commit_files_bench;
 mod commit_files_cache;
@@ -286,6 +288,10 @@ mod hosting_ui;
 mod image_editor;
 #[cfg(feature = "hosting")]
 mod issue_form;
+mod item_cmd;
+#[cfg(feature = "hosting")]
+#[cfg_attr(not(feature = "conversation"), path = "item_view_stub.rs")]
+mod item_view;
 #[cfg(feature = "hosting")]
 mod issue_ref_picker;
 #[cfg_attr(not(feature = "hosting"), path = "issue_tokens_stub.rs")]

@@ -38,6 +38,10 @@ use crate::pull_request::{
     PullRequestReceiver, PullRequestSeed,
 };
 #[cfg(feature = "hosting")]
+use crate::item_cmd::ItemCmd;
+#[cfg(feature = "hosting")]
+use crate::item_view::{ItemEffect, ItemTarget, ItemView};
+#[cfg(feature = "hosting")]
 use crate::review_cmd::ReviewCmd;
 #[cfg(feature = "hosting")]
 use crate::review_view::{ReviewEffect, ReviewTarget, ReviewView};
@@ -105,6 +109,9 @@ pub(crate) enum RepoDialog {
     /// The Kanban board of the ISSUES source (`board_view`).
     #[cfg(feature = "hosting")]
     Board(Box<BoardView>),
+    /// The conversation of an issue or a request (`item_view`).
+    #[cfg(feature = "hosting")]
+    Item(Box<ItemView>),
     /// "Create patch...": choose a folder to
     /// save `source` into, under the first free `name[-n].patch`.
     SavePatch {
@@ -189,6 +196,10 @@ pub(crate) enum DialogEffect {
     SparseDisable,
     /// The panel's Show in Log: put the Log on this commit.
     ShowCommit(gitpoulpi_core::domain::Oid),
+    /// A conversation's commit link: put the Log on the commit this
+    /// abbreviated id names.
+    #[cfg_attr(not(feature = "hosting"), allow(dead_code))]
+    ShowCommitPrefix(String),
     /// The panel's Cherry-pick.
     CherryPick(gitpoulpi_core::domain::Oid),
     /// The review view's Check out: the existing pull request checkout flow.
@@ -448,6 +459,19 @@ impl RepoDialogs {
         }
     }
 
+    /// Whether the open conversation can hand the keyboard to the palette (no
+    /// composer focused, no menu or question open over it).
+    pub(crate) fn item_wants_palette(&self) -> bool {
+        #[cfg(feature = "hosting")]
+        {
+            matches!(&self.dialog, Some(RepoDialog::Item(view)) if view.takes_palette())
+        }
+        #[cfg(not(feature = "hosting"))]
+        {
+            false
+        }
+    }
+
     /// Whether the open board can hand the keyboard to the palette (no
     /// popup or text filter open over it).
     pub(crate) fn board_wants_palette(&self) -> bool {
@@ -492,6 +516,8 @@ impl RepoDialogs {
             #[cfg(feature = "hosting")]
             Some(RepoDialog::Board(view)) => view.busy(),
             #[cfg(feature = "hosting")]
+            Some(RepoDialog::Item(view)) => view.busy(),
+            #[cfg(feature = "hosting")]
             Some(RepoDialog::PullRequest { form }) => form.animating(),
             #[cfg(feature = "hosting")]
             Some(RepoDialog::Issue { form }) => form.animating(),
@@ -499,10 +525,13 @@ impl RepoDialogs {
         }
     }
 
-    /// When the Clone dialog's highlighted source asks for its list.
+    /// When the Clone dialog's highlighted source asks for its list, or the
+    /// open conversation its timed refresh.
     pub(crate) fn next_deadline(&self) -> Option<std::time::Instant> {
         match &self.dialog {
             Some(RepoDialog::Clone { form, .. }) => form.next_deadline(),
+            #[cfg(feature = "hosting")]
+            Some(RepoDialog::Item(view)) => view.next_deadline(),
             _ => None,
         }
     }
@@ -758,6 +787,64 @@ impl RepoDialogs {
         None
     }
 
+    /// Opens the conversation of an issue or a request.
+    #[cfg(feature = "hosting")]
+    #[cfg_attr(not(feature = "conversation"), allow(unreachable_code))]
+    pub(crate) fn open_item(&mut self, target: ItemTarget) {
+        self.dialog = Some(RepoDialog::Item(Box::new(ItemView::open(
+            target,
+            self.issue_factory.clone(),
+        ))));
+    }
+
+    /// What the palette needs to gray a conversation command out (`None`: no
+    /// conversation is open).
+    pub(crate) fn item_avail(&self) -> Option<crate::item_cmd::ItemAvail> {
+        #[cfg(feature = "hosting")]
+        if let Some(RepoDialog::Item(view)) = &self.dialog {
+            return Some(view.avail());
+        }
+        None
+    }
+
+    /// Runs a palette command on the open conversation.
+    #[cfg(feature = "hosting")]
+    pub(crate) fn run_item(&mut self, cmd: ItemCmd) -> Option<DialogEffect> {
+        let effect = match self.dialog.as_mut() {
+            Some(RepoDialog::Item(view)) => view.run(cmd),
+            _ => return None,
+        };
+        self.on_item(effect)
+    }
+
+    /// What the conversation asked of the window.
+    #[cfg(feature = "hosting")]
+    fn on_item(&mut self, effect: ItemEffect) -> Option<DialogEffect> {
+        match effect {
+            ItemEffect::None => None,
+            ItemEffect::Message(message) => Some(DialogEffect::Message(message)),
+            ItemEffect::Close => {
+                self.dialog = None;
+                self.resume_board();
+                None
+            }
+            ItemEffect::OpenUrl(url) => Some(DialogEffect::Message(
+                match crate::repo_menu::open_url(&url) {
+                    Ok(()) => msg::hosting_ui::opened_in_browser(&url),
+                    Err(err) => crate::activity_log::report_problem_clear(
+                        crate::activity_log::ProblemSource::Tool,
+                        &err,
+                    ),
+                },
+            )),
+            ItemEffect::ShowCommit(sha) => {
+                self.dialog = None;
+                self.parked_board = None;
+                Some(DialogEffect::ShowCommitPrefix(sha))
+            }
+        }
+    }
+
     /// Opens the Kanban board of the ISSUES source.
     #[cfg(feature = "hosting")]
     #[cfg_attr(not(feature = "board"), allow(unreachable_code))]
@@ -807,6 +894,14 @@ impl RepoDialogs {
                     ),
                 },
             )),
+            BoardEffect::Item(target) => {
+                // The board waits behind the conversation and comes back with it.
+                if let Some(RepoDialog::Board(view)) = self.dialog.take() {
+                    self.parked_board = Some(view);
+                }
+                self.open_item(*target);
+                None
+            }
             BoardEffect::NewIssue(seed, at) => {
                 // The board waits behind the form and comes back with it.
                 if let Some(RepoDialog::Board(view)) = self.dialog.take() {
@@ -995,6 +1090,7 @@ impl RepoDialogs {
             | RepoDialog::Issue { .. }
             | RepoDialog::Meta(_)
             | RepoDialog::Board(_)
+            | RepoDialog::Item(_)
             | RepoDialog::Review(_) => None,
             #[cfg(feature = "hosting")]
             RepoDialog::IssueFlow(_) => None,
@@ -1041,6 +1137,8 @@ impl RepoDialogs {
             Some(RepoDialog::PullRequest { form }) => form.nav_targets(),
             #[cfg(feature = "hosting")]
             Some(RepoDialog::Issue { form }) => form.nav_targets(),
+            #[cfg(feature = "hosting")]
+            Some(RepoDialog::Item(view)) => view.nav_targets(),
             _ => Vec::new(),
         }
     }
@@ -1162,6 +1260,11 @@ impl RepoDialogs {
                     let effect = view.on_key(key);
                     self.on_board(effect)
                 }
+                #[cfg(feature = "hosting")]
+                Some(RepoDialog::Item(view)) => {
+                    let effect = view.on_key(key);
+                    self.on_item(effect)
+                }
                 _ => None,
             }
         };
@@ -1195,6 +1298,8 @@ impl RepoDialogs {
                 Some(RepoDialog::Review(view)) => view.paste(text),
                 #[cfg(feature = "hosting")]
                 Some(RepoDialog::Board(view)) => view.paste(text),
+                #[cfg(feature = "hosting")]
+                Some(RepoDialog::Item(view)) => view.paste(text),
                 _ => {}
             }
         }
@@ -1366,6 +1471,11 @@ impl RepoDialogs {
                     let effect = view.on_mouse(mouse);
                     self.on_board(effect)
                 }
+                #[cfg(feature = "hosting")]
+                Some(RepoDialog::Item(view)) => {
+                    let effect = view.on_mouse(mouse);
+                    self.on_item(effect)
+                }
                 _ => None,
             }
         };
@@ -1421,6 +1531,7 @@ impl RepoDialogs {
                         | RepoDialog::Issue { .. }
                         | RepoDialog::Meta(_)
                         | RepoDialog::Board(_)
+                        | RepoDialog::Item(_)
                         | RepoDialog::Review(_),
                     ) => {}
                     Some(RepoDialog::SavePatch { source, name, .. }) => {
@@ -2079,6 +2190,14 @@ impl RepoDialogs {
             if let Some(effect) = board_done {
                 effects.extend(self.on_board(effect));
             }
+            // ...and for the conversation's reads, layout and timer.
+            let item_done = match self.dialog.as_mut() {
+                Some(RepoDialog::Item(view)) => Some(view.poll()),
+                _ => None,
+            };
+            if let Some(effect) = item_done {
+                effects.extend(self.on_item(effect));
+            }
             // ...and for the Clone dialog's hosted sources.
             // No Clone dialog open: nobody waits for these, stop the fetches.
             if !matches!(self.dialog, Some(RepoDialog::Clone { .. })) {
@@ -2312,6 +2431,8 @@ impl RepoDialogs {
             Some(RepoDialog::Review(view)) => view.render_all(area, buf),
             #[cfg(feature = "hosting")]
             Some(RepoDialog::Board(view)) => view.render(area, buf),
+            #[cfg(feature = "hosting")]
+            Some(RepoDialog::Item(view)) => view.render(area, buf),
             Some(RepoDialog::SavePatch { picker, .. }) => picker.render(picker_rect(area), buf),
             Some(RepoDialog::ApplyPatch(picker)) => picker.render(picker_rect(area), buf),
             Some(RepoDialog::Workspace { form, picker }) => {
@@ -2483,6 +2604,8 @@ pub(crate) fn apply_dialog_effect(effect: DialogEffect, ctx: &mut TabCtx) -> Opt
             Some(msg::sparse::APPLYING.get().to_string())
         }
         DialogEffect::ShowCommit(_) => None,
+        // Handled by the event loop's `apply_effect`.
+        DialogEffect::ShowCommitPrefix(_) => None,
         DialogEffect::WorkspaceProgress(line) => {
             if let Some(manager) = ctx.management.as_mut() {
                 manager.ws.progress = line;

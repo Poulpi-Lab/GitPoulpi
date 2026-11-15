@@ -182,6 +182,7 @@ fn rig_with(source: BoardSource, fail: Option<&'static str>, delay: Duration) ->
         query: None,
         repo_root: dir.path().to_path_buf(),
         labels: Vec::new(),
+        bases: Default::default(),
     };
     let mut view = BoardView::open(target, factory);
     wait_for(&mut view, |v| v.loaded);

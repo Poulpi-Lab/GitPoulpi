@@ -124,6 +124,17 @@ impl HostingUi {
                         ),
                         Entry::Separator,
                     ]
+                } else if self.conversation_prs() {
+                    vec![
+                        Entry::action(
+                            msg::item_view::OPEN_CONVERSATION.get(),
+                            HostingAction::Conversation {
+                                number: pr.number,
+                                pr: true,
+                            },
+                        ),
+                        Entry::Separator,
+                    ]
                 } else {
                     Vec::new()
                 };
@@ -180,7 +191,18 @@ impl HostingUi {
                 Some(
                     ContextMenu::new(
                         format!("{} {}", issue.iid_label, issue.title),
-                        vec![
+                        self.conversation_issues()
+                            .then(|| {
+                                Entry::action(
+                                    msg::item_view::OPEN_CONVERSATION.get(),
+                                    HostingAction::Conversation {
+                                        number: issue.number,
+                                        pr: false,
+                                    },
+                                )
+                            })
+                            .into_iter()
+                            .chain(vec![
                             Entry::action(
                                 if local {
                                     msg::local_issues::OPEN_NOTE.get()
@@ -211,8 +233,7 @@ impl HostingUi {
                                     issue,
                                 )),
                             ),
-                        ]
-                        .into_iter()
+                        ])
                         .chain(if local {
                             std::iter::once(Entry::Separator)
                                 .chain(Self::local_entries(issue))
@@ -374,10 +395,20 @@ impl HostingUi {
             HostingRow::Pull(_, i) => match self.linked_snapshot().and_then(|s| s.prs.get(i)) {
                 // Where a review exists, Enter opens it; elsewhere the page.
                 Some(pr) if self.review_prs() => HostingAction::Review { number: pr.number },
+                Some(pr) if self.conversation_prs() => HostingAction::Conversation {
+                    number: pr.number,
+                    pr: true,
+                },
                 Some(pr) => HostingAction::OpenUrl(pr.web_url.clone()),
                 None => return HostingEffect::None,
             },
             HostingRow::Issue(i) => match self.snapshot.as_ref().and_then(|s| s.issues.get(i)) {
+                // Where the conversation can be read, Enter opens it; `o`
+                // and the row menu keep the browser.
+                Some(issue) if self.conversation_issues() => HostingAction::Conversation {
+                    number: issue.number,
+                    pr: false,
+                },
                 Some(issue) => HostingAction::OpenUrl(issue.web_url.clone()),
                 None => return HostingEffect::None,
             },
@@ -502,6 +533,7 @@ impl HostingUi {
             HostingAction::StartPullRequest(branch) => HostingEffect::StartPullRequest(branch),
             HostingAction::EditMeta { field, pr, number } => self.meta_action(field, pr, number),
             HostingAction::Review { number } => self.review_effect(number),
+            HostingAction::Conversation { number, pr } => self.item_effect(number, pr),
             HostingAction::PushForReview { branch } => self.push_review_effect(branch),
         }
     }
@@ -787,6 +819,7 @@ impl HostingUi {
             HostingCommand::SetMilestone => self.meta_command(MetaField::Milestone, anchor),
             HostingCommand::ReviewPullRequest => self.review_command(anchor),
             HostingCommand::OpenBoard => self.board_effect(),
+            HostingCommand::OpenIssueConversation => self.item_command(anchor),
             HostingCommand::UseProfile => {
                 self.menu = Some(ContextMenu::new(
                     msg::hosting_ui::MENU_REPO_INTEGRATION.get(),

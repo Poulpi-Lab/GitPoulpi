@@ -57,6 +57,31 @@ pub(in crate::event_loop) fn apply_effect(cx: &mut CommandCtx<'_>, effect: Dialo
                 *cx.last_message = Some(msg::input::not_in_loaded_log(&commit.to_hex()[..8]));
             }
         }
+        DialogEffect::ShowCommitPrefix(sha) => {
+            let found = cx.log_result.as_ref().ok().and_then(|g| {
+                g.nodes
+                    .iter()
+                    .find(|n| n.id.to_hex().starts_with(&sha))
+                    .map(|n| n.id)
+            });
+            match found {
+                Some(commit)
+                    if select_log_commit(
+                        &*cx.log_result,
+                        &*cx.log_order,
+                        &mut *cx.log_state,
+                        commit,
+                    ) =>
+                {
+                    *cx.focus = Focus::Log;
+                    *cx.right_panel = RightPanel::CommitDetail;
+                }
+                _ => {
+                    let short: String = sha.chars().take(8).collect();
+                    *cx.last_message = Some(msg::input::not_in_loaded_log(&short));
+                }
+            }
+        }
         #[cfg(feature = "hosting")]
         DialogEffect::CheckoutPullRequest(number) => {
             let refs = cx.refs_result.as_deref().unwrap_or(&[]);

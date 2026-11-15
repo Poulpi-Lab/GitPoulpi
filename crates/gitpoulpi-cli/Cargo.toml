@@ -19,7 +19,7 @@ path = "src/main.rs"
 
 [features]
 default = ["full"]
-full = ["all-langs", "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "ai", "mcp", "lfs", "worktree", "submodule", "avatar-fetch", "image-view", "radar", "mermaid", "board", "review", "history-rewrite", "global-search", "workspaces", "rewrite-scripts"]
+full = ["all-langs", "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "ai", "mcp", "lfs", "worktree", "submodule", "avatar-fetch", "image-view", "radar", "mermaid", "board", "review", "conversation", "history-rewrite", "global-search", "workspaces", "rewrite-scripts"]
 all-langs = [
     "lang-fr",
     "lang-es",
@@ -79,6 +79,7 @@ radar = ["gitpoulpi-commands/radar", "gitpoulpi-tui/radar", "gitpoulpi-mcp?/rada
 mermaid = ["gitpoulpi-commands/mermaid", "gitpoulpi-tui/mermaid", "gitpoulpi-mcp?/mermaid"]
 board = ["gitpoulpi-commands/board", "gitpoulpi-tui/board", "gitpoulpi-mcp?/board"]
 review = ["gitpoulpi-commands/review", "gitpoulpi-tui/review", "gitpoulpi-mcp?/review"]
+conversation = ["gitpoulpi-tui/conversation"]
 history-rewrite = ["gitpoulpi-commands/history-rewrite", "gitpoulpi-tui/history-rewrite", "gitpoulpi-mcp?/history-rewrite"]
 global-search = ["gitpoulpi-commands/global-search", "gitpoulpi-tui/global-search", "gitpoulpi-mcp?/global-search"]
 workspaces = ["gitpoulpi-commands/workspaces", "gitpoulpi-tui/workspaces", "gitpoulpi-mcp?/workspaces"]

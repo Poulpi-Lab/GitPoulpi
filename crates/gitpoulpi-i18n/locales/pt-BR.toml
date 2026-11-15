@@ -10346,7 +10346,7 @@ open_conversation = "Abrir conversa"
 # context: title of the list of issues offered by the palette command. Width budget: 40 cells
 menu_pick_conversation = "Abrir conversa"
 # context: command palette entry
-palette_open_conversation = "Host: abrir a conversa de uma issue..."
+palette_open_conversation = "Hospedagem: abrir a conversa de uma issue..."
 # context: command palette entry: acts on the selected Radar row
 palette_radar_conversation = "Radar: abrir a conversa da issue"
 # context: command palette entry

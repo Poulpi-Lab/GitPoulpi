@@ -14,7 +14,7 @@ use super::*;
 
 /// What the repository's two links make a token mean. A link whose profile
 /// is gone or disabled counts as unlinked: nothing is a reference.
-fn context(
+pub(super) fn context(
     state: &gitpoulpi_session::RepoState,
     integrations: &[Integration],
     root: Option<&std::path::Path>,

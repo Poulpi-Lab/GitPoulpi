@@ -391,9 +391,13 @@ pub struct MarkdownArgs {
     #[arg(long)]
     pub width: Option<usize>,
     /// The integration whose grammar the references follow (see `hosting
-    /// list`). Without it only links and plain references resolve.
+    /// list`). Without it only links and mentions resolve.
     #[arg(long)]
     pub id: Option<String>,
+    /// The project the text belongs to, so `#12` points at its page
+    /// (`owner/name`, `group/project`).
+    #[arg(long)]
+    pub project: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, clap::ValueEnum)]

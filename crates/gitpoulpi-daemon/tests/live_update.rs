@@ -405,5 +405,80 @@ async fn a_ref_filter_change_from_one_client_is_broadcast_to_another() {
     handle.shutdown().await.unwrap();
 }
 
+/// A comment posted by the CLI (a client that calls the host in its own
+/// process) reaches another client as `HostingItemChanged`, and a request
+/// without a repository or with a malformed item is refused.
+#[tokio::test]
+async fn a_hosting_comment_notification_is_broadcast_to_another_client() {
+    use gitpoulpi_ipc::{HostingChange, HostingChangeArgs, HostingItemKind};
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("initial")
+        .unwrap()
+        .build();
+    let repo_ref = repo.repo_ref();
+
+    let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
+    let daemon = Daemon::new("hosting-notify-test");
+    let handle = daemon.spawn(backend).await.unwrap();
+    let mut watcher = Client::connect(&handle.endpoint())
+        .await
+        .unwrap()
+        .into_stream();
+    let mut actor = Client::connect(&handle.endpoint()).await.unwrap();
+    let sent = HostingChangeArgs {
+        integration_id: "gh".into(),
+        project: "owner/repo".into(),
+        kind: HostingItemKind::Issue,
+        number: 142,
+        id: String::new(),
+        change: HostingChange::Posted,
+    };
+    let call =
+        |id: u64, repo: Option<gitpoulpi_core::domain::RepoId>, args: serde_json::Value| Request {
+            id,
+            session: "hosting-notify-test".into(),
+            repo,
+            command: OperationKind::NotifyHostingChange,
+            args,
+        };
+    let resp = actor
+        .call(&call(1, Some(repo_ref.id.clone()), json(&sent)))
+        .await
+        .unwrap();
+    assert!(resp.result.is_ok(), "notify failed: {:?}", resp.result);
+    let no_repo = actor.call(&call(2, None, json(&sent))).await.unwrap();
+    assert!(no_repo.result.is_err(), "a notification needs a repository");
+    let bad = actor
+        .call(&call(
+            3,
+            Some(repo_ref.id.clone()),
+            serde_json::json!({ "nope": 1 }),
+        ))
+        .await
+        .unwrap();
+    assert!(bad.result.is_err(), "a malformed item is refused");
+
+    let got = tokio::time::timeout(Duration::from_secs(5), async {
+        loop {
+            let msg: gitpoulpi_ipc::ServerMessage =
+                gitpoulpi_ipc::transport::read_message(&mut watcher)
+                    .await
+                    .unwrap()
+                    .expect("connection closed before event arrived");
+            if let gitpoulpi_ipc::ServerMessage::Event(Event::HostingItemChanged { repo, change }) =
+                msg
+            {
+                return (repo, change);
+            }
+        }
+    })
+    .await
+    .expect("timed out waiting for HostingItemChanged");
+    assert_eq!(got.0, repo_ref.id);
+    assert_eq!(got.1, sent);
+    handle.shutdown().await.unwrap();
+}
+
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();

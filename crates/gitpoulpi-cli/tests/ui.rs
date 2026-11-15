@@ -435,7 +435,7 @@ fn the_other_show_targets_build_the_right_intent() {
         vec!["show", "search", "fix"],
         vec!["show", "ref", "main"],
         vec!["show", "pr", "12"],
-        vec!["show", "issue", "7"],
+        vec!["show", "issue", "7", "--view", "conversation"],
         vec!["show", "wip", "src/a.rs", "--staged", "--composer"],
         vec!["show", "palette", "stash"],
         vec!["highlight", "3:2-5:9", "--no-scroll"],
@@ -468,6 +468,15 @@ fn the_other_show_targets_build_the_right_intent() {
         &seen[5].0,
         UiIntent::ShowHosting {
             item: gitpoulpi_ipc::ui::HostingItem::Issue(7),
+            view: gitpoulpi_ipc::ui::HostingView::Conversation,
+            ..
+        }
+    ));
+    // The default view is the details.
+    assert!(matches!(
+        &seen[4].0,
+        UiIntent::ShowHosting {
+            view: gitpoulpi_ipc::ui::HostingView::Details,
             ..
         }
     ));

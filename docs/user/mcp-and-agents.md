@@ -157,6 +157,18 @@ What this means in practice:
   destructive; `conflicts_unresolve` is a plain write. A refused call (`stale`,
   `not_conflicted`, `pick_incomplete`...) answers `{"refused": {...}}` with exit
   code 2 instead of failing.
+- **Issue and pull request conversations**: `hosting_issue_comments` and
+  `hosting_review_conversation` read the whole timeline (reads, open world: they
+  call the host); `hosting_markdown` cleans a text and finds its references and
+  calls nothing (closed world). Posting (`hosting_issue_comment`,
+  `hosting_review_comment`, `hosting_review_reply`) and editing
+  (`hosting_*_comment_edit`) are plain mutations marked open world: they go to
+  the host at once, as the identity the token has (`posted_as` in the answer; a
+  bot token posts as the bot), so `allow_mutations` and `mutation_allowlist`
+  decide whether an agent may. Deleting a comment (`hosting_*_comment_delete`) is
+  destructive. After a post, edit or delete the daemon is told, and an open
+  window of the repository refreshes that item. `ui_show_pr` / `ui_show_issue`
+  take `--view conversation` to open the conversation instead of the row.
 - **Stuck states**: `conflicts_am_continue` is a write, `conflicts_am_skip`,
   `conflicts_am_abort` and `index_lock_remove` are destructive, `index_lock_show`
   is a read.
@@ -300,6 +312,10 @@ confirm.
 | `hosting_integrations_test` | `gitpoulpi hosting integrations test` | read, network |
 | `hosting_issue_base` | `gitpoulpi hosting issue base` | write |
 | `hosting_issue_close` | `gitpoulpi hosting issue close` | write |
+| `hosting_issue_comment` | `gitpoulpi hosting issue comment` | write, network |
+| `hosting_issue_comment_delete` | `gitpoulpi hosting issue comment-delete` | destructive, network |
+| `hosting_issue_comment_edit` | `gitpoulpi hosting issue comment-edit` | write, network |
+| `hosting_issue_comments` | `gitpoulpi hosting issue comments` | read, network |
 | `hosting_issue_create` | `gitpoulpi hosting issue create` | write, network |
 | `hosting_issue_edit` | `gitpoulpi hosting issue edit` | write, network |
 | `hosting_issue_move` | `gitpoulpi hosting issue move` | write |
@@ -310,6 +326,7 @@ confirm.
 | `hosting_link` | `gitpoulpi hosting link` | write |
 | `hosting_list` | `gitpoulpi hosting list` | read |
 | `hosting_logout` | `gitpoulpi hosting logout` | destructive |
+| `hosting_markdown` | `gitpoulpi hosting markdown` | read |
 | `hosting_members` | `gitpoulpi hosting members` | read, network |
 | `hosting_milestones` | `gitpoulpi hosting milestones` | read, network |
 | `hosting_open` | `gitpoulpi hosting open` | read |
@@ -322,6 +339,9 @@ confirm.
 | `hosting_refs` | `gitpoulpi hosting refs` | read |
 | `hosting_review_abandon` | `gitpoulpi hosting review abandon` | write, network |
 | `hosting_review_comment` | `gitpoulpi hosting review comment` | write, network |
+| `hosting_review_comment_delete` | `gitpoulpi hosting review comment-delete` | destructive, network |
+| `hosting_review_comment_edit` | `gitpoulpi hosting review comment-edit` | write, network |
+| `hosting_review_conversation` | `gitpoulpi hosting review conversation` | read, network |
 | `hosting_review_diff` | `gitpoulpi hosting review diff` | read, network |
 | `hosting_review_fetch` | `gitpoulpi hosting review fetch` | write, network |
 | `hosting_review_push` | `gitpoulpi hosting review push` | write, network |

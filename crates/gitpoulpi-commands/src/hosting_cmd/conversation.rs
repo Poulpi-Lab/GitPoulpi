@@ -430,7 +430,7 @@ async fn notify(
 }
 
 fn base_json(target: &RepoTarget, key: &ItemKey) -> Value {
-    let mut out = super::review::target_json(target);
+    let mut out = json!({ "target": super::review::target_json(target) });
     out["item"] = json!({ "kind": kind_json(key.kind), "number": key.number, "id": key.id });
     out
 }
@@ -446,6 +446,15 @@ pub(super) async fn run(
     let client = env.client(&target.integration, &target.integrations)?;
     let caps = client.conversation_caps(key.kind);
     let kind = key.kind;
+    // What the repository links make a reference mean: `#9` that is one of
+    // its own issues or requests is `in_app`.
+    let mut ctx = xref_context(target);
+    if let Some(session) = ipc.as_deref() {
+        if let Ok(state) = load_state(session) {
+            ctx.repo_links =
+                super::refs::context(&state, &target.integrations, session.repo_root());
+        }
+    }
     match op {
         Op::Read {
             limit,
@@ -468,7 +477,6 @@ pub(super) async fn run(
                 .await
                 .map_err(|e| e.to_string())?;
             let identity = identity_of(client.as_ref(), &target.project).await;
-            let ctx = xref_context(target);
             let mut entries = page.entries;
             if !events {
                 entries.retain(|e| !matches!(e, TimelineEntry::Event(_)));
@@ -536,7 +544,6 @@ pub(super) async fn run(
             // After the post: a first post teaches an App bot's login.
             let identity = identity_of(client.as_ref(), &target.project).await;
             let notified = notify(ipc, target, &key, HostingChange::Posted).await;
-            let ctx = xref_context(target);
             let who = posted_as(identity.as_ref(), &comment);
             let mut out = base_json(target, &key);
             out["comment"] = comment_json(&comment, &ctx);
@@ -565,7 +572,6 @@ pub(super) async fn run(
                 .map_err(|e| e.to_string())?;
             let identity = identity_of(client.as_ref(), &target.project).await;
             let notified = notify(ipc, target, &key, HostingChange::Edited).await;
-            let ctx = xref_context(target);
             let who = posted_as(identity.as_ref(), &comment);
             let mut out = base_json(target, &key);
             out["comment"] = comment_json(&comment, &ctx);
@@ -636,6 +642,7 @@ pub(super) fn markdown(
             XrefContext {
                 family: Some(integration.kind.family()),
                 web_base: gitpoulpi_hosting::integration_web_base(integration).unwrap_or_default(),
+                project: args.project.clone().unwrap_or_default(),
                 ..XrefContext::default()
             }
         }

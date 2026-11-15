@@ -401,6 +401,41 @@ mod tests {
         }
     }
 
+    /// The conversation tools: reading is allowed with mutations off, posting
+    /// and editing are plain mutations, deleting a comment is destructive.
+    #[test]
+    fn the_conversation_tools_are_classified_by_what_they_do() {
+        for name in [
+            "hosting_issue_comments",
+            "hosting_review_conversation",
+            "hosting_markdown",
+        ] {
+            assert!(spec(name).read_only, "{name} only reads");
+            assert!(!spec(name).destructive, "{name} deletes nothing");
+        }
+        for name in [
+            "hosting_issue_comment",
+            "hosting_issue_comment_edit",
+            "hosting_review_comment_edit",
+        ] {
+            assert!(!spec(name).read_only, "{name} writes to the host");
+            assert!(!spec(name).destructive, "{name} can be edited again");
+        }
+        for name in [
+            "hosting_issue_comment_delete",
+            "hosting_review_comment_delete",
+        ] {
+            assert!(spec(name).destructive, "{name} deletes for good");
+        }
+        let denied = McpConfig {
+            allow_mutations: false,
+            ..McpConfig::default()
+        };
+        assert!(allowed(&spec("hosting_issue_comments"), &denied).is_ok());
+        assert!(allowed(&spec("hosting_issue_comment"), &denied).is_err());
+        assert!(allowed(&spec("hosting_review_comment_delete"), &denied).is_err());
+    }
+
     /// Undo and redo move refs and HEAD: mutations, gated like `reset`.
     #[test]
     fn undo_and_redo_are_destructive_mutations() {
@@ -492,7 +527,7 @@ mod tests {
             .map(|s| s.name)
             .collect();
         got.sort();
-        assert_eq!(got.len(), 42, "destructive set changed: {got:?}");
+        assert_eq!(got.len(), 44, "destructive set changed: {got:?}");
     }
 
     #[cfg(feature = "full")]

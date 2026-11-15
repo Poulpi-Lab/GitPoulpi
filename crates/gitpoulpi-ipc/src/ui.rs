@@ -863,6 +863,20 @@ mod tests {
         }))
         .unwrap();
         assert!(matches!(hl, UiIntent::Highlight { scroll: true, .. }));
+        // An older client sends no `view`: it means the details.
+        let hosting: UiIntent = serde_json::from_value(serde_json::json!({
+            "kind": "show_hosting",
+            "repo": "/r",
+            "item": {"pr": 7}
+        }))
+        .unwrap();
+        assert!(matches!(
+            hosting,
+            UiIntent::ShowHosting {
+                view: HostingView::Details,
+                ..
+            }
+        ));
     }
 
     /// The wire format has no way to express an action: an unknown `kind`

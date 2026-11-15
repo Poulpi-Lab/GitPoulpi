@@ -368,7 +368,7 @@ them.
 | Option | What it does |
 |---|---|
 | **Pull Requests and issues refresh** | How often the sidebar lists and the toolbar chip refresh, a number and a unit (minutes or hours). Default 5 minutes, up to 2 hours, `0` turns the timer off (`general.hosting_refresh_minutes`, `general.hosting_refresh_unit`). |
-| **Post as** | The name messages to a host are posted as when the repository's token is a bot's (a GitHub App token), for example `poulpi-lab[bot]`; also used to recognise your own comments. Empty: asked from the host, else learned from the first message posted. A repository can override it in Settings > Repository > SSH & credentials > Hosting (`general.hosting_post_as`). |
+| **Post as** | The name messages to a host are posted as when the repository's token is a bot's (a GitHub App token), for example `my-app[bot]`; also used to recognise your own comments. Empty: asked from the host, else learned from the first message posted. A repository can override it in Settings > Repository > SSH & credentials > Hosting (`general.hosting_post_as`). |
 | **Review request terminology** | The word used for hosted reviews: **Auto (per host)**, **Pull request** or **Merge request**. |
 | **Hide the pull request chip when it is closed or merged** | On by default (`ui.hide_finished_pr_chip`; it reads "merge request" on GitLab). The chip on the toolbar shows the latest request of the checked-out branch; once that request is closed or merged it is hidden and the dim **+ PR** chip (start a new request) shows instead, as if the branch had none. Off, the chip always shows the latest request, whatever its state. Applies at once. |
 
@@ -384,6 +384,14 @@ holds the defaults of the [review context](ai.md#review-context): **Run the agen
 (*Profile setting*, *Yes*, *No*), **Include CLAUDE.md**, **Include AGENTS.md** and **Extra file** (a path or a
 link; empty adds none, with a **Browse...** button under it that opens a file picker; `Enter` on the button is
 its keyboard form). This page has its own guide: [AI assistance](ai.md).
+
+The **Replies on a host** block holds what drafts comments, replies and issue descriptions: its profile and
+instructions, the **Base prompt** (empty uses the built-in one) and a **Repository access** group: **Let the AI read
+the repository by default** (off: the choice in each composer starts unticked), **Keep the agent's session between
+replies** and **Keep a repository context for (minutes)**. The byte limits **Largest conversation to send for a reply**,
+**Largest repository file for a reply**, **Largest repository map for a reply**, **Most search hits per term for a
+reply** and **Most search terms for a reply** are with the other input limits. See
+[Writing help on a host](ai.md#writing-help-on-a-host).
 
 Under the per-action blocks, the **Privacy** group:
 

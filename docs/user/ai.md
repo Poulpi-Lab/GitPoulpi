@@ -290,7 +290,7 @@ hover or highlight it.
 | **History rewrite script** | In the [history rewrite workbench](history-rewrite.md#write-a-script-with-ai): the `✦ Write with AI...` button of the Script editor, or palette `Rewrite: Write a Script with AI...`. A dialog shows exactly what will be sent; the script lands in the editor, marked, and is never run or applied for you. | `ai rewrite-script "<instruction>" [--sample N]` (prints) |
 | **History rewrite rules** | In the [history rewrite workbench](history-rewrite.md#create-rules-with-ai): the `✦ Create Rules with AI...` button, `Alt+E`, or palette `Rewrite: Create Rules with AI...`. A multi-line dialog shows exactly what will be sent; the rules and settings land in the workbench and nothing is previewed or applied for you. | `ai rewrite-rules "<description>" [--context]` (prints) |
 | **Worktree name** | In the [Create worktree dialog](worktrees.md#naming-with-ai): the `✦ Name with AI` button or `Alt+A` opens a box where you describe the feature, bug or task; the model names the worktree and its branch after the repository's own branch names, and both land in the dialog's fields for you to edit. Only your description and the local branch names are sent, so it has no "what is sent" dialog. | `ai worktree-name --describe "<task>"` (prints) |
-| **Reply on a host** and **Issue description** | Settings > AI and the CLI only for now: the composer's `✦` comes later. They draft a comment, an answer in a thread, a review comment or summary, or a new issue's description. See [Writing help on a host](#writing-help-on-a-host). | `ai hosting-reply` (prints a draft) |
+| **Reply on a host** and **Issue description** | The **Write with AI** button (`Alt+E`) of every Markdown composer that sends to a host: a comment, a reply or an edit in a conversation, a review comment or summary, a new issue's description. The draft lands in the box; nothing is posted. See [Writing help on a host](#writing-help-on-a-host). | `ai hosting-reply` (prints a draft) |
 | **Commit composer** | The WIP row's menu *Compose commits (AI)...*, `Ctrl+G C`, palette `AI: Compose Commits From Working Changes...` | |
 
 `Esc` cancels a running request (a local agent's process is killed).
@@ -375,63 +375,105 @@ and instructions are the *History rewrite rules* ones in Settings > AI.
 ### Writing help on a host
 
 *Reply on a host* drafts a comment, an answer in a thread, a comment on a line of code or the summary of a
-review; *Issue description* drafts the description of a new issue. **The AI only drafts**: the text is
-printed (or, later, put in the composer) for you to read, edit and post yourself. Nothing in this feature
-posts, edits or deletes anything on a host, and the CLI and MCP answer says `"posted": false`.
+review; *Issue description* drafts the description of a new issue. **The AI only drafts.** The text goes into the
+composer (or is printed by the CLI) for you to read, edit and send yourself. There is no code path from this feature
+to a host's write: it cannot post, edit, resolve or delete anything, the CLI and MCP answer says `"posted": false`,
+and a local agent runs read-only (below). The text leaves GitPoulpi only through the composer's own **Send**
+(`Ctrl+Enter`) or **Comment** button.
 
-What the model is given: the item's title, state and description, the thread you answer, the recent
-comments (newest first, within `ai.limits.hosting_reply_context_bytes`, 49152 by default), what you want
-in this answer (`--hint`, typed at the moment of use) and, to improve your own text, your draft
-(`--draft`). Everything other people wrote is marked as untrusted data in the request, so an instruction
-hidden in a comment is not followed. Over the limit the oldest comments are left out first and the cut is
-reported in `truncated` (`--send-all` lifts the limit). **Reading the repository is off by default.** The AI reads the repository only when *Let the AI read the
-repository* is ticked for that draft (`--read-repo` on the CLI; `ai.hosting_reply.read_repository`, off, only
-sets where the box starts). A **local agent** profile reads it itself, in the repository folder, with read-only
-tools (Claude Code: `Read`, `Grep`, `Glob`; Writes, `Bash`, the web and MCP servers are refused; Codex: its
-read-only sandbox), without the hosting credentials of your environment, and keeps its session between replies
-(`reuse_agent_session`; a new commit or *Refresh context* starts a new one). An agent GitPoulpi has no confirmed
-read-only mode for cannot be let in. An **API** profile gets a context GitPoulpi builds from the files the
-conversation names (whole, or a window around the line), search hits for identifiers and error messages, a
-repository map and, for a pull request (`--pr-base`, `--pr-head`), its diff, within
-`ai.limits.hosting_reply_*`; files that look sensitive are left out and secrets are masked first. The built
-context is kept (`context_ttl_minutes`, 30 by default; per repository, in `<data>/private/ai-context` for
-the CLI) and Anthropic's prompt cache is used, so the next reply costs little; a new HEAD or
-`--refresh-context` rebuilds it. **The AI still only drafts**: its tools cannot write, and nothing here posts.
+**In the Markdown composer.** While AI is on, every composer whose text goes to a host (a comment, a reply or an
+edit in [the conversation view](hosting-integration.md#5c-conversations), a review comment, the Finish review
+summary, the new-issue description and the pull request description) has a **Write with AI** button (`Alt+E`, the
+same key in all of them) at the right end of its mode bar. It opens a panel under the bar:
 
-**Your own base prompt.** The instructions both actions start from are editable: *Settings > AI > Replies
-on a host > Base prompt* (`ai.hosting_reply.base_prompt`). Empty uses the built-in prompt, which asks for
-the text only, in the host's markup and in the conversation's language unless your hint says otherwise.
-Your global, workspace and repository instructions still follow it. `ai prompt --action hosting_reply`
-prints the layers.
+- a field, *What I want in this answer*, typed at the moment of use (`Enter` drafts). Its placeholder gives an
+  example of the kind ("agree, and ask for a failing test"). A **Recent** list keeps earlier instructions (click
+  one, or `Up` / `Down` in the field; kept in `ai-hints.toml`);
+- *Improve my draft*, ticked when the box already holds a text: the AI starts from it instead of writing a new one;
+- *Let the AI read the repository*, **unticked every time** unless you turned its default on (see below);
+- **Draft**, **Stop** (also `Esc`) and **Close**, and one line for progress or the error.
+
+The usual "What is sent" dialog (`[ai.sent_preview] hosting_reply`, `issue_body`, `pull_request_description`) shows
+the request before it leaves. Besides the system and user text it shows a **Repository context** list when the
+repository is read: each part with its size, the total against the limit (*31.2 KB of 48 KB*), what was cut to fit,
+what was left out as sensitive and which parts are reused. For a local agent it says that the agent reads the
+repository itself with read-only tools, names them, gives the working folder and whether the agent session is new or
+continued, and every dialog ends with *The AI only writes a draft. Nothing is posted until you send it yourself.*
+The draft replaces the text in one undo step and the composer switches to Preview so you read it before you send;
+`Ctrl+Z` gives your text back. A pull request description is written from the branch's commits and diff, and takes
+the same instruction; the repository box is grayed there ("not for this text").
+
+What the model is given: the item's title, state and description, the thread you answer, the recent comments (newest
+first, within `ai.limits.hosting_reply_context_bytes`, 49152 by default), the markup the host takes (so a Jira
+answer comes back as Markdown that GitPoulpi converts), what you want in this answer and, to improve your own text,
+your draft. Everything other people wrote is marked as untrusted data in the request, so an instruction hidden in a
+comment is not followed. Over the limit nothing is cut silently: you are asked, and the oldest comments are left out
+first (the thread you answer is kept, up to half the budget); the CLI reports the cut in `truncated` and
+`--send-all` lifts it.
+
+**Your own base prompt.** The instructions both actions start from are editable: *Settings > AI > Replies on a host >
+Base prompt* (`ai.hosting_reply.base_prompt`). Empty uses the built-in prompt, which asks for the text only, in the
+host's markup and in the conversation's language unless your hint says otherwise. Your global, workspace and
+repository instructions still follow it, and the text of other people stays marked as untrusted whatever you write
+there. `ai prompt --action hosting_reply` prints the layers.
+
+#### Repository access
+
+**Off by default, and ticked per use.** Reading the repository gives much better answers to "does this crash happen
+in our code?" but sends more, so it is a choice you make each time: *Let the AI read the repository* starts unticked
+in every box. `ai.hosting_reply.read_repository` (*Let the AI read the repository by default*, off) only makes the
+box start ticked; `--read-repo` is the CLI's tick. The choice is grayed, with its reason when you activate it, in
+three cases: the repository is **not cloned** (the Radar's conversation of another repository: there is nothing to
+read), the chosen local agent has **no read-only mode** GitPoulpi trusts, or the text is **not written from the
+repository** (a pull request description). Nothing but your own tick turns it on.
+
+What happens then depends on the profile:
+
+| Profile | What reads the repository | What is sent |
+|---|---|---|
+| **API** (OpenAI-compatible, Anthropic) | GitPoulpi, through the daemon, read-only | A context it builds and gives to the model: the repository map (top-level tree and the paths around matched files), the files the conversation names (the whole file, or a window of 40 lines around the line or symbol), search hits for identifiers and error messages in the conversation, and for a pull request its diff. Within `ai.limits.hosting_reply_*` (context 49152, file 8192, map 6144, 20 hits per term, 8 terms), cut in the order diff, files, hits, map and reported. Files that look sensitive are left out and secrets in the rest are masked first (see [Privacy](#privacy)). |
+| **Local agent** (Claude Code, Codex), headless | The agent itself, in the repository folder | Nothing is built: the agent is started in the repository with **read-only tools** and reads what it needs. Claude Code gets `Read`, `Grep` and `Glob` and is refused `Bash`, `Edit`, `Write`, `NotebookEdit`, `WebFetch` and `WebSearch`, with no MCP server loaded (a project's own server could post); Codex runs in its read-only sandbox. The hosting credentials of your environment (`GH_TOKEN`, `GITHUB_TOKEN`, `GITLAB_TOKEN`, Jira, Linear, Azure DevOps and Bitbucket variables, `GIT_ASKPASS`, `SSH_AUTH_SOCK`) are removed from its environment, so even a misconfigured agent cannot publish or push. |
+
+An agent GitPoulpi has no confirmed read-only mode for (and any agent in the interactive terminal run mode) cannot be
+let in: the choice stays grayed with *This agent has no read-only mode GitPoulpi trusts.*
+
+**Caching and Refresh context.** What was gathered is reused so the next reply is quick and cheap:
+
+- The built context of an API profile is kept per repository for `ai.hosting_reply.context_ttl_minutes` (*Keep a
+  repository context for*, 30 by default). It is keyed by the repository, its `HEAD`, the selection and the limits,
+  and its parts are kept one by one, so the next issue of the same repository rebuilds only the parts it does not
+  share. In the window the caches live in memory (the last 8 contexts); the CLI keeps them in files in its private
+  state folder, so a second `ai hosting-reply --read-repo` reuses what the first built.
+- A new commit on the checked-out branch (`HEAD` moves), a change of the limits, or the time limit start over. So
+  does **Refresh context**, the button in the panel when the repository is read, or `--refresh-context` on the CLI. A line under the box says what the last draft did: *Context built: 5
+  parts, 31.2 KB, HEAD a1b2c3d*, *Context reused (4 of 5 parts, HEAD a1b2c3d)*, *Provider cache: 12k tokens reused*,
+  *The agent read the repository (HEAD a1b2c3d)*, *Agent session started* or *Agent session continued*.
+- **Anthropic prompt cache.** For an Anthropic profile the request is sent with the base prompt and instructions as
+  one cached block and the repository context as a second one, and your conversation, hint and draft after them, so
+  a second reply on the same context is read from the provider's cache and costs a fraction. The answer's cache
+  counters are what *Provider cache: N tokens reused* shows. OpenAI-compatible servers get the same stable order of
+  the request, which their automatic prefix caching benefits from; GitPoulpi sends nothing extra.
+- **The agent keeps its session.** With **Keep the agent's session between replies**
+  (`ai.hosting_reply.reuse_agent_session`, on by default) and *Let the AI read the repository* ticked, a local agent
+  that supports it (Claude Code today) is started with a session id, then resumed by it, so what it read of the
+  repository stays in its own history and the next reply starts faster. Other agents run one-shot. The session is per repository, `HEAD` and
+  action; a new commit or **Refresh context** begins a new one; with the option off, or the box unticked, each reply
+  is a one-shot run that keeps nothing. The session lives in the agent's own storage, GitPoulpi keeps only its id
+  (in memory in the window, in a user-only file for the CLI).
 
 ```
-gitpoulpi hosting ... --json > conversation.json          # a page: header and entries
 gitpoulpi ai hosting-reply --conversation conversation.json --hint "say I will look tomorrow"
 gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
+gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "is this our bug?"
 gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"
 ```
 
-`--conversation` takes a file, `-` for standard input, or the JSON itself. The conversation commands that
-print such a page come with the conversation CLI.
-
-**In the Markdown composer.** While AI is on, the composer of a review comment, the Finish review summary, the
-new-issue description and the pull request description has a **✦ Write with AI** button (`Alt+E`, the same key in every one of them) at the right
-end of its mode bar. It opens a panel under the bar:
-
-- a field for *what I want in this answer*, typed at the moment of use (`Enter` drafts), with a **Recent**
-  list of earlier instructions (click one, or `Up` / `Down` in the field);
-- *Improve my draft* (ticked when there is already a text: the AI starts from it);
-- *Let the AI read the repository*, **unticked** every time unless you turned its default on; disabled with its
-  reason when there is no local clone or the agent has no read-only mode (see above). Ticked, a **Refresh
-  context** button and a line say what the last draft read ("Context reused (4 of 5 parts, HEAD a1b2c3d)",
-  "Provider cache: 12k tokens reused", "Agent session continued"), and "What is sent" lists the context parts;
-- **Draft**, **Stop** (also `Esc`) and **Close**, and one line for progress or the error.
-
-The usual "What is sent" dialog shows the request first (`[ai.sent_preview] hosting_reply`, `issue_body`,
-`pull_request_description`). The draft replaces the text in one undo step and the composer switches to
-Preview so you read it before you send; `Ctrl+Z` gives your text back. The pull request description is written
-from the branch's commits and diff, and takes the same instruction. The AI never posts: the text goes out only
-through the form's own button.
+`--conversation` takes a file, `-` for standard input, or the JSON itself: a page with a `header` and `entries`, the
+shape GitPoulpi saves a conversation in. (The JSON `hosting issue comments` prints is the agent-oriented shape, with
+`item` and typed entries; it is not accepted here.) With `--read-repo`, `--pr-base REV
+--pr-head REV` put a pull request's diff in the context; the answer's `context` says which parts were read, whether
+they were reused, the provider's cache tokens and the agent session. The MCP tool `ai_hosting_reply` is the same
+command and is read-only.
 
 ## Where the key goes
 
@@ -527,10 +569,10 @@ room, lower them to keep requests small.
 | `review_context_file_bytes` | 8192 | One project context file of a review (`CLAUDE.md`, `AGENTS.md`, the extra file) |
 | `review_context_bytes` | 16384 | All the context files of a review together |
 | `hosting_reply_context_bytes` | 49152 | The item and conversation given to a drafted reply |
-| `hosting_reply_file_bytes` | 8192 | One repository file given to a drafted reply (reserved: the repository is not read yet) |
-| `hosting_reply_map_bytes` | 6144 | The repository map given to a drafted reply (reserved) |
-| `hosting_reply_hits_per_term` | 20 | Search hits kept per term (reserved; 1 to 200) |
-| `hosting_reply_terms` | 8 | Search terms looked up (reserved; 1 to 50) |
+| `hosting_reply_file_bytes` | 8192 | One repository file given to a drafted reply (when the AI reads the repository) |
+| `hosting_reply_map_bytes` | 6144 | The repository map given to a drafted reply |
+| `hosting_reply_hits_per_term` | 20 | Search hits kept per term (1 to 200) |
+| `hosting_reply_terms` | 8 | Search terms looked up (1 to 50) |
 
 **Nothing is cut silently.** When an input is over its limit the request waits
 and *Over the AI limit* lists what is over: which part (the diff, a file, the

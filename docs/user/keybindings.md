@@ -1503,7 +1503,7 @@ section. See [Hosting and issue trackers](hosting-integration.md#5-pull-requests
 
 | Key | Action |
 |---|---|
-| `Enter` | Open the selected row in the browser. On a `Reconnect` row: open Settings on that profile |
+| `Enter` | Open the selected row: an issue (and a request on Azure DevOps or Bitbucket) as a [conversation](hosting-integration.md#5c-conversations), a pull request in the [review](review.md) on the hosts that have one, anything else in the browser. On a `Reconnect` row: open Settings on that profile |
 | `Space` | Expand or collapse the section |
 | `v` | Open the section's filter. Pull requests: Open, Merged / closed, All. Issues: Open, Assigned to me, Closed, All |
 | `n` | Pull requests section: create a pull request. ISSUES section: new issue. (The header's `+` button) |
@@ -1511,7 +1511,7 @@ section. See [Hosting and issue trackers](hosting-integration.md#5-pull-requests
 | `Enter` on the search row | Type in the search field. `Enter`, `Tab` or `Esc` leaves it; `Ctrl+U` clears it |
 | `Enter` on a group header | Fold or unfold the group (*My Pull Requests*, *Assigned To Me*, *Awaiting My Review*, *All Pull Requests*) |
 | `Enter` on the filter, provider or repository row | Open that dropdown. The provider list ends with **None (unlink this repository)** |
-| `.`, or a right-click | The row's menu: open in browser, copy URL or number, check out the source branch (pull requests); create a branch from the issue (issues) |
+| `.`, or a right-click | The row's menu: open the conversation, open in browser, copy URL or number, check out the source branch (pull requests); create a branch from the issue (issues) |
 
 ### The issue board
 
@@ -1524,7 +1524,7 @@ below is also a palette command (**Board: ...**).
 | Arrows | Select a card (`Up`, `Down`) or the neighbouring column (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` jump in the column |
 | `Shift+Left`, `Shift+Right` | Move the selected card to the previous or next column |
 | `m` | **Move Card To...**: a dropdown of the columns |
-| `Enter` | Open the issue (the note, for a local issue; the host's page otherwise) |
+| `Enter` | Open the issue's [conversation](hosting-integration.md#5c-conversations) (the host's page where the host has none to read) |
 | `e`, `.` | Edit assignees, labels or milestone; the card menu |
 | `n` | New issue in the selected column |
 | `a`, `l`, `M`, `/` | Filter by assignee, label, milestone, text. `x` clears the filters |
@@ -1534,6 +1534,40 @@ below is also a palette command (**Board: ...**).
 
 Mouse: drag a card onto another column to move it, click a card to select it, double-click to open it, right-click for
 the card menu, wheel to scroll a column, `Shift`+wheel (or the bar under the board) to scroll the columns.
+
+### The Markdown composer and the conversation view
+
+Every box whose text goes to a host (a comment, a reply, a review summary, the description of a new issue or pull
+request) is the same composer. Its keys are in the `md_editor` table above and can be rebound.
+
+| Key | Action |
+|---|---|
+| `Alt+P` | Swap **Write** and **Preview** (from **Split** it goes to Preview) |
+| `Alt+L` | **Split** on, or back to Write (needs a window 100 columns wide) |
+| `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` | Send the text (the form's own button does the same) |
+| `Alt+E` | **Write with AI**: opens or closes the panel under the mode bar (AI on only) |
+| `Alt+R` | The commit composer only: insert an issue reference |
+| `Alt+W` | The new issue and pull request forms: create on the provider's own web page |
+| `Esc` | In the panel of **Write with AI**: stop a running draft, else close the panel |
+
+In the [conversation view](hosting-integration.md#5c-conversations) of an issue or a request (palette rows
+*Conversation: ...*; the rows with a key are in the palette list above):
+
+| Key | Action |
+|---|---|
+| `r` | Reply to the selected entry (into its thread, or with its text quoted on a host without threads) |
+| `Q` | Quote the selected entry in a new comment |
+| `c` | New comment |
+| `e`, `d` | Edit, delete one of your own comments |
+| `Alt+I` | In the comment box: **Internal note** (GitLab, Redmine) |
+| `l`, `y`, `o` | Links of the entry, copy its address, open it in the browser |
+| `n` | Next unread entry |
+| `v`, `m`, `F5` | Show or hide events, load older entries, refresh |
+| `Alt+Left`, `Backspace` | Back along the stack of items opened from references |
+| `Tab` | Timeline, comment box, header buttons |
+| `q`, `Esc` | Close |
+
+In the Radar, `i` opens the conversation of an issue row.
 
 ### Flow (branching workflows)
 

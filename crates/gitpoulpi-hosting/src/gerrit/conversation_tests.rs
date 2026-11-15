@@ -161,7 +161,10 @@ fn a_change_becomes_one_timeline_of_events_messages_votes_and_threads() {
     let TimelineEntry::Thread(thread) = &page.entries[2] else {
         panic!()
     };
-    assert_eq!((thread.path.as_str(), thread.line), ("src/main.rs", Some(3)));
+    assert_eq!(
+        (thread.path.as_str(), thread.line),
+        ("src/main.rs", Some(3))
+    );
     assert_eq!(thread.side, DiffSide::New);
     assert_eq!(thread.comments.len(), 2, "the draft reply is left out");
     assert!(thread.resolved && thread.resolvable);
@@ -182,13 +185,9 @@ fn a_change_becomes_one_timeline_of_events_messages_votes_and_threads() {
 #[test]
 fn events_can_be_left_out() {
     let t = fixture(messages());
-    let page = block_on(client(&t).item_timeline(
-        "sandbox",
-        &pr(),
-        None,
-        &TimelineOpts { events: false },
-    ))
-    .unwrap();
+    let page =
+        block_on(client(&t).item_timeline("sandbox", &pr(), None, &TimelineOpts { events: false }))
+            .unwrap();
     assert!(page
         .entries
         .iter()
@@ -274,7 +273,10 @@ fn a_reply_answers_the_thread_on_its_patch_set() {
         block_on(c.reply_in_discussion("sandbox", &pr(), "c2|2|0|n|3|src/main.rs", "Thanks"))
             .unwrap();
     assert_eq!(made.in_reply_to.as_deref(), Some("c2"));
-    assert_eq!(made.discussion_id.as_deref(), Some("c2|2|0|n|3|src/main.rs"));
+    assert_eq!(
+        made.discussion_id.as_deref(),
+        Some("c2|2|0|n|3|src/main.rs")
+    );
     let post = t
         .requests()
         .into_iter()

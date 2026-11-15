@@ -110,7 +110,10 @@ fn event_kind(row: &Value) -> Option<EventKind> {
         "reopen" => EventKind::Reopened,
         "merge_pull" => EventKind::Merged,
         "label" => {
-            let label = row["label"]["name"].as_str().unwrap_or_default().to_string();
+            let label = row["label"]["name"]
+                .as_str()
+                .unwrap_or_default()
+                .to_string();
             if body == "1" {
                 EventKind::Labeled {
                     added: vec![label],
@@ -160,7 +163,9 @@ fn event_kind(row: &Value) -> Option<EventKind> {
         }
         "issue_ref" | "pull_ref" | "comment_ref" => {
             let issue = &row["ref_issue"];
-            let repo = issue["repository"]["full_name"].as_str().unwrap_or_default();
+            let repo = issue["repository"]["full_name"]
+                .as_str()
+                .unwrap_or_default();
             let number = issue["number"].as_u64().unwrap_or_default();
             EventKind::CrossReferenced {
                 from: format!("{repo}#{number}"),

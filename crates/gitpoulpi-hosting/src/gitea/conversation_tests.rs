@@ -227,7 +227,10 @@ fn a_pull_request_adds_threads_and_reviews_and_skips_the_duplicates() {
     };
     assert_eq!(thread.id, "31|n|2|main.rs");
     assert_eq!(thread.side, DiffSide::New);
-    assert_eq!(thread.comments[0].discussion_id.as_deref(), Some(thread.id.as_str()));
+    assert_eq!(
+        thread.comments[0].discussion_id.as_deref(),
+        Some(thread.id.as_str())
+    );
     assert!(thread.resolvable);
     let TimelineEntry::Event(pushed) = &page.entries[0] else {
         panic!()
@@ -295,13 +298,9 @@ fn the_newest_window_is_read_first_and_older_pages_by_cursor() {
     }
     let t = Arc::new(transport.on("issues/3", 200, ISSUE));
     let c = client(&t);
-    let first = block_on(c.item_timeline(
-        PROJECT,
-        &ItemKey::issue(3),
-        None,
-        &TimelineOpts::default(),
-    ))
-    .unwrap();
+    let first =
+        block_on(c.item_timeline(PROJECT, &ItemKey::issue(3), None, &TimelineOpts::default()))
+            .unwrap();
     assert_eq!(first.entries.len(), 300);
     let TimelineEntry::Comment(oldest) = &first.entries[0] else {
         panic!()
@@ -399,8 +398,7 @@ fn editing_patches_and_deleting_deletes_the_comment() {
         "created_at":"2026-10-03T10:00:00Z","updated_at":"2026-10-03T11:00:00Z"}"#;
     let t = Arc::new(RecordedTransport::new().on("issues/comments/88", 200, edited));
     let c = client(&t);
-    let made =
-        block_on(c.edit_item_comment(PROJECT, &ItemKey::issue(7), "88", "Updated")).unwrap();
+    let made = block_on(c.edit_item_comment(PROJECT, &ItemKey::issue(7), "88", "Updated")).unwrap();
     assert!(made.edited);
     block_on(c.delete_item_comment(PROJECT, &ItemKey::pull_request(3), "88")).unwrap();
     let sent = t.requests();

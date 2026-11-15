@@ -14,8 +14,6 @@
 //! conversation.
 
 pub mod caps;
-pub mod identity;
-pub mod model;
 #[cfg(any(
     feature = "github",
     feature = "gitlab",
@@ -25,6 +23,8 @@ pub mod model;
     feature = "gerrit"
 ))]
 pub(crate) mod compat;
+pub mod identity;
+pub mod model;
 #[cfg(any(
     feature = "github",
     feature = "gitlab",

@@ -259,10 +259,10 @@ impl BitbucketDcClient {
             labels: Vec::new(),
         };
         let mut start: u64 = match older {
-            Some(c) => c
-                .0
-                .parse()
-                .map_err(|_| invalid("reading a conversation", "bad page cursor"))?,
+            Some(c) => {
+                c.0.parse()
+                    .map_err(|_| invalid("reading a conversation", "bad page cursor"))?
+            }
             None => 0,
         };
         let mut entries = Vec::new();
@@ -404,7 +404,10 @@ impl BitbucketDcClient {
         let url = self.conv_pr_url(
             project,
             key,
-            &format!("/comments/{}?version={version}", encode_component(comment_id)),
+            &format!(
+                "/comments/{}?version={version}",
+                encode_component(comment_id)
+            ),
         )?;
         let response = self
             .transport

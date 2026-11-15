@@ -8,8 +8,8 @@ use super::dc::BitbucketDcClient;
 use super::BitbucketClient;
 use crate::client::HostingClient;
 use crate::conversation::{
-    ActorKind, EventKind, IdentityKind, ItemKey, ItemKind, MarkupFlavor, PageCursor,
-    TimelineEntry, TimelineOpts, TokenSource,
+    ActorKind, EventKind, IdentityKind, ItemKey, ItemKind, MarkupFlavor, PageCursor, TimelineEntry,
+    TimelineOpts, TokenSource,
 };
 use crate::http::{HttpRequest, Method, RecordedTransport};
 use crate::integration::{Integration, IntegrationKind};
@@ -85,8 +85,9 @@ fn a_cloud_pull_request_maps_comments_threads_replies_and_activity() {
             .on("pullrequests/12/comments", 200, CLOUD_COMMENTS)
             .on("pullrequests/12", 200, CLOUD_PR),
     );
-    let page = block_on(cloud(&t).item_timeline("ws/repo", &pr(12), None, &TimelineOpts::default()))
-        .unwrap();
+    let page =
+        block_on(cloud(&t).item_timeline("ws/repo", &pr(12), None, &TimelineOpts::default()))
+            .unwrap();
     let h = &page.header;
     assert_eq!(h.reference, "#12");
     assert_eq!(h.state_label, "merged");
@@ -174,8 +175,9 @@ fn a_cloud_activity_that_cannot_be_read_does_not_fail_the_timeline() {
             .on("pullrequests/12/comments", 200, CLOUD_COMMENTS)
             .on("pullrequests/12", 200, CLOUD_PR),
     );
-    let page = block_on(cloud(&t).item_timeline("ws/repo", &pr(12), None, &TimelineOpts::default()))
-        .unwrap();
+    let page =
+        block_on(cloud(&t).item_timeline("ws/repo", &pr(12), None, &TimelineOpts::default()))
+            .unwrap();
     assert_eq!(page.entries.len(), 3);
 }
 
@@ -230,15 +232,30 @@ fn cloud_post_reply_edit_delete_send_exactly_these_requests() {
     block_on(c.delete_item_comment("ws/repo", &pr(12), "20")).unwrap();
     let sent = t.requests();
     assert_eq!(sent.len(), 4);
-    assert_eq!((sent[0].method, sent[0].url.as_str()), (Method::Post, &*format!("{CLOUD}/12/comments")));
-    assert_eq!(body_of(&sent[0]), serde_json::json!({"content":{"raw":"hi"}}));
+    assert_eq!(
+        (sent[0].method, sent[0].url.as_str()),
+        (Method::Post, &*format!("{CLOUD}/12/comments"))
+    );
+    assert_eq!(
+        body_of(&sent[0]),
+        serde_json::json!({"content":{"raw":"hi"}})
+    );
     assert_eq!(
         body_of(&sent[1]),
         serde_json::json!({"content":{"raw":"yes"},"parent":{"id":13}})
     );
-    assert_eq!((sent[2].method, sent[2].url.as_str()), (Method::Put, &*format!("{CLOUD}/12/comments/21")));
-    assert_eq!(body_of(&sent[2]), serde_json::json!({"content":{"raw":"yes!"}}));
-    assert_eq!((sent[3].method, sent[3].url.as_str()), (Method::Delete, &*format!("{CLOUD}/12/comments/20")));
+    assert_eq!(
+        (sent[2].method, sent[2].url.as_str()),
+        (Method::Put, &*format!("{CLOUD}/12/comments/21"))
+    );
+    assert_eq!(
+        body_of(&sent[2]),
+        serde_json::json!({"content":{"raw":"yes!"}})
+    );
+    assert_eq!(
+        (sent[3].method, sent[3].url.as_str()),
+        (Method::Delete, &*format!("{CLOUD}/12/comments/20"))
+    );
     assert_eq!(sent[3].body, None);
 }
 
@@ -350,7 +367,10 @@ fn a_dc_pull_request_maps_threads_replies_events_and_approvals() {
         panic!()
     };
     assert_eq!(thread.id, "31");
-    assert_eq!((thread.path.as_str(), thread.line), ("src/net.rs", Some(17)));
+    assert_eq!(
+        (thread.path.as_str(), thread.line),
+        ("src/net.rs", Some(17))
+    );
     assert_eq!(thread.side, DiffSide::New);
     assert!(!thread.resolved && thread.resolvable);
     assert_eq!(thread.comments.len(), 2);
@@ -425,7 +445,10 @@ fn dc_post_reply_edit_delete_send_exactly_these_requests() {
     );
     let c = dc(&t);
     let a = block_on(c.post_item_comment("K/r", &pr(5), "hi", false)).unwrap();
-    assert_eq!((a.id.as_str(), a.discussion_id.as_deref()), ("40", Some("40")));
+    assert_eq!(
+        (a.id.as_str(), a.discussion_id.as_deref()),
+        ("40", Some("40"))
+    );
     let b = block_on(c.reply_in_discussion("K/r", &pr(5), "31", "yes")).unwrap();
     assert_eq!(b.discussion_id.as_deref(), Some("31"));
     block_on(c.edit_item_comment("K/r", &pr(5), "40", "hi!")).unwrap();
@@ -446,7 +469,10 @@ fn dc_post_reply_edit_delete_send_exactly_these_requests() {
         serde_json::json!({"text":"hi!","version":3})
     );
     assert_eq!(line(4), (Method::Get, format!("{DC}/5/comments/40")));
-    assert_eq!(line(5), (Method::Delete, format!("{DC}/5/comments/40?version=3")));
+    assert_eq!(
+        line(5),
+        (Method::Delete, format!("{DC}/5/comments/40?version=3"))
+    );
 }
 
 #[test]

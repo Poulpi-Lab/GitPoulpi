@@ -79,7 +79,11 @@ fn comment_of(c: &Value, discussion: Option<String>) -> Comment {
     let parent = c["parent"]["id"].as_u64().map(|p| p.to_string());
     let id = c["id"].as_u64().unwrap_or_default().to_string();
     Comment {
-        discussion_id: Some(discussion.or_else(|| parent.clone()).unwrap_or_else(|| id.clone())),
+        discussion_id: Some(
+            discussion
+                .or_else(|| parent.clone())
+                .unwrap_or_else(|| id.clone()),
+        ),
         in_reply_to: parent,
         id,
         author: actor_of(c.get("user")),
@@ -231,7 +235,10 @@ impl BitbucketClient {
         let mut hint: Option<u32> = None;
         for page in 0..PAGES_PER_WINDOW {
             let body = self
-                .conv_get(url.clone(), "reading the comments of a Bitbucket pull request")
+                .conv_get(
+                    url.clone(),
+                    "reading the comments of a Bitbucket pull request",
+                )
                 .await?;
             if page == 0 && older.is_none() {
                 hint = body["size"].as_u64().map(|s| s as u32);
@@ -239,7 +246,9 @@ impl BitbucketClient {
             raw.extend(body["values"].as_array().cloned().unwrap_or_default());
             next = opt_text(&body, "next");
             match &next {
-                Some(n) if page + 1 < PAGES_PER_WINDOW => url = self.conv_cursor(&PageCursor(n.clone()))?,
+                Some(n) if page + 1 < PAGES_PER_WINDOW => {
+                    url = self.conv_cursor(&PageCursor(n.clone()))?
+                }
                 _ => break,
             }
         }
@@ -361,7 +370,10 @@ impl BitbucketClient {
             key,
             &format!("/comments/{}", encode_component(comment_id)),
         )?;
-        let response = self.transport.send(self.authed(HttpRequest::delete(url))).await?;
+        let response = self
+            .transport
+            .send(self.authed(HttpRequest::delete(url)))
+            .await?;
         response.error_for_status("deleting a Bitbucket comment")
     }
 
@@ -376,7 +388,9 @@ impl BitbucketClient {
             .await?;
         let login = login_of(&account);
         if login.is_empty() {
-            return Err(Error::Decode("no nickname in the Bitbucket user".to_string()));
+            return Err(Error::Decode(
+                "no nickname in the Bitbucket user".to_string(),
+            ));
         }
         Ok(PostingIdentity::new(
             Some(login),

@@ -14,6 +14,10 @@ use crate::client::{
     encode_component as enc, CreatedIssue, CreatedPullRequest, HostingClient, NewIssue,
     NewPullRequest, MAX_PAGES, PAGE_SIZE,
 };
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
+    TimelinePage,
+};
 use crate::http::{HttpRequest, HttpResponse, HttpTransport};
 use crate::integration::Integration;
 use crate::model::{
@@ -31,6 +35,7 @@ const WORK_ITEM_BATCH: usize = 200;
 const DEFAULT_TYPES: [&str; 5] = ["Issue", "Task", "Bug", "User Story", "Product Backlog Item"];
 
 mod account;
+mod conversation;
 mod protection;
 
 pub struct AzureDevopsClient {
@@ -39,6 +44,7 @@ pub struct AzureDevopsClient {
     transport: Arc<dyn HttpTransport>,
     /// `Project/Repo` to repository id (the PR endpoints want an id).
     repo_ids: Mutex<HashMap<String, String>>,
+    pub(crate) scopes: crate::scope_handle::ScopeHandle,
 }
 
 impl AzureDevopsClient {
@@ -52,6 +58,7 @@ impl AzureDevopsClient {
             token,
             transport,
             repo_ids: Mutex::new(HashMap::new()),
+            scopes: Default::default(),
         }
     }
 
@@ -684,5 +691,62 @@ impl HostingClient for AzureDevopsClient {
             default_type,
             default_list: None,
         })
+    }
+
+    fn conversation_caps(&self, kind: ItemKind) -> ConversationCaps {
+        ConversationCaps::azure_devops(kind, self.is_server())
+    }
+
+    async fn posting_identity(&self, project: &str) -> Result<PostingIdentity> {
+        self.conv_identity(project).await
+    }
+
+    async fn item_timeline(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        older: Option<&PageCursor>,
+        opts: &TimelineOpts,
+    ) -> Result<TimelinePage> {
+        self.conv_timeline(project, key, older, opts).await
+    }
+
+    async fn post_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> Result<Comment> {
+        self.conv_post(project, key, body, internal).await
+    }
+
+    async fn reply_in_discussion(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        discussion_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_reply(project, key, discussion_id, body).await
+    }
+
+    async fn edit_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_edit(project, key, comment_id, body).await
+    }
+
+    async fn delete_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+    ) -> Result<()> {
+        self.conv_delete(project, key, comment_id).await
     }
 }

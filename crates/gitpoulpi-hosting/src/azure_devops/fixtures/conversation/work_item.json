@@ -1,0 +1,1 @@
+{"id":42,"fields":{"System.Title":"Crash on empty config","System.State":"Active","System.CreatedBy":{"displayName":"Ann A","uniqueName":"ann@acme.test"},"System.CreatedDate":"2026-10-01T09:00:00Z","System.Description":"<div>The app <b>crashes</b> when the config is empty.</div><ul><li>one</li></ul>","System.Tags":"bug; triage","System.TeamProject":"Proj"}}

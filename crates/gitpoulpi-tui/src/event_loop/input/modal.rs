@@ -14,11 +14,20 @@ pub(super) fn copy_mermaid_outcome(
     cx: &mut CommandCtx<'_>,
     outcome: crate::mermaid_popup::Outcome,
 ) {
-    if let crate::mermaid_popup::Outcome::Copy(text) = outcome {
-        *cx.last_message = Some(
-            cx.clipboard
-                .copy(gitpoulpi_i18n::msg::mermaid::COPIED_WHAT.get(), &text),
-        );
+    match outcome {
+        crate::mermaid_popup::Outcome::Copy(text) => {
+            *cx.last_message = Some(
+                cx.clipboard
+                    .copy(gitpoulpi_i18n::msg::mermaid::COPIED_WHAT.get(), &text),
+            );
+        }
+        crate::mermaid_popup::Outcome::CopyDiagram(text) => {
+            *cx.last_message = Some(cx.clipboard.copy(
+                gitpoulpi_i18n::msg::mermaid::DIAGRAM_COPIED_WHAT.get(),
+                &text,
+            ));
+        }
+        crate::mermaid_popup::Outcome::None => {}
     }
 }
 

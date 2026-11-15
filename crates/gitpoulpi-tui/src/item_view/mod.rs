@@ -77,6 +77,7 @@ impl ItemTarget {
                 repo_links: self.bases.clone(),
                 ..Default::default()
             },
+            diagrams: crate::build_features::MERMAID,
         }
     }
 
@@ -180,6 +181,8 @@ pub(crate) enum ItemEffect {
     OpenUrl(String),
     /// Leave the view and put the Log on this commit (an abbreviated id).
     ShowCommit(String),
+    /// Open the diagram viewer on this Mermaid script.
+    OpenDiagram(String),
 }
 
 /// Where the keyboard is.
@@ -369,6 +372,11 @@ impl ItemView {
             has_older: self.conv.older.is_some(),
             has_unread: self.conv.has_unread(),
             has_links: self.conv.selected().is_some_and(|i| !i.links.is_empty()),
+            has_diagram: self
+                .conv
+                .selected_links()
+                .iter()
+                .any(|l| l.diagram.is_some()),
             has_url: self.conv.selected_url().is_some(),
             reply: self.conv.reply_reason(),
             edit,

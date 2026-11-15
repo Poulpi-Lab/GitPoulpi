@@ -185,7 +185,7 @@ fn gitlab(request: &Request, rest: &str, port: u16) -> Reply {
             "author": {"username": "ines"},
             "web_url": format!("http://127.0.0.1:{port}/{path}/-/issues/{GITLAB_ISSUE}"),
             "created_at": "2026-10-10T09:00:00Z",
-            "description": "Starts with `planets()` returning nothing.", "labels": ["bug"],
+            "description": issue_description(&path), "labels": ["bug"],
         })),
         ("GET", "discussions") => ok(json!([
             {"id": "d_issue1", "individual_note": false, "notes": [
@@ -207,6 +207,18 @@ fn gitlab(request: &Request, rest: &str, port: u16) -> Reply {
         ("DELETE", e) if e.starts_with("notes/") => no_content(),
         _ => None,
     }
+}
+
+/// The issue's text: the account-wide Radar row of `northwind/ledger-ui`
+/// carries a Mermaid diagram, the other projects do not.
+fn issue_description(project: &str) -> String {
+    let mut text = String::from("Starts with `planets()` returning nothing.");
+    if project == "northwind/ledger-ui" {
+        text.push_str(
+            "\n\n```mermaid\ngraph TD\n  Export[Export job] --> Ledger[Ledger table]\n```\n",
+        );
+    }
+    text
 }
 
 fn azure(request: &Request, path: &str) -> Reply {

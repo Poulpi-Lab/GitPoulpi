@@ -44,7 +44,12 @@ pub(super) fn link_label(link: &LinkTarget) -> String {
         Some(XrefTarget::Mention { login, .. }) => {
             format!("@{}", crate::md_render::sanitize(login))
         }
-        _ => crate::md_render::sanitize(&link.url),
+        _ => match &link.diagram {
+            Some(source) => m::link_diagram(crate::md_render::sanitize(
+                source.lines().next().unwrap_or("").trim(),
+            )),
+            None => crate::md_render::sanitize(&link.url),
+        },
     }
 }
 
@@ -122,6 +127,9 @@ impl ItemView {
 
     /// A link was activated (a click, Enter, a menu row).
     pub(super) fn activate_link(&mut self, link: &LinkTarget) -> ItemEffect {
+        if let Some(source) = &link.diagram {
+            return ItemEffect::OpenDiagram(source.clone());
+        }
         match &link.xref {
             Some(XrefTarget::InApp(x)) => {
                 if let Some(target) = self.resolve(x) {
@@ -163,6 +171,26 @@ impl ItemView {
         if links.is_empty() {
             return ItemEffect::Message(m::WHY_NO_LINKS.get().to_string());
         }
+        self.show_links(links)
+    }
+
+    /// The palette's "Open Diagram": the entry's only diagram opens at once,
+    /// several are chosen from the menu.
+    pub(super) fn open_diagram_menu(&mut self) -> ItemEffect {
+        let mut diagrams: Vec<LinkTarget> = self
+            .conv
+            .selected_links()
+            .into_iter()
+            .filter(|l| l.diagram.is_some())
+            .collect();
+        match diagrams.len() {
+            0 => ItemEffect::Message(m::WHY_NO_DIAGRAM.get().to_string()),
+            1 => self.activate_link(&diagrams.remove(0)),
+            _ => self.show_links(diagrams),
+        }
+    }
+
+    fn show_links(&mut self, links: Vec<LinkTarget>) -> ItemEffect {
         let mut combo = Combo::new("").with_click_picks();
         combo.set_options(
             links

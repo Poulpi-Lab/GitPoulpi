@@ -11,7 +11,9 @@ mod vocab;
 use crossterm::event::{KeyEvent, MouseEvent};
 use ratatui::layout::Rect;
 
-pub(crate) use vocab::{Act, ColumnCmd, Outcome, RadarCommand, ReviewRequest, Spot};
+pub(crate) use vocab::{
+    Act, ColumnCmd, ConversationRequest, Outcome, RadarCommand, ReviewRequest, Spot,
+};
 
 /// Never open in this build.
 #[derive(Debug, Clone, Default)]
@@ -104,6 +106,24 @@ impl RadarSlot {
     }
 
     pub(crate) fn run_review(&mut self, _cmd: crate::review_cmd::ReviewCmd) -> Outcome {
+        Outcome::None
+    }
+
+    pub(crate) fn hosts_item(&self) -> bool {
+        false
+    }
+
+    pub(crate) fn host_item(&mut self, _view: Box<crate::item_view::ItemView>) {}
+
+    pub(crate) fn item_takes_palette(&self) -> bool {
+        false
+    }
+
+    pub(crate) fn item_avail(&self) -> Option<crate::item_cmd::ItemAvail> {
+        None
+    }
+
+    pub(crate) fn run_item(&mut self, _cmd: crate::item_cmd::ItemCmd) -> Outcome {
         Outcome::None
     }
 

@@ -42,6 +42,9 @@ pub(crate) type LinkId = usize;
 pub(crate) struct LinkTarget {
     pub(crate) url: String,
     pub(crate) xref: Option<gitpoulpi_hosting::xrefs::XrefTarget>,
+    /// The source of a ```mermaid block this "link" opens in the diagram
+    /// viewer (the "Open diagram" button); `url` is empty then.
+    pub(crate) diagram: Option<String>,
 }
 
 /// How a run of text is drawn.
@@ -62,6 +65,8 @@ pub(crate) enum Look {
     Marker,
     /// Task marks, rules, table borders, footnote labels.
     Dim,
+    /// A real button of the text (the "Open diagram" under a mermaid block).
+    Button,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -116,6 +121,9 @@ pub(crate) struct Doc {
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub(crate) struct Context {
     pub(crate) xrefs: gitpoulpi_hosting::xrefs::XrefContext,
+    /// The caller can open a diagram: a mermaid block gets its "Open
+    /// diagram" button (only in a build with the `mermaid` feature).
+    pub(crate) diagrams: bool,
 }
 
 /// Longest code block shown, and longest total code per document.
@@ -168,6 +176,10 @@ pub(crate) fn look_style(look: Look, base: Style) -> Style {
         Look::Quote => base.fg(t.ui.muted).add_modifier(Modifier::ITALIC),
         Look::Marker => base.fg(t.ui.accent),
         Look::Dim => base.fg(t.ui.muted),
+        Look::Button => base
+            .fg(t.ui.on_accent)
+            .bg(t.ui.accent)
+            .add_modifier(Modifier::BOLD),
     }
 }
 

@@ -12,8 +12,8 @@ use pulldown_cmark::{
 
 use super::layout::{atoms, wrap, Atom, LineBuf, Prefix};
 use super::{
-    code, is_banned, links, Context, Doc, LineKind, LinkId, Look, MdLine, Span, CODE_BLOCK_LINES,
-    CODE_DOC_LINES,
+    code, is_banned, links, Context, Doc, LineKind, LinkId, LinkTarget, Look, MdLine, Span,
+    CODE_BLOCK_LINES, CODE_DOC_LINES,
 };
 use crate::cell_text::cells;
 
@@ -707,6 +707,19 @@ impl Builder<'_> {
         if hidden > 0 {
             let more = atoms(&format!("\u{2026} +{hidden}"), Look::Dim, None);
             self.emit(&more);
+        }
+        if cb.lang.eq_ignore_ascii_case("mermaid")
+            && self.ctx.diagrams
+            && crate::build_features::MERMAID
+        {
+            self.doc.links.push(LinkTarget {
+                url: String::new(),
+                xref: None,
+                diagram: Some(text.to_string()),
+            });
+            let id = self.doc.links.len() - 1;
+            let label = format!("[ {} ]", gitpoulpi_i18n::msg::item_view::OPEN_DIAGRAM.get());
+            self.emit(&atoms(&label, Look::Button, Some(id)));
         }
     }
 

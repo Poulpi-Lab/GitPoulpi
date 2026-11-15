@@ -775,6 +775,8 @@ fn keys_step_over_the_blank_line_and_the_mouse_ignores_it() {
 
 mod account;
 mod columns;
+#[cfg(feature = "conversation")]
+mod conversation;
 mod resize;
 #[cfg(feature = "review")]
 mod review;

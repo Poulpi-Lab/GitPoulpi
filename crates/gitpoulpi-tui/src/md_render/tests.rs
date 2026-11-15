@@ -498,6 +498,7 @@ fn host_context() -> Context {
             project: "o/r".into(),
             ..Default::default()
         },
+        ..Default::default()
     }
 }
 
@@ -559,6 +560,7 @@ fn merge_requests_are_linked_with_a_bang() {
             project: "g/p".into(),
             ..Default::default()
         },
+        ..Default::default()
     };
     let d = render("merged by !7", 80, &ctx);
     assert_eq!(d.links.len(), 1, "{:?}", d.links);
@@ -567,4 +569,47 @@ fn merge_requests_are_linked_with_a_bang() {
         "{:?}",
         d.links
     );
+}
+
+const DIAGRAM: &str = "before\n\n```mermaid\ngraph TD\n  A --> B\n```\n\nafter";
+
+fn diagram_context() -> Context {
+    Context {
+        diagrams: true,
+        ..Default::default()
+    }
+}
+
+#[cfg(feature = "mermaid")]
+#[test]
+fn a_mermaid_block_gets_an_open_diagram_button_that_carries_its_script() {
+    let d = render(DIAGRAM, 60, &diagram_context());
+    let lines: Vec<String> = d.lines.iter().map(MdLine::text).collect();
+    let button = lines
+        .iter()
+        .position(|l| l.contains("[ Open diagram ]"))
+        .unwrap_or_else(|| panic!("a button: {lines:?}"));
+    let code = lines.iter().position(|l| l.contains("A --> B")).unwrap();
+    assert!(button > code, "under the block: {lines:?}");
+    assert!(lines[button + 1..].iter().any(|l| l == "after"));
+    let diagrams: Vec<&str> = d
+        .links
+        .iter()
+        .filter_map(|l| l.diagram.as_deref())
+        .collect();
+    assert_eq!(diagrams, ["graph TD\n  A --> B"]);
+    // The button is a link span with a hit rect.
+    let (_, hits) = paint_doc(&d, 60);
+    assert!(hits.iter().any(|(_, id)| d.links[*id].diagram.is_some()));
+}
+
+#[test]
+fn other_blocks_and_callers_that_cannot_open_a_diagram_get_no_button() {
+    // The caller did not ask (the composer's preview).
+    let d = render(DIAGRAM, 60, &Context::default());
+    assert!(d.lines.iter().all(|l| !l.text().contains("Open diagram")));
+    assert!(d.links.iter().all(|l| l.diagram.is_none()));
+    // Not a mermaid block.
+    let d = render("```rust\nlet a = 1;\n```", 60, &diagram_context());
+    assert!(d.links.is_empty());
 }

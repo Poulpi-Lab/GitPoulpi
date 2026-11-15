@@ -302,12 +302,22 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             let _ = cmd;
         }
         PaletteCommand::Item(cmd) => {
-            #[cfg(feature = "hosting")]
-            if let Some(effect) = cx.repo_dialogs.run_item(cmd) {
-                super::super::menu_actions::apply_effect(cx, effect);
+            // The conversation hosted over the Radar answers before the
+            // dialogs do.
+            if cx.management.as_ref().is_some_and(|m| m.radar.hosts_item()) {
+                let outcome = cx
+                    .management
+                    .as_mut()
+                    .map_or(crate::radar::Outcome::None, |m| m.radar.run_item(cmd));
+                apply_radar_outcome(cx, outcome);
+            } else {
+                #[cfg(feature = "hosting")]
+                if let Some(effect) = cx.repo_dialogs.run_item(cmd) {
+                    super::super::menu_actions::apply_effect(cx, effect);
+                }
+                #[cfg(not(feature = "hosting"))]
+                let _ = cmd;
             }
-            #[cfg(not(feature = "hosting"))]
-            let _ = cmd;
         }
         // The window opens the dialog, menu or page at its next notice pass
         // (it owns the seed's data: refs, tags, issues).

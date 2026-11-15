@@ -77,7 +77,13 @@ pub(crate) enum Outcome {
     None,
     /// Put this text on the clipboard; the popup has closed.
     Copy(String),
+    /// The same for a diagram of a conversation (the viewer of
+    /// [`open_script`]).
+    CopyDiagram(String),
 }
+
+mod view;
+pub(crate) use view::open_script;
 
 #[derive(Default)]
 struct Rects {
@@ -339,7 +345,7 @@ pub(crate) fn open(
 }
 
 pub(crate) fn is_open() -> bool {
-    POPUP.lock().is_ok_and(|p| p.is_some())
+    view::is_open() || POPUP.lock().is_ok_and(|p| p.is_some())
 }
 
 fn close(slot: &mut Option<Open>) {
@@ -355,6 +361,9 @@ fn copy_out(slot: &mut Option<Open>) -> Outcome {
 
 /// A key while the popup is open (it swallows them all).
 pub(crate) fn on_key(key: KeyEvent, config_path: &Option<PathBuf>) -> Outcome {
+    if view::is_open() {
+        return view::on_key(key);
+    }
     let Ok(mut slot) = POPUP.lock() else {
         return Outcome::None;
     };
@@ -411,6 +420,9 @@ pub(crate) fn on_key(key: KeyEvent, config_path: &Option<PathBuf>) -> Outcome {
 
 /// A mouse event while the popup is open (it swallows them all).
 pub(crate) fn on_mouse(mouse: MouseEvent, config_path: &Option<PathBuf>) -> Outcome {
+    if view::is_open() {
+        return view::on_mouse(mouse);
+    }
     let Ok(mut slot) = POPUP.lock() else {
         return Outcome::None;
     };
@@ -522,6 +534,9 @@ const WIN: dialog_kit::Win = dialog_kit::Win::resizable("mermaid", 60, 16);
 
 /// Paints the popup, last, over the panes.
 pub(crate) fn render(frame: &mut Frame) {
+    if view::is_open() {
+        return view::render(frame);
+    }
     let Ok(mut slot) = POPUP.lock() else {
         return;
     };

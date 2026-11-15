@@ -19,6 +19,8 @@ pub(crate) struct ItemAvail {
     pub(crate) has_unread: bool,
     /// The selected entry holds links.
     pub(crate) has_links: bool,
+    /// The selected entry holds a Mermaid diagram.
+    pub(crate) has_diagram: bool,
     /// The selected entry has a page on the host.
     pub(crate) has_url: bool,
     /// Why a reply to the selected entry is not offered (`None`: it is).
@@ -48,6 +50,8 @@ pub(crate) enum ItemCmd {
     Reply,
     NewComment,
     Links,
+    /// Open the Mermaid diagram of the selected entry.
+    OpenDiagram,
     CopyLink,
     OpenBrowser,
     Edit,
@@ -85,6 +89,7 @@ impl ItemCmd {
                 }
             }
             Self::Links => (!a.has_links).then_some(msg::WHY_NO_LINKS.get()),
+            Self::OpenDiagram => (!a.has_diagram).then_some(msg::WHY_NO_DIAGRAM.get()),
             Self::CopyLink => (!a.has_url).then_some(msg::WHY_NO_URL.get()),
             Self::Edit => a.edit,
             Self::Delete => a.delete,

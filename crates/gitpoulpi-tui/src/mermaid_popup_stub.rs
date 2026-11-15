@@ -14,6 +14,7 @@ use ratatui::Frame;
 pub(crate) enum Outcome {
     None,
     Copy(String),
+    CopyDiagram(String),
 }
 
 pub(crate) fn open(
@@ -24,6 +25,8 @@ pub(crate) fn open(
 ) -> Result<(), String> {
     Err("Mermaid is not built into this binary".to_string()) // i18n-english
 }
+
+pub(crate) fn open_script(_text: &str) {}
 
 pub(crate) fn is_open() -> bool {
     false

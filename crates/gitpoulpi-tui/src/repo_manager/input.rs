@@ -67,6 +67,9 @@ pub fn passes_through(manager: &RepoManager, key: &KeyEvent) -> bool {
     if manager.radar.hosts_review() {
         return km.is(Action::GlobalPalette, key) && manager.radar.review_takes_palette();
     }
+    if manager.radar.hosts_item() {
+        return km.is(Action::GlobalPalette, key) && manager.radar.item_takes_palette();
+    }
     if km.is(Action::GlobalPalette, key)
         || km.is(Action::GlobalSettings, key)
         || km.is(Action::GlobalWorkspaceSearch, key)

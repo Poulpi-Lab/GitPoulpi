@@ -23,6 +23,7 @@ mod account_fs;
 mod account_ui;
 mod columns;
 mod input;
+mod item_host;
 mod labels;
 mod model;
 pub(crate) mod pending;
@@ -57,7 +58,9 @@ use labels::{
 use model::{Board, BoardInput, Group, Heading, Item, ItemKind, Row, View, Who, WipFacts};
 use pending::Pending;
 use scope::{ScopeChoice, ScopeRepo, BROWSE_FOLDER, CLONE_FOLDER, OPEN_TABS};
-pub(crate) use vocab::{Act, ColumnCmd, Outcome, RadarCommand, ReviewRequest, SizedColumn, Spot};
+pub(crate) use vocab::{
+    Act, ColumnCmd, ConversationRequest, Outcome, RadarCommand, ReviewRequest, SizedColumn, Spot,
+};
 use worker::{FsPrepare, Msg, RadarWorker, RepoAnswer, Setup};
 
 /// Where a click landed. Row indices index the view's rows.
@@ -258,7 +261,11 @@ impl RadarSlot {
 
     /// When the loop must wake to show a tooltip whose dwell is running.
     pub(crate) fn next_deadline(&self) -> Option<Instant> {
-        self.0.as_ref().and_then(|ui| ui.tooltip_due())
+        let ui = self.0.as_ref()?;
+        match (ui.tooltip_due(), ui.item_deadline()) {
+            (Some(a), Some(b)) => Some(a.min(b)),
+            (a, b) => a.or(b),
+        }
     }
 
     /// Drains the workers; true when something on screen changed.
@@ -298,9 +305,35 @@ impl RadarSlot {
         self.get().map_or(Outcome::None, |ui| ui.run_review(cmd))
     }
 
+    /// Whether a conversation is showing over the Radar.
+    pub(crate) fn hosts_item(&self) -> bool {
+        self.peek().is_some_and(RadarUi::hosts_item)
+    }
+
+    /// Hands the Radar the conversation the event loop built.
+    pub(crate) fn host_item(&mut self, view: Box<crate::item_view::ItemView>) {
+        if let Some(ui) = self.get() {
+            ui.host_item(view);
+        }
+    }
+
+    pub(crate) fn item_takes_palette(&self) -> bool {
+        self.peek().is_some_and(RadarUi::item_takes_palette)
+    }
+
+    /// What the palette needs to gray a conversation command out.
+    pub(crate) fn item_avail(&self) -> Option<crate::item_cmd::ItemAvail> {
+        self.peek().and_then(RadarUi::item_avail)
+    }
+
+    pub(crate) fn run_item(&mut self, cmd: crate::item_cmd::ItemCmd) -> Outcome {
+        self.get().map_or(Outcome::None, |ui| ui.run_item(cmd))
+    }
+
     pub(crate) fn paste(&mut self, text: &str) {
         if let Some(ui) = self.get() {
             ui.api_paste(text);
+            ui.item_paste(text);
         }
     }
 }
@@ -394,6 +427,9 @@ pub(crate) struct RadarUi {
     asking: Option<review_flow::Asking>,
     /// The review through the API, hosted over the Radar (`review_flow`).
     api_review: Option<Box<crate::review_view::ReviewView>>,
+    /// The conversation of a not-cloned item, hosted over the Radar
+    /// (`item_host`).
+    api_item: Option<Box<crate::item_view::ItemView>>,
     /// A line the hosted review said while polling, for the status line.
     said: Option<String>,
 }
@@ -494,6 +530,7 @@ impl RadarUi {
             mode_hint: None,
             asking: None,
             api_review: None,
+            api_item: None,
             said: None,
         };
         ui.fill_combos();
@@ -574,7 +611,7 @@ impl RadarUi {
     /// The worker's answers, the probe's facts, and a snooze that ended by
     /// the clock. True when something on screen changed.
     pub(crate) fn poll(&mut self) -> bool {
-        let mut changed = self.api_poll();
+        let mut changed = self.api_poll() | self.item_poll();
         if let Some(Ok((scope, found))) = self.scan.as_ref().map(|rx| rx.try_recv()) {
             self.scan = None;
             if scope == self.scope {
@@ -1068,6 +1105,13 @@ impl RadarUi {
                 }
             }
             Act::Conversation => match item.kind {
+                // Not cloned: the view needs only the profile and the
+                // project, so the Radar hosts it (`item_host`).
+                ItemKind::Issue | ItemKind::Pr
+                    if crate::build_features::CONVERSATION && item.repo.is_none() =>
+                {
+                    self.conversation_without_clone(&item)
+                }
                 ItemKind::Issue if crate::build_features::CONVERSATION => self.open_repo(
                     &item,
                     Some(Pending::Conversation {
@@ -1205,6 +1249,17 @@ impl RadarUi {
                 out.push(Entry::action(act_label(Act::StartWork), Act::StartWork));
             }
             ItemKind::Issue | ItemKind::Wip => {}
+        }
+        // Not cloned: the conversation needs no checkout (`item_host`).
+        if !cloned
+            && crate::build_features::CONVERSATION
+            && !item.integration.is_empty()
+            && matches!(item.kind, ItemKind::Issue | ItemKind::Pr)
+        {
+            out.push(Entry::action(
+                act_label(Act::Conversation),
+                Act::Conversation,
+            ));
         }
         if item.meta && cloned {
             out.push(Entry::Separator);

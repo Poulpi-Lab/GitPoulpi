@@ -9,7 +9,7 @@ impl RadarUi {
     }
 
     pub(crate) fn animating(&self) -> bool {
-        self.in_flight || self.api_busy()
+        self.in_flight || self.api_busy() || self.item_busy()
     }
 
     /// When the dwell on the checks glyphs ends, if it is still running.
@@ -25,6 +25,16 @@ impl RadarUi {
     pub(crate) fn command(&mut self, command: RadarCommand) -> Outcome {
         // The hosted review owns the window: the Radar's own commands wait
         // for it to close (Back closes it).
+        if self.api_item.is_some() {
+            return match command {
+                RadarCommand::Open | RadarCommand::CloseTab => Outcome::None,
+                RadarCommand::Back => {
+                    self.api_item = None;
+                    Outcome::None
+                }
+                _ => self.say(msg::radar::MSG_CLOSE_REVIEW_FIRST.get().to_string()),
+            };
+        }
         if self.api_review.is_some() {
             return match command {
                 RadarCommand::Open | RadarCommand::CloseTab => Outcome::None,
@@ -80,7 +90,7 @@ impl RadarUi {
     pub(crate) fn nav_targets(&self) -> Vec<(Rect, Spot)> {
         // The hosted review is badged by nobody (like the other review
         // pages); the choice dialog badges its own controls only.
-        if self.api_review.is_some() {
+        if self.api_review.is_some() || self.api_item.is_some() {
             return Vec::new();
         }
         if let Some(asking) = &self.asking {
@@ -190,6 +200,9 @@ impl RadarUi {
     pub(crate) fn on_key(&mut self, key: KeyEvent) -> Outcome {
         self.message = None;
         self.hover_since = None;
+        if self.api_item.is_some() {
+            return self.item_key(key);
+        }
         if self.api_review.is_some() {
             return self.api_key(key);
         }
@@ -435,6 +448,9 @@ impl RadarUi {
 
     pub(crate) fn on_mouse(&mut self, mouse: MouseEvent, double: bool) -> Outcome {
         let (col, row) = (mouse.column, mouse.row);
+        if self.api_item.is_some() {
+            return self.item_mouse(mouse);
+        }
         if self.api_review.is_some() {
             return self.api_mouse(mouse);
         }

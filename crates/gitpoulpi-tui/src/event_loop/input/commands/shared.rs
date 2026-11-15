@@ -572,6 +572,7 @@ pub(in crate::event_loop) fn apply_radar_outcome(
             *cx.preferences = Some(state);
         }
         Outcome::ApiReview(request) => open_api_review(cx, *request),
+        Outcome::ApiConversation(request) => open_api_conversation(cx, *request),
         // The ordinary Clone dialog, prefilled; the clone's end carries the
         // review on (`after_clone`).
         Outcome::CloneReview(request) => {
@@ -632,6 +633,50 @@ fn open_api_review(cx: &mut CommandCtx<'_>, request: crate::radar::ReviewRequest
 
 #[cfg(not(all(feature = "hosting", feature = "review")))]
 fn open_api_review(cx: &mut CommandCtx<'_>, _request: crate::radar::ReviewRequest) {
+    *cx.last_message = Some(msg::meta_picker::UNSUPPORTED.get().to_string());
+}
+
+/// The conversation of an item of a repository that is not cloned, hosted by
+/// the Radar over the Home window: the profile and the project are all the
+/// view needs.
+#[cfg(feature = "conversation")]
+fn open_api_conversation(cx: &mut CommandCtx<'_>, request: crate::radar::ConversationRequest) {
+    use gitpoulpi_hosting::conversation::ItemKey;
+    let all = crate::pull_request::load_integrations();
+    let Some(integration) = all.iter().find(|i| i.id == request.integration).cloned() else {
+        *cx.last_message = Some(msg::radar::why_no_integration(&request.integration));
+        return;
+    };
+    if !request.pr && !crate::item_view::supports_issues(integration.kind) {
+        *cx.last_message = Some(msg::item_view::WHY_NO_CONVERSATION.get().to_string());
+        return;
+    }
+    let target = crate::item_view::ItemTarget {
+        integration,
+        all,
+        project: request.project,
+        key: if request.pr {
+            ItemKey::pull_request(request.number)
+        } else {
+            ItemKey::issue(request.number)
+        },
+        reference: request.label,
+        title: request.title,
+        web_url: request.web_url,
+        repo_root: None,
+        bases: Default::default(),
+    };
+    let view = crate::item_view::ItemView::open(
+        target,
+        std::sync::Arc::new(crate::hosting_task::DefaultFactory),
+    );
+    if let Some(manager) = cx.management.as_mut() {
+        manager.radar.host_item(Box::new(view));
+    }
+}
+
+#[cfg(not(feature = "conversation"))]
+fn open_api_conversation(cx: &mut CommandCtx<'_>, _request: crate::radar::ConversationRequest) {
     *cx.last_message = Some(msg::meta_picker::UNSUPPORTED.get().to_string());
 }
 

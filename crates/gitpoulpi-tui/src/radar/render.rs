@@ -219,6 +219,7 @@ impl RadarUi {
         if let Some(view) = self.api_review.as_mut() {
             view.render_all(body, frame.buffer_mut());
         }
+        self.paint_hosted_item(frame.buffer_mut(), body);
     }
 
     /// The checks / conflicts tooltip, after the dwell. Never under a popup

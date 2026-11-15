@@ -522,6 +522,7 @@ fn an_agent_without_a_read_only_mode_cannot_be_let_into_the_repository() {
 
 /// Runs a palette row from the open form: `query` filters, `entry` is what
 /// must be listed, Enter runs it.
+#[cfg(unix)]
 fn palette_row(term: &mut xtask::pty::Terminal, query: &str, entry: &str) {
     term.send_keys("C-p").expect("the palette");
     term.wait_for_text("Command Palette", STEP)

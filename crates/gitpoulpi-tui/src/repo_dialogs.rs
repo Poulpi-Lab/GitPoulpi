@@ -469,6 +469,8 @@ impl RepoDialogs {
 
     /// Runs a palette row on that help; the sentence for the status line.
     pub(crate) fn run_composer(&mut self, cmd: crate::composer_cmd::ComposerCmd) -> Option<String> {
+        #[cfg(not(feature = "hosting"))]
+        let _ = cmd;
         match self.dialog.as_mut()? {
             #[cfg(feature = "hosting")]
             RepoDialog::PullRequest { form } => form.run_composer(cmd),

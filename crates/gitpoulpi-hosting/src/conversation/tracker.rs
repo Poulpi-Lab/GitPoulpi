@@ -2,12 +2,23 @@
 //! item reference, an empty-body check, and windowing for hosts that hand
 //! over the whole history in one answer.
 
+// Each tracker uses a subset (a build with one tracker leaves the rest unused).
+#![allow(dead_code)]
+
 use serde_json::Value;
 
 use super::time::iso_secs;
 use super::{PageCursor, WINDOW};
-use crate::review::invalid;
-use crate::Result;
+use crate::{Error, Result};
+
+/// A refusal before anything is sent, shaped like the host's own 422.
+pub(crate) fn invalid(what: &str, detail: impl Into<String>) -> Error {
+    Error::Api {
+        what: what.to_string(),
+        status: 422,
+        detail: detail.into(),
+    }
+}
 
 pub(crate) fn text(v: &Value, key: &str) -> String {
     v.get(key)

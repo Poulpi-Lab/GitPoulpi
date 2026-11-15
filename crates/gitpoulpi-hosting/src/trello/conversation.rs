@@ -12,6 +12,7 @@ use serde_json::{json, Value};
 
 use super::client::TrelloClient;
 use crate::client::encode_component;
+use crate::conversation::tracker::invalid;
 use crate::conversation::tracker::{check_body, opt_text, require_issue, text, window_of};
 use crate::conversation::{
     Actor, ActorKind, Comment, Event, EventKind, IdentityKind, ItemHeader, ItemKey, ItemKind,
@@ -19,7 +20,6 @@ use crate::conversation::{
     TokenSource,
 };
 use crate::http::HttpRequest;
-use crate::review::invalid;
 use crate::{Error, Result};
 
 const MAX_BODY: usize = 16_384;

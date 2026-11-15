@@ -306,7 +306,7 @@ impl RedmineClient {
         require_issue("Redmine", key)?;
         check_body("editing a Redmine comment", body, None)?;
         let id: u64 = comment_id.trim().parse().map_err(|_| {
-            crate::review::invalid(
+            crate::conversation::tracker::invalid(
                 "editing a Redmine comment",
                 "the comment id is not a number",
             )

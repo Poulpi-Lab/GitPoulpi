@@ -20,6 +20,7 @@ use super::client::JiraClient;
 use super::map::{browse_url, number_of};
 use crate::client::encode_component;
 use crate::conversation::time::is_edited;
+use crate::conversation::tracker::invalid;
 use crate::conversation::tracker::{
     check_body, decode_cursor, encode_cursor, item_ref, oldest_secs, opt_text, require_issue,
     span_of, text,
@@ -31,7 +32,6 @@ use crate::conversation::{
 };
 use crate::http::HttpRequest;
 use crate::markup::{jira_to_markdown, markdown_to_jira};
-use crate::review::invalid;
 use crate::{Error, Result};
 
 const PAGE: usize = 100;

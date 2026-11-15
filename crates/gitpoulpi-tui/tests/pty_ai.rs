@@ -1296,6 +1296,7 @@ fn the_repo_instructions_reach_the_prompt_in_both_modes() {
 /// back to back reach the TUI in one read on a busy machine and parse as
 /// `Alt+Esc`: the page then stays open, and a later click on the gear closes it
 /// instead of opening it (the test failed on "the combo row" under load).
+#[cfg(unix)]
 fn leave_settings(term: &mut Terminal) {
     const EDITOR: &str = "Repository instructions - Custom instructions";
     const PAGE: &str = "GitPoulpi - Settings";

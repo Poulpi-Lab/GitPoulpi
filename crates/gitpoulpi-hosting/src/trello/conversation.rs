@@ -67,15 +67,11 @@ fn event_of(a: &Value) -> Option<Event> {
                 opt_text(&data["listAfter"], "name"),
             ) {
                 EventKind::StatusChanged { from, to }
-            } else if let Some(old) = data["old"]["closed"].as_bool() {
+            } else if data["old"]["closed"].as_bool()? {
                 // `old.closed` is what it was: archived before means reopened.
-                if old {
-                    EventKind::Reopened
-                } else {
-                    EventKind::Closed
-                }
+                EventKind::Reopened
             } else {
-                return None;
+                EventKind::Closed
             }
         }
         _ => return None,

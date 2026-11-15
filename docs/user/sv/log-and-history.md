@@ -179,12 +179,12 @@ På en commit utan ref visar det också ett bleknat piller i kolumnen Ref med na
 **Remotes.** `+` i rubriken REMOTE lägger till en; högerklicka på en remotes
 namn för att göra fetch på den, kopiera dess webblänk, göra den till
 standard-remote, dölja den i grafen, ändra dess URL:er eller ta bort den. **Att dölja en remote**
-(radens öga, menyns *Dölj remote i grafen* eller `Remote: Dölj remote i grafen...` i
+(radens ⊙, menyns *Dölj remote i grafen* eller `Remote: Dölj remote i grafen...` i
 paletten) döljer varje gren den har nu eller får senare, och commits som bara den
 når lämnar Log: sättet att bläddra i en historik utan historiken från en orelaterad
 arkiv-remote; ta tillbaka den med *Visa remote i grafen*. Att visa en
 remote visar också grenarna i den som dolts en och en. En gren i en
-dold remote säger det på statusraden om dess öga används: visa remoten
+dold remote säger det på statusraden om du klickar på dess ⊙: visa remoten
 först.
 
 **Stashes.** **Stash** stashar allt (inklusive ospårade filer); `Ctrl+G m`

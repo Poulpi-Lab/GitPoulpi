@@ -22,28 +22,46 @@ utan worktrees börjar fortfarande med avsnittet dolt.
 Skapa worktree...**) öppnar en meny:
 
 - **Från aktuell gren**: grenen är utcheckad i huvudmappen, så dialogrutan
-  föreslår en ny gren på den (`<gren>-wt`).
+  föreslår en ny gren på den (`worktree-<id>`).
 - **Från vald commit**: nedtonad tills en commit är vald i Log. Worktreen
-  startar frånkopplad där om du inte namnger en ny gren.
-- **Välj en gren...**: dialogrutan öppnas på sin lista **Ref**.
+  föreslår en ny gren `worktree-<id>` som startar där; töm grenfältet för en
+  frånkopplad worktree.
+- **Välj en gren...**: dialogrutan öppnas på sin lista **Worktree-gren**, för
+  att öppna en gren som redan finns.
 
 Paletten har samma tre (**Refs: Skapa worktree från aktuell gren**,
 **Git: Skapa worktree vid vald commit...**, **Refs: Skapa worktree och välj en
 gren**). De äldre posterna fungerar fortfarande: **Skapa worktree från** i en
 gren-, tag- eller commit-meny.
 
-Dialogrutan föreslår allt och låter dig ändra det:
+Dialogrutan föreslår allt och låter dig ändra det. **Namn** och den nya grenen
+börjar båda som `worktree-<id>`, där `<id>` är 8 slumpmässiga hexadecimala
+siffror (samma för båda), så att två worktrees aldrig krockar.
 
 | Fält | Betydelse |
 |---|---|
-| **Namn** | Mappnamnet byggs av det. Föreslås från grenen eller det korta id:t. |
+| **Namn** | Mappnamnet byggs av det. **Namn efter gren** (`Alt+N`) sätter det till `worktree-<gren>`: snedstreck blir `-` och ordet dubbleras inte (`worktree-foo` och `feature/worktree-x` behåller sina egna, `feature/login` ger `worktree-feature-login`). |
 | **Mapp** | En syskonmapp till repositoryt, `<repository>-<namn>`. Den följer Namn tills du skriver i Mapp; **Bläddra...** väljer var. |
-| **Ref** | Grenen eller commiten som worktreen startar från (en lista; skriv för att söka). Att ändra den föreslår ett nytt Namn. |
-| **Ny gren** | Tomt checkar ut Refs gren där (eller frånkopplar på en commit). Krävs när grenen redan är utcheckad. |
+| **Ref** | Var en *ny* gren startar: en gren eller en commit (en lista; skriv för att söka). Den används inte, och säger det, medan en befintlig gren är vald. |
+| **Worktree-gren** | Ett fält, två betydelser, angivna under det. Ett namn som inte är en lokal gren skapar en ny gren från Ref (**ny gren från main**). En lokal gren som inte är utcheckad någon annanstans (välj den i listan eller skriv dess namn) checkas ut där som den är (**checkar ut den här grenen**). Listans första rad, eller ett tomt fält, checkar ut Refs gren (eller frånkopplar på en commit); det nekas när den grenen redan är utcheckad. |
+| **Slumpa om** | `Alt+R`. Drar ett nytt `<id>` och ersätter Namn och grenen med det, utom det du skrev själv (ett Namn eller en gren du skrev står kvar) och en befintlig gren (ersätts aldrig). Ett Namn från **Namn efter gren** eller från AI:n räknas som genererat. |
+| **Namnge med AI** | Bara när AI är på (se nedan). |
 | **Öppna den nya worktree som flik** | På som standard. |
 
-En mapp som inte är tom, ett ogiltigt namn eller en gren som redan finns
-rapporteras på dialogrutans egen rad, och **Skapa** förblir nedtonad.
+En mapp som inte är tom, ett ogiltigt namn, ett grennamn som git nekar eller
+en gren som en annan worktree har rapporteras på dialogrutans egen rad, och
+**Skapa** förblir nedtonad.
+
+### Namnge med AI
+
+Med [AI](ai.md) påslagen öppnar **Namnge med AI** (`Alt+A`) en ruta i
+dialogrutan: *Beskriv funktionen, felet eller uppgiften*. **Namnge** ber
+modellen om ett kort worktree-namn och ett grennamn som följer repositoryts
+egna grennamn (`feature/`, `fix/`, gemener med bindestreck). De fyller Namn
+(som `worktree-<namn>`) och grenfältet, fortfarande redigerbara; ett grennamn
+som redan finns får suffixet `-2` så att svaret aldrig tyst checkar ut något.
+Rutan visar upptagetläget, **Stoppa** (eller `Esc`) avbryter, och ett fel visas
+i dialogrutan. Bara din beskrivning och de lokala grennamnen skickas.
 
 ## Radens meny
 
@@ -102,5 +120,7 @@ historiken.
 `gitpoulpi worktree changes <path>` listar de ocommittade ändringarna i en
 worktree. `gitpoulpi worktree remove <path> [--force] [--commit-message M
 [--commit-branch B]] [--stash-message M] [--delete-branch]` tar bort den;
-MCP-verktygen är `worktree_changes` och `worktree_remove`. Se
-[CLI-referens](cli-reference.md).
+MCP-verktygen är `worktree_changes` och `worktree_remove`. `gitpoulpi ai
+worktree-name --describe "<uppgift>"` skriver ut worktree- och grennamnen som
+AI:n föreslår (`{ name, worktree, branch }`) och skapar ingenting; MCP-verktyget
+är `ai_worktree_name`. Se [CLI-referens](cli-reference.md).

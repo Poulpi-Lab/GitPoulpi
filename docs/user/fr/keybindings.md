@@ -999,7 +999,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Conversation : Fermer | `Esc` |
 | Éditeur Markdown : écrire avec l'IA |  |
 | Éditeur Markdown : actualiser le contexte de l'IA |  |
-| Hébergement : Ouvrir la conversation d'un ticket... |  |
+| Hébergeur : Ouvrir la conversation d'un ticket... |  |
 | Revue : ✦ Rédiger une revue... | `s` |
 | Revue : Accepter la suggestion | `y` |
 | Revue : Modifier et accepter la suggestion... | `w` |
@@ -1557,9 +1557,9 @@ carte « une branche est apparue » sont décrites dans les [workflows de bran
 | `Esc` | Fermer une liste déroulante, revenir de l'aperçu au formulaire, fermer la fenêtre (pas pendant une exécution) |
 | Survoler une branche | Son type, son parent, et de combien elle est en retard sur le parent |
 
-### Le compositeur Markdown et la vue de conversation
+### L'éditeur Markdown et la vue de conversation
 
-Chaque zone dont le texte part vers un hébergeur (un commentaire, une réponse, un résumé de revue, la description d'un nouveau ticket ou d'une pull request) est le même compositeur. Ses touches sont dans le tableau `md_editor` plus haut et peuvent être réaffectées.
+Chaque zone dont le texte part vers un hébergeur (un commentaire, une réponse, un résumé de revue, la description d'un nouveau ticket ou d'une pull request) est le même éditeur. Ses touches sont dans le tableau `md_editor` plus haut et peuvent être réaffectées.
 
 | Touche | Action |
 |---|---|

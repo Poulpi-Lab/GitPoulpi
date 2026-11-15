@@ -55,6 +55,8 @@ revisiones ya enviadas, de la más antigua a la más reciente, cada una con su v
 `descartada`). En GitLab los veredictos son sus aprobaciones. Debajo, la caja de respuesta: haz clic en ella o pulsa **`c`**
 para escribir un comentario en la conversación. **Este se publica al instante**, y la caja lo dice.
 
+La caja de comentario (también la de una respuesta, la de un comentario sobre una línea y la del resumen de **Finalizar revisión**) es el editor de Markdown compartido con [la vista de conversación](hosting-integration.md#escribir): **Escribir**, **Previa** (`Alt+P`) y **Dividida** (`Alt+L`, en una ventana de 100 columnas), `Ctrl+Enter` (también `Ctrl+S`, `Alt+Enter`) envía, y donde la IA está activada `Alt+E` abre **Escribir con IA** ([el capítulo de IA](ai.md#ayuda-para-escribir-en-un-host)). La vista previa muestra el texto como lo mostrará el host, referencias incluidas (`#7`, `!12`, `ABC-12`, ids de commit); un texto sin enviar se conserva por solicitud. El texto de la descripción y de la conversación usa el mismo renderizador, así que Markdown, tablas, avisos y referencias se ven igual aquí y en la vista de conversación de un issue. Citar, editar o eliminar un comentario ya publicado, y las notas internas, pertenecen a la vista de conversación de los issues y de las solicitudes en hosts sin revisión (ver [Conversaciones](hosting-integration.md#5c-conversaciones)); aquí solo se pueden editar tus comentarios pendientes.
+
 ### Archivos
 
 Los archivos cambiados a la izquierda (letra de estado, `+añadidas -eliminadas`, un recuento `●n` de hilos abiertos, un recuento `✎n` de

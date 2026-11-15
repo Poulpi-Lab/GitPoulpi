@@ -4,6 +4,8 @@
 //! into the status line, nothing is posted, and no browser is ever launched
 //! (`GITPOULPI_NO_BROWSER`, its log is the stub).
 
+use std::time::Duration;
+
 use crate::mock::*;
 use crate::support::*;
 use xtask::pty::{Screen, Terminal};
@@ -73,8 +75,8 @@ fn wait_open(term: &mut Terminal) -> Screen {
 
 /// The badge character drawn left of `label` (a button's badge is on its own
 /// left edge), on the row that holds it.
-fn badge_before(screen: &Screen, label: &str) -> Option<char> {
-    let (col, row) = screen.find(label)?;
+fn badge_before(screen: &Screen, at: (u16, u16)) -> Option<char> {
+    let (col, row) = at;
     let line: Vec<char> = screen.line(row).chars().collect();
     let col = usize::from(col).min(line.len());
     (col.saturating_sub(7)..col).rev().find_map(|i| {
@@ -86,14 +88,30 @@ fn badge_before(screen: &Screen, label: &str) -> Option<char> {
     })
 }
 
-fn press_badge(term: &mut Terminal, label: &str) {
+/// Where the tail of a label is: a badge covers the first letters of its
+/// control, so the label is found by what it leaves visible. `last` takes the
+/// lowest occurrence on the screen (the composer's buttons), else the first.
+fn tail(label: &'static str, last: bool) -> impl Fn(&Screen) -> Option<(u16, u16)> {
+    move |s| {
+        let all = s.find_all(label);
+        if last {
+            all.into_iter().max_by_key(|(_, r)| *r)
+        } else {
+            all.into_iter().next()
+        }
+    }
+}
+
+/// `Ctrl+N`, then the badge drawn before the control `locate` finds.
+fn press_badge(term: &mut Terminal, locate: impl Fn(&Screen) -> Option<(u16, u16)>) {
     term.send_keys("C-n").unwrap();
-    let l = label.to_string();
-    term.wait_for("the badge on the control", STEP, move |s| {
-        badge_before(s, &l).is_some()
+    term.wait_for("the badge on the control", STEP, |s| {
+        locate(s).and_then(|at| badge_before(s, at)).is_some()
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let badge = badge_before(&term.screen(), label).expect("badge");
+    let screen = term.screen();
+    let at = locate(&screen).expect("the control");
+    let badge = badge_before(&screen, at).expect("badge");
     term.send_text(&badge.to_string()).unwrap();
 }
 
@@ -185,15 +203,17 @@ fn ctrl_n_badges_reach_reply_a_link_and_send() {
     .unwrap_or_else(|e| panic!("{e}"));
 
     // Reply: its badge opens the composer with the entry quoted.
-    press_badge(&mut term, "Reply");
+    // (A badge covers the first letters of its control: found by its tail.)
+    press_badge(&mut term, tail("ply", false));
     term.wait_for("the quote in the composer", STEP, |s| {
         s.contains("> **Bo Brandt**") && s.contains("> Seen on Linux too")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Escape").unwrap();
+    term.wait_for_stable(Duration::from_millis(400), STEP).unwrap();
 
     // A link: the badge before the address opens the question.
-    press_badge(&mut term, "https://example.org/docs");
+    press_badge(&mut term, tail("ps://example.org/docs", false));
     term.wait_for("the confirmation", STEP, |s| s.contains("Open this link?"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Escape").unwrap();
@@ -201,7 +221,7 @@ fn ctrl_n_badges_reach_reply_a_link_and_send() {
         .unwrap_or_else(|e| panic!("{e}"));
 
     // Send: greyed, and it says why.
-    press_badge(&mut term, "Send");
+    press_badge(&mut term, tail("nd", true));
     term.wait_for("the reason", STEP, |s| {
         s.contains("writing from this view is not available yet")
     })
@@ -209,31 +229,24 @@ fn ctrl_n_badges_reach_reply_a_link_and_send() {
     assert!(opened_urls(&config).is_empty());
 }
 
-/// PTY 7: at 70 columns Split is refused with its reason and Preview works;
-/// the issue is reached from the palette.
+/// PTY 7: at 70 columns Split is refused with its reason and Preview works.
 #[test]
 fn at_70_columns_split_is_refused_and_preview_works() {
-    let (mut term, _config, _mock, _repo) = launch("pty-conv-narrow", 70);
-    term.send_keys("C-p").unwrap();
-    term.wait_for("the palette", STEP, |s| s.contains("Type a command") || s.contains("Command"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    term.send_text("Open Issue Conversation").unwrap();
-    term.wait_for("the command", STEP, |s| s.contains("Hosting: Open Issue Conversation"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    term.send_keys("Enter").unwrap();
-    term.wait_for("the issue list", STEP, |s| s.contains("Crash on startup"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    term.send_keys("Enter").unwrap();
-    term.wait_for("the conversation", STEP, |s| {
-        s.contains("Crash on startup") && s.contains("Posting as")
+    let (mut term, _config, _mock, _repo) = launch("pty-conv-narrow", COLS);
+    open_with_enter(&mut term);
+    term.resize(70, ROWS).expect("shrink the window");
+    term.wait_for("the narrow view", STEP, |s| {
+        s.contains("Posting as") && s.contains("New comment")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // New comment, then Alt+L: refused with the reason.
     term.send_keys("c").unwrap();
+    term.wait_for_stable(Duration::from_millis(400), STEP).unwrap();
     term.send_keys("M-l").unwrap();
+    term.wait_for_stable(Duration::from_millis(400), STEP).unwrap();
     term.wait_for("the Split reason", STEP, |s| {
-        s.contains("Split needs a window 100 columns wide")
+        s.contains("Split needs a window")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 

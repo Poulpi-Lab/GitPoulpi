@@ -1565,11 +1565,14 @@ In the [conversation view](hosting-integration.md#5c-conversations) of an issue 
 | `l`, `y`, `o` | Links of the entry, copy its address, open it in the browser |
 | `n` | Next unread entry |
 | `v`, `m`, `F5` | Show or hide events, load older entries, refresh |
+| `g` | Open the diagram of the entry (a `mermaid` block) |
 | `Alt+Left`, `Backspace` | Back along the stack of items opened from references |
 | `Tab` | Timeline, comment box, header buttons |
 | `q`, `Esc` | Close |
 
 In the Radar, `i` opens the conversation of an issue row.
+
+On a pull request or issue row of the sidebar sections, `Enter` opens the conversation and `o` opens the row in the browser.
 
 ### Flow (branching workflows)
 

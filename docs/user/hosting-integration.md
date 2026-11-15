@@ -417,7 +417,8 @@ CLI: `gitpoulpi hosting members|labels|milestones`, `hosting pr-edit <n>`,
 
 | Key | Action |
 |---|---|
-| `Enter` / double-click | open the row in the browser |
+| `Enter` / double-click | open the conversation in GitPoulpi where the host has one (a pull request on GitHub, GitLab, Gitea or Gerrit opens the review), else the browser |
+| `o` | open the row in the browser |
 | `.` / right-click | row menu |
 | `e` | edit the selected pull request on the host |
 | `n` | new pull request (PULL REQUESTS) or new issue (ISSUES) |

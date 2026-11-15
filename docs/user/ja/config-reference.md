@@ -44,6 +44,7 @@ gitpoulpi config set general.auto_stash always # checked against the schema, the
 | `general.auto_prune_tags` | `false` | fetch 時に、リモートで削除された tag もローカルから削除します（対象はリモートにあった tag だけで、push していない tag は残ります）。Git 2.41 以降。 |
 | `general.hosting_refresh_minutes` | `5` | pull request / Issue の一覧とツールバーのチップの更新間隔です（0〜120）。`0` は要求時とイベント時のみです。 |
 | `general.hosting_refresh_unit` | `"auto"` | 設定が更新間隔を表示する単位：`minutes`、`hours`、`auto`。`general.auto_fetch_interval_unit` と同じように読まれます。表示専用です。 |
+| `general.hosting_post_as` | `""` | リポジトリのトークンが bot のもの（GitHub App トークン）である場合に、ホストへのメッセージの投稿者名となる名前（例：`my-app[bot]`）です。すべての入力欄に表示され、自分のコメントを見分けるのに使われます。空欄：ホストに問い合わせ、それでも分からなければ最初の投稿から学習します。リポジトリごとに上書きできます（設定、リポジトリの SSH と認証情報）。 |
 | `general.keep_submodules_up_to_date` | `false` | checkout または pull の後、サブモジュールが合っていない場合に `git submodule update --init --recursive` を実行します。[サブモジュール](submodules.md)を参照してください。 |
 | `general.default_branch_name` | `"main"` | Init で作成したリポジトリの最初のブランチ名です。空にすると git に任せます。既存のブランチは変更しません。 |
 | `general.delete_orig_files_after_merge` | `false` | 取り込まれた merge の後で、バックアップの `*.orig` ファイルを削除します。 |
@@ -350,7 +351,16 @@ review_mode = "ask"       # ask | clone | api
 | `ai.limits.review_threads_bytes` | `6000` | すでにあるレビューコメントの一覧（モデルが繰り返さないように渡されます）の最大バイト数。超えると、*切り詰めて送信*は一覧を切り詰めます。範囲は同じです。 |
 | `ai.limits.review_context_file_bytes` | `8192` | コードレビューに渡す 1 つのプロジェクトコンテキストファイル（`CLAUDE.md`、`AGENTS.md`、追加ファイル）の最大バイト数。超えると、*切り詰めて送信*はそのファイルを注記つきで短くします。範囲は同じです。 |
 | `ai.limits.review_context_bytes` | `16384` | すべてのコンテキストファイルを合わせた最大バイト数。超えると、*切り詰めて送信*は上限をまたぐファイルを短くし、それ以降のファイルを除外します。範囲は同じです。 |
-| `ai.sent_preview.<action>` | `true` | アクションごとに 1 つのキー（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`）：リクエストを送る前に「送信する内容」を表示します。ダイアログの「今後表示しない」が `false` を書き込み、設定 > AI > *送信前に内容を表示...* でオンに戻せます。 |
+| `ai.limits.hosting_reply_context_bytes` | `49152` | 下書きの返信（または Issue の説明）に、自分のテキスト以外として渡されるもの（項目とその会話）全体の最大バイト数です。超えると古いコメントから除外され、切り詰めは `truncated` に報告されます。他のバイト上限と同じ範囲です。 |
+| `ai.limits.hosting_reply_file_bytes` | `8192` | 下書きの返信に渡すリポジトリの 1 ファイルの最大バイト数です。AI がリポジトリを読むときに使われます。同じ範囲です。 |
+| `ai.limits.hosting_reply_map_bytes` | `6144` | 下書きの返信に渡すリポジトリマップの最大バイト数です。AI がリポジトリを読むときに使われます。同じ範囲です。 |
+| `ai.limits.hosting_reply_hits_per_term` | `20` | 下書きの返信の検索語ごとに残す検索ヒットの最大数です。AI がリポジトリを読むときに使われます。1〜200 に収められます。 |
+| `ai.limits.hosting_reply_terms` | `8` | 下書きの返信が検索する検索語の最大数です。AI がリポジトリを読むときに使われます。1〜50 に収められます。 |
+| `ai.hosting_reply.base_prompt` | `""` | 2 つの作成アクション（`hosting_reply`、`issue_body`）のベースプロンプトです。空ならビルトインのものを使い、ここにテキストを入れると置き換えられ、指示のレベルはそのあとに続きます。設定 > AI > ホストでの返信で編集します。 |
+| `ai.hosting_reply.read_repository` | `false` | 「AI にリポジトリを読ませる」にチェックが入った状態で始めるかどうかです。既定はオフで、その用途でチェックを入れたときにだけリポジトリを読みます。ローカルエージェントまたは API プロファイルは、[AI の章](ai.md#リポジトリへのアクセス)の説明どおりに読みます。 |
+| `ai.hosting_reply.reuse_agent_session` | `true` | ハーネスが対応していれば、2 回の返信の間ローカルエージェントのセッションを保持します。AI がリポジトリを読める場合に有効です。 |
+| `ai.hosting_reply.context_ttl_minutes` | `30` | 返信のために作ったリポジトリのコンテキストを再利用する時間です。1〜1440 に収められます。AI がリポジトリを読める場合に有効です。 |
+| `ai.sent_preview.<action>` | `true` | アクションごとに 1 つのキー（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`、`hosting_reply`、`issue_body`）：リクエストを送る前に「送信する内容」を表示します。ダイアログの「今後表示しない」が `false` を書き込み、設定 > AI > *送信前に内容を表示...* でオンに戻せます。 |
 
 リポジトリ固有の `[preferences.ai_review]` テーブル（`repo-state.toml` 内、またはクローンしていないリポジトリでは `remote-reviews.toml` のエントリ）にも同じキーを指定でき（すべて省略可能）、加えて `no_extra_file = true` があります。これは `ai.review.extra_file` の内容にかかわらず、そのリポジトリでは追加ファイルを使いません。未設定のキー、未設定の `extra_file`、存在しない `no_extra_file` は全体の値を継承します。`extra_file` にファイルを設定するとスイッチが解除され、逆の場合も同様です。
 

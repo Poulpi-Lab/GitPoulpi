@@ -107,6 +107,7 @@ claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
 
 - **初期状態では、エージェントは読み取り専用です。** 読み取り、ウィンドウへの表示（`ui_*`）、そして許可した場合はユーザーが確認する変更の提案ができます。リポジトリを変更させる（commit、push、リセットなど）には `allow_mutations = true` にします。範囲を絞って許可するには、`true` のまま `mutation_allowlist` を設定します。すべてのツールには MCP のアノテーション（`readOnlyHint`、`destructiveHint`、`openWorldHint`）が付いているため、Claude Code のようなクライアントは、危険なものについては事前にユーザーに確認します。
 - **競合：** `conflicts_check`（merge の前に行う予測）、`conflicts_list`、`conflicts_show`、`conflicts_state` は読み取りです。`conflicts_resolve`（残さなかった側を破棄します。`--delete` はファイルを削除します）と `conflicts_abort`（merge／rebase／cherry-pick 全体を破棄します）は破壊的です。`conflicts_unresolve` は通常の書き込みです。拒否された呼び出し（`stale`、`not_conflicted`、`pick_incomplete` など）は、失敗する代わりに `{"refused": {...}}` と終了コード 2 で応答します。
+- **Issue と pull request の会話：** `hosting_issue_comments` と `hosting_review_conversation` はタイムライン全体を読みます（読み取り、オープンワールド：ホストを呼び出します）。`hosting_markdown` はテキストを整形して参照を見つけるだけで、何も呼び出しません（クローズドワールド）。投稿（`hosting_issue_comment`、`hosting_review_comment`、`hosting_review_reply`）と編集（`hosting_*_comment_edit`）は、オープンワールドの通常の変更で、トークンの持つ ID としてすぐにホストへ送られるため（回答の `posted_as`。bot のトークンは bot として投稿します）、エージェントに許すかどうかは `allow_mutations` と `mutation_allowlist` が決めます。コメントの削除（`hosting_*_comment_delete`）は破壊的です。投稿、編集、削除の後はデーモンに通知され、そのリポジトリの開いているウィンドウはその項目を更新します。`ui_show_pr` / `ui_show_issue` に `--view conversation` を付けると、行の代わりに会話を開きます。
 - **行き詰まった状態：** `conflicts_am_continue` は書き込み、`conflicts_am_skip`、`conflicts_am_abort`、`index_lock_remove` は破壊的、`index_lock_show` は読み取りです。
 - **履歴の書き換え：** `rewrite_tools`、`rewrite_preview`、`rewrite_rows`、`rewrite_script_check`、`rewrite_script_test`、`rewrite_discard`、`rewrite_analyze`（サイズ分析）、`rewrite_scan_secrets`（マスクしたプレビュー付きの検出結果で、値は決して含みません）、`rewrite_note` は読み取りです（プレビューは何も変更せず、計画をデーモンと git ディレクトリのディスクに保持するだけなので、`rewrite_apply` は再起動後でも動作します）。`rewrite_apply` と `rewrite_run` は破壊的です。書き換えた commit に向けて多数の参照を、元に戻す操作 1 回分として動かし（`undo` で元に戻ります）、push はしません。レシピは `recipe_json`（またはパスを渡す `recipe`）で、シークレットは `secrets_file` で渡し、インラインでは渡さないでください。拒否された場合は `{"refused": {"reason", "message", "detail"}}` で応答し、push 済みの参照を動かす計画は、呼び出しで `yes` を設定するまで `{"needs_confirmation": ...}`（終了コード 3）で応答します。先にユーザーに見せてください。シェル、Python、外部 Lua のスクリプト（`script_language`）はサンドボックスの外で動作し、**エージェントは信頼できません**。`rewrite_script_trust` ツールも `trust` 引数もないため、そのようなスクリプトが実行されるのは、人がそのテキストそのものに対して `gitpoulpi rewrite script trust FILE` を実行した後だけです（変更されたスクリプトは再び拒否され、`script_not_trusted` とハッシュが `refused.script` に入ります）。さらに `rewrite.external_scripts` でその言語がオンになっている必要があります（`scripts_disabled`）。`rewrite_maps` は書き込み、`rewrite_push` は破壊的でネットワークを使います（リース付きの強制 push で、元に戻せません）。`rewrite_purge` は破壊的で、`[mcp] allow_history_purge = true` のときだけ一覧に表示されます。
 - **エージェントからは決して到達できないもの：** トークンの保存（`hosting login`）、SSH 鍵の作成とアップロード、`config set`（自分自身の制限を書き換えられてしまうため）、デーモンのライフサイクル。トークンがエージェントに表示されることはありません。
@@ -141,6 +142,7 @@ CLI コマンド 1 つにつき 1 つのツールがあり、名前はコマン�
 |---|---|---|
 | `ai_commit_message` | `gitpoulpi ai commit-message` | read, network |
 | `ai_explain` | `gitpoulpi ai explain` | read, network |
+| `ai_hosting_reply` | `gitpoulpi ai hosting-reply` | read, network |
 | `ai_prompt` | `gitpoulpi ai prompt` | read |
 | `ai_resolve_conflict` | `gitpoulpi ai resolve-conflict` | read, network |
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
@@ -203,6 +205,7 @@ CLI コマンド 1 つにつき 1 つのツールがあり、名前はコマン�
 | `flow_status` | `gitpoulpi flow status` | read |
 | `flow_sync` | `gitpoulpi flow sync` | destructive |
 | `flow_templates` | `gitpoulpi flow templates` | read |
+| `hosting_assignment` | `gitpoulpi hosting assignment` | write |
 | `hosting_board_move` | `gitpoulpi hosting board move` | write, network |
 | `hosting_board_show` | `gitpoulpi hosting board show` | read, network |
 | `hosting_checkout_pr` | `gitpoulpi hosting checkout-pr` | write, network |
@@ -216,6 +219,10 @@ CLI コマンド 1 つにつき 1 つのツールがあり、名前はコマン�
 | `hosting_integrations_test` | `gitpoulpi hosting integrations test` | read, network |
 | `hosting_issue_base` | `gitpoulpi hosting issue base` | write |
 | `hosting_issue_close` | `gitpoulpi hosting issue close` | write |
+| `hosting_issue_comment` | `gitpoulpi hosting issue comment` | write, network |
+| `hosting_issue_comment_delete` | `gitpoulpi hosting issue comment-delete` | destructive, network |
+| `hosting_issue_comment_edit` | `gitpoulpi hosting issue comment-edit` | write, network |
+| `hosting_issue_comments` | `gitpoulpi hosting issue comments` | read, network |
 | `hosting_issue_create` | `gitpoulpi hosting issue create` | write, network |
 | `hosting_issue_edit` | `gitpoulpi hosting issue edit` | write, network |
 | `hosting_issue_move` | `gitpoulpi hosting issue move` | write |
@@ -226,6 +233,7 @@ CLI コマンド 1 つにつき 1 つのツールがあり、名前はコマン�
 | `hosting_link` | `gitpoulpi hosting link` | write |
 | `hosting_list` | `gitpoulpi hosting list` | read |
 | `hosting_logout` | `gitpoulpi hosting logout` | destructive |
+| `hosting_markdown` | `gitpoulpi hosting markdown` | read |
 | `hosting_members` | `gitpoulpi hosting members` | read, network |
 | `hosting_milestones` | `gitpoulpi hosting milestones` | read, network |
 | `hosting_open` | `gitpoulpi hosting open` | read |
@@ -238,6 +246,9 @@ CLI コマンド 1 つにつき 1 つのツールがあり、名前はコマン�
 | `hosting_refs` | `gitpoulpi hosting refs` | read |
 | `hosting_review_abandon` | `gitpoulpi hosting review abandon` | write, network |
 | `hosting_review_comment` | `gitpoulpi hosting review comment` | write, network |
+| `hosting_review_comment_delete` | `gitpoulpi hosting review comment-delete` | destructive, network |
+| `hosting_review_comment_edit` | `gitpoulpi hosting review comment-edit` | write, network |
+| `hosting_review_conversation` | `gitpoulpi hosting review conversation` | read, network |
 | `hosting_review_diff` | `gitpoulpi hosting review diff` | read, network |
 | `hosting_review_fetch` | `gitpoulpi hosting review fetch` | write, network |
 | `hosting_review_push` | `gitpoulpi hosting review push` | write, network |

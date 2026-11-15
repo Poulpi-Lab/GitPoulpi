@@ -159,7 +159,7 @@ Par défaut, une ligne sous les volets et au-dessus de la ligne d'état. **Param
 |---|---|
 | **Annuler**, **Rétablir** | Reprennent ou restaurent la dernière opération (`Ctrl+Z`, `Ctrl+Y`). Masqués quand l'annulation est désactivée. Voir [Annuler et rétablir](undo-redo.md). |
 | **Pull** `▾` | Fait le pull comme le dit **Paramètres > Git et encodage > Bouton Pull**. La liste `▾` contient **Fetch All**, **Pull (fast-forward si possible)**, **Pull (fast-forward seul)** et **Pull (rebase)**. Un élément de la liste s'exécute une fois et ne change pas le bouton. |
-| **Push** `▾` | Pousse la branche extraite. La liste `▾` pousse une fois vers le remote que vous choisissez. |
+| **Push** `▾` | Pousse la branche extraite. La liste `▾` pousse une fois vers le distant que vous choisissez. |
 | **Branche** | Crée une branche au commit extrait. |
 | **Tag** | Crée un tag au commit extrait. |
 | **Stash**, **Pop** | Fait un stash de toutes les modifications. Fait un pop du dernier stash. |

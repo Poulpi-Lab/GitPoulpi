@@ -220,7 +220,7 @@ Un outil par commande CLI, nommé d'après son chemin avec `_` (`branch create` 
 par défaut celui du serveur) et `session`. Le `structuredContent` d'un appel réussi
 est exactement ce qu'affiche `gitpoulpi --json <commande>`. **Kind** (la colonne
 « Kind », en anglais comme dans le serveur) : *read* ne change jamais rien ; *write*
-et *destructive* sont des mutations (contrôlées) ; *network* parle à un remote ou à
+et *destructive* sont des mutations (contrôlées) ; *network* parle à un distant ou à
 un hébergeur ; *view* ne déplace que votre fenêtre ; *propose* ouvre une boîte que
 vous confirmez.
 

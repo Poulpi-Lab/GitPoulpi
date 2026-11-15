@@ -260,16 +260,16 @@ La palette propose **Lanceur : Installer le menu Ouvrir dans GitPoulpi** et **La
 
 ### Synchronisation
 
-Comment GitPoulpi garde un dépôt aligné avec ses remotes, et ce qu'il fait de vos
+Comment GitPoulpi garde un dépôt aligné avec ses distants, et ce qu'il fait de vos
 modifications locales entre-temps.
 
 ![La page Synchronisation : l'intervalle d'auto-fetch sous forme d'un nombre et d'une unité (minutes) sur une seule ligne, puis les autres options](../images/settings-quantity.png)
 
 | Option | Ce qu'elle fait |
 |---|---|
-| **Intervalle d'auto-fetch** | Fait un fetch de chaque remote en arrière-plan à cet intervalle, un nombre et une unité (minutes ou heures) sur une ligne. Défaut 5 minutes, maximum 60 minutes (1 heure), `0` le désactive. `general.auto_fetch_interval_minutes` reste en minutes ; `general.auto_fetch_interval_unit` ne garde que la façon de l'afficher. Demande un redémarrage. |
+| **Intervalle d'auto-fetch** | Fait un fetch de chaque distant en arrière-plan à cet intervalle, un nombre et une unité (minutes ou heures) sur une ligne. Défaut 5 minutes, maximum 60 minutes (1 heure), `0` le désactive. `general.auto_fetch_interval_minutes` reste en minutes ; `general.auto_fetch_interval_unit` ne garde que la façon de l'afficher. Demande un redémarrage. |
 | **Fetch à l'ouverture d'un onglet** | Lance Fetch All en arrière-plan à l'ouverture d'un onglet de dépôt. Activé par défaut. Un dépôt dont le fetch date de moins de 60 secondes n'est pas refetché. |
-| **Auto-prune** | Les fetchs suppriment aussi les branches de suivi distant qui n'existent plus sur le remote. Activé par défaut. Non annulable : une branche élaguée revient au prochain fetch si elle réapparaît sur le remote. |
+| **Auto-prune** | Les fetchs suppriment aussi les branches de suivi distant qui n'existent plus sur le distant. Activé par défaut. Non annulable : une branche élaguée revient au prochain fetch si elle réapparaît sur le distant. |
 | **Élagage automatique des tags** | Les fetchs suppriment aussi les tags locaux que le distant a supprimés. Seuls les tags qui étaient sur le distant sont concernés : un tag jamais envoyé (push) est conservé. Désactivé par défaut, comme git. Demande git 2.41 ou plus récent. CLI : `gitpoulpi fetch --prune-tags` ; clé de configuration `general.auto_prune_tags`. Voir [Branches, tags et le panneau Refs](log-and-history.md#branches-tags-et-le-panneau-refs). |
 | **Garder les sous-modules à jour** | Après un checkout ou un pull, met à jour les sous-modules aux commits que le dépôt enregistre. Voir [Sous-modules](submodules.md). |
 | **Supprimer les fichiers « .orig » après un merge** | Une fois un merge terminé, supprime les fichiers de sauvegarde `*.orig`. Désactivé par défaut. |
@@ -326,7 +326,7 @@ de clé.
 | **Chemin de la clé privée** | Quand il est défini, fetch, pull, push et clone lancent git avec `GIT_SSH_COMMAND=ssh -i "<key>" -o IdentitiesOnly=yes`, de sorte que ssh ne propose que cette clé. Vide : l'agent et votre configuration ssh s'appliquent inchangés. |
 | **Chemin de la clé publique** | Utilisé seulement quand le chemin de la clé privée est vide : ssh choisit la clé correspondante détenue par ssh-agent (ou une clé matérielle). |
 | **Type de clé** | Le type que crée **Générer une paire de clés** : `ed25519`, `rsa` (4096 bits) ou `ecdsa` (NIST P-256). |
-| **Identifiants HTTPS** | Comment fetch, pull, push et clone s'authentifient en HTTPS : **credential_helper** (l'assistant propre à git, par défaut), **prompt** (ignore les assistants ; git demande dans un terminal) ou **none** (aucun identifiant, remotes publics seulement). |
+| **Identifiants HTTPS** | Comment fetch, pull, push et clone s'authentifient en HTTPS : **credential_helper** (l'assistant propre à git, par défaut), **prompt** (ignore les assistants ; git demande dans un terminal) ou **none** (aucun identifiant, distants publics seulement). |
 | **Oublier tous les noms d'utilisateur et mots de passe** | Supprime chaque jeton que GitPoulpi a stocké dans votre assistant d'identifiants. Il demande d'abord confirmation. |
 | **Générer une paire de clés** | Crée une paire de clés du **Type de clé** dans `~/.ssh/gitpoulpi_<type>`, sans phrase secrète, et enregistre ses deux chemins. Il n'écrase jamais un fichier. |
 
@@ -576,7 +576,7 @@ La partie globale de la détection proactive des conflits (`gitpoulpi ui show se
 |---|---|
 | **Moteur Git** | `git2` (libgit2, par défaut) ou `system` (votre `git` installé). Global. S'applique aux démons démarrés après le changement. |
 | **Bouton Pull** | Ce que fait le bouton Pull : merge (fast-forward si possible), fast-forward seul, ou rebase. Global. Les éléments `▾` ne le changent pas. |
-| **Bouton Push** | **direct** pousse aussitôt ; **ask** montre d'abord le menu des remotes. Global. |
+| **Bouton Push** | **direct** pousse aussitôt ; **ask** montre d'abord le menu des distants. Global. |
 | **Vérifier chaque distant avant un push** | Activé par défaut (`git.push_group_preflight`). Avant un push d'une branche qui a des cibles de push supplémentaires, regarde d'abord chaque distant (une requête rapide, plus un téléchargement de ce distant seulement quand il diffère), pour qu'un problème sur le troisième distant apparaisse avant le début du premier push. Désactivé : pousse vers chaque distant à tour de rôle et rend compte. Global. |
 | **Merge fast-forward** | Ce que fait un merge que vous lancez quand la branche pourrait simplement avancer en fast-forward : **never** (par défaut) crée toujours un commit de merge, **allowed** fait un fast-forward quand c'est possible (le comportement par défaut de git), **only** fait un fast-forward ou refuse. Global (`git.merge_fast_forward`) ; un dépôt le remplace sur sa page [Options de merge](#propre-au-dépôt-options-de-merge). |
 | **Encodage par défaut** | L'encodage utilisé pour afficher le texte qui **n'est pas de l'UTF-8 valide** : contenus de fichiers, blame, diffs et messages de commit. La page a une ligne globale et une ligne pour ce dépôt ; celle du dépôt l'emporte. L'UTF-8 valide n'est jamais redécodé, et le stage ne réencode jamais rien. |
@@ -758,11 +758,11 @@ Un message avec lequel le formulaire de commit démarre (`gitpoulpi ui show sett
   | Motif | Correspond à |
   |---|---|
   | `origin/main` | uniquement cette branche |
-  | `origin/**` | toutes les branches du remote `origin` |
+  | `origin/**` | toutes les branches du distant `origin` |
   | `origin/feature/**` | les branches d'`origin` qui commencent par `feature/` |
   | `!origin/abc` | exclut cette branche |
 
-  Une branche locale s'écrit avec son nom seul (`main`), une branche de suivi distant avec son remote devant
+  Une branche locale s'écrit avec son nom seul (`main`), une branche de suivi distant avec son distant devant
   (`origin/main`). `*` et `?` restent à l'intérieur d'un segment de chemin, `**` les traverse. Les lignes vides et les
   commentaires `#` sont ignorés ; une liste d'exclusions seules signifie « toutes les branches sauf celles-ci ». Le
   choix est enregistré dans `repo-state.toml` et relu à la fermeture des Paramètres.
@@ -772,7 +772,7 @@ Un message avec lequel le formulaire de commit démarre (`gitpoulpi ui show sett
   nouveau le défaut.
 - **Utiliser les branches de base du workflow** (affiché quand un [workflow de branches](branching-workflows.md) avec
   des branches de base est configuré pour le dépôt) : remplit **Liste propre** avec ces bases, chacune comme branche
-  locale et comme branche de n'importe quel remote (`main` et `*/main`). Il les copie une fois ; il ne suit pas les
+  locale et comme branche de n'importe quel distant (`main` et `*/main`). Il les copie une fois ; il ne suit pas les
   changements ultérieurs du workflow.
 
 ### Propre au dépôt : IA

@@ -1230,7 +1230,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | `h` / `l`, `Left` / `Right` | Volet Refs : changer de section. Log : quitter (`h`) ou entrer dans (`l`) la liste des fichiers modifiés d'un commit |
 | `?` | Ouvrir ou fermer l'aide (voir [Aide dans l'application](#aide-dans-lapplication-)) |
 | `r` | Actualiser |
-| `F5` | Fetch de chaque remote, rechargement des pull requests et des tickets, et actualisation |
+| `F5` | Fetch de chaque distant, rechargement des pull requests et des tickets, et actualisation |
 | `q` | Quitter |
 | `Ctrl+Z` | **Annuler** la dernière opération. Voir [Annuler et rétablir](undo-redo.md) |
 | `Ctrl+Y`, `Ctrl+Shift+Z` | **Rétablir**. `Ctrl+Shift+Z` demande le protocole clavier kitty ; `Ctrl+Y` marche toujours |
@@ -1458,14 +1458,14 @@ pour les champs.
 | `h` / `l`, `Left` / `Right` | Changer de section |
 | `/` | Filtrer par nom (`Enter` applique, `Esc` annule) |
 | `y` | Vue hiérarchique des branches activée ou non : des dossiers à partir des `/` des noms de branches (LOCALES et DISTANTES) |
-| `o` | **Solo** sur la ref sélectionnée, ou sur chaque ref sous le dossier ou le remote sélectionné. Mettez plusieurs refs en solo pour voir leur union |
+| `o` | **Solo** sur la ref sélectionnée, ou sur chaque ref sous le dossier ou le distant sélectionné. Mettez plusieurs refs en solo pour voir leur union |
 | `Shift+O` | **Arrêter le solo** : effacer chaque solo |
 | `Shift+H` | **Tout afficher** : réafficher chaque ref masquée |
 | `g` | **Révéler dans le graphe** : fait défiler le Log jusqu'au commit de la ref (ou du stash) sélectionnée et fait clignoter sa ligne ; la sélection ne bouge pas |
 | `m` | **Marquer** la ref sélectionnée comme source de dépôt (`Échap`, ou `m` de nouveau dessus, efface la marque) |
 | `Shift+M` | **Déposer la ref marquée** sur la ref sélectionnée : ouvre le menu qu'ouvre un glisser-déposer (Merge, Rebase, Push, Fast-forward...) |
-| `+` (section DISTANTES) | Ajouter un remote |
-| `.`, `Menu`, `Shift+F10`, ou un clic droit | Le menu de la ligne : une branche, un tag, le nom d'un remote, ou un dossier |
+| `+` (section DISTANTES) | Ajouter un distant |
+| `.`, `Menu`, `Shift+F10`, ou un clic droit | Le menu de la ligne : une branche, un tag, le nom d'un distant, ou un dossier |
 | `Enter` sur une ligne WORKTREES | Ouvrir ce worktree dans son propre onglet |
 | `Ctrl+G d` | Supprimer la branche ou le tag sélectionné (demande d'abord). Sur une ligne DISTANTES : supprimer cette branche distante |
 
@@ -1780,9 +1780,9 @@ menus : *Éditeur : Changer l'encodage*, *Éditeur : Rouvrir avec l'encodage*
 | `Shift+T` | Stasher toutes les modifications (fichiers non suivis compris), sans message |
 | `o` | Pop d'un stash : la ligne de stash sélectionnée dans le Log, sinon le dernier stash |
 | `p` | Pull, comme le bouton Pull est réglé (`git.pull_mode`) |
-| `Shift+P` | Push vers le remote par défaut (définit l'amont au premier push), ou demander le remote |
+| `Shift+P` | Push vers le distant par défaut (définit l'amont au premier push), ou demander le distant |
 | `Shift+U` | Pousser tous les tags |
-| `f` | Fetch de chaque remote, avec prune |
+| `f` | Fetch de chaque distant, avec prune |
 | `g` | Ouvrir dans le navigateur la pull request de la branche extraite |
 | `b` / `t` | Nouvelle branche / nouveau tag sur HEAD (voir [Nommer une branche ou un tag](#nommer-une-branche-ou-un-tag)) |
 | `d` | Supprimer la branche ou le tag sélectionné (demande d'abord) |

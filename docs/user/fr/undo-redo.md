@@ -19,7 +19,7 @@ de ces moyens ramène votre travail :
 
 Après chaque action qui détruit quelque chose et peut être annulée (abandon,
 suppression d'un fichier, suppression d'une branche ou d'un tag, reset hard,
-suppression d'un stash, retrait d'un remote), la ligne d'état le dit :
+suppression d'un stash, retrait d'un distant), la ligne d'état le dit :
 « abandon des modifications : fait - Ctrl+Z pour annuler », avec la touche telle
 que vous l'avez configurée. L'infobulle d'Annuler dit combien d'actions vous
 pouvez remonter.
@@ -68,7 +68,7 @@ ligne d'aide sous les boutons. Pour la ligne sélectionnée :
   demande un autre, avec un nom libre déjà rempli) ; un stash abandonné est remis
   au sommet de la liste des stashes ; un fichier abandonné ou supprimé est
   réécrit à sa place s'il n'a pas changé depuis, sinon à côté, sous le nom
-  `nom.restored` (rien n'est jamais écrasé) ; un remote, un amont, une ligne
+  `nom.restored` (rien n'est jamais écrasé) ; un distant, un amont, une ligne
   d'ignore ou une ligne d'attributs retirés sont ajoutés de nouveau. Un reset,
   un amend, un rebase, un merge ou un commit reçoit une branche
   `restore/<branche>-<sha>` à l'ancien sommet : votre branche courante et vos
@@ -208,8 +208,8 @@ saisie de nom que le bouton.
 | Historique | merge (fast-forward ou commit de merge), rebase (simple et interactif, une fois terminé), cherry-pick, revert, reset (soft, mixed et hard), la partie locale d'un pull |
 | Modifications locales | stage et unstage (fichier, dossier, hunk, lignes, tout), abandon (fichier, dossier, hunk, lignes, un checkout de fichier), appliquer un patch ou les changements d'un commit (`apply-commit`), **supprimer un fichier du disque**, **ignorer** (fichier, extension ou dossier : la ligne du `.gitignore` choisi), **traiter comme binaire ou texte** (la ligne de `.gitattributes`) |
 | Stashes | push, apply, pop, drop, enregistrer en stash les changements d'un commit (`stash from-commit`) |
-| Remotes et configuration | ajouter, retirer, renommer, changer l'URL ou l'URL de push d'un remote, suivre et ne plus suivre avec Git LFS |
-| Sur un serveur | **supprimer une branche ou un tag sur un remote** (depuis le menu de la ref, la palette, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, ou une fin de workflow qui supprime la branche distante) : voir ci-dessous |
+| Distants et configuration | ajouter, retirer, renommer, changer l'URL ou l'URL de push d'un distant, suivre et ne plus suivre avec Git LFS |
+| Sur un serveur | **supprimer une branche ou un tag sur un distant** (depuis le menu de la ref, la palette, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, ou une fin de workflow qui supprime la branche distante) : voir ci-dessous |
 
 Tant qu'un merge, un cherry-pick ou un revert est arrêté sur des conflits,
 **Enregistrer et marquer résolu**, le stage et l'unstage sont aussi annulables
@@ -226,14 +226,14 @@ Tout ce qu'un abandon ou un reset hard jette est d'abord conservé, de sorte que
 l'annuler restitue les octets exacts, fichiers non suivis, bits exécutables et
 liens symboliques compris. Annuler un stash supprimé redonne le même stash, avec
 le même id de commit (il se place au sommet de la liste des stashes, comme
-`stash@{0}`, pas à son ancienne position). Annuler le retrait d'un remote
+`stash@{0}`, pas à son ancienne position). Annuler le retrait d'un distant
 redonne ses branches de suivi, son alias `origin/HEAD` et les paramètres d'amont
 des branches qui le suivaient.
 
-### Supprimer une branche ou un tag sur un remote
+### Supprimer une branche ou un tag sur un distant
 
 Avant la suppression, GitPoulpi demande au serveur ce que contient la branche ou le tag
-à cet instant et l'enregistre : le remote, le nom et le commit exact (pour un tag
+à cet instant et l'enregistre : le distant, le nom et le commit exact (pour un tag
 annoté, l'objet tag lui-même, donc son annotation est conservée). La suppression n'est
 faite que si le serveur contient encore cette valeur.
 
@@ -246,13 +246,13 @@ identifiants qu'un push. La branche de suivi distant revient avec elle.
 
 Annuler refuse, sans rien changer, quand :
 
-- la branche ou le tag a été **recréé sur le remote** depuis, ou déplacé : il est à un
+- la branche ou le tag a été **recréé sur le distant** depuis, ou déplacé : il est à un
   autre commit que celui enregistré, et pousser écraserait le travail de quelqu'un
   d'autre (le refus nomme les deux commits) ;
 - le commit (ou l'objet tag) **n'est plus dans votre dépôt** (il a été supprimé par le
   ramasse-miettes) : l'annulation est impossible.
 
-« Supprimer en local et sur le remote » est **une seule entrée** : Annuler restaure
+« Supprimer en local et sur le distant » est **une seule entrée** : Annuler restaure
 ensemble la branche ou le tag local et distant, Rétablir les supprime de nouveau tous
 les deux. Supprimer seulement la branche distante laisse la locale tranquille ;
 l'annuler fait de même. Une fin de workflow qui supprime aussi la branche distante est
@@ -396,7 +396,7 @@ Annuler ne demande confirmation que lorsque c'est risqué :
   travail : vos modifications sont conservées, mais l'annulation s'arrête sans
   rien changer si l'un d'eux est dans un fichier qu'elle doit réécrire.
 
-- l'entrée a supprimé une branche ou un tag sur un remote : l'annuler **la repousse
+- l'entrée a supprimé une branche ou un tag sur un distant : l'annuler **la repousse
   sur le serveur** (voir plus haut), donc il demande toujours, tout comme le
   rétablissement qui la supprime de nouveau là-bas.
 
@@ -480,7 +480,7 @@ gitpoulpi lost-commits [--skip N] [--limit N] [--no-deep] [--budget-ms MS]
   autres.
 - `undo-restore <id>` ramène ce que cette seule entrée a supprimé (une branche
   ou un tag supprimé, un stash abandonné, un fichier abandonné ou supprimé, un
-  remote retiré avec ses branches de suivi et ses amonts, une ligne d'ignore) et
+  distant retiré avec ses branches de suivi et ses amonts, une ligne d'ignore) et
   garde toutes les opérations suivantes. Il n'écrase jamais : un fichier qui a
   changé depuis reçoit la version conservée à côté, sous le nom
   `<nom>.restored` ; un nom de branche pris est un refus (code 2) qui en

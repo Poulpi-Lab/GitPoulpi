@@ -169,7 +169,7 @@ et joignez-le à un ticket.
 `.gitpoulpi/repo-state.toml` à l'intérieur du dépôt.
 
 **GitPoulpi envoie-t-il quelque chose quelque part ?** Seulement ce que vous demandez :
-des opérations git vers vos remotes, des requêtes d'hébergeur après avoir connecté un
+des opérations git vers vos distants, des requêtes d'hébergeur après avoir connecté un
 compte, des requêtes IA après avoir appuyé sur un bouton IA, et, si vous activez les
 avatars, un hash des e-mails d'auteurs vers Gravatar. Il n'y a aucune télémétrie. Voir
 [Assistance IA](ai.md#confidentialité).
@@ -209,7 +209,7 @@ Un fichier qui devrait être une image, un modèle ou un gros binaire contient `
 - Regardez le volet Status : un dépôt qui utilise LFS alors que `git-lfs` manque affiche un bandeau ambre. Installez le programme (https://git-lfs.com ; Windows : fourni avec Git for Windows ou `winget install GitHub.GitLFS` ; Debian/Ubuntu : `apt install git-lfs` ; macOS : `brew install git-lfs`) et rouvrez ou appuyez sur `r`.
 - `gitpoulpi lfs status` dit si le programme est installé, si les filtres et le hook sont en place et quels motifs sont suivis ; `gitpoulpi lfs files` liste les fichiers pointeurs et lesquels sont `local`.
 - Avec `git-lfs` installé, lancez **`LFS : Pull des objets`** dans la palette (ou `gitpoulpi lfs pull`) : cela télécharge les objets et remplace les pointeurs. Cela installe d'abord les filtres LFS de ce dépôt s'il n'y en a pas.
-- Si le téléchargement échoue, le message nomme la raison (identifiants du remote, un serveur qui n'a plus l'objet). GitPoulpi n'a besoin d'aucun compte propre : LFS utilise les identifiants habituels de votre remote (assistant d'identifiants ou ssh-agent).
+- Si le téléchargement échoue, le message nomme la raison (identifiants du distant, un serveur qui n'a plus l'objet). GitPoulpi n'a besoin d'aucun compte propre : LFS utilise les identifiants habituels de votre distant (assistant d'identifiants ou ssh-agent).
 - Le clonage d'un dépôt LFS n'échoue jamais à cause de LFS ; si l'étape de téléchargement n'a pas pu s'exécuter, le clone est là avec des pointeurs, et `LFS : Pull des objets` le termine plus tard. `gitpoulpi clone --no-lfs` saute le téléchargement exprès.
 - Vous pouvez désactiver tout LFS dans Paramètres > Git et encodage > Git LFS (ou `[git] lfs_enabled = false`).
 
@@ -225,7 +225,7 @@ GitPoulpi ne dessine la colonne Graph et les avatars des auteurs en pixels que l
 - Dans un terminal qui montre des carrés ou du bruit là où le graphe devrait être, réglez `ui.image_protocol = "none"` ou `ui.graph_renderer = "text"`.
 - `GITPOULPI_TERMINAL_IMAGE=off` désactive les images quelle que soit la configuration.
 
-**herdr distant (`herdr --remote <hôte>`, ou `ssh` puis `herdr`) : le graphe en texte est le défaut.** Via SSH, GitPoulpi tourne sur l'hôte distant et ne peut lire que l'environnement du distant et le `config.toml` de herdr. Qu'une image Kitty apparaisse ou non est décidé par le client herdr *local* (son propre paramètre `kitty_graphics` et son propre terminal), que GitPoulpi ne peut pas voir : quand le client ne dessine pas les images, les cellules restent vides. GitPoulpi dessine donc le graphe en texte chaque fois qu'il détecte herdr via SSH (`SSH_CONNECTION` / `SSH_CLIENT` / `SSH_TTY`). Si votre herdr local a `kitty_graphics = true` et un terminal qui dessine les images Kitty (kitty, Ghostty), activez-le avec `ui.graph_renderer = "image"` (ou `ui.image_protocol = "kitty"`) sur le distant. Les images sont envoyées en ligne (`t=d`), ce qui marche sur n'importe quel flux d'octets. Si la colonne est vide, réglez `ui.graph_renderer = "text"`.
+**herdr remote (`herdr --remote <hôte>`, ou `ssh` puis `herdr`) : le graphe en texte est le défaut.** Via SSH, GitPoulpi tourne sur l'hôte distant et ne peut lire que l'environnement du distant et le `config.toml` de herdr. Qu'une image Kitty apparaisse ou non est décidé par le client herdr *local* (son propre paramètre `kitty_graphics` et son propre terminal), que GitPoulpi ne peut pas voir : quand le client ne dessine pas les images, les cellules restent vides. GitPoulpi dessine donc le graphe en texte chaque fois qu'il détecte herdr via SSH (`SSH_CONNECTION` / `SSH_CLIENT` / `SSH_TTY`). Si votre herdr local a `kitty_graphics = true` et un terminal qui dessine les images Kitty (kitty, Ghostty), activez-le avec `ui.graph_renderer = "image"` (ou `ui.image_protocol = "kitty"`) sur le distant. Les images sont envoyées en ligne (`t=d`), ce qui marche sur n'importe quel flux d'octets. Si la colonne est vide, réglez `ui.graph_renderer = "text"`.
 
 **Un rectangle plus clair derrière les voies.** L'image est transparente (PNG RGBA à alpha droit) partout où rien n'est dessiné, si bien que le fond du terminal et la bande de sélection transparaissent. Les terminaux au protocole Kitty, **WezTerm** et **Rio** composent cet alpha ; GitPoulpi réserve alors des cellules vides ordinaires sous l'image et l'envoie après elles. Tout autre terminal au protocole iTerm2 (iTerm2 plus ancien, mintty) n'est pas connu pour mélanger l'alpha des PNG, l'image y porte donc un fond opaque de la couleur du thème, qui peut apparaître comme un rectangle sur un terminal dont le fond diffère ; `ui.graph_renderer = "text"` le supprime. Avec `ui.graph_lane_background = "off"`, rien n'est peint derrière les voies sur les chemins transparents.
 

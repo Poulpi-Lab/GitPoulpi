@@ -49,6 +49,7 @@ impl ReviewTarget {
                 project: self.project.clone(),
                 ..Default::default()
             },
+            ..Default::default()
         }
     }
 

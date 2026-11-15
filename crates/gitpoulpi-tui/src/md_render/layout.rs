@@ -101,7 +101,7 @@ fn gap_atom(before: Atom, after: Atom) -> Atom {
         && before.link == after.link
         && matches!(
             before.look,
-            Look::Heading | Look::Quote | Look::Link | Look::Strike | Look::Dim
+            Look::Heading | Look::Quote | Look::Link | Look::Strike | Look::Dim | Look::Button
         );
     if shared {
         Atom { ch: ' ', ..before }

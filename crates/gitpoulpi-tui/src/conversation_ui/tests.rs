@@ -311,6 +311,7 @@ pub(crate) fn conversation(
                 project: "g/p".into(),
                 ..Default::default()
             },
+            ..Default::default()
         },
         seen.map(str::to_string),
         true,

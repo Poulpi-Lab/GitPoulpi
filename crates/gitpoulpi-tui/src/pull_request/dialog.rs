@@ -281,6 +281,7 @@ impl PullRequestDialog {
                 project,
                 ..Default::default()
             },
+            ..Default::default()
         }
     }
 

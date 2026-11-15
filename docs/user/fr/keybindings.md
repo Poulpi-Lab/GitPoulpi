@@ -986,6 +986,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Conversation : Citer l'entrée | `Q` |
 | Conversation : Nouveau commentaire | `c` |
 | Conversation : Liens de l'entrée... | `l` |
+| Conversation : Ouvrir le diagramme de l'entrée | `m` |
 | Conversation : Copier le lien de l'entrée | `y` |
 | Conversation : Ouvrir dans le navigateur | `o` |
 | Conversation : Modifier le commentaire | `e` |

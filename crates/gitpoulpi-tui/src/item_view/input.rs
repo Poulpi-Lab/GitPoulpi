@@ -576,6 +576,7 @@ impl ItemView {
             ItemCmd::ToggleInternal => self.toggle_internal(),
             ItemCmd::NewComment => self.act(Act::NewComment),
             ItemCmd::Links => self.act(Act::Links),
+            ItemCmd::OpenDiagram => self.open_diagram_menu(),
             ItemCmd::CopyLink => self.act(Act::CopyLink),
             ItemCmd::OpenBrowser => self.act(Act::OpenBrowser),
             ItemCmd::Edit => self.act(Act::Edit),

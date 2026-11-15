@@ -858,6 +858,10 @@ impl RepoDialogs {
                     ),
                 },
             )),
+            ItemEffect::OpenDiagram(source) => {
+                crate::mermaid_popup::open_script(&source);
+                None
+            }
             ItemEffect::ShowCommit(sha) => {
                 self.dialog = None;
                 self.parked_board = None;

@@ -24,6 +24,7 @@ pub(crate) enum ItemEffect {
     Message(String),
     OpenUrl(String),
     ShowCommit(String),
+    OpenDiagram(String),
 }
 
 /// No provider's issues have a conversation to read in this build.

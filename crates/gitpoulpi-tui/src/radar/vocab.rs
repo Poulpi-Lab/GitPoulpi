@@ -139,6 +139,26 @@ pub(crate) enum Outcome {
     /// Open the Clone dialog prefilled for a request; once the clone lands,
     /// its review opens in the new repository's tab.
     CloneReview(Box<ReviewRequest>),
+    /// Read the conversation of an item whose repository is not cloned, in
+    /// the Home window: the event loop builds the view and hands it back to
+    /// the Radar, which hosts it (`item_host`).
+    ApiConversation(Box<ConversationRequest>),
+}
+
+/// What a conversation opened from a Radar row starts from (plain text, so
+/// the stub build compiles it too).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct ConversationRequest {
+    /// The profile the row came from.
+    pub(crate) integration: String,
+    /// `owner/name` on the host.
+    pub(crate) project: String,
+    pub(crate) number: u64,
+    /// A request (`!53`, `#7`) rather than an issue.
+    pub(crate) pr: bool,
+    pub(crate) label: String,
+    pub(crate) title: String,
+    pub(crate) web_url: String,
 }
 
 /// The request a review starts from (everything the Radar knows about it,

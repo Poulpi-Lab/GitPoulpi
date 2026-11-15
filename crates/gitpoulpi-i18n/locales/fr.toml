@@ -6052,6 +6052,12 @@ hint_next = "champ suivant"
 hint_copy = "copier"
 # context: key hint: the arrows scroll the preview
 hint_scroll = "défiler"
+# context: title of the viewer that shows one Mermaid diagram of a conversation. Width budget: 40 cells
+view_title = "Diagramme Mermaid"
+# context: key hint: Esc closes the viewer
+hint_close = "fermer"
+# context: noun for the status line after a copy: 'copied <this> (...)'
+diagram_copied_what = "diagramme Mermaid"
 # context: noun for the status line after a copy: 'copied <this> (...)'
 copied_what = "gitGraph Mermaid"
 # context: status line: Copy as Mermaid gitGraph was used with nothing to copy
@@ -10079,6 +10085,10 @@ why_no_older = "il n'y a pas d'entrées plus anciennes"
 why_no_unread = "rien de nouveau depuis votre dernière visite"
 why_no_composer = "cet hébergeur n'accepte pas de commentaires d'ici"
 why_no_links = "l'entrée sélectionnée n'a pas de liens"
+open_diagram = "Ouvrir le diagramme"
+link_diagram = "Diagramme : {first}"
+why_no_diagram = "l'entrée choisie n'a pas de diagramme"
+palette_open_diagram = "Conversation : Ouvrir le diagramme de l'entrée"
 why_no_url = "cette entrée n'a pas de page sur l'hébergeur"
 why_no_events = "cet hébergeur ne liste pas d'événements"
 why_no_reply = "cet hébergeur n'accepte pas de réponse à cette entrée"

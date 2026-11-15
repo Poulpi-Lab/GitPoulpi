@@ -277,6 +277,7 @@ fn the_preview_resolves_the_hosts_references() {
             project: "o/r".into(),
             ..Default::default()
         },
+        ..Default::default()
     };
     let doc = md_render::render("see #7 and @mara", 60, &ctx);
     let urls: Vec<&str> = doc.links.iter().map(|l| l.url.as_str()).collect();

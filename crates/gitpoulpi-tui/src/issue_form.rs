@@ -171,6 +171,7 @@ impl IssueDialog {
                 project: seed.project.clone(),
                 ..Default::default()
             },
+            ..Default::default()
         };
         let choice = ChoiceKind::of(seed.integration.kind.family()).map(|kind| ChoiceField {
             kind,

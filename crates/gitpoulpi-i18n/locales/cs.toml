@@ -6034,6 +6034,12 @@ hint_next = "další pole"
 hint_copy = "kopírovat"
 # context: key hint: the arrows scroll the preview
 hint_scroll = "posun"
+# context: title of the viewer that shows one Mermaid diagram of a conversation. Width budget: 40 cells
+view_title = "Mermaid diagram"
+# context: key hint: Esc closes the viewer
+hint_close = "close"
+# context: noun for the status line after a copy: 'copied <this> (...)'
+diagram_copied_what = "Mermaid diagram"
 # context: noun for the status line after a copy: 'copied <this> (...)'
 copied_what = "Mermaid gitGraph"
 # context: status line: Copy as Mermaid gitGraph was used with nothing to copy
@@ -10186,6 +10192,10 @@ why_no_older = "there are no older entries"
 why_no_unread = "nothing new since your last visit"
 why_no_composer = "this host does not take comments from here"
 why_no_links = "the selected entry has no links"
+open_diagram = "Open diagram"
+link_diagram = "Diagram: {first}"
+why_no_diagram = "the selected entry has no diagram"
+palette_open_diagram = "Conversation: Open Diagram of Entry"
 why_no_url = "this entry has no page on the host"
 why_no_events = "this host does not list events"
 why_no_reply = "this host does not take a reply to this entry"

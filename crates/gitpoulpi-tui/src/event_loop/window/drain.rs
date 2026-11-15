@@ -308,7 +308,7 @@ impl WindowState {
                         && self
                             .management
                             .as_ref()
-                            .is_some_and(|m| m.radar.hosts_review()) =>
+                            .is_some_and(|m| m.radar.hosts_review() || m.radar.hosts_item()) =>
                 {
                     if let Some(manager) = self.management.as_mut() {
                         manager.radar.paste(&text);

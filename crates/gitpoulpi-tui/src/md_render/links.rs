@@ -25,6 +25,7 @@ pub(super) fn register(doc: &mut Doc, url: &str) -> Option<LinkId> {
     doc.links.push(LinkTarget {
         url: url.to_string(),
         xref: None,
+        diagram: None,
     });
     Some(doc.links.len() - 1)
 }
@@ -42,6 +43,7 @@ fn register_xref(doc: &mut Doc, url: String, target: XrefTarget) -> LinkId {
     doc.links.push(LinkTarget {
         url,
         xref: Some(target),
+        diagram: None,
     });
     doc.links.len() - 1
 }

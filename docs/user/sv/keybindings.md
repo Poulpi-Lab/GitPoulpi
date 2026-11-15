@@ -986,6 +986,7 @@ Tangenterna är standardvärdena.
 | Conversation: Quote Entry | `Q` |
 | Conversation: New Comment | `c` |
 | Conversation: Links of Entry... | `l` |
+| Conversation: Open Diagram of Entry | `m` |
 | Conversation: Copy Link of Entry | `y` |
 | Conversation: Open in Browser | `o` |
 | Conversation: Edit Comment | `e` |

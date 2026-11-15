@@ -67,6 +67,7 @@ fn cut_name(part: gitpoulpi_ai::Part) -> &'static str {
         Part::ReviewThreads => "the existing comments",
         Part::ContextFile => "a context file",
         Part::ContextTotal => "the context files",
+        Part::ReplyConversation => "the conversation",
     }
 }
 
@@ -222,11 +223,10 @@ fn prompt(session: &Session, action: &str) -> Result<Emitted, String> {
     .with_repo_instructions(repo_instructions)
     .with_workspace(workspace)
     .with_context(context);
-    let layers: Vec<serde_json::Value> =
-        std::iter::once(("base", prompts::base_prompt(action).to_string()))
-            .chain(job.prompt_layers())
-            .map(|(level, text)| json!({ "level": level, "text": text }))
-            .collect();
+    let layers: Vec<serde_json::Value> = std::iter::once(("base", job.base_prompt()))
+        .chain(job.prompt_layers())
+        .map(|(level, text)| json!({ "level": level, "text": text }))
+        .collect();
     let system = job.system_prompt();
     let mut out = json!({
         "action": action.key(),
@@ -619,6 +619,110 @@ async fn worktree_name(
     ))
 }
 
+/// The conversation of `ai hosting-reply`: a file, `-` (standard input) or
+/// the JSON itself.
+#[cfg(feature = "hosting")]
+fn read_conversation(
+    source: &str,
+) -> Result<gitpoulpi_hosting::conversation::TimelinePage, String> {
+    use std::io::Read;
+    let text = if source.trim_start().starts_with('{') {
+        source.to_string()
+    } else if source == "-" {
+        let mut text = String::new();
+        std::io::stdin()
+            .read_to_string(&mut text)
+            .map_err(|e| format!("could not read the conversation from standard input: {e}"))?;
+        text
+    } else {
+        std::fs::read_to_string(source)
+            .map_err(|e| format!("could not read the conversation {source}: {e}"))?
+    };
+    serde_json::from_str(&text).map_err(|e| {
+        format!("the conversation is not a page of entries (`header` and `entries`): {e}")
+    })
+}
+
+/// What `ai hosting-reply` was asked.
+#[cfg(feature = "hosting")]
+pub(crate) struct ReplyArgs {
+    pub conversation: Option<String>,
+    pub reply_to: Option<String>,
+    pub path: Option<String>,
+    pub line: Option<u32>,
+    pub review_summary: bool,
+    pub issue_title: Option<String>,
+    pub hint: String,
+    pub draft: Option<String>,
+    pub flavor: Option<String>,
+    pub read_repo: bool,
+}
+
+/// `ai hosting-reply`: a draft for a conversation on a host. Drafts only:
+/// nothing here reaches a hosting client, so nothing is posted.
+#[cfg(feature = "hosting")]
+async fn hosting_reply(
+    session: &mut Session,
+    ctx: &mut Ctx,
+    args: ReplyArgs,
+) -> Result<Emitted, String> {
+    use gitpoulpi_ai::hosting_reply::{convert, draft, ReplyRequest, ReplyTarget};
+    use gitpoulpi_hosting::conversation::MarkupFlavor;
+
+    if args.read_repo {
+        return Err(
+            "--read-repo: letting the AI read the repository is not built yet;              run without it (the AI then sees only the conversation)"
+                .into(),
+        );
+    }
+    let target = match (&args.issue_title, &args.reply_to, &args.path) {
+        (Some(title), ..) => ReplyTarget::IssueBody {
+            title: title.trim().to_string(),
+        },
+        (_, Some(thread), _) => ReplyTarget::ThreadReply {
+            thread: thread.clone(),
+        },
+        (_, _, Some(path)) => ReplyTarget::LineComment {
+            path: path.clone(),
+            line: args.line,
+            hunk: None,
+        },
+        _ if args.review_summary => ReplyTarget::ReviewSummary,
+        _ => ReplyTarget::Comment,
+    };
+    let mut request = ReplyRequest::new(target);
+    request.hint = args.hint;
+    request.draft = args.draft;
+    let mut flavor = MarkupFlavor::default();
+    if let Some(source) = &args.conversation {
+        let page = read_conversation(source)?;
+        flavor = page.header.body.flavor;
+        request.item = Some(convert::item_digest(&page.header));
+        request.entries = convert::entries(&page.entries);
+    }
+    if let Some(named) = &args.flavor {
+        flavor = serde_json::from_value(json!(named.trim()))
+            .map_err(|_| format!("unknown markup flavor `{named}`"))?;
+    }
+    request.flavor = convert::flavor_name(flavor).to_string();
+
+    let action = request.target.action();
+    let job = ctx.job(session, action)?;
+    let result = draft(&job, &request).await.map_err(|e| e.to_string())?;
+    Ok(emitted(
+        json!({
+            "action": action.key(),
+            "target": request.target.name(),
+            "draft": result.text,
+            "improved": result.improved,
+            "context": result.context,
+            // Said on purpose: this command never posts, edits or deletes.
+            "posted": false,
+        }),
+        result.text,
+    ))
+}
+
 pub(crate) async fn run(
     session: &mut Session,
     action: AiCommand,
@@ -650,6 +754,37 @@ async fn run_action(
             ))
         }
         AiCommand::Prompt { action } => prompt(session, &action),
+        #[cfg(feature = "hosting")]
+        AiCommand::HostingReply {
+            conversation,
+            reply_to,
+            path,
+            line,
+            review_summary,
+            issue_title,
+            hint,
+            draft,
+            flavor,
+            read_repo,
+        } => {
+            hosting_reply(
+                session,
+                ctx,
+                ReplyArgs {
+                    conversation,
+                    reply_to,
+                    path,
+                    line,
+                    review_summary,
+                    issue_title,
+                    hint,
+                    draft,
+                    flavor,
+                    read_repo,
+                },
+            )
+            .await
+        }
         #[cfg(feature = "worktree")]
         AiCommand::WorktreeName { describe } => worktree_name(session, ctx, &describe).await,
         // Answered from files, before a daemon is involved (`is_local`).

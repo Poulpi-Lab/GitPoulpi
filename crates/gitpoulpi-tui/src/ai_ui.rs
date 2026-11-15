@@ -65,6 +65,8 @@ fn action_label(action: AiAction) -> &'static str {
         AiAction::RewriteScript => rewrite_msg::ACTION,
         AiAction::RewriteRules => gitpoulpi_i18n::msg::rewrite_rules_ai::ACTION,
         AiAction::WorktreeName => action_msg::ACTION_WORKTREE_NAME,
+        AiAction::HostingReply => action_msg::ACTION_HOSTING_REPLY,
+        AiAction::IssueBody => action_msg::ACTION_ISSUE_BODY,
     }
     .get()
 }

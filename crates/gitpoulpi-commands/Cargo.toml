@@ -18,7 +18,7 @@ full = [
 ]
 ai = ["dep:gitpoulpi-ai", "dep:async-trait"]
 # Internal: "at least one hosting provider". Never enabled alone.
-hosting = ["gitpoulpi-daemon/hosting"]
+hosting = ["gitpoulpi-daemon/hosting", "gitpoulpi-ai?/conversation"]
 github = ["hosting", "gitpoulpi-hosting/github"]
 gitlab = ["hosting", "gitpoulpi-hosting/gitlab"]
 azure-devops = ["hosting", "gitpoulpi-hosting/azure-devops"]

@@ -66,10 +66,17 @@ pub enum AiAction {
     /// Names a new worktree and its branch from a description of the task
     /// (the Create worktree dialog's ✦). It only fills two fields.
     WorktreeName,
+    /// Drafts a comment, a thread reply, a review comment or a review
+    /// summary on a host (the composer's ✦). It only drafts text: nothing
+    /// is ever posted by it.
+    HostingReply,
+    /// Drafts the description of a new issue (the issue form's ✦). Drafts
+    /// only.
+    IssueBody,
 }
 
 impl AiAction {
-    pub const ALL: [AiAction; 11] = [
+    pub const ALL: [AiAction; 13] = [
         Self::CommitMessage,
         Self::ExplainChanges,
         Self::StashMessage,
@@ -81,6 +88,8 @@ impl AiAction {
         Self::RewriteScript,
         Self::RewriteRules,
         Self::WorktreeName,
+        Self::HostingReply,
+        Self::IssueBody,
     ];
 
     /// The snake_case key used in `config.toml` and on the CLI.
@@ -97,6 +106,8 @@ impl AiAction {
             Self::RewriteScript => "rewrite_script",
             Self::RewriteRules => "rewrite_rules",
             Self::WorktreeName => "worktree_name",
+            Self::HostingReply => "hosting_reply",
+            Self::IssueBody => "issue_body",
         }
     }
 
@@ -117,6 +128,8 @@ impl AiAction {
             Self::RewriteScript => "History rewrite script",
             Self::RewriteRules => "History rewrite rules",
             Self::WorktreeName => "Worktree name",
+            Self::HostingReply => "Reply on a host",
+            Self::IssueBody => "Issue description",
         }
     }
 }
@@ -491,6 +504,25 @@ pub const DEFAULT_REVIEW_CONTEXT_FILE_BYTES: usize = 8 * 1024;
 /// Default for `ai.limits.review_context_bytes`: all the context files of a
 /// review together.
 pub const DEFAULT_REVIEW_CONTEXT_BYTES: usize = 16 * 1024;
+/// Default for `ai.limits.hosting_reply_context_bytes`: everything the
+/// conversation and the repository add to a drafted reply, together.
+pub const DEFAULT_HOSTING_REPLY_CONTEXT_BYTES: usize = 49_152;
+/// Default for `ai.limits.hosting_reply_file_bytes`: one repository file
+/// given to a drafted reply.
+pub const DEFAULT_HOSTING_REPLY_FILE_BYTES: usize = 8_192;
+/// Default for `ai.limits.hosting_reply_map_bytes`: the repository map
+/// given to a drafted reply.
+pub const DEFAULT_HOSTING_REPLY_MAP_BYTES: usize = 6_144;
+/// Default for `ai.limits.hosting_reply_hits_per_term`.
+pub const DEFAULT_HOSTING_REPLY_HITS_PER_TERM: usize = 20;
+/// Default for `ai.limits.hosting_reply_terms`.
+pub const DEFAULT_HOSTING_REPLY_TERMS: usize = 8;
+/// Smallest and largest `ai.limits.hosting_reply_hits_per_term`.
+pub const MIN_HOSTING_REPLY_HITS: usize = 1;
+pub const MAX_HOSTING_REPLY_HITS: usize = 200;
+/// Smallest and largest `ai.limits.hosting_reply_terms`.
+pub const MIN_HOSTING_REPLY_TERMS: usize = 1;
+pub const MAX_HOSTING_REPLY_TERMS: usize = 50;
 /// Smallest `ai.limits.*` (other than the conflict's) takes.
 pub const MIN_LIMIT_BYTES: usize = 1_000;
 /// Largest `ai.limits.*` (other than the conflict's) takes.
@@ -521,6 +553,18 @@ pub struct AiLimits {
     pub review_context_file_bytes: usize,
     /// Bytes of all the project context files given to a code review.
     pub review_context_bytes: usize,
+    /// Bytes of everything a drafted reply is given besides the user's own
+    /// text: the item, the conversation and (once the AI may read it) the
+    /// repository.
+    pub hosting_reply_context_bytes: usize,
+    /// Bytes of one repository file given to a drafted reply.
+    pub hosting_reply_file_bytes: usize,
+    /// Bytes of the repository map given to a drafted reply.
+    pub hosting_reply_map_bytes: usize,
+    /// Most search hits kept per search term of a drafted reply.
+    pub hosting_reply_hits_per_term: usize,
+    /// Most search terms a drafted reply looks up.
+    pub hosting_reply_terms: usize,
 }
 
 impl Default for AiLimits {
@@ -533,6 +577,11 @@ impl Default for AiLimits {
             review_threads_bytes: DEFAULT_REVIEW_THREADS_BYTES,
             review_context_file_bytes: DEFAULT_REVIEW_CONTEXT_FILE_BYTES,
             review_context_bytes: DEFAULT_REVIEW_CONTEXT_BYTES,
+            hosting_reply_context_bytes: DEFAULT_HOSTING_REPLY_CONTEXT_BYTES,
+            hosting_reply_file_bytes: DEFAULT_HOSTING_REPLY_FILE_BYTES,
+            hosting_reply_map_bytes: DEFAULT_HOSTING_REPLY_MAP_BYTES,
+            hosting_reply_hits_per_term: DEFAULT_HOSTING_REPLY_HITS_PER_TERM,
+            hosting_reply_terms: DEFAULT_HOSTING_REPLY_TERMS,
         }
     }
 }
@@ -543,7 +592,7 @@ fn clamp_limit(value: usize) -> usize {
 
 impl AiLimits {
     /// The settings keys, in the order Settings shows them.
-    pub const KEYS: [&'static str; 7] = [
+    pub const KEYS: [&'static str; 12] = [
         "ai.limits.conflict_bytes",
         "ai.limits.diff_bytes",
         "ai.limits.review_file_bytes",
@@ -551,6 +600,11 @@ impl AiLimits {
         "ai.limits.review_threads_bytes",
         "ai.limits.review_context_file_bytes",
         "ai.limits.review_context_bytes",
+        "ai.limits.hosting_reply_context_bytes",
+        "ai.limits.hosting_reply_file_bytes",
+        "ai.limits.hosting_reply_map_bytes",
+        "ai.limits.hosting_reply_hits_per_term",
+        "ai.limits.hosting_reply_terms",
     ];
 
     /// `conflict_bytes` with a hand-edited out-of-range value brought back
@@ -588,6 +642,118 @@ impl AiLimits {
     /// `review_context_bytes`, clamped like [`Self::diff_bytes_clamped`].
     pub fn review_context_bytes_clamped(&self) -> usize {
         clamp_limit(self.review_context_bytes)
+    }
+
+    /// `hosting_reply_context_bytes`, clamped like [`Self::diff_bytes_clamped`].
+    pub fn hosting_reply_context_bytes_clamped(&self) -> usize {
+        clamp_limit(self.hosting_reply_context_bytes)
+    }
+
+    /// `hosting_reply_file_bytes`, clamped like [`Self::diff_bytes_clamped`].
+    pub fn hosting_reply_file_bytes_clamped(&self) -> usize {
+        clamp_limit(self.hosting_reply_file_bytes)
+    }
+
+    /// `hosting_reply_map_bytes`, clamped like [`Self::diff_bytes_clamped`].
+    pub fn hosting_reply_map_bytes_clamped(&self) -> usize {
+        clamp_limit(self.hosting_reply_map_bytes)
+    }
+
+    /// `hosting_reply_hits_per_term`, brought into
+    /// `MIN_HOSTING_REPLY_HITS..=MAX_HOSTING_REPLY_HITS`.
+    pub fn hosting_reply_hits_per_term_clamped(&self) -> usize {
+        self.hosting_reply_hits_per_term
+            .clamp(MIN_HOSTING_REPLY_HITS, MAX_HOSTING_REPLY_HITS)
+    }
+
+    /// `hosting_reply_terms`, brought into
+    /// `MIN_HOSTING_REPLY_TERMS..=MAX_HOSTING_REPLY_TERMS`.
+    pub fn hosting_reply_terms_clamped(&self) -> usize {
+        self.hosting_reply_terms
+            .clamp(MIN_HOSTING_REPLY_TERMS, MAX_HOSTING_REPLY_TERMS)
+    }
+}
+
+/// Default for `ai.hosting_reply.context_ttl_minutes`.
+pub const DEFAULT_CONTEXT_TTL_MINUTES: u32 = 30;
+/// Largest `ai.hosting_reply.context_ttl_minutes` (a day); the smallest is 1.
+pub const MAX_CONTEXT_TTL_MINUTES: u32 = 1_440;
+
+/// `[ai.hosting_reply]`: how the writing help for conversations on a host
+/// ([`AiAction::HostingReply`], [`AiAction::IssueBody`]) behaves. The AI only
+/// ever drafts text; none of these settings lets it post.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct AiHostingReply {
+    /// The base prompt both actions start from. Empty means the built-in
+    /// one (`gitpoulpi-ai`'s `hosting_reply::BASE_PROMPT`); text here
+    /// replaces it entirely, the instruction levels still follow it.
+    pub base_prompt: String,
+    /// The default of the per-use "Let the AI read the repository" choice.
+    /// **Off by default**: the repository is only read when this use ticks it.
+    pub read_repository: bool,
+    /// Keep a local agent's session between two replies when its harness
+    /// supports it.
+    pub reuse_agent_session: bool,
+    /// How long a repository context built for a reply is reused.
+    pub context_ttl_minutes: u32,
+}
+
+impl Default for AiHostingReply {
+    fn default() -> Self {
+        Self {
+            base_prompt: String::new(),
+            read_repository: false,
+            reuse_agent_session: true,
+            context_ttl_minutes: DEFAULT_CONTEXT_TTL_MINUTES,
+        }
+    }
+}
+
+impl AiHostingReply {
+    /// `context_ttl_minutes`, brought into `1..=MAX_CONTEXT_TTL_MINUTES`.
+    pub fn context_ttl_minutes_clamped(&self) -> u32 {
+        self.context_ttl_minutes.clamp(1, MAX_CONTEXT_TTL_MINUTES)
+    }
+
+    /// The base prompt in force: the user's text, or `builtin` when theirs is
+    /// blank.
+    pub fn base_prompt_or<'a>(&'a self, builtin: &'a str) -> &'a str {
+        if self.base_prompt.trim().is_empty() {
+            builtin
+        } else {
+            self.base_prompt.trim()
+        }
+    }
+
+    /// The settings with a repository's own values on top.
+    pub fn with_repo(&self, repo: &RepoAiHostingReply) -> Self {
+        Self {
+            base_prompt: self.base_prompt.clone(),
+            read_repository: repo.read_repository.unwrap_or(self.read_repository),
+            reuse_agent_session: repo.reuse_agent_session.unwrap_or(self.reuse_agent_session),
+            context_ttl_minutes: repo.context_ttl_minutes.unwrap_or(self.context_ttl_minutes),
+        }
+    }
+}
+
+/// One repository's own `[ai.hosting_reply]` values (`RepoPreferences`):
+/// `None` inherits the global one. The base prompt has no repository twin:
+/// a repository changes the prompt through its instructions.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct RepoAiHostingReply {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub read_repository: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reuse_agent_session: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub context_ttl_minutes: Option<u32>,
+}
+
+impl RepoAiHostingReply {
+    pub fn is_empty(&self) -> bool {
+        *self == Self::default()
     }
 }
 
@@ -791,6 +957,8 @@ pub struct AiActions {
     pub rewrite_script: AiActionSettings,
     pub rewrite_rules: AiActionSettings,
     pub worktree_name: AiActionSettings,
+    pub hosting_reply: AiActionSettings,
+    pub issue_body: AiActionSettings,
 }
 
 impl AiActions {
@@ -807,6 +975,8 @@ impl AiActions {
             AiAction::RewriteScript => &self.rewrite_script,
             AiAction::RewriteRules => &self.rewrite_rules,
             AiAction::WorktreeName => &self.worktree_name,
+            AiAction::HostingReply => &self.hosting_reply,
+            AiAction::IssueBody => &self.issue_body,
         }
     }
 
@@ -823,6 +993,8 @@ impl AiActions {
             AiAction::RewriteScript => &mut self.rewrite_script,
             AiAction::RewriteRules => &mut self.rewrite_rules,
             AiAction::WorktreeName => &mut self.worktree_name,
+            AiAction::HostingReply => &mut self.hosting_reply,
+            AiAction::IssueBody => &mut self.issue_body,
         }
     }
 }
@@ -875,6 +1047,8 @@ pub struct AiConfig {
     /// `[ai.sent_preview]`: per action, whether "What is sent" is shown
     /// before the request goes out.
     pub sent_preview: AiSentPreview,
+    /// `[ai.hosting_reply]`: the writing help for conversations on a host.
+    pub hosting_reply: AiHostingReply,
     /// Archive of the pre-2026-10-01 `[[ai.presets]]`, written by the
     /// migration and never read by an action. See the module docs.
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -893,6 +1067,7 @@ impl Default for AiConfig {
             privacy: AiPrivacy::default(),
             limits: AiLimits::default(),
             sent_preview: AiSentPreview::default(),
+            hosting_reply: AiHostingReply::default(),
             legacy_presets: Vec::new(),
         };
         ai.ensure_default_profile();
@@ -1582,5 +1757,92 @@ explain_changes = "ghost"
             assert_eq!(RunInRepo::from_key(v.key()), Some(v));
         }
         assert_eq!(RunInRepo::from_key("maybe"), None);
+    }
+
+    /// Owner decision: the AI never reads the repository unless this use
+    /// ticks it, so the stored default is off, and an empty file says so.
+    #[test]
+    fn reading_the_repository_is_off_by_default() {
+        let ai = AiConfig::default();
+        assert!(!ai.hosting_reply.read_repository);
+        assert!(ai.hosting_reply.reuse_agent_session);
+        assert_eq!(ai.hosting_reply.context_ttl_minutes, 30);
+        let ai: AiConfig = toml::from_str("enabled = true").unwrap();
+        assert!(!ai.hosting_reply.read_repository, "absent means off");
+        let ai: AiConfig = toml::from_str("[hosting_reply]\nread_repository = true\n").unwrap();
+        assert!(ai.hosting_reply.read_repository);
+        assert!(
+            ai.hosting_reply.reuse_agent_session,
+            "unmentioned keeps its default"
+        );
+    }
+
+    /// The base prompt is the user's to edit; blank falls back to the
+    /// built-in text, and a repository can change the other three settings.
+    #[test]
+    fn the_base_prompt_is_editable_and_blank_means_built_in() {
+        let mut hr = AiHostingReply::default();
+        assert_eq!(hr.base_prompt_or("built-in"), "built-in");
+        hr.base_prompt = "  \n ".into();
+        assert_eq!(hr.base_prompt_or("built-in"), "built-in");
+        hr.base_prompt = "  Be brief.  ".into();
+        assert_eq!(hr.base_prompt_or("built-in"), "Be brief.");
+        let own = RepoAiHostingReply {
+            read_repository: Some(true),
+            context_ttl_minutes: Some(5),
+            ..RepoAiHostingReply::default()
+        };
+        let merged = hr.with_repo(&own);
+        assert!(merged.read_repository);
+        assert!(merged.reuse_agent_session, "None inherits");
+        assert_eq!(merged.context_ttl_minutes, 5);
+        assert_eq!(merged.base_prompt, "  Be brief.  ", "no repository twin");
+        assert!(RepoAiHostingReply::default().is_empty());
+    }
+
+    #[test]
+    fn the_reply_limits_have_their_defaults_and_are_clamped() {
+        let l = AiLimits::default();
+        assert_eq!(
+            (
+                l.hosting_reply_context_bytes,
+                l.hosting_reply_file_bytes,
+                l.hosting_reply_map_bytes,
+                l.hosting_reply_hits_per_term,
+                l.hosting_reply_terms
+            ),
+            (49_152, 8_192, 6_144, 20, 8)
+        );
+        let wild = AiLimits {
+            hosting_reply_context_bytes: 0,
+            hosting_reply_hits_per_term: 0,
+            hosting_reply_terms: 10_000,
+            ..AiLimits::default()
+        };
+        assert_eq!(wild.hosting_reply_context_bytes_clamped(), MIN_LIMIT_BYTES);
+        assert_eq!(wild.hosting_reply_hits_per_term_clamped(), 1);
+        assert_eq!(wild.hosting_reply_terms_clamped(), MAX_HOSTING_REPLY_TERMS);
+        for key in AiLimits::KEYS {
+            assert!(Config::default().get(key).is_ok(), "{key} is a real key");
+        }
+    }
+
+    #[test]
+    fn the_two_new_actions_have_keys_labels_and_settings() {
+        for (action, key) in [
+            (AiAction::HostingReply, "hosting_reply"),
+            (AiAction::IssueBody, "issue_body"),
+        ] {
+            assert_eq!(action.key(), key);
+            assert_eq!(AiAction::from_key(key), Some(action));
+            assert!(!action.label().is_empty());
+            let mut actions = AiActions::default();
+            actions.get_mut(action).instructions = "x".into();
+            assert_eq!(actions.get(action).instructions, "x");
+            assert!(AiSentPreview::default().shows(action));
+            assert!(Config::default()
+                .get(&format!("ai.actions.{key}.profile"))
+                .is_ok());
+        }
     }
 }

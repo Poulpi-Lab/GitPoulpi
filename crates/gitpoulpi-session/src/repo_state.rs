@@ -127,6 +127,11 @@ pub struct RepoPreferences {
     /// `remote-reviews.toml`.
     #[serde(skip_serializing_if = "gitpoulpi_config::RepoAiReview::is_empty")]
     pub ai_review: gitpoulpi_config::RepoAiReview,
+    /// This repository's own `[ai.hosting_reply]` values (read the
+    /// repository by default, reuse the agent session, context lifetime);
+    /// `None` fields inherit the global ones.
+    #[serde(skip_serializing_if = "gitpoulpi_config::RepoAiHostingReply::is_empty")]
+    pub ai_hosting_reply: gitpoulpi_config::RepoAiHostingReply,
     /// Read-only legacy key: the preset id chosen per action before the
     /// 2026-10-01 AI redesign. [`Self::migrate_ai`] turns it into
     /// `ai_overrides`; it is never written back.
@@ -792,6 +797,31 @@ mod tests {
         assert_eq!(back.include_agents_md, None, "left to inherit");
         assert_eq!(back.extra_file.as_deref(), Some(""), "cleared is not unset");
         assert_eq!(back.no_extra_file, Some(true));
+    }
+
+    /// The reply-drafting defaults are per repository, every field optional.
+    #[test]
+    fn the_hosting_reply_defaults_round_trip_as_none_until_chosen() {
+        use gitpoulpi_config::RepoAiHostingReply;
+        let dir = tempfile::tempdir().unwrap();
+        let path = RepoState::path_for(dir.path(), ".gitpoulpi");
+        RepoState::default().save(&path).unwrap();
+        let raw = std::fs::read_to_string(&path).unwrap();
+        assert!(
+            !raw.contains("ai_hosting_reply"),
+            "unset is not written: {raw}"
+        );
+        let mut state = RepoState::default();
+        state.preferences.ai_hosting_reply = RepoAiHostingReply {
+            read_repository: Some(true),
+            reuse_agent_session: None,
+            context_ttl_minutes: Some(5),
+        };
+        state.save(&path).unwrap();
+        let back = RepoState::load(&path).unwrap().preferences.ai_hosting_reply;
+        assert_eq!(back.read_repository, Some(true));
+        assert_eq!(back.reuse_agent_session, None, "left to inherit");
+        assert_eq!(back.context_ttl_minutes, Some(5));
     }
 
     /// The choice is per repository and survives a save/load.

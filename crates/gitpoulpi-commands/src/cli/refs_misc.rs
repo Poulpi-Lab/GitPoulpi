@@ -457,6 +457,66 @@ pub enum AiCommand {
         #[arg(long, value_name = "TEXT")]
         describe: String,
     },
+    #[cfg(feature = "hosting")]
+    /// Print a draft the AI writes for a conversation on a code host: a
+    /// comment, an answer in a thread (`--reply-to`), a comment on a line of
+    /// code (`--path`), a review summary (`--review-summary`), or the
+    /// description of a new issue (`--issue-title`). The conversation is read
+    /// from `--conversation` (the JSON a `hosting` conversation command prints:
+    /// `header` and `entries`); the AI sees the item, the thread, the recent
+    /// comments within `ai.limits.hosting_reply_context_bytes` and your
+    /// `--hint`. **It only drafts: the answer is `{ draft, posted: false, ... }`
+    /// and nothing is posted, edited or deleted**; posting is a separate
+    /// command you run yourself. The base prompt is
+    /// `ai.hosting_reply.base_prompt` (edit it in Settings > AI). Needs
+    /// `ai.enabled = true`.
+    HostingReply {
+        /// The conversation as JSON: a file, `-` for standard input, or the
+        /// JSON itself. Not for `--issue-title`.
+        #[arg(
+            long,
+            value_name = "FILE|-|JSON",
+            required_unless_present = "issue_title",
+            conflicts_with = "issue_title"
+        )]
+        conversation: Option<String>,
+        /// Answer in the thread with this id (a code thread, a comment or a
+        /// discussion).
+        #[arg(
+            long,
+            value_name = "ID",
+            conflicts_with_all = ["path", "review_summary", "issue_title"]
+        )]
+        reply_to: Option<String>,
+        /// Draft a new review comment on this file of the pull request.
+        #[arg(long, conflicts_with_all = ["review_summary", "issue_title"])]
+        path: Option<String>,
+        /// With `--path`: the line.
+        #[arg(long, requires = "path")]
+        line: Option<u32>,
+        /// Draft the summary of the review being submitted.
+        #[arg(long, conflicts_with = "issue_title")]
+        review_summary: bool,
+        /// Draft the description of a new issue with this title (no
+        /// conversation).
+        #[arg(long, value_name = "TITLE")]
+        issue_title: Option<String>,
+        /// What you want in this answer ("say I will look at it tomorrow").
+        #[arg(long, default_value = "")]
+        hint: String,
+        /// Your own text to improve instead of writing a new one.
+        #[arg(long)]
+        draft: Option<String>,
+        /// The markup the host takes: `gfm`, `gitlab_md`, `gitea_md`,
+        /// `common_mark`, `azure_md`, `bitbucket_md`, `html`, `jira_wiki`,
+        /// `textile`, `youtrack_md`, `trello_md`, `plain_text`,
+        /// `obsidian_md`. Default: the item's own.
+        #[arg(long)]
+        flavor: Option<String>,
+        /// Let the AI read the repository. Not built yet: refused.
+        #[arg(long)]
+        read_repo: bool,
+    },
     /// Print the system prompt an AI action sends for this repository, level
     /// by level: the built-in base, the global instructions, the workspace's
     /// (the one in `GITPOULPI_WORKSPACE` if it holds the repository, else the

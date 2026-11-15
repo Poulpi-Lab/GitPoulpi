@@ -98,6 +98,7 @@ const READ_ONLY: &[&[&str]] = &[
     &["ai", "rewrite-script"],
     &["ai", "rewrite-rules"],
     &["ai", "worktree-name"],
+    &["ai", "hosting-reply"],
     // Prints the layered system prompt; calls no model.
     &["ai", "prompt"],
     // They answer a question: `config get` reads one key, `config path`

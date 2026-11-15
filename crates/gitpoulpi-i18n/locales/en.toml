@@ -3846,6 +3846,24 @@ title_worktree_name = "Worktree names"
 profile_help_worktree_name = "The profile GitPoulpi will use to name a new worktree and its branch from a description."
 repo_profile_help_worktree_name = "The profile used in this repository to name a new worktree and its branch."
 action_worktree_name = "Worktree name"
+# context: Settings > AI, heading of the block for drafting replies on a code host or tracker with the AI (comments, answers in a thread, review comments, review summaries)
+title_hosting_reply = "Replies on a host"
+# context: Settings > AI, help under the profile of that block
+profile_help_hosting_reply = "The profile GitPoulpi will use to draft a comment, an answer in a thread, a review comment or a review summary. It only writes a draft: nothing is posted until you post it."
+# context: Settings > AI, repository page, help under the profile of that block
+repo_profile_help_hosting_reply = "The profile used in this repository to draft replies on a host."
+# context: name of the AI action that drafts replies on a host, in lists of actions
+action_hosting_reply = "Reply on a host"
+# context: Settings > AI, heading of the block for drafting the description of a new issue with the AI
+title_issue_body = "New issue descriptions"
+# context: Settings > AI, help under the profile of that block
+profile_help_issue_body = "The profile GitPoulpi will use to draft the description of a new issue. It only writes a draft: nothing is created until you create it."
+# context: Settings > AI, repository page, help under the profile of that block
+repo_profile_help_issue_body = "The profile used in this repository to draft the description of a new issue."
+# context: name of the AI action that drafts the description of a new issue, in lists of actions
+action_issue_body = "Issue description"
+# context: title of the editor that opens on the base prompt of the AI replies on a host
+title_hosting_base = "Base prompt for replies"
 [palette]
 sidebar_show_worktrees = "Sidebar: Show Worktrees Section"
 refs_open_worktree_in = "Refs: Open Worktree In..."
@@ -11538,6 +11556,28 @@ part_review_threads = "The existing comments are {size}, limit {limit} (setting 
 part_context_file = "The context file {name} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
 # context: list line of that dialog, for the project context files together; {name} is the file that crossed the limit
 part_context_total = "The context files together reach {size} at {name}, limit {limit} (setting {key}). Truncated, the rest is left out."
+# context: Settings > AI, label of a number: the most bytes of the conversation (the item, its comments) given to the AI when it drafts a reply
+hosting_reply_context_label = "Largest conversation to send for a reply (bytes)"
+# context: help under that number
+hosting_reply_context_help = "Over this size, nothing is cut silently: you are asked whether to send everything, send it truncated (the oldest comments are left out first), open this setting or cancel. 49152 by default."
+# context: Settings > AI, label of a number: the most bytes of one repository file given to the AI when it drafts a reply
+hosting_reply_file_label = "Largest repository file for a reply (bytes)"
+# context: help under that number
+hosting_reply_file_help = "Used once the AI may read the repository, which is not built yet. 8192 by default."
+# context: Settings > AI, label of a number: the most bytes of the repository map (its list of files) given to the AI when it drafts a reply
+hosting_reply_map_label = "Largest repository map for a reply (bytes)"
+# context: help under that number
+hosting_reply_map_help = "Used once the AI may read the repository, which is not built yet. 6144 by default."
+# context: Settings > AI, label of a number: the most search results kept for each search term when the AI drafts a reply
+hosting_reply_hits_label = "Most search hits per term for a reply"
+# context: help under that number
+hosting_reply_hits_help = "Used once the AI may read the repository, which is not built yet. 20 by default."
+# context: Settings > AI, label of a number: the most search terms looked up in the repository when the AI drafts a reply
+hosting_reply_terms_label = "Most search terms for a reply"
+# context: help under that number
+hosting_reply_terms_help = "Used once the AI may read the repository, which is not built yet. 8 by default."
+# context: list line of the dialog shown when what would be sent to the AI is over a limit, for the conversation of a drafted reply; {size} is its size (for example "91.2 KB (91234 bytes)"), {limit} the limit in the same form, {key} the name of the setting
+part_reply_conversation = "The conversation is {size}, limit {limit} (setting {key}). Truncated, the oldest comments and the start of long ones are left out."
 # context: button that sends everything of the oversized request this one time, nothing cut
 send_all = "Send all"
 # context: button that sends the request with what is over its limit cut
@@ -12230,3 +12270,23 @@ discard_body = "What you wrote will be lost."
 hint_preview = "Preview"
 # context: footer hint of the Markdown editor, after the key that toggles Split. Width budget: 14 cells
 hint_split = "Split"
+
+[ai_hosting_reply]
+# context: Settings > AI, label of the editor row for the base prompt of the AI replies on a host and issue descriptions
+base_prompt_label = "Base prompt"
+# context: help under that row
+base_prompt_help = "The instructions every drafted reply and issue description starts from. Empty uses the built-in prompt. Your global, workspace and repository instructions still follow it, and text written by other people is always marked as untrusted in the request."
+# context: Settings > AI, heading of the rows about letting the AI read the repository when it drafts a reply
+repo_heading = "Repository access"
+# context: Settings > AI, label of a switch: whether the choice "Let the AI read the repository" starts ticked
+read_repository_label = "Let the AI read the repository by default"
+# context: help under that switch
+read_repository_help = "Off by default. When on, the choice \"Let the AI read the repository\" starts ticked each time you ask for a draft; you can change it every time. Reading the repository is not built yet: for now this setting has no effect."
+# context: Settings > AI, label of a switch: keep a local agent's session between two drafts
+reuse_session_label = "Keep the agent's session between replies"
+# context: help under that switch
+reuse_session_help = "A local agent that supports it keeps what it read of the repository between two drafts, so the next one starts faster. Takes effect once the AI may read the repository."
+# context: Settings > AI, label of a number: how many minutes a context built from the repository is reused
+context_ttl_label = "Keep a repository context for (minutes)"
+# context: help under that number
+context_ttl_help = "How long what was gathered from the repository for a draft is reused by the next ones. A change in the repository always starts over. 30 by default. Takes effect once the AI may read the repository."

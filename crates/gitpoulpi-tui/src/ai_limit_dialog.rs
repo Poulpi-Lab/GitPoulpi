@@ -203,6 +203,7 @@ fn line_of(cut: &Cut) -> String {
         Part::ReviewThreads => m::part_review_threads(size, limit, key),
         Part::ContextFile => m::part_context_file(name, size, limit, key),
         Part::ContextTotal => m::part_context_total(name, size, limit, key),
+        Part::ReplyConversation => m::part_reply_conversation(size, limit, key),
     }
 }
 

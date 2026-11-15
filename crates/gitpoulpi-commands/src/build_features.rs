@@ -117,6 +117,7 @@ pub fn ai_action_offered(action: gitpoulpi_config::AiAction) -> bool {
     match action {
         A::RewriteScript | A::RewriteRules => HISTORY_REWRITE,
         A::WorktreeName => WORKTREE,
+        A::HostingReply | A::IssueBody => HOSTING,
         _ => true,
     }
 }

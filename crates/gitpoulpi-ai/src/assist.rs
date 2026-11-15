@@ -68,6 +68,11 @@ pub struct Job {
     /// The other input caps (`[ai.limits]`), whom to ask when an input is
     /// over one, and what was truncated (see [`crate::limits`]).
     pub limit: LimitPolicy,
+    /// The user's own base prompt (`ai.hosting_reply.base_prompt`) for the
+    /// two writing actions; `None` uses the built-in one. Every other
+    /// action ignores it: their base prompts fix an answer format a parser
+    /// relies on.
+    pub base_override: Option<String>,
 }
 
 impl Job {
@@ -108,6 +113,9 @@ impl Job {
             ),
             conflict_limit: config.limits.conflict_bytes_clamped(),
             limit: LimitPolicy::new(Limits::from_config(&config.limits)),
+            base_override: matches!(action, AiAction::HostingReply | AiAction::IssueBody)
+                .then(|| config.hosting_reply.base_prompt.trim().to_string())
+                .filter(|text| !text.is_empty()),
         })
     }
 
@@ -291,7 +299,18 @@ impl Job {
         layers
     }
 
-    /// The system prompt this job sends: the built-in base prompt, then the
+    /// The base prompt this job starts from: the built-in one of its action,
+    /// or the user's own for the writing actions (see
+    /// [`Job::base_override`]).
+    pub fn base_prompt(&self) -> String {
+        match &self.base_override {
+            Some(text) => vars::expand(text, &self.context),
+            None => prompts::base_prompt(self.action).to_string(),
+        }
+    }
+
+    /// The system prompt this job sends: the base prompt (see
+    /// [`Job::base_prompt`]), then the
     /// instructions from the most general to the most specific - global,
     /// workspace, repository - then the action's own (see
     /// [`prompts::system_prompt_layered`]). A level in "replace" mode drops
@@ -307,8 +326,8 @@ impl Job {
             &expand(&self.workspace.for_action(self.action)),
             self.action_from_repo,
         );
-        let mut out = prompts::system_prompt_layered(
-            self.action,
+        let mut out = prompts::system_prompt_layered_with_base(
+            &self.base_prompt(),
             &vars::expand(&self.global_instructions, ctx),
             &expand(&self.workspace.general),
             &expand(&self.repo_instructions),

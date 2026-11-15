@@ -679,7 +679,7 @@ executa nada (código de saída 2 quando ele ainda não compila). Usa-se o perfi
 ## Criar regras com IA
 
 Com a IA ativada ([Assistência de IA](ai.md)), o painel tem um botão
-`✦ Criar regras com IA...` ao lado de Salvar e Carregar, a tecla `Alt+E` (*Criar regras
+`✦ Criar regras com IA...` ao lado de Salvar e Carregar, a tecla `Alt+I` (*Criar regras
 de reescrita com IA* em Configurações > Teclado, contexto *Reescrita*), e a paleta tem
 `✦ Reescrita: criar regras com IA...`. Com a IA desligada, ou em uma compilação sem IA, o
 botão e a linha da paleta não aparecem. Você descreve com as suas palavras como o

@@ -12271,7 +12271,7 @@ ev_closed = "closed this"
 # context: event line, after the actor's name. Width budget: 30 cells
 ev_reopened = "reopened this"
 # context: event line, after the actor's name; {$pr} is the pull or merge request. Width budget: 40 cells
-ev_merged = "merged this {$pr}"
+ev_merged = "{$merge}d this {$pr}"
 # context: event line, after the actor's name; {labels} are the added labels. Width budget: 50 cells
 ev_label_added = "added the label {labels}"
 # context: event line, after the actor's name; {labels} are the removed labels. Width budget: 50 cells

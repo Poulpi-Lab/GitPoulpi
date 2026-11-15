@@ -9948,7 +9948,7 @@ review_dismissed = "dismissed"
 ev_opened = "opened this"
 ev_closed = "closed this"
 ev_reopened = "reopened this"
-ev_merged = "merged this {$pr}"
+ev_merged = { git = "mergade denna {$pr}", local = "slog ihop denna" }
 ev_label_added = "added the label {labels}"
 ev_label_removed = "removed the label {labels}"
 ev_label_changed = "added {added} and removed {removed} labels"
@@ -10024,7 +10024,7 @@ why_no_conversation = "this item has no conversation to read here, open it in th
 noun_link = "link"
 nothing_to_open = "nothing to open"
 link_issue = "issue {key}"
-link_request = "{$pr} {key}"
+link_request = { git = "{$pr} {key}", local = "{key}" }
 link_commit = "{$commit} {sha}"
 open_conversation = "Open conversation"
 menu_pick_conversation = "Open conversation"

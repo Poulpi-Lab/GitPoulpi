@@ -41,7 +41,7 @@ fn long_version_lists_features_and_languages() {
         }
         assert_eq!(
             features,
-            "features: ai github gitlab azure-devops bitbucket jira trello gitea linear youtrack redmine gerrit local-issues mcp lfs worktree submodule avatar-fetch image-view radar mermaid board review history-rewrite global-search workspaces rewrite-scripts",
+            "features: ai github gitlab azure-devops bitbucket jira trello gitea linear youtrack redmine gerrit local-issues mcp lfs worktree submodule avatar-fetch image-view radar mermaid board review conversation history-rewrite global-search workspaces rewrite-scripts",
             "{text}"
         );
         assert!(!text.contains("custom build"), "{text}");

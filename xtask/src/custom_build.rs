@@ -198,6 +198,7 @@ impl Choices {
                 (self.mermaid, "mermaid"),
                 (self.board, "board"),
                 (self.review, "review"),
+                (self.conversation, "conversation"),
                 (self.history_rewrite, "history-rewrite"),
                 (self.global_search, "global-search"),
                 (self.workspaces, "workspaces"),
@@ -210,11 +211,6 @@ impl Choices {
                 if on {
                     add(bin, feat);
                 }
-            }
-            // The conversation view is a TUI surface: the CLI forwards it to the
-            // TUI it embeds, the MCP server has no such view.
-            if self.conversation && bin != "mcp" {
-                add(bin, "conversation");
             }
             // The `mcp` feature lives on the crates that gate the subcommand.
             if self.mcp && bin != "mcp" {
@@ -1265,14 +1261,14 @@ mod tests {
     }
 
     #[test]
-    fn conversation_goes_to_the_cli_and_the_tui_and_has_its_own_flag() {
+    fn conversation_goes_to_every_binary_and_has_its_own_flag() {
         let f = Choices::all(&avail()).features();
-        assert!(f.contains(&"gitpoulpi-cli/conversation".to_string()));
-        assert!(f.contains(&"gitpoulpi-tui/conversation".to_string()));
-        assert!(
-            !f.contains(&"gitpoulpi-mcp/conversation".to_string()),
-            "the MCP server has no conversation view"
-        );
+        for bin in ["cli", "tui", "mcp"] {
+            assert!(
+                f.contains(&format!("gitpoulpi-{bin}/conversation")),
+                "{bin}"
+            );
+        }
         let off = parse(&["--no-conversation"]).unwrap();
         assert!(!off
             .choices

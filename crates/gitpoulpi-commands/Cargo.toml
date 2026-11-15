@@ -14,7 +14,7 @@ default = ["full"]
 # Standalone (`cargo test -p gitpoulpi-commands`) behaves as a full build.
 full = [
     "gitpoulpi-i18n/all-langs", "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "ai", "mcp", "lfs", "worktree", "submodule",
-    "avatar-fetch", "image-view", "radar", "mermaid", "board", "review", "history-rewrite", "global-search", "workspaces", "rewrite-scripts",
+    "avatar-fetch", "image-view", "radar", "mermaid", "board", "review", "conversation", "history-rewrite", "global-search", "workspaces", "rewrite-scripts",
 ]
 ai = ["dep:gitpoulpi-ai", "dep:async-trait"]
 # Internal: "at least one hosting provider". Never enabled alone.
@@ -45,6 +45,8 @@ mermaid = []
 radar = []
 board = []
 review = []
+# The conversation view of an issue or a request (a TUI surface; listed so `--version` reports the build faithfully).
+conversation = []
 # Advanced history rewriting (Rewrite: palette commands, `gitpoulpi rewrite`).
 history-rewrite = []
 # Global search (`gitpoulpi search`).

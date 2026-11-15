@@ -9960,7 +9960,7 @@ review_dismissed = "écarté"
 ev_opened = "a ouvert ceci"
 ev_closed = "a fermé ceci"
 ev_reopened = "a rouvert ceci"
-ev_merged = "a fusionné cette {$pr}"
+ev_merged = { git = "a mergé cette {$pr}", local = "a fusionné cette {$pr}" }
 ev_label_added = "a ajouté l'étiquette {labels}"
 ev_label_removed = "a retiré l'étiquette {labels}"
 ev_label_changed = "a ajouté {added} et retiré {removed} (étiquettes)"

@@ -3757,6 +3757,7 @@ settings_preferences_the = "设置（标题栏齿轮，{{global.settings}} / {{n
 text_fields_filters = "文本字段（筛选、搜索、撰写器、对话框、设置）"
 mouse_gestures_in = "鼠标手势详解"
 split = { git = "拆分 {$commit}", local = "拆分{$commit}" }
+markdown_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [help_text]
 git_actions_then_amend = { git = "修订所选 {$commit}：在同一个弹窗中修改摘要、描述、作者姓名、邮箱和日期", local = "修订所选{$commit}：在同一个弹窗中修改摘要、描述、作者姓名、邮箱和日期" }
@@ -4137,6 +4138,9 @@ rewrite_host_howto = { git = "说明如何让重写通过受主机保护的分�
 rewrite_ai_rules = "用 AI 根据你的描述创建重写规则（不会预览也不会应用任何内容）"
 log_columns_2 = "在各列保持宽度时横向滚动 Log 的列（即列选择器、设置中选择的“横向滚动”布局，或选中某列时按 s）；在“适应窗格”布局中，所有列都适应窗格"
 refs_pane_20 = { git = "编辑所选本地分支的远程（其 upstream 和额外的 {$push} 目标）：相当于点击其行上远程徽标的键盘操作", local = "编辑所选本地分支的远程（其上游和额外的{$push}目标）：相当于点击其行上远程徽标的键盘操作" }
+markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
+markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
+markdown_editor_3 = "send the text (Enter inserts a newline)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} 或右键"

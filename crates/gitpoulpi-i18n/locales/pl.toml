@@ -3756,6 +3756,7 @@ settings_preferences_the = "Ustawienia (koło zębate na pasku tytułu, {{global
 text_fields_filters = "Pola tekstowe (filtry, szukanie, kompozytor, okna, Ustawienia)"
 mouse_gestures_in = "Gesty myszy, w całości"
 split = { git = "Podział commita", local = "Podział zatwierdzenia" }
+markdown_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [help_text]
 git_actions_then_amend = { git = "popraw wybrany commit: podsumowanie, opis, imię, e-mail i datę autora w jednym oknie", local = "popraw wybrane zatwierdzenie: podsumowanie, opis, imię, e-mail i datę autora w jednym oknie" }
@@ -4135,6 +4136,9 @@ rewrite_host_howto = { git = "wyjaśnia, jak przepchnąć przepisaną historię 
 rewrite_ai_rules = "tworzy z AI reguły przepisania na podstawie twojego opisu (niczego nie podgląda ani nie stosuje)"
 log_columns_2 = "przewijaj kolumny Logu w poziomie, gdy zachowują swoje szerokości (układ Przewijaj w poziomie, wybierany w oknie wyboru kolumn, w Ustawieniach lub klawiszem s przy wybranej kolumnie); w układzie dopasowanym każda kolumna mieści się w panelu"
 refs_pane_20 = { git = "edytuje zdalne wybranej gałęzi lokalnej (jej upstream i dodatkowe cele push): klawiaturowy odpowiednik kliknięcia plakietki zdalnych w jej wierszu", local = "edytuje zdalne wybranej gałęzi lokalnej (jej upstream i dodatkowe cele wypychania): klawiaturowy odpowiednik kliknięcia plakietki zdalnych w jej wierszu" }
+markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
+markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
+markdown_editor_3 = "send the text (Enter inserts a newline)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} lub prawy przycisk"

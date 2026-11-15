@@ -3756,6 +3756,7 @@ settings_preferences_the = "Definições (a roda dentada da barra de título, {{
 text_fields_filters = "Campos de texto (filtros, pesquisa, compositor, diálogos, Definições)"
 mouse_gestures_in = "Gestos do rato, em detalhe"
 split = "Dividir um {$commit}"
+markdown_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [help_text]
 git_actions_then_amend = "alterar o {$commit} selecionado: resumo, descrição, nome, e-mail e data do autor numa só janela"
@@ -4135,6 +4136,9 @@ rewrite_host_howto = "explica como fazer passar uma reescrita por uma branch que
 rewrite_ai_rules = "cria as regras de reescrita a partir da sua descrição com IA (nada é pré-visualizado nem aplicado)"
 log_columns_2 = "deslocar lateralmente as colunas do Log quando mantêm as suas larguras (a disposição Deslocamento lateral, escolhida no seletor de colunas, nas Definições ou com s quando uma coluna está escolhida); na disposição ajustada, cada coluna cabe no painel"
 refs_pane_20 = "editar os remotos da branch local selecionada (o seu upstream e os destinos de {$push_noun} adicionais): o equivalente em teclado de clicar no emblema de remotos da sua linha"
+markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
+markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
+markdown_editor_3 = "send the text (Enter inserts a newline)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} ou botão direito"

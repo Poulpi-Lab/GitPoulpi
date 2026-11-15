@@ -3756,6 +3756,7 @@ settings_preferences_the = "설정 (제목 표시줄의 톱니바퀴, {{global.s
 text_fields_filters = "텍스트 필드 (필터, 검색, 작성기, 대화상자, 설정)"
 mouse_gestures_in = "마우스 제스처 전체"
 split = "{$Commit} 분할"
+markdown_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [help_text]
 git_actions_then_amend = "선택한 {$commit} 수정: 요약, 설명, 작성자 이름·이메일·날짜를 한 팝업에서"
@@ -4135,6 +4136,9 @@ rewrite_host_howto = "호스트가 보호하는 브랜치에서 다시 쓴 기�
 rewrite_ai_rules = "설명을 바탕으로 AI가 다시 쓰기 규칙을 만듦 (미리보기도 적용도 하지 않음)"
 log_columns_2 = "열이 너비를 유지할 때 Log의 열을 옆으로 스크롤합니다(열 선택기나 설정에서, 또는 열을 고른 상태에서 s로 고르는 옆으로 스크롤 배치). 창에 맞춤 배치에서는 모든 열이 창에 맞춰집니다"
 refs_pane_20 = "선택한 로컬 브랜치의 리모트(업스트림과 추가 {$push} 대상)를 편집합니다: 행의 리모트 배지를 클릭하는 것과 같은 키보드 동작"
+markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
+markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
+markdown_editor_3 = "send the text (Enter inserts a newline)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} 또는 오른쪽 클릭"

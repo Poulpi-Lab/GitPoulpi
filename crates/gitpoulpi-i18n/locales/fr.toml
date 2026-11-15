@@ -2595,9 +2595,9 @@ log_scroll_left = "Faire défiler les colonnes vers la gauche"
 log_scroll_right = "Faire défiler les colonnes vers la droite"
 log_columns_layout = "Défilement latéral ou ajustement au volet"
 refs_remotes = "Branche : modifier ses distants"
-md_editor_preview = "Éditeur Markdown\u00a0: basculer entre Écrire et Aperçu"
-md_editor_split = "Éditeur Markdown\u00a0: afficher ou masquer la vue côte à côte"
-md_editor_submit = "Éditeur Markdown\u00a0: envoyer le texte"
+md_editor_preview = "Éditeur Markdown\u00a0: Écrire ou Aperçu"
+md_editor_split = "Éditeur Markdown\u00a0: vue côte à côte"
+md_editor_submit = "Éditeur Markdown\u00a0: envoyer"
 
 
 [keymap_ctx]
@@ -3761,6 +3761,7 @@ settings_preferences_the = "Paramètres (l'engrenage de la barre de titre, {{glo
 text_fields_filters = "Champs de texte (filtres, recherche, formulaire, boîtes de dialogue, Paramètres)"
 mouse_gestures_in = "Gestes de souris, en détail"
 split = { git = "Scinder un commit", local = "Scinder une validation" }
+markdown_editor = "Éditeur Markdown (commentaires, descriptions, résumés)"
 
 [help_text]
 git_actions_then_amend = { git = "modifier le commit sélectionné : résumé, description, nom, e-mail et date de l'auteur dans une seule fenêtre", local = "modifier la validation sélectionnée : résumé, description, nom, e-mail et date de l'auteur dans une seule fenêtre" }
@@ -4140,6 +4141,9 @@ rewrite_host_howto = { git = "explique comment faire passer une réécriture sur
 rewrite_ai_rules = "crée les règles de réécriture à partir de votre description avec l'IA (rien n'est prévisualisé ni appliqué)"
 log_columns_2 = "faire défiler latéralement les colonnes du Log quand elles gardent leur largeur (la disposition Défilement latéral, choisie dans le sélecteur de colonnes, dans les Paramètres ou avec s quand une colonne est choisie) ; dans la disposition ajustée, chaque colonne tient dans le volet"
 refs_pane_20 = "modifier les distants de la branche locale sélectionnée (son amont et ses cibles de {$push} supplémentaires) : l'équivalent clavier d'un clic sur le badge des distants de sa ligne"
+markdown_editor_1 = "basculer entre Écrire et Aperçu (le texte tel qu'il apparaîtra une fois publié)"
+markdown_editor_2 = "afficher le texte et son aperçu côte à côte (demande une fenêtre large)"
+markdown_editor_3 = "envoyer le texte (Entrée insère un saut de ligne)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} ou clic droit"

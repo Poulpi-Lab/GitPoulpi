@@ -3757,6 +3757,7 @@ settings_preferences_the = "Ajustes (el engranaje de la barra de título, {{glob
 text_fields_filters = "Campos de texto (filtros, búsqueda, compositor, diálogos, Ajustes)"
 mouse_gestures_in = "Gestos del ratón, al detalle"
 split = { git = "Dividir un {$commit}", local = "Dividir una {$commit}" }
+markdown_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [help_text]
 git_actions_then_amend = { git = "modificar el commit seleccionado: resumen, descripción, nombre, correo y fecha del autor en una sola ventana", local = "modificar la confirmación seleccionada: resumen, descripción, nombre, correo y fecha del autor en una sola ventana" }
@@ -4136,6 +4137,9 @@ rewrite_host_howto = "explica cómo sortear la protección de una rama del host 
 rewrite_ai_rules = "crea las reglas de reescritura a partir de tu descripción con IA (no se previsualiza ni se aplica nada)"
 log_columns_2 = "desplazar lateralmente las columnas del Log cuando conservan sus anchos (la disposición Desplazar lateralmente, que se elige en el selector de columnas, en Ajustes o con s mientras hay una columna elegida); en la disposición ajustada, todas las columnas caben en el panel"
 refs_pane_20 = "edita los remotos de la rama local seleccionada (su upstream y los destinos de {$push_noun} adicionales): el equivalente en teclado de hacer clic en la insignia de remotos de su fila"
+markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
+markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
+markdown_editor_3 = "send the text (Enter inserts a newline)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} o clic derecho"

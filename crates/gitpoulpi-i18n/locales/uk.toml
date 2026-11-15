@@ -3757,6 +3757,7 @@ settings_preferences_the = "Налаштування (шестерня в ряд
 text_fields_filters = "Текстові поля (фільтри, пошук, композер, діалоги, налаштування)"
 mouse_gestures_in = "Жести миші докладно"
 split = { git = "Розділення commit'у", local = "Розділення коміту" }
+markdown_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [help_text]
 git_actions_then_amend = { git = "змінити вибраний commit: заголовок, опис, ім'я, email і дату автора в одному вікні", local = "змінити вибраний коміт: заголовок, опис, ім'я, email і дату автора в одному вікні" }
@@ -4136,6 +4137,9 @@ rewrite_host_howto = "пояснює, як пропустити перепису
 rewrite_ai_rules = "створює правила переписування за вашим описом за допомогою ШІ (нічого не переглядається і не застосовується)"
 log_columns_2 = "прокручувати стовпці Log убік, коли вони зберігають свою ширину (розкладка «Прокрутка вбік», яку обирають у виборі стовпців, у Налаштуваннях або клавішею s при вибраному стовпці); у розкладці під панель кожен стовпець вміщується в панель"
 refs_pane_20 = "змінити remote вибраної локальної гілки (її upstream і додаткові цілі {$push}): клавіатурний відповідник клацання по значку remote в її рядку"
+markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
+markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
+markdown_editor_3 = "send the text (Enter inserts a newline)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} або праве клацання"

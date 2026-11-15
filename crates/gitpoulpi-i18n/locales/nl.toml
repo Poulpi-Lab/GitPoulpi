@@ -3758,6 +3758,7 @@ settings_preferences_the = "Instellingen (het tandwiel in de titelbalk, {{global
 text_fields_filters = "Tekstvelden (filters, zoeken, composer, dialogen, instellingen)"
 mouse_gestures_in = "Muisgebaren, volledig"
 split = "Een {$commit} splitsen"
+markdown_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [help_text]
 git_actions_then_amend = "de geselecteerde {$commit} wijzigen: samenvatting, beschrijving, naam, e-mail en datum van de auteur in één venster"
@@ -4137,6 +4138,9 @@ rewrite_host_howto = "legt uit hoe je een herschrijving door een branch krijgt d
 rewrite_ai_rules = "maakt met AI de herschrijfregels op basis van je beschrijving (er wordt geen voorbeeld getoond en niets toegepast)"
 log_columns_2 = "de kolommen van de Log zijwaarts scrollen als ze hun breedte behouden (de indeling Zijwaarts scrollen, te kiezen in de kolomkeuze, in de Instellingen of met s terwijl een kolom gekozen is); bij de indeling Aanpassen past elke kolom in het paneel"
 refs_pane_20 = "de remotes van de geselecteerde lokale branch bewerken (zijn upstream en extra {$push}-doelen): het toetsenbordequivalent van klikken op het remotes-label op zijn rij"
+markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
+markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
+markdown_editor_3 = "send the text (Enter inserts a newline)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} of rechtsklik"

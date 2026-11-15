@@ -3758,6 +3758,7 @@ settings_preferences_the = "Ayarlar (başlık çubuğundaki dişli, {{global.set
 text_fields_filters = "Metin alanları (filtreler, arama, composer, iletişim kutuları, Ayarlar)"
 mouse_gestures_in = "Fare hareketleri, ayrıntılı"
 split = "{$Commit} bölme"
+markdown_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [help_text]
 git_actions_then_amend = "seçili {$commit} öğesini değiştir: özet, açıklama, yazar adı, e-posta ve tarih tek bir pencerede"
@@ -4137,6 +4138,9 @@ rewrite_host_howto = { git = "yeniden yazılan geçmişin barındırıcının ko
 rewrite_ai_rules = "açıklamanızdan YZ ile yeniden yazma kurallarını oluşturur (hiçbir şey önizlenmez veya uygulanmaz)"
 log_columns_2 = "sütunlar genişliklerini koruyorsa Log'un sütunlarını yana kaydır (sütun seçicide, Ayarlar'da ya da bir sütun seçiliyken s ile seçilen Yana kaydır düzeni); sığdırma düzeninde her sütun bölmeye sığar"
 refs_pane_20 = "seçili yerel dalın uzak depolarını (upstream'ini ve ek {$push} hedeflerini) düzenler: satırındaki uzak depo rozetine tıklamanın klavye karşılığı"
+markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
+markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
+markdown_editor_3 = "send the text (Enter inserts a newline)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} veya sağ tık"

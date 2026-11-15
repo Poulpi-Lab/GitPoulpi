@@ -61,7 +61,9 @@ impl TrustGate {
         let user = match client.current_user().await {
             Ok(u) => u,
             // A kind that cannot say who the token is has nothing to compare.
-            Err(Error::Unsupported(_) | Error::NotImplemented(_)) => return Ok(()),
+            Err(Error::Unsupported(_) | Error::NotImplemented(_) | Error::BotToken) => {
+                return Ok(())
+            }
             Err(e) => return Err(e),
         };
         let new = Account {

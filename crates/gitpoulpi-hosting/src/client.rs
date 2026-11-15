@@ -609,15 +609,29 @@ pub fn client_for(
         transport
     } else {
         let admitted = gate.admit(&integration)?;
-        Arc::new(crate::trust::GuardedTransport::new(
+        let guarded = Arc::new(crate::trust::GuardedTransport::new(
             transport,
             admitted.subject,
             admitted.record.origin.clone(),
             admitted.origins,
             admitted.record.tls.clone(),
-        )) as Arc<dyn HttpTransport>
+        )) as Arc<dyn HttpTransport>;
+        // A repository's token command can stand in for the personal token
+        // on its own calls (a GitHub App bot).
+        #[cfg(feature = "github")]
+        let guarded = if integration.kind.family() == ApiFamily::Github {
+            Arc::new(crate::scoped_transport::ScopedTransport::new(
+                guarded,
+                integration.id.clone(),
+            )) as Arc<dyn HttpTransport>
+        } else {
+            guarded
+        };
+        guarded
     };
-    Ok(build_client(integration, token, transport))
+    Ok(crate::assignment_guard::AssignmentGuard::wrap(
+        build_client(integration, token, transport),
+    ))
 }
 
 fn build_client(

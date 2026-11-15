@@ -43,6 +43,11 @@ pub enum RepoAuthAction {
         /// With `token-command`: how long its token is reused, in minutes.
         #[arg(long, value_name = "N")]
         cache_minutes: Option<u32>,
+        /// With `token-command`: the same command also supplies the token of
+        /// this repository's hosting API calls (issues, pull requests), in
+        /// place of the personal token. For a GitHub App installation token.
+        #[arg(long)]
+        use_for_hosting: bool,
         /// SSH identity: `system` (ssh's own configuration and agent),
         /// `key:<path>` (a private key file, offered alone) or
         /// `integration-key:<id>` (the key of a GitPoulpi account).

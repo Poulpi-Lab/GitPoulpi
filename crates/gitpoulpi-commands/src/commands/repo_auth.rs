@@ -50,6 +50,7 @@ pub(super) async fn repo_auth(
             command,
             hosts,
             cache_minutes,
+            use_for_hosting,
             ssh,
             known_hosts,
             strict,
@@ -62,6 +63,7 @@ pub(super) async fn repo_auth(
                 command,
                 hosts,
                 cache_minutes,
+                use_for_hosting,
                 known_hosts,
                 strict,
             };
@@ -180,6 +182,7 @@ struct SetFlags {
     command: Vec<String>,
     hosts: Vec<String>,
     cache_minutes: Option<u32>,
+    use_for_hosting: bool,
     known_hosts: Option<String>,
     strict: bool,
 }
@@ -211,6 +214,13 @@ fn parse_https(source: &str, f: &SetFlags) -> Result<HttpsAuth, String> {
             "--https token-command",
         )
     };
+    let not_hosting = |f: &SetFlags| {
+        goes_with(
+            f.use_for_hosting,
+            "--use-for-hosting",
+            "--https token-command",
+        )
+    };
     let not_ignore = |f: &SetFlags| {
         goes_with(
             f.ignore_repo_helpers,
@@ -224,6 +234,7 @@ fn parse_https(source: &str, f: &SetFlags) -> Result<HttpsAuth, String> {
             not_command(f)?;
             not_hosts(f)?;
             not_cache(f)?;
+            not_hosting(f)?;
             Ok(HttpsAuth::System {
                 username,
                 ignore_repo_helpers: f.ignore_repo_helpers,
@@ -233,6 +244,7 @@ fn parse_https(source: &str, f: &SetFlags) -> Result<HttpsAuth, String> {
             not_ignore(f)?;
             not_command(f)?;
             not_cache(f)?;
+            not_hosting(f)?;
             let helper = f
                 .helper
                 .clone()
@@ -261,6 +273,7 @@ fn parse_https(source: &str, f: &SetFlags) -> Result<HttpsAuth, String> {
                 username,
                 hosts: f.hosts.clone(),
                 cache_minutes: f.cache_minutes,
+                use_for_hosting: f.use_for_hosting,
                 confirmed_sha256: None,
                 script_sha256: None,
                 confirmed_at: None,
@@ -273,6 +286,7 @@ fn parse_https(source: &str, f: &SetFlags) -> Result<HttpsAuth, String> {
                 not_command(f)?;
                 not_hosts(f)?;
                 not_cache(f)?;
+                not_hosting(f)?;
                 Ok(HttpsAuth::Integration {
                     integration: id.to_string(),
                     username,
@@ -513,6 +527,7 @@ mod tests {
             username: None,
             hosts: vec!["github.com".into()],
             cache_minutes: None,
+            use_for_hosting: false,
             confirmed_sha256: None,
             script_sha256: None,
             confirmed_at: None,

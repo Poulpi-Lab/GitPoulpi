@@ -55,6 +55,11 @@ pub enum HttpsAuth {
         hosts: Vec<String>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         cache_minutes: Option<u32>,
+        /// Also the token of this repository's hosting API calls (issues,
+        /// pull requests), instead of the personal token. Pairs with a
+        /// GitHub App installation token.
+        #[serde(default, skip_serializing_if = "is_false")]
+        use_for_hosting: bool,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         confirmed_sha256: Option<String>,
         #[serde(default, skip_serializing_if = "Option::is_none")]

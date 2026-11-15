@@ -257,6 +257,12 @@ pub struct RepoState {
     /// `gitpoulpi_hosting::resolve_for_repo`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hosting_integration: Option<String>,
+    /// Assignment is blocked for this repository's issues and pull requests:
+    /// nothing can be assigned from GitPoulpi (every surface refuses), the
+    /// existing assignees stay visible. For a project whose maintainers must
+    /// not be named by a bot-driven workflow.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub assignment_blocked: bool,
     /// Where this repository's ISSUES section reads from: the provider
     /// profile and that provider's own repository/project, both chosen in
     /// the section. `None` means unlinked: nothing is fetched, and

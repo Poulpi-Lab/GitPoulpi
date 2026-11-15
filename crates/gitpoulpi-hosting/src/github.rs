@@ -15,7 +15,7 @@ use crate::model::{
     TokenCheck, TokenFlavor,
 };
 use crate::project::{HostedProject, HostedSshKey};
-use crate::Result;
+use crate::{Error, Result};
 
 mod protection;
 
@@ -634,8 +634,18 @@ impl GitHubClient {
     }
 
     async fn fetch_user(&self) -> Result<(HostedUser, HttpResponse)> {
+        // An App installation token has no user behind it: there is no
+        // "me" to ask for, so do not ask.
+        if crate::scope::is_app_installation_token(&self.token) {
+            return Err(Error::BotToken);
+        }
         let url = format!("{}/user", self.integration.api_base());
         let response = self.transport.send(self.get(url)).await?;
+        // The same token seen from a host that answers instead: `/user` is
+        // 403 or 404 for an installation token.
+        if matches!(response.status, 403 | 404) && !crate::conditional::is_rate_limited(&response) {
+            return Err(Error::BotToken);
+        }
         response.error_for_status("checking the GitHub token")?;
         let row: GitHubUser = response.json()?;
         let user = HostedUser {

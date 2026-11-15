@@ -24,6 +24,8 @@
 
 #[cfg(feature = "hosting")]
 pub mod account;
+#[cfg(feature = "hosting")]
+mod assignment_guard;
 pub mod auth;
 #[cfg(feature = "azure-devops")]
 pub mod azure_devops;
@@ -80,6 +82,9 @@ pub mod refs;
 pub mod resolve;
 #[cfg(feature = "hosting")]
 pub mod review;
+pub mod scope;
+#[cfg(feature = "github")]
+mod scoped_transport;
 pub mod spec;
 pub mod ssh_key;
 #[cfg(feature = "trello")]
@@ -140,6 +145,7 @@ pub use review::{
     ReviewFile, ReviewOutcome, ReviewState, ReviewSubmission, ReviewThread, ReviewVote,
     SubmittedReview, VoteLabel, VoteValue,
 };
+pub use scope::{install as install_repo_scopes, RepoScopes};
 #[cfg(feature = "hosting")]
 pub use spec::CheckoutSource;
 pub use spec::{spec_for, FamilySpec, RemoteRef};
@@ -223,6 +229,16 @@ pub enum Error {
     /// says now.
     #[error("the integration trust store is unusable: {0}")]
     TrustStore(String),
+
+    /// The repository blocks assignment: nothing was sent.
+    #[error("{}", scope::ASSIGNMENT_BLOCKED)]
+    AssignmentBlocked,
+
+    /// The token is a GitHub App installation token: it has no user behind
+    /// it, so `GET /user` (who am I) does not apply. Not a failure: the
+    /// actor is the App.
+    #[error("the token belongs to a GitHub App (a bot), not to a person")]
+    BotToken,
 }
 
 /// Which configured instance a remote URL belongs to, so a repository's

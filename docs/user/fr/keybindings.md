@@ -1508,7 +1508,7 @@ merge requests). Avec un profil d'hébergeur connecté, il a aussi une section T
 
 | Touche | Action |
 |---|---|
-| `Enter` | Ouvrir la ligne sélectionnée dans le navigateur. Sur une ligne `Reconnect` : ouvrir les Paramètres sur ce profil |
+| `Enter` | Ouvrir la ligne sélectionnée : un ticket (et une demande sur Azure DevOps ou Bitbucket) comme [conversation](hosting-integration.md#5c-conversations), une pull request dans la [revue](review.md) sur les hébergeurs qui en ont une, tout le reste dans le navigateur. Sur une ligne `Reconnect` : ouvrir les Paramètres sur ce profil |
 | `Space` | Déplier ou replier la section |
 | `v` | Ouvrir le filtre de la section. Pull requests : Ouvertes, Mergées / fermées, Toutes. Tickets : Ouverts, Qui me sont assignés, Fermés, Tous |
 | `n` | Section de pull requests : créer une pull request. Section TICKETS : nouveau ticket. (Le bouton `+` de l'en-tête) |
@@ -1516,7 +1516,7 @@ merge requests). Avec un profil d'hébergeur connecté, il a aussi une section T
 | `Enter` sur la ligne de recherche | Taper dans le champ de recherche. `Enter`, `Tab` ou `Esc` le quitte ; `Ctrl+U` l'efface |
 | `Enter` sur un en-tête de groupe | Replier ou déplier le groupe (*Mes pull requests*, *Assignées à moi*, *En attente de ma relecture*, *Toutes les pull requests*) |
 | `Enter` sur la ligne du filtre, du fournisseur ou du dépôt | Ouvrir cette liste déroulante. La liste des fournisseurs se termine par **Aucun (délier ce dépôt)** |
-| `.`, ou un clic droit | Le menu de la ligne : ouvrir dans le navigateur, copier l'URL ou le numéro, extraire la branche source (pull requests) ; créer une branche depuis le ticket (tickets) |
+| `.`, ou un clic droit | Le menu de la ligne : ouvrir la conversation, ouvrir dans le navigateur, copier l'URL ou le numéro, extraire la branche source (pull requests) ; créer une branche depuis le ticket (tickets) |
 
 ### Le tableau des tickets
 
@@ -1529,7 +1529,7 @@ ci-dessous est aussi une commande de palette (**Tableau : ...**).
 | Flèches | Sélectionner une carte (`Up`, `Down`) ou la colonne voisine (`Left`, `Right`) ; `Home`, `End`, `PageUp`, `PageDown` sautent dans la colonne |
 | `Shift+Left`, `Shift+Right` | Déplacer la carte sélectionnée vers la colonne précédente ou suivante |
 | `m` | **Déplacer la carte vers...** : une liste déroulante des colonnes |
-| `Enter` | Ouvrir le ticket (la note, pour un ticket local ; la page de l'hébergeur sinon) |
+| `Enter` | Ouvrir la [conversation](hosting-integration.md#5c-conversations) du ticket (la page de l'hébergeur quand il n'a rien à lire) |
 | `e`, `.` | Modifier les assignés, étiquettes ou jalon ; le menu de la carte |
 | `n` | Nouveau ticket dans la colonne sélectionnée |
 | `a`, `l`, `M`, `/` | Filtrer par assigné, étiquette, jalon, texte. `x` efface les filtres |
@@ -1556,6 +1556,41 @@ carte « une branche est apparue » sont décrites dans les [workflows de bran
 | `Space` | Cocher une case (*Publier*, *Exécuter les hooks*, *Mettre aussi à jour les branches empilées dessus*) |
 | `Esc` | Fermer une liste déroulante, revenir de l'aperçu au formulaire, fermer la fenêtre (pas pendant une exécution) |
 | Survoler une branche | Son type, son parent, et de combien elle est en retard sur le parent |
+
+### Le compositeur Markdown et la vue de conversation
+
+Chaque zone dont le texte part vers un hébergeur (un commentaire, une réponse, un résumé de revue, la description d'un nouveau ticket ou d'une pull request) est le même compositeur. Ses touches sont dans le tableau `md_editor` plus haut et peuvent être réaffectées.
+
+| Touche | Action |
+|---|---|
+| `Alt+P` | Alterner **Écrire** et **Aperçu** (depuis **Côte à côte**, on passe à Aperçu) |
+| `Alt+L` | Activer **Côte à côte**, ou revenir à Écrire (demande une fenêtre de 100 colonnes) |
+| `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` | Envoyer le texte (le bouton du formulaire fait la même chose) |
+| `Alt+E` | **Écrire avec l'IA** : ouvre ou ferme le volet sous la barre de modes (IA activée seulement) |
+| `Alt+R` | Le compositeur de commits seulement : insérer une référence de ticket |
+| `Alt+W` | Les formulaires de nouveau ticket et de pull request : créer sur la page web de l'hébergeur |
+| `Esc` | Dans le volet de **Écrire avec l'IA** : arrêter un brouillon en cours, sinon fermer le volet |
+
+Dans la [vue de conversation](hosting-integration.md#5c-conversations) d'un ticket ou d'une demande (lignes de palette *Conversation : ...* ; celles qui ont une touche sont dans la liste de la palette plus haut) :
+
+| Touche | Action |
+|---|---|
+| `r` | Répondre à l'entrée sélectionnée (dans son fil, ou en citant son texte sur un hébergeur sans fils) |
+| `Q` | Citer l'entrée sélectionnée dans un nouveau commentaire |
+| `c` | Nouveau commentaire |
+| `e`, `d` | Modifier, supprimer un de vos commentaires |
+| `Alt+I` | Dans la zone de commentaire : **Note interne** (GitLab, Redmine) |
+| `l`, `y`, `o` | Liens de l'entrée, copier son adresse, l'ouvrir dans le navigateur |
+| `n` | Entrée non lue suivante |
+| `v`, `m`, `F5` | Afficher ou masquer les événements, charger les entrées plus anciennes, actualiser |
+| `g` | Ouvrir le diagramme de l'entrée (un bloc `mermaid`) |
+| `Alt+Left`, `Backspace` | Revenir en arrière dans la pile des éléments ouverts depuis des références |
+| `Tab` | Chronologie, zone de commentaire, boutons de l'en-tête |
+| `q`, `Esc` | Fermer |
+
+Dans le Radar, `i` ouvre la conversation d'une ligne de ticket.
+
+Sur une ligne de pull request ou de ticket des sections de la barre latérale, `Enter` ouvre la conversation et `o` ouvre la ligne dans le navigateur.
 
 ## Volet Log
 

@@ -1255,22 +1255,22 @@ choose_folder = { git = "worktree のフォルダーを選択してください"
 not_absolute = "フォルダーはフルパスで指定してください（参照で選択できます）"
 not_empty = "{path} は空ではありません"
 already_checked_out = "{label} はすでにチェックアウトされています - 新しいブランチ名を指定してください"
-branch_field = "Worktree branch"
-hint_new_branch = "new branch from {r}"
-hint_existing_branch = "checks out this branch"
-ref_unused = "not used: the existing branch is checked out as it is"
-name_after_branch = "Name after branch"
-regenerate = "Regenerate"
-ai_button = "Name with AI"
-ai_describe = "Describe the feature, bug or task"
-ai_describe_hint = "e.g. fix the crash when the config file is empty"
-ai_run = "Name it"
-ai_stop = "Stop"
-ai_hide = "Hide"
-ai_working = "asking the AI..."
-ai_need_text = "describe the work first"
-ai_failed = "AI: {why}"
-need_branch = "type or pick a branch first"
+branch_field = { git = "worktree のブランチ", local = "ワークツリーのブランチ" }
+hint_new_branch = "{r} から新しいブランチ"
+hint_existing_branch = "このブランチをチェックアウト"
+ref_unused = "使用しません：既存のブランチはそのままチェックアウトされます"
+name_after_branch = "ブランチ名に合わせる"
+regenerate = "再生成"
+ai_button = "AI で命名"
+ai_describe = "機能、バグ、作業内容を説明してください"
+ai_describe_hint = "例：設定ファイルが空のときのクラッシュを修正"
+ai_run = "命名する"
+ai_stop = "停止"
+ai_hide = "隠す"
+ai_working = "AI に問い合わせ中..."
+ai_need_text = "先に作業内容を説明してください"
+ai_failed = "AI：{why}"
+need_branch = "先にブランチを入力または選択してください"
 
 [repo_dialogs]
 # context: status line after opening the provider's web form
@@ -2946,10 +2946,10 @@ env_no_color = "出力に色コードを含めない"
 env_permissions = "確認なしでエージェントができる範囲"
 env_timeout = "エージェント自身のリクエストタイムアウト（ms）"
 env_offline = "起動時のネットワーク呼び出しなし"
-title_worktree_name = "Worktree names"
-profile_help_worktree_name = "The profile GitPoulpi will use to name a new worktree and its branch from a description."
-repo_profile_help_worktree_name = "The profile used in this repository to name a new worktree and its branch."
-action_worktree_name = "Worktree name"
+title_worktree_name = { git = "worktree の名前", local = "ワークツリーの名前" }
+profile_help_worktree_name = { git = "説明から新しい worktree とそのブランチに名前を付けるときに、GitPoulpi が使うプロファイルです。", local = "説明から新しいワークツリーとそのブランチに名前を付けるときに、GitPoulpi が使うプロファイルです。" }
+repo_profile_help_worktree_name = { git = "このリポジトリで、新しい worktree とそのブランチに名前を付けるときに使うプロファイルです。", local = "このリポジトリで、新しいワークツリーとそのブランチに名前を付けるときに使うプロファイルです。" }
+action_worktree_name = { git = "worktree の名前", local = "ワークツリーの名前" }
 
 [palette]
 sidebar_show_worktrees = { git = "サイドバー: worktree セクションを表示", local = "サイドバー: ワークツリーセクションを表示" }
@@ -3861,7 +3861,7 @@ refs_pane_13 = "現在のセクション（階層表示では選択中のフォ�
 refs_pane_14 = "現在のセクションを切り替え"
 refs_pane_15 = "名前で絞り込み（Enter で適用、Esc でキャンセル）"
 refs_pane_16 = "LOCAL/REMOTE のブランチ階層表示（名前の `/` でフォルダー化）を切り替え - 保存されます（`ui.ref_tree`）"
-refs_pane_17 = "マウス：左側の予約された余白にカーソルを合わせると、グラフでの非表示の目（ソロ表示中はソロの丸）が現れます。フォルダー/リモート名の行の余白は、その下のすべての参照を一度に非表示/ソロ表示にします。タイトルの「ソロ解除」/「すべて表示」ボタンをクリックすると全体を解除できます"
+refs_pane_17 = "マウス：左側の予約された余白にカーソルを合わせると、グラフでの非表示の印 ⊙（ソロ表示中はソロの丸）が現れます。フォルダー/リモート名の行の余白は、その下のすべての参照を一度に非表示/ソロ表示にします。タイトルの「ソロ解除」/「すべて表示」ボタンをクリックすると全体を解除できます"
 refs_pane_18 = "選択した参照を Log で表示します：指す位置までスクロールして行をハイライトし、選択は変えません"
 refs_pane_19 = "選択中の参照をドロップ元としてマークし、別の参照にドロップします。ドラッグと同じメニュー（{$merge}、{$rebase}、{$push} など）が開きます。Esc でマークを解除"
 status_pane_working_1 = "移動。サブペインの端を越えるともう一方に移ります（折りたたまれたものや空のものはスキップ）"

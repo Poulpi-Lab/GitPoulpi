@@ -781,6 +781,7 @@ impl Prepare for FsPrepare {
                 issue_view: IssueView::Open,
                 issues_source,
                 pulls_source: state.and_then(|s| s.pulls_source),
+                repo_root: repo.to_path_buf(),
             },
             cache: Some(cache_path(repo, state_dir)),
         }
@@ -811,6 +812,7 @@ pub(crate) fn empty_snapshot() -> HostingSnapshot {
             issue_view: IssueView::Open,
             issues_source: None,
             pulls_source: None,
+            repo_root: PathBuf::new(),
         },
     )
 }

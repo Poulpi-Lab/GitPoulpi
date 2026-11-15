@@ -40,6 +40,7 @@ fn request(remote_url: &str) -> HostingRequest {
             project: "g/p".into(),
             filter: None,
         }),
+        repo_root: std::path::PathBuf::new(),
     }
 }
 
@@ -47,6 +48,7 @@ fn unlinked_request(remote_url: &str) -> HostingRequest {
     HostingRequest {
         issues_source: None,
         pulls_source: None,
+        repo_root: std::path::PathBuf::new(),
         ..request(remote_url)
     }
 }

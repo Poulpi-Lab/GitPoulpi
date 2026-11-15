@@ -233,6 +233,10 @@ pub(crate) struct HostingRequest {
     /// `RepoState::pulls_source`: the same choice for PULL REQUESTS. With
     /// neither this nor `override_id` the section is unlinked.
     pub(crate) pulls_source: Option<gitpoulpi_session::IssuesSource>,
+    /// The repository's folder: its stored hosting settings (a token command
+    /// for the host calls, blocked assignment) apply to its project. Empty
+    /// when the request is not about one repository.
+    pub(crate) repo_root: PathBuf,
 }
 
 /// A remote's proposal to link the repository (never applied on its own).
@@ -721,7 +725,28 @@ pub(crate) fn fetch_snapshot(
             snap.issues_problem = out.problem;
         }
     }
+    register_scopes(req, &snap);
     snap
+}
+
+/// Tells the hosting clients which repository the project this snapshot
+/// answers for belongs to, so the repository's token command and its
+/// assignment block apply to the calls made about it (forms, menus and the
+/// CLI-style edits alike).
+fn register_scopes(req: &HostingRequest, snap: &HostingSnapshot) {
+    if req.repo_root.as_os_str().is_empty() {
+        return;
+    }
+    if let Some(id) = &snap.profile_id {
+        gitpoulpi_daemon::hosting_scope::register(&req.repo_root, id, &snap.project);
+    }
+    if let Some(target) = &snap.issues_target {
+        gitpoulpi_daemon::hosting_scope::register(
+            &req.repo_root,
+            &target.profile.id,
+            &target.project,
+        );
+    }
 }
 
 /// What the pull request list needs once its client exists.

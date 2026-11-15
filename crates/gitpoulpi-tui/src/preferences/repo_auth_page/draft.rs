@@ -37,6 +37,9 @@ pub(crate) struct Draft {
     pub(crate) command: String,
     pub(crate) hosts: String,
     pub(crate) cache: String,
+    /// "Use for the hosting API": the token command is also the token of
+    /// this repository's issue and pull request calls.
+    pub(crate) use_for_hosting: bool,
     pub(crate) ssh: SshKind,
     pub(crate) key: String,
     pub(crate) ssh_account: String,
@@ -149,9 +152,11 @@ impl Draft {
                 username,
                 hosts,
                 cache_minutes,
+                use_for_hosting,
                 ..
             }) => {
                 d.https = HttpsKind::TokenCommand;
+                d.use_for_hosting = *use_for_hosting;
                 d.command = join_command(argv);
                 d.username = username.clone().unwrap_or_default();
                 d.hosts = hosts.join(", ");
@@ -263,7 +268,7 @@ impl Draft {
                     username,
                     hosts: split_hosts(&self.hosts),
                     cache_minutes,
-                    use_for_hosting: false,
+                    use_for_hosting: self.use_for_hosting,
                     confirmed_sha256,
                     script_sha256,
                     confirmed_at,
@@ -293,6 +298,20 @@ impl Draft {
         let Ok(profile) = self.to_profile(stored) else {
             return false;
         };
+        // Sending the hosting calls through the command is a person's call
+        // too: turning it on or off asks, like a new command.
+        let hosting_changed = |profile: &RepoAuthProfile| {
+            matches!(
+                profile.https,
+                Some(HttpsAuth::TokenCommand {
+                    use_for_hosting: true,
+                    ..
+                })
+            )
+        };
+        if hosting_changed(&profile) != hosting_changed(stored) {
+            return true;
+        }
         match &profile.https {
             Some(HttpsAuth::Helper {
                 confirmed_sha256, ..
@@ -345,7 +364,7 @@ mod tests {
                 username: Some("x-access-token".into()),
                 hosts: vec!["github.com".into(), "git.example".into()],
                 cache_minutes: Some(30),
-                use_for_hosting: false,
+                use_for_hosting: true,
                 confirmed_sha256: Some("abc".into()),
                 script_sha256: None,
                 confirmed_at: Some(5),

@@ -30,6 +30,7 @@ fn linked(url: &str) -> HostingRequest {
         issue_view: IssueView::Open,
         issues_source: Some(source.clone()),
         pulls_source: Some(source),
+        repo_root: std::path::PathBuf::new(),
     }
 }
 
@@ -37,6 +38,7 @@ fn unlinked(url: &str) -> HostingRequest {
     HostingRequest {
         issues_source: None,
         pulls_source: None,
+        repo_root: std::path::PathBuf::new(),
         ..linked(url)
     }
 }
@@ -358,6 +360,7 @@ fn github_linked() -> HostingRequest {
         issue_view: IssueView::Open,
         issues_source: Some(source.clone()),
         pulls_source: Some(source),
+        repo_root: std::path::PathBuf::new(),
     }
 }
 

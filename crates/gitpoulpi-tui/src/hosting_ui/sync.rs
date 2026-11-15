@@ -252,6 +252,7 @@ impl HostingUi {
                 self.issues_source.clone(),
             ),
             pulls_source: self.pulls_source.clone(),
+            repo_root: self.repo_root.clone(),
         });
         if !self.in_flight {
             self.in_flight_since = Some(Instant::now());

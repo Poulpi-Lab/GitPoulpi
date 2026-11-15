@@ -33,6 +33,8 @@
 //! - Issues and wikis were retired on 2026-08-20: `issues` is unsupported.
 
 pub mod client;
+#[cfg(test)]
+mod conversation_tests;
 pub mod dc;
 mod map;
 pub mod spec;

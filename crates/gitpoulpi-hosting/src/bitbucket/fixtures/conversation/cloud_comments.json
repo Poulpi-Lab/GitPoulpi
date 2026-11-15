@@ -1,0 +1,7 @@
+{"size":5,"page":1,"pagelen":100,"next":"https://api.bitbucket.org/2.0/repositories/ws/repo/pullrequests/12/comments?pagelen=100&sort=-created_on&page=2","values":[
+ {"id":14,"created_on":"2026-10-01T14:00:00.000000+00:00","updated_on":"2026-10-01T14:00:00.000000+00:00","content":{"raw":"Fixed, thanks."},"user":{"nickname":"ann","display_name":"Ann A"},"parent":{"id":13},"deleted":false,"inline":{"path":"src/net.rs","to":17,"from":null}},
+ {"id":13,"created_on":"2026-10-01T13:00:00.000000+00:00","updated_on":"2026-10-01T13:00:00.000000+00:00","content":{"raw":"Use a backoff here."},"user":{"nickname":"bob","display_name":"Bob B"},"deleted":false,"inline":{"path":"src/net.rs","to":17,"from":null},"resolution":{"type":"resolution","user":{"nickname":"ann"}},"links":{"html":{"href":"https://bitbucket.org/ws/repo/pull-requests/12/_/diff#comment-13"}}},
+ {"id":12,"created_on":"2026-10-01T12:00:00.000000+00:00","updated_on":"2026-10-01T12:40:00.000000+00:00","content":{"raw":"Looks good to me."},"user":{"nickname":"carol","display_name":"Carol C"},"deleted":false},
+ {"id":11,"created_on":"2026-10-01T11:00:00.000000+00:00","updated_on":"2026-10-01T11:00:00.000000+00:00","content":{"raw":"oops"},"user":{"nickname":"carol"},"deleted":true},
+ {"id":10,"created_on":"2026-10-01T10:00:00.000000+00:00","updated_on":"2026-10-01T10:00:00.000000+00:00","content":{"raw":"Could you add a test?"},"user":{"nickname":"bob","display_name":"Bob B"},"deleted":false}
+]}

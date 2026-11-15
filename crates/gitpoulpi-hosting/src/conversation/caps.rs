@@ -82,7 +82,8 @@ impl ConversationCaps {
     }
 
     /// Azure DevOps. A pull request has threads (a reply is a comment of the
-    /// thread; resolution is the thread status). A work item has a flat
+    /// thread; the thread status is shown but not changed, so `resolve` is
+    /// off). A work item has a flat
     /// comment list with no threads and no event history here. Azure DevOps
     /// Server (7.0) takes work item comments as HTML, so it is written as
     /// HTML and shown as the Markdown converted from it.
@@ -95,7 +96,7 @@ impl ConversationCaps {
             start_thread: false,
             edit_own: true,
             delete_own: true,
-            resolve: pr,
+            resolve: false,
             reactions: false,
             events: pr,
             internal_notes: false,
@@ -110,8 +111,8 @@ impl ConversationCaps {
     }
 
     /// Bitbucket Cloud and Data Center: pull requests only (Cloud retired
-    /// its issue tracker; Data Center has none). No reactions on Data Center
-    /// reads here, no internal notes.
+    /// its issue tracker; Data Center has none). A resolved thread is shown
+    /// but not changed (`resolve` off); no reactions, no internal notes.
     pub fn bitbucket(kind: ItemKind) -> Self {
         if kind == ItemKind::Issue {
             return Self::NONE;
@@ -123,7 +124,7 @@ impl ConversationCaps {
             start_thread: false,
             edit_own: true,
             delete_own: true,
-            resolve: true,
+            resolve: false,
             reactions: false,
             events: true,
             internal_notes: false,

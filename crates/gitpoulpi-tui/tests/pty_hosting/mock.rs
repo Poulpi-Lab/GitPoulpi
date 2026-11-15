@@ -130,6 +130,10 @@ pub fn route(method: &str, target: &str, port: u16) -> (u16, String) {
     if let Some(answer) = providers_route(method, path) {
         return answer;
     }
+    #[cfg(feature = "conversation")]
+    if let Some(answer) = crate::conversation::route(method, path) {
+        return answer;
+    }
     match (method, path) {
         ("GET", "/api/v4/user") => (
             200,

@@ -32,6 +32,7 @@ that build exists. It also writes `BUILD-FEATURES.txt` next to the binaries.
 | Radar | No Radar tab, `Alt+R` or palette command; the Radar never opens. Needs an integration (with none it is inert anyway). |
 | Mermaid | No Copy as Mermaid gitGraph (Log menu, `Shift+Y`, palette) and no `log --format mermaid` in the CLI/MCP. |
 | Board | No Kanban board view (ISSUES header button, palette) and no `hosting board` command. Needs an integration. |
+| Conversation | No in-app conversation view of an issue or request: Enter on an issue row, a board card or a Radar row opens the browser as before. Needs an integration. |
 | Review | No in-app code review view (row menu, Enter on a pull request row, palette, Radar `Review`) and no AI review assist. The `hosting review` CLI/MCP commands stay (Gerrit and agents use them). Needs an integration. |
 | History workbench (advanced history rewriting: authors, dates, messages, content) | No History Rewrite Workbench: no `Rewrite:` palette commands, no workbench chord, keys or help section, no "Rewrite history" rows in the Log menus, no "Modify History Deeper..." button in the Amend dialog, no "Create rules with AI" or script AI, no script limits on the Sync settings page and no history rewrite AI blocks in the AI settings. The `rewrite` CLI/MCP commands, `ai rewrite-script`, `ai rewrite-rules` and `ui propose rewrite` are gone from the command tree. `.mailmap` identities (`mailmap`, `log.use_mailmap`) are not part of it and stay. |
 | Global search | No Global search button in the title bar, no `Ctrl+Alt+F`, no `Search: Workspace...` palette command and no `gitpoulpi search` CLI/MCP command. The Log find bar (`ui show search`) is a different feature and stays. |
@@ -67,7 +68,7 @@ Any argument skips the questions and goes straight to
 | `--logo-colors all` / `violet,teal` | Logo colorways to compile in (default `all`, kept in the table's order, which is the spin order). `--list-logo-colors` prints them (`*` = official default). |
 | `--logo-default teal` | The default colorway; must be among the compiled ones (default: lavender, else the first compiled). |
 | `--icon-color sun` | Color of the Windows executable icon (default: the logo default). |
-| `--[no-]ai`, `--[no-]mcp`, `--[no-]lfs`, `--[no-]worktree`, `--[no-]submodules`, `--[no-]avatar-fetch`, `--[no-]image-view`, `--[no-]radar`, `--[no-]mermaid`, `--[no-]board`, `--[no-]review` | Each defaults to on. |
+| `--[no-]ai`, `--[no-]mcp`, `--[no-]lfs`, `--[no-]worktree`, `--[no-]submodules`, `--[no-]avatar-fetch`, `--[no-]image-view`, `--[no-]radar`, `--[no-]mermaid`, `--[no-]board`, `--[no-]review`, `--[no-]conversation` | Each defaults to on. |
 | `--[no-]history-rewrite` | The History workbench (advanced history rewriting: authors, dates, messages, content). Default on. |
 | `--[no-]global-search` | Global search (title-bar button, `Ctrl+Alt+F`, `gitpoulpi search`). Default on. |
 | `--[no-]workspaces` | Workspaces (named groups of repositories). Default on; off leaves only the default tab list. |

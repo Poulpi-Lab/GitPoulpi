@@ -91,9 +91,17 @@ impl ItemTarget {
 
     /// The state file of the repository, when there is one.
     fn state_path(&self) -> Option<PathBuf> {
-        self.repo_root
-            .as_deref()
-            .map(crate::remotes_ui::repo_state_path)
+        self.repo_root.as_deref().map(|root| {
+            if cfg!(test) {
+                // Never the real configuration under test.
+                gitpoulpi_session::RepoState::path_for(
+                    root,
+                    gitpoulpi_config::DEFAULT_REPO_DATA_LOCATION,
+                )
+            } else {
+                crate::remotes_ui::repo_state_path(root)
+            }
+        })
     }
 
     fn seen_key(&self) -> String {
@@ -443,15 +451,6 @@ impl ItemView {
         self.stack.len()
     }
 
-    #[cfg(test)]
-    pub(crate) fn target(&self) -> &ItemTarget {
-        &self.target
-    }
-
-    #[cfg(test)]
-    pub(crate) fn conversation(&self) -> &Conversation {
-        &self.conv
-    }
 }
 
 impl Drop for ItemView {

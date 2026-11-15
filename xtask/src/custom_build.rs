@@ -41,13 +41,14 @@ Features (each defaults to on):
   --[no-]mermaid           off = no Copy as Mermaid gitGraph, no `log --format mermaid`
   --[no-]board             off = no Kanban board view, no `hosting board`
   --[no-]review            off = no in-app code review view and its AI assist
+  --[no-]conversation      off = no in-app issue / request conversation view (Enter opens the browser)
   --[no-]history-rewrite   off = no History workbench (advanced history rewriting:
                            authors, dates, messages, content)
   --[no-]global-search     off = no Global search (title-bar button, Ctrl+Alt+F, `search`)
   --[no-]workspaces        off = no workspaces (only the default tab list, no workspace commands)
   --[no-]rewrite-scripts   off = no embedded Lua: Script rules are a typed refusal
                            (needs history rewrite, else ignored with a warning)
-                           (radar, board and review need a hosting integration)
+                           (radar, board, review and conversation need a hosting integration)
 Saved selections (KEY=value files, kept outside target/ so cargo clean keeps them):
   --save <name|file>       store the resolved choices as a preset
   --preset <name|file>     start from a preset; flags still override it
@@ -106,6 +107,7 @@ pub struct Choices {
     pub mermaid: bool,
     pub board: bool,
     pub review: bool,
+    pub conversation: bool,
     pub history_rewrite: bool,
     pub global_search: bool,
     pub workspaces: bool,
@@ -133,6 +135,7 @@ impl Choices {
             mermaid: true,
             board: true,
             review: true,
+            conversation: true,
             history_rewrite: true,
             global_search: true,
             workspaces: true,
@@ -160,6 +163,7 @@ impl Choices {
             mermaid: false,
             board: false,
             review: false,
+            conversation: false,
             history_rewrite: false,
             global_search: false,
             workspaces: false,
@@ -206,6 +210,11 @@ impl Choices {
                 if on {
                     add(bin, feat);
                 }
+            }
+            // The conversation view is a TUI surface: the CLI forwards it to the
+            // TUI it embeds, the MCP server has no such view.
+            if self.conversation && bin != "mcp" {
+                add(bin, "conversation");
             }
             // The `mcp` feature lives on the crates that gate the subcommand.
             if self.mcp && bin != "mcp" {
@@ -345,6 +354,7 @@ impl Choices {
         let _ = writeln!(s, "MERMAID={}", b(self.mermaid));
         let _ = writeln!(s, "BOARD={}", b(self.board));
         let _ = writeln!(s, "REVIEW={}", b(self.review));
+        let _ = writeln!(s, "CONVERSATION={}", b(self.conversation));
         let _ = writeln!(s, "HISTORY_REWRITE={}", b(self.history_rewrite));
         let _ = writeln!(s, "GLOBAL_SEARCH={}", b(self.global_search));
         let _ = writeln!(s, "WORKSPACES={}", b(self.workspaces));
@@ -456,6 +466,7 @@ impl Choices {
                 "MERMAID" => c.mermaid = flag,
                 "BOARD" => c.board = flag,
                 "REVIEW" => c.review = flag,
+                "CONVERSATION" => c.conversation = flag,
                 "HISTORY_REWRITE" => c.history_rewrite = flag,
                 "GLOBAL_SEARCH" => c.global_search = flag,
                 "WORKSPACES" => c.workspaces = flag,
@@ -508,6 +519,7 @@ impl Choices {
             (self.mermaid, "mermaid"),
             (self.board, "board"),
             (self.review, "review"),
+            (self.conversation, "conversation"),
             (self.history_rewrite, "history-rewrite"),
             (self.global_search, "global-search"),
             (self.workspaces, "workspaces"),
@@ -539,7 +551,7 @@ impl Choices {
 }
 
 /// Every selection-file key with its accepted spelling variant.
-const ENV_KEYS: [(&str, &str); 21] = [
+const ENV_KEYS: [(&str, &str); 22] = [
     ("LANGS", "LANGS"),
     ("INTEGRATIONS", "INTEGRATIONS"),
     ("THEMES", "THEMES"),
@@ -557,6 +569,7 @@ const ENV_KEYS: [(&str, &str); 21] = [
     ("MERMAID", "MERMAID"),
     ("BOARD", "BOARD"),
     ("REVIEW", "REVIEW"),
+    ("CONVERSATION", "CONVERSATION"),
     ("HISTORY_REWRITE", "HISTORY_REWRITE"),
     ("GLOBAL_SEARCH", "GLOBAL_SEARCH"),
     ("WORKSPACES", "WORKSPACES"),
@@ -979,6 +992,9 @@ fn parse_args(
             "--mermaid" | "--no-mermaid" => o.choices.mermaid = a == "--mermaid",
             "--board" | "--no-board" => o.choices.board = a == "--board",
             "--review" | "--no-review" => o.choices.review = a == "--review",
+            "--conversation" | "--no-conversation" => {
+                o.choices.conversation = a == "--conversation"
+            }
             "--global-search" | "--no-global-search" => {
                 o.choices.global_search = a == "--global-search"
             }

@@ -19,7 +19,7 @@ mod input;
 mod paint;
 pub(crate) mod rows;
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;
 mod unread;
 pub(crate) mod worker;
 
@@ -383,6 +383,13 @@ impl Conversation {
             self.ctx = ctx;
             self.rev += 1;
         }
+    }
+
+    /// Tests: who posts, as the worker would have said it.
+    #[cfg(test)]
+    pub(crate) fn set_identity(&mut self, identity: Result<PostingIdentity, String>) {
+        self.identity = Some(identity);
+        self.rev += 1;
     }
 
     pub(crate) fn set_events(&mut self, on: bool) {

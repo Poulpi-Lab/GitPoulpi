@@ -144,6 +144,7 @@ pub fn plan(all_langs: &[String], quick: bool) -> Vec<Run> {
         ("mermaid", |c| c.mermaid = false),
         ("board", |c| c.board = false),
         ("review", |c| c.review = false),
+        ("conversation", |c| c.conversation = false),
         ("history-rewrite", |c| c.history_rewrite = false),
         ("global-search", |c| c.global_search = false),
         ("workspaces", |c| c.workspaces = false),

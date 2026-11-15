@@ -216,7 +216,7 @@ ICON_SEL=$(pick1 "Windows executable icon color (used when building for Windows)
 
 # Screen 5: features.
 FEAT_PRE=""
-for pair in ai:AI mcp:MCP lfs:LFS worktree:WORKTREE submodules:SUBMODULES avatar-fetch:AVATAR_FETCH image-view:IMAGE_VIEW radar:RADAR mermaid:MERMAID board:BOARD review:REVIEW history-rewrite:HISTORY_REWRITE global-search:GLOBAL_SEARCH workspaces:WORKSPACES rewrite-scripts:REWRITE_SCRIPTS; do
+for pair in ai:AI mcp:MCP lfs:LFS worktree:WORKTREE submodules:SUBMODULES avatar-fetch:AVATAR_FETCH image-view:IMAGE_VIEW radar:RADAR mermaid:MERMAID board:BOARD review:REVIEW conversation:CONVERSATION history-rewrite:HISTORY_REWRITE global-search:GLOBAL_SEARCH workspaces:WORKSPACES rewrite-scripts:REWRITE_SCRIPTS; do
     [ "$(saved "${pair#*:}" 1)" = 1 ] && FEAT_PRE="$FEAT_PRE,${pair%%:*}"
 done
 FEAT_SEL=$(pick "Features" "$FEAT_PRE" \
@@ -231,6 +231,7 @@ FEAT_SEL=$(pick "Features" "$FEAT_PRE" \
     "mermaid|Copy as Mermaid gitGraph and log --format mermaid" \
     "board|Kanban board view and hosting board (needs an integration)" \
     "review|In-app code review and its AI assist (needs an integration)" \
+    "conversation|In-app issue and request conversation view (needs an integration)" \
     "history-rewrite|History workbench (advanced history rewriting: authors, dates, messages, content)" \
     "global-search|Global search (title-bar button, Ctrl+Alt+F, search command)" \
     "workspaces|Workspaces (named groups of repositories; off: only the default tab list)" \
@@ -249,7 +250,7 @@ ARGS+=(--logo-colors "$LOGO_CSV" --logo-default "$LOGO_DEF" --icon-color "$ICON_
 LANGS_CSV=$(csv $LANGS_SEL); ARGS+=(--langs "${LANGS_CSV:-en}")
 # shellcheck disable=SC2086
 INT_CSV=$(csv $INT_SEL); ARGS+=(--integrations "${INT_CSV:-none}")
-for feat in ai mcp lfs worktree submodules avatar-fetch image-view radar mermaid board review history-rewrite global-search workspaces rewrite-scripts; do
+for feat in ai mcp lfs worktree submodules avatar-fetch image-view radar mermaid board review conversation history-rewrite global-search workspaces rewrite-scripts; do
     # Lua without the rewrite it plugs into is meaningless: not passed at all.
     if [ "$feat" = rewrite-scripts ] && ! has "$(echo "$FEAT_SEL" | tr ' ' ',')" history-rewrite; then continue; fi
     if has "$(echo "$FEAT_SEL" | tr ' ' ',')" "$feat"; then ARGS+=("--$feat"); else ARGS+=("--no-$feat"); fi

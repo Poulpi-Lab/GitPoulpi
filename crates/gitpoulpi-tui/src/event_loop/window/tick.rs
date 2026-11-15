@@ -269,6 +269,8 @@ impl WindowState {
         // The Create worktree dialog's ✦ follows AI on / off and the running state.
         self.repo_dialogs
             .sync_worktree_ai(self.ai_ui.enabled(), self.ai_ui.running_worktree_name());
+        self.repo_dialogs
+            .sync_composer_ai(self.ai_ui.enabled(), &self.repo.root);
         if let Some(outcome) = self.ai_ui.poll() {
             // A failed job is a card (the status line is cleared below).
             if let AiOutcome::Done(_, Err(why)) = &outcome {

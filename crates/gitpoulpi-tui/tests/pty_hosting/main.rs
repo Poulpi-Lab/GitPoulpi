@@ -19,6 +19,8 @@ mod commit_tokens;
 mod composer_ref;
 #[cfg(feature = "conversation")]
 mod conversation;
+#[cfg(feature = "ai")]
+mod conversation_ai;
 mod failure_card;
 mod flow_mr;
 mod gerrit;

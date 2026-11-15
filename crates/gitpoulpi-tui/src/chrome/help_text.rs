@@ -497,6 +497,7 @@ pub(crate) const HELP_TEXT: &[HelpEntry] = &[
     Item(keys!("{md_editor.preview}"), msg::help_text::MARKDOWN_EDITOR_1),
     Item(keys!("{md_editor.split}"), msg::help_text::MARKDOWN_EDITOR_2),
     Item(keys!("{md_editor.submit}"), msg::help_text::MARKDOWN_EDITOR_3),
+    Item(keys!("{md_editor.ai}"), msg::help_text::MARKDOWN_EDITOR_4),
     Sec(msg::help_section::AI_RESULT_POPUPS),
     Item(keys!("{ai_popup.copy}"), msg::help_text::AI_RESULT_POPUPS_1),
     Sec(msg::help_section::SETTINGS_INTEGRATIONS_THE),

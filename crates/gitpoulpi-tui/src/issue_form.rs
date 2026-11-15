@@ -138,12 +138,26 @@ pub(crate) struct IssueDialog {
     /// arrive: the board column the form was opened from.
     preselect: Option<String>,
     guard: dialog_kit::DiscardGuard,
+    /// The title as the description's "Write with AI" help reads it.
+    ai_title: Option<crate::md_editor::ai::Shared<String>>,
 }
 
 impl IssueDialog {
     /// What `Ctrl+N` badges: every field and button.
     pub(crate) fn nav_targets(&self) -> Vec<(Rect, (u16, u16))> {
-        dialog_kit::nav_cells(self.hits.iter().map(|(r, _)| *r))
+        dialog_kit::nav_cells(self.hits.iter().map(|(r, _)| *r).chain(self.md.nav_rects()))
+    }
+
+    /// Gives the description its "Write with AI" help (only while AI is on).
+    pub(crate) fn bind_ai(&mut self, scope: crate::md_editor::ai::AiScope) {
+        let title = crate::md_editor::ai::Shared::default();
+        self.md.bind_ai(
+            scope,
+            Box::new(crate::md_editor::ai::IssueBodySource {
+                title: title.clone(),
+            }),
+        );
+        self.ai_title = Some(title);
     }
 
     pub(crate) fn new(seed: IssueSeed) -> Self {
@@ -181,6 +195,7 @@ impl IssueDialog {
             integrations: Vec::new(),
             preselect: None,
             guard: Default::default(),
+            ai_title: None,
         }
     }
 
@@ -541,7 +556,11 @@ impl IssueDialog {
                 .filter(|f| *f != IssueFocus::Body),
         );
         match focus {
-            _ if crate::keymap::current().is(Bind::DialogWeb, &key) => return self.open_web(),
+            _ if crate::keymap::current().is(Bind::DialogWeb, &key)
+                && !(focus == IssueFocus::Body && self.md.takes_ai_key(&key)) =>
+            {
+                return self.open_web()
+            }
             IssueFocus::Title | IssueFocus::Labels => {
                 let mut value = std::mem::take(self.text_of(focus).expect("a text field"));
                 let handled = self.edit.dialog_key(focus, &mut value, &key);
@@ -683,6 +702,11 @@ impl IssueDialog {
                 .filter(|f| *f != IssueFocus::Body),
         );
         self.edit.begin_frame();
+        if let Some(cell) = &self.ai_title {
+            if let Ok(mut t) = cell.lock() {
+                t.clone_from(&self.title);
+            }
+        }
         let title = match self.seed.integration.kind.family() {
             gitpoulpi_config::ApiFamily::AzureDevops => msg::issue_form::TITLE_WORK_ITEM.get(),
             gitpoulpi_config::ApiFamily::Trello => msg::issue_form::TITLE_CARD.get(),

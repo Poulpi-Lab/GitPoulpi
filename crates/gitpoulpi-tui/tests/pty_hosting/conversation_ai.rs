@@ -281,6 +281,7 @@ fn draft_reading(term: &mut xtask::pty::Terminal, expect: &[&str]) {
     send_request(term, expect);
 }
 
+#[cfg(unix)]
 fn flag_value(args: &[String], flag: &str) -> Option<String> {
     args.iter()
         .position(|a| a == flag)

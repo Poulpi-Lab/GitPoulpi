@@ -10,6 +10,10 @@ use crate::client::{
     encode_component, CreatedIssue, CreatedPullRequest, HostingClient, NewIssue, NewPullRequest,
     MAX_PAGES,
 };
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
+    TimelinePage,
+};
 use crate::http::{HttpRequest, HttpTransport};
 use crate::integration::Integration;
 use crate::metadata::{HostedLabel, HostedMilestone, IssueEdit, ItemMeta, MetaKind};
@@ -27,7 +31,7 @@ const PAGE: usize = 100;
 const MAX_ISSUES: usize = 500;
 
 pub(crate) struct RedmineClient {
-    integration: Integration,
+    pub(super) integration: Integration,
     token: String,
     transport: Arc<dyn HttpTransport>,
 }
@@ -45,7 +49,7 @@ impl RedmineClient {
         }
     }
 
-    fn site(&self) -> String {
+    pub(super) fn site(&self) -> String {
         self.integration
             .url
             .trim()
@@ -53,7 +57,7 @@ impl RedmineClient {
             .to_string()
     }
 
-    fn api(&self) -> String {
+    pub(super) fn api(&self) -> String {
         self.integration.api_base()
     }
 
@@ -65,7 +69,7 @@ impl RedmineClient {
         request
     }
 
-    async fn get_json<T: DeserializeOwned>(&self, path: &str, what: &str) -> Result<T> {
+    pub(super) async fn get_json<T: DeserializeOwned>(&self, path: &str, what: &str) -> Result<T> {
         let url = format!("{}{path}", self.api());
         let response = self
             .transport
@@ -75,14 +79,18 @@ impl RedmineClient {
         response.json()
     }
 
-    async fn send(&self, request: HttpRequest, what: &str) -> Result<crate::http::HttpResponse> {
+    pub(super) async fn send(
+        &self,
+        request: HttpRequest,
+        what: &str,
+    ) -> Result<crate::http::HttpResponse> {
         let response = self.transport.send(self.authed(request)).await?;
         response.error_for_status(what)?;
         Ok(response)
     }
 
     /// `PUT /issues/{n}.json`: an edit; Redmine answers 204 with no body.
-    async fn edit(&self, what: &str, number: u64, issue: Value) -> Result<()> {
+    pub(super) async fn edit(&self, what: &str, number: u64, issue: Value) -> Result<()> {
         let url = format!("{}/issues/{number}.json", self.api());
         self.send(HttpRequest::put_json(url, &json!({ "issue": issue })), what)
             .await?;
@@ -243,6 +251,47 @@ impl HostingClient for RedmineClient {
 
     async fn create_pull_request(&self, _req: &NewPullRequest) -> Result<CreatedPullRequest> {
         Err(self.unsupported("create_pull_request"))
+    }
+
+    fn conversation_caps(&self, kind: ItemKind) -> ConversationCaps {
+        ConversationCaps::redmine(
+            kind,
+            self.integration.markup == gitpoulpi_config::RedmineMarkup::Textile,
+        )
+    }
+
+    async fn posting_identity(&self, _project: &str) -> Result<PostingIdentity> {
+        self.conv_identity().await
+    }
+
+    async fn item_timeline(
+        &self,
+        _project: &str,
+        key: &ItemKey,
+        older: Option<&PageCursor>,
+        opts: &TimelineOpts,
+    ) -> Result<TimelinePage> {
+        self.conv_timeline(key, older, opts).await
+    }
+
+    async fn post_item_comment(
+        &self,
+        _project: &str,
+        key: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> Result<Comment> {
+        self.conv_post(key, body, internal).await
+    }
+
+    async fn edit_item_comment(
+        &self,
+        _project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_edit(key, comment_id, body).await
     }
 
     async fn current_user(&self) -> Result<HostedUser> {

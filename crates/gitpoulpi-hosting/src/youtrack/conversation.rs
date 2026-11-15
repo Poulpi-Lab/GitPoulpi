@@ -14,7 +14,9 @@ use super::map::{issue_url, number_of};
 use super::query::epoch_ms_to_iso;
 use crate::client::encode_component;
 use crate::conversation::time::is_edited;
-use crate::conversation::tracker::{check_body, item_ref, opt_text, require_issue, text, window_of};
+use crate::conversation::tracker::{
+    check_body, item_ref, opt_text, require_issue, text, window_of,
+};
 use crate::conversation::{
     Actor, ActorKind, Comment, IdentityKind, ItemHeader, ItemKey, ItemKind, Markup, MarkupFlavor,
     PageCursor, PostingIdentity, TimelineEntry, TimelineOpts, TimelinePage, TokenSource,
@@ -87,7 +89,10 @@ impl YouTrackClient {
         let site = self.site();
         let issue: Value = self
             .get_json(
-                &format!("/issues/{}?fields={ISSUE_FIELDS}", encode_component(&reference)),
+                &format!(
+                    "/issues/{}?fields={ISSUE_FIELDS}",
+                    encode_component(&reference)
+                ),
                 "reading the YouTrack issue",
             )
             .await?;
@@ -124,9 +129,8 @@ impl YouTrackClient {
                 id: readable.clone(),
             },
             title: text(&issue, "summary"),
-            state_label: state.unwrap_or_else(|| {
-                if resolved { "resolved" } else { "open" }.to_string()
-            }),
+            state_label: state
+                .unwrap_or_else(|| if resolved { "resolved" } else { "open" }.to_string()),
             open: !resolved,
             author: actor_of(&site, &issue["reporter"]),
             body: Markup::new(text(&issue, "description"), MarkupFlavor::YoutrackMd),
@@ -170,7 +174,10 @@ impl YouTrackClient {
                 "internal comments: YouTrack comments are restricted by visibility groups, which the profile does not know".into(),
             ));
         }
-        let url = format!("{}?fields={COMMENT_FIELDS}", self.comments_url(project, key));
+        let url = format!(
+            "{}?fields={COMMENT_FIELDS}",
+            self.comments_url(project, key)
+        );
         let response = self
             .send(
                 HttpRequest::post_json(url, &json!({ "text": body, "usesMarkdown": true })),
@@ -232,7 +239,10 @@ impl YouTrackClient {
     /// The token's own user (`/users/me`).
     pub(super) async fn conv_identity(&self) -> Result<PostingIdentity> {
         let me: Value = self
-            .get_json("/users/me?fields=id,login,fullName", "checking the YouTrack token")
+            .get_json(
+                "/users/me?fields=id,login,fullName",
+                "checking the YouTrack token",
+            )
             .await?;
         let actor = actor_of(&self.site(), &me);
         if actor.kind == ActorKind::Unknown {

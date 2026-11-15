@@ -80,13 +80,13 @@ fn an_issue_maps_comments_flavors_edits_and_skips_deleted_ones() {
         comment(4, true, true)
     ])
     .to_string();
-    let t = Arc::new(
-        RecordedTransport::new()
-            .on("/comments?", 200, &rows)
-            .on("/issues/ABC-12?", 200, &issue()),
-    );
-    let page = block_on(client(&t).item_timeline("ABC", &key(), None, &TimelineOpts::default()))
-        .unwrap();
+    let t = Arc::new(RecordedTransport::new().on("/comments?", 200, &rows).on(
+        "/issues/ABC-12?",
+        200,
+        &issue(),
+    ));
+    let page =
+        block_on(client(&t).item_timeline("ABC", &key(), None, &TimelineOpts::default())).unwrap();
     let h = &page.header;
     assert_eq!(h.reference, "ABC-12");
     assert_eq!(h.key.number, 12);
@@ -178,14 +178,21 @@ fn post_edit_and_delete_send_the_exact_requests() {
     block_on(c.delete_item_comment("ABC", &key(), "4-9")).unwrap();
     let sent = t.requests();
     assert_eq!(sent[0].method, Method::Post);
-    assert!(sent[0].url.starts_with(&format!("{API}/issues/ABC-12/comments?fields=")));
+    assert!(sent[0]
+        .url
+        .starts_with(&format!("{API}/issues/ABC-12/comments?fields=")));
     assert_eq!(
         body_of(&sent[0]),
         json!({ "text": "Fixed in **1.2**", "usesMarkdown": true })
     );
     assert_eq!(sent[1].method, Method::Post, "YouTrack edits with POST");
-    assert!(sent[1].url.starts_with(&format!("{API}/issues/ABC-12/comments/4-9?fields=")));
-    assert_eq!(body_of(&sent[1]), json!({ "text": "Updated", "usesMarkdown": true }));
+    assert!(sent[1]
+        .url
+        .starts_with(&format!("{API}/issues/ABC-12/comments/4-9?fields=")));
+    assert_eq!(
+        body_of(&sent[1]),
+        json!({ "text": "Updated", "usesMarkdown": true })
+    );
     assert_eq!(sent[2].method, Method::Delete);
     assert_eq!(sent[2].url, format!("{API}/issues/ABC-12/comments/4-9"));
     assert_eq!(sent[2].body, None);
@@ -208,7 +215,12 @@ fn what_youtrack_cannot_do_is_refused_before_anything_is_sent() {
         Err(Error::Unsupported(_))
     ));
     assert!(matches!(
-        block_on(c.item_timeline("ABC", &ItemKey::pull_request(1), None, &TimelineOpts::default())),
+        block_on(c.item_timeline(
+            "ABC",
+            &ItemKey::pull_request(1),
+            None,
+            &TimelineOpts::default()
+        )),
         Err(Error::Unsupported(_))
     ));
     assert!(t.requests().is_empty());

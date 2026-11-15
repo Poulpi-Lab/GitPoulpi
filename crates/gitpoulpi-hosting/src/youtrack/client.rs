@@ -86,7 +86,11 @@ impl YouTrackClient {
     }
 
     /// A POST (YouTrack edits with POST) or DELETE whose answer is not read.
-    pub(super) async fn send(&self, request: HttpRequest, what: &str) -> Result<crate::http::HttpResponse> {
+    pub(super) async fn send(
+        &self,
+        request: HttpRequest,
+        what: &str,
+    ) -> Result<crate::http::HttpResponse> {
         let response = self.transport.send(self.authed(request)).await?;
         response.error_for_status(what)?;
         Ok(response)

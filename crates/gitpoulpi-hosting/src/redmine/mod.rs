@@ -12,9 +12,13 @@
 //! the milestone. Core Redmine has no labels, so none are listed or edited.
 
 mod client;
+mod conversation;
+#[cfg(test)]
+mod conversation_tests;
 mod map;
 pub mod spec;
 #[cfg(test)]
 mod tests;
+mod textile_out;
 
 pub(crate) use client::RedmineClient;

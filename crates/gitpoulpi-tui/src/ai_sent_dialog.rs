@@ -255,6 +255,12 @@ fn pane_lines(sent: &Prepared, width: usize) -> Vec<(String, bool)> {
         }
     };
     section(&mut lines, pane_msg::DLG_SENT_SYSTEM.get(), &sent.system);
+    // The repository text that goes after the instructions, when the user let
+    // the AI read the repository and GitPoulpi built it.
+    if let Some(context) = sent.context.as_ref().filter(|c| !c.text.is_empty()) {
+        lines.push((String::new(), false));
+        section(&mut lines, msg::CTX_PANE.get(), &context.text);
+    }
     lines.push((String::new(), false));
     section(&mut lines, pane_msg::DLG_SENT_USER.get(), &sent.user);
     lines
@@ -565,6 +571,7 @@ fn summary_rows(open: &Open) -> Vec<(String, bool)> {
     let mut rows: Vec<(String, bool)> = Vec::new();
     if sent.redactions.is_empty() && sent.excluded_files.is_empty() {
         rows.push((msg::NOTHING_REMOVED.get().to_string(), false));
+        context_rows(open, &mut rows);
         return rows;
     }
     if !sent.redactions.is_empty() {
@@ -585,7 +592,75 @@ fn summary_rows(open: &Open) -> Vec<(String, bool)> {
             rows.push((format!("  {}", visible(f)), false));
         }
     }
+    context_rows(open, &mut rows);
     rows
+}
+
+/// "KB" with one decimal, like the settings rows say sizes.
+fn size_text(bytes: usize) -> String {
+    if bytes < 1024 {
+        format!("{bytes} B")
+    } else {
+        format!("{:.1} KB", bytes as f64 / 1024.0)
+    }
+}
+
+/// The repository context of the request: each part with its size and
+/// whether it was kept from an earlier draft, the total against the limit,
+/// what was cut or left out, or, for a local agent, what it reads with; and
+/// the reminder that the AI only drafts.
+fn context_rows(open: &Open, rows: &mut Vec<(String, bool)>) {
+    let draft_only = matches!(open.action, AiAction::HostingReply | AiAction::IssueBody);
+    if let Some(context) = &open.sent.context {
+        let summary = &context.summary;
+        rows.push((msg::CTX_HEADING.get().to_string(), true));
+        if let Some(agent) = &summary.agent {
+            rows.push((format!("  {}", msg::ctx_agent(&agent.tools)), false));
+            rows.push((
+                format!("  {}", msg::ctx_folder(visible(&agent.folder))),
+                false,
+            ));
+            match agent.session.as_str() {
+                "started" => rows.push((format!("  {}", msg::CTX_SESSION_STARTED.get()), false)),
+                "continued" => {
+                    rows.push((format!("  {}", msg::CTX_SESSION_CONTINUED.get()), false))
+                }
+                _ => {}
+            }
+        } else {
+            rows.push((
+                format!(
+                    "  {}",
+                    msg::ctx_size(size_text(summary.total), size_text(summary.budget))
+                ),
+                false,
+            ));
+            for part in summary.parts.iter().take(LIST_ROWS) {
+                let label = visible(&part.label);
+                let size = size_text(part.bytes);
+                let row = if part.reused {
+                    msg::ctx_part_reused(label, size)
+                } else {
+                    msg::ctx_part(label, size)
+                };
+                rows.push((format!("  {row}"), false));
+            }
+            let more = summary.parts.len().saturating_sub(LIST_ROWS);
+            if more > 0 {
+                rows.push((format!("  {}", msg::ctx_more(more as u64)), false));
+            }
+            for cut in summary.cuts.iter().take(2) {
+                rows.push((format!("  {}", msg::ctx_cut(visible(&cut.what))), false));
+            }
+            if !summary.left_out.is_empty() {
+                let files: Vec<String> = summary.left_out.iter().map(|f| visible(f)).collect();
+                rows.push((format!("  {}", msg::ctx_left_out(files.join(", "))), false));
+            }
+        }
+    }
+    if draft_only {
+        rows.push((msg::CTX_DRAFT_ONLY.get().to_string(), false));
+    }
 }
 
 #[cfg(test)]

@@ -166,6 +166,16 @@ pub fn route(method: &str, target: &str, port: u16) -> (u16, String) {
     if let Some(answer) = conversation_route(method, path) {
         return answer;
     }
+    // An OpenAI-compatible model on the same loopback server (the AI tests'
+    // HTTP route): it answers one canned draft and, like any model, changes
+    // nothing on the host.
+    if method == "POST" && path == "/v1/chat/completions" {
+        return (
+            200,
+            r#"{"choices":[{"message":{"content":"Please attach the stack trace of the crash."}}]}"#
+                .into(),
+        );
+    }
     match (method, path) {
         ("GET", "/api/v4/user") => (
             200,

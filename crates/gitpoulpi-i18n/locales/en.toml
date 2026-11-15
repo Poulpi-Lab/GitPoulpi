@@ -11442,6 +11442,32 @@ excluded_heading = { one = "{n} sensitive file left out", other = "{n} sensitive
 nothing_removed = "No secret was found and no sensitive file is part of this request."
 # context: one row of the list of replaced secrets; {rule} is the kind of secret (github-token), {preview} a masked sample that never shows the whole value
 redaction_row = "{rule}: {preview}"
+# context: heading of the list of repository parts that go along with an AI request
+ctx_heading = "Repository context"
+# context: size of the repository context against its limit, like 31.2 KB of 48 KB
+ctx_size = "{used} of {budget}"
+# context: one part of the repository context: a file, the diff, a search, the map; and its size
+ctx_part = "{label}: {size}"
+# context: same, for a part kept from an earlier draft instead of read again
+ctx_part_reused = "{label}: {size} (reused)"
+# context: plural
+ctx_more = { one = "...and {n} more part", other = "...and {n} more parts" }
+# context: a part of the repository context that was shortened or left out to stay within the limit
+ctx_cut = "Cut to fit: {what}"
+# context: files the repository context does not include because they look sensitive
+ctx_left_out = "Left out (sensitive): {files}"
+# context: line of the dialog when a local agent reads the repository by itself instead of receiving a context
+ctx_agent = "A local agent reads the repository itself with read-only tools ({tools})"
+# context: line of the dialog: the folder a local agent that reads the repository works in
+ctx_folder = "Working folder: {folder}"
+# context: line of the dialog: the local agent starts a session
+ctx_session_started = "Agent session: new"
+# context: line of the dialog: the local agent continues its session
+ctx_session_continued = "Agent session: continued"
+# context: line of the dialog for a drafted reply on a host
+ctx_draft_only = "The AI only writes a draft. Nothing is posted until you send it yourself."
+# context: heading of the repository context text in the pane that shows what is sent
+ctx_pane = "Repository context"
 # context: checkbox of the dialog; {action} is the name of the AI action (Commit message, Explain changes...)
 dont_show = "Don't show again for {action}"
 # context: button that sends the AI request
@@ -11567,19 +11593,19 @@ hosting_reply_context_help = "Over this size, nothing is cut silently: you are a
 # context: Settings > AI, label of a number: the most bytes of one repository file given to the AI when it drafts a reply
 hosting_reply_file_label = "Largest repository file for a reply (bytes)"
 # context: help under that number
-hosting_reply_file_help = "Used once the AI may read the repository, which is not built yet. 8192 by default."
+hosting_reply_file_help = "Used when the AI reads the repository for a drafted reply. 8192 by default."
 # context: Settings > AI, label of a number: the most bytes of the repository map (its list of files) given to the AI when it drafts a reply
 hosting_reply_map_label = "Largest repository map for a reply (bytes)"
 # context: help under that number
-hosting_reply_map_help = "Used once the AI may read the repository, which is not built yet. 6144 by default."
+hosting_reply_map_help = "Used when the AI reads the repository for a drafted reply. 6144 by default."
 # context: Settings > AI, label of a number: the most search results kept for each search term when the AI drafts a reply
 hosting_reply_hits_label = "Most search hits per term for a reply"
 # context: help under that number
-hosting_reply_hits_help = "Used once the AI may read the repository, which is not built yet. 20 by default."
+hosting_reply_hits_help = "Used when the AI reads the repository for a drafted reply. 20 by default."
 # context: Settings > AI, label of a number: the most search terms looked up in the repository when the AI drafts a reply
 hosting_reply_terms_label = "Most search terms for a reply"
 # context: help under that number
-hosting_reply_terms_help = "Used once the AI may read the repository, which is not built yet. 8 by default."
+hosting_reply_terms_help = "Used when the AI reads the repository for a drafted reply. 8 by default."
 # context: list line of the dialog shown when what would be sent to the AI is over a limit, for the conversation of a drafted reply; {size} is its size (for example "91.2 KB (91234 bytes)"), {limit} the limit in the same form, {key} the name of the setting
 part_reply_conversation = "The conversation is {size}, limit {limit} (setting {key}). Truncated, the oldest comments and the start of long ones are left out."
 # context: button that sends everything of the oversized request this one time, nothing cut
@@ -12286,10 +12312,33 @@ ai_only_drafts = "The AI only writes a draft, nothing is posted."
 ai_placeholder = "for example: agree, and ask for a failing test"
 # context: checkbox: the AI starts from the text already typed instead of writing a new one. Width budget: 28 cells
 ai_improve = "Improve my draft"
-# context: checkbox, unticked and disabled until it is built. Width budget: 34 cells
+# context: checkbox, unticked by default: the AI may read the repository for this draft. Width budget: 34 cells
 ai_repo = "Let the AI read the repository"
+# context: the reason the repository checkbox is disabled when the repository is not cloned here, in parentheses after it. Width budget: 24 cells
+ai_repo_no_clone = "no local clone"
+# context: the reason the repository checkbox is disabled when the chosen local agent has no read-only mode GitPoulpi trusts, in parentheses after it. Width budget: 24 cells
+ai_repo_no_readonly = "no read-only mode"
+# context: full sentence shown when the disabled repository checkbox is activated. Width budget: 70 cells
+ai_repo_no_readonly_why = "This agent has no read-only mode GitPoulpi trusts."
+# context: the reason the repository checkbox is disabled for a text that is already written from a diff (a pull request description), in parentheses after it. Width budget: 24 cells
+ai_repo_not_here = "not for this text"
+# context: button: forget the repository context kept from earlier drafts and read the repository again. Width budget: 20 cells
+ai_refresh = "Refresh context"
+# context: shown after the Refresh context button. Width budget: 64 cells
+ai_refreshed = "Context refreshed. The next draft reads the repository again."
+# context: status after a draft that read the repository; {size} is like 31.2 KB, HEAD is the git word and stays. Width budget: 56 cells
+ai_ctx_built = "Context built: {parts} parts, {size}, HEAD {head}"
+# context: status after a draft whose repository context came from the cache. Width budget: 56 cells
+ai_ctx_reused = "Context reused ({reused} of {parts} parts, HEAD {head})"
+# context: status: the AI service reused this many tokens of its own prompt cache. Width budget: 44 cells
+ai_ctx_cache = "Provider cache: {tokens} tokens reused"
+# context: status after a draft by a local agent that read the repository. Width budget: 44 cells
+ai_ctx_agent = "The agent read the repository (HEAD {head})"
+# context: status: the local agent's session began with this draft. Width budget: 30 cells
+ai_ctx_session_started = "Agent session started"
+# context: status: the local agent continued its session from the previous draft. Width budget: 30 cells
+ai_ctx_session_continued = "Agent session continued"
 # context: the reason that checkbox is disabled, shown in parentheses after it. Width budget: 24 cells
-ai_repo_unavailable = "not built yet"
 # context: label before the list of instructions typed before. Width budget: 12 cells
 ai_recent = "Recent"
 # context: shown after that label when the list is empty. Width budget: 24 cells
@@ -12327,7 +12376,7 @@ repo_heading = "Repository access"
 # context: Settings > AI, label of a switch: whether the choice "Let the AI read the repository" starts ticked
 read_repository_label = "Let the AI read the repository by default"
 # context: help under that switch
-read_repository_help = "Off by default. When on, the choice \"Let the AI read the repository\" starts ticked each time you ask for a draft; you can change it every time. Reading the repository is not built yet: for now this setting has no effect."
+read_repository_help = "Off by default. When on, the choice \"Let the AI read the repository\" starts ticked each time you ask for a draft; you can change it every time."
 # context: Settings > AI, label of a switch: keep a local agent's session between two drafts
 reuse_session_label = "Keep the agent's session between replies"
 # context: help under that switch

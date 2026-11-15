@@ -33,6 +33,7 @@ fn sent() -> Prepared {
             preview: "ghp_****abcd".into(),
         }],
         excluded_files: vec![".env".into()],
+        context: None,
     }
 }
 
@@ -259,4 +260,130 @@ fn dont_show_again_turns_the_action_off_in_the_file() {
     let config = gitpoulpi_config::Config::load(&path).unwrap();
     assert!(!config.ai.sent_preview.shows(AiAction::ExplainChanges));
     assert!(config.ai.sent_preview.shows(AiAction::CommitMessage));
+}
+
+fn reply_context() -> gitpoulpi_ai::ContextBlock {
+    use gitpoulpi_ai::hosting_reply::repo_context::{ContextCut, PartSummary};
+    gitpoulpi_ai::ContextBlock {
+        text: "### src/a.rs\nfn a() {}\n".into(),
+        summary: gitpoulpi_ai::ContextSummary {
+            head: "a1b2c3d".into(),
+            parts: [
+                "Repository map",
+                "src/a.rs",
+                "Search: parse",
+                "src/b.rs",
+                "src/c.rs",
+                "src/d.rs",
+            ]
+            .iter()
+            .enumerate()
+            .map(|(i, label)| PartSummary {
+                label: (*label).into(),
+                bytes: 2048 + i * 100,
+                reused: i == 1,
+            })
+            .collect(),
+            total: 12_345,
+            budget: 49_152,
+            cuts: vec![ContextCut {
+                what: "src/d.rs".into(),
+                bytes: 9_000,
+                kept: 500,
+            }],
+            left_out: vec![".env".into()],
+            agent: None,
+        },
+    }
+}
+
+/// The repository context is listed before it goes out: each part with its
+/// size and whether it is reused, the total against the budget, what was cut
+/// or left out, and that the AI only drafts.
+#[test]
+fn a_drafted_reply_lists_the_repository_context_and_says_the_ai_only_drafts() {
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    reset();
+    let mut sent = sent();
+    sent.redactions.clear();
+    sent.excluded_files.clear();
+    sent.context = Some(reply_context());
+    let worker = std::thread::spawn(move || {
+        let gate = Gate::shared(
+            AiAction::HostingReply,
+            "Claude".into(),
+            "Reply on a host".into(),
+        );
+        tokio::runtime::Builder::new_current_thread()
+            .build()
+            .unwrap()
+            .block_on(async move { gate_confirm(&gate, &sent).await })
+    });
+    for _ in 0..300 {
+        if is_open() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    let text = screen_of(120, 40);
+    assert!(text.contains("Repository context"), "{text}");
+    assert!(text.contains("12.1 KB of 48.0 KB"), "{text}");
+    assert!(text.contains("Repository map: 2.0 KB"), "{text}");
+    assert!(text.contains("src/a.rs: 2.1 KB (reused)"), "{text}");
+    assert!(text.contains("...and 2 more parts"), "{text}");
+    assert!(text.contains("Cut to fit: src/d.rs"), "{text}");
+    assert!(text.contains("Left out (sensitive): .env"), "{text}");
+    assert!(
+        text.contains("The AI only writes a draft. Nothing is posted until you send it yourself."),
+        "{text}"
+    );
+    // The context text itself is part of what is sent, in the pane.
+    assert!(text.contains("fn a() {}"), "{text}");
+    on_key(key(KeyCode::Esc));
+    assert!(!worker.join().unwrap());
+}
+
+/// A local agent reads the repository itself: the dialog says with which
+/// tools, where, and whether its session continues.
+#[test]
+fn an_agent_that_reads_the_repository_is_listed_with_its_tools_and_folder() {
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    reset();
+    let mut sent = sent();
+    sent.redactions.clear();
+    sent.excluded_files.clear();
+    sent.context = Some(gitpoulpi_ai::ContextBlock {
+        text: String::new(),
+        summary: gitpoulpi_ai::ContextSummary {
+            head: "a1b2c3d".into(),
+            agent: Some(gitpoulpi_ai::hosting_reply::repo_context::AgentReads {
+                tools: "Read, Grep, Glob".into(),
+                folder: "/work/repo".into(),
+                session: "continued".into(),
+            }),
+            ..Default::default()
+        },
+    });
+    let worker = std::thread::spawn(move || {
+        let gate = Gate::shared(AiAction::IssueBody, "Claude".into(), "Issue".into());
+        tokio::runtime::Builder::new_current_thread()
+            .build()
+            .unwrap()
+            .block_on(async move { gate_confirm(&gate, &sent).await })
+    });
+    for _ in 0..300 {
+        if is_open() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    let text = screen_of(140, 40);
+    assert!(
+        text.contains("reads the repository itself with read-only tools (Read, Grep, Glob)"),
+        "{text}"
+    );
+    assert!(text.contains("Working folder: /work/repo"), "{text}");
+    assert!(text.contains("Agent session: continued"), "{text}");
+    on_key(key(KeyCode::Esc));
+    assert!(!worker.join().unwrap());
 }

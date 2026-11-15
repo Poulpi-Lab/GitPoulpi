@@ -381,7 +381,7 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
 | `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
 | `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+W` |
+| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+I` |
 | `dialog` | `browse` | Sfoglia per trovare una cartella | `Ctrl+B` |
 | `dialog` | `sources` | Vai alle origini del clone | `Alt+S` |
 | `dialog` | `submit` | Invia il modulo pull request | `Ctrl+S` |

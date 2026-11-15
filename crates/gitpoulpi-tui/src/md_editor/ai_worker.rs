@@ -23,6 +23,10 @@ pub(super) struct Input {
     pub(super) scope: AiScope,
     pub(super) task: AiTask,
     pub(super) cancel: Arc<AtomicBool>,
+    /// "Let the AI read the repository" was ticked for this draft.
+    pub(super) read_repo: bool,
+    /// Where the worker says what it read (the panel shows it).
+    pub(super) context: Arc<std::sync::Mutex<Option<String>>>,
     #[cfg(test)]
     pub(super) fake: Option<super::ai::Fake>,
 }
@@ -79,6 +83,8 @@ fn run(input: Input) -> Answer {
     let cancel = input.cancel.clone();
     let scope = input.scope;
     let task = input.task;
+    let read_repo = input.read_repo;
+    let context = input.context.clone();
     let answer = runtime.block_on(async {
         let ask = async {
             let job = match &scope.root {
@@ -86,6 +92,16 @@ fn run(input: Input) -> Answer {
                 None => crate::ai_ui::prepare_remote(&config, action),
             }?;
             match task {
+                // The repository is read only when the box was ticked, and the
+                // AI still only drafts.
+                AiTask::Reply(request) if read_repo => {
+                    let draft =
+                        super::ai_context::draft_reading(job, *request, &scope, &config).await?;
+                    if let Ok(mut slot) = context.lock() {
+                        *slot = super::ai_context::line(&draft.context);
+                    }
+                    Ok(draft.text)
+                }
                 AiTask::Reply(request) => gitpoulpi_ai::hosting_reply::draft(&job, &request)
                     .await
                     .map(|d| d.text)

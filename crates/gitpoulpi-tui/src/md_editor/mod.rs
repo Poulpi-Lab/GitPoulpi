@@ -25,6 +25,7 @@
 #![allow(dead_code)]
 
 pub(crate) mod ai;
+mod ai_context;
 #[cfg(test)]
 mod ai_tests;
 #[cfg_attr(not(feature = "ai"), path = "ai_worker_stub.rs")]

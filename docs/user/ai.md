@@ -384,10 +384,19 @@ comments (newest first, within `ai.limits.hosting_reply_context_bytes`, 49152 by
 in this answer (`--hint`, typed at the moment of use) and, to improve your own text, your draft
 (`--draft`). Everything other people wrote is marked as untrusted data in the request, so an instruction
 hidden in a comment is not followed. Over the limit the oldest comments are left out first and the cut is
-reported in `truncated` (`--send-all` lifts the limit). **The AI does not read the repository** yet:
-`--read-repo` is refused with "not built yet", and the defaults under *Repository access* in Settings > AI
-(`ai.hosting_reply.read_repository`, **off by default**, `reuse_agent_session`, `context_ttl_minutes`) only
-prepare that.
+reported in `truncated` (`--send-all` lifts the limit). **Reading the repository is off by default.** The AI reads the repository only when *Let the AI read the
+repository* is ticked for that draft (`--read-repo` on the CLI; `ai.hosting_reply.read_repository`, off, only
+sets where the box starts). A **local agent** profile reads it itself, in the repository folder, with read-only
+tools (Claude Code: `Read`, `Grep`, `Glob`; Writes, `Bash`, the web and MCP servers are refused; Codex: its
+read-only sandbox), without the hosting credentials of your environment, and keeps its session between replies
+(`reuse_agent_session`; a new commit or *Refresh context* starts a new one). An agent GitPoulpi has no confirmed
+read-only mode for cannot be let in. An **API** profile gets a context GitPoulpi builds from the files the
+conversation names (whole, or a window around the line), search hits for identifiers and error messages, a
+repository map and, for a pull request (`--pr-base`, `--pr-head`), its diff, within
+`ai.limits.hosting_reply_*`; files that look sensitive are left out and secrets are masked first. The built
+context is kept (`context_ttl_minutes`, 30 by default; per repository, in `<data>/private/ai-context` for
+the CLI) and Anthropic's prompt cache is used, so the next reply costs little; a new HEAD or
+`--refresh-context` rebuilds it. **The AI still only drafts**: its tools cannot write, and nothing here posts.
 
 **Your own base prompt.** The instructions both actions start from are editable: *Settings > AI > Replies
 on a host > Base prompt* (`ai.hosting_reply.base_prompt`). Empty uses the built-in prompt, which asks for
@@ -406,13 +415,16 @@ gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps t
 print such a page come with the conversation CLI.
 
 **In the Markdown composer.** While AI is on, the composer of a review comment, the Finish review summary, the
-new-issue description and the pull request description has a **✦ Write with AI** button (`Alt+W`) at the right
+new-issue description and the pull request description has a **✦ Write with AI** button (`Alt+I`, the same key in every one of them) at the right
 end of its mode bar. It opens a panel under the bar:
 
 - a field for *what I want in this answer*, typed at the moment of use (`Enter` drafts), with a **Recent**
   list of earlier instructions (click one, or `Up` / `Down` in the field);
 - *Improve my draft* (ticked when there is already a text: the AI starts from it);
-- *Let the AI read the repository*, unticked and disabled ("not built yet") until that part lands;
+- *Let the AI read the repository*, **unticked** every time unless you turned its default on; disabled with its
+  reason when there is no local clone or the agent has no read-only mode (see above). Ticked, a **Refresh
+  context** button and a line say what the last draft read ("Context reused (4 of 5 parts, HEAD a1b2c3d)",
+  "Provider cache: 12k tokens reused", "Agent session continued"), and "What is sent" lists the context parts;
 - **Draft**, **Stop** (also `Esc`) and **Close**, and one line for progress or the error.
 
 The usual "What is sent" dialog shows the request first (`[ai.sent_preview] hosting_reply`, `issue_body`,

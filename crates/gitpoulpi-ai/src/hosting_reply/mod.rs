@@ -11,10 +11,15 @@
 //! The request is built from the conversation ([`prompt::build`]): the item's
 //! header and description, the thread being answered, the recent entries
 //! within `ai.limits.hosting_reply_context_bytes` ([`plan`]), then the user's
-//! per-use hint and, when improving, their draft. **No repository access
-//! yet** ([`RepoAccess`] has no way to ask for it): a later slice adds it
-//! behind the per-use "Let the AI read the repository" choice, off by default
-//! (`ai.hosting_reply.read_repository`).
+//! per-use hint and, when improving, their draft.
+//!
+//! **Repository access is off unless the user ticked "Let the AI read the
+//! repository" for this use** (`ai.hosting_reply.read_repository` is only the
+//! default of that box, off). Then [`repo_access::read_repository`] sets
+//! [`RepoAccess`]: a local agent reads the repository itself with read-only
+//! tools, any other profile gets a [`repo_context::RepoContext`] built through
+//! a [`repo_context::RepoReader`] (privacy first, budgeted, cached in
+//! [`cache`]). Either way the AI only drafts.
 
 use std::path::PathBuf;
 use std::sync::Arc;

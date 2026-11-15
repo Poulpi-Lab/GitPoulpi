@@ -27,7 +27,7 @@ fn a_pristine_dialog_closes_on_esc_the_cross_and_outside_with_no_esc_hint() {
 #[test]
 fn a_typed_description_asks_before_closing_and_discard_closes() {
     let mut d = dialog();
-    d.body = "some words".into();
+    d.md.set_text("some words".into());
     let (_, _) = paint(&mut d, 110, 34);
     let cross = d.guard.close.rect().expect("a cross");
     for step in 0..3 {

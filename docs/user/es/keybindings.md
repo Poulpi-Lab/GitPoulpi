@@ -379,6 +379,9 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `reword` | `deeper` | Modificar el historial más a fondo | `Alt+H` |
 | `composer` | `commit` | Commit desde el compositor | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Insertar una referencia a un issue | `Alt+R` |
+| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
+| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
+| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
 | `dialog` | `browse` | Examinar en busca de una carpeta | `Ctrl+B` |
 | `dialog` | `sources` | Ir a los orígenes de clonación | `Alt+S` |
 | `dialog` | `submit` | Enviar el formulario de pull request | `Ctrl+S` |

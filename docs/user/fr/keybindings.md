@@ -378,6 +378,9 @@ préfixe (`Ctrl+G s`).
 | `reword` | `deeper` | Modifier l'historique en profondeur | `Alt+H` |
 | `composer` | `commit` | Commit depuis le compositeur | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Insérer une référence de ticket | `Alt+R` |
+| `md_editor` | `preview` | Éditeur Markdown : basculer entre Écrire et Aperçu | `Alt+P` |
+| `md_editor` | `split` | Éditeur Markdown : afficher ou masquer la vue côte à côte | `Alt+L` |
+| `md_editor` | `submit` | Éditeur Markdown : envoyer le texte | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
 | `dialog` | `browse` | Parcourir un dossier | `Ctrl+B` |
 | `dialog` | `sources` | Aller aux sources de clonage | `Alt+S` |
 | `dialog` | `submit` | Envoyer le formulaire de pull request | `Ctrl+S` |

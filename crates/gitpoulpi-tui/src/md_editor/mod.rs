@@ -504,7 +504,6 @@ impl MdEditor {
         let body = if tight {
             rect
         } else {
-            self.paint_bar(buf, rect);
             Rect::new(rect.x, rect.y + 1, rect.width, rect.height - 1)
         };
         match self.mode {
@@ -522,6 +521,11 @@ impl MdEditor {
                 self.paint_text(buf, text, focused, placeholder);
                 self.paint_preview(buf, pane);
             }
+        }
+        // After the body: the bar says whether the Preview is still being
+        // laid out, which the body's paint just found out.
+        if !tight {
+            self.paint_bar(buf, rect);
         }
     }
 
@@ -559,7 +563,8 @@ impl MdEditor {
             x = r.right() + 1;
         }
         let muted = Style::default().fg(th().ui.muted).bg(th().ui.panel);
-        let room = self.ai_slot.x.saturating_sub(x + 1);
+        // The note may run under the (hidden) AI slot until that button exists.
+        let room = rect.right().saturating_sub(x + 1);
         if let Some(note) = self.note.as_deref() {
             dialog_kit::put(
                 buf,

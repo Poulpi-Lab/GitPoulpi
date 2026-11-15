@@ -374,6 +374,9 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `reword` | `deeper` | Verlauf weitergehend ändern | `Alt+H` |
 | `composer` | `commit` | Commit aus dem Composer | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Issue-Referenz einfügen | `Alt+R` |
+| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
+| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
+| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
 | `dialog` | `browse` | Nach einem Ordner suchen | `Ctrl+B` |
 | `dialog` | `sources` | Zu den Klon-Quellen | `Alt+S` |
 | `dialog` | `submit` | Formular für Pull Request absenden | `Ctrl+S` |

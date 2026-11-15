@@ -2457,3 +2457,148 @@ fn the_small_review_dialogs_close_on_their_cross() {
     let (c, r) = cross_of(&buf);
     assert_eq!(confirm.on_mouse(down(c, r)), ConfirmOutcome::No);
 }
+
+mod md_composer {
+    //! The Markdown composer inside the review's two text dialogs: the
+    //! Write / Preview modes, the discard question and the send key.
+
+    use super::*;
+    use crate::review_view::popups::{ComposeBox, ComposeOutcome, FinishOutcome};
+
+    fn key(code: KeyCode) -> KeyEvent {
+        KeyEvent::new(code, KeyModifiers::NONE)
+    }
+
+    fn alt(c: char) -> KeyEvent {
+        KeyEvent::new(KeyCode::Char(c), KeyModifiers::ALT)
+    }
+
+    fn type_text(compose: &mut ComposeBox, text: &str) {
+        for c in text.chars() {
+            compose.on_key(key(KeyCode::Char(c)));
+        }
+    }
+
+    fn screen(buf: &Buffer) -> String {
+        (0..buf.area.height)
+            .map(|y| {
+                (0..buf.area.width)
+                    .map(|x| buf[(x, y)].symbol().to_string())
+                    .collect::<String>()
+            })
+            .collect::<Vec<_>>()
+            .join("\n")
+    }
+
+    fn compose() -> ComposeBox {
+        ComposeBox::new(
+            ComposeFor::Conversation,
+            "Comment".into(),
+            "about".into(),
+            String::new(),
+        )
+    }
+
+    #[test]
+    fn the_comment_box_has_write_and_preview_and_renders_the_markdown() {
+        let area = Rect::new(0, 0, 120, 40);
+        let mut c = compose();
+        type_text(&mut c, "**bold** words");
+        let mut buf = Buffer::empty(area);
+        c.render(area, &mut buf);
+        let s = screen(&buf);
+        for want in ["Write", "Preview", "Split", "**bold** words"] {
+            assert!(s.contains(want), "{want:?}:\n{s}");
+        }
+        // Alt+P: the same text, rendered.
+        c.on_key(alt('p'));
+        let mut buf = Buffer::empty(area);
+        c.render(area, &mut buf);
+        let s = screen(&buf);
+        assert!(s.contains("bold words"), "{s}");
+        assert!(!s.contains("**bold**"), "{s}");
+        // Back to Write: the text is still there.
+        c.on_key(alt('p'));
+        assert_eq!(c.text(), "**bold** words");
+    }
+
+    #[test]
+    fn a_comment_that_was_typed_asks_before_it_is_thrown_away() {
+        let area = Rect::new(0, 0, 120, 40);
+        let mut c = compose();
+        type_text(&mut c, "half a thought");
+        // Esc asks; Keep editing goes back to the text.
+        assert_eq!(c.on_key(key(KeyCode::Esc)), ComposeOutcome::Stay);
+        let mut buf = Buffer::empty(area);
+        c.render(area, &mut buf);
+        let s = screen(&buf);
+        assert!(s.contains("Discard this text?"), "{s}");
+        assert_eq!(c.on_key(key(KeyCode::Esc)), ComposeOutcome::Stay);
+        assert_eq!(c.text(), "half a thought");
+        // Again, then Discard (the second button) closes.
+        c.on_key(key(KeyCode::Esc));
+        c.on_key(key(KeyCode::Right));
+        assert_eq!(c.on_key(key(KeyCode::Enter)), ComposeOutcome::Cancel);
+    }
+
+    #[test]
+    fn an_untouched_comment_box_closes_without_asking() {
+        let mut c = compose();
+        assert_eq!(c.on_key(key(KeyCode::Esc)), ComposeOutcome::Cancel);
+        let mut edit = ComposeBox::new(
+            ComposeFor::EditPending(0),
+            "Edit".into(),
+            "a:1".into(),
+            "existing words".into(),
+        );
+        assert_eq!(edit.on_key(key(KeyCode::Esc)), ComposeOutcome::Cancel);
+        type_text(&mut edit, "x");
+        assert_eq!(edit.on_key(key(KeyCode::Esc)), ComposeOutcome::Stay);
+    }
+
+    #[test]
+    fn ctrl_enter_and_the_post_button_send_the_trimmed_text() {
+        let mut c = compose();
+        assert_eq!(
+            c.on_key(KeyEvent::new(KeyCode::Enter, KeyModifiers::CONTROL)),
+            ComposeOutcome::Stay,
+            "nothing to send yet"
+        );
+        type_text(&mut c, " hi ");
+        c.on_key(key(KeyCode::Enter));
+        type_text(&mut c, "there");
+        assert_eq!(
+            c.on_key(KeyEvent::new(KeyCode::Enter, KeyModifiers::CONTROL)),
+            ComposeOutcome::Submit("hi \nthere".into())
+        );
+    }
+
+    #[test]
+    fn the_finish_summary_is_a_markdown_editor_too() {
+        let area = Rect::new(0, 0, 120, 40);
+        let caps = ReviewCapabilities {
+            review: true,
+            ..Default::default()
+        };
+        let mut d = super::super::popups::FinishDialog::new(caps, 0, None, &[]);
+        for c in "# Verdict".chars() {
+            d.on_key(key(KeyCode::Char(c)));
+        }
+        let mut buf = Buffer::empty(area);
+        d.render(area, &mut buf, ' ');
+        let s = screen(&buf);
+        assert!(s.contains("Write") && s.contains("Preview"), "{s}");
+        d.on_key(alt('p'));
+        let mut buf = Buffer::empty(area);
+        d.render(area, &mut buf, ' ');
+        let s = screen(&buf);
+        assert!(!s.contains("# Verdict"), "{s}");
+        assert!(s.contains("Verdict"), "{s}");
+        // Typed text: Esc asks.
+        d.on_key(alt('p'));
+        assert!(matches!(d.on_key(key(KeyCode::Esc)), FinishOutcome::Stay));
+        let mut buf = Buffer::empty(area);
+        d.render(area, &mut buf, ' ');
+        assert!(screen(&buf).contains("Discard this text?"));
+    }
+}

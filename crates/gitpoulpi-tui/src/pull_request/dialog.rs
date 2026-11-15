@@ -102,17 +102,14 @@ pub(crate) struct PullRequestDialog {
     pub(super) to_repo: Combo,
     pub(super) to_branch: Combo,
     pub(crate) title: String,
-    pub(crate) body: String,
+    /// The description: the shared Markdown editor.
+    pub(crate) md: crate::md_editor::MdEditor,
     pub(crate) draft: bool,
     pub(crate) focus: PrFocus,
     pub(crate) message: Option<String>,
     pub(crate) busy: bool,
     pub(crate) hover: Option<PrHit>,
     pub(super) hits: Vec<(Rect, PrHit)>,
-    /// The Description's scrollbar from the last paint (focused and
-    /// overflowing only), for its end arrows.
-    pub(super) body_bar: Option<crate::scrollbar::Track>,
-    pub(super) body_drag: crate::scrollbar::BarDrag,
     pub(super) edit: crate::text_edit::FieldEditor<PrFocus>,
     /// Each provider's project list, fetched the first time its tab is
     /// shown.
@@ -173,15 +170,22 @@ impl PullRequestDialog {
             to_repo: Combo::new(msg::pull_request::SELECT.get()).with_custom(),
             to_branch: Combo::new(msg::pull_request::SELECT.get()).with_custom(),
             title: title.clone(),
-            body: String::new(),
+            md: crate::md_editor::MdEditor::new(String::new(), Default::default()).with_draft(
+                crate::md_editor::draft::key(&[
+                    seed.tabs
+                        .get(seed.tab)
+                        .map_or("", |t| t.integration.id.as_str()),
+                    seed.project.as_deref().unwrap_or(""),
+                    &seed.local_branch,
+                    "new-pr",
+                ]),
+            ),
             draft: false,
             focus: PrFocus::Title,
             message: None,
             busy: false,
             hover: None,
             hits: Vec::new(),
-            body_bar: None,
-            body_drag: Default::default(),
             edit: Default::default(),
             projects: Default::default(),
             projects_rx: Vec::new(),
@@ -223,6 +227,29 @@ impl PullRequestDialog {
 
     pub(super) fn current_tab(&self) -> Option<&PrTab> {
         self.seed.tabs.get(self.tab)
+    }
+
+    /// What `#N` and `!N` in the description mean: the provider of the
+    /// active tab, the repository the request goes to.
+    pub(super) fn md_context(&self) -> crate::md_render::Context {
+        let Some(tab) = self.current_tab() else {
+            return Default::default();
+        };
+        let project = self
+            .to_repo
+            .selected()
+            .map(str::to_string)
+            .or_else(|| self.seed.project.clone())
+            .unwrap_or_default();
+        crate::md_render::Context {
+            xrefs: gitpoulpi_hosting::xrefs::XrefContext {
+                family: Some(tab.integration.kind.family()),
+                web_base: gitpoulpi_hosting::integration_web_base(&tab.integration)
+                    .unwrap_or_default(),
+                project,
+                ..Default::default()
+            },
+        }
     }
 
     fn ensure_projects(&mut self) {
@@ -410,7 +437,7 @@ impl PullRequestDialog {
     /// Fills Title and Description (the AI generator's answer).
     pub(crate) fn set_generated(&mut self, title: String, body: String) {
         self.title = title;
-        self.body = body;
+        self.md.set_text(body);
         self.message = None;
         self.generating = false;
     }
@@ -464,7 +491,7 @@ impl PullRequestDialog {
             source_branch: from_branch,
             target_branch: to_branch,
             title: title.to_string(),
-            body: self.body.trim().to_string(),
+            body: self.md.text().trim().to_string(),
             draft: self.draft,
             assignees: if self.assignment_blocked() {
                 Vec::new()
@@ -558,7 +585,7 @@ impl PullRequestDialog {
 
     /// The Title was edited or a Description typed.
     fn typed(&self) -> bool {
-        self.title != self.initial_title || !self.body.trim().is_empty()
+        self.title != self.initial_title || !self.md.is_blank()
     }
 
     /// The cross, Esc, Cancel and a click outside all ask the one rule.
@@ -687,13 +714,7 @@ impl PullRequestDialog {
                     .caret_mut(PrFocus::Title)
                     .insert(&mut self.title, &clean);
             }
-            PrFocus::Body => {
-                let clean = text.replace("\r\n", "\n").replace('\r', "\n");
-                self.edit.sync(Some(PrFocus::Body));
-                self.edit
-                    .caret_mut(PrFocus::Body)
-                    .insert(&mut self.body, &clean);
-            }
+            PrFocus::Body => self.md.paste(text),
             _ => {}
         }
     }
@@ -720,10 +741,7 @@ impl PullRequestDialog {
             return self.open_web();
         }
         // The text fields' editing keys, through the shared core.
-        self.edit.sync(match self.focus {
-            PrFocus::Title | PrFocus::Body => Some(self.focus),
-            _ => None,
-        });
+        self.edit.sync((self.focus == PrFocus::Title).then_some(self.focus));
         match self.focus {
             PrFocus::Title => {
                 if let Some((result, copied)) =
@@ -738,30 +756,14 @@ impl PullRequestDialog {
                     return PullRequestOutcome::Stay;
                 }
             }
-            PrFocus::Body => {
-                // Enter is a newline here (Tab leaves the field).
-                if key.code == KeyCode::Enter {
-                    self.edit
-                        .caret_mut(PrFocus::Body)
-                        .insert(&mut self.body, "\n");
+            PrFocus::Body => match self.md.on_key(key) {
+                crate::md_editor::KeyUse::Handled => {
                     self.message = None;
                     return PullRequestOutcome::Stay;
                 }
-                if self.edit.claims(PrFocus::Body, &self.body, &key, true) {
-                    let edit = self.edit.on_key(PrFocus::Body, &mut self.body, &key, true);
-                    match edit {
-                        crate::text_edit::KeyEdit::Edited => self.message = None,
-                        crate::text_edit::KeyEdit::Copy(s) | crate::text_edit::KeyEdit::Cut(s) => {
-                            self.message = Some(crate::clipboard::copy_shared(
-                                msg::pull_request::NOUN_SELECTION.get(),
-                                &s,
-                            ));
-                        }
-                        _ => {}
-                    }
-                    return PullRequestOutcome::Stay;
-                }
-            }
+                crate::md_editor::KeyUse::Submit => return self.submit(),
+                crate::md_editor::KeyUse::Pass => {}
+            },
             _ => {}
         }
         // A focused, closed combobox opens on Enter / Space / Down.
@@ -822,7 +824,6 @@ impl PullRequestDialog {
         let focus = self.focus;
         let (id, text) = match focus {
             PrFocus::Title => (Some(PrFocus::Title), self.title.clone()),
-            PrFocus::Body => (Some(PrFocus::Body), self.body.clone()),
             _ => (None, String::new()),
         };
         self.edit.sync(id);
@@ -866,17 +867,11 @@ impl PullRequestDialog {
         if let Some(kind) = self.guard.pointer(mouse) {
             return self.request_close(kind);
         }
-        // The Description scrollbar: thumb drag, track jump, end arrows.
-        {
-            let top = self.edit.caret(PrFocus::Body).map_or(0, |c| c.top.get());
-            let lines = self.body.split('\n').count();
-            if let Some(top) = self.body_drag.on_mouse(self.body_bar, mouse, lines, top) {
-                let rows = self.body_bar.map_or(1, |t| t.rect.height as usize);
-                self.edit
-                    .caret_mut(PrFocus::Body)
-                    .scroll_lines_to(&self.body, top, rows);
-                return PullRequestOutcome::Stay;
+        if self.md.on_mouse(mouse) == crate::md_editor::MouseUse::Inside {
+            if matches!(mouse.kind, MouseEventKind::Down(MouseButton::Left)) {
+                self.focus = PrFocus::Body;
             }
+            return PullRequestOutcome::Stay;
         }
         let hit = dialog_kit::hit_at(&self.hits, mouse.column, mouse.row);
         if !matches!(mouse.kind, MouseEventKind::Down(_)) && self.field_mouse(mouse) {
@@ -900,9 +895,10 @@ impl PullRequestDialog {
                                 c.on_mouse(mouse);
                             }
                         }
-                        PrFocus::Title | PrFocus::Body => {
+                        PrFocus::Title => {
                             self.field_mouse(mouse);
                         }
+                        PrFocus::Body => {}
                         PrFocus::Tabs => {}
                         _ => return self.activate(part),
                     }

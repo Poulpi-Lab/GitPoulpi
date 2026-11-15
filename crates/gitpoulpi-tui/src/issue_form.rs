@@ -120,15 +120,14 @@ const SPIN_AFTER: std::time::Duration = std::time::Duration::from_millis(150);
 pub(crate) struct IssueDialog {
     pub(crate) seed: IssueSeed,
     pub(crate) title: String,
-    pub(crate) body: String,
+    /// The description: the shared Markdown editor.
+    pub(crate) md: crate::md_editor::MdEditor,
     pub(crate) labels: String,
     pub(crate) focus: IssueFocus,
     pub(crate) message: Option<String>,
     pub(crate) busy: bool,
     pub(crate) hover: Option<IssueHit>,
     hits: Vec<(Rect, IssueHit)>,
-    body_bar: Option<crate::scrollbar::Track>,
-    body_drag: crate::scrollbar::BarDrag,
     edit: crate::text_edit::FieldEditor<IssueFocus>,
     choice: Option<ChoiceField>,
     /// Assignees, labels and milestone, chosen in the picker.
@@ -148,6 +147,20 @@ impl IssueDialog {
     }
 
     pub(crate) fn new(seed: IssueSeed) -> Self {
+        let draft_key = crate::md_editor::draft::key(&[
+            &seed.integration.id,
+            &seed.project,
+            "new-issue",
+        ]);
+        let md_context = crate::md_render::Context {
+            xrefs: gitpoulpi_hosting::xrefs::XrefContext {
+                family: Some(seed.integration.kind.family()),
+                web_base: gitpoulpi_hosting::integration_web_base(&seed.integration)
+                    .unwrap_or_default(),
+                project: seed.project.clone(),
+                ..Default::default()
+            },
+        };
         let choice = ChoiceKind::of(seed.integration.kind.family()).map(|kind| ChoiceField {
             kind,
             combo: Combo::new(""),
@@ -158,15 +171,13 @@ impl IssueDialog {
             choice,
             seed,
             title: String::new(),
-            body: String::new(),
+            md: crate::md_editor::MdEditor::new(String::new(), md_context).with_draft(draft_key),
             labels: String::new(),
             focus: IssueFocus::Title,
             message: None,
             busy: false,
             hover: None,
             hits: Vec::new(),
-            body_bar: None,
-            body_drag: Default::default(),
             edit: Default::default(),
             meta: MetaFields::default(),
             factory: None,
@@ -347,7 +358,7 @@ impl IssueDialog {
         Ok(NewIssue {
             project: self.seed.project.clone(),
             title: title.to_string(),
-            body: self.body.trim().to_string(),
+            body: self.md.text().trim().to_string(),
             labels: self.chosen_labels(),
             assignees: if self.uses_meta() && !self.assignment_blocked() {
                 self.meta.selection.assignees.clone()
@@ -402,7 +413,7 @@ impl IssueDialog {
             &base,
             &self.seed.project,
             &self.title,
-            &self.body,
+            self.md.text(),
             &labels,
         ))
     }
@@ -435,7 +446,7 @@ impl IssueDialog {
 
     /// Something typed would be lost on close.
     fn typed(&self) -> bool {
-        [&self.title, &self.body, &self.labels]
+        [self.title.as_str(), self.md.text(), self.labels.as_str()]
             .iter()
             .any(|t| !t.trim().is_empty())
     }
@@ -480,7 +491,6 @@ impl IssueDialog {
     fn text_of(&mut self, focus: IssueFocus) -> Option<&mut String> {
         match focus {
             IssueFocus::Title => Some(&mut self.title),
-            IssueFocus::Body => Some(&mut self.body),
             IssueFocus::Labels => Some(&mut self.labels),
             _ => None,
         }
@@ -498,14 +508,14 @@ impl IssueDialog {
             return;
         }
         let focus = self.focus;
-        if !Self::is_text(focus) {
+        if !Self::is_text(focus) || self.guard.is_open() {
             return;
         }
-        let clean = if focus == IssueFocus::Body {
-            text.replace("\r\n", "\n").replace('\r', "\n")
-        } else {
-            text.chars().filter(|c| !c.is_control()).collect()
-        };
+        if focus == IssueFocus::Body {
+            self.md.paste(text);
+            return;
+        }
+        let clean: String = text.chars().filter(|c| !c.is_control()).collect();
         self.edit.sync(Some(focus));
         let mut value = std::mem::take(self.text_of(focus).expect("a text field"));
         self.edit.caret_mut(focus).insert(&mut value, &clean);
@@ -528,7 +538,8 @@ impl IssueDialog {
             choice.combo.on_key(key);
             return IssueOutcome::Stay;
         }
-        self.edit.sync(Self::is_text(focus).then_some(focus));
+        self.edit
+            .sync(Self::is_text(focus).then_some(focus).filter(|f| *f != IssueFocus::Body));
         match focus {
             _ if crate::keymap::current().is(Bind::DialogWeb, &key) => return self.open_web(),
             IssueFocus::Title | IssueFocus::Labels => {
@@ -545,34 +556,14 @@ impl IssueDialog {
                     return IssueOutcome::Stay;
                 }
             }
-            IssueFocus::Body => {
-                // Enter is a newline here (Tab leaves the field).
-                if key.code == KeyCode::Enter {
-                    let mut value = std::mem::take(&mut self.body);
-                    self.edit
-                        .caret_mut(IssueFocus::Body)
-                        .insert(&mut value, "\n");
-                    self.body = value;
+            IssueFocus::Body => match self.md.on_key(key) {
+                crate::md_editor::KeyUse::Handled => {
                     self.message = None;
                     return IssueOutcome::Stay;
                 }
-                if self.edit.claims(IssueFocus::Body, &self.body, &key, true) {
-                    let mut value = std::mem::take(&mut self.body);
-                    let edit = self.edit.on_key(IssueFocus::Body, &mut value, &key, true);
-                    self.body = value;
-                    match edit {
-                        crate::text_edit::KeyEdit::Edited => self.message = None,
-                        crate::text_edit::KeyEdit::Copy(s) | crate::text_edit::KeyEdit::Cut(s) => {
-                            self.message = Some(crate::clipboard::copy_shared(
-                                msg::issue_form::NOUN_SELECTION.get(),
-                                &s,
-                            ));
-                        }
-                        _ => {}
-                    }
-                    return IssueOutcome::Stay;
-                }
-            }
+                crate::md_editor::KeyUse::Submit => return self.submit(),
+                crate::md_editor::KeyUse::Pass => {}
+            },
             _ => {}
         }
         // A focused, closed dropdown opens on Enter / Space / Down.
@@ -629,7 +620,6 @@ impl IssueDialog {
         let focus = self.focus;
         let (id, text) = match focus {
             IssueFocus::Title => (Some(focus), self.title.clone()),
-            IssueFocus::Body => (Some(focus), self.body.clone()),
             IssueFocus::Labels => (Some(focus), self.labels.clone()),
             _ => (None, String::new()),
         };
@@ -655,16 +645,11 @@ impl IssueDialog {
         if let Some(kind) = self.guard.pointer(mouse) {
             return self.request_close(kind);
         }
-        {
-            let top = self.edit.caret(IssueFocus::Body).map_or(0, |c| c.top.get());
-            let lines = self.body.split('\n').count();
-            if let Some(top) = self.body_drag.on_mouse(self.body_bar, mouse, lines, top) {
-                let rows = self.body_bar.map_or(1, |t| t.rect.height as usize);
-                self.edit
-                    .caret_mut(IssueFocus::Body)
-                    .scroll_lines_to(&self.body, top, rows);
-                return IssueOutcome::Stay;
+        if self.md.on_mouse(mouse) == crate::md_editor::MouseUse::Inside {
+            if matches!(mouse.kind, MouseEventKind::Down(MouseButton::Left)) {
+                self.focus = IssueFocus::Body;
             }
+            return IssueOutcome::Stay;
         }
         let hit = dialog_kit::hit_at(&self.hits, mouse.column, mouse.row);
         if !matches!(mouse.kind, MouseEventKind::Down(_)) && self.field_mouse(mouse) {
@@ -679,7 +664,7 @@ impl IssueDialog {
                         if let Some(choice) = self.choice.as_mut() {
                             choice.combo.on_mouse(mouse);
                         }
-                    } else if Self::is_text(part) {
+                    } else if Self::is_text(part) && part != IssueFocus::Body {
                         self.field_mouse(mouse);
                     } else {
                         return self.activate(part);
@@ -692,8 +677,11 @@ impl IssueDialog {
     }
 
     pub(crate) fn render(&mut self, rect: Rect, buf: &mut Buffer) {
-        self.edit
-            .sync(Self::is_text(self.focus).then_some(self.focus));
+        self.edit.sync(
+            Self::is_text(self.focus)
+                .then_some(self.focus)
+                .filter(|f| *f != IssueFocus::Body),
+        );
         self.edit.begin_frame();
         let title = match self.seed.integration.kind.family() {
             gitpoulpi_config::ApiFamily::AzureDevops => msg::issue_form::TITLE_WORK_ITEM.get(),
@@ -826,14 +814,11 @@ impl IssueDialog {
             .saturating_sub(y + footer_rows)
             .clamp(2, body_cap);
         let body = Rect::new(inner.x, y, inner.width, body_h);
-        self.body_bar = dialog_kit::text_area(
+        self.md.render(
             buf,
             body,
-            &self.body,
-            msg::issue_form::DESCRIPTION_PLACEHOLDER.get(),
             self.focus == IssueFocus::Body,
-            self.hover == Some(IssueHit::Part(IssueFocus::Body)),
-            (&self.edit, IssueFocus::Body),
+            msg::issue_form::DESCRIPTION_PLACEHOLDER.get(),
         );
         hits.push((body, IssueHit::Part(IssueFocus::Body)));
         y += body_h + 1;
@@ -969,6 +954,7 @@ impl IssueDialog {
         hits.push((create, IssueHit::Part(IssueFocus::Create)));
         let create_key = dialog_kit::key_label(Bind::DialogSubmit);
         let web_key = dialog_kit::key_label(Bind::DialogWeb);
+        let [(prev_key, prev_what), _] = crate::md_editor::MdEditor::hints();
         dialog_kit::hints(
             buf,
             inner.x,
@@ -981,6 +967,7 @@ impl IssueDialog {
                 ),
                 (create_key.as_str(), msg::issue_form::HINT_CREATE.get()),
                 (web_key.as_str(), msg::issue_form::HINT_WEB.get()),
+                (prev_key.as_str(), prev_what),
             ],
         );
         self.hits = hits;
@@ -1196,7 +1183,7 @@ mod tests {
         assert!(form.message.is_some());
         type_text(&mut form, "  It breaks ");
         form.labels = "bug, ,ui ".into();
-        form.body = "steps\n".into();
+        form.md.set_text("steps\n".into());
         let req = form.plan().unwrap();
         assert_eq!(req.project, "g/p");
         assert_eq!(req.title, "It breaks");
@@ -1214,7 +1201,7 @@ mod tests {
         type_text(&mut form, "a");
         form.on_key(key(KeyCode::Enter));
         type_text(&mut form, "b");
-        assert_eq!(form.body, "a\nb");
+        assert_eq!(form.md.text(), "a\nb");
         // GitLab: the metadata buttons replace the typed labels.
         for want in [
             IssueFocus::MetaAssignees,

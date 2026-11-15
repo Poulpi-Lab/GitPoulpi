@@ -248,12 +248,6 @@ hosting_reply_map_bytes = 6144
 hosting_reply_hits_per_term = 20
 hosting_reply_terms = 8
 
-[ai.hosting_reply]
-base_prompt = ""
-read_repository = false
-reuse_agent_session = true
-context_ttl_minutes = 30
-
 [ai.sent_preview]
 code_review = true
 commit_composer = true
@@ -268,6 +262,12 @@ rewrite_script = true
 split_commit = true
 stash_message = true
 worktree_name = true
+
+[ai.hosting_reply]
+base_prompt = ""
+read_repository = false
+reuse_agent_session = true
+context_ttl_minutes = 30
 
 [session]
 per_repo_state_dir = "in_git_dir"

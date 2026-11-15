@@ -301,6 +301,24 @@ impl RadarSlot {
         self.peek().and_then(RadarUi::review_avail)
     }
 
+    /// What the palette may ask of the AI help of the text box open in the
+    /// hosted review or conversation.
+    pub(crate) fn composer_avail(&self) -> Option<crate::composer_cmd::ComposerAvail> {
+        self.peek().and_then(|ui| {
+            ui.review_composer_avail()
+                .or_else(|| ui.item_composer_avail())
+        })
+    }
+
+    pub(crate) fn run_composer(&mut self, cmd: crate::composer_cmd::ComposerCmd) -> Option<String> {
+        let ui = self.get()?;
+        if ui.hosts_review() {
+            ui.run_review_composer(cmd)
+        } else {
+            ui.run_item_composer(cmd)
+        }
+    }
+
     pub(crate) fn run_review(&mut self, cmd: crate::review_cmd::ReviewCmd) -> Outcome {
         self.get().map_or(Outcome::None, |ui| ui.run_review(cmd))
     }

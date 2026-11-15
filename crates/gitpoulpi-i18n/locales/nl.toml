@@ -5307,6 +5307,11 @@ resolve_first = "los eerst de conflicten op"
 plan_invalid_twice = "het plan was twee keer ongeldig ({error})"
 no_changes_stash = { git = "er zijn geen wijzigingen om te stashen", local = "er zijn geen wijzigingen om in {$stash} te zetten" }
 nothing_to_explain = "er is niets om uit te leggen"
+repo_read_failed = "could not read the repository ({what}): {why}"
+repo_what_files = "the file list"
+repo_what_search = "the search"
+repo_what_diff = "the changes under review"
+code_source_gone = "the code source is gone"
 
 [ui_intent]
 tab = "tabblad {name}"
@@ -9998,6 +10003,10 @@ ai_keys = "Enter writes, Esc closes"
 ai_pick_branches = "Pick the branches first."
 ai_needs_repository = "Writing this description needs the repository: open it first."
 ai_job = "Writing a draft with AI"
+palette_refresh_context = "Markdown Editor: Refresh the AI Context"
+why_no_composer = "no text box with the AI writing help is open"
+why_no_repo_read = "tick \"Let the AI read the repository\" first"
+why_text_box_open = "close this text box first (only its AI commands work here)"
 
 [ai_hosting_reply]
 base_prompt_label = "Base prompt"
@@ -10156,3 +10165,4 @@ delete_failed = "not deleted: {why}"
 palette_quote = "Conversation: Quote Entry"
 palette_toggle_internal = "Conversation: Toggle Internal Note"
 why_unchanged = "nothing changed yet"
+flavor_plain_text = "Plain text"

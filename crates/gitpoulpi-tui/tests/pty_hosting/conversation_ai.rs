@@ -519,3 +519,111 @@ fn an_agent_without_a_read_only_mode_cannot_be_let_into_the_repository() {
     no_write(&mock);
     term.stop().unwrap();
 }
+
+/// Runs a palette row from the open form: `query` filters, `entry` is what
+/// must be listed, Enter runs it.
+fn palette_row(term: &mut xtask::pty::Terminal, query: &str, entry: &str) {
+    term.send_keys("C-p").expect("the palette");
+    term.wait_for_text("Command Palette", STEP)
+        .unwrap_or_else(|e| {
+            panic!(
+                "the palette must open over the form: {e}\n{}",
+                term.screen().text()
+            )
+        });
+    term.send_text(query).unwrap();
+    term.wait_for("the row", STEP, |s| s.contains(entry))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    term.send_keys("Enter").unwrap();
+}
+
+/// The form's AI help is reachable from the command palette, the form being
+/// modal: "Write with AI" opens the panel, "Refresh context" is grayed out
+/// until the repository box is ticked, then forgets the context. Any other
+/// command waits until the form is closed.
+#[cfg(unix)]
+#[test]
+fn the_palette_reaches_write_with_ai_and_refresh_context_over_the_form() {
+    use gitpoulpi_testkit::fake_agent::write_recording_fake_agent;
+    let mock = start_mock();
+    let repo = fixture(mock.port);
+    let tools = tempfile::tempdir().unwrap();
+    let agent = write_recording_fake_agent(tools.path(), &[DRAFT_LINE]);
+    let ai = format!(
+        "\n[ai]\nenabled = true\n\n[[ai.profiles]]\nid = \"fake\"\nname = \"Fake agent\"\n\
+         kind = \"local_agent\"\nharness = \"claude\"\ncommand = '{}'\n\
+         args = [\"-p\", \"--no-session-persistence\"]\n",
+        agent.display()
+    );
+    let (mut term, _config) = launch_issues(
+        &repo,
+        "pty-composer-ai-palette",
+        &config_toml(mock.port, &ai),
+        COLS,
+        "Add the feature",
+    );
+    open_form(&mut term);
+    assert!(
+        !term.screen().contains("What I want in this answer"),
+        "the panel starts closed"
+    );
+
+    // Write with AI, from the palette: the panel opens, the text is intact.
+    palette_row(&mut term, "Write with AI", "Markdown Editor: Write with AI");
+    let screen = term
+        .wait_for("the AI field", STEP, |s| {
+            s.contains("What I want in this answer")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    assert!(screen.contains("my own words"), "{}", screen.text());
+
+    // Refresh context: grayed out while the repository box is unticked.
+    term.send_keys("C-p").expect("the palette");
+    term.send_text("Refresh the AI Context").unwrap();
+    term.wait_for("the reason", STEP, |s| {
+        s.contains("Refresh the AI Context") && s.contains("tick \"Let the AI read")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    term.send_keys("Escape").unwrap();
+    term.wait_for("the palette closed", STEP, |s| {
+        !s.contains("Command Palette")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+
+    // Any other command waits until the form is closed.
+    term.send_keys("C-p").expect("the palette");
+    term.send_text("Pull").unwrap();
+    term.wait_for("the other commands are off", STEP, |s| {
+        s.contains("close this text box first")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    term.send_keys("Escape").unwrap();
+    term.wait_for("the palette closed", STEP, |s| {
+        !s.contains("Command Palette")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+
+    // Ticked, the row runs: the context is forgotten.
+    click_text(&mut term, "Let the AI read the repository");
+    term.wait_for("the box ticked", STEP, |s| {
+        s.contains("[x] Let the AI read the repository")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    palette_row(
+        &mut term,
+        "Refresh the AI Context",
+        "Markdown Editor: Refresh the AI Context",
+    );
+    term.wait_for("refreshed", STEP, |s| s.contains("Context refreshed."))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+
+    // The same row closes the panel again.
+    palette_row(&mut term, "Write with AI", "Markdown Editor: Write with AI");
+    term.wait_for("the panel closed", STEP, |s| {
+        !s.contains("What I want in this answer")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    assert_eq!(agent_calls(&agent), 0, "nothing was asked");
+    no_write(&mock);
+    term.stop().unwrap();
+}

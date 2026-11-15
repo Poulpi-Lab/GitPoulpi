@@ -997,6 +997,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Conversation : Envoyer le commentaire |  |
 | Conversation : Basculer la note interne |  |
 | Conversation : Fermer | `Esc` |
+| Éditeur Markdown : écrire avec l'IA |  |
+| Éditeur Markdown : actualiser le contexte de l'IA |  |
 | Hébergement : Ouvrir la conversation d'un ticket... |  |
 | Revue : ✦ Rédiger une revue... | `s` |
 | Revue : Accepter la suggestion | `y` |

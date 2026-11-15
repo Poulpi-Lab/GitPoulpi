@@ -63,7 +63,7 @@ impl ReviewView {
         let mut request = ReplyRequest::new(target);
         request.item = Some(ItemDigest {
             summary: format!(
-                "Pull request {} \"{}\" ({:?}) by {}", // i18n-english
+                "Pull request {} \"{}\" ({:?}) by {}", // i18n-english: prompt text for the model, English like every prompt
                 summary.iid_label,
                 summary.title.trim(),
                 summary.state,
@@ -77,7 +77,7 @@ impl ReviewView {
                     .chain(c.in_reply_to.clone())
                     .collect(),
                 text: format!(
-                    "Comment by {} on {}:\n{}", // i18n-english
+                    "Comment by {} on {}:\n{}", // i18n-english: prompt text for the model, English like every prompt
                     c.author,
                     c.created_at,
                     c.body.trim()
@@ -95,14 +95,14 @@ impl ReviewView {
                 .iter()
                 .map(|c| {
                     format!(
-                        "Comment by {} on {}:\n{}", // i18n-english
+                        "Comment by {} on {}:\n{}", // i18n-english: prompt text for the model, English like every prompt
                         c.author,
                         c.created_at,
                         c.body.trim()
                     )
                 })
                 .collect();
-            let text = format!("Code thread on {place}\n{}", comments.join("\n\n")); // i18n-english
+            let text = format!("Code thread on {place}\n{}", comments.join("\n\n")); // i18n-english: prompt text for the model, English like every prompt
             request.entries.push(Entry {
                 thread_ids: std::iter::once(t.id.clone())
                     .chain(t.comments.iter().map(|c| c.id.clone()))

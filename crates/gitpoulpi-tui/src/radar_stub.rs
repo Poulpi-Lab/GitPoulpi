@@ -105,6 +105,17 @@ impl RadarSlot {
         None
     }
 
+    pub(crate) fn composer_avail(&self) -> Option<crate::composer_cmd::ComposerAvail> {
+        None
+    }
+
+    pub(crate) fn run_composer(
+        &mut self,
+        _cmd: crate::composer_cmd::ComposerCmd,
+    ) -> Option<String> {
+        None
+    }
+
     pub(crate) fn run_review(&mut self, _cmd: crate::review_cmd::ReviewCmd) -> Outcome {
         Outcome::None
     }

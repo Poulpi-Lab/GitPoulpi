@@ -28,6 +28,9 @@ pub(crate) struct PaletteContext {
     pub(crate) board: Option<crate::board_cmd::BoardAvail>,
     /// What the open conversation allows (`None`: none is open).
     pub(crate) item: Option<crate::item_cmd::ItemAvail>,
+    /// What the open text box with the AI writing help allows (`None`: none
+    /// is open).
+    pub(crate) composer: Option<crate::composer_cmd::ComposerAvail>,
     pub(crate) in_refs_pane: bool,
     pub(crate) in_diff_view: bool,
     /// File View / Blame / History is open in the central column.
@@ -292,6 +295,10 @@ pub(crate) fn unavailable_reason(
     if ctx.settings_open && !command.stays_in_settings() {
         return Some(msg::palette::WHY_CLOSE_SETTINGS_FIRST.get());
     }
+    // A form or popup over the window owns it: only the help's own rows act.
+    if ctx.composer.is_some_and(|c| c.modal) && !matches!(command, PaletteCommand::Composer(_)) {
+        return Some(msg::md_editor::WHY_TEXT_BOX_OPEN.get());
+    }
     base_reason(command, ctx).or_else(|| {
         (ctx.auto_stash_pending && blocked_by_auto_stash(command))
             .then_some(msg::palette::WHY_AN_AUTO_STASH_IS_PENDING_USE_THE_BANNER_S_POP_NOW.get())
@@ -365,6 +372,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         C::Review(cmd) => cmd.unavailable(ctx.review),
         C::Board(cmd) => cmd.unavailable(ctx.board),
         C::Item(cmd) => cmd.unavailable(ctx.item),
+        C::Composer(cmd) => cmd.unavailable(ctx.composer),
         C::Flow(cmd) => cmd.unavailable(),
         C::UndoOffer => (!ctx.undo_offer).then_some(msg::undo_safety::WHY_NO_OFFER.get()),
 

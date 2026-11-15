@@ -2778,6 +2778,16 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     )
     .requires(crate::build_features::Feature::Conversation),
     entry(
+        gitpoulpi_i18n::msg::keymap_action::MD_EDITOR_AI,
+        "",
+        PaletteCommand::Composer(crate::composer_cmd::ComposerCmd::WriteWithAi),
+    ),
+    entry(
+        gitpoulpi_i18n::msg::md_editor::PALETTE_REFRESH_CONTEXT,
+        "",
+        PaletteCommand::Composer(crate::composer_cmd::ComposerCmd::RefreshContext),
+    ),
+    entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_OPEN_CONVERSATION,
         "",
         PaletteCommand::Hosting(HostingCommand::OpenIssueConversation),

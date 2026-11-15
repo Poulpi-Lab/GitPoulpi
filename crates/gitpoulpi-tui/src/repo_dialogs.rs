@@ -450,6 +450,38 @@ impl RepoDialogs {
         matches!(&self.dialog, Some(RepoDialog::Safety(panel)) if panel.takes_palette())
     }
 
+    /// What the palette may ask of the AI writing help of the text box open
+    /// in the top dialog (the new request / issue forms, the review's boxes,
+    /// the conversation's composer); `None`: no such text box.
+    pub(crate) fn composer_avail(&self) -> Option<crate::composer_cmd::ComposerAvail> {
+        match self.dialog.as_ref()? {
+            #[cfg(feature = "hosting")]
+            RepoDialog::PullRequest { form } => form.composer_avail(),
+            #[cfg(feature = "hosting")]
+            RepoDialog::Issue { form } => form.composer_avail(),
+            #[cfg(feature = "hosting")]
+            RepoDialog::Review(view) => view.composer_avail(),
+            #[cfg(feature = "hosting")]
+            RepoDialog::Item(view) => view.composer_avail(),
+            _ => None,
+        }
+    }
+
+    /// Runs a palette row on that help; the sentence for the status line.
+    pub(crate) fn run_composer(&mut self, cmd: crate::composer_cmd::ComposerCmd) -> Option<String> {
+        match self.dialog.as_mut()? {
+            #[cfg(feature = "hosting")]
+            RepoDialog::PullRequest { form } => form.run_composer(cmd),
+            #[cfg(feature = "hosting")]
+            RepoDialog::Issue { form } => form.run_composer(cmd),
+            #[cfg(feature = "hosting")]
+            RepoDialog::Review(view) => view.run_composer(cmd),
+            #[cfg(feature = "hosting")]
+            RepoDialog::Item(view) => view.run_composer(cmd),
+            _ => None,
+        }
+    }
+
     /// Whether the open review view can hand the keyboard to the palette (no
     /// comment box or picker open over it).
     pub(crate) fn review_wants_palette(&self) -> bool {

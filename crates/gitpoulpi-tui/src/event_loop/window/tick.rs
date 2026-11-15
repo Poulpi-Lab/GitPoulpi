@@ -793,6 +793,12 @@ impl WindowState {
                     // The conversation hosted over the Radar (not cloned).
                     self.management.as_ref().and_then(|m| m.radar.item_avail())
                 }),
+                composer: self.repo_dialogs.composer_avail().or_else(|| {
+                    // The review or conversation hosted over the Radar.
+                    self.management
+                        .as_ref()
+                        .and_then(|m| m.radar.composer_avail())
+                }),
                 agent_pending: self.ui_viewer.has_pending(),
                 auto_stash_pending: self.pending_auto_stash.is_some(),
                 agent_back: self.ui_viewer.can_go_back(),

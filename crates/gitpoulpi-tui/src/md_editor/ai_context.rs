@@ -237,9 +237,8 @@ mod real {
         }
     }
 
-    fn failed(what: &str, why: String) -> gitpoulpi_ai::Error {
-        let message = format!("could not read the repository ({what}): {why}"); // i18n-english
-        gitpoulpi_ai::Error::Invalid(message)
+    fn failed(what: impl std::fmt::Display, why: String) -> gitpoulpi_ai::Error {
+        gitpoulpi_ai::Error::Invalid(gitpoulpi_i18n::msg::ai_ui::repo_read_failed(what, why))
     }
 
     #[async_trait::async_trait]
@@ -254,7 +253,7 @@ mod real {
             let paths: Vec<PathBuf> = self
                 .call(OperationKind::ListTree, json!({ "at": at }))
                 .await
-                .map_err(|e| failed("the file list", e))?; // i18n-english
+                .map_err(|e| failed(gitpoulpi_i18n::msg::ai_ui::REPO_WHAT_FILES.get(), e))?;
             Ok(paths
                 .into_iter()
                 .map(|p| p.to_string_lossy().replace('\\', "/"))
@@ -293,7 +292,7 @@ mod real {
                 json!({ "at": at, "terms": terms, "max_hits": max_hits }),
             )
             .await
-            .map_err(|e| failed("the search", e)) // i18n-english
+            .map_err(|e| failed(gitpoulpi_i18n::msg::ai_ui::REPO_WHAT_SEARCH.get(), e))
         }
 
         async fn diff(&self, base: &str, head: &str) -> gitpoulpi_ai::Result<Option<String>> {
@@ -316,7 +315,7 @@ mod real {
                     json!({ "target": DiffTarget::CommitRange(from, head) }),
                 )
                 .await
-                .map_err(|e| failed("the pull request's diff", e))?; // i18n-english
+                .map_err(|e| failed(gitpoulpi_i18n::msg::ai_ui::REPO_WHAT_DIFF.get(), e))?;
             Ok(Some(gitpoulpi_ai::assist::render_diff(&files)))
         }
     }

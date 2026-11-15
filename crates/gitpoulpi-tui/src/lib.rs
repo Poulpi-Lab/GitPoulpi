@@ -273,6 +273,7 @@ mod compare;
 mod compare_cards;
 mod compose_ui;
 mod composer;
+mod composer_cmd;
 #[cfg(all(feature = "hosting", feature = "conversation"))]
 mod conversation_ui;
 mod diff_actions;

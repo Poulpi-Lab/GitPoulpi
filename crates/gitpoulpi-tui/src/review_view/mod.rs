@@ -970,6 +970,24 @@ impl ReviewView {
         }
     }
 
+    /// What the palette may ask of the AI help of the open comment box or
+    /// Finish dialog (`None`: none is open, or has no help).
+    pub(crate) fn composer_avail(&self) -> Option<crate::composer_cmd::ComposerAvail> {
+        self.compose
+            .as_ref()
+            .and_then(ComposeBox::composer_avail)
+            .or_else(|| self.finish.as_ref().and_then(FinishDialog::composer_avail))
+    }
+
+    /// Runs a palette row on that help; the sentence for the status line.
+    pub(crate) fn run_composer(&mut self, cmd: crate::composer_cmd::ComposerCmd) -> Option<String> {
+        if let Some(c) = self.compose.as_mut() {
+            c.run_composer(cmd)
+        } else {
+            self.finish.as_mut().and_then(|f| f.run_composer(cmd))
+        }
+    }
+
     /// No popup is open over the view: the palette may take the keyboard.
     pub(crate) fn takes_palette(&self) -> bool {
         self.compose.is_none()

@@ -576,3 +576,44 @@ fn the_context_line_has_a_row_while_the_box_is_ticked_and_refresh_clears_it() {
     let s = screen(&paint(&mut ed, 90, 20));
     assert!(!s.contains("Context reused"), "{s}");
 }
+
+#[test]
+fn the_palette_rows_open_the_panel_and_refresh_the_context_only_with_the_box_ticked() {
+    use crate::composer_cmd::ComposerCmd;
+    // No help bound: no row has anything to act on.
+    let plain = MdEditor::new(String::new(), md_render::Context::default());
+    assert!(plain.composer_avail(true).is_none());
+    assert!(ComposerCmd::WriteWithAi.unavailable(None).is_some());
+
+    let (mut ed, _) = bound("kept text", |_| Ok("x".into()));
+    ed.ai_mut().unwrap().offer_repo(false);
+    let avail = ed.composer_avail(true).expect("the help is bound");
+    assert!(avail.modal);
+    assert_eq!(ComposerCmd::WriteWithAi.unavailable(Some(avail)), None);
+    assert!(
+        ComposerCmd::RefreshContext
+            .unavailable(Some(avail))
+            .is_some(),
+        "nothing to refresh while the repository box is unticked"
+    );
+    assert!(!ed.ai_open());
+
+    // Write with AI: opens, and the same row closes (the Alt+E twin).
+    assert_eq!(ed.run_composer(ComposerCmd::WriteWithAi), None);
+    assert!(ed.ai_open());
+    assert_eq!(ed.text(), "kept text");
+    ed.run_composer(ComposerCmd::WriteWithAi);
+    assert!(!ed.ai_open());
+
+    // Refresh context: refused with its reason, then run once ticked.
+    let why = ed.run_composer(ComposerCmd::RefreshContext).unwrap();
+    assert!(why.contains("Let the AI read the repository"), "{why}");
+    ed.ai_mut().unwrap().offer_repo(true);
+    ed.ai_mut().unwrap().set_context_line("Context built");
+    let avail = ed.composer_avail(false).unwrap();
+    assert_eq!(ComposerCmd::RefreshContext.unavailable(Some(avail)), None);
+    assert!(!avail.modal);
+    let said = ed.run_composer(ComposerCmd::RefreshContext).unwrap();
+    assert!(said.contains("Context refreshed"), "{said}");
+    assert!(ed.ai_mut().unwrap().context_line().is_none());
+}

@@ -216,6 +216,40 @@ impl MdEditor {
         }
     }
 
+    /// What the palette may ask of the help (`None`: this text has none).
+    /// `modal`: the editor sits in a form or popup that owns the window.
+    pub(crate) fn composer_avail(&self, modal: bool) -> Option<crate::composer_cmd::ComposerAvail> {
+        self.ai
+            .as_ref()
+            .map(|ai| crate::composer_cmd::ComposerAvail {
+                refresh: ai.refresh_reason(),
+                modal,
+            })
+    }
+
+    /// Runs a palette row on the help; the sentence for the status line.
+    pub(crate) fn run_composer(&mut self, cmd: crate::composer_cmd::ComposerCmd) -> Option<String> {
+        use crate::composer_cmd::ComposerCmd;
+        match cmd {
+            ComposerCmd::WriteWithAi => {
+                self.toggle_ai();
+                None
+            }
+            ComposerCmd::RefreshContext => {
+                let ai = self.ai.as_mut()?;
+                if let Some(why) = ai.refresh_reason() {
+                    return Some(why.to_string());
+                }
+                ai.refresh_context();
+                Some(
+                    gitpoulpi_i18n::msg::md_editor::AI_REFRESHED
+                        .get()
+                        .to_string(),
+                )
+            }
+        }
+    }
+
     /// Whether the panel is open, and whether a request is running.
     pub(crate) fn ai_open(&self) -> bool {
         self.ai.as_ref().is_some_and(|a| a.is_open())

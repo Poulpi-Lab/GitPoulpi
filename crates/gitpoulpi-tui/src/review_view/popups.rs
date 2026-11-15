@@ -97,6 +97,19 @@ impl ComposeBox {
         }
     }
 
+    /// The AI help's reach from the palette (`None`: none, or a question).
+    pub(super) fn composer_avail(&self) -> Option<crate::composer_cmd::ComposerAvail> {
+        if self.guard.is_open() {
+            return None;
+        }
+        self.md.composer_avail(true)
+    }
+
+    pub(super) fn run_composer(&mut self, cmd: crate::composer_cmd::ComposerCmd) -> Option<String> {
+        self.focus = ComposePart::Text;
+        self.md.run_composer(cmd)
+    }
+
     /// The host the text goes to (what the Preview resolves `#N` against)
     /// and where its draft is kept (`None`: no draft).
     pub(super) fn for_target(mut self, ctx: md_render::Context, draft_key: Option<String>) -> Self {
@@ -427,6 +440,23 @@ fn event_value(event: ReviewEvent) -> &'static str {
 }
 
 impl FinishDialog {
+    /// The AI help's reach from the palette (`None`: none, or a question or
+    /// list is open).
+    pub(super) fn composer_avail(&self) -> Option<crate::composer_cmd::ComposerAvail> {
+        if self.guard.is_open()
+            || self.combo.is_open()
+            || self.votes.iter().any(|r| r.combo.is_open())
+        {
+            return None;
+        }
+        self.md.composer_avail(true)
+    }
+
+    pub(super) fn run_composer(&mut self, cmd: crate::composer_cmd::ComposerCmd) -> Option<String> {
+        self.focus = FinishPart::Body;
+        self.md.run_composer(cmd)
+    }
+
     pub(super) fn new(
         caps: ReviewCapabilities,
         pending: usize,

@@ -1001,6 +1001,8 @@ stage_file = "z"
 | Conversation: Send the Comment |  |
 | Conversation: Toggle Internal Note |  |
 | Conversation: Close | `Esc` |
+| Markdown Editor: Write with AI |  |
+| Markdown Editor: Refresh the AI Context |  |
 | Hosting: Open Issue Conversation... |  |
 | Ревью: ✦ составить черновик ревью... | `s` |
 | Ревью: принять предложение | `y` |

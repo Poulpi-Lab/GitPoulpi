@@ -5321,6 +5321,11 @@ resolve_first = "résolvez d'abord les conflits"
 plan_invalid_twice = "le plan était invalide deux fois ({error})"
 no_changes_stash = { git = "aucune modification à mettre dans un stash", local = "aucune modification à remiser" }
 nothing_to_explain = "il n'y a rien à expliquer"
+repo_read_failed = "impossible de lire le dépôt ({what})\u00a0: {why}"
+repo_what_files = "la liste des fichiers"
+repo_what_search = "la recherche"
+repo_what_diff = "les modifications en revue"
+code_source_gone = "la source du code a disparu"
 
 [ui_intent]
 tab = "l'onglet {name}"
@@ -10016,6 +10021,10 @@ ai_keys = "Entrée rédige, Échap ferme"
 ai_pick_branches = "Choisissez d'abord les branches."
 ai_needs_repository = "Cette description se r\u00e9dige \u00e0 partir du d\u00e9p\u00f4t\u00a0: ouvrez-le d'abord."
 ai_job = "Rédaction d'un brouillon par l'IA"
+palette_refresh_context = "Éditeur Markdown\u00a0: actualiser le contexte de l'IA"
+why_no_composer = "aucune zone de texte avec l'aide d'écriture de l'IA n'est ouverte"
+why_no_repo_read = "cochez d'abord «\u00a0Laisser l'IA lire le dépôt\u00a0»"
+why_text_box_open = "fermez d'abord cette zone de texte (seules ses commandes IA agissent ici)"
 
 [ai_hosting_reply]
 base_prompt_label = "Prompt de base"
@@ -10174,3 +10183,4 @@ delete_failed = "non supprimé : {why}"
 palette_quote = "Conversation : Citer l'entrée"
 palette_toggle_internal = "Conversation : Basculer la note interne"
 why_unchanged = "rien n'a encore changé"
+flavor_plain_text = "Texte brut"

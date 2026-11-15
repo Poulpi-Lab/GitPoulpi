@@ -32,19 +32,19 @@ fn muted() -> Style {
 /// not translated.
 fn flavor_name(flavor: MarkupFlavor) -> &'static str {
     match flavor {
-        MarkupFlavor::Gfm => "Markdown (GitHub)", // i18n-english
-        MarkupFlavor::GitlabMd => "Markdown (GitLab)", // i18n-english
-        MarkupFlavor::GiteaMd => "Markdown (Gitea)", // i18n-english
-        MarkupFlavor::AzureMd => "Markdown (Azure DevOps)", // i18n-english
-        MarkupFlavor::BitbucketMd => "Markdown (Bitbucket)", // i18n-english
-        MarkupFlavor::YoutrackMd => "Markdown (YouTrack)", // i18n-english
-        MarkupFlavor::TrelloMd => "Markdown (Trello)", // i18n-english
-        MarkupFlavor::ObsidianMd => "Markdown (Obsidian)", // i18n-english
-        MarkupFlavor::CommonMark => "Markdown",   // i18n-english
-        MarkupFlavor::JiraWiki => "Jira wiki markup", // i18n-english
-        MarkupFlavor::Textile => "Textile",       // i18n-english
-        MarkupFlavor::Html => "HTML",             // i18n-english
-        MarkupFlavor::PlainText => "Plain text",  // i18n-english
+        MarkupFlavor::Gfm => "Markdown (GitHub)", // i18n-english: the markup language's own name
+        MarkupFlavor::GitlabMd => "Markdown (GitLab)", // i18n-english: the markup language's own name
+        MarkupFlavor::GiteaMd => "Markdown (Gitea)", // i18n-english: the markup language's own name
+        MarkupFlavor::AzureMd => "Markdown (Azure DevOps)", // i18n-english: the markup language's own name
+        MarkupFlavor::BitbucketMd => "Markdown (Bitbucket)", // i18n-english: the markup language's own name
+        MarkupFlavor::YoutrackMd => "Markdown (YouTrack)", // i18n-english: the markup language's own name
+        MarkupFlavor::TrelloMd => "Markdown (Trello)", // i18n-english: the markup language's own name
+        MarkupFlavor::ObsidianMd => "Markdown (Obsidian)", // i18n-english: the markup language's own name
+        MarkupFlavor::CommonMark => "Markdown",            // i18n-english
+        MarkupFlavor::JiraWiki => "Jira wiki markup", // i18n-english: the markup language's own name
+        MarkupFlavor::Textile => "Textile",           // i18n-english
+        MarkupFlavor::Html => "HTML",                 // i18n-english
+        MarkupFlavor::PlainText => m::FLAVOR_PLAIN_TEXT.get(),
     }
 }
 

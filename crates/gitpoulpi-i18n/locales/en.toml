@@ -6500,6 +6500,13 @@ resolve_first = "resolve the conflicts first"
 plan_invalid_twice = "the plan was invalid twice ({error})"
 no_changes_stash = "there are no changes to {$stash}"
 nothing_to_explain = "there is nothing to explain"
+# context: error of the AI repository reading; {what} is one of the next three texts or HEAD, {why} the cause
+repo_read_failed = "could not read the repository ({what}): {why}"
+repo_what_files = "the file list"
+repo_what_search = "the search"
+repo_what_diff = "the changes under review"
+# context: error: the pull request code the review showed can no longer be read
+code_source_gone = "the code source is gone"
 
 [ui_intent]
 # context: the next messages finish the sentences "<agent> wants to show ..." and "Shown by <agent>: ..."
@@ -12379,6 +12386,14 @@ ai_pick_branches = "Pick the branches first."
 ai_needs_repository = "Writing this description needs the repository: open it first."
 # context: name of the AI writing job in the jobs list. Width budget: 40 cells
 ai_job = "Writing a draft with AI"
+# context: command palette entry: forget the repository context kept for the AI writing help (the Refresh context button of its panel)
+palette_refresh_context = "Markdown Editor: Refresh the AI Context"
+# context: palette: why the Write with AI and Refresh context commands do nothing
+why_no_composer = "no text box with the AI writing help is open"
+# context: palette: why Refresh context does nothing; the quoted text is the checkbox label
+why_no_repo_read = "tick \"Let the AI read the repository\" first"
+# context: palette: why a command is grayed out while a text box with the AI writing help is open over the window
+why_text_box_open = "close this text box first (only its AI commands work here)"
 
 [ai_hosting_reply]
 # context: Settings > AI, label of the editor row for the base prompt of the AI replies on a host and issue descriptions
@@ -12689,3 +12704,5 @@ palette_quote = "Conversation: Quote Entry"
 palette_toggle_internal = "Conversation: Toggle Internal Note"
 # context: why Save does nothing when the edited comment has the same text. Width budget: 40 cells
 why_unchanged = "nothing changed yet"
+# context: name of the text format a host takes when it has no markup, shown in the composer footer. Width budget: 20 cells
+flavor_plain_text = "Plain text"

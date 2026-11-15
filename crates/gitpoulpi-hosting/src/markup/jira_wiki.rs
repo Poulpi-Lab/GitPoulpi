@@ -10,7 +10,7 @@ use std::sync::OnceLock;
 use pulldown_cmark::{CodeBlockKind, Event, HeadingLevel, Options, Parser, Tag, TagEnd};
 use regex::Regex;
 
-use super::{Block, Lines, sanitize, split_spans, wrap_pairs};
+use super::{sanitize, split_spans, wrap_pairs, Block, Lines};
 
 fn re(cell: &'static OnceLock<Regex>, pattern: &str) -> &'static Regex {
     cell.get_or_init(|| Regex::new(pattern).expect("static pattern"))
@@ -58,7 +58,10 @@ fn image_re() -> &'static Regex {
 
 fn macro_re() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
-    re(&R, r"\{(?:color|anchor|panel|noformat|code|quote|loading-align)(?::[^}]*)?\}")
+    re(
+        &R,
+        r"\{(?:color|anchor|panel|noformat|code|quote|loading-align)(?::[^}]*)?\}",
+    )
 }
 
 /// A code fence for the language named by a `{code:...}` macro.
@@ -225,7 +228,11 @@ pub fn jira_to_markdown(src: &str) -> String {
         let mut text;
         if let Some(c) = heading_re().captures(trimmed) {
             kind = Block::Heading;
-            text = format!("{} {}", "#".repeat(c[1].parse().unwrap_or(1)), inline(&c[2]));
+            text = format!(
+                "{} {}",
+                "#".repeat(c[1].parse().unwrap_or(1)),
+                inline(&c[2])
+            );
         } else if let Some(c) = bq_re().captures(trimmed) {
             kind = Block::Quote;
             text = format!("> {}", inline(&c[1]));
@@ -437,7 +444,8 @@ fn end(w: &mut Writer, tag: TagEnd, head_row: &mut bool) {
         TagEnd::BlockQuote(_) => {
             let text = w.pop_buf();
             let text = text.trim_end();
-            w.buf().push_str(&format!("{{quote}}\n{text}\n{{quote}}\n\n"));
+            w.buf()
+                .push_str(&format!("{{quote}}\n{text}\n{{quote}}\n\n"));
         }
         TagEnd::CodeBlock => {
             let code = w.pop_buf();
@@ -491,7 +499,8 @@ fn end(w: &mut Writer, tag: TagEnd, head_row: &mut bool) {
             w.in_cell = false;
             let cell = w.pop_buf();
             let cell = cell.trim().replace('\n', " ");
-            w.cells.push(if cell.is_empty() { " ".into() } else { cell });
+            w.cells
+                .push(if cell.is_empty() { " ".into() } else { cell });
         }
         TagEnd::TableHead => {
             *head_row = true;
@@ -522,8 +531,14 @@ mod tests {
         let cases: &[(&str, &str)] = &[
             ("h1. Title", "# Title"),
             ("h3. Sub", "### Sub"),
-            ("a *bold* and _it_ and -gone- and {{mono}}", "a **bold** and _it_ and ~~gone~~ and `mono`"),
-            ("see [the docs|https://x.io/d] now", "see [the docs](https://x.io/d) now"),
+            (
+                "a *bold* and _it_ and -gone- and {{mono}}",
+                "a **bold** and _it_ and ~~gone~~ and `mono`",
+            ),
+            (
+                "see [the docs|https://x.io/d] now",
+                "see [the docs](https://x.io/d) now",
+            ),
             ("see [https://x.io] now", "see <https://x.io> now"),
             ("ping [~jdoe] and [~accountid:5b10]", "ping @jdoe and @5b10"),
             ("!shot.png!", "![](shot.png)"),
@@ -554,8 +569,14 @@ mod tests {
             jira_to_markdown("{code:title=T|language=rust}\nfn x(){}\n{code}"),
             "```rust\nfn x(){}\n```"
         );
-        assert_eq!(jira_to_markdown("{noformat}\nraw\n{noformat}"), "```\nraw\n```");
-        assert_eq!(jira_to_markdown("{code}\nunterminated"), "```\nunterminated\n```");
+        assert_eq!(
+            jira_to_markdown("{noformat}\nraw\n{noformat}"),
+            "```\nraw\n```"
+        );
+        assert_eq!(
+            jira_to_markdown("{code}\nunterminated"),
+            "```\nunterminated\n```"
+        );
         assert_eq!(jira_to_markdown("{code}x{code}"), "```\nx\n```");
     }
 
@@ -579,7 +600,10 @@ mod tests {
         let cases: &[(&str, &str)] = &[
             ("# Title", "h1. Title"),
             ("## Sub", "h2. Sub"),
-            ("a **bold** and *it* and ~~gone~~ and `mono`", "a *bold* and _it_ and -gone- and {{mono}}"),
+            (
+                "a **bold** and *it* and ~~gone~~ and `mono`",
+                "a *bold* and _it_ and -gone- and {{mono}}",
+            ),
             ("[the docs](https://x.io/d)", "[the docs|https://x.io/d]"),
             ("<https://x.io>", "[https://x.io]"),
             ("![alt](shot.png)", "!shot.png!"),
@@ -588,7 +612,10 @@ mod tests {
             ("> quoted", "{quote}\nquoted\n{quote}"),
             ("---", "----"),
             ("a\n\nb", "a\n\nb"),
-            ("100 * 3 {braces} [brackets]", "100 \\* 3 \\{braces\\} \\[brackets\\]"),
+            (
+                "100 * 3 {braces} [brackets]",
+                "100 \\* 3 \\{braces\\} \\[brackets\\]",
+            ),
             ("snake_case and _it_", "snake_case and _it_"),
         ];
         for (input, want) in cases {
@@ -607,7 +634,10 @@ mod tests {
             markdown_to_jira("| a | b |\n|---|---|\n| 1 | 2 |"),
             "||a||b||\n|1|2|"
         );
-        assert_eq!(markdown_to_jira("- [x] done\n- [ ] todo"), "* (/) done\n* ( ) todo");
+        assert_eq!(
+            markdown_to_jira("- [x] done\n- [ ] todo"),
+            "* (/) done\n* ( ) todo"
+        );
     }
 
     #[test]

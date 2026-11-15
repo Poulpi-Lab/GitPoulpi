@@ -8,7 +8,7 @@ use std::sync::OnceLock;
 
 use regex::Regex;
 
-use super::{Block, Lines, sanitize, split_spans, wrap_pairs};
+use super::{sanitize, split_spans, wrap_pairs, Block, Lines};
 
 fn re(cell: &'static OnceLock<Regex>, pattern: &str) -> &'static Regex {
     cell.get_or_init(|| Regex::new(pattern).expect("static pattern"))
@@ -161,11 +161,7 @@ pub fn textile_to_markdown(src: &str) -> String {
             let mut first = true;
             loop {
                 let closed = cur.contains("</pre>") || cur.contains("</code>");
-                let body = cur
-                    .split("</")
-                    .next()
-                    .unwrap_or("")
-                    .to_string();
+                let body = cur.split("</").next().unwrap_or("").to_string();
                 if !body.is_empty() || (!closed && !first) {
                     out.push(Block::Code, super::decode_entities(&body));
                 }
@@ -194,7 +190,10 @@ pub fn textile_to_markdown(src: &str) -> String {
         }
         if let Some(c) = heading_re().captures(t) {
             let level: usize = c[1].parse().unwrap_or(1);
-            out.push(Block::Heading, format!("{} {}", "#".repeat(level), inline(&c[2])));
+            out.push(
+                Block::Heading,
+                format!("{} {}", "#".repeat(level), inline(&c[2])),
+            );
         } else if let Some(c) = bq_re().captures(t) {
             out.push(Block::Quote, format!("> {}", inline(&c[1])));
         } else if t == "---" {
@@ -206,7 +205,10 @@ pub fn textile_to_markdown(src: &str) -> String {
             if !table_open {
                 table_open = true;
                 let _ = header;
-                out.push(Block::Table, format!("| {} |", vec!["---"; cells.len()].join(" | ")));
+                out.push(
+                    Block::Table,
+                    format!("| {} |", vec!["---"; cells.len()].join(" | ")),
+                );
             }
         } else if let Some(c) = list_re().captures(t) {
             let marks = &c[1];
@@ -220,7 +222,9 @@ pub fn textile_to_markdown(src: &str) -> String {
                 format!("{}{bullet} {}", " ".repeat(indent), inline(&c[2])),
             );
         } else {
-            let body = para_re().captures(t).map_or(t, |c| c.get(1).map_or(t, |m| m.as_str()));
+            let body = para_re()
+                .captures(t)
+                .map_or(t, |c| c.get(1).map_or(t, |m| m.as_str()));
             let mut text = inline(body);
             if input.get(i).is_some_and(|n| !is_block_start(n)) {
                 text.push_str("  ");
@@ -261,8 +265,14 @@ mod tests {
             ("h1. Title", "# Title"),
             ("h2(#anchor). Sub", "## Sub"),
             ("p. plain", "plain"),
-            ("a *bold* _it_ -gone- @code@ end", "a **bold** _it_ ~~gone~~ `code` end"),
-            ("see \"the docs\":https://x.io/d.", "see [the docs](https://x.io/d)."),
+            (
+                "a *bold* _it_ -gone- @code@ end",
+                "a **bold** _it_ ~~gone~~ `code` end",
+            ),
+            (
+                "see \"the docs\":https://x.io/d.",
+                "see [the docs](https://x.io/d).",
+            ),
             ("!shot.png!", "![](shot.png)"),
             ("!shot.png(alt text)!", "![alt text](shot.png)"),
             ("Wow! really!", "Wow! really!"),

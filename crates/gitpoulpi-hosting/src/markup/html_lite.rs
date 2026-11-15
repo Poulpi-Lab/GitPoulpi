@@ -7,16 +7,13 @@
 //! rendered with pulldown-cmark. Raw HTML in the Markdown is escaped, never
 //! passed through, and `javascript:` style link targets are neutralised.
 
-use pulldown_cmark::{CowStr, Event, Options, Parser, Tag, html};
+use pulldown_cmark::{html, CowStr, Event, Options, Parser, Tag};
 
 use super::{decode_entities, sanitize};
 
 enum Token<'a> {
     Text(&'a str),
-    Open {
-        name: String,
-        attrs: &'a str,
-    },
+    Open { name: String, attrs: &'a str },
     Close(String),
 }
 
@@ -103,7 +100,10 @@ fn attr(attrs: &str, name: &str) -> Option<String> {
         let rest = rest.trim_start();
         let value = match rest.chars().next() {
             Some(q @ ('"' | '\'')) => rest[1..].split(q).next().unwrap_or(""),
-            _ => rest.split(|c: char| c.is_whitespace() || c == '/').next().unwrap_or(""),
+            _ => rest
+                .split(|c: char| c.is_whitespace() || c == '/')
+                .next()
+                .unwrap_or(""),
         };
         return Some(decode_entities(value));
     }
@@ -221,10 +221,10 @@ fn open(st: &mut State, name: &str, attrs: &str) {
         "code" => {
             if st.fence_pending {
                 if let Some(class) = attr(attrs, "class") {
-                    if let Some(lang) = class
-                        .split_whitespace()
-                        .find_map(|c| c.strip_prefix("language-").or_else(|| c.strip_prefix("lang-")))
-                    {
+                    if let Some(lang) = class.split_whitespace().find_map(|c| {
+                        c.strip_prefix("language-")
+                            .or_else(|| c.strip_prefix("lang-"))
+                    }) {
                         st.out.push_str(lang);
                     }
                 }
@@ -323,7 +323,13 @@ fn close(st: &mut State, name: &str) {
                 let quoted: Vec<String> = body
                     .trim()
                     .lines()
-                    .map(|l| if l.is_empty() { ">".to_string() } else { format!("> {l}") })
+                    .map(|l| {
+                        if l.is_empty() {
+                            ">".to_string()
+                        } else {
+                            format!("> {l}")
+                        }
+                    })
                     .collect();
                 st.out.push_str(&quoted.join("\n"));
                 st.blank();
@@ -331,7 +337,8 @@ fn close(st: &mut State, name: &str) {
         }
         "td" | "th" => {
             if let Some((cell, _)) = st.take_mark("cell") {
-                st.row.push(cell.split_whitespace().collect::<Vec<_>>().join(" "));
+                st.row
+                    .push(cell.split_whitespace().collect::<Vec<_>>().join(" "));
             }
         }
         "tr" => {
@@ -341,7 +348,8 @@ fn close(st: &mut State, name: &str) {
                 st.out.push_str(&format!("| {} |\n", cells.join(" | ")));
                 if let Some(n) = st.rows_in_table.last_mut() {
                     if *n == 0 {
-                        st.out.push_str(&format!("| {} |\n", vec!["---"; cells.len()].join(" | ")));
+                        st.out
+                            .push_str(&format!("| {} |\n", vec!["---"; cells.len()].join(" | ")));
                     }
                     *n += 1;
                 }
@@ -425,20 +433,35 @@ mod tests {
             ("<p>a</p><p>b</p>", "a\n\nb"),
             ("a<br>b", "a  \nb"),
             ("<h2>Title</h2>", "## Title"),
-            ("<i>it</i> <em>em</em> <s>gone</s> <code>x</code>", "*it* *em* ~~gone~~ `x`"),
-            ("<a href=\"https://x.io/a?b=1&amp;c=2\">link</a>", "[link](https://x.io/a?b=1&c=2)"),
+            (
+                "<i>it</i> <em>em</em> <s>gone</s> <code>x</code>",
+                "*it* *em* ~~gone~~ `x`",
+            ),
+            (
+                "<a href=\"https://x.io/a?b=1&amp;c=2\">link</a>",
+                "[link](https://x.io/a?b=1&c=2)",
+            ),
             ("<a href=\"javascript:alert(1)\">bad</a>", "bad"),
             ("<img src=\"a.png\" alt=\"pic\">", "![pic](a.png)"),
-            ("<ul><li>one</li><li>two<ul><li>deep</li></ul></li></ul>", "- one\n- two\n  - deep"),
+            (
+                "<ul><li>one</li><li>two<ul><li>deep</li></ul></li></ul>",
+                "- one\n- two\n  - deep",
+            ),
             ("<ol><li>a</li><li>b</li></ol>", "1. a\n2. b"),
             ("<blockquote><p>q</p></blockquote>", "> q"),
             ("<hr>", "---"),
             ("x &lt; y &amp;&amp; z", "x \\< y && z"),
             ("<!-- hidden -->shown", "shown"),
             ("<script>alert(1)</script>text<style>p{}</style>", "text"),
-            ("<span class=\"x\">kept</span> <unknown>too</unknown>", "kept too"),
+            (
+                "<span class=\"x\">kept</span> <unknown>too</unknown>",
+                "kept too",
+            ),
             ("1 < 2 and 3 > 2", "1 \\< 2 and 3 > 2"),
-            ("<details><summary>More</summary>body</details>", "**More**\n\nbody"),
+            (
+                "<details><summary>More</summary>body</details>",
+                "**More**\n\nbody",
+            ),
         ];
         for (input, want) in cases {
             assert_eq!(html_to_markdown(input), *want, "{input:?}");
@@ -448,12 +471,16 @@ mod tests {
     #[test]
     fn html_pre_and_table() {
         assert_eq!(
-            html_to_markdown("<pre><code class=\"language-rust\">let a = 1;\nlet b = 2;</code></pre>"),
+            html_to_markdown(
+                "<pre><code class=\"language-rust\">let a = 1;\nlet b = 2;</code></pre>"
+            ),
             "```rust\nlet a = 1;\nlet b = 2;\n```"
         );
         assert_eq!(html_to_markdown("<pre>x &lt; y</pre>"), "```\nx < y\n```");
         assert_eq!(
-            html_to_markdown("<table><tr><th>a</th><th>b</th></tr><tr><td>1</td><td>2</td></tr></table>"),
+            html_to_markdown(
+                "<table><tr><th>a</th><th>b</th></tr><tr><td>1</td><td>2</td></tr></table>"
+            ),
             "| a | b |\n| --- | --- |\n| 1 | 2 |"
         );
     }
@@ -470,7 +497,10 @@ mod tests {
             ("# T", "<h1>T</h1>"),
             ("[a](https://x.io)", "<p><a href=\"https://x.io\">a</a></p>"),
             ("- a\n- b", "<ul>\n<li>a</li>\n<li>b</li>\n</ul>"),
-            ("<script>alert(1)</script>", "&lt;script&gt;alert(1)&lt;/script&gt;"),
+            (
+                "<script>alert(1)</script>",
+                "&lt;script&gt;alert(1)&lt;/script&gt;",
+            ),
             ("[x](javascript:alert(1))", "<p><a href=\"#\">x</a></p>"),
             ("~~gone~~", "<p><del>gone</del></p>"),
         ];
@@ -482,8 +512,14 @@ mod tests {
     #[test]
     fn md_to_html_table_and_code() {
         let html = markdown_to_html("| a | b |\n|---|---|\n| 1 | 2 |");
-        assert!(html.contains("<table>") && html.contains("<td>1</td>"), "{html}");
+        assert!(
+            html.contains("<table>") && html.contains("<td>1</td>"),
+            "{html}"
+        );
         let html = markdown_to_html("```rust\nlet a = 1;\n```");
-        assert!(html.contains("<pre><code class=\"language-rust\">"), "{html}");
+        assert!(
+            html.contains("<pre><code class=\"language-rust\">"),
+            "{html}"
+        );
     }
 }

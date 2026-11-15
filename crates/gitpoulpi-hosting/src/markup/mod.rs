@@ -70,7 +70,9 @@ fn closer_for(chars: &[char], i: usize, marker: char) -> Option<usize> {
             && j > i + 1
             && !chars[j - 1].is_whitespace()
             && chars[j - 1] != marker
-            && chars.get(j + 1).is_none_or(|n| !is_word(*n) && *n != marker)
+            && chars
+                .get(j + 1)
+                .is_none_or(|n| !is_word(*n) && *n != marker)
         {
             return Some(j);
         }
@@ -129,10 +131,11 @@ pub(crate) struct Lines {
 impl Lines {
     pub(crate) fn push(&mut self, kind: Block, line: String) {
         if let Some(last) = self.last {
-            let same_run = last == kind && matches!(
-                kind,
-                Block::List | Block::Table | Block::Quote | Block::Para | Block::Code
-            );
+            let same_run = last == kind
+                && matches!(
+                    kind,
+                    Block::List | Block::Table | Block::Quote | Block::Para | Block::Code
+                );
             if !same_run && !self.lines.last().is_some_and(String::is_empty) {
                 self.lines.push(String::new());
             }
@@ -229,6 +232,9 @@ mod tests {
 
     #[test]
     fn entities() {
-        assert_eq!(decode_entities("a &amp; b &lt;c&gt; &#65;&#x42; &bogus; &"), "a & b <c> AB &bogus; &");
+        assert_eq!(
+            decode_entities("a &amp; b &lt;c&gt; &#65;&#x42; &bogus; &"),
+            "a & b <c> AB &bogus; &"
+        );
     }
 }

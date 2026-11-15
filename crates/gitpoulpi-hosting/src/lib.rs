@@ -86,9 +86,26 @@ pub mod resolve;
 #[cfg(feature = "hosting")]
 pub mod review;
 pub mod scope;
-#[cfg(all(test, any(feature = "github", feature = "gitlab")))]
+#[cfg(all(
+    test,
+    any(
+        feature = "github",
+        feature = "gitlab",
+        feature = "gitea",
+        feature = "azure-devops",
+        feature = "bitbucket",
+        feature = "gerrit"
+    )
+))]
 mod scope_fake;
-#[cfg(any(feature = "github", feature = "gitlab"))]
+#[cfg(any(
+    feature = "github",
+    feature = "gitlab",
+    feature = "gitea",
+    feature = "azure-devops",
+    feature = "bitbucket",
+    feature = "gerrit"
+))]
 mod scope_handle;
 #[cfg(feature = "github")]
 mod scoped_transport;

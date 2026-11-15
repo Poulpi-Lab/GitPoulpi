@@ -21,6 +21,9 @@
 
 #[cfg(test)]
 mod code_tests;
+mod conversation;
+#[cfg(test)]
+mod conversation_tests;
 mod flow;
 mod meta;
 mod review;
@@ -35,6 +38,10 @@ use serde::de::DeserializeOwned;
 
 use crate::client::{
     CreatedIssue, CreatedPullRequest, HostingClient, NewIssue, NewPullRequest, MAX_PAGES,
+};
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
+    TimelinePage,
 };
 use crate::http::{HttpRequest, HttpResponse, HttpTransport};
 use crate::integration::Integration;
@@ -57,6 +64,7 @@ pub struct GiteaClient {
     pub(crate) integration: Integration,
     token: String,
     pub(crate) transport: Arc<dyn HttpTransport>,
+    pub(crate) scopes: crate::scope_handle::ScopeHandle,
 }
 
 impl GiteaClient {
@@ -69,6 +77,7 @@ impl GiteaClient {
             integration,
             token,
             transport,
+            scopes: Default::default(),
         }
     }
 
@@ -894,5 +903,62 @@ impl HostingClient for GiteaClient {
 
     async fn update_pull_request(&self, project: &str, number: u64, edit: &PrEdit) -> Result<()> {
         self.meta_update_pull_request(project, number, edit).await
+    }
+
+    fn conversation_caps(&self, kind: ItemKind) -> ConversationCaps {
+        ConversationCaps::gitea(kind, self.review_caps().resolve)
+    }
+
+    async fn posting_identity(&self, project: &str) -> Result<PostingIdentity> {
+        self.conv_identity(project).await
+    }
+
+    async fn item_timeline(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        older: Option<&PageCursor>,
+        opts: &TimelineOpts,
+    ) -> Result<TimelinePage> {
+        self.conv_timeline(project, key, older, opts).await
+    }
+
+    async fn post_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> Result<Comment> {
+        self.conv_post(project, key, body, internal).await
+    }
+
+    async fn reply_in_discussion(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        discussion_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_reply(project, key, discussion_id, body).await
+    }
+
+    async fn edit_item_comment(
+        &self,
+        project: &str,
+        _key: &ItemKey,
+        comment_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_edit(project, comment_id, body).await
+    }
+
+    async fn delete_item_comment(
+        &self,
+        project: &str,
+        _key: &ItemKey,
+        comment_id: &str,
+    ) -> Result<()> {
+        self.conv_delete(project, comment_id).await
     }
 }

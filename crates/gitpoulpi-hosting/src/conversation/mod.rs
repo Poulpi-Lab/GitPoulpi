@@ -16,7 +16,23 @@
 pub mod caps;
 pub mod identity;
 pub mod model;
-#[cfg(any(feature = "github", feature = "gitlab"))]
+#[cfg(any(
+    feature = "github",
+    feature = "gitlab",
+    feature = "gitea",
+    feature = "azure-devops",
+    feature = "bitbucket",
+    feature = "gerrit"
+))]
+pub(crate) mod compat;
+#[cfg(any(
+    feature = "github",
+    feature = "gitlab",
+    feature = "gitea",
+    feature = "azure-devops",
+    feature = "bitbucket",
+    feature = "gerrit"
+))]
 pub(crate) mod time;
 
 pub use caps::ConversationCaps;

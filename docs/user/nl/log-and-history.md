@@ -167,12 +167,12 @@ Bij een commit zonder ref toont aanwijzen van zijn rij ook een vervaagde pil in 
 **Remotes.** De `+` in de titel REMOTE voegt er een toe; klik met rechts op de naam van een
 remote om hem op te halen, zijn weblink te kopiëren, hem de standaardremote te maken, hem uit
 de grafiek te verbergen, zijn URL's te bewerken of hem te verwijderen. **Een remote verbergen**
-(het oog op zijn rij, *Remote in grafiek verbergen* in het menu, of `Remote: Remote in grafiek
+(de ⊙ op zijn rij, *Remote in grafiek verbergen* in het menu, of `Remote: Remote in grafiek
 verbergen...` in het palet) verbergt elke branch die hij nu heeft of later krijgt, en de commits
 die alleen hij bereikt verlaten de Log: zo blader je door één geschiedenis zonder de geschiedenis
 van een niet-verwante archiefremote; haal hem terug met *Remote in grafiek tonen*. Een remote
 tonen toont ook de branches ervan die afzonderlijk verborgen waren. Een branch van een verborgen
-remote zegt dat op de statusregel als zijn oog wordt gebruikt: toon eerst de remote.
+remote zegt dat op de statusregel als je op zijn ⊙ klikt: toon eerst de remote.
 
 **Stashes.** **Stash** zet alles in een stash (niet-gevolgde bestanden inbegrepen); `Ctrl+G m` vraagt
 eerst om een bericht (met AI aan stelt `Ctrl+G` in die prompt er een voor). Klik met rechts

@@ -349,10 +349,10 @@ include_untracked_in_autostash = "Incluir arquivos não rastreados no auto-stash
 include_untracked_in_autostash_help = "Se o stash automático também leva arquivos não rastreados (caso contrário, só as alterações rastreadas são guardadas e restauradas)."
 hosting_refresh_minutes = { git = "Atualização de {$prs} e issues", local = "Atualização de {$Prs} e issues" }
 hosting_refresh_minutes_help = { git = "Com que frequência as listas de {$prs} e Issues da barra lateral (e o chip de {$pr_abbr} vinculado da barra de ferramentas) consultam o host de novo. 0 desliga o temporizador; elas ainda atualizam ao abrir um repositório, ao trocar de branch, após um push ou fetch, e sob demanda.", local = "Com que frequência as listas de {$Prs} e Issues da barra lateral (e o chip de {$pr_abbr} vinculado da barra de ferramentas) consultam o host de novo. 0 desliga o temporizador; elas ainda atualizam ao abrir um repositório, ao trocar de branch, após um envio ou uma busca, e sob demanda." }
-# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
-hosting_post_as = "Post as"
+# context: label of the row that sets the name messages to a host are posted as (a bot such as my-app[bot])
+hosting_post_as = "Publicar como"
 # context: help under the "Post as" row of Settings
-hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
+hosting_post_as_help = "O nome com que suas mensagens são publicadas no host e o nome usado para reconhecer seus próprios comentários (editar, excluir), por exemplo my-app[bot] para um GitHub App. Necessário só com um token de bot: se ficar vazio, o GitPoulpi pergunta ao host e aprende o nome na primeira mensagem que publica."
 pr_terminology = "Terminologia de solicitação de revisão"
 pr_terminology_help = { git = "A palavra usada para uma solicitação de revisão de código hospedada em todo o TUI. Auto segue o host do repositório: Merge Request para o GitLab, Pull Request para os outros hosts. Pull Request ou Merge Request força essa palavra. Aplicado imediatamente.", local = "A palavra usada para uma solicitação de revisão de código hospedada em todo o TUI. Auto segue o host do repositório: Solicitação de mesclagem para o GitLab, solicitação de integração para os outros hosts. Cada uma das duas força essa palavra. Aplicado imediatamente." }
 hide_finished_pr_chip = { git = "Ocultar o chip de {$pr} após o fechamento ou o {$merge}", local = "Ocultar o chip de {$pr} após o fechamento ou a {$merge}" }
@@ -1824,7 +1824,8 @@ view_merged_closed = { git = "Merged / fechados", local = "Mesclados / fechados"
 view_all = "Todos"
 view_issue_open = "Abertas"
 view_issue_all = "Todas"
-bot_suffix = "App bot"
+# context: short note after the name of a hosting profile whose calls are made by a GitHub App bot
+bot_suffix = "bot do App"
 view_assigned = "Atribuídas a mim"
 view_closed = "Fechadas"
 dur_seconds = "{n}s"
@@ -1959,7 +1960,8 @@ set_milestone = "Definir marco..."
 menu_pick_item = "Escolha uma solicitação ou uma issue"
 why_no_meta = "nenhum item do GitHub, GitLab, Gitea ou Forgejo está listado para editar"
 why_no_meta_prs = "nenhum item revisável do GitHub, GitLab, Gitea ou Forgejo está listado para editar"
-why_assignment_blocked = "assignment is blocked in this repository"
+# context: why a palette command or form field is grayed out or hidden
+why_assignment_blocked = "a atribuição está bloqueada neste repositório"
 # context: row menu: open the in-app review of a request
 review = "Revisar..."
 # context: why a palette row is off
@@ -2591,10 +2593,14 @@ log_scroll_left = "Rolar as colunas para a esquerda"
 log_scroll_right = "Rolar as colunas para a direita"
 log_columns_layout = "Rolar para os lados ou ajustar ao painel"
 refs_remotes = "Branch: editar seus remotos"
-md_editor_preview = "Markdown Editor: Toggle Write and Preview"
-md_editor_split = "Markdown Editor: Toggle the Split View"
-md_editor_submit = "Markdown Editor: Send the Text"
-md_editor_ai = "Markdown Editor: Write with AI"
+# context: palette and Settings label of the key that flips the Markdown editor between Write and Preview
+md_editor_preview = "Editor Markdown: alternar Escrever e Prévia"
+# context: label of the key that shows the text and its preview side by side
+md_editor_split = "Editor Markdown: alternar a visão lado a lado"
+# context: label of the key that sends (posts or saves) the text of the Markdown editor
+md_editor_submit = "Editor Markdown: enviar o texto"
+# context: label of the key that opens the AI writing help of the Markdown editor
+md_editor_ai = "Editor Markdown: escrever com IA"
 
 
 [keymap_ctx]
@@ -2631,7 +2637,8 @@ integrations = "Configurações: página Integrações"
 activity_log = "Janela do Registro de atividade"
 palette = "Comandos da paleta"
 split = "Editor de divisão de {$commit}"
-md_editor = "Markdown editor (comments, descriptions, summaries)"
+# context: name of the key group of the Markdown editor on the Settings keybindings page
+md_editor = "Editor Markdown (comentários, descrições, resumos)"
 
 [keymap_conflict]
 already_bound = "{chord} já é {action} ({ctx})"
@@ -2960,15 +2967,24 @@ title_worktree_name = "Nomes de worktree"
 profile_help_worktree_name = "O perfil que o GitPoulpi usará para dar nome a um novo worktree e à sua branch a partir de uma descrição."
 repo_profile_help_worktree_name = "O perfil usado neste repositório para dar nome a um novo worktree e à sua branch."
 action_worktree_name = "Nome do worktree"
-title_hosting_reply = "Replies on a host"
-profile_help_hosting_reply = "The profile GitPoulpi will use to draft a comment, an answer in a thread, a review comment or a review summary. It only writes a draft: nothing is posted until you post it."
-repo_profile_help_hosting_reply = "The profile used in this repository to draft replies on a host."
-action_hosting_reply = "Reply on a host"
-title_issue_body = "New issue descriptions"
-profile_help_issue_body = "The profile GitPoulpi will use to draft the description of a new issue. It only writes a draft: nothing is created until you create it."
-repo_profile_help_issue_body = "The profile used in this repository to draft the description of a new issue."
-action_issue_body = "Issue description"
-title_hosting_base = "Base prompt for replies"
+# context: Settings > AI, heading of the block for drafting replies on a code host or tracker with the AI (comments, answers in a thread, review comments, review summaries)
+title_hosting_reply = "Respostas em um host"
+# context: Settings > AI, help under the profile of that block
+profile_help_hosting_reply = "O perfil que o GitPoulpi usará para redigir um comentário, uma resposta em uma thread, um comentário de revisão ou um resumo de revisão. Ele só escreve um rascunho: nada é publicado até você publicar."
+# context: Settings > AI, repository page, help under the profile of that block
+repo_profile_help_hosting_reply = "O perfil usado neste repositório para redigir respostas em um host."
+# context: name of the AI action that drafts replies on a host, in lists of actions
+action_hosting_reply = "Resposta em um host"
+# context: Settings > AI, heading of the block for drafting the description of a new issue with the AI
+title_issue_body = "Descrições de novas issues"
+# context: Settings > AI, help under the profile of that block
+profile_help_issue_body = "O perfil que o GitPoulpi usará para redigir a descrição de uma nova issue. Ele só escreve um rascunho: nada é criado até você criar."
+# context: Settings > AI, repository page, help under the profile of that block
+repo_profile_help_issue_body = "O perfil usado neste repositório para redigir a descrição de uma nova issue."
+# context: name of the AI action that drafts the description of a new issue, in lists of actions
+action_issue_body = "Descrição da issue"
+# context: title of the editor that opens on the base prompt of the AI replies on a host
+title_hosting_base = "Prompt base das respostas"
 
 [palette]
 sidebar_show_worktrees = "Painel esquerdo: mostrar a seção Worktrees"
@@ -3767,7 +3783,8 @@ settings_preferences_the = "Configurações (a engrenagem da barra de título, {
 text_fields_filters = "Campos de texto (filtros, busca, compositor, diálogos, Configurações)"
 mouse_gestures_in = "Gestos do mouse, em detalhe"
 split = "Dividir um {$commit}"
-markdown_editor = "Markdown editor (comments, descriptions, summaries)"
+# context: heading of the help section about the shared Markdown editor
+markdown_editor = "Editor Markdown (comentários, descrições, resumos)"
 
 [help_text]
 git_actions_then_amend = "alterar o {$commit} selecionado: resumo, descrição, nome, e-mail e data do autor em uma só janela"
@@ -3860,12 +3877,12 @@ git_actions_then_21 = "editar a mensagem do commit selecionado - veja “Ediçã
 git_actions_then_22 = "{$cherry_pick} do commit selecionado em HEAD"
 git_actions_then_23 = "reverter o commit selecionado (com confirmação)"
 git_actions_then_24 = { git = "reset da branch para o commit selecionado, mixed (soft/hard só pela paleta, hard com confirmação)", local = "redefinir a branch para o commit selecionado, misto (suave/forte só pela paleta, forte com confirmação)" }
-pull_requests_and_1 = "abrir a linha no navegador; “Reconectar” abre as Configurações no perfil"
+pull_requests_and_1 = "abrir a linha (a conversa, se o host tiver uma; senão o navegador); “Reconectar” abre as Configurações no perfil"
 pull_requests_and_2 = "linha de {$pr}: editar no site do provedor (o lápis da linha); a paleta tem o equivalente da branch em checkout"
 pull_requests_and_3 = "(seção {$PRS}) criar um - o + do cabeçalho"
 pull_requests_and_4 = "o menu da linha: abrir, copiar URL / número, checkout da branch de origem, ver seus commits, criar uma branch a partir de uma issue"
 pull_requests_and_5 = "escolher o filtro (Abertos, Meus, Revisão solicitada, Todos / Atribuídos a mim); o chip da barra de ferramentas (GL !53, GH #12) abre a solicitação vinculada, botão direito para o menu; \"+ {$pr_abbr}\" inicia uma para uma branch enviada"
-pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
+pull_requests_and_6 = "abrir a página da linha no navegador (Enter abre a conversa, se o host tiver uma)"
 refs_pane_1 = "abrir o menu da ref selecionada: checkout, ocultar/solo, {$merge}, rebase, fast-forward, {$pull} / {$push} / {$fetch}, definir upstream, criar worktree, iniciar {$pr}, renomear, excluir, Copiar (nome / ref completa / SHA de destino)"
 refs_pane_2 = "Fast-forward <branch> até <atual> / <atual> até <branch> (menu ou paleta): só avança uma branch; em cinza, com o motivo, quando não é um fast-forward"
 refs_pane_3 = { git = "Criar worktree a partir de <ref>... (menu de uma branch, tag ou commit): um diálogo - pasta (Procurar / {{dialog.browse}}), nova branch opcional, [x] abrir como aba (Espaço alterna)", local = "Criar worktree a partir de <ref>... (menu de uma branch, etiqueta ou commit): um diálogo - pasta (Procurar / {{dialog.browse}}), nova branch opcional, [x] abrir como aba (Espaço alterna)" }
@@ -4148,10 +4165,14 @@ rewrite_host_howto = { git = "explica como fazer uma reescrita passar por uma br
 rewrite_ai_rules = "cria com IA as regras de reescrita a partir da sua descrição (nenhuma prévia é gerada e nada é aplicado)"
 log_columns_2 = "rolar as colunas do Log para os lados quando mantêm suas larguras (a disposição Rolar para os lados, escolhida no seletor de colunas, em Configurações ou com s enquanto uma coluna está escolhida); na disposição ajustada, todas as colunas cabem no painel"
 refs_pane_20 = "editar os remotos da branch local selecionada (seu upstream e destinos de {$push} extras): o equivalente no teclado de clicar na etiqueta de remotos da linha dela"
-markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
-markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
-markdown_editor_3 = "send the text (Enter inserts a newline)"
-markdown_editor_4 = "open or close Write with AI (it only drafts: nothing is posted)"
+# context: help line; the keys are shown beside it
+markdown_editor_1 = "alternar entre Escrever e Prévia (o texto como ficará depois de publicado)"
+# context: help line; the keys are shown beside it
+markdown_editor_2 = "mostrar o texto e sua prévia lado a lado (precisa de uma janela larga)"
+# context: help line; the keys are shown beside it
+markdown_editor_3 = "enviar o texto (Enter insere uma quebra de linha)"
+# context: help line of the Markdown editor, after the key that opens the AI writing help
+markdown_editor_4 = "abrir ou fechar Escrever com IA (ela só redige: nada é publicado)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} ou botão direito"
@@ -4775,8 +4796,10 @@ undo_label = "Desfazer {label}"
 redo_label = "Refazer {label}"
 undo_label_key = "Desfazer {label} · {key}"
 redo_label_key = "Refazer {label} · {key}"
-nothing_to_undo_comment = "nothing to undo (a comment posted to a host can't be undone here: edit or delete it instead)"
-tip_nothing_to_undo_comment = "Nothing to undo (a comment posted to a host can't be undone here: edit or delete it instead)"
+# context: why Undo is idle after a comment was posted to a host
+nothing_to_undo_comment = "nada a desfazer (um comentário publicado em um host não pode ser desfeito aqui: edite-o ou exclua-o)"
+# context: tooltip of Undo after a comment was posted to a host
+tip_nothing_to_undo_comment = "Nada a desfazer (um comentário publicado em um host não pode ser desfeito aqui: edite-o ou exclua-o)"
 
 [status_pane]
 unstaged_title = "{$unstaged_files}"
@@ -5307,11 +5330,13 @@ resolve_first = "resolva antes os conflitos"
 plan_invalid_twice = "o plano foi inválido duas vezes ({error})"
 no_changes_stash = "não há alterações para {$stash}"
 nothing_to_explain = "não há nada a explicar"
-repo_read_failed = "could not read the repository ({what}): {why}"
-repo_what_files = "the file list"
-repo_what_search = "the search"
-repo_what_diff = "the changes under review"
-code_source_gone = "the code source is gone"
+# context: error of the AI repository reading; {what} is one of the next three texts or HEAD, {why} the cause
+repo_read_failed = "não foi possível ler o repositório ({what}): {why}"
+repo_what_files = "a lista de arquivos"
+repo_what_search = "a busca"
+repo_what_diff = "as alterações em revisão"
+# context: error: the pull request code the review showed can no longer be read
+code_source_gone = "a origem do código não existe mais"
 
 [ui_intent]
 tab = "aba {name}"
@@ -6041,11 +6066,11 @@ hint_copy = "copiar"
 # context: key hint: the arrows scroll the preview
 hint_scroll = "rolar"
 # context: title of the viewer that shows one Mermaid diagram of a conversation. Width budget: 40 cells
-view_title = "Mermaid diagram"
+view_title = "Diagrama Mermaid"
 # context: key hint: Esc closes the viewer
-hint_close = "close"
+hint_close = "fechar"
 # context: noun for the status line after a copy: 'copied <this> (...)'
-diagram_copied_what = "Mermaid diagram"
+diagram_copied_what = "diagrama Mermaid"
 # context: noun for the status line after a copy: 'copied <this> (...)'
 copied_what = "gitGraph do Mermaid"
 # context: status line: Copy as Mermaid gitGraph was used with nothing to copy
@@ -8946,9 +8971,9 @@ reopen_tip = "Mostrar a coluna de {$commits}"
 # Settings > Integrations, the text format row of a connected Redmine profile (integrations_page/redmine.rs).
 [redmine_settings]
 # context: row of a Redmine profile; {format} is Textile or Markdown, a proper noun; pressing it switches to the other one
-markup_row = "Text format of the server: {format}"
+markup_row = "Formato de texto do servidor: {format}"
 # context: help under that row; Administration > Settings > General > Text formatting is the Redmine menu path
-markup_help = "Set it to what this Redmine uses (Administration > Settings > General > Text formatting). Comments are read and written in that format; you always type Markdown, which is converted for Textile."
+markup_help = "Defina o que este Redmine usa (Administração > Configurações > Geral > Formatação de texto). Os comentários são lidos e escritos nesse formato; você sempre digita Markdown, que é convertido para Textile."
 
 # Settings > Integrations, the Radar block of a connected code host (integrations_page/radar.rs).
 [radar_settings]
@@ -9286,19 +9311,32 @@ excluded_heading = { one = "{n} arquivo sensível deixado de fora", other = "{n}
 nothing_removed = "Nenhum segredo foi encontrado e nenhum arquivo sensível faz parte desta requisição."
 # context: one row of the list of replaced secrets; {rule} is the kind of secret (github-token), {preview} a masked sample that never shows the whole value
 redaction_row = "{rule}: {preview}"
-ctx_heading = "Repository context"
-ctx_size = "{used} of {budget}"
+# context: heading of the list of repository parts that go along with an AI request
+ctx_heading = "Contexto do repositório"
+# context: size of the repository context against its limit, like 31.2 KB of 48 KB
+ctx_size = "{used} de {budget}"
+# context: one part of the repository context: a file, the diff, a search, the map; and its size
 ctx_part = "{label}: {size}"
-ctx_part_reused = "{label}: {size} (reused)"
-ctx_more = { one = "...and {n} more part", other = "...and {n} more parts" }
-ctx_cut = "Cut to fit: {what}"
-ctx_left_out = "Left out (sensitive): {files}"
-ctx_agent = "A local agent reads the repository itself with read-only tools ({tools})"
-ctx_folder = "Working folder: {folder}"
-ctx_session_started = "Agent session: new"
-ctx_session_continued = "Agent session: continued"
-ctx_draft_only = "The AI only writes a draft. Nothing is posted until you send it yourself."
-ctx_pane = "Repository context"
+# context: same, for a part kept from an earlier draft instead of read again
+ctx_part_reused = "{label}: {size} (reaproveitado)"
+# context: plural
+ctx_more = { one = "...e mais {n} parte", other = "...e mais {n} partes" }
+# context: a part of the repository context that was shortened or left out to stay within the limit
+ctx_cut = "Cortado para caber: {what}"
+# context: files the repository context does not include because they look sensitive
+ctx_left_out = "Deixado de fora (sensível): {files}"
+# context: line of the dialog when a local agent reads the repository by itself instead of receiving a context
+ctx_agent = "Um agente local lê o repositório por conta própria, com ferramentas somente leitura ({tools})"
+# context: line of the dialog: the folder a local agent that reads the repository works in
+ctx_folder = "Pasta de trabalho: {folder}"
+# context: line of the dialog: the local agent starts a session
+ctx_session_started = "Sessão do agente: nova"
+# context: line of the dialog: the local agent continues its session
+ctx_session_continued = "Sessão do agente: continuada"
+# context: line of the dialog for a drafted reply on a host
+ctx_draft_only = "A IA só escreve um rascunho. Nada é publicado até você enviar por conta própria."
+# context: heading of the repository context text in the pane that shows what is sent
+ctx_pane = "Contexto do repositório"
 # context: checkbox of the dialog; {action} is the name of the AI action (Commit message, Explain changes...)
 dont_show = "Não mostrar de novo para {action}"
 # context: button that sends the AI request
@@ -9417,17 +9455,28 @@ part_review_threads = "Os comentários existentes têm {size}, limite {limit} (c
 part_context_file = "O arquivo de contexto {name} tem {size}, limite {limit} (configuração {key}). Truncado, o final fica de fora."
 # context: list line of that dialog, for the project context files together; {name} is the file that crossed the limit
 part_context_total = "Os arquivos de contexto juntos chegam a {size} em {name}, limite {limit} (configuração {key}). Truncado, o resto fica de fora."
-hosting_reply_context_label = "Largest conversation to send for a reply (bytes)"
-hosting_reply_context_help = "Over this size, nothing is cut silently: you are asked whether to send everything, send it truncated (the oldest comments are left out first), open this setting or cancel. 49152 by default."
-hosting_reply_file_label = "Largest repository file for a reply (bytes)"
-hosting_reply_file_help = "Used when the AI reads the repository for a drafted reply. 8192 by default."
-hosting_reply_map_label = "Largest repository map for a reply (bytes)"
-hosting_reply_map_help = "Used when the AI reads the repository for a drafted reply. 6144 by default."
-hosting_reply_hits_label = "Most search hits per term for a reply"
-hosting_reply_hits_help = "Used when the AI reads the repository for a drafted reply. 20 by default."
-hosting_reply_terms_label = "Most search terms for a reply"
-hosting_reply_terms_help = "Used when the AI reads the repository for a drafted reply. 8 by default."
-part_reply_conversation = "The conversation is {size}, limit {limit} (setting {key}). Truncated, the oldest comments and the start of long ones are left out."
+# context: Settings > AI, label of a number: the most bytes of the conversation (the item, its comments) given to the AI when it drafts a reply
+hosting_reply_context_label = "Maior conversa a enviar para uma resposta (bytes)"
+# context: help under that number
+hosting_reply_context_help = "Acima deste tamanho, nada é cortado em silêncio: você escolhe entre enviar tudo, enviar truncado (os comentários mais antigos saem primeiro), abrir esta configuração ou cancelar. 49152 por padrão."
+# context: Settings > AI, label of a number: the most bytes of one repository file given to the AI when it drafts a reply
+hosting_reply_file_label = "Maior arquivo do repositório para uma resposta (bytes)"
+# context: help under that number
+hosting_reply_file_help = "Usado quando a IA lê o repositório para redigir uma resposta. 8192 por padrão."
+# context: Settings > AI, label of a number: the most bytes of the repository map (its list of files) given to the AI when it drafts a reply
+hosting_reply_map_label = "Maior mapa do repositório para uma resposta (bytes)"
+# context: help under that number
+hosting_reply_map_help = "Usado quando a IA lê o repositório para redigir uma resposta. 6144 por padrão."
+# context: Settings > AI, label of a number: the most search results kept for each search term when the AI drafts a reply
+hosting_reply_hits_label = "Máximo de resultados de busca por termo para uma resposta"
+# context: help under that number
+hosting_reply_hits_help = "Usado quando a IA lê o repositório para redigir uma resposta. 20 por padrão."
+# context: Settings > AI, label of a number: the most search terms looked up in the repository when the AI drafts a reply
+hosting_reply_terms_label = "Máximo de termos de busca para uma resposta"
+# context: help under that number
+hosting_reply_terms_help = "Usado quando a IA lê o repositório para redigir uma resposta. 8 por padrão."
+# context: list line of the dialog shown when what would be sent to the AI is over a limit, for the conversation of a drafted reply; {size} is its size (for example "91.2 KB (91234 bytes)"), {limit} the limit in the same form, {key} the name of the setting
+part_reply_conversation = "A conversa tem {size}, limite {limit} (configuração {key}). Truncada, os comentários mais antigos e o início dos longos ficam de fora."
 # context: button that sends everything of the oversized request this one time, nothing cut
 send_all = "Enviar tudo"
 # context: button that sends the request with what is over its limit cut
@@ -9472,17 +9521,24 @@ username = "Usuário do git"
 username_help = "Enviado como nome de usuário dos remotos HTTPS. Deixe vazio para usar o da conta ou do auxiliar."
 ignore_helpers = "Ignorar auxiliares de credenciais definidos por este repositório"
 ignore_helpers_help = "Os auxiliares do sistema e globais continuam funcionando. Os auxiliares que um repositório define para si executam programas à escolha dele."
-use_for_hosting = "Use for the hosting API (issues, {$prs})"
-use_for_hosting_help = "The same command also gives the token of this repository's issue and {$pr} calls, in place of your personal token. With a GitHub App installation token, what you write then appears as the App. Other repositories keep your personal token."
-heading_hosting = "Hosting"
-assignment_label = "Assignment"
-assignment_allowed = "Allowed"
-assignment_blocked = "Blocked"
-assignment_help = "Blocked: nothing can be assigned in this repository's issues and {$prs}, from the app, the CLI or an agent. Existing assignees stay visible. Applies immediately."
+# context: checkbox on the SSH & credentials page: the token command also gives the token of this repository's hosting API calls
+use_for_hosting = "Usar para a API do host (issues, {$prs})"
+# context: help under the "Use for the hosting API" checkbox
+use_for_hosting_help = "O mesmo comando também fornece o token das chamadas de issues e de {$pr} deste repositório, no lugar do seu token pessoal. Com um token de instalação de GitHub App, o que você escreve passa a aparecer como o App. Os outros repositórios mantêm seu token pessoal."
+# context: heading of the hosting rows of the SSH & credentials page
+heading_hosting = "Host"
+# context: row label: whether people can be assigned in this repository's issues and pull requests
+assignment_label = "Atribuição"
+# context: choice of the Assignment row
+assignment_allowed = "Permitida"
+# context: choice of the Assignment row
+assignment_blocked = "Bloqueada"
+# context: help under the Assignment row
+assignment_help = "Bloqueada: nada pode ser atribuído nas issues e nas {$prs} deste repositório, pelo app, pela CLI ou por um agente. Os responsáveis atuais continuam visíveis. Vale na hora."
 # context: label of the repository row that overrides the global "Post as" name
-post_as_label = "Post as"
+post_as_label = "Publicar como"
 # context: help under the repository "Post as" row of the SSH & credentials page
-post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
+post_as_help = "O nome com que suas mensagens são publicadas no host e o nome usado para reconhecer seus próprios comentários (editar, excluir), por exemplo my-app[bot] para um GitHub App. Necessário só com um token de bot: se ficar vazio, o GitPoulpi pergunta ao host e aprende o nome na primeira mensagem que publica. Só para este repositório; vazio, vale a configuração global."
 repo_helper_line = "{value}  ({origin})"
 repo_helper_label = "Definido por este repositório"
 no_repo_helpers = "Este repositório não define nenhum auxiliar de credenciais próprio."
@@ -9950,219 +10006,428 @@ hint_next = "próximo"
 hint_default = "executar"
 
 [md_render]
-alert_note = "Note"
-alert_tip = "Tip"
-alert_important = "Important"
-alert_warning = "Warning"
-alert_caution = "Caution"
+# context: label of a Note alert block (a Markdown quote that starts with [!NOTE]); one word. Width budget: 14 cells
+alert_note = "Nota"
+# context: label of a Tip alert block ([!TIP]); one word. Width budget: 14 cells
+alert_tip = "Dica"
+# context: label of an Important alert block ([!IMPORTANT]); one word. Width budget: 14 cells
+alert_important = "Importante"
+# context: label of a Warning alert block ([!WARNING]); one word. Width budget: 14 cells
+alert_warning = "Aviso"
+# context: label of a Caution alert block ([!CAUTION]), the strongest of the five; one word. Width budget: 14 cells
+alert_caution = "Cuidado"
 
 [md_editor]
-mode_write = "Write"
-mode_preview = "Preview"
-mode_split = "Split"
-split_needs_width = "Split needs a window 100 columns wide."
-preview_updating = "updating..."
-preview_empty = "Nothing to preview yet."
-sent_as = "Sent as {markup}"
-discard_title = "Discard this text?"
-discard_body = "What you wrote will be lost."
-hint_preview = "Preview"
-hint_split = "Split"
-ai_button = "Write with AI"
-ai_button_short = "AI"
-ai_label = "What I want in this answer"
-ai_only_drafts = "The AI only writes a draft, nothing is posted."
-ai_placeholder = "for example: agree, and ask for a failing test"
-ai_improve = "Improve my draft"
-ai_repo = "Let the AI read the repository"
-ai_repo_no_clone = "no local clone"
-ai_repo_no_readonly = "no read-only mode"
-ai_repo_no_readonly_why = "This agent has no read-only mode GitPoulpi trusts."
-ai_repo_no_clone_why = "The repository is not cloned here, so there is nothing to read."
-ai_repo_not_here_why = "This text is written from the changes, not from the repository."
-ai_repo_not_here = "not for this text"
-ai_refresh = "Refresh context"
-ai_refreshed = "Context refreshed. The next draft reads the repository again."
-ai_ctx_built = "Context built: {parts} parts, {size}, HEAD {head}"
-ai_ctx_reused = "Context reused ({reused} of {parts} parts, HEAD {head})"
-ai_ctx_cache = "Provider cache: {tokens} tokens reused"
-ai_ctx_agent = "The agent read the repository (HEAD {head})"
-ai_ctx_session_started = "Agent session started"
-ai_ctx_session_continued = "Agent session continued"
-ai_recent = "Recent"
-ai_recent_none = "nothing yet"
-ai_draft = "Draft"
-ai_stop = "Stop"
-ai_close = "Close"
-ai_working = "Writing... {secs}s"
-ai_stopped = "Stopped."
-ai_done = "Draft ready. Read it, then send. Ctrl+Z gives your text back."
-ai_error = "AI: {why}"
-ai_keys = "Enter writes, Esc closes"
-ai_pick_branches = "Pick the branches first."
-ai_needs_repository = "Writing this description needs the repository: open it first."
-ai_job = "Writing a draft with AI"
-palette_refresh_context = "Markdown Editor: Refresh the AI Context"
-why_no_composer = "no text box with the AI writing help is open"
-why_no_repo_read = "tick \"Let the AI read the repository\" first"
-why_text_box_open = "close this text box first (only its AI commands work here)"
+# context: button of the Markdown editor: edit the text. Width budget: 10 cells
+mode_write = "Escrever"
+# context: button of the Markdown editor: show the text as it will look once posted. Width budget: 10 cells
+mode_preview = "Prévia"
+# context: button of the Markdown editor: the text on the left, its preview on the right. Width budget: 12 cells
+mode_split = "Lado a lado"
+# context: shown when Split is asked in a window that is too narrow for two panes. Width budget: 50 cells
+split_needs_width = "Lado a lado precisa de uma janela de 100 colunas."
+# context: small mark on a Preview that is being recomputed (a long text). Width budget: 16 cells
+preview_updating = "atualizando..."
+# context: shown in the Preview of an empty text. Width budget: 40 cells
+preview_empty = "Ainda não há o que mostrar."
+# context: dim line under a Preview: the host does not read Markdown, the text is converted; {markup} is the name of the format, like Jira wiki markup. Width budget: 40 cells
+sent_as = "Enviado como {markup}"
+# context: title of the confirmation that opens when closing a comment, reply or summary that still holds typed text. Width budget: 30 cells
+discard_title = "Descartar este texto?"
+# context: body of that confirmation
+discard_body = "O que você escreveu será perdido."
+# context: footer hint of the Markdown editor, after the key that toggles the Preview. Width budget: 14 cells
+hint_preview = "Prévia"
+# context: footer hint of the Markdown editor, after the key that toggles Split. Width budget: 14 cells
+hint_split = "Lado a lado"
+# context: button of the Markdown editor's mode bar: opens the AI writing help (a star is drawn before it). Width budget: 16 cells
+ai_button = "Escrever com IA"
+# context: same button when the bar is too narrow for the full label. Width budget: 4 cells
+ai_button_short = "IA"
+# context: label of the instruction field of the AI writing help: the user says what the text should contain. Width budget: 36 cells
+ai_label = "O que quero nesta resposta"
+# context: reminder next to that label. Width budget: 50 cells
+ai_only_drafts = "A IA só escreve um rascunho, nada é publicado."
+# context: placeholder of the instruction field. Width budget: 56 cells
+ai_placeholder = "por exemplo: concordar e pedir um teste que falhe"
+# context: checkbox: the AI starts from the text already typed instead of writing a new one. Width budget: 28 cells
+ai_improve = "Melhorar meu rascunho"
+# context: checkbox, unticked by default: the AI may read the repository for this draft. Width budget: 34 cells
+ai_repo = "Deixar a IA ler o repositório"
+# context: the reason the repository checkbox is disabled when the repository is not cloned here, in parentheses after it. Width budget: 24 cells
+ai_repo_no_clone = "sem clone local"
+# context: the reason the repository checkbox is disabled when the chosen local agent has no read-only mode GitPoulpi trusts, in parentheses after it. Width budget: 24 cells
+ai_repo_no_readonly = "sem modo somente leitura"
+# context: full sentence shown when the disabled repository checkbox is activated. Width budget: 70 cells
+ai_repo_no_readonly_why = "Este agente não tem um modo somente leitura em que o GitPoulpi confie."
+# context: full sentence shown when the disabled repository checkbox is activated and the repository is not cloned. Width budget: 70 cells
+ai_repo_no_clone_why = "O repositório não está clonado aqui, então não há nada para ler."
+# context: full sentence shown when the disabled repository checkbox is activated on a text written from the changes. Width budget: 70 cells
+ai_repo_not_here_why = "Este texto é escrito a partir das alterações, não do repositório."
+# context: the reason the repository checkbox is disabled for a text that is already written from a diff (a pull request description), in parentheses after it. Width budget: 24 cells
+ai_repo_not_here = "não para este texto"
+# context: button: forget the repository context kept from earlier drafts and read the repository again. Width budget: 20 cells
+ai_refresh = "Atualizar contexto"
+# context: shown after the Refresh context button. Width budget: 64 cells
+ai_refreshed = "Contexto atualizado. O próximo rascunho lê o repositório de novo."
+# context: status after a draft that read the repository; {size} is like 31.2 KB, HEAD is the git word and stays. Width budget: 56 cells
+ai_ctx_built = "Contexto montado: {parts} partes, {size}, HEAD {head}"
+# context: status after a draft whose repository context came from the cache. Width budget: 56 cells
+ai_ctx_reused = "Contexto reaproveitado ({reused} de {parts} partes, HEAD {head})"
+# context: status: the AI service reused this many tokens of its own prompt cache. Width budget: 44 cells
+ai_ctx_cache = "Cache do provedor: {tokens} tokens reaproveitados"
+# context: status after a draft by a local agent that read the repository. Width budget: 44 cells
+ai_ctx_agent = "O agente leu o repositório (HEAD {head})"
+# context: status: the local agent's session began with this draft. Width budget: 30 cells
+ai_ctx_session_started = "Sessão do agente iniciada"
+# context: status: the local agent continued its session from the previous draft. Width budget: 30 cells
+ai_ctx_session_continued = "Sessão do agente continuada"
+# context: the reason that checkbox is disabled, shown in parentheses after it. Width budget: 24 cells
+# context: label before the list of instructions typed before. Width budget: 12 cells
+ai_recent = "Recentes"
+# context: shown after that label when the list is empty. Width budget: 24 cells
+ai_recent_none = "nada ainda"
+# context: button: ask the AI for a draft. Width budget: 12 cells
+ai_draft = "Redigir"
+# context: button: stop the AI request that is running. Width budget: 12 cells
+ai_stop = "Parar"
+# context: button: close the AI writing help. Width budget: 12 cells
+ai_close = "Fechar"
+# context: shown while the AI writes; {secs} is the number of seconds so far. Width budget: 24 cells
+ai_working = "Escrevendo... {secs}s"
+# context: shown after the user stopped the AI request. Width budget: 24 cells
+ai_stopped = "Interrompido."
+# context: shown after the AI filled the editor; Ctrl+Z is a key. Width budget: 64 cells
+ai_done = "Rascunho pronto. Leia e depois envie. Ctrl+Z devolve o seu texto."
+# context: inline error of the AI writing help; {why} is the reason. Width budget: 70 cells
+ai_error = "IA: {why}"
+# context: key hints in the AI writing help; Enter and Esc are key names. Width budget: 30 cells
+ai_keys = "Enter escreve, Esc fecha"
+# context: shown when the AI is asked for a pull request description before both branches are chosen. Width budget: 40 cells
+ai_pick_branches = "Escolha antes as branches."
+# context: shown when the AI is asked for a pull request description without a local repository. Width budget: 70 cells
+ai_needs_repository = "Escrever esta descrição exige o repositório: abra-o antes."
+# context: name of the AI writing job in the jobs list. Width budget: 40 cells
+ai_job = "Redigindo um rascunho com IA"
+# context: command palette entry: forget the repository context kept for the AI writing help (the Refresh context button of its panel)
+palette_refresh_context = "Editor Markdown: atualizar o contexto da IA"
+# context: palette: why the Write with AI and Refresh context commands do nothing
+why_no_composer = "nenhuma caixa de texto com ajuda de escrita da IA está aberta"
+# context: palette: why Refresh context does nothing; the quoted text is the checkbox label
+why_no_repo_read = "marque antes “Deixar a IA ler o repositório”"
+# context: palette: why a command is grayed out while a text box with the AI writing help is open over the window
+why_text_box_open = "feche antes esta caixa de texto (aqui só funcionam os comandos de IA dela)"
 
 [ai_hosting_reply]
-base_prompt_label = "Base prompt"
-base_prompt_help = "The instructions every drafted reply and issue description starts from. Empty uses the built-in prompt. Your global, workspace and repository instructions still follow it, and text written by other people is always marked as untrusted in the request."
-repo_heading = "Repository access"
-read_repository_label = "Let the AI read the repository by default"
-read_repository_help = "Off by default. When on, the choice \"Let the AI read the repository\" starts ticked each time you ask for a draft; you can change it every time."
-reuse_session_label = "Keep the agent's session between replies"
-reuse_session_help = "A local agent that supports it keeps what it read of the repository between two drafts, so the next one starts faster. Takes effect once the AI may read the repository."
-context_ttl_label = "Keep a repository context for (minutes)"
-context_ttl_help = "How long what was gathered from the repository for a draft is reused by the next ones. A change in the repository always starts over. 30 by default. Takes effect once the AI may read the repository."
+# context: Settings > AI, label of the editor row for the base prompt of the AI replies on a host and issue descriptions
+base_prompt_label = "Prompt base"
+# context: help under that row
+base_prompt_help = "As instruções de que parte toda resposta e toda descrição de issue redigida. Vazio usa o prompt embutido. Suas instruções globais, do workspace e do repositório continuam vindo depois, e o texto escrito por outras pessoas é sempre marcado como não confiável na requisição."
+# context: Settings > AI, heading of the rows about letting the AI read the repository when it drafts a reply
+repo_heading = "Acesso ao repositório"
+# context: Settings > AI, label of a switch: whether the choice "Let the AI read the repository" starts ticked
+read_repository_label = "Deixar a IA ler o repositório por padrão"
+# context: help under that switch
+read_repository_help = "Desligado por padrão. Ligado, a opção “Deixar a IA ler o repositório” já vem marcada a cada pedido de rascunho; você pode mudar a cada vez."
+# context: Settings > AI, label of a switch: keep a local agent's session between two drafts
+reuse_session_label = "Manter a sessão do agente entre respostas"
+# context: help under that switch
+reuse_session_help = "Um agente local que aceita isso guarda o que leu do repositório entre dois rascunhos, e o próximo começa mais rápido. Vale quando a IA pode ler o repositório."
+# context: Settings > AI, label of a number: how many minutes a context built from the repository is reused
+context_ttl_label = "Manter um contexto do repositório por (minutos)"
+# context: help under that number
+context_ttl_help = "Por quanto tempo o que foi reunido do repositório para um rascunho é reaproveitado pelos seguintes. Uma mudança no repositório sempre recomeça do zero. 30 por padrão. Vale quando a IA pode ler o repositório."
 
 [conversation_ui]
+# context: tag after the name of an author that is a bot account. Width budget: 6 cells
 bot = "bot"
-edited = "edited"
-internal = "internal"
-new = "new"
+# context: tag after a comment's time: it was changed after it was posted. Width budget: 10 cells
+edited = "editado"
+# context: tag on a comment only project members can see. Width budget: 10 cells
+internal = "interno"
+# context: tag on an entry newer than the user's last visit. Width budget: 8 cells
+new = "novo"
+# context: start of the headline of a conversation about a piece of code. Width budget: 10 cells
 thread = "Thread"
-resolved = "resolved"
-unresolved = "unresolved"
-outdated = "outdated"
-btn_reply = "Reply"
-btn_edit = "Edit"
-btn_delete = "Delete"
+# context: state of a code thread that was resolved. Width budget: 12 cells
+resolved = "resolvida"
+# context: state of a code thread that is still open. Width budget: 14 cells
+unresolved = "não resolvida"
+# context: state of a code thread whose code has changed since. Width budget: 12 cells
+outdated = "desatualizada"
+# context: button on the selected comment: answer it. Width budget: 12 cells
+btn_reply = "Responder"
+# context: button on the selected comment: change your own comment. Width budget: 12 cells
+btn_edit = "Editar"
+# context: button on the selected comment: delete your own comment. Width budget: 12 cells
+btn_delete = "Excluir"
+# context: button on the selected comment: lists the links in it. Width budget: 10 cells
 btn_links = "Links"
-review_approved = "approved"
-review_changes = "requested changes"
-review_commented = "reviewed"
-review_dismissed = "dismissed"
-ev_opened = "opened this"
-ev_closed = "closed this"
-ev_reopened = "reopened this"
-ev_merged = "{$merge}d this {$pr}"
-ev_label_added = "added the label {labels}"
-ev_label_removed = "removed the label {labels}"
-ev_label_changed = "added {added} and removed {removed} labels"
-ev_assigned = "assigned {who}"
-ev_unassigned = "unassigned {who}"
-ev_assignees_changed = "assigned {added} and unassigned {removed}"
-ev_renamed = "renamed this from {from} to {to}"
-ev_pushed = { one = "added {n} {$commit}", other = "added {n} {$commits}" }
-ev_pushed_head = { one = "added {n} {$commit} (now {head})", other = "added {n} {$commits} (now {head})" }
-ev_referenced = "mentioned this in {from}"
-ev_status = "changed the status from {from} to {to}"
-ev_review_requested = "requested a review from {who}"
-btn_quote = "Quote"
+# context: verdict of a submitted review, after the reviewer's name. Width budget: 20 cells
+review_approved = "aprovou"
+# context: verdict of a submitted review, after the reviewer's name. Width budget: 26 cells
+review_changes = "pediu alterações"
+# context: verdict of a submitted review, after the reviewer's name. Width budget: 20 cells
+review_commented = "revisou"
+# context: verdict of a review that was dismissed. Width budget: 20 cells
+review_dismissed = "revisão dispensada"
+# context: event line, after the actor's name. Width budget: 30 cells
+ev_opened = "abriu isto"
+# context: event line, after the actor's name. Width budget: 30 cells
+ev_closed = "fechou isto"
+# context: event line, after the actor's name. Width budget: 30 cells
+ev_reopened = "reabriu isto"
+# context: event line, after the actor's name; {$pr} is the pull or merge request. Width budget: 40 cells
+ev_merged = "fez a {$merge} desta {$pr}"
+# context: event line, after the actor's name; {labels} are the added labels. Width budget: 50 cells
+ev_label_added = "adicionou a etiqueta {labels}"
+# context: event line, after the actor's name; {labels} are the removed labels. Width budget: 50 cells
+ev_label_removed = "removeu a etiqueta {labels}"
+# context: event line, after the actor's name; the labels that were added and removed. Width budget: 60 cells
+ev_label_changed = "adicionou {added} e removeu {removed} das etiquetas"
+# context: event line, after the actor's name; {who} are the new assignees. Width budget: 50 cells
+ev_assigned = "atribuiu a {who}"
+# context: event line, after the actor's name; {who} are the people removed as assignees. Width budget: 50 cells
+ev_unassigned = "removeu a atribuição de {who}"
+# context: event line, after the actor's name; people added and removed as assignees. Width budget: 60 cells
+ev_assignees_changed = "atribuiu a {added} e removeu a atribuição de {removed}"
+# context: event line, after the actor's name; the old and the new title. Width budget: 60 cells
+ev_renamed = "renomeou isto de {from} para {to}"
+# context: event line, after the actor's name: commits were added to the request. Width budget: 40 cells
+ev_pushed = { one = "adicionou {n} {$commit}", other = "adicionou {n} {$commits}" }
+# context: event line, after the actor's name: commits were added to the request; {head} is the new tip. Width budget: 50 cells
+ev_pushed_head = { one = "adicionou {n} {$commit} (agora {head})", other = "adicionou {n} {$commits} (agora {head})" }
+# context: event line, after the actor's name; {from} names where it was mentioned. Width budget: 50 cells
+ev_referenced = "mencionou isto em {from}"
+# context: event line, after the actor's name; the old and the new status. Width budget: 50 cells
+ev_status = "mudou o status de {from} para {to}"
+# context: event line, after the actor's name; {who} is the reviewer asked. Width budget: 50 cells
+ev_review_requested = "pediu uma revisão a {who}"
+# context: button on the selected comment: reply with its text quoted. Width budget: 10 cells
+btn_quote = "Citar"
 
 [item_view]
-loading = "Loading the conversation..."
-load_failed = "could not load the conversation: {why}"
-load_stopped = "the conversation could not be read"
-not_readable = "This host does not offer a conversation for this item here."
-retry_hint = "Press F5 to try again."
-too_small = "The window is too small for the conversation."
-opened_this = "opened this"
-opened_by = "opened by {author} on {date}"
-comments_n = { one = "{n} comment", other = "{n} comments" }
-no_description = "No description."
-load_older = "Load older"
-load_older_n = "Load older ({n} more)"
-offline_banner = "Offline: showing the copy saved {age} ({why})"
-offline_banner_unknown = "Offline: showing the saved copy ({why})"
-age_now = "just now"
-age_minutes = "{n} min ago"
-age_hours = "{n} h ago"
-age_days = { one = "{n} day ago", other = "{n} days ago" }
-btn_back = "Back"
-btn_refresh = "Refresh"
-btn_browser = "Open in browser"
-show_events = "Show events"
-refreshing = "Refreshing..."
-posting_as_profile = "Posting as {name} (personal token)"
-posting_as_command = "Posting as {name} (repository token command)"
-writing_as_local = "Writing as {name} (local note)"
-posting_unknown = "Who you would post as is not known yet. Set Post as in Settings."
-read_only_note = "Read only: this host does not take comments from here."
-new_comment = "New comment"
-composer_placeholder = "Write a comment (Markdown)..."
-btn_send = "Send"
-btn_cancel = "Cancel"
-hint_move = "move"
-hint_reply = "reply"
-hint_comment = "comment"
+# context: shown while the conversation is read from the host. Width budget: 40 cells
+loading = "Carregando a conversa..."
+# context: error; {why} is the host's message. Width budget: 70 cells
+load_failed = "não foi possível carregar a conversa: {why}"
+# context: error when a background read ended without an answer. Width budget: 50 cells
+load_stopped = "não foi possível ler a conversa"
+# context: shown when the host has no conversation to read for the item. Width budget: 70 cells
+not_readable = "Este host não oferece uma conversa para este item aqui."
+# context: shown after the conversation failed to load. Width budget: 40 cells
+retry_hint = "Pressione F5 para tentar de novo."
+# context: shown when the window is too small for the conversation. Width budget: 50 cells
+too_small = "A janela é pequena demais para a conversa."
+# context: after the author's name above the description. Width budget: 20 cells
+opened_this = "abriu isto"
+# context: header line: {author} opened the item on {date}. Width budget: 50 cells
+opened_by = "aberto por {author} em {date}"
+# context: header line: how many comments the item has. Width budget: 18 cells
+comments_n = { one = "{n} comentário", other = "{n} comentários" }
+# context: shown under the author of an item that has no description. Width budget: 30 cells
+no_description = "Sem descrição."
+# context: button above the timeline: reads the older entries. Width budget: 26 cells
+load_older = "Carregar anteriores"
+# context: button above the timeline: {n} older entries are known. Width budget: 34 cells
+load_older_n = "Carregar anteriores (mais {n})"
+# context: banner: the host cannot be reached, the saved copy is shown; {age} is how old it is (3 min ago), {why} the error. Width budget: 90 cells
+offline_banner = "Offline: mostrando a cópia salva {age} ({why})"
+# context: banner: the host cannot be reached, the saved copy is shown; {why} is the error. Width budget: 80 cells
+offline_banner_unknown = "Offline: mostrando a cópia salva ({why})"
+# context: how old a saved copy is. Width budget: 14 cells
+age_now = "agora mesmo"
+# context: how old a saved copy is. Width budget: 14 cells
+age_minutes = "há {n} min"
+# context: how old a saved copy is. Width budget: 14 cells
+age_hours = "há {n} h"
+# context: how old a saved copy is. Width budget: 16 cells
+age_days = { one = "há {n} dia", other = "há {n} dias" }
+# context: button of the header: back to the item the view came from. Width budget: 10 cells
+btn_back = "Voltar"
+# context: button of the header: read the conversation again. Width budget: 12 cells
+btn_refresh = "Atualizar"
+# context: button of the header: open the item's page on the host. Width budget: 28 cells
+btn_browser = "Abrir no navegador"
+# context: checkbox of the header: show the system events (labels, status changes). Width budget: 26 cells
+show_events = "Mostrar eventos"
+# context: shown while the conversation is read again. Width budget: 16 cells
+refreshing = "Atualizando..."
+# context: who a comment would be posted as; {name} is the account of the profile's token. Width budget: 60 cells
+posting_as_profile = "Publicando como {name} (token pessoal)"
+# context: who a comment would be posted as; {name} is the account of the repository's token command (a bot). Width budget: 70 cells
+posting_as_command = "Publicando como {name} (comando de token do repositório)"
+# context: who a comment in a local note would be written as. Width budget: 60 cells
+writing_as_local = "Escrevendo como {name} (nota local)"
+# context: shown when who a comment would be posted as is not known yet. Width budget: 80 cells
+posting_unknown = "Ainda não se sabe como você publicaria. Defina Publicar como nas Configurações."
+# context: shown in place of the posting line when the host takes no comments. Width budget: 70 cells
+read_only_note = "Somente leitura: este host não aceita comentários daqui."
+# context: title of the comment box under the timeline. Width budget: 24 cells
+new_comment = "Novo comentário"
+# context: placeholder of the comment box. Width budget: 40 cells
+composer_placeholder = "Escreva um comentário (Markdown)..."
+# context: button under the comment box: post the comment. Width budget: 10 cells
+btn_send = "Enviar"
+# context: button under the comment box: put the box away. Width budget: 10 cells
+btn_cancel = "Cancelar"
+# context: footer hint after the arrow keys. Width budget: 10 cells
+hint_move = "mover"
+# context: footer hint after the reply key. Width budget: 10 cells
+hint_reply = "responder"
+# context: footer hint after the new comment key. Width budget: 12 cells
+hint_comment = "comentar"
+# context: footer hint after the links key. Width budget: 8 cells
 hint_links = "links"
-hint_unread = "next unread"
-hint_browser = "browser"
-hint_back = "back"
-hint_close = "close"
-why_no_view = "no conversation is open"
-why_no_back = "there is nothing to go back to"
-why_not_loaded = "the conversation is still loading"
-why_no_older = "there are no older entries"
-why_no_unread = "nothing new since your last visit"
-why_no_composer = "this host does not take comments from here"
-why_no_links = "the selected entry has no links"
-open_diagram = "Open diagram"
-link_diagram = "Diagram: {first}"
-why_no_diagram = "the selected entry has no diagram"
-palette_open_diagram = "Conversation: Open Diagram of Entry"
-why_no_url = "this entry has no page on the host"
-why_no_events = "this host does not list events"
-why_no_reply = "this host does not take a reply to this entry"
-why_offline = "the host cannot be reached"
-why_no_comment = "this host does not take comments from here"
-why_no_edit = "this host does not let you edit comments"
-why_no_delete = "this host does not let you delete comments"
-why_not_yours = "only your own comments can be changed"
-why_empty = "write something first"
-why_too_long = "the text is longer than the host takes"
-why_no_conversation = "this item has no conversation to read here, open it in the browser"
+# context: footer hint after the next unread key. Width budget: 14 cells
+hint_unread = "próximo não lido"
+# context: footer hint after the open in browser key. Width budget: 12 cells
+hint_browser = "navegador"
+# context: footer hint after the back key. Width budget: 8 cells
+hint_back = "voltar"
+# context: footer hint after the Esc key. Width budget: 8 cells
+hint_close = "fechar"
+# context: why a palette row does nothing. Width budget: 50 cells
+why_no_view = "nenhuma conversa está aberta"
+# context: why Back does nothing. Width budget: 50 cells
+why_no_back = "não há para onde voltar"
+# context: why a row does nothing. Width budget: 50 cells
+why_not_loaded = "a conversa ainda está carregando"
+# context: why Load older does nothing. Width budget: 50 cells
+why_no_older = "não há entradas anteriores"
+# context: why Next unread does nothing. Width budget: 50 cells
+why_no_unread = "nada de novo desde a sua última visita"
+# context: why a comment box row does nothing. Width budget: 60 cells
+why_no_composer = "este host não aceita comentários daqui"
+# context: why the links list does nothing. Width budget: 50 cells
+why_no_links = "a entrada selecionada não tem links"
+# context: button under a Mermaid block of a conversation; opens the diagram viewer. Width budget: 20 cells
+open_diagram = "Abrir diagrama"
+# context: row of the links list: a Mermaid diagram; {first} is its first line. Width budget: 40 cells
+link_diagram = "Diagrama: {first}"
+# context: why Open Diagram does nothing. Width budget: 50 cells
+why_no_diagram = "a entrada selecionada não tem diagrama"
+# context: command palette entry
+palette_open_diagram = "Conversa: abrir o diagrama da entrada"
+# context: why copying or opening does nothing. Width budget: 50 cells
+why_no_url = "esta entrada não tem página no host"
+# context: why the events checkbox does nothing. Width budget: 50 cells
+why_no_events = "este host não lista eventos"
+# context: why Reply does nothing. Width budget: 60 cells
+why_no_reply = "este host não aceita resposta a esta entrada"
+# context: why a post does nothing. Width budget: 50 cells
+why_offline = "não foi possível alcançar o host"
+# context: why a post does nothing. Width budget: 60 cells
+why_no_comment = "este host não aceita comentários daqui"
+# context: why Edit does nothing. Width budget: 60 cells
+why_no_edit = "este host não permite editar comentários"
+# context: why Delete does nothing. Width budget: 60 cells
+why_no_delete = "este host não permite excluir comentários"
+# context: why Edit or Delete does nothing. Width budget: 60 cells
+why_not_yours = "só os seus próprios comentários podem ser alterados"
+# context: why Send does nothing. Width budget: 40 cells
+why_empty = "escreva algo antes"
+# context: why Send does nothing. Width budget: 40 cells
+why_too_long = "o texto é maior do que o host aceita"
+# context: status line: the item has no conversation to read in the app. Width budget: 80 cells
+why_no_conversation = "este item não tem conversa para ler aqui, abra-o no navegador"
+# context: what was copied: a link, in 'Copied link: ...'. Width budget: 12 cells
 noun_link = "link"
-nothing_to_open = "nothing to open"
+# context: status line: a link has no address. Width budget: 40 cells
+nothing_to_open = "nada para abrir"
+# context: row of the links list: an issue; {key} is its reference. Width budget: 40 cells
 link_issue = "issue {key}"
+# context: row of the links list: a pull or merge request; {key} is its reference. Width budget: 40 cells
 link_request = "{$pr} {key}"
+# context: row of the links list: a commit; {sha} is its abbreviated id. Width budget: 40 cells
 link_commit = "{$commit} {sha}"
-open_conversation = "Open conversation"
-menu_pick_conversation = "Open conversation"
-palette_open_conversation = "Hosting: Open Issue Conversation..."
-palette_radar_conversation = "Radar: Open Issue Conversation"
-palette_back = "Conversation: Back"
-palette_refresh = "Conversation: Refresh"
-palette_load_older = "Conversation: Load Older Entries"
-palette_prev_entry = "Conversation: Previous Entry"
-palette_next_entry = "Conversation: Next Entry"
-palette_next_unread = "Conversation: Next Unread Entry"
-palette_reply = "Conversation: Reply to Entry"
-palette_new_comment = "Conversation: New Comment"
-palette_links = "Conversation: Links of Entry..."
-palette_copy_link = "Conversation: Copy Link of Entry"
-palette_open_browser = "Conversation: Open in Browser"
-palette_edit = "Conversation: Edit Comment"
-palette_delete = "Conversation: Delete Comment"
-palette_toggle_events = "Conversation: Show or Hide Events"
-palette_toggle_preview = "Conversation: Toggle Write and Preview"
-palette_toggle_split = "Conversation: Toggle the Split View"
-palette_send = "Conversation: Send the Comment"
-palette_close = "Conversation: Close"
-posting_as_app_bot = "Posting as {name} (GitHub App bot)"
-posting_app_bot_unknown = "Posting as the GitHub App bot (its name is not known yet: set Post as in Settings)"
-posting_as_project_bot = "Posting as {name} (project bot)"
-btn_save = "Save"
-composer_reply_title = "Reply to {who}"
-composer_edit_title = "Edit comment"
-sending = "Sending..."
-internal_note = "Internal note"
-why_composer_busy = "finish or cancel the text in the comment box first"
-why_sending = "a comment is being sent"
-why_no_internal = "this host has no internal notes"
-why_unsent = "this comment is not on the host yet"
-delete_title = "Delete this comment?"
-delete_body = "It is removed from the host for everyone. This cannot be undone from here."
-delete_confirm = "Delete"
-delete_keep = "Keep"
-send_failed = "not sent: {why}"
-edit_failed = "not saved: {why}"
-delete_failed = "not deleted: {why}"
-palette_quote = "Conversation: Quote Entry"
-palette_toggle_internal = "Conversation: Toggle Internal Note"
-why_unchanged = "nothing changed yet"
-flavor_plain_text = "Plain text"
+# context: row menu entry: read the issue or request in the app. Width budget: 30 cells
+open_conversation = "Abrir conversa"
+# context: title of the list of issues offered by the palette command. Width budget: 40 cells
+menu_pick_conversation = "Abrir conversa"
+# context: command palette entry
+palette_open_conversation = "Host: abrir a conversa de uma issue..."
+# context: command palette entry: acts on the selected Radar row
+palette_radar_conversation = "Radar: abrir a conversa da issue"
+# context: command palette entry
+palette_back = "Conversa: voltar"
+# context: command palette entry
+palette_refresh = "Conversa: atualizar"
+# context: command palette entry
+palette_load_older = "Conversa: carregar entradas anteriores"
+# context: command palette entry
+palette_prev_entry = "Conversa: entrada anterior"
+# context: command palette entry
+palette_next_entry = "Conversa: próxima entrada"
+# context: command palette entry
+palette_next_unread = "Conversa: próxima entrada não lida"
+# context: command palette entry
+palette_reply = "Conversa: responder à entrada"
+# context: command palette entry
+palette_new_comment = "Conversa: novo comentário"
+# context: command palette entry: lists the links of the selected entry
+palette_links = "Conversa: links da entrada..."
+# context: command palette entry
+palette_copy_link = "Conversa: copiar o link da entrada"
+# context: command palette entry
+palette_open_browser = "Conversa: abrir no navegador"
+# context: command palette entry
+palette_edit = "Conversa: editar comentário"
+# context: command palette entry
+palette_delete = "Conversa: excluir comentário"
+# context: command palette entry
+palette_toggle_events = "Conversa: mostrar ou ocultar eventos"
+# context: command palette entry
+palette_toggle_preview = "Conversa: alternar Escrever e Prévia"
+# context: command palette entry
+palette_toggle_split = "Conversa: alternar a visão lado a lado"
+# context: command palette entry
+palette_send = "Conversa: enviar o comentário"
+# context: command palette entry
+palette_close = "Conversa: fechar"
+# context: who a comment would be posted as; {name} is the login of the GitHub App bot. Width budget: 70 cells
+posting_as_app_bot = "Publicando como {name} (bot de GitHub App)"
+# context: who a comment would be posted as when the bot login is not known. Width budget: 100 cells
+posting_app_bot_unknown = "Publicando como o bot do GitHub App (seu nome ainda não é conhecido: defina Publicar como nas Configurações)"
+# context: who a comment would be posted as; {name} is the login of a project or group access token bot. Width budget: 70 cells
+posting_as_project_bot = "Publicando como {name} (bot do projeto)"
+# context: button under the comment box when an own comment is edited: save the change. Width budget: 12 cells
+btn_save = "Salvar"
+# context: title of the comment box when answering a thread; {who} is the author or the place in the code. Width budget: 40 cells
+composer_reply_title = "Responder a {who}"
+# context: title of the comment box when an own comment is edited. Width budget: 24 cells
+composer_edit_title = "Editar comentário"
+# context: shown in the comment box while the host takes the comment. Width budget: 14 cells
+sending = "Enviando..."
+# context: checkbox under the comment box: only project members see the note. Width budget: 26 cells
+internal_note = "Nota interna"
+# context: why Reply, Edit or Quote does nothing. Width budget: 60 cells
+why_composer_busy = "termine ou cancele antes o texto da caixa de comentário"
+# context: why a comment action does nothing. Width budget: 40 cells
+why_sending = "um comentário está sendo enviado"
+# context: why the internal note row does nothing. Width budget: 50 cells
+why_no_internal = "este host não tem notas internas"
+# context: why Edit or Delete does nothing on a comment still being sent. Width budget: 50 cells
+why_unsent = "este comentário ainda não está no host"
+# context: title of the question before a comment is deleted. Width budget: 40 cells
+delete_title = "Excluir este comentário?"
+# context: question before a comment is deleted. Width budget: 100 cells
+delete_body = "Ele é removido do host para todos. Isso não pode ser desfeito daqui."
+# context: button that deletes the comment. Width budget: 12 cells
+delete_confirm = "Excluir"
+# context: button that keeps the comment. Width budget: 12 cells
+delete_keep = "Manter"
+# context: error under the comment box; {why} is the host's message. Width budget: 100 cells
+send_failed = "não enviado: {why}"
+# context: error under the comment box; {why} is the host's message. Width budget: 100 cells
+edit_failed = "não salvo: {why}"
+# context: message when the host refused to delete a comment; {why} is its message. Width budget: 100 cells
+delete_failed = "não excluído: {why}"
+# context: command palette entry
+palette_quote = "Conversa: citar a entrada"
+# context: command palette entry
+palette_toggle_internal = "Conversa: alternar nota interna"
+# context: why Save does nothing when the edited comment has the same text. Width budget: 40 cells
+why_unchanged = "nada mudou ainda"
+# context: name of the text format a host takes when it has no markup, shown in the composer footer. Width budget: 20 cells
+flavor_plain_text = "Texto simples"

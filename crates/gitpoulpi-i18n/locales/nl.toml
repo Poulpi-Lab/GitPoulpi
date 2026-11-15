@@ -349,10 +349,10 @@ include_untracked_in_autostash = { git = "Niet-gevolgde bestanden opnemen in aut
 include_untracked_in_autostash_help = { git = "Of de automatische stash ook niet-gevolgde bestanden meeneemt (anders worden alleen gevolgde wijzigingen gestasht en teruggezet).", local = "Of de automatische berging ook niet-gevolgde bestanden meeneemt (anders worden alleen gevolgde wijzigingen in berging gezet en teruggezet)." }
 hosting_refresh_minutes = "Vernieuwing {$prs} & issues"
 hosting_refresh_minutes_help = { git = "Hoe vaak de lijsten {$prs} en Issues in de zijbalk (en de chip van de gekoppelde {$pr_abbr} in de werkbalk) de host opnieuw vragen. 0 zet de timer uit; ze vernieuwen nog steeds bij het openen van een repository, bij een branchwissel, na een push of fetch en op verzoek.", local = "Hoe vaak de lijsten {$prs} en Issues in de zijbalk (en de chip van de gekoppelde {$pr_abbr} in de werkbalk) de host opnieuw vragen. 0 zet de timer uit; ze vernieuwen nog steeds bij het openen van een repository, bij een branchwissel, na een push of ophalen en op verzoek." }
-# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
+# context: label of the row that sets the name messages to a host are posted as (a bot such as my-app[bot])
 hosting_post_as = "Post as"
 # context: help under the "Post as" row of Settings
-hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
+hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example my-app[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
 pr_terminology = "Terminologie voor reviewverzoeken"
 pr_terminology_help = { git = "Het woord voor een gehost codereviewverzoek, overal in de TUI. Auto volgt de host van de repository: Merge request voor GitLab, Pull request voor de andere hosts. Pull request of Merge request dwingt dat woord af. Geldt meteen.", local = "Het woord voor een gehost codereviewverzoek, overal in de TUI. Auto volgt de host van de repository: Samenvoegaanvraag voor GitLab, Pull request voor de andere hosts. Pull request of Samenvoegaanvraag dwingt dat woord af. Geldt meteen." }
 hide_finished_pr_chip = { git = "{$Pr}-chip verbergen als de {$pr} gesloten of gemerged is", local = "{$Pr}-chip verbergen als de {$pr} gesloten of samengevoegd is" }
@@ -9484,7 +9484,7 @@ assignment_help = "Blocked: nothing can be assigned in this repository's issues 
 # context: label of the repository row that overrides the global "Post as" name
 post_as_label = "Post as"
 # context: help under the repository "Post as" row of the SSH & credentials page
-post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
+post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example my-app[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
 repo_helper_line = "{value}  ({origin})"
 repo_helper_label = "Ingesteld door deze repository"
 no_repo_helpers = "Deze repository stelt geen eigen credential helper in."

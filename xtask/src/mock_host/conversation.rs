@@ -6,7 +6,7 @@
 //!   pull request's code threads come from the review module's GraphQL).
 //!   A token that starts with `ghs_` is an App installation token: `GET /user`
 //!   answers 403 "Resource not accessible by integration", GraphQL `viewer`
-//!   is not served, and a post comes back authored by `poulpi-lab[bot]`.
+//!   is not served, and a post comes back authored by `my-app[bot]`.
 //! - GitLab side: issue `#31` of any project and the merge request `!58`
 //!   of the review module (discussions are the review module's).
 //! - Azure DevOps Server (`kind = "azure_devops_server"`, `url =
@@ -27,7 +27,7 @@ pub const GITLAB_ISSUE: u64 = 31;
 /// The pull request id on the Azure DevOps side.
 pub const AZURE_PR: u64 = 9;
 /// Who an App installation token posts as.
-pub const BOT_LOGIN: &str = "poulpi-lab[bot]";
+pub const BOT_LOGIN: &str = "my-app[bot]";
 
 const AZURE_THREADS: &str = include_str!(
     "../../../crates/gitpoulpi-hosting/src/azure_devops/fixtures/conversation/threads.json"

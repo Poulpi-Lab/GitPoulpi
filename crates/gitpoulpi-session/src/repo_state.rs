@@ -269,7 +269,7 @@ pub struct RepoState {
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub assignment_blocked: bool,
     /// "Post as" for this repository (a bot's name such as
-    /// `poulpi-lab[bot]`), overriding `general.hosting_post_as`. `None`:
+    /// `my-app[bot]`), overriding `general.hosting_post_as`. `None`:
     /// the global one applies.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hosting_post_as: Option<String>,

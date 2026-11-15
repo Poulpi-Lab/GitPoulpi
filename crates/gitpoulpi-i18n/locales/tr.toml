@@ -350,10 +350,10 @@ include_untracked_in_autostash = { git = "Otomatik stash'e izlenmeyen dosyaları
 include_untracked_in_autostash_help = { git = "Otomatik stash'in izlenmeyen dosyaları da alıp almayacağı (aksi halde yalnızca izlenen değişiklikler stash'lenir ve geri konur).", local = "Otomatik saklamanın izlenmeyen dosyaları da alıp almayacağı (aksi halde yalnızca izlenen değişiklikler saklanır ve geri konur)." }
 hosting_refresh_minutes = { git = "{$prs} ve Issue Yenileme", local = "{$^prs} ve Issue Yenileme" }
 hosting_refresh_minutes_help = { git = "Kenar çubuğunun {$prs} ve Issue listelerinin (ve araç çubuğundaki bağlı {$pr_abbr} çipinin) barındırıcıya ne sıklıkla yeniden sorduğu. 0 zamanlayıcıyı kapatır; bir depo açılırken, dal değişince, push veya fetch sonrasında ve istek üzerine yine yenilenirler.", local = "Kenar çubuğunun {$prs} ve Issue listelerinin (ve araç çubuğundaki bağlı {$pr_abbr} çipinin) barındırıcıya ne sıklıkla yeniden sorduğu. 0 zamanlayıcıyı kapatır; bir depo açılırken, dal değişince, gönderme veya getirme sonrasında ve istek üzerine yine yenilenirler." }
-# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
+# context: label of the row that sets the name messages to a host are posted as (a bot such as my-app[bot])
 hosting_post_as = "Post as"
 # context: help under the "Post as" row of Settings
-hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
+hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example my-app[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
 pr_terminology = "İnceleme isteği terimi"
 pr_terminology_help = "TUI'nin her yerinde barındırılan bir kod inceleme isteği için kullanılan sözcük. Otomatik deponun barındırıcısını izler: GitLab için Merge Request, diğer barındırıcılar için Pull Request. Pull Request veya Merge Request o sözcüğü zorlar. Hemen uygulanır."
 hide_finished_pr_chip = { git = "{$pr} çipini, kapatıldığında veya merge edildiğinde gizle", local = "{$pr} çipini, kapatıldığında veya birleştirildiğinde gizle" }
@@ -9489,7 +9489,7 @@ assignment_help = "Blocked: nothing can be assigned in this repository's issues 
 # context: label of the repository row that overrides the global "Post as" name
 post_as_label = "Post as"
 # context: help under the repository "Post as" row of the SSH & credentials page
-post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
+post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example my-app[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
 repo_helper_line = "{value}  ({origin})"
 repo_helper_label = "Bu depo tarafından ayarlanan"
 no_repo_helpers = "Bu depo kendi kimlik bilgisi yardımcısını ayarlamamış."

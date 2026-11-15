@@ -349,10 +349,10 @@ include_untracked_in_autostash = { git = "自动 {$stash} 包含未跟踪文件"
 include_untracked_in_autostash_help = { git = "自动 {$stash} 是否也包含未跟踪的文件（否则只 {$stash} 并恢复已跟踪的更改）。", local = "自动{$stash}是否也包含未跟踪的文件（否则只{$stash}并恢复已跟踪的更改）。" }
 hosting_refresh_minutes = { git = "{$prs} 和议题刷新间隔", local = "{$PRS}和议题刷新间隔" }
 hosting_refresh_minutes_help = { git = "侧栏的 {$prs} 和议题列表（以及工具栏中已关联 {$pr_abbr} 的 {$tag}）多久向托管平台重新查询一次。0 表示关闭定时器；打开仓库、切换分支、{$push} 或 {$fetch} 之后，以及手动操作时仍会刷新。", local = "侧栏的{$prs}和议题列表（以及工具栏中已关联{$pr_abbr}的{$tag}）多久向托管平台重新查询一次。0 表示关闭定时器；打开仓库、切换分支、{$push}或{$fetch}之后，以及手动操作时仍会刷新。" }
-# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
+# context: label of the row that sets the name messages to a host are posted as (a bot such as my-app[bot])
 hosting_post_as = "Post as"
 # context: help under the "Post as" row of Settings
-hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
+hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example my-app[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
 pr_terminology = "评审请求术语"
 pr_terminology_help = "界面中托管平台代码评审请求所使用的称呼。“自动”跟随仓库的托管平台：GitLab 用 Merge Request，其他平台用 Pull Request。选择 Pull Request 或 Merge Request 则强制使用该称呼。立即生效。"
 hide_finished_pr_chip = { git = "{$pr} 已关闭或已 {$merge} 时隐藏其徽章", local = "{$pr}已关闭或已{$merge}时隐藏其徽章" }
@@ -9486,7 +9486,7 @@ assignment_help = "Blocked: nothing can be assigned in this repository's issues 
 # context: label of the repository row that overrides the global "Post as" name
 post_as_label = "Post as"
 # context: help under the repository "Post as" row of the SSH & credentials page
-post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
+post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example my-app[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
 repo_helper_line = "{value}  ({origin})"
 repo_helper_label = "此仓库设置的"
 no_repo_helpers = "此仓库没有设置自己的凭据助手。"

@@ -159,7 +159,7 @@ pub struct GeneralConfig {
     pub hosting_refresh_unit: DisplayUnit,
     /// Live: the name messages to a host are posted as when the repository's
     /// token is a bot's (a GitHub App installation token has no `GET /user`),
-    /// for example `poulpi-lab[bot]`. Shown in every composer and used to
+    /// for example `my-app[bot]`. Shown in every composer and used to
     /// recognise your own comments (edit, delete). Empty: GitPoulpi asks the
     /// host, then learns it from its first post. A repository can override
     /// it. (Named `general.hosting_post_as`: `hosting` is the legacy

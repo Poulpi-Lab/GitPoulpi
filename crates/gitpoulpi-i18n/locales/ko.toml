@@ -349,10 +349,10 @@ include_untracked_in_autostash = "자동 {$stash}에 추적되지 않는 파일 
 include_untracked_in_autostash_help = "자동 {$stash}가 추적되지 않는 파일도 포함할지 여부입니다 (꺼짐이면 추적 중인 변경 사항만 {$stash}하고 되돌립니다)."
 hosting_refresh_minutes = "{$prs} 및 이슈 새로 고침"
 hosting_refresh_minutes_help = { git = "사이드바의 {$prs}와 Issues 목록(및 도구 모음의 연결된 {$pr_abbr} 칩)이 호스트에 다시 요청하는 주기입니다. 0이면 타이머를 끕니다. 저장소를 열 때, 브랜치를 전환할 때, {$push}나 {$fetch} 후, 그리고 요청 시에는 계속 새로 고침됩니다.", local = "사이드바의 {$prs}와 이슈 목록(및 도구 모음의 연결된 {$pr_abbr} 칩)이 호스트에 다시 요청하는 주기입니다. 0이면 타이머를 끕니다. 저장소를 열 때, 브랜치를 전환할 때, {$push}나 {$fetch} 후, 그리고 요청 시에는 계속 새로 고침됩니다." }
-# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
+# context: label of the row that sets the name messages to a host are posted as (a bot such as my-app[bot])
 hosting_post_as = "Post as"
 # context: help under the "Post as" row of Settings
-hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
+hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example my-app[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
 pr_terminology = "리뷰 요청 용어"
 pr_terminology_help = { git = "TUI 전체에서 호스팅되는 코드 리뷰 요청에 쓰는 용어입니다. 자동은 저장소의 호스트를 따릅니다: GitLab은 Merge Request, 그 외 호스트는 Pull Request. Pull Request 또는 Merge Request를 고르면 그 용어로 고정됩니다. 즉시 적용됩니다.", local = "TUI 전체에서 호스팅되는 코드 리뷰 요청에 쓰는 용어입니다. 자동은 저장소의 호스트를 따릅니다: GitLab은 머지 리퀘스트, 그 외 호스트는 풀 리퀘스트. 풀 리퀘스트 또는 머지 리퀘스트를 고르면 그 용어로 고정됩니다. 즉시 적용됩니다." }
 hide_finished_pr_chip = "닫혔거나 {$merge}된 {$pr}의 칩 숨기기"
@@ -9492,7 +9492,7 @@ assignment_help = "Blocked: nothing can be assigned in this repository's issues 
 # context: label of the repository row that overrides the global "Post as" name
 post_as_label = "Post as"
 # context: help under the repository "Post as" row of the SSH & credentials page
-post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
+post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example my-app[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
 # context: one row listing a credential helper set by the repository; {value} is the helper, {origin} the file that sets it
 repo_helper_line = "{value}  ({origin})"
 # context: label of the rows that list the credential helpers set by this repository

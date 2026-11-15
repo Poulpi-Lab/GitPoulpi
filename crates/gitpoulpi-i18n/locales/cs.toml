@@ -349,10 +349,10 @@ include_untracked_in_autostash = { git = "Zahrnout nesledované soubory do auto-
 include_untracked_in_autostash_help = { git = "Zda automatický stash bere i nesledované soubory (jinak se uloží a vrátí jen sledované změny).", local = "Zda automatické odložení bere i nesledované soubory (jinak se uloží a vrátí jen sledované změny)." }
 hosting_refresh_minutes = { git = "Obnovení: {$prs} a issues", local = "Obnovení žádostí o sloučení a issues" }
 hosting_refresh_minutes_help = { git = "Jak často se seznamy {$prs} a Issues v postranním panelu (a čip propojeného {$pr_abbr} na panelu nástrojů) znovu ptají hostitele. 0 vypne časovač; stále se obnoví při otevření repozitáře, přepnutí větve, po pushi či fetchi a na požádání.", local = "Jak často se seznamy žádostí o sloučení a issues v postranním panelu (a čip propojené žádosti na panelu nástrojů) znovu ptají hostitele. 0 vypne časovač; stále se obnoví při otevření repozitáře, přepnutí větve, po odeslání či načtení a na požádání." }
-# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
+# context: label of the row that sets the name messages to a host are posted as (a bot such as my-app[bot])
 hosting_post_as = "Post as"
 # context: help under the "Post as" row of Settings
-hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
+hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example my-app[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
 pr_terminology = "Terminologie žádosti o kontrolu kódu"
 pr_terminology_help = "Slovo používané pro hostovanou žádost o kontrolu kódu v celém TUI. Auto se řídí hostitelem repozitáře: Merge Request pro GitLab, Pull Request pro ostatní. Pull Request nebo Merge Request vynutí dané slovo. Platí okamžitě."
 hide_finished_pr_chip = { git = "Čip {$pr}: skrýt po uzavření nebo merge", local = "Čip {$pr}: skrýt po uzavření nebo sloučení" }
@@ -9492,7 +9492,7 @@ assignment_help = "Blocked: nothing can be assigned in this repository's issues 
 # context: label of the repository row that overrides the global "Post as" name
 post_as_label = "Post as"
 # context: help under the repository "Post as" row of the SSH & credentials page
-post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
+post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example my-app[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
 # context: one row listing a credential helper set by the repository; {value} is the helper, {origin} the file that sets it
 repo_helper_line = "{value}  ({origin})"
 # context: label of the rows that list the credential helpers set by this repository

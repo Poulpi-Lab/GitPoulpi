@@ -182,7 +182,11 @@ fn stop_kills_the_agent_and_the_text_stays() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
     // Past the agent's sleep, it never answered: its process was killed.
     std::thread::sleep(Duration::from_secs(7));
-    assert_eq!(agent_calls(&agent), 0, "the agent was killed, not waited for");
+    assert_eq!(
+        agent_calls(&agent),
+        0,
+        "the agent was killed, not waited for"
+    );
     let screen = term.screen();
     assert!(!screen.contains(DRAFT_LINE), "{}", screen.text());
     assert!(screen.contains("my own words"), "{}", screen.text());

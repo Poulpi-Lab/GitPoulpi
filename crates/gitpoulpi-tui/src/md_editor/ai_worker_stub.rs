@@ -5,7 +5,7 @@
 use std::sync::atomic::AtomicBool;
 use std::sync::{mpsc, Arc};
 
-use super::ai::{Answer, AiScope, AiTask};
+use super::ai::{AiScope, AiTask, Answer};
 
 pub(super) struct Input {
     pub(super) scope: AiScope,

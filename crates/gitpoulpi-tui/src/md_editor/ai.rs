@@ -650,8 +650,13 @@ impl AiHelp {
                 Some(AiPart::Hint) => {
                     self.focus = AiPart::Hint;
                     self.edit.sync(Some(()));
-                    self.edit
-                        .dialog_mouse(Some(()), &self.hint, mouse.kind, mouse.column, mouse.row);
+                    self.edit.dialog_mouse(
+                        Some(()),
+                        &self.hint,
+                        mouse.kind,
+                        mouse.column,
+                        mouse.row,
+                    );
                 }
                 Some(part) => {
                     self.focus = match part {
@@ -720,12 +725,7 @@ impl AiHelp {
             y += 1;
         }
         // The instruction field.
-        let field = Rect::new(
-            rect.x + 1,
-            y,
-            rect.width.saturating_sub(2),
-            1,
-        );
+        let field = Rect::new(rect.x + 1, y, rect.width.saturating_sub(2), 1);
         dialog_kit::text_input(
             buf,
             field,
@@ -844,7 +844,8 @@ impl AiHelp {
                 focused: focused(run_part),
             },
         );
-        self.hits.push((run, if running { AiPart::Stop } else { AiPart::Run }));
+        self.hits
+            .push((run, if running { AiPart::Stop } else { AiPart::Run }));
         x = run.right() + 1;
         let close = dialog_kit::button(
             buf,

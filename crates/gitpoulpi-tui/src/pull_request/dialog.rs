@@ -141,12 +141,7 @@ impl PullRequestDialog {
         if self.open_combo().is_some() || self.meta.is_open() {
             return Vec::new();
         }
-        dialog_kit::nav_cells(
-            self.hits
-                .iter()
-                .map(|(r, _)| *r)
-                .chain(self.md.nav_rects()),
-        )
+        dialog_kit::nav_cells(self.hits.iter().map(|(r, _)| *r).chain(self.md.nav_rects()))
     }
 
     /// Gives the description its "Write with AI" help (only while AI is on):

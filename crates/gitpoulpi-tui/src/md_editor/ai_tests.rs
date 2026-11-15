@@ -78,7 +78,10 @@ impl AiContextSource for Refusing {
 type Seen = Arc<Mutex<Vec<AiTask>>>;
 
 /// An editor with the helper bound over `fake`; `seen` records every task.
-fn bound(text: &str, fake: impl Fn(&AiTask) -> Result<String, String> + Send + Sync + 'static) -> (MdEditor, Seen) {
+fn bound(
+    text: &str,
+    fake: impl Fn(&AiTask) -> Result<String, String> + Send + Sync + 'static,
+) -> (MdEditor, Seen) {
     let seen: Seen = Arc::default();
     let log = seen.clone();
     let fake: Fake = Arc::new(move |task| {
@@ -123,7 +126,10 @@ fn rect_of(ed: &mut MdEditor, part: ai::AiPart) -> Rect {
 fn without_a_bound_helper_there_is_no_button_and_alt_w_does_nothing() {
     let mut ed = MdEditor::new("text".into(), md_render::Context::default());
     let s = screen(&paint(&mut ed, 90, 12));
-    assert!(!s.contains("Write with AI") && !s.contains('\u{2726}'), "{s}");
+    assert!(
+        !s.contains("Write with AI") && !s.contains('\u{2726}'),
+        "{s}"
+    );
     assert_eq!(ed.on_key(alt('w')), KeyUse::Pass);
     assert!(!ed.ai_open());
 }
@@ -191,7 +197,10 @@ fn the_repository_box_is_unticked_and_disabled_and_a_click_only_says_why() {
     let s = screen(&paint(&mut ed, 90, 16));
     assert!(s.contains("[ ] Let the AI read the repository"), "{s}");
     assert!(!s.contains("[x] Let the AI read"), "{s}");
-    assert!(s.contains("Let the AI read the repository: not built yet"), "{s}");
+    assert!(
+        s.contains("Let the AI read the repository: not built yet"),
+        "{s}"
+    );
 }
 
 #[test]
@@ -208,11 +217,17 @@ fn improve_my_draft_starts_ticked_only_when_there_is_a_text() {
 
 #[test]
 fn enter_in_the_field_asks_with_the_hint_and_fills_the_editor_then_previews() {
-    let (mut ed, seen) = bound("old text", |_| Ok("# New draft\n\nWritten by the AI.".into()));
+    let (mut ed, seen) = bound("old text", |_| {
+        Ok("# New draft\n\nWritten by the AI.".into())
+    });
     paint(&mut ed, 90, 16);
     ed.on_key(alt('w'));
     type_str(&mut ed, "agree and ask for a test");
-    assert_eq!(ed.text(), "old text", "typing went to the field, not the text");
+    assert_eq!(
+        ed.text(),
+        "old text",
+        "typing went to the field, not the text"
+    );
     assert_eq!(ed.on_key(key(KeyCode::Enter)), KeyUse::Handled);
     wait_for(&mut ed, "the draft", |e| e.text() != "old text");
     assert_eq!(ed.text(), "# New draft\n\nWritten by the AI.");
@@ -319,7 +334,10 @@ fn stop_ends_the_run_and_its_answer_never_lands() {
     let flag = started.clone();
     let (mut ed, _) = bound("mine", move |_| {
         flag.store(true, Ordering::SeqCst);
-        let _ = gate_rx.lock().unwrap().recv_timeout(Duration::from_secs(10));
+        let _ = gate_rx
+            .lock()
+            .unwrap()
+            .recv_timeout(Duration::from_secs(10));
         Ok("late answer".into())
     });
     paint(&mut ed, 90, 16);
@@ -349,7 +367,10 @@ fn the_stop_button_stops_with_the_mouse() {
     let (gate_tx, gate_rx) = mpsc::channel::<()>();
     let gate_rx = Mutex::new(gate_rx);
     let (mut ed, _) = bound("", move |_| {
-        let _ = gate_rx.lock().unwrap().recv_timeout(Duration::from_secs(10));
+        let _ = gate_rx
+            .lock()
+            .unwrap()
+            .recv_timeout(Duration::from_secs(10));
         Ok("late".into())
     });
     paint(&mut ed, 90, 16);

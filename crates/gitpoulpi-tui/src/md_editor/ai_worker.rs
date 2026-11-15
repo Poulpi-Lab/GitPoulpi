@@ -16,7 +16,7 @@ use std::time::Duration;
 use gitpoulpi_config::AiAction;
 use gitpoulpi_core::domain::RepoRef;
 
-use super::ai::{Answer, AiScope, AiTask};
+use super::ai::{AiScope, AiTask, Answer};
 use crate::redraw::NotifySend as _;
 
 pub(super) struct Input {
@@ -43,10 +43,8 @@ pub(super) fn start(input: Input) -> mpsc::Receiver<Answer> {
         gitpoulpi_i18n::msg::md_editor::AI_JOB.get()
     );
     let flag = input.cancel.clone();
-    let job = crate::jobs_ui::local_start(
-        label,
-        Arc::new(move || flag.store(true, Ordering::Relaxed)),
-    );
+    let job =
+        crate::jobs_ui::local_start(label, Arc::new(move || flag.store(true, Ordering::Relaxed)));
     std::thread::spawn(move || {
         let cancel = input.cancel.clone();
         let answer = run(input);

@@ -93,7 +93,14 @@ impl ReviewView {
             let comments: Vec<String> = t
                 .comments
                 .iter()
-                .map(|c| format!("Comment by {} on {}:\n{}", c.author, c.created_at, c.body.trim()))
+                .map(|c| {
+                    format!(
+                        "Comment by {} on {}:\n{}",
+                        c.author,
+                        c.created_at,
+                        c.body.trim()
+                    )
+                })
                 .collect();
             let text = format!("Code thread on {place}\n{}", comments.join("\n\n"));
             request.entries.push(Entry {

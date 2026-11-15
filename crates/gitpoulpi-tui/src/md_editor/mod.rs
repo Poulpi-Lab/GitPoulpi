@@ -25,12 +25,12 @@
 #![allow(dead_code)]
 
 pub(crate) mod ai;
+#[cfg(test)]
+mod ai_tests;
 #[cfg_attr(not(feature = "ai"), path = "ai_worker_stub.rs")]
 mod ai_worker;
 pub(crate) mod draft;
 pub(crate) mod preview;
-#[cfg(test)]
-mod ai_tests;
 #[cfg(test)]
 mod tests;
 

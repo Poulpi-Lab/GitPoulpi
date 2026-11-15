@@ -601,7 +601,8 @@ mod tests {
         assert!(explain_changes("commit abc", Some("msg"), "+x", 100).contains("msg"));
         assert!(stash_message("+x", 100).contains("+x"));
         assert!(pull_request(&["a".into()], "+x", 100).contains("- a"));
-        let with = pull_request_with_hint(&["a".into()], "+x", 100, "mention the risk", Some("old"));
+        let with =
+            pull_request_with_hint(&["a".into()], "+x", 100, "mention the risk", Some("old"));
         assert!(with.contains("What the author wants in this description:\nmention the risk"));
         assert!(with.contains("Improve it") && with.ends_with("old"));
         let plain = pull_request_with_hint(&["a".into()], "+x", 100, "  ", Some(" "));

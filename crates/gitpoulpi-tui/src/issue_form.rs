@@ -145,12 +145,7 @@ pub(crate) struct IssueDialog {
 impl IssueDialog {
     /// What `Ctrl+N` badges: every field and button.
     pub(crate) fn nav_targets(&self) -> Vec<(Rect, (u16, u16))> {
-        dialog_kit::nav_cells(
-            self.hits
-                .iter()
-                .map(|(r, _)| *r)
-                .chain(self.md.nav_rects()),
-        )
+        dialog_kit::nav_cells(self.hits.iter().map(|(r, _)| *r).chain(self.md.nav_rects()))
     }
 
     /// Gives the description its "Write with AI" help (only while AI is on).

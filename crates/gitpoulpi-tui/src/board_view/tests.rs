@@ -182,6 +182,7 @@ fn rig_with(source: BoardSource, fail: Option<&'static str>, delay: Duration) ->
         query: None,
         repo_root: dir.path().to_path_buf(),
         labels: Vec::new(),
+        bases: Default::default(),
     };
     let mut view = BoardView::open(target, factory);
     wait_for(&mut view, |v| v.loaded);
@@ -349,10 +350,26 @@ fn a_click_without_a_drag_only_selects_and_a_double_click_opens() {
     assert_eq!(r.view.on_mouse(up), BoardEffect::None);
     assert_eq!(r.view.sel_number, Some(2));
     assert!(r.shared.lock().unwrap().moves.is_empty());
-    assert_eq!(
-        r.view.on_mouse(down),
-        BoardEffect::OpenUrl("https://example.test/issues/2".into())
-    );
+    opens(r.view.on_mouse(down), 2);
+}
+
+/// A card opens: its conversation in the app where that can be read, else its
+/// page in the browser.
+fn opens(effect: BoardEffect, number: u64) {
+    match effect {
+        BoardEffect::Item(target) if cfg!(feature = "conversation") => {
+            #[cfg(feature = "conversation")]
+            {
+                assert_eq!(target.key.number, number);
+                assert_eq!(target.project, "g/p");
+            }
+            let _ = target;
+        }
+        BoardEffect::OpenUrl(url) if !cfg!(feature = "conversation") => {
+            assert_eq!(url, format!("https://example.test/issues/{number}"));
+        }
+        other => panic!("unexpected {other:?}"),
+    }
 }
 
 #[test]
@@ -367,10 +384,7 @@ fn arrows_move_the_selection_and_enter_opens_the_issue() {
         Some(3),
         "the nearest card of the next column"
     );
-    assert_eq!(
-        r.view.on_key(key(KeyCode::Enter)),
-        BoardEffect::OpenUrl("https://example.test/issues/3".into())
-    );
+    opens(r.view.on_key(key(KeyCode::Enter)), 3);
     assert_eq!(r.view.on_key(key(KeyCode::Esc)), BoardEffect::Close);
 }
 

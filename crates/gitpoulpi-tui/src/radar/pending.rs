@@ -30,6 +30,8 @@ pub(crate) enum Pending {
     StartWork { branch: String },
     /// The metadata picker (`act` says which field) for a request or issue.
     EditMeta { pr: bool, number: u64, act: Act },
+    /// The conversation of an issue, once this window's list knows it.
+    Conversation { number: u64 },
     /// The in-app code review of a request. `repo` names the repository
     /// whose window runs it when the action leaves a window that is not that
     /// repository's (the workspace search); the Radar ends its own

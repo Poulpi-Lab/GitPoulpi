@@ -273,6 +273,8 @@ mod compare;
 mod compare_cards;
 mod compose_ui;
 mod composer;
+#[cfg(all(feature = "hosting", feature = "conversation"))]
+mod conversation_ui;
 mod diff_actions;
 #[cfg(test)]
 mod docs_tables;
@@ -290,6 +292,10 @@ mod issue_form;
 mod issue_ref_picker;
 #[cfg_attr(not(feature = "hosting"), path = "issue_tokens_stub.rs")]
 mod issue_tokens;
+mod item_cmd;
+#[cfg(feature = "hosting")]
+#[cfg_attr(not(feature = "conversation"), path = "item_view_stub.rs")]
+mod item_view;
 mod language_picker;
 mod link_confirm;
 mod log_inline_ref;

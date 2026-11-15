@@ -33,6 +33,13 @@ impl WindowState {
                 return;
             }
         }
+        // A carried conversation waits for the issue list to arrive.
+        #[cfg(feature = "hosting")]
+        if let Some(Pending::Conversation { number }) = pending::peek() {
+            if !self.hosting.item_ready(number) {
+                return;
+            }
+        }
         // A carried review waits for the request list to arrive.
         #[cfg(feature = "hosting")]
         if let Some(Pending::Review { number, .. }) = pending::peek() {
@@ -88,6 +95,7 @@ impl WindowState {
             Pending::Worktree { branch } => self.radar_worktree(&branch),
             Pending::EditMeta { pr, number, act } => self.radar_edit_meta(pr, number, act),
             Pending::Review { number, .. } => self.radar_review(number),
+            Pending::Conversation { number } => self.radar_conversation(number),
         }
     }
 
@@ -120,6 +128,17 @@ impl WindowState {
 
     #[cfg(not(feature = "hosting"))]
     fn radar_review(&mut self, _number: u64) {}
+
+    /// The conversation of an issue the Radar named, once this window's list
+    /// knows it.
+    #[cfg(feature = "hosting")]
+    fn radar_conversation(&mut self, number: u64) {
+        let effect = self.hosting.item_effect(number, false);
+        commands::apply_hosting_effect(&mut self.command_ctx(), effect);
+    }
+
+    #[cfg(not(feature = "hosting"))]
+    fn radar_conversation(&mut self, _number: u64) {}
 
     /// The Create worktree dialog for a pull request's branch: the local
     /// branch when there is one, else a new local branch started at the

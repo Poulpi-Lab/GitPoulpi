@@ -296,6 +296,15 @@ pub struct RepoState {
     /// order. Empty: Open / Closed only.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub board_labels: Vec<String>,
+    /// What the user last saw of each conversation (an issue's or a request's
+    /// timeline): the newest entry then, keyed by `conversation_key`. Entries
+    /// newer than it are unread. Capped at 200, the oldest forgotten.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub conversation_seen: BTreeMap<String, ConversationSeen>,
+    /// Whether the conversation view shows system events (labels, state
+    /// changes, pushes). `None` is on.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub conversation_events: Option<bool>,
     /// This user's tweaks to the branching workflow (`[workflow]`), layered
     /// over the shared `.gitpoulpi/workflow.toml`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -328,6 +337,23 @@ pub struct HookLine {
     /// `after_start` or `before_finish`.
     pub phase: String,
     pub command: String,
+}
+
+/// The newest entry of a conversation the user has seen.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ConversationSeen {
+    /// Where the newest entry sat (its time, ISO 8601: entries compare by it).
+    pub at: String,
+    /// Its id, to tell two entries of the same second apart.
+    pub id: String,
+    /// Unix seconds of the visit (for forgetting the oldest).
+    pub visited: i64,
+}
+
+/// The key a conversation is filed under in `RepoState::conversation_seen`.
+pub fn conversation_key(integration: &str, project: &str, kind: &str, number: u64) -> String {
+    format!("{integration}|{project}|{kind}#{number}")
 }
 
 /// A list of committed workflow hooks the user trusted (see
@@ -367,6 +393,32 @@ pub struct WatchedIssue {
 }
 
 impl RepoState {
+    /// Remembers that the user has seen the conversation up to the entry
+    /// (`at`, `id`); the list keeps the 200 most recent visits.
+    pub fn mark_conversation_seen(&mut self, key: &str, at: &str, id: &str, now: i64) {
+        self.conversation_seen.insert(
+            key.to_string(),
+            ConversationSeen {
+                at: at.to_string(),
+                id: id.to_string(),
+                visited: now,
+            },
+        );
+        while self.conversation_seen.len() > 200 {
+            let oldest = self
+                .conversation_seen
+                .iter()
+                .min_by_key(|(_, v)| v.visited)
+                .map(|(k, _)| k.clone());
+            match oldest {
+                Some(k) => {
+                    self.conversation_seen.remove(&k);
+                }
+                None => break,
+            }
+        }
+    }
+
     /// Trusts the script whose hash is `hash` (a second trust of the same
     /// hash only refreshes its label); the list is capped at 200 entries,
     /// forgetting the oldest.
@@ -563,6 +615,32 @@ mod tests {
 
     /// Saving state must not make the repository dirty: the state
     /// directory lives in the working tree.
+    #[test]
+    fn the_seen_conversations_round_trip_and_keep_the_most_recent_visits() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = RepoState::path_for(dir.path(), ".gitpoulpi");
+        let mut state = RepoState::default();
+        let key = conversation_key("gh", "o/r", "issue", 7);
+        assert_eq!(key, "gh|o/r|issue#7");
+        state.mark_conversation_seen(&key, "2026-11-12T10:00:00Z", "c9", 100);
+        state.mark_conversation_seen(&key, "2026-11-13T10:00:00Z", "c10", 200);
+        assert_eq!(state.conversation_seen[&key].at, "2026-11-13T10:00:00Z");
+        for n in 0..210 {
+            state.mark_conversation_seen(&format!("k{n}"), "t", "i", 1000 + n);
+        }
+        assert_eq!(state.conversation_seen.len(), 200);
+        assert!(
+            !state.conversation_seen.contains_key(&key),
+            "the oldest visit goes first"
+        );
+        assert!(state.conversation_seen.contains_key("k209"));
+        state.conversation_events = Some(false);
+        state.save(&path).unwrap();
+        let back = RepoState::load(&path).unwrap();
+        assert_eq!(back.conversation_seen, state.conversation_seen);
+        assert_eq!(back.conversation_events, Some(false));
+    }
+
     #[test]
     fn trusted_scripts_round_trip_and_are_keyed_by_hash() {
         let dir = tempfile::tempdir().unwrap();

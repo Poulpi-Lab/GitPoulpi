@@ -17,6 +17,8 @@ mod board;
 mod chip;
 mod commit_tokens;
 mod composer_ref;
+#[cfg(feature = "conversation")]
+mod conversation;
 mod failure_card;
 mod flow_mr;
 mod gerrit;

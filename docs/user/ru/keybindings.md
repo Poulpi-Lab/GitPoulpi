@@ -837,6 +837,7 @@ stage_file = "z"
 | Radar: закрепить или открепить | `p` |
 | Radar: отложить... | `z` |
 | Radar: ревью запроса... | `e` |
+| Radar: Open Issue Conversation | `i` |
 | Radar: ревью через API |  |
 | Radar: клонировать и сделать ревью... |  |
 | Radar: изменить исполнителей... |  |
@@ -978,6 +979,25 @@ stage_file = "z"
 | Доска: задать метки колонок... | `c` |
 | Доска: обновить | `r` |
 | Доска: закрыть | `Esc` |
+| Conversation: Back |  |
+| Conversation: Refresh | `F5` |
+| Conversation: Load Older Entries | `m` |
+| Conversation: Previous Entry | `Up` |
+| Conversation: Next Entry | `Down` |
+| Conversation: Next Unread Entry | `n` |
+| Conversation: Reply to Entry | `r` |
+| Conversation: New Comment | `c` |
+| Conversation: Links of Entry... | `l` |
+| Conversation: Copy Link of Entry | `y` |
+| Conversation: Open in Browser | `o` |
+| Conversation: Edit Comment | `e` |
+| Conversation: Delete Comment | `d` |
+| Conversation: Show or Hide Events | `v` |
+| Conversation: Toggle Write and Preview |  |
+| Conversation: Toggle the Split View |  |
+| Conversation: Send the Comment |  |
+| Conversation: Close | `Esc` |
+| Hosting: Open Issue Conversation... |  |
 | Ревью: ✦ составить черновик ревью... | `s` |
 | Ревью: принять предложение | `y` |
 | Ревью: изменить и принять предложение... | `w` |

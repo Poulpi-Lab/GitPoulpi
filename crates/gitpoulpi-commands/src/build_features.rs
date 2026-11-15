@@ -73,13 +73,14 @@ pub const RADAR: bool = cfg!(all(feature = "radar", feature = "hosting"));
 pub const MERMAID: bool = cfg!(feature = "mermaid");
 pub const BOARD: bool = cfg!(all(feature = "board", feature = "hosting"));
 pub const REVIEW: bool = cfg!(all(feature = "review", feature = "hosting"));
+pub const CONVERSATION: bool = cfg!(all(feature = "conversation", feature = "hosting"));
 pub const HISTORY_REWRITE: bool = cfg!(feature = "history-rewrite");
 pub const GLOBAL_SEARCH: bool = cfg!(feature = "global-search");
 pub const WORKSPACES: bool = cfg!(feature = "workspaces");
 pub const REWRITE_SCRIPTS: bool = cfg!(feature = "rewrite-scripts");
 
 /// The user-facing feature table, in `--version` order.
-pub const FLAGS: [(&str, bool); 27] = [
+pub const FLAGS: [(&str, bool); 28] = [
     ("ai", AI),
     ("github", GITHUB),
     ("gitlab", GITLAB),
@@ -103,6 +104,7 @@ pub const FLAGS: [(&str, bool); 27] = [
     ("mermaid", MERMAID),
     ("board", BOARD),
     ("review", REVIEW),
+    ("conversation", CONVERSATION),
     ("history-rewrite", HISTORY_REWRITE),
     ("global-search", GLOBAL_SEARCH),
     ("workspaces", WORKSPACES),
@@ -227,7 +229,7 @@ mod tests {
         }
         let text = long_version();
         assert!(text.contains(
-            "features: ai github gitlab azure-devops bitbucket jira trello gitea linear youtrack redmine gerrit local-issues mcp lfs worktree submodule avatar-fetch image-view radar mermaid board review history-rewrite global-search workspaces rewrite-scripts"
+            "features: ai github gitlab azure-devops bitbucket jira trello gitea linear youtrack redmine gerrit local-issues mcp lfs worktree submodule avatar-fetch image-view radar mermaid board review conversation history-rewrite global-search workspaces rewrite-scripts"
         ));
         assert!(text.starts_with(gitpoulpi_ipc::VERSION_STRING));
         assert!(!text.contains("custom build"));

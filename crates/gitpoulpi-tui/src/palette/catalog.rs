@@ -1872,6 +1872,12 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     )
     .requires(crate::build_features::Feature::Radar),
     entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_RADAR_CONVERSATION,
+        "i",
+        PaletteCommand::Radar(RadarCommand::Act(RadarAct::Conversation)),
+    )
+    .requires(crate::build_features::Feature::Radar),
+    entry(
         msg::palette::RADAR_REVIEW_API,
         "",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::ReviewApi)),
@@ -2644,6 +2650,121 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::Board(crate::board_cmd::BoardCmd::Close),
     )
     .requires(crate::build_features::Feature::Board),
+    // -- conversation (open) -------------------------------------------
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_BACK,
+        "",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::Back),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_REFRESH,
+        "F5",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::Refresh),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_LOAD_OLDER,
+        "m",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::LoadOlder),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_PREV_ENTRY,
+        "Up",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::PrevEntry),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_NEXT_ENTRY,
+        "Down",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::NextEntry),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_NEXT_UNREAD,
+        "n",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::NextUnread),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_REPLY,
+        "r",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::Reply),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_NEW_COMMENT,
+        "c",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::NewComment),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_LINKS,
+        "l",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::Links),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_COPY_LINK,
+        "y",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::CopyLink),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_OPEN_BROWSER,
+        "o",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::OpenBrowser),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_EDIT,
+        "e",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::Edit),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_DELETE,
+        "d",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::Delete),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_TOGGLE_EVENTS,
+        "v",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::ToggleEvents),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_TOGGLE_PREVIEW,
+        "",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::TogglePreview),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_TOGGLE_SPLIT,
+        "",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::ToggleSplit),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_SEND,
+        "",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::Send),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_CLOSE,
+        "Esc",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::Close),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_OPEN_CONVERSATION,
+        "",
+        PaletteCommand::Hosting(HostingCommand::OpenIssueConversation),
+    )
+    .requires(crate::build_features::Feature::Conversation),
     entry(
         msg::review_ai::PALETTE_SUGGEST,
         "s",

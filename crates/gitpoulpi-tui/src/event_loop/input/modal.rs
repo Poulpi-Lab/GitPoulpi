@@ -407,7 +407,8 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         && matches!(*cx.input_mode, InputMode::Normal)
         && (cx.repo_dialogs.safety_wants_palette()
             || cx.repo_dialogs.review_wants_palette()
-            || cx.repo_dialogs.board_wants_palette())
+            || cx.repo_dialogs.board_wants_palette()
+            || cx.repo_dialogs.item_wants_palette())
         && km.is(Bind::GlobalPalette, &key)
     {
         *cx.input_mode = InputMode::CommandPalette {

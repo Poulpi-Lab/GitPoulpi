@@ -784,6 +784,7 @@ impl WindowState {
                         .and_then(|m| m.radar.review_avail())
                 }),
                 board: self.repo_dialogs.board_avail(),
+                item: self.repo_dialogs.item_avail(),
                 agent_pending: self.ui_viewer.has_pending(),
                 auto_stash_pending: self.pending_auto_stash.is_some(),
                 agent_back: self.ui_viewer.can_go_back(),

@@ -288,6 +288,12 @@ pub(crate) enum HostingAction {
     Review {
         number: u64,
     },
+    /// Open the conversation of an issue (`pr: false`) or of a request on a
+    /// host with no review view.
+    Conversation {
+        number: u64,
+        pr: bool,
+    },
     /// Push `HEAD` to `refs/for/<branch>` (Gerrit).
     PushForReview {
         branch: String,
@@ -333,6 +339,8 @@ pub(crate) enum HostingEffect {
     Review(Box<crate::review_view::ReviewTarget>),
     /// The Kanban board of the ISSUES source.
     Board(Box<crate::board_view::BoardTarget>),
+    /// The conversation of an issue or a request.
+    Item(Box<crate::item_view::ItemTarget>),
     /// Push `HEAD` to `refs/for/<branch>` of `remote` (Gerrit).
     PushForReview {
         remote: String,
@@ -418,6 +426,8 @@ pub(crate) enum HostingCommand {
     CreateObsidianBase,
     /// The Kanban board of the ISSUES source.
     OpenBoard,
+    /// Pick an issue, then read its conversation in the app.
+    OpenIssueConversation,
     /// Push `HEAD` to `refs/for/<branch>` to open a Gerrit change.
     PushForReview,
 }
@@ -612,6 +622,9 @@ pub(crate) fn command_unavailable_from(
         }
         HostingCommand::CreateObsidianBase => {
             (!a.local_issues).then_some(msg::local_issues::WHY_NOT_LOCAL.get())
+        }
+        HostingCommand::OpenIssueConversation => {
+            (!a.has_issues).then_some(msg::hosting_ui::WHY_NO_ISSUES.get())
         }
         HostingCommand::OpenBoard => {
             (!a.issue_repo).then_some(msg::hosting_ui::WHY_ISSUES_PICK_REPO.get())
@@ -957,6 +970,7 @@ pub(crate) struct HostingUi {
 
 mod actions;
 mod board;
+mod item;
 mod local;
 mod meta;
 mod picker;

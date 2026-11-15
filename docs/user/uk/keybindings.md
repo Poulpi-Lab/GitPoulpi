@@ -825,6 +825,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Radar: закріпити або відкріпити | `p` |
 | Radar: відкласти... | `z` |
 | Radar: рев'ю запиту... | `e` |
+| Radar: Open Issue Conversation | `i` |
 | Radar: рев'ю через API |  |
 | Radar: клонувати й зробити рев'ю... |  |
 | Radar: змінити виконавців... |  |
@@ -966,6 +967,25 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Дошка: задати мітки колонок... | `c` |
 | Дошка: оновити | `r` |
 | Дошка: закрити | `Esc` |
+| Conversation: Back |  |
+| Conversation: Refresh | `F5` |
+| Conversation: Load Older Entries | `m` |
+| Conversation: Previous Entry | `Up` |
+| Conversation: Next Entry | `Down` |
+| Conversation: Next Unread Entry | `n` |
+| Conversation: Reply to Entry | `r` |
+| Conversation: New Comment | `c` |
+| Conversation: Links of Entry... | `l` |
+| Conversation: Copy Link of Entry | `y` |
+| Conversation: Open in Browser | `o` |
+| Conversation: Edit Comment | `e` |
+| Conversation: Delete Comment | `d` |
+| Conversation: Show or Hide Events | `v` |
+| Conversation: Toggle Write and Preview |  |
+| Conversation: Toggle the Split View |  |
+| Conversation: Send the Comment |  |
+| Conversation: Close | `Esc` |
+| Hosting: Open Issue Conversation... |  |
 | Рев'ю: ✦ чернетка рев'ю... | `s` |
 | Рев'ю: прийняти пропозицію | `y` |
 | Рев'ю: змінити й прийняти пропозицію... | `w` |

@@ -826,6 +826,7 @@ die Standardtasten.
 | Radar: Anheften / Anheften aufheben | `p` |
 | Radar: Zurückstellen... | `z` |
 | Radar: Anfrage prüfen... | `e` |
+| Radar: Open Issue Conversation | `i` |
 | Radar: Über die API prüfen |  |
 | Radar: Klonen und prüfen... |  |
 | Radar: Zugewiesene bearbeiten... |  |
@@ -967,6 +968,25 @@ die Standardtasten.
 | Board: Spalten-Labels festlegen... | `c` |
 | Board: Aktualisieren | `r` |
 | Board: Schließen | `Esc` |
+| Conversation: Back |  |
+| Conversation: Refresh | `F5` |
+| Conversation: Load Older Entries | `m` |
+| Conversation: Previous Entry | `Up` |
+| Conversation: Next Entry | `Down` |
+| Conversation: Next Unread Entry | `n` |
+| Conversation: Reply to Entry | `r` |
+| Conversation: New Comment | `c` |
+| Conversation: Links of Entry... | `l` |
+| Conversation: Copy Link of Entry | `y` |
+| Conversation: Open in Browser | `o` |
+| Conversation: Edit Comment | `e` |
+| Conversation: Delete Comment | `d` |
+| Conversation: Show or Hide Events | `v` |
+| Conversation: Toggle Write and Preview |  |
+| Conversation: Toggle the Split View |  |
+| Conversation: Send the Comment |  |
+| Conversation: Close | `Esc` |
+| Hosting: Open Issue Conversation... |  |
 | Review: ✦ Review entwerfen... | `s` |
 | Review: Vorschlag übernehmen | `y` |
 | Review: Vorschlag bearbeiten und übernehmen... | `w` |

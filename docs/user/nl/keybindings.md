@@ -835,6 +835,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Radar: Vastpinnen of losmaken | `p` |
 | Radar: Uitstellen... | `z` |
 | Radar: Verzoek reviewen... | `e` |
+| Radar: Open Issue Conversation | `i` |
 | Radar: Reviewen via de API |  |
 | Radar: Klonen en reviewen... |  |
 | Radar: Toegewezenen bewerken... |  |
@@ -976,6 +977,25 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Bord: Kolomlabels instellen... | `c` |
 | Bord: Vernieuwen | `r` |
 | Bord: Sluiten | `Esc` |
+| Conversation: Back |  |
+| Conversation: Refresh | `F5` |
+| Conversation: Load Older Entries | `m` |
+| Conversation: Previous Entry | `Up` |
+| Conversation: Next Entry | `Down` |
+| Conversation: Next Unread Entry | `n` |
+| Conversation: Reply to Entry | `r` |
+| Conversation: New Comment | `c` |
+| Conversation: Links of Entry... | `l` |
+| Conversation: Copy Link of Entry | `y` |
+| Conversation: Open in Browser | `o` |
+| Conversation: Edit Comment | `e` |
+| Conversation: Delete Comment | `d` |
+| Conversation: Show or Hide Events | `v` |
+| Conversation: Toggle Write and Preview |  |
+| Conversation: Toggle the Split View |  |
+| Conversation: Send the Comment |  |
+| Conversation: Close | `Esc` |
+| Hosting: Open Issue Conversation... |  |
 | Review: ✦ Review opstellen... | `s` |
 | Review: Suggestie accepteren | `y` |
 | Review: Suggestie bewerken en accepteren... | `w` |

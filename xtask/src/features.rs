@@ -115,7 +115,7 @@ pub fn plan(all_langs: &[String], quick: bool) -> Vec<Run> {
         return out;
     }
     let full = Choices::all(all_langs);
-    let toggles: [Toggle; 28] = [
+    let toggles: [Toggle; 29] = [
         ("github", |c| c.integrations.retain(|i| i != "github")),
         ("gitlab", |c| c.integrations.retain(|i| i != "gitlab")),
         ("azure-devops", |c| {
@@ -144,6 +144,7 @@ pub fn plan(all_langs: &[String], quick: bool) -> Vec<Run> {
         ("mermaid", |c| c.mermaid = false),
         ("board", |c| c.board = false),
         ("review", |c| c.review = false),
+        ("conversation", |c| c.conversation = false),
         ("history-rewrite", |c| c.history_rewrite = false),
         ("global-search", |c| c.global_search = false),
         ("workspaces", |c| c.workspaces = false),
@@ -328,8 +329,8 @@ mod tests {
         let minus_ai = &p.iter().find(|(l, _, _)| l == "full minus ai").unwrap().1;
         assert!(!minus_ai.join(" ").contains("/ai"));
         assert!(minus_ai.join(" ").contains("/lfs"));
-        // 28 toggles + the scripts-off run, each in two forms, then 5 test runs.
-        assert_eq!(p.len(), (28 + 1) * 2 + 5);
+        // 29 toggles + the scripts-off run, each in two forms, then 5 test runs.
+        assert_eq!(p.len(), (29 + 1) * 2 + 5);
         let bins = p
             .iter()
             .find(|(l, _, _)| l == "full minus lfs (bins only)")

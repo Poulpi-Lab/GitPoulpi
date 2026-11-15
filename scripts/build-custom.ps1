@@ -22,7 +22,7 @@ param(
     [string]$LogoColors, [string]$LogoDefault, [string]$IconColor,
     [switch]$NoAi, [switch]$NoMcp, [switch]$NoLfs, [switch]$NoWorktree,
     [switch]$NoSubmodules, [switch]$NoAvatarFetch, [switch]$NoImageView,
-    [switch]$NoRadar, [switch]$NoMermaid, [switch]$NoBoard, [switch]$NoReview, [switch]$NoHistoryRewrite, [switch]$NoGlobalSearch, [switch]$NoWorkspaces, [switch]$NoRewriteScripts,
+    [switch]$NoRadar, [switch]$NoMermaid, [switch]$NoBoard, [switch]$NoReview, [switch]$NoConversation, [switch]$NoHistoryRewrite, [switch]$NoGlobalSearch, [switch]$NoWorkspaces, [switch]$NoRewriteScripts,
     [string]$Preset, [string]$Save, [switch]$ListPresets, [string]$DeletePreset,
     [switch]$Last, [switch]$Full, [switch]$DryRun,
     [ValidateSet('custom', 'dist', 'release')][string]$Profile = 'custom',
@@ -56,6 +56,7 @@ if ($PSBoundParameters.Count -gt 0) {
     if ($NoMermaid) { $a += '--no-mermaid' }
     if ($NoBoard) { $a += '--no-board' }
     if ($NoReview) { $a += '--no-review' }
+    if ($NoConversation) { $a += '--no-conversation' }
     if ($NoHistoryRewrite) { $a += '--no-history-rewrite' }
     if ($NoGlobalSearch) { $a += '--no-global-search' }
     if ($NoWorkspaces) { $a += '--no-workspaces' }
@@ -216,6 +217,7 @@ $feat = @(
     @('mermaid', 'Copy as Mermaid gitGraph and log --format mermaid', 'MERMAID'),
     @('board', 'Kanban board view and hosting board (needs an integration)', 'BOARD'),
     @('review', 'In-app code review and its AI assist (needs an integration)', 'REVIEW'),
+    @('conversation', 'In-app issue and request conversation view (needs an integration)', 'CONVERSATION'),
     @('history-rewrite', 'History workbench (advanced history rewriting: authors, dates, messages, content)', 'HISTORY_REWRITE'),
     @('global-search', 'Global search (title-bar button, Ctrl+Alt+F, search command)', 'GLOBAL_SEARCH'),
     @('workspaces', 'Workspaces (named groups of repositories; off: only the default tab list)', 'WORKSPACES'),

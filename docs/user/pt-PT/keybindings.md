@@ -829,6 +829,7 @@ As teclas são as predefinidas.
 | Radar: afixar ou desafixar | `p` |
 | Radar: adiar... | `z` |
 | Radar: rever pedido... | `e` |
+| Radar: Open Issue Conversation | `i` |
 | Radar: rever através da API |  |
 | Radar: clonar e rever... |  |
 | Radar: editar responsáveis... |  |
@@ -970,6 +971,25 @@ As teclas são as predefinidas.
 | Quadro: definir etiquetas das colunas... | `c` |
 | Quadro: atualizar | `r` |
 | Quadro: fechar | `Esc` |
+| Conversation: Back |  |
+| Conversation: Refresh | `F5` |
+| Conversation: Load Older Entries | `m` |
+| Conversation: Previous Entry | `Up` |
+| Conversation: Next Entry | `Down` |
+| Conversation: Next Unread Entry | `n` |
+| Conversation: Reply to Entry | `r` |
+| Conversation: New Comment | `c` |
+| Conversation: Links of Entry... | `l` |
+| Conversation: Copy Link of Entry | `y` |
+| Conversation: Open in Browser | `o` |
+| Conversation: Edit Comment | `e` |
+| Conversation: Delete Comment | `d` |
+| Conversation: Show or Hide Events | `v` |
+| Conversation: Toggle Write and Preview |  |
+| Conversation: Toggle the Split View |  |
+| Conversation: Send the Comment |  |
+| Conversation: Close | `Esc` |
+| Hosting: Open Issue Conversation... |  |
 | Revisão: ✦ redigir revisão... | `s` |
 | Revisão: aceitar sugestão | `y` |
 | Revisão: editar e aceitar sugestão... | `w` |

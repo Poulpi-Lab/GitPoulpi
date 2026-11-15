@@ -835,6 +835,7 @@ applicano. I tasti sono quelli predefiniti.
 | Radar: Fissa o non fissare | `p` |
 | Radar: Rimanda... | `z` |
 | Radar: Rivedi la richiesta... | `e` |
+| Radar: Open Issue Conversation | `i` |
 | Radar: Rivedi tramite l'API |  |
 | Radar: Clona e rivedi... |  |
 | Radar: Modifica assegnatari... |  |
@@ -976,6 +977,25 @@ applicano. I tasti sono quelli predefiniti.
 | Bacheca: Imposta le etichette delle colonne... | `c` |
 | Bacheca: Aggiorna | `r` |
 | Bacheca: Chiudi | `Esc` |
+| Conversation: Back |  |
+| Conversation: Refresh | `F5` |
+| Conversation: Load Older Entries | `m` |
+| Conversation: Previous Entry | `Up` |
+| Conversation: Next Entry | `Down` |
+| Conversation: Next Unread Entry | `n` |
+| Conversation: Reply to Entry | `r` |
+| Conversation: New Comment | `c` |
+| Conversation: Links of Entry... | `l` |
+| Conversation: Copy Link of Entry | `y` |
+| Conversation: Open in Browser | `o` |
+| Conversation: Edit Comment | `e` |
+| Conversation: Delete Comment | `d` |
+| Conversation: Show or Hide Events | `v` |
+| Conversation: Toggle Write and Preview |  |
+| Conversation: Toggle the Split View |  |
+| Conversation: Send the Comment |  |
+| Conversation: Close | `Esc` |
+| Hosting: Open Issue Conversation... |  |
 | Revisione: ✦ Bozza di revisione... | `s` |
 | Revisione: Accetta il suggerimento | `y` |
 | Revisione: Modifica e accetta il suggerimento... | `w` |

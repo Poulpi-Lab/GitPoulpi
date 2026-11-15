@@ -196,6 +196,15 @@ directory or `*_tests.rs` for the big ones); shared fixtures in
   the review comment box and Finish summary, the issue form and the pull
   request body. A form owns focus and the close question (`Dismiss`), routes
   keys and mouse to `MdEditor::on_key` / `on_mouse`, and gives it a rect.
+- `conversation_ui/` (the timeline widget of an issue or request: rows laid
+  out on a worker, selection and scrolling, unread marks, saved copy for the
+  offline banner, buttons of the selected entry; the paint walk returns the
+  hit rects) and `item_view/` (the full-window modal `RepoDialog::Item` around
+  it: header, "Posting as ..." line, composer dock, link menu, Back stack;
+  `item_cmd.rs` is its palette vocabulary, `item_view_stub.rs` the build
+  without the `conversation` feature). Writing from the view is the next
+  slice: until `conversation_ui::WRITING` flips, Send, Edit and Delete are
+  greyed with `why_writing_later`.
 - `push_group_ui/` (grouped push: selection, plan and progress dialog, and the
   paused strip; entries `PushGroupUi::open_selection/open_plan/open_progress`,
   design notes in `session-and-state.md`, "The push group dialog").

@@ -46,6 +46,8 @@ pub(crate) enum Act {
     /// The same review after cloning the repository (the Clone dialog opens
     /// prefilled).
     CloneReview,
+    /// The conversation of an issue, read in the repository's own window.
+    Conversation,
     /// Turns on the account-wide review requests of a code host (the hint
     /// row's `[Turn on]`).
     TurnOn,

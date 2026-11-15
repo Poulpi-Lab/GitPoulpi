@@ -836,6 +836,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Radar: Fijar o dejar de fijar | `p` |
 | Radar: Posponer... | `z` |
 | Radar: Revisar solicitud... | `e` |
+| Radar: Open Issue Conversation | `i` |
 | Radar: Revisar mediante la API |  |
 | Radar: Clonar y revisar... |  |
 | Radar: Editar asignados... |  |
@@ -977,6 +978,25 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Tablero: Definir etiquetas de columna... | `c` |
 | Tablero: Actualizar | `r` |
 | Tablero: Cerrar | `Esc` |
+| Conversation: Back |  |
+| Conversation: Refresh | `F5` |
+| Conversation: Load Older Entries | `m` |
+| Conversation: Previous Entry | `Up` |
+| Conversation: Next Entry | `Down` |
+| Conversation: Next Unread Entry | `n` |
+| Conversation: Reply to Entry | `r` |
+| Conversation: New Comment | `c` |
+| Conversation: Links of Entry... | `l` |
+| Conversation: Copy Link of Entry | `y` |
+| Conversation: Open in Browser | `o` |
+| Conversation: Edit Comment | `e` |
+| Conversation: Delete Comment | `d` |
+| Conversation: Show or Hide Events | `v` |
+| Conversation: Toggle Write and Preview |  |
+| Conversation: Toggle the Split View |  |
+| Conversation: Send the Comment |  |
+| Conversation: Close | `Esc` |
+| Hosting: Open Issue Conversation... |  |
 | Revisión: ✦ Redactar revisión... | `s` |
 | Revisión: Aceptar sugerencia | `y` |
 | Revisión: Editar y aceptar sugerencia... | `w` |

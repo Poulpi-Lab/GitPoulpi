@@ -831,6 +831,7 @@ Tuşlar varsayılanlardır.
 | Radar: Sabitle veya Sabitlemeyi Kaldır | `p` |
 | Radar: Ertele... | `z` |
 | Radar: İsteği İncele... | `e` |
+| Radar: Open Issue Conversation | `i` |
 | Radar: API Üzerinden İncele |  |
 | Radar: Klonla ve İncele... |  |
 | Radar: Atananları Düzenle... |  |
@@ -972,6 +973,25 @@ Tuşlar varsayılanlardır.
 | Pano: Sütun Etiketlerini Ayarla... | `c` |
 | Pano: Yenile | `r` |
 | Pano: Kapat | `Esc` |
+| Conversation: Back |  |
+| Conversation: Refresh | `F5` |
+| Conversation: Load Older Entries | `m` |
+| Conversation: Previous Entry | `Up` |
+| Conversation: Next Entry | `Down` |
+| Conversation: Next Unread Entry | `n` |
+| Conversation: Reply to Entry | `r` |
+| Conversation: New Comment | `c` |
+| Conversation: Links of Entry... | `l` |
+| Conversation: Copy Link of Entry | `y` |
+| Conversation: Open in Browser | `o` |
+| Conversation: Edit Comment | `e` |
+| Conversation: Delete Comment | `d` |
+| Conversation: Show or Hide Events | `v` |
+| Conversation: Toggle Write and Preview |  |
+| Conversation: Toggle the Split View |  |
+| Conversation: Send the Comment |  |
+| Conversation: Close | `Esc` |
+| Hosting: Open Issue Conversation... |  |
 | İnceleme: ✦ İnceleme Taslağı... | `s` |
 | İnceleme: Öneriyi Kabul Et | `y` |
 | İnceleme: Öneriyi Düzenle ve Kabul Et... | `w` |

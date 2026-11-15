@@ -833,6 +833,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Radar : Épingler ou désépingler | `p` |
 | Radar : Reporter... | `z` |
 | Radar : Relire la pull request... | `e` |
+| Radar : Ouvrir la conversation du ticket | `i` |
 | Radar : Relire via l'API |  |
 | Radar : Cloner et relire... |  |
 | Radar : Modifier les assignés... |  |
@@ -974,6 +975,25 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Tableau : Définir les étiquettes des colonnes... | `c` |
 | Tableau : Actualiser | `r` |
 | Tableau : Fermer | `Esc` |
+| Conversation : Retour |  |
+| Conversation : Actualiser | `F5` |
+| Conversation : Charger les entrées plus anciennes | `m` |
+| Conversation : Entrée précédente | `Up` |
+| Conversation : Entrée suivante | `Down` |
+| Conversation : Prochaine entrée non lue | `n` |
+| Conversation : Répondre à l'entrée | `r` |
+| Conversation : Nouveau commentaire | `c` |
+| Conversation : Liens de l'entrée... | `l` |
+| Conversation : Copier le lien de l'entrée | `y` |
+| Conversation : Ouvrir dans le navigateur | `o` |
+| Conversation : Modifier le commentaire | `e` |
+| Conversation : Supprimer le commentaire | `d` |
+| Conversation : Afficher ou masquer les événements | `v` |
+| Conversation : Basculer écriture et aperçu |  |
+| Conversation : Basculer l'affichage côte à côte |  |
+| Conversation : Envoyer le commentaire |  |
+| Conversation : Fermer | `Esc` |
+| Hébergement : Ouvrir la conversation d'un ticket... |  |
 | Revue : ✦ Rédiger une revue... | `s` |
 | Revue : Accepter la suggestion | `y` |
 | Revue : Modifier et accepter la suggestion... | `w` |

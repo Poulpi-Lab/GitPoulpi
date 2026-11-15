@@ -831,6 +831,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Radar: Pin or Unpin | `p` |
 | Radar: Snooze... | `z` |
 | Radar: Review Request... | `e` |
+| Radar: Open Issue Conversation | `i` |
 | Radar: Review Through the API |  |
 | Radar: Clone and Review... |  |
 | Radar: Edit Assignees... |  |
@@ -972,6 +973,25 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Board: Set Column Labels... | `c` |
 | Board: Refresh | `r` |
 | Board: Close | `Esc` |
+| Conversation: Back |  |
+| Conversation: Refresh | `F5` |
+| Conversation: Load Older Entries | `m` |
+| Conversation: Previous Entry | `Up` |
+| Conversation: Next Entry | `Down` |
+| Conversation: Next Unread Entry | `n` |
+| Conversation: Reply to Entry | `r` |
+| Conversation: New Comment | `c` |
+| Conversation: Links of Entry... | `l` |
+| Conversation: Copy Link of Entry | `y` |
+| Conversation: Open in Browser | `o` |
+| Conversation: Edit Comment | `e` |
+| Conversation: Delete Comment | `d` |
+| Conversation: Show or Hide Events | `v` |
+| Conversation: Toggle Write and Preview |  |
+| Conversation: Toggle the Split View |  |
+| Conversation: Send the Comment |  |
+| Conversation: Close | `Esc` |
+| Hosting: Open Issue Conversation... |  |
 | Review: ✦ Draft Review... | `s` |
 | Review: Accept Suggestion | `y` |
 | Review: Edit and Accept Suggestion... | `w` |

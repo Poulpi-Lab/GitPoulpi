@@ -797,6 +797,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Radar：固定或取消固定 | `p` |
 | Radar：延后… | `z` |
 | Radar：评审请求… | `e` |
+| Radar: Open Issue Conversation | `i` |
 | Radar：通过 API 评审 |  |
 | Radar：克隆并评审… |  |
 | Radar：编辑指派人… |  |
@@ -938,6 +939,25 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 看板：设置列标签… | `c` |
 | 看板：刷新 | `r` |
 | 看板：关闭 | `Esc` |
+| Conversation: Back |  |
+| Conversation: Refresh | `F5` |
+| Conversation: Load Older Entries | `m` |
+| Conversation: Previous Entry | `Up` |
+| Conversation: Next Entry | `Down` |
+| Conversation: Next Unread Entry | `n` |
+| Conversation: Reply to Entry | `r` |
+| Conversation: New Comment | `c` |
+| Conversation: Links of Entry... | `l` |
+| Conversation: Copy Link of Entry | `y` |
+| Conversation: Open in Browser | `o` |
+| Conversation: Edit Comment | `e` |
+| Conversation: Delete Comment | `d` |
+| Conversation: Show or Hide Events | `v` |
+| Conversation: Toggle Write and Preview |  |
+| Conversation: Toggle the Split View |  |
+| Conversation: Send the Comment |  |
+| Conversation: Close | `Esc` |
+| Hosting: Open Issue Conversation... |  |
 | 评审：✦ 起草评审… | `s` |
 | 评审：接受建议 | `y` |
 | 评审：编辑并接受建议… | `w` |

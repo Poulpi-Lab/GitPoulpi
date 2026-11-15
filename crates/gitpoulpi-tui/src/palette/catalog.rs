@@ -1876,7 +1876,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "i",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::Conversation)),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::build_features::Feature::Radar),
     entry(
         msg::palette::RADAR_REVIEW_API,
         "",
@@ -2653,7 +2653,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     // -- conversation (open) -------------------------------------------
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_BACK,
-        "Alt+Left",
+        "",
         PaletteCommand::Item(crate::item_cmd::ItemCmd::Back),
     )
     .requires(crate::build_features::Feature::Conversation),
@@ -2737,19 +2737,19 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     .requires(crate::build_features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_TOGGLE_PREVIEW,
-        "Alt+P",
+        "",
         PaletteCommand::Item(crate::item_cmd::ItemCmd::TogglePreview),
     )
     .requires(crate::build_features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_TOGGLE_SPLIT,
-        "Alt+L",
+        "",
         PaletteCommand::Item(crate::item_cmd::ItemCmd::ToggleSplit),
     )
     .requires(crate::build_features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_SEND,
-        "Ctrl+Enter",
+        "",
         PaletteCommand::Item(crate::item_cmd::ItemCmd::Send),
     )
     .requires(crate::build_features::Feature::Conversation),

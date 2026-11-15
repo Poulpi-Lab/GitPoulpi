@@ -831,6 +831,7 @@ Klávesy jsou výchozí.
 | Radar: Připnout nebo odepnout | `p` |
 | Radar: Odložit... | `z` |
 | Radar: Zkontrolovat žádost... | `e` |
+| Radar: Open Issue Conversation | `i` |
 | Radar: Zkontrolovat přes API |  |
 | Radar: Naklonovat a zkontrolovat... |  |
 | Radar: Upravit řešitele... |  |
@@ -972,6 +973,25 @@ Klávesy jsou výchozí.
 | Tabule: Nastavit štítky sloupců... | `c` |
 | Tabule: Obnovit | `r` |
 | Tabule: Zavřít | `Esc` |
+| Conversation: Back |  |
+| Conversation: Refresh | `F5` |
+| Conversation: Load Older Entries | `m` |
+| Conversation: Previous Entry | `Up` |
+| Conversation: Next Entry | `Down` |
+| Conversation: Next Unread Entry | `n` |
+| Conversation: Reply to Entry | `r` |
+| Conversation: New Comment | `c` |
+| Conversation: Links of Entry... | `l` |
+| Conversation: Copy Link of Entry | `y` |
+| Conversation: Open in Browser | `o` |
+| Conversation: Edit Comment | `e` |
+| Conversation: Delete Comment | `d` |
+| Conversation: Show or Hide Events | `v` |
+| Conversation: Toggle Write and Preview |  |
+| Conversation: Toggle the Split View |  |
+| Conversation: Send the Comment |  |
+| Conversation: Close | `Esc` |
+| Hosting: Open Issue Conversation... |  |
 | Kontrola: ✦ Koncept kontroly... | `s` |
 | Kontrola: Přijmout návrh | `y` |
 | Kontrola: Upravit a přijmout návrh... | `w` |

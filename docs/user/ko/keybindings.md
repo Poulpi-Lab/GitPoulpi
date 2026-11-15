@@ -824,6 +824,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Radar: 고정 또는 해제 | `p` |
 | Radar: 미루기... | `z` |
 | Radar: 요청 리뷰... | `e` |
+| Radar: Open Issue Conversation | `i` |
 | Radar: API로 리뷰 |  |
 | Radar: 클론 후 리뷰... |  |
 | Radar: 담당자 편집... |  |
@@ -965,6 +966,25 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 보드: 열 레이블 설정... | `c` |
 | 보드: 새로 고침 | `r` |
 | 보드: 닫기 | `Esc` |
+| Conversation: Back |  |
+| Conversation: Refresh | `F5` |
+| Conversation: Load Older Entries | `m` |
+| Conversation: Previous Entry | `Up` |
+| Conversation: Next Entry | `Down` |
+| Conversation: Next Unread Entry | `n` |
+| Conversation: Reply to Entry | `r` |
+| Conversation: New Comment | `c` |
+| Conversation: Links of Entry... | `l` |
+| Conversation: Copy Link of Entry | `y` |
+| Conversation: Open in Browser | `o` |
+| Conversation: Edit Comment | `e` |
+| Conversation: Delete Comment | `d` |
+| Conversation: Show or Hide Events | `v` |
+| Conversation: Toggle Write and Preview |  |
+| Conversation: Toggle the Split View |  |
+| Conversation: Send the Comment |  |
+| Conversation: Close | `Esc` |
+| Hosting: Open Issue Conversation... |  |
 | 리뷰: ✦ 리뷰 초안 작성... | `s` |
 | 리뷰: 제안 수락 | `y` |
 | 리뷰: 제안 편집 후 수락... | `w` |

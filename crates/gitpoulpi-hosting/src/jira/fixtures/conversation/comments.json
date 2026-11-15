@@ -1,0 +1,22 @@
+{
+  "startAt": 0,
+  "maxResults": 100,
+  "total": 2,
+  "comments": [
+    {
+      "id": "11",
+      "author": { "accountId": "bot1", "displayName": "Release Bot", "accountType": "app" },
+      "body": "*bold* and [~accountid:a1]",
+      "created": "2024-05-01T11:00:00.000+0000",
+      "updated": "2024-05-01T12:00:00.000+0000",
+      "visibility": { "type": "role", "value": "Administrators" }
+    },
+    {
+      "id": "10",
+      "author": { "accountId": "a1", "displayName": "Ann Lee", "accountType": "atlassian" },
+      "body": "Works on {{main}}",
+      "created": "2024-05-01T10:00:00.000+0000",
+      "updated": "2024-05-01T10:00:00.000+0000"
+    }
+  ]
+}

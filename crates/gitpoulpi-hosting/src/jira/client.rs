@@ -7,6 +7,10 @@ use crate::client::{
     encode_component, CreatedIssue, CreatedPullRequest, HostingClient, NewIssue, NewPullRequest,
     MAX_PAGES,
 };
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
+    TimelinePage,
+};
 use crate::http::{HttpRequest, HttpTransport};
 use crate::integration::{Integration, IntegrationKind};
 use crate::model::{HostedUser, IssueCreateOptions, IssueFilter, IssueSummary, TokenCheck};
@@ -22,9 +26,9 @@ const SEARCH_PAGE: usize = 100;
 const MAX_ISSUES: usize = 500;
 
 pub(crate) struct JiraClient {
-    integration: Integration,
+    pub(super) integration: Integration,
     token: String,
-    transport: Arc<dyn HttpTransport>,
+    pub(super) transport: Arc<dyn HttpTransport>,
 }
 
 impl JiraClient {
@@ -44,7 +48,7 @@ impl JiraClient {
         self.integration.kind == IntegrationKind::JiraCloud
     }
 
-    fn site(&self) -> String {
+    pub(super) fn site(&self) -> String {
         self.integration
             .url
             .trim()
@@ -53,19 +57,19 @@ impl JiraClient {
     }
 
     /// Cloud `/rest/api/3`, Data Center `/rest/api/2`.
-    fn api(&self) -> String {
+    pub(super) fn api(&self) -> String {
         self.integration.api_base()
     }
 
     /// `/rest/api/2` on both: its `description` is plain text, where v3
     /// wants an Atlassian Document Format tree.
-    fn api_v2(&self) -> String {
+    pub(super) fn api_v2(&self) -> String {
         self.integration
             .api_base_v2()
             .unwrap_or_else(|| self.integration.api_base())
     }
 
-    fn authed(&self, request: HttpRequest) -> HttpRequest {
+    pub(super) fn authed(&self, request: HttpRequest) -> HttpRequest {
         let mut request = request.header("Accept", "application/json");
         for (name, value) in auth_headers(&self.integration, &self.token) {
             request = request.header(name, value);
@@ -77,7 +81,11 @@ impl JiraClient {
         self.authed(HttpRequest::get(url))
     }
 
-    async fn get_json<T: serde::de::DeserializeOwned>(&self, url: String, what: &str) -> Result<T> {
+    pub(super) async fn get_json<T: serde::de::DeserializeOwned>(
+        &self,
+        url: String,
+        what: &str,
+    ) -> Result<T> {
         let response = self.transport.send(self.get(url)).await?;
         response.error_for_status(what)?;
         response.json()
@@ -347,6 +355,53 @@ impl HostingClient for JiraClient {
             web_url: map::browse_url(&self.site(), &created.key),
             reference: created.key,
         })
+    }
+
+    fn conversation_caps(&self, kind: ItemKind) -> ConversationCaps {
+        ConversationCaps::jira(kind)
+    }
+
+    async fn posting_identity(&self, _project: &str) -> Result<PostingIdentity> {
+        self.conv_identity().await
+    }
+
+    async fn item_timeline(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        older: Option<&PageCursor>,
+        opts: &TimelineOpts,
+    ) -> Result<TimelinePage> {
+        self.conv_timeline(project, key, older, opts).await
+    }
+
+    async fn post_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> Result<Comment> {
+        self.conv_post(project, key, body, internal).await
+    }
+
+    async fn edit_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_edit(project, key, comment_id, body).await
+    }
+
+    async fn delete_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+    ) -> Result<()> {
+        self.conv_delete(project, key, comment_id).await
     }
 
     async fn issue_create_options(&self, project: &str) -> Result<IssueCreateOptions> {

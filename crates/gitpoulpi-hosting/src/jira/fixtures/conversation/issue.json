@@ -1,0 +1,42 @@
+{
+  "id": "10001",
+  "key": "ABC-7",
+  "fields": {
+    "summary": "Login fails behind a proxy",
+    "status": { "name": "Done", "statusCategory": { "key": "done" } },
+    "reporter": { "accountId": "a1", "displayName": "Ann Lee", "accountType": "atlassian" },
+    "labels": ["bug", "ui"],
+    "description": "h2. Steps\n* one\n* *bold*",
+    "created": "2024-05-01T08:00:00.000+0000"
+  },
+  "changelog": {
+    "histories": [
+      {
+        "id": "900",
+        "author": { "accountId": "a2", "displayName": "Bob Ray", "accountType": "atlassian" },
+        "created": "2024-05-01T09:00:00.000+0000",
+        "items": [
+          { "field": "status", "fromString": "To Do", "toString": "In Progress" }
+        ]
+      },
+      {
+        "id": "901",
+        "author": { "accountId": "a2", "displayName": "Bob Ray", "accountType": "atlassian" },
+        "created": "2024-05-01T10:30:00.000+0000",
+        "items": [
+          { "field": "labels", "fromString": "bug", "toString": "bug ui" },
+          { "field": "assignee", "fromString": null, "toString": "Bob Ray" },
+          { "field": "summary", "fromString": "Login breaks", "toString": "Login fails behind a proxy" }
+        ]
+      },
+      {
+        "id": "902",
+        "author": { "accountId": "a2", "displayName": "Bob Ray", "accountType": "atlassian" },
+        "created": "2024-05-03T10:00:00.000+0000",
+        "items": [
+          { "field": "resolution", "fromString": null, "toString": "Fixed" }
+        ]
+      }
+    ]
+  }
+}

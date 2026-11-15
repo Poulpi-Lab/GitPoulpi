@@ -47,6 +47,35 @@ Free Markdown. GitPoulpi never rewrites the body.
   with no frontmatter takes its title from the first `# heading`. A file that is not an issue (`readme.md`) is ignored.
 - A status is free text. **Open** means "not the done status".
 
+### Comments in a note
+
+A comment on a note is written into the note itself, in a last `## Comments` section (no network, and it reads fine in
+Obsidian):
+
+```markdown
+(the note's text)
+
+## Comments
+
+### kai - 2026-11-15T10:00:00Z
+First comment, **any Markdown**.
+
+### ann - 2026-11-15T11:30:00Z (edited 2026-11-15T12:00:00Z)
+Second one.
+```
+
+- An entry starts at a line that is exactly `### <author> - <UTC time>`, with ` (edited <UTC time>)` after an edit;
+  its text runs to the next entry. The section is the last `## Comments` heading outside a code fence and runs to the
+  end of the file, so write nothing after it.
+- A comment line that would read as an entry or as the heading is stored with a leading backslash (`\### ...`, which
+  Markdown shows as the same text) and read back without it.
+- Posting adds to the end and leaves everything above byte for byte (line endings included); an edit or a delete
+  rewrites only the section. A post also moves the note's `updated` (a note without frontmatter is given none).
+- The author is the profile's local author (the "me" of the Local issues settings). You can edit or delete only your
+  own comments; a comment's id is its time and author, and two posts in the same second are told apart by moving the
+  second one on by a second.
+- There are no replies, no internal comments and no event history for a note.
+
 ## What you can do
 
 | In the ISSUES section | Keyboard / palette |

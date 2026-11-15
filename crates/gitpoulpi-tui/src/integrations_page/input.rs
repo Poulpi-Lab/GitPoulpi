@@ -33,6 +33,7 @@ impl IntegrationsPage {
             | Item::RadarNamespaces
             | Item::RadarRegex
             | Item::RadarMode => self.activate_radar(item, env),
+            Item::RedmineMarkup => self.toggle_redmine_markup(env),
             Item::Host | Item::Org | Item::Account | Item::Token => self.step(1, env.config),
             Item::StrictPin => self.strict = !self.strict,
             Item::AllowPlain => self.plain_http = !self.plain_http,

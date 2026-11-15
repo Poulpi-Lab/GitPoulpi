@@ -8919,6 +8919,13 @@ column_hidden = { git = "Колонка commit'ов: {part} скрыта", local
 # context: tooltip of the strip left of a view that brings the hidden commit column back; the key of the toggle is appended in parentheses; no final period
 reopen_tip = { git = "Показать колонку commit'ов", local = "Показать колонку коммитов" }
 
+# Settings > Integrations, the text format row of a connected Redmine profile (integrations_page/redmine.rs).
+[redmine_settings]
+# context: row of a Redmine profile; {format} is Textile or Markdown, a proper noun; pressing it switches to the other one
+markup_row = "Text format of the server: {format}"
+# context: help under that row; Administration > Settings > General > Text formatting is the Redmine menu path
+markup_help = "Set it to what this Redmine uses (Administration > Settings > General > Text formatting). Comments are read and written in that format; you always type Markdown, which is converted for Textile."
+
 # Settings > Integrations, the Radar block of a connected code host (integrations_page/radar.rs).
 [radar_settings]
 # context: heading of the block: the Radar lists this profile feeds

@@ -33,8 +33,8 @@ pub use ai::{
 pub use integration::{
     clean_namespaces, normalize_azure_url, parse_namespace_text, AccountField, ApiFamily,
     AuthMethod, Capabilities, ConnectedUser, Integration, IntegrationCategory, IntegrationKind,
-    IntegrationRadar, IntegrationSsh, LocalMarkdownSettings, RemoteReviewMode, SshMode, TokenHelp,
-    TokenLink, DEFAULT_STATUSES,
+    IntegrationRadar, IntegrationSsh, LocalMarkdownSettings, RedmineMarkup, RemoteReviewMode,
+    SshMode, TokenHelp, TokenLink, DEFAULT_STATUSES,
 };
 pub use keybindings::{
     reset_all_keybindings_in_file, reset_keybinding_in_file, set_keybinding_in_file,

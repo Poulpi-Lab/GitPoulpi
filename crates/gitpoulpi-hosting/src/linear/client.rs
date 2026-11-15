@@ -10,6 +10,10 @@ use crate::auth::auth_headers;
 use crate::client::{
     CreatedIssue, CreatedPullRequest, HostingClient, NewIssue, NewPullRequest, MAX_PAGES,
 };
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
+    TimelinePage,
+};
 use crate::http::{HttpRequest, HttpTransport};
 use crate::integration::Integration;
 use crate::metadata::{HostedLabel, HostedMilestone, IssueEdit, ItemMeta, MetaKind};
@@ -26,7 +30,7 @@ use super::queries;
 const MAX_ISSUES: usize = 500;
 
 pub(crate) struct LinearClient {
-    integration: Integration,
+    pub(super) integration: Integration,
     token: String,
     transport: Arc<dyn HttpTransport>,
     /// Team key to team id, so a form that needs the id three times asks once.
@@ -127,7 +131,7 @@ impl LinearClient {
     }
 
     /// Runs one document and returns its `data`.
-    async fn graphql(&self, what: &str, query: &str, variables: Value) -> Result<Value> {
+    pub(super) async fn graphql(&self, what: &str, query: &str, variables: Value) -> Result<Value> {
         let body = json!({ "query": query, "variables": variables });
         let mut request =
             HttpRequest::post_json(self.endpoint(), &body).header("Accept", "application/json");
@@ -548,6 +552,69 @@ impl HostingClient for LinearClient {
     }
 
     /// The states are the "lists" of the New-issue form.
+    fn conversation_caps(&self, kind: ItemKind) -> ConversationCaps {
+        ConversationCaps::linear(kind)
+    }
+
+    async fn posting_identity(&self, _project: &str) -> Result<PostingIdentity> {
+        self.conv_identity().await
+    }
+
+    async fn item_timeline(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        older: Option<&PageCursor>,
+        opts: &TimelineOpts,
+    ) -> Result<TimelinePage> {
+        self.conv_timeline(project, key, older, opts).await
+    }
+
+    async fn post_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> Result<Comment> {
+        if internal {
+            return Err(Error::Unsupported(
+                "internal comments: Linear has none".into(),
+            ));
+        }
+        self.conv_post(project, key, body, None).await
+    }
+
+    async fn reply_in_discussion(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        discussion_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_post(project, key, body, Some(discussion_id))
+            .await
+    }
+
+    async fn edit_item_comment(
+        &self,
+        _project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_edit(key, comment_id, body).await
+    }
+
+    async fn delete_item_comment(
+        &self,
+        _project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+    ) -> Result<()> {
+        self.conv_delete(key, comment_id).await
+    }
+
     async fn issue_create_options(&self, project: &str) -> Result<IssueCreateOptions> {
         let (states, default) = self.states(project).await?;
         let lists: Vec<Choice> = states

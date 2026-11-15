@@ -103,6 +103,7 @@ fn write_account(id: &str, url: &str) {
         enabled: true,
         local: None,
         radar: None,
+        markup: Default::default(),
     };
     gitpoulpi_config::set_list_in_file(
         &config_dir().join("config.toml"),

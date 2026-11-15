@@ -5,6 +5,9 @@
 //! header, never in a URL.
 
 mod client;
+mod conversation;
+#[cfg(test)]
+mod conversation_tests;
 mod map;
 pub mod spec;
 #[cfg(test)]

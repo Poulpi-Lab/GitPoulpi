@@ -11,6 +11,10 @@ use crate::client::{
     encode_component, CreatedIssue, CreatedPullRequest, HostingClient, NewIssue, NewPullRequest,
     MAX_PAGES,
 };
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
+    TimelinePage,
+};
 use crate::http::{HttpRequest, HttpTransport};
 use crate::integration::Integration;
 use crate::metadata::{list_delta, HostedLabel, HostedMilestone, IssueEdit, ItemMeta, MetaKind};
@@ -30,7 +34,7 @@ const BUNDLE_FIELDS: &str =
     "field(name),bundle(values(name,isResolved,archived,released,releaseDate))";
 
 pub(crate) struct YouTrackClient {
-    integration: Integration,
+    pub(super) integration: Integration,
     token: String,
     transport: Arc<dyn HttpTransport>,
     /// Short name to database id, asked once.
@@ -51,7 +55,7 @@ impl YouTrackClient {
         }
     }
 
-    fn site(&self) -> String {
+    pub(super) fn site(&self) -> String {
         self.integration
             .url
             .trim()
@@ -59,7 +63,7 @@ impl YouTrackClient {
             .to_string()
     }
 
-    fn api(&self) -> String {
+    pub(super) fn api(&self) -> String {
         self.integration.api_base()
     }
 
@@ -71,7 +75,7 @@ impl YouTrackClient {
         request
     }
 
-    async fn get_json<T: DeserializeOwned>(&self, path: &str, what: &str) -> Result<T> {
+    pub(super) async fn get_json<T: DeserializeOwned>(&self, path: &str, what: &str) -> Result<T> {
         let url = format!("{}{path}", self.api());
         let response = self
             .transport
@@ -82,7 +86,11 @@ impl YouTrackClient {
     }
 
     /// A POST (YouTrack edits with POST) or DELETE whose answer is not read.
-    async fn send(&self, request: HttpRequest, what: &str) -> Result<crate::http::HttpResponse> {
+    pub(super) async fn send(
+        &self,
+        request: HttpRequest,
+        what: &str,
+    ) -> Result<crate::http::HttpResponse> {
         let response = self.transport.send(self.authed(request)).await?;
         response.error_for_status(what)?;
         Ok(response)
@@ -90,7 +98,7 @@ impl YouTrackClient {
 
     /// Every row of a list endpoint, `$top` / `$skip` paged. `path` already
     /// carries a `?`.
-    async fn paged<T: DeserializeOwned>(
+    pub(super) async fn paged<T: DeserializeOwned>(
         &self,
         path: &str,
         what: &str,
@@ -292,6 +300,53 @@ impl HostingClient for YouTrackClient {
 
     async fn create_pull_request(&self, _req: &NewPullRequest) -> Result<CreatedPullRequest> {
         Err(self.unsupported("create_pull_request"))
+    }
+
+    fn conversation_caps(&self, kind: ItemKind) -> ConversationCaps {
+        ConversationCaps::youtrack(kind)
+    }
+
+    async fn posting_identity(&self, _project: &str) -> Result<PostingIdentity> {
+        self.conv_identity().await
+    }
+
+    async fn item_timeline(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        older: Option<&PageCursor>,
+        opts: &TimelineOpts,
+    ) -> Result<TimelinePage> {
+        self.conv_timeline(project, key, older, opts).await
+    }
+
+    async fn post_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> Result<Comment> {
+        self.conv_post(project, key, body, internal).await
+    }
+
+    async fn edit_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_edit(project, key, comment_id, body).await
+    }
+
+    async fn delete_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+    ) -> Result<()> {
+        self.conv_delete(project, key, comment_id).await
     }
 
     async fn current_user(&self) -> Result<HostedUser> {

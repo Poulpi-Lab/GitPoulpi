@@ -8,6 +8,10 @@
 use std::path::{Path, PathBuf};
 
 use crate::client::{CreatedIssue, CreatedPullRequest, HostingClient, NewIssue, NewPullRequest};
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
+    TimelinePage,
+};
 use crate::integration::Integration;
 use crate::metadata::{HostedLabel, HostedMilestone, IssueEdit, ItemMeta, MetaKind};
 use crate::model::{
@@ -87,7 +91,7 @@ fn store_for(integration: &Integration, folder: &str) -> Store {
 }
 
 pub(crate) struct LocalMarkdownClient {
-    integration: Integration,
+    pub(super) integration: Integration,
 }
 
 impl LocalMarkdownClient {
@@ -95,11 +99,11 @@ impl LocalMarkdownClient {
         Self { integration }
     }
 
-    fn store(&self, project: &str) -> Store {
+    pub(super) fn store(&self, project: &str) -> Store {
         store_for(&self.integration, project)
     }
 
-    fn me(&self) -> String {
+    pub(super) fn me(&self) -> String {
         let settings = self.integration.local.clone().unwrap_or_default();
         if !settings.me.trim().is_empty() {
             return settings.me.trim().to_string();
@@ -213,6 +217,53 @@ impl HostingClient for LocalMarkdownClient {
 
     async fn create_pull_request(&self, _req: &NewPullRequest) -> Result<CreatedPullRequest> {
         Err(self.unsupported("create_pull_request"))
+    }
+
+    fn conversation_caps(&self, kind: ItemKind) -> ConversationCaps {
+        ConversationCaps::local_markdown(kind)
+    }
+
+    async fn posting_identity(&self, _project: &str) -> Result<PostingIdentity> {
+        self.conv_identity().await
+    }
+
+    async fn item_timeline(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        older: Option<&PageCursor>,
+        opts: &TimelineOpts,
+    ) -> Result<TimelinePage> {
+        self.conv_timeline(project, key, older, opts).await
+    }
+
+    async fn post_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> Result<Comment> {
+        self.conv_post(project, key, body, internal).await
+    }
+
+    async fn edit_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_edit(project, key, comment_id, body).await
+    }
+
+    async fn delete_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+    ) -> Result<()> {
+        self.conv_delete(project, key, comment_id).await
     }
 
     async fn current_user(&self) -> Result<HostedUser> {

@@ -35,8 +35,8 @@ use crate::keymap::Action as Bind;
 use crate::wide_edge::Clear;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEventKind};
 use gitpoulpi_config::{
-    set_list_in_file, AccountField, Config, ConnectedUser, Integration, IntegrationCategory,
-    IntegrationKind, SshMode, TokenLink,
+    set_list_in_file, AccountField, ApiFamily, Config, ConnectedUser, Integration,
+    IntegrationCategory, IntegrationKind, SshMode, TokenLink,
 };
 use gitpoulpi_hosting::{client_for, HttpTransport, TokenCheck};
 use gitpoulpi_i18n::{
@@ -136,6 +136,8 @@ pub(crate) enum Item {
     /// The "Regular expressions" checkbox under the Namespaces area.
     RadarRegex,
     RadarMode,
+    /// A Redmine profile's "Text format of the server" row (Textile or Markdown).
+    RedmineMarkup,
 }
 
 impl Item {
@@ -697,6 +699,9 @@ impl IntegrationsPage {
                 if cfg.integrations[i].kind.capabilities().local_folder {
                     items.retain(|it| *it != Item::Disconnect);
                 }
+                if cfg.integrations[i].kind.family() == ApiFamily::Redmine {
+                    items.push(Item::RedmineMarkup);
+                }
                 items.extend(self.ssh_items(&cfg.integrations[i]));
                 items.extend(self.radar_items(&cfg.integrations[i]));
                 items
@@ -962,6 +967,7 @@ use render_forms::put_wrapped;
 mod input;
 mod jobs;
 mod radar;
+mod redmine;
 mod render;
 mod render_forms;
 

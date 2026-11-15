@@ -238,7 +238,8 @@ mod real {
     }
 
     fn failed(what: &str, why: String) -> gitpoulpi_ai::Error {
-        gitpoulpi_ai::Error::Invalid(format!("could not read the repository ({what}): {why}"))
+        let message = format!("could not read the repository ({what}): {why}"); // i18n-english
+        gitpoulpi_ai::Error::Invalid(message)
     }
 
     #[async_trait::async_trait]
@@ -253,7 +254,7 @@ mod real {
             let paths: Vec<PathBuf> = self
                 .call(OperationKind::ListTree, json!({ "at": at }))
                 .await
-                .map_err(|e| failed("the file list", e))?;
+                .map_err(|e| failed("the file list", e))?; // i18n-english
             Ok(paths
                 .into_iter()
                 .map(|p| p.to_string_lossy().replace('\\', "/"))
@@ -292,7 +293,7 @@ mod real {
                 json!({ "at": at, "terms": terms, "max_hits": max_hits }),
             )
             .await
-            .map_err(|e| failed("the search", e))
+            .map_err(|e| failed("the search", e)) // i18n-english
         }
 
         async fn diff(&self, base: &str, head: &str) -> gitpoulpi_ai::Result<Option<String>> {
@@ -315,7 +316,7 @@ mod real {
                     json!({ "target": DiffTarget::CommitRange(from, head) }),
                 )
                 .await
-                .map_err(|e| failed("the pull request's diff", e))?;
+                .map_err(|e| failed("the pull request's diff", e))?; // i18n-english
             Ok(Some(gitpoulpi_ai::assist::render_diff(&files)))
         }
     }

@@ -7,6 +7,10 @@
 //! are atomic. See `docs/user/local-issues.md`.
 
 mod client;
+mod comments;
+mod conversation;
+#[cfg(test)]
+mod conversation_tests;
 pub mod frontmatter;
 pub mod obsidian;
 pub mod spec;

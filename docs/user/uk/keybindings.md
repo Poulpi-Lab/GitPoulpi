@@ -989,6 +989,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Conversation: Send the Comment |  |
 | Conversation: Toggle Internal Note |  |
 | Conversation: Close | `Esc` |
+| Markdown Editor: Write with AI |  |
+| Markdown Editor: Refresh the AI Context |  |
 | Hosting: Open Issue Conversation... |  |
 | Рев'ю: ✦ чернетка рев'ю... | `s` |
 | Рев'ю: прийняти пропозицію | `y` |

@@ -961,6 +961,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Conversation: Send the Comment |  |
 | Conversation: Toggle Internal Note |  |
 | Conversation: Close | `Esc` |
+| Markdown Editor: Write with AI |  |
+| Markdown Editor: Refresh the AI Context |  |
 | Hosting: Open Issue Conversation... |  |
 | レビュー: ✦ レビューのドラフトを作成... | `s` |
 | レビュー: 提案を採用 | `y` |

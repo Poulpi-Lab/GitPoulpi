@@ -1352,7 +1352,6 @@ impl PaletteCommand {
                 | PaletteCommand::AiSplitSelectedCommit
                 | PaletteCommand::AiExplainWip
                 | PaletteCommand::AiComposeCommits
-                | PaletteCommand::Composer(_)
                 | PaletteCommand::Merge(crate::merge_view::MergeCmd::AiSuggest)
                 | PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::ScriptAi)
                 | PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::RulesAi)

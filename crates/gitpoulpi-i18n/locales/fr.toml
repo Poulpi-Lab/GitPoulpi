@@ -5324,7 +5324,7 @@ nothing_to_explain = "il n'y a rien à expliquer"
 repo_read_failed = "impossible de lire le dépôt ({what})\u00a0: {why}"
 repo_what_files = "la liste des fichiers"
 repo_what_search = "la recherche"
-repo_what_diff = { git = "le diff de la {$pr}", local = "la différence de la {$pr}" }
+repo_what_diff = "les modifications en revue"
 code_source_gone = "la source du code a disparu"
 
 [ui_intent]

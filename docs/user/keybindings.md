@@ -995,6 +995,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Conversation: Send the Comment |  |
 | Conversation: Toggle Internal Note |  |
 | Conversation: Close | `Esc` |
+| Markdown Editor: Write with AI |  |
+| Markdown Editor: Refresh the AI Context |  |
 | Hosting: Open Issue Conversation... |  |
 | Review: ✦ Draft Review... | `s` |
 | Review: Accept Suggestion | `y` |

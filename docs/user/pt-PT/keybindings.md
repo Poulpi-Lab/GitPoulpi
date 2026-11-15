@@ -993,6 +993,8 @@ As teclas são as predefinidas.
 | Conversation: Send the Comment |  |
 | Conversation: Toggle Internal Note |  |
 | Conversation: Close | `Esc` |
+| Markdown Editor: Write with AI |  |
+| Markdown Editor: Refresh the AI Context |  |
 | Hosting: Open Issue Conversation... |  |
 | Revisão: ✦ redigir revisão... | `s` |
 | Revisão: aceitar sugestão | `y` |

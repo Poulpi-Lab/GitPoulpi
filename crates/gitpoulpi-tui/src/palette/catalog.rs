@@ -2779,7 +2779,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     .requires(crate::build_features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::keymap_action::MD_EDITOR_AI,
-        "Alt+E",
+        "",
         PaletteCommand::Composer(crate::composer_cmd::ComposerCmd::WriteWithAi),
     ),
     entry(

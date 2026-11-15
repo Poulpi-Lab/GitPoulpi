@@ -961,6 +961,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Conversation: Send the Comment |  |
 | Conversation: Toggle Internal Note |  |
 | Conversation: Close | `Esc` |
+| Markdown Editor: Write with AI |  |
+| Markdown Editor: Refresh the AI Context |  |
 | Hosting: Open Issue Conversation... |  |
 | 评审：✦ 起草评审… | `s` |
 | 评审：接受建议 | `y` |

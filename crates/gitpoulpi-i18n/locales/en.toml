@@ -6504,7 +6504,7 @@ nothing_to_explain = "there is nothing to explain"
 repo_read_failed = "could not read the repository ({what}): {why}"
 repo_what_files = "the file list"
 repo_what_search = "the search"
-repo_what_diff = { git = "the diff of the {$pr}", local = "the diff of the {$pr}" }
+repo_what_diff = "the changes under review"
 # context: error: the pull request code the review showed can no longer be read
 code_source_gone = "the code source is gone"
 

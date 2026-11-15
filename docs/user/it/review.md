@@ -55,6 +55,8 @@ e le revisioni già inviate, dalla più vecchia, ciascuna con il suo esito (`app
 `ignorata`). Su GitLab gli esiti sono le sue approvazioni. Sotto, la casella di risposta: cliccala o premi **`c`**
 per scrivere un commento sulla conversazione. **Questo viene pubblicato subito**, e la casella lo dice.
 
+La casella dei commenti (anche quella di una risposta, di un commento su una riga e del riepilogo di **Termina la revisione**) è il compositore Markdown condiviso con [la vista di conversazione](hosting-integration.md#scrivere): **Scrivi**, **Anteprima** (`Alt+P`) e **Affianca** (`Alt+L`, in una finestra larga 100 colonne); `Ctrl+Enter` (anche `Ctrl+S`, `Alt+Enter`) invia, e dove l'IA è attiva `Alt+E` apre **Scrivi con l'IA** ([il capitolo sull'IA](ai.md#aiuto-alla-scrittura-su-un-host)). L'anteprima mostra il testo come lo mostrerà l'host, riferimenti compresi (`#7`, `!12`, `ABC-12`, id di commit); un testo non inviato viene conservato per richiesta. Il testo della descrizione e della conversazione usa lo stesso renderer, quindi Markdown, tabelle, avvisi e riferimenti hanno lo stesso aspetto qui e nella vista di conversazione di una issue. Citare, modificare o eliminare un commento già pubblicato, e le note interne, appartengono alla vista di conversazione delle issue e delle richieste su host senza revisione (vedi [Conversazioni](hosting-integration.md#5c-conversazioni)); qui si possono modificare solo i tuoi commenti in sospeso.
+
 ### File
 
 I file modificati a sinistra (lettera di stato, `+aggiunte -rimosse`, un conteggio `●n` delle discussioni aperte, un

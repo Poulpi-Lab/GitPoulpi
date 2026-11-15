@@ -1408,6 +1408,7 @@ dependencies = [
 name = "gitpoulpi-daemon"
 version = "1.0.0-rc.1"
 dependencies = [
+ "async-trait",
  "gitpoulpi-cli-backend",
  "gitpoulpi-config",
  "gitpoulpi-core",

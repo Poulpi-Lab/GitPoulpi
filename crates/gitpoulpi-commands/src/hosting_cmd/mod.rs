@@ -26,6 +26,7 @@ use crate::client::Session;
 use crate::repo_cmd::Emitted;
 
 #[cfg(feature = "board")]
+mod assignment;
 mod board_cmd;
 pub mod flow_issue;
 mod integrations;
@@ -239,6 +240,7 @@ pub fn needs_daemon(action: &HostingAction) -> bool {
             | HostingAction::Refs { .. }
             | HostingAction::EditUrl { .. }
             | HostingAction::Use { .. }
+            | HostingAction::Assignment { .. }
             | HostingAction::Link { .. }
             | HostingAction::PrEdit { .. }
             | HostingAction::Members { .. }
@@ -467,6 +469,10 @@ pub(crate) fn trust_answer(result: Result<Emitted, String>) -> Result<Emitted, S
     let Err(message) = result else {
         return result;
     };
+    // A repository that blocks assignment: refused, not failed.
+    if message.contains(gitpoulpi_hosting::scope::ASSIGNMENT_BLOCKED) {
+        return Ok(assignment::assignment_refusal(&message));
+    }
     let queue = gitpoulpi_hosting::trust::take_pending();
     let (mine, rest): (Vec<_>, Vec<_>) = queue
         .into_iter()
@@ -587,6 +593,7 @@ async fn run_local_inner(env: &HostingEnv, action: HostingAction) -> Result<Emit
         | HostingAction::Refs { .. }
         | HostingAction::EditUrl { .. }
         | HostingAction::Use { .. }
+        | HostingAction::Assignment { .. }
         | HostingAction::Link { .. }
         | HostingAction::PrEdit { .. }
         | HostingAction::Members { .. }
@@ -919,6 +926,9 @@ async fn run_via_daemon_inner(
             });
         }
         HostingAction::Use { id, clear } => return run_use(env, ipc, id, clear).await,
+        HostingAction::Assignment { block, allow } => {
+            return assignment::run_assignment(ipc, block, allow)
+        }
         HostingAction::Link {
             kind,
             id,

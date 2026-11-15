@@ -107,6 +107,7 @@ const TOOLS: &[(&str, &str, bool)] = &[
     ("hosting_ssh_key_delete", "destructive", true),
     ("hosting_ssh_key_list", "read", true),
     ("hosting_use", "write", false),
+    ("hosting_assignment", "write", false),
     ("ignore", "write", false),
     ("mailmap_add", "write", false),
     ("mailmap_check", "read", false),

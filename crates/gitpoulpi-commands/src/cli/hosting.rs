@@ -212,6 +212,19 @@ pub enum HostingAction {
         #[arg(long, conflicts_with = "id")]
         clear: bool,
     },
+    /// Shows, blocks or allows assigning people in the current repository's
+    /// issues and pull requests (with neither flag, shows what is in force).
+    /// Blocked: every assignment is refused (exit code 2, reason
+    /// `assignment_blocked`), whatever the surface; existing assignees stay
+    /// visible. Only a person can allow again.
+    Assignment {
+        /// Refuse every assignment in this repository.
+        #[arg(long, conflicts_with = "allow")]
+        block: bool,
+        /// Allow assignment again (a person only).
+        #[arg(long)]
+        allow: bool,
+    },
     /// Opens a pull request (GitHub, Gitea, Forgejo, Bitbucket, Azure DevOps) or merge request
     /// (GitLab) from a branch of the current repository.
     Pr {

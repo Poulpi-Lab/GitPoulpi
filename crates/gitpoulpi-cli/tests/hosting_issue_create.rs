@@ -280,3 +280,75 @@ fn a_host_refusal_is_surfaced_with_its_status_and_detail() {
 
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();
+
+impl Cli {
+    /// Exit code and payload, success or not.
+    fn code(&self, cwd: &Path, args: &[&str]) -> (i32, Value) {
+        let output = Command::cargo_bin("gitpoulpi")
+            .unwrap()
+            .env("GITPOULPI_CONFIG_DIR", self.config.path())
+            .env("GITPOULPI_TOKEN_CORP", "test-token")
+            .arg("--json")
+            .args(["--session", &self.session])
+            .args(args)
+            .current_dir(cwd)
+            .output()
+            .expect("run gitpoulpi");
+        let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
+        let json =
+            serde_json::from_str(&stdout).unwrap_or_else(|e| panic!("not JSON ({e}): {stdout}"));
+        (output.status.code().unwrap_or(-1), json)
+    }
+}
+
+#[test]
+fn a_repository_that_blocks_assignment_refuses_an_issue_created_with_assignees() {
+    let mock = start_mock(None);
+    let repo = fixture(mock.port);
+    let cli = Cli::new("hosting-issue-assignment-blocked", mock.port);
+    link_issues(&repo);
+
+    // Allowed by default.
+    assert_eq!(
+        cli.json(repo.root(), &["hosting", "assignment"])["assignment"],
+        "allowed"
+    );
+
+    let shown = cli.json(repo.root(), &["hosting", "assignment", "--block"]);
+    assert_eq!(shown["assignment"], "blocked");
+    let before = mock.requests().len();
+    let (code, json) = cli.code(
+        repo.root(),
+        &[
+            "hosting",
+            "issue",
+            "create",
+            "--title",
+            "B",
+            "--assignee",
+            "kai",
+        ],
+    );
+    assert_eq!(code, 2, "{json}");
+    assert_eq!(json["refused"]["reason"], "assignment_blocked", "{json}");
+    assert!(
+        !mock
+            .requests()
+            .iter()
+            .skip(before)
+            .any(|(m, _, _)| m == "POST"),
+        "nothing is created when the assignment is refused"
+    );
+
+    // Without an assignee the same repository still creates issues.
+    let (code, _) = cli.code(repo.root(), &["hosting", "issue", "create", "--title", "C"]);
+    assert_eq!(code, 0);
+
+    // Allowing again is shown and persisted.
+    let shown = cli.json(repo.root(), &["hosting", "assignment", "--allow"]);
+    assert_eq!(shown["assignment"], "allowed");
+    assert_eq!(
+        cli.json(repo.root(), &["hosting", "assignment"])["assignment"],
+        "allowed"
+    );
+}

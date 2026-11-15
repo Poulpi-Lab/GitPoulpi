@@ -425,3 +425,72 @@ fn walk(dir: &Path) -> Vec<std::path::PathBuf> {
     }
     found
 }
+
+#[test]
+fn use_for_hosting_is_stored_shown_and_only_goes_with_a_token_command() {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("initial")
+        .unwrap()
+        .build();
+    let root = repo.root();
+    let session = "ra-use-for-hosting";
+    let (code, json) = run(
+        root,
+        session,
+        &[
+            "repo-auth",
+            "set",
+            "--https",
+            "token-command",
+            "--hosts",
+            "github.com",
+            "--use-for-hosting",
+            "--yes",
+            "--command",
+            "pass",
+            "show",
+            "token",
+        ],
+    );
+    assert_eq!(code, 0, "{json}");
+    assert_eq!(json["view"]["profile"]["https"]["use_for_hosting"], true);
+    let shown = ok(root, session, &["repo-auth", "show"]);
+    assert_eq!(
+        shown["profile"]["https"]["use_for_hosting"], true,
+        "{shown}"
+    );
+
+    // Without the flag it is off (and absent from the profile).
+    let (code, _) = run(
+        root,
+        session,
+        &[
+            "repo-auth",
+            "set",
+            "--https",
+            "token-command",
+            "--hosts",
+            "github.com",
+            "--yes",
+            "--command",
+            "pass",
+            "show",
+            "token",
+        ],
+    );
+    assert_eq!(code, 0);
+    let shown = ok(root, session, &["repo-auth", "show"]);
+    assert!(
+        shown["profile"]["https"]["use_for_hosting"].is_null(),
+        "{shown}"
+    );
+
+    // A failure, not a refusal: the flag belongs to a token command.
+    let (code, json) = run(
+        root,
+        session,
+        &["repo-auth", "set", "--https", "system", "--use-for-hosting"],
+    );
+    assert_eq!(code, 1, "{json}");
+}

@@ -287,6 +287,11 @@ pub(super) async fn repo_target(
                 .into_owned();
         }
     }
+    // The repository's stored settings (a token command for its host calls,
+    // blocked assignment) apply to the calls made about this project.
+    if let Some(root) = ipc.repo_root() {
+        gitpoulpi_daemon::hosting_scope::register(root, &target.integration.id, &target.project);
+    }
     Ok(target)
 }
 

@@ -27,7 +27,7 @@ use gitpoulpi_update::plan::Procedure;
 use super::auto::Phase;
 use super::{Snapshot, UpdatesCommand};
 use crate::dialog_kit::put;
-use crate::markdown_lite::{self, Look};
+use crate::md_render;
 use crate::scrollbar::{BarDrag, Track};
 use crate::{button_bg, display_width, th};
 
@@ -126,7 +126,7 @@ impl ReleaseNotesSlot {
 /// One line of the body.
 #[derive(Clone)]
 enum Row {
-    Md(markdown_lite::Line),
+    Md(md_render::MdLine),
     Rule,
 }
 
@@ -196,6 +196,7 @@ impl NotesUi {
             return;
         }
         let text_w = usize::from(width.saturating_sub(3)).max(8);
+        let ctx = md_render::Context::default();
         let mut rows: Vec<Row> = Vec::new();
         let release = snapshot.available.as_ref().or(snapshot.skipped.as_ref());
         if let Some(release) = release {
@@ -208,8 +209,13 @@ impl NotesUi {
                 }
             };
             if let Some(note) = note {
-                rows.extend(markdown_lite::render(note, text_w).into_iter().map(Row::Md));
-                rows.push(Row::Md(markdown_lite::Line::default()));
+                rows.extend(
+                    md_render::render(note, text_w, &ctx)
+                        .lines
+                        .into_iter()
+                        .map(Row::Md),
+                );
+                rows.push(Row::Md(md_render::MdLine::default()));
             }
             let body = if release.notes.trim().is_empty() {
                 msg::NOTES_EMPTY.get().to_string()
@@ -217,19 +223,25 @@ impl NotesUi {
                 release.notes.clone()
             };
             rows.extend(
-                markdown_lite::render(&body, text_w)
+                md_render::render(&body, text_w, &ctx)
+                    .lines
                     .into_iter()
                     .map(Row::Md),
             );
-            rows.push(Row::Md(markdown_lite::Line::default()));
+            rows.push(Row::Md(md_render::MdLine::default()));
             rows.push(Row::Rule);
-            rows.push(Row::Md(markdown_lite::Line::default()));
+            rows.push(Row::Md(md_render::MdLine::default()));
         }
         let start = section_start(CHANGELOG, super::RUNNING, !super::GIT_HASH.is_empty());
-        let before = markdown_lite::render(&CHANGELOG[..start], text_w).len();
-        self.anchor = rows.len() + before;
+        let before = md_render::render(&CHANGELOG[..start], text_w, &ctx)
+            .lines
+            .len();
+        // Blocks are one blank line apart, so the section starts one row after
+        // the lines of everything before it.
+        self.anchor = rows.len() + before + usize::from(before > 0);
         rows.extend(
-            markdown_lite::render(CHANGELOG, text_w)
+            md_render::render(CHANGELOG, text_w, &ctx)
+                .lines
                 .into_iter()
                 .map(Row::Md),
         );
@@ -427,12 +439,8 @@ impl NotesUi {
                     );
                 }
                 Row::Md(line) => {
-                    let mut x = body.x;
-                    for span in &line.spans {
-                        let room = body.right().saturating_sub(x);
-                        let r = put(buf, x, y, &span.text, room, md_style(span.look));
-                        x += r.width;
-                    }
+                    let base = Style::default().fg(th().ui.text);
+                    md_render::paint(buf, body.x, y, body.width, line, base, false);
                 }
             }
         }
@@ -526,27 +534,5 @@ impl NotesUi {
             },
             _ => NotesEvent::None,
         }
-    }
-}
-
-fn md_style(look: Look) -> Style {
-    let base = Style::default().fg(th().ui.text);
-    match look {
-        Look::Plain => base,
-        Look::Bold => base.add_modifier(Modifier::BOLD),
-        Look::Italic => base.add_modifier(Modifier::ITALIC),
-        Look::BoldItalic => base.add_modifier(Modifier::BOLD | Modifier::ITALIC),
-        Look::Strike => base.add_modifier(Modifier::CROSSED_OUT),
-        Look::Code => Style::default().fg(th().ui.accent),
-        Look::Link => Style::default()
-            .fg(th().ui.accent)
-            .add_modifier(Modifier::UNDERLINED),
-        Look::Heading => Style::default()
-            .fg(th().ui.accent)
-            .add_modifier(Modifier::BOLD),
-        Look::Quote => Style::default()
-            .fg(th().ui.muted)
-            .add_modifier(Modifier::ITALIC),
-        Look::Marker => Style::default().fg(th().ui.accent),
     }
 }

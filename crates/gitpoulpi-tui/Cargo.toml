@@ -137,6 +137,7 @@ sha2.workspace = true
 reqwest = { workspace = true, optional = true }
 # The editor's syntax highlighting (`editor_highlight.rs`).
 syntect.workspace = true
+pulldown-cmark.workspace = true
 
 # `kitty_keyboard.rs`: a bounded poll(2) on the tty for the start-up query.
 [target.'cfg(unix)'.dependencies]

@@ -149,6 +149,10 @@ pub(crate) struct ReviewView {
     ov_bar: Option<crate::scrollbar::Track>,
     ov_drag: crate::scrollbar::BarDrag,
     ov_len: usize,
+    /// The Overview's laid-out Markdown, and the addresses of the links
+    /// painted this frame (`Hit::MdLink` indexes it).
+    md_cache: crate::md_render::DocCache,
+    md_links: Vec<String>,
     ov_rows: usize,
     file_sel: usize,
     file_offset: usize,
@@ -293,6 +297,8 @@ impl ReviewView {
             ov_bar: None,
             ov_drag: Default::default(),
             ov_len: 0,
+            md_cache: Default::default(),
+            md_links: Vec::new(),
             ov_rows: 0,
             file_sel: 0,
             file_offset: 0,

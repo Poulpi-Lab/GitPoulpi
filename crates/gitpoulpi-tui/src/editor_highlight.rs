@@ -226,6 +226,17 @@ impl Highlight {
         Highlight::with_syntax(syntax)
     }
 
+    /// The grammar a Markdown fence names (`rust`, `py`, `sh`), plain text
+    /// when it is unknown or empty.
+    pub(crate) fn for_token(token: &str) -> Highlight {
+        let token = token.trim();
+        let syntax = (!token.is_empty())
+            .then(|| syntaxes().find_syntax_by_token(token))
+            .flatten()
+            .filter(|s| s.name != "Plain Text");
+        Highlight::with_syntax(syntax)
+    }
+
     fn with_syntax(syntax: Option<&'static SyntaxReference>) -> Highlight {
         let highlighter = Highlighter::new(theme_named(th().syntax));
         let state = syntax.map(|s| {

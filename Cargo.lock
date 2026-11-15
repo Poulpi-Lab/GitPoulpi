@@ -1608,6 +1608,7 @@ dependencies = [
  "jpeg-decoder",
  "libc",
  "png",
+ "pulldown-cmark",
  "ratatui",
  "reqwest",
  "serde",

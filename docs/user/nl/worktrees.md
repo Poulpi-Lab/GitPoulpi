@@ -22,27 +22,45 @@ De **+** op de kop WORKTREES (toetsenbord: `+` in de sectie; palet: **Refs: Work
 maken...**) opent een menu:
 
 - **Van de huidige branch**: de branch is uitgecheckt in de hoofdmap, dus het dialoogvenster
-  stelt een nieuwe branch erop voor (`<branch>-wt`).
+  stelt een nieuwe branch erop voor (`worktree-<id>`).
 - **Van de geselecteerde commit**: grijs tot er een commit is geselecteerd in het Log. De
-  worktree begint daar losgekoppeld, tenzij je een nieuwe branch een naam geeft.
-- **Een branch kiezen...**: het dialoogvenster opent op zijn lijst **Ref**.
+  dialoogvenster stelt een nieuwe branch `worktree-<id>` voor die daar begint; maak het
+  branchveld leeg voor een losgekoppelde worktree.
+- **Een branch kiezen...**: het dialoogvenster opent op zijn lijst **Worktree-branch**, om een
+  branch te openen die al bestaat.
 
 Het palet heeft dezelfde drie (**Refs: Worktree maken van huidige branch**, **Git: Worktree
 maken op geselecteerde commit...**, **Refs: Worktree maken met een gekozen branch**). De
 oudere items werken nog: **Worktree maken van...** in het menu van een branch, tag of commit.
 
-Het dialoogvenster stelt alles voor en laat je het wijzigen:
+Het dialoogvenster stelt alles voor en laat je het wijzigen. De **Naam** en de nieuwe branch
+beginnen allebei als `worktree-<id>`, waarbij `<id>` 8 willekeurige hexadecimale cijfers zijn
+(voor beide dezelfde), zodat twee worktrees nooit botsen.
 
 | Veld | Betekenis |
 |---|---|
-| **Naam** | De mapnaam wordt eruit opgebouwd. Voorgesteld op basis van de branch of de korte id. |
+| **Naam** | De mapnaam wordt eruit opgebouwd. **Naam naar branch** (`Alt+N`) zet hem op `worktree-<branch>`: schuine strepen worden `-` en het woord wordt niet verdubbeld (`worktree-foo` en `feature/worktree-x` houden hun eigen naam, `feature/login` geeft `worktree-feature-login`). |
 | **Map** | Een naaste van de repository, `<repository>-<naam>`. Hij volgt de Naam tot je in de Map typt; **Bladeren** kiest waar. |
-| **Ref** | De branch of commit waar de worktree mee begint (een lijst; typ om te zoeken). Door hem te wijzigen wordt een nieuwe Naam voorgesteld. |
-| **Nieuwe branch** | Leeg checkt de branch van de Ref daar uit (of koppelt los op een commit). Vereist als de branch al is uitgecheckt. |
+| **Ref** | Waar een *nieuwe* branch begint: een branch of een commit (een lijst; typ om te zoeken). Hij wordt niet gebruikt, en dat staat erbij, zolang een bestaande branch is gekozen. |
+| **Worktree-branch** | Eén veld, twee betekenissen, zoals eronder staat. Een naam die geen lokale branch is, maakt een nieuwe branch vanaf de Ref (**nieuwe branch vanaf main**). Een lokale branch die nergens anders is uitgecheckt (kies hem in de lijst of typ zijn naam) wordt daar ongewijzigd uitgecheckt (**checkt deze branch uit**). De eerste rij van de lijst, of een leeg veld, checkt de branch van de Ref uit (of koppelt los op een commit); dat wordt geweigerd als die branch al is uitgecheckt. |
+| **Opnieuw** | `Alt+R`. Trekt een nieuwe `<id>` en vervangt de Naam en de branch erdoor, behalve wat je zelf typte (een Naam of branch die je schreef blijft) en een bestaande branch (wordt nooit vervangen). Een Naam van **Naam naar branch** of van de AI telt als gegenereerd. |
+| **Naam met AI** | Alleen als AI aan staat (zie hieronder). |
 | **De nieuwe worktree als tabblad openen** | Standaard aan. |
 
-Een map die niet leeg is, een ongeldige naam of een branch die al bestaat wordt gemeld op de
-eigen regel van het dialoogvenster, en **Maken** blijft grijs.
+Een map die niet leeg is, een ongeldige naam, een branchnaam die git weigert of een branch die
+een andere worktree heeft wordt gemeld op de eigen regel van het dialoogvenster, en **Maken**
+blijft grijs.
+
+### Een naam geven met AI
+
+Met [AI](ai.md) aan opent **Naam met AI** (`Alt+A`) een vak in het dialoogvenster: *Beschrijf de
+functie, bug of taak*. **Noem het** vraagt het model om een korte worktreenaam en een branchnaam
+die de eigen branchnamen van de repository volgt (`feature/`, `fix/`, kleine letters met
+streepjes). Ze vullen de Naam (als `worktree-<naam>`) en het branchveld, nog te bewerken; een
+branchnaam die al bestaat krijgt het achtervoegsel `-2`, zodat het antwoord nooit stilzwijgend
+iets uitcheckt. Het vak toont de bezig-status, **Stop** (of `Esc`) annuleert en een mislukking
+wordt in het dialoogvenster getoond. Alleen je beschrijving en de lokale branchnamen worden
+verstuurd.
 
 ## Het menu van de rij
 
@@ -100,4 +118,6 @@ geschiedenis.
 `gitpoulpi worktree changes <path>` toont de niet-gecommitte wijzigingen van een worktree.
 `gitpoulpi worktree remove <path> [--force] [--commit-message M [--commit-branch B]]
 [--stash-message M] [--delete-branch]` verwijdert hem; de MCP-tools zijn `worktree_changes`
-en `worktree_remove`. Zie de [CLI-referentie](cli-reference.md).
+en `worktree_remove`. `gitpoulpi ai worktree-name --describe "<taak>"` drukt de worktree- en
+branchnamen af die de AI voorstelt (`{ name, worktree, branch }`) en maakt niets; de MCP-tool is
+`ai_worktree_name`. Zie de [CLI-referentie](cli-reference.md).

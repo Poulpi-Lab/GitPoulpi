@@ -153,9 +153,8 @@ pub(crate) fn sanitize(text: &str) -> String {
         if c == '\r' || is_banned(c) {
             continue;
         }
-        let lone_mark = crate::cell_text::char_cells(c) == 0
-            && !c.is_control()
-            && prev.is_none_or(char::is_whitespace);
+        let lone_mark =
+            layout::cw(c) == 0 && !c.is_control() && prev.is_none_or(char::is_whitespace);
         if lone_mark {
             continue;
         }

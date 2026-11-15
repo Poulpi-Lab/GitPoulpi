@@ -429,33 +429,55 @@ fn rendering_never_panics_on_hostile_input() {
     }
 }
 
-/// Budgets of the plan: a 20 KB document lays out in well under 30 ms in a
-/// release build.
+/// Budgets of the plan (release): 500 comments of about 1 KB at 100 columns
+/// lay out in under 40 ms, a cache hit costs microseconds, painting from a
+/// ready layout stays under 2 ms.
 #[test]
 #[ignore = "release-mode benchmark: cargo test -p gitpoulpi-tui --release md_render_bench -- --ignored"]
 fn md_render_bench() {
-    let mut src = String::new();
-    while src.len() < 20 * 1024 {
-        src.push_str(EVERYTHING);
-    }
+    let comment = "Thanks for the report, this looks **related** to #12 and to \
+https://example.com/docs/page. A few notes:\n\n\
+- the `parse` step drops the trailing newline when the input is *empty*\n\
+- the second pass [reads the config](https://example.com/config) twice\n\
+- tests for the wide-character case are missing\n\n\
+> quoted context from the earlier message that wraps over more than one line of the pane\n\n\
+Longer paragraph with enough words to wrap a few times at one hundred columns, mentioning \
+`Vec<String>`, a path like crates/core/src/lib.rs and some more filler text to reach a \
+realistic size for a typical review comment on a pull request or an issue thread. \
+Another sentence follows so that the paragraph is long enough to wrap across several rows.\n\n\
+| a | b |\n|---|---|\n| 1 | 2 |\n";
     let ctx = Context::default();
-    let start = std::time::Instant::now();
-    let d = render(&src, 100, &ctx);
-    let first = start.elapsed();
-    assert!(!d.lines.is_empty());
+    let comments: Vec<String> = (0..500)
+        .map(|n| format!("{comment}\nnumber {n}\n"))
+        .collect();
+    // The grammar compile of the first fence is paid once per process.
+    let _ = render("```rust\nfn a() {}\n```", 100, &ctx);
+    // Best of five: a loaded machine only ever makes a run slower.
+    let mut layout = std::time::Duration::MAX;
+    let mut docs: Vec<Doc> = Vec::new();
+    for _ in 0..5 {
+        let start = std::time::Instant::now();
+        docs = comments.iter().map(|c| render(c, 100, &ctx)).collect();
+        layout = layout.min(start.elapsed());
+    }
     let mut cache = DocCache::default();
-    let _ = cache.get_text("bench", &src, 100, &ctx);
+    let _ = cache.get_text("bench", &comments[0], 100, &ctx);
     let start = std::time::Instant::now();
-    let _ = cache.get_text("bench", &src, 100, &ctx);
+    let _ = cache.get_text("bench", &comments[0], 100, &ctx);
     let hit = start.elapsed();
     let mut buf = Buffer::empty(Rect::new(0, 0, 100, 50));
     let start = std::time::Instant::now();
-    for line in d.lines.iter().take(50) {
-        paint(&mut buf, 0, 0, 100, line, base(), false);
+    for (y, line) in docs
+        .iter()
+        .flat_map(|d| d.lines.iter())
+        .take(50)
+        .enumerate()
+    {
+        paint(&mut buf, 0, y as u16, 100, line, base(), false);
     }
     let painted = start.elapsed();
-    eprintln!("layout 20 KB: {first:?}, cache hit: {hit:?}, paint 50 lines: {painted:?}");
-    assert!(first.as_millis() < 30, "layout {first:?}");
+    eprintln!("layout 500 x 1 KB: {layout:?}, cache hit: {hit:?}, paint 50 lines: {painted:?}");
+    assert!(layout.as_millis() < 40, "layout {layout:?}");
     assert!(hit.as_micros() < 500, "cache hit {hit:?}");
     assert!(painted.as_micros() < 2000, "paint {painted:?}");
 }

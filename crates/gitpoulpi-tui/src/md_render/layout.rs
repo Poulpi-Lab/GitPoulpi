@@ -4,6 +4,16 @@
 use super::{LineKind, LinkId, Look, MdLine, Span};
 use crate::cell_text::char_cells;
 
+/// Cells of one char, with a fast path for ASCII (the width lookup of the
+/// general case is the hot spot of a layout).
+pub(super) fn cw(c: char) -> usize {
+    if c.is_ascii() {
+        usize::from(!c.is_ascii_control())
+    } else {
+        char_cells(c)
+    }
+}
+
 /// One styled character. `'\n'` is a forced line break.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) struct Atom {
@@ -69,7 +79,7 @@ impl LineBuf {
     pub(super) fn push_atom(&mut self, a: Atom) {
         let mut buf = [0u8; 4];
         self.push_str(a.ch.encode_utf8(&mut buf), a.look, a.link);
-        self.used += char_cells(a.ch);
+        self.used += cw(a.ch);
     }
 
     pub(super) fn finish(self) -> MdLine {
@@ -144,7 +154,7 @@ pub(super) fn wrap(atoms: &[Atom], width: usize, first: &Prefix, rest: &Prefix) 
             last = None;
             continue;
         };
-        let word_w: usize = word.iter().map(|a| char_cells(a.ch)).sum();
+        let word_w: usize = word.iter().map(|a| cw(a.ch)).sum();
         let gap = usize::from(!fresh);
         if !fresh && line.used + gap + word_w > limit {
             newline(&mut out, &mut line, &mut fresh);
@@ -155,7 +165,7 @@ pub(super) fn wrap(atoms: &[Atom], width: usize, first: &Prefix, rest: &Prefix) 
             }
         }
         for &a in &word {
-            let w = char_cells(a.ch);
+            let w = cw(a.ch);
             if line.used + w > limit && !fresh {
                 newline(&mut out, &mut line, &mut fresh);
                 limit = width.max(rest.width + 2);

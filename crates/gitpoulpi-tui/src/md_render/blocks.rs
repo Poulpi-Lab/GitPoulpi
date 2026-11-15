@@ -730,7 +730,7 @@ impl Builder<'_> {
         for (text, hl) in runs {
             let mut piece = String::new();
             for ch in text.chars() {
-                let w = crate::cell_text::char_cells(ch);
+                let w = super::layout::cw(ch);
                 if used + w > limit && used > prefix.width {
                     if !piece.is_empty() {
                         line.spans.push(Span {
@@ -788,11 +788,7 @@ impl Builder<'_> {
                 })
                 .collect()
         };
-        let width_of = |cell: &[Atom]| {
-            cell.iter()
-                .map(|a| crate::cell_text::char_cells(a.ch))
-                .sum()
-        };
+        let width_of = |cell: &[Atom]| cell.iter().map(|a| super::layout::cw(a.ch)).sum();
         let mut widths = vec![0usize; cols];
         for row in std::iter::once(&t.head).chain(t.rows.iter()) {
             for (c, cell) in row.iter().enumerate() {

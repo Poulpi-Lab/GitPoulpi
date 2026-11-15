@@ -135,6 +135,16 @@ Release build, Linux, SSD, warm cache. The fixture is `import_content_history`: 
 
 Spawns: preview + apply of a content run is 8 without a remote and at most 10 with one (the metadata run's budget plus one `status` and one `read-tree`), whatever the history size (`spawn_budget_rewrite.rs`). The time is trees and blobs read once through one `cat-file --batch` and written to the temp pack as they are made; the 100k remove run is superlinear against 10k because the root and `src/` trees grow with the history.
 
+## Markdown layout (`md_render_bench`, `#[ignore]`, release: `cargo test -p gitpoulpi-tui --release md_render_bench -- --ignored`)
+
+| operation | measured | budget |
+|---|---|---|
+| Layout of 500 comments of about 1 KB at 100 columns (best of 5; load average about 50) | 28 ms | under 40 ms |
+| Cache hit (`DocCache`) | under 2 us | under 500 us |
+| Paint 50 lines from a ready layout | 140 us | under 2 ms |
+
+Trap: the width lookup (`cell_text::char_cells`) per char is the hot spot of a layout (65 ms with it, 28 ms with the ASCII fast path of `md_render::layout::cw`).
+
 ## TUI budgets (`xtask perf --tui`, `xtask/src/perf_tui.rs`)
 
 Measured over a 10 s idle window with the Log open, then a held Down x300 at 100 Hz, then 40 key-latency samples. Baseline: three runs, release, load average 2.4-5.

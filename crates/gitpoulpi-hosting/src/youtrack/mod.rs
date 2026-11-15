@@ -14,6 +14,9 @@
 //! Markdown source).
 
 mod client;
+mod conversation;
+#[cfg(test)]
+mod conversation_tests;
 mod map;
 mod query;
 pub mod spec;

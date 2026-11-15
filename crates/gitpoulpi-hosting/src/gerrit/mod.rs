@@ -16,6 +16,8 @@
 mod client;
 #[cfg(test)]
 mod code_tests;
+#[cfg(test)]
+mod conversation_tests;
 pub(crate) mod map;
 pub mod spec;
 #[cfg(test)]

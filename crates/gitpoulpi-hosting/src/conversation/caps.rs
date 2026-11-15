@@ -136,8 +136,7 @@ impl ConversationCaps {
 
     /// Gerrit: changes only. Messages and comments cannot be edited or
     /// deleted by their author (only an administrator can delete a change
-    /// message), and a reply goes into the comment's thread as a new draft
-    /// published with the next review.
+    /// message); a reply is posted at once into the comment's thread.
     pub fn gerrit(kind: ItemKind) -> Self {
         if kind == ItemKind::Issue {
             return Self::NONE;

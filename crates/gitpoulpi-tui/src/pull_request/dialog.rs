@@ -770,9 +770,9 @@ impl PullRequestDialog {
             self.message = None;
             return PullRequestOutcome::Stay;
         }
-        if crate::keymap::current().is(Bind::DialogWeb, &key)
-            && !(self.focus == PrFocus::Body && self.md.takes_ai_key(&key))
-        {
+        // `Alt+W` is "Create on the web" wherever the focus is; the writing
+        // help has its own key (`md_editor.ai`, `Alt+E`).
+        if crate::keymap::current().is(Bind::DialogWeb, &key) {
             return self.open_web();
         }
         // The text fields' editing keys, through the shared core.

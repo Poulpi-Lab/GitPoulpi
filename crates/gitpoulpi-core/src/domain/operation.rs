@@ -74,6 +74,9 @@ pub enum OperationKind {
     /// `GitBackend::list_tree`). A read: what the project *contained*, not
     /// what a commit changed.
     ListTree,
+    /// The lines of a revision's files that contain given terms (see
+    /// `GitBackend::grep_tree`). A read, never journaled.
+    GrepTree,
     StageFile,
     StageHunk,
     StageLine,
@@ -681,6 +684,7 @@ impl OperationKind {
             | K::Blame
             | K::FileHistory
             | K::ListTree
+            | K::GrepTree
             | K::BinaryPaths
             | K::MailmapIdentities
             | K::MailmapResolve
@@ -886,7 +890,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 186] = [
+    pub const ALL: [OperationKind; 187] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -912,6 +916,7 @@ impl OperationKind {
         OperationKind::Blame,
         OperationKind::FileHistory,
         OperationKind::ListTree,
+        OperationKind::GrepTree,
         OperationKind::StageFile,
         OperationKind::StageHunk,
         OperationKind::StageLine,

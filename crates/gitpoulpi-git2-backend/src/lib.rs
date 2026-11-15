@@ -352,6 +352,15 @@ impl GitBackend for Git2Backend {
     fn list_tree(&self, repo: &RepoRef, at: Oid) -> Result<Vec<PathBuf>> {
         reads::list_tree(repo, at)
     }
+    fn grep_tree(
+        &self,
+        repo: &RepoRef,
+        at: Oid,
+        terms: &[String],
+        max_hits: usize,
+    ) -> Result<Vec<gitpoulpi_core::domain::GrepHit>> {
+        reads::grep_tree(repo, at, terms, max_hits)
+    }
     fn mailmap_resolve(
         &self,
         repo: &RepoRef,

@@ -53,6 +53,53 @@ pub struct LocalAgentClient {
     timeout: Duration,
     /// The folder the agent runs in; `None` is this process's.
     workdir: Option<PathBuf>,
+    /// Start without the hosting credentials of this process's environment.
+    scrub_env: bool,
+}
+
+/// Variables of the environment that carry a hosting or tracker credential,
+/// or a way to get one (the askpass helpers, the ssh agent): an agent that
+/// reads a repository for a drafted reply does not get them, so even a
+/// misconfigured one cannot publish. Exact names, plus every `BITBUCKET_*`.
+const CREDENTIAL_ENV: &[&str] = &[
+    "GH_TOKEN",
+    "GITHUB_TOKEN",
+    "GH_ENTERPRISE_TOKEN",
+    "GITHUB_ENTERPRISE_TOKEN",
+    "GITLAB_TOKEN",
+    "GL_TOKEN",
+    "CI_JOB_TOKEN",
+    "AZURE_DEVOPS_EXT_PAT",
+    "SYSTEM_ACCESSTOKEN",
+    "JIRA_API_TOKEN",
+    "JIRA_TOKEN",
+    "LINEAR_API_KEY",
+    "YOUTRACK_TOKEN",
+    "REDMINE_API_KEY",
+    "TRELLO_TOKEN",
+    "TRELLO_API_KEY",
+    "GITEA_TOKEN",
+    "FORGEJO_TOKEN",
+    "CODEBERG_TOKEN",
+    "GIT_ASKPASS",
+    "SSH_ASKPASS",
+    "SSH_AUTH_SOCK",
+];
+
+/// The names among `names` that carry a credential (see [`CREDENTIAL_ENV`]).
+pub fn credential_env<I, S>(names: I) -> Vec<String>
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<str>,
+{
+    names
+        .into_iter()
+        .map(|n| n.as_ref().to_string())
+        .filter(|name| {
+            let upper = name.to_ascii_uppercase();
+            CREDENTIAL_ENV.contains(&upper.as_str()) || upper.starts_with("BITBUCKET_")
+        })
+        .collect()
 }
 
 impl LocalAgentClient {
@@ -63,6 +110,7 @@ impl LocalAgentClient {
             env: Vec::new(),
             timeout: Duration::from_secs(DEFAULT_TIMEOUT_SECS),
             workdir: None,
+            scrub_env: false,
         }
     }
 
@@ -98,6 +146,14 @@ impl LocalAgentClient {
         self
     }
 
+    /// Starts the agent without the hosting credentials of this process's
+    /// environment (see [`credential_env`]); variables the profile sets
+    /// itself are still passed.
+    pub fn scrubbing_env(mut self, scrub: bool) -> Self {
+        self.scrub_env = scrub;
+        self
+    }
+
     pub fn with_timeout(mut self, timeout: Duration) -> Self {
         self.timeout = timeout;
         self
@@ -109,6 +165,12 @@ impl AiClient for LocalAgentClient {
     async fn complete(&self, system: &str, user: &str) -> Result<String> {
         let program = resolve_command(&self.command);
         let mut command = Command::new(&program);
+        if self.scrub_env {
+            let names = std::env::vars_os().filter_map(|(k, _)| k.into_string().ok());
+            for name in credential_env(names) {
+                command.env_remove(name);
+            }
+        }
         command
             .args(&self.args)
             .envs(self.env.iter().map(|(k, v)| (k, v)))

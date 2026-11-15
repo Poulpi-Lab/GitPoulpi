@@ -33,6 +33,7 @@ const GOLDEN: &[(OperationKind, &str, &str)] = &[
     (K::Blame, "R", "ALL"),
     (K::FileHistory, "R", "ALL"),
     (K::ListTree, "R", "ALL"),
+    (K::GrepTree, "R", "ALL"),
     (K::StageFile, "", "INDEX|WORKTREE|CONFLICTS"),
     (K::StageHunk, "", "INDEX|WORKTREE|CONFLICTS"),
     (K::StageLine, "", "INDEX|WORKTREE|CONFLICTS"),

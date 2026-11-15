@@ -2,9 +2,10 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use gitpoulpi_core::domain::{
-    Blame, BlameContent, BlameLine, Blob, BlobBody, BlobBytes, BlobContent, BlobSource,
-    ConflictEntry, ImageInfo, MergeDocument, Oid, RawStage, RepoRef, StageEntry, Worktree,
-    MAX_TEXT_BLOB_BYTES, MODE_GITLINK,
+    finish_hits, grep_bytes, usable_terms, Blame, BlameContent, BlameLine, Blob, BlobBody,
+    BlobBytes, BlobContent, BlobSource, ConflictEntry, GrepHit, ImageInfo, MergeDocument, Oid,
+    RawStage, RepoRef, StageEntry, Worktree, MAX_GREP_FILE_BYTES, MAX_TEXT_BLOB_BYTES,
+    MODE_GITLINK,
 };
 #[cfg(feature = "submodule")]
 use gitpoulpi_core::domain::{Submodule, SubmoduleState};
@@ -484,6 +485,59 @@ pub fn list_tree(repo: &RepoRef, at: Oid) -> Result<Vec<PathBuf>> {
     // not coincidental.
     paths.sort();
     Ok(paths)
+}
+
+/// The lines of the files at `at` that contain `terms`, by walking the
+/// tree's blobs. The rules (binary, pointer, size, cut, order, per-term
+/// cap) are `gitpoulpi_core::domain::grep_bytes` / `finish_hits`, shared
+/// with the system-git twin.
+pub fn grep_tree(
+    repo: &RepoRef,
+    at: Oid,
+    terms: &[String],
+    max_hits: usize,
+) -> Result<Vec<GrepHit>> {
+    let git = open(repo)?;
+    let oid = to_git2_oid(at)?;
+    let commit = git
+        .find_commit(oid)
+        .map_err(|e| Error::Backend(format!("no commit {}: {e}", at.to_hex())))?;
+    let tree = commit
+        .tree()
+        .map_err(|e| Error::Backend(format!("commit {} has no tree: {e}", at.to_hex())))?;
+    let terms = usable_terms(terms);
+    if terms.is_empty() || max_hits == 0 {
+        return Ok(Vec::new());
+    }
+    let mut hits: Vec<GrepHit> = Vec::new();
+    tree.walk(git2::TreeWalkMode::PreOrder, |dir, entry| {
+        if entry.kind() != Some(git2::ObjectType::Blob) {
+            return git2::TreeWalkResult::Ok;
+        }
+        // Submodule links are commits, symlinks are blobs of a path: both
+        // are skipped by the same rules as the system twin (`git grep`
+        // follows neither).
+        if entry.filemode() == 0o120000 {
+            return git2::TreeWalkResult::Ok;
+        }
+        let Ok(name) = entry.name() else {
+            return git2::TreeWalkResult::Ok;
+        };
+        let Ok(odb) = git.odb() else {
+            return git2::TreeWalkResult::Ok;
+        };
+        // The size first: an oversized file is never read.
+        match odb.read_header(entry.id()) {
+            Ok((size, _)) if (size as u64) <= MAX_GREP_FILE_BYTES => {}
+            _ => return git2::TreeWalkResult::Ok,
+        }
+        if let Ok(blob) = git.find_blob(entry.id()) {
+            hits.extend(grep_bytes(&format!("{dir}{name}"), blob.content(), &terms));
+        }
+        git2::TreeWalkResult::Ok
+    })
+    .map_err(|e| Error::Backend(format!("walking the tree of {}: {e}", at.to_hex())))?;
+    Ok(finish_hits(hits, &terms, max_hits))
 }
 
 /// Every submodule `.gitmodules` declares, natively (no process): what is

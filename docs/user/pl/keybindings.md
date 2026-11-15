@@ -379,7 +379,7 @@ prefiksem (`Ctrl+G s`).
 | `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
 | `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
 | `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+W` |
+| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
 | `dialog` | `browse` | Przeglądaj w poszukiwaniu folderu | `Ctrl+B` |
 | `dialog` | `sources` | Przejdź do źródeł klonowania | `Alt+S` |
 | `dialog` | `submit` | Wyślij formularz (pull request) | `Ctrl+S` |

@@ -13,7 +13,7 @@
 //! draft" box, the "Let the AI read the repository" box (unticked, and
 //! disabled with its reason until the repository-context slice lands), the
 //! Draft / Stop / Close buttons and the line that says what is going on.
-//! Every mouse action has a key: `Alt+W` opens and closes the panel, `Enter`
+//! Every mouse action has a key: `Alt+E` opens and closes the panel, `Enter`
 //! in the field drafts, `Esc` stops a run, then closes, `Tab` walks the parts.
 //!
 //! What a host's text is a draft *of* comes from an [`AiContextSource`]: the
@@ -31,6 +31,7 @@ use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::style::{Modifier, Style};
 
+use super::ai_context;
 use crate::dialog_kit::{self, ButtonState, CheckState};
 use crate::text_edit::FieldEditor;
 use crate::th;
@@ -81,6 +82,12 @@ pub(crate) trait AiContextSource {
     /// (their own text to improve; `None` writes a new one). `Err` is a
     /// sentence for the panel ("Pick the branches first").
     fn task(&self, hint: &str, draft: Option<&str>) -> Result<AiTask, String>;
+
+    /// Whether "Let the AI read the repository" makes sense for this text
+    /// (a pull request description is written from its diff instead).
+    fn reads_repository(&self) -> bool {
+        true
+    }
 }
 
 /// Where a run reads its settings and instructions from.
@@ -139,6 +146,10 @@ pub(crate) struct PullRequestSource {
 }
 
 impl AiContextSource for PullRequestSource {
+    fn reads_repository(&self) -> bool {
+        false
+    }
+
     fn task(&self, hint: &str, draft: Option<&str>) -> Result<AiTask, String> {
         let (source, target) = self.branches.lock().map(|b| b.clone()).unwrap_or_default();
         if source.trim().is_empty() || target.trim().is_empty() {
@@ -165,10 +176,19 @@ pub(crate) enum AiPart {
     Run,
     Stop,
     Close,
+    /// "Refresh context": forget what was kept and read the repository again.
+    Refresh,
 }
 
 /// The parts `Tab` walks, in order, once the panel has the keyboard.
-const WALK: [AiPart; 4] = [AiPart::Hint, AiPart::Improve, AiPart::Run, AiPart::Close];
+const WALK: [AiPart; 6] = [
+    AiPart::Hint,
+    AiPart::Improve,
+    AiPart::Repo,
+    AiPart::Run,
+    AiPart::Close,
+    AiPart::Refresh,
+];
 
 /// What a key meant to the panel.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -204,6 +224,8 @@ struct Run {
     rx: mpsc::Receiver<Answer>,
     cancel: Arc<AtomicBool>,
     started: Instant,
+    /// What the worker says it read of the repository (see `ai_context`).
+    context: Arc<Mutex<Option<String>>>,
 }
 
 /// A test's stand-in for the model: the task in, the text out.
@@ -217,6 +239,12 @@ pub(crate) struct AiHelp {
     hint: String,
     edit: FieldEditor<()>,
     improve: bool,
+    /// "Let the AI read the repository" is ticked (never without a clone).
+    repo: bool,
+    /// Whether that box can be ticked, and if not why.
+    repo_choice: ai_context::Choice,
+    /// What the last draft read of the repository.
+    context_line: Option<String>,
     focus: AiPart,
     hover: Option<AiPart>,
     /// Newest first.
@@ -231,6 +259,9 @@ pub(crate) struct AiHelp {
     dir: Option<std::path::PathBuf>,
     #[cfg(test)]
     pub(crate) fake: Option<Fake>,
+    /// Whether the last run was asked to read the repository (tests).
+    #[cfg(test)]
+    pub(crate) last_read_repo: Option<bool>,
 }
 
 impl Drop for AiHelp {
@@ -287,6 +318,9 @@ impl AiHelp {
             hint: String::new(),
             edit: FieldEditor::default(),
             improve: false,
+            repo: false,
+            repo_choice: ai_context::Choice::Disabled(ai_context::Why::NoClone),
+            context_line: None,
             focus: AiPart::Text,
             hover: None,
             recent,
@@ -298,6 +332,8 @@ impl AiHelp {
             dir,
             #[cfg(test)]
             fake: None,
+            #[cfg(test)]
+            last_read_repo: None,
         }
     }
 
@@ -337,6 +373,11 @@ impl AiHelp {
         if !self.open {
             self.improve = has_text;
             self.note = Note::None;
+            self.context_line = None;
+            self.repo_choice = ai_context::offered(&self.scope, self.source.reads_repository());
+            // Off unless the user turned the default on in Settings.
+            self.repo = self.repo_choice == ai_context::Choice::Offered
+                && ai_context::default_on(&self.scope);
         }
         self.open = true;
         self.focus = AiPart::Hint;
@@ -377,8 +418,38 @@ impl AiHelp {
         if room < 2 {
             0
         } else {
-            room.min(PANEL_ROWS)
+            room.min(PANEL_ROWS + u16::from(self.shows_context_line()))
         }
+    }
+
+    /// The panel has a row of its own for what the last draft read of the
+    /// repository.
+    fn shows_context_line(&self) -> bool {
+        self.repo_on() && self.context_line.is_some()
+    }
+
+    /// Makes the box offerable, as a repository with a clone and a trusted
+    /// agent does, and says what the last draft read (tests).
+    #[cfg(test)]
+    pub(crate) fn offer_repo(&mut self, ticked: bool) {
+        self.repo_choice = ai_context::Choice::Offered;
+        self.repo = ticked;
+    }
+
+    #[cfg(test)]
+    pub(crate) fn set_context_line(&mut self, line: &str) {
+        self.context_line = Some(line.to_string());
+    }
+
+    /// The box is ticked and can be.
+    pub(crate) fn repo_on(&self) -> bool {
+        self.repo && self.repo_choice == ai_context::Choice::Offered
+    }
+
+    /// What the last draft read of the repository, when it did.
+    #[cfg(test)]
+    pub(crate) fn context_line(&self) -> Option<&str> {
+        self.context_line.as_deref()
     }
 
     /// Where `part` was painted (tests).
@@ -416,10 +487,17 @@ impl AiHelp {
         let cancel = Arc::new(AtomicBool::new(false));
         #[cfg(test)]
         let fake = self.fake.clone();
+        #[cfg(test)]
+        {
+            self.last_read_repo = Some(self.repo_on());
+        }
+        let context = Arc::new(Mutex::new(None));
         let rx = super::ai_worker::start(super::ai_worker::Input {
             scope: self.scope.clone(),
             task,
             cancel: cancel.clone(),
+            read_repo: self.repo_on(),
+            context: context.clone(),
             #[cfg(test)]
             fake,
         });
@@ -427,6 +505,7 @@ impl AiHelp {
             rx,
             cancel,
             started: Instant::now(),
+            context,
         });
     }
 
@@ -445,6 +524,7 @@ impl AiHelp {
         let run = self.run.as_ref()?;
         match run.rx.try_recv() {
             Ok(answer) => {
+                self.context_line = run.context.lock().ok().and_then(|mut c| c.take());
                 self.run = None;
                 Some(answer)
             }
@@ -468,14 +548,25 @@ impl AiHelp {
 
     // -- keys ------------------------------------------------------------------------
 
+    /// The parts `Tab` visits now: Refresh only exists while the box is ticked.
+    fn walk(&self) -> Vec<AiPart> {
+        WALK.iter()
+            .copied()
+            .filter(|p| *p != AiPart::Refresh || self.repo_on())
+            // A box that cannot be ticked is not a stop: its reason is on screen.
+            .filter(|p| *p != AiPart::Repo || self.repo_choice == ai_context::Choice::Offered)
+            .collect()
+    }
+
     fn step(&mut self, back: bool) {
-        let at = WALK.iter().position(|p| *p == self.focus);
+        let walk = self.walk();
+        let at = walk.iter().position(|p| *p == self.focus);
         let next = match (at, back) {
-            (Some(i), false) if i + 1 < WALK.len() => WALK[i + 1],
+            (Some(i), false) if i + 1 < walk.len() => walk[i + 1],
             (Some(_), false) => AiPart::Text,
             (Some(0), true) | (None, true) => AiPart::Text,
-            (Some(i), true) => WALK[i - 1],
-            (None, false) => WALK[0],
+            (Some(i), true) => walk[i - 1],
+            (None, false) => walk[0],
         };
         // The Run button is the Stop button while a request runs.
         self.focus = if next == AiPart::Run && self.run.is_some() {
@@ -522,10 +613,12 @@ impl AiHelp {
                 }
                 _ => AiKey::Pass,
             },
-            AiPart::Run | AiPart::Stop | AiPart::Close | AiPart::Recent(_) => match key.code {
-                KeyCode::Enter | KeyCode::Char(' ') => self.activate(self.focus),
-                _ => AiKey::Pass,
-            },
+            AiPart::Run | AiPart::Stop | AiPart::Close | AiPart::Refresh | AiPart::Recent(_) => {
+                match key.code {
+                    KeyCode::Enter | KeyCode::Char(' ') => self.activate(self.focus),
+                    _ => AiKey::Pass,
+                }
+            }
             AiPart::Text => AiKey::Pass,
         }
     }
@@ -588,11 +681,29 @@ impl AiHelp {
                 AiKey::Handled
             }
             AiPart::Repo => {
-                self.note = Note::Info(format!(
-                    "{}: {}",
-                    msg::AI_REPO.get(),
-                    msg::AI_REPO_UNAVAILABLE.get()
-                ));
+                match self.repo_choice {
+                    ai_context::Choice::Offered => {
+                        self.repo = !self.repo;
+                        self.note = Note::None;
+                        if !self.repo {
+                            self.context_line = None;
+                            if self.focus == AiPart::Refresh {
+                                self.focus = AiPart::Repo;
+                            }
+                        }
+                    }
+                    ai_context::Choice::Disabled(why) => {
+                        self.note = Note::Info(why.full().to_string());
+                    }
+                }
+                AiKey::Handled
+            }
+            AiPart::Refresh => {
+                if let Some(root) = self.scope.root.as_deref() {
+                    ai_context::forget(root);
+                }
+                self.context_line = None;
+                self.note = Note::Info(msg::AI_REFRESHED.get().to_string());
                 AiKey::Handled
             }
             AiPart::Recent(i) => {
@@ -767,26 +878,60 @@ impl AiHelp {
             );
             self.hits.push((improve, AiPart::Improve));
             x = improve.right() + 2;
-            let repo_label = format!(
-                "{} ({})",
-                msg::AI_REPO.get(),
-                msg::AI_REPO_UNAVAILABLE.get()
-            );
             if x < rect.right() {
+                let (label, checked, state) = match self.repo_choice {
+                    ai_context::Choice::Offered => (
+                        msg::AI_REPO.get().to_string(),
+                        self.repo,
+                        CheckState::Enabled {
+                            hovered: self.hover == Some(AiPart::Repo),
+                            focused: self.focus == AiPart::Repo,
+                        },
+                    ),
+                    ai_context::Choice::Disabled(why) => {
+                        // The reason in parentheses only when the row has room
+                        // for it (activating the box says it in full anyway).
+                        let with = format!("{} ({})", msg::AI_REPO.get(), why.short());
+                        let room = usize::from(rect.right().saturating_sub(x));
+                        let label = if crate::ui_kit::display_width(&with) + 5 <= room {
+                            with
+                        } else {
+                            msg::AI_REPO.get().to_string()
+                        };
+                        (label, false, CheckState::Disabled)
+                    }
+                };
                 let repo = dialog_kit::checkbox(
                     buf,
                     x,
                     y,
                     rect.right().saturating_sub(x),
-                    &repo_label,
-                    false,
-                    CheckState::Disabled,
+                    &label,
+                    checked,
+                    state,
                 );
                 self.hits.push((repo, AiPart::Repo));
             }
             y += 1;
         }
-        if want_recent {
+        // What the last draft read of the repository has a row of its own when
+        // the panel can have six; in a form that gives it five, the line takes
+        // the Recent row's place.
+        let ctx_line = self.context_line.clone().filter(|_| self.repo_on());
+        let ctx_takes_recent = h < PANEL_ROWS + 1 && ctx_line.is_some();
+        if want_recent && ctx_takes_recent {
+            if let Some(line) = &ctx_line {
+                dialog_kit::put(
+                    buf,
+                    rect.x + 1,
+                    y,
+                    line,
+                    rect.right().saturating_sub(rect.x + 2),
+                    muted,
+                );
+            }
+            y += 1;
+        } else if want_recent {
             let mut x = rect.x + 1;
             let head = dialog_kit::put(
                 buf,
@@ -858,7 +1003,22 @@ impl AiHelp {
             },
         );
         self.hits.push((close, AiPart::Close));
-        x = close.right() + 2;
+        x = close.right() + 1;
+        if self.repo_on() {
+            let refresh = dialog_kit::button(
+                buf,
+                x,
+                y,
+                msg::AI_REFRESH.get(),
+                ButtonState::Normal {
+                    hovered: self.hover == Some(AiPart::Refresh),
+                    focused: focused(AiPart::Refresh),
+                },
+            );
+            self.hits.push((refresh, AiPart::Refresh));
+            x = refresh.right() + 1;
+        }
+        x += 1;
         let room = rect.right().saturating_sub(x);
         match (&self.run, &self.note) {
             (Some(run), _) => {
@@ -891,6 +1051,19 @@ impl AiHelp {
             }
             (None, Note::None) => {
                 dialog_kit::put(buf, x, y, msg::AI_KEYS.get(), room, muted);
+            }
+        }
+        // What the last draft read of the repository, on a row of its own.
+        if let Some(line) = ctx_line.as_deref().filter(|_| !ctx_takes_recent) {
+            if y + 1 < rect.bottom() {
+                dialog_kit::put(
+                    buf,
+                    rect.x + 1,
+                    y + 1,
+                    line,
+                    rect.right().saturating_sub(rect.x + 2),
+                    muted,
+                );
             }
         }
     }

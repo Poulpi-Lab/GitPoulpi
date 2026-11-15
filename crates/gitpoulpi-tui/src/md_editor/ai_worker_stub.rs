@@ -11,6 +11,8 @@ pub(super) struct Input {
     pub(super) scope: AiScope,
     pub(super) task: AiTask,
     pub(super) cancel: Arc<AtomicBool>,
+    pub(super) read_repo: bool,
+    pub(super) context: Arc<std::sync::Mutex<Option<String>>>,
     #[cfg(test)]
     pub(super) fake: Option<super::ai::Fake>,
 }

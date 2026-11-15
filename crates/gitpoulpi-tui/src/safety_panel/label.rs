@@ -183,6 +183,7 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::Blame
         | K::FileHistory
         | K::ListTree
+        | K::GrepTree
         | K::PatchCreate
         | K::BinaryPaths
         | K::MailmapIdentities
@@ -563,6 +564,7 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         | K::Blame
         | K::FileHistory
         | K::ListTree
+        | K::GrepTree
         | K::PatchCreate
         | K::BinaryPaths
         | K::MailmapIdentities

@@ -284,11 +284,11 @@ hover or highlight it.
 | **Explain changes** | The `✦` at the top right of the working-changes pane (`Ctrl+G w`: the selected commit, else the working changes), or a commit's menu *Explain changes (AI)*. A popup: arrows scroll, `c` copies, `Esc` closes. | `ai explain [rev] [--wip]` |
 | **Stash message** | `Ctrl+G m` opens the stash dialog; its AI button (`Ctrl+G` inside the dialog) asks the model. Palette `AI: Generate Stash Message` does both. | `stash push --ai` |
 | **Pull request title and description** | *Generate title and description* in the Create Pull Request form (the branch's commits and diff are read locally). | |
-| **Merge conflict resolution** | In the merge conflict editor: the `✦ Suggest` toolbar button, a conflict's right-click menu *✦ Suggest resolution (AI)*, `Alt+I`, or palette `AI: Suggest Merge Conflict Resolution`. The suggestion replaces the *current conflict's* region of the Output as one edit (marked edited, one undo step); nothing is saved or staged until you save. | `ai resolve-conflict <path> [--conflict N]` (prints) |
+| **Merge conflict resolution** | In the merge conflict editor: the `✦ Suggest` toolbar button, a conflict's right-click menu *✦ Suggest resolution (AI)*, `Alt+E`, or palette `AI: Suggest Merge Conflict Resolution`. The suggestion replaces the *current conflict's* region of the Output as one edit (marked edited, one undo step); nothing is saved or staged until you save. | `ai resolve-conflict <path> [--conflict N]` (prints) |
 | **Code review** | In the [review of a pull or merge request](review.md#-ai-review-draft): the `✦ Draft review...` button, `s`, or palette `Review: ✦ Draft Review...` (it opens the review options, `Enter` runs). The model reads the request's diff, description and existing comments (and, by default, the project's `CLAUDE.md` and `AGENTS.md`: see [Review context](#review-context)) and proposes comments; you accept, edit or dismiss each one. Nothing reaches the host before you submit the review. | `hosting review suggest <n>` (prints JSON, posts nothing), `ai review-context` (the defaults) |
 | **Split a commit** | A commit's menu *Split commit (AI)...*, or palette `AI: Split Selected Commit...`. The split editor opens with the model's grouping filled in; see below. | `ai split-plan <rev>` (prints) |
 | **History rewrite script** | In the [history rewrite workbench](history-rewrite.md#write-a-script-with-ai): the `✦ Write with AI...` button of the Script editor, or palette `Rewrite: Write a Script with AI...`. A dialog shows exactly what will be sent; the script lands in the editor, marked, and is never run or applied for you. | `ai rewrite-script "<instruction>" [--sample N]` (prints) |
-| **History rewrite rules** | In the [history rewrite workbench](history-rewrite.md#create-rules-with-ai): the `✦ Create Rules with AI...` button, `Alt+I`, or palette `Rewrite: Create Rules with AI...`. A multi-line dialog shows exactly what will be sent; the rules and settings land in the workbench and nothing is previewed or applied for you. | `ai rewrite-rules "<description>" [--context]` (prints) |
+| **History rewrite rules** | In the [history rewrite workbench](history-rewrite.md#create-rules-with-ai): the `✦ Create Rules with AI...` button, `Alt+E`, or palette `Rewrite: Create Rules with AI...`. A multi-line dialog shows exactly what will be sent; the rules and settings land in the workbench and nothing is previewed or applied for you. | `ai rewrite-rules "<description>" [--context]` (prints) |
 | **Worktree name** | In the [Create worktree dialog](worktrees.md#naming-with-ai): the `✦ Name with AI` button or `Alt+A` opens a box where you describe the feature, bug or task; the model names the worktree and its branch after the repository's own branch names, and both land in the dialog's fields for you to edit. Only your description and the local branch names are sent, so it has no "what is sent" dialog. | `ai worktree-name --describe "<task>"` (prints) |
 | **Reply on a host** and **Issue description** | Settings > AI and the CLI only for now: the composer's `✦` comes later. They draft a comment, an answer in a thread, a review comment or summary, or a new issue's description. See [Writing help on a host](#writing-help-on-a-host). | `ai hosting-reply` (prints a draft) |
 | **Commit composer** | The WIP row's menu *Compose commits (AI)...*, `Ctrl+G C`, palette `AI: Compose Commits From Working Changes...` | |
@@ -384,10 +384,19 @@ comments (newest first, within `ai.limits.hosting_reply_context_bytes`, 49152 by
 in this answer (`--hint`, typed at the moment of use) and, to improve your own text, your draft
 (`--draft`). Everything other people wrote is marked as untrusted data in the request, so an instruction
 hidden in a comment is not followed. Over the limit the oldest comments are left out first and the cut is
-reported in `truncated` (`--send-all` lifts the limit). **The AI does not read the repository** yet:
-`--read-repo` is refused with "not built yet", and the defaults under *Repository access* in Settings > AI
-(`ai.hosting_reply.read_repository`, **off by default**, `reuse_agent_session`, `context_ttl_minutes`) only
-prepare that.
+reported in `truncated` (`--send-all` lifts the limit). **Reading the repository is off by default.** The AI reads the repository only when *Let the AI read the
+repository* is ticked for that draft (`--read-repo` on the CLI; `ai.hosting_reply.read_repository`, off, only
+sets where the box starts). A **local agent** profile reads it itself, in the repository folder, with read-only
+tools (Claude Code: `Read`, `Grep`, `Glob`; Writes, `Bash`, the web and MCP servers are refused; Codex: its
+read-only sandbox), without the hosting credentials of your environment, and keeps its session between replies
+(`reuse_agent_session`; a new commit or *Refresh context* starts a new one). An agent GitPoulpi has no confirmed
+read-only mode for cannot be let in. An **API** profile gets a context GitPoulpi builds from the files the
+conversation names (whole, or a window around the line), search hits for identifiers and error messages, a
+repository map and, for a pull request (`--pr-base`, `--pr-head`), its diff, within
+`ai.limits.hosting_reply_*`; files that look sensitive are left out and secrets are masked first. The built
+context is kept (`context_ttl_minutes`, 30 by default; per repository, in `<data>/private/ai-context` for
+the CLI) and Anthropic's prompt cache is used, so the next reply costs little; a new HEAD or
+`--refresh-context` rebuilds it. **The AI still only drafts**: its tools cannot write, and nothing here posts.
 
 **Your own base prompt.** The instructions both actions start from are editable: *Settings > AI > Replies
 on a host > Base prompt* (`ai.hosting_reply.base_prompt`). Empty uses the built-in prompt, which asks for
@@ -406,13 +415,16 @@ gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps t
 print such a page come with the conversation CLI.
 
 **In the Markdown composer.** While AI is on, the composer of a review comment, the Finish review summary, the
-new-issue description and the pull request description has a **✦ Write with AI** button (`Alt+W`) at the right
+new-issue description and the pull request description has a **✦ Write with AI** button (`Alt+E`, the same key in every one of them) at the right
 end of its mode bar. It opens a panel under the bar:
 
 - a field for *what I want in this answer*, typed at the moment of use (`Enter` drafts), with a **Recent**
   list of earlier instructions (click one, or `Up` / `Down` in the field);
 - *Improve my draft* (ticked when there is already a text: the AI starts from it);
-- *Let the AI read the repository*, unticked and disabled ("not built yet") until that part lands;
+- *Let the AI read the repository*, **unticked** every time unless you turned its default on; disabled with its
+  reason when there is no local clone or the agent has no read-only mode (see above). Ticked, a **Refresh
+  context** button and a line say what the last draft read ("Context reused (4 of 5 parts, HEAD a1b2c3d)",
+  "Provider cache: 12k tokens reused", "Agent session continued"), and "What is sent" lists the context parts;
 - **Draft**, **Stop** (also `Esc`) and **Close**, and one line for progress or the error.
 
 The usual "What is sent" dialog shows the request first (`[ai.sent_preview] hosting_reply`, `issue_body`,

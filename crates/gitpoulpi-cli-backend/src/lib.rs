@@ -399,6 +399,15 @@ impl GitBackend for SystemGitBackend {
     fn list_tree(&self, repo: &RepoRef, at: Oid) -> Result<Vec<PathBuf>> {
         content::list_tree(repo, at)
     }
+    fn grep_tree(
+        &self,
+        repo: &RepoRef,
+        at: Oid,
+        terms: &[String],
+        max_hits: usize,
+    ) -> Result<Vec<gitpoulpi_core::domain::GrepHit>> {
+        content::grep_tree(repo, at, terms, max_hits)
+    }
 
     fn blame(&self, repo: &RepoRef, path: &Path, at: Oid) -> Result<Blame> {
         content::blame(repo, path, at)

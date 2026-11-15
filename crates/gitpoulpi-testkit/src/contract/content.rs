@@ -496,6 +496,98 @@ pub fn check_list_tree_rejects_an_unknown_revision(backend: &dyn GitBackend) {
     assert!(backend.list_tree(&repo_ref, missing).is_err());
 }
 
+// -- grep_tree -----------------------------------------------------------
+
+fn grep_keys(hits: &[gitpoulpi_core::domain::GrepHit]) -> Vec<String> {
+    hits.iter()
+        .map(|h| format!("{}:{}:{}:{}", h.term, h.path, h.line, h.text))
+        .collect()
+}
+
+/// The lines containing a term, sorted by path then line, searched at the
+/// revision asked for (not on disk), case-sensitively and as plain text
+/// (`.` is not a pattern), with CRLF stripped.
+pub fn check_grep_tree_finds_lines_at_the_revision_sorted(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .commit_file("src/b.rs", "fn main() {}\nlet needle = 1;\n", "b")
+        .commit_file("a.txt", "Needle\nneedle here\r\nplain a.b\n", "a")
+        .build();
+    let repo_ref = repo.repo_ref();
+    let head = head_oid(backend, &repo_ref);
+    // A later working-tree edit must not leak into a search of HEAD.
+    std::fs::write(repo.root().join("a.txt"), "needle on disk only\n").unwrap();
+
+    let hits = backend
+        .grep_tree(&repo_ref, head, &["needle".to_string()], 10)
+        .unwrap();
+    assert_eq!(
+        grep_keys(&hits),
+        [
+            "needle:a.txt:2:needle here",
+            "needle:src/b.rs:2:let needle = 1;"
+        ]
+    );
+    // `.` is literal: "a.b" matches, and a term is not a pattern.
+    let hits = backend
+        .grep_tree(&repo_ref, head, &["a.b".to_string()], 10)
+        .unwrap();
+    assert_eq!(grep_keys(&hits), ["a.b:a.txt:3:plain a.b"]);
+    let hits = backend
+        .grep_tree(&repo_ref, head, &["a.*b".to_string()], 10)
+        .unwrap();
+    assert!(hits.is_empty(), "{hits:?}");
+}
+
+/// At most `max_hits` for each term, and blank terms are ignored.
+pub fn check_grep_tree_caps_hits_per_term_and_ignores_blank_terms(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .commit_file("one.txt", "foo\nfoo\nbar\n", "one")
+        .commit_file("two.txt", "foo\nbar\n", "two")
+        .build();
+    let repo_ref = repo.repo_ref();
+    let head = head_oid(backend, &repo_ref);
+    let terms = vec!["foo".to_string(), "  ".to_string(), "bar".to_string()];
+    let hits = backend.grep_tree(&repo_ref, head, &terms, 2).unwrap();
+    assert_eq!(
+        grep_keys(&hits),
+        [
+            "foo:one.txt:1:foo",
+            "foo:one.txt:2:foo",
+            "bar:one.txt:3:bar",
+            "bar:two.txt:2:bar"
+        ]
+    );
+}
+
+/// Binary files, LFS pointers and files over the size cap are never
+/// searched, whatever they contain.
+pub fn check_grep_tree_skips_binary_pointer_and_oversized_files(backend: &dyn GitBackend) {
+    let oid = "a".repeat(64);
+    let big = format!("needle\n{}", "x".repeat(1024 * 1024 + 10));
+    let repo = TestRepoBuilder::new()
+        .commit_file("text.txt", "a needle\n", "text")
+        .commit_bytes("bin.dat", b"needle\0\x01\x02", "binary")
+        .commit_pointer_text("model.bin", &oid, 123, "pointer")
+        .commit_file("big.txt", &big, "big")
+        .build();
+    let repo_ref = repo.repo_ref();
+    let head = head_oid(backend, &repo_ref);
+    let terms = vec!["needle".to_string(), "oid".to_string()];
+    let hits = backend.grep_tree(&repo_ref, head, &terms, 50).unwrap();
+    let paths: Vec<&str> = hits.iter().map(|h| h.path.as_str()).collect();
+    assert_eq!(paths, ["text.txt"], "{hits:?}");
+}
+
+/// A revision that does not exist is an error, not "no hits".
+pub fn check_grep_tree_rejects_an_unknown_revision(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new().commit("only").build();
+    let repo_ref = repo.repo_ref();
+    let missing = Oid::from_hex("0123456789abcdef0123456789abcdef01234567").unwrap();
+    assert!(backend
+        .grep_tree(&repo_ref, missing, &["only".to_string()], 5)
+        .is_err());
+}
+
 // -- repository discovery ------------------------------------------------
 //
 // The two backends have different machinery underneath (`git rev-parse`

@@ -108,3 +108,52 @@ pub fn write_capturing_fake_agent(dir: &Path, answer: &[&str]) -> PathBuf {
 pub fn agent_prompt(agent: &Path) -> String {
     std::fs::read_to_string(agent.with_file_name("agent.prompt")).unwrap_or_default()
 }
+
+/// One run of a [`write_recording_fake_agent`] agent: where it was started,
+/// the arguments it got and which credential variables were in its
+/// environment.
+#[cfg(unix)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct AgentRun {
+    pub cwd: PathBuf,
+    pub args: Vec<String>,
+    /// Names (never values) of the hosting credential variables it saw.
+    pub credential_env: Vec<String>,
+}
+
+/// Like [`write_capturing_fake_agent`] but every run also records its
+/// working folder, its arguments and the hosting credential variables of
+/// its environment in `agent.runs`, read back with [`agent_runs`]. Unix only.
+#[cfg(unix)]
+pub fn write_recording_fake_agent(dir: &Path, answer: &[&str]) -> PathBuf {
+    let path = write_capturing_fake_agent(dir, answer);
+    let body = std::fs::read_to_string(&path).expect("read the fake agent");
+    let record = concat!(
+        "{ echo \"cwd=$PWD\"; for a in \"$@\"; do echo \"arg=$a\"; done; ",
+        "env | grep -E '^(GH_TOKEN|GITHUB_TOKEN|GITLAB_TOKEN|SSH_AUTH_SOCK|GIT_ASKPASS)=' ",
+        "| sed -e 's/=.*//' -e 's/^/env=/'; echo '--'; } >> \"$(dirname \"$0\")/agent.runs\"\n",
+    );
+    let body = body.replacen("echo called >>", &format!("{record}echo called >>"), 1);
+    std::fs::write(&path, body).expect("rewrite the fake agent");
+    path
+}
+
+/// The runs the recording agent at `agent` has had, oldest first.
+#[cfg(unix)]
+pub fn agent_runs(agent: &Path) -> Vec<AgentRun> {
+    let text = std::fs::read_to_string(agent.with_file_name("agent.runs")).unwrap_or_default();
+    let mut runs = Vec::new();
+    let mut current = AgentRun::default();
+    for line in text.lines() {
+        if line == "--" {
+            runs.push(std::mem::take(&mut current));
+        } else if let Some(cwd) = line.strip_prefix("cwd=") {
+            current.cwd = PathBuf::from(cwd);
+        } else if let Some(arg) = line.strip_prefix("arg=") {
+            current.args.push(arg.to_string());
+        } else if let Some(name) = line.strip_prefix("env=") {
+            current.credential_env.push(name.to_string());
+        }
+    }
+    runs
+}

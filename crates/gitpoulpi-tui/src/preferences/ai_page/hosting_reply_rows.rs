@@ -4,8 +4,8 @@
 //! instructions), then the "Repository access" group.
 //!
 //! The AI only ever drafts: none of these rows lets it post. Letting it read
-//! the repository is **off by default** and not built yet, so the group sets
-//! the defaults the later per-use choice starts from.
+//! the repository is **off by default**: the group sets what the per-use
+//! choice in the composer starts from.
 
 use gitpoulpi_i18n::msg::ai_hosting_reply as msg;
 

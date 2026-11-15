@@ -23,6 +23,7 @@ mod agent;
 pub mod agent_terminal;
 mod api;
 pub mod assist;
+pub mod hosting_reply;
 pub mod limits;
 pub mod parse;
 pub mod presets;

@@ -75,6 +75,7 @@ pub fn base_prompt(action: AiAction) -> &'static str {
         AiAction::RewriteScript => REWRITE_SCRIPT_BASE_PROMPT,
         AiAction::RewriteRules => rewrite_rules::base_prompt_static(),
         AiAction::WorktreeName => crate::worktree_name::BASE_PROMPT,
+        AiAction::HostingReply | AiAction::IssueBody => crate::hosting_reply::BASE_PROMPT,
         AiAction::SplitCommit => {
             "You split one git commit into several smaller, logical commits. You get the \
              original message and the changes as numbered pieces: H<n> is one hunk, F<n> a \
@@ -173,7 +174,19 @@ pub fn system_prompt_layered(
     repo: &RepoAiInstructions,
     per_action: &str,
 ) -> String {
-    let mut out = base_prompt(action).to_string();
+    system_prompt_layered_with_base(base_prompt(action), global, workspace, repo, per_action)
+}
+
+/// [`system_prompt_layered`] with the base prompt given: the writing
+/// actions let the user replace the built-in one.
+pub fn system_prompt_layered_with_base(
+    base: &str,
+    global: &str,
+    workspace: &RepoAiInstructions,
+    repo: &RepoAiInstructions,
+    per_action: &str,
+) -> String {
+    let mut out = base.to_string();
     let mut parts = general_layers(global, workspace, repo);
     parts.push(("Instructions for this task", per_action.trim().to_string()));
     for (heading, text) in parts {

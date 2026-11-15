@@ -11,8 +11,12 @@ description = "AI completion clients (OpenAI-compatible, Anthropic, local agent 
 [features]
 # Off, nothing here can open a socket: clients still work over a
 # caller-supplied `HttpTransport`, which is what every test does.
-default = ["network"]
+default = ["network", "conversation"]
 network = ["gitpoulpi-hosting/network"]
+# The mapping from `gitpoulpi-hosting`'s conversation shapes to a drafted
+# reply's input (`hosting_reply::convert`). Off, `hosting_reply` still works
+# over input a caller built itself.
+conversation = ["gitpoulpi-hosting/hosting"]
 # The terminal run mode of local agents (`agent_terminal`): drives the
 # agent's interactive screen on a pty. Off, a profile set to it fails with
 # a clear error and the pty crate is not even compiled.

@@ -67,6 +67,7 @@ fn cut_name(part: gitpoulpi_ai::Part) -> &'static str {
         Part::ReviewThreads => "the existing comments",
         Part::ContextFile => "a context file",
         Part::ContextTotal => "the context files",
+        Part::ReplyConversation => "the conversation",
     }
 }
 
@@ -222,11 +223,10 @@ fn prompt(session: &Session, action: &str) -> Result<Emitted, String> {
     .with_repo_instructions(repo_instructions)
     .with_workspace(workspace)
     .with_context(context);
-    let layers: Vec<serde_json::Value> =
-        std::iter::once(("base", prompts::base_prompt(action).to_string()))
-            .chain(job.prompt_layers())
-            .map(|(level, text)| json!({ "level": level, "text": text }))
-            .collect();
+    let layers: Vec<serde_json::Value> = std::iter::once(("base", job.base_prompt().to_string()))
+        .chain(job.prompt_layers())
+        .map(|(level, text)| json!({ "level": level, "text": text }))
+        .collect();
     let system = job.system_prompt();
     let mut out = json!({
         "action": action.key(),

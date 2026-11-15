@@ -731,12 +731,8 @@ impl AiHostingReply {
         Self {
             base_prompt: self.base_prompt.clone(),
             read_repository: repo.read_repository.unwrap_or(self.read_repository),
-            reuse_agent_session: repo
-                .reuse_agent_session
-                .unwrap_or(self.reuse_agent_session),
-            context_ttl_minutes: repo
-                .context_ttl_minutes
-                .unwrap_or(self.context_ttl_minutes),
+            reuse_agent_session: repo.reuse_agent_session.unwrap_or(self.reuse_agent_session),
+            context_ttl_minutes: repo.context_ttl_minutes.unwrap_or(self.context_ttl_minutes),
         }
     }
 }

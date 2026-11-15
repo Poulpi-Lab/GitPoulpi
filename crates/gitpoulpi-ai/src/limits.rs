@@ -45,6 +45,8 @@ pub enum Part {
     ContextFile,
     /// The project context files of a review together.
     ContextTotal,
+    /// The item and conversation text given to a drafted reply.
+    ReplyConversation,
 }
 
 impl Part {
@@ -57,6 +59,7 @@ impl Part {
             Part::ReviewThreads => "ai.limits.review_threads_bytes",
             Part::ContextFile => "ai.limits.review_context_file_bytes",
             Part::ContextTotal => "ai.limits.review_context_bytes",
+            Part::ReplyConversation => "ai.limits.hosting_reply_context_bytes",
         }
     }
 }
@@ -103,6 +106,8 @@ pub struct Limits {
     pub review_threads: usize,
     pub context_file: usize,
     pub context_total: usize,
+    /// The conversation text of a drafted reply.
+    pub reply_context: usize,
 }
 
 impl Limits {
@@ -115,6 +120,7 @@ impl Limits {
             review_threads: config.review_threads_bytes_clamped(),
             context_file: config.review_context_file_bytes_clamped(),
             context_total: config.review_context_bytes_clamped(),
+            reply_context: config.hosting_reply_context_bytes_clamped(),
         }
     }
 
@@ -127,6 +133,7 @@ impl Limits {
             review_threads: usize::MAX,
             context_file: usize::MAX,
             context_total: usize::MAX,
+            reply_context: usize::MAX,
         }
     }
 }
@@ -337,6 +344,10 @@ mod tests {
             (Part::ReviewThreads, "ai.limits.review_threads_bytes"),
             (Part::ContextFile, "ai.limits.review_context_file_bytes"),
             (Part::ContextTotal, "ai.limits.review_context_bytes"),
+            (
+                Part::ReplyConversation,
+                "ai.limits.hosting_reply_context_bytes",
+            ),
         ] {
             assert_eq!(Cut::new(part, "", 2, 1).setting, key);
             assert!(AiLimits::KEYS.contains(&key));

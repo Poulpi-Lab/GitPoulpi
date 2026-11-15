@@ -405,6 +405,22 @@ gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps t
 `--conversation` takes a file, `-` for standard input, or the JSON itself. The conversation commands that
 print such a page come with the conversation CLI.
 
+**In the Markdown composer.** While AI is on, the composer of a review comment, the Finish review summary, the
+new-issue description and the pull request description has a **✦ Write with AI** button (`Alt+W`) at the right
+end of its mode bar. It opens a panel under the bar:
+
+- a field for *what I want in this answer*, typed at the moment of use (`Enter` drafts), with a **Recent**
+  list of earlier instructions (click one, or `Up` / `Down` in the field);
+- *Improve my draft* (ticked when there is already a text: the AI starts from it);
+- *Let the AI read the repository*, unticked and disabled ("not built yet") until that part lands;
+- **Draft**, **Stop** (also `Esc`) and **Close**, and one line for progress or the error.
+
+The usual "What is sent" dialog shows the request first (`[ai.sent_preview] hosting_reply`, `issue_body`,
+`pull_request_description`). The draft replaces the text in one undo step and the composer switches to
+Preview so you read it before you send; `Ctrl+Z` gives your text back. The pull request description is written
+from the branch's commits and diff, and takes the same instruction. The AI never posts: the text goes out only
+through the form's own button.
+
 ## Where the key goes
 
 An API key (OpenAI, Anthropic, OpenRouter, an OpenAI-compatible server) is bound to the address it was stored for: the origin of the profile's base URL, recorded in `trust.toml` in the user-only private data folder. If the base URL later points somewhere else, the request is refused before anything is sent and the key stays where it is. Run `gitpoulpi ai trust <profile> --accept-origin <url>` (or accept it in the app) to move the key to the new address on purpose.

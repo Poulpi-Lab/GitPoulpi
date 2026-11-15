@@ -271,6 +271,19 @@ pub fn stash_message(diff: &str, budget: usize) -> String {
 
 /// "PR description": the branch's commit subjects and its diff.
 pub fn pull_request(commits: &[String], diff: &str, budget: usize) -> String {
+    pull_request_with_hint(commits, diff, budget, "", None)
+}
+
+/// [`pull_request`] with what the author typed at the moment of use (the
+/// composer's "Write with AI" field) and, when improving, their own draft
+/// of the description.
+pub fn pull_request_with_hint(
+    commits: &[String],
+    diff: &str,
+    budget: usize,
+    hint: &str,
+    draft: Option<&str>,
+) -> String {
     let (diff, _) = truncate_diff(diff, budget);
     let mut out =
         String::from("Write the title and description of this pull request.\n\nCommits:\n");
@@ -278,6 +291,18 @@ pub fn pull_request(commits: &[String], diff: &str, budget: usize) -> String {
         out.push_str(&format!("- {commit}\n"));
     }
     out.push_str(&format!("\n```diff\n{diff}\n```"));
+    let hint = hint.trim();
+    if !hint.is_empty() {
+        out.push_str(&format!(
+            "\n\nWhat the author wants in this description:\n{hint}"
+        ));
+    }
+    if let Some(draft) = draft.map(str::trim).filter(|d| !d.is_empty()) {
+        out.push_str(&format!(
+            "\n\nThe author's own draft of the description. Improve it: keep its meaning and \
+             voice, fix what is wrong, keep what is fine:\n{draft}"
+        ));
+    }
     out
 }
 
@@ -576,6 +601,12 @@ mod tests {
         assert!(explain_changes("commit abc", Some("msg"), "+x", 100).contains("msg"));
         assert!(stash_message("+x", 100).contains("+x"));
         assert!(pull_request(&["a".into()], "+x", 100).contains("- a"));
+        let with =
+            pull_request_with_hint(&["a".into()], "+x", 100, "mention the risk", Some("old"));
+        assert!(with.contains("What the author wants in this description:\nmention the risk"));
+        assert!(with.contains("Improve it") && with.ends_with("old"));
+        let plain = pull_request_with_hint(&["a".into()], "+x", 100, "  ", Some(" "));
+        assert!(!plain.contains("author wants") && !plain.contains("Improve it"));
         let p = commit_composer(&["src/a.rs".into()], "+x", 100);
         assert!(p.contains("- src/a.rs") && p.contains("+x"));
     }

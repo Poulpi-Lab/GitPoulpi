@@ -2598,6 +2598,7 @@ refs_remotes = "Branche : modifier ses distants"
 md_editor_preview = "Éditeur Markdown\u00a0: Écrire ou Aperçu"
 md_editor_split = "Éditeur Markdown\u00a0: vue côte à côte"
 md_editor_submit = "Éditeur Markdown\u00a0: envoyer"
+md_editor_ai = "Éditeur Markdown\u00a0: écrire avec l'IA"
 
 
 [keymap_ctx]
@@ -4153,6 +4154,7 @@ refs_pane_20 = "modifier les distants de la branche locale sélectionnée (son a
 markdown_editor_1 = "basculer entre Écrire et Aperçu (le texte tel qu'il apparaîtra une fois publié)"
 markdown_editor_2 = "afficher le texte et son aperçu côte à côte (demande une fenêtre large)"
 markdown_editor_3 = "envoyer le texte (Entrée insère un saut de ligne)"
+markdown_editor_4 = "ouvrir ou fermer l'aide d'écriture par l'IA (le texte reste le vôtre, rien n'est publié)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} ou clic droit"
@@ -9965,6 +9967,27 @@ discard_title = "Abandonner ce texte\u00a0?"
 discard_body = "Ce que vous avez écrit sera perdu."
 hint_preview = "Aperçu"
 hint_split = "Côte à côte"
+ai_button = "Écrire avec l'IA"
+ai_button_short = "IA"
+ai_label = "Ce que je veux dans cette réponse"
+ai_only_drafts = "L'IA écrit seulement un brouillon, rien n'est publié."
+ai_placeholder = "par exemple\u00a0: être d'accord, et demander un test qui échoue"
+ai_improve = "Améliorer mon brouillon"
+ai_repo = "Laisser l'IA lire le dépôt"
+ai_repo_unavailable = "pas encore disponible"
+ai_recent = "Récents"
+ai_recent_none = "rien pour l'instant"
+ai_draft = "Rédiger"
+ai_stop = "Arrêter"
+ai_close = "Fermer"
+ai_working = "Rédaction... {secs}\u00a0s"
+ai_stopped = "Arrêté."
+ai_done = "Brouillon prêt. Relisez-le, puis envoyez. Ctrl+Z rend votre texte."
+ai_error = "IA\u00a0: {why}"
+ai_keys = "Entrée rédige, Échap ferme"
+ai_pick_branches = "Choisissez d'abord les branches."
+ai_needs_repository = "Cette description se r\u00e9dige \u00e0 partir du d\u00e9p\u00f4t\u00a0: ouvrez-le d'abord."
+ai_job = "Rédaction d'un brouillon par l'IA"
 
 [ai_hosting_reply]
 base_prompt_label = "Prompt de base"

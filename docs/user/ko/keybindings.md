@@ -376,6 +376,7 @@ stage_file = "z"
 | `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
 | `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
 | `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+W` |
 | `dialog` | `browse` | 폴더 찾아보기 | `Ctrl+B` |
 | `dialog` | `sources` | 클론 소스로 이동 | `Alt+S` |
 | `dialog` | `submit` | Pull request 양식 제출 | `Ctrl+S` |

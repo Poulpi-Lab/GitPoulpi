@@ -110,6 +110,20 @@ impl ComposeBox {
         self
     }
 
+    /// Gives the text its "Write with AI" help (`None`: AI is off).
+    pub(super) fn with_ai(
+        mut self,
+        ai: Option<(
+            crate::md_editor::ai::AiScope,
+            Box<dyn crate::md_editor::ai::AiContextSource>,
+        )>,
+    ) -> Self {
+        if let Some((scope, source)) = ai {
+            self.md.bind_ai(scope, source);
+        }
+        self
+    }
+
     #[cfg(test)]
     pub(super) fn text(&self) -> &str {
         self.md.text()
@@ -476,6 +490,20 @@ impl FinishDialog {
         let text = self.md.text().to_string();
         self.md = MdEditor::new(text, ctx).with_draft(draft_key);
         self.initial = self.md.text().to_string();
+        self
+    }
+
+    /// Gives the summary its "Write with AI" help (`None`: AI is off).
+    pub(super) fn with_ai(
+        mut self,
+        ai: Option<(
+            crate::md_editor::ai::AiScope,
+            Box<dyn crate::md_editor::ai::AiContextSource>,
+        )>,
+    ) -> Self {
+        if let Some((scope, source)) = ai {
+            self.md.bind_ai(scope, source);
+        }
         self
     }
 

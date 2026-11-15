@@ -2595,6 +2595,7 @@ refs_remotes = "Dal: Uzak Depolarını Düzenle"
 md_editor_preview = "Markdown Editor: Toggle Write and Preview"
 md_editor_split = "Markdown Editor: Toggle the Split View"
 md_editor_submit = "Markdown Editor: Send the Text"
+md_editor_ai = "Markdown Editor: Write with AI"
 
 
 [keymap_ctx]
@@ -4150,6 +4151,7 @@ refs_pane_20 = "seçili yerel dalın uzak depolarını (upstream'ini ve ek {$pus
 markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
 markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
 markdown_editor_3 = "send the text (Enter inserts a newline)"
+markdown_editor_4 = "open or close Write with AI (it only drafts: nothing is posted)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} veya sağ tık"
@@ -9952,6 +9954,27 @@ discard_title = "Discard this text?"
 discard_body = "What you wrote will be lost."
 hint_preview = "Preview"
 hint_split = "Split"
+ai_button = "Write with AI"
+ai_button_short = "AI"
+ai_label = "What I want in this answer"
+ai_only_drafts = "The AI only writes a draft, nothing is posted."
+ai_placeholder = "for example: agree, and ask for a failing test"
+ai_improve = "Improve my draft"
+ai_repo = "Let the AI read the repository"
+ai_repo_unavailable = "not built yet"
+ai_recent = "Recent"
+ai_recent_none = "nothing yet"
+ai_draft = "Draft"
+ai_stop = "Stop"
+ai_close = "Close"
+ai_working = "Writing... {secs}s"
+ai_stopped = "Stopped."
+ai_done = "Draft ready. Read it, then send. Ctrl+Z gives your text back."
+ai_error = "AI: {why}"
+ai_keys = "Enter writes, Esc closes"
+ai_pick_branches = "Pick the branches first."
+ai_needs_repository = "Writing this description needs the repository: open it first."
+ai_job = "Writing a draft with AI"
 
 [ai_hosting_reply]
 base_prompt_label = "Base prompt"

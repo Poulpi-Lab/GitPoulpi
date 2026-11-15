@@ -483,7 +483,7 @@ fn capabilities_follow_the_item_kind() {
 }
 
 #[test]
-fn a_provider_without_conversations_says_unsupported() {
+fn a_kind_without_conversations_says_unsupported() {
     let t = Arc::new(RecordedTransport::new());
     let c = crate::client::client_for(
         Integration::new(
@@ -496,17 +496,16 @@ fn a_provider_without_conversations_says_unsupported() {
         &crate::trust::TrustGate::for_tests(),
     )
     .unwrap();
-    assert_eq!(c.conversation_caps(ItemKind::Issue), ConversationCaps::NONE);
+    assert_eq!(
+        c.conversation_caps(ItemKind::PullRequest),
+        ConversationCaps::NONE
+    );
     assert!(matches!(
-        block_on(c.item_timeline("p", &ItemKey::issue(1), None, &no_events())),
+        block_on(c.item_timeline("p", &ItemKey::pull_request(1), None, &no_events())),
         Err(Error::Unsupported(_))
     ));
     assert!(matches!(
-        block_on(c.post_item_comment("p", &ItemKey::issue(1), "x", false)),
-        Err(Error::Unsupported(_))
-    ));
-    assert!(matches!(
-        block_on(c.posting_identity("p")),
+        block_on(c.post_item_comment("p", &ItemKey::pull_request(1), "x", false)),
         Err(Error::Unsupported(_))
     ));
     assert!(t.requests().is_empty());

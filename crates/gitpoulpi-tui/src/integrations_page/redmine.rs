@@ -13,8 +13,8 @@ use gitpoulpi_i18n::msg::redmine_settings as rmsg;
 /// The format's name: proper nouns, not translated.
 fn format_name(markup: RedmineMarkup) -> &'static str {
     match markup {
-        RedmineMarkup::Textile => "Textile",
-        RedmineMarkup::Markdown => "Markdown",
+        RedmineMarkup::Textile => "Textile",   // i18n-english
+        RedmineMarkup::Markdown => "Markdown", // i18n-english
     }
 }
 

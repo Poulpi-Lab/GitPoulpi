@@ -980,6 +980,7 @@ zastosowania. Klawisze są domyślne.
 | Conversation: Next Entry | `Down` |
 | Conversation: Next Unread Entry | `n` |
 | Conversation: Reply to Entry | `r` |
+| Conversation: Quote Entry | `Q` |
 | Conversation: New Comment | `c` |
 | Conversation: Links of Entry... | `l` |
 | Conversation: Copy Link of Entry | `y` |
@@ -990,6 +991,7 @@ zastosowania. Klawisze są domyślne.
 | Conversation: Toggle Write and Preview |  |
 | Conversation: Toggle the Split View |  |
 | Conversation: Send the Comment |  |
+| Conversation: Toggle Internal Note |  |
 | Conversation: Close | `Esc` |
 | Hosting: Open Issue Conversation... |  |
 | Przegląd: ✦ Przygotuj szkic przeglądu... | `s` |

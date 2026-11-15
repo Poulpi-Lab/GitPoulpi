@@ -983,6 +983,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Conversation : Entrée suivante | `Down` |
 | Conversation : Prochaine entrée non lue | `n` |
 | Conversation : Répondre à l'entrée | `r` |
+| Conversation : Citer l'entrée | `Q` |
 | Conversation : Nouveau commentaire | `c` |
 | Conversation : Liens de l'entrée... | `l` |
 | Conversation : Copier le lien de l'entrée | `y` |
@@ -993,6 +994,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Conversation : Basculer écriture et aperçu |  |
 | Conversation : Basculer l'affichage côte à côte |  |
 | Conversation : Envoyer le commentaire |  |
+| Conversation : Basculer la note interne |  |
 | Conversation : Fermer | `Esc` |
 | Hébergement : Ouvrir la conversation d'un ticket... |  |
 | Revue : ✦ Rédiger une revue... | `s` |

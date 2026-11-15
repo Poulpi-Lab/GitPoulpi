@@ -724,6 +724,7 @@ actions! {
     MdEditorPreview => (MdEditor, "md_editor.preview", MD_EDITOR_PREVIEW, ["Alt+P"], @Hosting),
     MdEditorSplit => (MdEditor, "md_editor.split", MD_EDITOR_SPLIT, ["Alt+L"], @Hosting),
     MdEditorSubmit => (MdEditor, "md_editor.submit", MD_EDITOR_SUBMIT, ["Ctrl+Enter", "Ctrl+S", "Alt+Enter"], @Hosting),
+    MdEditorAi => (MdEditor, "md_editor.ai", MD_EDITOR_AI, ["Alt+W"], @Ai),
     DialogBrowse => (Dialog, "dialog.browse", DIALOG_BROWSE, ["Ctrl+B"]),
     DialogSources => (Dialog, "dialog.sources", DIALOG_SOURCES, ["Alt+S"]),
     DialogSubmit => (Dialog, "dialog.submit", DIALOG_SUBMIT, ["Ctrl+S"]),

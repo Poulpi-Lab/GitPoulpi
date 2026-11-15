@@ -153,6 +153,10 @@ impl Suggest {
         self.enabled
     }
 
+    pub(super) fn session(&self) -> &str {
+        &self.session
+    }
+
     pub(super) fn running(&self) -> bool {
         self.run.is_some() || self.queued
     }

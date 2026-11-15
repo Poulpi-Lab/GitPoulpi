@@ -16,12 +16,19 @@
 //! and every mouse event to [`MdEditor::on_mouse`]. Nothing is ever typed in
 //! the status line: the field lives in the dialog.
 //!
-//! The top row is the mode bar. Its right end is reserved for the "Write
-//! with AI" button (`ai_slot`), hidden until that feature lands.
+//! The top row is the mode bar. Its right end holds the "Write with AI"
+//! button (`ai_slot`) once the owner bound the helper (`bind_ai`, only while
+//! AI is on): `Alt+W` or the button opens its panel under the bar (`ai`), the
+//! draft it writes fills the text in one undo step and switches to Preview.
 
 // Not every build shows a form with a Markdown field.
 #![allow(dead_code)]
 
+pub(crate) mod ai;
+#[cfg(test)]
+mod ai_tests;
+#[cfg_attr(not(feature = "ai"), path = "ai_worker_stub.rs")]
+mod ai_worker;
 pub(crate) mod draft;
 pub(crate) mod preview;
 #[cfg(test)]
@@ -82,6 +89,7 @@ enum Part {
     Split,
     Text,
     Pane,
+    Ai,
 }
 
 /// A draft kept for the editor's target.
@@ -118,6 +126,8 @@ pub(crate) struct MdEditor {
     pane_rows: usize,
     pv_len: usize,
     draft: Option<Draft>,
+    /// The "Write with AI" helper, bound by the owner while AI is on.
+    ai: Option<ai::AiHelp>,
 }
 
 impl MdEditor {
@@ -141,6 +151,7 @@ impl MdEditor {
             pane_rows: 1,
             pv_len: 0,
             draft: None,
+            ai: None,
         };
         // The caret starts at the end of what is being edited.
         me.edit.sync(Some(()));
@@ -172,6 +183,120 @@ impl MdEditor {
             settled: false,
         });
         self
+    }
+
+    /// Gives the editor its "Write with AI" help: `source` says what the text
+    /// is about. Called only while AI is on; without it there is no button and
+    /// `Alt+W` does nothing.
+    pub(crate) fn bind_ai(&mut self, scope: ai::AiScope, source: Box<dyn ai::AiContextSource>) {
+        self.ai = Some(ai::AiHelp::new(scope, source));
+    }
+
+    #[cfg(test)]
+    pub(crate) fn bind_ai_with(&mut self, help: ai::AiHelp) {
+        self.ai = Some(help);
+    }
+
+    #[cfg(test)]
+    pub(crate) fn ai_mut(&mut self) -> Option<&mut ai::AiHelp> {
+        self.ai.as_mut()
+    }
+
+    /// Whether the helper is bound (the button is shown).
+    pub(crate) fn ai_bound(&self) -> bool {
+        self.ai.is_some()
+    }
+
+    /// Whether `key` is the helper's own (`Alt+W`): a form whose own `Alt+W`
+    /// means something else gives it to the editor while the text has focus.
+    pub(crate) fn takes_ai_key(&self, key: &KeyEvent) -> bool {
+        self.ai.is_some() && crate::keymap::current().is(Bind::MdEditorAi, key)
+    }
+
+    /// Opens (or closes) the "Write with AI" panel.
+    pub(crate) fn toggle_ai(&mut self) {
+        let has_text = !self.is_blank();
+        if let Some(ai) = self.ai.as_mut() {
+            ai.toggle(has_text);
+        }
+    }
+
+    /// Whether the panel is open, and whether a request is running.
+    pub(crate) fn ai_open(&self) -> bool {
+        self.ai.as_ref().is_some_and(|a| a.is_open())
+    }
+
+    pub(crate) fn ai_running(&self) -> bool {
+        self.ai.as_ref().is_some_and(|a| a.running())
+    }
+
+    /// The rects of the bar's buttons and the panel's controls, for the
+    /// form's `Ctrl+N` badges.
+    pub(crate) fn nav_rects(&self) -> Vec<Rect> {
+        let mut rects: Vec<Rect> = self
+            .hits
+            .iter()
+            .filter(|(_, p)| matches!(p, Part::Write | Part::Preview | Part::Split | Part::Ai))
+            .map(|(r, _)| *r)
+            .collect();
+        if let Some(ai) = &self.ai {
+            rects.extend(ai.rects());
+        }
+        rects
+    }
+
+    /// Runs the helper over the current text.
+    fn start_ai(&mut self) {
+        let text = self.text.clone();
+        if let Some(ai) = self.ai.as_mut() {
+            ai.start(&text);
+        }
+    }
+
+    /// The answer of the helper: a draft replaces the text (one undo step)
+    /// and the Preview shows it; a failure stays in the panel.
+    fn take_ai_answer(&mut self) {
+        let Some(answer) = self.ai.as_mut().and_then(|a| a.poll()) else {
+            return;
+        };
+        if let Some(ai) = self.ai.as_mut() {
+            ai.finished(&answer);
+        }
+        if let Ok(draft) = answer {
+            self.fill_with(&draft);
+        }
+    }
+
+    /// Replaces the whole text by `draft` as one edit of the field's history,
+    /// so `Ctrl+Z` gives the previous text back, and shows it in Preview.
+    pub(crate) fn fill_with(&mut self, draft: &str) {
+        self.edit.sync(Some(()));
+        let mut value = std::mem::take(&mut self.text);
+        let caret = self.edit.caret_mut(());
+        caret.select_all(&value);
+        caret.insert(&mut value, draft);
+        self.text = value;
+        self.touched();
+        self.preview.top = 0;
+        self.set_mode(Mode::Preview);
+    }
+
+    /// `Ctrl+Z` / `Ctrl+Y` while the Preview shows: the text goes back (or
+    /// forward) and the Write mode shows it.
+    fn undo_in_preview(&mut self, redo: bool) {
+        self.edit.sync(Some(()));
+        let mut value = std::mem::take(&mut self.text);
+        let caret = self.edit.caret_mut(());
+        let done = if redo {
+            caret.redo(&mut value)
+        } else {
+            caret.undo(&mut value)
+        };
+        self.text = value;
+        if done {
+            self.touched();
+            self.mode = Mode::Write;
+        }
     }
 
     /// The text goes to the host as `format` (Jira wiki markup, Textile):
@@ -323,9 +448,29 @@ impl MdEditor {
             self.toggle_split();
             return KeyUse::Handled;
         }
+        if self.ai.is_some() && km.is(Bind::MdEditorAi, &key) {
+            self.toggle_ai();
+            return KeyUse::Handled;
+        }
+        if self.ai.as_ref().is_some_and(|a| a.has_focus()) {
+            let used = self.ai.as_mut().map_or(ai::AiKey::Pass, |a| a.on_key(key));
+            match used {
+                ai::AiKey::Handled | ai::AiKey::Closed => return KeyUse::Handled,
+                ai::AiKey::Start => {
+                    self.start_ai();
+                    return KeyUse::Handled;
+                }
+                ai::AiKey::Pass => {}
+            }
+        }
         if self.mode == Mode::Preview {
             let page = self.pane_rows.max(1) as isize;
+            let ctrl = key
+                .modifiers
+                .contains(crossterm::event::KeyModifiers::CONTROL);
             match key.code {
+                KeyCode::Char('z' | 'Z') if ctrl => self.undo_in_preview(false),
+                KeyCode::Char('y' | 'Y') if ctrl => self.undo_in_preview(true),
                 KeyCode::Up => self.scroll_preview(-1),
                 KeyCode::Down => self.scroll_preview(1),
                 KeyCode::PageUp => self.scroll_preview(-page),
@@ -399,14 +544,26 @@ impl MdEditor {
             }
             return MouseUse::Outside;
         }
+        match self.ai.as_mut().map(|a| a.on_mouse(mouse)) {
+            Some(ai::AiMouse::Handled | ai::AiMouse::Closed) => return MouseUse::Inside,
+            Some(ai::AiMouse::Start) => {
+                self.start_ai();
+                return MouseUse::Inside;
+            }
+            Some(ai::AiMouse::Outside) | None => {}
+        }
         let hit = dialog_kit::hit_at(&self.hits, mouse.column, mouse.row);
         match mouse.kind {
             MouseEventKind::Moved => self.hover = hit,
             MouseEventKind::Down(MouseButton::Left) => match hit {
+                Some(Part::Ai) => self.toggle_ai(),
                 Some(Part::Write) => self.set_mode(Mode::Write),
                 Some(Part::Preview) => self.set_mode(Mode::Preview),
                 Some(Part::Split) => self.set_mode(Mode::Split),
                 Some(Part::Text) => {
+                    if let Some(ai) = self.ai.as_mut() {
+                        ai.focus_text();
+                    }
                     self.edit.sync(Some(()));
                     let shift = mouse
                         .modifiers
@@ -488,6 +645,7 @@ impl MdEditor {
         placeholder: &str,
     ) {
         self.save_when_idle();
+        self.take_ai_answer();
         self.edit.begin_frame();
         self.area = rect;
         self.hits.clear();
@@ -503,11 +661,32 @@ impl MdEditor {
             self.mode = Mode::Write;
         }
         let tight = rect.height < MIN_HEIGHT;
-        let body = if tight {
+        let mut body = if tight {
             rect
         } else {
             Rect::new(rect.x, rect.y + 1, rect.width, rect.height - 1)
         };
+        // The AI panel sits under the bar and keeps the text its rows.
+        let panel_rows = if tight {
+            0
+        } else {
+            self.ai.as_ref().map_or(0, |a| a.height(body.height))
+        };
+        if panel_rows > 0 {
+            let panel = Rect::new(body.x, body.y, body.width, panel_rows);
+            if let Some(ai) = self.ai.as_mut() {
+                ai.render(buf, panel);
+            }
+            body = Rect::new(
+                body.x,
+                body.y + panel_rows,
+                body.width,
+                body.height - panel_rows,
+            );
+        } else if let Some(ai) = self.ai.as_mut() {
+            ai.render(buf, Rect::default());
+        }
+        let focused = focused && !self.ai.as_ref().is_some_and(|a| a.has_focus());
         match self.mode {
             Mode::Write => self.paint_text(buf, body, focused, placeholder),
             Mode::Preview => self.paint_preview(buf, body),
@@ -565,8 +744,39 @@ impl MdEditor {
             x = r.right() + 1;
         }
         let muted = Style::default().fg(th().ui.muted).bg(th().ui.panel);
-        // The note may run under the (hidden) AI slot until that button exists.
-        let room = rect.right().saturating_sub(x + 1);
+        if let Some(ai) = &self.ai {
+            let state = if ai.is_open() {
+                ButtonState::Primary {
+                    hovered: self.hover == Some(Part::Ai),
+                    focused: false,
+                }
+            } else {
+                ButtonState::Normal {
+                    hovered: self.hover == Some(Part::Ai),
+                    focused: false,
+                }
+            };
+            let full = format!("{} {}", crate::theme::AI_SPARK, msg::AI_BUTTON.get());
+            let short = format!("{} {}", crate::theme::AI_SPARK, msg::AI_BUTTON_SHORT.get());
+            let label = [full, short]
+                .into_iter()
+                .find(|l| dialog_kit::button_width(l) <= self.ai_slot.width);
+            if let Some(label) = label {
+                let w = dialog_kit::button_width(&label);
+                let bx = rect.right().saturating_sub(w);
+                let r = dialog_kit::button(buf, bx, rect.y, &label, state);
+                self.hits.push((r, Part::Ai));
+                self.ai_slot = r;
+            } else {
+                self.ai_slot = Rect::new(rect.right(), rect.y, 0, 1);
+            }
+        }
+        // The note stops where the AI button starts.
+        let room = if self.ai.is_some() {
+            self.ai_slot.x.saturating_sub(x + 2)
+        } else {
+            rect.right().saturating_sub(x + 1)
+        };
         if let Some(note) = self.note.as_deref() {
             dialog_kit::put(
                 buf,

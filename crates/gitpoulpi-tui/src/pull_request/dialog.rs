@@ -117,6 +117,9 @@ pub(crate) struct PullRequestDialog {
     pub(super) projects_rx: Vec<ProjectsReceiver>,
     pub(super) factory: Option<std::sync::Arc<dyn ClientFactory>>,
     pub(super) ai_generate: bool,
+    /// The chosen `(source, target)` branches as the description's "Write
+    /// with AI" help reads them.
+    pub(super) ai_branches: Option<crate::md_editor::ai::Shared<(String, String)>>,
     /// A generation is running: the button says so and does nothing.
     pub(super) generating: bool,
     /// Where a popup was when a click closed it. A popup lies over the
@@ -138,7 +141,35 @@ impl PullRequestDialog {
         if self.open_combo().is_some() || self.meta.is_open() {
             return Vec::new();
         }
-        dialog_kit::nav_cells(self.hits.iter().map(|(r, _)| *r))
+        dialog_kit::nav_cells(self.hits.iter().map(|(r, _)| *r).chain(self.md.nav_rects()))
+    }
+
+    /// Gives the description its "Write with AI" help (only while AI is on):
+    /// the branch pair the form holds is what it describes.
+    pub(crate) fn bind_ai(&mut self, scope: crate::md_editor::ai::AiScope) {
+        let branches = crate::md_editor::ai::Shared::default();
+        self.md.bind_ai(
+            scope,
+            Box::new(crate::md_editor::ai::PullRequestSource {
+                branches: branches.clone(),
+            }),
+        );
+        self.ai_branches = Some(branches);
+    }
+
+    /// Tells the description's AI help which branches are chosen now.
+    pub(super) fn sync_ai_branches(&self) {
+        let Some(cell) = &self.ai_branches else {
+            return;
+        };
+        let pick = |c: &Combo| {
+            c.selected()
+                .map(|s| s.trim().to_string())
+                .unwrap_or_default()
+        };
+        if let Ok(mut pair) = cell.lock() {
+            *pair = (pick(&self.from_branch), pick(&self.to_branch));
+        }
     }
 
     /// `tip_subject` prefills Title with the source branch's tip
@@ -191,6 +222,7 @@ impl PullRequestDialog {
             projects_rx: Vec::new(),
             factory: Some(factory),
             ai_generate: AI_GENERATE_HOOK,
+            ai_branches: None,
             generating: false,
             popup_shield: None,
             meta: MetaFields::default(),
@@ -737,7 +769,9 @@ impl PullRequestDialog {
             self.message = None;
             return PullRequestOutcome::Stay;
         }
-        if crate::keymap::current().is(Bind::DialogWeb, &key) {
+        if crate::keymap::current().is(Bind::DialogWeb, &key)
+            && !(self.focus == PrFocus::Body && self.md.takes_ai_key(&key))
+        {
             return self.open_web();
         }
         // The text fields' editing keys, through the shared core.

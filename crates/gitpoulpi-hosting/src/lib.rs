@@ -67,6 +67,7 @@ pub mod linear;
 pub mod list_cache;
 #[cfg(feature = "local-issues")]
 pub mod local_markdown;
+pub mod markup;
 #[cfg(feature = "hosting")]
 pub mod metadata;
 #[cfg(feature = "hosting")]
@@ -92,6 +93,7 @@ pub mod trello;
 pub mod trust;
 pub mod updates;
 mod web_url;
+pub mod xrefs;
 #[cfg(feature = "youtrack")]
 pub mod youtrack;
 

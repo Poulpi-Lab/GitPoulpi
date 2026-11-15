@@ -159,6 +159,9 @@ vt100 = "0.15"
 # gain a terminal editor could see. Everything else (HTML output, plist /
 # YAML grammar loading) is off -- nothing here loads a grammar at runtime.
 syntect = { version = "5", default-features = false, features = ["parsing", "default-syntaxes", "default-themes", "regex-fancy"] }
+# CommonMark/GFM parser. Default features (CLI, html output, simd) are off;
+# the hosting crate turns `html` on for Azure DevOps Server (Markdown to HTML).
+pulldown-cmark = { version = "0.13", default-features = false }
 # The clipboard, for the commit/ref context menus' Copy entries.
 #
 # Chosen over `copypasta`/`cli-clipboard` because it is the only

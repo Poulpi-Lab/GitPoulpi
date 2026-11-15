@@ -14,7 +14,7 @@ GitKraken is a trademark of its respective owner. GitPoulpi is an independent
 project, not affiliated with, endorsed or sponsored by it; the name is
 mentioned only to describe compatibility and inspiration.
 
-Cargo.lock sha256: 261f248b19f613cc747eac9109dad982e38f36f61608256b4e830de8751f0175
+Cargo.lock sha256: 4a8b5e44ed9b06619d7eb9ba85d13fc1d79ba26b56f41d5cad41987c141d60d4
 
 
 
@@ -1705,7 +1705,7 @@ option-ext 0.2.0 - Mozilla Public License 2.0
 3. RUST CRATES
 ############################################################################################
 
-479 crates, one per line: name version (license).
+482 crates, one per line: name version (license).
 
 adler2 2.0.1 (0BSD OR MIT OR Apache-2.0)
 aho-corasick 1.1.5 (Unlicense OR MIT)
@@ -1966,6 +1966,8 @@ ppv-lite86 0.2.21 (MIT OR Apache-2.0)
 primeorder 0.13.6 (Apache-2.0 OR MIT)
 proc-macro2 1.0.107 (MIT OR Apache-2.0)
 psm 0.1.32 (MIT OR Apache-2.0)
+pulldown-cmark 0.13.6 (MIT)
+pulldown-cmark-escape 0.11.0 (MIT)
 quick-error 2.0.1 (MIT/Apache-2.0)
 quick-xml 0.41.0 (MIT)
 quinn 0.11.12 (MIT OR Apache-2.0)
@@ -2103,6 +2105,7 @@ typed-path 0.13.0 (MIT OR Apache-2.0)
 typeid 1.0.3 (MIT OR Apache-2.0)
 typenum 1.20.1 (MIT OR Apache-2.0)
 ucd-trie 0.1.7 (MIT OR Apache-2.0)
+unicase 2.10.0 (MIT OR Apache-2.0)
 unicode-ident 1.0.24 ((MIT OR Apache-2.0) AND Unicode-3.0)
 unicode-segmentation 1.13.3 (MIT OR Apache-2.0)
 unicode-truncate 2.0.1 (MIT OR Apache-2.0)
@@ -3421,7 +3424,7 @@ regex-automata 0.4.18, regex-syntax 0.8.11, rsa 0.9.10, rustix 1.1.6, rustls 0.2
 rustls-native-certs 0.8.5, scopeguard 1.2.0, security-framework 3.7.0,
 security-framework-sys 2.17.0, shared_library 0.1.9, signal-hook 0.3.18, signal-hook-mio
 0.2.5, signal-hook-registry 1.4.8, smallvec 1.16.1, socket2 0.6.5, stable_deref_trait 1.2.1,
-stacker 0.1.25, syn 1.0.109, tar 0.4.46, tempfile 3.27.0, ucd-trie 0.1.7,
+stacker 0.1.25, syn 1.0.109, tar 0.4.46, tempfile 3.27.0, ucd-trie 0.1.7, unicase 2.10.0,
 unicode-segmentation 1.13.3, unicode-truncate 2.0.1, unicode-width 0.1.14, unicode-width
 0.2.0, url 2.5.8, uuid 1.26.1, wasi 0.11.1+wasi-snapshot-preview1, wasip2 1.0.4+wasi-0.2.12,
 wasm-bindgen 0.2.128, wasm-bindgen-futures 0.4.78, wasm-bindgen-macro 0.2.128,
@@ -8939,7 +8942,7 @@ IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
 ============================================================================================
-Used by: hyper 1.11.1
+Used by: hyper 1.11.1, unicase 2.10.0
 --------------------------------------------------------------------------------------------
 Copyright (c) 2014-2026 Sean McArthur
 
@@ -13391,6 +13394,31 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FO
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT
 OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+============================================================================================
+Used by: pulldown-cmark 0.13.6, pulldown-cmark-escape 0.11.0
+--------------------------------------------------------------------------------------------
+The MIT License
+
+Copyright 2015 Google Inc. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 ============================================================================================
 Used by: quick-error 2.0.1

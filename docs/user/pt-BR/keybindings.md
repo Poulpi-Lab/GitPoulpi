@@ -375,10 +375,10 @@ As teclas depois de um prefixo aparecem com o prefixo (`Ctrl+G s`).
 | `reword` | `deeper` | Modificar o histórico mais a fundo | `Alt+H` |
 | `composer` | `commit` | Commit pelo compositor | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Inserir uma referência de issue | `Alt+R` |
-| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
-| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
-| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
+| `md_editor` | `preview` | Editor Markdown: alternar Escrever e Prévia | `Alt+P` |
+| `md_editor` | `split` | Editor Markdown: alternar a visão lado a lado | `Alt+L` |
+| `md_editor` | `submit` | Editor Markdown: enviar o texto | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Editor Markdown: escrever com IA | `Alt+E` |
 | `dialog` | `browse` | Procurar uma pasta | `Ctrl+B` |
 | `dialog` | `sources` | Ir para as origens do clone | `Alt+S` |
 | `dialog` | `submit` | Enviar o formulário de pull request | `Ctrl+S` |
@@ -830,7 +830,7 @@ As teclas são as padrão.
 | Radar: fixar ou desafixar | `p` |
 | Radar: adiar... | `z` |
 | Radar: revisar solicitação... | `e` |
-| Radar: Open Issue Conversation | `i` |
+| Radar: abrir a conversa da issue | `i` |
 | Radar: revisar pela API |  |
 | Radar: clonar e revisar... |  |
 | Radar: editar responsáveis... |  |
@@ -972,30 +972,30 @@ As teclas são as padrão.
 | Quadro: definir rótulos das colunas... | `c` |
 | Quadro: atualizar | `r` |
 | Quadro: fechar | `Esc` |
-| Conversation: Back |  |
-| Conversation: Refresh | `F5` |
-| Conversation: Load Older Entries | `m` |
-| Conversation: Previous Entry | `Up` |
-| Conversation: Next Entry | `Down` |
-| Conversation: Next Unread Entry | `n` |
-| Conversation: Reply to Entry | `r` |
-| Conversation: Quote Entry | `Q` |
-| Conversation: New Comment | `c` |
-| Conversation: Links of Entry... | `l` |
-| Conversation: Open Diagram of Entry | `g` |
-| Conversation: Copy Link of Entry | `y` |
-| Conversation: Open in Browser | `o` |
-| Conversation: Edit Comment | `e` |
-| Conversation: Delete Comment | `d` |
-| Conversation: Show or Hide Events | `v` |
-| Conversation: Toggle Write and Preview |  |
-| Conversation: Toggle the Split View |  |
-| Conversation: Send the Comment |  |
-| Conversation: Toggle Internal Note |  |
-| Conversation: Close | `Esc` |
-| Markdown Editor: Write with AI |  |
-| Markdown Editor: Refresh the AI Context |  |
-| Hosting: Open Issue Conversation... |  |
+| Conversa: voltar |  |
+| Conversa: atualizar | `F5` |
+| Conversa: carregar entradas anteriores | `m` |
+| Conversa: entrada anterior | `Up` |
+| Conversa: próxima entrada | `Down` |
+| Conversa: próxima entrada não lida | `n` |
+| Conversa: responder à entrada | `r` |
+| Conversa: citar a entrada | `Q` |
+| Conversa: novo comentário | `c` |
+| Conversa: links da entrada... | `l` |
+| Conversa: abrir o diagrama da entrada | `g` |
+| Conversa: copiar o link da entrada | `y` |
+| Conversa: abrir no navegador | `o` |
+| Conversa: editar comentário | `e` |
+| Conversa: excluir comentário | `d` |
+| Conversa: mostrar ou ocultar eventos | `v` |
+| Conversa: alternar Escrever e Prévia |  |
+| Conversa: alternar a visão lado a lado |  |
+| Conversa: enviar o comentário |  |
+| Conversa: alternar nota interna |  |
+| Conversa: fechar | `Esc` |
+| Editor Markdown: escrever com IA |  |
+| Editor Markdown: atualizar o contexto da IA |  |
+| Hospedagem: abrir a conversa de uma issue... |  |
 | Revisão: ✦ gerar rascunho de revisão... | `s` |
 | Revisão: aceitar sugestão | `y` |
 | Revisão: editar e aceitar sugestão... | `w` |

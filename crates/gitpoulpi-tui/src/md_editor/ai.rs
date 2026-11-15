@@ -693,7 +693,7 @@ impl AiHelp {
                         }
                     }
                     ai_context::Choice::Disabled(why) => {
-                        self.note = Note::Info(format!("{}: {}", msg::AI_REPO.get(), why.full()));
+                        self.note = Note::Info(why.full().to_string());
                     }
                 }
                 AiKey::Handled
@@ -888,11 +888,18 @@ impl AiHelp {
                             focused: self.focus == AiPart::Repo,
                         },
                     ),
-                    ai_context::Choice::Disabled(why) => (
-                        format!("{} ({})", msg::AI_REPO.get(), why.short()),
-                        false,
-                        CheckState::Disabled,
-                    ),
+                    ai_context::Choice::Disabled(why) => {
+                        // The reason in parentheses only when the row has room
+                        // for it (activating the box says it in full anyway).
+                        let with = format!("{} ({})", msg::AI_REPO.get(), why.short());
+                        let room = usize::from(rect.right().saturating_sub(x));
+                        let label = if crate::ui_kit::display_width(&with) + 5 <= room {
+                            with
+                        } else {
+                            msg::AI_REPO.get().to_string()
+                        };
+                        (label, false, CheckState::Disabled)
+                    }
                 };
                 let repo = dialog_kit::checkbox(
                     buf,
@@ -907,7 +914,24 @@ impl AiHelp {
             }
             y += 1;
         }
-        if want_recent {
+        // What the last draft read of the repository has a row of its own when
+        // the panel can have six; in a form that gives it five, the line takes
+        // the Recent row's place.
+        let ctx_line = self.context_line.clone().filter(|_| self.repo_on());
+        let ctx_takes_recent = h < PANEL_ROWS + 1 && ctx_line.is_some();
+        if want_recent && ctx_takes_recent {
+            if let Some(line) = &ctx_line {
+                dialog_kit::put(
+                    buf,
+                    rect.x + 1,
+                    y,
+                    line,
+                    rect.right().saturating_sub(rect.x + 2),
+                    muted,
+                );
+            }
+            y += 1;
+        } else if want_recent {
             let mut x = rect.x + 1;
             let head = dialog_kit::put(
                 buf,
@@ -1030,7 +1054,7 @@ impl AiHelp {
             }
         }
         // What the last draft read of the repository, on a row of its own.
-        if let Some(line) = self.context_line.as_deref().filter(|_| self.repo_on()) {
+        if let Some(line) = ctx_line.as_deref().filter(|_| !ctx_takes_recent) {
             if y + 1 < rect.bottom() {
                 dialog_kit::put(
                     buf,

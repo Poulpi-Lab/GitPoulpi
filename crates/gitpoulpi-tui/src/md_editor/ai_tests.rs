@@ -198,7 +198,7 @@ fn the_repository_box_is_unticked_and_disabled_without_a_clone_and_a_click_only_
     assert!(s.contains("[ ] Let the AI read the repository"), "{s}");
     assert!(!s.contains("[x] Let the AI read"), "{s}");
     assert!(
-        s.contains("Let the AI read the repository: no local clone"),
+        s.contains("The repository is not cloned here, so there is nothing to read."),
         "{s}"
     );
 }

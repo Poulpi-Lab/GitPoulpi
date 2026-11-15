@@ -12320,6 +12320,10 @@ ai_repo_no_clone = "no local clone"
 ai_repo_no_readonly = "no read-only mode"
 # context: full sentence shown when the disabled repository checkbox is activated. Width budget: 70 cells
 ai_repo_no_readonly_why = "This agent has no read-only mode GitPoulpi trusts."
+# context: full sentence shown when the disabled repository checkbox is activated and the repository is not cloned. Width budget: 70 cells
+ai_repo_no_clone_why = "The repository is not cloned here, so there is nothing to read."
+# context: full sentence shown when the disabled repository checkbox is activated on a text written from a diff. Width budget: 70 cells
+ai_repo_not_here_why = "This text is written from the diff, not from the repository."
 # context: the reason the repository checkbox is disabled for a text that is already written from a diff (a pull request description), in parentheses after it. Width budget: 24 cells
 ai_repo_not_here = "not for this text"
 # context: button: forget the repository context kept from earlier drafts and read the repository again. Width budget: 20 cells

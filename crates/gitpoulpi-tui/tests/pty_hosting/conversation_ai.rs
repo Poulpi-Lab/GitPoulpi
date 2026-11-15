@@ -97,8 +97,8 @@ fn the_ai_field_drafts_into_the_description_previews_it_and_ctrl_z_restores_the_
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(
-        screen.contains("[ ] Let the AI read the repository (no read-only mode)"),
-        "unticked and disabled with its reason (this agent has no read-only mode):\n{}",
+        screen.contains("[ ] Let the AI read the repository"),
+        "unticked and disabled (this agent has no read-only mode):\n{}",
         screen.text()
     );
     assert!(
@@ -476,6 +476,45 @@ fn with_the_box_ticked_an_api_profile_gets_a_context_that_is_reused_until_refres
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
 
+    no_write(&mock);
+    term.stop().unwrap();
+}
+
+/// An agent GitPoulpi has no confirmed read-only mode for cannot be let into
+/// the repository: the box is disabled, and activating it says why.
+#[cfg(unix)]
+#[test]
+fn an_agent_without_a_read_only_mode_cannot_be_let_into_the_repository() {
+    let mock = start_mock();
+    let repo = fixture(mock.port);
+    let tools = tempfile::tempdir().unwrap();
+    let agent = write_fake_agent(tools.path(), &[DRAFT_LINE]);
+    let (mut term, _config) = launch_issues(
+        &repo,
+        "pty-composer-ai-noreadonly",
+        &config_toml(mock.port, &format!("\n{}", ai_config_toml(&agent))),
+        COLS,
+        "Add the feature",
+    );
+    open_form(&mut term);
+    term.send_keys("M-i").expect("Alt+I");
+    term.wait_for("the AI field", STEP, |s| {
+        s.contains("What I want in this answer")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    click_text(&mut term, "Let the AI read the repository");
+    let screen = term
+        .wait_for("the reason", STEP, |s| {
+            s.contains("This agent has no read-only mode GitPoulpi trusts.")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    assert!(
+        screen.contains("[ ] Let the AI read the repository") && !screen.contains("[x] Let the AI"),
+        "nothing was ticked:\n{}",
+        screen.text()
+    );
+    assert!(!screen.contains("Refresh context"), "{}", screen.text());
+    assert_eq!(agent_calls(&agent), 0);
     no_write(&mock);
     term.stop().unwrap();
 }

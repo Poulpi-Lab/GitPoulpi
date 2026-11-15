@@ -42,8 +42,9 @@ impl Why {
     /// The sentence shown when the disabled box is activated.
     pub(crate) fn full(self) -> &'static str {
         match self {
+            Why::NoClone => msg::AI_REPO_NO_CLONE_WHY.get(),
             Why::NoReadOnly => msg::AI_REPO_NO_READONLY_WHY.get(),
-            other => other.short(),
+            Why::NotHere => msg::AI_REPO_NOT_HERE_WHY.get(),
         }
     }
 }

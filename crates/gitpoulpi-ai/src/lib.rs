@@ -309,10 +309,16 @@ fn agent_workdir(
 
 #[cfg(not(feature = "terminal-agent"))]
 fn agent_workdir(
-    _profile: &AiProfile,
-    _repo_root: Option<&std::path::Path>,
+    profile: &AiProfile,
+    repo_root: Option<&std::path::Path>,
 ) -> Option<std::path::PathBuf> {
-    None
+    // A headless agent runs where the process is, unless it is set to work in
+    // the repository (the choice "Let the AI read the repository" does that
+    // and must not depend on the build).
+    (profile.workdir == gitpoulpi_config::AgentWorkdir::Repository)
+        .then(|| repo_root.filter(|p| !p.as_os_str().is_empty()))
+        .flatten()
+        .map(std::path::Path::to_path_buf)
 }
 
 /// [`client_for`] over the real network transport, with the AI timeout.

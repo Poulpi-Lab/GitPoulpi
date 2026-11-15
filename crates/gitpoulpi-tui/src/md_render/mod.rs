@@ -27,6 +27,7 @@ use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::style::{Modifier, Style};
 
+#[allow(unused_imports)] // only the review view keeps a cache
 pub(crate) use cache::DocCache;
 
 use crate::th;

@@ -256,6 +256,9 @@ pub(crate) struct RepoDialogs {
     ws_jobs: Vec<crate::workspace_ui::task::Receiver>,
     /// The frame the dialogs were last drawn in: where "outside" starts.
     area: Rect,
+    /// Where the composers' "Write with AI" help reads its settings from;
+    /// `None` while AI is off (no composer shows the help).
+    ai_scope: Option<crate::md_editor::ai::AiScope>,
 }
 
 /// Workspace walks whose window went away (a tab switch): they keep running,
@@ -306,6 +309,7 @@ impl RepoDialogs {
             sparse: Default::default(),
             ws_jobs: std::mem::take(&mut *PARKED_WS.lock().unwrap_or_else(|e| e.into_inner())),
             area: Rect::default(),
+            ai_scope: None,
         }
     }
 
@@ -671,6 +675,9 @@ impl RepoDialogs {
     ) {
         let mut form = PullRequestDialog::new(seed, tip_subject);
         form.set_ai_generate(ai_enabled);
+        if let Some(scope) = self.ai_scope.clone() {
+            form.bind_ai(scope);
+        }
         self.dialog = Some(RepoDialog::PullRequest {
             form: Box::new(form),
         });
@@ -710,6 +717,9 @@ impl RepoDialogs {
     #[cfg(feature = "hosting")]
     fn open_issue_form(&mut self, seed: IssueSeed) {
         let mut form = Box::new(IssueDialog::new(seed));
+        if let Some(scope) = self.ai_scope.clone() {
+            form.bind_ai(scope);
+        }
         // Jira / Azure issue types, Trello lists: asked when the form opens.
         form.fetch_options(
             self.issue_factory.clone(),
@@ -875,6 +885,24 @@ impl RepoDialogs {
     /// Whether the Create worktree dialog is the open dialog.
     pub(crate) fn worktree_open(&self) -> bool {
         matches!(self.dialog, Some(RepoDialog::Worktree { .. }))
+    }
+
+    /// AI went on or off, or the repository changed: the Markdown composers
+    /// opened from now on get (or lose) their "Write with AI" help (called
+    /// every tick).
+    pub(crate) fn sync_composer_ai(&mut self, enabled: bool, root: &std::path::Path) {
+        if !enabled {
+            self.ai_scope = None;
+        } else if self
+            .ai_scope
+            .as_ref()
+            .is_none_or(|s| s.root.as_deref() != Some(root))
+        {
+            self.ai_scope = Some(crate::md_editor::ai::AiScope {
+                session: self.session.clone(),
+                root: Some(root.to_path_buf()),
+            });
+        }
     }
 
     /// AI went on or off, or a request ended: the Create worktree dialog's

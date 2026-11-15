@@ -7,6 +7,7 @@ impl PullRequestDialog {
             _ => None,
         });
         self.edit.begin_frame();
+        self.sync_ai_branches();
         self.sync_meta_scope();
         self.guard
             .framed(buf, rect, msg::pull_request::TITLE.get(), &WIN);

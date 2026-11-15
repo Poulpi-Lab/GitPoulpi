@@ -991,6 +991,20 @@ async fn pull_request(
     source: &str,
     target: &str,
 ) -> Result<parse::PullRequestText, String> {
+    pull_request_hinted(config, session, repo, source, target, "", None).await
+}
+
+/// [`pull_request`] with what the author typed in the composer's "Write with
+/// AI" field and, when improving, their own draft of the description.
+pub(crate) async fn pull_request_hinted(
+    config: &AiConfig,
+    session: &str,
+    repo: &RepoRef,
+    source: &str,
+    target: &str,
+    hint: &str,
+    draft: Option<&str>,
+) -> Result<parse::PullRequestText, String> {
     let job = prepare(config, session, repo, AiAction::PullRequestDescription)?;
     let mut client = connect(session).await?;
     let mut id = 0u64;
@@ -1055,7 +1069,7 @@ async fn pull_request(
     )?;
     let diff = render_diff(&diffs);
     let budget = diff_budget(&job, diff.len()).await?;
-    let prompt = prompts::pull_request(&subjects, &diff, budget);
+    let prompt = prompts::pull_request_with_hint(&subjects, &diff, budget, hint, draft);
     let answer = job.run(&prompt).await.map_err(|e| e.to_string())?;
     parse::pull_request(&answer).map_err(|e| e.to_string())
 }
@@ -1536,7 +1550,6 @@ async fn explain(
 /// [`prepare`] for the repository rooted at `root`: the review view's
 /// suggestions resolve their job the way every other action does, with the
 /// repository's and the workspace's instructions.
-#[cfg(all(feature = "hosting", feature = "review"))]
 pub(crate) fn prepare_for_root(
     config: &AiConfig,
     session: &str,
@@ -1549,7 +1562,6 @@ pub(crate) fn prepare_for_root(
 /// [`prepare_for_root`] for a request of a repository that is not cloned:
 /// the global profile and instructions only (there is no repository to read
 /// a preference or a work tree from).
-#[cfg(all(feature = "hosting", feature = "review"))]
 pub(crate) fn prepare_remote(config: &AiConfig, action: AiAction) -> Result<Job, String> {
     let job = Job::prepare(config, action, None, &CredentialHelperTokens::new())?;
     let context = gitpoulpi_ai::vars::PromptContext {

@@ -630,8 +630,12 @@ impl ReviewView {
             ])
         });
         let ctx = self.target.md_context();
-        self.compose =
-            Some(ComposeBox::new(purpose, title, about, text).for_target(ctx, draft_key));
+        let ai = self.composer_ai(Some(&purpose));
+        self.compose = Some(
+            ComposeBox::new(purpose, title, about, text)
+                .for_target(ctx, draft_key)
+                .with_ai(ai),
+        );
     }
 
     fn finish_compose(&mut self, purpose: ComposeFor, text: String) {

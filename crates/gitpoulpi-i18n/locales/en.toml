@@ -3454,6 +3454,8 @@ md_editor_preview = "Markdown Editor: Toggle Write and Preview"
 md_editor_split = "Markdown Editor: Toggle the Split View"
 # context: label of the key that sends (posts or saves) the text of the Markdown editor
 md_editor_submit = "Markdown Editor: Send the Text"
+# context: label of the key that opens the AI writing help of the Markdown editor
+md_editor_ai = "Markdown Editor: Write with AI"
 
 [keymap_ctx]
 rewrite = "Rewrite history workbench"
@@ -12270,6 +12272,48 @@ discard_body = "What you wrote will be lost."
 hint_preview = "Preview"
 # context: footer hint of the Markdown editor, after the key that toggles Split. Width budget: 14 cells
 hint_split = "Split"
+# context: button of the Markdown editor's mode bar: opens the AI writing help (a star is drawn before it). Width budget: 16 cells
+ai_button = "Write with AI"
+# context: same button when the bar is too narrow for the full label. Width budget: 4 cells
+ai_button_short = "AI"
+# context: label of the instruction field of the AI writing help: the user says what the text should contain. Width budget: 36 cells
+ai_label = "What I want in this answer"
+# context: reminder next to that label. Width budget: 50 cells
+ai_only_drafts = "The AI only writes a draft, nothing is posted."
+# context: placeholder of the instruction field. Width budget: 56 cells
+ai_placeholder = "for example: agree, and ask for a failing test"
+# context: checkbox: the AI starts from the text already typed instead of writing a new one. Width budget: 28 cells
+ai_improve = "Improve my draft"
+# context: checkbox, unticked and disabled until it is built. Width budget: 34 cells
+ai_repo = "Let the AI read the repository"
+# context: the reason that checkbox is disabled, shown in parentheses after it. Width budget: 24 cells
+ai_repo_unavailable = "not built yet"
+# context: label before the list of instructions typed before. Width budget: 12 cells
+ai_recent = "Recent"
+# context: shown after that label when the list is empty. Width budget: 24 cells
+ai_recent_none = "nothing yet"
+# context: button: ask the AI for a draft. Width budget: 12 cells
+ai_draft = "Draft"
+# context: button: stop the AI request that is running. Width budget: 12 cells
+ai_stop = "Stop"
+# context: button: close the AI writing help. Width budget: 12 cells
+ai_close = "Close"
+# context: shown while the AI writes; {secs} is the number of seconds so far. Width budget: 24 cells
+ai_working = "Writing... {secs}s"
+# context: shown after the user stopped the AI request. Width budget: 24 cells
+ai_stopped = "Stopped."
+# context: shown after the AI filled the editor; Ctrl+Z is a key. Width budget: 64 cells
+ai_done = "Draft ready. Read it, then send. Ctrl+Z gives your text back."
+# context: inline error of the AI writing help; {why} is the reason. Width budget: 70 cells
+ai_error = "AI: {why}"
+# context: key hints in the AI writing help; Enter and Esc are key names. Width budget: 30 cells
+ai_keys = "Enter writes, Esc closes"
+# context: shown when the AI is asked for a pull request description before both branches are chosen. Width budget: 40 cells
+ai_pick_branches = "Pick the branches first."
+# context: shown when the AI is asked for a pull request description without a local repository. Width budget: 70 cells
+ai_needs_repository = "A {$pr} description is read from the repository: open it first."
+# context: name of the AI writing job in the jobs list. Width budget: 40 cells
+ai_job = "Writing a draft with AI"
 
 [ai_hosting_reply]
 # context: Settings > AI, label of the editor row for the base prompt of the AI replies on a host and issue descriptions

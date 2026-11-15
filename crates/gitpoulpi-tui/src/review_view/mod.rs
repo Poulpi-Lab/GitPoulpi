@@ -23,6 +23,7 @@
 mod ai;
 #[cfg(feature = "ai")]
 mod ai_context;
+mod ai_reply;
 #[cfg_attr(not(feature = "ai"), path = "ai_worker_stub.rs")]
 mod ai_worker;
 mod barmenu;
@@ -936,6 +937,7 @@ impl ReviewView {
             &format!("pr#{}", self.target.number),
             "finish",
         ]);
+        let ai = self.composer_ai(None);
         self.finish = Some(
             FinishDialog::new(
                 h.detail.capabilities,
@@ -943,7 +945,8 @@ impl ReviewView {
                 summary,
                 &h.detail.vote_labels,
             )
-            .for_target(self.target.md_context(), draft_key),
+            .for_target(self.target.md_context(), draft_key)
+            .with_ai(ai),
         );
     }
 

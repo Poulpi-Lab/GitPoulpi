@@ -12474,8 +12474,6 @@ why_no_edit = "this host does not let you edit comments"
 why_no_delete = "this host does not let you delete comments"
 # context: why Edit or Delete does nothing. Width budget: 60 cells
 why_not_yours = "only your own comments can be changed"
-# context: why Send, Edit or Delete does nothing for now. Width budget: 60 cells
-why_writing_later = "writing from this view is not available yet"
 # context: why Send does nothing. Width budget: 40 cells
 why_empty = "write something first"
 # context: status line: the item has no conversation to read in the app. Width budget: 80 cells

@@ -384,10 +384,7 @@ fn palette_commands_carry_their_reasons() {
     let a = r.view.avail();
     assert_eq!(ItemCmd::Edit.unavailable(Some(a)), None);
     assert_eq!(ItemCmd::Delete.unavailable(Some(a)), None);
-    assert_eq!(
-        ItemCmd::Send.unavailable(Some(a)),
-        Some(m::WHY_EMPTY.get())
-    );
+    assert_eq!(ItemCmd::Send.unavailable(Some(a)), Some(m::WHY_EMPTY.get()));
 }
 
 #[test]
@@ -936,4 +933,26 @@ fn who_posts_is_named_for_every_kind_of_token() {
         id(Some("tok"), IdentityKind::ProjectOrGroupBot, profile),
         "Posting as tok (project bot)"
     );
+}
+
+#[test]
+fn a_host_that_does_not_read_markdown_says_what_the_text_is_sent_as() {
+    use gitpoulpi_hosting::conversation::MarkupFlavor;
+    let mut r = rig();
+    let mut caps = r.view.conv.caps.clone().unwrap();
+    caps.write_flavor = MarkupFlavor::JiraWiki;
+    r.view.conv.caps = Some(caps);
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Char('c')));
+    type_text(&mut r.view, "**hi**");
+    r.view
+        .on_key(KeyEvent::new(KeyCode::Char('p'), KeyModifiers::ALT));
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(screen.contains("Sent as Jira wiki markup"), "{screen}");
+    // Markdown hosts say nothing of the kind.
+    let mut caps = r.view.conv.caps.clone().unwrap();
+    caps.write_flavor = MarkupFlavor::GitlabMd;
+    r.view.conv.caps = Some(caps);
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(!screen.contains("Sent as"), "{screen}");
 }

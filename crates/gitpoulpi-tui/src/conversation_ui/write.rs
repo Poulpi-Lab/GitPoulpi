@@ -26,12 +26,23 @@ use crate::redraw::NotifySend as _;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum WriteOp {
     /// A comment on the item. `internal`: only members see it (GitLab).
-    Post { body: String, internal: bool },
+    Post {
+        body: String,
+        internal: bool,
+    },
     /// An answer in a discussion or a code thread.
-    Reply { discussion_id: String, body: String },
+    Reply {
+        discussion_id: String,
+        body: String,
+    },
     /// A new text for one of our comments.
-    Edit { id: String, body: String },
-    Delete { id: String },
+    Edit {
+        id: String,
+        body: String,
+    },
+    Delete {
+        id: String,
+    },
 }
 
 impl WriteOp {
@@ -237,11 +248,7 @@ fn comments_mut(entry: &mut TimelineEntry) -> Vec<&mut Comment> {
 }
 
 /// Shows `op` as if the host had accepted it.
-pub(crate) fn apply(
-    entries: &mut Vec<TimelineEntry>,
-    op: &WriteOp,
-    pending: Option<Comment>,
-) {
+pub(crate) fn apply(entries: &mut Vec<TimelineEntry>, op: &WriteOp, pending: Option<Comment>) {
     match op {
         WriteOp::Post { .. } => {
             if let Some(c) = pending {
@@ -454,7 +461,9 @@ impl Conversation {
             match rx.try_recv() {
                 Ok(WMsg::Done(result)) => {
                     changed = true;
-                    let Some(w) = self.writing.take() else { continue };
+                    let Some(w) = self.writing.take() else {
+                        continue;
+                    };
                     match result {
                         Ok(answer) => {
                             match (&w.op, &answer) {
@@ -465,6 +474,16 @@ impl Conversation {
                                     self.posted.remove(id);
                                 }
                                 _ => {}
+                            }
+                            // Keep the new comment selected under its real id.
+                            if let (WriteOp::Post { .. } | WriteOp::Reply { .. }, Some(c)) =
+                                (&w.op, &answer)
+                            {
+                                if self.select_when_laid_out.is_some()
+                                    || self.sel_key.starts_with(&format!("c{PENDING}"))
+                                {
+                                    self.select_when_laid_out = Some(format!("c{}", c.id));
+                                }
                             }
                             settle(&mut self.entries, &w.op, answer);
                             self.write_done = Some(WriteDone {

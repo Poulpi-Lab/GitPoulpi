@@ -366,8 +366,7 @@ impl ItemView {
         }
         let hovered = |h: Hit| self.hover == Some(h);
         let mut internal_hit = None;
-        if self.conv.caps.as_ref().is_some_and(|c| c.internal_notes)
-            && self.compose == Compose::New
+        if self.conv.caps.as_ref().is_some_and(|c| c.internal_notes) && self.compose == Compose::New
         {
             let label_w = crate::ui_kit::display_width(m::INTERNAL_NOTE.get()) as u16 + 4;
             if left + label_w + 40 < rect.right() {

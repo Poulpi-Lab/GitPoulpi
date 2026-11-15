@@ -170,12 +170,7 @@ impl Fake {
         } else {
             format!("{}", 900 + n)
         };
-        let mut c = comment(
-            &id,
-            &login,
-            body,
-            "2026-11-15T10:00:00Z",
-        );
+        let mut c = comment(&id, &login, body, "2026-11-15T10:00:00Z");
         if login.ends_with("[bot]") {
             c.author.kind = ActorKind::Bot;
         }

@@ -356,3 +356,45 @@ fn enter_on_a_row_and_the_palette_twins_open_and_drive_the_review() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
 }
+
+/// PTY 8: the Overview's comment box is the shared composer (Write, Preview
+/// and Split; `Ctrl+S` sends) and the host gets exactly the typed text.
+#[test]
+fn the_overviews_comment_box_is_the_shared_composer_and_posts_its_exact_text() {
+    let mock = mock_host::start(Options::default()).expect("the mock host");
+    let repo = review_fixture();
+    let (mut term, _config) = launch_review(&mock, &repo, "pty-review-overview-post");
+    open_from_menu(&mut term);
+    term.wait_for("the overview loaded", STEP, |s| {
+        s.contains("Looks promising, one question inline.") && s.contains("Finish review")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("c").expect("comment on the conversation");
+    term.wait_for("the shared composer", STEP, |s| {
+        s.contains("Comment on the conversation") && s.contains("Preview") && s.contains("Split")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_text("looks good").unwrap();
+    term.send_keys("Enter").unwrap();
+    term.send_text("**ship** it").unwrap();
+    term.send_keys("M-p").unwrap();
+    term.wait_for("the preview", STEP, |s| {
+        s.contains("ship it") && !s.contains("**ship**")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(
+        !mock.saw("POST", "/merge_requests/58/notes"),
+        "previewing sends nothing"
+    );
+    term.send_keys("C-s").unwrap();
+    wait_until("the comment reached the host", || {
+        mock.saw("POST", "/merge_requests/58/notes")
+    });
+    let request = mock
+        .requests()
+        .into_iter()
+        .find(|r| r.method == "POST" && r.target.ends_with("/merge_requests/58/notes"))
+        .expect("the note");
+    let body: serde_json::Value = serde_json::from_str(&request.body).unwrap();
+    assert_eq!(body["body"], "looks good\n**ship** it");
+}

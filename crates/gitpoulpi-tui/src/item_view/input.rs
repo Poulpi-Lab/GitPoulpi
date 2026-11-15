@@ -355,7 +355,8 @@ impl ItemView {
         let op = match &self.compose {
             Compose::New => WriteOp::Post {
                 body,
-                internal: self.internal && self.conv.caps.as_ref().is_some_and(|c| c.internal_notes),
+                internal: self.internal
+                    && self.conv.caps.as_ref().is_some_and(|c| c.internal_notes),
             },
             Compose::Reply { discussion, .. } => WriteOp::Reply {
                 discussion_id: discussion.clone(),
@@ -496,7 +497,11 @@ impl ItemView {
             .md
             .as_ref()
             .is_some_and(|e| e.area().contains(pos.into()));
-        if in_md || (self.focus == Focus::Composer && mouse.kind != MouseEventKind::Moved) {
+        // A drag or a release that left the field still belongs to it; a press
+        // elsewhere is a click on the timeline.
+        let keeps = self.focus == Focus::Composer
+            && matches!(mouse.kind, MouseEventKind::Drag(_) | MouseEventKind::Up(_));
+        if in_md || keeps {
             if mouse.kind == MouseEventKind::Down(MouseButton::Left) {
                 self.focus = Focus::Composer;
             }

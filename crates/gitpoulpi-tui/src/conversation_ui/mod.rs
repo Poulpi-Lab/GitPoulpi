@@ -535,11 +535,14 @@ impl Conversation {
             .items
             .get(self.sel)
             .map_or(key, |i| i.key.clone());
-        if let Some(wanted) = self.select_when_laid_out.take() {
+        if let Some(wanted) = self.select_when_laid_out.clone() {
+            // Only a layout that holds the entry settles it: one that was
+            // started before the write does not.
             if let Some(at) = self.layout.items.iter().position(|i| i.key == wanted) {
                 self.sel = at;
                 self.sel_key = wanted;
                 self.follow = true;
+                self.select_when_laid_out = None;
             }
         }
         self.top = self.top.min(self.layout.rows.len().saturating_sub(1));

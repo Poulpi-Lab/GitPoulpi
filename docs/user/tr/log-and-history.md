@@ -173,13 +173,13 @@ Ref'i olmayan bir commit'te, satırının üzerine gelmek Ref sütununda ait old
 **Uzak depolar.** UZAK başlığındaki `+` bir tane ekler; bir uzak deponun adına
 sağ tıklayarak onu fetch edebilir, web bağlantısını kopyalayabilir, varsayılan
 uzak depo yapabilir, grafikten gizleyebilir, URL'lerini düzenleyebilir veya
-kaldırabilirsiniz. **Bir uzak depoyu gizlemek** (satırının gözü, menünün *Uzak depoyu
+kaldırabilirsiniz. **Bir uzak depoyu gizlemek** (satırının ⊙ işareti, menünün *Uzak depoyu
 grafikten gizle* satırı ya da paletteki `Remote: Uzak Depoyu Grafikte Gizle...`) şu
 an sahip olduğu ve sonradan edineceği her dalı gizler; yalnızca onun ulaştığı commit'ler
 Log'dan çıkar: ilgisiz bir arşiv uzak deposunun geçmişi olmadan tek bir geçmişe
 göz atmanın yolu; *Uzak depoyu grafikte göster* ile geri getirin. Bir uzak depoyu
 göstermek, tek tek gizlenmiş dallarını da gösterir. Gizli bir uzak deponun dalı,
-gözü kullanılırsa bunu durum satırında söyler: önce uzak depoyu gösterin.
+⊙ işaretine tıklarsanız bunu durum satırında söyler: önce uzak depoyu gösterin.
 
 **Stash'ler.** **Stash** her şeyi stash'ler (izlenmeyen dosyalar dahil);
 `Ctrl+G m` önce bir mesaj sorar (YZ açıkken o istemin içindeki `Ctrl+G` bir

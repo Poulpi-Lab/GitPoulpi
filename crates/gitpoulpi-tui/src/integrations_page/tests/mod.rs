@@ -14,6 +14,7 @@ mod input;
 mod profiles;
 mod providers;
 mod radar;
+mod redmine;
 mod render;
 mod scroll;
 mod security;

@@ -591,6 +591,9 @@ impl IntegrationsPage {
         }
         y += 2;
 
+        if e.kind.family() == gitpoulpi_config::ApiFamily::Redmine {
+            y = self.render_redmine_markup(frame, body, y, e, focused, current);
+        }
         if e.kind.capabilities().ssh_keys {
             y = self.render_ssh(frame, body, y, e, focused, current);
         }

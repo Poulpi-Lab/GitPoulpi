@@ -8930,6 +8930,13 @@ column_hidden = "Colonne des {$commits} : {part} masquée"
 # context: tooltip of the strip left of a view that brings the hidden commit column back; the key of the toggle is appended in parentheses; no final period
 reopen_tip = "Afficher la colonne des {$commits}"
 
+# Settings > Integrations, the text format row of a connected Redmine profile (integrations_page/redmine.rs).
+[redmine_settings]
+# context: row of a Redmine profile; {format} is Textile or Markdown, a proper noun; pressing it switches to the other one
+markup_row = "Format de texte du serveur : {format}"
+# context: help under that row; Administration > Settings > General > Text formatting is the Redmine menu path
+markup_help = "Indiquez le format de texte de ce Redmine (Administration > Configuration > Général > Formatage du texte). Les commentaires sont lus et écrits dans ce format ; vous tapez toujours du Markdown, converti pour Textile."
+
 # Settings > Integrations, the Radar block of a connected code host (integrations_page/radar.rs).
 [radar_settings]
 # context: heading of the block: the Radar lists this profile feeds

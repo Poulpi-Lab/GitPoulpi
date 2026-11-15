@@ -203,7 +203,6 @@ pub(crate) fn tab_column(area: Rect, a: ColumnArgs<'_>) -> Column {
         more: None,
         chip: None,
         radar: None,
-        markup: Default::default(),
         radar_close: None,
         workspaces: None,
         workspaces_close: None,

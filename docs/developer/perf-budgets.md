@@ -145,6 +145,8 @@ Spawns: preview + apply of a content run is 8 without a remote and at most 10 wi
 
 Trap: the width lookup (`cell_text::char_cells`) per char is the hot spot of a layout (65 ms with it, 28 ms with the ASCII fast path of `md_render::layout::cw`).
 
+The conversation view (`conversation_ui`) lays its rows out through this same renderer, on a worker, so the rows above are its budget: a first window is at most 300 entries (the host's cap, not a perf choice), and a width change repaints the old layout until the new one arrives. What is deliberately **not** budgeted: the saved copy (a JSON of at most 2 MB, written after a read, 50 files kept: `conversation_ui/cache.rs`) and the AI repository context (`GitBackend::grep_tree` and the file reads run on the daemon off the render thread; their size is bounded by `ai.limits.hosting_reply_*`, not by time). If a conversation of several thousand comments ever feels slow, measure `md_render_bench` first.
+
 ## TUI budgets (`xtask perf --tui`, `xtask/src/perf_tui.rs`)
 
 Measured over a 10 s idle window with the Log open, then a held Down x300 at 100 Hz, then 40 key-latency samples. Baseline: three runs, release, load average 2.4-5.

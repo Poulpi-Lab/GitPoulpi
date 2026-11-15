@@ -197,14 +197,21 @@ directory or `*_tests.rs` for the big ones); shared fixtures in
   request body. A form owns focus and the close question (`Dismiss`), routes
   keys and mouse to `MdEditor::on_key` / `on_mouse`, and gives it a rect.
 - `conversation_ui/` (the timeline widget of an issue or request: rows laid
-  out on a worker, selection and scrolling, unread marks, saved copy for the
-  offline banner, buttons of the selected entry; the paint walk returns the
-  hit rects) and `item_view/` (the full-window modal `RepoDialog::Item` around
-  it: header, "Posting as ..." line, composer dock, link menu, Back stack;
-  `item_cmd.rs` is its palette vocabulary, `item_view_stub.rs` the build
-  without the `conversation` feature). Writing from the view is the next
-  slice: until `conversation_ui::WRITING` flips, Send, Edit and Delete are
-  greyed with `why_writing_later`.
+  out on a worker, selection and scrolling, unread marks (`unread.rs`), the
+  saved copy for the offline banner (`cache.rs`), writing (`write.rs`: optimistic
+  entry, refusal gives the text back), buttons of the selected entry; the paint
+  walk returns the hit rects) and `item_view/` (the full-window modal
+  `RepoDialog::Item` around it: header, "Posting as ..." line, composer dock,
+  link menu, Back stack, Radar hosting for a repository that is not cloned
+  through `radar/item_host.rs`; `item_cmd.rs` is its palette vocabulary,
+  `item_view_stub.rs` the build without the `conversation` feature). The
+  composer's AI side is `md_editor/ai.rs` (panel, Recent list in `ai-hints.toml`),
+  `ai_context.rs` (the repository choice, caches, status line) and `ai_worker.rs`;
+  the drafting itself is `gitpoulpi-ai/src/hosting_reply/` and the reads it
+  needs are `GitBackend::grep_tree` through the daemon. User guide:
+  `docs/user/hosting-integration.md` "Conversations"; decisions and traps:
+  `docs/architecture/session-and-state.md` "Conversations" and "AI reply
+  context".
 - `push_group_ui/` (grouped push: selection, plan and progress dialog, and the
   paused strip; entries `PushGroupUi::open_selection/open_plan/open_progress`,
   design notes in `session-and-state.md`, "The push group dialog").
@@ -632,6 +639,7 @@ and a scratch repository.
   `Esc` returns to it with the draft and page intact; the octopus in Settings' title line opens About; in the palette
   a command like "Toggle Word Wrap" is grayed with "close Settings first". Check at 80 columns too.
 - Windows, real mouse: double-click a language or theme in Settings (searchable comboboxes), and click one entry in the tab bar's "Open in" list when it has more than seven: a single click runs it.
+- **Conversations** (`docs/user/hosting-integration.md#5c-conversations`, `docs/user/ai.md#writing-help-on-a-host`; everything is tested against the mock host and fake clients, never a real account; use a scratch repository and a scratch issue, posting cannot be undone): (1) **GitHub App token identity and GraphQL viewer:** a repository whose token command prints an installation token (`docs/user/hosting-integration.md#13d-acting-as-a-github-app-bot`), **Post as** empty: the view says either *Posting as <app>[bot] (GitHub App bot)* (GraphQL `viewer` answered) or *Posting as the GitHub App bot (its name is not known yet ...)*; in the second case post one comment, the line gains the name (learned from the author), and Edit and Delete appear only on that comment, not on a person's. Then set **Post as** to a wrong name and check that nothing of a person's becomes editable. (2) **Jira Cloud wiki round trip:** post a comment with a heading, bold, a `code` span, a fenced block, a list and a link; open the issue on the site (the markup is rendered, no stray `*` or `{{`), read it back in the view (the same Markdown), edit it, delete it. Check the footer says *Sent as Jira wiki markup*. (3) **Azure DevOps Server (7.0) HTML fallback:** on a work item post and edit a comment with a list and a link; the site shows HTML, the view the converted Markdown; the same on Azure DevOps Services takes Markdown and the footer says nothing. (4) **Trello comment JSON body:** a card comment with quotes, a newline and a non-ASCII character posts, edits and deletes (the body travels as JSON, not as a query string). (5) **Bitbucket Data Center activity order:** a pull request with comments, replies, an approval and a push: the timeline reads oldest to newest, a reply sits in its thread, *Load older* is absent when everything fits. (6) **Gitea 1.18+ timeline rows:** an issue with a label change, an assignment, a rename and a closed/reopened pair shows each event line once and in order (an older Gitea has no timeline: events are then missing, the comments are not); Forgejo has no resolve. (7) **GitLab reply to an individual note:** reply to a note that is not part of a discussion thread, and to a note inside one: both land where expected, an internal note is only visible to members. (8) **Claude read-only flags with a real `claude -p`:** in a scratch repository tick *Let the AI read the repository* on a Claude Code profile (headless) and ask for a reply that needs a file; the answer names the file's content, `git status` stays clean, and asking the agent to write a file or run a command in the hint is refused (no `Bash`, `Edit` or `Write`), no MCP server of the project starts, and `GH_TOKEN` exported in the shell is not visible to it. (9) **Anthropic cache hits on a second reply:** with an Anthropic profile and the box ticked, the first draft says *Context built ...*, the second on the same HEAD says *Context reused ...* and *Provider cache: N tokens reused* (N above 0); a new commit or **Refresh context** goes back to *built*. (10) Windows and macOS: the saved copy path and the composer keys (`Alt+P`, `Alt+L`, `Alt+E`, `Ctrl+Enter`) in the terminals of `docs/user/terminals.md`.
 
 ## Conventions that bit us, worth knowing before you edit
 

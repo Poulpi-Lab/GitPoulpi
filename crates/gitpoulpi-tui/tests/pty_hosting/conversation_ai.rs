@@ -35,6 +35,20 @@ fn open_form(term: &mut xtask::pty::Terminal) {
     .unwrap_or_else(|e| panic!("{e}"));
 }
 
+/// The "What is sent" dialog opens before the request leaves: it shows the
+/// instruction and the draft, and Enter on its focused Send goes on.
+fn send_request(term: &mut xtask::pty::Terminal, expect: &[&str]) {
+    let screen = term
+        .wait_for("the What is sent dialog", STEP, |s| {
+            s.contains("Review what is sent") && s.contains("Send")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    for want in expect {
+        assert!(screen.contains(want), "{want:?}:\n{}", screen.text());
+    }
+    term.send_keys("Enter").expect("Send");
+}
+
 /// No request of the mock changed anything on the host.
 fn no_write(mock: &Mock) {
     let writes: Vec<_> = mock
@@ -98,6 +112,7 @@ fn the_ai_field_drafts_into_the_description_previews_it_and_ctrl_z_restores_the_
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Enter").expect("draft");
+    send_request(&mut term, &["Parser crashes", "my own words"]);
     let screen = term
         .wait_for("the draft in the Preview", STEP, |s| {
             s.contains(DRAFT_LINE) && s.contains("Draft ready.")
@@ -148,6 +163,7 @@ fn stop_kills_the_agent_and_the_text_stays() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Enter").expect("draft");
+    send_request(&mut term, &[]);
     let screen = term
         .wait_for("the run in progress", STEP, |s| {
             s.contains("Writing...") && s.contains("Stop")
@@ -188,7 +204,7 @@ fn with_ai_off_the_composer_shows_no_button_and_no_panel() {
     open_form(&mut term);
     let screen = term.screen();
     assert!(
-        !screen.contains("Write with AI") && !screen.contains('\u{2726}'),
+        !screen.contains("Write with AI") && !screen.contains("\u{2726}"),
         "{}",
         screen.text()
     );

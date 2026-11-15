@@ -40,6 +40,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "general.fetch_on_tab_open",
     "general.hosting_refresh_minutes",
     "general.hosting_refresh_unit",
+    "general.hosting_post_as",
     "general.default_branch_name",
     "general.auto_prune",
     "general.auto_prune_tags",

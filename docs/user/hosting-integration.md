@@ -786,6 +786,17 @@ What changes for that repository:
   header names the profile with **(App bot)** and the filters built on "me"
   (*Assigned to me*, *Mine*, *Awaiting my review*) have nothing to match.
   Nothing is shown as an error.
+- **Post as.** What GitPoulpi posts is always shown with the name it is posted
+  as. With a personal token that is your login (`GET /user`). With an App
+  token it is the **Post as** name, for example `poulpi-lab[bot]`: set it for
+  every repository in **Settings > Integrations** (`general.hosting_post_as`,
+  also `gitpoulpi config set general.hosting_post_as poulpi-lab[bot]`) or for
+  one repository in **Settings > Repository > SSH & credentials > Hosting**.
+  Left empty, GitPoulpi asks GitHub (GraphQL `viewer`) and otherwise learns
+  the name from the author of the first comment it posts, and keeps it with the
+  repository. That name is also how your own comments are recognised, so edit
+  and delete are only offered on them (an App's comments must also come from a
+  bot account).
 - An App cannot be assigned. Combine the setup with the blocked assignment
   below.
 - Turning **Use for the hosting API** on or off needs a person, like a new

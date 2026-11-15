@@ -344,6 +344,12 @@ impl PreferencesState {
             self.updates_channel_field(),
             self.updates_installed_with_field(),
             self.hosting_refresh_field(),
+            Field::global(
+                msg::settings_general::HOSTING_POST_AS.get(),
+                "general.hosting_post_as",
+                Control::Text(g.hosting_post_as.clone()),
+            )
+            .with_help(msg::settings_general::HOSTING_POST_AS_HELP.get()),
             self.script_timeout_field(),
             self.script_total_timeout_field(),
             Field::global(

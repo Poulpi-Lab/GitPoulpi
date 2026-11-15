@@ -263,6 +263,15 @@ pub struct RepoState {
     /// not be named by a bot-driven workflow.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub assignment_blocked: bool,
+    /// "Post as" for this repository (a bot's name such as
+    /// `poulpi-lab[bot]`), overriding `general.hosting_post_as`. `None`:
+    /// the global one applies.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hosting_post_as: Option<String>,
+    /// The login learned from the author of the first message posted with
+    /// the repository's bot token, used when no "Post as" is configured.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hosting_identity: Option<String>,
     /// Where this repository's ISSUES section reads from: the provider
     /// profile and that provider's own repository/project, both chosen in
     /// the section. `None` means unlinked: nothing is fetched, and

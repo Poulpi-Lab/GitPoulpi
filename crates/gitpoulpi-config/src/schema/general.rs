@@ -157,6 +157,14 @@ pub struct GeneralConfig {
     /// Live: the unit Settings shows `hosting_refresh_minutes` in (`auto`,
     /// `minutes`, `hours`). Display only. See [`DisplayUnit`].
     pub hosting_refresh_unit: DisplayUnit,
+    /// Live: the name messages to a host are posted as when the repository's
+    /// token is a bot's (a GitHub App installation token has no `GET /user`),
+    /// for example `poulpi-lab[bot]`. Shown in every composer and used to
+    /// recognise your own comments (edit, delete). Empty: GitPoulpi asks the
+    /// host, then learns it from its first post. A repository can override
+    /// it. (Named `general.hosting_post_as`: `hosting` is the legacy
+    /// `[[hosting]]` array of the config file.)
+    pub hosting_post_as: String,
     pub auto_prune: bool,
     /// Live: on a fetch, also delete the local tags the remote has deleted
     /// (only tags that were on it: an unpushed tag is never touched). Off
@@ -265,6 +273,7 @@ impl Default for GeneralConfig {
             fetch_on_tab_open: true,
             hosting_refresh_minutes: DEFAULT_HOSTING_REFRESH_MINUTES,
             hosting_refresh_unit: DisplayUnit::default(),
+            hosting_post_as: String::new(),
             auto_prune: true,
             auto_prune_tags: false,
             keep_submodules_up_to_date: false,

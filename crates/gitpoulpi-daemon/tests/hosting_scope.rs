@@ -204,3 +204,34 @@ fn assignment_is_allowed_until_the_repository_blocks_it() {
     state.save(&path).unwrap();
     assert!(hosting_scope::assignment_blocked(root));
 }
+
+#[test]
+fn post_as_is_the_repository_override_and_a_learned_login_is_kept() {
+    let fixture = repo();
+    let root = fixture.root();
+    let state_dir = gitpoulpi_config::Settings::resolve_ambient()
+        .map(|s| s.config().session.per_repo_state_dir.clone())
+        .unwrap_or_else(|_| gitpoulpi_config::DEFAULT_REPO_DATA_LOCATION.to_string());
+    let path = gitpoulpi_session::RepoState::path_for(root, &state_dir);
+    assert_eq!(hosting_scope::post_as(root), None, "nothing configured");
+
+    gitpoulpi_session::RepoState {
+        hosting_post_as: Some("  poulpi-lab[bot] ".into()),
+        ..Default::default()
+    }
+    .save(&path)
+    .unwrap();
+    assert_eq!(
+        hosting_scope::post_as(root).as_deref(),
+        Some("poulpi-lab[bot]")
+    );
+
+    hosting_scope::learn_login(root, "learned[bot]");
+    let state = gitpoulpi_session::RepoState::load(&path).unwrap();
+    assert_eq!(state.hosting_identity.as_deref(), Some("learned[bot]"));
+    assert_eq!(
+        state.hosting_post_as.as_deref(),
+        Some("  poulpi-lab[bot] "),
+        "learning leaves the rest of the state alone"
+    );
+}

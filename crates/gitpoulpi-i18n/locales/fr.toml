@@ -349,6 +349,10 @@ include_untracked_in_autostash = "Inclure les fichiers non suivis dans l'auto-{$
 include_untracked_in_autostash_help = { git = "Indique si le stash automatique prend aussi les fichiers non suivis (sinon seules les modifications suivies sont stashées puis restaurées).", local = "Indique si le remisage automatique prend aussi les fichiers non suivis (sinon seules les modifications suivies sont remisées puis restaurées)." }
 hosting_refresh_minutes = "Actualisation des {$prs} et des tickets"
 hosting_refresh_minutes_help = { git = "Fréquence à laquelle les listes {$prs} et Tickets du volet latéral (et la pastille de {$pr} liée de la barre d'outils) interrogent à nouveau l'hébergeur. 0 coupe le minuteur ; elles s'actualisent quand même à l'ouverture d'un dépôt, au changement de branche, après un {$push} ou un {$fetch}, et à la demande.", local = "Fréquence à laquelle les listes {$Prs} et Tickets du volet latéral (et la pastille de {$pr} liée de la barre d'outils) interrogent à nouveau l'hébergeur. 0 coupe le minuteur ; elles s'actualisent quand même à l'ouverture d'un dépôt, au changement de branche, après un envoi ou une récupération, et à la demande." }
+# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
+hosting_post_as = "Publier en tant que"
+# context: help under the "Post as" row of Settings
+hosting_post_as_help = "Le nom sous lequel vos messages sont publiés sur l'hébergeur, et qui sert à reconnaître vos propres commentaires (modifier, supprimer), par exemple poulpi-lab[bot] pour une GitHub App. Utile seulement avec un jeton de bot : laissé vide, GitPoulpi interroge l'hébergeur et l'apprend au premier message publié."
 pr_terminology = "Terme pour les demandes de revue"
 pr_terminology_help = "Le mot employé pour une demande de revue de code hébergée, partout dans la TUI. Auto suit l'hébergeur du dépôt : Merge request pour GitLab, Pull request pour les autres. Pull request ou Merge request impose ce mot. S'applique immédiatement."
 hide_finished_pr_chip = { git = "Masquer la pastille de {$pr} quand elle est fermée ou mergée", local = "Masquer la pastille de {$pr} quand elle est fermée ou fusionnée" }
@@ -9431,6 +9435,10 @@ assignment_label = "Assignation"
 assignment_allowed = "Autorisée"
 assignment_blocked = "Bloquée"
 assignment_help = "Bloquée : personne ne peut être assigné dans les tickets et les {$prs} de ce dépôt, ni depuis l'application, ni en CLI, ni par un agent. Les assignés existants restent visibles. S'applique immédiatement."
+# context: label of the repository row that overrides the global "Post as" name
+post_as_label = "Publier en tant que"
+# context: help under the repository "Post as" row of the SSH & credentials page
+post_as_help = "Le nom sous lequel vos messages sont publiés sur l'hébergeur, et qui sert à reconnaître vos propres commentaires (modifier, supprimer), par exemple poulpi-lab[bot] pour une GitHub App. Utile seulement avec un jeton de bot : laissé vide, GitPoulpi interroge l'hébergeur et l'apprend au premier message publié. Pour ce dépôt seulement ; vide, le réglage global s'applique."
 repo_helper_line = "{value}  ({origin})"
 repo_helper_label = "Défini par ce dépôt"
 no_repo_helpers = "Ce dépôt ne définit aucun assistant d'identifiants."

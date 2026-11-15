@@ -349,6 +349,10 @@ include_untracked_in_autostash = { git = "自動{$stash}に未追跡ファイル
 include_untracked_in_autostash_help = { git = "自動{$stash}で未追跡ファイルも対象にするかどうかです（オフの場合、追跡中の変更のみを{$stash}して戻します）。", local = "自動スタッシュで未追跡ファイルも対象にするかどうかです（オフの場合、追跡中の変更のみをスタッシュして戻します）。" }
 hosting_refresh_minutes = { git = "{$prs}と Issue の更新間隔", local = "{$prs}と Issue の更新間隔" }
 hosting_refresh_minutes_help = { git = "サイドバーの{$prs}と Issue の一覧（およびツールバーの関連 {$pr_abbr} チップ）がホストに再問い合わせする間隔です。0 でタイマーをオフにします。リポジトリを開いたとき、ブランチ切り替え時、{$push}や{$fetch}の後、および手動でも更新されます。", local = "サイドバーの{$prs}と Issue の一覧（およびツールバーの関連 {$pr_abbr} チップ）がホストに再問い合わせする間隔です。0 でタイマーをオフにします。リポジトリを開いたとき、ブランチ切り替え時、プッシュやフェッチの後、および手動でも更新されます。" }
+# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
+hosting_post_as = "Post as"
+# context: help under the "Post as" row of Settings
+hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
 pr_terminology = "レビュー依頼の用語"
 pr_terminology_help = { git = "TUI 全体でホスト上のコードレビュー依頼に使う用語です。自動はリポジトリのホストに従い、GitLab は Merge Request、それ以外のホストは Pull Request を使います。Pull Request または Merge Request を選ぶとその用語に固定されます。すぐに反映されます。", local = "TUI 全体でホスト上のコードレビュー依頼に使う用語です。自動はリポジトリのホストに従い、GitLab はマージリクエスト、それ以外のホストはプルリクエストを使います。プルリクエストまたはマージリクエストを選ぶと、その用語に固定されます。すぐに反映されます。" }
 hide_finished_pr_chip = "{$pr}が閉じられた、または{$merge}済みのときはチップを隠す"
@@ -9415,6 +9419,10 @@ assignment_label = "Assignment"
 assignment_allowed = "Allowed"
 assignment_blocked = "Blocked"
 assignment_help = "Blocked: nothing can be assigned in this repository's issues and {$prs}, from the app, the CLI or an agent. Existing assignees stay visible. Applies immediately."
+# context: label of the repository row that overrides the global "Post as" name
+post_as_label = "Post as"
+# context: help under the repository "Post as" row of the SSH & credentials page
+post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
 repo_helper_line = "{value}  ({origin})"
 repo_helper_label = "このリポジトリの設定"
 no_repo_helpers = "このリポジトリには独自の認証情報ヘルパーがありません。"

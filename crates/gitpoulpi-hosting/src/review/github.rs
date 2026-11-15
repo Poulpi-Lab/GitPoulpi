@@ -231,7 +231,7 @@ fn checks_state(runs: &[CheckRun]) -> Option<ChecksState> {
 }
 
 impl GitHubClient {
-    fn repo_url(&self, project: &str, rest: &str) -> String {
+    pub(crate) fn repo_url(&self, project: &str, rest: &str) -> String {
         format!("{}/repos/{project}/{rest}", self.integration.api_base())
     }
 
@@ -448,27 +448,6 @@ impl GitHubClient {
                 })
             })
             .collect())
-    }
-
-    pub(crate) async fn review_add_comment(
-        &self,
-        project: &str,
-        number: u64,
-        body: &str,
-    ) -> Result<ReviewComment> {
-        if body.trim().is_empty() {
-            return Err(invalid(
-                "commenting on a pull request",
-                "the comment is empty",
-            ));
-        }
-        let url = self.repo_url(project, &format!("issues/{number}/comments"));
-        let response = self
-            .transport
-            .send(self.post(url, &json!({ "body": body })))
-            .await?;
-        response.error_for_status("commenting on a GitHub pull request")?;
-        Ok(response.json::<IssueComment>()?.into_comment())
     }
 
     pub(crate) async fn review_reply(&self, thread_id: &str, body: &str) -> Result<ReviewComment> {

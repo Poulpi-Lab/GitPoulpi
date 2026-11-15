@@ -1,0 +1,10 @@
+{
+  "id": 4002,
+  "html_url": "https://github.com/octo/thing/pull/12#discussion_r4002",
+  "body": "Done, pushed.",
+  "user": {"login": "poulpi-lab[bot]", "id": 41898282, "type": "Bot", "html_url": "https://github.com/apps/poulpi-lab"},
+  "created_at": "2024-05-02T09:30:00Z",
+  "updated_at": "2024-05-02T09:50:00Z",
+  "in_reply_to_id": 4001,
+  "diff_hunk": "@@ -40,6 +40,8 @@ fn load() {\n"
+}

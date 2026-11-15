@@ -6,6 +6,10 @@ use crate::client::{
     encode_component, fetch_pages, fetch_pages_with, CreatedIssue, CreatedPullRequest,
     HostingClient, NewIssue, NewPullRequest, PAGE_SIZE,
 };
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
+    TimelinePage,
+};
 use crate::http::{HttpRequest, HttpResponse, HttpTransport};
 use crate::integration::Integration;
 use crate::metadata::{HostedLabel, HostedMilestone, IssueEdit, ItemMeta, MetaKind, PrEdit};
@@ -17,12 +21,16 @@ use crate::model::{
 use crate::project::{HostedProject, HostedSshKey};
 use crate::{Error, Result};
 
+mod conversation;
+#[cfg(test)]
+mod conversation_tests;
 mod protection;
 
 pub struct GitHubClient {
     pub(crate) integration: Integration,
     token: String,
     pub(crate) transport: std::sync::Arc<dyn HttpTransport>,
+    pub(crate) scopes: crate::scope_handle::ScopeHandle,
 }
 
 impl GitHubClient {
@@ -35,6 +43,7 @@ impl GitHubClient {
             integration,
             token,
             transport,
+            scopes: Default::default(),
         }
     }
 
@@ -470,6 +479,63 @@ impl HostingClient for GitHubClient {
         crate::review::github::CAPABILITIES
     }
 
+    fn conversation_caps(&self, kind: ItemKind) -> ConversationCaps {
+        ConversationCaps::github(kind)
+    }
+
+    async fn posting_identity(&self, project: &str) -> Result<PostingIdentity> {
+        self.conv_identity(project).await
+    }
+
+    async fn item_timeline(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        older: Option<&PageCursor>,
+        opts: &TimelineOpts,
+    ) -> Result<TimelinePage> {
+        self.conv_timeline(project, key, older, opts).await
+    }
+
+    async fn post_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> Result<Comment> {
+        self.conv_post(project, key, body, internal).await
+    }
+
+    async fn reply_in_discussion(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        discussion_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_reply(project, key, discussion_id, body).await
+    }
+
+    async fn edit_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_edit(project, key, comment_id, body).await
+    }
+
+    async fn delete_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+    ) -> Result<()> {
+        self.conv_delete(project, key, comment_id).await
+    }
+
     async fn pull_request_detail(
         &self,
         project: &str,
@@ -516,7 +582,17 @@ impl HostingClient for GitHubClient {
         number: u64,
         body: &str,
     ) -> Result<crate::review::ReviewComment> {
-        self.review_add_comment(project, number, body).await
+        let c = self
+            .conv_post(project, &ItemKey::pull_request(number), body, false)
+            .await?;
+        Ok(crate::review::ReviewComment {
+            id: c.id,
+            author: c.author.login,
+            body: c.body.text,
+            created_at: c.created_at,
+            in_reply_to: None,
+            web_url: c.web_url,
+        })
     }
 
     async fn reply_to_thread(

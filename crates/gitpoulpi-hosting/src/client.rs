@@ -30,6 +30,9 @@ use serde::de::DeserializeOwned;
 
 #[cfg(feature = "bitbucket")]
 use crate::bitbucket::BitbucketClient;
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, PageCursor, PostingIdentity, TimelineOpts, TimelinePage,
+};
 #[cfg(feature = "github")]
 use crate::github::GitHubClient;
 #[cfg(feature = "gitlab")]
@@ -410,6 +413,77 @@ pub trait HostingClient: Send + Sync {
         _review: &ReviewSubmission,
     ) -> Result<ReviewOutcome> {
         Err(self.unsupported("submit_review"))
+    }
+
+    // -- conversations -------------------------------------------------------
+
+    /// What the conversation of an issue or request may do on this host.
+    /// [`ConversationCaps::NONE`] by default: no conversation at all.
+    fn conversation_caps(&self, _kind: crate::conversation::ItemKind) -> ConversationCaps {
+        ConversationCaps::NONE
+    }
+
+    /// Who a post to `project` is made as: always known (see
+    /// [`crate::conversation::identity`]). Hits the network at most once.
+    async fn posting_identity(&self, _project: &str) -> Result<PostingIdentity> {
+        Err(self.unsupported("posting_identity"))
+    }
+
+    /// The item's header and the newest window (at most
+    /// [`crate::conversation::WINDOW`] entries) of its conversation, or the
+    /// window before `older`.
+    async fn item_timeline(
+        &self,
+        _project: &str,
+        _key: &ItemKey,
+        _older: Option<&PageCursor>,
+        _opts: &TimelineOpts,
+    ) -> Result<TimelinePage> {
+        Err(self.unsupported("item_timeline"))
+    }
+
+    /// Posts a comment on the item, immediately. Outward, not undoable.
+    /// `internal`: only members see it (GitLab).
+    async fn post_item_comment(
+        &self,
+        _project: &str,
+        _key: &ItemKey,
+        _body: &str,
+        _internal: bool,
+    ) -> Result<Comment> {
+        Err(self.unsupported("post_item_comment"))
+    }
+
+    /// Answers a discussion (a code thread, or a GitLab discussion).
+    async fn reply_in_discussion(
+        &self,
+        _project: &str,
+        _key: &ItemKey,
+        _discussion_id: &str,
+        _body: &str,
+    ) -> Result<Comment> {
+        Err(self.unsupported("reply_in_discussion"))
+    }
+
+    /// Edits one of our own comments.
+    async fn edit_item_comment(
+        &self,
+        _project: &str,
+        _key: &ItemKey,
+        _comment_id: &str,
+        _body: &str,
+    ) -> Result<Comment> {
+        Err(self.unsupported("edit_item_comment"))
+    }
+
+    /// Deletes one of our own comments.
+    async fn delete_item_comment(
+        &self,
+        _project: &str,
+        _key: &ItemKey,
+        _comment_id: &str,
+    ) -> Result<()> {
+        Err(self.unsupported("delete_item_comment"))
     }
 
     // -- host-driven flows (slice W4) ----------------------------------------

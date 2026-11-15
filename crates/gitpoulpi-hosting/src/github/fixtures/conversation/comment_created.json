@@ -1,0 +1,12 @@
+{
+  "id": 777,
+  "url": "https://api.github.com/repos/octo/thing/issues/comments/777",
+  "html_url": "https://github.com/octo/thing/issues/7#issuecomment-777",
+  "body": "Fixed in main.",
+  "user": {"login": "poulpi-lab[bot]", "id": 41898282, "type": "Bot", "html_url": "https://github.com/apps/poulpi-lab"},
+  "created_at": "2024-05-04T10:00:00Z",
+  "updated_at": "2024-05-04T10:00:00Z",
+  "author_association": "NONE",
+  "performed_via_github_app": {"id": 99, "slug": "poulpi-lab", "name": "Poulpi Lab"},
+  "reactions": {"url": "x", "total_count": 0, "+1": 0, "-1": 0, "laugh": 0, "hooray": 0, "confused": 0, "heart": 0, "rocket": 0, "eyes": 0}
+}

@@ -19,7 +19,7 @@ const COMMAND: &str = "pass show work-token";
 fn launch(repo: &Path, home: &Path) -> (Terminal, tempfile::TempDir) {
     common::launch(repo)
         .session("pty-repo-auth-confirm")
-        .size(200, 60)
+        .size(200, 68)
         .scratch_home(home)
         .env("GIT_CONFIG_GLOBAL", "/dev/null")
         .env("GIT_CONFIG_NOSYSTEM", "1")

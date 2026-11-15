@@ -350,6 +350,10 @@ include_untracked_in_autostash = { git = "Включати невідстежу�
 include_untracked_in_autostash_help = { git = "Чи автоматичний stash забирає й невідстежувані файли (інакше ховаються й повертаються лише відстежувані зміни).", local = "Чи автоматична схованка забирає й невідстежувані файли (інакше ховаються й повертаються лише відстежувані зміни)." }
 hosting_refresh_minutes = "Оновлення {$prs} та issues"
 hosting_refresh_minutes_help = { git = "Як часто списки {$prs} та issues на бічній панелі (та чип прив'язаного {$pr_abbr} на панелі) знову запитують хостинг. 0 вимикає таймер; вони все одно оновлюються при відкритті репозиторію, перемиканні гілки, після push чи fetch і на вимогу.", local = "Як часто списки запитів на злиття та issues на бічній панелі (та чип прив'язаного запиту на панелі) знову запитують хостинг. 0 вимикає таймер; вони все одно оновлюються при відкритті репозиторію, перемиканні гілки, після надсилання чи завантаження і на вимогу." }
+# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
+hosting_post_as = "Post as"
+# context: help under the "Post as" row of Settings
+hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
 pr_terminology = "Термінологія запитів на рев'ю"
 pr_terminology_help = "Слово для запиту на рев'ю коду на хостингу всюди в TUI. Авто залежить від хоста репозиторію: Merge Request для GitLab, Pull Request для інших. Pull Request або Merge Request примусово задає слово. Застосовується одразу."
 hide_finished_pr_chip = "Ховати чип {$pr} після закриття чи {$merge}"
@@ -9417,6 +9421,10 @@ assignment_label = "Assignment"
 assignment_allowed = "Allowed"
 assignment_blocked = "Blocked"
 assignment_help = "Blocked: nothing can be assigned in this repository's issues and {$prs}, from the app, the CLI or an agent. Existing assignees stay visible. Applies immediately."
+# context: label of the repository row that overrides the global "Post as" name
+post_as_label = "Post as"
+# context: help under the repository "Post as" row of the SSH & credentials page
+post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
 repo_helper_line = "{value}  ({origin})"
 repo_helper_label = "Задано цим репозиторієм"
 no_repo_helpers = "Цей репозиторій не задає власного помічника облікових даних."

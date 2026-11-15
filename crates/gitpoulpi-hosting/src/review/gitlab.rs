@@ -88,7 +88,7 @@ struct RangeEnd {
 }
 
 #[derive(Deserialize)]
-struct Discussion {
+pub(crate) struct Discussion {
     id: String,
     #[serde(default)]
     notes: Vec<Note>,
@@ -210,7 +210,7 @@ fn place(p: &Position) -> (DiffSide, Option<u32>, Option<u32>) {
     }
 }
 
-fn thread_of(d: Discussion, head_sha: &str) -> Option<ReviewThread> {
+pub(crate) fn thread_of(d: Discussion, head_sha: &str) -> Option<ReviewThread> {
     let first = d.notes.first()?;
     if first.system {
         return None;

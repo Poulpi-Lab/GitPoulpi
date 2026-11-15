@@ -38,6 +38,21 @@ pub trait RepoScopes: Send + Sync {
 
     /// Whether the repository's host calls are made by an App bot.
     fn acts_as_bot(&self, integration_id: &str, project: &str) -> bool;
+
+    /// The "Post as" name the user configured for `project`: the
+    /// repository's own, else the global `general.hosting_post_as`.
+    fn post_as(&self, _integration_id: &str, _project: &str) -> Option<String> {
+        None
+    }
+
+    /// The login learned from the author of our first post, kept in the
+    /// repository's state.
+    fn learned_login(&self, _integration_id: &str, _project: &str) -> Option<String> {
+        None
+    }
+
+    /// Remembers `login` as who the repository's token posts as.
+    fn learn_login(&self, _integration_id: &str, _project: &str, _login: &str) {}
 }
 
 static SCOPES: OnceLock<Arc<dyn RepoScopes>> = OnceLock::new();
@@ -59,6 +74,26 @@ pub fn assignment_blocked(integration_id: &str, project: &str) -> bool {
 /// Whether the repository's host calls are made by an App bot.
 pub fn acts_as_bot(integration_id: &str, project: &str) -> bool {
     installed().is_some_and(|s| s.acts_as_bot(integration_id, project))
+}
+
+/// The configured "Post as" name of `project`, if any.
+pub fn post_as(integration_id: &str, project: &str) -> Option<String> {
+    installed()
+        .and_then(|s| s.post_as(integration_id, project))
+        .map(|n| n.trim().to_string())
+        .filter(|n| !n.is_empty())
+}
+
+/// The login learned from our first post in `project`, if any.
+pub fn learned_login(integration_id: &str, project: &str) -> Option<String> {
+    installed().and_then(|s| s.learned_login(integration_id, project))
+}
+
+/// Persists `login` as who the token posts as in `project`.
+pub fn learn_login(integration_id: &str, project: &str, login: &str) {
+    if let Some(s) = installed() {
+        s.learn_login(integration_id, project, login);
+    }
 }
 
 /// The refusal of an assignment into a blocked repository.

@@ -22,7 +22,7 @@ use xtask::pty::Terminal;
 
 const STEP: Duration = Duration::from_secs(30);
 const COLS: u16 = 180;
-const ROWS: u16 = 45;
+const ROWS: u16 = 52;
 
 const KEY: &str = "/keys/work_ed25519";
 const PIN: &str = "ssh -i \"/keys/work_ed25519\" -o IdentitiesOnly=yes";

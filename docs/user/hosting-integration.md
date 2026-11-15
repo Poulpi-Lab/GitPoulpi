@@ -752,6 +752,67 @@ turns a list on, `gitpoulpi hosting radar --json` prints the lists (and
 `--refresh` skips the cache). AI agents have the same two commands over MCP
 (`hosting_radar`, `hosting_integrations_radar`).
 
+## 13d. Acting as a GitHub App bot
+
+A project that must not show a person's name can do everything on the host
+through a **GitHub App**: every comment, review, close or reopen and label
+change then appears as `<app-slug>[bot]`. This works for one repository at a
+time and leaves your other repositories on your own token.
+
+1. Create a GitHub App for the organization with the **Issues** and **Pull
+   requests** permissions set to *Read & write* (and *Contents: read*, so
+   pull requests can be listed and reviewed), and install it on the
+   repository.
+2. Write a small script that prints an **installation token** on its standard
+   output (the App's private key signs a short-lived JWT, which is exchanged
+   for a token that is valid for one hour). GitPoulpi never sees the key.
+3. In **Settings > Repository > SSH & credentials**, choose **Token
+   command** under HTTPS, enter the script as the **Command** and the host
+   (`github.com`) under **Hosts**, and tick **Use for the hosting API
+   (issues, pull requests)**. Save and confirm the command (a person always
+   confirms it, with its SHA-256). From the command line:
+   `gitpoulpi repo-auth set --https token-command --hosts github.com
+   --use-for-hosting --yes --command ./app-token.sh`.
+
+What changes for that repository:
+
+- Its issue and pull request calls (listing, creating, commenting,
+  reviewing, merging, closing, labels) use the command's token, with the same
+  30 second limit, in-memory cache and redaction as git's own sign-in. When
+  the host answers 401 because the token expired, the command is asked again
+  once. If the command cannot run, the call is refused: your personal token is
+  never the fallback.
+- There is no "me": an installation token cannot ask who it is. The section
+  header names the profile with **(App bot)** and the filters built on "me"
+  (*Assigned to me*, *Mine*, *Awaiting my review*) have nothing to match.
+  Nothing is shown as an error.
+- An App cannot be assigned. Combine the setup with the blocked assignment
+  below.
+- Turning **Use for the hosting API** on or off needs a person, like a new
+  command.
+
+Only GitHub profiles use the repository's token this way; other hosts keep the
+profile's own token.
+
+### Blocking assignment in a repository
+
+**Settings > Repository > SSH & credentials** has an **Assignment** row
+(**Allowed** by default, or **Blocked**; saved at once). Blocked, assignment
+is impossible in that repository's issues and pull requests, whoever asks:
+
+- the assignee picker is left out of the new issue and new pull request forms
+  (with a note saying why), the palette's *Hosting: Edit Assignees...* is
+  grayed with the reason, and the row menu says so instead of opening it;
+- every client refuses an assignment before anything is sent, including
+  assignees passed while creating an issue or a pull request: the CLI answers
+  `{"refused": {"reason": "assignment_blocked", ...}}` with exit code 2, and
+  an agent over MCP gets the same refusal;
+- assignees that already exist stay visible (read-only).
+
+`gitpoulpi hosting assignment` shows the setting, `--block` turns it on and
+`--allow` turns it off again; only a person can allow again (the MCP server
+cannot).
+
 ## 14. From the command line
 
 ```
@@ -762,6 +823,7 @@ gitpoulpi hosting edit-url --branch my-branch --open
 gitpoulpi hosting open pr 12 --browser
 gitpoulpi hosting pr-edit 12 --add-reviewer ann --add-label bug --milestone v1.0
 gitpoulpi hosting radar --what review --json
+gitpoulpi hosting assignment --block
 ```
 
 See the [CLI reference](cli-reference.md#commands) for every command. A token

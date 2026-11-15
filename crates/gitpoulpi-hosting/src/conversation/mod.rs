@@ -16,6 +16,7 @@
 pub mod caps;
 pub mod identity;
 pub mod model;
+#[cfg(any(feature = "github", feature = "gitlab"))]
 pub(crate) mod time;
 
 pub use caps::ConversationCaps;

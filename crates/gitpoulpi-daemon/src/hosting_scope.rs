@@ -109,13 +109,11 @@ pub fn post_as(root: &Path) -> Option<String> {
     let own = gitpoulpi_session::RepoState::load(&state_path(root))
         .ok()
         .and_then(|s| s.hosting_post_as);
-    let name = own
-        .filter(|n| !n.trim().is_empty())
-        .or_else(|| {
-            gitpoulpi_config::Settings::resolve_ambient()
-                .ok()
-                .map(|s| s.config().general.hosting_post_as.clone())
-        })?;
+    let name = own.filter(|n| !n.trim().is_empty()).or_else(|| {
+        gitpoulpi_config::Settings::resolve_ambient()
+            .ok()
+            .map(|s| s.config().general.hosting_post_as.clone())
+    })?;
     let name = name.trim();
     (!name.is_empty()).then(|| name.to_string())
 }

@@ -82,11 +82,7 @@ fn actor_of(user: Option<&Value>, via_app: bool) -> Actor {
     } else {
         ActorKind::User
     };
-    let mut actor = Actor::new(
-        login.clone(),
-        opt_text(user, "name").unwrap_or(login),
-        kind,
-    );
+    let mut actor = Actor::new(login.clone(), opt_text(user, "name").unwrap_or(login), kind);
     actor.web_url = opt_text(user, "html_url");
     actor
 }
@@ -332,7 +328,12 @@ fn event_of(row: &Value) -> Option<Event> {
             text: other.replace(['_', '-'], " "),
         },
     };
-    Some(Event { id, actor, at, kind })
+    Some(Event {
+        id,
+        actor,
+        at,
+        kind,
+    })
 }
 
 fn review_state(text: &str) -> Option<ReviewState> {

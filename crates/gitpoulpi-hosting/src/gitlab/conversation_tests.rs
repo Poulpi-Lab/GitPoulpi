@@ -5,8 +5,8 @@ use std::sync::Arc;
 use super::GitLabClient;
 use crate::client::HostingClient;
 use crate::conversation::{
-    ActorKind, EventKind, IdentityKind, ItemKey, ItemKind, PageCursor, TimelineEntry,
-    TimelineOpts, TokenSource,
+    ActorKind, EventKind, IdentityKind, ItemKey, ItemKind, PageCursor, TimelineEntry, TimelineOpts,
+    TokenSource,
 };
 use crate::http::{Method, RecordedTransport};
 use crate::integration::{Integration, IntegrationKind};
@@ -245,18 +245,15 @@ fn body_of(r: &crate::http::HttpRequest) -> serde_json::Value {
 fn posting_and_replying_send_exactly_one_request_each() {
     let t = Arc::new(RecordedTransport::new().on("/notes", 201, NOTE_CREATED));
     let c = client(&t);
-    let made = block_on(c.post_item_comment(PROJECT, &ItemKey::issue(3), "Thanks, will look.", true))
-        .unwrap();
+    let made =
+        block_on(c.post_item_comment(PROJECT, &ItemKey::issue(3), "Thanks, will look.", true))
+            .unwrap();
     assert_eq!(made.id, "88");
     assert!(made.internal);
     block_on(c.post_item_comment(PROJECT, &ItemKey::issue(3), "hello", false)).unwrap();
-    let replied = block_on(c.reply_in_discussion(
-        PROJECT,
-        &ItemKey::pull_request(5),
-        "d3",
-        "Squid 5 it is.",
-    ))
-    .unwrap();
+    let replied =
+        block_on(c.reply_in_discussion(PROJECT, &ItemKey::pull_request(5), "d3", "Squid 5 it is."))
+            .unwrap();
     assert_eq!(replied.discussion_id.as_deref(), Some("d3"));
 
     let sent = t.requests();
@@ -346,17 +343,15 @@ fn a_personal_token_posts_as_its_user_and_a_bot_token_as_a_bot() {
     assert_eq!(who.source, TokenSource::RepoTokenCommand);
     // And its own notes are recognised as its own.
     let me = Some(true);
-    let bot_actor = crate::conversation::Actor::new(
-        "project_42_bot_a1b2c3",
-        "triage-bot",
-        ActorKind::Bot,
-    );
+    let bot_actor =
+        crate::conversation::Actor::new("project_42_bot_a1b2c3", "triage-bot", ActorKind::Bot);
     assert_eq!(who.authored(&bot_actor), me);
 }
 
 #[test]
 fn a_rejected_token_is_an_error() {
-    let t = Arc::new(RecordedTransport::new().on("/user", 401, r#"{"message":"401 Unauthorized"}"#));
+    let t =
+        Arc::new(RecordedTransport::new().on("/user", 401, r#"{"message":"401 Unauthorized"}"#));
     assert!(matches!(
         block_on(client(&t).posting_identity(PROJECT)),
         Err(Error::Unauthorized { .. })

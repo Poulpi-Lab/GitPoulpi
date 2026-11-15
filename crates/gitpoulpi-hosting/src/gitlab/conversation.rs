@@ -61,11 +61,7 @@ fn actor_of(user: Option<&Value>) -> Actor {
     } else {
         ActorKind::User
     };
-    let mut actor = Actor::new(
-        login.clone(),
-        opt_text(user, "name").unwrap_or(login),
-        kind,
-    );
+    let mut actor = Actor::new(login.clone(), opt_text(user, "name").unwrap_or(login), kind);
     actor.web_url = opt_text(user, "web_url");
     actor
 }
@@ -107,7 +103,12 @@ fn labels_in(body: &str, verb: &str) -> Vec<String> {
         .trim_end_matches(" labels")
         .trim_end_matches(" label");
     rest.split(" ~")
-        .map(|l| l.trim().trim_start_matches('~').trim_matches('"').to_string())
+        .map(|l| {
+            l.trim()
+                .trim_start_matches('~')
+                .trim_matches('"')
+                .to_string()
+        })
         .filter(|l| !l.is_empty())
         .collect()
 }
@@ -331,8 +332,7 @@ impl GitLabClient {
         let row = self.conv_item_row(project, key).await?;
         let header = self.header_of(&row, key);
         let head_sha = text(&row, "sha");
-        let (discussions, next, total_hint) =
-            self.discussions_window(project, key, cursor).await?;
+        let (discussions, next, total_hint) = self.discussions_window(project, key, cursor).await?;
         let mut entries = Vec::new();
         for d in discussions {
             self.entries_of_discussion(&d, &header.web_url, &head_sha, opts, &mut entries);
@@ -376,14 +376,7 @@ impl GitLabClient {
             .iter()
             .filter(|n| n["system"].as_bool() != Some(true))
             .enumerate()
-            .map(|(i, n)| {
-                note_comment(
-                    n,
-                    Some(&id),
-                    (i > 0).then(|| first_id.clone()),
-                    item_url,
-                )
-            })
+            .map(|(i, n)| note_comment(n, Some(&id), (i > 0).then(|| first_id.clone()), item_url))
             .collect();
         if first.get("position").is_some_and(|p| !p.is_null()) {
             let parsed = serde_json::from_value::<Discussion>(d.clone())
@@ -467,7 +460,11 @@ impl GitLabClient {
         body: &str,
     ) -> Result<Comment> {
         check_body("editing a comment", body)?;
-        let url = self.item_url(project, key, &format!("/notes/{}", encode_component(comment_id)));
+        let url = self.item_url(
+            project,
+            key,
+            &format!("/notes/{}", encode_component(comment_id)),
+        );
         let response = self
             .transport
             .send(self.put(url, &json!({ "body": body })))
@@ -482,7 +479,11 @@ impl GitLabClient {
         key: &ItemKey,
         comment_id: &str,
     ) -> Result<()> {
-        let url = self.item_url(project, key, &format!("/notes/{}", encode_component(comment_id)));
+        let url = self.item_url(
+            project,
+            key,
+            &format!("/notes/{}", encode_component(comment_id)),
+        );
         let response = self.transport.send(self.delete(url)).await?;
         response.error_for_status("deleting a GitLab note")
     }

@@ -292,7 +292,9 @@ impl HostingClient for AssignmentGuard {
         key: &ItemKey,
         comment_id: &str,
     ) -> Result<()> {
-        self.inner.delete_item_comment(project, key, comment_id).await
+        self.inner
+            .delete_item_comment(project, key, comment_id)
+            .await
     }
     async fn create_issue_branch(&self, req: &NewIssueBranch) -> Result<CreatedBranch> {
         self.inner.create_issue_branch(req).await

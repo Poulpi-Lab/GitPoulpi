@@ -85,10 +85,10 @@ pub mod resolve;
 #[cfg(feature = "hosting")]
 pub mod review;
 pub mod scope;
-#[cfg(any(feature = "github", feature = "gitlab"))]
-mod scope_handle;
 #[cfg(all(test, any(feature = "github", feature = "gitlab")))]
 mod scope_fake;
+#[cfg(any(feature = "github", feature = "gitlab"))]
+mod scope_handle;
 #[cfg(feature = "github")]
 mod scoped_transport;
 pub mod spec;

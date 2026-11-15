@@ -30,6 +30,9 @@ use serde::de::DeserializeOwned;
 
 #[cfg(feature = "bitbucket")]
 use crate::bitbucket::BitbucketClient;
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, PageCursor, PostingIdentity, TimelineOpts, TimelinePage,
+};
 #[cfg(feature = "github")]
 use crate::github::GitHubClient;
 #[cfg(feature = "gitlab")]
@@ -37,9 +40,6 @@ use crate::gitlab::GitLabClient;
 use crate::http::HttpTransport;
 #[cfg(any(feature = "github", feature = "gitlab"))]
 use crate::http::{HttpRequest, HttpResponse};
-use crate::conversation::{
-    Comment, ConversationCaps, ItemKey, PageCursor, PostingIdentity, TimelineOpts, TimelinePage,
-};
 use crate::integration::Integration;
 use crate::issue_flow::{CreatedBranch, IssueLinks, NewIssueBranch};
 use crate::metadata::{HostedLabel, HostedMilestone, IssueEdit, ItemMeta, MetaKind, PrEdit};

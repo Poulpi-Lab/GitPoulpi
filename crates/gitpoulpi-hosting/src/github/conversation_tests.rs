@@ -22,12 +22,14 @@ const TIMELINE_ISSUE: &str = include_str!("fixtures/conversation/timeline_issue.
 const TIMELINE_PULL: &str = include_str!("fixtures/conversation/timeline_pull.json");
 const THREADS: &str = include_str!("fixtures/conversation/threads.json");
 const COMMENT_CREATED: &str = include_str!("fixtures/conversation/comment_created.json");
-const REVIEW_COMMENT_EDITED: &str = include_str!("fixtures/conversation/review_comment_edited.json");
+const REVIEW_COMMENT_EDITED: &str =
+    include_str!("fixtures/conversation/review_comment_edited.json");
 const REPLY: &str = include_str!("fixtures/conversation/reply_mutation.json");
 const VIEWER: &str = include_str!("fixtures/conversation/viewer.json");
 const VIEWER_FORBIDDEN: &str = include_str!("fixtures/conversation/viewer_forbidden.json");
 const USER_FORBIDDEN: &str = include_str!("fixtures/conversation/user_forbidden.json");
-const USER: &str = r#"{"login":"octo","id":9,"name":"Octo Cat","html_url":"https://github.com/octo"}"#;
+const USER: &str =
+    r#"{"login":"octo","id":9,"name":"Octo Cat","html_url":"https://github.com/octo"}"#;
 
 const API: &str = "https://api.github.com/repos/octo/thing";
 const PROJECT: &str = "octo/thing";
@@ -209,7 +211,10 @@ fn a_pull_request_adds_reviews_commit_runs_and_code_threads() {
     assert!(open.diff_hunk.as_deref().unwrap().starts_with("@@ -40,6"));
     assert_eq!(open.comments.len(), 2);
     assert_eq!(open.comments[0].id, "review-4001");
-    assert_eq!(open.comments[0].discussion_id.as_deref(), Some("PRRT_kwDOA"));
+    assert_eq!(
+        open.comments[0].discussion_id.as_deref(),
+        Some("PRRT_kwDOA")
+    );
     assert_eq!(open.comments[0].reactions.len(), 1);
     assert_eq!(open.comments[1].author.kind, ActorKind::Bot);
     assert!(open.comments[1].edited, "lastEditedAt is set");
@@ -310,8 +315,13 @@ fn the_newest_window_is_read_first_and_older_pages_by_cursor() {
 #[test]
 fn posting_sends_exactly_one_post_and_maps_the_bot_author() {
     let t = Arc::new(RecordedTransport::new().on("issues/7/comments", 201, COMMENT_CREATED));
-    let c = block_on(client(&t).post_item_comment(PROJECT, &ItemKey::issue(7), "Fixed in main.", false))
-        .unwrap();
+    let c = block_on(client(&t).post_item_comment(
+        PROJECT,
+        &ItemKey::issue(7),
+        "Fixed in main.",
+        false,
+    ))
+    .unwrap();
     let sent = t.requests();
     assert_eq!(sent.len(), 1);
     assert_eq!(sent[0].method, Method::Post);
@@ -402,7 +412,8 @@ fn editing_and_deleting_address_the_right_comment_route() {
 
     let plain = block_on(c.edit_item_comment(PROJECT, &key, "777", "Fixed.")).unwrap();
     assert_eq!(plain.id, "777");
-    let code = block_on(c.edit_item_comment(PROJECT, &key, "review-4002", "Done, pushed.")).unwrap();
+    let code =
+        block_on(c.edit_item_comment(PROJECT, &key, "review-4002", "Done, pushed.")).unwrap();
     assert_eq!(code.id, "review-4002");
     assert!(code.edited, "09:30 to 09:50");
     assert_eq!(code.in_reply_to.as_deref(), Some("review-4001"));
@@ -475,7 +486,11 @@ fn capabilities_follow_the_item_kind() {
 fn a_provider_without_conversations_says_unsupported() {
     let t = Arc::new(RecordedTransport::new());
     let c = crate::client::client_for(
-        Integration::new("rm", IntegrationKind::Redmine, "https://redmine.example.com"),
+        Integration::new(
+            "rm",
+            IntegrationKind::Redmine,
+            "https://redmine.example.com",
+        ),
         "tok".into(),
         t.clone(),
         &crate::trust::TrustGate::for_tests(),

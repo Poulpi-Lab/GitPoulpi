@@ -7,6 +7,10 @@ use crate::auth::auth_headers;
 use crate::client::{
     encode_component, CreatedIssue, CreatedPullRequest, HostingClient, NewIssue, NewPullRequest,
 };
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
+    TimelinePage,
+};
 use crate::http::{HttpRequest, HttpTransport};
 use crate::integration::Integration;
 use crate::model::{
@@ -18,7 +22,7 @@ use crate::{Error, Result};
 use super::map::{self, CARD_FIELDS};
 
 pub(crate) struct TrelloClient {
-    integration: Integration,
+    pub(super) integration: Integration,
     token: String,
     transport: Arc<dyn HttpTransport>,
 }
@@ -45,7 +49,11 @@ impl TrelloClient {
         request
     }
 
-    async fn get_json<T: serde::de::DeserializeOwned>(&self, path: &str, what: &str) -> Result<T> {
+    pub(super) async fn get_json<T: serde::de::DeserializeOwned>(
+        &self,
+        path: &str,
+        what: &str,
+    ) -> Result<T> {
         let url = format!("{}{path}", self.integration.api_base());
         let response = self
             .transport
@@ -53,6 +61,17 @@ impl TrelloClient {
             .await?;
         response.error_for_status(what)?;
         response.json()
+    }
+
+    /// A POST, PUT or DELETE whose answer is read by the caller.
+    pub(super) async fn send(
+        &self,
+        request: HttpRequest,
+        what: &str,
+    ) -> Result<crate::http::HttpResponse> {
+        let response = self.transport.send(self.authed(request)).await?;
+        response.error_for_status(what)?;
+        Ok(response)
     }
 
     async fn open_lists(&self, board: &str) -> Result<Vec<map::TrelloList>> {
@@ -108,6 +127,53 @@ impl HostingClient for TrelloClient {
 
     async fn create_pull_request(&self, _req: &NewPullRequest) -> Result<CreatedPullRequest> {
         Err(self.unsupported("create_pull_request"))
+    }
+
+    fn conversation_caps(&self, kind: ItemKind) -> ConversationCaps {
+        ConversationCaps::trello(kind)
+    }
+
+    async fn posting_identity(&self, _project: &str) -> Result<PostingIdentity> {
+        self.conv_identity().await
+    }
+
+    async fn item_timeline(
+        &self,
+        _project: &str,
+        key: &ItemKey,
+        older: Option<&PageCursor>,
+        opts: &TimelineOpts,
+    ) -> Result<TimelinePage> {
+        self.conv_timeline(key, older, opts).await
+    }
+
+    async fn post_item_comment(
+        &self,
+        _project: &str,
+        key: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> Result<Comment> {
+        self.conv_post(key, body, internal).await
+    }
+
+    async fn edit_item_comment(
+        &self,
+        _project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_edit(key, comment_id, body).await
+    }
+
+    async fn delete_item_comment(
+        &self,
+        _project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+    ) -> Result<()> {
+        self.conv_delete(key, comment_id).await
     }
 
     async fn current_user(&self) -> Result<HostedUser> {

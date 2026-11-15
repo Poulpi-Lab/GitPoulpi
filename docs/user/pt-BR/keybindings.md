@@ -1502,7 +1502,7 @@ ISSUES. Veja [Integrações de hospedagem e de rastreadores de issues](hosting-i
 
 | Tecla | Ação |
 |---|---|
-| `Enter` | Abre a linha selecionada no navegador. Em uma linha `Reconectar`: abre as Configurações nesse perfil |
+| `Enter` | Abre a linha selecionada: uma issue (e uma solicitação no Azure DevOps ou no Bitbucket) como [conversa](hosting-integration.md#5c-conversas), um pull request na [revisão](review.md) nos hosts que têm uma, qualquer outra coisa no navegador. Em uma linha `Reconectar`: abre as Configurações nesse perfil |
 | `Space` | Expande ou recolhe a seção |
 | `v` | Abre o filtro da seção. Pull requests: Abertos, Merged / fechados, Todos. Issues: Abertas, Atribuídas a mim, Fechadas, Todas |
 | `n` | Seção de pull requests: cria um pull request. Seção ISSUES: nova issue. (O botão `+` do cabeçalho) |
@@ -1510,7 +1510,7 @@ ISSUES. Veja [Integrações de hospedagem e de rastreadores de issues](hosting-i
 | `Enter` na linha de busca | Digita no campo de busca. `Enter`, `Tab` ou `Esc` saem dele; `Ctrl+U` o limpa |
 | `Enter` em um cabeçalho de grupo | Recolhe ou expande o grupo (*Meus pull requests*, *Atribuídos a mim*, *Aguardando minha revisão*, *Todos os pull requests*) |
 | `Enter` na linha de filtro, provedor ou repositório | Abre esse menu suspenso. A lista de provedores termina com **Nenhum (desvincular este repositório)** |
-| `.`, ou um clique com o botão direito | O menu da linha: abrir no navegador, copiar URL ou número, fazer checkout da branch de origem (pull requests); criar uma branch a partir da issue (issues) |
+| `.`, ou um clique com o botão direito | O menu da linha: abrir a conversa, abrir no navegador, copiar URL ou número, fazer checkout da branch de origem (pull requests); criar uma branch a partir da issue (issues) |
 
 ### O quadro de issues
 
@@ -1523,7 +1523,7 @@ abaixo também é um comando da paleta (**Quadro: ...**).
 | Setas | Selecionam um cartão (`Cima`, `Baixo`) ou a coluna vizinha (`Esquerda`, `Direita`); `Home`, `End`, `PageUp`, `PageDown` saltam na coluna |
 | `Shift+Left`, `Shift+Right` | Movem o cartão selecionado para a coluna anterior ou a seguinte |
 | `m` | **Mover cartão para...**: uma lista suspensa das colunas |
-| `Enter` | Abre a issue (a nota, para uma issue local; a página do host nos outros casos) |
+| `Enter` | Abre a [conversa](hosting-integration.md#5c-conversas) da issue (a página do host, onde o host não tem nenhuma para ler) |
 | `e`, `.` | Editam responsáveis, rótulos ou marco; o menu do cartão |
 | `n` | Nova issue na coluna selecionada |
 | `a`, `l`, `M`, `/` | Filtram por responsável, rótulo, marco, texto. `x` limpa os filtros |
@@ -1533,6 +1533,44 @@ abaixo também é um comando da paleta (**Quadro: ...**).
 
 Mouse: arraste um cartão para outra coluna para movê-lo, clique em um cartão para selecioná-lo, clique duplo para abri-lo, clique com o botão direito para o
 menu do cartão, roda para rolar uma coluna, `Shift`+roda (ou a barra sob o quadro) para rolar as colunas.
+
+### O editor Markdown e a visão de conversa
+
+Toda caixa cujo texto vai para um host (um comentário, uma resposta, o resumo de uma revisão, a descrição de uma nova
+issue ou de um pull request) é o mesmo editor. As teclas dele estão na tabela `md_editor` acima e podem ser
+reatribuídas.
+
+| Tecla | Ação |
+|---|---|
+| `Alt+P` | Alterna **Escrever** e **Prévia** (de **Lado a lado** vai para Prévia) |
+| `Alt+L` | Liga **Lado a lado**, ou volta para Escrever (precisa de uma janela de 100 colunas) |
+| `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` | Envia o texto (o botão do próprio formulário faz o mesmo) |
+| `Alt+E` | **Escrever com IA**: abre ou fecha o painel sob a barra de modos (só com a IA ligada) |
+| `Alt+R` | Só o compositor de commits: insere uma referência de issue |
+| `Alt+W` | Os formulários de nova issue e de pull request: criar na própria página web do provedor |
+| `Esc` | No painel de **Escrever com IA**: para um rascunho em andamento, senão fecha o painel |
+
+Na [visão de conversa](hosting-integration.md#5c-conversas) de uma issue ou de uma solicitação (linhas da paleta
+*Conversa: ...*; as linhas com tecla estão na lista da paleta acima):
+
+| Tecla | Ação |
+|---|---|
+| `r` | Responde à entrada selecionada (na thread dela, ou com o texto dela citado em um host sem threads) |
+| `Q` | Cita a entrada selecionada em um novo comentário |
+| `c` | Novo comentário |
+| `e`, `d` | Editam, excluem um dos seus próprios comentários |
+| `Alt+I` | Na caixa de comentário: **Nota interna** (GitLab, Redmine) |
+| `l`, `y`, `o` | Links da entrada, copiar o endereço dela, abri-la no navegador |
+| `n` | Próxima entrada não lida |
+| `v`, `m`, `F5` | Mostrar ou ocultar eventos, carregar entradas anteriores, atualizar |
+| `g` | Abre o diagrama da entrada (um bloco `mermaid`) |
+| `Alt+Left`, `Backspace` | Voltar ao longo da pilha de itens abertos a partir de referências |
+| `Tab` | Linha do tempo, caixa de comentário, botões do cabeçalho |
+| `q`, `Esc` | Fecham |
+
+No Radar, `i` abre a conversa de uma linha de issue.
+
+Em uma linha de pull request ou de issue das seções da barra lateral, `Enter` abre a conversa e `o` abre a linha no navegador.
 
 ### Flow (fluxos de trabalho de branches)
 

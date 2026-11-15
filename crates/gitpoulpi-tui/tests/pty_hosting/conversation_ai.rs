@@ -114,8 +114,11 @@ fn the_ai_field_drafts_into_the_description_previews_it_and_ctrl_z_restores_the_
     term.send_keys("Enter").expect("draft");
     send_request(&mut term, &["Parser crashes", "my own words"]);
     let screen = term
-        .wait_for("the draft in the Preview", STEP, |s| {
-            s.contains(DRAFT_LINE) && s.contains("Draft ready.")
+        .wait_for("the draft in the Preview, the dialog gone", STEP, |s| {
+            s.contains(DRAFT_LINE)
+                && s.contains("Draft ready.")
+                && !s.contains("Review what is sent")
+                && !s.contains("my own words")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
     assert_eq!(agent_calls(&agent), 1);

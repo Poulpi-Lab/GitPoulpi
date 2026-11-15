@@ -4153,6 +4153,7 @@ refs_pane_20 = "redigera den valda lokala grenens remotes (dess upstream och ext
 markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
 markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
 markdown_editor_3 = "send the text (Enter inserts a newline)"
+markdown_editor_4 = "open or close Write with AI (it only drafts: nothing is posted)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} eller högerklick"
@@ -9967,7 +9968,7 @@ ai_done = "Draft ready. Read it, then send. Ctrl+Z gives your text back."
 ai_error = "AI: {why}"
 ai_keys = "Enter writes, Esc closes"
 ai_pick_branches = "Pick the branches first."
-ai_needs_repository = "A {$pr} description is read from the repository: open it first."
+ai_needs_repository = "Writing this description needs the repository: open it first."
 ai_job = "Writing a draft with AI"
 
 [ai_hosting_reply]

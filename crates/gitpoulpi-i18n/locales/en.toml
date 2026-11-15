@@ -5101,6 +5101,8 @@ markdown_editor_1 = "switch between Write and Preview (the text as it will look 
 markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
 # context: help line; the keys are shown beside it
 markdown_editor_3 = "send the text (Enter inserts a newline)"
+# context: help line of the Markdown editor, after the key that opens the AI writing help
+markdown_editor_4 = "open or close Write with AI (it only drafts: nothing is posted)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} or right-click"
@@ -12311,7 +12313,7 @@ ai_keys = "Enter writes, Esc closes"
 # context: shown when the AI is asked for a pull request description before both branches are chosen. Width budget: 40 cells
 ai_pick_branches = "Pick the branches first."
 # context: shown when the AI is asked for a pull request description without a local repository. Width budget: 70 cells
-ai_needs_repository = "A {$pr} description is read from the repository: open it first."
+ai_needs_repository = "Writing this description needs the repository: open it first."
 # context: name of the AI writing job in the jobs list. Width budget: 40 cells
 ai_job = "Writing a draft with AI"
 

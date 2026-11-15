@@ -378,6 +378,7 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
 | `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
 | `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+W` |
 | `dialog` | `browse` | Browse for a Folder | `Ctrl+B` |
 | `dialog` | `sources` | Go to the Clone Sources | `Alt+S` |
 | `dialog` | `submit` | Submit the Pull Request Form | `Ctrl+S` |

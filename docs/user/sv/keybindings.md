@@ -380,6 +380,7 @@ Varje tangent du kan binda om, med id:t som används i
 | `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
 | `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
 | `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+W` |
 | `dialog` | `browse` | Bläddra efter en mapp | `Ctrl+B` |
 | `dialog` | `sources` | Gå till klonkällorna | `Alt+S` |
 | `dialog` | `submit` | Skicka formuläret för pull request | `Ctrl+S` |

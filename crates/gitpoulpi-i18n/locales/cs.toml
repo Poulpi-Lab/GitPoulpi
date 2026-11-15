@@ -1820,6 +1820,7 @@ view_merged_closed = { git = "Merged / zavřené", local = "Sloučené / zavřen
 view_all = "Všechny"
 view_issue_open = "Otevřené"
 view_issue_all = "Všechny"
+bot_suffix = "App bot"
 view_assigned = "Přiřazené mně"
 view_closed = "Zavřené"
 dur_seconds = "{n} s"
@@ -1954,6 +1955,7 @@ set_milestone = "Nastavit milník..."
 menu_pick_item = "Vyberte žádost nebo issue"
 why_no_meta = "není uvedena žádná položka z GitHubu, GitLabu, Gitea ani Forgejo, kterou lze upravit"
 why_no_meta_prs = "není uvedena žádná položka z GitHubu, GitLabu, Gitea ani Forgejo, kterou lze zkontrolovat a upravit"
+why_assignment_blocked = "assignment is blocked in this repository"
 # context: row menu: open the in-app review of a request
 review = "Zkontrolovat..."
 # context: why a palette row is off
@@ -9412,6 +9414,13 @@ username_help = "Odesílá se jako uživatelské jméno pro remote přes HTTPS. 
 ignore_helpers = "Ignorovat credential helpery nastavené tímto repozitářem"
 # context: help under the checkbox that ignores the repository's own credential helpers
 ignore_helpers_help = "Systémoví a globální pomocníci dál fungují. Pomocníci, které si repozitář nastaví sám, spouštějí programy podle svého výběru."
+use_for_hosting = "Use for the hosting API (issues, {$prs})"
+use_for_hosting_help = "The same command also gives the token of this repository's issue and {$pr} calls, in place of your personal token. With a GitHub App installation token, what you write then appears as the App. Other repositories keep your personal token."
+heading_hosting = "Hosting"
+assignment_label = "Assignment"
+assignment_allowed = "Allowed"
+assignment_blocked = "Blocked"
+assignment_help = "Blocked: nothing can be assigned in this repository's issues and {$prs}, from the app, the CLI or an agent. Existing assignees stay visible. Applies immediately."
 # context: one row listing a credential helper set by the repository; {value} is the helper, {origin} the file that sets it
 repo_helper_line = "{value}  ({origin})"
 # context: label of the rows that list the credential helpers set by this repository

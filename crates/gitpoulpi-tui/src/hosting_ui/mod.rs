@@ -460,6 +460,8 @@ pub(crate) struct HostingAvailability {
     pub(crate) meta_prs: bool,
     /// A listed issue is on GitHub or GitLab.
     pub(crate) meta_issues: bool,
+    /// This repository blocks assignment.
+    pub(crate) assignment_blocked: bool,
     /// The ISSUES source is a local Markdown folder.
     pub(crate) local_issues: bool,
     /// The PULL REQUESTS section is linked to a Gerrit project.
@@ -588,6 +590,9 @@ pub(crate) fn command_unavailable_from(
         }
         HostingCommand::ReviewPullRequest => {
             (!a.meta_prs).then_some(msg::hosting_ui::WHY_NO_REVIEW.get())
+        }
+        HostingCommand::EditAssignees if a.assignment_blocked => {
+            Some(msg::hosting_ui::WHY_ASSIGNMENT_BLOCKED.get())
         }
         HostingCommand::EditAssignees
         | HostingCommand::EditLabels

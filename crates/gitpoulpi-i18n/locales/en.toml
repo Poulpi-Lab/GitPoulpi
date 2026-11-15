@@ -2416,6 +2416,8 @@ view_all = "All"
 view_issue_open = "Open"
 # context: sidebar filter option for issues: no filter
 view_issue_all = "All"
+# context: short note after the name of a hosting profile whose calls are made by a GitHub App bot
+bot_suffix = "App bot"
 # context: sidebar filter option for issues: assigned to the signed-in user
 view_assigned = "Assigned to me"
 # context: sidebar filter option for issues
@@ -2665,6 +2667,8 @@ menu_pick_item = "Choose a request or an issue"
 why_no_meta = "no GitHub, GitLab, Gitea or Forgejo item is listed to edit"
 # context: why a palette command is grayed out
 why_no_meta_prs = "no reviewable item from GitHub, GitLab, Gitea or Forgejo is listed to edit"
+# context: why a palette command or form field is grayed out or hidden
+why_assignment_blocked = "assignment is blocked in this repository"
 # context: row menu: open the in-app review of a request
 review = "Review..."
 # context: why a palette row is off
@@ -11563,6 +11567,20 @@ username_help = "Sent as the user name of HTTPS remotes. Leave it empty to use t
 ignore_helpers = "Ignore credential helpers set by this repository"
 # context: help under the checkbox that ignores the repository's own credential helpers
 ignore_helpers_help = "The system and global helpers keep working. Helpers a repository sets for itself run programs of its choosing."
+# context: checkbox on the SSH & credentials page: the token command also gives the token of this repository's hosting API calls
+use_for_hosting = "Use for the hosting API (issues, {$prs})"
+# context: help under the "Use for the hosting API" checkbox
+use_for_hosting_help = "The same command also gives the token of this repository's issue and {$pr} calls, in place of your personal token. With a GitHub App installation token, what you write then appears as the App. Other repositories keep your personal token."
+# context: heading of the hosting rows of the SSH & credentials page
+heading_hosting = "Hosting"
+# context: row label: whether people can be assigned in this repository's issues and pull requests
+assignment_label = "Assignment"
+# context: choice of the Assignment row
+assignment_allowed = "Allowed"
+# context: choice of the Assignment row
+assignment_blocked = "Blocked"
+# context: help under the Assignment row
+assignment_help = "Blocked: nothing can be assigned in this repository's issues and {$prs}, from the app, the CLI or an agent. Existing assignees stay visible. Applies immediately."
 # context: one row listing a credential helper set by the repository; {value} is the helper, {origin} the file that sets it
 repo_helper_line = "{value}  ({origin})"
 # context: label of the rows that list the credential helpers set by this repository

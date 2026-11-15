@@ -1820,6 +1820,7 @@ view_merged_closed = { git = "Gemergt / geschlossen", local = "Zusammengeführt 
 view_all = "Alle"
 view_issue_open = "Offen"
 view_issue_all = "Alle"
+bot_suffix = "App bot"
 view_assigned = "Mir zugewiesen"
 view_closed = "Geschlossen"
 dur_seconds = "{n}s"
@@ -1955,6 +1956,7 @@ set_milestone = "Meilenstein festlegen..."
 menu_pick_item = "Anfrage oder Issue wählen"
 why_no_meta = "kein Element von GitHub, GitLab, Gitea oder Forgejo zum Bearbeiten in der Liste"
 why_no_meta_prs = "kein prüfbares Element von GitHub, GitLab, Gitea oder Forgejo zum Bearbeiten in der Liste"
+why_assignment_blocked = "assignment is blocked in this repository"
 # context: row menu: open the in-app review of a request
 review = "Review..."
 # context: why a palette row is off
@@ -9420,6 +9422,13 @@ username_help = "Wird als Benutzername für HTTPS-Remotes gesendet. Leer lassen,
 ignore_helpers = "Von diesem Repository gesetzte Credential-Helper ignorieren"
 # context: help under the checkbox that ignores the repository's own credential helpers
 ignore_helpers_help = "Die System- und globalen Helper funktionieren weiter. Helper, die ein Repository für sich selbst setzt, führen Programme nach dessen Wahl aus."
+use_for_hosting = "Use for the hosting API (issues, {$prs})"
+use_for_hosting_help = "The same command also gives the token of this repository's issue and {$pr} calls, in place of your personal token. With a GitHub App installation token, what you write then appears as the App. Other repositories keep your personal token."
+heading_hosting = "Hosting"
+assignment_label = "Assignment"
+assignment_allowed = "Allowed"
+assignment_blocked = "Blocked"
+assignment_help = "Blocked: nothing can be assigned in this repository's issues and {$prs}, from the app, the CLI or an agent. Existing assignees stay visible. Applies immediately."
 # context: one row listing a credential helper set by the repository; {value} is the helper, {origin} the file that sets it
 repo_helper_line = "{value}  ({origin})"
 # context: label of the rows that list the credential helpers set by this repository

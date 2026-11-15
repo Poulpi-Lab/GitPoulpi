@@ -247,12 +247,16 @@ impl PullRequestDialog {
         if self.uses_meta() {
             // Assignees, reviewers, labels and milestone: one row of
             // buttons, each opening the picker.
-            let fields = [
+            let blocked = self.assignment_blocked();
+            let fields: Vec<MetaField> = [
                 MetaField::Assignees,
                 MetaField::Reviewers,
                 MetaField::Labels,
                 MetaField::Milestone,
-            ];
+            ]
+            .into_iter()
+            .filter(|f| !blocked || *f != MetaField::Assignees)
+            .collect();
             let focus = self.focus.meta_field();
             let hover = match self.hover {
                 Some(PrHit::Part(part)) => part.meta_field(),
@@ -263,6 +267,16 @@ impl PullRequestDialog {
                     .render_chips(buf, (inner.x, y), inner.width, &fields, focus, hover)
             {
                 hits.push((r, PrHit::Part(PrFocus::of_meta(field))));
+            }
+            if blocked {
+                dialog_kit::put(
+                    buf,
+                    inner.x,
+                    y + 1,
+                    msg::hosting_ui::WHY_ASSIGNMENT_BLOCKED.get(),
+                    inner.width,
+                    muted,
+                );
             }
             y += 2;
         }

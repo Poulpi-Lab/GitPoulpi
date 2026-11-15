@@ -1819,6 +1819,7 @@ view_merged_closed = "{$merge}됨 / 닫힘"
 view_all = "전체"
 view_issue_open = "열림"
 view_issue_all = "전체"
+bot_suffix = "App bot"
 view_assigned = "나에게 할당됨"
 view_closed = "닫힘"
 dur_seconds = "{n}초"
@@ -1953,6 +1954,7 @@ set_milestone = "마일스톤 설정..."
 menu_pick_item = "요청 또는 이슈 선택"
 why_no_meta = "편집할 GitHub, GitLab, Gitea, Forgejo 항목이 목록에 없습니다"
 why_no_meta_prs = "편집할 수 있는 GitHub, GitLab, Gitea, Forgejo의 리뷰 가능 항목이 목록에 없습니다"
+why_assignment_blocked = "assignment is blocked in this repository"
 # context: row menu: open the in-app review of a request
 review = "리뷰..."
 # context: why a palette row is off
@@ -9412,6 +9414,13 @@ username_help = "HTTPS 리모트의 사용자 이름으로 전송됩니다. 비�
 ignore_helpers = "이 저장소가 설정한 자격 증명 도우미 무시"
 # context: help under the checkbox that ignores the repository's own credential helpers
 ignore_helpers_help = "시스템 및 전역 도우미는 계속 작동합니다. 저장소가 자체적으로 설정한 도우미는 저장소가 정한 프로그램을 실행합니다."
+use_for_hosting = "Use for the hosting API (issues, {$prs})"
+use_for_hosting_help = "The same command also gives the token of this repository's issue and {$pr} calls, in place of your personal token. With a GitHub App installation token, what you write then appears as the App. Other repositories keep your personal token."
+heading_hosting = "Hosting"
+assignment_label = "Assignment"
+assignment_allowed = "Allowed"
+assignment_blocked = "Blocked"
+assignment_help = "Blocked: nothing can be assigned in this repository's issues and {$prs}, from the app, the CLI or an agent. Existing assignees stay visible. Applies immediately."
 # context: one row listing a credential helper set by the repository; {value} is the helper, {origin} the file that sets it
 repo_helper_line = "{value}  ({origin})"
 # context: label of the rows that list the credential helpers set by this repository

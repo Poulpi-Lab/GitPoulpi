@@ -161,6 +161,13 @@ impl HostingUi {
 
     /// The effect of picking an item in a menu or palette list.
     pub(super) fn meta_action(&self, field: MetaField, pr: bool, number: u64) -> HostingEffect {
+        if field == MetaField::Assignees
+            && gitpoulpi_daemon::hosting_scope::assignment_blocked(&self.repo_root)
+        {
+            return HostingEffect::Message(
+                msg::hosting_ui::WHY_ASSIGNMENT_BLOCKED.get().to_string(),
+            );
+        }
         match self.meta_target(pr, number) {
             Some(target) => HostingEffect::EditMeta(Box::new(target), field),
             None => HostingEffect::Message(msg::hosting_ui::WHY_NO_META.get().to_string()),

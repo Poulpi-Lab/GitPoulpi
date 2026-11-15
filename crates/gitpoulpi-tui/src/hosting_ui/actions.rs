@@ -581,6 +581,9 @@ impl HostingUi {
             profile_pinned: self.override_id.is_some(),
             meta_prs: self.meta_prs() && self.data_len(HostingList::Pulls) > 0,
             meta_issues: self.meta_issues() && self.data_len(HostingList::Issues) > 0,
+            assignment_blocked: gitpoulpi_daemon::hosting_scope::assignment_blocked(
+                &self.repo_root,
+            ),
             local_issues: self.issues_local(),
             gerrit_pulls: self.gerrit_pulls(),
         }

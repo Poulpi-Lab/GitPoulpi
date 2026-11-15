@@ -79,11 +79,28 @@ fn state_path(root: &Path) -> PathBuf {
     gitpoulpi_session::RepoState::path_for(root, &state_dir)
 }
 
-/// Whether assignment is blocked for the repository at `root`.
+/// Whether assignment is blocked for the repository at `root`. The file is
+/// parsed again only when its modification time changed, so a form can ask on
+/// every key press.
 pub fn assignment_blocked(root: &Path) -> bool {
-    gitpoulpi_session::RepoState::load(&state_path(root))
+    type Seen = (Option<std::time::SystemTime>, bool);
+    static SEEN: OnceLock<Mutex<HashMap<PathBuf, Seen>>> = OnceLock::new();
+    let path = state_path(root);
+    let modified = std::fs::metadata(&path).and_then(|m| m.modified()).ok();
+    let mut seen = SEEN
+        .get_or_init(Mutex::default)
+        .lock()
+        .unwrap_or_else(|e| e.into_inner());
+    if let Some((at, blocked)) = seen.get(&path) {
+        if *at == modified && modified.is_some() {
+            return *blocked;
+        }
+    }
+    let blocked = gitpoulpi_session::RepoState::load(&path)
         .map(|s| s.assignment_blocked)
-        .unwrap_or(true)
+        .unwrap_or(true);
+    seen.insert(path, (modified, blocked));
+    blocked
 }
 
 /// The token command of the repository's profile when it is marked for the

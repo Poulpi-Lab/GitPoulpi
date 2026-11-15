@@ -307,6 +307,12 @@ impl IssueDialog {
         true
     }
 
+    /// Whether this repository blocks assignment: the assignee picker is
+    /// left out and nothing is assigned.
+    fn assignment_blocked(&self) -> bool {
+        gitpoulpi_hosting::scope::assignment_blocked(&self.seed.integration.id, &self.seed.project)
+    }
+
     /// The focus order, top to bottom.
     fn order(&self) -> Vec<IssueFocus> {
         let mut order = vec![IssueFocus::Title];
@@ -315,7 +321,9 @@ impl IssueDialog {
         }
         order.push(IssueFocus::Body);
         if self.uses_meta() {
-            order.push(IssueFocus::MetaAssignees);
+            if !self.assignment_blocked() {
+                order.push(IssueFocus::MetaAssignees);
+            }
             if self.has_labels() {
                 order.push(IssueFocus::MetaLabels);
             }
@@ -341,7 +349,7 @@ impl IssueDialog {
             title: title.to_string(),
             body: self.body.trim().to_string(),
             labels: self.chosen_labels(),
-            assignees: if self.uses_meta() {
+            assignees: if self.uses_meta() && !self.assignment_blocked() {
                 self.meta.selection.assignees.clone()
             } else {
                 Vec::new()
@@ -840,6 +848,7 @@ impl IssueDialog {
             ]
             .into_iter()
             .filter(|f| meta_picker::supports_field(self.seed.integration.kind, *f))
+            .filter(|f| *f != MetaField::Assignees || !self.assignment_blocked())
             .collect();
             let focus = Self::meta_field(self.focus);
             let hover = match self.hover {
@@ -851,6 +860,16 @@ impl IssueDialog {
                     .render_chips(buf, (inner.x, y), inner.width, &fields, focus, hover)
             {
                 hits.push((rect, IssueHit::Part(Self::focus_of(field))));
+            }
+            if self.assignment_blocked() {
+                dialog_kit::put(
+                    buf,
+                    inner.x,
+                    y + 1,
+                    msg::hosting_ui::WHY_ASSIGNMENT_BLOCKED.get(),
+                    inner.width,
+                    muted,
+                );
             }
         } else {
             dialog_kit::put(

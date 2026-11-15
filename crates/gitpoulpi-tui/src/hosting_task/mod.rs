@@ -725,7 +725,7 @@ pub(crate) fn fetch_snapshot(
             snap.issues_problem = out.problem;
         }
     }
-    register_scopes(req, &snap);
+    register_scopes(req, &mut snap);
     snap
 }
 
@@ -733,12 +733,20 @@ pub(crate) fn fetch_snapshot(
 /// answers for belongs to, so the repository's token command and its
 /// assignment block apply to the calls made about it (forms, menus and the
 /// CLI-style edits alike).
-fn register_scopes(req: &HostingRequest, snap: &HostingSnapshot) {
+fn register_scopes(req: &HostingRequest, snap: &mut HostingSnapshot) {
     if req.repo_root.as_os_str().is_empty() {
         return;
     }
     if let Some(id) = &snap.profile_id {
         gitpoulpi_daemon::hosting_scope::register(&req.repo_root, id, &snap.project);
+        // The calls are made by an App bot, not by the person: say so.
+        if gitpoulpi_hosting::scope::acts_as_bot(id, &snap.project) {
+            snap.profile_label = format!(
+                "{} ({})",
+                snap.profile_label,
+                msg::hosting_task::BOT_SUFFIX.get()
+            );
+        }
     }
     if let Some(target) = &snap.issues_target {
         gitpoulpi_daemon::hosting_scope::register(

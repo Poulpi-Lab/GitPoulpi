@@ -1811,6 +1811,7 @@ view_merged_closed = { git = "Merged / закрытые", local = "Слитые 
 view_all = "Все"
 view_issue_open = "Открытые"
 view_issue_all = "Все"
+bot_suffix = "App bot"
 view_assigned = "Назначенные мне"
 view_closed = "Закрытые"
 dur_seconds = "{n} с"
@@ -1945,6 +1946,7 @@ set_milestone = "Задать этап..."
 menu_pick_item = "Выберите запрос или задачу"
 why_no_meta = "нет элемента GitHub, GitLab, Gitea или Forgejo, который можно изменить"
 why_no_meta_prs = "нет запроса GitHub, GitLab, Gitea или Forgejo, который можно изменить"
+why_assignment_blocked = "assignment is blocked in this repository"
 # context: row menu: open the in-app review of a request
 review = "Ревью..."
 # context: why a palette row is off
@@ -9423,6 +9425,13 @@ username_help = "Передаётся как имя пользователя д�
 ignore_helpers = "Игнорировать помощники учётных данных, заданные этим репозиторием"
 # context: help under the checkbox that ignores the repository's own credential helpers
 ignore_helpers_help = "Системные и глобальные помощники продолжают работать. Помощники, которые репозиторий задаёт сам, запускают программы по его выбору."
+use_for_hosting = "Use for the hosting API (issues, {$prs})"
+use_for_hosting_help = "The same command also gives the token of this repository's issue and {$pr} calls, in place of your personal token. With a GitHub App installation token, what you write then appears as the App. Other repositories keep your personal token."
+heading_hosting = "Hosting"
+assignment_label = "Assignment"
+assignment_allowed = "Allowed"
+assignment_blocked = "Blocked"
+assignment_help = "Blocked: nothing can be assigned in this repository's issues and {$prs}, from the app, the CLI or an agent. Existing assignees stay visible. Applies immediately."
 # context: one row listing a credential helper set by the repository; {value} is the helper, {origin} the file that sets it
 repo_helper_line = "{value}  ({origin})"
 # context: label of the rows that list the credential helpers set by this repository

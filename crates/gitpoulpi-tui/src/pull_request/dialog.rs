@@ -287,6 +287,17 @@ impl PullRequestDialog {
             .is_some_and(|t| meta_picker::supports(t.integration.kind))
     }
 
+    /// Whether the target repository blocks assignment: the assignee picker
+    /// is left out and nothing is assigned.
+    pub(super) fn assignment_blocked(&self) -> bool {
+        self.current_tab().is_some_and(|t| {
+            gitpoulpi_hosting::scope::assignment_blocked(
+                &t.integration.id,
+                self.to_repo.selected().unwrap_or(""),
+            )
+        })
+    }
+
     /// What the metadata choices were made for: the provider tab and the
     /// target repository. A form that moves on starts them over.
     fn meta_scope(&self) -> String {
@@ -455,7 +466,11 @@ impl PullRequestDialog {
             title: title.to_string(),
             body: self.body.trim().to_string(),
             draft: self.draft,
-            assignees: meta.assignees.clone(),
+            assignees: if self.assignment_blocked() {
+                Vec::new()
+            } else {
+                meta.assignees.clone()
+            },
             reviewers: meta.reviewers.clone(),
             labels: meta.labels.clone(),
             milestone: meta.milestone.as_ref().map(|m| m.id),
@@ -477,8 +492,10 @@ impl PullRequestDialog {
         }
         order.push(PrFocus::Body);
         if self.uses_meta() {
+            if !self.assignment_blocked() {
+                order.push(PrFocus::MetaAssignees);
+            }
             order.extend([
-                PrFocus::MetaAssignees,
                 PrFocus::MetaReviewers,
                 PrFocus::MetaLabels,
                 PrFocus::MetaMilestone,

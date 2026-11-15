@@ -470,9 +470,9 @@ impl ItemView {
             }
             None => None,
         };
-        let internal = if !self.conv.caps.as_ref().is_some_and(|c| c.internal_notes) {
-            Some(m::WHY_NO_INTERNAL.get())
-        } else if !matches!(self.compose, Compose::New) {
+        let internal = if !self.conv.caps.as_ref().is_some_and(|c| c.internal_notes)
+            || !matches!(self.compose, Compose::New)
+        {
             Some(m::WHY_NO_INTERNAL.get())
         } else {
             None

@@ -59,7 +59,7 @@ impl WriteOp {
 /// What the worker says.
 pub(crate) enum WMsg {
     /// The host's answer: the comment it holds now (a delete has none).
-    Done(Result<Option<Comment>, String>),
+    Done(Box<Result<Option<Comment>, String>>),
     /// Who a post is made as, asked again after a post (a first post can
     /// teach an App bot's name).
     Identity(Result<PostingIdentity, String>),
@@ -91,7 +91,7 @@ pub(crate) fn start(
         let rt = match rt {
             Ok(rt) => rt,
             Err(e) => {
-                let _ = tx.send_notify(WMsg::Done(Err(request_task_failed(e))));
+                let _ = tx.send_notify(WMsg::Done(Box::new(Err(request_task_failed(e)))));
                 let _ = tx.send_notify(WMsg::Finished);
                 return;
             }
@@ -100,7 +100,7 @@ pub(crate) fn start(
             let client = match factory.client(&source.integration, &source.all) {
                 Ok(c) => c,
                 Err(e) => {
-                    let _ = tx.send_notify(WMsg::Done(Err(error_text(&e))));
+                    let _ = tx.send_notify(WMsg::Done(Box::new(Err(error_text(&e)))));
                     return;
                 }
             };
@@ -129,7 +129,7 @@ pub(crate) fn start(
             match result {
                 Ok(comment) => {
                     remember(state_path.as_deref(), &conversation, &op, comment.as_ref());
-                    let _ = tx.send_notify(WMsg::Done(Ok(comment)));
+                    let _ = tx.send_notify(WMsg::Done(Box::new(Ok(comment))));
                     // A first post can teach an App bot's login.
                     let identity = client
                         .posting_identity(project)
@@ -138,7 +138,7 @@ pub(crate) fn start(
                     let _ = tx.send_notify(WMsg::Identity(identity));
                 }
                 Err(e) => {
-                    let _ = tx.send_notify(WMsg::Done(Err(error_text(&e))));
+                    let _ = tx.send_notify(WMsg::Done(Box::new(Err(error_text(&e)))));
                 }
             }
         });
@@ -460,6 +460,7 @@ impl Conversation {
         while let Some(rx) = &self.write_rx {
             match rx.try_recv() {
                 Ok(WMsg::Done(result)) => {
+                    let result = *result;
                     changed = true;
                     let Some(w) = self.writing.take() else {
                         continue;

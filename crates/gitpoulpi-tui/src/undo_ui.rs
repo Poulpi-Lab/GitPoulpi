@@ -31,6 +31,10 @@ thread_local! {
 /// A comment was posted, edited or deleted on a host from this window: that
 /// is outward and has no journal entry, so when Undo has nothing to offer it
 /// says why (the comment itself is changed or deleted from its own view).
+#[cfg_attr(
+    not(all(feature = "hosting", feature = "conversation")),
+    allow(dead_code)
+)]
 pub(crate) fn note_outward_comment() {
     OUTWARD_COMMENT.with(|c| c.set(true));
 }

@@ -178,7 +178,7 @@ taper, et cliquez sur un bouton ou une case à cocher pour l'utiliser.
   pour effacer chaque solo ou chaque ref masquée.
 - **Clic droit** sur une ligne pour son menu : checkout, merge, fast-forward, rebase,
   créer un worktree, renommer, supprimer, masquer, solo, et plus. La ligne propre d'un
-  remote a **Fetch**, **Modifier**, **Retirer** et d'autres actions de remote. Un stash a
+  distant a **Fetch**, **Modifier**, **Retirer** et d'autres actions de distant. Un stash a
   **Pop**, **Appliquer** et **Supprimer**. Une ligne grisée dit pourquoi elle ne peut
   pas s'exécuter.
 - **Cliquez sur `+`** dans le titre DISTANTES pour ajouter un distant.
@@ -262,7 +262,7 @@ glissement.
 | Glissement | Menu |
 |---|---|
 | Branche locale X sur la branche locale Y | **Merge X dans Y**, **Rebase X sur Y**, **Rebase interactif X sur Y...**, **Fast-forward Y vers X** |
-| Branche locale sur une branche distante | **Push X** vers ce remote |
+| Branche locale sur une branche distante | **Push X** vers ce distant |
 | Branche distante sur la branche locale Y | **Merge**, **Rebase Y sur elle**, **Fast-forward Y vers elle**, et **Pull** quand c'est l'amont de Y |
 
 Quand l'action change une branche qui n'est pas extraite, GitPoulpi l'extrait
@@ -448,7 +448,7 @@ Les boîtes peuvent être déplacées, et les grandes fenêtres redimensionnées
 | Réécriture de l'historique : boîtes de purge, d'identité et de question | oui | non |
 | Fenêtre de déplacement de fichier du compositeur de commit, avis de fusion | oui | non |
 
-Non déplaçables : les écrans pleine page (Paramètres, Aide, pages Revue et Tableau, qui remplissent déjà la fenêtre), les menus contextuels et les listes déroulantes (ils pendent à ce qui les a ouverts), les infobulles, et les petites fenêtres à l'intérieur d'une page (le formulaire des remotes, l'éditeur de scission de commit).
+Non déplaçables : les écrans pleine page (Paramètres, Aide, pages Revue et Tableau, qui remplissent déjà la fenêtre), les menus contextuels et les listes déroulantes (ils pendent à ce qui les a ouverts), les infobulles, et les petites fenêtres à l'intérieur d'une page (le formulaire des distants, l'éditeur de scission de commit).
 
 Le pointeur prend une forme de déplacement sur la barre de titre et une forme de redimensionnement sur les bordures et les coins (terminaux avec `OSC 22`).
 

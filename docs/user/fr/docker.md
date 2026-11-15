@@ -65,7 +65,7 @@ Avec `--user`, le socket doit être lisible par votre identifiant d'utilisateur,
 ## Identité Git et identifiants
 
 - **Identité et paramètres :** montez votre configuration Git en lecture seule : `-v ~/.gitconfig:/home/gitpoulpi/.gitconfig:ro`. Ou définissez l'identité de commit dans un profil GitPoulpi (Paramètres > Profils), qui vit dans `/config`.
-- **Identifiants HTTPS :** l'image n'a pas d'assistant d'identifiants comme un trousseau. Montez un magasin d'identifiants (`-v ~/.git-credentials:/home/gitpoulpi/.git-credentials:ro`, avec `credential.helper = store` dans le `.gitconfig` monté), ou utilisez un remote SSH avec l'agent transmis.
+- **Identifiants HTTPS :** l'image n'a pas d'assistant d'identifiants comme un trousseau. Montez un magasin d'identifiants (`-v ~/.git-credentials:/home/gitpoulpi/.git-credentials:ro`, avec `credential.helper = store` dans le `.gitconfig` monté), ou utilisez un distant SSH avec l'agent transmis.
 - **Jetons d'hébergement** (pull requests, tickets) : sans assistant d'identifiants, GitPoulpi garde un jeton en mémoire pour la session seulement. Pour une configuration durable, passez-le par l'environnement avec `-e GITPOULPI_TOKEN_<ID>=...`, où `<ID>` est l'identifiant de l'intégration en majuscules avec les caractères non alphanumériques remplacés par `_` (voir [Hébergeurs et suivi de tickets](hosting-integration.md)). Les intégrations elles-mêmes sont dans `config.toml` sous `/config`.
 
 ## Terminal, couleurs et souris

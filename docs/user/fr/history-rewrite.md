@@ -269,7 +269,7 @@ change donc tous les commits situés après le premier qu'elle touche.
       (le nouveau dépôt reçoit un dossier portant le nom du dossier extrait), y est
       réécrite, puis nettoyée pour ne contenir que le nouvel historique, chaque
       branche et chaque tag local qui a le dossier. Ce dépôt n'est pas touché. Le
-      nouveau dépôt n'a pas de remote (l'original n'est pas son amont).
+      nouveau dépôt n'a pas de distant (l'original n'est pas son amont).
     - *Sur place : l'historique de ce dépôt est réécrit* (`--extract-mode
       in-place`) : la réécriture habituelle, aperçu, Appliquer, annulation. Les
       branches sans le dossier sont supprimées (l'annulation les ramène) ; la

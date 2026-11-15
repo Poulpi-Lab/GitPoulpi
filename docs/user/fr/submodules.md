@@ -24,7 +24,7 @@ Quand un dépôt a un `.gitmodules`, le panneau latéral Refs reçoit une sectio
 | Mettre à jour tous les sous-modules | | `Ctrl+P` : `Git : Mettre à jour tous les sous-modules` |
 | Aller à la section | clic sur son en-tête | `Ctrl+P` : `Navigation : Aller à Refs > Sous-modules` |
 
-Une mise à jour peut faire un fetch depuis le remote du sous-module ; elle suit donc **Paramètres > SSH et identifiants > Identifiants HTTPS** comme tout autre transfert. Un sous-module non cloné n'a rien à ouvrir dans un onglet ; la ligne d'état le dit et renvoie vers Mettre à jour.
+Une mise à jour peut faire un fetch depuis le distant du sous-module ; elle suit donc **Paramètres > SSH et identifiants > Identifiants HTTPS** comme tout autre transfert. Un sous-module non cloné n'a rien à ouvrir dans un onglet ; la ligne d'état le dit et renvoie vers Mettre à jour.
 
 ## Garder les sous-modules à jour
 

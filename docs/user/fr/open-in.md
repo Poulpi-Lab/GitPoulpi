@@ -71,7 +71,7 @@ Un dossier dont le nom contient une espace reste donc un seul argument.
 | `${repo}` | La racine du dépôt (diffère de `${cwd}` pour un onglet de worktree). |
 | `${name}` | Le nom de base du dossier. |
 | `${branch}` | La branche extraite ; vide en HEAD détaché. |
-| `${web_url}` | La page web du remote origin quand c'est GitHub ou GitLab ; vide sinon. |
+| `${web_url}` | La page web du distant origin quand c'est GitHub ou GitLab ; vide sinon. |
 | `${env:NAME}` | La variable d'environnement `NAME` ; vide si elle n'est pas définie. |
 
 L'ancien `{repo}` fonctionne encore et signifie `${cwd}`. Tout autre `${...}`
@@ -146,7 +146,7 @@ WezTerm, Alacritty, VS Code, Cursor et les IDE JetBrains sont proposés partout.
 
 ### Variable `${web_url}`
 
-La page web du remote `origin` du dépôt, quand c'est un projet GitHub ou GitLab
+La page web du distant `origin` du dépôt, quand c'est un projet GitHub ou GitLab
 (github.com, gitlab.com, ou un hôte auto-hébergé qui a une entrée dans
 `[[integrations]]`) ; vide sinon, et alors une entrée qui l'utilise s'arrête avec
 un message au lieu d'ouvrir une adresse vide. Elle est facultative : aucun

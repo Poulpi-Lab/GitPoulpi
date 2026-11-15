@@ -4,7 +4,7 @@
 
 Git LFS (« Large File Storage ») garde les gros fichiers (fichiers de design, vidéos, jeux de données) hors de l'historique d'un dépôt : git stocke à la place un petit *pointeur* texte de trois lignes, et le vrai contenu vit sur le serveur LFS et dans un cache local sous `.git/lfs`.
 
-GitPoulpi n'a besoin d'aucun compte pour tout cela. LFS utilise les identifiants que votre remote utilise déjà (votre assistant d'identifiants git, ou ssh-agent).
+GitPoulpi n'a besoin d'aucun compte pour tout cela. LFS utilise les identifiants que votre distant utilise déjà (votre assistant d'identifiants git, ou ssh-agent).
 
 ## Ce qui demande le programme `git-lfs`, et ce qui n'en a pas besoin
 
@@ -72,10 +72,10 @@ gitpoulpi lfs pull  [--remote origin]           # fetch, then replace pointer fi
 gitpoulpi lfs push  [--remote origin] [--all]   # upload the current branch's objects (or every ref with --all)
 ```
 
-- Le remote par défaut est celui du dépôt, comme pour `fetch` et `push`.
-- Les identifiants sont ceux habituels de votre remote (assistant d'identifiants, ssh-agent). GitPoulpi ne demande jamais de compte propre.
+- Le distant par défaut est celui du dépôt, comme pour `fetch` et `push`.
+- Les identifiants sont ceux habituels de votre distant (assistant d'identifiants, ssh-agent). GitPoulpi ne demande jamais de compte propre.
 - `pull` installe les filtres LFS de ce dépôt s'ils manquent : sans eux, git-lfs télécharge les objets mais ne remplace pas les pointeurs, et un checkout ultérieur remettrait les pointeurs.
-- MCP traite `lfs push` comme `push` : un outil destructif (il modifie le remote).
+- MCP traite `lfs push` comme `push` : un outil destructif (il modifie le distant).
 - La fenêtre affiche la progression d'un transfert (fichiers et octets) sur la ligne d'état. La CLI attend le résultat.
 
 ### Récupérer le contenu : `lfs checkout`
@@ -104,7 +104,7 @@ gitpoulpi lfs lock   assets/hero.psd [--remote origin]
 gitpoulpi lfs unlock assets/hero.psd [--remote origin] [--force]
 ```
 
-- Le verrouillage est une fonction du **serveur LFS** (GitHub, GitLab et Gitea l'ont). On l'atteint avec les identifiants propres du remote ; GitPoulpi n'a pas de compte propre.
+- Le verrouillage est une fonction du **serveur LFS** (GitHub, GitLab et Gitea l'ont). On l'atteint avec les identifiants propres du distant ; GitPoulpi n'a pas de compte propre.
 - Un serveur sans verrouillage fait échouer `lock` avec un message qui le dit (le `LfsLockingUnsupported` typé). `locks` sur un tel serveur ne liste rien, ce que git-lfs lui-même signale.
 - Suivre un motif avec `--lockable` (`lfs track '*.psd' --lockable`) rend ces fichiers en lecture seule tant que vous ne les verrouillez pas.
 - `unlock` du verrou d'un autre est refusé ; `--force` le brise, c'est pourquoi MCP traite `lfs_unlock` comme un outil destructif. `lfs_locks` est en lecture seule.

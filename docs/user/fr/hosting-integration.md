@@ -91,7 +91,7 @@ l'organisation.
 - **Azure DevOps :** l'**Organisation**, le nom dans `dev.azure.com/<organization>`.
   Une adresse `https://<org>.visualstudio.com` est aussi acceptée. Deux
   organisations demandent deux profils. Un dépôt utilise le profil de l'organisation
-  que nomme son remote. **Azure DevOps Server** demande l'**URL de la collection**,
+  que nomme son distant. **Azure DevOps Server** demande l'**URL de la collection**,
   par exemple `tfs.corp/tfs/DefaultCollection`. GitPoulpi n'utilise pas l'assistant
   d'identifiants du système pour Azure DevOps : Git Credential Manager y stocke un
   jeton de connexion, pas un jeton d'accès personnel.
@@ -207,11 +207,11 @@ La liaison est explicite et par dépôt. Quand un profil est connecté, le panne
 latéral Refs affiche une section **PULL REQUESTS** et une section **TICKETS** après
 TAGS. Chaque section a deux listes déroulantes : le fournisseur et le projet.
 
-- La liste des fournisseurs **propose** les comptes qui correspondent aux remotes du
+- La liste des fournisseurs **propose** les comptes qui correspondent aux distants du
   dépôt (`origin` d'abord), sous forme de lignes comme `owner/name · origin · GitHub`.
   Un seul choix règle le fournisseur et le projet.
 - Rien n'est lié automatiquement. Jira, Trello, Linear, YouTrack et Redmine ne sont jamais proposés, car aucun
-  remote ne les nomme : choisissez-les vous-même.
+  distant ne les nomme : choisissez-les vous-même.
 - **Aucun (délier ce dépôt)**, en haut de la liste, délie la section. Rien ne la
   relie ensuite tout seul.
 - La liaison est enregistrée dans le fichier `.gitpoulpi/repo-state.toml` du dépôt.
@@ -332,7 +332,7 @@ assez large.
 locale `pr/<n>` (`mr/<n>` sur GitLab) qui la suit, et bascule dessus. Sur GitHub, GitLab,
 Gitea et Forgejo cela fonctionne aussi pour les forks (GitPoulpi récupère la ref head spéciale
 de l'hébergeur). Azure DevOps et Bitbucket récupèrent la branche source de la
-demande. Une demande venant d'un fork y est refusée : ajoutez le fork comme remote
+demande. Une demande venant d'un fork y est refusée : ajoutez le fork comme distant
 et extrayez sa branche vous-même. Annuler revient à la branche précédente. CLI :
 `gitpoulpi hosting checkout-pr <n>`.
 
@@ -678,7 +678,7 @@ a besoin :
 | Bitbucket Data Center | les permissions de branche qui bloquent un push forcé (`fast-forward-only`, `pull-request-only`, `read-only`) | administrateur du dépôt |
 
 La page de réglages de la protection (et de la branche par défaut, et de la
-suppression du dépôt) est construite à partir de l'URL du remote du dépôt pour
+suppression du dépôt) est construite à partir de l'URL du distant du dépôt pour
 GitHub, GitLab, Azure DevOps et Bitbucket, même quand le dépôt n'est pas lié, et
 affichée avec les trois façons de passer quand l'hébergeur refuse un push.
 

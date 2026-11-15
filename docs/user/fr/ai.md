@@ -274,7 +274,7 @@ tel quel et l'éditeur vous en avertit ; écrivez `$${` pour un `${` littéral.
 | `${time}` | Heure locale, `HH:MM` | `14:05` |
 | `${datetime}` | Date et heure locales | `2026-10-03 14:05` |
 | `${user}` / `${email}` | `git config user.name` / `user.email` | `Ada Lovelace` |
-| `${remote}` | Le remote par défaut (`origin`, sinon le premier) | `origin` |
+| `${remote}` | Le distant par défaut (`origin`, sinon le premier) | `origin` |
 | `${host}` | `github`, `gitlab`, `other` (un autre hébergeur) ou `none` | `github` |
 | `${files}` | Nombre de fichiers du diff de l'action | `3` |
 | `${action}` | L'action en cours d'exécution | `commit_message` |

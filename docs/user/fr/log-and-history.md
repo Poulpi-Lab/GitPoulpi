@@ -100,9 +100,9 @@ l'historique et écrit les lignes de `.mailmap` à votre place, voir
   ne correspond pas et garde la forme du graphe. `Enter` / `Shift+Enter` sautent à
   la correspondance suivante / précédente.
 - **Filtre des refs** (`/` dans le panneau latéral) : restreint les listes de
-  branches, de tags et de remotes par nom.
+  branches, de tags et de distants par nom.
 - **Solo** (la touche `o`, ou le menu de la ref, sur une ref, un dossier ou un
-  remote) : n'affiche que les commits des refs en solo ; mettez-en plusieurs en
+  distant) : n'affiche que les commits des refs en solo ; mettez-en plusieurs en
   solo pour voir leur union. `Shift+O` arrête le solo.
 - **Masquer** une ref (son menu) pour la sortir du graphe : sa pastille disparaît,
   et les commits que seule elle atteint aussi (le commit extrait reste toujours,
@@ -128,50 +128,50 @@ menu. Les entrées les plus utiles :
 | Renommer, Supprimer | Supprimer demande d'abord ; son jumeau distant peut aussi être supprimé |
 | Copier le nom de la branche, Copier le lien de la branche sur le distant | Vers le presse-papiers |
 
-**Où se trouve un tag.** Un tag peut être sur cet ordinateur, sur un remote, ou les deux, et
+**Où se trouve un tag.** Un tag peut être sur cet ordinateur, sur un distant, ou les deux, et
 les lignes TAGS du panneau latéral (et la pastille du tag dans le Log) l'indiquent par un marqueur
 après le nom. Survolez un tag pour le même renseignement en toutes lettres.
 
 | Marqueur | Signification |
 |---|---|
-| flèche vers le haut | Ici seulement : aucun remote ne l'a. Son menu propose *Push* |
-| flèche gauche-droite | Ici et sur un remote, au même commit |
-| flèche vers le bas (ligne estompée) | Sur un remote seulement : pas dans ce dépôt (jamais récupéré, ou supprimé ici). Son menu propose *Fetch `<tag>` depuis `<remote>`* et *Supprimer `<tag>` sur `<remote>`...* ; `Git : Fetch le tag sélectionné` dans la palette |
-| flèche haut-bas | Aussi sur un remote, mais à un autre commit (un push serait refusé) |
+| flèche vers le haut | Ici seulement : aucun distant ne l'a. Son menu propose *Push* |
+| flèche gauche-droite | Ici et sur un distant, au même commit |
+| flèche vers le bas (ligne estompée) | Sur un distant seulement : pas dans ce dépôt (jamais récupéré, ou supprimé ici). Son menu propose *Fetch `<tag>` depuis `<remote>`* et *Supprimer `<tag>` sur `<remote>`...* ; `Git : Fetch le tag sélectionné` dans la palette |
+| flèche haut-bas | Aussi sur un distant, mais à un autre commit (un push serait refusé) |
 
-git ne garde aucune ref de suivi distant pour les tags : GitPoulpi apprend ce que chaque remote
+git ne garde aucune ref de suivi distant pour les tags : GitPoulpi apprend ce que chaque distant
 possède par votre dernier **fetch** (n'importe lequel, l'automatique compris) et par ses propres
 pushes et suppressions de tags. Rien n'interroge le réseau pendant que vous naviguez ; si quelqu'un
-d'autre a modifié les tags d'un remote, faites un fetch pour le voir. Les mêmes informations se
+d'autre a modifié les tags d'un distant, faites un fetch pour le voir. Les mêmes informations se
 trouvent dans `gitpoulpi tag list` (champs `local`, `remote`, `differs_on`, `where`).
 
-**Supprimer un tag.** Quand un remote a le tag, le bouton rouge **Supprimer** ouvre une boîte
+**Supprimer un tag.** Quand un distant a le tag, le bouton rouge **Supprimer** ouvre une boîte
 avec trois lignes numérotées (`1`-`9`, ou Haut/Bas et `Enter` ; `Esc` annule), et la ligne
 en surbrillance s'explique juste dessous :
 
 1. **Supprimer en local** : le retire de ce dépôt seulement. Cela s'exécute aussitôt, et
-   le message dit que le remote l'a encore. **Le prochain fetch le rapporte** (git suit
-   les tags du remote), sauf si vous le supprimez aussi sur le remote.
+   le message dit que le distant l'a encore. **Le prochain fetch le rapporte** (git suit
+   les tags du distant), sauf si vous le supprimez aussi sur le distant.
 2. **Supprimer sur `<remote>`** : le retire de là-bas pour tout le monde (`git push <remote>
-   --delete`). Une confirmation qui nomme le remote est demandée. Votre tag local
+   --delete`). Une confirmation qui nomme le distant est demandée. Votre tag local
    reste. Cette action est irréversible.
 3. **Supprimer en local et sur `<remote>`** : les deux, après la même confirmation, de sorte
    qu'un fetch ne puisse plus le rapporter. **Annuler ne restaure que le tag local** (le même
-   objet tag) ; il redevient alors local seulement et *Push* le remet sur le remote.
+   objet tag) ; il redevient alors local seulement et *Push* le remet sur le distant.
 
 ![La boîte de dialogue Supprimer le tag avec ses trois lignes, Supprimer en local, Supprimer sur origin et Supprimer en local et sur origin, au-dessus de la section Tags du panneau des refs où chaque tag porte un marqueur : local seulement, ou aussi sur origin](../images/tag-delete.png)
 
-Avec plusieurs remotes, chacun a ses propres lignes. Un tag présent ici seulement garde la
-confirmation simple ; un tag présent sur un seul remote passe directement à la confirmation de ce remote.
+Avec plusieurs distants, chacun a ses propres lignes. Un tag présent ici seulement garde la
+confirmation simple ; un tag présent sur un seul distant passe directement à la confirmation de ce distant.
 CLI : `gitpoulpi tag delete <name> [--local | --remote <r> | --both [--remote <r>]]`.
 
-**Fetch et tags.** Un fetch rafraîchit aussi ce que chaque remote possède (les marqueurs), et
+**Fetch et tags.** Un fetch rafraîchit aussi ce que chaque distant possède (les marqueurs), et
 le suivi des tags propre à git s'applique toujours : un tag supprimé seulement ici est récupéré de nouveau.
-Un tag que quelqu'un a **supprimé sur le remote** disparaît du côté remote du
+Un tag que quelqu'un a **supprimé sur le distant** disparaît du côté distant du
 marqueur après n'importe quel fetch, mais reste ici comme votre tag local (désormais *ici seulement*),
 parce que git n'élague pas les tags par défaut. **Paramètres > Synchronisation > Élagage automatique des
 tags** (désactivé par défaut ; `gitpoulpi fetch --prune-tags`) supprime aussi un tel tag local,
-mais seulement s'il avait été sur le remote : un tag que vous n'avez jamais poussé, ou que vous avez
+mais seulement s'il avait été sur le distant : un tag que vous n'avez jamais poussé, ou que vous avez
 déplacé, n'est jamais touché. Demande git 2.41 ou plus récent pour savoir ce qui a été élagué.
 
 **Nouvelle branche ou nouveau tag.** Les boutons **Branche** et **Tag** de la barre
@@ -182,16 +182,16 @@ signalé en rouge sans fermer la zone.
 
 Sur un commit sans ref, survoler sa ligne affiche aussi, dans la colonne Ref, une pastille estompée avec le nom de la branche à laquelle il appartient (sinon sa branche distante), déduit de l'historique ; un tag n'est jamais montré en fantôme. Une branche supprimée après une fusion s'affiche quand même, barrée, sous le nom du sujet du commit de fusion (`Merge branch 'x'`, `Merge pull request #N from owner/x`...) ; les squash, rebases et fast-forwards ne laissent pas cette trace. Survoler la pastille indique son type. Elle ne crée rien : utilisez la commande de création de branche ci-dessus. **Afficher une branche fantôme sur le commit survolé** dans Paramètres > Journal et graphe la désactive ; rien n'est dessiné là où la colonne Ref est trop étroite.
 
-**Remotes.** Le `+` dans le titre DISTANTES en ajoute un ; clic droit sur le nom
-d'un remote pour le fetcher, copier son lien web, en faire le remote par défaut,
-le masquer du graphe, modifier ses URL ou le retirer. **Masquer un remote** (le ⊙
+**Distants.** Le `+` dans le titre DISTANTES en ajoute un ; clic droit sur le nom
+d'un distant pour le fetcher, copier son lien web, en faire le distant par défaut,
+le masquer du graphe, modifier ses URL ou le retirer. **Masquer un distant** (le ⊙
 de sa ligne, l'entrée de menu *Masquer le distant du graphe*, ou `Distant : Masquer
 le distant du graphe...` dans la palette) masque toutes les branches qu'il a ou
 aura, et les commits que seul lui atteint quittent le Log : le moyen de parcourir
-un historique sans celui d'un remote d'archive sans rapport, et de le ramener avec
-*Afficher le distant dans le graphe*. Afficher un remote affiche aussi ses branches
-qui avaient été masquées une par une. Une branche d'un remote masqué le dit sur la
-ligne d'état si l'on clique son ⊙ : affichez d'abord le remote.
+un historique sans celui d'un distant d'archive sans rapport, et de le ramener avec
+*Afficher le distant dans le graphe*. Afficher un distant affiche aussi ses branches
+qui avaient été masquées une par une. Une branche d'un distant masqué le dit sur la
+ligne d'état si l'on clique son ⊙ : affichez d'abord le distant.
 
 **Stashes.** **Stash** fait un stash de tout (fichiers non suivis compris) ;
 `Ctrl+G m` demande d'abord un message (avec l'IA activée, `Ctrl+G` dans cette
@@ -212,7 +212,7 @@ pointeur et les cibles valides s'allument ; relâchez pour obtenir un menu :
 
 - une branche locale **sur une autre branche locale** : Merge, Rebase, Rebase
   interactif, Fast-forward ;
-- une branche locale **sur une branche distante** : Push vers ce remote ;
+- une branche locale **sur une branche distante** : Push vers ce distant ;
 - une branche distante **sur une branche locale** : Merge, Rebase, Fast-forward,
   Pull.
 
@@ -479,12 +479,12 @@ Ouvrez-le depuis le segment `Fichier` du sélecteur `Fichier │ Tout` de la bar
   (fast-forward seul)* ou *Pull (rebase)* une fois, sans changer le bouton. Le mode
   est toujours passé explicitement à git, si bien que le `pull.rebase` de votre
   configuration git ne peut pas vous surprendre.
-- **Push** (`Ctrl+G Shift+P`) envoie la branche extraite vers le remote par défaut,
+- **Push** (`Ctrl+G Shift+P`) envoie la branche extraite vers le distant par défaut,
   en définissant l'amont la première fois. Son `▾` pousse une fois vers un autre
-  remote de votre choix. Si le remote a des commits que vous n'avez pas, une boîte
+  distant de votre choix. Si le distant a des commits que vous n'avez pas, une boîte
   de dialogue propose **Pull (merge), puis push**, **Force push (avec lease)...**
   (jamais un `--force` nu) ou **Annuler**.
-- `Ctrl+G f` fait un fetch de tous les remotes. Dans *Paramètres > Synchronisation*,
+- `Ctrl+G f` fait un fetch de tous les distants. Dans *Paramètres > Synchronisation*,
   *Auto-prune* décide si les fetchs élaguent, et *Intervalle d'auto-fetch
   (minutes)* fait un fetch en arrière-plan.
 
@@ -546,7 +546,7 @@ aussi), pull, fast-forward, cherry-pick, revert, reword, composition de commits 
 l'IA et rétablir. La fenêtre grise ces boutons et ces entrées de palette et donne
 la raison. La CLI et MCP reçoivent une erreur `PendingAutoStash` (code de sortie
 1). Tout le reste reste permis : lectures, stage, abandon, commit, branches, tags,
-remotes, fetch, push, continuer / sauter / annuler un rebase, résolution de
+distants, fetch, push, continuer / sauter / annuler un rebase, résolution de
 conflits, `stash push`, `reset`, et `stash pop` / `apply` / `drop`. Annuler est
 permis aussi.
 

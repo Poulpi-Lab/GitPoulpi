@@ -29,6 +29,9 @@ pub struct Prepared {
     pub redactions: Vec<Redaction>,
     /// The paths whose diff was left out.
     pub excluded_files: Vec<String>,
+    /// The repository context that goes after the system prompt, cleaned
+    /// too (only when the user let the AI read the repository).
+    pub context: Option<crate::ContextBlock>,
 }
 
 /// Asked before a prepared request is sent. `false` cancels it.
@@ -68,7 +71,13 @@ impl Report {
                 r.excluded_files.push(f.clone());
             }
         }
-        r.sent.push((p.system.clone(), p.user.clone()));
+        let system = match &p.context {
+            Some(context) if !context.text.is_empty() => {
+                format!("{}\n\n{}", p.system, context.text)
+            }
+            _ => p.system.clone(),
+        };
+        r.sent.push((system, p.user.clone()));
     }
 
     pub fn summary(&self) -> PrivacySummary {
@@ -263,7 +272,24 @@ pub fn prepare(system: &str, user: &str, settings: &Privacy) -> Prepared {
         user,
         redactions,
         excluded_files: excluded,
+        context: None,
     }
+}
+
+/// [`prepare`] for a request that also carries repository context: the
+/// context is cleaned like the system prompt (secrets masked; its files were
+/// already screened when it was built).
+pub fn prepare_request(request: &crate::Request<'_>, settings: &Privacy) -> Prepared {
+    let mut prepared = prepare(request.system, request.user, settings);
+    if let Some(context) = request.context {
+        let cleaned = prepare(&context.text, "", settings);
+        prepared.redactions.extend(cleaned.redactions);
+        prepared.context = Some(crate::ContextBlock {
+            text: cleaned.system,
+            summary: context.summary.clone(),
+        });
+    }
+    prepared
 }
 
 /// Stands in for the provider when nothing may be sent (`--print-sent`).
@@ -296,24 +322,45 @@ impl PrivacyClient {
     }
 }
 
-#[async_trait::async_trait]
-impl AiClient for PrivacyClient {
-    async fn complete(&self, system: &str, user: &str) -> Result<String> {
+impl PrivacyClient {
+    /// Records `prepared`, then lets the print-only setting and the gate
+    /// (the "What is sent" dialog) decide whether it goes out.
+    async fn admit(&self, prepared: &Prepared) -> Result<()> {
         use std::sync::atomic::Ordering;
-        let prepared = prepare(system, user, &self.privacy);
-        self.privacy.report.record(&prepared);
+        self.privacy.report.record(prepared);
         if self.privacy.print_only {
             return Err(Error::PrintOnly);
         }
         if let Some(gate) = &self.privacy.gate {
             // One decision per run: a retry of the same request is not asked again.
             if !self.privacy.approved.load(Ordering::SeqCst) {
-                if !gate.confirm(&prepared).await {
+                if !gate.confirm(prepared).await {
                     return Err(Error::Declined);
                 }
                 self.privacy.approved.store(true, Ordering::SeqCst);
             }
         }
+        Ok(())
+    }
+}
+
+#[async_trait::async_trait]
+impl AiClient for PrivacyClient {
+    async fn complete(&self, system: &str, user: &str) -> Result<String> {
+        let prepared = prepare(system, user, &self.privacy);
+        self.admit(&prepared).await?;
         self.inner.complete(&prepared.system, &prepared.user).await
+    }
+
+    async fn complete_request(&self, request: &crate::Request<'_>) -> Result<crate::Completion> {
+        let prepared = prepare_request(request, &self.privacy);
+        self.admit(&prepared).await?;
+        self.inner
+            .complete_request(&crate::Request {
+                system: &prepared.system,
+                context: prepared.context.as_ref(),
+                user: &prepared.user,
+            })
+            .await
     }
 }

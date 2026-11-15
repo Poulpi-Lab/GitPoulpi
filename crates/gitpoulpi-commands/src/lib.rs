@@ -30,6 +30,8 @@ compile_error!(
 #[cfg_attr(not(feature = "ai"), path = "ai_cmd_stub.rs")]
 mod ai_cmd;
 #[cfg(feature = "ai")]
+pub(crate) mod ai_repo;
+#[cfg(feature = "ai")]
 pub(crate) mod ai_review_ctx;
 pub mod alias_cmd;
 pub mod build_features;

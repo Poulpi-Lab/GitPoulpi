@@ -808,6 +808,140 @@ impl Harness {
     }
 }
 
+// -- repository reading: read-only tools and sessions ---------------------------
+
+/// How an agent CLI is run so it can read the repository and nothing else
+/// (the "Let the AI read the repository" choice for a local agent).
+///
+/// Only harnesses whose read-only mode is confirmed have one; for every
+/// other the choice stays off, with the reason in its tooltip. Kept apart
+/// from [`ArgPurpose`]: these flags are never a settings toggle, GitPoulpi
+/// adds them for the run.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ReadOnlyTools {
+    /// Flags (and their values) this mode replaces wherever they stand.
+    pub replaces: &'static [&'static str],
+    /// Flags that are alone (no value) and replaced too.
+    pub replaces_bare: &'static [&'static str],
+    /// What the mode adds.
+    pub adds: &'static [&'static str],
+    /// The tools the agent keeps, for "What is sent".
+    pub tools: &'static str,
+}
+
+/// Claude Code: the three reading tools, every writing or reaching one
+/// refused, and no MCP server (a project's GitHub server could post).
+const CLAUDE_READ_ONLY: ReadOnlyTools = ReadOnlyTools {
+    replaces: &[
+        "--tools",
+        "--allowedTools",
+        "--disallowedTools",
+        "--mcp-config",
+    ],
+    replaces_bare: &["--strict-mcp-config"],
+    adds: &[
+        "--tools",
+        "Read,Grep,Glob",
+        "--allowedTools",
+        "Read,Grep,Glob",
+        "--disallowedTools",
+        "Bash,Edit,Write,NotebookEdit,WebFetch,WebSearch",
+        "--strict-mcp-config",
+        "--mcp-config",
+        "{\"mcpServers\":{}}",
+    ],
+    tools: "Read, Grep, Glob",
+};
+
+/// Codex: its read-only sandbox (files readable, nothing writable, no network).
+const CODEX_READ_ONLY: ReadOnlyTools = ReadOnlyTools {
+    replaces: &["--sandbox", "-s"],
+    replaces_bare: &[],
+    adds: &["--sandbox", "read-only"],
+    tools: "read-only sandbox",
+};
+
+/// Whether an agent keeps its session between two runs.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SessionUse {
+    /// The first run of a session the caller named.
+    Start(String),
+    /// A later run of that session.
+    Resume(String),
+}
+
+impl Harness {
+    /// The read-only mode of this agent, when it is a confirmed one.
+    pub fn read_only_tools(&self) -> Option<ReadOnlyTools> {
+        match self.command {
+            "claude" => Some(CLAUDE_READ_ONLY),
+            "codex" => Some(CODEX_READ_ONLY),
+            _ => None,
+        }
+    }
+
+    /// `args` set up for reading the repository: the flags of
+    /// [`Harness::read_only_tools`], replacing any the user had of the same
+    /// kind. `None`: this agent has no read-only mode GitPoulpi trusts.
+    pub fn with_read_only_tools(&self, args: &[String]) -> Option<Vec<String>> {
+        let mode = self.read_only_tools()?;
+        let mut out = strip_flags(args, mode.replaces, mode.replaces_bare);
+        out.extend(owned(mode.adds));
+        Some(out)
+    }
+
+    /// Whether this agent can keep a session the caller names.
+    pub fn supports_sessions(&self) -> bool {
+        self.command == "claude"
+    }
+
+    /// `args` for the first or a later run of a named session (Claude:
+    /// `--session-id <uuid>`, then `--resume <uuid>`, in place of
+    /// `--no-session-persistence`). `None`: this agent's sessions are not
+    /// supported here (a run is then one-shot, as before).
+    pub fn with_session(&self, args: &[String], session: &SessionUse) -> Option<Vec<String>> {
+        if !self.supports_sessions() {
+            return None;
+        }
+        let mut out = strip_flags(
+            args,
+            &["--session-id", "--resume", "-r"],
+            &["--no-session-persistence", "--continue", "-c"],
+        );
+        match session {
+            SessionUse::Start(id) => out.extend([String::from("--session-id"), id.clone()]),
+            SessionUse::Resume(id) => out.extend([String::from("--resume"), id.clone()]),
+        }
+        Some(out)
+    }
+}
+
+/// `args` without the `valued` flags (and the value after each) and the
+/// `bare` ones.
+fn strip_flags(args: &[String], valued: &[&str], bare: &[&str]) -> Vec<String> {
+    let mut out = Vec::with_capacity(args.len());
+    let mut skip_value = false;
+    for arg in args {
+        if skip_value {
+            skip_value = false;
+            continue;
+        }
+        if valued.contains(&arg.as_str()) {
+            skip_value = true;
+            continue;
+        }
+        if valued
+            .iter()
+            .any(|f| f.starts_with("--") && arg.starts_with(&format!("{f}=")))
+            || bare.contains(&arg.as_str())
+        {
+            continue;
+        }
+        out.push(arg.clone());
+    }
+    out
+}
+
 fn find_run(args: &[String], run: &[&str]) -> Option<usize> {
     if run.is_empty() || args.len() < run.len() {
         return None;

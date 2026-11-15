@@ -513,9 +513,25 @@ pub enum AiCommand {
         /// `obsidian_md`. Default: the item's own.
         #[arg(long)]
         flavor: Option<String>,
-        /// Let the AI read the repository. Not built yet: refused.
+        /// Let the AI read the repository for this draft (off unless given or
+        /// `ai.hosting_reply.read_repository` is true). A local agent reads it
+        /// itself with read-only tools in the repository folder; an API profile
+        /// gets a context GitPoulpi builds (the files the conversation names,
+        /// search hits, the map) within `ai.limits.hosting_reply_*`. The AI
+        /// only drafts either way; nothing is posted.
         #[arg(long)]
         read_repo: bool,
+        /// Forget the context and the agent session kept from earlier drafts
+        /// of this repository and read it again (with `--read-repo`).
+        #[arg(long, requires = "read_repo")]
+        refresh_context: bool,
+        /// With `--read-repo`: the base revision of the pull request, to put
+        /// its diff (against the merge base) in the context.
+        #[arg(long, requires = "read_repo", value_name = "REV")]
+        pr_base: Option<String>,
+        /// With `--read-repo`: the head revision of the pull request.
+        #[arg(long, requires = "pr_base", value_name = "REV")]
+        pr_head: Option<String>,
     },
     /// Print the system prompt an AI action sends for this repository, level
     /// by level: the built-in base, the global instructions, the workspace's

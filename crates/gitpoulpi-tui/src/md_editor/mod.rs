@@ -18,7 +18,7 @@
 //!
 //! The top row is the mode bar. Its right end holds the "Write with AI"
 //! button (`ai_slot`) once the owner bound the helper (`bind_ai`, only while
-//! AI is on): `Alt+W` or the button opens its panel under the bar (`ai`), the
+//! AI is on): `Alt+I` or the button opens its panel under the bar (`ai`), the
 //! draft it writes fills the text in one undo step and switches to Preview.
 
 // Not every build shows a form with a Markdown field.
@@ -187,7 +187,7 @@ impl MdEditor {
 
     /// Gives the editor its "Write with AI" help: `source` says what the text
     /// is about. Called only while AI is on; without it there is no button and
-    /// `Alt+W` does nothing.
+    /// `Alt+I` does nothing.
     pub(crate) fn bind_ai(&mut self, scope: ai::AiScope, source: Box<dyn ai::AiContextSource>) {
         self.ai = Some(ai::AiHelp::new(scope, source));
     }
@@ -205,12 +205,6 @@ impl MdEditor {
     /// Whether the helper is bound (the button is shown).
     pub(crate) fn ai_bound(&self) -> bool {
         self.ai.is_some()
-    }
-
-    /// Whether `key` is the helper's own (`Alt+W`): a form whose own `Alt+W`
-    /// means something else gives it to the editor while the text has focus.
-    pub(crate) fn takes_ai_key(&self, key: &KeyEvent) -> bool {
-        self.ai.is_some() && crate::keymap::current().is(Bind::MdEditorAi, key)
     }
 
     /// Opens (or closes) the "Write with AI" panel.

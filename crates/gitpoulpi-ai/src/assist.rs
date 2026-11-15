@@ -73,7 +73,14 @@ pub struct Job {
     /// action ignores it: their base prompts fix an answer format a parser
     /// relies on.
     pub base_override: Option<String>,
+    /// A local agent starts without the hosting credentials of the
+    /// environment (set by [`Job::with_read_only_agent`]).
+    pub scrub_env: bool,
 }
+
+/// Why a local agent cannot be let into the repository: the tooltip of the
+/// disabled "Let the AI read the repository" choice.
+pub const NO_READ_ONLY_MODE: &str = "This agent has no read-only mode GitPoulpi trusts";
 
 impl Job {
     /// Resolves `action` for a repository (whose override, if any, is
@@ -116,6 +123,7 @@ impl Job {
             base_override: matches!(action, AiAction::HostingReply | AiAction::IssueBody)
                 .then(|| config.hosting_reply.base_prompt.trim().to_string())
                 .filter(|text| !text.is_empty()),
+            scrub_env: false,
         })
     }
 
@@ -346,19 +354,84 @@ impl Job {
     /// over the real network transport (or the agent subprocess).
     #[cfg(feature = "network")]
     pub async fn run(&self, user: &str) -> Result<String> {
-        let client = crate::client_for_network_in(
+        Ok(self.run_context(None, user).await?.text)
+    }
+
+    /// [`Job::run`] with a block of repository context after the
+    /// instructions (see [`crate::AiClient::complete_request`]): the answer
+    /// and the provider's cache counters.
+    #[cfg(feature = "network")]
+    pub async fn run_context(
+        &self,
+        context: Option<&crate::ContextBlock>,
+        user: &str,
+    ) -> Result<crate::Completion> {
+        let client = crate::client_for_network_with(
             &self.profile,
             self.api_key.clone(),
             self.repo_path().as_deref(),
             &self.privacy,
+            self.scrub_env,
         )?;
-        self.run_with(&*client, user).await
+        self.run_context_with(&*client, context, user).await
     }
 
     /// [`Job::run`] over a caller-supplied client (tests).
     pub async fn run_with(&self, client: &dyn AiClient, user: &str) -> Result<String> {
         let job = self.with_files_counted(user);
         client.complete(&job.system_prompt(), user).await
+    }
+
+    /// [`Job::run_context`] over a caller-supplied client (tests).
+    pub async fn run_context_with(
+        &self,
+        client: &dyn AiClient,
+        context: Option<&crate::ContextBlock>,
+        user: &str,
+    ) -> Result<crate::Completion> {
+        let job = self.with_files_counted(user);
+        client
+            .complete_request(&crate::Request {
+                system: &job.system_prompt(),
+                context,
+                user,
+            })
+            .await
+    }
+
+    /// Sets this job up so a local agent reads the repository at `root`
+    /// itself, and can do nothing else: it runs in the repository, with
+    /// the read-only flags of its harness ([`crate::presets::ReadOnlyTools`]),
+    /// without the hosting credentials of the environment, and (when
+    /// `session` says so and the harness supports it) in a named session.
+    /// An agent without a read-only mode GitPoulpi trusts is an error.
+    pub fn with_read_only_agent(
+        mut self,
+        root: &std::path::Path,
+        session: Option<&crate::presets::SessionUse>,
+    ) -> Result<Self> {
+        use gitpoulpi_config::{AgentRunMode, AgentWorkdir, AiProviderKind};
+        if self.profile.kind != AiProviderKind::LocalAgent {
+            return Err(Error::Invalid("this profile is not a local agent".into()));
+        }
+        if self.profile.run_mode != AgentRunMode::Headless {
+            return Err(Error::Invalid(NO_READ_ONLY_MODE.into()));
+        }
+        let harness = crate::presets::harness_of(&self.profile)
+            .ok_or_else(|| Error::Invalid(NO_READ_ONLY_MODE.into()))?;
+        let mut args = harness
+            .with_read_only_tools(&self.profile.args)
+            .ok_or_else(|| Error::Invalid(NO_READ_ONLY_MODE.into()))?;
+        if let Some(session) = session {
+            if let Some(with) = harness.with_session(&args, session) {
+                args = with;
+            }
+        }
+        self.profile.args = args;
+        self.profile.workdir = AgentWorkdir::Repository;
+        self.context.repo_root = root.display().to_string();
+        self.scrub_env = true;
+        Ok(self)
     }
 
     /// Suggests the resolution of one conflict ([`AiAction::ConflictResolve`]

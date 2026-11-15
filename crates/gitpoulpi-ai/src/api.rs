@@ -5,7 +5,7 @@ use std::sync::Arc;
 use gitpoulpi_hosting::{HttpRequest, HttpResponse, HttpTransport};
 use serde_json::{json, Value};
 
-use crate::{AiClient, Error, Result};
+use crate::{AiClient, Completion, Error, Request, Result, Usage};
 
 /// OpenAI's chat-completions dialect. Also serves OpenRouter and any
 /// OpenAI-compatible server, which differ only by base URL and key.
@@ -81,9 +81,10 @@ impl AnthropicClient {
     }
 }
 
-#[async_trait::async_trait]
-impl AiClient for AnthropicClient {
-    async fn complete(&self, system: &str, user: &str) -> Result<String> {
+impl AnthropicClient {
+    /// One Messages call with `system` as the API takes it (a string, or
+    /// blocks with `cache_control`); the answer's text and cache counters.
+    async fn messages(&self, system: Value, user: &str) -> Result<Completion> {
         let body = json!({
             "model": self.model,
             "max_tokens": 4096,
@@ -104,7 +105,41 @@ impl AiClient for AnthropicClient {
             .filter(|b| b["type"] == "text")
             .filter_map(|b| b["text"].as_str())
             .collect();
-        non_empty(&text)
+        let usage = Usage {
+            cache_read_tokens: value["usage"]["cache_read_input_tokens"]
+                .as_u64()
+                .unwrap_or(0),
+            cache_creation_tokens: value["usage"]["cache_creation_input_tokens"]
+                .as_u64()
+                .unwrap_or(0),
+        };
+        non_empty(&text)?;
+        Ok(Completion { text, usage })
+    }
+}
+
+#[async_trait::async_trait]
+impl AiClient for AnthropicClient {
+    async fn complete(&self, system: &str, user: &str) -> Result<String> {
+        Ok(self.messages(json!(system), user).await?.text)
+    }
+
+    /// The instructions and the repository context are two system blocks,
+    /// each marked `cache_control: ephemeral`, so the provider reuses them for
+    /// the next reply (the conversation, hint and draft are in the user
+    /// message and change every time).
+    async fn complete_request(&self, request: &Request<'_>) -> Result<Completion> {
+        let Some(context) = request.context.filter(|c| !c.text.is_empty()) else {
+            return Ok(Completion {
+                text: self.complete(request.system, request.user).await?,
+                usage: Usage::default(),
+            });
+        };
+        let system = json!([
+            {"type": "text", "text": request.system, "cache_control": {"type": "ephemeral"}},
+            {"type": "text", "text": context.text, "cache_control": {"type": "ephemeral"}},
+        ]);
+        self.messages(system, request.user).await
     }
 }
 

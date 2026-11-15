@@ -123,19 +123,19 @@ fn rect_of(ed: &mut MdEditor, part: ai::AiPart) -> Rect {
 }
 
 #[test]
-fn without_a_bound_helper_there_is_no_button_and_alt_w_does_nothing() {
+fn without_a_bound_helper_there_is_no_button_and_alt_i_does_nothing() {
     let mut ed = MdEditor::new("text".into(), md_render::Context::default());
     let s = screen(&paint(&mut ed, 90, 12));
     assert!(
         !s.contains("Write with AI") && !s.contains('\u{2726}'),
         "{s}"
     );
-    assert_eq!(ed.on_key(alt('w')), KeyUse::Pass);
+    assert_eq!(ed.on_key(alt('i')), KeyUse::Pass);
     assert!(!ed.ai_open());
 }
 
 #[test]
-fn the_bar_has_a_real_button_with_a_label_and_a_glyph_and_alt_w_twin() {
+fn the_bar_has_a_real_button_with_a_label_and_a_glyph_and_alt_i_twin() {
     let (mut ed, _) = bound("", |_| Ok(String::new()));
     let buf = paint(&mut ed, 90, 12);
     let s = screen(&buf);
@@ -143,10 +143,10 @@ fn the_bar_has_a_real_button_with_a_label_and_a_glyph_and_alt_w_twin() {
     // The button is where the slot was reserved: the right end of the bar.
     let slot = ed.ai_slot();
     assert_eq!(slot.right(), 90, "right-aligned on the bar");
-    assert_eq!(ed.on_key(alt('w')), KeyUse::Handled);
-    assert!(ed.ai_open(), "Alt+W opens the panel");
-    assert_eq!(ed.on_key(alt('w')), KeyUse::Handled);
-    assert!(!ed.ai_open(), "Alt+W again closes it");
+    assert_eq!(ed.on_key(alt('i')), KeyUse::Handled);
+    assert!(ed.ai_open(), "Alt+I opens the panel");
+    assert_eq!(ed.on_key(alt('i')), KeyUse::Handled);
+    assert!(!ed.ai_open(), "Alt+I again closes it");
     // The mouse twin.
     assert_eq!(ed.on_mouse(click(slot.x + 2, slot.y)), MouseUse::Inside);
     assert!(ed.ai_open());
@@ -168,7 +168,7 @@ fn a_narrow_bar_shows_the_short_label() {
 fn the_open_panel_shows_the_field_the_two_boxes_and_the_buttons() {
     let (mut ed, _) = bound("", |_| Ok(String::new()));
     paint(&mut ed, 90, 16);
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     let s = screen(&paint(&mut ed, 90, 16));
     for want in [
         "What I want in this answer",
@@ -191,7 +191,7 @@ fn the_open_panel_shows_the_field_the_two_boxes_and_the_buttons() {
 fn the_repository_box_is_unticked_and_disabled_and_a_click_only_says_why() {
     let (mut ed, _) = bound("", |_| Ok(String::new()));
     paint(&mut ed, 90, 16);
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     let repo = rect_of(&mut ed, ai::AiPart::Repo);
     ed.on_mouse(click(repo.x + 1, repo.y));
     let s = screen(&paint(&mut ed, 90, 16));
@@ -207,11 +207,11 @@ fn the_repository_box_is_unticked_and_disabled_and_a_click_only_says_why() {
 fn improve_my_draft_starts_ticked_only_when_there_is_a_text() {
     let (mut with, _) = bound("my words", |_| Ok(String::new()));
     paint(&mut with, 90, 16);
-    with.on_key(alt('w'));
+    with.on_key(alt('i'));
     assert!(with.ai_mut().unwrap().improve());
     let (mut empty, _) = bound("", |_| Ok(String::new()));
     paint(&mut empty, 90, 16);
-    empty.on_key(alt('w'));
+    empty.on_key(alt('i'));
     assert!(!empty.ai_mut().unwrap().improve());
 }
 
@@ -221,7 +221,7 @@ fn enter_in_the_field_asks_with_the_hint_and_fills_the_editor_then_previews() {
         Ok("# New draft\n\nWritten by the AI.".into())
     });
     paint(&mut ed, 90, 16);
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     type_str(&mut ed, "agree and ask for a test");
     assert_eq!(
         ed.text(),
@@ -249,7 +249,7 @@ fn enter_in_the_field_asks_with_the_hint_and_fills_the_editor_then_previews() {
 fn ctrl_z_gives_the_previous_text_back_in_one_step() {
     let (mut ed, _) = bound("old text", |_| Ok("a\nb\nc".into()));
     paint(&mut ed, 90, 16);
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     ed.on_key(key(KeyCode::Enter));
     wait_for(&mut ed, "the draft", |e| e.text() == "a\nb\nc");
     assert_eq!(ed.mode(), Mode::Preview);
@@ -266,7 +266,7 @@ fn ctrl_z_gives_the_previous_text_back_in_one_step() {
 fn an_unticked_improve_box_sends_no_draft() {
     let (mut ed, seen) = bound("keep me", |_| Ok("fresh".into()));
     paint(&mut ed, 90, 16);
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     let improve = rect_of(&mut ed, ai::AiPart::Improve);
     ed.on_mouse(click(improve.x + 1, improve.y));
     assert!(!ed.ai_mut().unwrap().improve());
@@ -285,7 +285,7 @@ fn an_unticked_improve_box_sends_no_draft() {
 fn space_on_the_improve_box_toggles_it_by_keyboard() {
     let (mut ed, _) = bound("x", |_| Ok(String::new()));
     paint(&mut ed, 90, 16);
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     assert!(ed.ai_mut().unwrap().improve());
     ed.on_key(key(KeyCode::Tab));
     ed.on_key(key(KeyCode::Char(' ')));
@@ -296,7 +296,7 @@ fn space_on_the_improve_box_toggles_it_by_keyboard() {
 fn a_failure_is_shown_inline_and_the_text_is_untouched() {
     let (mut ed, _) = bound("mine", |_| Err("the agent exited with status 2".into()));
     paint(&mut ed, 90, 16);
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     ed.on_key(key(KeyCode::Enter));
     let until = Instant::now() + Duration::from_secs(10);
     let mut s = String::new();
@@ -319,7 +319,7 @@ fn a_source_that_cannot_say_what_to_write_about_shows_its_reason() {
     let mut ed = MdEditor::new(String::new(), md_render::Context::default());
     ed.bind_ai_with(help);
     paint(&mut ed, 90, 16);
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     ed.on_key(key(KeyCode::Enter));
     let s = screen(&paint(&mut ed, 90, 16));
     assert!(s.contains("AI: Pick the branches first."), "{s}");
@@ -341,7 +341,7 @@ fn stop_ends_the_run_and_its_answer_never_lands() {
         Ok("late answer".into())
     });
     paint(&mut ed, 90, 16);
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     ed.on_key(key(KeyCode::Enter));
     assert!(ed.ai_running());
     let s = screen(&paint(&mut ed, 90, 16));
@@ -374,7 +374,7 @@ fn the_stop_button_stops_with_the_mouse() {
         Ok("late".into())
     });
     paint(&mut ed, 90, 16);
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     ed.on_key(key(KeyCode::Enter));
     let stop = rect_of(&mut ed, ai::AiPart::Stop);
     ed.on_mouse(click(stop.x + 1, stop.y));
@@ -386,11 +386,11 @@ fn the_stop_button_stops_with_the_mouse() {
 fn the_close_button_and_escape_close_the_panel_and_stop_a_run() {
     let (mut ed, _) = bound("", |_| Ok("x".into()));
     paint(&mut ed, 90, 16);
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     let close = rect_of(&mut ed, ai::AiPart::Close);
     assert_eq!(ed.on_mouse(click(close.x + 1, close.y)), MouseUse::Inside);
     assert!(!ed.ai_open());
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     assert_eq!(ed.on_key(key(KeyCode::Esc)), KeyUse::Handled);
     assert!(!ed.ai_open());
     // With the panel closed, Esc is the form's again.
@@ -401,7 +401,7 @@ fn the_close_button_and_escape_close_the_panel_and_stop_a_run() {
 fn tab_walks_the_panel_then_hands_the_keyboard_back_to_the_text() {
     let (mut ed, _) = bound("", |_| Ok("x".into()));
     paint(&mut ed, 90, 16);
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     for _ in 0..4 {
         assert_eq!(ed.on_key(key(KeyCode::Tab)), KeyUse::Handled);
     }
@@ -417,9 +417,9 @@ fn recent_instructions_are_listed_clickable_and_walked_with_up_and_down() {
     paint(&mut ed, 90, 16);
     for hint in ["first idea", "second idea"] {
         if ed.ai_open() {
-            ed.on_key(alt('w'));
+            ed.on_key(alt('i'));
         }
-        ed.on_key(alt('w'));
+        ed.on_key(alt('i'));
         ed.on_key(ctrl('a'));
         type_str(&mut ed, hint);
         ed.on_key(key(KeyCode::Enter));
@@ -451,7 +451,7 @@ fn recent_instructions_are_listed_clickable_and_walked_with_up_and_down() {
 fn a_short_editor_drops_the_label_and_the_recent_row_before_the_field() {
     let (mut ed, _) = bound("", |_| Ok("x".into()));
     paint(&mut ed, 90, 8);
-    ed.on_key(alt('w'));
+    ed.on_key(alt('i'));
     let s = screen(&paint(&mut ed, 90, 8));
     assert!(s.contains("Draft") && s.contains("Close"), "{s}");
     assert!(s.contains("for example"), "the field stays:\n{s}");
@@ -459,10 +459,10 @@ fn a_short_editor_drops_the_label_and_the_recent_row_before_the_field() {
 }
 
 #[test]
-fn alt_w_works_while_the_preview_shows() {
+fn alt_i_works_while_the_preview_shows() {
     let (mut ed, _) = bound("text", |_| Ok("x".into()));
     paint(&mut ed, 90, 16);
     ed.set_mode(Mode::Preview);
-    assert_eq!(ed.on_key(alt('w')), KeyUse::Handled);
+    assert_eq!(ed.on_key(alt('i')), KeyUse::Handled);
     assert!(ed.ai_open());
 }

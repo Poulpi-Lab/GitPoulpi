@@ -41,6 +41,7 @@ pub use agent::{expand_env_refs, resolve_command, LocalAgentClient};
 pub use api::{AnthropicClient, OpenAiClient};
 use gitpoulpi_config::{AiProfile, AiProviderKind};
 use gitpoulpi_hosting::{HttpTransport, TrustGate};
+pub use hosting_reply::repo_context::{ContextBlock, ContextSummary};
 pub use limits::{Cut, LimitAnswer, LimitGate, LimitPolicy, Limits, Part};
 pub use parse::{CommitMessage, PlannedCommit, PlannedSplit, PullRequestText};
 pub use privacy::{Prepared, Privacy, PrivacyClient, PrivacySummary, SendGate};
@@ -110,6 +111,48 @@ pub const DEFAULT_TIMEOUT_SECS: u64 = 120;
 #[async_trait::async_trait]
 pub trait AiClient: Send + Sync {
     async fn complete(&self, system: &str, user: &str) -> Result<String>;
+
+    /// [`AiClient::complete`] with a block of repository context that stays
+    /// the same across replies. The default puts it after the system prompt
+    /// (the stable-prefix order OpenAI-compatible servers cache by themselves);
+    /// the Anthropic client sends it as its own cacheable system block and
+    /// reads the cache counters back.
+    async fn complete_request(&self, request: &Request<'_>) -> Result<Completion> {
+        let system = match request.context {
+            Some(context) if !context.text.is_empty() => {
+                format!("{}\n\n{}", request.system, context.text)
+            }
+            _ => request.system.to_string(),
+        };
+        Ok(Completion {
+            text: self.complete(&system, request.user).await?,
+            usage: Usage::default(),
+        })
+    }
+}
+
+/// One request to a model: the instructions, the repository context (when
+/// the user let the AI read the repository) and the user message.
+#[derive(Debug, Clone, Copy)]
+pub struct Request<'a> {
+    pub system: &'a str,
+    pub context: Option<&'a ContextBlock>,
+    pub user: &'a str,
+}
+
+/// An answer and what the provider said about its cache.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Completion {
+    pub text: String,
+    pub usage: Usage,
+}
+
+/// The provider's prompt-cache counters (Anthropic's `cache_read_input_tokens`
+/// and `cache_creation_input_tokens`); zero when it reports none.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, serde::Serialize)]
+pub struct Usage {
+    pub cache_read_tokens: u64,
+    pub cache_creation_tokens: u64,
 }
 
 /// Builds the client a profile describes over `transport`.
@@ -166,11 +209,26 @@ pub fn client_for_in(
     gate: &TrustGate,
     privacy: &Privacy,
 ) -> Result<Box<dyn AiClient>> {
+    client_for_in_with(profile, api_key, transport, repo_root, gate, privacy, false)
+}
+
+/// [`client_for_in`], with `scrub_env`: a local agent starts without the
+/// hosting credentials of this process's environment ([`agent::credential_env`]),
+/// so an agent that reads the repository cannot publish or push with them.
+pub fn client_for_in_with(
+    profile: &AiProfile,
+    api_key: Option<String>,
+    transport: Arc<dyn HttpTransport>,
+    repo_root: Option<&std::path::Path>,
+    gate: &TrustGate,
+    privacy: &Privacy,
+    scrub_env: bool,
+) -> Result<Box<dyn AiClient>> {
     // Nothing is sent: no key, no trust decision and no agent are needed.
     if privacy.print_only {
         return Ok(Box::new(PrivacyClient::print_only(privacy.clone())));
     }
-    let inner = raw_client_for(profile, api_key, transport, repo_root, gate)?;
+    let inner = raw_client_for(profile, api_key, transport, repo_root, gate, scrub_env)?;
     Ok(Box::new(PrivacyClient::new(inner, privacy.clone())))
 }
 
@@ -180,6 +238,7 @@ fn raw_client_for(
     transport: Arc<dyn HttpTransport>,
     repo_root: Option<&std::path::Path>,
     gate: &TrustGate,
+    scrub_env: bool,
 ) -> Result<Box<dyn AiClient>> {
     let key = || {
         api_key
@@ -212,7 +271,7 @@ fn raw_client_for(
             profile.effective_model(),
             key()?,
         )),
-        AiProviderKind::LocalAgent => local_agent_client(profile, repo_root)?,
+        AiProviderKind::LocalAgent => local_agent_client(profile, repo_root, scrub_env)?,
     })
 }
 
@@ -220,11 +279,14 @@ fn raw_client_for(
 fn local_agent_client(
     profile: &AiProfile,
     repo_root: Option<&std::path::Path>,
+    scrub_env: bool,
 ) -> Result<Box<dyn AiClient>> {
     use gitpoulpi_config::AgentRunMode;
     match profile.run_mode {
         AgentRunMode::Headless => Ok(Box::new(
-            LocalAgentClient::from_profile(profile)?.in_workdir(agent_workdir(profile, repo_root)),
+            LocalAgentClient::from_profile(profile)?
+                .in_workdir(agent_workdir(profile, repo_root))
+                .scrubbing_env(scrub_env),
         )),
         #[cfg(feature = "terminal-agent")]
         AgentRunMode::Terminal => Ok(Box::new(agent_terminal::TerminalAgentClient::from_profile(
@@ -270,17 +332,31 @@ pub fn client_for_network_in(
     repo_root: Option<&std::path::Path>,
     privacy: &Privacy,
 ) -> Result<Box<dyn AiClient>> {
+    client_for_network_with(profile, api_key, repo_root, privacy, false)
+}
+
+/// [`client_for_network_in`], with the hosting credentials taken out of a
+/// local agent's environment when `scrub_env` (see [`client_for_in_with`]).
+#[cfg(feature = "network")]
+pub fn client_for_network_with(
+    profile: &AiProfile,
+    api_key: Option<String>,
+    repo_root: Option<&std::path::Path>,
+    privacy: &Privacy,
+    scrub_env: bool,
+) -> Result<Box<dyn AiClient>> {
     let transport = gitpoulpi_hosting::ReqwestTransport::with_timeout(
         std::time::Duration::from_secs(DEFAULT_TIMEOUT_SECS),
     )
     .map_err(|e| Error::Http(e.to_string()))?;
-    client_for_in(
+    client_for_in_with(
         profile,
         api_key,
         Arc::new(transport),
         repo_root,
         &TrustGate::ambient(),
         privacy,
+        scrub_env,
     )
 }
 

@@ -656,6 +656,9 @@ pub(crate) struct ReplyArgs {
     pub draft: Option<String>,
     pub flavor: Option<String>,
     pub read_repo: bool,
+    pub refresh_context: bool,
+    pub pr_base: Option<String>,
+    pub pr_head: Option<String>,
 }
 
 /// `ai hosting-reply`: a draft for a conversation on a host. Drafts only:
@@ -669,12 +672,6 @@ async fn hosting_reply(
     use gitpoulpi_ai::hosting_reply::{convert, draft, ReplyRequest, ReplyTarget};
     use gitpoulpi_hosting::conversation::MarkupFlavor;
 
-    if args.read_repo {
-        return Err(
-            "--read-repo: letting the AI read the repository is not built yet;              run without it (the AI then sees only the conversation)"
-                .into(),
-        );
-    }
     let target = match (&args.issue_title, &args.reply_to, &args.path) {
         (Some(title), ..) => ReplyTarget::IssueBody {
             title: title.trim().to_string(),
@@ -706,9 +703,64 @@ async fn hosting_reply(
     }
     request.flavor = convert::flavor_name(flavor).to_string();
 
+    if let (Some(base), Some(head)) = (&args.pr_base, &args.pr_head) {
+        request.diff = Some(gitpoulpi_ai::hosting_reply::DiffRange {
+            base: base.clone(),
+            head: head.clone(),
+        });
+    }
+
     let action = request.target.action();
     let job = ctx.job(session, action)?;
-    let result = draft(&job, &request).await.map_err(|e| e.to_string())?;
+    let settings = gitpoulpi_config::Settings::resolve_ambient().map_err(|e| e.to_string())?;
+    let repo_prefs = session
+        .repo_root()
+        .map(crate::commands::repo_state_path)
+        .and_then(|p| gitpoulpi_session::RepoState::load(&p).ok())
+        .map(|s| s.preferences.ai_hosting_reply)
+        .unwrap_or_default();
+    let reply_settings = settings.config().ai.hosting_reply.with_repo(&repo_prefs);
+    // Off unless asked for: the flag, or the setting the user turned on.
+    let read_repo = args.read_repo || reply_settings.read_repository;
+    let result = if read_repo {
+        let root = session
+            .repo_root()
+            .map(std::path::Path::to_path_buf)
+            .ok_or_else(|| "--read-repo needs a repository".to_string())?;
+        if let Some(why) = gitpoulpi_ai::hosting_reply::repo_access::blocked_reason(&job.profile) {
+            return Err(format!("--read-repo: {why}"));
+        }
+        let paths = gitpoulpi_config::ConfigPaths::discover()
+            .ok_or_else(|| "could not determine this OS's data directory".to_string())?;
+        let private = paths.private_dir();
+        let ttl = reply_settings.context_ttl_minutes_clamped();
+        let mut cache = gitpoulpi_ai::hosting_reply::cache::ContextCache::on_disk(
+            &private.join("ai-context"),
+            &root,
+            ttl,
+        );
+        let mut sessions = gitpoulpi_ai::hosting_reply::cache::SessionStore::on_disk(
+            &private.join("ai-sessions.toml"),
+        );
+        let reader = crate::ai_repo::SessionReader::new(session);
+        let mut setup = gitpoulpi_ai::hosting_reply::repo_access::RepoSetup {
+            reader: &reader,
+            root: &root,
+            cache: &mut cache,
+            sessions: &mut sessions,
+            reuse_session: reply_settings.reuse_agent_session,
+            refresh: args.refresh_context,
+            limits: gitpoulpi_ai::hosting_reply::repo_context::ContextLimits::from_config(
+                &settings.config().ai.limits,
+            ),
+            privacy: job.privacy.clone(),
+        };
+        gitpoulpi_ai::hosting_reply::repo_access::draft_reading(job, request.clone(), &mut setup)
+            .await
+            .map_err(|e| e.to_string())?
+    } else {
+        draft(&job, &request).await.map_err(|e| e.to_string())?
+    };
     Ok(emitted(
         json!({
             "action": action.key(),
@@ -766,6 +818,9 @@ async fn run_action(
             draft,
             flavor,
             read_repo,
+            refresh_context,
+            pr_base,
+            pr_head,
         } => {
             hosting_reply(
                 session,
@@ -781,6 +836,9 @@ async fn run_action(
                     draft,
                     flavor,
                     read_repo,
+                    refresh_context,
+                    pr_base,
+                    pr_head,
                 },
             )
             .await

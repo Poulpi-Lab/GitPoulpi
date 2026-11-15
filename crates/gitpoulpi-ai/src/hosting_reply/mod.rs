@@ -16,17 +16,25 @@
 //! behind the per-use "Let the AI read the repository" choice, off by default
 //! (`ai.hosting_reply.read_repository`).
 
+use std::path::PathBuf;
+use std::sync::Arc;
+
 use gitpoulpi_config::AiAction;
+use gitpoulpi_core::domain::Oid;
 use serde::Serialize;
 
 use crate::assist::Job;
 use crate::limits::Cut;
-use crate::{AiClient, Error, Result};
+use crate::{AiClient, ContextBlock, ContextSummary, Error, Result};
+use repo_context::{AgentReads, RepoContext};
 
+pub mod cache;
 #[cfg(feature = "conversation")]
 pub mod convert;
 pub mod plan;
 pub mod prompt;
+pub mod repo_access;
+pub mod repo_context;
 
 pub use prompt::{build, Built, BASE_PROMPT};
 
@@ -71,14 +79,51 @@ impl ReplyTarget {
     }
 }
 
-/// Whether the AI may read the repository for this use. Reading it is not
-/// built yet, so the only value is `Off`; the per-use choice and its default
-/// (`ai.hosting_reply.read_repository`, off) come with that slice.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-#[non_exhaustive]
+/// Whether the AI may read the repository for this use. Off unless the user
+/// ticked "Let the AI read the repository" for it (its default is
+/// `ai.hosting_reply.read_repository`, off); [`repo_access::read_repository`]
+/// sets the other two.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub enum RepoAccess {
     #[default]
     Off,
+    /// A local agent reads the repository itself, in its working folder,
+    /// with read-only tools (the job was set up by
+    /// [`crate::assist::Job::with_read_only_agent`]).
+    AgentReadOnly {
+        root: PathBuf,
+        head: Oid,
+        /// The read-only tools it keeps, for "What is sent".
+        tools: String,
+        /// Whether its session is new or continued; `None`: one-shot.
+        session: Option<AgentSession>,
+    },
+    /// GitPoulpi read the repository and sends the result as context.
+    Built(Arc<RepoContext>),
+}
+
+/// How a local agent's session stands for one reply.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AgentSession {
+    Started,
+    Continued,
+}
+
+impl AgentSession {
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Started => "started",
+            Self::Continued => "continued",
+        }
+    }
+}
+
+/// The commits a pull request carries, as revisions a [`RepoReader`] can
+/// diff.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DiffRange {
+    pub base: String,
+    pub head: String,
 }
 
 /// What the model is told about the item: its one-line header and its
@@ -122,6 +167,9 @@ pub struct ReplyRequest {
     /// Markdown").
     pub flavor: String,
     pub repo: RepoAccess,
+    /// The range of a pull request, so its diff can go in the repository
+    /// context (only read when the repository is).
+    pub diff: Option<DiffRange>,
 }
 
 impl ReplyRequest {
@@ -134,6 +182,33 @@ impl ReplyRequest {
             draft: None,
             flavor: "Markdown".into(),
             repo: RepoAccess::Off,
+            diff: None,
+        }
+    }
+
+    /// The repository part of the request as the model and the dialog see
+    /// it: the context block (empty text for an agent that reads for itself).
+    pub fn context_block(&self) -> Option<ContextBlock> {
+        match &self.repo {
+            RepoAccess::Off => None,
+            RepoAccess::Built(context) => Some(context.block()),
+            RepoAccess::AgentReadOnly {
+                root,
+                head,
+                tools,
+                session,
+            } => Some(ContextBlock {
+                text: String::new(),
+                summary: ContextSummary {
+                    head: head.to_hex().chars().take(7).collect(),
+                    agent: Some(AgentReads {
+                        tools: tools.clone(),
+                        folder: root.display().to_string(),
+                        session: session.map_or("none", AgentSession::name).to_string(),
+                    }),
+                    ..ContextSummary::default()
+                },
+            }),
         }
     }
 }
@@ -145,8 +220,38 @@ pub struct ContextReport {
     pub entries_sent: usize,
     /// Entries left out for lack of room.
     pub entries_omitted: usize,
-    /// Whether the repository was read (never, for now).
+    /// Whether the AI read the repository (by a built context or as an
+    /// agent with read-only tools).
     pub repository: bool,
+    /// What of the repository, when it was read.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub repo: Option<RepoReport>,
+}
+
+/// What the repository part of a request was.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct RepoReport {
+    /// `context` (GitPoulpi read it) or `agent` (the agent reads it).
+    pub route: &'static str,
+    /// The commit, short.
+    pub head: String,
+    pub parts: Vec<repo_context::PartSummary>,
+    pub bytes: usize,
+    pub budget: usize,
+    pub reused_parts: usize,
+    /// The whole context came from the cache.
+    pub context_reused: bool,
+    pub cuts: Vec<repo_context::ContextCut>,
+    pub left_out: Vec<String>,
+    /// The provider's prompt cache: tokens read and written.
+    pub provider_cache_read_tokens: u64,
+    pub provider_cache_creation_tokens: u64,
+    /// The tools of an agent that reads the repository.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub agent_tools: Option<String>,
+    /// `started`, `continued`, or `none` for an agent run.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub agent_session: Option<String>,
 }
 
 /// The result: a text for the user to read, edit and post themselves.
@@ -193,26 +298,70 @@ fn unfence(text: &str) -> Option<&str> {
 /// [`Job::truncated`], `--send-all` lifts the cap).
 pub async fn draft_with(job: &Job, client: &dyn AiClient, request: &ReplyRequest) -> Result<Draft> {
     let built = prepare(job, request).await?;
-    let answer = job.run_with(client, &built.user).await?;
-    finish(request, &built, &answer)
+    let block = request.context_block();
+    let done = job
+        .run_context_with(client, block.as_ref(), &built.user)
+        .await?;
+    finish(request, &built, done)
 }
 
 /// [`draft_with`] over the real transport (or the agent subprocess).
 #[cfg(feature = "network")]
 pub async fn draft(job: &Job, request: &ReplyRequest) -> Result<Draft> {
     let built = prepare(job, request).await?;
-    let answer = job.run(&built.user).await?;
-    finish(request, &built, &answer)
+    let block = request.context_block();
+    let done = job.run_context(block.as_ref(), &built.user).await?;
+    finish(request, &built, done)
 }
 
-fn finish(request: &ReplyRequest, built: &Built, answer: &str) -> Result<Draft> {
+fn finish(request: &ReplyRequest, built: &Built, done: crate::Completion) -> Result<Draft> {
+    let repo = match &request.repo {
+        RepoAccess::Off => None,
+        RepoAccess::Built(context) => Some(RepoReport {
+            route: "context",
+            head: context.key.head.to_hex().chars().take(7).collect(),
+            parts: context.summary().parts,
+            bytes: context.total,
+            budget: context.budget,
+            reused_parts: context.reused_parts(),
+            context_reused: !context.parts.is_empty()
+                && context.reused_parts() == context.parts.len(),
+            cuts: context.cuts.clone(),
+            left_out: context.left_out.clone(),
+            provider_cache_read_tokens: done.usage.cache_read_tokens,
+            provider_cache_creation_tokens: done.usage.cache_creation_tokens,
+            agent_tools: None,
+            agent_session: None,
+        }),
+        RepoAccess::AgentReadOnly {
+            head,
+            tools,
+            session,
+            ..
+        } => Some(RepoReport {
+            route: "agent",
+            head: head.to_hex().chars().take(7).collect(),
+            parts: Vec::new(),
+            bytes: 0,
+            budget: 0,
+            reused_parts: 0,
+            context_reused: false,
+            cuts: Vec::new(),
+            left_out: Vec::new(),
+            provider_cache_read_tokens: 0,
+            provider_cache_creation_tokens: 0,
+            agent_tools: Some(tools.clone()),
+            agent_session: Some(session.map_or("none", AgentSession::name).to_string()),
+        }),
+    };
     Ok(Draft {
-        text: parse_draft(answer)?,
+        text: parse_draft(&done.text)?,
         improved: is_improving(request),
         context: ContextReport {
             entries_sent: built.entries_sent,
             entries_omitted: built.entries_omitted,
-            repository: false,
+            repository: repo.is_some(),
+            repo,
         },
     })
 }
@@ -242,5 +391,7 @@ pub async fn prepare(job: &Job, request: &ReplyRequest) -> Result<Built> {
     Ok(capped)
 }
 
+#[cfg(test)]
+mod repo_tests;
 #[cfg(test)]
 mod tests;

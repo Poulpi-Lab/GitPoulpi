@@ -5,8 +5,8 @@ mod refs;
 #[cfg(feature = "submodule")]
 pub use files::submodules;
 pub use files::{
-    blame, conflict_entries, list_tree, merge_document, provably_no_conflicts, provably_no_rebase,
-    read_blob, read_blob_bytes, worktrees,
+    blame, conflict_entries, grep_tree, list_tree, merge_document, provably_no_conflicts,
+    provably_no_rebase, read_blob, read_blob_bytes, worktrees,
 };
 pub use messages::commit_messages;
 pub use refs::{ahead_behind, merge_base, refs, remotes, resolve, stashes};

@@ -681,6 +681,16 @@ pub fn run_bytes(repo_root: &Path, args: &[&str]) -> Result<Vec<u8>> {
     Ok(checked(args, output)?.stdout)
 }
 
+/// [`run_bytes`] for a query whose "nothing found" is exit status 1 (`git
+/// grep`): that gives an empty answer, any other failure is an error.
+pub fn run_lenient_bytes(repo_root: &Path, args: &[&str]) -> Result<Vec<u8>> {
+    let output = git(repo_root, args).output().map_err(spawn_failed)?;
+    if output.status.code() == Some(1) {
+        return Ok(output.stdout);
+    }
+    Ok(checked(args, output)?.stdout)
+}
+
 /// Runs `git <args>` in `repo_root`, writing `stdin` to the child process --
 /// used for `git apply --cached [--reverse] -` when staging/unstaging a
 /// single hunk or a subset of lines.

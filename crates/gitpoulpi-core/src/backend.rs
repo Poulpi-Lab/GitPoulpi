@@ -436,6 +436,22 @@ pub trait GitBackend: Send + Sync {
     /// it from the path list.
     fn list_tree(&self, repo: &RepoRef, at: Oid) -> Result<Vec<PathBuf>>;
 
+    /// The lines of the files **at** `at` that contain any of `terms`
+    /// (plain strings, case-sensitive), at most `max_hits` for each term,
+    /// sorted by path then line. A read: nothing is journaled.
+    ///
+    /// Binary files, LFS pointers and files over
+    /// [`crate::domain::MAX_GREP_FILE_BYTES`] are skipped; blank terms are
+    /// ignored (see [`crate::domain::grep_bytes`] for the rules both
+    /// backends share). An unknown revision is an `Err`.
+    fn grep_tree(
+        &self,
+        repo: &RepoRef,
+        at: Oid,
+        terms: &[String],
+        max_hits: usize,
+    ) -> Result<Vec<crate::domain::GrepHit>>;
+
     /// Per-line attribution for `path` as of the commit `at`.
     ///
     /// Always a committed revision: blaming a dirty working tree would

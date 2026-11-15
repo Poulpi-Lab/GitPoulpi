@@ -282,6 +282,15 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
             let at: Oid = arg_or_err!(args, "at", request.id);
             to_json!(backend.list_tree(&repo, at))
         }
+        OperationKind::GrepTree => {
+            let at: Oid = arg_or_err!(args, "at", request.id);
+            let terms: Vec<String> = arg_or_err!(args, "terms", request.id);
+            let max_hits: usize = args
+                .get("max_hits")
+                .and_then(|v| serde_json::from_value(v.clone()).ok())
+                .unwrap_or(20);
+            to_json!(backend.grep_tree(&repo, at, &terms, max_hits))
+        }
         OperationKind::Conflicts => to_json!(backend.conflicts(&repo)),
         OperationKind::LfsStatus => to_json!(backend.lfs_status(&repo)),
         OperationKind::LfsInstall => {

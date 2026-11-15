@@ -6,6 +6,7 @@ pub mod conflict_prevention;
 mod content;
 mod diff;
 mod file_history;
+mod grep;
 mod image_info;
 mod lfs;
 mod merge_doc;
@@ -50,6 +51,10 @@ pub use diff::{
     HunkId, LineOrigin, LineSelector, StageTarget, StatusEntry,
 };
 pub use file_history::{FileChangeKind, FileHistoryEntry, FileHistoryPage};
+pub use grep::{
+    finish_hits, grep_bytes, hit_text, is_searchable, usable_terms, GrepHit, MAX_GREP_FILE_BYTES,
+    MAX_HIT_TEXT_BYTES,
+};
 pub use image_info::{sniff as sniff_image, ImageFormat, ImageInfo};
 pub use lfs::{
     attributes_mention_lfs, describe_pointer, human_size, lfs_change, parse_lfs_patterns,

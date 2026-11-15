@@ -7,8 +7,9 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use gitpoulpi_core::domain::{
-    Blame, BlameContent, BlameLine, Blob, BlobBody, BlobBytes, BlobContent, BlobSource, LfsPointer,
-    Oid, RepoRef, MAX_TEXT_BLOB_BYTES,
+    finish_hits, usable_terms, Blame, BlameContent, BlameLine, Blob, BlobBody, BlobBytes,
+    BlobContent, BlobSource, GrepHit, LfsPointer, Oid, RepoRef, MAX_GREP_FILE_BYTES,
+    MAX_TEXT_BLOB_BYTES,
 };
 use gitpoulpi_core::{Error, Result};
 
@@ -427,4 +428,123 @@ pub fn list_tree(repo: &RepoRef, at: Oid) -> Result<Vec<PathBuf>> {
         &["ls-tree", "-r", "-z", "--name-only", "--full-tree", &spec],
     )?;
     Ok(fields.into_iter().map(PathBuf::from).collect())
+}
+
+/// The lines of the files at `at` that contain `terms`: one `git grep -F -I`
+/// per term (so each term gets its own cap), then the files the shared rules
+/// exclude (symlinks, over the size cap, LFS pointers) are dropped from the
+/// hits. The rules are `gitpoulpi_core::domain::grep_bytes` / `finish_hits`;
+/// the contract suite holds this to the git2 backend's walk.
+pub fn grep_tree(
+    repo: &RepoRef,
+    at: Oid,
+    terms: &[String],
+    max_hits: usize,
+) -> Result<Vec<GrepHit>> {
+    let rev = at.to_hex();
+    // An unknown revision is an error, not "no hits" (`grep` exits 1 for
+    // both and we read its exit status as "nothing found").
+    run(
+        &repo.root,
+        &["rev-parse", "--verify", &format!("{rev}^{{commit}}")],
+    )?;
+    let terms = usable_terms(terms);
+    if terms.is_empty() || max_hits == 0 {
+        return Ok(Vec::new());
+    }
+
+    // Size and kind of every file, to leave out what git grep would read.
+    let listing = run_bytes(
+        &repo.root,
+        &["ls-tree", "-r", "-l", "-z", "--full-tree", &rev],
+    )?;
+    let mut excluded: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut small: std::collections::HashSet<String> = std::collections::HashSet::new();
+    for record in listing.split(|b| *b == 0).filter(|r| !r.is_empty()) {
+        let record = String::from_utf8_lossy(record);
+        let Some((meta, path)) = record.split_once('\t') else {
+            continue;
+        };
+        let fields: Vec<&str> = meta.split_whitespace().collect();
+        let (mode, size) = (fields.first().copied(), fields.get(3).copied());
+        if mode == Some("120000") {
+            excluded.insert(path.to_string());
+        } else if let Some(size) = size.and_then(|s| s.parse::<u64>().ok()) {
+            if size > MAX_GREP_FILE_BYTES {
+                excluded.insert(path.to_string());
+            } else if size < gitpoulpi_core::domain::LFS_POINTER_MAX_BYTES as u64 {
+                small.insert(path.to_string());
+            }
+        }
+    }
+
+    let prefix = format!("{rev}:");
+    let max_count = max_hits.to_string();
+    let mut hits: Vec<GrepHit> = Vec::new();
+    for term in &terms {
+        let out = crate::process::run_lenient_bytes(
+            &repo.root,
+            &[
+                "grep",
+                "-n",
+                "-F",
+                "-I",
+                "--no-color",
+                "-z",
+                "--max-count",
+                &max_count,
+                "-e",
+                term,
+                &rev,
+                "--",
+            ],
+        )?;
+        // `<rev>:<path> NUL <line> NUL <text> LF`
+        for record in out.split(|b| *b == b'\n') {
+            let mut parts = record.splitn(3, |b| *b == 0);
+            let (Some(path), Some(line), Some(text)) = (parts.next(), parts.next(), parts.next())
+            else {
+                continue;
+            };
+            let path = String::from_utf8_lossy(path);
+            let Some(path) = path.strip_prefix(&prefix) else {
+                continue;
+            };
+            let Ok(line) = String::from_utf8_lossy(line).parse::<u32>() else {
+                continue;
+            };
+            if excluded.contains(path) {
+                continue;
+            }
+            hits.push(GrepHit {
+                term: term.clone(),
+                path: path.to_string(),
+                line,
+                text: gitpoulpi_core::domain::hit_text(&String::from_utf8_lossy(text)),
+            });
+        }
+    }
+
+    // A small file may be an LFS pointer: look at the few that have hits.
+    let mut pointer_free: std::collections::HashMap<String, bool> =
+        std::collections::HashMap::new();
+    let mut kept = Vec::with_capacity(hits.len());
+    for hit in hits {
+        if small.contains(&hit.path) {
+            let searchable = match pointer_free.get(&hit.path) {
+                Some(known) => *known,
+                None => {
+                    let raw = run_bytes(&repo.root, &["show", &format!("{rev}:{}", hit.path)])?;
+                    let ok = LfsPointer::parse(&raw).is_none();
+                    pointer_free.insert(hit.path.clone(), ok);
+                    ok
+                }
+            };
+            if !searchable {
+                continue;
+            }
+        }
+        kept.push(hit);
+    }
+    Ok(finish_hits(kept, &terms, max_hits))
 }

@@ -373,7 +373,7 @@ review_mode = "ask"       # ask | clone | api
 | `ai.enabled` | `false` | 스위치입니다. 꺼져 있으면 AI 관련 항목이 어디에도 표시되지 않고 아무것도 전송되지 않습니다. |
 | `ai.default_profile` | `"default"` | 동작이 프로필을 지정하지 않을 때 사용하는 프로필의 ID. |
 | `ai.global_instructions` | `""` | 모든 동작의 프롬프트에 추가되는 텍스트. `${repo}`, `${uilang}`, ... 를 사용할 수 있습니다([AI > 프롬프트 변수](ai.md#프롬프트-변수) 참고). 동작별 지침과 저장소 지침도 같습니다. |
-| `ai.actions.<action>.profile` | `""` | 한 동작의 프로필. 비어 있으면 기본값. 동작: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`. 워크스페이스(`workspaces.toml`, `[workspace.ai_instructions]`와 `[workspace.ai_overrides.<action>]`)와 저장소는 이 지침에 추가하거나 이를 대체할 수 있습니다: [AI](ai.md#지침)를 참조하세요. |
+| `ai.actions.<action>.profile` | `""` | 한 동작의 프로필. 비어 있으면 기본값. 동작: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`. 워크스페이스(`workspaces.toml`, `[workspace.ai_instructions]`와 `[workspace.ai_overrides.<action>]`)와 저장소는 이 지침에 추가하거나 이를 대체할 수 있습니다: [AI](ai.md#지침)를 참조하세요. |
 | `ai.actions.<action>.instructions` | `""` | 해당 동작에만 추가되는 텍스트. |
 | `ai.review.run_in_repository` | `"profile"` | `profile`, `yes` 또는 `no`: 코드 리뷰 초안의 로컬 에이전트가 해당 실행에서 AI 프로필의 `workdir`을 무시하고 저장소 안에서 작업할지 여부. 저장소가 고유 값을 가질 수 있습니다(`gitpoulpi ai review-context --repo`). [AI > 리뷰 컨텍스트](ai.md#리뷰-컨텍스트)를 참고하세요. |
 | `ai.review.include_claude_md` | `true` | 코드 리뷰 초안에 저장소의 `CLAUDE.md`를 전달합니다(루트, 요청이 대상으로 하는 브랜치에서 읽음, 8 KB에서 잘림). |
@@ -388,7 +388,7 @@ review_mode = "ask"       # ask | clone | api
 | `ai.limits.review_context_bytes` | `16384` | 모든 컨텍스트 파일 합계의 최대 바이트 수. 이를 넘으면 *잘라서 보내기*가 한도를 넘는 파일을 줄이고 그 뒤의 파일은 제외합니다. 범위는 같습니다. |
 | `ai.privacy.redact_secrets` | `true` | 스캐너가 인식하는 모든 비밀 정보(토큰, 개인 키 블록, URL 안의 비밀번호, 값이 무작위로 보이는 `password = ...`)를 요청이 나가기 전에 `[REDACTED:<rule>]`로 대체합니다. 꺼져 있는 동안 설정 > AI에 빨간 경고가 표시됩니다. |
 | `ai.privacy.exclude_sensitive_files` | `true` | `privacy.sensitive_patterns`에 일치하는 모든 파일의 diff를 전송 내용에서 제외합니다. 저장소 폴더에서 작업하는 로컬 에이전트는 여전히 파일을 직접 읽을 수 있습니다: [AI > 개인정보](ai.md#개인정보)를 참고하세요. |
-| `ai.sent_preview.<action>` | `true` | 동작마다 키 하나(`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`): 요청이 나가기 전에 "보내는 내용"을 표시합니다. 대화상자의 "다시 표시하지 않기"는 `false`를 기록하고, 설정 > AI > *보내기 전에 전송 내용 표시...*가 다시 켭니다. |
+| `ai.sent_preview.<action>` | `true` | 동작마다 키 하나(`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`): 요청이 나가기 전에 "보내는 내용"을 표시합니다. 대화상자의 "다시 표시하지 않기"는 `false`를 기록하고, 설정 > AI > *보내기 전에 전송 내용 표시...*가 다시 켭니다. `worktree_name`도 받아들여지지만 효과가 없습니다: 워크트리 만들기 대화상자에 입력한 내용과 로컬 브랜치 이름만 보내기 때문입니다. |
 
 저장소 고유의 `[preferences.ai_review]` 테이블(`repo-state.toml`에 있으며, 클론되지 않은 저장소의 항목은 `remote-reviews.toml`에 있음)은 같은 키를 모두 선택 사항으로 받고, 추가로 `no_extra_file = true`를 받습니다. 이는 `ai.review.extra_file`이 무엇이든 그 저장소에는 추가 파일이 없다는 뜻입니다. 설정하지 않은 키, 설정하지 않은 `extra_file`, 없는 `no_extra_file`은 전역 값을 상속하며, `extra_file`을 파일로 설정하면 스위치가 지워지고 그 반대도 마찬가지입니다.
 
@@ -552,7 +552,7 @@ stage_file = "z"
 | `hosting_integration` | 여기에 고정된 `[[integrations]]` 프로필 | `gitpoulpi hosting use --id` |
 | `pulls_source`, `issues_source` | PR / 이슈 목록이 읽는 제공자 프로젝트, `{ integration, project, filter }` 형태. `filter`는 선택 사항입니다: 목록 쿼리에 AND로 붙는 제공자 고유의 추가 절(Jira JQL 조각, Azure WIQL 조건, Trello 목록 이름). GitHub와 GitLab은 무시합니다. | 사이드바 섹션, `gitpoulpi hosting link` |
 | `ref_visibility` | 숨기거나 솔로로 지정한 ref | Refs 사이드바, `gitpoulpi refs hide\|show\|solo` |
-| `hidden_remotes` | 그래프에서 통째로 숨긴 리모트(모든 브랜치, 나중에 fetch하는 것 포함) | 리모트의 눈 아이콘과 메뉴, `gitpoulpi refs hide --remote` |
+| `hidden_remotes` | 그래프에서 통째로 숨긴 리모트(모든 브랜치, 나중에 fetch하는 것 포함) | 리모트의 ⊙와 메뉴, `gitpoulpi refs hide --remote` |
 | `folds`, `collapsed_*_ref_folders` | 접힌 사이드바 섹션과 브랜치 및 tag 폴더. `[folds]`에는 `status_folders`(스테이징 안 된 / 스테이징된 파일 트리의 접힌 폴더)와 `commit_folders`(commit의 변경된 파일 트리의 접힌 폴더. 모든 commit에 동일)도 있으며, 각각 500개 경로로 제한되고 오래된 것부터 삭제됩니다 | 사이드바, 파일 트리 |
 | `pending_auto_stash` | GitPoulpi가 만들었으나 아직 되돌리지 않은 stash | 데몬이 기록. [자동 stash](log-and-history.md#자동-stash) 참고 |
 

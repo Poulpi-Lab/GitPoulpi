@@ -10,7 +10,7 @@ use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::style::{Modifier, Style};
 
-use super::{Bar, Focus, Hit, ItemView};
+use super::{Bar, Compose, Focus, Hit, ItemView};
 use crate::dialog_kit::{self, ButtonState, CheckState};
 use crate::md_render::sanitize;
 use crate::th;
@@ -51,8 +51,16 @@ fn flavor_name(flavor: MarkupFlavor) -> &'static str {
 /// "Posting as ..." for `id`: who a post would be made as, always shown.
 pub(crate) fn identity_line(id: &PostingIdentity) -> String {
     let name = sanitize(&id.display);
-    if id.kind == IdentityKind::LocalAuthor {
-        return m::writing_as_local(name);
+    match id.kind {
+        IdentityKind::LocalAuthor => return m::writing_as_local(name),
+        IdentityKind::AppBot if id.login.is_none() => {
+            return m::POSTING_APP_BOT_UNKNOWN.get().to_string();
+        }
+        IdentityKind::AppBot => return m::posting_as_app_bot(name),
+        IdentityKind::ProjectOrGroupBot if !name.is_empty() => {
+            return m::posting_as_project_bot(name);
+        }
+        _ => {}
     }
     if name.is_empty() {
         return m::POSTING_UNKNOWN.get().to_string();
@@ -117,6 +125,9 @@ impl ItemView {
         // The popups, last, over everything.
         if let Some(menu) = self.menu.as_mut() {
             menu.combo.render_popup(buf, area);
+        }
+        if let Some((confirm, _)) = self.delete_ask.as_mut() {
+            confirm.render(buf, area);
         }
         self.guard.render(buf);
     }
@@ -293,23 +304,46 @@ impl ItemView {
             rect.width,
             Style::default().fg(th().ui.border).bg(th().ui.panel),
         );
+        let title = match &self.compose {
+            Compose::New => m::NEW_COMMENT.get().to_string(),
+            Compose::Reply { label, .. } => m::composer_reply_title(sanitize(label)),
+            Compose::Edit { .. } => m::COMPOSER_EDIT_TITLE.get().to_string(),
+        };
+        let sending = self.conv.is_writing();
+        let title = if sending {
+            format!(" {title} - {} ", m::SENDING.get())
+        } else {
+            format!(" {title} ")
+        };
         dialog_kit::put(
             buf,
             rect.x + 1,
             rect.y,
-            &format!(" {} ", m::NEW_COMMENT.get()),
+            &title,
             rect.width.saturating_sub(2),
             Style::default()
                 .fg(th().ui.text)
                 .bg(th().ui.panel)
                 .add_modifier(Modifier::BOLD),
         );
+        // A refusal sits under the text, in its own row.
+        let error_row = self.compose_error.is_some() && rect.height >= 5;
         let editor = Rect::new(
             rect.x,
             rect.y + 1,
             rect.width,
-            rect.height.saturating_sub(2),
+            rect.height.saturating_sub(if error_row { 3 } else { 2 }),
         );
+        if let (true, Some(error)) = (error_row, &self.compose_error) {
+            dialog_kit::put(
+                buf,
+                rect.x + 1,
+                rect.bottom() - 2,
+                &sanitize(error),
+                rect.width.saturating_sub(2),
+                Style::default().fg(th().status.danger).bg(th().ui.panel),
+            );
+        }
         self.composer_rect = editor;
         let focused = self.focus == Focus::Composer && !self.guard.is_open();
         let write_flavor = self.conv.caps.as_ref().map(|c| c.write_flavor);
@@ -325,11 +359,39 @@ impl ItemView {
         }
         // The footer: the markup it is written in, and the buttons.
         let y = rect.bottom() - 1;
+        let mut left = rect.x + 1;
         if let Some(f) = write_flavor {
-            dialog_kit::put(buf, rect.x + 1, y, flavor_name(f), rect.width / 2, muted());
+            let used = dialog_kit::put(buf, left, y, flavor_name(f), rect.width / 3, muted());
+            left = used.right() + 2;
         }
         let hovered = |h: Hit| self.hover == Some(h);
-        let send_label = m::BTN_SEND.get();
+        let mut internal_hit = None;
+        if self.conv.caps.as_ref().is_some_and(|c| c.internal_notes)
+            && self.compose == Compose::New
+        {
+            let label_w = crate::ui_kit::display_width(m::INTERNAL_NOTE.get()) as u16 + 4;
+            if left + label_w + 40 < rect.right() {
+                let r = dialog_kit::checkbox(
+                    buf,
+                    left,
+                    y,
+                    label_w,
+                    m::INTERNAL_NOTE.get(),
+                    self.internal,
+                    CheckState::Enabled {
+                        hovered: hovered(Hit::Internal),
+                        focused: false,
+                    },
+                );
+                crate::pointer_map::hand(r);
+                internal_hit = Some(r);
+            }
+        }
+        let send_label = match &self.compose {
+            Compose::New => m::BTN_SEND.get(),
+            Compose::Reply { .. } => gitpoulpi_i18n::msg::conversation_ui::BTN_REPLY.get(),
+            Compose::Edit { .. } => m::BTN_SAVE.get(),
+        };
         let cancel_label = m::BTN_CANCEL.get();
         let send_w = dialog_kit::button_width(send_label);
         let cancel_w = dialog_kit::button_width(cancel_label);
@@ -375,6 +437,9 @@ impl ItemView {
         }
         self.hits.push((send, Hit::Send));
         self.hits.push((cancel, Hit::Cancel));
+        if let Some(r) = internal_hit {
+            self.hits.push((r, Hit::Internal));
+        }
     }
 
     // -- the last row -------------------------------------------------------------------

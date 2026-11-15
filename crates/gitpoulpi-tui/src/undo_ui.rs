@@ -17,7 +17,26 @@ use gitpoulpi_i18n::msg;
 /// Why the Undo button and the palette entry are idle: there is nothing in
 /// the journal, and a push or any other operation on a server never is.
 pub(crate) fn nothing_to_undo() -> &'static str {
-    msg::undo_ui::NOTHING_TO_UNDO.get()
+    if outward_comment() {
+        msg::undo_ui::NOTHING_TO_UNDO_COMMENT.get()
+    } else {
+        msg::undo_ui::NOTHING_TO_UNDO.get()
+    }
+}
+
+thread_local! {
+    static OUTWARD_COMMENT: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// A comment was posted, edited or deleted on a host from this window: that
+/// is outward and has no journal entry, so when Undo has nothing to offer it
+/// says why (the comment itself is changed or deleted from its own view).
+pub(crate) fn note_outward_comment() {
+    OUTWARD_COMMENT.with(|c| c.set(true));
+}
+
+fn outward_comment() -> bool {
+    OUTWARD_COMMENT.with(std::cell::Cell::get)
 }
 
 /// An undo or redo the daemon would only do after the user agreed
@@ -233,6 +252,9 @@ pub(crate) fn tooltip(state: &JournalState, d: Direction, busy: bool) -> String 
         .to_string();
     }
     match side(state, d) {
+        (None, _) if d == Direction::Undo && outward_comment() => {
+            msg::undo_ui::TIP_NOTHING_TO_UNDO_COMMENT.get().to_string()
+        }
         (None, _) if d == Direction::Undo => msg::undo_ui::TIP_NOTHING_TO_UNDO.get().to_string(),
         (None, _) => msg::undo_ui::TIP_NOTHING_TO_REDO.get().to_string(),
         (Some(entry), Some(refusal)) => match d {
@@ -367,6 +389,24 @@ mod tests {
             reason(&s, Direction::Redo, false).as_deref(),
             Some("nothing to redo")
         );
+    }
+
+    #[test]
+    fn a_comment_posted_to_a_host_is_not_undoable_and_undo_says_so() {
+        let s = JournalState::default();
+        note_outward_comment();
+        let tip = tooltip(&s, Direction::Undo, false);
+        assert!(
+            tip.contains("comment posted to a host can't be undone here"),
+            "{tip}"
+        );
+        assert!(tip.contains("edit or delete it"), "{tip}");
+        let why = reason(&s, Direction::Undo, false).unwrap();
+        assert!(why.contains("comment posted to a host"), "{why}");
+        assert_eq!(nothing_to_undo(), why);
+        // An undoable entry still shows as the thing Undo would do.
+        let ready = tooltip(&state(), Direction::Undo, false);
+        assert!(ready.starts_with("Undo Commit"), "{ready}");
     }
 
     #[test]

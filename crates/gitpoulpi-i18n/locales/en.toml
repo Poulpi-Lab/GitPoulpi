@@ -5824,6 +5824,10 @@ redo_label = "Redo {label}"
 # context: {key} is the key chord, after a middle dot
 undo_label_key = "Undo {label} \u00b7 {key}"
 redo_label_key = "Redo {label} \u00b7 {key}"
+# context: why Undo is idle after a comment was posted to a host
+nothing_to_undo_comment = "nothing to undo (a comment posted to a host can't be undone here: edit or delete it instead)"
+# context: tooltip of Undo after a comment was posted to a host
+tip_nothing_to_undo_comment = "Nothing to undo (a comment posted to a host can't be undone here: edit or delete it instead)"
 
 # Status + diffs: the working-changes lists, the Diff / File View bars,
 # hunk and line buttons, file menus, confirmations and the new-file dialog.
@@ -12356,6 +12360,8 @@ ev_referenced = "mentioned this in {from}"
 ev_status = "changed the status from {from} to {to}"
 # context: event line, after the actor's name; {who} is the reviewer asked. Width budget: 50 cells
 ev_review_requested = "requested a review from {who}"
+# context: button on the selected comment: reply with its text quoted. Width budget: 10 cells
+btn_quote = "Quote"
 
 [item_view]
 # context: shown while the conversation is read from the host. Width budget: 40 cells
@@ -12528,3 +12534,47 @@ palette_toggle_split = "Conversation: Toggle the Split View"
 palette_send = "Conversation: Send the Comment"
 # context: command palette entry
 palette_close = "Conversation: Close"
+# context: who a comment would be posted as; {name} is the login of the GitHub App bot. Width budget: 70 cells
+posting_as_app_bot = "Posting as {name} (GitHub App bot)"
+# context: who a comment would be posted as when the bot login is not known. Width budget: 100 cells
+posting_app_bot_unknown = "Posting as the GitHub App bot (its name is not known yet: set Post as in Settings)"
+# context: who a comment would be posted as; {name} is the login of a project or group access token bot. Width budget: 70 cells
+posting_as_project_bot = "Posting as {name} (project bot)"
+# context: button under the comment box when an own comment is edited: save the change. Width budget: 12 cells
+btn_save = "Save"
+# context: title of the comment box when answering a thread; {who} is the author or the place in the code. Width budget: 40 cells
+composer_reply_title = "Reply to {who}"
+# context: title of the comment box when an own comment is edited. Width budget: 24 cells
+composer_edit_title = "Edit comment"
+# context: shown in the comment box while the host takes the comment. Width budget: 14 cells
+sending = "Sending..."
+# context: checkbox under the comment box: only project members see the note. Width budget: 26 cells
+internal_note = "Internal note"
+# context: why Reply, Edit or Quote does nothing. Width budget: 60 cells
+why_composer_busy = "finish or cancel the text in the comment box first"
+# context: why a comment action does nothing. Width budget: 40 cells
+why_sending = "a comment is being sent"
+# context: why the internal note row does nothing. Width budget: 50 cells
+why_no_internal = "this host has no internal notes"
+# context: why Edit or Delete does nothing on a comment still being sent. Width budget: 50 cells
+why_unsent = "this comment is not on the host yet"
+# context: title of the question before a comment is deleted. Width budget: 40 cells
+delete_title = "Delete this comment?"
+# context: question before a comment is deleted. Width budget: 100 cells
+delete_body = "It is removed from the host for everyone. This cannot be undone from here."
+# context: button that deletes the comment. Width budget: 12 cells
+delete_confirm = "Delete"
+# context: button that keeps the comment. Width budget: 12 cells
+delete_keep = "Keep"
+# context: error under the comment box; {why} is the host's message. Width budget: 100 cells
+send_failed = "not sent: {why}"
+# context: error under the comment box; {why} is the host's message. Width budget: 100 cells
+edit_failed = "not saved: {why}"
+# context: message when the host refused to delete a comment; {why} is its message. Width budget: 100 cells
+delete_failed = "not deleted: {why}"
+# context: command palette entry
+palette_quote = "Conversation: Quote Entry"
+# context: command palette entry
+palette_toggle_internal = "Conversation: Toggle Internal Note"
+# context: why Save does nothing when the edited comment has the same text. Width budget: 40 cells
+why_unchanged = "nothing changed yet"

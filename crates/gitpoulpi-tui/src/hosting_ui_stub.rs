@@ -287,6 +287,9 @@ impl HostingUi {
     pub(crate) fn reveal(&mut self, _list: HostingList, _number: u64) -> RevealOutcome {
         RevealOutcome::NotLinked
     }
+    pub(crate) fn item_effect(&self, _number: u64, _pr: bool) -> HostingEffect {
+        HostingEffect::None
+    }
     pub(crate) fn focus_row(&self, _list: HostingList) -> Option<usize> {
         None
     }

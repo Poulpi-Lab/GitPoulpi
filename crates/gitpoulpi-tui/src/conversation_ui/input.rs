@@ -17,6 +17,7 @@ pub(crate) enum Act {
     /// The widget took the event (a move, a scroll, a hover).
     Handled,
     Reply,
+    Quote,
     Edit,
     Delete,
     /// Open the menu of the selected entry's links.
@@ -67,6 +68,7 @@ impl Conversation {
                 return match c {
                     'q' => Some(Act::Close),
                     'r' => Some(Act::Reply),
+                    'Q' => Some(Act::Quote),
                     'e' => Some(Act::Edit),
                     'd' => Some(Act::Delete),
                     'l' => Some(Act::Links),
@@ -138,6 +140,7 @@ impl Conversation {
                     self.select(i);
                     Some(match btn {
                         Btn::Reply => Act::Reply,
+                        Btn::Quote => Act::Quote,
                         Btn::Edit => Act::Edit,
                         Btn::Delete => Act::Delete,
                         Btn::Links => Act::Links,

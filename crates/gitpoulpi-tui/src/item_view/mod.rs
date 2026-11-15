@@ -1,13 +1,18 @@
-//! The conversation view of an issue or a pull / merge request, read-only
-//! (the write slice adds sending, editing and deleting).
+//! The conversation view of an issue or a pull / merge request: read it, and
+//! write to it (post, reply, quote, edit and delete your own comments).
 //!
 //! A full-window modal owned by `RepoDialogs` (`RepoDialog::Item`), like the
 //! review and the board: keys, mouse, paste and the per-frame poll all arrive
 //! there. The timeline is the shared widget (`conversation_ui`); this module
 //! is the surface around it: the frame with its close cross, the header, the
 //! "Posting as ..." line, the composer dock (Write / Preview / Split through
-//! `md_editor`, its Send greyed with the reason until writing lands), the
-//! menu of an entry's links and the **Back stack**.
+//! `md_editor`; Send greyed with its reason), the question before a delete,
+//! the menu of an entry's links and the **Back stack**.
+//!
+//! Writing: the text goes to the host on a worker, the entry shows at once
+//! and is taken back, with the text still in the composer and the error
+//! under it, when the host refuses. Posting is outward: nothing is journaled
+//! and nothing can be undone (`undo_ui` says so).
 //!
 //! Links: a `#7` of the repository's linked sources opens in this view and
 //! the previous one goes on the stack (`Back`); a commit reveals in the Log;
@@ -34,8 +39,9 @@ use ratatui::layout::Rect;
 
 use crate::combo::Combo;
 use crate::conversation_ui::worker::Source;
+use crate::conversation_ui::write::WriteOp;
 use crate::conversation_ui::{self as cu, Conversation};
-use crate::dialog_kit;
+use crate::dialog_kit::{self, Confirm};
 use crate::hosting_task::ClientFactory;
 use crate::item_cmd::ItemAvail;
 use crate::md_editor::MdEditor;
@@ -124,6 +130,29 @@ impl ItemTarget {
             "comment",
         ])
     }
+
+    fn reply_draft_key(&self, discussion: &str) -> String {
+        crate::md_editor::draft::key(&[
+            &self.integration.id,
+            &self.project,
+            &format!("{}#{}", kind_word(self.key.kind), self.key.number),
+            "reply",
+            discussion,
+        ])
+    }
+
+    /// Whether a change the host announced is about this item.
+    fn is(&self, change: &gitpoulpi_ipc::HostingChangeArgs) -> bool {
+        use gitpoulpi_ipc::HostingItemKind as K;
+        change.integration_id == self.integration.id
+            && change.project == self.project
+            && change.number == self.key.number
+            && matches!(
+                (change.kind, self.key.kind),
+                (K::Issue, ItemKind::Issue) | (K::PullRequest, ItemKind::PullRequest)
+            )
+            && (change.id.is_empty() || self.key.id.is_empty() || change.id == self.key.id)
+    }
 }
 
 fn kind_word(kind: ItemKind) -> &'static str {
@@ -210,6 +239,35 @@ pub(super) enum Hit {
     Bar(Bar),
     Send,
     Cancel,
+    Internal,
+}
+
+/// What the comment box is writing.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(super) enum Compose {
+    /// A new comment on the item (quotes are put in it).
+    New,
+    /// An answer in a discussion or a code thread.
+    Reply { discussion: String, label: String },
+    /// A new text for one of our comments; `original` is what it said.
+    Edit { id: String, original: String },
+}
+
+/// The answers of the question before a delete.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum DeleteChoice {
+    Keep,
+    Delete,
+}
+
+/// Whose "discard" the open question is.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub(super) enum Discarding {
+    /// The view is closing.
+    #[default]
+    Close,
+    /// Only the comment box is put away.
+    Composer,
 }
 
 /// The item the view came from: what Back returns to.
@@ -232,6 +290,14 @@ pub(crate) struct ItemView {
     pub(super) focus: Focus,
     pub(super) md: Option<MdEditor>,
     pub(super) composer_open: bool,
+    pub(super) compose: Compose,
+    /// What the host last said when a send failed (shown under the text).
+    pub(super) compose_error: Option<String>,
+    /// The new comment is an internal note (hosts that have them).
+    pub(super) internal: bool,
+    /// "Delete this comment?", with the comment it is about.
+    pub(super) delete_ask: Option<(Confirm<DeleteChoice>, String)>,
+    pub(super) discarding: Discarding,
     pub(super) menu: Option<LinkMenu>,
     pub(super) guard: dialog_kit::DiscardGuard,
     pub(super) hits: Vec<(Rect, Hit)>,
@@ -246,6 +312,7 @@ pub(crate) struct ItemView {
 impl ItemView {
     /// Opens the view and starts the read.
     pub(crate) fn open(target: ItemTarget, factory: Arc<dyn ClientFactory>) -> Self {
+        register_scope(&target);
         let conv = Self::open_conversation(&target, &factory);
         Self {
             target,
@@ -255,6 +322,11 @@ impl ItemView {
             focus: Focus::Timeline,
             md: None,
             composer_open: true,
+            compose: Compose::New,
+            compose_error: None,
+            internal: false,
+            delete_ask: None,
+            discarding: Discarding::Close,
             menu: None,
             guard: Default::default(),
             hits: Vec::new(),
@@ -266,7 +338,7 @@ impl ItemView {
     }
 
     fn open_conversation(target: &ItemTarget, factory: &Arc<dyn ClientFactory>) -> Conversation {
-        let (seen, events) = match target.state_path() {
+        let (seen, events, posted) = match target.state_path() {
             Some(path) => {
                 let state = gitpoulpi_session::RepoState::load(&path).unwrap_or_default();
                 (
@@ -276,21 +348,24 @@ impl ItemView {
                         .map(|s| s.at.clone())
                         .filter(|a| !a.is_empty()),
                     state.conversation_events.unwrap_or(true),
+                    state.posted_comments_of(&target.seen_key()),
                 )
             }
-            None => (None, true),
+            None => (None, true, Vec::new()),
         };
         let cache_dir = target
             .state_path()
             .and_then(|p| p.parent().map(PathBuf::from));
-        Conversation::new(
+        let mut conv = Conversation::new(
             Arc::clone(factory),
             target.source(),
             cache_dir,
             target.md_context(),
             seen,
             events,
-        )
+        );
+        conv.set_write_context(target.state_path(), target.seen_key(), posted);
+        conv
     }
 
     // -- state the owner and the palette read ----------------------------------
@@ -318,20 +393,37 @@ impl ItemView {
 
     /// The palette's keys reach the view unless a field or a popup has them.
     pub(crate) fn takes_palette(&self) -> bool {
-        self.focus != Focus::Composer && self.menu.is_none() && !self.guard.is_open()
+        self.focus != Focus::Composer
+            && self.menu.is_none()
+            && !self.guard.is_open()
+            && self.delete_ask.is_none()
     }
 
     /// Why Send does nothing now (`None`: it would send).
     pub(super) fn send_reason(&self) -> Option<&'static str> {
         use gitpoulpi_i18n::msg::item_view as m;
-        if !cu::WRITING {
-            return Some(m::WHY_WRITING_LATER.get());
+        if self.conv.is_writing() {
+            return Some(m::WHY_SENDING.get());
         }
-        if self.conv.caps.is_none() {
+        let Some(caps) = &self.conv.caps else {
             return Some(m::WHY_NOT_LOADED.get());
-        }
-        if !self.conv.can_comment() {
-            return Some(m::WHY_NO_COMMENT.get());
+        };
+        match &self.compose {
+            Compose::Edit { .. } => {
+                if !caps.edit_own {
+                    return Some(m::WHY_NO_EDIT.get());
+                }
+            }
+            Compose::Reply { .. } => {
+                if !caps.reply_in_thread {
+                    return Some(m::WHY_NO_REPLY.get());
+                }
+            }
+            Compose::New => {
+                if !caps.comment {
+                    return Some(m::WHY_NO_COMMENT.get());
+                }
+            }
         }
         if self.conv.is_offline() {
             return Some(m::WHY_OFFLINE.get());
@@ -339,27 +431,49 @@ impl ItemView {
         if self.md.as_ref().is_none_or(|e| e.is_blank()) {
             return Some(m::WHY_EMPTY.get());
         }
+        if !self.composer_dirty() {
+            return Some(m::WHY_UNCHANGED.get());
+        }
         None
     }
 
     pub(crate) fn avail(&self) -> ItemAvail {
         use gitpoulpi_i18n::msg::item_view as m;
-        let has_entry = self.conv.selected_comment().is_some();
+        let has_entry = self.conv.writable_comment().is_some();
+        let sending = self.conv.is_writing().then(|| m::WHY_SENDING.get());
+        let unsent = self
+            .conv
+            .writable_comment()
+            .is_some_and(|c| cu::write::is_pending(&c.id));
         let edit = if !self.conv.caps.as_ref().is_some_and(|c| c.edit_own) {
             Some(m::WHY_NO_EDIT.get())
+        } else if unsent {
+            Some(m::WHY_UNSENT.get())
         } else if !has_entry || !self.conv.can_edit_selected() {
             Some(m::WHY_NOT_YOURS.get())
-        } else if !cu::WRITING {
-            Some(m::WHY_WRITING_LATER.get())
         } else {
-            None
+            sending
         };
         let delete = if !self.conv.caps.as_ref().is_some_and(|c| c.delete_own) {
             Some(m::WHY_NO_DELETE.get())
+        } else if unsent {
+            Some(m::WHY_UNSENT.get())
         } else if !has_entry || !self.conv.can_delete_selected() {
             Some(m::WHY_NOT_YOURS.get())
-        } else if !cu::WRITING {
-            Some(m::WHY_WRITING_LATER.get())
+        } else {
+            sending
+        };
+        let quote = match self.conv.reply_reason() {
+            Some(why) => Some(why),
+            None if self.conv.selected_entry().is_none() && self.conv.selected().is_none() => {
+                Some(m::WHY_NOT_LOADED.get())
+            }
+            None => None,
+        };
+        let internal = if !self.conv.caps.as_ref().is_some_and(|c| c.internal_notes) {
+            Some(m::WHY_NO_INTERNAL.get())
+        } else if !matches!(self.compose, Compose::New) {
+            Some(m::WHY_NO_INTERNAL.get())
         } else {
             None
         };
@@ -371,9 +485,11 @@ impl ItemView {
             has_links: self.conv.selected().is_some_and(|i| !i.links.is_empty()),
             has_url: self.conv.selected_url().is_some(),
             reply: self.conv.reply_reason(),
+            quote,
             edit,
             delete,
             send: self.send_reason(),
+            internal,
             has_events: self.conv.caps.as_ref().is_some_and(|c| c.events),
             split_fits: self
                 .md
@@ -393,6 +509,7 @@ impl ItemView {
     /// Creates the composer when the capabilities say it can exist.
     pub(super) fn ensure_composer(&mut self) {
         if self.md.is_none() && self.composer_available() {
+            self.compose = Compose::New;
             let md = MdEditor::new(String::new(), self.target.md_context())
                 .with_draft(self.target.draft_key());
             self.md = Some(md);
@@ -400,7 +517,112 @@ impl ItemView {
     }
 
     pub(super) fn composer_dirty(&self) -> bool {
-        self.md.as_ref().is_some_and(|e| !e.is_blank())
+        let Some(md) = self.md.as_ref() else {
+            return false;
+        };
+        match &self.compose {
+            Compose::Edit { original, .. } => md.text() != original,
+            _ => !md.is_blank(),
+        }
+    }
+
+    /// Puts the comment box in `mode`, with `text` in it. A box holding
+    /// unsent text of another kind is never replaced: that says why.
+    pub(super) fn start_compose(
+        &mut self,
+        mode: Compose,
+        text: String,
+    ) -> Result<(), &'static str> {
+        use gitpoulpi_i18n::msg::item_view as m;
+        if self.conv.is_writing() {
+            return Err(m::WHY_SENDING.get());
+        }
+        if self.md.is_some() && self.compose != mode && self.composer_dirty() {
+            return Err(m::WHY_COMPOSER_BUSY.get());
+        }
+        if self.md.is_none() || self.compose != mode {
+            let ctx = self.target.md_context();
+            let md = MdEditor::new(text, ctx);
+            let md = match &mode {
+                Compose::New => md.with_draft(self.target.draft_key()),
+                Compose::Reply { discussion, .. } => {
+                    md.with_draft(self.target.reply_draft_key(discussion))
+                }
+                Compose::Edit { .. } => md,
+            };
+            self.md = Some(md);
+            self.compose = mode;
+            self.compose_error = None;
+        }
+        self.composer_open = true;
+        self.focus = Focus::Composer;
+        Ok(())
+    }
+
+    /// The comment box is let go of: a draft stays for the next visit.
+    pub(super) fn release_composer(&mut self) {
+        self.md = None;
+        self.compose = Compose::New;
+        self.compose_error = None;
+        self.internal = false;
+    }
+
+    /// The comment box goes back to a plain new comment, its text gone.
+    pub(super) fn reset_composer(&mut self) {
+        if let Some(md) = self.md.as_mut() {
+            md.discard();
+        }
+        self.md = None;
+        self.compose = Compose::New;
+        self.compose_error = None;
+        self.internal = false;
+    }
+
+    /// What a finished write means for the box and the status.
+    fn on_write_done(&mut self, done: cu::write::WriteDone) {
+        use gitpoulpi_i18n::msg::item_view as m;
+        match (&done.op, done.result) {
+            (WriteOp::Delete { .. }, Ok(())) => {
+                crate::undo_ui::note_outward_comment();
+            }
+            (WriteOp::Delete { .. }, Err(why)) => {
+                self.message = Some(m::delete_failed(why));
+            }
+            (op, Ok(())) => {
+                crate::undo_ui::note_outward_comment();
+                if let Some(md) = self.md.as_mut() {
+                    md.sent();
+                }
+                self.md = None;
+                self.compose = Compose::New;
+                self.compose_error = None;
+                self.internal = false;
+                self.focus = Focus::Timeline;
+                let _ = op;
+            }
+            (op, Err(why)) => {
+                // The text is still in the box: nothing the user typed is lost.
+                self.compose_error = Some(match op {
+                    WriteOp::Edit { .. } => m::edit_failed(why),
+                    _ => m::send_failed(why),
+                });
+                self.composer_open = true;
+                self.focus = Focus::Composer;
+            }
+        }
+    }
+
+    /// The host says an item changed (the CLI or MCP wrote to it): read it
+    /// again when it is the one shown, or one waiting on the Back stack.
+    pub(crate) fn on_hosting_changed(&mut self, change: &gitpoulpi_ipc::HostingChangeArgs) {
+        if self.target.is(change) {
+            self.conv.request_refresh();
+        }
+        for f in &mut self.stack {
+            if f.target.is(change) {
+                f.conv.request_refresh();
+            }
+        }
     }
 
     // -- polling -------------------------------------------------------------------
@@ -408,6 +630,12 @@ impl ItemView {
     /// Drains the worker and runs the timer; what the owner has to do.
     pub(crate) fn poll(&mut self) -> ItemEffect {
         self.conv.poll();
+        if let Some(done) = self.conv.take_write_done() {
+            self.on_write_done(done);
+        }
+        if self.conv.wants_refresh() {
+            self.conv.refresh_quietly();
+        }
         self.ensure_composer();
         if self.auto_refreshes() && !self.conv.busy() && self.conv.since_fresh() >= AUTO_REFRESH {
             self.conv.refresh_quietly();
@@ -419,6 +647,7 @@ impl ItemView {
 
     /// Leaves the item for another one: this one waits on the stack.
     pub(super) fn push_item(&mut self, target: ItemTarget) {
+        register_scope(&target);
         mark_seen(&self.target, &self.conv);
         let conv = Self::open_conversation(&target, &self.factory);
         let old_target = std::mem::replace(&mut self.target, target);
@@ -427,8 +656,9 @@ impl ItemView {
             target: old_target,
             conv: old_conv,
         });
-        self.md = None;
+        self.release_composer();
         self.menu = None;
+        self.delete_ask = None;
         self.focus = Focus::Timeline;
     }
 
@@ -440,8 +670,9 @@ impl ItemView {
         mark_seen(&self.target, &self.conv);
         self.target = frame.target;
         self.conv = frame.conv;
-        self.md = None;
+        self.release_composer();
         self.menu = None;
+        self.delete_ask = None;
         self.focus = Focus::Timeline;
         true
     }
@@ -458,6 +689,15 @@ impl Drop for ItemView {
         for f in &self.stack {
             mark_seen(&f.target, &f.conv);
         }
+    }
+}
+
+/// Tells the hosting clients which repository this item's project is, so its
+/// stored settings (the token command, "Post as", the learned bot login)
+/// apply to what is posted.
+fn register_scope(target: &ItemTarget) {
+    if let Some(root) = &target.repo_root {
+        gitpoulpi_daemon::hosting_scope::register(root, &target.integration.id, &target.project);
     }
 }
 

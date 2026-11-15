@@ -1112,6 +1112,59 @@ mod tests {
         }
     }
 
+    /// A repository that blocks assignment: the form has no assignee picker,
+    /// says why, and sends no assignee even if one was chosen before.
+    #[test]
+    fn a_blocked_repository_has_no_assignee_picker_in_the_issue_form() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        let state_dir = gitpoulpi_config::Settings::resolve_ambient()
+            .map(|s| s.config().session.per_repo_state_dir.clone())
+            .unwrap_or_else(|_| gitpoulpi_config::DEFAULT_REPO_DATA_LOCATION.to_string());
+        let path = gitpoulpi_session::RepoState::path_for(root, &state_dir);
+        let seed = IssueSeed {
+            integration: Integration::new(
+                "blocked-form",
+                IntegrationKind::GitlabSelfManaged,
+                "http://h",
+            ),
+            provider: "corp".into(),
+            project: "blocked/form".into(),
+        };
+        gitpoulpi_daemon::hosting_scope::register(root, "blocked-form", "blocked/form");
+        let mut form = IssueDialog::new(seed);
+        form.meta.selection.apply(meta_picker::Applied::List(
+            MetaField::Assignees,
+            vec!["ann".into()],
+        ));
+        type_text(&mut form, "T");
+        // Allowed (no file): the picker is there and the choice is sent.
+        assert!(form.order().contains(&IssueFocus::MetaAssignees));
+        assert_eq!(form.plan().unwrap().assignees, ["ann"]);
+
+        gitpoulpi_session::RepoState {
+            assignment_blocked: true,
+            ..Default::default()
+        }
+        .save(&path)
+        .unwrap();
+        assert!(!form.order().contains(&IssueFocus::MetaAssignees));
+        assert!(form.plan().unwrap().assignees.is_empty());
+        let area = Rect::new(0, 0, 100, 30);
+        let mut buf = Buffer::empty(area);
+        form.render(issue_rect(area), &mut buf);
+        let text = crate::dialog_kit::buffer_text(&buf);
+        assert!(!text.contains("Assignees"), "{text}");
+        assert!(
+            text.contains("assignment is blocked in this repository"),
+            "{text}"
+        );
+        assert!(
+            text.contains("Labels: none"),
+            "the other pickers stay:\n{text}"
+        );
+    }
+
     #[test]
     fn a_redmine_form_has_a_tracker_dropdown_and_no_labels_button() {
         let seed = IssueSeed {

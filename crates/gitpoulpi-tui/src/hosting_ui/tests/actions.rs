@@ -261,3 +261,23 @@ fn the_board_command_needs_a_linked_source_and_opens_on_it() {
         other => panic!("{other:?}"),
     }
 }
+
+/// A repository that blocks assignment: the palette's assignee entry is grayed
+/// with the reason, the other metadata entries are not.
+#[test]
+fn a_blocked_repository_grays_the_assign_entry_with_the_reason() {
+    let open = HostingAvailability {
+        meta_issues: true,
+        ..HostingAvailability::default()
+    };
+    assert!(command_unavailable_from(HostingCommand::EditAssignees, open).is_none());
+    let blocked = HostingAvailability {
+        assignment_blocked: true,
+        ..open
+    };
+    assert_eq!(
+        command_unavailable_from(HostingCommand::EditAssignees, blocked),
+        Some("assignment is blocked in this repository")
+    );
+    assert!(command_unavailable_from(HostingCommand::EditLabels, blocked).is_none());
+}

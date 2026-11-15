@@ -57,6 +57,10 @@ pub(crate) enum RaTarget {
     Command,
     Hosts,
     Cache,
+    /// "Use for the hosting API" of a token command.
+    UseForHosting,
+    /// The repository's assignment block (Allowed / Blocked), saved at once.
+    Assignment,
     SshSource,
     Key,
     SshAccount,
@@ -499,6 +503,7 @@ impl PreferencesState {
         match target {
             RaTarget::IgnoreHelpers => d.ignore_repo_helpers = value,
             RaTarget::Strict => d.strict = value,
+            RaTarget::UseForHosting => d.use_for_hosting = value,
             _ => {}
         }
     }
@@ -513,6 +518,15 @@ impl PreferencesState {
             RaTarget::SshSource => {
                 if let Some(kind) = self.ra_ssh_kinds().get(next) {
                     self.repo_auth.draft.ssh = *kind;
+                }
+            }
+            RaTarget::Assignment => {
+                // A setting, not part of the profile: saved at once, on top
+                // of what the file holds now.
+                let mut state = RepoState::load(&self.repo_state_path).unwrap_or_default();
+                state.assignment_blocked = next == 1;
+                if state.save(&self.repo_state_path).is_ok() {
+                    self.repo_state.assignment_blocked = state.assignment_blocked;
                 }
             }
             RaTarget::Account | RaTarget::SshAccount => {
@@ -835,6 +849,14 @@ impl PreferencesState {
                     )
                     .with_help(t::CACHE_HELP.get()),
                 );
+                f.push(
+                    Field::plain(
+                        t::USE_FOR_HOSTING.get(),
+                        Control::Toggle(d.use_for_hosting),
+                        target(RaTarget::UseForHosting),
+                    )
+                    .with_help(t::USE_FOR_HOSTING_HELP.get()),
+                );
                 f.push(username(t::USERNAME.get()));
             }
         }
@@ -927,6 +949,23 @@ impl PreferencesState {
         ));
 
         f.extend(self.ra_pin_rows());
+
+        // -- Hosting ----------------------------------------------------------------
+        f.push(Field::heading(t::HEADING_HOSTING.get()));
+        f.push(
+            Field::plain(
+                t::ASSIGNMENT_LABEL.get(),
+                Control::Choice {
+                    options: vec![
+                        t::ASSIGNMENT_ALLOWED.get().to_string(),
+                        t::ASSIGNMENT_BLOCKED.get().to_string(),
+                    ],
+                    index: usize::from(self.repo_state.assignment_blocked),
+                },
+                target(RaTarget::Assignment),
+            )
+            .with_help(t::ASSIGNMENT_HELP.get()),
+        );
 
         // -- Remotes ----------------------------------------------------------------
         f.push(Field::heading(t::HEADING_REMOTES.get()));

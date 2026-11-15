@@ -11,6 +11,7 @@ use crossterm::event::{KeyCode, KeyModifiers, MouseButton, MouseEventKind};
 use gitpoulpi_core::domain::{RemoteIdentity, RemoteTransport, SshAuth};
 use gitpoulpi_core::failure::ErrorDetail;
 
+mod hosting;
 mod migrate;
 
 fn key(code: KeyCode) -> KeyEvent {

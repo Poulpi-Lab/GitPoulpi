@@ -262,6 +262,7 @@ fn commit_more(repo: &gitpoulpi_testkit::FixtureRepo, name: &str) {
     repo.git(&["commit", "-q", "-m", &format!("feat: {name}")]);
 }
 
+#[cfg(unix)]
 fn flag_value(args: &[String], flag: &str) -> Option<String> {
     args.iter()
         .position(|a| a == flag)

@@ -113,6 +113,8 @@ impl RadarSlot {
         false
     }
 
+    #[cfg(all(feature = "hosting", feature = "conversation"))]
+    #[allow(clippy::boxed_local)]
     pub(crate) fn host_item(&mut self, _view: Box<crate::item_view::ItemView>) {}
 
     pub(crate) fn item_takes_palette(&self) -> bool {

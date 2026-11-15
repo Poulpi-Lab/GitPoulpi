@@ -977,6 +977,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Conversation: Reply to Entry | `r` |
 | Conversation: New Comment | `c` |
 | Conversation: Links of Entry... | `l` |
+| Conversation: Open Diagram of Entry | `m` |
 | Conversation: Copy Link of Entry | `y` |
 | Conversation: Open in Browser | `o` |
 | Conversation: Edit Comment | `e` |

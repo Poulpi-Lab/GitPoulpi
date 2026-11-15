@@ -587,7 +587,7 @@ fn a_mermaid_block_gets_an_open_diagram_button_that_carries_its_script() {
     let lines: Vec<String> = d.lines.iter().map(MdLine::text).collect();
     let button = lines
         .iter()
-        .position(|l| l.contains("[ Open diagram ]"))
+        .position(|l| l.contains("\u{a0}Open diagram\u{a0}"))
         .unwrap_or_else(|| panic!("a button: {lines:?}"));
     let code = lines.iter().position(|l| l.contains("A --> B")).unwrap();
     assert!(button > code, "under the block: {lines:?}");

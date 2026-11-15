@@ -718,7 +718,10 @@ impl Builder<'_> {
                 diagram: Some(text.to_string()),
             });
             let id = self.doc.links.len() - 1;
-            let label = format!("[ {} ]", gitpoulpi_i18n::msg::item_view::OPEN_DIAGRAM.get());
+            let label = format!(
+                "\u{a0}{}\u{a0}",
+                gitpoulpi_i18n::msg::item_view::OPEN_DIAGRAM.get()
+            );
             self.emit(&atoms(&label, Look::Button, Some(id)));
         }
     }

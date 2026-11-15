@@ -639,7 +639,7 @@ fn open_api_review(cx: &mut CommandCtx<'_>, _request: crate::radar::ReviewReques
 /// The conversation of an item of a repository that is not cloned, hosted by
 /// the Radar over the Home window: the profile and the project are all the
 /// view needs.
-#[cfg(feature = "conversation")]
+#[cfg(all(feature = "hosting", feature = "conversation"))]
 fn open_api_conversation(cx: &mut CommandCtx<'_>, request: crate::radar::ConversationRequest) {
     use gitpoulpi_hosting::conversation::ItemKey;
     let all = crate::pull_request::load_integrations();
@@ -675,7 +675,7 @@ fn open_api_conversation(cx: &mut CommandCtx<'_>, request: crate::radar::Convers
     }
 }
 
-#[cfg(not(feature = "conversation"))]
+#[cfg(not(all(feature = "hosting", feature = "conversation")))]
 fn open_api_conversation(cx: &mut CommandCtx<'_>, _request: crate::radar::ConversationRequest) {
     *cx.last_message = Some(msg::meta_picker::UNSUPPORTED.get().to_string());
 }

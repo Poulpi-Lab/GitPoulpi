@@ -25,8 +25,8 @@ use crate::cli::{HostingAction, IssueAction, LinkKind, OpenKind, ReviewAction};
 use crate::client::Session;
 use crate::repo_cmd::Emitted;
 
-#[cfg(feature = "board")]
 mod assignment;
+#[cfg(feature = "board")]
 mod board_cmd;
 pub mod flow_issue;
 mod integrations;

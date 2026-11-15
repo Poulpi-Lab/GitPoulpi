@@ -12,35 +12,16 @@ use xtask::pty::{Screen, Terminal};
 
 const TITLE_12: &str = "#12  Crash on startup";
 
-/// The routes of the conversation: `#12` (a description with a bold word, a
-/// reference to `#7`, a web address; one comment and one label event) and `#7`.
-pub fn route(method: &str, path: &str) -> Option<(u16, String)> {
-    if method != "GET" {
-        return None;
-    }
-    let body = match path {
-        "/api/v4/projects/g%2Fp/issues/12" => r#"{"id":112,"iid":12,"title":"Crash on startup",
-            "state":"opened","description":"Opening a repo **freezes** when files are locked.\n\nSame as #7, see https://example.org/docs and more.\n\n- [x] reproduced on Linux",
-            "author":{"username":"ann","name":"Ann Archer"},"created_at":"2026-11-12T09:14:00Z",
-            "updated_at":"2026-11-12T09:14:00Z","web_url":"http://127.0.0.1/g/p/-/issues/12","labels":["bug","lfs"]}"#,
-        "/api/v4/projects/g%2Fp/issues/12/discussions" => r#"[
-            {"id":"dn1","individual_note":true,"notes":[{"id":201,"body":"Seen on Linux too, really.",
-              "author":{"username":"bo","name":"Bo Brandt"},"created_at":"2026-11-12T10:30:00Z",
-              "updated_at":"2026-11-12T10:30:00Z","system":false}]},
-            {"id":"dn2","individual_note":true,"notes":[{"id":202,"body":"added ~lfs label",
-              "author":{"username":"bo","name":"Bo Brandt"},"created_at":"2026-11-12T10:31:00Z","system":true}]}]"#,
-        "/api/v4/projects/g%2Fp/issues/7" => r#"{"id":107,"iid":7,"title":"Locked files",
-            "state":"opened","description":"Locks are not released.",
-            "author":{"username":"kai","name":"Kai"},"created_at":"2026-11-01T09:00:00Z",
-            "web_url":"http://127.0.0.1/g/p/-/issues/7","labels":[]}"#,
-        "/api/v4/projects/g%2Fp/issues/7/discussions" => "[]",
-        _ => return None,
-    };
-    Some((200, body.to_string()))
-}
-
 /// The ISSUES section with `#12` listed.
-fn launch(session: &str, cols: u16) -> (Terminal, tempfile::TempDir, Mock, gitpoulpi_testkit::FixtureRepo) {
+fn launch(
+    session: &str,
+    cols: u16,
+) -> (
+    Terminal,
+    tempfile::TempDir,
+    Mock,
+    gitpoulpi_testkit::FixtureRepo,
+) {
     let mock = start_mock();
     let repo = fixture(mock.port);
     let (term, config) = launch_issues(
@@ -129,13 +110,21 @@ fn enter_on_an_issue_opens_its_conversation_and_links_work() {
         screen.text()
     );
     assert!(screen.contains("Ann Archer"), "{}", screen.text());
-    assert!(screen.contains("Bo Brandt added the label lfs"), "{}", screen.text());
+    assert!(
+        screen.contains("Bo Brandt added the label lfs"),
+        "{}",
+        screen.text()
+    );
     assert!(
         !screen.contains("**freezes**"),
         "Markdown is rendered, not shown: {}",
         screen.text()
     );
-    assert!(mock.saw("GET", "issues/12/discussions"), "{:?}", mock.requests());
+    assert!(
+        mock.saw("GET", "issues/12/discussions"),
+        "{:?}",
+        mock.requests()
+    );
     assert!(
         opened_urls(&config).is_empty(),
         "Enter reads the issue in the app, never in the browser"
@@ -172,10 +161,15 @@ fn enter_on_an_issue_opens_its_conversation_and_links_work() {
         s.contains("Open this link?") && s.contains("https://example.org/docs")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(opened_urls(&config).is_empty(), "nothing opened before the answer");
+    assert!(
+        opened_urls(&config).is_empty(),
+        "nothing opened before the answer"
+    );
     term.send_keys("Escape").unwrap();
-    term.wait_for("the question closed", STEP, |s| !s.contains("Open this link?"))
-        .unwrap_or_else(|e| panic!("{e}"));
+    term.wait_for("the question closed", STEP, |s| {
+        !s.contains("Open this link?")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     assert!(opened_urls(&config).is_empty());
 
     // The close cross returns to the repository.
@@ -210,15 +204,18 @@ fn ctrl_n_badges_reach_reply_a_link_and_send() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Escape").unwrap();
-    term.wait_for_stable(Duration::from_millis(400), STEP).unwrap();
+    term.wait_for_stable(Duration::from_millis(400), STEP)
+        .unwrap();
 
     // A link: the badge before the address opens the question.
     press_badge(&mut term, tail("ps://example.org/docs", false));
     term.wait_for("the confirmation", STEP, |s| s.contains("Open this link?"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Escape").unwrap();
-    term.wait_for("the question closed", STEP, |s| !s.contains("Open this link?"))
-        .unwrap_or_else(|e| panic!("{e}"));
+    term.wait_for("the question closed", STEP, |s| {
+        !s.contains("Open this link?")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
 
     // Send: greyed, and it says why.
     press_badge(&mut term, tail("nd", true));
@@ -242,9 +239,11 @@ fn at_70_columns_split_is_refused_and_preview_works() {
 
     // New comment, then Alt+L: refused with the reason.
     term.send_keys("c").unwrap();
-    term.wait_for_stable(Duration::from_millis(400), STEP).unwrap();
+    term.wait_for_stable(Duration::from_millis(400), STEP)
+        .unwrap();
     term.send_keys("M-l").unwrap();
-    term.wait_for_stable(Duration::from_millis(400), STEP).unwrap();
+    term.wait_for_stable(Duration::from_millis(400), STEP)
+        .unwrap();
     term.wait_for("the Split reason", STEP, |s| {
         s.contains("Split needs a window")
     })

@@ -135,7 +135,10 @@ fn escape_plain(text: &str) -> String {
         }
         first = false;
         for c in line.chars() {
-            if matches!(c, '\\' | '`' | '*' | '_' | '[' | ']' | '<' | '>' | '#' | '~' | '|') {
+            if matches!(
+                c,
+                '\\' | '`' | '*' | '_' | '[' | ']' | '<' | '>' | '#' | '~' | '|'
+            ) {
                 out.push('\\');
             }
             out.push(c);
@@ -183,7 +186,10 @@ pub(crate) fn build(input: &Input, content_width: usize, key: LayoutKey) -> Layo
         }
         let item = out.items.len();
         let key = entry_key(entry);
-        let unread = input.seen_at.as_deref().is_some_and(|seen| entry.at() > seen)
+        let unread = input
+            .seen_at
+            .as_deref()
+            .is_some_and(|seen| entry.at() > seen)
             && !entry_is_mine(entry, &input.me);
         out.items.push(Item {
             key,
@@ -279,11 +285,17 @@ fn body_doc(markup: &Markup, width: usize, indent: u16, ctx: &md_render::Context
 fn push_doc(out: &mut Layout, item: usize, doc: Arc<Doc>, indent: u16) {
     // Trailing blank lines of a document are the gap's job.
     let mut n = doc.lines.len();
-    while n > 0 && doc.lines[n - 1].spans.iter().all(|s| s.text.trim().is_empty()) {
+    while n > 0
+        && doc.lines[n - 1]
+            .spans
+            .iter()
+            .all(|s| s.text.trim().is_empty())
+    {
         n -= 1;
     }
     for line in 0..n {
-        out.rows.push(Row::Body(item, Arc::clone(&doc), line, indent));
+        out.rows
+            .push(Row::Body(item, Arc::clone(&doc), line, indent));
     }
 }
 
@@ -337,7 +349,10 @@ pub(crate) fn event_label(kind: &EventKind) -> String {
         },
         EventKind::Renamed { from, to } => m::ev_renamed(clean(from), clean(to)),
         EventKind::CommitsPushed { count, head } => match head {
-            Some(h) => m::ev_pushed_head(u64::from(*count), clean(&h.chars().take(8).collect::<String>())),
+            Some(h) => m::ev_pushed_head(
+                u64::from(*count),
+                clean(&h.chars().take(8).collect::<String>()),
+            ),
             None => m::ev_pushed(u64::from(*count)),
         },
         EventKind::CrossReferenced { from, .. } => m::ev_referenced(clean(from)),

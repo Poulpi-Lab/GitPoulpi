@@ -31,16 +31,16 @@ use crate::issue_form::{
     issue_rect, IssueDialog, IssueEvent, IssueOutcome, IssueReceiver, IssueSeed,
 };
 #[cfg(feature = "hosting")]
+use crate::item_cmd::ItemCmd;
+#[cfg(feature = "hosting")]
+use crate::item_view::{ItemEffect, ItemTarget, ItemView};
+#[cfg(feature = "hosting")]
 use crate::meta_picker::{MetaEdit, MetaEditOutcome, MetaField, MetaTarget};
 #[cfg(feature = "hosting")]
 use crate::pull_request::{
     pull_request_rect, PullRequestDialog, PullRequestEvent, PullRequestOutcome,
     PullRequestReceiver, PullRequestSeed,
 };
-#[cfg(feature = "hosting")]
-use crate::item_cmd::ItemCmd;
-#[cfg(feature = "hosting")]
-use crate::item_view::{ItemEffect, ItemTarget, ItemView};
 #[cfg(feature = "hosting")]
 use crate::review_cmd::ReviewCmd;
 #[cfg(feature = "hosting")]

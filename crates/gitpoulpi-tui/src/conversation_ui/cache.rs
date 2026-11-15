@@ -107,7 +107,7 @@ fn prune(file: &Path) {
     if all.len() <= KEEP {
         return;
     }
-    all.sort_by(|a, b| b.0.cmp(&a.0));
+    all.sort_by_key(|(modified, _)| std::cmp::Reverse(*modified));
     for (_, path) in all.into_iter().skip(KEEP) {
         let _ = std::fs::remove_file(path);
     }

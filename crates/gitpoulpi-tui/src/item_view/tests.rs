@@ -15,9 +15,7 @@ use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 
 use super::*;
-use crate::conversation_ui::tests::{
-    comment, integration, shared, text, Factory, Shared,
-};
+use crate::conversation_ui::tests::{comment, integration, shared, text, Factory, Shared};
 use crate::item_cmd::ItemCmd;
 
 const WIDE: Rect = Rect {
@@ -126,10 +124,9 @@ fn link_cell(view: &ItemView, needle: &str) -> (u16, u16) {
         .hits
         .iter()
         .find(|(_, h)| match h {
-            crate::conversation_ui::Hit::Link(i) => view
-                .conv
-                .link(*i)
-                .is_some_and(|l| format!("{:?}", l.xref).contains(needle) || l.url.contains(needle)),
+            crate::conversation_ui::Hit::Link(i) => view.conv.link(*i).is_some_and(|l| {
+                format!("{:?}", l.xref).contains(needle) || l.url.contains(needle)
+            }),
             _ => false,
         })
         .unwrap_or_else(|| panic!("no link to {needle}: {:?}", view.conv.links));
@@ -140,13 +137,25 @@ fn link_cell(view: &ItemView, needle: &str) -> (u16, u16) {
 fn the_header_names_the_item_and_who_posts() {
     let mut r = rig();
     let screen = text(&draw(&mut r.view, WIDE));
-    assert!(screen.contains("#142  Crash when opening a repository"), "{screen}");
+    assert!(
+        screen.contains("#142  Crash when opening a repository"),
+        "{screen}"
+    );
     assert!(screen.contains("\u{25CF} open"), "{screen}");
-    assert!(screen.contains("opened by alice on 2026-11-12 09:14"), "{screen}");
+    assert!(
+        screen.contains("opened by alice on 2026-11-12 09:14"),
+        "{screen}"
+    );
     assert!(screen.contains("bug  lfs"), "{screen}");
     assert!(screen.contains("2 comments"), "{screen}");
-    assert!(screen.contains("Posting as bob (personal token)"), "{screen}");
-    assert!(screen.contains("Open in browser") && screen.contains("Refresh"), "{screen}");
+    assert!(
+        screen.contains("Posting as bob (personal token)"),
+        "{screen}"
+    );
+    assert!(
+        screen.contains("Open in browser") && screen.contains("Refresh"),
+        "{screen}"
+    );
 }
 
 #[test]
@@ -184,7 +193,10 @@ fn a_host_that_takes_no_comments_says_read_only_and_has_no_composer() {
     r.view.conv.caps = Some(caps);
     r.view.md = None;
     let screen = text(&draw(&mut r.view, WIDE));
-    assert!(screen.contains("Read only: this host does not take comments from here."), "{screen}");
+    assert!(
+        screen.contains("Read only: this host does not take comments from here."),
+        "{screen}"
+    );
     assert!(!screen.contains("New comment"), "{screen}");
     assert_eq!(
         ItemCmd::NewComment.unavailable(Some(r.view.avail())),
@@ -213,9 +225,16 @@ fn send_is_greyed_with_its_reason_and_nothing_is_posted() {
     r.view.message = None;
     let (rect, _) = *r.view.hits.iter().find(|(_, h)| *h == Hit::Send).unwrap();
     assert_eq!(r.view.on_mouse(click(rect.x, rect.y)), ItemEffect::None);
-    assert_eq!(r.view.message.as_deref(), Some(why), "the button answers with the reason");
+    assert_eq!(
+        r.view.message.as_deref(),
+        Some(why),
+        "the button answers with the reason"
+    );
     let screen = text(&draw(&mut r.view, WIDE));
-    assert!(screen.contains(why), "the reason is drawn in the view: {screen}");
+    assert!(
+        screen.contains(why),
+        "the reason is drawn in the view: {screen}"
+    );
     assert_eq!(r.shared.lock().unwrap().writes, 0, "nothing was posted");
 }
 
@@ -223,7 +242,12 @@ fn send_is_greyed_with_its_reason_and_nothing_is_posted() {
 fn the_close_cross_and_esc_close_a_clean_view_and_a_typed_one_asks() {
     let mut r = rig();
     let _ = draw(&mut r.view, WIDE);
-    let cross = r.view.guard.close.rect().expect("the frame paints a close cross");
+    let cross = r
+        .view
+        .guard
+        .close
+        .rect()
+        .expect("the frame paints a close cross");
     assert_eq!(r.view.on_mouse(click(cross.x, cross.y)), ItemEffect::Close);
     assert_eq!(r.view.on_key(key(KeyCode::Esc)), ItemEffect::Close);
     assert_eq!(r.view.on_key(key(KeyCode::Char('q'))), ItemEffect::Close);
@@ -235,7 +259,10 @@ fn the_close_cross_and_esc_close_a_clean_view_and_a_typed_one_asks() {
     assert_eq!(r.view.on_key(key(KeyCode::Esc)), ItemEffect::None);
     assert_eq!(r.view.focus, Focus::Timeline);
     assert_eq!(r.view.on_key(key(KeyCode::Esc)), ItemEffect::None);
-    assert!(r.view.guard.is_open(), "a typed reply is not thrown away silently");
+    assert!(
+        r.view.guard.is_open(),
+        "a typed reply is not thrown away silently"
+    );
     let screen = text(&draw(&mut r.view, WIDE));
     assert!(screen.contains("Discard this text?"), "{screen}");
     // Keep editing stays; the discard closes.
@@ -270,7 +297,11 @@ fn a_reference_opens_in_the_view_and_back_returns() {
     // Back: the button, the key, Backspace.
     let screen = text(&draw(&mut r.view, WIDE));
     assert!(screen.contains("Back"), "{screen}");
-    assert_eq!(r.view.on_key(KeyEvent::new(KeyCode::Left, KeyModifiers::ALT)), ItemEffect::None);
+    assert_eq!(
+        r.view
+            .on_key(KeyEvent::new(KeyCode::Left, KeyModifiers::ALT)),
+        ItemEffect::None
+    );
     assert_eq!(r.view.depth(), 0);
     assert_eq!(r.view.target.reference, "#142");
     assert_eq!(r.view.on_key(key(KeyCode::Backspace)), ItemEffect::None);
@@ -293,7 +324,10 @@ fn a_commit_reveals_in_the_log_and_an_external_address_asks_first() {
     assert!(!crate::link_confirm::is_open());
     let (x, y) = link_cell(&r.view, "example.org");
     assert_eq!(r.view.on_mouse(click(x, y)), ItemEffect::None);
-    assert!(crate::link_confirm::is_open(), "the real address is asked about first");
+    assert!(
+        crate::link_confirm::is_open(),
+        "the real address is asked about first"
+    );
     crate::link_confirm::on_key(key(KeyCode::Esc));
     assert!(!crate::link_confirm::is_open());
 }
@@ -340,9 +374,13 @@ fn a_70_column_window_disables_split_and_preview_works() {
     for c in "**bold**".chars() {
         r.view.on_key(key(KeyCode::Char(c)));
     }
-    r.view.on_key(KeyEvent::new(KeyCode::Char('p'), KeyModifiers::ALT));
+    r.view
+        .on_key(KeyEvent::new(KeyCode::Char('p'), KeyModifiers::ALT));
     let screen = text(&draw(&mut r.view, narrow));
-    assert!(screen.contains("bold") && !screen.contains("**bold**"), "{screen}");
+    assert!(
+        screen.contains("bold") && !screen.contains("**bold**"),
+        "{screen}"
+    );
     // On a wide window the same command is available.
     let _ = draw(&mut r.view, WIDE);
     assert_eq!(ItemCmd::ToggleSplit.unavailable(Some(r.view.avail())), None);
@@ -354,10 +392,22 @@ fn palette_commands_carry_their_reasons() {
     let _ = draw(&mut r.view, WIDE);
     let a = r.view.avail();
     use gitpoulpi_i18n::msg::item_view as m;
-    assert_eq!(ItemCmd::Back.unavailable(Some(a)), Some(m::WHY_NO_BACK.get()));
-    assert_eq!(ItemCmd::LoadOlder.unavailable(Some(a)), Some(m::WHY_NO_OLDER.get()));
-    assert_eq!(ItemCmd::NextUnread.unavailable(Some(a)), Some(m::WHY_NO_UNREAD.get()));
-    assert_eq!(ItemCmd::Edit.unavailable(Some(a)), Some(m::WHY_NOT_YOURS.get()));
+    assert_eq!(
+        ItemCmd::Back.unavailable(Some(a)),
+        Some(m::WHY_NO_BACK.get())
+    );
+    assert_eq!(
+        ItemCmd::LoadOlder.unavailable(Some(a)),
+        Some(m::WHY_NO_OLDER.get())
+    );
+    assert_eq!(
+        ItemCmd::NextUnread.unavailable(Some(a)),
+        Some(m::WHY_NO_UNREAD.get())
+    );
+    assert_eq!(
+        ItemCmd::Edit.unavailable(Some(a)),
+        Some(m::WHY_NOT_YOURS.get())
+    );
     assert_eq!(ItemCmd::Reply.unavailable(Some(a)), None);
     assert_eq!(ItemCmd::Refresh.unavailable(Some(a)), None);
     assert_eq!(ItemCmd::Close.unavailable(Some(a)), None);
@@ -366,8 +416,14 @@ fn palette_commands_carry_their_reasons() {
     // reason left is that writing is not in this version.
     r.view.conv.select(2);
     let a = r.view.avail();
-    assert_eq!(ItemCmd::Edit.unavailable(Some(a)), Some(m::WHY_WRITING_LATER.get()));
-    assert_eq!(ItemCmd::Send.unavailable(Some(a)), Some(m::WHY_WRITING_LATER.get()));
+    assert_eq!(
+        ItemCmd::Edit.unavailable(Some(a)),
+        Some(m::WHY_WRITING_LATER.get())
+    );
+    assert_eq!(
+        ItemCmd::Send.unavailable(Some(a)),
+        Some(m::WHY_WRITING_LATER.get())
+    );
 }
 
 #[test]
@@ -378,7 +434,10 @@ fn reply_quotes_the_entry_into_the_composer() {
     assert_eq!(r.view.on_key(key(KeyCode::Char('r'))), ItemEffect::None);
     assert_eq!(r.view.focus, Focus::Composer);
     let text_in = r.view.md.as_ref().unwrap().text().to_string();
-    assert!(text_in.starts_with("> **carol**\n> Same as #120"), "{text_in}");
+    assert!(
+        text_in.starts_with("> **carol**\n> Same as #120"),
+        "{text_in}"
+    );
 }
 
 #[test]
@@ -395,7 +454,10 @@ fn buttons_are_reachable_with_tab_and_enter() {
     let before = r.shared.lock().unwrap().reads.len();
     r.view.on_key(key(KeyCode::Enter));
     wait(&mut r.view, "the refresh", |v| !v.conv.busy());
-    assert!(r.shared.lock().unwrap().reads.len() > before, "Enter on Refresh reads again");
+    assert!(
+        r.shared.lock().unwrap().reads.len() > before,
+        "Enter on Refresh reads again"
+    );
     // The events checkbox toggles with Space.
     r.view.on_key(key(KeyCode::Right));
     r.view.on_key(key(KeyCode::Right));
@@ -425,7 +487,10 @@ fn the_seen_mark_is_left_when_the_view_goes_away() {
         t
     };
     let state = gitpoulpi_session::RepoState::load(&t.state_path().unwrap()).unwrap();
-    let seen = state.conversation_seen.get(&t.seen_key()).expect("a visit is recorded");
+    let seen = state
+        .conversation_seen
+        .get(&t.seen_key())
+        .expect("a visit is recorded");
     assert_eq!(seen.at, "2026-11-13T08:00:00Z");
     // A second visit sees nothing new; a newer comment is flagged.
     let s = shared(entries());

@@ -1074,7 +1074,11 @@ impl RadarUi {
                         number: item.number,
                     }),
                 ),
-                _ => self.say(gitpoulpi_i18n::msg::item_view::WHY_NO_CONVERSATION.get().to_string()),
+                _ => self.say(
+                    gitpoulpi_i18n::msg::item_view::WHY_NO_CONVERSATION
+                        .get()
+                        .to_string(),
+                ),
             },
             Act::Review | Act::ReviewApi | Act::CloneReview => self.review(item, act),
             Act::Link | Act::Reconnect | Act::TurnOn | Act::FitColumn(_) | Act::FitAllColumns => {

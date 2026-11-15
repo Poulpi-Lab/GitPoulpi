@@ -6,9 +6,7 @@
 //! Popups own the keyboard and the pointer innermost first: the discard
 //! question, then the links menu.
 
-use crossterm::event::{
-    KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind,
-};
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
 use gitpoulpi_i18n::msg::item_view as m;
 
 use super::{Bar, Focus, Hit, ItemEffect, ItemView};
@@ -144,9 +142,7 @@ impl ItemView {
                 self.cycle(true);
                 ItemEffect::None
             }
-            KeyCode::Enter | KeyCode::Char(' ') if key.modifiers.is_empty() => {
-                self.bar_press(bar)
-            }
+            KeyCode::Enter | KeyCode::Char(' ') if key.modifiers.is_empty() => self.bar_press(bar),
             KeyCode::Esc => {
                 self.focus = Focus::Timeline;
                 ItemEffect::None
@@ -200,10 +196,9 @@ impl ItemView {
             ),
             Act::Links => self.open_links_menu(),
             Act::CopyLink => match self.conv.selected_url() {
-                Some(url) => ItemEffect::Message(crate::clipboard::copy_shared(
-                    m::NOUN_LINK.get(),
-                    &url,
-                )),
+                Some(url) => {
+                    ItemEffect::Message(crate::clipboard::copy_shared(m::NOUN_LINK.get(), &url))
+                }
                 None => ItemEffect::Message(m::WHY_NO_URL.get().to_string()),
             },
             Act::OpenBrowser => {

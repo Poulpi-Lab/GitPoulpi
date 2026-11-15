@@ -121,7 +121,11 @@ impl ClientFactory for Factory {
 }
 
 pub(crate) fn integration() -> Integration {
-    Integration::new("corp", IntegrationKind::Gitlab, "https://gitlab.example.com")
+    Integration::new(
+        "corp",
+        IntegrationKind::Gitlab,
+        "https://gitlab.example.com",
+    )
 }
 
 pub(crate) fn actor(login: &str) -> Actor {
@@ -142,7 +146,9 @@ pub(crate) fn comment(id: &str, author: &str, body: &str, at: &str) -> Comment {
         internal: false,
         can_edit: None,
         can_delete: None,
-        web_url: Some(format!("https://gitlab.example.com/g/p/-/issues/142#note_{id}")),
+        web_url: Some(format!(
+            "https://gitlab.example.com/g/p/-/issues/142#note_{id}"
+        )),
     }
 }
 
@@ -297,7 +303,12 @@ fn entries() -> Vec<TimelineEntry> {
             "Same as #120, see `src/lfs.rs`.\n\n```rust\nfn lock() -> Result<()> { Ok(()) }\n```",
             "2026-11-12T10:30:00Z",
         )),
-        TimelineEntry::Comment(comment("c2", "bob", "Thanks, fixed in 1.2.", "2026-11-13T08:00:00Z")),
+        TimelineEntry::Comment(comment(
+            "c2",
+            "bob",
+            "Thanks, fixed in 1.2.",
+            "2026-11-13T08:00:00Z",
+        )),
     ]
 }
 
@@ -350,7 +361,11 @@ fn rows_partition_into_items_whatever_the_width() {
             assert_eq!(item.start, next, "items are contiguous at {width}");
             next = item.start + item.len;
         }
-        assert_eq!(next, layout.rows.len(), "every row belongs to an item at {width}");
+        assert_eq!(
+            next,
+            layout.rows.len(),
+            "every row belongs to an item at {width}"
+        );
         assert_eq!(layout.items.len(), 1 + entries().len());
     }
 }
@@ -408,7 +423,10 @@ fn what_arrived_since_the_last_visit_is_unread_but_not_what_i_wrote() {
     let screen = text(&paint(&mut conv, AREA));
     // The label event and carol's comment are new; bob (me) wrote the last.
     assert_eq!(conv.unread_count(), 2, "{screen}");
-    assert!(screen.contains("\u{258C}"), "the unread marker is drawn: {screen}");
+    assert!(
+        screen.contains("\u{258C}"),
+        "the unread marker is drawn: {screen}"
+    );
     assert!(screen.contains("new"), "{screen}");
     assert!(conv.next_unread());
     assert!(conv.selected().unwrap().unread);
@@ -489,7 +507,12 @@ fn a_thread_shows_its_hunk_and_its_comments() {
         diff_hunk: Some("@@ -40,3 +40,4 @@\n let a = 1;\n+let n = tokens.len();".into()),
         comments: vec![
             comment("n1", "kai", "Why not iterate?", "2026-11-12T11:00:00Z"),
-            comment("n2", "bob", "Because I need the count.", "2026-11-12T11:05:00Z"),
+            comment(
+                "n2",
+                "bob",
+                "Because I need the count.",
+                "2026-11-12T11:05:00Z",
+            ),
         ],
     });
     let review = TimelineEntry::Review(ReviewEntry {
@@ -521,9 +544,18 @@ fn an_unreachable_host_leaves_the_saved_copy_with_an_offline_banner() {
     let mut again = conversation(&shared, Some(dir.path().to_path_buf()), None);
     wait_for(&mut again, "the offline banner", |c| c.is_offline());
     let screen = text(&paint(&mut again, AREA));
-    assert!(screen.contains("Offline: showing the copy saved"), "{screen}");
-    assert!(screen.contains("Thanks, fixed in 1.2."), "the saved copy shows: {screen}");
-    assert_eq!(again.reply_reason(), Some(gitpoulpi_i18n::msg::item_view::WHY_OFFLINE.get()));
+    assert!(
+        screen.contains("Offline: showing the copy saved"),
+        "{screen}"
+    );
+    assert!(
+        screen.contains("Thanks, fixed in 1.2."),
+        "the saved copy shows: {screen}"
+    );
+    assert_eq!(
+        again.reply_reason(),
+        Some(gitpoulpi_i18n::msg::item_view::WHY_OFFLINE.get())
+    );
 }
 
 #[test]
@@ -531,9 +563,14 @@ fn without_a_saved_copy_a_failed_read_says_so_and_f5_retries() {
     let shared = shared(entries());
     shared.lock().unwrap().offline = true;
     let mut conv = conversation(&shared, None, None);
-    wait_for(&mut conv, "the failure", |c| matches!(c.load, Load::Failed(_)));
+    wait_for(&mut conv, "the failure", |c| {
+        matches!(c.load, Load::Failed(_))
+    });
     let screen = text(&paint(&mut conv, AREA));
-    assert!(screen.contains("could not load the conversation"), "{screen}");
+    assert!(
+        screen.contains("could not load the conversation"),
+        "{screen}"
+    );
     assert!(screen.contains("Press F5"), "{screen}");
     conv.rx = None;
     conv.refresh();
@@ -566,9 +603,15 @@ fn load_older_prepends_and_keeps_the_selection() {
     conv.select(2);
     let sel = conv.selected().unwrap().key.clone();
     conv.load_older();
-    wait_for(&mut conv, "the older window", |c| c.older.is_none() && !c.busy());
+    wait_for(&mut conv, "the older window", |c| {
+        c.older.is_none() && !c.busy()
+    });
     let _ = paint(&mut conv, AREA);
-    assert_eq!(conv.selected().unwrap().key, sel, "the same entry stays selected");
+    assert_eq!(
+        conv.selected().unwrap().key,
+        sel,
+        "the same entry stays selected"
+    );
     assert!(conv.entries.len() == 4);
     conv.scroll_to(0);
     let screen = text(&paint(&mut conv, AREA));
@@ -614,8 +657,14 @@ fn the_selected_entry_has_buttons_and_edit_only_on_my_own_comments() {
     // bob's (mine) comment shows Edit and Delete, greyed until writing lands.
     conv.select(3);
     let screen = text(&paint(&mut conv, AREA));
-    assert!(screen.contains("Edit") && screen.contains("Delete"), "{screen}");
-    assert!(conv.hits.iter().any(|(_, h)| matches!(h, Hit::Btn(Btn::Edit, _))));
+    assert!(
+        screen.contains("Edit") && screen.contains("Delete"),
+        "{screen}"
+    );
+    assert!(conv
+        .hits
+        .iter()
+        .any(|(_, h)| matches!(h, Hit::Btn(Btn::Edit, _))));
 }
 
 #[test]
@@ -626,7 +675,10 @@ fn quoting_an_entry_prefixes_its_text() {
     let _ = paint(&mut conv, AREA);
     conv.select(3);
     let q = conv.quote().unwrap();
-    assert!(q.starts_with("> **bob**\n> Thanks, fixed in 1.2.\n\n"), "{q}");
+    assert!(
+        q.starts_with("> **bob**\n> Thanks, fixed in 1.2.\n\n"),
+        "{q}"
+    );
 }
 
 #[test]
@@ -634,7 +686,10 @@ fn the_cache_round_trips_and_stays_bounded() {
     let dir = tempfile::tempdir().unwrap();
     let key = ItemKey::issue(7);
     let file = cache::file_for(dir.path(), "corp", "g/p", &key);
-    assert!(file.ends_with("conversations/corp/g_p/issue-7.json"), "{file:?}");
+    assert!(
+        file.ends_with("conversations/corp/g_p/issue-7.json"),
+        "{file:?}"
+    );
     cache::write(&file, &page(Vec::new()));
     let (back, at) = cache::read(&file).unwrap();
     assert_eq!(back.header.title, "Crash when opening a repository");

@@ -1274,8 +1274,16 @@ mod tests {
             "the MCP server has no conversation view"
         );
         let off = parse(&["--no-conversation"]).unwrap();
-        assert!(!off.choices.features().iter().any(|x| x.contains("conversation")));
-        assert!(parse(&[]).unwrap().choices.summary().contains("conversation"));
+        assert!(!off
+            .choices
+            .features()
+            .iter()
+            .any(|x| x.contains("conversation")));
+        assert!(parse(&[])
+            .unwrap()
+            .choices
+            .summary()
+            .contains("conversation"));
     }
 
     #[test]

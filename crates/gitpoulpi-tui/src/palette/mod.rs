@@ -928,7 +928,8 @@ pub(crate) const fn command_requires(
         PaletteCommand::Board(_) | PaletteCommand::Hosting(HostingCommand::OpenBoard) => {
             Some(crate::build_features::Feature::Board)
         }
-        PaletteCommand::Item(_) | PaletteCommand::Hosting(HostingCommand::OpenIssueConversation) => {
+        PaletteCommand::Item(_)
+        | PaletteCommand::Hosting(HostingCommand::OpenIssueConversation) => {
             Some(crate::build_features::Feature::Conversation)
         }
         PaletteCommand::CopySelectedAsMermaid => Some(crate::build_features::Feature::Mermaid),

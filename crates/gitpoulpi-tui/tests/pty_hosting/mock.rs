@@ -125,13 +125,45 @@ pub fn projects_json(port: u16, target: &str) -> String {
     format!("[{}]", slice.join(","))
 }
 
+/// The routes of the conversation: `#12` (a description with a bold word, a
+/// reference to `#7`, a web address; one comment and one label event) and `#7`.
+fn conversation_route(method: &str, path: &str) -> Option<(u16, String)> {
+    if method != "GET" {
+        return None;
+    }
+    let body = match path {
+        "/api/v4/projects/g%2Fp/issues/12" => {
+            r#"{"id":112,"iid":12,"title":"Crash on startup",
+            "state":"opened","description":"Opening a repo **freezes** when files are locked.\n\nSame as #7, see https://example.org/docs and more.\n\n- [x] reproduced on Linux",
+            "author":{"username":"ann","name":"Ann Archer"},"created_at":"2026-11-12T09:14:00Z",
+            "updated_at":"2026-11-12T09:14:00Z","web_url":"http://127.0.0.1/g/p/-/issues/12","labels":["bug","lfs"]}"#
+        }
+        "/api/v4/projects/g%2Fp/issues/12/discussions" => {
+            r#"[
+            {"id":"dn1","individual_note":true,"notes":[{"id":201,"body":"Seen on Linux too, really.",
+              "author":{"username":"bo","name":"Bo Brandt"},"created_at":"2026-11-12T10:30:00Z",
+              "updated_at":"2026-11-12T10:30:00Z","system":false}]},
+            {"id":"dn2","individual_note":true,"notes":[{"id":202,"body":"added ~lfs label",
+              "author":{"username":"bo","name":"Bo Brandt"},"created_at":"2026-11-12T10:31:00Z","system":true}]}]"#
+        }
+        "/api/v4/projects/g%2Fp/issues/7" => {
+            r#"{"id":107,"iid":7,"title":"Locked files",
+            "state":"opened","description":"Locks are not released.",
+            "author":{"username":"kai","name":"Kai"},"created_at":"2026-11-01T09:00:00Z",
+            "web_url":"http://127.0.0.1/g/p/-/issues/7","labels":[]}"#
+        }
+        "/api/v4/projects/g%2Fp/issues/7/discussions" => "[]",
+        _ => return None,
+    };
+    Some((200, body.to_string()))
+}
+
 pub fn route(method: &str, target: &str, port: u16) -> (u16, String) {
     let path = target.split('?').next().unwrap_or(target);
     if let Some(answer) = providers_route(method, path) {
         return answer;
     }
-    #[cfg(feature = "conversation")]
-    if let Some(answer) = crate::conversation::route(method, path) {
+    if let Some(answer) = conversation_route(method, path) {
         return answer;
     }
     match (method, path) {

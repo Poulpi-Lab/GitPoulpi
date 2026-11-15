@@ -303,8 +303,9 @@ impl ItemView {
 
     /// When the view next wants a frame without input (the 60 s refresh).
     pub(crate) fn next_deadline(&self) -> Option<std::time::Instant> {
-        self.auto_refreshes()
-            .then(|| std::time::Instant::now() + AUTO_REFRESH.saturating_sub(self.conv.since_fresh()))
+        self.auto_refreshes().then(|| {
+            std::time::Instant::now() + AUTO_REFRESH.saturating_sub(self.conv.since_fresh())
+        })
     }
 
     fn auto_refreshes(&self) -> bool {
@@ -367,10 +368,7 @@ impl ItemView {
             has_back: !self.stack.is_empty(),
             has_older: self.conv.older.is_some(),
             has_unread: self.conv.has_unread(),
-            has_links: self
-                .conv
-                .selected()
-                .is_some_and(|i| !i.links.is_empty()),
+            has_links: self.conv.selected().is_some_and(|i| !i.links.is_empty()),
             has_url: self.conv.selected_url().is_some(),
             reply: self.conv.reply_reason(),
             edit,
@@ -452,7 +450,6 @@ impl ItemView {
     pub(crate) fn depth(&self) -> usize {
         self.stack.len()
     }
-
 }
 
 impl Drop for ItemView {

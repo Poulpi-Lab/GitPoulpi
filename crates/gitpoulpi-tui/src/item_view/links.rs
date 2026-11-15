@@ -38,10 +38,12 @@ pub(super) fn link_label(link: &LinkTarget) -> String {
                 RefKind::PullRequest => m::link_request(crate::md_render::sanitize(&key)),
             }
         }
-        Some(XrefTarget::Commit { sha, .. }) => {
-            m::link_commit(crate::md_render::sanitize(&sha.chars().take(10).collect::<String>()))
+        Some(XrefTarget::Commit { sha, .. }) => m::link_commit(crate::md_render::sanitize(
+            &sha.chars().take(10).collect::<String>(),
+        )),
+        Some(XrefTarget::Mention { login, .. }) => {
+            format!("@{}", crate::md_render::sanitize(login))
         }
-        Some(XrefTarget::Mention { login, .. }) => format!("@{}", crate::md_render::sanitize(login)),
         _ => crate::md_render::sanitize(&link.url),
     }
 }
@@ -60,8 +62,7 @@ impl ItemView {
                     &gitpoulpi_hosting::integration_web_base(&self.target.integration)
                         .unwrap_or_default(),
                     &x.web_base,
-                ))
-        {
+                )) {
             self.target.integration.clone()
         } else {
             self.target
@@ -76,7 +77,10 @@ impl ItemView {
                 })?
                 .clone()
         };
-        let by_key = matches!(family, ApiFamily::Jira | ApiFamily::Linear | ApiFamily::YouTrack);
+        let by_key = matches!(
+            family,
+            ApiFamily::Jira | ApiFamily::Linear | ApiFamily::YouTrack
+        );
         let key_text = x.key.trim_start_matches(['#', '!']).to_string();
         if !by_key && x.number == 0 {
             return None;
@@ -88,7 +92,11 @@ impl ItemView {
         let key = ItemKey {
             kind,
             number: x.number,
-            id: if by_key { key_text.clone() } else { String::new() },
+            id: if by_key {
+                key_text.clone()
+            } else {
+                String::new()
+            },
         };
         let reference = if x.key.is_empty() {
             format!("#{}", x.number)

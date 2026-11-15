@@ -259,8 +259,7 @@ impl Conversation {
     /// Drains the worker: `true` when something changed on screen.
     pub(crate) fn poll(&mut self) -> bool {
         let mut changed = false;
-        loop {
-            let Some(rx) = &self.rx else { break };
+        while let Some(rx) = &self.rx {
             match rx.try_recv() {
                 Ok(msg) => {
                     changed = true;
@@ -272,7 +271,9 @@ impl Conversation {
                     self.loading_older = false;
                     if self.load == Load::Loading {
                         self.load = Load::Failed(
-                            gitpoulpi_i18n::msg::item_view::LOAD_STOPPED.get().to_string(),
+                            gitpoulpi_i18n::msg::item_view::LOAD_STOPPED
+                                .get()
+                                .to_string(),
                         );
                     }
                     changed = true;
@@ -585,12 +586,7 @@ impl Conversation {
         let page = self.view_rows.saturating_sub(1).max(1) as isize;
         self.scroll(if down { page } else { -page });
         let top = self.top;
-        if let Some(i) = self
-            .layout
-            .items
-            .iter()
-            .position(|i| i.start + i.len > top)
-        {
+        if let Some(i) = self.layout.items.iter().position(|i| i.start + i.len > top) {
             self.sel = i;
             self.sel_key = self.layout.items[i].key.clone();
             self.followed = Some(self.sel_key.clone());
@@ -653,9 +649,9 @@ impl Conversation {
 
     pub(crate) fn can_delete_selected(&self) -> bool {
         self.caps.as_ref().is_some_and(|c| c.delete_own)
-            && self.selected_comment().is_some_and(|c| {
-                c.can_delete.unwrap_or_else(|| self.mine(c))
-            })
+            && self
+                .selected_comment()
+                .is_some_and(|c| c.can_delete.unwrap_or_else(|| self.mine(c)))
     }
 
     /// Whether the selected item can be answered, and the reason when not.

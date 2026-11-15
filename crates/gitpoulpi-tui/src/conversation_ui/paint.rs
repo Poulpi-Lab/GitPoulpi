@@ -95,8 +95,8 @@ impl Conversation {
         // Banners: offline, a notice, "Load older".
         if let Some(o) = self.offline.clone().filter(|o| !o.why.is_empty()) {
             let text = match self.age_text() {
-                Some(age) => iv::offline_banner(&age, &sanitize(&o.why)),
-                None => iv::offline_banner_unknown(&sanitize(&o.why)),
+                Some(age) => iv::offline_banner(&age, sanitize(&o.why)),
+                None => iv::offline_banner_unknown(sanitize(&o.why)),
             };
             dialog_kit::put(
                 buf,
@@ -270,12 +270,14 @@ impl Conversation {
             // Inner first: buttons and links, then the row under them.
             self.hits.extend(row_hits);
             if let Some(i) = item {
-                self.hits.push((Rect::new(body.x, y, band_w, 1), Hit::Item(i)));
+                self.hits
+                    .push((Rect::new(body.x, y, band_w, 1), Hit::Item(i)));
             }
         }
         // The bar.
         let strip = Rect::new(body.right() - 1, body.y, 1, body.height);
-        self.bar = crate::scrollbar::Track::column(strip, total, usize::from(body.height), self.top);
+        self.bar =
+            crate::scrollbar::Track::column(strip, total, usize::from(body.height), self.top);
         if let Some(track) = self.bar {
             crate::scrollbar::render_buf(buf, track, true, false);
         }
@@ -466,10 +468,7 @@ impl Conversation {
             format!("{}  ", event_label(&ev.kind)),
             Style::default().fg(th().ui.muted),
         ));
-        parts.push((
-            short_time(&ev.at),
-            Style::default().fg(th().ui.muted),
-        ));
+        parts.push((short_time(&ev.at), Style::default().fg(th().ui.muted)));
         if self.layout.items.get(item).is_some_and(|i| i.unread) {
             parts.push((
                 format!("  {}", m::NEW.get()),

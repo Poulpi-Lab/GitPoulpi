@@ -40,11 +40,11 @@ fn flavor_name(flavor: MarkupFlavor) -> &'static str {
         MarkupFlavor::YoutrackMd => "Markdown (YouTrack)", // i18n-english
         MarkupFlavor::TrelloMd => "Markdown (Trello)", // i18n-english
         MarkupFlavor::ObsidianMd => "Markdown (Obsidian)", // i18n-english
-        MarkupFlavor::CommonMark => "Markdown", // i18n-english
+        MarkupFlavor::CommonMark => "Markdown",   // i18n-english
         MarkupFlavor::JiraWiki => "Jira wiki markup", // i18n-english
-        MarkupFlavor::Textile => "Textile", // i18n-english
-        MarkupFlavor::Html => "HTML", // i18n-english
-        MarkupFlavor::PlainText => "Plain text", // i18n-english
+        MarkupFlavor::Textile => "Textile",       // i18n-english
+        MarkupFlavor::Html => "HTML",             // i18n-english
+        MarkupFlavor::PlainText => "Plain text",  // i18n-english
     }
 }
 
@@ -304,7 +304,12 @@ impl ItemView {
                 .bg(th().ui.panel)
                 .add_modifier(Modifier::BOLD),
         );
-        let editor = Rect::new(rect.x, rect.y + 1, rect.width, rect.height.saturating_sub(2));
+        let editor = Rect::new(
+            rect.x,
+            rect.y + 1,
+            rect.width,
+            rect.height.saturating_sub(2),
+        );
         self.composer_rect = editor;
         let focused = self.focus == Focus::Composer && !self.guard.is_open();
         let write_flavor = self.conv.caps.as_ref().map(|c| c.write_flavor);
@@ -411,7 +416,13 @@ impl ItemView {
         if let Some(r) = self.guard.close.rect() {
             rects.push(r);
         }
-        rects.extend(self.conv.hits.iter().map(|(r, _)| *r).filter(|r| r.width < self.conv.area.width.saturating_sub(2)));
+        rects.extend(
+            self.conv
+                .hits
+                .iter()
+                .map(|(r, _)| *r)
+                .filter(|r| r.width < self.conv.area.width.saturating_sub(2)),
+        );
         if self.composer_rect.width > 0 {
             rects.push(self.composer_rect);
         }

@@ -624,7 +624,10 @@ mod tests {
             state.mark_conversation_seen(&format!("k{n}"), "t", "i", 1000 + n);
         }
         assert_eq!(state.conversation_seen.len(), 200);
-        assert!(!state.conversation_seen.contains_key(&key), "the oldest visit goes first");
+        assert!(
+            !state.conversation_seen.contains_key(&key),
+            "the oldest visit goes first"
+        );
         assert!(state.conversation_seen.contains_key("k209"));
         state.conversation_events = Some(false);
         state.save(&path).unwrap();

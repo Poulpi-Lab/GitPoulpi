@@ -203,59 +203,61 @@ impl HostingUi {
                             })
                             .into_iter()
                             .chain(vec![
-                            Entry::action(
-                                if local {
-                                    msg::local_issues::OPEN_NOTE.get()
-                                } else {
-                                    msg::hosting_ui::OPEN_BROWSER.get()
-                                },
-                                HostingAction::OpenUrl(issue.web_url.clone()),
-                            ),
-                            Entry::action(
-                                msg::hosting_ui::COPY_URL.get(),
-                                HostingAction::CopyText {
-                                    what: msg::hosting_ui::NOUN_ISSUE_URL.get().into(),
-                                    text: issue.web_url.clone(),
-                                },
-                            ),
-                            Entry::action(
-                                msg::hosting_ui::COPY_NUMBER.get(),
-                                HostingAction::CopyText {
-                                    what: msg::hosting_ui::NOUN_ISSUE_NUMBER.get().into(),
-                                    text: issue.iid_label.clone(),
-                                },
-                            ),
-                            Entry::Separator,
-                            Entry::action(
-                                msg::hosting_ui::BRANCH_FROM_ISSUE.get(),
-                                HostingAction::NewBranchFromIssue(issue_branch_for(
-                                    snap.issues_target.as_ref().map(|t| t.profile.kind.family()),
-                                    issue,
-                                )),
-                            ),
-                        ])
-                        .chain(if local {
-                            std::iter::once(Entry::Separator)
-                                .chain(Self::local_entries(issue))
-                                .collect::<Vec<_>>()
-                        } else {
-                            Vec::new()
-                        })
-                        .chain(if self.meta_issues() {
-                            std::iter::once(Entry::Separator)
-                                .chain(meta::menu_entries(
-                                    self.snapshot
-                                        .as_ref()
-                                        .and_then(|s| s.issues_target.as_ref())
-                                        .map(|t| t.profile.kind),
-                                    false,
-                                    issue.number,
-                                ))
-                                .collect::<Vec<_>>()
-                        } else {
-                            Vec::new()
-                        })
-                        .collect(),
+                                Entry::action(
+                                    if local {
+                                        msg::local_issues::OPEN_NOTE.get()
+                                    } else {
+                                        msg::hosting_ui::OPEN_BROWSER.get()
+                                    },
+                                    HostingAction::OpenUrl(issue.web_url.clone()),
+                                ),
+                                Entry::action(
+                                    msg::hosting_ui::COPY_URL.get(),
+                                    HostingAction::CopyText {
+                                        what: msg::hosting_ui::NOUN_ISSUE_URL.get().into(),
+                                        text: issue.web_url.clone(),
+                                    },
+                                ),
+                                Entry::action(
+                                    msg::hosting_ui::COPY_NUMBER.get(),
+                                    HostingAction::CopyText {
+                                        what: msg::hosting_ui::NOUN_ISSUE_NUMBER.get().into(),
+                                        text: issue.iid_label.clone(),
+                                    },
+                                ),
+                                Entry::Separator,
+                                Entry::action(
+                                    msg::hosting_ui::BRANCH_FROM_ISSUE.get(),
+                                    HostingAction::NewBranchFromIssue(issue_branch_for(
+                                        snap.issues_target
+                                            .as_ref()
+                                            .map(|t| t.profile.kind.family()),
+                                        issue,
+                                    )),
+                                ),
+                            ])
+                            .chain(if local {
+                                std::iter::once(Entry::Separator)
+                                    .chain(Self::local_entries(issue))
+                                    .collect::<Vec<_>>()
+                            } else {
+                                Vec::new()
+                            })
+                            .chain(if self.meta_issues() {
+                                std::iter::once(Entry::Separator)
+                                    .chain(meta::menu_entries(
+                                        self.snapshot
+                                            .as_ref()
+                                            .and_then(|s| s.issues_target.as_ref())
+                                            .map(|t| t.profile.kind),
+                                        false,
+                                        issue.number,
+                                    ))
+                                    .collect::<Vec<_>>()
+                            } else {
+                                Vec::new()
+                            })
+                            .collect(),
                         col,
                         row,
                     )

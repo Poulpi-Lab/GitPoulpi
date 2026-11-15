@@ -96,9 +96,9 @@ pub(crate) fn start(
 ) -> mpsc::Receiver<Msg> {
     let (tx, rx) = mpsc::channel();
     std::thread::spawn(move || {
-        let file = cache_dir.as_deref().map(|d| {
-            cache::file_for(d, &source.integration.id, &source.project, &source.key)
-        });
+        let file = cache_dir
+            .as_deref()
+            .map(|d| cache::file_for(d, &source.integration.id, &source.project, &source.key));
         if mode == Mode::Open {
             if let Some((page, at)) = file.as_deref().and_then(cache::read) {
                 let _ = tx.send_notify(Msg::Cached(Box::new(page), at));
@@ -128,7 +128,9 @@ pub(crate) fn start(
             let _ = tx.send_notify(Msg::Caps(caps));
             if !readable {
                 let _ = tx.send_notify(Msg::Failed(Failure::Unsupported(
-                    gitpoulpi_i18n::msg::item_view::NOT_READABLE.get().to_string(),
+                    gitpoulpi_i18n::msg::item_view::NOT_READABLE
+                        .get()
+                        .to_string(),
                 )));
                 return;
             }

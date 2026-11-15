@@ -17,8 +17,8 @@ use crate::dialog_kit::{self, ButtonState};
 use crate::keymap::Action as Bind;
 use crate::md_editor::{KeyUse, MdEditor, MouseUse};
 use crate::md_render;
-use gitpoulpi_i18n::msg::md_editor as md_msg;
 use crate::th;
+use gitpoulpi_i18n::msg::md_editor as md_msg;
 
 // -- the comment box -----------------------------------------------------------
 

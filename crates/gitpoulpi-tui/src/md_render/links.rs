@@ -82,9 +82,12 @@ fn piece(x: XrefTarget) -> Option<Piece> {
             Piece::Link(url, Some(x))
         }
         XrefTarget::Web(ref url) => Piece::Link(url.clone(), Some(x.clone())),
-        XrefTarget::Mention { url: Some(ref url), .. } | XrefTarget::Commit { url: Some(ref url), .. } => {
-            Piece::Link(url.clone(), Some(x.clone()))
+        XrefTarget::Mention {
+            url: Some(ref url), ..
         }
+        | XrefTarget::Commit {
+            url: Some(ref url), ..
+        } => Piece::Link(url.clone(), Some(x.clone())),
         XrefTarget::Mention { url: None, .. } => Piece::Styled(Look::Marker),
         XrefTarget::Commit { url: None, .. } => Piece::Styled(Look::Code),
         XrefTarget::Chip { .. } => Piece::Styled(Look::Code),

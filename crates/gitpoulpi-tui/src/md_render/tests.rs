@@ -509,7 +509,10 @@ fn host_references_become_links_through_xrefs() {
         &host_context(),
     );
     let urls: Vec<&str> = d.links.iter().map(|l| l.url.as_str()).collect();
-    assert!(urls.contains(&"https://github.com/o/r/issues/12"), "{urls:?}");
+    assert!(
+        urls.contains(&"https://github.com/o/r/issues/12"),
+        "{urls:?}"
+    );
     assert!(urls.contains(&"https://github.com/mara"), "{urls:?}");
     assert!(
         urls.contains(&"https://github.com/o/other/issues/3"),

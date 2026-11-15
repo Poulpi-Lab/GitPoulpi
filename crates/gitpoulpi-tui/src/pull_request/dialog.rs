@@ -741,7 +741,8 @@ impl PullRequestDialog {
             return self.open_web();
         }
         // The text fields' editing keys, through the shared core.
-        self.edit.sync((self.focus == PrFocus::Title).then_some(self.focus));
+        self.edit
+            .sync((self.focus == PrFocus::Title).then_some(self.focus));
         match self.focus {
             PrFocus::Title => {
                 if let Some((result, copied)) =

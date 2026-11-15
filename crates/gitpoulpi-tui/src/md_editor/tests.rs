@@ -18,7 +18,12 @@ fn editor(text: &str) -> MdEditor {
 
 fn paint(ed: &mut MdEditor, width: u16, height: u16) -> Buffer {
     let mut buf = Buffer::empty(Rect::new(0, 0, width, height));
-    ed.render(&mut buf, Rect::new(0, 0, width, height), true, "placeholder");
+    ed.render(
+        &mut buf,
+        Rect::new(0, 0, width, height),
+        true,
+        "placeholder",
+    );
     buf
 }
 
@@ -63,7 +68,10 @@ fn preview_mode_shows_the_markdown_rendered() {
     let s = screen(&paint(&mut ed, 60, 12));
     assert!(s.contains("Plan"), "{s}");
     assert!(!s.contains("# Plan"), "the heading marker is gone:\n{s}");
-    assert!(s.contains("Some bold and code."), "inline marks are gone:\n{s}");
+    assert!(
+        s.contains("Some bold and code."),
+        "inline marks are gone:\n{s}"
+    );
     assert!(!s.contains("**"), "{s}");
     assert!(s.contains("\u{2022} first"), "a list becomes bullets:\n{s}");
 }
@@ -167,7 +175,10 @@ fn the_mode_buttons_are_real_buttons() {
             .unwrap()
     };
     let preview = rect_of(&ed, Part::Preview);
-    assert_eq!(ed.on_mouse(click(preview.x + 1, preview.y)), MouseUse::Inside);
+    assert_eq!(
+        ed.on_mouse(click(preview.x + 1, preview.y)),
+        MouseUse::Inside
+    );
     assert_eq!(ed.mode(), Mode::Preview);
     paint(&mut ed, 90, 12);
     let write = rect_of(&ed, Part::Write);
@@ -226,7 +237,10 @@ fn the_preview_scrolls_with_the_keys() {
 
 #[test]
 fn a_long_text_is_laid_out_on_a_worker_and_never_blocks_the_paint() {
-    let long = format!("# Big heading\n\n{}", "word ".repeat(preview::SYNC_LIMIT / 4));
+    let long = format!(
+        "# Big heading\n\n{}",
+        "word ".repeat(preview::SYNC_LIMIT / 4)
+    );
     assert!(long.len() > preview::SYNC_LIMIT);
     let mut ed = editor(&long);
     ed.set_mode(Mode::Preview);
@@ -234,7 +248,11 @@ fn a_long_text_is_laid_out_on_a_worker_and_never_blocks_the_paint() {
     let first = screen(&paint(&mut ed, 60, 12));
     // The first paint did not wait for the layout (the debounce alone is
     // longer than any paint).
-    assert!(started.elapsed() < preview::DEBOUNCE, "{:?}", started.elapsed());
+    assert!(
+        started.elapsed() < preview::DEBOUNCE,
+        "{:?}",
+        started.elapsed()
+    );
     assert!(!first.contains("Big heading"), "{first}");
     assert!(first.contains(msg::PREVIEW_UPDATING.get()), "{first}");
     let deadline = Instant::now() + std::time::Duration::from_secs(10);
@@ -262,7 +280,10 @@ fn the_preview_resolves_the_hosts_references() {
     };
     let doc = md_render::render("see #7 and @mara", 60, &ctx);
     let urls: Vec<&str> = doc.links.iter().map(|l| l.url.as_str()).collect();
-    assert!(urls.contains(&"https://github.com/o/r/issues/7"), "{urls:?}");
+    assert!(
+        urls.contains(&"https://github.com/o/r/issues/7"),
+        "{urls:?}"
+    );
     assert!(urls.iter().any(|u| u.ends_with("/mara")), "{urls:?}");
 }
 

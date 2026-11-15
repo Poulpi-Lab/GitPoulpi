@@ -380,18 +380,17 @@ impl MdEditor {
             return MouseUse::Inside;
         }
         let len = self.pv_len;
-        if let Some(top) = self
-            .preview
-            .drag
-            .on_mouse(self.preview.bar, mouse, len, self.preview.top)
+        if let Some(top) =
+            self.preview
+                .drag
+                .on_mouse(self.preview.bar, mouse, len, self.preview.top)
         {
             self.preview.top = top;
             return MouseUse::Inside;
         }
         // A selection drag goes on wherever the pointer is.
         if !matches!(mouse.kind, MouseEventKind::Down(_)) && self.edit.is_dragging() {
-            self.edit
-                .area_mouse((), &self.text, mouse.kind, pos, false);
+            self.edit.area_mouse((), &self.text, mouse.kind, pos, false);
             return MouseUse::Inside;
         }
         if !self.area.contains(at()) {
@@ -412,8 +411,7 @@ impl MdEditor {
                     let shift = mouse
                         .modifiers
                         .contains(crossterm::event::KeyModifiers::SHIFT);
-                    self.edit
-                        .area_mouse((), &self.text, mouse.kind, pos, shift);
+                    self.edit.area_mouse((), &self.text, mouse.kind, pos, shift);
                 }
                 _ => {}
             },
@@ -426,13 +424,11 @@ impl MdEditor {
                 if self.pane_rect.contains(at()) {
                     self.scroll_preview(step);
                 } else {
-                    self.edit
-                        .area_mouse((), &self.text, mouse.kind, pos, false);
+                    self.edit.area_mouse((), &self.text, mouse.kind, pos, false);
                 }
             }
             MouseEventKind::Drag(MouseButton::Left) | MouseEventKind::Up(MouseButton::Left) => {
-                self.edit
-                    .area_mouse((), &self.text, mouse.kind, pos, false);
+                self.edit.area_mouse((), &self.text, mouse.kind, pos, false);
             }
             _ => {}
         }
@@ -484,7 +480,13 @@ impl MdEditor {
     // -- painting ----------------------------------------------------------------
 
     /// Paints the editor into `rect`. `focused` gives the text its caret.
-    pub(crate) fn render(&mut self, buf: &mut Buffer, rect: Rect, focused: bool, placeholder: &str) {
+    pub(crate) fn render(
+        &mut self,
+        buf: &mut Buffer,
+        rect: Rect,
+        focused: bool,
+        placeholder: &str,
+    ) {
         self.save_when_idle();
         self.edit.begin_frame();
         self.area = rect;

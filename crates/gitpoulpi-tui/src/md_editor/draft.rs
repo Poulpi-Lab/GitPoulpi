@@ -62,7 +62,10 @@ fn write(dir: &Path, drafts: &Drafts) {
 
 /// The saved draft of `key`.
 pub(crate) fn load(dir: &Path, key: &str) -> Option<String> {
-    read(dir).drafts.remove(key).filter(|t| !t.trim().is_empty())
+    read(dir)
+        .drafts
+        .remove(key)
+        .filter(|t| !t.trim().is_empty())
 }
 
 /// Saves `text` as the draft of `key` (a blank text removes it).

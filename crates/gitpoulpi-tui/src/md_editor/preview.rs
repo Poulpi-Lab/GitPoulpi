@@ -51,11 +51,8 @@ impl Worker {
         std::thread::spawn(move || {
             while let Ok(mut job) = jobs.recv() {
                 // Typing goes on: only the newest text is worth laying out.
-                loop {
-                    match jobs.recv_timeout(DEBOUNCE) {
-                        Ok(newer) => job = newer,
-                        Err(_) => break,
-                    }
+                while let Ok(newer) = jobs.recv_timeout(DEBOUNCE) {
+                    job = newer;
                 }
                 let doc = md_render::render(&job.text, job.key.width, &job.ctx);
                 if done_tx.send_notify(Done { key: job.key, doc }).is_err() {

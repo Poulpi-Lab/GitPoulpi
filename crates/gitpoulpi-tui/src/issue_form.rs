@@ -147,11 +147,8 @@ impl IssueDialog {
     }
 
     pub(crate) fn new(seed: IssueSeed) -> Self {
-        let draft_key = crate::md_editor::draft::key(&[
-            &seed.integration.id,
-            &seed.project,
-            "new-issue",
-        ]);
+        let draft_key =
+            crate::md_editor::draft::key(&[&seed.integration.id, &seed.project, "new-issue"]);
         let md_context = crate::md_render::Context {
             xrefs: gitpoulpi_hosting::xrefs::XrefContext {
                 family: Some(seed.integration.kind.family()),
@@ -538,8 +535,11 @@ impl IssueDialog {
             choice.combo.on_key(key);
             return IssueOutcome::Stay;
         }
-        self.edit
-            .sync(Self::is_text(focus).then_some(focus).filter(|f| *f != IssueFocus::Body));
+        self.edit.sync(
+            Self::is_text(focus)
+                .then_some(focus)
+                .filter(|f| *f != IssueFocus::Body),
+        );
         match focus {
             _ if crate::keymap::current().is(Bind::DialogWeb, &key) => return self.open_web(),
             IssueFocus::Title | IssueFocus::Labels => {

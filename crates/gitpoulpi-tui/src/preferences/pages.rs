@@ -91,6 +91,7 @@ pub(super) const SYNC_REWRITE: &[Row] = &[
 /// The generic rows above the Integrations page's own body.
 pub(super) const INTEGRATIONS: &[Row] = &[
     Key("general.hosting_refresh_minutes"),
+    Key("general.hosting_post_as"),
     Key("ui.pr_terminology"),
     Key("ui.hide_finished_pr_chip"),
 ];

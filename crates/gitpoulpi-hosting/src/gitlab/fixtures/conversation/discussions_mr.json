@@ -1,0 +1,43 @@
+[
+  {
+    "id": "m1",
+    "individual_note": true,
+    "notes": [
+      {"id": 20, "body": "added 3 commits\n\n<ul><li>abc</li></ul>", "author": {"id": 6, "username": "erin", "name": "Erin"}, "created_at": "2024-06-02T09:05:00.000Z", "updated_at": "2024-06-02T09:05:00.000Z", "system": true}
+    ]
+  },
+  {
+    "id": "m2",
+    "individual_note": false,
+    "notes": [
+      {
+        "id": 21, "type": "DiffNote", "body": "Use `env::var_os` here.",
+        "author": {"id": 5, "username": "dana", "name": "Dana Scully"},
+        "created_at": "2024-06-02T10:00:00.000Z", "updated_at": "2024-06-02T10:00:00.000Z",
+        "system": false, "resolvable": true, "resolved": false,
+        "position": {"base_sha": "b", "start_sha": "s", "head_sha": "head123", "old_path": "src/net.rs", "new_path": "src/net.rs", "position_type": "text", "old_line": null, "new_line": 17}
+      },
+      {
+        "id": 22, "type": "DiffNote", "body": "Done.",
+        "author": {"id": 6, "username": "erin", "name": "Erin"},
+        "created_at": "2024-06-02T10:30:00.000Z", "updated_at": "2024-06-02T10:30:00.000Z",
+        "system": false, "resolvable": true, "resolved": false,
+        "position": {"base_sha": "b", "start_sha": "s", "head_sha": "head123", "old_path": "src/net.rs", "new_path": "src/net.rs", "position_type": "text", "old_line": null, "new_line": 17}
+      }
+    ]
+  },
+  {
+    "id": "m3",
+    "individual_note": true,
+    "notes": [
+      {"id": 23, "body": "mentioned in merge request !9", "author": {"id": 6, "username": "erin", "name": "Erin"}, "created_at": "2024-06-02T11:00:00.000Z", "updated_at": "2024-06-02T11:00:00.000Z", "system": true}
+    ]
+  },
+  {
+    "id": "m4",
+    "individual_note": true,
+    "notes": [
+      {"id": 24, "body": "merged", "author": {"id": 6, "username": "erin", "name": "Erin"}, "created_at": "2024-06-03T09:00:00.000Z", "updated_at": "2024-06-03T09:00:00.000Z", "system": true}
+    ]
+  }
+]

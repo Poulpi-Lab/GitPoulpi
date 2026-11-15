@@ -349,6 +349,10 @@ include_untracked_in_autostash = "Incluir ficheiros não acompanhados no auto-st
 include_untracked_in_autostash_help = "Se o stash automático também leva ficheiros não acompanhados (caso contrário, só as alterações acompanhadas são guardadas e restauradas)."
 hosting_refresh_minutes = { git = "Atualização de {$prs} e issues", local = "Atualização de {$Prs} e issues" }
 hosting_refresh_minutes_help = { git = "Com que frequência as listas de {$prs} e Issues da barra lateral (e o chip de {$pr_abbr} associado na barra de ferramentas) voltam a consultar o host. 0 desliga o temporizador; continuam a ser atualizadas ao abrir um repositório, ao mudar de branch, após um push ou fetch, e a pedido.", local = "Com que frequência as listas de {$Prs} e Issues da barra lateral (e o chip de {$pr_abbr} associado na barra de ferramentas) voltam a consultar o host. 0 desliga o temporizador; continuam a ser atualizadas ao abrir um repositório, ao mudar de branch, após um envio ou uma obtenção, e a pedido." }
+# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
+hosting_post_as = "Post as"
+# context: help under the "Post as" row of Settings
+hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
 pr_terminology = "Terminologia de pedido de revisão"
 pr_terminology_help = { git = "A palavra usada para um pedido de revisão de código alojado em todo o TUI. Auto segue o host do repositório: Merge Request para o GitLab, Pull Request para os outros hosts. Pull Request ou Merge Request força essa palavra. Aplica-se de imediato.", local = "A palavra usada para um pedido de revisão de código alojado em todo o TUI. Auto segue o host do repositório: Pedido de integração para o GitLab, Pedido de incorporação para os outros hosts. Pedido de incorporação ou Pedido de integração força essa palavra. Aplica-se de imediato." }
 hide_finished_pr_chip = { git = "Ocultar o chip do {$pr} depois de fechado ou de feito o merge", local = "Ocultar o chip do {$pr} depois de fechado ou de feita a integração" }
@@ -9420,6 +9424,10 @@ assignment_label = "Assignment"
 assignment_allowed = "Allowed"
 assignment_blocked = "Blocked"
 assignment_help = "Blocked: nothing can be assigned in this repository's issues and {$prs}, from the app, the CLI or an agent. Existing assignees stay visible. Applies immediately."
+# context: label of the repository row that overrides the global "Post as" name
+post_as_label = "Post as"
+# context: help under the repository "Post as" row of the SSH & credentials page
+post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
 # context: one row listing a credential helper set by the repository; {value} is the helper, {origin} the file that sets it
 repo_helper_line = "{value}  ({origin})"
 # context: label of the rows that list the credential helpers set by this repository

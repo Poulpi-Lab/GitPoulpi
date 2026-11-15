@@ -4,6 +4,9 @@
 //! command carried the assignee. Reads and everything else pass through.
 
 use crate::client::{CreatedIssue, CreatedPullRequest, HostingClient, NewIssue, NewPullRequest};
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, PageCursor, PostingIdentity, TimelineOpts, TimelinePage,
+};
 use crate::integration::Integration;
 use crate::issue_flow::{CreatedBranch, IssueLinks, NewIssueBranch};
 use crate::metadata::{HostedLabel, HostedMilestone, IssueEdit, ItemMeta, MetaKind, PrEdit};
@@ -234,6 +237,62 @@ impl HostingClient for AssignmentGuard {
         review: &ReviewSubmission,
     ) -> Result<ReviewOutcome> {
         self.inner.submit_review(project, number, review).await
+    }
+    fn conversation_caps(&self, kind: crate::conversation::ItemKind) -> ConversationCaps {
+        self.inner.conversation_caps(kind)
+    }
+    async fn posting_identity(&self, project: &str) -> Result<PostingIdentity> {
+        self.inner.posting_identity(project).await
+    }
+    async fn item_timeline(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        older: Option<&PageCursor>,
+        opts: &TimelineOpts,
+    ) -> Result<TimelinePage> {
+        self.inner.item_timeline(project, key, older, opts).await
+    }
+    async fn post_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> Result<Comment> {
+        self.inner
+            .post_item_comment(project, key, body, internal)
+            .await
+    }
+    async fn reply_in_discussion(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        discussion_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.inner
+            .reply_in_discussion(project, key, discussion_id, body)
+            .await
+    }
+    async fn edit_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.inner
+            .edit_item_comment(project, key, comment_id, body)
+            .await
+    }
+    async fn delete_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+    ) -> Result<()> {
+        self.inner.delete_item_comment(project, key, comment_id).await
     }
     async fn create_issue_branch(&self, req: &NewIssueBranch) -> Result<CreatedBranch> {
         self.inner.create_issue_branch(req).await

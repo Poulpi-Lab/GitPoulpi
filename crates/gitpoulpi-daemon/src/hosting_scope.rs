@@ -103,6 +103,35 @@ pub fn assignment_blocked(root: &Path) -> bool {
     blocked
 }
 
+/// The "Post as" name of the repository at `root`: its own override, else the
+/// global `general.hosting_post_as`; `None` when neither is set.
+pub fn post_as(root: &Path) -> Option<String> {
+    let own = gitpoulpi_session::RepoState::load(&state_path(root))
+        .ok()
+        .and_then(|s| s.hosting_post_as);
+    let name = own
+        .filter(|n| !n.trim().is_empty())
+        .or_else(|| {
+            gitpoulpi_config::Settings::resolve_ambient()
+                .ok()
+                .map(|s| s.config().general.hosting_post_as.clone())
+        })?;
+    let name = name.trim();
+    (!name.is_empty()).then(|| name.to_string())
+}
+
+/// Keeps `login` as who the repository's bot token posts as, in its state.
+pub fn learn_login(root: &Path, login: &str) {
+    let path = state_path(root);
+    let Ok(mut state) = gitpoulpi_session::RepoState::load(&path) else {
+        return;
+    };
+    if state.hosting_identity.as_deref() != Some(login) {
+        state.hosting_identity = Some(login.to_string());
+        let _ = state.save(&path);
+    }
+}
+
 /// The token command of the repository's profile when it is marked for the
 /// hosting API: `Ok(None)` when it is not.
 fn hosting_command(root: &Path) -> Result<Option<TokenCommand>, Error> {
@@ -180,5 +209,24 @@ impl RepoScopes for Registry {
     fn acts_as_bot(&self, integration_id: &str, project: &str) -> bool {
         self.root_of(integration_id, project)
             .is_some_and(|root| matches!(hosting_command(&root), Ok(Some(_))))
+    }
+
+    fn post_as(&self, integration_id: &str, project: &str) -> Option<String> {
+        let root = self.root_of(integration_id, project)?;
+        post_as(&root)
+    }
+
+    fn learned_login(&self, integration_id: &str, project: &str) -> Option<String> {
+        let root = self.root_of(integration_id, project)?;
+        gitpoulpi_session::RepoState::load(&state_path(&root))
+            .ok()?
+            .hosting_identity
+            .filter(|l| !l.trim().is_empty())
+    }
+
+    fn learn_login(&self, integration_id: &str, project: &str, login: &str) {
+        if let Some(root) = self.root_of(integration_id, project) {
+            learn_login(&root, login);
+        }
     }
 }

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "s1",
+    "individual_note": true,
+    "notes": [
+      {"id": 10, "type": null, "body": "added ~\"bug\" label", "author": {"id": 5, "username": "dana", "name": "Dana Scully"}, "created_at": "2024-06-01T09:00:02.000Z", "updated_at": "2024-06-01T09:00:02.000Z", "system": true, "noteable_type": "Issue"}
+    ]
+  },
+  {
+    "id": "d2",
+    "individual_note": true,
+    "notes": [
+      {"id": 11, "type": null, "body": "Reproduced on 16.4.", "author": {"id": 7, "username": "mulder", "name": "Fox Mulder", "web_url": "https://gitlab.com/mulder"}, "created_at": "2024-06-01T10:00:00.000Z", "updated_at": "2024-06-01T10:20:00.000Z", "system": false, "internal": false, "noteable_type": "Issue"}
+    ]
+  },
+  {
+    "id": "d3",
+    "individual_note": false,
+    "notes": [
+      {"id": 12, "type": "DiscussionNote", "body": "Which proxy?", "author": {"id": 5, "username": "dana", "name": "Dana Scully"}, "created_at": "2024-06-01T11:00:00.000Z", "updated_at": "2024-06-01T11:00:00.000Z", "system": false, "internal": false, "resolvable": false},
+      {"id": 13, "type": "DiscussionNote", "body": "Squid 5.", "author": {"id": 99, "username": "project_42_bot_a1b2c3", "name": "triage-bot", "bot": true}, "created_at": "2024-06-01T11:05:00.000Z", "updated_at": "2024-06-01T11:05:01.000Z", "system": false, "internal": false, "resolvable": false}
+    ]
+  },
+  {
+    "id": "d4",
+    "individual_note": true,
+    "notes": [
+      {"id": 14, "type": null, "body": "Needs the security team.", "author": {"id": 5, "username": "dana", "name": "Dana Scully"}, "created_at": "2024-06-01T12:00:00.000Z", "updated_at": "2024-06-01T12:00:00.000Z", "system": false, "internal": true}
+    ]
+  },
+  {
+    "id": "s2",
+    "individual_note": true,
+    "notes": [
+      {"id": 15, "body": "assigned to @erin", "author": {"id": 5, "username": "dana", "name": "Dana Scully"}, "created_at": "2024-06-02T08:00:00.000Z", "updated_at": "2024-06-02T08:00:00.000Z", "system": true}
+    ]
+  },
+  {
+    "id": "s3",
+    "individual_note": true,
+    "notes": [
+      {"id": 16, "body": "changed title from **Login breaks** to **Login fails behind a proxy**", "author": {"id": 5, "username": "dana", "name": "Dana Scully"}, "created_at": "2024-06-02T08:30:00.000Z", "updated_at": "2024-06-02T08:30:00.000Z", "system": true}
+    ]
+  },
+  {
+    "id": "s4",
+    "individual_note": true,
+    "notes": [
+      {"id": 17, "body": "closed", "author": {"id": 6, "username": "erin", "name": "Erin"}, "created_at": "2024-06-03T09:00:00.000Z", "updated_at": "2024-06-03T09:00:00.000Z", "system": true}
+    ]
+  }
+]

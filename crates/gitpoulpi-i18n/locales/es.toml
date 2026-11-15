@@ -349,6 +349,10 @@ include_untracked_in_autostash = { git = "Incluir archivos sin seguimiento en el
 include_untracked_in_autostash_help = { git = "Si el stash automático también toma los archivos sin seguimiento (si no, solo se guardan y se restauran los cambios con seguimiento).", local = "Si el guardado rápido automático también toma los archivos sin seguimiento (si no, solo se guardan y se restauran los cambios con seguimiento)." }
 hosting_refresh_minutes = "Actualización de {$prs} e issues"
 hosting_refresh_minutes_help = { git = "Cada cuánto vuelven a consultar al host las listas de {$prs} e issues de la barra lateral (y el chip de {$pr_abbr} vinculada de la barra de herramientas). 0 apaga el temporizador; aun así se actualizan al abrir un repositorio, al cambiar de rama, tras un push o fetch, y bajo demanda.", local = "Cada cuánto vuelven a consultar al host las listas de {$prs} e issues de la barra lateral (y el chip de {$pr_abbr} vinculada de la barra de herramientas). 0 apaga el temporizador; aun así se actualizan al abrir un repositorio, al cambiar de rama, tras un envío o obtención, y bajo demanda." }
+# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
+hosting_post_as = "Post as"
+# context: help under the "Post as" row of Settings
+hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
 pr_terminology = "Terminología de las solicitudes de revisión"
 pr_terminology_help = { git = "La palabra que designa una solicitud de revisión de código alojada en toda la TUI. Auto sigue el host del repositorio: Merge request en GitLab, Pull request en los demás. Pull request o Merge request fuerza esa palabra. Se aplica al instante.", local = "La palabra que designa una solicitud de revisión de código alojada en toda la TUI. Auto sigue el host del repositorio: «Solicitud de fusión» en GitLab, «Solicitud de incorporación» en los demás. «Solicitud de incorporación» o «Solicitud de fusión» fuerza esa palabra. Se aplica al instante." }
 hide_finished_pr_chip = { git = "Ocultar el chip de {$pr} cuando se cierra o se hace {$merge} de ella", local = "Ocultar el chip de {$pr} cuando se cierra o se fusiona" }
@@ -9424,6 +9428,10 @@ assignment_label = "Assignment"
 assignment_allowed = "Allowed"
 assignment_blocked = "Blocked"
 assignment_help = "Blocked: nothing can be assigned in this repository's issues and {$prs}, from the app, the CLI or an agent. Existing assignees stay visible. Applies immediately."
+# context: label of the repository row that overrides the global "Post as" name
+post_as_label = "Post as"
+# context: help under the repository "Post as" row of the SSH & credentials page
+post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
 # context: one row listing a credential helper set by the repository; {value} is the helper, {origin} the file that sets it
 repo_helper_line = "{value}  ({origin})"
 # context: label of the rows that list the credential helpers set by this repository

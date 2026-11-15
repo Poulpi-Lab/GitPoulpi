@@ -351,6 +351,10 @@ include_untracked_in_autostash = "Ta med ospårade filer i auto-stash"
 include_untracked_in_autostash_help = "Om den automatiska stashen också tar ospårade filer (annars stashas och återställs bara spårade ändringar)."
 hosting_refresh_minutes = "Uppdatering av {$prs} och ärenden"
 hosting_refresh_minutes_help = { git = "Hur ofta sidopanelens listor över {$prs} och ärenden (och verktygsfältets länkade {$pr_abbr}-chip) frågar värden igen. 0 stänger av timern; de uppdateras ändå när ett repository öppnas, vid grenbyte, efter push eller fetch och på begäran.", local = "Hur ofta sidopanelens listor över {$prs} och ärenden (och verktygsfältets länkade {$pr_abbr}-chip) frågar värden igen. 0 stänger av timern; de uppdateras ändå när ett repository öppnas, vid grenbyte, efter push eller hämtning och på begäran." }
+# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
+hosting_post_as = "Post as"
+# context: help under the "Post as" row of Settings
+hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
 pr_terminology = "Terminologi för granskningsbegäran"
 pr_terminology_help = "Ordet som används överallt i TUI:t för en hostad kodgranskningsbegäran. Auto följer repositoryts värd: Merge request för GitLab, Pull request för övriga värdar. Pull request eller Merge request tvingar det ordet. Gäller direkt."
 hide_finished_pr_chip = { git = "Dölj {$pr}-chipet när den är stängd eller {$merge}ad", local = "Dölj {$pr_abbr}-chipet när den är stängd eller sammanslagen" }
@@ -9419,6 +9423,10 @@ assignment_label = "Assignment"
 assignment_allowed = "Allowed"
 assignment_blocked = "Blocked"
 assignment_help = "Blocked: nothing can be assigned in this repository's issues and {$prs}, from the app, the CLI or an agent. Existing assignees stay visible. Applies immediately."
+# context: label of the repository row that overrides the global "Post as" name
+post_as_label = "Post as"
+# context: help under the repository "Post as" row of the SSH & credentials page
+post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
 repo_helper_line = "{value}  ({origin})"
 repo_helper_label = "Angivna av det här repositoryt"
 no_repo_helpers = "Det här repositoryt anger ingen egen credential helper."

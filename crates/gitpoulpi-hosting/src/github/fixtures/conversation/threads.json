@@ -1,0 +1,88 @@
+{
+  "data": {
+    "repository": {
+      "pullRequest": {
+        "reviewThreads": {
+          "pageInfo": {"hasNextPage": false, "endCursor": null},
+          "nodes": [
+            {
+              "id": "PRRT_kwDOA",
+              "isResolved": false,
+              "isOutdated": false,
+              "path": "src/config.rs",
+              "line": 42,
+              "originalLine": 42,
+              "startLine": null,
+              "originalStartLine": null,
+              "diffSide": "RIGHT",
+              "comments": {
+                "nodes": [
+                  {
+                    "databaseId": 4001,
+                    "author": {"login": "alice", "__typename": "User", "url": "https://github.com/alice"},
+                    "body": "Why not `unwrap_or_default()`?",
+                    "createdAt": "2024-05-02T08:45:00Z",
+                    "updatedAt": "2024-05-02T08:45:00Z",
+                    "lastEditedAt": null,
+                    "url": "https://github.com/octo/thing/pull/12#discussion_r4001",
+                    "diffHunk": "@@ -40,6 +40,8 @@ fn load() {\n     let raw = read();\n+    if raw.is_empty() {\n+        return Config::default();\n+    }\n",
+                    "replyTo": null,
+                    "viewerCanUpdate": false,
+                    "viewerCanDelete": false,
+                    "reactionGroups": [
+                      {"content": "THUMBS_UP", "reactors": {"totalCount": 1}},
+                      {"content": "HEART", "reactors": {"totalCount": 0}}
+                    ]
+                  },
+                  {
+                    "databaseId": 4002,
+                    "author": {"login": "poulpi-lab", "__typename": "Bot", "url": "https://github.com/apps/poulpi-lab"},
+                    "body": "Done in the next push.",
+                    "createdAt": "2024-05-02T09:30:00Z",
+                    "updatedAt": "2024-05-02T09:40:00Z",
+                    "lastEditedAt": "2024-05-02T09:40:00Z",
+                    "url": "https://github.com/octo/thing/pull/12#discussion_r4002",
+                    "diffHunk": "@@ -40,6 +40,8 @@ fn load() {\n",
+                    "replyTo": {"databaseId": 4001},
+                    "viewerCanUpdate": true,
+                    "viewerCanDelete": true,
+                    "reactionGroups": []
+                  }
+                ]
+              }
+            },
+            {
+              "id": "PRRT_kwDOB",
+              "isResolved": true,
+              "isOutdated": true,
+              "path": "src/old.rs",
+              "line": null,
+              "originalLine": 9,
+              "startLine": null,
+              "originalStartLine": 7,
+              "diffSide": "LEFT",
+              "comments": {
+                "nodes": [
+                  {
+                    "databaseId": 4003,
+                    "author": null,
+                    "body": "Stale.",
+                    "createdAt": "2024-05-01T00:00:00Z",
+                    "updatedAt": "2024-05-01T00:00:00Z",
+                    "lastEditedAt": null,
+                    "url": "https://github.com/octo/thing/pull/12#discussion_r4003",
+                    "diffHunk": "@@ -7,3 +7,3 @@\n",
+                    "replyTo": null,
+                    "viewerCanUpdate": false,
+                    "viewerCanDelete": false,
+                    "reactionGroups": []
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

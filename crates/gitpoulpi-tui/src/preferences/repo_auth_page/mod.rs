@@ -61,6 +61,8 @@ pub(crate) enum RaTarget {
     UseForHosting,
     /// The repository's assignment block (Allowed / Blocked), saved at once.
     Assignment,
+    /// The repository's "Post as" name, saved at once.
+    PostAs,
     SshSource,
     Key,
     SshAccount,
@@ -483,8 +485,18 @@ impl PreferencesState {
     // -- the rows' commits ---------------------------------------------------------
 
     pub(super) fn ra_commit_text(&mut self, target: RaTarget, text: &str) -> bool {
-        let d = &mut self.repo_auth.draft;
         let text = text.trim().to_string();
+        if target == RaTarget::PostAs {
+            // A setting of the repository, not part of the profile: saved at
+            // once, on top of what the file holds now.
+            let mut state = RepoState::load(&self.repo_state_path).unwrap_or_default();
+            state.hosting_post_as = Some(text).filter(|t| !t.is_empty());
+            if state.save(&self.repo_state_path).is_ok() {
+                self.repo_state.hosting_post_as = state.hosting_post_as;
+            }
+            return true;
+        }
+        let d = &mut self.repo_auth.draft;
         match target {
             RaTarget::Username => d.username = text,
             RaTarget::Helper => d.helper = text,
@@ -965,6 +977,14 @@ impl PreferencesState {
                 target(RaTarget::Assignment),
             )
             .with_help(t::ASSIGNMENT_HELP.get()),
+        );
+        f.push(
+            Field::plain(
+                t::POST_AS_LABEL.get(),
+                Control::Text(self.repo_state.hosting_post_as.clone().unwrap_or_default()),
+                target(RaTarget::PostAs),
+            )
+            .with_help(t::POST_AS_HELP.get()),
         );
 
         // -- Remotes ----------------------------------------------------------------

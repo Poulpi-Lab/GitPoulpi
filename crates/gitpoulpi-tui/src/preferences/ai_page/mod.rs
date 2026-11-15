@@ -12,6 +12,7 @@
 //! subprocess) and testing a connection (a network round trip) run on
 //! their own threads and report on a channel `poll_ai` drains.
 
+mod hosting_reply_rows;
 mod limits_rows;
 mod open_agent;
 mod privacy_rows;
@@ -94,6 +95,9 @@ pub(super) enum AiScope {
 pub(super) enum AiSection {
     Global,
     Action(AiAction),
+    /// The base prompt of the writing help on a host
+    /// (`ai.hosting_reply.base_prompt`): global only, no repository twin.
+    HostingBase,
 }
 
 impl AiSection {
@@ -111,6 +115,9 @@ impl AiSection {
             Self::Action(AiAction::RewriteScript) => gitpoulpi_i18n::msg::rewrite_ai::TITLE,
             Self::Action(AiAction::RewriteRules) => gitpoulpi_i18n::msg::rewrite_rules_ai::TITLE,
             Self::Action(AiAction::WorktreeName) => msg::TITLE_WORKTREE_NAME,
+            Self::Action(AiAction::HostingReply) => msg::TITLE_HOSTING_REPLY,
+            Self::Action(AiAction::IssueBody) => msg::TITLE_ISSUE_BODY,
+            Self::HostingBase => msg::TITLE_HOSTING_BASE,
         }
         .get()
     }
@@ -129,6 +136,10 @@ impl AiSection {
             (AiAction::RewriteRules, false) => gitpoulpi_i18n::msg::rewrite_rules_ai::PROFILE_HELP,
             (AiAction::WorktreeName, false) => msg::PROFILE_HELP_WORKTREE_NAME,
             (AiAction::WorktreeName, true) => msg::REPO_PROFILE_HELP_WORKTREE_NAME,
+            (AiAction::HostingReply, false) => msg::PROFILE_HELP_HOSTING_REPLY,
+            (AiAction::HostingReply, true) => msg::REPO_PROFILE_HELP_HOSTING_REPLY,
+            (AiAction::IssueBody, false) => msg::PROFILE_HELP_ISSUE_BODY,
+            (AiAction::IssueBody, true) => msg::REPO_PROFILE_HELP_ISSUE_BODY,
             (AiAction::ConflictResolve, false) => msg::PROFILE_HELP_CONFLICT_RESOLVE,
             (AiAction::CodeReview, false) => {
                 gitpoulpi_i18n::msg::review_ai::PROFILE_HELP_CODE_REVIEW
@@ -156,6 +167,7 @@ impl AiSection {
         match self {
             Self::Global => "ai.global_instructions".to_string(),
             Self::Action(a) => format!("ai.actions.{}.instructions", a.key()),
+            Self::HostingBase => "ai.hosting_reply.base_prompt".to_string(),
         }
     }
 }
@@ -419,6 +431,8 @@ fn action_label(action: AiAction) -> &'static str {
         AiAction::RewriteScript => gitpoulpi_i18n::msg::rewrite_ai::ACTION,
         AiAction::RewriteRules => gitpoulpi_i18n::msg::rewrite_rules_ai::ACTION,
         AiAction::WorktreeName => msg::ACTION_WORKTREE_NAME,
+        AiAction::HostingReply => msg::ACTION_HOSTING_REPLY,
+        AiAction::IssueBody => msg::ACTION_ISSUE_BODY,
         AiAction::ConflictResolve => msg::ACTION_CONFLICT_RESOLVE,
         AiAction::CodeReview => gitpoulpi_i18n::msg::review_ai::ACTION_CODE_REVIEW,
     }
@@ -871,6 +885,7 @@ impl PreferencesState {
             (AiScope::Repo, AiSection::Action(a)) => self.repo_override(a).instructions,
             (_, AiSection::Global) => self.config.ai.global_instructions.clone(),
             (_, AiSection::Action(a)) => self.config.ai.actions.get(a).instructions.clone(),
+            (_, AiSection::HostingBase) => self.config.ai.hosting_reply.base_prompt.clone(),
         }
     }
 

@@ -16,7 +16,10 @@ const VERY_LARGE_BYTES: usize = 400_000;
 impl PreferencesState {
     /// The Limits rows: one number per capped input.
     pub(in crate::preferences) fn limits_rows(&self) -> Vec<Field> {
-        use gitpoulpi_config::{AiLimits, MIN_LIMIT_BYTES};
+        use gitpoulpi_config::{
+            AiLimits, MAX_HOSTING_REPLY_HITS, MAX_HOSTING_REPLY_TERMS, MIN_HOSTING_REPLY_HITS,
+            MIN_HOSTING_REPLY_TERMS, MIN_LIMIT_BYTES,
+        };
         use gitpoulpi_config::{MAX_CONFLICT_BYTES, MAX_LIMIT_BYTES, MIN_CONFLICT_BYTES};
         let l = &self.config.ai.limits;
         // (label, help, key, current, min, max): the keys are `AiLimits::KEYS`.
@@ -69,6 +72,41 @@ impl PreferencesState {
                 l.review_context_bytes_clamped(),
                 MIN_LIMIT_BYTES,
                 MAX_LIMIT_BYTES,
+            ),
+            (
+                msg::HOSTING_REPLY_CONTEXT_LABEL.get(),
+                msg::HOSTING_REPLY_CONTEXT_HELP.get(),
+                l.hosting_reply_context_bytes_clamped(),
+                MIN_LIMIT_BYTES,
+                MAX_LIMIT_BYTES,
+            ),
+            (
+                msg::HOSTING_REPLY_FILE_LABEL.get(),
+                msg::HOSTING_REPLY_FILE_HELP.get(),
+                l.hosting_reply_file_bytes_clamped(),
+                MIN_LIMIT_BYTES,
+                MAX_LIMIT_BYTES,
+            ),
+            (
+                msg::HOSTING_REPLY_MAP_LABEL.get(),
+                msg::HOSTING_REPLY_MAP_HELP.get(),
+                l.hosting_reply_map_bytes_clamped(),
+                MIN_LIMIT_BYTES,
+                MAX_LIMIT_BYTES,
+            ),
+            (
+                msg::HOSTING_REPLY_HITS_LABEL.get(),
+                msg::HOSTING_REPLY_HITS_HELP.get(),
+                l.hosting_reply_hits_per_term_clamped(),
+                MIN_HOSTING_REPLY_HITS,
+                MAX_HOSTING_REPLY_HITS,
+            ),
+            (
+                msg::HOSTING_REPLY_TERMS_LABEL.get(),
+                msg::HOSTING_REPLY_TERMS_HELP.get(),
+                l.hosting_reply_terms_clamped(),
+                MIN_HOSTING_REPLY_TERMS,
+                MAX_HOSTING_REPLY_TERMS,
             ),
         ];
         let mut fields = vec![Field::heading(msg::SETTINGS_HEADING.get())];

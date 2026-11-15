@@ -302,10 +302,11 @@ impl Job {
     /// The base prompt this job starts from: the built-in one of its action,
     /// or the user's own for the writing actions (see
     /// [`Job::base_override`]).
-    pub fn base_prompt(&self) -> &str {
-        self.base_override
-            .as_deref()
-            .unwrap_or_else(|| prompts::base_prompt(self.action))
+    pub fn base_prompt(&self) -> String {
+        match &self.base_override {
+            Some(text) => vars::expand(text, &self.context),
+            None => prompts::base_prompt(self.action).to_string(),
+        }
     }
 
     /// The system prompt this job sends: the base prompt (see
@@ -326,7 +327,7 @@ impl Job {
             self.action_from_repo,
         );
         let mut out = prompts::system_prompt_layered_with_base(
-            self.base_prompt(),
+            &self.base_prompt(),
             &vars::expand(&self.global_instructions, ctx),
             &expand(&self.workspace.general),
             &expand(&self.repo_instructions),

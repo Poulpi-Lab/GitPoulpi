@@ -115,6 +115,7 @@ pub(crate) fn ai_action_built(action: gitpoulpi_config::AiAction) -> bool {
     match action {
         A::RewriteScript | A::RewriteRules => crate::build_features::HISTORY_REWRITE,
         A::WorktreeName => crate::build_features::WORKTREE,
+        A::HostingReply | A::IssueBody => crate::build_features::HOSTING,
         _ => true,
     }
 }

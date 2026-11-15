@@ -2963,6 +2963,15 @@ title_worktree_name = { git = "Noms de worktree", local = "Noms d'arbre de trava
 profile_help_worktree_name = { git = "Le profil que GitPoulpi utilisera pour nommer un nouveau worktree et sa branche à partir d'une description.", local = "Le profil que GitPoulpi utilisera pour nommer un nouvel arbre de travail et sa branche à partir d'une description." }
 repo_profile_help_worktree_name = { git = "Le profil utilisé dans ce dépôt pour nommer un nouveau worktree et sa branche.", local = "Le profil utilisé dans ce dépôt pour nommer un nouvel arbre de travail et sa branche." }
 action_worktree_name = { git = "Nom de worktree", local = "Nom d'arbre de travail" }
+title_hosting_reply = "Réponses sur un hébergeur"
+profile_help_hosting_reply = "Le profil que GitPoulpi utilisera pour rédiger le brouillon d'un commentaire, d'une réponse dans un fil, d'un commentaire de revue ou d'un résumé de revue. Il ne rédige qu'un brouillon : rien n'est publié tant que vous ne le publiez pas."
+repo_profile_help_hosting_reply = "Le profil utilisé dans ce dépôt pour rédiger des brouillons de réponses sur un hébergeur."
+action_hosting_reply = "Réponse sur un hébergeur"
+title_issue_body = "Descriptions de nouveaux tickets"
+profile_help_issue_body = "Le profil que GitPoulpi utilisera pour rédiger le brouillon de la description d'un nouveau ticket. Il ne rédige qu'un brouillon : rien n'est créé tant que vous ne le créez pas."
+repo_profile_help_issue_body = "Le profil utilisé dans ce dépôt pour rédiger la description d'un nouveau ticket."
+action_issue_body = "Description de ticket"
+title_hosting_base = "Prompt de base des réponses"
 
 [palette]
 sidebar_show_worktrees = { git = "Barre latérale : Afficher la section Worktrees", local = "Barre latérale : Afficher la section Arbres de travail" }
@@ -9399,6 +9408,17 @@ part_review_threads = "Les commentaires existants font {size}, limite {limit} (p
 part_context_file = "Le fichier de contexte {name} fait {size}, limite {limit} (paramètre {key}). Tronqué, sa fin est écartée."
 # context: list line of that dialog, for the project context files together; {name} is the file that crossed the limit
 part_context_total = "Les fichiers de contexte réunis atteignent {size} à {name}, limite {limit} (paramètre {key}). Tronqués, le reste est écarté."
+hosting_reply_context_label = "Plus grande conversation envoyée pour une réponse (octets)"
+hosting_reply_context_help = "Au-delà de cette taille, rien n'est coupé en silence : on vous demande d'envoyer tout, d'envoyer tronqué (les commentaires les plus anciens sont écartés d'abord), d'ouvrir ce paramètre ou d'annuler. 49152 par défaut."
+hosting_reply_file_label = "Plus gros fichier du dépôt pour une réponse (octets)"
+hosting_reply_file_help = "Utilisé quand l'IA pourra lire le dépôt, ce qui n'est pas encore construit. 8192 par défaut."
+hosting_reply_map_label = "Plus grande carte du dépôt pour une réponse (octets)"
+hosting_reply_map_help = "Utilisé quand l'IA pourra lire le dépôt, ce qui n'est pas encore construit. 6144 par défaut."
+hosting_reply_hits_label = "Nombre maximal de résultats de recherche par terme pour une réponse"
+hosting_reply_hits_help = "Utilisé quand l'IA pourra lire le dépôt, ce qui n'est pas encore construit. 20 par défaut."
+hosting_reply_terms_label = "Nombre maximal de termes recherchés pour une réponse"
+hosting_reply_terms_help = "Utilisé quand l'IA pourra lire le dépôt, ce qui n'est pas encore construit. 8 par défaut."
+part_reply_conversation = "La conversation fait {size}, limite {limit} (paramètre {key}). Tronquée, les commentaires les plus anciens et le début des longs sont écartés."
 # context: button that sends everything of the oversized request this one time, nothing cut
 send_all = "Tout envoyer"
 # context: button that sends the request with what is over its limit cut
@@ -9939,3 +9959,14 @@ discard_title = "Abandonner ce texte\u00a0?"
 discard_body = "Ce que vous avez écrit sera perdu."
 hint_preview = "Aperçu"
 hint_split = "Côte à côte"
+
+[ai_hosting_reply]
+base_prompt_label = "Prompt de base"
+base_prompt_help = "Les consignes dont part chaque brouillon de réponse et de description de ticket. Vide, c'est le prompt intégré qui sert. Vos consignes globales, d'espace de travail et de dépôt le suivent toujours, et le texte écrit par d'autres est toujours signalé comme non fiable dans la requête."
+repo_heading = "Accès au dépôt"
+read_repository_label = "Laisser l'IA lire le dépôt par défaut"
+read_repository_help = "Désactivé par défaut. Activé, le choix « Laisser l'IA lire le dépôt » démarre coché à chaque demande de brouillon ; vous pouvez le changer à chaque fois. La lecture du dépôt n'est pas encore construite : pour l'instant ce paramètre n'a aucun effet."
+reuse_session_label = "Garder la session de l'agent entre deux réponses"
+reuse_session_help = "Un agent local qui le permet garde ce qu'il a lu du dépôt entre deux brouillons, pour que le suivant démarre plus vite. Prend effet quand l'IA pourra lire le dépôt."
+context_ttl_label = "Durée de conservation d'un contexte du dépôt (minutes)"
+context_ttl_help = "Durée pendant laquelle ce qui a été rassemblé dans le dépôt pour un brouillon sert aux suivants. Toute modification du dépôt repart toujours de zéro. 30 par défaut. Prend effet quand l'IA pourra lire le dépôt."

@@ -53,6 +53,7 @@ impl AiSection {
             Self::Action(AiAction::RewriteScript) => &[],
             Self::Action(AiAction::RewriteRules) => &[],
             Self::Action(AiAction::WorktreeName) => &[],
+            Self::Action(AiAction::HostingReply | AiAction::IssueBody) | Self::HostingBase => &[],
             Self::Action(AiAction::CommitComposer) => &[
                 (msg::CHIP_SMALL_COMMITS, msg::CHIP_SMALL_COMMITS_TEXT),
                 (msg::CHIP_GROUP_FEATURE, msg::CHIP_GROUP_FEATURE_TEXT),
@@ -148,6 +149,9 @@ impl PreferencesState {
             );
             if action == AiAction::CodeReview {
                 fields.extend(self.review_rows(AiScope::Global));
+            }
+            if action == AiAction::HostingReply {
+                fields.extend(self.hosting_reply_rows());
             }
         }
 

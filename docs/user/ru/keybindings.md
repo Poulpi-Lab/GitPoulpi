@@ -382,7 +382,7 @@ stage_file = "z"
 | `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
 | `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
 | `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+I` |
+| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
 | `dialog` | `browse` | Выбрать папку (Обзор) | `Ctrl+B` |
 | `dialog` | `sources` | Перейти к источникам клонирования | `Alt+S` |
 | `dialog` | `submit` | Отправить форму pull request | `Ctrl+S` |

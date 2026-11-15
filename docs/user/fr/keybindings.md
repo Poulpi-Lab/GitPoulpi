@@ -381,7 +381,7 @@ préfixe (`Ctrl+G s`).
 | `md_editor` | `preview` | Éditeur Markdown : Écrire ou Aperçu | `Alt+P` |
 | `md_editor` | `split` | Éditeur Markdown : vue côte à côte | `Alt+L` |
 | `md_editor` | `submit` | Éditeur Markdown : envoyer | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Éditeur Markdown : écrire avec l'IA | `Alt+I` |
+| `md_editor` | `ai` | Éditeur Markdown : écrire avec l'IA | `Alt+E` |
 | `dialog` | `browse` | Parcourir un dossier | `Ctrl+B` |
 | `dialog` | `sources` | Aller aux sources de clonage | `Alt+S` |
 | `dialog` | `submit` | Envoyer le formulaire de pull request | `Ctrl+S` |

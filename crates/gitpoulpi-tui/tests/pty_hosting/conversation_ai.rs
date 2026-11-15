@@ -83,14 +83,14 @@ fn the_ai_field_drafts_into_the_description_previews_it_and_ctrl_z_restores_the_
     open_form(&mut term);
     assert_eq!(agent_calls(&agent), 0, "nothing is asked on its own");
 
-    // The button is there; Alt+I opens the field inside the composer.
+    // The button is there; Alt+E opens the field inside the composer.
     let screen = term.screen();
     assert!(
         screen.contains("\u{2726} Write with AI"),
         "{}",
         screen.text()
     );
-    term.send_keys("M-i").expect("Alt+I");
+    term.send_keys("M-e").expect("Alt+E");
     let screen = term
         .wait_for("the AI field", STEP, |s| {
             s.contains("What I want in this answer") && s.contains("Improve my draft")
@@ -162,7 +162,7 @@ fn stop_kills_the_agent_and_the_text_stays() {
         "Add the feature",
     );
     open_form(&mut term);
-    term.send_keys("M-i").expect("Alt+I");
+    term.send_keys("M-e").expect("Alt+E");
     term.wait_for("the AI field", STEP, |s| {
         s.contains("What I want in this answer")
     })
@@ -236,7 +236,7 @@ fn a_fake_agent_that_is_not_asked_is_never_called() {
         "Add the feature",
     );
     open_form(&mut term);
-    term.send_keys("M-i").expect("Alt+I");
+    term.send_keys("M-e").expect("Alt+E");
     term.wait_for("the AI field", STEP, |s| {
         s.contains("What I want in this answer")
     })
@@ -310,7 +310,7 @@ fn with_the_box_ticked_a_local_agent_reads_read_only_and_keeps_its_session() {
         "Add the feature",
     );
     open_form(&mut term);
-    term.send_keys("M-i").expect("Alt+I");
+    term.send_keys("M-e").expect("Alt+E");
     let screen = term
         .wait_for("the AI field", STEP, |s| {
             s.contains("What I want in this answer")
@@ -421,7 +421,7 @@ fn with_the_box_ticked_an_api_profile_gets_a_context_that_is_reused_until_refres
         "Add the feature",
     );
     open_form(&mut term);
-    term.send_keys("M-i").expect("Alt+I");
+    term.send_keys("M-e").expect("Alt+E");
     term.wait_for("the AI field", STEP, |s| {
         s.contains("What I want in this answer")
     })
@@ -497,7 +497,7 @@ fn an_agent_without_a_read_only_mode_cannot_be_let_into_the_repository() {
         "Add the feature",
     );
     open_form(&mut term);
-    term.send_keys("M-i").expect("Alt+I");
+    term.send_keys("M-e").expect("Alt+E");
     term.wait_for("the AI field", STEP, |s| {
         s.contains("What I want in this answer")
     })

@@ -377,7 +377,7 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
 | `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
 | `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+I` |
+| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
 | `dialog` | `browse` | Nach einem Ordner suchen | `Ctrl+B` |
 | `dialog` | `sources` | Zu den Klon-Quellen | `Alt+S` |
 | `dialog` | `submit` | Formular für Pull Request absenden | `Ctrl+S` |

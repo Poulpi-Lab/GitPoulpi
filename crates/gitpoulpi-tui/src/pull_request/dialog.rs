@@ -770,7 +770,7 @@ impl PullRequestDialog {
             return PullRequestOutcome::Stay;
         }
         // `Alt+W` is "Create on the web" wherever the focus is; the writing
-        // help has its own key (`md_editor.ai`, `Alt+I`).
+        // help has its own key (`md_editor.ai`, `Alt+E`).
         if crate::keymap::current().is(Bind::DialogWeb, &key) {
             return self.open_web();
         }

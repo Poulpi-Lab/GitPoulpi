@@ -13,7 +13,7 @@
 //! draft" box, the "Let the AI read the repository" box (unticked, and
 //! disabled with its reason until the repository-context slice lands), the
 //! Draft / Stop / Close buttons and the line that says what is going on.
-//! Every mouse action has a key: `Alt+I` opens and closes the panel, `Enter`
+//! Every mouse action has a key: `Alt+E` opens and closes the panel, `Enter`
 //! in the field drafts, `Esc` stops a run, then closes, `Tab` walks the parts.
 //!
 //! What a host's text is a draft *of* comes from an [`AiContextSource`]: the

@@ -557,7 +557,7 @@ impl IssueDialog {
         );
         match focus {
             // `Alt+W` is "Create on the web" wherever the focus is: the writing
-            // help has its own key (`md_editor.ai`, `Alt+I`), so one key never
+            // help has its own key (`md_editor.ai`, `Alt+E`), so one key never
             // means two things depending on focus.
             _ if crate::keymap::current().is(Bind::DialogWeb, &key) => return self.open_web(),
             IssueFocus::Title | IssueFocus::Labels => {

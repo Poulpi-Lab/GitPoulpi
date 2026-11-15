@@ -364,7 +364,7 @@ stage_file = "z"
 | `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
 | `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
 | `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+I` |
+| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
 | `dialog` | `browse` | 浏览文件夹 | `Ctrl+B` |
 | `dialog` | `sources` | 转到克隆来源 | `Alt+S` |
 | `dialog` | `submit` | 提交 pull request 表单 | `Ctrl+S` |

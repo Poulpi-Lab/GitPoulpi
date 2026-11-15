@@ -22,28 +22,46 @@ WORKTREE'LER başlığındaki **+** (klavye: bölümde `+`; palet: **Refs: Workt
 Oluştur...**) bir menü açar:
 
 - **Geçerli daldan**: dal ana klasörde checkout edilmiştir, bu yüzden iletişim
-  kutusu onun üzerinde yeni bir dal önerir (`<dal>-wt`).
+  kutusu onun üzerinde yeni bir dal önerir (`worktree-<id>`).
 - **Seçili commit üzerinden**: Log'da bir commit seçilene kadar gri kalır.
-  Yeni bir dal adlandırmazsanız worktree orada ayrık HEAD ile başlar.
-- **Dal seç...**: iletişim kutusu **Ref** listesi üzerinde açılır.
+  İletişim kutusu orada başlayan `worktree-<id>` adlı yeni bir dal önerir;
+  ayrık HEAD'li bir worktree için dal alanını boşaltın.
+- **Dal seç...**: iletişim kutusu, zaten var olan bir dalı açmak için **Worktree
+  dalı** listesi üzerinde açılır.
 
 Paletin aynı üçü vardır (**Refs: Geçerli Daldan Worktree Oluştur**, **Git: Seçili
 Commit'te Worktree Oluştur...**, **Refs: Dal Seçerek Worktree Oluştur**). Eski
 girişler de çalışır: bir dal, tag veya commit menüsündeki **... üzerinden
 worktree oluştur...**.
 
-İletişim kutusu her şeyi önerir ve değiştirmenize izin verir:
+İletişim kutusu her şeyi önerir ve değiştirmenize izin verir. **Ad** ve yeni dal
+ikisi de `worktree-<id>` olarak başlar; `<id>` 8 rastgele onaltılık rakamdır (ikisinde
+aynı), böylece iki worktree asla çakışmaz.
 
 | Alan | Anlamı |
 |---|---|
-| **Ad** | Klasör adı bundan üretilir. Daldan veya kısa kimlikten önerilir. |
+| **Ad** | Klasör adı bundan üretilir. **Dalın adını ver** (`Alt+N`) onu `worktree-<dal>` yapar: eğik çizgiler `-` olur ve sözcük ikilenmez (`worktree-foo` ve `feature/worktree-x` kendi hâlini korur, `feature/login` `worktree-feature-login` verir). |
 | **Klasör** | Deponun yanında, `<depo>-<ad>` biçiminde bir kardeş klasör. Klasör alanına yazana kadar Ad'ı izler; **Gözat...** nereye konacağını seçer. |
-| **Ref** | Worktree'nin başladığı dal veya commit (bir liste; aramak için yazın). Değiştirmek yeni bir Ad önerir. |
-| **Yeni dal** | Boşsa Ref'in dalı orada checkout edilir (bir commit'te ayrık HEAD olur). Dal zaten checkout edilmişse zorunludur. |
+| **Ref** | *Yeni* bir dalın başladığı yer: bir dal veya commit (bir liste; aramak için yazın). Mevcut bir dal seçiliyken kullanılmaz ve bunu söyler. |
+| **Worktree dalı** | Tek alan, iki anlam; altında hangisi olduğu yazar. Yerel dal olmayan bir ad, Ref'ten yeni bir dal oluşturur (**main üzerinden yeni dal**). Başka yerde checkout edilmemiş yerel bir dal (listeden seçin veya adını yazın) orada olduğu gibi checkout edilir (**bu dalı checkout eder**). Listenin ilk satırı veya boş alan Ref'in dalını checkout eder (bir commit'te ayrık HEAD olur); o dal zaten checkout edilmişse reddedilir. |
+| **Yeniden üret** | `Alt+R`. Yeni bir `<id>` üretir ve Ad ile dalı onunla değiştirir; kendi yazdığınız (yazdığınız bir Ad veya dal kalır) ve mevcut bir dal (asla değiştirilmez) hariç. **Dalın adını ver** veya YZ'den gelen bir Ad üretilmiş sayılır. |
+| **YZ ile adlandır** | Yalnızca YZ açıkken (aşağıya bakın). |
 | **Yeni worktree'yi sekme olarak aç** | Varsayılan olarak açık. |
 
-Boş olmayan bir klasör, geçersiz bir ad veya zaten var olan bir dal iletişim
-kutusunun kendi satırında bildirilir ve **Oluştur** gri kalır.
+Boş olmayan bir klasör, geçersiz bir ad, git'in reddettiği bir dal adı veya başka
+bir worktree'nin sahip olduğu bir dal iletişim kutusunun kendi satırında bildirilir
+ve **Oluştur** gri kalır.
+
+### YZ ile adlandırma
+
+[YZ](ai.md) açıkken **YZ ile adlandır** (`Alt+A`) iletişim kutusunun içinde bir
+kutu açar: *Özelliği, hatayı veya görevi açıklayın*. **Adlandır**, modelden kısa bir
+worktree adı ve deponun kendi dal adlarını (`feature/`, `fix/`, küçük harfli
+kebab-case) izleyen bir dal adı ister. Bunlar Ad'ı (`worktree-<ad>` olarak) ve dal
+alanını doldurur, yine düzenlenebilir; zaten var olan bir dal adı `-2` soneki alır,
+böylece yanıt sessizce bir şeyi checkout etmez. Kutu meşgul durumunu gösterir,
+**Durdur** (veya `Esc`) iptal eder ve bir hata iletişim kutusunun içinde gösterilir.
+Yalnızca açıklamanız ve yerel dal adları gönderilir.
 
 ## Satırın menüsü
 
@@ -100,5 +118,7 @@ silme işlemi olağan, günlüğe yazılan işlemdir: **Geri Al** dalı geri get
 `gitpoulpi worktree changes <path>` bir worktree'nin commit edilmemiş
 değişikliklerini listeler. `gitpoulpi worktree remove <path> [--force]
 [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]`
-onu kaldırır; MCP araçları `worktree_changes` ve `worktree_remove`'dur. Bkz.
-[CLI başvurusu](cli-reference.md).
+onu kaldırır; MCP araçları `worktree_changes` ve `worktree_remove`'dur.
+`gitpoulpi ai worktree-name --describe "<görev>"` YZ'nin önerdiği worktree ve dal
+adlarını (`{ name, worktree, branch }`) yazdırır ve hiçbir şey oluşturmaz; MCP aracı
+`ai_worktree_name`'dir. Bkz. [CLI başvurusu](cli-reference.md).

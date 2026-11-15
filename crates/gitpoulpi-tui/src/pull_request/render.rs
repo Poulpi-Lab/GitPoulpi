@@ -3,7 +3,7 @@ use super::*;
 impl PullRequestDialog {
     pub(crate) fn render(&mut self, rect: Rect, buf: &mut Buffer) {
         self.edit.sync(match self.focus {
-            PrFocus::Title | PrFocus::Body => Some(self.focus),
+            PrFocus::Title => Some(self.focus),
             _ => None,
         });
         self.edit.begin_frame();
@@ -232,14 +232,13 @@ impl PullRequestDialog {
         let body_cap = 8 + rect.height.saturating_sub(DEFAULT_HEIGHT);
         let body_h = (inner.bottom().saturating_sub(y + footer_rows)).clamp(2, body_cap);
         let body = Rect::new(inner.x, y, inner.width, body_h);
-        self.body_bar = dialog_kit::text_area(
+        let md_ctx = self.md_context();
+        self.md.set_context(md_ctx);
+        self.md.render(
             buf,
             body,
-            &self.body,
-            msg::pull_request::DESCRIPTION_PLACEHOLDER.get(),
             self.focus == PrFocus::Body,
-            self.hover == Some(PrHit::Part(PrFocus::Body)),
-            (&self.edit, PrFocus::Body),
+            msg::pull_request::DESCRIPTION_PLACEHOLDER.get(),
         );
         hits.push((body, PrHit::Part(PrFocus::Body)));
         y += body_h + 1;
@@ -381,6 +380,7 @@ impl PullRequestDialog {
         hits.push((create, PrHit::Part(PrFocus::Create)));
         let create_key = dialog_kit::key_label(Bind::DialogSubmit);
         let web_key = dialog_kit::key_label(Bind::DialogWeb);
+        let [(prev_key, prev_what), _] = crate::md_editor::MdEditor::hints();
         dialog_kit::hints(
             buf,
             inner.x,
@@ -393,6 +393,7 @@ impl PullRequestDialog {
                 ),
                 (create_key.as_str(), msg::pull_request::HINT_CREATE.get()),
                 (web_key.as_str(), msg::issue_form::HINT_WEB.get()),
+                (prev_key.as_str(), prev_what),
             ],
         );
 

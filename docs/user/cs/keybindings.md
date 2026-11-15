@@ -376,6 +376,9 @@ předponou (`Ctrl+G s`).
 | `reword` | `deeper` | Upravit historii hlouběji | `Alt+H` |
 | `composer` | `commit` | Commit z Composeru | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Vložit odkaz na issue | `Alt+R` |
+| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
+| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
+| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
 | `dialog` | `browse` | Vybrat složku | `Ctrl+B` |
 | `dialog` | `sources` | Přejít na zdroje klonování | `Alt+S` |
 | `dialog` | `submit` | Odeslat formulář pro pull request | `Ctrl+S` |

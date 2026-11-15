@@ -377,6 +377,9 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `reword` | `deeper` | Geçmişi daha kapsamlı değiştir | `Alt+H` |
 | `composer` | `commit` | Composer'dan Commit | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Issue referansı ekle | `Alt+R` |
+| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
+| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
+| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
 | `dialog` | `browse` | Klasör Gözat | `Ctrl+B` |
 | `dialog` | `sources` | Klon kaynaklarına git | `Alt+S` |
 | `dialog` | `submit` | Pull Request Formunu Gönder | `Ctrl+S` |

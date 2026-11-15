@@ -188,6 +188,14 @@ directory or `*_tests.rs` for the big ones); shared fixtures in
 - `hosting_task/` (worker), `hosting_ui/` (sidebar sections, chip, menus),
   `pull_request/`, `issue_form.rs`, `issue_ref_picker.rs`, `issue_tokens.rs`,
   `remote_links.rs`, `remotes_ui/`, `git_actions.rs`.
+- `md_render/` (Markdown to styled, wrapped, clickable cells; references go
+  through `gitpoulpi_hosting::xrefs`, text hygiene through `markup::sanitize`)
+  and `md_editor/`: the one Markdown composer (Write / Preview / Split, `Alt+P`
+  and `Alt+L`, `Ctrl+Enter` sends; `preview.rs` lays long texts out on a worker,
+  `draft.rs` keeps a draft per target in `remote-conversations.toml`). Used by
+  the review comment box and Finish summary, the issue form and the pull
+  request body. A form owns focus and the close question (`Dismiss`), routes
+  keys and mouse to `MdEditor::on_key` / `on_mouse`, and gives it a rect.
 - `push_group_ui/` (grouped push: selection, plan and progress dialog, and the
   paused strip; entries `PushGroupUi::open_selection/open_plan/open_progress`,
   design notes in `session-and-state.md`, "The push group dialog").

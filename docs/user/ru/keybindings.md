@@ -379,6 +379,9 @@ stage_file = "z"
 | `reword` | `deeper` | Изменить историю глубже | `Alt+H` |
 | `composer` | `commit` | Commit из композитора | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Вставить ссылку на задачу | `Alt+R` |
+| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
+| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
+| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
 | `dialog` | `browse` | Выбрать папку (Обзор) | `Ctrl+B` |
 | `dialog` | `sources` | Перейти к источникам клонирования | `Alt+S` |
 | `dialog` | `submit` | Отправить форму pull request | `Ctrl+S` |

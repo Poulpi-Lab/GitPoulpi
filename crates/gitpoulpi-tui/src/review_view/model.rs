@@ -38,6 +38,20 @@ pub(crate) struct ReviewTarget {
 }
 
 impl ReviewTarget {
+    /// What `#N`, `!N`, mentions and commit ids in the request's text mean:
+    /// the host the request lives on (the Overview, the composers' previews).
+    pub(crate) fn md_context(&self) -> crate::md_render::Context {
+        crate::md_render::Context {
+            xrefs: gitpoulpi_hosting::xrefs::XrefContext {
+                family: Some(self.integration.kind.family()),
+                web_base: gitpoulpi_hosting::integration_web_base(&self.integration)
+                    .unwrap_or_default(),
+                project: self.project.clone(),
+                ..Default::default()
+            },
+        }
+    }
+
     /// `#12 Fix the thing`, what pickers and the status line call it.
     pub(crate) fn caption(&self) -> String {
         format!("{} {}", self.iid_label, self.title)

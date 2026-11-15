@@ -3448,6 +3448,12 @@ log_scroll_left = "Scroll the Columns Left"
 log_scroll_right = "Scroll the Columns Right"
 log_columns_layout = "Scroll Sideways or Fit the Pane"
 refs_remotes = "Branch: Edit its Remotes"
+# context: palette and Settings label of the key that flips the Markdown editor between Write and Preview
+md_editor_preview = "Markdown Editor: Toggle Write and Preview"
+# context: label of the key that shows the text and its preview side by side
+md_editor_split = "Markdown Editor: Toggle the Split View"
+# context: label of the key that sends (posts or saves) the text of the Markdown editor
+md_editor_submit = "Markdown Editor: Send the Text"
 
 [keymap_ctx]
 rewrite = "Rewrite history workbench"
@@ -3483,6 +3489,8 @@ integrations = "Settings: Integrations page"
 activity_log = "Activity Log window"
 palette = "Palette commands"
 split = "Split {$commit} editor"
+# context: name of the key group of the Markdown editor on the Settings keybindings page
+md_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [keymap_conflict]
 # context: {chord} is a key such as Ctrl+G, {action} the other action's name, {ctx} the config table name
@@ -4682,6 +4690,8 @@ settings_preferences_the = "Settings (the title bar gear, {{global.settings}} / 
 text_fields_filters = "Text fields (filters, search, composer, dialogs, Settings)"
 mouse_gestures_in = "Mouse gestures, in full"
 split = "Split a {$commit}"
+# context: heading of the help section about the shared Markdown editor
+markdown_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [help_text]
 # context: help line after a key chord; a git commit is amended
@@ -5065,6 +5075,12 @@ rewrite_host_howto = "explains how to get a rewrite through a branch the host pr
 rewrite_ai_rules = "creates the rewrite rules from your description with AI (nothing is previewed or applied)"
 log_columns_2 = "scroll the Log's columns sideways when they keep their widths (the Scroll sideways layout, chosen in the column chooser, in Settings or with s while a column is picked); in the fit layout every column fits the pane"
 refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
+# context: help line; the keys are shown beside it
+markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
+# context: help line; the keys are shown beside it
+markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
+# context: help line; the keys are shown beside it
+markdown_editor_3 = "send the text (Enter inserts a newline)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} or right-click"
@@ -12178,3 +12194,39 @@ stash_default = "WIP on {name}"
 hint_next = "next"
 # context: key hint
 hint_default = "run"
+
+[md_render]
+# context: label of a Note alert block (a Markdown quote that starts with [!NOTE]); one word. Width budget: 14 cells
+alert_note = "Note"
+# context: label of a Tip alert block ([!TIP]); one word. Width budget: 14 cells
+alert_tip = "Tip"
+# context: label of an Important alert block ([!IMPORTANT]); one word. Width budget: 14 cells
+alert_important = "Important"
+# context: label of a Warning alert block ([!WARNING]); one word. Width budget: 14 cells
+alert_warning = "Warning"
+# context: label of a Caution alert block ([!CAUTION]), the strongest of the five; one word. Width budget: 14 cells
+alert_caution = "Caution"
+
+[md_editor]
+# context: button of the Markdown editor: edit the text. Width budget: 10 cells
+mode_write = "Write"
+# context: button of the Markdown editor: show the text as it will look once posted. Width budget: 10 cells
+mode_preview = "Preview"
+# context: button of the Markdown editor: the text on the left, its preview on the right. Width budget: 12 cells
+mode_split = "Split"
+# context: shown when Split is asked in a window that is too narrow for two panes. Width budget: 50 cells
+split_needs_width = "Split needs a window 100 columns wide."
+# context: small mark on a Preview that is being recomputed (a long text). Width budget: 16 cells
+preview_updating = "updating..."
+# context: shown in the Preview of an empty text. Width budget: 40 cells
+preview_empty = "Nothing to preview yet."
+# context: dim line under a Preview: the host does not read Markdown, the text is converted; {markup} is the name of the format, like Jira wiki markup. Width budget: 40 cells
+sent_as = "Sent as {markup}"
+# context: title of the confirmation that opens when closing a comment, reply or summary that still holds typed text. Width budget: 30 cells
+discard_title = "Discard this text?"
+# context: body of that confirmation
+discard_body = "What you wrote will be lost."
+# context: footer hint of the Markdown editor, after the key that toggles the Preview. Width budget: 14 cells
+hint_preview = "Preview"
+# context: footer hint of the Markdown editor, after the key that toggles Split. Width budget: 14 cells
+hint_split = "Split"

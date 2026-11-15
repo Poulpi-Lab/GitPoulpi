@@ -31,7 +31,7 @@ fn the_ai_generate_hook_is_off_but_wired() {
         PullRequestOutcome::Generate(_)
     ));
     d.set_generated("T".into(), "B".into());
-    assert_eq!((d.title.as_str(), d.body.as_str()), ("T", "B"));
+    assert_eq!((d.title.as_str(), d.md.text()), ("T", "B"));
 }
 
 #[test]

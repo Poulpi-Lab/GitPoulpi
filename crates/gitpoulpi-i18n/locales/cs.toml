@@ -2591,6 +2591,9 @@ log_scroll_left = "Posunout sloupce doleva"
 log_scroll_right = "Posunout sloupce doprava"
 log_columns_layout = "Posouvat do stran nebo přizpůsobit panelu"
 refs_remotes = "Větev: upravit její remote"
+md_editor_preview = "Markdown Editor: Toggle Write and Preview"
+md_editor_split = "Markdown Editor: Toggle the Split View"
+md_editor_submit = "Markdown Editor: Send the Text"
 
 
 [keymap_ctx]
@@ -2627,6 +2630,7 @@ integrations = "Nastavení: Stránka Integrace"
 activity_log = "Okno Protokolu aktivity"
 palette = "Příkazy palety"
 split = "Editor rozdělení {$commit}u"
+md_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [keymap_conflict]
 already_bound = "{chord} už spouští {action} ({ctx})"
@@ -3753,6 +3757,7 @@ settings_preferences_the = "Nastavení (ozubené kolo v záhlaví okna, {{global
 text_fields_filters = "Textová pole (filtry, hledání, composer, dialogy, Nastavení)"
 mouse_gestures_in = "Gesta myší, kompletně"
 split = "Rozdělení {$commit}u"
+markdown_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [help_text]
 git_actions_then_amend = "upravit vybraný {$commit}: souhrn, popis, jméno, e-mail a datum autora v jednom okně"
@@ -4132,6 +4137,9 @@ rewrite_host_howto = "vysvětlí, jak prosadit přepis přes větev, kterou host
 rewrite_ai_rules = "vytvoří pravidla přepisu podle vašeho popisu pomocí AI (nic se nezobrazí v náhledu ani nepoužije)"
 log_columns_2 = "posouvejte sloupce Logu do stran, když si drží své šířky (rozložení Posouvat do stran, které se volí ve výběru sloupců, v Nastavení nebo klávesou s při vybraném sloupci); v rozložení Přizpůsobit panelu se každý sloupec vejde do panelu"
 refs_pane_20 = "upraví remote vybrané lokální větve (její upstream a další cíle {$push_noun}): klávesová obdoba kliknutí na odznak remote v jejím řádku"
+markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
+markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
+markdown_editor_3 = "send the text (Enter inserts a newline)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} nebo pravé tlačítko"
@@ -10018,3 +10026,23 @@ stash_default = "WIP v {name}"
 hint_next = "další"
 # context: key hint
 hint_default = "spustit"
+
+[md_render]
+alert_note = "Note"
+alert_tip = "Tip"
+alert_important = "Important"
+alert_warning = "Warning"
+alert_caution = "Caution"
+
+[md_editor]
+mode_write = "Write"
+mode_preview = "Preview"
+mode_split = "Split"
+split_needs_width = "Split needs a window 100 columns wide."
+preview_updating = "updating..."
+preview_empty = "Nothing to preview yet."
+sent_as = "Sent as {markup}"
+discard_title = "Discard this text?"
+discard_body = "What you wrote will be lost."
+hint_preview = "Preview"
+hint_split = "Split"

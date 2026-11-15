@@ -2592,6 +2592,9 @@ log_scroll_left = "Sütunları Sola Kaydır"
 log_scroll_right = "Sütunları Sağa Kaydır"
 log_columns_layout = "Yana Kaydır veya Bölmeye Sığdır"
 refs_remotes = "Dal: Uzak Depolarını Düzenle"
+md_editor_preview = "Markdown Editor: Toggle Write and Preview"
+md_editor_split = "Markdown Editor: Toggle the Split View"
+md_editor_submit = "Markdown Editor: Send the Text"
 
 
 [keymap_ctx]
@@ -2628,6 +2631,7 @@ integrations = "Ayarlar: Entegrasyonlar sayfası"
 activity_log = "Etkinlik Günlüğü penceresi"
 palette = "Palet komutları"
 split = "{$commit} bölme düzenleyicisi"
+md_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [keymap_conflict]
 already_bound = "{chord} zaten {action} ({ctx})"
@@ -3754,6 +3758,7 @@ settings_preferences_the = "Ayarlar (başlık çubuğundaki dişli, {{global.set
 text_fields_filters = "Metin alanları (filtreler, arama, composer, iletişim kutuları, Ayarlar)"
 mouse_gestures_in = "Fare hareketleri, ayrıntılı"
 split = "{$Commit} bölme"
+markdown_editor = "Markdown editor (comments, descriptions, summaries)"
 
 [help_text]
 git_actions_then_amend = "seçili {$commit} öğesini değiştir: özet, açıklama, yazar adı, e-posta ve tarih tek bir pencerede"
@@ -4133,6 +4138,9 @@ rewrite_host_howto = { git = "yeniden yazılan geçmişin barındırıcının ko
 rewrite_ai_rules = "açıklamanızdan YZ ile yeniden yazma kurallarını oluşturur (hiçbir şey önizlenmez veya uygulanmaz)"
 log_columns_2 = "sütunlar genişliklerini koruyorsa Log'un sütunlarını yana kaydır (sütun seçicide, Ayarlar'da ya da bir sütun seçiliyken s ile seçilen Yana kaydır düzeni); sığdırma düzeninde her sütun bölmeye sığar"
 refs_pane_20 = "seçili yerel dalın uzak depolarını (upstream'ini ve ek {$push} hedeflerini) düzenler: satırındaki uzak depo rozetine tıklamanın klavye karşılığı"
+markdown_editor_1 = "switch between Write and Preview (the text as it will look once posted)"
+markdown_editor_2 = "show the text and its preview side by side (needs a wide window)"
+markdown_editor_3 = "send the text (Enter inserts a newline)"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} veya sağ tık"
@@ -9898,3 +9906,23 @@ stash_default = "{name} üzerinde WIP"
 hint_next = "sonraki"
 # context: key hint
 hint_default = "çalıştır"
+
+[md_render]
+alert_note = "Note"
+alert_tip = "Tip"
+alert_important = "Important"
+alert_warning = "Warning"
+alert_caution = "Caution"
+
+[md_editor]
+mode_write = "Write"
+mode_preview = "Preview"
+mode_split = "Split"
+split_needs_width = "Split needs a window 100 columns wide."
+preview_updating = "updating..."
+preview_empty = "Nothing to preview yet."
+sent_as = "Sent as {markup}"
+discard_title = "Discard this text?"
+discard_body = "What you wrote will be lost."
+hint_preview = "Preview"
+hint_split = "Split"

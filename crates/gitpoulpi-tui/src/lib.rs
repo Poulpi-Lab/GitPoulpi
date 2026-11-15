@@ -297,6 +297,7 @@ mod log_menu;
 mod log_multiselect;
 mod log_pills;
 mod log_table;
+mod md_editor;
 mod md_render;
 #[cfg_attr(not(feature = "mermaid"), path = "mermaid_popup_stub.rs")]
 mod mermaid_popup;

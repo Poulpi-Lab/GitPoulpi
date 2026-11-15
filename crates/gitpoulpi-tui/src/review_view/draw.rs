@@ -555,7 +555,7 @@ impl ReviewView {
             DraftBar,
             SugText(usize, String),
         }
-        let ctx = md_render::Context::default();
+        let ctx = self.target.md_context();
         let mut all_docs: Vec<std::rc::Rc<md_render::Doc>> = Vec::new();
         fn md_lines(
             cache: &mut md_render::DocCache,
@@ -778,7 +778,7 @@ impl ReviewView {
                         panel_style(),
                         false,
                     ) {
-                        if let Some(target) = doc.links.get(id) {
+                        if let Some(target) = doc.links.get(id).filter(|t| !t.url.is_empty()) {
                             self.md_links.push(target.url.clone());
                             hits.push((rect, Hit::MdLink(self.md_links.len() - 1)));
                         }

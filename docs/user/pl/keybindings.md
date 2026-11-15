@@ -376,6 +376,9 @@ prefiksem (`Ctrl+G s`).
 | `reword` | `deeper` | Zmień historię głębiej | `Alt+H` |
 | `composer` | `commit` | Commit z kompozytora | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Wstaw odwołanie do zgłoszenia | `Alt+R` |
+| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
+| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
+| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
 | `dialog` | `browse` | Przeglądaj w poszukiwaniu folderu | `Ctrl+B` |
 | `dialog` | `sources` | Przejdź do źródeł klonowania | `Alt+S` |
 | `dialog` | `submit` | Wyślij formularz (pull request) | `Ctrl+S` |

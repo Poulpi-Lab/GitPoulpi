@@ -375,6 +375,9 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `reword` | `deeper` | Modificar o histórico mais a fundo | `Alt+H` |
 | `composer` | `commit` | Commit pelo compositor | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Inserir uma referência de issue | `Alt+R` |
+| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
+| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
+| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
 | `dialog` | `browse` | Procurar uma pasta | `Ctrl+B` |
 | `dialog` | `sources` | Ir para as origens do clone | `Alt+S` |
 | `dialog` | `submit` | Enviar o formulário de pull request | `Ctrl+S` |

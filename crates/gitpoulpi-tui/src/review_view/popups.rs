@@ -15,8 +15,10 @@ use ratatui::style::Style;
 use crate::combo::{Combo, ComboOption};
 use crate::dialog_kit::{self, ButtonState};
 use crate::keymap::Action as Bind;
-use crate::text_edit::{FieldEditor, KeyEdit};
+use crate::md_editor::{KeyUse, MdEditor, MouseUse};
+use crate::md_render;
 use crate::th;
+use gitpoulpi_i18n::msg::md_editor as md_msg;
 
 // -- the comment box -----------------------------------------------------------
 
@@ -70,77 +72,108 @@ pub(super) struct ComposeBox {
     title: String,
     /// What the text is about: `src/a.rs:12`, `#9`, a thread's author.
     about: String,
-    pub(super) text: String,
-    edit: FieldEditor<()>,
-    bar: Option<crate::scrollbar::Track>,
-    drag: crate::scrollbar::BarDrag,
+    md: MdEditor,
+    /// The text the box opened with: closing a box that still has it asks
+    /// nothing.
+    initial: String,
     focus: ComposePart,
     hover: Option<ComposePart>,
-    close: dialog_kit::CloseHit,
+    guard: dialog_kit::DiscardGuard,
     hits: Vec<(Rect, ComposePart)>,
 }
 
 impl ComposeBox {
     pub(super) fn new(purpose: ComposeFor, title: String, about: String, text: String) -> Self {
-        let mut me = Self {
+        Self {
             purpose,
             title,
             about,
-            text,
-            edit: FieldEditor::default(),
-            bar: None,
-            drag: Default::default(),
+            initial: text.clone(),
+            md: MdEditor::new(text, md_render::Context::default()),
             focus: ComposePart::Text,
             hover: None,
-            close: dialog_kit::CloseHit::default(),
+            guard: Default::default(),
             hits: Vec::new(),
-        };
-        // The caret starts at the end of what is being edited.
-        me.edit.sync(Some(()));
-        me
+        }
     }
 
-    fn submit(&self) -> ComposeOutcome {
-        if self.text.trim().is_empty() {
+    /// The host the text goes to (what the Preview resolves `#N` against)
+    /// and where its draft is kept (`None`: no draft).
+    pub(super) fn for_target(mut self, ctx: md_render::Context, draft_key: Option<String>) -> Self {
+        self.md.set_context(ctx);
+        if let Some(key) = draft_key {
+            let text = self.md.text().to_string();
+            let md = MdEditor::new(text, self.md.context().clone());
+            self.md = md.with_draft(key);
+            self.initial = self.md.text().to_string();
+        }
+        self
+    }
+
+    #[cfg(test)]
+    pub(super) fn text(&self) -> &str {
+        self.md.text()
+    }
+
+    fn submit(&mut self) -> ComposeOutcome {
+        if self.md.is_blank() {
             ComposeOutcome::Stay
         } else {
-            ComposeOutcome::Submit(self.text.trim().to_string())
+            self.md.sent();
+            ComposeOutcome::Submit(self.md.text().trim().to_string())
+        }
+    }
+
+    /// The cross, Esc, Cancel and a click outside all ask the one rule.
+    fn request_close(&mut self, kind: dialog_kit::DismissKind) -> ComposeOutcome {
+        use dialog_kit::{dismiss, DismissAction};
+        match dismiss(&*self, kind) {
+            DismissAction::Close => {
+                self.md.discard();
+                ComposeOutcome::Cancel
+            }
+            DismissAction::Swallow => {
+                self.guard.close.request_flash();
+                ComposeOutcome::Stay
+            }
+            DismissAction::Confirm => {
+                self.guard
+                    .ask_with(md_msg::DISCARD_TITLE.get(), md_msg::DISCARD_BODY.get());
+                ComposeOutcome::Stay
+            }
+        }
+    }
+
+    fn verdict(&mut self, v: dialog_kit::Verdict) -> ComposeOutcome {
+        match v {
+            dialog_kit::Verdict::Discard => {
+                self.md.discard();
+                ComposeOutcome::Cancel
+            }
+            dialog_kit::Verdict::Stay => ComposeOutcome::Stay,
         }
     }
 
     pub(super) fn paste(&mut self, text: &str) {
-        if self.focus != ComposePart::Text {
-            return;
+        if self.focus == ComposePart::Text && !self.guard.is_open() {
+            self.md.paste(text);
         }
-        let clean = text.replace("\r\n", "\n").replace('\r', "\n");
-        self.edit.sync(Some(()));
-        let mut value = std::mem::take(&mut self.text);
-        self.edit.caret_mut(()).insert(&mut value, &clean);
-        self.text = value;
     }
 
     pub(super) fn on_key(&mut self, key: KeyEvent) -> ComposeOutcome {
+        if let Some(v) = self.guard.key(key) {
+            return self.verdict(v);
+        }
         let shift = key.modifiers.contains(KeyModifiers::SHIFT);
         if self.focus == ComposePart::Text {
-            self.edit.sync(Some(()));
-            if key.code == KeyCode::Enter {
-                let mut value = std::mem::take(&mut self.text);
-                self.edit.caret_mut(()).insert(&mut value, "\n");
-                self.text = value;
-                return ComposeOutcome::Stay;
-            }
-            if self.edit.claims((), &self.text, &key, true) {
-                let mut value = std::mem::take(&mut self.text);
-                let edit = self.edit.on_key((), &mut value, &key, true);
-                self.text = value;
-                if let KeyEdit::Copy(s) | KeyEdit::Cut(s) = edit {
-                    crate::clipboard::copy_shared(msg::NOUN_SELECTION.get(), &s);
-                }
-                return ComposeOutcome::Stay;
+            match self.md.on_key(key) {
+                KeyUse::Handled => return ComposeOutcome::Stay,
+                KeyUse::Submit => return self.submit(),
+                KeyUse::Pass => {}
             }
         }
         match key.code {
-            KeyCode::Esc => return ComposeOutcome::Cancel,
+            KeyCode::Esc => return self.request_close(dialog_kit::DismissKind::Esc),
             KeyCode::Tab | KeyCode::BackTab => {
                 let order = [ComposePart::Text, ComposePart::Submit, ComposePart::Cancel];
                 let at = order.iter().position(|p| *p == self.focus).unwrap_or(0);
@@ -150,11 +183,15 @@ impl ComposeBox {
                     order[(at + 1) % order.len()]
                 };
             }
-            _ if crate::keymap::current().is(Bind::DialogSubmit, &key) => return self.submit(),
+            _ if crate::keymap::current().is(Bind::DialogSubmit, &key)
+                || crate::keymap::current().is(Bind::MdEditorSubmit, &key) =>
+            {
+                return self.submit()
+            }
             KeyCode::Enter | KeyCode::Char(' ') => {
                 return match self.focus {
                     ComposePart::Submit => self.submit(),
-                    ComposePart::Cancel => ComposeOutcome::Cancel,
+                    ComposePart::Cancel => self.request_close(dialog_kit::DismissKind::Cancel),
                     ComposePart::Text => ComposeOutcome::Stay,
                 }
             }
@@ -164,49 +201,28 @@ impl ComposeBox {
     }
 
     pub(super) fn on_mouse(&mut self, mouse: MouseEvent) -> ComposeOutcome {
-        let top = self.edit.caret(()).map_or(0, |c| c.top.get());
-        let lines = self.text.split('\n').count();
-        if let Some(top) = self.drag.on_mouse(self.bar, mouse, lines, top) {
-            let rows = self.bar.map_or(1, |t| t.rect.height as usize);
-            self.edit
-                .caret_mut(())
-                .scroll_lines_to(&self.text, top, rows);
+        if let Some(v) = self.guard.mouse(mouse) {
+            return self.verdict(v);
+        }
+        if let Some(kind) = self.guard.pointer(mouse) {
+            return self.request_close(kind);
+        }
+        if self.md.on_mouse(mouse) == MouseUse::Inside {
+            if matches!(mouse.kind, MouseEventKind::Down(MouseButton::Left)) {
+                self.focus = ComposePart::Text;
+            }
             return ComposeOutcome::Stay;
         }
         let hit = dialog_kit::hit_at(&self.hits, mouse.column, mouse.row);
-        if !matches!(mouse.kind, MouseEventKind::Down(_)) && self.edit.is_dragging() {
-            self.edit
-                .dialog_mouse(Some(()), &self.text, mouse.kind, mouse.column, mouse.row);
-            return ComposeOutcome::Stay;
-        }
         match mouse.kind {
-            MouseEventKind::Moved => {
-                self.hover = hit;
-                self.close.set_hover(mouse.column, mouse.row);
-            }
-            MouseEventKind::Down(MouseButton::Left) if self.close.hit(mouse.column, mouse.row) => {
-                return ComposeOutcome::Cancel;
-            }
+            MouseEventKind::Moved => self.hover = hit,
             MouseEventKind::Down(MouseButton::Left) => match hit {
-                Some(ComposePart::Text) => {
-                    self.focus = ComposePart::Text;
-                    self.edit.sync(Some(()));
-                    self.edit.dialog_mouse(
-                        Some(()),
-                        &self.text,
-                        mouse.kind,
-                        mouse.column,
-                        mouse.row,
-                    );
-                }
                 Some(ComposePart::Submit) => return self.submit(),
-                Some(ComposePart::Cancel) => return ComposeOutcome::Cancel,
-                None => {}
+                Some(ComposePart::Cancel) => {
+                    return self.request_close(dialog_kit::DismissKind::Cancel)
+                }
+                _ => {}
             },
-            MouseEventKind::Up(MouseButton::Left) => {
-                self.edit
-                    .dialog_mouse(Some(()), &self.text, mouse.kind, mouse.column, mouse.row);
-            }
             _ => {}
         }
         ComposeOutcome::Stay
@@ -214,9 +230,7 @@ impl ComposeBox {
 
     pub(super) fn render(&mut self, area: Rect, buf: &mut Buffer) {
         let rect = WIN_REVIEW_TEXT.place(area, dialog_kit::centered(area, 84, 16));
-        self.edit.begin_frame();
-        self.close
-            .framed(buf, rect, &self.title, &WIN_REVIEW_TEXT, true);
+        self.guard.framed(buf, rect, &self.title, &WIN_REVIEW_TEXT);
         let inner = Rect::new(
             rect.x + 2,
             rect.y + 1,
@@ -226,6 +240,7 @@ impl ComposeBox {
         let mut hits: Vec<(Rect, ComposePart)> = Vec::new();
         if inner.width < 20 || inner.height < 6 {
             self.hits = hits;
+            self.guard.render(buf);
             return;
         }
         let muted = Style::default().fg(th().ui.muted).bg(th().ui.panel);
@@ -244,14 +259,11 @@ impl ComposeBox {
             inner.width,
             button_y.saturating_sub(inner.y + 4).max(2),
         );
-        self.bar = dialog_kit::text_area(
+        self.md.render(
             buf,
             text,
-            &self.text,
-            msg::COMPOSE_PLACEHOLDER.get(),
             self.focus == ComposePart::Text,
-            self.hover == Some(ComposePart::Text),
-            (&self.edit, ()),
+            msg::COMPOSE_PLACEHOLDER.get(),
         );
         let cancel_label = msg::CANCEL.get();
         let submit_label = if self.purpose.posts_at_once() {
@@ -278,7 +290,7 @@ impl ComposeBox {
             submit_x,
             button_y,
             submit_label,
-            if self.text.trim().is_empty() {
+            if self.md.is_blank() {
                 ButtonState::Disabled
             } else {
                 ButtonState::Primary {
@@ -289,8 +301,8 @@ impl ComposeBox {
         );
         hits.push((submit, ComposePart::Submit));
         hits.push((cancel, ComposePart::Cancel));
-        hits.push((text, ComposePart::Text));
-        let key = dialog_kit::key_label(Bind::DialogSubmit);
+        let key = dialog_kit::key_label(Bind::MdEditorSubmit);
+        let [(prev_key, prev_what), (split_key, split_what)] = MdEditor::hints();
         dialog_kit::hints(
             buf,
             inner.x,
@@ -298,10 +310,31 @@ impl ComposeBox {
             cancel_x.saturating_sub(inner.x + 1),
             &[
                 (key.as_str(), msg::HINT_SUBMIT.get()),
+                (prev_key.as_str(), prev_what),
+                (split_key.as_str(), split_what),
                 (msg::KEY_ESC.get(), msg::HINT_CANCEL.get()),
             ],
         );
         self.hits = hits;
+        self.guard.render(buf);
+    }
+}
+
+impl dialog_kit::Dismiss for ComposeBox {
+    fn is_dirty(&self) -> bool {
+        self.md.text().trim() != self.initial.trim()
+    }
+
+    fn guard(&self) -> dialog_kit::Guard {
+        dialog_kit::Guard::ConfirmWhenDirty
+    }
+
+    fn close_hit(&self) -> &dialog_kit::CloseHit {
+        &self.guard.close
+    }
+
+    fn close_hit_mut(&mut self) -> &mut dialog_kit::CloseHit {
+        &mut self.guard.close
     }
 }
 
@@ -357,10 +390,10 @@ fn vote_text(value: i32, text: &str) -> String {
 }
 
 pub(super) struct FinishDialog {
-    body: String,
-    edit: FieldEditor<()>,
-    bar: Option<crate::scrollbar::Track>,
-    drag: crate::scrollbar::BarDrag,
+    md: MdEditor,
+    /// The text the dialog opened with (an AI draft): closing with it
+    /// untouched asks nothing.
+    initial: String,
     combo: Combo,
     /// The vote comboboxes (Gerrit): they replace the verdict list.
     votes: Vec<VoteRow>,
@@ -369,7 +402,7 @@ pub(super) struct FinishDialog {
     ai_summary: Option<String>,
     focus: FinishPart,
     hover: Option<FinishPart>,
-    close: dialog_kit::CloseHit,
+    guard: dialog_kit::DiscardGuard,
     hits: Vec<(Rect, FinishPart)>,
     pub(super) message: Option<String>,
     pub(super) busy: bool,
@@ -422,20 +455,57 @@ impl FinishDialog {
         combo.set_options(options);
         combo.select(Some(event_value(ReviewEvent::Comment).to_string()));
         Self {
-            body: String::new(),
-            edit: FieldEditor::default(),
-            bar: None,
-            drag: Default::default(),
+            md: MdEditor::new(String::new(), md_render::Context::default()),
+            initial: String::new(),
             combo,
             votes,
             pending,
             ai_summary,
             focus: FinishPart::Body,
             hover: None,
-            close: dialog_kit::CloseHit::default(),
+            guard: Default::default(),
             hits: Vec::new(),
             message: None,
             busy: false,
+        }
+    }
+
+    /// The host the summary goes to (what the Preview resolves `#N`
+    /// against) and where its draft is kept.
+    pub(super) fn for_target(mut self, ctx: md_render::Context, draft_key: String) -> Self {
+        let text = self.md.text().to_string();
+        self.md = MdEditor::new(text, ctx).with_draft(draft_key);
+        self.initial = self.md.text().to_string();
+        self
+    }
+
+    /// The cross, Esc, Cancel and a click outside all ask the one rule.
+    fn request_close(&mut self, kind: dialog_kit::DismissKind) -> FinishOutcome {
+        use dialog_kit::{dismiss, DismissAction};
+        match dismiss(&*self, kind) {
+            DismissAction::Close => {
+                self.md.discard();
+                FinishOutcome::Cancel
+            }
+            DismissAction::Swallow => {
+                self.guard.close.request_flash();
+                FinishOutcome::Stay
+            }
+            DismissAction::Confirm => {
+                self.guard
+                    .ask_with(md_msg::DISCARD_TITLE.get(), md_msg::DISCARD_BODY.get());
+                FinishOutcome::Stay
+            }
+        }
+    }
+
+    fn verdict(&mut self, v: dialog_kit::Verdict) -> FinishOutcome {
+        match v {
+            dialog_kit::Verdict::Discard => {
+                self.md.discard();
+                FinishOutcome::Cancel
+            }
+            dialog_kit::Verdict::Stay => FinishOutcome::Stay,
         }
     }
 
@@ -473,8 +543,7 @@ impl FinishDialog {
 
     /// Why Submit does nothing yet.
     fn blocked(&self) -> Option<&'static str> {
-        let empty =
-            self.body.trim().is_empty() && self.pending == 0 && self.changed_votes().is_empty();
+        let empty = self.md.is_blank() && self.pending == 0 && self.changed_votes().is_empty();
         (empty && self.event() != ReviewEvent::Approve).then(|| msg::NOTHING_TO_SUBMIT.get())
     }
 
@@ -486,30 +555,27 @@ impl FinishDialog {
             self.message = Some(why.to_string());
             return FinishOutcome::Stay;
         }
+        self.md.sent();
         FinishOutcome::Submit {
             event: self.event(),
-            body: self.body.trim().to_string(),
+            body: self.md.text().trim().to_string(),
             votes: self.changed_votes(),
         }
     }
 
     pub(super) fn paste(&mut self, text: &str) {
-        if self.focus != FinishPart::Body {
+        if self.focus != FinishPart::Body || self.guard.is_open() {
             return;
         }
-        let clean = text.replace("\r\n", "\n").replace('\r', "\n");
-        self.edit.sync(Some(()));
-        let mut value = std::mem::take(&mut self.body);
-        self.edit.caret_mut(()).insert(&mut value, &clean);
-        self.body = value;
+        self.md.paste(text);
     }
 
     /// Fills the form from the ✦ draft: its text, and its verdict when the
     /// host offers it. Returns what had to change (the host has no such
     /// verdict, or no vote of that size), for the dialog to say.
     pub(super) fn prefill(&mut self, body: &str, event: ReviewEvent) -> Option<String> {
-        self.body = body.trim().to_string();
-        self.edit.sync(Some(()));
+        self.md.set_text(body.trim().to_string());
+        self.initial = self.md.text().to_string();
         self.message = None;
         if self.voting() {
             let want = match event {
@@ -556,7 +622,7 @@ impl FinishDialog {
     /// The verdict and text the form would send (tests).
     #[cfg(test)]
     pub(super) fn filled(&self) -> (ReviewEvent, String) {
-        (self.event(), self.body.clone())
+        (self.event(), self.md.text().to_string())
     }
 
     /// The votes the form would change (tests).
@@ -579,17 +645,10 @@ impl FinishDialog {
         let Some(summary) = self.ai_summary.clone() else {
             return;
         };
-        if self.body.contains(summary.trim()) {
+        if self.md.text().contains(summary.trim()) {
             return;
         }
-        if !self.body.trim().is_empty() {
-            if !self.body.ends_with('\n') {
-                self.body.push('\n');
-            }
-            self.body.push('\n');
-        }
-        self.body.push_str(summary.trim());
-        self.edit.sync(Some(()));
+        self.md.append_block(summary.trim());
         self.message = None;
     }
 
@@ -620,25 +679,18 @@ impl FinishDialog {
             open.combo.on_key(key);
             return FinishOutcome::Stay;
         }
+        if let Some(v) = self.guard.key(key) {
+            return self.verdict(v);
+        }
         let shift = key.modifiers.contains(KeyModifiers::SHIFT);
         if self.focus == FinishPart::Body {
-            self.edit.sync(Some(()));
-            if key.code == KeyCode::Enter {
-                let mut value = std::mem::take(&mut self.body);
-                self.edit.caret_mut(()).insert(&mut value, "\n");
-                self.body = value;
-                self.message = None;
-                return FinishOutcome::Stay;
-            }
-            if self.edit.claims((), &self.body, &key, true) {
-                let mut value = std::mem::take(&mut self.body);
-                let edit = self.edit.on_key((), &mut value, &key, true);
-                self.body = value;
-                if let KeyEdit::Copy(s) | KeyEdit::Cut(s) = edit {
-                    crate::clipboard::copy_shared(msg::NOUN_SELECTION.get(), &s);
+            match self.md.on_key(key) {
+                KeyUse::Handled => {
+                    self.message = None;
+                    return FinishOutcome::Stay;
                 }
-                self.message = None;
-                return FinishOutcome::Stay;
+                KeyUse::Submit => return self.submit(),
+                KeyUse::Pass => {}
             }
         }
         if self.focus == FinishPart::Event
@@ -658,7 +710,7 @@ impl FinishDialog {
             }
         }
         match key.code {
-            KeyCode::Esc => return FinishOutcome::Cancel,
+            KeyCode::Esc => return self.request_close(dialog_kit::DismissKind::Esc),
             KeyCode::Tab | KeyCode::BackTab | KeyCode::Down | KeyCode::Up => {
                 let forward =
                     matches!(key.code, KeyCode::Down) || (key.code == KeyCode::Tab && !shift);
@@ -671,7 +723,11 @@ impl FinishDialog {
                     (at + n - 1) % n
                 }];
             }
-            _ if crate::keymap::current().is(Bind::DialogSubmit, &key) => return self.submit(),
+            _ if crate::keymap::current().is(Bind::DialogSubmit, &key)
+                || crate::keymap::current().is(Bind::MdEditorSubmit, &key) =>
+            {
+                return self.submit()
+            }
             KeyCode::Enter | KeyCode::Char(' ') => {
                 if self.focus == FinishPart::UseSummary {
                     self.use_summary();
@@ -680,7 +736,7 @@ impl FinishDialog {
                 return match self.focus {
                     FinishPart::Submit => self.submit(),
                     FinishPart::Discard => FinishOutcome::Discard,
-                    FinishPart::Cancel => FinishOutcome::Cancel,
+                    FinishPart::Cancel => self.request_close(dialog_kit::DismissKind::Cancel),
                     _ => FinishOutcome::Stay,
                 };
             }
@@ -698,41 +754,23 @@ impl FinishDialog {
             open.combo.on_mouse(mouse);
             return FinishOutcome::Stay;
         }
-        let top = self.edit.caret(()).map_or(0, |c| c.top.get());
-        let lines = self.body.split('\n').count();
-        if let Some(top) = self.drag.on_mouse(self.bar, mouse, lines, top) {
-            let rows = self.bar.map_or(1, |t| t.rect.height as usize);
-            self.edit
-                .caret_mut(())
-                .scroll_lines_to(&self.body, top, rows);
+        if let Some(v) = self.guard.mouse(mouse) {
+            return self.verdict(v);
+        }
+        if let Some(kind) = self.guard.pointer(mouse) {
+            return self.request_close(kind);
+        }
+        if self.md.on_mouse(mouse) == MouseUse::Inside {
+            if matches!(mouse.kind, MouseEventKind::Down(MouseButton::Left)) {
+                self.focus = FinishPart::Body;
+            }
             return FinishOutcome::Stay;
         }
         let hit = dialog_kit::hit_at(&self.hits, mouse.column, mouse.row);
-        if !matches!(mouse.kind, MouseEventKind::Down(_)) && self.edit.is_dragging() {
-            self.edit
-                .dialog_mouse(Some(()), &self.body, mouse.kind, mouse.column, mouse.row);
-            return FinishOutcome::Stay;
-        }
         match mouse.kind {
-            MouseEventKind::Moved => {
-                self.hover = hit;
-                self.close.set_hover(mouse.column, mouse.row);
-            }
-            MouseEventKind::Down(MouseButton::Left) if self.close.hit(mouse.column, mouse.row) => {
-                return FinishOutcome::Cancel;
-            }
+            MouseEventKind::Moved => self.hover = hit,
             MouseEventKind::Down(MouseButton::Left) => match hit {
-                Some(FinishPart::Body) => {
-                    self.focus = FinishPart::Body;
-                    self.edit.sync(Some(()));
-                    self.edit.dialog_mouse(
-                        Some(()),
-                        &self.body,
-                        mouse.kind,
-                        mouse.column,
-                        mouse.row,
-                    );
-                }
+                Some(FinishPart::Body) => self.focus = FinishPart::Body,
                 Some(FinishPart::UseSummary) => {
                     self.focus = FinishPart::UseSummary;
                     self.use_summary();
@@ -752,13 +790,11 @@ impl FinishDialog {
                     return self.submit();
                 }
                 Some(FinishPart::Discard) => return FinishOutcome::Discard,
-                Some(FinishPart::Cancel) => return FinishOutcome::Cancel,
+                Some(FinishPart::Cancel) => {
+                    return self.request_close(dialog_kit::DismissKind::Cancel)
+                }
                 None => {}
             },
-            MouseEventKind::Up(MouseButton::Left) => {
-                self.edit
-                    .dialog_mouse(Some(()), &self.body, mouse.kind, mouse.column, mouse.row);
-            }
             _ => {}
         }
         FinishOutcome::Stay
@@ -766,9 +802,8 @@ impl FinishDialog {
 
     pub(super) fn render(&mut self, area: Rect, buf: &mut Buffer, spinner: char) {
         let rect = WIN_REVIEW_FINISH.place(area, dialog_kit::centered(area, 84, 20));
-        self.edit.begin_frame();
-        self.close
-            .framed(buf, rect, msg::FINISH_TITLE.get(), &WIN_REVIEW_FINISH, true);
+        self.guard
+            .framed(buf, rect, msg::FINISH_TITLE.get(), &WIN_REVIEW_FINISH);
         let inner = Rect::new(
             rect.x + 2,
             rect.y + 1,
@@ -778,6 +813,7 @@ impl FinishDialog {
         let mut hits: Vec<(Rect, FinishPart)> = Vec::new();
         if inner.width < 30 || inner.height < 10 {
             self.hits = hits;
+            self.guard.render(buf);
             return;
         }
         let muted = Style::default().fg(th().ui.muted).bg(th().ui.panel);
@@ -818,16 +854,14 @@ impl FinishDialog {
         let button_y = inner.bottom().saturating_sub(1);
         // One row per vote label instead of the single verdict row.
         let extra = self.votes.len().saturating_sub(1) as u16;
-        let body_h = button_y.saturating_sub(y + 5 + extra).clamp(2, 9);
+        // The editor's own mode bar takes the first row.
+        let body_h = button_y.saturating_sub(y + 5 + extra).clamp(2, 10);
         let body = Rect::new(inner.x, y, inner.width, body_h);
-        self.bar = dialog_kit::text_area(
+        self.md.render(
             buf,
             body,
-            &self.body,
-            msg::SUMMARY_PLACEHOLDER.get(),
             self.focus == FinishPart::Body,
-            self.hover == Some(FinishPart::Body),
-            (&self.edit, ()),
+            msg::SUMMARY_PLACEHOLDER.get(),
         );
         hits.push((body, FinishPart::Body));
         y += body_h + 1;
@@ -937,19 +971,43 @@ impl FinishDialog {
             left = discard.right() + 1;
             hits.insert(0, (discard, FinishPart::Discard));
         }
-        let key = dialog_kit::key_label(Bind::DialogSubmit);
+        let key = dialog_kit::key_label(Bind::MdEditorSubmit);
+        let [(prev_key, prev_what), (split_key, split_what)] = MdEditor::hints();
         dialog_kit::hints(
             buf,
             left,
             button_y,
             cancel_x.saturating_sub(left + 1),
-            &[(key.as_str(), msg::HINT_SUBMIT.get())],
+            &[
+                (key.as_str(), msg::HINT_SUBMIT.get()),
+                (prev_key.as_str(), prev_what),
+                (split_key.as_str(), split_what),
+            ],
         );
         self.hits = hits;
         self.combo.render_popup(buf, buf.area);
         for row in &mut self.votes {
             row.combo.render_popup(buf, buf.area);
         }
+        self.guard.render(buf);
+    }
+}
+
+impl dialog_kit::Dismiss for FinishDialog {
+    fn is_dirty(&self) -> bool {
+        self.md.text().trim() != self.initial.trim()
+    }
+
+    fn guard(&self) -> dialog_kit::Guard {
+        dialog_kit::Guard::ConfirmWhenDirty
+    }
+
+    fn close_hit(&self) -> &dialog_kit::CloseHit {
+        &self.guard.close
+    }
+
+    fn close_hit_mut(&mut self) -> &mut dialog_kit::CloseHit {
+        &mut self.guard.close
     }
 }
 

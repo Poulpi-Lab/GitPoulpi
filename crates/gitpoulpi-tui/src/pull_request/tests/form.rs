@@ -72,7 +72,7 @@ fn keys_walk_the_form_pick_from_the_combos_and_create() {
     for c in "line two".chars() {
         d.on_key(key(KeyCode::Char(c)));
     }
-    assert_eq!(d.body, "line one\nline two");
+    assert_eq!(d.md.text(), "line one\nline two");
     // Up moves the caret inside the description, it does not leave it.
     d.on_key(key(KeyCode::Up));
     assert_eq!(d.focus, PrFocus::Body);

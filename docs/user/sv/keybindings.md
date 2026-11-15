@@ -377,6 +377,9 @@ Varje tangent du kan binda om, med id:t som används i
 | `reword` | `deeper` | Ändra historiken djupare | `Alt+H` |
 | `composer` | `commit` | Commit från composern | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Infoga en ärendereferens | `Alt+R` |
+| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
+| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
+| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
 | `dialog` | `browse` | Bläddra efter en mapp | `Ctrl+B` |
 | `dialog` | `sources` | Gå till klonkällorna | `Alt+S` |
 | `dialog` | `submit` | Skicka formuläret för pull request | `Ctrl+S` |

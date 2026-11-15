@@ -481,3 +481,90 @@ Another sentence follows so that the paragraph is long enough to wrap across sev
     assert!(hit.as_micros() < 500, "cache hit {hit:?}");
     assert!(painted.as_micros() < 2000, "paint {painted:?}");
 }
+
+#[test]
+fn alert_labels_follow_the_language() {
+    let src = "> [!TIP]\n> text\n";
+    assert_eq!(texts(src, 40)[0], "\u{2502} Tip");
+    let fr = gitpoulpi_i18n::with_lang(gitpoulpi_i18n::Lang::Fr, || texts(src, 40));
+    assert_eq!(fr[0], "\u{2502} Astuce");
+}
+
+fn host_context() -> Context {
+    Context {
+        xrefs: gitpoulpi_hosting::xrefs::XrefContext {
+            family: Some(gitpoulpi_config::ApiFamily::Github),
+            web_base: "https://github.com".into(),
+            project: "o/r".into(),
+            ..Default::default()
+        },
+    }
+}
+
+#[test]
+fn host_references_become_links_through_xrefs() {
+    let d = render(
+        "fixes #12, cc @mara, see o/other#3 and 0123abc\n\n`#99 in code`",
+        80,
+        &host_context(),
+    );
+    let urls: Vec<&str> = d.links.iter().map(|l| l.url.as_str()).collect();
+    assert!(
+        urls.contains(&"https://github.com/o/r/issues/12"),
+        "{urls:?}"
+    );
+    assert!(urls.contains(&"https://github.com/mara"), "{urls:?}");
+    assert!(
+        urls.contains(&"https://github.com/o/other/issues/3"),
+        "{urls:?}"
+    );
+    assert!(
+        urls.contains(&"https://github.com/o/r/commit/0123abc"),
+        "{urls:?}"
+    );
+    assert!(
+        !urls.iter().any(|u| u.contains("/99")),
+        "code is never linked: {urls:?}"
+    );
+    // The hit rect is the underlined cells of `#12`.
+    let (buf, hits) = paint_doc(&d, 80);
+    let id = d
+        .links
+        .iter()
+        .position(|l| l.url.ends_with("/issues/12"))
+        .unwrap();
+    let rect = hits.iter().find(|(_, i)| *i == id).unwrap().0;
+    assert_eq!(rect.width, 3);
+    let shown: String = row(&buf, rect.y)
+        .chars()
+        .skip(rect.x as usize)
+        .take(3)
+        .collect();
+    assert_eq!(shown, "#12");
+}
+
+#[test]
+fn without_a_host_a_bare_number_is_not_a_link() {
+    let d = doc("fixes #12 and https://example.com/x", 80);
+    let urls: Vec<&str> = d.links.iter().map(|l| l.url.as_str()).collect();
+    assert_eq!(urls, ["https://example.com/x"]);
+}
+
+#[test]
+fn merge_requests_are_linked_with_a_bang() {
+    let ctx = Context {
+        xrefs: gitpoulpi_hosting::xrefs::XrefContext {
+            family: Some(gitpoulpi_config::ApiFamily::Gitlab),
+            web_base: "https://gl.test".into(),
+            project: "g/p".into(),
+            ..Default::default()
+        },
+    };
+    let d = render("merged by !7", 80, &ctx);
+    assert_eq!(d.links.len(), 1, "{:?}", d.links);
+    assert!(
+        d.links[0].url.ends_with("/g/p/-/merge_requests/7"),
+        "{:?}",
+        d.links
+    );
+}

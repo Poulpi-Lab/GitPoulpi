@@ -373,6 +373,9 @@ stage_file = "z"
 | `reword` | `deeper` | 기록을 더 깊이 수정 | `Alt+H` |
 | `composer` | `commit` | 작성기에서 Commit | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | 이슈 참조 삽입 | `Alt+R` |
+| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
+| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
+| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
 | `dialog` | `browse` | 폴더 찾아보기 | `Ctrl+B` |
 | `dialog` | `sources` | 클론 소스로 이동 | `Alt+S` |
 | `dialog` | `submit` | Pull request 양식 제출 | `Ctrl+S` |

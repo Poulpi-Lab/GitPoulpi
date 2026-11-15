@@ -142,11 +142,11 @@ fn loose_lists(events: &[Event]) -> HashSet<usize> {
 
 fn alert_label(kind: BlockQuoteKind) -> &'static str {
     match kind {
-        BlockQuoteKind::Note => "Note",
-        BlockQuoteKind::Tip => "Tip",
-        BlockQuoteKind::Important => "Important",
-        BlockQuoteKind::Warning => "Warning",
-        BlockQuoteKind::Caution => "Caution",
+        BlockQuoteKind::Note => "Note", // i18n-english: the alert keyword of the host
+        BlockQuoteKind::Tip => "Tip",   // i18n-english: the alert keyword of the host
+        BlockQuoteKind::Important => "Important", // i18n-english: the alert keyword of the host
+        BlockQuoteKind::Warning => "Warning", // i18n-english: the alert keyword of the host
+        BlockQuoteKind::Caution => "Caution", // i18n-english: the alert keyword of the host
     }
 }
 
@@ -820,6 +820,7 @@ impl Builder<'_> {
             rows.extend(t.rows.iter().map(|r| (r.clone(), false)));
             for (n, (row, is_head)) in rows.iter().enumerate() {
                 let mut line = LineBuf::new(&rest);
+                #[allow(clippy::needless_range_loop)]
                 for c in 0..cols {
                     line.push_str(
                         if c == 0 { "\u{2502} " } else { " \u{2502} " },

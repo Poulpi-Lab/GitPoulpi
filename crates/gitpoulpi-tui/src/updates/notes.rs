@@ -236,7 +236,9 @@ impl NotesUi {
         let before = md_render::render(&CHANGELOG[..start], text_w, &ctx)
             .lines
             .len();
-        self.anchor = rows.len() + before;
+        // Blocks are one blank line apart, so the section starts one row after
+        // the lines of everything before it.
+        self.anchor = rows.len() + before + usize::from(before > 0);
         rows.extend(
             md_render::render(CHANGELOG, text_w, &ctx)
                 .lines

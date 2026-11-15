@@ -671,7 +671,7 @@ impl ReviewView {
                         &mut self.md_cache,
                         &mut all_docs,
                         &ctx,
-                        &format!("item{n}"),
+                        &format!("item{n}"), // i18n-english
                         &c.body,
                         width.saturating_sub(2),
                     ));
@@ -694,7 +694,7 @@ impl ReviewView {
                             &mut self.md_cache,
                             &mut all_docs,
                             &ctx,
-                            &format!("item{n}"),
+                            &format!("item{n}"), // i18n-english
                             &r.body,
                             width.saturating_sub(2),
                         ));

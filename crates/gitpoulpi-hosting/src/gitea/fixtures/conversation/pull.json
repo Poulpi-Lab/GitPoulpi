@@ -1,0 +1,1 @@
+{"id":502,"number":3,"title":"Greet","state":"closed","body":"Adds a greeting.","created_at":"2026-10-02T09:00:00Z","html_url":"https://git.example.com/o/p/pulls/3","user":{"login":"bob","full_name":""},"labels":[],"pull_request":{"merged":true,"draft":false}}

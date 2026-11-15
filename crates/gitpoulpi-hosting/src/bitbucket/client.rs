@@ -9,6 +9,10 @@ use crate::client::{
     encode_component, CreatedIssue, CreatedPullRequest, HostingClient, NewIssue, NewPullRequest,
     MAX_PAGES,
 };
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
+    TimelinePage,
+};
 use crate::http::{HttpRequest, HttpTransport};
 use crate::integration::Integration;
 use crate::model::{
@@ -27,12 +31,14 @@ const PAGELEN: u32 = 100;
 pub const ISSUES_RETIRED: &str =
     "Bitbucket issues were retired on 2026-08-20; link a Jira project instead";
 
+mod conversation;
 mod protection;
 
 pub struct BitbucketClient {
     integration: Integration,
     token: String,
     transport: Arc<dyn HttpTransport>,
+    pub(crate) scopes: crate::scope_handle::ScopeHandle,
 }
 
 impl BitbucketClient {
@@ -45,6 +51,7 @@ impl BitbucketClient {
             integration,
             token,
             transport,
+            scopes: Default::default(),
         }
     }
 
@@ -372,5 +379,62 @@ impl HostingClient for BitbucketClient {
 
     async fn create_issue(&self, _req: &NewIssue) -> Result<CreatedIssue> {
         Err(Error::Unsupported(ISSUES_RETIRED.to_string()))
+    }
+
+    fn conversation_caps(&self, kind: ItemKind) -> ConversationCaps {
+        ConversationCaps::bitbucket(kind)
+    }
+
+    async fn posting_identity(&self, project: &str) -> Result<PostingIdentity> {
+        self.conv_identity(project).await
+    }
+
+    async fn item_timeline(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        older: Option<&PageCursor>,
+        opts: &TimelineOpts,
+    ) -> Result<TimelinePage> {
+        self.conv_timeline(project, key, older, opts).await
+    }
+
+    async fn post_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> Result<Comment> {
+        self.conv_post(project, key, body, internal).await
+    }
+
+    async fn reply_in_discussion(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        discussion_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_reply(project, key, discussion_id, body).await
+    }
+
+    async fn edit_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_edit(project, key, comment_id, body).await
+    }
+
+    async fn delete_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+    ) -> Result<()> {
+        self.conv_delete(project, key, comment_id).await
     }
 }

@@ -1,0 +1,11 @@
+[
+ {"id":1,"type":"label","body":"1","created_at":"2026-10-01T09:01:00Z","user":{"login":"alice"},"label":{"name":"bug"}},
+ {"id":2,"type":"comment","body":"Reproduced on **1.2**.","created_at":"2026-10-01T10:00:00Z","updated_at":"2026-10-01T10:30:00Z","html_url":"https://git.example.com/o/p/issues/7#issuecomment-2","user":{"login":"carol","full_name":"Carol C","html_url":"https://git.example.com/carol"}},
+ {"id":3,"type":"assignees","body":"","created_at":"2026-10-01T11:00:00Z","user":{"login":"alice"},"assignee":{"login":"bob"},"removed_assignee":false},
+ {"id":4,"type":"change_title","body":"","created_at":"2026-10-01T11:05:00Z","user":{"login":"alice"},"old_title":"Crash on empty","new_title":"Crash on empty config"},
+ {"id":5,"type":"comment","body":"Thanks","created_at":"2026-10-01T12:00:00Z","updated_at":"2026-10-01T12:00:01Z","user":{"login":"gitea-bot","is_bot":true}},
+ {"id":6,"type":"issue_ref","body":"","created_at":"2026-10-01T12:30:00Z","user":{"login":"bob"},"ref_issue":{"number":12,"repository":{"full_name":"o/other"},"html_url":"https://git.example.com/o/other/issues/12"}},
+ {"id":7,"type":"label","body":"","created_at":"2026-10-01T12:40:00Z","user":{"login":"alice"},"label":{"name":"help wanted"}},
+ {"id":8,"type":"lock","body":"","created_at":"2026-10-01T12:50:00Z","user":{"login":"alice"}},
+ {"id":9,"type":"close","body":"","created_at":"2026-10-01T13:00:00Z","user":{"login":"bob"}}
+]

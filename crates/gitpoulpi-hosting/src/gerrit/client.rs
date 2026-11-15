@@ -10,6 +10,10 @@ use crate::auth::auth_headers;
 use crate::client::{
     encode_component, CreatedPullRequest, HostingClient, NewPullRequest, MAX_PAGES,
 };
+use crate::conversation::{
+    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
+    TimelinePage,
+};
 use crate::http::{HttpRequest, HttpResponse, HttpTransport};
 use crate::integration::Integration;
 use crate::metadata::{ItemMeta, MetaKind};
@@ -19,7 +23,7 @@ use crate::model::{
 use crate::project::{HostedProject, HostedSshKey};
 use crate::review::model::{
     DiffSide, MergeState, PullRequestDetail, ReviewCapabilities, ReviewComment, ReviewEvent,
-    ReviewFile, ReviewOutcome, ReviewState, ReviewSubmission, ReviewThread, SubmittedReview,
+    ReviewFile, ReviewOutcome, ReviewSubmission, ReviewThread, SubmittedReview,
 };
 use crate::review::{invalid, validate_submission};
 use crate::{Error, Result};
@@ -28,6 +32,7 @@ use super::map::{self, Account, ChangeInfo, CommentInfo};
 
 mod account;
 mod code;
+mod conversation;
 
 /// Changes of one page.
 const PAGE: usize = 100;
@@ -755,31 +760,7 @@ impl HostingClient for GerritClient {
         number: u64,
     ) -> Result<Vec<SubmittedReview>> {
         let change = self.change(project, number).await?;
-        let Some(label) = change.labels.get("Code-Review") else {
-            return Ok(Vec::new());
-        };
-        Ok(label
-            .all
-            .iter()
-            .filter_map(|e| {
-                let value = e.value.filter(|v| *v != 0)?;
-                Some(SubmittedReview {
-                    id: format!("{}-{}", e._account_id, value),
-                    author: e
-                        .username
-                        .clone()
-                        .or_else(|| e.name.clone())
-                        .unwrap_or_default(),
-                    state: if value > 0 {
-                        ReviewState::Approved
-                    } else {
-                        ReviewState::ChangesRequested
-                    },
-                    body: format!("Code-Review {value:+}"),
-                    submitted_at: map::iso(e.date.as_deref().unwrap_or("")),
-                })
-            })
-            .collect())
+        Ok(change.code_review_votes())
     }
 
     /// A patch-set comment, posted at once as a change message.
@@ -890,6 +871,63 @@ impl HostingClient for GerritClient {
             comments: review.comments.len(),
             review_id: None,
         })
+    }
+
+    fn conversation_caps(&self, kind: ItemKind) -> ConversationCaps {
+        ConversationCaps::gerrit(kind)
+    }
+
+    async fn posting_identity(&self, project: &str) -> Result<PostingIdentity> {
+        self.conv_identity(project).await
+    }
+
+    async fn item_timeline(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        older: Option<&PageCursor>,
+        opts: &TimelineOpts,
+    ) -> Result<TimelinePage> {
+        self.conv_timeline(project, key, older, opts).await
+    }
+
+    async fn post_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> Result<Comment> {
+        self.conv_post(project, key, body, internal).await
+    }
+
+    async fn reply_in_discussion(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        discussion_id: &str,
+        body: &str,
+    ) -> Result<Comment> {
+        self.conv_reply(project, key, discussion_id, body).await
+    }
+
+    async fn edit_item_comment(
+        &self,
+        _project: &str,
+        _key: &ItemKey,
+        _comment_id: &str,
+        _body: &str,
+    ) -> Result<Comment> {
+        Err(Self::conv_edit_refused())
+    }
+
+    async fn delete_item_comment(
+        &self,
+        _project: &str,
+        _key: &ItemKey,
+        _comment_id: &str,
+    ) -> Result<()> {
+        Err(Self::conv_delete_refused())
     }
 
     async fn item_meta(&self, project: &str, number: u64, _kind: MetaKind) -> Result<ItemMeta> {

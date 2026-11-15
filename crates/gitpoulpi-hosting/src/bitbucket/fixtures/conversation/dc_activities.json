@@ -1,0 +1,7 @@
+{"size":5,"isLastPage":true,"start":0,"limit":100,"values":[
+ {"id":50,"createdDate":1759330800000,"action":"APPROVED","user":{"name":"bob","displayName":"Bob B"}},
+ {"id":49,"createdDate":1759327200000,"action":"COMMENTED","user":{"name":"bob","displayName":"Bob B"},"commentAnchor":{"path":"src/net.rs","line":17,"lineType":"ADDED","fileType":"TO","orphaned":false},"comment":{"id":31,"version":2,"text":"Use a backoff here.","author":{"name":"bob","displayName":"Bob B"},"createdDate":1759327200000,"updatedDate":1759327200000,"threadResolved":false,"state":"OPEN","permittedOperations":{"editable":false,"deletable":false},"comments":[{"id":32,"version":0,"text":"Done.","author":{"name":"ann","displayName":"Ann A"},"createdDate":1759328000000,"updatedDate":1759329000000,"permittedOperations":{"editable":true,"deletable":true},"comments":[]}]}},
+ {"id":48,"createdDate":1759323600000,"action":"COMMENTED","user":{"name":"ann"},"comment":{"id":30,"version":0,"text":"Ready for review.","author":{"name":"ann","displayName":"Ann A"},"createdDate":1759323600000,"updatedDate":1759323600000,"comments":[]}},
+ {"id":47,"createdDate":1759320000000,"action":"RESCOPED","user":{"name":"ann"},"added":{"total":2,"commits":[]},"removed":{"total":0,"commits":[]},"fromHash":"f1","toHash":"t2"},
+ {"id":46,"createdDate":1759309200000,"action":"OPENED","user":{"name":"ann","displayName":"Ann A"}}
+]}

@@ -1,0 +1,18 @@
+{"count":7,"value":[
+ {"id":1,"status":"active","isDeleted":false,"comments":[
+   {"id":1,"parentCommentId":0,"author":{"displayName":"Bob B","uniqueName":"bob@acme.test"},"content":"Could you add a test?","publishedDate":"2026-10-01T10:00:00Z","lastUpdatedDate":"2026-10-01T10:00:00Z","lastContentUpdatedDate":"2026-10-01T10:00:00Z","commentType":"text"},
+   {"id":2,"parentCommentId":1,"author":{"displayName":"Ann A","uniqueName":"ann@acme.test"},"content":"Done in the next push.","publishedDate":"2026-10-01T10:30:00Z","lastUpdatedDate":"2026-10-01T11:30:00Z","lastContentUpdatedDate":"2026-10-01T11:30:00Z","commentType":"text"}]},
+ {"id":2,"status":"fixed","isDeleted":false,"threadContext":{"filePath":"/src/net.rs","rightFileStart":{"line":10,"offset":1},"rightFileEnd":{"line":12,"offset":5}},"comments":[
+   {"id":1,"parentCommentId":0,"author":{"displayName":"Bob B","uniqueName":"bob@acme.test"},"content":"Use a backoff here.","publishedDate":"2026-10-01T12:00:00Z","lastUpdatedDate":"2026-10-01T12:00:00Z","lastContentUpdatedDate":"2026-10-01T12:00:00Z","commentType":"text"},
+   {"id":2,"parentCommentId":1,"author":{"displayName":"Ann A","uniqueName":"ann@acme.test"},"content":"oops","publishedDate":"2026-10-01T12:10:00Z","lastUpdatedDate":"2026-10-01T12:10:00Z","commentType":"text","isDeleted":true}]},
+ {"id":3,"status":"closed","isDeleted":false,"properties":{"CodeReviewThreadType":{"$type":"System.String","$value":"VoteUpdate"},"CodeReviewVoteResult":{"$type":"System.String","$value":"10"}},"comments":[
+   {"id":1,"parentCommentId":0,"author":{"displayName":"Bob B","uniqueName":"bob@acme.test"},"content":"Bob B approved the pull request","publishedDate":"2026-10-01T13:00:00Z","commentType":"system"}]},
+ {"id":4,"status":"closed","isDeleted":false,"properties":{"CodeReviewThreadType":{"$type":"System.String","$value":"RefUpdate"}},"comments":[
+   {"id":1,"parentCommentId":0,"author":{"displayName":"Ann A","uniqueName":"ann@acme.test"},"content":"Ann A updated the source branch","publishedDate":"2026-10-01T09:30:00Z","commentType":"system"}]},
+ {"id":5,"status":"closed","isDeleted":false,"properties":{"CodeReviewThreadType":{"$type":"System.String","$value":"StatusUpdate"}},"comments":[
+   {"id":1,"parentCommentId":0,"author":{"displayName":"Ann A","uniqueName":"ann@acme.test"},"content":"Ann A completed the pull request","publishedDate":"2026-10-01T15:00:00Z","commentType":"system"}]},
+ {"id":6,"status":"active","isDeleted":true,"comments":[
+   {"id":1,"parentCommentId":0,"author":{"displayName":"X"},"content":"gone","publishedDate":"2026-10-01T16:00:00Z","commentType":"text"}]},
+ {"id":7,"status":"active","isDeleted":false,"comments":[
+   {"id":1,"parentCommentId":0,"author":{"displayName":"Ann A","uniqueName":"ann@acme.test"},"content":"Rebased.","publishedDate":"2026-10-01T14:00:00Z","lastUpdatedDate":"2026-10-01T14:00:00Z","commentType":"text"}]}
+]}

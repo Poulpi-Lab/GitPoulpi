@@ -14,6 +14,13 @@
 //! conversation.
 
 pub mod caps;
+#[cfg(any(
+    feature = "gitea",
+    feature = "azure-devops",
+    feature = "bitbucket",
+    feature = "gerrit"
+))]
+pub(crate) mod compat;
 pub mod identity;
 pub mod model;
 #[cfg(any(
@@ -24,7 +31,11 @@ pub mod model;
     feature = "youtrack",
     feature = "redmine",
     feature = "trello",
-    feature = "local-issues"
+    feature = "local-issues",
+    feature = "gitea",
+    feature = "azure-devops",
+    feature = "bitbucket",
+    feature = "gerrit"
 ))]
 pub(crate) mod time;
 #[cfg(any(

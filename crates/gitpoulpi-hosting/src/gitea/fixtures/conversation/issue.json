@@ -1,0 +1,1 @@
+{"id":501,"number":7,"title":"Crash on empty config","state":"closed","body":"The app **crashes** when the config is empty.","created_at":"2026-10-01T09:00:00Z","html_url":"https://git.example.com/o/p/issues/7","user":{"login":"alice","full_name":"Alice A","html_url":"https://git.example.com/alice"},"labels":[{"name":"bug"},{"name":"help wanted"}]}

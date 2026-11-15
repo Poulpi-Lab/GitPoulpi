@@ -69,6 +69,8 @@
 //! * The work item *new* form URL: left `None`.
 
 mod client;
+#[cfg(test)]
+mod conversation_tests;
 mod map;
 mod remote;
 pub mod spec;

@@ -233,6 +233,7 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 | `ai_rewrite_rules` | `gitpoulpi ai rewrite-rules` | read, network |
 | `ai_rewrite_script` | `gitpoulpi ai rewrite-script` | read, network |
 | `ai_split_plan` | `gitpoulpi ai split-plan` | read, network |
+| `ai_worktree_name` | `gitpoulpi ai worktree-name` | read, network |
 | `alias_status` | `gitpoulpi alias status` | read |
 | `amend` | `gitpoulpi amend` | destructive |
 | `apply_commit` | `gitpoulpi apply-commit` | write |

@@ -18,7 +18,7 @@ use super::model::{Focus, Sev};
 use super::{PaneId, ReviewView, SPIN_AFTER};
 use crate::commit_detail::wrap_text;
 use crate::dialog_kit::{self, ButtonState};
-use crate::markdown_lite::{self, Look};
+use crate::md_render;
 use crate::meta_picker::MetaField;
 use crate::review_cmd::Tab;
 use crate::th;
@@ -43,6 +43,8 @@ pub(super) enum Hit {
     Viewed(usize),
     Commit(usize),
     Row(PaneId, usize),
+    /// A link of the Overview's Markdown (index into `md_links`).
+    MdLink(usize),
     /// The `+` at the start of a code line.
     Add(PaneId, usize),
     Fold(usize),
@@ -70,29 +72,6 @@ pub(super) enum Hit {
     Bar(crate::diff_view::DiffBarButton),
     /// The bar's `⋯`: the list of the buttons it had no room for.
     BarMore,
-}
-
-/// The look of a run of Markdown text.
-fn md_style(look: Look) -> Style {
-    let base = panel_style();
-    match look {
-        Look::Plain => base,
-        Look::Bold => base.add_modifier(Modifier::BOLD),
-        Look::Italic => base.add_modifier(Modifier::ITALIC),
-        Look::BoldItalic => base.add_modifier(Modifier::BOLD | Modifier::ITALIC),
-        Look::Strike => base.add_modifier(Modifier::CROSSED_OUT),
-        Look::Code => Style::default().fg(th().ui.accent).bg(th().ui.side_bg),
-        Look::Link => Style::default()
-            .fg(th().ui.accent)
-            .bg(th().ui.panel)
-            .add_modifier(Modifier::UNDERLINED),
-        Look::Heading => Style::default()
-            .fg(th().ui.accent)
-            .bg(th().ui.panel)
-            .add_modifier(Modifier::BOLD),
-        Look::Quote => muted().add_modifier(Modifier::ITALIC),
-        Look::Marker => Style::default().fg(th().ui.accent).bg(th().ui.panel),
-    }
 }
 
 /// How a suggestion's severity is coloured.
@@ -556,13 +535,14 @@ impl ReviewView {
             msg::OVERVIEW_TITLE.get(),
             self.focus == Focus::List,
         );
-        let width = inner.width.saturating_sub(2) as usize;
+        let width = inner.width.saturating_sub(4) as usize;
+        self.md_links.clear();
 
         enum L {
             Heading(String),
             Meta(String, Option<(String, ratatui::style::Color)>),
             /// A line of Markdown text, already wrapped and styled.
-            Md(markdown_lite::Line),
+            Md(std::rc::Rc<md_render::Doc>, usize),
             Dim(String),
             Blank,
             /// The heading of the ✦ block, with the number of suggestions.
@@ -575,16 +555,35 @@ impl ReviewView {
             DraftBar,
             SugText(usize, String),
         }
+        let ctx = md_render::Context::default();
+        let mut all_docs: Vec<std::rc::Rc<md_render::Doc>> = Vec::new();
+        fn md_lines(
+            cache: &mut md_render::DocCache,
+            all: &mut Vec<std::rc::Rc<md_render::Doc>>,
+            ctx: &md_render::Context,
+            id: &str,
+            text: &str,
+            width: usize,
+        ) -> Vec<L> {
+            let doc = cache.get_text(id, text, width, ctx);
+            all.push(std::rc::Rc::clone(&doc));
+            (0..doc.lines.len())
+                .map(|n| L::Md(std::rc::Rc::clone(&doc), n))
+                .collect()
+        }
         let mut lines: Vec<L> = Vec::new();
         lines.push(L::Heading(msg::DESCRIPTION.get().to_string()));
         if h.detail.body.trim().is_empty() {
             lines.push(L::Dim(msg::NO_DESCRIPTION.get().to_string()));
         } else {
-            lines.extend(
-                markdown_lite::render(&h.detail.body, width)
-                    .into_iter()
-                    .map(L::Md),
-            );
+            lines.extend(md_lines(
+                &mut self.md_cache,
+                &mut all_docs,
+                &ctx,
+                "description",
+                &h.detail.body,
+                width,
+            ));
         }
         lines.push(L::Blank);
         // The AI's summary and suggestions: after a run only.
@@ -594,11 +593,14 @@ impl ReviewView {
                 lines.push(L::DraftBar);
                 if !self.sug.body.trim().is_empty() {
                     lines.push(L::Dim(ai_msg::DRAFT_TEXT_LABEL.get().to_string()));
-                    lines.extend(
-                        markdown_lite::render(&self.sug.body, width.saturating_sub(2))
-                            .into_iter()
-                            .map(L::Md),
-                    );
+                    lines.extend(md_lines(
+                        &mut self.md_cache,
+                        &mut all_docs,
+                        &ctx,
+                        "draft",
+                        &self.sug.body,
+                        width.saturating_sub(2),
+                    ));
                 }
                 lines.push(L::Blank);
             }
@@ -607,11 +609,14 @@ impl ReviewView {
                 && self.sug.summary.trim() != self.sug.body.trim()
             {
                 lines.push(L::Dim(ai_msg::SUMMARY_LABEL.get().to_string()));
-                lines.extend(
-                    markdown_lite::render(&self.sug.summary, width.saturating_sub(2))
-                        .into_iter()
-                        .map(L::Md),
-                );
+                lines.extend(md_lines(
+                    &mut self.md_cache,
+                    &mut all_docs,
+                    &ctx,
+                    "summary",
+                    &self.sug.summary,
+                    width.saturating_sub(2),
+                ));
             }
             for note in &self.sug.notes {
                 lines.push(L::Dim(note.clone()));
@@ -658,15 +663,18 @@ impl ReviewView {
         if items.is_empty() {
             lines.push(L::Dim(msg::NO_CONVERSATION.get().to_string()));
         }
-        for (when, item) in items {
+        for (n, (when, item)) in items.into_iter().enumerate() {
             match item {
                 Item::C(c) => {
                     lines.push(L::Meta(diffrows::who(&c.author, &when), None));
-                    lines.extend(
-                        markdown_lite::render(&c.body, width.saturating_sub(2))
-                            .into_iter()
-                            .map(L::Md),
-                    );
+                    lines.extend(md_lines(
+                        &mut self.md_cache,
+                        &mut all_docs,
+                        &ctx,
+                        &format!("item{n}"),
+                        &c.body,
+                        width.saturating_sub(2),
+                    ));
                 }
                 Item::R(r) => {
                     let (word, color) = match r.state {
@@ -682,16 +690,29 @@ impl ReviewView {
                         Some((word.to_string(), color)),
                     ));
                     if !r.body.trim().is_empty() {
-                        lines.extend(
-                            markdown_lite::render(&r.body, width.saturating_sub(2))
-                                .into_iter()
-                                .map(L::Md),
-                        );
+                        lines.extend(md_lines(
+                            &mut self.md_cache,
+                            &mut all_docs,
+                            &ctx,
+                            &format!("item{n}"),
+                            &r.body,
+                            width.saturating_sub(2),
+                        ));
                     }
                 }
             }
             lines.push(L::Blank);
         }
+        // The palette's "Open Link in Message" twin reaches every link of the page.
+        let mut urls: Vec<String> = Vec::new();
+        for doc in &all_docs {
+            for l in &doc.links {
+                if !urls.contains(&l.url) {
+                    urls.push(l.url.clone());
+                }
+            }
+        }
+        crate::link_confirm::set_message_urls(urls);
         self.ov_len = lines.len();
         self.ov_rows = inner.height as usize;
         self.ov_offset = self.ov_offset.min(self.ov_len.saturating_sub(self.ov_rows));
@@ -744,16 +765,23 @@ impl ReviewView {
                         );
                     }
                 }
-                L::Md(line) => {
-                    let mut cx = x + 2;
-                    let end = x + max;
-                    for span in &line.spans {
-                        if cx >= end {
-                            break;
+                L::Md(doc, n) => {
+                    let Some(line) = doc.lines.get(*n) else {
+                        continue;
+                    };
+                    for (rect, id) in md_render::paint(
+                        buf,
+                        x + 2,
+                        y,
+                        max.saturating_sub(2),
+                        line,
+                        panel_style(),
+                        false,
+                    ) {
+                        if let Some(target) = doc.links.get(id) {
+                            self.md_links.push(target.url.clone());
+                            hits.push((rect, Hit::MdLink(self.md_links.len() - 1)));
                         }
-                        let used =
-                            dialog_kit::put(buf, cx, y, &span.text, end - cx, md_style(span.look));
-                        cx = used.right();
                     }
                 }
                 L::SugHeading(n) => {

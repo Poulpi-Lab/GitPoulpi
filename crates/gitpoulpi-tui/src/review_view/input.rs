@@ -1199,6 +1199,11 @@ impl ReviewView {
             Hit::SubmitChange => return self.run(ReviewCmd::SubmitChange),
             Hit::AbandonChange => return self.run(ReviewCmd::AbandonChange),
             Hit::Compose => return self.run(ReviewCmd::ConversationComment),
+            Hit::MdLink(i) => {
+                if let Some(url) = self.md_links.get(i).cloned() {
+                    crate::link_confirm::ask(vec![url]);
+                }
+            }
             Hit::File(i) => {
                 self.select_file(i);
                 self.focus = Focus::List;

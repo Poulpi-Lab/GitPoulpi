@@ -1224,8 +1224,7 @@ fn the_repo_instructions_reach_the_prompt_in_both_modes() {
     wait_for_file_containing(&term, &state, "Repo rule RR.");
 
     let generate = |term: &mut Terminal| {
-        term.send_keys("Escape").unwrap();
-        term.send_keys("Escape").unwrap();
+        leave_settings(term);
         // The keyboard twin of the sparkle button.
         term.send_keys("C-g").unwrap();
         term.send_keys("i").unwrap();
@@ -1259,7 +1258,9 @@ fn the_repo_instructions_reach_the_prompt_in_both_modes() {
                 .wait_for_stable(Duration::from_millis(300), STEP)
                 .unwrap_or_else(|e| panic!("{e}"));
             if !screen.contains("\u{2713} Add to global") {
-                let (col, row) = screen.find("Combine with global").expect("the combo row");
+                let (col, row) = screen
+                    .find("Combine with global")
+                    .unwrap_or_else(|| panic!("the combo row. Screen was:\n{}", screen.text()));
                 t.click(col + 1, row).expect("open the combo");
             }
         },
@@ -1272,6 +1273,14 @@ fn the_repo_instructions_reach_the_prompt_in_both_modes() {
         .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Enter").unwrap();
     wait_for_file_containing(&term, &state, "replace");
+    // The dropdown is closed (the row shows the pick), so the next Escape
+    // leaves the page instead of closing a list.
+    term.wait_for("the combo on Replace global", STEP, |s| {
+        s.text()
+            .lines()
+            .any(|l| l.contains("Combine with global") && l.contains("Replace global"))
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
 
     generate(&mut term);
     wait_for_agent_calls(&term, &agent, 2);
@@ -1281,6 +1290,28 @@ fn the_repo_instructions_reach_the_prompt_in_both_modes() {
         second.contains("## Repository instructions\nRepo rule RR."),
         "{second}"
     );
+}
+
+/// Leaves Settings one `Escape` at a time, each waited for. Two Escapes sent
+/// back to back reach the TUI in one read on a busy machine and parse as
+/// `Alt+Esc`: the page then stays open, and a later click on the gear closes it
+/// instead of opening it (the test failed on "the combo row" under load).
+fn leave_settings(term: &mut Terminal) {
+    const EDITOR: &str = "Repository instructions - Custom instructions";
+    const PAGE: &str = "GitPoulpi - Settings";
+    let screen = snap(term);
+    if screen.contains(EDITOR) {
+        term.send_keys("Escape").unwrap();
+        term.wait_for("the editor closed", STEP, |s| {
+            !s.contains(EDITOR) && s.contains(PAGE)
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    }
+    term.send_keys("Escape").unwrap();
+    term.wait_for("Settings closed", STEP, |s| {
+        !s.contains(PAGE) && s.contains("Amend previous commit")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
 }
 
 #[cfg(unix)]

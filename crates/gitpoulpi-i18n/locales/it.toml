@@ -349,7 +349,7 @@ include_untracked_in_autostash = { git = "Includi i file non tracciati nell'auto
 include_untracked_in_autostash_help = { git = "Se lo stash automatico prende anche i file non tracciati (altrimenti solo le modifiche tracciate vengono messe da parte e ripristinate).", local = "Se l'accantonamento automatico prende anche i file non tracciati (altrimenti solo le modifiche tracciate vengono messe da parte e ripristinate)." }
 hosting_refresh_minutes = "Aggiornamento di {$prs} e issue"
 hosting_refresh_minutes_help = { git = "Ogni quanto gli elenchi {$prs} e Issue della barra laterale (e il chip della {$pr_abbr} collegata nella barra degli strumenti) interrogano di nuovo l'host. 0 spegne il timer; si aggiornano comunque all'apertura di un repository, al cambio di branch, dopo un push o un fetch e su richiesta.", local = "Ogni quanto gli elenchi {$prs} e Issue della barra laterale (e il chip della {$pr_abbr} collegata nella barra degli strumenti) interrogano di nuovo l'host. 0 spegne il timer; si aggiornano comunque all'apertura di un repository, al cambio di branch, dopo un invio o un recupero e su richiesta." }
-# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
+# context: label of the row that sets the name messages to a host are posted as (a bot such as my-app[bot])
 hosting_post_as = "Pubblica come"
 # context: help under the "Post as" row of Settings
 hosting_post_as_help = "Il nome con cui i tuoi messaggi vengono pubblicati sull'host e con cui si riconoscono i tuoi commenti (modifica, eliminazione), per esempio my-app[bot] per una GitHub App. Serve solo con un token di bot: se vuoto, GitPoulpi lo chiede all'host e lo impara dal primo messaggio che pubblica."

@@ -974,6 +974,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Conversation: Next Entry | `Down` |
 | Conversation: Next Unread Entry | `n` |
 | Conversation: Reply to Entry | `r` |
+| Conversation: Quote Entry | `Q` |
 | Conversation: New Comment | `c` |
 | Conversation: Links of Entry... | `l` |
 | Conversation: Copy Link of Entry | `y` |
@@ -984,6 +985,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Conversation: Toggle Write and Preview |  |
 | Conversation: Toggle the Split View |  |
 | Conversation: Send the Comment |  |
+| Conversation: Toggle Internal Note |  |
 | Conversation: Close | `Esc` |
 | Hosting: Open Issue Conversation... |  |
 | 리뷰: ✦ 리뷰 초안 작성... | `s` |

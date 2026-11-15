@@ -159,7 +159,7 @@ fn the_header_names_the_item_and_who_posts() {
 }
 
 #[test]
-fn an_app_bot_without_a_known_login_is_named_and_a_command_token_says_so() {
+fn an_app_bot_without_a_known_login_is_named_and_a_known_one_is_shown() {
     let mut r = rig();
     r.shared.lock().unwrap().identity = Ok(PostingIdentity::new(
         None,
@@ -170,7 +170,7 @@ fn an_app_bot_without_a_known_login_is_named_and_a_command_token_says_so() {
     r.view.conv.set_identity(identity);
     let screen = text(&draw(&mut r.view, WIDE));
     assert!(
-        screen.contains("Posting as the GitHub App bot (repository token command)"),
+        screen.contains("Posting as the GitHub App bot (its name is not known yet"),
         "{screen}"
     );
     r.view.conv.set_identity(Ok(PostingIdentity::new(
@@ -180,7 +180,7 @@ fn an_app_bot_without_a_known_login_is_named_and_a_command_token_says_so() {
     )));
     let screen = text(&draw(&mut r.view, WIDE));
     assert!(
-        screen.contains("Posting as poulpi-lab[bot] (repository token command)"),
+        screen.contains("Posting as poulpi-lab[bot] (GitHub App bot)"),
         "{screen}"
     );
 }
@@ -202,40 +202,6 @@ fn a_host_that_takes_no_comments_says_read_only_and_has_no_composer() {
         ItemCmd::NewComment.unavailable(Some(r.view.avail())),
         Some(gitpoulpi_i18n::msg::item_view::WHY_NO_COMPOSER.get())
     );
-}
-
-#[test]
-fn send_is_greyed_with_its_reason_and_nothing_is_posted() {
-    let mut r = rig();
-    let screen = text(&draw(&mut r.view, WIDE));
-    assert!(screen.contains("New comment"), "{screen}");
-    assert!(screen.contains("Send"), "{screen}");
-    // Type, then try to send by key and by mouse: only a reason comes back.
-    r.view.on_key(key(KeyCode::Char('c')));
-    for c in "hello".chars() {
-        r.view.on_key(key(KeyCode::Char(c)));
-    }
-    let _ = draw(&mut r.view, WIDE);
-    let effect = r
-        .view
-        .on_key(KeyEvent::new(KeyCode::Enter, KeyModifiers::CONTROL));
-    assert_eq!(effect, ItemEffect::None);
-    let why = gitpoulpi_i18n::msg::item_view::WHY_WRITING_LATER.get();
-    assert_eq!(r.view.message.as_deref(), Some(why));
-    r.view.message = None;
-    let (rect, _) = *r.view.hits.iter().find(|(_, h)| *h == Hit::Send).unwrap();
-    assert_eq!(r.view.on_mouse(click(rect.x, rect.y)), ItemEffect::None);
-    assert_eq!(
-        r.view.message.as_deref(),
-        Some(why),
-        "the button answers with the reason"
-    );
-    let screen = text(&draw(&mut r.view, WIDE));
-    assert!(
-        screen.contains(why),
-        "the reason is drawn in the view: {screen}"
-    );
-    assert_eq!(r.shared.lock().unwrap().writes, 0, "nothing was posted");
 }
 
 #[test]
@@ -412,18 +378,13 @@ fn palette_commands_carry_their_reasons() {
     assert_eq!(ItemCmd::Refresh.unavailable(Some(a)), None);
     assert_eq!(ItemCmd::Close.unavailable(Some(a)), None);
     assert_eq!(ItemCmd::Close.unavailable(None), Some(m::WHY_NO_VIEW.get()));
-    // Bob's own comment: Edit is allowed by the host and the login, and the
-    // reason left is that writing is not in this version.
+    // Bob's own comment: Edit and Delete are allowed by the login; Send has
+    // nothing to send yet.
     r.view.conv.select(2);
     let a = r.view.avail();
-    assert_eq!(
-        ItemCmd::Edit.unavailable(Some(a)),
-        Some(m::WHY_WRITING_LATER.get())
-    );
-    assert_eq!(
-        ItemCmd::Send.unavailable(Some(a)),
-        Some(m::WHY_WRITING_LATER.get())
-    );
+    assert_eq!(ItemCmd::Edit.unavailable(Some(a)), None);
+    assert_eq!(ItemCmd::Delete.unavailable(Some(a)), None);
+    assert_eq!(ItemCmd::Send.unavailable(Some(a)), Some(m::WHY_EMPTY.get()));
 }
 
 #[test]
@@ -509,4 +470,489 @@ fn the_seen_mark_is_left_when_the_view_goes_away() {
     });
     let _ = draw(&mut view, WIDE);
     assert_eq!(view.conv.unread_count(), 1);
+}
+
+// -- writing ------------------------------------------------------------------------
+
+fn ctrl_enter() -> KeyEvent {
+    KeyEvent::new(KeyCode::Enter, KeyModifiers::CONTROL)
+}
+
+fn type_text(view: &mut ItemView, text: &str) {
+    for c in text.chars() {
+        if c == '\n' {
+            view.on_key(key(KeyCode::Enter));
+        } else {
+            view.on_key(key(KeyCode::Char(c)));
+        }
+    }
+}
+
+fn wait_written(view: &mut ItemView) {
+    wait(view, "the write", |v| v.conv.take_idle_for_tests());
+}
+
+fn log(r: &Rig) -> Vec<String> {
+    r.shared.lock().unwrap().write_log.clone()
+}
+
+fn entry_ids(view: &ItemView) -> Vec<String> {
+    view.conv
+        .entries
+        .iter()
+        .filter_map(|e| match e {
+            TimelineEntry::Comment(c) => Some(c.id.clone()),
+            _ => None,
+        })
+        .collect()
+}
+
+#[test]
+fn a_comment_shows_at_once_goes_to_the_host_as_typed_and_clears_the_box() {
+    let mut r = rig();
+    r.shared.lock().unwrap().write_delay = Duration::from_millis(300);
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Char('c')));
+    type_text(&mut r.view, "Thanks\nagain");
+    let _ = draw(&mut r.view, WIDE);
+    assert_eq!(r.view.on_key(ctrl_enter()), ItemEffect::None);
+    // Before the host answers: the entry is there, pending, and the view says so.
+    assert!(r.view.conv.is_writing());
+    assert_eq!(entry_ids(&r.view), ["c1", "c2", "pending:1"]);
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(screen.contains("Sending..."), "{screen}");
+    wait_written(&mut r.view);
+    assert_eq!(log(&r), ["post||Thanks\nagain"]);
+    assert_eq!(
+        entry_ids(&r.view),
+        ["c1", "c2", "901"],
+        "the host's own copy replaced the pending one"
+    );
+    assert_eq!(r.view.md.as_ref().unwrap().text(), "", "the box is empty");
+    assert_eq!(r.view.compose, Compose::New);
+    assert_eq!(r.view.focus, Focus::Timeline);
+    // Posting to a host is outward: Undo says it cannot take it back.
+    assert!(
+        crate::undo_ui::nothing_to_undo().contains("comment posted to a host"),
+        "{}",
+        crate::undo_ui::nothing_to_undo()
+    );
+}
+
+#[test]
+fn a_refused_comment_goes_back_with_its_text_and_the_error_under_it() {
+    let mut r = rig();
+    r.shared.lock().unwrap().fail_write = Some("403 Forbidden".into());
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Char('c')));
+    type_text(&mut r.view, "Keep me");
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(ctrl_enter());
+    wait_written(&mut r.view);
+    assert_eq!(
+        entry_ids(&r.view),
+        ["c1", "c2"],
+        "the optimistic entry is gone"
+    );
+    assert_eq!(r.view.md.as_ref().unwrap().text(), "Keep me");
+    assert_eq!(r.view.focus, Focus::Composer);
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(screen.contains("not sent: 403 Forbidden"), "{screen}");
+    assert!(screen.contains("Keep me"), "{screen}");
+    // Sending again works and clears the error.
+    r.view.on_key(ctrl_enter());
+    wait_written(&mut r.view);
+    assert_eq!(log(&r).len(), 2);
+    assert_eq!(r.view.compose_error, None);
+    assert_eq!(r.view.md.as_ref().unwrap().text(), "");
+}
+
+#[test]
+fn send_is_greyed_with_its_reason_until_there_is_text() {
+    let mut r = rig();
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Char('c')));
+    let _ = draw(&mut r.view, WIDE);
+    let why = gitpoulpi_i18n::msg::item_view::WHY_EMPTY.get();
+    assert_eq!(r.view.send_reason(), Some(why));
+    let (rect, _) = *r.view.hits.iter().find(|(_, h)| *h == Hit::Send).unwrap();
+    assert_eq!(r.view.on_mouse(click(rect.x, rect.y)), ItemEffect::None);
+    assert_eq!(r.view.message.as_deref(), Some(why));
+    assert_eq!(r.shared.lock().unwrap().writes, 0, "nothing was posted");
+    type_text(&mut r.view, "x");
+    let _ = draw(&mut r.view, WIDE);
+    assert_eq!(r.view.send_reason(), None);
+    // The Send button posts too.
+    let (rect, _) = *r.view.hits.iter().find(|(_, h)| *h == Hit::Send).unwrap();
+    r.view.on_mouse(click(rect.x, rect.y));
+    wait_written(&mut r.view);
+    assert_eq!(log(&r), ["post||x"]);
+}
+
+fn thread_entries() -> Vec<TimelineEntry> {
+    let mut c1 = comment("c1", "carol", "Why not iterate?", "2026-11-12T10:30:00Z");
+    c1.discussion_id = Some("d1".into());
+    vec![
+        TimelineEntry::Comment(c1),
+        TimelineEntry::Comment(comment("c2", "bob", "Thanks.", "2026-11-13T08:00:00Z")),
+    ]
+}
+
+#[test]
+fn a_reply_goes_into_the_discussion_and_a_quote_into_a_new_comment() {
+    let mut r = rig_at(thread_entries(), None);
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Down));
+    // `r`: a reply into carol's discussion.
+    assert_eq!(r.view.on_key(key(KeyCode::Char('r'))), ItemEffect::None);
+    assert!(
+        matches!(r.view.compose, Compose::Reply { .. }),
+        "{:?}",
+        r.view.compose
+    );
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(screen.contains("Reply to carol"), "{screen}");
+    type_text(&mut r.view, "Because");
+    r.view.on_key(ctrl_enter());
+    wait_written(&mut r.view);
+    assert_eq!(log(&r), ["reply|d1|Because"]);
+    assert_eq!(r.view.compose, Compose::New);
+    // `Q`: the entry quoted into a new comment (also a button on a discussion).
+    r.view.on_key(key(KeyCode::Esc));
+    r.view.conv.select(1);
+    assert_eq!(r.view.on_key(key(KeyCode::Char('Q'))), ItemEffect::None);
+    assert_eq!(r.view.compose, Compose::New);
+    let quoted = r.view.md.as_ref().unwrap().text().to_string();
+    assert!(
+        quoted.starts_with("> **carol**\n> Why not iterate?"),
+        "{quoted}"
+    );
+    r.view.focus = Focus::Timeline;
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(screen.contains("Quote"), "the button is there: {screen}");
+}
+
+#[test]
+fn an_own_comment_is_edited_with_its_text_and_unchanged_text_is_refused() {
+    let mut r = rig();
+    let _ = draw(&mut r.view, WIDE);
+    r.view.conv.select(2);
+    assert_eq!(r.view.on_key(key(KeyCode::Char('e'))), ItemEffect::None);
+    assert!(matches!(r.view.compose, Compose::Edit { .. }));
+    assert_eq!(r.view.md.as_ref().unwrap().text(), "Thanks.");
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(
+        screen.contains("Edit comment") && screen.contains("Save"),
+        "{screen}"
+    );
+    // Nothing changed: Save says so and the host is not asked.
+    r.view.on_key(ctrl_enter());
+    assert_eq!(
+        r.view.message.as_deref(),
+        Some(gitpoulpi_i18n::msg::item_view::WHY_UNCHANGED.get())
+    );
+    assert_eq!(r.shared.lock().unwrap().writes, 0);
+    assert!(!r.view.composer_dirty());
+    type_text(&mut r.view, " a lot");
+    r.view.on_key(ctrl_enter());
+    wait_written(&mut r.view);
+    assert_eq!(log(&r), ["edit|c2|Thanks. a lot"]);
+    match &r.view.conv.entries[1] {
+        TimelineEntry::Comment(c) => assert_eq!(c.body.text, "Thanks. a lot"),
+        other => panic!("{other:?}"),
+    }
+    assert_eq!(r.view.compose, Compose::New);
+}
+
+#[test]
+fn delete_asks_first_and_keep_does_nothing() {
+    let mut r = rig();
+    let _ = draw(&mut r.view, WIDE);
+    r.view.conv.select(2);
+    r.view.on_key(key(KeyCode::Char('d')));
+    assert!(r.view.delete_ask.is_some());
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(screen.contains("Delete this comment?"), "{screen}");
+    assert!(!r.view.takes_palette());
+    // Esc keeps it.
+    r.view.on_key(key(KeyCode::Esc));
+    assert!(r.view.delete_ask.is_none());
+    assert_eq!(r.shared.lock().unwrap().writes, 0);
+    // Delete: Tab to the button, Enter.
+    r.view.on_key(key(KeyCode::Char('d')));
+    r.view.on_key(key(KeyCode::Tab));
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Enter));
+    assert!(r.view.conv.is_writing());
+    assert_eq!(entry_ids(&r.view), ["c1"], "gone at once");
+    wait_written(&mut r.view);
+    assert_eq!(log(&r), ["delete|c2|"]);
+}
+
+#[test]
+fn a_refused_delete_brings_the_comment_back_and_says_why() {
+    let mut r = rig();
+    r.shared.lock().unwrap().fail_write = Some("500 oops".into());
+    let _ = draw(&mut r.view, WIDE);
+    r.view.conv.select(2);
+    r.view.on_key(key(KeyCode::Char('d')));
+    r.view.on_key(key(KeyCode::Tab));
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Enter));
+    wait_written(&mut r.view);
+    assert_eq!(entry_ids(&r.view), ["c1", "c2"]);
+    assert_eq!(r.view.message.as_deref(), Some("not deleted: 500 oops"));
+}
+
+#[test]
+fn edit_and_delete_follow_the_provider_and_the_author() {
+    use gitpoulpi_i18n::msg::item_view as m;
+    let mut r = rig();
+    let _ = draw(&mut r.view, WIDE);
+    // carol's comment is not mine.
+    r.view.conv.select(1);
+    assert_eq!(r.view.avail().edit, Some(m::WHY_NOT_YOURS.get()));
+    assert_eq!(r.view.avail().delete, Some(m::WHY_NOT_YOURS.get()));
+    r.view.conv.select(2);
+    assert_eq!(r.view.avail().edit, None);
+    // A host that lets nobody edit or delete says so, mine or not.
+    let mut caps = r.view.conv.caps.clone().unwrap();
+    caps.edit_own = false;
+    caps.delete_own = false;
+    r.view.conv.caps = Some(caps);
+    assert_eq!(r.view.avail().edit, Some(m::WHY_NO_EDIT.get()));
+    assert_eq!(r.view.avail().delete, Some(m::WHY_NO_DELETE.get()));
+    assert_eq!(
+        r.view.on_key(key(KeyCode::Char('e'))),
+        ItemEffect::None,
+        "the reason goes to the view's last row"
+    );
+    assert_eq!(r.view.message.as_deref(), Some(m::WHY_NO_EDIT.get()));
+}
+
+fn bot_comment(id: &str) -> TimelineEntry {
+    let mut c = comment(
+        id,
+        "poulpi-lab[bot]",
+        "A bot says hi",
+        "2026-11-13T09:00:00Z",
+    );
+    c.author.kind = gitpoulpi_hosting::conversation::ActorKind::Bot;
+    TimelineEntry::Comment(c)
+}
+
+fn unknown_bot() -> Result<PostingIdentity, String> {
+    Ok(PostingIdentity::new(
+        None,
+        IdentityKind::AppBot,
+        TokenSource::RepoTokenCommand,
+    ))
+}
+
+#[test]
+fn an_app_bot_with_no_known_login_edits_only_what_this_install_posted() {
+    use gitpoulpi_i18n::msg::item_view as m;
+    let dir = tempfile::tempdir().unwrap();
+    // The state file says this install posted c8, not c9.
+    let t = target(Some(dir.path().to_path_buf()));
+    let path = t.state_path().unwrap();
+    let mut state = gitpoulpi_session::RepoState::default();
+    state.record_posted_comment(&t.seen_key(), "c8");
+    std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+    state.save(&path).unwrap();
+    let s = shared(vec![bot_comment("c8"), bot_comment("c9")]);
+    s.lock().unwrap().identity = unknown_bot();
+    let factory: Arc<dyn ClientFactory> = Arc::new(Factory(s));
+    let mut view = ItemView::open(t, factory);
+    wait(&mut view, "the conversation", |v| {
+        v.conv.header.is_some() && v.conv.identity.is_some() && !v.conv.busy()
+    });
+    let _ = draw(&mut view, WIDE);
+    view.conv.select(1);
+    assert_eq!(view.avail().edit, None, "c8 was posted here");
+    assert_eq!(view.avail().delete, None);
+    view.conv.select(2);
+    assert_eq!(
+        view.avail().edit,
+        Some(m::WHY_NOT_YOURS.get()),
+        "c9 may be anyone's: never guessed"
+    );
+    // Once the login is known the author decides, bot or person.
+    view.conv.set_identity(Ok(PostingIdentity::new(
+        Some("poulpi-lab[bot]".into()),
+        IdentityKind::AppBot,
+        TokenSource::RepoTokenCommand,
+    )));
+    assert_eq!(view.avail().edit, None);
+}
+
+#[test]
+fn what_this_install_posted_is_kept_by_the_worker_and_found_again() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut r = rig_at(entries(), Some(dir.path().to_path_buf()));
+    r.shared.lock().unwrap().identity = unknown_bot();
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Char('c')));
+    type_text(&mut r.view, "from the bot");
+    r.view.on_key(ctrl_enter());
+    wait_written(&mut r.view);
+    let state = gitpoulpi_session::RepoState::load(&r.view.target.state_path().unwrap()).unwrap();
+    assert_eq!(
+        state.posted_comments_of(&r.view.target.seen_key()),
+        vec!["901".to_string()]
+    );
+    // The new comment may be edited at once, though the login is unknown.
+    let _ = draw(&mut r.view, WIDE);
+    r.view.conv.select(r.view.conv.items() - 1);
+    assert_eq!(r.view.avail().edit, None);
+}
+
+#[test]
+fn another_client_posting_makes_the_open_view_read_again() {
+    use gitpoulpi_ipc::{HostingChange, HostingChangeArgs, HostingItemKind};
+    let mut r = rig();
+    let reads = r.shared.lock().unwrap().reads.len();
+    let change = |number: u64| HostingChangeArgs {
+        integration_id: "corp".into(),
+        project: "g/p".into(),
+        kind: HostingItemKind::Issue,
+        number,
+        id: String::new(),
+        change: HostingChange::Posted,
+    };
+    r.view.on_hosting_changed(&change(7));
+    r.view.poll();
+    assert_eq!(r.shared.lock().unwrap().reads.len(), reads, "another item");
+    r.view.on_hosting_changed(&change(142));
+    wait(&mut r.view, "the refresh", |v| {
+        v.conv.since_fresh() < Duration::from_millis(500) && !v.conv.busy()
+    });
+    assert!(r.shared.lock().unwrap().reads.len() > reads);
+}
+
+#[test]
+fn an_internal_note_is_a_checkbox_with_a_key_where_the_host_has_them() {
+    let mut r = rig();
+    let _ = draw(&mut r.view, WIDE);
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(!screen.contains("Internal note"), "{screen}");
+    assert_eq!(
+        ItemCmd::ToggleInternal.unavailable(Some(r.view.avail())),
+        Some(gitpoulpi_i18n::msg::item_view::WHY_NO_INTERNAL.get())
+    );
+    let mut caps = r.view.conv.caps.clone().unwrap();
+    caps.internal_notes = true;
+    r.view.conv.caps = Some(caps);
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(screen.contains("[ ] Internal note"), "{screen}");
+    r.view.on_key(key(KeyCode::Char('c')));
+    type_text(&mut r.view, "for members");
+    // The key twin, then the mouse twin, toggle it.
+    r.view
+        .on_key(KeyEvent::new(KeyCode::Char('i'), KeyModifiers::ALT));
+    assert!(r.view.internal);
+    let _ = draw(&mut r.view, WIDE);
+    let (rect, _) = *r
+        .view
+        .hits
+        .iter()
+        .find(|(_, h)| *h == Hit::Internal)
+        .unwrap();
+    r.view.on_mouse(click(rect.x, rect.y));
+    assert!(!r.view.internal);
+    r.view.run(ItemCmd::ToggleInternal);
+    assert!(r.view.internal);
+    r.view.on_key(ctrl_enter());
+    wait_written(&mut r.view);
+    assert_eq!(log(&r), ["post|internal|for members"]);
+}
+
+#[test]
+fn cancel_puts_only_the_box_away_and_never_closes_the_view() {
+    let mut r = rig();
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Char('c')));
+    type_text(&mut r.view, "typed");
+    let _ = draw(&mut r.view, WIDE);
+    let (rect, _) = *r.view.hits.iter().find(|(_, h)| *h == Hit::Cancel).unwrap();
+    assert_eq!(r.view.on_mouse(click(rect.x, rect.y)), ItemEffect::None);
+    assert!(r.view.guard.is_open(), "typed text asks first");
+    // Discard is the second button.
+    r.view.on_key(key(KeyCode::Right));
+    assert_eq!(r.view.on_key(key(KeyCode::Enter)), ItemEffect::None);
+    assert!(!r.view.guard.is_open());
+    r.view.poll();
+    assert_eq!(r.view.md.as_ref().unwrap().text(), "");
+    assert_eq!(r.view.focus, Focus::Timeline);
+}
+
+#[test]
+fn while_a_comment_is_sent_the_box_and_the_actions_wait() {
+    use gitpoulpi_i18n::msg::item_view as m;
+    let mut r = rig();
+    r.shared.lock().unwrap().write_delay = Duration::from_millis(400);
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Char('c')));
+    type_text(&mut r.view, "one");
+    r.view.on_key(ctrl_enter());
+    assert_eq!(r.view.send_reason(), Some(m::WHY_SENDING.get()));
+    type_text(&mut r.view, "more");
+    assert_eq!(r.view.md.as_ref().unwrap().text(), "one", "input is held");
+    assert_eq!(r.view.conv.reply_reason(), Some(m::WHY_SENDING.get()));
+    wait_written(&mut r.view);
+    assert_eq!(log(&r).len(), 1);
+}
+
+#[test]
+fn who_posts_is_named_for_every_kind_of_token() {
+    let id = |login: Option<&str>, kind, source| {
+        super::draw::identity_line(&PostingIdentity::new(
+            login.map(str::to_string),
+            kind,
+            source,
+        ))
+    };
+    let profile = TokenSource::Profile { id: "corp".into() };
+    assert_eq!(
+        id(Some("bob"), IdentityKind::PersonalToken, profile.clone()),
+        "Posting as bob (personal token)"
+    );
+    assert_eq!(
+        id(
+            Some("poulpi-lab[bot]"),
+            IdentityKind::AppBot,
+            TokenSource::RepoTokenCommand
+        ),
+        "Posting as poulpi-lab[bot] (GitHub App bot)"
+    );
+    assert!(
+        id(None, IdentityKind::AppBot, TokenSource::RepoTokenCommand)
+            .starts_with("Posting as the GitHub App bot (its name is not known yet")
+    );
+    assert_eq!(
+        id(Some("tok"), IdentityKind::ProjectOrGroupBot, profile),
+        "Posting as tok (project bot)"
+    );
+}
+
+#[test]
+fn a_host_that_does_not_read_markdown_says_what_the_text_is_sent_as() {
+    use gitpoulpi_hosting::conversation::MarkupFlavor;
+    let mut r = rig();
+    let mut caps = r.view.conv.caps.clone().unwrap();
+    caps.write_flavor = MarkupFlavor::JiraWiki;
+    r.view.conv.caps = Some(caps);
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Char('c')));
+    type_text(&mut r.view, "**hi**");
+    r.view
+        .on_key(KeyEvent::new(KeyCode::Char('p'), KeyModifiers::ALT));
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(screen.contains("Sent as Jira wiki markup"), "{screen}");
+    // Markdown hosts say nothing of the kind.
+    let mut caps = r.view.conv.caps.clone().unwrap();
+    caps.write_flavor = MarkupFlavor::GitlabMd;
+    r.view.conv.caps = Some(caps);
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(!screen.contains("Sent as"), "{screen}");
 }

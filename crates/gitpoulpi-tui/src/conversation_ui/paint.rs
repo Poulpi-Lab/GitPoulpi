@@ -11,7 +11,7 @@ use ratatui::layout::Rect;
 use ratatui::style::{Modifier, Style};
 
 use super::rows::{event_label, short_time, Row, What, BODY_INDENT};
-use super::{Btn, Conversation, Hit, Load, WRITING};
+use super::{Btn, Conversation, Hit, Load};
 use crate::dialog_kit::{self, ButtonState};
 use crate::md_render::{self, sanitize};
 use crate::th;
@@ -509,14 +509,28 @@ impl Conversation {
                 },
             ));
         }
+        if !is_event
+            && self.caps.as_ref().is_some_and(|c| c.comment)
+            && matches!(self.reply_to(), super::write::ReplyTo::Discussion { .. })
+        {
+            wanted.push((
+                Btn::Quote,
+                m::BTN_QUOTE.get(),
+                if self.reply_reason().is_some() {
+                    ButtonState::Disabled
+                } else {
+                    normal(Btn::Quote)
+                },
+            ));
+        }
         if self.can_edit_selected() {
             wanted.push((
                 Btn::Edit,
                 m::BTN_EDIT.get(),
-                if WRITING {
-                    normal(Btn::Edit)
-                } else {
+                if self.is_writing() {
                     ButtonState::Disabled
+                } else {
+                    normal(Btn::Edit)
                 },
             ));
         }
@@ -524,10 +538,10 @@ impl Conversation {
             wanted.push((
                 Btn::Delete,
                 m::BTN_DELETE.get(),
-                if WRITING {
-                    normal(Btn::Delete)
-                } else {
+                if self.is_writing() {
                     ButtonState::Disabled
+                } else {
+                    normal(Btn::Delete)
                 },
             ));
         }

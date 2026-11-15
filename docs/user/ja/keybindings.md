@@ -947,6 +947,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Conversation: Next Entry | `Down` |
 | Conversation: Next Unread Entry | `n` |
 | Conversation: Reply to Entry | `r` |
+| Conversation: Quote Entry | `Q` |
 | Conversation: New Comment | `c` |
 | Conversation: Links of Entry... | `l` |
 | Conversation: Copy Link of Entry | `y` |
@@ -957,6 +958,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Conversation: Toggle Write and Preview |  |
 | Conversation: Toggle the Split View |  |
 | Conversation: Send the Comment |  |
+| Conversation: Toggle Internal Note |  |
 | Conversation: Close | `Esc` |
 | Hosting: Open Issue Conversation... |  |
 | レビュー: ✦ レビューのドラフトを作成... | `s` |

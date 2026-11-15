@@ -76,6 +76,10 @@ impl ItemView {
         match *self {}
     }
 
+    pub(crate) fn on_hosting_changed(&mut self, _change: &gitpoulpi_ipc::HostingChangeArgs) {
+        match *self {}
+    }
+
     pub(crate) fn poll(&mut self) -> ItemEffect {
         match *self {}
     }

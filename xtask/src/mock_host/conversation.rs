@@ -106,7 +106,23 @@ fn github(request: &Request, rest: &str, port: u16) -> Reply {
         })
     };
     let n_of = |text: &str| text.parse::<u64>().ok();
-    match (method, endpoint.split('/').collect::<Vec<_>>().as_slice()) {
+    match (
+        method,
+        endpoint
+            .split('?')
+            .next()
+            .unwrap_or_default()
+            .split('/')
+            .collect::<Vec<_>>()
+            .as_slice(),
+    ) {
+        // The ISSUES list of the sidebar: the one issue this module serves.
+        ("GET", ["issues"]) => {
+            let mut row = item(GITHUB_ISSUE);
+            row["updated_at"] = json!("2026-10-11T09:30:00Z");
+            row["assignees"] = json!([]);
+            ok(json!([row]))
+        }
         ("GET", ["issues", n]) => {
             let n = n_of(n)?;
             (n == GITHUB_ISSUE || n == super::review::GITHUB_PR).then(|| ok(item(n)))?

@@ -23,11 +23,15 @@ pub(crate) struct ItemAvail {
     pub(crate) has_url: bool,
     /// Why a reply to the selected entry is not offered (`None`: it is).
     pub(crate) reply: Option<&'static str>,
+    /// Why a quote reply is not offered.
+    pub(crate) quote: Option<&'static str>,
     /// Why the selected comment cannot be edited / deleted.
     pub(crate) edit: Option<&'static str>,
     pub(crate) delete: Option<&'static str>,
     /// Why the text cannot be sent now.
     pub(crate) send: Option<&'static str>,
+    /// Why the internal note checkbox does nothing.
+    pub(crate) internal: Option<&'static str>,
     /// The host lists system events.
     pub(crate) has_events: bool,
     /// The window is wide enough for the composer's Split.
@@ -46,6 +50,7 @@ pub(crate) enum ItemCmd {
     NextEntry,
     NextUnread,
     Reply,
+    Quote,
     NewComment,
     Links,
     CopyLink,
@@ -56,6 +61,7 @@ pub(crate) enum ItemCmd {
     TogglePreview,
     ToggleSplit,
     Send,
+    ToggleInternal,
     Close,
 }
 
@@ -72,6 +78,14 @@ impl ItemCmd {
             Self::LoadOlder => (!a.has_older).then_some(msg::WHY_NO_OLDER.get()),
             Self::NextUnread => (!a.has_unread).then_some(msg::WHY_NO_UNREAD.get()),
             Self::Reply => a.reply,
+            Self::Quote => a.quote,
+            Self::ToggleInternal => {
+                if !a.composer {
+                    Some(msg::WHY_NO_COMPOSER.get())
+                } else {
+                    a.internal
+                }
+            }
             Self::NewComment | Self::TogglePreview => {
                 (!a.composer).then_some(msg::WHY_NO_COMPOSER.get())
             }

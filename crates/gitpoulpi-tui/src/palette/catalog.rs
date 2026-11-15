@@ -2694,6 +2694,12 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     )
     .requires(crate::build_features::Feature::Conversation),
     entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_QUOTE,
+        "Q",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::Quote),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_NEW_COMMENT,
         "c",
         PaletteCommand::Item(crate::item_cmd::ItemCmd::NewComment),
@@ -2751,6 +2757,12 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         gitpoulpi_i18n::msg::item_view::PALETTE_SEND,
         "",
         PaletteCommand::Item(crate::item_cmd::ItemCmd::Send),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_TOGGLE_INTERNAL,
+        "",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::ToggleInternal),
     )
     .requires(crate::build_features::Feature::Conversation),
     entry(

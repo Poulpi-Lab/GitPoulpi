@@ -807,6 +807,17 @@ impl RepoDialogs {
         ))));
     }
 
+    /// Another client posted, edited or deleted a comment: the open
+    /// conversation of that item reads itself again.
+    pub(crate) fn on_hosting_changed(&mut self, change: &gitpoulpi_ipc::HostingChangeArgs) {
+        #[cfg(feature = "hosting")]
+        if let Some(RepoDialog::Item(view)) = self.dialog.as_mut() {
+            view.on_hosting_changed(change);
+        }
+        #[cfg(not(feature = "hosting"))]
+        let _ = change;
+    }
+
     /// What the palette needs to gray a conversation command out (`None`: no
     /// conversation is open).
     pub(crate) fn item_avail(&self) -> Option<crate::item_cmd::ItemAvail> {

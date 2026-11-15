@@ -22,6 +22,7 @@ pub(crate) mod rows;
 pub(crate) mod tests;
 mod unread;
 pub(crate) mod worker;
+pub(crate) mod write;
 
 use std::sync::{mpsc, Arc};
 use std::time::Instant;
@@ -34,6 +35,7 @@ use ratatui::layout::Rect;
 pub(crate) use input::Act;
 use rows::{Input, Layout, LayoutKey, Row, What};
 use worker::{Failure, Msg};
+use write::{WMsg, WriteDone, WriteOp};
 
 use crate::md_render::{self, LinkTarget};
 
@@ -42,10 +44,6 @@ pub(crate) fn now_secs() -> i64 {
     cache::now()
 }
 
-/// Writing from the view is the next slice's job: until it lands, every
-/// control that would post, edit or delete is drawn greyed with a reason.
-pub(crate) const WRITING: bool = false;
-
 /// A spinner shows once a read takes this long (maintainer rule 9).
 pub(crate) const SPIN_AFTER: std::time::Duration = std::time::Duration::from_millis(150);
 
@@ -53,6 +51,7 @@ pub(crate) const SPIN_AFTER: std::time::Duration = std::time::Duration::from_mil
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Btn {
     Reply,
+    Quote,
     Edit,
     Delete,
     Links,
@@ -135,6 +134,27 @@ pub(crate) struct Conversation {
     pub(crate) hover: Option<Hit>,
     /// The area the last paint used.
     pub(crate) area: Rect,
+    // writes
+    /// The ids of the comments this install posted (what authorship falls
+    /// back on while the login is not known).
+    posted: std::collections::HashSet<String>,
+    /// Where the id of a posted comment is kept, and under which key.
+    write_ctx: Option<(std::path::PathBuf, String)>,
+    write_rx: Option<mpsc::Receiver<WMsg>>,
+    writing: Option<Writing>,
+    write_done: Option<WriteDone>,
+    write_seq: u64,
+    /// The key of an entry to select once the rows that hold it exist.
+    select_when_laid_out: Option<String>,
+    /// The host said the item changed: read it again as soon as possible.
+    stale: bool,
+}
+
+/// A write in flight: what was asked, and the entries to go back to when
+/// the host refuses.
+struct Writing {
+    op: WriteOp,
+    backup: Vec<TimelineEntry>,
 }
 
 impl Conversation {
@@ -185,6 +205,14 @@ impl Conversation {
             links: Vec::new(),
             hover: None,
             area: Rect::default(),
+            posted: Default::default(),
+            write_ctx: None,
+            write_rx: None,
+            writing: None,
+            write_done: None,
+            write_seq: 0,
+            select_when_laid_out: None,
+            stale: false,
         };
         me.start(worker::Mode::Open);
         me
@@ -205,7 +233,7 @@ impl Conversation {
 
     /// Reads the newest window again (F5, the timer, after a post).
     pub(crate) fn refresh(&mut self) {
-        if self.rx.is_some() {
+        if self.rx.is_some() || self.writing.is_some() {
             return;
         }
         self.notice = None;
@@ -214,11 +242,23 @@ impl Conversation {
 
     /// [`Conversation::refresh`] for the timer: nothing shows while it runs.
     pub(crate) fn refresh_quietly(&mut self) {
-        if self.rx.is_some() {
+        if self.rx.is_some() || self.writing.is_some() {
             return;
         }
+        self.stale = false;
         self.start(worker::Mode::Refresh);
         self.quiet = true;
+    }
+
+    /// The item changed on the host (another client wrote to it): the next
+    /// quiet moment reads it again.
+    pub(crate) fn request_refresh(&mut self) {
+        self.stale = true;
+    }
+
+    /// A read asked for by [`Conversation::request_refresh`] can start now.
+    pub(crate) fn wants_refresh(&self) -> bool {
+        self.stale && self.rx.is_none() && self.writing.is_none() && self.header.is_some()
     }
 
     /// Reads the window before the one held.
@@ -281,6 +321,7 @@ impl Conversation {
                 }
             }
         }
+        changed |= self.poll_write();
         if let Some((_, rx)) = &self.layout_rx {
             match rx.try_recv() {
                 Ok(layout) => {
@@ -313,6 +354,12 @@ impl Conversation {
             Msg::Caps(caps) => {
                 self.caps = Some(caps);
                 self.rev += 1;
+            }
+            // A read that started before a write answers without it: the
+            // next refresh has it.
+            Msg::Fresh(_) if self.writing.is_some() => {
+                self.load = Load::Ready;
+                self.offline = None;
             }
             Msg::Fresh(page) => {
                 self.adopt(*page, false);
@@ -488,6 +535,16 @@ impl Conversation {
             .items
             .get(self.sel)
             .map_or(key, |i| i.key.clone());
+        if let Some(wanted) = self.select_when_laid_out.clone() {
+            // Only a layout that holds the entry settles it: one that was
+            // started before the write does not.
+            if let Some(at) = self.layout.items.iter().position(|i| i.key == wanted) {
+                self.sel = at;
+                self.sel_key = wanted;
+                self.follow = true;
+                self.select_when_laid_out = None;
+            }
+        }
         self.top = self.top.min(self.layout.rows.len().saturating_sub(1));
     }
 
@@ -629,29 +686,49 @@ impl Conversation {
         self.caps.as_ref().is_some_and(|c| c.comment)
     }
 
-    /// Whether the selected entry is the user's own comment, the host
-    /// allowing edits. `None` means the host did not say and nothing is
-    /// known about the login: the control stays hidden.
+    /// Whether `comment` is the user's own. The host's word comes first
+    /// (`can_edit`), then the token's login; while the login is not known (a
+    /// GitHub App bot) only what this install posted counts, and nothing is
+    /// ever guessed from a name.
     pub(crate) fn mine(&self, comment: &Comment) -> bool {
+        if write::is_pending(&comment.id) {
+            return false;
+        }
         if let Some(can) = comment.can_edit {
             return can;
         }
+        let posted_here = self.posted.contains(&comment.id);
         match &self.identity {
-            Some(Ok(id)) => id.authored(&comment.author).unwrap_or(false),
-            _ => false,
+            Some(Ok(id)) => id.authored(&comment.author).unwrap_or(posted_here),
+            _ => posted_here,
+        }
+    }
+
+    /// The comment Edit and Delete act on: the selected comment, or in a
+    /// thread the last one of ours (else the first).
+    pub(crate) fn writable_comment(&self) -> Option<&Comment> {
+        match self.selected_entry()? {
+            TimelineEntry::Comment(c) => Some(c),
+            TimelineEntry::Thread(t) => t
+                .comments
+                .iter()
+                .rev()
+                .find(|c| self.mine(c))
+                .or_else(|| t.comments.first()),
+            _ => None,
         }
     }
 
     pub(crate) fn can_edit_selected(&self) -> bool {
         self.caps.as_ref().is_some_and(|c| c.edit_own)
-            && self.selected_comment().is_some_and(|c| self.mine(c))
+            && self.writable_comment().is_some_and(|c| self.mine(c))
     }
 
     pub(crate) fn can_delete_selected(&self) -> bool {
         self.caps.as_ref().is_some_and(|c| c.delete_own)
-            && self
-                .selected_comment()
-                .is_some_and(|c| c.can_delete.unwrap_or_else(|| self.mine(c)))
+            && self.writable_comment().is_some_and(|c| {
+                !write::is_pending(&c.id) && c.can_delete.unwrap_or_else(|| self.mine(c))
+            })
     }
 
     /// Whether the selected item can be answered, and the reason when not.
@@ -671,6 +748,9 @@ impl Conversation {
         }
         if self.is_offline() {
             return Some(m::WHY_OFFLINE.get());
+        }
+        if self.writing.is_some() {
+            return Some(m::WHY_SENDING.get());
         }
         None
     }

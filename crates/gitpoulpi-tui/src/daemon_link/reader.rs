@@ -66,6 +66,14 @@ pub(super) async fn read_loop(
             {
                 activity.mark_ref_visibility_changed();
             }
+            // The CLI or the MCP server posted, edited or deleted a comment:
+            // an open conversation of that item reads itself again.
+            Some(ServerMessage::Event(Event::HostingItemChanged {
+                repo: changed,
+                change,
+            })) if changed == repo_id => {
+                activity.mark_hosting_item_changed(change);
+            }
             // The daemon wrote, changed or cleared the repo's pending
             // auto-stash record: the render loop re-reads it, so the
             // banner appears and vanishes live.

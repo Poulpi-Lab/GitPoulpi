@@ -183,6 +183,10 @@ impl DaemonLink {
         self.activity.take_pending_auto_stash_gone()
     }
 
+    pub(crate) fn take_hosting_item_changes(&self) -> Vec<gitpoulpi_ipc::HostingChangeArgs> {
+        self.activity.take_hosting_item_changes()
+    }
+
     pub(crate) fn take_ref_visibility_changed(&self) -> bool {
         self.activity.take_ref_visibility_changed()
     }

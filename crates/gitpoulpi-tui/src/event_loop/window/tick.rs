@@ -523,6 +523,9 @@ impl WindowState {
         if self.link.take_pending_auto_stash_gone().is_some() {
             self.last_message = Some(gitpoulpi_i18n::msg::input::AUTOSTASH_REMOVED.get().into());
         }
+        for change in self.link.take_hosting_item_changes() {
+            self.repo_dialogs.on_hosting_changed(&change);
+        }
         if self.link.take_ref_visibility_changed() {
             (self.hidden_from_graph, self.solo_refs) =
                 refs_tree::load_ref_visibility(&self.repo.root);

@@ -75,6 +75,9 @@ pub struct Activity {
     /// Set on `Event::PendingAutoStashGone`: the index the record last had,
     /// stored as `index + 1` so that 0 means none.
     pending_auto_stash_gone: std::sync::atomic::AtomicU64,
+    /// Set on `Event::HostingItemChanged`: what other clients wrote to an
+    /// issue or a request since the render loop last looked.
+    hosting_changes: Mutex<Vec<gitpoulpi_ipc::HostingChangeArgs>>,
     inner: Mutex<Inner>,
 }
 
@@ -113,6 +116,24 @@ impl Activity {
             .rewrite_progress
             .lock()
             .unwrap_or_else(|e| e.into_inner())
+    }
+
+    /// An issue or request was written to by another client.
+    pub(crate) fn mark_hosting_item_changed(&self, change: gitpoulpi_ipc::HostingChangeArgs) {
+        self.hosting_changes
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .push(change);
+        crate::redraw::poke();
+    }
+
+    pub(crate) fn take_hosting_item_changes(&self) -> Vec<gitpoulpi_ipc::HostingChangeArgs> {
+        std::mem::take(
+            &mut *self
+                .hosting_changes
+                .lock()
+                .unwrap_or_else(|e| e.into_inner()),
+        )
     }
 
     pub(crate) fn mark_ref_visibility_changed(&self) {

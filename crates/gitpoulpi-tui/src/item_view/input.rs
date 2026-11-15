@@ -9,10 +9,11 @@
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
 use gitpoulpi_i18n::msg::item_view as m;
 
-use super::{Bar, Focus, Hit, ItemEffect, ItemView};
+use super::{Bar, Compose, DeleteChoice, Discarding, Focus, Hit, ItemEffect, ItemView};
 use crate::combo::ComboOutcome;
+use crate::conversation_ui::write::{ReplyTo, WriteOp};
 use crate::conversation_ui::Act;
-use crate::dialog_kit::{self, DismissAction, DismissKind};
+use crate::dialog_kit::{self, ConfirmEvent, DismissAction, DismissKind};
 use crate::item_cmd::ItemCmd;
 use crate::md_editor::KeyUse;
 
@@ -39,7 +40,12 @@ impl ItemView {
     // -- keys --------------------------------------------------------------------------
 
     pub(crate) fn paste(&mut self, text: &str) {
-        if self.focus == Focus::Composer && !self.guard.is_open() && self.menu.is_none() {
+        if self.focus == Focus::Composer
+            && !self.guard.is_open()
+            && self.menu.is_none()
+            && self.delete_ask.is_none()
+            && !self.conv.is_writing()
+        {
             if let Some(md) = self.md.as_mut() {
                 md.paste(text);
             }
@@ -67,6 +73,10 @@ impl ItemView {
     fn key_inner(&mut self, key: KeyEvent) -> ItemEffect {
         if let Some(verdict) = self.guard.key(key) {
             return self.verdict(verdict);
+        }
+        if let Some((confirm, _)) = self.delete_ask.as_mut() {
+            let event = confirm.on_key(key);
+            return self.delete_event(event);
         }
         if let Some(menu) = self.menu.as_mut() {
             let outcome = menu.combo.on_key(key);
@@ -111,7 +121,14 @@ impl ItemView {
                 self.focus = Focus::Timeline;
                 return ItemEffect::None;
             }
+            // The twin of the internal note checkbox.
+            KeyCode::Char('i') if key.modifiers == KeyModifiers::ALT => {
+                return self.toggle_internal();
+            }
             _ => {}
+        }
+        if self.conv.is_writing() {
+            return ItemEffect::Message(m::WHY_SENDING.get().to_string());
         }
         let Some(md) = self.md.as_mut() else {
             self.focus = Focus::Timeline;
@@ -168,32 +185,53 @@ impl ItemView {
             Act::Handled => ItemEffect::None,
             Act::Reply => match self.conv.reply_reason() {
                 Some(why) => ItemEffect::Message(why.to_string()),
-                None => {
-                    let quote = self.conv.quote();
-                    self.open_composer(quote.as_deref());
-                    ItemEffect::None
-                }
+                None => match self.conv.reply_to() {
+                    ReplyTo::Discussion { id, label } => self.begin(
+                        Compose::Reply {
+                            discussion: id,
+                            label,
+                        },
+                        String::new(),
+                        None,
+                    ),
+                    ReplyTo::Quote => self.quote_reply(),
+                },
+            },
+            Act::Quote => match self.avail().quote {
+                Some(why) => ItemEffect::Message(why.to_string()),
+                None => self.quote_reply(),
             },
             Act::NewComment => {
                 if self.composer_available() {
-                    self.open_composer(None);
-                    ItemEffect::None
+                    self.begin(Compose::New, String::new(), None)
                 } else {
                     ItemEffect::Message(m::WHY_NO_COMMENT.get().to_string())
                 }
             }
-            Act::Edit => ItemEffect::Message(
-                self.avail()
-                    .edit
-                    .unwrap_or(m::WHY_WRITING_LATER.get())
-                    .to_string(),
-            ),
-            Act::Delete => ItemEffect::Message(
-                self.avail()
-                    .delete
-                    .unwrap_or(m::WHY_WRITING_LATER.get())
-                    .to_string(),
-            ),
+            Act::Edit => match self.avail().edit {
+                Some(why) => ItemEffect::Message(why.to_string()),
+                None => {
+                    let Some(c) = self.conv.writable_comment() else {
+                        return ItemEffect::None;
+                    };
+                    let text = crate::conversation_ui::rows::markdown_of(&c.body);
+                    let mode = Compose::Edit {
+                        id: c.id.clone(),
+                        original: text.clone(),
+                    };
+                    self.begin(mode, text, None)
+                }
+            },
+            Act::Delete => match self.avail().delete {
+                Some(why) => ItemEffect::Message(why.to_string()),
+                None => {
+                    let Some(id) = self.conv.writable_comment().map(|c| c.id.clone()) else {
+                        return ItemEffect::None;
+                    };
+                    self.ask_delete(id);
+                    ItemEffect::None
+                }
+            },
             Act::Links => self.open_links_menu(),
             Act::CopyLink => match self.conv.selected_url() {
                 Some(url) => {
@@ -246,22 +284,92 @@ impl ItemView {
         }
     }
 
-    /// Shows the composer and gives it the keyboard; `quote` goes in first.
-    fn open_composer(&mut self, quote: Option<&str>) {
-        self.ensure_composer();
-        self.composer_open = true;
-        self.focus = Focus::Composer;
-        if let (Some(md), Some(quote)) = (self.md.as_mut(), quote) {
-            md.append_block(quote);
+    /// Shows the composer in `mode` and gives it the keyboard; `quote` goes
+    /// in after what is there.
+    fn begin(&mut self, mode: Compose, text: String, quote: Option<&str>) -> ItemEffect {
+        match self.start_compose(mode, text) {
+            Err(why) => ItemEffect::Message(why.to_string()),
+            Ok(()) => {
+                if let (Some(md), Some(quote)) = (self.md.as_mut(), quote) {
+                    md.append_block(quote);
+                }
+                ItemEffect::None
+            }
         }
     }
 
-    /// A send was asked for. Writing is the next slice: the reason says so.
-    fn send(&mut self) -> ItemEffect {
-        match self.send_reason() {
-            Some(why) => ItemEffect::Message(why.to_string()),
-            None => ItemEffect::None,
+    /// A new comment with the selected entry quoted in it.
+    fn quote_reply(&mut self) -> ItemEffect {
+        let quote = self.conv.quote();
+        self.begin(Compose::New, String::new(), quote.as_deref())
+    }
+
+    /// The internal note checkbox (hosts that have such notes).
+    pub(super) fn toggle_internal(&mut self) -> ItemEffect {
+        if let Some(why) = self.avail().internal {
+            return ItemEffect::Message(why.to_string());
         }
+        self.internal = !self.internal;
+        ItemEffect::None
+    }
+
+    fn ask_delete(&mut self, id: String) {
+        let confirm = dialog_kit::Confirm::new(
+            m::DELETE_TITLE.get(),
+            m::DELETE_BODY.get(),
+            vec![
+                (m::DELETE_KEEP.get().to_string(), DeleteChoice::Keep),
+                (m::DELETE_CONFIRM.get().to_string(), DeleteChoice::Delete),
+            ],
+            DeleteChoice::Keep,
+        )
+        .primary(DeleteChoice::Delete);
+        self.delete_ask = Some((confirm, id));
+    }
+
+    fn delete_event(&mut self, event: ConfirmEvent<DeleteChoice>) -> ItemEffect {
+        match event {
+            ConfirmEvent::Stay => {}
+            ConfirmEvent::Chose(choice) => {
+                if let Some((_, id)) = self.delete_ask.take() {
+                    if choice == DeleteChoice::Delete {
+                        self.conv.submit(WriteOp::Delete { id });
+                    }
+                }
+            }
+        }
+        ItemEffect::None
+    }
+
+    /// Sends what the comment box holds: a new comment, an answer or the
+    /// new text of an own comment. The entry shows at once; a refusal puts
+    /// it back with the text still in the box.
+    fn send(&mut self) -> ItemEffect {
+        if let Some(why) = self.send_reason() {
+            return ItemEffect::Message(why.to_string());
+        }
+        let Some(md) = self.md.as_ref() else {
+            return ItemEffect::None;
+        };
+        let body = md.text().trim_end().to_string();
+        let op = match &self.compose {
+            Compose::New => WriteOp::Post {
+                body,
+                internal: self.internal
+                    && self.conv.caps.as_ref().is_some_and(|c| c.internal_notes),
+            },
+            Compose::Reply { discussion, .. } => WriteOp::Reply {
+                discussion_id: discussion.clone(),
+                body,
+            },
+            Compose::Edit { id, .. } => WriteOp::Edit {
+                id: id.clone(),
+                body,
+            },
+        };
+        self.compose_error = None;
+        self.conv.submit(op);
+        ItemEffect::None
     }
 
     fn menu_outcome(&mut self, outcome: ComboOutcome) -> ItemEffect {
@@ -286,6 +394,7 @@ impl ItemView {
     // -- closing ------------------------------------------------------------------------
 
     fn request_close(&mut self, kind: DismissKind) -> ItemEffect {
+        self.discarding = Discarding::Close;
         match dialog_kit::dismiss(&*self, kind) {
             DismissAction::Close => {
                 if let Some(md) = self.md.as_mut() {
@@ -309,12 +418,20 @@ impl ItemView {
 
     fn verdict(&mut self, v: dialog_kit::Verdict) -> ItemEffect {
         match v {
-            dialog_kit::Verdict::Discard => {
-                if let Some(md) = self.md.as_mut() {
-                    md.discard();
+            dialog_kit::Verdict::Discard => match self.discarding {
+                Discarding::Close => {
+                    if let Some(md) = self.md.as_mut() {
+                        md.discard();
+                    }
+                    ItemEffect::Close
                 }
-                ItemEffect::Close
-            }
+                Discarding::Composer => {
+                    self.discarding = Discarding::Close;
+                    self.reset_composer();
+                    self.focus = Focus::Timeline;
+                    ItemEffect::None
+                }
+            },
             dialog_kit::Verdict::Stay => ItemEffect::None,
         }
     }
@@ -336,6 +453,10 @@ impl ItemView {
     fn mouse_inner(&mut self, mouse: MouseEvent) -> ItemEffect {
         if let Some(v) = self.guard.mouse(mouse) {
             return self.verdict(v);
+        }
+        if let Some((confirm, _)) = self.delete_ask.as_mut() {
+            let event = confirm.on_mouse(mouse);
+            return self.delete_event(event);
         }
         if let Some(menu) = self.menu.as_mut() {
             let outcome = menu.combo.on_mouse(mouse);
@@ -363,6 +484,10 @@ impl ItemView {
                         return self.send();
                     }
                     Some(Hit::Cancel) => return self.cancel_composer(),
+                    Some(Hit::Internal) => {
+                        self.focus = Focus::Composer;
+                        return self.toggle_internal();
+                    }
                     None => {}
                 }
             }
@@ -372,7 +497,11 @@ impl ItemView {
             .md
             .as_ref()
             .is_some_and(|e| e.area().contains(pos.into()));
-        if in_md || (self.focus == Focus::Composer && mouse.kind != MouseEventKind::Moved) {
+        // A drag or a release that left the field still belongs to it; a press
+        // elsewhere is a click on the timeline.
+        let keeps = self.focus == Focus::Composer
+            && matches!(mouse.kind, MouseEventKind::Drag(_) | MouseEventKind::Up(_));
+        if in_md || keeps {
             if mouse.kind == MouseEventKind::Down(MouseButton::Left) {
                 self.focus = Focus::Composer;
             }
@@ -395,13 +524,21 @@ impl ItemView {
     /// Cancel under the composer: an untouched composer is just put away, a
     /// typed one asks first.
     fn cancel_composer(&mut self) -> ItemEffect {
+        if self.conv.is_writing() {
+            return ItemEffect::Message(m::WHY_SENDING.get().to_string());
+        }
         if self.composer_dirty() {
+            self.discarding = Discarding::Composer;
             self.guard.ask_with(
                 gitpoulpi_i18n::msg::md_editor::DISCARD_TITLE.get(),
                 gitpoulpi_i18n::msg::md_editor::DISCARD_BODY.get(),
             );
             return ItemEffect::None;
         }
+        if self.compose != Compose::New {
+            self.reset_composer();
+        }
+        self.compose_error = None;
         self.focus = Focus::Timeline;
         ItemEffect::None
     }
@@ -435,6 +572,8 @@ impl ItemView {
                 ItemEffect::None
             }
             ItemCmd::Reply => self.act(Act::Reply),
+            ItemCmd::Quote => self.act(Act::Quote),
+            ItemCmd::ToggleInternal => self.toggle_internal(),
             ItemCmd::NewComment => self.act(Act::NewComment),
             ItemCmd::Links => self.act(Act::Links),
             ItemCmd::CopyLink => self.act(Act::CopyLink),

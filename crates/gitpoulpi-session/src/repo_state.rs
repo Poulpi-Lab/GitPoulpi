@@ -305,6 +305,12 @@ pub struct RepoState {
     /// changes, pushes). `None` is on.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub conversation_events: Option<bool>,
+    /// The comments this install posted to a host, newest last (at most
+    /// [`POSTED_COMMENTS_MAX`]), each `conversation_key|comment id`. A GitHub
+    /// App bot whose login is not known yet cannot be matched to the author
+    /// of a comment, so only these may be edited or deleted from here.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub posted_comment_ids: Vec<String>,
     /// This user's tweaks to the branching workflow (`[workflow]`), layered
     /// over the shared `.gitpoulpi/workflow.toml`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -351,6 +357,9 @@ pub struct ConversationSeen {
     pub visited: i64,
 }
 
+/// The most comment ids `RepoState::posted_comment_ids` keeps.
+pub const POSTED_COMMENTS_MAX: usize = 200;
+
 /// The key a conversation is filed under in `RepoState::conversation_seen`.
 pub fn conversation_key(integration: &str, project: &str, kind: &str, number: u64) -> String {
     format!("{integration}|{project}|{kind}#{number}")
@@ -393,6 +402,34 @@ pub struct WatchedIssue {
 }
 
 impl RepoState {
+    /// Remembers that this install posted comment `comment_id` of the
+    /// conversation `conversation` (a `conversation_key`).
+    pub fn record_posted_comment(&mut self, conversation: &str, comment_id: &str) {
+        let entry = format!("{conversation}|{comment_id}");
+        self.posted_comment_ids.retain(|e| *e != entry);
+        self.posted_comment_ids.push(entry);
+        let over = self
+            .posted_comment_ids
+            .len()
+            .saturating_sub(POSTED_COMMENTS_MAX);
+        self.posted_comment_ids.drain(..over);
+    }
+
+    /// The ids of the comments of `conversation` this install posted.
+    pub fn posted_comments_of(&self, conversation: &str) -> Vec<String> {
+        let prefix = format!("{conversation}|");
+        self.posted_comment_ids
+            .iter()
+            .filter_map(|e| e.strip_prefix(&prefix).map(str::to_string))
+            .collect()
+    }
+
+    /// Forgets a comment that was deleted.
+    pub fn forget_posted_comment(&mut self, conversation: &str, comment_id: &str) {
+        let entry = format!("{conversation}|{comment_id}");
+        self.posted_comment_ids.retain(|e| *e != entry);
+    }
+
     /// Remembers that the user has seen the conversation up to the entry
     /// (`at`, `id`); the list keeps the 200 most recent visits.
     pub fn mark_conversation_seen(&mut self, key: &str, at: &str, id: &str, now: i64) {
@@ -639,6 +676,33 @@ mod tests {
         let back = RepoState::load(&path).unwrap();
         assert_eq!(back.conversation_seen, state.conversation_seen);
         assert_eq!(back.conversation_events, Some(false));
+    }
+
+    #[test]
+    fn posted_comments_are_kept_per_conversation_and_capped() {
+        let mut state = RepoState::default();
+        let a = conversation_key("gh", "o/r", "issue", 7);
+        let b = conversation_key("gh", "o/r", "issue", 8);
+        state.record_posted_comment(&a, "11");
+        state.record_posted_comment(&b, "11");
+        state.record_posted_comment(&a, "12");
+        assert_eq!(state.posted_comments_of(&a), vec!["11", "12"]);
+        assert_eq!(state.posted_comments_of(&b), vec!["11"]);
+        state.forget_posted_comment(&a, "11");
+        assert_eq!(state.posted_comments_of(&a), vec!["12"]);
+        for n in 0..300 {
+            state.record_posted_comment(&a, &format!("x{n}"));
+        }
+        assert_eq!(state.posted_comment_ids.len(), POSTED_COMMENTS_MAX);
+        assert!(state.posted_comments_of(&a).contains(&"x299".to_string()));
+        assert!(!state.posted_comments_of(&a).contains(&"12".to_string()));
+        let dir = tempfile::tempdir().unwrap();
+        let path = RepoState::path_for(dir.path(), ".gitpoulpi");
+        state.save(&path).unwrap();
+        assert_eq!(
+            RepoState::load(&path).unwrap().posted_comment_ids,
+            state.posted_comment_ids
+        );
     }
 
     #[test]

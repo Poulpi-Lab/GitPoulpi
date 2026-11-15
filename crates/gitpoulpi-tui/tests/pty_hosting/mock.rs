@@ -158,6 +158,35 @@ fn conversation_route(method: &str, path: &str) -> Option<(u16, String)> {
     Some((200, body.to_string()))
 }
 
+/// The writes to issue `#12`'s conversation: a note, an answer in a
+/// discussion, an edit and a delete, as a GitLab takes them. The answer
+/// carries the posted text and `kai` as the author, like the real host.
+fn conversation_write(request: &Seen) -> Option<(u16, String)> {
+    let path = request.target.split('?').next()?;
+    let rest = path.strip_prefix("/api/v4/projects/g%2Fp/issues/12/")?;
+    let text = serde_json::from_str::<serde_json::Value>(&request.body)
+        .ok()
+        .and_then(|v| v["body"].as_str().map(str::to_string))
+        .unwrap_or_default();
+    let note = |id: u64| {
+        serde_json::json!({"id": id, "body": text, "system": false,
+            "created_at": "2026-11-15T10:00:00Z", "updated_at": "2026-11-15T10:00:00Z",
+            "author": {"username": "kai", "name": "Kai"}})
+        .to_string()
+    };
+    match (request.method.as_str(), rest) {
+        ("POST", "notes") => Some((201, note(301))),
+        ("POST", e) if e.starts_with("discussions/") && e.ends_with("/notes") => {
+            Some((201, note(302)))
+        }
+        ("PUT", e) if e.starts_with("notes/") => {
+            Some((200, note(e.trim_start_matches("notes/").parse().ok()?)))
+        }
+        ("DELETE", e) if e.starts_with("notes/") => Some((204, String::new())),
+        _ => None,
+    }
+}
+
 pub fn route(method: &str, target: &str, port: u16) -> (u16, String) {
     let path = target.split('?').next().unwrap_or(target);
     if let Some(answer) = providers_route(method, path) {
@@ -365,6 +394,11 @@ pub fn start_mock() -> Mock {
         };
         if request.method == "POST" && request.target == "/graphql" {
             return linear_route(&request.body);
+        }
+        if forced.is_none() {
+            if let Some(answer) = conversation_write(request) {
+                return answer;
+            }
         }
         match forced {
             Some(401) => (401, r#"{"message":"401 Unauthorized"}"#.to_string()),

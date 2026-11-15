@@ -36,6 +36,12 @@ pub(crate) struct Shared {
     pub(crate) reads: Vec<(String, ItemKey)>,
     /// Every request the host saw that is not a read.
     pub(crate) writes: usize,
+    /// What the host was asked to write, as `kind|id|body`.
+    pub(crate) write_log: Vec<String>,
+    /// The next write is refused with this message.
+    pub(crate) fail_write: Option<String>,
+    /// A write waits this long before the host answers.
+    pub(crate) write_delay: Duration,
     /// The next timeline read waits this long.
     pub(crate) delay: Duration,
     /// The next read fails like an unreachable host.
@@ -78,6 +84,42 @@ impl HostingClient for Fake {
             .clone()
             .map_err(gitpoulpi_hosting::Error::Local)
     }
+    async fn post_item_comment(
+        &self,
+        _: &str,
+        _: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> gitpoulpi_hosting::Result<Comment> {
+        self.write("post", if internal { "internal" } else { "" }, body)
+            .await
+    }
+    async fn reply_in_discussion(
+        &self,
+        _: &str,
+        _: &ItemKey,
+        discussion_id: &str,
+        body: &str,
+    ) -> gitpoulpi_hosting::Result<Comment> {
+        self.write("reply", discussion_id, body).await
+    }
+    async fn edit_item_comment(
+        &self,
+        _: &str,
+        _: &ItemKey,
+        comment_id: &str,
+        body: &str,
+    ) -> gitpoulpi_hosting::Result<Comment> {
+        self.write("edit", comment_id, body).await
+    }
+    async fn delete_item_comment(
+        &self,
+        _: &str,
+        _: &ItemKey,
+        comment_id: &str,
+    ) -> gitpoulpi_hosting::Result<()> {
+        self.write("delete", comment_id, "").await.map(|_| ())
+    }
     async fn item_timeline(
         &self,
         project: &str,
@@ -102,6 +144,37 @@ impl HostingClient for Fake {
                 .ok_or_else(|| gitpoulpi_hosting::Error::Local("no older page".into()));
         }
         s.page.clone().map_err(gitpoulpi_hosting::Error::Local)
+    }
+}
+
+impl Fake {
+    /// Records a write and answers like a host that accepted it, authored
+    /// by whoever the identity is (comment id 900 + the number of writes).
+    async fn write(&self, kind: &str, arg: &str, body: &str) -> gitpoulpi_hosting::Result<Comment> {
+        let (delay, fail, login, n) = {
+            let mut s = self.shared.lock().unwrap();
+            s.writes += 1;
+            s.write_log.push(format!("{kind}|{arg}|{body}"));
+            let login = match &s.identity {
+                Ok(id) => id.login.clone().unwrap_or_else(|| "poulpi-lab[bot]".into()),
+                Err(_) => "nobody".into(),
+            };
+            (s.write_delay, s.fail_write.take(), login, s.writes)
+        };
+        tokio::time::sleep(delay).await;
+        if let Some(why) = fail {
+            return Err(gitpoulpi_hosting::Error::Local(why));
+        }
+        let id = if kind == "edit" {
+            arg.to_string()
+        } else {
+            format!("{}", 900 + n)
+        };
+        let mut c = comment(&id, &login, body, "2026-11-15T10:00:00Z");
+        if login.ends_with("[bot]") {
+            c.author.kind = ActorKind::Bot;
+        }
+        Ok(c)
     }
 }
 
@@ -209,6 +282,9 @@ pub(crate) fn shared(entries: Vec<TimelineEntry>) -> Arc<Mutex<Shared>> {
         identity: Ok(me("bob")),
         reads: Vec::new(),
         writes: 0,
+        write_log: Vec::new(),
+        fail_write: None,
+        write_delay: Duration::ZERO,
         delay: Duration::ZERO,
         offline: false,
     }))

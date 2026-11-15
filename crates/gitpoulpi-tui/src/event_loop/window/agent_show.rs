@@ -17,7 +17,7 @@
 use std::path::PathBuf;
 
 use crate::event_loop::*;
-use crate::hosting_ui::{HostingList, RevealOutcome};
+use crate::hosting_ui::{HostingEffect, HostingList, RevealOutcome};
 use crate::ui_intent::plan::{self, CommitStep, LogFacts, Presence};
 use crate::ui_viewer::{CommitGoal, Reveal, ShowReveal, REVEAL_POLL};
 use gitpoulpi_ipc::ui::{sanitize_with_limit, HostingItem, PaneId, UiIntent, UiOrigin, UiOutcome};
@@ -64,7 +64,7 @@ impl WindowState {
             ),
             UiIntent::ShowRef { name, .. } => self.show_ref(id, origin, what, name),
             UiIntent::ShowSearch { query, .. } => self.show_search(query),
-            UiIntent::ShowHosting { item, .. } => self.show_hosting(*item),
+            UiIntent::ShowHosting { item, view, .. } => self.show_hosting(*item, *view),
             UiIntent::ShowWip {
                 path,
                 staged,
@@ -332,7 +332,7 @@ impl WindowState {
 
     // -- pull requests and issues -------------------------------------------
 
-    fn show_hosting(&mut self, item: HostingItem) -> Applied {
+    fn show_hosting(&mut self, item: HostingItem, view: gitpoulpi_ipc::ui::HostingView) -> Applied {
         let (list, number, noun) = match item {
             HostingItem::Pr(n) => (
                 HostingList::Pulls,
@@ -356,8 +356,25 @@ impl WindowState {
             })),
             RevealOutcome::Row(row) => {
                 self.reveal_sidebar_row(list.section(), row);
+                if view == gitpoulpi_ipc::ui::HostingView::Conversation {
+                    return self.show_conversation(number, list == HostingList::Pulls);
+                }
                 Applied::Done
             }
+        }
+    }
+
+    /// `view: conversation`: the row is selected, and the item's conversation
+    /// opens in the app (an item the app cannot read here keeps the row).
+    fn show_conversation(&mut self, number: u64, pull: bool) -> Applied {
+        match self.hosting.item_effect(number, pull) {
+            #[cfg(feature = "hosting")]
+            HostingEffect::Item(target) => {
+                self.repo_dialogs.open_item(*target);
+                Applied::Done
+            }
+            HostingEffect::Message(why) => Applied::Not(Box::new(UiOutcome::refused(why))),
+            _ => Applied::Done,
         }
     }
 

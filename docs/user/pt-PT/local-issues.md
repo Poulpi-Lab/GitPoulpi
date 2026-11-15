@@ -21,6 +21,16 @@ editá-las ao mesmo tempo, e as listas acompanham.
 
 Nada fica ligado por si só: como qualquer origem de issues, é opcional por repositório.
 
+## Comentários numa nota
+
+`Enter` na linha de uma nota na secção ISSUES, ou no seu cartão, abre a sua conversa: o texto da nota e depois os
+comentários. Os comentários ficam no próprio ficheiro da nota, numa secção final `## Comments`, uma entrada
+`### <autor> - <hora UTC>` cada (uma editada acrescenta `(edited <hora>)`). Nada acima desse título é alguma vez tocado,
+por isso o Obsidian e uma shell leem e editam o mesmo ficheiro. Pode escrever, editar e eliminar os comentários do autor
+local (o `local.me` do perfil, senão o utilizador ligado, o nome que *Atribuídos a mim* usa); os de mais ninguém. A caixa
+é a habitual caixa de texto Markdown com prévia, e *A escrever como <nome> (nota local)* nomeia o autor. Nada passa pela
+rede. Uma nota com um título `## Comments` que escreveu à mão é lida como tal.
+
 ## As notas
 
 Uma nota por issue, com o nome `<id>-<slug>.md` (`12-crash-on-empty-name.md`), com um bloco de frontmatter:
@@ -46,6 +56,36 @@ Free Markdown. GitPoulpi never rewrites the body.
 - A leitura é tolerante: uma nota sem `id` toma-o do nome do ficheiro, uma nota sem `status` é `todo`, uma nota
   sem frontmatter toma o título do primeiro `# título`. Um ficheiro que não é uma issue (`readme.md`) é ignorado.
 - Um estado é texto livre. **Aberta** significa «não está no estado de concluída».
+
+### Comentários numa nota
+
+Um comentário numa nota é escrito na própria nota, numa última secção `## Comments` (sem rede, e lê-se bem no
+Obsidian):
+
+```markdown
+(o texto da nota)
+
+## Comments
+
+### kai - 2026-11-15T10:00:00Z
+Primeiro comentário, **qualquer Markdown**.
+
+### ann - 2026-11-15T11:30:00Z (edited 2026-11-15T12:00:00Z)
+Segundo.
+```
+
+- Uma entrada começa numa linha que é exatamente `### <autor> - <hora UTC>`, com ` (edited <hora UTC>)` depois de uma
+  edição; o seu texto vai até à entrada seguinte. A secção é o último título `## Comments` fora de um bloco de código
+  delimitado e vai até ao fim do ficheiro, por isso não escreva nada depois dela.
+- Uma linha de comentário que se leria como uma entrada ou como o título é guardada com uma barra invertida à frente
+  (`\### ...`, que o Markdown mostra como o mesmo texto) e lida de volta sem ela.
+- Publicar acrescenta no fim e deixa tudo o que está acima byte a byte (fins de linha incluídos); uma edição ou uma
+  eliminação reescreve só a secção. Uma publicação também move o `updated` da nota (uma nota sem frontmatter não recebe
+  nenhum).
+- O autor é o autor local do perfil (o "eu" das definições de issues locais). Só pode editar ou eliminar os seus próprios
+  comentários; o id de um comentário é a sua hora e autor, e duas publicações no mesmo segundo distinguem-se avançando a
+  segunda um segundo.
+- Não há respostas, nem comentários internos, nem histórico de eventos para uma nota.
 
 ## O que pode fazer
 
@@ -102,7 +142,7 @@ Se trabalha sozinho, ou numa equipa que guarda as issues junto ao código, a pas
   `Shift+Left` / `Shift+Right`, ou com **Quadro: mover cartão para...** (`m`), uma lista de colunas. O cartão move-se de
   imediato; o `status` da nota é reescrito como em [a secção das notas](#as-notas), nada mais no ficheiro. Se a escrita
   falhar o cartão volta atrás e o erro aparece na barra de estado.
-- **Abra** um cartão com `Enter` ou um clique duplo (a nota abre-se no seu programa predefinido para `.md`). `e` edita os seus
+- **Abra** um cartão com `Enter` ou um clique duplo: a [conversa](hosting-integration.md#5c-conversas) da nota abre-se na janela, com o texto da nota e os seus comentários (**Abrir nota** no menu do cartão abre o ficheiro no seu programa predefinido para `.md`). `e` edita os seus
   responsáveis, etiquetas ou marco, `.` ou um clique com o botão direito abre o menu do cartão, `n` inicia uma nova issue na coluna
   selecionada (o formulário volta ao quadro quando fecha).
 - **Filtre** por responsável (`a`), etiqueta (`l`), marco (`M`) ou texto (`/`); `x` limpa-os. Os filtros são

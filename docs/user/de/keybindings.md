@@ -374,10 +374,10 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `reword` | `deeper` | Verlauf weitergehend ändern | `Alt+H` |
 | `composer` | `commit` | Commit aus dem Composer | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Issue-Referenz einfügen | `Alt+R` |
-| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
-| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
-| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
+| `md_editor` | `preview` | Markdown-Editor: Schreiben und Vorschau umschalten | `Alt+P` |
+| `md_editor` | `split` | Markdown-Editor: Geteilte Ansicht umschalten | `Alt+L` |
+| `md_editor` | `submit` | Markdown-Editor: Text senden | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Markdown-Editor: Mit KI schreiben | `Alt+E` |
 | `dialog` | `browse` | Nach einem Ordner suchen | `Ctrl+B` |
 | `dialog` | `sources` | Zu den Klon-Quellen | `Alt+S` |
 | `dialog` | `submit` | Formular für Pull Request absenden | `Ctrl+S` |
@@ -827,7 +827,7 @@ die Standardtasten.
 | Radar: Anheften / Anheften aufheben | `p` |
 | Radar: Zurückstellen... | `z` |
 | Radar: Anfrage prüfen... | `e` |
-| Radar: Open Issue Conversation | `i` |
+| Radar: Issue-Unterhaltung öffnen | `i` |
 | Radar: Über die API prüfen |  |
 | Radar: Klonen und prüfen... |  |
 | Radar: Zugewiesene bearbeiten... |  |
@@ -969,30 +969,30 @@ die Standardtasten.
 | Board: Spalten-Labels festlegen... | `c` |
 | Board: Aktualisieren | `r` |
 | Board: Schließen | `Esc` |
-| Conversation: Back |  |
-| Conversation: Refresh | `F5` |
-| Conversation: Load Older Entries | `m` |
-| Conversation: Previous Entry | `Up` |
-| Conversation: Next Entry | `Down` |
-| Conversation: Next Unread Entry | `n` |
-| Conversation: Reply to Entry | `r` |
-| Conversation: Quote Entry | `Q` |
-| Conversation: New Comment | `c` |
-| Conversation: Links of Entry... | `l` |
-| Conversation: Open Diagram of Entry | `g` |
-| Conversation: Copy Link of Entry | `y` |
-| Conversation: Open in Browser | `o` |
-| Conversation: Edit Comment | `e` |
-| Conversation: Delete Comment | `d` |
-| Conversation: Show or Hide Events | `v` |
-| Conversation: Toggle Write and Preview |  |
-| Conversation: Toggle the Split View |  |
-| Conversation: Send the Comment |  |
-| Conversation: Toggle Internal Note |  |
-| Conversation: Close | `Esc` |
-| Markdown Editor: Write with AI |  |
-| Markdown Editor: Refresh the AI Context |  |
-| Hosting: Open Issue Conversation... |  |
+| Unterhaltung: Zurück |  |
+| Unterhaltung: Aktualisieren | `F5` |
+| Unterhaltung: Ältere Einträge laden | `m` |
+| Unterhaltung: Vorheriger Eintrag | `Up` |
+| Unterhaltung: Nächster Eintrag | `Down` |
+| Unterhaltung: Nächster ungelesener Eintrag | `n` |
+| Unterhaltung: Auf Eintrag antworten | `r` |
+| Unterhaltung: Eintrag zitieren | `Q` |
+| Unterhaltung: Neuer Kommentar | `c` |
+| Unterhaltung: Links des Eintrags... | `l` |
+| Unterhaltung: Diagramm des Eintrags öffnen | `g` |
+| Unterhaltung: Link des Eintrags kopieren | `y` |
+| Unterhaltung: Im Browser öffnen | `o` |
+| Unterhaltung: Kommentar bearbeiten | `e` |
+| Unterhaltung: Kommentar löschen | `d` |
+| Unterhaltung: Ereignisse zeigen oder ausblenden | `v` |
+| Unterhaltung: Schreiben und Vorschau umschalten |  |
+| Unterhaltung: Geteilte Ansicht umschalten |  |
+| Unterhaltung: Kommentar senden |  |
+| Unterhaltung: Interne Notiz umschalten |  |
+| Unterhaltung: Schließen | `Esc` |
+| Markdown-Editor: Mit KI schreiben |  |
+| Markdown-Editor: KI-Kontext erneuern |  |
+| Hosting: Issue-Unterhaltung öffnen... |  |
 | Review: ✦ Review entwerfen... | `s` |
 | Review: Vorschlag übernehmen | `y` |
 | Review: Vorschlag bearbeiten und übernehmen... | `w` |
@@ -1499,7 +1499,7 @@ ISSUES. Siehe [Hosting und Issue-Tracker](hosting-integration.md#5-pull-requests
 
 | Taste | Aktion |
 |---|---|
-| `Enter` | Die ausgewählte Zeile im Browser öffnen. Auf einer Zeile `Reconnect`: die Einstellungen auf diesem Profil öffnen |
+| `Enter` | Die ausgewählte Zeile öffnen: ein Issue (und ein Request bei Azure DevOps oder Bitbucket) als [Unterhaltung](hosting-integration.md#5c-unterhaltungen), einen Pull Request im [Review](review.md), wo der Host eines hat, alles andere im Browser. Auf einer Zeile `Reconnect`: die Einstellungen auf diesem Profil öffnen |
 | `Space` | Den Abschnitt auf- oder zuklappen |
 | `v` | Den Filter des Abschnitts öffnen. Pull Requests: Offen, Gemergt / geschlossen, Alle. Issues: Offen, Mir zugewiesen, Geschlossen, Alle |
 | `n` | Abschnitt der Pull Requests: einen Pull Request erstellen. Abschnitt ISSUES: neues Issue. (Die Schaltfläche `+` der Kopfzeile) |
@@ -1507,7 +1507,7 @@ ISSUES. Siehe [Hosting und Issue-Tracker](hosting-integration.md#5-pull-requests
 | `Enter` auf der Suchzeile | Im Suchfeld tippen. `Enter`, `Tab` oder `Esc` verlässt es; `Ctrl+U` leert es |
 | `Enter` auf einer Gruppenüberschrift | Die Gruppe falten oder entfalten (*Meine Pull Requests*, *Mir zugewiesen*, *Wartet auf mein Review*, *Alle Pull Requests*) |
 | `Enter` auf der Zeile von Filter, Anbieter oder Repository | Diese Dropdownliste öffnen. Die Anbieterliste endet mit **Keiner (dieses Repository trennen)** |
-| `.` oder ein Rechtsklick | Das Menü der Zeile: im Browser öffnen, URL oder Nummer kopieren, den Quell-Branch auschecken (Pull Requests); einen Branch aus dem Issue erstellen (Issues) |
+| `.` oder ein Rechtsklick | Das Menü der Zeile: die Unterhaltung öffnen, im Browser öffnen, URL oder Nummer kopieren, den Quell-Branch auschecken (Pull Requests); einen Branch aus dem Issue erstellen (Issues) |
 
 ### Das Issue-Board
 
@@ -1520,7 +1520,7 @@ unten ist auch ein Palettenbefehl (**Board: ...**).
 | Pfeile | Eine Karte auswählen (`Up`, `Down`) oder die benachbarte Spalte (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` springen in der Spalte |
 | `Shift+Left`, `Shift+Right` | Die ausgewählte Karte in die vorherige oder nächste Spalte verschieben |
 | `m` | **Karte verschieben nach...**: eine Dropdownliste der Spalten |
-| `Enter` | Das Issue öffnen (bei einem lokalen Issue die Notiz; sonst die Seite des Hosts) |
+| `Enter` | Die [Unterhaltung](hosting-integration.md#5c-unterhaltungen) des Issues öffnen (die Seite des Hosts, wo der Host keine zu lesen hat) |
 | `e`, `.` | Zugewiesene, Labels oder Meilenstein bearbeiten; das Kartenmenü |
 | `n` | Neues Issue in der ausgewählten Spalte |
 | `a`, `l`, `M`, `/` | Nach Zugewiesenen, Label, Meilenstein, Text filtern. `x` setzt die Filter zurück |
@@ -1530,6 +1530,41 @@ unten ist auch ein Palettenbefehl (**Board: ...**).
 
 Maus: Eine Karte auf eine andere Spalte ziehen, um sie zu verschieben, eine Karte anklicken, um sie auszuwählen, doppelklicken, um sie zu öffnen, Rechtsklick für
 das Kartenmenü, Mausrad scrollt eine Spalte, `Shift`+Mausrad (oder die Leiste unter dem Board) scrollt die Spalten.
+
+### Der Markdown-Editor und die Unterhaltungsansicht
+
+Jedes Feld, dessen Text an einen Host geht (ein Kommentar, eine Antwort, eine Review-Zusammenfassung, die Beschreibung eines neuen Issues oder Pull Requests), ist dasselbe Textfeld. Seine Tasten stehen in der Tabelle `md_editor` oben und lassen sich neu belegen.
+
+| Taste | Aktion |
+|---|---|
+| `Alt+P` | **Schreiben** und **Vorschau** tauschen (aus **Geteilt** geht es zur Vorschau) |
+| `Alt+L` | **Geteilt** an, oder zurück zu Schreiben (braucht ein Fenster mit 100 Spalten) |
+| `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` | Den Text senden (die eigene Schaltfläche des Formulars tut dasselbe) |
+| `Alt+E` | **Mit KI schreiben**: öffnet oder schließt das Panel unter der Modusleiste (nur mit KI an) |
+| `Alt+R` | Nur im Commit-Composer: einen Issue-Verweis einfügen |
+| `Alt+W` | Die Formulare für neue Issues und Pull Requests: auf der eigenen Webseite des Anbieters erstellen |
+| `Esc` | Im Panel von **Mit KI schreiben**: einen laufenden Entwurf stoppen, sonst das Panel schließen |
+
+In der [Unterhaltungsansicht](hosting-integration.md#5c-unterhaltungen) eines Issues oder Requests (Palettenzeilen *Unterhaltung: ...*; die Zeilen mit einer Taste stehen in der Palettenliste oben):
+
+| Taste | Aktion |
+|---|---|
+| `r` | Auf den ausgewählten Eintrag antworten (in seinen Thread, oder bei einem Host ohne Threads mit zitiertem Text) |
+| `Q` | Den ausgewählten Eintrag in einem neuen Kommentar zitieren |
+| `c` | Neuer Kommentar |
+| `e`, `d` | Einen eigenen Kommentar bearbeiten, löschen |
+| `Alt+I` | Im Kommentarfeld: **Interne Notiz** (GitLab, Redmine) |
+| `l`, `y`, `o` | Links des Eintrags, seine Adresse kopieren, ihn im Browser öffnen |
+| `n` | Nächster ungelesener Eintrag |
+| `v`, `m`, `F5` | Ereignisse zeigen oder ausblenden, ältere Einträge laden, aktualisieren |
+| `g` | Das Diagramm des Eintrags öffnen (ein `mermaid`-Block) |
+| `Alt+Left`, `Backspace` | Zurück entlang des Stapels der aus Verweisen geöffneten Elemente |
+| `Tab` | Zeitleiste, Kommentarfeld, Schaltflächen der Kopfzeile |
+| `q`, `Esc` | Schließen |
+
+Im Radar öffnet `i` die Unterhaltung einer Issue-Zeile.
+
+Auf einer Pull-Request- oder Issue-Zeile der Seitenleistenbereiche öffnet `Enter` die Unterhaltung, und `o` öffnet die Zeile im Browser.
 
 ### Flow (Branching-Workflows)
 

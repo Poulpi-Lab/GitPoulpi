@@ -175,12 +175,12 @@ Przy commicie bez refa najechanie na wiersz pokazuje też wyblakłą pigułkę w
 **Zdalne repozytoria.** Przycisk `+` w tytule ZDALNE dodaje nowe; kliknij
 nazwę zdalnego prawym przyciskiem, by wykonać fetch, skopiować jego link
 webowy, ustawić je jako domyślne, ukryć je w grafie, edytować jego adresy URL
-albo je usunąć. **Ukrycie zdalnego** (oko w jego wierszu, pozycja menu
+albo je usunąć. **Ukrycie zdalnego** (⊙ w jego wierszu, pozycja menu
 *Ukryj zdalne w grafie* albo `Zdalne: Ukryj zdalne w grafie...` w palecie)
 ukrywa każdą jego gałąź, obecną i przyszłą, a commity osiągalne tylko przez nie
 znikają z Logu: sposób na przeglądanie jednej historii bez historii niezwiązanego
 zdalnego archiwum; przywróć je pozycją *Pokaż zdalne w grafie*. Pokazanie
-zdalnego pokazuje też jego gałęzie ukryte pojedynczo. Użycie oka gałęzi ukrytego
+zdalnego pokazuje też jego gałęzie ukryte pojedynczo. Kliknięcie ⊙ gałęzi ukrytego
 zdalnego mówi o tym w linii statusu: najpierw pokaż zdalne.
 
 **Stashe.** **Stash** zapisuje w stashu wszystko (łącznie z nieśledzonymi

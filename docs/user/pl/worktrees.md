@@ -23,28 +23,46 @@ Przycisk **+** w nagłówku WORKTREES (klawiatura: `+` w sekcji; paleta:
 **Refs: Utwórz worktree...**) otwiera menu:
 
 - **Z bieżącej gałęzi**: gałąź jest przełączona w głównym folderze, więc okno
-  proponuje na niej nową gałąź (`<gałąź>-wt`).
+  proponuje na niej nową gałąź (`worktree-<id>`).
 - **Z zaznaczonego commita**: wyszarzone, dopóki w Logu nie zaznaczysz
-  commita. Worktree zaczyna tam jako odłączone, chyba że podasz nową gałąź.
-- **Wybierz gałąź...**: okno otwiera się na liście **Ref**.
+  commita. Okno proponuje tam nową gałąź `worktree-<id>`, która zaczyna się w
+  tym commicie; wyczyść pole gałęzi, by dostać odłączony worktree.
+- **Wybierz gałąź...**: okno otwiera się na liście **Gałąź worktree**, by
+  otworzyć gałąź, która już istnieje.
 
 Paleta ma te same trzy (**Refs: Utwórz worktree z bieżącej gałęzi**,
 **Git: Utwórz worktree dla zaznaczonego commita...**, **Refs: Utwórz worktree z
 wybranej gałęzi**). Starsze pozycje nadal działają: **Utwórz worktree z...** w
 menu gałęzi, tagu lub commita.
 
-Okno proponuje wszystko i pozwala to zmienić:
+Okno proponuje wszystko i pozwala to zmienić. **Nazwa** i nowa gałąź zaczynają
+od `worktree-<id>`, gdzie `<id>` to 8 losowych cyfr szesnastkowych (te same dla
+obu), więc dwa worktree nigdy się nie zderzają.
 
 | Pole | Znaczenie |
 |---|---|
-| **Nazwa** | Od niej bierze nazwę folder. Proponowana z gałęzi lub krótkiego id. |
+| **Nazwa** | Od niej bierze nazwę folder. **Nazwa z gałęzi** (`Alt+N`) ustawia ją na `worktree-<gałąź>`: ukośniki zamieniają się w `-`, a słowo nie jest podwajane (`worktree-foo` i `feature/worktree-x` zostają, jakie są, `feature/login` daje `worktree-feature-login`). |
 | **Folder** | Sąsiad repozytorium, `<repozytorium>-<nazwa>`. Podąża za polem Nazwa, dopóki nie wpiszesz czegoś w polu Folder; **Przeglądaj...** wybiera miejsce. |
-| **Ref** | Gałąź lub commit, od którego zaczyna worktree (lista; pisz, by szukać). Zmiana proponuje nową Nazwę. |
-| **Nowa gałąź** | Puste przełącza tam gałąź z pola Ref (lub odłącza HEAD na commicie). Wymagane, gdy ta gałąź jest już przełączona. |
+| **Ref** | Gdzie zaczyna się *nowa* gałąź: gałąź lub commit (lista; pisz, by szukać). Nie jest używany i mówi o tym, gdy wybrano istniejącą gałąź. |
+| **Gałąź worktree** | Jedno pole, dwa znaczenia, opisane pod nim. Nazwa, która nie jest lokalną gałęzią, tworzy nową gałąź z Ref (**nowa gałąź z main**). Lokalna gałąź, która nie jest przełączona gdzie indziej (wybierz ją z listy albo wpisz jej nazwę), jest tam przełączana bez zmian (**przełącza na tę gałąź**). Pierwszy wiersz listy lub puste pole przełącza gałąź z Ref (lub odłącza HEAD na commicie); jest to odrzucane, gdy ta gałąź jest już przełączona. |
+| **Losuj ponownie** | `Alt+R`. Losuje nowe `<id>` i podmienia Nazwę oraz gałąź, z wyjątkiem tego, co wpisałeś sam (wpisana Nazwa lub gałąź zostaje) i istniejącej gałęzi (nigdy nie jest podmieniana). Nazwa z **Nazwa z gałęzi** lub od AI liczy się jak wygenerowana. |
+| **Nazwij z AI** | Tylko przy włączonym AI (zob. niżej). |
 | **Otwórz nowy worktree jako kartę** | Domyślnie włączone. |
 
-Niepusty folder, niepoprawna nazwa lub gałąź, która już istnieje, są
-zgłaszane w osobnym wierszu okna, a **Utwórz** pozostaje wyszarzone.
+Niepusty folder, niepoprawna nazwa, nazwa gałęzi, którą git odrzuca, lub gałąź,
+którą ma inny worktree, są zgłaszane w osobnym wierszu okna, a **Utwórz**
+pozostaje wyszarzone.
+
+### Nazywanie z AI
+
+Przy włączonym [AI](ai.md) **Nazwij z AI** (`Alt+A`) otwiera w oknie pole:
+*Opisz funkcję, błąd lub zadanie*. **Nazwij** prosi model o krótką nazwę
+worktree i nazwę gałęzi zgodną z nazewnictwem gałęzi w samym repozytorium
+(`feature/`, `fix/`, małe litery z myślnikami). Wypełniają one Nazwę (jako
+`worktree-<nazwa>`) i pole gałęzi, nadal do edycji; nazwa gałęzi, która już
+istnieje, dostaje przyrostek `-2`, więc odpowiedź nigdy po cichu niczego nie
+przełącza. Pole pokazuje stan zajętości, **Stop** (lub `Esc`) anuluje, a błąd
+jest pokazany w oknie. Wysyłany jest tylko twój opis i nazwy lokalnych gałęzi.
 
 ## Menu wiersza
 
@@ -79,11 +97,11 @@ Przy niezatwierdzonych zmianach (śledzonych lub nieśledzonych) okno je wylicza
 
 - **Commit i usuń**: pole opisu w oknie; każda zmiana trafia do poczekalni
   (z poszanowaniem `.gitignore`) i jest zatwierdzana na gałęzi worktree, po
-  czym worktree jest usuwane. Odłączony worktree w tym samym oknie podaje
+  czym worktree jest usuwany. Odłączony worktree w tym samym oknie podaje
   gałąź dla commita.
 - **Stash i usuń**: każda zmiana, także w plikach nieśledzonych, trafia do
   stasha z edytowalnym opisem (domyślnie „WIP w <folder>”), po czym worktree
-  jest usuwane. Lista stashy jest wspólna dla wszystkich worktree: stash leży
+  jest usuwany. Lista stashy jest wspólna dla wszystkich worktree: stash leży
   potem w STASHES głównego repozytorium, gotowy do pop.
 - **Otwórz, by zrobić commit**: otwiera worktree w karcie z aktywnym polem
   opisu commita; nic nie jest usuwane.
@@ -102,4 +120,7 @@ historii.
 `gitpoulpi worktree changes <path>` wylicza niezatwierdzone zmiany worktree.
 `gitpoulpi worktree remove <path> [--force] [--commit-message M
 [--commit-branch B]] [--stash-message M] [--delete-branch]` je usuwa; narzędzia
-MCP to `worktree_changes` i `worktree_remove`. Zob. [Opis CLI](cli-reference.md).
+MCP to `worktree_changes` i `worktree_remove`. `gitpoulpi ai
+worktree-name --describe "<task>"` wypisuje nazwy worktree i gałęzi, które AI
+proponuje (`{ name, worktree, branch }`), i niczego nie tworzy; narzędzie MCP to
+`ai_worktree_name`. Zob. [Opis CLI](cli-reference.md).

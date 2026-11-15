@@ -956,3 +956,88 @@ fn a_host_that_does_not_read_markdown_says_what_the_text_is_sent_as() {
     let screen = text(&draw(&mut r.view, WIDE));
     assert!(!screen.contains("Sent as"), "{screen}");
 }
+
+#[cfg(feature = "mermaid")]
+#[test]
+fn g_opens_the_diagram_and_m_stays_load_older() {
+    let body = "see\n\n```mermaid\ngraph TD\n  A-->B\n```\n";
+    let mut r = rig_at(
+        vec![TimelineEntry::Comment(comment(
+            "c1",
+            "carol",
+            body,
+            "2026-11-12T10:30:00Z",
+        ))],
+        None,
+    );
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Down));
+    // `m` is Load older (nothing older here), never the diagram.
+    let effect = r.view.on_key(key(KeyCode::Char('m')));
+    assert!(!matches!(effect, ItemEffect::OpenDiagram(_)), "{effect:?}");
+    assert_eq!(
+        r.view.message.as_deref(),
+        Some(gitpoulpi_i18n::msg::item_view::WHY_NO_OLDER.get())
+    );
+    // `g` is the key the palette shows for Open Diagram.
+    let effect = r.view.on_key(key(KeyCode::Char('g')));
+    assert!(
+        matches!(&effect, ItemEffect::OpenDiagram(s) if s.contains("A-->B")),
+        "{effect:?}"
+    );
+    let hint = crate::palette::PALETTE_COMMANDS
+        .iter()
+        .find(|e| {
+            matches!(
+                e.command,
+                crate::palette::PaletteCommand::Item(ItemCmd::OpenDiagram)
+            )
+        })
+        .map(|e| e.shortcut);
+    assert_eq!(hint, Some("g"));
+}
+
+#[test]
+fn azure_devops_server_comments_say_they_are_sent_as_html() {
+    use gitpoulpi_hosting::conversation::MarkupFlavor;
+    let mut r = rig();
+    let mut caps = r.view.conv.caps.clone().unwrap();
+    caps.write_flavor = MarkupFlavor::Html;
+    r.view.conv.caps = Some(caps);
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Char('c')));
+    type_text(&mut r.view, "**hi**");
+    r.view
+        .on_key(KeyEvent::new(KeyCode::Char('p'), KeyModifiers::ALT));
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(screen.contains("Sent as HTML"), "{screen}");
+}
+
+#[test]
+fn a_text_over_the_hosts_limit_shows_the_count_and_is_refused_before_the_host() {
+    let mut r = rig();
+    let mut caps = r.view.conv.caps.clone().unwrap();
+    caps.max_body = Some(10);
+    r.view.conv.caps = Some(caps);
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Char('c')));
+    type_text(&mut r.view, "0123456789");
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(
+        screen.contains("10 / 10"),
+        "the count and the limit: {screen}"
+    );
+    assert_eq!(r.view.send_reason(), None, "at the limit is fine");
+    type_text(&mut r.view, "x");
+    let screen = text(&draw(&mut r.view, WIDE));
+    assert!(screen.contains("11 / 10"), "{screen}");
+    let why = gitpoulpi_i18n::msg::item_view::WHY_TOO_LONG.get();
+    assert_eq!(r.view.send_reason(), Some(why));
+    assert_eq!(r.view.on_key(ctrl_enter()), ItemEffect::None);
+    assert_eq!(r.view.message.as_deref(), Some(why));
+    assert_eq!(
+        r.shared.lock().unwrap().writes,
+        0,
+        "nothing reached the host"
+    );
+}

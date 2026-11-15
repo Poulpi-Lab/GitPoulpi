@@ -184,6 +184,31 @@ fn enter_on_an_issue_opens_its_conversation_and_links_work() {
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
 
+/// `o` on an issue row opens its page in the browser (the stub logs it) and
+/// the app stays on the repository: Enter is the conversation, `o` the host.
+#[test]
+fn o_on_an_issue_row_opens_the_browser_not_the_conversation() {
+    let (mut term, config, _mock, _repo) = launch("pty-conv-o-row", COLS);
+    let screen = term.screen();
+    let (col, row) = screen
+        .find_all("Crash on startup")
+        .into_iter()
+        .next()
+        .expect("the issue row");
+    term.click(col + 2, row).expect("select the row");
+    term.send_keys("o").expect("o");
+    let urls = wait_opened(&config, 1);
+    assert!(
+        urls.iter().any(|u| u.contains("/issues/12")),
+        "the issue page was opened: {urls:?}"
+    );
+    assert!(
+        !term.screen().contains("Posting as"),
+        "no conversation opened: {}",
+        term.text()
+    );
+}
+
 /// PTY 6: `Ctrl+N` badges reach Reply, Send (greyed while empty: it says
 /// why), a link and Quote.
 #[test]

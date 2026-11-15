@@ -3859,6 +3859,7 @@ pull_requests_and_2 = "строка {$pr}: править на сайте хос
 pull_requests_and_3 = "(раздел {$PRS}) создать - кнопка + в заголовке"
 pull_requests_and_4 = { git = "меню строки: открыть, копировать URL / номер, checkout исходной ветки, показать её commit'ы, создать ветку из задачи", local = "меню строки: открыть, копировать URL / номер, checkout исходной ветки, показать её коммиты, создать ветку из задачи" }
 pull_requests_and_5 = "выбрать фильтр («Открытые», «Мои {$prs}», «Ждут моего ревью», «Все» / «Назначенные мне»); значок на панели инструментов (GL !53, GH #12) открывает связанный запрос, правый щелчок - его меню; «+ {$pr_abbr}» создаёт запрос для отправленной ветки"
+pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
 refs_pane_1 = { git = "открыть меню выбранной ссылки: checkout, скрыть/solo, merge, rebase, fast-forward, pull / push / fetch, задать upstream, создать worktree, создать {$pr}, переименовать, удалить, Копировать (имя / полная ссылка / SHA цели)", local = "открыть меню выбранной ссылки: checkout, скрыть/solo, слияние, перебазирование, fast-forward, подтянуть / отправить / загрузить, задать upstream, создать worktree, создать {$pr}, переименовать, удалить, Копировать (имя / полная ссылка / SHA цели)" }
 refs_pane_2 = "Fast-forward <ветка> до <текущей> / <текущей> до <ветки> (меню или палитра): только двигает ветку вперёд; недоступно, с указанием причины, если это не fast-forward"
 refs_pane_3 = { git = "Создать worktree из <ссылки>... (меню ветки, tag'а или commit'а): диалог - папка (Обзор / {{dialog.browse}}), необязательная новая ветка, [x] открыть как вкладку (Пробел переключает)", local = "Создать worktree из <ссылки>... (меню ветки, тега или коммита): диалог - папка (Обзор / {{dialog.browse}}), необязательная новая ветка, [x] открыть как вкладку (Пробел переключает)" }
@@ -10242,6 +10243,7 @@ why_no_edit = "this host does not let you edit comments"
 why_no_delete = "this host does not let you delete comments"
 why_not_yours = "only your own comments can be changed"
 why_empty = "write something first"
+why_too_long = "the text is longer than the host takes"
 why_no_conversation = "this item has no conversation to read here, open it in the browser"
 noun_link = "link"
 nothing_to_open = "nothing to open"

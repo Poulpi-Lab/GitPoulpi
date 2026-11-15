@@ -3864,11 +3864,12 @@ git_actions_then_21 = { git = "modifie le message du {$commit} sélectionné, vo
 git_actions_then_22 = { git = "{$cherry_pick} du {$commit} sélectionné sur HEAD", local = "{$cherry_pick} de la {$commit} sélectionnée sur HEAD" }
 git_actions_then_23 = { git = "revert du {$commit} sélectionné (avec confirmation)", local = "inverse la validation sélectionnée (avec confirmation)" }
 git_actions_then_24 = { git = "reset de la branche sur le {$commit} sélectionné, en mixed (soft/hard : palette seulement, hard confirmé)", local = "réinitialise la branche sur la validation sélectionnée, en mode mixte (douce/dure : palette seulement, dure confirmée)" }
-pull_requests_and_1 = "ouvre la ligne dans le navigateur ; « Reconnecter » ouvre les Paramètres sur le profil"
+pull_requests_and_1 = "ouvre la ligne (sa conversation quand l'hébergeur en a une, sinon le navigateur) ; « Reconnecter » ouvre les Paramètres sur le profil"
 pull_requests_and_2 = "ligne de {$pr} : la modifier sur le site de l'hébergeur (le crayon de la ligne) ; la palette propose la même action pour la branche extraite"
 pull_requests_and_3 = "(section {$PRS}) en crée une : comme le + de l'en-tête"
 pull_requests_and_4 = "le menu de la ligne : ouvrir, copier l'URL / le numéro, extraire la branche source, voir ses {$commits}, créer une branche depuis un ticket"
 pull_requests_and_5 = "choisit le filtre (Ouvertes, Mes {$prs}, En attente de ma relecture, Toutes / Qui me sont assignés) ; la pastille de la barre d'outils (GL !53, GH #12) ouvre la demande liée, clic droit pour son menu ; « + {$pr_abbr} » en démarre une pour une branche poussée"
+pull_requests_and_6 = "ouvre la page de la ligne dans le navigateur (Entrée ouvre la conversation quand l'hébergeur en a une)"
 refs_pane_1 = { git = "ouvre le menu de la ref sélectionnée : checkout, masquer/solo, {$merge}, {$rebase}, fast-forward, {$pull} / {$push} / {$fetch}, définir l'amont, créer un worktree, démarrer une {$pr}, renommer, supprimer, Copier (nom / ref complète / SHA ciblé)", local = "ouvre le menu de la ref sélectionnée : basculer, masquer/solo, {$merge}, {$rebase}, avance rapide, {$pull} / {$push} / {$fetch}, définir l'amont, créer un arbre de travail, démarrer une {$pr}, renommer, supprimer, Copier (nom / ref complète / SHA ciblé)" }
 refs_pane_2 = { git = "Avancer <branche> jusqu'à <courante> / <courante> jusqu'à <branche> (menu ou palette) : fait seulement avancer une branche ; grisé, avec la raison, si ce n'est pas un fast-forward", local = "Avancer <branche> jusqu'à <courante> / <courante> jusqu'à <branche> (menu ou palette) : fait seulement avancer une branche ; grisé, avec la raison, si ce n'est pas une avance rapide" }
 refs_pane_3 = { git = "Créer un worktree depuis <ref>... (menu d'une branche, d'un {$tag} ou d'un {$commit}) : une boîte de dialogue, dossier ({{dialog.browse}} ou Parcourir...), nouvelle branche facultative, [x] l'ouvrir dans un onglet (Space bascule)", local = "Créer un arbre de travail depuis <ref>... (menu d'une branche, d'une étiquette ou d'une validation) : une boîte de dialogue, dossier ({{dialog.browse}} ou Parcourir...), nouvelle branche facultative, [x] l'ouvrir dans un onglet (Space bascule)" }
@@ -10124,6 +10125,7 @@ why_no_edit = "cet hébergeur ne permet pas de modifier les commentaires"
 why_no_delete = "cet hébergeur ne permet pas de supprimer les commentaires"
 why_not_yours = "seuls vos propres commentaires peuvent être modifiés"
 why_empty = "écrivez d'abord quelque chose"
+why_too_long = "le texte dépasse la longueur acceptée"
 why_no_conversation = "cet élément n'a pas de conversation à lire ici, ouvrez-le dans le navigateur"
 noun_link = "lien"
 nothing_to_open = "rien à ouvrir"

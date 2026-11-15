@@ -147,6 +147,18 @@ impl Default for Privacy {
 }
 
 impl Privacy {
+    /// A stable hash of what changes the text that is kept (masking, files
+    /// left out and their patterns), for a cache of already cleaned text:
+    /// turning redaction on must not find what was cached with it off.
+    pub fn cache_hash(&self) -> u64 {
+        use std::hash::{Hash, Hasher};
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        self.redact_secrets.hash(&mut hasher);
+        self.exclude_sensitive_files.hash(&mut hasher);
+        self.patterns.hash(&mut hasher);
+        hasher.finish()
+    }
+
     pub fn from_config(ai: &AiPrivacy, patterns: &[String]) -> Self {
         Self {
             redact_secrets: ai.redact_secrets,

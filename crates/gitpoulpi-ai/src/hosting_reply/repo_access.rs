@@ -119,6 +119,7 @@ pub async fn read_repository(
         head,
         selection_hash: selection.hash(),
         limits_hash: setup.limits.hash(),
+        privacy_hash: setup.privacy.cache_hash(),
     };
     let context: Arc<RepoContext> = match setup.cache.get(&key) {
         Some(found) => {

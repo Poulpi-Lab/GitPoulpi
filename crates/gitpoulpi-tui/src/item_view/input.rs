@@ -233,6 +233,7 @@ impl ItemView {
                 }
             },
             Act::Links => self.open_links_menu(),
+            Act::OpenDiagram => self.open_diagram_menu(),
             Act::CopyLink => match self.conv.selected_url() {
                 Some(url) => {
                     ItemEffect::Message(crate::clipboard::copy_shared(m::NOUN_LINK.get(), &url))
@@ -576,7 +577,7 @@ impl ItemView {
             ItemCmd::ToggleInternal => self.toggle_internal(),
             ItemCmd::NewComment => self.act(Act::NewComment),
             ItemCmd::Links => self.act(Act::Links),
-            ItemCmd::OpenDiagram => self.open_diagram_menu(),
+            ItemCmd::OpenDiagram => self.act(Act::OpenDiagram),
             ItemCmd::CopyLink => self.act(Act::CopyLink),
             ItemCmd::OpenBrowser => self.act(Act::OpenBrowser),
             ItemCmd::Edit => self.act(Act::Edit),

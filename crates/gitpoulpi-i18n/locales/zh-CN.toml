@@ -3865,6 +3865,7 @@ pull_requests_and_2 = { git = "{$pr} 行：在托管平台网站上编辑（该�
 pull_requests_and_3 = { git = "（{$PRS} 分区）创建一个 - 标题栏的 +", local = "（{$PRS}分区）创建一个 - 标题栏的 +" }
 pull_requests_and_4 = { git = "该行的菜单：打开、复制 URL / 编号、检出源分支、查看其 {$commit}、从议题创建分支", local = "该行的菜单：打开、复制 URL / 编号、检出源分支、查看其提交、从议题创建分支" }
 pull_requests_and_5 = { git = "选择筛选（打开、我的、请求我评审、全部 / 指派给我）；工具栏标签（GL !53、GH #12）会打开关联的请求，右键打开其菜单；“+ {$pr_abbr}”为已 {$push} 的分支发起一个", local = "选择筛选（打开、我的、请求我评审、全部 / 指派给我）；工具栏标签（GL !53、GH #12）会打开关联的请求，右键打开其菜单；“+ {$pr_abbr}”为已{$push}的分支发起一个" }
+pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
 refs_pane_1 = { git = "打开所选引用的菜单：检出、隐藏/单独显示、{$merge}、{$rebase}、快进、{$pull} / {$push} / {$fetch}、设置 upstream、创建 worktree、发起 {$pr}、重命名、删除、复制（名称 / 完整引用 / 目标 SHA）", local = "打开所选引用的菜单：检出、隐藏/单独显示、{$merge}、{$rebase}、快进、{$pull} / {$push} / {$fetch}、设置上游、创建工作树、发起{$pr}、重命名、删除、复制（名称 / 完整引用 / 目标 SHA）" }
 refs_pane_2 = "将 <分支> 快进到 <当前> / 将 <当前> 快进到 <分支>（菜单或命令面板）：只会让分支向前移动；若不是快进，则变灰并说明原因"
 refs_pane_3 = { git = "从 <引用> 创建 worktree…（分支、{$tag}，或 {$commit} 的菜单）：一个对话框 - 文件夹（浏览 / {{dialog.browse}}）、可选的新分支、[x] 将其作为标签页打开（按 Space 切换）", local = "从 <引用> 创建工作树…（分支、{$tag}，或{$commit}的菜单）：一个对话框 - 文件夹（浏览 / {{dialog.browse}}）、可选的新分支、[x] 将其作为标签页打开（按 Space 切换）" }
@@ -10108,6 +10109,7 @@ why_no_edit = "this host does not let you edit comments"
 why_no_delete = "this host does not let you delete comments"
 why_not_yours = "only your own comments can be changed"
 why_empty = "write something first"
+why_too_long = "the text is longer than the host takes"
 why_no_conversation = "this item has no conversation to read here, open it in the browser"
 noun_link = "link"
 nothing_to_open = "nothing to open"

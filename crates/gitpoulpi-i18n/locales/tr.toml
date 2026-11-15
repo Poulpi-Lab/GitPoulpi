@@ -3866,6 +3866,7 @@ pull_requests_and_2 = "{$pr} satırı: barındırıcının sitesinde düzenle (s
 pull_requests_and_3 = "({$PRS} bölümü) bir tane oluştur - başlığın +'sı"
 pull_requests_and_4 = "satırın menüsü: aç, URL / numara kopyala, kaynak dalda checkout, commit'lerini göster, bir issue'dan dal oluştur"
 pull_requests_and_5 = "filtreyi seç (Açık, Benim, İnceleme istenen, Tümü / Bana atanan); araç çubuğu çipi (GL !53, GH #12) bağlı isteği açar, menüsü için sağ tıklayın; \"+ {$pr_abbr}\" gönderilmiş bir dal için bir tane başlatır"
+pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
 refs_pane_1 = { git = "seçili ref'in menüsünü aç: checkout, gizle/solo, merge, rebase, fast-forward, pull / push / fetch, upstream ayarla, worktree oluştur, {$pr} başlat, yeniden adlandır, sil, Kopyala (ad / tam ref / hedef SHA)", local = "seçili ref'in menüsünü aç: checkout, gizle/solo, birleştir, rebase, fast-forward, çek / gönder / getir, upstream ayarla, worktree oluştur, {$pr} başlat, yeniden adlandır, sil, Kopyala (ad / tam ref / hedef SHA)" }
 refs_pane_2 = "<dal> dalını <geçerli>ye / <geçerli> dalını <dal>a fast-forward et (menü veya palet): bir dalı yalnızca ileri taşır; fast-forward değilse nedeniyle birlikte gri olur"
 refs_pane_3 = { git = "<ref> üzerinden worktree oluştur... (dal, tag veya bir commit'in menüsü): bir iletişim kutusu - klasör (Gözat / {{dialog.browse}}), isteğe bağlı yeni dal, [x] sekme olarak aç (Space değiştirir)", local = "<ref> üzerinden worktree oluştur... (dal, etiket veya bir commit'in menüsü): bir iletişim kutusu - klasör (Gözat / {{dialog.browse}}), isteğe bağlı yeni dal, [x] sekme olarak aç (Space değiştirir)" }
@@ -10111,6 +10112,7 @@ why_no_edit = "this host does not let you edit comments"
 why_no_delete = "this host does not let you delete comments"
 why_not_yours = "only your own comments can be changed"
 why_empty = "write something first"
+why_too_long = "the text is longer than the host takes"
 why_no_conversation = "this item has no conversation to read here, open it in the browser"
 noun_link = "link"
 nothing_to_open = "nothing to open"

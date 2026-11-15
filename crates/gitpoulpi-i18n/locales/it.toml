@@ -3865,6 +3865,7 @@ pull_requests_and_2 = "riga {$pr}: modificala sul sito dell'host (la matita dell
 pull_requests_and_3 = "(sezione {$PRS}) creane una - il + dell'intestazione"
 pull_requests_and_4 = "il menu della riga: apri, copia URL / numero, checkout del branch di origine, vedi i suoi commit, crea un branch da una issue"
 pull_requests_and_5 = "scegli il filtro (Aperte, Mie, Revisione richiesta, Tutte / Assegnate a me); il chip della barra degli strumenti (GL !53, GH #12) apre la richiesta collegata, clic destro per il suo menu; \"+ {$pr_abbr}\" ne avvia una per un branch inviato"
+pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
 refs_pane_1 = { git = "apre il menu del ref selezionato: checkout, nascondi/solo, merge, rebase, fast-forward, pull / push / fetch, imposta upstream, crea worktree, avvia una {$pr}, rinomina, elimina, Copia (nome / ref completo / SHA di destinazione)", local = "apre il menu del ref selezionato: passa a, nascondi/solo, unisci, ribasa, avanzamento rapido, scarica / invia / recupera, imposta upstream, crea un albero di lavoro, avvia una {$pr}, rinomina, elimina, Copia (nome / ref completo / SHA di destinazione)" }
 refs_pane_2 = "Fast-forward di <branch> a <corrente> / <corrente> a <branch> (menu o palette): sposta un branch solo in avanti; in grigio, con il motivo, quando non è un fast-forward"
 refs_pane_3 = { git = "Crea un worktree da <ref>... (menu di un branch, tag o commit): un dialogo - cartella (Sfoglia / {{dialog.browse}}), nuovo branch facoltativo, [x] aprilo come scheda (Space attiva/disattiva)", local = "Crea un albero di lavoro da <ref>... (menu di un branch, tag o commit): un dialogo - cartella (Sfoglia / {{dialog.browse}}), nuovo branch facoltativo, [x] aprilo come scheda (Space attiva/disattiva)" }
@@ -10105,6 +10106,7 @@ why_no_edit = "this host does not let you edit comments"
 why_no_delete = "this host does not let you delete comments"
 why_not_yours = "only your own comments can be changed"
 why_empty = "write something first"
+why_too_long = "the text is longer than the host takes"
 why_no_conversation = "this item has no conversation to read here, open it in the browser"
 noun_link = "link"
 nothing_to_open = "nothing to open"

@@ -3865,6 +3865,7 @@ pull_requests_and_2 = "řádek {$pr}: upraví ho na webu hostitele (tužka na ř
 pull_requests_and_3 = "(sekce {$PRS}) vytvoří nový - + v záhlaví"
 pull_requests_and_4 = "nabídka řádku: otevřít, kopírovat URL / číslo, checkout zdrojové větve, zobrazit její commity, vytvořit větev z issue"
 pull_requests_and_5 = { git = "zvolí filtr ({$prs}: Otevřené, Merged / zavřené, Všechny; issues: Otevřené, Všechny, Přiřazené mně, Zavřené); čip na panelu nástrojů (GL !53, GH #12) otevře propojený požadavek, pravé tlačítko jeho nabídku; „+ {$pr_abbr}“ založí požadavek pro odeslanou větev", local = "zvolí filtr ({$prs}: Otevřené, Sloučené / zavřené, Všechny; issues: Otevřené, Všechny, Přiřazené mně, Zavřené); čip na panelu nástrojů (GL !53, GH #12) otevře propojený požadavek, pravé tlačítko jeho nabídku; „+ {$pr_abbr}“ založí požadavek pro odeslanou větev" }
+pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
 refs_pane_1 = { git = "otevře nabídku vybraného refu: checkout, skrýt/solo, merge, rebase, fast-forward, pull / push / fetch, nastavit upstream, vytvořit worktree, založit {$pr}, přejmenovat, smazat, Kopírovat (Název / Úplný ref / Cílové SHA)", local = "otevře nabídku vybraného refu: checkout, skrýt/solo, sloučit, rebase, fast-forward, stáhnout / odeslat / načíst, nastavit upstream, vytvořit worktree, založit {$pr}, přejmenovat, smazat, Kopírovat (Název / Úplný ref / Cílové SHA)" }
 refs_pane_2 = "Fast-forward <větev> na <aktuální> / <aktuální> na <větev> (nabídka nebo paleta): posune větev jen dopředu; je-li zašedlé, uvádí důvod, proč to není fast-forward"
 refs_pane_3 = { git = "Vytvořit worktree z <ref>... (nabídka větve, tagu nebo commitu): dialog - složka (Procházet / {{dialog.browse}}), volitelná nová větev, [x] otevřít jako kartu (Space přepíná)", local = "Vytvořit worktree z <ref>... (nabídka větve, značky nebo commitu): dialog - složka (Procházet / {{dialog.browse}}), volitelná nová větev, [x] otevřít jako kartu (Space přepíná)" }
@@ -10231,6 +10232,7 @@ why_no_edit = "this host does not let you edit comments"
 why_no_delete = "this host does not let you delete comments"
 why_not_yours = "only your own comments can be changed"
 why_empty = "write something first"
+why_too_long = "the text is longer than the host takes"
 why_no_conversation = "this item has no conversation to read here, open it in the browser"
 noun_link = "link"
 nothing_to_open = "nothing to open"

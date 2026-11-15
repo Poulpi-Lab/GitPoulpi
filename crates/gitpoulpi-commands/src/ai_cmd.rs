@@ -638,15 +638,26 @@ fn read_conversation(
         std::fs::read_to_string(source)
             .map_err(|e| format!("could not read the conversation {source}: {e}"))?
     };
-    serde_json::from_str(&text).map_err(|e| {
-        format!("the conversation is not a page of entries (`header` and `entries`): {e}")
-    })
+    crate::ai_conversation::parse(&text)
+}
+
+/// `--item`: the conversation read from the host itself, through the same
+/// path as `hosting issue comments` (an issue) or `hosting review
+/// conversation` (a reference starting with `!` is a pull request).
+#[cfg(feature = "hosting")]
+async fn fetch_item(
+    session: &mut Session,
+    reference: &str,
+) -> Result<gitpoulpi_hosting::conversation::TimelinePage, String> {
+    let printed = crate::hosting_cmd::read_conversation_json(session, reference).await?;
+    crate::ai_conversation::parse(&printed.to_string())
 }
 
 /// What `ai hosting-reply` was asked.
 #[cfg(feature = "hosting")]
 pub(crate) struct ReplyArgs {
     pub conversation: Option<String>,
+    pub item: Option<String>,
     pub reply_to: Option<String>,
     pub path: Option<String>,
     pub line: Option<u32>,
@@ -691,8 +702,16 @@ async fn hosting_reply(
     request.hint = args.hint;
     request.draft = args.draft;
     let mut flavor = MarkupFlavor::default();
-    if let Some(source) = &args.conversation {
-        let page = read_conversation(source)?;
+    let fetched = match &args.item {
+        Some(reference) => Some(fetch_item(session, reference).await?),
+        None => None,
+    };
+    let source_page = match (&fetched, &args.conversation) {
+        (Some(page), _) => Some(page.clone()),
+        (None, Some(source)) => Some(read_conversation(source)?),
+        (None, None) => None,
+    };
+    if let Some(page) = source_page {
         flavor = page.header.body.flavor;
         request.item = Some(convert::item_digest(&page.header));
         request.entries = convert::entries(&page.entries);
@@ -809,6 +828,7 @@ async fn run_action(
         #[cfg(feature = "hosting")]
         AiCommand::HostingReply {
             conversation,
+            item,
             reply_to,
             path,
             line,
@@ -827,6 +847,7 @@ async fn run_action(
                 ctx,
                 ReplyArgs {
                     conversation,
+                    item,
                     reply_to,
                     path,
                     line,

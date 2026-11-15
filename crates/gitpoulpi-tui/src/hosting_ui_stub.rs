@@ -337,6 +337,14 @@ impl HostingUi {
     pub(crate) fn open_chip_menu(&mut self, _col: u16, _row: u16) -> bool {
         false
     }
+    pub(crate) fn open_row_in_browser(
+        &mut self,
+        _list: HostingList,
+        _index: usize,
+        _clipboard: &mut crate::clipboard::Clipboard,
+    ) -> HostingEffect {
+        HostingEffect::None
+    }
     pub(crate) fn activate_row(
         &mut self,
         _list: HostingList,

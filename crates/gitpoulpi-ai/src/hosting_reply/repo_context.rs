@@ -152,6 +152,10 @@ pub struct ContextKey {
     pub head: Oid,
     pub selection_hash: u64,
     pub limits_hash: u64,
+    /// The privacy settings the text was cleaned under (a context built with
+    /// masking off is not the one to give with masking on).
+    #[serde(default)]
+    pub privacy_hash: u64,
 }
 
 /// Something that did not fit and was shortened or left out.
@@ -369,11 +373,34 @@ pub struct BuildInput<'a> {
     pub now: u64,
 }
 
+/// The part cache seen under one privacy setting and one set of limits: the
+/// text of a part depends on both, so a part kept under other ones is not
+/// found.
+struct Salted<'a> {
+    inner: &'a mut PartCache,
+    salt: String,
+}
+
+impl Salted<'_> {
+    fn get(&self, head: &str, id: &str, now: u64) -> Option<super::cache::CachedPart> {
+        self.inner.get(head, &format!("{}|{id}", self.salt), now)
+    }
+
+    fn put(&mut self, head: &str, id: &str, kind: &PartKind, text: &str, now: u64) {
+        self.inner
+            .put(head, &format!("{}|{id}", self.salt), kind, text, now);
+    }
+}
+
 /// Reads the parts of `selection` through the reader, takes the parts the
 /// cache already holds, runs the privacy pass and holds the total to the
 /// budget. A part the reader cannot give (a file that went missing, a binary)
 /// is left out; a reader that fails is an error.
 pub async fn build(input: &BuildInput<'_>, parts_cache: &mut PartCache) -> Result<RepoContext> {
+    let mut parts_cache = Salted {
+        inner: parts_cache,
+        salt: format!("{:x}.{:x}", input.privacy.cache_hash(), input.limits.hash()),
+    };
     let head_hex = input.head.to_hex();
     let mut redactions = 0usize;
     let mut left_out: Vec<String> = Vec::new();
@@ -568,6 +595,7 @@ pub async fn build(input: &BuildInput<'_>, parts_cache: &mut PartCache) -> Resul
             head: input.head,
             selection_hash: input.selection.hash(),
             limits_hash: input.limits.hash(),
+            privacy_hash: input.privacy.cache_hash(),
         },
         total: parts.iter().map(|p| p.bytes).sum(),
         parts,

@@ -3865,6 +3865,7 @@ pull_requests_and_2 = "fila de {$pr}: edítala en el sitio del proveedor (el lá
 pull_requests_and_3 = "(sección {$PRS}) crea una - el + de la cabecera"
 pull_requests_and_4 = { git = "el menú de la fila: abrir, copiar URL / número, checkout de la rama de origen, ver sus commits, crear una rama desde un issue", local = "el menú de la fila: abrir, copiar URL / número, checkout de la rama de origen, ver sus confirmaciones, crear una rama desde un issue" }
 pull_requests_and_5 = "elige el filtro (abiertas, mías, con revisión solicitada, todas / asignadas a mí); el chip de la barra de herramientas (GL !53, GH #12) abre la solicitud vinculada, clic derecho para su menú; «+ {$pr_abbr}» inicia una para una rama enviada"
+pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
 refs_pane_1 = { git = "abre el menú de la ref seleccionada: checkout, ocultar/solo, merge, rebase, fast-forward, pull / push / fetch, definir upstream, crear worktree, iniciar {$pr}, renombrar, eliminar, Copiar (nombre / ref completa / SHA de destino)", local = "abre el menú de la ref seleccionada: checkout, ocultar/solo, fusión, reaplicado, fast-forward, traída / envío / obtención, definir upstream, crear worktree, iniciar {$pr}, renombrar, eliminar, Copiar (nombre / ref completa / SHA de destino)" }
 refs_pane_2 = "Fast-forward de <rama> a <actual> / de <actual> a <rama> (menú o paleta): solo avanza una rama; en gris, con el motivo, cuando no es un fast-forward"
 refs_pane_3 = { git = "Crear worktree desde <ref>... (menú de rama, tag o commit): un diálogo - carpeta (Examinar / {{dialog.browse}}), rama nueva opcional, [x] abrirlo como pestaña (Space alterna)", local = "Crear worktree desde <ref>... (menú de rama, etiqueta o confirmación): un diálogo - carpeta (Examinar / {{dialog.browse}}), rama nueva opcional, [x] abrirlo como pestaña (Space alterna)" }
@@ -10234,6 +10235,7 @@ why_no_edit = "this host does not let you edit comments"
 why_no_delete = "this host does not let you delete comments"
 why_not_yours = "only your own comments can be changed"
 why_empty = "write something first"
+why_too_long = "the text is longer than the host takes"
 why_no_conversation = "this item has no conversation to read here, open it in the browser"
 noun_link = "link"
 nothing_to_open = "nothing to open"

@@ -22,6 +22,8 @@ pub(crate) enum Act {
     Delete,
     /// Open the menu of the selected entry's links.
     Links,
+    /// Open the Mermaid diagram of the selected entry.
+    OpenDiagram,
     CopyLink,
     OpenBrowser,
     NewComment,
@@ -72,6 +74,7 @@ impl Conversation {
                     'e' => Some(Act::Edit),
                     'd' => Some(Act::Delete),
                     'l' => Some(Act::Links),
+                    'g' => Some(Act::OpenDiagram),
                     'y' => Some(Act::CopyLink),
                     'o' => Some(Act::OpenBrowser),
                     'c' => Some(Act::NewComment),

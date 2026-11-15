@@ -230,6 +230,22 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         // (no git mutation), so unlike delete it's a bare
         // key, same as the sidebar's other navigation/view
         // toggles (h/l/y).
+        // On a pull request / issue row the same key opens the page in the
+        // browser (Enter opens the conversation).
+        _ if *cx.focus == Focus::Refs
+            && km.is(Bind::RefsSolo, &key)
+            && HostingList::from_section(*cx.active_ref_section).is_some() =>
+        {
+            if let (Some(list), Some(index)) = (
+                HostingList::from_section(*cx.active_ref_section),
+                cx.sidebar_states.state(*cx.active_ref_section).selected(),
+            ) {
+                let effect = cx
+                    .hosting
+                    .open_row_in_browser(list, index, &mut *cx.clipboard);
+                commands::apply_hosting_effect(cx, effect);
+            }
+        }
         _ if *cx.focus == Focus::Refs && km.is(Bind::RefsSolo, &key) => {
             // Solo only means anything for refs; the
             // worktree/stash panes have nothing to solo.

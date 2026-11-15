@@ -3864,6 +3864,7 @@ pull_requests_and_2 = "wiersz {$pr}: edytuj na stronie hosta (ołówek wiersza);
 pull_requests_and_3 = "(sekcja {$PRS}) utwórz nowy - + w nagłówku"
 pull_requests_and_4 = { git = "menu wiersza: otwórz, kopiuj URL / numer, checkout gałęzi źródłowej, pokaż jej commity, utwórz gałąź ze zgłoszenia", local = "menu wiersza: otwórz, kopiuj URL / numer, checkout gałęzi źródłowej, pokaż jej zatwierdzenia, utwórz gałąź ze zgłoszenia" }
 pull_requests_and_5 = { git = "wybierz filtr ({$prs}: Otwarte, Merged / closed, Wszystkie; zgłoszenia: Otwarte, Wszystkie, Przypisane do mnie, Zamknięte); chip na pasku (GL !53, GH #12) otwiera powiązane żądanie, prawy przycisk myszy daje jego menu; „+ {$pr_abbr}” zaczyna je dla wypchniętej gałęzi", local = "wybierz filtr ({$prs}: Otwarte, Scalone / zamknięte, Wszystkie; zgłoszenia: Otwarte, Wszystkie, Przypisane do mnie, Zamknięte); chip na pasku (GL !53, GH #12) otwiera powiązane żądanie, prawy przycisk myszy daje jego menu; „+ {$pr_abbr}” zaczyna je dla wypchniętej gałęzi" }
+pull_requests_and_6 = "open the row's page in the browser (Enter opens the conversation where the host has one)"
 refs_pane_1 = { git = "otwórz menu zaznaczonego refu: checkout, ukryj/solo, merge, rebase, fast-forward, pull / push / fetch, ustaw upstream, utwórz worktree, rozpocznij {$pr}, zmień nazwę, usuń, Kopiuj (nazwa / pełny ref / SHA celu)", local = "otwórz menu zaznaczonego refu: checkout, ukryj/solo, scal, rebase, fast-forward, ściągnij / wypchnij / pobierz, ustaw upstream, utwórz worktree, rozpocznij {$pr}, zmień nazwę, usuń, Kopiuj (nazwa / pełny ref / SHA celu)" }
 refs_pane_2 = "Fast-forward <gałąź> do <bieżącej> / <bieżącej> do <gałęzi> (menu lub paleta): przesuwa gałąź tylko do przodu; wyszarzone, z powodem, gdy to nie jest fast-forward"
 refs_pane_3 = { git = "Utwórz worktree z <refu>... (menu gałęzi, tagu lub commita): okno - folder (Przeglądaj / {{dialog.browse}}), opcjonalna nowa gałąź, [x] otwórz jako kartę (Space przełącza)", local = "Utwórz worktree z <refu>... (menu gałęzi, znacznika lub zatwierdzenia): okno - folder (Przeglądaj / {{dialog.browse}}), opcjonalna nowa gałąź, [x] otwórz jako kartę (Space przełącza)" }
@@ -10107,6 +10108,7 @@ why_no_edit = "this host does not let you edit comments"
 why_no_delete = "this host does not let you delete comments"
 why_not_yours = "only your own comments can be changed"
 why_empty = "write something first"
+why_too_long = "the text is longer than the host takes"
 why_no_conversation = "this item has no conversation to read here, open it in the browser"
 noun_link = "link"
 nothing_to_open = "nothing to open"

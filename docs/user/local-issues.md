@@ -21,6 +21,15 @@ them at the same time, and the lists follow.
 
 Nothing is linked on its own: like every issue source it is opt-in per repository.
 
+## Comments on a note
+
+`Enter` on a note's row in the ISSUES section, or on its card, opens its conversation: the note's text, then the
+comments. Comments are kept in the note file itself, in a final `## Comments` section, one `### <author> - <UTC time>`
+entry each (an edited one adds `(edited <time>)`). Nothing above that heading is ever touched, so Obsidian and a shell
+read and edit the same file. You can write, edit and delete the comments of the local author (the profile's
+`local.me`, else the connected user, the name *Assigned to me* uses); nobody else's. The box is the usual Markdown
+composer with a preview, and *Writing as <name> (local note)* names the author. Nothing goes over the network. A note with a `## Comments` heading you wrote by hand is read as such.
+
 ## The notes
 
 One note per issue, named `<id>-<slug>.md` (`12-crash-on-empty-name.md`), with a frontmatter block:
@@ -131,7 +140,7 @@ If you work alone, or in a team that keeps its issues next to the code, the fold
   `Shift+Left` / `Shift+Right`, or with **Board: Move Card To...** (`m`), a dropdown of the columns. The card moves at
   once; the note's `status` is rewritten as in [the notes section](#the-notes), nothing else in the file. If the write
   fails the card goes back and the error is on the status line.
-- **Open** a card with `Enter` or a double click (the note opens in your default program for `.md`). `e` edits its
+- **Open** a card with `Enter` or a double click: the note's [conversation](hosting-integration.md#5c-conversations) opens in the window, with the note's text and its comments (the card menu's **Open note** opens the file in your default program for `.md`). `e` edits its
   assignees, labels or milestone, `.` or a right click opens the card menu, `n` starts a new issue in the selected
   column (the form comes back to the board when it closes).
 - **Filter** by assignee (`a`), label (`l`), milestone (`M`) or text (`/`); `x` clears them. The filters are

@@ -55,6 +55,16 @@ reviews already submitted, oldest first, each with its verdict (`approved`, `req
 `dismissed`). On GitLab the verdicts are its approvals. Under it, the reply box: click it or press **`c`**
 to write a comment on the conversation. **This one is posted at once**, and the box says so.
 
+The comment box (also the box of a reply, a comment on a line and the summary of **Finish review**) is the Markdown
+composer shared with [the conversation view](hosting-integration.md#writing): **Write**, **Preview** (`Alt+P`) and
+**Split** (`Alt+L`, in a window 100 columns wide), `Ctrl+Enter` (also `Ctrl+S`, `Alt+Enter`) sends, and where AI is on
+`Alt+E` opens **Write with AI** ([the AI chapter](ai.md#writing-help-on-a-host)). The preview shows the text as the host
+will, references included (`#7`, `!12`, `ABC-12`, commit ids); an unsent text is kept per request. The text in the
+description and the conversation uses the same renderer, so Markdown, tables, alerts and references look the same here
+and in the conversation view of an issue. Quoting, editing or deleting a comment already posted, and internal notes,
+belong to the conversation view of issues and of requests on hosts without a review (see
+[Conversations](hosting-integration.md#5c-conversations)); here only your pending comments can be edited.
+
 ### Files
 
 The changed files on the left (status letter, `+added -removed`, a `●n` count of open threads, a `✎n` count of

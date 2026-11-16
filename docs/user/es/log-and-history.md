@@ -250,6 +250,18 @@ segunda confirmación. `Ctrl+Z` (el Deshacer de la barra de herramientas) revier
 el reword; consulta [Deshacer y rehacer](undo-redo.md). La barra de estado
 también nombra la punta anterior.
 
+Un commit que no está en la rama activa (vive en otra rama) no se puede reescribir ni modificar donde estás, así que
+*Editar mensaje del commit...* y *Modificar...* abren en su lugar **Editar un commit de otra rama**, una lista de
+opciones (`Up` / `Down` o `Ctrl+J` / `Ctrl+K` se mueven, `Enter` o un clic elige, `Esc`, la cruz o **Cancelar (C)** la cierra):
+
+- **Hacer checkout de `<rama>` y editar (1)**: una fila por cada rama local cuyo historial contiene el commit (`1` a `8`,
+  las ocho primeras, el resto se cuentan). Se hace checkout de la rama de la forma habitual y después se abre la edición
+  en ella. El deshacer es el de las dos acciones: `Ctrl+Z` revierte la edición, el checkout es un checkout.
+- **Editar con reescritura avanzada del historial (R)**: abre el [editor de reescritura del historial](history-rewrite.md)
+  sobre ese commit, en las compilaciones que lo tienen.
+- **Crear una rama aquí... (N)**: solo cuando ninguna rama local contiene el commit (está solo en una rama remota, por
+  ejemplo); abre el cuadro del nombre para una rama en él.
+
 ## Modificar un commit (mensaje, autor, fechas)
 
 *Modificar...* en el menú del commit (o `Ctrl+G Shift+E`, o *Commit: Modificar...* en la paleta) abre un solo diálogo con las propiedades del commit: el resumen, la descripción y el nombre, el correo y la fecha del autor, cada uno rellenado con los valores del commit. Cambia lo que quieras y pulsa **Aplicar**; solo se envían los campos modificados. Una fecha se escribe `YYYY-MM-DD HH:MM:SS +HH:MM` y se muestra en UTC mientras no la edites. El committer eres tú, ahora (igual que en un reword). Se puede modificar cualquier commit de la rama activa, con las mismas reglas, el mismo aviso de commit ya enviado y la misma segunda confirmación que *Editar mensaje del commit...*; los commits de encima se recrean con sus propios autores y fechas, y tus cambios preparados y sin preparar no se tocan. `Ctrl+Z` (Deshacer de la barra de herramientas) lo revierte. En las compilaciones con reescritura del historial, **Modificar el historial más a fondo...** (`Alt+H`), abajo a la izquierda del diálogo, lo cierra sin aplicar nada y abre el [editor de reescritura del historial](history-rewrite.md) con el alcance desde este commit hasta el más reciente; si editaste un campo, pregunta antes (`Esc` confirma). `Ctrl+N` muestra una insignia en cada campo y botón del diálogo; púlsala para poner el cursor en ese campo o pulsar ese botón (consulta [Insignias](keybindings.md#insignias)).
@@ -433,7 +445,7 @@ Lo que se compara depende de la selección:
 | la fila WIP y un commit o stash | ese commit con el árbol de trabajo: cambios staged y unstaged de los archivos con seguimiento (los archivos sin seguimiento no forman parte de un diff) |
 | tres o más commits | sus cambios combinados: desde justo antes del más antiguo hasta el más reciente (los merges siguen su primer padre) |
 
-Un renombrado se muestra como un borrado más un añadido. **Intercambiar** (`x`)
+Un archivo renombrado o movido se muestra como un solo archivo, con el nombre antiguo y la similitud encima de su diff. **Intercambiar** (`x`)
 cambia los extremos de una comparación de dos filas; con la fila WIP, que
 siempre es el extremo más reciente, o con un rango de tres o más, no hay nada
 que intercambiar. Una comparación con la fila WIP sigue al árbol de trabajo

@@ -476,7 +476,7 @@ de solo lectura de confianza.*
 - **Caché de prompts de Anthropic.** Para un perfil de Anthropic la petición se envía con el prompt base y las
   instrucciones como un bloque en caché y el contexto del repositorio como un segundo bloque, y tu conversación,
   indicación y borrador después, de modo que una segunda respuesta sobre el mismo contexto se lee de la caché del
-  proveedor y cuesta una fracción. Los contadores de caché de la respuesta son lo que muestra *Caché: N tokens
+  proveedor y cuesta una fracción (los seguimientos también guardan en caché el mensaje de la conversación y el borrador más reciente, ver abajo). Los contadores de caché de la respuesta son lo que muestra *Caché: N tokens
   reutilizados*. Los servidores compatibles con OpenAI reciben el mismo orden estable de la petición, del que se
   beneficia su caché automática de prefijos; GitPoulpi no envía nada extra.
 - **El agente conserva su sesión.** Con **Mantener la sesión del agente entre respuestas**
@@ -488,8 +488,34 @@ de solo lectura de confianza.*
   única que no conserva nada. La sesión vive en el almacenamiento del propio agente; GitPoulpi solo guarda su id (en
   memoria en la ventana, en un archivo solo de usuario para la CLI).
 
+**Seguimientos: más corto, otra indicación.** Volver a pedir en el mismo cuadro («hazlo más corto», «añade un
+agradecimiento») es un solo intercambio. Una sesión reanudada de Claude Code lo recuerda por sí sola. Para todo lo demás
+(un perfil de API, Codex y cualquier otro agente) GitPoulpi lo devuelve: la petición lleva el mensaje de la conversación de
+la primera petición, después cada indicación anterior y el borrador que la respondió como turnos de chat propiamente dichos
+(una transcripción en el prompt para un agente, que lee un solo documento), y por último solo lo nuevo: tu indicación y,
+cuando *Mejorar mi borrador* está marcada, el texto que hay ahora en el cuadro con tus propias ediciones. Así un seguimiento
+nunca parte de cero, y no se vuelve a leer nada del repositorio. «Qué se envía» lo muestra todo. El intercambio se limita a
+`ai.limits.hosting_reply_context_bytes` igual que la conversación: los seguimientos más antiguos se dejan fuera primero, el
+mensaje de la conversación y tu borrador más reciente se quedan siempre (`context.history_omitted` en la respuesta de la CLI
+los cuenta). Dentro de un intercambio el contexto del repositorio sigue siendo el de su primera petición, así que se
+reutiliza y la caché del proveedor se mantiene: para un perfil de Anthropic el prompt base, el contexto del repositorio, el
+mensaje de la conversación y el borrador más reciente son la parte en caché, y un servidor compatible con OpenAI recibe el
+mismo orden de mensajes para su caché de prefijos. Codex podría reanudarse con `codex exec resume <id>`, pero elige él mismo
+el id de sesión y solo lo imprime entre sus eventos JSON (y `--last` recogería tus propias sesiones), así que GitPoulpi lo
+mantiene de una sola vez y vuelve a suministrar el historial. El intercambio vive con el cuadro de redacción: termina cuando
+el cuadro se cierra o el texto se envía, y **Actualizar contexto** también lo suelta (la siguiente petición es una primera).
+Solo se une una petición que obtuvo respuesta; una fallida o detenida no. La descripción de una pull request se escribe a
+partir del diff y no tiene intercambio.
+
+En la CLI cada llamada es independiente, así que `--continue` retoma el intercambio: continúa el último
+`ai hosting-reply` para el mismo destino en este repositorio (mismos `--item`, `--reply-to`, `--path`/`--line` o
+`--issue-title`), a partir de un pequeño archivo en la carpeta de estado privada. Sin `--continue` empieza un intercambio
+nuevo que sustituye al guardado. `--continue` sin nada guardado para el destino es un error. El `context` de la respuesta
+lleva `history_turns` (y `history_omitted`) cuando fueron turnos anteriores.
+
 ```
 gitpoulpi ai hosting-reply --conversation conversation.json --hint "say I will look tomorrow"
+gitpoulpi ai hosting-reply --conversation conversation.json --hint "shorter" --continue
 gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
 gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "is this our bug?"
 gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"

@@ -446,7 +446,7 @@ El mismo tablero está disponible para scripts y agentes: `gitpoulpi hosting boa
 Una tarjeta muestra el número, el título, los asignados como iniciales, las etiquetas y el hito. Arrástrala a otra columna,
 o `Shift+Left` / `Shift+Right`, o **Tablero: Mover tarjeta a...** (`m`). Se mueve al instante; pasados unos 150 ms un indicador giratorio
 dice que el host sigue trabajando, y si el host lo rechaza, la tarjeta vuelve y la barra de estado dice por qué. `Enter` abre
-el issue en el host (la nota, en los issues locales); `e` edita asignados, etiquetas e hito; `n` inicia un issue nuevo en
+la [conversación](#5c-conversaciones) del issue en GitPoulpi, y el tablero vuelve al cerrarla; `e` edita asignados, etiquetas e hito; `n` inicia un issue nuevo en
 la columna seleccionada; `a`, `l`, `M` y `/` filtran por asignado, etiqueta, hito y texto, `x` quita los filtros; `r`
 vuelve a leer el host. El tablero vuelve a leer cuando se actualizan las listas de la barra lateral. El Radar no tiene tablero.
 
@@ -462,7 +462,7 @@ de la ventana.
 | Desde | Cómo |
 |---|---|
 | Una fila de ISSUES | `Enter` o un doble clic; el **Abrir conversación** del menú de la fila; la paleta *Alojamiento: Abrir la conversación de un issue...* (una lista de los issues en pantalla). El **Abrir en el navegador** del menú de la fila conserva el navegador. |
-| Una fila de PULL REQUESTS en Azure DevOps o Bitbucket | `Enter` o **Abrir conversación**. En GitHub, GitLab, Gitea, Forgejo y Gerrit la fila abre la [revisión](review.md), cuya página Resumen es la conversación de la request. |
+| Una fila de PULL REQUESTS en Azure DevOps o Bitbucket | `Enter` o **Abrir conversación**. En GitHub, GitLab, Gitea, Forgejo y Gerrit la fila abre la [revisión](review.md), cuya página Resumen es esta misma conversación (la línea de tiempo, las teclas y la caja de comentario de más abajo). |
 | Una tarjeta del [tablero de issues](#5b-el-tablero-de-issues) | `Enter` o un doble clic. |
 | El [Radar](radar.md) | `i` en una fila de issue o de request, el **Abrir conversación** del menú de la fila, o *Radar: Abrir la conversación del issue*. |
 | Una referencia en otra conversación | Haz clic en ella (o `l`, y elígela): `#7`, `!12`, `ABC-12` de una fuente vinculada se abren en la app y se apilan en una pila de Volver. |

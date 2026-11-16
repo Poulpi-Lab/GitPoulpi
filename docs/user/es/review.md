@@ -49,13 +49,39 @@ Un control segmentado en el borde superior cambia de página: **Resumen**, **Arc
 
 ### Resumen
 
-La descripción (el Markdown básico se muestra como tal: negrita, cursiva, `código`, enlaces como su texto, listas con
-viñetas y numeradas, encabezados, citas y bloques de código), y después la conversación: los comentarios que no están sobre código y las
-revisiones ya enviadas, de la más antigua a la más reciente, cada una con su veredicto (`aprobada`, `con cambios solicitados`, `comentada`,
-`descartada`). En GitLab los veredictos son sus aprobaciones. Debajo, la caja de respuesta: haz clic en ella o pulsa **`c`**
-para escribir un comentario en la conversación. **Este se publica al instante**, y la caja lo dice.
+El Resumen es **la conversación de la solicitud**, la misma línea de tiempo y la misma caja de comentario que tiene un
+issue ([Conversaciones](hosting-integration.md#5c-conversaciones)): primero la descripción (*abrió esto*), y después los
+comentarios, los hilos sobre código con su fragmento de diff, las revisiones enviadas con su veredicto (`aprobada`,
+`con cambios solicitados`, `comentada`, `descartada`; en GitLab los veredictos son sus aprobaciones) y los eventos, de la más
+antigua a la más reciente, en la ventana de lo más nuevo con **Cargar anteriores** arriba. La caja de comentario está
+acoplada bajo la línea de tiempo (**Comentario nuevo**): **Escribir**, **Previa** y **Dividida**, **Cancelar** y **Enviar**.
+**Un comentario publicado aquí va al host al instante** (nada queda pendiente: los comentarios pendientes son los que están
+sobre código, que se envían con la revisión), aparece en la lista enseguida y ocupa su lugar cuando el host responde; si el
+host lo rechaza, la caja se abre de nuevo con tu texto y el motivo.
 
-La caja de comentario (también la de una respuesta, la de un comentario sobre una línea y la del resumen de **Finalizar revisión**) es el editor de Markdown compartido con [la vista de conversación](hosting-integration.md#escribir): **Escribir**, **Previa** (`Alt+P`) y **Dividida** (`Alt+L`, en una ventana de 100 columnas), `Ctrl+Enter` (también `Ctrl+S`, `Alt+Enter`) envía, y donde la IA está activada `Alt+E` abre **Escribir con IA** ([el capítulo de IA](ai.md#ayuda-para-escribir-en-un-host)). La vista previa muestra el texto como lo mostrará el host, referencias incluidas (`#7`, `!12`, `ABC-12`, ids de commit); un texto sin enviar se conserva por solicitud. El texto de la descripción y de la conversación usa el mismo renderizador, así que Markdown, tablas, avisos y referencias se ven igual aquí y en la vista de conversación de un issue. Citar, editar o eliminar un comentario ya publicado, y las notas internas, pertenecen a la vista de conversación de los issues y de las solicitudes en hosts sin revisión (ver [Conversaciones](hosting-integration.md#5c-conversaciones)); aquí solo se pueden editar tus comentarios pendientes.
+Las teclas son las de la vista de conversación: **`Up`** / **`Down`** (y `Ctrl+J` / `Ctrl+K`) se mueven entre entradas,
+**`r`** responde en el hilo de la entrada seleccionada, **`Q`** la cita en un comentario nuevo, **`c`** escribe un comentario
+nuevo, **`e`** / **`d`** editan y eliminan tus propios comentarios (antes de eliminar se pregunta), **`l`** o `Enter` abre los
+enlaces de una entrada, **`g`** su diagrama, **`y`** copia su dirección, **`o`** la abre en el navegador, **`n`** va a la
+siguiente entrada sin leer, **`v`** muestra u oculta los eventos, **`m`** carga entradas anteriores, `Tab` va entre la línea
+de tiempo y la caja, y **Nota interna** (`Alt+I`) está en los hosts que tienen esas notas. Los botones de la entrada
+seleccionada (**Responder**, **Citar**, **Editar**, **Eliminar**, **Enlaces**) hacen lo mismo, y la paleta tiene las filas
+*Conversación: ...* junto a las *Revisión: ...*. Antes de abrir un enlace se pregunta, como en toda la revisión.
+
+Donde una tecla de la conversación y una de la revisión coinciden, la letra en esta página es la de la conversación: `l`
+(etiquetas), `m` (hito), `Q` (abandonar, de Gerrit), `e` / `d`, `r`. Las etiquetas, el hito y abandonar siguen en los botones
+de la cabecera y en la paleta; `a` (asignados), `p` (revisores), `f` (**Terminar revisión**), `b` (**Checkout**), `P`, `D`,
+`U` y `Alt+1` / `Alt+2` / `Alt+3` conservan aquí su significado. Mientras la caja tiene el teclado, todas las teclas son de la
+caja, salvo `Alt+1` / `Alt+2` / `Alt+3`; `Esc` devuelve el teclado a la línea de tiempo y un segundo `Esc` cierra la revisión.
+
+Un comentario escrito en otra ventana o con la CLI aparece aquí por sí solo: cada escritura de GitPoulpi (esta ventana
+incluida) avisa a la sesión, y las ventanas que muestran la misma solicitud lo leen de nuevo.
+
+La caja de comentario es el editor de Markdown compartido con [la vista de conversación](hosting-integration.md#escribir)
+(también la de una respuesta a un hilo, la de un comentario sobre una línea y la del resumen de **Terminar revisión**):
+`Ctrl+Enter` (también `Ctrl+S`, `Alt+Enter`) envía, y donde la IA está activada `Alt+E` abre **Escribir con IA**
+([el capítulo de IA](ai.md#ayuda-para-escribir-en-un-host)). La vista previa muestra el texto como lo mostrará el host,
+referencias incluidas (`#7`, `!12`, `ABC-12`, ids de commit); un texto sin enviar se conserva por solicitud.
 
 ### Archivos
 
@@ -229,17 +255,18 @@ Las sugerencias **no son comentarios**. Se muestran en dos sitios:
   tres botones: **Aceptar**, **Editar** y **Descartar**. Una sugerencia sobre una línea que el diff no muestra se
   conserva, nunca se pierde: se lista tras los hunks bajo *Sugerencias de la IA sobre todo el archivo* y, una vez
   aceptada, cae en la primera línea cambiada del archivo con las palabras *(sobre la línea N)* delante.
-- **En el Resumen**, bajo la descripción: el resumen, y después la lista con los mismos botones y **Aceptar todas** /
-  **Descartar todas**.
+- **En el Resumen**, en un bloque sobre la conversación (solo después de una ejecución): el resumen, y después la lista con los
+  mismos botones y **Aceptar todas** / **Descartar todas**.
 
 **Aceptar** (`y`) convierte una sugerencia en un **comentario pendiente** corriente (aún puedes editarlo o eliminarlo);
 **Editar** (`w`) abre la caja de comentario con las palabras del modelo primero y acepta lo que dejes; **Descartar** (`n`)
 la tira. **Aceptar todas** (`A`) solo rellena la lista de pendientes. En la página Archivos las teclas actúan sobre la
-sugerencia bajo el cursor, en el Resumen sobre la primera de la lista. **Usar resumen de la IA** (`i`, o el botón
+sugerencia bajo el cursor, en el Resumen sobre la primera de la lista (`y` y `n` vuelven a ser *Copiar enlace* y *Siguiente sin leer* de la conversación
+cuando la lista queda vacía). **Usar resumen de la IA** (`i`, o el botón
 del formulario Terminar revisión) pone el resumen del modelo en el texto de la revisión; nunca se inserta solo.
 **No se envía nada al host hasta que envías la revisión.**
 
-El Resumen muestra el borrador como una tarjeta sobre las sugerencias: la etiqueta del veredicto, el texto de la revisión y tres
+El Resumen muestra el borrador como una tarjeta al principio de ese bloque, sobre las sugerencias: la etiqueta del veredicto, el texto de la revisión y tres
 botones.
 
 - **✦ Usar borrador...** (`u`) acepta cada sugerencia abierta como comentario pendiente y abre *Terminar revisión* ya
@@ -260,7 +287,7 @@ Enviar la revisión gasta el borrador.
 |---|---|---|
 | Resumen / Archivos / commits | `Alt+1` / `Alt+2` / `Alt+3` | *Revisión: Mostrar resumen*, *Mostrar archivos*, *Mostrar commits* |
 | Comentar la línea o el rango | `c` | *Revisión: Comentar la línea...* |
-| Comentar en la conversación | `c` en el Resumen, `C` | *Revisión: Comentar en la conversación...* |
+| Comentar en la conversación | `c` en el Resumen, `C` | *Revisión: Comentar en la conversación...* (abre la caja del Resumen), *Conversación: Comentario nuevo* |
 | Responder al hilo | `r` | *Revisión: Responder al hilo...* |
 | Resolver o reabrir | `x` | *Revisión: Resolver o reabrir el hilo* |
 | Plegar o desplegar un hilo | `z` | *Revisión: Plegar o desplegar el hilo* |

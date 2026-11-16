@@ -152,7 +152,7 @@ activado por defecto). Esa pestaña se cierra cuando se elimina el worktree.
 La pestaña Inicio es el gestor de repositorios. Tiene cuatro secciones:
 **REPOSITORIOS ABIERTOS**, **FAVORITOS**, **REPOSITORIOS RECIENTES** y **TODOS LOS
 REPOSITORIOS**. Cada fila muestra la rama, los recuentos de adelantados y
-atrasados y el número de cambios. Cada fila tiene una estrella (favorito),
+atrasados y el número de cambios, y después la ruta de la carpeta cuando hay sitio: abreviada con `~` y cortada por el medio cuando es estrecho, nunca empuja el nombre, el propietario ni la rama. Cada fila tiene una estrella (favorito),
 **Abrir** o **Ir a**, **Cerrar** o **Quitar**, y un menú `⋮`.
 
 Arriba: **Examinar**, **Clonar**, **Init**, un cuadro de búsqueda, **Contraer
@@ -160,7 +160,7 @@ todo** y **Expandir todo**. Una carpeta que ya no existe sale sola de *Recientes
 y de *Todos*. Un favorito que falta se queda, con un botón **Quitar**. **Quitar**
 nunca borra nada del disco.
 
-Teclas: `Enter` abrir, `f` favorito, `x` cerrar o quitar, `.` menú, `/` buscar,
+Teclas: `Enter` abrir, `f` favorito, `x` cerrar o quitar, `y` copiar la ruta, `o` abrir en la herramienta predeterminada (el **Abrir en** del menú `⋮` elige otra), `.` menú, `/` buscar,
 `Space` plegar una sección, `Esc` volver a tu pestaña.
 `Ctrl+N` muestra una insignia en el campo de búsqueda, cada sección y cada botón: pulsa el carácter de una insignia para enfocarla
 o pulsarla (consulta [Insignias](keybindings.md#insignias)).
@@ -265,7 +265,7 @@ próximo inicio.
 
 Una fila por commit, el más reciente primero. Haz clic derecho en la cabecera para
 mostrar u ocultar columnas. Arrastra el borde entre dos cabeceras para cambiar el
-tamaño de una columna. Arrastra una cabecera para mover la columna.
+tamaño de una columna. Arrastra una cabecera para mover la columna. Los anchos pertenecen al repositorio: se guardan con él y vuelven al reabrirlo, y un repositorio abierto por primera vez tiene todas las columnas ajustadas a lo que muestra el Log (*Ajustar todas las columnas a su contenido* lo hace de nuevo, *Restablecer los anchos de las columnas* vuelve a los anchos automáticos, que se conservan).
 
 El panel no tiene título: los encabezados de columna dicen lo que es. En un commit sin ref, la fila bajo el puntero muestra una píldora tenue con el nombre de la rama a la que pertenece (se desactiva con **Mostrar una rama fantasma en el commit bajo el puntero** en Ajustes > Log y grafo).
 

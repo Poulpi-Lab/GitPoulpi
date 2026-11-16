@@ -18,6 +18,8 @@ pub(crate) fn is_optimistic(action: &Action) -> bool {
             | Action::UnstageFile(_)
             | Action::StageAll
             | Action::UnstageAll
+            | Action::StagePaths { .. }
+            | Action::UnstagePaths { .. }
             | Action::StageFolder(_)
             | Action::UnstageFolder(_)
     )
@@ -26,6 +28,7 @@ pub(crate) fn is_optimistic(action: &Action) -> bool {
 enum Scope<'a> {
     Path(&'a Path),
     Folder(&'a Path),
+    Paths(&'a [std::path::PathBuf]),
     All,
 }
 
@@ -34,6 +37,7 @@ impl Scope<'_> {
         match self {
             Scope::Path(p) => path == *p,
             Scope::Folder(dir) => path.starts_with(dir),
+            Scope::Paths(ps) => ps.iter().any(|p| path.starts_with(p)),
             Scope::All => true,
         }
     }
@@ -47,6 +51,8 @@ pub(crate) fn apply(tree: &mut WorkingTree, action: &Action) -> bool {
         Action::UnstageFile(p) => (false, Scope::Path(p)),
         Action::StageFolder(p) => (true, Scope::Folder(p)),
         Action::UnstageFolder(p) => (false, Scope::Folder(p)),
+        Action::StagePaths { paths, .. } => (true, Scope::Paths(paths)),
+        Action::UnstagePaths { paths, .. } => (false, Scope::Paths(paths)),
         Action::StageAll => (true, Scope::All),
         Action::UnstageAll => (false, Scope::All),
         _ => return false,

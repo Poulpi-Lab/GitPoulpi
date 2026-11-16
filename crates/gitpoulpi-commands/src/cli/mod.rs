@@ -331,6 +331,10 @@ pub enum Commands {
         /// Comma-separated line indices within `--hunk`.
         #[arg(long)]
         lines: Option<String>,
+        /// Several paths (files or folders) as ONE operation: one journal
+        /// entry, one `undo` step (a moved file is its old and new path).
+        #[arg(long, num_args = 1.., conflicts_with_all = ["folder", "hunk", "lines", "all"])]
+        paths: Vec<String>,
         #[arg(long)]
         all: bool,
         /// Stage files that look sensitive (a private key, a `.env`, a
@@ -348,6 +352,10 @@ pub enum Commands {
         hunk: Option<u32>,
         #[arg(long)]
         lines: Option<String>,
+        /// Several paths (files or folders) as ONE operation: one journal
+        /// entry, one `undo` step (a moved file is its old and new path).
+        #[arg(long, num_args = 1.., conflicts_with_all = ["folder", "hunk", "lines", "all"])]
+        paths: Vec<String>,
         #[arg(long)]
         all: bool,
     },

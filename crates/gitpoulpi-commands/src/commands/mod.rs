@@ -557,10 +557,11 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
             folder,
             hunk,
             lines,
+            paths,
             all,
             allow_sensitive,
         } => {
-            let target = stage_target(file, folder, hunk, lines, all)?;
+            let target = stage_target(file, folder, hunk, lines, paths, all)?;
             let kind = stage_kind(&target, true);
             let answer = session
                 .call_typed::<()>(
@@ -584,9 +585,10 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
             folder,
             hunk,
             lines,
+            paths,
             all,
         } => {
-            let target = stage_target(file, folder, hunk, lines, all)?;
+            let target = stage_target(file, folder, hunk, lines, paths, all)?;
             let kind = stage_kind(&target, false);
             session
                 .call::<()>(kind, json!({ "target": target }))
@@ -1597,8 +1599,14 @@ fn stage_target(
     folder: Option<String>,
     hunk: Option<u32>,
     lines: Option<String>,
+    paths: Vec<String>,
     all: bool,
 ) -> Result<StageTarget, String> {
+    if !paths.is_empty() {
+        let mut all_paths: Vec<std::path::PathBuf> = file.into_iter().map(Into::into).collect();
+        all_paths.extend(paths.into_iter().map(std::path::PathBuf::from));
+        return Ok(StageTarget::Files(all_paths));
+    }
     if all {
         return Ok(StageTarget::All);
     }
@@ -1644,11 +1652,13 @@ fn discard_target(
     hunk: Option<u32>,
     lines: Option<String>,
 ) -> Result<Option<DiscardTarget>, String> {
-    Ok(match stage_target(Some(file), None, hunk, lines, false)? {
-        StageTarget::Hunk(path, hunk) => Some(DiscardTarget::Hunk(path, hunk)),
-        StageTarget::Line(path, selector) => Some(DiscardTarget::Line(path, selector)),
-        _ => None,
-    })
+    Ok(
+        match stage_target(Some(file), None, hunk, lines, Vec::new(), false)? {
+            StageTarget::Hunk(path, hunk) => Some(DiscardTarget::Hunk(path, hunk)),
+            StageTarget::Line(path, selector) => Some(DiscardTarget::Line(path, selector)),
+            _ => None,
+        },
+    )
 }
 
 /// The refusal of a stage that would add sensitive files, as the CLI and MCP
@@ -1682,12 +1692,12 @@ fn stage_kind(target: &StageTarget, staging: bool) -> OperationKind {
         (StageTarget::Folder(_), true) => OperationKind::StageFolder,
         (StageTarget::Hunk(..), true) => OperationKind::StageHunk,
         (StageTarget::Line(..), true) => OperationKind::StageLine,
-        (StageTarget::File(_), true) => OperationKind::StageFile,
+        (StageTarget::File(_) | StageTarget::Files(_), true) => OperationKind::StageFile,
         (StageTarget::All, false) => OperationKind::UnstageAll,
         (StageTarget::Folder(_), false) => OperationKind::UnstageFolder,
         (StageTarget::Hunk(..), false) => OperationKind::UnstageHunk,
         (StageTarget::Line(..), false) => OperationKind::UnstageLine,
-        (StageTarget::File(_), false) => OperationKind::UnstageFile,
+        (StageTarget::File(_) | StageTarget::Files(_), false) => OperationKind::UnstageFile,
     }
 }
 
@@ -1752,19 +1762,19 @@ mod tests {
     #[test]
     fn stage_target_covers_every_granularity() {
         assert_eq!(
-            stage_target(None, None, None, None, true).unwrap(),
+            stage_target(None, None, None, None, Vec::new(), true).unwrap(),
             StageTarget::All
         );
         assert_eq!(
-            stage_target(Some("a.txt".into()), None, None, None, false).unwrap(),
+            stage_target(Some("a.txt".into()), None, None, None, Vec::new(), false).unwrap(),
             StageTarget::File("a.txt".into())
         );
         assert_eq!(
-            stage_target(None, Some("src".into()), None, None, false).unwrap(),
+            stage_target(None, Some("src".into()), None, None, Vec::new(), false).unwrap(),
             StageTarget::Folder("src".into())
         );
         assert_eq!(
-            stage_target(Some("a.txt".into()), None, Some(2), None, false).unwrap(),
+            stage_target(Some("a.txt".into()), None, Some(2), None, Vec::new(), false).unwrap(),
             StageTarget::Hunk("a.txt".into(), HunkId(2))
         );
         assert_eq!(
@@ -1773,6 +1783,7 @@ mod tests {
                 None,
                 Some(2),
                 Some("0, 3".into()),
+                Vec::new(),
                 false
             )
             .unwrap(),
@@ -1784,8 +1795,16 @@ mod tests {
                 }
             )
         );
-        assert!(stage_target(None, None, None, None, false).is_err());
-        assert!(stage_target(Some("a.txt".into()), None, None, Some("1".into()), false).is_err());
+        assert!(stage_target(None, None, None, None, Vec::new(), false).is_err());
+        assert!(stage_target(
+            Some("a.txt".into()),
+            None,
+            None,
+            Some("1".into()),
+            Vec::new(),
+            false
+        )
+        .is_err());
     }
 
     #[test]

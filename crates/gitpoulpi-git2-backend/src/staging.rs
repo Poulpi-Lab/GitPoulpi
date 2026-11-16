@@ -25,7 +25,7 @@ fn index_path(path: &Path) -> String {
 pub fn handles(target: &StageTarget) -> bool {
     matches!(
         target,
-        StageTarget::File(_) | StageTarget::Folder(_) | StageTarget::All
+        StageTarget::File(_) | StageTarget::Folder(_) | StageTarget::Files(_) | StageTarget::All
     )
 }
 
@@ -34,32 +34,12 @@ pub fn stage(repo: &RepoRef, target: &StageTarget) -> Result<()> {
     let mut index = git.index().map_err(map_err)?;
     match target {
         StageTarget::File(path) | StageTarget::Folder(path) => {
-            let rel = index_path(path);
-            let full = repo.root.join(&rel);
-            let on_disk = std::fs::symlink_metadata(&full).ok();
-            match on_disk {
-                Some(meta) if meta.is_dir() => {
-                    // A folder (or a file target that is one): `git add -A <dir>`.
-                    add_dirty(&git, &mut index, Some(&rel))?;
-                }
-                Some(_) => {
-                    index.add_path(Path::new(&rel)).map_err(map_err)?;
-                }
-                None => {
-                    // Gone from disk: stage the deletion if the index (or,
-                    // for a folder, anything under it) holds it.
-                    let known = index.get_path(Path::new(&rel), 0).is_some()
-                        || index.iter().any(|e| {
-                            let p = String::from_utf8_lossy(&e.path);
-                            p.starts_with(&format!("{rel}/"))
-                        });
-                    if !known {
-                        return Err(Error::Backend(format!(
-                            "git2: pathspec '{rel}' did not match any files"
-                        )));
-                    }
-                    index.update_all([rel.as_str()], None).map_err(map_err)?;
-                }
+            stage_path(&git, &mut index, repo, path)?;
+        }
+        StageTarget::Files(paths) => {
+            // One index, one write: all of them or (on an error) none.
+            for path in paths {
+                stage_path(&git, &mut index, repo, path)?;
             }
         }
         StageTarget::All => {
@@ -72,6 +52,43 @@ pub fn stage(repo: &RepoRef, target: &StageTarget) -> Result<()> {
         }
     }
     index.write().map_err(map_err)
+}
+
+/// Stages one file or folder spec into `index` (no write).
+fn stage_path(
+    git: &git2::Repository,
+    index: &mut git2::Index,
+    repo: &RepoRef,
+    path: &Path,
+) -> Result<()> {
+    let rel = index_path(path);
+    let full = repo.root.join(&rel);
+    let on_disk = std::fs::symlink_metadata(&full).ok();
+    match on_disk {
+        Some(meta) if meta.is_dir() => {
+            // A folder (or a file target that is one): `git add -A <dir>`.
+            add_dirty(git, index, Some(&rel))?;
+        }
+        Some(_) => {
+            index.add_path(Path::new(&rel)).map_err(map_err)?;
+        }
+        None => {
+            // Gone from disk: stage the deletion if the index (or,
+            // for a folder, anything under it) holds it.
+            let known = index.get_path(Path::new(&rel), 0).is_some()
+                || index.iter().any(|e| {
+                    let p = String::from_utf8_lossy(&e.path);
+                    p.starts_with(&format!("{rel}/"))
+                });
+            if !known {
+                return Err(Error::Backend(format!(
+                    "git2: pathspec '{rel}' did not match any files"
+                )));
+            }
+            index.update_all([rel.as_str()], None).map_err(map_err)?;
+        }
+    }
+    Ok(())
 }
 
 /// Above this many dirty paths one `git add` process (which hashes the
@@ -133,9 +150,10 @@ fn add_dirty(git: &git2::Repository, index: &mut git2::Index, dir: Option<&str>)
 }
 
 pub fn unstage(repo: &RepoRef, target: &StageTarget) -> Result<()> {
-    let spec = match target {
-        StageTarget::File(path) | StageTarget::Folder(path) => index_path(path),
-        StageTarget::All => "*".to_string(),
+    let specs_wanted: Vec<String> = match target {
+        StageTarget::File(path) | StageTarget::Folder(path) => vec![index_path(path)],
+        StageTarget::Files(paths) => paths.iter().map(|p| index_path(p)).collect(),
+        StageTarget::All => vec!["*".to_string()],
         StageTarget::Hunk(..) | StageTarget::Line(..) => {
             return Err(Error::Unsupported {
                 operation: "Git2Backend::unstage(Hunk/Line) - dispatched via decorator fallback",
@@ -147,11 +165,11 @@ pub fn unstage(repo: &RepoRef, target: &StageTarget) -> Result<()> {
     match head {
         Ok(head) => {
             let commit = head.peel(git2::ObjectType::Commit).map_err(map_err)?;
-            let specs = if matches!(target, StageTarget::File(_)) {
-                // An explicit path is reset like `git restore --staged` does.
-                vec![spec.clone()]
+            let specs = if matches!(target, StageTarget::File(_) | StageTarget::Files(_)) {
+                // Explicit paths are reset like `git restore --staged` does.
+                specs_wanted.clone()
             } else {
-                unmerged_free_specs(&git, &spec)?
+                unmerged_free_specs(&git, &specs_wanted[0])?
             };
             if specs.is_empty() {
                 return Ok(());
@@ -162,7 +180,9 @@ pub fn unstage(repo: &RepoRef, target: &StageTarget) -> Result<()> {
         Err(e) if e.code() == git2::ErrorCode::UnbornBranch => {
             // No HEAD to restore from: unstaging empties the entries.
             let mut index = git.index().map_err(map_err)?;
-            index.remove_all([spec.as_str()], None).map_err(map_err)?;
+            index
+                .remove_all(specs_wanted.iter().map(String::as_str), None)
+                .map_err(map_err)?;
             index.write().map_err(map_err)
         }
         Err(e) => Err(map_err(e)),

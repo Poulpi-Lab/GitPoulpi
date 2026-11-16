@@ -114,6 +114,23 @@ fn slash(path: &Path) -> String {
     path.to_string_lossy().replace('\\', "/")
 }
 
+/// The label of a multi-path stage or unstage. A rename (`"rename": true`
+/// in the arguments, the paths `[new, old]`) reads `Stage rename old -> new`.
+fn files_label(request: &Request, verb: &str, paths: &[PathBuf]) -> String {
+    let rename = request
+        .args
+        .get("rename")
+        .and_then(|r| r.as_bool())
+        .unwrap_or(false);
+    match paths {
+        [] => format!("{verb} nothing"),
+        [one] => format!("{verb} {}", slash(one)),
+        [new, old] if rename => format!("{verb} rename {} -> {}", slash(old), slash(new)),
+        [a, b] => format!("{verb} {} and {}", slash(a), slash(b)),
+        many => format!("{verb} {} paths", many.len()),
+    }
+}
+
 /// `Stage a.txt`, `Discard 3 files`, ... The words the toolbar shows.
 pub fn label(request: &Request) -> Option<String> {
     if !is_snapshot_op(request) {
@@ -136,6 +153,7 @@ pub fn label(request: &Request) -> Option<String> {
         return Some(match stage_target(request) {
             Some(StageTarget::File(p)) => format!("{verb} {}", slash(&p)),
             Some(StageTarget::Folder(p)) => format!("{verb} folder {}", slash(&p)),
+            Some(StageTarget::Files(paths)) => files_label(request, verb, &paths),
             Some(StageTarget::Hunk(p, _)) => format!("{verb} a hunk of {}", slash(&p)),
             Some(StageTarget::Line(p, _)) => format!("{verb} lines of {}", slash(&p)),
             Some(StageTarget::All) | None => format!("{verb} all changes"),

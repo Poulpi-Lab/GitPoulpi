@@ -140,6 +140,10 @@ pub fn scan(
             .into_iter()
             .filter(|p| p.starts_with(dir))
             .collect(),
+        StageTarget::Files(wanted) => changed(backend, repo)?
+            .into_iter()
+            .filter(|p| wanted.iter().any(|w| p.starts_with(w)))
+            .collect(),
         StageTarget::All => changed(backend, repo)?,
         // Hunks and lines are parts of a file that is already being worked on.
         StageTarget::Hunk(..) | StageTarget::Line(..) => return Ok(Vec::new()),

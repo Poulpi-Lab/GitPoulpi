@@ -131,6 +131,10 @@ pub enum StageTarget {
     Hunk(PathBuf, HunkId),
     File(PathBuf),
     Folder(PathBuf),
+    /// Several paths (files or folders) as ONE operation: one index write,
+    /// one journal entry, one undo step. A moved file is two paths for git
+    /// (the deleted old one and the new one) and stages or unstages as one.
+    Files(Vec<PathBuf>),
     All,
 }
 

@@ -14,6 +14,14 @@ pub fn stage(repo: &RepoRef, target: &StageTarget) -> Result<()> {
         StageTarget::Folder(path) => {
             run(&repo.root, &["add", "--", &path_str(path)])?;
         }
+        StageTarget::Files(paths) => {
+            if !paths.is_empty() {
+                let mut args = vec!["add".to_string(), "--".to_string()];
+                args.extend(paths.iter().map(|p| path_str(p)));
+                let args: Vec<&str> = args.iter().map(String::as_str).collect();
+                run(&repo.root, &args)?;
+            }
+        }
         StageTarget::All => {
             run(&repo.root, &["add", "-A"])?;
         }
@@ -143,6 +151,13 @@ pub fn unstage(repo: &RepoRef, target: &StageTarget) -> Result<()> {
         StageTarget::File(path) => {
             unstage_paths(repo, &path_str(path))?;
         }
+        StageTarget::Files(paths) => {
+            if !paths.is_empty() {
+                let specs: Vec<String> = paths.iter().map(|p| path_str(p)).collect();
+                let specs: Vec<&str> = specs.iter().map(String::as_str).collect();
+                unstage_specs(repo, &specs)?;
+            }
+        }
         // A folder or everything never reaches an unmerged path: it has no
         // staged change to take back, and `git restore --staged` would
         // reset it to `HEAD`, dropping its conflict stages (the whole
@@ -168,16 +183,22 @@ pub fn unstage(repo: &RepoRef, target: &StageTarget) -> Result<()> {
 /// `git restore --staged -- <spec>`; on an unborn branch (no `HEAD` to
 /// restore from) it empties the index entries for `spec` instead.
 fn unstage_paths(repo: &RepoRef, spec: &str) -> Result<()> {
-    match run(&repo.root, &["restore", "--staged", "--", spec]) {
+    unstage_specs(repo, &[spec])
+}
+
+/// [`unstage_paths`] for several pathspecs in one git call (atomic).
+fn unstage_specs(repo: &RepoRef, specs: &[&str]) -> Result<()> {
+    let mut restore = vec!["restore", "--staged", "--"];
+    restore.extend_from_slice(specs);
+    match run(&repo.root, &restore) {
         // Git 2.55 quotes it: "could not resolve 'HEAD'".
         Err(Error::Git { message: msg, .. })
             if msg.contains("could not resolve HEAD")
                 || msg.contains("could not resolve 'HEAD'") =>
         {
-            run(
-                &repo.root,
-                &["rm", "-r", "-q", "--cached", "--ignore-unmatch", "--", spec],
-            )?;
+            let mut rm = vec!["rm", "-r", "-q", "--cached", "--ignore-unmatch", "--"];
+            rm.extend_from_slice(specs);
+            run(&repo.root, &rm)?;
             Ok(())
         }
         other => other.map(|_| ()),

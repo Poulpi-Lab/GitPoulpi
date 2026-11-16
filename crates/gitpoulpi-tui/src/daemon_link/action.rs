@@ -44,6 +44,17 @@ pub enum Action {
     },
     StageFile(PathBuf),
     UnstageFile(PathBuf),
+    /// Several paths staged or unstaged as ONE operation (one journal
+    /// entry, one undo step): a moved file (`rename`: `[new, old]`) or a
+    /// folder plus the rename partner outside it (`rename_pairs`).
+    StagePaths {
+        paths: Vec<PathBuf>,
+        rename: bool,
+    },
+    UnstagePaths {
+        paths: Vec<PathBuf>,
+        rename: bool,
+    },
     StageAll,
     UnstageAll,
     /// Stage/unstage a whole directory at once - what clicking a folder
@@ -570,6 +581,14 @@ impl Action {
                 OperationKind::UnstageFile,
                 json!({ "target": StageTarget::File(path.clone()) }),
             ),
+            Action::StagePaths { paths, rename } => (
+                OperationKind::StageFile,
+                json!({ "target": StageTarget::Files(paths.clone()), "rename": rename }),
+            ),
+            Action::UnstagePaths { paths, rename } => (
+                OperationKind::UnstageFile,
+                json!({ "target": StageTarget::Files(paths.clone()), "rename": rename }),
+            ),
             Action::StageAll => (
                 OperationKind::StageAll,
                 json!({ "target": StageTarget::All }),
@@ -867,6 +886,8 @@ impl Action {
             Action::UnstageFile(p) => l::act_unstaging_file(name(p)),
             Action::StageFolder(p) => l::act_staging_folder(name(p)),
             Action::UnstageFolder(p) => l::act_unstaging_folder(name(p)),
+            Action::StagePaths { .. } => plain(l::ACT_STAGING),
+            Action::UnstagePaths { .. } => plain(l::ACT_UNSTAGING),
             Action::StageAll => plain(l::ACT_STAGING_ALL),
             Action::UnstageAll => plain(l::ACT_UNSTAGING_ALL),
             Action::StageHunk { .. } | Action::StageLines { .. } => plain(l::ACT_STAGING),

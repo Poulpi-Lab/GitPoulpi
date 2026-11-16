@@ -7,12 +7,12 @@
 //! so the mouse, the keys, the menu and the palette all behave alike.
 //!
 //! - Stage (unstaged pair): stage the new path and the old one (git adds the
-//!   deletion), two journal entries.
-//! - Unstage (a staged rename): unstage both paths.
+//!   deletion): ONE `StagePaths [new, old]`, one journal entry.
+//! - Unstage (a staged rename): ONE `UnstagePaths [new, old]`.
 //! - Discard: ONE `DiscardPaths [new, old]`: the old file is restored, the
 //!   new one removed, one confirmation and one undo entry.
 //! - Stage/Unstage Folder: a pair split across the folder's edge brings the
-//!   path outside the folder along.
+//!   path outside the folder along, in the same one request.
 
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
@@ -69,11 +69,17 @@ impl RenamePairs {
         }
         match action {
             Action::StageFile(p) => match self.unstaged.get(&p) {
-                Some(old) => vec![Action::StageFile(p), Action::StageFile(old.clone())],
+                Some(old) => vec![Action::StagePaths {
+                    paths: vec![p, old.clone()],
+                    rename: true,
+                }],
                 None => vec![Action::StageFile(p)],
             },
             Action::UnstageFile(p) => match self.staged.get(&p) {
-                Some(old) => vec![Action::UnstageFile(p), Action::UnstageFile(old.clone())],
+                Some(old) => vec![Action::UnstagePaths {
+                    paths: vec![p, old.clone()],
+                    rename: true,
+                }],
                 None => vec![Action::UnstageFile(p)],
             },
             Action::DiscardFile { path, source } => match self.unstaged.get(&path) {
@@ -91,22 +97,28 @@ impl RenamePairs {
                 vec![Action::DiscardPaths(paths)]
             }
             Action::StageFolder(f) => {
-                let mut out = vec![Action::StageFolder(f.clone())];
-                out.extend(
-                    outside_partners(&self.unstaged, &f)
-                        .into_iter()
-                        .map(Action::StageFile),
-                );
-                out
+                let partners = outside_partners(&self.unstaged, &f);
+                if partners.is_empty() {
+                    return vec![Action::StageFolder(f)];
+                }
+                let mut paths = vec![f];
+                paths.extend(partners);
+                vec![Action::StagePaths {
+                    paths,
+                    rename: false,
+                }]
             }
             Action::UnstageFolder(f) => {
-                let mut out = vec![Action::UnstageFolder(f.clone())];
-                out.extend(
-                    outside_partners(&self.staged, &f)
-                        .into_iter()
-                        .map(Action::UnstageFile),
-                );
-                out
+                let partners = outside_partners(&self.staged, &f);
+                if partners.is_empty() {
+                    return vec![Action::UnstageFolder(f)];
+                }
+                let mut paths = vec![f];
+                paths.extend(partners);
+                vec![Action::UnstagePaths {
+                    paths,
+                    rename: false,
+                }]
             }
             other => vec![other],
         }
@@ -164,10 +176,10 @@ mod tests {
         let out = pairs().expand(Action::StageFile("sub/new.rs".into()));
         assert_eq!(
             out,
-            vec![
-                Action::StageFile("sub/new.rs".into()),
-                Action::StageFile("old.rs".into())
-            ]
+            vec![Action::StagePaths {
+                paths: vec!["sub/new.rs".into(), "old.rs".into()],
+                rename: true
+            }]
         );
         // The deleted file's own row is not listed.
         assert!(pairs()
@@ -180,10 +192,10 @@ mod tests {
         let out = pairs().expand(Action::UnstageFile("kept.rs".into()));
         assert_eq!(
             out,
-            vec![
-                Action::UnstageFile("kept.rs".into()),
-                Action::UnstageFile("was.rs".into())
-            ]
+            vec![Action::UnstagePaths {
+                paths: vec!["kept.rs".into(), "was.rs".into()],
+                rename: true
+            }]
         );
     }
 
@@ -215,10 +227,10 @@ mod tests {
         let out = pairs().expand(Action::StageFolder("sub".into()));
         assert_eq!(
             out,
-            vec![
-                Action::StageFolder("sub".into()),
-                Action::StageFile("old.rs".into())
-            ]
+            vec![Action::StagePaths {
+                paths: vec!["sub".into(), "old.rs".into()],
+                rename: false
+            }]
         );
     }
 

@@ -5,7 +5,7 @@
 
 use super::head_oid;
 use crate::TestRepoBuilder;
-use gitpoulpi_core::domain::{DiffTarget, FileStatus, RepoRef, StatusEntry};
+use gitpoulpi_core::domain::{DiffTarget, FileStatus, RepoRef, StageTarget, StatusEntry};
 use gitpoulpi_core::GitBackend;
 
 fn body() -> String {
@@ -192,4 +192,65 @@ pub fn check_commit_diff_shows_a_rename(backend: &dyn GitBackend) {
     assert_eq!(listed.files[0].path, diffs[0].path);
     assert_eq!(listed.files[0].status, FileStatus::Renamed);
     assert_eq!(listed.files[0].renamed_from, diffs[0].renamed_from);
+}
+
+/// Staging a move is ONE call over both paths (the new file and the old
+/// one's deletion): the index then holds a rename. Unstaging it is one call
+/// too and puts both entries back as they were.
+pub fn check_stage_and_unstage_a_move_as_one_target(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .commit_file("old.txt", &body(), "add")
+        .commit_file("keep.txt", "keep\n", "keep")
+        .build();
+    let repo_ref = repo.repo_ref();
+    std::fs::rename(repo.root().join("old.txt"), repo.root().join("moved.txt")).unwrap();
+    // A bystander change the target does not name stays unstaged.
+    std::fs::write(repo.root().join("keep.txt"), "changed\n").unwrap();
+
+    let both = StageTarget::Files(vec!["moved.txt".into(), "old.txt".into()]);
+    backend.stage(&repo_ref, &both).unwrap();
+    let files = status(backend, &repo_ref);
+    let moved = entry(&files, "moved.txt").expect("the new path is listed");
+    assert_eq!(moved.index, Some(FileStatus::Renamed), "{files:?}");
+    assert_eq!(moved.renamed_from.as_deref(), Some("old.txt".as_ref()));
+    let keep = entry(&files, "keep.txt").unwrap();
+    assert_eq!(keep.index, None, "the bystander is not staged");
+
+    backend.unstage(&repo_ref, &both).unwrap();
+    let files = status(backend, &repo_ref);
+    let moved = entry(&files, "moved.txt").expect("the new path is listed");
+    assert_eq!(moved.index, None, "{files:?}");
+    assert_eq!(moved.worktree, Some(FileStatus::Untracked));
+    assert_eq!(moved.renamed_from.as_deref(), Some("old.txt".as_ref()));
+    assert_eq!(
+        entry(&files, "old.txt").map(|e| (e.index, e.worktree)),
+        Some((None, Some(FileStatus::Deleted))),
+        "{files:?}"
+    );
+}
+
+/// A folder plus a partner outside it, in one target.
+pub fn check_stage_files_target_takes_folders_and_files(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .commit_file("old.txt", &body(), "add")
+        .build();
+    let repo_ref = repo.repo_ref();
+    std::fs::create_dir_all(repo.root().join("sub")).unwrap();
+    std::fs::rename(
+        repo.root().join("old.txt"),
+        repo.root().join("sub/moved.txt"),
+    )
+    .unwrap();
+    let target = StageTarget::Files(vec!["sub".into(), "old.txt".into()]);
+    backend.stage(&repo_ref, &target).unwrap();
+    let files = status(backend, &repo_ref);
+    let moved = entry(&files, "sub/moved.txt").expect("the new path is listed");
+    assert_eq!(moved.index, Some(FileStatus::Renamed), "{files:?}");
+    backend.unstage(&repo_ref, &target).unwrap();
+    let files = status(backend, &repo_ref);
+    assert_eq!(
+        entry(&files, "sub/moved.txt").map(|e| e.index),
+        Some(None),
+        "{files:?}"
+    );
 }

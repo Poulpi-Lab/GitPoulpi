@@ -139,6 +139,8 @@ macro_rules! for_each_contract_check {
             check_staged_rename_with_edits_diffs_against_the_old_file,
             check_unstaged_rename_pairs_the_deleted_and_the_untracked_file,
             check_unstaged_rename_with_edits_still_pairs,
+            check_stage_and_unstage_a_move_as_one_target,
+            check_stage_files_target_takes_folders_and_files,
             check_dissimilar_files_are_not_a_rename,
             check_commit_diff_shows_a_rename,
             check_diff_of_a_commit_is_against_its_first_parent,

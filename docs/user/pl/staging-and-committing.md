@@ -21,7 +21,7 @@ zmiany robocze:
 - **Pliki ze zmienioną nazwą lub przeniesione** to jeden wiersz, `nowa <- stara`, na obu listach
   (plik usunięty na dysku i nowy, w co najmniej 50% o tej samej treści, liczą się jako przeniesienie
   jeszcze przed stage). Stage, Unstage i Odrzuć działają na obie nazwy: stage dodaje usunięcie i nowy
-  plik, więc git widzi jedną zmianę nazwy. Otwarcie wiersza pokazuje diff treści względem starej
+  plik, więc git widzi jedną zmianę nazwy, i jest to JEDEN krok cofania (`Undo Stage rename stara -> nowa`). Otwarcie wiersza pokazuje diff treści względem starej
   nazwy, z nagłówkiem `stara -> nowa (podobieństwo N%)`; przeniesienie bez edycji mówi **Treść bez zmian**.
   To samo dotyczy plików commita, a `gitpoulpi status` / `gitpoulpi diff` zgłaszają `renamed_from`.
 - **Ścieżka** lub **Drzewo** (`m`) pokazuje pliki płasko albo w folderach. **Zwiń wszystko**
@@ -178,7 +178,8 @@ drugim.
 - **Pomiń hooki** (`Shift+H` albo **Commit: Przełącz pomijanie hooków** w palecie) tworzy commit
   bez uruchamiania hooków `pre-commit` i `commit-msg` repozytorium. Dotyczy jednego commita;
   **Ustawienia > Ustawienia repozytorium > Commit** sprawia, że opcja jest domyślnie
-  zaznaczona. Pokazywana, gdy wiersz ma miejsce.
+  zaznaczona. Na wąskim wierszu jej etykieta skraca się do **Bez hooków**, potem do samego
+  pola wyboru (jego podpowiedź je nazywa); nigdy nie znika.
 - `c` w panelu Status przenosi kursor do formularza. `Esc` go opuszcza.
 - `Ctrl+G c` i `Ctrl+G Enter` (**Git: Commit...** i **Git: Zrób commit zmian ze
   stage od razu** w palecie) to jedno polecenie, przycisk commita dostępny z
@@ -205,7 +206,11 @@ go edytować; nic nie jest zatwierdzane, dopóki nie naciśniesz przycisku commi
 **Skomponuj commity przez AI** leży na prawym końcu wiersza Popraw i kurczy się razem
 z prawym panelem zamiast znikać: pełna etykieta, potem **Skomponuj przez AI**, potem samo
 **`✦`**. Zachowuje kliknięcie, podpowiedź i klawisz (`Ctrl+G C`) przy każdej szerokości;
-etykiety Popraw i Pomiń hooki ustępują jemu, nigdy odwrotnie.
+etykieta Pomiń hooki ustępuje jemu (**Bez hooków**, potem samo pole), zanim on sam się skurczy.
+
+Przyciski **`✦`** (wygeneruj opis) i **`#`** (wstaw odwołanie do zgłoszenia) na prawym końcu
+wiersza podsumowania kurczą się tak samo: w wąskim panelu tracą marginesy, a potem zwijają się w jeden
+przycisk **`⋯`**, którego menu zawiera oba, więc żaden nigdy nie znika.
 
 ## Kompozytor commitów: podziel zmiany na commity
 

@@ -498,6 +498,8 @@ Widok na całe okno: nagłówek (stan, kto i kiedy to otworzył, etykiety, liczb
   jest najpierw konwertowany (zob. [Konwersja znaczników](#konwersja-znaczników)). Blok kodu `mermaid` dostaje
   przycisk **Otwórz diagram**, który pokazuje źródło diagramu w przewijanym podglądzie (`Enter` je kopiuje); paleta
   ma *Rozmowa: Otwórz diagram wpisu*. Wymaga to buildu z funkcjami `conversation` i `mermaid`.
+- W podsumowaniu przeglądu `ścieżka:linia` wątku w kodzie jest linkiem do kodu (`G`, *Rozmowa: Otwórz kod wątku*;
+  zob. [Przegląd](review.md)); w rozmowie otwartej osobno (zgłoszenie, wiersz Radaru) nie ma strony kodu, do której można przejść.
 - Widok czyta ponownie co 60 sekund i po `F5` (**Odśwież**).
 
 **Klawisze.** Każdy ma przycisk, wiersz menu lub wiersz palety (*Rozmowa: ...*), a `Ctrl+N` numeruje przyciski.

@@ -6,8 +6,8 @@
 use gitpoulpi_core::domain::short;
 use gitpoulpi_hosting::{ChecksState, MergeState, PullRequestState};
 use gitpoulpi_i18n::msg::hosting_ui as hosting;
-use gitpoulpi_i18n::msg::review_ai as ai_msg;
 use gitpoulpi_i18n::msg::item_view as item_msg;
+use gitpoulpi_i18n::msg::review_ai as ai_msg;
 use gitpoulpi_i18n::msg::review_view as msg;
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;

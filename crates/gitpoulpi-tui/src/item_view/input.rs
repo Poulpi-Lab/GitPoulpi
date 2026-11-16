@@ -86,7 +86,9 @@ impl ItemView {
             || self.focus == Focus::Composer;
         if !owned {
             let timeline_key = matches!(key.code, KeyCode::Tab | KeyCode::BackTab)
-                && !key.modifiers.intersects(KeyModifiers::CONTROL | KeyModifiers::ALT)
+                && !key
+                    .modifiers
+                    .intersects(KeyModifiers::CONTROL | KeyModifiers::ALT)
                 || self.conv.takes_key(&key);
             if !timeline_key {
                 return None;

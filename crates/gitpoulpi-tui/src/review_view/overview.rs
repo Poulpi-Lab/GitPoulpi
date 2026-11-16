@@ -112,7 +112,7 @@ impl ReviewView {
                 );
             }
             lines.push(L::Blank);
-        }        // The palette's "Open Link in Message" twin reaches every link of the block.
+        } // The palette's "Open Link in Message" twin reaches every link of the block.
         let mut urls: Vec<String> = Vec::new();
         for doc in &all_docs {
             for l in &doc.links {

@@ -7,15 +7,15 @@ use std::time::{Duration, Instant};
 
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
 use gitpoulpi_core::domain::{DiffLine, FileDiff, FileStatus, Hunk, HunkId, LineOrigin, Oid};
+use gitpoulpi_hosting::conversation::{
+    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
+    TimelinePage,
+};
 use gitpoulpi_hosting::{
     ChecksState, DiffSide, HostedProject, HostedSshKey, HostingClient, Integration,
     IntegrationKind, MergeState, NewPullRequest, PullRequestDetail, PullRequestState,
     PullRequestSummary, ReviewCapabilities, ReviewComment, ReviewEvent, ReviewFile, ReviewOutcome,
     ReviewState, ReviewSubmission, ReviewThread, SubmittedReview,
-};
-use gitpoulpi_hosting::conversation::{
-    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
-    TimelinePage,
 };
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
@@ -132,7 +132,9 @@ impl HostingClient for Fake {
         key: &ItemKey,
         comment_id: &str,
     ) -> gitpoulpi_hosting::Result<()> {
-        self.conv.delete_item_comment(project, key, comment_id).await
+        self.conv
+            .delete_item_comment(project, key, comment_id)
+            .await
     }
     async fn pull_request_detail(
         &self,
@@ -767,7 +769,8 @@ fn a_review_without_a_date_shows_no_dangling_separator() {
         .unwrap_or_else(|| panic!("no nora on:\n{s}"));
     assert!(nora.contains("approved"), "{nora}");
     assert!(
-        !nora.contains("nora \u{b7}") && !nora.trim_end_matches(['\u{2502}', ' ']).ends_with("nora"),
+        !nora.contains("nora \u{b7}")
+            && !nora.trim_end_matches(['\u{2502}', ' ']).ends_with("nora"),
         "a verdict, no dangling separator: {nora}"
     );
 }
@@ -2618,8 +2621,8 @@ mod md_composer {
     fn compose() -> ComposeBox {
         ComposeBox::new(
             ComposeFor::Reply {
-            thread_id: "T1".into(),
-        },
+                thread_id: "T1".into(),
+            },
             "Comment".into(),
             "about".into(),
             String::new(),

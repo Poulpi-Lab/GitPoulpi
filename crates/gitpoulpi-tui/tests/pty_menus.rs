@@ -294,40 +294,54 @@ fn a_menu_row_is_chosen_with_the_arrows_and_enter() {
     term.stop().unwrap();
 }
 
-/// The `⋯` overflow menu with another menu open: on today's code it
-/// closes every context menu (checked per kind, at 95 columns where the
-/// toolbar overflows yet every pane still shows); a single `OpenMenu`
-/// holds this by construction.
+/// The `⋯` overflow menu with a context menu open. The rule of every popup
+/// menu (`closes_on_press_outside`): a press that is not on one of its rows
+/// closes it and does nothing else, a toolbar button included, so the first
+/// click on `⋯` only closes the context menu (the `⋯` is not under it: the
+/// menu hangs from a pane row, below the toolbar) and a second one opens the
+/// overflow menu. Checked per kind at 90 columns, where the toolbar overflows
+/// yet every pane still shows and `Search` is hidden behind the `⋯` (wider,
+/// `Search` stays on the bar and the overflow menu would prove nothing).
 #[test]
 fn the_overflow_menu_versus_each_open_context_menu() {
     let repo = fixture();
-    let mut still_open = Vec::new();
+    let mut failures = Vec::new();
     for kind in Kind::ALL {
-        let (mut term, _c) = launch(&repo, &format!("pty-menus-overflow-{kind:?}"), 95);
+        let (mut term, _c) = launch(&repo, &format!("pty-menus-overflow-{kind:?}"), 90);
         open_by_mouse(&mut term, kind);
+        let before = term.screen();
+        assert!(
+            !before.contains("\u{2315} Search"),
+            "{kind:?}: Search must be hidden behind the overflow\n{}",
+            term.text()
+        );
         let (c, r) = term.wait_for_text(OVERFLOW, STEP).unwrap();
+        // The first press closes the context menu and nothing else.
         term.click(c, r).unwrap();
-        // Whatever happens, the overflow menu itself must open.
-        term.wait_for("the overflow menu", STEP, |s| s.contains("\u{2315} Search"))
-            .unwrap_or_else(|e| panic!("{kind:?}: {e}\n{}", term.text()));
-        // A frame read mid-write can still show the old menu's cells next
-        // to the new popup, so "still open" means it never goes away.
-        if term
-            .wait_for("the context menu to close", Duration::from_secs(3), |s| {
-                s.contains("\u{2315} Search") && !s.contains(kind.marker())
+        let closed = term.wait_for("the context menu closed", STEP, |s| {
+            !s.contains(kind.marker())
+        });
+        if closed.is_err() {
+            failures.push(format!("{kind:?}: the context menu stayed open"));
+        } else if term
+            .wait_for("no overflow menu yet", Duration::from_secs(1), |s| {
+                s.contains("\u{2315} Search")
             })
+            .is_ok()
+        {
+            failures.push(format!("{kind:?}: the first press opened the overflow"));
+        }
+        // The second press opens the overflow menu.
+        term.click(c, r).unwrap();
+        if term
+            .wait_for("the overflow menu", STEP, |s| s.contains("\u{2315} Search"))
             .is_err()
         {
-            still_open.push(format!("{kind:?}"));
+            failures.push(format!("{kind:?}: the second press did not open it"));
         }
         term.stop().unwrap();
     }
-    // Observed on today's code (see the assertion message when it moves).
-    assert_eq!(
-        still_open,
-        Vec::<String>::new(),
-        "the overflow menu left these context menus open"
-    );
+    assert_eq!(failures, Vec::<String>::new());
 }
 
 /// Menus do not stack (see `a_second_right_click_replaces_the_open_menu`):

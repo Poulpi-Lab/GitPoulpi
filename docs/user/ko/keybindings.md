@@ -373,10 +373,10 @@ stage_file = "z"
 | `reword` | `deeper` | 기록을 더 깊이 수정 | `Alt+H` |
 | `composer` | `commit` | 작성기에서 Commit | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | 이슈 참조 삽입 | `Alt+R` |
-| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
-| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
-| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
+| `md_editor` | `preview` | Markdown 편집기: 쓰기/미리보기 전환 | `Alt+P` |
+| `md_editor` | `split` | Markdown 편집기: 분할 보기 전환 | `Alt+L` |
+| `md_editor` | `submit` | Markdown 편집기: 텍스트 보내기 | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Markdown 편집기: AI로 쓰기 | `Alt+E` |
 | `dialog` | `browse` | 폴더 찾아보기 | `Ctrl+B` |
 | `dialog` | `sources` | 클론 소스로 이동 | `Alt+S` |
 | `dialog` | `submit` | Pull request 양식 제출 | `Ctrl+S` |
@@ -825,7 +825,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Radar: 고정 또는 해제 | `p` |
 | Radar: 미루기... | `z` |
 | Radar: 요청 리뷰... | `e` |
-| Radar: Open Issue Conversation | `i` |
+| Radar: 이슈 대화 열기 | `i` |
 | Radar: API로 리뷰 |  |
 | Radar: 클론 후 리뷰... |  |
 | Radar: 담당자 편집... |  |
@@ -967,30 +967,30 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 보드: 열 레이블 설정... | `c` |
 | 보드: 새로 고침 | `r` |
 | 보드: 닫기 | `Esc` |
-| Conversation: Back |  |
-| Conversation: Refresh | `F5` |
-| Conversation: Load Older Entries | `m` |
-| Conversation: Previous Entry | `Up` |
-| Conversation: Next Entry | `Down` |
-| Conversation: Next Unread Entry | `n` |
-| Conversation: Reply to Entry | `r` |
-| Conversation: Quote Entry | `Q` |
-| Conversation: New Comment | `c` |
-| Conversation: Links of Entry... | `l` |
-| Conversation: Open Diagram of Entry | `g` |
-| Conversation: Copy Link of Entry | `y` |
-| Conversation: Open in Browser | `o` |
-| Conversation: Edit Comment | `e` |
-| Conversation: Delete Comment | `d` |
-| Conversation: Show or Hide Events | `v` |
-| Conversation: Toggle Write and Preview |  |
-| Conversation: Toggle the Split View |  |
-| Conversation: Send the Comment |  |
-| Conversation: Toggle Internal Note |  |
-| Conversation: Close | `Esc` |
-| Markdown Editor: Write with AI |  |
-| Markdown Editor: Refresh the AI Context |  |
-| Hosting: Open Issue Conversation... |  |
+| 대화: 뒤로 |  |
+| 대화: 새로고침 | `F5` |
+| 대화: 이전 항목 불러오기 | `m` |
+| 대화: 이전 항목 | `Up` |
+| 대화: 다음 항목 | `Down` |
+| 대화: 다음 안 읽은 항목 | `n` |
+| 대화: 항목에 답글 | `r` |
+| 대화: 항목 인용 | `Q` |
+| 대화: 새 댓글 | `c` |
+| 대화: 항목의 링크... | `l` |
+| 대화: 항목의 다이어그램 열기 | `g` |
+| 대화: 항목의 링크 복사 | `y` |
+| 대화: 브라우저에서 열기 | `o` |
+| 대화: 댓글 편집 | `e` |
+| 대화: 댓글 삭제 | `d` |
+| 대화: 이벤트 표시/숨기기 | `v` |
+| 대화: 쓰기/미리보기 전환 |  |
+| 대화: 분할 보기 전환 |  |
+| 대화: 댓글 보내기 |  |
+| 대화: 내부 메모 전환 |  |
+| 대화: 닫기 | `Esc` |
+| Markdown 편집기: AI로 쓰기 |  |
+| Markdown 편집기: AI 컨텍스트 새로고침 |  |
+| 호스팅: 이슈 대화 열기... |  |
 | 리뷰: ✦ 리뷰 초안 작성... | `s` |
 | 리뷰: 제안 수락 | `y` |
 | 리뷰: 제안 편집 후 수락... | `w` |

@@ -192,6 +192,14 @@ pub enum HostingChange {
     Posted,
     Edited,
     Deleted,
+    /// The item was closed, reopened or moved to another status.
+    StateChanged,
+    /// A review was submitted or a code thread resolved.
+    Reviewed,
+    /// The item itself was edited (labels, assignees, milestone, ...).
+    Updated,
+    /// The item was created.
+    Created,
 }
 
 /// Args of `OperationKind::NotifyHostingChange` and the payload of
@@ -207,4 +215,9 @@ pub struct HostingChangeArgs {
     #[serde(default)]
     pub id: String,
     pub change: HostingChange,
+    /// Who made the change: a TUI process names itself here so the window
+    /// that wrote does not refresh a second time when the daemon echoes the
+    /// event back. Empty for the CLI and the MCP server.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub origin: String,
 }

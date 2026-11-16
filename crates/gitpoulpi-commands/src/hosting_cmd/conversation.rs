@@ -409,6 +409,7 @@ fn change_args(target: &RepoTarget, key: &ItemKey, change: HostingChange) -> Res
         number: key.number,
         id: key.id.clone(),
         change,
+        origin: String::new(),
     })
     .map_err(|e| e.to_string())
 }

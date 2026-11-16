@@ -7083,26 +7083,6 @@ finish = "Dokončit kontrolu"
 finish_with = { one = "Dokončit kontrolu ({n})", few = "Dokončit kontrolu ({n})", other = "Dokončit kontrolu ({n})" }
 # context: box title of the Overview page
 overview_title = "Popis a konverzace"
-# context: heading: the request's text
-description = "Popis"
-# context: shown when the request has no text
-no_description = "Bez popisu."
-# context: heading; {n} comments and reviews
-conversation_heading = { one = "Konverzace ({n})", few = "Konverzace ({n})", other = "Konverzace ({n})" }
-# context: shown when nobody commented
-no_conversation = "Zatím žádné komentáře."
-# context: badge on a submitted review
-verdict_approved = "schváleno"
-# context: badge on a submitted review
-verdict_changes = "požadovány změny"
-# context: badge on a submitted review
-verdict_commented = "okomentováno"
-# context: badge on a submitted review
-verdict_dismissed = "zamítnuto"
-# context: title of the box under the conversation
-reply_box_title = "Komentář ke konverzaci"
-# context: inside the box under the conversation
-reply_placeholder = "Napište komentář... (odešle se hned)"
 # context: title of the file list; {n} files, {viewed} ticked as viewed
 files_title = { one = "Soubory ({n}) - zobrazeno {viewed}", few = "Soubory ({n}) - zobrazeno {viewed}", other = "Soubory ({n}) - zobrazeno {viewed}" }
 # context: title of the diff when the request changes no file
@@ -7135,8 +7115,6 @@ compose_title_line = "Komentář ke kódu"
 compose_title_edit = "Upravit čekající komentář"
 # context: dialog title: replying to a thread
 compose_title_reply = "Odpověď ve vlákně"
-# context: dialog title: a comment in the conversation
-compose_title_comment = "Komentář ke konverzaci"
 # context: subtitle of the reply box; {who} is a user name
 reply_about = "odpověď uživateli {who}"
 # context: placeholder of the comment box
@@ -7202,8 +7180,6 @@ pending_deleted = { one = "komentář smazán (čekajících: {n})", few = "kome
 # context: status line
 pending_edited = "čekající komentář aktualizován"
 # context: status line
-comment_posted = "komentář odeslán"
-# context: status line
 reply_posted = "odpověď odeslána"
 # context: status line
 thread_resolved = "vlákno vyřešeno"
@@ -7250,10 +7226,6 @@ why_no_pending = "není žádný čekající komentář"
 why_no_meta = "řešitele, recenzenty, štítky a milníky lze upravovat na GitHubu, GitLabu, Gitea a Forgejo"
 # context: why a row is off
 why_no_review = "tento hostitel kontroly nepodporuje"
-# context: footer hint after the arrow keys
-hint_scroll = "posun"
-# context: footer hint
-hint_comment = "komentář"
 # context: footer hint
 hint_finish = "dokončit"
 # context: footer hint

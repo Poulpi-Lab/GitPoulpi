@@ -7092,26 +7092,6 @@ finish = "İncelemeyi bitir"
 finish_with = { one = "İncelemeyi bitir ({n})", other = "İncelemeyi bitir ({n})" }
 # context: box title of the Overview page
 overview_title = "Açıklama ve konuşma"
-# context: heading: the request's text
-description = "Açıklama"
-# context: shown when the request has no text
-no_description = "Açıklama yok."
-# context: heading; {n} comments and reviews
-conversation_heading = { one = "Konuşma ({n})", other = "Konuşma ({n})" }
-# context: shown when nobody commented
-no_conversation = "Henüz yorum yok."
-# context: badge on a submitted review
-verdict_approved = "onayladı"
-# context: badge on a submitted review
-verdict_changes = "değişiklik istedi"
-# context: badge on a submitted review
-verdict_commented = "yorum yaptı"
-# context: badge on a submitted review
-verdict_dismissed = "yoksayıldı"
-# context: title of the box under the conversation
-reply_box_title = "Konuşmaya yorum yap"
-# context: inside the box under the conversation
-reply_placeholder = "Bir yorum yazın... (hemen gönderilir)"
 # context: title of the file list; {n} files, {viewed} ticked as viewed
 files_title = { one = "Dosyalar ({n}) - {viewed} görüldü", other = "Dosyalar ({n}) - {viewed} görüldü" }
 # context: title of the diff when the request changes no file
@@ -7144,8 +7124,6 @@ compose_title_line = "Koda yorum yap"
 compose_title_edit = "Bekleyen yorumu düzenle"
 # context: dialog title: replying to a thread
 compose_title_reply = "Yorum dizisini yanıtla"
-# context: dialog title: a comment in the conversation
-compose_title_comment = "Konuşmaya yorum yap"
 # context: subtitle of the reply box; {who} is a user name
 reply_about = "{who} kişisine yanıt"
 # context: placeholder of the comment box
@@ -7211,8 +7189,6 @@ pending_deleted = { one = "yorum silindi ({n} bekliyor)", other = "yorum silindi
 # context: status line
 pending_edited = "bekleyen yorum güncellendi"
 # context: status line
-comment_posted = "yorum gönderildi"
-# context: status line
 reply_posted = "yanıt gönderildi"
 # context: status line
 thread_resolved = "yorum dizisi çözüldü"
@@ -7259,10 +7235,6 @@ why_no_pending = "bekleyen yorum yok"
 why_no_meta = "atananlar, inceleyenler, etiketler ve kilometre taşları GitHub, GitLab, Gitea ve Forgejo'da kullanılabilir"
 # context: why a row is off
 why_no_review = "bu barındırıcı incelemeyi desteklemiyor"
-# context: footer hint after the arrow keys
-hint_scroll = "kaydır"
-# context: footer hint
-hint_comment = "yorum"
 # context: footer hint
 hint_finish = "bitir"
 # context: footer hint

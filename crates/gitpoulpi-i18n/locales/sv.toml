@@ -7093,26 +7093,6 @@ finish = "Slutför granskning"
 finish_with = { one = "Slutför granskning ({n})", other = "Slutför granskning ({n})" }
 # context: box title of the Overview page
 overview_title = "Beskrivning och konversation"
-# context: heading: the request's text
-description = "Beskrivning"
-# context: shown when the request has no text
-no_description = "Ingen beskrivning."
-# context: heading; {n} comments and reviews
-conversation_heading = { one = "Konversation ({n})", other = "Konversation ({n})" }
-# context: shown when nobody commented
-no_conversation = "Inga kommentarer än."
-# context: badge on a submitted review
-verdict_approved = "godkänd"
-# context: badge on a submitted review
-verdict_changes = "begärde ändringar"
-# context: badge on a submitted review
-verdict_commented = "kommenterade"
-# context: badge on a submitted review
-verdict_dismissed = "avfärdad"
-# context: title of the box under the conversation
-reply_box_title = "Kommentera konversationen"
-# context: inside the box under the conversation
-reply_placeholder = "Skriv en kommentar... (publiceras direkt)"
 # context: title of the file list; {n} files, {viewed} ticked as viewed
 files_title = { one = "Filer ({n}) - {viewed} visade", other = "Filer ({n}) - {viewed} visade" }
 # context: title of the diff when the request changes no file
@@ -7145,8 +7125,6 @@ compose_title_line = "Kommentera kod"
 compose_title_edit = "Redigera väntande kommentar"
 # context: dialog title: replying to a thread
 compose_title_reply = "Svara i tråd"
-# context: dialog title: a comment in the conversation
-compose_title_comment = "Kommentera konversationen"
 # context: subtitle of the reply box; {who} is a user name
 reply_about = "svarar {who}"
 # context: placeholder of the comment box
@@ -7212,8 +7190,6 @@ pending_deleted = { one = "kommentaren borttagen ({n} väntande)", other = "komm
 # context: status line
 pending_edited = "väntande kommentar uppdaterad"
 # context: status line
-comment_posted = "kommentaren publicerad"
-# context: status line
 reply_posted = "svaret publicerat"
 # context: status line
 thread_resolved = "tråden löst"
@@ -7260,10 +7236,6 @@ why_no_pending = "det finns ingen väntande kommentar"
 why_no_meta = "tilldelade, granskare, etiketter och milstolpar finns på GitHub, GitLab, Gitea och Forgejo"
 # context: why a row is off
 why_no_review = "den här värden stöder inte granskningar"
-# context: footer hint after the arrow keys
-hint_scroll = "rulla"
-# context: footer hint
-hint_comment = "kommentera"
 # context: footer hint
 hint_finish = "slutför"
 # context: footer hint

@@ -69,7 +69,7 @@ local-issues = ["hosting", "gitpoulpi-hosting/local-issues"]
 radar = []
 mermaid = []
 board = []
-review = []
+review = ["conversation"]
 # The read-only conversation view of an issue or a request (`item_view`).
 conversation = []
 history-rewrite = []

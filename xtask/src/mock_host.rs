@@ -240,14 +240,15 @@ pub fn start(options: Options) -> std::io::Result<MockHost> {
     let meta = Arc::new(meta::Meta::default());
     let gate = Arc::new(Gate::default());
     let handler_gate = Arc::clone(&gate);
-    let seen = http::serve(listener, move |request| {
+    let seen = http::serve_with_headers(listener, move |request| {
         if request.method == "GET" {
             let path = request.target.split('?').next().unwrap_or_default();
             if path == "/api/v3/user/repos" || path == "/api/v4/projects" {
                 handler_gate.wait_if_held();
             }
         }
-        route(request, port, &options, &meta)
+        let (status, body) = route(request, port, &options, &meta);
+        (status, review::extra_headers(request), body)
     });
     Ok(MockHost { port, seen, gate })
 }
@@ -274,6 +275,18 @@ pub mod http {
     where
         F: Fn(&Request) -> (u16, String) + Send + Sync + 'static,
     {
+        serve_with_headers(listener, move |request| {
+            let (status, body) = handler(request);
+            (status, Vec::new(), body)
+        })
+    }
+
+    /// [`serve`] for a handler that also sets response headers (a paged
+    /// list says how many pages there are).
+    pub fn serve_with_headers<F>(listener: TcpListener, handler: F) -> Arc<Mutex<Vec<Request>>>
+    where
+        F: Fn(&Request) -> (u16, Vec<(&'static str, String)>, String) + Send + Sync + 'static,
+    {
         let seen: Arc<Mutex<Vec<Request>>> = Arc::default();
         let log = Arc::clone(&seen);
         let handler = Arc::new(handler);
@@ -286,10 +299,14 @@ pub mod http {
                     let Some(request) = read_request(&mut stream) else {
                         return;
                     };
-                    let (status, json) = handler(&request);
+                    let (status, headers, json) = handler(&request);
                     log.lock().unwrap().push(request);
+                    let extra: String = headers
+                        .iter()
+                        .map(|(k, v)| format!("{k}: {v}\r\n"))
+                        .collect();
                     let reply = format!(
-                        "HTTP/1.1 {status} X\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{json}",
+                        "HTTP/1.1 {status} X\r\nContent-Type: application/json\r\n{extra}Content-Length: {}\r\nConnection: close\r\n\r\n{json}",
                         json.len()
                     );
                     let _ = stream.write_all(reply.as_bytes());

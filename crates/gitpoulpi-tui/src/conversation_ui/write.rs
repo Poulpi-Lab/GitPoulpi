@@ -129,6 +129,19 @@ pub(crate) fn start(
             match result {
                 Ok(comment) => {
                     remember(state_path.as_deref(), &conversation, &op, comment.as_ref());
+                    // Other windows showing this item read it again.
+                    crate::hosting_notify::notify_item(
+                        &source.integration.id,
+                        project,
+                        key,
+                        match &op {
+                            WriteOp::Post { .. } | WriteOp::Reply { .. } => {
+                                gitpoulpi_ipc::HostingChange::Posted
+                            }
+                            WriteOp::Edit { .. } => gitpoulpi_ipc::HostingChange::Edited,
+                            WriteOp::Delete { .. } => gitpoulpi_ipc::HostingChange::Deleted,
+                        },
+                    );
                     let _ = tx.send_notify(WMsg::Done(Box::new(Ok(comment))));
                     // A first post can teach an App bot's login.
                     let identity = client

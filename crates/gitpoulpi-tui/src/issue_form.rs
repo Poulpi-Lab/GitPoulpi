@@ -1095,9 +1095,18 @@ pub(crate) fn start_create(
             let client = factory
                 .client(&integration, &all)
                 .map_err(|e| crate::hosting_task::error_text(&e))?;
-            runtime
+            let created = runtime
                 .block_on(client.create_issue(&req))
-                .map_err(|e| crate::hosting_task::error_text(&e))
+                .map_err(|e| crate::hosting_task::error_text(&e))?;
+            crate::hosting_notify::notify(
+                &integration.id,
+                &req.project,
+                gitpoulpi_ipc::HostingItemKind::Issue,
+                created.number,
+                "",
+                gitpoulpi_ipc::HostingChange::Created,
+            );
+            Ok(created)
         })();
         let _ = tx.send(IssueEvent::Finished(result));
     });

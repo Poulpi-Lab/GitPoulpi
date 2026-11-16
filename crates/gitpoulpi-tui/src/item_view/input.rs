@@ -25,7 +25,9 @@ impl ItemView {
         if self.composer_available() && self.composer_open {
             order.push(Focus::Composer);
         }
-        order.extend(Bar::ALL.iter().map(|b| Focus::Bar(*b)));
+        if !self.embedded {
+            order.extend(Bar::ALL.iter().map(|b| Focus::Bar(*b)));
+        }
         order
     }
 
@@ -55,6 +57,10 @@ impl ItemView {
     /// A message stays in the view's own last row: the status line under the
     /// frame is not where the eyes are.
     fn note(&mut self, effect: ItemEffect) -> ItemEffect {
+        // Inside another view the message goes to that view's status line.
+        if self.embedded {
+            return effect;
+        }
         match effect {
             ItemEffect::Message(text) => {
                 self.message = Some(text);
@@ -68,6 +74,48 @@ impl ItemView {
         self.message = None;
         let effect = self.key_inner(key);
         self.note(effect)
+    }
+
+    /// A key for the conversation shown inside another view. `None`: not
+    /// the conversation's (the timeline has no use for it), the host view
+    /// handles it. The composer, a popup or a question takes every key.
+    pub(crate) fn embedded_key(&mut self, key: KeyEvent) -> Option<ItemEffect> {
+        let owned = self.guard.is_open()
+            || self.delete_ask.is_some()
+            || self.menu.is_some()
+            || self.focus == Focus::Composer;
+        if !owned {
+            let timeline_key = matches!(key.code, KeyCode::Tab | KeyCode::BackTab)
+                && !key
+                    .modifiers
+                    .intersects(KeyModifiers::CONTROL | KeyModifiers::ALT)
+                || self.conv.takes_key(&key);
+            if !timeline_key {
+                return None;
+            }
+        }
+        Some(self.on_key(key))
+    }
+
+    /// No popup or question of the conversation is open over the page.
+    pub(crate) fn takes_palette_for_mouse(&self) -> bool {
+        !self.guard.is_open() && self.delete_ask.is_none() && self.menu.is_none()
+    }
+
+    /// The pointer is on something of the embedded conversation (or a popup
+    /// of it is open and owns the pointer).
+    pub(crate) fn owns_mouse(&self, mouse: &MouseEvent) -> bool {
+        self.guard.is_open()
+            || self.delete_ask.is_some()
+            || self.menu.is_some()
+            || self.conv.drag.held()
+            || self.frame.contains((mouse.column, mouse.row).into())
+    }
+
+    /// The pointer left the embedded conversation: nothing in it is hovered.
+    pub(crate) fn clear_hover(&mut self) {
+        self.hover = None;
+        self.conv.hover = None;
     }
 
     fn key_inner(&mut self, key: KeyEvent) -> ItemEffect {
@@ -395,6 +443,11 @@ impl ItemView {
     // -- closing ------------------------------------------------------------------------
 
     fn request_close(&mut self, kind: DismissKind) -> ItemEffect {
+        if self.embedded {
+            // The host view closes itself; the text in the box stays as a
+            // draft for the next visit.
+            return ItemEffect::Close;
+        }
         self.discarding = Discarding::Close;
         match dialog_kit::dismiss(&*self, kind) {
             DismissAction::Close => {

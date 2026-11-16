@@ -489,6 +489,7 @@ async fn create(
     integration: Integration,
     req: NewPullRequest,
 ) -> Result<CreatedPullRequest, String> {
+    let integration_id = integration.id.clone();
     gitpoulpi_hosting::TrustGate::ambient()
         .preflight(&integration)
         .map_err(|e| crate::hosting_task::error_text(&e))?;
@@ -506,8 +507,17 @@ async fn create(
         &gitpoulpi_hosting::TrustGate::ambient(),
     )
     .map_err(|e| crate::hosting_task::error_text(&e))?;
-    client
+    let created = client
         .create_pull_request(&req)
         .await
-        .map_err(|e| crate::hosting_task::error_text(&e))
+        .map_err(|e| crate::hosting_task::error_text(&e))?;
+    crate::hosting_notify::notify(
+        &integration_id,
+        &req.project,
+        gitpoulpi_ipc::HostingItemKind::PullRequest,
+        created.number,
+        "",
+        gitpoulpi_ipc::HostingChange::Created,
+    );
+    Ok(created)
 }

@@ -83,6 +83,38 @@ fn created(value: Value) -> Reply {
     Some((201, value.to_string()))
 }
 
+/// How many pages the merge request's discussions pretend to have: the
+/// conversation view reads the last three first and "Load older" reaches the
+/// first (page 1 holds the discussions of the code review; page 4 one newer
+/// remark; the two between are empty).
+const DISCUSSION_PAGES: u32 = 4;
+
+/// The `page` of a list request.
+fn page_of(target: &str) -> u32 {
+    target
+        .split('?')
+        .nth(1)
+        .unwrap_or_default()
+        .split('&')
+        .find_map(|kv| kv.strip_prefix("page=")?.parse().ok())
+        .unwrap_or(1)
+}
+
+/// The response headers a request needs besides the JSON: the page count of
+/// the merge request's discussions (`X-Total-Pages`, which the conversation
+/// view reads to find the newest window).
+pub fn extra_headers(request: &Request) -> Vec<(&'static str, String)> {
+    let path = request.target.split('?').next().unwrap_or_default();
+    let is_mr_discussions = request.method == "GET"
+        && path.starts_with("/api/v4/projects/")
+        && path.ends_with(&format!("/merge_requests/{GITLAB_MR}/discussions"));
+    if is_mr_discussions {
+        vec![("X-Total-Pages", DISCUSSION_PAGES.to_string())]
+    } else {
+        Vec::new()
+    }
+}
+
 /// Answers a review endpoint, or `None` for any other request.
 pub fn route(request: &Request, path: &str, port: u16) -> Reply {
     if let Some(rest) = path.strip_prefix("/api/v3/repos/") {
@@ -317,6 +349,19 @@ fn gitlab(request: &Request, rest: &str, port: u16) -> Reply {
             {"old_path": "/dev/null", "new_path": "docs/moons.md", "new_file": true,
              "diff": MOONS_PATCH},
         ])),
+        ("GET", "discussions") if page_of(&request.target) > 1 => {
+            ok(json!(if page_of(&request.target) == DISCUSSION_PAGES {
+                json!([
+                    {"id": "d_late", "individual_note": false, "notes": [
+                        {"id": 5009, "body": "Newest remark from the mock.",
+                         "created_at": "2026-10-12T18:00:00Z",
+                         "author": {"username": "tomas"}, "system": false,
+                         "resolvable": false, "resolved": false, "position": null}]},
+                ])
+            } else {
+                json!([])
+            }))
+        }
         ("GET", "discussions") => ok(json!([
             {"id": "d_open", "individual_note": false, "notes": [
                 {"id": 5001, "body": "Why a Vec here and not a slice?", "created_at": "2026-10-11T08:05:00Z",

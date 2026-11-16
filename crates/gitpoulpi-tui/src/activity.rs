@@ -137,6 +137,10 @@ impl Activity {
 
     /// An issue or request was written to by another client.
     pub(crate) fn mark_hosting_item_changed(&self, change: gitpoulpi_ipc::HostingChangeArgs) {
+        // This window's own write coming back: it already shows it.
+        if crate::hosting_notify::is_own(&change) {
+            return;
+        }
         self.hosting_changes
             .lock()
             .unwrap_or_else(|e| e.into_inner())
@@ -361,6 +365,27 @@ pub(crate) fn spinner_frame(elapsed: Duration) -> char {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_echo_of_this_windows_own_hosting_write_is_dropped() {
+        use gitpoulpi_ipc::{HostingChange, HostingChangeArgs, HostingItemKind};
+        let activity = Activity::default();
+        let change = |origin: &str| HostingChangeArgs {
+            integration_id: "gh".into(),
+            project: "o/r".into(),
+            kind: HostingItemKind::Issue,
+            number: 3,
+            id: String::new(),
+            change: HostingChange::Posted,
+            origin: origin.into(),
+        };
+        activity.mark_hosting_item_changed(change(crate::hosting_notify::origin()));
+        assert!(activity.take_hosting_item_changes().is_empty());
+        // Another window's, and the CLI's (no origin), still refresh.
+        activity.mark_hosting_item_changed(change("tui-other"));
+        activity.mark_hosting_item_changed(change(""));
+        assert_eq!(activity.take_hosting_item_changes().len(), 2);
+    }
 
     #[test]
     fn nothing_is_shown_before_the_threshold_and_it_clears_on_end() {

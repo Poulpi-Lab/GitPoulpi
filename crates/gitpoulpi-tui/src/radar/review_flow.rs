@@ -308,7 +308,7 @@ impl RadarUi {
         self.api_review.as_ref().is_some_and(|v| v.busy())
     }
 
-    fn on_review_effect(&mut self, effect: ReviewEffect) -> Outcome {
+    pub(super) fn on_review_effect(&mut self, effect: ReviewEffect) -> Outcome {
         match effect {
             ReviewEffect::None => Outcome::None,
             ReviewEffect::Message(text) => self.say(text),

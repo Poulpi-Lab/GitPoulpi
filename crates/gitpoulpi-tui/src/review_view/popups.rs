@@ -38,8 +38,6 @@ pub(super) enum ComposeFor {
     EditPending(usize),
     /// A reply, posted at once.
     Reply { thread_id: String },
-    /// A comment in the conversation, posted at once.
-    Conversation,
     /// The words of ✦ suggestion `id`, edited before it is accepted.
     Suggestion(u64),
     /// The text of the ✦ review draft, before it is used.
@@ -49,7 +47,7 @@ pub(super) enum ComposeFor {
 impl ComposeFor {
     /// Whether the text reaches the host the moment it is submitted.
     pub(super) fn posts_at_once(&self) -> bool {
-        matches!(self, Self::Reply { .. } | Self::Conversation)
+        matches!(self, Self::Reply { .. })
     }
 }
 

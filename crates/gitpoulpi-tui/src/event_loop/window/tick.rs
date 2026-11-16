@@ -525,6 +525,10 @@ impl WindowState {
         }
         for change in self.link.take_hosting_item_changes() {
             self.repo_dialogs.on_hosting_changed(&change);
+            // The conversation or review hosted over the Radar (not cloned).
+            if let Some(m) = self.management.as_mut() {
+                m.radar.on_hosting_changed(&change);
+            }
         }
         if self.link.take_ref_visibility_changed() {
             (self.hidden_from_graph, self.solo_refs) =

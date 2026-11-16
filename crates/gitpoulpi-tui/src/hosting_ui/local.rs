@@ -143,6 +143,14 @@ impl HostingUi {
             runtime
                 .block_on(client.set_issue_state(&folder, number, closed))
                 .map_err(|e| crate::hosting_task::error_text(&e))?;
+            crate::hosting_notify::notify(
+                &integration.id,
+                &folder,
+                gitpoulpi_ipc::HostingItemKind::Issue,
+                number,
+                "",
+                gitpoulpi_ipc::HostingChange::StateChanged,
+            );
             Ok(said)
         });
         HostingEffect::None

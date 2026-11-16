@@ -7090,26 +7090,6 @@ finish = "Review abschließen"
 finish_with = { one = "Review abschließen ({n})", other = "Review abschließen ({n})" }
 # context: box title of the Overview page
 overview_title = "Beschreibung und Unterhaltung"
-# context: heading: the request's text
-description = "Beschreibung"
-# context: shown when the request has no text
-no_description = "Keine Beschreibung."
-# context: heading; {n} comments and reviews
-conversation_heading = { one = "Unterhaltung ({n})", other = "Unterhaltung ({n})" }
-# context: shown when nobody commented
-no_conversation = "Noch keine Kommentare."
-# context: badge on a submitted review
-verdict_approved = "genehmigt"
-# context: badge on a submitted review
-verdict_changes = "Änderungen angefordert"
-# context: badge on a submitted review
-verdict_commented = "kommentiert"
-# context: badge on a submitted review
-verdict_dismissed = "verworfen"
-# context: title of the box under the conversation
-reply_box_title = "Unterhaltung kommentieren"
-# context: inside the box under the conversation
-reply_placeholder = "Kommentar schreiben... (wird sofort gesendet)"
 # context: title of the file list; {n} files, {viewed} ticked as viewed
 files_title = { one = "Dateien ({n}) - {viewed} angesehen", other = "Dateien ({n}) - {viewed} angesehen" }
 # context: title of the diff when the request changes no file
@@ -7142,8 +7122,6 @@ compose_title_line = "Code kommentieren"
 compose_title_edit = "Ausstehenden Kommentar bearbeiten"
 # context: dialog title: replying to a thread
 compose_title_reply = "Auf Thread antworten"
-# context: dialog title: a comment in the conversation
-compose_title_comment = "Unterhaltung kommentieren"
 # context: subtitle of the reply box; {who} is a user name
 reply_about = "Antwort an {who}"
 # context: placeholder of the comment box
@@ -7209,8 +7187,6 @@ pending_deleted = { one = "Kommentar gelöscht ({n} ausstehend)", other = "Komme
 # context: status line
 pending_edited = "ausstehender Kommentar aktualisiert"
 # context: status line
-comment_posted = "Kommentar gesendet"
-# context: status line
 reply_posted = "Antwort gesendet"
 # context: status line
 thread_resolved = "Thread aufgelöst"
@@ -7257,10 +7233,6 @@ why_no_pending = "es gibt keinen ausstehenden Kommentar"
 why_no_meta = "Zugewiesene, Reviewer, Labels und Meilensteine gibt es auf GitHub, GitLab, Gitea und Forgejo"
 # context: why a row is off
 why_no_review = "dieser Host unterstützt keine Reviews"
-# context: footer hint after the arrow keys
-hint_scroll = "scrollen"
-# context: footer hint
-hint_comment = "kommentieren"
 # context: footer hint
 hint_finish = "abschließen"
 # context: footer hint

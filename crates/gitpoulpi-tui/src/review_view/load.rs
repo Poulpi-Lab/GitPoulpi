@@ -57,12 +57,11 @@ async fn host_load(factory: &dyn ClientFactory, target: &ReviewTarget) -> Result
         .map_err(|e| error_text(&e))?;
     let (project, number) = (target.project.as_str(), target.number);
     let patch_set = target.patch_set;
-    let (detail, files, threads, conversation, reviews, meta) = tokio::join!(
+    let (detail, files, threads, conversation, meta) = tokio::join!(
         client.pull_request_detail_at(project, number, patch_set),
         client.pull_request_files_against(project, number, patch_set, target.compare_patch_set),
         client.pull_request_threads_at(project, number, patch_set),
         client.pull_request_conversation(project, number),
-        client.pull_request_reviews(project, number),
         client.item_meta(project, number, MetaKind::PullRequest),
     );
     Ok(HostData {
@@ -70,9 +69,6 @@ async fn host_load(factory: &dyn ClientFactory, target: &ReviewTarget) -> Result
         files: files.map_err(|e| error_text(&e))?,
         threads: threads.map_err(|e| error_text(&e))?,
         conversation: conversation.map_err(|e| error_text(&e))?,
-        // Nice to have: a host that cannot list them, or a token that may
-        // not read them, still gets a review view.
-        reviews: reviews.unwrap_or_default(),
         meta: meta.ok(),
     })
 }
@@ -208,8 +204,6 @@ fn git_load(
 /// A call that changes something on the host.
 #[derive(Debug, Clone)]
 pub(super) enum Call {
-    /// A comment in the conversation, posted at once.
-    Comment(String),
     /// A reply to a thread, posted at once.
     Reply {
         thread_id: String,
@@ -230,7 +224,6 @@ pub(super) enum Call {
 /// What a call did, for the view to apply.
 #[derive(Debug, Clone)]
 pub(super) enum Done {
-    Comment(ReviewComment),
     Reply {
         thread_id: String,
         comment: ReviewComment,
@@ -266,9 +259,24 @@ async fn run_call(
         .client(&target.integration, &target.all)
         .map_err(|e| error_text(&e))?;
     let (project, number) = (target.project.as_str(), target.number);
-    perform(&*client, project, number, call)
+    let change = match &call {
+        Call::Reply { .. } => gitpoulpi_ipc::HostingChange::Posted,
+        Call::Resolve { .. } | Call::Submit(_) => gitpoulpi_ipc::HostingChange::Reviewed,
+        Call::SubmitChange | Call::AbandonChange => gitpoulpi_ipc::HostingChange::StateChanged,
+    };
+    let done = perform(&*client, project, number, call)
         .await
-        .map_err(|e| error_text(&e))
+        .map_err(|e| error_text(&e))?;
+    // Other windows showing this request read it again.
+    crate::hosting_notify::notify(
+        &target.integration.id,
+        project,
+        gitpoulpi_ipc::HostingItemKind::PullRequest,
+        number,
+        "",
+        change,
+    );
+    Ok(done)
 }
 
 async fn perform(
@@ -278,7 +286,6 @@ async fn perform(
     call: Call,
 ) -> gitpoulpi_hosting::Result<Done> {
     Ok(match call {
-        Call::Comment(body) => Done::Comment(client.add_comment(project, number, &body).await?),
         Call::Reply { thread_id, body } => Done::Reply {
             comment: client
                 .reply_to_thread(project, number, &thread_id, &body)

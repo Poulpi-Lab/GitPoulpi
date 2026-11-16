@@ -49,21 +49,39 @@ A segmented control in the top border switches page: **Overview**, **Files**, **
 
 ### Overview
 
-The description (basic Markdown is shown as such: bold, italic, `code`, links as their text, bullet and numbered
-lists, headings, quotes and code blocks), then the conversation: the comments that are not on code and the
-reviews already submitted, oldest first, each with its verdict (`approved`, `requested changes`, `commented`,
-`dismissed`). On GitLab the verdicts are its approvals. Under it, the reply box: click it or press **`c`**
-to write a comment on the conversation. **This one is posted at once**, and the box says so.
+The Overview is **the conversation of the request**, the same timeline and the same comment box an issue has
+([Conversations](hosting-integration.md#5c-conversations)): the description first (*opened this*), then the comments,
+the threads on code with their diff excerpt, the submitted reviews with their verdict (`approved`, `requested
+changes`, `commented`, `dismissed`; on GitLab the verdicts are its approvals) and the events, oldest first, on the
+newest window with **Load older** at its top. The comment box is docked under the timeline (**New comment**):
+**Write**, **Preview** and **Split**, **Cancel** and **Send**. **A comment posted here goes to the host at once**
+(nothing is pending: pending comments are the ones on code, sent with the review), appears in the list straight away
+and takes its place when the host answers; if the host refuses it, the box opens again with your text and the reason.
 
-The comment box (also the box of a reply, a comment on a line and the summary of **Finish review**) is the Markdown
-composer shared with [the conversation view](hosting-integration.md#writing): **Write**, **Preview** (`Alt+P`) and
-**Split** (`Alt+L`, in a window 100 columns wide), `Ctrl+Enter` (also `Ctrl+S`, `Alt+Enter`) sends, and where AI is on
-`Alt+E` opens **Write with AI** ([the AI chapter](ai.md#writing-help-on-a-host)). The preview shows the text as the host
-will, references included (`#7`, `!12`, `ABC-12`, commit ids); an unsent text is kept per request. The text in the
-description and the conversation uses the same renderer, so Markdown, tables, alerts and references look the same here
-and in the conversation view of an issue. Quoting, editing or deleting a comment already posted, and internal notes,
-belong to the conversation view of issues and of requests on hosts without a review (see
-[Conversations](hosting-integration.md#5c-conversations)); here only your pending comments can be edited.
+The keys are the conversation view's: **`Up`** / **`Down`** (and `Ctrl+J` / `Ctrl+K`) move between entries,
+**`r`** replies into the thread of the selected entry, **`Q`** quotes it in a new comment, **`c`** writes a new
+comment, **`e`** / **`d`** edit and delete your own comments (a question comes before a delete), **`l`** or `Enter`
+opens an entry's links, **`g`** its diagram, **`y`** copies its address, **`o`** opens it in the browser, **`n`**
+goes to the next unread entry, **`v`** shows or hides events, **`m`** loads older entries, `Tab` goes between the
+timeline and the box, and **Internal note** (`Alt+I`) is there on the hosts that have such notes. The buttons of the
+selected entry (**Reply**, **Quote**, **Edit**, **Delete**, **Links**) do the same, and the palette has the
+*Conversation: ...* rows next to the *Review: ...* ones. A link is asked about before it opens, like everywhere in the
+review.
+
+Where a conversation key and a review key meet, the conversation has the letter on this page: `l` (labels), `m`
+(milestone), `Q` (Gerrit's abandon), `e` / `d`, `r`. The labels, milestone and abandon stay on the header's buttons and
+in the palette; `a` (assignees), `p` (reviewers), `f` (**Finish review**), `b` (**Check out**), `P`, `D`, `U` and
+`Alt+1` / `Alt+2` / `Alt+3` keep their meaning here. While the box has the keyboard every key is the box's, except
+`Alt+1` / `Alt+2` / `Alt+3`; `Esc` gives the keyboard back to the timeline and a second `Esc` closes the review.
+
+A comment written on another window or by the CLI shows here by itself: every write of GitPoulpi (this window
+included) tells the session, and the windows showing the same request read it again.
+
+The comment box is the Markdown composer shared with [the conversation view](hosting-integration.md#writing)
+(also the box of a reply to a thread, a comment on a line and the summary of **Finish review**): `Ctrl+Enter` (also
+`Ctrl+S`, `Alt+Enter`) sends, and where AI is on `Alt+E` opens **Write with AI**
+([the AI chapter](ai.md#writing-help-on-a-host)). The preview shows the text as the host will, references included
+(`#7`, `!12`, `ABC-12`, commit ids); an unsent text is kept per request.
 
 ### Files
 
@@ -236,17 +254,18 @@ Suggestions are **not comments**. They show in two places:
   three buttons: **Accept**, **Edit** and **Dismiss**. A suggestion about a line the diff does not show is
   kept, never dropped: it is listed after the hunks under *AI suggestions about the whole file* and, once
   accepted, lands on the file's first changed line with the words *(about line N)* in front.
-- **In the Overview**, under the description: the summary, then the list with the same buttons and **Accept all** /
-  **Dismiss all**.
+- **In the Overview**, in a block above the conversation (only after a run): the summary, then the list with the same
+  buttons and **Accept all** / **Dismiss all**.
 
 **Accept** (`y`) turns a suggestion into an ordinary **pending comment** (you can still edit or delete it);
 **Edit** (`w`) opens the comment box with the model's words first and accepts what you leave; **Dismiss** (`n`)
 drops it. **Accept all** (`A`) still only fills the pending list. On the Files page the keys act on the
-suggestion under the cursor, on the Overview on the first of the list. **Use AI summary** (`i`, or the button
+suggestion under the cursor, on the Overview on the first of the list (`y` and `n` are the conversation's *Copy link* and
+*Next unread* again once the list is empty). **Use AI summary** (`i`, or the button
 in the Finish review form) puts the model's summary in the review text; it is never inserted on its own.
 **Nothing is sent to the host until you submit the review.**
 
-The Overview shows the draft as a card above the suggestions: the verdict chip, the review text, and three
+The Overview shows the draft as a card at the top of that block, above the suggestions: the verdict chip, the review text, and three
 buttons.
 
 - **✦ Use draft...** (`u`) accepts every open suggestion as a pending comment and opens *Finish review* already
@@ -267,7 +286,7 @@ Submitting the review spends the draft.
 |---|---|---|
 | Overview / Files / Commits | `Alt+1` / `Alt+2` / `Alt+3` | *Review: Show Overview*, *Show Files*, *Show Commits* |
 | Comment on the line or the range | `c` | *Review: Comment on Line...* |
-| Comment on the conversation | `c` on Overview, `C` | *Review: Comment on Conversation...* |
+| Comment on the conversation | `c` on Overview, `C` | *Review: Comment on Conversation...* (opens the Overview's box), *Conversation: New Comment* |
 | Reply to the thread | `r` | *Review: Reply to Thread...* |
 | Resolve or reopen | `x` | *Review: Resolve or Reopen Thread* |
 | Fold or unfold a thread | `z` | *Review: Fold or Unfold Thread* |

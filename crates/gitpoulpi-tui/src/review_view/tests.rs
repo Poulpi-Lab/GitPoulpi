@@ -7,6 +7,10 @@ use std::time::{Duration, Instant};
 
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
 use gitpoulpi_core::domain::{DiffLine, FileDiff, FileStatus, Hunk, HunkId, LineOrigin, Oid};
+use gitpoulpi_hosting::conversation::{
+    Comment, ConversationCaps, ItemKey, ItemKind, PageCursor, PostingIdentity, TimelineOpts,
+    TimelinePage,
+};
 use gitpoulpi_hosting::{
     ChecksState, DiffSide, HostedProject, HostedSshKey, HostingClient, Integration,
     IntegrationKind, MergeState, NewPullRequest, PullRequestDetail, PullRequestState,
@@ -36,6 +40,8 @@ struct Fake {
     caps: ReviewCapabilities,
     calls: Arc<Calls>,
     submitted: Arc<Mutex<Vec<ReviewSubmission>>>,
+    /// The conversation half: the same fake provider the issue view's tests use.
+    conv: crate::conversation_ui::tests::Fake,
 }
 
 fn comment(id: &str, author: &str, body: &str, at: &str) -> ReviewComment {
@@ -71,6 +77,64 @@ impl HostingClient for Fake {
     }
     fn review_capabilities(&self) -> ReviewCapabilities {
         self.caps
+    }
+    fn conversation_caps(&self, kind: ItemKind) -> ConversationCaps {
+        self.conv.conversation_caps(kind)
+    }
+    async fn posting_identity(&self, project: &str) -> gitpoulpi_hosting::Result<PostingIdentity> {
+        self.conv.posting_identity(project).await
+    }
+    async fn item_timeline(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        older: Option<&PageCursor>,
+        opts: &TimelineOpts,
+    ) -> gitpoulpi_hosting::Result<TimelinePage> {
+        self.conv.item_timeline(project, key, older, opts).await
+    }
+    async fn post_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        body: &str,
+        internal: bool,
+    ) -> gitpoulpi_hosting::Result<Comment> {
+        self.conv
+            .post_item_comment(project, key, body, internal)
+            .await
+    }
+    async fn reply_in_discussion(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        discussion_id: &str,
+        body: &str,
+    ) -> gitpoulpi_hosting::Result<Comment> {
+        self.conv
+            .reply_in_discussion(project, key, discussion_id, body)
+            .await
+    }
+    async fn edit_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+        body: &str,
+    ) -> gitpoulpi_hosting::Result<Comment> {
+        self.conv
+            .edit_item_comment(project, key, comment_id, body)
+            .await
+    }
+    async fn delete_item_comment(
+        &self,
+        project: &str,
+        key: &ItemKey,
+        comment_id: &str,
+    ) -> gitpoulpi_hosting::Result<()> {
+        self.conv
+            .delete_item_comment(project, key, comment_id)
+            .await
     }
     async fn pull_request_detail(
         &self,
@@ -338,6 +402,8 @@ struct Factory {
     caps: ReviewCapabilities,
     calls: Arc<Calls>,
     submitted: Arc<Mutex<Vec<ReviewSubmission>>>,
+    /// What the conversation half answers (see `crate::conversation_ui::tests`).
+    conv: Arc<Mutex<crate::conversation_ui::tests::Shared>>,
 }
 
 impl ClientFactory for Factory {
@@ -351,6 +417,10 @@ impl ClientFactory for Factory {
             caps: self.caps,
             calls: self.calls.clone(),
             submitted: self.submitted.clone(),
+            conv: crate::conversation_ui::tests::Fake {
+                integration: integration.clone(),
+                shared: self.conv.clone(),
+            },
         }))
     }
 }
@@ -371,7 +441,48 @@ const GITLAB_CAPS: ReviewCapabilities = ReviewCapabilities {
     resolve: true,
 };
 
+/// The request's conversation as the fake host holds it: the description,
+/// one comment and two submitted reviews (one with a text, one without).
+fn review_conv() -> Arc<Mutex<crate::conversation_ui::tests::Shared>> {
+    use crate::conversation_ui::tests as ct;
+    use gitpoulpi_hosting::conversation::{Markup, MarkupFlavor, ReviewEntry, TimelineEntry};
+    let mut talk = ct::comment("9", "tomas", "Looks promising.", "2026-10-11T08:00:00Z");
+    talk.discussion_id = Some("d9".into());
+    let shared = ct::shared(vec![
+        TimelineEntry::Comment(talk),
+        TimelineEntry::Review(ReviewEntry {
+            id: "r1".into(),
+            author: ct::actor("mara"),
+            state: gitpoulpi_hosting::review::model::ReviewState::ChangesRequested,
+            body: Markup::new("Please look at the inline note.", MarkupFlavor::GitlabMd),
+            submitted_at: "2026-10-12T10:00:00Z".into(),
+        }),
+        // GitLab's approvals carry neither a text nor a date.
+        TimelineEntry::Review(ReviewEntry {
+            id: "r2".into(),
+            author: ct::actor("nora"),
+            state: gitpoulpi_hosting::review::model::ReviewState::Approved,
+            body: Markup::new("", MarkupFlavor::GitlabMd),
+            submitted_at: String::new(),
+        }),
+    ]);
+    {
+        let mut s = shared.lock().unwrap();
+        let page = s.page.as_mut().unwrap();
+        page.header.key = ItemKey::pull_request(9);
+        page.header.reference = "!9".into();
+        page.header.title = "Add moons".into();
+        page.header.body = gitpoulpi_hosting::conversation::Markup::new(
+            "Adds the **moons** column.\n\n- sorted\n- tested",
+            MarkupFlavor::GitlabMd,
+        );
+        page.header.web_url = "https://gitlab.example.com/g/p/-/merge_requests/9".into();
+    }
+    shared
+}
+
 struct Rig {
+    conv: Arc<Mutex<crate::conversation_ui::tests::Shared>>,
     view: ReviewView,
     calls: Arc<Calls>,
     submitted: Arc<Mutex<Vec<ReviewSubmission>>>,
@@ -411,10 +522,12 @@ fn open_in(dir: tempfile::TempDir, caps: ReviewCapabilities) -> Rig {
 fn open_with(dir: tempfile::TempDir, caps: ReviewCapabilities, ai: bool) -> Rig {
     let calls = Arc::new(Calls::default());
     let submitted = Arc::new(Mutex::new(Vec::new()));
+    let conv = review_conv();
     let factory = Arc::new(Factory {
         caps,
         calls: calls.clone(),
         submitted: submitted.clone(),
+        conv: conv.clone(),
     });
     let queue = crate::daemon_link::RawQueue::default();
     let requester = queue.requester();
@@ -431,7 +544,9 @@ fn open_with(dir: tempfile::TempDir, caps: ReviewCapabilities, ai: bool) -> Rig 
         ..Default::default()
     });
     wait(&mut view, "the host data", |v| v.host.is_some());
+    wait(&mut view, "the conversation", |v| v.ov.loaded());
     Rig {
+        conv,
         view,
         calls,
         submitted,
@@ -579,6 +694,10 @@ fn alt(c: char) -> KeyEvent {
     KeyEvent::new(KeyCode::Char(c), KeyModifiers::ALT)
 }
 
+fn ctrl_enter() -> KeyEvent {
+    KeyEvent::new(KeyCode::Enter, KeyModifiers::CONTROL)
+}
+
 fn ctrl(c: char) -> KeyEvent {
     KeyEvent::new(KeyCode::Char(c), KeyModifiers::CONTROL)
 }
@@ -625,17 +744,18 @@ fn the_overview_lists_the_description_comments_and_submitted_reviews_with_their_
     let mut r = rig(GITHUB_CAPS);
     let s = r.screen();
     for want in [
-        "Description",
+        // The shared timeline: the description is the first entry.
+        "alice  opened this",
         "Adds the moons column.",
         "\u{2022} sorted",
         "\u{2022} tested",
-        "Conversation (3)",
-        "tomas \u{b7} 2026-10-11",
+        "tomas  2026-10-11",
         "Looks promising.",
-        "mara \u{b7} 2026-10-12",
-        "requested changes",
+        "mara  requested changes",
         "Please look at the inline note.",
-        "Write a comment... (posted at once)",
+        // The docked composer.
+        "New comment",
+        "Write a comment (Markdown)...",
     ] {
         assert!(s.contains(want), "{want} missing on:\n{s}");
     }
@@ -653,8 +773,9 @@ fn a_review_without_a_date_shows_no_dangling_separator() {
         .unwrap_or_else(|| panic!("no nora on:\n{s}"));
     assert!(nora.contains("approved"), "{nora}");
     assert!(
-        !nora.contains("nora \u{b7}"),
-        "no separator without a date: {nora}"
+        !nora.contains("nora \u{b7}")
+            && !nora.trim_end_matches(['\u{2502}', ' ']).ends_with("nora"),
+        "a verdict, no dangling separator: {nora}"
     );
 }
 
@@ -919,12 +1040,15 @@ fn replying_resolving_and_commenting_go_to_the_host_at_once_and_say_so() {
     assert!(r.view.host.as_ref().unwrap().threads[0].resolved);
     assert!(r.screen().contains("Reopen"), "folded with a Reopen button");
 
+    // The conversation comment is the Overview's composer: the host gets it
+    // through the shared write path, at once.
     r.key(alt('1'));
+    r.screen();
     r.key(plain(KeyCode::Char('c')));
     r.type_text("overall fine");
-    r.key(ctrl('s'));
-    wait(&mut r.view, "the comment", |v| v.call.is_none());
-    assert_eq!(r.calls.0.lock().unwrap()[2], "comment overall fine");
+    r.key(ctrl_enter());
+    wait(&mut r.view, "the comment", |v| v.ov.write_idle());
+    assert_eq!(r.conv.lock().unwrap().write_log, ["post||overall fine"]);
     assert!(r.screen().contains("overall fine"));
 }
 
@@ -1346,9 +1470,10 @@ fn the_summary_goes_into_the_finish_text_only_by_an_explicit_button() {
     r.key(plain(KeyCode::Char('f')));
     let s = r.screen();
     assert!(s.contains("Use AI summary"), "{s}");
-    assert!(
-        !s.contains("one risk in the loader"),
-        "not inserted on its own:\n{s}"
+    assert_eq!(
+        r.view.finish.as_ref().unwrap().filled().1,
+        "",
+        "not inserted on its own"
     );
     let rect = r
         .view
@@ -2410,6 +2535,7 @@ fn the_submit_and_abandon_confirmations_are_titled_by_their_verb() {
 }
 
 mod api;
+mod overview;
 mod review_options;
 
 /// The three small review dialogs carry the shared close cross on their top
@@ -2437,7 +2563,9 @@ fn the_small_review_dialogs_close_on_their_cross() {
     };
 
     let mut compose = ComposeBox::new(
-        ComposeFor::Conversation,
+        ComposeFor::Reply {
+            thread_id: "T1".into(),
+        },
         "Comment".into(),
         "about".into(),
         String::new(),
@@ -2498,7 +2626,9 @@ mod md_composer {
 
     fn compose() -> ComposeBox {
         ComposeBox::new(
-            ComposeFor::Conversation,
+            ComposeFor::Reply {
+                thread_id: "T1".into(),
+            },
             "Comment".into(),
             "about".into(),
             String::new(),

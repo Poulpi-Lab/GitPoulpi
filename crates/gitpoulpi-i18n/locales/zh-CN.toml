@@ -7089,26 +7089,6 @@ finish = "完成评审"
 finish_with = { one = "完成评审（{n}）", other = "完成评审（{n}）" }
 # context: box title of the Overview page
 overview_title = "描述与对话"
-# context: heading: the request's text
-description = "描述"
-# context: shown when the request has no text
-no_description = "没有描述。"
-# context: heading; {n} comments and reviews
-conversation_heading = { one = "对话（{n}）", other = "对话（{n}）" }
-# context: shown when nobody commented
-no_conversation = "还没有评论。"
-# context: badge on a submitted review
-verdict_approved = "已批准"
-# context: badge on a submitted review
-verdict_changes = "请求更改"
-# context: badge on a submitted review
-verdict_commented = "已评论"
-# context: badge on a submitted review
-verdict_dismissed = "已驳回"
-# context: title of the box under the conversation
-reply_box_title = "评论对话"
-# context: inside the box under the conversation
-reply_placeholder = "写下评论…（立即发布）"
 # context: title of the file list; {n} files, {viewed} ticked as viewed
 files_title = { one = "文件（{n}）- 已查看 {viewed}", other = "文件（{n}）- 已查看 {viewed}" }
 # context: title of the diff when the request changes no file
@@ -7141,8 +7121,6 @@ compose_title_line = "评论代码"
 compose_title_edit = "编辑待处理评论"
 # context: dialog title: replying to a thread
 compose_title_reply = "回复讨论"
-# context: dialog title: a comment in the conversation
-compose_title_comment = "评论对话"
 # context: subtitle of the reply box; {who} is a user name
 reply_about = "回复 {who}"
 # context: placeholder of the comment box
@@ -7208,8 +7186,6 @@ pending_deleted = { one = "已删除评论（{n} 条待处理）", other = "已�
 # context: status line
 pending_edited = "已更新待处理评论"
 # context: status line
-comment_posted = "已发布评论"
-# context: status line
 reply_posted = "已发布回复"
 # context: status line
 thread_resolved = "已解决讨论"
@@ -7256,10 +7232,6 @@ why_no_pending = "没有待处理评论"
 why_no_meta = "GitHub、GitLab、Gitea 和 Forgejo 支持指派人、评审者、标签和里程碑"
 # context: why a row is off
 why_no_review = "此平台不支持评审"
-# context: footer hint after the arrow keys
-hint_scroll = "滚动"
-# context: footer hint
-hint_comment = "评论"
 # context: footer hint
 hint_finish = "完成"
 # context: footer hint

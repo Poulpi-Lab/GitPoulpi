@@ -107,7 +107,16 @@ pub(super) fn start_move(
                 client
                     .move_issue(&target.seed.project, &issue, &spec, &to)
                     .await
-                    .map_err(|e| error_text(&e))
+                    .map_err(|e| error_text(&e))?;
+                crate::hosting_notify::notify(
+                    &target.seed.integration.id,
+                    &target.seed.project,
+                    gitpoulpi_ipc::HostingItemKind::Issue,
+                    issue.number,
+                    "",
+                    gitpoulpi_ipc::HostingChange::StateChanged,
+                );
+                Ok(())
             })
         });
         let _ = tx.send_notify(result);

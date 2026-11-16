@@ -4,8 +4,9 @@
 //! it sits in), and the list is what the mouse handler reads next.
 
 use gitpoulpi_core::domain::short;
-use gitpoulpi_hosting::{ChecksState, MergeState, PullRequestState, ReviewState};
+use gitpoulpi_hosting::{ChecksState, MergeState, PullRequestState};
 use gitpoulpi_i18n::msg::hosting_ui as hosting;
+use gitpoulpi_i18n::msg::item_view as item_msg;
 use gitpoulpi_i18n::msg::review_ai as ai_msg;
 use gitpoulpi_i18n::msg::review_view as msg;
 use ratatui::buffer::Buffer;
@@ -13,12 +14,9 @@ use ratatui::layout::Rect;
 use ratatui::style::{Modifier, Style};
 use ratatui::widgets::{Block, BorderType, Borders, Widget};
 
-use super::diffrows;
 use super::model::{Focus, Sev};
 use super::{PaneId, ReviewView, SPIN_AFTER};
-use crate::commit_detail::wrap_text;
 use crate::dialog_kit::{self, ButtonState};
-use crate::md_render;
 use crate::meta_picker::MetaField;
 use crate::review_cmd::Tab;
 use crate::th;
@@ -37,8 +35,6 @@ pub(super) enum Hit {
     /// Gerrit: merge / abandon the change (both ask first).
     SubmitChange,
     AbandonChange,
-    /// The reply box under the conversation.
-    Compose,
     File(usize),
     Viewed(usize),
     Commit(usize),
@@ -83,11 +79,11 @@ pub(super) fn sev_color(sev: Sev) -> ratatui::style::Color {
     }
 }
 
-fn panel_style() -> Style {
+pub(super) fn panel_style() -> Style {
     Style::default().fg(th().ui.text).bg(th().ui.panel)
 }
 
-fn muted() -> Style {
+pub(super) fn muted() -> Style {
     Style::default().fg(th().ui.muted).bg(th().ui.panel)
 }
 
@@ -190,7 +186,6 @@ impl ReviewView {
         self.status_line(buf, inner.x, status_y, inner.width);
         self.footer(buf, inner.x, hints_y, inner.width);
         crate::pointer_map::from_hits(&hits, |h| match h {
-            Hit::Compose => Some(crate::pointer_map::Kind::Field),
             // A code line is text to read and comment on.
             Hit::Row(..) => None,
             // A row of the Files list lights on hover and keeps the arrow.
@@ -520,485 +515,6 @@ impl ReviewView {
         y + 1
     }
 
-    // -- Overview -------------------------------------------------------------------
-
-    fn overview(&mut self, buf: &mut Buffer, body: Rect, hits: &mut Vec<(Rect, Hit)>) {
-        let Some(h) = self.host.as_ref() else { return };
-        if body.height < 6 {
-            return;
-        }
-        let box_h = 3u16;
-        let scroll = Rect::new(body.x, body.y, body.width, body.height - box_h);
-        let inner = block(
-            buf,
-            scroll,
-            msg::OVERVIEW_TITLE.get(),
-            self.focus == Focus::List,
-        );
-        let width = inner.width.saturating_sub(4) as usize;
-        self.md_links.clear();
-
-        enum L {
-            Heading(String),
-            Meta(String, Option<(String, ratatui::style::Color)>),
-            /// A line of Markdown text, already wrapped and styled.
-            Md(std::rc::Rc<md_render::Doc>, usize),
-            Dim(String),
-            Blank,
-            /// The heading of the ✦ block, with the number of suggestions.
-            SugHeading(usize),
-            /// The head of suggestion `n` of the list.
-            Sug(usize),
-            /// The heading of the draft card (with the stale mark).
-            DraftHeading(bool),
-            /// The verdict chip and the draft's three buttons.
-            DraftBar,
-            SugText(usize, String),
-        }
-        let ctx = self.target.md_context();
-        let mut all_docs: Vec<std::rc::Rc<md_render::Doc>> = Vec::new();
-        fn md_lines(
-            cache: &mut md_render::DocCache,
-            all: &mut Vec<std::rc::Rc<md_render::Doc>>,
-            ctx: &md_render::Context,
-            id: &str,
-            text: &str,
-            width: usize,
-        ) -> Vec<L> {
-            let doc = cache.get_text(id, text, width, ctx);
-            all.push(std::rc::Rc::clone(&doc));
-            (0..doc.lines.len())
-                .map(|n| L::Md(std::rc::Rc::clone(&doc), n))
-                .collect()
-        }
-        let mut lines: Vec<L> = Vec::new();
-        lines.push(L::Heading(msg::DESCRIPTION.get().to_string()));
-        if h.detail.body.trim().is_empty() {
-            lines.push(L::Dim(msg::NO_DESCRIPTION.get().to_string()));
-        } else {
-            lines.extend(md_lines(
-                &mut self.md_cache,
-                &mut all_docs,
-                &ctx,
-                "description",
-                &h.detail.body,
-                width,
-            ));
-        }
-        lines.push(L::Blank);
-        // The AI's summary and suggestions: after a run only.
-        if self.sug.enabled() && (self.sug.done || !self.sug.items.is_empty()) {
-            if self.has_draft() {
-                lines.push(L::DraftHeading(self.draft_stale()));
-                lines.push(L::DraftBar);
-                if !self.sug.body.trim().is_empty() {
-                    lines.push(L::Dim(ai_msg::DRAFT_TEXT_LABEL.get().to_string()));
-                    lines.extend(md_lines(
-                        &mut self.md_cache,
-                        &mut all_docs,
-                        &ctx,
-                        "draft",
-                        &self.sug.body,
-                        width.saturating_sub(2),
-                    ));
-                }
-                lines.push(L::Blank);
-            }
-            lines.push(L::SugHeading(self.sug.items.len()));
-            if !self.sug.summary.trim().is_empty()
-                && self.sug.summary.trim() != self.sug.body.trim()
-            {
-                lines.push(L::Dim(ai_msg::SUMMARY_LABEL.get().to_string()));
-                lines.extend(md_lines(
-                    &mut self.md_cache,
-                    &mut all_docs,
-                    &ctx,
-                    "summary",
-                    &self.sug.summary,
-                    width.saturating_sub(2),
-                ));
-            }
-            for note in &self.sug.notes {
-                lines.push(L::Dim(note.clone()));
-            }
-            if self.sug.items.is_empty() {
-                lines.push(L::Dim(ai_msg::NOTHING.get().to_string()));
-            }
-            for (n, item) in self.sug.items.iter().enumerate() {
-                lines.push(L::Sug(n));
-                lines.extend(
-                    wrap_text(&item.body, width.saturating_sub(4))
-                        .into_iter()
-                        .map(|t| L::SugText(n, t)),
-                );
-            }
-            lines.push(L::Blank);
-        }
-        // Comments and submitted reviews, oldest first; undated last.
-        enum Item<'a> {
-            C(&'a gitpoulpi_hosting::ReviewComment),
-            R(&'a gitpoulpi_hosting::SubmittedReview),
-        }
-        let mut items: Vec<(String, Item)> = h
-            .conversation
-            .iter()
-            .map(|c| (c.created_at.clone(), Item::C(c)))
-            .chain(
-                h.reviews
-                    .iter()
-                    .map(|r| (r.submitted_at.clone(), Item::R(r))),
-            )
-            .collect();
-        items.sort_by(|a, b| {
-            let key = |s: &String| {
-                if s.is_empty() {
-                    "~".to_string()
-                } else {
-                    s.clone()
-                }
-            };
-            key(&a.0).cmp(&key(&b.0))
-        });
-        lines.push(L::Heading(msg::conversation_heading(items.len() as u64)));
-        if items.is_empty() {
-            lines.push(L::Dim(msg::NO_CONVERSATION.get().to_string()));
-        }
-        for (n, (when, item)) in items.into_iter().enumerate() {
-            match item {
-                Item::C(c) => {
-                    lines.push(L::Meta(diffrows::who(&c.author, &when), None));
-                    lines.extend(md_lines(
-                        &mut self.md_cache,
-                        &mut all_docs,
-                        &ctx,
-                        &format!("item{n}"), // i18n-english
-                        &c.body,
-                        width.saturating_sub(2),
-                    ));
-                }
-                Item::R(r) => {
-                    let (word, color) = match r.state {
-                        ReviewState::Approved => (msg::VERDICT_APPROVED.get(), th().status.success),
-                        ReviewState::ChangesRequested => {
-                            (msg::VERDICT_CHANGES.get(), th().status.danger)
-                        }
-                        ReviewState::Commented => (msg::VERDICT_COMMENTED.get(), th().ui.muted),
-                        ReviewState::Dismissed => (msg::VERDICT_DISMISSED.get(), th().ui.muted),
-                    };
-                    lines.push(L::Meta(
-                        diffrows::who(&r.author, &when),
-                        Some((word.to_string(), color)),
-                    ));
-                    if !r.body.trim().is_empty() {
-                        lines.extend(md_lines(
-                            &mut self.md_cache,
-                            &mut all_docs,
-                            &ctx,
-                            &format!("item{n}"), // i18n-english
-                            &r.body,
-                            width.saturating_sub(2),
-                        ));
-                    }
-                }
-            }
-            lines.push(L::Blank);
-        }
-        // The palette's "Open Link in Message" twin reaches every link of the page.
-        let mut urls: Vec<String> = Vec::new();
-        for doc in &all_docs {
-            for l in &doc.links {
-                if !urls.contains(&l.url) {
-                    urls.push(l.url.clone());
-                }
-            }
-        }
-        crate::link_confirm::set_message_urls(urls);
-        self.ov_len = lines.len();
-        self.ov_rows = inner.height as usize;
-        self.ov_offset = self.ov_offset.min(self.ov_len.saturating_sub(self.ov_rows));
-        for (i, line) in lines
-            .iter()
-            .skip(self.ov_offset)
-            .take(inner.height as usize)
-            .enumerate()
-        {
-            let y = inner.y + i as u16;
-            let x = inner.x + 1;
-            let max = inner.width.saturating_sub(2);
-            match line {
-                L::Heading(t) => {
-                    dialog_kit::put(
-                        buf,
-                        x,
-                        y,
-                        t,
-                        max,
-                        Style::default()
-                            .fg(th().ui.accent)
-                            .bg(th().ui.panel)
-                            .add_modifier(Modifier::BOLD),
-                    );
-                }
-                L::Meta(t, verdict) => {
-                    let used = dialog_kit::put(
-                        buf,
-                        x,
-                        y,
-                        t,
-                        max,
-                        Style::default()
-                            .fg(th().ui.text)
-                            .bg(th().ui.panel)
-                            .add_modifier(Modifier::BOLD),
-                    );
-                    if let Some((word, color)) = verdict {
-                        dialog_kit::put(
-                            buf,
-                            used.right() + 1,
-                            y,
-                            &format!(" {word} "),
-                            max.saturating_sub(used.width + 1),
-                            Style::default()
-                                .fg(th().chrome.on_bright)
-                                .bg(*color)
-                                .add_modifier(Modifier::BOLD),
-                        );
-                    }
-                }
-                L::Md(doc, n) => {
-                    let Some(line) = doc.lines.get(*n) else {
-                        continue;
-                    };
-                    for (rect, id) in md_render::paint(
-                        buf,
-                        x + 2,
-                        y,
-                        max.saturating_sub(2),
-                        line,
-                        panel_style(),
-                        false,
-                    ) {
-                        if let Some(target) = doc.links.get(id).filter(|t| !t.url.is_empty()) {
-                            self.md_links.push(target.url.clone());
-                            hits.push((rect, Hit::MdLink(self.md_links.len() - 1)));
-                        }
-                    }
-                }
-                L::SugHeading(n) => {
-                    let ai = Style::default()
-                        .fg(th().status.ai)
-                        .bg(th().ui.panel)
-                        .add_modifier(Modifier::BOLD);
-                    let title = format!(
-                        "{} {} - {}",
-                        crate::theme::AI_SPARK,
-                        ai_msg::AI_TITLE.get(),
-                        ai_msg::suggestions_heading(*n as u64)
-                    );
-                    let used = dialog_kit::put(buf, x, y, &title, max, ai);
-                    if *n > 0 {
-                        // Right to left: Dismiss all, Accept all.
-                        let mut right = x + max;
-                        for (label, hit) in [
-                            (ai_msg::DISMISS_ALL.get(), Hit::SugDismissAll),
-                            (ai_msg::ACCEPT_ALL.get(), Hit::SugAcceptAll),
-                        ] {
-                            let w = dialog_kit::button_width(label);
-                            if right.saturating_sub(used.right()) > w + 1 {
-                                let rect = dialog_kit::button(
-                                    buf,
-                                    right - w,
-                                    y,
-                                    label,
-                                    ButtonState::Normal {
-                                        hovered: self.hover == Some(hit),
-                                        focused: false,
-                                    },
-                                );
-                                hits.push((rect, hit));
-                                right = rect.x.saturating_sub(1);
-                            }
-                        }
-                    }
-                }
-                L::DraftHeading(stale) => {
-                    let ai = Style::default()
-                        .fg(th().status.ai)
-                        .bg(th().ui.panel)
-                        .add_modifier(Modifier::BOLD);
-                    let used = dialog_kit::put(
-                        buf,
-                        x,
-                        y,
-                        &format!("{} {}", crate::theme::AI_SPARK, ai_msg::DRAFT_TITLE.get()),
-                        max,
-                        ai,
-                    );
-                    if *stale {
-                        dialog_kit::put(
-                            buf,
-                            used.right() + 2,
-                            y,
-                            ai_msg::DRAFT_STALE.get(),
-                            max.saturating_sub(used.width + 2),
-                            Style::default().fg(th().status.warning).bg(th().ui.panel),
-                        );
-                    }
-                }
-                L::DraftBar => {
-                    let (word, color) = match self.sug.verdict {
-                        gitpoulpi_hosting::ReviewEvent::Approve => {
-                            (msg::EVENT_APPROVE.get(), th().status.success)
-                        }
-                        gitpoulpi_hosting::ReviewEvent::RequestChanges => {
-                            (msg::EVENT_REQUEST_CHANGES.get(), th().status.danger)
-                        }
-                        gitpoulpi_hosting::ReviewEvent::Comment => {
-                            (msg::EVENT_COMMENT.get(), th().ui.muted)
-                        }
-                    };
-                    let chip = dialog_kit::put(
-                        buf,
-                        x,
-                        y,
-                        &format!(" {word} "),
-                        max,
-                        Style::default()
-                            .fg(th().chrome.on_bright)
-                            .bg(color)
-                            .add_modifier(Modifier::BOLD),
-                    );
-                    let mut bx = chip.right() + 2;
-                    for (label, hit, primary) in [
-                        (
-                            format!("{} {}", crate::theme::AI_SPARK, ai_msg::USE_DRAFT.get()),
-                            Hit::UseDraft,
-                            true,
-                        ),
-                        (ai_msg::EDIT_DRAFT.get().to_string(), Hit::EditDraft, false),
-                        (
-                            ai_msg::DISCARD_DRAFT.get().to_string(),
-                            Hit::DiscardDraft,
-                            false,
-                        ),
-                    ] {
-                        let w = dialog_kit::button_width(&label);
-                        if bx + w > x + max {
-                            break;
-                        }
-                        let hovered = self.hover == Some(hit);
-                        let state = if primary {
-                            ButtonState::Primary {
-                                hovered,
-                                focused: false,
-                            }
-                        } else {
-                            ButtonState::Normal {
-                                hovered,
-                                focused: false,
-                            }
-                        };
-                        let rect = dialog_kit::button(buf, bx, y, &label, state);
-                        hits.push((rect, hit));
-                        bx = rect.right() + 1;
-                    }
-                }
-                L::Sug(n) => {
-                    let Some(item) = self.sug.items.get(*n) else {
-                        continue;
-                    };
-                    let mut right = x + max;
-                    for (label, hit) in [
-                        (ai_msg::DISMISS.get(), Hit::SugDismiss(*n)),
-                        (ai_msg::EDIT_ACCEPT.get(), Hit::SugEdit(*n)),
-                        (ai_msg::ACCEPT.get(), Hit::SugAccept(*n)),
-                    ] {
-                        let w = dialog_kit::button_width(label);
-                        if right.saturating_sub(x) > w + 20 {
-                            let rect = dialog_kit::button(
-                                buf,
-                                right - w,
-                                y,
-                                label,
-                                ButtonState::Normal {
-                                    hovered: self.hover == Some(hit),
-                                    focused: false,
-                                },
-                            );
-                            hits.push((rect, hit));
-                            right = rect.x.saturating_sub(1);
-                        }
-                    }
-                    let place = if item.line > 0 {
-                        format!("{}:{}", item.path, item.line)
-                    } else {
-                        item.path.clone()
-                    };
-                    dialog_kit::put(
-                        buf,
-                        x,
-                        y,
-                        &format!(
-                            "{} {} - {place}",
-                            crate::theme::AI_SPARK,
-                            item.severity.word()
-                        ),
-                        right.saturating_sub(x),
-                        Style::default()
-                            .fg(sev_color(item.severity))
-                            .bg(th().ui.panel)
-                            .add_modifier(Modifier::BOLD),
-                    );
-                }
-                L::SugText(_, t) => {
-                    dialog_kit::put(
-                        buf,
-                        x + 1,
-                        y,
-                        "\u{250A}",
-                        1,
-                        Style::default().fg(th().status.ai).bg(th().ui.panel),
-                    );
-                    dialog_kit::put(buf, x + 3, y, t, max.saturating_sub(3), panel_style());
-                }
-                L::Dim(t) => {
-                    dialog_kit::put(buf, x, y, t, max, muted());
-                }
-                L::Blank => {}
-            }
-            // The keyboard acts on the first suggestion: its whole block
-            // carries the selected-row background (buttons keep theirs).
-            if matches!(line, L::Sug(0) | L::SugText(0, _)) {
-                let lit = dialog_kit::row_bg(true, false);
-                for cx in inner.x..inner.right() {
-                    let on_button = hits
-                        .iter()
-                        .any(|(r, _)| r.y == y && cx >= r.x && cx < r.right());
-                    if !on_button && buf[(cx, y)].bg == th().ui.panel {
-                        buf[(cx, y)].set_bg(lit);
-                    }
-                }
-            }
-        }
-        self.ov_bar = crate::scrollbar::Track::vertical(scroll, self.ov_len, self.ov_offset);
-        if let Some(track) = self.ov_bar {
-            crate::scrollbar::render_buf(buf, track, true, false);
-        }
-        // The reply box: a click or `c` opens the comment box.
-        let reply = Rect::new(body.x, body.bottom() - box_h, body.width, box_h);
-        let hovered = self.hovered(Hit::Compose);
-        let inner = block(buf, reply, msg::REPLY_BOX_TITLE.get(), hovered);
-        dialog_kit::put(
-            buf,
-            inner.x + 1,
-            inner.y,
-            msg::REPLY_PLACEHOLDER.get(),
-            inner.width.saturating_sub(2),
-            muted(),
-        );
-        hits.push((reply, Hit::Compose));
-    }
-
     // -- Files ----------------------------------------------------------------------
 
     /// The widths of a page that is a list and a diff.
@@ -1306,9 +822,11 @@ impl ReviewView {
         use crate::keymap::chord::Key;
         let tabs_key = format!("{}-3", dialog_kit::alt_key(Key::Char('1')));
         let mut pairs: Vec<(&str, &str)> = match self.tab {
+            // The conversation's keys are an issue's (`item_view`).
             Tab::Overview => vec![
-                ("\u{2191}\u{2193}", msg::HINT_SCROLL.get()),
-                ("c", msg::HINT_COMMENT.get()),
+                ("\u{2191}\u{2193}", item_msg::HINT_MOVE.get()),
+                ("r", item_msg::HINT_REPLY.get()),
+                ("c", item_msg::HINT_COMMENT.get()),
                 ("f", msg::HINT_FINISH.get()),
                 ("o", msg::HINT_BROWSER.get()),
                 (tabs_key.as_str(), msg::HINT_TABS.get()),

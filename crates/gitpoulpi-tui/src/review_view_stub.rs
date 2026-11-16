@@ -88,6 +88,18 @@ impl ReviewView {
         match *self {}
     }
 
+    pub(crate) fn item_avail(&self) -> Option<crate::item_cmd::ItemAvail> {
+        match *self {}
+    }
+
+    pub(crate) fn run_item(&mut self, _cmd: crate::item_cmd::ItemCmd) -> ReviewEffect {
+        match *self {}
+    }
+
+    pub(crate) fn on_hosting_changed(&mut self, _change: &gitpoulpi_ipc::HostingChangeArgs) {
+        match *self {}
+    }
+
     pub(crate) fn on_key(&mut self, _key: KeyEvent) -> ReviewEffect {
         match *self {}
     }

@@ -7,7 +7,6 @@ use std::path::PathBuf;
 use gitpoulpi_core::domain::{CommitNode, Oid};
 use gitpoulpi_hosting::{
     Integration, ItemMeta, PullRequestDetail, ReviewComment, ReviewFile, ReviewThread,
-    SubmittedReview,
 };
 
 /// The request under review and where it lives.
@@ -50,6 +49,22 @@ impl ReviewTarget {
                 ..Default::default()
             },
             ..Default::default()
+        }
+    }
+
+    /// The request as the conversation widget names it: the Overview shows
+    /// the same timeline an issue has.
+    pub(crate) fn item_target(&self) -> crate::item_view::ItemTarget {
+        crate::item_view::ItemTarget {
+            integration: self.integration.clone(),
+            all: self.all.clone(),
+            project: self.project.clone(),
+            key: gitpoulpi_hosting::conversation::ItemKey::pull_request(self.number),
+            reference: self.iid_label.clone(),
+            title: self.title.clone(),
+            web_url: self.web_url.clone(),
+            repo_root: self.repo_root.clone(),
+            bases: Default::default(),
         }
     }
 
@@ -131,7 +146,6 @@ pub(crate) struct HostData {
     pub(crate) files: Vec<ReviewFile>,
     pub(crate) threads: Vec<ReviewThread>,
     pub(crate) conversation: Vec<ReviewComment>,
-    pub(crate) reviews: Vec<SubmittedReview>,
     pub(crate) meta: Option<ItemMeta>,
 }
 

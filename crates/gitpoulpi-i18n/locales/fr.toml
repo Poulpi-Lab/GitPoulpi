@@ -10167,3 +10167,25 @@ palette_quote = "Conversation : Citer l'entrée"
 palette_toggle_internal = "Conversation : Basculer la note interne"
 why_unchanged = "rien n'a encore changé"
 flavor_plain_text = "Texte brut"
+
+[edit_off_branch]
+# context: title of the dialog offered when the commit to edit is not on the checked-out branch
+title = { git = "Modifier un {$commit} d'une autre branche", local = "Modifier une {$commit} d'une autre branche" }
+# context: body of that dialog when local branches hold the commit; {short} is the short commit id
+body_branches = "{short} n'est pas sur la branche courante. Basculez sur une branche qui le contient pour le modifier ici."
+# context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
+body_none = "{short} n'est sur aucune branche locale. Créez une branche dessus pour le modifier ici."
+# context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
+checkout = "Basculer sur {branch} et modifier"
+# context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
+rewrite = "Modifier avec la réécriture avancée"
+# context: button that opens the name box to create a branch at that commit
+create = "Créer une branche ici..."
+# context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
+key_rewrite = "r"
+# context: key of the Create a branch here button, one letter
+key_create = "b"
+# context: key of the Cancel button of that dialog, one letter
+key_cancel = "a"
+# context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
+gave_up = "{short} n'a pas été modifié : la branche n'a pas été activée"

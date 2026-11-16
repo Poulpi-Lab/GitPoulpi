@@ -2,7 +2,7 @@
 source: crates/gitpoulpi-tui/src/theme/snapshot_tests.rs
 expression: "dump(&theme, &buf)"
 ---
-00 |          ↶ Undo ▾   ↷ Redo   ⇩ Pull ▾   ⇧ Push ▾   ⎇ Branch   🔖  Tag   📥  Stash   📤  Pop   ▣ LFS ▾   ⌕ Search|
+00 |        ↶ Undo  ▾   ↷ Redo   ⇩ Pull  ▾   ⇧ Push  ▾   ⎇ Branch   🔖  Tag   📥  Stash   📤  Pop   ▣ LFS ▾   ⌕ Search|
 01 |╭ 🐙  GitPoulpi - Settings - Tab: sections/settings │… ─── ✕ ─╮ Graph  Message                  Author   Date|
 02 |│ Search settings...        │ Appearance - global            │ ●  commit 1            a   2d ago|
 03 |│                           │                                │ ○  commit 2            a   2d ago|
@@ -35,50 +35,50 @@ expression: "dump(&theme, &buf)"
 30 |                                                                                │⎘ Copy ›                           │|
 31 |                                                                                ╰───────────────────────────────────╯|
 
-00 000-008 -/ui.bg+ui.blend_bg
-00 009-009 -/ui.button+chrome.toolbar_bg
-00 010-010 toolbar.undo/ui.button+chrome.toolbar_bg
-00 011-016 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
-00 017-018 ui.on_button+chrome.toolbar_fg/chrome.toolbar_arrow_bg
-00 019-019 -/ui.bg+ui.blend_bg
-00 020-020 -/ui.button+chrome.toolbar_bg
-00 021-021 toolbar.undo/ui.button+chrome.toolbar_bg
-00 022-027 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
-00 028-028 -/ui.bg+ui.blend_bg
-00 029-029 -/ui.button+chrome.toolbar_bg
-00 030-030 toolbar.pull/ui.button+chrome.toolbar_bg
-00 031-036 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
-00 037-038 ui.on_button+chrome.toolbar_fg/chrome.toolbar_arrow_bg
+00 000-006 -/ui.bg+ui.blend_bg
+00 007-007 -/ui.button+chrome.toolbar_bg
+00 008-008 toolbar.undo/ui.button+chrome.toolbar_bg
+00 009-014 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
+00 015-017 ui.on_button+chrome.toolbar_fg/chrome.toolbar_arrow_bg
+00 018-018 -/ui.bg+ui.blend_bg
+00 019-019 -/ui.button+chrome.toolbar_bg
+00 020-020 toolbar.undo/ui.button+chrome.toolbar_bg
+00 021-026 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
+00 027-027 -/ui.bg+ui.blend_bg
+00 028-028 -/ui.button+chrome.toolbar_bg
+00 029-029 toolbar.pull/ui.button+chrome.toolbar_bg
+00 030-035 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
+00 036-038 ui.on_button+chrome.toolbar_fg/chrome.toolbar_arrow_bg
 00 039-039 -/ui.bg+ui.blend_bg
 00 040-040 -/ui.button+chrome.toolbar_bg
 00 041-041 toolbar.push/ui.button+chrome.toolbar_bg
 00 042-047 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
-00 048-049 ui.on_button+chrome.toolbar_fg/chrome.toolbar_arrow_bg
-00 050-050 -/ui.bg+ui.blend_bg
-00 051-051 -/ui.button+chrome.toolbar_bg
-00 052-052 toolbar.branch/ui.button+chrome.toolbar_bg
-00 053-060 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
-00 061-061 -/ui.bg+ui.blend_bg
-00 062-062 -/ui.button+chrome.toolbar_bg
-00 063-063 toolbar.tag/ui.button+chrome.toolbar_bg
-00 065-069 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
-00 070-070 -/ui.bg+ui.blend_bg
-00 071-071 -/ui.button+chrome.toolbar_bg
-00 072-072 toolbar.stash/ui.button+chrome.toolbar_bg
-00 074-080 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
-00 081-081 -/ui.bg+ui.blend_bg
-00 082-082 -/ui.button+chrome.toolbar_bg
-00 083-083 toolbar.stash/ui.button+chrome.toolbar_bg
-00 085-089 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
-00 090-090 -/ui.bg+ui.blend_bg
-00 091-091 -/ui.button+chrome.toolbar_bg
-00 092-092 toolbar.lfs/ui.button+chrome.toolbar_bg
-00 093-099 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
-00 100-100 -/ui.bg+ui.blend_bg
-00 101-101 -/ui.button+chrome.toolbar_bg
-00 102-102 toolbar.search/ui.button+chrome.toolbar_bg
-00 103-110 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
-00 111-119 -/ui.bg+ui.blend_bg
+00 048-050 ui.on_button+chrome.toolbar_fg/chrome.toolbar_arrow_bg
+00 051-051 -/ui.bg+ui.blend_bg
+00 052-052 -/ui.button+chrome.toolbar_bg
+00 053-053 toolbar.branch/ui.button+chrome.toolbar_bg
+00 054-061 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
+00 062-062 -/ui.bg+ui.blend_bg
+00 063-063 -/ui.button+chrome.toolbar_bg
+00 064-064 toolbar.tag/ui.button+chrome.toolbar_bg
+00 066-070 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
+00 071-071 -/ui.bg+ui.blend_bg
+00 072-072 -/ui.button+chrome.toolbar_bg
+00 073-073 toolbar.stash/ui.button+chrome.toolbar_bg
+00 075-081 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
+00 082-082 -/ui.bg+ui.blend_bg
+00 083-083 -/ui.button+chrome.toolbar_bg
+00 084-084 toolbar.stash/ui.button+chrome.toolbar_bg
+00 086-090 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
+00 091-091 -/ui.bg+ui.blend_bg
+00 092-092 -/ui.button+chrome.toolbar_bg
+00 093-093 toolbar.lfs/ui.button+chrome.toolbar_bg
+00 094-100 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
+00 101-101 -/ui.bg+ui.blend_bg
+00 102-102 -/ui.button+chrome.toolbar_bg
+00 103-103 toolbar.search/ui.button+chrome.toolbar_bg
+00 104-111 ui.on_button+chrome.toolbar_fg/ui.button+chrome.toolbar_bg
+00 112-119 -/ui.bg+ui.blend_bg
 01 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
 01 001-002 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
 01 004-004 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-

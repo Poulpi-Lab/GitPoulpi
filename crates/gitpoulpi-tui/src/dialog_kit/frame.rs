@@ -560,8 +560,12 @@ fn grip_at(l: &Live, col: u16, row: u16) -> Option<Grip> {
     match col {
         c if c == left => Some(Grip::Left),
         // The list popups draw their scrollbar on the right border: a press
-        // there is the scrollbar's; the corner and the other edges resize.
-        c if c == right && !POPUPS.contains(&l.id) => Some(Grip::Right),
+        // on the bar is the scrollbar's; the rest of the edge resizes.
+        c if c == right
+            && !(POPUPS.contains(&l.id) && crate::popup_list::View::bar_at(col, row)) =>
+        {
+            Some(Grip::Right)
+        }
         _ => None,
     }
 }

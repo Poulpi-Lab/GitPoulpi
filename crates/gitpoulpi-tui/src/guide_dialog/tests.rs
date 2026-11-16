@@ -1,5 +1,7 @@
 use super::*;
+use crate::reword_ui::AmendScope;
 use crossterm::event::{KeyEventKind, KeyEventState, MouseButton, MouseEventKind};
+use gitpoulpi_core::domain::Oid;
 
 fn key(code: KeyCode) -> KeyEvent {
     KeyEvent {
@@ -189,4 +191,131 @@ fn a_cyrillic_key_letter_also_answers_to_the_latin_key_in_its_place() {
         dialog.on_key(key(KeyCode::Char('j'))),
         Outcome::Chose(Choice::Cancel)
     );
+}
+
+fn ctrl(c: char) -> KeyEvent {
+    KeyEvent {
+        modifiers: KeyModifiers::CONTROL,
+        ..key(KeyCode::Char(c))
+    }
+}
+
+fn names(list: &[&str]) -> Vec<String> {
+    list.iter().map(|s| s.to_string()).collect()
+}
+
+#[test]
+fn the_off_branch_question_lists_a_button_per_branch_and_names_every_key() {
+    let dialog = GuideDialog::off_branch(Oid([7; 20]), None, &names(&["feature/a", "topic"]), true);
+    let (buf, text) = paint(&dialog, 100, 30);
+    assert!(text.contains("Edit a commit of another branch"), "{text}");
+    for want in [
+        "Check out feature/a and edit (1)",
+        "Check out topic and edit (2)",
+        "Edit with advanced history rewrite (R)",
+        "Cancel (C)",
+    ] {
+        assert!(text.contains(want), "{want}: {text}");
+    }
+    // One row each, left edges aligned: a list of buttons.
+    let col_of = |needle: &str| {
+        (0..30u16).find_map(|y| {
+            let row: String = (0..100u16).map(|x| buf[(x, y)].symbol()).collect();
+            row.find(needle).map(|at| (row[..at].chars().count(), y))
+        })
+    };
+    let (a, ya) = col_of("Check out feature/a").unwrap();
+    let (b, yb) = col_of("Check out topic").unwrap();
+    assert_eq!(a, b);
+    assert_eq!(yb, ya + 1);
+}
+
+#[test]
+fn the_off_branch_question_without_a_local_branch_offers_to_create_one() {
+    let dialog = GuideDialog::off_branch(Oid([7; 20]), None, &[], true);
+    let (_, text) = paint(&dialog, 100, 30);
+    assert!(text.contains("is on no local branch"), "{text}");
+    assert!(text.contains("Create a branch here... (B)"), "{text}");
+    assert!(!text.contains("Check out"), "{text}");
+    // A build without the rewrite offers no rewrite.
+    let dialog = GuideDialog::off_branch(Oid([7; 20]), None, &[], false);
+    let (_, text) = paint(&dialog, 100, 30);
+    assert!(!text.contains("advanced history rewrite"), "{text}");
+}
+
+#[test]
+fn the_off_branch_keys_pick_move_and_cancel() {
+    let mut dialog = GuideDialog::off_branch(
+        Oid([7; 20]),
+        Some(AmendScope::All),
+        &names(&["a", "b"]),
+        true,
+    );
+    assert_eq!(
+        dialog.on_key(key(KeyCode::Char('2'))),
+        Outcome::Chose(Choice::Pick(1))
+    );
+    assert_eq!(
+        dialog.on_key(key(KeyCode::Char('r'))),
+        Outcome::Chose(Choice::Rewrite)
+    );
+    assert_eq!(
+        dialog.on_key(key(KeyCode::Char('c'))),
+        Outcome::Chose(Choice::Cancel)
+    );
+    assert_eq!(
+        dialog.on_key(key(KeyCode::Esc)),
+        Outcome::Chose(Choice::Cancel)
+    );
+    // Arrows and Ctrl+J / Ctrl+K move the focus through the rows; Enter presses.
+    assert_eq!(
+        dialog.on_key(key(KeyCode::Enter)),
+        Outcome::Chose(Choice::Pick(0))
+    );
+    for step in [key(KeyCode::Down), ctrl('j')] {
+        let mut d = GuideDialog::off_branch(Oid([7; 20]), None, &names(&["a", "b"]), true);
+        assert_eq!(d.on_key(step), Outcome::Stay);
+        assert_eq!(
+            d.on_key(key(KeyCode::Enter)),
+            Outcome::Chose(Choice::Pick(1))
+        );
+    }
+    for step in [key(KeyCode::Up), ctrl('k')] {
+        let mut d = GuideDialog::off_branch(Oid([7; 20]), None, &names(&["a", "b"]), true);
+        assert_eq!(d.on_key(step), Outcome::Stay);
+        assert_eq!(
+            d.on_key(key(KeyCode::Enter)),
+            Outcome::Chose(Choice::Cancel)
+        );
+    }
+}
+
+#[test]
+fn more_than_eight_branches_are_capped_and_say_so() {
+    let many: Vec<String> = (1..=10).map(|i| format!("b{i}")).collect();
+    let dialog = GuideDialog::off_branch(Oid([7; 20]), None, &many, true);
+    let (_, text) = paint(&dialog, 100, 40);
+    assert!(text.contains("Check out b8 and edit (8)"), "{text}");
+    assert!(!text.contains("b9"), "{text}");
+    assert!(text.contains("and 2 more"), "{text}");
+}
+
+#[test]
+fn clicking_an_off_branch_row_answers_it() {
+    let mut dialog = GuideDialog::off_branch(Oid([7; 20]), None, &names(&["a", "b"]), true);
+    let (buf, _) = paint(&dialog, 100, 30);
+    for (needle, want) in [
+        ("Check out b and edit", Choice::Pick(1)),
+        ("Edit with advanced", Choice::Rewrite),
+        ("Cancel (C)", Choice::Cancel),
+    ] {
+        let (x, y) = (0..30u16)
+            .find_map(|y| {
+                let row: String = (0..100u16).map(|x| buf[(x, y)].symbol()).collect();
+                row.find(needle)
+                    .map(|at| (row[..at].chars().count() as u16 + 1, y))
+            })
+            .unwrap_or_else(|| panic!("no {needle}"));
+        assert_eq!(dialog.on_mouse(click(x, y)), Outcome::Chose(want));
+    }
 }

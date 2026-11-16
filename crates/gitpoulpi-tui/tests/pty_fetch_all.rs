@@ -68,7 +68,7 @@ fn fetch_all_by_key_shows_the_new_remote_commit_and_branch() {
         |s| {
             s.contains("upstream-news")
                 && s.contains("zz-upstream-branch")
-                && s.contains("Pull \u{25BE}")
+                && s.contains("Pull  \u{25BE}")
         },
     )
     .unwrap_or_else(|e| panic!("{e}"));
@@ -82,10 +82,10 @@ fn fetch_all_from_the_pull_menu_shows_the_new_remote_commit_and_branch() {
 
     let screen = term
         .wait_for("the toolbar's Pull split button", STEP, |s| {
-            s.contains("Pull \u{25BE}")
+            s.contains("Pull  \u{25BE}")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = screen.find("Pull \u{25BE}").unwrap();
+    let (c, r) = screen.find("Pull  \u{25BE}").unwrap();
     term.click(c + 5, r).expect("click the Pull dropdown arrow");
     let menu = term
         .wait_for("the Pull menu", STEP, |s| s.contains("Fetch All"))
@@ -98,7 +98,7 @@ fn fetch_all_from_the_pull_menu_shows_the_new_remote_commit_and_branch() {
         |s| {
             s.contains("upstream-news")
                 && s.contains("zz-upstream-branch")
-                && s.contains("Pull \u{25BE}")
+                && s.contains("Pull  \u{25BE}")
         },
     )
     .unwrap_or_else(|e| panic!("{e}"));
@@ -114,10 +114,10 @@ fn the_pull_button_pulls() {
 
     let screen = term
         .wait_for("the toolbar's Pull split button", STEP, |s| {
-            s.contains("Pull \u{25BE}")
+            s.contains("Pull  \u{25BE}")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = screen.find("Pull \u{25BE}").unwrap();
+    let (c, r) = screen.find("Pull  \u{25BE}").unwrap();
     term.click(c + 2, r).expect("click Pull");
     term.wait_for("the pulled commit", STEP, |s| s.contains("upstream-news"))
         .unwrap_or_else(|e| panic!("{e}"));

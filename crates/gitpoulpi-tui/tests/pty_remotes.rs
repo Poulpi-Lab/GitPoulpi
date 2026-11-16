@@ -133,10 +133,10 @@ fn the_pull_dropdown_runs_its_item_and_leaves_the_button_alone() {
 
     let screen = term
         .wait_for("the toolbar's Pull split button", STEP, |s| {
-            s.contains("Pull \u{25BE}")
+            s.contains("Pull  \u{25BE}")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = screen.find("Pull \u{25BE}").unwrap();
+    let (c, r) = screen.find("Pull  \u{25BE}").unwrap();
     // "Pull " is five columns; the arrow chip is the sixth.
     term.click(c + 5, r).expect("click the Pull dropdown arrow");
     let menu = term
@@ -152,7 +152,7 @@ fn the_pull_dropdown_runs_its_item_and_leaves_the_button_alone() {
     // It ran (the status line says what it is doing or did), the menu
     // is gone, and the button still reads Pull.
     term.wait_for("the pull ran and the menu closed", STEP, |s| {
-        !s.contains("Pull (fast-forward only)") && s.contains("Pull \u{25BE}")
+        !s.contains("Pull (fast-forward only)") && s.contains("Pull  \u{25BE}")
     })
     .unwrap_or_else(|e| panic!("{e}"));
     let toml = std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();

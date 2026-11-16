@@ -329,6 +329,8 @@ impl WindowState {
         crate::image_view::pane::sync(self.file_insight.as_ref(), &self.link);
         // The commit column picked another commit: the view goes along.
         self.follow_commit_column();
+        // An edit that waited for its checkout.
+        self.follow_off_branch_edit();
         // The sensitive-files question's "Show in file" round trip.
         self.sync_stage_guard_peek();
     }

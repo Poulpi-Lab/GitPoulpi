@@ -24,8 +24,11 @@ use gitpoulpi_i18n::msg;
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 
+use gitpoulpi_core::domain::Oid;
+
 use crate::ai_ui::AiRequest;
 use crate::dialog_kit::{Confirm, ConfirmEvent};
+use crate::reword_ui::AmendScope;
 
 /// The settings key the "too large" dialog sends the user to.
 pub(crate) const CONFLICT_LIMIT_KEY: &str = "ai.limits.conflict_bytes";
@@ -43,8 +46,31 @@ pub(crate) enum Choice {
     /// Send truncated (the truncation dialog only; `Primary` is Send all).
     #[cfg_attr(not(feature = "ai"), allow(dead_code))]
     Truncated,
+    /// Check out the n-th branch of the off-branch edit dialog, then edit.
+    Pick(u8),
+    /// Edit in the advanced history rewrite (the off-branch edit dialog).
+    Rewrite,
+    /// Create a branch at the commit (the off-branch edit dialog).
+    CreateBranch,
     Cancel,
 }
+
+/// The commit an edit was asked for although it is not on the checked-out
+/// branch, and what the dialog offers for it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct OffBranch {
+    pub(crate) commit: Oid,
+    /// `None`: Edit commit message; `Some`: Amend, with that scope.
+    pub(crate) scope: Option<AmendScope>,
+    /// The local branches offered (at most [`MAX_BRANCHES`]), in button order.
+    pub(crate) branches: Vec<String>,
+}
+
+/// Branch buttons the off-branch dialog lists (keys `1` to `8`).
+const MAX_BRANCHES: usize = 8;
+
+/// Cells of a branch name kept in its button.
+const BRANCH_CELLS: usize = 28;
 
 /// What the conflicts stand in the way of.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -64,6 +90,8 @@ pub(crate) enum Kind {
     /// Inputs over their caps, asked by a worker (`ai_limit_dialog`).
     #[cfg_attr(not(feature = "ai"), allow(dead_code))]
     Truncation,
+    /// An edit of a commit that is not on the checked-out branch.
+    OffBranch(OffBranch),
 }
 
 #[derive(Debug, Clone)]
@@ -206,6 +234,95 @@ impl GuideDialog {
                 (open, Choice::Secondary),
                 (cancel, Choice::Cancel),
             ],
+        }
+    }
+
+    /// `commit` is not on the checked-out branch: check out one of the local
+    /// `branches` that hold it and edit there, edit it in the advanced history
+    /// rewrite (`rewrite`: the build has it), or, with no such branch, create
+    /// one at it. The choices are a list of rows: the arrows and `Ctrl+J` /
+    /// `Ctrl+K` move through them, each row has a key.
+    pub(crate) fn off_branch(
+        commit: Oid,
+        scope: Option<AmendScope>,
+        branches: &[String],
+        rewrite: bool,
+    ) -> Self {
+        use msg::edit_off_branch as m;
+        let short = &commit.to_hex()[..crate::log_menu::SHORT_SHA_LEN];
+        let shown: Vec<String> = branches.iter().take(MAX_BRANCHES).cloned().collect();
+        let mut body = if shown.is_empty() {
+            m::body_none(short)
+        } else {
+            m::body_branches(short)
+        };
+        if branches.len() > shown.len() {
+            body.push_str("\n\n");
+            body.push_str(&msg::conflict_guard::more(
+                (branches.len() - shown.len()) as u64,
+            ));
+        }
+        let (rewrite_key, create_key, cancel_key) = (
+            key_of(m::KEY_REWRITE),
+            key_of(m::KEY_CREATE),
+            key_of(m::KEY_CANCEL),
+        );
+        let mut rows: Vec<(String, char, Choice)> = Vec::new();
+        for (i, name) in shown.iter().enumerate() {
+            let key = char::from_digit(i as u32 + 1, 10).unwrap_or('9');
+            let name = crate::ui_kit::fit(name, BRANCH_CELLS);
+            rows.push((
+                labelled(&m::checkout(name), key),
+                key,
+                Choice::Pick(i as u8),
+            ));
+        }
+        if shown.is_empty() {
+            rows.push((
+                labelled(m::CREATE.get(), create_key),
+                create_key,
+                Choice::CreateBranch,
+            ));
+        }
+        if rewrite {
+            rows.push((
+                labelled(m::REWRITE.get(), rewrite_key),
+                rewrite_key,
+                Choice::Rewrite,
+            ));
+        }
+        rows.push((
+            labelled(msg::dialog::CANCEL.get(), cancel_key),
+            cancel_key,
+            Choice::Cancel,
+        ));
+        // One width for every row, so the list reads as one column of buttons.
+        let widest = rows
+            .iter()
+            .map(|(l, ..)| crate::display_width(l))
+            .max()
+            .unwrap_or(0);
+        let buttons: Vec<(String, Choice)> = rows
+            .iter()
+            .map(|(l, _, c)| {
+                let pad = widest - crate::display_width(l);
+                (format!("{l}{}", " ".repeat(pad)), *c)
+            })
+            .collect();
+        let first = rows[0].2;
+        let confirm = Confirm::new(m::TITLE.get(), body, buttons, Choice::Cancel)
+            .with_primary(first)
+            .stacked()
+            .keep_breaks()
+            .min_width(56);
+        Self {
+            kind: Kind::OffBranch(OffBranch {
+                commit,
+                scope,
+                branches: shown,
+            }),
+            confirm: RefCell::new(confirm),
+            keys: rows.into_iter().map(|(_, k, c)| (k, c)).collect(),
         }
     }
 

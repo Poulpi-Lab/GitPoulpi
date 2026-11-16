@@ -20,7 +20,7 @@ use xtask::pty::Terminal;
 const STEP: Duration = Duration::from_secs(30);
 /// Narrow enough that Tag, Stash, Pop and Search do not fit (see
 /// `chrome::tests::the_toolbar_at_a_narrow_width_...` for the layout).
-const COLS: u16 = 60;
+const COLS: u16 = 68;
 const ROWS: u16 = 30;
 
 const OVERFLOW: &str = "\u{22EF}";

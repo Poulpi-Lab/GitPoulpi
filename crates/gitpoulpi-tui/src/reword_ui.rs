@@ -76,6 +76,28 @@ pub(crate) fn on_current_branch(graph: &CommitGraph, refs: &[Ref], commit: Oid) 
     reaches(graph, head_tip(refs)?, commit)
 }
 
+/// The local branches (other than the checked-out one) whose history, as far
+/// as the loaded graph shows, holds `commit`: where it could be edited after
+/// a checkout. Sorted by name.
+pub(crate) fn other_branches_holding(
+    graph: &CommitGraph,
+    refs: &[Ref],
+    commit: Oid,
+) -> Vec<String> {
+    let mut names: Vec<String> = refs
+        .iter()
+        .filter(|r| !r.is_head)
+        .filter_map(|r| match &r.kind {
+            RefKind::LocalBranch { name } => {
+                (reaches(graph, r.target, commit) == Some(true)).then(|| name.clone())
+            }
+            _ => None,
+        })
+        .collect();
+    names.sort();
+    names
+}
+
 /// The upstream (`origin/main`) of the checked-out branch when `commit`
 /// is already on it - i.e. rewording it will need a force push. `None`
 /// when the branch has no upstream, the upstream is not a known remote

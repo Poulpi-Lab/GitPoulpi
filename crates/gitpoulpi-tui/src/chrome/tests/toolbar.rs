@@ -34,13 +34,44 @@ fn the_toolbar_at_a_wide_width_shows_every_button_and_no_overflow() {
     let (text, _, toolbar) = draw_toolbar(110, None);
     assert_eq!(
         text,
-        "     \u{21B6} Undo \u{25BE}   \u{21B7} Redo   \u{21E9} Pull \u{25BE}   \
-         \u{21E7} Push \u{25BE}   \u{2387} Branch   \u{1F516}  Tag   \u{1F4E5}  Stash   \
+        "  \u{21B6} Undo  \u{25BE}   \u{21B7} Redo   \u{21E9} Pull  \u{25BE}   \
+         \u{21E7} Push  \u{25BE}   \u{2387} Branch   \u{1F516}  Tag   \u{1F4E5}  Stash   \
          \u{1F4E4}  Pop   \u{25A3} LFS \u{25BE}   \u{2315} Search     "
     );
     assert!(!text.contains("Fetch"), "Fetch lives in the Pull dropdown");
     assert!(toolbar.overflow.is_none());
     assert!(!text.contains('\u{22EF}'));
+}
+
+/// The dropdown arrow of every split button sits in the middle of its
+/// sub-button: the same number of cells (one) before and after the glyph,
+/// the whole chip lit as one (hit rect = painted chip), hovered too.
+#[test]
+fn a_split_buttons_arrow_is_centered_in_its_sub_button() {
+    for b in [
+        ToolbarButton::Undo,
+        ToolbarButton::Pull,
+        ToolbarButton::Push,
+    ] {
+        for hovered in [None, Some(HitTarget::ToolbarDropdown(b))] {
+            let (_, buf, tb) = draw_toolbar(130, hovered.as_ref());
+            let chip = tb
+                .hits
+                .iter()
+                .find(|(_, t)| *t == HitTarget::ToolbarDropdown(b))
+                .unwrap_or_else(|| panic!("{b:?} has no arrow"))
+                .0;
+            let glyph = (chip.x..chip.right())
+                .find(|&x| buf[(x, 0)].symbol() == "\u{25BE}")
+                .unwrap_or_else(|| panic!("{b:?}: no arrow in its chip"));
+            assert_eq!(glyph - chip.x, chip.right() - 1 - glyph, "{b:?}");
+            let bg = buf[(chip.x, 0)].bg;
+            assert!(
+                (chip.x..chip.right()).all(|x| buf[(x, 0)].bg == bg),
+                "{b:?}: one background over the chip"
+            );
+        }
+    }
 }
 
 fn button_span(
@@ -62,7 +93,7 @@ fn button_span(
 /// (within a column), at several widths, and never touches the gear.
 #[test]
 fn the_button_group_is_centered_at_several_widths() {
-    for width in [110u16, 130, 160, 200] {
+    for width in [120u16, 130, 160, 200] {
         let (_, _, tb) = draw_toolbar(width, None);
         assert!(tb.overflow.is_none(), "{width}");
         let (l, r) = button_span(&tb.hits, ToolbarButton::Undo, ToolbarButton::Search);
@@ -364,8 +395,8 @@ fn the_toolbar_at_a_narrow_width_collapses_the_least_important_buttons_into_one_
     let (text, _, toolbar) = draw_toolbar(56, None);
     assert_eq!(
         text,
-        " \u{21B6} Undo \u{25BE}   \u{21E9} Pull \u{25BE}   \u{21E7} Push \u{25BE}   \
-         \u{2387} Branch   \u{22EF}          "
+        " \u{21B6} Undo  \u{25BE}   \u{21E9} Pull  \u{25BE}   \u{21E7} Push  \u{25BE}   \
+         \u{2387} Branch   \u{22EF}       "
     );
     let (rect, hidden) = toolbar.overflow.expect("an overflow button");
     assert_eq!(
@@ -674,7 +705,17 @@ fn a_split_button_keeps_its_arrow_chip_at_the_end_of_its_row() {
         assert_eq!(main.y, arrow.y);
         assert_eq!(main.right(), arrow.x, "{b:?}");
         assert_eq!(arrow.right(), area.right(), "{b:?}");
-        assert_eq!(buf[(arrow.x, arrow.y)].symbol(), "\u{25BE}", "{b:?}");
+        // The glyph sits in the middle of its sub-button: one blank cell on
+        // each side, on the chip's own background.
+        assert_eq!(arrow.width % 2, 1, "{b:?}: an odd chip centers its glyph");
+        let mid = arrow.x + arrow.width / 2;
+        assert_eq!(buf[(mid, arrow.y)].symbol(), "\u{25BE}", "{b:?}");
+        for x in arrow.x..arrow.right() {
+            if x != mid {
+                assert_eq!(buf[(x, arrow.y)].symbol(), " ", "{b:?} pad at {x}");
+            }
+        }
+        assert_eq!(mid - arrow.x, arrow.right() - 1 - mid, "{b:?}");
     }
     // LFS is one rect over the whole row, with the arrow painted in it.
     let lfs = tb

@@ -200,6 +200,13 @@ impl View {
         Self::scroll_to((offset as isize + delta).max(0) as usize, selected);
     }
 
+    /// `(col, row)` is on the painted scrollbar (the right border of the list).
+    pub(crate) fn bar_at(col: u16, row: u16) -> bool {
+        STATE
+            .with(|s| s.borrow().track)
+            .is_some_and(|t| t.rect.contains((col, row).into()))
+    }
+
     /// A press on the scrollbar: grabs the thumb, steps an arrow or jumps the thumb under the pointer.
     /// `false` when `(col, row)` is not on the bar.
     pub(crate) fn bar_press(col: u16, row: u16, selected: usize) -> bool {

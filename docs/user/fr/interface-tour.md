@@ -57,6 +57,16 @@ Chacun porte un `✕` en haut à droite de sa bordure ; `Esc` ou un clic sur `�
 ferme une boîte de dialogue, une fenêtre contextuelle ou un panneau (voir
 [Fermer les fenêtres et les boîtes de dialogue](mouse-and-gestures.md#fermer-les-fenêtres-et-les-boîtes-de-dialogue)).
 
+### Quand la fenêtre est petite
+
+Rien ne disparaît en silence quand la fenêtre se rétrécit. Un bouton perd d'abord
+son libellé long (coupé par `...`), puis passe sur une deuxième ligne ou se range
+dans le menu `⋯` de sa ligne, et sa touche et son entrée de palette continuent de
+marcher. Une boîte de dialogue trop grande pour la fenêtre dessine un petit cadre
+avec son titre, le `✕` et la ligne **Fenêtre trop petite : agrandissez-la** au
+lieu de rien ; `Esc` et `✕` la ferment, et elle revient en entier quand vous
+agrandissez la fenêtre.
+
 ## Barre d'onglets
 
 L'onglet **Accueil** (l'icône de maison) est à l'extrémité gauche, suivi de la

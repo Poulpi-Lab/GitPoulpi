@@ -68,6 +68,15 @@ sélectionnée (**Répondre**, **Citer**, **Modifier**, **Supprimer**, **Liens**
 *Conversation : ...* à côté des lignes *Revue : ...*. Un lien est confirmé avant de s'ouvrir, comme partout dans la
 revue.
 
+Un fil sur du code montre son `chemin:ligne` comme un lien (souligné, un vrai bouton). Un clic dessus, **`G`** sur le fil
+sélectionné, ou *Conversation : Ouvrir le code du fil de discussion* dans la palette passe à la page **Fichiers**, ouvre ce
+fichier et place le curseur sur la ligne commentée (du côté ancien ou nouveau, comme elle a été écrite) avec le fil ouvert
+dessous (un fil replié est déplié). **Esc**, le bouton **Retour à l'aperçu** à gauche des onglets de page, ou *Revue : Retour
+au commentaire dans l'aperçu* ramènent à la même entrée de l'Aperçu. Un fil dont la ligne n'est plus dans le diff (obsolète)
+ouvre le fichier à la ligne la plus proche et la ligne d'état le dit ; un fil sur un fichier que la demande ne modifie plus dit
+que le fichier n'est pas dans le diff. Dans la vue ticket ou Radar de la même demande, il n'y a pas de code à ouvrir : `G`
+répond que la revue l'a.
+
 Quand une touche de la conversation et une touche de la revue se rencontrent, la conversation garde la lettre sur cette page : `l` (étiquettes), `m`
 (jalon), `Q` (abandon sur Gerrit), `e` / `d`, `r`. Les étiquettes, le jalon et l'abandon restent sur les boutons de l'en-tête et
 dans la palette ; `a` (assignés), `p` (relecteurs), `f` (**Terminer la revue**), `b` (**Basculer**), `P`, `D`, `U` et
@@ -288,6 +297,7 @@ Envoyer la revue dépense le brouillon.
 | Aperçu / Fichiers / Commits | `Alt+1` / `Alt+2` / `Alt+3` | *Revue : Afficher l'aperçu*, *Afficher les fichiers*, *Afficher les commits* |
 | Commenter la ligne ou la plage | `c` | *Revue : Commenter la ligne...* |
 | Commenter la discussion | `c` sur l'Aperçu, `C` | *Revue : Commenter la discussion...* (ouvre la zone de l'Aperçu), *Conversation : Nouveau commentaire* |
+| Ouvrir le code d'un fil (Aperçu) / revenir au commentaire | `G` / `Esc` | *Conversation : Ouvrir le code du fil de discussion*, *Revue : Retour au commentaire dans l'aperçu* |
 | Répondre au fil | `r` | *Revue : Répondre au fil de discussion...* |
 | Résoudre ou rouvrir | `x` | *Revue : Résoudre ou rouvrir le fil de discussion* |
 | Replier ou déplier un fil | `z` | *Revue : Replier ou déplier le fil de discussion* |

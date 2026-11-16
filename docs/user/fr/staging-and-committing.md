@@ -21,7 +21,7 @@ le volet de droite montre les modifications locales :
 - **Les fichiers renommés ou déplacés** sont une seule ligne, `nouveau <- ancien`, dans les deux listes (un fichier
   supprimé sur le disque et un nouveau dont au moins 50 % du contenu est identique comptent comme un déplacement
   avant même que vous les stagiez). Stage, Unstage et Abandon agissent sur les deux noms : stager stage la
-  suppression et le nouveau fichier, si bien que git voit un seul renommage. Ouvrir la ligne montre le diff du contenu
+  suppression et le nouveau fichier, si bien que git voit un seul renommage, et c'est UNE seule étape d'annulation (`Undo Stage rename ancien -> nouveau`). Ouvrir la ligne montre le diff du contenu
   par rapport à l'ancien nom, avec l'en-tête `ancien -> nouveau (N % de similarité)` ; un déplacement sans
   modification dit **Aucun changement de contenu**. Il en va de même pour les fichiers d'un commit, et
   `gitpoulpi status` / `gitpoulpi diff` rapportent `renamed_from`.
@@ -181,7 +181,7 @@ l'autre.
   force push (avec lease).
 - **Ignorer les hooks** (`Shift+H`, ou **Commit : Basculer Ignorer les hooks** dans la palette) commite
   sans exécuter les hooks `pre-commit` et `commit-msg` du dépôt. Le choix vaut pour un seul commit ;
-  **Paramètres > Paramètres du dépôt > Commit** permet de la cocher au départ. Affichée quand la ligne a la place.
+  **Paramètres > Paramètres du dépôt > Commit** permet de la cocher au départ. Sur une ligne étroite son libellé rétrécit en **Sans hooks**, puis en la seule case (son infobulle la nomme) ; elle ne disparaît jamais.
 - `c` dans le volet Status place le curseur dans le formulaire. `Esc` le quitte.
 - `Ctrl+G c` et `Ctrl+G Enter` (**Git : Commiter...** et **Git : Commiter le stage
   maintenant** dans la palette) forment une seule commande, le bouton de commit
@@ -207,8 +207,12 @@ n'appuyez pas sur le bouton de commit.
 
 **Composer des commits avec l'IA** est à l'extrémité droite de la ligne Modifier et rétrécit avec le volet de droite
 au lieu de disparaître : le libellé complet, puis **Composer avec l'IA**, puis le seul **`✦`**. Il garde son clic, son
-infobulle et sa touche (`Ctrl+G Shift+C`) à toutes les largeurs ; ce sont les libellés **Amender** et **Ignorer les hooks**
-qui lui cèdent la place, jamais l'inverse.
+infobulle et sa touche (`Ctrl+G Shift+C`) à toutes les largeurs ; c'est le libellé **Ignorer les hooks**
+qui lui cède la place (**Sans hooks**, puis la seule case) avant qu'il ne rétrécisse lui-même.
+
+Les boutons **`✦`** (générer le message) et **`#`** (insérer une référence de ticket) à l'extrémité droite de la ligne du
+résumé rétrécissent de la même façon : dans un volet étroit ils perdent leurs marges, puis se replient en un seul bouton
+**`⋯`** dont le menu les liste tous les deux, si bien qu'aucun ne disparaît.
 
 ## Le compositeur de commits : répartir vos modifications en commits
 

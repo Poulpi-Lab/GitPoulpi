@@ -1265,10 +1265,12 @@ The TUI side of the grouped run: selection, plan and progress in one movable fra
   512 KiB, size-ratio prefilter, a work budget; over any of them the listing stays a delete plus adds. The old side is
   read from the index (one `cat-file --batch` / libgit2 blobs). It runs in the daemon, never on the render thread.
 - **Acting on the row.** `DaemonLink::submit_action` expands through `RenamePairs` (rebuilt from each status): Stage
-  stages the new and the old path (two journal entries, so two undo steps), Unstage of a staged rename unstages both,
-  Discard becomes one `DiscardPaths [new, old]` (old restored, new removed, one confirmation, one undo entry),
-  Stage/Unstage Folder bring a partner outside the folder along. CLI/MCP callers stage the paths they name:
-  `status` shows `renamed_from` so they can name both.
+  and Unstage of a move are ONE `StageTarget::Files [new, old]` request (kind `StageFile` / `UnstageFile`, one index
+  write, one journal entry, labelled `Stage rename old -> new` through the request's `rename` flag), Discard becomes one
+  `DiscardPaths [new, old]` (old restored, new removed, one confirmation, one undo entry), Stage/Unstage Folder bring a
+  partner outside the folder along in the same one `Files [folder, partner]` request. The target entries are
+  pathspecs (files or folders). CLI/MCP callers use `stage --paths a b` / `unstage --paths a b` (same target, one
+  journaled op; label `Stage a and b`): `status` shows `renamed_from` so they can name both.
 - **The diff.** The Diff view of a moved row asks for both paths (`FileDiffRequest::also`, taken from the status);
   an unstaged move's untracked side is appended and merged by `merge_rename`. The header row is
   `old -> new (N% similar)`; a pure rename shows "No content change". Hunk staging is not offered on an untracked

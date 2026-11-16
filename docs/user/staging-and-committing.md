@@ -21,7 +21,8 @@ the working changes:
 - **Renamed or moved files** are one row, `new <- old`, in both lists (a file
   deleted on disk and a new one with at least 50% the same content count as a
   move even before you stage them). Stage, Unstage and Discard act on both
-  names: staging stages the deletion and the new file, so git sees one rename.
+  names: staging stages the deletion and the new file, so git sees one rename, and
+  it is ONE undo step (`Undo Stage rename old -> new`).
   Opening the row shows the content diff against the old name, headed
   `old -> new (N% similar)`; a move with no edits says **No content change**.
   The same goes for a commit's files, and `gitpoulpi status` / `gitpoulpi diff`

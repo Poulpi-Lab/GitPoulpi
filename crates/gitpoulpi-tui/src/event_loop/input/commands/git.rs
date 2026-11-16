@@ -6,7 +6,7 @@ use gitpoulpi_core::domain::ConflictSide;
 use gitpoulpi_i18n::msg;
 use gitpoulpi_session::PendingAutoStashState;
 
-use super::{pane::*, shared::*, CommandCtx};
+use super::{guard_off_branch, pane::*, shared::*, CommandCtx};
 
 pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option<String>) -> bool {
     let sel_ref = sel_ref.clone();
@@ -562,20 +562,22 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
             if let Some(commit) =
                 selected_log_commit(&*cx.log_result, &*cx.log_state, &*cx.log_order)
             {
-                apply_log_context_action(
-                    action,
-                    commit,
-                    &*cx.log_result,
-                    &*cx.refs_result,
-                    cx.link,
-                    &mut *cx.clipboard,
-                    &mut *cx.input_mode,
-                    &mut *cx.last_message,
-                    &mut *cx.worktree_seed,
-                    &mut *cx.patch_seed,
-                    &cx.log_multi.newest_first(&*cx.log_result),
-                    &cx.remote_ui.remotes,
-                );
+                if !guard_off_branch(cx, &action, commit) {
+                    apply_log_context_action(
+                        action,
+                        commit,
+                        &*cx.log_result,
+                        &*cx.refs_result,
+                        cx.link,
+                        &mut *cx.clipboard,
+                        &mut *cx.input_mode,
+                        &mut *cx.last_message,
+                        &mut *cx.worktree_seed,
+                        &mut *cx.patch_seed,
+                        &cx.log_multi.newest_first(&*cx.log_result),
+                        &cx.remote_ui.remotes,
+                    );
+                }
             }
         }
         PaletteCommand::RebaseContinue => {

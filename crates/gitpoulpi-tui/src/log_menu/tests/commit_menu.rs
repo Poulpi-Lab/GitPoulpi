@@ -475,6 +475,24 @@ fn edit_commit_message_opens_on_the_full_message_or_says_why_not() {
     assert!(off.contains("not on the current branch"), "{off}");
     let gone = reword_form_for(&graph, &refs, oid(42)).unwrap_err();
     assert!(gone.contains("no longer in the loaded graph"), "{gone}");
+
+    // The off-branch question's list: the other local branches whose
+    // history holds it, sorted; remote branches and the current one are not.
+    let mut topic = local_branch_at("topic", oid(9));
+    topic.is_head = false;
+    let mut main = local_branch_at("main", oid(3));
+    main.is_head = true;
+    let refs = vec![
+        main,
+        topic,
+        local_branch_at("alpha", oid(9)),
+        local_branch_at("other", oid(3)),
+        remote_branch_at("origin", "topic", oid(9)),
+    ];
+    let held = crate::reword_ui::other_branches_holding(graph.as_ref().unwrap(), &refs, oid(9));
+    assert_eq!(held, vec!["alpha".to_string(), "topic".to_string()]);
+    let none = crate::reword_ui::other_branches_holding(graph.as_ref().unwrap(), &refs, oid(42));
+    assert!(none.is_empty(), "{none:?}");
 }
 
 /// Regression: "Interactively rebase from here" listed the commits

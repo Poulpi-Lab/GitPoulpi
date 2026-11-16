@@ -238,6 +238,7 @@ pub(in crate::event_loop) fn run_log_menu_action(
         LogContextAction::Column(op) => commands::commit_column::run_op(cx, op, commit),
         LogContextAction::AiExplain => commands::explain_commit(cx, commit),
         LogContextAction::AiSplitCommit => commands::split_commit_with_ai(cx, commit),
+        other if commands::guard_off_branch(cx, &other, commit) => {}
         other => apply_log_context_action(
             other,
             commit,

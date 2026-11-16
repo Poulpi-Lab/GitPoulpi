@@ -12714,3 +12714,25 @@ palette_toggle_internal = "Conversation: Toggle Internal Note"
 why_unchanged = "nothing changed yet"
 # context: name of the text format a host takes when it has no markup, shown in the composer footer. Width budget: 20 cells
 flavor_plain_text = "Plain text"
+
+[edit_off_branch]
+# context: title of the dialog offered when the commit to edit is not on the checked-out branch
+title = "Edit a {$commit} of another branch"
+# context: body of that dialog when local branches hold the commit; {short} is the short commit id
+body_branches = "{short} is not on the current branch. Check out a branch that holds it to edit it here."
+# context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
+body_none = "{short} is on no local branch. Create a branch at it to edit it here."
+# context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
+checkout = "Check out {branch} and edit"
+# context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
+rewrite = "Edit with advanced history rewrite"
+# context: button that opens the name box to create a branch at that commit
+create = "Create a branch here..."
+# context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
+key_rewrite = "r"
+# context: key of the Create a branch here button, one letter
+key_create = "b"
+# context: key of the Cancel button of that dialog, one letter
+key_cancel = "c"
+# context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
+gave_up = "{short} was not edited: the branch was not checked out"

@@ -256,6 +256,23 @@ you will need a force push (with lease), and asks for a second confirmation.
 `Ctrl+Z` (the toolbar's Undo) takes the reword back; see
 [Undo and redo](undo-redo.md). The status line also names the previous tip.
 
+A commit that is not on the checked-out branch (it lives on another branch)
+cannot be reworded or amended where you are, so *Edit commit message...* and
+*Amend...* open **Edit a commit of another branch** instead, a list of choices
+(`Up` / `Down` or `Ctrl+J` / `Ctrl+K` move, `Enter` or a click picks, `Esc`, the
+cross or **Cancel (C)** closes it):
+
+- **Check out `<branch>` and edit (1)**: one row per local branch whose history
+  holds the commit (`1` to `8`, the first eight, the rest are counted). The
+  branch is checked out the usual way, then the edit opens on it. The undo story
+  is the two actions' own: `Ctrl+Z` takes the edit back, the checkout is a
+  checkout.
+- **Edit with advanced history rewrite (R)**: opens the
+  [history rewrite workbench](history-rewrite.md) on that commit, in builds that
+  have it.
+- **Create a branch here... (B)**: only when no local branch holds the commit
+  (it is on a remote branch only, say); opens the name box for a branch at it.
+
 ## Amending a commit (message, author, dates)
 
 *Amend...* in the commit menu (or `Ctrl+G Shift+E`, or the palette's *Commit: Amend...*) opens one dialog for the commit's properties: the summary, the description, the author's name, email and date, each filled in with the commit's own values. Change any of them and press **Apply**; only the fields you changed are sent. A date is written `YYYY-MM-DD HH:MM:SS +HH:MM` and shown in UTC until you edit it. The committer is you, now (as for a reword). Any commit of the checked-out branch can be amended, with the same rules, the same pushed-commit warning and the same second confirmation as *Edit commit message...*; the commits on top are re-created with their own authors and dates, and your staged and unstaged changes are left alone. `Ctrl+Z` (the toolbar's Undo) takes it back. In builds with history rewrite, **Modify History Deeper...** (`Alt+H`) at the bottom left of the dialog closes it without applying anything and opens the [history rewrite workbench](history-rewrite.md) scoped from this commit to the newest one; if you edited a field it asks first (`Esc` confirms). `Ctrl+N` shows a badge on every field and button of the dialog; press it to put the cursor in that field or press that button (see [Badges](keybindings.md#badges)).

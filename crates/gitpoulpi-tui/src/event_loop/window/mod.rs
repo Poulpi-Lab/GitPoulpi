@@ -25,6 +25,7 @@ mod history;
 mod idle;
 mod merge_sync;
 mod notices;
+mod off_branch_edit;
 #[cfg(feature = "hosting")]
 mod radar_pending;
 mod refs_update;

@@ -10,7 +10,7 @@
 //!   [`DismissKind`], the same way for every dialog.
 //! * [`Confirm`] is the modal "are you sure" box: title, body, buttons.
 
-use crossterm::event::{KeyCode, KeyEvent, MouseButton, MouseEvent, MouseEventKind};
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::style::Style;
@@ -179,6 +179,9 @@ pub(crate) struct Confirm<C: Copy + PartialEq> {
     keep_breaks: bool,
     /// The narrowest the box is drawn (a body that carries an address).
     min_width: u16,
+    /// The buttons are a list, one per row (long labels, a pick list): the
+    /// arrows and `Ctrl+J` / `Ctrl+K` move through them like Left / Right.
+    stacked: bool,
 }
 
 impl<C: Copy + PartialEq> Confirm<C> {
@@ -203,7 +206,14 @@ impl<C: Copy + PartialEq> Confirm<C> {
             hits: Vec::new(),
             keep_breaks: false,
             min_width: 44,
+            stacked: false,
         }
+    }
+
+    /// Lays the buttons out one per row instead of side by side.
+    pub(crate) fn stacked(mut self) -> Self {
+        self.stacked = true;
+        self
     }
 
     /// Draws the box at least `width` cells wide (when the screen allows).
@@ -245,6 +255,14 @@ impl<C: Copy + PartialEq> Confirm<C> {
             KeyCode::Esc => return ConfirmEvent::Chose(self.cancel),
             KeyCode::Left | KeyCode::BackTab => self.selected = (self.selected + n - 1) % n,
             KeyCode::Right | KeyCode::Tab => self.selected = (self.selected + 1) % n,
+            KeyCode::Up if self.stacked => self.selected = (self.selected + n - 1) % n,
+            KeyCode::Down if self.stacked => self.selected = (self.selected + 1) % n,
+            KeyCode::Char('k') if self.stacked && key.modifiers == KeyModifiers::CONTROL => {
+                self.selected = (self.selected + n - 1) % n
+            }
+            KeyCode::Char('j') if self.stacked && key.modifiers == KeyModifiers::CONTROL => {
+                self.selected = (self.selected + 1) % n
+            }
             KeyCode::Enter if !self.buttons.is_empty() => return self.press(self.selected),
             _ => {}
         }
@@ -276,12 +294,18 @@ impl<C: Copy + PartialEq> Confirm<C> {
     /// (the choice each one answers), also used by `on_mouse`.
     pub(crate) fn render(&mut self, buf: &mut Buffer, bounds: Rect) -> Vec<(Rect, C)> {
         self.hits.clear();
-        let buttons_w: u16 = self
-            .buttons
-            .iter()
-            .map(|(l, _)| button_width(l))
-            .sum::<u16>()
-            + 2 * self.buttons.len().saturating_sub(1) as u16;
+        let widths = self.buttons.iter().map(|(l, _)| button_width(l));
+        let buttons_w: u16 = if self.stacked {
+            widths.max().unwrap_or(0)
+        } else {
+            widths.sum::<u16>() + 2 * self.buttons.len().saturating_sub(1) as u16
+        };
+        // Stacked, the buttons take a row each below the text.
+        let button_rows = if self.stacked {
+            self.buttons.len().max(1) as u16
+        } else {
+            1
+        };
         let want_w = (crate::display_width(&self.title) as u16 + 8)
             .max(buttons_w + 4)
             .max(self.min_width)
@@ -308,7 +332,7 @@ impl<C: Copy + PartialEq> Confirm<C> {
             .into_iter()
             .flat_map(|line| hard_break(&line, inner_w))
             .collect();
-        let want_h = lines.len() as u16 + 4;
+        let want_h = lines.len() as u16 + 3 + button_rows;
         let panel_rect = CONFIRM_WIN.place(bounds, centered(bounds, want_w, want_h));
         self.panel = panel_rect;
         if panel_rect.width < 8 || panel_rect.height < 5 {
@@ -317,7 +341,7 @@ impl<C: Copy + PartialEq> Confirm<C> {
         self.close
             .framed(buf, panel_rect, &self.title, &CONFIRM_WIN, true);
         let text = Style::default().fg(th().ui.text).bg(th().ui.panel);
-        let room = (panel_rect.height - 4) as usize;
+        let room = panel_rect.height.saturating_sub(3 + button_rows) as usize;
         for (i, line) in lines.iter().take(room).enumerate() {
             put(
                 buf,
@@ -328,7 +352,7 @@ impl<C: Copy + PartialEq> Confirm<C> {
                 text,
             );
         }
-        let y = panel_rect.bottom() - 2;
+        let mut y = panel_rect.bottom() - 1 - button_rows;
         let mut x = panel_rect.x + panel_rect.width.saturating_sub(buttons_w) / 2;
         let mut out = Vec::new();
         for (i, (label, choice)) in self.buttons.iter().enumerate() {
@@ -342,7 +366,11 @@ impl<C: Copy + PartialEq> Confirm<C> {
             let r = button(buf, x, y, label, state);
             self.hits.push((r, i));
             out.push((r, *choice));
-            x += r.width + 2;
+            if self.stacked {
+                y += 1;
+            } else {
+                x += r.width + 2;
+            }
         }
         out
     }

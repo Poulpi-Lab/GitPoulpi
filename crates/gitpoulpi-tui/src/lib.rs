@@ -188,6 +188,7 @@ mod merge_flow;
 mod merge_view;
 mod minimap;
 mod new_file;
+mod off_branch_edit;
 mod palette;
 mod pane_menu;
 mod paste_burst;

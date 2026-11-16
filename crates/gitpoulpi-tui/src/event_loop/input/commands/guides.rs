@@ -120,12 +120,86 @@ fn apply(cx: &mut CommandCtx<'_>, dialog: GuideDialog, choice: Choice) {
         }
         // Never in the window's input mode: a worker asks it (`ai_limit_dialog`).
         (Kind::Truncation, _) => {}
+        (Kind::OffBranch(off), choice) => apply_off_branch(cx, off, choice),
         (Kind::TooLarge(_), Choice::Truncated) => {}
+        (Kind::TooLarge(_), Choice::Pick(_) | Choice::Rewrite | Choice::CreateBranch) => {}
         // Settings, on the limit's row.
         (Kind::TooLarge(_), Choice::Secondary) => {
             let mut state = PreferencesState::open(cx.repo_root);
             let _ = state.show_page(None, Some(CONFLICT_LIMIT_KEY));
             *cx.preferences = Some(state);
         }
+    }
+}
+
+/// An Edit commit message or Amend on a commit that is not on the checked-out
+/// branch asks what to do instead of refusing (`guide_dialog`): check out a
+/// branch that holds it, rewrite the history, or make a branch. `true`: the
+/// dialog is up and the action stops here.
+pub(in crate::event_loop) fn guard_off_branch(
+    cx: &mut CommandCtx<'_>,
+    action: &LogContextAction,
+    commit: Oid,
+) -> bool {
+    let scope = match action {
+        LogContextAction::EditMessage => None,
+        LogContextAction::Amend(scope) => Some(*scope),
+        _ => return false,
+    };
+    let refs = cx.refs_result.as_deref().unwrap_or(&[]);
+    let Ok(graph) = cx.log_result.as_ref() else {
+        return false;
+    };
+    if crate::log_menu::loaded_commit(&*cx.log_result, commit).is_none()
+        || crate::reword_ui::on_current_branch(graph, refs, commit) != Some(false)
+    {
+        return false;
+    }
+    let branches = crate::reword_ui::other_branches_holding(graph, refs, commit);
+    let dialog = GuideDialog::off_branch(
+        commit,
+        scope,
+        &branches,
+        crate::build_features::HISTORY_REWRITE,
+    );
+    *cx.input_mode = InputMode::Guide(Box::new(dialog));
+    true
+}
+
+/// What the off-branch edit dialog's buttons do.
+fn apply_off_branch(cx: &mut CommandCtx<'_>, off: crate::guide_dialog::OffBranch, choice: Choice) {
+    match choice {
+        // The usual checkout (the daemon's own dirty-worktree handling); the
+        // edit opens once the branch is the checked-out one.
+        Choice::Pick(i) => {
+            let Some(branch) = off.branches.get(i as usize).cloned() else {
+                return;
+            };
+            let message = crate::git_actions::checkout_ref_now(
+                &branch,
+                &*cx.refs_result,
+                &*cx.remote_names,
+                cx.link,
+                &mut *cx.input_mode,
+            );
+            crate::off_branch_edit::wait_for(off.commit, off.scope, branch);
+            if !message.is_empty() {
+                *cx.last_message = Some(message);
+            }
+        }
+        Choice::Rewrite => {
+            super::super::keys_prefix::open_rewrite_from_menu(
+                cx,
+                crate::log_menu::RewriteFrom::Selected,
+                off.commit,
+            );
+        }
+        Choice::CreateBranch => {
+            *cx.input_mode = InputMode::InlineName {
+                op: RefNameOp::NewBranchAt(off.commit),
+                value: String::new(),
+            };
+        }
+        _ => {}
     }
 }

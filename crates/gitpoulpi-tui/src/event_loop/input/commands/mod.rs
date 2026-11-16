@@ -33,7 +33,7 @@ pub(in crate::event_loop) use folds::{
 };
 use gitpoulpi_i18n::msg;
 pub(in crate::event_loop) use guides::{
-    block_on_conflicts, guide_key, guide_mouse, open_limit_setting, start_ai,
+    block_on_conflicts, guard_off_branch, guide_key, guide_mouse, open_limit_setting, start_ai,
 };
 pub(in crate::event_loop) use pane::*;
 pub(in crate::event_loop) use shared::*;

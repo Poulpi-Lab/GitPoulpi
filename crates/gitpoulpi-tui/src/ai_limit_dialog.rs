@@ -138,6 +138,8 @@ fn apply(slot: &mut Option<Open>, outcome: Outcome) {
             resolve(slot, LimitAnswer::Cancel);
         }
         Choice::Cancel => resolve(slot, LimitAnswer::Cancel),
+        // Buttons of another dialog.
+        Choice::Pick(_) | Choice::Rewrite | Choice::CreateBranch => {}
     }
 }
 

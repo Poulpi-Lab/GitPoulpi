@@ -188,6 +188,8 @@ prefiksem (`Ctrl+G s`).
 | `status` | `collapse_below` | Zwiń folder i jego podfoldery | `_`, `Shift+Left` |
 | `home` | `favorite` | Dodaj repozytorium do ulubionych lub usuń | `f`, `*` |
 | `home` | `close_repo` | Zamknij, usuń lub zdejmij gwiazdkę z wiersza | `x`, `Delete` |
+| `home` | `copy_path` | Copy the Repository Path | `y` |
+| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
 | `home` | `browse` | Przeglądaj w poszukiwaniu repozytorium | `b` |
 | `home` | `clone` | Klonuj repozytorium | `c` |
 | `home` | `init` | Zainicjuj repozytorium | `i` |
@@ -799,6 +801,8 @@ zastosowania. Klawisze są domyślne.
 | Repozytoria: Dodaj lub usuń zaznaczone z ulubionych | `f` |
 | Repozytoria: Zamknij lub usuń zaznaczone | `x` |
 | Repozytoria: Menu zaznaczonego repozytorium... | `.` |
+| Repositories: Copy Selected Path | `y` |
+| Repositories: Open Selected in Default Tool | `o` |
 | Repozytoria: Szukaj | `/ / Ctrl+F` |
 | Repozytoria: Zwiń wszystkie sekcje | `-` |
 | Repozytoria: Rozwiń wszystkie sekcje | `+` |

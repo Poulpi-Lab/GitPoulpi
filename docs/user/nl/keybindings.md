@@ -190,6 +190,8 @@ prefix getoond (`Ctrl+G s`).
 | `status` | `collapse_below` | De map en zijn submappen inklappen | `_`, `Shift+Left` |
 | `home` | `favorite` | Repository als favoriet (de)markeren | `f`, `*` |
 | `home` | `close_repo` | Rij sluiten, verwijderen of favoriet wissen | `x`, `Delete` |
+| `home` | `copy_path` | Copy the Repository Path | `y` |
+| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
 | `home` | `browse` | Naar een repository bladeren | `b` |
 | `home` | `clone` | Een repository klonen | `c` |
 | `home` | `init` | Een repository initialiseren | `i` |
@@ -804,6 +806,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Repositories: Geselecteerde aan favorieten toevoegen of eruit verwijderen | `f` |
 | Repositories: Geselecteerde sluiten of verwijderen | `x` |
 | Repositories: Menu van geselecteerde repository... | `.` |
+| Repositories: Copy Selected Path | `y` |
+| Repositories: Open Selected in Default Tool | `o` |
 | Repositories: Zoeken | `/ / Ctrl+F` |
 | Repositories: Alle secties inklappen | `-` |
 | Repositories: Alle secties uitklappen | `+` |

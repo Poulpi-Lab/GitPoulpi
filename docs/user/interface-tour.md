@@ -150,7 +150,9 @@ That tab closes when the worktree is removed.
 The Home tab is the repository manager. It has four sections: **OPEN
 REPOSITORIES**, **FAVORITES**, **RECENT REPOSITORIES** and **ALL
 REPOSITORIES**. Each row shows the branch, the ahead and behind counts and the
-number of changes. Each row has a star (favorite), **Open** or **Switch**,
+number of changes, then the folder's path when there is room: shortened with `~`
+and cut in the middle when narrow, it never pushes the name, owner or branch
+out. Each row has a star (favorite), **Open** or **Switch**,
 **Close** or **Remove**, and a `⋮` menu.
 
 At the top: **Browse**, **Clone**, **Init**, a search box, **Collapse all**
@@ -158,7 +160,7 @@ and **Expand all**. A folder that no longer exists leaves *Recent* and *All*
 by itself. A missing favorite stays, with a **Remove** button. **Remove**
 never deletes anything on disk.
 
-Keys: `Enter` open, `f` favorite, `x` close or remove, `.` menu, `/` search,
+Keys: `Enter` open, `f` favorite, `x` close or remove, `y` copy the path, `o` open in the default tool (the `⋮` menu's **Open in** picks another), `.` menu, `/` search,
 `Space` fold a section, `Esc` back to your tab. `Ctrl+N` shows a badge on the
 search box, each section, and each button: press a badge's
 character to focus it or press it (see [Badges](keybindings.md#badges)).

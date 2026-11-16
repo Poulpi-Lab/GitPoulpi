@@ -631,6 +631,11 @@ fn repo_line(
         }
         None => {}
     }
+    // The path takes whatever the columns left, so it never pushes the
+    // name, owner or branch out; too little room and it is simply absent.
+    if let Some(path) = path_cell(known, c.room()) {
+        c.push(&path, Style::default().fg(th().ui.muted));
+    }
     c.end = area.x + area.width;
 
     // Actions, right-aligned, registered before the row band.
@@ -654,4 +659,69 @@ fn repo_line(
     hits.push((star, ManagerHit::Star(offset)));
     hits.push((Rect::new(start, y, area.width, 1), ManagerHit::Row(offset)));
     c.line()
+}
+
+/// Least cells worth showing a path in: two spaces and a few characters.
+const MIN_PATH_CELLS: usize = 14;
+
+/// The path cell: two spaces, then the path shortened with `~` and cut in
+/// the middle to `room` cells. `None` without a path or without room.
+fn path_cell(known: &KnownRepo, room: usize) -> Option<String> {
+    if known.path.as_os_str().is_empty() || room < MIN_PATH_CELLS {
+        return None;
+    }
+    let home = gitpoulpi_config::home_dir();
+    let shown = home_shortened(&known.path, home.as_deref());
+    Some(format!("  {}", mid_fit(&shown, room - 2)))
+}
+
+/// `path` with a leading `home` replaced by `~`.
+pub(super) fn home_shortened(path: &Path, home: Option<&Path>) -> String {
+    if let Some(rest) = home.and_then(|h| path.strip_prefix(h).ok()) {
+        let rest = rest.to_string_lossy();
+        return if rest.is_empty() {
+            "~".to_string()
+        } else {
+            let sep = if cfg!(windows) { '\\' } else { '/' };
+            format!("~{sep}{rest}")
+        };
+    }
+    path.to_string_lossy().into_owned()
+}
+
+/// `text` cut in the middle with an ellipsis to fit `width` cells, keeping
+/// the start (the root) and the end (the folder's own name).
+pub(super) fn mid_fit(text: &str, width: usize) -> String {
+    if display_width(text) <= width {
+        return text.to_string();
+    }
+    if width <= 1 {
+        return "\u{2026}".repeat(width);
+    }
+    let budget = width - 1;
+    let head = budget / 3;
+    let tail = budget - head;
+    let chars: Vec<char> = text.chars().collect();
+    let mut start = String::new();
+    let mut used = 0;
+    for &ch in &chars {
+        let w = display_width(&ch.to_string());
+        if used + w > head {
+            break;
+        }
+        start.push(ch);
+        used += w;
+    }
+    let mut end: Vec<char> = Vec::new();
+    let mut used = 0;
+    for &ch in chars.iter().rev() {
+        let w = display_width(&ch.to_string());
+        if used + w > tail {
+            break;
+        }
+        end.push(ch);
+        used += w;
+    }
+    end.reverse();
+    format!("{start}\u{2026}{}", end.into_iter().collect::<String>())
 }

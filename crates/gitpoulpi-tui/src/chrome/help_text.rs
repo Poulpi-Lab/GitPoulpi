@@ -455,6 +455,7 @@ pub(crate) const HELP_TEXT: &[HelpEntry] = &[
     Item(Msg(msg::help_keys::REPOSITORIES_AND_TABS_7_KEYS), msg::help_text::REPOSITORIES_AND_TABS_7),
     Item(keys!("{home.favorite}"), msg::help_text::REPOSITORIES_AND_TABS_8),
     Item(keys!("{home.close_repo}"), msg::help_text::REPOSITORIES_AND_TABS_9),
+    Item(keys!("{home.copy_path} / {home.open_in}"), msg::help_text::REPOSITORIES_AND_TABS_COPY_OPEN),
     Item(keys!("{*global.context_menu}"), msg::help_text::REPOSITORIES_AND_TABS_10),
     Item(Msg(msg::help_keys::REPOSITORIES_AND_TABS_11_KEYS), msg::help_text::REPOSITORIES_AND_TABS_11),
     Item(keys!("Esc"), msg::help_text::REPOSITORIES_AND_TABS_12),

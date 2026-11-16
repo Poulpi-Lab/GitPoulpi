@@ -190,6 +190,8 @@ préfixe (`Ctrl+G s`).
 | `status` | `collapse_below` | Replier le dossier et ses sous-dossiers | `_`, `Shift+Left` |
 | `home` | `favorite` | Marquer ou démarquer le dépôt (étoile) | `f`, `*` |
 | `home` | `close_repo` | Fermer, retirer ou démarquer la ligne | `x`, `Delete` |
+| `home` | `copy_path` | Copier le chemin du dépôt | `y` |
+| `home` | `open_in` | Ouvrir le dépôt avec l'outil par défaut | `o` |
 | `home` | `browse` | Parcourir pour trouver un dépôt | `b` |
 | `home` | `clone` | Cloner un dépôt | `c` |
 | `home` | `init` | Initialiser un dépôt | `i` |
@@ -802,6 +804,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Dépôts : Ajouter ou retirer la sélection des favoris | `f` |
 | Dépôts : Fermer ou retirer la sélection | `x` |
 | Dépôts : Menu du dépôt sélectionné... | `.` |
+| Dépôts : Copier le chemin de la sélection | `y` |
+| Dépôts : Ouvrir la sélection avec l'outil par défaut | `o` |
 | Dépôts : Rechercher | `/ / Ctrl+F` |
 | Dépôts : Replier toutes les sections | `-` |
 | Dépôts : Déplier toutes les sections | `+` |

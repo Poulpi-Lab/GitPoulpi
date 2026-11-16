@@ -369,3 +369,28 @@ fn ctrl_n_badges_press_the_workspaces_buttons() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
+
+/// Each row shows its folder's path after the stats (the temp folder's
+/// own name, never pushing the name out), `y` copies the selected
+/// repository's path and says so in the Home footer.
+#[test]
+fn rows_show_the_path_and_y_copies_it() {
+    let (mut term, _c, fx) = setup();
+    let leaf =
+        fx.1.root()
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .into_owned();
+    term.wait_for("bravo-repo with its path", STEP, |s| {
+        s.text()
+            .lines()
+            .any(|l| l.contains("bravo-repo") && l.contains(&leaf))
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_text("y").unwrap();
+    term.wait_for("the copy answer in the footer", STEP, |s| {
+        s.contains("repository path")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+}

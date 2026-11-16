@@ -173,6 +173,8 @@ stage_file = "z"
 | `status` | `collapse_below` | フォルダーとそのサブフォルダーを折りたたむ | `_`, `Shift+Left` |
 | `home` | `favorite` | リポジトリのお気に入りを切り替え | `f`, `*` |
 | `home` | `close_repo` | 行を閉じる、削除、またはお気に入り解除 | `x`, `Delete` |
+| `home` | `copy_path` | Copy the Repository Path | `y` |
+| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
 | `home` | `browse` | リポジトリを参照 | `b` |
 | `home` | `clone` | リポジトリをクローン | `c` |
 | `home` | `init` | リポジトリを初期化 | `i` |
@@ -766,6 +768,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | リポジトリ一覧: 選択中のもののお気に入りを切り替え | `f` |
 | リポジトリ一覧: 選択中のものを閉じる／削除 | `x` |
 | リポジトリ一覧: 選択中のリポジトリのメニュー... | `.` |
+| Repositories: Copy Selected Path | `y` |
+| Repositories: Open Selected in Default Tool | `o` |
 | リポジトリ一覧: 検索 | `/ / Ctrl+F` |
 | リポジトリ一覧: すべてのセクションを折りたたむ | `-` |
 | リポジトリ一覧: すべてのセクションを展開 | `+` |

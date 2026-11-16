@@ -71,3 +71,36 @@ fn from_crossterm_maps_shift_f10_and_the_menu_key_to_key_menu_plain_f10_falls_th
         Key::Char('.')
     );
 }
+
+/// `y` and `o` ask for the selected repository's path to be copied or
+/// opened; a folder that is gone refuses to open and says why.
+#[test]
+fn y_copies_and_o_opens_the_selected_path() {
+    let mut m = manager();
+    m.selected = m
+        .rows()
+        .iter()
+        .position(|r| matches!(r, ManagerRow::Repo { repo, .. } if m.repos[*repo].name == "alpha"))
+        .unwrap();
+    assert_eq!(
+        handle_key(&mut m, Key::Char('y'), false),
+        ManagerAction::CopyPath(PathBuf::from("/work/alpha"))
+    );
+    assert_eq!(
+        handle_key(&mut m, Key::Char('o'), false),
+        ManagerAction::OpenIn(PathBuf::from("/work/alpha"))
+    );
+    m.selected = m
+        .rows()
+        .iter()
+        .position(|r| matches!(r, ManagerRow::Repo { repo, .. } if m.repos[*repo].name == "gamma"))
+        .unwrap();
+    assert_eq!(
+        handle_key(&mut m, Key::Char('o'), false),
+        ManagerAction::Handled
+    );
+    assert!(m
+        .message
+        .as_deref()
+        .is_some_and(|s| s.contains("/work/gamma")));
+}

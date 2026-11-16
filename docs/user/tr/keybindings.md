@@ -189,6 +189,8 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `status` | `collapse_below` | Klasörü ve Alt Klasörlerini Daralt | `_`, `Shift+Left` |
 | `home` | `favorite` | Depoyu Yıldızla veya Yıldızı Kaldır | `f`, `*` |
 | `home` | `close_repo` | Satırı Kapat, Kaldır veya Yıldızını Kaldır | `x`, `Delete` |
+| `home` | `copy_path` | Copy the Repository Path | `y` |
+| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
 | `home` | `browse` | Depo Gözat | `b` |
 | `home` | `clone` | Depo Klonla | `c` |
 | `home` | `init` | Depo Başlat | `i` |
@@ -800,6 +802,8 @@ Tuşlar varsayılanlardır.
 | Depolar: Seçiliyi Favorilere Ekle veya Kaldır | `f` |
 | Depolar: Seçiliyi Kapat veya Kaldır | `x` |
 | Depolar: Seçili Depo Menüsü... | `.` |
+| Repositories: Copy Selected Path | `y` |
+| Repositories: Open Selected in Default Tool | `o` |
 | Depolar: Ara | `/ / Ctrl+F` |
 | Depolar: Tüm Bölümleri Daralt | `-` |
 | Depolar: Tüm Bölümleri Genişlet | `+` |

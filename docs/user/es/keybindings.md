@@ -191,6 +191,8 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `status` | `collapse_below` | Contraer la carpeta y sus subcarpetas | `_`, `Shift+Left` |
 | `home` | `favorite` | Marcar o desmarcar el repositorio como favorito | `f`, `*` |
 | `home` | `close_repo` | Cerrar, quitar o desmarcar la fila | `x`, `Delete` |
+| `home` | `copy_path` | Copy the Repository Path | `y` |
+| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
 | `home` | `browse` | Examinar en busca de un repositorio | `b` |
 | `home` | `clone` | Clonar un repositorio | `c` |
 | `home` | `init` | Inicializar un repositorio | `i` |
@@ -805,6 +807,8 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Repositorios: Añadir o quitar el seleccionado de favoritos | `f` |
 | Repositorios: Cerrar o quitar el seleccionado | `x` |
 | Repositorios: Menú del repositorio seleccionado... | `.` |
+| Repositories: Copy Selected Path | `y` |
+| Repositories: Open Selected in Default Tool | `o` |
 | Repositorios: Buscar | `/ / Ctrl+F` |
 | Repositorios: Contraer todas las secciones | `-` |
 | Repositorios: Expandir todas las secciones | `+` |

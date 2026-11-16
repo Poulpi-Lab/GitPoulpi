@@ -191,6 +191,8 @@ pub fn handle_event(manager: &mut RepoManager, ev: &KeyEvent) -> ManagerAction {
         Some(Bind::HomeSearch) => return manager.focus_search(),
         Some(Bind::HomeFavorite) => return manager.favorite_selected(),
         Some(Bind::HomeCloseRepo) => return manager.close_selected(),
+        Some(Bind::HomeCopyPath) => return manager.copy_path_selected(),
+        Some(Bind::HomeOpenIn) => return manager.open_in_selected(),
         Some(Bind::HomeBrowse) => return ManagerAction::Browse,
         Some(Bind::HomeClone) => return ManagerAction::Clone,
         Some(Bind::HomeInit) => return ManagerAction::Init,

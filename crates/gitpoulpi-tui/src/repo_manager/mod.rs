@@ -263,6 +263,10 @@ pub enum ManagerAction {
     /// favorites). Never touches the folder or an open tab.
     RemoveFromList(PathBuf),
     RemoveAllRecent,
+    /// Copy the path to the clipboard (`HomeCopyPath`).
+    CopyPath(PathBuf),
+    /// Run the default "Open in" entry on the path (`HomeOpenIn`).
+    OpenIn(PathBuf),
     Browse,
     Clone,
     Init,
@@ -609,6 +613,27 @@ impl RepoManager {
     pub(crate) fn remove_selected_from_list(&mut self) -> ManagerAction {
         match self.selected_repo() {
             Some(repo) => ManagerAction::RemoveFromList(repo.path.clone()),
+            None => ManagerAction::Handled,
+        }
+    }
+
+    /// `HomeCopyPath`: copy the selected repository's path.
+    pub(crate) fn copy_path_selected(&mut self) -> ManagerAction {
+        match self.selected_repo() {
+            Some(repo) => ManagerAction::CopyPath(repo.path.clone()),
+            None => ManagerAction::Handled,
+        }
+    }
+
+    /// `HomeOpenIn`: open the selected repository with the default "Open in"
+    /// entry. A folder that is gone has nothing to open.
+    pub(crate) fn open_in_selected(&mut self) -> ManagerAction {
+        match self.selected_repo() {
+            Some(repo) if repo.exists => ManagerAction::OpenIn(repo.path.clone()),
+            Some(repo) => {
+                self.message = Some(msg::home::open_in_gone(repo.path.display()));
+                ManagerAction::Handled
+            }
             None => ManagerAction::Handled,
         }
     }

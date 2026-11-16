@@ -163,6 +163,17 @@ loopback и пробросьте порт по SSH с компьютера, на
   `conflicts_unresolve` - обычная запись. Отклонённый вызов (`stale`,
   `not_conflicted`, `pick_incomplete`...) отвечает `{"refused": {...}}` с кодом
   выхода 2, а не завершается ошибкой.
+- **Беседы задач и pull request'ов**: `hosting_issue_comments` и
+  `hosting_review_conversation` читают всю ленту (чтение, открытый мир: они
+  обращаются к хостингу); `hosting_markdown` очищает текст и находит его ссылки и
+  никуда не обращается (закрытый мир). Публикация (`hosting_issue_comment`,
+  `hosting_review_comment`, `hosting_review_reply`) и правка
+  (`hosting_*_comment_edit`) - обычные изменения, помеченные как открытый мир: они сразу уходят
+  на хостинг от имени, которому принадлежит токен (`posted_as` в ответе; токен бота
+  публикует от имени бота), поэтому разрешает ли это агенту, решают `allow_mutations` и `mutation_allowlist`.
+  Удаление комментария (`hosting_*_comment_delete`) разрушительно. После публикации, правки или удаления
+  демон получает уведомление, и открытое окно репозитория обновляет этот элемент. `ui_show_pr` / `ui_show_issue`
+  принимают `--view conversation`, чтобы открыть беседу вместо строки.
 - **Зависшие состояния**: `conflicts_am_continue` - запись, `conflicts_am_skip`,
   `conflicts_am_abort` и `index_lock_remove` разрушительны, `index_lock_show` -
   чтение.
@@ -229,6 +240,7 @@ allow_history_purge = false    # true: агент видит rewrite_purge (на
 |---|---|---|
 | `ai_commit_message` | `gitpoulpi ai commit-message` | read, network |
 | `ai_explain` | `gitpoulpi ai explain` | read, network |
+| `ai_hosting_reply` | `gitpoulpi ai hosting-reply` | read, network |
 | `ai_prompt` | `gitpoulpi ai prompt` | read |
 | `ai_resolve_conflict` | `gitpoulpi ai resolve-conflict` | read, network |
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
@@ -291,6 +303,7 @@ allow_history_purge = false    # true: агент видит rewrite_purge (на
 | `flow_status` | `gitpoulpi flow status` | read |
 | `flow_sync` | `gitpoulpi flow sync` | destructive |
 | `flow_templates` | `gitpoulpi flow templates` | read |
+| `hosting_assignment` | `gitpoulpi hosting assignment` | write |
 | `hosting_board_move` | `gitpoulpi hosting board move` | write, network |
 | `hosting_board_show` | `gitpoulpi hosting board show` | read, network |
 | `hosting_checkout_pr` | `gitpoulpi hosting checkout-pr` | write, network |
@@ -304,6 +317,10 @@ allow_history_purge = false    # true: агент видит rewrite_purge (на
 | `hosting_integrations_test` | `gitpoulpi hosting integrations test` | read, network |
 | `hosting_issue_base` | `gitpoulpi hosting issue base` | write |
 | `hosting_issue_close` | `gitpoulpi hosting issue close` | write |
+| `hosting_issue_comment` | `gitpoulpi hosting issue comment` | write, network |
+| `hosting_issue_comment_delete` | `gitpoulpi hosting issue comment-delete` | destructive, network |
+| `hosting_issue_comment_edit` | `gitpoulpi hosting issue comment-edit` | write, network |
+| `hosting_issue_comments` | `gitpoulpi hosting issue comments` | read, network |
 | `hosting_issue_create` | `gitpoulpi hosting issue create` | write, network |
 | `hosting_issue_edit` | `gitpoulpi hosting issue edit` | write, network |
 | `hosting_issue_move` | `gitpoulpi hosting issue move` | write |
@@ -314,6 +331,7 @@ allow_history_purge = false    # true: агент видит rewrite_purge (на
 | `hosting_link` | `gitpoulpi hosting link` | write |
 | `hosting_list` | `gitpoulpi hosting list` | read |
 | `hosting_logout` | `gitpoulpi hosting logout` | destructive |
+| `hosting_markdown` | `gitpoulpi hosting markdown` | read |
 | `hosting_members` | `gitpoulpi hosting members` | read, network |
 | `hosting_milestones` | `gitpoulpi hosting milestones` | read, network |
 | `hosting_open` | `gitpoulpi hosting open` | read |
@@ -326,6 +344,9 @@ allow_history_purge = false    # true: агент видит rewrite_purge (на
 | `hosting_refs` | `gitpoulpi hosting refs` | read |
 | `hosting_review_abandon` | `gitpoulpi hosting review abandon` | write, network |
 | `hosting_review_comment` | `gitpoulpi hosting review comment` | write, network |
+| `hosting_review_comment_delete` | `gitpoulpi hosting review comment-delete` | destructive, network |
+| `hosting_review_comment_edit` | `gitpoulpi hosting review comment-edit` | write, network |
+| `hosting_review_conversation` | `gitpoulpi hosting review conversation` | read, network |
 | `hosting_review_diff` | `gitpoulpi hosting review diff` | read, network |
 | `hosting_review_fetch` | `gitpoulpi hosting review fetch` | write, network |
 | `hosting_review_push` | `gitpoulpi hosting review push` | write, network |

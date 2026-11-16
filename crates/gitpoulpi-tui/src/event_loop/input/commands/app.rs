@@ -577,6 +577,9 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         PaletteCommand::AiComposeCommits => {
             super::start_ai(cx, AiRequest::Compose);
         }
+        PaletteCommand::StageGuardShowInFile => {
+            crate::stage_guard_dialog::show_in_file();
+        }
         PaletteCommand::StashPushWithMessage => {
             *cx.input_mode = InputMode::Prompt(Box::new(
                 crate::prompt_dialog::PromptDialog::stash(cx.ai_ui.enabled()),

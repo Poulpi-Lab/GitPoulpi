@@ -1158,6 +1158,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | ✦ AI: Split Selected Commit... |  |
 | ✦ AI: Explain Working Changes | `Ctrl+G w` |
 | ✦ AI: Compose Commits from Working Changes... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | Composer: Move File to Commit... | `m` |
 | Diff: Blame |  |
 | Blame: Show Commit in Log | `Enter` |

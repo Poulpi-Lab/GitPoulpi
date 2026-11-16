@@ -1152,6 +1152,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | ✦ ШІ: розділити вибраний commit... |  |
 | ✦ ШІ: пояснити робочі зміни | `Ctrl+G w` |
 | ✦ ШІ: скласти commit'и з робочих змін... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | Композер: перемістити файл до commit'у... | `m` |
 | Diff: Blame |  |
 | Blame: показати commit у Log | `Enter` |

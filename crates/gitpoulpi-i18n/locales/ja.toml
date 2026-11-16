@@ -3381,6 +3381,8 @@ ai_explain_selected_commit = { git = "AI: 選択中の{$Commit}を説明", local
 ai_explain_working_changes = "AI: 作業中の変更を説明"
 ai_insert_prompt_variable = "AI: プロンプト変数を挿入"
 ai_compose_commits_from_working_changes = { git = "AI: 作業中の変更から{$Commit}を構成...", local = "AI: 作業中の変更から{$Commit}を構成..." }
+# context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
+stage_guard_show_in_file = "Sensitive Files: Show in File"
 composer_move_file_to_commit = { git = "コンポーザー: ファイルを{$Commit}へ移動...", local = "コンポーザー: ファイルを{$Commit}へ移動..." }
 diff_blame = "{$Diff}: Blame"
 diff_history = "{$Diff}: ファイル履歴"
@@ -3434,6 +3436,8 @@ why_open_a_diff_file_view_blame_or_history_first = { git = "先に{$diff}、フ�
 why_no_text_selected_drag_over_the_text_first = "テキストが選択されていません - 先にテキストをドラッグしてください"
 why_the_diff_view_isn_t_open = { git = "{$diff}ビューが開いていません", local = "差分ビューが開いていません" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "先にファイルを開いてください - {$diff}ビュー、Status ペイン、または{$commit}から", local = "先にファイルを開いてください - 差分ビュー、Status ペイン、またはコミットから" }
+# context: why that palette command is unavailable
+why_no_sensitive_files_question = "no sensitive files question is open"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "先に Refs ペインでブランチまたは{$tag}を選択してください", local = "先に Refs ペインでブランチまたは{$tag}を選択してください" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "リモートブランチのチェックアウトにはまだ対応していません - 先にローカルの追跡ブランチを作成してください"
 why_select_a_local_branch_in_the_refs_pane_first = "先に Refs ペインでローカルブランチを選択してください"
@@ -9349,6 +9353,8 @@ answer_stage = "それでも{$Stage}"
 answer_cancel = "キャンセル（何も{$stage}しない）"
 # context: key hint at the bottom of the dialog
 hint = "↑/↓: 選択、Enter または 1/2: 回答、Esc: キャンセル"
+# context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
+show_in_file = "Show in file"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "機密ファイルは{$staged}されませんでした：{files}。ユーザーに確認し、機密ファイルを許可して再度{$stage}してください"
 

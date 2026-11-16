@@ -47,6 +47,12 @@ files** question lists each file with its reason (a pattern, or the kind of secr
 with a masked preview, never the value) and offers **1. Stage anyway** or **2. Cancel,
 stage nothing**. No answer is highlighted until you press an arrow key or a digit,
 so a stray Enter answers nothing; `Esc`, the close cross and a click outside cancel.
+A secret found in a file names its line (`config/app.env:12`). To look before you
+decide, click a finding (or move over them with `Tab` / `Shift+Tab`, `Ctrl+J` /
+`Ctrl+K`) and press the **Show in file** button, `S`, or the palette's **Sensitive
+Files: Show in File**: the file opens in the File View scrolled to that line and
+highlighting it, and the question comes back untouched when you close the File View
+(`Esc`). Looking stages nothing.
 It is the same question from the keyboard, a button, a menu, the palette or a
 drag-and-drop, because they all send the same request. Canceling stages nothing,
 not even the ordinary files of the same stage.
@@ -189,6 +195,12 @@ With [AI](ai.md) on, the **`✦`** button right of the summary writes a message
 from the staged changes (`Ctrl+G i`), and **Compose commits with AI** splits
 your work into several commits, below. The text goes into the form for you to
 edit; nothing is committed until you press the commit button.
+
+**Compose commits with AI** sits at the right end of the Amend row and shrinks
+with the right pane instead of disappearing: the full label, then **Compose
+with AI**, then the **`✦`** alone. It keeps its click, its tooltip and its
+key (`Ctrl+G Shift+C`) at every width; the Amend and Skip hooks labels give way
+to it, never the other way round.
 
 ## The commit composer: split your changes into commits
 

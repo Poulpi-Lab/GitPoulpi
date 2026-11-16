@@ -146,3 +146,92 @@ fn the_rows_and_the_cross_answer_by_mouse() {
         .unwrap_or_else(|e| panic!("{e}"));
     wait_staged(&repo, ".env");
 }
+
+/// A repository whose `leak.txt` holds a token on line 55 of 70, so the line
+/// is off screen unless the File View really scrolled to it.
+fn leaky() -> FixtureRepo {
+    let mut text = String::new();
+    for i in 1..=70 {
+        if i == 55 {
+            text.push_str("TOKEN=ghp_q7Xk2LmZp9RtV4bN8wYcJ3hGfD5sAe6U1oIx\n");
+        } else {
+            text.push_str(&format!("fill {i}\n"));
+        }
+    }
+    FixtureRepoBuilder::new()
+        .unwrap()
+        .commit_file("a.txt", "one\n", "initial commit")
+        .unwrap()
+        .write_worktree("leak.txt", text.as_bytes())
+        .unwrap()
+        .build()
+}
+
+fn launch_leaky(repo: &FixtureRepo, session: &str) -> Terminal {
+    common::launch(repo.root())
+        .session(session)
+        .size(200, 50)
+        .ready_when("the fixture loaded with its new file", |s| {
+            s.contains("initial commit") && s.contains("leak.txt")
+        })
+        .start()
+        .0
+}
+
+/// The question names the line of the secret and "Show in file" opens the
+/// file scrolled to it; closing the File View brings the question back.
+/// Keyboard (`S`), the button, and the palette entry.
+#[test]
+fn show_in_file_names_the_line_scrolls_to_it_and_comes_back() {
+    let repo = leaky();
+    let mut term = launch_leaky(&repo, "pty-stage-sensitive-show");
+
+    let screen = stage_all(&mut term);
+    assert!(screen.contains("leak.txt:55"), "{}", screen.text());
+    assert!(screen.contains("Show in file"), "{}", screen.text());
+
+    // Keyboard twin.
+    term.send_keys("s").expect("s");
+    term.wait_for("the file scrolled to the secret's line", STEP, |s| {
+        !s.contains("Sensitive files") && s.contains("fill 54") && !s.contains("fill 10")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    assert!(
+        term.screen().contains("ghp_"),
+        "the secret's own line is on screen"
+    );
+    term.send_keys("Escape").expect("Esc closes the File View");
+    term.wait_for("the question is back", STEP, |s| {
+        s.contains("Sensitive files") && s.contains("leak.txt:55")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(staged(&repo), "", "looking stages nothing");
+
+    // The button.
+    let (col, row) = term.screen().find("Show in file").unwrap();
+    term.click(col + 1, row).expect("click Show in file");
+    term.wait_for("the file again", STEP, |s| {
+        !s.contains("Sensitive files") && s.contains("fill 54")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("Escape").expect("Esc");
+    term.wait_for_text("Sensitive files", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+
+    // The palette entry, reachable while the question is open.
+    term.send_keys("C-p").expect("Ctrl+P");
+    term.send_text("show in file").expect("type");
+    term.wait_for("the palette entry", STEP, |s| {
+        s.contains("Sensitive Files: Show in File")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("Enter").expect("Enter");
+    term.wait_for("the file by the palette", STEP, |s| {
+        !s.contains("Sensitive files") && s.contains("fill 54")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("Escape").expect("Esc");
+    term.wait_for_text("Sensitive files", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(staged(&repo), "");
+}

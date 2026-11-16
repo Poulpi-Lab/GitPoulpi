@@ -62,6 +62,11 @@ pub enum Reason {
 pub struct Sensitive {
     pub path: String,
     pub reason: Reason,
+    /// The 1-based line of the file where the secret starts; `None` for a
+    /// path-pattern finding (the whole file is the finding) and for an answer
+    /// from an older daemon.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub line: Option<u32>,
 }
 
 impl Sensitive {
@@ -181,6 +186,7 @@ pub fn classify<S: AsRef<str>>(
         out.push(Sensitive {
             path: path.to_string(),
             reason: Reason::Pattern(p.to_string()),
+            line: None,
         });
     }
     if let Some(bytes) = content {
@@ -197,10 +203,18 @@ pub fn classify<S: AsRef<str>>(
                     rule: key.0,
                     preview: key.1,
                 },
+                line: Some(line_of(bytes, m.offset)),
             });
         }
     }
     out
+}
+
+/// The 1-based line of the byte `offset` of `text`.
+fn line_of(text: &[u8], offset: usize) -> u32 {
+    let end = offset.min(text.len());
+    let newlines = text[..end].iter().filter(|b| **b == b'\n').count();
+    u32::try_from(newlines + 1).unwrap_or(u32::MAX)
 }
 
 /// `text` with every secret replaced by `[REDACTED:<rule>]`, and what was

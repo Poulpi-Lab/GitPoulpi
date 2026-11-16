@@ -1124,6 +1124,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | ✦ AI：拆分所选 Commit… |  |
 | ✦ AI：解释工作区更改 | `Ctrl+G w` |
 | ✦ AI：根据工作区更改撰写 Commit… | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | 撰写器：将文件移到 Commit… | `m` |
 | Diff：Blame |  |
 | Blame：在 Log 中显示 commit | `Enter` |

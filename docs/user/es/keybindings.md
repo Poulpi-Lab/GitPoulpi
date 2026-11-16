@@ -1163,6 +1163,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | ✦ IA: Dividir el commit seleccionado... |  |
 | ✦ IA: Explicar los cambios de trabajo | `Ctrl+G w` |
 | ✦ IA: Componer commits a partir de los cambios de trabajo... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | Compositor: Mover archivo a un commit... | `m` |
 | Diff: Blame |  |
 | Blame: Mostrar el commit en el Log | `Enter` |

@@ -439,6 +439,7 @@ mod tests {
                     gitpoulpi_core::privacy::Sensitive {
                         path: ".env".into(),
                         reason: gitpoulpi_core::privacy::Reason::Pattern(".env".into()),
+                        line: None,
                     },
                     gitpoulpi_core::privacy::Sensitive {
                         path: "a.txt".into(),
@@ -446,6 +447,7 @@ mod tests {
                             rule: "github-token".into(),
                             preview: "ghp_****".into(),
                         },
+                        line: Some(3),
                     },
                 ],
             },

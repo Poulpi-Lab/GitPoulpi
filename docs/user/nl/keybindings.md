@@ -1162,6 +1162,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | ✦ AI: Geselecteerde Commit splitsen... |  |
 | ✦ AI: Lokale wijzigingen uitleggen | `Ctrl+G w` |
 | ✦ AI: Commits samenstellen uit lokale wijzigingen... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | Composer: Bestand naar commit verplaatsen... | `m` |
 | Diff: Blame |  |
 | Blame: Commit tonen in de Log | `Enter` |

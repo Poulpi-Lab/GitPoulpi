@@ -10,6 +10,7 @@ static SERIAL: Mutex<()> = Mutex::new(());
 fn reset() {
     *POPUP.lock().unwrap() = None;
     WAITING.lock().unwrap().clear();
+    *PEEK.lock().unwrap() = Peek::Off;
 }
 
 fn key(code: KeyCode) -> KeyEvent {
@@ -47,6 +48,7 @@ fn files(n: usize) -> Vec<Sensitive> {
         Sensitive {
             path: ".env".into(),
             reason: Reason::Pattern(".env".into()),
+            line: None,
         },
         Sensitive {
             path: "notes.txt".into(),
@@ -54,12 +56,14 @@ fn files(n: usize) -> Vec<Sensitive> {
                 rule: "github-token".into(),
                 preview: "ghp_****".into(),
             },
+            line: Some(7),
         },
     ];
     for i in 0..n {
         out.push(Sensitive {
             path: format!("keys/k{i}.pem"),
             reason: Reason::Pattern("*.pem".into()),
+            line: None,
         });
     }
     out
@@ -230,6 +234,7 @@ fn a_file_name_cannot_repaint_the_screen_and_refusals_queue() {
         vec![Sensitive {
             path: "bad\u{1b}[2Jname.pem".into(),
             reason: Reason::Pattern("*.pem".into()),
+            line: None,
         }],
     );
     ask(PathBuf::from("/b"), Action::StageAll, files(0));
@@ -248,4 +253,101 @@ fn a_file_name_cannot_repaint_the_screen_and_refusals_queue() {
     );
     on_key(key(KeyCode::Esc));
     assert!(!is_open());
+}
+
+#[test]
+fn a_secret_names_its_line_as_path_colon_line() {
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    open(0);
+    let text = screen();
+    assert!(text.contains("notes.txt:7"), "{text}");
+    // A path-pattern finding has no line to name.
+    assert!(!text.contains(".env:"), "{text}");
+    assert!(text.contains("Show in file"), "{text}");
+    reset();
+}
+
+/// What the window does with the ask: opens the file, scrolls, comes back.
+fn walk_the_round_trip(root: &str, expect_path: &str, expect_line: Option<u32>) {
+    assert!(!is_open(), "the question steps aside");
+    assert!(peeking());
+    assert_eq!(peek_request(std::path::Path::new("/other")), None);
+    let (path, line) = peek_request(std::path::Path::new(root)).expect("the file is asked for");
+    assert_eq!((path.as_str(), line), (expect_path, expect_line));
+    assert_eq!(peek_line(), expect_line);
+    peek_applied();
+    assert_eq!(peek_line(), None);
+    assert!(!is_open(), "still stepped aside while the File View is up");
+    peek_closed();
+    assert!(is_open(), "the File View closed: the question is back");
+}
+
+#[test]
+fn show_in_file_from_the_key_opens_the_focused_finding_and_comes_back() {
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    open(0);
+    screen();
+    // The first finding is the pattern one: a file with no line.
+    on_key(key(KeyCode::Char('s')));
+    walk_the_round_trip("/repo", ".env", None);
+    // Tab focuses the next finding: the secret on line 7.
+    screen();
+    on_key(key(KeyCode::Tab));
+    on_key(key(KeyCode::Char('S')));
+    walk_the_round_trip("/repo", "notes.txt", Some(7));
+    // Shift+Tab and Ctrl+K go back, wrapping.
+    on_key(key(KeyCode::BackTab));
+    on_key(KeyEvent::new(KeyCode::Char('j'), KeyModifiers::CONTROL));
+    on_key(KeyEvent::new(KeyCode::Char('k'), KeyModifiers::CONTROL));
+    on_key(key(KeyCode::Char('s')));
+    walk_the_round_trip("/repo", ".env", None);
+    reset();
+}
+
+#[test]
+fn show_in_file_from_the_button_and_a_row_click_pick_the_file() {
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    open(0);
+    screen();
+    let (button, hit) = {
+        let slot = POPUP.lock().unwrap();
+        let open = slot.as_ref().unwrap();
+        let hit = open.row_hits.iter().find(|(_, f)| *f == 1).unwrap().0;
+        (open.show_button, hit)
+    };
+    assert!(button.width > 0, "the button is painted");
+    // A click on the secret's row focuses it, the button opens it.
+    on_mouse(click(hit.x + 2, hit.y));
+    assert!(is_open());
+    on_mouse(click(button.x + 1, button.y));
+    walk_the_round_trip("/repo", "notes.txt", Some(7));
+    reset();
+}
+
+#[test]
+fn the_palette_entry_shows_the_focused_file_only_while_the_question_is_open() {
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    reset();
+    show_in_file();
+    assert!(!peeking(), "nothing is asked of a closed question");
+    open(0);
+    screen();
+    show_in_file();
+    walk_the_round_trip("/repo", ".env", None);
+    reset();
+}
+
+#[test]
+fn a_waiting_refusal_does_not_lose_the_peek_round_trip() {
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    open(0);
+    screen();
+    on_key(key(KeyCode::Char('s')));
+    // A second refusal arrives while the File View is up.
+    ask(PathBuf::from("/b"), Action::StageAll, files(0));
+    assert_eq!(WAITING.lock().unwrap().len(), 1);
+    peek_request(std::path::Path::new("/repo"));
+    peek_closed();
+    assert!(is_open());
+    reset();
 }

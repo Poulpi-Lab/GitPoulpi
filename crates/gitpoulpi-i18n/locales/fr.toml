@@ -3393,6 +3393,8 @@ ai_explain_selected_commit = { git = "IA : Expliquer le commit sélectionné", 
 ai_explain_working_changes = "IA : Expliquer les modifications locales"
 ai_insert_prompt_variable = "IA : Insérer une variable de prompt"
 ai_compose_commits_from_working_changes = "IA : Composer des {$commits} à partir des modifications locales..."
+# context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
+stage_guard_show_in_file = "Fichiers sensibles : afficher dans le fichier"
 composer_move_file_to_commit = { git = "Composer : Déplacer le fichier vers un commit...", local = "Composer : Déplacer le fichier vers une validation..." }
 diff_blame = "{$Diff} : Blame"
 diff_history = "{$Diff} : Historique du fichier"
@@ -3446,6 +3448,8 @@ why_open_a_diff_file_view_blame_or_history_first = { git = "ouvrez d'abord un {$
 why_no_text_selected_drag_over_the_text_first = "aucun texte sélectionné - sélectionnez-le d'abord à la souris"
 why_the_diff_view_isn_t_open = "la vue {$diff} n'est pas ouverte"
 why_open_a_file_first_in_the_diff_view_the_status = { git = "ouvrez d'abord un fichier - dans la vue {$diff}, le volet Status ou un commit", local = "ouvrez d'abord un fichier - dans la vue {$diff}, le volet Status ou une validation" }
+# context: why that palette command is unavailable
+why_no_sensitive_files_question = "aucune question sur des fichiers sensibles n'est ouverte"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "sélectionnez d'abord une branche ou un {$tag} dans le volet Refs", local = "sélectionnez d'abord une branche ou une {$tag} dans le volet Refs" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "basculer sur une branche distante n'est pas encore possible - créez d'abord une branche locale de suivi"
 why_select_a_local_branch_in_the_refs_pane_first = "sélectionnez d'abord une branche locale dans le volet Refs"
@@ -9365,6 +9369,8 @@ answer_stage = "{$Stage} quand même"
 answer_cancel = "Annuler, rien n'est {$staged}"
 # context: key hint at the bottom of the dialog
 hint = "Haut/Bas : choisir, Enter ou 1/2 : répondre, Esc : annuler"
+# context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
+show_in_file = "Afficher dans le fichier"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = { git = "des fichiers sensibles n'ont pas été {$staged} : {files} ; demandez à l'utilisateur, puis {$stage} à nouveau en autorisant les fichiers sensibles", local = "des fichiers sensibles n'ont pas été indexés : {files} ; demandez à l'utilisateur, puis indexez à nouveau en autorisant les fichiers sensibles" }
 

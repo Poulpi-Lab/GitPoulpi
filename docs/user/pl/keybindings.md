@@ -1157,6 +1157,7 @@ zastosowania. Klawisze są domyślne.
 | ✦ AI: Podziel zaznaczony commit... |  |
 | ✦ AI: Wyjaśnij zmiany robocze | `Ctrl+G w` |
 | ✦ AI: Skomponuj commity ze zmian roboczych... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | Kompozytor: Przenieś plik do commita... | `m` |
 | Diff: Blame |  |
 | Blame: Pokaż commit w Log | `Enter` |

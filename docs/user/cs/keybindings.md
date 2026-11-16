@@ -1158,6 +1158,7 @@ Klávesy jsou výchozí.
 | ✦ AI: Rozdělit vybraný Commit... |  |
 | ✦ AI: Vysvětlit rozpracované změny | `Ctrl+G w` |
 | ✦ AI: Sestavit commity z rozpracovaných změn... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | Composer: Přesunout soubor do commitu... | `m` |
 | Diff: Blame |  |
 | Blame: Zobrazit commit v Logu | `Enter` |

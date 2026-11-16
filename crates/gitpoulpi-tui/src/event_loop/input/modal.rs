@@ -351,6 +351,19 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         return Ok(Flow::Handled);
     }
 
+    // The sensitive-files question hands the keyboard to the palette (its
+    // "Show in File" is a palette row), which then owns it until it closes.
+    if key.kind == KeyEventKind::Press
+        && matches!(*cx.input_mode, InputMode::Normal)
+        && crate::stage_guard_dialog::is_open()
+        && km.is(Bind::GlobalPalette, &key)
+    {
+        *cx.input_mode = InputMode::CommandPalette {
+            draft: String::new(),
+            selected: 0,
+        };
+        return Ok(Flow::Handled);
+    }
     // The sensitive-files question of a refused stage owns the keyboard.
     if key.kind == KeyEventKind::Press
         && matches!(*cx.input_mode, InputMode::Normal)

@@ -1158,6 +1158,7 @@ Tuşlar varsayılanlardır.
 | ✦ YZ: Seçili Commit'i Böl... |  |
 | ✦ YZ: Çalışma Değişikliklerini Açıkla | `Ctrl+G w` |
 | ✦ YZ: Çalışma Değişikliklerinden Commit'ler Oluştur... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | Composer: Dosyayı Bir Commit'e Taşı... | `m` |
 | Diff: Blame |  |
 | Blame: Commit öğesini Log'da göster | `Enter` |

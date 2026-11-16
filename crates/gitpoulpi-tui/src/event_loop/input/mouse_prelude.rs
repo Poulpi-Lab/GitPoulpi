@@ -463,7 +463,7 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
         return Ok(None);
     }
     // The sensitive-files question of a refused stage is modal the same way.
-    if crate::stage_guard_dialog::is_open() {
+    if crate::stage_guard_dialog::is_open() && matches!(*cx.input_mode, InputMode::Normal) {
         *cx.hovered_target = None;
         *cx.hovered_tab_index = None;
         *cx.hovered_close_tab = None;

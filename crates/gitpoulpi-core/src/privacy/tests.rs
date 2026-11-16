@@ -140,3 +140,30 @@ fn redact_leaves_a_clean_text_alone() {
     assert_eq!(out, "nothing to see here");
     assert!(found.is_empty());
 }
+
+#[test]
+fn a_secret_finding_carries_its_one_based_line_and_a_pattern_none() {
+    let content = format!("# comment\n\nTOKEN={}\nother\n", token());
+    let found = classify(".env", Some(content.as_bytes()), &defaults());
+    let pattern = found
+        .iter()
+        .find(|s| matches!(s.reason, Reason::Pattern(_)))
+        .unwrap();
+    assert_eq!(pattern.line, None);
+    let secret = found
+        .iter()
+        .find(|s| matches!(s.reason, Reason::Secret { .. }))
+        .unwrap();
+    assert_eq!(secret.line, Some(3));
+    // The first line is line 1, not 0.
+    let first = format!("{}\n", token());
+    let found = classify("a.txt", Some(first.as_bytes()), &defaults());
+    assert_eq!(found[0].line, Some(1));
+    // A pattern finding leaves the line out of the wire form.
+    let wire = serde_json::to_string(pattern).unwrap();
+    assert!(!wire.contains("line"), "{wire}");
+    // An answer without the field (an older daemon) still reads.
+    let old: Sensitive =
+        serde_json::from_str(r#"{"path":"a","reason":{"Pattern":"*.pem"}}"#).unwrap();
+    assert_eq!(old.line, None);
+}

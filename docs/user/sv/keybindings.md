@@ -1160,6 +1160,7 @@ Tangenterna är standardvärdena.
 | ✦ AI: Dela upp vald commit... |  |
 | ✦ AI: Förklara ändringar i arbetskatalogen | `Ctrl+G w` |
 | ✦ AI: Komponera commits från ändringar... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | Composer: Flytta fil till commit... | `m` |
 | Diff: Blame |  |
 | Blame: Visa commit i Log | `Enter` |

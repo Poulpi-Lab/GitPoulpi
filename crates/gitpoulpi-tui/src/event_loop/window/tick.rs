@@ -802,6 +802,7 @@ impl WindowState {
                 agent_pending: self.ui_viewer.has_pending(),
                 auto_stash_pending: self.pending_auto_stash.is_some(),
                 agent_back: self.ui_viewer.can_go_back(),
+                stage_guard_open: crate::stage_guard_dialog::is_open(),
                 ai_enabled: self.ai_ui.enabled(),
                 ai_running: self.ai_ui.running(),
                 hosting: self.hosting.availability(),

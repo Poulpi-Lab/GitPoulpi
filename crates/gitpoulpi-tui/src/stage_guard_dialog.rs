@@ -7,7 +7,7 @@
 //! the link hands the refused action here (`ask`). The dialog lists every file
 //! with its reason (a path pattern, or the kind of secret found with a masked
 //! preview: never a value) in a scrollable pane with a draggable bar, and has
-//! two numbered answers:
+//! two numbered answers (and a "Show in file" button, below):
 //!
 //! 1. **Stage anyway**: the action again, wrapped in `Action::AllowSensitive`.
 //! 2. **Cancel, stage nothing**.
@@ -16,14 +16,25 @@
 //! a digit, so a stray Enter answers nothing. Esc, the close cross and a click
 //! outside the dialog cancel. Every mouse action has a key: PageUp/PageDown/
 //! Home/End scroll like the wheel and the bar, 1/2 or Up/Down + Enter answer
-//! like a click. Process-wide state, like the other small modals, because the
+//! like a click.
+//!
+//! A finding inside a file names its line (`path:line`). One finding is
+//! focused (a click on its row, `Tab` / `Shift+Tab` / `Ctrl+J` / `Ctrl+K`);
+//! **Show in file** (the button, `S`, and the palette's "Sensitive Files: Show
+//! in File") opens that file in the File View, scrolled to the line and
+//! highlighting it. While the File View is up the dialog steps aside (it is
+//! not "open", so the File View owns the keys and the mouse); closing the
+//! File View brings the question back, untouched. The window drives that
+//! round trip through [`peek_request`] and [`peek_line`]. Process-wide state, like the other small modals, because the
 //! window restarts on every tab switch and the refusal comes from the link's
 //! own thread.
 
 use std::path::PathBuf;
 use std::sync::Mutex;
 
-use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, MouseButton, MouseEvent, MouseEventKind};
+use crossterm::event::{
+    KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseButton, MouseEvent, MouseEventKind,
+};
 use gitpoulpi_core::privacy::Sensitive;
 use gitpoulpi_i18n::msg::stage_guard as msg;
 use ratatui::buffer::Buffer;
@@ -56,11 +67,32 @@ enum Kind {
     Reason,
 }
 
+/// One finding the dialog can show in its file: a path, and the line of the
+/// secret in it (none for a path-pattern finding).
+#[derive(Clone, PartialEq, Eq, Debug)]
+struct Finding {
+    path: String,
+    line: Option<u32>,
+}
+
+/// One row of the list and the finding it belongs to.
+struct Row {
+    kind: Kind,
+    text: String,
+    finding: usize,
+}
+
 struct Open {
     root: PathBuf,
     action: Action,
+    /// What the list is about, in list order.
+    findings: Vec<Finding>,
+    /// The focused finding (what "Show in file" opens).
+    focus: usize,
+    /// The next paint scrolls the focused finding into view.
+    reveal: bool,
     /// The files, one path line then one line per reason.
-    lines: Vec<(Kind, String)>,
+    lines: Vec<Row>,
     /// The highlighted answer; `None` until an arrow key or a digit.
     cursor: Option<usize>,
     hover: Option<usize>,
@@ -72,10 +104,35 @@ struct Open {
     pane: Rect,
     frame: Rect,
     answers: [Rect; 2],
+    /// Where the finding rows were painted, for a click.
+    row_hits: Vec<(Rect, usize)>,
+    show_button: Rect,
+    show_hover: bool,
     close: dialog_kit::CloseHit,
 }
 
 static POPUP: Mutex<Option<Open>> = Mutex::new(None);
+
+/// The round trip to the File View, owned by the window's tick.
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum Peek {
+    /// The dialog is up.
+    Off,
+    /// "Show in file" was asked: the window opens the file.
+    Wanted {
+        root: PathBuf,
+        path: String,
+        line: Option<u32>,
+    },
+    /// The File View is up for the dialog; `line` is still to be scrolled to.
+    Open { line: Option<u32> },
+}
+
+static PEEK: Mutex<Peek> = Mutex::new(Peek::Off);
+
+fn peek() -> std::sync::MutexGuard<'static, Peek> {
+    PEEK.lock().unwrap_or_else(|e| e.into_inner())
+}
 /// Refusals that arrived while the dialog was open.
 static WAITING: Mutex<Vec<Open>> = Mutex::new(Vec::new());
 
@@ -121,31 +178,56 @@ fn reason_text(file: &Sensitive) -> String {
     }
 }
 
-/// The path line and the reason lines of `files`, a path once however many
-/// reasons it has.
-fn lines_of(files: &[Sensitive]) -> Vec<(Kind, String)> {
-    let mut out: Vec<(Kind, String)> = Vec::new();
-    let mut seen: Vec<&str> = Vec::new();
+/// The findings and the rows of `files`: a path (with `:line` when the
+/// secret has one) once however many reasons it has.
+fn lines_of(files: &[Sensitive]) -> (Vec<Finding>, Vec<Row>) {
+    let mut findings: Vec<Finding> = Vec::new();
+    let mut rows: Vec<Row> = Vec::new();
     for file in files {
-        if !seen.contains(&file.path.as_str()) {
-            seen.push(&file.path);
-            out.push((Kind::Path, visible(&file.path)));
-            for same in files.iter().filter(|f| f.path == file.path) {
-                out.push((Kind::Reason, format!("  {}", visible(&reason_text(same)))));
-            }
+        let finding = Finding {
+            path: file.path.clone(),
+            line: file.line,
+        };
+        if findings.contains(&finding) {
+            continue;
         }
+        let at = findings.len();
+        let shown = match finding.line {
+            Some(line) => format!("{}:{line}", file.path),
+            None => file.path.clone(),
+        };
+        rows.push(Row {
+            kind: Kind::Path,
+            text: visible(&shown),
+            finding: at,
+        });
+        for same in files
+            .iter()
+            .filter(|f| f.path == file.path && f.line == file.line)
+        {
+            rows.push(Row {
+                kind: Kind::Reason,
+                text: format!("  {}", visible(&reason_text(same))),
+                finding: at,
+            });
+        }
+        findings.push(finding);
     }
-    out
+    (findings, rows)
 }
 
 /// A stage `action` of the repository at `root` was refused for `files`:
 /// opens the question (or queues it behind the one that is open). Callable
 /// from any thread.
 pub(crate) fn ask(root: PathBuf, action: Action, files: Vec<Sensitive>) {
+    let (findings, lines) = lines_of(&files);
     let open = Open {
         root,
         action,
-        lines: lines_of(&files),
+        findings,
+        focus: 0,
+        reveal: false,
+        lines,
         cursor: None,
         hover: None,
         top: 0,
@@ -156,6 +238,9 @@ pub(crate) fn ask(root: PathBuf, action: Action, files: Vec<Sensitive>) {
         pane: Rect::default(),
         frame: Rect::default(),
         answers: [Rect::default(); 2],
+        row_hits: Vec::new(),
+        show_button: Rect::default(),
+        show_hover: false,
         close: Default::default(),
     };
     let mut slot = POPUP.lock().unwrap_or_else(|e| e.into_inner());
@@ -168,8 +253,73 @@ pub(crate) fn ask(root: PathBuf, action: Action, files: Vec<Sensitive>) {
     crate::redraw::poke();
 }
 
+/// Whether the question is up and owns the keys and the mouse: not while its
+/// file is being looked at in the File View.
 pub(crate) fn is_open() -> bool {
-    POPUP.lock().is_ok_and(|p| p.is_some())
+    POPUP.lock().is_ok_and(|p| p.is_some()) && *peek() == Peek::Off
+}
+
+/// The window is showing a file for the question (so the File View's close
+/// brings the question back): the tick polls [`peek_closed`] with it.
+pub(crate) fn peeking() -> bool {
+    *peek() != Peek::Off
+}
+
+/// "Show in file" on the focused finding, from the palette.
+pub(crate) fn show_in_file() {
+    if let Ok(mut slot) = POPUP.lock() {
+        if let Some(open) = slot.as_mut() {
+            open.begin_peek();
+        }
+    }
+}
+
+/// The file the window must open for "Show in file" in the repository at
+/// `root` (and the line to scroll to), once: the dialog steps aside from then
+/// on. `None` when nothing was asked, or the ask was for another repository.
+pub(crate) fn peek_request(root: &std::path::Path) -> Option<(String, Option<u32>)> {
+    let mut state = peek();
+    let Peek::Wanted {
+        root: wanted,
+        path,
+        line,
+    } = &*state
+    else {
+        return None;
+    };
+    if wanted != root {
+        return None;
+    }
+    let out = (path.clone(), *line);
+    *state = Peek::Open { line: out.1 };
+    Some(out)
+}
+
+/// The line still to be scrolled to once the file has loaded; [`peek_applied`]
+/// takes it.
+pub(crate) fn peek_line() -> Option<u32> {
+    match &*peek() {
+        Peek::Open { line } => *line,
+        _ => None,
+    }
+}
+
+/// The File View was scrolled to the line (or cannot be).
+pub(crate) fn peek_applied() {
+    let mut state = peek();
+    if matches!(&*state, Peek::Open { .. }) {
+        *state = Peek::Open { line: None };
+    }
+}
+
+/// The File View closed (or never opened): the question is back.
+pub(crate) fn peek_closed() {
+    let mut state = peek();
+    if matches!(&*state, Peek::Open { .. }) {
+        *state = Peek::Off;
+        drop(state);
+        crate::redraw::poke();
+    }
 }
 
 /// Closes the open question and brings up the next waiting one.
@@ -205,6 +355,29 @@ impl Open {
             .position(|r| r.width > 0 && r.contains((col, row).into()))
     }
 
+    /// Moves the focus over the findings, wrapping.
+    fn focus_by(&mut self, delta: isize) {
+        let n = self.findings.len() as isize;
+        if n > 0 {
+            self.focus = (self.focus as isize + delta).rem_euclid(n) as usize;
+            self.reveal = true;
+        }
+    }
+
+    /// Asks the window to open the focused finding's file; the question steps
+    /// aside until the File View closes.
+    fn begin_peek(&self) {
+        let Some(finding) = self.findings.get(self.focus) else {
+            return;
+        };
+        *peek() = Peek::Wanted {
+            root: self.root.clone(),
+            path: finding.path.clone(),
+            line: finding.line,
+        };
+        crate::redraw::poke();
+    }
+
     fn staged(&self) -> Staged {
         Staged {
             root: self.root.clone(),
@@ -221,7 +394,28 @@ pub(crate) fn on_key(key: KeyEvent) -> Option<Staged> {
     }
     let mut slot = POPUP.lock().ok()?;
     let open = slot.as_mut()?;
+    let ctrl = key.modifiers.contains(KeyModifiers::CONTROL);
     match key.code {
+        KeyCode::Tab => {
+            open.focus_by(1);
+            None
+        }
+        KeyCode::BackTab => {
+            open.focus_by(-1);
+            None
+        }
+        KeyCode::Char('j') if ctrl => {
+            open.focus_by(1);
+            None
+        }
+        KeyCode::Char('k') if ctrl => {
+            open.focus_by(-1);
+            None
+        }
+        KeyCode::Char('s' | 'S') if !ctrl => {
+            open.begin_peek();
+            None
+        }
         KeyCode::Esc | KeyCode::Char('2') => {
             finish(&mut slot);
             None
@@ -299,12 +493,26 @@ pub(crate) fn on_mouse(mouse: MouseEvent) -> Option<Staged> {
         }
         MouseEventKind::Moved | MouseEventKind::Drag(_) => {
             open.close.set_hover(mouse.column, mouse.row);
+            open.show_hover = open.show_button.width > 0 && open.show_button.contains(at);
             open.hover = open.answer_at(mouse.column, mouse.row);
             None
         }
         MouseEventKind::Down(MouseButton::Left) => {
             if open.close.hit(mouse.column, mouse.row) {
                 finish(&mut slot);
+                return None;
+            }
+            if open.show_button.width > 0 && open.show_button.contains(at) {
+                open.begin_peek();
+                return None;
+            }
+            if let Some(finding) = open
+                .row_hits
+                .iter()
+                .find(|(r, _)| r.contains(at))
+                .map(|(_, f)| *f)
+            {
+                open.focus = finding;
                 return None;
             }
             match open.answer_at(mouse.column, mouse.row) {
@@ -340,6 +548,9 @@ pub(crate) fn apply(staged: Staged, link: &DaemonLink, repo_root: &std::path::Pa
 
 /// Paints the question, last, over the panes.
 pub(crate) fn render(frame: &mut Frame) {
+    if peeking() {
+        return;
+    }
     let Ok(mut slot) = POPUP.lock() else {
         return;
     };
@@ -351,8 +562,9 @@ pub(crate) fn render(frame: &mut Frame) {
     if width < 30 || area.height < 12 {
         return;
     }
-    // Title, blank, question (2 rows), the pane, the two answers and the hint.
-    let fixed = 2 + 1 + 2 + 2 + 1 + 2;
+    // Title, blank, question (2 rows), the pane, the button row, the two
+    // answers and the hint.
+    let fixed = 2 + 1 + 2 + 2 + 1 + 1 + 2;
     let want_pane = (open.lines.len() as u16 + 2).max(5);
     let height = (fixed + want_pane).min(area.height.saturating_sub(2));
     let outer = WIN.place(area, dialog_kit::centered(area, width, height));
@@ -385,10 +597,21 @@ fn paint_body(open: &mut Open, buf: &mut Buffer, inner: Rect) {
     let hint_y = bottom.saturating_sub(1);
     let a2_y = hint_y.saturating_sub(1);
     let a1_y = a2_y.saturating_sub(1);
-    let pane = Rect::new(inner.x, y, inner.width, a1_y.saturating_sub(y));
+    let button_y = a1_y.saturating_sub(1);
+    let pane = Rect::new(inner.x, y, inner.width, button_y.saturating_sub(y));
     open.pane = pane;
     open.answers = [Rect::default(); 2];
     open.track = None;
+    open.row_hits.clear();
+    open.show_button = Rect::default();
+    if button_y > y + 3 {
+        let label = format!("{} [S]", msg::SHOW_IN_FILE.get());
+        let state = dialog_kit::ButtonState::Normal {
+            hovered: open.show_hover,
+            focused: false,
+        };
+        open.show_button = dialog_kit::button(buf, inner.x, button_y, &label, state);
+    }
     if pane.width >= 6 && pane.height >= 3 {
         paint_pane(open, buf, pane);
     }
@@ -441,31 +664,46 @@ fn paint_pane(open: &mut Open, buf: &mut Buffer, pane: Rect) {
     let text_x = pane.x + 2;
     let text_w = pane.width.saturating_sub(4) as usize;
     let rows = pane.height.saturating_sub(2) as usize;
-    let mut wrapped: Vec<(Kind, String)> = Vec::new();
-    for (kind, text) in &open.lines {
-        for piece in wrap_hard(text, text_w) {
-            wrapped.push((*kind, piece));
+    let mut wrapped: Vec<(Kind, String, usize)> = Vec::new();
+    for row in &open.lines {
+        for piece in wrap_hard(&row.text, text_w) {
+            wrapped.push((row.kind, piece, row.finding));
         }
     }
     open.content = wrapped.len();
     open.viewport = rows.max(1);
     open.top = open.top.min(open.max_top());
-    for (i, (kind, text)) in wrapped.iter().skip(open.top).take(rows).enumerate() {
+    if std::mem::take(&mut open.reveal) {
+        if let Some(first) = wrapped.iter().position(|(_, _, f)| *f == open.focus) {
+            let last = wrapped
+                .iter()
+                .rposition(|(_, _, f)| *f == open.focus)
+                .unwrap_or(first);
+            if first < open.top {
+                open.top = first;
+            } else if last >= open.top + rows {
+                open.top = (last + 1).saturating_sub(rows).min(first);
+            }
+            open.top = open.top.min(open.max_top());
+        }
+    }
+    for (i, (kind, text, finding)) in wrapped.iter().skip(open.top).take(rows).enumerate() {
+        let y = pane.y + 1 + i as u16;
+        let band = Rect::new(pane.x + 1, y, pane.width.saturating_sub(2), 1);
+        let focused = *finding == open.focus && open.findings.len() > 1;
+        if focused {
+            dialog_kit::fill(buf, band, Style::default().bg(th().ui.selection));
+        }
+        open.row_hits.push((band, *finding));
+        let row_bg = if focused { th().ui.selection } else { panel };
         let style = match kind {
             Kind::Path => Style::default()
                 .fg(th().ui.text)
-                .bg(panel)
+                .bg(row_bg)
                 .add_modifier(Modifier::BOLD),
-            Kind::Reason => Style::default().fg(th().status.warning).bg(panel),
+            Kind::Reason => Style::default().fg(th().status.warning).bg(row_bg),
         };
-        dialog_kit::put(
-            buf,
-            text_x,
-            pane.y + 1 + i as u16,
-            text,
-            text_w as u16,
-            style,
-        );
+        dialog_kit::put(buf, text_x, y, text, text_w as u16, style);
     }
     open.track = Track::vertical(pane, open.content, open.top);
     if let Some(track) = open.track {

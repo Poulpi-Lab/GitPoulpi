@@ -1164,6 +1164,7 @@ stage_file = "z"
 | ✦ ИИ: разделить выбранный commit... |  |
 | ✦ ИИ: объяснить рабочие изменения | `Ctrl+G w` |
 | ✦ ИИ: составить commit'ы из рабочих изменений... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | Композитор: переместить файл в commit... | `m` |
 | Diff: Blame |  |
 | Blame: Показать commit в Log | `Enter` |

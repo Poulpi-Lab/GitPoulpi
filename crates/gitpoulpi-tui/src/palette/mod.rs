@@ -803,6 +803,9 @@ pub(crate) enum PaletteCommand {
     AiComposeCommits,
     /// The commit composer review's "Move file to commit..." dropdown.
     ComposerMoveFile,
+    /// The sensitive-files question's "Show in file": opens the focused file
+    /// in the File View at the line of the secret.
+    StageGuardShowInFile,
     /// The integration commands: the linked pull request, the sidebar's
     /// pull-request / issue lists, the repository's profile
     /// (`hosting_ui`).

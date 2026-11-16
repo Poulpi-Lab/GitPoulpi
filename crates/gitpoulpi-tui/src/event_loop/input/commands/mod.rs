@@ -350,6 +350,7 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::AiExplainWip
         | PaletteCommand::ComposerMoveFile
         | PaletteCommand::AiComposeCommits
+        | PaletteCommand::StageGuardShowInFile
         | PaletteCommand::StashPushWithMessage
         | PaletteCommand::AiGenerateStashMessage
         | PaletteCommand::AiInsertPromptVariable

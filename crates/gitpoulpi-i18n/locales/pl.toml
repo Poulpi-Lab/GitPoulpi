@@ -3388,6 +3388,8 @@ ai_explain_selected_commit = { git = "AI: Wyjaśnij zaznaczony commit", local = 
 ai_explain_working_changes = "AI: Wyjaśnij zmiany robocze"
 ai_insert_prompt_variable = "AI: Wstaw zmienną promptu"
 ai_compose_commits_from_working_changes = { git = "AI: Skomponuj commity ze zmian roboczych...", local = "AI: Skomponuj zatwierdzenia ze zmian roboczych..." }
+# context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
+stage_guard_show_in_file = "Sensitive Files: Show in File"
 composer_move_file_to_commit = { git = "Kompozytor: Przenieś plik do commita...", local = "Kompozytor: Przenieś plik do zatwierdzenia..." }
 diff_blame = { git = "Diff: Blame", local = "Różnice: Blame" }
 diff_history = { git = "Diff: Historia pliku", local = "Różnice: Historia pliku" }
@@ -3441,6 +3443,8 @@ why_open_a_diff_file_view_blame_or_history_first = { git = "najpierw otwórz dif
 why_no_text_selected_drag_over_the_text_first = "brak zaznaczonego tekstu - najpierw przeciągnij po tekście"
 why_the_diff_view_isn_t_open = { git = "widok diff nie jest otwarty", local = "widok różnic nie jest otwarty" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "najpierw otwórz plik - w widoku diff, panelu Status lub z commita", local = "najpierw otwórz plik - w widoku różnic, panelu Status lub w zatwierdzeniu" }
+# context: why that palette command is unavailable
+why_no_sensitive_files_question = "no sensitive files question is open"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "najpierw zaznacz gałąź lub tag w panelu Refs", local = "najpierw zaznacz gałąź lub znacznik w panelu Refs" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "checkout gałęzi zdalnej nie jest jeszcze obsługiwany - najpierw utwórz lokalną gałąź śledzącą"
 why_select_a_local_branch_in_the_refs_pane_first = "najpierw zaznacz gałąź lokalną w panelu Refs"
@@ -9348,6 +9352,8 @@ answer_stage = { git = "Stage mimo to", local = "Dodaj mimo to do poczekalni" }
 answer_cancel = { git = "Anuluj, bez stage", local = "Anuluj, nic nie dodawaj" }
 # context: key hint at the bottom of the dialog
 hint = "Góra/Dół: wybór, Enter lub 1/2: odpowiedź, Esc: anuluj"
+# context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
+show_in_file = "Show in file"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = { git = "wrażliwe pliki nie zostały staged: {files}; zapytaj użytkownika, a potem zrób stage jeszcze raz, zezwalając na wrażliwe pliki", local = "wrażliwe pliki nie zostały dodane do poczekalni: {files}; zapytaj użytkownika, a potem dodaj je ponownie, zezwalając na wrażliwe pliki" }
 

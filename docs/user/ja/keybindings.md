@@ -1124,6 +1124,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | ✦ AI: 選択中のCommitを分割... |  |
 | ✦ AI: 作業中の変更を説明 | `Ctrl+G w` |
 | ✦ AI: 作業中の変更からCommitを構成... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | コンポーザー: ファイルをCommitへ移動... | `m` |
 | Diff: Blame |  |
 | Blame: commitを Log で表示 | `Enter` |

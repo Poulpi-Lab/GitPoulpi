@@ -30,6 +30,7 @@ mod radar_pending;
 mod refs_update;
 mod reveal;
 mod sizes;
+mod stage_guard_peek;
 mod tick;
 
 pub(in crate::event_loop) use follow::HostSnapshot;

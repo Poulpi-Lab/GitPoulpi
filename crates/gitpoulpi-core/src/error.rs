@@ -799,6 +799,7 @@ mod tests {
                 Sensitive {
                     path: ".env".into(),
                     reason: Reason::Pattern(".env".into()),
+                    line: None,
                 },
                 Sensitive {
                     path: "a.txt".into(),
@@ -806,6 +807,7 @@ mod tests {
                         rule: "github-token".into(),
                         preview: "ghp_****".into(),
                     },
+                    line: Some(3),
                 },
             ],
         };
@@ -815,6 +817,7 @@ mod tests {
             Error::SensitiveStage { files } => {
                 assert_eq!(files.len(), 2);
                 assert_eq!(files[1].path, "a.txt");
+                assert_eq!(files[1].line, Some(3));
             }
             other => panic!("{other:?}"),
         }

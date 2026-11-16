@@ -1160,6 +1160,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | ✦ IA : Scinder le commit sélectionné... |  |
 | ✦ IA : Expliquer les modifications locales | `Ctrl+G w` |
 | ✦ IA : Composer des commits à partir des modifications locales... | `Ctrl+G C` |
+| Fichiers sensibles : afficher dans le fichier | `S` |
 | Composer : Déplacer le fichier vers un commit... | `m` |
 | Diff : Blame |  |
 | Blame : Afficher le commit dans le Log | `Enter` |

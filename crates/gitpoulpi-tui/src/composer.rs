@@ -441,8 +441,10 @@ const GENERATE_MIN_ROW: u16 = 24;
 const ISSUE_REF_W: usize = 3;
 
 /// "Compose commits with AI" at the right end of the commit-options row.
-/// Not drawn when AI is off; the long label gives way to a short one, then to
-/// nothing, rather than overlapping the 24-column amend label.
+/// Not drawn when AI is off. On a narrow pane it shrinks instead of
+/// vanishing: the long label, then the short one, then the sparkle alone (it
+/// keeps its hit, its tooltip and its `Shift+C` twin). The checkboxes to its
+/// left give way to it, never the other way round.
 fn render_compose_button(
     frame: &mut Frame,
     row: Rect,
@@ -455,12 +457,17 @@ fn render_compose_button(
     }
     let long = format!(" {SPARK} {} ", msg::COMPOSE_LONG.get());
     let short = format!(" {SPARK} {} ", msg::COMPOSE_SHORT.get());
-    // The checkboxes to its left ("[x] " and their text) keep the room they need.
+    let icon = format!(" {SPARK} ");
+    // The checkboxes to its left ("[x] " and their text) keep the room they need
+    // while a text label fits; the icon takes the row's right end regardless.
     let amend_w = reserved_w.max(display_width(&format!("[x] {}", msg::AMEND.get())));
     let label = [long, short]
         .into_iter()
-        .find(|l| row.width as usize > amend_w + display_width(l));
-    let Some(label) = label else { return };
+        .find(|l| row.width as usize > amend_w + display_width(l))
+        .unwrap_or(icon);
+    if (row.width as usize) < display_width(&label) {
+        return;
+    }
     let width = display_width(&label) as u16;
     let rect = Rect::new(row.right() - width, row.y, width, 1);
     hits.push((rect, HitTarget::AiCompose));
@@ -822,6 +829,40 @@ mod tests {
             .unwrap()
             .0;
         assert_eq!(buf[(r.x + 1, r.y)].fg, th().ui.muted);
+    }
+
+    /// The Compose button shrinks with the pane (long label, short label,
+    /// the sparkle alone) and never vanishes while AI is on.
+    #[test]
+    fn compose_shrinks_to_the_icon_and_never_vanishes() {
+        let mut seen = Vec::new();
+        for width in [90u16, 56, 50, 46, 40, 30, 20, 12, 6, 3] {
+            let (buf, hits) = paint_ai(width, 1, true);
+            let rect = hits
+                .iter()
+                .find(|(_, t)| *t == HitTarget::AiCompose)
+                .unwrap_or_else(|| panic!("no Compose hit at width {width}"))
+                .0;
+            assert_eq!(rect.y, 1, "width {width}");
+            assert_eq!(rect.right(), width, "width {width}: flush right");
+            let text = row_text(&buf, 1, width);
+            assert!(text.contains(SPARK), "width {width}: {text:?}");
+            let kind = if text.contains("Compose commits with AI") {
+                "long"
+            } else if text.contains("Compose with AI") {
+                "short"
+            } else {
+                "icon"
+            };
+            seen.push((width, kind));
+        }
+        let kind_at = |w: u16| seen.iter().find(|(x, _)| *x == w).unwrap().1;
+        assert_eq!(kind_at(90), "long");
+        assert_eq!(kind_at(56), "long");
+        assert_eq!(kind_at(46), "short");
+        assert_eq!(kind_at(40), "icon");
+        assert_eq!(kind_at(20), "icon");
+        assert_eq!(kind_at(3), "icon");
     }
 
     /// AI off: no sparkle drawn and no hit target left behind.

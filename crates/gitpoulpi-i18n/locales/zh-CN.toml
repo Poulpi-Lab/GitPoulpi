@@ -3380,6 +3380,8 @@ ai_explain_selected_commit = { git = "AI：解释所选 {$Commit}", local = "AI�
 ai_explain_working_changes = "AI：解释工作区更改"
 ai_insert_prompt_variable = "AI：插入提示词变量"
 ai_compose_commits_from_working_changes = { git = "AI：根据工作区更改撰写 {$Commit}…", local = "AI：根据工作区更改撰写{$Commit}…" }
+# context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
+stage_guard_show_in_file = "Sensitive Files: Show in File"
 composer_move_file_to_commit = { git = "撰写器：将文件移到 {$Commit}…", local = "撰写器：将文件移到{$Commit}…" }
 diff_blame = { git = "{$Diff}：Blame", local = "{$Diff}：追溯" }
 diff_history = "{$Diff}：文件历史"
@@ -3433,6 +3435,8 @@ why_open_a_diff_file_view_blame_or_history_first = { git = "请先打开 {$diff}
 why_no_text_selected_drag_over_the_text_first = "未选中文本 - 请先拖选文本"
 why_the_diff_view_isn_t_open = { git = "{$diff} 视图未打开", local = "{$diff}视图未打开" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "请先打开一个文件 - 在 {$diff} 视图、状态窗格或某个 {$commit} 中", local = "请先打开一个文件 - 在{$diff}视图、状态窗格或某个提交中" }
+# context: why that palette command is unavailable
+why_no_sensitive_files_question = "no sensitive files question is open"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "请先在引用窗格中选择一个分支或 {$tag}", local = "请先在引用窗格中选择一个分支或{$tag}" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "暂不支持检出远程分支 - 请先创建本地跟踪分支"
 why_select_a_local_branch_in_the_refs_pane_first = "请先在引用窗格中选择一个本地分支"
@@ -9349,6 +9353,8 @@ answer_stage = { git = "仍然 {$Stage}", local = "仍然{$Stage}" }
 answer_cancel = { git = "取消，不 {$stage} 任何文件", local = "取消，不{$stage}任何文件" }
 # context: key hint at the bottom of the dialog
 hint = "Up/Down：选择，Enter 或 1/2：回答，Esc：取消"
+# context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
+show_in_file = "Show in file"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = { git = "敏感文件未被 {$staged}：{files}；请询问用户，然后在允许敏感文件的前提下再次 {$stage}", local = "敏感文件未被{$staged}：{files}；请询问用户，然后在允许敏感文件的前提下再次{$stage}" }
 

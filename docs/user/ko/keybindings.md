@@ -1151,6 +1151,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | ✦ AI: 선택한 Commit 분할... |  |
 | ✦ AI: 작업 변경 사항 설명 | `Ctrl+G w` |
 | ✦ AI: 작업 변경 사항으로 Commit 구성... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | 작성기: 파일을 Commit으로 이동... | `m` |
 | Diff: Blame |  |
 | Blame: Log에서 commit 표시 | `Enter` |

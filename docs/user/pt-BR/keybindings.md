@@ -1156,6 +1156,7 @@ As teclas são as padrão.
 | ✦ IA: dividir o commit selecionado... |  |
 | ✦ IA: explicar as alterações em andamento | `Ctrl+G w` |
 | ✦ IA: compor commits a partir das alterações em andamento... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | Compositor: mover arquivo para um commit... | `m` |
 | Diff: blame |  |
 | Blame: mostrar o commit no Log | `Enter` |

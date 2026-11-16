@@ -3389,6 +3389,8 @@ ai_explain_selected_commit = { git = "ШІ: пояснити вибраний co
 ai_explain_working_changes = "ШІ: пояснити робочі зміни"
 ai_insert_prompt_variable = "ШІ: вставити змінну запиту"
 ai_compose_commits_from_working_changes = { git = "ШІ: скласти commit'и з робочих змін...", local = "ШІ: скласти коміти з робочих змін..." }
+# context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
+stage_guard_show_in_file = "Sensitive Files: Show in File"
 composer_move_file_to_commit = { git = "Композер: перемістити файл до commit'у...", local = "Композер: перемістити файл до коміту..." }
 diff_blame = { git = "Diff: Blame", local = "Різниця: Blame" }
 diff_history = { git = "Diff: історія файлу", local = "Різниця: історія файлу" }
@@ -3442,6 +3444,8 @@ why_open_a_diff_file_view_blame_or_history_first = { git = "спершу від�
 why_no_text_selected_drag_over_the_text_first = "текст не виділено - спершу виділіть його"
 why_the_diff_view_isn_t_open = { git = "подання diff не відкрито", local = "подання різниці не відкрито" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "спершу відкрийте файл - у diff, панелі Status чи commit'і", local = "спершу відкрийте файл - у різниці, панелі Status чи коміті" }
+# context: why that palette command is unavailable
+why_no_sensitive_files_question = "no sensitive files question is open"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "спершу виберіть гілку чи tag на панелі Refs", local = "спершу виберіть гілку чи тег на панелі Refs" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "checkout віддаленої гілки ще не підтримується - спершу створіть локальну гілку відстеження"
 why_select_a_local_branch_in_the_refs_pane_first = "спершу виберіть локальну гілку на панелі Refs"
@@ -9351,6 +9355,8 @@ answer_stage = "{$Stage} попри це"
 answer_cancel = "Скасувати, нічого не {$stage}"
 # context: key hint at the bottom of the dialog
 hint = "Вгору/Вниз: вибір, Enter або 1/2: відповідь, Esc: скасувати"
+# context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
+show_in_file = "Show in file"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "чутливі файли не було {$staged}: {files}; спитайте користувача, потім {$stage} знову, дозволивши чутливі файли"
 

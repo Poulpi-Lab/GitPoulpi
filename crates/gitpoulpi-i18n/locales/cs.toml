@@ -3389,6 +3389,8 @@ ai_explain_selected_commit = "AI: Vysvětlit vybraný commit"
 ai_explain_working_changes = "AI: Vysvětlit rozpracované změny"
 ai_insert_prompt_variable = "AI: Vložit proměnnou promptu"
 ai_compose_commits_from_working_changes = "AI: Sestavit commity z rozpracovaných změn..."
+# context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
+stage_guard_show_in_file = "Sensitive Files: Show in File"
 composer_move_file_to_commit = "Composer: Přesunout soubor do commitu..."
 diff_blame = { git = "Diff: Blame", local = "Rozdíly: Blame" }
 diff_history = { git = "Diff: Historie souboru", local = "Rozdíly: Historie souboru" }
@@ -3442,6 +3444,8 @@ why_open_a_diff_file_view_blame_or_history_first = { git = "nejdřív otevřete 
 why_no_text_selected_drag_over_the_text_first = "není vybrán žádný text - nejdřív ho označte tažením"
 why_the_diff_view_isn_t_open = { git = "zobrazení diffu není otevřeno", local = "zobrazení rozdílů není otevřeno" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "nejdřív otevřete soubor - v zobrazení Diff, v panelu Stav nebo v commitu", local = "nejdřív otevřete soubor - v zobrazení Rozdíl, v panelu Stav nebo v commitu" }
+# context: why that palette command is unavailable
+why_no_sensitive_files_question = "no sensitive files question is open"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "nejdřív vyberte větev nebo tag v panelu Refs", local = "nejdřív vyberte větev nebo značku v panelu Refs" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "checkout vzdálené větve zatím není podporován - nejdřív vytvořte lokální sledující větev"
 why_select_a_local_branch_in_the_refs_pane_first = "nejdřív vyberte lokální větev v panelu Refs"
@@ -9343,6 +9347,8 @@ answer_stage = "{$Stage} přesto"
 answer_cancel = "Zrušit, nic nebude {$staged}"
 # context: key hint at the bottom of the dialog
 hint = "Nahoru/Dolů: výběr, Enter nebo 1/2: odpověď, Esc: zrušit"
+# context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
+show_in_file = "Show in file"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "citlivé soubory nebyly {$staged}: {files}; zeptejte se uživatele a pak {$stage} znovu s povolením citlivých souborů"
 

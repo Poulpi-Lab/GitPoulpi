@@ -3390,6 +3390,8 @@ ai_explain_selected_commit = "YZ: Seçili Commit'i Açıkla"
 ai_explain_working_changes = "YZ: Çalışma Değişikliklerini Açıkla"
 ai_insert_prompt_variable = "YZ: İstem Değişkeni Ekle"
 ai_compose_commits_from_working_changes = "YZ: Çalışma Değişikliklerinden Commit'ler Oluştur..."
+# context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
+stage_guard_show_in_file = "Sensitive Files: Show in File"
 composer_move_file_to_commit = "Composer: Dosyayı Bir Commit'e Taşı..."
 diff_blame = { git = "Diff: Blame", local = "Fark: Blame" }
 diff_history = { git = "Diff: Dosya Geçmişi", local = "Fark: Dosya Geçmişi" }
@@ -3443,6 +3445,8 @@ why_open_a_diff_file_view_blame_or_history_first = { git = "önce bir diff, Dosy
 why_no_text_selected_drag_over_the_text_first = "seçili metin yok - önce metnin üzerinde sürükleyin"
 why_the_diff_view_isn_t_open = { git = "diff görünümü açık değil", local = "fark görünümü açık değil" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "önce bir dosya açın - Diff görünümünde, Durum panelinde veya bir commit'te", local = "önce bir dosya açın - Fark görünümünde, Durum panelinde veya bir commit'te" }
+# context: why that palette command is unavailable
+why_no_sensitive_files_question = "no sensitive files question is open"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "önce Refs panelinde bir dal veya tag seçin", local = "önce Refs panelinde bir dal veya etiket seçin" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "uzak dalda checkout henüz desteklenmiyor - önce yerel bir izleme dalı oluşturun"
 why_select_a_local_branch_in_the_refs_pane_first = "önce Refs panelinde bir yerel dal seçin"
@@ -9352,6 +9356,8 @@ answer_stage = "Yine de {$stage}"
 answer_cancel = "İptal et, “{$stage}” eylemi uygulanmasın"
 # context: key hint at the bottom of the dialog
 hint = "Yukarı/Aşağı: seç, Enter veya 1/2: yanıtla, Esc: iptal"
+# context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
+show_in_file = "Show in file"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = { git = "hassas dosyalar stage'lenmedi: {files}; kullanıcıya sorun, sonra hassas dosyalara izin vererek yeniden stage'leyin", local = "hassas dosyalar hazırlanmadı: {files}; kullanıcıya sorun, sonra hassas dosyalara izin vererek yeniden hazırlayın" }
 

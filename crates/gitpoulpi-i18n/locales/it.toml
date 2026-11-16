@@ -3389,6 +3389,8 @@ ai_explain_selected_commit = "IA: Spiega il commit selezionato"
 ai_explain_working_changes = "IA: Spiega le modifiche in corso"
 ai_insert_prompt_variable = "IA: Inserisci variabile del prompt"
 ai_compose_commits_from_working_changes = "IA: Componi {$commits} dalle modifiche in corso..."
+# context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
+stage_guard_show_in_file = "Sensitive Files: Show in File"
 composer_move_file_to_commit = "Compositore: Sposta il file in un commit..."
 diff_blame = "{$Diff}: Blame"
 diff_history = "{$Diff}: Cronologia del file"
@@ -3442,6 +3444,8 @@ why_open_a_diff_file_view_blame_or_history_first = "apri prima un diff, la vista
 why_no_text_selected_drag_over_the_text_first = "nessun testo selezionato - prima trascina sul testo"
 why_the_diff_view_isn_t_open = "la vista diff non è aperta"
 why_open_a_file_first_in_the_diff_view_the_status = "apri prima un file - nella vista Diff, nel pannello Stato o in un commit"
+# context: why that palette command is unavailable
+why_no_sensitive_files_question = "no sensitive files question is open"
 why_select_a_branch_or_tag_in_the_refs_pane_first = "seleziona prima un branch o un tag nel pannello Refs"
 why_checking_out_a_remote_branch_isn_t_supported_yet = "il checkout di un branch remoto non è ancora supportato - crea prima un branch di tracciamento locale"
 why_select_a_local_branch_in_the_refs_pane_first = "seleziona prima un branch locale nel pannello Refs"
@@ -9346,6 +9350,8 @@ answer_stage = "Metti comunque in {$stage}"
 answer_cancel = "Annulla, niente in {$stage}"
 # context: key hint at the bottom of the dialog
 hint = "Su/Giù: scegli, Invio o 1/2: rispondi, Esc: annulla"
+# context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
+show_in_file = "Show in file"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "file sensibili non messi in {$stage}: {files}; chiedi all'utente, poi rimettili in {$stage} consentendo i file sensibili"
 

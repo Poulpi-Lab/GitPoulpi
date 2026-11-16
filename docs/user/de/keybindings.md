@@ -1153,6 +1153,7 @@ die Standardtasten.
 | ✦ KI: Ausgewählten Commit aufteilen... |  |
 | ✦ KI: Änderungen im Arbeitsverzeichnis erklären | `Ctrl+G w` |
 | ✦ KI: Commits aus Änderungen im Arbeitsverzeichnis zusammenstellen... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | Composer: Datei in Commit verschieben... | `m` |
 | Diff: Blame |  |
 | Blame: Commit im Log zeigen | `Enter` |

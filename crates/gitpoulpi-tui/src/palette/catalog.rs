@@ -3628,6 +3628,11 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     )
     .requires(crate::build_features::Feature::Ai),
     entry(
+        msg::palette::STAGE_GUARD_SHOW_IN_FILE,
+        "S",
+        PaletteCommand::StageGuardShowInFile,
+    ),
+    entry(
         msg::palette::COMPOSER_MOVE_FILE_TO_COMMIT,
         "m",
         PaletteCommand::ComposerMoveFile,

@@ -3392,6 +3392,8 @@ ai_explain_selected_commit = { git = "AI: Förklara vald commit", local = "AI: F
 ai_explain_working_changes = "AI: Förklara ändringar i arbetskatalogen"
 ai_insert_prompt_variable = "AI: Infoga promptvariabel"
 ai_compose_commits_from_working_changes = { git = "AI: Komponera commits från ändringar...", local = "AI: Komponera incheckningar från ändringar..." }
+# context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
+stage_guard_show_in_file = "Sensitive Files: Show in File"
 composer_move_file_to_commit = { git = "Composer: Flytta fil till commit...", local = "Composer: Flytta fil till incheckning..." }
 diff_blame = "Diff: Blame"
 diff_history = "Diff: Filhistorik"
@@ -3445,6 +3447,8 @@ why_open_a_diff_file_view_blame_or_history_first = "öppna först en diff, filvy
 why_no_text_selected_drag_over_the_text_first = "ingen text markerad - dra över texten först"
 why_the_diff_view_isn_t_open = "diff-vyn är inte öppen"
 why_open_a_file_first_in_the_diff_view_the_status = { git = "öppna först en fil - i Diff-vyn, Status-rutan eller en commit", local = "öppna först en fil - i Diff-vyn, Status-rutan eller en incheckning" }
+# context: why that palette command is unavailable
+why_no_sensitive_files_question = "no sensitive files question is open"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "välj först en gren eller tag i Refs-rutan", local = "välj först en gren eller tagg i Refs-rutan" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "att checka ut en remote-gren stöds inte ännu - skapa först en lokal spårande gren"
 why_select_a_local_branch_in_the_refs_pane_first = "välj först en lokal gren i Refs-rutan"
@@ -9353,6 +9357,8 @@ answer_stage = "{$Stage} ändå"
 answer_cancel = "Avbryt, {$stage} ingenting"
 # context: key hint at the bottom of the dialog
 hint = "Upp/Ned: välj, Enter eller 1/2: svara, Esc: avbryt"
+# context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
+show_in_file = "Show in file"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "känsliga filer blev inte {$staged}: {files}; fråga användaren och {$stage} sedan igen med känsliga filer tillåtna"
 

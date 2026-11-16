@@ -1162,6 +1162,7 @@ applicano. I tasti sono quelli predefiniti.
 | ✦ IA: Dividi il commit selezionato... |  |
 | ✦ IA: Spiega le modifiche in corso | `Ctrl+G w` |
 | ✦ IA: Componi commit dalle modifiche in corso... | `Ctrl+G C` |
+| Sensitive Files: Show in File | `S` |
 | Compositore: Sposta il file in un commit... | `m` |
 | Diff: Blame |  |
 | Blame: Mostra il commit nel Log | `Enter` |

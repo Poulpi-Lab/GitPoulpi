@@ -104,6 +104,8 @@ pub(crate) struct PaletteContext {
     /// The working tree has uncommitted changes, so the Log shows its WIP
     /// row - and with it the inline commit-message field.
     pub(crate) has_wip: bool,
+    /// The sensitive-files question of a refused stage is up.
+    pub(crate) stage_guard_open: bool,
     /// The AI commit composer's review is open behind the palette.
     pub(crate) compose_open: bool,
     /// ... and a file row is selected in it.
@@ -995,6 +997,9 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         // action itself opens the guiding dialog if something still runs it).
         C::Commit | C::CommitNow if ctx.has_conflicts => {
             Some(gitpoulpi_i18n::msg::conflict_guard::WHY_COMMIT.get())
+        }
+        C::StageGuardShowInFile => {
+            (!ctx.stage_guard_open).then_some(msg::palette::WHY_NO_SENSITIVE_FILES_QUESTION.get())
         }
         C::AiComposeCommits => {
             if !ctx.ai_enabled {

@@ -24,6 +24,8 @@ pub(crate) enum Act {
     Links,
     /// Open the Mermaid diagram of the selected entry.
     OpenDiagram,
+    /// Open the code the selected thread is about.
+    OpenCode,
     CopyLink,
     OpenBrowser,
     NewComment,
@@ -68,6 +70,7 @@ impl Conversation {
                             | 'd'
                             | 'l'
                             | 'g'
+                            | 'G'
                             | 'y'
                             | 'o'
                             | 'c'
@@ -109,6 +112,7 @@ impl Conversation {
                     'd' => Some(Act::Delete),
                     'l' => Some(Act::Links),
                     'g' => Some(Act::OpenDiagram),
+                    'G' => Some(Act::OpenCode),
                     'y' => Some(Act::CopyLink),
                     'o' => Some(Act::OpenBrowser),
                     'c' => Some(Act::NewComment),
@@ -184,6 +188,10 @@ impl Conversation {
                     })
                 }
                 Hit::Link(id) => self.link(id).cloned().map(Act::Link),
+                Hit::Code(i) => {
+                    self.select(i);
+                    Some(Act::OpenCode)
+                }
                 Hit::LoadOlder => Some(Act::LoadOlder),
             },
             _ => None,

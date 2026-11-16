@@ -931,6 +931,7 @@ Tuşlar varsayılanlardır.
 | İnceleme: Konuşmaya Yorum Yap... | `C` |
 | İnceleme: Yorum Dizisini Yanıtla... | `r` |
 | İnceleme: Yorum Dizisini Çöz veya Yeniden Aç | `x` |
+| Review: Back to Comment in Overview | `Esc` |
 | İnceleme: Yorum Dizisini Daralt veya Genişlet | `z` |
 | İnceleme: Bekleyen Yorumu Düzenle... | `e` |
 | İnceleme: Bekleyen Yorumu Sil | `d` |
@@ -989,6 +990,7 @@ Tuşlar varsayılanlardır.
 | Konuşma: Yeni Yorum | `c` |
 | Konuşma: Kaydın Bağlantıları... | `l` |
 | Konuşma: Kaydın Diyagramını Aç | `g` |
+| Conversation: Open Code of Thread | `G` |
 | Konuşma: Kaydın Bağlantısını Kopyala | `y` |
 | Konuşma: Tarayıcıda Aç | `o` |
 | Konuşma: Yorumu Düzenle | `e` |

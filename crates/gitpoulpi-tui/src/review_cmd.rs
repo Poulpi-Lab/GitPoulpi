@@ -50,6 +50,8 @@ pub(crate) struct ReviewAvail {
     pub(crate) has_summary: bool,
     /// The Overview holds a ✦ review draft.
     pub(crate) has_draft: bool,
+    /// The Files page was reached from a comment of the Overview.
+    pub(crate) can_return: bool,
 }
 
 /// What the view can be asked to do. The palette lists one entry per value.
@@ -58,6 +60,8 @@ pub(crate) enum ReviewCmd {
     TabOverview,
     TabFiles,
     TabCommits,
+    /// From the code a comment of the Overview opened: back to that comment.
+    BackToComment,
     /// A comment on the cursor line or the selected range (pending).
     AddComment,
     /// A comment in the conversation (posted at once).
@@ -157,6 +161,7 @@ impl ReviewCmd {
             | Self::OpenBrowser
             | Self::Checkout
             | Self::Close => None,
+            Self::BackToComment => (!a.can_return).then_some(msg::WHY_NO_RETURN.get()),
             Self::ConversationComment => (!a.loaded).then_some(msg::NOT_LOADED.get()),
             Self::AddComment => {
                 if !files {

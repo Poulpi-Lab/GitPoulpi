@@ -3618,6 +3618,8 @@ review_reply = "Review: Op discussie reageren..."
 # context: command palette entry
 review_resolve = "Review: Discussie oplossen of heropenen"
 # context: command palette entry
+review_back_to_comment = "Review: Back to Comment in Overview"
+# context: command palette entry
 review_fold_thread = "Review: Discussie inklappen of uitklappen"
 # context: command palette entry
 review_edit_pending = "Review: Conceptopmerking bewerken..."
@@ -7230,6 +7232,14 @@ why_not_on_diff = "open eerst een pagina met wijzigingen"
 why_not_on_code = "zet de cursor eerst op een coderegel"
 # context: why a row is off
 why_not_on_thread = "zet de cursor eerst op een discussie"
+# context: button on the Files page after jumping from a comment: returns to that comment in the Overview
+back_to_overview = "Back to Overview"
+# context: why Back to Comment does nothing. Width budget: 50 cells
+why_no_return = "no comment to go back to"
+# context: status line: the commented file is not in the diff. {path} is a file path
+thread_not_in_diff = "{path} is not in the {$diff}"
+# context: status line: the thread's line no longer exists; {path} is a file path
+thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
 # context: why a row is off
 why_no_resolve = "deze discussie kan niet worden opgelost"
 # context: why a row is off
@@ -10098,6 +10108,12 @@ open_diagram = "Diagram openen"
 link_diagram = "Diagram: {first}"
 why_no_diagram = "het geselecteerde item heeft geen diagram"
 palette_open_diagram = "Gesprek: Diagram van item openen"
+# context: command palette entry
+palette_open_code = "Conversation: Open Code of Thread"
+# context: why Open Code does nothing. Width budget: 50 cells
+why_no_code = "the selected entry is not a code thread"
+# context: why Open Code does nothing outside a review. Width budget: 50 cells
+why_no_code_here = "open the review of this request to reach its code"
 why_no_url = "dit item heeft geen pagina op de host"
 why_no_events = "deze host toont geen gebeurtenissen"
 why_no_reply = "deze host neemt geen antwoord op dit item aan"

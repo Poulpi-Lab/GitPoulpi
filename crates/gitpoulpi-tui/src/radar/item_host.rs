@@ -159,6 +159,7 @@ impl RadarUi {
                 crate::mermaid_popup::open_script(&source);
                 Outcome::None
             }
+            ItemEffect::OpenCode(_) => self.say(msg::item_view::WHY_NO_CODE_HERE.get().to_string()),
             // No repository here: the view never offers it (a commit link
             // opens on the host), and nothing else can ask.
             ItemEffect::ShowCommit(_) => self.say(msg::radar::MSG_CLONE_FIRST.get().to_string()),

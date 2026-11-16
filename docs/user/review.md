@@ -68,6 +68,15 @@ selected entry (**Reply**, **Quote**, **Edit**, **Delete**, **Links**) do the sa
 *Conversation: ...* rows next to the *Review: ...* ones. A link is asked about before it opens, like everywhere in the
 review.
 
+A thread on code shows its `path:line` as a link (underlined, a real button). A click on it, **`G`** on the selected
+thread, or the palette's *Conversation: Open Code of Thread* switches to the **Files** page, opens that file and puts
+the cursor on the commented line (on the old or the new side, as it was written) with the thread open under it (a
+folded one is unfolded). **Esc**, the **Back to Overview** button at the left of the page tabs, or *Review: Back to
+Comment in Overview* return to the same entry of the Overview. A thread whose line is no longer in the diff (outdated)
+opens the file at the nearest line and the status line says so; a thread on a file the request no longer changes says
+that the file is not in the diff. In an issue or Radar view of the same request there is no code to open: `G` answers
+that the review has it.
+
 Where a conversation key and a review key meet, the conversation has the letter on this page: `l` (labels), `m`
 (milestone), `Q` (Gerrit's abandon), `e` / `d`, `r`. The labels, milestone and abandon stay on the header's buttons and
 in the palette; `a` (assignees), `p` (reviewers), `f` (**Finish review**), `b` (**Check out**), `P`, `D`, `U` and
@@ -287,6 +296,7 @@ Submitting the review spends the draft.
 | Overview / Files / Commits | `Alt+1` / `Alt+2` / `Alt+3` | *Review: Show Overview*, *Show Files*, *Show Commits* |
 | Comment on the line or the range | `c` | *Review: Comment on Line...* |
 | Comment on the conversation | `c` on Overview, `C` | *Review: Comment on Conversation...* (opens the Overview's box), *Conversation: New Comment* |
+| Open the code of a thread (Overview) / back to the comment | `G` / `Esc` | *Conversation: Open Code of Thread*, *Review: Back to Comment in Overview* |
 | Reply to the thread | `r` | *Review: Reply to Thread...* |
 | Resolve or reopen | `x` | *Review: Resolve or Reopen Thread* |
 | Fold or unfold a thread | `z` | *Review: Fold or Unfold Thread* |

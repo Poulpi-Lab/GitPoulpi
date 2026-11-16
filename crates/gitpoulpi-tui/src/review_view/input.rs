@@ -216,6 +216,7 @@ impl ReviewView {
             ReviewCmd::TabOverview => self.set_tab(Tab::Overview),
             ReviewCmd::TabFiles => self.set_tab(Tab::Files),
             ReviewCmd::TabCommits => self.set_tab(Tab::Commits),
+            ReviewCmd::BackToComment => self.set_tab(Tab::Overview),
             ReviewCmd::AddComment => match self.comment_target() {
                 Ok(purpose) => self.open_compose(purpose, String::new()),
                 Err(why) => self.message = Some(why.to_string()),
@@ -502,7 +503,16 @@ impl ReviewView {
         }
     }
 
-    fn set_tab(&mut self, tab: Tab) {
+    pub(super) fn set_tab(&mut self, tab: Tab) {
+        // Leaving the code a comment opened: back on that comment.
+        if tab != Tab::Files {
+            self.goto = None;
+            if let Some(id) = self.ov_return.take() {
+                if tab == Tab::Overview {
+                    self.ov.select_thread(&id);
+                }
+            }
+        }
         self.tab = tab;
         self.focus = Focus::List;
         self.message = None;
@@ -822,9 +832,12 @@ impl ReviewView {
                 return ReviewEffect::None;
             }
             let tab = self.tab;
+            let returning = tab == Tab::Files && self.ov_return.is_some();
             let pane = self.active_pane();
             if tab != Tab::Overview && pane.anchor.is_some() {
                 pane.anchor = None;
+            } else if returning {
+                self.set_tab(Tab::Overview);
             } else {
                 return ReviewEffect::Close;
             }
@@ -1208,6 +1221,7 @@ impl ReviewView {
                 }
             }
             Hit::Tab(tab) => self.set_tab(tab),
+            Hit::BackToComment => return self.run(ReviewCmd::BackToComment),
             Hit::Meta(field) => self.open_meta(field),
             Hit::Checkout => return self.run(ReviewCmd::Checkout),
             Hit::Browser => return self.run(ReviewCmd::OpenBrowser),

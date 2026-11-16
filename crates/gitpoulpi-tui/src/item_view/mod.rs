@@ -212,6 +212,9 @@ pub(crate) enum ItemEffect {
     ShowCommit(String),
     /// Open the diagram viewer on this Mermaid script.
     OpenDiagram(String),
+    /// Go to the code a thread is about (only an embedded view, the
+    /// review's Overview, sends it).
+    OpenCode(crate::item_cmd::CodeRef),
 }
 
 /// Where the keyboard is.
@@ -345,11 +348,27 @@ impl ItemView {
         }
     }
 
+    #[cfg(test)]
+    pub(crate) fn selected_is_thread(&self, id: &str) -> bool {
+        self.conv.selected_is_thread(id)
+    }
+
+    #[cfg(test)]
+    pub(crate) fn code_link_rect(&self) -> Option<ratatui::layout::Rect> {
+        self.conv.code_link_rect()
+    }
+
+    /// Selects the code thread `id` of the timeline.
+    pub(crate) fn select_thread(&mut self, id: &str) -> bool {
+        self.conv.select_thread(id)
+    }
+
     /// Opens the conversation to be shown inside another view (the review's
     /// Overview): the same timeline and docked composer, without a frame.
     pub(crate) fn open_embedded(target: ItemTarget, factory: Arc<dyn ClientFactory>) -> Self {
         let mut view = Self::open(target, factory);
         view.embedded = true;
+        view.conv.code_links = true;
         view
     }
 
@@ -538,6 +557,13 @@ impl ItemView {
                 .selected_links()
                 .iter()
                 .any(|l| l.diagram.is_some()),
+            code: if !self.embedded {
+                Some(m::WHY_NO_CODE_HERE.get())
+            } else if self.conv.selected_code().is_none() {
+                Some(m::WHY_NO_CODE.get())
+            } else {
+                None
+            },
             has_url: self.conv.selected_url().is_some(),
             reply: self.conv.reply_reason(),
             quote,

@@ -25,6 +25,7 @@ pub(crate) enum ItemEffect {
     OpenUrl(String),
     ShowCommit(String),
     OpenDiagram(String),
+    OpenCode(crate::item_cmd::CodeRef),
 }
 
 /// No provider's issues have a conversation to read in this build.
@@ -43,6 +44,10 @@ pub(crate) enum ItemView {}
 impl ItemView {
     pub(crate) fn open(target: ItemTarget, _factory: Arc<dyn ClientFactory>) -> Self {
         match target {}
+    }
+
+    pub(crate) fn select_thread(&mut self, _id: &str) -> bool {
+        match *self {}
     }
 
     pub(crate) fn busy(&self) -> bool {

@@ -511,6 +511,10 @@ impl ReviewView {
                 crate::mermaid_popup::open_script(&source);
                 ReviewEffect::None
             }
+            ItemEffect::OpenCode(code) => {
+                self.open_code(code);
+                ReviewEffect::None
+            }
         }
     }
 

@@ -905,6 +905,10 @@ impl RepoDialogs {
                 crate::mermaid_popup::open_script(&source);
                 None
             }
+            // Only the review's Overview opens code.
+            ItemEffect::OpenCode(_) => Some(DialogEffect::Message(
+                msg::item_view::WHY_NO_CODE_HERE.get().to_string(),
+            )),
             ItemEffect::ShowCommit(sha) => {
                 self.dialog = None;
                 self.parked_board = None;

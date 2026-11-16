@@ -76,7 +76,7 @@ pub(crate) fn notify(
 }
 
 /// [`notify`] for an item named by its conversation key.
-#[cfg(feature = "hosting")]
+#[cfg(all(feature = "hosting", feature = "conversation"))]
 pub(crate) fn notify_item(
     integration_id: &str,
     project: &str,

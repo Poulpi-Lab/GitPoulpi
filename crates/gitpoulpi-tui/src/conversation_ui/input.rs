@@ -48,6 +48,40 @@ fn plain(key: &KeyEvent) -> bool {
 }
 
 impl Conversation {
+    /// Whether `on_key` would take `key` (without moving anything).
+    pub(crate) fn takes_key(&self, key: &KeyEvent) -> bool {
+        let ctrl = key.modifiers.contains(KeyModifiers::CONTROL)
+            && !key.modifiers.intersects(KeyModifiers::ALT);
+        match key.code {
+            KeyCode::Up | KeyCode::Down | KeyCode::PageUp | KeyCode::PageDown => plain(key),
+            KeyCode::Home | KeyCode::End | KeyCode::Enter | KeyCode::Backspace => plain(key),
+            KeyCode::Char('k' | 'K' | 'j' | 'J') if ctrl => true,
+            KeyCode::F(5) | KeyCode::Esc => true,
+            KeyCode::Left => key.modifiers == KeyModifiers::ALT,
+            KeyCode::Char(c) => {
+                plain(key)
+                    && matches!(
+                        c,
+                        'q' | 'r'
+                            | 'Q'
+                            | 'e'
+                            | 'd'
+                            | 'l'
+                            | 'g'
+                            | 'y'
+                            | 'o'
+                            | 'c'
+                            | 'v'
+                            | 'm'
+                            | 'n'
+                            | 'k'
+                            | 'j'
+                    )
+            }
+            _ => false,
+        }
+    }
+
     /// A key while the timeline has the keyboard. `None`: not the timeline's.
     pub(crate) fn on_key(&mut self, key: KeyEvent) -> Option<Act> {
         let ctrl = key.modifiers.contains(KeyModifiers::CONTROL)

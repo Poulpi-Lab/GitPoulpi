@@ -142,6 +142,8 @@ impl RadarSlot {
 
     pub(crate) fn paste(&mut self, _text: &str) {}
 
+    pub(crate) fn on_hosting_changed(&mut self, _change: &gitpoulpi_ipc::HostingChangeArgs) {}
+
     pub(crate) fn nav_targets(&self) -> Vec<(Rect, Spot)> {
         Vec::new()
     }

@@ -132,6 +132,47 @@ impl ItemView {
         self.guard.render(buf);
     }
 
+    /// Paints the conversation inside another view's page: the "Posting as"
+    /// line, the timeline and the docked composer, the popups last. The
+    /// frame, the header and the footer are the host view's.
+    pub(crate) fn render_embedded(&mut self, area: Rect, buf: &mut Buffer) {
+        self.hits.clear();
+        self.frame = area;
+        if area.height < 3 || area.width < 20 {
+            self.composer_rect = Rect::default();
+            return;
+        }
+        self.identity_row(buf, Rect::new(area.x, area.y, area.width, 1));
+        let body_top = area.y + 1;
+        let dock_h = self.dock_height(area.height);
+        let dock_top = area.bottom().saturating_sub(dock_h).max(body_top);
+        let timeline = Rect::new(
+            area.x,
+            body_top,
+            area.width,
+            dock_top.saturating_sub(body_top),
+        );
+        let focused = self.focus == Focus::Timeline;
+        self.conv.paint(buf, timeline, focused);
+        if dock_h > 0 {
+            self.dock(buf, Rect::new(area.x, dock_top, area.width, dock_h));
+        } else {
+            self.composer_rect = Rect::default();
+            if let Some(md) = self.md.as_mut() {
+                // Not drawn: it must not catch clicks from its last place.
+                md.render(buf, Rect::default(), false, "");
+            }
+        }
+        let all = buf.area;
+        if let Some(menu) = self.menu.as_mut() {
+            menu.combo.render_popup(buf, all);
+        }
+        if let Some((confirm, _)) = self.delete_ask.as_mut() {
+            confirm.render(buf, all);
+        }
+        self.guard.render(buf);
+    }
+
     fn title(&self, width: u16) -> String {
         let (reference, title) = match &self.conv.header {
             Some(h) => (h.reference.clone(), h.title.clone()),

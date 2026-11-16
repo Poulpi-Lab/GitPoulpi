@@ -34,6 +34,7 @@ mod input;
 mod load;
 mod model;
 mod options;
+mod overview;
 mod pane;
 mod patchset;
 mod popups;
@@ -55,6 +56,7 @@ use ratatui::layout::Rect;
 
 use crate::daemon_link::Requester;
 use crate::hosting_task::ClientFactory;
+use crate::item_view::ItemView;
 use crate::meta_picker::{MetaEdit, MetaEditOutcome, MetaField, MetaTarget};
 
 use crate::review_cmd::{ReviewAvail, Tab};
@@ -150,7 +152,13 @@ pub(crate) struct ReviewView {
     ov_bar: Option<crate::scrollbar::Track>,
     ov_drag: crate::scrollbar::BarDrag,
     ov_len: usize,
-    /// The Overview's laid-out Markdown, and the addresses of the links
+    /// The conversation of the Overview: the shared timeline and docked
+    /// composer (`item_view`), the same as an issue's.
+    ov: ItemView,
+    /// Where the Overview painted the ✦ block (the draft card and the
+    /// suggestions); the conversation has the rest.
+    ov_strip: Rect,
+    /// The ✦ block's laid-out Markdown, and the addresses of the links
     /// painted this frame (`Hit::MdLink` indexes it).
     md_cache: crate::md_render::DocCache,
     md_links: Vec<String>,
@@ -275,6 +283,7 @@ impl ReviewView {
         session: String,
     ) -> Self {
         let draft = store.load(&target);
+        let ov = ItemView::open_embedded(target.item_target(), factory.clone());
         let mut view = Self {
             target,
             factory,
@@ -298,6 +307,8 @@ impl ReviewView {
             ov_bar: None,
             ov_drag: Default::default(),
             ov_len: 0,
+            ov,
+            ov_strip: Rect::default(),
             md_cache: Default::default(),
             md_links: Vec::new(),
             ov_rows: 0,
@@ -374,9 +385,28 @@ impl ReviewView {
         );
     }
 
+    /// Another client wrote to this request (a comment, a review, a state
+    /// change): the conversation and the host data are read again.
+    pub(crate) fn on_hosting_changed(&mut self, change: &gitpoulpi_ipc::HostingChangeArgs) {
+        use gitpoulpi_ipc::HostingItemKind as K;
+        if change.integration_id != self.target.integration.id
+            || change.project != self.target.project
+            || change.number != self.target.number
+            || change.kind != K::PullRequest
+        {
+            return;
+        }
+        self.ov.on_hosting_changed(change);
+        // The threads, the verdicts and the chips read the host too.
+        if self.host_rx.is_none() {
+            self.host_rx = Some(load::start_host(self.factory.clone(), self.target.clone()));
+        }
+    }
+
     /// Reads the request again (the host and the refs). Pending comments and
     /// viewed ticks stay.
     pub(crate) fn refresh(&mut self) {
+        self.ov.request_refresh();
         self.diffs.clear();
         self.commit_diffs.clear();
         self.blobs.clear();
@@ -395,7 +425,8 @@ impl ReviewView {
 
     /// Something is moving: the spinner needs frames.
     pub(crate) fn busy(&self) -> bool {
-        self.loading()
+        self.ov.busy()
+            || self.loading()
             || self.call.is_some()
             || self.diff_wait.is_some()
             || self.commit_wait.is_some()
@@ -591,6 +622,10 @@ impl ReviewView {
                 }
                 Err(mpsc::TryRecvError::Empty) => {}
             }
+        }
+        self.sync_overview_ai();
+        if let Some(e) = self.poll_overview() {
+            effect = e;
         }
         self.poll_diffs();
         if self.blobs.poll() || self.recodes.poll() {
@@ -814,13 +849,9 @@ impl ReviewView {
 
     fn apply_done(&mut self, done: Done) {
         match done {
-            Done::Comment(comment) => {
-                if let Some(h) = self.host.as_mut() {
-                    h.conversation.push(comment);
-                }
-                self.message = Some(msg::COMMENT_POSTED.get().to_string());
-            }
             Done::Reply { thread_id, comment } => {
+                // The Overview shows the thread as well.
+                self.ov.request_refresh();
                 if let Some(t) = self
                     .host
                     .as_mut()
@@ -834,6 +865,7 @@ impl ReviewView {
                 thread_id,
                 resolved,
             } => {
+                self.ov.request_refresh();
                 if let Some(t) = self
                     .host
                     .as_mut()
@@ -977,20 +1009,43 @@ impl ReviewView {
             .as_ref()
             .and_then(ComposeBox::composer_avail)
             .or_else(|| self.finish.as_ref().and_then(FinishDialog::composer_avail))
+            .or_else(|| {
+                (self.tab == Tab::Overview)
+                    .then(|| self.ov.composer_avail())
+                    .flatten()
+            })
     }
 
     /// Runs a palette row on that help; the sentence for the status line.
     pub(crate) fn run_composer(&mut self, cmd: crate::composer_cmd::ComposerCmd) -> Option<String> {
         if let Some(c) = self.compose.as_mut() {
             c.run_composer(cmd)
+        } else if let Some(f) = self.finish.as_mut() {
+            f.run_composer(cmd)
+        } else if self.tab == Tab::Overview {
+            self.ov.run_composer(cmd)
         } else {
-            self.finish.as_mut().and_then(|f| f.run_composer(cmd))
+            None
         }
+    }
+
+    /// What the palette needs to gray a conversation command out: the
+    /// Overview's conversation has the commands of an issue's (`None`: the
+    /// page is not the Overview).
+    pub(crate) fn item_avail(&self) -> Option<crate::item_cmd::ItemAvail> {
+        (self.tab == Tab::Overview).then(|| self.ov.avail())
+    }
+
+    /// Runs a conversation command of the palette on the Overview.
+    pub(crate) fn run_item(&mut self, cmd: crate::item_cmd::ItemCmd) -> ReviewEffect {
+        let effect = self.ov.run(cmd);
+        self.on_overview_effect(effect)
     }
 
     /// No popup is open over the view: the palette may take the keyboard.
     pub(crate) fn takes_palette(&self) -> bool {
-        self.compose.is_none()
+        (self.tab != Tab::Overview || self.ov.takes_palette())
+            && self.compose.is_none()
             && self.finish.is_none()
             && self.options.is_none()
             && self.confirm.is_none()

@@ -16,10 +16,12 @@ fn api_target() -> ReviewTarget {
 pub(super) fn open_api_in(config: tempfile::TempDir, caps: ReviewCapabilities, ai: bool) -> Rig {
     let calls = Arc::new(Calls::default());
     let submitted = Arc::new(Mutex::new(Vec::new()));
+    let conv = review_conv();
     let factory = Arc::new(Factory {
         caps,
         calls: calls.clone(),
         submitted: submitted.clone(),
+        conv: conv.clone(),
     });
     let mut view = ReviewView::open_api(
         api_target(),
@@ -38,7 +40,9 @@ pub(super) fn open_api_in(config: tempfile::TempDir, caps: ReviewCapabilities, a
     });
     wait(&mut view, "the host data", |v| v.host.is_some());
     wait(&mut view, "the code", |v| v.git.is_some());
+    wait(&mut view, "the conversation", |v| v.ov.loaded());
     Rig {
+        conv,
         view,
         calls,
         submitted,

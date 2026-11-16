@@ -348,6 +348,13 @@ impl RadarSlot {
         self.get().map_or(Outcome::None, |ui| ui.run_item(cmd))
     }
 
+    /// Another client wrote to an item shown over the Radar.
+    pub(crate) fn on_hosting_changed(&mut self, change: &gitpoulpi_ipc::HostingChangeArgs) {
+        if let Some(ui) = self.get() {
+            ui.on_hosting_changed(change);
+        }
+    }
+
     pub(crate) fn paste(&mut self, text: &str) {
         if let Some(ui) = self.get() {
             ui.api_paste(text);

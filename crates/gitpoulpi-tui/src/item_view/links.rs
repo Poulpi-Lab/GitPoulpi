@@ -132,14 +132,18 @@ impl ItemView {
         }
         match &link.xref {
             Some(XrefTarget::InApp(x)) => {
-                if let Some(target) = self.resolve(x) {
-                    self.push_item(target);
-                    return ItemEffect::None;
+                // Inside the review the address is asked, as for any link:
+                // the page the reviewer is on is not replaced.
+                if !self.embedded {
+                    if let Some(target) = self.resolve(x) {
+                        self.push_item(target);
+                        return ItemEffect::None;
+                    }
                 }
                 self.ask(&link.url)
             }
             Some(XrefTarget::Commit { sha, url }) => {
-                if self.target.repo_root.is_some() && sha.len() >= 7 {
+                if self.target.repo_root.is_some() && sha.len() >= 7 && !self.embedded {
                     ItemEffect::ShowCommit(sha.to_ascii_lowercase())
                 } else {
                     match url.as_deref().filter(|u| !u.is_empty()) {

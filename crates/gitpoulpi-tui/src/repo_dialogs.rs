@@ -845,8 +845,10 @@ impl RepoDialogs {
     /// conversation of that item reads itself again.
     pub(crate) fn on_hosting_changed(&mut self, change: &gitpoulpi_ipc::HostingChangeArgs) {
         #[cfg(feature = "hosting")]
-        if let Some(RepoDialog::Item(view)) = self.dialog.as_mut() {
-            view.on_hosting_changed(change);
+        match self.dialog.as_mut() {
+            Some(RepoDialog::Item(view)) => view.on_hosting_changed(change),
+            Some(RepoDialog::Review(view)) => view.on_hosting_changed(change),
+            _ => {}
         }
         #[cfg(not(feature = "hosting"))]
         let _ = change;
@@ -856,8 +858,11 @@ impl RepoDialogs {
     /// conversation is open).
     pub(crate) fn item_avail(&self) -> Option<crate::item_cmd::ItemAvail> {
         #[cfg(feature = "hosting")]
-        if let Some(RepoDialog::Item(view)) = &self.dialog {
-            return Some(view.avail());
+        match &self.dialog {
+            Some(RepoDialog::Item(view)) => return Some(view.avail()),
+            // The review's Overview is the same conversation.
+            Some(RepoDialog::Review(view)) => return view.item_avail(),
+            _ => {}
         }
         None
     }
@@ -867,6 +872,10 @@ impl RepoDialogs {
     pub(crate) fn run_item(&mut self, cmd: ItemCmd) -> Option<DialogEffect> {
         let effect = match self.dialog.as_mut() {
             Some(RepoDialog::Item(view)) => view.run(cmd),
+            Some(RepoDialog::Review(view)) => {
+                let effect = view.run_item(cmd);
+                return self.on_review(effect);
+            }
             _ => return None,
         };
         self.on_item(effect)

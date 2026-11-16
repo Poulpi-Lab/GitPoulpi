@@ -24,7 +24,7 @@ use crate::review_cmd::{ReviewCmd, Tab};
 const H_STEP: isize = 4;
 
 /// The command a plain key stands for on `tab`.
-fn key_cmd(tab: Tab, key: &KeyEvent) -> Option<ReviewCmd> {
+pub(super) fn key_cmd(tab: Tab, key: &KeyEvent) -> Option<ReviewCmd> {
     let alt = key.modifiers.contains(KeyModifiers::ALT);
     let ctrl = key.modifiers.contains(KeyModifiers::CONTROL);
     match key.code {
@@ -221,7 +221,10 @@ impl ReviewView {
                 Err(why) => self.message = Some(why.to_string()),
             },
             ReviewCmd::ConversationComment => {
-                self.open_compose(ComposeFor::Conversation, String::new())
+                // The conversation is the Overview's: its composer opens.
+                self.set_tab(Tab::Overview);
+                let effect = self.ov.run(crate::item_cmd::ItemCmd::NewComment);
+                return self.on_overview_effect(effect);
             }
             ReviewCmd::Reply => {
                 if let Some(thread) = self.thread_at_cursor() {
@@ -585,10 +588,6 @@ impl ReviewView {
                     msg::reply_about(&who),
                 )
             }
-            ComposeFor::Conversation => (
-                msg::COMPOSE_TITLE_COMMENT.get().to_string(),
-                self.target.caption(),
-            ),
             ComposeFor::DraftText => (
                 gitpoulpi_i18n::msg::review_ai::COMPOSE_TITLE_DRAFT
                     .get()
@@ -616,7 +615,6 @@ impl ReviewView {
         };
         // New texts keep a draft per target; edits of an existing text do not.
         let target_key = match &purpose {
-            ComposeFor::Conversation => Some("conversation".to_string()),
             ComposeFor::Reply { thread_id } => Some(format!("reply:{thread_id}")),
             ComposeFor::Line { path, line, .. } => Some(format!("line:{path}:{line}")),
             _ => None,
@@ -683,10 +681,6 @@ impl ReviewView {
                     restore,
                 );
             }
-            ComposeFor::Conversation => {
-                let restore = Some((ComposeFor::Conversation, text.clone()));
-                self.start_call(Call::Comment(text), false, restore);
-            }
             ComposeFor::Suggestion(id) => self.finish_suggestion_edit(id, text),
             ComposeFor::DraftText => self.finish_draft_text(text),
         }
@@ -705,6 +699,8 @@ impl ReviewView {
             f.paste(text);
         } else if let Some(o) = self.options.as_mut() {
             o.paste(text);
+        } else if self.tab == Tab::Overview {
+            self.ov.paste(text);
         }
     }
 
@@ -747,6 +743,11 @@ impl ReviewView {
             return self.on_options(outcome);
         }
         self.message = None;
+        if self.tab == Tab::Overview {
+            if let Some(effect) = self.overview_key(key) {
+                return effect;
+            }
+        }
         if let Some(cmd) = key_cmd(self.tab, &key) {
             // `N` throws the whole ✦ draft away when there is one.
             let cmd = if cmd == ReviewCmd::DismissAllSuggestions && self.has_draft() {
@@ -830,18 +831,8 @@ impl ReviewView {
             return ReviewEffect::None;
         }
         match self.tab {
-            Tab::Overview => {
-                let page = self.ov_rows.max(1) as isize;
-                match key.code {
-                    KeyCode::Up => self.scroll_overview(-1),
-                    KeyCode::Down => self.scroll_overview(1),
-                    KeyCode::PageUp => self.scroll_overview(-page),
-                    KeyCode::PageDown => self.scroll_overview(page),
-                    KeyCode::Home => self.ov_offset = 0,
-                    KeyCode::End => self.scroll_overview(isize::MAX / 2),
-                    _ => {}
-                }
-            }
+            // The conversation has the keys (`overview_key`).
+            Tab::Overview => {}
             Tab::Files | Tab::Commits => {
                 let tab = self.tab;
                 match (self.focus, key.code) {
@@ -967,6 +958,11 @@ impl ReviewView {
         }
         if self.bars_consume(mouse) {
             return ReviewEffect::None;
+        }
+        if self.tab == Tab::Overview {
+            if let Some(effect) = self.overview_mouse(mouse) {
+                return effect;
+            }
         }
         let hit = self
             .hits
@@ -1219,7 +1215,6 @@ impl ReviewView {
             Hit::Finish => return self.run(ReviewCmd::FinishReview),
             Hit::SubmitChange => return self.run(ReviewCmd::SubmitChange),
             Hit::AbandonChange => return self.run(ReviewCmd::AbandonChange),
-            Hit::Compose => return self.run(ReviewCmd::ConversationComment),
             Hit::MdLink(i) => {
                 if let Some(url) = self.md_links.get(i).cloned() {
                     crate::link_confirm::ask(vec![url]);

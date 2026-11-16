@@ -65,12 +65,30 @@ impl RadarUi {
     }
 
     pub(crate) fn item_avail(&self) -> Option<ItemAvail> {
-        self.api_item.as_ref().map(|v| v.avail())
+        self.api_item
+            .as_ref()
+            .map(|v| v.avail())
+            // The hosted review's Overview is the same conversation.
+            .or_else(|| self.api_review.as_ref().and_then(|v| v.item_avail()))
+    }
+
+    /// Another client wrote to an item shown over the Radar.
+    pub(crate) fn on_hosting_changed(&mut self, change: &gitpoulpi_ipc::HostingChangeArgs) {
+        if let Some(view) = self.api_item.as_mut() {
+            view.on_hosting_changed(change);
+        }
+        if let Some(view) = self.api_review.as_mut() {
+            view.on_hosting_changed(change);
+        }
     }
 
     pub(crate) fn run_item(&mut self, cmd: ItemCmd) -> Outcome {
         let Some(view) = self.api_item.as_mut() else {
-            return Outcome::None;
+            let Some(review) = self.api_review.as_mut() else {
+                return Outcome::None;
+            };
+            let effect = review.run_item(cmd);
+            return self.on_review_effect(effect);
         };
         let effect = view.run(cmd);
         self.on_item_effect(effect)

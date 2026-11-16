@@ -32,15 +32,10 @@ impl ReviewView {
         &self,
         purpose: Option<&ComposeFor>,
     ) -> Option<(AiScope, Box<dyn AiContextSource>)> {
-        use gitpoulpi_ai::hosting_reply::{Entry, ItemDigest, ReplyRequest, ReplyTarget};
+        use gitpoulpi_ai::hosting_reply::ReplyTarget;
 
-        if !self.ai_on() {
-            return None;
-        }
-        let host = self.host.as_ref()?;
         let target = match purpose {
             None | Some(ComposeFor::DraftText) => ReplyTarget::ReviewSummary,
-            Some(ComposeFor::Conversation) => ReplyTarget::Comment,
             Some(ComposeFor::Reply { thread_id }) => ReplyTarget::ThreadReply {
                 thread: thread_id.clone(),
             },
@@ -59,6 +54,44 @@ impl ReviewView {
             },
             Some(ComposeFor::Suggestion(_)) => ReplyTarget::Comment,
         };
+        self.composer_ai_target(target)
+    }
+
+    /// The helper of the Overview's conversation composer: a new comment, or
+    /// an answer in a discussion.
+    pub(super) fn overview_ai(
+        &self,
+        reply_to: Option<&str>,
+    ) -> Option<(AiScope, Box<dyn AiContextSource>)> {
+        #[cfg(feature = "ai")]
+        {
+            use gitpoulpi_ai::hosting_reply::ReplyTarget;
+            let target = match reply_to {
+                Some(thread) => ReplyTarget::ThreadReply {
+                    thread: thread.to_string(),
+                },
+                None => ReplyTarget::Comment,
+            };
+            self.composer_ai_target(target)
+        }
+        #[cfg(not(feature = "ai"))]
+        {
+            let _ = reply_to;
+            None
+        }
+    }
+
+    #[cfg(feature = "ai")]
+    fn composer_ai_target(
+        &self,
+        target: gitpoulpi_ai::hosting_reply::ReplyTarget,
+    ) -> Option<(AiScope, Box<dyn AiContextSource>)> {
+        use gitpoulpi_ai::hosting_reply::{Entry, ItemDigest, ReplyRequest};
+
+        if !self.ai_on() {
+            return None;
+        }
+        let host = self.host.as_ref()?;
         let summary = &host.detail.summary;
         let mut request = ReplyRequest::new(target);
         request.item = Some(ItemDigest {

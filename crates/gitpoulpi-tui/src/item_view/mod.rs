@@ -310,6 +310,10 @@ pub(crate) struct ItemView {
     pub(super) frame: Rect,
     /// Where the composer's text field last sat (a click there focuses it).
     pub(super) composer_rect: Rect,
+    /// Lives inside another view (the review's Overview): that view owns the
+    /// frame, the header, the footer and the close, and routes keys and the
+    /// mouse here (`embedded_key`, `on_mouse`).
+    pub(super) embedded: bool,
 }
 
 impl ItemView {
@@ -337,7 +341,16 @@ impl ItemView {
             message: None,
             frame: Rect::default(),
             composer_rect: Rect::default(),
+            embedded: false,
         }
+    }
+
+    /// Opens the conversation to be shown inside another view (the review's
+    /// Overview): the same timeline and docked composer, without a frame.
+    pub(crate) fn open_embedded(target: ItemTarget, factory: Arc<dyn ClientFactory>) -> Self {
+        let mut view = Self::open(target, factory);
+        view.embedded = true;
+        view
     }
 
     fn open_conversation(target: &ItemTarget, factory: &Arc<dyn ClientFactory>) -> Conversation {
@@ -667,6 +680,35 @@ impl ItemView {
         }
     }
 
+    /// The conversation is read again (its host data changed behind it).
+    pub(crate) fn request_refresh(&mut self) {
+        self.conv.request_refresh();
+    }
+
+    /// The composer is open and has no "Write with AI" help yet (the host
+    /// view binds one, `bind_composer_ai`).
+    pub(crate) fn composer_needs_ai(&self) -> bool {
+        self.md.as_ref().is_some_and(|e| !e.ai_bound())
+    }
+
+    /// The discussion the composer answers (`None`: a new comment or an edit).
+    pub(crate) fn composer_replies_to(&self) -> Option<&str> {
+        match &self.compose {
+            Compose::Reply { discussion, .. } => Some(discussion),
+            _ => None,
+        }
+    }
+
+    pub(crate) fn bind_composer_ai(
+        &mut self,
+        scope: crate::md_editor::ai::AiScope,
+        source: Box<dyn crate::md_editor::ai::AiContextSource>,
+    ) {
+        if let Some(md) = self.md.as_mut() {
+            md.bind_ai(scope, source);
+        }
+    }
+
     // -- polling -------------------------------------------------------------------
 
     /// Drains the worker and runs the timer; what the owner has to do.
@@ -717,6 +759,43 @@ impl ItemView {
         self.delete_ask = None;
         self.focus = Focus::Timeline;
         true
+    }
+
+    /// The composer has the keyboard.
+    #[cfg(test)]
+    pub(crate) fn composer_focused(&self) -> bool {
+        self.focus == Focus::Composer
+    }
+
+    /// The composer answers a discussion (`r`, the Reply button).
+    #[cfg(test)]
+    pub(crate) fn composing_reply(&self) -> bool {
+        matches!(self.compose, Compose::Reply { .. })
+    }
+
+    /// What the composer holds.
+    #[cfg(test)]
+    pub(crate) fn composer_text(&self) -> String {
+        self.md
+            .as_ref()
+            .map_or(String::new(), |e| e.text().to_string())
+    }
+
+    /// A write finished and nothing is in flight (draining it once).
+    #[cfg(test)]
+    pub(crate) fn write_idle(&self) -> bool {
+        self.conv.take_idle_for_tests()
+    }
+
+    /// The timeline: header and identity are in and nothing is being read.
+    #[cfg(test)]
+    pub(crate) fn loaded(&self) -> bool {
+        self.conv.header.is_some() && self.conv.identity.is_some() && !self.conv.busy()
+    }
+
+    #[cfg(test)]
+    pub(crate) fn conv(&self) -> &Conversation {
+        &self.conv
     }
 
     #[cfg(test)]

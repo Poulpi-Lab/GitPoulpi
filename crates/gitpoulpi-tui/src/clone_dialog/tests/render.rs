@@ -94,3 +94,13 @@ fn the_selected_source_row_has_no_arrow_marker() {
         "the label starts at the edge"
     );
 }
+
+#[test]
+fn a_window_too_small_for_the_form_says_so() {
+    let mut dialog = CloneDialog::new(Some(&abs("clones")));
+    let mut buf = Buffer::empty(Rect::new(0, 0, 50, 10));
+    dialog.render(clone_rect(buf.area), &mut buf);
+    let text = dialog_kit::buffer_text(&buf);
+    assert!(text.contains("Window too small"), "{text}");
+    assert!(text.contains('\u{2715}'), "{text}");
+}

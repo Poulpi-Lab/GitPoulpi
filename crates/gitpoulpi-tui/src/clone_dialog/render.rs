@@ -36,6 +36,7 @@ impl CloneDialog {
             rect.height.saturating_sub(2),
         );
         if inner.width < 40 || inner.height < 12 {
+            dialog_kit::too_small::note(buf, rect);
             self.hits = hits;
             return;
         }
@@ -370,34 +371,38 @@ impl CloneDialog {
         } else {
             msg::clone::GO.get()
         };
-        let clone_w = dialog_kit::button_width(clone_label);
-        let cancel_w = dialog_kit::button_width(msg::dialog::CANCEL.get());
-        let clone_x = inner.right().saturating_sub(clone_w + 1);
-        let cancel_x = clone_x.saturating_sub(cancel_w + 1);
-        let cancel = dialog_kit::button(
+        // Right-aligned; a narrow dialog clips the labels, never drops one.
+        use dialog_kit::button_row::Btn;
+        let [cancel, clone] = dialog_kit::button_row::paint(
             buf,
-            cancel_x,
+            inner.right().saturating_sub(1),
             footer,
-            msg::dialog::CANCEL.get(),
-            ButtonState::Normal {
-                hovered: self.hover == Some(CloneHit::Part(CloneFocus::Cancel)),
-                focused: self.focus == CloneFocus::Cancel,
-            },
-        );
-        let clone = dialog_kit::button(
-            buf,
-            clone_x,
-            footer,
-            clone_label,
-            if plan.is_err() || self.busy() {
-                ButtonState::Disabled
-            } else {
-                ButtonState::Primary {
-                    hovered: self.hover == Some(CloneHit::Part(CloneFocus::Clone)),
-                    focused: self.focus == CloneFocus::Clone,
-                }
-            },
-        );
+            inner.width.saturating_sub(1),
+            0,
+            &[
+                Btn {
+                    label: msg::dialog::CANCEL.get(),
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(CloneHit::Part(CloneFocus::Cancel)),
+                        focused: self.focus == CloneFocus::Cancel,
+                    },
+                },
+                Btn {
+                    label: clone_label,
+                    state: if plan.is_err() || self.busy() {
+                        ButtonState::Disabled
+                    } else {
+                        ButtonState::Primary {
+                            hovered: self.hover == Some(CloneHit::Part(CloneFocus::Clone)),
+                            focused: self.focus == CloneFocus::Clone,
+                        }
+                    },
+                },
+            ],
+        )[..] else {
+            unreachable!("two buttons in, two rects out")
+        };
+        let cancel_x = cancel.x;
         hits.insert(0, (cancel, CloneHit::Part(CloneFocus::Cancel)));
         hits.insert(0, (clone, CloneHit::Part(CloneFocus::Clone)));
         let browse = dialog_kit::key_label(crate::keymap::Action::DialogBrowse);

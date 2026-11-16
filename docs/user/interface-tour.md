@@ -81,6 +81,15 @@ Settings open over the window. Each has a `✕` at the top right of its border;
 `Esc` or a click on `✕` closes it, and a click outside closes a dialog, popup or
 panel (see [Closing windows and dialogs](mouse-and-gestures.md#closing-windows-and-dialogs)).
 
+### When the window is small
+
+Nothing disappears silently as the window narrows. A button first loses its
+long label (clipped with `...`), then wraps to a second row or goes behind the
+`⋯` menu of its row, and its key and palette entry keep working throughout. A
+dialog too big for the window draws a small frame with its title, the `✕` and
+the line **Window too small: enlarge it** instead of nothing; `Esc` and `✕`
+close it, and it comes back whole when you enlarge the window.
+
 ## Tab row
 
 The **Home** tab (the house icon) is at the left end, followed by the

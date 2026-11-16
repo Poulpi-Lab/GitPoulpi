@@ -1108,3 +1108,23 @@ fn a_refused_write_tells_nobody() {
     wait_written(&mut r.view);
     assert_eq!(crate::hosting_notify::testing::sent(project), []);
 }
+
+/// Narrow window: the header buttons clip their labels, none is dropped.
+#[test]
+fn the_header_buttons_keep_all_three_at_the_narrowest_width() {
+    let mut r = rig();
+    for width in [120u16, 60, 44, 42] {
+        let area = Rect::new(0, 0, width, 30);
+        let _ = draw(&mut r.view, area);
+        for bar in [Bar::Back, Bar::Refresh, Bar::Browser] {
+            assert!(
+                r.view
+                    .hits
+                    .iter()
+                    .any(|(rect, h)| *h == Hit::Bar(bar) && rect.width >= 5),
+                "{bar:?} vanished at {width} columns: {:?}",
+                r.view.hits
+            );
+        }
+    }
+}

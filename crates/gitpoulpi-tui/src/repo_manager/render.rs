@@ -485,6 +485,8 @@ fn header_line(
         _ => false,
     };
     if let (Some(label), true) = (section.action_label(), has_any) {
+        // Clipped, not dropped, when the row is short.
+        let label = fit(label, c.room().saturating_sub(4).max(3));
         let text = format!(" {label} ");
         let w = display_width(&text) as u16;
         if c.room() > w as usize + 2 {
@@ -534,12 +536,35 @@ fn repo_line(
     } else {
         open_text.as_str()
     };
-    let actions_width = display_width(open_label)
-        + 1
-        + close_label.map(|l| display_width(l) + 1).unwrap_or(0)
-        + display_width(MORE)
-        + 2
-        + 1;
+    // The buttons degrade as the row narrows: all of them, then without the
+    // Close / Remove button, then the menu button alone. What a dropped button
+    // did stays in that menu (Open, Close the tab, Remove from the list), and
+    // Enter / double click still open the row.
+    let width_of = |open: bool, close: bool| {
+        (if open {
+            display_width(open_label) + 1
+        } else {
+            0
+        }) + if close {
+            close_label.map(|l| display_width(l) + 1).unwrap_or(0)
+        } else {
+            0
+        } + display_width(MORE)
+            + 2
+            + 1
+    };
+    // The gutter and star, a name worth reading, and the gap after it.
+    let min_content = 6 + 10 + 2;
+    let room = area.width as usize;
+    let (show_open, show_close) = if room >= min_content + width_of(true, true) {
+        (true, true)
+    } else if room >= min_content + width_of(true, false) {
+        (true, false)
+    } else {
+        (false, false)
+    };
+    let close_label = close_label.filter(|_| show_close);
+    let actions_width = width_of(show_open, show_close);
 
     let mut c = Cursor::new(area, y);
     let start = c.x;
@@ -646,10 +671,12 @@ fn repo_line(
         hits.push((rect, hit));
         c.push(" ", Style::default());
     };
-    if known.available() {
-        action(&mut c, open_label, ManagerHit::RowOpen(offset));
-    } else {
-        c.push(&" ".repeat(display_width(open_label) + 1), Style::default());
+    if show_open {
+        if known.available() {
+            action(&mut c, open_label, ManagerHit::RowOpen(offset));
+        } else {
+            c.push(&" ".repeat(display_width(open_label) + 1), Style::default());
+        }
     }
     if let Some(label) = close_label {
         action(&mut c, label, ManagerHit::RowClose(offset));

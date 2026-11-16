@@ -778,6 +778,7 @@ impl WorktreeRemoveDialog {
             area.height.saturating_sub(2),
         );
         if inner.width < 30 || inner.height < 8 {
+            dialog_kit::too_small::note(buf, area);
             self.hits = hits;
             return;
         }

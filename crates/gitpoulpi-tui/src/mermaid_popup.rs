@@ -545,6 +545,16 @@ pub(crate) fn render(frame: &mut Frame) {
     };
     let area = frame.area();
     if area.width < 30 || area.height < 12 {
+        let outer = dialog_kit::too_small::paint_closable(
+            frame.buffer_mut(),
+            area,
+            msg::TITLE.get(),
+            &mut open.cross,
+        );
+        open.rects = Rects {
+            outer,
+            ..Rects::default()
+        };
         return;
     }
     let outer = WIN.place(

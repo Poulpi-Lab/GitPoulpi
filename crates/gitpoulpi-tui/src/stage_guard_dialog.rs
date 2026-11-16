@@ -563,6 +563,13 @@ pub(crate) fn render(frame: &mut Frame) {
     let area = frame.area();
     let width = 80u16.min(area.width.saturating_sub(4));
     if width < 30 || area.height < 12 {
+        open.row_hits.clear();
+        open.frame = dialog_kit::too_small::paint_closable(
+            frame.buffer_mut(),
+            area,
+            msg::TITLE.get(),
+            &mut open.close,
+        );
         return;
     }
     // Title, blank, question (2 rows), the pane, the button row, the two

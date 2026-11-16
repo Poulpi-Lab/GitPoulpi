@@ -1001,6 +1001,7 @@ impl RewordForm {
         );
         let warning_rows: u16 = if self.pushed_to.is_some() { 2 } else { 0 };
         if inner.width < 16 || inner.height < 4 + warning_rows {
+            crate::dialog_kit::too_small::note(frame.buffer_mut(), popup);
             return hits;
         }
         let w = inner.width as usize;

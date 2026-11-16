@@ -805,3 +805,30 @@ fn a_blocked_repository_grays_the_assign_command_with_the_reason() {
     r.view.run(BoardCmd::EditAssignees);
     assert_eq!(r.view.message.as_deref(), Some(WHY));
 }
+
+/// Narrow window: the toolbar's buttons, dropdowns and search field shrink,
+/// none is dropped.
+#[test]
+fn the_toolbar_keeps_every_control_when_the_board_is_narrow() {
+    let mut r = rig();
+    for width in [120u16, 80, 60, 52] {
+        let area = Rect::new(0, 0, width, 30);
+        let mut buf = Buffer::empty(area);
+        r.view.render(area, &mut buf);
+        let has = |want: Hit| {
+            r.view
+                .hits
+                .iter()
+                .any(|(rect, h)| *h == want && rect.width > 0)
+        };
+        for want in [Hit::New, Hit::Refresh, Hit::Search] {
+            assert!(has(want), "{want:?} vanished at {width} columns");
+        }
+        for kind in FilterKind::ALL {
+            assert!(
+                has(Hit::Filter(kind)),
+                "{kind:?} filter vanished at {width} columns"
+            );
+        }
+    }
+}

@@ -128,6 +128,18 @@ impl ComposeForm {
         hovered: Option<ComposePart>,
     ) -> Vec<(Rect, ComposePart)> {
         let mut hits = Vec::new();
+        if area.width.saturating_sub(4) < 40 || area.height.saturating_sub(2) < 8 {
+            // Too small for the dialog: a minimal frame whose cross cancels.
+            let title = format!("\u{2726} {}", msg::TITLE.get());
+            let cross = crate::dialog_kit::too_small::paint(
+                frame.buffer_mut(),
+                area,
+                &title,
+                hovered == Some(ComposePart::Cancel),
+            );
+            hits.extend(cross.map(|c| (c, ComposePart::Cancel)));
+            return hits;
+        }
         frame.render_clipped(Clear, area);
         frame.render_clipped(
             Block::default()

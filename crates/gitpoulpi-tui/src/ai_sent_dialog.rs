@@ -426,6 +426,18 @@ pub(crate) fn render(frame: &mut Frame) {
         area.height.saturating_sub(2),
     );
     if room.width < 20 || room.height < 8 {
+        let title = format!(
+            "{} {}",
+            crate::theme::AI_SPARK,
+            msg::title(open.via.as_str())
+        );
+        open.hits.clear();
+        open.frame = dialog_kit::too_small::paint_closable(
+            frame.buffer_mut(),
+            area,
+            &title,
+            &mut open.close,
+        );
         return;
     }
     let width = room.width.min(MAX_WIDTH);

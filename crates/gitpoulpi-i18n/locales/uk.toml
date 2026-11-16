@@ -1098,6 +1098,8 @@ hint_clear_field = "очистити поле"
 hint_create = "створити"
 hint_open = "відкрити"
 hint_toggle = "перемкнути"
+# context: one line in the minimal frame a dialog shows when the window is too small for it
+too_small = "Window too small: enlarge it"
 
 [clone]
 title = "Клонувати репозиторій"

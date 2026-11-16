@@ -1097,6 +1097,8 @@ hint_clear_field = "wyczyść pole"
 hint_create = "utwórz"
 hint_open = "otwórz"
 hint_toggle = "przełącz"
+# context: one line in the minimal frame a dialog shows when the window is too small for it
+too_small = "Window too small: enlarge it"
 
 [clone]
 title = "Klonuj repozytorium"

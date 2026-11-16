@@ -1097,6 +1097,8 @@ hint_clear_field = "vaciar campo"
 hint_create = "crear"
 hint_open = "abrir"
 hint_toggle = "alternar"
+# context: one line in the minimal frame a dialog shows when the window is too small for it
+too_small = "Window too small: enlarge it"
 
 [clone]
 title = "Clonar un repositorio"

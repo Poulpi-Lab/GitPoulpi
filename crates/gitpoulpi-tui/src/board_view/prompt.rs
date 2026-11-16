@@ -153,6 +153,7 @@ impl LabelsPrompt {
         );
         let mut hits: Vec<(Rect, Part)> = Vec::new();
         if inner.width < 20 || inner.height < 6 {
+            dialog_kit::too_small::note(buf, rect);
             self.hits = hits;
             return;
         }
@@ -189,30 +190,34 @@ impl LabelsPrompt {
         let button_y = inner.bottom().saturating_sub(1);
         let save_label = msg::COLUMNS_SAVE.get();
         let cancel_label = msg::CANCEL.get();
-        let save_w = dialog_kit::button_width(save_label);
-        let cancel_w = dialog_kit::button_width(cancel_label);
-        let save_x = inner.right().saturating_sub(save_w);
-        let cancel_x = save_x.saturating_sub(cancel_w + 1);
-        let cancel = dialog_kit::button(
+        // Right-aligned; a narrow prompt clips the labels, never drops one.
+        use dialog_kit::button_row::Btn;
+        let [cancel, save] = dialog_kit::button_row::paint(
             buf,
-            cancel_x,
+            inner.right(),
             button_y,
-            cancel_label,
-            ButtonState::Normal {
-                hovered: self.hover == Some(Part::Cancel),
-                focused: self.focus == Part::Cancel,
-            },
-        );
-        let save = dialog_kit::button(
-            buf,
-            save_x,
-            button_y,
-            save_label,
-            ButtonState::Primary {
-                hovered: self.hover == Some(Part::Save),
-                focused: self.focus == Part::Save,
-            },
-        );
+            inner.width,
+            0,
+            &[
+                Btn {
+                    label: cancel_label,
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(Part::Cancel),
+                        focused: self.focus == Part::Cancel,
+                    },
+                },
+                Btn {
+                    label: save_label,
+                    state: ButtonState::Primary {
+                        hovered: self.hover == Some(Part::Save),
+                        focused: self.focus == Part::Save,
+                    },
+                },
+            ],
+        )[..] else {
+            unreachable!("two buttons in, two rects out")
+        };
+        let cancel_x = cancel.x;
         hits.insert(0, (cancel, Part::Cancel));
         hits.insert(0, (save, Part::Save));
         dialog_kit::hints(

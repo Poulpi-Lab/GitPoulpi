@@ -1342,7 +1342,7 @@ hint_back = "返回标签页"
 hint_quit = "退出"
 not_a_repo_any_more = "{path} 已不再是 git 仓库 - 用 {key} 将其从列表中移除"
 gone_from_disk_msg = "{path} 在磁盘上已不存在 - 用 {key} 将其从列表中移除"
-open_in_gone = "{path} is gone from disk, there is nothing to open"
+open_in_gone = "{path} 在磁盘上已不存在，没有可打开的内容"
 actions_need_tab = "{key} 操作需要一个已打开的仓库标签页"
 home_tab_fixed = "主页标签页没有标签页菜单，也无法关闭"
 
@@ -2431,8 +2431,8 @@ status_stage_toggle = { git = "{$stage} 或 {$unstage} 所选行", local = "暂�
 status_open_diff = { git = "打开所选文件的 {$Diff}", local = "打开所选文件的{$Diff}" }
 home_favorite = "收藏或取消收藏仓库"
 home_close_repo = "关闭、移除或取消收藏该行"
-home_copy_path = "Copy the Repository Path"
-home_open_in = "Open the Repository in the Default Tool"
+home_copy_path = "复制仓库路径"
+home_open_in = "用默认工具打开仓库"
 home_browse = "浏览仓库"
 home_clone = "克隆仓库"
 home_init = "初始化仓库"
@@ -3314,8 +3314,8 @@ repositories_collapse_all_sections = "仓库列表：折叠所有分区"
 repositories_expand_all_sections = "仓库列表：展开所有分区"
 repositories_close_all_tabs = "仓库列表：关闭所有标签页…"
 repositories_remove_selected_from_list = "仓库列表：将所选从列表中移除"
-repositories_copy_selected_path = "Repositories: Copy Selected Path"
-repositories_open_selected_in = "Repositories: Open Selected in Default Tool"
+repositories_copy_selected_path = "仓库：复制所选路径"
+repositories_open_selected_in = "仓库：用默认工具打开所选项"
 repositories_remove_all_recent = "仓库列表：移除所有最近项"
 tab_new_tab = "标签页：新标签页"
 tab_new_menu = "标签页：新建…"
@@ -3386,7 +3386,7 @@ ai_explain_working_changes = "AI：解释工作区更改"
 ai_insert_prompt_variable = "AI：插入提示词变量"
 ai_compose_commits_from_working_changes = { git = "AI：根据工作区更改撰写 {$Commit}…", local = "AI：根据工作区更改撰写{$Commit}…" }
 # context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
-stage_guard_show_in_file = "Sensitive Files: Show in File"
+stage_guard_show_in_file = "敏感文件：在文件中显示"
 composer_move_file_to_commit = { git = "撰写器：将文件移到 {$Commit}…", local = "撰写器：将文件移到{$Commit}…" }
 diff_blame = { git = "{$Diff}：Blame", local = "{$Diff}：追溯" }
 diff_history = "{$Diff}：文件历史"
@@ -3441,7 +3441,7 @@ why_no_text_selected_drag_over_the_text_first = "未选中文本 - 请先拖选�
 why_the_diff_view_isn_t_open = { git = "{$diff} 视图未打开", local = "{$diff}视图未打开" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "请先打开一个文件 - 在 {$diff} 视图、状态窗格或某个 {$commit} 中", local = "请先打开一个文件 - 在{$diff}视图、状态窗格或某个提交中" }
 # context: why that palette command is unavailable
-why_no_sensitive_files_question = "no sensitive files question is open"
+why_no_sensitive_files_question = "没有打开的敏感文件询问"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "请先在引用窗格中选择一个分支或 {$tag}", local = "请先在引用窗格中选择一个分支或{$tag}" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "暂不支持检出远程分支 - 请先创建本地跟踪分支"
 why_select_a_local_branch_in_the_refs_pane_first = "请先在引用窗格中选择一个本地分支"
@@ -4069,7 +4069,7 @@ repositories_and_tabs_open_in = "此标签页文件夹的“打开方式”列�
 repositories_and_tabs_7 = "打开（或切换到）所选仓库"
 repositories_and_tabs_8 = "加星/取消星标"
 repositories_and_tabs_9 = "关闭标签页（已打开）、移除（最近）、取消星标（收藏）"
-repositories_and_tabs_copy_open = "copy the path / open in the default tool"
+repositories_and_tabs_copy_open = "复制路径 / 用默认工具打开"
 repositories_and_tabs_10 = "该行的菜单"
 repositories_and_tabs_11 = "搜索所有分区"
 repositories_and_tabs_12 = "清除 / 回到标签页"
@@ -5622,9 +5622,9 @@ too_large = "文件太大，无法显示（{bytes} 字节）"
 unexpected = "意外的应答"
 loading_whole = { git = "正在加载整个文件…（“Hunk”按钮只显示更改）", local = "正在加载整个文件…（“代码块”按钮只显示更改）" }
 whole_unavailable = { git = "（无法显示整个文件：{why} - 仅显示 hunk）", local = "（无法显示整个文件：{why} - 仅显示代码块）" }
-renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header = "{from} -> {to}（相似度 {percent}%）"
 renamed_header_plain = "{from} -> {to}"
-rename_no_change = "No content change (the file was only renamed or moved)"
+rename_no_change = "内容无更改（文件仅被重命名或移动）"
 
 [git_actions]
 no_such_local_branch = "该本地分支已不存在 - 请刷新"
@@ -9335,7 +9335,7 @@ answer_cancel = { git = "取消，不 {$stage} 任何文件", local = "取消，
 # context: key hint at the bottom of the dialog
 hint = "Up/Down：选择，Enter 或 1/2：回答，Esc：取消"
 # context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
-show_in_file = "Show in file"
+show_in_file = "在文件中显示"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = { git = "敏感文件未被 {$staged}：{files}；请询问用户，然后在允许敏感文件的前提下再次 {$stage}", local = "敏感文件未被{$staged}：{files}；请询问用户，然后在允许敏感文件的前提下再次{$stage}" }
 
@@ -10160,17 +10160,17 @@ flavor_plain_text = "纯文本"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
-title = "Edit a {$commit} of another branch"
+title = { git = "编辑其他分支上的 {$commit}", local = "编辑其他分支上的{$commit}" }
 # context: body of that dialog when local branches hold the commit; {short} is the short commit id
-body_branches = "{short} is not on the current branch. Check out a branch that holds it to edit it here."
+body_branches = "{short} 不在当前分支上。请检出包含它的分支，以便在此编辑。"
 # context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
-body_none = "{short} is on no local branch. Create a branch at it to edit it here."
+body_none = "{short} 不在任何本地分支上。请在它处创建一个分支，以便在此编辑。"
 # context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
-checkout = "Check out {branch} and edit"
+checkout = "检出 {branch} 并编辑"
 # context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
-rewrite = "Edit with advanced history rewrite"
+rewrite = "用高级历史重写来编辑"
 # context: button that opens the name box to create a branch at that commit
-create = "Create a branch here..."
+create = "在此创建分支…"
 # context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
 key_rewrite = "r"
 # context: key of the Create a branch here button, one letter
@@ -10178,4 +10178,4 @@ key_create = "b"
 # context: key of the Cancel button of that dialog, one letter
 key_cancel = "c"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
-gave_up = "{short} was not edited: the branch was not checked out"
+gave_up = "未编辑 {short}：分支未被检出"

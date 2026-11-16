@@ -76,7 +76,8 @@
 | 命令 | 作用 |
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | stage 一个文件、文件夹、全部内容、一个 hunk 或若干行。如果某次文件、文件夹或 `--all` 的 stage 会加入敏感文件（私钥、`.env`、可识别的令牌：见[配置参考](config-reference.md#privacy敏感文件)中的 `[privacy]`），就会被拒绝，退出码为 2，并输出 `{error: "sensitive_files", files: [{path, reason}]}`（一条规则和遮蔽后的预览，绝不输出值）；不会 stage 任何内容。`--allow-sensitive` 会仍然 stage 它们。 |
-| `unstage`（相同的标志） | 相反的操作。 |
+| `stage --paths A B ...` | 把多个文件或文件夹作为一次操作 stage：只记一条日志，只需一次 `undo`（被重命名的文件包含其旧路径和新路径，就像 `status` 显示的 `renamed_from`）。不能与 `--folder`、`--hunk`、`--lines` 或 `--all` 同时使用。 |
+| `unstage`（相同的标志，包括 `--paths`） | 相反的操作。 |
 | `discard --file F [--hunk N [--lines a,b]]` | 丢弃 unstaged 的更改（整个文件：所有更改，未跟踪的文件会被删除，并删除因此变空的文件夹）。可撤销。 |
 | `rm-file <paths>...` | 从工作区中删除文件。可撤销。 |
 | `ignore <pattern> [--file <.gitignore>]` | 向某个 `.gitignore` 追加一个模式（用 `--file .git/info/exclude` 则追加到 `.git/info/exclude`）。可撤销，写入 `.git/info/exclude` 除外。 |

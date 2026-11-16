@@ -378,10 +378,10 @@ prefix getoond (`Ctrl+G s`).
 | `reword` | `deeper` | Geschiedenis dieper wijzigen | `Alt+H` |
 | `composer` | `commit` | Commit vanuit de composer | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Een issue-verwijzing invoegen | `Alt+R` |
-| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
-| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
-| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
+| `md_editor` | `preview` | Markdown-editor: Schrijven en Voorbeeld wisselen | `Alt+P` |
+| `md_editor` | `split` | Markdown-editor: Gesplitste weergave wisselen | `Alt+L` |
+| `md_editor` | `submit` | Markdown-editor: Tekst verzenden | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Markdown-editor: Schrijven met AI | `Alt+E` |
 | `dialog` | `browse` | Naar een map bladeren | `Ctrl+B` |
 | `dialog` | `sources` | Naar de kloonbronnen | `Alt+S` |
 | `dialog` | `submit` | Het formulier voor pull request indienen | `Ctrl+S` |
@@ -836,7 +836,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Radar: Vastpinnen of losmaken | `p` |
 | Radar: Uitstellen... | `z` |
 | Radar: Verzoek reviewen... | `e` |
-| Radar: Open Issue Conversation | `i` |
+| Radar: Issuegesprek openen | `i` |
 | Radar: Reviewen via de API |  |
 | Radar: Klonen en reviewen... |  |
 | Radar: Toegewezenen bewerken... |  |
@@ -978,30 +978,30 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Bord: Kolomlabels instellen... | `c` |
 | Bord: Vernieuwen | `r` |
 | Bord: Sluiten | `Esc` |
-| Conversation: Back |  |
-| Conversation: Refresh | `F5` |
-| Conversation: Load Older Entries | `m` |
-| Conversation: Previous Entry | `Up` |
-| Conversation: Next Entry | `Down` |
-| Conversation: Next Unread Entry | `n` |
-| Conversation: Reply to Entry | `r` |
-| Conversation: Quote Entry | `Q` |
-| Conversation: New Comment | `c` |
-| Conversation: Links of Entry... | `l` |
-| Conversation: Open Diagram of Entry | `g` |
-| Conversation: Copy Link of Entry | `y` |
-| Conversation: Open in Browser | `o` |
-| Conversation: Edit Comment | `e` |
-| Conversation: Delete Comment | `d` |
-| Conversation: Show or Hide Events | `v` |
-| Conversation: Toggle Write and Preview |  |
-| Conversation: Toggle the Split View |  |
-| Conversation: Send the Comment |  |
-| Conversation: Toggle Internal Note |  |
-| Conversation: Close | `Esc` |
-| Markdown Editor: Write with AI |  |
-| Markdown Editor: Refresh the AI Context |  |
-| Hosting: Open Issue Conversation... |  |
+| Gesprek: Terug |  |
+| Gesprek: Vernieuwen | `F5` |
+| Gesprek: Oudere items laden | `m` |
+| Gesprek: Vorig item | `Up` |
+| Gesprek: Volgend item | `Down` |
+| Gesprek: Volgend nieuw item | `n` |
+| Gesprek: Op item antwoorden | `r` |
+| Gesprek: Item citeren | `Q` |
+| Gesprek: Nieuwe opmerking | `c` |
+| Gesprek: Links van item... | `l` |
+| Gesprek: Diagram van item openen | `g` |
+| Gesprek: Link van item kopiëren | `y` |
+| Gesprek: Openen in browser | `o` |
+| Gesprek: Opmerking bewerken | `e` |
+| Gesprek: Opmerking verwijderen | `d` |
+| Gesprek: Gebeurtenissen tonen of verbergen | `v` |
+| Gesprek: Schrijven en Voorbeeld wisselen |  |
+| Gesprek: Gesplitste weergave wisselen |  |
+| Gesprek: Opmerking verzenden |  |
+| Gesprek: Interne notitie wisselen |  |
+| Gesprek: Sluiten | `Esc` |
+| Markdown-editor: Schrijven met AI |  |
+| Markdown-editor: AI-context vernieuwen |  |
+| Hosting: Issuegesprek openen... |  |
 | Review: ✦ Review opstellen... | `s` |
 | Review: Suggestie accepteren | `y` |
 | Review: Suggestie bewerken en accepteren... | `w` |

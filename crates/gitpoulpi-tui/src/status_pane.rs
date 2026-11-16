@@ -244,7 +244,7 @@ pub(crate) fn section_paths(tree: &WorkingTree, section: StatusSection) -> Vec<P
     // An unstaged move is one row, at the new path: the deleted file it
     // came from is not listed on its own (`rename_pairs`).
     let pairs = crate::rename_pairs::RenamePairs::of(tree);
-    let hidden = match section {
+    let hidden: std::collections::HashSet<&Path> = match section {
         StatusSection::Unstaged => pairs.hidden_unstaged_sources(),
         StatusSection::Staged => Default::default(),
     };

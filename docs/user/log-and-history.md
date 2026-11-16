@@ -428,7 +428,7 @@ What is compared depends on the selection:
 | the WIP row and a commit or stash | that commit against the working tree: staged and unstaged changes of tracked files (untracked files are not part of a diff) |
 | three or more commits | their changes combined: from just before the oldest to the newest (merges follow their first parent) |
 
-A rename shows as a delete plus an add. **Swap** (`x`) trades the ends of a
+A renamed or moved file shows as one file, with the old name and the similarity on top of its diff. **Swap** (`x`) trades the ends of a
 two-row comparison; with the WIP row, which is always the newer end, or a
 range of three or more, there is nothing to swap. A comparison with the WIP
 row follows the working tree as you save files.

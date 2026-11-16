@@ -92,6 +92,43 @@ fn status_reports_a_worktree_change() {
     assert_eq!(tree.files[0].path.to_str(), Some("new.txt"));
 }
 
+/// A move not yet staged is one entry at the new path in `status`, naming
+/// the old one; the staged diff of the same move says where it came from.
+#[test]
+fn status_and_diff_report_renamed_from() {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("initial")
+        .unwrap()
+        .build();
+    let session = "cli-test-rename";
+    let body: String = (1..=12).map(|n| format!("line {n}\n")).collect();
+    std::fs::write(repo.root().join("old.txt"), &body).unwrap();
+    run_json(repo.root(), session, &["stage", "--file", "old.txt"]);
+    run_json(repo.root(), session, &["commit", "-m", "add old"]);
+    std::fs::rename(repo.root().join("old.txt"), repo.root().join("moved.txt")).unwrap();
+
+    let tree: WorkingTree = parse(run_json(repo.root(), session, &["status"]));
+    let moved = tree
+        .files
+        .iter()
+        .find(|f| f.path.to_str() == Some("moved.txt"))
+        .expect("the new path is listed");
+    assert_eq!(moved.renamed_from.as_deref(), Some(Path::new("old.txt")));
+
+    run_json(repo.root(), session, &["stage", "--file", "moved.txt"]);
+    run_json(repo.root(), session, &["stage", "--file", "old.txt"]);
+    let staged: Vec<gitpoulpi_core::domain::FileDiff> =
+        parse(run_json(repo.root(), session, &["diff", "--staged"]));
+    assert_eq!(staged.len(), 1, "{staged:?}");
+    assert_eq!(staged[0].path.to_str(), Some("moved.txt"));
+    assert_eq!(
+        staged[0].renamed_from.as_deref(),
+        Some(Path::new("old.txt"))
+    );
+    assert_eq!(staged[0].similarity, Some(100));
+}
+
 #[test]
 fn stage_and_commit_move_head() {
     let repo = FixtureRepoBuilder::new()

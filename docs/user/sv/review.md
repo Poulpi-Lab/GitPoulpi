@@ -68,6 +68,15 @@ valda posten (**Svara**, **Citera**, **Redigera**, **Ta bort**, **Länkar**) gö
 *Konversation: ...* bredvid raderna *Granskning: ...*. En länk frågas om innan den öppnas, som överallt i
 granskningen.
 
+En tråd på kod visar sin `path:line` som en länk (understruken, en riktig knapp). Ett klick på den, **`G`** på den valda
+tråden eller paletten *Konversation: Öppna trådens kod* växlar till sidan **Filer**, öppnar den filen och sätter
+markören på den kommenterade raden (på den gamla eller nya sidan, som den skrevs) med tråden öppen under (en ihopfälld
+fälls ut). **Esc**, knappen **Tillbaka till översikten** till vänster om sidflikarna eller *Granskning: Tillbaka till
+kommentaren i översikten* tar dig tillbaka till samma post i Översikten. En tråd vars rad inte längre finns i diffen
+(föråldrad) öppnar filen vid närmaste rad och statusraden säger det; en tråd på en fil som begäran inte längre ändrar
+säger att filen inte finns i diffen. I en ärende- eller Radar-vy av samma begäran finns ingen kod att öppna: `G` svarar
+att granskningen har den.
+
 Där en konversationstangent och en granskningstangent möts har konversationen bokstaven på den här sidan: `l` (etiketter), `m`
 (milstolpe), `Q` (Gerrits abandon), `e` / `d`, `r`. Etiketter, milstolpe och abandon finns kvar på sidhuvudets knappar och
 i paletten; `a` (tilldelade), `p` (granskare), `f` (**Slutför granskning**), `b` (**Checka ut**), `P`, `D`, `U` och
@@ -287,6 +296,7 @@ Att skicka granskningen förbrukar utkastet.
 | Översikt / Filer / Commits | `Alt+1` / `Alt+2` / `Alt+3` | *Granskning: Visa översikt*, *Visa filer*, *Visa Commits* |
 | Kommentera raden eller intervallet | `c` | *Granskning: Kommentera rad...* |
 | Kommentera konversationen | `c` i Översikt, `C` | *Granskning: Kommentera konversationen...* (öppnar Översiktens ruta), *Konversation: Ny kommentar* |
+| Öppna trådens kod (Översikt) / tillbaka till kommentaren | `G` / `Esc` | *Konversation: Öppna trådens kod*, *Granskning: Tillbaka till kommentaren i översikten* |
 | Svara i tråden | `r` | *Granskning: Svara i tråd...* |
 | Lös eller öppna igen | `x` | *Granskning: Lös eller öppna tråd igen* |
 | Vik ihop eller ut en tråd | `z` | *Granskning: Fäll ihop eller ut tråd* |

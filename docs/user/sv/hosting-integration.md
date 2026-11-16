@@ -496,6 +496,8 @@ En helfönstervy: rubriken (tillstånd, vem som öppnade det och när, etiketter
   [Markupkonvertering](#markupkonvertering)). Ett kodblock `mermaid` får en knapp **Öppna diagram** som visar
   diagrammets källtext i en rullbar visare (`Enter` kopierar den); paletten har *Konversation: Öppna postens diagram*.
   Det kräver ett bygge med både `conversation` och `mermaid`.
+- I granskningens Översikt är en kodtråds `path:line` en länk till koden (`G`, *Konversation: Öppna trådens kod*;
+  se [Granskning](review.md)); i en konversation som öppnats för sig (ett ärende, en Radar-rad) finns ingen kodsida att gå till.
 - Vyn läser igen var 60:e sekund och med `F5` (**Uppdatera**).
 
 **Tangenter.** Var och en har en knapp, en menyrad eller en palettrad (*Konversation: ...*), och `Ctrl+N` märker knapparna.

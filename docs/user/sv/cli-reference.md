@@ -101,7 +101,8 @@ Hunks och rader numreras så som `gitpoulpi --json diff` numrerar dem.
 | Kommando | Vad det gör |
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Stagea en fil, mapp, allt, en hunk eller några rader. En stage av en fil, mapp eller `--all` som skulle lägga till en känslig fil (en privat nyckel, en `.env`, en igenkänd token: `[privacy]` i [konfigurationsreferensen](config-reference.md#privacy-känsliga-filer)) nekas med slutkod 2 och `{error: "sensitive_files", files: [{path, reason}]}` (en regel och en maskerad förhandsvisning, aldrig ett värde); ingenting stageas. `--allow-sensitive` stagear dem ändå. |
-| `unstage` (samma flaggor) | Det omvända. |
+| `stage --paths A B ...` | Stagea flera filer eller mappar som EN åtgärd: en journalpost, ett `undo`-steg (en omdöpt fil är sin gamla och sin nya sökväg, som `status` visar med `renamed_from`). Kan inte kombineras med `--folder`, `--hunk`, `--lines` eller `--all`. |
+| `unstage` (samma flaggor, `--paths` inräknat) | Det omvända. |
 | `discard --file F [--hunk N [--lines a,b]]` | Förkasta unstageade ändringar (en hel fil: varje ändring, ospårad fil tas bort, samt de mappar som det lämnar tomma). Går att ångra. |
 | `rm-file <paths>...` | Ta bort filer från arbetskatalogen. Går att ångra. |
 | `ignore <pattern> [--file <.gitignore>]` | Lägg till ett mönster i en `.gitignore` (eller `.git/info/exclude` med `--file .git/info/exclude`). Går att ångra, utom i `.git/info/exclude`. |

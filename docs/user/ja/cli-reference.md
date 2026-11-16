@@ -76,7 +76,8 @@
 | コマンド | 内容 |
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | ファイル、フォルダー、すべて、ハンク、または一部の行をステージします。機密ファイル（秘密鍵、`.env`、認識されたトークン。[設定リファレンス](config-reference.md)の `[privacy]`：[機密ファイル](config-reference.md#privacy機密ファイル)）を追加することになるファイル、フォルダー、`--all` のステージは、終了コード 2 と `{error: "sensitive_files", files: [{path, reason}]}`（ルールとマスクしたプレビュー。値は含みません）で拒否され、何もステージされません。`--allow-sensitive` を付けると、それでもステージします。 |
-| `unstage`（同じフラグ） | その逆です。 |
+| `stage --paths A B ...` | 複数のファイルまたはフォルダーを 1 つの操作としてステージします：ジャーナルのエントリーも `undo` のステップも 1 つです（名前変更されたファイルは旧パスと新パスの両方で、`status` が `renamed_from` として示すとおりです）。`--folder`、`--hunk`、`--lines`、`--all` とは併用できません。 |
+| `unstage`（同じフラグ。`--paths` を含む） | その逆です。 |
 | `discard --file F [--hunk N [--lines a,b]]` | 未ステージの変更を破棄します（ファイル全体：すべての変更が対象で、未追跡ファイルは削除され、それで空になるフォルダーも削除されます）。元に戻せます。 |
 | `rm-file <paths>...` | 作業ツリーからファイルを削除します。元に戻せます。 |
 | `ignore <pattern> [--file <.gitignore>]` | `.gitignore` にパターンを追記します（`--file .git/info/exclude` を付けると `.git/info/exclude` に追記します）。元に戻せます。ただし `.git/info/exclude` への追記は元に戻せません。 |

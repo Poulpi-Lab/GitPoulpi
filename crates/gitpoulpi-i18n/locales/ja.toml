@@ -1099,7 +1099,7 @@ hint_create = "作成"
 hint_open = "開く"
 hint_toggle = "切り替え"
 # context: one line in the minimal frame a dialog shows when the window is too small for it
-too_small = "Window too small: enlarge it"
+too_small = "ウィンドウが小さすぎます：広げてください"
 
 [clone]
 title = "リポジトリをクローン"
@@ -3620,7 +3620,7 @@ review_reply = "レビュー: スレッドに返信..."
 # context: command palette entry
 review_resolve = "レビュー: スレッドを解決／再開"
 # context: command palette entry
-review_back_to_comment = "Review: Back to Comment in Overview"
+review_back_to_comment = "レビュー: 概要のコメントに戻る"
 # context: command palette entry
 review_fold_thread = "レビュー: スレッドを折りたたみ／展開"
 # context: command palette entry
@@ -4308,7 +4308,7 @@ explain_changes = "作業中の変更を説明"
 ai_generate = { git = "AI で{$commit}メッセージを生成", local = "AI で{$commit}メッセージを生成" }
 ai_compose = { git = "AI で{$commit}を構成", local = "AI で{$commit}を構成" }
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: {$commit} without running git hooks"
+skip_hooks = "フックをスキップ：git フックを実行せずに{$commit}します"
 commit_reference = { git = "ブラウザーで開く（パレット：連携: {$commit}の参照を開く）", local = "ブラウザーで開く（パレット：連携: コミットの参照を開く）" }
 quit = "GitPoulpi を終了"
 quit_cd = "終了して、シェルをこのタブのフォルダーに移動（シェルラッパーが必要）"
@@ -5486,7 +5486,7 @@ ref_from_branch = "（ブランチから）"
 issue_ref_inserted = "{reference} を挿入しました"
 skip_hooks = "フックをスキップ"
 # context: shorter label of the Skip hooks checkbox on a narrow commit options row
-skip_hooks_short = "No hooks"
+skip_hooks_short = "フック無し"
 
 [compose_ui]
 select_commit = "{$commit}を選択..."
@@ -7237,13 +7237,13 @@ why_not_on_code = "先にカーソルをコードの行に置いてください"
 # context: why a row is off
 why_not_on_thread = "先にカーソルをコメントのスレッドに置いてください"
 # context: button on the Files page after jumping from a comment: returns to that comment in the Overview
-back_to_overview = "Back to Overview"
+back_to_overview = "概要へ戻る"
 # context: why Back to Comment does nothing. Width budget: 50 cells
-why_no_return = "no comment to go back to"
+why_no_return = "戻り先のコメントがありません"
 # context: status line: the commented file is not in the diff. {path} is a file path
-thread_not_in_diff = "{path} is not in the {$diff}"
+thread_not_in_diff = "{path} は{$diff}に含まれていません"
 # context: status line: the thread's line no longer exists; {path} is a file path
-thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
+thread_outdated_nearest = "このスレッドは古くなっています：{path} の最も近い行を表示しています"
 # context: why a row is off
 why_no_resolve = "このスレッドは解決できません"
 # context: why a row is off
@@ -10113,11 +10113,11 @@ link_diagram = "図：{first}"
 why_no_diagram = "選択中の項目に図がありません"
 palette_open_diagram = "会話: 項目の図を開く"
 # context: command palette entry
-palette_open_code = "Conversation: Open Code of Thread"
+palette_open_code = "会話: スレッドのコードを開く"
 # context: why Open Code does nothing. Width budget: 50 cells
-why_no_code = "the selected entry is not a code thread"
+why_no_code = "選択中の項目はコードのスレッドではありません"
 # context: why Open Code does nothing outside a review. Width budget: 50 cells
-why_no_code_here = "open the review of this request to reach its code"
+why_no_code_here = "コードを見るにはこのリクエストのレビューを開いてください"
 why_no_url = "この項目にはホスト上のページがありません"
 why_no_events = "このホストはイベントを一覧表示しません"
 why_no_reply = "このホストは、この項目への返信を受け付けません"

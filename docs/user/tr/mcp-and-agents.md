@@ -161,6 +161,19 @@ Pratikte bunun anlamı:
   yıkıcıdır; `conflicts_unresolve` düz bir yazmadır. Reddedilen bir çağrı
   (`stale`, `not_conflicted`, `pick_incomplete`...) başarısız olmak yerine çıkış
   kodu 2 ile `{"refused": {...}}` yanıtlar.
+- **Issue ve pull request konuşmaları**: `hosting_issue_comments` ve
+  `hosting_review_conversation` tüm zaman çizelgesini okur (okumalar, açık
+  dünya: barındırıcıyı çağırırlar); `hosting_markdown` bir metni temizler ve
+  referanslarını bulur, hiçbir şey çağırmaz (kapalı dünya). Göndermek
+  (`hosting_issue_comment`, `hosting_review_comment`, `hosting_review_reply`) ve
+  düzenlemek (`hosting_*_comment_edit`) açık dünya olarak işaretlenmiş düz
+  yazmalardır: barındırıcıya hemen, token'ın kimliğiyle gider (yanıttaki
+  `posted_as`; bir bot token'ı bot olarak gönderir), bu yüzden bir ajanın
+  yapıp yapamayacağına `allow_mutations` ve `mutation_allowlist` karar verir.
+  Bir yorumu silmek (`hosting_*_comment_delete`) yıkıcıdır. Bir gönderme,
+  düzenleme veya silmeden sonra daemon'a haber verilir ve deponun açık bir
+  penceresi o öğeyi yeniler. `ui_show_pr` / `ui_show_issue`, satır yerine
+  konuşmayı açmak için `--view conversation` alır.
 - **Takılı durumlar**: `conflicts_am_continue` bir yazmadır, `conflicts_am_skip`,
   `conflicts_am_abort` ve `index_lock_remove` yıkıcıdır, `index_lock_show` bir
   okumadır.
@@ -226,6 +239,7 @@ onaylayacağınız bir iletişim kutusu açar.
 |---|---|---|
 | `ai_commit_message` | `gitpoulpi ai commit-message` | read, network |
 | `ai_explain` | `gitpoulpi ai explain` | read, network |
+| `ai_hosting_reply` | `gitpoulpi ai hosting-reply` | read, network |
 | `ai_prompt` | `gitpoulpi ai prompt` | read |
 | `ai_resolve_conflict` | `gitpoulpi ai resolve-conflict` | read, network |
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
@@ -288,6 +302,7 @@ onaylayacağınız bir iletişim kutusu açar.
 | `flow_status` | `gitpoulpi flow status` | read |
 | `flow_sync` | `gitpoulpi flow sync` | destructive |
 | `flow_templates` | `gitpoulpi flow templates` | read |
+| `hosting_assignment` | `gitpoulpi hosting assignment` | write |
 | `hosting_board_move` | `gitpoulpi hosting board move` | write, network |
 | `hosting_board_show` | `gitpoulpi hosting board show` | read, network |
 | `hosting_checkout_pr` | `gitpoulpi hosting checkout-pr` | write, network |
@@ -301,6 +316,10 @@ onaylayacağınız bir iletişim kutusu açar.
 | `hosting_integrations_test` | `gitpoulpi hosting integrations test` | read, network |
 | `hosting_issue_base` | `gitpoulpi hosting issue base` | write |
 | `hosting_issue_close` | `gitpoulpi hosting issue close` | write |
+| `hosting_issue_comment` | `gitpoulpi hosting issue comment` | write, network |
+| `hosting_issue_comment_delete` | `gitpoulpi hosting issue comment-delete` | destructive, network |
+| `hosting_issue_comment_edit` | `gitpoulpi hosting issue comment-edit` | write, network |
+| `hosting_issue_comments` | `gitpoulpi hosting issue comments` | read, network |
 | `hosting_issue_create` | `gitpoulpi hosting issue create` | write, network |
 | `hosting_issue_edit` | `gitpoulpi hosting issue edit` | write, network |
 | `hosting_issue_move` | `gitpoulpi hosting issue move` | write |
@@ -311,6 +330,7 @@ onaylayacağınız bir iletişim kutusu açar.
 | `hosting_link` | `gitpoulpi hosting link` | write |
 | `hosting_list` | `gitpoulpi hosting list` | read |
 | `hosting_logout` | `gitpoulpi hosting logout` | destructive |
+| `hosting_markdown` | `gitpoulpi hosting markdown` | read |
 | `hosting_members` | `gitpoulpi hosting members` | read, network |
 | `hosting_milestones` | `gitpoulpi hosting milestones` | read, network |
 | `hosting_open` | `gitpoulpi hosting open` | read |
@@ -323,6 +343,9 @@ onaylayacağınız bir iletişim kutusu açar.
 | `hosting_refs` | `gitpoulpi hosting refs` | read |
 | `hosting_review_abandon` | `gitpoulpi hosting review abandon` | write, network |
 | `hosting_review_comment` | `gitpoulpi hosting review comment` | write, network |
+| `hosting_review_comment_delete` | `gitpoulpi hosting review comment-delete` | destructive, network |
+| `hosting_review_comment_edit` | `gitpoulpi hosting review comment-edit` | write, network |
+| `hosting_review_conversation` | `gitpoulpi hosting review conversation` | read, network |
 | `hosting_review_diff` | `gitpoulpi hosting review diff` | read, network |
 | `hosting_review_fetch` | `gitpoulpi hosting review fetch` | write, network |
 | `hosting_review_push` | `gitpoulpi hosting review push` | write, network |

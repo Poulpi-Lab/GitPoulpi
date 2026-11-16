@@ -138,7 +138,8 @@ impostazione predefinita). Quella scheda si chiude quando il worktree viene rimo
 
 La scheda Home è il gestore dei repository. Ha quattro sezioni: **REPOSITORY
 APERTI**, **PREFERITI**, **REPOSITORY RECENTI** e **TUTTI I REPOSITORY**. Ogni riga
-mostra il branch, i conteggi di ahead e behind e il numero di modifiche. Ogni riga
+mostra il branch, i conteggi di ahead e behind e il numero di modifiche, poi il percorso della cartella quando c'è spazio: abbreviato con `~`
+e tagliato a metà quando è stretto, non spinge mai fuori il nome, il proprietario o il branch. Ogni riga
 ha una stella (preferito), **Apri** o **Vai a**, **Chiudi** o **Rimuovi**, e un
 menu `⋮`.
 
@@ -147,7 +148,7 @@ tutto** ed **Espandi tutto**. Una cartella che non esiste più esce da *Recenti*
 da *Tutti* da sola. Un preferito mancante resta, con un pulsante **Rimuovi**.
 **Rimuovi** non elimina mai nulla su disco.
 
-Tasti: `Enter` apre, `f` preferito, `x` chiude o rimuove, `.` menu, `/` cerca,
+Tasti: `Enter` apre, `f` preferito, `x` chiude o rimuove, `y` copia il percorso, `o` apre nello strumento predefinito (**Apri in** del menu `⋮` ne sceglie un altro), `.` menu, `/` cerca,
 `Space` comprime una sezione, `Esc` torna alla tua scheda.
 `Ctrl+N` mostra un badge sul campo di ricerca, su ogni sezione e su ogni pulsante: premi il carattere di un badge per portare il focus su
 quel controllo o per premerlo (vedi [Badge](keybindings.md#badge)).
@@ -252,7 +253,9 @@ lasciati lì, ed è quello lo stato salvato per l'avvio successivo.
 
 Una riga per commit, dal più recente. Clic destro sull'intestazione per mostrare o
 nascondere le colonne. Trascina il bordo tra due intestazioni per ridimensionare
-una colonna. Trascina un'intestazione per spostare la colonna.
+una colonna. Trascina un'intestazione per spostare la colonna. Le larghezze appartengono al repository: vengono salvate con esso
+e tornano quando lo riapri, e un repository aperto per la prima volta ha ogni colonna adattata a ciò che il Log mostra
+(`Adatta tutte le colonne al contenuto` lo rifà, `Reimposta le larghezze delle colonne` torna alle larghezze automatiche, che restano).
 
 Il pannello non ha titolo: lo dicono le intestazioni delle colonne. I tag sono disegnati dove sono, mai come fantasma. Su un commit senza ref, la riga evidenziata mostra una pillola sbiadita con il nome del branch a cui appartiene; se quel branch è stato eliminato, una pillola barrata mostra il nome letto dal commit di unione che lo ha unito (si disattiva con **Mostra un branch fantasma sul commit evidenziato** in Impostazioni > Log e grafo).
 

@@ -251,6 +251,23 @@ conferma. `Ctrl+Z` (Annulla della barra degli strumenti) annulla il reword; vedi
 [Annulla e ripeti](undo-redo.md). La barra di stato nomina anche la punta
 precedente.
 
+Un commit che non è sul branch attivo (sta su un altro branch) non può essere
+modificato dove sei (né il messaggio né con *Modifica...*), quindi *Modifica il messaggio del commit...* e
+*Modifica...* aprono invece **Modifica un commit di un altro branch**, un elenco di scelte
+(`Up` / `Down` o `Ctrl+J` / `Ctrl+K` si spostano, `Enter` o un clic sceglie, `Esc`, la
+croce o **Annulla (A)** lo chiude):
+
+- **Fai il checkout di `<branch>` e modifica (1)**: una riga per ogni branch locale la cui cronologia
+  contiene il commit (da `1` a `8`, i primi otto, gli altri vengono contati). Il
+  checkout del branch avviene nel modo consueto, poi la modifica si apre su di esso. L'annullamento
+  è quello delle due azioni: `Ctrl+Z` annulla la modifica, il checkout resta un
+  checkout.
+- **Modifica con riscrittura avanzata della cronologia (R)**: apre il
+  [pannello di riscrittura della cronologia](history-rewrite.md) su quel commit, nelle build che
+  lo includono.
+- **Crea un branch qui... (B)**: solo quando nessun branch locale contiene il commit
+  (per esempio sta solo su un branch remoto); apre la casella del nome per un branch su di esso.
+
 ## Modificare un commit (messaggio, autore, date)
 
 *Modifica...* nel menu del commit (o `Ctrl+G Shift+E`, o *Commit: Modifica...* nella palette) apre un'unica finestra con le proprietà del commit: il riepilogo, la descrizione e il nome, l'e-mail e la data dell'autore, ciascuno precompilato con i valori del commit. Cambia ciò che vuoi e premi **Applica**; vengono inviati solo i campi modificati. Una data si scrive `YYYY-MM-DD HH:MM:SS +HH:MM` e si mostra in UTC finché non la modifichi. Il committer sei tu, adesso (come in un reword). Qualsiasi commit del branch corrente può essere modificato, con le stesse regole, lo stesso avviso per un commit già pubblicato e la stessa seconda conferma di *Modifica il messaggio del commit...*; i commit sopra vengono ricreati con i propri autori e date, e le tue modifiche in stage e non in stage restano com'erano. `Ctrl+Z` (Annulla nella barra degli strumenti) annulla l'operazione. Nelle build con la riscrittura della cronologia, **Modifica la cronologia in profondità...** (`Alt+H`) in basso a sinistra nella finestra la chiude senza applicare nulla e apre il [pannello di riscrittura della cronologia](history-rewrite.md) con l'ambito da questo commit al più recente; se hai modificato un campo chiede prima conferma (`Esc` conferma). `Ctrl+N` mostra un badge su ogni campo e pulsante della finestra; premilo per portarvi il cursore o per premere quel pulsante (vedi [Badge](keybindings.md#badge)).
@@ -435,7 +452,7 @@ Ciò che viene confrontato dipende dalla selezione:
 | la riga WIP e un commit o uno stash | quel commit con la directory di lavoro: modifiche in stage e non in stage dei file tracciati (i file non tracciati non fanno parte di un diff) |
 | tre o più commit | le loro modifiche combinate: da subito prima del più vecchio al più recente (i merge seguono il primo genitore) |
 
-Una rinomina appare come una cancellazione più un'aggiunta. **Inverti** (`x`)
+Un file rinominato o spostato appare come un solo file, con il vecchio nome e la somiglianza in cima al suo diff. **Inverti** (`x`)
 scambia le estremità di un confronto a due righe; con la riga WIP, che è sempre
 l'estremità più recente, o con un intervallo di tre o più, non c'è nulla da
 invertire. Un confronto con la riga WIP segue la directory di lavoro mentre salvi i file.

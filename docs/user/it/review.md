@@ -49,13 +49,39 @@ Un controllo segmentato nel bordo superiore cambia pagina: **Panoramica**, **Fil
 
 ### Panoramica
 
-La descrizione (il Markdown di base viene mostrato come tale: grassetto, corsivo, `codice`, link come il loro testo,
-elenchi puntati e numerati, titoli, citazioni e blocchi di codice), poi la conversazione: i commenti che non sono sul codice
-e le revisioni già inviate, dalla più vecchia, ciascuna con il suo esito (`approvata`, `modifiche richieste`, `commentata`,
-`ignorata`). Su GitLab gli esiti sono le sue approvazioni. Sotto, la casella di risposta: cliccala o premi **`c`**
-per scrivere un commento sulla conversazione. **Questo viene pubblicato subito**, e la casella lo dice.
+La Panoramica è **la conversazione della richiesta**, la stessa cronologia e la stessa casella dei commenti di una issue
+([Conversazioni](hosting-integration.md#5c-conversazioni)): prima la descrizione (*ha aperto questo*), poi i commenti,
+le discussioni sul codice con il loro estratto di diff, le revisioni inviate con il loro esito (`approvata`, `modifiche
+richieste`, `commentata`, `ignorata`; su GitLab gli esiti sono le sue approvazioni) e gli eventi, dal più vecchio, nella
+finestra più recente con **Carica precedenti** in cima. La casella dei commenti è agganciata sotto la cronologia (**Nuovo commento**):
+**Scrivi**, **Anteprima** e **Affianca**, **Annulla** e **Invia**. **Un commento pubblicato qui va subito all'host**
+(nulla è in sospeso: i commenti in sospeso sono quelli sul codice, inviati con la revisione), compare subito nell'elenco
+e prende il suo posto quando l'host risponde; se l'host lo rifiuta, la casella si riapre con il tuo testo e il motivo.
 
-La casella dei commenti (anche quella di una risposta, di un commento su una riga e del riepilogo di **Termina la revisione**) è il compositore Markdown condiviso con [la vista di conversazione](hosting-integration.md#scrivere): **Scrivi**, **Anteprima** (`Alt+P`) e **Affianca** (`Alt+L`, in una finestra larga 100 colonne); `Ctrl+Enter` (anche `Ctrl+S`, `Alt+Enter`) invia, e dove l'IA è attiva `Alt+E` apre **Scrivi con l'IA** ([il capitolo sull'IA](ai.md#aiuto-alla-scrittura-su-un-host)). L'anteprima mostra il testo come lo mostrerà l'host, riferimenti compresi (`#7`, `!12`, `ABC-12`, id di commit); un testo non inviato viene conservato per richiesta. Il testo della descrizione e della conversazione usa lo stesso renderer, quindi Markdown, tabelle, avvisi e riferimenti hanno lo stesso aspetto qui e nella vista di conversazione di una issue. Citare, modificare o eliminare un commento già pubblicato, e le note interne, appartengono alla vista di conversazione delle issue e delle richieste su host senza revisione (vedi [Conversazioni](hosting-integration.md#5c-conversazioni)); qui si possono modificare solo i tuoi commenti in sospeso.
+I tasti sono quelli della vista di conversazione: **`Up`** / **`Down`** (e `Ctrl+J` / `Ctrl+K`) si spostano tra le voci,
+**`r`** risponde nella discussione della voce selezionata, **`Q`** la cita in un nuovo commento, **`c`** scrive un nuovo
+commento, **`e`** / **`d`** modificano ed eliminano i tuoi commenti (prima di un'eliminazione c'è una domanda), **`l`** o `Enter`
+apre i link di una voce, **`g`** il suo diagramma, **`y`** ne copia l'indirizzo, **`o`** la apre nel browser, **`n`**
+passa alla prossima voce nuova, **`v`** mostra o nasconde gli eventi, **`m`** carica le voci più vecchie, `Tab` passa tra la
+cronologia e la casella, e **Nota interna** (`Alt+I`) c'è sugli host che hanno note di questo tipo. I pulsanti della
+voce selezionata (**Rispondi**, **Cita**, **Modifica**, **Elimina**, **Link**) fanno lo stesso, e la palette ha le righe
+*Conversazione: ...* accanto a quelle *Revisione: ...*. Prima che un link si apra viene chiesta conferma, come ovunque nella
+revisione.
+
+Dove un tasto della conversazione e uno della revisione si incontrano, in questa pagina la lettera è della conversazione: `l` (etichette), `m`
+(milestone), `Q` (l'abbandono di Gerrit), `e` / `d`, `r`. Le etichette, la milestone e l'abbandono restano sui pulsanti dell'intestazione e
+nella palette; `a` (assegnatari), `p` (revisori), `f` (**Termina la revisione**), `b` (**Checkout**), `P`, `D`, `U` e
+`Alt+1` / `Alt+2` / `Alt+3` mantengono qui il loro significato. Mentre la casella ha la tastiera ogni tasto è suo, tranne
+`Alt+1` / `Alt+2` / `Alt+3`; `Esc` restituisce la tastiera alla cronologia e un secondo `Esc` chiude la revisione.
+
+Un commento scritto in un'altra finestra o dalla CLI compare qui da solo: ogni scrittura di GitPoulpi (questa finestra
+compresa) lo comunica alla sessione, e le finestre che mostrano la stessa richiesta lo rileggono.
+
+La casella dei commenti è il compositore Markdown condiviso con [la vista di conversazione](hosting-integration.md#scrivere)
+(anche la casella di una risposta a una discussione, di un commento su una riga e del riepilogo di **Termina la revisione**): `Ctrl+Enter` (anche
+`Ctrl+S`, `Alt+Enter`) invia, e dove l'IA è attiva `Alt+E` apre **Scrivi con l'IA**
+([il capitolo sull'IA](ai.md#aiuto-alla-scrittura-su-un-host)). L'anteprima mostra il testo come lo mostrerà l'host, riferimenti compresi
+(`#7`, `!12`, `ABC-12`, id di commit); un testo non inviato viene conservato per richiesta.
 
 ### File
 
@@ -230,17 +256,18 @@ I suggerimenti **non sono commenti**. Compaiono in due posti:
   tre pulsanti: **Accetta**, **Modifica** e **Ignora**. Un suggerimento su una riga che il diff non mostra viene
   conservato, mai scartato: è elencato dopo gli hunk sotto *Suggerimenti IA sull'intero file* e, una volta
   accettato, finisce sulla prima riga modificata del file con le parole *(riguardo alla riga N)* davanti.
-- **Nella Panoramica**, sotto la descrizione: il riepilogo, poi l'elenco con gli stessi pulsanti e **Accetta tutti** /
-  **Ignora tutti**.
+- **Nella Panoramica**, in un blocco sopra la conversazione (solo dopo un'esecuzione): il riepilogo, poi l'elenco con gli stessi
+  pulsanti e **Accetta tutti** / **Ignora tutti**.
 
 **Accetta** (`y`) trasforma un suggerimento in un normale **commento in sospeso** (puoi ancora modificarlo o eliminarlo);
 **Modifica** (`w`) apre la casella del commento con prima le parole del modello e accetta ciò che lasci; **Ignora** (`n`)
 lo scarta. **Accetta tutti** (`A`) riempie comunque solo l'elenco dei commenti in sospeso. Nella pagina File i tasti agiscono sul
-suggerimento sotto il cursore, nella Panoramica sul primo dell'elenco. **Usa il riepilogo IA** (`i`, o il pulsante
+suggerimento sotto il cursore, nella Panoramica sul primo dell'elenco (`y` e `n` tornano a essere *Copia il link* e
+*Prossima voce nuova* della conversazione quando l'elenco è vuoto). **Usa il riepilogo IA** (`i`, o il pulsante
 nel modulo Termina revisione) mette il riepilogo del modello nel testo della revisione; non viene mai inserito da solo.
 **Nulla viene inviato all'host finché non invii la revisione.**
 
-La Panoramica mostra la bozza come una scheda sopra i suggerimenti: il chip dell'esito, il testo della revisione e tre
+La Panoramica mostra la bozza come una scheda in cima a quel blocco, sopra i suggerimenti: il chip dell'esito, il testo della revisione e tre
 pulsanti.
 
 - **✦ Usa la bozza...** (`u`) accetta ogni suggerimento aperto come commento in sospeso e apre *Termina la revisione* già
@@ -261,7 +288,7 @@ Inviare la revisione consuma la bozza.
 |---|---|---|
 | Panoramica / File / Commit | `Alt+1` / `Alt+2` / `Alt+3` | *Revisione: Mostra panoramica*, *Mostra file*, *Mostra commit* |
 | Commenta la riga o l'intervallo | `c` | *Revisione: Commenta la riga...* |
-| Commenta la conversazione | `c` nella Panoramica, `C` | *Revisione: Commenta la conversazione...* |
+| Commenta la conversazione | `c` nella Panoramica, `C` | *Revisione: Commenta la conversazione...* (apre la casella della Panoramica), *Conversazione: Nuovo commento* |
 | Rispondi alla discussione | `r` | *Revisione: Rispondi alla discussione...* |
 | Risolvi o riapri | `x` | *Revisione: Risolvi o riapri la discussione* |
 | Comprimi o espandi una discussione | `z` | *Revisione: Comprimi o espandi la discussione* |

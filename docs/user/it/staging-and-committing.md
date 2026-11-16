@@ -18,6 +18,14 @@ le modifiche in corso:
 - **File non in stage**: file modificati, aggiunti (non tracciati) ed eliminati non ancora nel
   prossimo commit.
 - **File in stage**: ciò che conterrà il prossimo commit.
+- **I file rinominati o spostati** sono una sola riga, `nuovo <- vecchio`, in entrambi gli elenchi (un file
+  eliminato su disco e uno nuovo con almeno il 50% di contenuto uguale contano come uno
+  spostamento anche prima di metterli in stage). Stage, Unstage e Scarta agiscono su entrambi i
+  nomi: mettere in stage mette in stage l'eliminazione e il nuovo file, così git vede una sola rinomina.
+  Aprire la riga mostra il diff del contenuto rispetto al vecchio nome, con l'intestazione
+  `vecchio -> nuovo (N% simile)`; uno spostamento senza modifiche dice **Nessuna modifica al contenuto**.
+  Lo stesso vale per i file di un commit, e `gitpoulpi status` / `gitpoulpi diff`
+  riportano `renamed_from`.
 - **Percorso** o **Albero** (`m`) elenca i file in piano o in cartelle. **Comprimi tutto**
   (`z`) chiude le cartelle. **Vedi tutti i file** (`a`) mostra l'intero albero
   invece dei soli file modificati. Clic destro sullo spazio vuoto dell'elenco per
@@ -47,7 +55,14 @@ contiene un segreto riconosciuto dallo scanner, non viene messo in stage. La dom
 segreto con un'anteprima mascherata, mai il valore) e offre **1. Metti comunque in stage**
 o **2. Annulla, niente in stage**. Nessuna risposta è evidenziata finché non premi una
 freccia o una cifra, quindi un Invio per errore non risponde nulla; `Esc`, la croce di
-chiusura e un clic all'esterno annullano. È la stessa domanda da tastiera, da un pulsante,
+chiusura e un clic all'esterno annullano.
+Un segreto trovato in un file ne indica la riga (`config/app.env:12`). Per guardare prima di
+decidere, clicca un rilevamento (o spostati tra essi con `Tab` / `Shift+Tab`, `Ctrl+J` /
+`Ctrl+K`) e premi il pulsante **Mostra nel file**, `S`, oppure **File sensibili: Mostra nel
+file** della palette: il file si apre nella Vista file scorso a quella riga e la
+evidenzia, e la domanda torna intatta quando chiudi la Vista file
+(`Esc`). Guardare non mette in stage nulla.
+È la stessa domanda da tastiera, da un pulsante,
 da un menu, dalla palette o con il trascinamento, perché tutti inviano la stessa richiesta.
 Annullare non mette in stage nulla, nemmeno i file normali dello stesso stage.
 
@@ -191,6 +206,12 @@ Con l'[IA](ai.md) attiva, il pulsante **`✦`** a destra del riepilogo scrive un
 dalle modifiche in stage (`Ctrl+G i`), e **Componi commit con l'IA** divide
 il tuo lavoro in più commit, qui sotto. Il testo va nel modulo perché tu lo
 modifichi; non viene fatto alcun commit finché non premi il pulsante di commit.
+
+**Componi commit con l'IA** sta all'estremità destra della riga Modifica e si riduce
+con il pannello destro invece di sparire: l'etichetta intera, poi **Componi con l'IA**, poi
+il solo **`✦`**. Mantiene il clic, il suggerimento e il tasto
+(`Ctrl+G Shift+C`) a ogni larghezza; le etichette Modifica e Salta gli hook cedono il posto
+a lui, mai il contrario.
 
 ## Il compositore di commit: dividere le modifiche in commit
 

@@ -18,6 +18,12 @@ e o painel direito mostra as alterações em curso:
 - **Ficheiros unstaged**: ficheiros editados, adicionados (não acompanhados) e
   eliminados que ainda não estão no próximo commit.
 - **Ficheiros staged**: o que o próximo commit vai conter.
+- **Ficheiros renomeados ou movidos** são uma só linha, `novo <- antigo`, nas duas listas (um ficheiro eliminado no
+  disco e um novo com pelo menos 50% do mesmo conteúdo contam como um movimento mesmo antes de os pôr em stage).
+  Stage, Unstage e Descartar atuam nos dois nomes: o stage põe em stage a eliminação e o ficheiro novo, pelo que o git
+  vê uma só renomeação. Abrir a linha mostra o diff do conteúdo contra o nome antigo, encabeçado
+  `antigo -> novo (N% semelhante)`; um movimento sem edições diz **Sem alteração de conteúdo**. O mesmo vale para os
+  ficheiros de um commit, e `gitpoulpi status` / `gitpoulpi diff` indicam `renamed_from`.
 - **Caminho** ou **Árvore** (`m`) lista os ficheiros em plano ou em pastas.
   **Recolher tudo** (`z`) recolhe as pastas. **Ver todos os ficheiros** (`a`)
   mostra a árvore inteira em vez de apenas os ficheiros alterados. Clique com o botão direito no espaço vazio da lista para
@@ -47,6 +53,10 @@ cujo texto contenha um segredo que o analisador reconheça, não entra em stage.
 com uma pré-visualização mascarada, nunca o valor) e oferece **1. Stage mesmo assim** ou **2. Cancelar,
 não stage nada**. Nenhuma resposta fica realçada até premir uma seta ou um dígito,
 pelo que um Enter perdido não responde a nada; `Esc`, a cruz de fechar e um clique fora cancelam.
+Um segredo encontrado num ficheiro indica a sua linha (`config/app.env:12`). Para ver antes de decidir, clique num
+achado (ou percorra-os com `Tab` / `Shift+Tab`, `Ctrl+J` / `Ctrl+K`) e prima o botão **Mostrar no ficheiro**, `S`, ou
+**Ficheiros sensíveis: mostrar no ficheiro** na paleta: o ficheiro abre-se na Vista de ficheiro, deslocado para essa
+linha e a realçá-la, e a pergunta volta intacta quando fecha a Vista de ficheiro (`Esc`). Ver não põe nada em stage.
 É a mesma pergunta a partir do teclado, de um botão, de um menu, da paleta ou de um
 arrastar e largar, porque todos enviam o mesmo pedido. Cancelar não coloca nada em stage,
 nem sequer os ficheiros normais do mesmo stage.
@@ -190,6 +200,11 @@ Com a [IA](ai.md) ligada, o botão **`✦`** à direita do resumo escreve uma
 mensagem a partir das alterações staged (`Ctrl+G i`), e **Compor commits com
 IA** divide o seu trabalho em vários commits, abaixo. O texto vai para o
 formulário para o editar; nada é commitado até premir o botão de commit.
+
+**Compor commits com IA** fica na extremidade direita da linha de Amend e encolhe com o painel direito em vez de
+desaparecer: o rótulo completo, depois **Compor com IA**, depois só o **`✦`**. Mantém o seu clique, a sua dica e a sua
+tecla (`Ctrl+G Shift+C`) em qualquer largura; os rótulos **Amend do commit anterior** e **Ignorar hooks** cedem-lhe o
+lugar, nunca o contrário.
 
 ## O compositor de commits: dividir as alterações em commits
 

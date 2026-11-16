@@ -69,6 +69,15 @@ Os botões da entrada selecionada (**Responder**, **Citar**, **Editar**, **Elimi
 paleta tem as linhas *Conversa: ...* junto às *Revisão: ...*. Uma ligação pergunta antes de abrir, como em toda a
 revisão.
 
+Uma discussão sobre código mostra o seu `path:line` como ligação (sublinhada, um botão a sério). Um clique nela, **`G`**
+na discussão selecionada, ou *Conversa: abrir o código da discussão* na paleta passa para a página **Ficheiros**, abre
+esse ficheiro e põe o cursor na linha comentada (do lado antigo ou do novo, como foi escrito) com a discussão aberta por
+baixo (uma recolhida é expandida). **Esc**, o botão **Voltar ao resumo** à esquerda dos separadores da página, ou
+*Revisão: voltar ao comentário no resumo* regressam à mesma entrada do Resumo. Uma discussão cuja linha já não está no
+diff (desatualizada) abre o ficheiro na linha mais próxima e a linha de estado di-lo; uma discussão sobre um ficheiro
+que o pedido já não altera diz que o ficheiro não está no diff. Numa vista de problema ou do Radar do mesmo pedido não
+há código para abrir: `G` responde que a revisão o tem.
+
 Onde uma tecla da conversa e uma da revisão se encontram, a conversa fica com a letra nesta página: `l` (etiquetas),
 `m` (marco), `Q` (abandonar, do Gerrit), `e` / `d`, `r`. As etiquetas, o marco e o abandono ficam nos botões do
 cabeçalho e na paleta; `a` (responsáveis), `p` (revisores), `f` (**Concluir revisão**), `b` (**Fazer checkout**), `P`,
@@ -290,6 +299,7 @@ Submeter a revisão gasta o rascunho.
 | Resumo / Ficheiros / Commits | `Alt+1` / `Alt+2` / `Alt+3` | *Revisão: mostrar resumo*, *mostrar ficheiros*, *mostrar commits* |
 | Comentar a linha ou o intervalo | `c` | *Revisão: comentar a linha...* |
 | Comentar a conversa | `c` no Resumo, `C` | *Revisão: comentar a conversa...* (abre a caixa do Resumo), *Conversa: novo comentário* |
+| Abrir o código de uma discussão (Resumo) / voltar ao comentário | `G` / `Esc` | *Conversa: abrir o código da discussão*, *Revisão: voltar ao comentário no resumo* |
 | Responder à discussão | `r` | *Revisão: responder à discussão...* |
 | Resolver ou reabrir | `x` | *Revisão: resolver ou reabrir a discussão* |
 | Recolher ou expandir uma discussão | `z` | *Revisão: recolher ou expandir a discussão* |

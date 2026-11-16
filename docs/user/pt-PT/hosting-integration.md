@@ -499,6 +499,9 @@ por baixo, a caixa de comentário.
   primeiro (veja [Conversão de marcação](#conversão-de-marcação)). Um bloco de código `mermaid` ganha um botão **Abrir
   diagrama** que mostra o código do diagrama numa vista com deslocação (`Enter` copia-o); a paleta tem *Conversa: abrir o
   diagrama da entrada*. Precisa de uma compilação com `conversation` e `mermaid`.
+- No Resumo da revisão, o `path:line` de uma discussão sobre código é uma ligação para o código (`G`, *Conversa: abrir o
+  código da discussão*; veja [Revisão](review.md)); numa conversa aberta isoladamente (um problema, uma linha do Radar)
+  não há página de código para onde ir.
 - A vista lê de novo a cada 60 segundos e com `F5` (**Atualizar**).
 
 **Teclas.** Cada uma tem um botão, uma linha de menu ou uma linha da paleta (*Conversa: ...*), e `Ctrl+N` põe emblemas

@@ -55,6 +55,8 @@ gönderilmiş incelemeler, en eskiden başlayarak, her biri kararıyla (`onaylad
 `yorum yaptı`, `yoksayıldı`). GitLab'da kararlar onaylarıdır. Altında yanıt kutusu bulunur: bir tık veya **`c`**
 tuşu, konuşmaya bir yorum yazmanızı sağlar. **Bu yorum hemen gönderilir** ve kutu bunu söyler.
 
+Yorum kutusu (bir yanıtın, bir satıra yorumun ve **İncelemeyi bitir** özetinin kutusu da), [konuşma görünümüyle](hosting-integration.md#yazma) paylaşılan Markdown yazma kutusudur: **Yaz**, **Önizleme** (`Alt+P`) ve **Yan yana** (`Alt+L`, 100 sütun genişliğinde bir pencerede); `Ctrl+Enter` (ayrıca `Ctrl+S`, `Alt+Enter`) gönderir ve YZ açıkken `Alt+E` **YZ ile Yaz**'ı açar ([YZ bölümü](ai.md#sunucuda-yazma-yardımı)). Önizleme metni barındırıcının göstereceği gibi, referanslarla birlikte gösterir (`#7`, `!12`, `ABC-12`, commit kimlikleri); gönderilmemiş bir metin istek başına saklanır. Açıklamadaki ve konuşmadaki metin aynı çizim motorunu kullanır; bu yüzden Markdown, tablolar, uyarı blokları ve referanslar burada ve bir issue'nun konuşma görünümünde aynı görünür. Zaten gönderilmiş bir yorumu alıntılamak, düzenlemek veya silmek ve dahili notlar, issue'ların ve incelemesi olmayan barındırıcılardaki isteklerin konuşma görünümüne aittir (bkz. [Konuşmalar](hosting-integration.md#5c-konuşmalar)); burada yalnızca bekleyen yorumlarınız düzenlenebilir.
+
 ### Dosyalar
 
 Solda değişen dosyalar (durum harfi, `+eklenen -kaldırılan`, açık yorum dizilerinin `●n` sayısı, bekleyen

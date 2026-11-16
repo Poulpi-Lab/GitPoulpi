@@ -4306,7 +4306,7 @@ explain_changes = "Förklara ändringar i arbetskatalogen"
 ai_generate = { git = "Generera ett {$commit}-meddelande med AI", local = "Generera ett incheckningsmeddelande med AI" }
 ai_compose = "Komponera {$commits} med AI"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: commit without running git hooks"
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = { git = "Öppna i din webbläsare (palett: Öppna commit-referens)", local = "Öppna i din webbläsare (palett: Öppna incheckningsreferens)" }
 quit = "Avsluta GitPoulpi"
 quit_cd = "Avsluta och lämna ditt skal i den här flikens mapp (kräver skalomslaget)"

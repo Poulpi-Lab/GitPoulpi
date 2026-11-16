@@ -4304,7 +4304,7 @@ explain_changes = "Çalışma değişikliklerini açıkla"
 ai_generate = "YZ ile {$commit} mesajı oluştur"
 ai_compose = "YZ ile {$commits} oluştur"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: commit without running git hooks"
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = "Tarayıcınızda açın (palet: Commit Referansını Aç)"
 quit = "GitPoulpi'den çık"
 quit_cd = "Çık ve kabuğunuzu bu sekmenin klasöründe bırak (kabuk sarmalayıcısı gerekir)"

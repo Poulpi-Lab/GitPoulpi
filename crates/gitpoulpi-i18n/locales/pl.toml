@@ -4302,7 +4302,7 @@ explain_changes = "Wyjaśnij zmiany robocze"
 ai_generate = { git = "Wygeneruj opis commita przez AI", local = "Wygeneruj opis zatwierdzenia przez AI" }
 ai_compose = { git = "Skomponuj commity przez AI", local = "Skomponuj zatwierdzenia przez AI" }
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: commit without running git hooks"
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = { git = "Otwórz w przeglądarce (paleta: Otwórz odwołanie z commita)", local = "Otwórz w przeglądarce (paleta: Otwórz odwołanie z zatwierdzenia)" }
 quit = "Zakończ GitPoulpi"
 quit_cd = "Zakończ, zostawiając powłokę w folderze tej karty (wymaga wrappera powłoki)"

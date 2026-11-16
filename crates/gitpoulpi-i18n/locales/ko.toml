@@ -4302,7 +4302,7 @@ explain_changes = "작업 변경 사항 설명"
 ai_generate = "AI로 {$commit} 메시지 생성"
 ai_compose = "AI로 {$commit} 구성"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: commit without running git hooks"
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = "브라우저에서 열기 (팔레트: {$commit} 참조 열기)"
 quit = "GitPoulpi 종료"
 quit_cd = "종료하고 셸을 이 탭의 폴더에 둠 (셸 래퍼 필요)"

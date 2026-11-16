@@ -4304,7 +4304,7 @@ explain_changes = "Lokale wijzigingen uitleggen"
 ai_generate = "Een {$commit}-bericht genereren met AI"
 ai_compose = "{$Commits} samenstellen met AI"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: commit without running git hooks"
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = { git = "Openen in je browser (palet: Commit-verwijzing openen)", local = "Openen in je browser (palet: Commitverwijzing openen)" }
 quit = "GitPoulpi afsluiten"
 quit_cd = "Afsluiten en je shell in de map van dit tabblad achterlaten (vereist de shell-wrapper)"

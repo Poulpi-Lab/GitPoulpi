@@ -4297,7 +4297,7 @@ explain_changes = "Объяснить рабочие изменения"
 ai_generate = { git = "Создать сообщение commit'а с помощью ИИ", local = "Создать сообщение коммита с помощью ИИ" }
 ai_compose = "Составить {$commits} с помощью ИИ"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: commit without running git hooks"
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = { git = "Открыть в браузере (палитра: «Интеграции: открыть ссылку из commit'а»)", local = "Открыть в браузере (палитра: «Интеграции: открыть ссылку из коммита»)" }
 quit = "Выйти из GitPoulpi"
 quit_cd = "Выйти, оставив оболочку в папке этой вкладки (нужна обёртка оболочки)"

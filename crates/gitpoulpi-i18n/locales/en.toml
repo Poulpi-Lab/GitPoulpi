@@ -5267,7 +5267,7 @@ explain_changes = "Explain working changes"
 ai_generate = "Generate a {$commit} message with AI"
 ai_compose = "Compose {$commits} with AI"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: commit without running git hooks"
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = "Open in your browser (palette: Open Commit Reference)"
 quit = "Quit GitPoulpi"
 quit_cd = "Quit, leaving your shell in this tab's folder (needs the shell wrapper)"

@@ -4304,7 +4304,7 @@ explain_changes = "作業中の変更を説明"
 ai_generate = { git = "AI で{$commit}メッセージを生成", local = "AI で{$commit}メッセージを生成" }
 ai_compose = { git = "AI で{$commit}を構成", local = "AI で{$commit}を構成" }
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: commit without running git hooks"
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = { git = "ブラウザーで開く（パレット：連携: {$commit}の参照を開く）", local = "ブラウザーで開く（パレット：連携: コミットの参照を開く）" }
 quit = "GitPoulpi を終了"
 quit_cd = "終了して、シェルをこのタブのフォルダーに移動（シェルラッパーが必要）"

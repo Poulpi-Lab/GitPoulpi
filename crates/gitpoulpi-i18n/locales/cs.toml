@@ -4303,7 +4303,7 @@ explain_changes = "Vysvětlit rozpracované změny"
 ai_generate = "Vygenerovat zprávu commitu pomocí AI"
 ai_compose = "Sestavit commity pomocí AI"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: commit without running git hooks"
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = "Otevřít v prohlížeči (paleta: Otevřít odkaz z commitu)"
 quit = "Ukončit GitPoulpi"
 quit_cd = "Ukončit a nechat shell ve složce této karty (vyžaduje obal shellu)"

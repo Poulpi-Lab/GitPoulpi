@@ -4305,7 +4305,7 @@ explain_changes = "Änderungen im Arbeitsverzeichnis erklären"
 ai_generate = "{$Commit}-Nachricht mit KI erzeugen"
 ai_compose = "{$Commits} mit KI zusammenstellen"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: commit without running git hooks"
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = "In Ihrem Browser öffnen (Palette: Commit-Referenz öffnen)"
 quit = "GitPoulpi beenden"
 quit_cd = "Beenden und Ihre Shell im Ordner dieses Tabs lassen (braucht den Shell-Wrapper)"

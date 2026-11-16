@@ -18,6 +18,12 @@ de lokale wijzigingen:
 - **Unstaged bestanden**: gewijzigde, toegevoegde (untracked) en verwijderde bestanden die nog niet
   in de volgende commit zitten.
 - **Staged bestanden**: wat de volgende commit zal bevatten.
+- **Hernoemde of verplaatste bestanden** zijn één rij, `nieuw <- oud`, in beide lijsten (een bestand dat op schijf is
+  verwijderd en een nieuw bestand met minstens 50% dezelfde inhoud tellen al als een verplaatsing voordat je ze stagt).
+  Stagen, Unstagen en Verwerpen werken op beide namen: stagen staget de verwijdering en het nieuwe bestand, zodat git één
+  hernoeming ziet. Als je de rij opent, zie je de inhoudsdiff tegen de oude naam, met bovenaan
+  `oud -> nieuw (N% gelijk)`; een verplaatsing zonder bewerkingen zegt **Geen inhoudelijke wijziging**. Hetzelfde geldt
+  voor de bestanden van een commit, en `gitpoulpi status` / `gitpoulpi diff` melden `renamed_from`.
 - **Pad** of **Boom** (`m`) toont bestanden plat of in mappen. **Alles inklappen**
   (`z`) klapt de mappen in. **Alle bestanden tonen** (`a`) toont de hele boom
   in plaats van alleen de gewijzigde bestanden. Klik met rechts op de lege ruimte
@@ -47,6 +53,11 @@ bestanden** somt elk bestand op met zijn reden (een patroon, of de soort geheim
 met een gemaskeerd voorbeeld, nooit de waarde) en biedt **Toch stagen** of **Annuleren, niets stagen**.
 Geen enkel antwoord is gemarkeerd tot je een pijltoets of een cijfer indrukt,
 dus een verdwaalde Enter beantwoordt niets; `Esc`, het sluitkruisje en een klik buiten het venster annuleren.
+Een geheim dat in een bestand is gevonden, noemt zijn regel (`config/app.env:12`). Om te kijken voordat je beslist, klik je
+op een bevinding (of ga je er met `Tab` / `Shift+Tab`, `Ctrl+J` / `Ctrl+K` overheen) en druk je op de knop **In bestand
+tonen**, `S`, of op het palet-commando **Gevoelige bestanden: In bestand tonen**: het bestand opent in de Bestandsweergave,
+gescrold naar die regel en met die regel gemarkeerd, en de vraag komt ongewijzigd terug als je de Bestandsweergave sluit
+(`Esc`). Kijken staget niets.
 Het is dezelfde vraag vanaf het toetsenbord, een knop, een menu, het palet of een
 drag-and-drop, want ze sturen allemaal hetzelfde verzoek. Annuleren staget niets,
 ook niet de gewone bestanden van dezelfde stage.
@@ -188,6 +199,11 @@ Met [AI](ai.md) aan schrijft de knop **`✦`** rechts van de samenvatting een be
 op basis van de gestagede wijzigingen (`Ctrl+G i`), en **Commits samenstellen met AI** verdeelt
 je werk over meerdere commits, hieronder. De tekst komt in het formulier terecht zodat je hem
 kunt bewerken; er wordt niets gecommit tot je op de commit-knop drukt.
+
+**Commits samenstellen met AI** staat aan het rechteruiteinde van de Amend-rij en krimpt mee met het rechterpaneel in
+plaats van te verdwijnen: eerst het volledige label, dan **Samenstellen met AI**, dan alleen de **`✦`**. De knop behoudt
+op elke breedte zijn klik, zijn tooltip en zijn toets (`Ctrl+G Shift+C`); de labels van Amend en Hooks overslaan wijken
+voor hem, nooit andersom.
 
 ## De commit-composer: verdeel je wijzigingen over commits
 

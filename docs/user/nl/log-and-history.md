@@ -238,6 +238,20 @@ gepusht, dan waarschuwt de pop-up in oranje dat je een force push (met lease) no
 vraagt om een tweede bevestiging. `Ctrl+Z` (Ongedaan in de werkbalk) draait de reword terug; zie
 [Ongedaan maken en opnieuw](undo-redo.md). De statusbalk noemt ook de vorige tip.
 
+Een commit die niet op de uitgecheckte branch staat (hij leeft op een andere branch), kan niet worden herschreven of
+gewijzigd waar je nu bent, dus *Commit-bericht bewerken...* en *Wijzigen...* openen in plaats daarvan **Een commit van een
+andere branch bewerken**, een lijst met keuzes (`Up` / `Down` of `Ctrl+J` / `Ctrl+K` verplaatsen, `Enter` of een klik kiest,
+`Esc`, het kruisje of **Annuleren (A)** sluit het):
+
+- **`<branch>` uitchecken en bewerken (1)**: één rij per lokale branch waarvan de geschiedenis de commit bevat (`1` tot `8`,
+  de eerste acht, de rest wordt geteld). De branch wordt op de gebruikelijke manier uitgecheckt, daarna opent de
+  bewerking erop. Het ongedaan-maken is dat van de twee acties zelf: `Ctrl+Z` draait de bewerking terug, de checkout is
+  een checkout.
+- **Bewerken met geavanceerd herschrijven van de geschiedenis (R)**: opent de
+  [werkbank voor geschiedenis herschrijven](history-rewrite.md) op die commit, in builds die hem hebben.
+- **Hier een branch maken... (B)**: alleen als geen lokale branch de commit bevat (hij staat bijvoorbeeld alleen op een
+  remote branch); opent het naamvak voor een branch op die commit.
+
 ## Een commit wijzigen (bericht, auteur, datums)
 
 *Wijzigen...* in het commit-menu (of `Ctrl+G Shift+E`, of *Commit: Wijzigen...* in het palet) opent één dialoog met de eigenschappen van de commit: samenvatting, beschrijving en de naam, het e-mailadres en de datum van de auteur, elk ingevuld met de waarden van de commit. Pas aan wat je wilt en druk op **Toepassen**; alleen de gewijzigde velden worden verstuurd. Een datum schrijf je als `YYYY-MM-DD HH:MM:SS +HH:MM`; tot je hem aanpast wordt hij in UTC getoond. De committer ben jij, nu (net als bij een reword). Elke commit van de uitgecheckte branch kan worden gewijzigd, met dezelfde regels, dezelfde waarschuwing voor een al gepushte commit en dezelfde tweede bevestiging als *Commit-bericht bewerken...*; de commits erboven worden opnieuw gemaakt met hun eigen auteurs en datums, en je gestagede en niet-gestagede wijzigingen blijven ongemoeid. `Ctrl+Z` (Ongedaan in de werkbalk) draait het terug. In builds met geschiedenis herschrijven sluit **Geschiedenis dieper wijzigen...** (`Alt+H`) linksonder in de dialoog die zonder iets toe te passen en opent de [werkbank voor geschiedenis herschrijven](history-rewrite.md), met als bereik deze commit tot de nieuwste; als je een veld hebt aangepast, vraagt hij eerst (`Esc` bevestigt). `Ctrl+N` toont een badge op elk veld en elke knop van de dialoog; druk erop om de cursor in dat veld te zetten of die knop in te drukken (zie [Badges](keybindings.md#badges)).
@@ -395,7 +409,7 @@ Wat wordt vergeleken hangt van de selectie af:
 | de WIP-rij en een commit of stash | die commit met de werkmap: staged en unstaged wijzigingen van gevolgde bestanden (niet-gevolgde bestanden maken geen deel uit van een diff) |
 | drie of meer commits | hun gecombineerde wijzigingen: van vlak vóór de oudste tot de nieuwste (merges volgen hun eerste ouder) |
 
-Een hernoeming verschijnt als een verwijdering plus een toevoeging. **Omwisselen** (`x`) verwisselt de uiteinden van een vergelijking van twee rijen; met de WIP-rij, die altijd het nieuwere uiteinde is, of een bereik van drie of meer rijen valt er niets om te wisselen. Een vergelijking met de WIP-rij volgt de werkmap terwijl je bestanden opslaat.
+Een hernoemd of verplaatst bestand verschijnt als één bestand, met de oude naam en de gelijkenis bovenaan zijn diff. **Omwisselen** (`x`) verwisselt de uiteinden van een vergelijking van twee rijen; met de WIP-rij, die altijd het nieuwere uiteinde is, of een bereik van drie of meer rijen valt er niets om te wisselen. Een vergelijking met de WIP-rij volgt de werkmap terwijl je bestanden opslaat.
 
 Toetsenbord: `v` (of **Log: Selectie vergelijken** in het opdrachtenpalet) zet de focus in de bestandslijst van de vergelijking; `x` (of **Log: Uiteinden van de vergelijking omwisselen**) wisselt om; `n` (of **Log: Naar de volgende vergeleken rij**) is de toetsenbordtweeling van het klikken op een kaart: de Log-cursor gaat naar de volgende geselecteerde rij, rond aan het einde. `Esc` of een gewone klik op een rij gaat terug naar de enkele commit. De regel **Cherry-pick** telt alleen de commits van de selectie; de WIP-rij en stashes worden daar genegeerd.
 

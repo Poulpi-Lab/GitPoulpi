@@ -109,8 +109,9 @@ Het tabblad van een worktree komt direct na het tabblad van zijn repository, en 
 
 Het tabblad Start is het repositorybeheer. Het heeft vier secties: **GEOPENDE
 REPOSITORIES**, **FAVORIETEN**, **RECENTE REPOSITORIES** en **ALLE REPOSITORIES**. Elke rij
-toont de branch, het aantal commits voor en achter en het aantal wijzigingen. Elke rij heeft
-een ster (favoriet), **Openen** of **Wisselen**, **Sluiten** of **Verwijderen**, en een
+toont de branch, het aantal commits voor en achter en het aantal wijzigingen, daarna het pad van de map als er ruimte is:
+ingekort met `~` en in het midden afgekapt als het smal is, het duwt nooit de naam, de eigenaar of de branch weg.
+Elke rij heeft een ster (favoriet), **Openen** of **Wisselen**, **Sluiten** of **Verwijderen**, en een
 `⋮`-menu.
 
 Bovenaan: **Bladeren**, **Klonen**, **Init**, een zoekvak, **Alles inklappen** en **Alles
@@ -118,7 +119,7 @@ uitklappen**. Een map die niet meer bestaat verdwijnt uit *Recent* en *Alle* uit
 Een ontbrekende favoriet blijft staan, met een knop **Verwijderen**. **Verwijderen** wist
 nooit iets op schijf.
 
-Toetsen: `Enter` openen, `f` favoriet, `x` sluiten of verwijderen, `.` menu, `/` zoeken,
+Toetsen: `Enter` openen, `f` favoriet, `x` sluiten of verwijderen, `y` het pad kopiëren, `o` in de standaardtool openen (**Openen in** in het `⋮`-menu kiest een andere), `.` menu, `/` zoeken,
 `Space` een sectie in- of uitklappen, `Esc` terug naar je tabblad.
 `Ctrl+N` toont een badge op het zoekveld, elke sectie en elke knop: druk op het teken van een badge om het te focussen of in te drukken (zie [Badges](keybindings.md#badges)).
 
@@ -208,7 +209,10 @@ De twee zijpanelen (de zijbalk Refs, `Ctrl+N h`, en het rechterpaneel, `Ctrl+N l
 
 Eén rij per commit, de nieuwste eerst. Klik met rechts op de kop om kolommen te tonen of te
 verbergen. Sleep de rand tussen twee koppen om een kolom van grootte te veranderen. Sleep een
-kop om de kolom te verplaatsen.
+kop om de kolom te verplaatsen. De breedtes horen bij de repository: ze worden ermee opgeslagen en komen terug als je hem
+opnieuw opent, en een repository die voor het eerst wordt geopend, krijgt elke kolom aangepast aan wat de Log toont
+(`Alle kolommen aan inhoud aanpassen` doet dat opnieuw, `Kolombreedtes herstellen` gaat terug naar automatische breedtes,
+die blijven staan).
 
 Het paneel heeft geen titel: de kolomkoppen zeggen wat het is. Tags worden getekend waar ze staan, nooit als spook. Bij een commit zonder ref toont de aangewezen rij een vervaagde pil met de naam van de branch waartoe die behoort; was die branch verwijderd, dan toont een doorgestreepte pil de naam uit de merge-commit die hem samenvoegde (uit te zetten met **Spookbranch tonen bij de aangewezen commit** onder Instellingen > Log & grafiek).
 

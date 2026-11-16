@@ -1342,7 +1342,7 @@ hint_back = "terug naar tabblad"
 hint_quit = "afsluiten"
 not_a_repo_any_more = "{path} is geen git-repository meer - verwijder het uit de lijst met {key}"
 gone_from_disk_msg = "{path} is van schijf verdwenen - verwijder het uit de lijst met {key}"
-open_in_gone = "{path} is gone from disk, there is nothing to open"
+open_in_gone = "{path} is van schijf verdwenen, er valt niets te openen"
 actions_need_tab = "acties met {key} vereisen een geopend repositorytabblad"
 home_tab_fixed = "het tabblad Start heeft geen tabbladmenu en kan niet worden gesloten"
 
@@ -2434,8 +2434,8 @@ status_stage_toggle = "Geselecteerde rij stagen of unstagen"
 status_open_diff = "{$Diff} van geselecteerd bestand openen"
 home_favorite = "Repository als favoriet (de)markeren"
 home_close_repo = "Rij sluiten, verwijderen of favoriet wissen"
-home_copy_path = "Copy the Repository Path"
-home_open_in = "Open the Repository in the Default Tool"
+home_copy_path = "Het pad van de repository kopiëren"
+home_open_in = "De repository in de standaardtool openen"
 home_browse = "Naar een repository bladeren"
 home_clone = "Een repository klonen"
 home_init = "Een repository initialiseren"
@@ -3324,8 +3324,8 @@ repositories_collapse_all_sections = "Repositories: Alle secties inklappen"
 repositories_expand_all_sections = "Repositories: Alle secties uitklappen"
 repositories_close_all_tabs = "Repositories: Alle tabbladen sluiten..."
 repositories_remove_selected_from_list = "Repositories: Geselecteerde uit lijst verwijderen"
-repositories_copy_selected_path = "Repositories: Copy Selected Path"
-repositories_open_selected_in = "Repositories: Open Selected in Default Tool"
+repositories_copy_selected_path = "Repositories: Pad van selectie kopiëren"
+repositories_open_selected_in = "Repositories: Selectie in standaardtool openen"
 repositories_remove_all_recent = "Repositories: Alle recente verwijderen"
 tab_new_tab = "Tabblad: Nieuw tabblad"
 tab_new_menu = "Tabblad: Nieuw..."
@@ -3396,7 +3396,7 @@ ai_explain_working_changes = "AI: Lokale wijzigingen uitleggen"
 ai_insert_prompt_variable = "AI: Promptvariabele invoegen"
 ai_compose_commits_from_working_changes = "AI: Commits samenstellen uit lokale wijzigingen..."
 # context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
-stage_guard_show_in_file = "Sensitive Files: Show in File"
+stage_guard_show_in_file = "Gevoelige bestanden: In bestand tonen"
 composer_move_file_to_commit = "Composer: Bestand naar commit verplaatsen..."
 diff_blame = { git = "Diff: Blame", local = "Verschil: Blame" }
 diff_history = { git = "Diff: Bestandsgeschiedenis", local = "Verschil: Bestandsgeschiedenis" }
@@ -3451,7 +3451,7 @@ why_no_text_selected_drag_over_the_text_first = "geen tekst geselecteerd - sleep
 why_the_diff_view_isn_t_open = { git = "de diff-weergave is niet open", local = "de verschilweergave is niet open" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "open eerst een bestand - in de Diff-weergave, het Statuspaneel of een commit", local = "open eerst een bestand - in de Verschilweergave, het Statuspaneel of een commit" }
 # context: why that palette command is unavailable
-why_no_sensitive_files_question = "no sensitive files question is open"
+why_no_sensitive_files_question = "er is geen vraag over gevoelige bestanden open"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "selecteer eerst een branch of tag in het Refs-paneel", local = "selecteer eerst een branch of label in het Refs-paneel" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "een remote branch uitchecken wordt nog niet ondersteund - maak eerst een lokale trackingbranch"
 why_select_a_local_branch_in_the_refs_pane_first = "selecteer eerst een lokale branch in het Refs-paneel"
@@ -4074,7 +4074,7 @@ repositories_and_tabs_open_in = "de lijst \"Openen in\" voor de map van dit tabb
 repositories_and_tabs_7 = "de geselecteerde repository openen (of ernaartoe wisselen)"
 repositories_and_tabs_8 = "ster geven/weghalen"
 repositories_and_tabs_9 = "tabblad sluiten (Open), verwijderen (Recent), ster weghalen (Favorieten)"
-repositories_and_tabs_copy_open = "copy the path / open in the default tool"
+repositories_and_tabs_copy_open = "het pad kopiëren / in de standaardtool openen"
 repositories_and_tabs_10 = "het menu van de rij"
 repositories_and_tabs_11 = "elke sectie doorzoeken"
 repositories_and_tabs_12 = "wissen / terug naar het tabblad"
@@ -5620,9 +5620,9 @@ too_large = "het bestand is te groot om te tonen ({bytes} bytes)"
 unexpected = "onverwacht antwoord"
 loading_whole = "het hele bestand laden... (de knop Hunks toont alleen de wijzigingen)"
 whole_unavailable = "(heel bestand niet beschikbaar: {why} - alleen de hunks getoond)"
-renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header = "{from} -> {to} ({percent}% gelijk)"
 renamed_header_plain = "{from} -> {to}"
-rename_no_change = "No content change (the file was only renamed or moved)"
+rename_no_change = "Geen inhoudelijke wijziging (het bestand is alleen hernoemd of verplaatst)"
 
 [git_actions]
 no_such_local_branch = "die lokale branch bestaat niet meer - vernieuw"
@@ -9333,7 +9333,7 @@ answer_cancel = "Annuleren, niets stagen"
 # context: key hint at the bottom of the dialog
 hint = "Omhoog/Omlaag: kiezen, Enter of 1/2: antwoorden, Esc: annuleren"
 # context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
-show_in_file = "Show in file"
+show_in_file = "In bestand tonen"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "gevoelige bestanden zijn niet gestaged: {files}; vraag het de gebruiker en stage dan opnieuw met gevoelige bestanden toegestaan"
 
@@ -10158,22 +10158,22 @@ flavor_plain_text = "Platte tekst"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
-title = "Edit a {$commit} of another branch"
+title = "Een {$commit} van een andere branch bewerken"
 # context: body of that dialog when local branches hold the commit; {short} is the short commit id
-body_branches = "{short} is not on the current branch. Check out a branch that holds it to edit it here."
+body_branches = "{short} staat niet op de huidige branch. Check een branch uit die hem bevat om hem hier te bewerken."
 # context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
-body_none = "{short} is on no local branch. Create a branch at it to edit it here."
+body_none = "{short} staat op geen enkele lokale branch. Maak er een branch op aan om hem hier te bewerken."
 # context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
-checkout = "Check out {branch} and edit"
+checkout = "{branch} uitchecken en bewerken"
 # context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
-rewrite = "Edit with advanced history rewrite"
+rewrite = "Bewerken met geavanceerd herschrijven van de geschiedenis"
 # context: button that opens the name box to create a branch at that commit
-create = "Create a branch here..."
+create = "Hier een branch maken..."
 # context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
 key_rewrite = "r"
 # context: key of the Create a branch here button, one letter
 key_create = "b"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "a"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
-gave_up = "{short} was not edited: the branch was not checked out"
+gave_up = "{short} is niet bewerkt: de branch is niet uitgecheckt"

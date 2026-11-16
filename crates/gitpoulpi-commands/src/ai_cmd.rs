@@ -759,9 +759,9 @@ async fn hosting_reply(
         )
     });
     let mut exchange = if args.continue_exchange {
-        let store = store
-            .as_ref()
-            .ok_or_else(|| "--continue: could not determine this OS's data directory".to_string())?;
+        let store = store.as_ref().ok_or_else(|| {
+            "--continue: could not determine this OS's data directory".to_string()
+        })?;
         let earlier = store.load();
         if earlier.is_empty() {
             return Err("--continue: no earlier draft for this target to continue".into());

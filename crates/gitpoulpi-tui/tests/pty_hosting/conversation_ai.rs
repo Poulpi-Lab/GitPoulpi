@@ -481,6 +481,94 @@ fn with_the_box_ticked_an_api_profile_gets_a_context_that_is_reused_until_refres
     term.stop().unwrap();
 }
 
+/// A model that keeps no session (an API profile here) is given the sitting
+/// back by GitPoulpi: the second request carries the first instruction and
+/// draft as earlier chat turns, "What is sent" shows them, and "Refresh
+/// context" starts the sitting over.
+#[cfg(unix)]
+#[test]
+fn a_follow_up_gives_the_earlier_turns_back_and_refresh_context_drops_them() {
+    let mock = start_mock();
+    let repo = fixture(mock.port);
+    let ai = format!(
+        "\n[ai]\nenabled = true\n\n[[ai.profiles]]\nid = \"api\"\nname = \"API\"\n\
+         kind = \"open_ai_compatible\"\nbase_url = \"http://127.0.0.1:{}/v1\"\nmodel = \"m\"\n",
+        mock.port
+    );
+    let (mut term, _config) = launch_issues(
+        &repo,
+        "pty-composer-ai-history",
+        &config_toml(mock.port, &ai),
+        COLS,
+        "Add the feature",
+    );
+    open_form(&mut term);
+    term.send_keys("M-e").expect("Alt+E");
+    term.wait_for("the AI field", STEP, |s| {
+        s.contains("What I want in this answer")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_text("ask for a stack trace").unwrap();
+    click_text(&mut term, "Let the AI read the repository");
+    term.wait_for("the box ticked", STEP, |s| {
+        s.contains("[x] Let the AI read the repository")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    let asked = |mock: &Mock| -> Vec<serde_json::Value> {
+        mock.requests()
+            .into_iter()
+            .filter(|r| r.target == "/v1/chat/completions")
+            .map(|r| serde_json::from_str(&r.body).unwrap())
+            .collect()
+    };
+
+    // First draft: one system and one user message.
+    draft_reading(&mut term, &["Repository context"]);
+    term.wait_for("the first draft", STEP, |s| s.contains("Draft ready."))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    assert_eq!(asked(&mock)[0]["messages"].as_array().unwrap().len(), 2);
+
+    // The follow-up: "What is sent" shows the draft that came back, and the
+    // request is system, first user message, that draft, the new instruction.
+    draft_reading(
+        &mut term,
+        &["Your draft so far:", "Please attach the stack trace"],
+    );
+    term.wait_for("the follow-up", STEP, |s| s.contains("Draft ready."))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    let bodies = asked(&mock);
+    let messages = bodies[1]["messages"].as_array().unwrap();
+    let roles: Vec<&str> = messages
+        .iter()
+        .map(|m| m["role"].as_str().unwrap())
+        .collect();
+    assert_eq!(
+        roles,
+        ["system", "user", "assistant", "user"],
+        "{messages:?}"
+    );
+    assert_eq!(messages[2]["content"], DRAFT_LINE);
+    assert_eq!(
+        messages[..2],
+        bodies[0]["messages"].as_array().unwrap()[..],
+        "the first two messages are the first request's: a provider caches that prefix"
+    );
+
+    // Refresh context: the next request is a first one again.
+    click_text(&mut term, "Refresh context");
+    term.wait_for("refreshed", STEP, |s| s.contains("Context refreshed."))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    draft_reading(&mut term, &["Repository context"]);
+    term.wait_for("a first request again", STEP, |s| {
+        s.contains("Draft ready.") && s.contains("Context built:")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    assert_eq!(asked(&mock)[2]["messages"].as_array().unwrap().len(), 2);
+
+    no_write(&mock);
+    term.stop().unwrap();
+}
+
 /// An agent GitPoulpi has no confirmed read-only mode for cannot be let into
 /// the repository: the box is disabled, and activating it says why.
 #[cfg(unix)]

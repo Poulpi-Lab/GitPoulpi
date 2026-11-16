@@ -131,7 +131,10 @@ mod tests {
         // One byte under: the oldest middle turn goes.
         let (kept, left_out) = trim(turns.clone(), all - 1);
         assert_eq!(left_out, 1);
-        assert_eq!(kept, vec![turns[0].clone(), turns[2].clone(), turns[3].clone()]);
+        assert_eq!(
+            kept,
+            vec![turns[0].clone(), turns[2].clone(), turns[3].clone()]
+        );
         // Nothing fits: the conversation and the newest draft stay.
         let (kept, left_out) = trim(turns.clone(), 0);
         assert_eq!(left_out, 2);

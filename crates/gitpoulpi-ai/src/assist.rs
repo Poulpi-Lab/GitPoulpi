@@ -374,7 +374,8 @@ impl Job {
             &self.privacy,
             self.scrub_env,
         )?;
-        self.run_context_with(&*client, context, history, user).await
+        self.run_context_with(&*client, context, history, user)
+            .await
     }
 
     /// [`Job::run`] over a caller-supplied client (tests).

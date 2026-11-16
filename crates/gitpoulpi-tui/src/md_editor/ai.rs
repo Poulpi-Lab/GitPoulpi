@@ -450,6 +450,12 @@ impl AiHelp {
         self.repo = ticked;
     }
 
+    /// The instruction field's text, as if typed (tests).
+    #[cfg(all(test, feature = "ai"))]
+    pub(crate) fn set_hint_for_test(&mut self, hint: &str) {
+        self.hint = hint.to_string();
+    }
+
     #[cfg(test)]
     pub(crate) fn set_context_line(&mut self, line: &str) {
         self.context_line = Some(line.to_string());

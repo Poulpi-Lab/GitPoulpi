@@ -617,3 +617,83 @@ fn the_palette_rows_open_the_panel_and_refresh_the_context_only_with_the_box_tic
     assert!(said.contains("Context refreshed"), "{said}");
     assert!(ed.ai_mut().unwrap().context_line().is_none());
 }
+
+/// A reply source (a comment), as the conversation view and the issue form
+/// hand the helper.
+#[cfg(feature = "ai")]
+struct Reply;
+
+#[cfg(feature = "ai")]
+impl AiContextSource for Reply {
+    fn task(&self, hint: &str, draft: Option<&str>) -> Result<AiTask, String> {
+        use gitpoulpi_ai::hosting_reply::{ReplyRequest, ReplyTarget};
+        let mut request = ReplyRequest::new(ReplyTarget::Comment);
+        request.hint = hint.to_string();
+        request.draft = draft.map(str::to_string);
+        Ok(AiTask::Reply(Box::new(request)))
+    }
+}
+
+/// Starts a run as the Draft button would and waits for its answer to land.
+#[cfg(feature = "ai")]
+fn ask_again(ed: &mut MdEditor, hint: &str) {
+    let text = ed.text().to_string();
+    let help = ed.ai_mut().unwrap();
+    help.set_hint_for_test(hint);
+    help.start(&text);
+    wait_for(ed, "the answer", |e| !e.ai_running());
+}
+
+#[cfg(feature = "ai")]
+#[test]
+fn the_requests_of_a_sitting_are_kept_for_the_next_one_until_refresh_context() {
+    let seen: Seen = Arc::default();
+    let log = seen.clone();
+    // Popped from the end: the answers in the order they are asked.
+    let answers = Arc::new(Mutex::new(vec![
+        Err("model down".to_string()),
+        Ok("Draft two.".to_string()),
+        Ok("Draft one.".to_string()),
+    ]));
+    let fake: Fake = Arc::new(move |task| {
+        log.lock().unwrap().push(task.clone());
+        answers
+            .lock()
+            .unwrap()
+            .pop()
+            .unwrap_or_else(|| Ok("More.".into()))
+    });
+    let mut help = AiHelp::new_in(AiScope::default(), Box::new(Reply), None);
+    help.fake = Some(fake);
+    let mut ed = MdEditor::new("my text".to_string(), md_render::Context::default());
+    ed.bind_ai_with(help);
+    paint(&mut ed, 90, 20);
+    ed.on_key(alt('e'));
+
+    let exchange_of = |seen: &Seen, n: usize| match &seen.lock().unwrap()[n] {
+        AiTask::Reply(r) => r.exchange.clone(),
+        other => panic!("{other:?}"),
+    };
+    ask_again(&mut ed, "be polite");
+    assert!(exchange_of(&seen, 0).is_empty(), "a first request has none");
+    ask_again(&mut ed, "shorter");
+    let second = exchange_of(&seen, 1);
+    assert_eq!(second.len(), 1);
+    assert_eq!(second[0].hint, "be polite");
+    assert_eq!(second[0].draft.as_deref(), Some("my text"));
+    assert_eq!(second[0].answer, "Draft one.");
+    // A request that failed is not part of the sitting.
+    ask_again(&mut ed, "this one fails");
+    ask_again(&mut ed, "add a thanks");
+    let fourth = exchange_of(&seen, 3);
+    assert_eq!(
+        fourth.iter().map(|e| e.hint.as_str()).collect::<Vec<_>>(),
+        ["be polite", "shorter"],
+        "the failed request is not there"
+    );
+    // Refresh context: the sitting starts over.
+    ed.ai_mut().unwrap().refresh_context();
+    assert_eq!(ed.ai_mut().unwrap().exchange_len(), 0);
+    ask_again(&mut ed, "again");
+    assert!(exchange_of(&seen, 4).is_empty());
+}

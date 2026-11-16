@@ -169,9 +169,8 @@ impl AiClient for AnthropicClient {
             });
         }
         let mark = json!({"type": "ephemeral"});
-        let mut system = vec![
-            json!({"type": "text", "text": request.system, "cache_control": mark}),
-        ];
+        let mut system =
+            vec![json!({"type": "text", "text": request.system, "cache_control": mark})];
         if let Some(context) = context {
             system.push(json!({"type": "text", "text": context.text, "cache_control": mark}));
         }

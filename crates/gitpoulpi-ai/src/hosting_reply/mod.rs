@@ -462,6 +462,8 @@ pub async fn prepare(job: &Job, request: &ReplyRequest) -> Result<Built> {
 }
 
 #[cfg(test)]
+mod exchange_tests;
+#[cfg(test)]
 mod repo_tests;
 #[cfg(test)]
 mod tests;

@@ -506,6 +506,9 @@ caixa de comentário.
   antes (veja [Conversão de marcação](#conversão-de-marcação)). Um bloco de código `mermaid` ganha um botão **Abrir
   diagrama** que mostra o código-fonte do diagrama em um visualizador com rolagem (`Enter` o copia); a paleta tem
   *Conversa: abrir o diagrama da entrada*. Isso exige um build com `conversation` e `mermaid`.
+- Na Visão geral da revisão, o `path:line` de uma thread de código é um link para o código (`G`, *Conversa: abrir o código da
+  thread*; veja [Revisão](review.md)); em uma conversa aberta sozinha (uma issue, uma linha do Radar) não há página de código
+  para onde ir.
 - A visão lê de novo a cada 60 segundos e com `F5` (**Atualizar**).
 
 **Teclas.** Cada uma tem um botão, uma linha de menu ou uma linha da paleta (*Conversa: ...*), e `Ctrl+N` marca os botões com selos.

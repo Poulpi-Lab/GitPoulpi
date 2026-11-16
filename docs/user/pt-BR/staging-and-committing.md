@@ -21,7 +21,7 @@ direita mostra as alterações em andamento:
 - **Arquivos renomeados ou movidos** são uma única linha, `novo <- antigo`, nas duas listas (um arquivo excluído
   no disco e um novo com pelo menos 50% do mesmo conteúdo contam como um movimento mesmo antes de você fazer
   stage). Stage, Unstage e Descartar agem nos dois nomes: fazer stage grava a exclusão e o arquivo novo, então o
-  git vê um único renome. Abrir a linha mostra o diff de conteúdo contra o nome antigo, encabeçado por
+  git vê um único renome, e é UM passo de desfazer (`Undo Stage rename antigo -> novo`). Abrir a linha mostra o diff de conteúdo contra o nome antigo, encabeçado por
   `antigo -> novo (N% de similaridade)`; um movimento sem edições diz **Nenhuma mudança de conteúdo**. O mesmo vale
   para os arquivos de um commit, e `gitpoulpi status` / `gitpoulpi diff` informam `renamed_from`.
 - **Caminho** ou **Árvore** (`m`) lista os arquivos de forma plana ou em pastas.
@@ -178,7 +178,8 @@ no outro.
 - **Ignorar hooks** (`Shift+H`, ou **Commit: alternar Ignorar hooks** na paleta) faz o
   commit sem executar os hooks `pre-commit` e `commit-msg` do repositório. Vale por
   commit; **Configurações > Configurações do repositório > Commit** faz a opção
-  começar marcada. Aparece quando a linha tem espaço.
+  começar marcada. Em uma linha estreita o rótulo encolhe para **Sem hooks**, depois para só a
+  caixa (a dica a nomeia); ela nunca some.
 - `c` no painel Status move o cursor para o formulário. `Esc` sai dele.
 - `Ctrl+G c` e `Ctrl+G Enter` (**Git: Commit...** e **Git: Fazer commit das
   alterações em stage agora** na paleta) são um só comando, o botão de commit de
@@ -206,7 +207,11 @@ editá-lo; nada é commitado até você pressionar o botão de commit.
 
 **Compor commits com IA** fica na ponta direita da linha de Amend e encolhe junto com o painel direito em vez de
 sumir: o rótulo completo, depois **Compor com IA**, depois só o **`✦`**. Ele mantém o clique, a dica e a tecla
-(`Ctrl+G Shift+C`) em qualquer largura; os rótulos de Amend e Ignorar hooks cedem lugar a ele, nunca o contrário.
+(`Ctrl+G Shift+C`) em qualquer largura; o rótulo Ignorar hooks cede lugar a ele (**Sem hooks**, depois só a caixa) antes que ele mesmo encolha.
+
+Os botões **`✦`** (gerar a mensagem) e **`#`** (inserir uma referência de issue) na ponta direita da linha do resumo
+encolhem do mesmo modo: em um painel estreito perdem as margens, depois se juntam em um só botão **`⋯`** cujo menu lista
+os dois, então nenhum deles some.
 
 ## O compositor de commits: divida suas alterações em commits
 

@@ -104,7 +104,8 @@ numera.
 | Comando | O que faz |
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Faz stage de um arquivo, pasta, tudo, um hunk ou algumas linhas. Um stage de arquivo, pasta ou `--all` que adicionaria um arquivo sensível (uma chave privada, um `.env`, um token reconhecido: `[privacy]` na [referência de configuração](config-reference.md#privacy-arquivos-sensíveis)) é recusado com código de saída 2 e `{error: "sensitive_files", files: [{path, reason}]}` (uma regra e uma prévia mascarada, nunca um valor); nada recebe stage. `--allow-sensitive` faz o stage mesmo assim. |
-| `unstage` (mesmas opções) | O inverso. |
+| `stage --paths A B ...` | Faz stage de vários arquivos ou pastas como UMA operação: uma entrada no diário, um passo de `undo` (um arquivo renomeado são o caminho antigo e o novo, como `status` mostra em `renamed_from`). Não pode ser combinado com `--folder`, `--hunk`, `--lines` ou `--all`. |
+| `unstage` (mesmas opções, `--paths` incluído) | O inverso. |
 | `discard --file F [--hunk N [--lines a,b]]` | Descarta alterações unstaged (um arquivo inteiro: toda alteração, arquivo untracked excluído, e as pastas que isso deixa vazias). Pode ser desfeito. |
 | `rm-file <paths>...` | Exclui arquivos da árvore de trabalho. Pode ser desfeito. |
 | `ignore <pattern> [--file <.gitignore>]` | Acrescenta um padrão a um `.gitignore` (ou a `.git/info/exclude` com `--file .git/info/exclude`). Pode ser desfeito, exceto em `.git/info/exclude`. |

@@ -73,6 +73,14 @@ Configurações abrem sobre a janela. Cada um tem um `✕` no canto superior dir
 borda; `Esc` ou um clique no `✕` o fecha, e um clique fora fecha um diálogo, um popup ou
 um painel (veja [Fechando janelas e diálogos](mouse-and-gestures.md#fechando-janelas-e-diálogos)).
 
+### Quando a janela é pequena
+
+Nada some em silêncio quando a janela estreita. Um botão primeiro perde o rótulo longo (cortado com `...`), depois
+passa para uma segunda linha ou vai para o menu `⋯` da sua linha, e a sua tecla e a sua entrada na paleta continuam
+funcionando o tempo todo. Um diálogo grande demais para a janela desenha uma moldura pequena com o título, o `✕` e a
+linha **Janela pequena demais: aumente-a** em vez de nada; `Esc` e `✕` o fecham, e ele volta inteiro quando você
+aumenta a janela.
+
 ## Linha de abas
 
 A aba **Início** (o ícone de casa) fica na extremidade esquerda, seguida da

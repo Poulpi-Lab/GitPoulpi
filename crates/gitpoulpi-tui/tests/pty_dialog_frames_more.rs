@@ -138,6 +138,77 @@ fn the_palette_moves_resizes_and_keeps_its_place_when_reopened() {
     term.stop().unwrap();
 }
 
+/// The first column of the top border's corner on `row`, left of `from`.
+fn left_corner(s: &Screen, row: u16, from: u16) -> Option<u16> {
+    (0..from).rev().find(|&c| {
+        s.cell(c, row)
+            .is_some_and(|x| matches!(x.text.as_str(), "\u{256d}" | "\u{250c}" | "\u{2554}"))
+    })
+}
+
+/// Both side borders resize a dialog sideways, the right one as well as the
+/// left (the palette's right border once left that gesture to its scrollbar
+/// even where there was none).
+#[test]
+fn the_palette_resizes_by_its_right_and_left_borders() {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit_file("a.txt", "a\n", "frames-commit")
+        .unwrap()
+        .build();
+    let (mut term, _config) = launch_in(&repo, "pty-frames-palette-edges", "frames-commit");
+    term.send_keys("C-p").unwrap();
+    wait(&mut term, "the palette", |s| {
+        title_at(s, "Command Palette").is_some() && grip(s).is_some()
+    });
+    // A short result list: no scrollbar on the right border.
+    term.send_text("dialog: move").unwrap();
+    let s = wait(&mut term, "the filtered palette", |s| {
+        s.contains("Dialog: Move or Resize") && grip(s).is_some()
+    });
+    let (tc, tr) = title_at(&s, "Command Palette").unwrap();
+    let (gx, gy) = grip(&s).unwrap();
+    let left = left_corner(&s, tr, tc).expect("left corner");
+    let row = gy - 1;
+    // The right edge outward, then inward.
+    act_until(
+        &mut term,
+        "the right border dragged outward",
+        |t| {
+            if grip(&t.screen()) == Some((gx, gy)) {
+                t.drag((gx, row), (gx + 6, row))?;
+            }
+            Ok(())
+        },
+        |s| grip(s) == Some((gx + 6, gy)) && left_corner(s, tr, tc) == Some(left),
+    );
+    act_until(
+        &mut term,
+        "the right border dragged inward",
+        |t| {
+            if grip(&t.screen()) == Some((gx + 6, gy)) {
+                t.drag((gx + 6, row), (gx + 2, row))?;
+            }
+            Ok(())
+        },
+        |s| grip(s) == Some((gx + 2, gy)) && left_corner(s, tr, tc) == Some(left),
+    );
+    // The left edge outward: the right edge stays.
+    act_until(
+        &mut term,
+        "the left border dragged outward",
+        |t| {
+            if left_corner(&t.screen(), tr, tc) == Some(left) {
+                t.drag((left, row), (left - 4, row))?;
+            }
+            Ok(())
+        },
+        |s| grip(s) == Some((gx + 2, gy)) && left_corner(s, tr, tc) == Some(left - 4),
+    );
+    term.send_keys("Escape").unwrap();
+    term.stop().unwrap();
+}
+
 /// The palette row "Dialog: Move or Resize" arranges the palette in front and
 /// leaves it open; "Dialog: Reset Position and Size" puts it back.
 #[test]

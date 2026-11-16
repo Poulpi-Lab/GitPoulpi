@@ -448,7 +448,7 @@ et `gitpoulpi hosting board move <carte> <colonne>` en déplace une (voir [la r�
 Une carte montre le numéro, le titre, les assignés en initiales, les étiquettes et le jalon. Glissez-la sur une autre colonne,
 ou `Shift+Left` / `Shift+Right`, ou **Tableau : Déplacer la carte vers...** (`m`). Elle bouge aussitôt ; après 150 ms environ, un indicateur d'attente
 dit que l'hébergeur travaille encore, et si l'hébergeur refuse, la carte revient et la ligne d'état dit pourquoi. `Enter` ouvre
-le ticket chez l'hébergeur (la note, pour les tickets locaux) ; `e` modifie assignés, étiquettes et jalon ; `n` commence un nouveau ticket dans
+la [conversation](#5c-conversations) du ticket dans GitPoulpi, et le tableau revient quand vous la fermez ; `e` modifie assignés, étiquettes et jalon ; `n` commence un nouveau ticket dans
 la colonne sélectionnée ; `a`, `l`, `M` et `/` filtrent par assigné, étiquette, jalon et texte, `x` efface les filtres ; `r`
 relit l'hébergeur. Le tableau se relit quand les listes de la barre latérale s'actualisent. Le Radar n'a pas de tableau.
 
@@ -461,7 +461,7 @@ Une **conversation** est tout ce qui se dit sur un ticket, un work item, une car
 | Depuis | Comment |
 |---|---|
 | Une ligne de TICKETS | `Enter` ou un double-clic ; **Ouvrir la conversation** du menu de la ligne ; la palette *Hébergeur : Ouvrir la conversation d'un ticket...* (une liste des tickets à l'écran). **Ouvrir dans le navigateur** du menu de la ligne garde le navigateur. |
-| Une ligne de PULL REQUESTS sur Azure DevOps ou Bitbucket | `Enter` ou **Ouvrir la conversation**. Sur GitHub, GitLab, Gitea, Forgejo et Gerrit, la ligne ouvre la [revue](review.md), dont la page Vue d'ensemble est la conversation de la demande. |
+| Une ligne de PULL REQUESTS sur Azure DevOps ou Bitbucket | `Enter` ou **Ouvrir la conversation**. Sur GitHub, GitLab, Gitea, Forgejo et Gerrit, la ligne ouvre la [revue](review.md), dont la page Aperçu est cette même conversation (la chronologie, les touches et la zone de commentaire en dessous). |
 | Une carte du [tableau des tickets](#5b-le-tableau-des-tickets) | `Enter` ou un double-clic. |
 | Le [Radar](radar.md) | `i` sur une ligne de ticket ou de demande, **Ouvrir la conversation** du menu de la ligne, ou *Radar : Ouvrir la conversation du ticket*. |
 | Une référence dans une autre conversation | Cliquez dessus (ou `l`, puis choisissez-la) : `#7`, `!12`, `ABC-12` d'une source liée s'ouvrent dans l'application et s'empilent sur une pile Retour. |

@@ -422,11 +422,34 @@ Un agent dont GitPoulpi n'a pas confirmé de mode lecture seule (et tout agent e
 
 - Le contexte construit d'un profil API est gardé par dépôt pendant `ai.hosting_reply.context_ttl_minutes` (*Durée de conservation d'un contexte du dépôt*, 30 par défaut). Il est identifié par le dépôt, son `HEAD`, la sélection et les limites, et ses parties sont gardées une à une : le ticket suivant du même dépôt ne reconstruit donc que les parties qu'il ne partage pas. Dans la fenêtre, les caches vivent en mémoire (les 8 derniers contextes) ; le CLI les garde dans des fichiers de son dossier d'état privé, si bien qu'un second `ai hosting-reply --read-repo` réutilise ce que le premier a construit.
 - Un nouveau commit sur la branche extraite (`HEAD` bouge), un changement des limites ou l'expiration du délai repartent de zéro. Il en va de même de **Actualiser le contexte**, le bouton du volet quand le dépôt est lu, ou de `--refresh-context` en CLI. Une ligne sous la zone dit ce que le dernier brouillon a fait : *Contexte construit : 5 parties, 31.2 KB, HEAD a1b2c3d*, *Contexte réutilisé (4 parties sur 5, HEAD a1b2c3d)*, *Cache du fournisseur : 12k jetons réutilisés*, *L'agent a lu le dépôt (HEAD a1b2c3d)*, *Session de l'agent démarrée* ou *Session de l'agent poursuivie*.
-- **Cache de prompt d'Anthropic.** Pour un profil Anthropic, la requête est envoyée avec le prompt de base et les instructions en un bloc mis en cache et le contexte du dépôt en un second, puis votre conversation, votre consigne et votre brouillon ; une deuxième réponse sur le même contexte est donc lue dans le cache du fournisseur et coûte une fraction. Les compteurs de cache de la réponse sont ce qu'affiche *Cache du fournisseur : N jetons réutilisés*. Les serveurs compatibles OpenAI reçoivent le même ordre stable de la requête, dont profite leur cache de préfixe automatique ; GitPoulpi n'envoie rien de plus.
+- **Cache de prompt d'Anthropic.** Pour un profil Anthropic, la requête est envoyée avec le prompt de base et les instructions en un bloc mis en cache et le contexte du dépôt en un second, puis votre conversation, votre consigne et votre brouillon ; une deuxième réponse sur le même contexte est donc lue dans le cache du fournisseur et coûte une fraction (les relances mettent aussi en cache le message de conversation et le brouillon le plus récent, voir plus bas). Les compteurs de cache de la réponse sont ce qu'affiche *Cache du fournisseur : N jetons réutilisés*. Les serveurs compatibles OpenAI reçoivent le même ordre stable de la requête, dont profite leur cache de préfixe automatique ; GitPoulpi n'envoie rien de plus.
 - **L'agent garde sa session.** Avec **Garder la session de l'agent entre deux réponses** (`ai.hosting_reply.reuse_agent_session`, activé par défaut) et *Laisser l'IA lire le dépôt* coché, un agent local qui le permet (Claude Code aujourd'hui) est lancé avec un identifiant de session, puis repris par lui : ce qu'il a lu du dépôt reste dans son propre historique et la réponse suivante démarre plus vite. Les autres agents s'exécutent en un seul coup. La session est propre à un dépôt, à un `HEAD` et à une action ; un nouveau commit ou **Actualiser le contexte** en commence une nouvelle ; option désactivée ou case décochée, chaque réponse est une exécution unique qui ne garde rien. La session vit dans le stockage propre à l'agent, GitPoulpi n'en garde que l'identifiant (en mémoire dans la fenêtre, dans un fichier réservé à l'utilisateur pour le CLI).
+
+**Relances : plus court, autre consigne.** Redemander dans le même éditeur (« raccourcis-le », « ajoute un merci ») reste un seul échange.
+Une session Claude Code reprise s'en souvient toute seule. Pour tout le reste (un profil API, Codex et tous les autres agents),
+GitPoulpi le redonne : la requête porte le message de conversation de la première requête, puis chaque consigne précédente et le
+brouillon qui y a répondu comme de vrais tours de chat (une transcription dans le prompt pour un agent, qui lit un seul document),
+et enfin seulement ce qui est nouveau : votre consigne et, quand *Améliorer mon brouillon* est coché, le texte maintenant dans la
+zone avec vos propres retouches. Une relance ne part donc jamais de rien, et rien n'est relu dans le dépôt. « Ce qui est envoyé »
+montre tout. L'échange est tenu à `ai.limits.hosting_reply_context_bytes` comme la conversation : les relances les plus anciennes
+sont écartées d'abord, le message de conversation et votre brouillon le plus récent restent toujours (le `context.history_omitted`
+de la réponse du CLI les compte). Dans un échange, le contexte du dépôt reste celui de sa première requête : il est donc réutilisé
+et le cache du fournisseur tient. Pour un profil Anthropic, le prompt de base, le contexte du dépôt, le message de conversation et le
+brouillon le plus récent forment la partie en cache, et un serveur compatible OpenAI reçoit le même ordre de messages pour son cache de
+préfixe. Codex pourrait être repris avec `codex exec resume <id>`, mais il choisit lui-même l'identifiant de session et ne l'imprime
+que parmi ses événements JSON (et `--last` reprendrait vos propres sessions) : GitPoulpi le garde donc en exécution unique et
+redonne l'historique. L'échange vit avec l'éditeur : il se termine quand l'éditeur se ferme ou que le texte est envoyé, et
+**Actualiser le contexte** l'abandonne aussi (la requête suivante est une première). Seule une requête qui a abouti le rejoint ; une
+requête échouée ou arrêtée non. Une description de pull request est écrite à partir du diff et n'a pas d'échange.
+
+En CLI, chaque appel est séparé : `--continue` reprend donc l'échange. Il poursuit le dernier `ai hosting-reply` pour la même cible
+dans ce dépôt (même `--item`, `--reply-to`, `--path`/`--line` ou `--issue-title`), depuis un petit fichier du dossier d'état privé.
+Sans `--continue`, un nouvel échange commence et remplace celui qui était gardé. `--continue` sans rien de gardé pour la cible est
+une erreur. Le `context` de la réponse porte `history_turns` (et `history_omitted`) quand des tours précédents sont partis avec.
 
 ```
 gitpoulpi ai hosting-reply --conversation conversation.json --hint "say I will look tomorrow"
+gitpoulpi ai hosting-reply --conversation conversation.json --hint "shorter" --continue
 gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
 gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "is this our bug?"
 gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"

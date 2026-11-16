@@ -133,7 +133,8 @@ L'onglet d'un worktree se place juste après celui de son dépôt, et un onglet 
 L'onglet Accueil est le gestionnaire de dépôts. Il a quatre sections : **Dépôts
 ouverts**, **Favoris**, **Dépôts récents** et **Tous les dépôts**. Chaque ligne
 montre la branche, les nombres d'avance et de retard et le nombre de
-modifications. Chaque ligne a une étoile (favori), **Ouvrir** ou **Aller**,
+modifications, puis le chemin du dossier quand il y a de la place : abrégé avec `~` et
+coupé au milieu quand c'est étroit, il ne repousse jamais le nom, le propriétaire ni la branche. Chaque ligne a une étoile (favori), **Ouvrir** ou **Aller**,
 **Fermer** ou **Retirer**, et un menu `⋮`.
 
 En haut : **Parcourir**, **Cloner**, **Init**, une zone de recherche, **Tout
@@ -141,7 +142,7 @@ replier** et **Tout déplier**. Un dossier qui n'existe plus quitte *Récents* e
 *Tous* tout seul. Un favori manquant reste, avec un bouton **Retirer**.
 **Retirer** ne supprime jamais rien sur le disque.
 
-Touches : `Enter` ouvrir, `f` favori, `x` fermer ou retirer, `.` menu, `/`
+Touches : `Enter` ouvrir, `f` favori, `x` fermer ou retirer, `y` copier le chemin, `o` ouvrir avec l'outil par défaut (**Ouvrir dans** du menu `⋮` en propose un autre), `.` menu, `/`
 recherche, `Space` replier une section, `Esc` retour à votre onglet.
 `Ctrl+N` affiche un badge sur la zone de recherche, chaque section et chaque bouton : appuyez sur le caractère d'un badge pour y placer le focus ou l'actionner (voir [Badges](keybindings.md#badges)).
 
@@ -236,7 +237,9 @@ Les deux volets latéraux (le panneau Refs, `Ctrl+N h`, et le volet de droite, `
 
 Une ligne par commit, du plus récent au plus ancien. Clic droit sur l'en-tête
 pour afficher ou masquer des colonnes. Glissez la bordure entre deux en-têtes
-pour redimensionner une colonne. Glissez un en-tête pour déplacer la colonne.
+pour redimensionner une colonne. Glissez un en-tête pour déplacer la colonne. Les largeurs appartiennent au dépôt : elles sont enregistrées avec lui
+et reviennent quand vous le rouvrez, et un dépôt ouvert pour la première fois a chaque colonne ajustée à ce que montre le Log
+(*Ajuster toutes les colonnes au contenu* le refait, *Réinitialiser les largeurs de colonnes* revient aux largeurs automatiques, qui restent).
 
 Le volet n'a pas de titre : les en-têtes de colonnes disent ce qu'il est. Les tags sont dessinés là où ils sont, jamais en fantôme. Sur un commit sans ref, la ligne survolée affiche une pastille estompée avec le nom de la branche à laquelle il appartient ; si cette branche a été supprimée, une pastille barrée montre le nom lu dans le commit de fusion qui l'a fusionnée (désactivable avec **Afficher une branche fantôme sur le commit survolé** dans Paramètres > Journal et graphe).
 

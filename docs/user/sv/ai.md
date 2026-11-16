@@ -293,6 +293,7 @@ hovrar eller markerar den.
 | **Skript för historikomskrivning** | I [omskrivningsvyn](history-rewrite.md#skriv-ett-skript-med-ai): knappen `✦ Skriv med AI...` i skriptredigeraren, eller palettens `Omskrivning: Skriv ett skript med AI...`. En dialog visar exakt vad som skickas; skriptet hamnar i redigeraren, markerat, och körs eller tillämpas aldrig åt dig. | `ai rewrite-script "<instruktion>" [--sample N]` (skriver ut) |
 | **Regler för historikomskrivning** | I [omskrivningsvyn](history-rewrite.md#skapa-regler-med-ai): knappen `✦ Skapa regler med AI...`, `Alt+I`, eller palettens `Omskrivning: Skapa regler med AI...`. En dialog med flera rader visar exakt vad som skickas; reglerna och inställningarna hamnar i omskrivningsvyn, och ingenting förhandsgranskas eller tillämpas åt dig. | `ai rewrite-rules "<beskrivning>" [--context]` (skriver ut) |
 | **Worktree-namn** | I [dialogrutan Skapa worktree](worktrees.md#namnge-med-ai): knappen `✦ Namnge med AI` eller `Alt+A` öppnar en ruta där du beskriver funktionen, felet eller uppgiften; modellen namnger worktreen och dess gren efter repositoryts egna grennamn, och båda hamnar i dialogrutans fält så att du kan ändra dem. Bara din beskrivning och de lokala grennamnen skickas, så det finns ingen dialogruta för ”det som skickas”. | `ai worktree-name --describe "<uppgift>"` (skriver ut) |
+| **Svar på en värd** och **Ärendebeskrivning** | Knappen **Skriv med AI** (`Alt+E`) i varje Markdown-redigerare som skickar till en värd: en kommentar, ett svar eller en redigering i en konversation, en granskningskommentar eller sammanfattning, ett nytt ärendes beskrivning. Utkastet hamnar i rutan; inget publiceras. Se [Skrivhjälp på en värd](#skrivhjälp-på-en-värd). | `ai hosting-reply` (skriver ut ett utkast) |
 | **Commit-composer** | WIP-radens menyval *Komponera commits (AI)...*, `Ctrl+G C`, palettens `AI: Komponera commits från ändringar...` | |
 
 `Esc` avbryter en pågående förfrågan (en lokal agents process dödas).
@@ -378,6 +379,110 @@ Om du vill följer omfånget, namnen på grenar och taggar och författarna till
 nyaste commits med (en ruta, av som standard, som syns i rutan ”det som
 skickas”). Profilen och instruktionerna är de för *Regler för historikomskrivning*
 under Inställningar > AI.
+
+### Skrivhjälp på en värd
+
+*Svar på en värd* skriver ett utkast till en kommentar, ett svar i en tråd, en kommentar på en kodrad eller sammanfattningen av en
+granskning; *Ärendebeskrivning* skriver ett utkast till beskrivningen av ett nytt ärende. **AI:n skriver bara ett utkast.** Texten hamnar i
+redigeraren (eller skrivs ut av CLI:t) så att du kan läsa, redigera och skicka den själv. Det finns ingen kodväg från den här funktionen
+till en värds skrivåtgärder: den kan inte publicera, redigera, lösa eller ta bort något, svaret i CLI och MCP säger `"posted": false`,
+och en lokal agent körs skrivskyddat (nedan). Texten lämnar GitPoulpi bara genom redigerarens egen knapp **Skicka**
+(`Ctrl+Enter`).
+
+**I Markdown-redigeraren.** Medan AI är på har varje redigerare vars text går till en värd (en kommentar, ett svar eller en
+redigering i [konversationsvyn](hosting-integration.md#5c-konversationer), en granskningskommentar, sammanfattningen i Slutför granskning,
+beskrivningen av ett nytt ärende och pull request-beskrivningen) en knapp **Skriv med AI** (`Alt+E`, samma tangent i alla) i högra
+änden av sin lägesrad. Den öppnar en panel under raden:
+
+- ett fält, *Vad jag vill ha i det här svaret*, som skrivs när du använder det (`Enter` skriver ett utkast). Dess platshållare ger ett
+  exempel på sorten (”instämma och be om ett test som misslyckas”). En lista **Senaste** sparar tidigare instruktioner (klicka på
+  en, eller `Up` / `Down` i fältet; sparas i `ai-hints.toml`);
+- *Förbättra mitt utkast*, ikryssat när rutan redan innehåller en text: AI:n utgår från den i stället för att skriva en ny;
+- *Låt AI:n läsa repositoryt*, **urkryssat varje gång** om du inte slagit på dess standardvärde (se nedan);
+- **Utkast**, **Stoppa** (också `Esc`) och **Stäng**, och en rad för förlopp eller felet.
+
+Den vanliga dialogen ”Det som skickas” (`[ai.sent_preview] hosting_reply`, `issue_body`, `pull_request_description`) visar
+begäran innan den går iväg. Förutom system- och användartexten visar den en lista **Repositorykontext** när
+repositoryt läses: varje del med sin storlek, totalen mot gränsen (*31.2 KB av 48 KB*), vad som kapades för att få plats,
+vad som utelämnades som känsligt och vilka delar som återanvänds. För en lokal agent anges att agenten läser
+repositoryt själv med skrivskyddade verktyg, verktygen nämns, arbetsmappen anges och om agentsessionen är ny eller
+fortsatt, och varje dialog slutar med *AI:n skriver bara ett utkast. Inget publiceras förrän du skickar det själv.*
+Utkastet ersätter texten i ett enda ångrasteg och redigeraren växlar till Förhandsvy så att du läser det innan du skickar;
+`Ctrl+Z` ger tillbaka din text. En pull request-beskrivning skrivs utifrån grenens commits och diff och tar
+samma instruktion; repositoryrutan är nedtonad där (”inte för den här texten”).
+
+Vad modellen får: objektets titel, tillstånd och beskrivning, tråden du svarar i, de senaste kommentarerna (nyast
+först, inom `ai.limits.hosting_reply_context_bytes`, 49152 som standard), markeringsspråket som värden tar emot (så att ett Jira-svar
+kommer tillbaka som Markdown som GitPoulpi konverterar), vad du vill ha i det här svaret och, för att förbättra din egen text,
+ditt utkast. Allt som andra har skrivit markeras som opålitliga data i begäran, så en instruktion gömd i en
+kommentar följs inte. Över gränsen kapas inget i tysthet: du får frågan, och de äldsta kommentarerna utelämnas
+först (tråden du svarar i behålls, upp till hälften av budgeten); CLI:t anger avkortningen i `truncated` och
+`--send-all` häver den.
+
+**Din egen grundprompt.** Instruktionerna som båda åtgärderna utgår från kan redigeras: *Inställningar > AI > Svar på en värd >
+Grundprompt* (`ai.hosting_reply.base_prompt`). Tomt använder den inbyggda prompten, som ber om bara texten, i
+värdens markeringsspråk och på konversationens språk om inte din ledtråd säger något annat. Dina globala, arbetsytans och
+repositoryts instruktioner följer fortfarande efter den, och andras text förblir markerad som opålitlig vad du än skriver
+där. `ai prompt --action hosting_reply` skriver ut nivåerna.
+
+#### Åtkomst till repositoryt
+
+**Av som standard och ikryssat per användning.** Att läsa repositoryt ger mycket bättre svar på ”kraschar det här
+i vår kod?” men skickar mer, så det är ett val du gör varje gång: *Låt AI:n läsa repositoryt* börjar urkryssat
+i varje ruta. `ai.hosting_reply.read_repository` (*Låt AI:n läsa repositoryt som standard*, av) gör bara att
+rutan börjar ikryssad; `--read-repo` är CLI:ts kryss. Valet är nedtonat, med sin orsak när du aktiverar det, i
+tre fall: repositoryt är **inte klonat** (Radars konversation för ett annat repository: det finns inget att
+läsa), den valda lokala agenten har **inget skrivskyddat läge** som GitPoulpi litar på, eller texten **inte skrivs utifrån
+repositoryt** (en pull request-beskrivning). Inget annat än ditt eget kryss slår på det.
+
+Vad som händer sedan beror på profilen:
+
+| Profil | Vad som läser repositoryt | Vad som skickas |
+|---|---|---|
+| **API** (OpenAI-kompatibel, Anthropic) | GitPoulpi, via daemonen, skrivskyddat | En kontext som den bygger och ger till modellen: repositorykartan (toppnivåträdet och sökvägarna kring träffade filer), filerna som konversationen nämner (hela filen, eller ett fönster på 40 rader kring raden eller symbolen), sökträffar för identifierare och felmeddelanden i konversationen, och för en pull request dess diff. Inom `ai.limits.hosting_reply_*` (kontext 49152, fil 8192, karta 6144, 20 träffar per term, 8 termer), avkortad i ordningen diff, filer, träffar, karta och rapporterad. Filer som ser känsliga ut utelämnas och hemligheter i resten maskas först (se [Integritet](#integritet)). |
+| **Lokal agent** (Claude Code, Codex), headless | Agenten själv, i repositoryts mapp | Inget byggs: agenten startas i repositoryt med **skrivskyddade verktyg** och läser det den behöver. Claude Code får `Read`, `Grep` och `Glob` och nekas `Bash`, `Edit`, `Write`, `NotebookEdit`, `WebFetch` och `WebSearch`, utan någon MCP-server inläst (ett projekts egen server kunde publicera); Codex körs i sin skrivskyddade sandlåda. Värdinloggningarna i din miljö (`GH_TOKEN`, `GITHUB_TOKEN`, `GITLAB_TOKEN`, variablerna för Jira, Linear, Azure DevOps och Bitbucket, `GIT_ASKPASS`, `SSH_AUTH_SOCK`) tas bort ur dess miljö, så att inte ens en felkonfigurerad agent kan publicera eller pusha. |
+
+En agent som GitPoulpi inte har något bekräftat skrivskyddat läge för (och varje agent i det interaktiva terminalkörläget) kan inte
+släppas in: valet förblir nedtonat med *Den här agenten har inget skrivskyddat läge som GitPoulpi litar på.*
+
+**Cachelagring och Uppdatera kontext.** Det som samlats in återanvänds så att nästa svar går snabbt och billigt:
+
+- Den byggda kontexten för en API-profil sparas per repository i `ai.hosting_reply.context_ttl_minutes` (*Behåll en
+  repositorykontext i*, 30 som standard). Den nycklas på repositoryt, dess `HEAD`, urvalet och gränserna,
+  och dess delar sparas en och en, så att nästa ärende i samma repository bara bygger om de delar det inte
+  delar. I fönstret lever cacharna i minnet (de 8 senaste kontexterna); CLI:t sparar dem i filer i sin privata
+  tillståndsmapp, så att ett andra `ai hosting-reply --read-repo` återanvänder det det första byggde.
+- En ny commit på den utcheckade grenen (`HEAD` flyttas), en ändring av gränserna eller tidsgränsen börjar om. Det gör
+  också **Uppdatera kontext**, knappen i panelen när repositoryt läses, eller `--refresh-context` i CLI:t. En rad under rutan säger vad det senaste utkastet gjorde: *Kontext byggd: 5
+  delar, 31.2 KB, HEAD a1b2c3d*, *Kontext återanvänd (4 av 5 delar, HEAD a1b2c3d)*, *Leverantörens cache: 12k token återanvända*,
+  *Agenten läste repositoryt (HEAD a1b2c3d)*, *Agentsession startad* eller *Agentsession fortsatt*.
+- **Anthropics promptcache.** För en Anthropic-profil skickas begäran med grundprompten och instruktionerna som
+  ett cachat block och repositorykontexten som ett andra, och din konversation, ledtråd och utkast efter dem, så
+  att ett andra svar på samma kontext läses från leverantörens cache och kostar en bråkdel. Svarets cacheräknare
+  är det *Leverantörens cache: N token återanvända* visar. OpenAI-kompatibla servrar får samma stabila ordning på
+  begäran, vilket deras automatiska prefixcachning drar nytta av; GitPoulpi skickar inget extra.
+- **Agenten behåller sin session.** Med **Behåll agentens session mellan svar**
+  (`ai.hosting_reply.reuse_agent_session`, på som standard) och *Låt AI:n läsa repositoryt* ikryssat startas en lokal agent
+  som stöder det (Claude Code i dag) med ett sessions-id och återupptas sedan med det, så att det den läste i
+  repositoryt stannar i dess egen historik och nästa svar börjar snabbare. Andra agenter körs en gång. Sessionen gäller per repository, `HEAD` och
+  åtgärd; en ny commit eller **Uppdatera kontext** börjar en ny; med alternativet av, eller rutan urkryssad, är varje svar
+  en engångskörning som inte behåller något. Sessionen lever i agentens egen lagring, GitPoulpi behåller bara dess id
+  (i minnet i fönstret, i en fil bara för användaren för CLI:t).
+
+```
+gitpoulpi ai hosting-reply --conversation conversation.json --hint "say I will look tomorrow"
+gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
+gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "is this our bug?"
+gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"
+```
+
+`--conversation` tar en fil, `-` för standard in eller själva JSON-texten: den JSON som `hosting issue comments --json`
+eller `hosting review conversation --json` skriver ut (en äldre sida med `header` och `entries` accepteras också), så
+`gitpoulpi hosting issue comments 7 --json | gitpoulpi ai hosting-reply --conversation -` fungerar; `--item <ref>`
+hämtar själva konversationen (`7` eller `#7` ett ärende, `!7` en pull request). Med `--read-repo` lägger `--pr-base REV
+--pr-head REV` en pull requests diff i kontexten; svarets `context` anger vilka delar som lästes, om de
+återanvändes, leverantörens cache-token och agentsessionen. MCP-verktyget `ai_hosting_reply` är samma
+kommando och är skrivskyddat.
 
 ## Vart nyckeln tar vägen
 
@@ -471,6 +576,11 @@ modell har utrymme, sänk dem för att hålla begäranden små.
 | `review_threads_bytes` | 6000 | De granskningskommentarer som redan finns |
 | `review_context_file_bytes` | 8192 | En kontextfil för projektet i en granskning (`CLAUDE.md`, `AGENTS.md`, den extra filen) |
 | `review_context_bytes` | 16384 | Alla kontextfiler i en granskning tillsammans |
+| `hosting_reply_context_bytes` | 49152 | Objektet och konversationen som ges till ett utkast till svar |
+| `hosting_reply_file_bytes` | 8192 | En repositoryfil som ges till ett utkast till svar (när AI:n läser repositoryt) |
+| `hosting_reply_map_bytes` | 6144 | Repositorykartan som ges till ett utkast till svar |
+| `hosting_reply_hits_per_term` | 20 | Sökträffar som behålls per term (1 till 200) |
+| `hosting_reply_terms` | 8 | Sökterm som slås upp (1 till 50) |
 
 **Ingenting klipps av i det tysta.** När en indata överskrider sin gräns väntar
 begäran och *Över AI-gränsen* listar vad som överskrider: vilken del (diffen, en

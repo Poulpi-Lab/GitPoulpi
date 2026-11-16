@@ -356,6 +356,7 @@ för att nå dem.
 | Alternativ | Vad det gör |
 |---|---|
 | **Uppdatering av pull requests och ärenden** | Hur ofta sidopanelens listor och verktygsfältets chip uppdateras, ett tal och en enhet (minuter eller timmar). Standard 5 minuter, högst 2 timmar, `0` stänger av timern (`general.hosting_refresh_minutes`, `general.hosting_refresh_unit`). |
+| **Publicera som** | Namnet som meddelanden till en värd publiceras under när repositoryts token tillhör en bot (en GitHub App-token), till exempel `my-app[bot]`; används också för att känna igen dina egna kommentarer. Tomt: efterfrågas från värden, annars inlärt från det första meddelandet som publiceras. Ett repository kan åsidosätta det i Inställningar > Repo-specifikt: SSH & inloggning > Värd (`general.hosting_post_as`). |
 | **Terminologi för granskningsbegäran** | Ordet som används för granskningar hos värden: **Auto (per värd)**, **Pull request** eller **Merge request**. |
 | **Dölj pull request-chipet när den är stängd eller mergad** | På som standard (`ui.hide_finished_pr_chip`; på GitLab står det ”merge request”). Chipet i verktygsfältet visar den senaste begäran för den utcheckade grenen; när den är stängd eller mergad döljs chipet och det nedtonade chipet **+ PR** (starta en ny begäran) visas i stället, som om grenen inte hade någon. Av: chipet visar alltid den senaste begäran, oavsett status. Gäller direkt. |
 
@@ -371,6 +372,13 @@ innehåller också standardvärdena för [granskningskontexten](ai.md#granskning
 (*Profilinställning*, *Ja*, *Nej*), **Ta med CLAUDE.md**, **Ta med AGENTS.md** och **Extra fil** (en sökväg eller en
 länk; tomt lägger inte till någon, med en knapp **Bläddra...** under som öppnar en filväljare; `Enter` på knappen är
 dess tangentbordsform). Den här sidan har en egen guide: [AI-hjälp](ai.md).
+
+Blocket **Svar på en värd** innehåller det som skriver utkast till kommentarer, svar och ärendebeskrivningar: dess profil och instruktioner,
+**Grundprompten** (tomt använder den inbyggda) och en grupp **Åtkomst till repositoryt**: **Låt AI:n läsa repositoryt som standard** (av:
+valet i varje textruta börjar urkryssat), **Behåll agentens session mellan svar** och **Behåll en repositorykontext i (minuter)**. Bytegränserna
+**Största konversation att skicka för ett svar**, **Största repositoryfil för ett svar**, **Största repositorykarta för ett svar**,
+**Flest sökträffar per term för ett svar** och **Flest sökord för ett svar** finns bland de andra indatagränserna. Se
+[Skrivhjälp på en värd](ai.md#skrivhjälp-på-en-värd).
 
 Under blocken per åtgärd gruppen **Integritet**:
 
@@ -600,6 +608,8 @@ blockerar aldrig.
 | **Git-användarnamn** | Skickas som användarnamn till HTTPS-remotes. Med **System** låter det en credential manager välja ett av flera sparade konton. |
 | **Ignorera credential helpers som det här repositoryt anger** | Bara **System**. De helpers repositoryt anger själv (dess `.git/config`, filer den inkluderar) listas under raden med filen var och en kommer från; system- och globala helpers fungerar som förut. |
 | **Helper**, **Kommando**, **Värdar**, **Cache (minuter)** | Ett kommando som repositoryt kör för att logga in. En *helper* är en git credential helper; ett *tokenkommando* skriver ut en token (argumentlistan delas vid mellanslag, med citattecken runt ett argument som innehåller mellanslag, och visas under **Körs som**; inget skal kör det, det körs i repositoryts mapp). **Värdar** begränsar det till de värdarna (tomt: huvudremotens värd); **Cache** är hur länge en token återanvänds (50 minuter som standard). **Använd det här repositoryts nuvarande helper** kopierar helpern som repositoryt anger till fältet. |
+| **Använd för värd-API:et (ärenden, pull requests)** | Med ett tokenkommando: samma kommando ger också token för det här repositoryts ärende- och pull request-anrop, i stället för din personliga token (en installationstoken för en GitHub App, så kommentarer visas som appen). Att slå på eller av det ber om bekräftelse. Se ”Att agera som en GitHub App-bot” i guiden för [värdintegrationer](hosting-integration.md). |
+| **Tilldelning** | **Tillåten** (standard) eller **Blockerad**, sparas direkt. Blockerad kan inget tilldelas i det här repositoryts ärenden och pull requests från appen, CLI:t eller en agent; befintliga tilldelade syns kvar. |
 | **SSH: Logga in med** | **System** (ssh:s egen konfiguration, agenten och standardnycklarna), **Nyckelfil** eller **Kontonyckel** (en integrations nyckel). |
 | **Privat nyckelfil** | Välj en av nycklarna som finns i `~/.ssh` eller skriv en sökväg. Bara den här nyckeln erbjuds, till varje SSH-remote i repositoryt, submoduler inräknade. När andra konton kan läsa nyckelfilen (en behörighetsbit för grupp eller andra på Linux och macOS, en post för Everyone, Users eller Authenticated Users på Windows) säger en varning att OpenSSH avvisar en sådan nyckel (”bad permissions”) och **Begränsa till mitt konto** åtgärdar det (`chmod 600`, eller en DACL bara för ditt konto och SYSTEM på Windows). |
 | **Known hosts-fil**, **Strikt kontroll av värdnyckel** | En valfri fil med betrodda värdnycklar, och att avvisa en värd som inte finns i den. |

@@ -103,7 +103,8 @@ nummeriert.
 | Befehl | Was er tut |
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Eine Datei, einen Ordner, alles, einen Hunk oder einige Zeilen stagen. Ein Staging von Datei, Ordner oder `--all`, das eine sensible Datei hinzufügen würde (ein privater Schlüssel, eine `.env`, ein erkanntes Token: `[privacy]` in der [Konfigurationsreferenz](config-reference.md#privacy-sensible-dateien)), wird mit Exit-Code 2 und `{error: "sensitive_files", files: [{path, reason}]}` abgelehnt (eine Regel und eine maskierte Vorschau, nie ein Wert); nichts wird gestagt. `--allow-sensitive` stagt sie trotzdem. |
-| `unstage` (dieselben Optionen) | Das Gegenteil. |
+| `stage --paths A B ...` | Mehrere Dateien oder Ordner als EINE Operation stagen: ein Journal-Eintrag, ein `undo`-Schritt (eine verschobene Datei sind ihr alter und ihr neuer Pfad, wie `status` es mit `renamed_from` zeigt). Nicht kombinierbar mit `--folder`, `--hunk`, `--lines` oder `--all`. |
+| `unstage` (dieselben Optionen, auch `--paths`) | Das Gegenteil. |
 | `discard --file F [--hunk N [--lines a,b]]` | Ungestagte Änderungen wegwerfen (eine ganze Datei: jede Änderung, nicht verfolgte Datei gelöscht, samt den Ordnern, die dadurch leer werden). Rückgängig zu machen. |
 | `rm-file <paths>...` | Dateien aus dem Arbeitsverzeichnis löschen. Rückgängig zu machen. |
 | `ignore <pattern> [--file <.gitignore>]` | Ein Muster an eine `.gitignore` anhängen (oder an `.git/info/exclude` mit `--file .git/info/exclude`). Rückgängig zu machen, außer in `.git/info/exclude`. |

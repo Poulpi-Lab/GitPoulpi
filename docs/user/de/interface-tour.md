@@ -51,6 +51,14 @@ An ihrem rechten Ende öffnet die Schaltfläche **Aktivität** das Aktivitätspr
 Die Befehlspalette, die Hilfe, Kontextmenüs, Dialoge, Popups und die
 Einstellungen öffnen sich über dem Fenster. Jedes hat oben rechts im Rahmen ein `✕`; `Esc` oder ein Klick auf `✕` schließt es, und ein Klick daneben schließt einen Dialog, ein Popup oder ein Panel (siehe [Fenster und Dialoge schließen](mouse-and-gestures.md#fenster-und-dialoge-schließen)).
 
+### Wenn das Fenster klein ist
+
+Nichts verschwindet stillschweigend, wenn das Fenster schmaler wird. Eine Schaltfläche verliert zuerst ihre lange Beschriftung
+(mit `...` gekürzt), bricht dann in eine zweite Zeile um oder wandert hinter das Menü `⋯` ihrer Zeile; ihre Taste und ihr
+Paletteneintrag funktionieren dabei weiter. Ein Dialog, der für das Fenster zu groß ist, zeichnet einen kleinen Rahmen mit seinem
+Titel, dem `✕` und der Zeile **Fenster zu klein: bitte vergrößern** statt nichts; `Esc` und `✕` schließen ihn, und er kommt
+vollständig zurück, sobald Sie das Fenster vergrößern.
+
 ## Tab-Leiste
 
 Der **Home**-Tab (das Haus-Symbol) steht am linken Ende, gefolgt vom

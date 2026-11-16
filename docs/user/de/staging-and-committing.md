@@ -21,7 +21,8 @@ der rechte Bereich zeigt die Änderungen:
 - **Umbenannte oder verschobene Dateien** sind eine Zeile, `neu <- alt`, in beiden Listen (eine
   auf dem Datenträger gelöschte Datei und eine neue mit mindestens 50 % gleichem Inhalt zählen
   schon als Verschiebung, bevor Sie sie stagen). Stagen, Unstagen und Verwerfen wirken auf beide
-  Namen: Stagen stagt das Löschen und die neue Datei, sodass Git eine Umbenennung sieht.
+  Namen: Stagen stagt das Löschen und die neue Datei, sodass Git eine Umbenennung sieht, und es ist
+  EIN Rückgängig-Schritt (`Undo Stage rename alt -> neu`).
   Die Zeile zu öffnen zeigt den Inhalts-Diff gegen den alten Namen, überschrieben mit
   `alt -> neu (N% ähnlich)`; eine Verschiebung ohne Änderungen sagt **Keine Inhaltsänderung**.
   Dasselbe gilt für die Dateien eines Commits, und `gitpoulpi status` / `gitpoulpi diff`
@@ -179,8 +180,8 @@ erscheint im anderen.
   dann einen Force-Push (mit Lease).
 - **Hooks überspringen** (`Shift+H` oder **Commit: Hooks überspringen umschalten** in der Palette) committet
   ohne die Hooks `pre-commit` und `commit-msg` des Repositorys auszuführen. Es gilt je Commit; unter
-  **Einstellungen > Repository-spezifische Einstellungen > Commit** ist es vorab angehakt. Wird gezeigt, wenn die
-  Zeile Platz hat.
+  **Einstellungen > Repository-spezifische Einstellungen > Commit** ist es vorab angehakt. In einer schmalen Zeile
+  schrumpft die Beschriftung auf **Ohne Hooks**, dann auf das Kontrollkästchen allein (sein Tooltip nennt es); es verschwindet nie.
 - `c` im Status-Bereich setzt den Cursor ins Formular. `Esc` verlässt es.
 - `Ctrl+G c` und `Ctrl+G Enter` (**Git: Commit...** und **Git: Staged Änderungen jetzt
   committen** in der Palette) sind ein und derselbe Befehl, die Commit-Schaltfläche von überall.
@@ -207,8 +208,12 @@ bis Sie die Commit-Schaltfläche drücken.
 **Commits mit KI zusammenstellen** sitzt am rechten Ende der Zeile mit **Vorherigen Commit ändern** und schrumpft mit
 dem rechten Bereich, statt zu verschwinden: die volle Beschriftung, dann **Mit KI zusammenstellen**,
 dann nur das **`✦`**. Es behält seinen Klick, seinen Tooltip und seine
-Taste (`Ctrl+G Shift+C`) bei jeder Breite; die Beschriftungen von **Vorherigen Commit ändern** und **Hooks überspringen** weichen
-ihm, nie umgekehrt.
+Taste (`Ctrl+G Shift+C`) bei jeder Breite; die Beschriftung von **Hooks überspringen** weicht ihm (**Ohne Hooks**, dann nur das
+Kästchen), bevor es selbst schrumpft.
+
+Die Schaltflächen **`✦`** (die Nachricht erzeugen) und **`#`** (einen Issue-Verweis einfügen) am rechten Ende der
+Zusammenfassungszeile schrumpfen genauso: in einem schmalen Bereich verlieren sie ihre Ränder und werden dann zu einer einzigen
+Schaltfläche **`⋯`** zusammengefasst, deren Menü beide auflistet, sodass keine je verschwindet.
 
 ## Der Commit-Composer: Änderungen auf Commits verteilen
 

@@ -70,6 +70,15 @@ ausgewählten Eintrags (**Antworten**, **Zitieren**, **Bearbeiten**, **Löschen*
 Zeilen *Unterhaltung: ...* neben den Zeilen *Review: ...*. Vor dem Öffnen eines Links wird gefragt, wie überall im
 Review.
 
+Ein Thread auf Code zeigt sein `Pfad:Zeile` als Link (unterstrichen, eine echte Schaltfläche). Ein Klick darauf, **`G`** auf dem
+ausgewählten Thread oder *Unterhaltung: Code des Threads öffnen* in der Palette wechselt zur Seite **Dateien**, öffnet diese Datei
+und setzt den Cursor auf die kommentierte Zeile (auf der alten oder der neuen Seite, wie sie geschrieben wurde), mit dem darunter
+geöffneten Thread (ein eingeklappter wird aufgeklappt). **Esc**, die Schaltfläche **Zurück zur Übersicht** links neben den
+Seiten-Tabs oder *Review: Zurück zum Kommentar in der Übersicht* führen zum selben Eintrag der Übersicht zurück. Ein Thread, dessen
+Zeile nicht mehr im Diff steht (veraltet), öffnet die Datei an der nächstgelegenen Zeile, und die Statuszeile sagt es; bei einem
+Thread auf einer Datei, die die Anfrage nicht mehr ändert, sagt sie, dass die Datei nicht im Diff ist. In einer Issue- oder
+Radar-Ansicht derselben Anfrage gibt es keinen Code zu öffnen: `G` antwortet, dass das Review ihn hat.
+
 Wo sich eine Taste der Unterhaltung und eine des Reviews treffen, behält auf dieser Seite die Unterhaltung den Buchstaben: `l` (Labels), `m`
 (Meilenstein), `Q` (Abandon bei Gerrit), `e` / `d`, `r`. Labels, Meilenstein und Abandon bleiben auf den Schaltflächen der Kopfzeile und
 in der Palette; `a` (Zuständige), `p` (Reviewer), `f` (**Review abschließen**), `b` (**Auschecken**), `P`, `D`, `U` und
@@ -298,6 +307,7 @@ Das Absenden des Reviews verbraucht den Entwurf.
 | Die Unterhaltung kommentieren | `c` in der Übersicht, `C` | *Review: Unterhaltung kommentieren...* (öffnet das Feld der Übersicht), *Unterhaltung: Neuer Kommentar* |
 | Auf den Thread antworten | `r` | *Review: Auf Thread antworten...* |
 | Auflösen oder wieder öffnen | `x` | *Review: Thread auflösen oder wieder öffnen* |
+| Den Code eines Threads öffnen (Übersicht) / zurück zum Kommentar | `G` / `Esc` | *Unterhaltung: Code des Threads öffnen*, *Review: Zurück zum Kommentar in der Übersicht* |
 | Einen Thread ein- oder ausklappen | `z` | *Review: Thread ein- oder ausklappen* |
 | Ausstehenden Kommentar bearbeiten / löschen | `e` / `d` | *Review: Ausstehenden Kommentar bearbeiten...*, *Ausstehenden Kommentar löschen* |
 | Die Datei als angesehen markieren | `v` | *Review: Datei als angesehen markieren* |

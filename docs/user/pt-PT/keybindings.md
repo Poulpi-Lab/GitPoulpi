@@ -187,8 +187,8 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `status` | `collapse_below` | Recolher a pasta e as suas subpastas | `_`, `Shift+Left` |
 | `home` | `favorite` | Marcar ou desmarcar o repositório como favorito | `f`, `*` |
 | `home` | `close_repo` | Fechar, remover ou desmarcar a linha | `x`, `Delete` |
-| `home` | `copy_path` | Copy the Repository Path | `y` |
-| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
+| `home` | `copy_path` | Copiar o caminho do repositório | `y` |
+| `home` | `open_in` | Abrir o repositório na ferramenta predefinida | `o` |
 | `home` | `browse` | Procurar um repositório | `b` |
 | `home` | `clone` | Clonar um repositório | `c` |
 | `home` | `init` | Inicializar um repositório | `i` |
@@ -800,8 +800,8 @@ As teclas são as predefinidas.
 | Repositórios: adicionar/remover o selecionado dos favoritos | `f` |
 | Repositórios: fechar ou remover o selecionado | `x` |
 | Repositórios: menu do repositório selecionado... | `.` |
-| Repositories: Copy Selected Path | `y` |
-| Repositories: Open Selected in Default Tool | `o` |
+| Repositórios: copiar o caminho do selecionado | `y` |
+| Repositórios: abrir o selecionado na ferramenta predefinida | `o` |
 | Repositórios: pesquisar | `/ / Ctrl+F` |
 | Repositórios: recolher todas as secções | `-` |
 | Repositórios: expandir todas as secções | `+` |
@@ -1160,7 +1160,7 @@ As teclas são as predefinidas.
 | ✦ IA: dividir o commit selecionado... |  |
 | ✦ IA: explicar as alterações em curso | `Ctrl+G w` |
 | ✦ IA: compor commits a partir das alterações em curso... | `Ctrl+G C` |
-| Sensitive Files: Show in File | `S` |
+| Ficheiros sensíveis: mostrar no ficheiro | `S` |
 | Compositor: mover ficheiro para um commit... | `m` |
 | Diff: blame |  |
 | Blame: mostrar o commit no Log | `Enter` |

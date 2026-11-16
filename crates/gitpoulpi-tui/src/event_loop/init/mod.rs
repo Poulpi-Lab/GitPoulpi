@@ -380,11 +380,12 @@ pub(super) fn init(
             .and_then(|s| s.log_columns);
     // `GITPOULPI_NO_LOG_AUTOFIT=1` is the PTY harness's switch: the tests
     // about other things start from the automatic widths.
-    let log_widths_autofit = saved_log_widths.is_none()
-        && !no_repository
-        && std::env::var("GITPOULPI_NO_LOG_AUTOFIT").as_deref() != Ok("1");
     let initial_log_columns =
         LogColumnPrefs::for_repo(&settings.config().ui, saved_log_widths.as_ref());
+    let log_widths_autofit = saved_log_widths.is_none()
+        && initial_log_columns.has_no_widths()
+        && !no_repository
+        && std::env::var("GITPOULPI_NO_LOG_AUTOFIT").as_deref() != Ok("1");
     let last_saved_log_columns = initial_log_columns.clone();
     // Left-pane sections hidden by the user: global, `[ui]`, saved from the tick.
     let (hidden_sidebar_sections, sidebar_scope) = crate::sections_scope::SectionsScope::resolve(

@@ -97,16 +97,17 @@ impl LogColumnPrefs {
     }
 
     /// The global order and hidden set from `[ui]`, the widths from this
-    /// repository's own state (`None`: never saved, so no widths yet and the
-    /// window fits every column once the Log has painted).
+    /// repository's own state. `None` (never saved) falls back to the global
+    /// `[ui]` widths an older version wrote, if any (kept as they were);
+    /// without those the window fits every column once the Log has painted.
     pub(crate) fn for_repo(
         ui: &gitpoulpi_config::UiConfig,
         saved: Option<&gitpoulpi_session::LogColumnWidths>,
     ) -> Self {
         let mut me = Self::from_ui(ui);
-        me.widths.clear();
-        me.scroll_widths.clear();
         if let Some(saved) = saved {
+            me.widths.clear();
+            me.scroll_widths.clear();
             let by_name = |m: &NameWidths| -> std::collections::HashMap<LogColumn, u16> {
                 m.iter()
                     .filter_map(|(n, w)| LogColumn::from_config_name(n).map(|c| (c, *w)))
@@ -118,6 +119,11 @@ impl LogColumnPrefs {
             me.scroll_widths = by_name(&saved.scroll);
         }
         me
+    }
+
+    /// No width at all, from either place: the first-open fit applies.
+    pub(crate) fn has_no_widths(&self) -> bool {
+        self.widths.is_empty() && self.scroll_widths.is_empty()
     }
 
     /// The widths as this repository's state stores them.

@@ -1,6 +1,6 @@
 //! Dragging a Log column boundary resizes the column on its left, dragging
 //! a header onto another reorders, and both are persisted to
-//! `[ui] log_column_widths` / `log_columns_order` and honoured by the next
+//! the repository's `log_columns` and `[ui] log_columns_order` and honoured by the next
 //! process. (`pty_log_columns.rs` covers hide/show.) Temp config dirs only.
 
 mod common;
@@ -90,9 +90,16 @@ fn drag_and_restart(session: &str, toml: &str, grab_dx: i32, grab_dy: u16) {
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let new_x = header(&moved, "Date").unwrap().0;
     assert_eq!(new_x, date_x - 3, "the boundary follows the pointer");
-    wait_config(config.path(), "a saved width", |t| {
-        t.contains("log_column_widths")
-    });
+    let state = gitpoulpi_config::repo_data_file(
+        repo.root(),
+        gitpoulpi_config::DEFAULT_REPO_DATA_LOCATION,
+        "repo-state.toml",
+    );
+    let deadline = Instant::now() + STEP;
+    while !std::fs::read_to_string(&state).is_ok_and(|t| t.contains("log_columns")) {
+        assert!(Instant::now() < deadline, "no saved width in {state:?}");
+        std::thread::sleep(Duration::from_millis(100));
+    }
     quit(term);
 
     let term = launch(&repo, session, config.path());

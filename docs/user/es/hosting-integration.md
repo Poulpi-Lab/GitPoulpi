@@ -501,6 +501,8 @@ tiempo y, debajo, la caja de comentario.
   host se convierte antes (ver [Conversión de markup](#conversión-de-markup)). Un bloque de código `mermaid` tiene un
   botón **Abrir diagrama** que muestra el código fuente del diagrama en un visor desplazable (`Enter` lo copia); la
   paleta tiene *Conversación: Abrir el diagrama de la entrada*. Necesita una compilación con `conversation` y `mermaid`.
+- En el Resumen de la revisión, el `ruta:línea` de un hilo de código es un enlace al código (`G`, *Conversación: Abrir el código del hilo*;
+  véase [Revisión](review.md)); en una conversación abierta por sí sola (un issue, una fila del Radar) no hay página de código a la que ir.
 - La vista vuelve a leer cada 60 segundos y con `F5` (**Actualizar**).
 
 **Teclas.** Cada una tiene un botón, una fila de menú o una fila de paleta (*Conversación: ...*), y `Ctrl+N` pone

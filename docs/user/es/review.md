@@ -68,6 +68,8 @@ de tiempo y la caja, y **Nota interna** (`Alt+I`) está en los hosts que tienen 
 seleccionada (**Responder**, **Citar**, **Editar**, **Eliminar**, **Enlaces**) hacen lo mismo, y la paleta tiene las filas
 *Conversación: ...* junto a las *Revisión: ...*. Antes de abrir un enlace se pregunta, como en toda la revisión.
 
+Un hilo sobre código muestra su `ruta:línea` como un enlace (subrayado, un botón de verdad). Un clic en él, **`G`** sobre el hilo seleccionado o *Conversación: Abrir el código del hilo* de la paleta cambian a la página **Archivos**, abren ese archivo y ponen el cursor en la línea comentada (en el lado antiguo o el nuevo, como se escribió) con el hilo abierto debajo (uno plegado se despliega). **Esc**, el botón **Volver al resumen** a la izquierda de las pestañas de la página o *Revisión: Volver al comentario en el resumen* regresan a la misma entrada del Resumen. Un hilo cuya línea ya no está en el diff (obsoleto) abre el archivo en la línea más cercana y la línea de estado lo dice; un hilo sobre un archivo que la solicitud ya no cambia dice que el archivo no está en el diff. En una vista de issue o de Radar de la misma solicitud no hay código que abrir: `G` responde que la revisión lo tiene.
+
 Donde una tecla de la conversación y una de la revisión coinciden, la letra en esta página es la de la conversación: `l`
 (etiquetas), `m` (hito), `Q` (abandonar, de Gerrit), `e` / `d`, `r`. Las etiquetas, el hito y abandonar siguen en los botones
 de la cabecera y en la paleta; `a` (asignados), `p` (revisores), `f` (**Terminar revisión**), `b` (**Checkout**), `P`, `D`,
@@ -288,6 +290,7 @@ Enviar la revisión gasta el borrador.
 | Resumen / Archivos / commits | `Alt+1` / `Alt+2` / `Alt+3` | *Revisión: Mostrar resumen*, *Mostrar archivos*, *Mostrar commits* |
 | Comentar la línea o el rango | `c` | *Revisión: Comentar la línea...* |
 | Comentar en la conversación | `c` en el Resumen, `C` | *Revisión: Comentar en la conversación...* (abre la caja del Resumen), *Conversación: Comentario nuevo* |
+| Abrir el código de un hilo (Resumen) / volver al comentario | `G` / `Esc` | *Conversación: Abrir el código del hilo*, *Revisión: Volver al comentario en el resumen* |
 | Responder al hilo | `r` | *Revisión: Responder al hilo...* |
 | Resolver o reabrir | `x` | *Revisión: Resolver o reabrir el hilo* |
 | Plegar o desplegar un hilo | `z` | *Revisión: Plegar o desplegar el hilo* |

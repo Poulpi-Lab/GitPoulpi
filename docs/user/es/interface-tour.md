@@ -79,6 +79,15 @@ en la esquina superior derecha de su borde; `Esc` o un clic en la `✕` lo cierr
 clic fuera cierra un diálogo, una ventana emergente o un panel (véase
 [Cerrar ventanas y diálogos](mouse-and-gestures.md#cerrar-ventanas-y-diálogos)).
 
+### Cuando la ventana es pequeña
+
+Nada desaparece en silencio al estrecharse la ventana. Un botón pierde primero su
+etiqueta larga (recortada con `...`), después pasa a una segunda fila o se va al menú
+`⋯` de su fila, y su tecla y su entrada de la paleta siguen funcionando en todo momento.
+Un diálogo demasiado grande para la ventana dibuja un marco pequeño con su título, la
+`✕` y la línea **Ventana demasiado pequeña: agrándala** en lugar de nada; `Esc` y `✕`
+lo cierran, y vuelve entero al agrandar la ventana.
+
 ## Fila de pestañas
 
 La pestaña **Inicio** (el icono de la casa) está en el extremo izquierdo, seguida

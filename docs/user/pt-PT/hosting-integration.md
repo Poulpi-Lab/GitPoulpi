@@ -447,7 +447,7 @@ O mesmo quadro está disponível para scripts e agentes: `gitpoulpi hosting boar
 Um cartão mostra o número, o título, os responsáveis como iniciais, as etiquetas e o marco. Arraste-o para outra coluna,
 ou `Shift+Left` / `Shift+Right`, ou **Quadro: mover cartão para...** (`m`). Move-se de imediato; passados cerca de 150 ms um indicador de atividade
 diz que o host ainda está a trabalhar, e se o host recusar, o cartão volta atrás e a barra de estado diz porquê. `Enter` abre
-a issue no host (a nota, para issues locais); `e` edita responsáveis, etiquetas e marco; `n` inicia uma nova issue na
+a [conversa](#5c-conversas) da issue no GitPoulpi, e o quadro volta quando a fecha; `e` edita responsáveis, etiquetas e marco; `n` inicia uma nova issue na
 coluna selecionada; `a`, `l`, `M` e `/` filtram por responsável, etiqueta, marco e texto, `x` limpa os filtros; `r`
 lê o host de novo. O quadro é lido de novo quando as listas da barra lateral se atualizam. O Radar não tem quadro.
 
@@ -462,7 +462,7 @@ pushes). O GitPoulpi lê-a do host, mostra-a formatada e deixa-o responder sem s
 | A partir de | Como |
 |---|---|
 | Uma linha de ISSUES | `Enter` ou um clique duplo; **Abrir conversa** no menu da linha; paleta *Alojamento: abrir a conversa de uma issue...* (uma lista das issues no ecrã). **Abrir no navegador** no menu da linha mantém o navegador. |
-| Uma linha de PULL REQUESTS no Azure DevOps ou no Bitbucket | `Enter` ou **Abrir conversa**. No GitHub, GitLab, Gitea, Forgejo e Gerrit a linha abre a [revisão](review.md), cuja página Resumo é a conversa do pedido. |
+| Uma linha de PULL REQUESTS no Azure DevOps ou no Bitbucket | `Enter` ou **Abrir conversa**. No GitHub, GitLab, Gitea, Forgejo e Gerrit a linha abre a [revisão](review.md), cuja página Resumo é esta mesma conversa (a cronologia, as teclas e a caixa de comentário abaixo). |
 | Um cartão do [quadro de issues](#5b-o-quadro-de-issues) | `Enter` ou um clique duplo. |
 | O [Radar](radar.md) | `i` numa linha de issue ou de pedido, **Abrir conversa** no menu da linha, ou *Radar: abrir a conversa da issue*. |
 | Uma referência noutra conversa | Clique nela (ou `l` e depois escolha-a): `#7`, `!12`, `ABC-12` de uma fonte associada abrem na aplicação e entram numa pilha de Voltar. |

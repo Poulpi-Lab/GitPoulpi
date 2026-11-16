@@ -144,7 +144,8 @@ O separador de um worktree fica logo a seguir ao do seu repositório, e um separ
 O separador Início é o gestor de repositórios. Tem quatro secções: **Repositórios
 abertos**, **Favoritos**, **Repositórios recentes** e **Todos os
 repositórios**. Cada linha mostra a branch, as contagens de commits à frente e atrás e o
-número de alterações. Cada linha tem uma estrela (favorito), **Abrir** ou **Ir**,
+número de alterações, depois o caminho da pasta quando há espaço: abreviado com `~` e cortado ao meio quando é
+estreito, nunca empurra o nome, o dono nem a branch para fora. Cada linha tem uma estrela (favorito), **Abrir** ou **Ir**,
 **Fechar** ou **Remover**, e um menu `⋮`.
 
 No topo: **Procurar**, **Clonar**, **Init**, uma caixa de pesquisa, **Recolher tudo**
@@ -152,7 +153,7 @@ e **Expandir tudo**. Uma pasta que já não existe sai de *Recentes* e de *Todos
 por si. Um favorito em falta fica, com um botão **Remover**. **Remover**
 nunca elimina nada no disco.
 
-Teclas: `Enter` abrir, `f` favorito, `x` fechar ou remover, `.` menu, `/` pesquisar,
+Teclas: `Enter` abrir, `f` favorito, `x` fechar ou remover, `y` copiar o caminho, `o` abrir na ferramenta predefinida (o **Abrir em** do menu `⋮` escolhe outra), `.` menu, `/` pesquisar,
 `Space` recolher uma secção, `Esc` voltar ao seu separador.
 `Ctrl+N` mostra um selo no campo de pesquisa, em cada secção e em cada botão: prima o carácter de um selo para o focar ou acionar (veja [Selos](keybindings.md#selos)).
 
@@ -256,7 +257,9 @@ guardado para o próximo arranque.
 
 Uma linha por commit, o mais recente primeiro. Clique com o botão direito no cabeçalho para mostrar ou ocultar
 colunas. Arraste a margem entre dois cabeçalhos para redimensionar uma coluna. Arraste um cabeçalho
-para mover a coluna.
+para mover a coluna. As larguras pertencem ao repositório: ficam guardadas com ele e voltam quando o
+reabre, e um repositório aberto pela primeira vez tem todas as colunas ajustadas ao que o Log mostra (*Ajustar todas as
+colunas ao conteúdo* faz isso de novo, *Repor as larguras das colunas* volta às larguras automáticas, que se mantêm).
 
 O painel não tem título: os cabeçalhos das colunas dizem o que ele é. Num commit sem ref, a linha sob o ponteiro mostra uma pílula esbatida com o nome da branch a que pertence (desative com **Mostrar uma branch fantasma no commit sob o rato** em Definições > Log e grafo).
 

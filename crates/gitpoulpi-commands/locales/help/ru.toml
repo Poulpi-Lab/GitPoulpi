@@ -904,6 +904,7 @@ launch = "То, что запускают ярлыки GitPoulpi: показыв
 "ai hosting-reply --path" = "Написать новый комментарий ревью к этому файлу pull request"
 "ai hosting-reply --read_repo" = "Разрешить ИИ читать репозиторий для этого черновика (выключено, если не указано и `ai.hosting_reply.read_repository` не равно true). Локальный агент читает его сам инструментами только для чтения в папке репозитория; профиль API получает контекст, который строит GitPoulpi (файлы, названные в беседе, результаты поиска, карта) в пределах `ai.limits.hosting_reply_*`. В любом случае ИИ только пишет черновик; ничего не публикуется"
 "ai hosting-reply --refresh_context" = "Забыть контекст и сессию агента, сохранённые от прошлых черновиков этого репозитория, и прочитать его заново (с `--read-repo`)"
+"ai hosting-reply --continue_exchange" = 'Continue the exchange of the last `hosting-reply` for this same target (same `--item`, `--reply-to`, `--path`/`--line` or `--issue-title`): the earlier hints and drafts of it go back to the model as earlier turns, so "make it shorter" works. Not needed for a local Claude agent whose session is kept (it remembers). Without the flag a new exchange starts. Kept in the state folder'
 "ai hosting-reply --pr_base" = "С `--read-repo`: базовая ревизия pull request, чтобы поместить в контекст его diff (относительно merge base)"
 "ai hosting-reply --pr_head" = "С `--read-repo`: головная ревизия pull request"
 "ai hosting-reply --reply_to" = "Ответить в обсуждении с этим id (обсуждение кода, комментарий или дискуссия)"

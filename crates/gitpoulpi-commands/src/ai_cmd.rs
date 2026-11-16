@@ -667,6 +667,7 @@ pub(crate) struct ReplyArgs {
     pub draft: Option<String>,
     pub flavor: Option<String>,
     pub read_repo: bool,
+    pub continue_exchange: bool,
     pub refresh_context: bool,
     pub pr_base: Option<String>,
     pub pr_head: Option<String>,
@@ -729,6 +730,49 @@ async fn hosting_reply(
         });
     }
 
+    // The exchange: what an earlier call for this same target asked and
+    // answered, given back to a model that would not remember it.
+    let store = gitpoulpi_config::ConfigPaths::discover().map(|paths| {
+        let root = session
+            .repo_root()
+            .map(|r| r.display().to_string())
+            .unwrap_or_default();
+        let (thread, place) = match &request.target {
+            ReplyTarget::ThreadReply { thread } => (thread.clone(), String::new()),
+            ReplyTarget::LineComment { path, line, .. } => (
+                String::new(),
+                format!("{path}:{}", line.map(|l| l.to_string()).unwrap_or_default()),
+            ),
+            ReplyTarget::IssueBody { title } => (String::new(), title.clone()),
+            _ => (String::new(), String::new()),
+        };
+        let key = gitpoulpi_ai::hosting_reply::exchange::key_of(&[
+            &root,
+            request.target.name(),
+            &thread,
+            &place,
+            args.item.as_deref().unwrap_or_default(),
+        ]);
+        gitpoulpi_ai::hosting_reply::exchange::ExchangeStore::on_disk(
+            &paths.private_dir().join("ai-exchange"),
+            &key,
+        )
+    });
+    let mut exchange = if args.continue_exchange {
+        let store = store.as_ref().ok_or_else(|| {
+            "--continue: could not determine this OS's data directory".to_string()
+        })?;
+        let earlier = store.load();
+        if earlier.is_empty() {
+            return Err("--continue: no earlier draft for this target to continue".into());
+        }
+        earlier
+    } else {
+        Vec::new()
+    };
+    request.exchange = exchange.clone();
+    let (asked_hint, asked_draft) = (request.hint.clone(), request.draft.clone());
+
     let action = request.target.action();
     let job = ctx.job(session, action)?;
     let settings = gitpoulpi_config::Settings::resolve_ambient().map_err(|e| e.to_string())?;
@@ -780,6 +824,17 @@ async fn hosting_reply(
     } else {
         draft(&job, &request).await.map_err(|e| e.to_string())?
     };
+    if let Some(store) = &store {
+        gitpoulpi_ai::hosting_reply::exchange::push_capped(
+            &mut exchange,
+            gitpoulpi_ai::hosting_reply::Exchange {
+                hint: asked_hint,
+                draft: asked_draft,
+                answer: result.text.clone(),
+            },
+        );
+        store.save(&exchange);
+    }
     Ok(emitted(
         json!({
             "action": action.key(),
@@ -838,6 +893,7 @@ async fn run_action(
             draft,
             flavor,
             read_repo,
+            continue_exchange,
             refresh_context,
             pr_base,
             pr_head,
@@ -857,6 +913,7 @@ async fn run_action(
                     draft,
                     flavor,
                     read_repo,
+                    continue_exchange,
                     refresh_context,
                     pr_base,
                     pr_head,

@@ -34,6 +34,7 @@ fn sent() -> Prepared {
         }],
         excluded_files: vec![".env".into()],
         context: None,
+        history: Vec::new(),
     }
 }
 

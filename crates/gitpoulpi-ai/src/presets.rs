@@ -1312,6 +1312,39 @@ mod tests {
         assert_eq!(names.len(), PROVIDERS.len());
     }
 
+    /// Codex could resume (`codex exec resume <id> -`), but it picks the
+    /// session id itself and only prints it among its `--json` events, and
+    /// `--last` would pick up the user's own sessions. So GitPoulpi does not
+    /// resume it: a Codex run stays one-shot (`--ephemeral`) and the earlier
+    /// turns of an exchange are given back in the prompt instead.
+    #[test]
+    fn codex_stays_one_shot_so_the_history_is_given_back() {
+        let codex = harness_for("codex").unwrap();
+        assert!(!codex.supports_sessions());
+        // The one-shot setting (`--ephemeral`) is an option the user keeps on.
+        let run = args(&["exec", "-", "--ephemeral"]);
+        assert_eq!(run[..2], args(&["exec", "-"]));
+        for session in [
+            SessionUse::Start("x".into()),
+            SessionUse::Resume("x".into()),
+        ] {
+            assert_eq!(codex.with_session(&run, &session), None);
+        }
+        let read_only = codex.with_read_only_tools(&run).unwrap();
+        assert!(
+            read_only.contains(&"--ephemeral".to_string()),
+            "{read_only:?}"
+        );
+        assert!(!read_only.iter().any(|a| a == "resume" || a == "--last"));
+        // Claude is the one that keeps a session.
+        assert!(harness_for("claude").unwrap().supports_sessions());
+        for other in ["gemini", "opencode", "pi", "cursor-agent", "crush"] {
+            if let Some(h) = harness_for(other) {
+                assert!(!h.supports_sessions(), "{other}");
+            }
+        }
+    }
+
     #[test]
     fn terminal_options_never_carry_headless_only_flags() {
         for h in HARNESSES {

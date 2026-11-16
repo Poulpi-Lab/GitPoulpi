@@ -42,6 +42,12 @@ pub struct Built {
     pub entries_sent: usize,
     /// Entries left out for lack of room.
     pub entries_omitted: usize,
+    /// The earlier turns of the exchange that go along as messages, oldest
+    /// first (the first holds the conversation); empty for a first request.
+    /// `user` is then the follow-up alone.
+    pub history: Vec<crate::Turn>,
+    /// Earlier turns left out of `history` for lack of room.
+    pub history_omitted: usize,
 }
 
 /// Text of other people, made safe to put between the markers: a literal
@@ -131,10 +137,18 @@ fn task_line(target: &ReplyTarget, improving: bool) -> String {
 /// The user message for `request`, with the conversation held to `budget`
 /// bytes (`usize::MAX`: whole). Pure.
 pub fn build(request: &ReplyRequest, budget: usize) -> Built {
-    let improving = request
-        .draft
-        .as_deref()
-        .is_some_and(|d| !d.trim().is_empty());
+    build_with(request, &request.hint, request.draft.as_deref(), budget)
+}
+
+/// [`build`] for the `hint` and `draft` given instead of the request's own
+/// (the first message of an exchange is rebuilt from its first hint and draft).
+pub(super) fn build_with(
+    request: &ReplyRequest,
+    hint: &str,
+    draft: Option<&str>,
+    budget: usize,
+) -> Built {
+    let improving = draft.is_some_and(|d| !d.trim().is_empty());
     let mut user = format!(
         "{}\nWrite in {}.\n\n",
         task_line(&request.target, improving),
@@ -266,14 +280,14 @@ pub fn build(request: &ReplyRequest, budget: usize) -> Built {
         }
     }
 
-    let hint = request.hint.trim();
+    let hint = hint.trim();
     if !hint.is_empty() {
         user.push_str(&format!("What the user wants in this answer:\n{hint}\n\n"));
     }
     if improving {
         user.push_str(&format!(
             "The user's draft to improve:\n{}\n",
-            request.draft.as_deref().unwrap_or_default().trim()
+            draft.unwrap_or_default().trim()
         ));
     } else {
         user.push_str("Write the text now.\n");
@@ -283,7 +297,26 @@ pub fn build(request: &ReplyRequest, budget: usize) -> Built {
         cuts,
         entries_sent: sent,
         entries_omitted: omitted,
+        history: Vec::new(),
+        history_omitted: 0,
     }
+}
+
+/// The message of a follow-up in an exchange: only what is new (the
+/// conversation went in the first message of the exchange).
+pub(super) fn follow_up(hint: &str, draft: Option<&str>) -> String {
+    let mut out = String::new();
+    let hint = hint.trim();
+    if !hint.is_empty() {
+        out.push_str(&format!("What the user wants now:\n{hint}\n\n"));
+    }
+    match draft.map(str::trim).filter(|d| !d.is_empty()) {
+        Some(draft) => out.push_str(&format!(
+            "The user's current text (their own edits of your last draft included), to improve:\n{draft}\n"
+        )),
+        None => out.push_str("Write the text again with that change.\n"),
+    }
+    out
 }
 
 #[cfg(test)]

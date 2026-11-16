@@ -32,6 +32,17 @@ pub struct Prepared {
     /// The repository context that goes after the system prompt, cleaned
     /// too (only when the user let the AI read the repository).
     pub context: Option<crate::ContextBlock>,
+    /// The earlier turns of the exchange that go along, cleaned too.
+    pub history: Vec<crate::Turn>,
+}
+
+impl Prepared {
+    /// What the user message amounts to for the dialog and the print-only
+    /// output: the earlier turns written out in front of it, when there are
+    /// any ([`crate::transcript`]).
+    pub fn user_text(&self) -> String {
+        crate::transcript(&self.history, &self.user)
+    }
 }
 
 /// Asked before a prepared request is sent. `false` cancels it.
@@ -77,7 +88,7 @@ impl Report {
             }
             _ => p.system.clone(),
         };
-        r.sent.push((system, p.user.clone()));
+        r.sent.push((system, p.user_text()));
     }
 
     pub fn summary(&self) -> PrivacySummary {
@@ -285,6 +296,7 @@ pub fn prepare(system: &str, user: &str, settings: &Privacy) -> Prepared {
         redactions,
         excluded_files: excluded,
         context: None,
+        history: Vec::new(),
     }
 }
 
@@ -299,6 +311,23 @@ pub fn prepare_request(request: &crate::Request<'_>, settings: &Privacy) -> Prep
         prepared.context = Some(crate::ContextBlock {
             text: cleaned.system,
             summary: context.summary.clone(),
+        });
+    }
+    // The earlier turns were cleaned when they first went out, but what is
+    // kept is the text before cleaning: every request cleans it again (a turn
+    // is cleaned as `prepare` takes a pair: the answer as instructions, the
+    // message as the user part, with its per-file diffs).
+    for turn in request.history {
+        let cleaned = prepare(&turn.assistant, &turn.user, settings);
+        prepared.redactions.extend(cleaned.redactions);
+        for file in cleaned.excluded_files {
+            if !prepared.excluded_files.contains(&file) {
+                prepared.excluded_files.push(file);
+            }
+        }
+        prepared.history.push(crate::Turn {
+            user: cleaned.user,
+            assistant: cleaned.system,
         });
     }
     prepared
@@ -371,6 +400,7 @@ impl AiClient for PrivacyClient {
             .complete_request(&crate::Request {
                 system: &prepared.system,
                 context: prepared.context.as_ref(),
+                history: &prepared.history,
                 user: &prepared.user,
             })
             .await

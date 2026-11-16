@@ -117,27 +117,83 @@ pub trait AiClient: Send + Sync {
     /// (the stable-prefix order OpenAI-compatible servers cache by themselves);
     /// the Anthropic client sends it as its own cacheable system block and
     /// reads the cache counters back.
+    ///
+    /// With a `history` (the earlier turns of the same exchange) this default,
+    /// for a client with no message list of its own (a local agent reads one
+    /// document), writes them as a transcript in front of the new message
+    /// ([`transcript`]), so the agent knows what a resumed session would.
     async fn complete_request(&self, request: &Request<'_>) -> Result<Completion> {
-        let system = match request.context {
-            Some(context) if !context.text.is_empty() => {
-                format!("{}\n\n{}", request.system, context.text)
-            }
-            _ => request.system.to_string(),
-        };
         Ok(Completion {
-            text: self.complete(&system, request.user).await?,
+            text: self
+                .complete(
+                    &request.system_text(),
+                    &transcript(request.history, request.user),
+                )
+                .await?,
             usage: Usage::default(),
         })
     }
 }
 
+/// One earlier turn of an exchange: what was sent and the answer that came
+/// back (the message list of a chat API is these, in order).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Turn {
+    pub user: String,
+    pub assistant: String,
+}
+
 /// One request to a model: the instructions, the repository context (when
-/// the user let the AI read the repository) and the user message.
+/// the user let the AI read the repository), the earlier turns of the
+/// exchange and the user message.
+///
+/// The order is the cache order: instructions, repository context, then
+/// `history` (its first turn holds the conversation, the same in every
+/// request of an exchange), then `user`. Anything that changes from one
+/// request to the next comes last.
 #[derive(Debug, Clone, Copy)]
 pub struct Request<'a> {
     pub system: &'a str,
     pub context: Option<&'a ContextBlock>,
+    /// Earlier turns, oldest first; empty for a first request.
+    pub history: &'a [Turn],
     pub user: &'a str,
+}
+
+impl Request<'_> {
+    /// The instructions with the repository context after them, as one text.
+    pub fn system_text(&self) -> String {
+        match self.context {
+            Some(context) if !context.text.is_empty() => {
+                format!("{}\n\n{}", self.system, context.text)
+            }
+            _ => self.system.to_string(),
+        }
+    }
+}
+
+/// `history` and `user` as one document, for a client that takes a single
+/// message: the first turn as it was, then each answer and the next
+/// instruction under a plain label. A stable prefix: a later request only
+/// appends.
+pub fn transcript(history: &[Turn], user: &str) -> String {
+    let Some((first, rest)) = history.split_first() else {
+        return user.to_string();
+    };
+    let mut out = first.user.clone();
+    out.push_str(&format!(
+        "\n\nYour draft so far:\n{}",
+        first.assistant.trim()
+    ));
+    for turn in rest {
+        out.push_str(&format!(
+            "\n\nThe user then asked:\n{}\n\nYour draft:\n{}",
+            turn.user.trim(),
+            turn.assistant.trim()
+        ));
+    }
+    out.push_str(&format!("\n\nThe user now asks:\n{}", user.trim()));
+    out
 }
 
 /// An answer and what the provider said about its cache.

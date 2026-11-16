@@ -898,6 +898,7 @@ launch = "Co spouštějí zástupci GitPoulpi: ukáže okno už otevřeného Git
 "ai hosting-reply --path" = "Navrhne nový komentář při kontrole k tomuto souboru pull requestu"
 "ai hosting-reply --read_repo" = "Nechá AI číst repozitář pro tento návrh (vypnuto, dokud se nezadá nebo dokud `ai.hosting_reply.read_repository` není true). Lokální agent ho čte sám nástroji jen pro čtení ve složce repozitáře; profil API dostane kontext, který GitPoulpi sestaví (soubory, které konverzace jmenuje, nálezy hledání, mapu) v mezích `ai.limits.hosting_reply_*`. AI v obou případech jen navrhuje; nic se neodešle"
 "ai hosting-reply --refresh_context" = "Zapomene kontext a relaci agenta ponechané z dřívějších návrhů tohoto repozitáře a přečte ho znovu (s `--read-repo`)"
+"ai hosting-reply --continue_exchange" = 'Continue the exchange of the last `hosting-reply` for this same target (same `--item`, `--reply-to`, `--path`/`--line` or `--issue-title`): the earlier hints and drafts of it go back to the model as earlier turns, so "make it shorter" works. Not needed for a local Claude agent whose session is kept (it remembers). Without the flag a new exchange starts. Kept in the state folder'
 "ai hosting-reply --pr_base" = "S `--read-repo`: základní revize pull requestu, aby se do kontextu dostal jeho diff (proti merge base)"
 "ai hosting-reply --pr_head" = "S `--read-repo`: hlavní revize (head) pull requestu"
 "ai hosting-reply --reply_to" = "Odpoví ve vlákně s tímto id (vlákno ke kódu, komentář nebo diskuse)"

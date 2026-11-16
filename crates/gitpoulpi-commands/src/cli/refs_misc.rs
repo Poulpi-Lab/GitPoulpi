@@ -530,6 +530,14 @@ pub enum AiCommand {
         /// only drafts either way; nothing is posted.
         #[arg(long)]
         read_repo: bool,
+        /// Continue the exchange of the last `hosting-reply` for this same
+        /// target (same `--item`, `--reply-to`, `--path`/`--line` or
+        /// `--issue-title`): the earlier hints and drafts of it go back to the
+        /// model as earlier turns, so "make it shorter" works. Not needed for
+        /// a local Claude agent whose session is kept (it remembers). Without
+        /// the flag a new exchange starts. Kept in the state folder.
+        #[arg(long = "continue")]
+        continue_exchange: bool,
         /// Forget the context and the agent session kept from earlier drafts
         /// of this repository and read it again (with `--read-repo`).
         #[arg(long, requires = "read_repo")]

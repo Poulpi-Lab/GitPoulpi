@@ -259,9 +259,16 @@ fn request_texts(request: &ReplyRequest) -> (String, Vec<String>) {
         texts.push(item.description.clone());
     }
     texts.extend(request.entries.iter().map(|e| e.text.clone()));
-    texts.push(request.hint.clone());
-    if let Some(draft) = &request.draft {
-        texts.push(draft.clone());
+    // Within an exchange the selection stays the one of the first request, so
+    // the context (and the provider cache over it) is the same for every
+    // follow-up.
+    let (hint, draft) = match request.exchange.first() {
+        Some(first) => (first.hint.as_str(), first.draft.as_deref()),
+        None => (request.hint.as_str(), request.draft.as_deref()),
+    };
+    texts.push(hint.to_string());
+    if let Some(draft) = draft {
+        texts.push(draft.to_string());
     }
     (title, texts)
 }

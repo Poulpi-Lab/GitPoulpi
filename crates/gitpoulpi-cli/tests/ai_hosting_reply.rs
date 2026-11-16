@@ -150,6 +150,59 @@ fn prints_the_draft_and_says_nothing_was_posted() {
     }
 }
 
+/// `--continue` gives the earlier hints and drafts of the same target back to
+/// the model (this agent keeps no session, so it knows nothing otherwise); a
+/// call without it starts a new exchange, and another target has none to
+/// continue.
+#[test]
+#[cfg(unix)]
+fn continue_gives_the_earlier_drafts_of_the_same_target_back_to_the_model() {
+    let repo = fixture();
+    let tools = tempfile::tempdir().unwrap();
+    let config = tempfile::tempdir().unwrap();
+    let agent = write_capturing_fake_agent(tools.path(), &["Thanks, I will look tomorrow."]);
+    config_with(config.path(), &agent, "");
+    let file = write_page(tools.path(), vec![comment("c1", "bob", "Can you look?")]);
+    let ask = |extra: &[&str]| {
+        let mut args = vec!["--conversation", file.as_str()];
+        args.extend_from_slice(extra);
+        run(config.path(), repo.root(), "cli-ai-reply-continue", &args)
+    };
+
+    let (code, first) = ask(&["--hint", "be polite"]);
+    assert_eq!(code, 0, "{first}");
+    assert!(first["context"].get("history_turns").is_none(), "{first}");
+    assert!(!agent_prompt(&agent).contains("Your draft so far:"));
+
+    let (code, second) = ask(&["--hint", "make it shorter", "--continue"]);
+    assert_eq!(code, 0, "{second}");
+    assert_eq!(second["context"]["history_turns"], 1, "{second}");
+    let prompt = agent_prompt(&agent);
+    assert!(prompt.contains("Can you look?"), "{prompt}");
+    assert!(prompt.contains("be polite"), "{prompt}");
+    assert!(
+        prompt.contains("Your draft so far:\nThanks, I will look tomorrow."),
+        "{prompt}"
+    );
+    assert!(prompt.contains("make it shorter"), "{prompt}");
+
+    // A third one continues both.
+    let (_, third) = ask(&["--hint", "and friendlier", "--continue"]);
+    assert_eq!(third["context"]["history_turns"], 2, "{third}");
+
+    // Without the flag a new exchange starts, and replaces the kept one.
+    let (_, fresh) = ask(&["--hint", "start over"]);
+    assert!(fresh["context"].get("history_turns").is_none(), "{fresh}");
+    assert!(!agent_prompt(&agent).contains("Your draft so far:"));
+    let (_, again) = ask(&["--hint", "shorter", "--continue"]);
+    assert_eq!(again["context"]["history_turns"], 1, "{again}");
+
+    // Another target (a thread) has no exchange to continue.
+    let (code, value) = ask(&["--reply-to", "c1", "--hint", "x", "--continue"]);
+    assert_ne!(code, 0, "{value}");
+    assert!(value.to_string().contains("no earlier draft"), "{value}");
+}
+
 #[test]
 fn a_thread_answer_that_improves_a_draft_says_so() {
     let repo = fixture();

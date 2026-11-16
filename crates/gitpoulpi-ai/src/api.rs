@@ -35,12 +35,37 @@ impl OpenAiClient {
 #[async_trait::async_trait]
 impl AiClient for OpenAiClient {
     async fn complete(&self, system: &str, user: &str) -> Result<String> {
+        self.chat(json!([
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ]))
+        .await
+    }
+
+    /// The earlier turns of an exchange as real chat messages, after the
+    /// instructions and the repository context (one system message: the
+    /// order OpenAI-style servers cache a prefix by), the conversation first
+    /// and what changes last.
+    async fn complete_request(&self, request: &Request<'_>) -> Result<Completion> {
+        let mut messages = vec![json!({"role": "system", "content": request.system_text()})];
+        for turn in request.history {
+            messages.push(json!({"role": "user", "content": turn.user}));
+            messages.push(json!({"role": "assistant", "content": turn.assistant}));
+        }
+        messages.push(json!({"role": "user", "content": request.user}));
+        Ok(Completion {
+            text: self.chat(Value::Array(messages)).await?,
+            usage: Usage::default(),
+        })
+    }
+}
+
+impl OpenAiClient {
+    /// One chat-completions call with `messages`; the answer's text.
+    async fn chat(&self, messages: Value) -> Result<String> {
         let body = json!({
             "model": self.model,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
+            "messages": messages,
         });
         let mut request =
             HttpRequest::post_json(format!("{}/chat/completions", self.base_url), &body);
@@ -84,12 +109,12 @@ impl AnthropicClient {
 impl AnthropicClient {
     /// One Messages call with `system` as the API takes it (a string, or
     /// blocks with `cache_control`); the answer's text and cache counters.
-    async fn messages(&self, system: Value, user: &str) -> Result<Completion> {
+    async fn messages(&self, system: Value, messages: Value) -> Result<Completion> {
         let body = json!({
             "model": self.model,
             "max_tokens": 4096,
             "system": system,
-            "messages": [{"role": "user", "content": user}],
+            "messages": messages,
         });
         let request = HttpRequest::post_json(format!("{}/messages", self.base_url), &body)
             .header("x-api-key", self.key.clone())
@@ -121,25 +146,57 @@ impl AnthropicClient {
 #[async_trait::async_trait]
 impl AiClient for AnthropicClient {
     async fn complete(&self, system: &str, user: &str) -> Result<String> {
-        Ok(self.messages(json!(system), user).await?.text)
+        let messages = json!([{"role": "user", "content": user}]);
+        Ok(self.messages(json!(system), messages).await?.text)
     }
 
     /// The instructions and the repository context are two system blocks,
     /// each marked `cache_control: ephemeral`, so the provider reuses them for
     /// the next reply (the conversation, hint and draft are in the user
     /// message and change every time).
+    ///
+    /// Earlier turns of the exchange go as real messages, and the stable
+    /// prefix stays under `cache_control`: the instructions, the context, the
+    /// first user message (it holds the conversation, the same in every
+    /// request of the exchange) and the newest answer. That is four markers
+    /// at most, the API's limit; only the final instruction is new.
     async fn complete_request(&self, request: &Request<'_>) -> Result<Completion> {
-        let Some(context) = request.context.filter(|c| !c.text.is_empty()) else {
+        let context = request.context.filter(|c| !c.text.is_empty());
+        if context.is_none() && request.history.is_empty() {
             return Ok(Completion {
                 text: self.complete(request.system, request.user).await?,
                 usage: Usage::default(),
             });
+        }
+        let mark = json!({"type": "ephemeral"});
+        let mut system =
+            vec![json!({"type": "text", "text": request.system, "cache_control": mark})];
+        if let Some(context) = context {
+            system.push(json!({"type": "text", "text": context.text, "cache_control": mark}));
+        }
+        let cached = |role: &str, text: &str| {
+            json!({
+                "role": role,
+                "content": [{"type": "text", "text": text, "cache_control": mark}],
+            })
         };
-        let system = json!([
-            {"type": "text", "text": request.system, "cache_control": {"type": "ephemeral"}},
-            {"type": "text", "text": context.text, "cache_control": {"type": "ephemeral"}},
-        ]);
-        self.messages(system, request.user).await
+        let mut messages = Vec::new();
+        let last = request.history.len().saturating_sub(1);
+        for (i, turn) in request.history.iter().enumerate() {
+            messages.push(if i == 0 {
+                cached("user", &turn.user)
+            } else {
+                json!({"role": "user", "content": turn.user})
+            });
+            messages.push(if i == last {
+                cached("assistant", &turn.assistant)
+            } else {
+                json!({"role": "assistant", "content": turn.assistant})
+            });
+        }
+        messages.push(json!({"role": "user", "content": request.user}));
+        self.messages(Value::Array(system), Value::Array(messages))
+            .await
     }
 }
 

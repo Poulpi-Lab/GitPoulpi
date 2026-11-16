@@ -30,17 +30,19 @@ use serde::Serialize;
 
 use crate::assist::Job;
 use crate::limits::Cut;
-use crate::{AiClient, ContextBlock, ContextSummary, Error, Result};
+use crate::{AiClient, ContextBlock, ContextSummary, Error, Result, Turn};
 use repo_context::{AgentReads, RepoContext};
 
 pub mod cache;
 #[cfg(feature = "conversation")]
 pub mod convert;
+pub mod exchange;
 pub mod plan;
 pub mod prompt;
 pub mod repo_access;
 pub mod repo_context;
 
+pub use exchange::Exchange;
 pub use prompt::{build, Built, BASE_PROMPT};
 
 /// What the text is for.
@@ -175,6 +177,12 @@ pub struct ReplyRequest {
     /// The range of a pull request, so its diff can go in the repository
     /// context (only read when the repository is).
     pub diff: Option<DiffRange>,
+    /// The earlier requests of this exchange (a first draft, then "shorter"
+    /// ...), oldest first, with their answers. When the model would not
+    /// remember them (anything but a resumed agent session) they go along as
+    /// earlier turns, see [`exchange`]. The `hint` and `draft` above are the
+    /// newest request, not part of it.
+    pub exchange: Vec<Exchange>,
 }
 
 impl ReplyRequest {
@@ -188,7 +196,20 @@ impl ReplyRequest {
             flavor: "Markdown".into(),
             repo: RepoAccess::Off,
             diff: None,
+            exchange: Vec::new(),
         }
+    }
+
+    /// Whether a resumed agent session already holds the exchange, so
+    /// GitPoulpi must not give it back.
+    fn session_remembers(&self) -> bool {
+        matches!(
+            self.repo,
+            RepoAccess::AgentReadOnly {
+                session: Some(AgentSession::Continued),
+                ..
+            }
+        )
     }
 
     /// The repository part of the request as the model and the dialog see
@@ -225,12 +246,22 @@ pub struct ContextReport {
     pub entries_sent: usize,
     /// Entries left out for lack of room.
     pub entries_omitted: usize,
+    /// Earlier turns of the exchange sent again as messages.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub history_turns: usize,
+    /// Earlier turns left out for lack of room.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub history_omitted: usize,
     /// Whether the AI read the repository (by a built context or as an
     /// agent with read-only tools).
     pub repository: bool,
     /// What of the repository, when it was read.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repo: Option<RepoReport>,
+}
+
+fn is_zero(n: &usize) -> bool {
+    *n == 0
 }
 
 /// What the repository part of a request was.
@@ -305,7 +336,7 @@ pub async fn draft_with(job: &Job, client: &dyn AiClient, request: &ReplyRequest
     let built = prepare(job, request).await?;
     let block = request.context_block();
     let done = job
-        .run_context_with(client, block.as_ref(), &built.user)
+        .run_context_with(client, block.as_ref(), &built.history, &built.user)
         .await?;
     finish(request, &built, done)
 }
@@ -315,7 +346,9 @@ pub async fn draft_with(job: &Job, client: &dyn AiClient, request: &ReplyRequest
 pub async fn draft(job: &Job, request: &ReplyRequest) -> Result<Draft> {
     let built = prepare(job, request).await?;
     let block = request.context_block();
-    let done = job.run_context(block.as_ref(), &built.user).await?;
+    let done = job
+        .run_context(block.as_ref(), &built.history, &built.user)
+        .await?;
     finish(request, &built, done)
 }
 
@@ -365,6 +398,8 @@ fn finish(request: &ReplyRequest, built: &Built, done: crate::Completion) -> Res
         context: ContextReport {
             entries_sent: built.entries_sent,
             entries_omitted: built.entries_omitted,
+            history_turns: built.history.len(),
+            history_omitted: built.history_omitted,
             repository: repo.is_some(),
             repo,
         },
@@ -388,14 +423,46 @@ pub async fn prepare(job: &Job, request: &ReplyRequest) -> Result<Built> {
             job.action.key()
         )));
     }
-    let capped = build(request, job.limit.limits.reply_context);
+    let budget = job.limit.limits.reply_context;
+    // An exchange the model does not remember is given back: the first
+    // message is the conversation as the first request asked it, then each
+    // answer and the next instruction; the request itself is only the new
+    // instruction. A resumed agent session needs none of it.
+    let first = if request.session_remembers() {
+        None
+    } else {
+        request.exchange.first()
+    };
+    let message = |cap: usize| match first {
+        Some(first) => prompt::build_with(request, &first.hint, first.draft.as_deref(), cap),
+        None => build(request, cap),
+    };
+    let capped = message(budget);
     let cuts: Vec<Cut> = capped.cuts.clone();
-    if job.limit.decide(cuts).await? {
-        return Ok(build(request, usize::MAX));
+    let mut built = if job.limit.decide(cuts).await? {
+        message(usize::MAX)
+    } else {
+        capped
+    };
+    if first.is_some() {
+        let mut turns = vec![Turn {
+            user: std::mem::take(&mut built.user),
+            assistant: request.exchange[0].answer.clone(),
+        }];
+        for earlier in &request.exchange[1..] {
+            turns.push(Turn {
+                user: prompt::follow_up(&earlier.hint, earlier.draft.as_deref()),
+                assistant: earlier.answer.clone(),
+            });
+        }
+        (built.history, built.history_omitted) = exchange::trim(turns, budget);
+        built.user = prompt::follow_up(&request.hint, request.draft.as_deref());
     }
-    Ok(capped)
+    Ok(built)
 }
 
+#[cfg(test)]
+mod exchange_tests;
 #[cfg(test)]
 mod repo_tests;
 #[cfg(test)]

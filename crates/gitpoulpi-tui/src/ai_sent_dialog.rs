@@ -262,7 +262,7 @@ fn pane_lines(sent: &Prepared, width: usize) -> Vec<(String, bool)> {
         section(&mut lines, msg::CTX_PANE.get(), &context.text);
     }
     lines.push((String::new(), false));
-    section(&mut lines, pane_msg::DLG_SENT_USER.get(), &sent.user);
+    section(&mut lines, pane_msg::DLG_SENT_USER.get(), &sent.user_text());
     lines
 }
 

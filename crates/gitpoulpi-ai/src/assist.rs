@@ -354,16 +354,17 @@ impl Job {
     /// over the real network transport (or the agent subprocess).
     #[cfg(feature = "network")]
     pub async fn run(&self, user: &str) -> Result<String> {
-        Ok(self.run_context(None, user).await?.text)
+        Ok(self.run_context(None, &[], user).await?.text)
     }
 
-    /// [`Job::run`] with a block of repository context after the
+    /// [`Job::run`] with the earlier turns of an exchange and a block of repository context after the
     /// instructions (see [`crate::AiClient::complete_request`]): the answer
     /// and the provider's cache counters.
     #[cfg(feature = "network")]
     pub async fn run_context(
         &self,
         context: Option<&crate::ContextBlock>,
+        history: &[crate::Turn],
         user: &str,
     ) -> Result<crate::Completion> {
         let client = crate::client_for_network_with(
@@ -373,7 +374,8 @@ impl Job {
             &self.privacy,
             self.scrub_env,
         )?;
-        self.run_context_with(&*client, context, user).await
+        self.run_context_with(&*client, context, history, user)
+            .await
     }
 
     /// [`Job::run`] over a caller-supplied client (tests).
@@ -387,6 +389,7 @@ impl Job {
         &self,
         client: &dyn AiClient,
         context: Option<&crate::ContextBlock>,
+        history: &[crate::Turn],
         user: &str,
     ) -> Result<crate::Completion> {
         let job = self.with_files_counted(user);
@@ -394,6 +397,7 @@ impl Job {
             .complete_request(&crate::Request {
                 system: &job.system_prompt(),
                 context,
+                history,
                 user,
             })
             .await

@@ -50,21 +50,41 @@ nazywa się **Zatwierdzenia**.
 
 ### Podsumowanie
 
-Opis (podstawowy Markdown jest pokazany jako taki: pogrubienie, kursywa, `kod`, odnośniki jako ich tekst, listy
-punktowane i numerowane, nagłówki, cytaty i bloki kodu), potem dyskusja: komentarze, które nie dotyczą kodu, i
-już wysłane przeglądy, od najstarszego, każdy z werdyktem (`zaakceptowano`, `zażądano zmian`, `skomentowano`,
-`uchylono`). W GitLab werdyktami są jego akceptacje. Pod spodem pole odpowiedzi: kliknij je lub naciśnij **`c`**,
-aby napisać komentarz do dyskusji. **Ten jest publikowany od razu**, a pole to mówi.
+Podsumowanie to **rozmowa żądania**: ta sama oś czasu i to samo pole komentarza co przy zgłoszeniu
+([Rozmowy](hosting-integration.md#5c-rozmowy)). Najpierw opis (*otworzył(a) to*), potem komentarze,
+wątki w kodzie z fragmentem diffu, wysłane przeglądy z werdyktem (`zaakceptowano`, `zażądano zmian`,
+`skomentowano`, `uchylono`; w GitLab werdyktami są jego akceptacje) i zdarzenia, od najstarszego, w oknie
+najnowszych wpisów z przyciskiem **Wczytaj starsze** na górze. Pole komentarza jest zadokowane pod osią czasu
+(**Nowy komentarz**): **Pisanie**, **Podgląd** i **Podział**, **Anuluj** i **Wyślij**. **Komentarz wysłany tutaj
+trafia do hosta od razu** (nic nie czeka: oczekujące są komentarze w kodzie, wysyłane razem z przeglądem), pojawia
+się na liście natychmiast i zajmuje swoje miejsce, gdy host odpowie; jeśli host go odrzuci, pole otwiera się
+ponownie z twoim tekstem i powodem.
 
-Pole komentarza (także pole odpowiedzi, komentarza do linii i podsumowania w **Zakończ przegląd**) to edytor Markdown
-wspólny z [widokiem rozmowy](hosting-integration.md#pisanie): **Pisanie**, **Podgląd** (`Alt+P`) i **Podział**
-(`Alt+L`, w oknie szerokim na 100 kolumn), `Ctrl+Enter` (także `Ctrl+S`, `Alt+Enter`) wysyła, a gdy AI jest włączone,
-`Alt+E` otwiera **Pisz z AI** ([rozdział o AI](ai.md#pomoc-w-pisaniu-na-hoście)). Podgląd pokazuje tekst tak, jak
-pokaże go host, z odwołaniami (`#7`, `!12`, `ABC-12`, id commitów); niewysłany tekst jest przechowywany dla każdego
-żądania. Tekst opisu i rozmowy używa tego samego renderera, więc Markdown, tabele, alerty i odwołania wyglądają tu
-tak samo jak w widoku rozmowy zgłoszenia. Cytowanie, edycja lub usuwanie już opublikowanego komentarza oraz
-notatki wewnętrzne należą do widoku rozmowy zgłoszeń i żądań na hostach bez przeglądu (zob.
-[Rozmowy](hosting-integration.md#5c-rozmowy)); tutaj można edytować tylko twoje oczekujące komentarze.
+Klawisze są takie jak w widoku rozmowy: **`Up`** / **`Down`** (i `Ctrl+J` / `Ctrl+K`) przechodzą między
+wpisami, **`r`** odpowiada w wątku zaznaczonego wpisu, **`Q`** cytuje go w nowym komentarzu, **`c`** pisze nowy
+komentarz, **`e`** / **`d`** edytują i usuwają twoje własne komentarze (przed usunięciem jest pytanie), **`l`**
+lub `Enter` otwiera linki wpisu, **`g`** jego diagram, **`y`** kopiuje jego adres, **`o`** otwiera go w przeglądarce,
+**`n`** przechodzi do następnego nieprzeczytanego wpisu, **`v`** pokazuje lub ukrywa zdarzenia, **`m`** wczytuje
+starsze wpisy, `Tab` przechodzi między osią czasu a polem, a **Notatka wewnętrzna** (`Alt+I`) jest tam, gdzie host
+ma takie notatki. Przyciski zaznaczonego wpisu (**Odpowiedz**, **Cytuj**, **Edytuj**, **Usuń**, **Linki**) robią
+to samo, a paleta ma wiersze *Rozmowa: ...* obok wierszy *Przegląd: ...*. O link pyta się przed otwarciem, jak
+wszędzie w przeglądzie.
+
+Tam, gdzie klawisz rozmowy spotyka się z klawiszem przeglądu, na tej stronie literę ma rozmowa: `l` (etykiety),
+`m` (kamień milowy), `Q` (porzucenie w Gerrit), `e` / `d`, `r`. Etykiety, kamień milowy i porzucenie zostają na
+przyciskach nagłówka i w palecie; `a` (przypisani), `p` (recenzenci), `f` (**Zakończ przegląd**), `b`
+(**Checkout**), `P`, `D`, `U` i `Alt+1` / `Alt+2` / `Alt+3` zachowują tu swoje znaczenie. Gdy pole ma klawiaturę,
+każdy klawisz należy do pola, z wyjątkiem `Alt+1` / `Alt+2` / `Alt+3`; `Esc` oddaje klawiaturę osi czasu, a drugie
+`Esc` zamyka przegląd.
+
+Komentarz napisany w innym oknie lub przez CLI pokazuje się tu sam: każdy zapis GitPoulpi (także z tego okna)
+informuje sesję, a okna pokazujące to samo żądanie czytają je ponownie.
+
+Pole komentarza to edytor Markdown wspólny z [widokiem rozmowy](hosting-integration.md#pisanie) (także pole
+odpowiedzi w wątku, komentarza do linii i podsumowania w **Zakończ przegląd**): `Ctrl+Enter` (także `Ctrl+S`,
+`Alt+Enter`) wysyła, a gdy AI jest włączone, `Alt+E` otwiera **Pisz z AI**
+([rozdział o AI](ai.md#pomoc-w-pisaniu-na-hoście)). Podgląd pokazuje tekst tak, jak pokaże go host, z odwołaniami
+(`#7`, `!12`, `ABC-12`, id commitów); niewysłany tekst jest przechowywany dla każdego żądania.
 
 ### Pliki
 
@@ -237,17 +257,18 @@ Sugestie **nie są komentarzami**. Widać je w dwóch miejscach:
   trzema przyciskami: **Przyjmij**, **Edytuj** i **Odrzuć**. Sugestia dotycząca linii, której diff nie pokazuje, jest
   zachowywana, nigdy gubiona: jest wypisana po hunkach pod nagłówkiem *Sugestie AI dotyczące całego pliku* i, po
   przyjęciu, ląduje na pierwszej zmienionej linii pliku ze słowami *(dotyczy linii N)* z przodu.
-- **W Podsumowaniu**, pod opisem: podsumowanie, a potem lista z tymi samymi przyciskami oraz **Przyjmij wszystkie** /
-  **Odrzuć wszystkie**.
+- **W Podsumowaniu**, w bloku nad rozmową (tylko po uruchomieniu): podsumowanie, a potem lista z tymi samymi
+  przyciskami oraz **Przyjmij wszystkie** / **Odrzuć wszystkie**.
 
 **Przyjmij** (`y`) zamienia sugestię w zwykły **oczekujący komentarz** (nadal możesz go edytować lub usunąć);
 **Edytuj** (`w`) otwiera pole komentarza ze słowami modelu na początku i przyjmuje to, co zostawisz; **Odrzuć** (`n`)
 ją porzuca. **Przyjmij wszystkie** (`A`) nadal tylko wypełnia listę oczekujących. Na stronie Pliki klawisze działają na
-sugestię pod kursorem, w Podsumowaniu na pierwszą z listy. **Użyj podsumowania AI** (`i` albo przycisk
+sugestię pod kursorem, w Podsumowaniu na pierwszą z listy (`y` i `n` znów są rozmowy *Kopiuj link* i
+*Następny nieprzeczytany*, gdy lista jest pusta). **Użyj podsumowania AI** (`i` albo przycisk
 w formularzu Zakończ przegląd) wkłada podsumowanie modelu do treści przeglądu; nigdy nie jest wstawiane samo.
 **Nic nie jest wysyłane do hosta, dopóki nie wyślesz przeglądu.**
 
-Podsumowanie pokazuje szkic jako kartę nad sugestiami: plakietkę werdyktu, tekst przeglądu i trzy
+Podsumowanie pokazuje szkic jako kartę na górze tego bloku, nad sugestiami: plakietkę werdyktu, tekst przeglądu i trzy
 przyciski.
 
 - **✦ Użyj szkicu...** (`u`) przyjmuje każdą otwartą sugestię jako oczekujący komentarz i otwiera *Zakończ przegląd* już
@@ -268,7 +289,7 @@ Wysłanie przeglądu zużywa szkic.
 |---|---|---|
 | Podsumowanie / Pliki / Commity | `Alt+1` / `Alt+2` / `Alt+3` | *Przegląd: Pokaż podsumowanie*, *Pokaż pliki*, *Pokaż commity* |
 | Komentarz do linii lub zakresu | `c` | *Przegląd: Skomentuj linię...* |
-| Komentarz do dyskusji | `c` w Podsumowaniu, `C` | *Przegląd: Skomentuj dyskusję...* |
+| Komentarz do dyskusji | `c` w Podsumowaniu, `C` | *Przegląd: Skomentuj dyskusję...* (otwiera pole Podsumowania), *Rozmowa: Nowy komentarz* |
 | Odpowiedź w wątku | `r` | *Przegląd: Odpowiedz w wątku...* |
 | Rozwiąż lub otwórz ponownie | `x` | *Przegląd: Rozwiąż lub otwórz ponownie wątek* |
 | Zwiń lub rozwiń wątek | `z` | *Przegląd: Zwiń lub rozwiń wątek* |

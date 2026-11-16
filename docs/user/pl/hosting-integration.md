@@ -447,7 +447,7 @@ Ta sama tablica jest dostępna dla skryptów i agentów: `gitpoulpi hosting boar
 Karta pokazuje numer, tytuł, przypisanych jako inicjały, etykiety i kamień milowy. Przeciągnij ją na inną kolumnę,
 albo `Shift+Left` / `Shift+Right`, albo **Tablica: Przenieś kartę do...** (`m`). Przenosi się od razu; po około 150 ms spinner
 mówi, że host jeszcze pracuje, a jeśli host odmówi, karta wraca, a pasek stanu mówi dlaczego. `Enter` otwiera
-zgłoszenie na hoście (notatkę, dla zgłoszeń lokalnych); `e` edytuje przypisanych, etykiety i kamień milowy; `n` zaczyna nowe zgłoszenie w
+[rozmowę](#5c-rozmowy) zgłoszenia w GitPoulpi, a tablica wraca po jej zamknięciu; `e` edytuje przypisanych, etykiety i kamień milowy; `n` zaczyna nowe zgłoszenie w
 zaznaczonej kolumnie; `a`, `l`, `M` i `/` filtrują według przypisanego, etykiety, kamienia milowego i tekstu, `x` czyści filtry; `r`
 czyta hosta ponownie. Tablica czyta ponownie, gdy listy paska bocznego się odświeżają. Radar nie ma tablicy.
 
@@ -462,7 +462,7 @@ pushe). GitPoulpi czyta ją z hosta, pokazuje sformatowaną i pozwala odpowiedzi
 | Skąd | Jak |
 |---|---|
 | Wiersz ZGŁOSZENIA | `Enter` lub dwukrotne kliknięcie; **Otwórz rozmowę** w menu wiersza; paleta *Hosting: Otwórz rozmowę zgłoszenia...* (lista zgłoszeń na ekranie). **Otwórz w przeglądarce** w menu wiersza zostawia przeglądarkę. |
-| Wiersz PULL REQUESTS w Azure DevOps lub Bitbucket | `Enter` lub **Otwórz rozmowę**. W GitHub, GitLab, Gitea, Forgejo i Gerrit wiersz otwiera [przegląd](review.md), którego strona Przegląd ogólny jest rozmową żądania. |
+| Wiersz PULL REQUESTS w Azure DevOps lub Bitbucket | `Enter` lub **Otwórz rozmowę**. W GitHub, GitLab, Gitea, Forgejo i Gerrit wiersz otwiera [przegląd](review.md), którego strona Podsumowanie jest tą samą rozmową (oś czasu, klawisze i pole komentarza pod nią). |
 | Karta [tablicy zgłoszeń](#5b-tablica-zgłoszeń) | `Enter` lub dwukrotne kliknięcie. |
 | [Radar](radar.md) | `i` na wierszu zgłoszenia lub żądania, **Otwórz rozmowę** w menu wiersza albo *Radar: Otwórz rozmowę zgłoszenia*. |
 | Odwołanie w innej rozmowie | Kliknij je (albo `l`, potem wybierz): `#7`, `!12`, `ABC-12` powiązanego źródła otwierają się w aplikacji i trafiają na stos Wstecz. |

@@ -251,6 +251,20 @@ kolorem, że potrzebny będzie force push (z lease), i prosi o drugie
 potwierdzenie. `Ctrl+Z` (Cofnij na pasku narzędzi) cofa reword; zob.
 [Cofnij i ponów](undo-redo.md). Pasek stanu podaje też poprzedni wierzchołek gałęzi.
 
+Commit, którego nie ma na bieżącej gałęzi (leży na innej), nie może być tu edytowany ani
+poprawiony, więc *Edytuj opis commita...* i *Popraw...* otwierają zamiast tego okno
+**Edytowanie: commit z innej gałęzi**, czyli listę wyborów (`Up` / `Down` lub `Ctrl+J` / `Ctrl+K`
+przesuwają, `Enter` lub kliknięcie wybiera, `Esc`, krzyżyk albo **Anuluj (A)** zamyka okno):
+
+- **Checkout `<gałąź>` i edytuj (1)**: jeden wiersz na każdą lokalną gałąź, której historia
+  zawiera ten commit (`1` do `8`, pierwsze osiem, reszta jest zliczona). Gałąź jest wyewidencjonowana
+  zwykłym sposobem, a potem na niej otwiera się edycja. Cofanie to dwie osobne operacje:
+  `Ctrl+Z` cofa edycję, a checkout pozostaje checkoutem.
+- **Zaawansowane przepisanie historii (P)**: otwiera [warsztat przepisywania historii](history-rewrite.md)
+  na tym commicie, w kompilacjach, które go mają.
+- **Utwórz gałąź tutaj... (G)**: tylko gdy żadna lokalna gałąź nie zawiera commita (na przykład
+  leży tylko na zdalnej); otwiera pole nazwy dla gałęzi w tym miejscu.
+
 ## Poprawianie commita (opis, autor, daty)
 
 Pozycja *Popraw...* w menu commita (albo `Ctrl+G Shift+E`, albo *Commit: Popraw...* w palecie) otwiera jedno okno z właściwościami commita: podsumowaniem, opisem oraz imieniem, e-mailem i datą autora, każde wypełnione wartościami commita. Zmień, co chcesz, i naciśnij **Zastosuj**; wysyłane są tylko zmienione pola. Datę zapisuje się jako `YYYY-MM-DD HH:MM:SS +HH:MM` i do czasu edycji jest pokazywana w UTC. Committerem zostajesz ty, z bieżącą datą (jak przy reword). Poprawić można każdy commit bieżącej gałęzi, z tymi samymi zasadami, tym samym ostrzeżeniem o już wypchniętym commicie i tym samym drugim potwierdzeniem co w *Edytuj opis commita...*; commity powyżej są tworzone od nowa z własnymi autorami i datami, a twoje zmiany w poczekalni i poza nią zostają nietknięte. `Ctrl+Z` (Cofnij na pasku narzędzi) wycofuje operację. W kompilacjach z przepisywaniem historii przycisk **Zmień historię głębiej...** (`Alt+H`) w lewym dolnym rogu okna zamyka je bez stosowania czegokolwiek i otwiera [warsztat przepisywania historii](history-rewrite.md) z zakresem od tego commita do najnowszego; jeśli zmieniono jakieś pole, najpierw pyta (`Esc` potwierdza). `Ctrl+N` pokazuje plakietkę przy każdym polu i przycisku okna; naciśnij ją, by ustawić kursor w tym polu lub nacisnąć ten przycisk (zob. [Plakietki](keybindings.md#plakietki)).
@@ -411,7 +425,7 @@ To, co jest porównywane, zależy od zaznaczenia:
 | wiersz WIP i commit lub stash | ten commit z drzewem roboczym: zmiany staged i unstaged w plikach śledzonych (pliki nieśledzone nie są częścią diffu) |
 | trzy lub więcej commitów | ich połączone zmiany: od chwili tuż przed najstarszym do najnowszego (merge podążają za pierwszym rodzicem) |
 
-Zmiana nazwy pokazuje się jako usunięcie plus dodanie. **Zamień** (`x`) zamienia końce porównania dwóch wierszy; przy wierszu WIP, który zawsze jest nowszym końcem, albo przy zakresie trzech lub więcej wierszy nie ma czego zamieniać. Porównanie z wierszem WIP podąża za drzewem roboczym, gdy zapisujesz pliki.
+Plik ze zmienioną nazwą lub przeniesiony pokazuje się jako jeden plik, ze starą nazwą i podobieństwem nad jego diffem. **Zamień** (`x`) zamienia końce porównania dwóch wierszy; przy wierszu WIP, który zawsze jest nowszym końcem, albo przy zakresie trzech lub więcej wierszy nie ma czego zamieniać. Porównanie z wierszem WIP podąża za drzewem roboczym, gdy zapisujesz pliki.
 
 Klawiatura: `v` (albo **Log: Porównaj zaznaczenie** w palecie poleceń) przenosi fokus na listę plików porównania; `x` (albo **Log: Zamień końce porównania**) zamienia; `n` (albo **Log: przejdź do następnego porównywanego wiersza**) to klawiaturowy bliźniak kliknięcia kafelka: kursor Logu przechodzi do następnego zaznaczonego wiersza, zawijając się na końcu. `Esc` albo zwykłe kliknięcie wiersza wraca do pojedynczego commita. Pozycja **Cherry-pick** liczy tylko commity z zaznaczenia; wiersz WIP i stashe są tam ignorowane.
 

@@ -242,11 +242,16 @@ GitPoulpi 没有确认其只读模式的代理（以及交互式终端运行模�
 
 - API 配置构建的上下文按仓库保留 `ai.hosting_reply.context_ttl_minutes`（*仓库上下文保留时长*，默认 30）。它以仓库、其 `HEAD`、所选内容和上限为键，各部分逐个保留，所以同一仓库的下一个议题只重建它不共享的部分。在窗口中缓存保存在内存里（最近 8 份上下文）；CLI 把它们保存在其私有状态文件夹的文件中，所以第二次 `ai hosting-reply --read-repo` 会复用第一次构建的内容。
 - 已检出分支上的新提交（`HEAD` 移动）、上限的更改或时间限制会让一切重新开始。**刷新上下文**同样如此，即读取仓库时面板中的按钮，或 CLI 上的 `--refresh-context`。框下面的一行说明上一份草稿做了什么：*已构建上下文：5 个部分，31.2 KB，HEAD a1b2c3d*、*已复用上下文（4/5 个部分，HEAD a1b2c3d）*、*服务商缓存：复用 12k 个 token*、*代理已读取仓库（HEAD a1b2c3d）*、*代理会话已开始*或*代理会话已继续*。
-- **Anthropic 提示词缓存。**对 Anthropic 配置，请求发送时把基础提示词和指令作为一个缓存块，仓库上下文作为第二个，你的对话、提示和草稿放在它们之后，因此在同一上下文上的第二次回复会从服务商的缓存中读取，只需一小部分费用。回答中的缓存计数就是*服务商缓存：复用 N 个 token* 所显示的内容。OpenAI 兼容服务器得到同样稳定的请求顺序，能受益于它们的自动前缀缓存；GitPoulpi 不会额外发送任何内容。
+- **Anthropic 提示词缓存。**对 Anthropic 配置，请求发送时把基础提示词和指令作为一个缓存块，仓库上下文作为第二个，你的对话、提示和草稿放在它们之后，因此在同一上下文上的第二次回复会从服务商的缓存中读取，只需一小部分费用（后续追问还会缓存对话消息和最新的草稿，见下文）。回答中的缓存计数就是*服务商缓存：复用 N 个 token* 所显示的内容。OpenAI 兼容服务器得到同样稳定的请求顺序，能受益于它们的自动前缀缓存；GitPoulpi 不会额外发送任何内容。
 - **代理保留它的会话。**在**在回复之间保留代理会话**（`ai.hosting_reply.reuse_agent_session`，默认开启）且勾选了*允许 AI 读取仓库*时，支持此功能的本地代理（目前是 Claude Code）会带着会话 id 启动，之后凭它恢复，所以它读到的仓库内容保留在自己的历史中，下一次回复启动更快。其他代理以一次性方式运行。会话按仓库、`HEAD` 和操作区分；新提交或**刷新上下文**会开始新会话；该选项关闭或未勾选该框时，每次回复都是什么也不保留的一次性运行。会话保存在代理自己的存储中，GitPoulpi 只保留它的 id（窗口中在内存里，CLI 则在仅用户可读的文件中）。
+
+**追问：更短、换一条指令。**在同一个文本框里再问一次（“改短一点”“加一句感谢”）算作一次交流。恢复的 Claude Code 会话自己记得它。其他所有情况（API 配置、Codex 以及其他所有代理），GitPoulpi 会把它还给模型：请求带上第一次请求的对话消息，然后是此前的每条指令和回答它的草稿，作为正式的聊天轮次（对只读取一份文档的代理，则是提示词中的一份记录），最后只有新的内容：你的指令，以及在勾选了*改进我的草稿*时，框中现在的文本，包含你自己的修改。所以追问从不从零开始，也不会再次读取仓库。“发送内容”会完整显示这一切。这次交流和对话一样受 `ai.limits.hosting_reply_context_bytes` 限制：最旧的追问最先被舍去，对话消息和你最新的草稿始终保留（CLI 回答中的 `context.history_omitted` 会统计被舍去的轮次）。在一次交流中，仓库上下文始终是它第一次请求的那份，因此会被复用，服务商的缓存也能命中：对 Anthropic 配置，基础提示词、仓库上下文、对话消息和最新的草稿是被缓存的部分，OpenAI 兼容服务器则得到同样的消息顺序，以受益于它的前缀缓存。Codex 本可以用 `codex exec resume <id>` 恢复，但会话 id 由它自己选定，只在它的 JSON 事件中打印出来（而且 `--last` 会接上你自己的会话），所以 GitPoulpi 让它保持一次性运行，改为重新提供历史。这次交流与文本框同生共死：文本框关闭或文本发送后它就结束，**刷新上下文**也会丢弃它（下一次请求又是第一次请求）。只有得到回答的请求才会加入它；失败或被停止的不会。pull request 描述由 diff 写成，没有交流。
+
+在 CLI 上每次调用都是独立的，所以用 `--continue` 接续这次交流：它会延续此仓库中针对同一目标（相同的 `--item`、`--reply-to`、`--path`/`--line` 或 `--issue-title`）的上一次 `ai hosting-reply`，数据来自私有状态文件夹中的一个小文件。不带 `--continue` 则开始新的交流，并替换已保留的那次。目标没有已保留的内容时使用 `--continue` 会报错。有先前轮次一起发送时，回答的 `context` 会带有 `history_turns`（以及 `history_omitted`）。
 
 ```
 gitpoulpi ai hosting-reply --conversation conversation.json --hint "say I will look tomorrow"
+gitpoulpi ai hosting-reply --conversation conversation.json --hint "shorter" --continue
 gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
 gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "is this our bug?"
 gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"

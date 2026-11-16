@@ -28,7 +28,7 @@ build-custom                     # Windows, cmd or PowerShell (scripts/build-cus
 | Mermaid | 没有“复制为 Mermaid gitGraph”（Log 菜单、`Shift+Y`、命令面板），CLI/MCP 中也没有 `log --format mermaid`。 另外，[对话](hosting-integration.md#5c-对话)中 `mermaid` 代码块下没有**打开图表**按钮（该块保持为代码），也没有“对话：打开条目的图表”命令面板行。 |
 | Board | 没有 Kanban 看板视图（议题标题处的按钮、命令面板），也没有 `hosting board` 命令。需要一个集成。 |
 | Conversation | 没有议题或请求的应用内[对话](hosting-integration.md#5c-对话)视图：在议题行、看板卡片或 Radar 行上按 Enter 仍像以前一样打开浏览器，没有“打开对话”行，没有“对话：…”命令面板命令，对话中也没有**AI 写作**（评审、议题表单和 pull request 表单的文本框保留它）。CLI 和 MCP 的对话命令（`hosting issue comments`、`comment`、`comment-edit`、`comment-delete`、`hosting review conversation`）和 `ai hosting-reply` 保留。需要一个集成。 |
-| Review | 没有应用内的代码评审视图（行菜单、在 pull request 行上按 Enter、命令面板、Radar 的 `Review`），也没有 AI 评审辅助。`hosting review` 的 CLI/MCP 命令保留（Gerrit 和代理会用到它们）。需要一个集成。 |
+| Review | 评审的“概览”页就是对话视图，所以含 Review 的构建也包含对话视图，不论 *Conversation* 如何。没有应用内的代码评审视图（行菜单、在 pull request 行上按 Enter、命令面板、Radar 的 `Review`），也没有 AI 评审辅助。`hosting review` 的 CLI/MCP 命令保留（Gerrit 和代理会用到它们）。需要一个集成。 |
 | 历史重写工作台（高级历史重写：作者、日期、消息、内容） | 没有历史重写工作台：没有 `重写：` 命令面板命令，没有工作台的组合键、按键或帮助部分，Log 菜单中没有“重写历史”行，修订对话框中没有“深入修改历史…”按钮，没有“用 AI 创建重写规则”或脚本 AI，同步设置页面上没有脚本限制，AI 设置中也没有历史重写 AI 区块。`rewrite` CLI/MCP 命令、`ai rewrite-script`、`ai rewrite-rules` 和 `ui propose rewrite` 都会从命令树中消失。`.mailmap` 身份（`mailmap`、`log.use_mailmap`）不属于它，会保留。 |
 | 全局搜索 | 标题栏中没有全局搜索按钮，没有 `Ctrl+Alt+F`，没有 `搜索：工作空间…` 命令面板命令，也没有 `gitpoulpi search` CLI/MCP 命令。Log 的查找栏（`ui show search`）是另一个功能，会保留。 |
 | 工作空间 | 窗口只使用默认的单一标签页列表（“无工作空间”）：没有工作空间标记，没有工作空间标签页，没有 `Alt+W` / `Alt+J`，没有 `工作空间：` 命令面板命令，标签页行中没有“添加到工作空间”，没有 `gitpoulpi workspace` CLI/MCP 命令，`commit` 和 `search` 上也没有 `--workspace` 标志。标签页和会话照常工作。其他构建写下的 `workspaces.toml` 既不会被读取，也不会被改动；工作空间的默认配置文件和 AI 指令不生效。Radar 和全局搜索覆盖已打开的标签页。 |

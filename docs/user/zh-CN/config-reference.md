@@ -101,8 +101,8 @@ author_email = "jane@work.example"
 | `ui.reveal_on_ref_click` | `true` | 在引用窗格中点击某个引用（分支、tag、远程分支、stash）会将 Log 滚动到其 commit 并让该行闪烁；commit 的选择不会移动。 |
 | `ui.log_wip_counts_in_message` | `true` | 更改列被隐藏时，在 WIP 消息中显示 WIP 的更改数量。 |
 | `ui.log_columns_layout` | `"fit"` | Log 各列的布局方式。`fit`：每个可见列都恰好适应窗格，只有 `message` 伸缩；窗格较窄时整列会让出空间。`scroll`：各列保持宽度（`message` 也是），不会让出空间，表格比窗格宽时可横向滚动。 |
-| `ui.log_column_widths_scroll` | 空 | `scroll` 布局的列宽，名称 -> 单元格数（允许 `message`，而 `ui.log_column_widths` 仍是 `fit` 布局的，从不包含 `message`）。在布局为 `scroll` 时拖动、调整或按内容调整某一列会写入。 |
-| `ui.log_columns_hidden`, `ui.log_columns_order`, `ui.log_column_widths` | 空 | Log 的列（`ref`、`graph`、`message`、`author`、`date`、`sha`、`changes`），在你隐藏、拖动或调整某一列时写入。`message` 不能被隐藏。 |
+| `ui.log_column_widths_scroll` | 空 | 旧键：Log 的列宽现在按仓库保存，在它的 `repo-state.toml` 中（`[log_columns]`，`fit` 和 `scroll` 两张表，名称 -> 单元格数；`scroll` 可以包含 `message`，`fit` 从不包含）。没有已保存列宽的仓库，若你有旧的 `ui.log_column_widths` / `ui.log_column_widths_scroll` 就使用它们，否则首次打开时按内容调整。 |
+| `ui.log_columns_hidden`, `ui.log_columns_order` | 空 | 显示哪些 Log 列（`ref`、`graph`、`message`、`author`、`date`、`sha`、`changes`）及其顺序，在你隐藏或拖动某一列时写入；所有仓库共用。`message` 不能被隐藏。`ui.log_column_widths` 是旧键（见上）。 |
 | `ui.commit_column_columns_visible`, `ui.commit_column_columns_order`, `ui.commit_column_columns_widths` | 空 | diff 旁 [Commit 列](interface-tour.md#commit-列)自己的各栏，与 Log 的列相互独立：显示的栏按名称列出（`ref`、`graph`、`message`、`author`、`date`、`changes`、`sha`；为空表示泳道、消息、作者和日期），它们从左到右的顺序，用同样的名称表示（为空表示刚才列出的顺序；漏掉的名称按该顺序排在后面），以及拖动得到的各栏宽度（以单元格计，未列出的栏为自动宽度），在你选择、移动或调整各栏时写入。`message` 不能被隐藏。在这些键出现之前写入的会话文件会被读取一次并导入其中。 |
 | `ui.sidebar_sections_hidden` | 空 | 你隐藏的左侧窗格分区（`local`、`remote`、`worktrees`、`stashes`、`tags`、`pull_requests`、`issues`、`submodules`），通过窗格的右键菜单或命令面板写入。至少始终会保留一个存在的分区。 这是默认值：每个仓库可以隐藏自己的分区（保存在该仓库的状态文件中），此键适用于没有自己选择的仓库；*用于所有仓库* 会写入它。 |
 | `ui.sidebar_sections_scope` | `"repository"` | 左侧窗格分区由谁决定：`repository`（每个仓库各自保存，`ui.sidebar_sections_hidden` 是默认值）或 `global`（所有仓库都显示 `ui.sidebar_sections_hidden`，更改也写入它）。来回切换不会丢失任何一套：开启 `global` 期间，各仓库自己的选择仍保存在它们的状态文件中。设置：*左侧窗格分区*。 |

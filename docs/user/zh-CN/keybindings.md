@@ -173,8 +173,8 @@ stage_file = "z"
 | `status` | `collapse_below` | 折叠该文件夹及其子文件夹 | `_`, `Shift+Left` |
 | `home` | `favorite` | 收藏或取消收藏仓库 | `f`, `*` |
 | `home` | `close_repo` | 关闭、移除或取消收藏该行 | `x`, `Delete` |
-| `home` | `copy_path` | Copy the Repository Path | `y` |
-| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
+| `home` | `copy_path` | 复制仓库路径 | `y` |
+| `home` | `open_in` | 用默认工具打开仓库 | `o` |
 | `home` | `browse` | 浏览仓库 | `b` |
 | `home` | `clone` | 克隆仓库 | `c` |
 | `home` | `init` | 初始化仓库 | `i` |
@@ -768,8 +768,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 仓库列表：将所选加入或移出收藏 | `f` |
 | 仓库列表：关闭或移除所选 | `x` |
 | 仓库列表：所选仓库菜单… | `.` |
-| Repositories: Copy Selected Path | `y` |
-| Repositories: Open Selected in Default Tool | `o` |
+| 仓库：复制所选路径 | `y` |
+| 仓库：用默认工具打开所选项 | `o` |
 | 仓库列表：搜索 | `/ / Ctrl+F` |
 | 仓库列表：折叠所有分区 | `-` |
 | 仓库列表：展开所有分区 | `+` |
@@ -1128,7 +1128,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | ✦ AI：拆分所选 Commit… |  |
 | ✦ AI：解释工作区更改 | `Ctrl+G w` |
 | ✦ AI：根据工作区更改撰写 Commit… | `Ctrl+G C` |
-| Sensitive Files: Show in File | `S` |
+| 敏感文件：在文件中显示 | `S` |
 | 撰写器：将文件移到 Commit… | `m` |
 | Diff：Blame |  |
 | Blame：在 Log 中显示 commit | `Enter` |

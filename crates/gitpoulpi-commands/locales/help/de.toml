@@ -398,6 +398,8 @@ ssh-command = "Die repository-lokale Festlegung von `core.sshCommand`: welchen S
 "stage --allow_sensitive" = "Stagt auch Dateien, die sensibel aussehen (ein privater Schlüssel, eine `.env`, ein erkanntes Token). Ohne das wird ein solches Staging abgelehnt und nichts gestaget (`[privacy] staging_guard`)"
 "stage --hunk" = "Index eines Hunks im Diff von `--file`, so nummeriert, wie `gitpoulpi diff --json` sie nummeriert"
 "stage --lines" = "Kommagetrennte Zeilenindizes innerhalb von `--hunk`"
+"stage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
+"unstage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
 "stash push --ai" = "Lässt die KI den Stash anhand der Änderungen im Arbeitsverzeichnis benennen (erfordert `ai.enabled = true`, siehe `docs/user/ai.md`)"
 submodule = "Submodule: sie samt Zustand auflisten, registrieren (`init`) oder auschecken (`update`)"
 "submodule init" = "Registriert Submodule in `.git/config`, ohne sie zu klonen (`git submodule init`). Ohne Pfade: alle"

@@ -392,6 +392,8 @@ amend = "Změní vlastnosti commitu aktuální větve: zprávu, jméno, e-mail a
 "stage --allow_sensitive" = "Přidá do indexu i soubory, které vypadají citlivě (soukromý klíč, `.env`, rozpoznaný token). Bez toho se takové přidání odmítne a do indexu se nepřidá nic (`[privacy] staging_guard`)"
 "stage --hunk" = "Index hunku v diffu `--file`, tak jak je číslují `gitpoulpi diff --json`"
 "stage --lines" = "Indexy řádků uvnitř `--hunk` oddělené čárkou"
+"stage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
+"unstage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
 "stash push --ai" = "Nechá AI pojmenovat stash podle rozpracovaných změn (vyžaduje `ai.enabled = true`, viz `docs/user/ai.md`)"
 "submodule" = "Submoduly: vypíše je s jejich stavem, zaregistruje (`init`) nebo přepne (`update`)"
 "submodule init" = "Zaregistruje submoduly v `.git/config`, aniž je naklonuje (`git submodule init`). Bez cest: všechny"

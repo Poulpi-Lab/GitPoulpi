@@ -398,6 +398,8 @@ ssh-command = "Le pin `core.sshCommand` local au dépôt : quelle clé SSH ce d�
 "stage --allow_sensitive" = "Indexe aussi les fichiers qui semblent sensibles (une clé privée, un `.env`, un jeton reconnu). Sans cette option, une telle indexation est refusée et rien n'est indexé (`[privacy] staging_guard`)"
 "stage --hunk" = "Indice d'un hunk dans le diff de `--file`, tel que `gitpoulpi diff --json` les numérote"
 "stage --lines" = "Indices de lignes séparés par des virgules dans `--hunk`"
+"stage --paths" = "Plusieurs chemins (fichiers ou dossiers) comme UNE seule opération : une entrée de journal, une étape d'`undo` (un fichier déplacé est son ancien et son nouveau chemin)"
+"unstage --paths" = "Plusieurs chemins (fichiers ou dossiers) comme UNE seule opération : une entrée de journal, une étape d'`undo` (un fichier déplacé est son ancien et son nouveau chemin)"
 "stash push --ai" = "Laisse l'IA nommer la mise de côté d'après les modifications en cours (nécessite `ai.enabled = true`, voir `docs/user/ai.md`)"
 submodule = "Sous-modules : les lister avec leur état, les enregistrer (`init`) ou les extraire (`update`)"
 "submodule init" = "Enregistre les sous-modules dans `.git/config` sans les cloner (`git submodule init`). Sans chemins : tous"

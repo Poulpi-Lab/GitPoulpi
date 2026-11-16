@@ -398,6 +398,8 @@ ssh-command = "Lokalne dla repozytorium przypięcie `core.sshCommand`: którego 
 "stage --allow_sensitive" = "Dodaje do poczekalni także pliki wyglądające na wrażliwe (klucz prywatny, `.env`, rozpoznany token). Bez tego takie dodanie jest odrzucane i nic nie trafia do poczekalni (`[privacy] staging_guard`)"
 "stage --hunk" = "Indeks hunka w diffie `--file`, tak jak numeruje je `gitpoulpi diff --json`"
 "stage --lines" = "Indeksy linii w `--hunk`, oddzielone przecinkami"
+"stage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
+"unstage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
 "stash push --ai" = "Pozwala AI nazwać stash na podstawie zmian roboczych (wymaga `ai.enabled = true`, zob. `docs/user/ai.md`)"
 submodule = "Submoduły: wylistuj je ze stanem, zarejestruj (`init`) lub zrób ich checkout (`update`)"
 "submodule init" = "Rejestruje submoduły w `.git/config` bez ich klonowania (`git submodule init`). Bez ścieżek: wszystkie"

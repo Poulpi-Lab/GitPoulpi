@@ -402,6 +402,8 @@ ssh-command = "The repository-local `core.sshCommand` pin: which SSH key this re
 "stage --allow_sensitive" = "Stage files that look sensitive (a private key, a `.env`, a recognized token) too. Without it such a stage is refused and nothing is staged (`[privacy] staging_guard`)"
 "stage --hunk" = "Index of a hunk within `--file`'s diff, as `gitpoulpi diff --json` numbers them"
 "stage --lines" = "Comma-separated line indices within `--hunk`"
+"stage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
+"unstage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
 "stash push --ai" = "Let the AI name the stash from the working changes (needs `ai.enabled = true`, see `docs/user/ai.md`)"
 submodule = "Submodules: list them with their state, register (`init`) or check out (`update`) them"
 "submodule init" = "Register submodules in `.git/config` without cloning them (`git submodule init`). No paths: all of them"

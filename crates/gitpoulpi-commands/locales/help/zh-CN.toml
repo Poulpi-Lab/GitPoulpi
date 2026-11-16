@@ -398,6 +398,8 @@ ssh-command = "仓库本地的 `core.sshCommand` 固定：此仓库使用哪个 
 "stage --allow_sensitive" = "同时暂存看起来敏感的文件（私钥、`.env`、可识别的令牌）。不带此项时，这样的暂存会被拒绝且不暂存任何内容（`[privacy] staging_guard`）"
 "stage --hunk" = "`--file` 的 diff 中某个 hunk 的索引，编号方式与 `gitpoulpi diff --json` 一致"
 "stage --lines" = "`--hunk` 内以逗号分隔的行索引"
+"stage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
+"unstage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
 "stash push --ai" = "让 AI 根据工作区更改为 stash 命名（需要 `ai.enabled = true`，见 `docs/user/ai.md`）"
 submodule = "子模块：列出其状态，注册（`init`）或检出（`update`）它们"
 "submodule init" = "在 `.git/config` 中注册子模块而不克隆它们（`git submodule init`）。不带路径：全部"

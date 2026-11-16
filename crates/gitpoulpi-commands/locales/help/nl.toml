@@ -398,6 +398,8 @@ ssh-command = "De repositorylokale `core.sshCommand`-pin: welke SSH-sleutel deze
 "stage --allow_sensitive" = "Stage ook bestanden die gevoelig lijken (een privésleutel, een `.env`, een herkend token). Zonder deze optie wordt zo'n stage geweigerd en wordt niets gestaged (`[privacy] staging_guard`)"
 "stage --hunk" = "Index van een hunk binnen de diff van `--file`, zoals `gitpoulpi diff --json` ze nummert"
 "stage --lines" = "Door komma's gescheiden regelindices binnen `--hunk`"
+"stage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
+"unstage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
 "stash push --ai" = "Laat de AI de stash een naam geven op basis van de werkwijzigingen (vereist `ai.enabled = true`, zie `docs/user/ai.md`)"
 submodule = "Submodules: toon ze met hun staat, registreer (`init`) of check ze uit (`update`)"
 "submodule init" = "Registreer submodules in `.git/config` zonder ze te klonen (`git submodule init`). Geen paden: alle"

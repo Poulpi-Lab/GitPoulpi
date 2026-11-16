@@ -398,6 +398,8 @@ ssh-command = "リポジトリローカルの `core.sshCommand` の固定：こ�
 "stage --allow_sensitive" = "機密に見えるファイル（秘密鍵、`.env`、認識されたトークン）もステージします。指定しない場合、そのようなステージは拒否され、何もステージされません（`[privacy] staging_guard`）"
 "stage --hunk" = "`--file` の差分内のハンクのインデックス（`gitpoulpi diff --json` が付ける番号）"
 "stage --lines" = "`--hunk` 内の行インデックス（カンマ区切り）"
+"stage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
+"unstage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
 "stash push --ai" = "作業中の変更から AI にスタッシュの名前を付けさせます（`ai.enabled = true` が必要。`docs/user/ai.md` を参照）"
 submodule = "サブモジュール：状態付きで一覧表示、登録（`init`）、チェックアウト（`update`）します"
 "submodule init" = "クローンせずにサブモジュールを `.git/config` に登録します（`git submodule init`）。パスなしならすべて"

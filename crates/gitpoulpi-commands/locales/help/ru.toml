@@ -398,6 +398,8 @@ ssh-command = "Закрепление `core.sshCommand` на уровне реп
 "stage --allow_sensitive" = "Добавлять в индекс и файлы, похожие на конфиденциальные (закрытый ключ, `.env`, распознанный токен). Без флага такая операция отклоняется и ничего не добавляется (`[privacy] staging_guard`)"
 "stage --hunk" = "Индекс hunk в diff для `--file`, как его нумерует `gitpoulpi diff --json`"
 "stage --lines" = "Индексы строк через запятую внутри `--hunk`"
+"stage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
+"unstage --paths" = "Several paths (files or folders) as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path)"
 "stash push --ai" = "Пусть ИИ назовёт stash по рабочим изменениям (нужен `ai.enabled = true`, см. `docs/user/ai.md`)"
 submodule = "Подмодули: показывает их с состоянием, регистрирует (`init`) или переключает (`update`)"
 "submodule init" = "Регистрирует подмодули в `.git/config`, не клонируя их (`git submodule init`). Без путей: все"

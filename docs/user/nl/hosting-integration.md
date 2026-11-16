@@ -448,7 +448,7 @@ Hetzelfde bord is beschikbaar voor scripts en agents: `gitpoulpi hosting board` 
 Een kaart toont het nummer, de titel, de toegewezenen als initialen, de labels en de mijlpaal. Sleep hem naar een andere kolom,
 of `Shift+Left` / `Shift+Right`, of **Bord: Kaart verplaatsen naar...** (`m`). Hij verplaatst direct; na ongeveer 150 ms zegt een spinner
 dat de host nog bezig is, en als de host weigert, gaat de kaart terug en zegt de statusbalk waarom. `Enter` opent
-het issue op de host (de notitie, bij lokale issues); `e` bewerkt toegewezenen, labels en mijlpaal; `n` start een nieuw issue in
+het [gesprek](#5c-gesprekken) van het issue in GitPoulpi, en het bord komt terug als je het sluit; `e` bewerkt toegewezenen, labels en mijlpaal; `n` start een nieuw issue in
 de geselecteerde kolom; `a`, `l`, `M` en `/` filteren op toegewezene, label, mijlpaal en tekst, `x` wist de filters; `r`
 leest de host opnieuw. Het bord leest opnieuw als de lijsten van de zijbalk vernieuwen. De Radar heeft geen bord.
 
@@ -464,7 +464,7 @@ verlaten.
 | Vanuit | Hoe |
 |---|---|
 | Een rij ISSUES | `Enter` of een dubbelklik; **Gesprek openen** in het rijmenu; palet *Hosting: Issuegesprek openen...* (een lijst van de issues op het scherm). **Openen in browser** in het rijmenu houdt de browser. |
-| Een rij PULL REQUESTS op Azure DevOps of Bitbucket | `Enter` of **Gesprek openen**. Op GitHub, GitLab, Gitea, Forgejo en Gerrit opent de rij de [review](review.md), waarvan de pagina Overzicht het gesprek van het verzoek is. |
+| Een rij PULL REQUESTS op Azure DevOps of Bitbucket | `Enter` of **Gesprek openen**. Op GitHub, GitLab, Gitea, Forgejo en Gerrit opent de rij de [review](review.md), waarvan de pagina Overzicht ditzelfde gesprek is (de tijdlijn, de toetsen en het opmerkingenvak eronder). |
 | Een kaart van het [issuebord](#5b-het-issuebord) | `Enter` of een dubbelklik. |
 | De [Radar](radar.md) | `i` op een issue- of verzoekrij, **Gesprek openen** in het rijmenu, of *Radar: Issuegesprek openen*. |
 | Een verwijzing in een ander gesprek | Klik erop (of `l`, kies dan): `#7`, `!12`, `ABC-12` van een gekoppelde bron openen in de app en komen op een Terug-stapel. |

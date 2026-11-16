@@ -49,21 +49,41 @@ Een segmentbesturing in de bovenrand wisselt van pagina: **Overzicht**, **Bestan
 
 ### Overzicht
 
-De beschrijving (basis-Markdown wordt als zodanig getoond: vet, cursief, `code`, links als hun tekst, opsommingen en
-genummerde lijsten, koppen, citaten en codeblokken), daarna het gesprek: de opmerkingen die niet bij code staan en de
-reviews die al zijn ingediend, oudste eerst, elk met zijn oordeel (`goedgekeurd`, `wijzigingen aangevraagd`, `opmerking geplaatst`,
-`ingetrokken`). Op GitLab zijn de oordelen de goedkeuringen. Eronder staat het antwoordvak: klik erop of druk op **`c`**
-om een opmerking in het gesprek te schrijven. **Deze wordt direct geplaatst**, en het vak zegt dat.
+Het Overzicht is **het gesprek van het verzoek**, dezelfde tijdlijn en hetzelfde opmerkingenvak als een issue heeft
+([Gesprekken](hosting-integration.md#5c-gesprekken)): eerst de beschrijving (*opende dit*), dan de opmerkingen, de
+discussies bij code met hun diff-fragment, de ingediende reviews met hun oordeel (`goedgekeurd`, `wijzigingen
+aangevraagd`, `opmerking geplaatst`, `ingetrokken`; op GitLab zijn de oordelen de goedkeuringen) en de gebeurtenissen,
+oudste eerst, in het nieuwste venster met bovenaan **Oudere laden**. Het opmerkingenvak zit onder de tijdlijn vast
+(**Nieuwe opmerking**): **Schrijven**, **Voorbeeld** en **Gesplitst**, **Annuleren** en **Verzenden**. **Een opmerking die je
+hier plaatst, gaat direct naar de host** (er is niets in behandeling: conceptopmerkingen zijn die bij code, die met de
+review worden verzonden), verschijnt meteen in de lijst en neemt haar plaats in zodra de host antwoordt; weigert de host
+haar, dan opent het vak opnieuw met je tekst en de reden.
 
-Het opmerkingsvak (ook het vak van een antwoord, een opmerking bij een regel en de samenvatting van **Review afronden**) is de
-Markdown-composer die het deelt met [de gespreksweergave](hosting-integration.md#schrijven): **Schrijven**, **Voorbeeld** (`Alt+P`) en
-**Gesplitst** (`Alt+L`, in een venster van 100 kolommen), `Ctrl+Enter` (ook `Ctrl+S`, `Alt+Enter`) verzendt, en waar AI aan staat
-opent `Alt+E` **Schrijven met AI** ([het hoofdstuk over AI](ai.md#schrijfhulp-op-een-host)). Het voorbeeld toont de tekst zoals de host
-hem toont, verwijzingen inbegrepen (`#7`, `!12`, `ABC-12`, commit-id's); een niet-verzonden tekst wordt per verzoek bewaard. De tekst in
-de beschrijving en het gesprek gebruikt dezelfde renderer, dus Markdown, tabellen, meldingen en verwijzingen zien er hier hetzelfde uit
-als in de gespreksweergave van een issue. Citeren, bewerken of verwijderen van een al geplaatste opmerking, en interne notities,
-horen bij de gespreksweergave van issues en van verzoeken op hosts zonder review (zie
-[Gesprekken](hosting-integration.md#5c-gesprekken)); hier kun je alleen je conceptopmerkingen bewerken.
+De toetsen zijn die van de gespreksweergave: **`Omhoog`** / **`Omlaag`** (en `Ctrl+J` / `Ctrl+K`) gaan tussen de items,
+**`r`** antwoordt in de discussie van het geselecteerde item, **`Q`** citeert het in een nieuwe opmerking, **`c`** schrijft
+een nieuwe opmerking, **`e`** / **`d`** bewerken en verwijderen je eigen opmerkingen (bij verwijderen wordt eerst gevraagd),
+**`l`** of `Enter` opent de links van een item, **`g`** zijn diagram, **`y`** kopieert zijn adres, **`o`** opent het in de
+browser, **`n`** gaat naar het volgende ongelezen item, **`v`** toont of verbergt gebeurtenissen, **`m`** laadt oudere
+items, `Tab` gaat tussen de tijdlijn en het vak, en **Interne notitie** (`Alt+I`) is er op hosts die zulke notities
+hebben. De knoppen van het geselecteerde item (**Antwoorden**, **Citeren**, **Bewerken**, **Verwijderen**, **Links**)
+doen hetzelfde, en het palet heeft de rijen *Gesprek: ...* naast die van *Review: ...*. Voor een link wordt eerst om
+bevestiging gevraagd voordat hij opent, zoals overal in de review.
+
+Waar een gesprekstoets en een reviewtoets samenkomen, houdt het gesprek de letter op deze pagina: `l` (labels), `m`
+(mijlpaal), `Q` (Gerrit's wijziging opgeven), `e` / `d`, `r`. De labels, de mijlpaal en het opgeven blijven op de knoppen
+van de kop en in het palet; `a` (toegewezenen), `p` (reviewers), `f` (**Review afronden**), `b` (**Uitchecken**), `P`, `D`,
+`U` en `Alt+1` / `Alt+2` / `Alt+3` behouden hier hun betekenis. Zolang het vak het toetsenbord heeft, is elke toets die van
+het vak, behalve `Alt+1` / `Alt+2` / `Alt+3`; `Esc` geeft het toetsenbord terug aan de tijdlijn en een tweede `Esc` sluit
+de review.
+
+Een opmerking die in een ander venster of via de CLI is geschreven, verschijnt hier vanzelf: elke schrijfactie van
+GitPoulpi (dit venster inbegrepen) meldt het aan de sessie, en de vensters die hetzelfde verzoek tonen, lezen het opnieuw.
+
+Het opmerkingenvak is de Markdown-composer die het deelt met [de gespreksweergave](hosting-integration.md#schrijven)
+(ook het vak van een antwoord op een discussie, een opmerking bij een regel en de samenvatting van **Review afronden**):
+`Ctrl+Enter` (ook `Ctrl+S`, `Alt+Enter`) verzendt, en waar AI aan staat opent `Alt+E` **Schrijven met AI**
+([het hoofdstuk over AI](ai.md#schrijfhulp-op-een-host)). Het voorbeeld toont de tekst zoals de host hem toont,
+verwijzingen inbegrepen (`#7`, `!12`, `ABC-12`, commit-id's); een niet-verzonden tekst wordt per verzoek bewaard.
 
 ### Bestanden
 
@@ -238,17 +258,17 @@ Suggesties zijn **geen opmerkingen**. Ze staan op twee plaatsen:
   drie knoppen: **Accepteren**, **Bewerken** en **Negeren**. Een suggestie over een regel die het verschil niet toont, wordt
   bewaard en nooit weggegooid: ze staat na de hunks onder *AI-suggesties over het hele bestand* en komt, eenmaal
   geaccepteerd, terecht op de eerste gewijzigde regel van het bestand met de woorden *(over regel N)* ervoor.
-- **In het Overzicht**, onder de beschrijving: de samenvatting, daarna de lijst met dezelfde knoppen en **Alles accepteren** /
+- **In het Overzicht**, in een blok boven het gesprek (alleen na een run): de samenvatting, daarna de lijst met dezelfde knoppen en **Alles accepteren** /
   **Alles negeren**.
 
 **Accepteren** (`y`) maakt van een suggestie een gewone **conceptopmerking** (je kunt haar nog bewerken of verwijderen);
 **Bewerken** (`w`) opent het opmerkingenvak met de woorden van het model eerst en accepteert wat je laat staan; **Negeren** (`n`)
 gooit haar weg. **Alles accepteren** (`A`) vult nog steeds alleen de conceptlijst. Op de pagina Bestanden werken de toetsen op de
-suggestie onder de cursor, op het Overzicht op de eerste van de lijst. **AI-samenvatting gebruiken** (`i`, of de knop
+suggestie onder de cursor, op het Overzicht op de eerste van de lijst (`y` en `n` zijn weer *Link kopiëren* en *Volgende ongelezen* van het gesprek zodra de lijst leeg is). **AI-samenvatting gebruiken** (`i`, of de knop
 in het formulier Review afronden) zet de samenvatting van het model in de reviewtekst; ze wordt nooit uit zichzelf ingevoegd.
 **Er wordt niets naar de host gestuurd tot je de review indient.**
 
-Het Overzicht toont het concept als kaart boven de suggesties: de oordeelchip, de reviewtekst en drie
+Het Overzicht toont het concept als kaart bovenaan dat blok, boven de suggesties: de oordeelchip, de reviewtekst en drie
 knoppen.
 
 - **✦ Concept gebruiken...** (`u`) accepteert elke openstaande suggestie als conceptopmerking en opent *Review afronden* al
@@ -269,7 +289,7 @@ Het indienen van de review verbruikt het concept.
 |---|---|---|
 | Overzicht / Bestanden / Commits | `Alt+1` / `Alt+2` / `Alt+3` | *Review: Overzicht tonen*, *Bestanden tonen*, *Commits tonen* |
 | Opmerking bij de regel of het bereik | `c` | *Review: Opmerking bij regel plaatsen...* |
-| Opmerking in het gesprek | `c` op Overzicht, `C` | *Review: Opmerking in het gesprek plaatsen...* |
+| Opmerking in het gesprek | `c` op Overzicht, `C` | *Review: Opmerking in het gesprek plaatsen...* (opent het vak van het Overzicht), *Gesprek: Nieuwe opmerking* |
 | Reageren op de discussie | `r` | *Review: Op discussie reageren...* |
 | Oplossen of heropenen | `x` | *Review: Discussie oplossen of heropenen* |
 | Een discussie in- of uitklappen | `z` | *Review: Discussie inklappen of uitklappen* |

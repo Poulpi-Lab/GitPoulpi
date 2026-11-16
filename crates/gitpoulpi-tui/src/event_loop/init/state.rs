@@ -238,6 +238,9 @@ pub(in crate::event_loop) struct WindowState {
     /// (`editor.follow_selection`'s Cancel puts it back).
     pub(in crate::event_loop) editor_host_snapshot: Option<window::HostSnapshot>,
     pub(in crate::event_loop) last_saved_log_columns: LogColumnPrefs,
+    /// This repository has no saved Log column widths: fit every column to
+    /// the content once the Log has painted rows (`tick`), then save.
+    pub(in crate::event_loop) log_widths_autofit: bool,
     pub(in crate::event_loop) last_saved_folds: crate::fold_state::Folds,
     pub(in crate::event_loop) log_column_order: Vec<LogColumn>,
     /// The Log column the keyboard has picked (`Shift+C`, then `Tab`, `<` / `>`,

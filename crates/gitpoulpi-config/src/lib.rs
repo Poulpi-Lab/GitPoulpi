@@ -364,6 +364,36 @@ pub fn set_commit_column_in_file(
     Ok(())
 }
 
+/// Writes the two global `[ui]` Log-column keys (`log_columns_hidden`,
+/// `log_columns_order`) and leaves the rest of the file as it was. The widths
+/// are per repository (`gitpoulpi-session`'s `RepoState::log_columns`).
+pub fn set_log_column_layout_in_file(
+    path: &Path,
+    hidden: &[String],
+    order: &[String],
+) -> Result<()> {
+    let _guard = COLUMN_WRITE_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+    let raw = if path.exists() {
+        std::fs::read_to_string(path)?
+    } else {
+        String::new()
+    };
+    let mut document = if raw.trim().is_empty() {
+        toml::Value::Table(toml::map::Map::new())
+    } else {
+        toml::from_str(&raw)?
+    };
+    let strings =
+        |v: &[String]| toml::Value::Array(v.iter().cloned().map(toml::Value::String).collect());
+    insert_dotted(&mut document, "ui.log_columns_hidden", strings(hidden))?;
+    insert_dotted(&mut document, "ui.log_columns_order", strings(order))?;
+    if let Some(parent) = path.parent() {
+        secure_fs::create_private_dir_all(parent)?;
+    }
+    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
+    Ok(())
+}
+
 /// Writes the three `[ui]` Log-column keys (`log_columns_hidden`,
 /// `log_columns_order`, `log_column_widths`) in one load-modify-save of the
 /// document at `path`, leaving every other key as the file had it.

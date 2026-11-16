@@ -37,12 +37,17 @@ use crate::text_edit::FieldEditor;
 use crate::th;
 
 #[cfg(feature = "ai")]
-pub(crate) use gitpoulpi_ai::hosting_reply::ReplyRequest;
+pub(crate) use gitpoulpi_ai::hosting_reply::{Exchange, ReplyRequest};
 
 /// A build without AI never builds a request: the type only has to exist.
 #[cfg(not(feature = "ai"))]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct ReplyRequest;
+
+/// Likewise: no exchange is ever kept without AI.
+#[cfg(not(feature = "ai"))]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct Exchange;
 
 /// State a form shares with the source it handed the editor (the issue
 /// form's title, the pull request form's branches).
@@ -226,6 +231,9 @@ struct Run {
     started: Instant,
     /// What the worker says it read of the repository (see `ai_context`).
     context: Arc<Mutex<Option<String>>>,
+    /// The instruction and the text to improve this run was asked with; its
+    /// answer joins the exchange. `None` for a task that is not a reply.
+    asked: Option<(String, Option<String>)>,
 }
 
 /// A test's stand-in for the model: the task in, the text out.
@@ -245,6 +253,11 @@ pub(crate) struct AiHelp {
     repo_choice: ai_context::Choice,
     /// What the last draft read of the repository.
     context_line: Option<String>,
+    /// The finished requests of this sitting, oldest first. Given back to the
+    /// model with the next one when it would not remember them (see
+    /// `gitpoulpi_ai::hosting_reply::exchange`); lives as long as the
+    /// composer, dropped by "Refresh context".
+    exchange: Vec<Exchange>,
     focus: AiPart,
     hover: Option<AiPart>,
     /// Newest first.
@@ -321,6 +334,7 @@ impl AiHelp {
             repo: false,
             repo_choice: ai_context::Choice::Disabled(ai_context::Why::NoClone),
             context_line: None,
+            exchange: Vec::new(),
             focus: AiPart::Text,
             hover: None,
             recent,
@@ -473,13 +487,15 @@ impl AiHelp {
         }
         let hint = self.hint.trim().to_string();
         let draft = (self.improve && !text.trim().is_empty()).then_some(text);
-        let task = match self.source.task(&hint, draft) {
+        #[allow(unused_mut)]
+        let mut task = match self.source.task(&hint, draft) {
             Ok(task) => task,
             Err(why) => {
                 self.note = Note::Error(msg::ai_error(&why));
                 return;
             }
         };
+        let asked = self.attach_exchange(&mut task, &hint, draft);
         if !hint.is_empty() {
             self.remember(&hint);
         }
@@ -506,7 +522,60 @@ impl AiHelp {
             cancel,
             started: Instant::now(),
             context,
+            asked,
         });
+    }
+
+    /// Gives a reply task what came before it in this sitting, and returns
+    /// what the run is asked with, to record its answer under.
+    #[cfg(feature = "ai")]
+    fn attach_exchange(
+        &self,
+        task: &mut AiTask,
+        hint: &str,
+        draft: Option<&str>,
+    ) -> Option<(String, Option<String>)> {
+        match task {
+            AiTask::Reply(request) => {
+                request.exchange = self.exchange.clone();
+                Some((hint.to_string(), draft.map(str::to_string)))
+            }
+            AiTask::PullRequest { .. } => None,
+        }
+    }
+
+    #[cfg(not(feature = "ai"))]
+    fn attach_exchange(
+        &self,
+        _: &mut AiTask,
+        _: &str,
+        _: Option<&str>,
+    ) -> Option<(String, Option<String>)> {
+        None
+    }
+
+    /// The answer of a finished run joins the exchange.
+    #[cfg(feature = "ai")]
+    fn record(&mut self, asked: Option<(String, Option<String>)>, answer: &Answer) {
+        if let (Some((hint, draft)), Ok(text)) = (asked, answer) {
+            gitpoulpi_ai::hosting_reply::exchange::push_capped(
+                &mut self.exchange,
+                Exchange {
+                    hint,
+                    draft,
+                    answer: text.clone(),
+                },
+            );
+        }
+    }
+
+    #[cfg(not(feature = "ai"))]
+    fn record(&mut self, _: Option<(String, Option<String>)>, _: &Answer) {}
+
+    /// The requests of this sitting that go back to the model (tests).
+    #[cfg(test)]
+    pub(crate) fn exchange_len(&self) -> usize {
+        self.exchange.len()
     }
 
     fn remember(&mut self, hint: &str) {
@@ -525,7 +594,8 @@ impl AiHelp {
         match run.rx.try_recv() {
             Ok(answer) => {
                 self.context_line = run.context.lock().ok().and_then(|mut c| c.take());
-                self.run = None;
+                let asked = self.run.take().and_then(|r| r.asked);
+                self.record(asked, &answer);
                 Some(answer)
             }
             Err(mpsc::TryRecvError::Empty) => None,
@@ -680,6 +750,7 @@ impl AiHelp {
             ai_context::forget(root);
         }
         self.context_line = None;
+        self.exchange.clear();
         self.note = Note::Info(msg::AI_REFRESHED.get().to_string());
     }
 

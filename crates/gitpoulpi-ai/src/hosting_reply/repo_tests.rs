@@ -820,6 +820,7 @@ fn anthropic_gets_two_cacheable_system_blocks_and_the_cache_tokens_come_back() {
         &crate::Request {
             system: "BASE + layers",
             context: Some(&block),
+            history: &[],
             user: "the conversation",
         },
     ))
@@ -856,6 +857,7 @@ fn without_context_anthropic_keeps_a_plain_system_string() {
         &crate::Request {
             system: "S",
             context: None,
+            history: &[],
             user: "U",
         },
     ))
@@ -882,6 +884,7 @@ fn an_openai_compatible_server_gets_the_context_after_the_instructions() {
         &crate::Request {
             system: "BASE",
             context: Some(&block),
+            history: &[],
             user: "U",
         },
     ))

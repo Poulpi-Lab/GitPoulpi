@@ -107,6 +107,7 @@ claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
 
 - **开箱即用时代理是只读的**：它可以读取、在你的窗口中向你展示内容（`ui_*`），并且在你允许时，提出由你确认的更改。要让它更改仓库（commit、push、reset……），请设置 `allow_mutations = true`；若只想授予有限权限，请保持其为 `true` 并配合 `mutation_allowlist`。每个工具都带有 MCP 注解（`readOnlyHint`、`destructiveHint`、`openWorldHint`），所以像 Claude Code 这样的客户端在执行有风险的操作前仍会询问你。
 - **冲突**：`conflicts_check`（merge 之前的预测）、`conflicts_list`、`conflicts_show` 和 `conflicts_state` 是读取；`conflicts_resolve`（它会丢弃未保留的一侧，`--delete` 会删除文件）和 `conflicts_abort`（丢弃整个 merge/rebase/cherry-pick）是破坏性的；`conflicts_unresolve` 是普通写入。被拒绝的调用（`stale`、`not_conflicted`、`pick_incomplete`……）会以退出码 2 回答 `{"refused": {...}}`，而不是失败。
+- **议题和 pull request 的对话**：`hosting_issue_comments` 和 `hosting_review_conversation` 读取完整时间线（读取，开放世界：它们会调用托管平台）；`hosting_markdown` 清理一段文本并找出其中的引用，不调用任何外部服务（封闭世界）。发布（`hosting_issue_comment`、`hosting_review_comment`、`hosting_review_reply`）和编辑（`hosting_*_comment_edit`）是标记为开放世界的普通更改：它们会立即以令牌所属的身份发往托管平台（回答中的 `posted_as`；机器人令牌以机器人身份发布），因此由 `allow_mutations` 和 `mutation_allowlist` 决定代理是否可以这么做。删除评论（`hosting_*_comment_delete`）是破坏性的。发布、编辑或删除之后，守护进程会得到通知，该仓库已打开的窗口会刷新那一项。`ui_show_pr` / `ui_show_issue` 接受 `--view conversation`，打开对话而不是该行。
 - **卡住的状态**：`conflicts_am_continue` 是写入，`conflicts_am_skip`、`conflicts_am_abort` 和 `index_lock_remove` 是破坏性的，`index_lock_show` 是读取。
 - **历史重写**：`rewrite_tools`、`rewrite_preview`、`rewrite_rows`、`rewrite_analyze`（大小分析）、`rewrite_scan_secrets`（带脱敏预览的发现项，绝不含机密值）、`rewrite_script_check`、`rewrite_script_test` 和 `rewrite_discard` 是读取（预览不会改动任何内容；它只在守护进程和 git 目录的磁盘上保存一份规划，所以 `rewrite_apply` 在重启之后也能工作）。`rewrite_apply` 和 `rewrite_run` 是破坏性的：它们会把许多引用作为一条撤销记录移到重写后的 commit 上（`undo` 可还原），并且绝不会 push。方案用 `recipe_json`（或 `recipe`，一个路径）传入，机密用 `secrets_file` 传入，绝不要内联。shell、Python 和外部 Lua 脚本（`script_language`）没有沙箱隔离，**代理无法信任它们**：没有 `rewrite_script_trust` 工具，也没有 `trust` 参数，所以这类脚本只有在有人对那段确切的文本运行过 `gitpoulpi rewrite script trust FILE` 之后才会运行（脚本一旦改动就会再次被拒绝，`script_not_trusted`，哈希在 `refused.script` 中），并且只有在 `rewrite.external_scripts` 启用了其语言时才可用（`scripts_disabled`）。被拒绝时返回 `{"refused": {"reason", "message", "detail"}}`；规划要移动已 push 的引用时，在调用设置 `yes` 之前返回 `{"needs_confirmation": ...}`（退出码 3）- 请先向用户展示。
 - **代理永远无法触及**：存储令牌（`hosting login`）、创建并上传 SSH 密钥、`config set`（它可能改写自己的限制），以及守护进程的生命周期。令牌绝不会展示给代理。
@@ -138,6 +139,7 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 |---|---|---|
 | `ai_commit_message` | `gitpoulpi ai commit-message` | read, network |
 | `ai_explain` | `gitpoulpi ai explain` | read, network |
+| `ai_hosting_reply` | `gitpoulpi ai hosting-reply` | read, network |
 | `ai_prompt` | `gitpoulpi ai prompt` | read |
 | `ai_resolve_conflict` | `gitpoulpi ai resolve-conflict` | read, network |
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
@@ -200,6 +202,7 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 | `flow_status` | `gitpoulpi flow status` | read |
 | `flow_sync` | `gitpoulpi flow sync` | destructive |
 | `flow_templates` | `gitpoulpi flow templates` | read |
+| `hosting_assignment` | `gitpoulpi hosting assignment` | write |
 | `hosting_board_move` | `gitpoulpi hosting board move` | write, network |
 | `hosting_board_show` | `gitpoulpi hosting board show` | read, network |
 | `hosting_checkout_pr` | `gitpoulpi hosting checkout-pr` | write, network |
@@ -213,6 +216,10 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 | `hosting_integrations_test` | `gitpoulpi hosting integrations test` | read, network |
 | `hosting_issue_base` | `gitpoulpi hosting issue base` | write |
 | `hosting_issue_close` | `gitpoulpi hosting issue close` | write |
+| `hosting_issue_comment` | `gitpoulpi hosting issue comment` | write, network |
+| `hosting_issue_comment_delete` | `gitpoulpi hosting issue comment-delete` | destructive, network |
+| `hosting_issue_comment_edit` | `gitpoulpi hosting issue comment-edit` | write, network |
+| `hosting_issue_comments` | `gitpoulpi hosting issue comments` | read, network |
 | `hosting_issue_create` | `gitpoulpi hosting issue create` | write, network |
 | `hosting_issue_edit` | `gitpoulpi hosting issue edit` | write, network |
 | `hosting_issue_move` | `gitpoulpi hosting issue move` | write |
@@ -223,6 +230,7 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 | `hosting_link` | `gitpoulpi hosting link` | write |
 | `hosting_list` | `gitpoulpi hosting list` | read |
 | `hosting_logout` | `gitpoulpi hosting logout` | destructive |
+| `hosting_markdown` | `gitpoulpi hosting markdown` | read |
 | `hosting_members` | `gitpoulpi hosting members` | read, network |
 | `hosting_milestones` | `gitpoulpi hosting milestones` | read, network |
 | `hosting_open` | `gitpoulpi hosting open` | read |
@@ -235,6 +243,9 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 | `hosting_refs` | `gitpoulpi hosting refs` | read |
 | `hosting_review_abandon` | `gitpoulpi hosting review abandon` | write, network |
 | `hosting_review_comment` | `gitpoulpi hosting review comment` | write, network |
+| `hosting_review_comment_delete` | `gitpoulpi hosting review comment-delete` | destructive, network |
+| `hosting_review_comment_edit` | `gitpoulpi hosting review comment-edit` | write, network |
+| `hosting_review_conversation` | `gitpoulpi hosting review conversation` | read, network |
 | `hosting_review_diff` | `gitpoulpi hosting review diff` | read, network |
 | `hosting_review_fetch` | `gitpoulpi hosting review fetch` | write, network |
 | `hosting_review_push` | `gitpoulpi hosting review push` | write, network |

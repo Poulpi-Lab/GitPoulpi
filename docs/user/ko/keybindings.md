@@ -373,10 +373,10 @@ stage_file = "z"
 | `reword` | `deeper` | 기록을 더 깊이 수정 | `Alt+H` |
 | `composer` | `commit` | 작성기에서 Commit | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | 이슈 참조 삽입 | `Alt+R` |
-| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
-| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
-| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
+| `md_editor` | `preview` | Markdown 편집기: 쓰기/미리보기 전환 | `Alt+P` |
+| `md_editor` | `split` | Markdown 편집기: 분할 보기 전환 | `Alt+L` |
+| `md_editor` | `submit` | Markdown 편집기: 텍스트 보내기 | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Markdown 편집기: AI로 쓰기 | `Alt+E` |
 | `dialog` | `browse` | 폴더 찾아보기 | `Ctrl+B` |
 | `dialog` | `sources` | 클론 소스로 이동 | `Alt+S` |
 | `dialog` | `submit` | Pull request 양식 제출 | `Ctrl+S` |
@@ -825,7 +825,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Radar: 고정 또는 해제 | `p` |
 | Radar: 미루기... | `z` |
 | Radar: 요청 리뷰... | `e` |
-| Radar: Open Issue Conversation | `i` |
+| Radar: 이슈 대화 열기 | `i` |
 | Radar: API로 리뷰 |  |
 | Radar: 클론 후 리뷰... |  |
 | Radar: 담당자 편집... |  |
@@ -967,30 +967,30 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 보드: 열 레이블 설정... | `c` |
 | 보드: 새로 고침 | `r` |
 | 보드: 닫기 | `Esc` |
-| Conversation: Back |  |
-| Conversation: Refresh | `F5` |
-| Conversation: Load Older Entries | `m` |
-| Conversation: Previous Entry | `Up` |
-| Conversation: Next Entry | `Down` |
-| Conversation: Next Unread Entry | `n` |
-| Conversation: Reply to Entry | `r` |
-| Conversation: Quote Entry | `Q` |
-| Conversation: New Comment | `c` |
-| Conversation: Links of Entry... | `l` |
-| Conversation: Open Diagram of Entry | `g` |
-| Conversation: Copy Link of Entry | `y` |
-| Conversation: Open in Browser | `o` |
-| Conversation: Edit Comment | `e` |
-| Conversation: Delete Comment | `d` |
-| Conversation: Show or Hide Events | `v` |
-| Conversation: Toggle Write and Preview |  |
-| Conversation: Toggle the Split View |  |
-| Conversation: Send the Comment |  |
-| Conversation: Toggle Internal Note |  |
-| Conversation: Close | `Esc` |
-| Markdown Editor: Write with AI |  |
-| Markdown Editor: Refresh the AI Context |  |
-| Hosting: Open Issue Conversation... |  |
+| 대화: 뒤로 |  |
+| 대화: 새로고침 | `F5` |
+| 대화: 이전 항목 불러오기 | `m` |
+| 대화: 이전 항목 | `Up` |
+| 대화: 다음 항목 | `Down` |
+| 대화: 다음 안 읽은 항목 | `n` |
+| 대화: 항목에 답글 | `r` |
+| 대화: 항목 인용 | `Q` |
+| 대화: 새 댓글 | `c` |
+| 대화: 항목의 링크... | `l` |
+| 대화: 항목의 다이어그램 열기 | `g` |
+| 대화: 항목의 링크 복사 | `y` |
+| 대화: 브라우저에서 열기 | `o` |
+| 대화: 댓글 편집 | `e` |
+| 대화: 댓글 삭제 | `d` |
+| 대화: 이벤트 표시/숨기기 | `v` |
+| 대화: 쓰기/미리보기 전환 |  |
+| 대화: 분할 보기 전환 |  |
+| 대화: 댓글 보내기 |  |
+| 대화: 내부 메모 전환 |  |
+| 대화: 닫기 | `Esc` |
+| Markdown 편집기: AI로 쓰기 |  |
+| Markdown 편집기: AI 컨텍스트 새로고침 |  |
+| 호스팅: 이슈 대화 열기... |  |
 | 리뷰: ✦ 리뷰 초안 작성... | `s` |
 | 리뷰: 제안 수락 | `y` |
 | 리뷰: 제안 편집 후 수락... | `w` |
@@ -1478,7 +1478,7 @@ Radar 탭에서는 필터 필드, **범위**·**보기**·**표시** 콤보박�
 
 | 키 | 동작 |
 |---|---|
-| `Enter` | 선택한 행을 브라우저에서 열기. `다시 연결` 행에서는 해당 프로필의 설정 열기 |
+| `Enter` | 선택한 행 열기: 이슈(그리고 Azure DevOps나 Bitbucket의 요청)는 [대화](hosting-integration.md#5c-대화)로, pull request는 리뷰가 있는 호스트에서는 [리뷰](review.md)로, 그 밖에는 브라우저에서 엽니다. `다시 연결` 행에서는 해당 프로필의 설정 열기 |
 | `Space` | 섹션 펼치기 또는 접기 |
 | `v` | 섹션의 필터 열기. Pull requests: 열림, merge됨 / 닫힘, 전체. 이슈: 열림, 나에게 할당됨, 닫힘, 전체 |
 | `n` | PULL REQUESTS 섹션: pull request 만들기. 이슈 섹션: 새 이슈. (헤더의 `+` 버튼) |
@@ -1486,7 +1486,7 @@ Radar 탭에서는 필터 필드, **범위**·**보기**·**표시** 콤보박�
 | 검색 행에서 `Enter` | 검색 필드에 입력. `Enter`, `Tab`, `Esc`로 나가며, `Ctrl+U`는 지웁니다 |
 | 그룹 헤더에서 `Enter` | 그룹 접기 또는 펼치기(*내 pull request*, *나에게 할당됨*, *내 리뷰 대기 중*, *모든 pull request*) |
 | 필터, 제공자 또는 저장소 행에서 `Enter` | 해당 드롭다운 열기. 제공자 목록의 끝에는 **없음 (이 저장소 연결 해제)**가 있습니다 |
-| `.` 또는 오른쪽 클릭 | 행 메뉴: 브라우저에서 열기, URL 또는 번호 복사, 소스 브랜치 체크아웃(pull requests). 이슈에서 브랜치 만들기(이슈) |
+| `.` 또는 오른쪽 클릭 | 행 메뉴: 대화 열기, 브라우저에서 열기, URL 또는 번호 복사, 소스 브랜치 체크아웃(pull requests). 이슈에서 브랜치 만들기(이슈) |
 
 ### 이슈 보드
 
@@ -1498,7 +1498,7 @@ Radar 탭에서는 필터 필드, **범위**·**보기**·**표시** 콤보박�
 | 화살표 | 카드 선택(`Up`, `Down`) 또는 이웃 열 선택(`Left`, `Right`). `Home`, `End`, `PageUp`, `PageDown`은 열 안에서 이동 |
 | `Shift+Left`, `Shift+Right` | 선택한 카드를 이전 또는 다음 열로 이동 |
 | `m` | **보드: 카드 이동...**: 열의 드롭다운 |
-| `Enter` | 이슈 열기(로컬 이슈는 노트, 그 밖에는 호스트의 페이지) |
+| `Enter` | 이슈의 [대화](hosting-integration.md#5c-대화) 열기 (읽을 대화가 없는 호스트는 호스트의 페이지) |
 | `e`, `.` | 담당자, 레이블, 마일스톤 편집. 카드 메뉴 |
 | `n` | 선택한 열에 새 이슈 |
 | `a`, `l`, `M`, `/` | 담당자, 레이블, 마일스톤, 텍스트로 필터링. `x`는 필터를 지움 |
@@ -1508,6 +1508,41 @@ Radar 탭에서는 필터 필드, **범위**·**보기**·**표시** 콤보박�
 
 마우스: 카드를 다른 열로 드래그하면 이동하고, 카드를 클릭하면 선택, 더블 클릭하면 열기, 오른쪽 클릭하면 카드 메뉴, 휠은 열을 스크롤하며, `Shift`+휠(또는 보드 아래의 막대)은
 열들을 스크롤합니다.
+
+### Markdown 입력창과 대화 보기
+
+호스트로 텍스트를 보내는 모든 상자(댓글, 답글, 리뷰 요약, 새 이슈나 pull request의 설명)는 같은 입력창입니다. 키는 위의 `md_editor` 표에 있으며 다시 지정할 수 있습니다.
+
+| 키 | 동작 |
+|---|---|
+| `Alt+P` | **쓰기**와 **미리보기** 전환 (**분할**에서는 미리보기로 이동) |
+| `Alt+L` | **분할** 켜기, 또는 쓰기로 돌아가기 (너비 100열의 창 필요) |
+| `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` | 텍스트 보내기 (폼 자체의 버튼도 같은 일을 함) |
+| `Alt+E` | **AI로 쓰기**: 모드 표시줄 아래의 패널을 열거나 닫음 (AI가 켜져 있을 때만) |
+| `Alt+R` | commit 작성기만: 이슈 참조 삽입 |
+| `Alt+W` | 새 이슈와 pull request 폼: 제공자의 웹 페이지에서 만들기 |
+| `Esc` | **AI로 쓰기** 패널에서: 실행 중인 초안 중지, 아니면 패널 닫기 |
+
+이슈나 요청의 [대화 보기](hosting-integration.md#5c-대화)에서 (팔레트 행 *대화: ...*. 키가 있는 행은 위의 팔레트 목록에 있습니다):
+
+| 키 | 동작 |
+|---|---|
+| `r` | 선택한 항목에 답글 (그 스레드에, 스레드가 없는 호스트에서는 그 텍스트를 인용해서) |
+| `Q` | 선택한 항목을 인용해 새 댓글 작성 |
+| `c` | 새 댓글 |
+| `e`, `d` | 내 댓글 편집, 삭제 |
+| `Alt+I` | 댓글 상자에서: **내부 메모** (GitLab, Redmine) |
+| `l`, `y`, `o` | 항목의 링크, 주소 복사, 브라우저에서 열기 |
+| `n` | 다음 안 읽은 항목 |
+| `v`, `m`, `F5` | 이벤트 표시/숨기기, 이전 항목 불러오기, 새로고침 |
+| `g` | 항목의 다이어그램 열기 (`mermaid` 블록) |
+| `Alt+Left`, `Backspace` | 참조에서 연 항목들의 스택을 따라 뒤로 |
+| `Tab` | 타임라인, 댓글 상자, 헤더 버튼 |
+| `q`, `Esc` | 닫기 |
+
+Radar에서는 `i`가 이슈 행의 대화를 엽니다.
+
+사이드바 섹션의 pull request나 이슈 행에서는 `Enter`가 대화를 열고 `o`가 행을 브라우저에서 엽니다.
 
 ### Flow (브랜치 워크플로)
 

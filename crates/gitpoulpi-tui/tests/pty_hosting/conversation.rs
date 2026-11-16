@@ -591,7 +591,7 @@ fn an_own_comment_is_edited_and_deleted_after_a_question() {
 
 /// A repository whose ISSUES list is the GitHub mock's `o/r`, with an App
 /// installation token (`ghs_...`): `GET /user` answers 403 and a post comes
-/// back from `poulpi-lab[bot]`.
+/// back from `my-app[bot]`.
 fn launch_bot(
     session: &str,
 ) -> (
@@ -685,7 +685,7 @@ fn a_github_app_bot_is_named_and_edits_only_what_this_install_posted() {
     let screen = term
         .wait_for("the comment and the learned name", STEP, |s| {
             s.contains("from the app")
-                && s.contains("Posting as poulpi-lab[bot] (GitHub App bot)")
+                && s.contains("Posting as my-app[bot] (GitHub App bot)")
                 && s.contains("Edit")
                 && s.contains("Delete")
         })
@@ -701,7 +701,7 @@ fn a_github_app_bot_is_named_and_edits_only_what_this_install_posted() {
     let state =
         std::fs::read_to_string(repo.state_dir().join("repo-state.toml")).unwrap_or_default();
     assert!(
-        state.contains("hosting_identity = \"poulpi-lab[bot]\""),
+        state.contains("hosting_identity = \"my-app[bot]\""),
         "{state}"
     );
     assert!(state.contains("|2100"), "{state}");

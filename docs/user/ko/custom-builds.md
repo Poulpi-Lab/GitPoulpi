@@ -25,8 +25,9 @@ build-custom                     # Windows, cmd or PowerShell (scripts/build-cus
 | 아바타 다운로드 | 이니셜 배지만 표시되고 네트워크 가져오기가 없습니다. |
 | 이미지 미리 보기 | 이미지 파일에 일반 바이너리 안내가 표시되며, **편집 프로그램**은 그대로 동작합니다. |
 | Radar | Radar 탭, `Alt+R`, 팔레트 명령이 없으며 Radar는 열리지 않습니다. 연동이 필요합니다(연동이 없으면 어차피 동작하지 않습니다). |
-| Mermaid | Mermaid gitGraph로 복사(Log 메뉴, `Shift+Y`, 팔레트)가 없고 CLI/MCP에서 `log --format mermaid`도 없습니다. |
+| Mermaid | Mermaid gitGraph로 복사(Log 메뉴, `Shift+Y`, 팔레트)가 없고 CLI/MCP에서 `log --format mermaid`도 없습니다. 또한 [대화](hosting-integration.md#5c-대화)의 `mermaid` 블록 아래에 **다이어그램 열기** 버튼이 없고(블록은 코드로 남음) *대화: 항목의 다이어그램 열기* 팔레트 행도 없습니다. |
 | Board | 칸반 보드 보기(이슈 헤더 버튼, 팔레트)와 `hosting board` 명령이 없습니다. 연동이 필요합니다. |
+| Conversation | 이슈나 요청의 앱 안 [대화](hosting-integration.md#5c-대화) 보기가 없습니다: 이슈 행, 보드 카드, Radar 행에서 Enter를 누르면 이전처럼 브라우저가 열리고, *대화 열기* 행도 *대화: ...* 팔레트 명령도 없으며, 대화 안의 **AI로 쓰기**도 없습니다 (리뷰, 이슈 폼, pull request 폼의 입력창은 자기 것을 유지). CLI와 MCP의 대화 명령(`hosting issue comments`, `comment`, `comment-edit`, `comment-delete`, `hosting review conversation`)과 `ai hosting-reply`는 그대로 있습니다. 연동이 필요합니다. |
 | Review | 앱 안의 코드 리뷰 보기(행 메뉴, pull request 행에서 Enter, 팔레트, Radar `Review`)와 AI 리뷰 보조가 없습니다. `hosting review` CLI/MCP 명령은 남습니다(Gerrit과 에이전트가 사용). 연동이 필요합니다. |
 | 기록 워크벤치(고급 기록 다시 쓰기: 작성자, 날짜, 메시지, 내용) | 기록 다시 쓰기 워크벤치가 없습니다. `다시 쓰기:` 팔레트 명령, 워크벤치 코드 키, 키, 도움말 섹션이 없고, Log 메뉴에 "기록 다시 쓰기" 행이 없으며, 수정 대화상자에 "기록 더 깊이 수정..." 버튼이 없고, "AI로 규칙 만들기"나 스크립트 AI가 없으며, 동기화 설정 페이지에 스크립트 한도가 없고, AI 설정에 기록 다시 쓰기 AI 블록이 없습니다. `rewrite` CLI/MCP 명령, `ai rewrite-script`, `ai rewrite-rules`, `ui propose rewrite`는 명령 트리에서 사라집니다. `.mailmap` 신원(`mailmap`, `log.use_mailmap`)은 이에 포함되지 않으며 그대로 남습니다. |
 | 전체 검색 | 제목 표시줄에 전체 검색 버튼이 없고, `Ctrl+Alt+F`와 `검색: 워크스페이스...` 팔레트 명령, `gitpoulpi search` CLI/MCP 명령이 없습니다. Log 찾기 막대(`ui show search`)는 다른 기능이므로 그대로 남습니다. |
@@ -57,7 +58,7 @@ Bash 스크립트는 `whiptail` 또는 `dialog` 체크리스트(화면 세 개, 
 | `--logo-colors all` / `violet,teal` | 컴파일해 넣을 로고 색 구성(기본값 `all`이며 표의 순서, 즉 회전 순서를 유지). `--list-logo-colors`가 출력합니다(`*` = 공식 기본값). |
 | `--logo-default teal` | 기본 색 구성. 컴파일된 것 중 하나여야 합니다(기본값: lavender, 없으면 컴파일된 첫 번째). |
 | `--icon-color sun` | Windows 실행 파일 아이콘의 색상(기본값: 로고 기본값). |
-| `--[no-]ai`, `--[no-]mcp`, `--[no-]lfs`, `--[no-]worktree`, `--[no-]submodules`, `--[no-]avatar-fetch`, `--[no-]image-view`, `--[no-]radar`, `--[no-]mermaid`, `--[no-]board`, `--[no-]review` | 각각 기본값은 켜짐입니다. |
+| `--[no-]ai`, `--[no-]mcp`, `--[no-]lfs`, `--[no-]worktree`, `--[no-]submodules`, `--[no-]avatar-fetch`, `--[no-]image-view`, `--[no-]radar`, `--[no-]mermaid`, `--[no-]board`, `--[no-]review`, `--[no-]conversation` | 각각 기본값은 켜짐입니다. |
 | `--[no-]history-rewrite` | 기록 워크벤치(고급 기록 다시 쓰기: 작성자, 날짜, 메시지, 내용). 기본값은 켜짐. |
 | `--[no-]global-search` | 전체 검색(제목 표시줄 버튼, `Ctrl+Alt+F`, `gitpoulpi search`). 기본값은 켜짐. |
 | `--[no-]workspaces` | 워크스페이스(이름 붙인 저장소 그룹). 기본값은 켜짐. 끄면 기본 탭 목록만 남습니다. |

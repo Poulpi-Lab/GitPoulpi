@@ -100,7 +100,7 @@ fn an_issue_maps_header_comments_bots_edits_reactions_and_events() {
         panic!("{:?}", page.entries[2]);
     };
     assert_eq!(bot.author.kind, ActorKind::Bot);
-    assert_eq!(bot.author.login, "poulpi-lab[bot]");
+    assert_eq!(bot.author.login, "my-app[bot]");
     assert!(!bot.edited, "one second apart is not an edit");
 
     let kinds: Vec<&EventKind> = page
@@ -336,7 +336,7 @@ fn posting_sends_exactly_one_post_and_maps_the_bot_author() {
         .any(|(k, v)| k == "Authorization" && v == "Bearer tok"));
     assert_eq!(c.id, "777");
     assert_eq!(c.author.kind, ActorKind::Bot);
-    assert_eq!(c.author.login, "poulpi-lab[bot]");
+    assert_eq!(c.author.login, "my-app[bot]");
 }
 
 #[test]
@@ -344,7 +344,7 @@ fn a_pull_request_comment_uses_the_same_endpoint_and_add_comment_still_works() {
     let t = Arc::new(RecordedTransport::new().on("issues/12/comments", 201, COMMENT_CREATED));
     let old = block_on(client(&t).add_comment(PROJECT, 12, "hello")).unwrap();
     assert_eq!(old.id, "777");
-    assert_eq!(old.author, "poulpi-lab[bot]");
+    assert_eq!(old.author, "my-app[bot]");
     assert_eq!(t.requests()[0].url, format!("{API}/issues/12/comments"));
 }
 
@@ -374,7 +374,7 @@ fn the_first_post_of_an_app_bot_teaches_its_login() {
     let mut c = client_with("ghs_installation", &t);
     c.scopes = handle;
     block_on(c.post_item_comment(PROJECT, &ItemKey::issue(7), "hi", false)).unwrap();
-    assert_eq!(scopes.learned().as_deref(), Some("poulpi-lab[bot]"));
+    assert_eq!(scopes.learned().as_deref(), Some("my-app[bot]"));
 }
 
 #[test]
@@ -532,14 +532,14 @@ fn an_app_bot_uses_the_configured_post_as_name() {
     let t = Arc::new(forbidden());
     let (handle, _) = FakeScopes {
         bot: true,
-        post_as: Some("poulpi-lab[bot]".into()),
+        post_as: Some("my-app[bot]".into()),
         ..Default::default()
     }
     .handle();
     let mut c = client(&t);
     c.scopes = handle;
     let who = block_on(c.posting_identity(PROJECT)).unwrap();
-    assert_eq!(who.login.as_deref(), Some("poulpi-lab[bot]"));
+    assert_eq!(who.login.as_deref(), Some("my-app[bot]"));
     assert_eq!(who.kind, IdentityKind::AppBot);
     assert_eq!(who.source, TokenSource::RepoTokenCommand);
     assert!(
@@ -552,7 +552,7 @@ fn an_app_bot_uses_the_configured_post_as_name() {
 fn an_app_bot_without_a_name_asks_graphql_viewer() {
     let t = Arc::new(forbidden().on("/graphql", 200, VIEWER));
     let who = block_on(client(&t).posting_identity(PROJECT)).unwrap();
-    assert_eq!(who.login.as_deref(), Some("poulpi-lab[bot]"));
+    assert_eq!(who.login.as_deref(), Some("my-app[bot]"));
     assert_eq!(who.kind, IdentityKind::AppBot);
     let body = t.requests().last().unwrap().body.clone().unwrap();
     assert!(body.contains("viewer"));

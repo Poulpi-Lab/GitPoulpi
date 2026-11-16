@@ -58,6 +58,8 @@ die nicht am Code stehen, und die bereits abgesendeten Reviews, älteste zuerst,
 Genehmigungen (Approvals). Darunter das Antwortfeld: Klicken Sie darauf oder drücken Sie **`c`**, um einen Kommentar
 zur Unterhaltung zu schreiben. **Dieser wird sofort gesendet**, und das Feld sagt es.
 
+Das Kommentarfeld (auch das Feld einer Antwort, eines Kommentars an einer Zeile und der Zusammenfassung von **Review abschließen**) ist das gemeinsame Markdown-Textfeld der [Unterhaltungsansicht](hosting-integration.md#schreiben): **Schreiben**, **Vorschau** (`Alt+P`) und **Geteilt** (`Alt+L`, in einem Fenster mit 100 Spalten), `Ctrl+Enter` (auch `Ctrl+S`, `Alt+Enter`) sendet, und wo KI an ist, öffnet `Alt+E` **Mit KI schreiben** ([das KI-Kapitel](ai.md#schreibhilfe-auf-einem-host)). Die Vorschau zeigt den Text so, wie der Host ihn zeigt, Verweise eingeschlossen (`#7`, `!12`, `ABC-12`, Commit-IDs); ein ungesendeter Text bleibt je Request erhalten. Der Text in der Beschreibung und in der Unterhaltung nutzt denselben Renderer, sodass Markdown, Tabellen, Hinweisblöcke und Verweise hier und in der Unterhaltungsansicht eines Issues gleich aussehen. Zitieren, Bearbeiten oder Löschen eines bereits gesendeten Kommentars sowie interne Notizen gehören zur Unterhaltungsansicht von Issues und von Requests bei Hosts ohne Review (siehe [Unterhaltungen](hosting-integration.md#5c-unterhaltungen)); hier lassen sich nur Ihre ausstehenden Kommentare bearbeiten.
+
 ### Dateien
 
 Links die geänderten Dateien (Statusbuchstabe, `+hinzugefügt -entfernt`, eine Zahl `●n` offener Threads, eine Zahl

@@ -369,6 +369,7 @@ um sie zu erreichen.
 | Option | Was sie tut |
 |---|---|
 | **Aktualisierung von Pull Requests und Issues** | Wie oft sich die Listen der Seitenleiste und der Chip der Symbolleiste aktualisieren, eine Zahl und eine Einheit (Minuten oder Stunden). Standard 5 Minuten, bis zu 2 Stunden, `0` schaltet den Timer ab (`general.hosting_refresh_minutes`, `general.hosting_refresh_unit`). |
+| **Senden als** | Der Name, unter dem Nachrichten an einen Host gesendet werden, wenn das Token des Repositorys das eines Bots ist (ein GitHub-App-Token), zum Beispiel `my-app[bot]`; auch genutzt, um Ihre eigenen Kommentare zu erkennen. Leer: wird beim Host erfragt, sonst aus der ersten gesendeten Nachricht gelernt. Ein Repository kann es unter Einstellungen > Repository-spezifische Einstellungen > SSH & Zugangsdaten > Hosting überschreiben (`general.hosting_post_as`). |
 | **Begriff für Review-Anfragen** | Das Wort für gehostete Reviews: **Auto (je nach Host)**, **Pull Request** oder **Merge Request**. |
 | **Pull-Request-Chip ausblenden, wenn erledigt (geschlossen oder gemergt)** | Standardmäßig an (`ui.hide_finished_pr_chip`; bei GitLab steht dort „Merge Request“). Der Chip in der Symbolleiste zeigt die jüngste Anfrage des ausgecheckten Branches; ist sie geschlossen oder gemergt, wird er ausgeblendet, und stattdessen erscheint der blasse Chip **+ PR** (eine neue Anfrage starten), als hätte der Branch keine. Aus: Der Chip zeigt immer die jüngste Anfrage, egal in welchem Zustand. Wirkt sofort. |
 
@@ -383,6 +384,8 @@ eingebetteten Tabelle für die Umgebungsvariablen eines Profils. Der Block *Code
 enthält außerdem die Standardwerte des [Review-Kontexts](ai.md#review-kontext): **Agent im Repository ausführen**
 (*Profileinstellung*, *Ja*, *Nein*), **CLAUDE.md einbeziehen**, **AGENTS.md einbeziehen** und **Zusätzliche Datei** (ein Pfad oder ein
 Link; leer fügt keine hinzu, mit einer Schaltfläche **Durchsuchen...** darunter, die eine Dateiauswahl öffnet; `Enter` auf der Schaltfläche ist ihre Tastaturform). Diese Seite hat eine eigene Anleitung: [KI-Unterstützung](ai.md).
+
+Der Block **Antworten auf einem Host** enthält, was Kommentare, Antworten und Issue-Beschreibungen entwirft: sein Profil und seine Anweisungen, den **Basis-Prompt** (leer verwendet den eingebauten) und eine Gruppe **Repository-Zugriff**: **Die KI standardmäßig das Repository lesen lassen** (aus: Die Auswahl in jedem Textfeld beginnt nicht angekreuzt), **Agentensitzung zwischen Antworten behalten** und **Repository-Kontext behalten für (Minuten)**. Die Byte-Limits **Größte Unterhaltung für eine Antwort (Bytes)**, **Größte Repository-Datei für eine Antwort (Bytes)**, **Größte Repository-Übersicht für eine Antwort (Bytes)**, **Meiste Suchtreffer je Begriff für eine Antwort** und **Meiste Suchbegriffe für eine Antwort** stehen bei den anderen Eingabe-Limits. Siehe [Schreibhilfe auf einem Host](ai.md#schreibhilfe-auf-einem-host).
 
 Unter den Blöcken je Aktion die Gruppe **Datenschutz**:
 
@@ -656,6 +659,9 @@ fragt den Daemon, blockiert also nie.
 | **ssh-Programm** | Das Programm, das ausgeführt wird (schreibgeschützt). |
 | **In der git-Konfiguration festgelegt** | Nur wenn dieses Repository ein eigenes `core.sshCommand` setzt (die alte Festlegung „SSH-Schlüssel für dieses Repository“, die GitPoulpi früher schrieb). Der Befehl wird schreibgeschützt angezeigt. **In GitPoulpi übernehmen** speichert die entsprechende Wahl **Schlüsseldatei** und entfernt dann die Festlegung aus der Konfiguration von git; es wird angeboten, wenn der Befehl eine einfache Festlegung `ssh -i <key>` ist, und nur solange die Seite keine ungespeicherten Änderungen hat und ihre SSH-Wahl noch **System** ist. Jeder andere Befehl wird stattdessen mit einem Hinweis gezeigt: Bearbeiten Sie ihn mit `git config`. Das Übernehmen ist nicht rückgängig zu machen, wie jede Einstellung hier, und das Entfernen der Festlegung steht auch nicht im Undo-Verlauf (nichts geht verloren: Der Schlüssel liegt im Profil). |
 | **Remotes** | Schreibgeschützt: jedes Remote mit seinem Protokoll und der Identität, die es verwendet. Einstellungen, die das Profil überschreibt (`core.sshCommand`, `credential.helper`), stehen mit ihrer Datei da, und ein Profil, das nicht verwendet werden kann, sagt warum. |
+| **Für die Hosting-API verwenden (Issues, Pull Requests)** | Mit einem Token-Befehl: Derselbe Befehl liefert auch das Token für die Issue- und Pull-Request-Aufrufe dieses Repositorys, anstelle Ihres persönlichen Tokens (ein Installations-Token einer GitHub App, sodass Kommentare als die App erscheinen). Das An- oder Ausschalten fragt nach einer Bestätigung. Siehe „Als GitHub-App-Bot handeln“ in der Anleitung [Hosting-Integrationen](hosting-integration.md). |
+| **Zuweisung** | **Erlaubt** (Standard) oder **Gesperrt**, sofort gespeichert. Gesperrt lässt sich in den Issues und Pull Requests dieses Repositorys nichts zuweisen, weder in der App noch per CLI oder durch einen Agenten; bestehende Zugewiesene bleiben sichtbar. |
+| **Senden als** | Überschreibt für dieses Repository den globalen Namen **Senden als** (`general.hosting_post_as`); leer gilt die globale Einstellung. |
 
 Schaltflächen (jede mit einer Taste: `Tab`/`Left`/`Right` zwischen ihnen, `Enter` drückt):
 

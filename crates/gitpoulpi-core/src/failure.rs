@@ -682,7 +682,7 @@ mod tests {
         assert_eq!(d.kind(), FailureKind::AuthFailed);
     }
 
-    const HELPER_STDERR: &str = "sh: /c/Users/X/.config/poulpi-lab/token.sh: No such file or directory\nremote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/Poulpi-Lab/GitPoulpi.git/'";
+    const HELPER_STDERR: &str = "sh: /c/Users/X/.config/my-tool/token.sh: No such file or directory\nremote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/Poulpi-Lab/GitPoulpi.git/'";
 
     #[test]
     fn a_credential_helper_that_cannot_run_is_not_read_as_a_refusal() {
@@ -690,7 +690,7 @@ mod tests {
         let line = K::credential_helper_line(HELPER_STDERR).unwrap();
         assert_eq!(
             line,
-            "sh: /c/Users/X/.config/poulpi-lab/token.sh: No such file or directory"
+            "sh: /c/Users/X/.config/my-tool/token.sh: No such file or directory"
         );
         for stderr in [
             "git: 'credential-foo' is not a git command. See 'git --help'.\nfatal: Authentication failed for 'https://h/r'",
@@ -712,7 +712,7 @@ mod tests {
         assert_eq!(K::classify(&flat), K::CredentialHelperFailed);
         assert_eq!(
             K::credential_helper_line(&flat).as_deref(),
-            Some("sh: /c/Users/X/.config/poulpi-lab/token.sh: No such file or directory")
+            Some("sh: /c/Users/X/.config/my-tool/token.sh: No such file or directory")
         );
         assert_eq!(K::credential_helper_line(refusal), None);
         assert_eq!(

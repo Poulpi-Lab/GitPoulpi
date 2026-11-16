@@ -55,6 +55,16 @@ reviews die al zijn ingediend, oudste eerst, elk met zijn oordeel (`goedgekeurd`
 `ingetrokken`). Op GitLab zijn de oordelen de goedkeuringen. Eronder staat het antwoordvak: klik erop of druk op **`c`**
 om een opmerking in het gesprek te schrijven. **Deze wordt direct geplaatst**, en het vak zegt dat.
 
+Het opmerkingsvak (ook het vak van een antwoord, een opmerking bij een regel en de samenvatting van **Review afronden**) is de
+Markdown-composer die het deelt met [de gespreksweergave](hosting-integration.md#schrijven): **Schrijven**, **Voorbeeld** (`Alt+P`) en
+**Gesplitst** (`Alt+L`, in een venster van 100 kolommen), `Ctrl+Enter` (ook `Ctrl+S`, `Alt+Enter`) verzendt, en waar AI aan staat
+opent `Alt+E` **Schrijven met AI** ([het hoofdstuk over AI](ai.md#schrijfhulp-op-een-host)). Het voorbeeld toont de tekst zoals de host
+hem toont, verwijzingen inbegrepen (`#7`, `!12`, `ABC-12`, commit-id's); een niet-verzonden tekst wordt per verzoek bewaard. De tekst in
+de beschrijving en het gesprek gebruikt dezelfde renderer, dus Markdown, tabellen, meldingen en verwijzingen zien er hier hetzelfde uit
+als in de gespreksweergave van een issue. Citeren, bewerken of verwijderen van een al geplaatste opmerking, en interne notities,
+horen bij de gespreksweergave van issues en van verzoeken op hosts zonder review (zie
+[Gesprekken](hosting-integration.md#5c-gesprekken)); hier kun je alleen je conceptopmerkingen bewerken.
+
 ### Bestanden
 
 Links de gewijzigde bestanden (statusletter, `+toegevoegd -verwijderd`, een teller `●n` van open discussies, een teller `✎n` van

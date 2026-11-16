@@ -312,14 +312,13 @@ mod tests {
 
     #[test]
     fn a_failing_credential_helper_is_named_with_its_line_and_the_command_to_check() {
-        let message = "backend error: git fetch --porcelain --all --prune failed: sh: /c/Users/X/.config/poulpi-lab/token.sh: No such file or directory\nremote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/Poulpi-Lab/GitPoulpi.git/'";
+        let message = "backend error: git fetch --porcelain --all --prune failed: sh: /c/Users/X/.config/my-tool/token.sh: No such file or directory\nremote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/Poulpi-Lab/GitPoulpi.git/'";
         let error = CoreError::Backend(message.into());
         let kind = kind_of(&error);
         assert_eq!(kind, FailureKind::CredentialHelperFailed);
         let (summary, hint) = wording(kind, message).unwrap();
         assert!(
-            summary
-                .contains("sh: /c/Users/X/.config/poulpi-lab/token.sh: No such file or directory"),
+            summary.contains("sh: /c/Users/X/.config/my-tool/token.sh: No such file or directory"),
             "{summary}"
         );
         assert!(!summary.contains("refused the credentials"), "{summary}");

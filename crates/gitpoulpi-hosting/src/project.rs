@@ -19,7 +19,7 @@ pub struct HostedProject {
     pub id: String,
     /// The short name (`gitpoulpi`).
     pub name: String,
-    /// The full path (`poulpi-lab/gitpoulpi`, `group/sub/thing`) - what
+    /// The full path (`my-org/gitpoulpi`, `group/sub/thing`) - what
     /// the list is filtered on, because that is what a user types.
     pub full_name: String,
     pub description: Option<String>,

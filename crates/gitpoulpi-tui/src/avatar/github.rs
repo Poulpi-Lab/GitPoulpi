@@ -291,7 +291,7 @@ mod tests {
     #[test]
     fn the_avatar_url_is_the_top_level_author_not_the_git_identity() {
         let linked = br#"{"sha":"abc","commit":{"author":{"name":"S","email":"s@x"}},
-            "author":{"login":"poulpi-lab","avatar_url":"https://avatars.githubusercontent.com/u/9?v=4"}}"#;
+            "author":{"login":"my-org","avatar_url":"https://avatars.githubusercontent.com/u/9?v=4"}}"#;
         assert_eq!(
             author_avatar_url(linked).as_deref(),
             Some("https://avatars.githubusercontent.com/u/9?v=4")

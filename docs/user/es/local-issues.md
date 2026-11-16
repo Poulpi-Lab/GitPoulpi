@@ -21,6 +21,10 @@ a la vez, y las listas lo siguen.
 
 Nada se vincula solo: como todo origen de issues, se activa por repositorio.
 
+## Comentarios en una nota
+
+`Enter` en la fila de una nota en la sección ISSUES, o en su tarjeta, abre su conversación: el texto de la nota y luego los comentarios. Los comentarios se guardan en el propio archivo de la nota, en una sección final `## Comments`, con una entrada `### <autor> - <hora UTC>` para cada uno (uno editado añade `(edited <hora>)`). Nada por encima de ese encabezado se toca nunca, así que Obsidian y una shell leen y editan el mismo archivo. Puedes escribir, editar y eliminar los comentarios del autor local (el `local.me` del perfil, si no el usuario conectado, el nombre que usa *Asignados a mí*); los de nadie más. La caja es el editor de Markdown habitual con vista previa, y *Escribiendo como <nombre> (nota local)* nombra al autor. Nada va por la red. Una nota con un encabezado `## Comments` escrito a mano se lee como tal.
+
 ## Las notas
 
 Una nota por issue, llamada `<id>-<slug>.md` (`12-crash-on-empty-name.md`), con un bloque de frontmatter:
@@ -46,6 +50,28 @@ Free Markdown. GitPoulpi never rewrites the body.
 - La lectura es tolerante: una nota sin `id` lo toma de su nombre de archivo, una nota sin `status` es `todo`, una nota
   sin frontmatter toma su título del primer `# heading`. Un archivo que no es un issue (`readme.md`) se ignora.
 - Un estado es texto libre. **Abierto** significa «que no es el estado de hecho».
+
+### Comentarios en una nota
+
+Un comentario sobre una nota se escribe en la propia nota, en una última sección `## Comments` (sin red, y se lee bien en Obsidian):
+
+```markdown
+(the note's text)
+
+## Comments
+
+### kai - 2026-11-15T10:00:00Z
+First comment, **any Markdown**.
+
+### ann - 2026-11-15T11:30:00Z (edited 2026-11-15T12:00:00Z)
+Second one.
+```
+
+- Una entrada empieza en una línea que es exactamente `### <autor> - <hora UTC>`, con ` (edited <hora UTC>)` tras una edición; su texto llega hasta la entrada siguiente. La sección es el último encabezado `## Comments` fuera de un bloque de código y llega hasta el final del archivo, así que no escribas nada después.
+- Una línea de comentario que se leería como una entrada o como el encabezado se guarda con una barra invertida delante (`\### ...`, que Markdown muestra como el mismo texto) y se lee sin ella.
+- Publicar añade al final y deja todo lo de arriba byte por byte (saltos de línea incluidos); una edición o una eliminación reescribe solo la sección. Una publicación también mueve el `updated` de la nota (a una nota sin frontmatter no se le da ninguno).
+- El autor es el autor local del perfil (el «yo» de los ajustes de Issues locales). Solo puedes editar o eliminar tus propios comentarios; el id de un comentario es su hora y su autor, y dos publicaciones en el mismo segundo se distinguen adelantando un segundo la segunda.
+- No hay respuestas, ni comentarios internos, ni historial de eventos para una nota.
 
 ## Qué puedes hacer
 
@@ -102,7 +128,7 @@ Si trabajas solo, o en un equipo que guarda sus issues junto al código, la carp
   `Shift+Left` / `Shift+Right`, o con **Tablero: Mover tarjeta a...** (`m`), un desplegable con las columnas. La tarjeta se mueve
   al instante; el `status` de la nota se reescribe como en [la sección de las notas](#las-notas), sin tocar nada más del archivo. Si la escritura
   falla, la tarjeta vuelve y el error aparece en la barra de estado.
-- **Abre** una tarjeta con `Enter` o un doble clic (la nota se abre en tu programa predeterminado para `.md`). `e` edita sus
+- **Abre** una tarjeta con `Enter` o un doble clic: la [conversación](hosting-integration.md#5c-conversaciones) de la nota se abre en la ventana, con el texto de la nota y sus comentarios (el **Abrir nota** del menú de la tarjeta abre el archivo en tu programa predeterminado para `.md`). `e` edita sus
   asignados, etiquetas o hito, `.` o un clic derecho abre el menú de la tarjeta, `n` inicia un issue nuevo en la columna
   seleccionada (el formulario vuelve al tablero al cerrarse).
 - **Filtra** por asignado (`a`), etiqueta (`l`), hito (`M`) o texto (`/`); `x` los quita. Los filtros son

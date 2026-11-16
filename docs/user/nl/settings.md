@@ -353,6 +353,7 @@ Twee opties staan boven de providers. Druk op `Up` bij de eerste provider om ze 
 | Optie | Wat ze doet |
 |---|---|
 | **Vernieuwing pull requests & issues** | Hoe vaak de zijbalklijsten en de werkbalkchip worden vernieuwd, een getal en een eenheid (minuten of uren). Standaard 5 minuten, hooguit 2 uur, `0` zet de timer uit (`general.hosting_refresh_minutes`, `general.hosting_refresh_unit`). |
+| **Plaatsen als** | De naam waarmee berichten naar een host worden geplaatst als het token van de repository van een bot is (een token van een GitHub App), bijvoorbeeld `my-app[bot]`; ook gebruikt om je eigen opmerkingen te herkennen. Leeg: gevraagd aan de host, anders geleerd van het eerste geplaatste bericht. Een repository kan het overschrijven in Instellingen > Repositoryspecifieke instellingen > SSH & inloggegevens > Hosting (`general.hosting_post_as`). |
 | **Terminologie voor reviewverzoeken** | Het woord voor gehoste reviews: **Auto (per host)**, **Pull request** of **Merge request**. |
 | **De pull request-chip verbergen als hij gesloten of gemerged is** | Standaard aan (`ui.hide_finished_pr_chip`; op GitLab heet het "merge request"). De chip in de werkbalk toont het laatste verzoek van de uitgecheckte branch; zodra dat verzoek gesloten of gemerged is, verdwijnt hij en toont de gedimde chip **+ PR** (een nieuw verzoek starten), alsof de branch er geen had. Uit: de chip toont altijd het laatste verzoek, in welke status het ook staat. Geldt meteen. |
 
@@ -368,6 +369,14 @@ standaardwaarden van de [reviewcontext](ai.md#reviewcontext): **De agent in de r
 (*Profielinstelling*, *Ja*, *Nee*), **CLAUDE.md meegeven**, **AGENTS.md meegeven** en **Extra bestand** (een pad of een
 link; leeg voegt er geen toe, met een knop **Bladeren...** eronder die een bestandskiezer opent; `Enter` op de knop is
 het toetsenbordequivalent). Deze pagina heeft een eigen gids: [AI-ondersteuning](ai.md).
+
+Het blok **Antwoorden op een host** bevat wat opmerkingen, antwoorden en issuebeschrijvingen opstelt: zijn profiel en
+instructies, de **Basisprompt** (leeg gebruikt de ingebouwde) en een groep **Toegang tot de repository**: **AI standaard de
+repository laten lezen** (uit: de keuze in elk schrijfvak begint niet aangevinkt), **Sessie van de agent behouden tussen antwoorden**
+en **Repositorycontext bewaren gedurende (minuten)**. De bytelimieten **Grootste gesprek om te sturen voor een antwoord**,
+**Grootste repositorybestand voor een antwoord**, **Grootste repositoryoverzicht voor een antwoord**, **Meeste zoekresultaten per
+term voor een antwoord** en **Meeste zoektermen voor een antwoord** staan bij de andere invoerlimieten. Zie
+[Schrijfhulp op een host](ai.md#schrijfhulp-op-een-host).
 
 Onder de blokken per actie staat de groep **Privacy**:
 
@@ -591,6 +600,8 @@ daemon en blokkeert dus nooit.
 | **Git-gebruikersnaam** | Wordt als gebruikersnaam van HTTPS-remotes verstuurd. Met **Systeem** laat het een credential manager een van meerdere opgeslagen accounts kiezen. |
 | **Credential helpers van deze repository negeren** | Alleen **Systeem**. De helpers die de repository voor zichzelf instelt (haar `.git/config`, bestanden die ze insluit) staan eronder, met het bestand waar elk vandaan komt; de helpers van het systeem en de globale helpers blijven werken. |
 | **Helper**, **Commando**, **Hosts**, **Cache (minuten)** | Een commando dat de repository draait om in te loggen. Een *helper* is een credential helper van git; een *tokencommando* drukt een token af (de argumentenlijst wordt op spaties gesplitst, met aanhalingstekens rond een argument met spaties, en getoond onder **Draait als**; er draait geen shell omheen, het draait in de map van de repository). **Hosts** beperkt het tot die hosts (leeg: de host van de hoofdremote); **Cache** is hoe lang een token opnieuw wordt gebruikt (standaard 50 minuten). **Huidige helper van deze repository gebruiken** kopieert de helper die de repository instelt naar het veld. |
+| **Gebruiken voor de host-API (issues, pull requests)** | Met een tokencommando: hetzelfde commando geeft ook het token voor de issue- en pull-requestaanroepen van deze repository, in plaats van je persoonlijke token (een installatietoken van een GitHub App, dus opmerkingen verschijnen als de App). Aan- of uitzetten vraagt om bevestiging. Zie "Optreden als GitHub App-bot" in de gids [Hosting en issuetrackers](hosting-integration.md). |
+| **Toewijzing** | **Toegestaan** (standaard) of **Geblokkeerd**, direct opgeslagen. Geblokkeerd kan er in de issues en pull requests van deze repository niets worden toegewezen vanuit de app, de CLI of een agent; bestaande toegewezenen blijven zichtbaar. |
 | **SSH: Inloggen met** | **Systeem** (de eigen instelling van ssh, de agent en de standaardsleutels), **Sleutelbestand** of **Accountsleutel** (de sleutel van een integratie). |
 | **Bestand met privésleutel** | Kies een van de sleutels in `~/.ssh` of typ een pad. Alleen deze sleutel wordt aangeboden, aan elke SSH-remote van de repository, submodules inbegrepen. Als andere accounts het sleutelbestand kunnen lezen (een rechtenbit voor groep of anderen op Linux en macOS, een item voor Everyone, Users of Authenticated Users op Windows), zegt een waarschuwing dat OpenSSH zo'n sleutel weigert ("bad permissions") en lost **Beperken tot mijn account** het op (`chmod 600`, of op Windows een DACL alleen voor jouw account en SYSTEM). |
 | **Bestand met bekende hosts**, **Strikte controle van hostsleutels** | Een optioneel bestand met vertrouwde hostsleutels, en het weigeren van een host die er niet in staat. |

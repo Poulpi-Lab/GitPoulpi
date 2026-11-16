@@ -156,6 +156,18 @@ Was das in der Praxis heißt:
   `mutation_allowlist`. Jedes Tool trägt MCP-Annotationen (`readOnlyHint`,
   `destructiveHint`, `openWorldHint`), sodass ein Client wie Claude Code Sie vor den
   riskanten weiterhin fragt.
+- **Unterhaltungen von Issues und Pull Requests**: `hosting_issue_comments` und
+  `hosting_review_conversation` lesen die ganze Zeitleiste (Lesezugriffe, offene Welt: Sie
+  rufen den Host auf); `hosting_markdown` bereinigt einen Text und findet seine Verweise und
+  ruft nichts auf (geschlossene Welt). Senden (`hosting_issue_comment`,
+  `hosting_review_comment`, `hosting_review_reply`) und Bearbeiten
+  (`hosting_*_comment_edit`) sind gewöhnliche Mutationen, als offene Welt markiert: Sie gehen
+  sofort an den Host, unter der Identität des Tokens (`posted_as` in der Antwort; ein
+  Bot-Token sendet als der Bot), sodass `allow_mutations` und `mutation_allowlist`
+  entscheiden, ob ein Agent es darf. Das Löschen eines Kommentars (`hosting_*_comment_delete`) ist
+  destruktiv. Nach dem Senden, Bearbeiten oder Löschen wird der Daemon informiert, und ein offenes
+  Fenster des Repositorys aktualisiert dieses Element. `ui_show_pr` / `ui_show_issue`
+  nehmen `--view conversation`, um die Unterhaltung statt der Zeile zu öffnen.
 - **Konflikte**: `conflicts_check` (eine Vorhersage, vor jedem Merge), `conflicts_list`, `conflicts_show` und `conflicts_state` sind
   Lesezugriffe; `conflicts_resolve` (es verwirft die nicht behaltene Seite, `--delete`
   entfernt die Datei) und `conflicts_abort` (verwirft den ganzen
@@ -230,6 +242,7 @@ Ihr Fenster; *propose* öffnet einen Dialog, den Sie bestätigen.
 |---|---|---|
 | `ai_commit_message` | `gitpoulpi ai commit-message` | read, network |
 | `ai_explain` | `gitpoulpi ai explain` | read, network |
+| `ai_hosting_reply` | `gitpoulpi ai hosting-reply` | read, network |
 | `ai_prompt` | `gitpoulpi ai prompt` | read |
 | `ai_resolve_conflict` | `gitpoulpi ai resolve-conflict` | read, network |
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
@@ -303,8 +316,13 @@ Ihr Fenster; *propose* öffnet einen Dialog, den Sie bestätigen.
 | `hosting_integrations_radar` | `gitpoulpi hosting integrations radar` | write |
 | `hosting_integrations_remove` | `gitpoulpi hosting integrations remove` | destructive |
 | `hosting_integrations_test` | `gitpoulpi hosting integrations test` | read, network |
+| `hosting_assignment` | `gitpoulpi hosting assignment` | write |
 | `hosting_issue_base` | `gitpoulpi hosting issue base` | write |
 | `hosting_issue_close` | `gitpoulpi hosting issue close` | write |
+| `hosting_issue_comment` | `gitpoulpi hosting issue comment` | write, network |
+| `hosting_issue_comment_delete` | `gitpoulpi hosting issue comment-delete` | destructive, network |
+| `hosting_issue_comment_edit` | `gitpoulpi hosting issue comment-edit` | write, network |
+| `hosting_issue_comments` | `gitpoulpi hosting issue comments` | read, network |
 | `hosting_issue_create` | `gitpoulpi hosting issue create` | write, network |
 | `hosting_issue_edit` | `gitpoulpi hosting issue edit` | write, network |
 | `hosting_issue_move` | `gitpoulpi hosting issue move` | write |
@@ -315,6 +333,7 @@ Ihr Fenster; *propose* öffnet einen Dialog, den Sie bestätigen.
 | `hosting_link` | `gitpoulpi hosting link` | write |
 | `hosting_list` | `gitpoulpi hosting list` | read |
 | `hosting_logout` | `gitpoulpi hosting logout` | destructive |
+| `hosting_markdown` | `gitpoulpi hosting markdown` | read |
 | `hosting_members` | `gitpoulpi hosting members` | read, network |
 | `hosting_milestones` | `gitpoulpi hosting milestones` | read, network |
 | `hosting_open` | `gitpoulpi hosting open` | read |
@@ -327,6 +346,9 @@ Ihr Fenster; *propose* öffnet einen Dialog, den Sie bestätigen.
 | `hosting_refs` | `gitpoulpi hosting refs` | read |
 | `hosting_review_abandon` | `gitpoulpi hosting review abandon` | write, network |
 | `hosting_review_comment` | `gitpoulpi hosting review comment` | write, network |
+| `hosting_review_comment_delete` | `gitpoulpi hosting review comment-delete` | destructive, network |
+| `hosting_review_comment_edit` | `gitpoulpi hosting review comment-edit` | write, network |
+| `hosting_review_conversation` | `gitpoulpi hosting review conversation` | read, network |
 | `hosting_review_diff` | `gitpoulpi hosting review diff` | read, network |
 | `hosting_review_fetch` | `gitpoulpi hosting review fetch` | write, network |
 | `hosting_review_push` | `gitpoulpi hosting review push` | write, network |

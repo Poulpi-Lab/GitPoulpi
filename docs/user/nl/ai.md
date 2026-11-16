@@ -282,6 +282,7 @@ met de muis boven staat of hem markeert.
 | **Script voor het herschrijven van de geschiedenis** | In de [werkbank voor het herschrijven van de geschiedenis](history-rewrite.md#een-script-schrijven-met-ai): de knop `✦ Schrijven met AI...` van de scripteditor, of palet `Herschrijven: Een script schrijven met AI...`. Een dialoogvenster toont precies wat er wordt verstuurd; het script komt gemarkeerd in de editor en wordt nooit voor je uitgevoerd of toegepast. | `ai rewrite-script "<instructie>" [--sample N]` (drukt af) |
 | **Regels voor geschiedenis herschrijven** | In de [werkbank voor het herschrijven van de geschiedenis](history-rewrite.md#regels-maken-met-ai): de knop `✦ Regels maken met AI...`, `Alt+I`, of palet `Herschrijven: Regels maken met AI...`. Een dialoogvenster met meerdere regels toont precies wat er wordt verstuurd; de regels en instellingen komen in de werkbank en er wordt niets voor je als voorbeeld getoond of toegepast. | `ai rewrite-rules "<beschrijving>" [--context]` (drukt af) |
 | **Worktree-naam** | In het [dialoogvenster Worktree maken](worktrees.md#een-naam-geven-met-ai): de knop `✦ Naam met AI` of `Alt+A` opent een vak waarin je de functie, bug of taak beschrijft; het model geeft de worktree en zijn branch een naam naar de eigen branchnamen van de repository, en beide komen in de velden van het dialoogvenster om te bewerken. Alleen je beschrijving en de lokale branchnamen worden verstuurd, dus er is geen dialoogvenster "wat wordt verstuurd". | `ai worktree-name --describe "<taak>"` (drukt af) |
+| **Antwoord op een host** en **Issuebeschrijving** | De knop **Schrijven met AI** (`Alt+E`) van elke Markdown-composer die naar een host verstuurt: een opmerking, een antwoord of een bewerking in een gesprek, een reviewopmerking of -samenvatting, de beschrijving van een nieuw issue. Het concept komt in het vak; er wordt niets geplaatst. Zie [Schrijfhulp op een host](#schrijfhulp-op-een-host). | `ai hosting-reply` (drukt een concept af) |
 | **Commit-composer** | Het menu van de WIP-rij *Commits samenstellen (AI)...*, `Ctrl+G C`, palet `AI: Commits samenstellen uit lokale wijzigingen...` | |
 
 `Esc` annuleert een lopend verzoek (het proces van een lokale agent wordt beëindigd).
@@ -361,6 +362,111 @@ de geldige behouden blijven. Een Script-regel wordt nooit op deze manier gemaakt
 namen van branches en tags en de auteurs van de nieuwste commits mee (een vakje, standaard uit, getoond in het
 paneel "wat wordt verstuurd"). Het profiel en de instructies zijn die van *Regels voor geschiedenis
 herschrijven* in Instellingen > AI.
+
+### Schrijfhulp op een host
+
+*Antwoord op een host* stelt een opmerking, een antwoord in een discussie, een opmerking bij een regel code of de samenvatting
+van een review op; *Issuebeschrijving* stelt de beschrijving van een nieuw issue op. **De AI schrijft alleen een concept.**
+De tekst komt in de composer (of wordt door de CLI afgedrukt) zodat jij hem leest, bewerkt en zelf verzendt. Er is geen
+codepad van deze functie naar een schrijfactie van een host: ze kan niets plaatsen, bewerken, oplossen of verwijderen, het
+antwoord van CLI en MCP zegt `"posted": false`, en een lokale agent draait alleen-lezen (zie onder). De tekst verlaat
+GitPoulpi alleen via de eigen knop **Verzenden** (`Ctrl+Enter`) of de plaatsknop van het formulier.
+
+**In de Markdown-composer.** Zolang AI aan staat, heeft elke composer waarvan de tekst naar een host gaat (een opmerking, een
+antwoord of een bewerking in [de gespreksweergave](hosting-integration.md#5c-gesprekken), een reviewopmerking, de samenvatting
+van Review afronden, de beschrijving van een nieuw issue en de beschrijving van een pull request) een knop **Schrijven met AI**
+(`Alt+E`, in alle dezelfde toets) aan het rechteruiteinde van zijn modusbalk. Ze opent een paneel onder de balk:
+
+- een veld, *Wat ik in dit antwoord wil*, dat je op het moment van gebruik typt (`Enter` stelt het concept op). Zijn
+  plaatshouder geeft een voorbeeld van de soort ("eens, en vraag om een falende test"). Een lijst **Recent** bewaart eerdere
+  instructies (klik er een aan, of `Up` / `Down` in het veld; bewaard in `ai-hints.toml`);
+- *Mijn concept verbeteren*, aangevinkt als het vak al een tekst bevat: de AI begint ermee in plaats van een nieuwe te schrijven;
+- *AI de repository laten lezen*, **elke keer niet aangevinkt** tenzij je de standaard hebt aangezet (zie onder);
+- **Concept**, **Stoppen** (ook `Esc`) en **Sluiten**, en één regel voor de voortgang of de fout.
+
+Het gebruikelijke dialoogvenster "Wat wordt verstuurd" (`[ai.sent_preview] hosting_reply`, `issue_body`,
+`pull_request_description`) toont het verzoek voordat het weggaat. Naast de systeem- en gebruikerstekst toont het een lijst
+**Repositorycontext** als de repository wordt gelezen: elk deel met zijn grootte, het totaal tegen de limiet (*31,2 KB van
+48 KB*), wat werd ingekort om te passen, wat als gevoelig werd weggelaten en welke delen worden hergebruikt. Voor een lokale
+agent zegt het dat de agent de repository zelf leest met alleen-lezen-hulpmiddelen, noemt het die, geeft het de werkmap en of
+de agentsessie nieuw of voortgezet is, en elk dialoogvenster eindigt met *De AI schrijft alleen een concept. Er wordt niets
+geplaatst voordat je het zelf verzendt.* Het concept vervangt de tekst in één ongedaanmakingsstap en de composer schakelt naar
+Voorbeeld zodat je het leest voordat je verzendt; `Ctrl+Z` geeft je tekst terug. Een beschrijving van een pull request wordt
+geschreven uit de commits en de diff van de branch en neemt dezelfde instructie; het vak voor de repository is er grijs
+("niet voor deze tekst").
+
+Wat het model krijgt: de titel, status en beschrijving van het item, de discussie waarop je antwoordt, de recente opmerkingen
+(nieuwste eerst, binnen `ai.limits.hosting_reply_context_bytes`, standaard 49152), de opmaak die de host aanneemt (zodat een
+Jira-antwoord terugkomt als Markdown die GitPoulpi omzet), wat je in dit antwoord wilt en, om je eigen tekst te verbeteren, je
+concept. Alles wat andere mensen schreven, is in het verzoek als niet-vertrouwde gegevens gemarkeerd, dus een instructie die in
+een opmerking verstopt zit, wordt niet gevolgd. Boven de limiet wordt niets stilletjes ingekort: er wordt gevraagd, en de
+oudste opmerkingen vallen eerst weg (de discussie waarop je antwoordt blijft behouden, tot de helft van het budget); de CLI
+meldt de inkorting in `truncated` en `--send-all` heft die op.
+
+**Je eigen basisprompt.** De instructies waarmee beide acties beginnen, zijn te bewerken: *Instellingen > AI > Antwoorden op een
+host > Basisprompt* (`ai.hosting_reply.base_prompt`). Leeg gebruikt de ingebouwde prompt, die om alleen de tekst vraagt, in de
+opmaak van de host en in de taal van het gesprek tenzij je hint iets anders zegt. Je algemene, workspace- en
+repositoryinstructies volgen er nog steeds op, en de tekst van andere mensen blijft als niet-vertrouwd gemarkeerd, wat je
+daar ook schrijft. `ai prompt --action hosting_reply` drukt de lagen af.
+
+#### Toegang tot de repository
+
+**Standaard uit, en per gebruik aangevinkt.** De repository lezen geeft veel betere antwoorden op "komt deze crash voor in onze
+code?", maar stuurt meer mee, dus het is een keuze die je elke keer maakt: *AI de repository laten lezen* begint in elk vak
+niet aangevinkt. `ai.hosting_reply.read_repository` (*AI standaard de repository laten lezen*, uit) laat het vak alleen
+aangevinkt beginnen; `--read-repo` is het vinkje van de CLI. De keuze is grijs, met haar reden als je haar activeert, in drie
+gevallen: de repository is **niet gekloond** (het gesprek van een andere repository in de Radar: er valt niets te lezen), de
+gekozen lokale agent heeft **geen alleen-lezenmodus** die GitPoulpi vertrouwt, of de tekst wordt **niet uit de repository
+geschreven** (een beschrijving van een pull request). Niets anders dan je eigen vinkje zet het aan.
+
+Wat er dan gebeurt, hangt van het profiel af:
+
+| Profiel | Wat de repository leest | Wat wordt verstuurd |
+|---|---|---|
+| **API** (OpenAI-compatibel, Anthropic) | GitPoulpi, via de daemon, alleen-lezen | Een context die het zelf opbouwt en aan het model geeft: het repositoryoverzicht (de boom op het hoogste niveau en de paden rond gevonden bestanden), de bestanden die het gesprek noemt (het hele bestand, of een venster van 40 regels rond de regel of het symbool), zoekresultaten voor identifiers en foutmeldingen in het gesprek, en bij een pull request zijn diff. Binnen `ai.limits.hosting_reply_*` (context 49152, bestand 8192, overzicht 6144, 20 resultaten per term, 8 termen), ingekort in de volgorde diff, bestanden, resultaten, overzicht en gemeld. Bestanden die gevoelig lijken, worden weggelaten en geheimen in de rest worden eerst gemaskeerd (zie [Privacy](#privacy)). |
+| **Lokale agent** (Claude Code, Codex), headless | De agent zelf, in de repositorymap | Er wordt niets opgebouwd: de agent wordt in de repository gestart met **alleen-lezen-hulpmiddelen** en leest wat hij nodig heeft. Claude Code krijgt `Read`, `Grep` en `Glob` en `Bash`, `Edit`, `Write`, `NotebookEdit`, `WebFetch` en `WebSearch` worden hem geweigerd, zonder geladen MCP-server (de eigen server van een project zou kunnen plaatsen); Codex draait in zijn alleen-lezen-sandbox. De hostinginloggegevens van je omgeving (`GH_TOKEN`, `GITHUB_TOKEN`, `GITLAB_TOKEN`, de variabelen van Jira, Linear, Azure DevOps en Bitbucket, `GIT_ASKPASS`, `SSH_AUTH_SOCK`) worden uit zijn omgeving verwijderd, zodat zelfs een verkeerd ingestelde agent niets kan publiceren of pushen. |
+
+Een agent waarvoor GitPoulpi geen bevestigde alleen-lezenmodus heeft (en elke agent in de interactieve terminalmodus) kan niet
+worden toegelaten: de keuze blijft grijs met *Deze agent heeft geen alleen-lezenmodus die GitPoulpi vertrouwt.*
+
+**Caching en Context vernieuwen.** Wat is verzameld, wordt hergebruikt zodat het volgende antwoord snel en goedkoop is:
+
+- De opgebouwde context van een API-profiel wordt per repository bewaard gedurende `ai.hosting_reply.context_ttl_minutes`
+  (*Repositorycontext bewaren gedurende*, standaard 30). Hij is gesleuteld op de repository, zijn `HEAD`, de selectie en de
+  limieten, en zijn delen worden één voor één bewaard, dus het volgende issue van dezelfde repository bouwt alleen de delen
+  opnieuw op die het niet deelt. In het venster leven de caches in het geheugen (de laatste 8 contexten); de CLI bewaart ze in
+  bestanden in zijn privé-statusmap, dus een tweede `ai hosting-reply --read-repo` hergebruikt wat de eerste opbouwde.
+- Een nieuwe commit op de uitgecheckte branch (`HEAD` verschuift), een wijziging van de limieten of de tijdslimiet beginnen
+  opnieuw. Dat doet ook **Context vernieuwen**, de knop in het paneel als de repository wordt gelezen, of `--refresh-context`
+  op de CLI. Een regel onder het vak zegt wat het laatste concept deed: *Context opgebouwd: 5 delen, 31,2 KB, HEAD a1b2c3d*,
+  *Context hergebruikt (4 van 5 delen, HEAD a1b2c3d)*, *Providercache: 12k tokens hergebruikt*, *De agent las de repository
+  (HEAD a1b2c3d)*, *Agentsessie gestart* of *Agentsessie voortgezet*.
+- **Prompt-cache van Anthropic.** Voor een Anthropic-profiel wordt het verzoek verstuurd met de basisprompt en instructies als
+  één gecachet blok en de repositorycontext als tweede, en daarna je gesprek, hint en concept, zodat een tweede antwoord op
+  dezelfde context uit de cache van de provider wordt gelezen en een fractie kost. De cachetellers van het antwoord zijn wat
+  *Providercache: N tokens hergebruikt* toont. OpenAI-compatibele servers krijgen dezelfde stabiele volgorde van het verzoek,
+  waar hun automatische prefixcaching baat bij heeft; GitPoulpi stuurt niets extra's.
+- **De agent houdt zijn sessie.** Met **Sessie van de agent behouden tussen antwoorden**
+  (`ai.hosting_reply.reuse_agent_session`, standaard aan) en *AI de repository laten lezen* aangevinkt, wordt een lokale agent
+  die het ondersteunt (nu Claude Code) met een sessie-id gestart en daarna ermee hervat, zodat wat hij van de repository las in
+  zijn eigen geschiedenis blijft en het volgende antwoord sneller start. Andere agents draaien eenmalig. De sessie geldt per
+  repository, `HEAD` en actie; een nieuwe commit of **Context vernieuwen** begint een nieuwe; met de optie uit, of het vak niet
+  aangevinkt, is elk antwoord een eenmalige run die niets bewaart. De sessie leeft in de eigen opslag van de agent, GitPoulpi
+  bewaart alleen haar id (in het geheugen in het venster, in een bestand alleen voor de gebruiker bij de CLI).
+
+```
+gitpoulpi ai hosting-reply --conversation conversation.json --hint "say I will look tomorrow"
+gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
+gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "is this our bug?"
+gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"
+```
+
+`--conversation` neemt een bestand, `-` voor standaardinvoer of de JSON zelf: de JSON die `hosting issue comments --json` of
+`hosting review conversation --json` afdrukt (een oudere pagina met een `header` en `entries` wordt ook geaccepteerd), dus
+`gitpoulpi hosting issue comments 7 --json | gitpoulpi ai hosting-reply --conversation -` werkt; `--item <ref>` haalt het
+gesprek zelf op (`7` of `#7` een issue, `!7` een pull request). Met `--read-repo` zetten `--pr-base REV --pr-head REV` de diff
+van een pull request in de context; de `context` van het antwoord zegt welke delen zijn gelezen, of ze zijn hergebruikt, de
+cachetokens van de provider en de agentsessie. De MCP-tool `ai_hosting_reply` is hetzelfde commando en is alleen-lezen.
 
 ## Waar de sleutel naartoe gaat
 
@@ -449,6 +555,11 @@ om verzoeken klein te houden.
 | `review_threads_bytes` | 6000 | De reviewopmerkingen die al bestaan |
 | `review_context_file_bytes` | 8192 | Eén projectcontextbestand van een review (`CLAUDE.md`, `AGENTS.md`, het extra bestand) |
 | `review_context_bytes` | 16384 | Alle contextbestanden van een review samen |
+| `hosting_reply_context_bytes` | 49152 | Het item en gesprek dat aan een opgesteld antwoord wordt gegeven |
+| `hosting_reply_file_bytes` | 8192 | Eén repositorybestand dat aan een opgesteld antwoord wordt gegeven (als de AI de repository leest) |
+| `hosting_reply_map_bytes` | 6144 | Het repositoryoverzicht dat aan een opgesteld antwoord wordt gegeven |
+| `hosting_reply_hits_per_term` | 20 | Zoekresultaten die per term worden bewaard (1 tot 200) |
+| `hosting_reply_terms` | 8 | Zoektermen die worden opgezocht (1 tot 50) |
 
 **Er wordt niets stilzwijgend afgekapt.** Als een invoer boven zijn limiet zit, wacht het verzoek
 en toont *Boven de AI-limiet* wat er boven zit: welk deel (de diff, een bestand, de

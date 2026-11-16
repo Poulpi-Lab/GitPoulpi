@@ -299,6 +299,7 @@ enquanto você passa o ponteiro ou a realça.
 | **Script de reescrita do histórico** | No [painel de reescrita do histórico](history-rewrite.md#escrever-um-script-com-ia): o botão `✦ Escrever com IA...` do editor de Script, ou o comando da paleta `Reescrita: escrever um script com IA...`. Um diálogo mostra exatamente o que será enviado; o script cai no editor, marcado, e nunca é executado nem aplicado no seu lugar. | `ai rewrite-script "<instrução>" [--sample N]` (imprime) |
 | **Regras de reescrita do histórico** | No [painel de reescrita do histórico](history-rewrite.md#criar-regras-com-ia): o botão `✦ Criar regras com IA...`, `Alt+I`, ou o comando da paleta `Reescrita: criar regras com IA...`. Um diálogo de várias linhas mostra exatamente o que será enviado; as regras e as configurações caem no painel, e nada é pré-visualizado nem aplicado no seu lugar. | `ai rewrite-rules "<descrição>" [--context]` (imprime) |
 | **Nome do worktree** | No [diálogo Criar worktree](worktrees.md#nomeando-com-ia): o botão `✦ Nomear com IA` ou `Alt+A` abre uma caixa em que você descreve a funcionalidade, o bug ou a tarefa; o modelo dá nome ao worktree e à sua branch seguindo os nomes de branch do próprio repositório, e os dois caem nos campos do diálogo para você editar. Só a sua descrição e os nomes das branches locais são enviados, então não há diálogo de "o que é enviado". | `ai worktree-name --describe "<tarefa>"` (imprime) |
+| **Resposta em um host** e **Descrição da issue** | O botão **Escrever com IA** (`Alt+E`) de todo editor Markdown que envia para um host: um comentário, uma resposta ou uma edição em uma conversa, um comentário ou resumo de revisão, a descrição de uma nova issue. O rascunho cai na caixa; nada é publicado. Veja [Ajuda de escrita em um host](#ajuda-de-escrita-em-um-host). | `ai hosting-reply` (imprime um rascunho) |
 | **Compositor de commits** | O menu da linha WIP *Compor commits (IA)...*, `Ctrl+G C`, o comando da paleta `IA: compor commits a partir das alterações em andamento...` | |
 
 `Esc` cancela uma requisição em andamento (o processo de um agente local é
@@ -386,6 +387,117 @@ válidas são mantidas. Uma regra de Script nunca é criada assim. Opcionalmente
 escopo, os nomes de branches e tags e os autores dos commits mais recentes vão junto
 (uma caixa, desligada por padrão, mostrada no painel "o que é enviado"). O perfil e as
 instruções são os de *Regras de reescrita do histórico* em Configurações > IA.
+
+### Ajuda de escrita em um host
+
+*Resposta em um host* redige um comentário, uma resposta em uma thread, um comentário em uma linha de código ou o
+resumo de uma revisão; *Descrição da issue* redige a descrição de uma nova issue. **A IA só redige.** O texto vai
+para a caixa de texto (ou é impresso pela CLI) para você ler, editar e enviar por conta própria. Não existe nenhum
+caminho desse recurso até uma escrita no host: ele não pode publicar, editar, resolver nem excluir nada, a resposta
+da CLI e do MCP traz `"posted": false`, e um agente local roda somente leitura (abaixo). O texto só sai do GitPoulpi
+pelo próprio botão **Enviar** (`Ctrl+Enter`) ou **Comentar** da caixa de texto.
+
+**No editor Markdown.** Com a IA ligada, toda caixa de texto cujo conteúdo vai para um host (um comentário, uma
+resposta ou uma edição na [visão de conversa](hosting-integration.md#5c-conversas), um comentário de revisão, o
+resumo de Finalizar revisão, a descrição de uma nova issue e a descrição de um pull request) tem um botão
+**Escrever com IA** (`Alt+E`, a mesma tecla em todas) na ponta direita da sua barra de modos. Ele abre um painel sob a
+barra:
+
+- um campo, *O que quero nesta resposta*, digitado na hora do uso (`Enter` redige). O texto de exemplo mostra o tipo
+  de pedido ("concordar e pedir um teste que falhe"). Uma lista **Recentes** guarda instruções anteriores (clique em
+  uma, ou `Cima` / `Baixo` no campo; guardadas em `ai-hints.toml`);
+- *Melhorar meu rascunho*, marcado quando a caixa já tem um texto: a IA parte dele em vez de escrever um novo;
+- *Deixar a IA ler o repositório*, **desmarcado a cada vez**, a menos que você ligue o padrão (veja abaixo);
+- **Redigir**, **Parar** (também `Esc`) e **Fechar**, e uma linha para o progresso ou o erro.
+
+O diálogo "O que é enviado" de sempre (`[ai.sent_preview] hosting_reply`, `issue_body`, `pull_request_description`)
+mostra a requisição antes de ela sair. Além do texto de sistema e do de usuário, ele mostra uma lista **Contexto do
+repositório** quando o repositório é lido: cada parte com o seu tamanho, o total contra o limite (*31.2 KB de 48 KB*),
+o que foi cortado para caber, o que foi deixado de fora por ser sensível e quais partes foram reaproveitadas. Para um
+agente local, diz que o agente lê o repositório por conta própria com ferramentas somente leitura, nomeia essas
+ferramentas, dá a pasta de trabalho e informa se a sessão do agente é nova ou continuada, e todo diálogo termina com
+*A IA só escreve um rascunho. Nada é publicado até você enviar por conta própria.* O rascunho substitui o texto em um
+único passo de desfazer e a caixa muda para Prévia, para você ler antes de enviar; `Ctrl+Z` devolve o seu texto. A
+descrição de um pull request é escrita a partir dos commits e do diff da branch e aceita a mesma instrução; a opção
+do repositório fica em cinza ali ("não para este texto").
+
+O que o modelo recebe: o título, o estado e a descrição do item, a thread a que você responde, os comentários recentes
+(os mais novos primeiro, dentro de `ai.limits.hosting_reply_context_bytes`, 49152 por padrão), a marcação que o host
+aceita (assim uma resposta para o Jira volta como Markdown que o GitPoulpi converte), o que você quer nesta resposta
+e, para melhorar o seu próprio texto, o seu rascunho. Tudo o que outras pessoas escreveram é marcado como dado não
+confiável na requisição, então uma instrução escondida em um comentário não é seguida. Acima do limite nada é cortado
+em silêncio: você é consultado, e os comentários mais antigos saem primeiro (a thread a que você responde é mantida,
+até metade do orçamento); a CLI informa o corte em `truncated` e `--send-all` o suspende.
+
+**O seu próprio prompt base.** As instruções de que as duas ações partem são editáveis: *Configurações > IA >
+Respostas em um host > Prompt base* (`ai.hosting_reply.base_prompt`). Vazio usa o prompt embutido, que pede só o
+texto, na marcação do host e no idioma da conversa, a menos que a sua instrução diga outra coisa. Suas instruções
+globais, do workspace e do repositório continuam vindo depois dele, e o texto de outras pessoas continua marcado como
+não confiável, seja o que for que você escrever ali. `ai prompt --action hosting_reply` imprime as camadas.
+
+#### Acesso ao repositório
+
+**Desligado por padrão e marcado a cada uso.** Ler o repositório dá respostas bem melhores para "esse travamento
+acontece no nosso código?", mas envia mais, então é uma escolha que você faz a cada vez: *Deixar a IA ler o
+repositório* começa desmarcada em toda caixa. `ai.hosting_reply.read_repository` (*Deixar a IA ler o repositório por
+padrão*, desligado) só faz a caixa começar marcada; `--read-repo` é o "marcar" da CLI. A opção fica em cinza, com o
+motivo ao ativá-la, em três casos: o repositório **não está clonado** (a conversa do Radar de outro repositório: não
+há nada para ler), o agente local escolhido **não tem um modo somente leitura** em que o GitPoulpi confie, ou o texto
+**não é escrito a partir do repositório** (uma descrição de pull request). Nada além da sua própria marca a liga.
+
+O que acontece depois depende do perfil:
+
+| Perfil | O que lê o repositório | O que é enviado |
+|---|---|---|
+| **API** (compatível com a OpenAI, Anthropic) | O GitPoulpi, pelo daemon, somente leitura | Um contexto que ele monta e entrega ao modelo: o mapa do repositório (a árvore de nível superior e os caminhos em volta dos arquivos encontrados), os arquivos que a conversa nomeia (o arquivo inteiro, ou uma janela de 40 linhas em volta da linha ou do símbolo), resultados de busca por identificadores e mensagens de erro da conversa e, para um pull request, o diff dele. Dentro de `ai.limits.hosting_reply_*` (contexto 49152, arquivo 8192, mapa 6144, 20 resultados por termo, 8 termos), cortado na ordem diff, arquivos, resultados, mapa e informado. Arquivos que parecem sensíveis ficam de fora e os segredos do resto são ocultados antes (veja [Privacidade](#privacidade)). |
+| **Agente local** (Claude Code, Codex), headless | O próprio agente, na pasta do repositório | Nada é montado: o agente é iniciado no repositório com **ferramentas somente leitura** e lê o que precisa. O Claude Code recebe `Read`, `Grep` e `Glob` e tem `Bash`, `Edit`, `Write`, `NotebookEdit`, `WebFetch` e `WebSearch` recusados, sem nenhum servidor MCP carregado (o servidor de um projeto poderia publicar); o Codex roda no seu sandbox somente leitura. As credenciais de host do seu ambiente (`GH_TOKEN`, `GITHUB_TOKEN`, `GITLAB_TOKEN`, as variáveis do Jira, Linear, Azure DevOps e Bitbucket, `GIT_ASKPASS`, `SSH_AUTH_SOCK`) são removidas do ambiente dele, então nem um agente mal configurado consegue publicar ou fazer push. |
+
+Um agente para o qual o GitPoulpi não tem um modo somente leitura confirmado (e qualquer agente no modo de execução
+de terminal interativo) não pode ser liberado: a opção continua em cinza com *Este agente não tem um modo somente
+leitura em que o GitPoulpi confie.*
+
+**Cache e Atualizar contexto.** O que foi reunido é reaproveitado para que a próxima resposta seja rápida e barata:
+
+- O contexto montado de um perfil de API é guardado por repositório durante `ai.hosting_reply.context_ttl_minutes`
+  (*Manter um contexto do repositório por*, 30 por padrão). Ele é indexado pelo repositório, pelo seu `HEAD`, pela
+  seleção e pelos limites, e as suas partes são guardadas uma a uma, então a próxima issue do mesmo repositório
+  remonta só as partes que não compartilha. Na janela, os caches vivem na memória (os últimos 8 contextos); a CLI os
+  guarda em arquivos na sua pasta de estado privada, então um segundo `ai hosting-reply --read-repo` reaproveita o que
+  o primeiro montou.
+- Um novo commit na branch com checkout (o `HEAD` se move), uma mudança dos limites ou o fim do prazo recomeçam do
+  zero. Também recomeça **Atualizar contexto**, o botão do painel quando o repositório é lido, ou `--refresh-context`
+  na CLI. Uma linha sob a caixa diz o que o último rascunho fez: *Contexto montado: 5 partes, 31.2 KB, HEAD a1b2c3d*,
+  *Contexto reaproveitado (4 de 5 partes, HEAD a1b2c3d)*, *Cache do provedor: 12k tokens reaproveitados*, *O agente
+  leu o repositório (HEAD a1b2c3d)*, *Sessão do agente iniciada* ou *Sessão do agente continuada*.
+- **Cache de prompt da Anthropic.** Para um perfil da Anthropic, a requisição é enviada com o prompt base e as
+  instruções como um bloco em cache e o contexto do repositório como um segundo, e a sua conversa, a instrução e o
+  rascunho depois deles, então uma segunda resposta sobre o mesmo contexto é lida do cache do provedor e custa uma
+  fração. Os contadores de cache da resposta são o que *Cache do provedor: N tokens reaproveitados* mostra. Os
+  servidores compatíveis com a OpenAI recebem a mesma ordem estável da requisição, da qual o cache automático de
+  prefixo deles se beneficia; o GitPoulpi não envia nada a mais.
+- **O agente mantém a sessão.** Com **Manter a sessão do agente entre respostas**
+  (`ai.hosting_reply.reuse_agent_session`, ligado por padrão) e *Deixar a IA ler o repositório* marcado, um agente
+  local que aceita isso (o Claude Code, hoje) é iniciado com um id de sessão e depois retomado por ele, então o que
+  ele leu do repositório continua no próprio histórico e a próxima resposta começa mais rápido. Os outros agentes
+  rodam uma vez só. A sessão é por repositório, `HEAD` e ação; um novo commit ou **Atualizar contexto** começa uma
+  nova; com a opção desligada, ou a caixa desmarcada, cada resposta é uma execução única que não guarda nada. A
+  sessão vive no armazenamento do próprio agente, o GitPoulpi guarda só o id dela (na memória na janela, em um arquivo
+  só do usuário na CLI).
+
+```
+gitpoulpi ai hosting-reply --conversation conversation.json --hint "say I will look tomorrow"
+gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
+gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "is this our bug?"
+gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"
+```
+
+`--conversation` aceita um arquivo, `-` para a entrada padrão, ou o próprio JSON: o JSON que `hosting issue comments --json`
+ou `hosting review conversation --json` imprime (uma página mais antiga com um `header` e `entries` também é aceita), então
+`gitpoulpi hosting issue comments 7 --json | gitpoulpi ai hosting-reply --conversation -` funciona; `--item <ref>`
+busca a própria conversa (`7` ou `#7` uma issue, `!7` um pull request). Com `--read-repo`, `--pr-base REV
+--pr-head REV` põem o diff de um pull request no contexto; o `context` da resposta diz quais partes foram lidas, se
+foram reaproveitadas, os tokens de cache do provedor e a sessão do agente. A ferramenta MCP `ai_hosting_reply` é o
+mesmo comando e é somente leitura.
 
 ## Para onde vai a chave
 
@@ -483,6 +595,11 @@ pequenas.
 | `review_threads_bytes` | 6000 | Os comentários de revisão que já existem |
 | `review_context_file_bytes` | 8192 | Um arquivo de contexto do projeto em uma revisão (`CLAUDE.md`, `AGENTS.md`, o arquivo extra) |
 | `review_context_bytes` | 16384 | Todos os arquivos de contexto de uma revisão juntos |
+| `hosting_reply_context_bytes` | 49152 | O item e a conversa entregues a uma resposta redigida |
+| `hosting_reply_file_bytes` | 8192 | Um arquivo do repositório entregue a uma resposta redigida (quando a IA lê o repositório) |
+| `hosting_reply_map_bytes` | 6144 | O mapa do repositório entregue a uma resposta redigida |
+| `hosting_reply_hits_per_term` | 20 | Resultados de busca mantidos por termo (1 a 200) |
+| `hosting_reply_terms` | 8 | Termos de busca consultados (1 a 50) |
 
 **Nada é cortado em silêncio.** Quando uma entrada passa do limite, a requisição
 espera e *Acima do limite da IA* lista o que passou: qual parte (o diff, um arquivo,

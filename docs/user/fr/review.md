@@ -55,6 +55,8 @@ revues déjà envoyées, les plus anciennes d'abord, chacune avec son verdict (`
 `écartée`). Sur GitLab, les verdicts sont ses approbations. En dessous, la zone de réponse : cliquez dessus ou appuyez sur **`c`**
 pour écrire un commentaire dans la discussion. **Celui-ci est publié immédiatement**, et la zone le dit.
 
+La zone de commentaire (aussi celle d'une réponse, d'un commentaire sur une ligne et du résumé de **Terminer la revue**) est l'éditeur Markdown partagé avec [la vue de conversation](hosting-integration.md#éditeur-markdown) : **Écrire**, **Aperçu** (`Alt+P`) et **Côte à côte** (`Alt+L`, dans une fenêtre de 100 colonnes), `Ctrl+Enter` (aussi `Ctrl+S`, `Alt+Enter`) envoie, et là où l'IA est activée `Alt+E` ouvre **Écrire avec l'IA** ([le chapitre IA](ai.md#aide-à-la-rédaction-sur-un-hébergeur)). L'aperçu montre le texte comme l'hébergeur le rendra, références comprises (`#7`, `!12`, `ABC-12`, identifiants de commit) ; un texte non envoyé est gardé par demande. Le texte de la description et de la conversation passe par le même moteur de rendu : Markdown, tableaux, alertes et références s'y affichent donc comme dans la vue de conversation d'un ticket. Citer, modifier ou supprimer un commentaire déjà publié, et les notes internes, relèvent de la vue de conversation des tickets et des demandes sur les hébergeurs sans revue (voir [Conversations](hosting-integration.md#5c-conversations)) ; ici, seuls vos commentaires en attente se modifient.
+
 ### Fichiers
 
 Les fichiers modifiés à gauche (lettre d'état, `+ajouté -retiré`, un compteur `●n` de fils ouverts, un compteur `✎n` de

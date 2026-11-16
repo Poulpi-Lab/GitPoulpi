@@ -45,7 +45,7 @@ pub enum RepoAuthAction {
         cache_minutes: Option<u32>,
         /// With `token-command`: the same command also supplies the token of
         /// this repository's hosting API calls (issues, pull requests), in
-        /// place of the personal token. For a GitHub App installation token.
+        /// place of the personal token, for example a GitHub App installation token.
         #[arg(long)]
         use_for_hosting: bool,
         /// SSH identity: `system` (ssh's own configuration and agent),

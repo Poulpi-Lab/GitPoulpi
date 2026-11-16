@@ -55,6 +55,16 @@ revisões já submetidas, das mais antigas para as mais recentes, cada uma com o
 `dispensada`). No GitLab os pareceres são as suas aprovações. Por baixo, a caixa de resposta: clique nela ou prima **`c`**
 para escrever um comentário na conversa. **Este é publicado de imediato**, e a caixa di-lo.
 
+A caixa de comentário (também a caixa de uma resposta, de um comentário numa linha e do resumo de **Concluir revisão**) é a
+caixa de texto Markdown partilhada com a [vista de conversa](hosting-integration.md#escrever): **Escrever**, **Prévia**
+(`Alt+P`) e **Lado a lado** (`Alt+L`, numa janela com 100 colunas), `Ctrl+Enter` (também `Ctrl+S`, `Alt+Enter`) envia, e
+onde a IA está ativa `Alt+E` abre **Escrever com IA** ([o capítulo da IA](ai.md#ajuda-de-escrita-num-host)). A prévia
+mostra o texto como o host o fará, referências incluídas (`#7`, `!12`, `ABC-12`, ids de commit); um texto não enviado é
+guardado por pedido. O texto da descrição e da conversa usa o mesmo desenhador, por isso o Markdown, as tabelas, os alertas
+e as referências têm o mesmo aspeto aqui e na vista de conversa de uma issue. Citar, editar ou eliminar um comentário já
+publicado, e as notas internas, pertencem à vista de conversa das issues e dos pedidos em hosts sem revisão (veja
+[Conversas](hosting-integration.md#5c-conversas)); aqui só os seus comentários pendentes podem ser editados.
+
 ### Ficheiros
 
 Os ficheiros alterados à esquerda (letra de estado, `+adicionadas -removidas`, uma contagem `●n` de discussões abertas, uma contagem `✎n` dos

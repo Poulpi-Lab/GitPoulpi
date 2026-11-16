@@ -3,7 +3,7 @@
     "addPullRequestReviewThreadReply": {
       "comment": {
         "databaseId": 4010,
-        "author": {"login": "poulpi-lab", "__typename": "Bot", "url": "https://github.com/apps/poulpi-lab"},
+        "author": {"login": "my-app", "__typename": "Bot", "url": "https://github.com/apps/my-app"},
         "body": "Agreed.",
         "createdAt": "2024-05-04T11:00:00Z",
         "updatedAt": "2024-05-04T11:00:00Z",

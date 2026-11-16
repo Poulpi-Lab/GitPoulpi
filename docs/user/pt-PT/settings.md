@@ -372,6 +372,7 @@ para lá chegar.
 | Opção | O que faz |
 |---|---|
 | **Atualização de Pull Requests e issues** | Com que frequência as listas da barra lateral e o chip da barra de ferramentas se atualizam, um número e uma unidade (minutos ou horas). Predefinição 5 minutos, até 2 horas, `0` desliga o temporizador (`general.hosting_refresh_minutes`, `general.hosting_refresh_unit`). |
+| **Publicar como** | O nome com que as mensagens a um host são publicadas quando o token do repositório é o de um bot (um token de GitHub App), por exemplo `my-app[bot]`; serve também para reconhecer os seus próprios comentários. Vazio: pedido ao host, senão aprendido com a primeira mensagem publicada. Um repositório pode substituí-lo em Definições > Definições do repositório > SSH e credenciais > Host (`general.hosting_post_as`). |
 | **Terminologia de pedido de revisão** | A palavra usada para as revisões alojadas: **Auto (por host)**, **Pull Request** ou **Merge Request**. |
 | **Ocultar o chip do pull request quando está fechado ou com merge feito** | Ativado por predefinição (`ui.hide_finished_pr_chip`; no GitLab diz "merge request"). O chip da barra de ferramentas mostra o pedido mais recente da branch em checkout; quando esse pedido é fechado ou o merge é feito, fica oculto e aparece em seu lugar o chip esbatido **+ PR** (iniciar um novo pedido), como se a branch não tivesse nenhum. Desativado, o chip mostra sempre o pedido mais recente, seja qual for o estado. Aplica-se de imediato. |
 
@@ -387,6 +388,14 @@ contém também as predefinições do [contexto da revisão](ai.md#contexto-da-r
 (*Definição do perfil*, *Sim*, *Não*), **Incluir CLAUDE.md**, **Incluir AGENTS.md** e **Ficheiro extra** (um caminho ou uma
 ligação; vazio não junta nenhum, com um botão **Procurar...** por baixo que abre um seletor de ficheiros; `Enter` no botão
 é a sua forma de teclado). Esta página tem o seu próprio guia: [Assistência de IA](ai.md).
+
+O bloco **Respostas num host** guarda o que redige comentários, respostas e descrições de issues: o seu perfil e as
+instruções, o **Prompt base** (vazio usa o incorporado) e um grupo **Acesso ao repositório**: **Deixar a IA ler o
+repositório por omissão** (desligado: a escolha em cada caixa de texto começa desmarcada), **Manter a sessão do agente
+entre respostas** e **Manter um contexto do repositório durante (minutos)**. Os limites de bytes **Maior conversa a enviar
+para uma resposta**, **Maior ficheiro do repositório para uma resposta**, **Maior mapa do repositório para uma resposta**,
+**Máximo de resultados de pesquisa por termo numa resposta** e **Máximo de termos de pesquisa numa resposta** estão com os
+outros limites de entrada. Veja [Ajuda de escrita num host](ai.md#ajuda-de-escrita-num-host).
 
 Por baixo dos blocos por ação, o grupo **Privacidade**:
 
@@ -615,6 +624,8 @@ bloqueia.
 | **Nome de utilizador git** | Enviado como nome de utilizador dos remotos HTTPS. Com **Sistema**, permite a um gestor de credenciais escolher uma de várias contas guardadas. |
 | **Ignorar os assistentes de credenciais definidos por este repositório** | Só com **Sistema**. Os assistentes que o repositório define para si (o seu `.git/config`, os ficheiros que inclui) são listados por baixo, com o ficheiro de onde vêm cada um; os assistentes do sistema e globais continuam a funcionar. |
 | **Assistente**, **Comando**, **Hosts**, **Cache (minutos)** | Um comando que o repositório executa para iniciar sessão. Um *assistente* é um assistente de credenciais do git; um *comando de token* imprime um token (a lista de argumentos é dividida por espaços, com aspas num argumento que contenha espaços, e mostrada em **Executa como**; nenhuma shell o executa, corre na pasta do repositório). **Hosts** limita-o a esses hosts (vazio: o host do remoto principal); **Cache** é durante quanto tempo um token é reutilizado (50 minutos por predefinição). **Usar o assistente atual deste repositório** copia para o campo o assistente que o repositório define. |
+| **Usar para a API do host (issues, pull requests)** | Com um comando de token: o mesmo comando dá também o token das chamadas de issues e de pull requests deste repositório, em vez do seu token pessoal (um token de instalação de uma GitHub App, para os comentários aparecerem como a App). Ligar ou desligar pede confirmação. Veja "Agir como um bot de GitHub App" no guia de [integrações de alojamento](hosting-integration.md). |
+| **Atribuição** | **Permitida** (predefinição) ou **Bloqueada**, guardada de imediato. Bloqueada, nada pode ser atribuído nas issues e pull requests deste repositório a partir da aplicação, da CLI ou de um agente; os responsáveis existentes continuam visíveis. |
 | **SSH: Iniciar sessão com** | **Sistema** (a configuração própria do ssh, o agente e as chaves predefinidas), **Ficheiro de chave** ou **Chave da conta** (a chave de uma integração). |
 | **Ficheiro da chave privada** | Escolha uma das chaves encontradas em `~/.ssh` ou escreva um caminho. Só esta chave é oferecida, a todos os remotos SSH do repositório, submódulos incluídos. Quando outras contas podem ler o ficheiro de chave (um bit de permissão para grupo ou outros no Linux e no macOS, uma entrada para Todos, Utilizadores ou Utilizadores autenticados no Windows), um aviso diz que o OpenSSH recusa essa chave («bad permissions») e **Restringir à minha conta** resolve-o (`chmod 600`, ou uma DACL só para a sua conta e o SYSTEM no Windows). |
 | **Ficheiro de hosts conhecidos**, **Verificação estrita da chave do host** | Um ficheiro opcional de chaves de host de confiança, e a recusa de um host que não conste dele. |

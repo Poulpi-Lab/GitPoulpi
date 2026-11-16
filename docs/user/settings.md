@@ -368,7 +368,7 @@ them.
 | Option | What it does |
 |---|---|
 | **Pull Requests and issues refresh** | How often the sidebar lists and the toolbar chip refresh, a number and a unit (minutes or hours). Default 5 minutes, up to 2 hours, `0` turns the timer off (`general.hosting_refresh_minutes`, `general.hosting_refresh_unit`). |
-| **Post as** | The name messages to a host are posted as when the repository's token is a bot's (a GitHub App token), for example `my-app[bot]`; also used to recognise your own comments. Empty: asked from the host, else learned from the first message posted. A repository can override it in Settings > Repository > SSH & credentials > Hosting (`general.hosting_post_as`). |
+| **Post as** | The name messages to a host are posted as when the repository's token is a bot's (a GitHub App token), for example `my-app[bot]`; also used to recognise your own comments. Empty: asked from the host, else learned from the first message posted. A repository can override it in Settings > Repo-specific settings > SSH & credentials > Hosting (`general.hosting_post_as`). |
 | **Review request terminology** | The word used for hosted reviews: **Auto (per host)**, **Pull request** or **Merge request**. |
 | **Hide the pull request chip when it is closed or merged** | On by default (`ui.hide_finished_pr_chip`; it reads "merge request" on GitLab). The chip on the toolbar shows the latest request of the checked-out branch; once that request is closed or merged it is hidden and the dim **+ PR** chip (start a new request) shows instead, as if the branch had none. Off, the chip always shows the latest request, whatever its state. Applies at once. |
 

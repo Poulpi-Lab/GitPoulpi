@@ -103,13 +103,13 @@ mod tests {
 
     #[test]
     fn an_app_bot_needs_a_bot_author() {
-        let me = bot_identity(Some("poulpi-lab[bot]"));
+        let me = bot_identity(Some("my-app[bot]"));
         assert_eq!(
-            me.authored(&Actor::new("Poulpi-Lab[bot]", "x", ActorKind::Bot)),
+            me.authored(&Actor::new("My-App[bot]", "x", ActorKind::Bot)),
             Some(true)
         );
         assert_eq!(
-            me.authored(&Actor::new("poulpi-lab[bot]", "x", ActorKind::User)),
+            me.authored(&Actor::new("my-app[bot]", "x", ActorKind::User)),
             Some(false)
         );
     }

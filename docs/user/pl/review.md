@@ -56,6 +56,16 @@ już wysłane przeglądy, od najstarszego, każdy z werdyktem (`zaakceptowano`, 
 `uchylono`). W GitLab werdyktami są jego akceptacje. Pod spodem pole odpowiedzi: kliknij je lub naciśnij **`c`**,
 aby napisać komentarz do dyskusji. **Ten jest publikowany od razu**, a pole to mówi.
 
+Pole komentarza (także pole odpowiedzi, komentarza do linii i podsumowania w **Zakończ przegląd**) to edytor Markdown
+wspólny z [widokiem rozmowy](hosting-integration.md#pisanie): **Pisanie**, **Podgląd** (`Alt+P`) i **Podział**
+(`Alt+L`, w oknie szerokim na 100 kolumn), `Ctrl+Enter` (także `Ctrl+S`, `Alt+Enter`) wysyła, a gdy AI jest włączone,
+`Alt+E` otwiera **Pisz z AI** ([rozdział o AI](ai.md#pomoc-w-pisaniu-na-hoście)). Podgląd pokazuje tekst tak, jak
+pokaże go host, z odwołaniami (`#7`, `!12`, `ABC-12`, id commitów); niewysłany tekst jest przechowywany dla każdego
+żądania. Tekst opisu i rozmowy używa tego samego renderera, więc Markdown, tabele, alerty i odwołania wyglądają tu
+tak samo jak w widoku rozmowy zgłoszenia. Cytowanie, edycja lub usuwanie już opublikowanego komentarza oraz
+notatki wewnętrzne należą do widoku rozmowy zgłoszeń i żądań na hostach bez przeglądu (zob.
+[Rozmowy](hosting-integration.md#5c-rozmowy)); tutaj można edytować tylko twoje oczekujące komentarze.
+
 ### Pliki
 
 Zmienione pliki po lewej (litera stanu, `+dodane -usunięte`, licznik `●n` otwartych wątków, licznik `✎n`

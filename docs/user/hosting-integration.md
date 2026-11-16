@@ -466,7 +466,7 @@ The same board is available to scripts and agents: `gitpoulpi hosting board` pri
 A card shows the number, the title, the assignees as initials, the labels and the milestone. Drag it to another column,
 or `Shift+Left` / `Shift+Right`, or **Board: Move Card To...** (`m`). It moves at once; after about 150 ms a spinner
 says the host is still working, and if the host refuses, the card goes back and the status line says why. `Enter` opens
-the issue on the host (the note, for local issues); `e` edits assignees, labels and milestone; `n` starts a new issue in
+the issue's [conversation](#5c-conversations) in GitPoulpi, and the board comes back when you close it; `e` edits assignees, labels and milestone; `n` starts a new issue in
 the selected column; `a`, `l`, `M` and `/` filter by assignee, label, milestone and text, `x` clears the filters; `r`
 reads the host again. The board reads again when the sidebar's lists refresh. The Radar has no board.
 
@@ -578,7 +578,7 @@ The line under the header says who your messages are posted as, and the same lin
 | *Who you would post as is not known yet. Set Post as in Settings.* | Nothing could be learned. |
 
 **Post as** is a name: for a GitHub App it is `my-app[bot]`. Set it for every repository in **Settings > Integrations >
-Post as** (`general.hosting_post_as`), or for one repository in **Settings > Repository > SSH & credentials > Hosting**,
+Post as** (`general.hosting_post_as`), or for one repository in **Settings > Repo-specific settings > SSH & credentials > Hosting**,
 which overrides it. Left empty, GitPoulpi asks GitHub (GraphQL `viewer { login }`, which an installation token may or
 may not answer) and, failing that, learns the name from the author of the first comment it posts and keeps it with
 the repository. A personal token never needs it. See
@@ -969,7 +969,7 @@ time and leaves your other repositories on your own token.
 2. Write a small script that prints an **installation token** on its standard
    output (the App's private key signs a short-lived JWT, which is exchanged
    for a token that is valid for one hour). GitPoulpi never sees the key.
-3. In **Settings > Repository > SSH & credentials**, choose **Token
+3. In **Settings > Repo-specific settings > SSH & credentials**, choose **Token
    command** under HTTPS, enter the script as the **Command** and the host
    (`github.com`) under **Hosts**, and tick **Use for the hosting API
    (issues, pull requests)**. Save and confirm the command (a person always
@@ -994,7 +994,7 @@ What changes for that repository:
   [conversation](#posting-as) and in its comment box; `posted_as` in the CLI answer). With a personal token that is
   your login (`GET /user`). With an App token it is the **Post as** name, for example `my-app[bot]`: set it for
   every repository in **Settings > Integrations** (`general.hosting_post_as`, also
-  `gitpoulpi config set general.hosting_post_as my-app[bot]`) or for one repository in **Settings > Repository > SSH
+  `gitpoulpi config set general.hosting_post_as my-app[bot]`) or for one repository in **Settings > Repo-specific settings > SSH
   & credentials > Hosting**, which wins. Left empty, GitPoulpi asks GitHub (GraphQL `viewer { login }`) and
   otherwise learns the name from the author of the first comment it posts, and keeps it with the repository. That
   name is also how your own comments are recognised, so edit and delete are only offered on them (an App's comments
@@ -1010,7 +1010,7 @@ profile's own token. (A GitLab project or group access token is a bot too: it is
 
 ### Blocking assignment in a repository
 
-**Settings > Repository > SSH & credentials** has an **Assignment** row
+**Settings > Repo-specific settings > SSH & credentials** has an **Assignment** row
 (**Allowed** by default, or **Blocked**; saved at once). Blocked, assignment
 is impossible in that repository's issues and pull requests, whoever asks:
 

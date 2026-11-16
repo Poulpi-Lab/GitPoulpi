@@ -216,22 +216,19 @@ fn post_as_is_the_repository_override_and_a_learned_login_is_kept() {
     assert_eq!(hosting_scope::post_as(root), None, "nothing configured");
 
     gitpoulpi_session::RepoState {
-        hosting_post_as: Some("  poulpi-lab[bot] ".into()),
+        hosting_post_as: Some("  my-app[bot] ".into()),
         ..Default::default()
     }
     .save(&path)
     .unwrap();
-    assert_eq!(
-        hosting_scope::post_as(root).as_deref(),
-        Some("poulpi-lab[bot]")
-    );
+    assert_eq!(hosting_scope::post_as(root).as_deref(), Some("my-app[bot]"));
 
     hosting_scope::learn_login(root, "learned[bot]");
     let state = gitpoulpi_session::RepoState::load(&path).unwrap();
     assert_eq!(state.hosting_identity.as_deref(), Some("learned[bot]"));
     assert_eq!(
         state.hosting_post_as.as_deref(),
-        Some("  poulpi-lab[bot] "),
+        Some("  my-app[bot] "),
         "learning leaves the rest of the state alone"
     );
 }

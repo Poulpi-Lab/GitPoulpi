@@ -156,7 +156,7 @@ impl Fake {
             s.writes += 1;
             s.write_log.push(format!("{kind}|{arg}|{body}"));
             let login = match &s.identity {
-                Ok(id) => id.login.clone().unwrap_or_else(|| "poulpi-lab[bot]".into()),
+                Ok(id) => id.login.clone().unwrap_or_else(|| "my-app[bot]".into()),
                 Err(_) => "nobody".into(),
             };
             (s.write_delay, s.fail_write.take(), login, s.writes)

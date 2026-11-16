@@ -557,10 +557,10 @@ include_untracked_in_autostash = "Include untracked files in auto-stash"
 include_untracked_in_autostash_help = "Whether the automatic stash also takes untracked files (otherwise only tracked changes are stashed and put back)."
 hosting_refresh_minutes = "{$^prs} and issues refresh"
 hosting_refresh_minutes_help = "How often the sidebar's {$^prs} and Issues lists (and the toolbar's linked-{$pr_abbr} chip) ask the host again. 0 turns the timer off; they still refresh on opening a repository, on a branch switch, after a push or fetch, and on demand."
-# context: label of the row that sets the name messages to a host are posted as (a bot such as poulpi-lab[bot])
+# context: label of the row that sets the name messages to a host are posted as (a bot such as my-app[bot])
 hosting_post_as = "Post as"
 # context: help under the "Post as" row of Settings
-hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
+hosting_post_as_help = "The name your messages to the host are posted as, and the name used to recognize your own comments (edit, delete), for example my-app[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts."
 pr_terminology = "Review request terminology"
 pr_terminology_help = "The word used for a hosted code-review request everywhere in the TUI. Auto follows the repository's host: Merge request for GitLab, Pull request for the other hosts. Pull request or Merge request forces that word. Applies at once."
 hide_finished_pr_chip = "Hide the {$pr} chip when it is closed or {$merge}d"
@@ -11699,7 +11699,7 @@ assignment_help = "Blocked: nothing can be assigned in this repository's issues 
 # context: label of the repository row that overrides the global "Post as" name
 post_as_label = "Post as"
 # context: help under the repository "Post as" row of the SSH & credentials page
-post_as_help = "The name your messages to the host are posted as, and the name used to recognise your own comments (edit, delete), for example poulpi-lab[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
+post_as_help = "The name your messages to the host are posted as, and the name used to recognize your own comments (edit, delete), for example my-app[bot] for a GitHub App. Only needed with a bot token: left empty, GitPoulpi asks the host and learns it from the first message it posts. For this repository only; empty, the global setting applies."
 # context: one row listing a credential helper set by the repository; {value} is the helper, {origin} the file that sets it
 repo_helper_line = "{value}  ({origin})"
 # context: label of the rows that list the credential helpers set by this repository
@@ -12360,7 +12360,6 @@ ai_ctx_agent = "The agent read the repository (HEAD {head})"
 ai_ctx_session_started = "Agent session started"
 # context: status: the local agent continued its session from the previous draft. Width budget: 30 cells
 ai_ctx_session_continued = "Agent session continued"
-# context: the reason that checkbox is disabled, shown in parentheses after it. Width budget: 24 cells
 # context: label before the list of instructions typed before. Width budget: 12 cells
 ai_recent = "Recent"
 # context: shown after that label when the list is empty. Width budget: 24 cells

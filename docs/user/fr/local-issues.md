@@ -21,6 +21,10 @@ en même temps, et les listes suivent.
 
 Rien n'est lié tout seul : comme toute source de tickets, c'est à activer dépôt par dépôt.
 
+## Commentaires d'une note
+
+`Enter` sur la ligne d'une note dans la section TICKETS, ou sur sa carte, ouvre sa conversation : le texte de la note, puis les commentaires. Les commentaires sont conservés dans le fichier de la note elle-même, dans une dernière section `## Comments`, une entrée `### <auteur> - <heure UTC>` chacune (une entrée modifiée ajoute `(edited <heure>)`). Rien au-dessus de ce titre n'est jamais touché : Obsidian et un shell lisent et modifient donc le même fichier. Vous pouvez écrire, modifier et supprimer les commentaires de l'auteur local (le `local.me` du profil, sinon l'utilisateur connecté, le nom qu'utilise *Assignés à moi*), jamais ceux d'un autre. La zone est l'éditeur Markdown habituel avec un aperçu, et *Écriture en tant que <nom> (note locale)* nomme l'auteur. Rien ne passe par le réseau. Une note dont vous avez écrit à la main un titre `## Comments` est lue comme telle.
+
 ## Les notes
 
 Une note par ticket, nommée `<id>-<slug>.md` (`12-crash-on-empty-name.md`), avec un bloc de frontmatter :
@@ -46,6 +50,28 @@ Free Markdown. GitPoulpi never rewrites the body.
 - La lecture est indulgente : une note sans `id` le prend dans son nom de fichier, une note sans `status` vaut `todo`, une note
   sans frontmatter prend son titre dans le premier `# titre`. Un fichier qui n'est pas un ticket (`readme.md`) est ignoré.
 - Un statut est du texte libre. **Ouvert** veut dire « pas le statut terminé ».
+
+### Commentaires dans une note
+
+Un commentaire sur une note est écrit dans la note elle-même, dans une dernière section `## Comments` (sans réseau, et elle se lit très bien dans Obsidian) :
+
+```markdown
+(le texte de la note)
+
+## Comments
+
+### kai - 2026-11-15T10:00:00Z
+Premier commentaire, **avec n'importe quel Markdown**.
+
+### ann - 2026-11-15T11:30:00Z (edited 2026-11-15T12:00:00Z)
+Un deuxième.
+```
+
+- Une entrée commence à une ligne qui est exactement `### <auteur> - <heure UTC>`, suivie de ` (edited <heure UTC>)` après une modification ; son texte court jusqu'à l'entrée suivante. La section est le dernier titre `## Comments` hors d'un bloc de code et va jusqu'à la fin du fichier : n'écrivez rien après.
+- Une ligne de commentaire qui se lirait comme une entrée ou comme le titre est stockée avec une barre oblique inverse devant (`\### ...`, que Markdown affiche comme le même texte) et relue sans elle.
+- Publier ajoute à la fin et laisse tout ce qui précède octet pour octet (fins de ligne comprises) ; une modification ou une suppression ne réécrit que la section. Une publication fait aussi avancer le `updated` de la note (une note sans frontmatter n'en reçoit pas).
+- L'auteur est l'auteur local du profil (le « moi » des paramètres des tickets locaux). Vous ne pouvez modifier ou supprimer que vos propres commentaires ; l'identifiant d'un commentaire est son heure et son auteur, et deux publications dans la même seconde se distinguent en décalant la seconde d'une seconde.
+- Une note n'a ni réponses, ni commentaires internes, ni historique d'événements.
 
 ## Ce que vous pouvez faire
 
@@ -102,7 +128,7 @@ Si vous travaillez seul, ou dans une équipe qui garde ses tickets à côté du 
   `Shift+Left` / `Shift+Right`, ou avec **Tableau : Déplacer la carte vers...** (`m`), une liste déroulante des colonnes. La carte bouge
   immédiatement ; le `status` de la note est réécrit comme dans [la section sur les notes](#les-notes), rien d'autre dans le fichier. Si l'écriture
   échoue, la carte revient et l'erreur est sur la ligne d'état.
-- **Ouvrez** une carte avec `Enter` ou un double-clic (la note s'ouvre dans votre programme par défaut pour `.md`). `e` modifie ses
+- **Ouvrez** une carte avec `Enter` ou un double-clic : la [conversation](hosting-integration.md#5c-conversations) de la note s'ouvre dans la fenêtre, avec le texte de la note et ses commentaires (**Ouvrir la note** du menu de la carte ouvre le fichier dans votre programme par défaut pour `.md`). `e` modifie ses
   assignés, étiquettes ou jalon, `.` ou un clic droit ouvre le menu de la carte, `n` commence un nouveau ticket dans la
   colonne sélectionnée (le formulaire revient au tableau quand il se ferme).
 - **Filtrez** par assigné (`a`), étiquette (`l`), jalon (`M`) ou texte (`/`) ; `x` les efface. Les filtres sont des

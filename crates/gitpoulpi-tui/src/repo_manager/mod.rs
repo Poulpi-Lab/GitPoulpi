@@ -73,7 +73,7 @@ impl KnownRepo {
 
     /// What the owner column shows. When another known repository has the
     /// same name, the parent folder is appended so the two can be told
-    /// apart (`poulpi-lab  work/tools`).
+    /// apart (`my-org  work/tools`).
     fn column_text(&self, ambiguous: bool) -> String {
         let owner = self.owner_label();
         if !ambiguous {

@@ -12,12 +12,12 @@ fn post_as_is_empty_by_default_and_settable_by_key() {
         serde_json::json!("")
     );
     config
-        .set("general.hosting_post_as", "poulpi-lab[bot]")
+        .set("general.hosting_post_as", "my-app[bot]")
         .unwrap();
-    assert_eq!(config.general.hosting_post_as, "poulpi-lab[bot]");
+    assert_eq!(config.general.hosting_post_as, "my-app[bot]");
     assert_eq!(
         config.get("general.hosting_post_as").unwrap(),
-        serde_json::json!("poulpi-lab[bot]")
+        serde_json::json!("my-app[bot]")
     );
 }
 

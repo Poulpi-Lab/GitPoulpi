@@ -302,9 +302,12 @@ dość szeroki.
 
 ### Akcje na wierszu
 
-- `Enter` lub dwukrotne kliknięcie otwiera wiersz w przeglądarce.
+- `Enter` lub dwukrotne kliknięcie otwiera wiersz: pull request w [przeglądzie](review.md) (GitHub, GitLab, Gitea,
+  Forgejo, Gerrit), zgłoszenie oraz żądanie w Azure DevOps lub Bitbucket jako [rozmowę](#5c-rozmowy) w oknie,
+  a wszystko inne w przeglądarce. **Otwórz w przeglądarce** w menu wiersza zawsze otwiera przeglądarkę.
 - Prawy przycisk myszy lub `.` otwiera menu wiersza:
-  - **Otwórz w przeglądarce**, **Kopiuj URL**, **Kopiuj numer**.
+  - **Otwórz rozmowę** (zgłoszenia i żądania, które nie mają widoku przeglądu), **Otwórz w przeglądarce**,
+    **Kopiuj URL**, **Kopiuj numer**.
   - Dla pull requesta: **Edytuj na <dostawca>**, **Checkout gałęzi
     źródłowej**, **Pokaż commity gałęzi źródłowej**. Dla żądania z forka
     checkout brzmi **Checkout pull request (fork)**, a **Pokaż** jest
@@ -396,7 +399,8 @@ CLI: `gitpoulpi hosting members|labels|milestones`, `hosting pr-edit <n>`,
 
 | Klawisz | Akcja |
 |---|---|
-| `Enter` / dwukrotne kliknięcie | otwiera wiersz w przeglądarce |
+| `Enter` / dwukrotne kliknięcie | otwiera rozmowę w GitPoulpi, gdy host ją ma (pull request w GitHub, GitLab, Gitea lub Gerrit otwiera przegląd), w przeciwnym razie przeglądarkę |
+| `o` | otwiera wiersz w przeglądarce |
 | `.` / prawy przycisk | menu wiersza |
 | `e` | edytuje zaznaczony pull request na hoście |
 | `n` | nowy pull request (PULL REQUESTS) lub nowe zgłoszenie (ZGŁOSZENIA) |
@@ -446,6 +450,207 @@ mówi, że host jeszcze pracuje, a jeśli host odmówi, karta wraca, a pasek sta
 zgłoszenie na hoście (notatkę, dla zgłoszeń lokalnych); `e` edytuje przypisanych, etykiety i kamień milowy; `n` zaczyna nowe zgłoszenie w
 zaznaczonej kolumnie; `a`, `l`, `M` i `/` filtrują według przypisanego, etykiety, kamienia milowego i tekstu, `x` czyści filtry; `r`
 czyta hosta ponownie. Tablica czyta ponownie, gdy listy paska bocznego się odświeżają. Radar nie ma tablicy.
+
+## 5c. Rozmowy
+
+**Rozmowa** to wszystko, co powiedziano o jednym zgłoszeniu, elemencie pracy, karcie, zmianie lub pull / merge
+requeście: opis, komentarze, przeglądy, wątki w kodzie i zdarzenia (etykiety, przypisania, zmiany stanu,
+pushe). GitPoulpi czyta ją z hosta, pokazuje sformatowaną i pozwala odpowiedzieć bez opuszczania okna.
+
+### Otwieranie
+
+| Skąd | Jak |
+|---|---|
+| Wiersz ZGŁOSZENIA | `Enter` lub dwukrotne kliknięcie; **Otwórz rozmowę** w menu wiersza; paleta *Hosting: Otwórz rozmowę zgłoszenia...* (lista zgłoszeń na ekranie). **Otwórz w przeglądarce** w menu wiersza zostawia przeglądarkę. |
+| Wiersz PULL REQUESTS w Azure DevOps lub Bitbucket | `Enter` lub **Otwórz rozmowę**. W GitHub, GitLab, Gitea, Forgejo i Gerrit wiersz otwiera [przegląd](review.md), którego strona Przegląd ogólny jest rozmową żądania. |
+| Karta [tablicy zgłoszeń](#5b-tablica-zgłoszeń) | `Enter` lub dwukrotne kliknięcie. |
+| [Radar](radar.md) | `i` na wierszu zgłoszenia lub żądania, **Otwórz rozmowę** w menu wiersza albo *Radar: Otwórz rozmowę zgłoszenia*. |
+| Odwołanie w innej rozmowie | Kliknij je (albo `l`, potem wybierz): `#7`, `!12`, `ABC-12` powiązanego źródła otwierają się w aplikacji i trafiają na stos Wstecz. |
+| Agent | `gitpoulpi ui show issue <n> --view conversation` (także `ui show pr`), zob. [opis CLI](cli-reference.md). |
+
+**Repozytoria, które nie są sklonowane.** Wiersz Radaru z repozytorium, którego nie masz sklonowanego, też otwiera
+swoją rozmowę: widok potrzebuje tylko profilu integracji i projektu, więc Radar wyświetla go nad własnym oknem,
+a `Esc` oddaje Radar z powrotem. Pominięte jest to, co wymaga klonu: odwołanie do commita otwiera się na hoście
+zamiast w Logu, a *Pozwól AI czytać repozytorium* jest wyszarzone z powodem (zob. [rozdział o AI](ai.md#pomoc-w-pisaniu-na-hoście)).
+Żądanie sklonowanego repozytorium ma zamiast tego swój przegląd (`e`), a **Otwórz rozmowę** w Radarze mówi, że nie
+ma tu dla niego rozmowy do odczytu; zgłoszenie sklonowanego repozytorium otwiera ją na karcie tego repozytorium.
+
+Zgłoszenie hosta, który żadnych nie ma do odczytu (Bitbucket i Gerrit nie mają zgłoszeń), otwiera przeglądarkę jak
+dawniej, a build bez funkcji `conversation` robi tak wszędzie ([własne buildy](custom-builds.md)).
+
+### Widok
+
+Widok na całe okno: nagłówek (stan, kto i kiedy to otworzył, etykiety, liczba komentarzy, **Pokaż zdarzenia**,
+**Wstecz**, **Odśwież**, **Otwórz w przeglądarce**), linia **Publikowanie jako**, oś czasu, a pod nią pole komentarza.
+
+- Oś czasu czyta się od najstarszego do najnowszego i zaczyna od najnowszego okna (najwyżej 300 wpisów). **Wczytaj
+  starsze** na jej górze (`m`, paleta *Rozmowa: Wczytaj starsze wpisy*) czyta okno wcześniejsze, z liczbą wpisów,
+  które jeszcze zostały, gdy host ją podaje.
+- Komentarz pokazuje autora, datę, znacznik `edytowano`, znacznik `bot` dla botów, `wewnętrzny` dla notatek
+  prywatnych oraz przyciski **Odpowiedz**, **Cytuj**, **Edytuj**, **Usuń** i **Linki**, na które pozwala zaznaczony
+  wpis. Wątek w kodzie pokazuje `ścieżka:linia`, `rozwiązany` lub `nierozwiązany`, `nieaktualny` i swoje
+  komentarze. Przegląd pokazuje swój werdykt.
+- Zdarzenia to po jednej przygaszonej linii (*carol dodał(a) etykietę lfs*). **Pokaż zdarzenia** (`v`) je ukrywa;
+  wybór jest pamiętany dla repozytorium. Hosty bez historii zdarzeń (YouTrack, elementy pracy Azure DevOps,
+  notatki lokalne) nie mają takiego pola wyboru.
+- Tekst jest renderowanym Markdownem: nagłówki, listy zagnieżdżone i z zadaniami, cytaty, alerty w stylu GitHub,
+  podświetlony kod, tabele, linki, obrazy jako `[image: alt]`. Tekst, który przyszedł we własnych znacznikach hosta,
+  jest najpierw konwertowany (zob. [Konwersja znaczników](#konwersja-znaczników)). Blok kodu `mermaid` dostaje
+  przycisk **Otwórz diagram**, który pokazuje źródło diagramu w przewijanym podglądzie (`Enter` je kopiuje); paleta
+  ma *Rozmowa: Otwórz diagram wpisu*. Wymaga to buildu z funkcjami `conversation` i `mermaid`.
+- Widok czyta ponownie co 60 sekund i po `F5` (**Odśwież**).
+
+**Klawisze.** Każdy ma przycisk, wiersz menu lub wiersz palety (*Rozmowa: ...*), a `Ctrl+N` numeruje przyciski.
+
+| Klawisz | Akcja |
+|---|---|
+| `Up`, `Down`, `Ctrl+J`, `Ctrl+K`, `j`, `k` | Poprzedni / następny wpis |
+| `PageUp`, `PageDown`, `Home`, `End`, kółko, pasek przewijania | Przewijanie |
+| `Tab`, `Shift+Tab` | Oś czasu, pole komentarza, potem przyciski nagłówka |
+| `r` | Odpowiedź: do wątku zaznaczonego wpisu albo z jego tekstem w cytacie, gdy host nie ma wątków |
+| `Q` | Cytuje zaznaczony wpis w nowym komentarzu |
+| `c` | Nowy komentarz |
+| `e`, `d` | Edytuje, usuwa jeden z twoich komentarzy (przed usunięciem pada pytanie) |
+| `l`, `Enter` | Linki wpisu: `Enter` idzie za jedynym albo otwiera ich menu |
+| `y`, `o` | Kopiuje adres wpisu, otwiera go w przeglądarce |
+| `n` | Następny nieprzeczytany wpis |
+| `v`, `m`, `F5` | Pokaż lub ukryj zdarzenia, Wczytaj starsze, Odśwież |
+| `Alt+Left`, `Backspace` | Wstecz po stosie Wstecz |
+| `q`, `Esc` | Zamyka (pyta najpierw, gdy pole zawiera tekst) |
+
+### Pisanie
+
+**Nowy komentarz** (`c` albo `Tab` do pola), **Odpowiedz** (`r`), **Cytuj** (`Q`) i **Edytuj** (`e`) używają jednego
+edytora Markdown: **Pisanie**, **Podgląd** i **Podział** (`Alt+P` przełącza Pisanie i Podgląd, `Alt+L` włącza Podział
+i wymaga okna szerokiego na 100 kolumn). `Ctrl+Enter` (także `Ctrl+S` i `Alt+Enter`) lub **Wyślij** publikuje,
+**Anuluj** odrzuca pole, a `Alt+E` otwiera **Pisz z AI**, gdy AI jest włączone ([rozdział o AI](ai.md#pomoc-w-pisaniu-na-hoście)).
+Podgląd jest układany tym samym rendererem co oś czasu, z tymi samymi odwołaniami. Gdy host nie przyjmuje Markdown,
+stopka podaje, w jakich znacznikach tekst jest wysyłany (*Wysłano jako Jira wiki markup*, *Wysłano jako Textile*).
+
+- Komentarz jest dodawany do osi czasu od razu i zajmuje swoje miejsce, gdy host odpowie. Jeśli host odmówi, wpis
+  znika, a pole otwiera się ponownie z twoim tekstem i powodem.
+- Tekst, którego nie wysłano, jest przechowywany dla każdego elementu (`remote-conversations.toml` w folderze
+  konfiguracji) i czeka przy następnym otwarciu tego pola; wysłanie lub odrzucenie go usuwa. Zamknięcie pola z
+  tekstem najpierw pyta.
+- **Odpowiedz** w wątku (wątek przeglądu, dyskusja GitLab, komentarz Linear, wątek Bitbucket lub Azure DevOps)
+  publikuje do tego wątku. Gdy host ma tylko płaską listę, **Odpowiedz** zaczyna nowy komentarz z zaznaczonym
+  wpisem w cytacie (`> **autor**`), tak samo jak **Cytuj**.
+- **Notatka wewnętrzna** (pole wyboru, `Alt+I`): w GitLab i Redmine komentarz widzą tylko członkowie projektu.
+  Jest pokazywana tylko na hostach, które mają takie notatki, i tylko przy nowym komentarzu.
+- Publikowanie jest działaniem na zewnątrz: nic nie jest zapisywane w dzienniku i **z GitPoulpi nie da się niczego
+  cofnąć**. Bez połączenia pole zostaje, **Wyślij** jest wyszarzone z powodem, a nagłówek mówi, że pokazano
+  zapisaną kopię.
+
+**Kto może edytować lub usuwać.** Tylko twoje własne komentarze mają **Edytuj** i **Usuń**. Pierwsze słowo ma
+host, gdy je daje (`viewerCanUpdate` i `viewerCanDelete` w GitHub, `can_edit` gdzie indziej), potem twój login
+porównany z autorem komentarza, bez rozróżniania wielkości liter; komentarze bota App muszą też pochodzić z konta
+bota. Dopóki login bota GitHub App nie jest znany, liczą się tylko komentarze opublikowane przez tę instalację
+(repozytorium zachowuje ich id): nic nie jest zgadywane z nazwy. W wątku **Edytuj** i **Usuń** działają na ostatnim
+komentarzu wątku, który jest twój. Host, który nie umie edytować ani usuwać (zob. [tabelę](#czego-nie-potrafi-każdy-host)),
+pokazuje przyciski wyszarzone z powodem.
+
+### Publikowanie jako
+
+Linia pod nagłówkiem mówi, jako kto są publikowane twoje wiadomości, a ta sama linia jest w każdym polu:
+
+| Linia | Znaczenie |
+|---|---|
+| *Publikowanie jako ann (token osobisty)* | Token profilu: twój własny login (`GET /user`). |
+| *Publikowanie jako ci-bot (polecenie tokenu repozytorium)* | Do API hostingu używane jest [polecenie tokenu](#13d-działanie-jako-bot-github-app) repozytorium. |
+| *Publikowanie jako my-app[bot] (bot GitHub App)* | Token instalacji. Nazwa pochodzi z **Publikuj jako**, a w razie braku z hosta. |
+| *Publikowanie jako bot GitHub App (jego nazwa nie jest jeszcze znana: ustaw „Publikuj jako” w Ustawieniach)* | Nie skonfigurowano nazwy i jeszcze żadnej nie poznano. |
+| *Publikowanie jako ... (bot projektu)* | Token dostępu projektu lub grupy GitLab. |
+| *Pisanie jako kai (notatka lokalna)* | Folder notatek Markdown: `local.me` profilu, a w razie braku podłączony użytkownik. |
+| *Nieznane jeszcze, jako kto publikujesz. Ustaw „Publikuj jako” w Ustawieniach.* | Nic nie dało się ustalić. |
+
+**Publikuj jako** to nazwa: dla GitHub App jest to `my-app[bot]`. Ustaw ją dla każdego repozytorium w **Ustawienia >
+Integracje > Publikuj jako** (`general.hosting_post_as`) albo dla jednego repozytorium w **Ustawienia > Ustawienia
+repozytorium > SSH i poświadczenia > Hosting**, co ją nadpisuje. Gdy jest pusta, GitPoulpi pyta GitHub (GraphQL
+`viewer { login }`, na co token instalacji może, ale nie musi odpowiedzieć), a w razie braku odpowiedzi poznaje
+nazwę z autora pierwszego komentarza, który opublikuje, i przechowuje ją z repozytorium. Token osobisty nigdy jej
+nie potrzebuje. Zob. [Działanie jako bot GitHub App](#13d-działanie-jako-bot-github-app).
+
+### Odwołania krzyżowe
+
+Odwołania w rozmowie są podkreślone i klikalne. Najpierw dopasowywane są powiązane źródła ZGŁOSZEŃ i PULL REQUESTS
+repozytorium, więc `ABC-12` powiązanego projektu Jira otwiera się w aplikacji nawet wewnątrz komentarza GitHub;
+to, co dodaje własna gramatyka hosta, otwiera jego stronę po potwierdzeniu linku. Id commita otwiera się w Logu,
+gdy repozytorium jest sklonowane, a id ma co najmniej 7 znaków, w przeciwnym razie na hoście. Nic wewnątrz
+fragmentu kodu, bloku ogrodzonego, linku Markdown, adresu e-mail ani URL nie jest odwołaniem, podobnie jak `C#1`,
+`UTF-8`, `SHA-256` i `ISO-8601`.
+
+| Host | Rozpoznawane |
+|---|---|
+| GitHub | `#7`, `GH-7`, `owner/repo#7`, `owner/repo@sha`, `@login`, id commitów |
+| GitLab | `#7`, `!7`, `group/project#7`, `group/project!7`, `project#7` (projekt siostrzany), `@user`, `~label` i `%milestone` jako chipy, id commitów |
+| Gitea, Forgejo | `#7`, `!7`, `owner/repo#7`, `owner/repo@sha`, `@user`, id commitów |
+| Azure DevOps | `#7`, `!7`, `AB#7`, `@user` |
+| Bitbucket | `@user`, wzmianki `{uuid}`, id commitów |
+| Gerrit | wartości `Change-Id` (`I` i 40 cyfr szesnastkowych), id commitów |
+| Redmine | `#7`, rewizje `r123`, `commit:abc1234` |
+| Jira, Linear, YouTrack | `ABC-12`, tylko dla projektu lub zespołu powiązanego źródła |
+| Trello | adresy kart (`trello.com/c/...`) |
+| Notatki lokalne | `[[note]]`, `[[note\|alias]]` i względne linki `.md` do innej notatki folderu |
+
+`gitpoulpi hosting markdown --body T --id I` wypisuje, co aplikacja robi z tekstem, wraz z odwołaniami.
+
+### Konwersja znaczników
+
+Hosty, które nie mówią Markdownem, są konwertowane w obie strony, więc wszędzie czytasz i piszesz Markdown. To, czego
+konwerter nie rozumie, pozostaje czytelnym tekstem.
+
+- **Jira** (Cloud i Data Center) przechowuje komentarze jako wiki markup przez API v2. To, co czytasz, jest
+  konwertowane na Markdown; to, co piszesz, jest konwertowane na wiki markup, a stopka mówi *Wysłano jako Jira wiki
+  markup*.
+- **Redmine** formatuje tekst jako Textile lub Markdown, czego API nie podaje: mówi o tym GitPoulpi wiersz profilu
+  **Format tekstu serwera** (Ustawienia > Integracje, `markup`, domyślnie Textile). Textile jest konwertowany na
+  Markdown do czytania i z powrotem na Textile do pisania.
+- **Azure DevOps Server** zwraca komentarze elementów pracy jako HTML i przyjmuje je jako HTML: są pokazywane jako
+  Markdown skonwertowany z niego i zapisywane jako HTML. Azure DevOps Services i wątki pull requestów przyjmują
+  Markdown.
+- **Gerrit** to zwykły tekst: nie jest renderowany jako Markdown, a to, co piszesz, jest wysyłane tak, jak wpisano.
+- Każdy importer najpierw usuwa sekwencje sterujące i ucieczki, więc komentarz nie może poruszyć terminalem.
+
+### Zapisana kopia, Wczytaj starsze, nieprzeczytane
+
+- Każda otwarta rozmowa jest zapisywana (`<katalog stanu>/conversations/<integracja>/<projekt>/<rodzaj>-<n>.json`,
+  tylko dla użytkownika, bez tokenu, najwyżej 2 MB na plik, zachowywanych jest 50 najnowszych plików). Maluje się od
+  razu po otwarciu elementu i jest odświeżana w tle. Gdy host jest nieosiągalny, zapisana kopia zostaje na ekranie
+  pod *Offline: pokazano kopię zapisaną 3 min temu (powód)*, a Wyślij jest wyszarzone.
+- **Nieprzeczytane:** to, co widziałeś ostatnio, jest pamiętane dla każdej rozmowy (zachowywane jest 200 najnowszych).
+  Wpisy innych osób, które są nowsze, dostają pasek akcentu i znacznik `nowe`, a `n` przeskakuje do następnego.
+  Rozmowa otwierana po raz pierwszy nie ma nic nowego.
+
+### Czego nie potrafi każdy host
+
+Każde `nie` poniżej to prawdziwe ograniczenie: kontrolka jest ukryta lub wyszarzona z powodem, a CLI odpowiada
+błędem z nazwą hosta, zanim cokolwiek zostanie wysłane.
+
+| Host | Elementy | Odpowiedź w wątku | Edycja i usuwanie własnych | Rozwiązanie wątku | Zdarzenia | Notatki wewnętrzne | Zapisywane jako |
+|---|---|---|---|---|---|---|---|
+| GitHub | zgłoszenia, pull requesty | pull requesty | oba | pull requesty | tak | nie | GitHub Markdown |
+| GitLab | zgłoszenia, merge requesty | tak (dyskusje) | oba | merge requesty | tak | tak | GitLab Markdown |
+| Gitea | zgłoszenia, pull requesty | pull requesty | oba | pull requesty | tak | nie | Markdown |
+| Forgejo | zgłoszenia, pull requesty | pull requesty | oba | nie (host nie ma endpointu) | tak | nie | Markdown |
+| Azure DevOps | elementy pracy, pull requesty | pull requesty | oba | nie (status pokazany, niezmieniany) | tylko pull requesty | nie | Markdown (HTML w elementach pracy Server) |
+| Bitbucket (Cloud, Data Center) | tylko pull requesty | tak | oba | nie (pokazane, niezmieniane) | tak | nie | Markdown |
+| Gerrit | tylko zmiany | tak | nie (żadnego nie da się edytować ani usunąć) | tak | tak | nie | zwykły tekst |
+| Jira | zgłoszenia | nie (płaska lista) | oba | nie | tak (changelog) | nie (wymaga roli w projekcie) | wiki markup |
+| Linear | zgłoszenia | tak (odpowiedzi na komentarz) | oba | nie | tak | nie | Markdown |
+| YouTrack | zgłoszenia | nie | oba | nie | nie | nie | Markdown |
+| Redmine | zgłoszenia | nie | tylko edycja (Redmine 5 i nowszy), nigdy usuwanie | nie | tak (dzienniki) | tak (notatki prywatne) | Markdown lub Textile |
+| Trello | karty | nie | oba | nie | tak (przeniesienia) | nie | Markdown |
+| Notatki lokalne | notatki | nie | własne lokalnego autora | nie | nie | nie | Markdown |
+
+Ponadto: żaden host nie pozwala zacząć z rozmowy nowego wątku przy linii kodu (rób to w przeglądzie), a reakcje są
+pokazywane tylko w GitHub. Tekst dłuższy, niż przyjmuje host, jest odrzucany (GitHub 65 536 znaków, GitLab 1 000 000,
+Azure DevOps 150 000, Jira 32 767, Trello 16 384): CLI sprawdza to najpierw, w aplikacji pokazywany jest własny
+komunikat hosta, a twój tekst zostaje. Notatka lokalna trzyma swoje komentarze w końcowej sekcji `## Comments` samego
+pliku notatki, po jednym wpisie `### autor - czas`, więc widzą je także Obsidian i powłoka.
+
+W wierszu poleceń te same rozmowy to `gitpoulpi hosting issue comments`, `issue comment`, `comment-edit`
+i `comment-delete` oraz `hosting review conversation` (zob. [opis CLI](cli-reference.md)); dla agentów są to
+narzędzia MCP o tych samych nazwach (zob. [MCP i agenci](mcp-and-agents.md)).
 
 ## 6. Utwórz pull request
 
@@ -599,6 +804,12 @@ Co jest odwołaniem, zależy od dostawcy sekcji ZGŁOSZENIA:
 Gdy pasują obie listy `#N`, wygrywa zgłoszenie. CLI:
 `gitpoulpi hosting refs --message TEXT | --commit REV | --branch NAME`.
 
+**W rozmowach.** Tekst zgłoszenia lub żądania jest czytany z gramatyką jego hosta, szerszą niż tabela powyżej:
+`owner/repo#7`, `!7`, `GH-7`, `@login`, id commitów i inne formy wymienione w
+[Odwołaniach krzyżowych](#odwołania-krzyżowe). Najpierw dopasowywane są powiązane źródła repozytorium, więc klucz Jira
+w komentarzu GitHub nadal otwiera swoje zgłoszenie w aplikacji. `gitpoulpi hosting markdown --body TEXT --id I`
+pokazuje, co aplikacja znajduje w tekście.
+
 ### Wstaw odwołanie do zgłoszenia
 
 W kompozytorze commita przycisk `#▾` na prawym końcu Podsumowania otwiera
@@ -729,6 +940,69 @@ włącza listę, `gitpoulpi hosting radar --json` wypisuje listy (a
 `--refresh` pomija pamięć podręczną). Agenci AI mają te same dwa polecenia przez MCP
 (`hosting_radar`, `hosting_integrations_radar`).
 
+## 13d. Działanie jako bot GitHub App
+
+Projekt, który nie może pokazywać czyjegoś imienia, może robić wszystko na hoście przez **GitHub App**: każdy
+komentarz, przegląd, zamknięcie lub ponowne otwarcie i zmiana etykiety pojawia się wtedy jako
+`<app-slug>[bot]`. Działa to dla jednego repozytorium naraz i zostawia twoje pozostałe repozytoria na twoim
+własnym tokenie.
+
+1. Utwórz GitHub App dla organizacji z uprawnieniami **Issues** i **Pull requests** ustawionymi na *Read & write*
+   (oraz *Contents: read*, aby można było wyświetlać i przeglądać pull requesty) i zainstaluj ją w repozytorium.
+2. Napisz mały skrypt, który wypisuje **token instalacji** na swoim standardowym wyjściu (klucz prywatny App
+   podpisuje krótkotrwały JWT, który jest wymieniany na token ważny przez godzinę). GitPoulpi nigdy nie widzi
+   klucza.
+3. W **Ustawienia > Ustawienia repozytorium > SSH i poświadczenia** wybierz **Polecenie tokenu** w HTTPS, wpisz
+   skrypt jako **Polecenie** i host (`github.com`) w **Hosty**, i zaznacz **Użyj do API hostingu (zgłoszenia,
+   pull requesty)**. Zapisz i potwierdź polecenie (człowiek zawsze
+   je potwierdza, wraz z jego SHA-256). Z wiersza poleceń: `gitpoulpi repo-auth set --https token-command --hosts
+   github.com --use-for-hosting --yes --command ./app-token.sh`.
+
+Co się zmienia dla tego repozytorium:
+
+- Jego wywołania zgłoszeń i pull requestów (wyświetlanie, tworzenie, komentowanie, przeglądanie, merge, zamykanie,
+  etykiety) używają tokenu polecenia, z tym samym 30-sekundowym limitem, pamięcią podręczną w pamięci i redakcją co
+  własne logowanie gita. Gdy host odpowiada 401, bo token wygasł, polecenie jest uruchamiane ponownie jeden raz.
+  Jeśli polecenia nie da się uruchomić, wywołanie jest odrzucane: twój osobisty token nigdy nie jest rozwiązaniem
+  awaryjnym.
+- Nie ma „mnie”: token instalacji nie może zapytać, kim jest. Nagłówek sekcji nazywa profil z **(bot aplikacji)**,
+  a filtry zbudowane na „mnie” (*Przypisane do mnie*, *Moje*, *Czekają na mój przegląd*) nie mają czego dopasować. Nic
+  nie jest pokazywane jako błąd.
+- **Publikuj jako.** Każda wiadomość, którą GitPoulpi publikuje, jest pokazywana z nazwą, jako którą jest
+  publikowana (*Publikowanie jako my-app[bot] (bot GitHub App)* pod nagłówkiem [rozmowy](#publikowanie-jako) i w jej
+  polu komentarza; `posted_as` w odpowiedzi CLI). Z tokenem osobistym jest to twój login (`GET /user`). Z tokenem
+  App jest to nazwa **Publikuj jako**, na przykład `my-app[bot]`: ustaw ją dla każdego repozytorium w
+  **Ustawienia > Integracje** (`general.hosting_post_as`, także
+  `gitpoulpi config set general.hosting_post_as my-app[bot]`) albo dla jednego repozytorium w **Ustawienia >
+  Ustawienia repozytorium > SSH i poświadczenia > Hosting**, co wygrywa. Gdy jest pusta, GitPoulpi pyta GitHub
+  (GraphQL `viewer { login }`), a w razie braku odpowiedzi poznaje nazwę z autora pierwszego komentarza, który
+  opublikuje, i przechowuje ją z repozytorium. Ta nazwa służy też do rozpoznawania twoich własnych komentarzy,
+  więc edycja i usuwanie są oferowane tylko na nich (komentarze App muszą też pochodzić z konta bota); dopóki nie
+  jest znana, można zmieniać tylko komentarze opublikowane przez tę instalację.
+- App nie można przypisać. Połącz tę konfigurację z blokadą przypisywania opisaną niżej.
+- Włączenie lub wyłączenie **Użyj do API hostingu** wymaga człowieka, tak jak nowe polecenie.
+
+Tylko profile GitHub używają tokenu repozytorium w ten sposób; inne hosty zachowują własny token profilu. (Token
+dostępu projektu lub grupy GitLab to także bot: jest tokenem profilu, pokazywanym jako *bot projektu*, i nic nie
+trzeba ustawiać.)
+
+### Blokowanie przypisywania w repozytorium
+
+**Ustawienia > Ustawienia repozytorium > SSH i poświadczenia** ma wiersz **Przypisywanie** (**Dozwolone** domyślnie
+albo **Zablokowane**; zapisywane od razu). Gdy jest zablokowane, przypisywanie w zgłoszeniach i pull requestach tego
+repozytorium jest niemożliwe, kto by o nie nie prosił:
+
+- wybór przypisanych jest pominięty w formularzach nowego zgłoszenia i nowego pull requesta (z notatką, dlaczego),
+  polecenie palety *Hosting: Edytuj przypisanych...* jest wyszarzone z powodem, a menu wiersza mówi o tym zamiast je
+  otwierać;
+- każdy klient odrzuca przypisanie, zanim cokolwiek zostanie wysłane, także przypisanych podanych przy tworzeniu
+  zgłoszenia lub pull requesta: CLI odpowiada `{"refused": {"reason": "assignment_blocked", ...}}` z kodem wyjścia
+  2, a agent przez MCP dostaje to samo odrzucenie;
+- istniejący przypisani pozostają widoczni (tylko do odczytu).
+
+`gitpoulpi hosting assignment` pokazuje ustawienie, `--block` je włącza, a `--allow` wyłącza z powrotem; ponownie
+zezwolić może tylko człowiek (serwer MCP nie może).
+
 ## 14. Z wiersza poleceń
 
 ```
@@ -739,6 +1013,7 @@ gitpoulpi hosting edit-url --branch my-branch --open
 gitpoulpi hosting open pr 12 --browser
 gitpoulpi hosting pr-edit 12 --add-reviewer ann --add-label bug --milestone v1.0
 gitpoulpi hosting radar --what review --json
+gitpoulpi hosting assignment --block
 ```
 
 Wszystkie polecenia opisuje [Opis CLI](cli-reference.md#polecenia). Token nigdy nie
@@ -799,6 +1074,10 @@ tylko na czas tej sesji.
   Repozytoria są wyliczane workspace po workspace.
 - **Jira Cloud:** działają tylko klasyczne tokeny API (bez tokenów z zakresami,
   bez OAuth). Nowe zgłoszenie Jira dostaje opis jako zwykły tekst.
+- **Rozmowy:** najpierw ładuje się najnowszych 300 wpisów (**Wczytaj starsze** dla reszty); komentarz, edycja lub
+  usunięcie opublikowane z GitPoulpi to działanie na zewnątrz i nie można ich z niego cofnąć; to, czego nie potrafi
+  każdy host, jest w [tabeli](#czego-nie-potrafi-każdy-host). W Gerrit wiadomości ani komentarza nie można edytować
+  ani usunąć, a tekst Gerrit jest zwykły.
 - Utworzenie pull requesta, elementu pracy, zgłoszenia lub karty odbywa się na
   hoście i **nie można tego cofnąć** z GitPoulpi. Checkout żądania można cofnąć
   normalnie.

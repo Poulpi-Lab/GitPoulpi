@@ -21,6 +21,10 @@ können sie gleichzeitig bearbeiten, und die Listen folgen.
 
 Nichts wird von selbst verknüpft: Wie jede Issue-Quelle ist sie pro Repository freiwillig.
 
+## Kommentare zu einer Notiz
+
+`Enter` auf der Zeile einer Notiz im Bereich ISSUES oder auf ihrer Karte öffnet ihre Unterhaltung: den Text der Notiz, dann die Kommentare. Kommentare werden in der Notizdatei selbst gespeichert, in einem letzten Abschnitt `## Comments`, je ein Eintrag `### <Autor> - <UTC-Zeit>` (ein bearbeiteter ergänzt `(edited <Zeit>)`). Nichts oberhalb dieser Überschrift wird je angetastet, sodass Obsidian und eine Shell dieselbe Datei lesen und bearbeiten. Sie können die Kommentare des lokalen Autors schreiben, bearbeiten und löschen (das `local.me` des Profils, sonst der verbundene Benutzer, der Name, den *Mir zugewiesen* nutzt); die von niemand anderem. Das Feld ist das übliche Markdown-Textfeld mit Vorschau, und *Schreiben als <Name> (lokale Notiz)* nennt den Autor. Nichts geht über das Netzwerk. Eine von Hand geschriebene Überschrift `## Comments` in einer Notiz wird als solche gelesen.
+
 ## Die Notizen
 
 Eine Notiz pro Issue, benannt `<id>-<slug>.md` (`12-crash-on-empty-name.md`), mit einem Frontmatter-Block:
@@ -66,6 +70,28 @@ oder `12-...` in einem Branch-Namen wird erkannt.
 Änderungen außerhalb von GitPoulpi (Obsidian, eine Shell, ein `git pull`) erscheinen nach etwa einer Sekunde: Dateinamen und
 Änderungszeiten des Ordners werden in einem Hintergrund-Thread angesehen, nie im Render-Thread.
 
+### Kommentare in einer Notiz
+
+Ein Kommentar zu einer Notiz wird in die Notiz selbst geschrieben, in einen letzten Abschnitt `## Comments` (kein Netzwerk, und er liest sich gut in Obsidian):
+
+```markdown
+(der Text der Notiz)
+
+## Comments
+
+### kai - 2026-11-15T10:00:00Z
+Erster Kommentar, **beliebiges Markdown**.
+
+### ann - 2026-11-15T11:30:00Z (edited 2026-11-15T12:00:00Z)
+Der zweite.
+```
+
+- Ein Eintrag beginnt an einer Zeile, die genau `### <Autor> - <UTC-Zeit>` lautet, mit ` (edited <UTC-Zeit>)` nach einer Bearbeitung; sein Text reicht bis zum nächsten Eintrag. Der Abschnitt ist die letzte Überschrift `## Comments` außerhalb eines Codeblocks und reicht bis zum Dateiende, schreiben Sie also nichts danach.
+- Eine Kommentarzeile, die wie ein Eintrag oder wie die Überschrift gelesen würde, wird mit einem vorangestellten Backslash gespeichert (`\### ...`, was Markdown als denselben Text zeigt) und ohne ihn zurückgelesen.
+- Beim Senden wird am Ende angefügt und alles darüber Byte für Byte belassen (Zeilenenden eingeschlossen); eine Bearbeitung oder ein Löschen schreibt nur den Abschnitt neu. Ein Senden setzt außerdem das `updated` der Notiz weiter (eine Notiz ohne Frontmatter bekommt keines).
+- Der Autor ist der lokale Autor des Profils (das „Ich“ der Einstellungen für lokale Issues). Sie können nur Ihre eigenen Kommentare bearbeiten oder löschen; die ID eines Kommentars ist seine Zeit und sein Autor, und zwei Beiträge in derselben Sekunde werden unterschieden, indem der zweite um eine Sekunde weitergerückt wird.
+- Es gibt keine Antworten, keine internen Kommentare und keinen Ereignisverlauf für eine Notiz.
+
 ## Konfigurationsdatei
 
 In der `config.toml`, neben dem Profil (jeder Schlüssel ist optional):
@@ -102,7 +128,7 @@ Wenn Sie allein arbeiten oder in einem Team, das seine Issues neben dem Code fü
   `Shift+Links` / `Shift+Rechts` oder mit **Board: Karte verschieben nach...** (`m`), einer Auswahlliste der Spalten. Die Karte bewegt sich sofort;
   der `status` der Notiz wird wie im [Abschnitt über die Notizen](#die-notizen) umgeschrieben, sonst nichts in der Datei. Schlägt das Schreiben
   fehl, springt die Karte zurück, und der Fehler steht in der Statuszeile.
-- **Öffnen** Sie eine Karte mit `Enter` oder einem Doppelklick (die Notiz öffnet sich in Ihrem Standardprogramm für `.md`). `e` bearbeitet ihre
+- **Öffnen** Sie eine Karte mit `Enter` oder einem Doppelklick (die [Unterhaltung](hosting-integration.md#5c-unterhaltungen) der Notiz öffnet sich im Fenster, mit dem Text der Notiz und ihren Kommentaren; **Notiz öffnen** im Kartenmenü öffnet die Datei in Ihrem Standardprogramm für `.md`). `e` bearbeitet ihre
   Zugewiesenen, Labels oder ihren Meilenstein, `.` oder ein Rechtsklick öffnet das Kartenmenü, `n` beginnt ein neues Issue in der ausgewählten
   Spalte (das Formular kehrt beim Schließen zum Board zurück).
 - **Filtern** nach Zugewiesenen (`a`), Label (`l`), Meilenstein (`M`) oder Text (`/`); `x` setzt sie zurück. Die Filter sind

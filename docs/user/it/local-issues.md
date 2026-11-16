@@ -21,6 +21,15 @@ nello stesso momento, e gli elenchi seguono.
 
 Nulla viene collegato da solo: come ogni sorgente di issue, si attiva per repository.
 
+## Commenti su una nota
+
+`Enter` sulla riga di una nota nella sezione ISSUE, o sulla sua card, ne apre la conversazione: il testo della nota, poi i
+commenti. I commenti sono conservati nel file stesso della nota, in una sezione finale `## Comments`, una voce
+`### <autore> - <ora UTC>` ciascuno (una voce modificata aggiunge `(edited <ora>)`). Nulla sopra quell'intestazione viene mai toccato, quindi Obsidian e una shell
+leggono e modificano lo stesso file. Puoi scrivere, modificare ed eliminare i commenti dell'autore locale (il `local.me` del profilo,
+altrimenti l'utente connesso, il nome che usa *Assegnate a me*); quelli di nessun altro. La casella è il consueto
+compositore Markdown con anteprima, e *Scrivi come <nome> (nota locale)* indica l'autore. Nulla passa dalla rete. Una nota con un'intestazione `## Comments` scritta a mano viene letta come tale.
+
 ## Le note
 
 Una nota per issue, chiamata `<id>-<slug>.md` (`12-crash-on-empty-name.md`), con un blocco frontmatter:
@@ -46,6 +55,35 @@ Free Markdown. GitPoulpi never rewrites the body.
 - La lettura è tollerante: una nota senza `id` lo prende dal nome del file, una nota senza `status` è `todo`, una nota
   senza frontmatter prende il titolo dal primo `# titolo`. Un file che non è una issue (`readme.md`) viene ignorato.
 - Uno stato è testo libero. **Aperta** significa «non nello stato di completamento».
+
+### Commenti in una nota
+
+Un commento su una nota viene scritto nella nota stessa, in una sezione finale `## Comments` (nessuna rete, e si legge bene in
+Obsidian):
+
+```markdown
+(il testo della nota)
+
+## Comments
+
+### kai - 2026-11-15T10:00:00Z
+Primo commento, **qualsiasi Markdown**.
+
+### ann - 2026-11-15T11:30:00Z (edited 2026-11-15T12:00:00Z)
+Il secondo.
+```
+
+- Una voce inizia a una riga che è esattamente `### <autore> - <ora UTC>`, con ` (edited <ora UTC>)` dopo una modifica;
+  il suo testo arriva fino alla voce successiva. La sezione è l'ultima intestazione `## Comments` fuori da un blocco di codice e arriva
+  fino alla fine del file, quindi non scrivere nulla dopo.
+- Una riga di commento che verrebbe letta come una voce o come l'intestazione viene memorizzata con una barra rovesciata iniziale (`\### ...`, che
+  Markdown mostra come lo stesso testo) e riletta senza.
+- Pubblicare aggiunge in fondo e lascia tutto ciò che sta sopra byte per byte (fini riga compresi); una modifica o un'eliminazione
+  riscrive solo la sezione. Una pubblicazione sposta anche `updated` della nota (a una nota senza frontmatter non ne viene dato uno).
+- L'autore è l'autore locale del profilo (il «me» delle impostazioni delle issue locali). Puoi modificare o eliminare solo i tuoi
+  commenti; l'id di un commento è la sua ora più l'autore, e due pubblicazioni nello stesso secondo si distinguono spostando
+  la seconda avanti di un secondo.
+- Per una nota non ci sono risposte, commenti interni né cronologia degli eventi.
 
 ## Cosa puoi fare
 
@@ -102,7 +140,7 @@ Se lavori da solo, o in un team che tiene le issue accanto al codice, la cartell
   `Shift+Left` / `Shift+Right`, o con **Bacheca: Sposta la card in...** (`m`), un elenco a discesa delle colonne. La card si sposta
   subito; lo `status` della nota viene riscritto come nella [sezione sulle note](#le-note), nient'altro nel file. Se la scrittura
   fallisce la card torna indietro e l'errore è nella barra di stato.
-- **Apri** una card con `Enter` o un doppio clic (la nota si apre nel tuo programma predefinito per i `.md`). `e` modifica i suoi
+- **Apri** una card con `Enter` o un doppio clic : si apre nella finestra la [conversazione](hosting-integration.md#5c-conversazioni) della nota, con il suo testo e i suoi commenti (**Apri nota** nel menu della card apre il file nel tuo programma predefinito per i `.md`). `e` modifica i suoi
   assegnatari, etichette o milestone, `.` o un clic destro apre il menu della card, `n` avvia una nuova issue nella colonna
   selezionata (il modulo torna alla bacheca quando si chiude).
 - **Filtra** per assegnatario (`a`), etichetta (`l`), milestone (`M`) o testo (`/`); `x` li azzera. I filtri sono

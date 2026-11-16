@@ -21,6 +21,16 @@ tegelijk bewerken, en de lijsten volgen.
 
 Niets wordt uit zichzelf gekoppeld: zoals elke issuebron is hij per repository opt-in.
 
+## Opmerkingen bij een notitie
+
+`Enter` op de rij van een notitie in de sectie ISSUES, of op zijn kaart, opent zijn gesprek: de tekst van de notitie, daarna de
+opmerkingen. Opmerkingen worden in het notitiebestand zelf bewaard, in een laatste sectie `## Comments`, elk als een item
+`### <auteur> - <UTC-tijd>` (een bewerkt item krijgt `(edited <tijd>)` erbij). Niets boven die kop wordt ooit aangeraakt, dus
+Obsidian en een shell lezen en bewerken hetzelfde bestand. Je kunt de opmerkingen van de lokale auteur schrijven, bewerken en
+verwijderen (de `local.me` van het profiel, anders de verbonden gebruiker, de naam die *Aan mij toegewezen* gebruikt); die van
+niemand anders. Het vak is de gewone Markdown-composer met een voorbeeld, en *Schrijven als <naam> (lokale notitie)* noemt de
+auteur. Er gaat niets over het netwerk. Een kop `## Comments` die je met de hand schreef, wordt als zodanig gelezen.
+
 ## De notities
 
 Eén notitie per issue, genoemd `<id>-<slug>.md` (`12-crash-on-empty-name.md`), met een frontmatter-blok:
@@ -46,6 +56,36 @@ Vrije Markdown. GitPoulpi herschrijft de inhoud nooit.
 - Lezen is vergevingsgezind: een notitie zonder `id` neemt hem uit haar bestandsnaam, een notitie zonder `status` is `todo`, een notitie
   zonder frontmatter neemt haar titel uit de eerste `# kop`. Een bestand dat geen issue is (`readme.md`) wordt genegeerd.
 - Een status is vrije tekst. **Open** betekent "niet de klaar-status".
+
+### Opmerkingen in een notitie
+
+Een opmerking bij een notitie wordt in de notitie zelf geschreven, in een laatste sectie `## Comments` (geen netwerk, en het
+leest prima in Obsidian):
+
+```markdown
+(de tekst van de notitie)
+
+## Comments
+
+### kai - 2026-11-15T10:00:00Z
+Eerste opmerking, **elke Markdown**.
+
+### ann - 2026-11-15T11:30:00Z (edited 2026-11-15T12:00:00Z)
+De tweede.
+```
+
+- Een item begint bij een regel die precies `### <auteur> - <UTC-tijd>` is, met ` (edited <UTC-tijd>)` na een bewerking; zijn
+  tekst loopt tot het volgende item. De sectie is de laatste kop `## Comments` buiten een codeblok en loopt tot het einde van
+  het bestand, dus schrijf er niets achter.
+- Een opmerkingsregel die als een item of als de kop zou worden gelezen, wordt met een backslash ervoor opgeslagen (`\### ...`,
+  wat Markdown als dezelfde tekst toont) en zonder die teruggelezen.
+- Plaatsen voegt aan het einde toe en laat alles erboven byte voor byte ongemoeid (regeleinden inbegrepen); een bewerking of
+  verwijdering herschrijft alleen de sectie. Een bericht verplaatst ook de `updated` van de notitie (een notitie zonder
+  frontmatter krijgt er geen).
+- De auteur is de lokale auteur van het profiel (de "ik" van de instellingen Lokale issues). Je kunt alleen je eigen
+  opmerkingen bewerken of verwijderen; de id van een opmerking is zijn tijd en auteur, en twee berichten in dezelfde seconde
+  worden onderscheiden door het tweede een seconde op te schuiven.
+- Er zijn geen antwoorden, geen interne opmerkingen en geen gebeurtenisgeschiedenis voor een notitie.
 
 ## Wat je kunt doen
 
@@ -102,7 +142,7 @@ Als je alleen werkt, of in een team dat zijn issues naast de code bewaart, is de
   `Shift+Left` / `Shift+Right`, of met **Bord: Kaart verplaatsen naar...** (`m`), een keuzelijst van de kolommen. De kaart verplaatst
   direct; de `status` van de notitie wordt herschreven zoals in [de sectie over de notities](#de-notities), verder niets in het bestand. Als het schrijven
   mislukt, gaat de kaart terug en staat de fout op de statusbalk.
-- **Een kaart openen** doe je met `Enter` of een dubbelklik (de notitie opent in je standaardprogramma voor `.md`). `e` bewerkt zijn
+- **Een kaart openen** doe je met `Enter` of een dubbelklik : het [gesprek](hosting-integration.md#5c-gesprekken) van de notitie opent in het venster, met de tekst van de notitie en zijn opmerkingen (**Notitie openen** in het kaartmenu opent het bestand in je standaardprogramma voor `.md`). `e` bewerkt zijn
   toegewezenen, labels of mijlpaal, `.` of een rechtsklik opent het kaartmenu, `n` start een nieuw issue in de geselecteerde
   kolom (het formulier keert terug naar het bord als het sluit).
 - **Filteren** kan op toegewezene (`a`), label (`l`), mijlpaal (`M`) of tekst (`/`); `x` wist ze. De filters zijn

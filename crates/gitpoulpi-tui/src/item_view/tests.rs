@@ -174,13 +174,13 @@ fn an_app_bot_without_a_known_login_is_named_and_a_known_one_is_shown() {
         "{screen}"
     );
     r.view.conv.set_identity(Ok(PostingIdentity::new(
-        Some("poulpi-lab[bot]".into()),
+        Some("my-app[bot]".into()),
         IdentityKind::AppBot,
         TokenSource::RepoTokenCommand,
     )));
     let screen = text(&draw(&mut r.view, WIDE));
     assert!(
-        screen.contains("Posting as poulpi-lab[bot] (GitHub App bot)"),
+        screen.contains("Posting as my-app[bot] (GitHub App bot)"),
         "{screen}"
     );
 }
@@ -731,12 +731,7 @@ fn edit_and_delete_follow_the_provider_and_the_author() {
 }
 
 fn bot_comment(id: &str) -> TimelineEntry {
-    let mut c = comment(
-        id,
-        "poulpi-lab[bot]",
-        "A bot says hi",
-        "2026-11-13T09:00:00Z",
-    );
+    let mut c = comment(id, "my-app[bot]", "A bot says hi", "2026-11-13T09:00:00Z");
     c.author.kind = gitpoulpi_hosting::conversation::ActorKind::Bot;
     TimelineEntry::Comment(c)
 }
@@ -779,7 +774,7 @@ fn an_app_bot_with_no_known_login_edits_only_what_this_install_posted() {
     );
     // Once the login is known the author decides, bot or person.
     view.conv.set_identity(Ok(PostingIdentity::new(
-        Some("poulpi-lab[bot]".into()),
+        Some("my-app[bot]".into()),
         IdentityKind::AppBot,
         TokenSource::RepoTokenCommand,
     )));
@@ -919,11 +914,11 @@ fn who_posts_is_named_for_every_kind_of_token() {
     );
     assert_eq!(
         id(
-            Some("poulpi-lab[bot]"),
+            Some("my-app[bot]"),
             IdentityKind::AppBot,
             TokenSource::RepoTokenCommand
         ),
-        "Posting as poulpi-lab[bot] (GitHub App bot)"
+        "Posting as my-app[bot] (GitHub App bot)"
     );
     assert!(
         id(None, IdentityKind::AppBot, TokenSource::RepoTokenCommand)

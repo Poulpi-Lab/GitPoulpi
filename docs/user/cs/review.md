@@ -55,6 +55,8 @@ odeslané kontroly, od nejstarší, každá se svým rozhodnutím (`schváleno`,
 `zamítnuto`). Na GitLabu jsou rozhodnutími jeho schválení. Pod tím je pole odpovědi: klikněte na ně nebo stiskněte **`c`**
 a napíšete komentář ke konverzaci. **Tento se odešle hned** a pole to říká.
 
+Pole komentáře (také pole odpovědi, komentáře k řádku a shrnutí **Dokončit kontrolu**) je Markdown textové pole sdílené s [pohledem konverzace](hosting-integration.md#psaní): **Psát**, **Náhled** (`Alt+P`) a **Vedle sebe** (`Alt+L`, v okně širokém 100 sloupců); `Ctrl+Enter` (také `Ctrl+S`, `Alt+Enter`) odešle a tam, kde je AI zapnutá, `Alt+E` otevře **Napsat pomocí AI** ([kapitola o AI](ai.md#pomoc-s-psaním-na-hostiteli)). Náhled ukazuje text tak, jak ho zobrazí hostitel, včetně odkazů (`#7`, `!12`, `ABC-12`, id commitů); neodeslaný text se uchovává pro každou žádost zvlášť. Popis a konverzace používají stejný vykreslovač, takže Markdown, tabulky, upozornění a odkazy vypadají tady stejně jako v pohledu konverzace issue. Citování, úprava nebo smazání už odeslaného komentáře a interní poznámky patří do pohledu konverzace issues a žádostí na hostitelích bez kontroly (viz [Konverzace](hosting-integration.md#5c-konverzace)); tady lze upravovat jen vaše čekající komentáře.
+
 ### Soubory
 
 Vlevo změněné soubory (písmeno stavu, `+přidáno -odebráno`, počet `●n` otevřených vláken, počet `✎n`

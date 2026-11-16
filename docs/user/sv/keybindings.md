@@ -933,7 +933,7 @@ Tangenterna är standardvärdena.
 | Granskning: Kommentera konversationen... | `C` |
 | Granskning: Svara i tråd... | `r` |
 | Granskning: Lös eller öppna tråd igen | `x` |
-| Review: Back to Comment in Overview | `Esc` |
+| Granskning: Tillbaka till kommentaren i översikten | `Esc` |
 | Granskning: Fäll ihop eller ut tråd | `z` |
 | Granskning: Redigera väntande kommentar... | `e` |
 | Granskning: Ta bort väntande kommentar | `d` |
@@ -992,7 +992,7 @@ Tangenterna är standardvärdena.
 | Konversation: Ny kommentar | `c` |
 | Konversation: Postens länkar... | `l` |
 | Konversation: Öppna postens diagram | `g` |
-| Conversation: Open Code of Thread | `G` |
+| Konversation: Öppna trådens kod | `G` |
 | Konversation: Kopiera postens länk | `y` |
 | Konversation: Öppna i webbläsare | `o` |
 | Konversation: Redigera kommentar | `e` |

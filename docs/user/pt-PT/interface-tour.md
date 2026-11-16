@@ -73,6 +73,14 @@ Definições abrem por cima da janela. Cada um tem um `✕` no canto superior di
 da borda; `Esc` ou um clique no `✕` fecha-o, e um clique fora fecha um diálogo, um
 popup ou um painel (veja [Fechar janelas e diálogos](mouse-and-gestures.md#fechar-janelas-e-diálogos)).
 
+### Quando a janela é pequena
+
+Nada desaparece em silêncio quando a janela estreita. Um botão perde primeiro o rótulo longo (cortado com `...`), depois
+passa para uma segunda linha ou para o menu `⋯` da sua linha, e a sua tecla e a sua entrada na paleta continuam a
+funcionar sempre. Um diálogo grande demais para a janela desenha uma moldura pequena com o título, o `✕` e a linha
+**Janela demasiado pequena: aumente-a** em vez de nada; `Esc` e `✕` fecham-no, e volta inteiro quando aumentar a
+janela.
+
 ## Linha de separadores
 
 O separador **Início** (o ícone da casa) fica na extremidade esquerda, seguido da

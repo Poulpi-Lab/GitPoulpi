@@ -103,7 +103,8 @@ numera.
 | Comando | O que faz |
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Faz stage de um ficheiro, pasta, tudo, um hunk ou algumas linhas. Um stage de ficheiro, pasta ou `--all` que acrescentaria um ficheiro sensível (uma chave privada, um `.env`, um token reconhecido: `[privacy]` na [referência de configuração](config-reference.md#privacy-ficheiros-sensíveis)) é recusado com código de saída 2 e `{error: "sensitive_files", files: [{path, reason}]}` (uma regra e uma pré-visualização mascarada, nunca um valor); nada entra em stage. `--allow-sensitive` faz stage deles mesmo assim. |
-| `unstage` (as mesmas opções) | O inverso. |
+| `stage --paths A B ...` | Põe em stage vários ficheiros ou pastas como UMA só operação: uma entrada no registo, um passo de `undo` (um ficheiro renomeado são o seu caminho antigo e o novo, como `status` mostra em `renamed_from`). Não pode ser combinado com `--folder`, `--hunk`, `--lines` nem `--all`. |
+| `unstage` (as mesmas opções, `--paths` incluído) | O inverso. |
 | `discard --file F [--hunk N [--lines a,b]]` | Deita fora alterações unstaged (um ficheiro inteiro: todas as alterações, ficheiro não acompanhado eliminado, e as pastas que isso deixa vazias). Desfazível. |
 | `rm-file <paths>...` | Elimina ficheiros da árvore de trabalho. Desfazível. |
 | `ignore <pattern> [--file <.gitignore>]` | Acrescenta um padrão a um `.gitignore` (ou a `.git/info/exclude` com `--file .git/info/exclude`). Desfazível, exceto em `.git/info/exclude`. |

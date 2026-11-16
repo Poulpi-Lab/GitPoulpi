@@ -1098,7 +1098,7 @@ hint_create = "criar"
 hint_open = "abrir"
 hint_toggle = "alternar"
 # context: one line in the minimal frame a dialog shows when the window is too small for it
-too_small = "Window too small: enlarge it"
+too_small = "Janela demasiado pequena: aumente-a"
 
 [clone]
 title = "Clonar um repositório"
@@ -3618,7 +3618,7 @@ review_reply = "Revisão: responder à discussão..."
 # context: command palette entry
 review_resolve = "Revisão: resolver ou reabrir a discussão"
 # context: command palette entry
-review_back_to_comment = "Review: Back to Comment in Overview"
+review_back_to_comment = "Revisão: voltar ao comentário no resumo"
 # context: command palette entry
 review_fold_thread = "Revisão: recolher ou expandir a discussão"
 # context: command palette entry
@@ -4306,7 +4306,7 @@ explain_changes = "Explicar as alterações em curso"
 ai_generate = "Gerar uma mensagem de {$commit} com IA"
 ai_compose = "Compor {$commits} com IA"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: {$commit} without running git hooks"
+skip_hooks = "Ignorar hooks: fazer {$commit} sem executar os hooks do git"
 commit_reference = "Abrir no seu navegador (paleta: Abrir referência do commit)"
 quit = "Sair do GitPoulpi"
 quit_cd = "Sair, a deixar o shell na pasta deste separador (exige o wrapper do shell)"
@@ -5484,7 +5484,7 @@ ref_from_branch = "(da branch)"
 issue_ref_inserted = "{reference} inserido"
 skip_hooks = "Ignorar hooks"
 # context: shorter label of the Skip hooks checkbox on a narrow commit options row
-skip_hooks_short = "No hooks"
+skip_hooks_short = "Sem hooks"
 
 [compose_ui]
 select_commit = "Selecione um commit..."
@@ -7230,13 +7230,13 @@ why_not_on_code = "ponha primeiro o cursor numa linha de código"
 # context: why a row is off
 why_not_on_thread = "ponha primeiro o cursor numa discussão de comentários"
 # context: button on the Files page after jumping from a comment: returns to that comment in the Overview
-back_to_overview = "Back to Overview"
+back_to_overview = "Voltar ao resumo"
 # context: why Back to Comment does nothing. Width budget: 50 cells
-why_no_return = "no comment to go back to"
+why_no_return = "não há comentário para onde voltar"
 # context: status line: the commented file is not in the diff. {path} is a file path
-thread_not_in_diff = "{path} is not in the {$diff}"
+thread_not_in_diff = { git = "{path} não está no {$diff}", local = "{path} não está na {$diff}" }
 # context: status line: the thread's line no longer exists; {path} is a file path
-thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
+thread_outdated_nearest = "esta discussão está desatualizada: a mostrar a linha mais próxima de {path}"
 # context: why a row is off
 why_no_resolve = "esta discussão não pode ser resolvida"
 # context: why a row is off
@@ -10235,11 +10235,11 @@ link_diagram = "Diagrama: {first}"
 why_no_diagram = "a entrada selecionada não tem diagrama"
 palette_open_diagram = "Conversa: abrir o diagrama da entrada"
 # context: command palette entry
-palette_open_code = "Conversation: Open Code of Thread"
+palette_open_code = "Conversa: abrir o código da discussão"
 # context: why Open Code does nothing. Width budget: 50 cells
-why_no_code = "the selected entry is not a code thread"
+why_no_code = "a entrada selecionada não é uma discussão sobre código"
 # context: why Open Code does nothing outside a review. Width budget: 50 cells
-why_no_code_here = "open the review of this request to reach its code"
+why_no_code_here = "abra a revisão deste pedido para chegar ao código"
 why_no_url = "esta entrada não tem página no host"
 why_no_events = "este host não lista eventos"
 why_no_reply = "este host não aceita uma resposta a esta entrada"

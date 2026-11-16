@@ -1099,7 +1099,7 @@ hint_create = "oluştur"
 hint_open = "aç"
 hint_toggle = "aç/kapat"
 # context: one line in the minimal frame a dialog shows when the window is too small for it
-too_small = "Window too small: enlarge it"
+too_small = "Pencere çok küçük: büyütün"
 
 [clone]
 title = "Depo klonla"
@@ -3620,7 +3620,7 @@ review_reply = "İnceleme: Yorum Dizisini Yanıtla..."
 # context: command palette entry
 review_resolve = "İnceleme: Yorum Dizisini Çöz veya Yeniden Aç"
 # context: command palette entry
-review_back_to_comment = "Review: Back to Comment in Overview"
+review_back_to_comment = "İnceleme: Genel Bakışta Yoruma Dön"
 # context: command palette entry
 review_fold_thread = "İnceleme: Yorum Dizisini Daralt veya Genişlet"
 # context: command palette entry
@@ -4308,7 +4308,7 @@ explain_changes = "Çalışma değişikliklerini açıkla"
 ai_generate = "YZ ile {$commit} mesajı oluştur"
 ai_compose = "YZ ile {$commits} oluştur"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: {$commit} without running git hooks"
+skip_hooks = "Hook'ları atla: {$commit} git hook'ları çalışmadan yapılır"
 commit_reference = "Tarayıcınızda açın (palet: Commit Referansını Aç)"
 quit = "GitPoulpi'den çık"
 quit_cd = "Çık ve kabuğunuzu bu sekmenin klasöründe bırak (kabuk sarmalayıcısı gerekir)"
@@ -5491,7 +5491,7 @@ ref_from_branch = "(daldan)"
 issue_ref_inserted = "{reference} eklendi"
 skip_hooks = "Hook'ları atla"
 # context: shorter label of the Skip hooks checkbox on a narrow commit options row
-skip_hooks_short = "No hooks"
+skip_hooks_short = "Hook yok"
 
 [compose_ui]
 select_commit = "Bir commit seç..."
@@ -7240,13 +7240,13 @@ why_not_on_code = "önce imleci bir kod satırına getirin"
 # context: why a row is off
 why_not_on_thread = "önce imleci bir yorum dizisine getirin"
 # context: button on the Files page after jumping from a comment: returns to that comment in the Overview
-back_to_overview = "Back to Overview"
+back_to_overview = "Genel Bakışa dön"
 # context: why Back to Comment does nothing. Width budget: 50 cells
-why_no_return = "no comment to go back to"
+why_no_return = "dönülecek yorum yok"
 # context: status line: the commented file is not in the diff. {path} is a file path
-thread_not_in_diff = "{path} is not in the {$diff}"
+thread_not_in_diff = "{path} {$diff} içinde yok"
 # context: status line: the thread's line no longer exists; {path} is a file path
-thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
+thread_outdated_nearest = "bu dizi eskimiş: {path} dosyasındaki en yakın satır gösteriliyor"
 # context: why a row is off
 why_no_resolve = "bu yorum dizisi çözülemez"
 # context: why a row is off
@@ -10116,11 +10116,11 @@ link_diagram = "Diyagram: {first}"
 why_no_diagram = "seçili kayıtta diyagram yok"
 palette_open_diagram = "Konuşma: Kaydın Diyagramını Aç"
 # context: command palette entry
-palette_open_code = "Conversation: Open Code of Thread"
+palette_open_code = "Konuşma: Dizinin Kodunu Aç"
 # context: why Open Code does nothing. Width budget: 50 cells
-why_no_code = "the selected entry is not a code thread"
+why_no_code = "seçili kayıt bir kod dizisi değil"
 # context: why Open Code does nothing outside a review. Width budget: 50 cells
-why_no_code_here = "open the review of this request to reach its code"
+why_no_code_here = "koduna ulaşmak için bu isteğin incelemesini açın"
 why_no_url = "bu kaydın sunucuda sayfası yok"
 why_no_events = "bu sunucu olayları listelemiyor"
 why_no_reply = "bu sunucu bu kayda yanıt kabul etmiyor"

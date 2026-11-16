@@ -936,7 +936,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Revisión: Comentar en la conversación... | `C` |
 | Revisión: Responder al hilo... | `r` |
 | Revisión: Resolver o reabrir el hilo | `x` |
-| Review: Back to Comment in Overview | `Esc` |
+| Revisión: Volver al comentario en el resumen | `Esc` |
 | Revisión: Plegar o desplegar el hilo | `z` |
 | Revisión: Editar el comentario pendiente... | `e` |
 | Revisión: Eliminar el comentario pendiente | `d` |
@@ -995,7 +995,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Conversación: Comentario nuevo | `c` |
 | Conversación: Enlaces de la entrada... | `l` |
 | Conversación: Abrir el diagrama de la entrada | `g` |
-| Conversation: Open Code of Thread | `G` |
+| Conversación: Abrir el código del hilo | `G` |
 | Conversación: Copiar el enlace de la entrada | `y` |
 | Conversación: Abrir en el navegador | `o` |
 | Conversación: Editar comentario | `e` |

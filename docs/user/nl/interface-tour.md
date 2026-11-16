@@ -40,6 +40,14 @@ Aan het rechteruiteinde opent de knop **Activiteit** het activiteitenlogboek: ee
 Het opdrachtenpalet, de help, contextmenu's, dialoogvensters, pop-ups en de Instellingen openen
 boven het venster. Elk heeft rechtsboven in de rand een `✕`; `Esc` of een klik op `✕` sluit het, en een klik buiten sluit een dialoog, pop-up of paneel (zie [Vensters en dialogen sluiten](mouse-and-gestures.md#vensters-en-dialogen-sluiten)).
 
+### Als het venster klein is
+
+Er verdwijnt niets stilzwijgend als het venster smaller wordt. Een knop verliest eerst zijn lange label (afgekapt met `...`),
+gaat dan over op een tweede rij of achter het `⋯`-menu van zijn rij, en zijn toets en palet-item blijven de hele tijd werken.
+Een dialoog die te groot is voor het venster tekent een klein kader met zijn titel, de `✕` en de regel
+**Venster te klein: maak het groter** in plaats van niets; `Esc` en `✕` sluiten hem, en hij komt weer heel terug als je het
+venster groter maakt.
+
 ## Tabbalk
 
 Het tabblad **Start** (het huispictogram) staat aan het linkeruiteinde, gevolgd door de

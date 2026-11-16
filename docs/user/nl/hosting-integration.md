@@ -500,6 +500,8 @@ opmerkingsvak.
   eerst omgezet (zie [Opmaakconversie](#opmaakconversie)). Een codeblok `mermaid` krijgt een knop **Diagram openen** die de bron
   van het diagram in een scrollbare weergave toont (`Enter` kopieert hem); het palet heeft *Gesprek: Diagram van item openen*.
   Het vereist een build met zowel `conversation` als `mermaid`.
+- In het Overzicht van de review is de `pad:regel` van een codediscussie een link naar de code (`G`, *Gesprek: Code van discussie openen*;
+  zie [Review](review.md)); in een gesprek dat los is geopend (een issue, een Radar-rij) is er geen codepagina om naartoe te gaan.
 - De weergave leest elke 60 seconden opnieuw en bij `F5` (**Vernieuwen**).
 
 **Toetsen.** Elke heeft een knop, een menurij of een paletrij (*Gesprek: ...*), en `Ctrl+N` geeft de knoppen een badge.

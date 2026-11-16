@@ -69,6 +69,15 @@ hebben. De knoppen van het geselecteerde item (**Antwoorden**, **Citeren**, **Be
 doen hetzelfde, en het palet heeft de rijen *Gesprek: ...* naast die van *Review: ...*. Voor een link wordt eerst om
 bevestiging gevraagd voordat hij opent, zoals overal in de review.
 
+Een discussie bij code toont zijn `pad:regel` als link (onderstreept, een echte knop). Een klik erop, **`G`** op de
+geselecteerde discussie, of *Gesprek: Code van discussie openen* in het palet gaat naar de pagina **Bestanden**, opent dat
+bestand en zet de cursor op de becommentarieerde regel (aan de oude of de nieuwe kant, zoals hij geschreven is) met de
+discussie eronder open (een ingeklapte wordt uitgeklapt). **Esc**, de knop **Terug naar Overzicht** links van de paginatabs,
+of *Review: Terug naar de discussie in het Overzicht* brengen je terug bij hetzelfde item van het Overzicht. Een discussie
+waarvan de regel niet meer in de diff staat (verouderd) opent het bestand bij de dichtstbijzijnde regel en de statusregel
+zegt dat; een discussie bij een bestand dat het verzoek niet meer wijzigt, meldt dat het bestand niet in de diff staat. In
+een issue- of Radar-weergave van hetzelfde verzoek is er geen code om te openen: `G` antwoordt dat de review die heeft.
+
 Waar een gesprekstoets en een reviewtoets samenkomen, houdt het gesprek de letter op deze pagina: `l` (labels), `m`
 (mijlpaal), `Q` (Gerrit's wijziging opgeven), `e` / `d`, `r`. De labels, de mijlpaal en het opgeven blijven op de knoppen
 van de kop en in het palet; `a` (toegewezenen), `p` (reviewers), `f` (**Review afronden**), `b` (**Uitchecken**), `P`, `D`,
@@ -290,6 +299,7 @@ Het indienen van de review verbruikt het concept.
 | Overzicht / Bestanden / Commits | `Alt+1` / `Alt+2` / `Alt+3` | *Review: Overzicht tonen*, *Bestanden tonen*, *Commits tonen* |
 | Opmerking bij de regel of het bereik | `c` | *Review: Opmerking bij regel plaatsen...* |
 | Opmerking in het gesprek | `c` op Overzicht, `C` | *Review: Opmerking in het gesprek plaatsen...* (opent het vak van het Overzicht), *Gesprek: Nieuwe opmerking* |
+| De code van een discussie openen (Overzicht) / terug naar de discussie | `G` / `Esc` | *Gesprek: Code van discussie openen*, *Review: Terug naar de discussie in het Overzicht* |
 | Reageren op de discussie | `r` | *Review: Op discussie reageren...* |
 | Oplossen of heropenen | `x` | *Review: Discussie oplossen of heropenen* |
 | Een discussie in- of uitklappen | `z` | *Review: Discussie inklappen of uitklappen* |

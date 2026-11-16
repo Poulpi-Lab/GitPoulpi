@@ -935,7 +935,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Review: Opmerking in het gesprek plaatsen... | `C` |
 | Review: Op discussie reageren... | `r` |
 | Review: Discussie oplossen of heropenen | `x` |
-| Review: Back to Comment in Overview | `Esc` |
+| Review: Terug naar de discussie in het Overzicht | `Esc` |
 | Review: Discussie inklappen of uitklappen | `z` |
 | Review: Conceptopmerking bewerken... | `e` |
 | Review: Conceptopmerking verwijderen | `d` |
@@ -994,7 +994,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Gesprek: Nieuwe opmerking | `c` |
 | Gesprek: Links van item... | `l` |
 | Gesprek: Diagram van item openen | `g` |
-| Conversation: Open Code of Thread | `G` |
+| Gesprek: Code van discussie openen | `G` |
 | Gesprek: Link van item kopiëren | `y` |
 | Gesprek: Openen in browser | `o` |
 | Gesprek: Opmerking bewerken | `e` |

@@ -930,7 +930,7 @@ zastosowania. Klawisze są domyślne.
 | Przegląd: Skomentuj dyskusję... | `C` |
 | Przegląd: Odpowiedz w wątku... | `r` |
 | Przegląd: Rozwiąż lub otwórz ponownie wątek | `x` |
-| Review: Back to Comment in Overview | `Esc` |
+| Przegląd: Wróć do komentarza w podsumowaniu | `Esc` |
 | Przegląd: Zwiń lub rozwiń wątek | `z` |
 | Przegląd: Edytuj oczekujący komentarz... | `e` |
 | Przegląd: Usuń oczekujący komentarz | `d` |
@@ -989,7 +989,7 @@ zastosowania. Klawisze są domyślne.
 | Rozmowa: Nowy komentarz | `c` |
 | Rozmowa: Linki wpisu... | `l` |
 | Rozmowa: Otwórz diagram wpisu | `g` |
-| Conversation: Open Code of Thread | `G` |
+| Rozmowa: Otwórz kod wątku | `G` |
 | Rozmowa: Kopiuj link wpisu | `y` |
 | Rozmowa: Otwórz w przeglądarce | `o` |
 | Rozmowa: Edytuj komentarz | `e` |

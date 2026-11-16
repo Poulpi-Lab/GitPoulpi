@@ -102,7 +102,8 @@ Hunki i linie są numerowane tak, jak numeruje je `gitpoulpi --json diff`.
 | Polecenie | Działanie |
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Dodaje do poczekalni plik, folder, wszystko, hunk lub kilka linii. Dodanie pliku, folderu lub `--all`, które dodałoby plik wrażliwy (klucz prywatny, `.env`, rozpoznany token: `[privacy]` w [opisie konfiguracji](config-reference.md#privacy-wrażliwe-pliki)), jest odrzucane z kodem wyjścia 2 i `{error: "sensitive_files", files: [{path, reason}]}` (reguła i zamaskowany podgląd, nigdy wartość); nic nie trafia do poczekalni. `--allow-sensitive` dodaje je mimo to. |
-| `unstage` (te same flagi) | Odwrotność. |
+| `stage --paths A B ...` | Dodaje do poczekalni kilka plików lub folderów jako JEDNĄ operację: jeden wpis w dzienniku, jeden krok `undo` (plik ze zmienioną nazwą to jego stara i nowa ścieżka, tak jak `status` pokazuje `renamed_from`). Nie łączy się z `--folder`, `--hunk`, `--lines` ani `--all`. |
+| `unstage` (te same flagi, także `--paths`) | Odwrotność. |
 | `discard --file F [--hunk N [--lines a,b]]` | Odrzuca zmiany poza poczekalnią (cały plik: każda zmiana, plik nieśledzony zostaje usunięty, razem z folderami, które w ten sposób zostają puste). Można cofnąć. |
 | `rm-file <paths>...` | Usuwa pliki z katalogu roboczego. Można cofnąć. |
 | `ignore <pattern> [--file <.gitignore>]` | Dopisuje wzorzec do `.gitignore`. Można cofnąć. |

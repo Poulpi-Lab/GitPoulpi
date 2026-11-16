@@ -53,6 +53,14 @@ i Ustawienia otwierają się nad oknem. Każda z nich ma `✕` w prawym górnym 
 ramki; zamyka ją `Esc` albo kliknięcie `✕`, a kliknięcie poza oknem zamyka okno
 dialogowe, okno podręczne lub panel (zob. [Zamykanie okien i dialogów](mouse-and-gestures.md#zamykanie-okien-i-dialogów)).
 
+### Gdy okno jest małe
+
+Nic nie znika po cichu, gdy okno się zwęża. Przycisk najpierw traci długą etykietę
+(przyciętą z `...`), potem zawija się do drugiego wiersza albo trafia do menu `⋯`
+swojego wiersza, a jego klawisz i wpis palety działają cały czas. Okno dialogowe zbyt duże
+dla okna rysuje małą ramkę z tytułem, `✕` i wierszem **Okno za małe: powiększ je**
+zamiast niczego; `Esc` i `✕` je zamykają, a po powiększeniu okna wraca w całości.
+
 ## Rząd kart
 
 Karta **Home** (ikona domku) jest na lewym końcu, a za nią

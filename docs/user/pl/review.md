@@ -70,6 +70,15 @@ ma takie notatki. Przyciski zaznaczonego wpisu (**Odpowiedz**, **Cytuj**, **Edyt
 to samo, a paleta ma wiersze *Rozmowa: ...* obok wierszy *Przegląd: ...*. O link pyta się przed otwarciem, jak
 wszędzie w przeglądzie.
 
+Wątek w kodzie pokazuje swoje `ścieżka:linia` jako link (podkreślony, prawdziwy przycisk). Kliknięcie go, **`G`** na zaznaczonym
+wątku albo wiersz palety *Rozmowa: Otwórz kod wątku* przełącza na stronę **Pliki**, otwiera ten plik i ustawia kursor
+na skomentowanej linii (po starej lub nowej stronie, tak jak została napisana) z otwartym pod nią wątkiem (zwinięty
+zostaje rozwinięty). **Esc**, przycisk **Wróć do podsumowania** po lewej od kart strony albo *Przegląd: Wróć do komentarza
+w podsumowaniu* wracają do tego samego wpisu Podsumowania. Wątek, którego linii nie ma już w diffie (nieaktualny),
+otwiera plik przy najbliższej linii, a wiersz stanu to mówi; wątek w pliku, którego żądanie już nie zmienia, zgłasza,
+że pliku nie ma w diffie. W widoku zgłoszenia lub Radaru tego samego żądania nie ma kodu do otwarcia: `G` odpowiada,
+że ma go przegląd.
+
 Tam, gdzie klawisz rozmowy spotyka się z klawiszem przeglądu, na tej stronie literę ma rozmowa: `l` (etykiety),
 `m` (kamień milowy), `Q` (porzucenie w Gerrit), `e` / `d`, `r`. Etykiety, kamień milowy i porzucenie zostają na
 przyciskach nagłówka i w palecie; `a` (przypisani), `p` (recenzenci), `f` (**Zakończ przegląd**), `b`
@@ -290,6 +299,7 @@ Wysłanie przeglądu zużywa szkic.
 | Podsumowanie / Pliki / Commity | `Alt+1` / `Alt+2` / `Alt+3` | *Przegląd: Pokaż podsumowanie*, *Pokaż pliki*, *Pokaż commity* |
 | Komentarz do linii lub zakresu | `c` | *Przegląd: Skomentuj linię...* |
 | Komentarz do dyskusji | `c` w Podsumowaniu, `C` | *Przegląd: Skomentuj dyskusję...* (otwiera pole Podsumowania), *Rozmowa: Nowy komentarz* |
+| Otwórz kod wątku (Podsumowanie) / wróć do komentarza | `G` / `Esc` | *Rozmowa: Otwórz kod wątku*, *Przegląd: Wróć do komentarza w podsumowaniu* |
 | Odpowiedź w wątku | `r` | *Przegląd: Odpowiedz w wątku...* |
 | Rozwiąż lub otwórz ponownie | `x` | *Przegląd: Rozwiąż lub otwórz ponownie wątek* |
 | Zwiń lub rozwiń wątek | `z` | *Przegląd: Zwiń lub rozwiń wątek* |

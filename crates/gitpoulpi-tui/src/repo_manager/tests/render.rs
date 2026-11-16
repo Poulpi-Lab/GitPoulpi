@@ -219,3 +219,41 @@ fn a_long_list_has_a_scrollbar_the_thumb_drags() {
     render(&mut few, area);
     assert!(few.bar.is_none());
 }
+
+/// The path cell: `~` for the home folder, cut in the middle, absent when
+/// there is no room - and never at the name's expense at any width.
+#[test]
+fn paths_are_shortened_and_never_push_the_name_out() {
+    use super::super::render::{home_shortened, mid_fit};
+    assert_eq!(
+        home_shortened(Path::new("/home/me/code/app"), Some(Path::new("/home/me"))),
+        if cfg!(windows) {
+            "~\\code\\app"
+        } else {
+            "~/code/app"
+        }
+    );
+    assert_eq!(home_shortened(Path::new("/srv/app"), None), "/srv/app");
+    let cut = mid_fit("~/work/some/deep/folder/app", 14);
+    assert_eq!(display_width(&cut), 14);
+    assert!(cut.contains('\u{2026}') && cut.starts_with("~/") && cut.ends_with("app"));
+    assert_eq!(mid_fit("short", 14), "short");
+
+    let mut long = repo("alpha");
+    long.path = PathBuf::from("/very/long/parent/folders/that/go/on/alpha");
+    for width in [60u16, 80, 100, 140] {
+        let mut m = RepoManager::new(vec![long.clone()]);
+        let area = Rect::new(0, 0, width, 12);
+        let r = render(&mut m, area);
+        let row = r
+            .lines
+            .iter()
+            .map(text)
+            .find(|l| l.contains("alpha"))
+            .unwrap_or_else(|| panic!("name missing at {width}"));
+        assert!(display_width(&row) <= width as usize, "{width}: {row:?}");
+        if width >= 100 {
+            assert!(row.contains("/very"), "{width}: {row:?}");
+        }
+    }
+}

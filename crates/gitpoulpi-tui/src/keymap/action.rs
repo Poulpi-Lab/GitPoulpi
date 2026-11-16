@@ -524,6 +524,8 @@ actions! {
     // ---- home tab ----
     HomeFavorite => (Home, "home.favorite", HOME_FAVORITE, ["f", "*"]),
     HomeCloseRepo => (Home, "home.close_repo", HOME_CLOSE_REPO, ["x", "Delete"]),
+    HomeCopyPath => (Home, "home.copy_path", HOME_COPY_PATH, ["y"]),
+    HomeOpenIn => (Home, "home.open_in", HOME_OPEN_IN, ["o"]),
     HomeBrowse => (Home, "home.browse", HOME_BROWSE, ["b"]),
     HomeClone => (Home, "home.clone", HOME_CLONE, ["c"]),
     HomeInit => (Home, "home.init", HOME_INIT, ["i"]),

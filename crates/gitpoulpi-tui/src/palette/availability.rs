@@ -881,6 +881,8 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
                     | M::ToggleSelectedFavorite
                     | M::CloseOrRemoveSelected
                     | M::SelectedMenu
+                    | M::CopySelectedPath
+                    | M::OpenSelectedIn
             ) && !ctx.management_row_selected
             {
                 Some(msg::palette::WHY_SELECT_A_REPOSITORY_IN_THE_LIST_FIRST.get())

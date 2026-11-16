@@ -657,6 +657,8 @@ pub(crate) fn run_management_command(
         C::ToggleSelectedFavorite => manager.favorite_selected(),
         C::CloseOrRemoveSelected => manager.close_selected(),
         C::SelectedMenu => manager.menu_selected(),
+        C::CopySelectedPath => manager.copy_path_selected(),
+        C::OpenSelectedIn => manager.open_in_selected(),
         C::Search => manager.focus_search(),
         C::CollapseAll => {
             manager.set_collapsed_all(true);
@@ -851,6 +853,11 @@ pub(crate) fn apply_manager_action(
             session_store::clear_recent();
             Some(msg::tabs::CLEARED_RECENT.get().into())
         }
+        M::CopyPath(path) => Some(ctx.clipboard.copy(
+            msg::tabs::REPOSITORY_PATH.get(),
+            &repo_menu::path_text(&path),
+        )),
+        M::OpenIn(path) => Some(crate::open_in_bar::run_default(&path)),
         M::Browse => {
             go_to_management(ManagementEntry::Browse, ctx);
             None

@@ -173,6 +173,8 @@ stage_file = "z"
 | `status` | `collapse_below` | 折叠该文件夹及其子文件夹 | `_`, `Shift+Left` |
 | `home` | `favorite` | 收藏或取消收藏仓库 | `f`, `*` |
 | `home` | `close_repo` | 关闭、移除或取消收藏该行 | `x`, `Delete` |
+| `home` | `copy_path` | Copy the Repository Path | `y` |
+| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
 | `home` | `browse` | 浏览仓库 | `b` |
 | `home` | `clone` | 克隆仓库 | `c` |
 | `home` | `init` | 初始化仓库 | `i` |
@@ -766,6 +768,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 仓库列表：将所选加入或移出收藏 | `f` |
 | 仓库列表：关闭或移除所选 | `x` |
 | 仓库列表：所选仓库菜单… | `.` |
+| Repositories: Copy Selected Path | `y` |
+| Repositories: Open Selected in Default Tool | `o` |
 | 仓库列表：搜索 | `/ / Ctrl+F` |
 | 仓库列表：折叠所有分区 | `-` |
 | 仓库列表：展开所有分区 | `+` |

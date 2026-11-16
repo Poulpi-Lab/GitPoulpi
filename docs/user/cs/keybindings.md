@@ -188,6 +188,8 @@ předponou (`Ctrl+G s`).
 | `status` | `collapse_below` | Sbalit složku a její podsložky | `_`, `Shift+Left` |
 | `home` | `favorite` | Přidat repozitář k oblíbeným nebo odebrat | `f`, `*` |
 | `home` | `close_repo` | Zavřít, odebrat nebo odznačit řádek | `x`, `Delete` |
+| `home` | `copy_path` | Copy the Repository Path | `y` |
+| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
 | `home` | `browse` | Vyhledat repozitář | `b` |
 | `home` | `clone` | Klonovat repozitář | `c` |
 | `home` | `init` | Inicializovat repozitář | `i` |
@@ -800,6 +802,8 @@ Klávesy jsou výchozí.
 | Repozitáře: Přidat/odebrat vybraný z oblíbených | `f` |
 | Repozitáře: Zavřít nebo odebrat vybraný | `x` |
 | Repozitáře: Nabídka vybraného repozitáře... | `.` |
+| Repositories: Copy Selected Path | `y` |
+| Repositories: Open Selected in Default Tool | `o` |
 | Repozitáře: Hledat | `/ / Ctrl+F` |
 | Repozitáře: Sbalit všechny sekce | `-` |
 | Repozitáře: Rozbalit všechny sekce | `+` |

@@ -550,6 +550,7 @@ fn every_management_control_and_tab_menu_row_maps_to_a_palette_command() {
                 PaletteCommand::Management(M::CloseOrRemoveSelected)
             }
             RepoMenuAction::RemoveFromList => PaletteCommand::Management(M::RemoveSelectedFromList),
+            RepoMenuAction::CopyPath => PaletteCommand::Management(M::CopySelectedPath),
             RepoMenuAction::SshKey => PaletteCommand::RepoAuthOpen,
             RepoMenuAction::Sparse => PaletteCommand::SparseCheckout,
             RepoMenuAction::NewTab => PaletteCommand::NewTab,

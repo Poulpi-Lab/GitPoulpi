@@ -824,6 +824,8 @@ pub(crate) enum ManagementCommand {
     ToggleSelectedFavorite,
     CloseOrRemoveSelected,
     SelectedMenu,
+    CopySelectedPath,
+    OpenSelectedIn,
     Search,
     CollapseAll,
     ExpandAll,
@@ -1285,6 +1287,8 @@ pub(crate) fn command_action(entry: &PaletteEntry) -> Option<crate::keymap::Acti
             Some(A::HomeCloseRepo)
         }
         PaletteCommand::Management(ManagementCommand::SelectedMenu) => Some(A::GlobalContextMenu),
+        PaletteCommand::Management(ManagementCommand::CopySelectedPath) => Some(A::HomeCopyPath),
+        PaletteCommand::Management(ManagementCommand::OpenSelectedIn) => Some(A::HomeOpenIn),
         PaletteCommand::Management(ManagementCommand::CollapseAll) => Some(A::HomeCollapseAll),
         PaletteCommand::Management(ManagementCommand::ExpandAll) => Some(A::HomeExpandAll),
         _ => None,

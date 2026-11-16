@@ -191,6 +191,8 @@ stage_file = "z"
 | `status` | `collapse_below` | Свернуть папку и её вложенные папки | `_`, `Shift+Left` |
 | `home` | `favorite` | Добавить репозиторий в избранное или убрать | `f`, `*` |
 | `home` | `close_repo` | Закрыть, убрать или снять звезду со строки | `x`, `Delete` |
+| `home` | `copy_path` | Copy the Repository Path | `y` |
+| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
 | `home` | `browse` | Найти репозиторий (Обзор) | `b` |
 | `home` | `clone` | Клонировать репозиторий | `c` |
 | `home` | `init` | Инициализировать репозиторий | `i` |
@@ -806,6 +808,8 @@ stage_file = "z"
 | Репозитории: в избранное или из избранного | `f` |
 | Репозитории: закрыть или убрать выбранный | `x` |
 | Репозитории: меню выбранного репозитория... | `.` |
+| Repositories: Copy Selected Path | `y` |
+| Repositories: Open Selected in Default Tool | `o` |
 | Репозитории: поиск | `/ / Ctrl+F` |
 | Репозитории: свернуть все разделы | `-` |
 | Репозитории: развернуть все разделы | `+` |

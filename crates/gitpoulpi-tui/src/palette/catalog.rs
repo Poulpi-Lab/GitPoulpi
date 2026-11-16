@@ -1698,6 +1698,16 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::Management(ManagementCommand::SelectedMenu),
     ),
     entry(
+        msg::palette::REPOSITORIES_COPY_SELECTED_PATH,
+        "y",
+        PaletteCommand::Management(ManagementCommand::CopySelectedPath),
+    ),
+    entry(
+        msg::palette::REPOSITORIES_OPEN_SELECTED_IN,
+        "o",
+        PaletteCommand::Management(ManagementCommand::OpenSelectedIn),
+    ),
+    entry(
         msg::palette::REPOSITORIES_SEARCH,
         "/ / Ctrl+F",
         PaletteCommand::Management(ManagementCommand::Search),

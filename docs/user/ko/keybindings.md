@@ -185,6 +185,8 @@ stage_file = "z"
 | `status` | `collapse_below` | 폴더와 하위 폴더 접기 | `_`, `Shift+Left` |
 | `home` | `favorite` | 저장소 즐겨찾기 추가 또는 해제 | `f`, `*` |
 | `home` | `close_repo` | 행 닫기, 제거 또는 즐겨찾기 해제 | `x`, `Delete` |
+| `home` | `copy_path` | Copy the Repository Path | `y` |
+| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
 | `home` | `browse` | 저장소 찾아보기 | `b` |
 | `home` | `clone` | 저장소 클론 | `c` |
 | `home` | `init` | 저장소 초기화 | `i` |
@@ -793,6 +795,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 저장소 목록: 선택 항목 즐겨찾기 추가 또는 제거 | `f` |
 | 저장소 목록: 선택 항목 닫기 또는 제거 | `x` |
 | 저장소 목록: 선택한 저장소 메뉴... | `.` |
+| Repositories: Copy Selected Path | `y` |
+| Repositories: Open Selected in Default Tool | `o` |
 | 저장소 목록: 검색 | `/ / Ctrl+F` |
 | 저장소 목록: 모든 섹션 접기 | `-` |
 | 저장소 목록: 모든 섹션 펼치기 | `+` |

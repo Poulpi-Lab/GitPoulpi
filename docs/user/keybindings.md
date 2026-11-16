@@ -187,6 +187,8 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `status` | `collapse_below` | Collapse the Folder and Its Subfolders | `_`, `Shift+Left` |
 | `home` | `favorite` | Star or Unstar the Repository | `f`, `*` |
 | `home` | `close_repo` | Close, Remove or Unstar the Row | `x`, `Delete` |
+| `home` | `copy_path` | Copy the Repository Path | `y` |
+| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
 | `home` | `browse` | Browse for a Repository | `b` |
 | `home` | `clone` | Clone a Repository | `c` |
 | `home` | `init` | Initialize a Repository | `i` |
@@ -800,6 +802,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Repositories: Add or Remove Selected from Favorites | `f` |
 | Repositories: Close or Remove Selected | `x` |
 | Repositories: Selected Repository Menu... | `.` |
+| Repositories: Copy Selected Path | `y` |
+| Repositories: Open Selected in Default Tool | `o` |
 | Repositories: Search | `/ / Ctrl+F` |
 | Repositories: Collapse All Sections | `-` |
 | Repositories: Expand All Sections | `+` |

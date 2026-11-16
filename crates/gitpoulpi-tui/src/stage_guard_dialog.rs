@@ -50,6 +50,9 @@ use crate::scrollbar::{self, BarDrag, Track};
 use crate::th;
 use crate::ui_kit::display_width;
 
+/// The key of "Show in file" (a fixed key of this modal, like 1 and 2).
+const SHOW_KEY: char = 'S';
+
 /// How many lines one wheel notch scrolls.
 const WHEEL_LINES: usize = 3;
 
@@ -605,7 +608,7 @@ fn paint_body(open: &mut Open, buf: &mut Buffer, inner: Rect) {
     open.row_hits.clear();
     open.show_button = Rect::default();
     if button_y > y + 3 {
-        let label = format!("{} [S]", msg::SHOW_IN_FILE.get());
+        let label = format!("{} [{}]", msg::SHOW_IN_FILE.get(), SHOW_KEY);
         let state = dialog_kit::ButtonState::Normal {
             hovered: open.show_hover,
             focused: false,

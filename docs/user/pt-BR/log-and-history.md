@@ -249,6 +249,19 @@ um force push (com lease) e pede uma segunda confirmação. `Ctrl+Z` (o Desfazer
 barra de ferramentas) desfaz o reword; veja [Desfazer e refazer](undo-redo.md). A
 linha de status também nomeia a ponta anterior.
 
+Um commit que não está na branch em checkout (ele vive em outra branch) não pode ser reescrito nem alterado onde você
+está, então *Editar mensagem do commit...* e *Alterar...* abrem **Editar um commit de outra branch**, uma lista de
+escolhas (`Up` / `Down` ou `Ctrl+J` / `Ctrl+K` movem, `Enter` ou um clique escolhe, `Esc`, o ✕ ou
+**Cancelar (C)** fecha):
+
+- **Checkout de `<branch>` e editar (1)**: uma linha por branch local cujo histórico contém o commit (`1` a `8`, as
+  oito primeiras, as demais são contadas). O checkout da branch é feito do jeito de sempre e depois a edição abre
+  nela. O desfazer é o das duas ações: `Ctrl+Z` desfaz a edição, o checkout continua sendo um checkout.
+- **Editar com reescrita avançada de histórico (R)**: abre o [painel de reescrita do histórico](history-rewrite.md)
+  nesse commit, nas compilações que o têm.
+- **Criar uma branch aqui... (B)**: só quando nenhuma branch local contém o commit (ele está só em uma branch
+  remota, por exemplo); abre a caixa de nome para uma branch nele.
+
 ## Alterando um commit (mensagem, autor, datas)
 
 *Alterar...* no menu do commit (ou `Ctrl+G Shift+E`, ou *Commit: alterar...* na paleta) abre um único diálogo com as propriedades do commit: o resumo, a descrição e o nome, o e-mail e a data do autor, cada um preenchido com os valores do commit. Mude o que quiser e pressione **Aplicar**; só os campos alterados são enviados. Uma data se escreve `YYYY-MM-DD HH:MM:SS +HH:MM` e aparece em UTC enquanto você não a editar. O committer é você, agora (como em um reword). Qualquer commit da branch atual pode ser alterado, com as mesmas regras, o mesmo aviso de commit já enviado e a mesma segunda confirmação de *Editar mensagem do commit...*; os commits por cima são recriados com seus próprios autores e datas, e suas mudanças no stage e fora dele ficam como estão. `Ctrl+Z` (Desfazer da barra de ferramentas) desfaz a operação. Em compilações com reescrita do histórico, **Modificar o histórico mais a fundo...** (`Alt+H`), no canto inferior esquerdo do diálogo, fecha-o sem aplicar nada e abre o [painel de reescrita do histórico](history-rewrite.md) com o escopo deste commit até o mais recente; se você editou um campo, ele pergunta antes (`Esc` confirma). `Ctrl+N` mostra um selo em cada campo e botão do diálogo; pressione-o para pôr o cursor nesse campo ou acionar esse botão (veja [Selos](keybindings.md#selos)).
@@ -426,7 +439,7 @@ O que é comparado depende da seleção:
 | a linha WIP e um commit ou stash | esse commit com o diretório de trabalho: alterações em stage e fora dele dos arquivos rastreados (arquivos não rastreados não fazem parte de um diff) |
 | três ou mais commits | as alterações combinadas deles: de logo antes do mais antigo até o mais recente (merges seguem o primeiro pai) |
 
-Um renome aparece como uma exclusão mais uma adição. **Trocar** (`x`) inverte as
+Um arquivo renomeado ou movido aparece como um só arquivo, com o nome antigo e a similaridade no topo do diff. **Trocar** (`x`) inverte as
 extremidades de uma comparação de duas linhas; com a linha WIP, que é sempre a
 extremidade mais recente, ou com um intervalo de três ou mais, não há o que trocar.
 Uma comparação com a linha WIP acompanha o diretório de trabalho conforme você

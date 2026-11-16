@@ -1342,7 +1342,7 @@ hint_back = "torna alla scheda"
 hint_quit = "esci"
 not_a_repo_any_more = "{path} non è più un repository git - rimuovilo dall'elenco con {key}"
 gone_from_disk_msg = "{path} non esiste più su disco - rimuovilo dall'elenco con {key}"
-open_in_gone = "{path} is gone from disk, there is nothing to open"
+open_in_gone = "{path} non esiste più sul disco, non c'è nulla da aprire"
 actions_need_tab = "le azioni {key} richiedono una scheda di repository aperta"
 home_tab_fixed = "la scheda Home non ha un menu scheda e non si può chiudere"
 
@@ -2433,8 +2433,8 @@ status_stage_toggle = "Stage o unstage della riga selezionata"
 status_open_diff = "Apri il {$diff} del file selezionato"
 home_favorite = "Aggiungi o togli il repository dai preferiti"
 home_close_repo = "Chiudi, rimuovi o togli dai preferiti la riga"
-home_copy_path = "Copy the Repository Path"
-home_open_in = "Open the Repository in the Default Tool"
+home_copy_path = "Copia il percorso del repository"
+home_open_in = "Apri il repository nello strumento predefinito"
 home_browse = "Sfoglia per trovare un repository"
 home_clone = "Clona un repository"
 home_init = "Inizializza un repository"
@@ -3323,8 +3323,8 @@ repositories_collapse_all_sections = "Repository: Comprimi tutte le sezioni"
 repositories_expand_all_sections = "Repository: Espandi tutte le sezioni"
 repositories_close_all_tabs = "Repository: Chiudi tutte le schede..."
 repositories_remove_selected_from_list = "Repository: Rimuovi il selezionato dall'elenco"
-repositories_copy_selected_path = "Repositories: Copy Selected Path"
-repositories_open_selected_in = "Repositories: Open Selected in Default Tool"
+repositories_copy_selected_path = "Repository: Copia il percorso del selezionato"
+repositories_open_selected_in = "Repository: Apri il selezionato nello strumento predefinito"
 repositories_remove_all_recent = "Repository: Rimuovi tutti i recenti"
 tab_new_tab = "Scheda: Nuova scheda"
 tab_new_menu = "Scheda: Nuova..."
@@ -3395,7 +3395,7 @@ ai_explain_working_changes = "IA: Spiega le modifiche in corso"
 ai_insert_prompt_variable = "IA: Inserisci variabile del prompt"
 ai_compose_commits_from_working_changes = "IA: Componi {$commits} dalle modifiche in corso..."
 # context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
-stage_guard_show_in_file = "Sensitive Files: Show in File"
+stage_guard_show_in_file = "File sensibili: Mostra nel file"
 composer_move_file_to_commit = "Compositore: Sposta il file in un commit..."
 diff_blame = "{$Diff}: Blame"
 diff_history = "{$Diff}: Cronologia del file"
@@ -3450,7 +3450,7 @@ why_no_text_selected_drag_over_the_text_first = "nessun testo selezionato - prim
 why_the_diff_view_isn_t_open = "la vista diff non è aperta"
 why_open_a_file_first_in_the_diff_view_the_status = "apri prima un file - nella vista Diff, nel pannello Stato o in un commit"
 # context: why that palette command is unavailable
-why_no_sensitive_files_question = "no sensitive files question is open"
+why_no_sensitive_files_question = "nessuna domanda sui file sensibili è aperta"
 why_select_a_branch_or_tag_in_the_refs_pane_first = "seleziona prima un branch o un tag nel pannello Refs"
 why_checking_out_a_remote_branch_isn_t_supported_yet = "il checkout di un branch remoto non è ancora supportato - crea prima un branch di tracciamento locale"
 why_select_a_local_branch_in_the_refs_pane_first = "seleziona prima un branch locale nel pannello Refs"
@@ -4073,7 +4073,7 @@ repositories_and_tabs_open_in = "l'elenco «Apri in» per la cartella di questa 
 repositories_and_tabs_7 = "apre (o passa a) il repository selezionato"
 repositories_and_tabs_8 = "aggiunge/toglie la stella"
 repositories_and_tabs_9 = "chiude la scheda (Aperti), rimuove (Recenti), toglie la stella (Preferiti)"
-repositories_and_tabs_copy_open = "copy the path / open in the default tool"
+repositories_and_tabs_copy_open = "copia il percorso / apri nello strumento predefinito"
 repositories_and_tabs_10 = "il menu della riga"
 repositories_and_tabs_11 = "cerca in ogni sezione"
 repositories_and_tabs_12 = "svuota / torna alla scheda"
@@ -5619,9 +5619,9 @@ too_large = "il file è troppo grande per essere mostrato ({bytes} byte)"
 unexpected = "risposta inattesa"
 loading_whole = "caricamento del file intero... (il pulsante Hunk mostra solo le modifiche)"
 whole_unavailable = "(file intero non disponibile: {why} - vengono mostrati solo gli hunk)"
-renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header = "{from} -> {to} ({percent}% simile)"
 renamed_header_plain = "{from} -> {to}"
-rename_no_change = "No content change (the file was only renamed or moved)"
+rename_no_change = "Nessuna modifica al contenuto (il file è stato solo rinominato o spostato)"
 
 [git_actions]
 no_such_local_branch = "quel branch locale non esiste più - aggiorna"
@@ -9332,7 +9332,7 @@ answer_cancel = "Annulla, niente in {$stage}"
 # context: key hint at the bottom of the dialog
 hint = "Su/Giù: scegli, Invio o 1/2: rispondi, Esc: annulla"
 # context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
-show_in_file = "Show in file"
+show_in_file = "Mostra nel file"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "file sensibili non messi in {$stage}: {files}; chiedi all'utente, poi rimettili in {$stage} consentendo i file sensibili"
 
@@ -10157,22 +10157,22 @@ flavor_plain_text = "Testo semplice"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
-title = "Edit a {$commit} of another branch"
+title = "Modifica un {$commit} di un altro branch"
 # context: body of that dialog when local branches hold the commit; {short} is the short commit id
-body_branches = "{short} is not on the current branch. Check out a branch that holds it to edit it here."
+body_branches = "{short} non è nel branch corrente. Fai il checkout di un branch che lo contiene per modificarlo qui."
 # context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
-body_none = "{short} is on no local branch. Create a branch at it to edit it here."
+body_none = "{short} non è in nessun branch locale. Crea un branch su di esso per modificarlo qui."
 # context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
-checkout = "Check out {branch} and edit"
+checkout = "Fai il checkout di {branch} e modifica"
 # context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
-rewrite = "Edit with advanced history rewrite"
+rewrite = "Modifica con riscrittura avanzata della cronologia"
 # context: button that opens the name box to create a branch at that commit
-create = "Create a branch here..."
+create = "Crea un branch qui..."
 # context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
 key_rewrite = "r"
 # context: key of the Create a branch here button, one letter
-key_create = "b"
+key_create = "c"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "a"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
-gave_up = "{short} was not edited: the branch was not checked out"
+gave_up = "{short} non è stato modificato: il checkout del branch non è avvenuto"

@@ -21,6 +21,15 @@ dem samtidigt, och listorna följer med.
 
 Ingenting länkas av sig självt: som varje ärendekälla är det något man väljer in per repository.
 
+## Kommentarer på en anteckning
+
+`Enter` på en antecknings rad i avsnittet ÄRENDEN, eller på dess kort, öppnar dess konversation: anteckningens text och sedan
+kommentarerna. Kommentarer sparas i själva anteckningsfilen, i ett avslutande avsnitt `## Comments`, med en post `### <författare> - <UTC-tid>`
+för var och en (en redigerad får `(edited <tid>)`). Ingenting ovanför den rubriken rörs någonsin, så Obsidian och ett skal
+läser och redigerar samma fil. Du kan skriva, redigera och ta bort den lokala författarens kommentarer (profilens
+`local.me`, annars den anslutna användaren, namnet *Tilldelade mig* använder); ingen annans. Rutan är den vanliga Markdown-redigeraren
+med förhandsvy, och *Skriver som <namn> (lokal anteckning)* anger författaren. Inget går över nätverket. En anteckning med en `## Comments`-rubrik som du skrivit för hand läses som en sådan.
+
 ## Anteckningarna
 
 En anteckning per ärende, med namnet `<id>-<slug>.md` (`12-crash-on-empty-name.md`), och ett frontmatter-block:
@@ -46,6 +55,35 @@ Fri Markdown. GitPoulpi skriver aldrig om innehållet.
 - Läsningen är tolerant: en anteckning utan `id` tar det från sitt filnamn, en anteckning utan `status` är `todo`, en anteckning
   utan frontmatter tar sin titel från den första `# rubriken`. En fil som inte är ett ärende (`readme.md`) ignoreras.
 - En status är fri text. **Öppet** betyder ”inte klar-statusen”.
+
+### Kommentarer i en anteckning
+
+En kommentar på en anteckning skrivs in i själva anteckningen, i ett sista avsnitt `## Comments` (inget nätverk, och det läses bra i
+Obsidian):
+
+```markdown
+(anteckningens text)
+
+## Comments
+
+### kai - 2026-11-15T10:00:00Z
+Första kommentaren, **valfri Markdown**.
+
+### ann - 2026-11-15T11:30:00Z (edited 2026-11-15T12:00:00Z)
+Andra.
+```
+
+- En post börjar på en rad som är exakt `### <författare> - <UTC-tid>`, med ` (edited <UTC-tid>)` efter en redigering;
+  dess text löper till nästa post. Avsnittet är den sista rubriken `## Comments` utanför ett kodstaket och löper till
+  slutet av filen, så skriv ingenting efter den.
+- En kommentarsrad som skulle läsas som en post eller som rubriken sparas med ett inledande omvänt snedstreck (`\### ...`, som
+  Markdown visar som samma text) och läses tillbaka utan det.
+- Att publicera lägger till i slutet och lämnar allt ovanför byte för byte (radslut inräknade); en redigering eller borttagning
+  skriver om bara avsnittet. En publicering flyttar också anteckningens `updated` (en anteckning utan frontmatter får ingen).
+- Författaren är profilens lokala författare (”jag” i inställningarna för Lokala ärenden). Du kan bara redigera eller ta bort dina egna
+  kommentarer; en kommentars id är dess tid och författare, och två inlägg under samma sekund hålls isär genom att flytta
+  det andra en sekund framåt.
+- Det finns inga svar, inga interna kommentarer och ingen händelsehistorik för en anteckning.
 
 ## Vad du kan göra
 
@@ -102,7 +140,7 @@ Om du arbetar ensam, eller i ett team som håller sina ärenden bredvid koden, �
   `Shift+Left` / `Shift+Right`, eller med **Tavla: Flytta kort till...** (`m`), en lista med kolumnerna. Kortet flyttas
   direkt; anteckningens `status` skrivs om som i [avsnittet om anteckningarna](#anteckningarna), inget annat i filen. Om skrivningen
   misslyckas går kortet tillbaka och felet visas på statusraden.
-- **Öppna** ett kort med `Enter` eller ett dubbelklick (anteckningen öppnas i ditt standardprogram för `.md`). `e` redigerar dess
+- **Öppna** ett kort med `Enter` eller ett dubbelklick: anteckningens [konversation](hosting-integration.md#5c-konversationer) öppnas i fönstret, med anteckningens text och dess kommentarer (kortmenyns **Öppna anteckning** öppnar filen i ditt standardprogram för `.md`). `e` redigerar dess
   tilldelade, etiketter eller milstolpe, `.` eller ett högerklick öppnar kortmenyn, `n` startar ett nytt ärende i den
   valda kolumnen (formuläret återvänder till tavlan när det stängs).
 - **Filtrera** på tilldelad (`a`), etikett (`l`), milstolpe (`M`) eller text (`/`); `x` rensar dem. Filtren är

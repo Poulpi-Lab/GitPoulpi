@@ -377,10 +377,10 @@ Varje tangent du kan binda om, med id:t som används i
 | `reword` | `deeper` | Ändra historiken djupare | `Alt+H` |
 | `composer` | `commit` | Commit från composern | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Infoga en ärendereferens | `Alt+R` |
-| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
-| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
-| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
+| `md_editor` | `preview` | Markdown-redigerare: Växla mellan Skriv och Förhandsvy | `Alt+P` |
+| `md_editor` | `split` | Markdown-redigerare: Växla delad vy | `Alt+L` |
+| `md_editor` | `submit` | Markdown-redigerare: Skicka texten | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Markdown-redigerare: Skriv med AI | `Alt+E` |
 | `dialog` | `browse` | Bläddra efter en mapp | `Ctrl+B` |
 | `dialog` | `sources` | Gå till klonkällorna | `Alt+S` |
 | `dialog` | `submit` | Skicka formuläret för pull request | `Ctrl+S` |
@@ -834,7 +834,7 @@ Tangenterna är standardvärdena.
 | Radar: Fäst eller lossa | `p` |
 | Radar: Snooza... | `z` |
 | Radar: Granska begäran... | `e` |
-| Radar: Open Issue Conversation | `i` |
+| Radar: Öppna ärendekonversation | `i` |
 | Radar: Granska via API:et |  |
 | Radar: Klona och granska... |  |
 | Radar: Redigera tilldelade... |  |
@@ -976,30 +976,30 @@ Tangenterna är standardvärdena.
 | Tavla: Ange kolumnetiketter... | `c` |
 | Tavla: Uppdatera | `r` |
 | Tavla: Stäng | `Esc` |
-| Conversation: Back |  |
-| Conversation: Refresh | `F5` |
-| Conversation: Load Older Entries | `m` |
-| Conversation: Previous Entry | `Up` |
-| Conversation: Next Entry | `Down` |
-| Conversation: Next Unread Entry | `n` |
-| Conversation: Reply to Entry | `r` |
-| Conversation: Quote Entry | `Q` |
-| Conversation: New Comment | `c` |
-| Conversation: Links of Entry... | `l` |
-| Conversation: Open Diagram of Entry | `g` |
-| Conversation: Copy Link of Entry | `y` |
-| Conversation: Open in Browser | `o` |
-| Conversation: Edit Comment | `e` |
-| Conversation: Delete Comment | `d` |
-| Conversation: Show or Hide Events | `v` |
-| Conversation: Toggle Write and Preview |  |
-| Conversation: Toggle the Split View |  |
-| Conversation: Send the Comment |  |
-| Conversation: Toggle Internal Note |  |
-| Conversation: Close | `Esc` |
-| Markdown Editor: Write with AI |  |
-| Markdown Editor: Refresh the AI Context |  |
-| Hosting: Open Issue Conversation... |  |
+| Konversation: Tillbaka |  |
+| Konversation: Uppdatera | `F5` |
+| Konversation: Läs in äldre poster | `m` |
+| Konversation: Föregående post | `Up` |
+| Konversation: Nästa post | `Down` |
+| Konversation: Nästa olästa post | `n` |
+| Konversation: Svara på post | `r` |
+| Konversation: Citera post | `Q` |
+| Konversation: Ny kommentar | `c` |
+| Konversation: Postens länkar... | `l` |
+| Konversation: Öppna postens diagram | `g` |
+| Konversation: Kopiera postens länk | `y` |
+| Konversation: Öppna i webbläsare | `o` |
+| Konversation: Redigera kommentar | `e` |
+| Konversation: Ta bort kommentar | `d` |
+| Konversation: Visa eller dölj händelser | `v` |
+| Konversation: Växla mellan Skriv och Förhandsvy |  |
+| Konversation: Växla delad vy |  |
+| Konversation: Skicka kommentaren |  |
+| Konversation: Växla intern anteckning |  |
+| Konversation: Stäng | `Esc` |
+| Markdown-redigerare: Skriv med AI |  |
+| Markdown-redigerare: Uppdatera AI-kontexten |  |
+| Värd: Öppna ärendekonversation... |  |
 | Granskning: ✦ Granskningsutkast... | `s` |
 | Granskning: Godta förslag | `y` |
 | Granskning: Redigera och godta förslag... | `w` |
@@ -1504,7 +1504,7 @@ Med en matchande integration har Refs-rutan ett avsnitt för pull requests
 
 | Tangent | Åtgärd |
 |---|---|
-| `Enter` | Öppna den markerade raden i webbläsaren. På en `Anslut igen`-rad: öppna Inställningar på den profilen |
+| `Enter` | Öppna den markerade raden: ett ärende (och en begäran på Azure DevOps eller Bitbucket) som en [konversation](hosting-integration.md#5c-konversationer), en pull request i [granskningen](review.md) på värdar som har en, allt annat i webbläsaren. På en `Anslut igen`-rad: öppna Inställningar på den profilen |
 | `Space` | Fäll ut eller ihop avsnittet |
 | `v` | Öppna avsnittets filter. Pull requests: Öppna, Mergade / stängda, Alla. Ärenden: Öppna, Tilldelade mig, Stängda, Alla |
 | `n` | Avsnittet pull requests: skapa en pull request. Avsnittet ÄRENDEN: nytt ärende. (Rubrikens `+`-knapp) |
@@ -1512,7 +1512,7 @@ Med en matchande integration har Refs-rutan ett avsnitt för pull requests
 | `Enter` på sökraden | Skriv i sökfältet. `Enter`, `Tab` eller `Esc` lämnar det; `Ctrl+U` rensar det |
 | `Enter` på en grupprubrik | Fäll ihop eller ut gruppen (*Mina pull requests*, *Tilldelade mig*, *Väntar på min granskning*, *Alla pull requests*) |
 | `Enter` på filter-, leverantörs- eller repositoryraden | Öppna den rullgardinslistan. Leverantörslistan slutar med **Ingen (koppla bort det här repositoryt)** |
-| `.`, eller ett högerklick | Radens meny: öppna i webbläsaren, kopiera URL eller nummer, checka ut källgrenen (pull requests); skapa en gren från ärendet (ärenden) |
+| `.`, eller ett högerklick | Radens meny: öppna konversationen, öppna i webbläsaren, kopiera URL eller nummer, checka ut källgrenen (pull requests); skapa en gren från ärendet (ärenden) |
 
 ### Ärendetavlan
 
@@ -1525,7 +1525,7 @@ nedan är också ett palettkommando (**Tavla: ...**).
 | Piltangenter | Markera ett kort (`Up`, `Down`) eller grannkolumnen (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` hoppar i kolumnen |
 | `Shift+Left`, `Shift+Right` | Flytta det markerade kortet till föregående eller nästa kolumn |
 | `m` | **Flytta kort till...**: en lista med kolumnerna |
-| `Enter` | Öppna ärendet (anteckningen för ett lokalt ärende; annars värdens sida) |
+| `Enter` | Öppna ärendets [konversation](hosting-integration.md#5c-konversationer) (värdens sida där värden inte har någon att läsa) |
 | `e`, `.` | Redigera tilldelade, etiketter eller milstolpe; kortmenyn |
 | `n` | Nytt ärende i den markerade kolumnen |
 | `a`, `l`, `M`, `/` | Filtrera på tilldelad, etikett, milstolpe, text. `x` rensar filtren |
@@ -1535,6 +1535,43 @@ nedan är också ett palettkommando (**Tavla: ...**).
 
 Mus: dra ett kort till en annan kolumn för att flytta det, klicka på ett kort för att markera det, dubbelklicka för att öppna det, högerklicka för
 kortmenyn, hjulet rullar en kolumn, `Shift`+hjul (eller listen under tavlan) rullar kolumnerna.
+
+### Markdown-redigeraren och konversationsvyn
+
+Varje ruta vars text går till en värd (en kommentar, ett svar, en granskningssammanfattning, beskrivningen av ett nytt ärende eller en ny pull
+request) är samma redigerare. Dess tangenter står i tabellen `md_editor` ovan och kan bindas om.
+
+| Tangent | Åtgärd |
+|---|---|
+| `Alt+P` | Växla mellan **Skriv** och **Förhandsvy** (från **Delad** går det till Förhandsvy) |
+| `Alt+L` | **Delad** på, eller tillbaka till Skriv (kräver ett fönster som är 100 kolumner brett) |
+| `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` | Skicka texten (formulärets egen knapp gör detsamma) |
+| `Alt+E` | **Skriv med AI**: öppnar eller stänger panelen under lägesraden (bara med AI på) |
+| `Alt+R` | Bara commit-composern: infoga en ärendereferens |
+| `Alt+W` | Formulären för nytt ärende och ny pull request: skapa på leverantörens egen webbsida |
+| `Esc` | I panelen för **Skriv med AI**: stoppa ett pågående utkast, annars stäng panelen |
+
+I [konversationsvyn](hosting-integration.md#5c-konversationer) för ett ärende eller en begäran (palettrader
+*Konversation: ...*; raderna med en tangent finns i palettlistan ovan):
+
+| Tangent | Åtgärd |
+|---|---|
+| `r` | Svara på den valda posten (i dess tråd, eller med dess text citerad på en värd utan trådar) |
+| `Q` | Citera den valda posten i en ny kommentar |
+| `c` | Ny kommentar |
+| `e`, `d` | Redigera, ta bort en av dina egna kommentarer |
+| `Alt+I` | I kommentarsrutan: **Intern anteckning** (GitLab, Redmine) |
+| `l`, `y`, `o` | Postens länkar, kopiera dess adress, öppna den i webbläsaren |
+| `n` | Nästa olästa post |
+| `v`, `m`, `F5` | Visa eller dölj händelser, läs in äldre poster, uppdatera |
+| `g` | Öppna postens diagram (ett `mermaid`-block) |
+| `Alt+Left`, `Backspace` | Tillbaka längs stacken av objekt som öppnats från referenser |
+| `Tab` | Tidslinje, kommentarsruta, rubrikens knappar |
+| `q`, `Esc` | Stäng |
+
+I Radar öppnar `i` konversationen för en ärenderad.
+
+På en pull request- eller ärenderad i sidofältets avsnitt öppnar `Enter` konversationen och `o` öppnar raden i webbläsaren.
 
 ### Flow (grenarbetsflöden)
 

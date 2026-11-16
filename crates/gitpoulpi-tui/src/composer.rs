@@ -507,7 +507,7 @@ fn summary_rung(width: u16, count_width: usize) -> Option<SummaryRung> {
         Some(SummaryRung::Full)
     } else if width >= COMPACT_MIN_ROW {
         Some(SummaryRung::Compact)
-    } else if usize::from(width) >= count_width + 1 + MORE_W + 1 {
+    } else if usize::from(width) > count_width + 1 + MORE_W {
         Some(SummaryRung::More)
     } else {
         None

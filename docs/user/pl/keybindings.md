@@ -376,10 +376,10 @@ prefiksem (`Ctrl+G s`).
 | `reword` | `deeper` | Zmień historię głębiej | `Alt+H` |
 | `composer` | `commit` | Commit z kompozytora | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Wstaw odwołanie do zgłoszenia | `Alt+R` |
-| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
-| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
-| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
+| `md_editor` | `preview` | Edytor Markdown: Przełącz Pisanie i Podgląd | `Alt+P` |
+| `md_editor` | `split` | Edytor Markdown: Przełącz widok podzielony | `Alt+L` |
+| `md_editor` | `submit` | Edytor Markdown: Wyślij tekst | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Edytor Markdown: Pisz z AI | `Alt+E` |
 | `dialog` | `browse` | Przeglądaj w poszukiwaniu folderu | `Ctrl+B` |
 | `dialog` | `sources` | Przejdź do źródeł klonowania | `Alt+S` |
 | `dialog` | `submit` | Wyślij formularz (pull request) | `Ctrl+S` |
@@ -831,7 +831,7 @@ zastosowania. Klawisze są domyślne.
 | Radar: Przypnij lub odepnij | `p` |
 | Radar: Odłóż... | `z` |
 | Radar: Przejrzyj żądanie... | `e` |
-| Radar: Open Issue Conversation | `i` |
+| Radar: Otwórz rozmowę zgłoszenia | `i` |
 | Radar: Przejrzyj przez API |  |
 | Radar: Sklonuj i przejrzyj... |  |
 | Radar: Edytuj przypisanych... |  |
@@ -973,30 +973,30 @@ zastosowania. Klawisze są domyślne.
 | Tablica: Ustaw etykiety kolumn... | `c` |
 | Tablica: Odśwież | `r` |
 | Tablica: Zamknij | `Esc` |
-| Conversation: Back |  |
-| Conversation: Refresh | `F5` |
-| Conversation: Load Older Entries | `m` |
-| Conversation: Previous Entry | `Up` |
-| Conversation: Next Entry | `Down` |
-| Conversation: Next Unread Entry | `n` |
-| Conversation: Reply to Entry | `r` |
-| Conversation: Quote Entry | `Q` |
-| Conversation: New Comment | `c` |
-| Conversation: Links of Entry... | `l` |
-| Conversation: Open Diagram of Entry | `g` |
-| Conversation: Copy Link of Entry | `y` |
-| Conversation: Open in Browser | `o` |
-| Conversation: Edit Comment | `e` |
-| Conversation: Delete Comment | `d` |
-| Conversation: Show or Hide Events | `v` |
-| Conversation: Toggle Write and Preview |  |
-| Conversation: Toggle the Split View |  |
-| Conversation: Send the Comment |  |
-| Conversation: Toggle Internal Note |  |
-| Conversation: Close | `Esc` |
-| Markdown Editor: Write with AI |  |
-| Markdown Editor: Refresh the AI Context |  |
-| Hosting: Open Issue Conversation... |  |
+| Rozmowa: Wstecz |  |
+| Rozmowa: Odśwież | `F5` |
+| Rozmowa: Wczytaj starsze wpisy | `m` |
+| Rozmowa: Poprzedni wpis | `Up` |
+| Rozmowa: Następny wpis | `Down` |
+| Rozmowa: Następny nieprzeczytany wpis | `n` |
+| Rozmowa: Odpowiedz na wpis | `r` |
+| Rozmowa: Cytuj wpis | `Q` |
+| Rozmowa: Nowy komentarz | `c` |
+| Rozmowa: Linki wpisu... | `l` |
+| Rozmowa: Otwórz diagram wpisu | `g` |
+| Rozmowa: Kopiuj link wpisu | `y` |
+| Rozmowa: Otwórz w przeglądarce | `o` |
+| Rozmowa: Edytuj komentarz | `e` |
+| Rozmowa: Usuń komentarz | `d` |
+| Rozmowa: Pokaż lub ukryj zdarzenia | `v` |
+| Rozmowa: Przełącz Pisanie i Podgląd |  |
+| Rozmowa: Przełącz widok podzielony |  |
+| Rozmowa: Wyślij komentarz |  |
+| Rozmowa: Przełącz notatkę wewnętrzną |  |
+| Rozmowa: Zamknij | `Esc` |
+| Edytor Markdown: Pisz z AI |  |
+| Edytor Markdown: Odśwież kontekst AI |  |
+| Hosting: Otwórz rozmowę zgłoszenia... |  |
 | Przegląd: ✦ Przygotuj szkic przeglądu... | `s` |
 | Przegląd: Przyjmij sugestię | `y` |
 | Przegląd: Edytuj i przyjmij sugestię... | `w` |
@@ -1504,7 +1504,7 @@ requesty). Przy połączonym profilu hostingu ma też sekcję ZGŁOSZENIA. Zob.
 
 | Klawisz | Działanie |
 |---|---|
-| `Enter` | Otwiera zaznaczony wiersz w przeglądarce. Na wierszu `Połącz ponownie`: otwiera Ustawienia na tym profilu |
+| `Enter` | Otwiera zaznaczony wiersz: zgłoszenie (oraz żądanie w Azure DevOps lub Bitbucket) jako [rozmowę](hosting-integration.md#5c-rozmowy), pull request w [przeglądzie](review.md) na hostach, które go mają, wszystko inne w przeglądarce. Na wierszu `Połącz ponownie`: otwiera Ustawienia na tym profilu |
 | `Space` | Rozwija lub zwija sekcję |
 | `v` | Otwiera filtr sekcji. Pull requesty: Open, Merged / closed, All. Zgłoszenia: Open, Przypisane do mnie, Closed, All |
 | `n` | Sekcja pull requestów: tworzy pull request. Sekcja ZGŁOSZENIA: nowe zgłoszenie. (Przycisk `+` w nagłówku) |
@@ -1512,7 +1512,7 @@ requesty). Przy połączonym profilu hostingu ma też sekcję ZGŁOSZENIA. Zob.
 | `Enter` na wierszu wyszukiwania | Wpisywanie w polu wyszukiwania. `Enter`, `Tab` lub `Esc` je opuszcza; `Ctrl+U` je czyści |
 | `Enter` na nagłówku grupy | Zwija lub rozwija grupę (*Moje pull requesty*, *Przypisane do mnie*, *Czeka na mój review*, *Wszystkie pull requesty*) |
 | `Enter` na wierszu filtra, dostawcy lub repozytorium | Otwiera tę listę rozwijaną. Lista dostawców kończy się pozycją **Brak (odłącz to repozytorium)** |
-| `.` albo prawy klik | Menu wiersza: otwórz w przeglądarce, kopiuj URL lub numer, checkout gałęzi źródłowej (pull requesty); utwórz gałąź ze zgłoszenia (zgłoszenia) |
+| `.` albo prawy klik | Menu wiersza: otwórz rozmowę, otwórz w przeglądarce, kopiuj URL lub numer, checkout gałęzi źródłowej (pull requesty); utwórz gałąź ze zgłoszenia (zgłoszenia) |
 
 ### Tablica zgłoszeń
 
@@ -1525,7 +1525,7 @@ poniższy klawisz jest też poleceniem palety (**Tablica: ...**).
 | Strzałki | Zaznaczają kartę (`Up`, `Down`) albo sąsiednią kolumnę (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` skaczą w kolumnie |
 | `Shift+Left`, `Shift+Right` | Przenoszą zaznaczoną kartę do poprzedniej lub następnej kolumny |
 | `m` | **Tablica: Przenieś kartę do...**: lista rozwijana kolumn |
-| `Enter` | Otwiera zgłoszenie (notatkę, dla zgłoszenia lokalnego; w przeciwnym razie stronę hosta) |
+| `Enter` | Otwiera [rozmowę](hosting-integration.md#5c-rozmowy) zgłoszenia (stronę hosta, gdy host nie ma jej do odczytu) |
 | `e`, `.` | Edytuje przypisanych, etykiety lub kamień milowy; menu karty |
 | `n` | Nowe zgłoszenie w zaznaczonej kolumnie |
 | `a`, `l`, `M`, `/` | Filtrują według przypisanego, etykiety, kamienia milowego, tekstu. `x` czyści filtry |
@@ -1535,6 +1535,43 @@ poniższy klawisz jest też poleceniem palety (**Tablica: ...**).
 
 Mysz: przeciągnij kartę na inną kolumnę, aby ją przenieść, kliknij kartę, aby ją zaznaczyć, kliknij dwukrotnie, aby ją otworzyć, kliknij prawym przyciskiem
 dla menu karty, kółko przewija kolumnę, `Shift`+kółko (albo pasek pod tablicą) przewija kolumny.
+
+### Edytor Markdown i widok rozmowy
+
+Każde pole, którego tekst trafia na hosta (komentarz, odpowiedź, podsumowanie przeglądu, opis nowego zgłoszenia lub
+pull requesta), jest tym samym edytorem. Jego klawisze są w tabeli `md_editor` powyżej i można je przypisać na nowo.
+
+| Klawisz | Akcja |
+|---|---|
+| `Alt+P` | Przełącza **Pisanie** i **Podgląd** (z **Podziału** przechodzi do Podglądu) |
+| `Alt+L` | Włącza **Podział** albo wraca do Pisania (wymaga okna szerokiego na 100 kolumn) |
+| `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` | Wysyła tekst (własny przycisk formularza robi to samo) |
+| `Alt+E` | **Pisz z AI**: otwiera lub zamyka panel pod paskiem trybów (tylko przy włączonym AI) |
+| `Alt+R` | Tylko edytor commita: wstawia odwołanie do zgłoszenia |
+| `Alt+W` | Formularze nowego zgłoszenia i pull requesta: tworzy na własnej stronie WWW dostawcy |
+| `Esc` | W panelu **Pisz z AI**: zatrzymuje trwający szkic, w przeciwnym razie zamyka panel |
+
+W [widoku rozmowy](hosting-integration.md#5c-rozmowy) zgłoszenia lub żądania (wiersze palety
+*Rozmowa: ...*; wiersze z klawiszem są na powyższej liście palety):
+
+| Klawisz | Akcja |
+|---|---|
+| `r` | Odpowiada na zaznaczony wpis (do jego wątku albo z jego tekstem w cytacie na hoście bez wątków) |
+| `Q` | Cytuje zaznaczony wpis w nowym komentarzu |
+| `c` | Nowy komentarz |
+| `e`, `d` | Edytuje, usuwa jeden z twoich komentarzy |
+| `Alt+I` | W polu komentarza: **Notatka wewnętrzna** (GitLab, Redmine) |
+| `l`, `y`, `o` | Linki wpisu, kopiuje jego adres, otwiera go w przeglądarce |
+| `n` | Następny nieprzeczytany wpis |
+| `v`, `m`, `F5` | Pokazuje lub ukrywa zdarzenia, wczytuje starsze wpisy, odświeża |
+| `g` | Otwiera diagram wpisu (blok `mermaid`) |
+| `Alt+Left`, `Backspace` | Wstecz po stosie elementów otwartych z odwołań |
+| `Tab` | Oś czasu, pole komentarza, przyciski nagłówka |
+| `q`, `Esc` | Zamyka |
+
+W Radarze `i` otwiera rozmowę wiersza zgłoszenia.
+
+Na wierszu pull requesta lub zgłoszenia w sekcjach panelu bocznego `Enter` otwiera rozmowę, a `o` otwiera wiersz w przeglądarce.
 
 ### Flow (przepływy pracy z gałęziami)
 

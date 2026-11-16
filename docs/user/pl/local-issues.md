@@ -21,6 +21,16 @@ w tym samym czasie, a listy za tym podążają.
 
 Nic nie jest powiązane samo: jak każde źródło zgłoszeń, jest włączane osobno dla każdego repozytorium.
 
+## Komentarze do notatki
+
+`Enter` na wierszu notatki w sekcji ZGŁOSZENIA albo na jej karcie otwiera jej rozmowę: tekst notatki, a potem komentarze.
+Komentarze są przechowywane w samym pliku notatki, w końcowej sekcji `## Comments`, po jednym wpisie
+`### <autor> - <czas UTC>` (edytowany dodaje `(edited <czas>)`). Nic powyżej tego nagłówka nigdy nie jest ruszane,
+więc Obsidian i powłoka czytają i edytują ten sam plik. Możesz pisać, edytować i usuwać komentarze lokalnego autora
+(`local.me` profilu, a w razie braku podłączony użytkownik, czyli nazwa, której używa *Przypisane do mnie*); cudzych
+nie. Pole to zwykły edytor Markdown z podglądem, a *Pisanie jako <nazwa> (notatka lokalna)* nazywa autora. Nic nie
+idzie przez sieć. Notatka z nagłówkiem `## Comments` wpisanym ręcznie jest czytana jako taka.
+
 ## Notatki
 
 Jedna notatka na zgłoszenie, nazwana `<id>-<slug>.md` (`12-crash-on-empty-name.md`), z blokiem frontmatter:
@@ -46,6 +56,35 @@ Dowolny Markdown. GitPoulpi nigdy nie przepisuje treści.
 - Odczyt jest wyrozumiały: notatka bez `id` bierze go z nazwy pliku, notatka bez `status` ma `todo`, notatka
   bez frontmatter bierze tytuł z pierwszego `# nagłówka`. Plik, który nie jest zgłoszeniem (`readme.md`), jest pomijany.
 - Status to dowolny tekst. **Otwarte** znaczy „nie jest statusem zakończenia”.
+
+### Komentarze w notatce
+
+Komentarz do notatki jest zapisywany w samej notatce, w ostatniej sekcji `## Comments` (bez sieci, a w Obsidianie
+czyta się dobrze):
+
+```markdown
+(the note's text)
+
+## Comments
+
+### kai - 2026-11-15T10:00:00Z
+First comment, **any Markdown**.
+
+### ann - 2026-11-15T11:30:00Z (edited 2026-11-15T12:00:00Z)
+Second one.
+```
+
+- Wpis zaczyna się od linii będącej dokładnie `### <autor> - <czas UTC>`, z ` (edited <czas UTC>)` po edycji; jego
+  tekst biegnie do następnego wpisu. Sekcją jest ostatni nagłówek `## Comments` poza blokiem kodu i biegnie do końca
+  pliku, więc nie pisz nic po niej.
+- Linia komentarza, która zostałaby odczytana jako wpis lub nagłówek, jest przechowywana z odwrotnym ukośnikiem na
+  początku (`\### ...`, co Markdown pokazuje jako ten sam tekst) i czytana z powrotem bez niego.
+- Publikowanie dopisuje na końcu i zostawia wszystko powyżej bajt w bajt (łącznie z zakończeniami linii); edycja lub
+  usunięcie przepisuje tylko sekcję. Publikacja przesuwa też `updated` notatki (notatka bez frontmatter go nie dostaje).
+- Autorem jest lokalny autor profilu („ja” z ustawień Zgłoszeń lokalnych). Możesz edytować lub usuwać tylko własne
+  komentarze; id komentarza to jego czas i autor, a dwa wpisy w tej samej sekundzie są rozróżniane przez przesunięcie
+  drugiego o sekundę.
+- Nie ma odpowiedzi, komentarzy wewnętrznych ani historii zdarzeń notatki.
 
 ## Co możesz zrobić
 
@@ -102,7 +141,7 @@ Jeśli pracujesz sam albo w zespole, który trzyma zgłoszenia obok kodu, folder
   `Shift+Left` / `Shift+Right` albo wierszem **Tablica: Przenieś kartę do...** (`m`), listą kolumn. Karta przenosi się
   od razu; `status` notatki jest przepisywany jak w [sekcji o notatkach](#notatki), nic więcej w pliku. Jeśli zapis
   się nie uda, karta wraca, a błąd jest na pasku stanu.
-- **Otwórz** kartę klawiszem `Enter` lub podwójnym kliknięciem (notatka otwiera się w twoim domyślnym programie dla `.md`). `e` edytuje jej
+- **Otwórz** kartę klawiszem `Enter` lub podwójnym kliknięciem: [rozmowa](hosting-integration.md#5c-rozmowy) notatki otwiera się w oknie, z tekstem notatki i jej komentarzami (**Otwórz notatkę** w menu karty otwiera plik w twoim domyślnym programie dla `.md`). `e` edytuje jej
   przypisanych, etykiety lub kamień milowy, `.` albo prawy przycisk myszy otwiera menu karty, `n` zaczyna nowe zgłoszenie w zaznaczonej
   kolumnie (formularz wraca do tablicy po zamknięciu).
 - **Filtruj** według przypisanego (`a`), etykiety (`l`), kamienia milowego (`M`) lub tekstu (`/`); `x` je czyści. Filtry to

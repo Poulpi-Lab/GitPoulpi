@@ -570,7 +570,7 @@ A linha sob o cabeçalho diz como as suas mensagens são publicadas, e a mesma l
 | *Ainda não se sabe como você publicaria. Defina Publicar como nas Configurações.* | Nada pôde ser aprendido. |
 
 **Publicar como** é um nome: para um GitHub App é `my-app[bot]`. Defina-o para todos os repositórios em **Configurações >
-Integrações > Publicar como** (`general.hosting_post_as`), ou para um repositório em **Configurações > Repositório > SSH e
+Integrações > Publicar como** (`general.hosting_post_as`), ou para um repositório em **Configurações > Configurações do repositório > SSH e
 credenciais > Host**, que o sobrescreve. Se ficar vazio, o GitPoulpi pergunta ao GitHub (GraphQL `viewer { login }`, que
 um token de instalação pode ou não responder) e, se isso falhar, aprende o nome pelo autor do primeiro comentário que
 publica e o guarda junto ao repositório. Um token pessoal nunca precisa disso. Veja
@@ -959,7 +959,7 @@ de cada vez e deixa os seus outros repositórios no seu próprio token.
 2. Escreva um pequeno script que imprima um **token de instalação** na saída
    padrão (a chave privada do App assina um JWT de vida curta, que é trocado
    por um token válido por uma hora). O GitPoulpi nunca vê a chave.
-3. Em **Configurações > Repositório > SSH e credenciais**, escolha **Comando de
+3. Em **Configurações > Configurações do repositório > SSH e credenciais**, escolha **Comando de
    token** em HTTPS, informe o script em **Comando** e o host
    (`github.com`) em **Hosts**, e marque **Usar para a API do host
    (issues, pull requests)**. Salve e confirme o comando (uma pessoa sempre
@@ -1001,7 +1001,7 @@ token do próprio perfil. (Um token de acesso de projeto ou de grupo do GitLab t
 
 ### Bloqueando a atribuição em um repositório
 
-**Configurações > Repositório > SSH e credenciais** tem uma linha **Atribuição**
+**Configurações > Configurações do repositório > SSH e credenciais** tem uma linha **Atribuição**
 (**Permitida** por padrão, ou **Bloqueada**; salva na hora). Bloqueada, atribuir
 é impossível nas issues e nos pull requests desse repositório, quem quer que peça:
 

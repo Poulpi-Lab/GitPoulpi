@@ -491,9 +491,10 @@ gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "
 gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"
 ```
 
-`--conversation` aceita um arquivo, `-` para a entrada padrão, ou o próprio JSON: uma página com um `header` e
-`entries`, o formato em que o GitPoulpi guarda uma conversa. (O JSON que `hosting issue comments` imprime é o formato
-voltado a agentes, com `item` e entradas tipadas; ele não é aceito aqui.) Com `--read-repo`, `--pr-base REV
+`--conversation` aceita um arquivo, `-` para a entrada padrão, ou o próprio JSON: o JSON que `hosting issue comments --json`
+ou `hosting review conversation --json` imprime (uma página mais antiga com um `header` e `entries` também é aceita), então
+`gitpoulpi hosting issue comments 7 --json | gitpoulpi ai hosting-reply --conversation -` funciona; `--item <ref>`
+busca a própria conversa (`7` ou `#7` uma issue, `!7` um pull request). Com `--read-repo`, `--pr-base REV
 --pr-head REV` põem o diff de um pull request no contexto; o `context` da resposta diz quais partes foram lidas, se
 foram reaproveitadas, os tokens de cache do provedor e a sessão do agente. A ferramenta MCP `ai_hosting_reply` é o
 mesmo comando e é somente leitura.

@@ -146,7 +146,15 @@ pub(crate) fn paint_name_box(
         .max(buttons_w + 4)
         .max(display_width(&title) as u16 + 6);
     if area.width < 24 || area.height < BOX_HEIGHT {
-        return Vec::new();
+        let cross = dialog_kit::too_small::paint(
+            frame.buffer_mut(),
+            area,
+            title.trim(),
+            hovered == Some(RefNamePart::Close),
+        );
+        return cross
+            .map(|c| vec![(c, RefNamePart::Close)])
+            .unwrap_or_default();
     }
     let popup = WIN.place(
         area,
@@ -209,29 +217,32 @@ pub(crate) fn paint_name_box(
         );
     }
     let y = inner.y + 3;
-    let confirm_w = dialog_kit::button_width(confirm);
-    let confirm_x = inner.right().saturating_sub(confirm_w);
-    let cancel_x = confirm_x.saturating_sub(2 + dialog_kit::button_width(cancel_label));
-    let cancel = dialog_kit::button(
+    // Right-aligned; a narrow box clips the labels, never drops a button.
+    let [cancel, ok] = dialog_kit::button_row::paint(
         buf,
-        cancel_x,
+        inner.right(),
         y,
-        cancel_label,
-        ButtonState::Normal {
-            hovered: hovered == Some(RefNamePart::Cancel),
-            focused: false,
-        },
-    );
-    let ok = dialog_kit::button(
-        buf,
-        confirm_x,
-        y,
-        confirm,
-        ButtonState::Primary {
-            hovered: hovered == Some(RefNamePart::Confirm),
-            focused: false,
-        },
-    );
+        inner.width,
+        0,
+        &[
+            dialog_kit::button_row::Btn {
+                label: cancel_label,
+                state: ButtonState::Normal {
+                    hovered: hovered == Some(RefNamePart::Cancel),
+                    focused: false,
+                },
+            },
+            dialog_kit::button_row::Btn {
+                label: confirm,
+                state: ButtonState::Primary {
+                    hovered: hovered == Some(RefNamePart::Confirm),
+                    focused: false,
+                },
+            },
+        ],
+    )[..] else {
+        unreachable!("two buttons in, two rects out")
+    };
     hits.push((cancel, RefNamePart::Cancel));
     hits.push((ok, RefNamePart::Confirm));
     WIN.decorate(buf, popup, cross, true);

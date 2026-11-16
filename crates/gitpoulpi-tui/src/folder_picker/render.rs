@@ -251,30 +251,34 @@ impl FolderPicker {
 
         // Footer: hints on the left, the two buttons on the right.
         let footer_y = bottom.saturating_sub(1);
-        let choose_w = dialog_kit::button_width(&self.confirm);
-        let cancel_w = dialog_kit::button_width(msg::dialog::CANCEL.get());
-        let choose_x = (x0 + w).saturating_sub(choose_w);
-        let cancel_x = choose_x.saturating_sub(cancel_w + 1);
-        let cancel = dialog_kit::button(
+        // A narrow picker clips the labels, never drops a button.
+        use dialog_kit::button_row::Btn;
+        let [cancel, choose] = dialog_kit::button_row::paint(
             buf,
-            cancel_x,
+            x0 + w,
             footer_y,
-            msg::dialog::CANCEL.get(),
-            ButtonState::Normal {
-                hovered: self.hover == Some(PickerHit::Cancel),
-                focused: false,
-            },
-        );
-        let choose = dialog_kit::button(
-            buf,
-            choose_x,
-            footer_y,
-            &self.confirm,
-            ButtonState::Primary {
-                hovered: self.hover == Some(PickerHit::Choose),
-                focused: false,
-            },
-        );
+            w,
+            0,
+            &[
+                Btn {
+                    label: msg::dialog::CANCEL.get(),
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(PickerHit::Cancel),
+                        focused: false,
+                    },
+                },
+                Btn {
+                    label: &self.confirm,
+                    state: ButtonState::Primary {
+                        hovered: self.hover == Some(PickerHit::Choose),
+                        focused: false,
+                    },
+                },
+            ],
+        )[..] else {
+            unreachable!("two buttons in, two rects out")
+        };
+        let cancel_x = cancel.x;
         let tab = dialog_kit::key_name(Key::Tab);
         let enter = dialog_kit::key_name(Key::Enter);
         let up_keys = format!(

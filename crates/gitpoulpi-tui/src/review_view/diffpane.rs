@@ -523,38 +523,36 @@ impl ReviewView {
                                 } else {
                                     msg::RESOLVE.get()
                                 };
-                                let w = dialog_kit::button_width(label);
-                                if right.saturating_sub(x0) > w + 8 {
-                                    let rect = dialog_kit::button(
-                                        buf,
-                                        right - w,
-                                        y,
-                                        label,
-                                        ButtonState::Normal {
-                                            hovered: hover == Some(Hit::ThreadResolve(i)),
-                                            focused: false,
-                                        },
-                                    );
-                                    hits.push((rect, Hit::ThreadResolve(i)));
-                                    right = rect.x.saturating_sub(1);
-                                }
-                            }
-                            let label = msg::REPLY.get();
-                            let w = dialog_kit::button_width(label);
-                            if right.saturating_sub(x0) > w + 8 {
-                                let rect = dialog_kit::button(
+                                let rect = dialog_kit::button_row::right_clipped(
                                     buf,
-                                    right - w,
+                                    right,
                                     y,
+                                    right.saturating_sub(x0),
+                                    8,
                                     label,
                                     ButtonState::Normal {
-                                        hovered: hover == Some(Hit::ThreadReply(i)),
+                                        hovered: hover == Some(Hit::ThreadResolve(i)),
                                         focused: false,
                                     },
                                 );
-                                hits.push((rect, Hit::ThreadReply(i)));
+                                hits.push((rect, Hit::ThreadResolve(i)));
                                 right = rect.x.saturating_sub(1);
                             }
+                            let label = msg::REPLY.get();
+                            let rect = dialog_kit::button_row::right_clipped(
+                                buf,
+                                right,
+                                y,
+                                right.saturating_sub(x0),
+                                8,
+                                label,
+                                ButtonState::Normal {
+                                    hovered: hover == Some(Hit::ThreadReply(i)),
+                                    focused: false,
+                                },
+                            );
+                            hits.push((rect, Hit::ThreadReply(i)));
+                            right = rect.x.saturating_sub(1);
                         }
                         let glyph = crate::fold_mark::glyph(folded);
                         let fold = dialog_kit::put(
@@ -631,21 +629,20 @@ impl ReviewView {
                                 (msg::DELETE.get(), Hit::PendingDelete(i)),
                                 (msg::EDIT.get(), Hit::PendingEdit(i)),
                             ] {
-                                let w = dialog_kit::button_width(label);
-                                if right.saturating_sub(x0) > w + 8 {
-                                    let rect = dialog_kit::button(
-                                        buf,
-                                        right - w,
-                                        y,
-                                        label,
-                                        ButtonState::Normal {
-                                            hovered: hover == Some(hit),
-                                            focused: false,
-                                        },
-                                    );
-                                    hits.push((rect, hit));
-                                    right = rect.x.saturating_sub(1);
-                                }
+                                let rect = dialog_kit::button_row::right_clipped(
+                                    buf,
+                                    right,
+                                    y,
+                                    right.saturating_sub(x0),
+                                    8,
+                                    label,
+                                    ButtonState::Normal {
+                                        hovered: hover == Some(hit),
+                                        focused: false,
+                                    },
+                                );
+                                hits.push((rect, hit));
+                                right = rect.x.saturating_sub(1);
                             }
                         }
                         dialog_kit::put(
@@ -687,21 +684,20 @@ impl ReviewView {
                                 (ai_msg::EDIT_ACCEPT.get(), Hit::GhostEdit(i)),
                                 (ai_msg::ACCEPT.get(), Hit::GhostAccept(i)),
                             ] {
-                                let w = dialog_kit::button_width(label);
-                                if right.saturating_sub(x0) > w + 8 {
-                                    let rect = dialog_kit::button(
-                                        buf,
-                                        right - w,
-                                        y,
-                                        label,
-                                        ButtonState::Normal {
-                                            hovered: hover == Some(hit),
-                                            focused: false,
-                                        },
-                                    );
-                                    hits.push((rect, hit));
-                                    right = rect.x.saturating_sub(1);
-                                }
+                                let rect = dialog_kit::button_row::right_clipped(
+                                    buf,
+                                    right,
+                                    y,
+                                    right.saturating_sub(x0),
+                                    8,
+                                    label,
+                                    ButtonState::Normal {
+                                        hovered: hover == Some(hit),
+                                        focused: false,
+                                    },
+                                );
+                                hits.push((rect, hit));
+                                right = rect.x.saturating_sub(1);
                             }
                         }
                         dialog_kit::put(

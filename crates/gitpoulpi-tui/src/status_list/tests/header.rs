@@ -250,8 +250,11 @@ fn the_header_has_a_red_trash_far_left_and_an_explain_sparkle_far_right() {
         .iter()
         .all(|(_, t)| *t != HitTarget::StatusExplainButton));
     assert_eq!(off_hits.len(), 1);
-    // Too narrow for the title plus Explain: only the trash.
+    // Narrow: the Explain icon keeps its place (the title is clipped before
+    // it), and only a pane with no room beside the trash loses it.
     let (_, hits) = paint_header(30, true);
+    assert_eq!(hits.len(), 2);
+    let (_, hits) = paint_header(16, true);
     assert_eq!(hits.len(), 1);
 }
 

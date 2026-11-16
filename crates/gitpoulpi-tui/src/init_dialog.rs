@@ -293,6 +293,7 @@ impl InitDialog {
             rect.height.saturating_sub(2),
         );
         if inner.width < 30 || inner.height < 8 {
+            dialog_kit::too_small::note(buf, rect);
             self.hits = hits;
             return;
         }
@@ -441,34 +442,37 @@ impl InitDialog {
         } else {
             msg::dialog::CREATE.get()
         };
-        let create_w = dialog_kit::button_width(create_label);
-        let cancel_w = dialog_kit::button_width(msg::dialog::CANCEL.get());
-        let create_x = inner.right().saturating_sub(create_w);
-        let cancel_x = create_x.saturating_sub(cancel_w + 1);
-        let cancel = dialog_kit::button(
+        // Right-aligned; a narrow dialog clips the labels, never drops one.
+        let [cancel, create] = dialog_kit::button_row::paint(
             buf,
-            cancel_x,
+            inner.right(),
             footer,
-            msg::dialog::CANCEL.get(),
-            ButtonState::Normal {
-                hovered: self.hover == Some(InitFocus::Cancel),
-                focused: self.focus == InitFocus::Cancel,
-            },
-        );
-        let create = dialog_kit::button(
-            buf,
-            create_x,
-            footer,
-            create_label,
-            if plan.is_err() || self.busy {
-                ButtonState::Disabled
-            } else {
-                ButtonState::Primary {
-                    hovered: self.hover == Some(InitFocus::Create),
-                    focused: self.focus == InitFocus::Create,
-                }
-            },
-        );
+            inner.width,
+            0,
+            &[
+                dialog_kit::button_row::Btn {
+                    label: msg::dialog::CANCEL.get(),
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(InitFocus::Cancel),
+                        focused: self.focus == InitFocus::Cancel,
+                    },
+                },
+                dialog_kit::button_row::Btn {
+                    label: create_label,
+                    state: if plan.is_err() || self.busy {
+                        ButtonState::Disabled
+                    } else {
+                        ButtonState::Primary {
+                            hovered: self.hover == Some(InitFocus::Create),
+                            focused: self.focus == InitFocus::Create,
+                        }
+                    },
+                },
+            ],
+        )[..] else {
+            unreachable!("two buttons in, two rects out")
+        };
+        let cancel_x = cancel.x;
         hits.insert(0, (cancel, InitFocus::Cancel));
         hits.insert(0, (create, InitFocus::Create));
         let browse = dialog_kit::key_label(crate::keymap::Action::DialogBrowse);
@@ -764,5 +768,27 @@ mod tests {
         let mut dialog = InitDialog::new(&abs("work"), "bad name");
         let (_, text) = draw(&mut dialog, 100, 30);
         assert!(text.contains("not a valid branch name"), "{text}");
+    }
+
+    /// Too small for the form: the frame says why (and keeps its cross),
+    /// instead of an empty box.
+    #[test]
+    fn a_window_too_small_for_the_form_says_so() {
+        let mut dialog = InitDialog::new(&abs("work"), "main");
+        let (_, text) = draw(&mut dialog, 40, 8);
+        assert!(text.contains("Window too small"), "{text}");
+        assert!(text.contains('\u{2715}'), "{text}");
+    }
+
+    /// A narrow dialog clips the button labels; neither button goes.
+    #[test]
+    fn a_narrow_dialog_keeps_both_buttons() {
+        let mut dialog = InitDialog::new(&abs("work"), "main");
+        for width in [34u16, 40, 60] {
+            let (_, _) = draw(&mut dialog, width, 30);
+            let hits: Vec<_> = dialog.hits.iter().map(|(_, h)| *h).collect();
+            assert!(hits.contains(&InitFocus::Cancel), "{width}: {hits:?}");
+            assert!(hits.contains(&InitFocus::Create), "{width}: {hits:?}");
+        }
     }
 }

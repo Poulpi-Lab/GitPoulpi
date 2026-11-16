@@ -1097,6 +1097,8 @@ hint_clear_field = "清空字段"
 hint_create = "创建"
 hint_open = "打开"
 hint_toggle = "切换"
+# context: one line in the minimal frame a dialog shows when the window is too small for it
+too_small = "Window too small: enlarge it"
 
 [clone]
 title = "克隆仓库"

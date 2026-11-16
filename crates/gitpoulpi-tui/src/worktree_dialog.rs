@@ -1059,6 +1059,7 @@ impl WorktreeDialog {
             rect.height.saturating_sub(2),
         );
         if inner.width < 30 || inner.height < 8 {
+            dialog_kit::too_small::note(buf, rect);
             self.hits = hits;
             return;
         }
@@ -1387,31 +1388,35 @@ impl WorktreeDialog {
         }
 
         let footer = bottom.saturating_sub(1);
-        let create_w = dialog_kit::button_width(msg::dialog::CREATE.get());
-        let cancel_w = dialog_kit::button_width(msg::dialog::CANCEL.get());
-        let create_x = inner.right().saturating_sub(create_w);
-        let cancel_x = create_x.saturating_sub(cancel_w + 1);
-        let cancel = dialog_kit::button(
+        // Right-aligned; a narrow dialog clips the labels, never drops one.
+        use dialog_kit::button_row::Btn;
+        let [cancel, create] = dialog_kit::button_row::paint(
             buf,
-            cancel_x,
+            inner.right(),
             footer,
-            msg::dialog::CANCEL.get(),
-            normal(WtFocus::Cancel, self.hover, self.focus),
-        );
-        let create = dialog_kit::button(
-            buf,
-            create_x,
-            footer,
-            msg::dialog::CREATE.get(),
-            if plan.is_err() {
-                ButtonState::Disabled
-            } else {
-                ButtonState::Primary {
-                    hovered: self.hover == Some(WtFocus::Create),
-                    focused: self.focus == WtFocus::Create,
-                }
-            },
-        );
+            inner.width,
+            0,
+            &[
+                Btn {
+                    label: msg::dialog::CANCEL.get(),
+                    state: normal(WtFocus::Cancel, self.hover, self.focus),
+                },
+                Btn {
+                    label: msg::dialog::CREATE.get(),
+                    state: if plan.is_err() {
+                        ButtonState::Disabled
+                    } else {
+                        ButtonState::Primary {
+                            hovered: self.hover == Some(WtFocus::Create),
+                            focused: self.focus == WtFocus::Create,
+                        }
+                    },
+                },
+            ],
+        )[..] else {
+            unreachable!("two buttons in, two rects out")
+        };
+        let cancel_x = cancel.x;
         hits.insert(0, (cancel, WtFocus::Cancel));
         hits.insert(0, (create, WtFocus::Create));
         let browse = dialog_kit::key_label(crate::keymap::Action::DialogBrowse);

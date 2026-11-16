@@ -200,6 +200,12 @@ pub(crate) fn render(frame: &mut Frame) {
     let rows = open.rows() as u16;
     let height = rows + 5;
     if width < 36 || area.height < height + 2 {
+        open.outer = dialog_kit::too_small::paint_closable(
+            frame.buffer_mut(),
+            area,
+            msg::POPUP_TITLE.get(),
+            &mut open.close,
+        );
         return;
     }
     let outer = WIN.place(

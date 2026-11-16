@@ -201,3 +201,21 @@ fn a_tag_only_here_keeps_the_plain_confirm_and_a_remote_only_one_goes_to_its_rem
         PendingDestructive::DeleteRemoteTag { .. }
     ));
 }
+
+/// A window too small for the dialog: its frame says so and still closes with
+/// Esc (it was an invisible modal that ate the keys).
+#[test]
+fn a_window_too_small_says_so_and_esc_still_closes() {
+    let _serial = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    install_one(true, &["origin"]);
+    let mut mode = InputMode::Normal;
+    let mut message = None;
+    begin("v1", false, &mut mode, &mut message);
+    let mut terminal = Terminal::new(TestBackend::new(40, 10)).unwrap();
+    terminal.draw(render).unwrap();
+    let text = crate::dialog_kit::buffer_text(terminal.backend().buffer());
+    assert!(text.contains("Window too small"), "{text}");
+    assert!(text.contains('\u{2715}'), "{text}");
+    on_key(key(KeyCode::Esc));
+    assert!(!is_open());
+}

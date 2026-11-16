@@ -149,3 +149,16 @@ fn the_cross_closes_the_popup_and_an_outside_click_too() {
     assert_eq!(on_mouse(click(cross.x + 1, cross.y)), None);
     assert!(!is_open());
 }
+
+#[test]
+fn a_window_too_small_says_so_and_esc_still_closes() {
+    let _serial = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    open(&graph(), oid(3), &[oid(1), oid(2)]);
+    let mut terminal = Terminal::new(TestBackend::new(30, 6)).unwrap();
+    terminal.draw(render).unwrap();
+    let text = crate::dialog_kit::buffer_text(terminal.backend().buffer());
+    assert!(text.contains("Window too small"), "{text}");
+    assert!(text.contains('\u{2715}'), "{text}");
+    assert_eq!(on_key(key(KeyCode::Esc)), None);
+    assert!(!is_open());
+}

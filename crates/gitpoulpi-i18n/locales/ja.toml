@@ -1098,6 +1098,8 @@ hint_clear_field = "入力を消去"
 hint_create = "作成"
 hint_open = "開く"
 hint_toggle = "切り替え"
+# context: one line in the minimal frame a dialog shows when the window is too small for it
+too_small = "Window too small: enlarge it"
 
 [clone]
 title = "リポジトリをクローン"

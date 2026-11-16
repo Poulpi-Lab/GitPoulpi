@@ -60,6 +60,7 @@ impl IssueFlowDialog {
             rect.height.saturating_sub(2),
         );
         if inner.width < 30 || inner.height < 7 {
+            dialog_kit::too_small::note(buf, rect);
             self.hits = hits;
             return;
         }
@@ -306,26 +307,37 @@ impl IssueFlowDialog {
                 Style::default().fg(th().status.warning).bg(panel_bg),
             );
         }
-        let mut right = inner.right();
-        let mut place = |label: &str, focus_of: Focus, primary: bool, hits: &mut Vec<_>| {
-            let w = dialog_kit::button_width(label);
-            right = right.saturating_sub(w);
+        // Right-aligned; a narrow dialog clips the labels, never drops one.
+        use dialog_kit::button_row::Btn;
+        let state_of = |focus_of: Focus, primary: bool| {
             let focused = self.focus == focus_of;
             let hovered = self.hover == Some(focus_of);
-            let state = if primary {
+            if primary {
                 ButtonState::Primary { hovered, focused }
             } else {
                 ButtonState::Normal { hovered, focused }
-            };
-            let r = dialog_kit::button(buf, right, buttons_y, label, state);
-            hits.push((r, focus_of));
-            right = right.saturating_sub(1);
+            }
         };
+        let mut items: Vec<Btn> = Vec::new();
+        let mut focuses: Vec<Focus> = Vec::new();
         if let Some(label) = self.secondary_label() {
-            place(label, Focus::Secondary, false, &mut hits);
+            items.push(Btn {
+                label,
+                state: state_of(Focus::Secondary, false),
+            });
+            focuses.push(Focus::Secondary);
         }
         if let Some(label) = self.primary_label() {
-            place(label, Focus::Primary, true, &mut hits);
+            items.push(Btn {
+                label,
+                state: state_of(Focus::Primary, true),
+            });
+            focuses.push(Focus::Primary);
+        }
+        let rects =
+            dialog_kit::button_row::paint(buf, inner.right(), buttons_y, inner.width, 0, &items);
+        for (r, focus_of) in rects.into_iter().zip(focuses) {
+            hits.push((r, focus_of));
         }
         self.hits = hits;
         if popups {

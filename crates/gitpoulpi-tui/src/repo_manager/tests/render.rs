@@ -257,3 +257,45 @@ fn paths_are_shortened_and_never_push_the_name_out() {
         }
     }
 }
+
+/// Nothing vanishes when the window narrows: the row buttons degrade (Open +
+/// Close + menu, then Open + menu, then the menu alone), and every row keeps
+/// its menu button down to the narrowest width.
+#[test]
+fn the_row_buttons_degrade_but_the_menu_button_never_goes() {
+    let mut seen_counts = std::collections::BTreeSet::new();
+    for width in [140u16, 70, 56, 44, 34] {
+        let mut m = manager();
+        let area = Rect::new(0, 1, width, 30);
+        let render = render(&mut m, area);
+        let menus = render
+            .hits
+            .iter()
+            .filter(|(_, h)| matches!(h, ManagerHit::RowMenu(_)))
+            .count();
+        let opens = render
+            .hits
+            .iter()
+            .filter(|(_, h)| matches!(h, ManagerHit::RowOpen(_)))
+            .count();
+        let closes = render
+            .hits
+            .iter()
+            .filter(|(_, h)| matches!(h, ManagerHit::RowClose(_)))
+            .count();
+        assert!(menus > 0, "no menu button at {width} columns");
+        let rows = render
+            .hits
+            .iter()
+            .filter(|(_, h)| matches!(h, ManagerHit::Row(_)))
+            .count();
+        assert_eq!(menus, rows, "a row lost its menu button at {width}");
+        // A dropped button is a tier, never a half button.
+        assert!(closes <= opens || opens == 0, "{width}: {opens} {closes}");
+        seen_counts.insert((opens > 0, closes > 0));
+    }
+    assert!(
+        seen_counts.len() >= 2,
+        "the buttons never degraded: {seen_counts:?}"
+    );
+}

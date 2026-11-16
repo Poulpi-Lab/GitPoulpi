@@ -136,6 +136,12 @@ pub(crate) fn render(frame: &mut Frame) {
     let area = frame.area();
     let width = 64u16.min(area.width.saturating_sub(4));
     if width < 16 || area.height < 8 {
+        dialog_kit::too_small::paint_closable(
+            frame.buffer_mut(),
+            area,
+            msg::TITLE.get(),
+            &mut open.close,
+        );
         return;
     }
     let outer = Rect::new(

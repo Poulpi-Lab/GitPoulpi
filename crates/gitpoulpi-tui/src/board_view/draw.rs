@@ -204,70 +204,70 @@ impl BoardView {
         dialog_kit::put(buf, inner.x, inner.y, &text, inner.width, muted());
     }
 
-    /// The filter dropdowns, the text filter and the buttons.
+    /// The filter dropdowns, the text filter and the buttons. When the row is
+    /// narrow every part degrades (clipped labels, narrower dropdowns and
+    /// search field) and none is dropped.
     fn toolbar(&mut self, buf: &mut Buffer, row: Rect, hits: &mut Vec<(Rect, Hit)>) {
-        // Buttons from the right: Refresh, Columns (a label board), New.
-        let mut right = row.right();
-        let mut button = |buf: &mut Buffer, label: &str, hit: Hit, hot: bool, right: &mut u16| {
-            let w = dialog_kit::button_width(label);
-            if right.saturating_sub(row.x) < w + 40 {
-                return;
-            }
-            *right -= w;
-            let rect = dialog_kit::button(
-                buf,
-                *right,
-                row.y,
+        // Buttons from the right: Refresh, Columns (a label board), New; in
+        // screen order New, Columns, Refresh.
+        let mut buttons: Vec<(&str, Hit)> = vec![(msg::NEW.get(), Hit::New)];
+        if self.label_columns() {
+            buttons.push((msg::COLUMNS.get(), Hit::Columns));
+        }
+        buttons.push((msg::REFRESH.get(), Hit::Refresh));
+        let items: Vec<dialog_kit::button_row::Btn> = buttons
+            .iter()
+            .map(|(label, hit)| dialog_kit::button_row::Btn {
                 label,
-                ButtonState::Normal {
-                    hovered: hot,
+                state: ButtonState::Normal {
+                    hovered: self.hovered(*hit),
                     focused: false,
                 },
-            );
-            hits.push((rect, hit));
-            *right -= 1;
-        };
-        button(
-            buf,
-            msg::REFRESH.get(),
-            Hit::Refresh,
-            self.hovered(Hit::Refresh),
-            &mut right,
-        );
-        if self.label_columns() {
-            button(
-                buf,
-                msg::COLUMNS.get(),
-                Hit::Columns,
-                self.hovered(Hit::Columns),
-                &mut right,
-            );
+            })
+            .collect();
+        // The filters keep 40 columns when there is room, and at least 30
+        // when there is not (the labels of the buttons are clipped instead).
+        let full: u16 = items
+            .iter()
+            .map(|b| crate::display_width(b.label) as u16 + 3)
+            .sum();
+        let btn_room = full.min(row.width.saturating_sub(30));
+        let rects = dialog_kit::button_row::paint(buf, row.right(), row.y, btn_room, 0, &items);
+        let right = rects.first().map_or(row.right(), |r| r.x.saturating_sub(1));
+        for (rect, (_, hit)) in rects.into_iter().zip(&buttons) {
+            hits.push((rect, *hit));
         }
-        button(
-            buf,
-            msg::NEW.get(),
-            Hit::New,
-            self.hovered(Hit::New),
-            &mut right,
-        );
 
         let room = right.saturating_sub(row.x);
-        let combo_w = ((room.saturating_sub(24)) / 3).clamp(14, 24);
+        // Dropdowns at their usual size when there is room; else each takes
+        // an equal share of what the search field (10) leaves, never fewer
+        // than 5 cells.
+        let usual = (room.saturating_sub(24) / 3).clamp(14, 24);
+        let fits = (room.saturating_sub(11) / 3).saturating_sub(1);
+        let combo_w = usual.min(fits).max(5);
         let mut x = row.x;
         for kind in FilterKind::ALL {
-            if x + combo_w > right {
+            let w = combo_w.min(right.saturating_sub(x));
+            if w == 0 {
                 break;
             }
-            let rect = Rect::new(x, row.y, combo_w, 1);
+            let rect = Rect::new(x, row.y, w, 1);
             let hot = self.hovered(Hit::Filter(kind));
             let combo = &mut self.combos[kind.index()];
             combo.render_field(buf, rect, false, hot);
             hits.push((rect, Hit::Filter(kind)));
-            x += combo_w + 1;
+            x += w + 1;
         }
-        // The text filter takes what is left (up to 26 cells).
-        let search_w = right.saturating_sub(x).min(26);
-        if search_w >= 10 {
+        // The text filter takes what is left (up to 26 cells); with a filter
+        // set, Clear keeps its place after it.
+        let clear_w = dialog_kit::button_width(msg::CLEAR.get());
+        let reserve = if self.filter.is_empty() {
+            0
+        } else {
+            clear_w + 1
+        };
+        let search_w = right.saturating_sub(x + reserve).min(26);
+        if search_w >= 6 {
             let rect = Rect::new(x, row.y, search_w, 1);
             dialog_kit::text_input(
                 buf,
@@ -280,21 +280,22 @@ impl BoardView {
             );
             hits.push((rect, Hit::Search));
             x += search_w + 1;
-            if !self.filter.is_empty()
-                && right.saturating_sub(x) >= dialog_kit::button_width(msg::CLEAR.get())
-            {
-                let rect = dialog_kit::button(
-                    buf,
-                    x,
-                    row.y,
-                    msg::CLEAR.get(),
-                    ButtonState::Normal {
-                        hovered: self.hovered(Hit::ClearFilters),
-                        focused: false,
-                    },
-                );
-                hits.push((rect, Hit::ClearFilters));
-            }
+        }
+        if !self.filter.is_empty() {
+            let clear_room = right.saturating_sub(x);
+            let rect = dialog_kit::button_row::right_clipped(
+                buf,
+                x + clear_room.min(clear_w),
+                row.y,
+                clear_room,
+                0,
+                msg::CLEAR.get(),
+                ButtonState::Normal {
+                    hovered: self.hovered(Hit::ClearFilters),
+                    focused: false,
+                },
+            );
+            hits.push((rect, Hit::ClearFilters));
         }
     }
 

@@ -162,6 +162,16 @@ pub(super) fn render(frame: &mut Frame) {
     };
     let area = frame.area();
     if area.width < 30 || area.height < 10 {
+        let outer = dialog_kit::too_small::paint_closable(
+            frame.buffer_mut(),
+            area,
+            msg::VIEW_TITLE.get(),
+            &mut view.cross,
+        );
+        view.rects = Rects {
+            outer,
+            ..Rects::default()
+        };
         return;
     }
     let outer = WIN.place(

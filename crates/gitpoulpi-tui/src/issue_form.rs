@@ -739,6 +739,7 @@ impl IssueDialog {
             rect.height.saturating_sub(2),
         );
         if inner.width < 30 || inner.height < 12 {
+            dialog_kit::too_small::note(buf, rect);
             self.hits = hits;
             return;
         }
@@ -960,36 +961,40 @@ impl IssueDialog {
         }
 
         let button_y = bottom.saturating_sub(1);
-        let cancel_w = dialog_kit::button_width(msg::issue_form::CANCEL.get());
         let create_label = msg::issue_form::CREATE.get();
-        let create_w = dialog_kit::button_width(create_label);
-        let create_x = inner.right().saturating_sub(create_w);
-        let cancel_x = create_x.saturating_sub(cancel_w + 1);
-        let cancel = dialog_kit::button(
+        // Right-aligned; a narrow form clips the labels, never drops one.
+        use dialog_kit::button_row::Btn;
+        let [cancel, create] = dialog_kit::button_row::paint(
             buf,
-            cancel_x,
+            inner.right(),
             button_y,
-            msg::issue_form::CANCEL.get(),
-            ButtonState::Normal {
-                hovered: self.hover == Some(IssueHit::Part(IssueFocus::Cancel)),
-                focused: self.focus == IssueFocus::Cancel,
-            },
-        );
+            inner.width,
+            0,
+            &[
+                Btn {
+                    label: msg::issue_form::CANCEL.get(),
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(IssueHit::Part(IssueFocus::Cancel)),
+                        focused: self.focus == IssueFocus::Cancel,
+                    },
+                },
+                Btn {
+                    label: create_label,
+                    state: if self.busy || self.plan().is_err() {
+                        ButtonState::Disabled
+                    } else {
+                        ButtonState::Primary {
+                            hovered: self.hover == Some(IssueHit::Part(IssueFocus::Create)),
+                            focused: self.focus == IssueFocus::Create,
+                        }
+                    },
+                },
+            ],
+        )[..] else {
+            unreachable!("two buttons in, two rects out")
+        };
+        let cancel_x = cancel.x;
         hits.push((cancel, IssueHit::Part(IssueFocus::Cancel)));
-        let create = dialog_kit::button(
-            buf,
-            create_x,
-            button_y,
-            create_label,
-            if self.busy || self.plan().is_err() {
-                ButtonState::Disabled
-            } else {
-                ButtonState::Primary {
-                    hovered: self.hover == Some(IssueHit::Part(IssueFocus::Create)),
-                    focused: self.focus == IssueFocus::Create,
-                }
-            },
-        );
         hits.push((create, IssueHit::Part(IssueFocus::Create)));
         let create_key = dialog_kit::key_label(Bind::DialogSubmit);
         let web_key = dialog_kit::key_label(Bind::DialogWeb);

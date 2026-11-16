@@ -213,31 +213,40 @@ impl ReviewView {
                         ai_msg::AI_TITLE.get(),
                         ai_msg::suggestions_heading(*n as u64)
                     );
-                    let used = dialog_kit::put(buf, x, y, &title, max, ai);
+                    // The buttons first (clipped, never dropped, at most half the
+                    // row), then the title in what is left.
+                    let mut title_room = max;
                     if *n > 0 {
-                        // Right to left: Dismiss all, Accept all.
-                        let mut right = x + max;
-                        for (label, hit) in [
-                            (ai_msg::DISMISS_ALL.get(), Hit::SugDismissAll),
+                        let both = [
                             (ai_msg::ACCEPT_ALL.get(), Hit::SugAcceptAll),
-                        ] {
-                            let w = dialog_kit::button_width(label);
-                            if right.saturating_sub(used.right()) > w + 1 {
-                                let rect = dialog_kit::button(
-                                    buf,
-                                    right - w,
-                                    y,
-                                    label,
-                                    ButtonState::Normal {
-                                        hovered: self.hover == Some(hit),
-                                        focused: false,
-                                    },
-                                );
-                                hits.push((rect, hit));
-                                right = rect.x.saturating_sub(1);
-                            }
+                            (ai_msg::DISMISS_ALL.get(), Hit::SugDismissAll),
+                        ];
+                        let items: Vec<dialog_kit::button_row::Btn> = both
+                            .iter()
+                            .map(|(label, hit)| dialog_kit::button_row::Btn {
+                                label,
+                                state: ButtonState::Normal {
+                                    hovered: self.hover == Some(*hit),
+                                    focused: false,
+                                },
+                            })
+                            .collect();
+                        let rects = dialog_kit::button_row::paint(
+                            buf,
+                            x + max,
+                            y,
+                            (max / 2).max(10).min(max),
+                            0,
+                            &items,
+                        );
+                        if let Some(first) = rects.first() {
+                            title_room = first.x.saturating_sub(x + 1);
+                        }
+                        for (rect, (_, hit)) in rects.into_iter().zip(both) {
+                            hits.push((rect, hit));
                         }
                     }
+                    dialog_kit::put(buf, x, y, &title, title_room, ai);
                 }
                 L::DraftHeading(stale) => {
                     let ai = Style::default()
@@ -286,8 +295,9 @@ impl ReviewView {
                             .bg(color)
                             .add_modifier(Modifier::BOLD),
                     );
-                    let mut bx = chip.right() + 2;
-                    for (label, hit, primary) in [
+                    let bx = chip.right() + 2;
+                    // Clipped when the row is narrow, never dropped.
+                    let draft = [
                         (
                             format!("{} {}", crate::theme::AI_SPARK, ai_msg::USE_DRAFT.get()),
                             Hit::UseDraft,
@@ -299,53 +309,75 @@ impl ReviewView {
                             Hit::DiscardDraft,
                             false,
                         ),
-                    ] {
-                        let w = dialog_kit::button_width(&label);
-                        if bx + w > x + max {
-                            break;
-                        }
-                        let hovered = self.hover == Some(hit);
-                        let state = if primary {
-                            ButtonState::Primary {
-                                hovered,
-                                focused: false,
+                    ];
+                    let items: Vec<dialog_kit::button_row::Btn> = draft
+                        .iter()
+                        .map(|(label, hit, primary)| {
+                            let hovered = self.hover == Some(*hit);
+                            dialog_kit::button_row::Btn {
+                                label,
+                                state: if *primary {
+                                    ButtonState::Primary {
+                                        hovered,
+                                        focused: false,
+                                    }
+                                } else {
+                                    ButtonState::Normal {
+                                        hovered,
+                                        focused: false,
+                                    }
+                                },
                             }
-                        } else {
-                            ButtonState::Normal {
-                                hovered,
-                                focused: false,
-                            }
-                        };
-                        let rect = dialog_kit::button(buf, bx, y, &label, state);
-                        hits.push((rect, hit));
-                        bx = rect.right() + 1;
+                        })
+                        .collect();
+                    let rects = dialog_kit::button_row::paint_left(
+                        buf,
+                        bx,
+                        y,
+                        (x + max).saturating_sub(bx),
+                        1,
+                        &items,
+                    );
+                    for (rect, (_, hit, _)) in rects.into_iter().zip(&draft) {
+                        hits.push((rect, *hit));
                     }
                 }
                 L::Sug(n) => {
                     let Some(item) = self.sug.items.get(*n) else {
                         continue;
                     };
-                    let mut right = x + max;
-                    for (label, hit) in [
-                        (ai_msg::DISMISS.get(), Hit::SugDismiss(*n)),
-                        (ai_msg::EDIT_ACCEPT.get(), Hit::SugEdit(*n)),
+                    // Left to right: Accept, Edit, Dismiss; the labels are clipped
+                    // (never a button dropped) when the row is narrow, and the
+                    // text keeps what is left.
+                    let acts = [
                         (ai_msg::ACCEPT.get(), Hit::SugAccept(*n)),
-                    ] {
-                        let w = dialog_kit::button_width(label);
-                        if right.saturating_sub(x) > w + 20 {
-                            let rect = dialog_kit::button(
-                                buf,
-                                right - w,
-                                y,
-                                label,
-                                ButtonState::Normal {
-                                    hovered: self.hover == Some(hit),
-                                    focused: false,
-                                },
-                            );
-                            hits.push((rect, hit));
-                            right = rect.x.saturating_sub(1);
-                        }
+                        (ai_msg::EDIT_ACCEPT.get(), Hit::SugEdit(*n)),
+                        (ai_msg::DISMISS.get(), Hit::SugDismiss(*n)),
+                    ];
+                    let items: Vec<dialog_kit::button_row::Btn> = acts
+                        .iter()
+                        .map(|(label, hit)| dialog_kit::button_row::Btn {
+                            label,
+                            state: ButtonState::Normal {
+                                hovered: self.hover == Some(*hit),
+                                focused: false,
+                            },
+                        })
+                        .collect();
+                    let rects = dialog_kit::button_row::paint(
+                        buf,
+                        x + max,
+                        y,
+                        max.saturating_sub(20).max(max / 2),
+                        0,
+                        &items,
+                    );
+                    let mut right = x + max;
+                    if let Some(first) = rects.first() {
+                        right = first.x.saturating_sub(1);
+                    }
+                    for (rect, (_, hit)) in rects.into_iter().zip(acts) {
+                        hits.push((rect, hit));
                     }
                     let place = if item.line > 0 {
                         format!("{}:{}", item.path, item.line)

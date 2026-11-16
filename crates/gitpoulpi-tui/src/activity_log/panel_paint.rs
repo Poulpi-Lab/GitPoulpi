@@ -161,6 +161,23 @@ pub(crate) fn render(frame: &mut Frame) {
     }
     let area = frame.area();
     if area.width < 40 || area.height < 12 {
+        // Too small for the window: a minimal frame (title, cross, why), so
+        // the keys it still answers to are not invisible.
+        let frame_rect = dialog_kit::too_small::rect_in(area);
+        let spot = Rect::new(frame_rect.right().saturating_sub(5), frame_rect.y, 3, 1);
+        let hovered = with(|s| s.pointer).is_some_and(|(x, y)| spot.contains((x, y).into()));
+        let close =
+            dialog_kit::too_small::paint(frame.buffer_mut(), area, msg::TITLE.get(), hovered)
+                .unwrap_or_default();
+        with(|s| {
+            s.window = frame_rect;
+            s.close = close;
+            s.list = Rect::default();
+            s.body = Rect::default();
+            s.hbody = Rect::default();
+            s.lines = 0;
+            s.hits.clear();
+        });
         return;
     }
     let want_w = area.width.saturating_sub(4).min(120);

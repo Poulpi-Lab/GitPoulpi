@@ -1100,6 +1100,8 @@ hint_clear_field = "очистить поле"
 hint_create = "создать"
 hint_open = "открыть"
 hint_toggle = "переключить"
+# context: one line in the minimal frame a dialog shows when the window is too small for it
+too_small = "Window too small: enlarge it"
 
 [clone]
 title = "Клонировать репозиторий"

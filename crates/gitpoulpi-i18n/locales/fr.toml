@@ -1102,6 +1102,8 @@ hint_clear_field = "effacer le champ"
 hint_create = "créer"
 hint_open = "ouvrir"
 hint_toggle = "cocher"
+# context: one line in the minimal frame a dialog shows when the window is too small for it
+too_small = "Fenêtre trop petite : agrandissez-la"
 
 [clone]
 title = "Cloner un dépôt"

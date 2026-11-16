@@ -269,55 +269,66 @@ impl ItemView {
     }
 
     fn bar_line(&mut self, buf: &mut Buffer, row: Rect) {
-        let mut x = row.x;
         let focused = |b: Bar| self.focus == Focus::Bar(b);
         let hovered = |b: Bar| self.hover == Some(Hit::Bar(b));
         let mut hits: Vec<(Rect, Hit)> = Vec::new();
-        for bar in Bar::ALL {
-            let state = ButtonState::Normal {
-                hovered: hovered(bar),
-                focused: focused(bar),
-            };
-            match bar {
-                Bar::Back => {
-                    let state = if self.stack.is_empty() {
-                        ButtonState::Disabled
-                    } else {
-                        state
-                    };
-                    let r = dialog_kit::button(buf, x, row.y, m::BTN_BACK.get(), state);
-                    hits.push((r, Hit::Bar(bar)));
-                    x = r.right() + 1;
-                }
-                Bar::Refresh => {
-                    let r = dialog_kit::button(buf, x, row.y, m::BTN_REFRESH.get(), state);
-                    hits.push((r, Hit::Bar(bar)));
-                    x = r.right() + 1;
-                }
-                Bar::Browser => {
-                    let r = dialog_kit::button(buf, x, row.y, m::BTN_BROWSER.get(), state);
-                    hits.push((r, Hit::Bar(bar)));
-                    x = r.right() + 2;
-                }
-                Bar::Events => {
-                    if self.conv.caps.as_ref().is_some_and(|c| c.events) {
-                        let r = dialog_kit::checkbox(
-                            buf,
-                            x,
-                            row.y,
-                            row.right().saturating_sub(x),
-                            m::SHOW_EVENTS.get(),
-                            self.conv.events,
-                            CheckState::Enabled {
-                                hovered: hovered(bar),
-                                focused: focused(bar),
-                            },
-                        );
-                        crate::pointer_map::hand(r);
-                        hits.push((r, Hit::Bar(bar)));
-                    }
-                }
-            }
+        let state_of = |b: Bar| ButtonState::Normal {
+            hovered: hovered(b),
+            focused: focused(b),
+        };
+        let events = self.conv.caps.as_ref().is_some_and(|c| c.events);
+        // The checkbox keeps at least its box and a few letters; the buttons
+        // clip their labels to the rest (never dropped, however narrow).
+        let events_room = if events {
+            (crate::display_width(m::SHOW_EVENTS.get()) as u16 + 4).min(8) + 2
+        } else {
+            0
+        };
+        let items = [
+            dialog_kit::button_row::Btn {
+                label: m::BTN_BACK.get(),
+                state: if self.stack.is_empty() {
+                    ButtonState::Disabled
+                } else {
+                    state_of(Bar::Back)
+                },
+            },
+            dialog_kit::button_row::Btn {
+                label: m::BTN_REFRESH.get(),
+                state: state_of(Bar::Refresh),
+            },
+            dialog_kit::button_row::Btn {
+                label: m::BTN_BROWSER.get(),
+                state: state_of(Bar::Browser),
+            },
+        ];
+        let rects = dialog_kit::button_row::paint_left(
+            buf,
+            row.x,
+            row.y,
+            row.width.saturating_sub(events_room),
+            1,
+            &items,
+        );
+        for (rect, bar) in rects.iter().zip([Bar::Back, Bar::Refresh, Bar::Browser]) {
+            hits.push((*rect, Hit::Bar(bar)));
+        }
+        if events {
+            let x = rects.last().map_or(row.x, |r| r.right() + 2);
+            let r = dialog_kit::checkbox(
+                buf,
+                x,
+                row.y,
+                row.right().saturating_sub(x),
+                m::SHOW_EVENTS.get(),
+                self.conv.events,
+                CheckState::Enabled {
+                    hovered: hovered(Bar::Events),
+                    focused: focused(Bar::Events),
+                },
+            );
+            crate::pointer_map::hand(r);
+            hits.push((r, Hit::Bar(Bar::Events)));
         }
         self.hits.extend(hits);
     }

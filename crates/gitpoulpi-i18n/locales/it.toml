@@ -1097,6 +1097,8 @@ hint_clear_field = "svuota campo"
 hint_create = "crea"
 hint_open = "apri"
 hint_toggle = "attiva/disattiva"
+# context: one line in the minimal frame a dialog shows when the window is too small for it
+too_small = "Window too small: enlarge it"
 
 [clone]
 title = "Clona un repository"

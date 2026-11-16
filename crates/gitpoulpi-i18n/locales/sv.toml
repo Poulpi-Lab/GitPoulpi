@@ -1099,6 +1099,8 @@ hint_clear_field = "töm fältet"
 hint_create = "skapa"
 hint_open = "öppna"
 hint_toggle = "växla"
+# context: one line in the minimal frame a dialog shows when the window is too small for it
+too_small = "Window too small: enlarge it"
 
 [clone]
 title = "Klona ett repository"

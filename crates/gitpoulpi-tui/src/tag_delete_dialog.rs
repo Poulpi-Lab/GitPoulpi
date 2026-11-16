@@ -328,6 +328,12 @@ pub(crate) fn render(frame: &mut Frame) {
     let area = frame.area();
     let width = 72u16.min(area.width.saturating_sub(4));
     if width < 30 || area.height < 12 {
+        dialog_kit::too_small::paint_closable(
+            frame.buffer_mut(),
+            area,
+            msg::DLG_TITLE.get(),
+            &mut open.close,
+        );
         return;
     }
     let inner = width.saturating_sub(4) as usize;

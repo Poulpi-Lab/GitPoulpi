@@ -355,17 +355,25 @@ impl ReviewView {
         let right_w = pending_text
             .as_ref()
             .map_or(0, |t| display_width(t) as u16 + 1);
+        // A fact that does not fit moves to the next row (never dropped).
+        let facts_y = y;
         for (text, color) in facts {
             let w = display_width(&text) as u16;
-            if x + w + right_w > inner.right() {
-                break;
+            let limit = if y == facts_y {
+                inner.right().saturating_sub(right_w)
+            } else {
+                inner.right()
+            };
+            if x + w > limit && x > inner.x {
+                y += 1;
+                x = inner.x;
             }
             dialog_kit::put(
                 buf,
                 x,
                 y,
                 &text,
-                w,
+                w.min(inner.right().saturating_sub(x)),
                 Style::default().fg(color).bg(th().ui.panel),
             );
             x += w + 2;
@@ -375,7 +383,7 @@ impl ReviewView {
             dialog_kit::put(
                 buf,
                 inner.right().saturating_sub(w),
-                y,
+                facts_y,
                 &text,
                 w,
                 Style::default()
@@ -432,6 +440,11 @@ impl ReviewView {
                 Style::default().fg(th().ui.on_button).bg(th().ui.button)
             };
             let w = (display_width(&text) as u16 + 2).min(each);
+            // A chip that does not fit moves to the next row.
+            if x > inner.x && x + w > inner.right() {
+                y += 1;
+                x = inner.x;
+            }
             let rect = dialog_kit::put(buf, x, y, &format!(" {text} "), w, style);
             if editable && rect.width > 0 {
                 hits.push((rect, Hit::Meta(field)));
@@ -441,7 +454,7 @@ impl ReviewView {
         y += 1;
 
         // Row 4: actions.
-        let mut x = inner.x;
+        let x = inner.x;
         let finish_label = if pending > 0 {
             msg::finish_with(pending as u64)
         } else {
@@ -482,24 +495,32 @@ impl ReviewView {
             ));
         }
         buttons.push((Hit::Finish, finish_label, true));
-        for (hit, label, primary) in buttons {
-            let hovered = self.hovered(hit);
-            let state = if primary {
-                ButtonState::Primary {
-                    hovered,
-                    focused: false,
+        // Wraps onto the next row when the buttons do not fit (never dropped).
+        let items: Vec<dialog_kit::button_row::Btn> = buttons
+            .iter()
+            .map(|(hit, label, primary)| {
+                let hovered = self.hovered(*hit);
+                dialog_kit::button_row::Btn {
+                    label,
+                    state: if *primary {
+                        ButtonState::Primary {
+                            hovered,
+                            focused: false,
+                        }
+                    } else {
+                        ButtonState::Normal {
+                            hovered,
+                            focused: false,
+                        }
+                    },
                 }
-            } else {
-                ButtonState::Normal {
-                    hovered,
-                    focused: false,
-                }
-            };
-            let rect = dialog_kit::button(buf, x, y, &label, state);
-            hits.push((rect, hit));
-            x = rect.right() + 1;
+            })
+            .collect();
+        let (rects, rows) = dialog_kit::button_row::flow(buf, x, y, inner.width, 1, &items);
+        for (rect, (hit, _, _)) in rects.into_iter().zip(&buttons) {
+            hits.push((rect, *hit));
         }
-        y += 1;
+        y += rows;
 
         // A rule under the header.
         for cx in inner.x..inner.right() {

@@ -1098,6 +1098,8 @@ hint_clear_field = "vymazat pole"
 hint_create = "vytvořit"
 hint_open = "otevřít"
 hint_toggle = "přepnout"
+# context: one line in the minimal frame a dialog shows when the window is too small for it
+too_small = "Window too small: enlarge it"
 
 [clone]
 title = "Klonovat repozitář"

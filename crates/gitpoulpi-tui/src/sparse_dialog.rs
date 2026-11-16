@@ -242,6 +242,7 @@ impl SparseDialog {
             rect.height.saturating_sub(2),
         );
         if inner.width < 30 || inner.height < 8 {
+            dialog_kit::too_small::note(buf, rect);
             self.hits = hits;
             return;
         }
@@ -310,50 +311,49 @@ impl SparseDialog {
         }
 
         let footer = bottom.saturating_sub(1);
-        let apply_w = dialog_kit::button_width(msg::sparse::APPLY.get());
-        let disable_w = dialog_kit::button_width(msg::sparse::DISABLE.get());
-        let cancel_w = dialog_kit::button_width(msg::dialog::CANCEL.get());
-        let apply_x = inner.right().saturating_sub(apply_w);
-        let disable_x = apply_x.saturating_sub(disable_w + 1);
-        let cancel_x = disable_x.saturating_sub(cancel_w + 1);
-        let cancel = dialog_kit::button(
+        // Right-aligned; a narrow dialog clips the labels, never drops one.
+        use dialog_kit::button_row::Btn;
+        let [cancel, disable, apply] = dialog_kit::button_row::paint(
             buf,
-            cancel_x,
+            inner.right(),
             footer,
-            msg::dialog::CANCEL.get(),
-            ButtonState::Normal {
-                hovered: self.hover == Some(SparseFocus::Cancel),
-                focused: self.focus == SparseFocus::Cancel,
-            },
-        );
-        let disable = dialog_kit::button(
-            buf,
-            disable_x,
-            footer,
-            msg::sparse::DISABLE.get(),
-            if self.state.enabled {
-                ButtonState::Normal {
-                    hovered: self.hover == Some(SparseFocus::Disable),
-                    focused: self.focus == SparseFocus::Disable,
-                }
-            } else {
-                ButtonState::Disabled
-            },
-        );
-        let apply = dialog_kit::button(
-            buf,
-            apply_x,
-            footer,
-            msg::sparse::APPLY.get(),
-            if plan.is_err() {
-                ButtonState::Disabled
-            } else {
-                ButtonState::Primary {
-                    hovered: self.hover == Some(SparseFocus::Apply),
-                    focused: self.focus == SparseFocus::Apply,
-                }
-            },
-        );
+            inner.width,
+            0,
+            &[
+                Btn {
+                    label: msg::dialog::CANCEL.get(),
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(SparseFocus::Cancel),
+                        focused: self.focus == SparseFocus::Cancel,
+                    },
+                },
+                Btn {
+                    label: msg::sparse::DISABLE.get(),
+                    state: if self.state.enabled {
+                        ButtonState::Normal {
+                            hovered: self.hover == Some(SparseFocus::Disable),
+                            focused: self.focus == SparseFocus::Disable,
+                        }
+                    } else {
+                        ButtonState::Disabled
+                    },
+                },
+                Btn {
+                    label: msg::sparse::APPLY.get(),
+                    state: if plan.is_err() {
+                        ButtonState::Disabled
+                    } else {
+                        ButtonState::Primary {
+                            hovered: self.hover == Some(SparseFocus::Apply),
+                            focused: self.focus == SparseFocus::Apply,
+                        }
+                    },
+                },
+            ],
+        )[..] else {
+            unreachable!("three buttons in, three rects out")
+        };
+        let cancel_x = cancel.x;
         hits.insert(0, (cancel, SparseFocus::Cancel));
         if self.state.enabled {
             hits.insert(0, (disable, SparseFocus::Disable));
@@ -494,5 +494,32 @@ mod tests {
             .map(|x| buf[(x, apply.y)].symbol().to_string())
             .collect();
         assert!(row.contains("Apply"), "{row:?}");
+    }
+
+    #[test]
+    fn a_window_too_small_for_the_form_says_so() {
+        let mut d = SparseDialog::new(sparse(&["src"]));
+        let area = Rect::new(0, 0, 40, 8);
+        let mut buf = Buffer::empty(area);
+        d.render(sparse_rect(area), &mut buf);
+        let text = dialog_kit::buffer_text(&buf);
+        assert!(text.contains("Window too small"), "{text}");
+        assert!(text.contains('\u{2715}'), "{text}");
+    }
+
+    #[test]
+    fn a_narrow_dialog_keeps_its_three_buttons() {
+        let mut d = SparseDialog::new(sparse(&["src"]));
+        let area = Rect::new(0, 0, 36, 14);
+        let mut buf = Buffer::empty(area);
+        d.render(sparse_rect(area), &mut buf);
+        let hits: Vec<_> = d.hits.iter().map(|(_, h)| *h).collect();
+        for want in [
+            SparseFocus::Apply,
+            SparseFocus::Disable,
+            SparseFocus::Cancel,
+        ] {
+            assert!(hits.contains(&want), "{want:?} missing: {hits:?}");
+        }
     }
 }

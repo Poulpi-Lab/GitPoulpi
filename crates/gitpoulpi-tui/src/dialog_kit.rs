@@ -15,9 +15,11 @@ use ratatui::style::{Modifier, Style};
 
 use crate::{button_bg, display_width, fit, text_field};
 
+pub(crate) mod button_row;
 mod discard;
 mod dismiss;
 pub(crate) mod frame;
+pub(crate) mod too_small;
 pub(crate) use discard::{DiscardGuard, Verdict};
 #[allow(unused_imports)]
 pub(crate) use dismiss::{

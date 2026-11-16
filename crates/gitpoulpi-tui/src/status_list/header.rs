@@ -44,6 +44,9 @@ pub(crate) const DISCARD_GAP: u16 = 2;
 /// Columns the header reserves left of the title: the collapse chevron (1),
 /// the gap and the discard button (3).
 pub(crate) const HEADER_LEFT_RESERVE: u16 = 1 + DISCARD_GAP + 3;
+/// The Explain sparkle is an icon already (3 cells): it stays until the pane
+/// has no room left for it beside the trash and a clipped title.
+const EXPLAIN_MIN_WIDTH: u16 = 20;
 
 /// Paints the working-changes header's two buttons over the top border
 /// row of `area` (the pane's outer rect): the red trash at the far left
@@ -53,8 +56,7 @@ pub(crate) const HEADER_LEFT_RESERVE: u16 = 1 + DISCARD_GAP + 3;
 /// [`HEADER_LEFT_RESERVE`] columns so it never sits under the trash. The
 /// hit rects come from this same paint walk. The trash is always live
 /// (its confirmation says "nothing to discard" itself); Explain is not drawn
-/// when AI is off and is dropped when the pane is too narrow for both the
-/// title and the button.
+/// when AI is off, and keeps its place (the title is clipped before it).
 pub(crate) fn render_status_header_buttons(
     frame: &mut Frame,
     area: Rect,
@@ -95,7 +97,7 @@ pub(crate) fn render_status_header_buttons(
             .bg(crate::theme::button_bg(false)),
         hits,
     );
-    if ai_enabled && area.width >= 44 {
+    if ai_enabled && area.width >= EXPLAIN_MIN_WIDTH {
         let w = display_width(EXPLAIN_GLYPH) as u16;
         let explain = Rect::new(area.right() - 1 - w, area.y, w, 1);
         let base = Style::default()

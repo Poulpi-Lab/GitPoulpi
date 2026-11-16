@@ -1098,6 +1098,8 @@ hint_clear_field = "alanı temizle"
 hint_create = "oluştur"
 hint_open = "aç"
 hint_toggle = "aç/kapat"
+# context: one line in the minimal frame a dialog shows when the window is too small for it
+too_small = "Window too small: enlarge it"
 
 [clone]
 title = "Depo klonla"

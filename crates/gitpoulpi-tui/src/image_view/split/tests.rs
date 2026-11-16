@@ -10,6 +10,8 @@ fn state(source: DiffSource) -> DiffViewState {
 
 fn file(path: &str, status: FileStatus) -> FileDiff {
     FileDiff {
+        renamed_from: None,
+        similarity: None,
         path: path.into(),
         status,
         hunks: Vec::new(),

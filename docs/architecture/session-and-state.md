@@ -347,7 +347,7 @@ Plan: [mcp-show-ui](../developer/the mcp-show-ui design); user page: [mcp-and-ag
 ## Comparing the Log's multi-selection
 
 - **A pure function of the selection** (`compare::resolve`), recomputed every frame: nothing is stored but the user's swap (`compare_swapped`, forgotten when the set of rows changes). `LogSelection` holds `RowKey`s (the WIP row, or an `Oid`; a stash row is its stash commit's `Oid`), kept next to the Log cursor as before. "Older to newer" is the Log's display order read from the bottom: the WIP row is the newest end and a stash sits above its base.
-- **Backend targets**: `DiffTarget::CommitRange` (two commits or a stash, already there), `CommitVsWorkingTree(oid)` (staged and unstaged edits of tracked files; untracked files are not in any diff target) and `CommitSpan(oldest, newest)` (from the oldest's first parent, the empty tree for a root commit). The system backend passes `--no-renames` on all three so a rename is a delete plus an add, like libgit2's tree diff. A range with the WIP row on top and a root commit as its oldest end starts at that commit itself (no parent to name).
+- **Backend targets**: `DiffTarget::CommitRange` (two commits or a stash, already there), `CommitVsWorkingTree(oid)` (staged and unstaged edits of tracked files; untracked files are not in any diff target) and `CommitSpan(oldest, newest)` (from the oldest's first parent, the empty tree for a root commit). Both backends detect renames (`-M` / libgit2 `find_similar`, 50%), see "Renamed and moved files". A range with the WIP row on top and a root commit as its oldest end starts at that commit itself (no parent to name).
 - **The file list is the commit-files list under a synthetic key** (`CompareSpec::id`, a hash of the target): the comparison rides `CommitFilesRequest::Compare` and comes back as a `CommitFilesOutcome`, so the tree/path view, filter, sort, scrollbar and click-to-open are the existing code, not a copy. `DiffSource::Compare` carries the target in `DiffViewState::compare`; the open file's hunks are asked by that target, the whole-file layout reads the newer end. A comparison reading the working tree is re-asked on every refresh. Not wired for a comparison: the file context menu (blame/history would be asked of the synthetic key) and the image diff.
 - **Swap** is only offered for two rows without WIP: reversing the WIP end would need a "working tree to commit" target, which no backend has.
 
@@ -359,9 +359,9 @@ Plan: [mcp-show-ui](../developer/the mcp-show-ui design); user page: [mcp-and-ag
 - **The diff on the right is the Diff view**, kept as a `DiffSource::Compare` state under a synthetic key
   (`HISTORY_KEY`), so modes, scrollbars and keys are not reimplemented. A debounce (40 ms) and a 32-entry per-row
   cache keep a held arrow key to one request; the Diff view's "latest request wins" drops stale answers.
-- **A rename commit's diff is two files** (the backends run `--no-renames`): the rows ask for both paths and
-  `history_view/rename.rs` merges them into one `Renamed` file, so a row at or before a rename is shown as git's
-  `-M` would. A range compare uses each end's own path.
+- **A rename commit's diff is one `Renamed` file** (both backends pair it, see "Renamed and moved files"): the rows ask
+  for both paths so the pair survives the pathspec; `history_view/rename.rs` still merges a delete and an add when a
+  backend left them apart (an unstaged move). A range compare uses each end's own path.
 - **Diff / File / Blame is per-view state**, kept while moving between rows; the File and Blame halves read the
   file at the selected commit (`FileInsightKind::Content` / `Blame` with a revision), so they follow the selection.
   There is no control of its own (it duplicated the view bar): while `commands::history::is_open`, the bar's File
@@ -1249,3 +1249,26 @@ The TUI side of the grouped run: selection, plan and progress in one movable fra
 - **Unattended runs.** The Push button (and the Pull button with sources) opens the plan with `auto_run`; when `PlanView::unattended` holds (the CLI's `default_is_unattended`: plain pushes, or fast-forwards and merges/rebases of a pull unless `git.pull_mode` is fast-forward only) the dialog presses its own Run. The paint that sees the plan has no link, so the actions go to `Core::outbox` and the window drains them each frame (`push_group_ui::drain`). Anything else leaves the plan open for decisions.
 - **Rejections.** A refused single-remote push (`NonFastForward`, `StaleLease`) of a branch with extra targets opens the plan for all its remotes (`notices.rs`) instead of the "has diverged" menu, which stays for branches without targets.
 - **The strip's Continue is always drawn** (greyed through `StripButton::disabled` while `ready_to_continue` is false); the palette twins (`Git: Continue / Abort Grouped Push`, `Retry Failed Pushes`, `Show Grouped Push`) read `push_group_ui::group_state`. `git.push_group_preflight` is read when a plan is asked (TUI and CLI; `--no-preflight` only turns it off).
+
+
+## Renamed and moved files
+
+- **Who pairs what.** Staged renames, commit diffs and ranges are paired by the backends (`git diff -M` / libgit2
+  `find_similar`, 50%, `rename_limit` 1000) into one `Renamed` `FileDiff` at the new path with `renamed_from` and
+  `similarity` (`-M` is explicit: `diff.renames` cannot change the answer; `commit_stats` still counts a move as two
+  files). An unstaged move (a tracked file deleted on disk plus an untracked or intent-to-add one) is paired by the
+  shared `gitpoulpi_core::domain::pair_unstaged_renames` inside `status`, so both backends agree: the new entry gets
+  `renamed_from`, the deleted file keeps its own entry. Nothing that works from raw statuses (auto-stash, journal
+  capture, flow) changed; only the file lists hide the deleted row (`rename_pairs`).
+- **Cost.** Pairing runs only when both sides are non-empty, at most `RENAME_LIMIT` (400) files each, files up to
+  512 KiB, size-ratio prefilter, a work budget; over any of them the listing stays a delete plus adds. The old side is
+  read from the index (one `cat-file --batch` / libgit2 blobs). It runs in the daemon, never on the render thread.
+- **Acting on the row.** `DaemonLink::submit_action` expands through `RenamePairs` (rebuilt from each status): Stage
+  stages the new and the old path (two journal entries, so two undo steps), Unstage of a staged rename unstages both,
+  Discard becomes one `DiscardPaths [new, old]` (old restored, new removed, one confirmation, one undo entry),
+  Stage/Unstage Folder bring a partner outside the folder along. CLI/MCP callers stage the paths they name:
+  `status` shows `renamed_from` so they can name both.
+- **The diff.** The Diff view of a moved row asks for both paths (`FileDiffRequest::also`, taken from the status);
+  an unstaged move's untracked side is appended and merged by `merge_rename`. The header row is
+  `old -> new (N% similar)`; a pure rename shows "No content change". Hunk staging is not offered on an untracked
+  side (as before); a staged-with-edits rename diffs against the old path.

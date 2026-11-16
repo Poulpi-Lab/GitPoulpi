@@ -7,6 +7,7 @@ fn status_rows_built_equal_the_visible_rows_not_the_file_count() {
     let tree = WorkingTree {
         files: (0..2000)
             .map(|i| StatusEntry {
+                renamed_from: None,
                 path: PathBuf::from(format!("dir{}/file{i}.rs", i % 40)),
                 index: None,
                 worktree: Some(FileStatus::Modified),

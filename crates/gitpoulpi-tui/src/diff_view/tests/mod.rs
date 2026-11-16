@@ -36,6 +36,8 @@ fn hunk(lines: Vec<DiffLine>) -> Hunk {
 
 fn file(hunks: Vec<Hunk>) -> FileDiff {
     FileDiff {
+        renamed_from: None,
+        similarity: None,
         path: PathBuf::from("src/lib.rs"),
         status: gitpoulpi_core::domain::FileStatus::Modified,
         hunks,

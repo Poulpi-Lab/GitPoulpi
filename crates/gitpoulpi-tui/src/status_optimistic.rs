@@ -108,6 +108,7 @@ mod tests {
 
     fn entry(path: &str, index: Option<FileStatus>, worktree: Option<FileStatus>) -> StatusEntry {
         StatusEntry {
+            renamed_from: None,
             path: path.into(),
             index,
             worktree,

@@ -9,6 +9,7 @@ use ratatui::Terminal;
 
 fn entry(path: &str, index: Option<FileStatus>, worktree: Option<FileStatus>) -> StatusEntry {
     StatusEntry {
+        renamed_from: None,
         path: PathBuf::from(path),
         index,
         worktree,

@@ -471,6 +471,8 @@ mod tests {
 
     fn diff(lines: &[(LineOrigin, &str)]) -> FileDiff {
         FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: "a.bin".into(),
             status: FileStatus::Modified,
             hunks: vec![Hunk {
@@ -531,6 +533,8 @@ mod tests {
         use LineOrigin::*;
         assert!(lfs_change(&diff(&[(Delete, "one"), (Add, "two")])).is_none());
         let empty = FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: "x".into(),
             status: FileStatus::Modified,
             hunks: vec![],

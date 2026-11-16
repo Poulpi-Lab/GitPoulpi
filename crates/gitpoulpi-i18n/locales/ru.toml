@@ -5609,6 +5609,9 @@ too_large = "файл слишком велик для показа ({bytes} б�
 unexpected = "неожиданный ответ"
 loading_whole = "загрузка всего файла... (кнопка «Hunk'и» показывает только изменения)"
 whole_unavailable = "(весь файл недоступен: {why} - показаны только hunk'и)"
+renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header_plain = "{from} -> {to}"
+rename_no_change = "No content change (the file was only renamed or moved)"
 
 [git_actions]
 no_such_local_branch = "этой локальной ветки больше нет - обновите"

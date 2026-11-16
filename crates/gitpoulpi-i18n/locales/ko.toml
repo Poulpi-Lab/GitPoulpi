@@ -5612,6 +5612,9 @@ too_large = "파일이 너무 커서 표시할 수 없습니다 ({bytes}바이�
 unexpected = "예기치 않은 응답"
 loading_whole = "전체 파일을 불러오는 중... (Hunk 버튼은 변경 사항만 표시)"
 whole_unavailable = "(전체 파일을 사용할 수 없음: {why} - hunk만 표시)"
+renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header_plain = "{from} -> {to}"
+rename_no_change = "No content change (the file was only renamed or moved)"
 
 [git_actions]
 no_such_local_branch = "그 로컬 브랜치가 더 이상 없습니다 - 새로 고침하세요"

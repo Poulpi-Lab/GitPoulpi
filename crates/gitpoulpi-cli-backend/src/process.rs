@@ -1060,6 +1060,67 @@ pub(crate) fn cat_file_batch_capped(
     Ok(out)
 }
 
+/// Reads the blobs named by `specs` (`:path` for the index) through one
+/// `git cat-file --batch`, the lenient sibling of [`cat_file_batch_capped`]:
+/// a spec that is missing, is not a blob (a submodule) or is over `cap`
+/// answers `None`, and the rest still answer. A failure of the process
+/// itself answers `None` for every spec.
+pub(crate) fn cat_file_batch_lenient(
+    repo_root: &Path,
+    specs: &[String],
+    cap: u64,
+) -> Vec<Option<Vec<u8>>> {
+    use std::io::{BufRead, BufReader, Read};
+
+    let mut out: Vec<Option<Vec<u8>>> = Vec::with_capacity(specs.len());
+    if specs.is_empty() {
+        return out;
+    }
+    let Ok(mut child) = git(repo_root, &["cat-file", "--batch"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+    else {
+        return vec![None; specs.len()];
+    };
+    let mut stdin = child.stdin.take().expect("stdin was piped");
+    let mut stdout = BufReader::new(child.stdout.take().expect("stdout was piped"));
+    let mut ask = |spec: &str| -> std::io::Result<Option<Vec<u8>>> {
+        writeln!(stdin, "{spec}")?;
+        stdin.flush()?;
+        let mut header = String::new();
+        stdout.read_line(&mut header)?;
+        let mut words = header.split_whitespace();
+        let (_, kind, size) = (words.next(), words.next(), words.next());
+        let (Some(kind), Some(size)) = (kind, size.and_then(|s| s.parse::<u64>().ok())) else {
+            // `<spec> missing` (or ambiguous): one line, no body.
+            return Ok(None);
+        };
+        let bytes = if kind == "blob" && size <= cap {
+            let mut buf = vec![0u8; size as usize];
+            stdout.read_exact(&mut buf)?;
+            Some(buf)
+        } else {
+            std::io::copy(&mut (&mut stdout).take(size), &mut std::io::sink())?;
+            None
+        };
+        let mut newline = [0u8; 1];
+        stdout.read_exact(&mut newline)?;
+        Ok(bytes)
+    };
+    for spec in specs {
+        match ask(spec) {
+            Ok(bytes) => out.push(bytes),
+            Err(_) => break,
+        }
+    }
+    drop(stdin);
+    let _ = child.wait();
+    out.resize(specs.len(), None);
+    out
+}
+
 /// `git merge-file`, whose exit status is the number of conflicts (0 to
 /// 127) and only a larger one is a failure. Returns stdout.
 pub(crate) fn run_merge_file(repo_root: &Path, args: &[&str]) -> Result<Vec<u8>> {

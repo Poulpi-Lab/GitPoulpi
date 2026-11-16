@@ -285,6 +285,7 @@ impl SafetyPanel {
             paths: &paths,
             status_of: &|p| statuses.get(p).copied(),
             is_lfs: &|_| false,
+            renamed_from: &|_| None,
             file_picked: &|_| false,
             folder_picked: &|_| false,
         }

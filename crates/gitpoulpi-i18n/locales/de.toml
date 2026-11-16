@@ -5620,6 +5620,9 @@ too_large = "die Datei ist zu groß für die Anzeige ({bytes} Bytes)"
 unexpected = "unerwartete Antwort"
 loading_whole = "die ganze Datei wird geladen... (die Schaltfläche Hunks zeigt nur die Änderungen)"
 whole_unavailable = "(ganze Datei nicht verfügbar: {why} - nur die Hunks werden angezeigt)"
+renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header_plain = "{from} -> {to}"
+rename_no_change = "No content change (the file was only renamed or moved)"
 
 [git_actions]
 no_such_local_branch = "dieser lokale Branch existiert nicht mehr - aktualisieren"

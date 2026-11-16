@@ -241,11 +241,18 @@ pub(crate) fn entry_is_conflicted(entry: &StatusEntry) -> bool {
 /// `GitBackend` operation, and listing it twice would show Take Ours / Take
 /// Theirs rows in a section where they read as already-resolved.
 pub(crate) fn section_paths(tree: &WorkingTree, section: StatusSection) -> Vec<PathBuf> {
+    // An unstaged move is one row, at the new path: the deleted file it
+    // came from is not listed on its own (`rename_pairs`).
+    let pairs = crate::rename_pairs::RenamePairs::of(tree);
+    let hidden: std::collections::HashSet<&Path> = match section {
+        StatusSection::Unstaged => pairs.hidden_unstaged_sources(),
+        StatusSection::Staged => Default::default(),
+    };
     tree.files
         .iter()
         .filter(|f| match section {
             StatusSection::Staged => f.index.is_some() && !entry_is_conflicted(f),
-            StatusSection::Unstaged => f.worktree.is_some(),
+            StatusSection::Unstaged => f.worktree.is_some() && !hidden.contains(f.path.as_path()),
         })
         .map(|f| f.path.clone())
         .collect()
@@ -256,6 +263,10 @@ pub(crate) fn section_paths(tree: &WorkingTree, section: StatusSection) -> Vec<P
 pub(crate) fn entry_status(entry: &StatusEntry, section: StatusSection) -> Option<FileStatus> {
     match section {
         StatusSection::Staged => entry.index,
+        // The new side of an unstaged move reads as a rename, not as a new file.
+        StatusSection::Unstaged if entry.renamed_from.is_some() && entry.index.is_none() => {
+            Some(FileStatus::Renamed)
+        }
         StatusSection::Unstaged => entry.worktree,
     }
 }
@@ -902,6 +913,7 @@ mod tests {
     fn a_partially_staged_file_shows_up_in_both_sections() {
         let tree = WorkingTree {
             files: vec![StatusEntry {
+                renamed_from: None,
                 path: PathBuf::from("both.rs"),
                 index: Some(FileStatus::Staged),
                 worktree: Some(FileStatus::Modified),
@@ -1148,6 +1160,7 @@ mod tests {
     fn a_conflicted_file_belongs_to_the_unstaged_half_alone() {
         let tree = WorkingTree {
             files: vec![StatusEntry {
+                renamed_from: None,
                 path: PathBuf::from("clash.rs"),
                 index: Some(FileStatus::Conflicted),
                 worktree: Some(FileStatus::Conflicted),
@@ -1220,6 +1233,7 @@ mod tests {
 
     fn entry(path: &str, worktree: Option<FileStatus>) -> StatusEntry {
         StatusEntry {
+            renamed_from: None,
             path: PathBuf::from(path),
             index: None,
             worktree,

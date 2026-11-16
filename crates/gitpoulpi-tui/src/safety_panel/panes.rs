@@ -164,6 +164,8 @@ impl DiffPane {
                 let file = result
                     .map(|files| {
                         files.into_iter().next().unwrap_or(FileDiff {
+                            renamed_from: None,
+                            similarity: None,
                             path: key.1.clone(),
                             status: gitpoulpi_core::domain::FileStatus::Modified,
                             hunks: Vec::new(),

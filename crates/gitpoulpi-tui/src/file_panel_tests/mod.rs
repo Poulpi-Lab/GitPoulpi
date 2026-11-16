@@ -15,6 +15,8 @@ fn outcome(changed: &[&str]) -> CommitFilesOutcome {
         files: Ok(changed
             .iter()
             .map(|p| FileDiff {
+                renamed_from: None,
+                similarity: None,
                 path: PathBuf::from(p),
                 status: FileStatus::Modified,
                 hunks: Vec::new(),

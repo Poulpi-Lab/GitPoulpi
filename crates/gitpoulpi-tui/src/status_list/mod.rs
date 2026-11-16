@@ -281,9 +281,13 @@ pub(crate) fn build_status_section_lines(
                 index,
             } => {
                 let path = paths[index].clone();
-                let status = by_path
-                    .get(path.as_path())
-                    .and_then(|e| entry_status(e, section));
+                let entry = by_path.get(path.as_path());
+                let status = entry.and_then(|e| entry_status(e, section));
+                // A renamed file says where it came from, after its name.
+                let label = match entry.and_then(|e| e.renamed_from.as_ref()) {
+                    Some(from) => format!("{label} <- {}", from.display()),
+                    None => label,
+                };
                 StatusPaneLine::File {
                     section,
                     path,

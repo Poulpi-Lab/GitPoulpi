@@ -29,6 +29,8 @@ pub(crate) struct FileRows<'a> {
     /// The commit's status of a path (`None`: unchanged, a View all files row).
     pub(crate) status_of: &'a dyn Fn(&Path) -> Option<FileStatus>,
     pub(crate) is_lfs: &'a dyn Fn(&Path) -> bool,
+    /// Where a renamed or moved file came from, shown after its name.
+    pub(crate) renamed_from: &'a dyn Fn(&Path) -> Option<PathBuf>,
     /// A file row that is picked (multi-selection).
     pub(crate) file_picked: &'a dyn Fn(&Path) -> bool,
     /// A folder row whose files are all picked.
@@ -68,12 +70,16 @@ impl FileRows<'_> {
                     let status = path.and_then(|p| (self.status_of)(p));
                     let marker = status.map(status_marker).unwrap_or(" ");
                     let color = status.map(file_status_color).unwrap_or(th().ui.muted);
+                    let label = match path.and_then(|p| (self.renamed_from)(p)) {
+                        Some(from) => format!("{label} <- {}", from.display()),
+                        None => label.clone(),
+                    };
                     let mut spans = vec![
                         Span::styled(
                             format!("{}{marker} ", "  ".repeat(*depth)),
                             Style::default().fg(color),
                         ),
-                        Span::styled(label.clone(), Style::default().fg(th().ui.text)),
+                        Span::styled(label, Style::default().fg(th().ui.text)),
                     ];
                     // Tagged by whether the path is an LFS file in the
                     // *current* index: the file almost certainly was one when
@@ -197,6 +203,7 @@ mod tests {
                 paths: &paths,
                 status_of: &status,
                 is_lfs: &lfs,
+                renamed_from: &|_| None,
                 file_picked: &picked,
                 folder_picked: &none,
             }
@@ -210,6 +217,7 @@ mod tests {
                     paths: &paths,
                     status_of: &status,
                     is_lfs: &lfs,
+                    renamed_from: &|_| None,
                     file_picked: &picked,
                     folder_picked: &none,
                 }

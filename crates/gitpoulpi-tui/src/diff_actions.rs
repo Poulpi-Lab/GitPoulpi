@@ -1106,6 +1106,8 @@ mod tests {
             staged: false,
         };
         let file = FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: PathBuf::from("multi.txt"),
             status: FileStatus::Modified,
             hunks: vec![

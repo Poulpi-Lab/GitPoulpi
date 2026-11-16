@@ -1,6 +1,9 @@
 use std::path::PathBuf;
 
-use gitpoulpi_core::domain::{FileStatus, RepoRef, StatusEntry, WorkingTree};
+use gitpoulpi_core::domain::{
+    is_unstaged_rename_source, pair_unstaged_renames, read_workdir_candidate, FileStatus,
+    RenameSide, RepoRef, StatusEntry, WorkingTree, RENAME_LIMIT, RENAME_MAX_FILE_BYTES,
+};
 use gitpoulpi_core::Result;
 
 use crate::process::run_z_fields;
@@ -50,16 +53,19 @@ pub fn status(repo: &RepoRef) -> Result<WorkingTree> {
                 let mut chars = xy.chars();
                 let index = chars.next().and_then(status_char);
                 let worktree = chars.next().and_then(status_char);
+                // A rename/copy record is followed by its origPath token.
+                let renamed_from = if kind == "2" {
+                    i += 1;
+                    tokens.get(i).map(PathBuf::from)
+                } else {
+                    None
+                };
                 files.push(StatusEntry {
                     path,
                     index,
                     worktree,
+                    renamed_from,
                 });
-
-                if kind == "2" {
-                    // consume the origPath token that follows this record
-                    i += 1;
-                }
             }
             "u" => {
                 let rest = parts.next().unwrap_or_default();
@@ -69,6 +75,7 @@ pub fn status(repo: &RepoRef) -> Result<WorkingTree> {
                 }
                 let path: PathBuf = fields.collect::<Vec<_>>().join(" ").into();
                 files.push(StatusEntry {
+                    renamed_from: None,
                     path,
                     index: Some(FileStatus::Conflicted),
                     worktree: Some(FileStatus::Conflicted),
@@ -77,6 +84,7 @@ pub fn status(repo: &RepoRef) -> Result<WorkingTree> {
             "?" => {
                 let rest = parts.next().unwrap_or_default();
                 files.push(StatusEntry {
+                    renamed_from: None,
                     path: PathBuf::from(rest),
                     index: None,
                     worktree: Some(FileStatus::Untracked),
@@ -88,8 +96,48 @@ pub fn status(repo: &RepoRef) -> Result<WorkingTree> {
         i += 1;
     }
 
+    pair_worktree_renames(repo, &mut files);
+
     Ok(WorkingTree {
         files,
         ..WorkingTree::default()
     })
+}
+
+/// Pairs the working tree's deleted tracked files with its new ones
+/// (`git status` leaves that as a deletion plus an untracked file): the
+/// shared pairing of `gitpoulpi_core::domain::pair_unstaged_renames`, with
+/// the old side read from the index in one `cat-file --batch`. Skipped when
+/// either side is empty or over the rename limit, so a large untracked set
+/// costs nothing.
+fn pair_worktree_renames(repo: &RepoRef, files: &mut [StatusEntry]) {
+    let paths: Vec<PathBuf> = files
+        .iter()
+        .filter(|e| is_unstaged_rename_source(e))
+        .map(|e| e.path.clone())
+        .collect();
+    let any_new = files.iter().any(|e| {
+        e.index.is_none()
+            && matches!(
+                e.worktree,
+                Some(FileStatus::Untracked) | Some(FileStatus::Added)
+            )
+    });
+    if paths.is_empty() || paths.len() > RENAME_LIMIT || !any_new {
+        return;
+    }
+    let specs: Vec<String> = paths
+        .iter()
+        .map(|p| format!(":{}", p.to_string_lossy().replace('\\', "/")))
+        .collect();
+    let blobs = crate::process::cat_file_batch_lenient(&repo.root, &specs, RENAME_MAX_FILE_BYTES);
+    let old_of: std::collections::HashMap<PathBuf, Vec<u8>> = paths
+        .into_iter()
+        .zip(blobs)
+        .filter_map(|(p, b)| b.map(|b| (p, b)))
+        .collect();
+    pair_unstaged_renames(files, |path, side| match side {
+        RenameSide::Old => old_of.get(path).cloned(),
+        RenameSide::New => read_workdir_candidate(&repo.root, path),
+    });
 }

@@ -133,6 +133,8 @@ pub(crate) fn all_added_diff(path: PathBuf, lines: &[String]) -> FileDiff {
         }]
     };
     FileDiff {
+        renamed_from: None,
+        similarity: None,
         path,
         status: FileStatus::Added,
         hunks,

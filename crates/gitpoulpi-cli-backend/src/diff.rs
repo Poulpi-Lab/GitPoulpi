@@ -62,6 +62,7 @@ fn diff_inner(
             "--no-color".into(),
             "--no-ext-diff".into(),
             "--no-textconv".into(),
+            "-M".into(),
             "-U3".into(),
         ],
         DiffTarget::IndexVsHead => {
@@ -70,6 +71,7 @@ fn diff_inner(
                 "--no-color".into(),
                 "--no-ext-diff".into(),
                 "--no-textconv".into(),
+                "-M".into(),
                 "-U3".into(),
                 "--cached".into(),
             ]
@@ -118,12 +120,13 @@ fn diff_inner(
 
 /// `git diff` of `new` against `old`, in the exact form every other
 /// target here uses.
-fn commit_diff_args<'a>(old: &'a str, new: &'a str) -> [&'a str; 7] {
+fn commit_diff_args<'a>(old: &'a str, new: &'a str) -> [&'a str; 8] {
     [
         "diff",
         "--no-color",
         "--no-ext-diff",
         "--no-textconv",
+        "-M",
         "-U3",
         old,
         new,
@@ -137,8 +140,8 @@ fn with_tail(args: impl IntoIterator<Item = impl ToString>, tail: &[String]) -> 
 }
 
 /// The system diff between arbitrary revisions (or one revision and the
-/// working tree). `--no-renames`: a rename is a delete plus an add, as
-/// libgit2's plain tree diff lists it, so both backends answer alike
+/// working tree). `-M`: a rename is one file (from 50% similarity), as
+/// libgit2's `find_similar` lists it, so both backends answer alike
 /// whatever the user's `diff.renames` says.
 fn compare_args(revs: &[&str]) -> Vec<String> {
     let mut args: Vec<String> = [
@@ -146,7 +149,7 @@ fn compare_args(revs: &[&str]) -> Vec<String> {
         "--no-color",
         "--no-ext-diff",
         "--no-textconv",
-        "--no-renames",
+        "-M",
         "-U3",
     ]
     .iter()
@@ -225,6 +228,7 @@ pub fn diff_files(repo: &RepoRef, target: DiffTarget) -> Result<DiffFileList> {
         "--no-ext-diff",
         "--no-textconv",
         "--name-status",
+        "-M",
         "-z",
     ];
     let with = |extra: &[&str]| -> Vec<String> {
@@ -248,15 +252,13 @@ pub fn diff_files(repo: &RepoRef, target: DiffTarget) -> Result<DiffFileList> {
                 Err(_) => run_owned(with(&[EMPTY_TREE, &hex]))?,
             }
         }
-        DiffTarget::CommitRange(from, to) => {
-            run_owned(with(&["--no-renames", &from.to_hex(), &to.to_hex()]))?
-        }
-        DiffTarget::CommitVsWorkingTree(oid) => run_owned(with(&["--no-renames", &oid.to_hex()]))?,
+        DiffTarget::CommitRange(from, to) => run_owned(with(&[&from.to_hex(), &to.to_hex()]))?,
+        DiffTarget::CommitVsWorkingTree(oid) => run_owned(with(&[&oid.to_hex()]))?,
         DiffTarget::CommitSpan(oldest, newest) => {
             let (oldest, newest) = (oldest.to_hex(), newest.to_hex());
-            match run_owned(with(&["--no-renames", &format!("{oldest}^"), &newest])) {
+            match run_owned(with(&[&format!("{oldest}^"), &newest])) {
                 Ok(raw) => raw,
-                Err(_) => run_owned(with(&["--no-renames", EMPTY_TREE, &newest]))?,
+                Err(_) => run_owned(with(&[EMPTY_TREE, &newest]))?,
             }
         }
     };
@@ -283,10 +285,18 @@ fn parse_name_status(raw: &str) -> Vec<FileDiff> {
             _ => FileStatus::Modified,
         };
         let mut path = fields.next().unwrap_or_default();
+        let mut from = None;
         if renamed {
+            from = Some(PathBuf::from(path));
             path = fields.next().unwrap_or(path);
         }
         files.push(FileDiff {
+            renamed_from: from,
+            similarity: if renamed {
+                code[1..].parse().ok()
+            } else {
+                None
+            },
             path: PathBuf::from(path),
             status,
             hunks: Vec::new(),

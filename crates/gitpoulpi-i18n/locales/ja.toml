@@ -5614,6 +5614,9 @@ too_large = "ファイルが大きすぎて表示できません（{bytes} バ�
 unexpected = "予期しない応答"
 loading_whole = "ファイル全体を読み込み中...（ハンクボタンで変更点のみを表示）"
 whole_unavailable = "（ファイル全体は利用できません：{why} - ハンクのみ表示中）"
+renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header_plain = "{from} -> {to}"
+rename_no_change = "No content change (the file was only renamed or moved)"
 
 [git_actions]
 no_such_local_branch = "そのローカルブランチはもう存在しません - 更新してください"

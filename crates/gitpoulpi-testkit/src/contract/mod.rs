@@ -27,6 +27,7 @@ mod remote_access;
 mod remote_group;
 mod remote_keys;
 mod remotes_network;
+mod rename;
 mod rewrite;
 mod rewrite_analyze;
 mod rewrite_content;
@@ -72,6 +73,7 @@ pub use remote_access::*;
 pub use remote_group::*;
 pub use remote_keys::*;
 pub use remotes_network::*;
+pub use rename::*;
 pub use rewrite::*;
 pub use rewrite_analyze::*;
 pub use rewrite_content::*;
@@ -133,6 +135,12 @@ macro_rules! for_each_contract_check {
             check_commit_messages_survive_a_ref_to_a_missing_object,
             check_rewrite_analyze_survives_a_ref_to_a_missing_object,
             check_diff_working_tree_vs_index,
+            check_staged_rename_is_one_entry_and_one_diff,
+            check_staged_rename_with_edits_diffs_against_the_old_file,
+            check_unstaged_rename_pairs_the_deleted_and_the_untracked_file,
+            check_unstaged_rename_with_edits_still_pairs,
+            check_dissimilar_files_are_not_a_rename,
+            check_commit_diff_shows_a_rename,
             check_diff_of_a_commit_is_against_its_first_parent,
             check_diff_files_lists_exactly_what_diff_lists,
             check_diff_restricted_to_paths,
@@ -761,6 +769,7 @@ mod meta_tests {
             include_str!("content.rs"),
             include_str!("file_history.rs"),
             include_str!("compare.rs"),
+            include_str!("rename.rs"),
             include_str!("count.rs"),
             include_str!("search.rs"),
             include_str!("split.rs"),

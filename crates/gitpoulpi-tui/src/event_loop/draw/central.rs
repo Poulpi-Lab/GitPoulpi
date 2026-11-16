@@ -691,6 +691,7 @@ fn draw_central_in(frame: &mut Frame, ctx: &mut CentralDrawCtx<'_>) {
         // notice. `None` (no hunks to explain, no app, text) leaves today's view.
         if open_file.is_some_and(|f| {
             f.hunks.is_empty()
+                && f.renamed_from.is_none()
                 && !diff_state.lfs_raw
                 && gitpoulpi_core::domain::lfs_change(f).is_none()
         }) {

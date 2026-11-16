@@ -394,7 +394,10 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
                             f.worktree
                                 .map(|s| format!("{s:?}"))
                                 .unwrap_or_else(|| "-".into()),
-                            f.path.display()
+                            match &f.renamed_from {
+                                Some(from) => format!("{} <- {}", f.path.display(), from.display()),
+                                None => f.path.display().to_string(),
+                            }
                         )
                     })
                     .collect::<Vec<_>>()

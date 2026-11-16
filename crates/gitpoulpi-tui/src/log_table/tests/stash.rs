@@ -42,6 +42,7 @@ fn a_stash_row_shifts_the_commits_below_it_and_is_its_own_selection() {
     });
     let dirty = Ok(WorkingTree {
         files: vec![gitpoulpi_core::domain::StatusEntry {
+            renamed_from: None,
             path: PathBuf::from("wip.rs"),
             index: None,
             worktree: Some(gitpoulpi_core::domain::FileStatus::Modified),

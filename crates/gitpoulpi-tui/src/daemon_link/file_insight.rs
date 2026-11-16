@@ -46,6 +46,8 @@ pub(super) async fn append_untracked_diffs(
             // Diff view draws as a "New file" picture (image view S8) rather
             // than "nothing left to show".
             BlobContent::Binary if blob.image.is_some() => files.push(FileDiff {
+                renamed_from: None,
+                similarity: None,
                 path: entry.path.clone(),
                 status: FileStatus::Added,
                 hunks: Vec::new(),

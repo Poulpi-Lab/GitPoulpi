@@ -5614,6 +5614,9 @@ too_large = "het bestand is te groot om te tonen ({bytes} bytes)"
 unexpected = "onverwacht antwoord"
 loading_whole = "het hele bestand laden... (de knop Hunks toont alleen de wijzigingen)"
 whole_unavailable = "(heel bestand niet beschikbaar: {why} - alleen de hunks getoond)"
+renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header_plain = "{from} -> {to}"
+rename_no_change = "No content change (the file was only renamed or moved)"
 
 [git_actions]
 no_such_local_branch = "die lokale branch bestaat niet meer - vernieuw"

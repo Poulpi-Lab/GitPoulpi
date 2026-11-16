@@ -438,6 +438,8 @@ mod tests {
     /// Old lines 10-12, new lines 10-13; the whole file has 14 lines.
     pub(crate) fn file() -> FileDiff {
         FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: "src/a.rs".into(),
             status: FileStatus::Modified,
             hunks: vec![Hunk {

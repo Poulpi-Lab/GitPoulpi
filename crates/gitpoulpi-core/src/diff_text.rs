@@ -26,6 +26,9 @@ pub fn parse_unified(raw: &str) -> Vec<FileDiff> {
         };
         let path = extract_path(header);
         let mut status = FileStatus::Modified;
+        let mut renamed_from: Option<PathBuf> = None;
+        let mut similarity: Option<u8> = None;
+        let mut renamed_to: Option<PathBuf> = None;
 
         // Consume everything up to (and including) the first hunk header
         // or the next file's diff header, tracking status markers.
@@ -38,16 +41,30 @@ pub fn parse_unified(raw: &str) -> Vec<FileDiff> {
                 status = FileStatus::Added;
             } else if l.starts_with("deleted file mode") {
                 status = FileStatus::Deleted;
-            } else if l.starts_with("rename from") || l.starts_with("rename to") {
+            } else if let Some(from) = l
+                .strip_prefix("rename from ")
+                .or_else(|| l.strip_prefix("copy from "))
+            {
                 status = FileStatus::Renamed;
+                renamed_from = Some(PathBuf::from(from));
+            } else if let Some(to) = l
+                .strip_prefix("rename to ")
+                .or_else(|| l.strip_prefix("copy to "))
+            {
+                status = FileStatus::Renamed;
+                renamed_to = Some(PathBuf::from(to));
+            } else if let Some(pct) = l.strip_prefix("similarity index ") {
+                similarity = pct.trim_end_matches('%').parse().ok();
             }
         }
 
         let hunks = read_hunks(&mut lines);
         files.push(FileDiff {
-            path,
+            path: renamed_to.unwrap_or(path),
             status,
             hunks,
+            renamed_from,
+            similarity,
         });
     }
 
@@ -64,6 +81,8 @@ pub fn parse_hunks(path: impl Into<PathBuf>, status: FileStatus, patch: &str) ->
     let mut lines = patch.lines().peekable();
     while lines.next_if(|l| !l.starts_with("@@ ")).is_some() {}
     FileDiff {
+        renamed_from: None,
+        similarity: None,
         path: path.into(),
         status,
         hunks: read_hunks(&mut lines),

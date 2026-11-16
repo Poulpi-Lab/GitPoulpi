@@ -20,6 +20,7 @@ mod refs;
 mod remote_group;
 mod remote_group_plan;
 mod remote_group_run;
+mod rename;
 mod repo;
 mod repo_auth;
 mod restore;
@@ -114,6 +115,11 @@ pub use remote_group_run::{
     GroupResume, GroupRunStatus, Integration, PendingGroup, RemoteGroupOutcome,
     RemoteGroupRunRequest, RunTarget, StateTarget, StoppedAt, StoppedOp, TargetResult,
     TargetStatus, REMOTE_GROUP_STATE_VERSION,
+};
+pub use rename::{
+    is_unstaged_rename_source, pair_unstaged_renames, read_workdir_candidate,
+    similarity as rename_similarity, RenameSide, RENAME_LIMIT, RENAME_MAX_FILE_BYTES,
+    RENAME_THRESHOLD,
 };
 pub use repo::{
     CommitGraph, CommitNode, DiscoveredRepo, Oid, Remote, RepoId, RepoRef, WorkingTree,

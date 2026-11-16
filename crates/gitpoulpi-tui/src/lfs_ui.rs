@@ -680,6 +680,7 @@ mod tests {
 
         let with_attributes = WorkingTree {
             files: vec![StatusEntry {
+                renamed_from: None,
                 path: ".gitattributes".into(),
                 index: None,
                 worktree: Some(FileStatus::Untracked),

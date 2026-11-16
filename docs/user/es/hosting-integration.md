@@ -569,7 +569,7 @@ La línea bajo la cabecera dice con qué nombre se publican tus mensajes, y la m
 | *Aún no se sabe con qué nombre publicarías. Define Publicar como en Ajustes.* | No se pudo aprender nada. |
 
 **Publicar como** es un nombre: para una GitHub App es `my-app[bot]`. Defínelo para todos los repositorios en **Ajustes >
-Integraciones > Publicar como** (`general.hosting_post_as`), o para un repositorio en **Ajustes > Repositorio > SSH y
+Integraciones > Publicar como** (`general.hosting_post_as`), o para un repositorio en **Ajustes > Ajustes del repositorio > SSH y
 credenciales > Alojamiento**, que lo sustituye. Si se deja vacío, GitPoulpi pregunta a GitHub (GraphQL `viewer { login }`,
 que un token de instalación puede responder o no) y, si no, aprende el nombre del autor del primer comentario que
 publica y lo conserva con el repositorio. Un token personal nunca lo necesita. Ver [Actuar como bot de una GitHub

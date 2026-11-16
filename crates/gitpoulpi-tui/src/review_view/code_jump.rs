@@ -17,6 +17,10 @@ pub(super) struct Goto {
     /// The file as the Files list names it.
     pub(super) path: String,
     pub(super) code: CodeRef,
+    /// Where the cursor was put. The file's rows can be built again (the
+    /// whole-file text arrives after the hunks): while the cursor is still
+    /// there, the jump is made again on the new rows.
+    landed: Option<usize>,
 }
 
 impl ReviewView {
@@ -49,7 +53,11 @@ impl ReviewView {
                 self.revision += 1;
             }
         }
-        self.goto = Some(Goto { path, code });
+        self.goto = Some(Goto {
+            path,
+            code,
+            landed: None,
+        });
     }
 
     /// Which of the host's threads the conversation's thread is: by id, else
@@ -71,15 +79,28 @@ impl ReviewView {
 
     /// Puts the cursor where a waiting jump wants it, once the rows of
     /// `path` are drawn.
-    pub(super) fn apply_goto(&mut self, path: &str) {
+    pub(super) fn apply_goto(&mut self, path: &str, rebuilt: bool) {
         let Some(goto) = self.goto.as_ref() else {
             return;
         };
-        if goto.path != path || self.files_pane.is_empty() {
+        if goto.path != path {
+            if goto.landed.is_some() {
+                self.goto = None;
+            }
             return;
         }
+        match goto.landed {
+            None if self.files_pane.is_empty() => return,
+            None => {}
+            Some(_) if !rebuilt => return,
+            // The reader moved the cursor since: the jump is over.
+            Some(at) if at != self.files_pane.cursor => {
+                self.goto = None;
+                return;
+            }
+            Some(_) => {}
+        }
         let code = goto.code.clone();
-        self.goto = None;
         let thread = self.thread_index(&code);
         let want = if code.outdated {
             code.original_line.or(code.line)
@@ -139,7 +160,11 @@ impl ReviewView {
             .saturating_sub(3)
             .min(pane.len().saturating_sub(pane.visible()));
         pane.reveal();
-        if code.outdated {
+        let first = self.goto.as_ref().is_some_and(|g| g.landed.is_none());
+        if let Some(g) = self.goto.as_mut() {
+            g.landed = Some(row);
+        }
+        if code.outdated && first {
             self.message = Some(msg::thread_outdated_nearest(&code.path));
         }
     }

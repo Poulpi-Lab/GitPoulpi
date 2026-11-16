@@ -280,3 +280,75 @@ fn a_comment_posted_in_the_overview_is_announced_to_the_other_windows() {
         "the writing window read the request again for its own write"
     );
 }
+
+/// The `path:line` of an inline thread of the Overview reaches its code: a
+/// click and the `G` key both open the Files page with the cursor on the
+/// commented line (the thread is answered from there, which only works with
+/// the cursor on it), and Esc returns to the same thread of the Overview.
+#[test]
+fn a_code_thread_of_the_overview_opens_its_line_and_back_returns() {
+    let mut s = setup("pty-review-overview-code");
+    open_review(&mut s);
+    s.term.send_keys("m").expect("load older");
+    let screen = s
+        .term
+        .wait_for("the inline thread", STEP, |s| {
+            s.contains("src/planets.rs:12")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    // Mouse: the link in the thread's headline.
+    let (col, row) = screen.find("src/planets.rs:12").unwrap();
+    s.term.click(col + 3, row).expect("the code link");
+    s.term
+        .wait_for("the Files page on the line", STEP, |s| {
+            s.contains("Back to Overview") && s.contains("Why a Vec here")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    // The cursor is on the commented line: `r` answers the thread.
+    s.term.send_keys("r").expect("reply");
+    s.term
+        .wait_for("the reply box of the thread", STEP, |s| {
+            s.contains("Reply to thread")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    s.term.send_keys("Escape").expect("close the box");
+    s.term
+        .wait_for("the box closed", STEP, |s| !s.contains("Reply to thread"))
+        .unwrap_or_else(|e| panic!("{e}"));
+    // Esc: back on the Overview.
+    s.term.send_keys("Escape").expect("back");
+    s.term
+        .wait_for("the Overview again", STEP, |s| {
+            !s.contains("Back to Overview") && s.contains("Write a comment")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    // Keyboard: the thread is still the selected entry; `G` goes there again.
+    s.term.send_keys("G").expect("open the code");
+    s.term
+        .wait_for("the Files page again", STEP, |s| {
+            s.contains("Back to Overview") && s.contains("Why a Vec here")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    s.term.send_keys("r").expect("reply");
+    s.term
+        .wait_for("the reply box again", STEP, |s| {
+            s.contains("Reply to thread")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    s.term.send_keys("Escape").expect("close the box");
+    s.term
+        .wait_for("the box closed", STEP, |s| !s.contains("Reply to thread"))
+        .unwrap_or_else(|e| panic!("{e}"));
+    // The Back button.
+    let screen = s
+        .term
+        .wait_for("the button", STEP, |s| s.contains("Back to Overview"))
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (col, row) = screen.find("Back to Overview").unwrap();
+    s.term.click(col + 3, row).expect("Back");
+    s.term
+        .wait_for("the Overview once more", STEP, |s| {
+            !s.contains("Back to Overview") && s.contains("Write a comment")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+}

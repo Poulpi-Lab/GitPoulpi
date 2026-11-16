@@ -555,14 +555,15 @@ impl ReviewView {
         let pad = crate::minimap::padding_for(right, crate::live_settings::minimap());
         let width = right.width.saturating_sub(2 + pad);
         let key = (key_name.clone(), width, self.revision);
-        if self.files_pane.stale(&key) {
+        let rebuilt = self.files_pane.stale(&key);
+        if rebuilt {
             let render = fd
                 .as_ref()
                 .map(|fd| self.build_files_render(fd, &key_name, width));
             self.set_pane_render(PaneId::Files, key, render);
         }
         if fd.is_some() {
-            self.apply_goto(&key_name);
+            self.apply_goto(&key_name, rebuilt);
         }
         let waiting = if key_name.is_empty() {
             None
@@ -860,7 +861,15 @@ impl ReviewView {
                 ("v", msg::HINT_VIEWED.get()),
                 ("f", msg::HINT_FINISH.get()),
                 (tabs_key.as_str(), msg::HINT_TABS.get()),
-                (msg::KEY_ESC.get(), msg::HINT_CLOSE.get()),
+                // After a jump from a comment, Esc goes back to it.
+                (
+                    msg::KEY_ESC.get(),
+                    if self.ov_return.is_some() {
+                        item_msg::HINT_BACK.get()
+                    } else {
+                        msg::HINT_CLOSE.get()
+                    },
+                ),
             ],
             Tab::Commits => vec![
                 ("\u{2191}\u{2193}", msg::HINT_MOVE.get()),

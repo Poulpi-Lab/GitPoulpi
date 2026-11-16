@@ -78,6 +78,15 @@ Impostazioni si aprono sopra la finestra. Ognuno ha una `✕` in alto a destra d
 `Esc` o un clic sulla `✕` lo chiude, e un clic all'esterno chiude un dialogo, un popup o
 un pannello (vedi [Chiudere finestre e dialoghi](mouse-and-gestures.md#chiudere-finestre-e-dialoghi)).
 
+### Quando la finestra è piccola
+
+Niente sparisce in silenzio quando la finestra si restringe. Un pulsante perde prima la
+sua etichetta lunga (tagliata con `...`), poi va a capo su una seconda riga o finisce dietro il
+menu `⋯` della sua riga, e il suo tasto e la sua voce di palette continuano a funzionare. Un
+dialogo troppo grande per la finestra disegna una piccola cornice con il suo titolo, la `✕` e
+la riga **Finestra troppo piccola: ingrandiscila** invece di niente; `Esc` e `✕` la
+chiudono, e il dialogo torna intero quando ingrandisci la finestra.
+
 ## Barra delle schede
 
 La scheda **Home** (l'icona della casa) è all'estremità sinistra, seguita dal

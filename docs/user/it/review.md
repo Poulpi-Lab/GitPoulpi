@@ -68,6 +68,15 @@ voce selezionata (**Rispondi**, **Cita**, **Modifica**, **Elimina**, **Link**) f
 *Conversazione: ...* accanto a quelle *Revisione: ...*. Prima che un link si apra viene chiesta conferma, come ovunque nella
 revisione.
 
+Una discussione sul codice mostra il suo `percorso:riga` come un link (sottolineato, un vero pulsante). Un clic su di esso, **`G`** sulla
+discussione selezionata, o *Conversazione: Apri il codice della discussione* della palette passa alla pagina **File**, apre quel file e porta
+il cursore sulla riga commentata (sul lato vecchio o nuovo, come era stato scritto) con la discussione aperta sotto (una
+compressa viene espansa). **Esc**, il pulsante **Torna alla panoramica** a sinistra delle schede della pagina, o *Revisione: Torna
+al commento nella panoramica* riportano alla stessa voce della Panoramica. Una discussione la cui riga non è più nel diff (obsoleta)
+apre il file alla riga più vicina e la riga di stato lo dice; una discussione su un file che la richiesta non modifica più dice
+che il file non è nel diff. In una vista issue o Radar della stessa richiesta non c'è codice da aprire: `G` risponde
+che ce l'ha la revisione.
+
 Dove un tasto della conversazione e uno della revisione si incontrano, in questa pagina la lettera è della conversazione: `l` (etichette), `m`
 (milestone), `Q` (l'abbandono di Gerrit), `e` / `d`, `r`. Le etichette, la milestone e l'abbandono restano sui pulsanti dell'intestazione e
 nella palette; `a` (assegnatari), `p` (revisori), `f` (**Termina la revisione**), `b` (**Checkout**), `P`, `D`, `U` e
@@ -289,6 +298,7 @@ Inviare la revisione consuma la bozza.
 | Panoramica / File / Commit | `Alt+1` / `Alt+2` / `Alt+3` | *Revisione: Mostra panoramica*, *Mostra file*, *Mostra commit* |
 | Commenta la riga o l'intervallo | `c` | *Revisione: Commenta la riga...* |
 | Commenta la conversazione | `c` nella Panoramica, `C` | *Revisione: Commenta la conversazione...* (apre la casella della Panoramica), *Conversazione: Nuovo commento* |
+| Apri il codice di una discussione (Panoramica) / torna al commento | `G` / `Esc` | *Conversazione: Apri il codice della discussione*, *Revisione: Torna al commento nella panoramica* |
 | Rispondi alla discussione | `r` | *Revisione: Rispondi alla discussione...* |
 | Risolvi o riapri | `x` | *Revisione: Risolvi o riapri la discussione* |
 | Comprimi o espandi una discussione | `z` | *Revisione: Comprimi o espandi la discussione* |

@@ -500,6 +500,9 @@ Una vista a finestra intera: l'intestazione (stato, chi l'ha aperta e quando, le
   [Conversione del markup](#conversione-del-markup)). Un blocco di codice `mermaid` ha un pulsante **Apri diagramma** che mostra il
   sorgente del diagramma in un visualizzatore scorrevole (`Enter` lo copia); la palette ha *Conversazione: Apri il diagramma della voce*.
   Richiede una build con entrambe le funzionalità `conversation` e `mermaid`.
+- Nella Panoramica della revisione il `percorso:riga` di una discussione sul codice è un link al codice (`G`, *Conversazione: Apri il codice
+  della discussione*; vedi [Revisione](review.md)); in una conversazione aperta da sola (un'issue, una riga del Radar) non c'è
+  nessuna pagina di codice a cui andare.
 - La vista rilegge ogni 60 secondi e con `F5` (**Aggiorna**).
 
 **Tasti.** Ciascuno ha un pulsante, una riga di menu o una riga di palette (*Conversazione: ...*), e `Ctrl+N` mette i badge ai pulsanti.

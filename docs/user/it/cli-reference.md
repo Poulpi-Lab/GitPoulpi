@@ -103,7 +103,8 @@ sha breve). Hunk e righe sono numerati come li numera `gitpoulpi --json diff`.
 | Comando | Cosa fa |
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Mette in stage un file, una cartella, tutto, un hunk o alcune righe. Uno stage di un file, di una cartella o con `--all` che aggiungerebbe un file sensibile (una chiave privata, un `.env`, un token riconosciuto: `[privacy]` nel [riferimento della configurazione](config-reference.md#privacy-file-sensibili)) viene rifiutato con codice di uscita 2 e `{error: "sensitive_files", files: [{path, reason}]}` (una regola e un'anteprima mascherata, mai un valore); nulla viene messo in stage. `--allow-sensitive` li mette comunque in stage. |
-| `unstage` (stessi flag) | L'inverso. |
+| `stage --paths A B ...` | Mette in stage più file o cartelle come UNA sola operazione: una voce nel journal, un solo passo di `undo` (un file rinominato è il suo vecchio e il suo nuovo percorso, come `status` mostra `renamed_from`). Non si combina con `--folder`, `--hunk`, `--lines` o `--all`. |
+| `unstage` (stessi flag, `--paths` incluso) | L'inverso. |
 | `discard --file F [--hunk N [--lines a,b]]` | Scarta le modifiche non in stage (un file intero: ogni modifica, file non tracciato eliminato, insieme alle cartelle che così restano vuote). Annullabile. |
 | `rm-file <paths>...` | Elimina file dalla directory di lavoro. Annullabile. |
 | `ignore <pattern> [--file <.gitignore>]` | Aggiunge un pattern a un `.gitignore` (o a `.git/info/exclude` con `--file .git/info/exclude`). Annullabile, tranne in `.git/info/exclude`. |

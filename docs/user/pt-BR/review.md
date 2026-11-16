@@ -69,6 +69,15 @@ alterna entre a linha do tempo e a caixa, e **Nota interna** (`Alt+I`) existe no
 botões da entrada selecionada (**Responder**, **Citar**, **Editar**, **Excluir**, **Links**) fazem o mesmo, e a paleta
 tem as linhas *Conversa: ...* ao lado das *Revisão: ...*. Um link é perguntado antes de abrir, como em toda a revisão.
 
+Uma thread de código mostra o seu `path:line` como um link (sublinhado, um botão de verdade). Um clique nele, **`G`** na
+thread selecionada ou *Conversa: abrir o código da thread* na paleta passam para a página **Arquivos**, abrem esse arquivo
+e põem o cursor na linha comentada (no lado antigo ou no novo, como foi escrito) com a thread aberta embaixo dela (uma
+recolhida é expandida). **Esc**, o botão **Voltar à visão geral** à esquerda das abas da página ou *Revisão: voltar ao
+comentário na visão geral* voltam à mesma entrada da Visão geral. Uma thread cuja linha não está mais no diff
+(desatualizada) abre o arquivo na linha mais próxima e a linha de status avisa; uma thread em um arquivo que o pedido
+não altera mais diz que o arquivo não está no diff. Em uma visão de issue ou de Radar do mesmo pedido não há código a
+abrir: `G` responde que a revisão o tem.
+
 Onde uma tecla da conversa e uma da revisão se encontram, a conversa fica com a letra nesta página: `l` (rótulos), `m`
 (marco), `Q` (abandonar, do Gerrit), `e` / `d`, `r`. Os rótulos, o marco e o abandono continuam nos botões do cabeçalho
 e na paleta; `a` (responsáveis), `p` (revisores), `f` (**Concluir revisão**), `b` (**Fazer checkout**), `P`, `D`, `U` e
@@ -289,6 +298,7 @@ Enviar a revisão consome o rascunho.
 |---|---|---|
 | Visão geral / Arquivos / Commits | `Alt+1` / `Alt+2` / `Alt+3` | *Revisão: mostrar visão geral*, *mostrar arquivos*, *mostrar commits* |
 | Comentar a linha ou o intervalo | `c` | *Revisão: comentar na linha...* |
+| Abrir o código de uma thread (Visão geral) / voltar ao comentário | `G` / `Esc` | *Conversa: abrir o código da thread*, *Revisão: voltar ao comentário na visão geral* |
 | Comentar na conversa | `c` na Visão geral, `C` | *Revisão: comentar na conversa...* (abre a caixa da Visão geral), *Conversa: novo comentário* |
 | Responder à thread | `r` | *Revisão: responder à thread...* |
 | Resolver ou reabrir | `x` | *Revisão: resolver ou reabrir a thread* |

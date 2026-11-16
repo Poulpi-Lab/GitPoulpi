@@ -212,6 +212,11 @@ with AI**, then the **`✦`** alone. It keeps its click, its tooltip and its
 key (`Ctrl+G Shift+C`) at every width; the Skip hooks label gives way to it
 (**No hooks**, then the box alone) before it shrinks itself.
 
+The **`✦`** (generate the message) and **`#`** (insert an issue reference)
+buttons at the right end of the summary row shrink the same way: on a narrow
+pane they lose their margins, then fold into one **`⋯`** button whose menu
+lists both, so neither ever disappears.
+
 ## The commit composer: split your changes into commits
 
 *(Needs AI turned on: see [AI assistance](ai.md).)* Press **Compose commits with

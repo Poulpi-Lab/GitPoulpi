@@ -566,7 +566,7 @@ A linha sob o cabeçalho diz com que nome as suas mensagens são publicadas, e a
 | *Ainda não se sabe como iria publicar. Defina Publicar como nas Definições.* | Nada se conseguiu aprender. |
 
 **Publicar como** é um nome: para uma GitHub App é `my-app[bot]`. Defina-o para todos os repositórios em **Definições >
-Integrações > Publicar como** (`general.hosting_post_as`), ou para um repositório em **Definições > Repositório > SSH e
+Integrações > Publicar como** (`general.hosting_post_as`), ou para um repositório em **Definições > Definições do repositório > SSH e
 credenciais > Host**, que o substitui. Se ficar vazio, o GitPoulpi pergunta ao GitHub (GraphQL `viewer { login }`, a que
 um token de instalação pode ou não responder) e, na falta disso, aprende o nome com o autor do primeiro comentário que
 publica e guarda-o com o repositório. Um token pessoal nunca o precisa. Veja
@@ -959,7 +959,7 @@ repositório de cada vez e deixa os seus outros repositórios no seu próprio to
 2. Escreva um pequeno script que imprima um **token de instalação** na sua saída
    padrão (a chave privada da App assina um JWT de curta duração, que é trocado
    por um token válido durante uma hora). O GitPoulpi nunca vê a chave.
-3. Em **Definições > Repositório > SSH e credenciais**, escolha **Comando de
+3. Em **Definições > Definições do repositório > SSH e credenciais**, escolha **Comando de
    token** em HTTPS, introduza o script como **Comando** e o host (`github.com`)
    em **Hosts**, e marque **Usar para a API do host (issues, pull requests)**.
    Guarde e confirme o comando (uma pessoa confirma-o sempre, com o seu SHA-256).
@@ -985,7 +985,7 @@ O que muda nesse repositório:
   App é o nome de **Publicar como**, por exemplo `my-app[bot]`: defina-o para todos os
   repositórios em **Definições > Integrações** (`general.hosting_post_as`, também
   `gitpoulpi config set general.hosting_post_as my-app[bot]`) ou para um repositório
-  em **Definições > Repositório > SSH e credenciais > Host**, que prevalece. Se ficar
+  em **Definições > Definições do repositório > SSH e credenciais > Host**, que prevalece. Se ficar
   vazio, o GitPoulpi pergunta ao GitHub (GraphQL `viewer { login }`) e, caso
   contrário, aprende o nome com o autor do primeiro comentário que publica, e guarda-o
   com o repositório. Esse nome é também a forma de reconhecer os seus próprios
@@ -1004,7 +1004,7 @@ a configurar.)
 
 ### Bloquear a atribuição num repositório
 
-**Definições > Repositório > SSH e credenciais** tem uma linha **Atribuição**
+**Definições > Definições do repositório > SSH e credenciais** tem uma linha **Atribuição**
 (**Permitida** por predefinição, ou **Bloqueada**; guardada de imediato). Bloqueada,
 a atribuição é impossível nas issues e pull requests desse repositório, seja quem for
 que a peça:

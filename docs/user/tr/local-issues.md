@@ -21,6 +21,10 @@ düzenleyici veya bir kabuk aynı anda onları düzenleyebilir ve listeler bunu 
 
 Hiçbir şey kendiliğinden bağlanmaz: her issue kaynağı gibi depo başına isteğe bağlıdır.
 
+## Bir nottaki yorumlar
+
+ISSUE'LAR bölümünde bir notun satırında veya kartında `Enter` onun konuşmasını açar: notun metni, sonra yorumlar. Yorumlar notun dosyasının kendisinde, sondaki bir `## Comments` bölümünde tutulur; her biri bir `### <yazar> - <UTC saati>` girdisidir (düzenlenmiş olana `(edited <saat>)` eklenir). Bu başlığın üstündeki hiçbir şeye dokunulmaz; böylece Obsidian ve bir kabuk aynı dosyayı okur ve düzenler. Yerel yazarın yorumlarını yazabilir, düzenleyebilir ve silebilirsiniz (profilin `local.me` değeri, yoksa bağlı kullanıcı; *Bana atananlar*'ın kullandığı ad); başkasının yorumlarını değil. Kutu, önizlemeli olağan Markdown yazma kutusudur ve *<ad> olarak yazılıyor (yerel not)* yazarı belirtir. Ağ üzerinden hiçbir şey gitmez. Elle yazdığınız bir `## Comments` başlığı da bu şekilde okunur.
+
 ## Notlar
 
 Issue başına bir not, `<id>-<slug>.md` adıyla (`12-crash-on-empty-name.md`) ve bir frontmatter bloğuyla:
@@ -46,6 +50,28 @@ Free Markdown. GitPoulpi never rewrites the body.
 - Okuma hoşgörülüdür: `id`'si olmayan bir not onu dosya adından alır, `status`'u olmayan bir not `todo`'dur,
   frontmatter'ı olmayan bir not başlığını ilk `# başlık`tan alır. Issue olmayan bir dosya (`readme.md`) yok sayılır.
 - Bir durum serbest metindir. **Açık**, "tamamlandı durumu değil" demektir.
+
+### Bir nottaki yorumlar
+
+Bir nota yapılan yorum notun kendisine, son bir `## Comments` bölümüne yazılır (ağ yok, Obsidian'da da düzgün okunur):
+
+```markdown
+(notun metni)
+
+## Comments
+
+### kai - 2026-11-15T10:00:00Z
+İlk yorum, **herhangi bir Markdown**.
+
+### ann - 2026-11-15T11:30:00Z (edited 2026-11-15T12:00:00Z)
+İkincisi.
+```
+
+- Bir girdi, tam olarak `### <yazar> - <UTC saati>` olan bir satırla başlar; bir düzenlemeden sonra ` (edited <UTC saati>)` eklenir; metni bir sonraki girdiye kadar sürer. Bölüm, bir kod çitinin dışındaki son `## Comments` başlığıdır ve dosyanın sonuna kadar sürer; bu yüzden onun ardına hiçbir şey yazmayın.
+- Bir girdi veya başlık gibi okunacak bir yorum satırı başında ters eğik çizgiyle saklanır (`\### ...`; Markdown aynı metni gösterir) ve geri okunurken onsuz okunur.
+- Gönderme sona ekler ve üstündeki her şeyi bayt bayt korur (satır sonları dahil); bir düzenleme veya silme yalnızca bölümü yeniden yazar. Bir gönderi ayrıca notun `updated` değerini ilerletir (frontmatter'ı olmayan nota bir tane verilmez).
+- Yazar, profilin yerel yazarıdır (Yerel issue ayarlarındaki "ben"). Yalnızca kendi yorumlarınızı düzenleyebilir veya silebilirsiniz; bir yorumun kimliği saati ve yazarıdır, aynı saniyedeki iki gönderi ikincisini bir saniye ilerleterek ayırt edilir.
+- Bir not için yanıt, dahili yorum ve olay geçmişi yoktur.
 
 ## Neler yapabilirsiniz
 
@@ -103,7 +129,7 @@ panosudur. **ISSUE'LAR başlığı > Pano** ya da paletin **Issue'lar: Panoyu A�
   `Shift+Left` / `Shift+Right` kullanın ya da sütunların bir açılır listesi olan **Pano: Kartı Şuraya Taşı...** (`m`)
   komutunu kullanın. Kart hemen taşınır; notun `status` değeri [notlar bölümündeki](#notlar) gibi yeniden yazılır, dosyada
   başka hiçbir şey değişmez. Yazma başarısız olursa kart geri döner ve hata durum çubuğunda görünür.
-- Bir kartı `Enter` veya çift tıkla **açın** (not, `.md` için varsayılan programınızda açılır). `e` atananlarını,
+- Bir kartı `Enter` veya çift tıkla **açın**: notun [konuşması](hosting-integration.md#5c-konuşmalar), notun metni ve yorumlarıyla birlikte pencerede açılır (kart menüsündeki **Notu aç** dosyayı `.md` için varsayılan programınızda açar). `e` atananlarını,
   etiketlerini veya kilometre taşını düzenler, `.` veya bir sağ tık kart menüsünü açar, `n` seçili sütunda yeni bir issue
   başlatır (form kapandığında panoya geri dönülür).
 - **Filtre**: atanana (`a`), etikete (`l`), kilometre taşına (`M`) veya metne (`/`) göre; `x` onları temizler. Filtreler

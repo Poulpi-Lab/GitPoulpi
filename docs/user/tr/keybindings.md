@@ -377,10 +377,10 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `reword` | `deeper` | Geçmişi daha kapsamlı değiştir | `Alt+H` |
 | `composer` | `commit` | Composer'dan Commit | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Issue referansı ekle | `Alt+R` |
-| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
-| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
-| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
+| `md_editor` | `preview` | Markdown Düzenleyici: Yaz ve Önizleme Arasında Geç | `Alt+P` |
+| `md_editor` | `split` | Markdown Düzenleyici: Yan Yana Görünümü Aç veya Kapat | `Alt+L` |
+| `md_editor` | `submit` | Markdown Düzenleyici: Metni Gönder | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Markdown Düzenleyici: YZ ile Yaz | `Alt+E` |
 | `dialog` | `browse` | Klasör Gözat | `Ctrl+B` |
 | `dialog` | `sources` | Klon kaynaklarına git | `Alt+S` |
 | `dialog` | `submit` | Pull Request Formunu Gönder | `Ctrl+S` |
@@ -832,7 +832,7 @@ Tuşlar varsayılanlardır.
 | Radar: Sabitle veya Sabitlemeyi Kaldır | `p` |
 | Radar: Ertele... | `z` |
 | Radar: İsteği İncele... | `e` |
-| Radar: Open Issue Conversation | `i` |
+| Radar: Issue Konuşmasını Aç | `i` |
 | Radar: API Üzerinden İncele |  |
 | Radar: Klonla ve İncele... |  |
 | Radar: Atananları Düzenle... |  |
@@ -974,30 +974,30 @@ Tuşlar varsayılanlardır.
 | Pano: Sütun Etiketlerini Ayarla... | `c` |
 | Pano: Yenile | `r` |
 | Pano: Kapat | `Esc` |
-| Conversation: Back |  |
-| Conversation: Refresh | `F5` |
-| Conversation: Load Older Entries | `m` |
-| Conversation: Previous Entry | `Up` |
-| Conversation: Next Entry | `Down` |
-| Conversation: Next Unread Entry | `n` |
-| Conversation: Reply to Entry | `r` |
-| Conversation: Quote Entry | `Q` |
-| Conversation: New Comment | `c` |
-| Conversation: Links of Entry... | `l` |
-| Conversation: Open Diagram of Entry | `g` |
-| Conversation: Copy Link of Entry | `y` |
-| Conversation: Open in Browser | `o` |
-| Conversation: Edit Comment | `e` |
-| Conversation: Delete Comment | `d` |
-| Conversation: Show or Hide Events | `v` |
-| Conversation: Toggle Write and Preview |  |
-| Conversation: Toggle the Split View |  |
-| Conversation: Send the Comment |  |
-| Conversation: Toggle Internal Note |  |
-| Conversation: Close | `Esc` |
-| Markdown Editor: Write with AI |  |
-| Markdown Editor: Refresh the AI Context |  |
-| Hosting: Open Issue Conversation... |  |
+| Konuşma: Geri |  |
+| Konuşma: Yenile | `F5` |
+| Konuşma: Eski Kayıtları Yükle | `m` |
+| Konuşma: Önceki Kayıt | `Up` |
+| Konuşma: Sonraki Kayıt | `Down` |
+| Konuşma: Sonraki Yeni Kayıt | `n` |
+| Konuşma: Kayda Yanıt Ver | `r` |
+| Konuşma: Kaydı Alıntıla | `Q` |
+| Konuşma: Yeni Yorum | `c` |
+| Konuşma: Kaydın Bağlantıları... | `l` |
+| Konuşma: Kaydın Diyagramını Aç | `g` |
+| Konuşma: Kaydın Bağlantısını Kopyala | `y` |
+| Konuşma: Tarayıcıda Aç | `o` |
+| Konuşma: Yorumu Düzenle | `e` |
+| Konuşma: Yorumu Sil | `d` |
+| Konuşma: Olayları Göster veya Gizle | `v` |
+| Konuşma: Yaz ve Önizleme Arasında Geç |  |
+| Konuşma: Yan Yana Görünümü Aç veya Kapat |  |
+| Konuşma: Yorumu Gönder |  |
+| Konuşma: Dahili Notu Aç veya Kapat |  |
+| Konuşma: Kapat | `Esc` |
+| Markdown Düzenleyici: YZ ile Yaz |  |
+| Markdown Düzenleyici: YZ Bağlamını Yenile |  |
+| Barındırma: Issue Konuşmasını Aç... |  |
 | İnceleme: ✦ İnceleme Taslağı... | `s` |
 | İnceleme: Öneriyi Kabul Et | `y` |
 | İnceleme: Öneriyi Düzenle ve Kabul Et... | `w` |
@@ -1501,7 +1501,7 @@ Bkz. [Barındırma hizmetleri ve issue takipçileri](hosting-integration.md#5-ke
 
 | Tuş | Eylem |
 |---|---|
-| `Enter` | Seçili satırı tarayıcıda aç. Bir `Yeniden bağlan` satırında: Ayarlar'ı o profilde aç |
+| `Enter` | Seçili satırı aç: bir issue (ve Azure DevOps veya Bitbucket'ta bir istek) [konuşma](hosting-integration.md#5c-konuşmalar) olarak, incelemesi olan barındırıcılarda bir pull request [incelemede](review.md), geri kalan her şey tarayıcıda. Bir `Yeniden bağlan` satırında: Ayarlar'ı o profilde aç |
 | `Space` | Bölümü genişlet veya daralt |
 | `v` | Bölümün filtresini aç. Pull request'ler: Açık, Merged / kapanan, Tümü. Issue'lar: Açık, Bana atanan, Kapalı, Tümü |
 | `n` | Pull request bölümü: bir pull request oluştur. ISSUE'LAR bölümü: yeni issue. (Başlıktaki `+` düğmesi) |
@@ -1509,7 +1509,7 @@ Bkz. [Barındırma hizmetleri ve issue takipçileri](hosting-integration.md#5-ke
 | Arama satırında `Enter` | Arama alanına yaz. `Enter`, `Tab` veya `Esc` ondan çıkar; `Ctrl+U` temizler |
 | Bir grup başlığında `Enter` | Grubu katla veya aç (*Pull Request'ler · Benim*, *Bana Atanan*, *İncelememi Bekleyen*, *Pull Request'ler · Tümü*) |
 | Filtre, sağlayıcı veya depo satırında `Enter` | O açılır listeyi aç. Sağlayıcı listesi **Yok (bu deponun bağlantısını kaldır)** ile biter |
-| `.` veya sağ tık | Satırın menüsü: tarayıcıda aç, URL'yi veya numarayı kopyala, kaynak dalı checkout et (pull request'ler); issue'dan dal oluştur (issue'lar) |
+| `.` veya sağ tık | Satırın menüsü: konuşmayı aç, tarayıcıda aç, URL'yi veya numarayı kopyala, kaynak dalı checkout et (pull request'ler); issue'dan dal oluştur (issue'lar) |
 
 ### Issue panosu
 
@@ -1522,7 +1522,7 @@ tuş aynı zamanda bir palet komutudur (**Pano: ...**).
 | Oklar | Bir kart (`Up`, `Down`) veya komşu sütun (`Left`, `Right`) seç; `Home`, `End`, `PageUp`, `PageDown` sütunda atlar |
 | `Shift+Left`, `Shift+Right` | Seçili kartı önceki veya sonraki sütuna taşı |
 | `m` | **Kartı Şuraya Taşı...**: sütunların bir açılır listesi |
-| `Enter` | Issue'yu aç (yerel bir issue için not; aksi halde barındırıcının sayfası) |
+| `Enter` | Issue'nun [konuşmasını](hosting-integration.md#5c-konuşmalar) aç (barındırıcının okunacak konuşması yoksa barındırıcının sayfası) |
 | `e`, `.` | Atananları, etiketleri veya kilometre taşını düzenle; kart menüsü |
 | `n` | Seçili sütunda yeni issue |
 | `a`, `l`, `M`, `/` | Atanana, etikete, kilometre taşına, metne göre filtrele. `x` filtreleri temizler |
@@ -1533,6 +1533,43 @@ tuş aynı zamanda bir palet komutudur (**Pano: ...**).
 Fare: bir kartı taşımak için başka bir sütuna sürükleyin, seçmek için bir karta tıklayın, açmak için çift tıklayın, kart
 menüsü için sağ tıklayın, bir sütunu kaydırmak için tekerlek, sütunları kaydırmak için `Shift`+tekerlek (veya panonun
 altındaki çubuk).
+
+### Markdown yazma kutusu ve konuşma görünümü
+
+Metni bir barındırıcıya giden her kutu (bir yorum, bir yanıt, bir inceleme özeti, yeni bir issue veya pull request
+açıklaması) aynı yazma kutusudur. Tuşları yukarıdaki `md_editor` tablosundadır ve yeniden atanabilir.
+
+| Tuş | Eylem |
+|---|---|
+| `Alt+P` | **Yaz** ile **Önizleme**'yi değiştir (**Yan yana**'dan Önizleme'ye geçer) |
+| `Alt+L` | **Yan yana**'yı aç veya Yaz'a dön (100 sütun genişliğinde bir pencere ister) |
+| `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` | Metni gönder (formun kendi düğmesi aynısını yapar) |
+| `Alt+E` | **YZ ile Yaz**: mod çubuğunun altındaki paneli açar veya kapatır (yalnızca YZ açıkken) |
+| `Alt+R` | Yalnızca commit composer'da: bir issue referansı ekle |
+| `Alt+W` | Yeni issue ve pull request formları: sağlayıcının kendi web sayfasında oluştur |
+| `Esc` | **YZ ile Yaz** panelinde: çalışan bir taslağı durdur, yoksa paneli kapat |
+
+Bir issue veya isteğin [konuşma görünümünde](hosting-integration.md#5c-konuşmalar) (palet satırları *Konuşma: ...*;
+tuşu olan satırlar yukarıdaki palet listesindedir):
+
+| Tuş | Eylem |
+|---|---|
+| `r` | Seçili kayda yanıt ver (yorum dizisine veya yorum dizisi olmayan bir barındırıcıda metni alıntılanarak) |
+| `Q` | Seçili kaydı yeni bir yorumda alıntıla |
+| `c` | Yeni yorum |
+| `e`, `d` | Kendi yorumlarınızdan birini düzenle, sil |
+| `Alt+I` | Yorum kutusunda: **Dahili not** (GitLab, Redmine) |
+| `l`, `y`, `o` | Kaydın bağlantıları, adresini kopyala, tarayıcıda aç |
+| `n` | Sonraki okunmamış kayıt |
+| `v`, `m`, `F5` | Olayları göster veya gizle, eski kayıtları yükle, yenile |
+| `g` | Kaydın diyagramını aç (bir `mermaid` bloğu) |
+| `Alt+Left`, `Backspace` | Referanslardan açılan öğelerin yığınında geri git |
+| `Tab` | Zaman çizelgesi, yorum kutusu, başlık düğmeleri |
+| `q`, `Esc` | Kapat |
+
+Radar'da `i` bir issue satırının konuşmasını açar.
+
+Kenar çubuğu bölümlerinin bir pull request veya issue satırında `Enter` konuşmayı, `o` satırı tarayıcıda açar.
 
 ### Flow (dal iş akışları)
 

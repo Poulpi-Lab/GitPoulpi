@@ -87,6 +87,20 @@ fn rig() -> Rig {
     rig_at(entries(), None)
 }
 
+/// A rig on a project of its own: the notification log is shared by every
+/// test, so a test that reads it names its project.
+fn rig_in(project: &str) -> Rig {
+    let shared = shared(entries());
+    let factory: Arc<dyn ClientFactory> = Arc::new(Factory(shared.clone()));
+    let mut t = target(None);
+    t.project = project.into();
+    let mut view = ItemView::open(t, factory);
+    wait(&mut view, "the conversation", |v| {
+        v.conv.header.is_some() && v.conv.identity.is_some() && !v.conv.busy()
+    });
+    Rig { view, shared }
+}
+
 fn wait(view: &mut ItemView, what: &str, done: impl Fn(&ItemView) -> bool) {
     let deadline = Instant::now() + Duration::from_secs(10);
     loop {
@@ -814,6 +828,7 @@ fn another_client_posting_makes_the_open_view_read_again() {
         number,
         id: String::new(),
         change: HostingChange::Posted,
+        origin: String::new(),
     };
     r.view.on_hosting_changed(&change(7));
     r.view.poll();
@@ -1035,4 +1050,61 @@ fn a_text_over_the_hosts_limit_shows_the_count_and_is_refused_before_the_host() 
         0,
         "nothing reached the host"
     );
+}
+
+#[test]
+fn every_write_of_this_window_tells_the_daemon_what_changed() {
+    use gitpoulpi_ipc::HostingChange as C;
+    let project = "notify/writes";
+    let mut r = rig_in(project);
+    let changes = || {
+        crate::hosting_notify::testing::sent(project)
+            .iter()
+            .map(|a| (a.change, a.number))
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(changes(), []);
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Char('c')));
+    type_text(&mut r.view, "Hello");
+    r.view.on_key(ctrl_enter());
+    wait_written(&mut r.view);
+    assert_eq!(changes(), [(C::Posted, 142)]);
+    // Edit our own comment.
+    let _ = draw(&mut r.view, WIDE);
+    r.view.conv.select(2);
+    r.view.on_key(key(KeyCode::Char('e')));
+    type_text(&mut r.view, " again");
+    r.view.on_key(ctrl_enter());
+    wait_written(&mut r.view);
+    assert_eq!(changes(), [(C::Posted, 142), (C::Edited, 142)]);
+    // Delete it.
+    let _ = draw(&mut r.view, WIDE);
+    r.view.conv.select(2);
+    r.view.on_key(key(KeyCode::Char('d')));
+    r.view.on_key(key(KeyCode::Tab));
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Enter));
+    wait_written(&mut r.view);
+    assert_eq!(
+        changes(),
+        [(C::Posted, 142), (C::Edited, 142), (C::Deleted, 142)]
+    );
+    // Every one carries this process's origin, so the echo is dropped.
+    assert!(crate::hosting_notify::testing::sent(project)
+        .iter()
+        .all(crate::hosting_notify::is_own));
+}
+
+#[test]
+fn a_refused_write_tells_nobody() {
+    let project = "notify/refused";
+    let mut r = rig_in(project);
+    r.shared.lock().unwrap().fail_write = Some("403 Forbidden".into());
+    let _ = draw(&mut r.view, WIDE);
+    r.view.on_key(key(KeyCode::Char('c')));
+    type_text(&mut r.view, "x");
+    r.view.on_key(ctrl_enter());
+    wait_written(&mut r.view);
+    assert_eq!(crate::hosting_notify::testing::sent(project), []);
 }

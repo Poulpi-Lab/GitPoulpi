@@ -433,6 +433,7 @@ async fn a_hosting_comment_notification_is_broadcast_to_another_client() {
         number: 142,
         id: String::new(),
         change: HostingChange::Posted,
+        origin: "tui-1".into(),
     };
     let call =
         |id: u64, repo: Option<gitpoulpi_core::domain::RepoId>, args: serde_json::Value| Request {

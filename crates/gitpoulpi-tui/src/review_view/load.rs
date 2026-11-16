@@ -266,9 +266,24 @@ async fn run_call(
         .client(&target.integration, &target.all)
         .map_err(|e| error_text(&e))?;
     let (project, number) = (target.project.as_str(), target.number);
-    perform(&*client, project, number, call)
+    let change = match &call {
+        Call::Comment(_) | Call::Reply { .. } => gitpoulpi_ipc::HostingChange::Posted,
+        Call::Resolve { .. } | Call::Submit(_) => gitpoulpi_ipc::HostingChange::Reviewed,
+        Call::SubmitChange | Call::AbandonChange => gitpoulpi_ipc::HostingChange::StateChanged,
+    };
+    let done = perform(&*client, project, number, call)
         .await
-        .map_err(|e| error_text(&e))
+        .map_err(|e| error_text(&e))?;
+    // Other windows showing this request read it again.
+    crate::hosting_notify::notify(
+        &target.integration.id,
+        project,
+        gitpoulpi_ipc::HostingItemKind::PullRequest,
+        number,
+        "",
+        change,
+    );
+    Ok(done)
 }
 
 async fn perform(

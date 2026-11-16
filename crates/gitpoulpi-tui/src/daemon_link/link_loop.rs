@@ -164,6 +164,7 @@ pub(super) async fn link_loop_with_port(
     // `JobChanged` / `JobRemoved`; cancels go out through this link.
     crate::jobs_ui::set_requester(activity.raw.requester());
     crate::push_group_ui::set_requester(activity.raw.requester());
+    crate::hosting_notify::set_requester(activity.raw.requester());
     if let Ok(list) = conn
         .call::<Vec<gitpoulpi_ipc::JobInfo>>(OperationKind::JobList, serde_json::json!({}))
         .await

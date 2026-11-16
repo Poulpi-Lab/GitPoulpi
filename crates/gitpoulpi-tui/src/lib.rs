@@ -162,6 +162,7 @@ mod guide_dialog;
 mod help_guide;
 mod help_view;
 mod history_view;
+mod hosting_notify;
 #[cfg(feature = "hosting")]
 mod hosting_task;
 #[cfg(test)]

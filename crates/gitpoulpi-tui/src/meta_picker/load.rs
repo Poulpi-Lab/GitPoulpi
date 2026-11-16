@@ -188,6 +188,19 @@ pub(crate) fn start_edit(
                 .map_err(|e| error_text(&e))
             })
         })();
+        if result.is_ok() {
+            crate::hosting_notify::notify(
+                &target.integration.id,
+                &target.project,
+                match target.kind {
+                    MetaKind::Issue => gitpoulpi_ipc::HostingItemKind::Issue,
+                    MetaKind::PullRequest => gitpoulpi_ipc::HostingItemKind::PullRequest,
+                },
+                target.number.unwrap_or_default(),
+                "",
+                gitpoulpi_ipc::HostingChange::Updated,
+            );
+        }
         let _ = tx.send_notify(result);
     });
     EditReceiver { rx }

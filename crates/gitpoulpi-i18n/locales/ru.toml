@@ -1101,7 +1101,7 @@ hint_create = "создать"
 hint_open = "открыть"
 hint_toggle = "переключить"
 # context: one line in the minimal frame a dialog shows when the window is too small for it
-too_small = "Window too small: enlarge it"
+too_small = "Окно слишком маленькое: увеличьте его"
 
 [clone]
 title = "Клонировать репозиторий"
@@ -3612,7 +3612,7 @@ review_reply = "Ревью: ответить в обсуждении..."
 # context: command palette entry
 review_resolve = "Ревью: разрешить обсуждение или открыть снова"
 # context: command palette entry
-review_back_to_comment = "Review: Back to Comment in Overview"
+review_back_to_comment = "Ревью: вернуться к комментарию в обзоре"
 # context: command palette entry
 review_fold_thread = "Ревью: свернуть или развернуть обсуждение"
 # context: command palette entry
@@ -4301,7 +4301,7 @@ explain_changes = "Объяснить рабочие изменения"
 ai_generate = { git = "Создать сообщение commit'а с помощью ИИ", local = "Создать сообщение коммита с помощью ИИ" }
 ai_compose = "Составить {$commits} с помощью ИИ"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: {$commit} without running git hooks"
+skip_hooks = "Пропустить хуки: {$commit} без запуска хуков git"
 commit_reference = { git = "Открыть в браузере (палитра: «Интеграции: открыть ссылку из commit'а»)", local = "Открыть в браузере (палитра: «Интеграции: открыть ссылку из коммита»)" }
 quit = "Выйти из GitPoulpi"
 quit_cd = "Выйти, оставив оболочку в папке этой вкладки (нужна обёртка оболочки)"
@@ -5481,7 +5481,7 @@ ref_from_branch = "(из ветки)"
 issue_ref_inserted = "вставлено {reference}"
 skip_hooks = "Пропустить хуки"
 # context: shorter label of the Skip hooks checkbox on a narrow commit options row
-skip_hooks_short = "No hooks"
+skip_hooks_short = "Без хуков"
 
 [compose_ui]
 select_commit = { git = "Выберите commit...", local = "Выберите коммит..." }
@@ -7241,13 +7241,13 @@ why_not_on_code = "сначала поставьте курсор на стро�
 # context: why a row is off
 why_not_on_thread = "сначала поставьте курсор на обсуждение"
 # context: button on the Files page after jumping from a comment: returns to that comment in the Overview
-back_to_overview = "Back to Overview"
+back_to_overview = "Назад к обзору"
 # context: why Back to Comment does nothing. Width budget: 50 cells
-why_no_return = "no comment to go back to"
+why_no_return = "нет комментария, к которому можно вернуться"
 # context: status line: the commented file is not in the diff. {path} is a file path
-thread_not_in_diff = "{path} is not in the {$diff}"
+thread_not_in_diff = "{path} не входит в {$diff}"
 # context: status line: the thread's line no longer exists; {path} is a file path
-thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
+thread_outdated_nearest = "обсуждение устарело: показана ближайшая строка в {path}"
 # context: why a row is off
 why_no_resolve = "это обсуждение нельзя разрешить"
 # context: why a row is off
@@ -10247,11 +10247,11 @@ link_diagram = "Диаграмма: {first}"
 why_no_diagram = "в выбранной записи нет диаграммы"
 palette_open_diagram = "Беседа: открыть диаграмму записи"
 # context: command palette entry
-palette_open_code = "Conversation: Open Code of Thread"
+palette_open_code = "Беседа: открыть код обсуждения"
 # context: why Open Code does nothing. Width budget: 50 cells
-why_no_code = "the selected entry is not a code thread"
+why_no_code = "выбранная запись не относится к коду"
 # context: why Open Code does nothing outside a review. Width budget: 50 cells
-why_no_code_here = "open the review of this request to reach its code"
+why_no_code_here = "откройте ревью этого запроса, чтобы перейти к коду"
 why_no_url = "у этой записи нет страницы на хостинге"
 why_no_events = "этот хостинг не показывает события"
 why_no_reply = "этот хостинг не принимает ответ на эту запись"

@@ -21,7 +21,8 @@ pracovní změny:
 - **Přejmenované nebo přesunuté soubory** jsou jeden řádek, `nový <- starý`, v obou
   seznamech (soubor smazaný na disku a nový soubor, který má alespoň z 50 % stejný obsah,
   se počítá jako přesun už před stagingem). Stage, Unstage a Zahodit působí na oba názvy:
-  stage přidá smazání i nový soubor, takže git vidí jedno přejmenování.
+  stage přidá smazání i nový soubor, takže git vidí jedno přejmenování, a je to
+  JEDEN krok zpět (`Undo Stage rename old -> new`).
   Otevření řádku ukáže diff obsahu proti starému názvu s hlavičkou
   `starý -> nový (podobnost N %)`; přesun bez úprav říká **Obsah se nezměnil**.
   Totéž platí pro soubory commitu a `gitpoulpi status` / `gitpoulpi diff`
@@ -178,8 +179,9 @@ na řádku pracovních změn v Logu: psaní do jednoho se zobrazí i v druhém.
   vyžadovat force push (with lease).
 - **Přeskočit hooky** (`Shift+H`, nebo **Commit: Přepnout Přeskočit hooky** v paletě) commituje
   bez spuštění hooků `pre-commit` a `commit-msg` repozitáře. Platí pro jeden commit;
-  **Nastavení > Nastavení repozitáře > Commit** ho nastaví jako ve výchozím stavu zaškrtnuté. Zobrazuje se,
-  když je na řádku místo.
+  **Nastavení > Nastavení repozitáře > Commit** ho nastaví jako ve výchozím stavu zaškrtnuté. Na úzkém řádku
+  se jeho popisek zkrátí na **Bez hooků**, pak na samotné zaškrtávátko (jeho tooltip ho pojmenuje);
+  nikdy nezmizí.
 - `c` v panelu Stav přesune kurzor do formuláře. `Esc` ho opustí.
 - `Ctrl+G c` a `Ctrl+G Enter` (**Git: Commit...** a **Git: Hned commitnout změny
   ze stage** v paletě) jsou jeden příkaz, tlačítko commitu odkudkoli. Když je ve
@@ -204,8 +206,12 @@ upravili; nic se necommituje, dokud nestisknete tlačítko commitu.
 
 **Sestavit commity pomocí AI** je na pravém konci řádku Amend a s pravým panelem se
 zmenšuje, místo aby zmizelo: celý popisek, pak **Sestavit pomocí AI**, pak samotné **`✦`**.
-Při každé šířce si drží klik, tooltip i klávesu (`Ctrl+G Shift+C`); popisky Amend a
-Přeskočit hooky mu ustupují, nikdy naopak.
+Při každé šířce si drží klik, tooltip i klávesu (`Ctrl+G Shift+C`); popisek Přeskočit hooky
+mu ustupuje (**Bez hooků**, pak jen políčko), než se zmenší on sám.
+
+Tlačítka **`✦`** (vygenerovat zprávu) a **`#`** (vložit odkaz na issue) na pravém konci
+řádku shrnutí se zmenšují stejně: v úzkém panelu přijdou o okraje, pak se složí do jednoho
+tlačítka **`⋯`**, jehož nabídka uvádí obě, takže žádné nezmizí.
 
 ## Commit composer: rozdělte změny do commitů
 

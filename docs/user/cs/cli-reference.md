@@ -101,7 +101,8 @@ Hunky a řádky se číslují tak, jak je číslují `gitpoulpi --json diff`.
 | Příkaz | Co dělá |
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Přidá do indexu soubor, složku, vše, hunk nebo některé řádky. Stage souboru, složky nebo `--all`, který by přidal citlivý soubor (soukromý klíč, `.env`, rozpoznaný token: `[privacy]` v [referenci konfigurace](config-reference.md#privacy-citlivé-soubory)), se odmítne s kódem ukončení 2 a `{error: "sensitive_files", files: [{path, reason}]}` (pravidlo a maskovaný náhled, nikdy hodnota); nic se nepřidá. `--allow-sensitive` je přesto přidá. |
-| `unstage` (stejné přepínače) | Opak. |
+| `stage --paths A B ...` | Přidá do indexu několik souborů nebo složek jako JEDNU operaci: jeden záznam v deníku, jeden krok `undo` (přejmenovaný soubor je jeho stará i nová cesta, jak je `status` ukazuje v `renamed_from`). Nelze kombinovat s `--folder`, `--hunk`, `--lines` ani `--all`. |
+| `unstage` (stejné přepínače, včetně `--paths`) | Opak. |
 | `discard --file F [--hunk N [--lines a,b]]` | Zahodí změny mimo index (celý soubor: každou změnu, nesledovaný soubor se smaže i složky, které tím zůstanou prázdné). Lze vrátit zpět. |
 | `rm-file <paths>...` | Smaže soubory z pracovního stromu. Lze vrátit zpět. |
 | `ignore <pattern> [--file <.gitignore>]` | Připojí vzor do `.gitignore` (nebo do `.git/info/exclude` pomocí `--file .git/info/exclude`). Lze vrátit zpět, kromě `.git/info/exclude`. |

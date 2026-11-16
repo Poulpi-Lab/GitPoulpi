@@ -1099,7 +1099,7 @@ hint_create = "vytvořit"
 hint_open = "otevřít"
 hint_toggle = "přepnout"
 # context: one line in the minimal frame a dialog shows when the window is too small for it
-too_small = "Window too small: enlarge it"
+too_small = "Okno je příliš malé: zvětšete ho"
 
 [clone]
 title = "Klonovat repozitář"
@@ -3619,7 +3619,7 @@ review_reply = "Kontrola: Odpovědět ve vlákně..."
 # context: command palette entry
 review_resolve = "Kontrola: Vyřešit nebo znovu otevřít vlákno"
 # context: command palette entry
-review_back_to_comment = "Review: Back to Comment in Overview"
+review_back_to_comment = "Kontrola: Zpět ke komentáři v přehledu"
 # context: command palette entry
 review_fold_thread = "Kontrola: Sbalit nebo rozbalit vlákno"
 # context: command palette entry
@@ -4307,7 +4307,7 @@ explain_changes = "Vysvětlit rozpracované změny"
 ai_generate = "Vygenerovat zprávu commitu pomocí AI"
 ai_compose = "Sestavit commity pomocí AI"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: {$commit} without running git hooks"
+skip_hooks = "Přeskočit hooky: {$commit} bez spuštění git hooků"
 commit_reference = "Otevřít v prohlížeči (paleta: Otevřít odkaz z commitu)"
 quit = "Ukončit GitPoulpi"
 quit_cd = "Ukončit a nechat shell ve složce této karty (vyžaduje obal shellu)"
@@ -5485,7 +5485,7 @@ ref_from_branch = "(z větve)"
 issue_ref_inserted = "vloženo {reference}"
 skip_hooks = "Přeskočit hooky"
 # context: shorter label of the Skip hooks checkbox on a narrow commit options row
-skip_hooks_short = "No hooks"
+skip_hooks_short = "Bez hooků"
 
 [compose_ui]
 select_commit = "Vyberte commit..."
@@ -7231,13 +7231,13 @@ why_not_on_code = "nejdřív umístěte kurzor na řádek kódu"
 # context: why a row is off
 why_not_on_thread = "nejdřív umístěte kurzor na vlákno komentářů"
 # context: button on the Files page after jumping from a comment: returns to that comment in the Overview
-back_to_overview = "Back to Overview"
+back_to_overview = "Zpět na přehled"
 # context: why Back to Comment does nothing. Width budget: 50 cells
-why_no_return = "no comment to go back to"
+why_no_return = "není komentář, ke kterému se vrátit"
 # context: status line: the commented file is not in the diff. {path} is a file path
-thread_not_in_diff = "{path} is not in the {$diff}"
+thread_not_in_diff = "{path} není v {$diff}"
 # context: status line: the thread's line no longer exists; {path} is a file path
-thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
+thread_outdated_nearest = "toto vlákno je zastaralé: zobrazuji nejbližší řádek souboru {path}"
 # context: why a row is off
 why_no_resolve = "toto vlákno nelze vyřešit"
 # context: why a row is off
@@ -10236,11 +10236,11 @@ link_diagram = "Diagram: {first}"
 why_no_diagram = "vybraný záznam nemá diagram"
 palette_open_diagram = "Konverzace: Otevřít diagram záznamu"
 # context: command palette entry
-palette_open_code = "Conversation: Open Code of Thread"
+palette_open_code = "Konverzace: Otevřít kód vlákna"
 # context: why Open Code does nothing. Width budget: 50 cells
-why_no_code = "the selected entry is not a code thread"
+why_no_code = "vybraný záznam není vlákno nad kódem"
 # context: why Open Code does nothing outside a review. Width budget: 50 cells
-why_no_code_here = "open the review of this request to reach its code"
+why_no_code_here = "kód najdete v kontrole této žádosti: otevřete ji"
 why_no_url = "tento záznam nemá stránku na hostiteli"
 why_no_events = "tento hostitel události nevypisuje"
 why_no_reply = "tento hostitel nepřijímá odpověď na tento záznam"

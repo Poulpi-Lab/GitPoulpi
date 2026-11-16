@@ -59,6 +59,15 @@ a Nastavení se otevírají nad oknem. Každé má vpravo nahoře na rámu `✕`
 zavřete je klávesou `Esc` nebo kliknutím na `✕` a kliknutí mimo zavře dialog,
 vyskakovací okno nebo panel (viz [Zavírání oken a dialogů](mouse-and-gestures.md#zavírání-oken-a-dialogů)).
 
+### Když je okno malé
+
+Při zužování okna nic tiše nemizí. Tlačítko nejdřív přijde o dlouhý popisek
+(oříznutý na `...`), pak se zalomí na druhý řádek nebo přejde za nabídku `⋯`
+svého řádku a jeho klávesa i položka v paletě fungují po celou dobu. Dialog,
+který je pro okno příliš velký, nakreslí místo ničeho malý rám s titulkem, `✕`
+a řádkem **Okno je příliš malé: zvětšete ho**; `Esc` a `✕` ho zavřou a po
+zvětšení okna se vrátí celý.
+
 ## Řádek karet
 
 Karta **Domů** (ikona domku) je na levém konci, za ní

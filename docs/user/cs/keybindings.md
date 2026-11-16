@@ -931,7 +931,7 @@ Klávesy jsou výchozí.
 | Kontrola: Okomentovat konverzaci... | `C` |
 | Kontrola: Odpovědět ve vlákně... | `r` |
 | Kontrola: Vyřešit nebo znovu otevřít vlákno | `x` |
-| Review: Back to Comment in Overview | `Esc` |
+| Kontrola: Zpět ke komentáři v přehledu | `Esc` |
 | Kontrola: Sbalit nebo rozbalit vlákno | `z` |
 | Kontrola: Upravit čekající komentář... | `e` |
 | Kontrola: Smazat čekající komentář | `d` |
@@ -990,7 +990,7 @@ Klávesy jsou výchozí.
 | Konverzace: Nový komentář | `c` |
 | Konverzace: Odkazy záznamu... | `l` |
 | Konverzace: Otevřít diagram záznamu | `g` |
-| Conversation: Open Code of Thread | `G` |
+| Konverzace: Otevřít kód vlákna | `G` |
 | Konverzace: Kopírovat odkaz záznamu | `y` |
 | Konverzace: Otevřít v prohlížeči | `o` |
 | Konverzace: Upravit komentář | `e` |

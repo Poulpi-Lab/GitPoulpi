@@ -282,6 +282,13 @@ impl ItemView {
             },
             Act::Links => self.open_links_menu(),
             Act::OpenDiagram => self.open_diagram_menu(),
+            Act::OpenCode => match self.avail().code {
+                Some(why) => ItemEffect::Message(why.to_string()),
+                None => self
+                    .conv
+                    .selected_code()
+                    .map_or(ItemEffect::None, ItemEffect::OpenCode),
+            },
             Act::CopyLink => match self.conv.selected_url() {
                 Some(url) => {
                     ItemEffect::Message(crate::clipboard::copy_shared(m::NOUN_LINK.get(), &url))
@@ -631,6 +638,7 @@ impl ItemView {
             ItemCmd::NewComment => self.act(Act::NewComment),
             ItemCmd::Links => self.act(Act::Links),
             ItemCmd::OpenDiagram => self.act(Act::OpenDiagram),
+            ItemCmd::OpenCode => self.act(Act::OpenCode),
             ItemCmd::CopyLink => self.act(Act::CopyLink),
             ItemCmd::OpenBrowser => self.act(Act::OpenBrowser),
             ItemCmd::Edit => self.act(Act::Edit),

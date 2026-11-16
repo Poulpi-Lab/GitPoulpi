@@ -27,6 +27,7 @@ mod ai_reply;
 #[cfg_attr(not(feature = "ai"), path = "ai_worker_stub.rs")]
 mod ai_worker;
 mod barmenu;
+mod code_jump;
 mod diffpane;
 mod diffrows;
 mod draw;
@@ -163,6 +164,11 @@ pub(crate) struct ReviewView {
     md_cache: crate::md_render::DocCache,
     md_links: Vec<String>,
     ov_rows: usize,
+    /// The code thread of the Overview whose code the Files page was opened
+    /// on: Back (Esc) returns to it.
+    ov_return: Option<String>,
+    /// Where the Files page must put its cursor once the file's rows exist.
+    goto: Option<code_jump::Goto>,
     file_sel: usize,
     file_offset: usize,
     /// Rows of the file / commit list as last painted.
@@ -312,6 +318,8 @@ impl ReviewView {
             md_cache: Default::default(),
             md_links: Vec::new(),
             ov_rows: 0,
+            ov_return: None,
+            goto: None,
             file_sel: 0,
             file_offset: 0,
             list_rows: 10,
@@ -1088,6 +1096,7 @@ impl ReviewView {
             on_suggestion: self.current_suggestion().is_some(),
             has_summary: !self.sug.summary.trim().is_empty(),
             has_draft: self.has_draft(),
+            can_return: self.ov_return.is_some() && self.tab == Tab::Files,
         }
     }
 }

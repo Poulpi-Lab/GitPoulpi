@@ -926,6 +926,7 @@ die Standardtasten.
 | Review: Unterhaltung kommentieren... | `C` |
 | Review: Auf Thread antworten... | `r` |
 | Review: Thread auflösen oder wieder öffnen | `x` |
+| Review: Back to Comment in Overview | `Esc` |
 | Review: Thread ein- oder ausklappen | `z` |
 | Review: Ausstehenden Kommentar bearbeiten... | `e` |
 | Review: Ausstehenden Kommentar löschen | `d` |
@@ -984,6 +985,7 @@ die Standardtasten.
 | Unterhaltung: Neuer Kommentar | `c` |
 | Unterhaltung: Links des Eintrags... | `l` |
 | Unterhaltung: Diagramm des Eintrags öffnen | `g` |
+| Conversation: Open Code of Thread | `G` |
 | Unterhaltung: Link des Eintrags kopieren | `y` |
 | Unterhaltung: Im Browser öffnen | `o` |
 | Unterhaltung: Kommentar bearbeiten | `e` |

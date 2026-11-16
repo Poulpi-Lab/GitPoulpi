@@ -515,6 +515,8 @@ A full-window view: the header (state, who opened it and when, the labels, the n
   [Markup conversion](#markup-conversion)). A `mermaid` code block gets an **Open diagram** button that shows the
   diagram's source in a scrollable viewer (`Enter` copies it); the palette has *Conversation: Open Diagram of Entry*.
   It needs a build with both `conversation` and `mermaid`.
+- In the review's Overview a code thread's `path:line` is a link to the code (`G`, *Conversation: Open Code of Thread*;
+  see [Review](review.md)); in a conversation opened on its own (an issue, a Radar row) there is no code page to go to.
 - The view reads again every 60 seconds and on `F5` (**Refresh**).
 
 **Keys.** Each has a button, a menu row or a palette row (*Conversation: ...*), and `Ctrl+N` badges the buttons.

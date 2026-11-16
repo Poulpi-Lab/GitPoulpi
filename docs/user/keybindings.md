@@ -931,6 +931,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Review: Comment on Conversation... | `C` |
 | Review: Reply to Thread... | `r` |
 | Review: Resolve or Reopen Thread | `x` |
+| Review: Back to Comment in Overview | `Esc` |
 | Review: Fold or Unfold Thread | `z` |
 | Review: Edit Pending Comment... | `e` |
 | Review: Delete Pending Comment | `d` |
@@ -989,6 +990,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Conversation: New Comment | `c` |
 | Conversation: Links of Entry... | `l` |
 | Conversation: Open Diagram of Entry | `g` |
+| Conversation: Open Code of Thread | `G` |
 | Conversation: Copy Link of Entry | `y` |
 | Conversation: Open in Browser | `o` |
 | Conversation: Edit Comment | `e` |

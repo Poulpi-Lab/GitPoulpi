@@ -935,6 +935,7 @@ applicano. I tasti sono quelli predefiniti.
 | Revisione: Commenta la conversazione... | `C` |
 | Revisione: Rispondi alla discussione... | `r` |
 | Revisione: Risolvi o riapri la discussione | `x` |
+| Review: Back to Comment in Overview | `Esc` |
 | Revisione: Comprimi o espandi la discussione | `z` |
 | Revisione: Modifica il commento in sospeso... | `e` |
 | Revisione: Elimina il commento in sospeso | `d` |
@@ -993,6 +994,7 @@ applicano. I tasti sono quelli predefiniti.
 | Conversazione: Nuovo commento | `c` |
 | Conversazione: Link della voce... | `l` |
 | Conversazione: Apri il diagramma della voce | `g` |
+| Conversation: Open Code of Thread | `G` |
 | Conversazione: Copia il link della voce | `y` |
 | Conversazione: Apri nel browser | `o` |
 | Conversazione: Modifica il commento | `e` |

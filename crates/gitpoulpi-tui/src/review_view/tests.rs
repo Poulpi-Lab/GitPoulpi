@@ -450,6 +450,25 @@ fn review_conv() -> Arc<Mutex<crate::conversation_ui::tests::Shared>> {
     talk.discussion_id = Some("d9".into());
     let shared = ct::shared(vec![
         TimelineEntry::Comment(talk),
+        // The inline thread the Files page shows too (`pull_request_threads`).
+        TimelineEntry::Thread(gitpoulpi_hosting::conversation::CodeThread {
+            id: "T1".into(),
+            path: "src/a.rs".into(),
+            line: Some(12),
+            original_line: Some(12),
+            side: DiffSide::New,
+            start_line: None,
+            resolved: false,
+            outdated: false,
+            resolvable: true,
+            diff_hunk: None,
+            comments: vec![ct::comment(
+                "1",
+                "tomas",
+                "Why a Vec here?",
+                "2026-10-11T08:05:00Z",
+            )],
+        }),
         TimelineEntry::Review(ReviewEntry {
             id: "r1".into(),
             author: ct::actor("mara"),
@@ -2737,4 +2756,133 @@ mod md_composer {
         d.render(area, &mut buf, ' ');
         assert!(screen(&buf).contains("Discard this text?"));
     }
+}
+
+// -- from a code thread to its code ---------------------------------------------------
+
+impl Rig {
+    /// The Files page's diff in, a screen painted.
+    fn overview_ready(&mut self) {
+        self.view.git = Some(GitData {
+            head: Oid::from_hex(&"1".repeat(40)).unwrap(),
+            diff_base: Oid::from_hex(&"2".repeat(40)).unwrap(),
+            comparing: false,
+            commits: Vec::new(),
+        });
+        self.view.git_rx = None;
+        self.view.diffs.insert("src/a.rs".into(), a_rs());
+        self.screen();
+    }
+
+    fn cursor_text(&self) -> String {
+        let p = &self.view.files_pane;
+        p.text(p.cursor)
+    }
+}
+
+fn code_ref(
+    line: Option<u32>,
+    original: Option<u32>,
+    old_side: bool,
+    outdated: bool,
+) -> crate::item_cmd::CodeRef {
+    crate::item_cmd::CodeRef {
+        thread_id: "T1".into(),
+        path: "src/a.rs".into(),
+        line,
+        original_line: original,
+        old_side,
+        outdated,
+    }
+}
+
+#[test]
+fn the_code_link_of_a_thread_opens_its_line_by_click_and_by_key_and_back_returns() {
+    let mut r = rig(GITHUB_CAPS);
+    r.overview_ready();
+    let s = r.screen();
+    assert!(s.contains("src/a.rs:12"), "the link is painted:\n{s}");
+    // Mouse.
+    let link = r
+        .view
+        .ov
+        .code_link_rect()
+        .expect("the thread's path:line is a button");
+    r.click(link);
+    r.screen();
+    assert_eq!(r.view.tab, Tab::Files);
+    assert!(r.cursor_text().contains("added two"), "{}", r.cursor_text());
+    assert_eq!(r.view.focus, Focus::Diff);
+    // The thread sits right under the line, visible.
+    assert!(r.screen().contains("Why a Vec here?"));
+    // Back (Esc) returns to the same entry.
+    assert_eq!(r.key(plain(KeyCode::Esc)), ReviewEffect::None);
+    assert_eq!(r.view.tab, Tab::Overview);
+    assert!(r.view.ov.selected_is_thread("T1"));
+    // Key twin: G on the selected thread.
+    r.view.files_pane.jump(0);
+    r.key(plain(KeyCode::Char('G')));
+    r.screen();
+    assert_eq!(r.view.tab, Tab::Files);
+    assert!(r.cursor_text().contains("added two"), "{}", r.cursor_text());
+    // The button back.
+    let back = r.rect_of(Hit::BackToComment);
+    r.click(back);
+    assert_eq!(r.view.tab, Tab::Overview);
+    assert!(ReviewCmd::BackToComment
+        .unavailable(Some(r.view.avail()))
+        .is_some());
+}
+
+#[test]
+fn an_outdated_thread_opens_the_nearest_line_and_says_why_and_a_folded_one_unfolds() {
+    let mut r = rig(GITHUB_CAPS);
+    r.overview_ready();
+    {
+        let t = &mut r.view.host.as_mut().unwrap().threads[0];
+        t.line = None;
+        t.original_line = Some(20);
+        t.outdated = true;
+        t.resolved = true;
+    }
+    r.view.collapsed.insert("T1".into());
+    r.view.open_code(code_ref(None, Some(20), false, true));
+    r.screen();
+    assert_eq!(r.view.tab, Tab::Files);
+    assert!(
+        r.cursor_text().contains("tail"),
+        "the nearest line to 20 is the last one: {}",
+        r.cursor_text()
+    );
+    assert!(r
+        .view
+        .message
+        .as_deref()
+        .is_some_and(|m| m.contains("outdated")));
+    assert!(!r.view.collapsed.contains("T1"), "the thread is opened");
+    // A file that is not in the diff says so and stays on the Overview.
+    let mut r = rig(GITHUB_CAPS);
+    let mut code = code_ref(Some(1), None, false, false);
+    code.path = "nope.rs".into();
+    r.view.open_code(code);
+    assert_eq!(r.view.tab, Tab::Overview);
+    assert!(r
+        .view
+        .message
+        .as_deref()
+        .is_some_and(|m| m.contains("nope.rs")));
+}
+
+#[test]
+fn a_deleted_line_thread_lands_on_the_old_side() {
+    let mut r = rig(GITHUB_CAPS);
+    r.overview_ready();
+    {
+        let t = &mut r.view.host.as_mut().unwrap().threads[0];
+        t.line = Some(11);
+        t.side = DiffSide::Old;
+    }
+    r.view.open_code(code_ref(Some(11), Some(11), true, false));
+    r.screen();
+    assert!(r.cursor_text().contains("gone"), "{}", r.cursor_text());
 }

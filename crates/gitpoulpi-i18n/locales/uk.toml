@@ -3617,6 +3617,8 @@ review_reply = "Рев'ю: відповісти в обговоренні..."
 # context: command palette entry
 review_resolve = "Рев'ю: вирішити або знову відкрити обговорення"
 # context: command palette entry
+review_back_to_comment = "Review: Back to Comment in Overview"
+# context: command palette entry
 review_fold_thread = "Рев'ю: згорнути або розгорнути обговорення"
 # context: command palette entry
 review_edit_pending = "Рев'ю: змінити незавершений коментар..."
@@ -7234,6 +7236,14 @@ why_not_on_diff = "спершу відкрийте сторінку зі змі�
 why_not_on_code = "спершу поставте курсор на рядок коду"
 # context: why a row is off
 why_not_on_thread = "спершу поставте курсор на обговорення"
+# context: button on the Files page after jumping from a comment: returns to that comment in the Overview
+back_to_overview = "Back to Overview"
+# context: why Back to Comment does nothing. Width budget: 50 cells
+why_no_return = "no comment to go back to"
+# context: status line: the commented file is not in the diff. {path} is a file path
+thread_not_in_diff = "{path} is not in the {$diff}"
+# context: status line: the thread's line no longer exists; {path} is a file path
+thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
 # context: why a row is off
 why_no_resolve = "це обговорення не можна вирішити"
 # context: why a row is off
@@ -10102,6 +10112,12 @@ open_diagram = "Відкрити діаграму"
 link_diagram = "Діаграма: {first}"
 why_no_diagram = "у вибраному записі немає діаграми"
 palette_open_diagram = "Бесіда: відкрити діаграму запису"
+# context: command palette entry
+palette_open_code = "Conversation: Open Code of Thread"
+# context: why Open Code does nothing. Width budget: 50 cells
+why_no_code = "the selected entry is not a code thread"
+# context: why Open Code does nothing outside a review. Width budget: 50 cells
+why_no_code_here = "open the review of this request to reach its code"
 why_no_url = "у цього запису немає сторінки на хостингу"
 why_no_events = "цей хостинг не показує події"
 why_no_reply = "цей хостинг не приймає відповіді на цей запис"

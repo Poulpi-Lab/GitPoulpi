@@ -1098,7 +1098,7 @@ hint_create = "maken"
 hint_open = "openen"
 hint_toggle = "wisselen"
 # context: one line in the minimal frame a dialog shows when the window is too small for it
-too_small = "Window too small: enlarge it"
+too_small = "Venster te klein: maak het groter"
 
 [clone]
 title = "Een repository klonen"
@@ -3620,7 +3620,7 @@ review_reply = "Review: Op discussie reageren..."
 # context: command palette entry
 review_resolve = "Review: Discussie oplossen of heropenen"
 # context: command palette entry
-review_back_to_comment = "Review: Back to Comment in Overview"
+review_back_to_comment = "Review: Terug naar de discussie in het Overzicht"
 # context: command palette entry
 review_fold_thread = "Review: Discussie inklappen of uitklappen"
 # context: command palette entry
@@ -4308,7 +4308,7 @@ explain_changes = "Lokale wijzigingen uitleggen"
 ai_generate = "Een {$commit}-bericht genereren met AI"
 ai_compose = "{$Commits} samenstellen met AI"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: {$commit} without running git hooks"
+skip_hooks = "Hooks overslaan: {$commit} zonder git-hooks uit te voeren"
 commit_reference = { git = "Openen in je browser (palet: Commit-verwijzing openen)", local = "Openen in je browser (palet: Commitverwijzing openen)" }
 quit = "GitPoulpi afsluiten"
 quit_cd = "Afsluiten en je shell in de map van dit tabblad achterlaten (vereist de shell-wrapper)"
@@ -5486,7 +5486,7 @@ ref_from_branch = "(van branch)"
 issue_ref_inserted = "{reference} ingevoegd"
 skip_hooks = "Hooks overslaan"
 # context: shorter label of the Skip hooks checkbox on a narrow commit options row
-skip_hooks_short = "No hooks"
+skip_hooks_short = "Geen hooks"
 
 [compose_ui]
 select_commit = "Kies een commit..."
@@ -7235,13 +7235,13 @@ why_not_on_code = "zet de cursor eerst op een coderegel"
 # context: why a row is off
 why_not_on_thread = "zet de cursor eerst op een discussie"
 # context: button on the Files page after jumping from a comment: returns to that comment in the Overview
-back_to_overview = "Back to Overview"
+back_to_overview = "Terug naar Overzicht"
 # context: why Back to Comment does nothing. Width budget: 50 cells
-why_no_return = "no comment to go back to"
+why_no_return = "geen discussie om naar terug te keren"
 # context: status line: the commented file is not in the diff. {path} is a file path
-thread_not_in_diff = "{path} is not in the {$diff}"
+thread_not_in_diff = { git = "{path} staat niet in de diff", local = "{path} staat niet in het verschil" }
 # context: status line: the thread's line no longer exists; {path} is a file path
-thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
+thread_outdated_nearest = "deze discussie is verouderd: de dichtstbijzijnde regel van {path} wordt getoond"
 # context: why a row is off
 why_no_resolve = "deze discussie kan niet worden opgelost"
 # context: why a row is off
@@ -10111,11 +10111,11 @@ link_diagram = "Diagram: {first}"
 why_no_diagram = "het geselecteerde item heeft geen diagram"
 palette_open_diagram = "Gesprek: Diagram van item openen"
 # context: command palette entry
-palette_open_code = "Conversation: Open Code of Thread"
+palette_open_code = "Gesprek: Code van discussie openen"
 # context: why Open Code does nothing. Width budget: 50 cells
-why_no_code = "the selected entry is not a code thread"
+why_no_code = "het geselecteerde item is geen codediscussie"
 # context: why Open Code does nothing outside a review. Width budget: 50 cells
-why_no_code_here = "open the review of this request to reach its code"
+why_no_code_here = "open de review van dit verzoek voor de code"
 why_no_url = "dit item heeft geen pagina op de host"
 why_no_events = "deze host toont geen gebeurtenissen"
 why_no_reply = "deze host neemt geen antwoord op dit item aan"

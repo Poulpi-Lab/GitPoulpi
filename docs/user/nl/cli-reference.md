@@ -101,7 +101,8 @@ Hunks en regels worden genummerd zoals `gitpoulpi --json diff` ze nummert.
 | Opdracht | Wat het doet |
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Een bestand, map, alles, een hunk of enkele regels stagen. Een stage van een bestand, map of `--all` die een gevoelig bestand zou toevoegen (een privésleutel, een `.env`, een herkend token: `[privacy]` in de [configuratiereferentie](config-reference.md#privacy-gevoelige-bestanden)) wordt geweigerd met afsluitcode 2 en `{error: "sensitive_files", files: [{path, reason}]}` (een regel en een gemaskeerd voorbeeld, nooit een waarde); er wordt niets gestaged. `--allow-sensitive` staget ze toch. |
-| `unstage` (dezelfde vlaggen) | Het omgekeerde. |
+| `stage --paths A B ...` | Meerdere bestanden of mappen stagen als ÉÉN bewerking: één journaalitem, één `undo`-stap (een hernoemd bestand is zijn oude en nieuwe pad, zoals `status` met `renamed_from` laat zien). Niet te combineren met `--folder`, `--hunk`, `--lines` of `--all`. |
+| `unstage` (dezelfde vlaggen, `--paths` inbegrepen) | Het omgekeerde. |
 | `discard --file F [--hunk N [--lines a,b]]` | Unstaged wijzigingen verwerpen (een heel bestand: elke wijziging, een niet-gevolgd bestand wordt verwijderd, en de mappen die daardoor leeg raken). Ongedaan te maken. |
 | `rm-file <paths>...` | Bestanden uit de werkmap verwijderen. Ongedaan te maken. |
 | `ignore <pattern> [--file <.gitignore>]` | Een patroon aan een `.gitignore` toevoegen (of aan `.git/info/exclude` met `--file .git/info/exclude`). Ongedaan te maken, behalve in `.git/info/exclude`. |

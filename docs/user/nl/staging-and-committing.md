@@ -21,7 +21,7 @@ de lokale wijzigingen:
 - **Hernoemde of verplaatste bestanden** zijn één rij, `nieuw <- oud`, in beide lijsten (een bestand dat op schijf is
   verwijderd en een nieuw bestand met minstens 50% dezelfde inhoud tellen al als een verplaatsing voordat je ze stagt).
   Stagen, Unstagen en Verwerpen werken op beide namen: stagen staget de verwijdering en het nieuwe bestand, zodat git één
-  hernoeming ziet. Als je de rij opent, zie je de inhoudsdiff tegen de oude naam, met bovenaan
+  hernoeming ziet, en het is ÉÉN undo-stap (`Undo Stage rename oud -> nieuw`). Als je de rij opent, zie je de inhoudsdiff tegen de oude naam, met bovenaan
   `oud -> nieuw (N% gelijk)`; een verplaatsing zonder bewerkingen zegt **Geen inhoudelijke wijziging**. Hetzelfde geldt
   voor de bestanden van een commit, en `gitpoulpi status` / `gitpoulpi diff` melden `renamed_from`.
 - **Pad** of **Boom** (`m`) toont bestanden plat of in mappen. **Alles inklappen**
@@ -176,8 +176,8 @@ andere.
   push nodig (met lease).
 - **Hooks overslaan** (`Shift+H`, of **Commit: Hooks overslaan omschakelen** in het palet) commit
   zonder de hooks `pre-commit` en `commit-msg` van de repository uit te voeren. Het geldt per commit;
-  met **Instellingen > Repositoryspecifieke instellingen > Commit** staat het standaard aangevinkt. Getoond
-  als de rij ruimte heeft.
+  met **Instellingen > Repositoryspecifieke instellingen > Commit** staat het standaard aangevinkt. Op een smalle rij
+  krimpt het label naar **Geen hooks** en dan naar alleen het vakje (de tooltip noemt het); het verdwijnt nooit.
 - `c` in het paneel Status zet de cursor in het formulier. `Esc` verlaat het.
 - `Ctrl+G c` en `Ctrl+G Enter` (**Git: Commit...** en **Git: Gestagede wijzigingen nu
   committen** in het palet) zijn één opdracht: de commit-knop vanaf elke plek. Met een
@@ -202,8 +202,12 @@ kunt bewerken; er wordt niets gecommit tot je op de commit-knop drukt.
 
 **Commits samenstellen met AI** staat aan het rechteruiteinde van de Amend-rij en krimpt mee met het rechterpaneel in
 plaats van te verdwijnen: eerst het volledige label, dan **Samenstellen met AI**, dan alleen de **`✦`**. De knop behoudt
-op elke breedte zijn klik, zijn tooltip en zijn toets (`Ctrl+G Shift+C`); de labels van Amend en Hooks overslaan wijken
-voor hem, nooit andersom.
+op elke breedte zijn klik, zijn tooltip en zijn toets (`Ctrl+G Shift+C`); het label van Hooks overslaan wijkt voor hem
+(**Geen hooks**, dan alleen het vakje) voordat hij zelf krimpt.
+
+De knoppen **`✦`** (het bericht genereren) en **`#`** (een issueverwijzing invoegen) aan het rechteruiteinde van de
+samenvattingsrij krimpen op dezelfde manier: in een smal paneel verliezen ze hun marges en vouwen dan samen tot één
+**`⋯`**-knop waarvan het menu beide toont, zodat geen van beide ooit verdwijnt.
 
 ## De commit-composer: verdeel je wijzigingen over commits
 

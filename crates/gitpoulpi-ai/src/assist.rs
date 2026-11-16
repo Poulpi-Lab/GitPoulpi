@@ -854,6 +854,8 @@ mod tests {
 
     fn file(path: &str, lines: &[(LineOrigin, &str)]) -> FileDiff {
         FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: PathBuf::from(path),
             status: FileStatus::Modified,
             hunks: vec![Hunk {
@@ -1101,6 +1103,8 @@ mod tests {
     fn a_review_job_asks_once_and_places_the_suggestions() {
         use gitpoulpi_core::domain::{DiffLine, FileStatus, Hunk, HunkId};
         let files = [FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: "src/a.rs".into(),
             status: FileStatus::Modified,
             hunks: vec![Hunk {
@@ -1184,6 +1188,8 @@ mod tests {
     fn the_prompt_of_an_agent_in_the_repository_says_the_diff_is_authoritative() {
         use gitpoulpi_config::AgentWorkdir as W;
         let files = [FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: "a.rs".into(),
             status: FileStatus::Modified,
             hunks: vec![],
@@ -1376,6 +1382,8 @@ mod tests {
     fn review_files(lines: usize) -> Vec<FileDiff> {
         use gitpoulpi_core::domain::{DiffLine, Hunk, HunkId};
         vec![FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: "src/big.rs".into(),
             status: FileStatus::Modified,
             hunks: vec![Hunk {

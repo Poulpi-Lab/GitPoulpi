@@ -22,6 +22,13 @@ pub struct StatusEntry {
     pub path: PathBuf,
     pub index: Option<FileStatus>,
     pub worktree: Option<FileStatus>,
+    /// Set on the new path of a rename (or copy): the path it came from.
+    /// Staged (`index == Renamed`): git's own pairing. Unstaged: a tracked
+    /// file deleted in the working tree plus an untracked (or
+    /// intent-to-add) one of similar content (`pair_unstaged_renames`).
+    /// The old path's own entry stays in the list, unchanged.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub renamed_from: Option<PathBuf>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -56,6 +63,14 @@ pub struct FileDiff {
     pub path: PathBuf,
     pub status: FileStatus,
     pub hunks: Vec<Hunk>,
+    /// A renamed (or copied) file: the path the content came from. `path`
+    /// is the new name and `hunks` the content diff against `renamed_from`
+    /// (none for a pure rename).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub renamed_from: Option<PathBuf>,
+    /// The rename's similarity in percent (100 for a pure rename).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub similarity: Option<u8>,
 }
 
 /// What `GitBackend::diff_files` answers: the files `diff` lists for the

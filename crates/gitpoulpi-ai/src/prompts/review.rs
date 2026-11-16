@@ -296,6 +296,8 @@ mod tests {
 
     fn file(path: &str, lines: Vec<DiffLine>) -> FileDiff {
         FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: path.into(),
             status: FileStatus::Modified,
             hunks: vec![Hunk {
@@ -472,6 +474,8 @@ mod cut_tests {
 
     fn big(path: &str, lines: usize) -> FileDiff {
         FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: path.into(),
             status: FileStatus::Modified,
             hunks: vec![Hunk {

@@ -130,6 +130,8 @@ fn lost_panel() -> SafetyPanel {
         panel.panes.diff.keep(
             (c, PathBuf::from(path)),
             FileDiff {
+                renamed_from: None,
+                similarity: None,
                 path: path.into(),
                 status: FileStatus::Modified,
                 hunks: vec![hunk(old, new)],
@@ -350,6 +352,8 @@ fn the_diff_and_the_files_each_have_a_bar_that_can_be_pressed_and_dragged() {
         },
     );
     let long = FileDiff {
+        renamed_from: None,
+        similarity: None,
         path: "f00.rs".into(),
         status: FileStatus::Added,
         hunks: vec![Hunk {

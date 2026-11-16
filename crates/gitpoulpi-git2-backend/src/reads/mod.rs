@@ -26,14 +26,25 @@ use crate::repo::{map_err, open, to_domain_oid, to_git2_oid};
 pub fn status(repo: &RepoRef) -> Result<WorkingTree> {
     let git_repo = open(repo)?;
     let mut opts = git2::StatusOptions::new();
-    opts.include_untracked(true).recurse_untracked_dirs(true);
+    opts.include_untracked(true)
+        .recurse_untracked_dirs(true)
+        // A staged rename is one entry at its new path, as git's own status.
+        .renames_head_to_index(true);
     let statuses = git_repo.statuses(Some(&mut opts)).map_err(map_err)?;
 
-    let files = statuses
+    let mut files: Vec<StatusEntry> = statuses
         .iter()
         .filter_map(|entry| {
-            let path = entry.path().ok().map(PathBuf::from)?;
             let s = entry.status();
+            // For a staged rename libgit2's `path()` is the OLD path: the
+            // new one and the origin come from the head-to-index delta.
+            let (path, renamed_from) = match entry.head_to_index() {
+                Some(delta) if s.contains(git2::Status::INDEX_RENAMED) => (
+                    delta.new_file().path().map(PathBuf::from)?,
+                    delta.old_file().path().map(PathBuf::from),
+                ),
+                _ => (entry.path().ok().map(PathBuf::from)?, None),
+            };
 
             let index = if s.contains(git2::Status::CONFLICTED) {
                 Some(FileStatus::Conflicted)
@@ -67,6 +78,7 @@ pub fn status(repo: &RepoRef) -> Result<WorkingTree> {
                 return None;
             }
             Some(StatusEntry {
+                renamed_from,
                 path,
                 index,
                 worktree,
@@ -74,10 +86,52 @@ pub fn status(repo: &RepoRef) -> Result<WorkingTree> {
         })
         .collect();
 
+    pair_worktree_renames(&git_repo, &mut files);
+
     Ok(WorkingTree {
         files,
         ..WorkingTree::default()
     })
+}
+
+/// Pairs the working tree's deleted tracked files with its new ones (what
+/// libgit2's status leaves as a deletion plus an untracked file): the shared
+/// `pair_unstaged_renames`, the old side read from the index.
+fn pair_worktree_renames(git_repo: &git2::Repository, files: &mut [StatusEntry]) {
+    use gitpoulpi_core::domain::{
+        is_unstaged_rename_source, pair_unstaged_renames, read_workdir_candidate, RenameSide,
+        RENAME_LIMIT,
+    };
+    let sources = files
+        .iter()
+        .filter(|e| is_unstaged_rename_source(e))
+        .count();
+    let any_new = files.iter().any(|e| {
+        e.index.is_none()
+            && matches!(
+                e.worktree,
+                Some(FileStatus::Untracked) | Some(FileStatus::Added)
+            )
+    });
+    if sources == 0 || sources > RENAME_LIMIT || !any_new {
+        return;
+    }
+    let (Some(root), Ok(index)) = (git_repo.workdir().map(PathBuf::from), git_repo.index()) else {
+        return;
+    };
+    pair_unstaged_renames(files, |path, side| match side {
+        RenameSide::New => read_workdir_candidate(&root, path),
+        RenameSide::Old => {
+            let entry = index.get_path(path, 0)?;
+            // A submodule (gitlink) is not a blob.
+            if entry.mode & 0o170000 != 0o100000 {
+                return None;
+            }
+            let blob = git_repo.find_blob(entry.id).ok()?;
+            (blob.size() as u64 <= gitpoulpi_core::domain::RENAME_MAX_FILE_BYTES)
+                .then(|| blob.content().to_vec())
+        }
+    });
 }
 
 /// The commit total counted in-process (`log.commit_count = "libgit2"`):
@@ -327,12 +381,38 @@ pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
     Ok(CommitGraph { nodes })
 }
 
-#[derive(Default)]
-struct DiffBuilder {
+struct DiffBuilder<'r> {
     files: Vec<FileDiff>,
+    /// For a renamed file's similarity (libgit2 does not expose its own).
+    repo: &'r git2::Repository,
 }
 
-impl DiffBuilder {
+impl<'r> DiffBuilder<'r> {
+    fn new(repo: &'r git2::Repository) -> Self {
+        DiffBuilder {
+            files: Vec::new(),
+            repo,
+        }
+    }
+
+    /// A renamed or copied file's similarity in percent: 100 for the same
+    /// object, else the shared measure over the two sides' bytes.
+    fn rename_similarity(&self, delta: &git2::DiffDelta) -> Option<u8> {
+        let (old, new) = (delta.old_file(), delta.new_file());
+        if !new.id().is_zero() && old.id() == new.id() {
+            return Some(100);
+        }
+        let old_bytes = self.repo.find_blob(old.id()).ok()?.content().to_vec();
+        let new_bytes = if new.id().is_zero() {
+            std::fs::read(self.repo.workdir()?.join(new.path()?)).ok()?
+        } else {
+            self.repo.find_blob(new.id()).ok()?.content().to_vec()
+        };
+        Some(gitpoulpi_core::domain::rename_similarity(
+            &old_bytes, &new_bytes,
+        ))
+    }
+
     fn on_file(&mut self, delta: git2::DiffDelta) {
         let path = delta
             .new_file()
@@ -346,7 +426,14 @@ impl DiffBuilder {
             git2::Delta::Renamed | git2::Delta::Copied => FileStatus::Renamed,
             _ => FileStatus::Modified,
         };
+        let renamed = matches!(delta.status(), git2::Delta::Renamed | git2::Delta::Copied);
+        let renamed_from = renamed
+            .then(|| delta.old_file().path().map(PathBuf::from))
+            .flatten();
+        let similarity = renamed.then(|| self.rename_similarity(&delta)).flatten();
         self.files.push(FileDiff {
+            renamed_from,
+            similarity,
             path,
             status,
             hunks: Vec::new(),
@@ -388,8 +475,8 @@ impl DiffBuilder {
     }
 }
 
-fn build_file_diffs(diff: &git2::Diff) -> Result<Vec<FileDiff>> {
-    let builder = RefCell::new(DiffBuilder::default());
+fn build_file_diffs(git_repo: &git2::Repository, diff: &git2::Diff) -> Result<Vec<FileDiff>> {
+    let builder = RefCell::new(DiffBuilder::new(git_repo));
     diff.foreach(
         &mut |delta, _progress| {
             builder.borrow_mut().on_file(delta);
@@ -412,7 +499,7 @@ fn build_file_diffs(diff: &git2::Diff) -> Result<Vec<FileDiff>> {
 pub fn diff(repo: &RepoRef, target: DiffTarget) -> Result<Vec<FileDiff>> {
     let git_repo = open(repo)?;
     let diff = git_diff(&git_repo, target, None)?;
-    build_file_diffs(&diff)
+    build_file_diffs(&git_repo, &diff)
 }
 
 /// `diff` restricted to literal `paths`: libgit2 pathspecs
@@ -423,7 +510,7 @@ pub fn diff_paths(repo: &RepoRef, target: DiffTarget, paths: &[PathBuf]) -> Resu
     }
     let git_repo = open(repo)?;
     let diff = git_diff(&git_repo, target, Some(paths))?;
-    build_file_diffs(&diff)
+    build_file_diffs(&git_repo, &diff)
 }
 
 /// `diff`'s file list without the hunks.
@@ -436,7 +523,7 @@ pub fn diff_paths(repo: &RepoRef, target: DiffTarget, paths: &[PathBuf]) -> Resu
 pub fn diff_files(repo: &RepoRef, target: DiffTarget) -> Result<DiffFileList> {
     let git_repo = open(repo)?;
     let diff = git_diff(&git_repo, target, None)?;
-    let mut builder = DiffBuilder::default();
+    let mut builder = DiffBuilder::new(&git_repo);
     for delta in diff.deltas() {
         builder.on_file(delta);
     }
@@ -547,5 +634,10 @@ fn git_diff<'r>(
                 .map_err(map_err)?
         }
     };
+    let mut diff = diff;
+    // A rename is one file (from 50% similarity), as `git diff -M`.
+    let mut find = git2::DiffFindOptions::new();
+    find.renames(true).rename_limit(1000);
+    diff.find_similar(Some(&mut find)).map_err(map_err)?;
     Ok(diff)
 }

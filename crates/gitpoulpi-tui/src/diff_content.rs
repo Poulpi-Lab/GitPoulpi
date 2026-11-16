@@ -411,6 +411,8 @@ mod tests {
             ],
         };
         FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: PathBuf::from("f.txt"),
             status: FileStatus::Modified,
             hunks: vec![h0, h1],
@@ -425,6 +427,8 @@ mod tests {
 
     fn one_hunk_in_the_middle() -> FileDiff {
         FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: PathBuf::from("f.txt"),
             status: FileStatus::Modified,
             hunks: vec![Hunk {
@@ -553,6 +557,8 @@ mod tests {
             FileStatus::Deleted,
         ] {
             let f = FileDiff {
+                renamed_from: None,
+                similarity: None,
                 status,
                 ..two_hunks()
             };
@@ -731,6 +737,8 @@ mod tests {
     fn pure_additions_and_deletions_line_the_gaps_up() {
         // New file: a b X c d; X added after line 2 (`-2,0 +3,1`, no context).
         let add = FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: "f.txt".into(),
             status: FileStatus::Modified,
             hunks: vec![Hunk {
@@ -760,6 +768,8 @@ mod tests {
 
         // New file: a b d; line c deleted after line 2 (`-3,1 +2,0`).
         let del = FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: "f.txt".into(),
             status: FileStatus::Modified,
             hunks: vec![Hunk {
@@ -898,6 +908,8 @@ mod tests {
             })
             .collect();
         let file = FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: "f.txt".into(),
             status: FileStatus::Modified,
             hunks,

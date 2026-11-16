@@ -101,6 +101,8 @@ pub(crate) fn recode(
     }
     Ok((
         FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: path.to_path_buf(),
             status,
             hunks,
@@ -440,6 +442,8 @@ mod tests {
         reset();
         let want = Want::of_commit(Oid([1; 20]), PathBuf::from("f.txt"), Charset::Windows1252);
         let original = FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: PathBuf::from("f.txt"),
             status: FileStatus::Modified,
             hunks: Vec::new(),

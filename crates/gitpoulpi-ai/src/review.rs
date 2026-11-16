@@ -588,6 +588,8 @@ mod tests {
     /// 12/13 tail.
     fn index() -> DiffIndex {
         let a = FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: "src/a.rs".into(),
             status: FileStatus::Modified,
             hunks: vec![Hunk {
@@ -606,6 +608,8 @@ mod tests {
             }],
         };
         let b = FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: "docs/b.md".into(),
             status: FileStatus::Added,
             hunks: vec![Hunk {

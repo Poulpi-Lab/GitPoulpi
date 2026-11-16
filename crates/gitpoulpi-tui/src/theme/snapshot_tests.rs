@@ -167,6 +167,8 @@ fn showcase(buf_theme: &Theme) -> Buffer {
                 staged: false,
             };
             let file = FileDiff {
+                renamed_from: None,
+                similarity: None,
                 path: "src/lib.rs".into(),
                 status: FileStatus::Modified,
                 hunks: vec![Hunk {

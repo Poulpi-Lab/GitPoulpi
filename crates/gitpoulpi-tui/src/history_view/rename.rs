@@ -38,6 +38,8 @@ pub(crate) fn merge_rename(mut files: Vec<FileDiff>, from: &Path, to: &Path) -> 
         return files;
     }
     files[new] = FileDiff {
+        renamed_from: None,
+        similarity: None,
         path: to.to_path_buf(),
         status: FileStatus::Renamed,
         hunks: hunks(&old_lines, &new_lines),
@@ -148,6 +150,8 @@ mod tests {
 
     fn half(path: &str, status: FileStatus, origin: LineOrigin, body: &[String]) -> FileDiff {
         FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: PathBuf::from(path),
             status,
             hunks: vec![Hunk {

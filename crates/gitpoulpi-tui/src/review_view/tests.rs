@@ -252,6 +252,8 @@ impl HostingClient for Fake {
             // The host left this file's patch out.
             ApiFileDiff {
                 diff: FileDiff {
+                    renamed_from: None,
+                    similarity: None,
                     path: "docs/moons.md".into(),
                     status: FileStatus::Added,
                     hunks: Vec::new(),
@@ -470,6 +472,8 @@ fn line(origin: LineOrigin, text: &str) -> DiffLine {
 
 fn a_rs() -> FileDiff {
     FileDiff {
+        renamed_from: None,
+        similarity: None,
         path: "src/a.rs".into(),
         status: FileStatus::Modified,
         hunks: vec![Hunk {
@@ -1964,6 +1968,8 @@ fn tall_and_wide(n: usize) -> FileDiff {
         ),
     );
     FileDiff {
+        renamed_from: None,
+        similarity: None,
         path: "src/a.rs".into(),
         status: FileStatus::Modified,
         hunks: vec![Hunk {

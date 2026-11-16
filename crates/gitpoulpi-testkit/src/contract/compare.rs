@@ -18,7 +18,7 @@ fn paths_and_statuses(files: &[FileDiff]) -> Vec<(String, FileStatus)> {
 /// the commit file list always showed it), and a commit against itself is
 /// empty. `diff_files` agrees with `diff` on every target.
 pub fn check_compare_two_commits_both_ways(backend: &dyn GitBackend) {
-    use FileStatus::{Added, Deleted, Modified};
+    use FileStatus::{Added, Deleted, Modified, Renamed};
     let repo = TestRepoBuilder::new()
         .commit_file("a.txt", "1\n2\n3\n", "c1")
         .commit_file("b.txt", "b\n", "c1b")
@@ -46,9 +46,8 @@ pub fn check_compare_two_commits_both_ways(backend: &dyn GitBackend) {
         paths_and_statuses(&forward),
         vec![
             ("a.txt".into(), Modified),
-            ("b.txt".into(), Deleted),
             ("c.txt".into(), Added),
-            ("moved.txt".into(), Added),
+            ("moved.txt".into(), Renamed),
         ]
     );
     let backward = diff(DiffTarget::CommitRange(c3, c1));
@@ -56,9 +55,8 @@ pub fn check_compare_two_commits_both_ways(backend: &dyn GitBackend) {
         paths_and_statuses(&backward),
         vec![
             ("a.txt".into(), Modified),
-            ("b.txt".into(), Added),
+            ("b.txt".into(), Renamed),
             ("c.txt".into(), Deleted),
-            ("moved.txt".into(), Deleted),
         ]
     );
     assert!(

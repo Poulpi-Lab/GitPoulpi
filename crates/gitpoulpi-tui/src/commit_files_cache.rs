@@ -320,6 +320,8 @@ mod tests {
 
     fn files(path: &str, text_len: usize) -> Vec<FileDiff> {
         vec![FileDiff {
+            renamed_from: None,
+            similarity: None,
             path: PathBuf::from(path),
             status: FileStatus::Modified,
             hunks: vec![Hunk {

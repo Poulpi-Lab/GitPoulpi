@@ -902,6 +902,7 @@ mod tests {
     fn a_partially_staged_file_shows_up_in_both_sections() {
         let tree = WorkingTree {
             files: vec![StatusEntry {
+                renamed_from: None,
                 path: PathBuf::from("both.rs"),
                 index: Some(FileStatus::Staged),
                 worktree: Some(FileStatus::Modified),
@@ -1148,6 +1149,7 @@ mod tests {
     fn a_conflicted_file_belongs_to_the_unstaged_half_alone() {
         let tree = WorkingTree {
             files: vec![StatusEntry {
+                renamed_from: None,
                 path: PathBuf::from("clash.rs"),
                 index: Some(FileStatus::Conflicted),
                 worktree: Some(FileStatus::Conflicted),
@@ -1220,6 +1222,7 @@ mod tests {
 
     fn entry(path: &str, worktree: Option<FileStatus>) -> StatusEntry {
         StatusEntry {
+            renamed_from: None,
             path: PathBuf::from(path),
             index: None,
             worktree,

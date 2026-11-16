@@ -619,6 +619,8 @@ impl ReviewView {
                 match answer {
                     Ok(mut files) => {
                         let fd = files.pop().unwrap_or(FileDiff {
+                            renamed_from: None,
+                            similarity: None,
                             path: path.clone().into(),
                             status: gitpoulpi_core::domain::FileStatus::Modified,
                             hunks: Vec::new(),

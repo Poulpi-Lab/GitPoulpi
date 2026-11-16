@@ -245,6 +245,7 @@ fn the_selected_conflicted_path_survives_tree_mode_folder_rows() {
     use gitpoulpi_core::domain::{ConflictEntry, FileStatus, Oid, StageEntry, StatusEntry};
 
     let entry = |path: &str| StatusEntry {
+        renamed_from: None,
         path: PathBuf::from(path),
         index: Some(FileStatus::Conflicted),
         worktree: Some(FileStatus::Conflicted),
@@ -253,6 +254,7 @@ fn the_selected_conflicted_path_survives_tree_mode_folder_rows() {
         files: vec![
             entry("src/a.rs"),
             StatusEntry {
+                renamed_from: None,
                 path: PathBuf::from("src/b.rs"),
                 index: None,
                 worktree: Some(FileStatus::Modified),

@@ -154,6 +154,7 @@ claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
   `conflicts_unresolve`는 일반 쓰기입니다. 거부된 호출(`stale`, `not_conflicted`,
   `pick_incomplete`...)은 실패하는 대신 종료 코드 2와 함께 `{"refused": {...}}`로
   응답합니다.
+- **이슈와 pull request 대화**: `hosting_issue_comments`와 `hosting_review_conversation`은 전체 타임라인을 읽습니다(읽기, 열린 세계: 호스트를 호출). `hosting_markdown`은 텍스트를 정리하고 그 참조를 찾으며 아무것도 호출하지 않습니다(닫힌 세계). 게시(`hosting_issue_comment`, `hosting_review_comment`, `hosting_review_reply`)와 편집(`hosting_*_comment_edit`)은 열린 세계로 표시된 일반 변경입니다: 토큰이 가진 신원으로 호스트에 바로 반영되므로(응답의 `posted_as`. 봇 토큰은 봇으로 게시) 에이전트가 할 수 있는지는 `allow_mutations`와 `mutation_allowlist`가 정합니다. 댓글 삭제(`hosting_*_comment_delete`)는 파괴적입니다. 게시, 편집, 삭제 후에는 데몬에 알려지고 저장소의 열린 창이 그 항목을 새로고침합니다. `ui_show_pr` / `ui_show_issue`는 `--view conversation`으로 행 대신 대화를 엽니다.
 - **멈춘 상태**: `conflicts_am_continue`는 쓰기이고, `conflicts_am_skip`,
   `conflicts_am_abort`, `index_lock_remove`는 파괴적이며, `index_lock_show`는 읽기입니다.
 - **기록 다시 쓰기**: `rewrite_tools`, `rewrite_preview`, `rewrite_rows`,
@@ -210,6 +211,7 @@ CLI 명령마다 도구가 하나씩 있으며, 이름은 경로를 `_`로 이�
 |---|---|---|
 | `ai_commit_message` | `gitpoulpi ai commit-message` | read, network |
 | `ai_explain` | `gitpoulpi ai explain` | read, network |
+| `ai_hosting_reply` | `gitpoulpi ai hosting-reply` | read, network |
 | `ai_prompt` | `gitpoulpi ai prompt` | read |
 | `ai_resolve_conflict` | `gitpoulpi ai resolve-conflict` | read, network |
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
@@ -272,6 +274,7 @@ CLI 명령마다 도구가 하나씩 있으며, 이름은 경로를 `_`로 이�
 | `flow_status` | `gitpoulpi flow status` | read |
 | `flow_sync` | `gitpoulpi flow sync` | destructive |
 | `flow_templates` | `gitpoulpi flow templates` | read |
+| `hosting_assignment` | `gitpoulpi hosting assignment` | write |
 | `hosting_board_move` | `gitpoulpi hosting board move` | write, network |
 | `hosting_board_show` | `gitpoulpi hosting board show` | read, network |
 | `hosting_checkout_pr` | `gitpoulpi hosting checkout-pr` | write, network |
@@ -285,6 +288,10 @@ CLI 명령마다 도구가 하나씩 있으며, 이름은 경로를 `_`로 이�
 | `hosting_integrations_test` | `gitpoulpi hosting integrations test` | read, network |
 | `hosting_issue_base` | `gitpoulpi hosting issue base` | write |
 | `hosting_issue_close` | `gitpoulpi hosting issue close` | write |
+| `hosting_issue_comment` | `gitpoulpi hosting issue comment` | write, network |
+| `hosting_issue_comment_delete` | `gitpoulpi hosting issue comment-delete` | destructive, network |
+| `hosting_issue_comment_edit` | `gitpoulpi hosting issue comment-edit` | write, network |
+| `hosting_issue_comments` | `gitpoulpi hosting issue comments` | read, network |
 | `hosting_issue_create` | `gitpoulpi hosting issue create` | write, network |
 | `hosting_issue_edit` | `gitpoulpi hosting issue edit` | write, network |
 | `hosting_issue_move` | `gitpoulpi hosting issue move` | write |
@@ -295,6 +302,7 @@ CLI 명령마다 도구가 하나씩 있으며, 이름은 경로를 `_`로 이�
 | `hosting_link` | `gitpoulpi hosting link` | write |
 | `hosting_list` | `gitpoulpi hosting list` | read |
 | `hosting_logout` | `gitpoulpi hosting logout` | destructive |
+| `hosting_markdown` | `gitpoulpi hosting markdown` | read |
 | `hosting_members` | `gitpoulpi hosting members` | read, network |
 | `hosting_milestones` | `gitpoulpi hosting milestones` | read, network |
 | `hosting_open` | `gitpoulpi hosting open` | read |
@@ -307,6 +315,9 @@ CLI 명령마다 도구가 하나씩 있으며, 이름은 경로를 `_`로 이�
 | `hosting_refs` | `gitpoulpi hosting refs` | read |
 | `hosting_review_abandon` | `gitpoulpi hosting review abandon` | write, network |
 | `hosting_review_comment` | `gitpoulpi hosting review comment` | write, network |
+| `hosting_review_comment_delete` | `gitpoulpi hosting review comment-delete` | destructive, network |
+| `hosting_review_comment_edit` | `gitpoulpi hosting review comment-edit` | write, network |
+| `hosting_review_conversation` | `gitpoulpi hosting review conversation` | read, network |
 | `hosting_review_diff` | `gitpoulpi hosting review diff` | read, network |
 | `hosting_review_fetch` | `gitpoulpi hosting review fetch` | write, network |
 | `hosting_review_push` | `gitpoulpi hosting review push` | write, network |

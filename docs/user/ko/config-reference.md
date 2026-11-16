@@ -50,6 +50,7 @@ gitpoulpi config set general.auto_stash always # checked against the schema, the
 | `general.auto_prune_tags` | `false` | fetch가 리모트에서 삭제된 로컬 tag도 삭제합니다 (리모트에 있었던 tag만 대상이며, push한 적 없는 tag는 유지). Git 2.41 이상. |
 | `general.hosting_refresh_minutes` | `5` | pull request / 이슈 목록과 도구 모음 칩의 새로 고침 주기, 0~120. `0` = 요청 시와 이벤트 때만. |
 | `general.hosting_refresh_unit` | `"auto"` | 설정이 새로 고침 주기를 표시하는 단위: `minutes`, `hours`, `auto`이며 `general.auto_fetch_interval_unit`처럼 읽습니다. 표시 전용입니다. |
+| `general.hosting_post_as` | `""` | 저장소의 토큰이 봇의 것일 때(GitHub App 토큰) 호스트에 보내는 메시지가 게시되는 이름. 예: `my-app[bot]`. 모든 입력창에 표시되며 내 댓글을 알아보는 데 쓰입니다. 비어 있으면 호스트에 물어보고, 그래도 모르면 처음 게시할 때 알아냅니다. 저장소가 이를 덮어쓸 수 있습니다 (설정, 저장소의 SSH 및 자격 증명). |
 | `general.keep_submodules_up_to_date` | `false` | 체크아웃이나 pull 후 서브모듈이 어긋나 있으면 `git submodule update --init --recursive`를 실행합니다. [서브모듈](submodules.md)을 참고하세요. |
 | `general.default_branch_name` | `"main"` | Init으로 만든 저장소의 첫 브랜치. 비워 두면 git이 정합니다. 기존 브랜치의 이름은 바꾸지 않습니다. |
 | `general.delete_orig_files_after_merge` | `false` | merge가 완료된 후 `*.orig` 백업 파일을 삭제합니다. |
@@ -386,9 +387,18 @@ review_mode = "ask"       # ask | clone | api
 | `ai.limits.review_threads_bytes` | `6000` | 이미 있는 리뷰 댓글 목록(모델이 반복하지 않도록 전달됨)의 최대 바이트 수. 이를 넘으면 *잘라서 보내기*가 목록을 자릅니다. 범위는 같습니다. |
 | `ai.limits.review_context_file_bytes` | `8192` | 코드 리뷰에 전달되는 프로젝트 컨텍스트 파일 하나(`CLAUDE.md`, `AGENTS.md`, 추가 파일)의 최대 바이트 수. 이를 넘으면 *잘라서 보내기*가 파일을 메모와 함께 줄입니다. 범위는 같습니다. |
 | `ai.limits.review_context_bytes` | `16384` | 모든 컨텍스트 파일 합계의 최대 바이트 수. 이를 넘으면 *잘라서 보내기*가 한도를 넘는 파일을 줄이고 그 뒤의 파일은 제외합니다. 범위는 같습니다. |
+| `ai.limits.hosting_reply_context_bytes` | `49152` | 초안 답글(또는 이슈 설명)이 내 텍스트 외에 받는 모든 것, 즉 항목과 그 대화의 최대 바이트 수. 넘으면 가장 오래된 댓글부터 빠지고 잘림이 `truncated`에 보고됩니다. 다른 바이트 한도와 같은 범위입니다. |
+| `ai.limits.hosting_reply_file_bytes` | `8192` | 초안 답글에 주는 저장소 파일 하나의 최대 바이트 수. AI가 저장소를 읽을 때 사용됩니다. 같은 범위입니다. |
+| `ai.limits.hosting_reply_map_bytes` | `6144` | 초안 답글에 주는 저장소 맵의 최대 바이트 수. AI가 저장소를 읽을 때 사용됩니다. 같은 범위입니다. |
+| `ai.limits.hosting_reply_hits_per_term` | `20` | 초안 답글의 검색어마다 남기는 최대 검색 결과 수. AI가 저장소를 읽을 때 사용됩니다. 1에서 200 사이로 유지됩니다. |
+| `ai.limits.hosting_reply_terms` | `8` | 초안 답글이 찾아보는 최대 검색어 수. AI가 저장소를 읽을 때 사용됩니다. 1에서 50 사이로 유지됩니다. |
+| `ai.hosting_reply.base_prompt` | `""` | 두 가지 작성 동작(`hosting_reply`, `issue_body`)의 기본 프롬프트. 비어 있으면 내장 프롬프트를 쓰고, 여기에 적은 텍스트는 그것을 대체하며 지시문 단계는 그 뒤에 계속 이어집니다. 설정 > AI > 호스트의 답글에서 편집합니다. |
+| `ai.hosting_reply.read_repository` | `false` | "AI가 저장소를 읽도록 허용"이 체크된 상태로 시작할지 여부. 기본값은 꺼짐: 그 사용에서 직접 체크할 때만 저장소를 읽습니다. 그러면 로컬 에이전트나 API 프로필이 [AI 장](ai.md#저장소-접근)에 설명된 대로 읽습니다. |
+| `ai.hosting_reply.reuse_agent_session` | `true` | 하니스가 지원하면 두 답글 사이에 로컬 에이전트의 세션을 유지합니다. AI가 저장소를 읽을 수 있을 때 적용됩니다. |
+| `ai.hosting_reply.context_ttl_minutes` | `30` | 답글을 위해 만든 저장소 컨텍스트를 재사용하는 시간. 1에서 1440 사이로 유지됩니다. AI가 저장소를 읽을 수 있을 때 적용됩니다. |
 | `ai.privacy.redact_secrets` | `true` | 스캐너가 인식하는 모든 비밀 정보(토큰, 개인 키 블록, URL 안의 비밀번호, 값이 무작위로 보이는 `password = ...`)를 요청이 나가기 전에 `[REDACTED:<rule>]`로 대체합니다. 꺼져 있는 동안 설정 > AI에 빨간 경고가 표시됩니다. |
 | `ai.privacy.exclude_sensitive_files` | `true` | `privacy.sensitive_patterns`에 일치하는 모든 파일의 diff를 전송 내용에서 제외합니다. 저장소 폴더에서 작업하는 로컬 에이전트는 여전히 파일을 직접 읽을 수 있습니다: [AI > 개인정보](ai.md#개인정보)를 참고하세요. |
-| `ai.sent_preview.<action>` | `true` | 동작마다 키 하나(`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`): 요청이 나가기 전에 "보내는 내용"을 표시합니다. 대화상자의 "다시 표시하지 않기"는 `false`를 기록하고, 설정 > AI > *보내기 전에 전송 내용 표시...*가 다시 켭니다. `worktree_name`도 받아들여지지만 효과가 없습니다: 워크트리 만들기 대화상자에 입력한 내용과 로컬 브랜치 이름만 보내기 때문입니다. |
+| `ai.sent_preview.<action>` | `true` | 동작마다 키 하나(`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`): 요청이 나가기 전에 "보내는 내용"을 표시합니다. 대화상자의 "다시 표시하지 않기"는 `false`를 기록하고, 설정 > AI > *보내기 전에 전송 내용 표시...*가 다시 켭니다. `worktree_name`도 받아들여지지만 효과가 없습니다: 워크트리 만들기 대화상자에 입력한 내용과 로컬 브랜치 이름만 보내기 때문입니다. |
 
 저장소 고유의 `[preferences.ai_review]` 테이블(`repo-state.toml`에 있으며, 클론되지 않은 저장소의 항목은 `remote-reviews.toml`에 있음)은 같은 키를 모두 선택 사항으로 받고, 추가로 `no_extra_file = true`를 받습니다. 이는 `ai.review.extra_file`이 무엇이든 그 저장소에는 추가 파일이 없다는 뜻입니다. 설정하지 않은 키, 설정하지 않은 `extra_file`, 없는 `no_extra_file`은 전역 값을 상속하며, `extra_file`을 파일로 설정하면 스위치가 지워지고 그 반대도 마찬가지입니다.
 

@@ -7236,7 +7236,7 @@ back_to_overview = "Back to Overview"
 # context: why Back to Comment does nothing. Width budget: 50 cells
 why_no_return = "no comment to go back to"
 # context: status line: the commented file is not in the diff. {path} is a file path
-thread_not_in_diff = "{path} is not in the diff of this request"
+thread_not_in_diff = "{path} is not in the diff"
 # context: status line: the thread's line no longer exists; {path} is a file path
 thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
 # context: why a row is off

@@ -933,6 +933,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Revue : Commenter la discussion... | `C` |
 | Revue : Répondre au fil de discussion... | `r` |
 | Revue : Résoudre ou rouvrir le fil de discussion | `x` |
+| Revue : Retour au commentaire dans l'aperçu | `Esc` |
 | Revue : Replier ou déplier le fil de discussion | `z` |
 | Revue : Modifier le commentaire en attente... | `e` |
 | Revue : Supprimer le commentaire en attente | `d` |
@@ -991,6 +992,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Conversation : Nouveau commentaire | `c` |
 | Conversation : Liens de l'entrée... | `l` |
 | Conversation : Ouvrir le diagramme de l'entrée | `g` |
+| Conversation : Ouvrir le code du fil de discussion | `G` |
 | Conversation : Copier le lien de l'entrée | `y` |
 | Conversation : Ouvrir dans le navigateur | `o` |
 | Conversation : Modifier le commentaire | `e` |

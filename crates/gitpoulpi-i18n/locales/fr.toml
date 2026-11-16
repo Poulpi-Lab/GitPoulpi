@@ -3621,7 +3621,7 @@ review_reply = "Revue : Répondre au fil de discussion..."
 # context: command palette entry
 review_resolve = "Revue : Résoudre ou rouvrir le fil de discussion"
 # context: command palette entry
-review_back_to_comment = "Revue : Retour au commentaire dans l'aperçu"
+review_back_to_comment = "Revue : Retour au commentaire dans l'aperçu"
 # context: command palette entry
 review_fold_thread = "Revue : Replier ou déplier le fil de discussion"
 # context: command palette entry
@@ -7251,7 +7251,7 @@ back_to_overview = "Retour à l'aperçu"
 # context: why Back to Comment does nothing. Width budget: 50 cells
 why_no_return = "aucun commentaire où revenir"
 # context: status line: the commented file is not in the diff. {path} is a file path
-thread_not_in_diff = "{path} n'est pas dans le diff de cette demande"
+thread_not_in_diff = "{path} n'est pas dans le diff"
 # context: status line: the thread's line no longer exists; {path} is a file path
 thread_outdated_nearest = "ce fil est obsolète : ligne la plus proche affichée dans {path}"
 # context: why a row is off
@@ -10123,7 +10123,7 @@ link_diagram = "Diagramme : {first}"
 why_no_diagram = "l'entrée choisie n'a pas de diagramme"
 palette_open_diagram = "Conversation : Ouvrir le diagramme de l'entrée"
 # context: command palette entry
-palette_open_code = "Conversation : Ouvrir le code du fil de discussion"
+palette_open_code = "Conversation : Ouvrir le code du fil de discussion"
 # context: why Open Code does nothing. Width budget: 50 cells
 why_no_code = "l'entrée choisie n'est pas un fil sur du code"
 # context: why Open Code does nothing outside a review. Width budget: 50 cells

@@ -929,6 +929,7 @@ As teclas são as predefinidas.
 | Revisão: comentar a conversa... | `C` |
 | Revisão: responder à discussão... | `r` |
 | Revisão: resolver ou reabrir a discussão | `x` |
+| Review: Back to Comment in Overview | `Esc` |
 | Revisão: recolher ou expandir a discussão | `z` |
 | Revisão: editar comentário pendente... | `e` |
 | Revisão: eliminar comentário pendente | `d` |
@@ -987,6 +988,7 @@ As teclas são as predefinidas.
 | Conversa: novo comentário | `c` |
 | Conversa: ligações da entrada... | `l` |
 | Conversa: abrir o diagrama da entrada | `g` |
+| Conversation: Open Code of Thread | `G` |
 | Conversa: copiar a ligação da entrada | `y` |
 | Conversa: abrir no navegador | `o` |
 | Conversa: editar comentário | `e` |

@@ -443,7 +443,7 @@ a `gitpoulpi hosting board move <card> <column>` jednu přesune (viz [referenčn
 Karta ukazuje číslo, název, řešitele jako iniciály, štítky a milník. Přetáhněte ji do jiného sloupce,
 nebo `Shift+Left` / `Shift+Right`, nebo **Tabule: Přesunout kartu do...** (`m`). Přesune se hned; po zhruba 150 ms spinner
 ukáže, že hostitel ještě pracuje, a když hostitel odmítne, karta se vrátí a stavový řádek řekne proč. `Enter` otevře
-issue u hostitele (u lokálních issues poznámku); `e` upraví řešitele, štítky a milník; `n` založí nové issue ve
+[konverzaci](#5c-konverzace) issue v GitPoulpi a po jejím zavření se tabule vrátí; `e` upraví řešitele, štítky a milník; `n` založí nové issue ve
 vybraném sloupci; `a`, `l`, `M` a `/` filtrují podle řešitele, štítku, milníku a textu, `x` filtry zruší; `r`
 znovu načte data od hostitele. Tabule se načte znovu, když se obnoví seznamy postranního panelu. Radar tabuli nemá.
 
@@ -456,7 +456,7 @@ znovu načte data od hostitele. Tabule se načte znovu, když se obnoví seznamy
 | Odkud | Jak |
 |---|---|
 | Řádek ISSUES | `Enter` nebo dvojklik; **Otevřít konverzaci** v nabídce řádku; paleta *Hosting: Otevřít konverzaci issue...* (seznam issues na obrazovce). **Otevřít v prohlížeči** v nabídce řádku ponechá prohlížeč. |
-| Řádek PULL REQUESTY na Azure DevOps nebo Bitbucketu | `Enter` nebo **Otevřít konverzaci**. Na GitHubu, GitLabu, Gitea, Forgejo a Gerritu řádek otevře [kontrolu](review.md), jejíž stránka Přehled je konverzací žádosti. |
+| Řádek PULL REQUESTY na Azure DevOps nebo Bitbucketu | `Enter` nebo **Otevřít konverzaci**. Na GitHubu, GitLabu, Gitea, Forgejo a Gerritu řádek otevře [kontrolu](review.md), jejíž stránka Přehled je touž konverzací (časová osa, klávesy a pole pro komentář pod ní). |
 | Karta [tabule issues](#5b-tabule-issues) | `Enter` nebo dvojklik. |
 | [Radar](radar.md) | `i` na řádku issue nebo žádosti, **Otevřít konverzaci** v nabídce řádku, nebo *Radar: Otevřít konverzaci issue*. |
 | Odkaz v jiné konverzaci | Klikněte na něj (nebo `l` a pak ho vyberte): `#7`, `!12`, `ABC-12` propojeného zdroje se otevřou v aplikaci a zařadí se do zásobníku Zpět. |

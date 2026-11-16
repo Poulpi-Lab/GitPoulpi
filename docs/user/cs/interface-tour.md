@@ -128,7 +128,8 @@ Karta worktree se umístí hned za kartu svého repozitáře a odtažená karta 
 
 Karta Domů je správce repozitářů. Má čtyři sekce: **OTEVŘENÉ REPOZITÁŘE**,
 **OBLÍBENÉ**, **NEDÁVNÉ REPOZITÁŘE** a **VŠECHNY REPOZITÁŘE**. Každý řádek
-zobrazuje větev, počty commitů napřed a pozadu a počet změn. Každý řádek má
+zobrazuje větev, počty commitů napřed a pozadu a počet změn, pak cestu ke složce, když je místo: zkrácenou pomocí `~`
+a uprostřed oříznutou, když je úzko; nikdy nevytlačí název, vlastníka ani větev. Každý řádek má
 hvězdičku (oblíbené), **Otevřít** nebo **Přepnout**, **Zavřít** nebo
 **Odebrat** a nabídku `⋮`.
 
@@ -137,7 +138,7 @@ a **Rozbalit vše**. Složka, která už neexistuje, z *Nedávných* a *Všech*
 zmizí sama. Chybějící oblíbená položka zůstane s tlačítkem **Odebrat**.
 **Odebrat** nikdy nic nesmaže na disku.
 
-Klávesy: `Enter` otevřít, `f` oblíbené, `x` zavřít nebo odebrat, `.` nabídka,
+Klávesy: `Enter` otevřít, `f` oblíbené, `x` zavřít nebo odebrat, `y` zkopírovat cestu, `o` otevřít ve výchozím nástroji (**Otevřít v** v nabídce `⋮` vybere jiný), `.` nabídka,
 `/` hledání, `Space` sbalit sekci, `Esc` zpět na vaši kartu.
 `Ctrl+N` zobrazí odznak u vyhledávacího pole, každé sekce a každého tlačítka: stiskněte znak odznaku a prvek se zaměří nebo stiskne (viz [Odznaky](keybindings.md#odznaky)).
 
@@ -235,7 +236,10 @@ spuštění.
 
 Jeden řádek na commit, nejnovější nahoře. Kliknutím pravým tlačítkem na
 záhlaví zobrazíte nebo skryjete sloupce. Tažením ohraničení mezi dvěma
-záhlavími změníte šířku sloupce. Tažením záhlaví sloupec přesunete.
+záhlavími změníte šířku sloupce. Tažením záhlaví sloupec přesunete. Šířky patří repozitáři:
+ukládají se s ním a po jeho opětovném otevření se vrátí; repozitář otevřený poprvé má
+každý sloupec přizpůsobený tomu, co Log ukazuje (`Přizpůsobit všechny sloupce obsahu` to udělá
+znovu, `Obnovit šířky sloupců` se vrátí k automatickým šířkám, které zůstanou).
 
 Panel nemá titulek: říkají to záhlaví sloupců. Tagy se kreslí tam, kde jsou, nikdy jako zástupné. U commitu bez refu ukáže najetý řádek vybledlou pilulku s názvem větve, do které patří; pokud byla ta větev smazána, přeškrtnutá pilulka ukáže název přečtený ze slučovacího commitu, který ji sloučil (vypíná se volbou **Zobrazit zástupnou větev u najetého commitu** v Nastavení > Log a graf).
 

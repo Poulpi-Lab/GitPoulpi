@@ -90,8 +90,39 @@ impl WindowState {
         self.tick_reveal();
         self.tick_history();
         self.tick_blame_diff();
+        // A repository with no saved widths: fit every column to the rows the
+        // Log has painted, once. A width the user set first wins.
+        if self.log_widths_autofit {
+            if !self.log_column_overrides.is_empty() || !self.log_column_scroll_widths.is_empty() {
+                self.log_widths_autofit = false;
+            } else if self.log_len > 0
+                // A paint has measured rows (the header titles alone are the
+                // untouched starting point).
+                && self.log_natural_widths != NaturalWidths::default()
+                && self.log_area.width > 0
+                && self.central_view == CentralView::Log
+            {
+                let ctx = crate::log_table::FitCtx {
+                    log_area: self.log_area,
+                    all_order: &self.log_column_order,
+                    hidden: &self.log_column_hidden,
+                    layout: crate::live_settings::log_columns_layout(),
+                };
+                crate::log_table::fit_all(
+                    &ctx,
+                    &mut crate::log_table::FitMaps {
+                        fit: &mut self.log_column_overrides,
+                        scroll: &mut self.log_column_scroll_widths,
+                    },
+                    &self.log_natural_widths,
+                );
+                self.log_widths_autofit = false;
+            }
+        }
         // Persist a changed Log column layout (not mid-drag: a resize
-        // fires per mouse move). The write runs on its own thread.
+        // fires per mouse move). Order and hidden set are global (`[ui]`),
+        // the widths this repository's (`repo-state.toml`); each write runs
+        // on its own thread.
         if self.dragging_log_boundary.is_none() && self.dragging_log_header.is_none() {
             let now = LogColumnPrefs {
                 order: self.log_column_order.clone(),
@@ -100,8 +131,18 @@ impl WindowState {
                 scroll_widths: self.log_column_scroll_widths.clone(),
             };
             if now != self.last_saved_log_columns {
-                if let Some(path) = &self.diff_config_path {
-                    now.save_in_background(path);
+                let last = &self.last_saved_log_columns;
+                if now.order != last.order || now.hidden != last.hidden {
+                    if let Some(path) = &self.diff_config_path {
+                        now.save_layout_in_background(path);
+                    }
+                }
+                if (now.widths != last.widths || now.scroll_widths != last.scroll_widths)
+                    && !self.no_repository
+                {
+                    now.save_widths_in_background(&crate::remotes_ui::repo_state_path(
+                        &self.repo_root,
+                    ));
                 }
                 self.last_saved_log_columns = now;
             }

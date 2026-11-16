@@ -208,6 +208,16 @@ pub struct FoldState {
     pub commit_folders: Vec<String>,
 }
 
+/// One repository's Log column widths, by column name, in cells: `fit` is the
+/// `fit` layout's (never holds `message`), `scroll` the `scroll` layout's.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LogColumnWidths {
+    #[serde(default)]
+    pub fit: BTreeMap<String, u16>,
+    #[serde(default)]
+    pub scroll: BTreeMap<String, u16>,
+}
+
 /// Per-repo state, gitignored under `.gitpoulpi/repo-state.toml` (§5),
 /// shared across named sessions since it belongs to the repo, not a session.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -287,6 +297,12 @@ pub struct RepoState {
     /// and that provider's repository. `None` means unlinked.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pulls_source: Option<IssuesSource>,
+    /// The widths the user gave the Log's columns in this repository (drag,
+    /// keys, palette, fit). `None`: never saved, so the first window fits
+    /// every column to what the Log shows; `Some` (even empty, after a
+    /// reset) is restored as it is.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub log_columns: Option<LogColumnWidths>,
     /// The in-app code review's local state per request (pending comments,
     /// viewed files), keyed by `ReviewDraft::key`.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
@@ -908,6 +924,38 @@ mod tests {
             "several remotes and no origin: ask, do not guess"
         );
         assert_eq!(resolve_default_remote(Some("x"), Some("y"), &[]), None);
+    }
+
+    /// The Log column widths are per repository: `None` (never saved) is
+    /// not written, and an empty saved set (a reset) stays `Some`.
+    #[test]
+    fn the_log_column_widths_round_trip_and_none_is_not_written() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = RepoState::path_for(dir.path(), ".gitpoulpi");
+        RepoState::default().save(&path).unwrap();
+        assert!(!std::fs::read_to_string(&path)
+            .unwrap()
+            .contains("log_columns"));
+        assert_eq!(RepoState::load(&path).unwrap().log_columns, None);
+        let widths = LogColumnWidths {
+            fit: BTreeMap::from([("author".to_string(), 17)]),
+            scroll: BTreeMap::from([("message".to_string(), 60)]),
+        };
+        let state = RepoState {
+            log_columns: Some(widths.clone()),
+            ..RepoState::default()
+        };
+        state.save(&path).unwrap();
+        assert_eq!(RepoState::load(&path).unwrap().log_columns, Some(widths));
+        let reset = RepoState {
+            log_columns: Some(LogColumnWidths::default()),
+            ..RepoState::default()
+        };
+        reset.save(&path).unwrap();
+        assert_eq!(
+            RepoState::load(&path).unwrap().log_columns,
+            Some(LogColumnWidths::default())
+        );
     }
 
     /// The review context defaults are per repository, every field optional:

@@ -58,12 +58,18 @@ fn config_list(config: &Path, key: &str) -> Vec<String> {
         .unwrap_or_default()
 }
 
-fn config_width(config: &Path, column: &str) -> Option<i64> {
-    let text = std::fs::read_to_string(config.join("config.toml")).unwrap_or_default();
+/// A column's saved width in the repository's own state file.
+fn config_width(repo_root: &Path, column: &str) -> Option<i64> {
+    let path = gitpoulpi_config::repo_data_file(
+        repo_root,
+        gitpoulpi_config::DEFAULT_REPO_DATA_LOCATION,
+        "repo-state.toml",
+    );
+    let text = std::fs::read_to_string(path).unwrap_or_default();
     let doc: toml::Table = toml::from_str(&text).unwrap_or_default();
-    doc.get("ui")?
+    doc.get("log_columns")?
         .as_table()?
-        .get("log_column_widths")?
+        .get("fit")?
         .as_table()?
         .get(column)?
         .as_integer()
@@ -198,13 +204,13 @@ fn keys_size_a_log_column_and_zero_puts_it_back() {
     .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(header_x(&term.screen(), "Author"), Some(before));
     for _ in 0..40 {
-        if config_width(config.path(), "author").is_some() {
+        if config_width(repo.root(), "author").is_some() {
             break;
         }
         std::thread::sleep(Duration::from_millis(100));
     }
     assert!(
-        config_width(config.path(), "author").is_some(),
+        config_width(repo.root(), "author").is_some(),
         "the width is saved"
     );
 
@@ -215,15 +221,15 @@ fn keys_size_a_log_column_and_zero_puts_it_back() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     for _ in 0..40 {
-        if config_width(config.path(), "author").is_none()
-            && config_width(config.path(), "date").is_none()
+        if config_width(repo.root(), "author").is_none()
+            && config_width(repo.root(), "date").is_none()
         {
             break;
         }
         std::thread::sleep(Duration::from_millis(100));
     }
-    assert_eq!(config_width(config.path(), "author"), None);
-    assert_eq!(config_width(config.path(), "date"), None);
+    assert_eq!(config_width(repo.root(), "author"), None);
+    assert_eq!(config_width(repo.root(), "date"), None);
     quit(term);
 }
 

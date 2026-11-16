@@ -63,3 +63,29 @@ fn scroll_widths_keep_message_and_round_trip_apart_from_the_fit_widths() {
     assert_eq!(scroll.get("sha"), Some(&9));
     assert!(!fit.contains_key("message"));
 }
+
+/// The widths are the repository's own: none saved is none (the window then
+/// fits once), an older version's global `[ui]` widths are only the fallback, and
+/// what a repository saved comes back apart from the other layout's map.
+#[test]
+fn widths_come_from_the_repository_not_from_the_global_config() {
+    let mut ui = gitpoulpi_config::UiConfig::default();
+    ui.log_column_widths.insert("author".into(), 20);
+    // Nothing saved: an older version's global widths are the fallback.
+    let legacy = LogColumnPrefs::for_repo(&ui, None);
+    assert_eq!(legacy.widths.get(&LogColumn::Author), Some(&20));
+    assert!(!legacy.has_no_widths());
+    let none = LogColumnPrefs::for_repo(&gitpoulpi_config::UiConfig::default(), None);
+    assert!(none.has_no_widths());
+
+    let saved = gitpoulpi_session::LogColumnWidths {
+        fit: [("date".to_string(), 11), ("message".to_string(), 50)].into(),
+        scroll: [("message".to_string(), 80), ("bogus".to_string(), 3)].into(),
+    };
+    let p = LogColumnPrefs::for_repo(&ui, Some(&saved));
+    assert_eq!(p.widths.get(&LogColumn::Date), Some(&11));
+    assert_eq!(p.widths.len(), 1, "no Message in the fit map; saved wins");
+    assert_eq!(p.scroll_widths.get(&LogColumn::Message), Some(&80));
+    assert_eq!(p.scroll_widths.len(), 1);
+    assert_eq!(p.to_repo_widths().fit.get("date"), Some(&11));
+}

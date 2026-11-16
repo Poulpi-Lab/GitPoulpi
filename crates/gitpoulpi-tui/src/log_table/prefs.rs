@@ -1,4 +1,5 @@
-//! The Log column layout persisted in the `[ui]` config table.
+//! The Log column layout: order and hidden set in the `[ui]` config table
+//! (global), widths in the repository's own state file.
 
 use super::*;
 
@@ -95,17 +96,66 @@ impl LogColumnPrefs {
         (hidden, order, widths, scroll)
     }
 
-    /// Writes the layout to `config.toml` on a short-lived thread (the
-    /// input loop never waits on the disk); a process-wide lock keeps two
-    /// quick successive saves in order.
-    pub(crate) fn save_in_background(&self, path: &std::path::Path) {
+    /// The global order and hidden set from `[ui]`, the widths from this
+    /// repository's own state. `None` (never saved) falls back to the global
+    /// `[ui]` widths an older version wrote, if any (kept as they were);
+    /// without those the window fits every column once the Log has painted.
+    pub(crate) fn for_repo(
+        ui: &gitpoulpi_config::UiConfig,
+        saved: Option<&gitpoulpi_session::LogColumnWidths>,
+    ) -> Self {
+        let mut me = Self::from_ui(ui);
+        if let Some(saved) = saved {
+            me.widths.clear();
+            me.scroll_widths.clear();
+            let by_name = |m: &NameWidths| -> std::collections::HashMap<LogColumn, u16> {
+                m.iter()
+                    .filter_map(|(n, w)| LogColumn::from_config_name(n).map(|c| (c, *w)))
+                    .collect()
+            };
+            me.widths = by_name(&saved.fit);
+            // `Message` is flexible in the `fit` layout; never pinned there.
+            me.widths.remove(&LogColumn::Message);
+            me.scroll_widths = by_name(&saved.scroll);
+        }
+        me
+    }
+
+    /// No width at all, from either place: the first-open fit applies.
+    pub(crate) fn has_no_widths(&self) -> bool {
+        self.widths.is_empty() && self.scroll_widths.is_empty()
+    }
+
+    /// The widths as this repository's state stores them.
+    pub(crate) fn to_repo_widths(&self) -> gitpoulpi_session::LogColumnWidths {
+        let (_, _, fit, scroll) = self.to_names();
+        gitpoulpi_session::LogColumnWidths { fit, scroll }
+    }
+
+    /// Writes the global order and hidden set to `config.toml` on a
+    /// short-lived thread (the input loop never waits on the disk); a
+    /// process-wide lock keeps two quick successive saves in order.
+    pub(crate) fn save_layout_in_background(&self, path: &std::path::Path) {
         static WRITE_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
-        let (hidden, order, widths, scroll) = self.to_names();
+        let (hidden, order, _, _) = self.to_names();
         let path = path.to_path_buf();
         std::thread::spawn(move || {
             let _guard = WRITE_LOCK.lock().unwrap_or_else(|e| e.into_inner());
-            let _ =
-                gitpoulpi_config::set_log_columns_in_file(&path, &hidden, &order, &widths, &scroll);
+            let _ = gitpoulpi_config::set_log_column_layout_in_file(&path, &hidden, &order);
+        });
+    }
+
+    /// Writes the widths to the repository's state file the same way
+    /// (load-modify-save, so its other fields are kept).
+    pub(crate) fn save_widths_in_background(&self, state_path: &std::path::Path) {
+        static WRITE_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let widths = self.to_repo_widths();
+        let path = state_path.to_path_buf();
+        std::thread::spawn(move || {
+            let _guard = WRITE_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+            let mut state = gitpoulpi_session::RepoState::load(&path).unwrap_or_default();
+            state.log_columns = Some(widths);
+            let _ = state.save(&path);
         });
     }
 }

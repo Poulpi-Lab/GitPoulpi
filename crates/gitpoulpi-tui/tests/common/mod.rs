@@ -323,6 +323,11 @@ impl Launch {
             // The once-a-day update check asks a release server: only the
             // tests about it (`pty_update_check`) turn it back on.
             .env("GITPOULPI_UPDATES_MODE", "off")
+            // A repository with no saved Log widths is fitted to its
+            // content on first open; the tests about something else start
+            // from the automatic widths (`pty_log_column_fit_new_repo`
+            // turns it back on with `.env(..)`).
+            .env("GITPOULPI_NO_LOG_AUTOFIT", "1")
             // The drawn caret is what most tests read off the screen; the
             // ones about the terminal's own cursor (`pty_text_cursor`)
             // override it with `.env(..)`.

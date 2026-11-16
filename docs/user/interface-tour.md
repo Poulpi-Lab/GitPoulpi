@@ -270,7 +270,10 @@ the next launch.
 One row per commit, newest first. The pane has no title: the column headers
 say what it is. Right-click the header to show or hide
 columns. Drag the border between two headers to resize a column. Drag a header
-to move the column.
+to move the column. The widths belong to the repository: they are saved with it
+and come back when you reopen it, and a repository opened for the first time has
+every column fitted to what the Log shows (`Fit All Columns to Content` does it
+again, `Reset Column Widths` goes back to automatic widths, which stay).
 
 | Column | Shows |
 |---|---|

@@ -1098,7 +1098,7 @@ hint_create = "crea"
 hint_open = "apri"
 hint_toggle = "attiva/disattiva"
 # context: one line in the minimal frame a dialog shows when the window is too small for it
-too_small = "Window too small: enlarge it"
+too_small = "Finestra troppo piccola: ingrandiscila"
 
 [clone]
 title = "Clona un repository"
@@ -3619,7 +3619,7 @@ review_reply = "Revisione: Rispondi alla discussione..."
 # context: command palette entry
 review_resolve = "Revisione: Risolvi o riapri la discussione"
 # context: command palette entry
-review_back_to_comment = "Review: Back to Comment in Overview"
+review_back_to_comment = "Revisione: Torna al commento nella panoramica"
 # context: command palette entry
 review_fold_thread = "Revisione: Comprimi o espandi la discussione"
 # context: command palette entry
@@ -4307,7 +4307,7 @@ explain_changes = "Spiega le modifiche in corso"
 ai_generate = "Genera un messaggio di {$commit} con l'IA"
 ai_compose = "Componi {$commits} con l'IA"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: {$commit} without running git hooks"
+skip_hooks = "Salta gli hook: {$commit} senza eseguire gli hook di git"
 commit_reference = "Apri nel browser (palette: Apri riferimento del commit)"
 quit = "Esci da GitPoulpi"
 quit_cd = "Esci, lasciando la shell nella cartella di questa scheda (richiede il wrapper della shell)"
@@ -5485,7 +5485,7 @@ ref_from_branch = "(dal branch)"
 issue_ref_inserted = "inserito {reference}"
 skip_hooks = "Salta gli hook"
 # context: shorter label of the Skip hooks checkbox on a narrow commit options row
-skip_hooks_short = "No hooks"
+skip_hooks_short = "No hook"
 
 [compose_ui]
 select_commit = "Seleziona un commit..."
@@ -7234,13 +7234,13 @@ why_not_on_code = "porta prima il cursore su una riga di codice"
 # context: why a row is off
 why_not_on_thread = "porta prima il cursore su una discussione"
 # context: button on the Files page after jumping from a comment: returns to that comment in the Overview
-back_to_overview = "Back to Overview"
+back_to_overview = "Torna alla panoramica"
 # context: why Back to Comment does nothing. Width budget: 50 cells
-why_no_return = "no comment to go back to"
+why_no_return = "nessun commento a cui tornare"
 # context: status line: the commented file is not in the diff. {path} is a file path
-thread_not_in_diff = "{path} is not in the {$diff}"
+thread_not_in_diff = "{path} non è nel {$diff}"
 # context: status line: the thread's line no longer exists; {path} is a file path
-thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
+thread_outdated_nearest = "questa discussione è obsoleta: mostro la riga più vicina di {path}"
 # context: why a row is off
 why_no_resolve = "questa discussione non si può risolvere"
 # context: why a row is off
@@ -10110,11 +10110,11 @@ link_diagram = "Diagramma: {first}"
 why_no_diagram = "la voce selezionata non ha diagrammi"
 palette_open_diagram = "Conversazione: Apri il diagramma della voce"
 # context: command palette entry
-palette_open_code = "Conversation: Open Code of Thread"
+palette_open_code = "Conversazione: Apri il codice della discussione"
 # context: why Open Code does nothing. Width budget: 50 cells
-why_no_code = "the selected entry is not a code thread"
+why_no_code = "la voce selezionata non è una discussione sul codice"
 # context: why Open Code does nothing outside a review. Width budget: 50 cells
-why_no_code_here = "open the review of this request to reach its code"
+why_no_code_here = "apri la revisione di questa richiesta per vedere il codice"
 why_no_url = "questa voce non ha una pagina sull'host"
 why_no_events = "questo host non elenca eventi"
 why_no_reply = "questo host non accetta una risposta a questa voce"

@@ -21,7 +21,8 @@ le modifiche in corso:
 - **I file rinominati o spostati** sono una sola riga, `nuovo <- vecchio`, in entrambi gli elenchi (un file
   eliminato su disco e uno nuovo con almeno il 50% di contenuto uguale contano come uno
   spostamento anche prima di metterli in stage). Stage, Unstage e Scarta agiscono su entrambi i
-  nomi: mettere in stage mette in stage l'eliminazione e il nuovo file, così git vede una sola rinomina.
+  nomi: mettere in stage mette in stage l'eliminazione e il nuovo file, così git vede una sola rinomina, ed è UN solo
+  passo di annullamento (`Undo Stage rename vecchio -> nuovo`).
   Aprire la riga mostra il diff del contenuto rispetto al vecchio nome, con l'intestazione
   `vecchio -> nuovo (N% simile)`; uno spostamento senza modifiche dice **Nessuna modifica al contenuto**.
   Lo stesso vale per i file di un commit, e `gitpoulpi status` / `gitpoulpi diff`
@@ -184,7 +185,8 @@ nell'altro.
 - **Salta gli hook** (`Shift+H`, o **Commit: Attiva o disattiva «Salta gli hook»** nella palette)
   fa il commit senza eseguire gli hook `pre-commit` e `commit-msg` del repository. Vale per un
   singolo commit; **Impostazioni > Impostazioni specifiche del repository > Commit** lo fa partire
-  selezionato. Compare quando la riga ha spazio.
+  selezionato. Su una riga stretta la sua etichetta si accorcia in **No hook**, poi resta la sola
+  casella (il suggerimento la nomina); non sparisce mai.
 - `c` nel pannello Stato porta il cursore nel modulo. `Esc` lo lascia.
 - `Ctrl+G c` e `Ctrl+G Enter` (**Git: Commit...** e **Git: Esegui ora il commit delle modifiche
   in stage** nella palette) sono un solo comando, il pulsante di commit da qualsiasi punto. Con un
@@ -210,8 +212,12 @@ modifichi; non viene fatto alcun commit finché non premi il pulsante di commit.
 **Componi commit con l'IA** sta all'estremità destra della riga Modifica e si riduce
 con il pannello destro invece di sparire: l'etichetta intera, poi **Componi con l'IA**, poi
 il solo **`✦`**. Mantiene il clic, il suggerimento e il tasto
-(`Ctrl+G Shift+C`) a ogni larghezza; le etichette Modifica e Salta gli hook cedono il posto
-a lui, mai il contrario.
+(`Ctrl+G Shift+C`) a ogni larghezza; l'etichetta Salta gli hook gli cede il posto
+(**No hook**, poi la sola casella) prima che lui si riduca.
+
+I pulsanti **`✦`** (genera il messaggio) e **`#`** (inserisci un riferimento a un'issue) all'estremità destra
+della riga del riepilogo si riducono allo stesso modo: in un pannello stretto perdono i margini, poi si
+riuniscono in un solo pulsante **`⋯`** il cui menu li elenca entrambi, così nessuno dei due sparisce mai.
 
 ## Il compositore di commit: dividere le modifiche in commit
 

@@ -63,7 +63,8 @@ thread_local! {
 /// `Win::decorate`.
 pub(crate) fn paint_popup_cross(buf: &mut ratatui::buffer::Buffer, popup: Rect) -> Option<Rect> {
     let hovered = popup_pointer().is_some_and(|(x, y)| {
-        Rect::new(popup.right().saturating_sub(5), popup.y, 3, 1).contains((x, y).into())
+        Rect::new(popup.right().saturating_sub(5).max(popup.x), popup.y, 3, 1)
+            .contains((x, y).into())
     });
     let cross = close_cross::paint(buf, popup, hovered);
     POPUP_CROSS.with(|c| c.set(cross));
@@ -518,9 +519,9 @@ pub(crate) fn render_close_app_button(
     }
     // One column left of the border's own right corner glyph.
     let right_edge = title_area.right().saturating_sub(1);
-    if title_end_x + width > right_edge {
-        return None;
-    }
+    // A title that runs into the button is covered, not the button dropped:
+    // the quit button keeps its place at any width (`Ctrl+Q` is its twin).
+    let _ = title_end_x;
     let rect = Rect::new(right_edge - width, title_area.y, width, 1);
     frame.render_clipped(
         Paragraph::new(Line::from(Span::styled(CLOSE, plain_button_style(hovered)))),

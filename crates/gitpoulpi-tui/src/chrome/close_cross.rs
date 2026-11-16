@@ -14,16 +14,20 @@ use crate::theme::{plain_button_style, th};
 
 const CROSS: &str = " \u{2715} ";
 const WIDTH: u16 = 3;
-/// A block narrower than this is too small to carry the cross.
-const MIN_BLOCK_WIDTH: u16 = 8;
+/// A block narrower than this cannot carry the cross whole (it is then the
+/// only thing on the top border, over the title's last cells and the corners).
+const MIN_BLOCK_WIDTH: u16 = 3;
 
-/// Where the cross sits for `block`, or `None` when it cannot be drawn
-/// whole (block too narrow, or off the buffer).
+/// Where the cross sits for `block`: two cells in from the right edge (one
+/// border cell and a gap) on a block of 8 or more columns; narrower, it moves
+/// left so it stays whole (over the title's last cells, never dropped). `None`
+/// only below 3 columns, or off the buffer.
 fn spot(buf: &Buffer, block: Rect) -> Option<Rect> {
     if block.width < MIN_BLOCK_WIDTH || block.height == 0 {
         return None;
     }
-    let rect = Rect::new(block.right() - 5, block.y, WIDTH, 1);
+    let x = block.right().saturating_sub(5).max(block.x);
+    let rect = Rect::new(x, block.y, WIDTH, 1);
     (buf.area.intersection(rect) == rect).then_some(rect)
 }
 
@@ -91,10 +95,16 @@ mod tests {
     }
 
     #[test]
-    fn a_block_too_narrow_registers_nothing() {
-        let (mut buf, area) = framed(7);
+    fn a_narrow_block_keeps_its_cross_down_to_three_columns() {
+        for width in (3..=40).rev() {
+            let (mut buf, area) = framed(width);
+            let rect =
+                paint(&mut buf, area, false).unwrap_or_else(|| panic!("no cross at width {width}"));
+            assert!(rect.x >= area.x && rect.right() <= area.right(), "{width}");
+            assert!(row(&buf, 0).contains('\u{2715}'), "width {width}");
+        }
+        let (mut buf, area) = framed(2);
         assert_eq!(paint(&mut buf, area, false), None);
-        assert!(!row(&buf, 0).contains('\u{2715}'));
     }
 
     #[test]

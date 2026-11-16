@@ -216,6 +216,8 @@ pub(crate) struct ComposerHover {
     /// Files that still have conflicts: the Commit button is disabled (and
     /// says why) until it is 0.
     pub(crate) conflicts: usize,
+    /// The mouse is over the summary row's `⋯` (the folded Generate and `#`).
+    pub(crate) more: bool,
 }
 
 /// State of the `#` button at the right of the Summary row.
@@ -261,9 +263,9 @@ pub(crate) fn render_commit_composer(
     merging: bool,
     hover: ComposerHover,
     editor: &text_edit::FieldEditor<MainField>,
-) {
+) -> Option<(Rect, Vec<OverflowItem>)> {
     if area.height < COMPOSER_MIN_HEIGHT {
-        return;
+        return None;
     }
 
     let [sep, amend_row, rest] = Layout::vertical([
@@ -408,13 +410,13 @@ pub(crate) fn render_commit_composer(
     frame.render_clipped(block, box_area);
 
     if inner.height == 0 {
-        return;
+        return None;
     }
 
     let [summary_row, desc_band] =
         Layout::vertical([Constraint::Length(1), Constraint::Min(0)]).areas(inner);
 
-    render_summary_row(
+    let overflow = render_summary_row(
         hits,
         frame,
         summary_row,
@@ -424,6 +426,7 @@ pub(crate) fn render_commit_composer(
         hover.ai,
         hover.issue_ref,
         staged_count > 0,
+        hover.more,
     );
 
     // How much of `desc_band` is a thin rule versus Description lines: 0
@@ -473,15 +476,43 @@ pub(crate) fn render_commit_composer(
             .style(style),
         button_row,
     );
+    overflow
 }
 
 /// Columns of the Generate glyph button in the summary row: space,
 /// sparkle, space.
 const GENERATE_W: usize = 3;
 /// The sparkle glyph (text presentation, one column).
-const SPARK: &str = "\u{2726}";
+pub(crate) const SPARK: &str = "\u{2726}";
 /// The summary row is too narrow for the Generate button below this.
 const GENERATE_MIN_ROW: u16 = 24;
+/// Below [`GENERATE_MIN_ROW`] the two buttons shrink to their bare glyph
+/// (two cells each); below this they fold into one `⋯` (the menu lists them).
+const COMPACT_MIN_ROW: u16 = 14;
+/// Columns of the folded `⋯` button.
+const MORE_W: usize = 3;
+
+/// How the summary row's buttons are drawn at a width: full glyph buttons,
+/// bare glyphs, then one `⋯` menu - never silently dropped (only a row too
+/// small even for the `⋯` loses them).
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum SummaryRung {
+    Full,
+    Compact,
+    More,
+}
+
+fn summary_rung(width: u16, count_width: usize) -> Option<SummaryRung> {
+    if width >= GENERATE_MIN_ROW {
+        Some(SummaryRung::Full)
+    } else if width >= COMPACT_MIN_ROW {
+        Some(SummaryRung::Compact)
+    } else if usize::from(width) >= count_width + 1 + MORE_W + 1 {
+        Some(SummaryRung::More)
+    } else {
+        None
+    }
+}
 /// Columns of the `#` button: space, `#`, the dropdown arrow.
 const ISSUE_REF_W: usize = 3;
 
@@ -558,18 +589,8 @@ fn render_summary_row(
     ai: ComposerAi,
     issue_ref: ComposerIssueRef,
     has_staged: bool,
-) {
-    let gen_w = if ai.enabled && row.width >= GENERATE_MIN_ROW {
-        GENERATE_W
-    } else {
-        0
-    };
-    let ref_w = if issue_ref.shown && row.width >= GENERATE_MIN_ROW {
-        ISSUE_REF_W
-    } else {
-        0
-    };
-    let gen_w = gen_w + ref_w;
+    more_hovered: bool,
+) -> Option<(Rect, Vec<OverflowItem>)> {
     let focused = matches!(
         focus,
         Some(ComposerField::Summary) | Some(ComposerField::WipSummary)
@@ -583,6 +604,24 @@ fn render_summary_row(
     // `remaining` goes negative (e.g. "-123"), so this stays correct
     // however long the summary gets.
     let count_width = count.len() + 1;
+    let rung = if ai.enabled || issue_ref.shown {
+        summary_rung(row.width, count_width)
+    } else {
+        None
+    };
+    let (gen_cells, ref_cells) = match rung {
+        Some(SummaryRung::Full) => (GENERATE_W, ISSUE_REF_W),
+        Some(SummaryRung::Compact) => (2, 2),
+        _ => (0, 0),
+    };
+    let ref_w = if issue_ref.shown { ref_cells } else { 0 };
+    let gen_w = if ai.enabled { gen_cells } else { 0 };
+    let more_w = if rung == Some(SummaryRung::More) {
+        MORE_W
+    } else {
+        0
+    };
+    let gen_w = gen_w + ref_w + more_w;
     let avail = (row.width as usize).saturating_sub(count_width + 1 + gen_w);
     editor.drawn(
         MainField::Summary,
@@ -638,9 +677,32 @@ fn render_summary_row(
         } else {
             base
         };
-        spans.push(Span::styled(" #\u{25BE}", style));
+        let glyph = if rung == Some(SummaryRung::Full) {
+            " #\u{25BE}"
+        } else {
+            " #"
+        };
+        spans.push(Span::styled(glyph, style));
     }
-    let gen_w = gen_w - ref_w;
+    let mut overflow = None;
+    if more_w > 0 {
+        let x = row.x + (used + pad) as u16;
+        let rect = Rect::new(x, row.y, more_w as u16, 1);
+        hits.push((rect, HitTarget::BarOverflow(OverflowBar::Composer)));
+        spans.push(Span::styled(
+            OVERFLOW_LABEL,
+            crate::button_bar::chip_overflow_style(more_hovered),
+        ));
+        let mut items = Vec::new();
+        if ai.enabled {
+            items.push(OverflowItem::AiGenerate);
+        }
+        if issue_ref.shown {
+            items.push(OverflowItem::ComposerIssueRef);
+        }
+        overflow = Some((rect, items));
+    }
+    let gen_w = gen_w - ref_w - more_w;
     if gen_w > 0 {
         // First registered wins a hit: Generate precedes the row-wide
         // summary-field hit.
@@ -658,7 +720,12 @@ fn render_summary_row(
         } else {
             base
         };
-        spans.push(Span::styled(format!(" {SPARK} "), style));
+        let glyph = if rung == Some(SummaryRung::Full) {
+            format!(" {SPARK} ")
+        } else {
+            format!(" {SPARK}")
+        };
+        spans.push(Span::styled(glyph, style));
     }
     spans.push(Span::styled(
         count,
@@ -672,6 +739,7 @@ fn render_summary_row(
     ));
     hits.push((row, HitTarget::CommitSummaryField));
     frame.render_clipped(Paragraph::new(Line::from(spans)), row);
+    overflow
 }
 
 /// The Description area: placeholder on its first row when empty and
@@ -922,6 +990,75 @@ mod tests {
         assert_eq!(kind_at(40), "icon");
         assert_eq!(kind_at(20), "icon");
         assert_eq!(kind_at(3), "icon");
+    }
+
+    /// Generate and `#` on the summary row shrink to glyphs, then fold into
+    /// one `⋯` whose menu lists both: reachable at every width.
+    #[test]
+    fn summary_buttons_degrade_and_never_vanish() {
+        for width in [90u16, 40, 30, 28, 26, 24, 22, 18, 16, 14, 13, 12] {
+            use ratatui::backend::TestBackend;
+            use ratatui::Terminal;
+            let mut terminal = Terminal::new(TestBackend::new(width, 12)).unwrap();
+            let mut hits: Vec<(Rect, HitTarget)> = Vec::new();
+            let mut overflow = None;
+            terminal
+                .draw(|frame| {
+                    overflow = render_commit_composer(
+                        frame,
+                        Rect::new(0, 0, width, 12),
+                        &mut hits,
+                        "",
+                        "",
+                        false,
+                        None,
+                        1,
+                        false,
+                        ComposerHover {
+                            ai: ComposerAi {
+                                enabled: true,
+                                ..ComposerAi::default()
+                            },
+                            issue_ref: ComposerIssueRef {
+                                shown: true,
+                                enabled: true,
+                                hovered: false,
+                            },
+                            ..ComposerHover::default()
+                        },
+                        &text_edit::FieldEditor::default(),
+                    );
+                })
+                .unwrap();
+            let items = overflow.map(|(_, i)| i).unwrap_or_default();
+            for (target, item) in [
+                (HitTarget::AiGenerate, OverflowItem::AiGenerate),
+                (HitTarget::ComposerIssueRef, OverflowItem::ComposerIssueRef),
+            ] {
+                let direct = hits.iter().any(|(_, t)| *t == target);
+                let folded = items.contains(&item);
+                assert!(
+                    direct ^ folded,
+                    "{target:?} at width {width}: {direct} {folded}"
+                );
+            }
+            if width >= GENERATE_MIN_ROW + 2 {
+                assert!(items.is_empty(), "width {width}");
+            }
+            if width <= COMPACT_MIN_ROW + 1 {
+                assert!(!items.is_empty(), "width {width}");
+            }
+            let on_row: Vec<_> = hits.iter().filter(|(r, _)| r.y == 2).collect();
+            for (i, (a, ta)) in on_row.iter().enumerate() {
+                for (b, tb) in on_row.iter().skip(i + 1) {
+                    let overlap = a.x < b.right() && b.x < a.right();
+                    // The row-wide summary field sits under every button.
+                    let field = *ta == HitTarget::CommitSummaryField
+                        || *tb == HitTarget::CommitSummaryField;
+                    assert!(field || !overlap, "{ta:?} overlaps {tb:?} at width {width}");
+                }
+            }
+        }
     }
 
     /// Skip hooks degrades with the row (full label, short label, the box

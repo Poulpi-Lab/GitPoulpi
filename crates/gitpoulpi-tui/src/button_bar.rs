@@ -175,6 +175,8 @@ pub(crate) enum OverflowBar {
     StatusToolbar,
     /// A working-changes section header's bulk button.
     StatusBulk(StatusSection),
+    /// The commit composer's summary row: Generate and `#` when it is narrow.
+    Composer,
 }
 
 /// One row of an overflow menu: a hidden button. Running it means
@@ -192,6 +194,10 @@ pub(crate) enum OverflowItem {
     StatusBulk(StatusSection),
     /// The working-changes toolbar's View all files checkbox.
     ViewAllFiles,
+    /// The composer's AI Generate button, folded into the summary row's `⋯`.
+    AiGenerate,
+    /// The composer's `#` issue-reference button, folded the same way.
+    ComposerIssueRef,
     /// The toolbar's pull request chip, when the bar had no room for it.
     HostingChip {
         /// The `GL !53` chip (a linked request), else the dim `+ PR` one.
@@ -210,6 +216,8 @@ impl OverflowItem {
             OverflowItem::CollapseAll { collapse } => HitTarget::CollapseAllButton { collapse },
             OverflowItem::StatusBulk(s) => HitTarget::StatusBulkButton(s),
             OverflowItem::ViewAllFiles => HitTarget::ViewAllFilesCheckbox,
+            OverflowItem::AiGenerate => HitTarget::AiGenerate,
+            OverflowItem::ComposerIssueRef => HitTarget::ComposerIssueRef,
             OverflowItem::HostingChip { linked: true } => {
                 HitTarget::Hosting(crate::hosting_ui::HostingHit::LinkedPrChip)
             }
@@ -279,6 +287,14 @@ impl OverflowItem {
                 gitpoulpi_i18n::msg::button_bar::EXPAND_ALL.get().into()
             }
             OverflowItem::StatusBulk(s) => s.bulk_label().into(),
+            OverflowItem::AiGenerate => format!(
+                "{} {}",
+                crate::composer::SPARK,
+                gitpoulpi_i18n::msg::tooltip::AI_GENERATE.get()
+            ),
+            OverflowItem::ComposerIssueRef => {
+                format!("# {}", gitpoulpi_i18n::msg::tooltip::INSERT_ISSUE_REF.get())
+            }
             OverflowItem::HostingChip { linked: true } => {
                 gitpoulpi_i18n::msg::hosting_ui::PR_ABBR.get().into()
             }

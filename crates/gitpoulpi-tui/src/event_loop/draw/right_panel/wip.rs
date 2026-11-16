@@ -364,7 +364,7 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
         }
     }
 
-    render_commit_composer(
+    if let Some((rect, items)) = render_commit_composer(
         frame,
         composer_band,
         frame_hits,
@@ -376,6 +376,7 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
         ctx.merging,
         ComposerHover {
             conflicts: conflicts.len(),
+            more: hover(hovered_target).composer_more(),
             amend_checkbox: hover(hovered_target).amend_checkbox(),
             skip_hooks: commit_skip_hooks,
             skip_hooks_checkbox: hover(hovered_target).skip_hooks_checkbox(),
@@ -393,7 +394,9 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
             },
         },
         field_editor,
-    );
+    ) {
+        overflow_slots.push((OverflowBar::Composer, rect, items));
+    }
 }
 
 /// The new-file name box of the Status list (`ref_name_box.rs`): over the row

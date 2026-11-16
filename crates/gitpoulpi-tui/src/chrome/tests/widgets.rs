@@ -387,44 +387,40 @@ fn the_close_button_lands_in_the_title_bars_right_hand_corner_and_is_clickable_t
     assert_eq!(find_hit_target(&hits, 20, 0), None);
 }
 
-/// Same falsifiable "no room, no button" rule the gear already has --
-/// a title so long it reaches the corner leaves nothing to click.
+/// The quit button never vanishes: a title that runs into it is covered by
+/// it (the title is not clickable, the button is), at any width where the
+/// button's three cells and the corner fit.
 #[test]
-fn a_title_bar_too_narrow_for_the_close_button_registers_no_button_at_all() {
+fn a_title_running_into_the_close_button_is_covered_never_the_button_dropped() {
     use ratatui::backend::TestBackend;
 
-    let mut terminal = Terminal::new(TestBackend::new(10, 1)).unwrap();
+    for (width, title_end) in [(10u16, 9u16), (20, 18), (5, 4), (40, 39)] {
+        let mut terminal = Terminal::new(TestBackend::new(width, 1)).unwrap();
+        let mut hits: Vec<(Rect, HitTarget)> = Vec::new();
+        terminal
+            .draw(|frame| {
+                render_close_app_button(
+                    frame,
+                    Rect::new(0, 0, width, 1),
+                    title_end,
+                    false,
+                    &mut hits,
+                );
+            })
+            .unwrap();
+        let buffer = terminal.backend().buffer();
+        let row: String = (0..width).map(|x| buffer[(x, 0)].symbol()).collect();
+        assert!(row.contains('\u{D7}'), "width {width}: {row:?}");
+        assert_eq!(hits.len(), 1, "width {width}");
+    }
+    // Below the button's own cells plus the corner there is no cell to give.
+    let mut terminal = Terminal::new(TestBackend::new(4, 1)).unwrap();
     let mut hits: Vec<(Rect, HitTarget)> = Vec::new();
     terminal
         .draw(|frame| {
-            render_close_app_button(frame, Rect::new(0, 0, 10, 1), 9, false, &mut hits);
+            render_close_app_button(frame, Rect::new(0, 0, 4, 1), 3, false, &mut hits);
         })
         .unwrap();
-
-    let buffer = terminal.backend().buffer();
-    let row: String = (0..10).map(|x| buffer[(x, 0)].symbol()).collect();
-    assert!(!row.contains('\u{D7}'), "{row:?}");
-    assert!(hits.is_empty(), "{hits:?}");
-}
-
-/// A very long title (`title_end_x` reaching past where the button
-/// would land) also suppresses the button - overlapping the title
-/// text is exactly the case called out ("must not
-/// overlap existing title content at narrow widths").
-#[test]
-fn a_close_button_overlapping_the_title_text_is_suppressed() {
-    use ratatui::backend::TestBackend;
-
-    let mut terminal = Terminal::new(TestBackend::new(20, 1)).unwrap();
-    let mut hits: Vec<(Rect, HitTarget)> = Vec::new();
-    // title_end_x = 18, right_edge (title_area.right() - 1) = 19,
-    // width(" \u{D7} ") = 3 -- 18 + 3 > 19, so nothing is drawn.
-    terminal
-        .draw(|frame| {
-            render_close_app_button(frame, Rect::new(0, 0, 20, 1), 18, false, &mut hits);
-        })
-        .unwrap();
-
     assert!(hits.is_empty(), "{hits:?}");
 }
 

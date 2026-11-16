@@ -188,6 +188,10 @@ impl Hover<'_> {
         matches!(self.0, Some(HitTarget::AiCompose))
     }
 
+    pub(super) fn composer_more(self) -> bool {
+        matches!(self.0, Some(HitTarget::BarOverflow(OverflowBar::Composer)))
+    }
+
     pub(super) fn issue_ref(self) -> bool {
         matches!(self.0, Some(HitTarget::ComposerIssueRef))
     }

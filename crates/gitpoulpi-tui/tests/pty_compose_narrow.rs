@@ -65,6 +65,18 @@ fn compose_shrinks_to_the_icon_and_stays_clickable() {
     let mut seen_icon_only = false;
     for cols in [110u16, 90, 75, 60] {
         term.resize(cols, 40).expect("resize");
+        // `resize` resizes the emulator at once, but the app redraws only
+        // after it handles the signal: under load a stable screen can still be
+        // the previous layout cropped to the new size (its right end, and the
+        // icon with it, cut off). Wait for the app's own redraw: the options
+        // row, icon included, in a screen that has stopped changing. The icon
+        // never being drawn is still a timeout, hence a failure.
+        term.wait_for(
+            &format!("the options row redrawn at {cols} columns"),
+            STEP,
+            |s| options_row(s).is_some_and(|(_, line)| line.contains(SPARK)),
+        )
+        .unwrap_or_else(|e| panic!("the Compose button vanished at {cols} columns: {e}"));
         let screen = term
             .wait_for_stable(Duration::from_millis(400), STEP)
             .unwrap_or_else(|e| panic!("{e}"));

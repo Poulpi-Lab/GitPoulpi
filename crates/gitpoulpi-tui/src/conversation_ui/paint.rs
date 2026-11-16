@@ -26,6 +26,40 @@ fn muted() -> Style {
 }
 
 /// Writes `parts` one after the other from `x`; returns where they ended.
+/// How a code thread's headline spends `max` cells on its link: whether the
+/// "Thread" label still shows, and the `path:line` text, ellipsized at its
+/// start when even alone it does not fit. The link itself never goes: the
+/// label gives way first, then the path shortens.
+fn place_fit(place: &str, max: u16) -> (bool, String) {
+    let label_w = display_width(m::THREAD.get()) + 2;
+    let max = usize::from(max);
+    let w = display_width(place);
+    if label_w + w <= max {
+        return (true, place.to_string());
+    }
+    if w <= max {
+        return (false, place.to_string());
+    }
+    if max == 0 {
+        return (false, String::new());
+    }
+    let mut tail: Vec<char> = Vec::new();
+    let mut used = 1;
+    for ch in place.chars().rev() {
+        let cw = display_width(ch.encode_utf8(&mut [0; 4]));
+        if used + cw > max {
+            break;
+        }
+        used += cw;
+        tail.push(ch);
+    }
+    tail.reverse();
+    (
+        false,
+        format!("\u{2026}{}", tail.into_iter().collect::<String>()),
+    )
+}
+
 /// `path:line` of a thread (the line it was written on when it is outdated).
 pub(crate) fn thread_place(t: &gitpoulpi_hosting::conversation::CodeThread) -> String {
     match t.line.or(t.original_line) {
@@ -388,16 +422,22 @@ impl Conversation {
         } else {
             Style::default().fg(th().ui.text)
         };
-        let mut parts = vec![
-            (
+        let (show_label, place) = if link {
+            place_fit(&place, max)
+        } else {
+            (true, place)
+        };
+        let mut parts = Vec::new();
+        if show_label {
+            parts.push((
                 m::THREAD.get().to_string(),
                 Style::default()
                     .fg(th().ui.accent)
                     .add_modifier(Modifier::BOLD),
-            ),
-            ("  ".to_string(), Style::default()),
-            (place, place_style),
-        ];
+            ));
+            parts.push(("  ".to_string(), Style::default()));
+        }
+        parts.push((place, place_style));
         if t.resolved {
             parts.push((
                 format!("  {}", m::RESOLVED.get()),
@@ -438,12 +478,17 @@ impl Conversation {
         let TimelineEntry::Thread(t) = self.entries.get(e)? else {
             return None;
         };
-        let start = x + display_width(m::THREAD.get()) as u16 + 2;
+        let (show_label, text) = place_fit(&thread_place(t), max);
+        let start = x + if show_label {
+            display_width(m::THREAD.get()) as u16 + 2
+        } else {
+            0
+        };
         let limit = x + max;
-        if start >= limit {
+        if start >= limit || text.is_empty() {
             return None;
         }
-        let w = (display_width(&thread_place(t)) as u16).min(limit - start);
+        let w = (display_width(&text) as u16).min(limit - start);
         Some(Rect::new(start, y, w, 1))
     }
 

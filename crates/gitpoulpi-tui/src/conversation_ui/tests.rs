@@ -611,6 +611,44 @@ fn a_thread_shows_its_hunk_and_its_comments() {
 }
 
 #[test]
+fn the_code_link_never_vanishes_when_narrow() {
+    let thread = TimelineEntry::Thread(CodeThread {
+        id: "t1".into(),
+        path: "src/deeply/nested/parse.rs".into(),
+        line: Some(42),
+        original_line: None,
+        side: DiffSide::New,
+        start_line: None,
+        resolved: false,
+        outdated: false,
+        resolvable: true,
+        diff_hunk: None,
+        comments: vec![comment("n1", "kai", "Why?", "2026-11-12T11:00:00Z")],
+    });
+    let shared = shared(vec![thread]);
+    let mut conv = conversation(&shared, None, None);
+    ready(&mut conv);
+    conv.code_links = true;
+    for width in [100u16, 40, 30, 24, 18, 14] {
+        let area = Rect::new(0, 0, width, 30);
+        let screen = text(&paint(&mut conv, area));
+        let rect = conv
+            .code_link_rect()
+            .unwrap_or_else(|| panic!("no link at width {width}: {screen}"));
+        assert!(
+            rect.width >= 2 && rect.right() <= width,
+            "{rect:?} at {width}"
+        );
+        if width <= 24 {
+            assert!(
+                screen.contains('\u{2026}'),
+                "ellipsized at {width}: {screen}"
+            );
+        }
+    }
+}
+
+#[test]
 fn an_unreachable_host_leaves_the_saved_copy_with_an_offline_banner() {
     let dir = tempfile::tempdir().unwrap();
     let shared = shared(entries());

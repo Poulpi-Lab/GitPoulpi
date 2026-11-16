@@ -49,21 +49,41 @@ Um controlo segmentado na margem superior muda de página: **Resumo**, **Ficheir
 
 ### Resumo
 
-A descrição (o Markdown básico é mostrado como tal: negrito, itálico, `código`, ligações como o seu texto, listas
-com marcas e numeradas, títulos, citações e blocos de código) e depois a conversa: os comentários que não estão no código e as
-revisões já submetidas, das mais antigas para as mais recentes, cada uma com o seu parecer (`aprovou`, `pediu alterações`, `comentou`,
-`dispensada`). No GitLab os pareceres são as suas aprovações. Por baixo, a caixa de resposta: clique nela ou prima **`c`**
-para escrever um comentário na conversa. **Este é publicado de imediato**, e a caixa di-lo.
+O Resumo é **a conversa do pedido**, a mesma cronologia e a mesma caixa de comentário que uma issue tem
+([Conversas](hosting-integration.md#5c-conversas)): primeiro a descrição (*abriu isto*), depois os comentários, as
+discussões no código com o seu excerto do diff, as revisões submetidas com o seu parecer (`aprovou`, `pediu
+alterações`, `comentou`, `dispensada`; no GitLab os pareceres são as suas aprovações) e os eventos, das mais antigas
+para as mais recentes, na janela mais recente, com **Carregar mais antigos** no topo. A caixa de comentário está
+fixa sob a cronologia (**Novo comentário**): **Escrever**, **Prévia** e **Lado a lado**, **Cancelar** e **Enviar**.
+**Um comentário publicado aqui vai de imediato para o host** (nada fica pendente: os pendentes são os do código,
+enviados com a revisão), aparece logo na lista e ocupa o seu lugar quando o host responde; se o host o recusar, a
+caixa volta a abrir-se com o seu texto e o motivo.
 
-A caixa de comentário (também a caixa de uma resposta, de um comentário numa linha e do resumo de **Concluir revisão**) é a
-caixa de texto Markdown partilhada com a [vista de conversa](hosting-integration.md#escrever): **Escrever**, **Prévia**
-(`Alt+P`) e **Lado a lado** (`Alt+L`, numa janela com 100 colunas), `Ctrl+Enter` (também `Ctrl+S`, `Alt+Enter`) envia, e
-onde a IA está ativa `Alt+E` abre **Escrever com IA** ([o capítulo da IA](ai.md#ajuda-de-escrita-num-host)). A prévia
-mostra o texto como o host o fará, referências incluídas (`#7`, `!12`, `ABC-12`, ids de commit); um texto não enviado é
-guardado por pedido. O texto da descrição e da conversa usa o mesmo desenhador, por isso o Markdown, as tabelas, os alertas
-e as referências têm o mesmo aspeto aqui e na vista de conversa de uma issue. Citar, editar ou eliminar um comentário já
-publicado, e as notas internas, pertencem à vista de conversa das issues e dos pedidos em hosts sem revisão (veja
-[Conversas](hosting-integration.md#5c-conversas)); aqui só os seus comentários pendentes podem ser editados.
+As teclas são as da vista de conversa: **`Up`** / **`Down`** (e `Ctrl+J` / `Ctrl+K`) movem entre entradas,
+**`r`** responde no tópico da entrada selecionada, **`Q`** cita-a num novo comentário, **`c`** escreve um novo
+comentário, **`e`** / **`d`** editam e eliminam os seus próprios comentários (antes de eliminar há uma pergunta), **`l`**
+ou `Enter` abre as ligações de uma entrada, **`g`** o seu diagrama, **`y`** copia o seu endereço, **`o`** abre-a no
+navegador, **`n`** vai para a próxima entrada por ler, **`v`** mostra ou oculta eventos, **`m`** carrega entradas mais
+antigas, `Tab` alterna entre a cronologia e a caixa, e **Nota interna** (`Alt+I`) existe nos hosts que têm tais notas.
+Os botões da entrada selecionada (**Responder**, **Citar**, **Editar**, **Eliminar**, **Ligações**) fazem o mesmo, e a
+paleta tem as linhas *Conversa: ...* junto às *Revisão: ...*. Uma ligação pergunta antes de abrir, como em toda a
+revisão.
+
+Onde uma tecla da conversa e uma da revisão se encontram, a conversa fica com a letra nesta página: `l` (etiquetas),
+`m` (marco), `Q` (abandonar, do Gerrit), `e` / `d`, `r`. As etiquetas, o marco e o abandono ficam nos botões do
+cabeçalho e na paleta; `a` (responsáveis), `p` (revisores), `f` (**Concluir revisão**), `b` (**Fazer checkout**), `P`,
+`D`, `U` e `Alt+1` / `Alt+2` / `Alt+3` mantêm aqui o seu significado. Enquanto a caixa tem o teclado, todas as teclas
+são da caixa, exceto `Alt+1` / `Alt+2` / `Alt+3`; `Esc` devolve o teclado à cronologia e um segundo `Esc` fecha a
+revisão.
+
+Um comentário escrito noutra janela ou pela CLI aparece aqui por si: cada escrita do GitPoulpi (esta janela incluída)
+avisa a sessão, e as janelas que mostram o mesmo pedido leem-no de novo.
+
+A caixa de comentário é a caixa de texto Markdown partilhada com a [vista de conversa](hosting-integration.md#escrever)
+(também a caixa de uma resposta a uma discussão, de um comentário numa linha e do resumo de **Concluir revisão**):
+`Ctrl+Enter` (também `Ctrl+S`, `Alt+Enter`) envia, e onde a IA está ativa `Alt+E` abre **Escrever com IA**
+([o capítulo da IA](ai.md#ajuda-de-escrita-num-host)). A prévia mostra o texto como o host o fará, referências
+incluídas (`#7`, `!12`, `ABC-12`, ids de commit); um texto não enviado é guardado por pedido.
 
 ### Ficheiros
 
@@ -237,17 +257,18 @@ As sugestões **não são comentários**. Aparecem em dois sítios:
   três botões: **Aceitar**, **Editar** e **Dispensar**. Uma sugestão sobre uma linha que o diff não mostra é
   guardada, nunca descartada: fica listada depois dos hunks em *Sugestões da IA sobre o ficheiro todo* e, depois de
   aceite, vai parar à primeira linha alterada do ficheiro, com as palavras *(sobre a linha N)* à frente.
-- **No Resumo**, sob a descrição: o resumo e depois a lista com os mesmos botões e **Aceitar tudo** /
-  **Dispensar tudo**.
+- **No Resumo**, num bloco acima da conversa (só depois de uma execução): o resumo e depois a lista com os mesmos
+  botões e **Aceitar tudo** / **Dispensar tudo**.
 
 **Aceitar** (`y`) transforma uma sugestão num **comentário pendente** normal (ainda o pode editar ou eliminar);
 **Editar** (`w`) abre a caixa de comentário com as palavras do modelo primeiro e aceita o que deixar; **Dispensar** (`n`)
 descarta-a. **Aceitar tudo** (`A`) apenas preenche a lista de pendentes. Na página Ficheiros as teclas atuam na
-sugestão sob o cursor, no Resumo na primeira da lista. **Usar resumo da IA** (`i`, ou o botão
+sugestão sob o cursor, no Resumo na primeira da lista (`y` e `n` voltam a ser *Copiar ligação* e *Próximo novo* da conversa quando a lista fica
+vazia). **Usar resumo da IA** (`i`, ou o botão
 do formulário Concluir revisão) põe o resumo do modelo no texto da revisão; nunca é inserido por si só.
 **Nada é enviado ao host até submeter a revisão.**
 
-O Resumo mostra o rascunho como um cartão acima das sugestões: a etiqueta do parecer, o texto da revisão e três
+O Resumo mostra o rascunho como um cartão no topo desse bloco, acima das sugestões: a etiqueta do parecer, o texto da revisão e três
 botões.
 
 - **✦ Usar rascunho...** (`u`) aceita cada sugestão aberta como comentário pendente e abre *Concluir revisão* já
@@ -268,7 +289,7 @@ Submeter a revisão gasta o rascunho.
 |---|---|---|
 | Resumo / Ficheiros / Commits | `Alt+1` / `Alt+2` / `Alt+3` | *Revisão: mostrar resumo*, *mostrar ficheiros*, *mostrar commits* |
 | Comentar a linha ou o intervalo | `c` | *Revisão: comentar a linha...* |
-| Comentar a conversa | `c` no Resumo, `C` | *Revisão: comentar a conversa...* |
+| Comentar a conversa | `c` no Resumo, `C` | *Revisão: comentar a conversa...* (abre a caixa do Resumo), *Conversa: novo comentário* |
 | Responder à discussão | `r` | *Revisão: responder à discussão...* |
 | Resolver ou reabrir | `x` | *Revisão: resolver ou reabrir a discussão* |
 | Recolher ou expandir uma discussão | `z` | *Revisão: recolher ou expandir a discussão* |

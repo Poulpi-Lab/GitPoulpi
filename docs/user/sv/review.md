@@ -55,6 +55,16 @@ granskningarna som redan är skickade, äldst först, var och en med sitt omdöm
 `avfärdad`). På GitLab är omdömena dess godkännanden. Under den finns svarsrutan: klicka på den eller tryck **`c`**
 för att skriva en kommentar i konversationen. **Den här publiceras direkt**, och rutan säger det.
 
+Kommentarsrutan (också rutan för ett svar, en kommentar på en rad och sammanfattningen i **Slutför granskning**) är den
+Markdown-redigerare som delas med [konversationsvyn](hosting-integration.md#skriva): **Skriv**, **Förhandsvy** (`Alt+P`) och
+**Delad** (`Alt+L`, i ett fönster som är 100 kolumner brett), `Ctrl+Enter` (också `Ctrl+S`, `Alt+Enter`) skickar, och där AI är på
+öppnar `Alt+E` **Skriv med AI** ([AI-kapitlet](ai.md#skrivhjälp-på-en-värd)). Förhandsvyn visar texten så som värden gör det,
+referenser inräknade (`#7`, `!12`, `ABC-12`, commit-id:n); en osänd text sparas per begäran. Texten i
+beskrivningen och konversationen använder samma renderare, så Markdown, tabeller, varningsblock och referenser ser likadana ut här
+och i konversationsvyn för ett ärende. Att citera, redigera eller ta bort en kommentar som redan publicerats, och interna anteckningar,
+hör till konversationsvyn för ärenden och för begäranden på värdar utan granskning (se
+[Konversationer](hosting-integration.md#5c-konversationer)); här kan bara dina väntande kommentarer redigeras.
+
 ### Filer
 
 De ändrade filerna till vänster (statusbokstav, `+tillagda -borttagna`, en `●n`-räknare för öppna trådar, en `✎n`-räknare för

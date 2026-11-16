@@ -361,10 +361,10 @@ stage_file = "z"
 | `reword` | `deeper` | 深入修改历史 | `Alt+H` |
 | `composer` | `commit` | 从撰写器 Commit | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | 插入议题引用 | `Alt+R` |
-| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
-| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
-| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
+| `md_editor` | `preview` | Markdown 编辑器：切换编写与预览 | `Alt+P` |
+| `md_editor` | `split` | Markdown 编辑器：切换分栏视图 | `Alt+L` |
+| `md_editor` | `submit` | Markdown 编辑器：发送文本 | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Markdown 编辑器：AI 写作 | `Alt+E` |
 | `dialog` | `browse` | 浏览文件夹 | `Ctrl+B` |
 | `dialog` | `sources` | 转到克隆来源 | `Alt+S` |
 | `dialog` | `submit` | 提交 pull request 表单 | `Ctrl+S` |
@@ -798,7 +798,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Radar：固定或取消固定 | `p` |
 | Radar：延后… | `z` |
 | Radar：评审请求… | `e` |
-| Radar: Open Issue Conversation | `i` |
+| Radar：打开议题对话 | `i` |
 | Radar：通过 API 评审 |  |
 | Radar：克隆并评审… |  |
 | Radar：编辑指派人… |  |
@@ -940,30 +940,30 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 看板：设置列标签… | `c` |
 | 看板：刷新 | `r` |
 | 看板：关闭 | `Esc` |
-| Conversation: Back |  |
-| Conversation: Refresh | `F5` |
-| Conversation: Load Older Entries | `m` |
-| Conversation: Previous Entry | `Up` |
-| Conversation: Next Entry | `Down` |
-| Conversation: Next Unread Entry | `n` |
-| Conversation: Reply to Entry | `r` |
-| Conversation: Quote Entry | `Q` |
-| Conversation: New Comment | `c` |
-| Conversation: Links of Entry... | `l` |
-| Conversation: Open Diagram of Entry | `g` |
-| Conversation: Copy Link of Entry | `y` |
-| Conversation: Open in Browser | `o` |
-| Conversation: Edit Comment | `e` |
-| Conversation: Delete Comment | `d` |
-| Conversation: Show or Hide Events | `v` |
-| Conversation: Toggle Write and Preview |  |
-| Conversation: Toggle the Split View |  |
-| Conversation: Send the Comment |  |
-| Conversation: Toggle Internal Note |  |
-| Conversation: Close | `Esc` |
-| Markdown Editor: Write with AI |  |
-| Markdown Editor: Refresh the AI Context |  |
-| Hosting: Open Issue Conversation... |  |
+| 对话：返回 |  |
+| 对话：刷新 | `F5` |
+| 对话：加载更早的条目 | `m` |
+| 对话：上一条目 | `Up` |
+| 对话：下一条目 | `Down` |
+| 对话：下一条未读条目 | `n` |
+| 对话：回复条目 | `r` |
+| 对话：引述条目 | `Q` |
+| 对话：新评论 | `c` |
+| 对话：条目的链接… | `l` |
+| 对话：打开条目的图表 | `g` |
+| 对话：复制条目链接 | `y` |
+| 对话：在浏览器中打开 | `o` |
+| 对话：编辑评论 | `e` |
+| 对话：删除评论 | `d` |
+| 对话：显示或隐藏事件 | `v` |
+| 对话：切换编写与预览 |  |
+| 对话：切换分栏视图 |  |
+| 对话：发送评论 |  |
+| 对话：切换内部备注 |  |
+| 对话：关闭 | `Esc` |
+| Markdown 编辑器：AI 写作 |  |
+| Markdown 编辑器：刷新 AI 上下文 |  |
+| 托管：打开议题对话… |  |
 | 评审：✦ 起草评审… | `s` |
 | 评审：接受建议 | `y` |
 | 评审：编辑并接受建议… | `w` |
@@ -1407,7 +1407,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 
 | 按键 | 操作 |
 |---|---|
-| `Enter` | 在浏览器中打开所选行。在 `重新连接` 行上：打开该配置的设置 |
+| `Enter` | 打开所选行：议题（以及 Azure DevOps 或 Bitbucket 上的请求）以[对话](hosting-integration.md#5c-对话)打开，有评审的托管平台上的 pull request 在[评审](review.md)中打开，其他情况在浏览器中打开。在 `重新连接` 行上：打开该配置的设置 |
 | `Space` | 展开或折叠该分区 |
 | `v` | 打开该分区的筛选。Pull request：打开、已 merge / 已关闭、全部。议题：打开、指派给我、已关闭、全部 |
 | `n` | Pull request 分区：创建 pull request。议题分区：新建议题。（标题栏的 `+` 按钮） |
@@ -1415,7 +1415,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 在搜索行上按 `Enter` | 在搜索框中输入。`Enter`、`Tab` 或 `Esc` 离开搜索框；`Ctrl+U` 清除内容 |
 | 在分组标题上按 `Enter` | 折叠或展开分组（*我的 pull request*、*指派给我*、*等待我评审*、*所有 pull request*） |
 | 在筛选、提供方或仓库行上按 `Enter` | 打开该下拉列表。提供方列表以**无（取消关联此仓库）**结尾 |
-| `.`，或右键点击 | 该行的菜单：在浏览器中打开、复制 URL 或编号、检出源分支（pull request）；根据议题创建分支（议题） |
+| `.`，或右键点击 | 该行的菜单：打开对话、在浏览器中打开、复制 URL 或编号、检出源分支（pull request）；根据议题创建分支（议题） |
 
 ### 议题看板
 
@@ -1426,7 +1426,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 方向键 | 选择卡片（`Up`、`Down`）或相邻的列（`Left`、`Right`）；`Home`、`End`、`PageUp`、`PageDown` 在列内跳转 |
 | `Shift+Left`、`Shift+Right` | 把所选卡片移到上一列或下一列 |
 | `m` | **将卡片移到…**：列的下拉列表 |
-| `Enter` | 打开议题（本地议题打开笔记；否则打开平台的页面） |
+| `Enter` | 打开议题的[对话](hosting-integration.md#5c-对话)（托管平台没有可读对话时打开它的页面） |
 | `e`、`.` | 编辑指派人、标签或里程碑；卡片菜单 |
 | `n` | 在所选列中新建议题 |
 | `a`、`l`、`M`、`/` | 按指派人、标签、里程碑、文本筛选。`x` 清除筛选 |
@@ -1435,6 +1435,41 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | `Esc` | 关闭看板 |
 
 鼠标：把卡片拖到另一列上即可移动，点击卡片选中它，双击打开它，右键点击打开卡片菜单，滚轮滚动一列，`Shift`+滚轮（或看板下方的滚动条）滚动各列。
+
+### Markdown 文本框与对话视图
+
+每个文本会发往托管平台的框（评论、回复、评审摘要、新议题或 pull request 的描述）都是同一个文本框。它的按键在上面的 `md_editor` 表中，可以重新绑定。
+
+| 按键 | 操作 |
+|---|---|
+| `Alt+P` | 在**编写**与**预览**之间切换（从**分栏**切换时进入预览） |
+| `Alt+L` | 打开**分栏**，或回到编写（需要 100 列宽的窗口） |
+| `Ctrl+Enter`、`Ctrl+S`、`Alt+Enter` | 发送文本（表单自己的按钮作用相同） |
+| `Alt+E` | **AI 写作**：打开或关闭模式栏下方的面板（仅在 AI 开启时） |
+| `Alt+R` | 仅 commit 撰写器：插入议题引用 |
+| `Alt+W` | 新建议题和 pull request 表单：在托管平台自己的网页上创建 |
+| `Esc` | 在 **AI 写作**面板中：停止正在运行的草稿，否则关闭面板 |
+
+在议题或请求的[对话视图](hosting-integration.md#5c-对话)中（命令面板行 *对话：…*；带按键的行在上面的面板列表中）：
+
+| 按键 | 操作 |
+|---|---|
+| `r` | 回复所选条目（进入它的评论串，或在没有评论串的托管平台上带上它的引述文本） |
+| `Q` | 在新评论中引述所选条目 |
+| `c` | 新评论 |
+| `e`、`d` | 编辑、删除你自己的评论 |
+| `Alt+I` | 在评论框中：**内部备注**（GitLab、Redmine） |
+| `l`、`y`、`o` | 该条目的链接、复制它的地址、在浏览器中打开它 |
+| `n` | 下一条未读条目 |
+| `v`、`m`、`F5` | 显示或隐藏事件、加载更早的条目、刷新 |
+| `g` | 打开该条目的图表（`mermaid` 块） |
+| `Alt+Left`、`Backspace` | 沿着从引用打开的条目栈返回 |
+| `Tab` | 时间线、评论框、标题区按钮 |
+| `q`、`Esc` | 关闭 |
+
+在 Radar 中，`i` 会打开议题行的对话。
+
+在侧栏各区的 pull request 或议题行上，`Enter` 打开对话，`o` 在浏览器中打开该行。
 
 ### Flow（分支工作流）
 

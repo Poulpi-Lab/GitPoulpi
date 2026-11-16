@@ -29,7 +29,8 @@ build-custom                     # Windows, cmd or PowerShell (scripts/build-cus
 | アバターのダウンロード | イニシャルのバッジのみで、ネットワーク取得はありません。 |
 | 画像プレビュー | 画像ファイルには通常のバイナリ通知が表示されます。**編集に使う**は引き続き動作します。 |
 | Radar | Radar タブ、`Alt+R`、ホームのキー、パレットのコマンドがなくなり、Radar は開きません。連携が必要です（連携がなければもともと機能しません）。 |
-| Mermaid | Mermaid gitGraph としてコピー（ログのメニュー、`Shift+Y`、パレット）がなくなり、CLI/MCP に `log --format mermaid` もありません。 |
+| Mermaid | Mermaid gitGraph としてコピー（ログのメニュー、`Shift+Y`、パレット）がなくなり、CLI/MCP に `log --format mermaid` もありません。また、[会話](hosting-integration.md#5c-会話)の `mermaid` ブロックの下の**図を開く**ボタン（ブロックはコードのまま残ります）と、パレットの「会話: 項目の図を開く」の行もなくなります。 |
+| Conversation | Issue や request のアプリ内[会話](hosting-integration.md#5c-会話)表示がなくなります：Issue の行、ボードのカード、Radar の行での Enter はこれまでどおりブラウザーを開き、「会話を開く」の行も「会話: ...」のパレットコマンドもなく、会話内の「AI で作成」もありません（レビュー、Issue フォーム、pull request フォームの入力欄にあるものは残ります）。CLI と MCP の会話コマンド（`hosting issue comments`、`comment`、`comment-edit`、`comment-delete`、`hosting review conversation`）と `ai hosting-reply` は残ります。連携が必要です。 |
 | Board | かんばんボードのビュー（ISSUES ヘッダーのボタン、パレット）と `hosting board` コマンドがなくなります。連携が必要です。 |
 | Review | アプリ内のコードレビュー表示（行メニュー、pull request の行での Enter、パレット、Radar の `Review`）と AI のレビュー支援がなくなります。CLI/MCP の `hosting review` コマンドは残ります（Gerrit とエージェントが使います）。連携が必要です。 |
 | 履歴ワークベンチ（高度な履歴の書き換え：作者、日付、メッセージ、内容） | 履歴書き換えワークベンチがなくなります。`書き換え:` のパレットコマンド、ワークベンチのコード、キー、ヘルプのセクション、ログメニューの「履歴を書き換え」の行、修正ダイアログの「履歴をさらに深く変更...」ボタン、「AI でルールを作成」とスクリプトの AI、同期設定ページのスクリプトの上限、AI 設定の履歴書き換え用 AI ブロックがすべてなくなります。`rewrite` の CLI/MCP コマンド、`ai rewrite-script`、`ai rewrite-rules`、`ui propose rewrite` はコマンドツリーから消えます。`.mailmap` の ID（`mailmap`、`log.use_mailmap`）はこれに含まれず、残ります。 |
@@ -64,7 +65,7 @@ Bash スクリプトは `whiptail` または `dialog` のチェックリスト�
 | `--logo-colors all` / `violet,teal` | コンパイルに含めるロゴのバリエーション（既定は `all`。表の順序のまま保持され、これが回転の順序です）。`--list-logo-colors` で一覧を表示します（`*` = 公式の既定）。 |
 | `--logo-default teal` | 既定のバリエーション。コンパイルされたものの中から選ぶ必要があります（既定：lavender、なければ最初にコンパイルされたもの）。 |
 | `--icon-color sun` | Windows 実行ファイルのアイコンの色（既定：ロゴの既定）。 |
-| `--[no-]ai`、`--[no-]mcp`、`--[no-]lfs`、`--[no-]worktree`、`--[no-]submodules`、`--[no-]avatar-fetch`、`--[no-]image-view`、`--[no-]radar`、`--[no-]mermaid`、`--[no-]board`、`--[no-]review` | それぞれ既定はオンです。 |
+| `--[no-]ai`、`--[no-]mcp`、`--[no-]lfs`、`--[no-]worktree`、`--[no-]submodules`、`--[no-]avatar-fetch`、`--[no-]image-view`、`--[no-]radar`、`--[no-]mermaid`、`--[no-]board`、`--[no-]review`、`--[no-]conversation` | それぞれ既定はオンです。 |
 | `--[no-]history-rewrite` | 履歴ワークベンチ（高度な履歴の書き換え：作者、日付、メッセージ、内容）。既定はオン。 |
 | `--[no-]global-search` | 全体検索（タイトルバーのボタン、`Ctrl+Alt+F`、`gitpoulpi search`）。既定はオン。 |
 | `--[no-]workspaces` | ワークスペース（名前付きのリポジトリのグループ）。既定はオン。オフにすると既定のタブ一覧だけが残ります。 |

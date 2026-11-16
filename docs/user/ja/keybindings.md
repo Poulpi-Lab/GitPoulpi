@@ -361,10 +361,10 @@ stage_file = "z"
 | `reword` | `deeper` | 履歴をさらに深く変更 | `Alt+H` |
 | `composer` | `commit` | コンポーザーからCommit | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Issue の参照を挿入 | `Alt+R` |
-| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
-| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
-| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
+| `md_editor` | `preview` | Markdown エディター: 編集とプレビューを切り替え | `Alt+P` |
+| `md_editor` | `split` | Markdown エディター: 分割表示を切り替え | `Alt+L` |
+| `md_editor` | `submit` | Markdown エディター: テキストを送信 | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Markdown エディター: AI で作成 | `Alt+E` |
 | `dialog` | `browse` | フォルダーを参照 | `Ctrl+B` |
 | `dialog` | `sources` | クローン元へ移動 | `Alt+S` |
 | `dialog` | `submit` | Pull Requestフォームを送信 | `Ctrl+S` |
@@ -798,7 +798,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Radar: 固定／固定解除 | `p` |
 | Radar: 保留... | `z` |
 | Radar: リクエストをレビュー... | `e` |
-| Radar: Open Issue Conversation | `i` |
+| Radar: Issue の会話を開く | `i` |
 | Radar: API 経由でレビュー |  |
 | Radar: クローンしてレビュー... |  |
 | Radar: 担当者を編集... |  |
@@ -940,30 +940,30 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | ボード: 列のラベルを設定... | `c` |
 | ボード: 更新 | `r` |
 | ボード: 閉じる | `Esc` |
-| Conversation: Back |  |
-| Conversation: Refresh | `F5` |
-| Conversation: Load Older Entries | `m` |
-| Conversation: Previous Entry | `Up` |
-| Conversation: Next Entry | `Down` |
-| Conversation: Next Unread Entry | `n` |
-| Conversation: Reply to Entry | `r` |
-| Conversation: Quote Entry | `Q` |
-| Conversation: New Comment | `c` |
-| Conversation: Links of Entry... | `l` |
-| Conversation: Open Diagram of Entry | `g` |
-| Conversation: Copy Link of Entry | `y` |
-| Conversation: Open in Browser | `o` |
-| Conversation: Edit Comment | `e` |
-| Conversation: Delete Comment | `d` |
-| Conversation: Show or Hide Events | `v` |
-| Conversation: Toggle Write and Preview |  |
-| Conversation: Toggle the Split View |  |
-| Conversation: Send the Comment |  |
-| Conversation: Toggle Internal Note |  |
-| Conversation: Close | `Esc` |
-| Markdown Editor: Write with AI |  |
-| Markdown Editor: Refresh the AI Context |  |
-| Hosting: Open Issue Conversation... |  |
+| 会話: 戻る |  |
+| 会話: 更新 | `F5` |
+| 会話: 古い項目を読み込む | `m` |
+| 会話: 前の項目 | `Up` |
+| 会話: 次の項目 | `Down` |
+| 会話: 次の新着項目 | `n` |
+| 会話: 項目に返信 | `r` |
+| 会話: 項目を引用 | `Q` |
+| 会話: 新規コメント | `c` |
+| 会話: 項目のリンク... | `l` |
+| 会話: 項目の図を開く | `g` |
+| 会話: 項目のリンクをコピー | `y` |
+| 会話: ブラウザーで開く | `o` |
+| 会話: コメントを編集 | `e` |
+| 会話: コメントを削除 | `d` |
+| 会話: イベントの表示／非表示 | `v` |
+| 会話: 編集とプレビューを切り替え |  |
+| 会話: 分割表示を切り替え |  |
+| 会話: コメントを送信 |  |
+| 会話: 内部メモを切り替え |  |
+| 会話: 閉じる | `Esc` |
+| Markdown エディター: AI で作成 |  |
+| Markdown エディター: AI のコンテキストを更新 |  |
+| ホスティング: Issue の会話を開く... |  |
 | レビュー: ✦ レビューのドラフトを作成... | `s` |
 | レビュー: 提案を採用 | `y` |
 | レビュー: 提案を編集して採用... | `w` |
@@ -1407,7 +1407,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 
 | キー | 動作 |
 |---|---|
-| `Enter` | 選択した行をブラウザーで開く。`再接続` の行では、そのプロファイルの設定を開く |
+| `Enter` | 選択した行を開く：Issue（および Azure DevOps と Bitbucket のリクエスト）は[会話](hosting-integration.md#5c-会話)として、pull request はレビュー機能のあるホストでは[レビュー](review.md)で、それ以外はブラウザーで開く。`再接続` の行では、そのプロファイルの設定を開く |
 | `Space` | セクションを展開 / 折りたたむ |
 | `v` | セクションのフィルターを開く。pull request：オープン、merge 済み / クローズ、すべて。Issue：オープン、自分に割り当て、クローズ、すべて |
 | `n` | pull request セクション：pull request を作成する。ISSUES セクション：新しい Issue（ヘッダーの `+` ボタン） |
@@ -1415,7 +1415,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 検索行で `Enter` | 検索フィールドに入力する。`Enter`、`Tab`、`Esc` で抜け、`Ctrl+U` で消去する |
 | グループヘッダーで `Enter` | グループを折りたたむ / 展開する（*自分のpull request*、*自分に割り当て*、*自分のレビュー待ち*、*すべてのpull request*） |
 | フィルター、プロバイダー、リポジトリの行で `Enter` | そのドロップダウンを開く。プロバイダーの一覧の末尾は**なし（このリポジトリのリンクを解除）** |
-| `.`、または右クリック | 行のメニュー：ブラウザーで開く、URL または番号をコピー、ソースブランチをチェックアウト（pull request）、Issue からブランチを作成（Issue） |
+| `.`、または右クリック | 行のメニュー：会話を開く、ブラウザーで開く、URL または番号をコピー、ソースブランチをチェックアウト（pull request）、Issue からブランチを作成（Issue） |
 
 ### Issue ボード
 
@@ -1426,7 +1426,7 @@ ISSUES ヘッダーの**ボード**（パレット：**Issue: ボードを開く
 | 矢印 | カードを選択する（`Up`、`Down`）、または隣の列へ移動する（`Left`、`Right`）。`Home`、`End`、`PageUp`、`PageDown` は列内でジャンプする |
 | `Shift+Left`、`Shift+Right` | 選択したカードを前または次の列へ移動する |
 | `m` | **カードの移動先...**：列のドロップダウン |
-| `Enter` | Issue を開く（ローカル Issue ではノート、それ以外ではホストのページ） |
+| `Enter` | Issue の[会話](hosting-integration.md#5c-会話)を開く（ホストに読める会話がない場合は、ホストのページ） |
 | `e`、`.` | 担当者、ラベル、マイルストーンを編集する。カードのメニュー |
 | `n` | 選択中の列に新規 Issue を作る |
 | `a`、`l`、`M`、`/` | 担当者、ラベル、マイルストーン、テキストで絞り込む。`x` で絞り込みを解除する |
@@ -1435,6 +1435,41 @@ ISSUES ヘッダーの**ボード**（パレット：**Issue: ボードを開く
 | `Esc` | ボードを閉じる |
 
 マウス：カードを別の列へドラッグすると移動し、クリックで選択、ダブルクリックで開き、右クリックでカードのメニュー、ホイールで列をスクロール、`Shift` とホイール（またはボードの下のバー）で列を横にスクロールします。
+
+### Markdown エディターと会話ビュー
+
+ホストにテキストを送るボックス（コメント、返信、レビューの要約、新規 Issue や pull request の説明）は、すべて同じエディターです。そのキーは上の `md_editor` の表にあり、割り当てを変更できます。
+
+| キー | 動作 |
+|---|---|
+| `Alt+P` | **編集**と**プレビュー**を切り替える（**分割**からはプレビューへ） |
+| `Alt+L` | **分割**をオンにする、または編集に戻す（幅 100 桁のウィンドウが必要） |
+| `Ctrl+Enter`、`Ctrl+S`、`Alt+Enter` | テキストを送信する（フォーム自身のボタンと同じ） |
+| `Alt+E` | **AI で作成**：モードバーの下のパネルを開く、または閉じる（AI がオンのときのみ） |
+| `Alt+R` | commit コンポーザーのみ：Issue の参照を挿入する |
+| `Alt+W` | 新規 Issue と pull request のフォーム：プロバイダー自身の Web ページで作成する |
+| `Esc` | **AI で作成**のパネルで：実行中の下書きを停止し、なければパネルを閉じる |
+
+Issue またはリクエストの[会話ビュー](hosting-integration.md#5c-会話)（パレットの行は*会話: ...*。キーのある行は上のパレット一覧にあります）：
+
+| キー | 動作 |
+|---|---|
+| `r` | 選択した項目に返信する（そのスレッドへ。スレッドのないホストでは、その本文を引用して） |
+| `Q` | 選択した項目を引用して新規コメントを書く |
+| `c` | 新規コメント |
+| `e`、`d` | 自分のコメントを編集、削除する |
+| `Alt+I` | コメントボックスで：**内部メモ**（GitLab、Redmine） |
+| `l`、`y`、`o` | 項目のリンク、そのアドレスをコピー、ブラウザーで開く |
+| `n` | 次の新着項目 |
+| `v`、`m`、`F5` | イベントの表示／非表示、古い項目の読み込み、更新 |
+| `g` | 項目の図（`mermaid` ブロック）を開く |
+| `Alt+Left`、`Backspace` | 参照から開いた項目のスタックをたどって戻る |
+| `Tab` | タイムライン、コメントボックス、ヘッダーのボタンの間を移動 |
+| `q`、`Esc` | 閉じる |
+
+Radar では `i` で Issue の行の会話を開きます。
+
+サイドバーのセクションの pull request または Issue の行では、`Enter` で会話を開き、`o` でその行をブラウザーで開きます。
 
 ### Flow（ブランチワークフロー）
 

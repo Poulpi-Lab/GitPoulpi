@@ -185,8 +185,8 @@ stage_file = "z"
 | `status` | `collapse_below` | Згорнути папку з підпапками | `_`, `Shift+Left` |
 | `home` | `favorite` | Додати репозиторій в обране чи прибрати | `f`, `*` |
 | `home` | `close_repo` | Закрити, прибрати чи зняти обране з рядка | `x`, `Delete` |
-| `home` | `copy_path` | Copy the Repository Path | `y` |
-| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
+| `home` | `copy_path` | Скопіювати шлях до репозиторію | `y` |
+| `home` | `open_in` | Відкрити репозиторій у типовому інструменті | `o` |
 | `home` | `browse` | Знайти репозиторій (огляд) | `b` |
 | `home` | `clone` | Клонувати репозиторій | `c` |
 | `home` | `init` | Ініціалізувати репозиторій | `i` |
@@ -796,8 +796,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Репозиторії: додати/прибрати з обраного | `f` |
 | Репозиторії: закрити чи прибрати вибраний | `x` |
 | Репозиторії: меню вибраного репозиторію... | `.` |
-| Repositories: Copy Selected Path | `y` |
-| Repositories: Open Selected in Default Tool | `o` |
+| Репозиторії: скопіювати шлях вибраного | `y` |
+| Репозиторії: відкрити вибраний у типовому інструменті | `o` |
 | Репозиторії: пошук | `/ / Ctrl+F` |
 | Репозиторії: згорнути всі розділи | `-` |
 | Репозиторії: розгорнути всі розділи | `+` |
@@ -1156,7 +1156,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | ✦ ШІ: розділити вибраний commit... |  |
 | ✦ ШІ: пояснити робочі зміни | `Ctrl+G w` |
 | ✦ ШІ: скласти commit'и з робочих змін... | `Ctrl+G C` |
-| Sensitive Files: Show in File | `S` |
+| Чутливі файли: показати у файлі | `S` |
 | Композер: перемістити файл до commit'у... | `m` |
 | Diff: Blame |  |
 | Blame: показати commit у Log | `Enter` |

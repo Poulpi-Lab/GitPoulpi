@@ -1343,7 +1343,7 @@ hint_back = "назад до вкладки"
 hint_quit = "вийти"
 not_a_repo_any_more = "{path} більше не git-репозиторій - приберіть його зі списку за допомогою {key}"
 gone_from_disk_msg = "{path} зник із диска - приберіть його зі списку за допомогою {key}"
-open_in_gone = "{path} is gone from disk, there is nothing to open"
+open_in_gone = "{path} зник із диска, відкривати нічого"
 actions_need_tab = "дії {key} потребують відкритої вкладки репозиторію"
 home_tab_fixed = "вкладка «Головна» не має меню вкладки й не закривається"
 
@@ -2433,8 +2433,8 @@ status_stage_toggle = { git = "Stage чи unstage вибраного рядка"
 status_open_diff = { git = "Відкрити diff вибраного файлу", local = "Відкрити різницю вибраного файлу" }
 home_favorite = "Додати репозиторій в обране чи прибрати"
 home_close_repo = "Закрити, прибрати чи зняти обране з рядка"
-home_copy_path = "Copy the Repository Path"
-home_open_in = "Open the Repository in the Default Tool"
+home_copy_path = "Скопіювати шлях до репозиторію"
+home_open_in = "Відкрити репозиторій у типовому інструменті"
 home_browse = "Знайти репозиторій (огляд)"
 home_clone = "Клонувати репозиторій"
 home_init = "Ініціалізувати репозиторій"
@@ -3323,8 +3323,8 @@ repositories_collapse_all_sections = "Репозиторії: згорнути �
 repositories_expand_all_sections = "Репозиторії: розгорнути всі розділи"
 repositories_close_all_tabs = "Репозиторії: закрити всі вкладки..."
 repositories_remove_selected_from_list = "Репозиторії: прибрати вибраний зі списку"
-repositories_copy_selected_path = "Repositories: Copy Selected Path"
-repositories_open_selected_in = "Repositories: Open Selected in Default Tool"
+repositories_copy_selected_path = "Репозиторії: скопіювати шлях вибраного"
+repositories_open_selected_in = "Репозиторії: відкрити вибраний у типовому інструменті"
 repositories_remove_all_recent = "Репозиторії: прибрати всі нещодавні"
 tab_new_tab = "Вкладка: нова вкладка"
 tab_new_menu = "Вкладка: нова..."
@@ -3395,7 +3395,7 @@ ai_explain_working_changes = "ШІ: пояснити робочі зміни"
 ai_insert_prompt_variable = "ШІ: вставити змінну запиту"
 ai_compose_commits_from_working_changes = { git = "ШІ: скласти commit'и з робочих змін...", local = "ШІ: скласти коміти з робочих змін..." }
 # context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
-stage_guard_show_in_file = "Sensitive Files: Show in File"
+stage_guard_show_in_file = "Чутливі файли: показати у файлі"
 composer_move_file_to_commit = { git = "Композер: перемістити файл до commit'у...", local = "Композер: перемістити файл до коміту..." }
 diff_blame = { git = "Diff: Blame", local = "Різниця: Blame" }
 diff_history = { git = "Diff: історія файлу", local = "Різниця: історія файлу" }
@@ -3450,7 +3450,7 @@ why_no_text_selected_drag_over_the_text_first = "текст не виділен�
 why_the_diff_view_isn_t_open = { git = "подання diff не відкрито", local = "подання різниці не відкрито" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "спершу відкрийте файл - у diff, панелі Status чи commit'і", local = "спершу відкрийте файл - у різниці, панелі Status чи коміті" }
 # context: why that palette command is unavailable
-why_no_sensitive_files_question = "no sensitive files question is open"
+why_no_sensitive_files_question = "питання про чутливі файли не відкрито"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "спершу виберіть гілку чи tag на панелі Refs", local = "спершу виберіть гілку чи тег на панелі Refs" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "checkout віддаленої гілки ще не підтримується - спершу створіть локальну гілку відстеження"
 why_select_a_local_branch_in_the_refs_pane_first = "спершу виберіть локальну гілку на панелі Refs"
@@ -4073,7 +4073,7 @@ repositories_and_tabs_open_in = "список «Відкрити в» для п�
 repositories_and_tabs_7 = "відкрити (або перейти до) вибраного репозиторію"
 repositories_and_tabs_8 = "додати/зняти зірку"
 repositories_and_tabs_9 = "закрити вкладку (Open), прибрати (Recent), зняти зірку (Favorites)"
-repositories_and_tabs_copy_open = "copy the path / open in the default tool"
+repositories_and_tabs_copy_open = "скопіювати шлях / відкрити в типовому інструменті"
 repositories_and_tabs_10 = "меню рядка"
 repositories_and_tabs_11 = "пошук у кожному розділі"
 repositories_and_tabs_12 = "очистити / назад до вкладки"
@@ -5624,9 +5624,9 @@ too_large = "файл завеликий для показу ({bytes} байті
 unexpected = "неочікувана відповідь"
 loading_whole = "завантаження всього файлу... (кнопка Hunks показує лише зміни)"
 whole_unavailable = "(весь файл недоступний: {why} - показано лише hunks)"
-renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header = "{from} -> {to} (схожість {percent}%)"
 renamed_header_plain = "{from} -> {to}"
-rename_no_change = "No content change (the file was only renamed or moved)"
+rename_no_change = "Вміст не змінено (файл лише перейменовано або переміщено)"
 
 [git_actions]
 no_such_local_branch = "цієї локальної гілки більше немає - оновіть"
@@ -9337,7 +9337,7 @@ answer_cancel = "Скасувати, нічого не {$stage}"
 # context: key hint at the bottom of the dialog
 hint = "Вгору/Вниз: вибір, Enter або 1/2: відповідь, Esc: скасувати"
 # context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
-show_in_file = "Show in file"
+show_in_file = "Показати у файлі"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "чутливі файли не було {$staged}: {files}; спитайте користувача, потім {$stage} знову, дозволивши чутливі файли"
 
@@ -10162,22 +10162,22 @@ flavor_plain_text = "Звичайний текст"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
-title = "Edit a {$commit} of another branch"
+title = "Змінити {$commit} іншої гілки"
 # context: body of that dialog when local branches hold the commit; {short} is the short commit id
-body_branches = "{short} is not on the current branch. Check out a branch that holds it to edit it here."
+body_branches = "{short} немає в поточній гілці. Зробіть checkout гілки, що його містить, щоб змінити його тут."
 # context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
-body_none = "{short} is on no local branch. Create a branch at it to edit it here."
+body_none = "{short} немає в жодній локальній гілці. Створіть гілку на ньому, щоб змінити його тут."
 # context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
-checkout = "Check out {branch} and edit"
+checkout = "Checkout {branch} і змінити"
 # context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
-rewrite = "Edit with advanced history rewrite"
+rewrite = "Змінити через переписування історії"
 # context: button that opens the name box to create a branch at that commit
-create = "Create a branch here..."
+create = "Створити гілку тут..."
 # context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
-key_rewrite = "r"
+key_rewrite = "п"
 # context: key of the Create a branch here button, one letter
-key_create = "b"
+key_create = "г"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "с"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
-gave_up = "{short} was not edited: the branch was not checked out"
+gave_up = "{short} не змінено: checkout гілки не відбувся"

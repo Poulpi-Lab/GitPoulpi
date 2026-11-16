@@ -411,6 +411,63 @@ pub fn check_branch_delete_remote_removes_it_from_the_remote(backend: &dyn GitBa
     );
 }
 
+/// A clone whose fetch refspec does not cover the branch (`--single-branch`,
+/// or `--depth`, which implies it) still loses the remote-tracking ref when
+/// the branch is deleted from the remote: git itself only drops the refs its
+/// refspec maps, and `fetch --prune` never touches the others, so a ref git
+/// left behind would stay in the list forever. Both deletion paths (plain,
+/// and the leased one undo/redo use) are checked; re-creating writes the
+/// tracking ref back.
+pub fn check_branch_delete_remote_drops_a_tracking_ref_outside_the_refspec(
+    backend: &dyn GitBackend,
+) {
+    let repo = TestRepoBuilder::new().with_initial().with_origin().build();
+    let repo_ref = repo.repo_ref();
+    let head = head_oid(backend, &repo_ref);
+    let main = repo.git(&["symbolic-ref", "--short", "HEAD"]);
+    let main = main.trim();
+    repo.git(&[
+        "config",
+        "remote.origin.fetch",
+        &format!("+refs/heads/{main}:refs/remotes/origin/{main}"),
+    ]);
+    for name in ["topic", "other"] {
+        backend.branch_create(&repo_ref, name, head).unwrap();
+        repo.git(&["push", "origin", name]);
+        repo.git(&[
+            "fetch",
+            "origin",
+            &format!("refs/heads/{name}:refs/remotes/origin/{name}"),
+        ]);
+    }
+    let tracked = |name: &str| {
+        backend
+            .refs(&repo_ref)
+            .unwrap()
+            .iter()
+            .any(|r| matches!(&r.kind, RefKind::RemoteBranch { name: n, .. } if n == name))
+    };
+    assert!(
+        tracked("topic") && tracked("other"),
+        "fixture: both tracking refs exist"
+    );
+
+    block_on(backend.branch_delete_remote(&repo_ref, "origin", "topic"))
+        .expect("delete remote branch");
+    assert!(!tracked("topic"), "the plain delete drops the tracking ref");
+
+    block_on(backend.remote_ref_update(&repo_ref, "origin", "refs/heads/other", None, Some(head)))
+        .expect("leased delete");
+    assert!(
+        !tracked("other"),
+        "the leased delete drops the tracking ref"
+    );
+
+    block_on(backend.remote_ref_update(&repo_ref, "origin", "refs/heads/other", Some(head), None))
+        .expect("re-create");
+    assert!(tracked("other"), "re-creating writes the tracking ref back");
+}
+
 /// The mirror image: deleting a tag *locally* must not reach the remote.
 /// The two deletions are separate menu entries, and conflating them would
 /// take a published tag away from everyone who had fetched it.

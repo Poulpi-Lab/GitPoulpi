@@ -4,11 +4,13 @@ use gitpoulpi_core::{Error, Result};
 use crate::process::{run, run_async};
 
 /// Deletes `refs/heads/<name>` on `remote`. The fully-qualified ref keeps
-/// a same-named tag from being the one deleted; the remote-tracking ref
-/// is dropped by git itself once the remote accepts the deletion.
+/// a same-named tag from being the one deleted. The remote-tracking ref is
+/// dropped here, not left to git, which skips it when the fetch refspec
+/// does not cover the branch (see `sync_tracking_ref`).
 pub async fn branch_delete_remote(repo: &RepoRef, remote: &str, name: &str) -> Result<()> {
     let target = format!("refs/heads/{name}");
     run_async(&repo.root, &["push", remote, "--delete", &target]).await?;
+    crate::remote_ref::sync_tracking_ref(repo, remote, name, None);
     Ok(())
 }
 

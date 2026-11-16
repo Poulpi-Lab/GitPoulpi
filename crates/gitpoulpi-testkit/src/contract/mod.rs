@@ -374,6 +374,7 @@ macro_rules! for_each_contract_check {
             check_tag_fetch_brings_one_remote_only_tag,
             check_a_fetch_notices_a_tag_deleted_on_the_remote,
             check_branch_delete_remote_removes_it_from_the_remote,
+            check_branch_delete_remote_drops_a_tracking_ref_outside_the_refspec,
             check_remote_ref_value_reads_the_server,
             check_remote_ref_update_recreates_and_deletes_with_a_lease,
             check_remote_ref_update_refuses_an_object_that_is_gone,

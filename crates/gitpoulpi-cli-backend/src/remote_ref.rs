@@ -57,8 +57,9 @@ pub async fn remote_ref_value(repo: &RepoRef, remote: &str, full_ref: &str) -> R
 /// with `StaleLease` comes back and nothing changed. Pushing an object this
 /// repository no longer has is [`UndoRefusal::RemoteObjectMissing`].
 ///
-/// A branch's remote-tracking ref follows by itself (the push writes it); a
-/// tag's mirror ref (see `tag_push`) is kept here.
+/// A branch's remote-tracking ref and a tag's mirror ref (see `tag_push`)
+/// are both kept here: git only moves the tracking refs its fetch refspec
+/// maps, see [`sync_tracking_ref`].
 pub async fn remote_ref_update(
     repo: &RepoRef,
     remote: &str,
@@ -107,7 +108,9 @@ pub async fn remote_ref_update(
             out.stderr.trim(),
         ));
     }
-    if let Some(tag) = full_ref.strip_prefix("refs/tags/") {
+    if let Some(branch) = full_ref.strip_prefix("refs/heads/") {
+        sync_tracking_ref(repo, remote, branch, new);
+    } else if let Some(tag) = full_ref.strip_prefix("refs/tags/") {
         let mirror = remote_tag_mirror_ref(remote, tag);
         let script = match new {
             Some(oid) => format!("update {mirror} {}\n", oid.to_hex()),
@@ -118,4 +121,28 @@ pub async fn remote_ref_update(
         let _ = run_with_stdin(&repo.root, &["update-ref", "--stdin"], &script);
     }
     Ok(())
+}
+
+/// Writes (`Some`) or drops (`None`) `refs/remotes/<remote>/<branch>` after
+/// the remote accepted the change. A push only updates the tracking refs the
+/// remote's fetch refspec maps, so in a `--single-branch` (or `--depth`)
+/// clone whose other tracking refs came from an explicit fetch, a deleted
+/// branch would otherwise stay listed for good: `fetch --prune` skips refs
+/// outside the refspec too. Already in place, this is a no-op.
+pub(crate) fn sync_tracking_ref(repo: &RepoRef, remote: &str, branch: &str, new: Option<Oid>) {
+    let tracking = format!("refs/remotes/{remote}/{branch}");
+    let script = match new {
+        Some(oid) => format!(
+            "update {tracking} {}
+",
+            oid.to_hex()
+        ),
+        None => format!(
+            "delete {tracking}
+"
+        ),
+    };
+    // A cache of what the remote says: a failure here is the next fetch's
+    // to repair, not the operation's.
+    let _ = run_with_stdin(&repo.root, &["update-ref", "--stdin"], &script);
 }

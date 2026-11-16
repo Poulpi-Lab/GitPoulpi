@@ -466,7 +466,7 @@ The same board is available to scripts and agents: `gitpoulpi hosting board` pri
 A card shows the number, the title, the assignees as initials, the labels and the milestone. Drag it to another column,
 or `Shift+Left` / `Shift+Right`, or **Board: Move Card To...** (`m`). It moves at once; after about 150 ms a spinner
 says the host is still working, and if the host refuses, the card goes back and the status line says why. `Enter` opens
-the issue on the host (the note, for local issues); `e` edits assignees, labels and milestone; `n` starts a new issue in
+the issue's [conversation](#5c-conversations) in GitPoulpi, and the board comes back when you close it; `e` edits assignees, labels and milestone; `n` starts a new issue in
 the selected column; `a`, `l`, `M` and `/` filter by assignee, label, milestone and text, `x` clears the filters; `r`
 reads the host again. The board reads again when the sidebar's lists refresh. The Radar has no board.
 

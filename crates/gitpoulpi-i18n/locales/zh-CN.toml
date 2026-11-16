@@ -4303,6 +4303,8 @@ new_tab = "新标签页"
 explain_changes = "解释工作区更改"
 ai_generate = { git = "用 AI 生成 {$commit} 消息", local = "用 AI 生成{$commit}消息" }
 ai_compose = { git = "用 AI 撰写 {$commit}", local = "用 AI 撰写{$commit}" }
+# context: tooltip of the Skip hooks checkbox
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = { git = "在浏览器中打开（命令面板：集成：打开 {$commit} 引用）", local = "在浏览器中打开（命令面板：集成：打开{$commit}引用）" }
 quit = "退出 GitPoulpi"
 quit_cd = "退出，并让你的 shell 停留在此标签页的文件夹（需要 shell 包装器）"
@@ -5480,6 +5482,8 @@ description = "描述"
 ref_from_branch = "（来自分支）"
 issue_ref_inserted = "已插入 {reference}"
 skip_hooks = "跳过钩子"
+# context: shorter label of the Skip hooks checkbox on a narrow commit options row
+skip_hooks_short = "No hooks"
 
 [compose_ui]
 select_commit = { git = "选择一个 {$commit}…", local = "选择一个{$commit}…" }

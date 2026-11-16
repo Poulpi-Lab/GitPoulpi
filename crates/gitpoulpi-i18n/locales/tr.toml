@@ -4303,6 +4303,8 @@ new_tab = "Yeni sekme"
 explain_changes = "Çalışma değişikliklerini açıkla"
 ai_generate = "YZ ile {$commit} mesajı oluştur"
 ai_compose = "YZ ile {$commits} oluştur"
+# context: tooltip of the Skip hooks checkbox
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = "Tarayıcınızda açın (palet: Commit Referansını Aç)"
 quit = "GitPoulpi'den çık"
 quit_cd = "Çık ve kabuğunuzu bu sekmenin klasöründe bırak (kabuk sarmalayıcısı gerekir)"
@@ -5484,6 +5486,8 @@ description = "Açıklama"
 ref_from_branch = "(daldan)"
 issue_ref_inserted = "{reference} eklendi"
 skip_hooks = "Hook'ları atla"
+# context: shorter label of the Skip hooks checkbox on a narrow commit options row
+skip_hooks_short = "No hooks"
 
 [compose_ui]
 select_commit = "Bir commit seç..."

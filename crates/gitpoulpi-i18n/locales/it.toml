@@ -4302,6 +4302,8 @@ new_tab = "Nuova scheda"
 explain_changes = "Spiega le modifiche in corso"
 ai_generate = "Genera un messaggio di {$commit} con l'IA"
 ai_compose = "Componi {$commits} con l'IA"
+# context: tooltip of the Skip hooks checkbox
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = "Apri nel browser (palette: Apri riferimento del commit)"
 quit = "Esci da GitPoulpi"
 quit_cd = "Esci, lasciando la shell nella cartella di questa scheda (richiede il wrapper della shell)"
@@ -5478,6 +5480,8 @@ description = "Descrizione"
 ref_from_branch = "(dal branch)"
 issue_ref_inserted = "inserito {reference}"
 skip_hooks = "Salta gli hook"
+# context: shorter label of the Skip hooks checkbox on a narrow commit options row
+skip_hooks_short = "No hooks"
 
 [compose_ui]
 select_commit = "Seleziona un commit..."

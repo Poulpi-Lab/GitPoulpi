@@ -4303,6 +4303,8 @@ new_tab = "新しいタブ"
 explain_changes = "作業中の変更を説明"
 ai_generate = { git = "AI で{$commit}メッセージを生成", local = "AI で{$commit}メッセージを生成" }
 ai_compose = { git = "AI で{$commit}を構成", local = "AI で{$commit}を構成" }
+# context: tooltip of the Skip hooks checkbox
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = { git = "ブラウザーで開く（パレット：連携: {$commit}の参照を開く）", local = "ブラウザーで開く（パレット：連携: コミットの参照を開く）" }
 quit = "GitPoulpi を終了"
 quit_cd = "終了して、シェルをこのタブのフォルダーに移動（シェルラッパーが必要）"
@@ -5479,6 +5481,8 @@ description = "説明"
 ref_from_branch = "（ブランチから）"
 issue_ref_inserted = "{reference} を挿入しました"
 skip_hooks = "フックをスキップ"
+# context: shorter label of the Skip hooks checkbox on a narrow commit options row
+skip_hooks_short = "No hooks"
 
 [compose_ui]
 select_commit = "{$commit}を選択..."

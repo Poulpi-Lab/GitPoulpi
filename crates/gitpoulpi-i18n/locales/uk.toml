@@ -4302,6 +4302,8 @@ new_tab = "Нова вкладка"
 explain_changes = "Пояснити робочі зміни"
 ai_generate = { git = "Згенерувати повідомлення commit'у за допомогою ШІ", local = "Згенерувати повідомлення коміту за допомогою ШІ" }
 ai_compose = "Скласти {$commits} за допомогою ШІ"
+# context: tooltip of the Skip hooks checkbox
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = { git = "Відкрити в браузері (палітра: «Інтеграції: відкрити посилання commit'у»)", local = "Відкрити в браузері (палітра: «Інтеграції: відкрити посилання коміту»)" }
 quit = "Вийти з GitPoulpi"
 quit_cd = "Вийти, залишивши оболонку в папці цієї вкладки (потрібна обгортка оболонки)"
@@ -5483,6 +5485,8 @@ description = "Опис"
 ref_from_branch = "(з гілки)"
 issue_ref_inserted = "вставлено {reference}"
 skip_hooks = "Пропустити хуки"
+# context: shorter label of the Skip hooks checkbox on a narrow commit options row
+skip_hooks_short = "No hooks"
 
 [compose_ui]
 select_commit = { git = "Виберіть commit...", local = "Виберіть коміт..." }

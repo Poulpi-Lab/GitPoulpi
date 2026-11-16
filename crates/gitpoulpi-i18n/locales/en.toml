@@ -5266,6 +5266,8 @@ new_tab = "New tab"
 explain_changes = "Explain working changes"
 ai_generate = "Generate a {$commit} message with AI"
 ai_compose = "Compose {$commits} with AI"
+# context: tooltip of the Skip hooks checkbox
+skip_hooks = "Skip hooks: {$commit} without running git hooks"
 commit_reference = "Open in your browser (palette: Open Commit Reference)"
 quit = "Quit GitPoulpi"
 quit_cd = "Quit, leaving your shell in this tab's folder (needs the shell wrapper)"
@@ -6722,6 +6724,8 @@ ref_from_branch = "(from branch)"
 issue_ref_inserted = "inserted {reference}"
 # context: label of the checkbox next to Amend; the commit is made without running git hooks
 skip_hooks = "Skip hooks"
+# context: shorter label of the Skip hooks checkbox on a narrow commit options row
+skip_hooks_short = "No hooks"
 
 [compose_ui]
 select_commit = "Select a commit..."

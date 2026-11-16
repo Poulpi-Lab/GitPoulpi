@@ -256,6 +256,20 @@ et demande une seconde confirmation. `Ctrl+Z` (Annuler de la barre d'outils)
 reprend le reword ; voir [Annuler et rétablir](undo-redo.md). La ligne d'état
 nomme aussi l'ancien sommet.
 
+Un commit qui n'est pas sur la branche extraite (il vit sur une autre branche) ne peut pas être reformulé ni modifié
+là où vous êtes : *Modifier le message du commit...* et *Modifier...* ouvrent donc **Modifier un commit d'une autre branche**,
+une liste de choix (`Up` / `Down` ou `Ctrl+J` / `Ctrl+K` se déplacent, `Enter` ou un clic choisit, `Esc`, la croix ou
+**Annuler (A)** la ferme) :
+
+- **Basculer sur `<branche>` et modifier (1)** : une ligne par branche locale dont l'historique contient le commit
+  (`1` à `8`, les huit premières, les autres sont comptées). La branche est extraite de la façon habituelle, puis la
+  modification s'ouvre dessus. L'annulation est celle des deux actions : `Ctrl+Z` annule la modification, le basculement
+  reste un basculement.
+- **Modifier avec la réécriture avancée (R)** : ouvre l'[atelier de réécriture d'historique](history-rewrite.md) sur ce commit,
+  dans les versions qui l'ont.
+- **Créer une branche ici... (B)** : seulement quand aucune branche locale ne contient le commit
+  (il n'est que sur une branche distante, par exemple) ; ouvre la zone de nom d'une branche sur lui.
+
 ## Modifier un commit (message, auteur, dates)
 
 *Modifier...* dans le menu du commit (ou `Ctrl+G Shift+E`, ou *Commit : Modifier...* dans la palette) ouvre une seule fenêtre pour les propriétés du commit : le résumé, la description, le nom, l'e-mail et la date de l'auteur, chacun prérempli avec les valeurs du commit. Changez ce que vous voulez puis appuyez sur **Appliquer** ; seuls les champs modifiés sont envoyés. Une date s'écrit `YYYY-MM-DD HH:MM:SS +HH:MM` et s'affiche en UTC tant que vous ne la modifiez pas. Le committer, c'est vous, maintenant (comme pour un reword). Tout commit de la branche extraite peut être modifié, avec les mêmes règles, le même avertissement pour un commit déjà poussé et la même seconde confirmation que *Modifier le message du commit...* ; les commits au-dessus sont recréés avec leurs propres auteurs et dates, et vos modifications, indexées ou non, restent telles quelles. `Ctrl+Z` (Annuler dans la barre d'outils) annule l'opération. Dans les builds avec la réécriture d'historique, **Modifier l'historique en profondeur...** (`Alt+H`), en bas à gauche de la fenêtre, la ferme sans rien appliquer et ouvre l'[atelier de réécriture d'historique](history-rewrite.md) sur ce commit et tous les plus récents ; si vous avez modifié un champ, il demande d'abord (`Esc` confirme). `Ctrl+N` affiche un badge sur chaque champ et chaque bouton de la fenêtre ; appuyez dessus pour placer le curseur dans ce champ ou actionner ce bouton (voir [Badges](keybindings.md#badges)).
@@ -415,7 +429,7 @@ Ce qui est comparé dépend de la sélection :
 | la ligne WIP et un commit ou un stash | ce commit avec l'arbre de travail : modifications stagées et non stagées des fichiers suivis (les fichiers non suivis ne font pas partie d'un diff) |
 | trois commits ou plus | leurs modifications combinées : de juste avant le plus ancien jusqu'au plus récent (les merges suivent leur premier parent) |
 
-Un renommage apparaît comme une suppression plus un ajout. **Inverser** (`x`) échange les extrémités d'une comparaison de deux lignes ; avec la ligne WIP, qui est toujours l'extrémité la plus récente, ou une plage de trois lignes ou plus, il n'y a rien à échanger. Une comparaison avec la ligne WIP suit l'arbre de travail au fil de vos enregistrements.
+Un fichier renommé ou déplacé apparaît comme un seul fichier, avec l'ancien nom et la similarité en haut de son diff. **Inverser** (`x`) échange les extrémités d'une comparaison de deux lignes ; avec la ligne WIP, qui est toujours l'extrémité la plus récente, ou une plage de trois lignes ou plus, il n'y a rien à échanger. Une comparaison avec la ligne WIP suit l'arbre de travail au fil de vos enregistrements.
 
 Au clavier : `v` (ou **Log : Comparer la sélection** dans la palette de commandes) place le focus dans la liste des fichiers de la comparaison ; `x` (ou **Log : Inverser les extrémités de la comparaison**) les échange ; `n` (ou **Log : Aller à la ligne comparée suivante**) est le jumeau clavier du clic sur une carte : le curseur du Log va à la ligne sélectionnée suivante, en bouclant. `Esc` ou un simple clic sur une ligne revient au commit seul. L'entrée **Cherry-pick** ne compte que les commits de la sélection ; la ligne WIP et les stashes y sont ignorés.
 

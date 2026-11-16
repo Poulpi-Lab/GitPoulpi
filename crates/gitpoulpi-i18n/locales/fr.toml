@@ -3399,7 +3399,7 @@ ai_explain_working_changes = "IA : Expliquer les modifications locales"
 ai_insert_prompt_variable = "IA : Insérer une variable de prompt"
 ai_compose_commits_from_working_changes = "IA : Composer des {$commits} à partir des modifications locales..."
 # context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
-stage_guard_show_in_file = "Fichiers sensibles : afficher dans le fichier"
+stage_guard_show_in_file = "Fichiers sensibles : Afficher dans le fichier"
 composer_move_file_to_commit = { git = "Composer : Déplacer le fichier vers un commit...", local = "Composer : Déplacer le fichier vers une validation..." }
 diff_blame = "{$Diff} : Blame"
 diff_history = "{$Diff} : Historique du fichier"
@@ -10194,4 +10194,4 @@ key_create = "b"
 # context: key of the Cancel button of that dialog, one letter
 key_cancel = "a"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
-gave_up = "{short} n'a pas été modifié : la branche n'a pas été activée"
+gave_up = "{short} n'a pas été modifié : le basculement sur la branche n'a pas eu lieu"

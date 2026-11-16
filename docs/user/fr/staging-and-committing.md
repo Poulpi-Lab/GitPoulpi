@@ -18,6 +18,13 @@ le volet de droite montre les modifications locales :
 - **Fichiers unstaged** : fichiers modifiés, ajoutés (non suivis) et supprimés qui
   ne sont pas encore dans le prochain commit.
 - **Fichiers staged** : ce que contiendra le prochain commit.
+- **Les fichiers renommés ou déplacés** sont une seule ligne, `nouveau <- ancien`, dans les deux listes (un fichier
+  supprimé sur le disque et un nouveau dont au moins 50 % du contenu est identique comptent comme un déplacement
+  avant même que vous les stagiez). Stage, Unstage et Abandon agissent sur les deux noms : stager stage la
+  suppression et le nouveau fichier, si bien que git voit un seul renommage. Ouvrir la ligne montre le diff du contenu
+  par rapport à l'ancien nom, avec l'en-tête `ancien -> nouveau (N % de similarité)` ; un déplacement sans
+  modification dit **Aucun changement de contenu**. Il en va de même pour les fichiers d'un commit, et
+  `gitpoulpi status` / `gitpoulpi diff` rapportent `renamed_from`.
 - **Chemins** ou **Arbre** (`m`) liste les fichiers à plat ou en dossiers. **Tout
   replier** (`z`) replie les dossiers. **Tous les fichiers** (`a`) montre tout
   l'arbre au lieu des seuls fichiers modifiés. Faites un clic droit sur l'espace vide de la liste pour
@@ -50,6 +57,11 @@ une flèche ou un chiffre, donc un Enter par mégarde ne répond à rien ; `Esc
 fermeture et un clic à l'extérieur annulent. C'est la même question au clavier, avec un
 bouton, un menu, la palette ou un glisser-déposer, car tous envoient la même requête.
 Annuler ne stage rien, pas même les fichiers ordinaires du même stage.
+Un secret trouvé dans un fichier nomme sa ligne (`config/app.env:12`). Pour regarder avant
+de décider, cliquez une trouvaille (ou parcourez-les avec `Tab` / `Shift+Tab`, `Ctrl+J` /
+`Ctrl+K`) et appuyez sur le bouton **Afficher dans le fichier**, `S`, ou sur la ligne de palette **Fichiers
+sensibles : Afficher dans le fichier** : le fichier s'ouvre dans la vue Fichier, défilé jusqu'à cette ligne et la
+surlignant, et la question revient intacte quand vous fermez la vue Fichier (`Esc`). Regarder ne stage rien.
 
 Les fichiers texte jusqu'à 1 Mio chacun et 32 Mio au total sont lus ; les fichiers plus
 gros et les fichiers binaires ne sont jugés que sur leur nom. `[privacy] staging_guard = false`
@@ -188,10 +200,15 @@ l'autre.
   référence de ticket ; voir [Hébergeurs et suivi de tickets](hosting-integration.md).
 
 Avec l'[IA](ai.md) activée, le bouton **`✦`** à droite du résumé écrit un message
-à partir des modifications stagées (`Ctrl+G i`), et **Composer les commits avec l'IA**
+à partir des modifications stagées (`Ctrl+G i`), et **Composer des commits avec l'IA**
 répartit votre travail en plusieurs commits, ci-dessous. Le texte va dans le
 formulaire pour que vous le modifiiez ; rien n'est commité tant que vous
 n'appuyez pas sur le bouton de commit.
+
+**Composer des commits avec l'IA** est à l'extrémité droite de la ligne Modifier et rétrécit avec le volet de droite
+au lieu de disparaître : le libellé complet, puis **Composer avec l'IA**, puis le seul **`✦`**. Il garde son clic, son
+infobulle et sa touche (`Ctrl+G Shift+C`) à toutes les largeurs ; ce sont les libellés **Amender** et **Ignorer les hooks**
+qui lui cèdent la place, jamais l'inverse.
 
 ## Le compositeur de commits : répartir vos modifications en commits
 

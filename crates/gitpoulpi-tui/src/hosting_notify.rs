@@ -101,6 +101,7 @@ pub(crate) mod testing {
 
     /// The notifications made for `project`: tests filter on a project of
     /// their own, since the log is shared.
+    #[cfg(feature = "conversation")]
     pub(crate) fn sent(project: &str) -> Vec<HostingChangeArgs> {
         SENT.lock()
             .unwrap_or_else(|e| e.into_inner())

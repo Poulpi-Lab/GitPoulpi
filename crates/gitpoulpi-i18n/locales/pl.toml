@@ -7081,26 +7081,6 @@ finish = "Zakończ przegląd"
 finish_with = { one = "Zakończ przegląd ({n})", few = "Zakończ przegląd ({n})", many = "Zakończ przegląd ({n})", other = "Zakończ przegląd ({n})" }
 # context: box title of the Overview page
 overview_title = "Opis i dyskusja"
-# context: heading: the request's text
-description = "Opis"
-# context: shown when the request has no text
-no_description = "Brak opisu."
-# context: heading; {n} comments and reviews
-conversation_heading = { one = "Dyskusja ({n})", few = "Dyskusja ({n})", many = "Dyskusja ({n})", other = "Dyskusja ({n})" }
-# context: shown when nobody commented
-no_conversation = "Brak komentarzy."
-# context: badge on a submitted review
-verdict_approved = "zaakceptowano"
-# context: badge on a submitted review
-verdict_changes = "zażądano zmian"
-# context: badge on a submitted review
-verdict_commented = "skomentowano"
-# context: badge on a submitted review
-verdict_dismissed = "uchylono"
-# context: title of the box under the conversation
-reply_box_title = "Komentarz w dyskusji"
-# context: inside the box under the conversation
-reply_placeholder = "Napisz komentarz... (publikowany od razu)"
 # context: title of the file list; {n} files, {viewed} ticked as viewed
 files_title = { one = "Pliki ({n}) - przejrzano: {viewed}", few = "Pliki ({n}) - przejrzano: {viewed}", many = "Pliki ({n}) - przejrzano: {viewed}", other = "Pliki ({n}) - przejrzano: {viewed}" }
 # context: title of the diff when the request changes no file
@@ -7133,8 +7113,6 @@ compose_title_line = "Komentarz do kodu"
 compose_title_edit = "Edytuj oczekujący komentarz"
 # context: dialog title: replying to a thread
 compose_title_reply = "Odpowiedź w wątku"
-# context: dialog title: a comment in the conversation
-compose_title_comment = "Komentarz w dyskusji"
 # context: subtitle of the reply box; {who} is a user name
 reply_about = "odpowiedź dla: {who}"
 # context: placeholder of the comment box
@@ -7200,8 +7178,6 @@ pending_deleted = { one = "usunięto komentarz (oczekuje: {n})", few = "usunięt
 # context: status line
 pending_edited = "zaktualizowano oczekujący komentarz"
 # context: status line
-comment_posted = "opublikowano komentarz"
-# context: status line
 reply_posted = "opublikowano odpowiedź"
 # context: status line
 thread_resolved = "rozwiązano wątek"
@@ -7248,10 +7224,6 @@ why_no_pending = "brak oczekującego komentarza"
 why_no_meta = "osoby przypisane, recenzenci, etykiety i kamienie milowe są dostępne w GitHub, GitLab, Gitea i Forgejo"
 # context: why a row is off
 why_no_review = "ten host nie obsługuje przeglądów"
-# context: footer hint after the arrow keys
-hint_scroll = "przewiń"
-# context: footer hint
-hint_comment = "komentarz"
 # context: footer hint
 hint_finish = "zakończ"
 # context: footer hint

@@ -7079,26 +7079,6 @@ finish = "Terminar revisión"
 finish_with = { one = "Terminar revisión ({n})", other = "Terminar revisión ({n})" }
 # context: box title of the Overview page
 overview_title = "Descripción y conversación"
-# context: heading: the request's text
-description = "Descripción"
-# context: shown when the request has no text
-no_description = "Sin descripción."
-# context: heading; {n} comments and reviews
-conversation_heading = { one = "Conversación ({n})", other = "Conversación ({n})" }
-# context: shown when nobody commented
-no_conversation = "Aún no hay comentarios."
-# context: badge on a submitted review
-verdict_approved = "aprobada"
-# context: badge on a submitted review
-verdict_changes = "con cambios solicitados"
-# context: badge on a submitted review
-verdict_commented = "comentada"
-# context: badge on a submitted review
-verdict_dismissed = "descartada"
-# context: title of the box under the conversation
-reply_box_title = "Comentar en la conversación"
-# context: inside the box under the conversation
-reply_placeholder = "Escribe un comentario... (se publica al instante)"
 # context: title of the file list; {n} files, {viewed} ticked as viewed
 files_title = { one = "Archivos ({n}) - {viewed} vistos", other = "Archivos ({n}) - {viewed} vistos" }
 # context: title of the diff when the request changes no file
@@ -7131,8 +7111,6 @@ compose_title_line = "Comentar el código"
 compose_title_edit = "Editar comentario pendiente"
 # context: dialog title: replying to a thread
 compose_title_reply = "Responder al hilo"
-# context: dialog title: a comment in the conversation
-compose_title_comment = "Comentar en la conversación"
 # context: subtitle of the reply box; {who} is a user name
 reply_about = "respondiendo a {who}"
 # context: placeholder of the comment box
@@ -7198,8 +7176,6 @@ pending_deleted = { one = "comentario eliminado ({n} pendiente)", other = "comen
 # context: status line
 pending_edited = "comentario pendiente actualizado"
 # context: status line
-comment_posted = "comentario publicado"
-# context: status line
 reply_posted = "respuesta publicada"
 # context: status line
 thread_resolved = "hilo resuelto"
@@ -7246,10 +7222,6 @@ why_no_pending = "no hay ningún comentario pendiente"
 why_no_meta = "los asignados, revisores, etiquetas e hitos están disponibles en GitHub, GitLab, Gitea y Forgejo"
 # context: why a row is off
 why_no_review = "este host no admite revisiones"
-# context: footer hint after the arrow keys
-hint_scroll = "desplazar"
-# context: footer hint
-hint_comment = "comentar"
 # context: footer hint
 hint_finish = "terminar"
 # context: footer hint

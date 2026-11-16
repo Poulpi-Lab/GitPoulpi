@@ -7086,26 +7086,6 @@ finish = "Завершить ревью"
 finish_with = { one = "Завершить ревью ({n})", few = "Завершить ревью ({n})", many = "Завершить ревью ({n})", other = "Завершить ревью ({n})" }
 # context: box title of the Overview page
 overview_title = "Описание и беседа"
-# context: heading: the request's text
-description = "Описание"
-# context: shown when the request has no text
-no_description = "Нет описания."
-# context: heading; {n} comments and reviews
-conversation_heading = { one = "Беседа ({n})", few = "Беседа ({n})", many = "Беседа ({n})", other = "Беседа ({n})" }
-# context: shown when nobody commented
-no_conversation = "Комментариев пока нет."
-# context: badge on a submitted review
-verdict_approved = "одобрено"
-# context: badge on a submitted review
-verdict_changes = "запрошены изменения"
-# context: badge on a submitted review
-verdict_commented = "прокомментировано"
-# context: badge on a submitted review
-verdict_dismissed = "отклонено"
-# context: title of the box under the conversation
-reply_box_title = "Комментарий к беседе"
-# context: inside the box under the conversation
-reply_placeholder = "Напишите комментарий... (публикуется сразу)"
 # context: title of the file list; {n} files, {viewed} ticked as viewed
 files_title = { one = "Файлы ({n}) - просмотрено: {viewed}", few = "Файлы ({n}) - просмотрено: {viewed}", many = "Файлы ({n}) - просмотрено: {viewed}", other = "Файлы ({n}) - просмотрено: {viewed}" }
 # context: title of the diff when the request changes no file
@@ -7138,8 +7118,6 @@ compose_title_line = "Комментарий к коду"
 compose_title_edit = "Правка неотправленного комментария"
 # context: dialog title: replying to a thread
 compose_title_reply = "Ответ в обсуждении"
-# context: dialog title: a comment in the conversation
-compose_title_comment = "Комментарий к беседе"
 # context: subtitle of the reply box; {who} is a user name
 reply_about = "ответ пользователю {who}"
 # context: placeholder of the comment box
@@ -7205,8 +7183,6 @@ pending_deleted = { one = "комментарий удалён (не отпра�
 # context: status line
 pending_edited = "неотправленный комментарий обновлён"
 # context: status line
-comment_posted = "комментарий опубликован"
-# context: status line
 reply_posted = "ответ опубликован"
 # context: status line
 thread_resolved = "обсуждение разрешено"
@@ -7253,10 +7229,6 @@ why_no_pending = "нет неотправленного комментария"
 why_no_meta = "исполнители, рецензенты, метки и этапы доступны на GitHub, GitLab, Gitea и Forgejo"
 # context: why a row is off
 why_no_review = "этот хостинг не поддерживает ревью"
-# context: footer hint after the arrow keys
-hint_scroll = "прокрутка"
-# context: footer hint
-hint_comment = "комментарий"
 # context: footer hint
 hint_finish = "завершить"
 # context: footer hint

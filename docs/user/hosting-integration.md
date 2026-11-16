@@ -481,7 +481,7 @@ pushes). GitPoulpi reads it from the host, shows it formatted, and lets you answ
 | From | How |
 |---|---|
 | An ISSUES row | `Enter` or a double-click; the row menu's **Open conversation**; palette *Hosting: Open Issue Conversation...* (a list of the issues on screen). The row menu's **Open in browser** keeps the browser. |
-| A PULL REQUESTS row on Azure DevOps or Bitbucket | `Enter` or **Open conversation**. On GitHub, GitLab, Gitea, Forgejo and Gerrit the row opens the [review](review.md), whose Overview page is the conversation of the request. |
+| A PULL REQUESTS row on Azure DevOps or Bitbucket | `Enter` or **Open conversation**. On GitHub, GitLab, Gitea, Forgejo and Gerrit the row opens the [review](review.md), whose Overview page is this same conversation (the timeline, the keys and the comment box below). |
 | A card of the [issue board](#5b-the-issue-board) | `Enter` or a double-click. |
 | The [Radar](radar.md) | `i` on an issue or request row, the row menu's **Open conversation**, or *Radar: Open Issue Conversation*. |
 | A reference in another conversation | Click it (or `l`, then pick it): `#7`, `!12`, `ABC-12` of a linked source open in the app and push onto a Back stack. |

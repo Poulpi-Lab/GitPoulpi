@@ -7084,26 +7084,6 @@ finish = "Завершити рев'ю"
 finish_with = { one = "Завершити рев'ю ({n})", few = "Завершити рев'ю ({n})", many = "Завершити рев'ю ({n})", other = "Завершити рев'ю ({n})" }
 # context: box title of the Overview page
 overview_title = "Опис і бесіда"
-# context: heading: the request's text
-description = "Опис"
-# context: shown when the request has no text
-no_description = "Опису немає."
-# context: heading; {n} comments and reviews
-conversation_heading = { one = "Бесіда ({n})", few = "Бесіда ({n})", many = "Бесіда ({n})", other = "Бесіда ({n})" }
-# context: shown when nobody commented
-no_conversation = "Коментарів ще немає."
-# context: badge on a submitted review
-verdict_approved = "схвалено"
-# context: badge on a submitted review
-verdict_changes = "вимагає змін"
-# context: badge on a submitted review
-verdict_commented = "прокоментовано"
-# context: badge on a submitted review
-verdict_dismissed = "відхилено"
-# context: title of the box under the conversation
-reply_box_title = "Коментар до бесіди"
-# context: inside the box under the conversation
-reply_placeholder = "Напишіть коментар... (публікується одразу)"
 # context: title of the file list; {n} files, {viewed} ticked as viewed
 files_title = { one = "Файли ({n}) - переглянуто: {viewed}", few = "Файли ({n}) - переглянуто: {viewed}", many = "Файли ({n}) - переглянуто: {viewed}", other = "Файли ({n}) - переглянуто: {viewed}" }
 # context: title of the diff when the request changes no file
@@ -7136,8 +7116,6 @@ compose_title_line = "Коментар до коду"
 compose_title_edit = "Змінити незавершений коментар"
 # context: dialog title: replying to a thread
 compose_title_reply = "Відповідь в обговоренні"
-# context: dialog title: a comment in the conversation
-compose_title_comment = "Коментар до бесіди"
 # context: subtitle of the reply box; {who} is a user name
 reply_about = "відповідь для {who}"
 # context: placeholder of the comment box
@@ -7203,8 +7181,6 @@ pending_deleted = { one = "коментар видалено (незаверше
 # context: status line
 pending_edited = "незавершений коментар оновлено"
 # context: status line
-comment_posted = "коментар опубліковано"
-# context: status line
 reply_posted = "відповідь опубліковано"
 # context: status line
 thread_resolved = "обговорення вирішено"
@@ -7251,10 +7227,6 @@ why_no_pending = "незавершених коментарів немає"
 why_no_meta = "виконавців, рев'юерів, мітки й віхи можна змінювати на GitHub, GitLab, Gitea і Forgejo"
 # context: why a row is off
 why_no_review = "цей хост не підтримує рев'ю"
-# context: footer hint after the arrow keys
-hint_scroll = "прокрутка"
-# context: footer hint
-hint_comment = "коментар"
 # context: footer hint
 hint_finish = "завершити"
 # context: footer hint

@@ -40,7 +40,8 @@ Features (each defaults to on):
   --[no-]radar         off = no Radar (PRs/issues of every repo in one list)
   --[no-]mermaid           off = no Copy as Mermaid gitGraph, no `log --format mermaid`
   --[no-]board             off = no Kanban board view, no `hosting board`
-  --[no-]review            off = no in-app code review view and its AI assist
+  --[no-]review            off = no in-app code review view and its AI assist (on brings the
+                           conversation view along: the Overview is that view)
   --[no-]conversation      off = no in-app issue / request conversation view (Enter opens the browser)
   --[no-]history-rewrite   off = no History workbench (advanced history rewriting:
                            authors, dates, messages, content)
@@ -198,7 +199,8 @@ impl Choices {
                 (self.mermaid, "mermaid"),
                 (self.board, "board"),
                 (self.review, "review"),
-                (self.conversation, "conversation"),
+                // The review's Overview is the conversation view: Review brings it along.
+                (self.conversation || self.review, "conversation"),
                 (self.history_rewrite, "history-rewrite"),
                 (self.global_search, "global-search"),
                 (self.workspaces, "workspaces"),
@@ -515,7 +517,7 @@ impl Choices {
             (self.mermaid, "mermaid"),
             (self.board, "board"),
             (self.review, "review"),
-            (self.conversation, "conversation"),
+            (self.conversation || self.review, "conversation"),
             (self.history_rewrite, "history-rewrite"),
             (self.global_search, "global-search"),
             (self.workspaces, "workspaces"),
@@ -1269,7 +1271,7 @@ mod tests {
                 "{bin}"
             );
         }
-        let off = parse(&["--no-conversation"]).unwrap();
+        let off = parse(&["--no-conversation", "--no-review"]).unwrap();
         assert!(!off
             .choices
             .features()

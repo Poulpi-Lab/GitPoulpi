@@ -143,18 +143,17 @@ fn a_merge_request_is_reviewed_in_the_app_and_the_pending_review_reaches_the_hos
     // verdicts submitted so far.
     let screen = term
         .wait_for("the overview loaded", STEP, |s| {
-            s.contains("Looks promising, one question inline.")
-                && s.contains("approved")
+            s.contains("Newest remark from the mock.")
                 && s.contains("main \u{2190} feature/moons")
                 && s.contains("Adds the moons column")
-                && s.contains("Conversation (")
+                && s.contains("New comment")
                 && s.contains("Finish review")
         })
         .unwrap_or_else(|e| panic!("{e}"));
     for want in [
         "main \u{2190} feature/moons",
         "Adds the moons column",
-        "Conversation (",
+        "New comment",
         "Finish review",
     ] {
         assert!(screen.contains(want), "{want}:\n{}", screen.text());
@@ -366,12 +365,12 @@ fn the_overviews_comment_box_is_the_shared_composer_and_posts_its_exact_text() {
     let (mut term, _config) = launch_review(&mock, &repo, "pty-review-overview-post");
     open_from_menu(&mut term);
     term.wait_for("the overview loaded", STEP, |s| {
-        s.contains("Looks promising, one question inline.") && s.contains("Finish review")
+        s.contains("Newest remark from the mock.") && s.contains("Finish review")
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("c").expect("comment on the conversation");
     term.wait_for("the shared composer", STEP, |s| {
-        s.contains("Comment on the conversation") && s.contains("Preview") && s.contains("Split")
+        s.contains("New comment") && s.contains("Preview") && s.contains("Split")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_text("looks good").unwrap();

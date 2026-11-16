@@ -8859,26 +8859,6 @@ finish = "Finish review"
 finish_with = { one = "Finish review ({n})", other = "Finish review ({n})" }
 # context: box title of the Overview page
 overview_title = "Description and conversation"
-# context: heading: the request's text
-description = "Description"
-# context: shown when the request has no text
-no_description = "No description."
-# context: heading; {n} comments and reviews
-conversation_heading = { one = "Conversation ({n})", other = "Conversation ({n})" }
-# context: shown when nobody commented
-no_conversation = "No comments yet."
-# context: badge on a submitted review
-verdict_approved = "approved"
-# context: badge on a submitted review
-verdict_changes = "requested changes"
-# context: badge on a submitted review
-verdict_commented = "commented"
-# context: badge on a submitted review
-verdict_dismissed = "dismissed"
-# context: title of the box under the conversation
-reply_box_title = "Comment on the conversation"
-# context: inside the box under the conversation
-reply_placeholder = "Write a comment... (posted at once)"
 # context: title of the file list; {n} files, {viewed} of them marked as viewed
 files_title = { one = "Files ({n}) - {viewed} viewed", other = "Files ({n}) - {viewed} viewed" }
 # context: title of the diff when the request changes no file
@@ -8911,8 +8891,6 @@ compose_title_line = "Comment on code"
 compose_title_edit = "Edit pending comment"
 # context: dialog title: replying to a thread
 compose_title_reply = "Reply to thread"
-# context: dialog title: a comment in the conversation
-compose_title_comment = "Comment on the conversation"
 # context: subtitle of the reply box; {who} is a user name
 reply_about = "replying to {who}"
 # context: placeholder of the comment box
@@ -8978,8 +8956,6 @@ pending_deleted = { one = "comment deleted ({n} pending)", other = "comment dele
 # context: status line
 pending_edited = "pending comment updated"
 # context: status line
-comment_posted = "comment posted"
-# context: status line
 reply_posted = "reply posted"
 # context: status line
 thread_resolved = "thread resolved"
@@ -9027,10 +9003,6 @@ why_no_pending = "there is no pending comment"
 why_no_meta = "assignees, reviewers, labels and milestones are available on GitHub, GitLab, Gitea and Forgejo"
 # context: why a row is off
 why_no_review = "this host does not support reviews"
-# context: footer hint after the arrow keys
-hint_scroll = "scroll"
-# context: footer hint
-hint_comment = "comment"
 # context: footer hint
 hint_finish = "finish"
 # context: footer hint

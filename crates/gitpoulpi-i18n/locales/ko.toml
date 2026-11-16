@@ -7076,26 +7076,6 @@ finish = "리뷰 완료"
 finish_with = { one = "리뷰 완료 ({n})", other = "리뷰 완료 ({n})" }
 # context: box title of the Overview page
 overview_title = "설명 및 대화"
-# context: heading: the request's text
-description = "설명"
-# context: shown when the request has no text
-no_description = "설명이 없습니다."
-# context: heading; {n} comments and reviews
-conversation_heading = { one = "대화 ({n})", other = "대화 ({n})" }
-# context: shown when nobody commented
-no_conversation = "아직 댓글이 없습니다."
-# context: badge on a submitted review
-verdict_approved = "승인함"
-# context: badge on a submitted review
-verdict_changes = "변경 요청함"
-# context: badge on a submitted review
-verdict_commented = "댓글 남김"
-# context: badge on a submitted review
-verdict_dismissed = "기각됨"
-# context: title of the box under the conversation
-reply_box_title = "대화에 댓글 달기"
-# context: inside the box under the conversation
-reply_placeholder = "댓글을 입력하세요... (바로 게시됨)"
 # context: title of the file list; {n} files, {viewed} ticked as viewed
 files_title = { one = "파일 ({n}) - {viewed}개 확인함", other = "파일 ({n}) - {viewed}개 확인함" }
 # context: title of the diff when the request changes no file
@@ -7128,8 +7108,6 @@ compose_title_line = "코드에 댓글 달기"
 compose_title_edit = "대기 중인 댓글 편집"
 # context: dialog title: replying to a thread
 compose_title_reply = "스레드에 답글"
-# context: dialog title: a comment in the conversation
-compose_title_comment = "대화에 댓글 달기"
 # context: subtitle of the reply box; {who} is a user name
 reply_about = "{who}에게 답글 작성 중"
 # context: placeholder of the comment box
@@ -7195,8 +7173,6 @@ pending_deleted = { one = "댓글을 삭제했습니다 (대기 {n}개)", other 
 # context: status line
 pending_edited = "대기 중인 댓글을 업데이트했습니다"
 # context: status line
-comment_posted = "댓글을 게시했습니다"
-# context: status line
 reply_posted = "답글을 게시했습니다"
 # context: status line
 thread_resolved = "스레드를 해결했습니다"
@@ -7243,10 +7219,6 @@ why_no_pending = "대기 중인 댓글이 없습니다"
 why_no_meta = "담당자, 리뷰어, 레이블, 마일스톤은 GitHub, GitLab, Gitea, Forgejo에서 사용할 수 있습니다"
 # context: why a row is off
 why_no_review = "이 호스트는 리뷰를 지원하지 않습니다"
-# context: footer hint after the arrow keys
-hint_scroll = "스크롤"
-# context: footer hint
-hint_comment = "댓글"
 # context: footer hint
 hint_finish = "완료"
 # context: footer hint

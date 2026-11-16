@@ -7082,26 +7082,6 @@ finish = "レビューを完了"
 finish_with = { one = "レビューを完了（{n}）", other = "レビューを完了（{n}）" }
 # context: box title of the Overview page
 overview_title = "説明と会話"
-# context: heading: the request's text
-description = "説明"
-# context: shown when the request has no text
-no_description = "説明はありません。"
-# context: heading; {n} comments and reviews
-conversation_heading = { one = "会話（{n}）", other = "会話（{n}）" }
-# context: shown when nobody commented
-no_conversation = "コメントはまだありません。"
-# context: badge on a submitted review
-verdict_approved = "承認"
-# context: badge on a submitted review
-verdict_changes = "変更を要求"
-# context: badge on a submitted review
-verdict_commented = "コメント"
-# context: badge on a submitted review
-verdict_dismissed = "却下"
-# context: title of the box under the conversation
-reply_box_title = "会話にコメント"
-# context: inside the box under the conversation
-reply_placeholder = "コメントを入力...（すぐに投稿されます）"
 # context: title of the file list; {n} files, {viewed} ticked as viewed
 files_title = { one = "ファイル（{n}）- 閲覧済み {viewed}", other = "ファイル（{n}）- 閲覧済み {viewed}" }
 # context: title of the diff when the request changes no file
@@ -7134,8 +7114,6 @@ compose_title_line = "コードにコメント"
 compose_title_edit = "保留中のコメントを編集"
 # context: dialog title: replying to a thread
 compose_title_reply = "スレッドに返信"
-# context: dialog title: a comment in the conversation
-compose_title_comment = "会話にコメント"
 # context: subtitle of the reply box; {who} is a user name
 reply_about = "{who} への返信"
 # context: placeholder of the comment box
@@ -7201,8 +7179,6 @@ pending_deleted = { one = "コメントを削除しました（保留中 {n} 件
 # context: status line
 pending_edited = "保留中のコメントを更新しました"
 # context: status line
-comment_posted = "コメントを投稿しました"
-# context: status line
 reply_posted = "返信を投稿しました"
 # context: status line
 thread_resolved = "スレッドを解決しました"
@@ -7249,10 +7225,6 @@ why_no_pending = "保留中のコメントがありません"
 why_no_meta = "担当者、レビュアー、ラベル、マイルストーンは GitHub、GitLab、Gitea、Forgejo で利用できます"
 # context: why a row is off
 why_no_review = "このホストはレビューに対応していません"
-# context: footer hint after the arrow keys
-hint_scroll = "スクロール"
-# context: footer hint
-hint_comment = "コメント"
 # context: footer hint
 hint_finish = "完了"
 # context: footer hint

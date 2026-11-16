@@ -904,6 +904,7 @@ launch = "GitPoulpi 快捷方式实际运行的命令：如果已有打开的 Gi
 "ai hosting-reply --path" = "为 pull request 的这个文件起草一条新的评审评论"
 "ai hosting-reply --read_repo" = "让 AI 为这份草稿读取仓库（除非给出此参数或 `ai.hosting_reply.read_repository` 为 true，否则关闭）。本地代理在仓库文件夹中用只读工具自行读取；API 配置则获得由 GitPoulpi 构建的上下文（对话提到的文件、搜索结果、地图），范围在 `ai.limits.hosting_reply_*` 之内。无论哪种方式，AI 都只写草稿；不会发布任何内容"
 "ai hosting-reply --refresh_context" = "忘记此仓库先前草稿留下的上下文和代理会话，并重新读取（配合 `--read-repo`）"
+"ai hosting-reply --continue_exchange" = 'Continue the exchange of the last `hosting-reply` for this same target (same `--item`, `--reply-to`, `--path`/`--line` or `--issue-title`): the earlier hints and drafts of it go back to the model as earlier turns, so "make it shorter" works. Not needed for a local Claude agent whose session is kept (it remembers). Without the flag a new exchange starts. Kept in the state folder'
 "ai hosting-reply --pr_base" = "配合 `--read-repo`：pull request 的基准版本，用于把它的 diff（相对于合并基点）放入上下文"
 "ai hosting-reply --pr_head" = "配合 `--read-repo`：pull request 的头部版本"
 "ai hosting-reply --reply_to" = "在此 id 的评论串中回答（代码评论串、评论或讨论）"

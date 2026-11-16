@@ -904,6 +904,7 @@ launch = "GitPoulpi のショートカットが実行するコマンドです。
 "ai hosting-reply --path" = "pull request のこのファイルへの新しいレビューコメントの下書きを作る"
 "ai hosting-reply --read_repo" = "この下書きのために AI にリポジトリを読ませる（指定するか `ai.hosting_reply.read_repository` が true の場合のみ）。ローカルエージェントはリポジトリのフォルダーで読み取り専用のツールを使って自分で読み、API プロファイルには GitPoulpi が作ったコンテキスト（会話に出てくるファイル、検索ヒット、マップ）を `ai.limits.hosting_reply_*` の範囲で渡します。どちらの場合も AI は下書きを書くだけで、何も投稿されません"
 "ai hosting-reply --refresh_context" = "このリポジトリの以前の下書きで保持されたコンテキストとエージェントのセッションを破棄し、読み直す（`--read-repo` と併用）"
+"ai hosting-reply --continue_exchange" = 'Continue the exchange of the last `hosting-reply` for this same target (same `--item`, `--reply-to`, `--path`/`--line` or `--issue-title`): the earlier hints and drafts of it go back to the model as earlier turns, so "make it shorter" works. Not needed for a local Claude agent whose session is kept (it remembers). Without the flag a new exchange starts. Kept in the state folder'
 "ai hosting-reply --pr_base" = "`--read-repo` と併用：pull request のベースのリビジョン。その差分（マージベースとの差分）をコンテキストに入れます"
 "ai hosting-reply --pr_head" = "`--read-repo` と併用：pull request の head のリビジョン"
 "ai hosting-reply --reply_to" = "この ID のスレッドに返答する（コードスレッド、コメント、ディスカッション）"

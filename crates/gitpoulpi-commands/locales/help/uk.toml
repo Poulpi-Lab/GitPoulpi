@@ -904,6 +904,7 @@ sparse-checkout = "Частковий checkout (режим cone): залишає
 "ai hosting-reply --path" = "Скласти чернетку нового коментаря рев'ю до цього файлу pull request"
 "ai hosting-reply --read_repo" = "Дозволити ШІ читати репозиторій для цієї чернетки (вимкнено, якщо не вказано або `ai.hosting_reply.read_repository` не true). Локальний агент читає його сам інструментами лише для читання в папці репозиторію; профіль API отримує контекст, який збирає GitPoulpi (файли, названі в обговоренні, збіги пошуку, карта) в межах `ai.limits.hosting_reply_*`. ШІ в обох випадках лише пише чернетку; нічого не публікується"
 "ai hosting-reply --refresh_context" = "Забути контекст і сесію агента, збережені з попередніх чернеток цього репозиторію, і прочитати його знову (з `--read-repo`)"
+"ai hosting-reply --continue_exchange" = 'Continue the exchange of the last `hosting-reply` for this same target (same `--item`, `--reply-to`, `--path`/`--line` or `--issue-title`): the earlier hints and drafts of it go back to the model as earlier turns, so "make it shorter" works. Not needed for a local Claude agent whose session is kept (it remembers). Without the flag a new exchange starts. Kept in the state folder'
 "ai hosting-reply --pr_base" = "З `--read-repo`: базова ревізія pull request, щоб покласти в контекст його diff (відносно merge base)"
 "ai hosting-reply --pr_head" = "З `--read-repo`: головна ревізія pull request"
 "ai hosting-reply --reply_to" = "Відповісти в обговоренні з цим id (обговорення коду, коментар або дискусія)"

@@ -904,6 +904,7 @@ launch = "GitPoulpi kısayollarının çalıştırdığı komut: zaten açık ol
 "ai hosting-reply --path" = "Pull request'in bu dosyası için yeni bir inceleme yorumu taslağı yazar"
 "ai hosting-reply --read_repo" = "YZ'nin bu taslak için depoyu okumasına izin verir (verilmedikçe veya `ai.hosting_reply.read_repository` true olmadıkça kapalı). Yerel bir ajan depoyu kendisi, depo klasöründe salt okunur araçlarla okur; bir API profiline GitPoulpi'nin oluşturduğu bir bağlam verilir (konuşmanın andığı dosyalar, arama sonuçları, harita), `ai.limits.hosting_reply_*` sınırları içinde. Her iki durumda da YZ yalnızca taslak yazar; hiçbir şey gönderilmez"
 "ai hosting-reply --refresh_context" = "Bu deponun önceki taslaklarından kalan bağlamı ve ajan oturumunu unutur ve depoyu yeniden okur (`--read-repo` ile)"
+"ai hosting-reply --continue_exchange" = 'Continue the exchange of the last `hosting-reply` for this same target (same `--item`, `--reply-to`, `--path`/`--line` or `--issue-title`): the earlier hints and drafts of it go back to the model as earlier turns, so "make it shorter" works. Not needed for a local Claude agent whose session is kept (it remembers). Without the flag a new exchange starts. Kept in the state folder'
 "ai hosting-reply --pr_base" = "`--read-repo` ile: pull request'in temel revizyonu; diff'ini (merge tabanına göre) bağlama koymak için"
 "ai hosting-reply --pr_head" = "`--read-repo` ile: pull request'in uç revizyonu"
 "ai hosting-reply --reply_to" = "Bu kimlikli yorum dizisinde yanıt verir (bir kod dizisi, bir yorum veya bir tartışma)"

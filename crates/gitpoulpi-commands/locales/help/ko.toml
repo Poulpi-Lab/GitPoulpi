@@ -904,6 +904,7 @@ launch = "GitPoulpi 바로 가기가 실행하는 명령입니다. 이미 열려
 "ai hosting-reply --path" = "pull request의 이 파일에 새 리뷰 댓글의 초안을 작성합니다"
 "ai hosting-reply --read_repo" = "AI가 이 초안을 위해 저장소를 읽도록 허용합니다 (지정하거나 `ai.hosting_reply.read_repository`가 true일 때만). 로컬 에이전트는 저장소 폴더에서 읽기 전용 도구로 직접 읽고, API 프로필은 GitPoulpi가 만든 컨텍스트(대화에 나온 파일, 검색 결과, 맵)를 `ai.limits.hosting_reply_*` 이내로 받습니다. 어느 쪽이든 AI는 초안만 작성하며 아무것도 게시되지 않습니다"
 "ai hosting-reply --refresh_context" = "이 저장소의 이전 초안에서 유지된 컨텍스트와 에이전트 세션을 버리고 다시 읽습니다 (`--read-repo`와 함께)"
+"ai hosting-reply --continue_exchange" = 'Continue the exchange of the last `hosting-reply` for this same target (same `--item`, `--reply-to`, `--path`/`--line` or `--issue-title`): the earlier hints and drafts of it go back to the model as earlier turns, so "make it shorter" works. Not needed for a local Claude agent whose session is kept (it remembers). Without the flag a new exchange starts. Kept in the state folder'
 "ai hosting-reply --pr_base" = "`--read-repo`와 함께: pull request의 기준 리비전. 그 diff(병합 기준점 대비)를 컨텍스트에 넣습니다"
 "ai hosting-reply --pr_head" = "`--read-repo`와 함께: pull request의 head 리비전"
 "ai hosting-reply --reply_to" = "이 id의 스레드에 답합니다 (코드 스레드, 댓글 또는 토론)"

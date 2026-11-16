@@ -1502,7 +1502,7 @@ requesty). S připojeným hostingovým profilem má také sekci ISSUES. Viz
 
 | Klávesa | Akce |
 |---|---|
-| `Enter` | Otevřít vybraný řádek v prohlížeči. Na řádku `Reconnect`: otevřít Nastavení na tomto profilu |
+| `Enter` | Otevřít vybraný řádek: issue (a žádost na Azure DevOps nebo Bitbucketu) jako [konverzaci](hosting-integration.md#5c-konverzace), pull request v [kontrole](review.md) u hostitelů, kteří ji mají, cokoli jiného v prohlížeči. Na řádku `Reconnect`: otevřít Nastavení na tomto profilu |
 | `Space` | Rozbalit nebo sbalit sekci |
 | `v` | Otevřít filtr sekce. Pull requesty: Otevřené, Merged / zavřené, Všechny. Issues: Otevřené, Přiřazené mně, Zavřené, Všechny |
 | `n` | Sekce pull requestů: vytvořit pull request. Sekce ISSUES: nové issue. (Tlačítko `+` v záhlaví) |
@@ -1510,7 +1510,7 @@ requesty). S připojeným hostingovým profilem má také sekci ISSUES. Viz
 | `Enter` na řádku hledání | Psát do vyhledávacího pole. `Enter`, `Tab` nebo `Esc` jej opustí; `Ctrl+U` je vymaže |
 | `Enter` na záhlaví skupiny | Sbalit nebo rozbalit skupinu (*Moje pull requesty*, *Přiřazené mně*, *Čekají na mou kontrolu*, *Všechny pull requesty*) |
 | `Enter` na řádku filtru, poskytovatele nebo repozitáře | Otevřít tento rozbalovací seznam. Seznam poskytovatelů končí volbou **Žádný (odpojit tento repozitář)** |
-| `.`, nebo pravé tlačítko | Nabídka řádku: otevřít v prohlížeči, kopírovat URL nebo číslo, checkout zdrojové větve (pull requesty); vytvořit větev z issue (issues) |
+| `.`, nebo pravé tlačítko | Nabídka řádku: otevřít konverzaci, otevřít v prohlížeči, kopírovat URL nebo číslo, checkout zdrojové větve (pull requesty); vytvořit větev z issue (issues) |
 
 ### Tabule issues
 
@@ -1523,7 +1523,7 @@ níže je také příkazem z palety (**Tabule: ...**).
 | Šipky | Vybrat kartu (`Up`, `Down`) nebo sousední sloupec (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` skáčou ve sloupci |
 | `Shift+Left`, `Shift+Right` | Přesunout vybranou kartu do předchozího nebo dalšího sloupce |
 | `m` | **Přesunout kartu do...**: rozbalovací seznam sloupců |
-| `Enter` | Otevřít issue (u lokálního issue poznámku; jinak stránku hostitele) |
+| `Enter` | Otevřít [konverzaci](hosting-integration.md#5c-konverzace) issue (stránku hostitele, kde hostitel žádnou ke čtení nemá) |
 | `e`, `.` | Upravit řešitele, štítky nebo milník; nabídka karty |
 | `n` | Nové issue ve vybraném sloupci |
 | `a`, `l`, `M`, `/` | Filtrovat podle řešitele, štítku, milníku, textu. `x` filtry zruší |
@@ -1533,6 +1533,41 @@ níže je také příkazem z palety (**Tabule: ...**).
 
 Myš: přetažením karty na jiný sloupec ji přesunete, kliknutím kartu vyberete, dvojklikem otevřete, pravým tlačítkem
 otevřete nabídku karty, kolečkem posouváte sloupec, `Shift`+kolečko (nebo lišta pod tabulí) posouvá sloupce.
+
+### Markdown editor a pohled konverzace
+
+Každé pole, jehož text jde hostiteli (komentář, odpověď, shrnutí kontroly, popis nové issue nebo pull requestu), je týž editor. Jeho klávesy jsou v tabulce `md_editor` výše a dají se předefinovat.
+
+| Klávesa | Akce |
+|---|---|
+| `Alt+P` | Přepnout **Psát** a **Náhled** (z **Vedle sebe** přejde na Náhled) |
+| `Alt+L` | Zapnout **Vedle sebe**, nebo zpět na Psát (vyžaduje okno široké 100 sloupců) |
+| `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` | Odeslat text (totéž udělá vlastní tlačítko formuláře) |
+| `Alt+E` | **Napsat pomocí AI**: otevře nebo zavře panel pod lištou režimů (jen se zapnutou AI) |
+| `Alt+R` | Jen composer commitů: vložit odkaz na issue |
+| `Alt+W` | Formuláře nové issue a pull requestu: vytvořit na vlastní webové stránce poskytovatele |
+| `Esc` | V panelu **Napsat pomocí AI**: zastavit běžící návrh, jinak zavřít panel |
+
+V [pohledu konverzace](hosting-integration.md#5c-konverzace) issue nebo žádosti (řádky palety *Konverzace: ...*; řádky s klávesou jsou v seznamu palety výše):
+
+| Klávesa | Akce |
+|---|---|
+| `r` | Odpovědět na vybraný záznam (do jeho vlákna, nebo s citací jeho textu u hostitele bez vláken) |
+| `Q` | Citovat vybraný záznam v novém komentáři |
+| `c` | Nový komentář |
+| `e`, `d` | Upravit, smazat jeden z vašich komentářů |
+| `Alt+I` | V poli komentáře: **Interní poznámka** (GitLab, Redmine) |
+| `l`, `y`, `o` | Odkazy záznamu, zkopírovat jeho adresu, otevřít ho v prohlížeči |
+| `n` | Další nepřečtený záznam |
+| `v`, `m`, `F5` | Zobrazit nebo skrýt události, načíst starší záznamy, obnovit |
+| `g` | Otevřít diagram záznamu (blok `mermaid`) |
+| `Alt+Left`, `Backspace` | Zpět podle zásobníku položek otevřených z odkazů |
+| `Tab` | Časová osa, pole komentáře, tlačítka záhlaví |
+| `q`, `Esc` | Zavřít |
+
+V Radaru `i` otevře konverzaci řádku issue.
+
+Na řádku pull requestu nebo issue v sekcích postranního panelu `Enter` otevře konverzaci a `o` otevře řádek v prohlížeči.
 
 ### Flow (workflow větvení)
 

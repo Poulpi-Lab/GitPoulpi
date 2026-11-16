@@ -66,6 +66,8 @@ pub(crate) enum Hit {
     Btn(Btn, usize),
     /// A link of the last paint's list (`Conversation::link`).
     Link(usize),
+    /// The `path:line` of the code thread of item `n`.
+    Code(usize),
     LoadOlder,
 }
 
@@ -132,6 +134,9 @@ pub(crate) struct Conversation {
     pub(crate) hits: Vec<(Rect, Hit)>,
     pub(crate) links: Vec<LinkTarget>,
     pub(crate) hover: Option<Hit>,
+    /// A code thread's `path:line` is a link to the code (the review's
+    /// Overview, which has the Files page to open it on).
+    pub(crate) code_links: bool,
     /// The area the last paint used.
     pub(crate) area: Rect,
     // writes
@@ -204,6 +209,7 @@ impl Conversation {
             hits: Vec::new(),
             links: Vec::new(),
             hover: None,
+            code_links: false,
             area: Rect::default(),
             posted: Default::default(),
             write_ctx: None,
@@ -566,6 +572,47 @@ impl Conversation {
             self.sel_key = i.key.clone();
         }
         self.follow = true;
+    }
+
+    /// Selects the code thread `id` (false: it is not in the timeline).
+    pub(crate) fn select_thread(&mut self, id: &str) -> bool {
+        let key = format!("t{id}");
+        match self.layout.items.iter().position(|i| i.key == key) {
+            Some(i) => {
+                self.select(i);
+                true
+            }
+            None => false,
+        }
+    }
+
+    /// Whether the selected entry is the code thread `id`.
+    pub(crate) fn selected_is_thread(&self, id: &str) -> bool {
+        self.selected().is_some_and(|i| i.key == format!("t{id}"))
+    }
+
+    /// The rect of the first `path:line` link of the last paint.
+    #[cfg(test)]
+    pub(crate) fn code_link_rect(&self) -> Option<Rect> {
+        self.hits
+            .iter()
+            .find(|(_, h)| matches!(h, Hit::Code(_)))
+            .map(|(r, _)| *r)
+    }
+
+    /// Where the selected entry's code is, when it is a code thread.
+    pub(crate) fn selected_code(&self) -> Option<crate::item_cmd::CodeRef> {
+        let Some(TimelineEntry::Thread(t)) = self.selected_entry() else {
+            return None;
+        };
+        Some(crate::item_cmd::CodeRef {
+            thread_id: t.id.clone(),
+            path: t.path.clone(),
+            line: t.line,
+            original_line: t.original_line,
+            old_side: t.side == gitpoulpi_hosting::DiffSide::Old,
+            outdated: t.outdated || t.line.is_none(),
+        })
     }
 
     pub(crate) fn selected(&self) -> Option<&rows::Item> {

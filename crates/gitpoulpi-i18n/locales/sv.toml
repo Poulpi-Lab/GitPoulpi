@@ -3620,6 +3620,8 @@ review_reply = "Granskning: Svara i tråd..."
 # context: command palette entry
 review_resolve = "Granskning: Lös eller öppna tråd igen"
 # context: command palette entry
+review_back_to_comment = "Review: Back to Comment in Overview"
+# context: command palette entry
 review_fold_thread = "Granskning: Fäll ihop eller ut tråd"
 # context: command palette entry
 review_edit_pending = "Granskning: Redigera väntande kommentar..."
@@ -7232,6 +7234,14 @@ why_not_on_diff = "öppna en sida som listar ändringar först"
 why_not_on_code = "placera markören på en kodrad först"
 # context: why a row is off
 why_not_on_thread = "placera markören på en kommentarstråd först"
+# context: button on the Files page after jumping from a comment: returns to that comment in the Overview
+back_to_overview = "Back to Overview"
+# context: why Back to Comment does nothing. Width budget: 50 cells
+why_no_return = "no comment to go back to"
+# context: status line: the commented file is not in the diff. {path} is a file path
+thread_not_in_diff = "{path} is not in the diff of this request"
+# context: status line: the thread's line no longer exists; {path} is a file path
+thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
 # context: why a row is off
 why_no_resolve = "den här tråden kan inte lösas"
 # context: why a row is off
@@ -10100,6 +10110,12 @@ open_diagram = "Öppna diagram"
 link_diagram = "Diagram: {first}"
 why_no_diagram = "den valda posten har inget diagram"
 palette_open_diagram = "Konversation: Öppna postens diagram"
+# context: command palette entry
+palette_open_code = "Conversation: Open Code of Thread"
+# context: why Open Code does nothing. Width budget: 50 cells
+why_no_code = "the selected entry is not a code thread"
+# context: why Open Code does nothing outside a review. Width budget: 50 cells
+why_no_code_here = "open the review of this request to reach its code"
 why_no_url = "den här posten har ingen sida på värden"
 why_no_events = "den här värden listar inga händelser"
 why_no_reply = "den här värden tar inte emot svar på den här posten"

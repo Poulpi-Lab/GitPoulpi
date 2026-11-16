@@ -3618,6 +3618,8 @@ review_reply = "İnceleme: Yorum Dizisini Yanıtla..."
 # context: command palette entry
 review_resolve = "İnceleme: Yorum Dizisini Çöz veya Yeniden Aç"
 # context: command palette entry
+review_back_to_comment = "Review: Back to Comment in Overview"
+# context: command palette entry
 review_fold_thread = "İnceleme: Yorum Dizisini Daralt veya Genişlet"
 # context: command palette entry
 review_edit_pending = "İnceleme: Bekleyen Yorumu Düzenle..."
@@ -7231,6 +7233,14 @@ why_not_on_diff = "önce değişiklikleri listeleyen bir sayfa açın"
 why_not_on_code = "önce imleci bir kod satırına getirin"
 # context: why a row is off
 why_not_on_thread = "önce imleci bir yorum dizisine getirin"
+# context: button on the Files page after jumping from a comment: returns to that comment in the Overview
+back_to_overview = "Back to Overview"
+# context: why Back to Comment does nothing. Width budget: 50 cells
+why_no_return = "no comment to go back to"
+# context: status line: the commented file is not in the diff. {path} is a file path
+thread_not_in_diff = "{path} is not in the diff of this request"
+# context: status line: the thread's line no longer exists; {path} is a file path
+thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
 # context: why a row is off
 why_no_resolve = "bu yorum dizisi çözülemez"
 # context: why a row is off
@@ -10099,6 +10109,12 @@ open_diagram = "Diyagramı aç"
 link_diagram = "Diyagram: {first}"
 why_no_diagram = "seçili kayıtta diyagram yok"
 palette_open_diagram = "Konuşma: Kaydın Diyagramını Aç"
+# context: command palette entry
+palette_open_code = "Conversation: Open Code of Thread"
+# context: why Open Code does nothing. Width budget: 50 cells
+why_no_code = "the selected entry is not a code thread"
+# context: why Open Code does nothing outside a review. Width budget: 50 cells
+why_no_code_here = "open the review of this request to reach its code"
 why_no_url = "bu kaydın sunucuda sayfası yok"
 why_no_events = "bu sunucu olayları listelemiyor"
 why_no_reply = "bu sunucu bu kayda yanıt kabul etmiyor"

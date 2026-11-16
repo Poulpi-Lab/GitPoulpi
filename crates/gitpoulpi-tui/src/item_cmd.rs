@@ -8,6 +8,20 @@
 
 use gitpoulpi_i18n::msg::item_view as msg;
 
+/// The code a thread is about: where `Open Code` goes.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct CodeRef {
+    pub(crate) thread_id: String,
+    pub(crate) path: String,
+    /// The line it sits on now (`None` once outdated).
+    pub(crate) line: Option<u32>,
+    /// The line it was written on.
+    pub(crate) original_line: Option<u32>,
+    /// On the old (deleted) side of the diff.
+    pub(crate) old_side: bool,
+    pub(crate) outdated: bool,
+}
+
 /// What the palette needs to know to gray an item-view command out. Plain
 /// data (`Copy`): the reasons are resolved by the view.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -21,6 +35,9 @@ pub(crate) struct ItemAvail {
     pub(crate) has_links: bool,
     /// The selected entry holds a Mermaid diagram.
     pub(crate) has_diagram: bool,
+    /// Why Open Code is not offered (`None`: the selected entry is a code
+    /// thread and the view can open code).
+    pub(crate) code: Option<&'static str>,
     /// The selected entry has a page on the host.
     pub(crate) has_url: bool,
     /// Why a reply to the selected entry is not offered (`None`: it is).
@@ -57,6 +74,8 @@ pub(crate) enum ItemCmd {
     Links,
     /// Open the Mermaid diagram of the selected entry.
     OpenDiagram,
+    /// Open the code of the selected thread (the review's Files page).
+    OpenCode,
     CopyLink,
     OpenBrowser,
     Edit,
@@ -104,6 +123,7 @@ impl ItemCmd {
             }
             Self::Links => (!a.has_links).then_some(msg::WHY_NO_LINKS.get()),
             Self::OpenDiagram => (!a.has_diagram).then_some(msg::WHY_NO_DIAGRAM.get()),
+            Self::OpenCode => a.code,
             Self::CopyLink => (!a.has_url).then_some(msg::WHY_NO_URL.get()),
             Self::Edit => a.edit,
             Self::Delete => a.delete,

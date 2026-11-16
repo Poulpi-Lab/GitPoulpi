@@ -3617,6 +3617,8 @@ review_reply = "Kontrola: Odpovědět ve vlákně..."
 # context: command palette entry
 review_resolve = "Kontrola: Vyřešit nebo znovu otevřít vlákno"
 # context: command palette entry
+review_back_to_comment = "Review: Back to Comment in Overview"
+# context: command palette entry
 review_fold_thread = "Kontrola: Sbalit nebo rozbalit vlákno"
 # context: command palette entry
 review_edit_pending = "Kontrola: Upravit čekající komentář..."
@@ -7222,6 +7224,14 @@ why_not_on_diff = "nejdřív otevřete stránku, která uvádí změny"
 why_not_on_code = "nejdřív umístěte kurzor na řádek kódu"
 # context: why a row is off
 why_not_on_thread = "nejdřív umístěte kurzor na vlákno komentářů"
+# context: button on the Files page after jumping from a comment: returns to that comment in the Overview
+back_to_overview = "Back to Overview"
+# context: why Back to Comment does nothing. Width budget: 50 cells
+why_no_return = "no comment to go back to"
+# context: status line: the commented file is not in the diff. {path} is a file path
+thread_not_in_diff = "{path} is not in the diff of this request"
+# context: status line: the thread's line no longer exists; {path} is a file path
+thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
 # context: why a row is off
 why_no_resolve = "toto vlákno nelze vyřešit"
 # context: why a row is off
@@ -10219,6 +10229,12 @@ open_diagram = "Otevřít diagram"
 link_diagram = "Diagram: {first}"
 why_no_diagram = "vybraný záznam nemá diagram"
 palette_open_diagram = "Konverzace: Otevřít diagram záznamu"
+# context: command palette entry
+palette_open_code = "Conversation: Open Code of Thread"
+# context: why Open Code does nothing. Width budget: 50 cells
+why_no_code = "the selected entry is not a code thread"
+# context: why Open Code does nothing outside a review. Width budget: 50 cells
+why_no_code_here = "open the review of this request to reach its code"
 why_no_url = "tento záznam nemá stránku na hostiteli"
 why_no_events = "tento hostitel události nevypisuje"
 why_no_reply = "tento hostitel nepřijímá odpověď na tento záznam"

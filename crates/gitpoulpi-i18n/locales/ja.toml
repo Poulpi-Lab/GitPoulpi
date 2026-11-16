@@ -3618,6 +3618,8 @@ review_reply = "レビュー: スレッドに返信..."
 # context: command palette entry
 review_resolve = "レビュー: スレッドを解決／再開"
 # context: command palette entry
+review_back_to_comment = "Review: Back to Comment in Overview"
+# context: command palette entry
 review_fold_thread = "レビュー: スレッドを折りたたみ／展開"
 # context: command palette entry
 review_edit_pending = "レビュー: 保留中のコメントを編集..."
@@ -7228,6 +7230,14 @@ why_not_on_diff = "先に変更を一覧表示するページを開いてくだ�
 why_not_on_code = "先にカーソルをコードの行に置いてください"
 # context: why a row is off
 why_not_on_thread = "先にカーソルをコメントのスレッドに置いてください"
+# context: button on the Files page after jumping from a comment: returns to that comment in the Overview
+back_to_overview = "Back to Overview"
+# context: why Back to Comment does nothing. Width budget: 50 cells
+why_no_return = "no comment to go back to"
+# context: status line: the commented file is not in the diff. {path} is a file path
+thread_not_in_diff = "{path} is not in the diff of this request"
+# context: status line: the thread's line no longer exists; {path} is a file path
+thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
 # context: why a row is off
 why_no_resolve = "このスレッドは解決できません"
 # context: why a row is off
@@ -10096,6 +10106,12 @@ open_diagram = "図を開く"
 link_diagram = "図：{first}"
 why_no_diagram = "選択中の項目に図がありません"
 palette_open_diagram = "会話: 項目の図を開く"
+# context: command palette entry
+palette_open_code = "Conversation: Open Code of Thread"
+# context: why Open Code does nothing. Width budget: 50 cells
+why_no_code = "the selected entry is not a code thread"
+# context: why Open Code does nothing outside a review. Width budget: 50 cells
+why_no_code_here = "open the review of this request to reach its code"
 why_no_url = "この項目にはホスト上のページがありません"
 why_no_events = "このホストはイベントを一覧表示しません"
 why_no_reply = "このホストは、この項目への返信を受け付けません"

@@ -2378,6 +2378,12 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     )
     .requires(crate::build_features::Feature::Review),
     entry(
+        msg::palette::REVIEW_BACK_TO_COMMENT,
+        "Esc",
+        PaletteCommand::Review(crate::review_cmd::ReviewCmd::BackToComment),
+    )
+    .requires(crate::build_features::Feature::Review),
+    entry(
         msg::palette::REVIEW_FOLD_THREAD,
         "z",
         PaletteCommand::Review(crate::review_cmd::ReviewCmd::ToggleThread),
@@ -2727,6 +2733,12 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::Item(crate::item_cmd::ItemCmd::OpenDiagram),
     )
     .requires(crate::build_features::Feature::Mermaid),
+    entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_OPEN_CODE,
+        "G",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::OpenCode),
+    )
+    .requires(crate::build_features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_COPY_LINK,
         "y",

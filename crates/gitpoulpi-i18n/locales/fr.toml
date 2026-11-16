@@ -3621,6 +3621,8 @@ review_reply = "Revue : Répondre au fil de discussion..."
 # context: command palette entry
 review_resolve = "Revue : Résoudre ou rouvrir le fil de discussion"
 # context: command palette entry
+review_back_to_comment = "Revue : Retour au commentaire dans l'aperçu"
+# context: command palette entry
 review_fold_thread = "Revue : Replier ou déplier le fil de discussion"
 # context: command palette entry
 review_edit_pending = "Revue : Modifier le commentaire en attente..."
@@ -7244,6 +7246,14 @@ why_not_on_diff = "ouvrez d'abord une page qui liste des modifications"
 why_not_on_code = "placez d'abord le curseur sur une ligne de code"
 # context: why a row is off
 why_not_on_thread = "placez d'abord le curseur sur un fil de discussion"
+# context: button on the Files page after jumping from a comment: returns to that comment in the Overview
+back_to_overview = "Retour à l'aperçu"
+# context: why Back to Comment does nothing. Width budget: 50 cells
+why_no_return = "aucun commentaire où revenir"
+# context: status line: the commented file is not in the diff. {path} is a file path
+thread_not_in_diff = "{path} n'est pas dans le diff de cette demande"
+# context: status line: the thread's line no longer exists; {path} is a file path
+thread_outdated_nearest = "ce fil est obsolète : ligne la plus proche affichée dans {path}"
 # context: why a row is off
 why_no_resolve = "ce fil de discussion ne peut pas être résolu"
 # context: why a row is off
@@ -10112,6 +10122,12 @@ open_diagram = "Ouvrir le diagramme"
 link_diagram = "Diagramme : {first}"
 why_no_diagram = "l'entrée choisie n'a pas de diagramme"
 palette_open_diagram = "Conversation : Ouvrir le diagramme de l'entrée"
+# context: command palette entry
+palette_open_code = "Conversation : Ouvrir le code du fil de discussion"
+# context: why Open Code does nothing. Width budget: 50 cells
+why_no_code = "l'entrée choisie n'est pas un fil sur du code"
+# context: why Open Code does nothing outside a review. Width budget: 50 cells
+why_no_code_here = "ouvrez la revue de cette demande pour accéder à son code"
 why_no_url = "cette entrée n'a pas de page sur l'hébergeur"
 why_no_events = "cet hébergeur ne liste pas d'événements"
 why_no_reply = "cet hébergeur n'accepte pas de réponse à cette entrée"

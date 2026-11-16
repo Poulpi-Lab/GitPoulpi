@@ -3617,6 +3617,8 @@ review_reply = "评审：回复讨论…"
 # context: command palette entry
 review_resolve = "评审：解决或重新打开讨论"
 # context: command palette entry
+review_back_to_comment = "Review: Back to Comment in Overview"
+# context: command palette entry
 review_fold_thread = "评审：折叠或展开讨论"
 # context: command palette entry
 review_edit_pending = "评审：编辑待处理评论…"
@@ -7228,6 +7230,14 @@ why_not_on_diff = "请先打开列出更改的页面"
 why_not_on_code = "请先把光标放在一行代码上"
 # context: why a row is off
 why_not_on_thread = "请先把光标放在一个评论讨论上"
+# context: button on the Files page after jumping from a comment: returns to that comment in the Overview
+back_to_overview = "Back to Overview"
+# context: why Back to Comment does nothing. Width budget: 50 cells
+why_no_return = "no comment to go back to"
+# context: status line: the commented file is not in the diff. {path} is a file path
+thread_not_in_diff = "{path} is not in the diff of this request"
+# context: status line: the thread's line no longer exists; {path} is a file path
+thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
 # context: why a row is off
 why_no_resolve = "此讨论无法解决"
 # context: why a row is off
@@ -10096,6 +10106,12 @@ open_diagram = "打开图表"
 link_diagram = "图表：{first}"
 why_no_diagram = "所选条目没有图表"
 palette_open_diagram = "对话：打开条目的图表"
+# context: command palette entry
+palette_open_code = "Conversation: Open Code of Thread"
+# context: why Open Code does nothing. Width budget: 50 cells
+why_no_code = "the selected entry is not a code thread"
+# context: why Open Code does nothing outside a review. Width budget: 50 cells
+why_no_code_here = "open the review of this request to reach its code"
 why_no_url = "此条目在托管平台上没有页面"
 why_no_events = "此托管平台不列出事件"
 why_no_reply = "此托管平台不接受对此条目的回复"

@@ -68,6 +68,8 @@ pub(super) enum Hit {
     Bar(crate::diff_view::DiffBarButton),
     /// The bar's `⋯`: the list of the buttons it had no room for.
     BarMore,
+    /// "Back to Overview": from the code a comment opened.
+    BackToComment,
 }
 
 /// How a suggestion's severity is coloured.
@@ -238,6 +240,21 @@ impl ReviewView {
             .map(|(_, l)| display_width(l) + 2)
             .sum::<usize>();
         let mut x = cx.saturating_sub(total as u16 + 1);
+        // After a jump from a comment: the way back, left of the tabs.
+        if self.ov_return.is_some() && self.tab == Tab::Files {
+            let text = format!(" \u{2039} {} ", msg::BACK_TO_OVERVIEW.get());
+            let w = display_width(&text) as u16;
+            let bx = x.saturating_sub(w + 1);
+            let style = if self.hovered(Hit::BackToComment) {
+                Style::default()
+                    .bg(th().ui.button_hover)
+                    .fg(th().ui.on_button)
+            } else {
+                Style::default().bg(th().ui.button).fg(th().ui.on_button)
+            };
+            let rect = dialog_kit::put(buf, bx, y, &text, w, style);
+            hits.push((rect, Hit::BackToComment));
+        }
         for (tab, label) in labels {
             let text = format!(" {label} ");
             let w = display_width(&text) as u16;
@@ -543,6 +560,9 @@ impl ReviewView {
                 .as_ref()
                 .map(|fd| self.build_files_render(fd, &key_name, width));
             self.set_pane_render(PaneId::Files, key, render);
+        }
+        if fd.is_some() {
+            self.apply_goto(&key_name);
         }
         let waiting = if key_name.is_empty() {
             None

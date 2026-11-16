@@ -3617,6 +3617,8 @@ review_reply = "Revisión: Responder al hilo..."
 # context: command palette entry
 review_resolve = "Revisión: Resolver o reabrir el hilo"
 # context: command palette entry
+review_back_to_comment = "Review: Back to Comment in Overview"
+# context: command palette entry
 review_fold_thread = "Revisión: Plegar o desplegar el hilo"
 # context: command palette entry
 review_edit_pending = "Revisión: Editar el comentario pendiente..."
@@ -7225,6 +7227,14 @@ why_not_on_diff = "abre antes una página que liste cambios"
 why_not_on_code = "pon antes el cursor en una línea de código"
 # context: why a row is off
 why_not_on_thread = "pon antes el cursor en un hilo de comentarios"
+# context: button on the Files page after jumping from a comment: returns to that comment in the Overview
+back_to_overview = "Back to Overview"
+# context: why Back to Comment does nothing. Width budget: 50 cells
+why_no_return = "no comment to go back to"
+# context: status line: the commented file is not in the diff. {path} is a file path
+thread_not_in_diff = "{path} is not in the diff of this request"
+# context: status line: the thread's line no longer exists; {path} is a file path
+thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
 # context: why a row is off
 why_no_resolve = "este hilo no se puede resolver"
 # context: why a row is off
@@ -10222,6 +10232,12 @@ open_diagram = "Abrir diagrama"
 link_diagram = "Diagrama: {first}"
 why_no_diagram = "la entrada seleccionada no tiene ningún diagrama"
 palette_open_diagram = "Conversación: Abrir el diagrama de la entrada"
+# context: command palette entry
+palette_open_code = "Conversation: Open Code of Thread"
+# context: why Open Code does nothing. Width budget: 50 cells
+why_no_code = "the selected entry is not a code thread"
+# context: why Open Code does nothing outside a review. Width budget: 50 cells
+why_no_code_here = "open the review of this request to reach its code"
 why_no_url = "esta entrada no tiene página en el host"
 why_no_events = "este host no lista eventos"
 why_no_reply = "este host no admite responder a esta entrada"

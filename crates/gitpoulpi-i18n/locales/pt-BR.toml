@@ -3633,6 +3633,8 @@ review_reply = "Revisão: responder à thread..."
 # context: command palette entry
 review_resolve = "Revisão: resolver ou reabrir a thread"
 # context: command palette entry
+review_back_to_comment = "Review: Back to Comment in Overview"
+# context: command palette entry
 review_fold_thread = "Revisão: recolher ou expandir a thread"
 # context: command palette entry
 review_edit_pending = "Revisão: editar comentário pendente..."
@@ -7249,6 +7251,14 @@ why_not_on_diff = "abra antes uma página que liste alterações"
 why_not_on_code = "coloque antes o cursor em uma linha de código"
 # context: why a row is off
 why_not_on_thread = "coloque antes o cursor em uma thread de comentários"
+# context: button on the Files page after jumping from a comment: returns to that comment in the Overview
+back_to_overview = "Back to Overview"
+# context: why Back to Comment does nothing. Width budget: 50 cells
+why_no_return = "no comment to go back to"
+# context: status line: the commented file is not in the diff. {path} is a file path
+thread_not_in_diff = "{path} is not in the diff of this request"
+# context: status line: the thread's line no longer exists; {path} is a file path
+thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
 # context: why a row is off
 why_no_resolve = "esta thread não pode ser resolvida"
 # context: why a row is off
@@ -10295,6 +10305,12 @@ link_diagram = "Diagrama: {first}"
 why_no_diagram = "a entrada selecionada não tem diagrama"
 # context: command palette entry
 palette_open_diagram = "Conversa: abrir o diagrama da entrada"
+# context: command palette entry
+palette_open_code = "Conversation: Open Code of Thread"
+# context: why Open Code does nothing. Width budget: 50 cells
+why_no_code = "the selected entry is not a code thread"
+# context: why Open Code does nothing outside a review. Width budget: 50 cells
+why_no_code_here = "open the review of this request to reach its code"
 # context: why copying or opening does nothing. Width budget: 50 cells
 why_no_url = "esta entrada não tem página no host"
 # context: why the events checkbox does nothing. Width budget: 50 cells

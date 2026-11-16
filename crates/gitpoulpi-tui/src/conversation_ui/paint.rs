@@ -26,6 +26,14 @@ fn muted() -> Style {
 }
 
 /// Writes `parts` one after the other from `x`; returns where they ended.
+/// `path:line` of a thread (the line it was written on when it is outdated).
+pub(crate) fn thread_place(t: &gitpoulpi_hosting::conversation::CodeThread) -> String {
+    match t.line.or(t.original_line) {
+        Some(line) => format!("{}:{line}", sanitize(&t.path)),
+        None => sanitize(&t.path),
+    }
+}
+
 fn put_parts(
     buf: &mut Buffer,
     mut x: u16,
@@ -197,6 +205,10 @@ impl Conversation {
                 }
                 Row::ThreadHead(i) => {
                     let end = self.paint_thread_head(buf, content_x, y, content_max, *i, bg);
+                    if let Some(rect) = self.thread_place_rect(content_x, y, content_max, *i) {
+                        crate::pointer_map::hand(rect);
+                        row_hits.push((rect, Hit::Code(*i)));
+                    }
                     if *i == self.sel {
                         self.paint_buttons(buf, body, y, end, *i, &mut row_hits);
                     }
@@ -360,9 +372,21 @@ impl Conversation {
         let Some(TimelineEntry::Thread(t)) = self.entries.get(e) else {
             return x;
         };
-        let place = match t.line.or(t.original_line) {
-            Some(line) => format!("{}:{line}", sanitize(&t.path)),
-            None => sanitize(&t.path),
+        let place = thread_place(t);
+        let link = self.code_links;
+        let hot = self.hover == Some(Hit::Code(item));
+        let place_style = if link {
+            // A link: the accent, underlined; lit under the pointer.
+            let s = Style::default()
+                .fg(th().ui.accent)
+                .add_modifier(Modifier::UNDERLINED);
+            if hot {
+                s.add_modifier(Modifier::BOLD)
+            } else {
+                s
+            }
+        } else {
+            Style::default().fg(th().ui.text)
         };
         let mut parts = vec![
             (
@@ -371,7 +395,8 @@ impl Conversation {
                     .fg(th().ui.accent)
                     .add_modifier(Modifier::BOLD),
             ),
-            (format!("  {place}"), Style::default().fg(th().ui.text)),
+            ("  ".to_string(), Style::default()),
+            (place, place_style),
         ];
         if t.resolved {
             parts.push((
@@ -399,6 +424,27 @@ impl Conversation {
             ));
         }
         put_parts(buf, x, y, x + max, &parts, bg)
+    }
+
+    /// Where the "path:line" of a thread's headline was painted, when it is
+    /// a link (the review's Overview).
+    fn thread_place_rect(&self, x: u16, y: u16, max: u16, item: usize) -> Option<Rect> {
+        if !self.code_links {
+            return None;
+        }
+        let What::Entry(e) = self.layout.items.get(item)?.what else {
+            return None;
+        };
+        let TimelineEntry::Thread(t) = self.entries.get(e)? else {
+            return None;
+        };
+        let start = x + display_width(m::THREAD.get()) as u16 + 2;
+        let limit = x + max;
+        if start >= limit {
+            return None;
+        }
+        let w = (display_width(&thread_place(t)) as u16).min(limit - start);
+        Some(Rect::new(start, y, w, 1))
     }
 
     #[allow(clippy::too_many_arguments)]

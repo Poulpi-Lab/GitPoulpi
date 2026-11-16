@@ -3616,6 +3616,8 @@ review_reply = "Przegląd: Odpowiedz w wątku..."
 # context: command palette entry
 review_resolve = "Przegląd: Rozwiąż lub otwórz ponownie wątek"
 # context: command palette entry
+review_back_to_comment = "Review: Back to Comment in Overview"
+# context: command palette entry
 review_fold_thread = "Przegląd: Zwiń lub rozwiń wątek"
 # context: command palette entry
 review_edit_pending = "Przegląd: Edytuj oczekujący komentarz..."
@@ -7227,6 +7229,14 @@ why_not_on_diff = "najpierw otwórz stronę z listą zmian"
 why_not_on_code = "najpierw ustaw kursor na linii kodu"
 # context: why a row is off
 why_not_on_thread = "najpierw ustaw kursor na wątku komentarzy"
+# context: button on the Files page after jumping from a comment: returns to that comment in the Overview
+back_to_overview = "Back to Overview"
+# context: why Back to Comment does nothing. Width budget: 50 cells
+why_no_return = "no comment to go back to"
+# context: status line: the commented file is not in the diff. {path} is a file path
+thread_not_in_diff = "{path} is not in the diff of this request"
+# context: status line: the thread's line no longer exists; {path} is a file path
+thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
 # context: why a row is off
 why_no_resolve = "tego wątku nie można rozwiązać"
 # context: why a row is off
@@ -10095,6 +10105,12 @@ open_diagram = "Otwórz diagram"
 link_diagram = "Diagram: {first}"
 why_no_diagram = "zaznaczony wpis nie ma diagramu"
 palette_open_diagram = "Rozmowa: Otwórz diagram wpisu"
+# context: command palette entry
+palette_open_code = "Conversation: Open Code of Thread"
+# context: why Open Code does nothing. Width budget: 50 cells
+why_no_code = "the selected entry is not a code thread"
+# context: why Open Code does nothing outside a review. Width budget: 50 cells
+why_no_code_here = "open the review of this request to reach its code"
 why_no_url = "ten wpis nie ma strony na hoście"
 why_no_events = "ten host nie podaje zdarzeń"
 why_no_reply = "ten host nie przyjmuje odpowiedzi na ten wpis"

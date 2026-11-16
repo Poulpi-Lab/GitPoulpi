@@ -1511,7 +1511,7 @@ sectie ISSUES. Zie
 
 | Toets | Actie |
 |---|---|
-| `Enter` | De geselecteerde rij in de browser openen. Op een rij `Opnieuw verbinden`: de Instellingen op dat profiel openen |
+| `Enter` | De geselecteerde rij openen: een issue (en een verzoek op Azure DevOps of Bitbucket) als [gesprek](hosting-integration.md#5c-gesprekken), een pull request in de [review](review.md) op de hosts die er een hebben, al het andere in de browser. Op een rij `Opnieuw verbinden`: de Instellingen op dat profiel openen |
 | `Space` | De sectie uit- of inklappen |
 | `v` | Het filter van de sectie openen. Pull requests: Open, Merged / gesloten, Alle. Issues: Open, Aan mij toegewezen, Gesloten, Alle |
 | `n` | Sectie pull requests: een pull request maken. Sectie ISSUES: nieuw issue. (De knop `+` van de kop) |
@@ -1519,7 +1519,7 @@ sectie ISSUES. Zie
 | `Enter` op de zoekrij | In het zoekveld typen. `Enter`, `Tab` of `Esc` verlaat het; `Ctrl+U` wist het |
 | `Enter` op een groepskop | De groep in- of uitklappen (*Mijn Pull Requests*, *Aan mij toegewezen*, *Wacht op mijn review*, *Alle Pull Requests*) |
 | `Enter` op de rij van filter, provider of repository | Die keuzelijst openen. De providerlijst eindigt met **Geen (ontkoppel deze repository)** |
-| `.`, of een rechtsklik | Het menu van de rij: in de browser openen, URL of nummer kopiëren, de bronbranch uitchecken (pull requests); een branch maken vanuit het issue (issues) |
+| `.`, of een rechtsklik | Het menu van de rij: het gesprek openen, in de browser openen, URL of nummer kopiëren, de bronbranch uitchecken (pull requests); een branch maken vanuit het issue (issues) |
 
 ### Het issuebord
 
@@ -1532,7 +1532,7 @@ hieronder is ook een paletopdracht (**Bord: ...**).
 | Pijlen | Een kaart selecteren (`Up`, `Down`) of de naburige kolom (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` springen in de kolom |
 | `Shift+Left`, `Shift+Right` | De geselecteerde kaart naar de vorige of volgende kolom verplaatsen |
 | `m` | **Kaart verplaatsen naar...**: een keuzelijst van de kolommen |
-| `Enter` | Het issue openen (de notitie, bij een lokaal issue; anders de pagina van de host) |
+| `Enter` | Het [gesprek](hosting-integration.md#5c-gesprekken) van het issue openen (de pagina van de host als de host er geen heeft om te lezen) |
 | `e`, `.` | Toegewezenen, labels of mijlpaal bewerken; het kaartmenu |
 | `n` | Nieuw issue in de geselecteerde kolom |
 | `a`, `l`, `M`, `/` | Filteren op toegewezene, label, mijlpaal, tekst. `x` wist de filters |
@@ -1542,6 +1542,44 @@ hieronder is ook een paletopdracht (**Bord: ...**).
 
 Muis: sleep een kaart naar een andere kolom om hem te verplaatsen, klik op een kaart om hem te selecteren, dubbelklik om hem te openen, klik met rechts voor
 het kaartmenu, gebruik het wiel om een kolom te scrollen, `Shift`+wiel (of de balk onder het bord) om de kolommen te scrollen.
+
+### De Markdown-composer en de gespreksweergave
+
+Elk vak waarvan de tekst naar een host gaat (een opmerking, een antwoord, een reviewsamenvatting, de beschrijving van een nieuw
+issue of een nieuwe pull request) is dezelfde composer. Zijn toetsen staan in de tabel `md_editor` hierboven en kunnen worden
+herbonden.
+
+| Toets | Actie |
+|---|---|
+| `Alt+P` | **Schrijven** en **Voorbeeld** wisselen (vanuit **Gesplitst** ga je naar Voorbeeld) |
+| `Alt+L` | **Gesplitst** aan, of terug naar Schrijven (vraagt een venster van 100 kolommen) |
+| `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` | De tekst verzenden (de eigen knop van het formulier doet hetzelfde) |
+| `Alt+E` | **Schrijven met AI**: opent of sluit het paneel onder de modusbalk (alleen met AI aan) |
+| `Alt+R` | Alleen de commit-composer: een issueverwijzing invoegen |
+| `Alt+W` | De formulieren voor een nieuw issue en een nieuwe pull request: aanmaken op de eigen webpagina van de provider |
+| `Esc` | In het paneel van **Schrijven met AI**: een lopend concept stoppen, anders het paneel sluiten |
+
+In de [gespreksweergave](hosting-integration.md#5c-gesprekken) van een issue of een verzoek (paletrijen
+*Gesprek: ...*; de rijen met een toets staan in de paletlijst hierboven):
+
+| Toets | Actie |
+|---|---|
+| `r` | Antwoorden op het geselecteerde item (in zijn discussie, of met zijn tekst geciteerd op een host zonder discussies) |
+| `Q` | Het geselecteerde item citeren in een nieuwe opmerking |
+| `c` | Nieuwe opmerking |
+| `e`, `d` | Een van je eigen opmerkingen bewerken, verwijderen |
+| `Alt+I` | In het opmerkingsvak: **Interne notitie** (GitLab, Redmine) |
+| `l`, `y`, `o` | Links van het item, zijn adres kopiëren, het in de browser openen |
+| `n` | Volgend nieuw item |
+| `v`, `m`, `F5` | Gebeurtenissen tonen of verbergen, oudere items laden, vernieuwen |
+| `g` | Het diagram van het item openen (een `mermaid`-blok) |
+| `Alt+Left`, `Backspace` | Terug langs de stapel van items die uit verwijzingen zijn geopend |
+| `Tab` | Tijdlijn, opmerkingsvak, knoppen in de kop |
+| `q`, `Esc` | Sluiten |
+
+In de Radar opent `i` het gesprek van een issuerij.
+
+Op een pull-request- of issuerij van de zijbalksecties opent `Enter` het gesprek en opent `o` de rij in de browser.
 
 ### Flow (branchingworkflows)
 

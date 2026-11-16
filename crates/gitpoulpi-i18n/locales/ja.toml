@@ -1343,7 +1343,7 @@ hint_back = "タブに戻る"
 hint_quit = "終了"
 not_a_repo_any_more = "{path} はもう git リポジトリではありません - {key} で一覧から削除してください"
 gone_from_disk_msg = "{path} はディスク上に存在しません - {key} で一覧から削除してください"
-open_in_gone = "{path} is gone from disk, there is nothing to open"
+open_in_gone = "{path} はディスク上に存在しないため、開くものがありません"
 actions_need_tab = "{key} の操作には、開いているリポジトリのタブが必要です"
 home_tab_fixed = "ホームタブにはタブメニューがなく、閉じることもできません"
 
@@ -2432,8 +2432,8 @@ status_stage_toggle = { git = "選択行の{$stage}／{$unstage}", local = "選�
 status_open_diff = { git = "選択中のファイルの{$Diff}を開く", local = "選択中のファイルの{$Diff}を開く" }
 home_favorite = "リポジトリのお気に入りを切り替え"
 home_close_repo = "行を閉じる、削除、またはお気に入り解除"
-home_copy_path = "Copy the Repository Path"
-home_open_in = "Open the Repository in the Default Tool"
+home_copy_path = "リポジトリのパスをコピー"
+home_open_in = "リポジトリを既定のツールで開く"
 home_browse = "リポジトリを参照"
 home_clone = "リポジトリをクローン"
 home_init = "リポジトリを初期化"
@@ -3315,8 +3315,8 @@ repositories_collapse_all_sections = "リポジトリ一覧: すべてのセク�
 repositories_expand_all_sections = "リポジトリ一覧: すべてのセクションを展開"
 repositories_close_all_tabs = "リポジトリ一覧: すべてのタブを閉じる..."
 repositories_remove_selected_from_list = "リポジトリ一覧: 選択中のものを一覧から削除"
-repositories_copy_selected_path = "Repositories: Copy Selected Path"
-repositories_open_selected_in = "Repositories: Open Selected in Default Tool"
+repositories_copy_selected_path = "リポジトリ一覧: 選択中のパスをコピー"
+repositories_open_selected_in = "リポジトリ一覧: 選択中のものを既定のツールで開く"
 repositories_remove_all_recent = "リポジトリ一覧: 最近の項目をすべて削除"
 tab_new_tab = "タブ: 新しいタブ"
 tab_new_menu = "タブ: 新規..."
@@ -3387,7 +3387,7 @@ ai_explain_working_changes = "AI: 作業中の変更を説明"
 ai_insert_prompt_variable = "AI: プロンプト変数を挿入"
 ai_compose_commits_from_working_changes = { git = "AI: 作業中の変更から{$Commit}を構成...", local = "AI: 作業中の変更から{$Commit}を構成..." }
 # context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
-stage_guard_show_in_file = "Sensitive Files: Show in File"
+stage_guard_show_in_file = "機密ファイル: ファイル内で表示"
 composer_move_file_to_commit = { git = "コンポーザー: ファイルを{$Commit}へ移動...", local = "コンポーザー: ファイルを{$Commit}へ移動..." }
 diff_blame = "{$Diff}: Blame"
 diff_history = "{$Diff}: ファイル履歴"
@@ -3442,7 +3442,7 @@ why_no_text_selected_drag_over_the_text_first = "テキストが選択されて�
 why_the_diff_view_isn_t_open = { git = "{$diff}ビューが開いていません", local = "差分ビューが開いていません" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "先にファイルを開いてください - {$diff}ビュー、Status ペイン、または{$commit}から", local = "先にファイルを開いてください - 差分ビュー、Status ペイン、またはコミットから" }
 # context: why that palette command is unavailable
-why_no_sensitive_files_question = "no sensitive files question is open"
+why_no_sensitive_files_question = "機密ファイルの確認は開かれていません"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "先に Refs ペインでブランチまたは{$tag}を選択してください", local = "先に Refs ペインでブランチまたは{$tag}を選択してください" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "リモートブランチのチェックアウトにはまだ対応していません - 先にローカルの追跡ブランチを作成してください"
 why_select_a_local_branch_in_the_refs_pane_first = "先に Refs ペインでローカルブランチを選択してください"
@@ -4069,7 +4069,7 @@ repositories_and_tabs_open_in = "このタブのフォルダーを開く先の�
 repositories_and_tabs_7 = "選択中のリポジトリを開く（または切り替える）"
 repositories_and_tabs_8 = "お気に入りの追加/解除"
 repositories_and_tabs_9 = "タブを閉じる（開いている）、削除（最近）、お気に入り解除（お気に入り）"
-repositories_and_tabs_copy_open = "copy the path / open in the default tool"
+repositories_and_tabs_copy_open = "パスをコピー / 既定のツールで開く"
 repositories_and_tabs_10 = "行のメニュー"
 repositories_and_tabs_11 = "すべてのセクションを検索"
 repositories_and_tabs_12 = "クリア / タブに戻る"
@@ -5620,9 +5620,9 @@ too_large = "ファイルが大きすぎて表示できません（{bytes} バ�
 unexpected = "予期しない応答"
 loading_whole = "ファイル全体を読み込み中...（ハンクボタンで変更点のみを表示）"
 whole_unavailable = "（ファイル全体は利用できません：{why} - ハンクのみ表示中）"
-renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header = "{from} -> {to}（{percent}% 類似）"
 renamed_header_plain = "{from} -> {to}"
-rename_no_change = "No content change (the file was only renamed or moved)"
+rename_no_change = "内容の変更はありません（ファイルは名前変更または移動されただけです）"
 
 [git_actions]
 no_such_local_branch = "そのローカルブランチはもう存在しません - 更新してください"
@@ -9335,7 +9335,7 @@ answer_cancel = "キャンセル（何も{$stage}しない）"
 # context: key hint at the bottom of the dialog
 hint = "↑/↓: 選択、Enter または 1/2: 回答、Esc: キャンセル"
 # context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
-show_in_file = "Show in file"
+show_in_file = "ファイル内で表示"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "機密ファイルは{$staged}されませんでした：{files}。ユーザーに確認し、機密ファイルを許可して再度{$stage}してください"
 
@@ -10160,17 +10160,17 @@ flavor_plain_text = "プレーンテキスト"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
-title = "Edit a {$commit} of another branch"
+title = "別のブランチの{$commit}を編集"
 # context: body of that dialog when local branches hold the commit; {short} is the short commit id
-body_branches = "{short} is not on the current branch. Check out a branch that holds it to edit it here."
+body_branches = "{short} は現在のブランチにありません。ここで編集するには、これを含むブランチをチェックアウトしてください。"
 # context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
-body_none = "{short} is on no local branch. Create a branch at it to edit it here."
+body_none = "{short} はどのローカルブランチにもありません。ここで編集するには、これにブランチを作成してください。"
 # context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
-checkout = "Check out {branch} and edit"
+checkout = "{branch} をチェックアウトして編集"
 # context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
-rewrite = "Edit with advanced history rewrite"
+rewrite = "高度な履歴の書き換えで編集"
 # context: button that opens the name box to create a branch at that commit
-create = "Create a branch here..."
+create = "ここにブランチを作成..."
 # context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
 key_rewrite = "r"
 # context: key of the Create a branch here button, one letter
@@ -10178,4 +10178,4 @@ key_create = "b"
 # context: key of the Cancel button of that dialog, one letter
 key_cancel = "c"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
-gave_up = "{short} was not edited: the branch was not checked out"
+gave_up = "{short} は編集されませんでした：ブランチがチェックアウトされませんでした"

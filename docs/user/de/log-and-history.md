@@ -246,6 +246,23 @@ zweite Bestätigung. `Ctrl+Z` (Rückgängig der Symbolleiste) nimmt das Reword z
 siehe [Rückgängig und Wiederholen](undo-redo.md). Die Statuszeile nennt auch die
 vorherige Spitze des Branches.
 
+Ein Commit, der nicht auf dem ausgecheckten Branch liegt (er lebt auf einem anderen Branch),
+lässt sich dort, wo Sie sind, weder umformulieren noch ändern, deshalb öffnen *Commit-Nachricht bearbeiten...* und
+*Ändern...* stattdessen **Einen Commit eines anderen Branches bearbeiten**, eine Liste von Möglichkeiten
+(`Up` / `Down` oder `Ctrl+J` / `Ctrl+K` bewegen, `Enter` oder ein Klick wählt, `Esc`, das
+Kreuz oder **Abbrechen (A)** schließt sie):
+
+- **`<Branch>` auschecken und bearbeiten (1)**: eine Zeile je lokalem Branch, dessen Verlauf
+  den Commit enthält (`1` bis `8`, die ersten acht, der Rest wird mitgezählt). Der
+  Branch wird auf die übliche Weise ausgecheckt, dann öffnet sich die Bearbeitung darauf. Die Rückgängig-Geschichte
+  ist die der beiden Aktionen: `Ctrl+Z` nimmt die Bearbeitung zurück, das Auschecken bleibt ein
+  Auschecken.
+- **Mit erweitertem Umschreiben bearbeiten (U)**: öffnet die
+  [Werkbank zum Umschreiben des Verlaufs](history-rewrite.md) an diesem Commit, in Builds, die
+  sie haben.
+- **Branch hier erstellen... (B)**: nur wenn kein lokaler Branch den Commit enthält
+  (er liegt etwa nur auf einem Remote-Branch); öffnet das Namensfeld für einen Branch daran.
+
 ## Einen Commit ändern (Nachricht, Autor, Datum)
 
 *Ändern...* im Commit-Menü (oder `Ctrl+G Shift+E`, oder *Commit: Ändern...* in der Palette) öffnet einen einzigen Dialog für die Eigenschaften des Commits: Zusammenfassung, Beschreibung sowie Name, E-Mail und Datum des Autors, jeweils mit den Werten des Commits vorbelegt. Ändern Sie beliebige Felder und drücken Sie **Anwenden**; es werden nur die geänderten Felder gesendet. Ein Datum wird als `YYYY-MM-DD HH:MM:SS +HH:MM` geschrieben und in UTC angezeigt, bis Sie es bearbeiten. Als Committer werden Sie mit dem aktuellen Zeitpunkt eingetragen (wie bei einem Reword). Jeder Commit des ausgecheckten Branches lässt sich ändern, mit denselben Regeln, derselben Warnung für bereits gepushte Commits und derselben zweiten Bestätigung wie *Commit-Nachricht bearbeiten...*; die Commits darüber werden mit ihren eigenen Autoren und Daten neu erstellt, und Ihre gestagten und ungestagten Änderungen bleiben unberührt. `Ctrl+Z` (Rückgängig in der Symbolleiste) nimmt es zurück. In Builds mit Verlaufs-Umschreibung schließt **Verlauf weitergehend ändern...** (`Alt+H`) unten links im Dialog diesen, ohne etwas anzuwenden, und öffnet die [Werkbank zum Umschreiben des Verlaufs](history-rewrite.md) mit dem Bereich von diesem Commit bis zum neuesten; haben Sie ein Feld geändert, fragt es vorher (`Esc` bestätigt). `Ctrl+N` zeigt ein Badge auf jedem Feld und jeder Schaltfläche des Dialogs; drücken Sie es, um den Cursor in dieses Feld zu setzen oder die Schaltfläche zu drücken (siehe [Badges](keybindings.md#badges)).
@@ -412,7 +429,7 @@ Was verglichen wird, hängt von der Auswahl ab:
 | die WIP-Zeile und ein Commit oder Stash | dieser Commit mit dem Arbeitsverzeichnis: gestagte und ungestagte Änderungen der versionierten Dateien (unversionierte Dateien sind nicht Teil eines Diffs) |
 | drei oder mehr Commits | ihre zusammengefassten Änderungen: von kurz vor dem ältesten bis zum neuesten (Merges folgen ihrem ersten Elternteil) |
 
-Eine Umbenennung erscheint als Löschen plus Hinzufügen. **Tauschen** (`x`) vertauscht die Enden eines Vergleichs aus zwei Zeilen; mit der WIP-Zeile, die immer das neuere Ende ist, oder bei einem Bereich aus drei oder mehr Zeilen gibt es nichts zu tauschen. Ein Vergleich mit der WIP-Zeile folgt dem Arbeitsverzeichnis, während Sie Dateien speichern.
+Eine umbenannte oder verschobene Datei erscheint als eine Datei, mit dem alten Namen und der Ähnlichkeit über ihrem Diff. **Tauschen** (`x`) vertauscht die Enden eines Vergleichs aus zwei Zeilen; mit der WIP-Zeile, die immer das neuere Ende ist, oder bei einem Bereich aus drei oder mehr Zeilen gibt es nichts zu tauschen. Ein Vergleich mit der WIP-Zeile folgt dem Arbeitsverzeichnis, während Sie Dateien speichern.
 
 Tastatur: `v` (oder **Log: Auswahl vergleichen** in der Befehlspalette) setzt den Fokus in die Dateiliste des Vergleichs; `x` (oder **Log: Vergleichsenden tauschen**) tauscht; `n` (oder **Log: Zur nächsten verglichenen Zeile**) ist das Tastatur-Gegenstück zum Klick auf eine Karte: Der Log-Cursor springt zur nächsten ausgewählten Zeile, am Ende wieder von vorn. `Esc` oder ein einfacher Klick auf eine Zeile führt zurück zum einzelnen Commit. Der Eintrag **Cherry-Pick** zählt nur die Commits der Auswahl; die WIP-Zeile und Stashes werden dort ignoriert.
 

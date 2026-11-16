@@ -444,7 +444,7 @@ und `gitpoulpi hosting board move <card> <column>` verschiebt eine (siehe [die C
 Eine Karte zeigt die Nummer, den Titel, die Zugewiesenen als Initialen, die Labels und den Meilenstein. Ziehen Sie sie in eine andere Spalte,
 oder `Shift+Links` / `Shift+Rechts`, oder **Board: Karte verschieben nach...** (`m`). Sie bewegt sich sofort; nach etwa 150 ms zeigt ein Spinner,
 dass der Host noch arbeitet, und lehnt der Host ab, springt die Karte zurück, und die Statuszeile sagt, warum. `Enter` öffnet
-das Issue beim Host (bei lokalen Issues die Notiz); `e` bearbeitet Zugewiesene, Labels und Meilenstein; `n` beginnt ein neues Issue in
+die [Unterhaltung](#5c-unterhaltungen) des Issues in GitPoulpi (bei lokalen Issues die Notiz), und das Board kommt zurück, wenn Sie sie schließen; `e` bearbeitet Zugewiesene, Labels und Meilenstein; `n` beginnt ein neues Issue in
 der ausgewählten Spalte; `a`, `l`, `M` und `/` filtern nach Zugewiesenen, Label, Meilenstein und Text, `x` setzt die Filter zurück; `r`
 liest den Host erneut. Das Board liest erneut, wenn sich die Listen der Seitenleiste aktualisieren. Das Radar hat kein Board.
 
@@ -457,7 +457,7 @@ Eine **Unterhaltung** ist alles, was zu einem Issue, Work Item, einer Karte, ein
 | Von | Wie |
 |---|---|
 | Eine ISSUES-Zeile | `Enter` oder ein Doppelklick; **Unterhaltung öffnen** im Zeilenmenü; die Palette *Hosting: Issue-Unterhaltung öffnen...* (eine Liste der Issues auf dem Bildschirm). **Im Browser öffnen** im Zeilenmenü bleibt beim Browser. |
-| Eine PULL-REQUESTS-Zeile bei Azure DevOps oder Bitbucket | `Enter` oder **Unterhaltung öffnen**. Bei GitHub, GitLab, Gitea, Forgejo und Gerrit öffnet die Zeile das [Review](review.md), dessen Übersichtsseite die Unterhaltung des Requests ist. |
+| Eine PULL-REQUESTS-Zeile bei Azure DevOps oder Bitbucket | `Enter` oder **Unterhaltung öffnen**. Bei GitHub, GitLab, Gitea, Forgejo und Gerrit öffnet die Zeile das [Review](review.md), dessen Übersichtsseite genau diese Unterhaltung ist (die Zeitleiste, die Tasten und das Kommentarfeld darunter). |
 | Eine Karte des [Issue-Boards](#5b-das-issue-board) | `Enter` oder ein Doppelklick. |
 | Das [Radar](radar.md) | `i` auf einer Issue- oder Request-Zeile, **Unterhaltung öffnen** im Zeilenmenü oder *Radar: Issue-Unterhaltung öffnen*. |
 | Ein Verweis in einer anderen Unterhaltung | Anklicken (oder `l`, dann auswählen): `#7`, `!12`, `ABC-12` einer verknüpften Quelle öffnen sich in der App und kommen auf einen Zurück-Stapel. |

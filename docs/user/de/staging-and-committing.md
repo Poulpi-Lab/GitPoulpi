@@ -18,6 +18,14 @@ der rechte Bereich zeigt die Änderungen:
 - **Unstaged Dateien**: bearbeitete, hinzugefügte (nicht verfolgte) und gelöschte
   Dateien, die noch nicht im nächsten Commit sind.
 - **Staged Dateien**: was der nächste Commit enthalten wird.
+- **Umbenannte oder verschobene Dateien** sind eine Zeile, `neu <- alt`, in beiden Listen (eine
+  auf dem Datenträger gelöschte Datei und eine neue mit mindestens 50 % gleichem Inhalt zählen
+  schon als Verschiebung, bevor Sie sie stagen). Stagen, Unstagen und Verwerfen wirken auf beide
+  Namen: Stagen stagt das Löschen und die neue Datei, sodass Git eine Umbenennung sieht.
+  Die Zeile zu öffnen zeigt den Inhalts-Diff gegen den alten Namen, überschrieben mit
+  `alt -> neu (N% ähnlich)`; eine Verschiebung ohne Änderungen sagt **Keine Inhaltsänderung**.
+  Dasselbe gilt für die Dateien eines Commits, und `gitpoulpi status` / `gitpoulpi diff`
+  melden `renamed_from`.
 - **Pfad** oder **Baum** (`m`) listet Dateien flach oder in Ordnern. **Alle
   einklappen** (`z`) faltet die Ordner. **Alle Dateien ansehen** (`a`) zeigt den
   ganzen Baum statt nur der geänderten Dateien. Rechtsklick auf den leeren Teil der Liste bietet
@@ -46,6 +54,11 @@ Dateien** listet jede Datei mit ihrem Grund auf (ein Muster oder die Art des Geh
 mit maskierter Vorschau, nie der Wert) und bietet **1. Trotzdem stagen** oder **2. Abbrechen,
 nichts stagen**. Keine Antwort ist hervorgehoben, bis Sie eine Pfeiltaste oder eine Ziffer drücken,
 ein versehentliches Enter beantwortet also nichts; `Esc`, das Schließen-Kreuz und ein Klick außerhalb brechen ab.
+Ein in einer Datei gefundenes Geheimnis nennt seine Zeile (`config/app.env:12`). Um vor der Entscheidung nachzusehen, klicken Sie einen Fund an (oder gehen mit `Tab` / `Shift+Tab`, `Ctrl+J` /
+`Ctrl+K` über sie) und drücken die Schaltfläche **In Datei anzeigen**, `S`, oder in der Palette **Sensible
+Dateien: In Datei anzeigen**: Die Datei öffnet sich in der Dateiansicht, zu dieser Zeile gescrollt und sie
+hervorhebend, und die Frage kommt unverändert zurück, wenn Sie die Dateiansicht schließen
+(`Esc`). Nachsehen stagt nichts.
 Es ist dieselbe Frage von der Tastatur, per Schaltfläche, Menü, Palette oder
 Drag-and-drop, weil alle dieselbe Anfrage senden. Abbrechen stagt nichts,
 nicht einmal die gewöhnlichen Dateien desselben Stagings.
@@ -190,6 +203,12 @@ Zusammenfassung eine Nachricht aus den gestagten Änderungen (`Ctrl+G i`), und
 **Commits mit KI zusammenstellen** verteilt Ihre Arbeit auf mehrere Commits, siehe
 unten. Der Text landet im Formular, damit Sie ihn bearbeiten; nichts wird committet,
 bis Sie die Commit-Schaltfläche drücken.
+
+**Commits mit KI zusammenstellen** sitzt am rechten Ende der Zeile mit **Vorherigen Commit ändern** und schrumpft mit
+dem rechten Bereich, statt zu verschwinden: die volle Beschriftung, dann **Mit KI zusammenstellen**,
+dann nur das **`✦`**. Es behält seinen Klick, seinen Tooltip und seine
+Taste (`Ctrl+G Shift+C`) bei jeder Breite; die Beschriftungen von **Vorherigen Commit ändern** und **Hooks überspringen** weichen
+ihm, nie umgekehrt.
 
 ## Der Commit-Composer: Änderungen auf Commits verteilen
 

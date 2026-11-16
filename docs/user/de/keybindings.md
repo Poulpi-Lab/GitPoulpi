@@ -186,8 +186,8 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `status` | `collapse_below` | Ordner und seine Unterordner zuklappen | `_`, `Shift+Left` |
 | `home` | `favorite` | Repository mit Stern markieren oder Stern entfernen | `f`, `*` |
 | `home` | `close_repo` | Zeile schließen, entfernen oder Stern entfernen | `x`, `Delete` |
-| `home` | `copy_path` | Copy the Repository Path | `y` |
-| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
+| `home` | `copy_path` | Repository-Pfad kopieren | `y` |
+| `home` | `open_in` | Repository im Standardwerkzeug öffnen | `o` |
 | `home` | `browse` | Nach einem Repository suchen | `b` |
 | `home` | `clone` | Ein Repository klonen | `c` |
 | `home` | `init` | Ein Repository initialisieren | `i` |
@@ -797,8 +797,8 @@ die Standardtasten.
 | Repositories: Ausgewähltes zu Favoriten hinzufügen oder daraus entfernen | `f` |
 | Repositories: Ausgewähltes schließen oder entfernen | `x` |
 | Repositories: Menü des ausgewählten Repositorys... | `.` |
-| Repositories: Copy Selected Path | `y` |
-| Repositories: Open Selected in Default Tool | `o` |
+| Repositories: Ausgewählten Pfad kopieren | `y` |
+| Repositories: Ausgewähltes im Standardwerkzeug öffnen | `o` |
 | Repositories: Suchen | `/ / Ctrl+F` |
 | Repositories: Alle Abschnitte einklappen | `-` |
 | Repositories: Alle Abschnitte ausklappen | `+` |
@@ -1157,7 +1157,7 @@ die Standardtasten.
 | ✦ KI: Ausgewählten Commit aufteilen... |  |
 | ✦ KI: Änderungen im Arbeitsverzeichnis erklären | `Ctrl+G w` |
 | ✦ KI: Commits aus Änderungen im Arbeitsverzeichnis zusammenstellen... | `Ctrl+G C` |
-| Sensitive Files: Show in File | `S` |
+| Sensible Dateien: In Datei anzeigen | `S` |
 | Composer: Datei in Commit verschieben... | `m` |
 | Diff: Blame |  |
 | Blame: Commit im Log zeigen | `Enter` |

@@ -113,7 +113,9 @@ Der Tab eines Worktrees steht direkt hinter dem Tab seines Repositorys, und ein 
 Der Home-Tab ist die Repository-Verwaltung. Er hat vier Abschnitte:
 **Geöffnete Repositories**, **Favoriten**, **Zuletzt verwendete Repositories** und
 **Alle Repositories**. Jede Zeile zeigt den Branch, die Zahlen voraus und zurück
-und die Zahl der Änderungen. Jede Zeile hat einen Stern (Favorit), **Öffnen** oder
+und die Zahl der Änderungen, dann den Pfad des Ordners, wenn Platz ist: mit `~` gekürzt
+und bei wenig Platz in der Mitte abgeschnitten, er schiebt nie Namen, Besitzer oder Branch
+hinaus. Jede Zeile hat einen Stern (Favorit), **Öffnen** oder
 **Wechseln**, **Schließen** oder **Entfernen** und ein `⋮`-Menü.
 
 Oben: **Durchsuchen**, **Klonen**, **Init**, ein Suchfeld, **Alle einklappen** und
@@ -121,7 +123,7 @@ Oben: **Durchsuchen**, **Klonen**, **Init**, ein Suchfeld, **Alle einklappen** u
 *Alle* von selbst. Ein fehlender Favorit bleibt, mit einer Schaltfläche
 **Entfernen**. **Entfernen** löscht nie etwas auf dem Datenträger.
 
-Tasten: `Enter` öffnen, `f` Favorit, `x` schließen oder entfernen, `.` Menü, `/`
+Tasten: `Enter` öffnen, `f` Favorit, `x` schließen oder entfernen, `y` den Pfad kopieren, `o` im Standardwerkzeug öffnen (**Öffnen in** im `⋮`-Menü wählt ein anderes), `.` Menü, `/`
 Suche, `Space` einen Abschnitt falten, `Esc` zurück zu Ihrem Tab.
 `Ctrl+N` zeigt ein Badge am Suchfeld, an jedem Abschnitt und an jeder Schaltfläche: Drücken Sie das Zeichen eines Badges, um es zu fokussieren oder auszulösen (siehe [Badges](keybindings.md#badges)).
 
@@ -217,7 +219,9 @@ Die beiden seitlichen Bereiche (die Refs-Seitenleiste, `Ctrl+N h`, und der recht
 
 Eine Zeile pro Commit, der neueste zuerst. Rechtsklick auf die Kopfzeile blendet
 Spalten ein oder aus. Ziehen Sie den Rand zwischen zwei Kopfzellen, um eine Spalte
-in der Größe zu ändern. Ziehen Sie eine Kopfzelle, um die Spalte zu verschieben.
+in der Größe zu ändern. Ziehen Sie eine Kopfzelle, um die Spalte zu verschieben. Die Breiten gehören zum Repository: Sie werden mit ihm gespeichert
+und kommen beim erneuten Öffnen zurück, und bei einem zum ersten Mal geöffneten Repository ist jede Spalte an das angepasst, was das Log zeigt
+(*Alle Spalten an Inhalt anpassen* tut es erneut, *Spaltenbreiten zurücksetzen* geht zurück zu automatischen Breiten, die bleiben).
 
 Der Bereich hat keinen Titel: die Spaltenköpfe sagen, was er ist. Bei einem Commit ohne Ref zeigt die überfahrene Zeile eine blasse Pille mit dem Namen des Branches, zu dem er gehört (abschaltbar mit **Platzhalter für Branch am überfahrenen Commit zeigen** unter Einstellungen > Verlauf & Graph).
 

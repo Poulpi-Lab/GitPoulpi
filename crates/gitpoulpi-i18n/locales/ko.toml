@@ -1342,7 +1342,7 @@ hint_back = "탭으로 돌아가기"
 hint_quit = "종료"
 not_a_repo_any_more = "{path}은(는) 더 이상 git 저장소가 아닙니다 - {key}로 목록에서 제거하세요"
 gone_from_disk_msg = "{path}이(가) 디스크에서 사라졌습니다 - {key}로 목록에서 제거하세요"
-open_in_gone = "{path} is gone from disk, there is nothing to open"
+open_in_gone = "{path}이(가) 디스크에서 사라져 열 것이 없습니다"
 actions_need_tab = "{key} 동작에는 열린 저장소 탭이 필요합니다"
 home_tab_fixed = "홈 탭에는 탭 메뉴가 없으며 닫을 수 없습니다"
 
@@ -2430,8 +2430,8 @@ status_stage_toggle = "선택한 행 {$stage} 또는 해제"
 status_open_diff = "선택한 파일의 {$Diff} 열기"
 home_favorite = "저장소 즐겨찾기 추가 또는 해제"
 home_close_repo = "행 닫기, 제거 또는 즐겨찾기 해제"
-home_copy_path = "Copy the Repository Path"
-home_open_in = "Open the Repository in the Default Tool"
+home_copy_path = "저장소 경로 복사"
+home_open_in = "기본 위치에서 저장소 열기"
 home_browse = "저장소 찾아보기"
 home_clone = "저장소 클론"
 home_init = "저장소 초기화"
@@ -3313,8 +3313,8 @@ repositories_collapse_all_sections = "저장소 목록: 모든 섹션 접기"
 repositories_expand_all_sections = "저장소 목록: 모든 섹션 펼치기"
 repositories_close_all_tabs = "저장소 목록: 모든 탭 닫기..."
 repositories_remove_selected_from_list = "저장소 목록: 선택 항목을 목록에서 제거"
-repositories_copy_selected_path = "Repositories: Copy Selected Path"
-repositories_open_selected_in = "Repositories: Open Selected in Default Tool"
+repositories_copy_selected_path = "저장소 목록: 선택 항목 경로 복사"
+repositories_open_selected_in = "저장소 목록: 선택 항목을 기본 위치에서 열기"
 repositories_remove_all_recent = "저장소 목록: 최근 항목 모두 제거"
 tab_new_tab = "탭: 새 탭"
 tab_new_menu = "탭: 새로 만들기..."
@@ -3385,7 +3385,7 @@ ai_explain_working_changes = "AI: 작업 변경 사항 설명"
 ai_insert_prompt_variable = "AI: 프롬프트 변수 삽입"
 ai_compose_commits_from_working_changes = "AI: 작업 변경 사항으로 {$Commit} 구성..."
 # context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
-stage_guard_show_in_file = "Sensitive Files: Show in File"
+stage_guard_show_in_file = "민감한 파일: 파일에서 보기"
 composer_move_file_to_commit = "작성기: 파일을 {$Commit}으로 이동..."
 diff_blame = "{$Diff}: Blame"
 diff_history = "{$Diff}: 파일 기록"
@@ -3440,7 +3440,7 @@ why_no_text_selected_drag_over_the_text_first = "선택한 텍스트가 없습�
 why_the_diff_view_isn_t_open = "{$diff} 보기가 열려 있지 않습니다"
 why_open_a_file_first_in_the_diff_view_the_status = "먼저 파일을 여세요 - {$Diff} 보기, Status 창 또는 {$commit}에서"
 # context: why that palette command is unavailable
-why_no_sensitive_files_question = "no sensitive files question is open"
+why_no_sensitive_files_question = "열려 있는 민감한 파일 질문이 없습니다"
 why_select_a_branch_or_tag_in_the_refs_pane_first = "먼저 Refs 창에서 브랜치 또는 {$tag}를 선택하세요"
 why_checking_out_a_remote_branch_isn_t_supported_yet = "리모트 브랜치 체크아웃은 아직 지원되지 않습니다 - 먼저 로컬 추적 브랜치를 만드세요"
 why_select_a_local_branch_in_the_refs_pane_first = "먼저 Refs 창에서 로컬 브랜치를 선택하세요"
@@ -4067,7 +4067,7 @@ repositories_and_tabs_open_in = "이 탭의 폴더를 열 위치 목록 (터미�
 repositories_and_tabs_7 = "선택한 저장소 열기 (또는 전환)"
 repositories_and_tabs_8 = "별 추가/해제"
 repositories_and_tabs_9 = "탭 닫기 (열림), 제거 (최근), 즐겨찾기 해제 (즐겨찾기)"
-repositories_and_tabs_copy_open = "copy the path / open in the default tool"
+repositories_and_tabs_copy_open = "경로 복사 / 기본 위치에서 열기"
 repositories_and_tabs_10 = "행 메뉴"
 repositories_and_tabs_11 = "모든 섹션 검색"
 repositories_and_tabs_12 = "지우기 / 탭으로 돌아가기"
@@ -5618,9 +5618,9 @@ too_large = "파일이 너무 커서 표시할 수 없습니다 ({bytes}바이�
 unexpected = "예기치 않은 응답"
 loading_whole = "전체 파일을 불러오는 중... (Hunk 버튼은 변경 사항만 표시)"
 whole_unavailable = "(전체 파일을 사용할 수 없음: {why} - hunk만 표시)"
-renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header = "{from} -> {to} (유사도 {percent}%)"
 renamed_header_plain = "{from} -> {to}"
-rename_no_change = "No content change (the file was only renamed or moved)"
+rename_no_change = "내용 변경 없음 (파일 이름만 바뀌었거나 이동됨)"
 
 [git_actions]
 no_such_local_branch = "그 로컬 브랜치가 더 이상 없습니다 - 새로 고침하세요"
@@ -9329,7 +9329,7 @@ answer_cancel = "취소, {$stage}하지 않음"
 # context: key hint at the bottom of the dialog
 hint = "위/아래: 선택, Enter 또는 1/2: 응답, Esc: 취소"
 # context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
-show_in_file = "Show in file"
+show_in_file = "파일에서 보기"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "민감한 파일은 {$staged} 상태가 아닙니다: {files}. 사용자에게 물어본 뒤 민감한 파일을 허용하여 다시 {$stage}하세요"
 
@@ -10283,17 +10283,17 @@ flavor_plain_text = "일반 텍스트"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
-title = "Edit a {$commit} of another branch"
+title = "다른 브랜치의 {$commit} 편집"
 # context: body of that dialog when local branches hold the commit; {short} is the short commit id
-body_branches = "{short} is not on the current branch. Check out a branch that holds it to edit it here."
+body_branches = "{short}은(는) 현재 브랜치에 없습니다. 여기서 편집하려면 이를 포함한 브랜치를 체크아웃하세요."
 # context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
-body_none = "{short} is on no local branch. Create a branch at it to edit it here."
+body_none = "{short}은(는) 어떤 로컬 브랜치에도 없습니다. 여기서 편집하려면 이 위치에 브랜치를 만드세요."
 # context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
-checkout = "Check out {branch} and edit"
+checkout = "{branch} 체크아웃 후 편집"
 # context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
-rewrite = "Edit with advanced history rewrite"
+rewrite = "고급 기록 다시 쓰기로 편집"
 # context: button that opens the name box to create a branch at that commit
-create = "Create a branch here..."
+create = "여기에 브랜치 만들기..."
 # context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
 key_rewrite = "r"
 # context: key of the Create a branch here button, one letter
@@ -10301,4 +10301,4 @@ key_create = "b"
 # context: key of the Cancel button of that dialog, one letter
 key_cancel = "c"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
-gave_up = "{short} was not edited: the branch was not checked out"
+gave_up = "{short}을(를) 편집하지 않았습니다: 브랜치가 체크아웃되지 않았습니다"

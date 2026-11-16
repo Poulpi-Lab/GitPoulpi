@@ -1343,7 +1343,7 @@ hint_back = "zpět na kartu"
 hint_quit = "konec"
 not_a_repo_any_more = "{path} už není git repozitář - odeberte ho ze seznamu pomocí {key}"
 gone_from_disk_msg = "{path} z disku zmizel - odeberte ho ze seznamu pomocí {key}"
-open_in_gone = "{path} is gone from disk, there is nothing to open"
+open_in_gone = "{path} z disku zmizel, není co otevřít"
 actions_need_tab = "akce {key} vyžadují otevřenou kartu repozitáře"
 home_tab_fixed = "karta Domů nemá nabídku karty a nelze ji zavřít"
 
@@ -2433,8 +2433,8 @@ status_stage_toggle = { git = "Stage nebo unstage vybraný řádek", local = "P�
 status_open_diff = "Otevřít {$diff} vybraného souboru"
 home_favorite = "Přidat repozitář k oblíbeným nebo odebrat"
 home_close_repo = "Zavřít, odebrat nebo odznačit řádek"
-home_copy_path = "Copy the Repository Path"
-home_open_in = "Open the Repository in the Default Tool"
+home_copy_path = "Kopírovat cestu k repozitáři"
+home_open_in = "Otevřít repozitář ve výchozím nástroji"
 home_browse = "Vyhledat repozitář"
 home_clone = "Klonovat repozitář"
 home_init = "Inicializovat repozitář"
@@ -3323,8 +3323,8 @@ repositories_collapse_all_sections = "Repozitáře: Sbalit všechny sekce"
 repositories_expand_all_sections = "Repozitáře: Rozbalit všechny sekce"
 repositories_close_all_tabs = "Repozitáře: Zavřít všechny karty..."
 repositories_remove_selected_from_list = "Repozitáře: Odebrat vybraný ze seznamu"
-repositories_copy_selected_path = "Repositories: Copy Selected Path"
-repositories_open_selected_in = "Repositories: Open Selected in Default Tool"
+repositories_copy_selected_path = "Repozitáře: Kopírovat cestu vybraného"
+repositories_open_selected_in = "Repozitáře: Otevřít vybraný ve výchozím nástroji"
 repositories_remove_all_recent = "Repozitáře: Odebrat všechny nedávné"
 tab_new_tab = "Karta: Nová karta"
 tab_new_menu = "Karta: Nová..."
@@ -3395,7 +3395,7 @@ ai_explain_working_changes = "AI: Vysvětlit rozpracované změny"
 ai_insert_prompt_variable = "AI: Vložit proměnnou promptu"
 ai_compose_commits_from_working_changes = "AI: Sestavit commity z rozpracovaných změn..."
 # context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
-stage_guard_show_in_file = "Sensitive Files: Show in File"
+stage_guard_show_in_file = "Citlivé soubory: Zobrazit v souboru"
 composer_move_file_to_commit = "Composer: Přesunout soubor do commitu..."
 diff_blame = { git = "Diff: Blame", local = "Rozdíly: Blame" }
 diff_history = { git = "Diff: Historie souboru", local = "Rozdíly: Historie souboru" }
@@ -3450,7 +3450,7 @@ why_no_text_selected_drag_over_the_text_first = "není vybrán žádný text - n
 why_the_diff_view_isn_t_open = { git = "zobrazení diffu není otevřeno", local = "zobrazení rozdílů není otevřeno" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "nejdřív otevřete soubor - v zobrazení Diff, v panelu Stav nebo v commitu", local = "nejdřív otevřete soubor - v zobrazení Rozdíl, v panelu Stav nebo v commitu" }
 # context: why that palette command is unavailable
-why_no_sensitive_files_question = "no sensitive files question is open"
+why_no_sensitive_files_question = "není otevřená žádná otázka o citlivých souborech"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "nejdřív vyberte větev nebo tag v panelu Refs", local = "nejdřív vyberte větev nebo značku v panelu Refs" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "checkout vzdálené větve zatím není podporován - nejdřív vytvořte lokální sledující větev"
 why_select_a_local_branch_in_the_refs_pane_first = "nejdřív vyberte lokální větev v panelu Refs"
@@ -4073,7 +4073,7 @@ repositories_and_tabs_open_in = "seznam „Otevřít v“ pro složku této kart
 repositories_and_tabs_7 = "otevře (nebo přepne na) vybraný repozitář"
 repositories_and_tabs_8 = "přidá/odebere hvězdičku"
 repositories_and_tabs_9 = "zavřít kartu (Otevřené), odebrat (Nedávné), odznačit (Oblíbené)"
-repositories_and_tabs_copy_open = "copy the path / open in the default tool"
+repositories_and_tabs_copy_open = "kopírovat cestu / otevřít ve výchozím nástroji"
 repositories_and_tabs_10 = "nabídka řádku"
 repositories_and_tabs_11 = "hledá v každé sekci"
 repositories_and_tabs_12 = "vymaže / zpět na kartu"
@@ -5619,9 +5619,9 @@ too_large = "soubor je příliš velký k zobrazení ({bytes} bajtů)"
 unexpected = "neočekávaná odpověď"
 loading_whole = "načítání celého souboru... (tlačítko Hunky ukáže jen změny)"
 whole_unavailable = "(celý soubor není k dispozici: {why} - zobrazeny jen hunky)"
-renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header = "{from} -> {to} (podobnost {percent} %)"
 renamed_header_plain = "{from} -> {to}"
-rename_no_change = "No content change (the file was only renamed or moved)"
+rename_no_change = "Obsah se nezměnil (soubor byl jen přejmenován nebo přesunut)"
 
 [git_actions]
 no_such_local_branch = "tato lokální větev už neexistuje - obnovte"
@@ -9329,7 +9329,7 @@ answer_cancel = "Zrušit, nic nebude {$staged}"
 # context: key hint at the bottom of the dialog
 hint = "Nahoru/Dolů: výběr, Enter nebo 1/2: odpověď, Esc: zrušit"
 # context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
-show_in_file = "Show in file"
+show_in_file = "Zobrazit v souboru"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "citlivé soubory nebyly {$staged}: {files}; zeptejte se uživatele a pak {$stage} znovu s povolením citlivých souborů"
 
@@ -10283,22 +10283,22 @@ flavor_plain_text = "Prostý text"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
-title = "Edit a {$commit} of another branch"
+title = "Upravit {$commit} jiné větve"
 # context: body of that dialog when local branches hold the commit; {short} is the short commit id
-body_branches = "{short} is not on the current branch. Check out a branch that holds it to edit it here."
+body_branches = "{short} není v aktuální větvi. Přepněte se na větev, která ho obsahuje, a upravte ho tady."
 # context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
-body_none = "{short} is on no local branch. Create a branch at it to edit it here."
+body_none = "{short} není v žádné lokální větvi. Vytvořte u něj větev a upravte ho tady."
 # context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
-checkout = "Check out {branch} and edit"
+checkout = "Přepnout na {branch} a upravit"
 # context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
-rewrite = "Edit with advanced history rewrite"
+rewrite = "Upravit pokročilým přepisem historie"
 # context: button that opens the name box to create a branch at that commit
-create = "Create a branch here..."
+create = "Vytvořit větev zde..."
 # context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
 key_rewrite = "r"
 # context: key of the Create a branch here button, one letter
-key_create = "b"
+key_create = "v"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "z"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
-gave_up = "{short} was not edited: the branch was not checked out"
+gave_up = "{short} nebyl upraven: větev nebyla přepnuta"

@@ -18,6 +18,14 @@ pracovní změny:
 - **Soubory unstaged**: upravené, přidané (untracked) a smazané soubory, které
   ještě nejsou v dalším commitu.
 - **Soubory staged**: co bude obsahovat další commit.
+- **Přejmenované nebo přesunuté soubory** jsou jeden řádek, `nový <- starý`, v obou
+  seznamech (soubor smazaný na disku a nový soubor, který má alespoň z 50 % stejný obsah,
+  se počítá jako přesun už před stagingem). Stage, Unstage a Zahodit působí na oba názvy:
+  stage přidá smazání i nový soubor, takže git vidí jedno přejmenování.
+  Otevření řádku ukáže diff obsahu proti starému názvu s hlavičkou
+  `starý -> nový (podobnost N %)`; přesun bez úprav říká **Obsah se nezměnil**.
+  Totéž platí pro soubory commitu a `gitpoulpi status` / `gitpoulpi diff`
+  hlásí `renamed_from`.
 - **Cesta** nebo **Strom** (`m`) zobrazí soubory jako plochý seznam nebo ve
   složkách. **Sbalit vše** (`z`) sbalí složky. **Zobrazit všechny soubory**
   (`a`) ukáže celý strom místo jen změněných souborů. Pravým tlačítkem na prázdné místo seznamu
@@ -47,6 +55,12 @@ soubory** vypíše každý soubor s důvodem (vzor, nebo druh tajné hodnoty
 s maskovaným náhledem, nikdy hodnota) a nabídne **1. Stage přesto** nebo **2. Zrušit a nic nepřidávat**.
 Žádná odpověď není zvýrazněna, dokud nestisknete šipku nebo číslici,
 takže náhodné Enter neodpoví nic; `Esc`, zavírací křížek a klik mimo ruší.
+Tajná hodnota nalezená v souboru uvádí svůj řádek (`config/app.env:12`). Chcete-li se
+podívat dřív, než se rozhodnete, klikněte na nález (nebo se mezi nimi pohybujte pomocí
+`Tab` / `Shift+Tab`, `Ctrl+J` / `Ctrl+K`) a stiskněte tlačítko **Zobrazit v souboru**, `S`,
+nebo příkaz z palety **Citlivé soubory: Zobrazit v souboru**: soubor se otevře v zobrazení
+Soubor odrolovaný na ten řádek a s jeho zvýrazněním a otázka se po zavření zobrazení
+Soubor (`Esc`) vrátí beze změny. Prohlížení nic nepřidá.
 Je to stejná otázka z klávesnice, tlačítka, nabídky, palety nebo
 přetažení, protože všechny posílají stejný požadavek. Zrušení nepřidá nic,
 ani běžné soubory téhož stage.
@@ -187,6 +201,11 @@ Když je [AI](ai.md) zapnuté, tlačítko **`✦`** vpravo od souhrnu napíše z
 ze změn v indexu (`Ctrl+G i`) a **Sestavit commity pomocí AI** rozdělí vaši
 práci do několika commitů, viz níže. Text se vloží do formuláře, abyste ho
 upravili; nic se necommituje, dokud nestisknete tlačítko commitu.
+
+**Sestavit commity pomocí AI** je na pravém konci řádku Amend a s pravým panelem se
+zmenšuje, místo aby zmizelo: celý popisek, pak **Sestavit pomocí AI**, pak samotné **`✦`**.
+Při každé šířce si drží klik, tooltip i klávesu (`Ctrl+G Shift+C`); popisky Amend a
+Přeskočit hooky mu ustupují, nikdy naopak.
 
 ## Commit composer: rozdělte změny do commitů
 

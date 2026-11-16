@@ -188,8 +188,8 @@ předponou (`Ctrl+G s`).
 | `status` | `collapse_below` | Sbalit složku a její podsložky | `_`, `Shift+Left` |
 | `home` | `favorite` | Přidat repozitář k oblíbeným nebo odebrat | `f`, `*` |
 | `home` | `close_repo` | Zavřít, odebrat nebo odznačit řádek | `x`, `Delete` |
-| `home` | `copy_path` | Copy the Repository Path | `y` |
-| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
+| `home` | `copy_path` | Kopírovat cestu k repozitáři | `y` |
+| `home` | `open_in` | Otevřít repozitář ve výchozím nástroji | `o` |
 | `home` | `browse` | Vyhledat repozitář | `b` |
 | `home` | `clone` | Klonovat repozitář | `c` |
 | `home` | `init` | Inicializovat repozitář | `i` |
@@ -802,8 +802,8 @@ Klávesy jsou výchozí.
 | Repozitáře: Přidat/odebrat vybraný z oblíbených | `f` |
 | Repozitáře: Zavřít nebo odebrat vybraný | `x` |
 | Repozitáře: Nabídka vybraného repozitáře... | `.` |
-| Repositories: Copy Selected Path | `y` |
-| Repositories: Open Selected in Default Tool | `o` |
+| Repozitáře: Kopírovat cestu vybraného | `y` |
+| Repozitáře: Otevřít vybraný ve výchozím nástroji | `o` |
 | Repozitáře: Hledat | `/ / Ctrl+F` |
 | Repozitáře: Sbalit všechny sekce | `-` |
 | Repozitáře: Rozbalit všechny sekce | `+` |
@@ -1162,7 +1162,7 @@ Klávesy jsou výchozí.
 | ✦ AI: Rozdělit vybraný Commit... |  |
 | ✦ AI: Vysvětlit rozpracované změny | `Ctrl+G w` |
 | ✦ AI: Sestavit commity z rozpracovaných změn... | `Ctrl+G C` |
-| Sensitive Files: Show in File | `S` |
+| Citlivé soubory: Zobrazit v souboru | `S` |
 | Composer: Přesunout soubor do commitu... | `m` |
 | Diff: Blame |  |
 | Blame: Zobrazit commit v Logu | `Enter` |

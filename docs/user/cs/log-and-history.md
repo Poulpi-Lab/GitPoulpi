@@ -251,6 +251,20 @@ už byl commit odeslán, okno jantarově upozorní, že budete potřebovat force
 reword vrátí; viz [Zpět a znovu](undo-redo.md). Stavový řádek také uvádí
 předchozí špičku.
 
+Commit, který není na právě vybrané větvi (žije na jiné větvi), nelze přeformulovat ani upravit tam, kde jste,
+takže *Upravit zprávu commitu...* a *Upravit...* místo toho otevřou **Upravit commit jiné větve**, seznam voleb
+(`Up` / `Down` nebo `Ctrl+J` / `Ctrl+K` se pohybují, `Enter` nebo klik vybere, `Esc`, křížek
+nebo **Zrušit (Z)** ho zavře):
+
+- **Přepnout na `<větev>` a upravit (1)**: jeden řádek pro každou lokální větev, jejíž historie
+  commit obsahuje (`1` až `8`, prvních osm, ostatní se jen spočítají). Větev se přepne obvyklým
+  způsobem a úprava se otevře na ní. Vracení zpět jsou vlastní dvě akce: `Ctrl+Z` vezme zpět
+  úpravu, přepnutí je prostě checkout.
+- **Upravit pokročilým přepisem historie (R)**: otevře [nástroj pro přepis historie](history-rewrite.md)
+  na tomto commitu, v sestaveních, která ho mají.
+- **Vytvořit větev zde... (B)**: jen když commit nemá žádná lokální větev
+  (je třeba jen na vzdálené větvi); otevře pole názvu pro větev v něm.
+
 ## Úprava commitu (zpráva, autor, data)
 
 Položka *Upravit...* v nabídce commitu (nebo `Ctrl+G Shift+E`, nebo *Commit: Upravit...* v paletě) otevře jedno okno s vlastnostmi commitu: souhrn, popis a jméno, e-mail a datum autora, každé předvyplněné hodnotami commitu. Změňte, co chcete, a stiskněte **Použít**; odešlou se jen změněná pole. Datum se píše `YYYY-MM-DD HH:MM:SS +HH:MM` a dokud ho neupravíte, zobrazuje se v UTC. Committerem jste vy, teď (jako u reword). Upravit lze každý commit právě vybrané větve, se stejnými pravidly, stejným varováním u už odeslaného commitu a stejným druhým potvrzením jako *Upravit zprávu commitu...*; commity nad ním se vytvoří znovu s vlastními autory a daty a vaše změny ve stagingu i mimo něj zůstanou nedotčené. `Ctrl+Z` (Zpět na panelu nástrojů) operaci vrátí. V sestaveních s přepisem historie tlačítko **Upravit historii hlouběji...** (`Alt+H`) vlevo dole v dialogu ho zavře, aniž by cokoli použilo, a otevře [nástroj pro přepis historie](history-rewrite.md) s rozsahem od tohoto commitu po nejnovější; pokud jste upravili pole, nejdřív se zeptá (`Esc` potvrdí). `Ctrl+N` ukáže odznak u každého pole a tlačítka dialogu; stiskem odznaku dáte kurzor do toho pole nebo stisknete to tlačítko (viz [Odznaky](keybindings.md#odznaky)).
@@ -410,7 +424,7 @@ Co se porovnává, závisí na výběru:
 | řádek WIP a commit nebo stash | ten commit s pracovním stromem: indexované i neindexované změny sledovaných souborů (nesledované soubory nejsou součástí diffu) |
 | tři a více commitů | jejich sloučené změny: od chvíle těsně před nejstarším po nejnovější (merge sledují svého prvního rodiče) |
 
-Přejmenování se ukáže jako smazání plus přidání. **Prohodit** (`x`) vymění konce porovnání dvou řádků; u řádku WIP, který je vždy novějším koncem, nebo u rozsahu tří a více řádků není co měnit. Porovnání s řádkem WIP sleduje pracovní strom, jak ukládáte soubory.
+Přejmenovaný nebo přesunutý soubor se ukáže jako jeden soubor, se starým názvem a podobností nad jeho diffem. **Prohodit** (`x`) vymění konce porovnání dvou řádků; u řádku WIP, který je vždy novějším koncem, nebo u rozsahu tří a více řádků není co měnit. Porovnání s řádkem WIP sleduje pracovní strom, jak ukládáte soubory.
 
 Klávesnice: `v` (nebo **Log: Porovnat výběr** v paletě příkazů) přesune fokus do seznamu souborů porovnání; `x` (nebo **Log: Prohodit konce porovnání**) je prohodí; `n` (nebo **Log: přejít na další porovnávaný řádek**) je klávesové dvojče kliknutí na dlaždici: kurzor Logu přeskočí na další vybraný řádek a na konci se vrátí na začátek. `Esc` nebo prosté kliknutí na řádek vrátí zpět k jedinému commitu. Položka **Cherry-pick** počítá jen commity výběru; řádek WIP a stashe se tam ignorují.
 

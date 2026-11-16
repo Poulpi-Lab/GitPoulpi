@@ -49,13 +49,38 @@ Segmentový přepínač v horním okraji mění stránku: **Přehled**, **Soubor
 
 ### Přehled
 
-Popis (základní Markdown se zobrazí jako takový: tučné, kurzíva, `kód`, odkazy jako jejich text, odrážkové a číslované
-seznamy, nadpisy, citace a bloky kódu), potom konverzace: komentáře, které nejsou ke kódu, a už
-odeslané kontroly, od nejstarší, každá se svým rozhodnutím (`schváleno`, `požadovány změny`, `okomentováno`,
-`zamítnuto`). Na GitLabu jsou rozhodnutími jeho schválení. Pod tím je pole odpovědi: klikněte na ně nebo stiskněte **`c`**
-a napíšete komentář ke konverzaci. **Tento se odešle hned** a pole to říká.
+Přehled je **konverzace žádosti**: stejná časová osa a stejné pole pro komentář, jaké má issue
+([Konverzace](hosting-integration.md#5c-konverzace)): nejdřív popis (*otevřel(a) toto*), pak komentáře, vlákna ke kódu
+s ukázkou diffu, odeslané kontroly s rozhodnutím (`schváleno`, `požadovány změny`, `okomentováno`, `zamítnuto`; na GitLabu
+jsou rozhodnutími jeho schválení) a události, od nejstarších, v nejnovějším okně s tlačítkem **Načíst starší** nahoře. Pole
+komentáře je ukotveno pod časovou osou (**Nový komentář**): **Psát**, **Náhled** a **Vedle sebe**, **Zrušit** a
+**Odeslat**. **Komentář napsaný tady jde hostiteli hned** (nic nečeká: čekající jsou komentáře ke kódu, odesílané s
+kontrolou), v seznamu se objeví okamžitě a své místo zaujme, když hostitel odpoví; když ho hostitel odmítne, pole se
+znovu otevře s vaším textem a důvodem.
 
-Pole komentáře (také pole odpovědi, komentáře k řádku a shrnutí **Dokončit kontrolu**) je Markdown textové pole sdílené s [pohledem konverzace](hosting-integration.md#psaní): **Psát**, **Náhled** (`Alt+P`) a **Vedle sebe** (`Alt+L`, v okně širokém 100 sloupců); `Ctrl+Enter` (také `Ctrl+S`, `Alt+Enter`) odešle a tam, kde je AI zapnutá, `Alt+E` otevře **Napsat pomocí AI** ([kapitola o AI](ai.md#pomoc-s-psaním-na-hostiteli)). Náhled ukazuje text tak, jak ho zobrazí hostitel, včetně odkazů (`#7`, `!12`, `ABC-12`, id commitů); neodeslaný text se uchovává pro každou žádost zvlášť. Popis a konverzace používají stejný vykreslovač, takže Markdown, tabulky, upozornění a odkazy vypadají tady stejně jako v pohledu konverzace issue. Citování, úprava nebo smazání už odeslaného komentáře a interní poznámky patří do pohledu konverzace issues a žádostí na hostitelích bez kontroly (viz [Konverzace](hosting-integration.md#5c-konverzace)); tady lze upravovat jen vaše čekající komentáře.
+Klávesy jsou klávesy pohledu konverzace: **`Up`** / **`Down`** (a `Ctrl+J` / `Ctrl+K`) se pohybují mezi záznamy, **`r`**
+odpovídá do vlákna vybraného záznamu, **`Q`** ho cituje v novém komentáři, **`c`** píše nový komentář, **`e`** / **`d`**
+upravují a mažou vaše vlastní komentáře (před smazáním následuje otázka), **`l`** nebo `Enter` otevře odkazy záznamu,
+**`g`** jeho diagram, **`y`** zkopíruje jeho adresu, **`o`** ho otevře v prohlížeči, **`n`** přejde na další nepřečtený
+záznam, **`v`** zobrazí nebo skryje události, **`m`** načte starší záznamy, `Tab` přepíná mezi časovou osou a polem a
+**Interní poznámka** (`Alt+I`) je k dispozici na hostitelích, které takové poznámky mají. Tlačítka vybraného záznamu
+(**Odpovědět**, **Citovat**, **Upravit**, **Smazat**, **Odkazy**) dělají totéž a paleta má řádky *Konverzace: ...* vedle
+řádků *Kontrola: ...*. Na odkaz se před otevřením zeptá, jako všude v kontrole.
+
+Kde se klávesa konverzace potká s klávesou kontroly, má na této stránce písmeno konverzace: `l` (štítky), `m`
+(milník), `Q` (zrušení u Gerritu), `e` / `d`, `r`. Štítky, milník a zrušení zůstávají na tlačítkách záhlaví a
+v paletě; `a` (řešitelé), `p` (recenzenti), `f` (**Dokončit kontrolu**), `b` (**Checkout**), `P`, `D`, `U` a
+`Alt+1` / `Alt+2` / `Alt+3` si svůj význam drží i tady. Dokud má pole klávesnici, každá klávesa patří poli, kromě
+`Alt+1` / `Alt+2` / `Alt+3`; `Esc` vrátí klávesnici časové ose a druhé `Esc` zavře kontrolu.
+
+Komentář napsaný v jiném okně nebo z CLI se tu objeví sám: každý zápis GitPoulpi (včetně tohoto okna) to oznámí relaci
+a okna, která ukazují stejnou žádost, ji načtou znovu.
+
+Pole komentáře je Markdown textové pole sdílené s [pohledem konverzace](hosting-integration.md#psaní) (je to i pole
+odpovědi do vlákna, komentáře k řádku a shrnutí **Dokončit kontrolu**): `Ctrl+Enter` (také `Ctrl+S`, `Alt+Enter`)
+odešle a tam, kde je AI zapnutá, `Alt+E` otevře **Napsat pomocí AI** ([kapitola o AI](ai.md#pomoc-s-psaním-na-hostiteli)).
+Náhled ukazuje text tak, jak ho zobrazí hostitel, včetně odkazů (`#7`, `!12`, `ABC-12`, id commitů); neodeslaný text se
+uchovává pro každou žádost zvlášť.
 
 ### Soubory
 
@@ -226,17 +251,17 @@ Návrhy **nejsou komentáře**. Ukazují se na dvou místech:
   třemi tlačítky: **Přijmout**, **Upravit** a **Odmítnout**. Návrh k řádku, který diff nezobrazuje, se
   uchová, nikdy se nezahodí: uvádí se za hunky pod *Návrhy AI k celému souboru* a po
   přijetí skončí na prvním změněném řádku souboru se slovy *(k řádku N)* na začátku.
-- **V Přehledu**, pod popisem: shrnutí, potom seznam se stejnými tlačítky a **Přijmout vše** /
+- **V Přehledu**, v bloku nad konverzací (jen po spuštění): shrnutí, potom seznam se stejnými tlačítky a **Přijmout vše** /
   **Odmítnout vše**.
 
 **Přijmout** (`y`) změní návrh v běžný **čekající komentář** (můžete ho dál upravit nebo smazat);
 **Upravit** (`w`) otevře pole komentáře se slovy modelu a přijme, co v něm necháte; **Odmítnout** (`n`)
 ho zahodí. **Přijmout vše** (`A`) jen naplní seznam čekajících. Na stránce Soubory klávesy působí na
-návrh pod kurzorem, v Přehledu na první ze seznamu. **Použít shrnutí od AI** (`i`, nebo tlačítko
+návrh pod kurzorem, v Přehledu na první ze seznamu (`y` a `n` jsou zase *Kopírovat odkaz* a *Další nepřečtený* konverzace, jakmile je seznam prázdný). **Použít shrnutí od AI** (`i`, nebo tlačítko
 ve formuláři Dokončit kontrolu) vloží shrnutí modelu do textu kontroly; nikdy se nevloží samo.
 **Nic se neodešle hostiteli, dokud kontrolu neodešlete.**
 
-Přehled ukazuje koncept jako kartu nad návrhy: čip s rozhodnutím, text kontroly a tři
+Přehled ukazuje koncept jako kartu na začátku toho bloku, nad návrhy: čip s rozhodnutím, text kontroly a tři
 tlačítka.
 
 - **✦ Použít koncept...** (`u`) přijme každý otevřený návrh jako čekající komentář a otevře *Dokončit kontrolu* už
@@ -257,7 +282,7 @@ Odeslání kontroly koncept spotřebuje.
 |---|---|---|
 | Přehled / Soubory / Commity | `Alt+1` / `Alt+2` / `Alt+3` | *Kontrola: Zobrazit přehled*, *Zobrazit soubory*, *Zobrazit commity* |
 | Okomentovat řádek nebo rozsah | `c` | *Kontrola: Okomentovat řádek...* |
-| Okomentovat konverzaci | `c` v Přehledu, `C` | *Kontrola: Okomentovat konverzaci...* |
+| Okomentovat konverzaci | `c` v Přehledu, `C` | *Kontrola: Okomentovat konverzaci...* (otevře pole Přehledu), *Konverzace: Nový komentář* |
 | Odpovědět ve vlákně | `r` | *Kontrola: Odpovědět ve vlákně...* |
 | Vyřešit nebo znovu otevřít | `x` | *Kontrola: Vyřešit nebo znovu otevřít vlákno* |
 | Sbalit nebo rozbalit vlákno | `z` | *Kontrola: Sbalit nebo rozbalit vlákno* |

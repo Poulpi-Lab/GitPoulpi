@@ -361,6 +361,7 @@ nich dojść.
 | Opcja | Działanie |
 |---|---|
 | **Odświeżanie: pull requesty i zgłoszenia** | Jak często odświeżają się listy w panelu bocznym i znacznik na pasku narzędzi, liczba i jednostka (minuty lub godziny). Domyślnie 5 minut, do 2 godzin, `0` wyłącza licznik (`general.hosting_refresh_minutes`, `general.hosting_refresh_unit`). |
+| **Publikuj jako** | Nazwa, pod którą wiadomości do hosta są publikowane, gdy token repozytorium należy do bota (token GitHub App), na przykład `my-app[bot]`; służy też do rozpoznawania twoich własnych komentarzy. Puste: pytany jest host, a w razie braku odpowiedzi nazwa jest poznawana z pierwszej opublikowanej wiadomości. Repozytorium może ją nadpisać w Ustawienia > Ustawienia repozytorium > SSH i poświadczenia > Hosting (`general.hosting_post_as`). |
 | **Terminologia żądań przeglądu** | Słowo używane dla przeglądów na hoście: **Auto (wg hosta)**, **Pull Request** lub **Merge Request**. |
 | **Ukryj chip pull requesta, gdy jest zamknięty lub scalony** | Domyślnie włączone (`ui.hide_finished_pr_chip`; na GitLabie nazywa się „merge request”). Chip na pasku narzędzi pokazuje najnowsze żądanie aktywnej gałęzi; gdy to żądanie zostanie zamknięte lub scalone, chip znika, a zamiast niego pojawia się przyciemniony chip **+ PR** (rozpocznij nowe żądanie), tak jakby gałąź go nie miała. Wyłączone: chip zawsze pokazuje najnowsze żądanie, niezależnie od jego stanu. Działa od razu. |
 
@@ -376,6 +377,14 @@ zawiera też wartości domyślne [kontekstu przeglądu](ai.md#kontekst-przegląd
 (*Ustawienie profilu*, *Tak*, *Nie*), **Dołącz CLAUDE.md**, **Dołącz AGENTS.md** i **Dodatkowy plik** (ścieżka lub
 link; puste nie dodaje nic, z przyciskiem **Przeglądaj...** pod spodem, który otwiera wybór pliku; `Enter` na przycisku to jego forma klawiaturowa). Ta strona ma własny
 przewodnik: [Wsparcie AI](ai.md).
+
+Blok **Odpowiedzi na hoście** zawiera to, co przygotowuje komentarze, odpowiedzi i opisy zgłoszeń: jego profil i
+instrukcje, **Prompt bazowy** (puste używa wbudowanego) oraz grupę **Dostęp do repozytorium**: **Domyślnie pozwalaj AI
+czytać repozytorium** (wyłączone: wybór w każdym edytorze zaczyna niezaznaczony), **Zachowaj sesję agenta między
+odpowiedziami** i **Przechowuj kontekst repozytorium przez (minuty)**. Limity bajtów **Największa rozmowa wysyłana do
+odpowiedzi**, **Największy plik repozytorium dla odpowiedzi**, **Największa mapa repozytorium dla odpowiedzi**,
+**Maks. trafień wyszukiwania na termin dla odpowiedzi** i **Maks. terminów wyszukiwania dla odpowiedzi** są razem z
+innymi limitami wejścia. Zob. [Pomoc w pisaniu na hoście](ai.md#pomoc-w-pisaniu-na-hoście).
 
 Pod blokami poszczególnych akcji jest grupa **Prywatność**:
 
@@ -603,6 +612,8 @@ więc nigdy nie blokuje.
 | **Nazwa użytkownika gita** | Wysyłana jako nazwa użytkownika zdalnych repozytoriów HTTPS. Z **System** pozwala menedżerowi poświadczeń wybrać jedno z kilku zapisanych kont. |
 | **Ignoruj pomocników poświadczeń ustawionych przez to repozytorium** | Tylko **System**. Pomocnicy, których repozytorium ustawia samo (jego `.git/config` i dołączane pliki), są wypisani pod spodem z plikiem, z którego pochodzą; pomocnicy systemowi i globalni nadal działają. |
 | **Pomocnik**, **Polecenie**, **Hosty**, **Pamięć podręczna (minuty)** | Polecenie, które repozytorium uruchamia, by się zalogować. *Pomocnik* to pomocnik poświadczeń gita; *polecenie tokenu* wypisuje token (lista argumentów jest dzielona po spacjach, z cudzysłowem wokół argumentu ze spacjami, i pokazana pod **Uruchamiane jako**; żadna powłoka go nie uruchamia, działa w folderze repozytorium). **Hosty** ogranicza je do tych hostów (puste: host głównego zdalnego repozytorium); **Pamięć podręczna** to czas ponownego użycia tokenu (domyślnie 50 minut). **Użyj obecnego pomocnika tego repozytorium** kopiuje do pola pomocnika, którego ustawia repozytorium. |
+| **Użyj do API hostingu (zgłoszenia, pull requesty)** | Z poleceniem tokenu: to samo polecenie podaje też token wywołań zgłoszeń i pull requestów tego repozytorium, zamiast twojego osobistego tokenu (token instalacji GitHub App, więc komentarze pojawiają się jako App). Włączenie lub wyłączenie prosi o potwierdzenie. Zob. „Działanie jako bot GitHub App” w przewodniku [integracje z hostingiem](hosting-integration.md). |
+| **Przypisywanie** | **Dozwolone** (domyślnie) lub **Zablokowane**, zapisywane od razu. Gdy zablokowane, w zgłoszeniach i pull requestach tego repozytorium nie można nic przypisać z aplikacji, CLI ani od agenta; istniejący przypisani pozostają widoczni. |
 | **SSH: Loguj przez** | **System** (własna konfiguracja ssh, agent i domyślne klucze), **Plik klucza** lub **Klucz konta** (klucz integracji). |
 | **Plik klucza prywatnego** | Wybierz jeden z kluczy znalezionych w `~/.ssh` albo wpisz ścieżkę. Podawany jest tylko ten klucz, każdemu zdalnemu repozytorium SSH tego repozytorium, także podmodułom. Gdy inne konta mogą czytać plik klucza (bit uprawnień dla grupy lub innych na Linuksie i macOS, wpis dla Everyone, Users lub Authenticated Users na Windows), ostrzeżenie mówi, że OpenSSH odrzuca taki klucz („bad permissions”), a **Ogranicz do mojego konta** to naprawia (`chmod 600`, a na Windows DACL tylko dla twojego konta i SYSTEM). |
 | **Plik znanych hostów**, **Ścisła kontrola klucza hosta** | Opcjonalny plik zaufanych kluczy hostów oraz odrzucanie hosta, którego w nim nie ma. |

@@ -1342,7 +1342,7 @@ hint_back = "volver a la pestaña"
 hint_quit = "salir"
 not_a_repo_any_more = "{path} ya no es un repositorio git - quítalo de la lista con {key}"
 gone_from_disk_msg = "{path} ya no está en disco - quítalo de la lista con {key}"
-open_in_gone = "{path} is gone from disk, there is nothing to open"
+open_in_gone = "{path} ya no existe en el disco, no hay nada que abrir"
 actions_need_tab = "las acciones de {key} necesitan una pestaña de repositorio abierta"
 home_tab_fixed = "la pestaña Inicio no tiene menú de pestaña y no se puede cerrar"
 
@@ -2433,8 +2433,8 @@ status_stage_toggle = { git = "Stage o unstage de la fila seleccionada", local =
 status_open_diff = { git = "Abrir el {$diff} del archivo seleccionado", local = "Abrir las {$diff} del archivo seleccionado" }
 home_favorite = "Marcar o desmarcar el repositorio como favorito"
 home_close_repo = "Cerrar, quitar o desmarcar la fila"
-home_copy_path = "Copy the Repository Path"
-home_open_in = "Open the Repository in the Default Tool"
+home_copy_path = "Copiar la ruta del repositorio"
+home_open_in = "Abrir el repositorio en la herramienta predeterminada"
 home_browse = "Examinar en busca de un repositorio"
 home_clone = "Clonar un repositorio"
 home_init = "Inicializar un repositorio"
@@ -3323,8 +3323,8 @@ repositories_collapse_all_sections = "Repositorios: Contraer todas las secciones
 repositories_expand_all_sections = "Repositorios: Expandir todas las secciones"
 repositories_close_all_tabs = "Repositorios: Cerrar todas las pestañas..."
 repositories_remove_selected_from_list = "Repositorios: Quitar el seleccionado de la lista"
-repositories_copy_selected_path = "Repositories: Copy Selected Path"
-repositories_open_selected_in = "Repositories: Open Selected in Default Tool"
+repositories_copy_selected_path = "Repositorios: Copiar la ruta del seleccionado"
+repositories_open_selected_in = "Repositorios: Abrir el seleccionado en la herramienta predeterminada"
 repositories_remove_all_recent = "Repositorios: Quitar todos los recientes"
 tab_new_tab = "Pestaña: Nueva pestaña"
 tab_new_menu = "Pestaña: Nueva..."
@@ -3395,7 +3395,7 @@ ai_explain_working_changes = "IA: Explicar los cambios de trabajo"
 ai_insert_prompt_variable = "IA: Insertar variable de prompt"
 ai_compose_commits_from_working_changes = "IA: Componer {$commits} a partir de los cambios de trabajo..."
 # context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
-stage_guard_show_in_file = "Sensitive Files: Show in File"
+stage_guard_show_in_file = "Archivos sensibles: Mostrar en el archivo"
 composer_move_file_to_commit = { git = "Compositor: Mover archivo a un commit...", local = "Compositor: Mover archivo a una confirmación..." }
 diff_blame = { git = "Diff: Blame", local = "Diferencias: Blame" }
 diff_history = { git = "Diff: Historial del archivo", local = "Diferencias: Historial del archivo" }
@@ -3450,7 +3450,7 @@ why_no_text_selected_drag_over_the_text_first = "no hay texto seleccionado - arr
 why_the_diff_view_isn_t_open = { git = "la vista de diff no está abierta", local = "la vista de diferencias no está abierta" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "abre antes un archivo - en la vista de diff, el panel Estado o un commit", local = "abre antes un archivo - en la vista de diferencias, el panel Estado o una confirmación" }
 # context: why that palette command is unavailable
-why_no_sensitive_files_question = "no sensitive files question is open"
+why_no_sensitive_files_question = "no hay ninguna pregunta sobre archivos sensibles abierta"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "selecciona antes una rama o un tag en el panel Refs", local = "selecciona antes una rama o una etiqueta en el panel Refs" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "aún no se puede hacer checkout de una rama remota - crea antes una rama local de seguimiento"
 why_select_a_local_branch_in_the_refs_pane_first = "selecciona antes una rama local en el panel Refs"
@@ -4073,7 +4073,7 @@ repositories_and_tabs_open_in = "la lista «Abrir en» para la carpeta de esta p
 repositories_and_tabs_7 = "abre (o cambia a) el repositorio seleccionado"
 repositories_and_tabs_8 = "marcar/desmarcar con estrella"
 repositories_and_tabs_9 = "cerrar pestaña (Abiertos), quitar (Recientes), desmarcar (Favoritos)"
-repositories_and_tabs_copy_open = "copy the path / open in the default tool"
+repositories_and_tabs_copy_open = "copiar la ruta / abrir en la herramienta predeterminada"
 repositories_and_tabs_10 = "el menú de la fila"
 repositories_and_tabs_11 = "busca en todas las secciones"
 repositories_and_tabs_12 = "vaciar / volver a la pestaña"
@@ -5619,9 +5619,9 @@ too_large = "el archivo es demasiado grande para mostrarlo ({bytes} bytes)"
 unexpected = "respuesta inesperada"
 loading_whole = "cargando el archivo completo... (el botón Hunks solo muestra los cambios)"
 whole_unavailable = "(archivo completo no disponible: {why} - se muestran solo los hunks)"
-renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header = "{from} -> {to} ({percent}% de similitud)"
 renamed_header_plain = "{from} -> {to}"
-rename_no_change = "No content change (the file was only renamed or moved)"
+rename_no_change = "Sin cambios de contenido (el archivo solo se renombró o se movió)"
 
 [git_actions]
 no_such_local_branch = "esa rama local ya no existe - actualiza"
@@ -9332,7 +9332,7 @@ answer_cancel = { git = "Cancelar, no hacer stage de nada", local = "Cancelar, n
 # context: key hint at the bottom of the dialog
 hint = "Arriba/Abajo: elegir, Enter o 1/2: responder, Esc: cancelar"
 # context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
-show_in_file = "Show in file"
+show_in_file = "Mostrar en el archivo"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = { git = "no se hizo stage de archivos sensibles: {files}; pregunta al usuario y vuelve a hacer stage permitiendo archivos sensibles", local = "no se prepararon archivos sensibles: {files}; pregunta al usuario y vuelve a preparar permitiendo archivos sensibles" }
 
@@ -10286,22 +10286,22 @@ flavor_plain_text = "Texto plano"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
-title = "Edit a {$commit} of another branch"
+title = { git = "Editar un {$commit} de otra rama", local = "Editar una {$commit} de otra rama" }
 # context: body of that dialog when local branches hold the commit; {short} is the short commit id
-body_branches = "{short} is not on the current branch. Check out a branch that holds it to edit it here."
+body_branches = "{short} no está en la rama actual. Haz checkout de una rama que lo contenga para editarlo aquí."
 # context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
-body_none = "{short} is on no local branch. Create a branch at it to edit it here."
+body_none = "{short} no está en ninguna rama local. Crea una rama en él para editarlo aquí."
 # context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
-checkout = "Check out {branch} and edit"
+checkout = { git = "Hacer checkout de {branch} y editar", local = "Cambiar a {branch} y editar" }
 # context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
-rewrite = "Edit with advanced history rewrite"
+rewrite = "Editar con reescritura avanzada del historial"
 # context: button that opens the name box to create a branch at that commit
-create = "Create a branch here..."
+create = "Crear una rama aquí..."
 # context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
 key_rewrite = "r"
 # context: key of the Create a branch here button, one letter
-key_create = "b"
+key_create = "n"
 # context: key of the Cancel button of that dialog, one letter
 key_cancel = "c"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
-gave_up = "{short} was not edited: the branch was not checked out"
+gave_up = "{short} no se editó: no se hizo checkout de la rama"

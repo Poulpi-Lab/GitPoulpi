@@ -49,13 +49,39 @@ Un contrôle segmenté dans la bordure du haut change de page : **Aperçu**, **
 
 ### Aperçu
 
-La description (le Markdown simple est rendu comme tel : gras, italique, `code`, liens affichés par leur texte, listes à puces et
-numérotées, titres, citations et blocs de code), puis la discussion : les commentaires qui ne portent pas sur le code et les
-revues déjà envoyées, les plus anciennes d'abord, chacune avec son verdict (`approuvée`, `modifications demandées`, `commentée`,
-`écartée`). Sur GitLab, les verdicts sont ses approbations. En dessous, la zone de réponse : cliquez dessus ou appuyez sur **`c`**
-pour écrire un commentaire dans la discussion. **Celui-ci est publié immédiatement**, et la zone le dit.
+La vue d'ensemble est **la conversation de la demande**, la même chronologie et la même zone de commentaire qu'un ticket
+([Conversations](hosting-integration.md#5c-conversations)) : d'abord la description (*a ouvert ceci*), puis les commentaires,
+les fils sur le code avec leur extrait de diff, les revues envoyées avec leur verdict (`approuvée`, `modifications demandées`,
+`commentée`, `écartée` ; sur GitLab, les verdicts sont ses approbations) et les événements, les plus anciens d'abord, sur la
+fenêtre la plus récente avec **Charger les plus anciens** en haut. La zone de commentaire est ancrée sous la chronologie (**Nouveau commentaire**) :
+**Écrire**, **Aperçu** et **Côte à côte**, **Annuler** et **Envoyer**. **Un commentaire publié ici part chez l'hébergeur aussitôt**
+(rien n'est en attente : les commentaires en attente sont ceux sur le code, envoyés avec la revue), apparaît tout de suite dans la liste
+et prend sa place quand l'hébergeur répond ; si l'hébergeur le refuse, la zone se rouvre avec votre texte et la raison.
 
-La zone de commentaire (aussi celle d'une réponse, d'un commentaire sur une ligne et du résumé de **Terminer la revue**) est l'éditeur Markdown partagé avec [la vue de conversation](hosting-integration.md#éditeur-markdown) : **Écrire**, **Aperçu** (`Alt+P`) et **Côte à côte** (`Alt+L`, dans une fenêtre de 100 colonnes), `Ctrl+Enter` (aussi `Ctrl+S`, `Alt+Enter`) envoie, et là où l'IA est activée `Alt+E` ouvre **Écrire avec l'IA** ([le chapitre IA](ai.md#aide-à-la-rédaction-sur-un-hébergeur)). L'aperçu montre le texte comme l'hébergeur le rendra, références comprises (`#7`, `!12`, `ABC-12`, identifiants de commit) ; un texte non envoyé est gardé par demande. Le texte de la description et de la conversation passe par le même moteur de rendu : Markdown, tableaux, alertes et références s'y affichent donc comme dans la vue de conversation d'un ticket. Citer, modifier ou supprimer un commentaire déjà publié, et les notes internes, relèvent de la vue de conversation des tickets et des demandes sur les hébergeurs sans revue (voir [Conversations](hosting-integration.md#5c-conversations)) ; ici, seuls vos commentaires en attente se modifient.
+Les touches sont celles de la vue de conversation : **`Up`** / **`Down`** (et `Ctrl+J` / `Ctrl+K`) passent d'une entrée à l'autre,
+**`r`** répond dans le fil de l'entrée sélectionnée, **`Q`** la cite dans un nouveau commentaire, **`c`** écrit un nouveau
+commentaire, **`e`** / **`d`** modifient et suppriment vos propres commentaires (une question précède la suppression), **`l`** ou `Enter`
+ouvre les liens d'une entrée, **`g`** son diagramme, **`y`** copie son adresse, **`o`** l'ouvre dans le navigateur, **`n`**
+va à l'entrée non lue suivante, **`v`** affiche ou masque les événements, **`m`** charge les entrées plus anciennes, `Tab` passe de la
+chronologie à la zone et inversement, et **Note interne** (`Alt+I`) est là sur les hébergeurs qui ont de telles notes. Les boutons de l'entrée
+sélectionnée (**Répondre**, **Citer**, **Modifier**, **Supprimer**, **Liens**) font la même chose, et la palette a les lignes
+*Conversation : ...* à côté des lignes *Revue : ...*. Un lien est confirmé avant de s'ouvrir, comme partout dans la
+revue.
+
+Quand une touche de la conversation et une touche de la revue se rencontrent, la conversation garde la lettre sur cette page : `l` (étiquettes), `m`
+(jalon), `Q` (abandon sur Gerrit), `e` / `d`, `r`. Les étiquettes, le jalon et l'abandon restent sur les boutons de l'en-tête et
+dans la palette ; `a` (assignés), `p` (relecteurs), `f` (**Terminer la revue**), `b` (**Basculer**), `P`, `D`, `U` et
+`Alt+1` / `Alt+2` / `Alt+3` gardent leur sens ici. Tant que la zone a le clavier, chaque touche est la sienne, sauf
+`Alt+1` / `Alt+2` / `Alt+3` ; `Esc` rend le clavier à la chronologie et un deuxième `Esc` ferme la revue.
+
+Un commentaire écrit sur une autre fenêtre ou par le CLI s'affiche ici tout seul : chaque écriture de GitPoulpi (cette fenêtre
+comprise) en informe la session, et les fenêtres qui montrent la même demande la relisent.
+
+La zone de commentaire est l'éditeur Markdown partagé avec [la vue de conversation](hosting-integration.md#éditeur-markdown)
+(aussi la zone d'une réponse à un fil, d'un commentaire sur une ligne et du résumé de **Terminer la revue**) : `Ctrl+Enter` (aussi
+`Ctrl+S`, `Alt+Enter`) envoie, et là où l'IA est activée `Alt+E` ouvre **Écrire avec l'IA**
+([le chapitre IA](ai.md#aide-à-la-rédaction-sur-un-hébergeur)). L'aperçu montre le texte comme l'hébergeur le rendra, références comprises
+(`#7`, `!12`, `ABC-12`, identifiants de commit) ; un texte non envoyé est gardé par demande.
 
 ### Fichiers
 
@@ -229,17 +255,18 @@ Les suggestions **ne sont pas des commentaires**. Elles s'affichent à deux endr
   trois boutons : **Accepter**, **Modifier** et **Écarter**. Une suggestion sur une ligne que le diff ne montre pas est
   gardée, jamais perdue : elle est listée après les hunks sous *Suggestions de l'IA sur le fichier entier* et, une fois
   acceptée, atterrit sur la première ligne modifiée du fichier avec les mots *(à propos de la ligne N)* devant.
-- **Dans l'Aperçu**, sous la description : le résumé, puis la liste avec les mêmes boutons et **Tout accepter** /
+- **Dans l'Aperçu**, dans un bloc au-dessus de la conversation (seulement après une exécution) : le résumé, puis la liste avec les mêmes boutons et **Tout accepter** /
   **Tout écarter**.
 
 **Accepter** (`y`) transforme une suggestion en **commentaire en attente** ordinaire (vous pouvez encore le modifier ou le supprimer) ;
 **Modifier** (`w`) ouvre la zone de commentaire avec les mots du modèle d'abord et accepte ce que vous laissez ; **Écarter** (`n`)
 la jette. **Tout accepter** (`A`) ne fait que remplir la liste des commentaires en attente. Sur la page Fichiers, les touches agissent sur la
-suggestion sous le curseur, sur l'Aperçu sur la première de la liste. **Utiliser le résumé IA** (`i`, ou le bouton
+suggestion sous le curseur, sur l'Aperçu sur la première de la liste (`y` et `n` redeviennent *Copier le lien* et
+*Entrée non lue suivante* de la conversation une fois la liste vide). **Utiliser le résumé IA** (`i`, ou le bouton
 du formulaire Terminer la revue) met le résumé du modèle dans le texte de la revue ; il n'est jamais inséré tout seul.
 **Rien n'est envoyé à l'hébergeur avant que vous envoyiez la revue.**
 
-L'Aperçu montre le brouillon comme une carte au-dessus des suggestions : la pastille du verdict, le texte de la revue, et trois
+L'Aperçu montre le brouillon comme une carte en haut de ce bloc, au-dessus des suggestions : la pastille du verdict, le texte de la revue, et trois
 boutons.
 
 - **✦ Utiliser le brouillon...** (`u`) accepte chaque suggestion ouverte comme commentaire en attente et ouvre *Terminer la revue* déjà
@@ -260,7 +287,7 @@ Envoyer la revue dépense le brouillon.
 |---|---|---|
 | Aperçu / Fichiers / Commits | `Alt+1` / `Alt+2` / `Alt+3` | *Revue : Afficher l'aperçu*, *Afficher les fichiers*, *Afficher les commits* |
 | Commenter la ligne ou la plage | `c` | *Revue : Commenter la ligne...* |
-| Commenter la discussion | `c` sur l'Aperçu, `C` | *Revue : Commenter la discussion...* |
+| Commenter la discussion | `c` sur l'Aperçu, `C` | *Revue : Commenter la discussion...* (ouvre la zone de l'Aperçu), *Conversation : Nouveau commentaire* |
 | Répondre au fil | `r` | *Revue : Répondre au fil de discussion...* |
 | Résoudre ou rouvrir | `x` | *Revue : Résoudre ou rouvrir le fil de discussion* |
 | Replier ou déplier un fil | `z` | *Revue : Replier ou déplier le fil de discussion* |

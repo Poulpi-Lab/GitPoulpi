@@ -1345,7 +1345,7 @@ hint_back = "к вкладке"
 hint_quit = "выход"
 not_a_repo_any_more = "{path} больше не git-репозиторий - уберите его из списка клавишей {key}"
 gone_from_disk_msg = "{path} исчез с диска - уберите его из списка клавишей {key}"
-open_in_gone = "{path} is gone from disk, there is nothing to open"
+open_in_gone = "{path} исчез с диска, открывать нечего"
 actions_need_tab = "действиям {key} нужна открытая вкладка репозитория"
 home_tab_fixed = "у вкладки «Главная» нет меню вкладки, и её нельзя закрыть"
 
@@ -2425,8 +2425,8 @@ status_stage_toggle = { git = "Stage или unstage выбранной стро�
 status_open_diff = { git = "Открыть diff выбранного файла", local = "Открыть различия выбранного файла" }
 home_favorite = "Добавить репозиторий в избранное или убрать"
 home_close_repo = "Закрыть, убрать или снять звезду со строки"
-home_copy_path = "Copy the Repository Path"
-home_open_in = "Open the Repository in the Default Tool"
+home_copy_path = "Копировать путь репозитория"
+home_open_in = "Открыть репозиторий в инструменте по умолчанию"
 home_browse = "Найти репозиторий (Обзор)"
 home_clone = "Клонировать репозиторий"
 home_init = "Инициализировать репозиторий"
@@ -3316,8 +3316,8 @@ repositories_collapse_all_sections = "Репозитории: свернуть �
 repositories_expand_all_sections = "Репозитории: развернуть все разделы"
 repositories_close_all_tabs = "Репозитории: закрыть все вкладки..."
 repositories_remove_selected_from_list = "Репозитории: убрать выбранный из списка"
-repositories_copy_selected_path = "Repositories: Copy Selected Path"
-repositories_open_selected_in = "Repositories: Open Selected in Default Tool"
+repositories_copy_selected_path = "Репозитории: копировать путь выбранного"
+repositories_open_selected_in = "Репозитории: открыть выбранный в инструменте по умолчанию"
 repositories_remove_all_recent = "Репозитории: убрать все недавние"
 tab_new_tab = "Вкладка: новая вкладка"
 tab_new_menu = "Вкладка: новая..."
@@ -3388,7 +3388,7 @@ ai_explain_working_changes = "ИИ: объяснить рабочие измен
 ai_insert_prompt_variable = "ИИ: вставить переменную запроса"
 ai_compose_commits_from_working_changes = { git = "ИИ: составить commit'ы из рабочих изменений...", local = "ИИ: составить коммиты из рабочих изменений..." }
 # context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
-stage_guard_show_in_file = "Sensitive Files: Show in File"
+stage_guard_show_in_file = "Конфиденциальные файлы: показать в файле"
 composer_move_file_to_commit = { git = "Композитор: переместить файл в commit...", local = "Композитор: переместить файл в коммит..." }
 diff_blame = { git = "Diff: Blame", local = "Различия: Blame" }
 diff_history = { git = "Diff: история файла", local = "Различия: история файла" }
@@ -3443,7 +3443,7 @@ why_no_text_selected_drag_over_the_text_first = "текст не выделен 
 why_the_diff_view_isn_t_open = { git = "diff не открыт", local = "различия не открыты" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "сначала откройте файл - в diff, панели Status или commit'е", local = "сначала откройте файл - в различиях, панели Status или коммите" }
 # context: why that palette command is unavailable
-why_no_sensitive_files_question = "no sensitive files question is open"
+why_no_sensitive_files_question = "вопрос о конфиденциальных файлах не открыт"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "сначала выберите ветку или tag в панели Refs", local = "сначала выберите ветку или тег в панели Refs" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "checkout удалённой ветки пока не поддерживается - сначала создайте локальную отслеживающую ветку"
 why_select_a_local_branch_in_the_refs_pane_first = "сначала выберите локальную ветку в панели Refs"
@@ -4067,7 +4067,7 @@ repositories_and_tabs_open_in = "список «Открыть в» для па�
 repositories_and_tabs_7 = "открыть (или переключиться на) выбранный репозиторий"
 repositories_and_tabs_8 = "добавить звезду/снять"
 repositories_and_tabs_9 = "закрыть вкладку («Открытые»), убрать («Недавние»), снять звезду («Избранное»)"
-repositories_and_tabs_copy_open = "copy the path / open in the default tool"
+repositories_and_tabs_copy_open = "скопировать путь / открыть в инструменте по умолчанию"
 repositories_and_tabs_10 = "меню строки"
 repositories_and_tabs_11 = "поиск по всем разделам"
 repositories_and_tabs_12 = "очистить / вернуться к вкладке"
@@ -5615,9 +5615,9 @@ too_large = "файл слишком велик для показа ({bytes} б�
 unexpected = "неожиданный ответ"
 loading_whole = "загрузка всего файла... (кнопка «Hunk'и» показывает только изменения)"
 whole_unavailable = "(весь файл недоступен: {why} - показаны только hunk'и)"
-renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header = "{from} -> {to} (сходство {percent}%)"
 renamed_header_plain = "{from} -> {to}"
-rename_no_change = "No content change (the file was only renamed or moved)"
+rename_no_change = "Содержимое не изменилось (файл только переименован или перемещён)"
 
 [git_actions]
 no_such_local_branch = "этой локальной ветки больше нет - обновите"
@@ -9340,7 +9340,7 @@ answer_cancel = "Отмена, ничего не {$stage}"
 # context: key hint at the bottom of the dialog
 hint = "Вверх/Вниз: выбор, Enter или 1/2: ответ, Esc: отмена"
 # context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
-show_in_file = "Show in file"
+show_in_file = "Показать в файле"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "конфиденциальные файлы не {$staged}: {files}; спросите пользователя, затем повторите {$stage}, разрешив конфиденциальные файлы"
 
@@ -10294,22 +10294,22 @@ flavor_plain_text = "Простой текст"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
-title = "Edit a {$commit} of another branch"
+title = { git = "Изменение commit'а из другой ветки", local = "Изменение коммита из другой ветки" }
 # context: body of that dialog when local branches hold the commit; {short} is the short commit id
-body_branches = "{short} is not on the current branch. Check out a branch that holds it to edit it here."
+body_branches = "{short} нет в текущей ветке. Переключитесь на ветку, где он есть, чтобы изменить его здесь."
 # context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
-body_none = "{short} is on no local branch. Create a branch at it to edit it here."
+body_none = "{short} нет ни в одной локальной ветке. Создайте ветку на нём, чтобы изменить его здесь."
 # context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
-checkout = "Check out {branch} and edit"
+checkout = "Переключиться на {branch} и изменить"
 # context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
-rewrite = "Edit with advanced history rewrite"
+rewrite = "Изменить через переписывание истории"
 # context: button that opens the name box to create a branch at that commit
-create = "Create a branch here..."
+create = "Создать здесь ветку..."
 # context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
-key_rewrite = "r"
+key_rewrite = "п"
 # context: key of the Create a branch here button, one letter
-key_create = "b"
+key_create = "в"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "о"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
-gave_up = "{short} was not edited: the branch was not checked out"
+gave_up = "{short} не изменён: на ветку не переключились"

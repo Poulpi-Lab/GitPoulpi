@@ -38,14 +38,14 @@ fn open_form(term: &mut xtask::pty::Terminal) {
 /// The "What is sent" dialog opens before the request leaves: it shows the
 /// instruction and the draft, and Enter on its focused Send goes on.
 fn send_request(term: &mut xtask::pty::Terminal, expect: &[&str]) {
-    let screen = term
-        .wait_for("the What is sent dialog", STEP, |s| {
-            s.contains("Review what is sent") && s.contains("Send")
-        })
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
-    for want in expect {
-        assert!(screen.contains(want), "{want:?}:\n{}", screen.text());
-    }
+    // The dialog frame can paint before its body (the request text) does:
+    // wait for the expected text too, not just the frame.
+    term.wait_for("the What is sent dialog", STEP, |s| {
+        s.contains("Review what is sent")
+            && s.contains("Send")
+            && expect.iter().all(|want| s.contains(want))
+    })
+    .unwrap_or_else(|e| panic!("{e}\nwanted {expect:?}:\n{}", term.screen().text()));
     term.send_keys("Enter").expect("Send");
 }
 

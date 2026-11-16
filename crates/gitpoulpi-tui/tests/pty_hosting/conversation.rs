@@ -90,7 +90,11 @@ fn press_badge(term: &mut Terminal, locate: impl Fn(&Screen) -> Option<(u16, u16
         locate(s).and_then(|at| badge_before(s, at)).is_some()
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    // Badges are handed out over the whole screen: let the overlay settle
+    // (a late repaint can renumber it) before reading the letter.
+    let screen = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap();
     let at = locate(&screen).expect("the control");
     let badge = badge_before(&screen, at).expect("badge");
     term.send_text(&badge.to_string()).unwrap();

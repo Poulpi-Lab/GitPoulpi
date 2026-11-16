@@ -44,6 +44,7 @@ gitpoulpi config set general.auto_stash always # checked against the schema, the
 | `general.auto_prune_tags` | `false` | fetch 时也会删除远程已经删除的本地 tag（只涉及曾存在于远程的 tag；你从未 push 过的 tag 会保留）。需要 Git 2.41+。 |
 | `general.hosting_refresh_minutes` | `5` | pull request / 议题列表和工具栏标签的刷新间隔，范围 0 到 120；`0` = 仅按需刷新以及在事件发生时刷新。 |
 | `general.hosting_refresh_unit` | `"auto"` | 设置中显示该刷新间隔所用的单位：`minutes`、`hours` 或 `auto`，读取方式与 `general.auto_fetch_interval_unit` 相同。仅影响显示。 |
+| `general.hosting_post_as` | `""` | 仓库的令牌是机器人的（GitHub App 令牌）时，发往托管平台的消息所用的名称，例如 `my-app[bot]`：显示在每个文本框中，并用于识别你自己的评论。留空：向托管平台查询，否则从第一条发布的消息中得知。仓库可以覆盖它（设置，仓库的 SSH 与凭据）。 |
 | `general.keep_submodules_up_to_date` | `false` | 在 checkout 或 pull 之后，如果某个子模块不同步，则执行 `git submodule update --init --recursive`。参见[子模块](submodules.md)。 |
 | `general.default_branch_name` | `"main"` | 通过初始化创建的仓库的第一个分支；留空则由 git 决定。不会重命名任何分支。 |
 | `general.delete_orig_files_after_merge` | `false` | merge 成功完成后，删除 `*.orig` 备份文件。 |
@@ -348,7 +349,16 @@ review_mode = "ask"       # ask | clone | api
 | `ai.limits.review_threads_bytes` | `6000` | 已存在的评审评论列表（提供给模型，免得它重复）最多可有的字节数。超过时，*发送截断版本* 会截断该列表。范围相同。 |
 | `ai.limits.review_context_file_bytes` | `8192` | 提供给代码评审的单个项目上下文文件（`CLAUDE.md`、`AGENTS.md`、额外文件）最多可有的字节数。超过时，*发送截断版本* 会缩短该文件并附上说明。范围相同。 |
 | `ai.limits.review_context_bytes` | `16384` | 所有上下文文件合计最多可有的字节数。超过时，*发送截断版本* 会缩短越过限制的那个文件，并省略其后的文件。范围相同。 |
-| `ai.sent_preview.<action>` | `true` | 每个操作一个键（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`）：在请求发出之前显示“发送的内容”。对话框中的“不再为……显示”会写入 `false`；设置 > AI > *发送前显示所发内容…* 会把它们重新打开。`worktree_name` 会被接受，但同样没有效果：它只发送你在“创建 worktree”对话框中输入的内容和本地分支名称。 |
+| `ai.limits.hosting_reply_context_bytes` | `49152` | 起草回复（或议题描述）时，除你自己的文本之外所给内容的字节数上限：条目及其对话。超过时先省略最旧的评论，并在 `truncated` 中报告截断。范围与其他字节上限相同。 |
+| `ai.limits.hosting_reply_file_bytes` | `8192` | 起草回复时给出的单个仓库文件的字节数上限。AI 读取仓库时使用。范围相同。 |
+| `ai.limits.hosting_reply_map_bytes` | `6144` | 起草回复时给出的仓库地图的字节数上限。AI 读取仓库时使用。范围相同。 |
+| `ai.limits.hosting_reply_hits_per_term` | `20` | 起草回复时每个搜索词保留的搜索结果数上限。AI 读取仓库时使用。限制在 1 到 200 之间。 |
+| `ai.limits.hosting_reply_terms` | `8` | 起草回复时查找的搜索词数量上限。AI 读取仓库时使用。限制在 1 到 50 之间。 |
+| `ai.hosting_reply.base_prompt` | `""` | 两个写作操作（`hosting_reply`、`issue_body`）的基础提示词。留空则使用内置提示词；此处的文本会取代它，各级指令仍会附在其后。在设置 > AI > 托管平台上的回复 中编辑。 |
+| `ai.hosting_reply.read_repository` | `false` | “允许 AI 读取仓库”是否默认处于勾选状态。默认关闭：只有在你为那次使用勾选时才会读取仓库。之后本地代理或 API 配置按 [AI 一章](ai.md#仓库访问) 所述读取。 |
+| `ai.hosting_reply.reuse_agent_session` | `true` | 在其运行框架支持时，于两次回复之间保留本地代理的会话。在 AI 获准读取仓库后生效。 |
+| `ai.hosting_reply.context_ttl_minutes` | `30` | 为回复构建的仓库上下文复用多久。限制在 1 到 1440 之间。在 AI 获准读取仓库后生效。 |
+| `ai.sent_preview.<action>` | `true` | 每个操作一个键（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`、`hosting_reply`、`issue_body`）：在请求发出之前显示“发送的内容”。对话框中的“不再为……显示”会写入 `false`；设置 > AI > *发送前显示所发内容…* 会把它们重新打开。`worktree_name` 会被接受，但同样没有效果：它只发送你在“创建 worktree”对话框中输入的内容和本地分支名称。 |
 
 仓库自己的 `[preferences.ai_review]` 表（在其 `repo-state.toml` 中；未克隆仓库的条目在 `remote-reviews.toml` 中）接受相同的键，全部可选，另加 `no_extra_file = true`：此仓库不使用额外文件，不论 `ai.review.extra_file` 是什么。未设置的键、未设置的 `extra_file` 和缺失的 `no_extra_file` 都继承全局值；把 `extra_file` 设为某个文件会清除该开关，反之亦然。
 

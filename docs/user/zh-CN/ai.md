@@ -161,6 +161,7 @@ timeout_secs = 180                  # 0 or absent: 120 headless, 180 terminal
 | **代码评审** | 在 [pull 或 merge request 的评审](review.md#-ai-评审草稿)中：`✦ 起草评审…` 按钮、`s`，或命令面板 `评审：✦ 起草评审…`（它会打开评审选项，`Enter` 运行）。模型读取请求的 diff、描述和已有评论（默认还有项目的 `CLAUDE.md` 和 `AGENTS.md`：见[评审上下文](#评审上下文)）并提出评论；你逐条接受、编辑或忽略。在你提交评审之前，不会有任何内容发送到平台。 | `hosting review suggest <n>`（输出 JSON，不发布任何内容），`ai review-context`（默认值） |
 | **拆分 commit** | commit 的菜单 *拆分 commit（AI）…*，或命令面板 `AI：拆分所选 Commit…`。拆分编辑器会带着模型给出的分组打开；见下文。 | `ai split-plan <rev>`（打印） |
 | **Worktree 名称** | 在[创建 worktree 对话框](worktrees.md#用-ai-命名)中：**✦ 用 AI 命名** 按钮或 `Alt+A` 会打开一个框，你在其中描述功能、缺陷或任务；模型按仓库自身的分支命名习惯为 worktree 及其分支命名，两者都会填入对话框的字段供你编辑。只发送你的描述和本地分支名称，因此没有“发送的内容”对话框。 | `ai worktree-name --describe "<task>"`（打印） |
+| **托管平台回复**和**议题描述** | 每个会发往托管平台的 Markdown 文本框的 **AI 写作**按钮（`Alt+E`）：对话中的评论、回复或编辑，评审评论或摘要，新议题的描述。草稿会放进文本框；不会发布任何内容。见[托管平台上的写作辅助](#托管平台上的写作辅助)。 | `ai hosting-reply`（输出草稿） |
 | **历史重写脚本** | 在[历史重写工作台](history-rewrite.md#用-ai-编写脚本)中：脚本编辑器的 `✦ 用 AI 编写…` 按钮，或命令面板 `重写：用 AI 编写脚本…`。对话框会如实显示将要发送的内容；脚本会带着标记出现在编辑器里，绝不会替你运行或应用。 | `ai rewrite-script "<instruction>" [--sample N]`（打印） |
 | **历史重写规则** | 在[历史重写工作台](history-rewrite.md#用-ai-创建规则)中：`✦ 用 AI 创建规则…` 按钮、`Alt+I`，或命令面板 `重写：用 AI 创建规则…`。一个多行对话框会如实显示将要发送的内容；规则和设置会填入工作台，不会替你预览或应用任何内容。 | `ai rewrite-rules "<description>" [--context]`（打印） |
 | **Commit 撰写器** | WIP 行菜单中的 *撰写 commit（AI）...*、`Ctrl+G C`，命令面板 `AI：根据工作区更改撰写 Commit…` | |
@@ -206,6 +207,52 @@ timeout_secs = 180                  # 0 or absent: 120 headless, 180 terminal
 ### 历史重写规则
 
 你用自己的话描述历史应如何重写（“把我的旧邮箱 a@b.org 换成 c@d.org”，“从全部历史中移除 secrets.txt”），模型就会用工作台自己的词汇提出一个范围、一些设置和一组[重写规则](history-rewrite.md#用-ai-创建规则)。**它只做准备**：答案会填入工作台，不会预览也不会应用任何内容；无法使用的条目会连同原因一起列出，有效的条目则保留。这种方式绝不会创建脚本规则。可选地，还可以一并发送范围、分支和 tag 名称以及最近 commit 的作者（一个复选框，默认关闭，显示在“发送的内容”窗格中）。所用的配置和指令是设置 > AI 中 *历史重写规则* 的那一组。
+
+### 托管平台上的写作辅助
+
+*托管平台回复*起草评论、评论串中的回答、对某行代码的评论或评审摘要；*议题描述*起草新议题的描述。**AI 只写草稿。**文本会放进文本框（或由 CLI 输出），由你自己阅读、编辑并发送。这个功能没有任何代码路径可以写入托管平台：它不能发布、编辑、解决或删除任何内容，CLI 和 MCP 的回答中是 `"posted": false`，本地代理以只读方式运行（见下文）。文本只会通过文本框自己的**发送**（`Ctrl+Enter`）或**评论**按钮离开 GitPoulpi。
+
+**在 Markdown 文本框中。**开启 AI 时，每个文本会发往托管平台的文本框（[对话视图](hosting-integration.md#5c-对话)中的评论、回复或编辑，评审评论，“完成评审”摘要，新议题的描述和 pull request 描述）在其模式栏右端都有一个 **AI 写作**按钮（所有文本框中都是同一个键 `Alt+E`）。它会在栏下方打开一个面板：
+
+- 一个字段，*我希望这条回答包含什么*，在使用时输入（`Enter` 起草）。它的占位文字给出了这类内容的例子（“表示同意，并请对方补充一个失败的测试”）。**最近**列表保留以前的指令（点击其中一条，或在字段中用 `Up` / `Down`；保存在 `ai-hints.toml` 中）；
+- *改进我的草稿*，文本框中已有文本时会勾选：AI 从它出发，而不是写新的；
+- *允许 AI 读取仓库*，除非你把默认值打开（见下文），否则**每次都不勾选**；
+- **起草**、**停止**（也可用 `Esc`）和**关闭**，以及一行显示进度或错误。
+
+通常的“发送的内容”对话框（`[ai.sent_preview] hosting_reply`、`issue_body`、`pull_request_description`）会在请求发出之前显示它。除 system 和 user 文本外，读取仓库时它还会显示**仓库上下文**列表：每个部分及其大小、总量与上限（*31.2 KB / 48 KB*）、为符合上限截掉了什么、因敏感而排除了什么，以及哪些部分是复用的。对本地代理，它会说明代理使用只读工具自行读取仓库，列出这些工具，给出工作文件夹，以及代理会话是新建还是继续；每个对话框都以*AI 只写草稿。在你亲自发送之前不会发布任何内容。*结尾。草稿会以一个撤销步骤替换文本，文本框切换到预览，让你发送前先读一遍；`Ctrl+Z` 会取回你的文本。pull request 描述根据分支的提交和 diff 撰写，接受同样的指令；那里的仓库选项会变灰（“不适用于此文本”）。
+
+模型得到的内容：条目的标题、状态和描述，你要回答的评论串，近期评论（最新的在前，限制在 `ai.limits.hosting_reply_context_bytes` 之内，默认 49152），托管平台接受的标记格式（因此 Jira 的回答会以 Markdown 返回，再由 GitPoulpi 转换），你希望这条回答包含的内容，以及要改进你自己的文本时，你的草稿。其他人写的所有内容在请求中都标记为不受信任的数据，所以藏在评论里的指令不会被执行。超过上限时不会悄悄截断：会询问你，并先省略最旧的评论（你要回答的评论串会保留，最多占预算的一半）；CLI 在 `truncated` 中报告截断，`--send-all` 解除限制。
+
+**你自己的基础提示词。**两个操作共同的起始指令可以编辑：*设置 > AI > 托管平台上的回复 > 基础提示词*（`ai.hosting_reply.base_prompt`）。留空则使用内置提示词，它要求只输出文本，使用托管平台的标记格式和对话的语言，除非你的提示另有说明。你的全局、工作区和仓库指令仍会附在其后，无论你在那里写什么，其他人的文本仍标记为不受信任。`ai prompt --action hosting_reply` 会输出各层。
+
+#### 仓库访问
+
+**默认关闭，每次使用时勾选。**读取仓库能让“这个崩溃是出在我们的代码里吗？”这类问题得到好得多的回答，但发送的内容也更多，所以这是每次都要做的选择：*允许 AI 读取仓库*在每个框中都从不勾选开始。`ai.hosting_reply.read_repository`（*默认允许 AI 读取仓库*，关闭）只会让框一开始就勾选；`--read-repo` 是 CLI 的勾选。在三种情况下该选项会变灰，激活时会给出原因：仓库**未克隆**（Radar 中另一个仓库的对话：没有可读取的内容）、所选本地代理**没有只读模式**可供 GitPoulpi 信任，或者文本**不是根据仓库撰写的**（pull request 描述）。只有你自己的勾选才会把它打开。
+
+之后的行为取决于配置：
+
+| 配置 | 由谁读取仓库 | 发送什么 |
+|---|---|---|
+| **API**（OpenAI 兼容、Anthropic） | GitPoulpi，通过守护进程，只读 | 由它构建并交给模型的上下文：仓库地图（顶层目录树和匹配文件周围的路径）、对话提到的文件（整个文件，或该行或符号周围 40 行的窗口）、对话中标识符和错误消息的搜索结果，pull request 则还有它的 diff。限制在 `ai.limits.hosting_reply_*` 之内（上下文 49152，文件 8192，地图 6144，每个词 20 条结果，8 个词），按 diff、文件、结果、地图的顺序截断并报告。看起来敏感的文件会被排除，其余内容中的密钥会先被遮蔽（见[隐私](#隐私)）。 |
+| **本地代理**（Claude Code、Codex），无头 | 代理自己，在仓库文件夹中 | 不构建任何内容：代理在仓库中以**只读工具**启动，并读取它需要的内容。Claude Code 得到 `Read`、`Grep` 和 `Glob`，`Bash`、`Edit`、`Write`、`NotebookEdit`、`WebFetch` 和 `WebSearch` 被拒绝，且不加载任何 MCP 服务器（项目自己的服务器可能会发布内容）；Codex 在它的只读沙箱中运行。你环境中的托管平台凭据（`GH_TOKEN`、`GITHUB_TOKEN`、`GITLAB_TOKEN`、Jira、Linear、Azure DevOps 和 Bitbucket 的变量、`GIT_ASKPASS`、`SSH_AUTH_SOCK`）会从它的环境中移除，所以即使配置有误的代理也无法发布或推送。 |
+
+GitPoulpi 没有确认其只读模式的代理（以及交互式终端运行模式下的任何代理）无法获准：该选项保持变灰，并显示*此代理没有 GitPoulpi 信任的只读模式。*
+
+**缓存与刷新上下文。**收集到的内容会被复用，让下一次回复又快又省：
+
+- API 配置构建的上下文按仓库保留 `ai.hosting_reply.context_ttl_minutes`（*仓库上下文保留时长*，默认 30）。它以仓库、其 `HEAD`、所选内容和上限为键，各部分逐个保留，所以同一仓库的下一个议题只重建它不共享的部分。在窗口中缓存保存在内存里（最近 8 份上下文）；CLI 把它们保存在其私有状态文件夹的文件中，所以第二次 `ai hosting-reply --read-repo` 会复用第一次构建的内容。
+- 已检出分支上的新提交（`HEAD` 移动）、上限的更改或时间限制会让一切重新开始。**刷新上下文**同样如此，即读取仓库时面板中的按钮，或 CLI 上的 `--refresh-context`。框下面的一行说明上一份草稿做了什么：*已构建上下文：5 个部分，31.2 KB，HEAD a1b2c3d*、*已复用上下文（4/5 个部分，HEAD a1b2c3d）*、*服务商缓存：复用 12k 个 token*、*代理已读取仓库（HEAD a1b2c3d）*、*代理会话已开始*或*代理会话已继续*。
+- **Anthropic 提示词缓存。**对 Anthropic 配置，请求发送时把基础提示词和指令作为一个缓存块，仓库上下文作为第二个，你的对话、提示和草稿放在它们之后，因此在同一上下文上的第二次回复会从服务商的缓存中读取，只需一小部分费用。回答中的缓存计数就是*服务商缓存：复用 N 个 token* 所显示的内容。OpenAI 兼容服务器得到同样稳定的请求顺序，能受益于它们的自动前缀缓存；GitPoulpi 不会额外发送任何内容。
+- **代理保留它的会话。**在**在回复之间保留代理会话**（`ai.hosting_reply.reuse_agent_session`，默认开启）且勾选了*允许 AI 读取仓库*时，支持此功能的本地代理（目前是 Claude Code）会带着会话 id 启动，之后凭它恢复，所以它读到的仓库内容保留在自己的历史中，下一次回复启动更快。其他代理以一次性方式运行。会话按仓库、`HEAD` 和操作区分；新提交或**刷新上下文**会开始新会话；该选项关闭或未勾选该框时，每次回复都是什么也不保留的一次性运行。会话保存在代理自己的存储中，GitPoulpi 只保留它的 id（窗口中在内存里，CLI 则在仅用户可读的文件中）。
+
+```
+gitpoulpi ai hosting-reply --conversation conversation.json --hint "say I will look tomorrow"
+gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
+gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "is this our bug?"
+gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"
+```
+
+`--conversation` 接受文件、表示标准输入的 `-`，或 JSON 本身：即 `hosting issue comments --json` 或 `hosting review conversation --json` 输出的 JSON（带 `header` 和 `entries` 的较旧页面也接受），所以 `gitpoulpi hosting issue comments 7 --json | gitpoulpi ai hosting-reply --conversation -` 可以工作；`--item <ref>` 则自行获取对话（`7` 或 `#7` 为议题，`!7` 为 pull request）。配合 `--read-repo`，`--pr-base REV --pr-head REV` 会把 pull request 的 diff 放入上下文；回答中的 `context` 说明读取了哪些部分、是否复用、服务商的缓存 token 数以及代理会话。MCP 工具 `ai_hosting_reply` 是同一条命令，并且是只读的。
 
 ## 密钥去向
 
@@ -277,6 +324,11 @@ GitPoulpi 放进请求的每一项输入都有大小限制，它们是 `[ai.limi
 | `review_threads_bytes` | 6000 | 已存在的评审评论 |
 | `review_context_file_bytes` | 8192 | 评审的单个项目上下文文件（`CLAUDE.md`、`AGENTS.md`、额外文件） |
 | `review_context_bytes` | 16384 | 评审的所有上下文文件合计 |
+| `hosting_reply_context_bytes` | 49152 | 交给草稿回复的条目和对话 |
+| `hosting_reply_file_bytes` | 8192 | 交给草稿回复的单个仓库文件（AI 读取仓库时） |
+| `hosting_reply_map_bytes` | 6144 | 交给草稿回复的仓库地图 |
+| `hosting_reply_hits_per_term` | 20 | 每个词保留的搜索结果数（1 到 200） |
+| `hosting_reply_terms` | 8 | 查找的搜索词数量（1 到 50） |
 
 **不会悄悄截断任何内容。** 当某项输入超过其限制时，请求会暂停，*超出 AI 限制* 对话框会列出超出的部分：哪一部分（diff、某个文件、描述、某个上下文文件）、它的大小、限制和对应的设置。评审会在同一个对话框中列出所有超出的部分。各按钮及其按键：
 

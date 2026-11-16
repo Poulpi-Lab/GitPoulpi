@@ -451,7 +451,7 @@ La stessa bacheca è disponibile per script e agenti: `gitpoulpi hosting board` 
 Una card mostra il numero, il titolo, gli assegnatari come iniziali, le etichette e la milestone. Trascinala su un'altra colonna,
 oppure `Shift+Left` / `Shift+Right`, oppure **Bacheca: Sposta la card in...** (`m`). Si sposta subito; dopo circa 150 ms un indicatore di attività
 dice che l'host sta ancora lavorando, e se l'host rifiuta la card torna indietro e la barra di stato dice perché. `Enter` apre
-la issue sull'host (la nota, per le issue locali); `e` modifica assegnatari, etichette e milestone; `n` avvia una nuova issue nella
+la [conversazione](#5c-conversazioni) della issue in GitPoulpi, e la bacheca ritorna quando la chiudi; `e` modifica assegnatari, etichette e milestone; `n` avvia una nuova issue nella
 colonna selezionata; `a`, `l`, `M` e `/` filtrano per assegnatario, etichetta, milestone e testo, `x` azzera i filtri; `r`
 rilegge l'host. La bacheca si rilegge quando gli elenchi della barra laterale si aggiornano. Il Radar non ha una bacheca.
 
@@ -466,7 +466,7 @@ push). GitPoulpi la legge dall'host, la mostra formattata e ti lascia rispondere
 | Da | Come |
 |---|---|
 | Una riga ISSUE | `Enter` o un doppio clic; **Apri conversazione** del menu della riga; palette *Hosting: Apri la conversazione di una issue...* (un elenco delle issue a schermo). **Apri nel browser** del menu della riga mantiene il browser. |
-| Una riga PULL REQUEST su Azure DevOps o Bitbucket | `Enter` o **Apri conversazione**. Su GitHub, GitLab, Gitea, Forgejo e Gerrit la riga apre la [revisione](review.md), la cui pagina Panoramica è la conversazione della richiesta. |
+| Una riga PULL REQUEST su Azure DevOps o Bitbucket | `Enter` o **Apri conversazione**. Su GitHub, GitLab, Gitea, Forgejo e Gerrit la riga apre la [revisione](review.md), la cui pagina Panoramica è questa stessa conversazione (la cronologia, i tasti e la casella dei commenti qui sotto). |
 | Una card della [bacheca delle issue](#5b-la-bacheca-delle-issue) | `Enter` o un doppio clic. |
 | Il [Radar](radar.md) | `i` su una riga di issue o di richiesta, **Apri conversazione** del menu della riga, o *Radar: Apri la conversazione della issue*. |
 | Un riferimento in un'altra conversazione | Cliccalo (oppure `l`, poi sceglilo): `#7`, `!12`, `ABC-12` di una sorgente collegata si aprono nell'app e finiscono su una pila di Indietro. |

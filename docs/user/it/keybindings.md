@@ -190,8 +190,8 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `status` | `collapse_below` | Comprimi la cartella e le sue sottocartelle | `_`, `Shift+Left` |
 | `home` | `favorite` | Aggiungi o togli il repository dai preferiti | `f`, `*` |
 | `home` | `close_repo` | Chiudi, rimuovi o togli dai preferiti la riga | `x`, `Delete` |
-| `home` | `copy_path` | Copy the Repository Path | `y` |
-| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
+| `home` | `copy_path` | Copia il percorso del repository | `y` |
+| `home` | `open_in` | Apri il repository nello strumento predefinito | `o` |
 | `home` | `browse` | Sfoglia per trovare un repository | `b` |
 | `home` | `clone` | Clona un repository | `c` |
 | `home` | `init` | Inizializza un repository | `i` |
@@ -806,8 +806,8 @@ applicano. I tasti sono quelli predefiniti.
 | Repository: Aggiungi o togli il selezionato dai preferiti | `f` |
 | Repository: Chiudi o rimuovi il selezionato | `x` |
 | Repository: Menu del repository selezionato... | `.` |
-| Repositories: Copy Selected Path | `y` |
-| Repositories: Open Selected in Default Tool | `o` |
+| Repository: Copia il percorso del selezionato | `y` |
+| Repository: Apri il selezionato nello strumento predefinito | `o` |
 | Repository: Cerca | `/ / Ctrl+F` |
 | Repository: Comprimi tutte le sezioni | `-` |
 | Repository: Espandi tutte le sezioni | `+` |
@@ -1166,7 +1166,7 @@ applicano. I tasti sono quelli predefiniti.
 | ✦ IA: Dividi il commit selezionato... |  |
 | ✦ IA: Spiega le modifiche in corso | `Ctrl+G w` |
 | ✦ IA: Componi commit dalle modifiche in corso... | `Ctrl+G C` |
-| Sensitive Files: Show in File | `S` |
+| File sensibili: Mostra nel file | `S` |
 | Compositore: Sposta il file in un commit... | `m` |
 | Diff: Blame |  |
 | Blame: Mostra il commit nel Log | `Enter` |

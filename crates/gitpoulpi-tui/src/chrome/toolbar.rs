@@ -295,8 +295,14 @@ enum Slot {
 /// The dropdown arrow after a button's label, and its width in cells.
 const DROPDOWN: &str = "\u{25BE} ";
 
-fn dropdown_w() -> u16 {
-    display_width(DROPDOWN) as u16
+/// A split button's arrow chip: one space each side of the glyph, so the
+/// arrow sits in the middle of its sub-button in every terminal.
+const SPLIT_ARROW: &str = " \u{25BE} ";
+
+/// The width of a button's arrow part, in cells.
+fn dropdown_w(b: ToolbarButton) -> u16 {
+    let text = if is_split(b) { SPLIT_ARROW } else { DROPDOWN };
+    display_width(text) as u16
 }
 
 /// Push, Pull and Undo: a button plus a `▾` chip with its own hit rect.
@@ -326,7 +332,11 @@ fn button_items(enabled: ToolbarEnabled) -> Vec<BarItem<ToolbarButton>> {
         .map(|(glyph, label, button)| BarItem {
             key: *button,
             width: display_width(&format!(" {glyph} {} ", label.get())) as u16
-                + if has_arrow(*button) { dropdown_w() } else { 0 },
+                + if has_arrow(*button) {
+                    dropdown_w(*button)
+                } else {
+                    0
+                },
             gap_before: 1,
             priority: toolbar_priority(*button),
         })
@@ -502,7 +512,12 @@ pub(crate) fn toolbar_render_with(
             format!(" {label} "),
             Style::default().bg(bg).fg(label_fg),
         ));
-        let main_w = item.width - if has_arrow(button) { dropdown_w() } else { 0 };
+        let main_w = item.width
+            - if has_arrow(button) {
+                dropdown_w(button)
+            } else {
+                0
+            };
         if matches!(button, ToolbarButton::Lfs | ToolbarButton::Flow) {
             // One rect over the label and its arrow, one background.
             spans.push(Span::styled(
@@ -536,11 +551,11 @@ pub(crate) fn toolbar_render_with(
                 th().chrome.toolbar_arrow_bg
             };
             spans.push(Span::styled(
-                DROPDOWN,
+                SPLIT_ARROW,
                 Style::default().bg(arrow_bg).fg(th().chrome.toolbar_fg),
             ));
             hits.push((
-                Rect::new(chip_x, area.y, dropdown_w(), 1),
+                Rect::new(chip_x, area.y, dropdown_w(button), 1),
                 HitTarget::ToolbarDropdown(button),
             ));
             // A dropdown opened from the keyboard or the palette hangs
@@ -678,7 +693,6 @@ pub(crate) fn toolbar_column(
 ) -> ToolbarRender {
     let w = area.width;
     let h = area.height;
-    let arrow_w = dropdown_w().min(w);
     let buttons = button_items(enabled);
     let chip_label = chip.map(|c| format!(" {} ", c.text));
     // The profile field and the pinned chip each take a row at the bottom,
@@ -752,7 +766,12 @@ pub(crate) fn toolbar_column(
         let (icon, label) = toolbar_parts(button);
         let bg = button_bg(hovered, button);
         let (icon_fg, label_fg) = button_fgs(enabled, button);
-        let main_w = if has_arrow(button) { w - arrow_w } else { w };
+        let arrow_w = if has_arrow(button) {
+            dropdown_w(button).min(w)
+        } else {
+            0
+        };
+        let main_w = w - arrow_w;
         // " <icon> <label>", the label clipped to what the row leaves and
         // padded so the chip's background fills the row.
         let icon_w = display_width(icon) as u16;
@@ -787,7 +806,7 @@ pub(crate) fn toolbar_column(
                         th().chrome.toolbar_arrow_bg
                     };
                     spans.push(Span::styled(
-                        DROPDOWN,
+                        SPLIT_ARROW,
                         Style::default().bg(arrow_bg).fg(th().chrome.toolbar_fg),
                     ));
                     hits.push((

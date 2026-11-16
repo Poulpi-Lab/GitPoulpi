@@ -404,7 +404,7 @@ Radar에는 보드가 없습니다.
 | 위치 | 방법 |
 |---|---|
 | 이슈 행 | `Enter` 또는 더블 클릭. 행 메뉴의 **대화 열기**. 팔레트 *호스팅: 이슈 대화 열기...* (화면에 있는 이슈 목록). 행 메뉴의 **브라우저에서 열기**는 브라우저를 그대로 엽니다. |
-| Azure DevOps나 Bitbucket의 PULL REQUESTS 행 | `Enter` 또는 **대화 열기**. GitHub, GitLab, Gitea, Forgejo, Gerrit에서는 행이 [리뷰](review.md)를 열며, 그 개요 페이지가 요청의 대화입니다. |
+| Azure DevOps나 Bitbucket의 PULL REQUESTS 행 | `Enter` 또는 **대화 열기**. GitHub, GitLab, Gitea, Forgejo, Gerrit에서는 행이 [리뷰](review.md)를 열며, 그 개요 페이지가 바로 이 대화입니다(타임라인, 키, 아래의 댓글 상자). |
 | [이슈 보드](#5b-이슈-보드)의 카드 | `Enter` 또는 더블 클릭. |
 | [Radar](radar.md) | 이슈나 요청 행에서 `i`, 행 메뉴의 **대화 열기**, 또는 *Radar: 이슈 대화 열기*. |
 | 다른 대화 안의 참조 | 클릭하거나(또는 `l`을 누르고 선택): 연결된 소스의 `#7`, `!12`, `ABC-12`는 앱 안에서 열리고 뒤로 스택에 쌓입니다. |

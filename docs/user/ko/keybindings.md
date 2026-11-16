@@ -185,8 +185,8 @@ stage_file = "z"
 | `status` | `collapse_below` | 폴더와 하위 폴더 접기 | `_`, `Shift+Left` |
 | `home` | `favorite` | 저장소 즐겨찾기 추가 또는 해제 | `f`, `*` |
 | `home` | `close_repo` | 행 닫기, 제거 또는 즐겨찾기 해제 | `x`, `Delete` |
-| `home` | `copy_path` | Copy the Repository Path | `y` |
-| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
+| `home` | `copy_path` | 저장소 경로 복사 | `y` |
+| `home` | `open_in` | 기본 위치에서 저장소 열기 | `o` |
 | `home` | `browse` | 저장소 찾아보기 | `b` |
 | `home` | `clone` | 저장소 클론 | `c` |
 | `home` | `init` | 저장소 초기화 | `i` |
@@ -795,8 +795,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 저장소 목록: 선택 항목 즐겨찾기 추가 또는 제거 | `f` |
 | 저장소 목록: 선택 항목 닫기 또는 제거 | `x` |
 | 저장소 목록: 선택한 저장소 메뉴... | `.` |
-| Repositories: Copy Selected Path | `y` |
-| Repositories: Open Selected in Default Tool | `o` |
+| 저장소 목록: 선택 항목 경로 복사 | `y` |
+| 저장소 목록: 선택 항목을 기본 위치에서 열기 | `o` |
 | 저장소 목록: 검색 | `/ / Ctrl+F` |
 | 저장소 목록: 모든 섹션 접기 | `-` |
 | 저장소 목록: 모든 섹션 펼치기 | `+` |
@@ -1155,7 +1155,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | ✦ AI: 선택한 Commit 분할... |  |
 | ✦ AI: 작업 변경 사항 설명 | `Ctrl+G w` |
 | ✦ AI: 작업 변경 사항으로 Commit 구성... | `Ctrl+G C` |
-| Sensitive Files: Show in File | `S` |
+| 민감한 파일: 파일에서 보기 | `S` |
 | 작성기: 파일을 Commit으로 이동... | `m` |
 | Diff: Blame |  |
 | Blame: Log에서 commit 표시 | `Enter` |

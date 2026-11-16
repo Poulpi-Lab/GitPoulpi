@@ -997,7 +997,7 @@ Tuşlar varsayılanlardır.
 | Konuşma: Kapat | `Esc` |
 | Markdown Düzenleyici: YZ ile Yaz |  |
 | Markdown Düzenleyici: YZ Bağlamını Yenile |  |
-| Sunucu: Issue Konuşmasını Aç... |  |
+| Barındırma: Issue Konuşmasını Aç... |  |
 | İnceleme: ✦ İnceleme Taslağı... | `s` |
 | İnceleme: Öneriyi Kabul Et | `y` |
 | İnceleme: Öneriyi Düzenle ve Kabul Et... | `w` |

@@ -293,6 +293,7 @@ listede ve düğmelerin üstündeki satırda gösterilir.
 | **Geçmiş yeniden yazma betiği** | [Geçmişi yeniden yazma ekranında](history-rewrite.md#yz-ile-betik-yazma): Betik düzenleyicisinin `✦ YZ ile yaz...` düğmesi ya da palette `Yeniden Yaz: YZ ile Betik Yaz...`. Bir iletişim kutusu tam olarak neyin gönderileceğini gösterir; betik işaretlenmiş olarak düzenleyiciye düşer ve sizin yerinize asla çalıştırılmaz veya uygulanmaz. | `ai rewrite-script "<yönerge>" [--sample N]` (yazdırır) |
 | **Geçmiş yeniden yazma kuralları** | [Geçmişi yeniden yazma ekranında](history-rewrite.md#yz-ile-kural-oluşturma): `✦ YZ ile kural oluştur...` düğmesi, `Alt+I` ya da palette `Yeniden Yaz: YZ ile Kural Oluştur...`. Çok satırlı bir iletişim kutusu tam olarak neyin gönderileceğini gösterir; kurallar ve ayarlar ekrana yerleşir, sizin yerinize hiçbir şey önizlenmez veya uygulanmaz. | `ai rewrite-rules "<açıklama>" [--context]` (yazdırır) |
 | **Worktree adı** | [Worktree oluştur penceresinde](worktrees.md#yz-ile-adlandırma): `✦ YZ ile adlandır` düğmesi veya `Alt+A`, özelliği, hatayı ya da görevi açıkladığınız bir kutu açar; model worktree'yi ve dalını deponun kendi dal adlarına göre adlandırır ve ikisi de düzenlemeniz için pencerenin alanlarına yerleşir. Yalnızca açıklamanız ve yerel dal adları gönderilir, bu yüzden "Gönderilenler" penceresi yoktur. | `ai worktree-name --describe "<görev>"` (yazdırır) |
+| **Sunucuda yanıt** ve **Issue açıklaması** | Bir sunucuya metin gönderen her Markdown yazma kutusunun **YZ ile Yaz** düğmesi (`Alt+E`): bir konuşmadaki yorum, yanıt veya düzenleme, bir inceleme yorumu veya özeti, yeni bir issue'nun açıklaması. Taslak kutuya düşer; hiçbir şey gönderilmez. Bkz. [Sunucuda yazma yardımı](#sunucuda-yazma-yardımı). | `ai hosting-reply` (bir taslak yazdırır) |
 | **Commit composer** | WIP satırının menüsündeki *Commit'leri oluştur (YZ)...*, `Ctrl+G C`, palette `YZ: Çalışma Değişikliklerinden Commit'ler Oluştur...` | |
 
 `Esc`, çalışan bir isteği iptal eder (yerel bir ajanın süreci sonlandırılır).
@@ -373,6 +374,111 @@ kullanılamayan bir girdi nedeniyle listelenir, geçerli olanlar korunur. Bu yol
 oluşturulmaz. İsterseniz kapsam, dal ve tag adları ve en yeni commit'lerin yazarları da gönderilir
 (varsayılan olarak kapalı bir kutu, "ne gönderilir" bölmesinde görünür). Profil ve talimatlar,
 Ayarlar > YZ içindeki *Geçmiş yeniden yazma kuralları* olanlardır.
+
+### Sunucuda yazma yardımı
+
+*Sunucuda yanıt* bir yorumun, bir yorum dizisindeki yanıtın, koddaki bir satıra yapılan yorumun veya bir incelemenin
+özetinin taslağını hazırlar; *Issue açıklaması* yeni bir issue'nun açıklamasının taslağını hazırlar. **YZ yalnızca
+taslak yazar.** Metin, siz okuyup düzenleyip kendiniz gönderesiniz diye yazma kutusuna girer (veya CLI tarafından
+yazdırılır). Bu özellikten bir barındırıcının yazma işlemine giden hiçbir kod yolu yoktur: hiçbir şeyi gönderemez,
+düzenleyemez, çözemez veya silemez, CLI ve MCP yanıtı `"posted": false` der ve yerel bir ajan salt okunur çalışır
+(aşağıda). Metin GitPoulpi'den yalnızca yazma kutusunun kendi **Gönder** (`Ctrl+Enter`) veya **Yorum yap** düğmesiyle çıkar.
+
+**Markdown yazma kutusunda.** YZ açıkken, metni bir barındırıcıya giden her yazma kutusunun (bir [konuşma
+görünümündeki](hosting-integration.md#5c-konuşmalar) yorum, yanıt veya düzenleme, bir inceleme yorumu, İncelemeyi bitir
+özeti, yeni issue açıklaması ve pull request açıklaması) mod çubuğunun sağ ucunda bir **YZ ile Yaz** düğmesi (hepsinde
+aynı tuş `Alt+E`) vardır. Çubuğun altında bir panel açar:
+
+- kullanım anında yazılan bir alan, *Bu yanıtta istediklerim* (`Enter` taslak yazdırır). Yer tutucusu bu türden bir
+  örnek verir ("katıl ve başarısız olan bir test iste"). Bir **Önceki** listesi önceki talimatları tutar (birine tıklayın
+  veya alanda `Up` / `Down`; `ai-hints.toml` içinde saklanır);
+- *Taslağımı iyileştir*, kutuda zaten bir metin varken işaretli: YZ yeni bir metin yazmak yerine ondan başlar;
+- *YZ depoyu okuyabilsin*, varsayılanını açmadıysanız **her seferinde işaretsiz** (aşağıya bakın);
+- **Taslak**, **Durdur** (ayrıca `Esc`) ve **Kapat** ve ilerleme veya hata için bir satır.
+
+Olağan "Gönderilenler" iletişim kutusu (`[ai.sent_preview] hosting_reply`, `issue_body`, `pull_request_description`)
+isteği, çıkmadan önce gösterir. Sistem ve kullanıcı metninin yanında, depo okunuyorsa bir **Depo bağlamı** listesi
+gösterir: her parça boyutuyla, toplam sınıra karşı (*48 KB içinden 31.2 KB*), sığması için nelerin kesildiği, hassas
+diye nelerin dışarıda bırakıldığı ve hangi parçaların yeniden kullanıldığı. Yerel bir ajan için ajanın depoyu salt
+okunur araçlarla kendisinin okuduğunu söyler, araçları adlandırır, çalışma klasörünü ve ajan oturumunun yeni mi
+sürdürülmüş mü olduğunu verir ve her iletişim kutusu *YZ yalnızca bir taslak yazar. Siz kendiniz göndermeden hiçbir şey
+gönderilmez.* ile biter. Taslak, metnin yerini tek bir geri alma adımında alır ve yazma kutusu Önizleme'ye geçer, böylece
+göndermeden önce okursunuz; `Ctrl+Z` metninizi geri verir. Bir pull request açıklaması dalın commit'lerinden ve
+diff'inden yazılır ve aynı talimatı alır; depo kutusu orada gridir ("bu metin için değil").
+
+Modele verilenler: öğenin başlığı, durumu ve açıklaması, yanıtladığınız yorum dizisi, son yorumlar (en yeniden başlayarak,
+`ai.limits.hosting_reply_context_bytes` içinde, varsayılan 49152), barındırıcının kabul ettiği işaretleme (böylece bir
+Jira yanıtı GitPoulpi'nin dönüştürdüğü Markdown olarak gelir), bu yanıtta ne istediğiniz ve kendi metninizi iyileştirmek
+için taslağınız. Başkalarının yazdığı her şey istekte güvenilmez veri olarak işaretlenir, bu yüzden bir yorumun içine
+gizlenmiş bir talimat izlenmez. Sınır aşılırsa hiçbir şey sessizce kesilmez: size sorulur ve önce en eski yorumlar
+dışarıda bırakılır (yanıtladığınız yorum dizisi, bütçenin yarısına kadar korunur); CLI kesintiyi `truncated` içinde
+bildirir ve `--send-all` onu kaldırır.
+
+**Kendi temel isteminiz.** Her iki eylemin de çıkış noktası olan talimatlar düzenlenebilir: *Ayarlar > YZ > Sunucudaki
+yanıtlar > Temel istem* (`ai.hosting_reply.base_prompt`). Boşsa, yalnızca metni, barındırıcının işaretlemesiyle ve
+ipucunuz aksini söylemedikçe konuşmanın dilinde isteyen yerleşik istem kullanılır. Genel, çalışma alanı ve depo
+talimatlarınız yine bunun ardından gelir ve başkalarının metni, oraya ne yazarsanız yazın güvenilmez olarak işaretli
+kalır. `ai prompt --action hosting_reply` katmanları yazdırır.
+
+#### Depo erişimi
+
+**Varsayılan olarak kapalı ve kullanım başına işaretlenir.** Depoyu okumak "bu çökme bizim kodumuzda mı oluyor?"
+sorusuna çok daha iyi yanıtlar verir ama daha çok şey gönderir; bu yüzden her seferinde verdiğiniz bir karardır: *YZ
+depoyu okuyabilsin* her kutuda işaretsiz başlar. `ai.hosting_reply.read_repository` (*YZ varsayılan olarak depoyu
+okuyabilsin*, kapalı) yalnızca kutunun işaretli başlamasını sağlar; `--read-repo` CLI'nin işaretidir. Seçenek üç
+durumda, etkinleştirdiğinizde nedeniyle birlikte gri olur: depo **klonlanmamıştır** (Radar'ın başka bir deponun
+konuşması: okunacak bir şey yoktur), seçilen yerel ajanın GitPoulpi'nin güvendiği bir **salt okunur kipi yoktur** veya
+metin **depodan yazılmaz** (bir pull request açıklaması). Onu yalnızca sizin kendi işaretiniz açar.
+
+Sonra olan şey profile bağlıdır:
+
+| Profil | Depoyu ne okur | Ne gönderilir |
+|---|---|---|
+| **API** (OpenAI uyumlu, Anthropic) | GitPoulpi, daemon üzerinden, salt okunur | Oluşturup modele verdiği bir bağlam: depo haritası (üst düzey ağaç ve eşleşen dosyaların çevresindeki yollar), konuşmanın andığı dosyalar (dosyanın tamamı veya satırın ya da simgenin çevresinde 40 satırlık bir pencere), konuşmadaki tanımlayıcılar ve hata mesajları için arama sonuçları ve bir pull request için diff'i. `ai.limits.hosting_reply_*` içinde (bağlam 49152, dosya 8192, harita 6144, terim başına 20 sonuç, 8 terim); diff, dosyalar, sonuçlar, harita sırasıyla kesilir ve bildirilir. Hassas görünen dosyalar dışarıda bırakılır ve geri kalanındaki gizli bilgiler önce maskelenir ([Gizlilik](#gizlilik) bölümüne bakın). |
+| **Yerel ajan** (Claude Code, Codex), başsız | Ajanın kendisi, depo klasöründe | Hiçbir şey oluşturulmaz: ajan depoda **salt okunur araçlarla** başlatılır ve ihtiyacı olanı okur. Claude Code `Read`, `Grep` ve `Glob` alır ve `Bash`, `Edit`, `Write`, `NotebookEdit`, `WebFetch` ve `WebSearch` reddedilir, hiçbir MCP sunucusu yüklenmez (bir projenin kendi sunucusu gönderebilir); Codex salt okunur korumalı alanında çalışır. Ortamınızın barındırma kimlik bilgileri (`GH_TOKEN`, `GITHUB_TOKEN`, `GITLAB_TOKEN`, Jira, Linear, Azure DevOps ve Bitbucket değişkenleri, `GIT_ASKPASS`, `SSH_AUTH_SOCK`) ajanın ortamından kaldırılır; yanlış yapılandırılmış bir ajan bile yayımlayamaz veya push edemez. |
+
+GitPoulpi'nin onaylanmış bir salt okunur kipi olmayan bir ajan (ve sanal terminal çalıştırma modundaki her ajan)
+içeri alınamaz: seçenek *Bu ajanın GitPoulpi'nin güvendiği bir salt okunur kipi yok.* ile gri kalır.
+
+**Önbellek ve Bağlamı yenile.** Toplananlar yeniden kullanılır, böylece sonraki yanıt hızlı ve ucuz olur:
+
+- Bir API profilinin oluşturulan bağlamı, depo başına `ai.hosting_reply.context_ttl_minutes` boyunca saklanır (*Depo
+  bağlamını şu kadar sakla*, varsayılan 30). Anahtarı depo, `HEAD`, seçim ve sınırlardır ve parçaları tek tek saklanır;
+  böylece aynı deponun sonraki issue'su yalnızca paylaşmadığı parçaları yeniden oluşturur. Pencerede önbellekler
+  bellekte durur (son 8 bağlam); CLI onları özel durum klasöründeki dosyalarda tutar, böylece ikinci bir
+  `ai hosting-reply --read-repo`, ilkinin oluşturduğunu yeniden kullanır.
+- Checkout yapılmış dalda yeni bir commit (`HEAD` ilerler), sınırlarda bir değişiklik veya süre sınırı baştan başlatır.
+  Depo okunurken panelde bulunan **Bağlamı yenile** düğmesi veya CLI'de `--refresh-context` de öyle. Kutunun altındaki
+  bir satır son taslağın ne yaptığını söyler: *Bağlam oluşturuldu: 5 parça, 31.2 KB, HEAD a1b2c3d*, *Bağlam tekrar
+  kullanıldı (4/5, HEAD a1b2c3d)*, *Önbellek: 12k token yeniden kullanıldı*, *Ajan depoyu okudu (HEAD a1b2c3d)*,
+  *Ajan oturumu başladı* veya *Ajan oturumu sürdü*.
+- **Anthropic istem önbelleği.** Bir Anthropic profili için istek, temel istem ve talimatlar tek bir önbellekli blok,
+  depo bağlamı ikinci bir blok olarak ve konuşmanız, ipucunuz ve taslağınız onlardan sonra gönderilir; böylece aynı
+  bağlamdaki ikinci bir yanıt sağlayıcının önbelleğinden okunur ve çok daha ucuza gelir. Yanıtın önbellek sayaçları
+  *Önbellek: N token yeniden kullanıldı* satırının gösterdiğidir. OpenAI uyumlu sunucular, otomatik önek önbelleklemesinin
+  yararlandığı aynı kararlı istek sırasını alır; GitPoulpi fazladan bir şey göndermez.
+- **Ajan oturumunu korur.** **Yanıtlar arasında ajanın oturumunu koru** (`ai.hosting_reply.reuse_agent_session`,
+  varsayılan olarak açık) ve *YZ depoyu okuyabilsin* işaretliyken, bunu destekleyen bir yerel ajan (bugün Claude Code) bir
+  oturum kimliğiyle başlatılır, sonra onunla sürdürülür; böylece depodan okuduğu kendi geçmişinde kalır ve sonraki yanıt
+  daha hızlı başlar. Diğer ajanlar tek seferlik çalışır. Oturum depo, `HEAD` ve eylem başınadır; yeni bir commit veya
+  **Bağlamı yenile** yenisini başlatır; seçenek kapalıyken veya kutu işaretsizken her yanıt hiçbir şey saklamayan tek
+  seferlik bir çalıştırmadır. Oturum ajanın kendi depolamasında yaşar, GitPoulpi yalnızca kimliğini tutar (pencerede
+  bellekte, CLI için yalnızca kullanıcıya açık bir dosyada).
+
+```
+gitpoulpi ai hosting-reply --conversation conversation.json --hint "yarın bakacağımı söyle"
+gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
+gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "bu bizim hatamız mı?"
+gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "yeniden üretme adımları"
+```
+
+`--conversation` bir dosya, standart girdi için `-` veya JSON'un kendisini alır: `hosting issue comments --json` veya
+`hosting review conversation --json` çıktısındaki JSON (bir `header` ve `entries` içeren daha eski bir sayfa da kabul
+edilir), yani `gitpoulpi hosting issue comments 7 --json | gitpoulpi ai hosting-reply --conversation -` çalışır;
+`--item <ref>` konuşmayı kendisi getirir (`7` veya `#7` bir issue, `!7` bir pull request). `--read-repo` ile `--pr-base
+REV --pr-head REV` bir pull request'in diff'ini bağlama koyar; yanıtın `context` alanı hangi parçaların okunduğunu,
+yeniden kullanılıp kullanılmadıklarını, sağlayıcının önbellek token'larını ve ajan oturumunu söyler. `ai_hosting_reply`
+MCP aracı aynı komuttur ve salt okunurdur.
 
 ## Anahtarın gittiği yer
 
@@ -466,6 +572,11 @@ istekleri küçük tutmak için azaltın.
 | `review_threads_bytes` | 6000 | Zaten var olan inceleme yorumları |
 | `review_context_file_bytes` | 8192 | Bir incelemenin tek bir proje bağlam dosyası (`CLAUDE.md`, `AGENTS.md`, ek dosya) |
 | `review_context_bytes` | 16384 | Bir incelemenin tüm bağlam dosyaları birlikte |
+| `hosting_reply_context_bytes` | 49152 | Taslağı hazırlanan bir yanıta verilen öğe ve konuşma |
+| `hosting_reply_file_bytes` | 8192 | Taslağı hazırlanan bir yanıta verilen tek bir depo dosyası (YZ depoyu okurken) |
+| `hosting_reply_map_bytes` | 6144 | Taslağı hazırlanan bir yanıta verilen depo haritası |
+| `hosting_reply_hits_per_term` | 20 | Terim başına tutulan arama sonuçları (1 ile 200) |
+| `hosting_reply_terms` | 8 | Aranan arama terimleri (1 ile 50) |
 
 **Hiçbir şey sessizce kesilmez.** Bir girdi sınırını aştığında istek bekler ve
 *YZ sınırı aşıldı* neyin aştığını listeler: hangi parça (diff, bir dosya, açıklama,

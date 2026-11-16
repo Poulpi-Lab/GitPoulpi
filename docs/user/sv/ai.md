@@ -458,7 +458,8 @@ släppas in: valet förblir nedtonat med *Den här agenten har inget skrivskydda
   *Agenten läste repositoryt (HEAD a1b2c3d)*, *Agentsession startad* eller *Agentsession fortsatt*.
 - **Anthropics promptcache.** För en Anthropic-profil skickas begäran med grundprompten och instruktionerna som
   ett cachat block och repositorykontexten som ett andra, och din konversation, ledtråd och utkast efter dem, så
-  att ett andra svar på samma kontext läses från leverantörens cache och kostar en bråkdel. Svarets cacheräknare
+  att ett andra svar på samma kontext läses från leverantörens cache och kostar en bråkdel (uppföljningar cachar också
+  konversationsmeddelandet och det senaste utkastet, se nedan). Svarets cacheräknare
   är det *Leverantörens cache: N token återanvända* visar. OpenAI-kompatibla servrar får samma stabila ordning på
   begäran, vilket deras automatiska prefixcachning drar nytta av; GitPoulpi skickar inget extra.
 - **Agenten behåller sin session.** Med **Behåll agentens session mellan svar**
@@ -469,8 +470,33 @@ släppas in: valet förblir nedtonat med *Den här agenten har inget skrivskydda
   en engångskörning som inte behåller något. Sessionen lever i agentens egen lagring, GitPoulpi behåller bara dess id
   (i minnet i fönstret, i en fil bara för användaren för CLI:t).
 
+**Uppföljningar: kortare, en annan instruktion.** Att fråga igen i samma ruta (”gör den kortare”, ”lägg till ett
+tack”) är ett enda utbyte. En återupptagen Claude Code-session minns det själv. För allt annat (en API-profil, Codex
+och varje annan agent) ger GitPoulpi tillbaka det: begäran innehåller konversationsmeddelandet från den första
+begäran, sedan varje tidigare instruktion och utkastet som svarade på den som riktiga chattturer (en avskrift i
+prompten för en agent, som läser ett dokument), och till sist bara det som är nytt: din instruktion och, när *Förbättra
+mitt utkast* är ikryssat, texten som nu står i rutan med dina egna ändringar. En uppföljning börjar alltså aldrig från
+ingenting, och inget läses från repositoryt igen. ”Det som skickas” visar allt. Utbytet hålls inom
+`ai.limits.hosting_reply_context_bytes` som konversationen: de äldsta uppföljningarna utelämnas först,
+konversationsmeddelandet och ditt senaste utkast stannar alltid (CLI-svarets `context.history_omitted` räknar dem).
+Inom ett utbyte förblir repositorykontexten den från dess första begäran, så den återanvänds och leverantörens cache
+håller: för en Anthropic-profil är grundprompten, repositorykontexten, konversationsmeddelandet och det senaste
+utkastet den cachade delen, och en OpenAI-kompatibel server får samma meddelandeordning för sin prefixcachning. Codex
+skulle kunna återupptas med `codex exec resume <id>`, men det väljer sessions-id själv och skriver bara ut det bland
+sina JSON-händelser (och `--last` skulle ta upp dina egna sessioner), så GitPoulpi behåller det som engångskörning och
+ger historiken på nytt i stället. Utbytet lever med rutan: det tar slut när rutan stängs eller texten skickas, och
+**Uppdatera kontext** släpper det också (nästa begäran är en första). Bara en begäran som gav svar ingår i det; en
+misslyckad eller stoppad gör det inte. En pull requests beskrivning skrivs från diffen och har inget utbyte.
+
+I CLI:t är varje anrop separat, så `--continue` tar upp utbytet igen: det fortsätter det senaste
+`ai hosting-reply` för samma mål i det här repositoryt (samma `--item`, `--reply-to`, `--path`/`--line` eller
+`--issue-title`), från en liten fil i den privata tillståndsmappen. Utan `--continue` startar ett nytt utbyte som
+ersätter det sparade. `--continue` utan något sparat för målet är ett fel. Svarets `context` innehåller
+`history_turns` (och `history_omitted`) när tidigare turer följde med.
+
 ```
 gitpoulpi ai hosting-reply --conversation conversation.json --hint "say I will look tomorrow"
+gitpoulpi ai hosting-reply --conversation conversation.json --hint "shorter" --continue
 gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
 gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "is this our bug?"
 gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"

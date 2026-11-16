@@ -49,21 +49,39 @@ En segmenterad kontroll i övre kanten växlar sida: **Översikt**, **Filer**, *
 
 ### Översikt
 
-Beskrivningen (grundläggande Markdown visas som sådan: fetstil, kursiv, `kod`, länkar som sin text, punkt- och numrerade
-listor, rubriker, citat och kodblock), sedan konversationen: kommentarerna som inte sitter på kod och
-granskningarna som redan är skickade, äldst först, var och en med sitt omdöme (`godkänd`, `begärde ändringar`, `kommenterade`,
-`avfärdad`). På GitLab är omdömena dess godkännanden. Under den finns svarsrutan: klicka på den eller tryck **`c`**
-för att skriva en kommentar i konversationen. **Den här publiceras direkt**, och rutan säger det.
+Översikten är **begärans konversation**, samma tidslinje och samma kommentarsruta som ett ärende har
+([Konversationer](hosting-integration.md#5c-konversationer)): beskrivningen först (*öppnade detta*), sedan kommentarerna,
+trådarna på kod med sitt diff-utdrag, de skickade granskningarna med sitt omdöme (`godkänd`, `begärde
+ändringar`, `kommenterade`, `avfärdad`; på GitLab är omdömena dess godkännanden) och händelserna, äldst först, i det
+nyaste fönstret med **Läs in äldre** överst. Kommentarsrutan sitter under tidslinjen (**Ny kommentar**):
+**Skriv**, **Förhandsvy** och **Delad**, **Avbryt** och **Skicka**. **En kommentar som skrivs här går direkt till värden**
+(inget är väntande: väntande kommentarer är de på kod, som skickas med granskningen), visas i listan med en gång
+och tar sin plats när värden svarar; om värden vägrar öppnas rutan igen med din text och orsaken.
 
-Kommentarsrutan (också rutan för ett svar, en kommentar på en rad och sammanfattningen i **Slutför granskning**) är den
-Markdown-redigerare som delas med [konversationsvyn](hosting-integration.md#skriva): **Skriv**, **Förhandsvy** (`Alt+P`) och
-**Delad** (`Alt+L`, i ett fönster som är 100 kolumner brett), `Ctrl+Enter` (också `Ctrl+S`, `Alt+Enter`) skickar, och där AI är på
-öppnar `Alt+E` **Skriv med AI** ([AI-kapitlet](ai.md#skrivhjälp-på-en-värd)). Förhandsvyn visar texten så som värden gör det,
-referenser inräknade (`#7`, `!12`, `ABC-12`, commit-id:n); en osänd text sparas per begäran. Texten i
-beskrivningen och konversationen använder samma renderare, så Markdown, tabeller, varningsblock och referenser ser likadana ut här
-och i konversationsvyn för ett ärende. Att citera, redigera eller ta bort en kommentar som redan publicerats, och interna anteckningar,
-hör till konversationsvyn för ärenden och för begäranden på värdar utan granskning (se
-[Konversationer](hosting-integration.md#5c-konversationer)); här kan bara dina väntande kommentarer redigeras.
+Tangenterna är konversationsvyns: **`Up`** / **`Down`** (och `Ctrl+J` / `Ctrl+K`) flyttar mellan poster,
+**`r`** svarar i den valda postens tråd, **`Q`** citerar den i en ny kommentar, **`c`** skriver en ny
+kommentar, **`e`** / **`d`** redigerar och tar bort dina egna kommentarer (en fråga kommer före en borttagning), **`l`** eller `Enter`
+öppnar en posts länkar, **`g`** dess diagram, **`y`** kopierar dess adress, **`o`** öppnar den i webbläsaren, **`n`**
+går till nästa olästa post, **`v`** visar eller döljer händelser, **`m`** läser in äldre poster, `Tab` växlar mellan
+tidslinjen och rutan, och **Intern anteckning** (`Alt+I`) finns på de värdar som har sådana anteckningar. Knapparna för den
+valda posten (**Svara**, **Citera**, **Redigera**, **Ta bort**, **Länkar**) gör detsamma, och paletten har raderna
+*Konversation: ...* bredvid raderna *Granskning: ...*. En länk frågas om innan den öppnas, som överallt i
+granskningen.
+
+Där en konversationstangent och en granskningstangent möts har konversationen bokstaven på den här sidan: `l` (etiketter), `m`
+(milstolpe), `Q` (Gerrits abandon), `e` / `d`, `r`. Etiketter, milstolpe och abandon finns kvar på sidhuvudets knappar och
+i paletten; `a` (tilldelade), `p` (granskare), `f` (**Slutför granskning**), `b` (**Checka ut**), `P`, `D`, `U` och
+`Alt+1` / `Alt+2` / `Alt+3` behåller sin betydelse här. Medan rutan har tangentbordet är varje tangent rutans, utom
+`Alt+1` / `Alt+2` / `Alt+3`; `Esc` ger tillbaka tangentbordet till tidslinjen och ett andra `Esc` stänger granskningen.
+
+En kommentar som skrivits i ett annat fönster eller av CLI:t visas här av sig själv: varje skrivning i GitPoulpi (det här
+fönstret inräknat) berättar det för sessionen, och fönstren som visar samma begäran läser den igen.
+
+Kommentarsrutan är den Markdown-redigerare som delas med [konversationsvyn](hosting-integration.md#skriva)
+(också rutan för ett svar i en tråd, en kommentar på en rad och sammanfattningen i **Slutför granskning**): `Ctrl+Enter` (också
+`Ctrl+S`, `Alt+Enter`) skickar, och där AI är på öppnar `Alt+E` **Skriv med AI**
+([AI-kapitlet](ai.md#skrivhjälp-på-en-värd)). Förhandsvyn visar texten så som värden gör det, referenser inräknade
+(`#7`, `!12`, `ABC-12`, commit-id:n); en osänd text sparas per begäran.
 
 ### Filer
 
@@ -236,17 +254,18 @@ Förslag är **inte kommentarer**. De visas på två ställen:
   tre knappar: **Godta**, **Redigera** och **Avfärda**. Ett förslag om en rad som diffen inte visar
   behålls, tappas aldrig: det listas efter hunkarna under *AI-förslag om hela filen* och, när det
   godtagits, hamnar det på filens första ändrade rad med orden *(om rad N)* framför.
-- **I Översikt**, under beskrivningen: sammanfattningen, sedan listan med samma knappar och **Godta alla** /
-  **Avfärda alla**.
+- **I Översikt**, i ett block ovanför konversationen (bara efter en körning): sammanfattningen, sedan listan med samma
+  knappar och **Godta alla** / **Avfärda alla**.
 
 **Godta** (`y`) gör ett förslag till en vanlig **väntande kommentar** (du kan fortfarande redigera eller ta bort den);
 **Redigera** (`w`) öppnar kommentarrutan med modellens ord först och godtar det du lämnar kvar; **Avfärda** (`n`)
 släpper det. **Godta alla** (`A`) fyller fortfarande bara den väntande listan. På sidan Filer verkar tangenterna på
-förslaget under markören, i Översikt på det första i listan. **Använd AI-sammanfattning** (`i`, eller knappen
+förslaget under markören, i Översikt på det första i listan (`y` och `n` är konversationens *Kopiera länk* och
+*Nästa olästa* igen när listan är tom). **Använd AI-sammanfattning** (`i`, eller knappen
 i formuläret Slutför granskning) lägger modellens sammanfattning i granskningstexten; den infogas aldrig av sig själv.
 **Inget skickas till värden förrän du skickar granskningen.**
 
-Översikt visar utkastet som ett kort ovanför förslagen: omdömeschippet, granskningstexten och tre
+Översikt visar utkastet som ett kort överst i det blocket, ovanför förslagen: omdömeschippet, granskningstexten och tre
 knappar.
 
 - **✦ Använd utkastet...** (`u`) godtar varje öppet förslag som en väntande kommentar och öppnar *Slutför granskning* redan
@@ -267,7 +286,7 @@ Att skicka granskningen förbrukar utkastet.
 |---|---|---|
 | Översikt / Filer / Commits | `Alt+1` / `Alt+2` / `Alt+3` | *Granskning: Visa översikt*, *Visa filer*, *Visa Commits* |
 | Kommentera raden eller intervallet | `c` | *Granskning: Kommentera rad...* |
-| Kommentera konversationen | `c` i Översikt, `C` | *Granskning: Kommentera konversationen...* |
+| Kommentera konversationen | `c` i Översikt, `C` | *Granskning: Kommentera konversationen...* (öppnar Översiktens ruta), *Konversation: Ny kommentar* |
 | Svara i tråden | `r` | *Granskning: Svara i tråd...* |
 | Lös eller öppna igen | `x` | *Granskning: Lös eller öppna tråd igen* |
 | Vik ihop eller ut en tråd | `z` | *Granskning: Fäll ihop eller ut tråd* |

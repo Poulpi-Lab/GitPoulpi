@@ -18,6 +18,12 @@ de lokala ändringarna:
 - **Unstaged-filer**: redigerade, tillagda (ospårade) och borttagna filer som
   ännu inte är med i nästa commit.
 - **Staged-filer**: det nästa commit kommer att innehålla.
+- **Filer som bytt namn eller flyttats** är en enda rad, `nytt <- gammalt`, i båda listorna (en fil som raderats på
+  disk och en ny med minst 50 % samma innehåll räknas som en flytt redan innan du stagear dem). Stage, Unstage och
+  Förkasta verkar på båda namnen: att stagea stagear borttagningen och den nya filen, så git ser en enda namnändring.
+  Att öppna raden visar innehållsdiffen mot det gamla namnet, med rubriken `gammalt -> nytt (N % lika)`; en flytt
+  utan ändringar säger **Ingen ändring av innehållet**. Detsamma gäller en commits filer, och `gitpoulpi status` /
+  `gitpoulpi diff` rapporterar `renamed_from`.
 - **Sökväg** eller **Träd** (`m`) listar filer platt eller i mappar. **Fäll
   ihop alla** (`z`) fäller ihop mapparna. **Visa alla filer** (`a`) visar hela
   trädet i stället för bara de ändrade filerna. Högerklicka på listans tomma yta för
@@ -50,6 +56,10 @@ så ett förlupet Enter svarar ingenting; `Esc`, stängningskorset och ett klick
 Det är samma fråga från tangentbordet, en knapp, en meny, paletten eller en
 drag och släpp, eftersom de alla skickar samma begäran. Att avbryta stagear ingenting,
 inte ens de vanliga filerna i samma stage.
+En hemlighet som hittats i en fil anger sin rad (`config/app.env:12`). För att titta innan du bestämmer dig, klicka på
+ett fynd (eller gå mellan dem med `Tab` / `Shift+Tab`, `Ctrl+J` / `Ctrl+K`) och tryck på knappen **Visa i filen**, `S`,
+eller paletten **Känsliga filer: Visa i filen**: filen öppnas i filvyn rullad till den raden med raden markerad, och
+frågan kommer tillbaka orörd när du stänger filvyn (`Esc`). Att titta stagear ingenting.
 
 Textfiler upp till 1 MiB var och 32 MiB totalt läses; större filer och binärfiler
 bedöms bara efter namn. `[privacy] staging_guard = false` stänger av kontrollen.
@@ -190,6 +200,11 @@ Med [AI](ai.md) på skriver knappen **`✦`** till höger om sammanfattningen et
 utifrån de stageade ändringarna (`Ctrl+G i`), och **Komponera commits med AI**
 delar upp ditt arbete i flera commits, se nedan. Texten hamnar i formuläret för
 att du ska redigera den; inget committas förrän du trycker på commit-knappen.
+
+**Komponera commits med AI** sitter längst till höger på Amend-raden och krymper med högerpanelen i stället för att
+försvinna: hela etiketten, sedan **Komponera med AI**, sedan bara **`✦`**. Den behåller sitt klick, sitt
+verktygstips och sin tangent (`Ctrl+G Shift+C`) i varje bredd; etiketterna Amend och Hoppa över hooks viker sig för den,
+aldrig tvärtom.
 
 ## Commit-composern: dela upp dina ändringar i commits
 

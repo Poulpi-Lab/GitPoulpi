@@ -447,7 +447,7 @@ Samma tavla finns för skript och agenter: `gitpoulpi hosting board` skriver ut 
 Ett kort visar numret, titeln, de tilldelade som initialer, etiketterna och milstolpen. Dra det till en annan kolumn,
 eller `Shift+Left` / `Shift+Right`, eller **Tavla: Flytta kort till...** (`m`). Det flyttas direkt; efter ungefär 150 ms säger en snurra
 att värden fortfarande arbetar, och om värden vägrar går kortet tillbaka och statusraden säger varför. `Enter` öppnar
-ärendet hos värden (anteckningen, för lokala ärenden); `e` redigerar tilldelade, etiketter och milstolpe; `n` startar ett nytt ärende i
+ärendets [konversation](#5c-konversationer) i GitPoulpi, och tavlan kommer tillbaka när du stänger den; `e` redigerar tilldelade, etiketter och milstolpe; `n` startar ett nytt ärende i
 den valda kolumnen; `a`, `l`, `M` och `/` filtrerar på tilldelad, etikett, milstolpe och text, `x` rensar filtren; `r`
 läser värden igen. Tavlan läses om när sidofältets listor uppdateras. Radar har ingen tavla.
 
@@ -462,7 +462,7 @@ pushar). GitPoulpi läser den från värden, visar den formaterad och låter dig
 | Från | Hur |
 |---|---|
 | En ÄRENDEN-rad | `Enter` eller ett dubbelklick; radmenyns **Öppna konversation**; paletten *Värd: Öppna ärendekonversation...* (en lista med ärendena på skärmen). Radmenyns **Öppna i webbläsare** behåller webbläsaren. |
-| En PULL REQUESTS-rad på Azure DevOps eller Bitbucket | `Enter` eller **Öppna konversation**. På GitHub, GitLab, Gitea, Forgejo och Gerrit öppnar raden [granskningen](review.md), vars Översikt-sida är begärans konversation. |
+| En PULL REQUESTS-rad på Azure DevOps eller Bitbucket | `Enter` eller **Öppna konversation**. På GitHub, GitLab, Gitea, Forgejo och Gerrit öppnar raden [granskningen](review.md), vars Översikt-sida är samma konversation (tidslinjen, tangenterna och kommentarsrutan nedan). |
 | Ett kort på [ärendetavlan](#5b-ärendetavlan) | `Enter` eller ett dubbelklick. |
 | [Radar](radar.md) | `i` på en ärende- eller begäranrad, radmenyns **Öppna konversation**, eller *Radar: Öppna ärendekonversation*. |
 | En referens i en annan konversation | Klicka på den (eller `l` och välj den): `#7`, `!12`, `ABC-12` i en länkad källa öppnas i appen och läggs på en Tillbaka-stack. |

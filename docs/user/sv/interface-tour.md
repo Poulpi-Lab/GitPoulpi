@@ -141,7 +141,8 @@ Den fliken stängs när worktreen tas bort.
 Fliken Hem är repositoryhanteraren. Den har fyra avsnitt: **ÖPPNA
 REPOSITORIES**, **FAVORITER**, **SENASTE REPOSITORIES** och **ALLA
 REPOSITORIES**. Varje rad visar grenen, antalet ahead och behind och antalet
-ändringar. Varje rad har en stjärna (favorit), **Öppna** eller **Växla**,
+ändringar, sedan mappens sökväg när det finns plats: förkortad med `~` och avklippt i mitten när det är trångt,
+den trycker aldrig undan namnet, ägaren eller grenen. Varje rad har en stjärna (favorit), **Öppna** eller **Växla**,
 **Stäng** eller **Ta bort**, och en `⋮`-meny.
 
 Överst: **Bläddra**, **Klona**, **Init**, en sökruta, **Fäll ihop alla** och
@@ -149,7 +150,7 @@ REPOSITORIES**. Varje rad visar grenen, antalet ahead och behind och antalet
 *Senaste* och *Alla*. En saknad favorit blir kvar, med en knapp **Ta bort**.
 **Ta bort** raderar aldrig något på disk.
 
-Tangenter: `Enter` öppna, `f` favorit, `x` stäng eller ta bort, `.` meny, `/`
+Tangenter: `Enter` öppna, `f` favorit, `x` stäng eller ta bort, `y` kopiera sökvägen, `o` öppna i standardverktyget (`⋮`-menyns **Öppna i** väljer ett annat), `.` meny, `/`
 sök, `Space` fäll ett avsnitt, `Esc` tillbaka till din flik.
 `Ctrl+N` visar ett märke på sökfältet, varje avsnitt och varje knapp: tryck på märkets tecken för att fokusera eller trycka på det (se [Märken](keybindings.md#märken)).
 
@@ -243,7 +244,10 @@ De två sidopanelerna (Refs-sidofältet, `Ctrl+N h`, och högerpanelen, `Ctrl+N 
 
 En rad per commit, nyaste först. Högerklicka på rubriken för att visa eller dölja
 kolumner. Dra i gränsen mellan två rubriker för att ändra en kolumns bredd. Dra
-en rubrik för att flytta kolumnen.
+en rubrik för att flytta kolumnen. Bredderna hör till repositoryt: de sparas med det och kommer tillbaka när du
+öppnar det igen, och ett repository som öppnas för första gången får varje kolumn anpassad efter det Log visar
+(`Anpassa alla kolumner efter innehållet` gör om det, `Återställ kolumnernas bredder` går tillbaka till automatiska
+bredder, som blir kvar).
 
 Panelen har ingen titel: kolumnrubrikerna säger vad den är. På en commit utan ref visar den pekade raden ett bleknat piller med namnet på den gren den tillhör (stängs av med **Visa en spökgren/tag på den commit som pekas på** under Inställningar > Log & graf).
 

@@ -189,8 +189,8 @@ Varje tangent du kan binda om, med id:t som används i
 | `status` | `collapse_below` | Fäll ihop mappen och dess undermappar | `_`, `Shift+Left` |
 | `home` | `favorite` | Stjärnmarkera repositoryt | `f`, `*` |
 | `home` | `close_repo` | Stäng, ta bort eller ta bort stjärnan på raden | `x`, `Delete` |
-| `home` | `copy_path` | Copy the Repository Path | `y` |
-| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
+| `home` | `copy_path` | Kopiera repositoryts sökväg | `y` |
+| `home` | `open_in` | Öppna repositoryt i standardverktyget | `o` |
 | `home` | `browse` | Bläddra efter ett repository | `b` |
 | `home` | `clone` | Klona ett repository | `c` |
 | `home` | `init` | Initiera ett repository | `i` |
@@ -804,8 +804,8 @@ Tangenterna är standardvärdena.
 | Repositories: Lägg till/ta bort valt i favoriter | `f` |
 | Repositories: Stäng eller ta bort valt | `x` |
 | Repositories: Valt repositorys meny... | `.` |
-| Repositories: Copy Selected Path | `y` |
-| Repositories: Open Selected in Default Tool | `o` |
+| Repositories: Kopiera vald sökväg | `y` |
+| Repositories: Öppna valt i standardverktyget | `o` |
 | Repositories: Sök | `/ / Ctrl+F` |
 | Repositories: Fäll ihop alla sektioner | `-` |
 | Repositories: Fäll ut alla sektioner | `+` |
@@ -1164,7 +1164,7 @@ Tangenterna är standardvärdena.
 | ✦ AI: Dela upp vald commit... |  |
 | ✦ AI: Förklara ändringar i arbetskatalogen | `Ctrl+G w` |
 | ✦ AI: Komponera commits från ändringar... | `Ctrl+G C` |
-| Sensitive Files: Show in File | `S` |
+| Känsliga filer: Visa i filen | `S` |
 | Composer: Flytta fil till commit... | `m` |
 | Diff: Blame |  |
 | Blame: Visa commit i Log | `Enter` |

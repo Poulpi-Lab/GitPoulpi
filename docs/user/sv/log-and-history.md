@@ -255,6 +255,19 @@ andra bekräftelse. `Ctrl+Z` (verktygsfältets Ångra) tar tillbaka omskrivninge
 se [Ångra och gör om](undo-redo.md). Statusraden namnger också den tidigare
 toppen.
 
+En commit som inte finns på den utcheckade grenen (den ligger på en annan gren) kan inte skrivas om eller ändras där du
+är, så *Redigera commit-meddelande...* och *Ändra...* öppnar **Redigera en commit på en annan gren** i stället, en
+lista med val (`Up` / `Down` eller `Ctrl+J` / `Ctrl+K` flyttar, `Enter` eller ett klick väljer, `Esc`, korset eller
+**Avbryt (A)** stänger den):
+
+- **Checka ut `<gren>` och redigera (1)**: en rad per lokal gren vars historik innehåller commiten (`1` till `8`, de
+  första åtta, resten räknas). Grenen checkas ut på vanligt sätt, sedan öppnas redigeringen på den. Ångra-historien är de
+  två åtgärdernas egen: `Ctrl+Z` tar tillbaka redigeringen, utcheckningen är en utcheckning.
+- **Redigera med avancerad omskrivning (O)**: öppnar [omskrivningsvyn](history-rewrite.md) på den commiten, i byggen
+  som har den.
+- **Skapa en gren här... (S)**: bara när ingen lokal gren innehåller commiten (den ligger till exempel bara på en
+  remote-gren); öppnar namnrutan för en gren vid den.
+
 ## Ändra en commit (meddelande, författare, datum)
 
 *Ändra...* i commit-menyn (eller `Ctrl+G Shift+E`, eller *Commit: Ändra...* i paletten) öppnar en enda dialog för commitens egenskaper: sammanfattning, beskrivning samt författarens namn, e-post och datum, var och en ifylld med commitens egna värden. Ändra vad du vill och tryck på **Tillämpa**; bara de ändrade fälten skickas. Ett datum skrivs `YYYY-MM-DD HH:MM:SS +HH:MM` och visas i UTC tills du redigerar det. Committern är du, nu (som vid en reword). Vilken commit som helst på den utcheckade grenen kan ändras, med samma regler, samma varning för en redan pushad commit och samma andra bekräftelse som *Redigera commit-meddelande...*; commits ovanpå den skapas om med sina egna författare och datum, och dina stageade och unstageade ändringar lämnas ifred. `Ctrl+Z` (Ångra i verktygsfältet) tar tillbaka det. I byggen med historikomskrivning stänger **Ändra historiken djupare...** (`Alt+H`) längst ned till vänster i dialogen den utan att tillämpa något och öppnar [omskrivningsvyn](history-rewrite.md) med omfånget från den här commiten till den nyaste; om du har ändrat ett fält frågar den först (`Esc` bekräftar). `Ctrl+N` visar ett märke på varje fält och varje knapp i dialogen; tryck på det för att sätta markören i fältet eller trycka på knappen (se [Märken](keybindings.md#märken)).
@@ -416,7 +429,7 @@ Vad som jämförs beror på markeringen:
 | raden WIP och en commit eller stash | den commiten med arbetskatalogen: stageade och unstageade ändringar i spårade filer (ospårade filer ingår inte i en diff) |
 | tre eller fler commits | deras kombinerade ändringar: från strax före den äldsta till den nyaste (merges följer sin första förälder) |
 
-En namnändring visas som en borttagning plus ett tillägg. **Byt plats** (`x`) byter ändarna på en jämförelse av två rader; med raden WIP, som alltid är den nyare änden, eller ett intervall av tre eller fler rader finns det inget att byta. En jämförelse med raden WIP följer arbetskatalogen medan du sparar filer.
+En fil som bytt namn eller flyttats visas som en enda fil, med det gamla namnet och likheten överst i sin diff. **Byt plats** (`x`) byter ändarna på en jämförelse av två rader; med raden WIP, som alltid är den nyare änden, eller ett intervall av tre eller fler rader finns det inget att byta. En jämförelse med raden WIP följer arbetskatalogen medan du sparar filer.
 
 Tangentbord: `v` (eller **Log: Jämför markeringen** i kommandopaletten) flyttar fokus till jämförelsens fillista; `x` (eller **Log: Byt plats på jämförelsens ändar**) byter plats; `n` (eller **Log: gå till nästa jämförda rad**) är tangentbordets motsvarighet till att klicka på ett kort: Log-markören går till nästa markerade rad och börjar om från början efter den sista. `Esc` eller ett vanligt klick på en rad går tillbaka till den enskilda commiten. Posten **Cherry-pick** räknar bara commits i markeringen; raden WIP och stashar ignoreras där.
 

@@ -1344,7 +1344,7 @@ hint_back = "tillbaka till flik"
 hint_quit = "avsluta"
 not_a_repo_any_more = "{path} är inte längre ett git-repository - ta bort det från listan med {key}"
 gone_from_disk_msg = "{path} finns inte längre på disk - ta bort det från listan med {key}"
-open_in_gone = "{path} is gone from disk, there is nothing to open"
+open_in_gone = "{path} finns inte längre på disk, det finns inget att öppna"
 actions_need_tab = "{key}-åtgärder kräver en öppen repositoryflik"
 home_tab_fixed = "fliken Hem har ingen flikmeny och kan inte stängas"
 
@@ -2435,8 +2435,8 @@ status_stage_toggle = "Stage eller unstage vald rad"
 status_open_diff = "Öppna vald fils {$diff}"
 home_favorite = "Stjärnmarkera repositoryt"
 home_close_repo = "Stäng, ta bort eller ta bort stjärnan på raden"
-home_copy_path = "Copy the Repository Path"
-home_open_in = "Open the Repository in the Default Tool"
+home_copy_path = "Kopiera repositoryts sökväg"
+home_open_in = "Öppna repositoryt i standardverktyget"
 home_browse = "Bläddra efter ett repository"
 home_clone = "Klona ett repository"
 home_init = "Initiera ett repository"
@@ -3326,8 +3326,8 @@ repositories_collapse_all_sections = "Repositories: Fäll ihop alla sektioner"
 repositories_expand_all_sections = "Repositories: Fäll ut alla sektioner"
 repositories_close_all_tabs = "Repositories: Stäng alla flikar..."
 repositories_remove_selected_from_list = "Repositories: Ta bort valt från listan"
-repositories_copy_selected_path = "Repositories: Copy Selected Path"
-repositories_open_selected_in = "Repositories: Open Selected in Default Tool"
+repositories_copy_selected_path = "Repositories: Kopiera vald sökväg"
+repositories_open_selected_in = "Repositories: Öppna valt i standardverktyget"
 repositories_remove_all_recent = "Repositories: Ta bort alla senaste"
 tab_new_tab = "Flik: Ny flik"
 tab_new_menu = "Flik: Ny..."
@@ -3398,7 +3398,7 @@ ai_explain_working_changes = "AI: Förklara ändringar i arbetskatalogen"
 ai_insert_prompt_variable = "AI: Infoga promptvariabel"
 ai_compose_commits_from_working_changes = { git = "AI: Komponera commits från ändringar...", local = "AI: Komponera incheckningar från ändringar..." }
 # context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
-stage_guard_show_in_file = "Sensitive Files: Show in File"
+stage_guard_show_in_file = "Känsliga filer: Visa i filen"
 composer_move_file_to_commit = { git = "Composer: Flytta fil till commit...", local = "Composer: Flytta fil till incheckning..." }
 diff_blame = "Diff: Blame"
 diff_history = "Diff: Filhistorik"
@@ -3453,7 +3453,7 @@ why_no_text_selected_drag_over_the_text_first = "ingen text markerad - dra över
 why_the_diff_view_isn_t_open = "diff-vyn är inte öppen"
 why_open_a_file_first_in_the_diff_view_the_status = { git = "öppna först en fil - i Diff-vyn, Status-rutan eller en commit", local = "öppna först en fil - i Diff-vyn, Status-rutan eller en incheckning" }
 # context: why that palette command is unavailable
-why_no_sensitive_files_question = "no sensitive files question is open"
+why_no_sensitive_files_question = "ingen fråga om känsliga filer är öppen"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "välj först en gren eller tag i Refs-rutan", local = "välj först en gren eller tagg i Refs-rutan" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "att checka ut en remote-gren stöds inte ännu - skapa först en lokal spårande gren"
 why_select_a_local_branch_in_the_refs_pane_first = "välj först en lokal gren i Refs-rutan"
@@ -4076,7 +4076,7 @@ repositories_and_tabs_open_in = "listan ”Öppna i” för den här flikens map
 repositories_and_tabs_7 = "öppna (eller växla till) valt repository"
 repositories_and_tabs_8 = "stjärnmarkera/ta bort stjärna"
 repositories_and_tabs_9 = "stäng flik (Öppna), ta bort (Senaste), ta bort stjärna (Favoriter)"
-repositories_and_tabs_copy_open = "copy the path / open in the default tool"
+repositories_and_tabs_copy_open = "kopiera sökvägen / öppna i standardverktyget"
 repositories_and_tabs_10 = "radens meny"
 repositories_and_tabs_11 = "sök i varje sektion"
 repositories_and_tabs_12 = "töm / tillbaka till fliken"
@@ -5626,9 +5626,9 @@ too_large = "filen är för stor för att visas ({bytes} byte)"
 unexpected = "oväntat svar"
 loading_whole = "laddar hela filen... (knappen Hunks visar bara ändringarna)"
 whole_unavailable = "(hela filen är inte tillgänglig: {why} - visar bara hunkarna)"
-renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header = "{from} -> {to} ({percent}% lika)"
 renamed_header_plain = "{from} -> {to}"
-rename_no_change = "No content change (the file was only renamed or moved)"
+rename_no_change = "Ingen ändring av innehållet (filen har bara bytt namn eller flyttats)"
 
 [git_actions]
 no_such_local_branch = "den lokala grenen finns inte längre - uppdatera"
@@ -9339,7 +9339,7 @@ answer_cancel = "Avbryt, {$stage} ingenting"
 # context: key hint at the bottom of the dialog
 hint = "Upp/Ned: välj, Enter eller 1/2: svara, Esc: avbryt"
 # context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
-show_in_file = "Show in file"
+show_in_file = "Visa i filen"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "känsliga filer blev inte {$staged}: {files}; fråga användaren och {$stage} sedan igen med känsliga filer tillåtna"
 
@@ -10164,22 +10164,22 @@ flavor_plain_text = "Ren text"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
-title = "Edit a {$commit} of another branch"
+title = "Redigera en {$commit} på en annan gren"
 # context: body of that dialog when local branches hold the commit; {short} is the short commit id
-body_branches = "{short} is not on the current branch. Check out a branch that holds it to edit it here."
+body_branches = "{short} finns inte på den aktuella grenen. Checka ut en gren som innehåller den för att redigera den här."
 # context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
-body_none = "{short} is on no local branch. Create a branch at it to edit it here."
+body_none = "{short} finns på ingen lokal gren. Skapa en gren vid den för att redigera den här."
 # context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
-checkout = "Check out {branch} and edit"
+checkout = "Checka ut {branch} och redigera"
 # context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
-rewrite = "Edit with advanced history rewrite"
+rewrite = "Redigera med avancerad omskrivning"
 # context: button that opens the name box to create a branch at that commit
-create = "Create a branch here..."
+create = "Skapa en gren här..."
 # context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
-key_rewrite = "r"
+key_rewrite = "o"
 # context: key of the Create a branch here button, one letter
-key_create = "b"
+key_create = "s"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "a"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
-gave_up = "{short} was not edited: the branch was not checked out"
+gave_up = "{short} redigerades inte: grenen checkades inte ut"

@@ -18,6 +18,12 @@ direita mostra as alterações em andamento:
 - **Arquivos unstaged**: arquivos editados, adicionados (não rastreados) e excluídos
   que ainda não estão no próximo commit.
 - **Arquivos staged**: o que o próximo commit vai conter.
+- **Arquivos renomeados ou movidos** são uma única linha, `novo <- antigo`, nas duas listas (um arquivo excluído
+  no disco e um novo com pelo menos 50% do mesmo conteúdo contam como um movimento mesmo antes de você fazer
+  stage). Stage, Unstage e Descartar agem nos dois nomes: fazer stage grava a exclusão e o arquivo novo, então o
+  git vê um único renome. Abrir a linha mostra o diff de conteúdo contra o nome antigo, encabeçado por
+  `antigo -> novo (N% de similaridade)`; um movimento sem edições diz **Nenhuma mudança de conteúdo**. O mesmo vale
+  para os arquivos de um commit, e `gitpoulpi status` / `gitpoulpi diff` informam `renamed_from`.
 - **Caminho** ou **Árvore** (`m`) lista os arquivos de forma plana ou em pastas.
   **Recolher tudo** (`z`) recolhe as pastas. **Ver todos os arquivos** (`a`) mostra a
   árvore inteira em vez de só os arquivos alterados. Clique com o botão direito no espaço
@@ -50,6 +56,12 @@ então um Enter perdido não responde nada; `Esc`, o `✕` de fechar e um clique
 cancelam. É a mesma pergunta pelo teclado, por um botão, por um menu, pela paleta ou por
 arrastar e soltar, porque todos enviam o mesmo pedido. Cancelar não faz stage de nada,
 nem dos arquivos comuns do mesmo stage.
+
+Um segredo encontrado em um arquivo indica a sua linha (`config/app.env:12`). Para olhar antes de decidir, clique
+em um achado (ou passe por eles com `Tab` / `Shift+Tab`, `Ctrl+J` / `Ctrl+K`) e pressione o botão **Mostrar no
+arquivo**, `S`, ou o comando da paleta **Arquivos sensíveis: mostrar no arquivo**: o arquivo abre na Visão de
+arquivo rolada até essa linha e a destacando, e a pergunta volta intacta quando você fecha a Visão de arquivo
+(`Esc`). Olhar não faz stage de nada.
 
 Arquivos de texto de até 1 MiB cada e 32 MiB no total são lidos; arquivos maiores e arquivos
 binários são julgados apenas pelo nome. `[privacy] staging_guard = false` desativa a verificação.
@@ -191,6 +203,10 @@ Com a [IA](ai.md) ativada, o botão **`✦`** à direita do resumo escreve uma m
 a partir das alterações em stage (`Ctrl+G i`), e **Compor commits com IA** divide o
 seu trabalho em vários commits, abaixo. O texto vai para o formulário para você
 editá-lo; nada é commitado até você pressionar o botão de commit.
+
+**Compor commits com IA** fica na ponta direita da linha de Amend e encolhe junto com o painel direito em vez de
+sumir: o rótulo completo, depois **Compor com IA**, depois só o **`✦`**. Ele mantém o clique, a dica e a tecla
+(`Ctrl+G Shift+C`) em qualquer largura; os rótulos de Amend e Ignorar hooks cedem lugar a ele, nunca o contrário.
 
 ## O compositor de commits: divida suas alterações em commits
 

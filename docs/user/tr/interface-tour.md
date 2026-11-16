@@ -76,6 +76,13 @@ seçeneğini sunar. İkisi de
 Komut paleti, yardım, bağlam menüleri, iletişim kutuları, açılır pencereler ve
 Ayarlar pencerenin üstünde açılır. Her birinin kenarlığının sağ üstünde bir `✕` vardır; `Esc` veya `✕`'e tıklamak kapatır, bir iletişim kutusunun, açılır pencerenin ya da panelin dışına tıklamak da onu kapatır (bkz. [Pencereleri ve iletişim kutularını kapatma](mouse-and-gestures.md#pencereleri-ve-iletişim-kutularını-kapatma)).
 
+### Pencere küçükken
+
+Pencere daraldıkça hiçbir şey sessizce kaybolmaz. Bir düğme önce uzun etiketini yitirir (`...` ile kırpılır), sonra
+ikinci bir satıra sarılır ya da satırının `⋯` menüsüne girer; tuşu ve palet girişi her zaman çalışmaya devam eder.
+Pencereye sığmayan bir diyalog, hiçbir şey çizmemek yerine başlığı, `✕` ve **Pencere çok küçük: büyütün** satırı olan
+küçük bir çerçeve çizer; `Esc` ve `✕` onu kapatır, pencereyi büyütünce diyalog bütün olarak geri gelir.
+
 ## Sekme satırı
 
 **Ana** sekme (ev simgesi) sol uçtadır; ardından [çalışma alanı rozeti](workspaces.md)

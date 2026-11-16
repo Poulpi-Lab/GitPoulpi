@@ -67,6 +67,14 @@ arasında geçer ve **Dahili not** (`Alt+I`) böyle notları olan barındırıc�
 (**Yanıtla**, **Alıntıla**, **Düzenle**, **Sil**, **Bağlantı**) aynı işi yapar ve palette *İnceleme: ...* satırlarının
 yanında *Konuşma: ...* satırları vardır. Bir bağlantı açılmadan önce sorulur, incelemenin her yerinde olduğu gibi.
 
+Koda ait bir dizi `path:line` değerini bağlantı olarak gösterir (altı çizili, gerçek bir düğme). Üzerine tıklamak, seçili
+dizide **`G`** veya paletteki *Konuşma: Dizinin Kodunu Aç*, **Dosyalar** sayfasına geçer, o dosyayı açar ve imleci yorum
+yapılan satıra getirir (yazıldığı gibi eski ya da yeni tarafta); dizi altında açık durur (katlanmışsa açılır). **Esc**,
+sayfa sekmelerinin solundaki **Genel Bakışa dön** düğmesi veya *İnceleme: Genel Bakışta Yoruma Dön* Genel Bakışın aynı
+kaydına geri götürür. Satırı artık diff'te olmayan (eskimiş) bir dizi dosyayı en yakın satırda açar ve durum satırı bunu
+söyler; isteğin artık değiştirmediği bir dosyadaki dizi için dosyanın diff'te olmadığı bildirilir. Aynı isteğin issue ya da
+Radar görünümünde açılacak kod yoktur: `G` kodun incelemede olduğunu söyler.
+
 Bir konuşma tuşu ile bir inceleme tuşu çakıştığında, bu sayfada harf konuşmanındır: `l` (etiketler), `m` (kilometre
 taşı), `Q` (Gerrit'in vazgeçmesi), `e` / `d`, `r`. Etiketler, kilometre taşı ve vazgeçme başlığın düğmelerinde ve
 paletle kalır; `a` (atananlar), `p` (inceleyenler), `f` (**İncelemeyi bitir**), `b` (**Checkout**), `P`, `D`, `U` ve
@@ -285,6 +293,7 @@ modelin yazmasından sonra değiştiyse kart *İstek, bu taslak yazıldığında
 | Genel Bakış / Dosyalar / Commit'ler | `Alt+1` / `Alt+2` / `Alt+3` | *İnceleme: Genel Bakışı Göster*, *Dosyaları Göster*, *Commit'leri Göster* |
 | Satıra veya aralığa yorum yap | `c` | *İnceleme: Satıra Yorum Yap...* |
 | Konuşmaya yorum yap | Genel Bakış'ta `c`, `C` | *İnceleme: Konuşmaya Yorum Yap...* (Genel Bakış'ın kutusunu açar), *Konuşma: Yeni Yorum* |
+| Bir dizinin kodunu aç (Genel Bakış) / yoruma dön | `G` / `Esc` | *Konuşma: Dizinin Kodunu Aç*, *İnceleme: Genel Bakışta Yoruma Dön* |
 | Yorum dizisini yanıtla | `r` | *İnceleme: Yorum Dizisini Yanıtla...* |
 | Çöz veya yeniden aç | `x` | *İnceleme: Yorum Dizisini Çöz veya Yeniden Aç* |
 | Bir yorum dizisini katla veya aç | `z` | *İnceleme: Yorum Dizisini Daralt veya Genişlet* |

@@ -496,6 +496,8 @@ Tam pencere bir görünüm: başlık (durum, kimin ne zaman açtığı, etiketle
   dönüştürülür ([İşaretleme dönüştürme](#işaretleme-dönüştürme) bölümüne bakın). Bir `mermaid` kod bloğu, diyagramın
   kaynağını kaydırılabilir bir görüntüleyicide gösteren bir **Diyagramı aç** düğmesi alır (`Enter` onu kopyalar); paletin
   *Konuşma: Kaydın Diyagramını Aç* satırı da vardır. Hem `conversation` hem `mermaid` içeren bir derleme gerekir.
+- İncelemenin Genel Bakış sayfasında koda ait bir dizinin `path:line` değeri koda giden bir bağlantıdır (`G`, *Konuşma: Dizinin
+  Kodunu Aç*; bkz. [İnceleme](review.md)); tek başına açılmış bir konuşmada (bir issue, bir Radar satırı) gidilecek kod sayfası yoktur.
 - Görünüm her 60 saniyede bir ve `F5` ile (**Yenile**) yeniden okur.
 
 **Tuşlar.** Her birinin bir düğmesi, bir menü satırı veya bir palet satırı (*Konuşma: ...*) vardır ve `Ctrl+N`

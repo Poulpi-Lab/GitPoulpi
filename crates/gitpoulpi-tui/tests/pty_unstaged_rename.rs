@@ -136,3 +136,61 @@ fn staging_the_row_stages_both_sides_as_one_rename() {
         std::thread::sleep(Duration::from_millis(200));
     }
 }
+
+/// Staging a move is ONE undo entry: the palette names the whole rename and
+/// one undo puts both the new file and the old file's deletion back.
+#[test]
+fn staging_a_move_is_one_undo_entry() {
+    let repo = moved_fixture(false);
+    let config = tempfile::tempdir().unwrap();
+    let mut term = common::launch(repo.root())
+        .session("pty-unstaged-rename-undo")
+        .config_dir(config.path())
+        .size(200, 50)
+        .no_exit_pause()
+        .env("GITPOULPI_GENERAL_JOURNAL_OUTSIDE", "false")
+        .env("GITPOULPI_GENERAL_UNDO_DEPTH", "0")
+        .spawn();
+    wait_row(&mut term);
+
+    let (c, r) = term
+        .wait_for_text("moved_name.txt", STEP)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.click(c, r).unwrap();
+    term.wait_for("the row open", STEP, |s| {
+        s.contains("old_name.txt -> moved_name.txt")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("C-g").unwrap();
+    term.send_keys("s").unwrap();
+    wait_git(&repo, "one staged rename", |_| {
+        repo.git(&["diff", "--cached", "--name-status", "-M"])
+            .starts_with('R')
+    });
+
+    // The one entry names the whole move.
+    term.send_keys("C-p").unwrap();
+    term.send_text("undo").unwrap();
+    term.wait_for("the undo row naming the rename", STEP, |s| {
+        s.contains("Undo Stage rename old_name.txt -> moved_name.txt")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Enter").unwrap();
+
+    // One undo: nothing is staged any more, and the move is unstaged again.
+    wait_git(&repo, "the move unstaged by one undo", |_| {
+        repo.git(&["diff", "--cached", "--name-only"]).is_empty()
+    });
+    let status = repo.git(&["status", "--porcelain=v1", "--untracked-files=all"]);
+    assert!(status.contains("D old_name.txt"), "{status}");
+    assert!(status.contains("?? moved_name.txt"), "{status}");
+}
+
+fn wait_git(repo: &gitpoulpi_testkit::FixtureRepo, what: &str, mut ok: impl FnMut(()) -> bool) {
+    let deadline = std::time::Instant::now() + STEP;
+    while !ok(()) {
+        assert!(std::time::Instant::now() < deadline, "never saw {what}");
+        std::thread::sleep(Duration::from_millis(200));
+    }
+    let _ = repo;
+}

@@ -102,7 +102,8 @@ numaralandırdığı gibi numaralandırılır.
 | Komut | Ne yapar |
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Bir dosyayı, klasörü, her şeyi, bir hunk'ı veya bazı satırları stage'le. Hassas bir dosya (bir özel anahtar, bir `.env`, tanınan bir token: [yapılandırma başvurusunda](config-reference.md#privacy-hassas-dosyalar) `[privacy]`) ekleyecek bir dosya, klasör veya `--all` stage'i çıkış kodu 2 ve `{error: "sensitive_files", files: [{path, reason}]}` ile reddedilir (bir kural ve maskeli bir önizleme, asla bir değer); hiçbir şey stage'lenmez. `--allow-sensitive` yine de stage'ler. |
-| `unstage` (aynı bayraklar) | Tersi. |
+| `stage --paths A B ...` | Birkaç dosyayı veya klasörü TEK işlem olarak stage'ler: tek günlük kaydı, tek `undo` adımı (yeniden adlandırılmış bir dosya eski ve yeni yoludur, `status` bunu `renamed_from` ile gösterir). `--folder`, `--hunk`, `--lines` veya `--all` ile birlikte kullanılamaz. |
+| `unstage` (aynı bayraklar, `--paths` dahil) | Tersi. |
 | `discard --file F [--hunk N [--lines a,b]]` | Stage'lenmemiş değişiklikleri at (tüm dosya: her değişiklik, izlenmeyen dosya silinir ve boş kalan klasörler de). Geri alınabilir. |
 | `rm-file <paths>...` | Dosyaları çalışma ağacından sil. Geri alınabilir. |
 | `ignore <pattern> [--file <.gitignore>]` | Bir `.gitignore` dosyasına (ya da `--file .git/info/exclude` ile `.git/info/exclude` dosyasına) desen ekle. `.git/info/exclude` dışında geri alınabilir. |

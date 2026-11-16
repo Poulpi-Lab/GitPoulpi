@@ -102,7 +102,7 @@ Hunks and lines are numbered as `gitpoulpi --json diff` numbers them.
 | Command | What it does |
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Stage a file, folder, everything, a hunk or some lines. A file, folder or `--all` stage that would add a sensitive file (a private key, a `.env`, a recognized token: `[privacy]` in the [config reference](config-reference.md#privacy-sensitive-files)) is refused with exit code 2 and `{error: "sensitive_files", files: [{path, reason}]}` (a rule and a masked preview, never a value); nothing is staged. `--allow-sensitive` stages them anyway. |
-| `stage --paths A B ...` | Stage several files or folders as ONE operation: one journal entry, one `undo` step (a moved file is its old and new path, as `status` shows `renamed_from`). Cannot be combined with `--folder`, `--hunk`, `--lines` or `--all`. |
+| `stage --paths A B ...` | Stage several files or folders as ONE operation: one journal entry, one `undo` step (a renamed file is its old and new path, as `status` shows `renamed_from`). Cannot be combined with `--folder`, `--hunk`, `--lines` or `--all`. |
 | `unstage` (same flags, `--paths` included) | The reverse. |
 | `discard --file F [--hunk N [--lines a,b]]` | Throw away unstaged changes (a whole file: every change, untracked file deleted, and the folders that leaves empty). Undoable. |
 | `rm-file <paths>...` | Delete files from the working tree. Undoable. |

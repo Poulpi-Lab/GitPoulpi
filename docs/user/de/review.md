@@ -51,14 +51,39 @@ Ein Umschalter im oberen Rand wechselt die Seite: **Übersicht**, **Dateien**, *
 
 ### Übersicht
 
-Die Beschreibung (einfaches Markdown wird als solches dargestellt: fett, kursiv, `Code`, Links als ihr Text,
-Aufzählungen und nummerierte Listen, Überschriften, Zitate und Codeblöcke), dann die Unterhaltung: die Kommentare,
-die nicht am Code stehen, und die bereits abgesendeten Reviews, älteste zuerst, jeweils mit ihrer Beurteilung
-(`genehmigt`, `Änderungen angefordert`, `kommentiert`, `verworfen`). Bei GitLab sind die Beurteilungen seine
-Genehmigungen (Approvals). Darunter das Antwortfeld: Klicken Sie darauf oder drücken Sie **`c`**, um einen Kommentar
-zur Unterhaltung zu schreiben. **Dieser wird sofort gesendet**, und das Feld sagt es.
+Die Übersicht ist **die Unterhaltung der Anfrage**, dieselbe Zeitleiste und dasselbe Kommentarfeld wie bei einem Issue
+([Unterhaltungen](hosting-integration.md#5c-unterhaltungen)): zuerst die Beschreibung (*hat dies geöffnet*), dann die Kommentare,
+die Threads am Code mit ihrem Diff-Ausschnitt, die abgesendeten Reviews mit ihrer Beurteilung (`genehmigt`, `Änderungen
+angefordert`, `kommentiert`, `verworfen`; bei GitLab sind die Beurteilungen seine Genehmigungen) und die Ereignisse, älteste zuerst,
+im neuesten Fenster mit **Ältere laden** an dessen Anfang. Das Kommentarfeld ist unter der Zeitleiste angedockt (**Neuer Kommentar**):
+**Schreiben**, **Vorschau** und **Geteilt**, **Abbrechen** und **Senden**. **Ein hier geschriebener Kommentar geht sofort an den Host**
+(nichts ist ausstehend: ausstehend sind die Kommentare am Code, die mit dem Review gesendet werden), erscheint gleich in der Liste
+und nimmt seinen Platz ein, wenn der Host antwortet; lehnt der Host ihn ab, öffnet sich das Feld wieder mit Ihrem Text und dem Grund.
 
-Das Kommentarfeld (auch das Feld einer Antwort, eines Kommentars an einer Zeile und der Zusammenfassung von **Review abschließen**) ist das gemeinsame Markdown-Textfeld der [Unterhaltungsansicht](hosting-integration.md#schreiben): **Schreiben**, **Vorschau** (`Alt+P`) und **Geteilt** (`Alt+L`, in einem Fenster mit 100 Spalten), `Ctrl+Enter` (auch `Ctrl+S`, `Alt+Enter`) sendet, und wo KI an ist, öffnet `Alt+E` **Mit KI schreiben** ([das KI-Kapitel](ai.md#schreibhilfe-auf-einem-host)). Die Vorschau zeigt den Text so, wie der Host ihn zeigt, Verweise eingeschlossen (`#7`, `!12`, `ABC-12`, Commit-IDs); ein ungesendeter Text bleibt je Request erhalten. Der Text in der Beschreibung und in der Unterhaltung nutzt denselben Renderer, sodass Markdown, Tabellen, Hinweisblöcke und Verweise hier und in der Unterhaltungsansicht eines Issues gleich aussehen. Zitieren, Bearbeiten oder Löschen eines bereits gesendeten Kommentars sowie interne Notizen gehören zur Unterhaltungsansicht von Issues und von Requests bei Hosts ohne Review (siehe [Unterhaltungen](hosting-integration.md#5c-unterhaltungen)); hier lassen sich nur Ihre ausstehenden Kommentare bearbeiten.
+Die Tasten sind die der Unterhaltungsansicht: **`Up`** / **`Down`** (und `Ctrl+J` / `Ctrl+K`) wechseln zwischen den Einträgen,
+**`r`** antwortet in den Thread des ausgewählten Eintrags, **`Q`** zitiert ihn in einem neuen Kommentar, **`c`** schreibt einen neuen
+Kommentar, **`e`** / **`d`** bearbeiten und löschen Ihre eigenen Kommentare (vor dem Löschen kommt eine Rückfrage), **`l`** oder `Enter`
+öffnet die Links eines Eintrags, **`g`** sein Diagramm, **`y`** kopiert seine Adresse, **`o`** öffnet ihn im Browser, **`n`**
+springt zum nächsten ungelesenen Eintrag, **`v`** zeigt oder blendet Ereignisse aus, **`m`** lädt ältere Einträge, `Tab` wechselt zwischen
+Zeitleiste und Feld, und **Interne Notiz** (`Alt+I`) gibt es bei den Hosts, die solche Notizen haben. Die Schaltflächen des
+ausgewählten Eintrags (**Antworten**, **Zitieren**, **Bearbeiten**, **Löschen**, **Links**) tun dasselbe, und die Palette hat die
+Zeilen *Unterhaltung: ...* neben den Zeilen *Review: ...*. Vor dem Öffnen eines Links wird gefragt, wie überall im
+Review.
+
+Wo sich eine Taste der Unterhaltung und eine des Reviews treffen, behält auf dieser Seite die Unterhaltung den Buchstaben: `l` (Labels), `m`
+(Meilenstein), `Q` (Abandon bei Gerrit), `e` / `d`, `r`. Labels, Meilenstein und Abandon bleiben auf den Schaltflächen der Kopfzeile und
+in der Palette; `a` (Zuständige), `p` (Reviewer), `f` (**Review abschließen**), `b` (**Auschecken**), `P`, `D`, `U` und
+`Alt+1` / `Alt+2` / `Alt+3` behalten hier ihre Bedeutung. Solange das Feld die Tastatur hat, gehört jede Taste dem Feld, außer
+`Alt+1` / `Alt+2` / `Alt+3`; `Esc` gibt die Tastatur an die Zeitleiste zurück, und ein zweites `Esc` schließt das Review.
+
+Ein Kommentar, der in einem anderen Fenster oder per CLI geschrieben wurde, erscheint hier von selbst: Jeder Schreibzugriff von GitPoulpi
+(dieses Fenster eingeschlossen) meldet es der Sitzung, und die Fenster, die dieselbe Anfrage zeigen, lesen sie neu.
+
+Das Kommentarfeld ist das gemeinsame Markdown-Textfeld der [Unterhaltungsansicht](hosting-integration.md#schreiben)
+(auch das Feld einer Antwort auf einen Thread, eines Kommentars an einer Zeile und der Zusammenfassung von **Review abschließen**): `Ctrl+Enter` (auch
+`Ctrl+S`, `Alt+Enter`) sendet, und wo KI an ist, öffnet `Alt+E` **Mit KI schreiben**
+([das KI-Kapitel](ai.md#schreibhilfe-auf-einem-host)). Die Vorschau zeigt den Text so, wie der Host ihn zeigt, Verweise eingeschlossen
+(`#7`, `!12`, `ABC-12`, Commit-IDs); ein ungesendeter Text bleibt je Request erhalten.
 
 ### Dateien
 
@@ -239,17 +264,17 @@ Vorschläge sind **keine Kommentare**. Sie erscheinen an zwei Stellen:
   Schaltflächen: **Übernehmen**, **Bearbeiten** und **Ablehnen**. Ein Vorschlag zu einer Zeile, die der Diff nicht zeigt, wird
   aufbewahrt und nie verworfen: Er steht nach den Hunks unter *KI-Vorschläge zur ganzen Datei* und landet, einmal übernommen, an der
   ersten geänderten Zeile der Datei, mit den Worten *(zu Zeile N)* davor.
-- **In der Übersicht**, unter der Beschreibung: die Zusammenfassung, dann die Liste mit denselben Schaltflächen und **Alle übernehmen** /
+- **In der Übersicht**, in einem Block über der Unterhaltung (nur nach einem Lauf): die Zusammenfassung, dann die Liste mit denselben Schaltflächen und **Alle übernehmen** /
   **Alle ablehnen**.
 
 **Übernehmen** (`y`) macht aus einem Vorschlag einen gewöhnlichen **ausstehenden Kommentar** (den Sie weiter bearbeiten oder löschen
 können); **Bearbeiten** (`w`) öffnet das Kommentarfeld mit den Worten des Modells zuerst und übernimmt, was Sie stehen lassen; **Ablehnen** (`n`)
 verwirft ihn. **Alle übernehmen** (`A`) füllt weiterhin nur die Liste der ausstehenden Kommentare. Auf der Seite Dateien wirken die Tasten
-auf den Vorschlag unter dem Cursor, in der Übersicht auf den ersten der Liste. **KI-Zusammenfassung verwenden** (`i` oder die Schaltfläche im
+auf den Vorschlag unter dem Cursor, in der Übersicht auf den ersten der Liste (`y` und `n` sind wieder *Link kopieren* und *Nächster ungelesener* der Unterhaltung, sobald die Liste leer ist). **KI-Zusammenfassung verwenden** (`i` oder die Schaltfläche im
 Formular Review abschließen) setzt die Zusammenfassung des Modells in den Review-Text; sie wird nie von selbst eingefügt.
 **Nichts wird an den Host gesendet, bevor Sie das Review absenden.**
 
-Die Übersicht zeigt den Entwurf als Karte über den Vorschlägen: den Chip mit der Beurteilung, den Review-Text und drei
+Die Übersicht zeigt den Entwurf als Karte am Anfang dieses Blocks, über den Vorschlägen: den Chip mit der Beurteilung, den Review-Text und drei
 Schaltflächen.
 
 - **✦ Entwurf verwenden...** (`u`) übernimmt jeden offenen Vorschlag als ausstehenden Kommentar und öffnet *Review abschließen*
@@ -270,7 +295,7 @@ Das Absenden des Reviews verbraucht den Entwurf.
 |---|---|---|
 | Übersicht / Dateien / Commits | `Alt+1` / `Alt+2` / `Alt+3` | *Review: Übersicht zeigen*, *Dateien zeigen*, *Commits zeigen* |
 | Die Zeile oder den Bereich kommentieren | `c` | *Review: Zeile kommentieren...* |
-| Die Unterhaltung kommentieren | `c` in der Übersicht, `C` | *Review: Unterhaltung kommentieren...* |
+| Die Unterhaltung kommentieren | `c` in der Übersicht, `C` | *Review: Unterhaltung kommentieren...* (öffnet das Feld der Übersicht), *Unterhaltung: Neuer Kommentar* |
 | Auf den Thread antworten | `r` | *Review: Auf Thread antworten...* |
 | Auflösen oder wieder öffnen | `x` | *Review: Thread auflösen oder wieder öffnen* |
 | Einen Thread ein- oder ausklappen | `z` | *Review: Thread ein- oder ausklappen* |

@@ -635,6 +635,21 @@ pub(crate) fn commit_file_status(
         .map(|f| f.status)
 }
 
+/// Where the commit's file `path` was renamed or moved from, if it was.
+pub(crate) fn commit_file_renamed_from(
+    outcome: Option<&CommitFilesOutcome>,
+    path: &Path,
+) -> Option<PathBuf> {
+    outcome?
+        .files
+        .as_ref()
+        .ok()?
+        .iter()
+        .find(|f| f.path == path)?
+        .renamed_from
+        .clone()
+}
+
 /// Which of the paths list the central view is showing right now, for
 /// the "click the open row again to close it" rule
 /// (`commit_file_click`): a diff of this commit, or a File View of this

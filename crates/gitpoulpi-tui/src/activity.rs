@@ -78,6 +78,9 @@ pub struct Activity {
     /// Set on `Event::HostingItemChanged`: what other clients wrote to an
     /// issue or a request since the render loop last looked.
     hosting_changes: Mutex<Vec<gitpoulpi_ipc::HostingChangeArgs>>,
+    /// The rename pairs of the latest status (`rename_pairs`): which paths a
+    /// staging or discard of one row must bring along.
+    rename_pairs: Mutex<crate::rename_pairs::RenamePairs>,
     inner: Mutex<Inner>,
 }
 
@@ -89,6 +92,20 @@ impl Activity {
             journal: crate::undo_ui::JournalCell::seeded(undo_enabled),
             ..Self::default()
         }
+    }
+
+    /// Remembers the rename pairs of a fresh status.
+    pub(crate) fn set_rename_pairs(&self, tree: &gitpoulpi_core::domain::WorkingTree) {
+        let pairs = crate::rename_pairs::RenamePairs::of(tree);
+        *self.rename_pairs.lock().unwrap_or_else(|e| e.into_inner()) = pairs;
+    }
+
+    /// `action` with what its rename partners need (`rename_pairs`).
+    pub(crate) fn expand_renames(&self, action: Action) -> Vec<Action> {
+        self.rename_pairs
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .expand(action)
     }
 
     pub(crate) fn generation(&self) -> u64 {

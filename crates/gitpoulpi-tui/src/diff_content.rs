@@ -349,6 +349,30 @@ impl DiffContent {
                 .with_notice_on_top(gitpoulpi_i18n::msg::diff_content::whole_unavailable(why)),
             ContentTag::None | ContentTag::Ready(_) => render_diff_with(file, &opts),
         };
+        // A renamed or moved file: the old name and the similarity on top;
+        // a pure rename has no content to show.
+        let render = match &file.renamed_from {
+            Some(from) => {
+                let header = match file.similarity {
+                    Some(percent) => gitpoulpi_i18n::msg::diff_content::renamed_header(
+                        from.display(),
+                        file.path.display(),
+                        percent,
+                    ),
+                    None => gitpoulpi_i18n::msg::diff_content::renamed_header_plain(
+                        from.display(),
+                        file.path.display(),
+                    ),
+                };
+                let body = if file.hunks.is_empty() {
+                    DiffRender::notice(gitpoulpi_i18n::msg::diff_content::RENAME_NO_CHANGE.get())
+                } else {
+                    render
+                };
+                body.with_notice_on_top(header)
+            }
+            None => render,
+        };
         let render = Rc::new(render);
         self.render = Some((file.clone(), key, Rc::clone(&render)));
         render

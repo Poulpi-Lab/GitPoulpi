@@ -704,6 +704,7 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
             paths: &commit_paths,
             status_of: &|p| commit_file_status(shown_outcome, p),
             is_lfs: &|p| lfs.is_lfs(p),
+            renamed_from: &|p| crate::file_panel::commit_file_renamed_from(shown_outcome, p),
             file_picked: &|p| file_sel.contains(FileList::Commit, p, false),
             folder_picked: &|p| file_sel.contains(FileList::Commit, p, true),
         }

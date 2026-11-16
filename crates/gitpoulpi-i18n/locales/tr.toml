@@ -5615,6 +5615,9 @@ too_large = "dosya göstermek için çok büyük ({bytes} bayt)"
 unexpected = "beklenmeyen yanıt"
 loading_whole = "tüm dosya yükleniyor... (Hunk düğmesi yalnızca değişiklikleri gösterir)"
 whole_unavailable = "(tüm dosya kullanılamıyor: {why} - yalnızca hunk'lar gösteriliyor)"
+renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header_plain = "{from} -> {to}"
+rename_no_change = "No content change (the file was only renamed or moved)"
 
 [git_actions]
 no_such_local_branch = "o yerel dal artık yok - yenileyin"

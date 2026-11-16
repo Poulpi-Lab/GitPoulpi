@@ -5612,6 +5612,9 @@ too_large = "文件太大，无法显示（{bytes} 字节）"
 unexpected = "意外的应答"
 loading_whole = { git = "正在加载整个文件…（“Hunk”按钮只显示更改）", local = "正在加载整个文件…（“代码块”按钮只显示更改）" }
 whole_unavailable = { git = "（无法显示整个文件：{why} - 仅显示 hunk）", local = "（无法显示整个文件：{why} - 仅显示代码块）" }
+renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header_plain = "{from} -> {to}"
+rename_no_change = "No content change (the file was only renamed or moved)"
 
 [git_actions]
 no_such_local_branch = "该本地分支已不存在 - 请刷新"

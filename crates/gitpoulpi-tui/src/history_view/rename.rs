@@ -37,9 +37,13 @@ pub(crate) fn merge_rename(mut files: Vec<FileDiff>, from: &Path, to: &Path) -> 
     if old_lines.is_empty() && new_lines.is_empty() {
         return files;
     }
+    let similarity = gitpoulpi_core::domain::rename_similarity(
+        joined(&old_lines).as_bytes(),
+        joined(&new_lines).as_bytes(),
+    );
     files[new] = FileDiff {
-        renamed_from: None,
-        similarity: None,
+        renamed_from: Some(from.to_path_buf()),
+        similarity: Some(similarity),
         path: to.to_path_buf(),
         status: FileStatus::Renamed,
         hunks: hunks(&old_lines, &new_lines),

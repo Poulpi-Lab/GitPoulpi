@@ -212,8 +212,25 @@ impl WindowState {
                     Some(target) => target,
                     None => gitpoulpi_core::domain::DiffTarget::CommitVsParent(s.commit),
                 };
-                daemon_link::FileDiffRequest::file(target, s.path.clone())
-                    .with_also(s.also_path.clone())
+                // A moved file's other name rides along, so the diff is the
+                // content against the old path (`rename_pairs`).
+                let also = s.also_path.clone().or_else(|| {
+                    let tree = self.status_result.as_ref().ok()?;
+                    let entry = tree.files.iter().find(|e| e.path == s.path)?;
+                    let from = entry.renamed_from.clone()?;
+                    match s.source {
+                        crate::diff_view::DiffSource::Unstaged if entry.index.is_none() => {
+                            Some(from)
+                        }
+                        crate::diff_view::DiffSource::Staged
+                            if entry.index == Some(gitpoulpi_core::domain::FileStatus::Renamed) =>
+                        {
+                            Some(from)
+                        }
+                        _ => None,
+                    }
+                });
+                daemon_link::FileDiffRequest::file(target, s.path.clone()).with_also(also)
             });
         let matches_wanted = |outcome: &daemon_link::WorkingDiffOutcome| {
             wanted_diff

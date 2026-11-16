@@ -341,6 +341,7 @@ mod ref_reveal;
 mod refs_sidebar;
 mod remote_links;
 mod remotes_ui;
+mod rename_pairs;
 mod repo_dialogs;
 mod revert_mainline;
 mod review_cmd;

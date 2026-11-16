@@ -5616,6 +5616,9 @@ too_large = "filen är för stor för att visas ({bytes} byte)"
 unexpected = "oväntat svar"
 loading_whole = "laddar hela filen... (knappen Hunks visar bara ändringarna)"
 whole_unavailable = "(hela filen är inte tillgänglig: {why} - visar bara hunkarna)"
+renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header_plain = "{from} -> {to}"
+rename_no_change = "No content change (the file was only renamed or moved)"
 
 [git_actions]
 no_such_local_branch = "den lokala grenen finns inte längre - uppdatera"

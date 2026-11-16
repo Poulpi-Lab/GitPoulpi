@@ -6878,6 +6878,12 @@ unexpected = "unexpected answer"
 loading_whole = "loading the whole file... (the Hunks button shows only the changes)"
 # context: notice at the top of the diff; {why} is the reason
 whole_unavailable = "(whole file unavailable: {why} - showing only the hunks)"
+# context: first line of the diff of a renamed or moved file; {from} and {to} are paths, {percent} a number
+renamed_header = "{from} -> {to} ({percent}% similar)"
+# context: first line of the diff of a renamed or moved file when its similarity is unknown; {from} and {to} are paths
+renamed_header_plain = "{from} -> {to}"
+# context: notice in the diff of a file that was only renamed or moved
+rename_no_change = "No content change (the file was only renamed or moved)"
 
 [git_actions]
 # context: status line

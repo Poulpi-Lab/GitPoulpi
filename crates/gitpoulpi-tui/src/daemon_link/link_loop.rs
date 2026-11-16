@@ -418,17 +418,13 @@ pub(super) async fn link_loop_with_port(
                         args,
                     )
                     .await;
-                    // The History view's rename: the delete and the add of
-                    // the two names become one diff.
-                    if let (Some(path), Some(also), Ok(listed)) = (&path, &also, &mut files) {
-                        let split = std::mem::take(listed);
-                        *listed = crate::history_view::merge_rename(split, also, path);
-                    }
                     // The Unstaged half lists untracked files too, and
                     // the backend's diff does not carry them. For one
-                    // file only when it is not among the tracked changes.
+                    // file only when it is not among the tracked changes
+                    // (or when it is half of a move: the deleted old file
+                    // is there, the untracked new one is not).
                     if let (DiffTarget::WorkingTreeVsIndex, Ok(listed)) = (&target, &mut files) {
-                        if path.is_none() || listed.is_empty() {
+                        if path.is_none() || listed.is_empty() || also.is_some() {
                             append_untracked_diffs(
                                 &conn,
                                 listed,
@@ -436,6 +432,12 @@ pub(super) async fn link_loop_with_port(
                             )
                             .await;
                         }
+                    }
+                    // A move: the delete and the add of the two names
+                    // become one diff (History view; an unstaged move).
+                    if let (Some(path), Some(also), Ok(listed)) = (&path, &also, &mut files) {
+                        let split = std::mem::take(listed);
+                        *listed = crate::history_view::merge_rename(split, also, path);
                     }
                     let _ = working_diff_out_tx.send_notify(WorkingDiffOutcome {
                         target,

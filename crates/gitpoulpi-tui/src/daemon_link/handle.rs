@@ -192,6 +192,19 @@ impl DaemonLink {
     }
 
     pub fn submit_action(&self, action: Action) {
+        // A renamed file is two paths for git: the row acts on both.
+        for action in self.activity.expand_renames(action) {
+            self.submit_one(action);
+        }
+    }
+
+    /// Remembers the rename pairs of the status just shown, for
+    /// `submit_action`.
+    pub(crate) fn set_rename_pairs(&self, tree: &gitpoulpi_core::domain::WorkingTree) {
+        self.activity.set_rename_pairs(tree);
+    }
+
+    fn submit_one(&self, action: Action) {
         // A transfer identical to one still running joins it: nothing is
         // sent, and the press says so (the daemon's join is the backstop for
         // the other clients).

@@ -364,6 +364,17 @@ fn button_fgs(enabled: ToolbarEnabled, button: ToolbarButton) -> (Color, Color) 
     }
 }
 
+/// The `⋯` row standing for the chip when the bar had no room for it.
+fn chip_overflow_item(chip: Option<&ToolbarChip>, hidden: &[Slot]) -> Option<OverflowItem> {
+    let chip = chip?;
+    hidden
+        .iter()
+        .any(|s| matches!(s, Slot::Chip))
+        .then_some(OverflowItem::HostingChip {
+            linked: chip.hit == HostingHit::LinkedPrChip,
+        })
+}
+
 /// The linked pull request chip's style.
 fn chip_style(chip: &ToolbarChip, hovered: Option<&HitTarget>) -> Style {
     let target = HitTarget::Hosting(chip.hit.clone());
@@ -420,7 +431,10 @@ pub(crate) fn toolbar_render_with(
     let chip_w = chip_label.as_deref().map_or(0, |l| display_width(l) as u16);
     let show_chip = chip.is_some() && area.width >= chip_w + 1 + TOOLBAR_MIN_BUTTON_ROOM;
     let pinned = show_chip && place.pr_pinned;
-    let flows = show_chip && !place.pr_pinned;
+    // A chip with no room left is not dropped: it joins the group as the
+    // first item to give way, so it ends up in the `⋯` menu.
+    let chip_squeezed = chip.is_some() && !show_chip;
+    let flows = (show_chip && !place.pr_pinned) || chip_squeezed;
     // Room for what is pinned at the right end (the profile combobox) and
     // the gap before it: the buttons are what give way.
     let gear_w = enabled.right_reserve;
@@ -440,8 +454,9 @@ pub(crate) fn toolbar_render_with(
             key: Slot::Chip,
             width: chip_w,
             gap_before: 1,
-            // Kept after Pull and Push, dropped before everything else.
-            priority: 1,
+            // Kept after Pull and Push, dropped before everything else;
+            // a squeezed chip goes before even those.
+            priority: if chip_squeezed { u8::MAX } else { 1 },
         });
     }
     items.extend(buttons.iter().map(|b| BarItem {
@@ -595,6 +610,7 @@ pub(crate) fn toolbar_render_with(
                 Slot::Chip => None,
             })
             .collect();
+        let chip_hidden = chip_overflow_item(chip, &fit.overflow);
         // A hidden split button's dropdown, opened from the keyboard or
         // the palette, hangs under the `⋯` instead of the left edge.
         for b in &hidden {
@@ -606,15 +622,15 @@ pub(crate) fn toolbar_render_with(
                 _ => {}
             }
         }
-        let items = hidden
-            .iter()
-            .flat_map(|b| {
+        let items = chip_hidden
+            .into_iter()
+            .chain(hidden.iter().flat_map(|b| {
                 let mut v = vec![OverflowItem::Toolbar(*b)];
                 if is_split(*b) {
                     v.push(OverflowItem::ToolbarDropdown(*b));
                 }
                 v
-            })
+            }))
             .collect();
         overflow = Some((rect, items));
     }
@@ -700,7 +716,8 @@ pub(crate) fn toolbar_column(
     let profile_row = enabled.right_reserve > 0 && h >= 6 && w >= COLUMN_MIN_WIDTH;
     let show_chip = chip.is_some() && h >= 6;
     let pinned = show_chip && place.pr_pinned;
-    let flows = show_chip && !place.pr_pinned;
+    let chip_squeezed = chip.is_some() && !show_chip;
+    let flows = (show_chip && !place.pr_pinned) || chip_squeezed;
     let bottom_rows = u16::from(profile_row) + u16::from(pinned);
     let group_limit = h.saturating_sub(bottom_rows);
 
@@ -710,7 +727,7 @@ pub(crate) fn toolbar_column(
             key: Slot::Chip,
             width: 1,
             gap_before: 0,
-            priority: 1,
+            priority: if chip_squeezed { u8::MAX } else { 1 },
         });
     }
     items.extend(buttons.iter().map(|b| BarItem {
@@ -855,15 +872,15 @@ pub(crate) fn toolbar_column(
                 _ => {}
             }
         }
-        let list = hidden
-            .iter()
-            .flat_map(|b| {
+        let list = chip_overflow_item(chip, &fit.overflow)
+            .into_iter()
+            .chain(hidden.iter().flat_map(|b| {
                 let mut v = vec![OverflowItem::Toolbar(*b)];
                 if is_split(*b) {
                     v.push(OverflowItem::ToolbarDropdown(*b));
                 }
                 v
-            })
+            }))
             .collect();
         overflow = Some((rect, list));
     }

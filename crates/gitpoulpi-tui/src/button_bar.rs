@@ -192,6 +192,11 @@ pub(crate) enum OverflowItem {
     StatusBulk(StatusSection),
     /// The working-changes toolbar's View all files checkbox.
     ViewAllFiles,
+    /// The toolbar's pull request chip, when the bar had no room for it.
+    HostingChip {
+        /// The `GL !53` chip (a linked request), else the dim `+ PR` one.
+        linked: bool,
+    },
 }
 
 impl OverflowItem {
@@ -205,6 +210,12 @@ impl OverflowItem {
             OverflowItem::CollapseAll { collapse } => HitTarget::CollapseAllButton { collapse },
             OverflowItem::StatusBulk(s) => HitTarget::StatusBulkButton(s),
             OverflowItem::ViewAllFiles => HitTarget::ViewAllFilesCheckbox,
+            OverflowItem::HostingChip { linked: true } => {
+                HitTarget::Hosting(crate::hosting_ui::HostingHit::LinkedPrChip)
+            }
+            OverflowItem::HostingChip { linked: false } => {
+                HitTarget::Hosting(crate::hosting_ui::HostingHit::NewPrChip)
+            }
         }
     }
 
@@ -268,6 +279,12 @@ impl OverflowItem {
                 gitpoulpi_i18n::msg::button_bar::EXPAND_ALL.get().into()
             }
             OverflowItem::StatusBulk(s) => s.bulk_label().into(),
+            OverflowItem::HostingChip { linked: true } => {
+                gitpoulpi_i18n::msg::hosting_ui::PR_ABBR.get().into()
+            }
+            OverflowItem::HostingChip { linked: false } => {
+                gitpoulpi_i18n::msg::hosting_ui::NEW_PR.get().into()
+            }
             OverflowItem::ViewAllFiles => {
                 gitpoulpi_i18n::msg::button_bar::view_all_files(crate::keymap::paren(
                     &crate::keymap::current(),

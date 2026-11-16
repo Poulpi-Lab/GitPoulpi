@@ -387,6 +387,46 @@ fn the_chip_outlasts_the_buttons_and_gives_way_only_when_nothing_would_fit() {
         .any(|(_, t)| matches!(t, HitTarget::Hosting(_))));
 }
 
+/// A chip with no room is not lost: the `⋯` menu lists it, first, and
+/// choosing it is the chip's own click.
+#[test]
+fn a_squeezed_chip_moves_into_the_overflow_menu_at_every_width() {
+    for chip in [
+        linked_chip(),
+        ToolbarChip {
+            text: "+ PR".to_string(),
+            fg: th().ui.muted,
+            bg: None,
+            hit: HostingHit::NewPrChip,
+        },
+    ] {
+        for width in 8..130u16 {
+            let (text, _, toolbar) = draw_toolbar_with_chip(width, None, Some(&chip));
+            let drawn = toolbar
+                .hits
+                .iter()
+                .any(|(_, t)| *t == HitTarget::Hosting(chip.hit.clone()));
+            let in_menu = toolbar.overflow.as_ref().is_some_and(|(_, items)| {
+                items
+                    .iter()
+                    .any(|i| i.hit_target() == HitTarget::Hosting(chip.hit.clone()))
+            });
+            let has_more = toolbar.overflow.is_some();
+            // Either drawn, or listed behind the `⋯`; only a bar too narrow
+            // for the `⋯` plus the profile reserve can lose it.
+            assert!(
+                drawn || in_menu,
+                "{:?} lost at width {width}: {text:?}",
+                chip.hit
+            );
+            assert!(!(drawn && in_menu), "chip twice at width {width}");
+            if !drawn {
+                assert!(has_more && text.contains('\u{22EF}'), "width {width}");
+            }
+        }
+    }
+}
+
 /// Golden, narrow: the least important buttons (Redo, Tag, Stash, Pop,
 /// Search) collapse into one `⋯` at the end, the sync trio, Branch and
 /// Undo stay.

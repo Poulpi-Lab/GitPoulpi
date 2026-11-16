@@ -136,6 +136,7 @@ pub(crate) fn paint(
 
 /// Paints buttons left to right from `x` on one row of `room` columns; when
 /// they do not fit, every label is clipped to an even share (never dropped).
+#[allow(dead_code)] // used by the feature-gated views (review, items, board)
 pub(crate) fn paint_left(
     buf: &mut Buffer,
     x: u16,
@@ -170,6 +171,7 @@ pub(crate) fn paint_left(
 /// A button right-aligned at `right` that is clipped, never dropped, when the
 /// row is short: it keeps at most `avail - reserve` cells (and never fewer than
 /// five), so the text it shares the row with keeps `reserve` columns.
+#[allow(dead_code)] // used by the feature-gated views (review, items, board)
 pub(crate) fn right_clipped(
     buf: &mut Buffer,
     right: u16,
@@ -190,6 +192,7 @@ pub(crate) fn right_clipped(
 /// the buttons' widths (padding included), `gap` the columns between two on a
 /// row, `room` the columns a row has. Returns `(dx, row, cells)` per button; a
 /// button wider than the room is cut to it, never dropped.
+#[allow(dead_code)] // used by the feature-gated views (review, items, board)
 pub(crate) fn flow_layout(cells: &[u16], gap: u16, room: u16) -> Vec<(u16, u16, u16)> {
     let mut out = Vec::with_capacity(cells.len());
     let (mut x, mut row) = (0u16, 0u16);
@@ -208,6 +211,7 @@ pub(crate) fn flow_layout(cells: &[u16], gap: u16, room: u16) -> Vec<(u16, u16, 
 /// Paints a row of buttons from `x`, left to right, wrapping onto the rows
 /// below `y` when they do not fit in `room` columns. Returns every button's
 /// rect (in the order given) and how many rows the row took (at least 1).
+#[allow(dead_code)] // used by the feature-gated views (review, items, board)
 pub(crate) fn flow(
     buf: &mut Buffer,
     x: u16,

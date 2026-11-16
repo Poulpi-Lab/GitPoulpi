@@ -67,6 +67,14 @@ záznam, **`v`** zobrazí nebo skryje události, **`m`** načte starší záznam
 (**Odpovědět**, **Citovat**, **Upravit**, **Smazat**, **Odkazy**) dělají totéž a paleta má řádky *Konverzace: ...* vedle
 řádků *Kontrola: ...*. Na odkaz se před otevřením zeptá, jako všude v kontrole.
 
+Vlákno nad kódem ukazuje svou `cestu:řádek` jako odkaz (podtržený, skutečné tlačítko). Klik na něj, **`G`** na vybraném
+vláknu nebo *Konverzace: Otevřít kód vlákna* v paletě přepne na stránku **Soubory**, otevře ten soubor a umístí kurzor
+na komentovaný řádek (na starou nebo novou stranu, jak byl napsán) s otevřeným vláknem pod ním (sbalené se rozbalí).
+**Esc**, tlačítko **Zpět na přehled** vlevo od karet stránek nebo *Kontrola: Zpět ke komentáři v přehledu* vrátí na
+stejný záznam přehledu. Vlákno, jehož řádek už v diffu není (zastaralé), otevře soubor na nejbližším řádku a stavový
+řádek to řekne; vlákno na souboru, který žádost už nemění, oznámí, že soubor není v diffu. V pohledu issue nebo Radaru
+téže žádosti není žádný kód k otevření: `G` odpoví, že ho má kontrola.
+
 Kde se klávesa konverzace potká s klávesou kontroly, má na této stránce písmeno konverzace: `l` (štítky), `m`
 (milník), `Q` (zrušení u Gerritu), `e` / `d`, `r`. Štítky, milník a zrušení zůstávají na tlačítkách záhlaví a
 v paletě; `a` (řešitelé), `p` (recenzenti), `f` (**Dokončit kontrolu**), `b` (**Checkout**), `P`, `D`, `U` a
@@ -283,6 +291,7 @@ Odeslání kontroly koncept spotřebuje.
 | Přehled / Soubory / Commity | `Alt+1` / `Alt+2` / `Alt+3` | *Kontrola: Zobrazit přehled*, *Zobrazit soubory*, *Zobrazit commity* |
 | Okomentovat řádek nebo rozsah | `c` | *Kontrola: Okomentovat řádek...* |
 | Okomentovat konverzaci | `c` v Přehledu, `C` | *Kontrola: Okomentovat konverzaci...* (otevře pole Přehledu), *Konverzace: Nový komentář* |
+| Otevřít kód vlákna (přehled) / zpět ke komentáři | `G` / `Esc` | *Konverzace: Otevřít kód vlákna*, *Kontrola: Zpět ke komentáři v přehledu* |
 | Odpovědět ve vlákně | `r` | *Kontrola: Odpovědět ve vlákně...* |
 | Vyřešit nebo znovu otevřít | `x` | *Kontrola: Vyřešit nebo znovu otevřít vlákno* |
 | Sbalit nebo rozbalit vlákno | `z` | *Kontrola: Sbalit nebo rozbalit vlákno* |

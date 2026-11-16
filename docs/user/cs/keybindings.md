@@ -376,10 +376,10 @@ předponou (`Ctrl+G s`).
 | `reword` | `deeper` | Upravit historii hlouběji | `Alt+H` |
 | `composer` | `commit` | Commit z Composeru | `Ctrl+Enter`, `Alt+Enter` |
 | `composer` | `insert_issue_ref` | Vložit odkaz na issue | `Alt+R` |
-| `md_editor` | `preview` | Markdown Editor: Toggle Write and Preview | `Alt+P` |
-| `md_editor` | `split` | Markdown Editor: Toggle the Split View | `Alt+L` |
-| `md_editor` | `submit` | Markdown Editor: Send the Text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
-| `md_editor` | `ai` | Markdown Editor: Write with AI | `Alt+E` |
+| `md_editor` | `preview` | Markdown editor: přepnout Psaní a Náhled | `Alt+P` |
+| `md_editor` | `split` | Markdown editor: přepnout zobrazení vedle sebe | `Alt+L` |
+| `md_editor` | `submit` | Markdown editor: odeslat text | `Ctrl+Enter`, `Ctrl+S`, `Alt+Enter` |
+| `md_editor` | `ai` | Markdown editor: napsat pomocí AI | `Alt+E` |
 | `dialog` | `browse` | Vybrat složku | `Ctrl+B` |
 | `dialog` | `sources` | Přejít na zdroje klonování | `Alt+S` |
 | `dialog` | `submit` | Odeslat formulář pro pull request | `Ctrl+S` |
@@ -832,7 +832,7 @@ Klávesy jsou výchozí.
 | Radar: Připnout nebo odepnout | `p` |
 | Radar: Odložit... | `z` |
 | Radar: Zkontrolovat žádost... | `e` |
-| Radar: Open Issue Conversation | `i` |
+| Radar: Otevřít konverzaci issue | `i` |
 | Radar: Zkontrolovat přes API |  |
 | Radar: Naklonovat a zkontrolovat... |  |
 | Radar: Upravit řešitele... |  |
@@ -974,30 +974,30 @@ Klávesy jsou výchozí.
 | Tabule: Nastavit štítky sloupců... | `c` |
 | Tabule: Obnovit | `r` |
 | Tabule: Zavřít | `Esc` |
-| Conversation: Back |  |
-| Conversation: Refresh | `F5` |
-| Conversation: Load Older Entries | `m` |
-| Conversation: Previous Entry | `Up` |
-| Conversation: Next Entry | `Down` |
-| Conversation: Next Unread Entry | `n` |
-| Conversation: Reply to Entry | `r` |
-| Conversation: Quote Entry | `Q` |
-| Conversation: New Comment | `c` |
-| Conversation: Links of Entry... | `l` |
-| Conversation: Open Diagram of Entry | `g` |
-| Conversation: Copy Link of Entry | `y` |
-| Conversation: Open in Browser | `o` |
-| Conversation: Edit Comment | `e` |
-| Conversation: Delete Comment | `d` |
-| Conversation: Show or Hide Events | `v` |
-| Conversation: Toggle Write and Preview |  |
-| Conversation: Toggle the Split View |  |
-| Conversation: Send the Comment |  |
-| Conversation: Toggle Internal Note |  |
-| Conversation: Close | `Esc` |
-| Markdown Editor: Write with AI |  |
-| Markdown Editor: Refresh the AI Context |  |
-| Hosting: Open Issue Conversation... |  |
+| Konverzace: Zpět |  |
+| Konverzace: Obnovit | `F5` |
+| Konverzace: Načíst starší záznamy | `m` |
+| Konverzace: Předchozí záznam | `Up` |
+| Konverzace: Další záznam | `Down` |
+| Konverzace: Další nepřečtený záznam | `n` |
+| Konverzace: Odpovědět na záznam | `r` |
+| Konverzace: Citovat záznam | `Q` |
+| Konverzace: Nový komentář | `c` |
+| Konverzace: Odkazy záznamu... | `l` |
+| Konverzace: Otevřít diagram záznamu | `g` |
+| Konverzace: Kopírovat odkaz záznamu | `y` |
+| Konverzace: Otevřít v prohlížeči | `o` |
+| Konverzace: Upravit komentář | `e` |
+| Konverzace: Smazat komentář | `d` |
+| Konverzace: Zobrazit nebo skrýt události | `v` |
+| Konverzace: Přepnout Psaní a Náhled |  |
+| Konverzace: Přepnout zobrazení vedle sebe |  |
+| Konverzace: Odeslat komentář |  |
+| Konverzace: Přepnout interní poznámku |  |
+| Konverzace: Zavřít | `Esc` |
+| Markdown editor: napsat pomocí AI |  |
+| Markdown editor: Obnovit kontext AI |  |
+| Hosting: Otevřít konverzaci issue... |  |
 | Kontrola: ✦ Koncept kontroly... | `s` |
 | Kontrola: Přijmout návrh | `y` |
 | Kontrola: Upravit a přijmout návrh... | `w` |

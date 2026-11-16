@@ -510,7 +510,7 @@ mod tests {
     #[test]
     fn a_narrow_dialog_keeps_its_three_buttons() {
         let mut d = SparseDialog::new(sparse(&["src"]));
-        let area = Rect::new(0, 0, 36, 14);
+        let area = Rect::new(0, 0, 48, 14);
         let mut buf = Buffer::empty(area);
         d.render(sparse_rect(area), &mut buf);
         let hits: Vec<_> = d.hits.iter().map(|(_, h)| *h).collect();

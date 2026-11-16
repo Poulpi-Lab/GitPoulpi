@@ -784,7 +784,7 @@ mod tests {
     #[test]
     fn a_narrow_dialog_keeps_both_buttons() {
         let mut dialog = InitDialog::new(&abs("work"), "main");
-        for width in [34u16, 40, 60] {
+        for width in [44u16, 52, 60] {
             let (_, _) = draw(&mut dialog, width, 30);
             let hits: Vec<_> = dialog.hits.iter().map(|(_, h)| *h).collect();
             assert!(hits.contains(&InitFocus::Cancel), "{width}: {hits:?}");

@@ -348,6 +348,7 @@ impl ItemView {
         }
     }
 
+    #[cfg(test)]
     pub(crate) fn selected_is_thread(&self, id: &str) -> bool {
         self.conv.selected_is_thread(id)
     }

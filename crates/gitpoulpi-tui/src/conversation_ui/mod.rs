@@ -587,6 +587,7 @@ impl Conversation {
     }
 
     /// Whether the selected entry is the code thread `id`.
+    #[cfg(test)]
     pub(crate) fn selected_is_thread(&self, id: &str) -> bool {
         self.selected().is_some_and(|i| i.key == format!("t{id}"))
     }

@@ -2780,7 +2780,12 @@ impl Rig {
     }
 }
 
-fn code_ref(line: Option<u32>, original: Option<u32>, old_side: bool, outdated: bool) -> crate::item_cmd::CodeRef {
+fn code_ref(
+    line: Option<u32>,
+    original: Option<u32>,
+    old_side: bool,
+    outdated: bool,
+) -> crate::item_cmd::CodeRef {
     crate::item_cmd::CodeRef {
         thread_id: "T1".into(),
         path: "src/a.rs".into(),

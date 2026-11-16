@@ -402,7 +402,7 @@ gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "
 gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"
 ```
 
-`--conversation` nimmt eine Datei, `-` für die Standardeingabe oder das JSON selbst: eine Seite mit `header` und `entries`, der Form, in der GitPoulpi eine Unterhaltung speichert. (Das JSON, das `hosting issue comments` ausgibt, ist die agentenorientierte Form mit `item` und typisierten Einträgen; sie wird hier nicht angenommen.) Mit `--read-repo` legen `--pr-base REV --pr-head REV` den Diff eines Pull Requests in den Kontext; das `context` der Antwort nennt, welche Teile gelesen wurden, ob sie wiederverwendet wurden, die Cache-Tokens des Anbieters und die Agentensitzung. Das MCP-Tool `ai_hosting_reply` ist derselbe Befehl und nur lesend.
+`--conversation` nimmt eine Datei, `-` für die Standardeingabe oder das JSON selbst: das JSON, das `hosting issue comments --json` oder `hosting review conversation --json` ausgibt (eine ältere Seite mit `header` und `entries` wird ebenfalls angenommen), sodass `gitpoulpi hosting issue comments 7 --json | gitpoulpi ai hosting-reply --conversation -` funktioniert; `--item <ref>` holt die Unterhaltung selbst (`7` oder `#7` ein Issue, `!7` ein Pull Request). Mit `--read-repo` legen `--pr-base REV --pr-head REV` den Diff eines Pull Requests in den Kontext; das `context` der Antwort nennt, welche Teile gelesen wurden, ob sie wiederverwendet wurden, die Cache-Tokens des Anbieters und die Agentensitzung. Das MCP-Tool `ai_hosting_reply` ist derselbe Befehl und nur lesend.
 
 ## Wohin der Schlüssel gehört
 

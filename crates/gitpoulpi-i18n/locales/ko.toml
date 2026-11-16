@@ -1098,7 +1098,7 @@ hint_create = "만들기"
 hint_open = "열기"
 hint_toggle = "전환"
 # context: one line in the minimal frame a dialog shows when the window is too small for it
-too_small = "Window too small: enlarge it"
+too_small = "창이 너무 작음: 넓히세요"
 
 [clone]
 title = "저장소 클론"
@@ -3618,7 +3618,7 @@ review_reply = "리뷰: 스레드에 답글..."
 # context: command palette entry
 review_resolve = "리뷰: 스레드 해결 또는 다시 열기"
 # context: command palette entry
-review_back_to_comment = "Review: Back to Comment in Overview"
+review_back_to_comment = "리뷰: 개요의 댓글로 돌아가기"
 # context: command palette entry
 review_fold_thread = "리뷰: 스레드 접기 또는 펼치기"
 # context: command palette entry
@@ -4306,7 +4306,7 @@ explain_changes = "작업 변경 사항 설명"
 ai_generate = "AI로 {$commit} 메시지 생성"
 ai_compose = "AI로 {$commit} 구성"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: {$commit} without running git hooks"
+skip_hooks = "훅 건너뛰기: 훅을 실행하지 않고 {$commit}"
 commit_reference = "브라우저에서 열기 (팔레트: {$commit} 참조 열기)"
 quit = "GitPoulpi 종료"
 quit_cd = "종료하고 셸을 이 탭의 폴더에 둠 (셸 래퍼 필요)"
@@ -5484,7 +5484,7 @@ ref_from_branch = "(브랜치에서)"
 issue_ref_inserted = "{reference} 삽입됨"
 skip_hooks = "훅 건너뛰기"
 # context: shorter label of the Skip hooks checkbox on a narrow commit options row
-skip_hooks_short = "No hooks"
+skip_hooks_short = "훅 없음"
 
 [compose_ui]
 select_commit = "{$commit} 선택..."
@@ -7231,13 +7231,13 @@ why_not_on_code = "먼저 커서를 코드 줄에 두세요"
 # context: why a row is off
 why_not_on_thread = "먼저 커서를 댓글 스레드에 두세요"
 # context: button on the Files page after jumping from a comment: returns to that comment in the Overview
-back_to_overview = "Back to Overview"
+back_to_overview = "개요로 돌아가기"
 # context: why Back to Comment does nothing. Width budget: 50 cells
-why_no_return = "no comment to go back to"
+why_no_return = "돌아갈 댓글이 없습니다"
 # context: status line: the commented file is not in the diff. {path} is a file path
-thread_not_in_diff = "{path} is not in the {$diff}"
+thread_not_in_diff = "{path}은(는) {$diff}에 없습니다"
 # context: status line: the thread's line no longer exists; {path} is a file path
-thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
+thread_outdated_nearest = "이 스레드는 오래되었습니다: {path}에서 가장 가까운 줄을 표시합니다"
 # context: why a row is off
 why_no_resolve = "이 스레드는 해결할 수 없습니다"
 # context: why a row is off
@@ -10236,11 +10236,11 @@ link_diagram = "다이어그램: {first}"
 why_no_diagram = "선택한 항목에 다이어그램이 없습니다"
 palette_open_diagram = "대화: 항목의 다이어그램 열기"
 # context: command palette entry
-palette_open_code = "Conversation: Open Code of Thread"
+palette_open_code = "대화: 스레드의 코드 열기"
 # context: why Open Code does nothing. Width budget: 50 cells
-why_no_code = "the selected entry is not a code thread"
+why_no_code = "선택한 항목은 코드 스레드가 아닙니다"
 # context: why Open Code does nothing outside a review. Width budget: 50 cells
-why_no_code_here = "open the review of this request to reach its code"
+why_no_code_here = "코드를 보려면 이 요청의 리뷰를 여세요"
 why_no_url = "이 항목은 호스트에 페이지가 없습니다"
 why_no_events = "이 호스트는 이벤트를 나열하지 않습니다"
 why_no_reply = "이 호스트는 이 항목에 대한 답글을 받지 않습니다"

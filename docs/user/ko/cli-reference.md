@@ -76,7 +76,8 @@
 | 명령 | 동작 |
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | 파일, 폴더, 전체, hunk 또는 일부 줄을 스테이징합니다. 민감한 파일(개인 키, `.env`, 인식된 토큰: [설정 참조](config-reference.md#privacy-민감한-파일)의 `[privacy]`)을 추가하게 될 파일, 폴더 또는 `--all` 스테이징은 종료 코드 2와 `{error: "sensitive_files", files: [{path, reason}]}`(규칙과 가려진 미리 보기이며 값은 절대 표시하지 않음)와 함께 거부되고 아무것도 스테이징되지 않습니다. `--allow-sensitive`는 그래도 스테이징합니다. |
-| `unstage` (같은 플래그) | 그 반대. |
+| `stage --paths A B ...` | 여러 파일이나 폴더를 하나의 작업으로 스테이징합니다: 저널 항목 하나, `undo` 단계 하나(이름이 바뀐 파일은 `status`가 `renamed_from`으로 보여 주듯 이전 경로와 새 경로입니다). `--folder`, `--hunk`, `--lines`, `--all`과 함께 쓸 수 없습니다. |
+| `unstage` (같은 플래그, `--paths` 포함) | 그 반대. |
 | `discard --file F [--hunk N [--lines a,b]]` | 스테이징되지 않은 변경 사항을 버립니다(파일 전체: 모든 변경, 추적되지 않는 파일은 삭제하고, 그 결과 비게 되는 폴더도 삭제). 실행 취소 가능. |
 | `rm-file <paths>...` | 작업 트리에서 파일을 삭제합니다. 실행 취소 가능. |
 | `ignore <pattern> [--file <.gitignore>]` | `.gitignore`에 패턴을 추가합니다(`--file .git/info/exclude`를 쓰면 `.git/info/exclude`에). `.git/info/exclude`를 제외하고 실행 취소 가능. |

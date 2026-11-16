@@ -1100,7 +1100,7 @@ hint_create = "skapa"
 hint_open = "öppna"
 hint_toggle = "växla"
 # context: one line in the minimal frame a dialog shows when the window is too small for it
-too_small = "Window too small: enlarge it"
+too_small = "Fönstret är för litet: gör det större"
 
 [clone]
 title = "Klona ett repository"
@@ -3622,7 +3622,7 @@ review_reply = "Granskning: Svara i tråd..."
 # context: command palette entry
 review_resolve = "Granskning: Lös eller öppna tråd igen"
 # context: command palette entry
-review_back_to_comment = "Review: Back to Comment in Overview"
+review_back_to_comment = "Granskning: Tillbaka till kommentaren i översikten"
 # context: command palette entry
 review_fold_thread = "Granskning: Fäll ihop eller ut tråd"
 # context: command palette entry
@@ -4310,7 +4310,7 @@ explain_changes = "Förklara ändringar i arbetskatalogen"
 ai_generate = { git = "Generera ett {$commit}-meddelande med AI", local = "Generera ett incheckningsmeddelande med AI" }
 ai_compose = "Komponera {$commits} med AI"
 # context: tooltip of the Skip hooks checkbox
-skip_hooks = "Skip hooks: {$commit} without running git hooks"
+skip_hooks = "Hoppa över hooks: gör {$commit} utan att köra git-hooks"
 commit_reference = { git = "Öppna i din webbläsare (palett: Öppna commit-referens)", local = "Öppna i din webbläsare (palett: Öppna incheckningsreferens)" }
 quit = "Avsluta GitPoulpi"
 quit_cd = "Avsluta och lämna ditt skal i den här flikens mapp (kräver skalomslaget)"
@@ -5492,7 +5492,7 @@ ref_from_branch = "(från grenen)"
 issue_ref_inserted = "{reference} infogad"
 skip_hooks = "Hoppa över hooks"
 # context: shorter label of the Skip hooks checkbox on a narrow commit options row
-skip_hooks_short = "No hooks"
+skip_hooks_short = "Utan hooks"
 
 [compose_ui]
 select_commit = { git = "Välj en commit...", local = "Välj en incheckning..." }
@@ -7241,13 +7241,13 @@ why_not_on_code = "placera markören på en kodrad först"
 # context: why a row is off
 why_not_on_thread = "placera markören på en kommentarstråd först"
 # context: button on the Files page after jumping from a comment: returns to that comment in the Overview
-back_to_overview = "Back to Overview"
+back_to_overview = "Tillbaka till översikten"
 # context: why Back to Comment does nothing. Width budget: 50 cells
-why_no_return = "no comment to go back to"
+why_no_return = "ingen kommentar att gå tillbaka till"
 # context: status line: the commented file is not in the diff. {path} is a file path
-thread_not_in_diff = "{path} is not in the {$diff}"
+thread_not_in_diff = "{path} finns inte i {$diff}"
 # context: status line: the thread's line no longer exists; {path} is a file path
-thread_outdated_nearest = "this thread is outdated: showing the nearest line of {path}"
+thread_outdated_nearest = "den här tråden är föråldrad: visar närmaste rad i {path}"
 # context: why a row is off
 why_no_resolve = "den här tråden kan inte lösas"
 # context: why a row is off
@@ -10117,11 +10117,11 @@ link_diagram = "Diagram: {first}"
 why_no_diagram = "den valda posten har inget diagram"
 palette_open_diagram = "Konversation: Öppna postens diagram"
 # context: command palette entry
-palette_open_code = "Conversation: Open Code of Thread"
+palette_open_code = "Konversation: Öppna trådens kod"
 # context: why Open Code does nothing. Width budget: 50 cells
-why_no_code = "the selected entry is not a code thread"
+why_no_code = "den valda posten är ingen kodtråd"
 # context: why Open Code does nothing outside a review. Width budget: 50 cells
-why_no_code_here = "open the review of this request to reach its code"
+why_no_code_here = "öppna den här begäran och dess granskning för att nå koden"
 why_no_url = "den här posten har ingen sida på värden"
 why_no_events = "den här värden listar inga händelser"
 why_no_reply = "den här värden tar inte emot svar på den här posten"

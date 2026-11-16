@@ -71,6 +71,13 @@ Kommandopaletten, hjälpen, kontextmenyer, dialoger, popuper och Inställningar
 klick på `✕` stänger den, och ett klick utanför stänger en dialogruta, popup eller
 panel (se [Stänga fönster och dialogrutor](mouse-and-gestures.md#stänga-fönster-och-dialogrutor)).
 
+### När fönstret är litet
+
+Inget försvinner i tysthet när fönstret blir smalare. En knapp förlorar först sin långa etikett (klippt med `...`),
+radbryts sedan till en andra rad eller hamnar bakom `⋯`-menyn på sin rad, och dess tangent och palettrad fungerar hela
+tiden. En dialog som är för stor för fönstret ritar en liten ram med sin titel, `✕` och raden **Fönstret är för litet:
+gör det större** i stället för ingenting; `Esc` och `✕` stänger den, och den kommer tillbaka hel när du gör fönstret större.
+
 ## Flikraden
 
 Fliken **Hem** (husikonen) ligger längst till vänster, följd av

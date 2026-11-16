@@ -93,8 +93,7 @@ impl WindowState {
         // A repository with no saved widths: fit every column to the rows the
         // Log has painted, once. A width the user set first wins.
         if self.log_widths_autofit {
-            if !self.log_column_overrides.is_empty() || !self.log_column_scroll_widths.is_empty()
-            {
+            if !self.log_column_overrides.is_empty() || !self.log_column_scroll_widths.is_empty() {
                 self.log_widths_autofit = false;
             } else if self.log_len > 0
                 // A paint has measured rows (the header titles alone are the

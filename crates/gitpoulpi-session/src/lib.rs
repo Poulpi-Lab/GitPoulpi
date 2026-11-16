@@ -34,9 +34,9 @@ pub use repo_auth::{
     REPO_AUTH_FILE,
 };
 pub use repo_state::{
-    conversation_key, resolve_default_remote, ConversationSeen, FoldState, HookLine, IssuesSource, LogColumnWidths,
-    PendingAutoStash, PendingAutoStashState, RepoPreferences, RepoState, TrustedHooks,
-    TrustedScript, WatchedIssue,
+    conversation_key, resolve_default_remote, ConversationSeen, FoldState, HookLine, IssuesSource,
+    LogColumnWidths, PendingAutoStash, PendingAutoStashState, RepoPreferences, RepoState,
+    TrustedHooks, TrustedScript, WatchedIssue,
 };
 pub use review_draft::{AiDraft, AiItem, AiPlace, DraftComment, ReviewDraft};
 

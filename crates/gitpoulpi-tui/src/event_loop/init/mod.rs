@@ -374,11 +374,10 @@ pub(super) fn init(
     // saved from the top of the frame loop whenever it changed.
     // The widths are per repository; a repository with none saved is fitted
     // to its content once the Log has painted (`log_widths_autofit`).
-    let saved_log_widths = gitpoulpi_session::RepoState::load(&crate::remotes_ui::repo_state_path(
-        &repo.root,
-    ))
-    .ok()
-    .and_then(|s| s.log_columns);
+    let saved_log_widths =
+        gitpoulpi_session::RepoState::load(&crate::remotes_ui::repo_state_path(&repo.root))
+            .ok()
+            .and_then(|s| s.log_columns);
     // `GITPOULPI_NO_LOG_AUTOFIT=1` is the PTY harness's switch: the tests
     // about other things start from the automatic widths.
     let log_widths_autofit = saved_log_widths.is_none()

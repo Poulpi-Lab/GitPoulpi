@@ -189,8 +189,8 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `status` | `collapse_below` | Klasörü ve Alt Klasörlerini Daralt | `_`, `Shift+Left` |
 | `home` | `favorite` | Depoyu Yıldızla veya Yıldızı Kaldır | `f`, `*` |
 | `home` | `close_repo` | Satırı Kapat, Kaldır veya Yıldızını Kaldır | `x`, `Delete` |
-| `home` | `copy_path` | Copy the Repository Path | `y` |
-| `home` | `open_in` | Open the Repository in the Default Tool | `o` |
+| `home` | `copy_path` | Depo Yolunu Kopyala | `y` |
+| `home` | `open_in` | Depoyu Varsayılan Araçta Aç | `o` |
 | `home` | `browse` | Depo Gözat | `b` |
 | `home` | `clone` | Depo Klonla | `c` |
 | `home` | `init` | Depo Başlat | `i` |
@@ -802,8 +802,8 @@ Tuşlar varsayılanlardır.
 | Depolar: Seçiliyi Favorilere Ekle veya Kaldır | `f` |
 | Depolar: Seçiliyi Kapat veya Kaldır | `x` |
 | Depolar: Seçili Depo Menüsü... | `.` |
-| Repositories: Copy Selected Path | `y` |
-| Repositories: Open Selected in Default Tool | `o` |
+| Depolar: Seçilen Yolu Kopyala | `y` |
+| Depolar: Seçileni Varsayılan Araçta Aç | `o` |
 | Depolar: Ara | `/ / Ctrl+F` |
 | Depolar: Tüm Bölümleri Daralt | `-` |
 | Depolar: Tüm Bölümleri Genişlet | `+` |
@@ -1162,7 +1162,7 @@ Tuşlar varsayılanlardır.
 | ✦ YZ: Seçili Commit'i Böl... |  |
 | ✦ YZ: Çalışma Değişikliklerini Açıkla | `Ctrl+G w` |
 | ✦ YZ: Çalışma Değişikliklerinden Commit'ler Oluştur... | `Ctrl+G C` |
-| Sensitive Files: Show in File | `S` |
+| Hassas Dosyalar: Dosyada Göster | `S` |
 | Composer: Dosyayı Bir Commit'e Taşı... | `m` |
 | Diff: Blame |  |
 | Blame: Commit öğesini Log'da göster | `Enter` |

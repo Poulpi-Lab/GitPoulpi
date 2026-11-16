@@ -10179,6 +10179,6 @@ key_rewrite = "g"
 # context: key of the Create a branch here button, one letter
 key_create = "d"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "i"
+key_cancel = "p"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
 gave_up = "{short} düzenlenmedi: dal checkout edilmedi"

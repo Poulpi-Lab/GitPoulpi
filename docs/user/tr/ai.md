@@ -454,7 +454,8 @@ içeri alınamaz: seçenek *Bu ajanın GitPoulpi'nin güvendiği bir salt okunur
   *Ajan oturumu başladı* veya *Ajan oturumu sürdü*.
 - **Anthropic istem önbelleği.** Bir Anthropic profili için istek, temel istem ve talimatlar tek bir önbellekli blok,
   depo bağlamı ikinci bir blok olarak ve konuşmanız, ipucunuz ve taslağınız onlardan sonra gönderilir; böylece aynı
-  bağlamdaki ikinci bir yanıt sağlayıcının önbelleğinden okunur ve çok daha ucuza gelir. Yanıtın önbellek sayaçları
+  bağlamdaki ikinci bir yanıt sağlayıcının önbelleğinden okunur ve çok daha ucuza gelir (devam istekleri konuşma
+  iletisini ve en yeni taslağı da önbelleğe alır, aşağıya bakın). Yanıtın önbellek sayaçları
   *Önbellek: N token yeniden kullanıldı* satırının gösterdiğidir. OpenAI uyumlu sunucular, otomatik önek önbelleklemesinin
   yararlandığı aynı kararlı istek sırasını alır; GitPoulpi fazladan bir şey göndermez.
 - **Ajan oturumunu korur.** **Yanıtlar arasında ajanın oturumunu koru** (`ai.hosting_reply.reuse_agent_session`,
@@ -465,8 +466,33 @@ içeri alınamaz: seçenek *Bu ajanın GitPoulpi'nin güvendiği bir salt okunur
   seferlik bir çalıştırmadır. Oturum ajanın kendi depolamasında yaşar, GitPoulpi yalnızca kimliğini tutar (pencerede
   bellekte, CLI için yalnızca kullanıcıya açık bir dosyada).
 
+**Devam istekleri: daha kısa, başka bir talimat.** Aynı yazı alanında yeniden istemek ("daha kısa yap", "teşekkür
+ekle") tek bir alışveriştir. Sürdürülen bir Claude Code oturumu bunu kendiliğinden hatırlar. Geri kalan her şey için
+(bir API profili, Codex ve diğer tüm ajanlar) GitPoulpi onu geri verir: istek, ilk isteğin konuşma iletisini, sonra
+her önceki talimatı ve ona yanıt veren taslağı gerçek sohbet turları olarak (tek bir belge okuyan ajan için istemde bir
+döküm olarak) ve en sonda yalnızca yeni olanı taşır: talimatınız ve, *Taslağımı iyileştir* işaretliyken, kutudaki
+metnin kendi düzenlemelerinizle şimdiki hali. Böylece bir devam isteği hiçbir zaman sıfırdan başlamaz ve depodan
+yeniden hiçbir şey okunmaz. "Gönderilenler" hepsini gösterir. Alışveriş, konuşma gibi
+`ai.limits.hosting_reply_context_bytes` ile sınırlanır: önce en eski devam istekleri dışarıda bırakılır, konuşma iletisi
+ve en yeni taslağınız her zaman kalır (CLI yanıtının `context.history_omitted` değeri bunları sayar). Bir alışveriş
+içinde depo bağlamı ilk isteğinkiyle aynı kalır, bu yüzden yeniden kullanılır ve sağlayıcının önbelleği işler: bir
+Anthropic profili için temel istem, depo bağlamı, konuşma iletisi ve en yeni taslak önbellekli kısımdır, OpenAI uyumlu
+bir sunucu da önek önbelleklemesi için aynı ileti sırasını alır. Codex `codex exec resume <id>` ile sürdürülebilirdi,
+ancak oturum kimliğini kendisi seçer ve yalnızca JSON olayları arasında yazdırır (`--last` ise sizin kendi
+oturumlarınızı alırdı), bu yüzden GitPoulpi onu tek seferlik tutar ve geçmişi yeniden verir. Alışveriş yazı alanıyla
+birlikte yaşar: yazı alanı kapanınca veya metin gönderilince biter, **Bağlamı yenile** de onu bırakır (sonraki istek
+bir ilk istek olur). Yalnızca yanıt veren bir istek ona katılır; başarısız olan veya durdurulan katılmaz. Bir pull
+request açıklaması diff'ten yazılır ve alışverişi yoktur.
+
+CLI'da her çağrı ayrıdır, bu yüzden `--continue` alışverişi yeniden alır: bu depoda aynı hedef için son
+`ai hosting-reply` çağrısını sürdürür (aynı `--item`, `--reply-to`, `--path`/`--line` veya `--issue-title`), özel durum
+klasöründeki küçük bir dosyadan. `--continue` olmadan yeni bir alışveriş başlar ve saklananın yerini alır. Hedef için
+saklanan bir şey yokken `--continue` bir hatadır. Yanıtın `context` alanı, önceki turlar gittiğinde `history_turns`
+(ve `history_omitted`) taşır.
+
 ```
 gitpoulpi ai hosting-reply --conversation conversation.json --hint "yarın bakacağımı söyle"
+gitpoulpi ai hosting-reply --conversation conversation.json --hint "daha kısa" --continue
 gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
 gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "bu bizim hatamız mı?"
 gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "yeniden üretme adımları"

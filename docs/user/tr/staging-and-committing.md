@@ -18,6 +18,14 @@ panel çalışma değişikliklerini gösterir:
 - **Unstaged Dosyalar**: düzenlenmiş, eklenmiş (izlenmeyen) ve silinmiş, henüz
   sonraki commit'te olmayan dosyalar.
 - **Staged Dosyalar**: sonraki commit'in içereceği şey.
+- **Yeniden adlandırılmış veya taşınmış dosyalar** iki listede de tek bir satırdır,
+  `yeni <- eski` (diskte silinmiş bir dosya ile içeriğinin en az %50'si aynı olan yeni
+  bir dosya, stage'lemeden önce bile taşıma sayılır). Stage'le, Unstage'le ve At her iki
+  ada da etki eder: stage'lemek silmeyi ve yeni dosyayı stage'ler, böylece git tek bir
+  yeniden adlandırma görür. Satırı açmak içerik diff'ini eski ada karşı gösterir,
+  başlığı `eski -> yeni (%N benzer)` olur; düzenlemesiz bir taşımada **İçerik değişmedi**
+  yazar. Bir commit'in dosyaları için de aynısı geçerlidir ve `gitpoulpi status` /
+  `gitpoulpi diff` `renamed_from` bildirir.
 - **Yol** veya **Ağaç** (`m`) dosyaları düz ya da klasörler halinde listeler.
   **Tümünü Daralt** (`z`) klasörleri kapatır. **Tüm dosyaları göster** (`a`)
   yalnızca değişen dosyalar yerine tüm ağacı gösterir. Listenin boş kısmına sağ
@@ -47,7 +55,14 @@ dosyayı nedeniyle birlikte listeler (bir kalıp ya da maskeli bir önizlemeyle 
 türü, asla değer) ve **1. Yine de stage'le** veya **2. İptal et, hiçbir şeye dokunma**
 seçeneklerini sunar. Bir ok tuşuna veya bir rakama basana kadar hiçbir yanıt vurgulanmaz;
 böylece yanlışlıkla basılan bir Enter hiçbir şeyi yanıtlamaz; `Esc`, kapatma çarpısı ve
-dışına bir tıklama iptal eder. Klavyeden, bir düğmeden, bir menüden, paletten ya da bir
+dışına bir tıklama iptal eder.
+Bir dosyada bulunan gizli bilgi satırını adlandırır (`config/app.env:12`). Karar vermeden
+önce bakmak için bir bulguya tıklayın (veya `Tab` / `Shift+Tab`, `Ctrl+J` / `Ctrl+K` ile
+aralarında gezinin) ve **Dosyada göster** düğmesine, `S` tuşuna ya da paletteki **Hassas
+Dosyalar: Dosyada Göster** komutuna basın: dosya Dosya Görünümü'nde o satıra kaydırılmış
+ve satır vurgulanmış olarak açılır, Dosya Görünümü'nü kapattığınızda (`Esc`) soru
+dokunulmadan geri gelir. Bakmak hiçbir şeyi stage'lemez.
+Klavyeden, bir düğmeden, bir menüden, paletten ya da bir
 sürükle ve bırakmadan gelse de aynı sorudur, çünkü hepsi aynı isteği gönderir. İptal etmek
 hiçbir şeyi stage'lemez; aynı stage işleminin sıradan dosyalarını bile.
 
@@ -189,6 +204,11 @@ değişiklikleri satırındaki alandır: ikisinden birine yazmak diğerinde gör
 bir mesaj yazar (`Ctrl+G i`); **YZ ile commit'ler oluştur** ise çalışmanızı
 birkaç commit'e böler (aşağıya bakın). Metin, düzenlemeniz için forma girer; commit
 düğmesine basana kadar hiçbir şey commit'lenmez.
+
+**YZ ile commit'ler oluştur**, Amend satırının sağ ucunda durur ve sağ panelle birlikte
+kaybolmak yerine küçülür: önce tam etiket, sonra **YZ ile oluştur**, sonra yalnızca
+**`✦`**. Her genişlikte tıkını, ipucunu ve tuşunu (`Ctrl+G Shift+C`) korur; Amend ve
+Hook'ları atla etiketleri ona yer açar, tersi asla.
 
 ## Commit composer: değişikliklerinizi commit'lere bölün
 

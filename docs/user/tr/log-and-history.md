@@ -248,6 +248,22 @@ kehribar renkli bir uyarıyla force push (lease ile) gerekeceğini bildirir ve i
 bir onay ister. `Ctrl+Z` (araç çubuğundaki Geri al) reword'ü geri alır; bkz.
 [Geri al ve yinele](undo-redo.md). Durum çubuğu önceki ucu da adlandırır.
 
+Çıkış yapılmış dalda olmayan (başka bir dalda yaşayan) bir commit, bulunduğunuz
+yerde reword edilemez veya değiştirilemez; bu yüzden *Commit mesajını düzenle...* ve
+*Değiştir...* onun yerine **Başka bir dalın commit'ini düzenle** iletişim kutusunu
+açar: bir seçenekler listesi (`Up` / `Down` veya `Ctrl+J` / `Ctrl+K` gezinir, `Enter`
+veya bir tık seçer, `Esc`, çarpı ya da **İptal (P)** kapatır):
+
+- **`<dal>` dalını checkout et ve düzenle (1)**: geçmişi commit'i içeren her yerel
+  dal için bir satır (`1` ile `8` arası, ilk sekiz; gerisi sayılır). Dal olağan
+  yoldan checkout edilir, sonra düzenleme onun üzerinde açılır. Geri alma, iki
+  eylemin kendi geri almasıdır: `Ctrl+Z` düzenlemeyi geri alır, checkout ise bir
+  checkout'tur.
+- **Gelişmiş geçmiş yeniden yazmayla düzenle (G)**: bunu içeren derlemelerde
+  [geçmiş yeniden yazma ekranını](history-rewrite.md) o commit üzerinde açar.
+- **Burada dal oluştur... (D)**: yalnızca hiçbir yerel dal commit'i içermiyorsa
+  (örneğin yalnızca bir uzak dalda ise); commit'te bir dal için ad kutusunu açar.
+
 ## Bir commit'i değiştirmek (mesaj, yazar, tarihler)
 
 Commit menüsündeki *Değiştir...* (veya `Ctrl+G Shift+E`, ya da paletteki *Commit: Değiştir...*) commit'in özelliklerini tek bir iletişim kutusunda açar: özet, açıklama ile yazarın adı, e-postası ve tarihi; her biri commit'in kendi değerleriyle doldurulmuştur. İstediğinizi değiştirip **Uygula**'ya basın; yalnızca değiştirdiğiniz alanlar gönderilir. Tarih `YYYY-MM-DD HH:MM:SS +HH:MM` biçiminde yazılır ve siz düzenleyene kadar UTC olarak gösterilir. Committer sizsiniz, şu anki zamanla (reword'deki gibi). Checkout yapılmış dalın herhangi bir commit'i değiştirilebilir; kurallar, zaten push edilmiş commit uyarısı ve ikinci onay *Commit mesajını düzenle...* ile aynıdır; üstündeki commit'ler kendi yazar ve tarihleriyle yeniden oluşturulur, stage'lenmiş ile stage'lenmemiş değişiklikleriniz olduğu gibi kalır. `Ctrl+Z` (araç çubuğundaki Geri al) işlemi geri alır. Geçmiş yeniden yazma içeren derlemelerde iletişim kutusunun sol altındaki **Geçmişi daha kapsamlı değiştir...** (`Alt+H`) hiçbir şey uygulamadan onu kapatır ve [geçmişi yeniden yazma ekranını](history-rewrite.md) bu commit'ten en yenisine kadar kapsamla açar; bir alanı düzenlediyseniz önce sorar (`Esc` onaylar). `Ctrl+N` iletişim kutusunun her alanında ve düğmesinde bir rozet gösterir; imleci o alana koymak ya da o düğmeye basmak için rozete basın (bkz. [Rozetler](keybindings.md#rozetler)).
@@ -424,7 +440,7 @@ Neyin karşılaştırıldığı seçime bağlıdır:
 | WIP satırı ve bir commit veya stash | o commit çalışma ağacıyla: izlenen dosyaların stage'deki ve stage dışındaki değişiklikleri (izlenmeyen dosyalar bir diff'in parçası değildir) |
 | üç veya daha fazla commit | birleştirilmiş değişiklikleri: en eskisinden hemen öncesinden en yenisine kadar (merge'ler ilk ebeveynlerini izler) |
 
-Yeniden adlandırma bir silme ile bir ekleme olarak görünür. **Yer değiştir** (`x`)
+Yeniden adlandırılmış veya taşınmış bir dosya tek bir dosya olarak görünür; diff'inin üstünde eski adı ve benzerliği vardır. **Yer değiştir** (`x`)
 iki satırlık bir karşılaştırmanın uçlarını değiş tokuş eder; her zaman daha yeni uç
 olan WIP satırı varsa ya da üç veya daha fazla satırlık bir aralıkta değiş tokuş edilecek
 bir şey yoktur. WIP satırıyla yapılan bir karşılaştırma, siz dosya kaydettikçe

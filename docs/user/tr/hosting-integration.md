@@ -460,7 +460,7 @@ push'lar). GitPoulpi onu barındırıcıdan okur, biçimlendirilmiş gösterir v
 | Nereden | Nasıl |
 |---|---|
 | Bir ISSUE'LAR satırı | `Enter` veya çift tık; satır menüsündeki **Konuşmayı aç**; palet *Barındırma: Issue Konuşmasını Aç...* (ekrandaki issue'ların bir listesi). Satır menüsündeki **Tarayıcıda aç** tarayıcıyı korur. |
-| Azure DevOps veya Bitbucket'ta bir PULL REQUEST'LER satırı | `Enter` veya **Konuşmayı aç**. GitHub, GitLab, Gitea, Forgejo ve Gerrit'te satır, Genel Bakış sayfası isteğin konuşması olan [incelemeyi](review.md) açar. |
+| Azure DevOps veya Bitbucket'ta bir PULL REQUEST'LER satırı | `Enter` veya **Konuşmayı aç**. GitHub, GitLab, Gitea, Forgejo ve Gerrit'te satır, Genel Bakış sayfası aynı bu konuşma olan [incelemeyi](review.md) açar (zaman çizelgesi, tuşlar ve aşağıdaki yorum kutusu). |
 | [Issue panosunun](#5b-issue-panosu) bir kartı | `Enter` veya çift tık. |
 | [Radar](radar.md) | Bir issue veya istek satırında `i`, satır menüsündeki **Konuşmayı aç** veya *Radar: Issue Konuşmasını Aç*. |
 | Başka bir konuşmadaki bir referans | Üzerine tıklayın (veya `l`, sonra seçin): bağlı bir kaynağın `#7`, `!12`, `ABC-12` referansları uygulamada açılır ve bir Geri yığınına eklenir. |

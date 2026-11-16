@@ -142,8 +142,9 @@ olarak açık). Worktree kaldırıldığında bu sekme kapanır.
 
 Ana sekme depo yöneticisidir. Dört bölümü vardır: **AÇIK DEPOLAR**,
 **FAVORİLER**, **SON DEPOLAR** ve **TÜM DEPOLAR**. Her satır dalı, önde ve
-geride olan commit sayılarını ve değişiklik sayısını gösterir. Her satırda bir
-yıldız (favori), **Aç** veya **Geç**, **Kapat** veya **Kaldır** ve bir `⋮` menüsü
+geride olan commit sayılarını ve değişiklik sayısını, sonra yer varsa klasörün
+yolunu gösterir: `~` ile kısaltılır, dar olduğunda ortasından kesilir ve adı,
+sahibi veya dalı asla dışarı itmez. Her satırda bir yıldız (favori), **Aç** veya **Geç**, **Kapat** veya **Kaldır** ve bir `⋮` menüsü
 vardır.
 
 En üstte: **Gözat**, **Klonla**, **Init**, bir arama kutusu, **Tümünü daralt**
@@ -151,7 +152,7 @@ ve **Tümünü genişlet**. Artık var olmayan bir klasör *Son* ve *Tüm*
 bölümlerinden kendiliğinden çıkar. Eksik bir favori kalır ve yanında bir
 **Kaldır** düğmesi görünür. **Kaldır** diskte hiçbir şeyi silmez.
 
-Tuşlar: `Enter` aç, `f` favori, `x` kapat veya kaldır, `.` menü, `/` ara,
+Tuşlar: `Enter` aç, `f` favori, `x` kapat veya kaldır, `y` yolu kopyala, `o` varsayılan araçta aç (`⋮` menüsünün **Şurada aç** seçeneği başka birini seçer), `.` menü, `/` ara,
 `Space` bir bölümü katla, `Esc` sekmenize dön.
 `Ctrl+N` arama alanında, her bölümde ve her düğmede bir rozet gösterir: odaklanmak veya basmak için rozetin karakterine basın (bkz. [Rozetler](keybindings.md#rozetler)).
 
@@ -251,7 +252,10 @@ tıklayın. Kenar çubuğu başlığındaki `‹` kenar çubuğunu daraltır (`C
 Her commit için bir satır, en yenisi en üstte. Sütunları göstermek veya
 gizlemek için başlığa sağ tıklayın. Bir sütunu yeniden boyutlandırmak için iki
 başlık arasındaki kenarlığı sürükleyin. Sütunu taşımak için bir başlığı
-sürükleyin.
+sürükleyin. Genişlikler depoya aittir: onunla birlikte kaydedilir ve yeniden
+açtığınızda geri gelir; ilk kez açılan bir depoda her sütun Log'un gösterdiğine
+göre sığdırılır (`Tüm Sütunları İçeriğe Sığdır` bunu yeniden yapar, `Sütun
+genişliklerini sıfırla` otomatik genişliklere döner ve onlar kalır).
 
 Panelin başlığı yoktur: sütun başlıkları ne olduğunu söyler. Ref'i olmayan bir commit'te, üzerine gelinen satır ait olduğu dalın adını taşıyan soluk bir hap gösterir (Ayarlar > Log ve grafik içindeki **Üzerine gelinen Commit için soluk bir dal/Tag göster** ile kapatılır).
 

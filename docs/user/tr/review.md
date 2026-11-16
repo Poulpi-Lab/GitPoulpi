@@ -49,13 +49,38 @@ checkout'u, görünümü de kapatır), **Tarayıcıda aç**, **Yenile** (**`F5`*
 
 ### Genel Bakış
 
-Açıklama (temel Markdown olduğu gibi gösterilir: kalın, italik, `kod`, bağlantılar metinleri olarak, madde işaretli ve
-numaralı listeler, başlıklar, alıntılar ve kod blokları), ardından konuşma: kod üzerinde olmayan yorumlar ve zaten
-gönderilmiş incelemeler, en eskiden başlayarak, her biri kararıyla (`onayladı`, `değişiklik istedi`,
-`yorum yaptı`, `yoksayıldı`). GitLab'da kararlar onaylarıdır. Altında yanıt kutusu bulunur: bir tık veya **`c`**
-tuşu, konuşmaya bir yorum yazmanızı sağlar. **Bu yorum hemen gönderilir** ve kutu bunu söyler.
+Genel Bakış **isteğin konuşmasıdır**: bir issue'nun sahip olduğu aynı zaman çizelgesi ve aynı yorum kutusu
+([Konuşmalar](hosting-integration.md#5c-konuşmalar)): önce açıklama (*bunu açtı*), sonra yorumlar, kod üzerindeki
+dizeler diff alıntılarıyla, gönderilmiş incelemeler kararlarıyla (`onayladı`, `değişiklik istedi`, `yorum yaptı`,
+`yoksayıldı`; GitLab'da kararlar onaylarıdır) ve olaylar, en eskiden başlayarak, en yeni pencerede, en üstünde
+**Eskileri yükle** ile. Yorum kutusu zaman çizelgesinin altına yerleşiktir (**Yeni yorum**): **Yaz**, **Önizleme** ve
+**Yan yana**, **İptal** ve **Gönder**. **Burada yazılan bir yorum hemen barındırıcıya gider** (hiçbir şey beklemede
+değildir: bekleyen yorumlar kod üzerindekilerdir ve incelemeyle birlikte gönderilir), listede hemen görünür ve
+barındırıcı yanıt verince yerini alır; barındırıcı reddederse kutu metninizle ve nedenle yeniden açılır.
 
-Yorum kutusu (bir yanıtın, bir satıra yorumun ve **İncelemeyi bitir** özetinin kutusu da), [konuşma görünümüyle](hosting-integration.md#yazma) paylaşılan Markdown yazma kutusudur: **Yaz**, **Önizleme** (`Alt+P`) ve **Yan yana** (`Alt+L`, 100 sütun genişliğinde bir pencerede); `Ctrl+Enter` (ayrıca `Ctrl+S`, `Alt+Enter`) gönderir ve YZ açıkken `Alt+E` **YZ ile Yaz**'ı açar ([YZ bölümü](ai.md#sunucuda-yazma-yardımı)). Önizleme metni barındırıcının göstereceği gibi, referanslarla birlikte gösterir (`#7`, `!12`, `ABC-12`, commit kimlikleri); gönderilmemiş bir metin istek başına saklanır. Açıklamadaki ve konuşmadaki metin aynı çizim motorunu kullanır; bu yüzden Markdown, tablolar, uyarı blokları ve referanslar burada ve bir issue'nun konuşma görünümünde aynı görünür. Zaten gönderilmiş bir yorumu alıntılamak, düzenlemek veya silmek ve dahili notlar, issue'ların ve incelemesi olmayan barındırıcılardaki isteklerin konuşma görünümüne aittir (bkz. [Konuşmalar](hosting-integration.md#5c-konuşmalar)); burada yalnızca bekleyen yorumlarınız düzenlenebilir.
+Tuşlar konuşma görünümününkilerdir: **`Up`** / **`Down`** (ve `Ctrl+J` / `Ctrl+K`) kayıtlar arasında gezinir,
+**`r`** seçili kaydın dizesine yanıt verir, **`Q`** onu yeni bir yorumda alıntılar, **`c`** yeni bir yorum yazar,
+**`e`** / **`d`** kendi yorumlarınızı düzenler ve siler (silmeden önce bir soru gelir), **`l`** veya `Enter` bir kaydın
+bağlantılarını açar, **`g`** diyagramını, **`y`** adresini kopyalar, **`o`** tarayıcıda açar, **`n`** sonraki yeni
+kayda gider, **`v`** olayları gösterir veya gizler, **`m`** eski kayıtları yükler, `Tab` zaman çizelgesi ile kutu
+arasında geçer ve **Dahili not** (`Alt+I`) böyle notları olan barındırıcılarda bulunur. Seçili kaydın düğmeleri
+(**Yanıtla**, **Alıntıla**, **Düzenle**, **Sil**, **Bağlantı**) aynı işi yapar ve palette *İnceleme: ...* satırlarının
+yanında *Konuşma: ...* satırları vardır. Bir bağlantı açılmadan önce sorulur, incelemenin her yerinde olduğu gibi.
+
+Bir konuşma tuşu ile bir inceleme tuşu çakıştığında, bu sayfada harf konuşmanındır: `l` (etiketler), `m` (kilometre
+taşı), `Q` (Gerrit'in vazgeçmesi), `e` / `d`, `r`. Etiketler, kilometre taşı ve vazgeçme başlığın düğmelerinde ve
+paletle kalır; `a` (atananlar), `p` (inceleyenler), `f` (**İncelemeyi bitir**), `b` (**Checkout**), `P`, `D`, `U` ve
+`Alt+1` / `Alt+2` / `Alt+3` burada anlamlarını korur. Klavye kutudayken her tuş kutununkidir, `Alt+1` / `Alt+2` /
+`Alt+3` dışında; `Esc` klavyeyi zaman çizelgesine geri verir ve ikinci bir `Esc` incelemeyi kapatır.
+
+Başka bir pencerede veya CLI ile yazılan bir yorum burada kendiliğinden görünür: GitPoulpi'nin her yazması (bu pencere
+dahil) oturuma bildirir ve aynı isteği gösteren pencereler onu yeniden okur.
+
+Yorum kutusu, [konuşma görünümüyle](hosting-integration.md#yazma) paylaşılan Markdown yazma kutusudur (bir dizeye
+yanıtın, bir satıra yorumun ve **İncelemeyi bitir** özetinin kutusu da): `Ctrl+Enter` (ayrıca `Ctrl+S`, `Alt+Enter`)
+gönderir ve YZ açıkken `Alt+E` **YZ ile Yaz**'ı açar ([YZ bölümü](ai.md#sunucuda-yazma-yardımı)). Önizleme metni
+barındırıcının göstereceği gibi, referanslarla birlikte gösterir (`#7`, `!12`, `ABC-12`, commit kimlikleri);
+gönderilmemiş bir metin istek başına saklanır.
 
 ### Dosyalar
 
@@ -229,17 +254,17 @@ sınırlara sığması için kısaltılan her dosya taslak kartında listelenir.
   olan hayalet yorumlar olarak: **Kabul et**, **Düzenle** ve **Yoksay**. Diff'in göstermediği bir satır hakkındaki
   öneri tutulur, asla atılmaz: hunk'lardan sonra *Tüm dosya hakkında YZ önerileri* altında listelenir ve kabul
   edildiğinde, önünde *(satır N hakkında)* sözleriyle dosyanın ilk değişen satırına düşer.
-- **Genel Bakış'ta**, açıklamanın altında: özet, ardından aynı düğmeler ve **Tümünü kabul et** / **Tümünü yoksay**
+- **Genel Bakış'ta**, konuşmanın üstündeki bir blokta (yalnızca bir çalıştırmadan sonra): özet, ardından aynı düğmeler ve **Tümünü kabul et** / **Tümünü yoksay**
   ile liste.
 
 **Kabul et** (`y`) bir öneriyi sıradan bir **bekleyen yoruma** çevirir (yine düzenleyebilir veya silebilirsiniz);
 **Düzenle** (`w`) yorum kutusunu önce modelin sözleriyle açar ve bıraktığınızı kabul eder; **Yoksay** (`n`) onu
 bırakır. **Tümünü kabul et** (`A`) yine yalnızca bekleyen listeyi doldurur. Dosyalar sayfasında tuşlar imlecin
-altındaki öneriye, Genel Bakış'ta listenin ilkine etki eder. **YZ özetini kullan** (`i` veya İncelemeyi bitir
+altındaki öneriye, Genel Bakış'ta listenin ilkine etki eder (liste boşaldığında `y` ve `n` yine konuşmanın *Bağlantıyı kopyala* ve *Sonraki yeni kayıt* tuşlarıdır). **YZ özetini kullan** (`i` veya İncelemeyi bitir
 formundaki düğme) modelin özetini inceleme metnine koyar; kendiliğinden asla eklenmez. **İncelemeyi gönderene kadar
 barındırıcıya hiçbir şey gönderilmez.**
 
-Genel Bakış taslağı, önerilerin üstünde bir kart olarak gösterir: karar çipi, inceleme metni ve üç düğme.
+Genel Bakış taslağı, o bloğun en üstünde, önerilerin üstünde bir kart olarak gösterir: karar çipi, inceleme metni ve üç düğme.
 
 - **✦ Taslağı kullan...** (`u`) açık her öneriyi bekleyen bir yorum olarak kabul eder ve *İncelemeyi bitir* formunu
   taslağın metni ve kararıyla önceden doldurulmuş olarak açar. Yine de onu okur, değiştirir ve kendiniz
@@ -259,7 +284,7 @@ modelin yazmasından sonra değiştiyse kart *İstek, bu taslak yazıldığında
 |---|---|---|
 | Genel Bakış / Dosyalar / Commit'ler | `Alt+1` / `Alt+2` / `Alt+3` | *İnceleme: Genel Bakışı Göster*, *Dosyaları Göster*, *Commit'leri Göster* |
 | Satıra veya aralığa yorum yap | `c` | *İnceleme: Satıra Yorum Yap...* |
-| Konuşmaya yorum yap | Genel Bakış'ta `c`, `C` | *İnceleme: Konuşmaya Yorum Yap...* |
+| Konuşmaya yorum yap | Genel Bakış'ta `c`, `C` | *İnceleme: Konuşmaya Yorum Yap...* (Genel Bakış'ın kutusunu açar), *Konuşma: Yeni Yorum* |
 | Yorum dizisini yanıtla | `r` | *İnceleme: Yorum Dizisini Yanıtla...* |
 | Çöz veya yeniden aç | `x` | *İnceleme: Yorum Dizisini Çöz veya Yeniden Aç* |
 | Bir yorum dizisini katla veya aç | `z` | *İnceleme: Yorum Dizisini Daralt veya Genişlet* |

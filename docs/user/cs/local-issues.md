@@ -21,6 +21,10 @@ upravovat zároveň a seznamy to sledují.
 
 Nic se nepropojuje samo: jako každý zdroj issues je to dobrovolné pro každý repozitář zvlášť.
 
+## Komentáře k poznámce
+
+`Enter` na řádku poznámky v sekci ISSUES nebo na její kartě otevře její konverzaci: text poznámky a pak komentáře. Komentáře se uchovávají v samotném souboru poznámky, v závěrečné sekci `## Comments`, každý jako záznam `### <autor> - <čas UTC>` (upravený přidá `(edited <čas>)`). Nic nad tímto nadpisem se nikdy nemění, takže Obsidian i shell čtou a upravují tentýž soubor. Můžete psát, upravovat a mazat komentáře lokálního autora (`local.me` profilu, jinak připojeného uživatele, tedy jména, které používá *Přiřazené mně*); nikoho jiného. Pole je obvyklé Markdown textové pole s náhledem a *Píšete jako <jméno> (lokální poznámka)* pojmenuje autora. Nic nejde po síti. Poznámka s nadpisem `## Comments`, který jste napsali ručně, se čte jako taková.
+
 ## Poznámky
 
 Jedna poznámka na issue, pojmenovaná `<id>-<slug>.md` (`12-crash-on-empty-name.md`), s blokem frontmatter:
@@ -46,6 +50,28 @@ Free Markdown. GitPoulpi never rewrites the body.
 - Čtení je shovívavé: poznámka bez `id` ho převezme z názvu souboru, poznámka bez `status` má `todo`, poznámka
   bez frontmatter převezme název z prvního `# nadpisu`. Soubor, který není issue (`readme.md`), se ignoruje.
 - Stav je volný text. **Otevřené** znamená „není stav hotovo“.
+
+### Komentáře v poznámce
+
+Komentář k poznámce se zapisuje přímo do poznámky, do poslední sekce `## Comments` (bez sítě a v Obsidianu se čte bez potíží):
+
+```markdown
+(text poznámky)
+
+## Comments
+
+### kai - 2026-11-15T10:00:00Z
+První komentář, **libovolný Markdown**.
+
+### ann - 2026-11-15T11:30:00Z (edited 2026-11-15T12:00:00Z)
+Druhý.
+```
+
+- Záznam začíná řádkem, který je přesně `### <autor> - <čas UTC>`, po úpravě s ` (edited <čas UTC>)`; jeho text sahá k dalšímu záznamu. Sekce je poslední nadpis `## Comments` mimo blok kódu a sahá do konce souboru, takže za ni nic nepište.
+- Řádek komentáře, který by se četl jako záznam nebo jako nadpis, se uloží s úvodním zpětným lomítkem (`\### ...`, které Markdown zobrazí jako stejný text) a čte se zpět bez něj.
+- Odeslání přidá na konec a vše nad tím nechá bajt po bajtu (včetně konců řádků); úprava nebo smazání přepíše jen sekci. Odeslání také posune `updated` poznámky (poznámce bez frontmatter se žádné nepřidá).
+- Autorem je lokální autor profilu („já“ z nastavení Lokální issues). Upravovat nebo mazat můžete jen vlastní komentáře; id komentáře je jeho čas a autor a dvě odeslání ve stejné vteřině se rozliší posunutím druhého o vteřinu.
+- U poznámky nejsou žádné odpovědi, žádné interní komentáře a žádná historie událostí.
 
 ## Co lze dělat
 
@@ -102,7 +128,7 @@ Pokud pracujete sami, nebo v týmu, který drží issues vedle kódu, je složka
   `Shift+Left` / `Shift+Right`, nebo příkazem **Tabule: Přesunout kartu do...** (`m`), rozbalovacím seznamem sloupců. Karta se přesune
   hned; `status` poznámky se přepíše jako v [sekci o poznámkách](#poznámky), nic jiného v souboru. Když
   zápis selže, karta se vrátí a chyba je na stavovém řádku.
-- **Otevření** karty klávesou `Enter` nebo dvojklikem (poznámka se otevře ve vašem výchozím programu pro `.md`). `e` upraví její
+- **Otevření** karty klávesou `Enter` nebo dvojklikem: v okně se otevře [konverzace](hosting-integration.md#5c-konverzace) poznámky s jejím textem a komentáři (**Otevřít poznámku** v nabídce karty otevře soubor ve vašem výchozím programu pro `.md`). `e` upraví její
   řešitele, štítky nebo milník, `.` nebo pravé tlačítko otevře nabídku karty, `n` založí nové issue ve vybraném
   sloupci (formulář se po zavření vrátí na tabuli).
 - **Filtrování** podle řešitele (`a`), štítku (`l`), milníku (`M`) nebo textu (`/`); `x` je zruší. Filtry jsou

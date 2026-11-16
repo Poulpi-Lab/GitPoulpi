@@ -158,6 +158,18 @@ Co to znamená v praxi:
   destruktivní; `conflicts_unresolve` je běžný zápis. Odmítnuté volání (`stale`,
   `not_conflicted`, `pick_incomplete`...) odpoví `{"refused": {...}}` s kódem
   ukončení 2 místo selhání.
+- **Konverzace issues a pull requestů**: `hosting_issue_comments` a
+  `hosting_review_conversation` čtou celou časovou osu (čtení, otevřený svět:
+  volají hostitele); `hosting_markdown` vyčistí text a najde jeho odkazy a nic
+  nevolá (uzavřený svět). Odesílání (`hosting_issue_comment`,
+  `hosting_review_comment`, `hosting_review_reply`) a úpravy
+  (`hosting_*_comment_edit`) jsou běžné mutace označené jako otevřený svět: jdou
+  hned k hostiteli, jako identita, kterou token má (`posted_as` v odpovědi; token
+  bota odesílá jako bot), takže o tom, zda to agent smí, rozhodují
+  `allow_mutations` a `mutation_allowlist`. Smazání komentáře
+  (`hosting_*_comment_delete`) je destruktivní. Po odeslání, úpravě nebo smazání se
+  démon dozví a otevřené okno repozitáře tu položku obnoví. `ui_show_pr` /
+  `ui_show_issue` berou `--view conversation` a otevřou konverzaci místo řádku.
 - **Zaseknuté stavy**: `conflicts_am_continue` je zápis, `conflicts_am_skip`,
   `conflicts_am_abort` a `index_lock_remove` jsou destruktivní, `index_lock_show`
   je čtení.
@@ -226,6 +238,7 @@ který potvrdíte.
 |---|---|---|
 | `ai_commit_message` | `gitpoulpi ai commit-message` | read, network |
 | `ai_explain` | `gitpoulpi ai explain` | read, network |
+| `ai_hosting_reply` | `gitpoulpi ai hosting-reply` | read, network |
 | `ai_prompt` | `gitpoulpi ai prompt` | read |
 | `ai_resolve_conflict` | `gitpoulpi ai resolve-conflict` | read, network |
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
@@ -287,6 +300,7 @@ který potvrdíte.
 | `flow_status` | `gitpoulpi flow status` | read |
 | `flow_sync` | `gitpoulpi flow sync` | destructive |
 | `flow_templates` | `gitpoulpi flow templates` | read |
+| `hosting_assignment` | `gitpoulpi hosting assignment` | write |
 | `hosting_board_move` | `gitpoulpi hosting board move` | write, network |
 | `hosting_board_show` | `gitpoulpi hosting board show` | read, network |
 | `hosting_checkout_pr` | `gitpoulpi hosting checkout-pr` | write, network |
@@ -300,6 +314,10 @@ který potvrdíte.
 | `hosting_integrations_test` | `gitpoulpi hosting integrations test` | read, network |
 | `hosting_issue_base` | `gitpoulpi hosting issue base` | write |
 | `hosting_issue_close` | `gitpoulpi hosting issue close` | write |
+| `hosting_issue_comment` | `gitpoulpi hosting issue comment` | write, network |
+| `hosting_issue_comment_delete` | `gitpoulpi hosting issue comment-delete` | destructive, network |
+| `hosting_issue_comment_edit` | `gitpoulpi hosting issue comment-edit` | write, network |
+| `hosting_issue_comments` | `gitpoulpi hosting issue comments` | read, network |
 | `hosting_issue_create` | `gitpoulpi hosting issue create` | write, network |
 | `hosting_issue_edit` | `gitpoulpi hosting issue edit` | write, network |
 | `hosting_issue_move` | `gitpoulpi hosting issue move` | write |
@@ -310,6 +328,7 @@ který potvrdíte.
 | `hosting_link` | `gitpoulpi hosting link` | write |
 | `hosting_list` | `gitpoulpi hosting list` | read |
 | `hosting_logout` | `gitpoulpi hosting logout` | destructive |
+| `hosting_markdown` | `gitpoulpi hosting markdown` | read |
 | `hosting_members` | `gitpoulpi hosting members` | read, network |
 | `hosting_milestones` | `gitpoulpi hosting milestones` | read, network |
 | `hosting_open` | `gitpoulpi hosting open` | read |
@@ -322,6 +341,9 @@ který potvrdíte.
 | `hosting_refs` | `gitpoulpi hosting refs` | read |
 | `hosting_review_abandon` | `gitpoulpi hosting review abandon` | write, network |
 | `hosting_review_comment` | `gitpoulpi hosting review comment` | write, network |
+| `hosting_review_comment_delete` | `gitpoulpi hosting review comment-delete` | destructive, network |
+| `hosting_review_comment_edit` | `gitpoulpi hosting review comment-edit` | write, network |
+| `hosting_review_conversation` | `gitpoulpi hosting review conversation` | read, network |
 | `hosting_review_diff` | `gitpoulpi hosting review diff` | read, network |
 | `hosting_review_fetch` | `gitpoulpi hosting review fetch` | write, network |
 | `hosting_review_push` | `gitpoulpi hosting review push` | write, network |

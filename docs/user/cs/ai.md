@@ -284,6 +284,7 @@ najedete nebo ji zvýrazníte.
 | **Skript pro přepis historie** | V [nástroji pro přepis historie](history-rewrite.md#napsat-skript-pomocí-ai): tlačítko `✦ Napsat pomocí AI...` v editoru skriptu nebo příkaz z palety `Přepis: Napsat skript pomocí AI...`. Dialog ukáže přesně, co se odešle; skript se objeví v editoru, označený, a nikdy se za vás nespustí ani neprovede. | `ai rewrite-script "<instrukce>" [--sample N]` (vypíše) |
 | **Pravidla pro přepis historie** | V [nástroji pro přepis historie](history-rewrite.md#vytvořit-pravidla-pomocí-ai): tlačítko `✦ Vytvořit pravidla pomocí AI...`, `Alt+I` nebo příkaz z palety `Přepis: Vytvořit pravidla pomocí AI...`. Víceřádkový dialog ukáže přesně, co se odešle; pravidla a nastavení se objeví v nástroji a nic se za vás nezobrazí v náhledu ani neprovede. | `ai rewrite-rules "<popis>" [--context]` (vypíše) |
 | **Název worktree** | V [dialogu Vytvořit worktree](worktrees.md#pojmenování-pomocí-ai): tlačítko `✦ Pojmenovat pomocí AI` nebo `Alt+A` otevře pole, kam popíšete funkci, chybu nebo úkol; model pojmenuje worktree a jeho větev podle názvů větví v samotném repozitáři a oba názvy se objeví v polích dialogu, kde je můžete upravit. Odesílá se jen váš popis a názvy lokálních větví, proto nemá dialog „co se odešle“. | `ai worktree-name --describe "<úkol>"` (vypíše) |
+| **Odpověď na hostiteli** a **Popis issue** | Tlačítko **Napsat pomocí AI** (`Alt+E`) každého Markdown editoru, který odesílá hostiteli: komentář, odpověď nebo úprava v konverzaci, komentář nebo shrnutí kontroly, popis nové issue. Návrh přistane v poli; nic se neodešle. Viz [Pomoc s psaním na hostiteli](#pomoc-s-psaním-na-hostiteli). | `ai hosting-reply` (vypíše návrh) |
 | **Composer commitů** | Nabídka řádku WIP *Sestavit commity (AI)...*, `Ctrl+G C`, příkaz z palety `AI: Sestavit commity z rozpracovaných změn...` | |
 | **Rozdělení commitu** | Nabídka commitu *Rozdělit commit (AI)...* nebo příkaz z palety `AI: Rozdělit vybraný commit...`. Otevře se editor rozdělení s vyplněným seskupením od modelu; viz níže. | `ai split-plan <rev>` (vypíše) |
 
@@ -359,6 +360,52 @@ a položka, kterou nelze použít, se vypíše s důvodem, zatímco platné zůs
 takto nikdy nevytvoří. Volitelně se přidá rozsah, názvy větví a tagů a autoři nejnovějších
 commitů (zaškrtávací políčko, ve výchozím stavu vypnuté, viditelné v podokně „co se odešle“). Profil
 a instrukce jsou ty pro *Pravidla pro přepis historie* v Nastavení > AI.
+
+### Pomoc s psaním na hostiteli
+
+*Odpověď na hostiteli* navrhuje komentář, odpověď ve vlákně, komentář k řádku kódu nebo shrnutí kontroly; *Popis issue* navrhuje popis nové issue. **AI jen navrhuje.** Text se vloží do textového pole (nebo ho vypíše CLI), abyste si ho přečetli, upravili a odeslali sami. Od této funkce nevede žádná cesta k zápisu na hostitele: nemůže nic odeslat, upravit, vyřešit ani smazat, odpověď CLI a MCP říká `"posted": false` a lokální agent běží jen pro čtení (viz níže). Text opouští GitPoulpi jen přes vlastní tlačítko **Odeslat** (`Ctrl+Enter`) nebo **Komentář** daného pole.
+
+**V Markdown editoru.** Dokud je AI zapnutá, každé textové pole, jehož text jde hostiteli (komentář, odpověď nebo úprava v [pohledu konverzace](hosting-integration.md#5c-konverzace), komentář při kontrole, shrnutí Dokončit kontrolu, popis nové issue a popis pull requestu), má na pravém konci lišty režimů tlačítko **Napsat pomocí AI** (`Alt+E`, ve všech stejná klávesa). Pod lištou otevře panel:
+
+- pole *Co chci v této odpovědi*, vyplněné v okamžiku použití (`Enter` navrhne). Jeho zástupný text dává příklad toho druhu („souhlasit a požádat o selhávající test“). Seznam **Nedávné** uchovává dřívější pokyny (klikněte na jeden, nebo `Up` / `Down` v poli; ukládají se do `ai-hints.toml`);
+- *Vylepšit můj návrh*, zaškrtnuté, když pole už text obsahuje: AI vyjde z něj místo psaní nového;
+- *Nechat AI číst repozitář*, **pokaždé nezaškrtnuté**, pokud jste nezapnuli jeho výchozí hodnotu (viz níže);
+- **Navrhnout**, **Zastavit** (také `Esc`) a **Zavřít** a jeden řádek pro průběh nebo chybu.
+
+Obvyklý dialog „Co se odešle“ (`[ai.sent_preview] hosting_reply`, `issue_body`, `pull_request_description`) ukáže požadavek dřív, než odejde. Vedle textu systému a uživatele ukáže seznam **Kontext repozitáře**, když se repozitář čte: každou část s velikostí, součet proti limitu (*31,2 KB z 48 KB*), co se zkrátilo, aby se to vešlo, co se vynechalo jako citlivé a které části se znovu použily. U lokálního agenta řekne, že agent čte repozitář sám nástroji jen pro čtení, jmenuje je, uvede pracovní složku a zda je relace agenta nová, nebo pokračuje, a každý dialog končí větou *AI píše jen návrh. Nic se neodešle, dokud to neodešlete sami.* Návrh nahradí text jedním krokem zpět a textové pole se přepne na Náhled, abyste si ho před odesláním přečetli; `Ctrl+Z` vrátí váš text. Popis pull requestu se píše z commitů a diffu větve a bere týž pokyn; pole pro repozitář je tam zašedlé („ne pro tento text“).
+
+Co model dostane: název, stav a popis položky, vlákno, na které odpovídáte, nedávné komentáře (nejnovější první, v mezích `ai.limits.hosting_reply_context_bytes`, výchozí 49152), značkování, které hostitel přijímá (takže odpověď pro Jiru se vrátí jako Markdown, který GitPoulpi převede), co chcete v této odpovědi a, pro vylepšení vlastního textu, váš návrh. Vše, co napsali jiní lidé, je v požadavku označeno jako nedůvěryhodná data, takže pokyn ukrytý v komentáři se neprovede. Nad limitem se nic potichu neořízne: zeptáme se a nejdřív se vynechají nejstarší komentáře (vlákno, na které odpovídáte, se zachová do poloviny rozpočtu); CLI hlásí ořez v `truncated` a `--send-all` ho zruší.
+
+**Váš vlastní základní prompt.** Pokyny, od kterých obě akce začínají, jsou upravitelné: *Nastavení > AI > Odpovědi na hostiteli > Základní prompt* (`ai.hosting_reply.base_prompt`). Prázdné použije vestavěný prompt, který žádá jen text, ve značkování hostitele a v jazyce konverzace, pokud váš pokyn neříká jinak. Vaše globální, pracovní a repozitářové pokyny po něm stále následují a text jiných lidí zůstává označen jako nedůvěryhodný, ať tam napíšete cokoli. `ai prompt --action hosting_reply` vypíše jednotlivé vrstvy.
+
+#### Přístup k repozitáři
+
+**Ve výchozím stavu vypnuto a zaškrtává se pro každé použití.** Čtení repozitáře dává mnohem lepší odpovědi na „vzniká ten pád v našem kódu?“, ale odesílá víc, takže je to volba, kterou děláte pokaždé: *Nechat AI číst repozitář* začíná nezaškrtnuté v každém poli. `ai.hosting_reply.read_repository` (*Nechat AI číst repozitář ve výchozím stavu*, vypnuto) jen způsobí, že pole začíná zaškrtnuté; `--read-repo` je zaškrtnutí v CLI. Volba je zašedlá, s důvodem po aktivaci, ve třech případech: repozitář **není naklonován** (konverzace jiného repozitáře z Radaru: není co číst), zvolený lokální agent nemá **režim jen pro čtení**, kterému GitPoulpi důvěřuje, nebo text **se nepíše z repozitáře** (popis pull requestu). Zapnout ji může jen vaše vlastní zaškrtnutí.
+
+Co se pak stane, závisí na profilu:
+
+| Profil | Co čte repozitář | Co se odešle |
+|---|---|---|
+| **API** (kompatibilní s OpenAI, Anthropic) | GitPoulpi, přes démona, jen pro čtení | Kontext, který sestaví a dá modelu: mapa repozitáře (strom nejvyšší úrovně a cesty kolem nalezených souborů), soubory, které konverzace jmenuje (celý soubor, nebo okno 40 řádků kolem řádku či symbolu), nálezy hledání identifikátorů a chybových hlášek z konverzace a u pull requestu jeho diff. V mezích `ai.limits.hosting_reply_*` (kontext 49152, soubor 8192, mapa 6144, 20 nálezů na výraz, 8 výrazů), ořezává se v pořadí diff, soubory, nálezy, mapa a hlásí se. Soubory, které vypadají citlivě, se vynechají a tajné hodnoty v ostatních se nejdřív zamaskují (viz [Soukromí](#soukromí)). |
+| **Lokální agent** (Claude Code, Codex), bezobslužně | Agent sám, ve složce repozitáře | Nic se nesestavuje: agent se spustí v repozitáři s **nástroji jen pro čtení** a čte, co potřebuje. Claude Code dostane `Read`, `Grep` a `Glob` a má odepřeno `Bash`, `Edit`, `Write`, `NotebookEdit`, `WebFetch` a `WebSearch`, bez načteného serveru MCP (vlastní server projektu by mohl odesílat); Codex běží ve svém sandboxu jen pro čtení. Přihlašovací údaje k hostitelům z vašeho prostředí (`GH_TOKEN`, `GITHUB_TOKEN`, `GITLAB_TOKEN`, proměnné Jira, Linear, Azure DevOps a Bitbucket, `GIT_ASKPASS`, `SSH_AUTH_SOCK`) se z jeho prostředí odeberou, takže ani špatně nastavený agent nemůže publikovat ani pushovat. |
+
+Agenta, u něhož GitPoulpi nemá potvrzený režim jen pro čtení (a každého agenta v interaktivním režimu terminálu), nelze pustit dovnitř: volba zůstane zašedlá s textem *Tento agent nemá režim jen pro čtení, kterému GitPoulpi důvěřuje.*
+
+**Cache a Obnovit kontext.** To, co se shromáždilo, se znovu používá, aby další odpověď byla rychlá a levná:
+
+- Sestavený kontext profilu API se uchovává pro každý repozitář po dobu `ai.hosting_reply.context_ttl_minutes` (*Uchovat kontext repozitáře po dobu*, výchozí 30). Klíčem je repozitář, jeho `HEAD`, výběr a limity a jeho části se uchovávají po jedné, takže další issue téhož repozitáře znovu sestaví jen části, které nesdílí. V okně žijí cache v paměti (posledních 8 kontextů); CLI je drží v souborech ve své soukromé složce stavu, takže druhé `ai hosting-reply --read-repo` znovu použije, co první sestavilo.
+- Nový commit na přepnuté větvi (`HEAD` se posune), změna limitů nebo uplynutí času začnou znovu. Totéž udělá **Obnovit kontext**, tlačítko v panelu, když se repozitář čte, nebo `--refresh-context` v CLI. Řádek pod polem říká, co udělal poslední návrh: *Kontext sestaven: částí 5, 31,2 KB, HEAD a1b2c3d*, *Kontext znovu použit (4 z 5 částí, HEAD a1b2c3d)*, *Cache služby: znovu použito tokenů: 12k*, *Agent přečetl repozitář (HEAD a1b2c3d)*, *Relace agenta zahájena* nebo *Relace agenta pokračuje*.
+- **Prompt cache Anthropicu.** U profilu Anthropic se požadavek posílá se základním promptem a pokyny jako jedním cachovaným blokem a kontextem repozitáře jako druhým, za nimi vaše konverzace, pokyn a návrh, takže druhá odpověď nad stejným kontextem se čte z cache poskytovatele a stojí zlomek. Čítače cache z odpovědi ukazuje *Cache služby: znovu použito tokenů: N*. Servery kompatibilní s OpenAI dostanou stejně stabilní pořadí požadavku, z něhož těží jejich automatická prefixová cache; GitPoulpi neposílá nic navíc.
+- **Agent si drží relaci.** S **Zachovat relaci agenta mezi odpověďmi** (`ai.hosting_reply.reuse_agent_session`, ve výchozím stavu zapnuto) a zaškrtnutým *Nechat AI číst repozitář* se lokální agent, který to podporuje (dnes Claude Code), spustí s id relace a pak se podle něj obnoví, takže to, co z repozitáře přečetl, zůstane v jeho vlastní historii a další odpověď začne rychleji. Ostatní agenti běží jednorázově. Relace je pro každý repozitář, `HEAD` a akci zvlášť; nový commit nebo **Obnovit kontext** začne novou; s vypnutou volbou nebo nezaškrtnutým polem je každá odpověď jednorázový běh, který nic neuchovává. Relace žije v úložišti samotného agenta, GitPoulpi drží jen její id (v paměti v okně, v souboru jen pro uživatele u CLI).
+
+```
+gitpoulpi ai hosting-reply --conversation conversation.json --hint "say I will look tomorrow"
+gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
+gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "is this our bug?"
+gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"
+```
+
+`--conversation` bere soubor, `-` pro standardní vstup nebo přímo JSON: JSON, který vypíše `hosting issue comments --json` nebo `hosting review conversation --json` (přijme se i starší stránka s `header` a `entries`), takže funguje `gitpoulpi hosting issue comments 7 --json | gitpoulpi ai hosting-reply --conversation -`; `--item <ref>` načte konverzaci sám (`7` nebo `#7` issue, `!7` pull request). S `--read-repo` vloží `--pr-base REV --pr-head REV` do kontextu diff pull requestu; `context` v odpovědi říká, které části se četly, zda se znovu použily, tokeny cache poskytovatele a relaci agenta. Nástroj MCP `ai_hosting_reply` je týž příkaz a je jen pro čtení.
 
 ## Kam jde klíč
 
@@ -452,6 +499,11 @@ kapacitu, nebo je snižte, aby byly požadavky malé.
 | `review_threads_bytes` | 6000 | Již existující komentáře revize |
 | `review_context_file_bytes` | 8192 | Jeden kontextový soubor projektu v revizi (`CLAUDE.md`, `AGENTS.md`, další soubor) |
 | `review_context_bytes` | 16384 | Všechny kontextové soubory revize dohromady |
+| `hosting_reply_context_bytes` | 49152 | Položka a konverzace dané navržené odpovědi |
+| `hosting_reply_file_bytes` | 8192 | Jeden soubor repozitáře daný navržené odpovědi (když AI čte repozitář) |
+| `hosting_reply_map_bytes` | 6144 | Mapa repozitáře daná navržené odpovědi |
+| `hosting_reply_hits_per_term` | 20 | Nálezy ponechané na výraz (1 až 200) |
+| `hosting_reply_terms` | 8 | Vyhledávané výrazy (1 až 50) |
 
 **Nic se neořezává potichu.** Když je vstup nad svým limitem, požadavek počká a
 *Nad limitem AI* vypíše, co je nad limitem: která část (diff, soubor, popis,

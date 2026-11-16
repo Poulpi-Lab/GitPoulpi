@@ -295,7 +295,7 @@ fn a_menu_row_is_chosen_with_the_arrows_and_enter() {
 }
 
 /// The `⋯` overflow menu with another menu open: on today's code it
-/// closes every context menu (checked per kind, at 90 columns where the
+/// closes every context menu (checked per kind, at 95 columns where the
 /// toolbar overflows yet every pane still shows); a single `OpenMenu`
 /// holds this by construction.
 #[test]
@@ -303,7 +303,7 @@ fn the_overflow_menu_versus_each_open_context_menu() {
     let repo = fixture();
     let mut still_open = Vec::new();
     for kind in Kind::ALL {
-        let (mut term, _c) = launch(&repo, &format!("pty-menus-overflow-{kind:?}"), 90);
+        let (mut term, _c) = launch(&repo, &format!("pty-menus-overflow-{kind:?}"), 95);
         open_by_mouse(&mut term, kind);
         let (c, r) = term.wait_for_text(OVERFLOW, STEP).unwrap();
         term.click(c, r).unwrap();

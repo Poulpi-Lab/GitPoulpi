@@ -346,7 +346,7 @@ fn the_pull_dropdown_closes_on_a_press_in_the_log() {
         8,
         Duration::from_secs(4),
         |t| {
-            if let Some((c, r)) = t.screen().find("Pull \u{25BE}") {
+            if let Some((c, r)) = t.screen().find("Pull  \u{25BE}") {
                 t.click(c + 5, r).unwrap();
             }
         },

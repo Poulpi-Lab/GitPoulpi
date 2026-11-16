@@ -4305,6 +4305,8 @@ new_tab = "Ny flik"
 explain_changes = "Förklara ändringar i arbetskatalogen"
 ai_generate = { git = "Generera ett {$commit}-meddelande med AI", local = "Generera ett incheckningsmeddelande med AI" }
 ai_compose = "Komponera {$commits} med AI"
+# context: tooltip of the Skip hooks checkbox
+skip_hooks = "Skip hooks: commit without running git hooks"
 commit_reference = { git = "Öppna i din webbläsare (palett: Öppna commit-referens)", local = "Öppna i din webbläsare (palett: Öppna incheckningsreferens)" }
 quit = "Avsluta GitPoulpi"
 quit_cd = "Avsluta och lämna ditt skal i den här flikens mapp (kräver skalomslaget)"
@@ -5485,6 +5487,8 @@ description = "Beskrivning"
 ref_from_branch = "(från grenen)"
 issue_ref_inserted = "{reference} infogad"
 skip_hooks = "Hoppa över hooks"
+# context: shorter label of the Skip hooks checkbox on a narrow commit options row
+skip_hooks_short = "No hooks"
 
 [compose_ui]
 select_commit = { git = "Välj en commit...", local = "Välj en incheckning..." }

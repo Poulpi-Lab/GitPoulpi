@@ -297,26 +297,66 @@ pub(crate) fn render_commit_composer(
         amend_style
     };
     let amend_w = display_width(&amend_label) as u16;
+    // Skip hooks sits after the Amend label. On a narrow row it degrades
+    // instead of vanishing: full label, short label, then the box alone (its
+    // tooltip, the palette and `Shift+H` reach it at every width). The AI
+    // Compose button shrinks with it (long, short, icon); the pairs are tried
+    // from the most to the least text.
+    let mark = if hover.skip_hooks { "[x]" } else { "[ ]" };
+    let skip_full = format!("{mark} {}", msg::SKIP_HOOKS.get());
+    let skip_short = format!("{mark} {}", msg::SKIP_HOOKS_SHORT.get());
+    let skip_box = mark.to_string();
+    let compose_w = |label: ComposeLabel| -> u16 {
+        if hover.ai.enabled {
+            display_width(&compose_label(label)) as u16
+        } else {
+            0
+        }
+    };
+    let amend_row_w = amend_row.width;
+    let fits = |skip: &str, c: ComposeLabel| {
+        amend_row_w > amend_w + 2 + display_width(skip) as u16 + compose_w(c)
+    };
+    let (skip_label, skip_rect) = [
+        (&skip_full, ComposeLabel::Long),
+        (&skip_short, ComposeLabel::Long),
+        (&skip_box, ComposeLabel::Long),
+        (&skip_box, ComposeLabel::Short),
+        (&skip_box, ComposeLabel::Icon),
+    ]
+    .into_iter()
+    .find(|(skip, c)| fits(skip, *c))
+    .map(|(skip, _)| {
+        let w = display_width(skip) as u16;
+        (
+            skip.clone(),
+            Some(Rect::new(amend_row.x + amend_w + 2, amend_row.y, w, 1)),
+        )
+    })
+    .unwrap_or_else(|| {
+        // Even the box does not fit after the full Amend label: the Amend
+        // text gives way (clipped) and the box keeps the room left of the
+        // icon.
+        let box_w = 3u16;
+        let x = amend_row
+            .right()
+            .saturating_sub(compose_w(ComposeLabel::Icon) + box_w + 1);
+        let rect = (x > amend_row.x).then(|| Rect::new(x, amend_row.y, box_w, 1));
+        (skip_box.clone(), rect)
+    });
+    // The Amend label never runs under the Skip hooks box.
+    let amend_draw_w = skip_rect.map_or(amend_w, |r| {
+        amend_w.min(r.x.saturating_sub(amend_row.x + 1))
+    });
     frame.render_clipped(
         Paragraph::new(Line::from(Span::styled(amend_label, amend_style))),
-        amend_row,
+        Rect::new(
+            amend_row.x,
+            amend_row.y,
+            amend_draw_w.min(amend_row.width),
+            1,
+        ),
     );
-    // Skip hooks sits after the Amend label when the row has room for both
-    // (the palette and `Shift+H` reach it either way).
-    let skip_label = format!(
-        "{} {}",
-        if hover.skip_hooks { "[x]" } else { "[ ]" },
-        msg::SKIP_HOOKS.get()
-    );
-    let skip_w = display_width(&skip_label) as u16;
-    // The AI Compose button keeps its (long) label before this one is drawn.
-    let compose_w = if hover.ai.enabled {
-        display_width(&format!(" {SPARK} {} ", msg::COMPOSE_LONG.get())) as u16
-    } else {
-        0
-    };
-    let skip_rect = (amend_row.width > amend_w + 2 + skip_w + compose_w)
-        .then(|| Rect::new(amend_row.x + amend_w + 2, amend_row.y, skip_w, 1));
     if let Some(rect) = skip_rect {
         let style = if hover.skip_hooks {
             Style::default().fg(th().status.warning)
@@ -342,7 +382,12 @@ pub(crate) fn render_commit_composer(
         hits.push((rect, HitTarget::SkipHooksCheckbox));
     }
     hits.push((
-        Rect::new(amend_row.x, amend_row.y, amend_w.min(amend_row.width), 1),
+        Rect::new(
+            amend_row.x,
+            amend_row.y,
+            amend_draw_w.min(amend_row.width),
+            1,
+        ),
         HitTarget::AmendCheckbox,
     ));
 
@@ -440,6 +485,21 @@ const GENERATE_MIN_ROW: u16 = 24;
 /// Columns of the `#` button: space, `#`, the dropdown arrow.
 const ISSUE_REF_W: usize = 3;
 
+#[derive(Clone, Copy)]
+enum ComposeLabel {
+    Long,
+    Short,
+    Icon,
+}
+
+fn compose_label(kind: ComposeLabel) -> String {
+    match kind {
+        ComposeLabel::Long => format!(" {SPARK} {} ", msg::COMPOSE_LONG.get()),
+        ComposeLabel::Short => format!(" {SPARK} {} ", msg::COMPOSE_SHORT.get()),
+        ComposeLabel::Icon => format!(" {SPARK} "),
+    }
+}
+
 /// "Compose commits with AI" at the right end of the commit-options row.
 /// Not drawn when AI is off. On a narrow pane it shrinks instead of
 /// vanishing: the long label, then the short one, then the sparkle alone (it
@@ -455,16 +515,14 @@ fn render_compose_button(
     if !ai.enabled {
         return;
     }
-    let long = format!(" {SPARK} {} ", msg::COMPOSE_LONG.get());
-    let short = format!(" {SPARK} {} ", msg::COMPOSE_SHORT.get());
-    let icon = format!(" {SPARK} ");
     // The checkboxes to its left ("[x] " and their text) keep the room they need
     // while a text label fits; the icon takes the row's right end regardless.
     let amend_w = reserved_w.max(display_width(&format!("[x] {}", msg::AMEND.get())));
-    let label = [long, short]
+    let label = [ComposeLabel::Long, ComposeLabel::Short]
         .into_iter()
+        .map(compose_label)
         .find(|l| row.width as usize > amend_w + display_width(l))
-        .unwrap_or(icon);
+        .unwrap_or_else(|| compose_label(ComposeLabel::Icon));
     if (row.width as usize) < display_width(&label) {
         return;
     }
@@ -836,7 +894,7 @@ mod tests {
     #[test]
     fn compose_shrinks_to_the_icon_and_never_vanishes() {
         let mut seen = Vec::new();
-        for width in [90u16, 56, 50, 46, 40, 30, 20, 12, 6, 3] {
+        for width in [90u16, 60, 52, 46, 40, 30, 20, 12, 6, 3] {
             let (buf, hits) = paint_ai(width, 1, true);
             let rect = hits
                 .iter()
@@ -858,11 +916,86 @@ mod tests {
         }
         let kind_at = |w: u16| seen.iter().find(|(x, _)| *x == w).unwrap().1;
         assert_eq!(kind_at(90), "long");
-        assert_eq!(kind_at(56), "long");
-        assert_eq!(kind_at(46), "short");
+        assert_eq!(kind_at(60), "long");
+        assert_eq!(kind_at(52), "short");
+        assert_eq!(kind_at(46), "icon");
         assert_eq!(kind_at(40), "icon");
         assert_eq!(kind_at(20), "icon");
         assert_eq!(kind_at(3), "icon");
+    }
+
+    /// Skip hooks degrades with the row (full label, short label, the box
+    /// alone) and keeps its hit target; with AI on, Compose degrades with it.
+    #[test]
+    fn skip_hooks_degrades_and_never_vanishes() {
+        for ai in [false, true] {
+            let mut kinds = Vec::new();
+            for width in [90u16, 68, 66, 60, 50, 44, 40, 34, 30, 26, 22, 18, 14, 12] {
+                use ratatui::backend::TestBackend;
+                use ratatui::Terminal;
+                let mut terminal = Terminal::new(TestBackend::new(width, 12)).unwrap();
+                let mut hits: Vec<(Rect, HitTarget)> = Vec::new();
+                terminal
+                    .draw(|frame| {
+                        render_commit_composer(
+                            frame,
+                            Rect::new(0, 0, width, 12),
+                            &mut hits,
+                            "",
+                            "",
+                            false,
+                            None,
+                            1,
+                            false,
+                            ComposerHover {
+                                ai: ComposerAi {
+                                    enabled: ai,
+                                    ..ComposerAi::default()
+                                },
+                                ..ComposerHover::default()
+                            },
+                            &text_edit::FieldEditor::default(),
+                        );
+                    })
+                    .unwrap();
+                let buf = terminal.backend().buffer().clone();
+                let rect = hits
+                    .iter()
+                    .find(|(_, t)| *t == HitTarget::SkipHooksCheckbox)
+                    .unwrap_or_else(|| panic!("no Skip hooks hit at width {width}, ai {ai}"))
+                    .0;
+                assert_eq!(rect.y, 1);
+                let text = row_text(&buf, 1, width);
+                assert!(text.contains("[ ]"), "width {width}: {text:?}");
+                assert!(
+                    text.matches("[ ]").count() >= 2,
+                    "the Skip hooks box is drawn at width {width}: {text:?}"
+                );
+                let kind = if text.contains("Skip hooks") {
+                    "full"
+                } else if text.contains("No hooks") {
+                    "short"
+                } else {
+                    "box"
+                };
+                kinds.push((width, kind));
+                // No hit overlaps another on the row.
+                let on_row: Vec<_> = hits.iter().filter(|(r, _)| r.y == 1).collect();
+                for (i, (a, ta)) in on_row.iter().enumerate() {
+                    for (b, tb) in on_row.iter().skip(i + 1) {
+                        let overlap = a.x < b.right() && b.x < a.right();
+                        assert!(!overlap, "{ta:?} overlaps {tb:?} at width {width}");
+                    }
+                }
+            }
+            let at = |w: u16| kinds.iter().find(|(x, _)| *x == w).unwrap().1;
+            assert_eq!(at(90), "full");
+            assert!(
+                kinds.iter().any(|(_, k)| *k == "short"),
+                "ai {ai}: {kinds:?}"
+            );
+            assert_eq!(at(12), "box", "ai {ai}");
+        }
     }
 
     /// AI off: no sparkle drawn and no hit target left behind.
@@ -1392,10 +1525,13 @@ mod tests {
             "hover lights the label"
         );
 
-        // Too narrow for both: Amend keeps the row, no Skip hooks hit.
+        // Too narrow for the label: the shorter one, never a missing control.
+        let (buf, hits) = paint_with(40, false, false);
+        assert!(row_text(&buf, 1, 40).contains("[ ] No hooks"));
+        assert!(hits.iter().any(|(_, t)| *t == HitTarget::SkipHooksCheckbox));
         let (buf, hits) = paint_with(30, false, false);
         assert!(!row_text(&buf, 1, 30).contains("Skip hooks"));
-        assert!(!hits.iter().any(|(_, t)| *t == HitTarget::SkipHooksCheckbox));
+        assert!(hits.iter().any(|(_, t)| *t == HitTarget::SkipHooksCheckbox));
         assert!(hits.iter().any(|(_, t)| *t == HitTarget::AmendCheckbox));
     }
 }

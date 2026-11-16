@@ -4302,6 +4302,8 @@ new_tab = "Nová karta"
 explain_changes = "Vysvětlit rozpracované změny"
 ai_generate = "Vygenerovat zprávu commitu pomocí AI"
 ai_compose = "Sestavit commity pomocí AI"
+# context: tooltip of the Skip hooks checkbox
+skip_hooks = "Skip hooks: commit without running git hooks"
 commit_reference = "Otevřít v prohlížeči (paleta: Otevřít odkaz z commitu)"
 quit = "Ukončit GitPoulpi"
 quit_cd = "Ukončit a nechat shell ve složce této karty (vyžaduje obal shellu)"
@@ -5478,6 +5480,8 @@ description = "Popis"
 ref_from_branch = "(z větve)"
 issue_ref_inserted = "vloženo {reference}"
 skip_hooks = "Přeskočit hooky"
+# context: shorter label of the Skip hooks checkbox on a narrow commit options row
+skip_hooks_short = "No hooks"
 
 [compose_ui]
 select_commit = "Vyberte commit..."

@@ -4304,6 +4304,8 @@ new_tab = "Neuer Tab"
 explain_changes = "Änderungen im Arbeitsverzeichnis erklären"
 ai_generate = "{$Commit}-Nachricht mit KI erzeugen"
 ai_compose = "{$Commits} mit KI zusammenstellen"
+# context: tooltip of the Skip hooks checkbox
+skip_hooks = "Skip hooks: commit without running git hooks"
 commit_reference = "In Ihrem Browser öffnen (Palette: Commit-Referenz öffnen)"
 quit = "GitPoulpi beenden"
 quit_cd = "Beenden und Ihre Shell im Ordner dieses Tabs lassen (braucht den Shell-Wrapper)"
@@ -5485,6 +5487,8 @@ description = "Beschreibung"
 ref_from_branch = "(vom Branch)"
 issue_ref_inserted = "{reference} eingefügt"
 skip_hooks = "Hooks überspringen"
+# context: shorter label of the Skip hooks checkbox on a narrow commit options row
+skip_hooks_short = "No hooks"
 
 [compose_ui]
 select_commit = "Einen Commit auswählen..."

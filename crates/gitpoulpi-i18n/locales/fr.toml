@@ -4307,6 +4307,8 @@ new_tab = "Nouvel onglet"
 explain_changes = "Expliquer les modifications en cours"
 ai_generate = "Générer un message de {$commit} avec l'IA"
 ai_compose = "Composer des {$commits} avec l'IA"
+# context: tooltip of the Skip hooks checkbox
+skip_hooks = "Ignorer les hooks : valider sans exécuter les hooks git"
 commit_reference = "Ouvrir dans le navigateur (palette : Ouvrir une référence de {$commit})"
 quit = "Quitter GitPoulpi"
 quit_cd = "Quitter en laissant le shell dans le dossier de cet onglet (nécessite le wrapper shell)"
@@ -5495,6 +5497,8 @@ description = "Description"
 ref_from_branch = "(de la branche)"
 issue_ref_inserted = "{reference} inséré"
 skip_hooks = "Ignorer les hooks"
+# context: shorter label of the Skip hooks checkbox on a narrow commit options row
+skip_hooks_short = "Sans hooks"
 
 [compose_ui]
 select_commit = { git = "Choisir un commit...", local = "Choisir une validation..." }

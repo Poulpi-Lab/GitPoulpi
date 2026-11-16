@@ -4301,6 +4301,8 @@ new_tab = "Nowa karta"
 explain_changes = "Wyjaśnij zmiany robocze"
 ai_generate = { git = "Wygeneruj opis commita przez AI", local = "Wygeneruj opis zatwierdzenia przez AI" }
 ai_compose = { git = "Skomponuj commity przez AI", local = "Skomponuj zatwierdzenia przez AI" }
+# context: tooltip of the Skip hooks checkbox
+skip_hooks = "Skip hooks: commit without running git hooks"
 commit_reference = { git = "Otwórz w przeglądarce (paleta: Otwórz odwołanie z commita)", local = "Otwórz w przeglądarce (paleta: Otwórz odwołanie z zatwierdzenia)" }
 quit = "Zakończ GitPoulpi"
 quit_cd = "Zakończ, zostawiając powłokę w folderze tej karty (wymaga wrappera powłoki)"
@@ -5482,6 +5484,8 @@ description = "Opis"
 ref_from_branch = "(z gałęzi)"
 issue_ref_inserted = "wstawiono {reference}"
 skip_hooks = "Pomiń hooki"
+# context: shorter label of the Skip hooks checkbox on a narrow commit options row
+skip_hooks_short = "No hooks"
 
 [compose_ui]
 select_commit = { git = "Wybierz commit...", local = "Wybierz zatwierdzenie..." }

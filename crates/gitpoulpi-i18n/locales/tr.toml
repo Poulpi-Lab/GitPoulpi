@@ -1343,7 +1343,7 @@ hint_back = "sekmeye dön"
 hint_quit = "çık"
 not_a_repo_any_more = "{path} artık bir git deposu değil - {key} ile listeden kaldırın"
 gone_from_disk_msg = "{path} diskten silinmiş - {key} ile listeden kaldırın"
-open_in_gone = "{path} is gone from disk, there is nothing to open"
+open_in_gone = "{path} diskten silinmiş, açılacak bir şey yok"
 actions_need_tab = "{key} eylemleri için açık bir depo sekmesi gerekir"
 home_tab_fixed = "Ana sekmenin sekme menüsü yoktur ve kapatılamaz"
 
@@ -2434,8 +2434,8 @@ status_stage_toggle = { git = "Seçili Satırı Stage'le veya Unstage'le", local
 status_open_diff = "Seçili Dosyanın {$Diff} Görünümünü Aç"
 home_favorite = "Depoyu Yıldızla veya Yıldızı Kaldır"
 home_close_repo = "Satırı Kapat, Kaldır veya Yıldızını Kaldır"
-home_copy_path = "Copy the Repository Path"
-home_open_in = "Open the Repository in the Default Tool"
+home_copy_path = "Depo Yolunu Kopyala"
+home_open_in = "Depoyu Varsayılan Araçta Aç"
 home_browse = "Depo Gözat"
 home_clone = "Depo Klonla"
 home_init = "Depo Başlat"
@@ -3324,8 +3324,8 @@ repositories_collapse_all_sections = "Depolar: Tüm Bölümleri Daralt"
 repositories_expand_all_sections = "Depolar: Tüm Bölümleri Genişlet"
 repositories_close_all_tabs = "Depolar: Tüm Sekmeleri Kapat..."
 repositories_remove_selected_from_list = "Depolar: Seçiliyi Listeden Kaldır"
-repositories_copy_selected_path = "Repositories: Copy Selected Path"
-repositories_open_selected_in = "Repositories: Open Selected in Default Tool"
+repositories_copy_selected_path = "Depolar: Seçilen Yolu Kopyala"
+repositories_open_selected_in = "Depolar: Seçileni Varsayılan Araçta Aç"
 repositories_remove_all_recent = "Depolar: Tüm Son Kullanılanları Kaldır"
 tab_new_tab = "Sekme: Yeni Sekme"
 tab_new_menu = "Sekme: Yeni..."
@@ -3396,7 +3396,7 @@ ai_explain_working_changes = "YZ: Çalışma Değişikliklerini Açıkla"
 ai_insert_prompt_variable = "YZ: İstem Değişkeni Ekle"
 ai_compose_commits_from_working_changes = "YZ: Çalışma Değişikliklerinden Commit'ler Oluştur..."
 # context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
-stage_guard_show_in_file = "Sensitive Files: Show in File"
+stage_guard_show_in_file = "Hassas Dosyalar: Dosyada Göster"
 composer_move_file_to_commit = "Composer: Dosyayı Bir Commit'e Taşı..."
 diff_blame = { git = "Diff: Blame", local = "Fark: Blame" }
 diff_history = { git = "Diff: Dosya Geçmişi", local = "Fark: Dosya Geçmişi" }
@@ -3451,7 +3451,7 @@ why_no_text_selected_drag_over_the_text_first = "seçili metin yok - önce metni
 why_the_diff_view_isn_t_open = { git = "diff görünümü açık değil", local = "fark görünümü açık değil" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "önce bir dosya açın - Diff görünümünde, Durum panelinde veya bir commit'te", local = "önce bir dosya açın - Fark görünümünde, Durum panelinde veya bir commit'te" }
 # context: why that palette command is unavailable
-why_no_sensitive_files_question = "no sensitive files question is open"
+why_no_sensitive_files_question = "açık bir hassas dosya sorusu yok"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "önce Refs panelinde bir dal veya tag seçin", local = "önce Refs panelinde bir dal veya etiket seçin" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "uzak dalda checkout henüz desteklenmiyor - önce yerel bir izleme dalı oluşturun"
 why_select_a_local_branch_in_the_refs_pane_first = "önce Refs panelinde bir yerel dal seçin"
@@ -4074,7 +4074,7 @@ repositories_and_tabs_open_in = "bu sekmenin klasörü için “Şurada aç” l
 repositories_and_tabs_7 = "seçili depoyu aç (veya ona geç)"
 repositories_and_tabs_8 = "yıldızla/yıldızı kaldır"
 repositories_and_tabs_9 = "sekmeyi kapat (Açık), kaldır (Son), yıldızı kaldır (Favoriler)"
-repositories_and_tabs_copy_open = "copy the path / open in the default tool"
+repositories_and_tabs_copy_open = "yolu kopyala / varsayılan araçta aç"
 repositories_and_tabs_10 = "satırın menüsü"
 repositories_and_tabs_11 = "her bölümde ara"
 repositories_and_tabs_12 = "temizle / sekmeye dön"
@@ -5625,9 +5625,9 @@ too_large = "dosya göstermek için çok büyük ({bytes} bayt)"
 unexpected = "beklenmeyen yanıt"
 loading_whole = "tüm dosya yükleniyor... (Hunk düğmesi yalnızca değişiklikleri gösterir)"
 whole_unavailable = "(tüm dosya kullanılamıyor: {why} - yalnızca hunk'lar gösteriliyor)"
-renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header = "{from} -> {to} (%{percent} benzer)"
 renamed_header_plain = "{from} -> {to}"
-rename_no_change = "No content change (the file was only renamed or moved)"
+rename_no_change = "İçerik değişmedi (dosyanın yalnızca adı veya yeri değişti)"
 
 [git_actions]
 no_such_local_branch = "o yerel dal artık yok - yenileyin"
@@ -9338,7 +9338,7 @@ answer_cancel = "İptal et, “{$stage}” eylemi uygulanmasın"
 # context: key hint at the bottom of the dialog
 hint = "Yukarı/Aşağı: seç, Enter veya 1/2: yanıtla, Esc: iptal"
 # context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
-show_in_file = "Show in file"
+show_in_file = "Dosyada göster"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = { git = "hassas dosyalar stage'lenmedi: {files}; kullanıcıya sorun, sonra hassas dosyalara izin vererek yeniden stage'leyin", local = "hassas dosyalar hazırlanmadı: {files}; kullanıcıya sorun, sonra hassas dosyalara izin vererek yeniden hazırlayın" }
 
@@ -10163,22 +10163,22 @@ flavor_plain_text = "Düz metin"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
-title = "Edit a {$commit} of another branch"
+title = "Başka bir dalın {$commit}'ini düzenle"
 # context: body of that dialog when local branches hold the commit; {short} is the short commit id
-body_branches = "{short} is not on the current branch. Check out a branch that holds it to edit it here."
+body_branches = "{short} geçerli dalda değil. Burada düzenlemek için onu içeren bir dalı checkout edin."
 # context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
-body_none = "{short} is on no local branch. Create a branch at it to edit it here."
+body_none = "{short} hiçbir yerel dalda değil. Burada düzenlemek için ona bir dal oluşturun."
 # context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
-checkout = "Check out {branch} and edit"
+checkout = "{branch} dalını checkout et ve düzenle"
 # context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
-rewrite = "Edit with advanced history rewrite"
+rewrite = "Gelişmiş geçmiş yeniden yazmayla düzenle"
 # context: button that opens the name box to create a branch at that commit
-create = "Create a branch here..."
+create = "Burada dal oluştur..."
 # context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
-key_rewrite = "r"
+key_rewrite = "g"
 # context: key of the Create a branch here button, one letter
-key_create = "b"
+key_create = "d"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "i"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
-gave_up = "{short} was not edited: the branch was not checked out"
+gave_up = "{short} düzenlenmedi: dal checkout edilmedi"

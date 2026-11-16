@@ -1342,7 +1342,7 @@ hint_back = "wróć do karty"
 hint_quit = "zakończ"
 not_a_repo_any_more = "{path} nie jest już repozytorium git - usuń je z listy za pomocą {key}"
 gone_from_disk_msg = "{path} zniknęło z dysku - usuń je z listy za pomocą {key}"
-open_in_gone = "{path} is gone from disk, there is nothing to open"
+open_in_gone = "{path} zniknęło z dysku, nie ma czego otworzyć"
 actions_need_tab = "akcje {key} wymagają otwartej karty repozytorium"
 home_tab_fixed = "karta Home nie ma menu karty i nie można jej zamknąć"
 
@@ -2432,8 +2432,8 @@ status_stage_toggle = { git = "Stage lub unstage zaznaczony wiersz", local = "Do
 status_open_diff = { git = "Otwórz diff zaznaczonego pliku", local = "Otwórz różnice zaznaczonego pliku" }
 home_favorite = "Dodaj repozytorium do ulubionych lub usuń"
 home_close_repo = "Zamknij, usuń lub zdejmij gwiazdkę z wiersza"
-home_copy_path = "Copy the Repository Path"
-home_open_in = "Open the Repository in the Default Tool"
+home_copy_path = "Skopiuj ścieżkę repozytorium"
+home_open_in = "Otwórz repozytorium w domyślnym narzędziu"
 home_browse = "Przeglądaj w poszukiwaniu repozytorium"
 home_clone = "Klonuj repozytorium"
 home_init = "Zainicjuj repozytorium"
@@ -3322,8 +3322,8 @@ repositories_collapse_all_sections = "Repozytoria: Zwiń wszystkie sekcje"
 repositories_expand_all_sections = "Repozytoria: Rozwiń wszystkie sekcje"
 repositories_close_all_tabs = "Repozytoria: Zamknij wszystkie karty..."
 repositories_remove_selected_from_list = "Repozytoria: Usuń zaznaczone z listy"
-repositories_copy_selected_path = "Repositories: Copy Selected Path"
-repositories_open_selected_in = "Repositories: Open Selected in Default Tool"
+repositories_copy_selected_path = "Repozytoria: Skopiuj zaznaczoną ścieżkę"
+repositories_open_selected_in = "Repozytoria: Otwórz zaznaczone w domyślnym narzędziu"
 repositories_remove_all_recent = "Repozytoria: Usuń wszystkie ostatnie"
 tab_new_tab = "Karta: Nowa karta"
 tab_new_menu = "Karta: Nowa..."
@@ -3394,7 +3394,7 @@ ai_explain_working_changes = "AI: Wyjaśnij zmiany robocze"
 ai_insert_prompt_variable = "AI: Wstaw zmienną promptu"
 ai_compose_commits_from_working_changes = { git = "AI: Skomponuj commity ze zmian roboczych...", local = "AI: Skomponuj zatwierdzenia ze zmian roboczych..." }
 # context: palette command, only while the sensitive-files question is open; opens the focused file at the line of the secret
-stage_guard_show_in_file = "Sensitive Files: Show in File"
+stage_guard_show_in_file = "Wrażliwe pliki: Pokaż w pliku"
 composer_move_file_to_commit = { git = "Kompozytor: Przenieś plik do commita...", local = "Kompozytor: Przenieś plik do zatwierdzenia..." }
 diff_blame = { git = "Diff: Blame", local = "Różnice: Blame" }
 diff_history = { git = "Diff: Historia pliku", local = "Różnice: Historia pliku" }
@@ -3449,7 +3449,7 @@ why_no_text_selected_drag_over_the_text_first = "brak zaznaczonego tekstu - najp
 why_the_diff_view_isn_t_open = { git = "widok diff nie jest otwarty", local = "widok różnic nie jest otwarty" }
 why_open_a_file_first_in_the_diff_view_the_status = { git = "najpierw otwórz plik - w widoku diff, panelu Status lub z commita", local = "najpierw otwórz plik - w widoku różnic, panelu Status lub w zatwierdzeniu" }
 # context: why that palette command is unavailable
-why_no_sensitive_files_question = "no sensitive files question is open"
+why_no_sensitive_files_question = "nie ma otwartego pytania o wrażliwe pliki"
 why_select_a_branch_or_tag_in_the_refs_pane_first = { git = "najpierw zaznacz gałąź lub tag w panelu Refs", local = "najpierw zaznacz gałąź lub znacznik w panelu Refs" }
 why_checking_out_a_remote_branch_isn_t_supported_yet = "checkout gałęzi zdalnej nie jest jeszcze obsługiwany - najpierw utwórz lokalną gałąź śledzącą"
 why_select_a_local_branch_in_the_refs_pane_first = "najpierw zaznacz gałąź lokalną w panelu Refs"
@@ -4072,7 +4072,7 @@ repositories_and_tabs_open_in = "lista „Otwórz w” dla folderu tej karty (te
 repositories_and_tabs_7 = "otwórz (lub przełącz na) zaznaczone repozytorium"
 repositories_and_tabs_8 = "dodaj/usuń gwiazdkę"
 repositories_and_tabs_9 = "zamknij kartę (Otwarte), usuń (Ostatnie), zdejmij gwiazdkę (Ulubione)"
-repositories_and_tabs_copy_open = "copy the path / open in the default tool"
+repositories_and_tabs_copy_open = "skopiuj ścieżkę / otwórz w domyślnym narzędziu"
 repositories_and_tabs_10 = "menu wiersza"
 repositories_and_tabs_11 = "szukaj w każdej sekcji"
 repositories_and_tabs_12 = "wyczyść / wróć do karty"
@@ -5623,9 +5623,9 @@ too_large = "plik jest za duży, by go pokazać ({bytes} bajtów)"
 unexpected = "nieoczekiwana odpowiedź"
 loading_whole = "wczytywanie całego pliku... (przycisk Hunki pokazuje tylko zmiany)"
 whole_unavailable = "(cały plik niedostępny: {why} - tylko hunki)"
-renamed_header = "{from} -> {to} ({percent}% similar)"
+renamed_header = "{from} -> {to} (podobieństwo {percent}%)"
 renamed_header_plain = "{from} -> {to}"
-rename_no_change = "No content change (the file was only renamed or moved)"
+rename_no_change = "Treść bez zmian (plik został tylko przemianowany lub przeniesiony)"
 
 [git_actions]
 no_such_local_branch = "ta gałąź lokalna już nie istnieje - odśwież"
@@ -9334,7 +9334,7 @@ answer_cancel = { git = "Anuluj, bez stage", local = "Anuluj, nic nie dodawaj" }
 # context: key hint at the bottom of the dialog
 hint = "Góra/Dół: wybór, Enter lub 1/2: odpowiedź, Esc: anuluj"
 # context: button of the sensitive-files dialog; opens the focused file in the File View at the line where the secret was found
-show_in_file = "Show in file"
+show_in_file = "Pokaż w pliku"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = { git = "wrażliwe pliki nie zostały staged: {files}; zapytaj użytkownika, a potem zrób stage jeszcze raz, zezwalając na wrażliwe pliki", local = "wrażliwe pliki nie zostały dodane do poczekalni: {files}; zapytaj użytkownika, a potem dodaj je ponownie, zezwalając na wrażliwe pliki" }
 
@@ -10159,22 +10159,22 @@ flavor_plain_text = "Zwykły tekst"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
-title = "Edit a {$commit} of another branch"
+title = "Edytowanie: {$commit} z innej gałęzi"
 # context: body of that dialog when local branches hold the commit; {short} is the short commit id
-body_branches = "{short} is not on the current branch. Check out a branch that holds it to edit it here."
+body_branches = "{short} nie należy do bieżącej gałęzi. Wykonaj checkout gałęzi, która go zawiera, aby edytować go tutaj."
 # context: body of that dialog when no local branch holds the commit (only a remote branch, or none); {short} is the short commit id
-body_none = "{short} is on no local branch. Create a branch at it to edit it here."
+body_none = "{short} nie należy do żadnej lokalnej gałęzi. Utwórz gałąź w tym miejscu, aby edytować go tutaj."
 # context: button, one per local branch that holds the commit; {branch} is the branch name. Width budget: 50 cells
-checkout = "Check out {branch} and edit"
+checkout = "Checkout {branch} i edytuj"
 # context: button that opens the advanced history rewrite workbench on that commit. Width budget: 40 cells
-rewrite = "Edit with advanced history rewrite"
+rewrite = "Zaawansowane przepisanie historii"
 # context: button that opens the name box to create a branch at that commit
-create = "Create a branch here..."
+create = "Utwórz gałąź tutaj..."
 # context: key of the advanced history rewrite button, one letter (shown as "Edit with advanced history rewrite (R)")
-key_rewrite = "r"
+key_rewrite = "p"
 # context: key of the Create a branch here button, one letter
-key_create = "b"
+key_create = "g"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "a"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
-gave_up = "{short} was not edited: the branch was not checked out"
+gave_up = "{short} nie został zmieniony: checkout gałęzi nie nastąpił"

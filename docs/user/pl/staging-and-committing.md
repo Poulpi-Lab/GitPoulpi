@@ -18,6 +18,12 @@ zmiany robocze:
 - **Pliki unstaged**: edytowane, dodane (nieśledzone) i usunięte pliki, których jeszcze nie ma
   w następnym commicie.
 - **Pliki staged**: to, co będzie zawierał następny commit.
+- **Pliki ze zmienioną nazwą lub przeniesione** to jeden wiersz, `nowa <- stara`, na obu listach
+  (plik usunięty na dysku i nowy, w co najmniej 50% o tej samej treści, liczą się jako przeniesienie
+  jeszcze przed stage). Stage, Unstage i Odrzuć działają na obie nazwy: stage dodaje usunięcie i nowy
+  plik, więc git widzi jedną zmianę nazwy. Otwarcie wiersza pokazuje diff treści względem starej
+  nazwy, z nagłówkiem `stara -> nowa (podobieństwo N%)`; przeniesienie bez edycji mówi **Treść bez zmian**.
+  To samo dotyczy plików commita, a `gitpoulpi status` / `gitpoulpi diff` zgłaszają `renamed_from`.
 - **Ścieżka** lub **Drzewo** (`m`) pokazuje pliki płasko albo w folderach. **Zwiń wszystko**
   (`z`) zwija foldery. **Wszystkie pliki** (`a`) pokazuje całe drzewo
   zamiast tylko zmienionych plików. Prawy przycisk na pustym miejscu listy daje
@@ -50,6 +56,12 @@ więc przypadkowy Enter nie odpowiada na nic; `Esc`, krzyżyk zamknięcia i klik
 To samo pytanie pojawia się z klawiatury, przycisku, menu, palety lub
 przeciągnięcia, bo wszystkie wysyłają to samo żądanie. Anulowanie nie dodaje nic do stage,
 nawet zwykłych plików z tego samego stage.
+Sekret znaleziony w pliku podaje swoją linię (`config/app.env:12`). Aby spojrzeć przed
+decyzją, kliknij znalezisko (albo przechodź po nich `Tab` / `Shift+Tab`, `Ctrl+J` /
+`Ctrl+K`) i naciśnij przycisk **Pokaż w pliku**, `S`, albo polecenie palety **Wrażliwe
+pliki: Pokaż w pliku**: plik otwiera się w Widoku pliku przewinięty do tej linii i ją
+podświetla, a pytanie wraca nietknięte, gdy zamkniesz Widok pliku (`Esc`). Samo
+oglądanie niczego nie dodaje do stage.
 
 Pliki tekstowe do 1 MiB każdy i 32 MiB łącznie są czytane; większe pliki i pliki
 binarne są oceniane tylko po nazwie. `[privacy] staging_guard = false` wyłącza sprawdzanie.
@@ -189,6 +201,11 @@ Gdy [AI](ai.md) jest włączone, przycisk **`✦`** na prawo od podsumowania pis
 na podstawie zmian w stage (`Ctrl+G i`), a **Skomponuj commity przez AI** dzieli
 twoją pracę na kilka commitów (zob. niżej). Tekst trafia do formularza, abyś mógł
 go edytować; nic nie jest zatwierdzane, dopóki nie naciśniesz przycisku commita.
+
+**Skomponuj commity przez AI** leży na prawym końcu wiersza Popraw i kurczy się razem
+z prawym panelem zamiast znikać: pełna etykieta, potem **Skomponuj przez AI**, potem samo
+**`✦`**. Zachowuje kliknięcie, podpowiedź i klawisz (`Ctrl+G C`) przy każdej szerokości;
+etykiety Popraw i Pomiń hooki ustępują jemu, nigdy odwrotnie.
 
 ## Kompozytor commitów: podziel zmiany na commity
 

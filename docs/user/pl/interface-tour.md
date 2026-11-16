@@ -126,7 +126,9 @@ Karta worktree trafia zaraz za kartę swojego repozytorium, a odciągnięta kart
 Karta Home to menedżer repozytoriów. Ma cztery sekcje: **Otwarte
 repozytoria**, **Ulubione**, **Ostatnie repozytoria** i **Wszystkie
 repozytoria**. Każdy wiersz pokazuje gałąź, liczby ahead i behind oraz liczbę
-zmian. Każdy wiersz ma gwiazdkę (ulubione), **Otwórz** lub **Przełącz**,
+zmian, a potem ścieżkę folderu, gdy jest miejsce: skróconą przez `~` i ucinaną
+pośrodku, gdy jest ciasno, nigdy nie wypycha nazwy, właściciela ani gałęzi.
+Każdy wiersz ma gwiazdkę (ulubione), **Otwórz** lub **Przełącz**,
 **Zamknij** lub **Usuń** oraz menu `⋮`.
 
 Na górze: **Przeglądaj**, **Klonuj**, **Init**, pole wyszukiwania, **Zwiń
@@ -134,7 +136,7 @@ wszystko** i **Rozwiń wszystko**. Folder, który już nie istnieje, sam znika
 z sekcji *Ostatnie* i *Wszystkie*. Brakujące ulubione zostaje, z przyciskiem
 **Usuń**. **Usuń** niczego nie kasuje na dysku.
 
-Klawisze: `Enter` otwiera, `f` ulubione, `x` zamyka lub usuwa, `.` menu, `/`
+Klawisze: `Enter` otwiera, `f` ulubione, `x` zamyka lub usuwa, `y` kopiuje ścieżkę, `o` otwiera w domyślnym narzędziu (pozycja **Otwórz w** menu `⋮` wybiera inne), `.` menu, `/`
 wyszukiwanie, `Space` zwija sekcję, `Esc` wraca do karty.
 `Ctrl+N` pokazuje plakietkę na polu wyszukiwania, każdej sekcji i każdym przycisku: naciśnij znak plakietki, aby ustawić na nim fokus lub go nacisnąć (zob. [Plakietki](keybindings.md#plakietki)).
 
@@ -237,6 +239,10 @@ zapisuje się na następne uruchomienie.
 Jeden wiersz na commit, od najnowszego. Kliknij nagłówek prawym przyciskiem,
 aby pokazać lub ukryć kolumny. Przeciągnij granicę między dwoma nagłówkami,
 aby zmienić szerokość kolumny. Przeciągnij nagłówek, aby przenieść kolumnę.
+Szerokości należą do repozytorium: są z nim zapisywane i wracają po ponownym otwarciu,
+a repozytorium otwarte po raz pierwszy ma każdą kolumnę dopasowaną do tego, co pokazuje Log
+(`Dopasuj wszystkie kolumny do zawartości` robi to ponownie, `Zresetuj szerokości kolumn` wraca
+do szerokości automatycznych, które już zostają).
 
 Panel nie ma tytułu: mówią o tym nagłówki kolumn. Przy commicie bez refa najechany wiersz pokazuje wyblakłą pigułkę z nazwą gałęzi, do której należy; jeśli ta gałąź została usunięta, przekreślona pigułka pokazuje nazwę odczytaną z merge commita, który ją scalił. Tagi są rysowane tam, gdzie są, nigdy jako widmo (wyłącza to **Pokaż widmową gałąź dla najechanego commita** w Ustawieniach > Log i graf).
 

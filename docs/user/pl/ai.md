@@ -464,7 +464,7 @@ szybka i tania:
 - **Cache promptów Anthropic.** Dla profilu Anthropic żądanie jest wysyłane z promptem bazowym i instrukcjami
   jako jednym buforowanym blokiem i kontekstem repozytorium jako drugim, a po nich twoja rozmowa, wskazówka
   i szkic, więc druga odpowiedź na tym samym kontekście jest czytana z pamięci podręcznej dostawcy i kosztuje
-  ułamek. Liczniki pamięci podręcznej w odpowiedzi to to, co pokazuje *Cache dostawcy: ponownie N tokenów*.
+  ułamek (kolejne prośby buforują też wiadomość rozmowy i najnowszy szkic, patrz niżej). Liczniki pamięci podręcznej w odpowiedzi to to, co pokazuje *Cache dostawcy: ponownie N tokenów*.
   Serwery zgodne z OpenAI dostają ten sam stabilny porządek żądania, z którego korzysta ich automatyczne
   buforowanie prefiksów; GitPoulpi nie wysyła niczego dodatkowo.
 - **Agent zachowuje sesję.** Przy włączonym **Zachowaj sesję agenta między odpowiedziami**
@@ -476,8 +476,34 @@ szybka i tania:
   jednorazowe uruchomienie, które niczego nie zachowuje. Sesja żyje w własnym magazynie agenta, GitPoulpi
   zachowuje tylko jej id (w pamięci w oknie, w pliku tylko dla użytkownika w CLI).
 
+**Kolejne prośby: krócej, inna instrukcja.** Ponowne zapytanie w tym samym kompozytorze („skróć to”, „dodaj
+podziękowanie”) to jedna wymiana. Wznowiona sesja Claude Code pamięta ją sama. We wszystkich pozostałych
+przypadkach (profil API, Codex i każdy inny agent) GitPoulpi oddaje ją z powrotem: żądanie niesie wiadomość
+rozmowy z pierwszego żądania, potem każdą wcześniejszą instrukcję i szkic, który na nią odpowiedział, jako zwykłe
+tury czatu (dla agenta, który czyta jeden dokument, jako zapis w prompcie), a na końcu tylko to, co nowe: twoją
+instrukcję oraz, gdy zaznaczono *Popraw mój szkic*, tekst z pola wraz z twoimi własnymi poprawkami. Dzięki temu
+kolejna prośba nigdy nie zaczyna od zera i nic nie jest czytane z repozytorium ponownie. „Co zostanie wysłane”
+pokazuje wszystko. Wymiana mieści się w `ai.limits.hosting_reply_context_bytes` tak jak rozmowa: najpierw pomijane
+są najstarsze kolejne prośby, a wiadomość rozmowy i twój najnowszy szkic zostają zawsze
+(`context.history_omitted` w odpowiedzi CLI je zlicza). W obrębie wymiany kontekst repozytorium pozostaje ten z jej
+pierwszego żądania, więc jest używany ponownie i pamięć podręczna dostawcy działa: dla profilu Anthropic prompt
+bazowy, kontekst repozytorium, wiadomość rozmowy i najnowszy szkic są częścią buforowaną, a serwer zgodny z OpenAI
+dostaje ten sam porządek wiadomości dla swojego buforowania prefiksów. Codex dałoby się wznowić przez
+`codex exec resume <id>`, ale sam wybiera id sesji i wypisuje je tylko wśród swoich zdarzeń JSON (a `--last`
+wybrałoby twoje własne sesje), więc GitPoulpi zostawia go jednorazowym i podaje historię na nowo. Wymiana żyje
+razem z kompozytorem: kończy się, gdy kompozytor się zamknie lub tekst zostanie wysłany, a **Odśwież kontekst** też
+ją porzuca (następne żądanie jest wtedy pierwszym). Dołącza do niej tylko żądanie, które dało odpowiedź; nieudane
+lub zatrzymane nie. Opis pull requesta jest pisany z diffu i nie ma wymiany.
+
+W CLI każde wywołanie jest osobne, więc `--continue` podejmuje wymianę na nowo: kontynuuje ostatnie
+`ai hosting-reply` dla tego samego celu w tym repozytorium (te same `--item`, `--reply-to`, `--path`/`--line` lub
+`--issue-title`), z małego pliku w prywatnym folderze stanu. Bez `--continue` zaczyna się nowa wymiana i zastępuje
+zachowaną. `--continue`, gdy dla celu nic nie zachowano, jest błędem. `context` w odpowiedzi niesie
+`history_turns` (i `history_omitted`), gdy wcześniejsze tury poszły razem z żądaniem.
+
 ```
 gitpoulpi ai hosting-reply --conversation conversation.json --hint "say I will look tomorrow"
+gitpoulpi ai hosting-reply --conversation conversation.json --hint "shorter" --continue
 gitpoulpi ai hosting-reply --conversation conversation.json --reply-to <thread id> --draft "thx will do"
 gitpoulpi ai hosting-reply --conversation conversation.json --read-repo --hint "is this our bug?"
 gitpoulpi ai hosting-reply --issue-title "Crash on empty config" --hint "steps to reproduce"

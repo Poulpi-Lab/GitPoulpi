@@ -102,7 +102,7 @@ flik. `Ctrl+W` stänger den aktuella fliken.
 repository.
 I alla tre dialogerna (och i mappväljaren de öppnar) visar `Ctrl+N` ett märke på varje fält och varje knapp: tryck på tecknet för att sätta markören i fältet eller trycka på knappen.
 
-| ![Klondialogen: vart du klonar, URL:en, mappnamnet och knappen Klona](../images/clone.png) | ![Dialogen Initiera ett repository: mappen, namnet och första grenen](../images/init.png) |
+| ![Klondialogen: vart du klonar, URL:en, mappnamnet och knapparna Avbryt och Klona](../images/clone.png) | ![Dialogen Initiera ett repository: mappen, namnet och första grenen](../images/init.png) |
 |---|---|
 
 ### Delvis utcheckning

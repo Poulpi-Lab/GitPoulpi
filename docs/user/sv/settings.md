@@ -133,7 +133,7 @@ varje sida. Klicka på den, eller tryck `/` eller `Ctrl+F`, och skriv. En lista 
 träffar fälls ned. Varje träff visar alternativet och dess sida. `Up` / `Down`
 väljer, `Enter` går till alternativet, `Esc` stänger listan.
 
-![Sökning i Inställningar efter ”diff”: de matchande alternativen från sidorna Log & graf, Diff & redigerare och Git](../images/settings-search.png)
+![Sökning i Inställningar efter ”diff”: de matchande alternativen från sidorna AI och Diff & redigerare](../images/settings-search.png)
 
 ## Inställningar från kommandopaletten
 
@@ -211,7 +211,7 @@ Ikonen är bläckfisken i din logotypfärg (Om GitPoulpi > färg); på Linux har
 
 **Gruppering i aktivitetsfältet och dockan.** GitPoulpi körs i ett terminalfönster, så aktivitetsfältet visar det normalt under terminalens ikon, utan punkten ”körs” under den fästa GitPoulpi-ikonen. Windows: genvägarna bär AppUserModelID `GitPoulpi.GitPoulpi`, och en GitPoulpi som startats från en av dem ger sitt terminalfönster samma ID och sin ikon (den hittar fönstret genom att ge det en unik titel en stund och återställer sedan titeln), så fönstret hamnar under den fästa GitPoulpi-ikonen. Ett terminalfönster med flera flikar flyttas som en helhet: alla dess flikar grupperas under GitPoulpis ikon så länge GitPoulpi körs i det. Genvägar och fästa objekt i aktivitetsfältet som gjorts tidigare skrivs om av samma synkronisering; visar ett fäst objekt fortfarande terminalens ikon, lossa det och fäst det igen. Linux: kitty, foot, Alacritty, WezTerm och Ghostty startas med fönsterklassen `gitpoulpi` och `.desktop`-posten anger den (`StartupWMClass`), så en dock grupperar fönstret under startarens ikon; andra terminaler behåller sin egen ikon. macOS: inget att göra, Dock grupperar per app.
 
-![Inställningar > Startare: terminalen för genvägar och raden för appstartaren](../images/settings-launcher.png)
+![Inställningar > Startare: terminalen för genvägar, startarbygget, kommando- och ny-flik-alias, aliasstatus och PATH-kontrollen](../images/settings-launcher.png)
 
 #### Kommandoalias och PATH, per system
 
@@ -413,7 +413,7 @@ servern; se [MCP och agenter](mcp-and-agents.md).
 
 ### Utseende
 
-![Sidan Utseende: tema, avatarer, inmatningsfärg, färgdjup och grafens färger (datumformaten följer nedanför)](../images/settings-ui.png)
+![Sidan Utseende rullad nedåt: avatarkällor och reserv, inmatningsfärg, färgdjup, textmarkör och början av grafens färger (datumformaten följer nedanför)](../images/settings-ui.png)
 
 ![Kombinationsrutan Tema öppen på Utseende med Ljus markerad: hela inställningsskärmen målas redan om i det temat](../images/settings-appearance-theme.png)
 

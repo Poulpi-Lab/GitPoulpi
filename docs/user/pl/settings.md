@@ -134,7 +134,7 @@ stronie. Kliknij je albo naciśnij `/` lub `Ctrl+F` i zacznij pisać. Rozwija si
 lista trafień. Każde trafienie pokazuje opcję i jej stronę. `Up` / `Down`
 wybierają, `Enter` przechodzi do opcji, `Esc` zamyka listę.
 
-![Wyszukiwanie „diff” w Ustawieniach: pasujące opcje ze stron Log i graf, Diff i edytor oraz Git i kodowanie](../images/settings-search.png)
+![Wyszukiwanie „diff” w Ustawieniach: pasujące opcje ze stron AI oraz Diff i edytor](../images/settings-search.png)
 
 ## Ustawienia z palety poleceń
 
@@ -213,7 +213,7 @@ O programie, klawisz `c`); w Linuksie każdy kolor ma własną nazwę ikony, wi�
 
 **Grupowanie na pasku zadań i w docku.** GitPoulpi działa w oknie terminala, więc pasek zadań zwykle pokazuje je pod ikoną terminala, bez kropki „uruchomione” pod przypiętą ikoną GitPoulpi. Windows: skróty niosą AppUserModelID `GitPoulpi.GitPoulpi`, a GitPoulpi uruchomiony z jednego z nich nadaje oknu swojego terminala ten sam identyfikator i swoją ikonę (znajduje okno, nadając mu na chwilę unikalny tytuł, po czym przywraca tytuł), dzięki czemu okno trafia pod przypiętą ikonę GitPoulpi. Okno terminala z wieloma kartami przenosi się jako całość: wszystkie jego karty grupują się pod ikoną GitPoulpi, dopóki działa w nim GitPoulpi. Wcześniej utworzone skróty i przypięcia na pasku zadań są przepisywane tą samą synchronizacją; jeśli przypięcie nadal pokazuje ikonę terminala, odepnij je i przypnij ponownie. Linux: kitty, foot, Alacritty, WezTerm i Ghostty są uruchamiane z klasą okna `gitpoulpi`, a wpis `.desktop` ją podaje (`StartupWMClass`), więc dock grupuje okno pod ikoną programu startowego; pozostałe terminale zachowują własną ikonę. macOS: nic do zrobienia, Dock grupuje według aplikacji.
 
-![Ustawienia > Uruchamianie z systemu: terminal dla skrótów i wiersz menu aplikacji](../images/settings-launcher.png)
+![Ustawienia > Uruchamianie z systemu: terminal dla skrótów, build uruchamiany przez skrót, aliasy polecenia i nowej karty, stan aliasów oraz kontrola PATH](../images/settings-launcher.png)
 
 #### Alias polecenia i PATH w poszczególnych systemach
 
@@ -419,7 +419,7 @@ punkt końcowy HTTP. Wiersze MCP są widoczne tylko w kompilacjach zawierającyc
 
 ### Wygląd
 
-![Strona Wygląd: motyw, awatary, kolor pól tekstowych, głębia kolorów i kolory grafu (formaty dat są niżej)](../images/settings-ui.png)
+![Strona Wygląd przewinięta w dół: źródła awatarów i awatar zapasowy, kolor pól tekstowych, głębia kolorów, kursor tekstowy i początek kolorów grafu (formaty dat są niżej)](../images/settings-ui.png)
 
 ![Lista Motyw otwarta na stronie Wygląd z wyróżnionym motywem Jasny: cały ekran Ustawień już maluje się w tym motywie](../images/settings-appearance-theme.png)
 

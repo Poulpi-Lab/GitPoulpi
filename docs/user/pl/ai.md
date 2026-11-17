@@ -94,7 +94,7 @@ Z AI w GitPoulpi można korzystać na dwa sposoby:
 4. Przy kilku profilach wybierz **Profil domyślny** na dole; każda akcja może
    nadal wskazać własny.
 
-![Blok Profile strony AI dla agenta lokalnego: Typ agenta (Claude Code), Polecenie, Argumenty, Model, dwa wiersze Env, Dodaj i Usuń zmienną środowiskową, Testuj połączenie i Profil domyślny](../images/settings-ai-agent.png)
+![Dolna część bloku Profile strony AI dla agenta lokalnego: Tryb uruchomienia, Argumenty, Model, Folder roboczy, Limit czasu, dwa wiersze Env, Dodaj zmienną środowiskową i Testuj połączenie](../images/settings-ai-agent.png)
 
 **Klucze API** wpisuje się przez `Enter` w wierszu **Klucz API** i zapisuje w
 systemowym menedżerze poświadczeń (Git Credential Manager, libsecret / `pass`,

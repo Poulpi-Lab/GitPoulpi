@@ -100,7 +100,7 @@ karcie. `Ctrl+W` zamyka bieżącą kartę.
 **Klonuj** pyta o URL i folder albo pozwala wybrać repozytorium z połączonego konta (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit; zob. [Klonowanie z połączonego konta](hosting-integration.md#klonowanie-z-połączonego-konta)). **Init** zamienia folder w nowe repozytorium.
 W tych trzech oknach (i w oknie wyboru folderu, które otwierają) `Ctrl+N` pokazuje plakietkę na każdym polu i przycisku: naciśnij znak, by ustawić kursor w polu albo nacisnąć przycisk.
 
-| ![Okno Klonuj: miejsce docelowe, URL, nazwa folderu i przycisk Klonuj repo!](../images/clone.png) | ![Okno inicjowania repozytorium: folder, nazwa i gałąź początkowa](../images/init.png) |
+| ![Okno Klonuj: miejsce docelowe, URL, nazwa folderu oraz przyciski Anuluj i Klonuj](../images/clone.png) | ![Okno inicjowania repozytorium: folder, nazwa i gałąź początkowa](../images/init.png) |
 |---|---|
 
 ### Częściowy checkout

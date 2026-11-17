@@ -191,7 +191,7 @@ Varsayılan olarak bölmelerin altındaki, durum çubuğunun üstündeki satırd
 | **Flow** `▾` | Dal iş akışı menüsü (başlat, bitir, eşitle, yükselt; `Ctrl+G Shift+W`). Yalnızca bir iş akışı olan depoda. Bkz. [Dal iş akışları](branching-workflows.md). |
 | **Ara** | Log'un üstünde commit arama çubuğunu açar (`f`). |
 
-Uçta (satırda sağ, sütunda alt), depo bir barındırma hizmetine bağlıysa, checkout yapılmış dalın pull request'ini gösteren bir **çip** (örneğin `GH #12` veya `GL !53`) ya da soluk bir `+ PR` görünür. **Ayarlar > Görünüm > Pull Request düğmesini sona sabitle** (varsayılan olarak açık) onu orada tutar; kapalıyken diğer düğmelerle birlikte akar ve onların hizasını izler. Bkz. [Barındırma hizmetleri ve issue takipçileri](hosting-integration.md). Sütunda profil açılır kutusu son satırı alır.
+Uçta (satırda sağ, sütunda alt), depo bir barındırma hizmetine bağlıysa, checkout yapılmış dalın pull request'ini gösteren bir **çip** (örneğin `GH #12` veya `GL !53`) ya da soluk bir `+ PR` görünür. **Ayarlar > Görünüm > Pull Request düğmesini sona sabitle** (varsayılan olarak açık) onu orada tutar; kapalıyken diğer düğmelerle birlikte akar ve onların hizasını izler. Dar bir satırda çip önce küçülür (`● #12`, sonra yalnızca durum simgesi) ve ancak ondan sonra `⋯` menüsüne geçer. Bkz. [Barındırma hizmetleri ve issue takipçileri](hosting-integration.md). Sütunda profil açılır kutusu son satırı alır.
 
 İki veya daha fazla [profiliniz](settings.md#profiller) varsa sağ uçtaki
 **profil açılır kutusu** bu depo için commit kimliğini seçer. İlk satır,

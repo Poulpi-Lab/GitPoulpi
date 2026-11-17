@@ -89,6 +89,11 @@ fn created(value: Value) -> Reply {
 /// remark; the two between are empty).
 const DISCUSSION_PAGES: u32 = 4;
 
+/// A project whose merge request answers its discussions in one page: the
+/// user-guide screenshots (`scripts/docs-screenshots`) want the plain
+/// conversation, without the paging the tests above exercise.
+pub const SINGLE_PAGE_PROJECT: &str = "orbit-co/orbit-docs";
+
 /// The `page` of a list request.
 fn page_of(target: &str) -> u32 {
     target
@@ -108,7 +113,8 @@ pub fn extra_headers(request: &Request) -> Vec<(&'static str, String)> {
     let is_mr_discussions = request.method == "GET"
         && path.starts_with("/api/v4/projects/")
         && path.ends_with(&format!("/merge_requests/{GITLAB_MR}/discussions"));
-    if is_mr_discussions {
+    let single_page = path.contains(&SINGLE_PAGE_PROJECT.replace('/', "%2F"));
+    if is_mr_discussions && !single_page {
         vec![("X-Total-Pages", DISCUSSION_PAGES.to_string())]
     } else {
         Vec::new()
@@ -403,5 +409,29 @@ fn gitlab(request: &Request, rest: &str, port: u16) -> Reply {
         ("POST", "draft_notes/bulk_publish") => ok(json!({})),
         ("POST", "approve") => created(json!({"approved": true})),
         _ => None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn discussions_of(project: &str) -> Request {
+        Request {
+            method: "GET".into(),
+            target: format!(
+                "/api/v4/projects/{project}/merge_requests/{GITLAB_MR}/discussions?per_page=100"
+            ),
+            headers: String::new(),
+            body: String::new(),
+        }
+    }
+
+    #[test]
+    fn only_the_screenshot_project_answers_its_discussions_in_one_page() {
+        let paged = extra_headers(&discussions_of("orbit-co%2Forbit"));
+        assert_eq!(paged, vec![("X-Total-Pages", DISCUSSION_PAGES.to_string())]);
+        let plain = extra_headers(&discussions_of("orbit-co%2Forbit-docs"));
+        assert!(plain.is_empty(), "{plain:?}");
     }
 }

@@ -6,6 +6,8 @@ A worktree is a second checked-out copy of the repository: another folder, on
 another branch, sharing the same history. The WORKTREES section of the Refs
 pane lists them; the main one is marked `(main)`.
 
+![The Refs pane of a repository with two linked worktrees: the WORKTREES section lists main (main), hotfix/axis-labels and feature/legend, with the SUBMODULES section below it](images/worktrees.png)
+
 ## Showing the section
 
 The section is hidden in a repository that has no linked worktree yet. To see
@@ -33,6 +35,8 @@ The palette has the same three (**Refs: Create Worktree from Current Branch**,
 **Git: Create Worktree at Selected Commit**, **Refs: Create Worktree Choosing a
 Branch**). The older entries still work: **Create worktree from...** in a
 branch, tag or commit menu.
+
+![The Create worktree dialog: Name, Folder, Ref and Worktree branch fields, the line "new branch from main", the Open the new worktree as a tab box and the Cancel and Create buttons](images/worktree-create.png)
 
 The dialog proposes everything and lets you change it. The **Name** and the
 new branch both start as `worktree-<id>`, where `<id>` is 8 random hex digits
@@ -79,6 +83,13 @@ Right-click a worktree (or select it and press the menu key, `Shift+F10` or
   there by the usual conflict flow. A branch checked out nowhere is refused
   with the reason. Not offered for a detached worktree.
 - **Remove worktree...**: never the main one.
+
+![The right-click menu of a worktree row: Open in a new tab, Open in, Merge hotfix/axis-labels into... and Remove worktree...](images/worktree-menu.png)
+
+**Open in a new tab** (or a double click, or `Enter`) opens the worktree's folder as
+a tab of its own, with its own Log, status and branch:
+
+![The hotfix/axis-labels worktree opened as its own tab next to the main one, showing its commit and changed file](images/worktree-tab.png)
 
 The palette has the same actions on the selected row (**Refs: Open Worktree
 In...**, **Refs: Merge Worktree Branch Into...**, **Refs: Remove Worktree...**,

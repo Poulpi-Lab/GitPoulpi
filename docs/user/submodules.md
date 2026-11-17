@@ -15,6 +15,8 @@ When a repository has a `.gitmodules`, the Refs sidebar gets a **SUBMODULES** se
 | `○` | not cloned | declared in `.gitmodules` and recorded, but its folder is empty: update it to clone it |
 | `✗` | conflicted | the repository has merge conflicts on the submodule |
 
+![The SUBMODULES section with three rows: vendor/almanac not cloned (○), vendor/ephemeris up to date (✓) and vendor/starfield modified (↑, at another commit than the one recorded), which also shows as a changed file in the Status pane](images/submodules.png)
+
 | Do | Mouse | Keyboard |
 |---|---|---|
 | Open the submodule as a tab of its own | double-click the row | select it, `Enter` (palette: `Refs: Submodule Open in Tab`) |
@@ -23,6 +25,8 @@ When a repository has a `.gitmodules`, the Refs sidebar gets a **SUBMODULES** se
 | Register it in `.git/config` without cloning | menu | `Ctrl+P`: `Refs: Submodule Init (Selected)` |
 | Update every submodule | | `Ctrl+P`: `Git: Update All Submodules` |
 | Jump to the section | click its header | `Ctrl+P`: `Navigation: Focus Refs > Submodules` |
+
+![The right-click menu of the modified vendor/starfield row: Update (clone if needed), Initialize and Open in new tab](images/submodule-menu.png)
 
 An update may fetch from the submodule's remote, so it follows **Settings > SSH & credentials > HTTPS credentials** like any other transfer. A submodule that is not cloned has nothing to open as a tab; the status line says so and points to Update.
 

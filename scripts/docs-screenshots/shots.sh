@@ -4,7 +4,7 @@
 #
 # Every picture of docs/user/images is a shot here (themes included).
 
-ALL_SHOTS=(hero about about-crates failure-card activity-log activity-log-repository compare-cards log-mermaid sparse-checkout palette palette-settings theme-picker log-graph log-columns-menu log-changes-column context-menu diff diff-split blame blame-card file-history file-history-blame editor editor-encoding-menu editor-eol-menu file-pane-multiselect commit-file-menu commit-column-all commit-column-menu ignore-picker open-with composer ai-explain help help-hosting rebase settings settings-launcher settings-conflict-prevention settings-search settings-profiles settings-ssh settings-integrations settings-connect settings-ai settings-ui settings-editor settings-git settings-repo-ai workflow-settings workflow-sidebar workflow-start undo-toolbar pull-push-tooltip settings-keyboard settings-keyboard-conflicts settings-language settings-ai-presets ai-commit-message theme-serie theme-material settings-appearance-theme settings-log-graph-lanes settings-ai-agent settings-open-in settings-open-in-presets open-in-menu theme-dark theme-light theme-catppuccin-latte theme-catppuccin-mocha theme-cyberpunk theme-dracula theme-everforest-dark theme-gruvbox-dark theme-gruvbox-light theme-kanagawa theme-matrix theme-fire theme-fire-light theme-sunset theme-monokai theme-nord theme-one-dark theme-rose-pine theme-solarized-dark theme-solarized-light theme-terminal theme-tokyo-night theme-catppuccin-frappe theme-catppuccin-macchiato theme-kanagawa-lotus theme-one-light theme-rose-pine-dawn theme-rose-pine-moon theme-tokyo-night-day theme-vesper theme-github-dark theme-github-light theme-vscode-dark theme-vscode-light theme-apprentice theme-ayu-dark theme-ayu-light theme-ayu-mirage theme-cobalt2 theme-deus theme-dracula-soft theme-everforest-light theme-github-dark-colorblind theme-github-dark-dimmed theme-github-dark-high-contrast theme-github-dark-legacy theme-github-light-colorblind theme-github-light-high-contrast theme-github-light-legacy theme-gotham theme-gruvbox-dark-hard-contrast theme-gruvbox-dark-soft-contrast theme-gruvbox-light-hard-contrast theme-gruvbox-light-soft-contrast theme-iceberg-dark theme-iceberg-light theme-jellybeans theme-kanagawa-dragon theme-lucario theme-miasma theme-moonfly theme-night-owl-dark theme-night-owl-light theme-nightfly theme-nightfox theme-nightfox-carbonfox theme-nightfox-dawnfox theme-nightfox-dayfox theme-nightfox-duskfox theme-nightfox-nordfox theme-nightfox-terafox theme-noctis theme-noctis-azureus theme-noctis-bordo theme-noctis-hibernus theme-noctis-lilac theme-noctis-lux theme-noctis-minimus theme-noctis-obscuro theme-noctis-sereno theme-noctis-uva theme-noctis-viola theme-nordic theme-one-half-dark theme-one-half-light theme-panda theme-posterpole theme-posterpole-gray theme-seoul256-dark theme-seoul256-light theme-shades-of-purple theme-shades-of-purple-super-dark theme-sonokai theme-sonokai-andromeda theme-sonokai-atlantis theme-sonokai-espresso theme-sonokai-maia theme-sonokai-shusia theme-srcery theme-tender theme-tokyo-night-moon theme-tokyo-night-storm theme-tomorrow theme-tomorrow-night theme-tomorrow-night-blue theme-tomorrow-night-bright theme-tomorrow-night-eighties theme-zenbones-duckbones theme-zenbones-forestbones-dark theme-zenbones-forestbones-light theme-zenbones-kanagawabones theme-zenbones-neobones-dark theme-zenbones-neobones-light theme-zenbones-nordbones theme-zenbones-rosebones-dark theme-zenbones-rosebones-light theme-zenbones-seoulbones-dark theme-zenbones-seoulbones-light theme-zenbones-tokyobones-dark theme-zenbones-tokyobones-light theme-zenbones-vimbones theme-zenbones-zenburned theme-zenbones-zenwritten-dark theme-zenbones-zenwritten-light undo-history reflog lost-work history-rewrite tag-delete settings-quantity conflict-banner merge-editor-card merge-editor merge-editor-full-file home clone clone-hosted clone-hosted-search init tab-picker new-tab workspace-search workspaces workspace-switch workspace-edit radar review-overview review-files local-issues issue-board review-ai lfs-menu)
+ALL_SHOTS=(hero about about-crates failure-card activity-log activity-log-repository compare-cards log-mermaid sparse-checkout palette palette-settings theme-picker log-graph log-columns-menu log-changes-column context-menu diff diff-split blame blame-card file-history file-history-blame editor editor-encoding-menu editor-eol-menu file-pane-multiselect commit-file-menu commit-column-all commit-column-menu ignore-picker open-with composer ai-explain help help-hosting rebase settings settings-launcher settings-conflict-prevention settings-search settings-profiles settings-ssh settings-integrations settings-connect settings-ai settings-ui settings-editor settings-git settings-repo-ai workflow-settings workflow-sidebar workflow-start undo-toolbar pull-push-tooltip settings-keyboard settings-keyboard-conflicts settings-language settings-ai-presets ai-commit-message theme-serie theme-material settings-appearance-theme settings-log-graph-lanes settings-ai-agent settings-open-in settings-open-in-presets open-in-menu theme-dark theme-light theme-catppuccin-latte theme-catppuccin-mocha theme-cyberpunk theme-dracula theme-everforest-dark theme-gruvbox-dark theme-gruvbox-light theme-kanagawa theme-matrix theme-fire theme-fire-light theme-sunset theme-monokai theme-nord theme-one-dark theme-rose-pine theme-solarized-dark theme-solarized-light theme-terminal theme-tokyo-night theme-catppuccin-frappe theme-catppuccin-macchiato theme-kanagawa-lotus theme-one-light theme-rose-pine-dawn theme-rose-pine-moon theme-tokyo-night-day theme-vesper theme-github-dark theme-github-light theme-vscode-dark theme-vscode-light theme-apprentice theme-ayu-dark theme-ayu-light theme-ayu-mirage theme-cobalt2 theme-deus theme-dracula-soft theme-everforest-light theme-github-dark-colorblind theme-github-dark-dimmed theme-github-dark-high-contrast theme-github-dark-legacy theme-github-light-colorblind theme-github-light-high-contrast theme-github-light-legacy theme-gotham theme-gruvbox-dark-hard-contrast theme-gruvbox-dark-soft-contrast theme-gruvbox-light-hard-contrast theme-gruvbox-light-soft-contrast theme-iceberg-dark theme-iceberg-light theme-jellybeans theme-kanagawa-dragon theme-lucario theme-miasma theme-moonfly theme-night-owl-dark theme-night-owl-light theme-nightfly theme-nightfox theme-nightfox-carbonfox theme-nightfox-dawnfox theme-nightfox-dayfox theme-nightfox-duskfox theme-nightfox-nordfox theme-nightfox-terafox theme-noctis theme-noctis-azureus theme-noctis-bordo theme-noctis-hibernus theme-noctis-lilac theme-noctis-lux theme-noctis-minimus theme-noctis-obscuro theme-noctis-sereno theme-noctis-uva theme-noctis-viola theme-nordic theme-one-half-dark theme-one-half-light theme-panda theme-posterpole theme-posterpole-gray theme-seoul256-dark theme-seoul256-light theme-shades-of-purple theme-shades-of-purple-super-dark theme-sonokai theme-sonokai-andromeda theme-sonokai-atlantis theme-sonokai-espresso theme-sonokai-maia theme-sonokai-shusia theme-srcery theme-tender theme-tokyo-night-moon theme-tokyo-night-storm theme-tomorrow theme-tomorrow-night theme-tomorrow-night-blue theme-tomorrow-night-bright theme-tomorrow-night-eighties theme-zenbones-duckbones theme-zenbones-forestbones-dark theme-zenbones-forestbones-light theme-zenbones-kanagawabones theme-zenbones-neobones-dark theme-zenbones-neobones-light theme-zenbones-nordbones theme-zenbones-rosebones-dark theme-zenbones-rosebones-light theme-zenbones-seoulbones-dark theme-zenbones-seoulbones-light theme-zenbones-tokyobones-dark theme-zenbones-tokyobones-light theme-zenbones-vimbones theme-zenbones-zenburned theme-zenbones-zenwritten-dark theme-zenbones-zenwritten-light undo-history reflog lost-work history-rewrite tag-delete settings-quantity conflict-banner merge-editor-card merge-editor merge-editor-full-file home clone clone-hosted clone-hosted-search init tab-picker new-tab workspace-search workspaces workspace-switch workspace-edit radar review-overview review-files local-issues issue-board review-ai lfs-menu worktrees worktree-menu worktree-create worktree-tab submodules submodule-menu merge-editor-chunk-menu merge-editor-take-both merge-editor-output-edited conflict-file-resolved conflict-commit-merge conflict-banner-rebase merge-editor-deleted-card conflict-banner-continue issues-sidebar issue-conversation issue-reply-composer pr-conversation pr-reply-composer)
 
 # --- helpers shared by the shots -------------------------------------------
 seed_config() {
@@ -96,7 +96,12 @@ start_tui() {
     XDG_DATA_DIRS="$GPD_ROOT/xdg/data" XDG_CONFIG_DIRS="$GPD_ROOT/xdg/config" XDG_CACHE_HOME="$GPD_ROOT/xdg/cache" XDG_STATE_HOME="$GPD_ROOT/xdg/state" \
     "$TUI" -s gpdocs --repo "$1"
   wait_text "main" 30
-  wait_text "docs: design notes" 30 || wait_text "Merge" 5
+  case $1 in
+    *orbit-tools) wait_text "feat(chart): two" 30 ;;
+    *orbit-rebase) wait_text "Rebasing feature" 30 ;;
+    *orbit-conflict) wait_text "Merge in progress" 30 ;;
+    *) wait_text "docs: design" 30 || wait_text "Merge" 5 ;;
+  esac
   GPD_SETTLE=0.8 settle
 }
 stop_tui() { kitty_down; "$CLI" -s gpdocs daemon stop >/dev/null 2>&1 || true; }
@@ -832,4 +837,176 @@ shot_merge-editor-card() {
   # the file on disk is not git's merge text for a binary: take the editor's own start
   screen | grep -qF "edited outside the editor" && { click_text "Start over from the merge" 1 3; sleep 0.8; }
   shot merge-editor-card; esc
+}
+
+# --- worktrees and submodules (own repository: orbit-tools) -----------------------
+# orbit-tools has two linked worktrees, a submodule at a newer commit than the one the
+# repository records (up arrow), one up to date and one declared but not cloned.
+tools_tui() { restart_tui "" "$GPD_ROOT/fx/orbit-tools"; }
+shot_worktrees() {
+  tools_tui
+  GPD_MAXCOL=38 rclick_text "hotfix/axis-labels" 1 2; wait_text "Remove worktree"; esc
+  shot worktrees
+}
+shot_worktree-menu() {
+  tools_tui
+  GPD_MAXCOL=38 rclick_text "hotfix/axis-labels" 1 2; wait_text "Remove worktree"; sleep 0.4
+  shot worktree-menu; esc
+}
+shot_worktree-create() {
+  tools_tui
+  GPD_MAXCOL=38 click_text "WORKTREES (3)" 1 28; wait_text "From the current branch"
+  click_text "From the current branch" 1 3; wait_text "Name after branch"
+  # the proposed names carry a random id: write readable ones
+  key ctrl+a; key BackSpace; text "legend-colors"
+  local p; p=$(find_text "Worktree branch") || die "no branch field"; set -- $p
+  click $(($1 + 20)) "$2"; wait_text "type your own"; text "feature/legend-colors"; wait_text "Use \"feature"; key Return
+  wait_text "new branch from main"; sleep 0.4
+  shot worktree-create; esc; esc
+}
+shot_worktree-tab() {
+  tools_tui
+  GPD_MAXCOL=38 click_text "hotfix/axis-labels" 1 2; key Return
+  wait_text "number the labels"; sleep 0.8
+  shot worktree-tab
+}
+shot_submodules() {
+  tools_tui
+  GPD_MAXCOL=38 click_text "vendor/starfield" 1 3; sleep 0.5
+  shot submodules
+}
+shot_submodule-menu() {
+  tools_tui
+  GPD_MAXCOL=38 rclick_text "vendor/starfield" 1 3; wait_text "Update (clone if needed)"; sleep 0.4
+  shot submodule-menu; esc
+}
+
+# --- more merge conflicts ---------------------------------------------------------
+# conflict_fresh <repo>: the demo repository back in its stopped state (a shot that
+# resolves files must not leave them resolved for the next one), TUI on it.
+conflict_fresh() {
+  local r=$1 pr="$GPD_ROOT/pristine"
+  stop_tui
+  mkdir -p "$pr"
+  if [ -d "$pr/$r" ]; then rm -rf "${GPD_ROOT:?}/fx/$r"; cp -a "$pr/$r" "$GPD_ROOT/fx/$r"; else cp -a "$GPD_ROOT/fx/$r" "$pr/$r"; fi
+  start_tui "$GPD_ROOT/fx/$r"
+}
+open_conflict() { # open_conflict <file>
+  click_text "$1" 1 1; key Return; wait_text "Conflict 1 /" 10; key alt+r; sleep 0.5
+}
+shot_merge-editor-chunk-menu() {
+  conflict_fresh orbit-conflict; open_conflict orbit.rs
+  rclick_text "] Conflict 2" 1 3; wait_text "A then B"; sleep 0.4
+  shot merge-editor-chunk-menu; esc
+}
+shot_merge-editor-take-both() {
+  conflict_fresh orbit-conflict; open_conflict orbit.rs
+  rclick_text "] Conflict 2" 1 3; wait_text "A then B"; click_text "A then B" 1 2; sleep 0.6
+  shot merge-editor-take-both
+}
+# orbit.rs resolved by hand: conflict 1 from A, conflict 2 both, conflict 3 typed in the Output.
+resolve_orbit() {
+  open_conflict orbit.rs
+  rclick_text "] Conflict 1" 1 3; wait_text "Take A only"; click_text "Take A only" 1 2; sleep 0.4
+  rclick_text "] Conflict 2" 1 3; wait_text "A then B"; click_text "A then B" 1 2; sleep 0.4
+  rclick_text "] Conflict 3" 1 3; wait_text "Edit in Output"; click_text "Edit in Output" 1 2; sleep 0.6
+  text "    (1.0 / a).sqrt().max(0.01)"; wait_text "1 edited"; sleep 0.4
+}
+shot_merge-editor-output-edited() {
+  conflict_fresh orbit-conflict; resolve_orbit
+  shot merge-editor-output-edited
+}
+shot_conflict-file-resolved() {
+  conflict_fresh orbit-conflict; resolve_orbit
+  click_text "Save & mark resolved" 1 3; wait_text "1 CONFLICTED" 10; sleep 0.6
+  shot conflict-file-resolved
+}
+shot_conflict-commit-merge() {
+  conflict_fresh orbit-conflict; resolve_orbit
+  click_text "Save & mark resolved" 1 3; wait_text "1 CONFLICTED" 10; sleep 0.6
+  click_text "logo.bin" 1 1; key Return; wait_text "Keep A" 10
+  screen | grep -qF "edited outside the editor" && { click_text "Start over from the merge" 1 3; sleep 0.8; }
+  click_text "Keep A" 1 3; wait_text "Commit merge" 10; sleep 0.6
+  shot conflict-commit-merge
+}
+# A rebase stopped on a text conflict and a deleted-here, changed-there file.
+shot_conflict-banner-rebase() {
+  conflict_fresh orbit-rebase; wait_text "Rebasing feature/cleanup"
+  shot conflict-banner-rebase
+}
+shot_merge-editor-deleted-card() {
+  conflict_fresh orbit-rebase
+  click_text "legacy.md" 1 1; key Return; wait_text "Accept the deletion" 10; sleep 0.5
+  shot merge-editor-deleted-card
+}
+shot_conflict-banner-continue() {
+  conflict_fresh orbit-rebase
+  click_text "legacy.md" 1 1; key Return; wait_text "Accept the deletion" 10
+  click_text "Accept the deletion" 1 3; wait_text "1 CONFLICTED" 10
+  click_text "moons.rs" 1 1; key Return; wait_text "Conflict 1 /" 10
+  key alt+r; sleep 0.4; text a; sleep 0.4   # reset what Return took, then pick A explicitly
+  click_text "Save & mark resolved" 1 3; wait_text "Continue" 10; sleep 0.8
+  shot conflict-banner-continue
+}
+
+# --- conversations (the fake hosting service) --------------------------------------
+# The pull request is merge request !58 of `orbit-co/orbit-docs` (the one project the mock
+# answers in a single page, see `SINGLE_PAGE_PROJECT` in xtask/src/mock_host/review.rs),
+# the issue is #7 of the GitHub side.
+conv_up() {
+  mock_up
+  GPD_CONFIG_EXTRA=$(mock_profiles); export GPD_CONFIG_EXTRA
+  mkdir -p "$GPD_ROOT/fx/orbit/.git/gitpoulpi"
+  printf '[pulls_source]\nintegration = "lab"\nproject = "orbit-co/orbit-docs"\n\n[issues_source]\nintegration = "hub"\nproject = "orbit-co/orbit"\n' \
+    > "$GPD_ROOT/fx/orbit/.git/gitpoulpi/repo-state.toml"
+  review_head
+  restart_tui ""
+}
+conv_down() { lp_unlink; unset GPD_CONFIG_EXTRA; stop_tui; }
+open_issue() { # the conversation of issue #7, from its sidebar row
+  wait_text "Crash when the planet" 20
+  GPD_MAXCOL=38 click_text "Crash when the planet" 1 2; key Return
+  wait_text "Thanks, fixing it" 20; sleep 0.8
+}
+shot_issues-sidebar() {
+  conv_up
+  wait_text "Crash when the planet" 20
+  GPD_MAXCOL=38 rclick_text "Crash when the planet" 1 2; wait_text "Open conversation"; sleep 0.4
+  shot issues-sidebar; esc
+  conv_down
+}
+shot_issue-conversation() {
+  conv_up; open_issue
+  shot issue-conversation
+  conv_down
+}
+shot_issue-reply-composer() {
+  conv_up; open_issue
+  key c; sleep 0.5
+  text "Thanks Ines! I can reproduce it with an empty save file too, **trying a fix** now:"
+  key Return; key Return; text '```rust'; key Return
+  text "assert!(planets().is_empty());"; key Return; text '```'
+  click_text "Split" 1 2; wait_text "trying a fix"; sleep 0.8
+  shot issue-reply-composer
+  conv_down
+}
+open_pr() { # the review of !58, from its sidebar row; the Overview is its conversation
+  wait_text "Add moons" 20
+  GPD_MAXCOL=38 rclick_text "Add moons" 1 2; wait_text "Review..."
+  click_text "Review..." 1 1; wait_text "Review !58" 15; wait_text "Thanks, answering below" 20; sleep 1
+}
+shot_pr-conversation() {
+  conv_up; open_pr
+  key Down; key Down; sleep 0.5
+  shot pr-conversation
+  conv_down
+}
+shot_pr-reply-composer() {
+  conv_up; open_pr
+  key c; sleep 0.5
+  text "Thanks both, it is built once at start-up. I will add a comment saying so."
+  key Return; key Return; text "- [x] answer the thread"; key Return; text "- [ ] add the comment"
+  click_text "Split" 1 2; wait_text "built once at start-up" 10; sleep 0.8
+  shot pr-reply-composer
+  conv_down
 }

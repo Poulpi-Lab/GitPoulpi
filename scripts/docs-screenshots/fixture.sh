@@ -355,6 +355,137 @@ X
 commit "2026-09-03 11:00:00" "$DANA" "feat(orbit): periods in days"
 git merge -q feature/kepler >/dev/null 2>&1 || true
 
+# ------------------------------------- orbit-rebase (a conflicting rebase)
+# A rebase stopped on two conflicts: a text file both sides changed and a file
+# one side deleted while the other changed it (a card, not lines).
+mkdir "$root/orbit-rebase" && cd "$root/orbit-rebase"
+git init -q
+git config user.name "Alice Martin"; git config user.email alice@example.com
+put src/moons.rs <<'X'
+//! Moons.
+
+/// How many moons Mars has.
+pub fn mars() -> u8 {
+    2
+}
+
+/// How many moons Earth has.
+pub fn earth() -> u8 {
+    1
+}
+X
+put docs/legacy.md <<'X'
+# Legacy notes
+
+The first renderer drew every planet as a dot.
+X
+commit "2026-09-02 05:05:00" "$ALICE" "chore: initial commit"
+git switch -q -c feature/cleanup
+put src/moons.rs <<'X'
+//! Moons.
+
+/// How many moons Mars has (two small ones).
+pub fn mars() -> u8 {
+    2
+}
+
+/// How many moons Earth has (just the one).
+pub fn earth() -> u8 {
+    1
+}
+X
+git rm -q docs/legacy.md
+commit "2026-09-03 10:00:00" "$BRUNO" "refactor: drop the legacy notes"
+git switch -q main
+put src/moons.rs <<'X'
+//! Moons.
+
+/// How many moons Mars has: Phobos and Deimos.
+pub fn mars() -> u8 {
+    2
+}
+
+/// How many moons Earth has.
+pub fn earth() -> u8 {
+    1
+}
+X
+put docs/legacy.md <<'X'
+# Legacy notes
+
+The first renderer drew every planet as a dot.
+It was replaced by the ASCII renderer.
+X
+commit "2026-09-03 11:00:00" "$DANA" "docs: say what replaced the first renderer"
+git switch -q feature/cleanup
+git rebase main >/dev/null 2>&1 || true
+
+# ------------------------------- orbit-tools (linked worktrees and submodules)
+# Two linked worktrees and three submodules: one at a newer commit than the
+# repository records, one up to date, one declared but not cloned.
+mkdir "$root/starfield" && cd "$root/starfield"
+git init -q
+git config user.name "Chen Wei"; git config user.email chen@example.com
+put stars.txt <<'X'
+Sirius
+Canopus
+X
+commit "2026-08-20 09:00:00" "$CHEN" "feat: first stars"
+cp -r "$root/starfield" "$root/ephemeris"
+cp -r "$root/starfield" "$root/almanac"
+put stars.txt <<'X'
+Sirius
+Canopus
+Arcturus
+X
+commit "2026-10-05 09:00:00" "$CHEN" "feat: add Arcturus"
+put stars.txt <<'X'
+Sirius
+Canopus
+Arcturus
+Vega
+X
+commit "2026-10-06 09:00:00" "$CHEN" "feat: add Vega"
+# the submodule's checkout at the older commit is what the repository records
+old=$(git rev-parse HEAD~2)
+
+mkdir "$root/orbit-tools" && cd "$root/orbit-tools"
+git init -q
+git config user.name "Alice Martin"; git config user.email alice@example.com
+put README.md <<'X'
+# Orbit tools
+
+Helpers around the simulator.
+X
+commit "2026-09-02 05:05:00" "$ALICE" "chore: initial commit"
+put src/chart.rs <<'X'
+pub fn chart() -> &'static str { "o" }
+X
+commit "2026-09-03 10:00:00" "$BRUNO" "feat(chart): a first chart"
+sm() { git -c protocol.file.allow=always submodule add -q "$@" >/dev/null 2>&1; }
+sm "$root/starfield" vendor/starfield
+git -C vendor/starfield checkout -q "$old"
+sm "$root/ephemeris" vendor/ephemeris
+sm "$root/almanac" vendor/almanac
+git add -A
+commit "2026-09-04 10:00:00" "$ALICE" "chore: vendor the star data"
+git branch feature/legend
+git branch hotfix/axis-labels
+put src/chart.rs <<'X'
+pub fn chart() -> &'static str { "o o" }
+X
+commit "2026-09-05 10:00:00" "$BRUNO" "feat(chart): two bodies"
+git worktree add -q "$root/orbit-tools-legend" feature/legend
+git worktree add -q "$root/orbit-tools-axis-labels" hotfix/axis-labels
+put "$root/orbit-tools-axis-labels/src/axis.rs" <<'X'
+pub fn label(n: u8) -> String { format!("{n}") }
+X
+(cd "$root/orbit-tools-axis-labels" && commit "2026-09-06 10:00:00" "$CHEN" "fix(axis): number the labels")
+# the first submodule moves on to its newest commit; the repository still records the old one
+git -C vendor/starfield checkout -q master 2>/dev/null || git -C vendor/starfield checkout -q main
+# the third one is declared but not cloned
+git submodule deinit -q -f vendor/almanac
+
 # --------------------------------------- a canned "AI" for the screenshots
 cat > "$root/fake-ai.sh" <<'X'
 #!/usr/bin/env bash

@@ -65,7 +65,7 @@ errores), una pestaña Aplicación (el registro de la aplicación, con un cuadro
 un botón **Vaciar registro**) y un cuadro Alcance que limita ambas a este repositorio, a un espacio de
 trabajo o a todos los repositorios. Un número en el botón cuenta los errores que aún no has
 mirado. A su izquierda, el indicador de trabajos muestra un trabajo en segundo plano
-con una `[x]` para cancelarlo. La pestaña **Inicio** tiene la misma barra de estado,
+con una `[x]` para cancelarlo (la lista de trabajos tiene **Cancelar todo**, y la paleta tiene *Tareas: cancelar todo lo que se pueda*; un trabajo que no se puede detener con seguridad dice por qué). La pestaña **Inicio** tiene la misma barra de estado,
 con el botón Actividad abajo a la derecha (se abre en Todos los repositorios). Cuando
 una operación falla, la barra de estado lo dice en rojo; su entrada del Registro de
 actividad explica por qué, ofrece un paso siguiente, los detalles y un Copiar para una IA. Ambos se

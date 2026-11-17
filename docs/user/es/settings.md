@@ -133,7 +133,7 @@ descripción de cada opción de cada página. Haz clic en él, o pulsa `/` o
 opción y su página. `Up` / `Down` eligen, `Enter` va a la opción, `Esc` cierra la
 lista.
 
-![Búsqueda en los Ajustes de «diff»: las opciones coincidentes de las páginas Historial y grafo, Diff y editor y Git](../images/settings-search.png)
+![Búsqueda en los Ajustes de «diff»: las opciones coincidentes de las páginas IA y Diff y editor](../images/settings-search.png)
 
 ## Ajustes desde la paleta de comandos
 
@@ -216,7 +216,7 @@ Actualizar; solo **Crear** (para un acceso directo que aún no existe) y **Quita
 
 **Agrupación en la barra de tareas y el dock.** GitPoulpi se ejecuta dentro de una ventana de terminal, así que la barra de tareas suele mostrarlo bajo el icono del terminal, sin el punto de «en ejecución» bajo el icono de GitPoulpi anclado. Windows: los accesos directos llevan el AppUserModelID `GitPoulpi.GitPoulpi`, y un GitPoulpi iniciado desde uno de ellos da a la ventana de su terminal el mismo ID y su icono (encuentra la ventana poniéndole un instante un título único y luego restaura el título), de modo que la ventana queda bajo el icono de GitPoulpi anclado. Una ventana de terminal con varias pestañas se mueve como un todo: todas sus pestañas se agrupan bajo el icono de GitPoulpi mientras GitPoulpi se ejecuta en ella. Los accesos directos y los anclajes de la barra de tareas creados antes los reescribe la misma sincronización; si un anclaje sigue mostrando el icono del terminal, desancla y vuelve a anclar. Linux: kitty, foot, Alacritty, WezTerm y Ghostty se inician con la clase de ventana `gitpoulpi` y la entrada `.desktop` la nombra (`StartupWMClass`), así que un dock agrupa la ventana bajo el icono del lanzador; los demás terminales conservan su propio icono. macOS: nada que hacer, el Dock agrupa por aplicación.
 
-![Ajustes > Lanzador: el terminal de los accesos directos y la fila del lanzador de aplicaciones](../images/settings-launcher.png)
+![Ajustes > Lanzador: el terminal de los accesos directos, la compilación del lanzador, los alias del comando y de añadir pestaña, el estado de los alias y la comprobación del PATH](../images/settings-launcher.png)
 
 #### Alias del comando y PATH, según el sistema
 
@@ -417,7 +417,7 @@ las compilaciones que incluyen el servidor; consulta [MCP y agentes](mcp-and-age
 
 ### Apariencia
 
-![La página Apariencia: tema, avatares, color de entrada, profundidad de color y colores del grafo (los formatos de fecha van debajo)](../images/settings-ui.png)
+![La página Apariencia desplazada hacia abajo: fuentes y avatar de reserva, color de entrada, profundidad de color, cursor de texto y el inicio de los colores del grafo (los formatos de fecha van debajo)](../images/settings-ui.png)
 
 ![El combo Tema abierto en Apariencia con Claro resaltado: toda la pantalla de Ajustes ya se repinta con ese tema](../images/settings-appearance-theme.png)
 

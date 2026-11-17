@@ -123,6 +123,7 @@ PATH, 바로 가기에 대해 묻습니다.
 | **MSI** (Windows, 관리형) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | 관리자용: 모든 사용자, 앱 내 업데이트 없음. [엔터프라이즈 배포](enterprise-distribution.md#msi-intune-또는-그룹-정책)를 참고하세요. |
 | **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (또는 `paru -S gitpoulpi-bin`) | 도우미가 없으면: `git clone https://aur.archlinux.org/gitpoulpi-bin.git` 다음 `cd gitpoulpi-bin && makepkg -si`. |
 | **cargo** | `cargo binstall gitpoulpi-cli` | 컴파일하지 않고 릴리스 아카이브를 내려받습니다. |
+| **cargo, crates.io에서** | `cargo install --locked gitpoulpi-cli` | 컴파일합니다. Rust 툴체인이 필요합니다. 하위 명령 없이 실행하면 터미널 UI를 여는 `gitpoulpi`를 설치하며, MCP(`gitpoulpi mcp`)도 제공합니다. `gitpoulpi-tui`와 `gitpoulpi-mcp`는 같은 프로그램을 독립 크레이트로 낸 것입니다. |
 | **cargo, 소스에서** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | 컴파일합니다. Rust 툴체인이 필요합니다. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | [Docker에서 실행하기](docker.md)를 참고하세요. 같은 이미지가 `ghcr.io/poulpi-lab/gitpoulpi`에도 있습니다. |
 

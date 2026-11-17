@@ -512,6 +512,14 @@ stage_file = "z"
 | `default_remote` | ワンクリックの Push/Pull/Fetch が使うリモート | リモートのメニュー、`gitpoulpi remote default <name>` |
 | `hosting_integration` | ここに固定された `[[integrations]]` のプロファイル | `gitpoulpi hosting use --id` |
 | `pulls_source`、`issues_source` | PR / Issue の一覧が読むプロバイダーのプロジェクトで、`{ integration, project, filter }` の形です。`filter` は省略可能で、プロバイダー固有の追加条件（Jira の JQL の断片、Azure の WIQL の条件、Trello のリスト名）を一覧のクエリに AND で加えます。GitHub と GitLab は無視します。 | サイドバーのセクション、`gitpoulpi hosting link` |
+| `[preferences] merge_fast_forward` | ここでの `git.merge_fast_forward` を上書きします：`never`、`allowed`、`only` | 設定 > リポジトリ別の設定 > merge オプション |
+| `[preferences] default_push_targets` | 新しいブランチが追加で push するリモートで、ブランチが最初に upstream を持つときにブランチへコピーされます | 設定 > リポジトリ別の設定 > Git とエンコード。[複数のリモート](multiple-remotes.md)を参照 |
+| `[preferences.ai_review]`、`[preferences.ai_hosting_reply]` | `[ai.review]` と `[ai.hosting_reply]` の各キーに対する、このリポジトリ独自の値です。省略したキーはグローバルの値を引き継ぎます | 設定 > リポジトリ別の設定 > AI |
+| `hosting_post_as`、`hosting_identity` | このリポジトリで、ホストへのメッセージの投稿者として使う名前（`general.hosting_post_as` を上書き）と、未設定のときに bot トークンで最初に投稿したメッセージから GitPoulpi が学習するログイン名 | 設定 > リポジトリ別の設定 > SSH と認証情報。[会話](conversations.md#投稿者名)を参照 |
+| `assignment_blocked` | このリポジトリの Issue と PR で、GitPoulpi からは何も割り当てられません | `gitpoulpi hosting assignment --block \| --allow` |
+| `board_labels` | ワークフローを持たないホストで、Issue ボードの列になるラベルを、ボードの順に並べたもの | ボードの**列**ボタン |
+| `conversation_seen`、`conversation_events`、`posted_comment_ids` | 各会話の最後に読んだ位置（それ以降は未読）、システムイベントを表示するかどうか、このインストールが投稿したコメント（bot が編集または削除できるもの） | 会話ビューが書き込みます |
+| `reviews` | アプリ内レビューのリクエストごとのローカルな状態：保留中のコメント、閲覧済みのファイル | レビュービューが書き込みます |
 | `ref_visibility` | 非表示 / ソロ表示の参照 | Refs サイドバー、`gitpoulpi refs hide\|show\|solo` |
 | `hidden_remotes` | グラフからまるごと非表示にしたリモート（すべてのブランチ。あとで fetch したものも） | リモートの ⊙ とメニュー、`gitpoulpi refs hide --remote` |
 | `folds`、`collapsed_*_ref_folders` | 折りたたんだサイドバーのセクションと、ブランチおよびタグのフォルダー。`[folds]` には、`status_folders`（Unstaged / Staged のファイルツリーの折りたたんだフォルダー）と `commit_folders`（commit の変更ファイルツリーの折りたたんだフォルダーで、すべての commit で共通）も含まれ、それぞれ最大 500 パスで、古いものから捨てられます | サイドバー、ファイルツリー |

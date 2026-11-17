@@ -118,6 +118,7 @@ OS と CPU に合ったアーカイブを選び、`.sha256` を確認して、`~
 | **MSI**（Windows、管理対象） | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | 管理者向け：全ユーザー、アプリ内更新なし。[エンタープライズ配布](enterprise-distribution.md#intune-またはグループポリシーでの-msi)を参照。 |
 | **AUR**（Arch Linux） | `yay -S gitpoulpi-bin`（または `paru -S gitpoulpi-bin`） | ヘルパーがない場合：`git clone https://aur.archlinux.org/gitpoulpi-bin.git` の後に `cd gitpoulpi-bin && makepkg -si`。 |
 | **cargo** | `cargo binstall gitpoulpi-cli` | コンパイルせず、リリースアーカイブをダウンロードします。 |
+| **cargo（crates.io から）** | `cargo install --locked gitpoulpi-cli` | コンパイルします。Rust ツールチェーンが必要です。`gitpoulpi` をインストールし、サブコマンドなしで実行すると端末 UI が開き、MCP（`gitpoulpi mcp`）も提供します。`gitpoulpi-tui` と `gitpoulpi-mcp` は、同じプログラムを単独のクレートにしたものです。 |
 | **cargo（ソースから）** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | コンパイルします。Rust ツールチェーンが必要です。 |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | [Docker で実行する](docker.md)を参照。同じイメージは `ghcr.io/poulpi-lab/gitpoulpi` にもあります。 |
 

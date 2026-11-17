@@ -26,10 +26,31 @@ przechodź wtedy, gdy będą potrzebne.
 3. **[Przewodnik po interfejsie](interface-tour.md)**: nazwa każdego obszaru
    okna, z obrazkami.
 
+## Znajdź funkcję
+
+| Chcę... | Strona | Jak do niej dojść w aplikacji |
+|---|---|---|
+| Pracować na dwóch gałęziach naraz | [Worktree](worktrees.md) | Sekcja **WORKTREES** panelu Refs (`+` tworzy worktree; ukryta, dopóki żaden nie istnieje: paleta **Panel boczny: Pokaż sekcję worktree**); paleta **Refs: Utwórz worktree...** |
+| Pracować z zagnieżdżonymi repozytoriami | [Submoduły](submodules.md) | Sekcja **SUBMODUŁY** panelu Refs; paleta **Git: Aktualizuj wszystkie submoduły**, **Refs: Aktualizuj submoduł (zaznaczony)** |
+| Rozwiązać konflikt merge | [Rozwiązywanie konfliktów merge](merge-conflicts.md) | `Enter` na wierszu `!` panelu Status, przycisk banera **Rozwiąż konflikty...** albo `Shift+E` w widoku Diff; paleta **Konflikty: Otwórz edytor merge** |
+| Zrecenzować pull lub merge request | [Przegląd pull lub merge requesta](review.md) | `Enter` na wierszu sekcji **PULL REQUESTS**, `e` na wierszu Radaru, `Alt+R` w wyszukiwaniu obszaru roboczego; paleta **Hosting: Review Request...** |
+| Przeglądać, tworzyć i obsługiwać pull requesty i zgłoszenia | [Pull requesty i zgłoszenia](pull-requests-and-issues.md) | Sekcje **PULL REQUESTS** i **ZGŁOSZENIA** panelu Refs (`n` tworzy nowy element); paleta **Pull requesty: Utwórz pull request...**, **Hosting: Nowe zgłoszenie...**. Najpierw połącz konto: [Hosting i trackery zgłoszeń](hosting-integration.md) |
+| Czytać i odpowiadać w dyskusji zgłoszenia lub żądania | [Rozmowy](conversations.md) | `Enter` na wierszu zgłoszenia, karcie tablicy lub wierszu Radaru; paleta **Hosting: Otwórz rozmowę zgłoszenia...** |
+| Zobaczyć swoje zgłoszenia jako tablicę | [Tablica zgłoszeń](pull-requests-and-issues.md#tablica-zgłoszeń) | Przycisk **Tablica** w nagłówku ZGŁOSZENIA; paleta **Zgłoszenia: Otwórz tablicę** |
+| Trzymać zgłoszenia jako notatki Markdown, bez tokenu | [Zgłoszenia lokalne i Obsidian](local-issues.md) | Sekcja ZGŁOSZENIA, dostawca `Local Markdown - <nazwa>`; paleta **Zgłoszenia lokalne: Otwórz w Obsidian...** |
+| Przepisać autorów, daty, komunikaty lub pliki w wielu commitach | [Przepisywanie historii](history-rewrite.md) | `Ctrl+G Shift+H`; paleta **Przepisanie: Warsztat historii** |
+| Cofnąć (lub ponowić) operację | [Cofnij i ponów](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`; `Alt+Z` otwiera historię cofania; paleta **Edycja: Cofnij** |
+| Śledzić duże pliki przez Git LFS | [Git LFS](lfs.md) | Paleta **LFS: Śledź wzorzec...**, **LFS: Zainicjuj dla tego repozytorium** |
+| Znaleźć gałąź, commit, pull request lub zgłoszenie w wielu repozytoriach | [Wyszukiwanie](search.md) | `Ctrl+Alt+F` albo przycisk Szukaj wszędzie na pasku tytułu; `f` przeszukuje graf commitów bieżącego repozytorium |
+| Zobaczyć wszystko, co na mnie czeka, w jednej liście | [Radar](radar.md) | `Alt+R`; paleta **Radar: Otwórz** |
+| Pogrupować repozytoria i pobierać je lub aktualizować razem | [Obszary robocze](workspaces.md) | `Alt+W` przełącza, `Alt+J` otwiera kartę Obszary robocze; paleta **Obszar roboczy: Zarządzaj...** |
+| Dostać pomoc AI (komunikaty commitów, wyjaśnienia, opisy) | [Wsparcie AI](ai.md) | `Ctrl+,` > **AI** > **Włącz AI**, potem `Ctrl+G i` pisze komunikat commita; paleta **AI: ...** |
+| Znaleźć dowolne polecenie lub klawisz | [Skróty klawiszowe](keybindings.md) | `?` w aplikacji wyświetla klawisze, `Ctrl+P` znajduje dowolne polecenie |
+
 ## Codzienna praca
 
 4. **[Praca z Logiem](log-and-history.md)**: czytanie grafu, wyszukiwanie,
-   gałęzie, tagi, stashe, worktree, przeciąganie refów, rebase, cherry-pick,
+   gałęzie, tagi, stashe, przeciąganie refów, rebase, cherry-pick,
    reword i poprawianie commitów, banery, pull i push, auto-stash.
 5. **[Stage i commity](staging-and-committing.md)**: zmiany robocze, diffy,
    stage hunków i pojedynczych linii, pisanie commitów, kompozytor commitów,
@@ -40,39 +61,46 @@ przechodź wtedy, gdy będą potrzebne.
    obok siebie nad Wynikiem), wybieranie linii i fragmentów, karty dla
    konfliktów plików binarnych, LFS, usuniętych, dowiązań symbolicznych
    i submodułów oraz sposób, w jaki agent proponuje rozwiązanie.
-8. **[Cofnij i ponów](undo-redo.md)**: `Ctrl+Z` / `Ctrl+Y`, co można,
-   a czego nie można cofnąć, kiedy odmawia lub pyta, jak daleko sięga
-   i jak je wyłączyć.
-9. **[Git LFS](lfs.md)**: duże pliki, śledzenie, blokady i co się dzieje bez
-   zainstalowanego `git-lfs`.
-10. **[Submoduły](submodules.md)**: sekcja SUBMODUŁY, ich aktualizowanie
-    i utrzymywanie w zgodzie z checkoutami i pullami.
-11. **[Motywy](themes.md)**: wbudowane motywy, dowolny motyw z dowolną paletą
+8. **[Worktree](worktrees.md)**: drugi wyewidencjonowany folder na innej gałęzi:
+   sekcja WORKTREES, tworzenie, otwieranie, scalanie i usuwanie powiązanych
+   worktree.
+9. **[Submoduły](submodules.md)**: sekcja SUBMODUŁY, ich aktualizowanie
+   i utrzymywanie w zgodzie z checkoutami i pullami.
+10. **[Cofnij i ponów](undo-redo.md)**: `Ctrl+Z` / `Ctrl+Y`, co można,
+    a czego nie można cofnąć, kiedy odmawia lub pyta, jak daleko sięga
+    i jak je wyłączyć.
+11. **[Git LFS](lfs.md)**: duże pliki, śledzenie, blokady i co się dzieje bez
+    zainstalowanego `git-lfs`.
+12. **[Motywy](themes.md)**: wbudowane motywy, dowolny motyw z dowolną paletą
     linii, podgląd na żywo, własne pliki motywów, `gitpoulpi theme`.
-12. **[Obszary robocze](workspaces.md)**: nazwane grupy repozytoriów z własnymi
+13. **[Obszary robocze](workspaces.md)**: nazwane grupy repozytoriów z własnymi
     kartami i opcjonalnym domyślnym profilem commitów, plakietka na pasku kart,
     karta Obszary robocze, Fetch wszystkich, Pull wszystkich,
     Klonuj brakujące.
-13. **[Wyszukiwanie](search.md)**: jedna przeszukiwarka (`Ctrl+Alt+F`) gałęzi,
+14. **[Wyszukiwanie](search.md)**: jedna przeszukiwarka (`Ctrl+Alt+F`) gałęzi,
     tagów, worktree, stashy, commitów, pull/merge requestów i zgłoszeń każdego
     repozytorium obszaru roboczego lub otwartych kart.
-14. **[Radar](radar.md)**: pull/merge requesty, zgłoszenia i praca
+15. **[Radar](radar.md)**: pull/merge requesty, zgłoszenia i praca
     w toku z obszaru roboczego (albo z otwartych kart) na jednej liście: filtry,
     przypięcia, odłożenia i to, co może każdy wiersz.
-    Czytanie i przegląd jednego z tych requestów w aplikacji, z wątkami
-    komentarzy, oczekującym przeglądem i Zaakceptuj / Zażądaj zmian:
-    **[Przegląd pull lub merge requesta](review.md)**.
-15. **[Otwórz w](open-in.md)**: lista na pasku tytułu, która otwiera folder
+16. **[Pull requesty i zgłoszenia](pull-requests-and-issues.md)**: sekcje
+    PULL REQUESTS i ZGŁOSZENIA panelu bocznego, tablica zgłoszeń, tworzenie
+    pull requesta lub zgłoszenia, znacznik na pasku narzędzi, odwołania
+    w opisach commitów.
+17. **[Rozmowy](conversations.md)**: czytanie i odpowiadanie w dyskusji
+    zgłoszenia lub żądania w oknie, publikowanie jako oraz to, czego nie
+    potrafi każdy host.
+18. **[Przegląd pull lub merge requesta](review.md)**: widok przeglądu z wątkami
+    komentarzy, oczekującym przeglądem i Zaakceptuj / Zażądaj zmian.
+19. **[Otwórz w](open-in.md)**: lista na pasku tytułu, która otwiera folder
     aktywnej karty w terminalu, multiplekserze, edytorze lub menedżerze
     plików.
-16. **[Podążanie za folderem aktywnej karty](following-the-tab-folder.md)**:
+20. **[Podążanie za folderem aktywnej karty](following-the-tab-folder.md)**:
     „Zakończ i cd tutaj” oraz wrapper `gitpoulpi shell-init` (`gp`) dla bash,
     zsh, fish i PowerShell.
     Który terminal pokazuje GitPoulpi najlepiej: **[Wybór terminala](terminals.md)**.
     Co przechodzi przez tmux, zellij, screen, herdr i panele terminala:
     **[Multipleksery](multiplexers.md)**.
-
-Także: **[Worktree](worktrees.md)**: tworzenie, otwieranie, scalanie i usuwanie powiązanych worktree.
 
 Także: **[Kilka zdalnych dla jednej gałęzi](multiple-remotes.md)**: cele push i źródła pull,
 okno Zdalne gałęzi, Push do wszystkich lub do wybranych zdalnych, rozstrzyganie zdalnego,
@@ -88,32 +116,32 @@ skryptami Lua i jednym cofnięciem.
 
 ## Klawiatura i mysz
 
-17. **[Skróty klawiszowe](keybindings.md)**: każdy klawisz, według obszaru,
+21. **[Skróty klawiszowe](keybindings.md)**: każdy klawisz, według obszaru,
     oraz każde polecenie palety. W aplikacji `?` pokazuje tę samą listę,
     a `Ctrl+P` znajduje dowolne polecenie.
-18. **[Mysz i gesty](mouse-and-gestures.md)**: klikanie, przeciąganie,
+22. **[Mysz i gesty](mouse-and-gestures.md)**: klikanie, przeciąganie,
     zaznaczanie i kopiowanie, paski przewijania i reakcje na najechanie.
 
 ## Ustawienia i integracje
 
-19. **[Ustawienia](settings.md)**: każda strona i opcja ekranu Ustawień,
+23. **[Ustawienia](settings.md)**: każda strona i opcja ekranu Ustawień,
     pole wyszukiwania, profile i zmiana przypisań skrótów.
-20. **[Wsparcie AI](ai.md)**: własne AI GitPoulpi (domyślnie wyłączone):
+24. **[Wsparcie AI](ai.md)**: własne AI GitPoulpi (domyślnie wyłączone):
     lokalny agent taki jak `claude -p`, Anthropic, OpenAI, OpenRouter, Ollama
     lub LM Studio; instrukcje; opisy commitów, wyjaśnienia, opisy pull
     requestów i kompozytor commitów; prywatność i rozwiązywanie problemów.
-21. **[Hosting i trackery zgłoszeń](hosting-integration.md)**: GitHub, GitLab, Gitea i Forgejo,
+25. **[Hosting i trackery zgłoszeń](hosting-integration.md)**: GitHub, GitLab, Gitea i Forgejo,
     Azure DevOps, Bitbucket, Gerrit oraz trackery zgłoszeń:
-    tokeny i ich zakresy, łączenie, powiązanie repozytorium, pull requesty
-    i zgłoszenia, odwołania w opisach commitów, klucze SSH, znane ograniczenia.
+    tokeny i ich zakresy, łączenie, powiązanie repozytorium, klucze SSH,
+    znane ograniczenia.
     Także **[Zgłoszenia lokalne i Obsidian](local-issues.md)**: folder notatek
     Markdown jako źródło zgłoszeń, bez tokenu, z Obsidian Base.
 
 ## Automatyzacja
 
-22. **[Opis CLI](cli-reference.md)**: każde polecenie `gitpoulpi`, z `--json`
+26. **[Opis CLI](cli-reference.md)**: każde polecenie `gitpoulpi`, z `--json`
     dla skryptów.
-23. **[MCP i agenci](mcp-and-agents.md)**: pozwól zewnętrznemu agentowi (Claude
+27. **[MCP i agenci](mcp-and-agents.md)**: pozwól zewnętrznemu agentowi (Claude
     Code, Cursor, Codex, ...) sterować GitPoulpi: rejestracja serwera,
     `.mcp.json`, przełączniki uprawnień i ich wartości domyślne, każde
     narzędzie oraz sposób, w jaki agent coś pokazuje w oknie.
@@ -122,10 +150,10 @@ skryptami Lua i jednym cofnięciem.
 
 ## Dokumentacja referencyjna i pomoc
 
-24. **[Opis konfiguracji](config-reference.md)**: każdy klucz `config.toml`,
+28. **[Opis konfiguracji](config-reference.md)**: każdy klucz `config.toml`,
     jego wartość domyślna i działanie, ustawienia poszczególnych repozytoriów,
     zmienne środowiskowe.
-25. **[Rozwiązywanie problemów i FAQ](troubleshooting.md)**: ikony,
+29. **[Rozwiązywanie problemów i FAQ](troubleshooting.md)**: ikony,
     renderowanie grafu, klawisze, które nie docierają, zawieszone demony,
     szybkość, wskaźniki LFS.
 

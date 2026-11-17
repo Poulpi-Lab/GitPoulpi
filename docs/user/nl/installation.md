@@ -127,6 +127,7 @@ Elk kanaal hieronder schrijft dezelfde markering `.gitpoulpi-dist` naast de prog
 | **MSI** (Windows, beheerd) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Voor beheerders: alle gebruikers, geen updates vanuit de app. Zie [Distributie voor organisaties](enterprise-distribution.md#msi-met-intune-of-groepsbeleid). |
 | **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (of `paru -S gitpoulpi-bin`) | Zonder helper: `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, dan `cd gitpoulpi-bin && makepkg -si`. |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Downloadt het releasearchief in plaats van te compileren. |
+| **cargo, vanuit crates.io** | `cargo install --locked gitpoulpi-cli` | Compileert; heeft een Rust-toolchain nodig. Installeert `gitpoulpi`, dat de terminal-UI opent als je het zonder subcommando start en ook MCP aanbiedt (`gitpoulpi mcp`). `gitpoulpi-tui` en `gitpoulpi-mcp` zijn dezelfde programma's als losse crates. |
 | **cargo, vanuit de broncode** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Compileert; heeft een Rust-toolchain nodig. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | Zie [GitPoulpi in Docker draaien](docker.md). Dezelfde image staat op `ghcr.io/poulpi-lab/gitpoulpi`. |
 

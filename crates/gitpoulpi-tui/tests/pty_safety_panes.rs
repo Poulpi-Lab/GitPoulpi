@@ -652,3 +652,24 @@ fn the_action_buttons_show_their_letters() {
     });
     rig.term.stop().unwrap();
 }
+
+/// Rule 13: a narrow Undo history keeps every action button of the Reflog
+/// tab (labels clipped with an ellipsis, none dropped), and the clipped
+/// Close still closes the dialog.
+#[test]
+fn a_narrow_reflog_keeps_every_action_button_and_close_still_works() {
+    let mut rig = launch(reflog_repo(), "pty-panes-narrow-buttons", "");
+    open_reflog(&mut rig);
+    rig.term.resize(64, 40).expect("shrink the window");
+    let screen = wait(&mut rig.term, "the button row, clipped but whole", |s| {
+        s.text()
+            .lines()
+            .any(|l| l.matches('\u{2026}').count() >= 5 && l.contains("Clo"))
+    });
+    let (col, row) = screen.find("Clo").expect("the Close button");
+    rig.term.click(col + 1, row).expect("click Close");
+    wait(&mut rig.term, "the dialog closed", |s| {
+        !s.contains("can be undone") && !s.contains("Undo history")
+    });
+    rig.term.stop().unwrap();
+}

@@ -643,6 +643,10 @@ pub(crate) fn command_unavailable_from(
 pub(crate) struct ToolbarChip {
     /// The label, without padding: `GL !53`, `+ PR`.
     pub(crate) text: String,
+    /// The label one step narrower (`● #12`, `+`); empty: none.
+    pub(crate) short: String,
+    /// The icon alone (the state glyph, `+`); empty: none.
+    pub(crate) icon: String,
     /// Resting colors; hovered, the strong plain-button fill takes over.
     pub(crate) fg: Color,
     pub(crate) bg: Option<Color>,

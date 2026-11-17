@@ -252,6 +252,8 @@ fn draw_toolbar_placed(
 fn linked_chip() -> ToolbarChip {
     ToolbarChip {
         text: "GL !53".to_string(),
+        short: "\u{25CF} !53".to_string(),
+        icon: "\u{25CF}".to_string(),
         fg: Color::Rgb(20, 22, 30),
         bg: Some(th().refs.local),
         hit: HostingHit::LinkedPrChip,
@@ -338,6 +340,8 @@ fn hovering_the_chip_uses_the_strong_fill_and_resting_uses_its_state_color() {
     // The dim `+ PR` chip has no fill at rest.
     let new_pr = ToolbarChip {
         text: "+ PR".to_string(),
+        short: String::new(),
+        icon: String::new(),
         fg: th().ui.muted,
         bg: None,
         hit: HostingHit::NewPrChip,
@@ -380,11 +384,45 @@ fn the_chip_outlasts_the_buttons_and_gives_way_only_when_nothing_would_fit() {
     let (text, _, toolbar) = draw_toolbar_with_chip(56, None, Some(&chip));
     assert!(text.contains('\u{22EF}'), "{text:?}");
     assert!(toolbar.overflow.is_some());
-    let (_, _, toolbar) = draw_toolbar_with_chip(20, None, Some(&chip));
+    let (_, _, toolbar) = draw_toolbar_with_chip(19, None, Some(&chip));
     assert!(!toolbar
         .hits
         .iter()
         .any(|(_, t)| matches!(t, HitTarget::Hosting(_))));
+}
+
+/// Rule 13: the chip steps down (full label, short label, icon alone) before
+/// the `⋯` menu takes it, and every step stays clickable.
+#[test]
+fn the_pr_chip_steps_down_before_it_goes_to_the_overflow_menu() {
+    let chip = linked_chip();
+    let hit = |width: u16| {
+        let (text, _, tb) =
+            draw_toolbar_placed(width, None, Some(&chip), ToolbarPlacement::default());
+        let rect = tb
+            .hits
+            .iter()
+            .find(|(_, t)| *t == HitTarget::Hosting(HostingHit::LinkedPrChip))
+            .map(|(r, _)| *r);
+        (text, rect, tb.overflow.is_some())
+    };
+    let (text, rect, _) = hit(25);
+    let r = rect.expect("full label");
+    assert_eq!(r.width, 8, "{text:?}");
+    let (text, rect, _) = hit(24);
+    let r = rect.expect("short label");
+    assert_eq!(r.width, 7, "{text:?}");
+    let painted: String = text
+        .chars()
+        .skip(r.x as usize)
+        .take(r.width as usize)
+        .collect();
+    assert_eq!(painted, " \u{25CF} !53 ");
+    let (text, rect, _) = hit(20);
+    let r = rect.expect("icon alone");
+    assert_eq!(r.width, 3, "{text:?}");
+    let (_, rect, overflow) = hit(19);
+    assert!(rect.is_none() && overflow, "the menu takes it last");
 }
 
 /// A chip with no room is not lost: the `⋯` menu lists it, first, and
@@ -395,6 +433,8 @@ fn a_squeezed_chip_moves_into_the_overflow_menu_at_every_width() {
         linked_chip(),
         ToolbarChip {
             text: "+ PR".to_string(),
+            short: String::new(),
+            icon: String::new(),
             fg: th().ui.muted,
             bg: None,
             hit: HostingHit::NewPrChip,
@@ -863,6 +903,8 @@ fn the_pinned_chip_takes_the_bottom_row_and_a_flowing_one_leads_the_group() {
 fn a_long_chip_text_is_clipped_to_the_column() {
     let chip = ToolbarChip {
         text: "GL !53 a very long merge request title".to_string(),
+        short: String::new(),
+        icon: String::new(),
         ..linked_chip()
     };
     let (buf, tb, area) = draw_column(30, Some(&chip), ToolbarEnabled::ALL, left_place(), None);

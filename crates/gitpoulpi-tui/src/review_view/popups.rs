@@ -13,6 +13,7 @@ use ratatui::layout::Rect;
 use ratatui::style::Style;
 
 use crate::combo::{Combo, ComboOption};
+use crate::dialog_kit::button_row::Btn;
 use crate::dialog_kit::{self, ButtonState};
 use crate::keymap::Action as Bind;
 use crate::md_editor::{KeyUse, MdEditor, MouseUse};
@@ -296,34 +297,36 @@ impl ComposeBox {
         } else {
             msg::SAVE_COMMENT.get()
         };
-        let submit_w = dialog_kit::button_width(submit_label);
-        let cancel_w = dialog_kit::button_width(cancel_label);
-        let submit_x = inner.right().saturating_sub(submit_w);
-        let cancel_x = submit_x.saturating_sub(cancel_w + 1);
-        let cancel = dialog_kit::button(
+        let [cancel, submit] = dialog_kit::button_row::paint(
             buf,
-            cancel_x,
+            inner.right(),
             button_y,
-            cancel_label,
-            ButtonState::Normal {
-                hovered: self.hover == Some(ComposePart::Cancel),
-                focused: self.focus == ComposePart::Cancel,
-            },
-        );
-        let submit = dialog_kit::button(
-            buf,
-            submit_x,
-            button_y,
-            submit_label,
-            if self.md.is_blank() {
-                ButtonState::Disabled
-            } else {
-                ButtonState::Primary {
-                    hovered: self.hover == Some(ComposePart::Submit),
-                    focused: self.focus == ComposePart::Submit,
-                }
-            },
-        );
+            inner.width,
+            0,
+            &[
+                Btn {
+                    label: cancel_label,
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(ComposePart::Cancel),
+                        focused: self.focus == ComposePart::Cancel,
+                    },
+                },
+                Btn {
+                    label: submit_label,
+                    state: if self.md.is_blank() {
+                        ButtonState::Disabled
+                    } else {
+                        ButtonState::Primary {
+                            hovered: self.hover == Some(ComposePart::Submit),
+                            focused: self.focus == ComposePart::Submit,
+                        }
+                    },
+                },
+            ],
+        )[..] else {
+            unreachable!("two buttons in, two rects out")
+        };
+        let cancel_x = cancel.x;
         hits.push((submit, ComposePart::Submit));
         hits.push((cancel, ComposePart::Cancel));
         let key = dialog_kit::key_label(Bind::MdEditorSubmit);
@@ -893,17 +896,20 @@ impl FinishDialog {
         );
         if self.ai_summary.is_some() {
             let label = format!("{} {}", crate::theme::AI_SPARK, ai_msg::USE_SUMMARY.get());
-            let w = dialog_kit::button_width(&label);
-            let rect = dialog_kit::button(
+            let rect = dialog_kit::button_row::paint(
                 buf,
-                inner.right().saturating_sub(w),
+                inner.right(),
                 y,
-                &label,
-                ButtonState::Normal {
-                    hovered: self.hover == Some(FinishPart::UseSummary),
-                    focused: self.focus == FinishPart::UseSummary,
-                },
-            );
+                inner.width.min(dialog_kit::button_width(&label)),
+                0,
+                &[Btn {
+                    label: &label,
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(FinishPart::UseSummary),
+                        focused: self.focus == FinishPart::UseSummary,
+                    },
+                }],
+            )[0];
             hits.push((rect, FinishPart::UseSummary));
         }
         y += 1;
@@ -982,50 +988,49 @@ impl FinishDialog {
         // Buttons, right to left: Submit, Cancel, then Discard on the left.
         let submit_label = msg::SUBMIT_REVIEW.get();
         let cancel_label = msg::CANCEL.get();
-        let submit_w = dialog_kit::button_width(submit_label);
-        let cancel_w = dialog_kit::button_width(cancel_label);
-        let submit_x = inner.right().saturating_sub(submit_w);
-        let cancel_x = submit_x.saturating_sub(cancel_w + 1);
-        let submit = dialog_kit::button(
-            buf,
-            submit_x,
-            button_y,
-            submit_label,
-            if self.busy || self.blocked().is_some() {
-                ButtonState::Disabled
-            } else {
-                ButtonState::Primary {
-                    hovered: self.hover == Some(FinishPart::Submit),
-                    focused: self.focus == FinishPart::Submit,
-                }
+        let discard_item = [Btn {
+            label: msg::DISCARD_REVIEW.get(),
+            state: ButtonState::Normal {
+                hovered: self.hover == Some(FinishPart::Discard),
+                focused: self.focus == FinishPart::Discard,
             },
-        );
-        let cancel = dialog_kit::button(
+        }];
+        let (left_rects, right_rects) = dialog_kit::button_row::paint_split(
             buf,
-            cancel_x,
+            inner.x,
             button_y,
-            cancel_label,
-            ButtonState::Normal {
-                hovered: self.hover == Some(FinishPart::Cancel),
-                focused: self.focus == FinishPart::Cancel,
-            },
+            inner.width,
+            if self.pending > 0 { &discard_item } else { &[] },
+            &[
+                Btn {
+                    label: cancel_label,
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(FinishPart::Cancel),
+                        focused: self.focus == FinishPart::Cancel,
+                    },
+                },
+                Btn {
+                    label: submit_label,
+                    state: if self.busy || self.blocked().is_some() {
+                        ButtonState::Disabled
+                    } else {
+                        ButtonState::Primary {
+                            hovered: self.hover == Some(FinishPart::Submit),
+                            focused: self.focus == FinishPart::Submit,
+                        }
+                    },
+                },
+            ],
         );
+        let (cancel, submit) = (right_rects[0], right_rects[1]);
+        let cancel_x = cancel.x;
         hits.insert(0, (cancel, FinishPart::Cancel));
         hits.insert(0, (submit, FinishPart::Submit));
         let mut left = inner.x;
-        if self.pending > 0 {
-            let discard = dialog_kit::button(
-                buf,
-                inner.x,
-                button_y,
-                msg::DISCARD_REVIEW.get(),
-                ButtonState::Normal {
-                    hovered: self.hover == Some(FinishPart::Discard),
-                    focused: self.focus == FinishPart::Discard,
-                },
-            );
+        if let Some(discard) = left_rects.first() {
+            // Narrow: Discard may sit left of Cancel in the one right-aligned row.
             left = discard.right() + 1;
-            hits.insert(0, (discard, FinishPart::Discard));
+            hits.insert(0, (*discard, FinishPart::Discard));
         }
         let key = dialog_kit::key_label(Bind::MdEditorSubmit);
         let [(prev_key, prev_what), (split_key, split_what)] = MdEditor::hints();
@@ -1181,30 +1186,31 @@ impl Confirm {
         }
         let y = inner.bottom().saturating_sub(1);
         let no_label = msg::KEEP.get();
-        let no_w = dialog_kit::button_width(no_label);
-        let yes_w = dialog_kit::button_width(self.yes);
-        let yes_x = inner.right().saturating_sub(yes_w);
-        let no_x = yes_x.saturating_sub(no_w + 1);
-        let no = dialog_kit::button(
+        let [no, yes] = dialog_kit::button_row::paint(
             buf,
-            no_x,
+            inner.right(),
             y,
-            no_label,
-            ButtonState::Normal {
-                hovered: self.hover == Some(ConfirmPart::No),
-                focused: self.focus == ConfirmPart::No,
-            },
-        );
-        let yes = dialog_kit::button(
-            buf,
-            yes_x,
-            y,
-            self.yes,
-            ButtonState::Normal {
-                hovered: self.hover == Some(ConfirmPart::Yes),
-                focused: self.focus == ConfirmPart::Yes,
-            },
-        );
+            inner.width,
+            0,
+            &[
+                Btn {
+                    label: no_label,
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(ConfirmPart::No),
+                        focused: self.focus == ConfirmPart::No,
+                    },
+                },
+                Btn {
+                    label: self.yes,
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(ConfirmPart::Yes),
+                        focused: self.focus == ConfirmPart::Yes,
+                    },
+                },
+            ],
+        )[..] else {
+            unreachable!("two buttons in, two rects out")
+        };
         self.hits = vec![(yes, ConfirmPart::Yes), (no, ConfirmPart::No)];
     }
 }
@@ -1217,3 +1223,87 @@ const WIN_REVIEW_FINISH: crate::dialog_kit::Win = crate::dialog_kit::Win::movabl
 
 /// The dialog moves (its size follows its content).
 const WIN_REVIEW_PICK: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("review_pick");
+
+#[cfg(test)]
+mod narrow_tests {
+    use super::*;
+
+    /// Rule 13: however narrow the window, every button of the dialog has a
+    /// hit rect inside the screen (labels clip, none is dropped).
+    fn assert_whole<T: std::fmt::Debug + PartialEq>(
+        hits: &[(Rect, T)],
+        need: &[T],
+        width: u16,
+        what: &str,
+    ) {
+        let mut rects: Vec<Rect> = Vec::new();
+        for part in need {
+            let rect = hits
+                .iter()
+                .find(|(_, p)| p == part)
+                .unwrap_or_else(|| panic!("{what} at {width}: {part:?} has no rect: {hits:?}"))
+                .0;
+            assert!(
+                rect.width >= 3 && rect.right() <= width,
+                "{what} {width}: {rect:?}"
+            );
+            rects.push(rect);
+        }
+        for (i, a) in rects.iter().enumerate() {
+            for b in &rects[i + 1..] {
+                assert!(!a.intersects(*b), "{what} {width}: {a:?} overlaps {b:?}");
+            }
+        }
+    }
+
+    #[test]
+    fn the_review_dialogs_keep_every_button_when_narrow() {
+        for width in [34u16, 44, 56, 80] {
+            let area = Rect::new(0, 0, width, 30);
+            let mut buf = Buffer::empty(area);
+
+            let mut compose = ComposeBox::new(
+                ComposeFor::Reply {
+                    thread_id: "t".into(),
+                },
+                "Reply".into(),
+                "about".into(),
+                "words".into(),
+            );
+            compose.render(area, &mut buf);
+            assert_whole(
+                &compose.hits,
+                &[ComposePart::Submit, ComposePart::Cancel],
+                width,
+                "compose",
+            );
+
+            let caps = ReviewCapabilities {
+                review: true,
+                ..Default::default()
+            };
+            let mut finish = FinishDialog::new(caps, 3, Some("summary".into()), &[]);
+            finish.render(area, &mut buf, ' ');
+            assert_whole(
+                &finish.hits,
+                &[
+                    FinishPart::Submit,
+                    FinishPart::Cancel,
+                    FinishPart::Discard,
+                    FinishPart::UseSummary,
+                ],
+                width,
+                "finish",
+            );
+
+            let mut confirm = Confirm::new("Title", "Sure?".into(), "Yes, do it");
+            confirm.render(area, &mut buf);
+            assert_whole(
+                &confirm.hits,
+                &[ConfirmPart::Yes, ConfirmPart::No],
+                width,
+                "confirm",
+            );
+        }
+    }
+}

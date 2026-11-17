@@ -427,9 +427,19 @@ pub(crate) fn toolbar_render_with(
     place: ToolbarPlacement,
 ) -> ToolbarRender {
     let buttons = button_items(enabled);
-    let chip_label = chip.map(|c| format!(" {} ", c.text));
+    // The chip degrades in steps: full label, short label, icon alone (then
+    // the `⋯` menu); the first one the bar has room for is painted.
+    let fitting = chip.and_then(|c| {
+        [&c.text, &c.short, &c.icon]
+            .into_iter()
+            .filter(|t| !t.is_empty())
+            .map(|t| format!(" {t} "))
+            .find(|l| area.width >= display_width(l) as u16 + 1 + TOOLBAR_MIN_BUTTON_ROOM)
+    });
+    let show_chip = fitting.is_some();
+    // Squeezed out entirely: the full label stands for it in the `⋯` menu.
+    let chip_label = fitting.or_else(|| chip.map(|c| format!(" {} ", c.text)));
     let chip_w = chip_label.as_deref().map_or(0, |l| display_width(l) as u16);
-    let show_chip = chip.is_some() && area.width >= chip_w + 1 + TOOLBAR_MIN_BUTTON_ROOM;
     let pinned = show_chip && place.pr_pinned;
     // A chip with no room left is not dropped: it joins the group as the
     // first item to give way, so it ends up in the `⋯` menu.

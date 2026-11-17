@@ -206,7 +206,7 @@ has its own icon color, which the theme sets (see [Themes](themes.md)). When the
 
 At the far end (the right of a row, the bottom of a column), when the repository is linked to a host, a **chip** shows
 the pull request of the checked-out branch (for example `GH #12` or
-`GL !53`), or a dim `+ PR`. **Pin the pull request button to the end** (on by default) keeps it there; off, it flows with the other buttons and follows their alignment. See
+`GL !53`), or a dim `+ PR`. **Pin the pull request button to the end** (on by default) keeps it there; off, it flows with the other buttons and follows their alignment. On a narrow row the chip shrinks first (`● #12`, then the state glyph alone) and only then moves into the `⋯` menu. See
 [Hosting and issue trackers](hosting-integration.md).
 
 Next to it (in a column, on its last row), when you have two or more [profiles](settings.md#profiles),

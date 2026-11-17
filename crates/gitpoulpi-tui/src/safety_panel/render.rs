@@ -12,6 +12,7 @@ use ratatui::widgets::{Block, BorderType, Borders, Widget};
 
 use super::panes::{self, Divider, Pane};
 use super::{label, rows, Act, Confirm, ModePick, NamePrompt, Overlay, RowMenu, SafetyPanel, Tab};
+use crate::dialog_kit::button_row::Btn;
 use crate::dialog_kit::{self, ButtonState};
 use crate::status_pane::FileListMode;
 use crate::{display_width, th};
@@ -223,7 +224,7 @@ impl SafetyPanel {
     }
 
     fn render_tabs(&mut self, buf: &mut Buffer, inner: Rect, hits: &mut Vec<(Rect, Hit)>) {
-        let mut x = inner.x;
+        let x = inner.x;
         let tabs = [
             (Tab::History, m::TAB_HISTORY.get().to_string()),
             (
@@ -232,22 +233,27 @@ impl SafetyPanel {
             ),
             (Tab::Lost, m::TAB_LOST.get().to_string()),
         ];
-        for (tab, label) in tabs {
-            let hovered = self.hover == Some(Hit::Tab(tab));
-            let state = if self.tab == tab {
-                ButtonState::Primary {
-                    hovered,
-                    focused: false,
-                }
-            } else {
-                ButtonState::Normal {
-                    hovered,
-                    focused: false,
-                }
-            };
-            let rect = dialog_kit::button(buf, x, inner.y, &label, state);
-            hits.push((rect, Hit::Tab(tab)));
-            x += rect.width + 1;
+        let items: Vec<Btn> = tabs
+            .iter()
+            .map(|(tab, label)| {
+                let hovered = self.hover == Some(Hit::Tab(*tab));
+                let state = if self.tab == *tab {
+                    ButtonState::Primary {
+                        hovered,
+                        focused: false,
+                    }
+                } else {
+                    ButtonState::Normal {
+                        hovered,
+                        focused: false,
+                    }
+                };
+                Btn { label, state }
+            })
+            .collect();
+        let rects = dialog_kit::button_row::paint_left(buf, x, inner.y, inner.width, 1, &items);
+        for ((tab, _), rect) in tabs.iter().zip(rects) {
+            hits.push((rect, Hit::Tab(*tab)));
         }
     }
 
@@ -541,32 +547,19 @@ impl SafetyPanel {
         state: &JournalState,
         hits: &mut Vec<(Rect, Hit)>,
     ) {
-        let close_w = dialog_kit::button_width(m::BTN_CLOSE.get());
-        let close_x = inner.right().saturating_sub(close_w);
-        let close = dialog_kit::button(
-            buf,
-            close_x,
-            y,
-            m::BTN_CLOSE.get(),
-            ButtonState::Normal {
-                hovered: self.hover == Some(Hit::Close),
-                focused: false,
-            },
-        );
-        let mut x = inner.x;
         let busy = self.job.is_some();
-        for act in self.actions(state) {
-            // The button names its own letter, as the toolbar's `[key]`.
-            let label = match super::input::key_of(act, self.tab) {
-                Some(c) => format!("{} [{c}]", act_label(act, self, state)),
-                None => act_label(act, self, state),
-            };
-            let w = dialog_kit::button_width(&label);
-            if x + w + 1 >= close_x {
-                break;
-            }
+        let acts = self.actions(state);
+        let labels: Vec<String> = acts
+            .iter()
+            .map(|act| match super::input::key_of(*act, self.tab) {
+                // The button names its own letter, as the toolbar's `[key]`.
+                Some(c) => format!("{} [{c}]", act_label(*act, self, state)),
+                None => act_label(*act, self, state),
+            })
+            .collect();
+        let state_of = |act: Act| {
             let hovered = self.hover == Some(Hit::Act(act));
-            let st = if busy {
+            if busy {
                 ButtonState::Disabled
             } else if matches!(act, Act::UndoTo | Act::RestoreRef) {
                 ButtonState::Primary {
@@ -578,14 +571,41 @@ impl SafetyPanel {
                     hovered,
                     focused: false,
                 }
-            };
-            let rect = dialog_kit::button(buf, x, y, &label, st);
-            if !busy {
-                hits.push((rect, Hit::Act(act)));
             }
-            x += rect.width + 1;
+        };
+        let close_state = ButtonState::Normal {
+            hovered: self.hover == Some(Hit::Close),
+            focused: false,
+        };
+        let close_label = m::BTN_CLOSE.get();
+        let mut items: Vec<Btn> = acts
+            .iter()
+            .zip(&labels)
+            .map(|(act, label)| Btn {
+                label,
+                state: state_of(*act),
+            })
+            .collect();
+        items.push(Btn {
+            label: close_label,
+            state: close_state,
+        });
+        let (act_items, close_item) = items.split_at(acts.len());
+        let (mut rects, close_rects) = dialog_kit::button_row::paint_split(
+            buf,
+            inner.x,
+            y,
+            inner.width,
+            act_items,
+            close_item,
+        );
+        rects.extend(close_rects);
+        for (act, rect) in acts.iter().zip(&rects) {
+            if !busy {
+                hits.push((*rect, Hit::Act(*act)));
+            }
         }
-        hits.push((close, Hit::Close));
+        hits.push((rects[rects.len() - 1], Hit::Close));
     }
 
     fn render_hints(&self, buf: &mut Buffer, inner: Rect, y: u16) {
@@ -704,24 +724,63 @@ fn popup_frame(
 /// The confirmation / prompt popups move (their size follows their text).
 const POPUP_WIN: dialog_kit::Win = dialog_kit::Win::movable("safety_popup");
 
-fn danger_button(buf: &mut Buffer, x: u16, y: u16, label: &str, hovered: bool) -> Rect {
-    let bg = if hovered {
-        crate::hover_fill(th().chrome.confirm_danger, th().ui.on_button, 30)
-    } else {
-        th().chrome.confirm_danger
-    };
-    let text = format!(" {label} ");
-    dialog_kit::put(
+#[derive(Clone, Copy, PartialEq)]
+enum Tone {
+    Primary,
+    Danger,
+}
+
+/// The popups' Cancel + confirm row: right-aligned, labels clipped when the
+/// popup is narrow, never a button dropped (hit rects come from the paint).
+fn pair_row(
+    buf: &mut Buffer,
+    inner: Rect,
+    y: u16,
+    hover: Option<Hit>,
+    confirm_label: &str,
+    tone: Tone,
+) -> [Rect; 2] {
+    use dialog_kit::button_row::paint;
+    let rects = paint(
         buf,
-        x,
+        inner.right(),
         y,
-        &text,
-        display_width(&text) as u16,
-        Style::default()
-            .fg(th().ui.on_button)
-            .bg(bg)
-            .add_modifier(Modifier::BOLD),
-    )
+        inner.width,
+        0,
+        &[
+            Btn {
+                label: gitpoulpi_i18n::msg::dialog::CANCEL.get(),
+                state: ButtonState::Normal {
+                    hovered: hover == Some(Hit::Cancel),
+                    focused: false,
+                },
+            },
+            Btn {
+                label: confirm_label,
+                state: ButtonState::Primary {
+                    hovered: hover == Some(Hit::Confirm),
+                    focused: false,
+                },
+            },
+        ],
+    );
+    let [cancel, confirm] = [rects[0], rects[1]];
+    if tone == Tone::Danger {
+        let hovered = hover == Some(Hit::Confirm);
+        let bg = if hovered {
+            crate::hover_fill(th().chrome.confirm_danger, th().ui.on_button, 30)
+        } else {
+            th().chrome.confirm_danger
+        };
+        buf.set_style(
+            confirm,
+            Style::default()
+                .fg(th().ui.on_button)
+                .bg(bg)
+                .add_modifier(Modifier::BOLD),
+        );
+    }
+    [cancel, confirm]
 }
 
 fn render_confirm(
@@ -772,34 +831,14 @@ fn render_confirm(
         );
     }
     let by = rect.y + rect.height - 2;
-    let confirm_w = dialog_kit::button_width(&c.button);
-    let cancel_w = dialog_kit::button_width(gitpoulpi_i18n::msg::dialog::CANCEL.get());
-    let confirm_x = inner.right().saturating_sub(confirm_w);
-    let cancel_x = confirm_x.saturating_sub(cancel_w + 1);
-    let cancel = dialog_kit::button(
+    let [cancel, confirm] = pair_row(
         buf,
-        cancel_x,
+        inner,
         by,
-        gitpoulpi_i18n::msg::dialog::CANCEL.get(),
-        ButtonState::Normal {
-            hovered: hover == Some(Hit::Cancel),
-            focused: false,
-        },
+        hover,
+        &c.button,
+        if c.red { Tone::Danger } else { Tone::Primary },
     );
-    let confirm = if c.red {
-        danger_button(buf, confirm_x, by, &c.button, hover == Some(Hit::Confirm))
-    } else {
-        dialog_kit::button(
-            buf,
-            confirm_x,
-            by,
-            &c.button,
-            ButtonState::Primary {
-                hovered: hover == Some(Hit::Confirm),
-                focused: false,
-            },
-        )
-    };
     hits.push((confirm, Hit::Confirm));
     hits.push((cancel, Hit::Cancel));
     // The popup body swallows clicks that miss its buttons.
@@ -853,31 +892,7 @@ fn render_name(
         );
     }
     let by = rect.y + rect.height - 2;
-    let ok_label = m::BTN_CREATE_OK.get();
-    let ok_w = dialog_kit::button_width(ok_label);
-    let cancel_w = dialog_kit::button_width(gitpoulpi_i18n::msg::dialog::CANCEL.get());
-    let ok_x = inner.right().saturating_sub(ok_w);
-    let cancel_x = ok_x.saturating_sub(cancel_w + 1);
-    let cancel = dialog_kit::button(
-        buf,
-        cancel_x,
-        by,
-        gitpoulpi_i18n::msg::dialog::CANCEL.get(),
-        ButtonState::Normal {
-            hovered: hover == Some(Hit::Cancel),
-            focused: false,
-        },
-    );
-    let ok = dialog_kit::button(
-        buf,
-        ok_x,
-        by,
-        ok_label,
-        ButtonState::Primary {
-            hovered: hover == Some(Hit::Confirm),
-            focused: false,
-        },
-    );
+    let [cancel, ok] = pair_row(buf, inner, by, hover, m::BTN_CREATE_OK.get(), Tone::Primary);
     hits.push((ok, Hit::Confirm));
     hits.push((cancel, Hit::Cancel));
     hits.push((field, Hit::NameField));
@@ -935,40 +950,14 @@ fn render_mode(
         );
     }
     let by = rect.y + rect.height - 2;
-    let ok_w = dialog_kit::button_width(m::BTN_CONTINUE.get());
-    let cancel_w = dialog_kit::button_width(gitpoulpi_i18n::msg::dialog::CANCEL.get());
-    let ok_x = inner.right().saturating_sub(ok_w);
-    let cancel_x = ok_x.saturating_sub(cancel_w + 1);
-    let cancel = dialog_kit::button(
+    let [cancel, ok] = pair_row(
         buf,
-        cancel_x,
+        inner,
         by,
-        gitpoulpi_i18n::msg::dialog::CANCEL.get(),
-        ButtonState::Normal {
-            hovered: hover == Some(Hit::Cancel),
-            focused: false,
-        },
+        hover,
+        m::BTN_CONTINUE.get(),
+        if hard { Tone::Danger } else { Tone::Primary },
     );
-    let ok = if hard {
-        danger_button(
-            buf,
-            ok_x,
-            by,
-            m::BTN_CONTINUE.get(),
-            hover == Some(Hit::Confirm),
-        )
-    } else {
-        dialog_kit::button(
-            buf,
-            ok_x,
-            by,
-            m::BTN_CONTINUE.get(),
-            ButtonState::Primary {
-                hovered: hover == Some(Hit::Confirm),
-                focused: false,
-            },
-        )
-    };
     hits.insert(0, (cancel, Hit::Cancel));
     hits.insert(0, (ok, Hit::Confirm));
     hits.push((rect, Hit::Body));

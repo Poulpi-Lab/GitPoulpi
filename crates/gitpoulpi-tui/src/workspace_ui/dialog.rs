@@ -36,6 +36,7 @@ use ratatui::style::Style;
 use super::ai_box::{self, AiBox, AiBoxOutcome};
 use super::task::Draft;
 use crate::combo::{Combo, ComboOption, ComboOutcome};
+use crate::dialog_kit::button_row::Btn;
 use crate::dialog_kit::{self, ButtonState};
 use crate::keymap::chord::Key;
 use crate::th;
@@ -761,16 +762,20 @@ impl WorkspaceDialog {
                 muted,
             );
             let edit_label = ai_m::EDIT.get();
-            let edit = dialog_kit::button(
+            let edit = dialog_kit::button_row::paint_left(
                 buf,
                 field_x,
                 y,
-                edit_label,
-                ButtonState::Normal {
-                    hovered: self.hover == Some(Hit::Part(Focus::Ai)),
-                    focused: self.focus == Focus::Ai,
-                },
-            );
+                inner.right().saturating_sub(field_x),
+                1,
+                &[Btn {
+                    label: edit_label,
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(Hit::Part(Focus::Ai)),
+                        focused: self.focus == Focus::Ai,
+                    },
+                }],
+            )[0];
             let sets = ai_box::count_sets(ai);
             let summary = if sets == 0 {
                 ai_m::NONE.get().to_string()
@@ -799,17 +804,22 @@ impl WorkspaceDialog {
             field_w,
             Style::default().fg(th().ui.text).bg(th().ui.panel),
         );
-        let browse_w = dialog_kit::button_width(m::BROWSE_ADD.get());
-        let browse = dialog_kit::button(
+        let browse = dialog_kit::button_row::paint(
             buf,
-            inner.right().saturating_sub(browse_w),
+            inner.right(),
             y,
-            m::BROWSE_ADD.get(),
-            ButtonState::Normal {
-                hovered: self.hover == Some(Hit::Part(Focus::Browse)),
-                focused: self.focus == Focus::Browse,
-            },
-        );
+            inner
+                .width
+                .min(dialog_kit::button_width(m::BROWSE_ADD.get())),
+            0,
+            &[Btn {
+                label: m::BROWSE_ADD.get(),
+                state: ButtonState::Normal {
+                    hovered: self.hover == Some(Hit::Part(Focus::Browse)),
+                    focused: self.focus == Focus::Browse,
+                },
+            }],
+        )[0];
         hits.push((browse, Hit::Part(Focus::Browse)));
 
         let footer = inner.bottom().saturating_sub(1);
@@ -917,34 +927,37 @@ impl WorkspaceDialog {
         } else {
             m::BTN_SAVE.get()
         };
-        let save_w = dialog_kit::button_width(save_label);
-        let cancel_w = dialog_kit::button_width(gitpoulpi_i18n::msg::dialog::CANCEL.get());
-        let save_x = inner.right().saturating_sub(save_w);
-        let cancel_x = save_x.saturating_sub(cancel_w + 1);
-        let cancel = dialog_kit::button(
+        // Right-aligned; a narrow dialog clips the labels, never drops a button.
+        let [cancel, save] = dialog_kit::button_row::paint(
             buf,
-            cancel_x,
+            inner.right(),
             footer,
-            gitpoulpi_i18n::msg::dialog::CANCEL.get(),
-            ButtonState::Normal {
-                hovered: self.hover == Some(Hit::Part(Focus::Cancel)),
-                focused: self.focus == Focus::Cancel,
-            },
-        );
-        let save = dialog_kit::button(
-            buf,
-            save_x,
-            footer,
-            save_label,
-            if self.busy {
-                ButtonState::Disabled
-            } else {
-                ButtonState::Primary {
-                    hovered: self.hover == Some(Hit::Part(Focus::Save)),
-                    focused: self.focus == Focus::Save,
-                }
-            },
-        );
+            inner.width,
+            0,
+            &[
+                Btn {
+                    label: gitpoulpi_i18n::msg::dialog::CANCEL.get(),
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(Hit::Part(Focus::Cancel)),
+                        focused: self.focus == Focus::Cancel,
+                    },
+                },
+                Btn {
+                    label: save_label,
+                    state: if self.busy {
+                        ButtonState::Disabled
+                    } else {
+                        ButtonState::Primary {
+                            hovered: self.hover == Some(Hit::Part(Focus::Save)),
+                            focused: self.focus == Focus::Save,
+                        }
+                    },
+                },
+            ],
+        )[..] else {
+            unreachable!("two buttons in, two rects out")
+        };
+        let cancel_x = cancel.x;
         // Buttons first, then the rows and fields they never overlap.
         hits.insert(0, (cancel, Hit::Part(Focus::Cancel)));
         hits.insert(0, (save, Hit::Part(Focus::Save)));
@@ -1378,5 +1391,30 @@ mod tests {
         d.on_key(press(KeyCode::Down));
         d.render(rect(area), &mut Buffer::empty(area));
         assert!(d.scroll <= d.cursor && d.cursor < d.scroll + d.list_rows);
+    }
+
+    /// Rule 13: a narrow dialog clips its button labels, none is dropped.
+    #[test]
+    fn a_narrow_workspace_dialog_keeps_every_button() {
+        for width in [40u16, 44, 60, 90] {
+            let area = Rect::new(0, 0, width, 30);
+            let mut buf = Buffer::empty(area);
+            let mut d = WorkspaceDialog::new(seed());
+            d.render(area, &mut buf);
+            let parts: Vec<Focus> = d
+                .hits
+                .iter()
+                .filter_map(|(_, h)| match h {
+                    Hit::Part(f) => Some(*f),
+                    _ => None,
+                })
+                .collect();
+            for need in [Focus::Save, Focus::Cancel, Focus::Browse] {
+                assert!(parts.contains(&need), "{width}: {need:?} in {parts:?}");
+            }
+            for (rect, _) in &d.hits {
+                assert!(rect.right() <= width, "{width}: {rect:?}");
+            }
+        }
     }
 }

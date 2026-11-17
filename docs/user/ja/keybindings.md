@@ -1410,11 +1410,11 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 
 ### Pull request と Issue
 
-対応する連携があると、Refs ペインに pull request のセクションが表示されます（GitLab では merge request）。ホスティングのプロファイルが接続されていると、ISSUES セクションも表示されます。[ホスティングと Issue トラッカー](hosting-integration.md#5-サイドバーの-pull-request-と-issue)を参照してください。
+対応する連携があると、Refs ペインに pull request のセクションが表示されます（GitLab では merge request）。ホスティングのプロファイルが接続されていると、ISSUES セクションも表示されます。[pull request と Issue](pull-requests-and-issues.md#サイドバーの-pull-request-と-issue)を参照してください。
 
 | キー | 動作 |
 |---|---|
-| `Enter` | 選択した行を開く：Issue（および Azure DevOps と Bitbucket のリクエスト）は[会話](hosting-integration.md#5c-会話)として、pull request はレビュー機能のあるホストでは[レビュー](review.md)で、それ以外はブラウザーで開く。`再接続` の行では、そのプロファイルの設定を開く |
+| `Enter` | 選択した行を開く：Issue（および Azure DevOps と Bitbucket のリクエスト）は[会話](conversations.md)として、pull request はレビュー機能のあるホストでは[レビュー](review.md)で、それ以外はブラウザーで開く。`再接続` の行では、そのプロファイルの設定を開く |
 | `Space` | セクションを展開 / 折りたたむ |
 | `v` | セクションのフィルターを開く。pull request：オープン、merge 済み / クローズ、すべて。Issue：オープン、自分に割り当て、クローズ、すべて |
 | `n` | pull request セクション：pull request を作成する。ISSUES セクション：新しい Issue（ヘッダーの `+` ボタン） |
@@ -1426,14 +1426,14 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 
 ### Issue ボード
 
-ISSUES ヘッダーの**ボード**（パレット：**Issue: ボードを開く**）は、Issue の取得元のカンバンボードを開きます。[ボード](hosting-integration.md#5b-issue-ボード)と[ローカル Issue](local-issues.md#カンバンボード)を参照してください。以下のキーはすべてパレットのコマンド（**ボード: ...**）でもあります。
+ISSUES ヘッダーの**ボード**（パレット：**Issue: ボードを開く**）は、Issue の取得元のカンバンボードを開きます。[ボード](pull-requests-and-issues.md#issue-ボード)と[ローカル Issue](local-issues.md#カンバンボード)を参照してください。以下のキーはすべてパレットのコマンド（**ボード: ...**）でもあります。
 
 | キー | 動作 |
 |---|---|
 | 矢印 | カードを選択する（`Up`、`Down`）、または隣の列へ移動する（`Left`、`Right`）。`Home`、`End`、`PageUp`、`PageDown` は列内でジャンプする |
 | `Shift+Left`、`Shift+Right` | 選択したカードを前または次の列へ移動する |
 | `m` | **カードの移動先...**：列のドロップダウン |
-| `Enter` | Issue の[会話](hosting-integration.md#5c-会話)を開く（ホストに読める会話がない場合は、ホストのページ） |
+| `Enter` | Issue の[会話](conversations.md)を開く（ホストに読める会話がない場合は、ホストのページ） |
 | `e`、`.` | 担当者、ラベル、マイルストーンを編集する。カードのメニュー |
 | `n` | 選択中の列に新規 Issue を作る |
 | `a`、`l`、`M`、`/` | 担当者、ラベル、マイルストーン、テキストで絞り込む。`x` で絞り込みを解除する |
@@ -1457,7 +1457,7 @@ ISSUES ヘッダーの**ボード**（パレット：**Issue: ボードを開く
 | `Alt+W` | 新規 Issue と pull request のフォーム：プロバイダー自身の Web ページで作成する |
 | `Esc` | **AI で作成**のパネルで：実行中の下書きを停止し、なければパネルを閉じる |
 
-Issue またはリクエストの[会話ビュー](hosting-integration.md#5c-会話)（パレットの行は*会話: ...*。キーのある行は上のパレット一覧にあります）：
+Issue またはリクエストの[会話ビュー](conversations.md)（パレットの行は*会話: ...*。キーのある行は上のパレット一覧にあります）：
 
 | キー | 動作 |
 |---|---|
@@ -1766,7 +1766,7 @@ commit コンポーザーでは次のとおりです。
 
 | ボタン | キー |
 |---|---|
-| タイトルバー左端の 🐙（バージョン情報） | パレットの `ヘルプ: GitPoulpi について` |
+| タイトルバー左端の <img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi のアイコン" height="16">（バージョン情報） | パレットの `ヘルプ: GitPoulpi について` |
 | タイトルバーの**開く場所** | `Alt+O`、`Ctrl+Alt+O` |
 | タイトルバー右端の `×`（終了） | `q` |
 | タイトルバーのバージョン（リリースノート） | パレットの `ヘルプ: リリースノート` |

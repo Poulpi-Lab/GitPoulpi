@@ -97,7 +97,7 @@ GitPoulpi ile YZ kullanmanın iki yolu vardır:
 4. Birden çok profil varsa en alttan **Varsayılan profil**i seçin; her eylem
    yine de kendi profilini belirtebilir.
 
-![Yerel bir ajan için YZ sayfasının Profiller bloğu: Ajan türü (Claude Code), Komut, Argümanlar, Model, iki Env satırı, Ortam değişkeni ekle ve kaldır, Bağlantıyı sına ve Varsayılan profil](../images/settings-ai-agent.png)
+![Yerel bir ajan için YZ sayfasındaki Profiller bloğunun alt kısmı: Çalıştırma modu, Argümanlar, Model, Çalışma klasörü, Zaman aşımı, iki Env satırı, Ortam değişkeni ekle ve Bağlantıyı sına](../images/settings-ai-agent.png)
 
 **API anahtarları**, **API anahtarı** satırında `Enter` ile girilir ve sistem
 kimlik bilgisi yardımcınızda (Git Credential Manager, libsecret / `pass`,

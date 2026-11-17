@@ -104,7 +104,7 @@ connected account (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerr
 **Init** makes a folder into a new repository.
 In all three dialogs (and in the folder picker they open), `Ctrl+N` shows a badge on each field and button: press the character to put the cursor in the field or press the button.
 
-| ![The Clone dialog: where to clone to, the URL, the folder name and the Clone the repo button](images/clone.png) | ![The Initialize a repository dialog: the folder, the name and the initial branch](images/init.png) |
+| ![The Clone dialog: where to clone to, the URL, the folder name, and the Cancel and Clone buttons](images/clone.png) | ![The Initialize a repository dialog: the folder, the name and the initial branch](images/init.png) |
 |---|---|
 
 ### Sparse checkout

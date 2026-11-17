@@ -94,7 +94,7 @@ There are two ways to use AI with GitPoulpi:
 4. With several profiles, choose the **Default profile** at the bottom; each
    action can still name its own.
 
-![The Profiles block of the AI page for a local agent: Agent type (Claude Code), Command, Arguments, Model, two Env rows, Add and Remove an environment variable, Test connection and Default profile](images/settings-ai-agent.png)
+![The lower part of the Profiles block of the AI page for a local agent: Run mode, Arguments, Model, Working folder, Timeout, two Env rows, Add an environment variable and Test connection](images/settings-ai-agent.png)
 
 **API keys** are entered with `Enter` on the **API key** row and stored in your
 system credential helper (Git Credential Manager, libsecret / `pass`, Keychain)

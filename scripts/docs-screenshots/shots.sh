@@ -4,7 +4,7 @@
 #
 # Every picture of docs/user/images is a shot here (themes included).
 
-ALL_SHOTS=(hero about about-crates failure-card activity-log activity-log-repository compare-cards log-mermaid sparse-checkout palette palette-settings theme-picker log-graph log-columns-menu log-changes-column context-menu diff diff-split blame blame-card file-history file-history-blame editor editor-encoding-menu editor-eol-menu file-pane-multiselect commit-file-menu commit-column-all commit-column-menu ignore-picker open-with composer ai-explain help help-hosting rebase settings settings-launcher settings-conflict-prevention settings-search settings-profiles settings-ssh settings-integrations settings-connect settings-ai settings-ui settings-editor settings-git settings-repo-ai workflow-settings workflow-sidebar workflow-start undo-toolbar pull-push-tooltip settings-keyboard settings-keyboard-conflicts settings-language settings-ai-presets ai-commit-message theme-serie theme-material settings-appearance-theme settings-log-graph-lanes settings-ai-agent settings-open-in settings-open-in-presets open-in-menu theme-dark theme-light theme-catppuccin-latte theme-catppuccin-mocha theme-cyberpunk theme-dracula theme-everforest-dark theme-gruvbox-dark theme-gruvbox-light theme-kanagawa theme-matrix theme-fire theme-fire-light theme-sunset theme-monokai theme-nord theme-one-dark theme-rose-pine theme-solarized-dark theme-solarized-light theme-terminal theme-tokyo-night theme-catppuccin-frappe theme-catppuccin-macchiato theme-kanagawa-lotus theme-one-light theme-rose-pine-dawn theme-rose-pine-moon theme-tokyo-night-day theme-vesper theme-github-dark theme-github-light theme-vscode-dark theme-vscode-light theme-apprentice theme-ayu-dark theme-ayu-light theme-ayu-mirage theme-cobalt2 theme-deus theme-dracula-soft theme-everforest-light theme-github-dark-colorblind theme-github-dark-dimmed theme-github-dark-high-contrast theme-github-dark-legacy theme-github-light-colorblind theme-github-light-high-contrast theme-github-light-legacy theme-gotham theme-gruvbox-dark-hard-contrast theme-gruvbox-dark-soft-contrast theme-gruvbox-light-hard-contrast theme-gruvbox-light-soft-contrast theme-iceberg-dark theme-iceberg-light theme-jellybeans theme-kanagawa-dragon theme-lucario theme-miasma theme-moonfly theme-night-owl-dark theme-night-owl-light theme-nightfly theme-nightfox theme-nightfox-carbonfox theme-nightfox-dawnfox theme-nightfox-dayfox theme-nightfox-duskfox theme-nightfox-nordfox theme-nightfox-terafox theme-noctis theme-noctis-azureus theme-noctis-bordo theme-noctis-hibernus theme-noctis-lilac theme-noctis-lux theme-noctis-minimus theme-noctis-obscuro theme-noctis-sereno theme-noctis-uva theme-noctis-viola theme-nordic theme-one-half-dark theme-one-half-light theme-panda theme-posterpole theme-posterpole-gray theme-seoul256-dark theme-seoul256-light theme-shades-of-purple theme-shades-of-purple-super-dark theme-sonokai theme-sonokai-andromeda theme-sonokai-atlantis theme-sonokai-espresso theme-sonokai-maia theme-sonokai-shusia theme-srcery theme-tender theme-tokyo-night-moon theme-tokyo-night-storm theme-tomorrow theme-tomorrow-night theme-tomorrow-night-blue theme-tomorrow-night-bright theme-tomorrow-night-eighties theme-zenbones-duckbones theme-zenbones-forestbones-dark theme-zenbones-forestbones-light theme-zenbones-kanagawabones theme-zenbones-neobones-dark theme-zenbones-neobones-light theme-zenbones-nordbones theme-zenbones-rosebones-dark theme-zenbones-rosebones-light theme-zenbones-seoulbones-dark theme-zenbones-seoulbones-light theme-zenbones-tokyobones-dark theme-zenbones-tokyobones-light theme-zenbones-vimbones theme-zenbones-zenburned theme-zenbones-zenwritten-dark theme-zenbones-zenwritten-light undo-history reflog lost-work history-rewrite tag-delete settings-quantity conflict-banner merge-editor-card merge-editor merge-editor-full-file home clone clone-hosted clone-hosted-search init tab-picker new-tab workspace-search workspaces workspace-switch workspace-edit radar review-overview review-files local-issues issue-board review-ai lfs-menu worktrees worktree-menu worktree-create worktree-tab submodules submodule-menu merge-editor-chunk-menu merge-editor-take-both merge-editor-output-edited conflict-file-resolved conflict-commit-merge conflict-banner-rebase merge-editor-deleted-card conflict-banner-continue issues-sidebar issue-conversation issue-reply-composer pr-conversation pr-reply-composer)
+ALL_SHOTS=(hero about about-crates activity-log activity-log-repository compare-cards log-mermaid sparse-checkout palette palette-settings theme-picker log-graph log-columns-menu log-changes-column context-menu diff diff-split blame blame-card file-history file-history-blame editor editor-encoding-menu editor-eol-menu file-pane-multiselect commit-file-menu commit-column-all commit-column-menu ignore-picker open-with composer ai-explain help help-hosting rebase settings settings-launcher settings-conflict-prevention settings-search settings-profiles settings-ssh settings-integrations settings-connect settings-ai settings-ui settings-editor settings-git settings-repo-ai workflow-settings workflow-sidebar workflow-start undo-toolbar pull-push-tooltip settings-keyboard settings-keyboard-conflicts settings-language settings-ai-presets ai-commit-message theme-serie theme-material settings-appearance-theme settings-log-graph-lanes settings-ai-agent settings-open-in settings-open-in-presets open-in-menu theme-dark theme-light theme-catppuccin-latte theme-catppuccin-mocha theme-cyberpunk theme-dracula theme-everforest-dark theme-gruvbox-dark theme-gruvbox-light theme-kanagawa theme-matrix theme-fire theme-fire-light theme-sunset theme-monokai theme-nord theme-one-dark theme-rose-pine theme-solarized-dark theme-solarized-light theme-terminal theme-tokyo-night theme-catppuccin-frappe theme-catppuccin-macchiato theme-kanagawa-lotus theme-one-light theme-rose-pine-dawn theme-rose-pine-moon theme-tokyo-night-day theme-vesper theme-github-dark theme-github-light theme-vscode-dark theme-vscode-light theme-apprentice theme-ayu-dark theme-ayu-light theme-ayu-mirage theme-cobalt2 theme-deus theme-dracula-soft theme-everforest-light theme-github-dark-colorblind theme-github-dark-dimmed theme-github-dark-high-contrast theme-github-dark-legacy theme-github-light-colorblind theme-github-light-high-contrast theme-github-light-legacy theme-gotham theme-gruvbox-dark-hard-contrast theme-gruvbox-dark-soft-contrast theme-gruvbox-light-hard-contrast theme-gruvbox-light-soft-contrast theme-iceberg-dark theme-iceberg-light theme-jellybeans theme-kanagawa-dragon theme-lucario theme-miasma theme-moonfly theme-night-owl-dark theme-night-owl-light theme-nightfly theme-nightfox theme-nightfox-carbonfox theme-nightfox-dawnfox theme-nightfox-dayfox theme-nightfox-duskfox theme-nightfox-nordfox theme-nightfox-terafox theme-noctis theme-noctis-azureus theme-noctis-bordo theme-noctis-hibernus theme-noctis-lilac theme-noctis-lux theme-noctis-minimus theme-noctis-obscuro theme-noctis-sereno theme-noctis-uva theme-noctis-viola theme-nordic theme-one-half-dark theme-one-half-light theme-panda theme-posterpole theme-posterpole-gray theme-seoul256-dark theme-seoul256-light theme-shades-of-purple theme-shades-of-purple-super-dark theme-sonokai theme-sonokai-andromeda theme-sonokai-atlantis theme-sonokai-espresso theme-sonokai-maia theme-sonokai-shusia theme-srcery theme-tender theme-tokyo-night-moon theme-tokyo-night-storm theme-tomorrow theme-tomorrow-night theme-tomorrow-night-blue theme-tomorrow-night-bright theme-tomorrow-night-eighties theme-zenbones-duckbones theme-zenbones-forestbones-dark theme-zenbones-forestbones-light theme-zenbones-kanagawabones theme-zenbones-neobones-dark theme-zenbones-neobones-light theme-zenbones-nordbones theme-zenbones-rosebones-dark theme-zenbones-rosebones-light theme-zenbones-seoulbones-dark theme-zenbones-seoulbones-light theme-zenbones-tokyobones-dark theme-zenbones-tokyobones-light theme-zenbones-vimbones theme-zenbones-zenburned theme-zenbones-zenwritten-dark theme-zenbones-zenwritten-light undo-history reflog lost-work history-rewrite tag-delete settings-quantity conflict-banner merge-editor-card merge-editor merge-editor-full-file home clone clone-hosted clone-hosted-search init tab-picker new-tab workspace-search workspaces workspace-switch workspace-edit radar review-overview review-files local-issues issue-board review-ai lfs-menu worktrees worktree-menu worktree-create worktree-tab submodules submodule-menu merge-editor-chunk-menu merge-editor-take-both merge-editor-output-edited conflict-file-resolved conflict-commit-merge conflict-banner-rebase merge-editor-deleted-card conflict-banner-continue issues-sidebar issue-conversation issue-reply-composer pr-conversation pr-reply-composer)
 
 # --- helpers shared by the shots -------------------------------------------
 seed_config() {
@@ -119,7 +119,7 @@ norm_layout() {
   local p; p=$(find_text "╭›") || return 0; set -- $p
   [ "$1" = 129 ] || { drag "$1" 28 129 28; sleep 0.4; }
 }
-select_wip() { esc_all; click_text "// WIP" 1 3; sleep 0.6; }
+select_wip() { esc_all; click_text "// W" 1 3; sleep 0.6; }
 # commit row text, e.g. "table" -> the Log row of "feat(render): table of planets"
 open_diff() { click_text "$1" 1 2; wait_text "$2" 10; }
 
@@ -222,8 +222,8 @@ shot_radar() {
   lp_link
   restart_tui ""
   second_tab open
-  key alt+l; wait_text "MY PULL REQUESTS" 20; sleep 3
-  key Down; key Down; key p; sleep 1.2
+  key alt+r; wait_text "MY PULL REQUESTS" 20; sleep 3
+  key Down; key Down; key Down; key p; sleep 1.2
   shot radar; esc_all
   lp_unlink; unset GPD_CONFIG_EXTRA; stop_tui
 }
@@ -263,14 +263,10 @@ open_review() {
   rclick_text "Add moons" 1 2; wait_text "Review..."
   click_text "Review..." 1 1; wait_text "Review !58" 15; sleep 1.2
 }
-shot_review-overview() {
-  mock_up
-  GPD_CONFIG_EXTRA=$(mock_profiles); export GPD_CONFIG_EXTRA
-  lp_link; review_head
-  restart_tui ""
-  open_review
-  shot review-overview; esc_all
-  lp_unlink; unset GPD_CONFIG_EXTRA; stop_tui
+shot_review-overview() {   # the single-page project of conv_up: both threads on the Overview
+  conv_up; open_pr
+  shot review-overview
+  conv_down
 }
 shot_review-files() {
   mock_up
@@ -290,7 +286,7 @@ shot_review-ai() {
   lp_link; review_head
   restart_tui ""
   open_review
-  key s; wait_text "Suggestions (2)" 30; sleep 0.5
+  key s; wait_text "Review options" 10; key Return; ai_send; wait_text "Suggestions (2)" 30; sleep 0.5
   key alt+2; wait_text "allocates on every call" 20; sleep 0.8
   shot review-ai; esc_all
   lp_unlink; unset GPD_CONFIG_EXTRA; stop_tui
@@ -389,22 +385,22 @@ shot_clone-hosted-search() {
 shot_init()  { screen | grep -qF "OPEN REPOSITORIES" || { esc_all; key ctrl+o; wait_text "OPEN REPOSITORIES"; }; clickt_home Init; wait_text "Initialize in"; shot init; esc; esc; }
 clickt_home() { click_text "$1" 1 1; sleep 0.8; }
 shot_log-graph() {
-  esc_all; click_text "Merge branch 'fea" 1 3; wait_text "Merge branch 'feature/moons'"; shot log-graph
+  esc_all; click_text "b7ef09f" 1 1; wait_text "Merge branch 'feature/moons'"; shot log-graph
 }
 shot_log-columns-menu() {
   esc_all; rclick_text "Author" 1 2; wait_text "Changes"; shot log-columns-menu
 }
 shot_log-changes-column() {
-  esc_all; rclick_text "Author" 1 2; wait_text "Changes"
-  click_text "Changes" 1 4; sleep 0.8; esc_all
+  esc_all; rclick_text "Author" 1 2; wait_text "Columns (click"
+  click_text "[ ] Changes" 1 5; sleep 0.8; esc_all
   local p; p=$(find_text "╭›"); set -- $p; local c=$1 r=$(($2 + 26))
   drag $c $r $((c + 26)) $r; sleep 0.6
   shot log-changes-column
   p=$(find_text "╭›"); set -- $p; drag $1 $r $c $r; sleep 0.5
-  rclick_text "Message" 1 2; click_text "Changes" 2 4; sleep 0.5; esc_all   # back to the default columns
+  rclick_text "Message" 1 2; wait_text "Columns (click"; click_text "[x] Changes" 1 5; sleep 0.5; esc_all   # back to the default columns
 }
 shot_context-menu() {
-  esc_all; rclick_text "docs: list the pla" 1 3; wait_text "Cherry"; shot context-menu; esc_all
+  esc_all; rclick_text "477b211" 1 1; wait_text "Cherry"; shot context-menu; esc_all
 }
 shot_diff() {
   select_wip; click_text "table.rs" 1 1; wait_text "Hunk"; shot diff
@@ -441,11 +437,19 @@ editor_open() {
 shot_editor()       { editor_open; shot editor; esc_all; esc_all; }
 shot_editor-encoding-menu() { editor_open; click_text "UTF-8" 1 1; sleep 0.8; shot editor-encoding-menu; esc; esc_all; esc_all; }
 shot_editor-eol-menu() { editor_open; click_text " LF " 1 1; sleep 0.8; shot editor-eol-menu; esc; esc_all; esc_all; }
-shot_composer()     { select_wip; click_text "Compose commits with AI" 1 2; wait_text "The AI proposes"; shot composer; esc_all; }
-shot_ai-commit-message() {
-  select_wip; click_text "✦ 72" 1 0; wait_text "status section" 15; shot ai-commit-message
+# ai_send: the "Review what is sent" dialog opens before every AI request; Send is its focused button.
+ai_send() {
+  local i
+  for i in $(seq 1 40); do
+    if screen | grep -qF "Review what is sent"; then key Return; return 0; fi
+    sleep 0.1
+  done
 }
-shot_ai-explain()   { select_wip; key ctrl+g; key w; wait_text "double-check" 15; shot ai-explain; esc_all; }
+shot_composer()     { select_wip; click_text "Compose commits with AI" 1 2; ai_send; wait_text "The AI proposes"; shot composer; esc_all; }
+shot_ai-commit-message() {
+  select_wip; click_text "✦ 72" 1 0; ai_send; wait_text "status section" 15; shot ai-commit-message
+}
+shot_ai-explain()   { select_wip; key ctrl+g; key w; ai_send; wait_text "double-check" 15; shot ai-explain; esc_all; }
 shot_help()         { esc_all; text "?"; wait_text "Hosting"; click_text "Keys" 1 1; wait_text "Mouse"; shot help; esc_all; }
 shot_help-hosting() { esc_all; text "?"; wait_text "Hosting"; click_text "Hosting" 1 1; wait_text "Link a repository"; shot help-hosting; esc_all; }
 about_open() {
@@ -457,16 +461,14 @@ shot_about-crates() {
   about_open; text "l"; sleep 1
   shot about-crates; esc_all
 }
-# --- failure card, Activity Log, comparison, sparse checkout ---------------------
-# A fetch that fails: origin points at a folder that does not exist (restored after).
-shot_failure-card() {
+# --- Activity Log, comparison, sparse checkout ---------------------
+# A fetch that fails (origin points at a folder that does not exist, restored after
+# the Git operations shot) gives the Activity Log an error entry to show.
+shot_activity-log() {
   esc_all
   git -C "$GPD_ROOT/fx/orbit" remote set-url origin "$GPD_ROOT/fx/no-such-remote.git"
-  key ctrl+g; key f; wait_text "Details" 20; sleep 0.8
-  shot failure-card
-}
-shot_activity-log() {
-  esc_all; click_text "Activity" 1 3; wait_text "Application"; click_text "Application" 1 2; sleep 0.8
+  key ctrl+g; key f; wait_text "Fetch failed" 20; sleep 0.8
+  click_text "Activity" 1 3; wait_text "Application"; click_text "Application" 1 2; sleep 0.8
   wait_text "Show:"; sleep 0.6
   shot activity-log
 }
@@ -477,14 +479,14 @@ shot_activity-log-repository() {
 }
 shot_compare-cards() {
   restart_tui 'avatars = "graph"'
-  click_text "Merge branch 'fea" 1 3; sleep 0.5
+  click_text "b7ef09f" 1 1; sleep 0.5
   key space; key shift+Down; key shift+Down; sleep 1
   shot compare-cards; esc_all; restart_tui ""
 }
 # Copy as Mermaid gitGraph: three rows selected (as in compare-cards), the
 # popup open on its live preview.
 shot_log-mermaid() {
-  click_text "Merge branch 'fea" 1 3; sleep 0.5
+  click_text "b7ef09f" 1 1; sleep 0.5
   key space; key shift+Down; key shift+Down; sleep 0.5
   key shift+y; wait_text "Copy as Mermaid gitGraph"; sleep 0.8
   shot log-mermaid; esc_all
@@ -500,7 +502,7 @@ shot_theme-picker() {   # App: Change Theme... with the Colored prefilter
   wait_text "Colored"; click_text "Colored" 1 1; sleep 1.2; shot theme-picker; esc; esc_all
 }
 shot_rebase() {
-  esc_all; rclick_text "chore: upd" 1 3; wait_text "Interactively"; click_text "Interactively" 1 3
+  esc_all; rclick_text "b0072d4" 1 1; wait_text "Interactively"; click_text "Interactively" 1 3
   wait_text "Start rebase" 10
   # the second commit: Squash, the third: Drop (the action dropdown opens on Enter, the first letter picks)
   key Down; text s; key Down; text d; sleep 0.5
@@ -528,9 +530,9 @@ shot_settings-search()   { click_text "Search settings" 1 2; text "diff"; sleep 
 shot_settings-profiles() { settings_open; settings_page "Profiles"; settings_tab "Profiles"; shot settings-profiles; }
 shot_settings-ssh()      { settings_page "SSH"; shot settings-ssh; }
 shot_settings-integrations() { settings_page "Integrations"; shot settings-integrations; }
-shot_settings-connect()  { settings_page "Integrations"; click_text "[ Connect ]" 1 3; sleep 0.8; shot settings-connect; click_text "[ Cancel ]" 1 3; }
+shot_settings-connect()  { settings_page "Integrations"; click_text "Connect" 2 2; sleep 0.8; shot settings-connect; click_text "Cancel" 1 2; }
 shot_settings-ai()       { settings_page "AI"; settings_tab "General"; sleep 0.5; shot settings-ai; }
-shot_settings-ai-agent()    { settings_page "AI"; settings_tab "Profiles (connections)"; wheel 100 30 0; wheel 100 30 0; wheel 100 30 0; wheel 100 30 0; sleep 0.5; shot settings-ai-agent; }
+shot_settings-ai-agent()    { settings_page "AI"; settings_tab "Profiles (connections)"; for i in 1 2 3 4 5 6 7 8; do wheel 100 30 1; done; sleep 0.5; shot settings-ai-agent; }
 shot_settings-appearance-theme() {
   settings_page "Appearance"; click_text "System (follows" 1 3; sleep 0.8
   key Down; key Down; sleep 1.2   # Dark, then Light: the whole screen repaints under the open list
@@ -600,7 +602,7 @@ parent = "main"
 finish = [{ into = "main", merge = "merge", tag = "v{version}" }, { into = "develop", merge = "merge" }]
 T
 }
-workflow_fixture_off() { rm -f "$GPD_ROOT/fx/orbit/.gitpoulpi/workflow.toml"; }
+workflow_fixture_off() { rm -f "$GPD_ROOT/fx/orbit/.gitpoulpi/workflow.toml"; git -C "$GPD_ROOT/fx/orbit" branch -q -D develop 2>/dev/null || true; }
 # workflow_up: the workflow file is there and the TUI has read it (any shot of
 # this group can run alone).
 workflow_up() {
@@ -632,7 +634,7 @@ shot_file-pane-multiselect() {
   shot file-pane-multiselect; esc; esc_all
 }
 shot_commit-file-menu() {
-  esc_all; click_text "feat(render): tabl" 1 3; sleep 1
+  esc_all; click_text "0361f44" 1 1; sleep 1
   local p; p=$(find_text "table.rs" 1) || die "no file"; set -- $p
   right_click $(($1 + 2)) $2; wait_text "Open Diff"; sleep 0.5
   shot commit-file-menu; esc; esc_all
@@ -641,7 +643,7 @@ shot_commit-file-menu() {
 # The parts are the column's own config keys (not the Log's).
 commit_column_open() {
   restart_tui 'commit_column_columns_visible = ["ref", "graph", "message", "author", "date"]'
-  esc_all; click_text "feat(render): tabl" 1 3; sleep 1
+  esc_all; click_text "0361f44" 1 1; sleep 1
   click_text "table.rs" 1 2; wait_text "Hunk"; sleep 0.6
   screen | grep -qF "Graph" || { click_text "All" 1 1; sleep 0.8; }
   # widen the column (drag the divider, the left border of the view, four cells
@@ -680,7 +682,7 @@ shot_undo-toolbar() {
   click_text "Undo" 1 2; sleep 1; raw '\e[<35;5;30M'
 }
 shot_open-in-menu() { GPD_CLEAN_ENV=1 restart_tui ""; click_text "Open in ▾" 1 3; sleep 0.8; shot open-in-menu; esc; GPD_CLEAN_ENV= restart_tui ""; }
-shot_pull-push-tooltip() { esc_all; click_text "Pull ▾" 1 5; sleep 0.8; shot pull-push-tooltip; esc; }
+shot_pull-push-tooltip() { esc_all; click_text "Pull" 1 6; sleep 0.8; shot pull-push-tooltip; esc; }
 # The LFS button only exists on a repository where LFS is initialized or in use:
 # initialize it for this shot (local hooks and filter only), restore afterwards.
 shot_lfs-menu() {
@@ -698,19 +700,19 @@ shot_tab-picker() {
 shot_theme-serie() {
   restart_tui 'graph_color_theme = "serie"
 graph_lane_background = "row_tint"'
-  click_text "Merge branch 'fea" 1 3; sleep 0.6; shot theme-serie
+  click_text "b7ef09f" 1 1; sleep 0.6; shot theme-serie
 }
 shot_theme-material() {
   restart_tui 'graph_color_theme = "material"
 graph_lane_background = "row_tint"'
-  click_text "Merge branch 'fea" 1 3; sleep 0.6; shot theme-material
+  click_text "b7ef09f" 1 1; sleep 0.6; shot theme-material
   restart_tui ""
 }
 
 # the main window in a whole theme (ui.theme), a merge commit selected
 theme_shot() {
   restart_tui "theme = \"$1\""
-  click_text "Merge branch 'fea" 1 3; sleep 0.8; shot "theme-$1"
+  click_text "b7ef09f" 1 1; sleep 0.8; shot "theme-$1"
 }
 # every built-in preset (the gallery in docs/user/themes.md), registry order
 THEME_SLUGS=(dark light catppuccin-latte catppuccin-mocha cyberpunk dracula

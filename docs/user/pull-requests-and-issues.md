@@ -34,6 +34,8 @@ Below the dropdowns: a search box, the state dropdown (*Open*,
 `ABC-12  title`, with the type and the status dimmed when the sidebar is wide
 enough.
 
+![The ISSUES section of the sidebar with the right-click menu of issue #7 open, Open conversation first](images/issues-sidebar.png)
+
 ### Actions on a row
 
 - `Enter` or a double-click opens the row: a pull request in the [review](review.md) (GitHub, GitLab, Gitea,

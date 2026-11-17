@@ -10,7 +10,7 @@ approval and requests for changes. It needs a profile for one of those hosts (se
 reviews. A host's limits are respected: GitLab has no *Request changes* verdict and takes one line per comment.
 This page calls all of them a *request*.
 
-![The review view, Overview page: the request's header with its metadata buttons, the description and the conversation with a submitted approval](images/review-overview.png)
+![The review view, Overview page: the request's header with its metadata buttons, the description, an unresolved and a resolved code thread, the comments and the comment box](images/review-overview.png)
 
 ![The Files page: the changed files with their viewed boxes, the diff with a comment thread under its line, and a resolved thread outside the lines shown](images/review-files.png)
 

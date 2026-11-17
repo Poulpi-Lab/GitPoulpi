@@ -34,6 +34,10 @@ without the `conversation` feature does the same everywhere ([custom builds](cus
 A full-window view: the header (state, who opened it and when, the labels, the number of comments, **Show events**,
 **Back**, **Refresh**, **Open in browser**), the **Posting as** line, the timeline, and under it the comment box.
 
+![The conversation of issue #7: the description with a link to #9, two comments, a label event shown by Show events, and the empty New comment box with Write, Preview and Split](images/issue-conversation.png)
+
+![The Overview page of merge request !58: the description, an unresolved and a resolved code thread with their file and line links, the comments, Reply and Quote on the selected thread, and the comment box](images/pr-conversation.png)
+
 - The timeline reads oldest to newest and starts on the newest window (at most 300 entries). **Load older** at its
   top (`m`, palette *Conversation: Load Older Entries*) reads the window before, with the number still to come when
   the host says it.
@@ -77,6 +81,8 @@ window 100 columns wide). `Ctrl+Enter` (also `Ctrl+S` and `Alt+Enter`) or **Send
 `Alt+E` opens **Write with AI** where AI is on ([the AI chapter](ai.md#writing-help-on-a-host)). The preview is
 laid out by the same renderer as the timeline, with the same references. When the host does not take Markdown the
 footer names the markup the text is sent in (*Sent as Jira wiki markup*, *Sent as Textile*).
+
+![An issue reply being written in the Split view: the Markdown draft on the left, its rendered preview on the right, and Send](images/issue-reply-composer.png)
 
 - The comment is added to the timeline at once and takes its place when the host answers. If the host refuses, the
   entry goes away and the box opens again with your text and the reason.

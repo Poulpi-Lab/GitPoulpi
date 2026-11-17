@@ -1,4 +1,4 @@
-//! The logo sprite and its colorways, from `assets/logo/colourways.json` --
+//! The logo sprite and its colorways, from `crates/gitpoulpi-logo-build/colourways.json` --
 //! the one table the About window, `scripts/gen-logo.py` (README images) and
 //! `build-custom` read. `build.rs` copies it to `OUT_DIR` keeping only the
 //! colorways a custom build selected (`GITPOULPI_LOGO_COLORS`) and setting
@@ -33,7 +33,7 @@ pub(crate) struct Way {
 
 fn table() -> &'static Table {
     static T: OnceLock<Table> = OnceLock::new();
-    T.get_or_init(|| serde_json::from_str(TABLE).expect("assets/logo/colourways.json parses"))
+    T.get_or_init(|| serde_json::from_str(TABLE).expect("colourways.json parses"))
 }
 
 /// Every colorway built in, in the table's order.
@@ -218,15 +218,12 @@ pub(crate) fn sprite_bitmap(way: &Way, px: u32) -> Bitmap {
     out
 }
 
-/// The build-time selection logic, also exercised here (it is shared with
-/// `build.rs` and `xtask` by `#[path]`).
-#[cfg(test)]
-#[path = "../../../assets/logo/logo_build.rs"]
-mod logo_build;
-
+/// The build-time selection logic (`gitpoulpi-logo-build`, shared with
+/// `build.rs` and `xtask`), also exercised here.
 #[cfg(test)]
 mod tests {
     use super::*;
+    use gitpoulpi_logo_build::logo_build;
 
     /// Under a custom build's environment the About default is the chosen
     /// one, and the table holds exactly the chosen colorways.
@@ -249,8 +246,7 @@ mod tests {
     fn a_stale_slug_falls_back_to_the_compiled_default() {
         // Only violet and teal compiled, teal the default: a stored "sun"
         // (not compiled) or "lavender" resolves to teal.
-        let full: serde_json::Value =
-            serde_json::from_str(include_str!("../../../assets/logo/colourways.json")).unwrap();
+        let full: serde_json::Value = serde_json::from_str(logo_build::TABLE_JSON).unwrap();
         let all = logo_build::slugs(&full);
         let sel = logo_build::parse_colors("violet,teal", &all).unwrap();
         let t: Table =

@@ -6,6 +6,11 @@ rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+exclude.workspace = true
 description = "GitPoulpi application log: a tracing sink with a level, daily files, retention and redaction."
 
 [dependencies]

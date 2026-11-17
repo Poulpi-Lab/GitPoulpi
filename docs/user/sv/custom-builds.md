@@ -93,9 +93,9 @@ om du föredrar det. `gitpoulpi --version` skriver ut en rad `themes:` med den u
 Logotypvalen är miljövariablerna `GITPOULPI_LOGO_COLORS`
 (`all` eller en kommalista med slugs), `GITPOULPI_LOGO_DEFAULT` och
 `GITPOULPI_ICON_COLOR`, lästa av byggskripten för `gitpoulpi-tui` (det filtrerar
-`assets/logo/colourways.json` till tabellen som Om-fönstret bäddar in) och för de
+`crates/gitpoulpi-logo-build/colourways.json` till tabellen som Om-fönstret bäddar in) och för de
 tre binärcraten (ikonen). Källan till färgerna förblir
-`assets/logo/colourways.json`.
+`crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Den körbara Windows-filens ikon
 

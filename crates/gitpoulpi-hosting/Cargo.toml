@@ -6,6 +6,11 @@ rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+exclude.workspace = true
 description = "Hosting and issue-tracker API clients (GitHub, GitLab, Gitea/Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine, local Markdown issues): project listing, clone helpers, SSH key generation and upload, remote-URL provider matching."
 
 [features]

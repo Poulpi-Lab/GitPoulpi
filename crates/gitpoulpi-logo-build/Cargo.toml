@@ -1,0 +1,18 @@
+[package]
+name = "gitpoulpi-logo-build"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+exclude.workspace = true
+description = "Build-script support of the GitPoulpi binaries: the logo colorway table, its build-time selection and the Windows executable icon."
+
+[dependencies]
+serde_json.workspace = true
+winresource = { version = "0.1", default-features = false }

@@ -95,9 +95,9 @@ build-custom                     # Windows, cmd или PowerShell (scripts/build
 Выбор логотипа - это переменные окружения `GITPOULPI_LOGO_COLORS`
 (`all` или список слагов через запятую), `GITPOULPI_LOGO_DEFAULT` и
 `GITPOULPI_ICON_COLOR`, которые читают скрипты сборки `gitpoulpi-tui` (он
-фильтрует `assets/logo/colourways.json` в таблицу, встраиваемую в окно «О
+фильтрует `crates/gitpoulpi-logo-build/colourways.json` в таблицу, встраиваемую в окно «О
 программе») и трёх крейтов с исполняемыми файлами (значок). Источник цветов остаётся
-`assets/logo/colourways.json`.
+`crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Значок исполняемого файла Windows
 

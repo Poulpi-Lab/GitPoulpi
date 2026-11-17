@@ -90,9 +90,9 @@ PowerShell の名前：`-Langs -Integrations -Themes -LogoColors -LogoDefault -I
 ロゴの選択は、環境変数 `GITPOULPI_LOGO_COLORS`
 （`all` またはスラッグのカンマ区切りリスト）、`GITPOULPI_LOGO_DEFAULT`、
 `GITPOULPI_ICON_COLOR` で、`gitpoulpi-tui` のビルドスクリプト
-（`assets/logo/colourways.json` をフィルターして「GitPoulpi について」ウィンドウが埋め込む表にします）と、
+（`crates/gitpoulpi-logo-build/colourways.json` をフィルターして「GitPoulpi について」ウィンドウが埋め込む表にします）と、
 3 つのバイナリ crate のビルドスクリプト（アイコン）が読み取ります。色の元データは
-`assets/logo/colourways.json` のままです。
+`crates/gitpoulpi-logo-build/colourways.json` のままです。
 
 ### Windows 実行ファイルのアイコン
 

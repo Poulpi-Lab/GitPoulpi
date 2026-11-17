@@ -5,8 +5,7 @@
 //! so it is unit-tested without ever running cargo. Feature names are the
 //! fixed contract of plan section 1.1.
 
-#[path = "../../assets/logo/logo_build.rs"]
-mod logo_build;
+use gitpoulpi_logo_build::logo_build;
 
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
@@ -628,8 +627,7 @@ pub fn parse_langs(value: &str, available: &[String]) -> Result<Vec<String>, Str
 }
 
 fn logo_table() -> serde_json::Value {
-    serde_json::from_str(include_str!("../../assets/logo/colourways.json"))
-        .expect("assets/logo/colourways.json parses")
+    serde_json::from_str(logo_build::TABLE_JSON).expect("colourways.json parses")
 }
 
 /// `all` (or `auto`) -> `None`, else the validated slugs in table order.

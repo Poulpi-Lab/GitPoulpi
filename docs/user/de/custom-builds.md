@@ -95,9 +95,9 @@ Kompilierzeit weglässt; setzen Sie sie bei Bedarf selbst für ein einfaches
 Die Logo-Auswahl sind die Umgebungsvariablen `GITPOULPI_LOGO_COLORS` (`all`
 oder eine kommagetrennte Liste von Slugs), `GITPOULPI_LOGO_DEFAULT` und
 `GITPOULPI_ICON_COLOR`, gelesen von den Build-Skripten von `gitpoulpi-tui`
-(es filtert `assets/logo/colourways.json` in die Tabelle, die das Fenster „Über GitPoulpi“
+(es filtert `crates/gitpoulpi-logo-build/colourways.json` in die Tabelle, die das Fenster „Über GitPoulpi“
 einbettet) und der drei Binär-Crates (das Symbol). Die Quelle der Farben
-bleibt `assets/logo/colourways.json`.
+bleibt `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Windows-Programmsymbol
 

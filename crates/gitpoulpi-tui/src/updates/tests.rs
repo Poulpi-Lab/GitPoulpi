@@ -237,7 +237,7 @@ fn the_changelog_is_compiled_in_and_the_running_section_is_found() {
     assert_eq!(notes::section_start("no headings", "0.1.0", false), 0);
 }
 
-const CHANGELOG_FOR_TESTS: &str = include_str!("../../../../CHANGELOG.md");
+const CHANGELOG_FOR_TESTS: &str = include_str!("../../CHANGELOG.md");
 
 fn screen(terminal: &Terminal<TestBackend>) -> String {
     let buf = terminal.backend().buffer();

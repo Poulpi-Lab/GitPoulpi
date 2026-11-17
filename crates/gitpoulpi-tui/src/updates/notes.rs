@@ -31,8 +31,10 @@ use crate::md_render;
 use crate::scrollbar::{BarDrag, Track};
 use crate::{button_bg, display_width, th};
 
-/// `CHANGELOG.md` of this build.
-const CHANGELOG: &str = include_str!("../../../../CHANGELOG.md");
+/// `CHANGELOG.md` of this build: the crate's copy of the repository's file (a
+/// crates.io package reads nothing outside its directory; a test in `xtask`
+/// compares the two).
+const CHANGELOG: &str = include_str!("../../CHANGELOG.md");
 
 /// Rows above the body: heading, buttons, rule.
 const CHROME_TOP: u16 = 3;

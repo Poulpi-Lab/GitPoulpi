@@ -21,8 +21,10 @@ pub use gitpoulpi_hosting::updates::signing::{PublicKey, SignError, VersionRule}
 use crate::UpdateError;
 
 /// The public key files compiled in, current first. `packaging/minisign.pub`
-/// is the project's key (id `B461FFCBF6F6A4F2`).
-const KEY_FILES: &[&str] = &[include_str!("../../../packaging/minisign.pub")];
+/// is the project's key (id `B461FFCBF6F6A4F2`); the crate holds a copy of it
+/// (a crates.io package reads nothing outside its directory, a test in
+/// `xtask` compares the two).
+const KEY_FILES: &[&str] = &[include_str!("../minisign.pub")];
 
 /// The debug-build override for the PTY tests (the test builds a key pair and
 /// signs a fake release with it). Release and dist builds do not contain it.

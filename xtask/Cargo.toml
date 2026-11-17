@@ -26,6 +26,7 @@ path = "src/main.rs"
 gitpoulpi-core.workspace = true
 gitpoulpi-pty.workspace = true
 gitpoulpi-ipc.workspace = true
+gitpoulpi-logo-build.workspace = true
 # `build-custom` lists the theme families of the presets it can select.
 gitpoulpi-config.workspace = true
 gitpoulpi-daemon = { workspace = true, features = ["default"] }

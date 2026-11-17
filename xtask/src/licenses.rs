@@ -26,6 +26,9 @@ use sha2::{Digest, Sha256};
 
 /// The committed output, at the repository root.
 pub const OUTPUT: &str = "THIRD-PARTY-LICENSES.txt";
+/// The copy the `gitpoulpi-core` package carries (it embeds the text and a
+/// crates.io package cannot read outside its directory).
+pub const CRATE_COPY: &str = "crates/gitpoulpi-core/THIRD-PARTY-LICENSES.txt";
 /// The prefix of the fingerprint line.
 pub const FINGERPRINT_PREFIX: &str = "Cargo.lock sha256: ";
 /// Widest line of the output: the About view shows it unwrapped.
@@ -43,8 +46,9 @@ pub fn run(args: &[String]) -> Result<i32, String> {
     match args {
         [] => {
             let text = generate(&root)?;
-            std::fs::write(root.join(OUTPUT), text).map_err(|e| e.to_string())?;
-            println!("wrote {OUTPUT}");
+            std::fs::write(root.join(OUTPUT), &text).map_err(|e| e.to_string())?;
+            std::fs::write(root.join(CRATE_COPY), &text).map_err(|e| e.to_string())?;
+            println!("wrote {OUTPUT} and {CRATE_COPY}");
             Ok(0)
         }
         [flag] if flag == "--check" => {

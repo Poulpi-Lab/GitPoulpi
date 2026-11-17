@@ -94,9 +94,9 @@ palety; można ją ustawić samodzielnie przy zwykłym `cargo build`. `gitpoulpi
 Wybory dotyczące logo to zmienne środowiskowe `GITPOULPI_LOGO_COLORS`
 (`all` lub lista slugów rozdzielona przecinkami), `GITPOULPI_LOGO_DEFAULT` i
 `GITPOULPI_ICON_COLOR`, odczytywane przez skrypty budowania `gitpoulpi-tui` (filtruje
-`assets/logo/colourways.json` do tabeli osadzanej w oknie O programie GitPoulpi)
+`crates/gitpoulpi-logo-build/colourways.json` do tabeli osadzanej w oknie O programie GitPoulpi)
 i trzech crate'ów binarnych (ikona). Źródłem kolorów pozostaje
-`assets/logo/colourways.json`.
+`crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Ikona pliku wykonywalnego w Windows
 

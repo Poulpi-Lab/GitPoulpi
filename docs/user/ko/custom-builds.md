@@ -78,7 +78,7 @@ PowerShell 이름: `-Langs -Integrations -Themes -LogoColors -LogoDefault -IconC
 테마 선택은 환경 변수 `GITPOULPI_THEMES`(`all`, `none` 또는 쉼표로 구분한 계열 목록)로 빌드에 전달되며, `gitpoulpi-config`의 빌드 스크립트가 이를 읽어 컴파일 시점에 다른 팔레트를 제외합니다. 원한다면 일반 `cargo build`에서 직접 설정해도 됩니다. `gitpoulpi
 --version`은 빌드된 집합을 담은 `themes:` 줄을 출력합니다.
 
-로고 선택은 환경 변수 `GITPOULPI_LOGO_COLORS`(`all` 또는 slug를 쉼표로 구분한 목록), `GITPOULPI_LOGO_DEFAULT`, `GITPOULPI_ICON_COLOR`이며, `gitpoulpi-tui`의 빌드 스크립트(`assets/logo/colourways.json`을 걸러 정보 창이 내장하는 표로 만듦)와 세 바이너리 크레이트의 빌드 스크립트(아이콘)가 읽습니다. 색상의 원본은 계속 `assets/logo/colourways.json`입니다.
+로고 선택은 환경 변수 `GITPOULPI_LOGO_COLORS`(`all` 또는 slug를 쉼표로 구분한 목록), `GITPOULPI_LOGO_DEFAULT`, `GITPOULPI_ICON_COLOR`이며, `gitpoulpi-tui`의 빌드 스크립트(`crates/gitpoulpi-logo-build/colourways.json`을 걸러 정보 창이 내장하는 표로 만듦)와 세 바이너리 크레이트의 빌드 스크립트(아이콘)가 읽습니다. 색상의 원본은 계속 `crates/gitpoulpi-logo-build/colourways.json`입니다.
 
 ### Windows 실행 파일 아이콘
 

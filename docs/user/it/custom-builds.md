@@ -94,9 +94,9 @@ impostala tu stesso per un semplice `cargo build` se preferisci. `gitpoulpi
 Le scelte del logo sono le variabili d'ambiente `GITPOULPI_LOGO_COLORS`
 (`all` o un elenco di slug separati da virgola), `GITPOULPI_LOGO_DEFAULT` e
 `GITPOULPI_ICON_COLOR`, lette dagli script di build di `gitpoulpi-tui` (che
-filtra `assets/logo/colourways.json` nella tabella che la finestra Informazioni
+filtra `crates/gitpoulpi-logo-build/colourways.json` nella tabella che la finestra Informazioni
 incorpora) e dei tre crate binari (l'icona). La fonte dei colori
-resta `assets/logo/colourways.json`.
+resta `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Icona dell'eseguibile Windows
 

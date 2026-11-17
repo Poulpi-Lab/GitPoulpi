@@ -127,6 +127,7 @@ Every channel below writes the same `.gitpoulpi-dist` marker next to the program
 | **MSI** (Windows, managed) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | For administrators: all users, no in-app updates. See [Enterprise distribution](enterprise-distribution.md#msi-with-intune-or-group-policy). |
 | **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (or `paru -S gitpoulpi-bin`) | Without a helper: `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, then `cd gitpoulpi-bin && makepkg -si`. |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Downloads the release archive instead of compiling. |
+| **cargo, from crates.io** | `cargo install --locked gitpoulpi-cli` | Compiles; needs a Rust toolchain. Installs `gitpoulpi`, which opens the terminal UI when run without a subcommand and also serves MCP (`gitpoulpi mcp`). `gitpoulpi-tui` and `gitpoulpi-mcp` are the same programs as standalone crates. |
 | **cargo, from source** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Compiles; needs a Rust toolchain. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | See [Running in Docker](docker.md). The same image is on `ghcr.io/poulpi-lab/gitpoulpi`. |
 

@@ -14,6 +14,16 @@ use std::path::Path;
 pub fn run() {
     let manifest = std::env::var("CARGO_MANIFEST_DIR").expect("set by cargo");
     let root = Path::new(&manifest).join("../..");
+    // Built from a crates.io package: no workspace around it, no list.
+    if !root.join("crates/gitpoulpi-tui").is_dir() {
+        std::fs::write(
+            Path::new(&std::env::var("OUT_DIR").expect("set by cargo"))
+                .join("third_party_crates.txt"),
+            "",
+        )
+        .expect("OUT_DIR is writable");
+        return;
+    }
     let lock_path = root.join("Cargo.lock");
     println!("cargo:rerun-if-changed={}", lock_path.display());
     let out =

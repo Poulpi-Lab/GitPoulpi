@@ -170,7 +170,7 @@ Domyślnie rząd pod panelami i nad paskiem stanu. **Ustawienia > Wygląd > Poł
 | **Flow** `▾` | Menu przepływu pracy z gałęziami (start, finish, sync, promote; `Ctrl+G Shift+W`). Tylko w repozytorium, które ma przepływ pracy. Zob. [Przepływy pracy z gałęziami](branching-workflows.md). |
 | **Szukaj** | Otwiera pasek wyszukiwania commitów nad Logiem (`f`). |
 
-Na końcu (z prawej w rzędzie, na dole w kolumnie), gdy repozytorium jest powiązane z hostem, **chip** pokazuje pull request bieżącej gałęzi (na przykład `GH #12` lub `GL !53`) albo przygaszony `+ PR`. **Ustawienia > Wygląd > Przypnij przycisk pull request na końcu** (domyślnie włączone) trzyma go tam; wyłączone, płynie z innymi przyciskami i podąża za ich wyrównaniem. Zob. [Hosting i trackery zgłoszeń](hosting-integration.md). W kolumnie lista rozwijana profili zajmuje ostatni wiersz.
+Na końcu (z prawej w rzędzie, na dole w kolumnie), gdy repozytorium jest powiązane z hostem, **chip** pokazuje pull request bieżącej gałęzi (na przykład `GH #12` lub `GL !53`) albo przygaszony `+ PR`. **Ustawienia > Wygląd > Przypnij przycisk pull request na końcu** (domyślnie włączone) trzyma go tam; wyłączone, płynie z innymi przyciskami i podąża za ich wyrównaniem. W wąskim rzędzie chip kurczy się jako pierwszy (`● #12`, potem sam symbol stanu) i dopiero potem trafia do menu `⋯`. Zob. [Hosting i trackery zgłoszeń](hosting-integration.md). W kolumnie lista rozwijana profili zajmuje ostatni wiersz.
 
 Na prawym końcu, gdy masz dwa lub więcej [profili](settings.md#profile),
 **lista rozwijana profili** wybiera tożsamość commitów dla tego repozytorium.

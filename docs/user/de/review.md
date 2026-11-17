@@ -11,7 +11,7 @@ verknüpftes Repository; andere Anbieter bieten keine Reviews an. Die Grenzen ei
 GitLab kennt keine Beurteilung *Änderungen anfordern* und nimmt eine Zeile pro Kommentar. Diese Seite nennt
 alle zusammen eine *Anfrage*.
 
-![Die Review-Ansicht, Seite Übersicht: die Kopfzeile der Anfrage mit ihren Metadaten-Schaltflächen, die Beschreibung und die Unterhaltung mit einer abgesendeten Genehmigung](../images/review-overview.png)
+![Die Review-Ansicht, Seite Übersicht: die Kopfzeile der Anfrage mit ihren Metadaten-Schaltflächen, die Beschreibung, ein offener und ein gelöster Code-Thread, die Kommentare und das Kommentarfeld](../images/review-overview.png)
 
 ![Die Seite Dateien: die geänderten Dateien mit ihren Kästchen für „angesehen“, der Diff mit einem Kommentar-Thread unter seiner Zeile und ein aufgelöster Thread außerhalb der gezeigten Zeilen](../images/review-files.png)
 
@@ -39,7 +39,7 @@ Immer sichtbar: Nummer und Titel, der Zustand (Open, Draft, Merged, Closed), die
 **`3 ausstehende Kommentare`**, sobald Sie welche geschrieben haben.
 
 Die vier Metadaten-Schaltflächen - **Zugewiesene**, **Reviewer**, **Labels**, **Meilenstein** - öffnen dieselben
-Auswahllisten wie die Seitenleiste (siehe [Zugewiesene, Reviewer, Labels und Meilenstein](hosting-integration.md#zugewiesene-reviewer-labels-und-meilenstein));
+Auswahllisten wie die Seitenleiste (siehe [Zugewiesene, Reviewer, Labels und Meilenstein](pull-requests-and-issues.md#zugewiesene-reviewer-labels-und-meilenstein));
 die Kopfzeile zeigt das Ergebnis, sobald der Host es angenommen hat. Die Aktionsschaltflächen: **Auschecken**
 (das übliche Auschecken des Branches der Anfrage, das auch die Ansicht schließt), **Im Browser öffnen**,
 **Aktualisieren** (**`F5`**) und **Review abschließen**.
@@ -52,7 +52,7 @@ Ein Umschalter im oberen Rand wechselt die Seite: **Übersicht**, **Dateien**, *
 ### Übersicht
 
 Die Übersicht ist **die Unterhaltung der Anfrage**, dieselbe Zeitleiste und dasselbe Kommentarfeld wie bei einem Issue
-([Unterhaltungen](hosting-integration.md#5c-unterhaltungen)): zuerst die Beschreibung (*hat dies geöffnet*), dann die Kommentare,
+([Unterhaltungen](conversations.md)): zuerst die Beschreibung (*hat dies geöffnet*), dann die Kommentare,
 die Threads am Code mit ihrem Diff-Ausschnitt, die abgesendeten Reviews mit ihrer Beurteilung (`genehmigt`, `Änderungen
 angefordert`, `kommentiert`, `verworfen`; bei GitLab sind die Beurteilungen seine Genehmigungen) und die Ereignisse, älteste zuerst,
 im neuesten Fenster mit **Ältere laden** an dessen Anfang. Das Kommentarfeld ist unter der Zeitleiste angedockt (**Neuer Kommentar**):
@@ -88,7 +88,7 @@ in der Palette; `a` (Zuständige), `p` (Reviewer), `f` (**Review abschließen**)
 Ein Kommentar, der in einem anderen Fenster oder per CLI geschrieben wurde, erscheint hier von selbst: Jeder Schreibzugriff von GitPoulpi
 (dieses Fenster eingeschlossen) meldet es der Sitzung, und die Fenster, die dieselbe Anfrage zeigen, lesen sie neu.
 
-Das Kommentarfeld ist das gemeinsame Markdown-Textfeld der [Unterhaltungsansicht](hosting-integration.md#schreiben)
+Das Kommentarfeld ist das gemeinsame Markdown-Textfeld der [Unterhaltungsansicht](conversations.md#schreiben)
 (auch das Feld einer Antwort auf einen Thread, eines Kommentars an einer Zeile und der Zusammenfassung von **Review abschließen**): `Ctrl+Enter` (auch
 `Ctrl+S`, `Alt+Enter`) sendet, und wo KI an ist, öffnet `Alt+E` **Mit KI schreiben**
 ([das KI-Kapitel](ai.md#schreibhilfe-auf-einem-host)). Die Vorschau zeigt den Text so, wie der Host ihn zeigt, Verweise eingeschlossen

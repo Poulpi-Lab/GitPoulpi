@@ -15,6 +15,8 @@ Hat ein Repository eine `.gitmodules`, erhält die Refs-Seitenleiste einen Absch
 | `○` | nicht geklont | in `.gitmodules` deklariert und festgehalten, aber sein Ordner ist leer: aktualisieren Sie es, um es zu klonen |
 | `✗` | Konflikt | das Repository hat Merge-Konflikte am Submodul |
 
+![Der Abschnitt SUBMODULE mit drei Zeilen: vendor/almanac nicht geklont (○), vendor/ephemeris aktuell (✓) und vendor/starfield geändert (↑, bei einem anderen Commit als dem festgehaltenen), was auch als geänderte Datei im Status-Bereich erscheint](../images/submodules.png)
+
 | Aktion | Maus | Tastatur |
 |---|---|---|
 | Das Submodul als eigenen Tab öffnen | Doppelklick auf die Zeile | auswählen, `Enter` (Palette: `Refs: Submodul in Tab öffnen`) |
@@ -23,6 +25,7 @@ Hat ein Repository eine `.gitmodules`, erhält die Refs-Seitenleiste einen Absch
 | Es in `.git/config` eintragen, ohne zu klonen | Menü | `Ctrl+P`: `Refs: Submodul initialisieren (ausgewählt)` |
 | Alle Submodule aktualisieren | | `Ctrl+P`: `Git: Alle Submodule aktualisieren` |
 | Zum Abschnitt springen | Klick auf seine Überschrift | `Ctrl+P`: `Navigation: Refs > Submodule fokussieren` |
+![Das Rechtsklickmenü der geänderten Zeile vendor/starfield: Aktualisieren (bei Bedarf klonen), Initialisieren und In neuem Tab öffnen](../images/submodule-menu.png)
 
 Eine Aktualisierung kann vom Remote des Submoduls fetchen und folgt daher wie jede andere Übertragung **Einstellungen > SSH & Zugangsdaten > HTTPS-Zugangsdaten**. Ein nicht geklontes Submodul lässt sich nicht als Tab öffnen; die Statuszeile sagt das und verweist auf Aktualisieren.
 

@@ -10,7 +10,7 @@ das Home-Fenster mit der Radar-Ansicht darüber, damit nichts darunter einen Kli
 eine Taste stehlen kann.
 
 Es braucht ein Code-Host-Profil (siehe [Hosting und
-Issue-Tracker](hosting-integration.md)) und damit verknüpfte Repositories oder ein Profil mit
+Issue-Tracker](hosting-integration.md); die Listen eines Repositorys stehen in [Pull Requests und Issues](pull-requests-and-issues.md), und die Diskussion einer Zeile öffnet sich als [Unterhaltung](conversations.md)) und damit verknüpfte Repositories oder ein Profil mit
 eingeschalteten kontoweiten Listen (siehe „Über den Umfang hinaus“ unten). Ein nicht
 verknüpftes Repository wird nie abgefragt: Es zeigt stattdessen eine Zeile
 „Verknüpfen...“ (siehe „Repositories mit etwas zu sagen“ unten).

@@ -187,7 +187,10 @@ im Abschnitt STASHES, für **Pop**, **Anwenden** (behält den Stash) oder **Drop
 öffnet einen Dialog, der einen Ordner neben dem Repository vorschlägt, einen
 optionalen neuen Branch-Namen und „Den neuen Worktree als Tab öffnen“. Worktrees
 erscheinen im Abschnitt WORKTREES; Doppelklick auf einen öffnet ihn, und sein Tab
-schließt sich von selbst, wenn der Worktree entfernt wird.
+schließt sich von selbst, wenn der Worktree entfernt wird. Die ganze Funktion
+(in einem anderen Werkzeug öffnen, den Branch eines Worktrees mergen, entfernen)
+steht in [Worktrees](worktrees.md); der Abschnitt SUBMODULE desselben Bereichs in
+[Submodule](submodules.md).
 
 ## Refs auf Commits ziehen
 

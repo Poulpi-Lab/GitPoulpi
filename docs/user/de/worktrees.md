@@ -6,6 +6,8 @@ Ein Worktree ist eine zweite ausgecheckte Kopie des Repositorys: ein anderer
 Ordner auf einem anderen Branch, mit demselben Verlauf. Der Abschnitt WORKTREES
 des Refs-Bereichs listet sie auf; der Haupt-Worktree ist mit `(Haupt)` markiert.
 
+![Der Refs-Bereich eines Repositorys mit zwei verknüpften Worktrees: Der Abschnitt WORKTREES listet main (Haupt), hotfix/axis-labels und feature/legend, darunter der Abschnitt SUBMODULE](../images/worktrees.png)
+
 ## Den Abschnitt anzeigen
 
 In einem Repository ohne verknüpften Worktree ist der Abschnitt ausgeblendet.
@@ -35,6 +37,8 @@ erstellen**, **Git: Worktree am ausgewählten Commit erstellen...**, **Refs:
 Worktree mit Branch-Auswahl erstellen**). Die älteren Einträge funktionieren
 weiterhin: **Worktree aus ... erstellen...** im Menü eines Branches, Tags oder
 Commits.
+
+![Der Dialog Worktree erstellen: die Felder Name, Ordner, Ref und Worktree-Branch, die Zeile „neuer Branch ab main“, das Kästchen Den neuen Worktree als Tab öffnen und die Schaltflächen Abbrechen und Erstellen](../images/worktree-create.png)
 
 Der Dialog schlägt alles vor und lässt Sie es ändern. **Name** und neuer Branch
 beginnen beide als `worktree-<id>`, wobei `<id>` 8 zufällige Hexziffern sind
@@ -84,6 +88,13 @@ oder `.` drücken):
   nirgends ausgecheckt ist, wird mit Begründung abgelehnt. Bei einem losgelösten
   Worktree nicht angeboten.
 - **Worktree entfernen...**: nie der Haupt-Worktree.
+
+![Das Rechtsklickmenü einer Worktree-Zeile: In neuem Tab öffnen, Öffnen in, Merge von hotfix/axis-labels in... und Worktree entfernen...](../images/worktree-menu.png)
+
+**In neuem Tab öffnen** (oder ein Doppelklick, oder `Enter`) öffnet den Ordner des
+Worktrees als eigenen Tab, mit eigenem Log, Status und Branch:
+
+![Der Worktree hotfix/axis-labels als eigener Tab neben dem Haupt-Tab, mit seinem Commit und seiner geänderten Datei](../images/worktree-tab.png)
 
 Die Palette hat dieselben Aktionen für die ausgewählte Zeile (**Refs: Worktree
 öffnen in...**, **Refs: Merge des Worktree-Branches in...**, **Refs: Worktree

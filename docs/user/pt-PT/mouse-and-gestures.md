@@ -132,7 +132,7 @@ O GitPoulpi memoriza todos os tamanhos. Veja
 
 ## Barra de título, linha de separadores e barra de ferramentas
 
-- **Clique em 🐙** na barra de título para abrir **Acerca do GitPoulpi**. Em Acerca de,
+- **Clique em <img src="../../../assets/logo/gitpoulpi.png" alt="Ícone do GitPoulpi" height="16">** na barra de título para abrir **Acerca do GitPoulpi**. Em Acerca de,
   as pupilas do polvo seguem o ponteiro; clique no logótipo para o fazer rodar para a cor
   seguinte, clique com o botão direito nele para ver a lista de cores, clique numa ligação
   para a abrir.

@@ -393,7 +393,7 @@ para uma escrita no host: não pode publicar, editar, resolver nem eliminar nada
 **Enviar** (`Ctrl+Enter`) ou **Comentar** da caixa de texto.
 
 **Na caixa de texto Markdown.** Com a IA ativa, cada caixa de texto cujo texto vai para um host (um comentário, uma
-resposta ou uma edição na [vista de conversa](hosting-integration.md#5c-conversas), um comentário de revisão, o resumo de
+resposta ou uma edição na [vista de conversa](conversations.md), um comentário de revisão, o resumo de
 Concluir revisão, a descrição de uma nova issue e a descrição do pull request) tem um botão **Escrever com IA**
 (`Alt+E`, a mesma tecla em todas) na extremidade direita da sua barra de modos. Abre um painel por baixo da barra:
 

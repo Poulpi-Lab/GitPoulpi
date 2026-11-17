@@ -6,6 +6,8 @@ Um worktree é uma segunda cópia em checkout do repositório: outra pasta, nout
 branch, com o mesmo histórico. A secção WORKTREES do painel Refs lista-os; o
 principal aparece marcado com `(principal)`.
 
+![O painel Refs de um repositório com dois worktrees ligados: a secção WORKTREES lista main (principal), hotfix/axis-labels e feature/legend, com a secção SUBMÓDULOS por baixo](../images/worktrees.png)
+
 ## Mostrar a secção
 
 A secção fica oculta num repositório que ainda não tem nenhum worktree ligado.
@@ -34,6 +36,8 @@ A paleta tem os mesmos três (**Refs: criar worktree a partir da branch atual**,
 **Git: criar worktree no commit selecionado...**, **Refs: criar worktree
 escolhendo uma branch**). As entradas mais antigas continuam a funcionar:
 **Criar worktree a partir de...** no menu de uma branch, tag ou commit.
+
+![O diálogo Criar worktree: os campos Nome, Pasta, Ref e Branch do worktree, a linha "nova branch a partir de main", a caixa Abrir o novo worktree como separador e os botões Cancelar e Criar](../images/worktree-create.png)
 
 O diálogo propõe tudo e deixa-o alterar. O **Nome** e a nova branch começam
 ambos como `worktree-<id>`, em que `<id>` são 8 dígitos hexadecimais aleatórios
@@ -81,6 +85,12 @@ Clique com o botão direito num worktree (ou selecione-o e prima a tecla de menu
   checkout em lado nenhum é recusada com o motivo. Não é oferecido para um
   worktree com HEAD desanexado.
 - **Remover worktree...**: nunca o principal.
+
+![O menu de clique direito de uma linha de worktree: Abrir em novo separador, Abrir em, Merge de hotfix/axis-labels em... e Remover worktree...](../images/worktree-menu.png)
+
+**Abrir em novo separador** (ou um clique duplo, ou `Enter`) abre a pasta do worktree como um separador próprio, com o seu Log, estado e branch:
+
+![O worktree hotfix/axis-labels aberto como separador próprio ao lado do principal, com o seu commit e o ficheiro alterado](../images/worktree-tab.png)
 
 A paleta tem as mesmas ações sobre a linha selecionada (**Refs: abrir worktree
 em...**, **Refs: merge da branch do worktree em...**, **Refs: remover

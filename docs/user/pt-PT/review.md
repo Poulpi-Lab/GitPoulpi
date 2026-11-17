@@ -10,7 +10,7 @@ aprovação e pedidos de alterações. Precisa de um perfil de um desses hosts (
 revisões. Os limites de cada host são respeitados: o GitLab não tem o parecer *Pedir alterações* e aceita uma linha por comentário.
 Esta página chama a todos eles um *pedido*.
 
-![A vista de revisão, página Resumo: o cabeçalho do pedido com os botões de metadados, a descrição e a conversa com uma aprovação submetida](../images/review-overview.png)
+![A vista de revisão, página Resumo: o cabeçalho do pedido com os botões de metadados, a descrição, um tópico de código por resolver e um resolvido, os comentários e a caixa de comentário](../images/review-overview.png)
 
 ![A página Ficheiros: os ficheiros alterados com as caixas de visto, o diff com uma discussão de comentários sob a sua linha e uma discussão resolvida fora das linhas mostradas](../images/review-files.png)
 
@@ -37,7 +37,7 @@ Sempre visível: o número e o título, o estado (Aberto, Rascunho, Integrado, F
 se integra sem problemas ou tem conflitos, o tamanho e **`3 comentários pendentes`** quando já escreveu alguns.
 
 Os quatro botões de metadados - **Responsáveis**, **Revisores**, **Etiquetas**, **Marco** - abrem os mesmos seletores que
-a barra lateral (ver [Responsáveis, revisores, etiquetas e marco](hosting-integration.md#responsáveis-revisores-etiquetas-e-marco));
+a barra lateral (ver [Responsáveis, revisores, etiquetas e marco](pull-requests-and-issues.md#responsáveis-revisores-etiquetas-e-marco));
 o cabeçalho mostra o resultado assim que o host o aceitar. Os botões de ação: **Fazer checkout** (o checkout
 habitual da branch do pedido, que também fecha a vista), **Abrir no navegador**, **Atualizar**
 (**`F5`**) e **Concluir revisão**.
@@ -50,7 +50,7 @@ Um controlo segmentado na margem superior muda de página: **Resumo**, **Ficheir
 ### Resumo
 
 O Resumo é **a conversa do pedido**, a mesma cronologia e a mesma caixa de comentário que uma issue tem
-([Conversas](hosting-integration.md#5c-conversas)): primeiro a descrição (*abriu isto*), depois os comentários, as
+([Conversas](conversations.md)): primeiro a descrição (*abriu isto*), depois os comentários, as
 discussões no código com o seu excerto do diff, as revisões submetidas com o seu parecer (`aprovou`, `pediu
 alterações`, `comentou`, `dispensada`; no GitLab os pareceres são as suas aprovações) e os eventos, das mais antigas
 para as mais recentes, na janela mais recente, com **Carregar mais antigos** no topo. A caixa de comentário está
@@ -88,7 +88,7 @@ revisão.
 Um comentário escrito noutra janela ou pela CLI aparece aqui por si: cada escrita do GitPoulpi (esta janela incluída)
 avisa a sessão, e as janelas que mostram o mesmo pedido leem-no de novo.
 
-A caixa de comentário é a caixa de texto Markdown partilhada com a [vista de conversa](hosting-integration.md#escrever)
+A caixa de comentário é a caixa de texto Markdown partilhada com a [vista de conversa](conversations.md#escrever)
 (também a caixa de uma resposta a uma discussão, de um comentário numa linha e do resumo de **Concluir revisão**):
 `Ctrl+Enter` (também `Ctrl+S`, `Alt+Enter`) envia, e onde a IA está ativa `Alt+E` abre **Escrever com IA**
 ([o capítulo da IA](ai.md#ajuda-de-escrita-num-host)). A prévia mostra o texto como o host o fará, referências

@@ -13,9 +13,9 @@ demonstração com autores inventados.
 ### Barra de título
 
 A margem superior da janela lê-se
-`🐙 GitPoulpi vX.Y.Z -- <caminho do repositório>` (o nome da sessão está na barra de estado, em baixo).
+<img src="../../../assets/logo/gitpoulpi.png" alt="Ícone do GitPoulpi" height="16"> `GitPoulpi vX.Y.Z -- <caminho do repositório>` (o nome da sessão está na barra de estado, em baixo).
 
-- **🐙** abre a janela **Acerca do GitPoulpi**: versão, funcionalidades da compilação,
+- **<img src="../../../assets/logo/gitpoulpi.png" alt="Ícone do GitPoulpi" height="16">** abre a janela **Acerca do GitPoulpi**: versão, funcionalidades da compilação,
   licença, ligações e os crates de terceiros. Num terminal que desenha imagens, o polvo
   é o logótipo em píxeis, na cor do seu logótipo (nos outros fica o emoji). Paleta:
   `Ajuda: acerca do GitPoulpi`; teclas: `Ctrl+N` e depois `A`. Em Acerca, as pupilas do

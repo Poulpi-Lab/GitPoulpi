@@ -44,7 +44,7 @@ Liczba commitów wygląda jak `500 / 48213 commita`, dopóki zostaje starsza his
 
 Na jej prawym końcu przycisk **Aktywność** otwiera Dziennik aktywności: kartę Operacje git (operacje z czasem ich trwania, komunikaty i błędy), kartę Aplikacja (dziennik aplikacji z polem poziomu) oraz pole Zakres, które zawęża obie do tego repozytorium, obszaru roboczego albo wszystkich repozytoriów. Liczba na przycisku zlicza błędy, których jeszcze nie obejrzano. Gdy operacja się nie powiedzie, linia stanu na czerwono mówi dlaczego, niezależnie od tego, gdzie jesteś; kliknięcie jej (albo polecenie palety `Dziennik aktywności: Otwórz ostatni błąd`) otwiera wpis w Aktywności ze szczegółami, przyciskiem Kopiuj dla AI i proponowanym następnym krokiem. Oba opisano w [Gdy coś się nie powiedzie](troubleshooting.md#gdy-coś-się-nie-powiedzie).
 
-Na karcie **Aplikacja** przycisk **Wyczyść dziennik** (`x`) po potwierdzeniu opróżnia pliki dziennika aplikacji. Na lewo od przycisku **Aktywność** wskaźnik zadań pokazuje działające zadanie w tle z `[x]` do jego anulowania. Karta Start ma ten sam pasek stanu z przyciskiem **Aktywność** w prawym dolnym rogu (otwiera się na Wszystkich repozytoriach).
+Na karcie **Aplikacja** przycisk **Wyczyść dziennik** (`x`) po potwierdzeniu opróżnia pliki dziennika aplikacji. Na lewo od przycisku **Aktywność** wskaźnik zadań pokazuje działające zadanie w tle z `[x]` do jego anulowania (lista zadań ma przycisk **Anuluj wszystko**, a paleta polecenie *Zadania: anuluj wszystko, co można anulować*; zadanie, którego nie da się bezpiecznie zatrzymać, podaje powód). Karta Start ma ten sam pasek stanu z przyciskiem **Aktywność** w prawym dolnym rogu (otwiera się na Wszystkich repozytoriach).
 
 ### Nakładki
 

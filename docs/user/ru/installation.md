@@ -126,6 +126,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 | **MSI** (Windows, управляемая) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Для администраторов: для всех пользователей, без обновлений из приложения. См. [Корпоративное распространение](enterprise-distribution.md#msi-с-intune-или-групповой-политикой). |
 | **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (или `paru -S gitpoulpi-bin`) | Без помощника: `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, затем `cd gitpoulpi-bin && makepkg -si`. |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Скачивает архив выпуска вместо компиляции. |
+| **cargo, из crates.io** | `cargo install --locked gitpoulpi-cli` | Компилирует; нужен набор инструментов Rust. Устанавливает `gitpoulpi`, который без подкоманды открывает терминальный интерфейс, а также служит MCP-сервером (`gitpoulpi mcp`). `gitpoulpi-tui` и `gitpoulpi-mcp` - те же программы в виде отдельных крейтов. |
 | **cargo, из исходников** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Компилирует; нужен набор инструментов Rust. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | См. [Запуск в Docker](docker.md). Тот же образ есть на `ghcr.io/poulpi-lab/gitpoulpi`. |
 

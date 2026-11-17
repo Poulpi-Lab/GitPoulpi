@@ -586,6 +586,14 @@ it never shows as a change. Written by the TUI and the CLI; you rarely edit it.
 | `default_remote` | The remote one-click Push/Pull/Fetch use | remote menu, `gitpoulpi remote default <name>` |
 | `hosting_integration` | The `[[integrations]]` profile pinned here | `gitpoulpi hosting use --id` |
 | `pulls_source`, `issues_source` | The provider project the PR / issue lists read, as `{ integration, project, filter }`. `filter` is optional: a provider-native extra clause (a Jira JQL fragment, an Azure WIQL condition, Trello list names) ANDed onto the list query; GitHub and GitLab ignore it. | sidebar sections, `gitpoulpi hosting link` |
+| `[preferences] merge_fast_forward` | Overrides `git.merge_fast_forward` here: `never`, `allowed` or `only` | Settings > Repo-specific settings > Merge options |
+| `[preferences] default_push_targets` | The remotes a new branch also pushes to, copied into the branch when it first gets an upstream | Settings > Repo-specific settings > Git & encoding; see [Several remotes](multiple-remotes.md) |
+| `[preferences.ai_review]`, `[preferences.ai_hosting_reply]` | This repository's own values for the keys of `[ai.review]` and `[ai.hosting_reply]`; absent keys inherit the global ones | Settings > Repo-specific settings > AI |
+| `hosting_post_as`, `hosting_identity` | The name messages to the host are posted as here (overrides `general.hosting_post_as`), and the login learned from the first message posted with a bot token when none is set | Settings > Repo-specific settings > SSH & credentials; see [Conversations](conversations.md#posting-as) |
+| `assignment_blocked` | Nothing can be assigned from GitPoulpi in this repository's issues and pull requests | `gitpoulpi hosting assignment --block \| --allow` |
+| `board_labels` | The labels that are the columns of the issue board on a host with no workflow, in board order | the board's **Columns** button |
+| `conversation_seen`, `conversation_events`, `posted_comment_ids` | What you last read of each conversation (the rest is unread), whether system events show, and the comments this install posted (the ones a bot may edit or delete) | written by the conversation view |
+| `reviews` | The in-app review's local state per request: pending comments, viewed files | written by the review view |
 | `ref_visibility` | Hidden / soloed refs | Refs sidebar, `gitpoulpi refs hide\|show\|solo` |
 | `hidden_remotes` | Remotes hidden from the graph as a whole (every branch, the ones fetched later too) | the remote's ⊙ and menu, `gitpoulpi refs hide --remote` |
 | `folds`, `collapsed_*_ref_folders` | Collapsed sidebar sections and branch and tag folders. `[folds]` also holds `status_folders` (collapsed folders of the Unstaged / Staged file trees) and `commit_folders` (collapsed folders of a commit's changed-files tree, the same for every commit), each capped at 500 paths, oldest dropped first | the sidebar, the file trees |

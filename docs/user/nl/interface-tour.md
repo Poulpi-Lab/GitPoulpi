@@ -153,7 +153,7 @@ Standaard een rij onder de panelen en boven de statusbalk. **Instellingen > Weer
 | **Flow** `▾` | Het menu van de branchingworkflow (starten, afronden, synchroniseren, promoveren; `Ctrl+G Shift+W`). Alleen in een repository met een workflow. Zie [Branchingworkflows](branching-workflows.md). |
 | **Zoeken** | Opent de zoekbalk voor commits boven de Log (`f`). |
 
-Aan het uiteinde (rechts in een rij, onderaan in een kolom) toont een **chip**, als de repository aan een host is gekoppeld, de pull request van de uitgecheckte branch (bijvoorbeeld `GH #12` of `GL !53`), of een gedimde `+ PR`. **Instellingen > Weergave > Zet de pull request-knop vast aan het einde** (standaard aan) houdt hem daar; uit, dan stroomt hij met de andere knoppen mee en volgt hun uitlijning. Zie [Hosting en issuetrackers](hosting-integration.md). In een kolom neemt de profielkeuzelijst de laatste rij.
+Aan het uiteinde (rechts in een rij, onderaan in een kolom) toont een **chip**, als de repository aan een host is gekoppeld, de pull request van de uitgecheckte branch (bijvoorbeeld `GH #12` of `GL !53`), of een gedimde `+ PR`. **Instellingen > Weergave > Zet de pull request-knop vast aan het einde** (standaard aan) houdt hem daar; uit, dan stroomt hij met de andere knoppen mee en volgt hun uitlijning. In een smalle rij krimpt de chip eerst (`● #12`, daarna alleen het statussymbool) en pas daarna verhuist hij naar het menu `⋯`. Zie [Hosting en issuetrackers](hosting-integration.md). In een kolom neemt de profielkeuzelijst de laatste rij.
 
 Aan het rechteruiteinde kiest de **profielkeuzelijst**, als je twee of meer
 [profielen](settings.md#profielen) hebt, de commit-identiteit voor deze repository. De eerste

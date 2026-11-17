@@ -104,6 +104,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 | **MSI**（Windows，受管理） | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | 面向管理员：所有用户，没有应用内更新。见[企业分发](enterprise-distribution.md#msi使用-intune-或组策略)。 |
 | **AUR**（Arch Linux） | `yay -S gitpoulpi-bin`（或 `paru -S gitpoulpi-bin`） | 没有助手时：`git clone https://aur.archlinux.org/gitpoulpi-bin.git`，然后 `cd gitpoulpi-bin && makepkg -si`。 |
 | **cargo** | `cargo binstall gitpoulpi-cli` | 下载发布压缩包而不是编译。 |
+| **cargo，来自 crates.io** | `cargo install --locked gitpoulpi-cli` | 需要编译；需要 Rust 工具链。安装 `gitpoulpi`，不带子命令运行时打开终端界面，同时提供 MCP 服务（`gitpoulpi mcp`）。`gitpoulpi-tui` 和 `gitpoulpi-mcp` 是作为独立 crate 提供的同一批程序。 |
 | **cargo，从源码** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | 需要编译；需要 Rust 工具链。 |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | 见[在 Docker 中运行](docker.md)。同一个镜像也在 `ghcr.io/poulpi-lab/gitpoulpi` 上。 |
 

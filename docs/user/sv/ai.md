@@ -390,7 +390,7 @@ och en lokal agent körs skrivskyddat (nedan). Texten lämnar GitPoulpi bara gen
 (`Ctrl+Enter`).
 
 **I Markdown-redigeraren.** Medan AI är på har varje redigerare vars text går till en värd (en kommentar, ett svar eller en
-redigering i [konversationsvyn](hosting-integration.md#5c-konversationer), en granskningskommentar, sammanfattningen i Slutför granskning,
+redigering i [konversationsvyn](conversations.md), en granskningskommentar, sammanfattningen i Slutför granskning,
 beskrivningen av ett nytt ärende och pull request-beskrivningen) en knapp **Skriv med AI** (`Alt+E`, samma tangent i alla) i högra
 änden av sin lägesrad. Den öppnar en panel under raden:
 

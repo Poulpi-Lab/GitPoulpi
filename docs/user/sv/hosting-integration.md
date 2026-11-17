@@ -20,6 +20,19 @@ credential helper, aldrig i `config.toml`. Vanliga `git`-operationer (fetch, pul
 push) behöver ingen integration: de använder de uppgifter som ditt `git`
 redan har.
 
+**Vart du går härifrån.** Den här sidan är installationen: tokens, anslutning, länkning av ett
+repository, SSH-nycklar. När ett konto är anslutet:
+
+- sektionerna PULL REQUESTS och ÄRENDEN i sidopanelen, ärendetavlan, att skapa en
+  pull request eller ett ärende, chippet i verktygsfältet och referenser i commit-meddelanden:
+  **[Pull requests och ärenden](pull-requests-and-issues.md)**;
+- appens vy av ett enskilt ärende eller en enskild begäran, med kommentarer, skrivande och
+  publicering som: **[Konversationer](conversations.md)**;
+- att läsa och granska en begäran med kommentarstrådar och en väntande granskning:
+  **[Granska en pull request](review.md)**;
+- pull requests och ärenden för en hel workspace i en enda lista:
+  **[Radar](radar.md)**.
+
 ## 1. Skapa en token hos värden
 
 Anslutningsformuläret har en länk *Generera en token på <host>*. Den öppnar
@@ -269,554 +282,7 @@ Listan för en profil som du har öppnat tidigare visas direkt från en sparad k
 
 Om värden vägrar token visar dialogen *kunde inte lista repositories* med orsaken i stället för listan (och den sparade kopian raderas); de andra källorna fungerar som vanligt.
 
-## 5. Pull requests och ärenden i sidopanelen
-
-### PULL REQUESTS
-
-Sektionen har en rubrik med antalet och ett `+` (skapa en pull request),
-leverantörs- och projektmenyerna, en sökruta och en tillståndsmeny (*Öppna*,
-*Mergade / stängda*, *Alla*). Sedan kommer fyra grupper, var och en med sitt antal:
-
-- **Mina pull requests**: du är författaren.
-- **Tilldelade mig**.
-- **Väntar på min granskning**: du är en begärd granskare.
-- **Alla pull requests**: hopfälld från början.
-
-Sökrutan filtrerar varje grupp (titel, nummer, författare, gren). Varje
-ändring av tillståndsmenyn frågar värden igen.
-
-En rad börjar med en tillståndsglyf: `●` öppen (grön), `○` utkast, `◆` mergad
-(lila), `✕` stängd (röd). Begäran för den utcheckade grenen är fetstilt.
-Raderna lyder `#12  titel` (GitHub, Gitea, Forgejo, Bitbucket) eller `!53  titel` (GitLab,
-Azure DevOps).
-
-### ÄRENDEN
-
-Sektionens titel nämner leverantören: `GITHUB-ÄRENDEN`, `JIRA-ÄRENDEN` och så
-vidare. Den lyder `...-ARBETSOBJEKT` för Azure DevOps och `...-KORT` för Trello.
-Under menyerna: en sökruta, tillståndsmenyn (*Öppna*,
-*Tilldelade mig*, *Stängda*, *Alla*) och ärendena. En Jira-rad lyder
-`ABC-12  titel`, med typ och status nedtonade när sidopanelen är tillräckligt
-bred.
-
-### Åtgärder på en rad
-
-- `Enter` eller ett dubbelklick öppnar raden: en pull request i [granskningen](review.md) (GitHub, GitLab, Gitea,
-  Forgejo, Gerrit), ett ärende, och en begäran på Azure DevOps eller Bitbucket, som en [konversation](#5c-konversationer)
-  i fönstret, och allt annat i din webbläsare. Radmenyns **Öppna i webbläsare** öppnar alltid webbläsaren.
-- Högerklick, eller `.`, öppnar radmenyn:
-  - **Öppna konversation** (ärenden, och begäranden som saknar granskningsvy), **Öppna i webbläsare**, **Kopiera URL**,
-    **Kopiera nummer**.
-  - För en pull request: **Redigera på <provider>**, **Checka ut källgrenen**,
-    **Visa källgrenens commits**. För en begäran från en fork lyder checkout
-    **Checka ut pull request (fork)**, och **Visa** är nedtonat.
-  - För ett ärende: **Skapa gren från ärende**. Den öppnar prompten för ny gren
-    med ett namn som `12-fix-the-thing` (eller `ABC-123-fix-the-thing` för
-    Jira).
-  - På GitHub, GitLab, Gitea och Forgejo har en pull request-rad också **Granska...**
-    (även **Enter** på raden): granskningen i appen, se
-    [Granska en pull request](review.md).
-  - På GitHub, GitLab, Gitea och Forgejo har båda raderna också **Redigera tilldelade...**,
-    **Redigera etiketter...** och **Ange milstolpe...** (och **Redigera granskare...** på
-    en pull request): se
-    [Tilldelade, granskare, etiketter och milstolpe](#tilldelade-granskare-etiketter-och-milstolpe).
-- **Redigera på <provider>** har tre andra ingångar: pennan `✎` längst till höger
-  på en pull request-rad som pekas på eller är vald, `e` på den valda raden, och
-  palettkommandot *Integrationer: Redigera länkad pull request på värden*
-  (för den utcheckade grenens begäran).
-- Om källgrenen ännu inte finns i repositoryt säger GitPoulpi det. Gör en fetch
-  först (`Ctrl+G f`).
-
-**Checkout av en pull request.** GitPoulpi hämtar begäran till en lokal
-gren `pr/<n>` (`mr/<n>` på GitLab) som spårar den, och byter till den. På
-GitHub, GitLab, Gitea och Forgejo fungerar detta även för forkar (GitPoulpi hämtar värdens
-särskilda head-ref). Azure DevOps och Bitbucket hämtar begärans källgren.
-En begäran från en fork nekas där: lägg till forken som remote och
-checka ut dess gren själv. Ångra återgår till föregående gren. CLI:
-`gitpoulpi hosting checkout-pr <n>`.
-
-**Granska en pull request från kommandoraden (och en agent).** På GitHub
-(inklusive Enterprise), GitLab (inklusive self-managed), Gitea och Forgejo kan en begäran
-läsas och granskas utan att lämna GitPoulpi: `hosting review show <n>` (filer,
-merge-tillstånd, kontroller), `hosting review threads <n>` (granskningstrådar och
-konversation), `hosting review comment`, `hosting review reply`, `hosting review resolve`
-och `hosting review submit <n> --event approve|request-changes|comment
---comment path:line[:side]:text`. Diffen kommer från ditt repository, inte från
-värden: `hosting review fetch <n>` hämtar begärans head till
-`refs/gitpoulpi/pr/<n>` och dess målgren till `refs/gitpoulpi/pr/<n>-base`
-(ingen av dem är en gren, inget checkas ut). Radnumren är de för den
-diffen: `new` är raden i head, `old` raden i merge-basen. GitLab
-har inget granskningstillstånd ”begär ändringar”: det vägras där, utan att något skickas.
-Gitea och Forgejo tar en kommentar på bara en rad (inga intervall); en tråd är
-kommentarerna på en rad i en fil. Gitea kan lösa en tråd, Forgejo 11 kan det inte
-(värden har ingen slutpunkt för det: anropet säger det). Ett svar på en server
-utan svarsslutpunkten publiceras som en granskning med en kommentar på samma rad.
-Gitea vägrar låta dig godkänna eller avvisa din egen begäran.
-Utan klon: lägg till `--project owner/name` (GitLab: `group/project`) i `review show`, `threads`,
-`comment`, `reply`, `resolve`, `submit` och `suggest` för att granska ett projekt som inte är det aktuella repositoryt;
-`hosting review diff <n> --project P` läser diffen (hunkar per fil) från värdens API, och
-`hosting file <path> --project P [--ref R]` läser en fil vid en revision (GitHub, GitLab, Gitea, Forgejo och Gerrit; på Gerrit läses diffen för ett
-patch set fil för fil och filen kommer från grenen eller, för ett commit-id, från committen). En fil som värden
-inte visar i diffen (för stor) markeras `omitted`.
-MCP-verktygen är samma kommandon (`hosting_review_show`, `hosting_review_submit`, `hosting_review_diff`,
-`hosting_file`...).
-
-### Tilldelade, granskare, etiketter och milstolpe
-
-På GitHub (inklusive Enterprise), GitLab (inklusive self-managed), Gitea och
-Forgejo kan du ändra vem en pull request eller ett ärende är tilldelad, vem som granskar den, dess etiketter
-och dess milstolpe utan att lämna GitPoulpi. Andra leverantörer visar inget av det.
-
-- **Radmeny**: **Redigera tilldelade...**, **Redigera granskare...** (bara pull
-  requests), **Redigera etiketter...**, **Ange milstolpe...**.
-- **Palett**: *Hosting: Redigera tilldelade...*, *Hosting: Redigera granskare...*,
-  *Hosting: Redigera etiketter...*, *Hosting: Ange milstolpe...* listar först var och en
-  begäranden och ärendena i sidofältet att välja bland. I
-  [Radar](radar.md) verkar samma fyra på den valda raden.
-- Väljaren öppnas direkt och läser in projektets personer eller etiketter (och vad
-  objektet har nu) från värden. En snurrrad visas efter ungefär 150 ms.
-  Skriv för att filtrera (fuzzy-matchning), `Up` / `Down` flyttar, `Space` kryssar i eller ur,
-  `Enter` verkställer, `Esc` avbryter, `Tab` når knapparna. Ett klick
-  på en rad kryssar den, och hjulet rullar. Personer visar ett initialmärke,
-  etiketter sin färg.
-- Milstolpen är en rullgardinsmeny (med **Ingen milstolpe** för att rensa den).
-- Efter **Verkställ** uppdateras värden, och listorna och Radar visar
-  ändringen efter sin nästa uppdatering, som startar direkt.
-
-Skapa-formulären (en pull request, ett ärende) har samma val som en rad med
-knappar: `Tilldelade: ingen`, `Granskare: ingen`, `Etiketter: ingen`,
-`Milstolpe: ingen`. På GitHub, GitLab, Gitea och Forgejo ersätter knappen Etiketter det skrivna
-etikettfältet i ärendeformuläret. Om en värd tar emot den nya pull requesten men
-vägrar några av dess etiketter eller personer säger statusraden det.
-
-CLI: `gitpoulpi hosting members|labels|milestones`, `hosting pr-edit <n>`,
-`hosting issue edit <n>`, och `--assignee`, `--reviewer`, `--label`,
-`--milestone` på `hosting pr` och `hosting issue create`; se
-[CLI-referensen](cli-reference.md).
-
-### Tangenter i sektionerna
-
-| Tangent | Åtgärd |
-|---|---|
-| `Enter` / dubbelklick | öppna konversationen i GitPoulpi där värden har en (en pull request på GitHub, GitLab, Gitea eller Gerrit öppnar granskningen), annars webbläsaren |
-| `o` | öppna raden i webbläsaren |
-| `.` / högerklick | radmeny |
-| `e` | redigera den valda pull requesten hos värden |
-| `n` | ny pull request (PULL REQUESTS) eller nytt ärende (ÄRENDEN) |
-| `v` | öppna tillståndsmenyn |
-| `r` | uppdatera |
-| `Enter` / `Space` på en rubrik | fäll ihop eller ut sektionen |
-
-### Anslut igen och offline
-
-När token saknas, avvisas eller saknar en behörighet lyder sektionens första rad
-`Anslut igen (token avvisad)`. Klicka på den, eller tryck `Enter`, för att öppna
-profilen i Inställningar > Integrationer.
-
-När värden inte kan nås ligger de senaste listorna kvar på skärmen och rubriken
-visar deras ålder (`· 5m gammal`). Det senaste svaret cachas också på disk
-(`.gitpoulpi/hosting-cache.json`), så listorna visas innan nätverket
-svarar.
-
-## 5b. Ärendetavlan
-
-Knappen **Tavla** i ÄRENDEN-huvudet (palett: **Ärenden: Öppna tavlan**) visar ärendena i den länkade källan som en Kanban-
-tavla över fönstret. Kolumnerna beror på källan:
-
-| Källa | Kolumner | Att flytta ett kort |
-|---|---|---|
-| Lokala Markdown-anteckningar | statusarna (`statuses` i profilen, sedan varje annan som används) | skriver om anteckningens `status` |
-| GitHub, GitLab, Gitea, Forgejo | **Öppna**, sedan etiketterna du valde, sedan **Stängda** | byter statusetikett; till **Stängda** stänger det ärendet, till en kolumn igen öppnar det om |
-| Trello | tavlans öppna listor, från vänster till höger | flyttar kortet till listan |
-| Redmine | ärendestatusarna | ändrar ärendets status (Redmines arbetsflödesregler gäller) |
-| Jira (Cloud och Data Center) | projektets statusar, att göra först, klart sist | kör arbetsflödesövergången som leder till kolumnen (`GET` sedan `POST .../transitions`); utan en sådan övergång går kortet tillbaka och statusraden säger `no transition from X to Y` |
-| Azure DevOps (Services och Server) | tillstånden för projektets work item-typer, efter tillståndskategori | sätter `System.State`; ett work item vars typ saknar kolumnens tillstånd går tillbaka, med orsaken (`a Bug has no state Done`) |
-
-På ett GitHub- eller GitLab-projekt frågar **Kolumner** (eller `c`, eller **Tavla: Ange kolumnetiketter...**) efter etiketterna som är
-kolumnerna, i ordning, till exempel `status::todo, status::doing, status::review`. Den föreslår projektets etiketter som
-ser ut som statusar. Valet sparas för repositoryt. Utan etiketter är tavlan Öppna / Stängda. Att flytta ett kort
-rör bara statusetiketterna du listade: dess andra etiketter stannar. En värdtavla listar de öppna ärendena och de 60 senast
-stängda.
-
-En Jira-övergång som kräver obligatoriska fält (en lösning, till exempel) vägras av Jira och kortet går
-tillbaka med Jiras eget meddelande: gör den på webbplatsen.
-
-Samma tavla finns för skript och agenter: `gitpoulpi hosting board` skriver ut kolumnerna med sina kort och
-`gitpoulpi hosting board move <card> <column>` flyttar ett (se [CLI-referensen](cli-reference.md)).
-
-Ett kort visar numret, titeln, de tilldelade som initialer, etiketterna och milstolpen. Dra det till en annan kolumn,
-eller `Shift+Left` / `Shift+Right`, eller **Tavla: Flytta kort till...** (`m`). Det flyttas direkt; efter ungefär 150 ms säger en snurra
-att värden fortfarande arbetar, och om värden vägrar går kortet tillbaka och statusraden säger varför. `Enter` öppnar
-ärendets [konversation](#5c-konversationer) i GitPoulpi, och tavlan kommer tillbaka när du stänger den; `e` redigerar tilldelade, etiketter och milstolpe; `n` startar ett nytt ärende i
-den valda kolumnen; `a`, `l`, `M` och `/` filtrerar på tilldelad, etikett, milstolpe och text, `x` rensar filtren; `r`
-läser värden igen. Tavlan läses om när sidofältets listor uppdateras. Radar har ingen tavla.
-
-## 5c. Konversationer
-
-En **konversation** är allt som sagts om ett ärende, ett arbetsobjekt, ett kort, en ändring eller en pull / merge request: beskrivningen,
-kommentarerna, granskningarna, trådarna på kod och händelserna (etiketter, tilldelningar, tillståndsändringar,
-pushar). GitPoulpi läser den från värden, visar den formaterad och låter dig svara utan att lämna fönstret.
-
-### Öppna en
-
-| Från | Hur |
-|---|---|
-| En ÄRENDEN-rad | `Enter` eller ett dubbelklick; radmenyns **Öppna konversation**; paletten *Värd: Öppna ärendekonversation...* (en lista med ärendena på skärmen). Radmenyns **Öppna i webbläsare** behåller webbläsaren. |
-| En PULL REQUESTS-rad på Azure DevOps eller Bitbucket | `Enter` eller **Öppna konversation**. På GitHub, GitLab, Gitea, Forgejo och Gerrit öppnar raden [granskningen](review.md), vars Översikt-sida är samma konversation (tidslinjen, tangenterna och kommentarsrutan nedan). |
-| Ett kort på [ärendetavlan](#5b-ärendetavlan) | `Enter` eller ett dubbelklick. |
-| [Radar](radar.md) | `i` på en ärende- eller begäranrad, radmenyns **Öppna konversation**, eller *Radar: Öppna ärendekonversation*. |
-| En referens i en annan konversation | Klicka på den (eller `l` och välj den): `#7`, `!12`, `ABC-12` i en länkad källa öppnas i appen och läggs på en Tillbaka-stack. |
-| En agent | `gitpoulpi ui show issue <n> --view conversation` (också `ui show pr`), se [CLI-referensen](cli-reference.md). |
-
-**Repositoryn som inte är klonade.** En Radar-rad för ett repository som du inte har någon klon av öppnar också sin konversation:
-vyn behöver bara integrationsprofilen och projektet, så Radar visar den över sitt eget fönster, och `Esc`
-ger tillbaka Radar. Det som kräver en klon utelämnas: en commit-referens öppnas hos värden i stället för i Log, och
-*Låt AI:n läsa repositoryt* är nedtonat med sin orsak (se [AI-kapitlet](ai.md#skrivhjälp-på-en-värd)). En
-begäran i ett klonat repository har sin granskning i stället (`e`), och Radars **Öppna konversation** säger att det inte finns någon
-konversation att läsa här för den; ett ärende i ett klonat repository öppnar den i det repositoryts flik.
-
-Ett ärende på en värd som inte har något att läsa (Bitbucket och Gerrit har inga ärenden) öppnar webbläsaren som förut, och ett bygge
-utan funktionen `conversation` gör likadant överallt ([anpassade byggen](custom-builds.md)).
-
-### Vyn
-
-En helfönstervy: rubriken (tillstånd, vem som öppnade det och när, etiketterna, antalet kommentarer, **Visa händelser**,
-**Tillbaka**, **Uppdatera**, **Öppna i webbläsare**), raden **Publicerar som**, tidslinjen och under den kommentarsrutan.
-
-- Tidslinjen läses äldst till nyast och börjar på det nyaste fönstret (högst 300 poster). **Läs in äldre** överst
-  (`m`, paletten *Konversation: Läs in äldre poster*) läser fönstret före, med antalet som återstår
-  när värden anger det.
-- En kommentar visar sin författare, datum, ett märke `ändrad`, ett märke `bot` för botar, `intern` för privata anteckningar, och
-  knapparna **Svara**, **Citera**, **Redigera**, **Ta bort** och **Länkar** som den valda posten tillåter. En tråd på kod
-  visar `sökväg:rad`, `löst` eller `olöst`, `föråldrad` och sina kommentarer. En granskning visar sitt omdöme.
-- Händelser är en dämpad rad var (*carol lade till etiketten lfs*). **Visa händelser** (`v`) döljer dem; valet sparas
-  per repository. Värdar utan händelsehistorik (YouTrack, work items på Azure DevOps, lokala anteckningar) har ingen sådan ruta.
-- Texten visas som renderad Markdown: rubriker, nästlade listor och uppgiftslistor, citat, varningsblock i GitHub-stil, markerad kod,
-  tabeller, länkar, bilder som `[image: alt]`. Text som kom i värdens eget markeringsspråk konverteras först (se
-  [Markupkonvertering](#markupkonvertering)). Ett kodblock `mermaid` får en knapp **Öppna diagram** som visar
-  diagrammets källtext i en rullbar visare (`Enter` kopierar den); paletten har *Konversation: Öppna postens diagram*.
-  Det kräver ett bygge med både `conversation` och `mermaid`.
-- I granskningens Översikt är en kodtråds `path:line` en länk till koden (`G`, *Konversation: Öppna trådens kod*;
-  se [Granskning](review.md)); i en konversation som öppnats för sig (ett ärende, en Radar-rad) finns ingen kodsida att gå till.
-- Vyn läser igen var 60:e sekund och med `F5` (**Uppdatera**).
-
-**Tangenter.** Var och en har en knapp, en menyrad eller en palettrad (*Konversation: ...*), och `Ctrl+N` märker knapparna.
-
-| Tangent | Åtgärd |
-|---|---|
-| `Up`, `Down`, `Ctrl+J`, `Ctrl+K`, `j`, `k` | Föregående / nästa post |
-| `PageUp`, `PageDown`, `Home`, `End`, hjulet, rullningslisten | Rulla |
-| `Tab`, `Shift+Tab` | Tidslinje, kommentarsruta, sedan rubrikens knappar |
-| `r` | Svara: i den valda postens tråd, eller med dess text citerad där värden saknar trådar |
-| `Q` | Citera den valda posten i en ny kommentar |
-| `c` | Ny kommentar |
-| `e`, `d` | Redigera, ta bort en av dina egna kommentarer (en fråga kommer före en borttagning) |
-| `l`, `Enter` | Postens länkar: `Enter` följer den enda, eller öppnar menyn med dem |
-| `y`, `o` | Kopiera postens adress, öppna den i webbläsaren |
-| `n` | Nästa olästa post |
-| `v`, `m`, `F5` | Visa eller dölj händelser, Läs in äldre, Uppdatera |
-| `Alt+Left`, `Backspace` | Tillbaka längs Tillbaka-stacken |
-| `q`, `Esc` | Stäng (frågar först när rutan innehåller text) |
-
-### Skriva
-
-**Ny kommentar** (`c`, eller `Tab` till rutan), **Svara** (`r`), **Citera** (`Q`) och **Redigera** (`e`) använder den enda Markdown-
-redigeraren: **Skriv**, **Förhandsvy** och **Delad** (`Alt+P` växlar mellan Skriv och Förhandsvy, `Alt+L` slår på Delad och kräver ett
-fönster som är 100 kolumner brett). `Ctrl+Enter` (också `Ctrl+S` och `Alt+Enter`) eller **Skicka** publicerar, **Avbryt** släpper rutan, och
-`Alt+E` öppnar **Skriv med AI** där AI är på ([AI-kapitlet](ai.md#skrivhjälp-på-en-värd)). Förhandsvyn läggs
-ut av samma renderare som tidslinjen, med samma referenser. När värden inte tar emot Markdown nämner
-sidfoten markeringsspråket texten skickas i (*Skickas som Jira wiki markup*, *Skickas som Textile*).
-
-- Kommentaren läggs till i tidslinjen direkt och tar sin plats när värden svarar. Om värden vägrar försvinner
-  posten och rutan öppnas igen med din text och orsaken.
-- En text du inte har skickat sparas per objekt (`remote-conversations.toml` i konfigurationsmappen) och finns där nästa
-  gång du öppnar rutan; att skicka eller förkasta den tar bort den. Att stänga en ruta som innehåller text frågar först.
-- **Svara** på en tråd (en granskningstråd, en GitLab-diskussion, en Linear-kommentar, en tråd på Bitbucket eller Azure DevOps)
-  publicerar i den tråden. Där värden bara har en platt lista startar **Svara** en ny kommentar med den valda posten
-  citerad (`> **författare**`), på samma sätt som **Citera**.
-- **Intern anteckning** (ruta, `Alt+I`): på GitLab och Redmine är kommentaren bara synlig för projektets medlemmar. Den
-  visas bara på värdar som har sådana anteckningar, och bara på en ny kommentar.
-- Att publicera är en utåtriktad åtgärd: inget journalförs och **inget kan ångras från GitPoulpi**. Utan
-  anslutning stannar rutan, **Skicka** är nedtonad med orsaken, och rubriken säger att den sparade kopian visas.
-
-**Vem som får redigera eller ta bort.** Bara dina egna kommentarer har **Redigera** och **Ta bort**. Värdens eget ord kommer först när
-den ger ett (GitHubs `viewerCanUpdate` och `viewerCanDelete`, `can_edit` på andra), därefter ditt login mot
-kommentarens författare, jämfört utan hänsyn till versaler; en App-bots kommentarer måste dessutom komma från ett bot-konto. Så länge
-loginet för en GitHub App-bot inte är känt räknas bara kommentarer som den här installationen publicerade (repositoryt behåller deras id:n):
-inget gissas utifrån ett namn. I en tråd verkar **Redigera** och **Ta bort** på den sista kommentaren i den som är din. En värd
-som inte kan redigera eller ta bort (se [tabellen](#vad-varje-värd-inte-kan-göra)) visar knapparna nedtonade med orsaken.
-
-### Publicera som
-
-Raden under rubriken anger vem dina meddelanden publiceras som, och samma rad finns i varje ruta:
-
-| Rad | Betydelse |
-|---|---|
-| *Publicerar som ann (personlig token)* | Profilens token: ditt eget login (`GET /user`). |
-| *Publicerar som ci-bot (repositoryts tokenkommando)* | Repositoryts [tokenkommando](#13d-agera-som-en-github-app-bot) används för värd-API:et. |
-| *Publicerar som my-app[bot] (GitHub App-bot)* | En installationstoken. Namnet kommer från **Publicera som**, annars från värden. |
-| *Publicerar som GitHub App-boten (dess namn är inte känt än: ställ in Publicera som i Inställningar)* | Inget namn inställt, inget inlärt än. |
-| *Publicerar som ... (projektbot)* | En GitLab-åtkomsttoken för projekt eller grupp. |
-| *Skriver som kai (lokal anteckning)* | En mapp med Markdown-anteckningar: profilens `local.me`, annars den anslutna användaren. |
-| *Vem du publicerar som är inte känt än. Ställ in Publicera som i Inställningar.* | Inget kunde läras. |
-
-**Publicera som** är ett namn: för en GitHub App är det `my-app[bot]`. Ställ in det för alla repositoryn i **Inställningar > Integrationer >
-Publicera som** (`general.hosting_post_as`), eller för ett repository i **Inställningar > Repo-specifikt: SSH & inloggning > Värd**,
-som åsidosätter det. Lämnas det tomt frågar GitPoulpi GitHub (GraphQL `viewer { login }`, som en installationstoken kan
-svara på eller inte) och lär sig annars namnet från författaren till den första kommentar den publicerar och behåller det med
-repositoryt. En personlig token behöver det aldrig. Se
-[Att agera som en GitHub App-bot](#13d-agera-som-en-github-app-bot).
-
-### Korsreferenser
-
-Referenser i en konversation är understrukna och klickbara. Repositoryts länkade ÄRENDEN- och PULL REQUESTS-källor
-matchas först, så `ABC-12` i ett länkat Jira-projekt öppnas i appen även inuti en GitHub-kommentar; det värdens
-egen grammatik lägger till öppnar dess sida efter länkbekräftelsen. Ett commit-id öppnas i Log när repositoryt
-är klonat och id:t har minst 7 tecken, annars hos värden. Inget inuti en kodsnutt, ett kodblock, en
-Markdown-länk, en e-postadress eller en URL är en referens, och `C#1`, `UTF-8`, `SHA-256` och `ISO-8601` är det inte.
-
-| Värd | Känns igen |
-|---|---|
-| GitHub | `#7`, `GH-7`, `owner/repo#7`, `owner/repo@sha`, `@login`, commit-id:n |
-| GitLab | `#7`, `!7`, `group/project#7`, `group/project!7`, `project#7` (ett syskonprojekt), `@user`, `~label` och `%milestone` som chip, commit-id:n |
-| Gitea, Forgejo | `#7`, `!7`, `owner/repo#7`, `owner/repo@sha`, `@user`, commit-id:n |
-| Azure DevOps | `#7`, `!7`, `AB#7`, `@user` |
-| Bitbucket | `@user`, `{uuid}`-omnämnanden, commit-id:n |
-| Gerrit | `Change-Id`-värden (`I` och 40 hexadecimala siffror), commit-id:n |
-| Redmine | `#7`, `r123`-revisioner, `commit:abc1234` |
-| Jira, Linear, YouTrack | `ABC-12`, bara för ett projekt eller team i en länkad källa |
-| Trello | kortadresser (`trello.com/c/...`) |
-| Lokala anteckningar | `[[note]]`, `[[note\|alias]]` och relativa `.md`-länkar till en annan anteckning i mappen |
-
-`gitpoulpi hosting markdown --body T --id I` skriver ut vad appen gör av en text, referenser inräknade.
-
-### Markupkonvertering
-
-Värdar som inte talar Markdown konverteras åt båda hållen, så att du läser och skriver Markdown överallt. Det en
-konverterare inte förstår förblir läsbar text.
-
-- **Jira** (Cloud och Data Center) lagrar kommentarer som wiki markup över API v2. Det du läser konverteras till
-  Markdown; det du skriver konverteras till wiki markup, och sidfoten säger *Skickas som Jira wiki markup*.
-- **Redmine** formaterar text som Textile eller Markdown, vilket API:et inte säger: profilens rad **Serverns textformat**
-  (Inställningar > Integrationer, `markup`, Textile som standard) talar om det för GitPoulpi. Textile konverteras till
-  Markdown för läsning och tillbaka till Textile för skrivning.
-- **Azure DevOps Server** returnerar kommentarer på work items som HTML och tar emot dem som HTML: de visas som Markdown
-  konverterad från den och skrivs som HTML. Azure DevOps Services och pull request-trådar tar emot Markdown.
-- **Gerrit** är ren text: den renderas inte som Markdown och det du skriver skickas som du skrev det.
-- Varje importerare tar först bort styr- och escape-sekvenser, så en kommentar kan inte flytta terminalen.
-
-### Den sparade kopian, Läs in äldre, olästa
-
-- Varje konversation du öppnar sparas (`<tillståndsmapp>/conversations/<integration>/<projekt>/<sort>-<n>.json`, bara för användaren,
-  ingen token i den, högst 2 MB per fil, de 50 senaste filerna behålls). Den ritas direkt när objektet öppnas och
-  uppdateras bakom den. När värden inte kan nås ligger den sparade kopian kvar på skärmen under *Offline: visar kopian som
-  sparades för 3 min sedan (orsak)* och Skicka är nedtonad.
-- **Olästa:** GitPoulpi minns per konversation vad du såg senast (de 200 senaste behålls). Poster av någon annan
-  som är nyare får en accentstapel och ett märke `ny`, och `n` hoppar till nästa. En konversation du öppnar för
-  första gången har inget nytt.
-
-### Vad varje värd inte kan göra
-
-Varje `nej` nedan är en verklig gräns: kontrollen döljs eller tonas ned med orsaken, och CLI:t svarar med ett fel som nämner
-värden innan något skickas.
-
-| Värd | Objekt | Svara i en tråd | Redigera och ta bort egna | Lösa en tråd | Händelser | Interna anteckningar | Skrivs som |
-|---|---|---|---|---|---|---|---|
-| GitHub | ärenden, pull requests | pull requests | båda | pull requests | ja | nej | GitHub Markdown |
-| GitLab | ärenden, merge requests | ja (diskussioner) | båda | merge requests | ja | ja | GitLab Markdown |
-| Gitea | ärenden, pull requests | pull requests | båda | pull requests | ja | nej | Markdown |
-| Forgejo | ärenden, pull requests | pull requests | båda | nej (värden har ingen ändpunkt) | ja | nej | Markdown |
-| Azure DevOps | work items, pull requests | pull requests | båda | nej (status visas, ändras inte) | bara pull requests | nej | Markdown (HTML på work items i Server) |
-| Bitbucket (Cloud, Data Center) | bara pull requests | ja | båda | nej (visas, ändras inte) | ja | nej | Markdown |
-| Gerrit | bara ändringar | ja | nej (ingetdera kan redigeras eller tas bort) | ja | ja | nej | ren text |
-| Jira | ärenden | nej (platt lista) | båda | nej | ja (changelog) | nej (kräver en projektroll) | wiki markup |
-| Linear | ärenden | ja (svar på en kommentar) | båda | nej | ja | nej | Markdown |
-| YouTrack | ärenden | nej | båda | nej | nej | nej | Markdown |
-| Redmine | ärenden | nej | bara redigera (Redmine 5 och senare), aldrig ta bort | nej | ja (journaler) | ja (privata anteckningar) | Markdown eller Textile |
-| Trello | kort | nej | båda | nej | ja (flyttar) | nej | Markdown |
-| Lokala anteckningar | anteckningar | nej | den lokala författarens egna | nej | nej | nej | Markdown |
-
-Dessutom: ingen värd låter dig starta en ny tråd på en rad från konversationen (gör det i granskningen), och reaktioner visas
-bara på GitHub. En text som är längre än värden tar emot avvisas (GitHub 65 536 tecken, GitLab 1 000 000, Azure
-DevOps 150 000, Jira 32 767, Trello 16 384): CLI:t kontrollerar först, i appen visas värdens eget meddelande och din
-text sparas. En lokal anteckning behåller sina kommentarer i ett avslutande avsnitt `## Comments` i själva anteckningsfilen, en
-post `### författare - tid` var, så att Obsidian och ett skal ser dem också.
-
-På kommandoraden är samma konversationer `gitpoulpi hosting issue comments`, `issue comment`, `comment-edit`
-och `comment-delete`, och `hosting review conversation` (se [CLI-referensen](cli-reference.md)); för agenter är de
-MCP-verktyg med samma namn (se [MCP och agenter](mcp-and-agents.md)).
-
-## 6. Skapa en pull request
-
-Öppna formuläret med `+` i rubriken PULL REQUESTS, `n` i sektionen, eller
-palettkommandot *Pull requests: Skapa pull request...*. En grenmeny
-har också **Starta en pull request från <gren>...**.
-
-Formuläret har:
-
-- En flik per ansluten profil som har pull requests (`Left` / `Right` på
-  flikraden).
-- Kombinationsrutor för **Från repo / Gren** och **Till repo / Gren**. Långa listor är
-  sökbara. Du kan skriva en gren eller ett repository som listorna inte visar.
-- **Titel**, ifylld med ämnet för den översta committen.
-- **Beskrivning**, på flera rader (`Enter` lägger till en ny rad, `Tab` lämnar
-  fältet).
-- Knapparna **Tilldelade**, **Granskare**, **Etiketter** och **Milstolpe** (GitHub,
-  GitLab, Gitea och Forgejo), som öppnar väljaren.
-- **Skicka som utkast**.
-- Med [AI](ai.md) på: **Generera titel och beskrivning**.
-
-Formuläret öppnas med profil, repository och grenar för den utcheckade
-grenen (`feature -> main`). Ett annat källrepository ger en begäran
-från en fork.
-
-**Skapa pull request** (eller `Ctrl+S`) skapar begäran hos värden. Resultatet
-öppnas i din webbläsare och statusraden nämner den.
-
-## 7. Skapa ett ärende
-
-När sektionen ÄRENDEN har en leverantör **och** ett projekt har dess rubrik ett
-`+` (*Nytt ärende*). Också: `n` i sektionen, eller palettkommandot
-*Hosting: Nytt ärende...*.
-
-Formuläret har **Titel** (obligatorisk), **Beskrivning** (flera rader) och
-**Etiketter** (kommaseparerade, till exempel `bug, ui`; på GitHub, GitLab, Gitea och Forgejo öppnar
-knapparna Etiketter, Tilldelade och Milstolpe väljaren i stället). Jira och Azure DevOps
-lägger till en rullgardinsmeny **Typ**. Trello lägger till en rullgardinsmeny **Lista**. Linear och YouTrack
-lägger till en rullgardinsmeny **Status** (arbetsflödestillståndet, eller värdet `State`, som ärendet
-startar i). Redmine lägger till en rullgardinsmeny **Typ** med projektets trackers (Bug, Feature,
-Support...); det har inga etiketter, så det finns ingen knapp Etiketter för det och en etikett
-som anges på kommandoraden vägras. Formuläret fyller
-dessa menyer från värden när det öppnas.
-
-**Skapa ärende** (eller `Ctrl+S`) skapar det hos värden. `Esc` eller **Avbryt**
-stänger formuläret. Om värden nekar (avvisad token, saknad behörighet, okänt
-projekt, okänd etikett) visar formuläret skälet och behåller det du skrivit.
-Vid lyckat resultat nämner statusraden det nya ärendet och sektionen ÄRENDEN
-uppdateras.
-
-CLI: `gitpoulpi hosting issue create --title ... [--body ... | --body-file ...]
-[--label ...] [--type ...] [--list ...]`.
-
-## 8. Skapa på värdens egen webbsida
-
-Formuläret Nytt ärende och formuläret Skapa pull request har en
-knapp **Skapa på <provider>**, uppe till höger. Tangenten är `Alt+W`. Den öppnar
-värdens webbformulär i din webbläsare, ifyllt med det du skrivit hittills. Dialogen
-förblir öppen. Den behöver ingen token och gör inga API-anrop, så den fungerar även
-efter ett API-fel.
-
-- GitHub har ingen URL-parameter för *utkast*, så utkastrutan förs inte
-  över. GitLab får ett titelprefix `Draft: `.
-- GitLab tar etiketter bara via id, så de läggs till som en snabbåtgärd
-  `/label ~"x"` i slutet av beskrivningen.
-- En mycket lång beskrivning kapas så att URL:en håller sig under 6000 tecken,
-  med en notering `[...truncated: paste the rest]`.
-- Bitbucket Data Center har ingen adress till något webbformulär, så det har ingen
-  knapp **Skapa på <provider>**.
-
-CLI: `gitpoulpi hosting issue create ... --web` och `gitpoulpi hosting pr --web`
-skriver ut samma URL.
-
-## 9. Chippet i verktygsfältet
-
-Längst bort i verktygsfältet (som standard till höger) visar ett chip begäran för den utcheckade
-grenen: `GH #12` (GitHub), `GL !53` (GitLab), `AZ !12` (Azure DevOps) eller
-`BB #12` (Bitbucket). Dess färg visar tillståndet: grön öppen, grå utkast,
-lila mergad, röd stängd.
-
-- Peka på det för titel, tillstånd och `källa → mål`.
-- Klicka på det, eller tryck `Ctrl+G g`, för att öppna begäran i webbläsaren.
-- Högerklicka på det för **Öppna i webbläsare**, **Kopiera URL**, **Uppdatera** och
-  **Byt profil**.
-
-En pushad gren utan begäran visar ett nedtonat `+ PR`-chip. Klicka på det för att starta en
-pull request. Det finns inget chip när ingen profil matchar, när grenen inte
-är pushad eller när värden inte kunde nås. I ett smalt fönster döljs chippet
-för att ge plats åt verktygsfältets knappar.
-
-## 10. När listorna uppdateras
-
-Listorna uppdateras:
-
-- när du öppnar ett repository;
-- när den utcheckade grenen ändras;
-- efter en push eller en fetch;
-- var *Uppdatering av pull requests och ärenden (minuter)*
-  (`general.hosting_refresh_minutes`, standard 5, `0` stänger av timern;
-  Inställningar > Integrationer);
-- när du stänger Inställningar;
-- när du trycker `r`, kör *Integrationer: Uppdatera pull requests och ärenden*, eller
-  ändrar ett filter.
-
-Förfrågningar blockerar aldrig fönstret.
-
-Värdar begränsar hur många anrop du får göra. GitPoulpi skickar tillbaka `ETag` från
-det senaste svaret, så en oförändrad lista kostar lite (ingenting på GitHub). När en
-värd rapporterar att få anrop återstår säger statusraden det. När inga
-återstår slutar GitPoulpi fråga den värden tills gränsen nollställs, och listorna
-förblir som de är.
-
-## 11. Terminologi
-
-GitHub, Azure DevOps och Bitbucket säger ”pull request”. GitLab säger ”merge
-request”. *Terminologi för granskningsbegäran* (`ui.pr_terminology`, under
-Inställningar > Integrationer) väljer ordet för varje etikett, meny, palettkommando
-och meddelande:
-
-- **Auto (per värd)**: följer repositoryts länkade leverantör (”Pull
-  Request” så länge inget är länkat).
-- **Pull request** eller **Merge request**: alltid det ordet.
-
-Ändringen gäller direkt. CLI:t och MCP säger alltid ”pull/merge request”.
-Den här sidan säger ”pull request”.
-
-## 12. Referenser i commit-meddelanden och grennamn
-
-När repositoryts ärenden eller pull requests är länkade är referenser i
-commit-meddelandet i Commit-detaljer understrukna. Ett klick öppnar den länkade
-sidan. Tangentbord: palettkommandot
-*Integrationer: Öppna commit-referens (#ärende / !request)...* (en meny när
-meddelandet har flera referenser). Ett repository utan något länkat har inga
-länkar.
-
-Vad som räknas som en referens beror på leverantören för sektionen ÄRENDEN:
-
-| ÄRENDEN länkat till | I ett meddelande | I ett grennamn |
-|---|---|---|
-| GitHub, GitLab, Gitea, Forgejo | `#123` | `123-fix-login` |
-| Azure DevOps | `#123` och `AB#123` | `123-fix-login` |
-| Jira | `ABC-123`, bara när `ABC` är nyckeln för det länkade projektet. Text som `UTF-8`, `SHA-256` eller `ISO-8601` är aldrig en länk. | `ABC-123` var som helst i namnet (`feature/ABC-123-x`), med versaler |
-| Linear | `ENG-123`, bara när `ENG` är nyckeln för det länkade teamet (eller för ett team i profilens teamlista). `UTF-8` är aldrig en länk. | Linears eget `branchName` när du skapar grenen från ett ärende; `ENG-123` var som helst i namnet läses tillbaka |
-| YouTrack | `ABC-123`, bara när `ABC` är det korta namnet för det länkade projektet (eller för ett i profilens projektlista) | `ABC-123` var som helst i namnet |
-| Redmine | `#123`, bara när Redmine är den länkade ÄRENDEN-källan (en pull request-källa behåller sitt eget tecken) | `123-fix-login` |
-| Trello | en adress `https://trello.com/c/<shortLink>`; `#12` bara när ett cachat kort har numret 12 | `12-fix-login` |
-
-| PULL REQUESTS länkat till | I ett meddelande |
-|---|---|
-| GitLab, Azure DevOps | `!45` |
-| GitHub, Bitbucket, Gitea, Forgejo | `#45` |
-
-När båda listorna matchar `#N` vinner ärendet. CLI:
-`gitpoulpi hosting refs --message TEXT | --commit REV | --branch NAME`.
-
-**I konversationer.** Texten i ett ärende eller en begäran läses med värdens grammatik, som är bredare än
-tabellen ovan: `owner/repo#7`, `!7`, `GH-7`, `@login`, commit-id:n och de andra formerna som listas i
-[Korsreferenser](#korsreferenser). Repositoryts länkade källor matchas först, så en Jira-nyckel i en GitHub-
-kommentar öppnar fortfarande sitt ärende i appen. `gitpoulpi hosting markdown --body TEXT --id I` visar vad appen hittar i
-en text.
-
-### Infoga en ärendereferens
-
-I commit-composern öppnar knappen `#▾` längst till höger i Sammanfattning
-en filtrerbar lista över de länkade ärendena. Ärendet som den aktuella grenen
-nämner kommer först, markerat *(från grenen)*. `Enter` eller ett klick infogar dess referens
-(`ABC-123`, `#12`, `AB#12`) vid markören. Tangentbord: `Alt+R` i composern.
-Palett: *Commit: Infoga ärendereferens...*. Utan en länkad ärendelista är
-knappen nedtonad och säger *länka först en ärendelista i sidofältet*.
-GitPoulpi lägger aldrig till en referens av sig självt.
-
-## 13. SSH-nycklar
+## 5. SSH-nycklar
 
 ### SSH-nyckel per profil
 
@@ -859,7 +325,7 @@ Den globala nyckeln under Inställningar > SSH & inloggning (*Sökväg till priv
 *Generera nyckelpar*) gäller för varje repository utan ett eget val.
 Ett repositorys nyckelfil eller fastsättning går före den.
 
-## 13b. Grenskydd, för en historikomskrivning
+## 6. Grenskydd, för en historikomskrivning
 
 När du skriver om historiken ([omskrivningsvyn](history-rewrite.md)) frågar
 GitPoulpi värden vilka grenar den skyddar, så att de lämnas utanför
@@ -881,7 +347,7 @@ repositoryt) byggs från repositoryts remote-URL för GitHub, GitLab, Azure DevO
 och Bitbucket, även när repositoryt inte är länkat, och visas tillsammans med de
 tre vägarna förbi när värden avvisar en push.
 
-## 13c. Kontoövergripande listor i Radar
+## 7. Kontoövergripande listor i Radar
 
 Radar bevakar normalt de repositories du har klonat. En profil kan också
 lista det som rör dig på hela värden, klonat eller inte, med tre reglage i
@@ -937,7 +403,7 @@ slår på en lista, `gitpoulpi hosting radar --json` skriver ut listorna (och
 `--refresh` hoppar över cachen). AI-agenter har samma två kommandon över MCP
 (`hosting_radar`, `hosting_integrations_radar`).
 
-## 13d. Att agera som en GitHub App-bot
+## 8. Att agera som en GitHub App-bot
 
 Ett projekt som inte får visa en persons namn kan göra allt hos värden
 genom en **GitHub App**: varje kommentar, granskning, stängning eller återöppning och varje etikett-
@@ -973,7 +439,7 @@ Vad som ändras för det repositoryt:
   Inget visas som ett fel.
 - **Publicera som.** Varje meddelande GitPoulpi publicerar visas med namnet det publiceras
   som (*Publicerar som my-app[bot] (GitHub App-bot)* under rubriken för en
-  [konversation](#publicera-som) och i dess kommentarsruta; `posted_as` i CLI-svaret). Med en personlig token är det
+  [konversation](conversations.md#publicera-som) och i dess kommentarsruta; `posted_as` i CLI-svaret). Med en personlig token är det
   ditt login (`GET /user`). Med en App-token är det namnet **Publicera som**, till exempel `my-app[bot]`: ställ in det för
   alla repositoryn i **Inställningar > Integrationer** (`general.hosting_post_as`, också
   `gitpoulpi config set general.hosting_post_as my-app[bot]`) eller för ett repository i **Inställningar > Repo-specifikt: SSH
@@ -1009,7 +475,7 @@ omöjlig i det repositoryts ärenden och pull requests, vem som än frågar:
 `--allow` slår av den igen; bara en person kan tillåta det igen (MCP-servern
 kan inte).
 
-## 14. Från kommandoraden
+## 9. Från kommandoraden
 
 ```
 echo $TOKEN | gitpoulpi hosting login --id my-gitlab --token-stdin
@@ -1042,7 +508,7 @@ ligger i minnet bara under den här sessionen.
 ## Kända begränsningar
 
 - **Pull requests från forkar:** Azure DevOps och Bitbucket kan inte checka ut en
-  begäran från en fork (se [Åtgärder på en rad](#åtgärder-på-en-rad)). Azure
+  begäran från en fork (se [Åtgärder på en rad](pull-requests-and-issues.md#åtgärder-på-en-rad)). Azure
   DevOps kan inte skapa en pull request från en fork.
 - **Trello** visar högst de första 1000 korten på en board. Använd listfiltret
   för att begränsa. **Jira**, **Linear** och **YouTrack** listar högst 500
@@ -1082,7 +548,7 @@ ligger i minnet bara under den här sessionen.
   Ett nytt Jira-ärende får en beskrivning i ren text.
 - **Konversationer:** de nyaste 300 posterna läses in först (**Läs in äldre** för resten); en kommentar, en redigering eller en borttagning
   som publiceras från GitPoulpi är utåtriktad och kan inte ångras från det; vad varje värd inte kan göra finns i
-  [tabellen](#vad-varje-värd-inte-kan-göra). På Gerrit kan ett meddelande eller en kommentar inte redigeras eller tas bort, och Gerrit-text
+  [tabellen](conversations.md#vad-varje-värd-inte-kan-göra). På Gerrit kan ett meddelande eller en kommentar inte redigeras eller tas bort, och Gerrit-text
   är ren text.
 - Att skapa en pull request, ett arbetsobjekt, ett ärende eller ett kort sker hos värden och
   **kan inte ångras** från GitPoulpi. Att checka ut en begäran kan ångras

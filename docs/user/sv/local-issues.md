@@ -140,7 +140,7 @@ Om du arbetar ensam, eller i ett team som håller sina ärenden bredvid koden, �
   `Shift+Left` / `Shift+Right`, eller med **Tavla: Flytta kort till...** (`m`), en lista med kolumnerna. Kortet flyttas
   direkt; anteckningens `status` skrivs om som i [avsnittet om anteckningarna](#anteckningarna), inget annat i filen. Om skrivningen
   misslyckas går kortet tillbaka och felet visas på statusraden.
-- **Öppna** ett kort med `Enter` eller ett dubbelklick: anteckningens [konversation](hosting-integration.md#5c-konversationer) öppnas i fönstret, med anteckningens text och dess kommentarer (kortmenyns **Öppna anteckning** öppnar filen i ditt standardprogram för `.md`). `e` redigerar dess
+- **Öppna** ett kort med `Enter` eller ett dubbelklick: anteckningens [konversation](conversations.md) öppnas i fönstret, med anteckningens text och dess kommentarer (kortmenyns **Öppna anteckning** öppnar filen i ditt standardprogram för `.md`). `e` redigerar dess
   tilldelade, etiketter eller milstolpe, `.` eller ett högerklick öppnar kortmenyn, `n` startar ett nytt ärende i den
   valda kolumnen (formuläret återvänder till tavlan när det stängs).
 - **Filtrera** på tilldelad (`a`), etikett (`l`), milstolpe (`M`) eller text (`/`); `x` rensar dem. Filtren är

@@ -21,7 +21,7 @@ A tag with a `-` in the version (`releases/v0.2.0-rc.1`) is published as a GitHu
 | `aur` | In an Arch container fills `gitpoulpi-bin` and `gitpoulpi`, runs `makepkg --printsrcinfo` and pushes over SSH. |
 | `apt` | Checks out `Poulpi-Lab/apt-gitpoulpi` (the `gh-pages` branch), adds the `.deb` files, runs `packaging/apt/build-repo.sh` (signs `Release` into `InRelease` and `Release.gpg`, keeps the last 5 versions) and commits. |
 | `docker` | One multi-arch buildx build (`linux/amd64`, `linux/arm64`) from `packaging/docker/Dockerfile`, pushed to Docker Hub as `poulpilab/gitpoulpi` and, when enabled, to `ghcr.io/poulpi-lab/gitpoulpi`. Tags `<v>`, `<major.minor>` and `latest`; a pre-release would only get `<v>`. Then the Docker Hub overview. |
-| `crates` | `cargo publish --workspace`, opt-in (see "crates.io"). |
+| `crates` | `scripts/publish-crates.sh`: every published crate in dependency order, opt-in (see "crates.io"). |
 
 Every channel job starts with an `env` flag that says whether its secrets exist (`HAS`, or `HAS_DOCKERHUB` and `HAS_GHCR`) and each publishing step carries `if: env.HAS... == 'true'`. A missing secret skips the step and the job stays green with a notice, so a half-configured release never fails the whole run.
 
@@ -39,10 +39,11 @@ The owner creates them in the repository settings. Signing keys and accounts bel
 | `AUR_SSH_PRIVATE_KEY` | secret | `aur`: the project's AUR account. |
 | `APT_GPG_PRIVATE_KEY`, `APT_GPG_PASSPHRASE` | secrets | `apt`: the repository signing key and its passphrase (none when the key has none). |
 | `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` | secrets | `docker`: the Docker Hub organisation or its service account, and a read-write access token limited to `poulpilab/gitpoulpi`. Both are needed to push and to update the overview. |
-| `CARGO_REGISTRY_TOKEN` | secret | `crates` (optional). |
+| `CARGO_REGISTRY_TOKEN` | secret | `crates` (optional): a crates.io API token, needed for the first publish and as the fallback when Trusted Publishing is off. |
 | `PUBLISH_PACKAGES` | variable | `true` enables every channel job. Anything else, and the release still publishes on GitHub. |
 | `PUBLISH_GHCR` | variable | `true` also pushes the image to GHCR with `GITHUB_TOKEN` (the job has `packages: write`). No extra secret. |
-| `PUBLISH_CRATES` | variable | `true` enables the `crates` job. |
+| `PUBLISH_CRATES` | variable | `true` enables the `crates` job (with `PUBLISH_PACKAGES`, a stable tag only). |
+| `CRATES_TRUSTED_PUBLISHING` | variable | `true` makes `crates` authenticate with crates.io Trusted Publishing (OIDC) instead of `CARGO_REGISTRY_TOKEN`. Set it only once every crate has its trusted publisher configured. |
 | `MINISIGN_SECRET_KEY`, `MINISIGN_PASSWORD` | secrets of the `release` environment | `publish` and `security-advisory.yml`: the release signing key box and its password. |
 | `ATTESTATIONS` | variable | `true` enables the build provenance attestation step of `publish`. |
 | `DTRACK_URL`, `DTRACK_API_KEY` | secrets (optional) | `publish`: uploads the SBOM to a Dependency-Track server. Skipped with a notice when absent. |
@@ -57,7 +58,30 @@ The owner creates them in the repository settings. Signing keys and accounts bel
 
 ## crates.io
 
-The first channel is `cargo binstall gitpoulpi-cli` (metadata in `crates/gitpoulpi-cli/Cargo.toml`) and `cargo install --git`; both work with the repository alone. Keep the `crates` job off until `publish = false` is set on `xtask` and `gitpoulpi-testkit`, the `xtask` dev-dependency is gone, the changelog `include_str!` lives inside the crate, every `gitpoulpi-*` name is reserved and `cargo publish --workspace --dry-run` is green.
+`cargo install --locked gitpoulpi-cli` installs the `gitpoulpi` program (it is the whole product: the terminal UI when run without a subcommand, the CLI, and `gitpoulpi mcp`). That crate is named after its role, not `gitpoulpi`, on purpose: the package name is what `cargo binstall` and the install-channel metadata already use, a second package carrying the same `gitpoulpi` binary would collide with it, and a `gitpoulpi` crate that only forwards to it would need the whole CLI moved into a library for no gain. `gitpoulpi-tui` and `gitpoulpi-mcp` are standalone binaries of the same code. The default features of those crates are the full set the release archives ship (`xtask dist` builds with the defaults too).
+
+**What is published.** Every crate except `xtask`, `gitpoulpi-testkit` and `gitpoulpi-updater` (`publish = false`; the updater is the install helper of the archive, installer and package channels, useless from crates.io, and `xtask` is a name somebody else owns). The testkit and `xtask` appear in `[dev-dependencies]` of published crates without a version, which cargo drops from the published manifest. The order, which `scripts/publish-crates.sh` follows and `xtask/tests/crates_io.rs` checks against `cargo metadata`:
+
+```
+gitpoulpi-core, -i18n, -logo-build, -pty, -secrets, -cli-backend, -config, -git2-backend,
+-hosting, -ipc, -log, -session, -update, -ai, -daemon, -tui, -commands, -mcp, -cli
+```
+
+**Packaging rules.** A package cannot read a file outside its own directory, so nothing in `src` or `build.rs` may `include_str!("../../..")`. Three files the repository keeps at its root have a copy inside the crate that embeds them, and `xtask/tests/crates_io.rs` fails when a copy differs: `CHANGELOG.md` (`gitpoulpi-tui`, copy it after editing the root file), `THIRD-PARTY-LICENSES.txt` (`gitpoulpi-core`, `cargo run -p xtask -- licenses` writes both) and `packaging/minisign.pub` (`gitpoulpi-update`). The logo table and the build-script code shared by the three binaries live in `gitpoulpi-logo-build`, a build-dependency. `[workspace.package]` carries the metadata crates.io asks for and an `exclude` that keeps tests, snapshots and golden files out of the packages (`gitpoulpi-daemon` keeps `tests/support/credential_stub.rs`, a binary its manifest names). Every path dependency of a published crate also carries a `version` in `[workspace.dependencies]`: **bumping the workspace version means bumping those too** (the test says which).
+
+**Check before a release.** `cargo publish --workspace --dry-run --exclude xtask --exclude gitpoulpi-testkit --exclude gitpoulpi-updater` packages and builds every crate in order, against the packaged sources (needs network for the index, publishes nothing). `cargo package -p gitpoulpi-cli --list` shows what a crate holds; each `.crate` must stay far below crates.io's 10 MB limit.
+
+**First publish (by token).** Trusted Publishing can only be configured on a crate that already exists, so the first release of the workspace uses an API token:
+
+1. The owner creates the crates.io account (sign in with GitHub) and verifies its email.
+2. Create an API token with the scopes `publish-new` and `publish-update` and, if possible, the crate pattern `gitpoulpi-*`. Store it as the secret `CARGO_REGISTRY_TOKEN` of the `release` environment.
+3. Set the variables `PUBLISH_PACKAGES` and `PUBLISH_CRATES` to `true` and push a stable tag. The `crates` job runs `scripts/publish-crates.sh`: crates one by one, each retried (the index needs a moment to show a dependency just published), and a version already on crates.io is skipped, so a failed run is restarted with "Re-run failed jobs". Pre-releases (a `-` in the tag) are never published.
+
+**Then Trusted Publishing**, so no long-lived token stays in the repository: on crates.io, for each crate, Settings, Trusted Publishing, add a GitHub publisher with repository `Poulpi-Lab/GitPoulpi`, workflow `release.yml` and environment `release`. When all nineteen are configured, set the variable `CRATES_TRUSTED_PUBLISHING` to `true` and delete the `CARGO_REGISTRY_TOKEN` secret. The job then gets a short-lived token from `rust-lang/crates-io-auth-action` (pinned by SHA like every action; the job has `id-token: write`). A new crate added later again needs one token publish before its publisher can be configured.
+
+**Ownership.** Crates published by the owner's account belong to that account. To avoid a single person owning them, add a GitHub team as owner: `cargo owner --add github:Poulpi-Lab:<team> <crate>` for each crate (the team must be visible to crates.io: the organisation grants the crates.io application access). Do it right after the first publish.
+
+**Yanking.** A bad release is yanked, never deleted: `cargo yank --version <v> <crate>` for each crate (`--undo` reverts). Yanking keeps existing lockfiles building and stops new resolutions. Publish a fixed patch version for all crates; versions move together.
 
 ## Dry run
 

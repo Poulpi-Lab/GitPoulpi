@@ -7,7 +7,7 @@
 //! links open in the browser on a click, or with `s` (source) and `d` (docs). Process-wide state, like the
 //! other small popups, because the window restarts on every tab switch.
 //!
-//! The logo is the 16x16 sprite of `assets/logo/colourways.json` (`logo_colors`),
+//! The logo is the 16x16 sprite of `crates/gitpoulpi-logo-build/colourways.json` (`logo_colors`),
 //! drawn through the terminal's pixel protocol when there is one and as
 //! half-blocks otherwise. A click on it spins it (a coin flip over about half
 //! a second, driven by the event loop's frame timer) and lands on the next

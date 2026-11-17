@@ -6,6 +6,7 @@ rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+publish = false
 description = "gitpoulpi-updater: the separate program that stops GitPoulpi, swaps its files (or runs the package manager), checks the result, rolls back on failure and starts GitPoulpi again. The TUI hands it a job file and exits, so nothing holds the install folder open."
 
 [[bin]]

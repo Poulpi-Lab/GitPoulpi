@@ -6,6 +6,11 @@ rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+exclude = ["tests/*.rs", "tests/common/", "tests/fixtures/", "**/snapshots/", "**/golden/", "**/*.snap"]
 description = "Background per-session daemon: owns GitBackend/session state and the IPC endpoint every frontend (TUI/CLI/MCP) connects to."
 
 [features]

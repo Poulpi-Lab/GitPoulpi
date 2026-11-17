@@ -718,7 +718,7 @@ pub struct UiConfig {
     /// label no entry has): the first entry.
     pub image_editor_default: String,
     /// Live: the About window's logo colorway, a slug of
-    /// `assets/logo/colourways.json`. Empty (or an unknown slug): the build's
+    /// `crates/gitpoulpi-logo-build/colourways.json`. Empty (or an unknown slug): the build's
     /// default colorway. Written when the logo is clicked or a color picked.
     pub logo_color: String,
     /// Live: whether the Log row and the commit-detail pane show the

@@ -6,6 +6,11 @@ rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+exclude.workspace = true
 description = "GitPoulpi MCP server: exposes GitBackend-mirroring tools to AI agents by talking to the background daemon over gitpoulpi-ipc (stdio transport by default)."
 
 [lib]
@@ -110,9 +115,8 @@ bytes = "1"
 tower-service = "0.3"
 
 [build-dependencies]
-# Build script: logo colorways + Windows executable icon (assets/logo/logo_build*.rs).
-serde_json.workspace = true
-winresource = { version = "0.1", default-features = false }
+# Build script: logo colorways + Windows executable icon.
+gitpoulpi-logo-build.workspace = true
 
 [dev-dependencies]
 gitpoulpi-testkit.workspace = true

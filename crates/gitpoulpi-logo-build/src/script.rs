@@ -1,9 +1,6 @@
-//! The build-script body of the binary crates (included with `#[path]`, next
-//! to `logo_build.rs`): the colorway table of the About window and the
+//! The build-script body of the binary crates: the colorway table of the About window and the
 //! Windows executable icon, both driven by the `GITPOULPI_LOGO_*` /
 //! `GITPOULPI_ICON_COLOR` environment variables of a custom build.
-
-#![allow(dead_code)]
 
 use crate::logo_build as lb;
 use std::path::PathBuf;
@@ -27,9 +24,8 @@ pub fn run(write_table: bool, embed_on_gnu: bool) {
         println!("cargo:rerun-if-env-changed={var}");
     }
     println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-changed=../../assets/logo/colourways.json");
-    let table: serde_json::Value = serde_json::from_str(include_str!("colourways.json"))
-        .unwrap_or_else(|e| fail(format!("assets/logo/colourways.json: {e}")));
+    let table: serde_json::Value = serde_json::from_str(lb::TABLE_JSON)
+        .unwrap_or_else(|e| fail(format!("colourways.json: {e}")));
     let env = |k: &str| std::env::var(k).unwrap_or_default();
     let colors =
         lb::parse_colors(&env(lb::COLORS_ENV), &lb::slugs(&table)).unwrap_or_else(|e| fail(e));

@@ -6,6 +6,11 @@ rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+exclude.workspace = true
 description = "GitPoulpi terminal UI: a ratatui/crossterm client over gitpoulpi-ipc, subscribed to daemon events for live updates."
 
 [[bin]]
@@ -146,13 +151,13 @@ pulldown-cmark.workspace = true
 libc.workspace = true
 
 [build-dependencies]
-# Build script: logo colorways + Windows executable icon (assets/logo/logo_build*.rs).
-serde_json.workspace = true
+# Build script: logo colorways + Windows executable icon.
+gitpoulpi-logo-build.workspace = true
 # Build script: the About window's third-party crate list (build_crates.rs).
 toml.workspace = true
-winresource = { version = "0.1", default-features = false }
 
 [dev-dependencies]
+gitpoulpi-logo-build.workspace = true
 gitpoulpi-hosting = { workspace = true, features = ["test-support"] }
 async-trait.workspace = true
 gitpoulpi-testkit.workspace = true

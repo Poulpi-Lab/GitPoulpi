@@ -6,6 +6,11 @@ rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+exclude.workspace = true
 description = "UI translations: per-language TOML compiled by build.rs into static tables. No runtime dependencies, usable from the TUI and the CLI."
 build = "build.rs"
 # Lets the build script of a dependent (gitpoulpi-commands) read the built

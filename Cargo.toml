@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "crates/gitpoulpi-logo-build",
     "crates/gitpoulpi-core",
     "crates/gitpoulpi-git2-backend",
     "crates/gitpoulpi-cli-backend",
@@ -31,6 +32,13 @@ rust-version = "1.88"
 authors = ["Poulpi-Lab <poulpilab@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/Poulpi-Lab/GitPoulpi"
+homepage = "https://github.com/Poulpi-Lab/GitPoulpi"
+readme = "README.md"
+keywords = ["git", "tui", "terminal", "git-client", "mcp"]
+categories = ["development-tools", "command-line-utilities"]
+# Tests, snapshots and golden files stay in the repository: a package holds what
+# a build needs (tests read fixtures and docs from the checkout anyway).
+exclude = ["tests/", "**/snapshots/", "**/golden/", "**/*.snap"]
 
 [workspace.dependencies]
 # The internal crates that have features are declared with
@@ -39,25 +47,31 @@ repository = "https://github.com/Poulpi-Lab/GitPoulpi"
 # docs/user/custom-builds.md) could never turn anything off. Consumers that need a
 # crate's full behavior say `features = ["default"]` (xtask), or the specific
 # feature (`network`).
+#
+# Every published crate carries `version` next to `path` (crates.io wants it;
+# `xtask/tests/crates_io.rs` keeps it equal to the workspace version).
+# `gitpoulpi-testkit` and `xtask` are never published, so they have none: a
+# path dev-dependency without a version is stripped from a published manifest.
 libc = "0.2"
-gitpoulpi-core = { path = "crates/gitpoulpi-core" }
-gitpoulpi-cli-backend = { path = "crates/gitpoulpi-cli-backend", default-features = false }
-gitpoulpi-git2-backend = { path = "crates/gitpoulpi-git2-backend", default-features = false }
-gitpoulpi-config = { path = "crates/gitpoulpi-config" }
-gitpoulpi-log = { path = "crates/gitpoulpi-log" }
-gitpoulpi-secrets = { path = "crates/gitpoulpi-secrets" }
-gitpoulpi-session = { path = "crates/gitpoulpi-session" }
-gitpoulpi-hosting = { path = "crates/gitpoulpi-hosting", default-features = false }
-gitpoulpi-pty = { path = "crates/gitpoulpi-pty" }
-gitpoulpi-ai = { path = "crates/gitpoulpi-ai", default-features = false }
-gitpoulpi-update = { path = "crates/gitpoulpi-update" }
-gitpoulpi-i18n = { path = "crates/gitpoulpi-i18n", default-features = false }
-gitpoulpi-ipc = { path = "crates/gitpoulpi-ipc" }
-gitpoulpi-daemon = { path = "crates/gitpoulpi-daemon", default-features = false }
+gitpoulpi-core = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-core" }
+gitpoulpi-cli-backend = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-cli-backend", default-features = false }
+gitpoulpi-git2-backend = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-git2-backend", default-features = false }
+gitpoulpi-config = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-config" }
+gitpoulpi-log = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-log" }
+gitpoulpi-secrets = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-secrets" }
+gitpoulpi-session = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-session" }
+gitpoulpi-hosting = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-hosting", default-features = false }
+gitpoulpi-pty = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-pty" }
+gitpoulpi-ai = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-ai", default-features = false }
+gitpoulpi-update = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-update" }
+gitpoulpi-logo-build = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-logo-build" }
+gitpoulpi-i18n = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-i18n", default-features = false }
+gitpoulpi-ipc = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-ipc" }
+gitpoulpi-daemon = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-daemon", default-features = false }
 gitpoulpi-testkit = { path = "crates/gitpoulpi-testkit" }
-gitpoulpi-tui = { path = "crates/gitpoulpi-tui", default-features = false }
-gitpoulpi-commands = { path = "crates/gitpoulpi-commands", default-features = false }
-gitpoulpi-mcp = { path = "crates/gitpoulpi-mcp", default-features = false }
+gitpoulpi-tui = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-tui", default-features = false }
+gitpoulpi-commands = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-commands", default-features = false }
+gitpoulpi-mcp = { version = "1.0.0-rc.1", path = "crates/gitpoulpi-mcp", default-features = false }
 gitpoulpi-updater = { path = "crates/gitpoulpi-updater" }
 xtask = { path = "xtask" }
 

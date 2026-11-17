@@ -6,6 +6,7 @@ rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+publish = false
 description = "Fixture-repo builder and contract-test harness shared by every GitBackend implementation's tests, plus TUI golden-test helpers."
 
 [features]

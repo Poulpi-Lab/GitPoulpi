@@ -1,9 +1,9 @@
-//! Build-time logo selection, shared (`#[path]`) by the build scripts of the
-//! three binary crates and by `xtask build-custom`, so the choices the
-//! scripts validate and the ones the build applies cannot disagree.
+//! Build-time logo selection, shared by the build scripts of the three
+//! binary crates and by `xtask build-custom`, so the choices the scripts
+//! validate and the ones the build applies cannot disagree.
 //!
 //! * `GITPOULPI_LOGO_COLORS`: unset or `all` = every colorway of
-//!   `assets/logo/colourways.json`; otherwise a comma list of slugs (kept in
+//!   `colourways.json`; otherwise a comma list of slugs (kept in
 //!   the table's order, which is the spin order of the About window);
 //! * `GITPOULPI_LOGO_DEFAULT`: the About default and the `ui.logo_color`
 //!   fallback; must be one of the compiled colorways (unset = the table's
@@ -11,9 +11,10 @@
 //! * `GITPOULPI_ICON_COLOR`: colorway of the Windows executable icon (any
 //!   colorway of the table, compiled or not; unset = the default above).
 
-#![allow(dead_code)] // each includer uses only part of it
-
 use serde_json::Value;
+
+/// The colorway table: every colorway with its 16x16 sprite.
+pub const TABLE_JSON: &str = include_str!("../colourways.json");
 
 pub const COLORS_ENV: &str = "GITPOULPI_LOGO_COLORS";
 pub const DEFAULT_ENV: &str = "GITPOULPI_LOGO_DEFAULT";
@@ -212,7 +213,7 @@ mod tests {
     use super::*;
 
     fn table() -> Value {
-        serde_json::from_str(include_str!("colourways.json")).unwrap()
+        serde_json::from_str(TABLE_JSON).unwrap()
     }
 
     fn all() -> Vec<String> {

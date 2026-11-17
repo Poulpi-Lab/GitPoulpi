@@ -81,7 +81,7 @@ De themaselectie bereikt de build als omgevingsvariabele
 
 De logokeuzes zijn de omgevingsvariabelen `GITPOULPI_LOGO_COLORS`
 (`all` of een kommalijst van slugs), `GITPOULPI_LOGO_DEFAULT` en
-`GITPOULPI_ICON_COLOR`, gelezen door de buildscripts van `gitpoulpi-tui` (dat `assets/logo/colourways.json` filtert tot de tabel die het venster Over insluit) en van de drie binarycrates (het pictogram). De bron van de kleuren blijft `assets/logo/colourways.json`.
+`GITPOULPI_ICON_COLOR`, gelezen door de buildscripts van `gitpoulpi-tui` (dat `crates/gitpoulpi-logo-build/colourways.json` filtert tot de tabel die het venster Over insluit) en van de drie binarycrates (het pictogram). De bron van de kleuren blijft `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Pictogram van het Windows-uitvoerbestand
 

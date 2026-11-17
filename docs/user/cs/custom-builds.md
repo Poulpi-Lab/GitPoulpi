@@ -93,9 +93,9 @@ odstraní; nastavte ji sami pro prostý `cargo build`, chcete-li. `gitpoulpi
 
 Volby loga jsou proměnné prostředí `GITPOULPI_LOGO_COLORS` (`all` nebo seznam
 slugů oddělený čárkami), `GITPOULPI_LOGO_DEFAULT` a `GITPOULPI_ICON_COLOR`,
-které čtou build skripty `gitpoulpi-tui` (filtruje `assets/logo/colourways.json`
+které čtou build skripty `gitpoulpi-tui` (filtruje `crates/gitpoulpi-logo-build/colourways.json`
 do tabulky, kterou okno O aplikaci vkládá) a tří binárních crates (ikona).
-Zdrojem barev zůstává `assets/logo/colourways.json`.
+Zdrojem barev zůstává `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Ikona spustitelného souboru pro Windows
 

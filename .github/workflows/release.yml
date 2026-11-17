@@ -21,8 +21,9 @@ name: Release
 # attestations, which need GitHub Enterprise Cloud on a private repository). docs/developer/releasing.md.
 #
 # Secrets: CHOCO_API_KEY, AUR_SSH_PRIVATE_KEY, APT_GPG_PRIVATE_KEY, APT_GPG_PASSPHRASE, POULPI_BOT_PRIVATE_KEY,
-# DOCKERHUB_USERNAME, DOCKERHUB_TOKEN, CARGO_REGISTRY_TOKEN (optional).
-# Variables: POULPI_BOT_APP_ID, PUBLISH_PACKAGES, PUBLISH_GHCR (optional), PUBLISH_CRATES (optional).
+# DOCKERHUB_USERNAME, DOCKERHUB_TOKEN, CARGO_REGISTRY_TOKEN (optional, crates.io).
+# Variables: POULPI_BOT_APP_ID, PUBLISH_PACKAGES, PUBLISH_GHCR (optional), PUBLISH_CRATES (optional),
+# CRATES_TRUSTED_PUBLISHING (optional, crates.io Trusted Publishing instead of the token).
 # Pushes to the other repositories go out as the Poulpi-Lab GitHub App bot (actions/create-github-app-token),
 # never as a personal account.
 #
@@ -724,30 +725,43 @@ jobs:
           readme-filepath: packaging/docker/README.md
           short-description: Git client for the terminal with a clickable commit graph, a CLI and an MCP server
 
-  # Opt-in until the workspace is ready for crates.io (publish = false on xtask and the testkit, the CHANGELOG
-  # include inside the crate, every name reserved): needs the secret and PUBLISH_CRATES == 'true'.
+  # crates.io, opt-in: the repository variable PUBLISH_CRATES must be 'true' (and PUBLISH_PACKAGES, like every
+  # channel). Credentials, in order: crates.io Trusted Publishing when the variable CRATES_TRUSTED_PUBLISHING is
+  # 'true' (a short-lived token from the job's OIDC identity, no secret stored), else the secret
+  # CARGO_REGISTRY_TOKEN. Trusted Publishing can only be configured on a crate that already exists, so the very
+  # first release uses the token; neither set means a notice and nothing published. The crates go out in
+  # dependency order with retries (scripts/publish-crates.sh), and a re-run skips the versions already there.
   crates:
     # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
     environment: release
     needs: publish
     if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' && vars.PUBLISH_CRATES == 'true' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # The OIDC identity crates.io Trusted Publishing trusts.
+      id-token: write
     env:
-      HAS: ${{ secrets.CARGO_REGISTRY_TOKEN != '' }}
+      HAS_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN != '' }}
+      HAS_TRUSTED: ${{ vars.CRATES_TRUSTED_PUBLISHING == 'true' }}
     steps:
-      - name: Notice when the secret is missing
-        if: env.HAS != 'true'
-        run: echo "::notice::CARGO_REGISTRY_TOKEN is not set, nothing was published to crates.io"
+      - name: Notice when no credential is configured
+        if: env.HAS_TOKEN != 'true' && env.HAS_TRUSTED != 'true'
+        run: echo "::notice::Neither CRATES_TRUSTED_PUBLISHING nor CARGO_REGISTRY_TOKEN is set, nothing was published to crates.io"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: env.HAS == 'true'
+        if: env.HAS_TOKEN == 'true' || env.HAS_TRUSTED == 'true'
         with:
           ref: ${{ env.TAG }}
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        if: env.HAS_TOKEN == 'true' || env.HAS_TRUSTED == 'true'
         with:
           toolchain: stable
-        if: env.HAS == 'true'
-      - name: Publish the workspace
-        if: env.HAS == 'true'
+      - uses: rust-lang/crates-io-auth-action@3268eb413133e2960fa4ae0e963ca76380c54cd9 # v1.0.6
+        id: auth
+        if: env.HAS_TRUSTED == 'true'
+      - name: Publish the crates in dependency order
+        if: env.HAS_TOKEN == 'true' || env.HAS_TRUSTED == 'true'
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish --workspace
+          # The short-lived token wins when Trusted Publishing is on.
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token || secrets.CARGO_REGISTRY_TOKEN }}
+        run: bash scripts/publish-crates.sh

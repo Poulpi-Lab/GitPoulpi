@@ -77,7 +77,7 @@ PowerShell 的名称：`-Langs -Integrations -Themes -LogoColors -LogoDefault -I
 
 主题选择以环境变量 `GITPOULPI_THEMES`（`all`、`none` 或以逗号分隔的系列列表）传递给构建，由 `gitpoulpi-config` 的构建脚本读取，并在编译时丢弃其他调色板；如果你愿意，也可以为普通的 `cargo build` 自行设置它。`gitpoulpi --version` 会打印一行 `themes:`，列出已构建的集合。
 
-徽标选择是环境变量 `GITPOULPI_LOGO_COLORS`（`all` 或以逗号分隔的 slug 列表）、`GITPOULPI_LOGO_DEFAULT` 和 `GITPOULPI_ICON_COLOR`，由 `gitpoulpi-tui` 的构建脚本（它把 `assets/logo/colourways.json` 过滤成“关于”窗口所嵌入的表）以及三个二进制 crate 的构建脚本（图标）读取。颜色的来源仍是 `assets/logo/colourways.json`。
+徽标选择是环境变量 `GITPOULPI_LOGO_COLORS`（`all` 或以逗号分隔的 slug 列表）、`GITPOULPI_LOGO_DEFAULT` 和 `GITPOULPI_ICON_COLOR`，由 `gitpoulpi-tui` 的构建脚本（它把 `crates/gitpoulpi-logo-build/colourways.json` 过滤成“关于”窗口所嵌入的表）以及三个二进制 crate 的构建脚本（图标）读取。颜色的来源仍是 `crates/gitpoulpi-logo-build/colourways.json`。
 
 ### Windows 可执行文件图标
 

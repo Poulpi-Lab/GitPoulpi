@@ -94,9 +94,9 @@ time; set it yourself for a plain `cargo build` if you prefer. `gitpoulpi
 The logo choices are the environment variables `GITPOULPI_LOGO_COLORS`
 (`all` or a comma list of slugs), `GITPOULPI_LOGO_DEFAULT` and
 `GITPOULPI_ICON_COLOR`, read by the build scripts of `gitpoulpi-tui` (it
-filters `assets/logo/colourways.json` into the table the About window
+filters `crates/gitpoulpi-logo-build/colourways.json` into the table the About window
 embeds) and of the three binary crates (the icon). The source of the colors
-stays `assets/logo/colourways.json`.
+stays `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Windows executable icon
 

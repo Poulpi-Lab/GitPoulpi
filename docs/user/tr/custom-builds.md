@@ -77,7 +77,7 @@ PowerShell adları: `-Langs -Integrations -Themes -LogoColors -LogoDefault -Icon
 
 Tema seçimi derlemeye `GITPOULPI_THEMES` ortam değişkeni olarak ulaşır (`all`, `none` ya da virgülle ayrılmış bir aile listesi); `gitpoulpi-config`'in derleme betiği bunu okur ve diğer paletleri derleme zamanında atar; tercih ederseniz sade bir `cargo build` için kendiniz ayarlayın. `gitpoulpi --version` derlenen kümeyi gösteren bir `themes:` satırı yazdırır.
 
-Logo seçimleri `GITPOULPI_LOGO_COLORS` (`all` ya da virgülle ayrılmış slug listesi), `GITPOULPI_LOGO_DEFAULT` ve `GITPOULPI_ICON_COLOR` ortam değişkenleridir; bunları `gitpoulpi-tui`'nin (`assets/logo/colourways.json` dosyasını Hakkında penceresinin gömdüğü tabloya süzer) ve üç ikili crate'in (simge) derleme betikleri okur. Renklerin kaynağı `assets/logo/colourways.json` olarak kalır.
+Logo seçimleri `GITPOULPI_LOGO_COLORS` (`all` ya da virgülle ayrılmış slug listesi), `GITPOULPI_LOGO_DEFAULT` ve `GITPOULPI_ICON_COLOR` ortam değişkenleridir; bunları `gitpoulpi-tui`'nin (`crates/gitpoulpi-logo-build/colourways.json` dosyasını Hakkında penceresinin gömdüğü tabloya süzer) ve üç ikili crate'in (simge) derleme betikleri okur. Renklerin kaynağı `crates/gitpoulpi-logo-build/colourways.json` olarak kalır.
 
 ### Windows çalıştırılabilir dosya simgesi
 

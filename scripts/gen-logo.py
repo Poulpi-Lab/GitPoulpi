@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerates the logo assets from assets/logo/colourways.json.
+"""Regenerates the logo assets from crates/gitpoulpi-logo-build/colourways.json.
 
   python3 scripts/gen-logo.py [--slug lavender] [--icon-slug lavender]
 

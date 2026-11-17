@@ -6,6 +6,11 @@ rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+exclude.workspace = true
 description = "The self-updater's engine: download and verify a release archive, extract it, stage and swap the binaries (Unix rename / Windows move-aside), revert. No TUI dependencies; every file operation goes through an injected trait."
 
 [dependencies]

@@ -13,9 +13,9 @@ repository dimostrativo con autori inventati.
 ### Barra del titolo
 
 Il bordo superiore della finestra riporta
-`🐙 GitPoulpi vX.Y.Z -- <percorso del repository>` (il nome della sessione è nella barra di stato, in basso per impostazione predefinita).
+<img src="../../../assets/logo/gitpoulpi.png" alt="Icona di GitPoulpi" height="16"> `GitPoulpi vX.Y.Z -- <percorso del repository>` (il nome della sessione è nella barra di stato, in basso per impostazione predefinita).
 
-- **🐙** apre la finestra **Informazioni**: versione, funzionalità della build,
+- **<img src="../../../assets/logo/gitpoulpi.png" alt="Icona di GitPoulpi" height="16">** apre la finestra **Informazioni**: versione, funzionalità della build,
   licenza, link, una breve nota che dice che GitPoulpi è un progetto indipendente,
   i crate di terze parti e le licenze e i crediti. In un terminale che disegna
   immagini il polpo è il logo in pixel, nel colore del tuo logo (altrove resta

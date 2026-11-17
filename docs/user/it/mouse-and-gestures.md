@@ -130,7 +130,7 @@ GitPoulpi ricorda ogni dimensione. Vedi
 
 ## Barra del titolo, barra delle schede e barra degli strumenti
 
-- **Clicca 🐙** nella barra del titolo per aprire **Informazioni**. In
+- **Clicca <img src="../../../assets/logo/gitpoulpi.png" alt="Icona di GitPoulpi" height="16">** nella barra del titolo per aprire **Informazioni**. In
   Informazioni le pupille del polpo seguono il puntatore; clicca il logo per
   farlo girare sul colore successivo, clic destro per l'elenco dei colori, clicca
   un link per aprirlo.

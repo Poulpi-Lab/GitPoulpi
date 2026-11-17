@@ -1516,11 +1516,11 @@ Per ciò che fanno i menu, vedi [Lavorare con il Log](log-and-history.md).
 Con un'integrazione corrispondente, il pannello Refs ha una sezione delle pull
 request (GitLab: merge request). Con un profilo di hosting connesso ha anche una
 sezione ISSUE. Vedi
-[Integrazioni di hosting e issue tracker](hosting-integration.md#5-pull-request-e-issue-nella-barra-laterale).
+[Pull request e issue](pull-requests-and-issues.md#pull-request-e-issue-nella-barra-laterale).
 
 | Tasto | Azione |
 |---|---|
-| `Enter` | Apre la riga selezionata: una issue (e una richiesta su Azure DevOps o Bitbucket) come [conversazione](hosting-integration.md#5c-conversazioni), una pull request nella [revisione](review.md) sugli host che ne hanno una, tutto il resto nel browser. Su una riga `Riconnetti`: apre le Impostazioni su quel profilo |
+| `Enter` | Apre la riga selezionata: una issue (e una richiesta su Azure DevOps o Bitbucket) come [conversazione](conversations.md), una pull request nella [revisione](review.md) sugli host che ne hanno una, tutto il resto nel browser. Su una riga `Riconnetti`: apre le Impostazioni su quel profilo |
 | `Space` | Espande o comprime la sezione |
 | `v` | Apre il filtro della sezione. Pull request: Aperte, Merged / chiuse, Tutte. Issue: Aperte, Assegnate a me, Chiuse, Tutte |
 | `n` | Sezione delle pull request: crea una pull request. Sezione ISSUE: nuova issue. (Il pulsante `+` dell'intestazione) |
@@ -1533,7 +1533,7 @@ sezione ISSUE. Vedi
 ### La bacheca delle issue
 
 **Bacheca** nell'intestazione ISSUE (palette: **Issue: Apri la bacheca**) apre la bacheca Kanban della sorgente delle issue. Vedi
-[la bacheca](hosting-integration.md#5b-la-bacheca-delle-issue) e [le issue locali](local-issues.md#la-bacheca-kanban). Ogni tasto
+[la bacheca](pull-requests-and-issues.md#la-bacheca-delle-issue) e [le issue locali](local-issues.md#la-bacheca-kanban). Ogni tasto
 qui sotto è anche un comando della palette (**Bacheca: ...**).
 
 | Tasto | Azione |
@@ -1541,7 +1541,7 @@ qui sotto è anche un comando della palette (**Bacheca: ...**).
 | Frecce | Selezionano una card (`Su`, `Giù`) o la colonna vicina (`Sinistra`, `Destra`); `Home`, `End`, `PageUp`, `PageDown` saltano nella colonna |
 | `Shift+Left`, `Shift+Right` | Spostano la card selezionata nella colonna precedente o successiva |
 | `m` | **Sposta la card in...**: un elenco a discesa delle colonne |
-| `Enter` | Apre la [conversazione](hosting-integration.md#5c-conversazioni) della issue (la pagina dell'host dove l'host non ne ha una da leggere) |
+| `Enter` | Apre la [conversazione](conversations.md) della issue (la pagina dell'host dove l'host non ne ha una da leggere) |
 | `e`, `.` | Modificano assegnatari, etichette o milestone; il menu della card |
 | `n` | Nuova issue nella colonna selezionata |
 | `a`, `l`, `M`, `/` | Filtrano per assegnatario, etichetta, milestone, testo. `x` azzera i filtri |
@@ -1567,7 +1567,7 @@ pull request) è lo stesso compositore. I suoi tasti sono nella tabella `md_edit
 | `Alt+W` | I moduli di nuova issue e pull request: crea sulla pagina web propria del provider |
 | `Esc` | Nel pannello di **Scrivi con l'IA**: ferma una bozza in corso, altrimenti chiude il pannello |
 
-Nella [vista di conversazione](hosting-integration.md#5c-conversazioni) di una issue o di una richiesta (righe di palette
+Nella [vista di conversazione](conversations.md) di una issue o di una richiesta (righe di palette
 *Conversazione: ...*; le righe con un tasto sono nell'elenco della palette qui sopra):
 
 | Tasto | Azione |
@@ -1933,7 +1933,7 @@ Ogni pulsante ha un gemello da tastiera:
 
 | Pulsante | Tasto |
 |---|---|
-| 🐙 a sinistra della barra del titolo (Informazioni) | `Aiuto: Informazioni su GitPoulpi` nella palette |
+| <img src="../../../assets/logo/gitpoulpi.png" alt="Icona di GitPoulpi" height="16"> a sinistra della barra del titolo (Informazioni) | `Aiuto: Informazioni su GitPoulpi` nella palette |
 | **Apri in** nella barra del titolo | `Alt+O`, `Ctrl+Alt+O` |
 | `×` a destra della barra del titolo (esci) | `q` |
 | La versione nella barra del titolo (Note di rilascio) | `Aiuto: Note di rilascio` nella palette |

@@ -405,7 +405,7 @@ e un agente locale gira in sola lettura (vedi sotto). Il testo lascia GitPoulpi 
 (`Ctrl+Enter`) o **Commenta** del compositore.
 
 **Nel compositore Markdown.** Con l'IA attiva, ogni compositore il cui testo va a un host (un commento, una risposta o una
-modifica nella [vista di conversazione](hosting-integration.md#5c-conversazioni), un commento di revisione, il riepilogo di Termina la revisione,
+modifica nella [vista di conversazione](conversations.md), un commento di revisione, il riepilogo di Termina la revisione,
 la descrizione di una nuova issue e quella di una pull request) ha un pulsante **Scrivi con l'IA** (`Alt+E`, lo
 stesso tasto in tutti) all'estremità destra della sua barra delle modalità. Apre un pannello sotto la barra:
 

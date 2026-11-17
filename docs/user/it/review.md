@@ -37,7 +37,7 @@ Sempre visibile: il numero e il titolo, lo stato (Aperta, Bozza, Unita, Chiusa),
 se si unisce senza problemi o è in conflitto, la dimensione, e **`3 commenti in sospeso`** quando ne hai scritti alcuni.
 
 I quattro pulsanti dei metadati - **Assegnatari**, **Revisori**, **Etichette**, **Milestone** - aprono gli stessi selettori
-della barra laterale (vedi [Assegnatari, revisori, etichette e milestone](hosting-integration.md#assegnatari-revisori-etichette-e-milestone));
+della barra laterale (vedi [Assegnatari, revisori, etichette e milestone](pull-requests-and-issues.md#assegnatari-revisori-etichette-e-milestone));
 l'intestazione mostra il risultato appena l'host lo ha accettato. I pulsanti di azione: **Checkout** (il solito
 checkout del branch della richiesta, che chiude anche la vista), **Apri nel browser**, **Aggiorna**
 (**`F5`**) e **Termina revisione**.
@@ -50,7 +50,7 @@ Un controllo segmentato nel bordo superiore cambia pagina: **Panoramica**, **Fil
 ### Panoramica
 
 La Panoramica è **la conversazione della richiesta**, la stessa cronologia e la stessa casella dei commenti di una issue
-([Conversazioni](hosting-integration.md#5c-conversazioni)): prima la descrizione (*ha aperto questo*), poi i commenti,
+([Conversazioni](conversations.md)): prima la descrizione (*ha aperto questo*), poi i commenti,
 le discussioni sul codice con il loro estratto di diff, le revisioni inviate con il loro esito (`approvata`, `modifiche
 richieste`, `commentata`, `ignorata`; su GitLab gli esiti sono le sue approvazioni) e gli eventi, dal più vecchio, nella
 finestra più recente con **Carica precedenti** in cima. La casella dei commenti è agganciata sotto la cronologia (**Nuovo commento**):
@@ -86,7 +86,7 @@ nella palette; `a` (assegnatari), `p` (revisori), `f` (**Termina la revisione**)
 Un commento scritto in un'altra finestra o dalla CLI compare qui da solo: ogni scrittura di GitPoulpi (questa finestra
 compresa) lo comunica alla sessione, e le finestre che mostrano la stessa richiesta lo rileggono.
 
-La casella dei commenti è il compositore Markdown condiviso con [la vista di conversazione](hosting-integration.md#scrivere)
+La casella dei commenti è il compositore Markdown condiviso con [la vista di conversazione](conversations.md#scrivere)
 (anche la casella di una risposta a una discussione, di un commento su una riga e del riepilogo di **Termina la revisione**): `Ctrl+Enter` (anche
 `Ctrl+S`, `Alt+Enter`) invia, e dove l'IA è attiva `Alt+E` apre **Scrivi con l'IA**
 ([il capitolo sull'IA](ai.md#aiuto-alla-scrittura-su-un-host)). L'anteprima mostra il testo come lo mostrerà l'host, riferimenti compresi

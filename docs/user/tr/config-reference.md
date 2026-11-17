@@ -573,17 +573,17 @@ asla bir değişiklik olarak görünmez. TUI ve CLI tarafından yazılır; nadir
 | `[preferences] lfs_enabled` | Burada `git.lfs_enabled` değerini geçersiz kılar | Ayarlar > Git ve Kodlama |
 | `[preferences] profile` | Burada commit'leri imzalayan `[[profiles]]` id'si; yoksa `general.active_profile` | araç çubuğunun profil açılır listesi, **Depo: Profili Değiştir...** |
 | `[preferences] autocrlf`, `eol` | *Henüz kullanılmıyor* | Ayarlar > Git ve Kodlama |
-| `[preferences] push_after_commit` | Her commit sonrasında dalı upstream'ine push eder (yokken kapalı) | Ayarlar > Depoya Özel Ayarlar > Commit |
-| `[preferences] skip_hooks_by_default` | Commit formundaki Hook'ları atla işaretli başlar (yokken kapalı) | Ayarlar > Depoya Özel Ayarlar > Commit |
-| `[preferences] squash_merge` | Yerel bir dal merge'ü squash yapar: stage'ler, merge commit'i yok (yokken kapalı) | Ayarlar > Depoya Özel Ayarlar > Merge seçenekleri |
-| `[preferences] template_apply`, `template_strip_comments` | Boş bir commit formunu şablonla önceden doldur; commit sırasında `#` yorum satırlarını kaldır (ikisi de yokken kapalı) | Ayarlar > Depoya Özel Ayarlar > Mesaj şablonu |
-| `[preferences] conflict_detection` | Bu depo için proaktif çakışma algılama; yokken `general.conflict_detection` izlenir | Ayarlar > Depoya Özel Ayarlar > Çakışma önleme |
-| `[preferences] conflict_base_branches` | Deponun kendi Temel dallar desenleri, satır başına bir tane (hâlâ **Kendi listesi** olarak kullanılır) | Ayarlar > Depoya Özel Ayarlar > Çakışma önleme |
-| `[preferences] conflict_base_source` | Temel dalların nereden geldiği: `default` (genel varsayılan liste), `list` (`conflict_base_list`) veya `own` (`conflict_base_branches`). Yokken: varsa kendi desenleri, yoksa varsayılan | Ayarlar > Depoya Özel Ayarlar > Çakışma önleme |
-| `[preferences] conflict_base_list` | Kaynak `list` olduğunda bu deponun izlediği `[conflict_prevention.lists.<ad>]`; silinmiş bir liste varsayılana döner | Ayarlar > Depoya Özel Ayarlar > Çakışma önleme |
-| `commit-template.txt` (`repo-state.toml` dosyasının yanında bir dosya) | Commit şablonu; git'in `commit.template` ayarı ona işaret eder | Ayarlar > Depoya Özel Ayarlar > Mesaj şablonu |
-| `[preferences.ai_instructions]` | `text`, `mode = "add" \| "replace"`: bu deponun YZ talimatları | Ayarlar > Depoya Özel Ayarlar > YZ |
-| `[preferences.ai_overrides.<action>]` | Burada tek bir eylem için `profile`, `instructions` | Ayarlar > Depoya Özel Ayarlar > YZ |
+| `[preferences] push_after_commit` | Her commit sonrasında dalı upstream'ine push eder (yokken kapalı) | Ayarlar > Depoya özel ayarlar > Commit |
+| `[preferences] skip_hooks_by_default` | Commit formundaki Hook'ları atla işaretli başlar (yokken kapalı) | Ayarlar > Depoya özel ayarlar > Commit |
+| `[preferences] squash_merge` | Yerel bir dal merge'ü squash yapar: stage'ler, merge commit'i yok (yokken kapalı) | Ayarlar > Depoya özel ayarlar > Merge seçenekleri |
+| `[preferences] template_apply`, `template_strip_comments` | Boş bir commit formunu şablonla önceden doldur; commit sırasında `#` yorum satırlarını kaldır (ikisi de yokken kapalı) | Ayarlar > Depoya özel ayarlar > Mesaj şablonu |
+| `[preferences] conflict_detection` | Bu depo için proaktif çakışma algılama; yokken `general.conflict_detection` izlenir | Ayarlar > Depoya özel ayarlar > Çakışma önleme |
+| `[preferences] conflict_base_branches` | Deponun kendi Temel dallar desenleri, satır başına bir tane (hâlâ **Kendi listesi** olarak kullanılır) | Ayarlar > Depoya özel ayarlar > Çakışma önleme |
+| `[preferences] conflict_base_source` | Temel dalların nereden geldiği: `default` (genel varsayılan liste), `list` (`conflict_base_list`) veya `own` (`conflict_base_branches`). Yokken: varsa kendi desenleri, yoksa varsayılan | Ayarlar > Depoya özel ayarlar > Çakışma önleme |
+| `[preferences] conflict_base_list` | Kaynak `list` olduğunda bu deponun izlediği `[conflict_prevention.lists.<ad>]`; silinmiş bir liste varsayılana döner | Ayarlar > Depoya özel ayarlar > Çakışma önleme |
+| `commit-template.txt` (`repo-state.toml` dosyasının yanında bir dosya) | Commit şablonu; git'in `commit.template` ayarı ona işaret eder | Ayarlar > Depoya özel ayarlar > Mesaj şablonu |
+| `[preferences.ai_instructions]` | `text`, `mode = "add" \| "replace"`: bu deponun YZ talimatları | Ayarlar > Depoya özel ayarlar > YZ |
+| `[preferences.ai_overrides.<action>]` | Burada tek bir eylem için `profile`, `instructions` | Ayarlar > Depoya özel ayarlar > YZ |
 | `default_remote` | Tek tıklamalı Push/Pull/Fetch'in kullandığı uzak depo | uzak depo menüsü, `gitpoulpi remote default <name>` |
 | `hosting_integration` | Buraya sabitlenen `[[integrations]]` profili | `gitpoulpi hosting use --id` |
 | `pulls_source`, `issues_source` | PR / issue listelerinin okuduğu sağlayıcı projesi, `{ integration, project, filter }` olarak. `filter` isteğe bağlıdır: liste sorgusuna AND ile eklenen, sağlayıcıya özgü ek bir koşul (bir Jira JQL parçası, bir Azure WIQL koşulu, Trello liste adları); GitHub ve GitLab bunu yok sayar. | kenar çubuğu bölümleri, `gitpoulpi hosting link` |

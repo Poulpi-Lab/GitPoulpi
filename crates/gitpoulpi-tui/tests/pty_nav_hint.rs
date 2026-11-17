@@ -30,7 +30,7 @@ fn the_nav_mode_status_line_names_the_theme_key_and_the_help_key_at_80_columns()
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let _ = &screen;
     let text = term.text();
-    for want in ["y=theme", "g=language", "?="] {
+    for want in ["t=theme", "l=language", "?="] {
         assert!(text.contains(want), "{want} missing:\n{text}");
     }
     let _ = term.stop();

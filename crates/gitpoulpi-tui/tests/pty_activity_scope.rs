@@ -92,7 +92,7 @@ fn open_activity(term: &mut Terminal) {
         term.send_keys("C-n").unwrap();
         if term
             .wait_for("the Ctrl+N chord prompt", Duration::from_secs(5), |s| {
-                s.contains("t=select tab")
+                s.contains("t=theme")
             })
             .is_ok()
         {

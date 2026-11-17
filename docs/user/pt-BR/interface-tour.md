@@ -64,7 +64,7 @@ diz isso em vermelho; um clique nela abre a entrada do Registro de atividade, co
 motivo, um próximo passo, os detalhes e um Copiar para uma IA. Os dois estão descritos em
 [Quando algo falha](troubleshooting.md#quando-algo-falha).
 
-À esquerda do botão **Atividade**, o indicador de tarefas mostra uma tarefa em segundo plano com um `[x]` para cancelá-la. A aba Início tem a mesma linha de status, com o botão **Atividade** no canto inferior direito (ele abre em Todos os repositórios).
+À esquerda do botão **Atividade**, o indicador de tarefas mostra uma tarefa em segundo plano com um `[x]` para cancelá-la (a lista de tarefas tem **Cancelar tudo**, e a paleta tem *Tarefas: cancelar tudo o que for possível*; uma tarefa que não pode ser interrompida com segurança diz o motivo). A aba Início tem a mesma linha de status, com o botão **Atividade** no canto inferior direito (ele abre em Todos os repositórios).
 
 ### Sobreposições
 

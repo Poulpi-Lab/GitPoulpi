@@ -128,7 +128,7 @@ Si vous travaillez seul, ou dans une équipe qui garde ses tickets à côté du 
   `Shift+Left` / `Shift+Right`, ou avec **Tableau : Déplacer la carte vers...** (`m`), une liste déroulante des colonnes. La carte bouge
   immédiatement ; le `status` de la note est réécrit comme dans [la section sur les notes](#les-notes), rien d'autre dans le fichier. Si l'écriture
   échoue, la carte revient et l'erreur est sur la ligne d'état.
-- **Ouvrez** une carte avec `Enter` ou un double-clic : la [conversation](hosting-integration.md#5c-conversations) de la note s'ouvre dans la fenêtre, avec le texte de la note et ses commentaires (**Ouvrir la note** du menu de la carte ouvre le fichier dans votre programme par défaut pour `.md`). `e` modifie ses
+- **Ouvrez** une carte avec `Enter` ou un double-clic : la [conversation](conversations.md) de la note s'ouvre dans la fenêtre, avec le texte de la note et ses commentaires (**Ouvrir la note** du menu de la carte ouvre le fichier dans votre programme par défaut pour `.md`). `e` modifie ses
   assignés, étiquettes ou jalon, `.` ou un clic droit ouvre le menu de la carte, `n` commence un nouveau ticket dans la
   colonne sélectionnée (le formulaire revient au tableau quand il se ferme).
 - **Filtrez** par assigné (`a`), étiquette (`l`), jalon (`M`) ou texte (`/`) ; `x` les efface. Les filtres sont des

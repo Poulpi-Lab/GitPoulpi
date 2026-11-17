@@ -202,7 +202,7 @@ section STASHES, pour **Pop**, **Appliquer** (garde le stash) ou **Supprimer**.
 commit) ouvre une boîte de dialogue qui propose un dossier à côté du dépôt, un nom
 facultatif de nouvelle branche et « Ouvrir le nouveau worktree dans un onglet ».
 Les worktrees apparaissent dans la section WORKTREES ; double-cliquez sur l'un
-pour l'ouvrir, et son onglet se ferme tout seul quand le worktree est supprimé.
+pour l'ouvrir, et son onglet se ferme tout seul quand le worktree est supprimé. La fonctionnalité complète (ouvrir dans un autre outil, merger la branche d'un worktree, retirer) est dans [Worktrees](worktrees.md) ; la section SUBMODULES du même volet est dans [Sous-modules](submodules.md).
 
 ## Glisser des refs sur des commits
 

@@ -1511,11 +1511,11 @@ Pour ce que font les menus, voir [Travailler avec le Log](log-and-history.md).
 
 Avec une intégration correspondante, le volet Refs a une section de pull requests (GitLab :
 merge requests). Avec un profil d'hébergeur connecté, il a aussi une section TICKETS. Voir
-[Hébergeurs et suivi de tickets](hosting-integration.md#5-pull-requests-et-tickets-dans-le-panneau-latéral).
+[Hébergeurs et suivi de tickets](pull-requests-and-issues.md#pull-requests-et-tickets-dans-le-panneau-latéral).
 
 | Touche | Action |
 |---|---|
-| `Enter` | Ouvrir la ligne sélectionnée : un ticket (et une demande sur Azure DevOps ou Bitbucket) comme [conversation](hosting-integration.md#5c-conversations), une pull request dans la [revue](review.md) sur les hébergeurs qui en ont une, tout le reste dans le navigateur. Sur une ligne `Reconnect` : ouvrir les Paramètres sur ce profil |
+| `Enter` | Ouvrir la ligne sélectionnée : un ticket (et une demande sur Azure DevOps ou Bitbucket) comme [conversation](conversations.md), une pull request dans la [revue](review.md) sur les hébergeurs qui en ont une, tout le reste dans le navigateur. Sur une ligne `Reconnect` : ouvrir les Paramètres sur ce profil |
 | `Space` | Déplier ou replier la section |
 | `v` | Ouvrir le filtre de la section. Pull requests : Ouvertes, Mergées / fermées, Toutes. Tickets : Ouverts, Qui me sont assignés, Fermés, Tous |
 | `n` | Section de pull requests : créer une pull request. Section TICKETS : nouveau ticket. (Le bouton `+` de l'en-tête) |
@@ -1528,7 +1528,7 @@ merge requests). Avec un profil d'hébergeur connecté, il a aussi une section T
 ### Le tableau des tickets
 
 **Tableau** dans l'en-tête TICKETS (palette : **Tickets : Ouvrir le tableau**) ouvre le tableau Kanban de la source de tickets. Voir
-[le tableau](hosting-integration.md#5b-le-tableau-des-tickets) et [les tickets locaux](local-issues.md#le-tableau-kanban). Chaque touche
+[le tableau](pull-requests-and-issues.md#le-tableau-des-tickets) et [les tickets locaux](local-issues.md#le-tableau-kanban). Chaque touche
 ci-dessous est aussi une commande de palette (**Tableau : ...**).
 
 | Touche | Action |
@@ -1536,7 +1536,7 @@ ci-dessous est aussi une commande de palette (**Tableau : ...**).
 | Flèches | Sélectionner une carte (`Up`, `Down`) ou la colonne voisine (`Left`, `Right`) ; `Home`, `End`, `PageUp`, `PageDown` sautent dans la colonne |
 | `Shift+Left`, `Shift+Right` | Déplacer la carte sélectionnée vers la colonne précédente ou suivante |
 | `m` | **Déplacer la carte vers...** : une liste déroulante des colonnes |
-| `Enter` | Ouvrir la [conversation](hosting-integration.md#5c-conversations) du ticket (la page de l'hébergeur quand il n'a rien à lire) |
+| `Enter` | Ouvrir la [conversation](conversations.md) du ticket (la page de l'hébergeur quand il n'a rien à lire) |
 | `e`, `.` | Modifier les assignés, étiquettes ou jalon ; le menu de la carte |
 | `n` | Nouveau ticket dans la colonne sélectionnée |
 | `a`, `l`, `M`, `/` | Filtrer par assigné, étiquette, jalon, texte. `x` efface les filtres |
@@ -1578,7 +1578,7 @@ Chaque zone dont le texte part vers un hébergeur (un commentaire, une réponse,
 | `Alt+W` | Les formulaires de nouveau ticket et de pull request : créer sur la page web de l'hébergeur |
 | `Esc` | Dans le volet de **Écrire avec l'IA** : arrêter un brouillon en cours, sinon fermer le volet |
 
-Dans la [vue de conversation](hosting-integration.md#5c-conversations) d'un ticket ou d'une demande (lignes de palette *Conversation : ...* ; celles qui ont une touche sont dans la liste de la palette plus haut) :
+Dans la [vue de conversation](conversations.md) d'un ticket ou d'une demande (lignes de palette *Conversation : ...* ; celles qui ont une touche sont dans la liste de la palette plus haut) :
 
 | Touche | Action |
 |---|---|
@@ -1921,7 +1921,7 @@ Chaque bouton a son jumeau au clavier :
 
 | Bouton | Touche |
 |---|---|
-| 🐙 à gauche de la barre de titre (À propos) | `Aide : À propos de GitPoulpi` dans la palette |
+| <img src="../../../assets/logo/gitpoulpi.png" alt="Icône GitPoulpi" height="16"> à gauche de la barre de titre (À propos) | `Aide : À propos de GitPoulpi` dans la palette |
 | **Ouvrir dans** dans la barre de titre | `Alt+O`, `Ctrl+Alt+O` |
 | `×` à droite de la barre de titre (quitter) | `q` |
 | La version dans la barre de titre (Notes de version) | `Aide : Notes de version` dans la palette |

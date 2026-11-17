@@ -10,7 +10,7 @@ approbation et demandes de modifications. Elle demande un profil pour l'un de ce
 pas de revue. Les limites de l'hébergeur sont respectées : GitLab n'a pas de verdict *Demander des modifications* et prend une ligne par commentaire.
 Cette page appelle toutes ces choses une *demande*.
 
-![La vue de revue, page Aperçu : l'en-tête de la demande avec ses boutons de métadonnées, la description et la discussion avec une approbation envoyée](../images/review-overview.png)
+![La vue de revue, page Aperçu : l'en-tête de la demande avec ses boutons de métadonnées, la description, un fil de code non résolu et un résolu, les commentaires et la zone de commentaire](../images/review-overview.png)
 
 ![La page Fichiers : les fichiers modifiés avec leurs cases « vu », le diff avec un fil de discussion sous sa ligne, et un fil résolu hors des lignes affichées](../images/review-files.png)
 
@@ -37,7 +37,7 @@ Toujours visible : le numéro et le titre, l'état (Ouverte, Brouillon, Fusionn
 si elle fusionne proprement ou entre en conflit, la taille, et **`3 commentaires en attente`** quand vous en avez écrit.
 
 Les quatre boutons de métadonnées - **Assignés**, **Relecteurs**, **Étiquettes**, **Jalon** - ouvrent les mêmes sélecteurs que
-la barre latérale (voir [Assignés, relecteurs, étiquettes et jalon](hosting-integration.md#assignés-relecteurs-étiquettes-et-jalon)) ;
+la barre latérale (voir [Assignés, relecteurs, étiquettes et jalon](pull-requests-and-issues.md#assignés-relecteurs-étiquettes-et-jalon)) ;
 l'en-tête affiche le résultat dès que l'hébergeur l'a pris en compte. Les boutons d'action : **Basculer** (le
 checkout habituel de la branche de la demande, qui ferme aussi la vue), **Ouvrir dans le navigateur**, **Actualiser**
 (**`F5`**) et **Terminer la revue**.
@@ -50,7 +50,7 @@ Un contrôle segmenté dans la bordure du haut change de page : **Aperçu**, **
 ### Aperçu
 
 La vue d'ensemble est **la conversation de la demande**, la même chronologie et la même zone de commentaire qu'un ticket
-([Conversations](hosting-integration.md#5c-conversations)) : d'abord la description (*a ouvert ceci*), puis les commentaires,
+([Conversations](conversations.md)) : d'abord la description (*a ouvert ceci*), puis les commentaires,
 les fils sur le code avec leur extrait de diff, les revues envoyées avec leur verdict (`approuvée`, `modifications demandées`,
 `commentée`, `écartée` ; sur GitLab, les verdicts sont ses approbations) et les événements, les plus anciens d'abord, sur la
 fenêtre la plus récente avec **Charger les plus anciens** en haut. La zone de commentaire est ancrée sous la chronologie (**Nouveau commentaire**) :
@@ -86,7 +86,7 @@ dans la palette ; `a` (assignés), `p` (relecteurs), `f` (**Terminer la revue**
 Un commentaire écrit sur une autre fenêtre ou par le CLI s'affiche ici tout seul : chaque écriture de GitPoulpi (cette fenêtre
 comprise) en informe la session, et les fenêtres qui montrent la même demande la relisent.
 
-La zone de commentaire est l'éditeur Markdown partagé avec [la vue de conversation](hosting-integration.md#éditeur-markdown)
+La zone de commentaire est l'éditeur Markdown partagé avec [la vue de conversation](conversations.md#éditeur-markdown)
 (aussi la zone d'une réponse à un fil, d'un commentaire sur une ligne et du résumé de **Terminer la revue**) : `Ctrl+Enter` (aussi
 `Ctrl+S`, `Alt+Enter`) envoie, et là où l'IA est activée `Alt+E` ouvre **Écrire avec l'IA**
 ([le chapitre IA](ai.md#aide-à-la-rédaction-sur-un-hébergeur)). L'aperçu montre le texte comme l'hébergeur le rendra, références comprises

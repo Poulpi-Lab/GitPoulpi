@@ -118,7 +118,7 @@ GitPoulpi mémorise chaque taille. Voir
 
 ## Barre de titre, barre d'onglets et barre d'outils
 
-- **Cliquez sur 🐙** dans la barre de titre pour ouvrir **À propos**. Dans À propos,
+- **Cliquez sur <img src="../../../assets/logo/gitpoulpi.png" alt="Icône GitPoulpi" height="16">** dans la barre de titre pour ouvrir **À propos**. Dans À propos,
   les pupilles de la pieuvre suivent le pointeur ; cliquez sur le logo pour le faire
   tourner vers la couleur suivante, clic droit dessus pour la liste des couleurs,
   cliquez sur un lien pour l'ouvrir.

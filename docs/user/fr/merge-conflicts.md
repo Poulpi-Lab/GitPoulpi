@@ -40,7 +40,9 @@ sont jamais repliées.
 ## Choisir
 
 Chaque conflit est un bloc encadré dans A et dans B, avec une case à cocher sur
-son en-tête et un `+` / `✓` devant chaque ligne.
+son en-tête et un `+` / `✓` devant chaque ligne. Faites un clic droit sur un bloc pour les choix de ce conflit :
+
+![Un menu clic droit sur le conflit 2 de l'éditeur de merge : Prendre A seulement, Prendre B seulement, A puis B, B puis A, Ne rien prendre, Désélectionner (non résolu), Modifier dans le résultat et Suggérer une résolution (IA)](../images/merge-editor-chunk-menu.png)
 
 | Pour... | Touche | Souris |
 |---|---|---|
@@ -76,6 +78,10 @@ conflit courant. Un clic sur une marque saute à ce conflit (une marque sous le
 curseur de la barre de défilement est déjà à l'écran, le clic y fait donc
 glisser le curseur).
 
+Prendre les deux (**A puis B**) écrit les lignes de A puis celles de B sous le marqueur du conflit dans le Résultat, chacune étiquetée de son côté ; les pastilles `1st` / `2nd` des deux blocs disent l'ordre, et `s` l'échange :
+
+![Le conflit 2 pris des deux côtés : sa ligne de A et sa ligne de B sont cochées, et le Résultat les montre l'une après l'autre, étiquetées A et B, tandis que les conflits 1 et 3 attendent encore un choix](../images/merge-editor-take-both.png)
+
 **Fichier entier** montre tout le fichier dans A et B avec chaque différence colorée, pas seulement les conflits :
 
 ![Le mode Fichier entier : tout le fichier dans A et B, avec les modifications colorées](../images/merge-editor-full-file.png)
@@ -85,6 +91,8 @@ coupez et collez, cherchez avec `Ctrl+F`. Un choix sur un conflit que vous avez
 modifié à la main remplace votre modification (`Ctrl+Z` la ramène).
 Enregistrer avec un conflit où rien n'est choisi, ou avec une ligne qui
 ressemble encore à un marqueur de conflit, demande d'abord confirmation.
+
+![L'éditeur de merge avec tous les conflits traités : conflit 1 pris dans A, conflit 2 des deux côtés, conflit 3 tapé à la main dans le Résultat (marqué d'un crayon et compté comme modifié), et le bouton Enregistrer et marquer résolu mis en évidence dans la barre d'outils](../images/merge-editor-output-edited.png)
 
 ### ✦ Suggérer une résolution (IA)
 
@@ -101,10 +109,23 @@ aussi. Avec l'IA désactivée, aucun de ces contrôles n'existe.
 Après **Enregistrer et marquer résolu**, le fichier est stagé et la liste des
 fichiers en conflit revient ; ouvrez vous-même le fichier
 suivant. `Ctrl+Z` (ou le bouton Annuler) reprend le dernier « marquer résolu ».
+
+![Après Enregistrer et marquer résolu : le bandeau indique « Merge en cours, 1 fichier en conflit », orbit.rs est passé dans Fichiers staged et logo.bin est le seul fichier restant dans Fichiers unstaged, marqué d'un ! rouge](../images/conflict-file-resolved.png)
+
 Quand il ne reste aucun fichier, le bandeau propose **Commiter le merge** (ou
 **Continuer** pour un cherry-pick, un revert ou un rebase) et **Annuler le
 merge**, qui demande d'abord confirmation : il remet HEAD, l'index et l'arbre de
 travail là où ils étaient.
+
+![Le bandeau une fois tous les fichiers résolus : « Merge en cours, tous les conflits sont résolus » avec les boutons Commiter le merge et Annuler le merge, et le fichier résolu sous Fichiers staged](../images/conflict-commit-merge.png)
+
+Un rebase s'arrête de la même façon, pas à pas. Son bandeau nomme la branche et ce sur quoi elle est rebasée, et a **Résoudre les conflits...**, **Continuer**, **Passer** et **Annuler** :
+
+![Le bandeau d'un rebase arrêté sur deux conflits : « Rebase de feature/cleanup sur ... » avec Résoudre les conflits..., Continuer, Passer et Annuler, et les deux fichiers en conflit dans le volet Status](../images/conflict-banner-rebase.png)
+
+Une fois le dernier fichier résolu, le même bandeau est prêt à **Continuer** :
+
+![Le bandeau du rebase une fois les deux fichiers résolus : il ne reste que Continuer, Passer et Annuler, et les deux fichiers sont sous Fichiers staged](../images/conflict-banner-continue.png)
 
 Un merge dont le résultat est égal à HEAD (vous avez pris notre côté partout) n'a
 rien de stagé et aucun fichier modifié, mais il peut quand même être conclu :
@@ -134,6 +155,8 @@ résout et stage le fichier aussitôt.
 | Supprimé d'un côté, modifié de l'autre | **Garder le fichier** (`k`), **Accepter la suppression** (`Shift+D`) |
 | Reste de renommage (le chemin n'existe que d'un côté) | **Garder le fichier** (`k`), **Supprimer le fichier** (`Shift+D`) |
 | Lien symbolique, sous-module, mode du fichier | **Garder A**, **Prendre B**, **Prendre la base** |
+
+![La carte d'un fichier modifié dans A et supprimé dans B : la boîte A montre la taille et le mode du fichier, la boîte B indique « aucun fichier ici (supprimé) », la boîte de la base montre l'original, et les boutons sont Garder le fichier et Accepter la suppression](../images/merge-editor-deleted-card.png)
 
 Quand le fichier est une image (PNG, JPEG, GIF, WebP, BMP, ICO), les cases
 montrent aussi les images A, B et Base, ajustées et en lecture seule, dans une

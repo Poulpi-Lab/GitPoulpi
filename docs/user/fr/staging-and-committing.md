@@ -18,6 +18,7 @@ le volet de droite montre les modifications locales :
 - **Fichiers unstaged** : fichiers modifiés, ajoutés (non suivis) et supprimés qui
   ne sont pas encore dans le prochain commit.
 - **Fichiers staged** : ce que contiendra le prochain commit.
+- **Fichiers en conflit** (un `!` rouge, tant qu'un merge, un rebase, un cherry-pick ou un revert est arrêté) : `Enter` ouvre l'éditeur de merge, voir [Résoudre les conflits de merge](merge-conflicts.md).
 - **Les fichiers renommés ou déplacés** sont une seule ligne, `nouveau <- ancien`, dans les deux listes (un fichier
   supprimé sur le disque et un nouveau dont au moins 50 % du contenu est identique comptent comme un déplacement
   avant même que vous les stagiez). Stage, Unstage et Abandon agissent sur les deux noms : stager stage la
@@ -181,7 +182,7 @@ l'autre.
   force push (avec lease).
 - **Ignorer les hooks** (`Shift+H`, ou **Commit : Basculer Ignorer les hooks** dans la palette) commite
   sans exécuter les hooks `pre-commit` et `commit-msg` du dépôt. Le choix vaut pour un seul commit ;
-  **Paramètres > Paramètres du dépôt > Commit** permet de la cocher au départ. Sur une ligne étroite son libellé rétrécit en **Sans hooks**, puis en la seule case (son infobulle la nomme) ; elle ne disparaît jamais.
+  **Paramètres > Paramètres du dépôt > Commit** permet de la cocher au départ. Elle a sa propre ligne juste sous **Amender le commit précédent**, avec son libellé complet ; seul un volet très étroit rétrécit le libellé en **Sans hooks**, puis en la seule case (son infobulle la nomme). Elle ne disparaît jamais. Sur un formulaire très court, elle partage la ligne d'Amender, en rétrécissant de la même façon.
 - `c` dans le volet Status place le curseur dans le formulaire. `Esc` le quitte.
 - `Ctrl+G c` et `Ctrl+G Enter` (**Git : Commiter...** et **Git : Commiter le stage
   maintenant** dans la palette) forment une seule commande, le bouton de commit
@@ -207,8 +208,7 @@ n'appuyez pas sur le bouton de commit.
 
 **Composer des commits avec l'IA** est à l'extrémité droite de la ligne Modifier et rétrécit avec le volet de droite
 au lieu de disparaître : le libellé complet, puis **Composer avec l'IA**, puis le seul **`✦`**. Il garde son clic, son
-infobulle et sa touche (`Ctrl+G Shift+C`) à toutes les largeurs ; c'est le libellé **Ignorer les hooks**
-qui lui cède la place (**Sans hooks**, puis la seule case) avant qu'il ne rétrécisse lui-même.
+infobulle et sa touche (`Ctrl+G Shift+C`) à toutes les largeurs.
 
 Les boutons **`✦`** (générer le message) et **`#`** (insérer une référence de ticket) à l'extrémité droite de la ligne du
 résumé rétrécissent de la même façon : dans un volet étroit ils perdent leurs marges, puis se replient en un seul bouton

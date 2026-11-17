@@ -398,7 +398,7 @@ da CLI e do MCP traz `"posted": false`, e um agente local roda somente leitura (
 pelo próprio botão **Enviar** (`Ctrl+Enter`) ou **Comentar** da caixa de texto.
 
 **No editor Markdown.** Com a IA ligada, toda caixa de texto cujo conteúdo vai para um host (um comentário, uma
-resposta ou uma edição na [visão de conversa](hosting-integration.md#5c-conversas), um comentário de revisão, o
+resposta ou uma edição na [visão de conversa](conversations.md), um comentário de revisão, o
 resumo de Finalizar revisão, a descrição de uma nova issue e a descrição de um pull request) tem um botão
 **Escrever com IA** (`Alt+E`, a mesma tecla em todas) na ponta direita da sua barra de modos. Ele abre um painel sob a
 barra:

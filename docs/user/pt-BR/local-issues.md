@@ -141,7 +141,7 @@ Se você trabalha sozinho, ou em uma equipe que guarda as suas issues junto do c
   `Shift+Left` / `Shift+Right`, ou com **Quadro: mover cartão para...** (`m`), uma lista suspensa das colunas. O cartão se move na
   hora; o `status` da nota é reescrito como em [a seção das notas](#as-notas), nada mais no arquivo. Se a gravação
   falhar, o cartão volta e o erro aparece na linha de status.
-- **Abra** um cartão com `Enter` ou um clique duplo: a [conversa](hosting-integration.md#5c-conversas) da nota abre na janela, com o texto da nota e os seus comentários (o **Abrir nota** do menu do cartão abre o arquivo no seu programa padrão para `.md`). `e` edita os seus
+- **Abra** um cartão com `Enter` ou um clique duplo: a [conversa](conversations.md) da nota abre na janela, com o texto da nota e os seus comentários (o **Abrir nota** do menu do cartão abre o arquivo no seu programa padrão para `.md`). `e` edita os seus
   responsáveis, rótulos ou marco, `.` ou um clique com o botão direito abre o menu do cartão, `n` inicia uma nova issue na coluna
   selecionada (o formulário volta ao quadro quando se fecha).
 - **Filtre** por responsável (`a`), rótulo (`l`), marco (`M`) ou texto (`/`); `x` os limpa. Os filtros são

@@ -6,6 +6,8 @@ Um worktree é uma segunda cópia com checkout do repositório: outra pasta, em 
 branch, compartilhando o mesmo histórico. A seção WORKTREES do painel Refs os lista; o
 principal é marcado com `(main)`.
 
+![O painel Refs de um repositório com dois worktrees vinculados: a seção WORKTREES lista main (main), hotfix/axis-labels e feature/legend, com a seção SUBMODULES abaixo dela](../images/worktrees.png)
+
 ## Mostrando a seção
 
 A seção fica oculta em um repositório que ainda não tem nenhum worktree vinculado. Para
@@ -33,6 +35,8 @@ A paleta tem os mesmos três (**Refs: criar worktree a partir da branch atual**,
 criar worktree no commit selecionado...**, **Refs: criar worktree escolhendo uma
 branch**). As entradas mais antigas continuam funcionando: **Criar worktree a partir
 de...** no menu de uma branch, tag ou commit.
+
+![O diálogo Criar worktree: os campos Nome, Pasta, Ref e Branch do worktree, a linha "nova branch a partir de main", a caixa Abrir o novo worktree como aba e os botões Cancelar e Criar](../images/worktree-create.png)
 
 O diálogo propõe tudo e deixa você mudar. O **Nome** e a nova branch começam ambos como
 `worktree-<id>`, em que `<id>` são 8 dígitos hexadecimais aleatórios (os mesmos nos dois),
@@ -78,6 +82,13 @@ Clique com o botão direito em um worktree (ou selecione-o e pressione a tecla d
   conflitos de sempre. Uma branch que não está em checkout em lugar nenhum é recusada,
   com o motivo. Não é oferecido para um worktree desanexado.
 - **Remover worktree...**: nunca o principal.
+
+![O menu de clique direito de uma linha de worktree: Abrir em uma nova aba, Abrir em, Merge hotfix/axis-labels em... e Remover worktree...](../images/worktree-menu.png)
+
+**Abrir em uma nova aba** (ou um clique duplo, ou `Enter`) abre a pasta do worktree como uma
+aba própria, com o seu próprio Log, status e branch:
+
+![O worktree hotfix/axis-labels aberto como uma aba própria ao lado da principal, mostrando o seu commit e o arquivo alterado](../images/worktree-tab.png)
 
 A paleta tem as mesmas ações sobre a linha selecionada (**Refs: abrir o worktree em...**,
 **Refs: Merge da branch do worktree em...**, **Refs: remover worktree...**, **Refs: abrir

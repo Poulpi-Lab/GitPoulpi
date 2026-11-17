@@ -1505,11 +1505,11 @@ Para o que os menus fazem, veja [Trabalhando com o Log](log-and-history.md).
 
 Com uma integração correspondente, o painel Refs tem uma seção de pull requests (GitLab:
 merge requests). Com um perfil de hospedagem conectado, ele também tem uma seção
-ISSUES. Veja [Integrações de hospedagem e de rastreadores de issues](hosting-integration.md#5-pull-requests-e-issues-na-barra-lateral).
+ISSUES. Veja [Integrações de hospedagem e de rastreadores de issues](pull-requests-and-issues.md#pull-requests-e-issues-na-barra-lateral).
 
 | Tecla | Ação |
 |---|---|
-| `Enter` | Abre a linha selecionada: uma issue (e uma solicitação no Azure DevOps ou no Bitbucket) como [conversa](hosting-integration.md#5c-conversas), um pull request na [revisão](review.md) nos hosts que têm uma, qualquer outra coisa no navegador. Em uma linha `Reconectar`: abre as Configurações nesse perfil |
+| `Enter` | Abre a linha selecionada: uma issue (e uma solicitação no Azure DevOps ou no Bitbucket) como [conversa](conversations.md), um pull request na [revisão](review.md) nos hosts que têm uma, qualquer outra coisa no navegador. Em uma linha `Reconectar`: abre as Configurações nesse perfil |
 | `Space` | Expande ou recolhe a seção |
 | `v` | Abre o filtro da seção. Pull requests: Abertos, Merged / fechados, Todos. Issues: Abertas, Atribuídas a mim, Fechadas, Todas |
 | `n` | Seção de pull requests: cria um pull request. Seção ISSUES: nova issue. (O botão `+` do cabeçalho) |
@@ -1522,7 +1522,7 @@ ISSUES. Veja [Integrações de hospedagem e de rastreadores de issues](hosting-i
 ### O quadro de issues
 
 **Quadro** no cabeçalho de ISSUES (paleta: **Issues: abrir quadro**) abre o quadro Kanban da origem das issues. Veja
-[o quadro](hosting-integration.md#5b-o-quadro-de-issues) e [issues locais](local-issues.md#o-quadro-kanban). Toda tecla
+[o quadro](pull-requests-and-issues.md#o-quadro-de-issues) e [issues locais](local-issues.md#o-quadro-kanban). Toda tecla
 abaixo também é um comando da paleta (**Quadro: ...**).
 
 | Tecla | Ação |
@@ -1530,7 +1530,7 @@ abaixo também é um comando da paleta (**Quadro: ...**).
 | Setas | Selecionam um cartão (`Cima`, `Baixo`) ou a coluna vizinha (`Esquerda`, `Direita`); `Home`, `End`, `PageUp`, `PageDown` saltam na coluna |
 | `Shift+Left`, `Shift+Right` | Movem o cartão selecionado para a coluna anterior ou a seguinte |
 | `m` | **Mover cartão para...**: uma lista suspensa das colunas |
-| `Enter` | Abre a [conversa](hosting-integration.md#5c-conversas) da issue (a página do host, onde o host não tem nenhuma para ler) |
+| `Enter` | Abre a [conversa](conversations.md) da issue (a página do host, onde o host não tem nenhuma para ler) |
 | `e`, `.` | Editam responsáveis, rótulos ou marco; o menu do cartão |
 | `n` | Nova issue na coluna selecionada |
 | `a`, `l`, `M`, `/` | Filtram por responsável, rótulo, marco, texto. `x` limpa os filtros |
@@ -1557,7 +1557,7 @@ reatribuídas.
 | `Alt+W` | Os formulários de nova issue e de pull request: criar na própria página web do provedor |
 | `Esc` | No painel de **Escrever com IA**: para um rascunho em andamento, senão fecha o painel |
 
-Na [visão de conversa](hosting-integration.md#5c-conversas) de uma issue ou de uma solicitação (linhas da paleta
+Na [visão de conversa](conversations.md) de uma issue ou de uma solicitação (linhas da paleta
 *Conversa: ...*; as linhas com tecla estão na lista da paleta acima):
 
 | Tecla | Ação |
@@ -1916,7 +1916,7 @@ Todo botão tem um equivalente no teclado:
 
 | Botão | Tecla |
 |---|---|
-| 🐙 à esquerda da barra de título (Sobre) | `Ajuda: sobre o GitPoulpi` na paleta |
+| <img src="../../../assets/logo/gitpoulpi.png" alt="Ícone do GitPoulpi" height="16"> à esquerda da barra de título (Sobre) | `Ajuda: sobre o GitPoulpi` na paleta |
 | **Abrir em** na barra de título | `Alt+O`, `Ctrl+Alt+O` |
 | `×` à direita da barra de título (sair) | `q` |
 | A versão na barra de título (Notas da versão) | `Ajuda: Notas da versão` na paleta |

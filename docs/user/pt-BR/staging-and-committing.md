@@ -18,6 +18,9 @@ direita mostra as alterações em andamento:
 - **Arquivos unstaged**: arquivos editados, adicionados (não rastreados) e excluídos
   que ainda não estão no próximo commit.
 - **Arquivos staged**: o que o próximo commit vai conter.
+- **Arquivos em conflito** (um `!` vermelho, enquanto um merge, rebase, cherry-pick ou revert
+  está parado): `Enter` abre o editor de merge, veja
+  [Resolvendo conflitos de merge](merge-conflicts.md).
 - **Arquivos renomeados ou movidos** são uma única linha, `novo <- antigo`, nas duas listas (um arquivo excluído
   no disco e um novo com pelo menos 50% do mesmo conteúdo contam como um movimento mesmo antes de você fazer
   stage). Stage, Unstage e Descartar agem nos dois nomes: fazer stage grava a exclusão e o arquivo novo, então o
@@ -178,8 +181,10 @@ no outro.
 - **Ignorar hooks** (`Shift+H`, ou **Commit: alternar Ignorar hooks** na paleta) faz o
   commit sem executar os hooks `pre-commit` e `commit-msg` do repositório. Vale por
   commit; **Configurações > Configurações do repositório > Commit** faz a opção
-  começar marcada. Em uma linha estreita o rótulo encolhe para **Sem hooks**, depois para só a
-  caixa (a dica a nomeia); ela nunca some.
+  começar marcada. Ela tem a sua própria linha logo abaixo de **Amend do commit anterior**, com o rótulo
+  completo; só em um painel muito estreito o rótulo encolhe para **Sem hooks**, depois para só a
+  caixa (a dica a nomeia). Ela nunca some. Em um formulário muito baixo ela divide a linha do
+  Amend, encolhendo do mesmo jeito.
 - `c` no painel Status move o cursor para o formulário. `Esc` sai dele.
 - `Ctrl+G c` e `Ctrl+G Enter` (**Git: Commit...** e **Git: Fazer commit das
   alterações em stage agora** na paleta) são um só comando, o botão de commit de
@@ -207,7 +212,7 @@ editá-lo; nada é commitado até você pressionar o botão de commit.
 
 **Compor commits com IA** fica na ponta direita da linha de Amend e encolhe junto com o painel direito em vez de
 sumir: o rótulo completo, depois **Compor com IA**, depois só o **`✦`**. Ele mantém o clique, a dica e a tecla
-(`Ctrl+G Shift+C`) em qualquer largura; o rótulo Ignorar hooks cede lugar a ele (**Sem hooks**, depois só a caixa) antes que ele mesmo encolha.
+(`Ctrl+G Shift+C`) em qualquer largura.
 
 Os botões **`✦`** (gerar a mensagem) e **`#`** (inserir uma referência de issue) na ponta direita da linha do resumo
 encolhem do mesmo modo: em um painel estreito perdem as margens, depois se juntam em um só botão **`⋯`** cujo menu lista

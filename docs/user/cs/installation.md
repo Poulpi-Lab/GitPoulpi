@@ -125,6 +125,7 @@ Každý kanál níže zapisuje vedle programů stejnou značku `.gitpoulpi-dist`
 | **MSI** (Windows, spravované) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Pro správce: všichni uživatelé, žádné aktualizace v aplikaci. Viz [Podniková distribuce](enterprise-distribution.md#msi-s-intune-nebo-group-policy). |
 | **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (nebo `paru -S gitpoulpi-bin`) | Bez pomocníka: `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, pak `cd gitpoulpi-bin && makepkg -si`. |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Stáhne archiv vydání místo kompilace. |
+| **cargo, z crates.io** | `cargo install --locked gitpoulpi-cli` | Kompiluje; potřebuje toolchain Rustu. Nainstaluje `gitpoulpi`, který bez podpříkazu otevře terminálové UI a zároveň slouží jako server MCP (`gitpoulpi mcp`). `gitpoulpi-tui` a `gitpoulpi-mcp` jsou tytéž programy jako samostatné crates. |
 | **cargo, ze zdrojových kódů** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Kompiluje; potřebuje toolchain Rustu. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | Viz [Běh v Dockeru](docker.md). Stejný obraz je na `ghcr.io/poulpi-lab/gitpoulpi`. |
 

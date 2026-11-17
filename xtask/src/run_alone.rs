@@ -111,12 +111,11 @@ pub fn split(queue: Vec<Job>, entries: &[Entry]) -> (Vec<Job>, Vec<Job>) {
             }
         } else {
             for (_, e) in &mine {
-                job.args.extend([
-                    "--skip".to_string(),
-                    e.test.clone().unwrap(),
-                    "--exact".to_string(),
-                ]);
+                job.args
+                    .extend(["--skip".to_string(), e.test.clone().unwrap()]);
             }
+            // libtest rejects a repeated flag: one `--exact` for all the skips.
+            job.args.push("--exact".to_string());
         }
         pool.push(job);
     }
@@ -224,7 +223,7 @@ mod tests {
         assert_eq!(pool.len(), 2);
         assert_eq!(
             pool[0].args,
-            ["--skip", "m::t1", "--exact", "--skip", "m::t2", "--exact"]
+            ["--skip", "m::t1", "--skip", "m::t2", "--exact"]
         );
         assert!(pool[1].args.is_empty());
         assert_eq!(alone.len(), 2);

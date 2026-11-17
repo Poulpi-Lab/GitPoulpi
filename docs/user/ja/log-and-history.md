@@ -100,7 +100,7 @@ ref のない commit では、その行にポインタを乗せると、Ref 列�
 
 **Stash。** **Stash** は（未追跡ファイルを含め）すべてを stash します。`Ctrl+G m` は先にメッセージを尋ねます（AI がオンのとき、そのプロンプト内で `Ctrl+G` を押すと提案が出ます）。ログまたは STASHES セクションの stash の行を右クリックすると、**Pop（復元して削除）**、**Apply（stashを残す）**、**Drop** が使えます。
 
-**Worktree。** *`<名前>` から worktree を作成...*（ブランチ、tag、commit で使えます）を選ぶとダイアログが開き、リポジトリの隣のフォルダー、任意の新しいブランチ名、そして「新しい worktree をタブで開く」が提案されます。worktree は WORKTREE セクションに表示されます。ダブルクリックで開き、worktree を削除するとそのタブは自動的に閉じます。
+**Worktree。** *`<名前>` から worktree を作成...*（ブランチ、tag、commit で使えます）を選ぶとダイアログが開き、リポジトリの隣のフォルダー、任意の新しいブランチ名、そして「新しい worktree をタブで開く」が提案されます。worktree は WORKTREE セクションに表示されます。ダブルクリックで開き、worktree を削除するとそのタブは自動的に閉じます。機能全体（別のツールで開く、worktree のブランチの merge、削除）は [worktree](worktrees.md) に、同じペインのサブモジュールのセクションは[サブモジュール](submodules.md)にあります。
 
 ## 参照を commit にドラッグする
 

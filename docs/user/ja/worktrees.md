@@ -5,6 +5,8 @@
 worktree は、リポジトリのもう 1 つのチェックアウト済みコピーです。別のフォルダーで別のブランチを開きながら、
 同じ履歴を共有します。Refs ペインの **WORKTREE** セクションに一覧が出ます。メインのものには `（メイン）` が付きます。
 
+![2 つのリンクされた worktree があるリポジトリの Refs ペイン：WORKTREE セクションに main（メイン）、hotfix/axis-labels、feature/legend が並び、その下にサブモジュールのセクションがある](../images/worktrees.png)
+
 ## セクションを表示する
 
 リンクされた worktree がまだないリポジトリでは、セクションは非表示です。それでも表示するには
@@ -28,6 +30,8 @@ WORKTREE 見出しの **+**（キーボード：セクション内で `+`、パ�
 パレットにも同じ 3 つがあります（**Refs: 現在のブランチから worktree を作成**、
 **Git: 選択中のCommitに worktree を作成...**、**Refs: ブランチを選んで worktree を作成**）。従来の項目も使えます。
 ブランチ、tag、commit のメニューの **<名前> から worktree を作成...** です。
+
+![worktree の作成ダイアログ：名前、フォルダー、起点、Worktree のブランチの各欄、「main から新しいブランチ」の行、「新しい worktree をタブで開く」のボックス、キャンセルと作成のボタン](../images/worktree-create.png)
 
 ダイアログはすべてを提案し、変更もできます。**名前**と新しいブランチは、どちらも `worktree-<id>` で始まります。
 `<id>` は 16 進数 8 桁のランダムな値（両方で同じ）なので、2 つの worktree が衝突することはありません。
@@ -67,6 +71,12 @@ worktree を右クリックします（または選択してメニューキー�
   競合は、そこで通常の競合の流れで解決します。どこにもチェックアウトされていないブランチは、理由付きで拒否されます。
   HEAD が切り離された worktree には表示されません。
 - **worktree を削除...**：メインのものは削除できません。
+
+![worktree の行の右クリックメニュー：新しいタブで開く、開く場所、hotfix/axis-labels を別のブランチに merge...、worktree を削除...](../images/worktree-menu.png)
+
+**新しいタブで開く**（またはダブルクリック、`Enter`）は、worktree のフォルダーを専用のタブで開きます。そのタブには独自の Log、ステータス、ブランチがあります。
+
+![hotfix/axis-labels の worktree がメインのタブの隣に専用のタブとして開き、その commit と変更されたファイルが表示されている](../images/worktree-tab.png)
 
 パレットにも、選択中の行に対する同じ操作があります（**Refs: worktree を開く場所...**、
 **Refs: worktree のブランチを別のブランチにmerge...**、**Refs: worktree を削除...**、

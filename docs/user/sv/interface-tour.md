@@ -183,7 +183,7 @@ Som standard är det en rad under panelerna och ovanför statusraden. **Inställ
 | **Flow** `▾` | Menyn för grenarbetsflödet (starta, slutför, synka, befordra; `Ctrl+G Shift+W`). Bara i ett repository som har ett arbetsflöde. Se [Grenarbetsflöden](branching-workflows.md). |
 | **Sök** | Öppnar commit-sökfältet över Log (`f`). |
 
-Längst bort (höger i en rad, nederst i en kolumn) visar en **chip**, när repositoryt är kopplat till en värdtjänst, pull requesten för den utcheckade grenen (till exempel `GH #12` eller `GL !53`), eller ett nedtonat `+ PR`. **Inställningar > Utseende > Fäst pull request-knappen i slutet** (på som standard) håller den där; av, flödar den med de andra knapparna och följer deras justering. Se [Värdtjänster och ärendehantering](hosting-integration.md).
+Längst bort (höger i en rad, nederst i en kolumn) visar en **chip**, när repositoryt är kopplat till en värdtjänst, pull requesten för den utcheckade grenen (till exempel `GH #12` eller `GL !53`), eller ett nedtonat `+ PR`. **Inställningar > Utseende > Fäst pull request-knappen i slutet** (på som standard) håller den där; av, flödar den med de andra knapparna och följer deras justering. På en smal rad krymper chipet först (`● #12`, sedan enbart tillståndssymbolen) och flyttas först därefter in i `⋯`-menyn. Se [Värdtjänster och ärendehantering](hosting-integration.md).
 
 Bredvid den (i en kolumn, på dess sista rad) väljer **profilrullgardinen**, när du har två eller fler
 [profiler](settings.md#profiler), commit-identiteten för det här repositoryt.

@@ -2,7 +2,7 @@
 
 # Běh v Dockeru
 
-Obraz `poulpilab/gitpoulpi` obsahuje oficiální binárky vydání (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) na `debian:bookworm-slim`, spolu s `git`, `git-lfs`, `openssh-client`, `less` a `tini`. Běží na `linux/amd64` a `linux/arm64`. Je na Docker Hubu; stejné tagy jsou také na `ghcr.io/poulpi-lab/gitpoulpi` a vše níže funguje s oběma názvy.
+Obraz `poulpilab/gitpoulpi` obsahuje oficiální binárky vydání (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) na `debian:bookworm-slim`, spolu s `git`, `git-lfs`, `openssh-client`, `less` a `tini`. Běží na `linux/amd64` a `linux/arm64`. Je na Docker Hubu.
 
 ## Spuštění rozhraní
 

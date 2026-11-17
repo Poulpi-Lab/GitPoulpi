@@ -35,17 +35,6 @@ GitPoulpi'nin güncellemesi `choco upgrade` komutunu `--params` olmadan çalış
 
 **Paketteki hiçbir şey `policy.toml` veya `config.toml` yazmaz.** Dağıttığınız her şey, kurulumda ve her yükseltmede kalır. Bkz. [Varsayılan bir config.toml dağıtma](#varsayılan-bir-configtoml-dağıtma).
 
-## winget, iç bir kaynakla
-
-winget, paketin geldiği kaynak hangisiyse onu kullanarak GitPoulpi'yi `winget upgrade --id GitPoulpi.GitPoulpi --exact` komutuyla günceller. İç bir kaynak için bir Windows Package Manager REST kaynağı barındırın (winget REST API'sinin herhangi bir uygulaması), sürümün üç bildirimini (`GitPoulpi.GitPoulpi.yaml`, `...installer.yaml`, `...locale.en-US.yaml`) `InstallerUrl` kurulum programının kopyanızı gösterecek ve eşleşen `InstallerSha256` ile yayımlayın, sonra:
-
-```
-winget source add --name corp --arg https://winget.example/api --type Microsoft.Rest
-winget install --id GitPoulpi.GitPoulpi --source corp
-```
-
-Bildirimin yükleyici anahtarlarını koruyun: `/CHANNEL=winget` işaretin `winget` demesini sağlar ve `/ALIAS=` `gp` takma adını dışarıda bırakır. winget GitPoulpi'ye neyin yeni olduğunu söylemez, bu yüzden denetim sürümü hâlâ GitHub'a sorar. GitHub'sız bir ağda onu bir politikayla kendi `latest.json` dosyanıza yöneltin: `check = "manifest"` (bkz. [latest.json](#latestjson-ve-download_base-sürümün-bir-yansısı)).
-
 ## Scoop, özel bir bucket ile
 
 `gitpoulpi.json` dosyasını (herkese açık bucket'taki bildirim) barındırdığınız bir Git deposunun `bucket/` klasörüne koyun, `url` değerini sürüm zip dosyasının kopyanıza çevirin ve `hash` değerini onun sha256 değerine ayarlayın (kopyanız sürüm adlarını izliyorsa `autoupdate` kalabilir). Sonra:
@@ -116,7 +105,7 @@ Formül işareti `channel=homebrew` ile kurar: GitPoulpi `brew upgrade gitpoulpi
 
 ## Docker registry yansısı
 
-İmaj adı `poulpilab/gitpoulpi` (ve `ghcr.io/poulpi-lab/gitpoulpi`) şeklindedir. Panel her zaman bu adı gösterir, bu yüzden bir yansının şeffaf olması gerekir.
+İmaj adı `poulpilab/gitpoulpi` şeklindedir. Panel her zaman bu adı gösterir, bu yüzden bir yansının şeffaf olması gerekir.
 
 - **Pull-through önbellek:** bir registry'yi Docker Hub'ın vekili olarak çalıştırın (`registry` imajı, `proxy.remoteurl: https://registry-1.docker.io` ile) ve Docker daemon'ının `daemon.json` dosyasında `"registry-mirrors": ["https://registry.example"]` ayarlayın. `docker pull poulpilab/gitpoulpi` bu durumda önbelleğinizden geçer.
 - **Kopya:** `docker pull poulpilab/gitpoulpi:<v>`, `docker tag poulpilab/gitpoulpi:<v> registry.example/tools/gitpoulpi:<v>`, `docker push registry.example/tools/gitpoulpi:<v>`, sonra o adı çalıştırın. Panel hâlâ herkese açık adı gösterir; bu, sürüme bir işaret olarak yeterlidir.

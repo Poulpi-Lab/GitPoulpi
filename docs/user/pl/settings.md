@@ -280,7 +280,7 @@ Na tej stronie, w grupie **Aktualizacje**:
 |---|---|
 | **Sprawdzanie aktualizacji** | Lista rozwijana (`updates.mode`): **Powiadamiaj** (domyślnie) raz dziennie sprawdza w tle i pokazuje `vX.Y.Z dostępna` na pasku tytułu; **Automatycznie** dodatkowo pobiera aktualizację w tle, gdy GitPoulpi zainstalowano z archiwum wydania (moment ponownego uruchomienia nadal wybierasz ty); **Wył.** nigdy nie wysyła zapytań. Działa od razu. Zob. [Aktualizacje](updates.md). |
 | **Kanał aktualizacji** | Lista rozwijana (`updates.channel`): **Stabilny** (domyślnie) albo **Wstępny** (także wersje kandydujące). Działa od razu. |
-| **Sposób instalacji** | Tylko do odczytu. Jak GitPoulpi trafił na ten komputer (archiwum wydania, instalator dla tego użytkownika lub wszystkich, Chocolatey, winget, Scoop, Homebrew, apt, pakiet MSI, AUR, obraz Docker, cargo albo kompilacja deweloperska). Od tego zależy, jak stosowane są aktualizacje, zob. [Aktualizacje](updates.md). |
+| **Sposób instalacji** | Tylko do odczytu. Jak GitPoulpi trafił na ten komputer (archiwum wydania, instalator dla tego użytkownika lub wszystkich, Chocolatey, Scoop, Homebrew, apt, pakiet MSI, obraz Docker, cargo albo kompilacja deweloperska). Od tego zależy, jak stosowane są aktualizacje, zob. [Aktualizacje](updates.md). |
 
 Wiersz ustawiony przez administratora w polityce aktualizacji obowiązującej na całym komputerze pokazuje **Ustawione przez administratora** i nie można go tu zmienić.
 

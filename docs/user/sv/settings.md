@@ -278,7 +278,7 @@ På samma sida, under **Uppdateringar**:
 |---|---|
 | **Sök efter uppdateringar** | En rullgardinslista (`updates.mode`): **Meddela** (standard) söker en gång per dygn i bakgrunden och visar `vX.Y.Z tillgänglig` i titelraden; **Auto** laddar dessutom ned uppdateringen i bakgrunden när GitPoulpi installerades från ett releasearkiv (du väljer själv när det startas om); **Av** gör aldrig någon förfrågan. Gäller direkt. Se [Uppdateringar](updates.md). |
 | **Uppdateringskanal** | En rullgardinslista (`updates.channel`): **Stabil** (standard) eller **Förhandsversion** (även release candidates). Gäller direkt. |
-| **Installerat med** | Skrivskyddad. Hur GitPoulpi kom till den här datorn (ett releasearkiv, installationsprogrammet för den här användaren eller alla användare, Chocolatey, winget, Scoop, Homebrew, apt, ett MSI-paket, AUR, en Docker-avbild, cargo eller ett utvecklingsbygge). Det avgör hur uppdateringar tillämpas, se [Uppdateringar](updates.md). |
+| **Installerat med** | Skrivskyddad. Hur GitPoulpi kom till den här datorn (ett releasearkiv, installationsprogrammet för den här användaren eller alla användare, Chocolatey, Scoop, Homebrew, apt, ett MSI-paket, en Docker-avbild, cargo eller ett utvecklingsbygge). Det avgör hur uppdateringar tillämpas, se [Uppdateringar](updates.md). |
 
 En rad som din administratör har satt i uppdateringspolicyn för hela datorn visar **Inställt av din administratör** och kan inte ändras här.
 

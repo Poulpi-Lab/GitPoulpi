@@ -2,7 +2,7 @@
 
 # Docker'da çalıştırma
 
-`poulpilab/gitpoulpi` imajı, resmi sürüm çalıştırılabilir dosyalarını (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) `debian:bookworm-slim` üzerinde, `git`, `git-lfs`, `openssh-client`, `less` ve `tini` ile birlikte taşır. `linux/amd64` ve `linux/arm64` üzerinde çalışır. Docker Hub'dadır; aynı etiketler `ghcr.io/poulpi-lab/gitpoulpi` adresinde de vardır ve aşağıdakilerin hepsi iki adla da çalışır.
+`poulpilab/gitpoulpi` imajı, resmi sürüm çalıştırılabilir dosyalarını (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) `debian:bookworm-slim` üzerinde, `git`, `git-lfs`, `openssh-client`, `less` ve `tini` ile birlikte taşır. `linux/amd64` ve `linux/arm64` üzerinde çalışır. Docker Hub'dadır.
 
 ## Arayüzü başlatın
 

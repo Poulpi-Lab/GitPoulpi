@@ -35,17 +35,6 @@ GitPoulpi の更新は、展開した内容に手を付けないよう `--params
 
 **パッケージは `policy.toml` も `config.toml` も書き込みません。** 展開した内容は、インストール時も、毎回のアップグレードでも、そのまま残ります。[既定の config.toml を配布する](#既定の-configtoml-を配布する)を参照してください。
 
-## 内部ソースでの winget
-
-winget は、パッケージの入手元のソースを使って `winget upgrade --id GitPoulpi.GitPoulpi --exact` で GitPoulpi を更新します。内部ソースを使うには、Windows Package Manager の REST ソース（winget REST API の任意の実装）を用意し、リリースの 3 つのマニフェスト（`GitPoulpi.GitPoulpi.yaml`、`...installer.yaml`、`...locale.en-US.yaml`）を、`InstallerUrl` を自社のセットアッププログラムのコピーに向け、対応する `InstallerSha256` を付けて公開します。その後：
-
-```
-winget source add --name corp --arg https://winget.example/api --type Microsoft.Rest
-winget install --id GitPoulpi.GitPoulpi --source corp
-```
-
-マニフェストのインストーラースイッチはそのまま残してください。`/CHANNEL=winget` でマーカーに `winget` と書かれ、`/ALIAS=` で `gp` エイリアスが省かれます。winget は何が新しいかを GitPoulpi に伝えないため、確認は引き続き GitHub にバージョンを問い合わせます。GitHub に接続できないネットワークでは、ポリシーの `check = "manifest"` で自社の `latest.json` に向けてください（[latest.json と download_base（リリースのミラー）](#latestjson-と-download_baseリリースのミラー)を参照）。
-
 ## プライベートバケットでの Scoop
 
 公開バケットの `gitpoulpi.json`（マニフェスト）を、自社でホストする Git リポジトリの `bucket/` に置き、`url` をリリース zip の自社コピーに変更し、`hash` をその sha256 に設定します（コピーがリリースの名前に従うなら `autoupdate` は残せます）。その後：

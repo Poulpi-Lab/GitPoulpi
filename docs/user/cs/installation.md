@@ -118,20 +118,18 @@ Každý kanál níže zapisuje vedle programů stejnou značku `.gitpoulpi-dist`
 | Kanál | Instalace | Poznámky |
 |---|---|---|
 | **Chocolatey** (Windows) | `choco install gitpoulpi` | Instaluje pro všechny uživatele, takže aktualizace žádají o schválení správcem. |
-| **winget** (Windows) | `winget install --id GitPoulpi.GitPoulpi` | Přidejte `--scope user` nebo `--scope machine` pro volbu; rozsah machine žádá o schválení správcem při instalaci i při každé aktualizaci. |
 | **Scoop** (Windows) | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` pak `scoop install gitpoulpi` | Pro uživatele, bez práv správce. |
 | **Homebrew** (macOS, Linux) | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | Tap je `Poulpi-Lab/homebrew-gitpoulpi`. |
 | **apt** (Debian, Ubuntu) | viz [repozitář apt](#apt-debian-a-ubuntu) | Podepsaný repozitář; `.deb` je také přiložen ke každému vydání. |
 | **MSI** (Windows, spravované) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Pro správce: všichni uživatelé, žádné aktualizace v aplikaci. Viz [Podniková distribuce](enterprise-distribution.md#msi-s-intune-nebo-group-policy). |
-| **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (nebo `paru -S gitpoulpi-bin`) | Bez pomocníka: `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, pak `cd gitpoulpi-bin && makepkg -si`. |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Stáhne archiv vydání místo kompilace. |
 | **cargo, z crates.io** | `cargo install --locked gitpoulpi-cli` | Kompiluje; potřebuje toolchain Rustu. Nainstaluje `gitpoulpi`, který bez podpříkazu otevře terminálové UI a zároveň slouží jako server MCP (`gitpoulpi mcp`). `gitpoulpi-tui` a `gitpoulpi-mcp` jsou tytéž programy jako samostatné crates. |
 | **cargo, ze zdrojových kódů** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Kompiluje; potřebuje toolchain Rustu. |
-| **Docker** | `docker pull poulpilab/gitpoulpi` | Viz [Běh v Dockeru](docker.md). Stejný obraz je na `ghcr.io/poulpi-lab/gitpoulpi`. |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | Viz [Běh v Dockeru](docker.md). |
 
 Názvy výše jsou ty, do kterých proces vydání publikuje (viz [Vydávání](../../developer/releasing.md)): kanál, který ještě není aktivní, odpoví "not found" a archiv vydání nebo instalační program funguje vždy.
 
-Platí vlastní zacházení správce balíčků s PATH: Chocolatey, winget, Scoop a Homebrew dávají programy do PATH samy a žádný z nich nevytváří alias `gp` (spusťte `gitpoulpi alias create gp`, nebo Nastavení > Spouštěč).
+Platí vlastní zacházení správce balíčků s PATH: Chocolatey, Scoop a Homebrew dávají programy do PATH samy a žádný z nich nevytváří alias `gp` (spusťte `gitpoulpi alias create gp`, nebo Nastavení > Spouštěč).
 
 ### apt (Debian a Ubuntu)
 

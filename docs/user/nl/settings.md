@@ -275,7 +275,7 @@ Ook op deze pagina, onder **Updates**:
 |---|---|
 | **Op updates controleren** | Een keuzelijst (`updates.mode`): **Melden** (standaard) controleert eenmaal per dag op de achtergrond en toont `vX.Y.Z beschikbaar` in de titelbalk; **Auto** downloadt de update ook op de achtergrond als GitPoulpi uit een releasearchief is geïnstalleerd (jij kiest nog steeds wanneer je herstart); **Uit** doet nooit een verzoek. Geldt direct. Zie [Updates](updates.md). |
 | **Updatekanaal** | Een keuzelijst (`updates.channel`): **Stabiel** (standaard) of **Pre-release** (ook release candidates). Geldt direct. |
-| **Geïnstalleerd via** | Alleen-lezen. Hoe GitPoulpi op deze computer is gekomen (een releasearchief, het installatieprogramma voor deze gebruiker of alle gebruikers, Chocolatey, winget, Scoop, Homebrew, apt, een MSI-pakket, de AUR, een Docker-image, cargo of een ontwikkelbuild). Het bepaalt hoe updates worden toegepast, zie [Updates](updates.md). |
+| **Geïnstalleerd via** | Alleen-lezen. Hoe GitPoulpi op deze computer is gekomen (een releasearchief, het installatieprogramma voor deze gebruiker of alle gebruikers, Chocolatey, Scoop, Homebrew, apt, een MSI-pakket, een Docker-image, cargo of een ontwikkelbuild). Het bepaalt hoe updates worden toegepast, zie [Updates](updates.md). |
 
 Een rij die je beheerder in het updatebeleid voor de hele machine heeft ingesteld, toont **Ingesteld door je beheerder** en kan hier niet worden gewijzigd.
 

@@ -35,17 +35,6 @@ La mise à jour de GitPoulpi lance `choco upgrade` sans `--params`, pour que rie
 
 **Rien dans le paquet n'écrit `policy.toml` ni `config.toml`.** Ce que vous avez déployé reste, à l'installation comme à chaque mise à jour. Voir [Déployer un config.toml par défaut](#déployer-un-configtoml-par-défaut).
 
-## winget, avec une source interne
-
-winget met à jour GitPoulpi avec `winget upgrade --id GitPoulpi.GitPoulpi --exact`, en utilisant la source d'où vient le paquet. Pour une source interne, hébergez une source REST du Gestionnaire de package Windows (toute implémentation de l'API REST de winget), publiez les trois manifestes de la version (`GitPoulpi.GitPoulpi.yaml`, `...installer.yaml`, `...locale.en-US.yaml`) avec `InstallerUrl` pointant vers votre copie du programme d'installation et le `InstallerSha256` correspondant, puis :
-
-```
-winget source add --name corp --arg https://winget.example/api --type Microsoft.Rest
-winget install --id GitPoulpi.GitPoulpi --source corp
-```
-
-Gardez les options d'installation du manifeste : `/CHANNEL=winget` fait dire `winget` au marqueur, et `/ALIAS=` omet l'alias `gp`. winget n'indique pas à GitPoulpi ce qui est nouveau, la recherche interroge donc toujours GitHub pour la version. Sur un réseau sans GitHub, orientez-la vers votre propre `latest.json` avec une politique : `check = "manifest"` (voir [latest.json](#latestjson-et-download_base-un-miroir-de-la-version)).
-
 ## Scoop, avec un bucket privé
 
 Placez `gitpoulpi.json` (le manifeste du bucket public) dans `bucket/` d'un dépôt Git que vous hébergez, changez `url` pour votre copie du zip de la version et réglez `hash` sur son sha256 (`autoupdate` peut rester si votre copie suit les noms des versions). Puis :
@@ -116,7 +105,7 @@ La formule installe le marqueur avec `channel=homebrew` : GitPoulpi lance lui-m
 
 ## Miroir de registre Docker
 
-Le nom de l'image est `poulpilab/gitpoulpi` (et `ghcr.io/poulpi-lab/gitpoulpi`). Le panneau affiche toujours ce nom, un miroir doit donc être transparent.
+Le nom de l'image est `poulpilab/gitpoulpi`. Le panneau affiche toujours ce nom, un miroir doit donc être transparent.
 
 - **Cache d'extraction :** lancez un registre comme proxy de Docker Hub (l'image `registry` avec `proxy.remoteurl: https://registry-1.docker.io`) et définissez `"registry-mirrors": ["https://registry.example"]` dans le `daemon.json` du démon Docker. `docker pull poulpilab/gitpoulpi` passe alors par votre cache.
 - **Copie :** `docker pull poulpilab/gitpoulpi:<v>`, `docker tag poulpilab/gitpoulpi:<v> registry.example/tools/gitpoulpi:<v>`, `docker push registry.example/tools/gitpoulpi:<v>`, puis lancez ce nom. Le panneau affiche toujours le nom public, ce qui convient comme repère de la version.

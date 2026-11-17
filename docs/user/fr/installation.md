@@ -123,20 +123,18 @@ Chaque canal ci-dessous écrit le même marqueur `.gitpoulpi-dist` à côté des
 | Canal | Installation | Remarques |
 |---|---|---|
 | **Chocolatey** (Windows) | `choco install gitpoulpi` | Installe pour tous les utilisateurs : les mises à jour demandent donc l'accord d'un administrateur. |
-| **winget** (Windows) | `winget install --id GitPoulpi.GitPoulpi` | Ajoutez `--scope user` ou `--scope machine` pour choisir ; la portée machine demande l'accord d'un administrateur à l'installation et à chaque mise à jour. |
 | **Scoop** (Windows) | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` puis `scoop install gitpoulpi` | Par utilisateur, sans droits d'administrateur. |
 | **Homebrew** (macOS, Linux) | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | Le tap est `Poulpi-Lab/homebrew-gitpoulpi`. |
 | **apt** (Debian, Ubuntu) | voir [le dépôt apt](#apt-debian-et-ubuntu) | Dépôt signé ; un `.deb` est aussi joint à chaque version. |
 | **MSI** (Windows, géré) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Pour les administrateurs : tous les utilisateurs, pas de mise à jour dans l'application. Voir [Distribution en entreprise](enterprise-distribution.md#msi-avec-intune-ou-une-stratégie-de-groupe). |
-| **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (ou `paru -S gitpoulpi-bin`) | Sans assistant : `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, puis `cd gitpoulpi-bin && makepkg -si`. |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Télécharge l'archive de version au lieu de compiler. |
 | **cargo, depuis crates.io** | `cargo install --locked gitpoulpi-cli` | Compile ; nécessite une chaîne d'outils Rust. Installe `gitpoulpi`, qui ouvre l'interface terminal quand on le lance sans sous-commande et sert aussi MCP (`gitpoulpi mcp`). `gitpoulpi-tui` et `gitpoulpi-mcp` sont les mêmes programmes, en crates autonomes. |
 | **cargo, depuis les sources** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Compile ; nécessite une chaîne d'outils Rust. |
-| **Docker** | `docker pull poulpilab/gitpoulpi` | Voir [Exécuter dans Docker](docker.md). La même image est sur `ghcr.io/poulpi-lab/gitpoulpi`. |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | Voir [Exécuter dans Docker](docker.md). |
 
 Les noms ci-dessus sont ceux vers lesquels le processus de publication publie (voir [Releasing](../../developer/releasing.md)) : un canal qui n'est pas encore en ligne répond « not found », et l'archive de version ou l'installeur fonctionne toujours.
 
-La gestion du PATH propre à chaque gestionnaire de paquets s'applique : Chocolatey, winget, Scoop et Homebrew placent eux-mêmes les programmes dans le PATH, et aucun ne crée l'alias `gp` (lancez `gitpoulpi alias create gp`, ou Paramètres > Lanceur).
+La gestion du PATH propre à chaque gestionnaire de paquets s'applique : Chocolatey, Scoop et Homebrew placent eux-mêmes les programmes dans le PATH, et aucun ne crée l'alias `gp` (lancez `gitpoulpi alias create gp`, ou Paramètres > Lanceur).
 
 ### apt (Debian et Ubuntu)
 

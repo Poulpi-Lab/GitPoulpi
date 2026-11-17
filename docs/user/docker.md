@@ -2,7 +2,7 @@
 
 # Running in Docker
 
-The `poulpilab/gitpoulpi` image holds the official release binaries (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) on `debian:bookworm-slim`, with `git`, `git-lfs`, `openssh-client`, `less` and `tini`. It runs on `linux/amd64` and `linux/arm64`. It is on Docker Hub; the same tags are also on `ghcr.io/poulpi-lab/gitpoulpi`, and everything below works with either name.
+The `poulpilab/gitpoulpi` image holds the official release binaries (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) on `debian:bookworm-slim`, with `git`, `git-lfs`, `openssh-client`, `less` and `tini`. It runs on `linux/amd64` and `linux/arm64`. It is on Docker Hub.
 
 ## Start the UI
 

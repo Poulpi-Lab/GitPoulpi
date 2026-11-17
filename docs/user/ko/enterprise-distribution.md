@@ -35,17 +35,6 @@ GitPoulpi의 업데이트는 배포한 것이 건드려지지 않도록 `--param
 
 **패키지는 `policy.toml`이나 `config.toml`을 쓰지 않습니다.** 배포한 것은 설치 때나 모든 업그레이드 때나 그대로 남습니다. [기본 config.toml 배포](#기본-configtoml-배포)를 참고하세요.
 
-## winget, 내부 소스
-
-winget은 패키지가 온 소스를 사용해 `winget upgrade --id GitPoulpi.GitPoulpi --exact`로 GitPoulpi를 업데이트합니다. 내부 소스를 쓰려면 Windows 패키지 관리자 REST 소스(winget REST API의 아무 구현)를 호스팅하고, 릴리스의 매니페스트 세 개(`GitPoulpi.GitPoulpi.yaml`, `...installer.yaml`, `...locale.en-US.yaml`)를 `InstallerUrl`이 설치 프로그램의 자체 사본을 가리키고 `InstallerSha256`이 일치하도록 게시한 뒤 다음을 실행합니다.
-
-```
-winget source add --name corp --arg https://winget.example/api --type Microsoft.Rest
-winget install --id GitPoulpi.GitPoulpi --source corp
-```
-
-매니페스트의 설치 프로그램 스위치는 그대로 두세요. `/CHANNEL=winget`은 마커에 `winget`이 기록되게 하고, `/ALIAS=`는 `gp` 별칭을 만들지 않습니다. winget은 GitPoulpi에 무엇이 새것인지 알려 주지 않으므로 확인은 여전히 GitHub에 버전을 묻습니다. GitHub에 접근할 수 없는 네트워크에서는 정책으로 자체 `latest.json`을 가리키게 하세요: `check = "manifest"` ([latest.json](#latestjson과-download_base-릴리스-미러) 참고).
-
 ## Scoop, 사설 버킷
 
 공개 버킷의 `gitpoulpi.json`(매니페스트)을 직접 호스팅하는 Git 저장소의 `bucket/`에 넣고, `url`을 릴리스 zip의 자체 사본으로 바꾸고 `hash`를 그 sha256으로 설정합니다(사본이 릴리스 이름을 따른다면 `autoupdate`는 그대로 둘 수 있습니다). 그다음:

@@ -35,17 +35,6 @@ GitPoulpi 的更新运行 `choco upgrade` 时不带 `--params`，这样你部署
 
 **软件包中没有任何内容会写入 `policy.toml` 或 `config.toml`。** 你部署的内容在安装时和每次升级时都会保留。见[部署默认 config.toml](#部署默认-configtoml)。
 
-## winget，使用内部源
-
-winget 用 `winget upgrade --id GitPoulpi.GitPoulpi --exact` 更新 GitPoulpi，使用的是该软件包最初来自的源。对于内部源，请托管一个 Windows 程序包管理器 REST 源（winget REST API 的任何实现），发布该发布版本的三个清单（`GitPoulpi.GitPoulpi.yaml`、`...installer.yaml`、`...locale.en-US.yaml`），其中 `InstallerUrl` 指向你保存的安装程序副本、`InstallerSha256` 与之匹配，然后：
-
-```
-winget source add --name corp --arg https://winget.example/api --type Microsoft.Rest
-winget install --id GitPoulpi.GitPoulpi --source corp
-```
-
-请保留清单中的安装程序开关：`/CHANNEL=winget` 让标记写成 `winget`，`/ALIAS=` 则不创建 `gp` 别名。winget 不会告诉 GitPoulpi 有什么新版本，所以检查仍然向 GitHub 询问版本。在没有 GitHub 的网络中，用策略把它指向你自己的 `latest.json`：`check = "manifest"`（见 [latest.json](#latestjson-与-download_base发布版本的镜像)）。
-
 ## Scoop，使用私有 bucket
 
 把 `gitpoulpi.json`（公共 bucket 中的清单）放进你托管的某个 Git 仓库的 `bucket/` 中，把 `url` 改成你保存的发布 zip 副本，并把 `hash` 设为它的 sha256（如果你的副本沿用发布版本的命名，可以保留 `autoupdate`）。然后：

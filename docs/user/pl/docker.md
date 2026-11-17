@@ -2,7 +2,7 @@
 
 # Uruchamianie w Dockerze
 
-Obraz `poulpilab/gitpoulpi` zawiera oficjalne pliki wykonywalne wydań (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) na `debian:bookworm-slim`, razem z `git`, `git-lfs`, `openssh-client`, `less` i `tini`. Działa na `linux/amd64` i `linux/arm64`. Jest w Docker Hub; te same tagi są też w `ghcr.io/poulpi-lab/gitpoulpi`, a wszystko poniżej działa z obiema nazwami.
+Obraz `poulpilab/gitpoulpi` zawiera oficjalne pliki wykonywalne wydań (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) na `debian:bookworm-slim`, razem z `git`, `git-lfs`, `openssh-client`, `less` i `tini`. Działa na `linux/amd64` i `linux/arm64`. Jest w Docker Hub.
 
 ## Uruchomienie interfejsu
 

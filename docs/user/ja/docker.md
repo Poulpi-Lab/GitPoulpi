@@ -2,7 +2,7 @@
 
 # Docker で実行する
 
-`poulpilab/gitpoulpi` イメージには、公式リリースの実行ファイル（`gitpoulpi-tui`、`gitpoulpi`、`gitpoulpi-mcp`）が `debian:bookworm-slim` 上に入っており、`git`、`git-lfs`、`openssh-client`、`less`、`tini` も含まれます。`linux/amd64` と `linux/arm64` で動作します。Docker Hub で公開されており、同じタグは `ghcr.io/poulpi-lab/gitpoulpi` にもあります。以下はどちらの名前でも同じように使えます。
+`poulpilab/gitpoulpi` イメージには、公式リリースの実行ファイル（`gitpoulpi-tui`、`gitpoulpi`、`gitpoulpi-mcp`）が `debian:bookworm-slim` 上に入っており、`git`、`git-lfs`、`openssh-client`、`less`、`tini` も含まれます。`linux/amd64` と `linux/arm64` で動作します。Docker Hub で公開されています。
 
 ## UI を起動する
 

@@ -293,7 +293,7 @@ Também nesta página, em **Atualizações**:
 |---|---|
 | **Verificar atualizações** | Uma lista suspensa (`updates.mode`): **Notificar** (o padrão) verifica uma vez por dia em segundo plano e mostra `vX.Y.Z disponível` na barra de título; **Automático** também baixa a atualização em segundo plano quando o GitPoulpi foi instalado a partir de um pacote de versão (você ainda escolhe quando reiniciar); **Desativado** nunca faz uma requisição. Aplicado imediatamente. Veja [Atualizações](updates.md). |
 | **Canal de atualização** | Uma lista suspensa (`updates.channel`): **Estável** (o padrão) ou **Pré-lançamento** (também as candidatas a lançamento). Aplicado imediatamente. |
-| **Instalado com** | Somente leitura. Como o GitPoulpi chegou a este computador (um arquivo de release, o instalador para este usuário ou para todos os usuários, Chocolatey, winget, Scoop, Homebrew, apt, um pacote MSI, o AUR, uma imagem Docker, cargo ou uma build de desenvolvimento). Isso define como as atualizações são aplicadas, veja [Atualizações](updates.md). |
+| **Instalado com** | Somente leitura. Como o GitPoulpi chegou a este computador (um arquivo de release, o instalador para este usuário ou para todos os usuários, Chocolatey, Scoop, Homebrew, apt, um pacote MSI, uma imagem Docker, cargo ou uma build de desenvolvimento). Isso define como as atualizações são aplicadas, veja [Atualizações](updates.md). |
 
 Uma linha que o seu administrador definiu na política de atualização da máquina inteira mostra **Definido pelo seu administrador** e não pode ser alterada aqui.
 

@@ -119,20 +119,18 @@ Aşağıdaki her kanal, programların yanına kendi kanal adıyla aynı `.gitpou
 | Kanal | Kurulum | Notlar |
 |---|---|---|
 | **Chocolatey** (Windows) | `choco install gitpoulpi` | Tüm kullanıcılar için kurar, bu yüzden güncellemeler yönetici onayı ister. |
-| **winget** (Windows) | `winget install --id GitPoulpi.GitPoulpi` | Seçmek için `--scope user` veya `--scope machine` ekleyin; makine kapsamı kurulumda ve her güncellemede yönetici onayı ister. |
 | **Scoop** (Windows) | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` ardından `scoop install gitpoulpi` | Kullanıcı başına, yönetici hakkı yok. |
 | **Homebrew** (macOS, Linux) | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | Tap `Poulpi-Lab/homebrew-gitpoulpi` adresindedir. |
 | **apt** (Debian, Ubuntu) | bkz. [apt deposu](#apt-debian-ve-ubuntu) | İmzalı depo; her sürüme bir `.deb` de eklenir. |
 | **MSI** (Windows, yönetilen) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Yöneticiler için: tüm kullanıcılar, uygulama içi güncelleme yok. Bkz. [Kurumsal dağıtım](enterprise-distribution.md#msi-intune-veya-grup-politikası-ile). |
-| **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (veya `paru -S gitpoulpi-bin`) | Yardımcı olmadan: `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, sonra `cd gitpoulpi-bin && makepkg -si`. |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Derlemek yerine sürüm arşivini indirir. |
 | **cargo, crates.io'dan** | `cargo install --locked gitpoulpi-cli` | Derler; bir Rust araç zinciri gerekir. Alt komutsuz çalıştırıldığında terminal arayüzünü açan ve MCP'yi de sunan (`gitpoulpi mcp`) `gitpoulpi` programını kurar. `gitpoulpi-tui` ve `gitpoulpi-mcp` aynı programların bağımsız crate olarak sunulmuş halidir. |
 | **cargo, kaynaktan** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Derler; bir Rust araç zinciri gerekir. |
-| **Docker** | `docker pull poulpilab/gitpoulpi` | Bkz. [Docker'da çalıştırma](docker.md). Aynı imaj `ghcr.io/poulpi-lab/gitpoulpi` adresinde de vardır. |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | Bkz. [Docker'da çalıştırma](docker.md). |
 
 Yukarıdaki adlar, sürüm sürecinin yayımladığı adlardır (bkz. [Sürüm yayımlama](../../developer/releasing.md)): henüz canlı olmayan bir kanal "bulunamadı" yanıtı verir ve sürüm arşivi veya yükleyici her zaman çalışır.
 
-Paket yöneticisinin kendi PATH işleyişi geçerlidir: Chocolatey, winget, Scoop ve Homebrew programları PATH'e kendileri koyar ve hiçbiri `gp` takma adını oluşturmaz (`gitpoulpi alias create gp` çalıştırın ya da Ayarlar > Başlatıcı).
+Paket yöneticisinin kendi PATH işleyişi geçerlidir: Chocolatey, Scoop ve Homebrew programları PATH'e kendileri koyar ve hiçbiri `gp` takma adını oluşturmaz (`gitpoulpi alias create gp` çalıştırın ya da Ayarlar > Başlatıcı).
 
 ### apt (Debian ve Ubuntu)
 

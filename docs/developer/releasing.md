@@ -102,6 +102,15 @@ Check by hand (the installers are not exercised by CI):
 - A `gitpoulpi --version` from the Docker image, `docker run -it` drawing the UI, and the SSH agent forwarding.
 - The apt repository: add the source on a clean Debian, `apt install`, then `apt install --only-upgrade` with a second version.
 
+## Adding a channel to the user docs
+
+The user docs list an install method only once it is published. Channels not live at 1.0.0 (AUR, winget, the GHCR mirror) have their templates, jobs and developer notes, and no user-facing text. When one opens:
+
+1. Install from the channel for real, on a clean machine or VM, and check that `gitpoulpi` runs and the update panel offers the right command.
+2. Add its row to the channel table of `docs/user/installation.md`, and to `README.md` if it lists install methods.
+3. Add its rows to `docs/user/updates.md` (the per-installation table) and, if administrators can host it internally, a section in `docs/user/enterprise-distribution.md`. Add its name to the "Installed with" list in `docs/user/settings.md`.
+4. Mirror every change in all 17 languages (`docs/user/<lang>/`), with the new text translated and reviewed like any other.
+
 ## Signing and supply chain
 
 ### The release signing key

@@ -35,17 +35,6 @@ GitPoulpis uppdatering kör `choco upgrade` utan `--params`, så att inget du ha
 
 **Ingenting i paketet skriver `policy.toml` eller `config.toml`.** Det du har driftsatt blir kvar, vid installation och vid varje uppgradering. Se [Distribuera en standard-config.toml](#distribuera-en-standard-configtoml).
 
-## winget, med en intern källa
-
-winget uppdaterar GitPoulpi med `winget upgrade --id GitPoulpi.GitPoulpi --exact`, med den källa som paketet kom från. För en intern källa värdar du en Windows Package Manager REST-källa (vilken implementation av winget-REST-API:t som helst), publicerar releasens tre manifest (`GitPoulpi.GitPoulpi.yaml`, `...installer.yaml`, `...locale.en-US.yaml`) med `InstallerUrl` pekande på din kopia av installationsprogrammet och motsvarande `InstallerSha256`, och kör sedan:
-
-```
-winget source add --name corp --arg https://winget.example/api --type Microsoft.Rest
-winget install --id GitPoulpi.GitPoulpi --source corp
-```
-
-Behåll manifestets installationsväljare: `/CHANNEL=winget` gör att markören säger `winget`, och `/ALIAS=` utelämnar aliaset `gp`. winget talar inte om för GitPoulpi vad som är nytt, så sökningen frågar fortfarande GitHub efter versionen. I ett nätverk utan GitHub pekar du den mot din egen `latest.json` med en policy: `check = "manifest"` (se [latest.json](#latestjson-och-download_base-en-spegel-av-releasen)).
-
 ## Scoop, med en privat bucket
 
 Lägg `gitpoulpi.json` (manifestet från den offentliga bucketen) i `bucket/` i ett Git-repository som du värdar, ändra `url` till din kopia av releasens zip och sätt `hash` till dess sha256 (`autoupdate` kan vara kvar om din kopia följer releasenamnen). Kör sedan:
@@ -116,7 +105,7 @@ Formeln installerar markören med `channel=homebrew`: GitPoulpi kör själv `bre
 
 ## Spegel av Docker-registret
 
-Avbildens namn är `poulpilab/gitpoulpi` (och `ghcr.io/poulpi-lab/gitpoulpi`). Panelen visar alltid det namnet, så en spegel måste vara transparent.
+Avbildens namn är `poulpilab/gitpoulpi`. Panelen visar alltid det namnet, så en spegel måste vara transparent.
 
 - **Genomströmmande cache:** kör ett register som proxy för Docker Hub (avbilden `registry` med `proxy.remoteurl: https://registry-1.docker.io`) och sätt `"registry-mirrors": ["https://registry.example"]` i Docker-daemonens `daemon.json`. `docker pull poulpilab/gitpoulpi` går då via din cache.
 - **Kopia:** `docker pull poulpilab/gitpoulpi:<v>`, `docker tag poulpilab/gitpoulpi:<v> registry.example/tools/gitpoulpi:<v>`, `docker push registry.example/tools/gitpoulpi:<v>`, och kör sedan det namnet. Panelen visar fortfarande det offentliga, vilket går bra som en pekare till versionen.

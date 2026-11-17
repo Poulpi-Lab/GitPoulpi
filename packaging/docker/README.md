@@ -26,7 +26,7 @@ The terminal UI opens in `/work`, which is the folder you mounted. Open a reposi
 | `X.Y` | The latest patch of that minor version (stable releases only). |
 | `latest` | The latest stable release. |
 
-Pre-releases only get their exact `X.Y.Z-...` tag. An image is replaced, never updated in place: run `docker pull poulpilab/gitpoulpi` to update. The same tags are mirrored on `ghcr.io/poulpi-lab/gitpoulpi` when the maintainers enable it.
+Pre-releases only get their exact `X.Y.Z-...` tag. An image is replaced, never updated in place: run `docker pull poulpilab/gitpoulpi` to update.
 
 ## Volumes and paths
 

@@ -40,12 +40,10 @@ GitPoulpi는 새 릴리스가 있는지 확인하고, 설치된 방법에 따라
 | Windows 설치 프로그램, 모든 사용자 | GitHub 릴리스 | 같지만 Windows가 관리자 승인을 요청합니다. 이 컴퓨터에서 다른 사용자가 실행 중인 GitPoulpi 세션은 종료되며 저장하지 않은 입력은 사라집니다. 거절하면 아무것도 바뀌지 않습니다. | **되돌리기**로 다시 교체하며 같은 확인 창이 뜹니다. |
 | Chocolatey | Chocolatey 커뮤니티 피드 | **업데이트 실행**은 `choco upgrade gitpoulpi -y`를 실행합니다(Windows가 관리자 승인을 요청). | 패널에 `choco install gitpoulpi --version <previous> --allow-downgrade -y`가 표시됩니다. |
 | Chocolatey, 사내 피드 | 조직의 피드 | **업데이트 실행**은 `choco upgrade gitpoulpi -y --source=<feed>`를 실행합니다. 패키지 매개변수는 다시 보내지 않으므로 배포된 구성은 그대로 유지됩니다. | 피드를 붙인 같은 `choco install` 줄. |
-| winget | GitHub 릴리스 | **업데이트 실행**은 약관에 동의한 상태로 `winget upgrade --id GitPoulpi.GitPoulpi --exact --silent`를 실행합니다. 설치가 컴퓨터 전체 범위이면 winget이 직접 관리자 승인을 요청합니다. | 패널에 `winget install --id GitPoulpi.GitPoulpi --version <previous>`가 표시됩니다. |
 | Scoop | GitHub 릴리스 | **업데이트 실행**은 GitPoulpi가 완전히 종료된 뒤 `scoop update gitpoulpi`를 실행합니다. | **되돌리기**는 `scoop reset gitpoulpi@<previous>`를 실행합니다. |
 | Homebrew | GitHub 릴리스 | **업데이트 실행**은 이 터미널에서 `brew upgrade gitpoulpi`를 실행합니다. | 패널에 `brew install gitpoulpi@<previous>`가 표시됩니다. |
 | apt | GitHub 릴리스 | 패널에 `sudo apt update && sudo apt install --only-upgrade gitpoulpi`가 **명령 복사**와 **터미널에서 열기**와 함께 표시됩니다. GitPoulpi는 `sudo`를 대신 실행하지 않습니다. 이 컴퓨터에 GitPoulpi apt 저장소가 없으면 대신 새 `.deb`를 다운로드하라고 안내합니다. | 패널에 `sudo apt install gitpoulpi=<previous>`가 표시됩니다. |
 | MSI 패키지 | GitHub 릴리스 또는 관리자의 소스 | 실행할 것이 없습니다. 설치본은 관리자가 관리하며 패널에 관리자의 메시지가 표시됩니다. | 제공되지 않습니다. |
-| AUR | GitHub 릴리스 | 패널에 `yay -S gitpoulpi-bin`이 표시됩니다(`paru`도 가능하며 먼저 찾은 쪽을 사용합니다. 도우미가 없으면 `git clone`과 `makepkg -si` 단계). | 제공되지 않습니다. |
 | cargo | GitHub 릴리스 | `cargo-binstall`이 설치되어 있으면 `cargo binstall gitpoulpi-cli`, 아니면 `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli`가 표시됩니다. | 이전 태그로 같은 명령. |
 | Docker 이미지 | GitHub 릴리스 | 실행할 것이 없습니다. 이미지는 통째로 교체됩니다. 패널에 `docker pull poulpilab/gitpoulpi:<version>`과 `:latest`가 표시됩니다. [Docker에서 실행하기](docker.md)를 참고하세요. | 패널에 `docker pull poulpilab/gitpoulpi:<previous>`가 표시됩니다. |
 | 쓸 수 없는 폴더에 있는 릴리스 아카이브 | GitHub 릴리스 | 그 위치에서는 GitPoulpi가 스스로 교체할 수 없다고 알리고 **다운로드**를 안내합니다. | 제공되지 않습니다. |
@@ -83,7 +81,7 @@ GitPoulpi가 자신의 파일을 직접 교체하는 경우 **되돌리기**는 
 
 ## 검사하고 거부하는 것
 
-무엇이든 교체하기 전에 GitPoulpi는 아카이브, `.minisig` 서명, `.sha256`을 다운로드합니다. 먼저 GitPoulpi에 내장된 프로젝트 릴리스 키로 서명을 검사하며, 서명의 신뢰된 주석에는 이 아카이브와 이 버전이 명시되어 있어야 합니다. 그다음 해시를 검사합니다. 다음은 거부합니다. `.minisig`가 없는 릴리스(릴리스에 서명하기 전에 공개된 이전 릴리스는 업데이터로 설치할 수 없으며, 버전 고정이나 이전 버전으로 돌아가기도 포함됩니다), 다른 키의 서명, 다른 파일이나 다른 버전에 대한 서명, `.sha256`이 없는 릴리스, 일치하지 않는 해시, 이 플랫폼용 이름(`gitpoulpi-<version>-<target>.<zip|tar.gz>`)이 아닌 아카이브, 표식이 다른 버전이나 플랫폼을 가리키는 아카이브, 그리고 GitHub 릴리스 호스트(모든 리디렉션 단계를 검사) 또는 관리자가 설정한 미러 밖의 다운로드 링크. 교체는 전부 아니면 전무입니다. 다른 프로그램이 실행 파일 하나를 붙잡고 있으면 GitPoulpi는 그 파일의 이름을 알리고, 아무것도 바꾸지 않으며, 다음 시도를 위해 다운로드를 남겨 둡니다. Windows에서 모든 사용자용 업데이트는 권한 상승 단계가 다시 검증합니다. 이 단계가 `.minisig`와 `.sha256`을 직접 다운로드해 둘 다 다시 검사하므로, 그 사이에 사용자의 다운로드 폴더에서 바뀐 파일은 거부됩니다. 패키지 관리자(Chocolatey, winget, Scoop, Homebrew, apt, AUR)는 자체 패키지를 직접 검증하므로 그 경우 GitPoulpi는 아무것도 다운로드하지 않습니다.
+무엇이든 교체하기 전에 GitPoulpi는 아카이브, `.minisig` 서명, `.sha256`을 다운로드합니다. 먼저 GitPoulpi에 내장된 프로젝트 릴리스 키로 서명을 검사하며, 서명의 신뢰된 주석에는 이 아카이브와 이 버전이 명시되어 있어야 합니다. 그다음 해시를 검사합니다. 다음은 거부합니다. `.minisig`가 없는 릴리스(릴리스에 서명하기 전에 공개된 이전 릴리스는 업데이터로 설치할 수 없으며, 버전 고정이나 이전 버전으로 돌아가기도 포함됩니다), 다른 키의 서명, 다른 파일이나 다른 버전에 대한 서명, `.sha256`이 없는 릴리스, 일치하지 않는 해시, 이 플랫폼용 이름(`gitpoulpi-<version>-<target>.<zip|tar.gz>`)이 아닌 아카이브, 표식이 다른 버전이나 플랫폼을 가리키는 아카이브, 그리고 GitHub 릴리스 호스트(모든 리디렉션 단계를 검사) 또는 관리자가 설정한 미러 밖의 다운로드 링크. 교체는 전부 아니면 전무입니다. 다른 프로그램이 실행 파일 하나를 붙잡고 있으면 GitPoulpi는 그 파일의 이름을 알리고, 아무것도 바꾸지 않으며, 다음 시도를 위해 다운로드를 남겨 둡니다. Windows에서 모든 사용자용 업데이트는 권한 상승 단계가 다시 검증합니다. 이 단계가 `.minisig`와 `.sha256`을 직접 다운로드해 둘 다 다시 검사하므로, 그 사이에 사용자의 다운로드 폴더에서 바뀐 파일은 거부됩니다. 패키지 관리자(Chocolatey, Scoop, Homebrew, apt)는 자체 패키지를 직접 검증하므로 그 경우 GitPoulpi는 아무것도 다운로드하지 않습니다.
 
 ## 보안 공지
 

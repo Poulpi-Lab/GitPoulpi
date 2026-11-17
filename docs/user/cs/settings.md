@@ -275,7 +275,7 @@ Též na této stránce, ve skupině **Aktualizace**:
 |---|---|
 | **Kontrola aktualizací** | Rozbalovací seznam (`updates.mode`): **Oznamovat** (výchozí) jednou denně na pozadí zkontroluje a v záhlaví okna ukáže `vX.Y.Z k dispozici`; **Auto** navíc stáhne aktualizaci na pozadí, byl-li GitPoulpi nainstalován z archivu vydání (kdy restartovat, volíte vy); **Vypnuto** neodešle nikdy žádný požadavek. Platí okamžitě. Viz [Aktualizace](updates.md). |
 | **Kanál aktualizací** | Rozbalovací seznam (`updates.channel`): **Stabilní** (výchozí) nebo **Předběžný** (i kandidáti na vydání). Platí okamžitě. |
-| **Nainstalováno přes** | Jen pro čtení. Jak se GitPoulpi dostal do tohoto počítače (archiv vydání, instalační program pro tohoto uživatele nebo všechny uživatele, Chocolatey, winget, Scoop, Homebrew, apt, balíček MSI, AUR, obraz Dockeru, cargo nebo vývojové sestavení). Určuje, jak se aktualizace použijí, viz [Aktualizace](updates.md). |
+| **Nainstalováno přes** | Jen pro čtení. Jak se GitPoulpi dostal do tohoto počítače (archiv vydání, instalační program pro tohoto uživatele nebo všechny uživatele, Chocolatey, Scoop, Homebrew, apt, balíček MSI, obraz Dockeru, cargo nebo vývojové sestavení). Určuje, jak se aktualizace použijí, viz [Aktualizace](updates.md). |
 
 Řádek, který nastavil váš správce v politice aktualizací platné pro celý počítač, ukazuje **Nastaveno vaším správcem** a nelze ho tady změnit.
 

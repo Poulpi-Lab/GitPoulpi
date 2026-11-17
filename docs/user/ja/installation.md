@@ -111,12 +111,10 @@ OS と CPU に合ったアーカイブを選び、`.sha256` を確認して、`~
 | チャンネル | インストール | 備考 |
 |---|---|---|
 | **Chocolatey**（Windows） | `choco install gitpoulpi` | 全ユーザー向けにインストールされるため、更新には管理者の承認が必要です。 |
-| **winget**（Windows） | `winget install --id GitPoulpi.GitPoulpi` | `--scope user` または `--scope machine` で選べます。machine スコープは、インストール時と更新のたびに管理者の承認を求めます。 |
 | **Scoop**（Windows） | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` の後に `scoop install gitpoulpi` | ユーザーごと。管理者権限は不要です。 |
 | **Homebrew**（macOS、Linux） | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | tap は `Poulpi-Lab/homebrew-gitpoulpi` です。 |
 | **apt**（Debian、Ubuntu） | [apt リポジトリ](#aptdebian-と-ubuntu)を参照 | 署名付きのリポジトリ。すべてのリリースに `.deb` も添付されています。 |
 | **MSI**（Windows、管理対象） | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | 管理者向け：全ユーザー、アプリ内更新なし。[エンタープライズ配布](enterprise-distribution.md#intune-またはグループポリシーでの-msi)を参照。 |
-| **AUR**（Arch Linux） | `yay -S gitpoulpi-bin`（または `paru -S gitpoulpi-bin`） | ヘルパーがない場合：`git clone https://aur.archlinux.org/gitpoulpi-bin.git` の後に `cd gitpoulpi-bin && makepkg -si`。 |
 | **cargo** | `cargo binstall gitpoulpi-cli` | コンパイルせず、リリースアーカイブをダウンロードします。 |
 | **cargo（crates.io から）** | `cargo install --locked gitpoulpi-cli` | コンパイルします。Rust ツールチェーンが必要です。`gitpoulpi` をインストールし、サブコマンドなしで実行すると端末 UI が開き、MCP（`gitpoulpi mcp`）も提供します。`gitpoulpi-tui` と `gitpoulpi-mcp` は、同じプログラムを単独のクレートにしたものです。 |
 | **cargo（ソースから）** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | コンパイルします。Rust ツールチェーンが必要です。 |
@@ -124,7 +122,7 @@ OS と CPU に合ったアーカイブを選び、`.sha256` を確認して、`~
 
 上の名前は、リリースの手順が公開先としているものです（[リリース](../../developer/releasing.md)を参照）。まだ公開されていないチャンネルは「見つかりません」と応答しますが、リリースアーカイブやインストーラーはつねに使えます。
 
-パッケージマネージャー自身の PATH の扱いが適用されます。Chocolatey、winget、Scoop、Homebrew はプログラムを自分で PATH に追加しますが、どれも `gp` エイリアスは作りません（`gitpoulpi alias create gp` を実行するか、設定 > ランチャーを使ってください）。
+パッケージマネージャー自身の PATH の扱いが適用されます。Chocolatey、Scoop、Homebrew はプログラムを自分で PATH に追加しますが、どれも `gp` エイリアスは作りません（`gitpoulpi alias create gp` を実行するか、設定 > ランチャーを使ってください）。
 
 ### apt（Debian と Ubuntu）
 

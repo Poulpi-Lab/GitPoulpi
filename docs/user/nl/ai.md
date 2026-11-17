@@ -94,7 +94,7 @@ Er zijn twee manieren om AI met GitPoulpi te gebruiken:
 4. Kies bij meerdere profielen onderaan het **Standaardprofiel**; elke
    actie kan nog steeds een eigen profiel noemen.
 
-![Het blok Profielen van de AI-pagina voor een lokale agent: Agenttype (Claude Code), Opdracht, Argumenten, Model, twee Env-rijen, Omgevingsvariabele toevoegen en verwijderen, Verbinding testen en Standaardprofiel](../images/settings-ai-agent.png)
+![Het onderste deel van het blok Profielen van de AI-pagina voor een lokale agent: Uitvoermodus, Argumenten, Model, Werkmap, Time-out, twee Env-rijen, Omgevingsvariabele toevoegen en Verbinding testen](../images/settings-ai-agent.png)
 
 **API-sleutels** voer je in met `Enter` op de rij **API-sleutel**; ze worden opgeslagen in de
 credential helper van je systeem (Git Credential Manager, libsecret / `pass`, Keychain)

@@ -515,7 +515,7 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 
 저장소가 어느 목록을 따르는지는 그 `repo-state.toml`(아래)에 있습니다. 우선순위: 저장소 자체의 패턴, 그다음 따르는 이름 붙인 목록, 그다음 `default_list`, 그다음 `**`.
 
-
+## `[keybindings]`
 
 TUI의 단축키를 다시 할당합니다. 설정 > 키보드 및 마우스에서 편집합니다.
 

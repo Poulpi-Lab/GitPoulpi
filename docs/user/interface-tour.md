@@ -66,7 +66,9 @@ At its right end, the **Activity** button opens the Activity Log: a Git operatio
 log with a level box and a **Clear log** button) and a Scope box that narrows both to this
 repository, a workspace or all repositories. A number on the
 button counts the errors you have not looked at. Left of it, the jobs indicator
-shows a running background job with an `[x]` to cancel it. The
+shows a running background job with an `[x]` to cancel it (the jobs
+list has **Cancel all**, and the palette has *Jobs: Cancel All That Can Be
+Canceled*; a job that cannot be stopped safely says why). The
 **Home** tab has the same status line, with the Activity button at its bottom
 right (it opens on All repositories). When an operation fails, the status
 line says why in red, wherever you are; a click on it (or the palette's

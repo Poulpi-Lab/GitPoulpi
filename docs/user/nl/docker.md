@@ -2,7 +2,7 @@
 
 # GitPoulpi in Docker draaien
 
-De image `poulpilab/gitpoulpi` bevat de officiële release-binaries (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) op `debian:bookworm-slim`, met `git`, `git-lfs`, `openssh-client`, `less` en `tini`. Hij draait op `linux/amd64` en `linux/arm64`. Hij staat op Docker Hub; dezelfde tags staan ook op `ghcr.io/poulpi-lab/gitpoulpi`, en alles hieronder werkt met beide namen.
+De image `poulpilab/gitpoulpi` bevat de officiële release-binaries (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) op `debian:bookworm-slim`, met `git`, `git-lfs`, `openssh-client`, `less` en `tini`. Hij draait op `linux/amd64` en `linux/arm64`. Hij staat op Docker Hub.
 
 ## De UI starten
 

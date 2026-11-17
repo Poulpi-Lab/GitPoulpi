@@ -288,7 +288,7 @@ Ebenfalls auf dieser Seite, unter **Updates**:
 |---|---|
 | **Nach Updates suchen** | Ein Dropdown (`updates.mode`): **Hinweisen** (Standard) prüft einmal täglich im Hintergrund und zeigt `vX.Y.Z verfügbar` in der Titelleiste; **Automatisch** lädt das Update zusätzlich im Hintergrund herunter, wenn GitPoulpi aus einem Release-Archiv installiert wurde (wann neu gestartet wird, entscheiden Sie weiterhin); **Aus** stellt nie eine Anfrage. Wirkt sofort. Siehe [Updates](updates.md). |
 | **Update-Kanal** | Ein Dropdown (`updates.channel`): **Stabil** (Standard) oder **Vorabversion** (auch Release Candidates). Wirkt sofort. |
-| **Installiert über** | Schreibgeschützt. Wie GitPoulpi auf diesen Computer gekommen ist (ein Release-Archiv, das Installationsprogramm für diesen Benutzer oder alle Benutzer, Chocolatey, winget, Scoop, Homebrew, apt, ein MSI-Paket, das AUR, ein Docker-Image, cargo oder ein Entwicklungs-Build). Das bestimmt, wie Updates angewendet werden, siehe [Updates](updates.md). |
+| **Installiert über** | Schreibgeschützt. Wie GitPoulpi auf diesen Computer gekommen ist (ein Release-Archiv, das Installationsprogramm für diesen Benutzer oder alle Benutzer, Chocolatey, Scoop, Homebrew, apt, ein MSI-Paket, ein Docker-Image, cargo oder ein Entwicklungs-Build). Das bestimmt, wie Updates angewendet werden, siehe [Updates](updates.md). |
 
 Eine Zeile, die Ihr Administrator in der computerweiten Update-Richtlinie gesetzt hat, zeigt **Vom Administrator festgelegt** und lässt sich hier nicht ändern.
 

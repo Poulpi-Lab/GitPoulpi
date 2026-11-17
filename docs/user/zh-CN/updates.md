@@ -40,12 +40,10 @@ GitPoulpi 会检查是否有更新的发布版本，并根据安装方式，要�
 | Windows 安装程序，所有用户 | GitHub 发布版本 | 同上，但 Windows 会请求管理员批准。这台电脑上其他用户的 GitPoulpi 会话会被关闭，其未保存的输入会丢失。如果你拒绝，则不会有任何更改。 | **回退**会换回，提示相同。 |
 | Chocolatey | Chocolatey 社区源 | **运行更新**会运行 `choco upgrade gitpoulpi -y`（Windows 会请求管理员批准）。 | 面板显示 `choco install gitpoulpi --version <previous> --allow-downgrade -y`。 |
 | Chocolatey，内部源 | 你所在组织的源 | **运行更新**会运行 `choco upgrade gitpoulpi -y --source=<feed>`。不会再次发送软件包参数，因此已部署的配置保持不变。 | 同样的 `choco install` 行，带上该源。 |
-| winget | GitHub 发布版本 | **运行更新**会运行 `winget upgrade --id GitPoulpi.GitPoulpi --exact --silent`，并已接受协议。当安装是整台机器范围时，winget 自己会请求管理员批准。 | 面板显示 `winget install --id GitPoulpi.GitPoulpi --version <previous>`。 |
 | Scoop | GitHub 发布版本 | GitPoulpi 完全关闭后，**运行更新**会运行 `scoop update gitpoulpi`。 | **回退**会运行 `scoop reset gitpoulpi@<previous>`。 |
 | Homebrew | GitHub 发布版本 | **运行更新**会在此终端中运行 `brew upgrade gitpoulpi`。 | 面板显示 `brew install gitpoulpi@<previous>`。 |
 | apt | GitHub 发布版本 | 面板显示 `sudo apt update && sudo apt install --only-upgrade gitpoulpi`，并提供**复制命令**和**在终端中打开**。GitPoulpi 绝不会替你运行 `sudo`。如果这台电脑上没有 GitPoulpi 的 apt 软件源，面板会提示改为下载新的 `.deb`。 | 面板显示 `sudo apt install gitpoulpi=<previous>`。 |
 | MSI 软件包 | GitHub 发布版本，或你的管理员提供的来源 | 无需运行任何内容：此安装由你的管理员管理，面板会显示管理员的留言。 | 不提供。 |
-| AUR | GitHub 发布版本 | 面板显示 `yay -S gitpoulpi-bin`（或 `paru`，先找到哪个用哪个；没有助手时，显示 `git clone` 和 `makepkg -si` 步骤）。 | 不提供。 |
 | cargo | GitHub 发布版本 | 已安装 `cargo-binstall` 时，面板显示 `cargo binstall gitpoulpi-cli`，否则显示 `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli`。 | 同样的命令，带上上一个标签。 |
 | Docker 镜像 | GitHub 发布版本 | 无需运行任何内容：镜像是整体替换的。面板显示 `docker pull poulpilab/gitpoulpi:<version>` 和 `:latest`。参见[在 Docker 中运行](docker.md)。 | 面板显示 `docker pull poulpilab/gitpoulpi:<previous>`。 |
 | 放在你无法写入的文件夹中的发布压缩包 | GitHub 发布版本 | 面板会说明 GitPoulpi 无法在那里替换自身，并指向**下载**。 | 不提供。 |
@@ -83,7 +81,7 @@ GitPoulpi 会检查是否有更新的发布版本，并根据安装方式，要�
 
 ## 检查什么、拒绝什么
 
-在替换任何东西之前，GitPoulpi 会下载压缩包、它的 `.minisig` 签名和它的 `.sha256`。它先校验签名，使用的是内置在 GitPoulpi 中的项目发布密钥，且签名的受信任注释必须写明这个压缩包和这个版本。然后再校验哈希。它会拒绝：没有 `.minisig` 的发布版本（在发布开始签名之前发布的旧版本无法通过更新程序安装，包括固定到或回到某个旧版本）、由另一个密钥签的签名、针对另一个文件或另一个版本的签名、没有 `.sha256` 的发布版本、不匹配的哈希、文件名不是适用于当前平台的名称（`gitpoulpi-<version>-<target>.<zip|tar.gz>`）的压缩包、标记指向另一个版本或平台的压缩包，以及指向 GitHub 发布主机（每一次重定向都会检查）或管理员配置的镜像之外的下载链接。替换要么全部完成，要么全都不做：如果另一个程序占用着其中一个可执行文件，GitPoulpi 会指出是哪个文件，不改动任何内容，并保留已下载的文件以便再试。在 Windows 上，所有用户的更新会由提权的步骤重新校验，它自己下载 `.minisig` 和 `.sha256` 并再次检查两者，因此其间在用户下载文件夹中被调包的文件会被拒绝。包管理器（Chocolatey、winget、Scoop、Homebrew、apt、AUR）会校验它们自己的软件包：GitPoulpi 在那里不下载任何东西。
+在替换任何东西之前，GitPoulpi 会下载压缩包、它的 `.minisig` 签名和它的 `.sha256`。它先校验签名，使用的是内置在 GitPoulpi 中的项目发布密钥，且签名的受信任注释必须写明这个压缩包和这个版本。然后再校验哈希。它会拒绝：没有 `.minisig` 的发布版本（在发布开始签名之前发布的旧版本无法通过更新程序安装，包括固定到或回到某个旧版本）、由另一个密钥签的签名、针对另一个文件或另一个版本的签名、没有 `.sha256` 的发布版本、不匹配的哈希、文件名不是适用于当前平台的名称（`gitpoulpi-<version>-<target>.<zip|tar.gz>`）的压缩包、标记指向另一个版本或平台的压缩包，以及指向 GitHub 发布主机（每一次重定向都会检查）或管理员配置的镜像之外的下载链接。替换要么全部完成，要么全都不做：如果另一个程序占用着其中一个可执行文件，GitPoulpi 会指出是哪个文件，不改动任何内容，并保留已下载的文件以便再试。在 Windows 上，所有用户的更新会由提权的步骤重新校验，它自己下载 `.minisig` 和 `.sha256` 并再次检查两者，因此其间在用户下载文件夹中被调包的文件会被拒绝。包管理器（Chocolatey、Scoop、Homebrew、apt）会校验它们自己的软件包：GitPoulpi 在那里不下载任何东西。
 
 ## 安全公告
 

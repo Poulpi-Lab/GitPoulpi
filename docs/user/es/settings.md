@@ -284,7 +284,7 @@ También en esta página, bajo **Actualizaciones**:
 |---|---|
 | **Buscar actualizaciones** | Un desplegable (`updates.mode`): **Notificar** (por defecto) comprueba una vez al día en segundo plano y muestra `vX.Y.Z disponible` en la barra de título; **Auto** además descarga la actualización en segundo plano cuando GitPoulpi se instaló desde un paquete de versión (tú eliges cuándo reiniciar); **Desactivado** nunca hace ninguna petición. Se aplica al instante. Consulta [Actualizaciones](updates.md). |
 | **Canal de actualización** | Un desplegable (`updates.channel`): **Estable** (por defecto) o **Preliminar** (también versiones candidatas). Se aplica al instante. |
-| **Instalado con** | Solo lectura. Cómo llegó GitPoulpi a este equipo (un archivo de versión, el instalador para este usuario o para todos, Chocolatey, winget, Scoop, Homebrew, apt, un paquete MSI, el AUR, una imagen de Docker, cargo o una compilación de desarrollo). Decide cómo se aplican las actualizaciones, consulta [Actualizaciones](updates.md). |
+| **Instalado con** | Solo lectura. Cómo llegó GitPoulpi a este equipo (un archivo de versión, el instalador para este usuario o para todos, Chocolatey, Scoop, Homebrew, apt, un paquete MSI, una imagen de Docker, cargo o una compilación de desarrollo). Decide cómo se aplican las actualizaciones, consulta [Actualizaciones](updates.md). |
 
 Una fila que tu administrador ha fijado en la política de actualización para todo el equipo muestra **Fijado por tu administrador** y no se puede cambiar aquí.
 

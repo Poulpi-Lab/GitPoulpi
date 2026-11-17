@@ -116,20 +116,18 @@ PATH, 바로 가기에 대해 묻습니다.
 | 채널 | 설치 | 비고 |
 |---|---|---|
 | **Chocolatey** (Windows) | `choco install gitpoulpi` | 모든 사용자용으로 설치되므로 업데이트에 관리자 승인이 필요합니다. |
-| **winget** (Windows) | `winget install --id GitPoulpi.GitPoulpi` | `--scope user` 또는 `--scope machine`을 붙여 선택합니다. machine 범위는 설치할 때와 업데이트마다 관리자 승인을 요청합니다. |
 | **Scoop** (Windows) | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` 다음 `scoop install gitpoulpi` | 사용자별, 관리자 권한 없음. |
 | **Homebrew** (macOS, Linux) | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | tap은 `Poulpi-Lab/homebrew-gitpoulpi`입니다. |
 | **apt** (Debian, Ubuntu) | [apt 저장소](#apt-debian-ubuntu) 참고 | 서명된 저장소. 모든 릴리스에 `.deb`도 첨부됩니다. |
 | **MSI** (Windows, 관리형) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | 관리자용: 모든 사용자, 앱 내 업데이트 없음. [엔터프라이즈 배포](enterprise-distribution.md#msi-intune-또는-그룹-정책)를 참고하세요. |
-| **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (또는 `paru -S gitpoulpi-bin`) | 도우미가 없으면: `git clone https://aur.archlinux.org/gitpoulpi-bin.git` 다음 `cd gitpoulpi-bin && makepkg -si`. |
 | **cargo** | `cargo binstall gitpoulpi-cli` | 컴파일하지 않고 릴리스 아카이브를 내려받습니다. |
 | **cargo, crates.io에서** | `cargo install --locked gitpoulpi-cli` | 컴파일합니다. Rust 툴체인이 필요합니다. 하위 명령 없이 실행하면 터미널 UI를 여는 `gitpoulpi`를 설치하며, MCP(`gitpoulpi mcp`)도 제공합니다. `gitpoulpi-tui`와 `gitpoulpi-mcp`는 같은 프로그램을 독립 크레이트로 낸 것입니다. |
 | **cargo, 소스에서** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | 컴파일합니다. Rust 툴체인이 필요합니다. |
-| **Docker** | `docker pull poulpilab/gitpoulpi` | [Docker에서 실행하기](docker.md)를 참고하세요. 같은 이미지가 `ghcr.io/poulpi-lab/gitpoulpi`에도 있습니다. |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | [Docker에서 실행하기](docker.md)를 참고하세요. |
 
 위의 이름은 릴리스 절차가 게시하는 대상입니다([릴리스](../../developer/releasing.md) 참고). 아직 게시되지 않은 채널은 "찾을 수 없음"으로 응답하며, 릴리스 아카이브나 설치 프로그램은 항상 동작합니다.
 
-패키지 관리자 자체의 PATH 처리가 적용됩니다. Chocolatey, winget, Scoop, Homebrew는 프로그램을 PATH에 직접 올려 주며, 어느 것도 `gp` 별칭을 만들지 않습니다(`gitpoulpi alias create gp`를 실행하거나 설정 > 런처를 사용하세요).
+패키지 관리자 자체의 PATH 처리가 적용됩니다. Chocolatey, Scoop, Homebrew는 프로그램을 PATH에 직접 올려 주며, 어느 것도 `gp` 별칭을 만들지 않습니다(`gitpoulpi alias create gp`를 실행하거나 설정 > 런처를 사용하세요).
 
 ### apt (Debian, Ubuntu)
 

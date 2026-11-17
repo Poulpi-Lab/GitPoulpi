@@ -2,7 +2,7 @@
 
 # Köra i Docker
 
-Avbilden `poulpilab/gitpoulpi` innehåller de officiella releasebinärerna (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) på `debian:bookworm-slim`, med `git`, `git-lfs`, `openssh-client`, `less` och `tini`. Den körs på `linux/amd64` och `linux/arm64`. Den finns på Docker Hub; samma taggar finns också på `ghcr.io/poulpi-lab/gitpoulpi`, och allt nedan fungerar med båda namnen.
+Avbilden `poulpilab/gitpoulpi` innehåller de officiella releasebinärerna (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) på `debian:bookworm-slim`, med `git`, `git-lfs`, `openssh-client`, `less` och `tini`. Den körs på `linux/amd64` och `linux/arm64`. Den finns på Docker Hub.
 
 ## Starta gränssnittet
 

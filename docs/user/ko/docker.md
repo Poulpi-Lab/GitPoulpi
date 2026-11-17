@@ -2,7 +2,7 @@
 
 # Docker에서 실행하기
 
-`poulpilab/gitpoulpi` 이미지에는 `debian:bookworm-slim` 위에 공식 릴리스 바이너리(`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`)와 `git`, `git-lfs`, `openssh-client`, `less`, `tini`가 들어 있습니다. `linux/amd64`와 `linux/arm64`에서 실행됩니다. Docker Hub에 있으며 같은 태그가 `ghcr.io/poulpi-lab/gitpoulpi`에도 있고, 아래의 모든 내용은 어느 이름으로도 동작합니다.
+`poulpilab/gitpoulpi` 이미지에는 `debian:bookworm-slim` 위에 공식 릴리스 바이너리(`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`)와 `git`, `git-lfs`, `openssh-client`, `less`, `tini`가 들어 있습니다. `linux/amd64`와 `linux/arm64`에서 실행됩니다. Docker Hub에 있습니다.
 
 ## UI 시작하기
 

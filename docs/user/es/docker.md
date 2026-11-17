@@ -2,7 +2,7 @@
 
 # Ejecutar en Docker
 
-La imagen `poulpilab/gitpoulpi` contiene los ejecutables oficiales de las versiones (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) sobre `debian:bookworm-slim`, con `git`, `git-lfs`, `openssh-client`, `less` y `tini`. Funciona en `linux/amd64` y `linux/arm64`. Está en Docker Hub; las mismas etiquetas están también en `ghcr.io/poulpi-lab/gitpoulpi`, y todo lo que sigue vale con cualquiera de los dos nombres.
+La imagen `poulpilab/gitpoulpi` contiene los ejecutables oficiales de las versiones (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) sobre `debian:bookworm-slim`, con `git`, `git-lfs`, `openssh-client`, `less` y `tini`. Funciona en `linux/amd64` y `linux/arm64`. Está en Docker Hub.
 
 ## Iniciar la interfaz
 

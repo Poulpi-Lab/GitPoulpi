@@ -287,7 +287,7 @@ Also on this page, under **Updates**:
 |---|---|
 | **Check for updates** | A dropdown (`updates.mode`): **Notify** (default) checks once a day in the background and shows `vX.Y.Z available` in the title bar; **Auto** also downloads the update in the background when GitPoulpi was installed from a release archive (you still choose when to restart); **Off** never makes a request. Applies at once. See [Updates](updates.md). |
 | **Update channel** | A dropdown (`updates.channel`): **Stable** (default) or **Prerelease** (also release candidates). Applies at once. |
-| **Installed with** | Read-only. How GitPoulpi got onto this computer (a release archive, the installer for this user or all users, Chocolatey, winget, Scoop, Homebrew, apt, an MSI package, the AUR, a Docker image, cargo, or a development build). It decides how updates are applied, see [Updates](updates.md). |
+| **Installed with** | Read-only. How GitPoulpi got onto this computer (a release archive, the installer for this user or all users, Chocolatey, Scoop, Homebrew, apt, an MSI package, a Docker image, cargo, or a development build). It decides how updates are applied, see [Updates](updates.md). |
 
 A row your administrator has set in the machine-wide update policy shows **Set by your administrator** and cannot be changed here.
 

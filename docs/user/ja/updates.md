@@ -40,12 +40,10 @@ GitPoulpi は新しいリリースを確認し、インストール方法に応�
 | Windows インストーラー（全ユーザー） | GitHub のリリース | 同じ動作ですが、Windows が管理者の承認を求めます。このコンピューター上の他のユーザーの GitPoulpi セッションは終了し、未保存の入力は失われます。拒否した場合は何も変わりません。 | **戻す**で入れ替えます（同じ確認あり）。 |
 | Chocolatey | Chocolatey のコミュニティフィード | **更新を実行**が `choco upgrade gitpoulpi -y` を実行します（Windows が管理者の承認を求めます）。 | パネルに `choco install gitpoulpi --version <previous> --allow-downgrade -y` が表示されます。 |
 | Chocolatey（社内フィード） | 組織のフィード | **更新を実行**が `choco upgrade gitpoulpi -y --source=<feed>` を実行します。パッケージパラメーターは再送されないため、展開済みの構成は変更されません。 | フィードを付けた同じ `choco install` の行。 |
-| winget | GitHub のリリース | **更新を実行**が、使用許諾に同意した状態で `winget upgrade --id GitPoulpi.GitPoulpi --exact --silent` を実行します。マシン全体へのインストールの場合、管理者の承認は winget 自身が求めます。 | パネルに `winget install --id GitPoulpi.GitPoulpi --version <previous>` が表示されます。 |
 | Scoop | GitHub のリリース | **更新を実行**が、GitPoulpi が完全に終了した後に `scoop update gitpoulpi` を実行します。 | **戻す**が `scoop reset gitpoulpi@<previous>` を実行します。 |
 | Homebrew | GitHub のリリース | **更新を実行**が、このターミナルで `brew upgrade gitpoulpi` を実行します。 | パネルに `brew install gitpoulpi@<previous>` が表示されます。 |
 | apt | GitHub のリリース | パネルに `sudo apt update && sudo apt install --only-upgrade gitpoulpi` が表示され、**コマンドをコピー**と**ターミナルで開く**が使えます。GitPoulpi があなたに代わって `sudo` を実行することはありません。このコンピューターに GitPoulpi の apt リポジトリがない場合は、代わりに新しい `.deb` をダウンロードするよう案内されます。 | パネルに `sudo apt install gitpoulpi=<previous>` が表示されます。 |
 | MSI パッケージ | GitHub のリリース、または管理者の提供元 | 実行するものはありません：このインストールは管理者が管理しており、パネルには管理者のメッセージが表示されます。 | 提供されません。 |
-| AUR | GitHub のリリース | パネルに `yay -S gitpoulpi-bin` が表示されます（`paru` も可。最初に見つかったほう。ヘルパーがなければ `git clone` と `makepkg -si` の手順）。 | 提供されません。 |
 | cargo | GitHub のリリース | `cargo-binstall` があれば `cargo binstall gitpoulpi-cli`、なければ `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` がパネルに表示されます。 | 前のタグを指定した同じコマンド。 |
 | Docker イメージ | GitHub のリリース | 実行するものはありません：イメージは置き換えるものです。パネルに `docker pull poulpilab/gitpoulpi:<version>` と `:latest` が表示されます。[Docker で実行する](docker.md)を参照してください。 | パネルに `docker pull poulpilab/gitpoulpi:<previous>` が表示されます。 |
 | 書き込めないフォルダー内のリリースアーカイブ | GitHub のリリース | パネルには、GitPoulpi がそこでは自分を置き換えられないことと、**ダウンロード**への案内が表示されます。 | 提供されません。 |
@@ -83,7 +81,7 @@ GitPoulpi が自分のファイルを置き換える場合、**戻す**は前の
 
 ## 検証されるもの、拒否されるもの
 
-何かを置き換える前に、GitPoulpi はアーカイブと、その `.minisig` 署名、`.sha256` をダウンロードします。まず、GitPoulpi に組み込まれたプロジェクトのリリース鍵で署名を検証し、署名の信頼済みコメントがこのアーカイブとこのバージョンを指している必要があります。次にハッシュを確認します。次のものは拒否されます：`.minisig` のないリリース（リリースが署名されるようになる前に公開された古いリリースは、更新プログラム経由ではインストールできません。そのバージョンへの固定や戻しも同様です）、別の鍵による署名、別のファイルや別のバージョンに対する署名、`.sha256` のないリリース、一致しないハッシュ、このプラットフォーム用の名前（`gitpoulpi-<version>-<target>.<zip|tar.gz>`）ではないアーカイブ、マーカーが別のバージョンやプラットフォームを指しているアーカイブ、そして GitHub のリリースホスト（すべてのリダイレクト先が対象）または管理者が設定したミラー以外へのダウンロードリンクです。入れ替えは全部成功するか何も行われないかのどちらかです。別のプログラムが実行ファイルのどれかを使用中の場合、GitPoulpi はそのファイル名を示し、何も変更せず、ダウンロードしたものを残して再試行できるようにします。Windows では、全ユーザー向けの更新は昇格したステップで再検証されます。このステップが `.minisig` と `.sha256` を自分でダウンロードして両方をもう一度確認するため、その間にユーザーのダウンロードフォルダーで差し替えられたファイルは拒否されます。パッケージマネージャー（Chocolatey、winget、Scoop、Homebrew、apt、AUR）は自分でパッケージを検証します。そこでは GitPoulpi は何もダウンロードしません。
+何かを置き換える前に、GitPoulpi はアーカイブと、その `.minisig` 署名、`.sha256` をダウンロードします。まず、GitPoulpi に組み込まれたプロジェクトのリリース鍵で署名を検証し、署名の信頼済みコメントがこのアーカイブとこのバージョンを指している必要があります。次にハッシュを確認します。次のものは拒否されます：`.minisig` のないリリース（リリースが署名されるようになる前に公開された古いリリースは、更新プログラム経由ではインストールできません。そのバージョンへの固定や戻しも同様です）、別の鍵による署名、別のファイルや別のバージョンに対する署名、`.sha256` のないリリース、一致しないハッシュ、このプラットフォーム用の名前（`gitpoulpi-<version>-<target>.<zip|tar.gz>`）ではないアーカイブ、マーカーが別のバージョンやプラットフォームを指しているアーカイブ、そして GitHub のリリースホスト（すべてのリダイレクト先が対象）または管理者が設定したミラー以外へのダウンロードリンクです。入れ替えは全部成功するか何も行われないかのどちらかです。別のプログラムが実行ファイルのどれかを使用中の場合、GitPoulpi はそのファイル名を示し、何も変更せず、ダウンロードしたものを残して再試行できるようにします。Windows では、全ユーザー向けの更新は昇格したステップで再検証されます。このステップが `.minisig` と `.sha256` を自分でダウンロードして両方をもう一度確認するため、その間にユーザーのダウンロードフォルダーで差し替えられたファイルは拒否されます。パッケージマネージャー（Chocolatey、Scoop、Homebrew、apt）は自分でパッケージを検証します。そこでは GitPoulpi は何もダウンロードしません。
 
 ## セキュリティ通知
 

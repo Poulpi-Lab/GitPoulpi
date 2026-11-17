@@ -280,7 +280,7 @@ Bu sayfada ayrıca **Güncellemeler** altında şunlar vardır:
 |---|---|
 | **Güncellemeleri denetle** | Bir açılır liste (`updates.mode`): **Bildir** (varsayılan) günde bir kez arka planda denetler ve başlık çubuğunda `vX.Y.Z kullanılabilir` gösterir; **Otomatik**, GitPoulpi bir sürüm arşivinden kurulduysa güncellemeyi arka planda da indirir (ne zaman yeniden başlatacağınıza yine siz karar verirsiniz); **Kapalı** hiç istek yapmaz. Hemen uygulanır. Bkz. [Güncellemeler](updates.md). |
 | **Güncelleme kanalı** | Bir açılır liste (`updates.channel`): **Kararlı** (varsayılan) veya **Ön sürüm** (sürüm adaylarını da kapsar). Hemen uygulanır. |
-| **Kurulum yöntemi** | Salt okunur. GitPoulpi'nin bu bilgisayara nasıl geldiği (bir sürüm arşivi, bu kullanıcı veya tüm kullanıcılar için kurulum programı, Chocolatey, winget, Scoop, Homebrew, apt, bir MSI paketi, AUR, bir Docker imajı, cargo veya bir geliştirme derlemesi). Güncellemelerin nasıl uygulanacağını belirler, bkz. [Güncellemeler](updates.md). |
+| **Kurulum yöntemi** | Salt okunur. GitPoulpi'nin bu bilgisayara nasıl geldiği (bir sürüm arşivi, bu kullanıcı veya tüm kullanıcılar için kurulum programı, Chocolatey, Scoop, Homebrew, apt, bir MSI paketi, bir Docker imajı, cargo veya bir geliştirme derlemesi). Güncellemelerin nasıl uygulanacağını belirler, bkz. [Güncellemeler](updates.md). |
 
 Yöneticinizin makine genelindeki güncelleme politikasında ayarladığı bir satır **Yöneticiniz tarafından ayarlandı** der ve burada değiştirilemez.
 

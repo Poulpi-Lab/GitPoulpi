@@ -1,6 +1,6 @@
 # Запуск у Docker
 
-Образ `poulpilab/gitpoulpi` містить офіційні виконувані файли випуску (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) на `debian:bookworm-slim`, із `git`, `git-lfs`, `openssh-client`, `less` і `tini`. Він працює на `linux/amd64` і `linux/arm64`. Він є на Docker Hub; ті самі теги є також на `ghcr.io/poulpi-lab/gitpoulpi`, і все нижче працює з будь-якою з назв.
+Образ `poulpilab/gitpoulpi` містить офіційні виконувані файли випуску (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) на `debian:bookworm-slim`, із `git`, `git-lfs`, `openssh-client`, `less` і `tini`. Він працює на `linux/amd64` і `linux/arm64`. Він є на Docker Hub.
 
 ## Запуск інтерфейсу
 

@@ -35,17 +35,6 @@ choco install gitpoulpi --source=https://nexus.example/repository/choco-internal
 
 **Ничто в пакете не записывает `policy.toml` или `config.toml`.** Всё, что вы развернули, остаётся и при установке, и при каждом обновлении. См. [Развёртывание config.toml по умолчанию](#развёртывание-configtoml-по-умолчанию).
 
-## winget с внутренним источником
-
-winget обновляет GitPoulpi командой `winget upgrade --id GitPoulpi.GitPoulpi --exact` из того источника, из которого пришёл пакет. Для внутреннего источника разместите REST-источник диспетчера пакетов Windows (любая реализация REST API winget), опубликуйте три манифеста выпуска (`GitPoulpi.GitPoulpi.yaml`, `...installer.yaml`, `...locale.en-US.yaml`), где `InstallerUrl` указывает на вашу копию программы установки, а `InstallerSha256` ей соответствует, затем выполните:
-
-```
-winget source add --name corp --arg https://winget.example/api --type Microsoft.Rest
-winget install --id GitPoulpi.GitPoulpi --source corp
-```
-
-Сохраните ключи установщика из манифеста: `/CHANNEL=winget` заставляет маркер указать `winget`, а `/ALIAS=` исключает псевдоним `gp`. winget не сообщает GitPoulpi, что нового, поэтому проверка по-прежнему спрашивает у GitHub версию. В сети без GitHub направьте её на собственный `latest.json` с помощью политики: `check = "manifest"` (см. [latest.json](#latestjson-и-download_base-зеркало-выпуска)).
-
 ## Scoop с частным bucket
 
 Положите `gitpoulpi.json` (манифест из общего bucket) в `bucket/` репозитория Git, который вы размещаете, замените `url` на свою копию zip выпуска и задайте `hash` равным её sha256 (`autoupdate` можно оставить, если ваша копия следует именам выпусков). Затем:
@@ -116,7 +105,7 @@ brew install corp/gitpoulpi/gitpoulpi
 
 ## Зеркало реестра Docker
 
-Образ называется `poulpilab/gitpoulpi` (и `ghcr.io/poulpi-lab/gitpoulpi`). Панель всегда показывает это имя, поэтому зеркало должно быть прозрачным.
+Образ называется `poulpilab/gitpoulpi`. Панель всегда показывает это имя, поэтому зеркало должно быть прозрачным.
 
 - **Кэширующий прокси:** запустите реестр как прокси Docker Hub (образ `registry` с `proxy.remoteurl: https://registry-1.docker.io`) и задайте `"registry-mirrors": ["https://registry.example"]` в `daemon.json` демона Docker. Тогда `docker pull poulpilab/gitpoulpi` идёт через ваш кэш.
 - **Копия:** `docker pull poulpilab/gitpoulpi:<v>`, `docker tag poulpilab/gitpoulpi:<v> registry.example/tools/gitpoulpi:<v>`, `docker push registry.example/tools/gitpoulpi:<v>`, затем запускайте это имя. Панель по-прежнему показывает общедоступное, и это нормально как указание на версию.

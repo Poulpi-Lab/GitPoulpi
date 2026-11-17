@@ -2,7 +2,7 @@
 
 # 在 Docker 中运行
 
-`poulpilab/gitpoulpi` 镜像基于 `debian:bookworm-slim`，内含官方发布的可执行文件（`gitpoulpi-tui`、`gitpoulpi`、`gitpoulpi-mcp`），以及 `git`、`git-lfs`、`openssh-client`、`less` 和 `tini`。它可运行在 `linux/amd64` 和 `linux/arm64` 上。镜像位于 Docker Hub；相同的标签也在 `ghcr.io/poulpi-lab/gitpoulpi` 上，下面的所有内容用任一名称都适用。
+`poulpilab/gitpoulpi` 镜像基于 `debian:bookworm-slim`，内含官方发布的可执行文件（`gitpoulpi-tui`、`gitpoulpi`、`gitpoulpi-mcp`），以及 `git`、`git-lfs`、`openssh-client`、`less` 和 `tini`。它可运行在 `linux/amd64` 和 `linux/arm64` 上。镜像位于 Docker Hub。
 
 ## 启动界面
 

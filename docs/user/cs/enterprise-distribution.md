@@ -35,17 +35,6 @@ Aktualizace GitPoulpi spouští `choco upgrade` bez `--params`, aby se nic z toh
 
 **Nic v balíčku nezapisuje `policy.toml` ani `config.toml`.** Co jste nasadili, zůstává, při instalaci i při každém upgradu. Viz [Nasazení výchozího config.toml](#nasazení-výchozího-configtoml).
 
-## winget s interním zdrojem
-
-winget aktualizuje GitPoulpi příkazem `winget upgrade --id GitPoulpi.GitPoulpi --exact` ze zdroje, ze kterého balíček přišel. Pro interní zdroj zprovozněte zdroj REST Windows Package Manager (libovolná implementace REST API wingetu), publikujte tři manifesty vydání (`GitPoulpi.GitPoulpi.yaml`, `...installer.yaml`, `...locale.en-US.yaml`) s `InstallerUrl` ukazujícím na vaši kopii instalačního programu a odpovídajícím `InstallerSha256`, pak:
-
-```
-winget source add --name corp --arg https://winget.example/api --type Microsoft.Rest
-winget install --id GitPoulpi.GitPoulpi --source corp
-```
-
-Ponechte přepínače instalačního programu z manifestu: `/CHANNEL=winget` způsobí, že značka říká `winget`, a `/ALIAS=` vynechá alias `gp`. winget GitPoulpi neřekne, co je nové, takže kontrola se na verzi stále ptá GitHubu. V síti bez GitHubu ji nasměrujte na vlastní `latest.json` politikou: `check = "manifest"` (viz [latest.json](#latestjson-a-download_base-zrcadlo-vydání)).
-
 ## Scoop se soukromým bucketem
 
 Vložte `gitpoulpi.json` (manifest z veřejného bucketu) do `bucket/` repozitáře Git, který hostujete, změňte `url` na vlastní kopii zip archivu vydání a nastavte `hash` na jeho sha256 (`autoupdate` může zůstat, pokud vaše kopie sleduje názvy vydání). Pak:
@@ -116,7 +105,7 @@ Formule nainstaluje značku s `channel=homebrew`: GitPoulpi sám spouští `brew
 
 ## Zrcadlo registru Dockeru
 
-Název obrazu je `poulpilab/gitpoulpi` (a `ghcr.io/poulpi-lab/gitpoulpi`). Panel vždy ukazuje tento název, takže zrcadlo musí být průhledné.
+Název obrazu je `poulpilab/gitpoulpi`. Panel vždy ukazuje tento název, takže zrcadlo musí být průhledné.
 
 - **Pull-through cache:** spusťte registr jako proxy Docker Hubu (obraz `registry` s `proxy.remoteurl: https://registry-1.docker.io`) a nastavte `"registry-mirrors": ["https://registry.example"]` v `daemon.json` daemona Dockeru. `docker pull poulpilab/gitpoulpi` pak půjde přes vaši cache.
 - **Kopie:** `docker pull poulpilab/gitpoulpi:<v>`, `docker tag poulpilab/gitpoulpi:<v> registry.example/tools/gitpoulpi:<v>`, `docker push registry.example/tools/gitpoulpi:<v>`, pak spusťte tento název. Panel stále ukazuje veřejný, což je v pořádku jako odkaz na verzi.

@@ -35,17 +35,6 @@ GitPoulpi's update runs `choco upgrade` without `--params`, so that nothing you 
 
 **Nothing in the package writes `policy.toml` or `config.toml`.** Whatever you deployed stays, on install and on every upgrade. See [Deploying a default config.toml](#deploying-a-default-configtoml).
 
-## winget, with an internal source
-
-winget updates GitPoulpi with `winget upgrade --id GitPoulpi.GitPoulpi --exact`, using whichever source the package came from. For an internal source, host a Windows Package Manager REST source (any implementation of the winget REST API), publish the three manifests of the release (`GitPoulpi.GitPoulpi.yaml`, `...installer.yaml`, `...locale.en-US.yaml`) with `InstallerUrl` pointing at your copy of the setup program and the matching `InstallerSha256`, then:
-
-```
-winget source add --name corp --arg https://winget.example/api --type Microsoft.Rest
-winget install --id GitPoulpi.GitPoulpi --source corp
-```
-
-Keep the installer switches of the manifest: `/CHANNEL=winget` makes the marker say `winget`, and `/ALIAS=` leaves out the `gp` alias. winget does not tell GitPoulpi what is new, so the check still asks GitHub for the version. On a network without GitHub, point it at your own `latest.json` with a policy: `check = "manifest"` (see [latest.json](#latestjson-and-download_base-a-mirror-of-the-release)).
-
 ## Scoop, with a private bucket
 
 Put `gitpoulpi.json` (the manifest from the public bucket) into `bucket/` of a Git repository you host, change `url` to your copy of the release zip and set `hash` to its sha256 (`autoupdate` can stay if your copy follows the release names). Then:
@@ -116,7 +105,7 @@ The formula installs the marker with `channel=homebrew`: GitPoulpi runs `brew up
 
 ## Docker registry mirror
 
-The image name is `poulpilab/gitpoulpi` (and `ghcr.io/poulpi-lab/gitpoulpi`). The panel always shows that name, so a mirror has to be transparent.
+The image name is `poulpilab/gitpoulpi`. The panel always shows that name, so a mirror has to be transparent.
 
 - **Pull-through cache:** run a registry as a proxy of Docker Hub (the `registry` image with `proxy.remoteurl: https://registry-1.docker.io`) and set `"registry-mirrors": ["https://registry.example"]` in the Docker daemon's `daemon.json`. `docker pull poulpilab/gitpoulpi` then goes through your cache.
 - **Copy:** `docker pull poulpilab/gitpoulpi:<v>`, `docker tag poulpilab/gitpoulpi:<v> registry.example/tools/gitpoulpi:<v>`, `docker push registry.example/tools/gitpoulpi:<v>`, then run that name. The panel still shows the public one, which is fine as a pointer to the version.

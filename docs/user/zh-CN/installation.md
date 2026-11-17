@@ -97,12 +97,10 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 | 通道 | 安装 | 说明 |
 |---|---|---|
 | **Chocolatey**（Windows） | `choco install gitpoulpi` | 为所有用户安装，所以更新会请求管理员批准。 |
-| **winget**（Windows） | `winget install --id GitPoulpi.GitPoulpi` | 加上 `--scope user` 或 `--scope machine` 来选择；machine 范围在安装和每次更新时都会请求管理员批准。 |
 | **Scoop**（Windows） | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` 然后 `scoop install gitpoulpi` | 按用户安装，不需要管理员权限。 |
 | **Homebrew**（macOS、Linux） | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | tap 是 `Poulpi-Lab/homebrew-gitpoulpi`。 |
 | **apt**（Debian、Ubuntu） | 见 [apt 软件源](#aptdebian-和-ubuntu) | 已签名的软件源；每个发布版本还附带一个 `.deb`。 |
 | **MSI**（Windows，受管理） | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | 面向管理员：所有用户，没有应用内更新。见[企业分发](enterprise-distribution.md#msi使用-intune-或组策略)。 |
-| **AUR**（Arch Linux） | `yay -S gitpoulpi-bin`（或 `paru -S gitpoulpi-bin`） | 没有助手时：`git clone https://aur.archlinux.org/gitpoulpi-bin.git`，然后 `cd gitpoulpi-bin && makepkg -si`。 |
 | **cargo** | `cargo binstall gitpoulpi-cli` | 下载发布压缩包而不是编译。 |
 | **cargo，来自 crates.io** | `cargo install --locked gitpoulpi-cli` | 需要编译；需要 Rust 工具链。安装 `gitpoulpi`，不带子命令运行时打开终端界面，同时提供 MCP 服务（`gitpoulpi mcp`）。`gitpoulpi-tui` 和 `gitpoulpi-mcp` 是作为独立 crate 提供的同一批程序。 |
 | **cargo，从源码** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | 需要编译；需要 Rust 工具链。 |
@@ -110,7 +108,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 
 上面的名称是发布流程所发布到的名称（见[发布](../../developer/releasing.md)）：尚未上线的通道会回答“not found”，而发布压缩包或安装程序始终可用。
 
-包管理器自己的 PATH 处理会生效：Chocolatey、winget、Scoop 和 Homebrew 会自己把程序放进 PATH，而且它们都不会创建 `gp` 别名（请运行 `gitpoulpi alias create gp`，或使用设置 > 启动器）。
+包管理器自己的 PATH 处理会生效：Chocolatey、Scoop 和 Homebrew 会自己把程序放进 PATH，而且它们都不会创建 `gp` 别名（请运行 `gitpoulpi alias create gp`，或使用设置 > 启动器）。
 
 ### apt（Debian 和 Ubuntu）
 

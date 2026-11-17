@@ -178,7 +178,7 @@ Par défaut, une ligne sous les volets et au-dessus de la ligne d'état. **Param
 | **Flow** `▾` | Le menu du workflow de branches (démarrer, terminer, synchroniser, promouvoir ; `Ctrl+G Shift+W`). Seulement dans un dépôt qui a un workflow. Voir [Workflows de branches](branching-workflows.md). |
 | **Chercher** | Ouvre la barre de recherche de commits au-dessus du Log (`f`). |
 
-À l'extrémité (la droite d'une ligne, le bas d'une colonne), quand le dépôt est lié à un hébergeur, une **pastille** montre la pull request de la branche extraite (par exemple `GH #12` ou `GL !53`), ou un `+ PR` estompé. **Paramètres > Apparence > Épingler le bouton pull request en bout de barre** (activé par défaut) l'y garde ; désactivé, elle suit les autres boutons et leur alignement. Voir [Hébergeurs et suivi de tickets](hosting-integration.md). En colonne, la liste déroulante de profils prend la dernière ligne.
+À l'extrémité (la droite d'une ligne, le bas d'une colonne), quand le dépôt est lié à un hébergeur, une **pastille** montre la pull request de la branche extraite (par exemple `GH #12` ou `GL !53`), ou un `+ PR` estompé. **Paramètres > Apparence > Épingler le bouton pull request en bout de barre** (activé par défaut) l'y garde ; désactivé, elle suit les autres boutons et leur alignement. Sur une ligne étroite, la pastille rétrécit d'abord (`● #12`, puis le glyphe d'état seul) et ne passe qu'ensuite dans le menu `⋯`. Voir [Hébergeurs et suivi de tickets](hosting-integration.md). En colonne, la liste déroulante de profils prend la dernière ligne.
 
 À l'extrémité droite, quand vous avez au moins deux [profils](settings.md#profils),
 la **liste déroulante de profils** choisit l'identité de commit pour ce dépôt.

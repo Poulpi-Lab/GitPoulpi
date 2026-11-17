@@ -6,6 +6,8 @@ En worktree är en andra utcheckad kopia av repositoryt: en annan mapp, på en
 annan gren, med samma historik. Avsnittet WORKTREES i Refs-panelen listar dem;
 den huvudsakliga är markerad `(main)`.
 
+![Refs-panelen i ett repository med två länkade worktrees: avsnittet WORKTREES listar main (main), hotfix/axis-labels och feature/legend, med avsnittet SUBMODULER under](../images/worktrees.png)
+
 ## Visa avsnittet
 
 Avsnittet är dolt i ett repository som ännu inte har någon länkad worktree. För
@@ -33,6 +35,8 @@ Paletten har samma tre (**Refs: Skapa worktree från aktuell gren**,
 **Git: Skapa worktree vid vald commit...**, **Refs: Skapa worktree och välj en
 gren**). De äldre posterna fungerar fortfarande: **Skapa worktree från** i en
 gren-, tag- eller commit-meny.
+
+![Dialogrutan Skapa worktree: fälten Namn, Mapp, Ref och Worktree-gren, raden ”ny gren från main”, rutan Öppna den nya worktree som flik och knapparna Avbryt och Skapa](../images/worktree-create.png)
 
 Dialogrutan föreslår allt och låter dig ändra det. **Namn** och den nya grenen
 börjar båda som `worktree-<id>`, där `<id>` är 8 slumpmässiga hexadecimala
@@ -78,6 +82,13 @@ Högerklicka på en worktree (eller markera den och tryck på menytangenten,
   vanliga konfliktflödet. En gren som inte är utcheckad någonstans nekas med
   orsaken. Erbjuds inte för en frånkopplad worktree.
 - **Ta bort worktree...**: aldrig den huvudsakliga.
+
+![Högerklicksmenyn för en worktree-rad: Öppna i ny flik, Öppna i, Merge hotfix/axis-labels i... och Ta bort worktree...](../images/worktree-menu.png)
+
+**Öppna i ny flik** (eller ett dubbelklick, eller `Enter`) öppnar worktreens mapp som en
+egen flik, med sin egen Log, status och gren:
+
+![Worktreen hotfix/axis-labels öppnad som en egen flik bredvid huvudfliken, med sin commit och ändrade fil](../images/worktree-tab.png)
 
 Paletten har samma åtgärder på den markerade raden (**Refs: Öppna worktree
 i...**, **Refs: Merge worktreens gren i...**, **Refs: Ta bort worktree...**,

@@ -13,9 +13,9 @@ med påhittade författare.
 ### Titelrad
 
 Fönstrets överkant lyder
-`🐙 GitPoulpi vX.Y.Z -- <repositorysökväg>` (sessionens namn står på statusraden, längst ned som standard).
+<img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi-ikon" height="16"> `GitPoulpi vX.Y.Z -- <repositorysökväg>` (sessionens namn står på statusraden, längst ned som standard).
 
-- **🐙** öppnar fönstret **Om GitPoulpi**: version, byggfunktioner, licens, länkar,
+- **<img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi-ikon" height="16">** öppnar fönstret **Om GitPoulpi**: version, byggfunktioner, licens, länkar,
   en kort notis om att GitPoulpi är ett oberoende projekt, tredjepartscraten samt
   licenserna och erkännandena. På en terminal som ritar bilder är bläckfisken
   pixellogotypen, i din logotypfärg (annars förblir den en emoji). Palett:

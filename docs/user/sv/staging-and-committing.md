@@ -18,6 +18,9 @@ de lokala ändringarna:
 - **Unstaged-filer**: redigerade, tillagda (ospårade) och borttagna filer som
   ännu inte är med i nästa commit.
 - **Staged-filer**: det nästa commit kommer att innehålla.
+- **Filer med konflikt** (ett rött `!`, medan en merge, rebase, cherry-pick eller revert
+  är stoppad): `Enter` öppnar merge-redigeraren, se
+  [Lösa merge-konflikter](merge-conflicts.md).
 - **Filer som bytt namn eller flyttats** är en enda rad, `nytt <- gammalt`, i båda listorna (en fil som raderats på
   disk och en ny med minst 50 % samma innehåll räknas som en flytt redan innan du stagear dem). Stage, Unstage och
   Förkasta verkar på båda namnen: att stagea stagear borttagningen och den nya filen, så git ser en enda namnändring, och det är ETT ångrasteg (`Undo Stage rename gammalt -> nytt`).
@@ -176,8 +179,10 @@ fältet på raden med lokala ändringar i Log: det du skriver i det ena syns i d
 - **Hoppa över hooks** (`Shift+H`, eller **Commit: Växla att hoppa över hooks** i paletten) committar
   utan att köra repositoryts hooks `pre-commit` och `commit-msg`. Det gäller en
   enskild commit; **Inställningar > Repo-specifika inställningar > Commit** gör att det är
-  ikryssat från början. På en smal rad krymper etiketten till **Utan hooks** och sedan till bara rutan (verktygstipset
-  namnger den); den försvinner aldrig.
+  ikryssat från början. Den har en egen rad strax under **Amend föregående commit**, med sin fulla
+  etikett; först i en mycket smal ruta krymper etiketten till **Utan hooks** och sedan till bara
+  rutan (verktygstipset namnger den). Den försvinner aldrig. I ett mycket lågt
+  formulär delar den i stället Amend-raden och krymper på samma sätt.
 - `c` i Status-rutan flyttar markören till formuläret. `Esc` lämnar det.
 - `Ctrl+G c` och `Ctrl+G Enter` (**Git: Commit...** och **Git: Commita stagade
   ändringar nu** i paletten) är ett och samma kommando, commit-knappen varifrån
@@ -204,8 +209,7 @@ att du ska redigera den; inget committas förrän du trycker på commit-knappen.
 
 **Komponera commits med AI** sitter längst till höger på Amend-raden och krymper med högerpanelen i stället för att
 försvinna: hela etiketten, sedan **Komponera med AI**, sedan bara **`✦`**. Den behåller sitt klick, sitt
-verktygstips och sin tangent (`Ctrl+G Shift+C`) i varje bredd; etiketten Hoppa över hooks viker sig för den
-(**Utan hooks**, sedan bara rutan) innan den själv krymper.
+verktygstips och sin tangent (`Ctrl+G Shift+C`) i varje bredd.
 
 Knapparna **`✦`** (generera meddelandet) och **`#`** (infoga en ärendereferens) längst till höger på sammanfattningsraden
 krymper på samma sätt: i en smal ruta förlorar de sina marginaler och viks sedan ihop till en enda **`⋯`**-knapp vars

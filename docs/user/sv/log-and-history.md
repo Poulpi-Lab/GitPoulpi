@@ -196,7 +196,9 @@ ett). Högerklicka på en stash-rad, i Log eller i avsnittet STASHES, för **Pop
 dialog som föreslår en mapp bredvid repositoryt, ett valfritt nytt grennamn och
 ”Öppna den nya worktree som flik”. Worktrees visas i avsnittet WORKTREES;
 dubbelklicka på en för att öppna den, och dess flik stängs av sig själv när
-worktreen tas bort.
+worktreen tas bort. Hela funktionen (öppna i ett annat verktyg, merga en
+worktrees gren, ta bort) finns i [Worktrees](worktrees.md); avsnittet SUBMODULER
+i samma ruta finns i [Submoduler](submodules.md).
 
 ## Dra refs till commits
 

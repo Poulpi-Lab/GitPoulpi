@@ -15,6 +15,8 @@ När ett repository har en `.gitmodules` får sidopanelen Refs ett avsnitt **SUB
 | `○` | inte klonad | deklarerad i `.gitmodules` och registrerad, men dess mapp är tom: uppdatera den för att klona den |
 | `✗` | i konflikt | repositoryt har merge-konflikter på submodulen |
 
+![Avsnittet SUBMODULER med tre rader: vendor/almanac inte klonad (○), vendor/ephemeris uppdaterad (✓) och vendor/starfield ändrad (↑, vid en annan commit än den registrerade), vilket också syns som en ändrad fil i Status-rutan](../images/submodules.png)
+
 | Gör | Mus | Tangentbord |
 |---|---|---|
 | Öppna submodulen som en egen flik | dubbelklicka på raden | markera den, `Enter` (palett: `Refs: Öppna submodul i flik`) |
@@ -23,6 +25,8 @@ När ett repository har en `.gitmodules` får sidopanelen Refs ett avsnitt **SUB
 | Registrera den i `.git/config` utan att klona | meny | `Ctrl+P`: `Refs: Initiera submodul (vald)` |
 | Uppdatera varje submodul | | `Ctrl+P`: `Git: Uppdatera alla submoduler` |
 | Hoppa till avsnittet | klicka på dess rubrik | `Ctrl+P`: `Navigering: Fokusera Refs > Submoduler` |
+
+![Högerklicksmenyn för den ändrade raden vendor/starfield: Uppdatera (klona vid behov), Initiera och Öppna i ny flik](../images/submodule-menu.png)
 
 En uppdatering kan göra fetch från submodulens remote, så den följer **Inställningar > SSH & inloggning > HTTPS-uppgifter** som varje annan överföring. En submodul som inte är klonad har inget att öppna som flik; statusraden säger det och pekar på Uppdatera.
 

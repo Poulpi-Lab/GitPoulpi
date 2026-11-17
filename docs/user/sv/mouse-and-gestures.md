@@ -120,7 +120,7 @@ GitPoulpi kommer ihåg varje storlek. Se
 
 ## Titelrad, flikrad och verktygsfält
 
-- **Klicka på 🐙** i titelraden för att öppna **Om GitPoulpi**. I Om-rutan följer
+- **Klicka på <img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi-ikon" height="16">** i titelraden för att öppna **Om GitPoulpi**. I Om-rutan följer
   bläckfiskens pupiller pekaren; klicka på logotypen för att snurra den till nästa färg,
   högerklicka på den för listan med färger, klicka på en länk för att öppna den.
 - **Klicka på Öppna i ▾** i titelraden för listan med program. Se

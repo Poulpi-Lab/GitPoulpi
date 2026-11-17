@@ -126,6 +126,7 @@ Aşağıdaki her kanal, programların yanına kendi kanal adıyla aynı `.gitpou
 | **MSI** (Windows, yönetilen) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Yöneticiler için: tüm kullanıcılar, uygulama içi güncelleme yok. Bkz. [Kurumsal dağıtım](enterprise-distribution.md#msi-intune-veya-grup-politikası-ile). |
 | **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (veya `paru -S gitpoulpi-bin`) | Yardımcı olmadan: `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, sonra `cd gitpoulpi-bin && makepkg -si`. |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Derlemek yerine sürüm arşivini indirir. |
+| **cargo, crates.io'dan** | `cargo install --locked gitpoulpi-cli` | Derler; bir Rust araç zinciri gerekir. Alt komutsuz çalıştırıldığında terminal arayüzünü açan ve MCP'yi de sunan (`gitpoulpi mcp`) `gitpoulpi` programını kurar. `gitpoulpi-tui` ve `gitpoulpi-mcp` aynı programların bağımsız crate olarak sunulmuş halidir. |
 | **cargo, kaynaktan** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Derler; bir Rust araç zinciri gerekir. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | Bkz. [Docker'da çalıştırma](docker.md). Aynı imaj `ghcr.io/poulpi-lab/gitpoulpi` adresinde de vardır. |
 

@@ -201,7 +201,7 @@ Por defecto, una fila bajo los paneles y sobre la barra de estado. **Ajustes > A
 | **Flow** `▾` | El menú del flujo de trabajo de ramas (empezar, terminar, sincronizar, promover; `Ctrl+G Shift+W`). Solo en un repositorio que tiene un flujo de trabajo. Consulta [Flujos de trabajo de ramas](branching-workflows.md). |
 | **Buscar** | Abre la barra de búsqueda de commits sobre el Log (`f`). |
 
-En el extremo (la derecha de una fila, la parte inferior de una columna), cuando el repositorio está vinculado a un host, un **chip** muestra la pull request de la rama con checkout (por ejemplo `GH #12` o `GL !53`), o un tenue `+ PR`. **Ajustes > Apariencia > Fijar el botón de pull request al final** (activado por defecto) lo mantiene allí; desactivado, fluye con los demás botones y sigue su alineación. Consulta [Alojamiento y gestores de issues](hosting-integration.md).
+En el extremo (la derecha de una fila, la parte inferior de una columna), cuando el repositorio está vinculado a un host, un **chip** muestra la pull request de la rama con checkout (por ejemplo `GH #12` o `GL !53`), o un tenue `+ PR`. **Ajustes > Apariencia > Fijar el botón de pull request al final** (activado por defecto) lo mantiene allí; desactivado, fluye con los demás botones y sigue su alineación. En una fila estrecha el chip se reduce primero (`● #12`, luego solo el glifo de estado) y solo después pasa al menú `⋯`. Consulta [Alojamiento y gestores de issues](hosting-integration.md).
 
 Junto a él (en una columna, en su última fila), cuando tienes dos o más [perfiles](settings.md#perfiles),
 el **combo de perfiles** elige la identidad de commit para este repositorio. La

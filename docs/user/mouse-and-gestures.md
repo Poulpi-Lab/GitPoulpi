@@ -128,7 +128,7 @@ GitPoulpi remembers every size. See
 
 ## Title bar, tab row and toolbar
 
-- **Click 🐙** in the title bar to open **About**. In About, the octopus's
+- **Click <img src="../../assets/logo/gitpoulpi.png" alt="GitPoulpi icon" height="16">** in the title bar to open **About**. In About, the octopus's
   pupils follow the pointer; click the logo to spin it to the next color,
   right-click it for the list of colors, click a link to open it.
 - **Click Open in ▾** in the title bar for the list of programs. See

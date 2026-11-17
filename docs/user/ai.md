@@ -382,7 +382,7 @@ and a local agent runs read-only (below). The text leaves GitPoulpi only through
 (`Ctrl+Enter`) or **Comment** button.
 
 **In the Markdown composer.** While AI is on, every composer whose text goes to a host (a comment, a reply or an
-edit in [the conversation view](hosting-integration.md#5c-conversations), a review comment, the Finish review
+edit in [the conversation view](conversations.md), a review comment, the Finish review
 summary, the new-issue description and the pull request description) has a **Write with AI** button (`Alt+E`, the
 same key in all of them) at the right end of its mode bar. It opens a panel under the bar:
 

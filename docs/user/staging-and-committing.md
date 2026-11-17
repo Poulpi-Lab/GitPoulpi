@@ -18,6 +18,9 @@ the working changes:
 - **Unstaged Files**: edited, added (untracked) and deleted files not yet in
   the next commit.
 - **Staged Files**: what the next commit will contain.
+- **Conflicted files** (a red `!`, while a merge, rebase, cherry-pick or revert
+  is stopped): `Enter` opens the merge editor, see
+  [Resolving merge conflicts](merge-conflicts.md).
 - **Renamed or moved files** are one row, `new <- old`, in both lists (a file
   deleted on disk and a new one with at least 50% the same content count as a
   move even before you stage them). Stage, Unstage and Discard act on both

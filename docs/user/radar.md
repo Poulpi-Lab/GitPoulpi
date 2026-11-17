@@ -7,7 +7,7 @@ requests you wrote, the ones that ask for your review, the issues assigned to yo
 the repositories where you left work in progress. It is the Home window with the
 Radar view on top, so that nothing underneath can steal a click or a key.
 
-It needs a code-host profile (see [Hosting and issue trackers](hosting-integration.md)) and
+It needs a code-host profile (see [Hosting and issue trackers](hosting-integration.md); the lists of one repository are in [Pull requests and issues](pull-requests-and-issues.md), and a row's discussion opens as a [conversation](conversations.md)) and
 repositories linked to it, or a profile with its account-wide lists turned on (see "Beyond the scope" below).
 A repository that is not linked is never asked: it shows a **Link...** line instead (see "Repositories with something to say" below).
 

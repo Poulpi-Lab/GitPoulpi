@@ -13,9 +13,9 @@ made-up authors.
 ### Title bar
 
 The top edge of the window reads
-`🐙 GitPoulpi vX.Y.Z -- <repository path>` (the session name is in the status line, at the bottom by default).
+<img src="../../assets/logo/gitpoulpi.png" alt="GitPoulpi icon" height="16"> `GitPoulpi vX.Y.Z -- <repository path>` (the session name is in the status line, at the bottom by default).
 
-- **🐙** opens the **About** window: version, build features, license, links,
+- **<img src="../../assets/logo/gitpoulpi.png" alt="GitPoulpi icon" height="16">** opens the **About** window: version, build features, license, links,
   a short notice that GitPoulpi is an independent project, the third-party crates
   and the licenses and credits. On a terminal that draws images the octopus is
   the pixel logo, in your logo color (elsewhere it stays the emoji). Palette:

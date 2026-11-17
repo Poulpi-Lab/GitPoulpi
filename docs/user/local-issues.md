@@ -140,7 +140,7 @@ If you work alone, or in a team that keeps its issues next to the code, the fold
   `Shift+Left` / `Shift+Right`, or with **Board: Move Card To...** (`m`), a dropdown of the columns. The card moves at
   once; the note's `status` is rewritten as in [the notes section](#the-notes), nothing else in the file. If the write
   fails the card goes back and the error is on the status line.
-- **Open** a card with `Enter` or a double click: the note's [conversation](hosting-integration.md#5c-conversations) opens in the window, with the note's text and its comments (the card menu's **Open note** opens the file in your default program for `.md`). `e` edits its
+- **Open** a card with `Enter` or a double click: the note's [conversation](conversations.md) opens in the window, with the note's text and its comments (the card menu's **Open note** opens the file in your default program for `.md`). `e` edits its
   assignees, labels or milestone, `.` or a right click opens the card menu, `n` starts a new issue in the selected
   column (the form comes back to the board when it closes).
 - **Filter** by assignee (`a`), label (`l`), milestone (`M`) or text (`/`); `x` clears them. The filters are

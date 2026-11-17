@@ -1508,11 +1508,11 @@ For what the menus do, see [Working with the Log](log-and-history.md).
 
 With a matching integration, the Refs pane has a pull requests section (GitLab:
 merge requests). With a connected hosting profile, it also has an ISSUES
-section. See [Hosting and issue trackers](hosting-integration.md#5-pull-requests-and-issues-in-the-sidebar).
+section. See [Hosting and issue trackers](pull-requests-and-issues.md#pull-requests-and-issues-in-the-sidebar).
 
 | Key | Action |
 |---|---|
-| `Enter` | Open the selected row: an issue (and a request on Azure DevOps or Bitbucket) as a [conversation](hosting-integration.md#5c-conversations), a pull request in the [review](review.md) on the hosts that have one, anything else in the browser. On a `Reconnect` row: open Settings on that profile |
+| `Enter` | Open the selected row: an issue (and a request on Azure DevOps or Bitbucket) as a [conversation](conversations.md), a pull request in the [review](review.md) on the hosts that have one, anything else in the browser. On a `Reconnect` row: open Settings on that profile |
 | `Space` | Expand or collapse the section |
 | `v` | Open the section's filter. Pull requests: Open, Merged / closed, All. Issues: Open, Assigned to me, Closed, All |
 | `n` | Pull requests section: create a pull request. ISSUES section: new issue. (The header's `+` button) |
@@ -1525,7 +1525,7 @@ section. See [Hosting and issue trackers](hosting-integration.md#5-pull-requests
 ### The issue board
 
 **Board** on the ISSUES header (palette: **Issues: Open Board**) opens the Kanban board of the issue source. See
-[the board](hosting-integration.md#5b-the-issue-board) and [local issues](local-issues.md#the-kanban-board). Every key
+[the board](pull-requests-and-issues.md#the-issue-board) and [local issues](local-issues.md#the-kanban-board). Every key
 below is also a palette command (**Board: ...**).
 
 | Key | Action |
@@ -1533,7 +1533,7 @@ below is also a palette command (**Board: ...**).
 | Arrows | Select a card (`Up`, `Down`) or the neighbouring column (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` jump in the column |
 | `Shift+Left`, `Shift+Right` | Move the selected card to the previous or next column |
 | `m` | **Move Card To...**: a dropdown of the columns |
-| `Enter` | Open the issue's [conversation](hosting-integration.md#5c-conversations) (the host's page where the host has none to read) |
+| `Enter` | Open the issue's [conversation](conversations.md) (the host's page where the host has none to read) |
 | `e`, `.` | Edit assignees, labels or milestone; the card menu |
 | `n` | New issue in the selected column |
 | `a`, `l`, `M`, `/` | Filter by assignee, label, milestone, text. `x` clears the filters |
@@ -1559,7 +1559,7 @@ request) is the same composer. Its keys are in the `md_editor` table above and c
 | `Alt+W` | The new issue and pull request forms: create on the provider's own web page |
 | `Esc` | In the panel of **Write with AI**: stop a running draft, else close the panel |
 
-In the [conversation view](hosting-integration.md#5c-conversations) of an issue or a request (palette rows
+In the [conversation view](conversations.md) of an issue or a request (palette rows
 *Conversation: ...*; the rows with a key are in the palette list above):
 
 | Key | Action |
@@ -1925,7 +1925,7 @@ Every button has a keyboard twin:
 
 | Button | Key |
 |---|---|
-| 🐙 at the left of the title bar (About) | `Help: About GitPoulpi` in the palette |
+| <img src="../../assets/logo/gitpoulpi.png" alt="GitPoulpi icon" height="16"> at the left of the title bar (About) | `Help: About GitPoulpi` in the palette |
 | **Open in** in the title bar | `Alt+O`, `Ctrl+Alt+O` |
 | `×` at the right of the title bar (quit) | `q` |
 | The version in the title bar (Release notes) | `Help: Release Notes` in the palette |

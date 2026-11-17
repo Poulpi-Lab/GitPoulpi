@@ -198,7 +198,9 @@ suggests one). Right-click a stash row, in the Log or the STASHES section, for
 dialog proposing a folder next to the repository, an optional new branch name
 and "Open the new worktree as a tab". Worktrees appear in the WORKTREES
 section; double-click one to open it, and its tab closes by itself when the
-worktree is removed.
+worktree is removed. The whole feature (opening in another tool, merging a
+worktree's branch, removing) is in [Worktrees](worktrees.md); the SUBMODULES
+section of the same pane is in [Submodules](submodules.md).
 
 ## Dragging refs onto commits
 

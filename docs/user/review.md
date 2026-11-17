@@ -37,7 +37,7 @@ Always visible: the number and title, the state (Open, Draft, Merged, Closed), t
 whether it merges cleanly or conflicts, the size, and **`3 pending comments`** when you have written some.
 
 The four metadata buttons - **Assignees**, **Reviewers**, **Labels**, **Milestone** - open the same pickers as
-the sidebar (see [Assignees, reviewers, labels and milestone](hosting-integration.md#assignees-reviewers-labels-and-milestone));
+the sidebar (see [Assignees, reviewers, labels and milestone](pull-requests-and-issues.md#assignees-reviewers-labels-and-milestone));
 the header shows the result as soon as the host has taken it. The action buttons: **Check out** (the usual
 checkout of the request's branch, which also closes the view), **Open in browser**, **Refresh**
 (**`F5`**), and **Finish review**.
@@ -50,7 +50,7 @@ A segmented control in the top border switches page: **Overview**, **Files**, **
 ### Overview
 
 The Overview is **the conversation of the request**, the same timeline and the same comment box an issue has
-([Conversations](hosting-integration.md#5c-conversations)): the description first (*opened this*), then the comments,
+([Conversations](conversations.md)): the description first (*opened this*), then the comments,
 the threads on code with their diff excerpt, the submitted reviews with their verdict (`approved`, `requested
 changes`, `commented`, `dismissed`; on GitLab the verdicts are its approvals) and the events, oldest first, on the
 newest window with **Load older** at its top. The comment box is docked under the timeline (**New comment**):
@@ -86,7 +86,7 @@ in the palette; `a` (assignees), `p` (reviewers), `f` (**Finish review**), `b` (
 A comment written on another window or by the CLI shows here by itself: every write of GitPoulpi (this window
 included) tells the session, and the windows showing the same request read it again.
 
-The comment box is the Markdown composer shared with [the conversation view](hosting-integration.md#writing)
+The comment box is the Markdown composer shared with [the conversation view](conversations.md#writing)
 (also the box of a reply to a thread, a comment on a line and the summary of **Finish review**): `Ctrl+Enter` (also
 `Ctrl+S`, `Alt+Enter`) sends, and where AI is on `Alt+E` opens **Write with AI**
 ([the AI chapter](ai.md#writing-help-on-a-host)). The preview shows the text as the host will, references included

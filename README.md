@@ -123,6 +123,12 @@ The complete user documentation starts at **[docs/user/README.md](docs/user/READ
 | [Workspaces](docs/user/workspaces.md) | Named groups of repositories, their own tabs, a default commit profile |
 | [Working with the Log](docs/user/log-and-history.md) | Graph, refs, branches, tags, stashes, rebase, cherry-pick |
 | [Staging and committing](docs/user/staging-and-committing.md) | Status, diff, hunks and lines, the composer, the editor |
+| [Resolving merge conflicts](docs/user/merge-conflicts.md) | The merge editor, picking lines and chunks, binary and submodule conflicts |
+| [Worktrees](docs/user/worktrees.md) | Several branches checked out at once, in their own folders |
+| [Submodules](docs/user/submodules.md) | The SUBMODULES section, updating, keeping in step with checkouts |
+| [Reviewing a pull request](docs/user/review.md) | Read, comment and approve a pull or merge request without leaving the window |
+| [Pull requests and issues](docs/user/pull-requests-and-issues.md) | The sidebar lists, the issue board, creating a request or an issue |
+| [Conversations](docs/user/conversations.md) | Read and answer the discussion of an issue or request in the app |
 | [Settings](docs/user/settings.md) | Every Settings page and option |
 | [AI assistance](docs/user/ai.md) | Configure the built-in AI, every AI action, privacy |
 | [Hosting and issue trackers](docs/user/hosting-integration.md) | GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine: tokens, linking a repository, pull and merge requests |

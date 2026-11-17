@@ -124,7 +124,7 @@ mod env_rows {
 
     fn config() -> String {
         format!(
-            "[ai]\nenabled = true\ndefault_profile = \"alpha\"\n\n[[ai.profiles]]\nid = \"alpha\"\nname = \"Alpha\"\nkind = \"local_agent\"\ncommand = \"claude\"\nargs = [\"-p\"]\n\n[ai.profiles.env]\nCLAUDE_CONFIG_DIR = \"{LONG_ENV}\"\nMY_FLAG = \"on\"\n"
+            "[ai]\nenabled = true\ndefault_profile = \"alpha\"\n\n[[ai.profiles]]\nid = \"alpha\"\nname = \"Alpha\"\nkind = \"local_agent\"\ncommand = \"no-such-agent-binary\"\nargs = [\"-p\"]\n\n[ai.profiles.env]\nCLAUDE_CONFIG_DIR = \"{LONG_ENV}\"\nMY_FLAG = \"on\"\n"
         )
     }
 

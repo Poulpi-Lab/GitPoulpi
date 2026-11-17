@@ -452,6 +452,19 @@ impl Terminal {
         ] {
             cmd.env_remove(name);
         }
+        // Nor the developer's AI credentials: a test reaches a model only
+        // through a fake agent or the mock host, never a real account.
+        for name in [
+            "ANTHROPIC_API_KEY",
+            "ANTHROPIC_AUTH_TOKEN",
+            "OPENAI_API_KEY",
+            "GEMINI_API_KEY",
+            "GOOGLE_API_KEY",
+            "MISTRAL_API_KEY",
+            "CLAUDE_CODE_OAUTH_TOKEN",
+        ] {
+            cmd.env_remove(name);
+        }
         // On Windows a ConPTY holds the child alone in its console, which the
         // TUI reads as "started by a double-click" (launcher start: another
         // startup tab, a possible relaunch in a terminal). Say a shell shares

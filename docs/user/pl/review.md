@@ -10,7 +10,7 @@ akceptację i prośby o zmiany. Wymaga profilu jednego z tych hostów (zob.
 oferują przeglądów. Ograniczenia hosta są respektowane: GitLab nie ma werdyktu *Zażądaj zmian* i przyjmuje jedną linię na komentarz.
 Ta strona nazywa je wszystkie *żądaniem*.
 
-![Widok przeglądu, strona Podsumowanie: nagłówek żądania z przyciskami metadanych, opis i dyskusja z wysłaną akceptacją](../images/review-overview.png)
+![Widok przeglądu, strona Podsumowanie: nagłówek żądania z przyciskami metadanych, opis, nierozwiązany i rozwiązany wątek w kodzie, komentarze i pole komentarza](../images/review-overview.png)
 
 ![Strona Pliki: zmienione pliki z polami przejrzenia, diff z wątkiem komentarzy pod linią i rozwiązany wątek poza pokazanymi liniami](../images/review-files.png)
 

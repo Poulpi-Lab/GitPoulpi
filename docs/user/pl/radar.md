@@ -8,7 +8,7 @@ do ciebie lub utworzone przez ciebie oraz repozytoria, w których zostawiłeś p
 To okno Home z widokiem Radaru na wierzchu, aby nic pod spodem nie
 mogło przechwycić kliknięcia ani klawisza.
 
-Wymaga profilu hosta kodu (zob. [Integracje z hostingiem i trackerami zgłoszeń](hosting-integration.md))
+Wymaga profilu hosta kodu (zob. [Integracje z hostingiem i trackerami zgłoszeń](hosting-integration.md); listy jednego repozytorium są w [Pull requestach i zgłoszeniach](pull-requests-and-issues.md), a dyskusja wiersza otwiera się jako [rozmowa](conversations.md))
 oraz repozytoriów z nim powiązanych albo profilu z włączonymi listami obejmującymi całe konto (zob. „Poza zakresem”
 niżej). Repozytorium, które nie jest powiązane, nigdy nie jest
 odpytywane: zamiast tego pokazuje wiersz **Powiąż...** (zob. „Repozytoria, które mają coś do

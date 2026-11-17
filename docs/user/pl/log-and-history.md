@@ -192,7 +192,10 @@ sekcji STASHES, by wybrać **Pop**, **Apply** (zachowaj stash) albo **Drop**.
 okno z propozycją folderu obok repozytorium, opcjonalną nazwą nowej gałęzi i
 opcją „Otwórz nowy worktree jako kartę”. Worktree pojawiają się w sekcji
 WORKTREES; kliknij jeden dwukrotnie, by go otworzyć, a jego karta zamyka się
-sama, gdy worktree zostanie usunięty.
+sama, gdy worktree zostanie usunięty. Cała funkcja (otwieranie w innym
+narzędziu, scalanie gałęzi worktree, usuwanie) jest opisana w
+[Worktree](worktrees.md); sekcja SUBMODUŁY tego samego panelu jest w
+[Submoduły](submodules.md).
 
 ## Przeciąganie refów na commity
 

@@ -119,7 +119,7 @@ GitPoulpi zapamiętuje każdy rozmiar. Zob.
 
 ## Pasek tytułu, rząd kart i pasek narzędzi
 
-- **Kliknij 🐙** na pasku tytułu, by otworzyć **O programie GitPoulpi**. W tym oknie źrenice ośmiornicy
+- **Kliknij <img src="../../../assets/logo/gitpoulpi.png" alt="Ikona GitPoulpi" height="16">** na pasku tytułu, by otworzyć **O programie GitPoulpi**. W tym oknie źrenice ośmiornicy
   podążają za wskaźnikiem; kliknij logo, by obrócić je do następnego koloru, kliknij je prawym
   przyciskiem, by zobaczyć listę kolorów, kliknij link, by go otworzyć.
 - **Kliknij Otwórz w ▾** na pasku tytułu, by zobaczyć listę programów. Zob.

@@ -1920,7 +1920,7 @@ Każdy przycisk ma odpowiednik na klawiaturze:
 
 | Przycisk | Klawisz |
 |---|---|
-| 🐙 po lewej stronie paska tytułu (O programie) | `Pomoc: O programie GitPoulpi` w palecie |
+| <img src="../../../assets/logo/gitpoulpi.png" alt="Ikona GitPoulpi" height="16"> po lewej stronie paska tytułu (O programie) | `Pomoc: O programie GitPoulpi` w palecie |
 | **Otwórz w** na pasku tytułu | `Alt+O`, `Ctrl+Alt+O` |
 | `×` po prawej stronie paska tytułu (zakończ) | `q` |
 | Wersja na pasku tytułu (Informacje o wersji) | `Pomoc: Informacje o wersji` w palecie |

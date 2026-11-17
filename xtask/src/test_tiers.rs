@@ -38,7 +38,7 @@ Usage: cargo run -p xtask -- test [--tier fast|pty|full] [--jobs N] [--serial] [
                 it converges to nothing. Run the full tier again before a release tag
   (xtask/run-alone.txt: tests that pass alone but fail under load run alone after
                 the pool; a test failing in the pool is rerun alone and, if it passes,
-                reported as "passed only when run alone" without failing the run)
+                reported as 'passed only when run alone' without failing the run)
   --only PATTERN  with --failed: rerun only the recorded failures whose target or
                 test name contains PATTERN (repeatable), i.e. the ones a fix is
                 meant to cure. The other recorded failures stay in the file";

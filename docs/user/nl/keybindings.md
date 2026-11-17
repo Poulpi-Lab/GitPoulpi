@@ -1514,11 +1514,11 @@ Voor wat de menu's doen, zie [Werken met de Log](log-and-history.md).
 Met een passende integratie heeft het Refs-paneel een sectie voor pull requests
 (GitLab: merge requests). Met een verbonden hostingprofiel heeft het ook een
 sectie ISSUES. Zie
-[Hosting en issuetrackers](hosting-integration.md#5-pull-requests-en-issues-in-de-zijbalk).
+[Hosting en issuetrackers](pull-requests-and-issues.md#pull-requests-en-issues-in-de-zijbalk).
 
 | Toets | Actie |
 |---|---|
-| `Enter` | De geselecteerde rij openen: een issue (en een verzoek op Azure DevOps of Bitbucket) als [gesprek](hosting-integration.md#5c-gesprekken), een pull request in de [review](review.md) op de hosts die er een hebben, al het andere in de browser. Op een rij `Opnieuw verbinden`: de Instellingen op dat profiel openen |
+| `Enter` | De geselecteerde rij openen: een issue (en een verzoek op Azure DevOps of Bitbucket) als [gesprek](conversations.md), een pull request in de [review](review.md) op de hosts die er een hebben, al het andere in de browser. Op een rij `Opnieuw verbinden`: de Instellingen op dat profiel openen |
 | `Space` | De sectie uit- of inklappen |
 | `v` | Het filter van de sectie openen. Pull requests: Open, Merged / gesloten, Alle. Issues: Open, Aan mij toegewezen, Gesloten, Alle |
 | `n` | Sectie pull requests: een pull request maken. Sectie ISSUES: nieuw issue. (De knop `+` van de kop) |
@@ -1531,7 +1531,7 @@ sectie ISSUES. Zie
 ### Het issuebord
 
 **Bord** in de kop van ISSUES (palet: **Issues: Bord openen**) opent het kanbanbord van de issuebron. Zie
-[het bord](hosting-integration.md#5b-het-issuebord) en [lokale issues](local-issues.md#het-kanbanbord). Elke toets
+[het bord](pull-requests-and-issues.md#het-issuebord) en [lokale issues](local-issues.md#het-kanbanbord). Elke toets
 hieronder is ook een paletopdracht (**Bord: ...**).
 
 | Toets | Actie |
@@ -1539,7 +1539,7 @@ hieronder is ook een paletopdracht (**Bord: ...**).
 | Pijlen | Een kaart selecteren (`Up`, `Down`) of de naburige kolom (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` springen in de kolom |
 | `Shift+Left`, `Shift+Right` | De geselecteerde kaart naar de vorige of volgende kolom verplaatsen |
 | `m` | **Kaart verplaatsen naar...**: een keuzelijst van de kolommen |
-| `Enter` | Het [gesprek](hosting-integration.md#5c-gesprekken) van het issue openen (de pagina van de host als de host er geen heeft om te lezen) |
+| `Enter` | Het [gesprek](conversations.md) van het issue openen (de pagina van de host als de host er geen heeft om te lezen) |
 | `e`, `.` | Toegewezenen, labels of mijlpaal bewerken; het kaartmenu |
 | `n` | Nieuw issue in de geselecteerde kolom |
 | `a`, `l`, `M`, `/` | Filteren op toegewezene, label, mijlpaal, tekst. `x` wist de filters |
@@ -1566,7 +1566,7 @@ herbonden.
 | `Alt+W` | De formulieren voor een nieuw issue en een nieuwe pull request: aanmaken op de eigen webpagina van de provider |
 | `Esc` | In het paneel van **Schrijven met AI**: een lopend concept stoppen, anders het paneel sluiten |
 
-In de [gespreksweergave](hosting-integration.md#5c-gesprekken) van een issue of een verzoek (paletrijen
+In de [gespreksweergave](conversations.md) van een issue of een verzoek (paletrijen
 *Gesprek: ...*; de rijen met een toets staan in de paletlijst hierboven):
 
 | Toets | Actie |
@@ -1930,7 +1930,7 @@ Elke knop heeft een toetsenbordtegenhanger:
 
 | Knop | Toets |
 |---|---|
-| 🐙 links in de titelbalk (Over) | `Help: Over GitPoulpi` in het palet |
+| <img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi-pictogram" height="16"> links in de titelbalk (Over) | `Help: Over GitPoulpi` in het palet |
 | **Openen in** in de titelbalk | `Alt+O`, `Ctrl+Alt+O` |
 | `×` rechts in de titelbalk (afsluiten) | `q` |
 | De versie in de titelbalk (Releasenotes) | `Help: Releasenotes` in het palet |

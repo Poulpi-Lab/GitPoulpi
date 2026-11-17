@@ -18,6 +18,9 @@ de lokale wijzigingen:
 - **Unstaged bestanden**: gewijzigde, toegevoegde (untracked) en verwijderde bestanden die nog niet
   in de volgende commit zitten.
 - **Staged bestanden**: wat de volgende commit zal bevatten.
+- **Bestanden met conflict** (een rode `!`, terwijl een merge, rebase, cherry-pick of revert
+  is gestopt): `Enter` opent de merge-editor, zie
+  [Merge-conflicten oplossen](merge-conflicts.md).
 - **Hernoemde of verplaatste bestanden** zijn één rij, `nieuw <- oud`, in beide lijsten (een bestand dat op schijf is
   verwijderd en een nieuw bestand met minstens 50% dezelfde inhoud tellen al als een verplaatsing voordat je ze stagt).
   Stagen, Unstagen en Verwerpen werken op beide namen: stagen staget de verwijdering en het nieuwe bestand, zodat git één
@@ -176,8 +179,10 @@ andere.
   push nodig (met lease).
 - **Hooks overslaan** (`Shift+H`, of **Commit: Hooks overslaan omschakelen** in het palet) commit
   zonder de hooks `pre-commit` en `commit-msg` van de repository uit te voeren. Het geldt per commit;
-  met **Instellingen > Repositoryspecifieke instellingen > Commit** staat het standaard aangevinkt. Op een smalle rij
-  krimpt het label naar **Geen hooks** en dan naar alleen het vakje (de tooltip noemt het); het verdwijnt nooit.
+  met **Instellingen > Repositoryspecifieke instellingen > Commit** staat het standaard aangevinkt. Het heeft een eigen
+  rij direct onder **Vorige commit amenden**, met zijn volledige label; pas in een zeer smal paneel krimpt het label
+  naar **Geen hooks** en dan naar alleen het vakje (de tooltip noemt het). Het verdwijnt nooit. In een zeer laag
+  formulier deelt het in plaats daarvan de Amend-rij en krimpt het op dezelfde manier.
 - `c` in het paneel Status zet de cursor in het formulier. `Esc` verlaat het.
 - `Ctrl+G c` en `Ctrl+G Enter` (**Git: Commit...** en **Git: Gestagede wijzigingen nu
   committen** in het palet) zijn één opdracht: de commit-knop vanaf elke plek. Met een
@@ -202,8 +207,7 @@ kunt bewerken; er wordt niets gecommit tot je op de commit-knop drukt.
 
 **Commits samenstellen met AI** staat aan het rechteruiteinde van de Amend-rij en krimpt mee met het rechterpaneel in
 plaats van te verdwijnen: eerst het volledige label, dan **Samenstellen met AI**, dan alleen de **`✦`**. De knop behoudt
-op elke breedte zijn klik, zijn tooltip en zijn toets (`Ctrl+G Shift+C`); het label van Hooks overslaan wijkt voor hem
-(**Geen hooks**, dan alleen het vakje) voordat hij zelf krimpt.
+op elke breedte zijn klik, zijn tooltip en zijn toets (`Ctrl+G Shift+C`).
 
 De knoppen **`✦`** (het bericht genereren) en **`#`** (een issueverwijzing invoegen) aan het rechteruiteinde van de
 samenvattingsrij krimpen op dezelfde manier: in een smal paneel verliezen ze hun marges en vouwen dan samen tot één

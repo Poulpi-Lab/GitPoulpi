@@ -35,7 +35,9 @@ zijwaarts wiel); ze worden nooit afgebroken.
 ## Kiezen
 
 Elk conflict is een omkaderd blok in A en in B, met een selectievakje op de kop en een
-`+` / `✓` voor elke regel.
+`+` / `✓` voor elke regel. Rechtsklik op een blok voor de keuzes van dat conflict:
+
+![Een rechtsklikmenu op conflict 2 van de merge-editor: Alleen A overnemen, Alleen B overnemen, A dan B, B dan A, Niets nemen, Keuze ongedaan maken, Bewerken in uitvoer en Oplossing voorstellen](../images/merge-editor-chunk-menu.png)
 
 | Om... | Toets | Muis |
 |---|---|---|
@@ -70,6 +72,10 @@ oranje zolang er nog een keuze nodig is, groen zodra het is afgehandeld, blauw v
 Een klik op een markering springt naar dat conflict (een markering onder de greep van de schuifbalk staat
 al op het scherm, dus daar sleept de klik de greep).
 
+Beide nemen (**A dan B**) schrijft de regels van A en daarna die van B onder de markering van het conflict in de Uitvoer, elk gelabeld met zijn kant; de badges `1st` / `2nd` op de twee blokken geven de volgorde aan, en `s` wisselt ze om:
+
+![Conflict 2 van beide kanten overgenomen: zijn A-regel en zijn B-regel zijn aangevinkt, en de Uitvoer toont ze na elkaar, gelabeld A en B, terwijl conflicten 1 en 3 nog op een keuze wachten](../images/merge-editor-take-both.png)
+
 **Heel bestand** toont het hele bestand in A en B met elk verschil gekleurd, niet alleen de conflicten:
 
 ![Modus Heel bestand: het hele bestand in A en B, met de wijzigingen gekleurd](../images/merge-editor-full-file.png)
@@ -78,6 +84,8 @@ De Uitvoer is een echte editor: klik erin en typ, selecteer, knip en plak, zoek 
 `Ctrl+F`. Een keuze op een conflict dat je met de hand hebt bewerkt, vervangt je bewerking (`Ctrl+Z`
 haalt hem terug). Opslaan met een conflict waarvoor niets is gekozen, of met een regel
 die nog op een conflictmarkering lijkt, vraagt eerst om bevestiging.
+
+![De merge-editor met elk conflict afgehandeld: conflict 1 overgenomen van A, conflict 2 van beide kanten, conflict 3 met de hand getypt in de Uitvoer (gemarkeerd met een potlood en als bewerkt geteld), en de knop Opslaan & als opgelost markeren gemarkeerd in de werkbalk](../images/merge-editor-output-edited.png)
 
 ### ✦ Een oplossing voorstellen (AI)
 
@@ -92,10 +100,24 @@ ook getoond. Met AI uit bestaat geen van deze bedieningen.
 
 Na **Opslaan & als opgelost markeren** is het bestand gestaged en is de lijst met bestanden met conflict
 terug; open het volgende bestand zelf. `Ctrl+Z` (of de knop Ongedaan)
-draait de laatste "als opgelost markeren" terug. Als er geen bestand meer over is, biedt de banner
+draait de laatste "als opgelost markeren" terug.
+
+![Na Opslaan & als opgelost markeren: de banner luidt "Merge bezig, 1 bestand met conflict", orbit.rs is naar Staged bestanden verplaatst en logo.bin is het enige bestand dat onder Unstaged bestanden overblijft, gemarkeerd met een rode !](../images/conflict-file-resolved.png)
+
+Als er geen bestand meer over is, biedt de banner
 **Commit merge** (of **Doorgaan** voor een cherry-pick, een revert of een rebase) en
 **Merge afbreken**, dat eerst vraagt: het zet HEAD, de index en de werkmap
 terug zoals ze waren.
+
+![De banner zodra elk bestand is opgelost: "Merge bezig, alle conflicten opgelost" met de knoppen Commit merge en Merge afbreken, en het opgeloste bestand onder Staged bestanden](../images/conflict-commit-merge.png)
+
+Een rebase stopt op dezelfde manier, stap voor stap. Zijn banner noemt de branch en waarop die wordt gerebased, en heeft **Conflicten oplossen...**, **Doorgaan**, **Overslaan** en **Afbreken**:
+
+![De banner van een rebase die op twee conflicten is gestopt: "feature/cleanup rebasen op ..." met Conflicten oplossen..., Doorgaan, Overslaan en Afbreken, en de twee bestanden met conflict in het paneel Status](../images/conflict-banner-rebase.png)
+
+Zodra het laatste bestand is opgelost, is dezelfde banner klaar om **Door te gaan**:
+
+![De rebasebanner nadat beide bestanden zijn opgelost: alleen Doorgaan, Overslaan en Afbreken blijven over, en beide bestanden staan onder Staged bestanden](../images/conflict-banner-continue.png)
 
 Een merge waarvan het resultaat gelijk is aan HEAD (je nam overal onze kant) heeft niets
 gestaged en geen gewijzigd bestand, maar kan toch worden afgerond: **Commit merge**
@@ -130,6 +152,8 @@ de afbeeldingen van A, B en Basis, passend gemaakt en alleen-lezen, in een venst
 voor ze is; zie [Afbeeldingen](image-view.md#in-de-merge-editor).
 
 ![De kaart van een binair conflict: wat A, B en de basis bevatten, en de knoppen A behouden, B overnemen, Basis overnemen en Openen in merge-tool](../images/merge-editor-card.png)
+
+![De kaart van een bestand dat in A is gewijzigd en in B is verwijderd: het vak A toont de grootte en modus van het bestand, het vak B luidt "geen bestand hier (verwijderd)", het vak Basis toont het origineel, en de knoppen zijn Bestand behouden en Verwijdering accepteren](../images/merge-editor-deleted-card.png)
 
 `Esc` sluit de kaart zonder te kiezen. De externe merge-tool is
 `general.external_merge_tool` in Instellingen > Diff & editor (`{base}`, `{local}` = A,

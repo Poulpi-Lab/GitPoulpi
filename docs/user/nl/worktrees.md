@@ -6,6 +6,8 @@ Een worktree is een tweede uitgecheckte kopie van de repository: een andere map,
 andere branch, met dezelfde geschiedenis. De sectie WORKTREES van het Refs-paneel toont ze;
 de hoofdworktree is gemarkeerd met `(hoofd)`.
 
+![Het Refs-paneel van een repository met twee gekoppelde worktrees: de sectie WORKTREES toont main (hoofd), hotfix/axis-labels en feature/legend, met de sectie SUBMODULES eronder](../images/worktrees.png)
+
 ## De sectie tonen
 
 De sectie is verborgen in een repository die nog geen gekoppelde worktree heeft. Om haar toch
@@ -28,6 +30,8 @@ maken...**) opent een menu:
   branchveld leeg voor een losgekoppelde worktree.
 - **Een branch kiezen...**: het dialoogvenster opent op zijn lijst **Worktree-branch**, om een
   branch te openen die al bestaat.
+
+![Het dialoogvenster Worktree maken: de velden Naam, Map, Ref en Worktree-branch, de regel "nieuwe branch vanaf main", het vak De nieuwe worktree als tabblad openen en de knoppen Annuleren en Maken](../images/worktree-create.png)
 
 Het palet heeft dezelfde drie (**Refs: Worktree maken van huidige branch**, **Git: Worktree
 maken op geselecteerde commit...**, **Refs: Worktree maken met een gekozen branch**). De
@@ -77,6 +81,13 @@ Klik met rechts op een worktree (of selecteer hem en druk op de menutoets, `Shif
   branch die nergens is uitgecheckt wordt geweigerd, met de reden. Niet aangeboden voor een
   losgekoppelde worktree.
 - **Worktree verwijderen...**: nooit de hoofdworktree.
+
+![Het rechtsklikmenu van een worktreerij: Openen in een nieuw tabblad, Openen in, Merge hotfix/axis-labels in... en Worktree verwijderen...](../images/worktree-menu.png)
+
+**Openen in een nieuw tabblad** (of een dubbelklik, of `Enter`) opent de map van de worktree als
+een eigen tabblad, met zijn eigen Log, status en branch:
+
+![De worktree hotfix/axis-labels geopend als eigen tabblad naast het hoofdtabblad, met zijn commit en gewijzigde bestand](../images/worktree-tab.png)
 
 Het palet heeft dezelfde acties op de geselecteerde rij (**Refs: Worktree openen in...**,
 **Refs: Worktree-branch mergen in...**, **Refs: Worktree verwijderen...**, **Refs: Worktree

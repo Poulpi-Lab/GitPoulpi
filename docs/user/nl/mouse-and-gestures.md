@@ -103,7 +103,7 @@ GitPoulpi onthoudt elke grootte. Zie
 
 ## Titelbalk, tabbalk en werkbalk
 
-- **Klik op 🐙** in de titelbalk om **Over** te openen. In Over volgen de pupillen van de
+- **Klik op <img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi-pictogram" height="16">** in de titelbalk om **Over** te openen. In Over volgen de pupillen van de
   octopus de aanwijzer; klik op het logo om het naar de volgende kleur te laten draaien, klik met rechts
   voor de lijst met kleuren, klik op een link om hem te openen.
 - **Klik op Openen in ▾** in de titelbalk voor de lijst met programma's. Zie

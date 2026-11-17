@@ -373,7 +373,7 @@ antwoord van CLI en MCP zegt `"posted": false`, en een lokale agent draait allee
 GitPoulpi alleen via de eigen knop **Verzenden** (`Ctrl+Enter`) of de plaatsknop van het formulier.
 
 **In de Markdown-composer.** Zolang AI aan staat, heeft elke composer waarvan de tekst naar een host gaat (een opmerking, een
-antwoord of een bewerking in [de gespreksweergave](hosting-integration.md#5c-gesprekken), een reviewopmerking, de samenvatting
+antwoord of een bewerking in [de gespreksweergave](conversations.md), een reviewopmerking, de samenvatting
 van Review afronden, de beschrijving van een nieuw issue en de beschrijving van een pull request) een knop **Schrijven met AI**
 (`Alt+E`, in alle dezelfde toets) aan het rechteruiteinde van zijn modusbalk. Ze opent een paneel onder de balk:
 

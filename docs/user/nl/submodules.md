@@ -15,6 +15,8 @@ Als een repository een `.gitmodules` heeft, krijgt de zijbalk Refs een sectie **
 | `○` | niet gekloond | gedeclareerd in `.gitmodules` en vastgelegd, maar de map is leeg: werk hem bij om hem te klonen |
 | `✗` | in conflict | de repository heeft merge-conflicten op de submodule |
 
+![De sectie SUBMODULES met drie rijen: vendor/almanac niet gekloond (○), vendor/ephemeris up-to-date (✓) en vendor/starfield gewijzigd (↑, op een andere commit dan de vastgelegde), die ook als gewijzigd bestand in het paneel Status staat](../images/submodules.png)
+
 | Doel | Muis | Toetsenbord |
 |---|---|---|
 | De submodule als eigen tabblad openen | dubbelklik op de rij | selecteer hem, `Enter` (palet: `Refs: Submodule openen in tabblad`) |
@@ -23,6 +25,8 @@ Als een repository een `.gitmodules` heeft, krijgt de zijbalk Refs een sectie **
 | Hem registreren in `.git/config` zonder te klonen | menu | `Ctrl+P`: `Refs: Submodule initialiseren (geselecteerd)` |
 | Elke submodule bijwerken | | `Ctrl+P`: `Git: Alle submodules bijwerken` |
 | Naar de sectie springen | klik op de kop | `Ctrl+P`: `Navigatie: Focus op Refs > Submodules` |
+
+![Het rechtsklikmenu van de gewijzigde rij vendor/starfield: Bijwerken (kloon indien nodig), Initialiseren en Openen in nieuw tabblad](../images/submodule-menu.png)
 
 Een update kan ophalen van de remote van de submodule, dus hij volgt **Instellingen > SSH & inloggegevens > HTTPS-inloggegevens** zoals elke andere overdracht. Een submodule die niet gekloond is, kan niet als tabblad worden geopend; de statusbalk zegt dat en verwijst naar Bijwerken.
 

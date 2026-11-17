@@ -15,6 +15,8 @@ Quando un repository ha un `.gitmodules`, la barra laterale Refs ottiene una sez
 | `○` | non clonato | dichiarato in `.gitmodules` e registrato, ma la sua cartella è vuota: aggiornalo per clonarlo |
 | `✗` | in conflitto | il repository ha conflitti di merge sul sottomodulo |
 
+![La sezione SOTTOMODULI con tre righe: vendor/almanac non clonato (○), vendor/ephemeris aggiornato (✓) e vendor/starfield modificato (↑, a un commit diverso da quello registrato), che compare anche come file modificato nel pannello Stato](../images/submodules.png)
+
 | Cosa fare | Mouse | Tastiera |
 |---|---|---|
 | Aprire il sottomodulo in una scheda propria | doppio clic sulla riga | selezionalo, `Enter` (palette: `Refs: Apri il sottomodulo in una scheda`) |
@@ -23,6 +25,8 @@ Quando un repository ha un `.gitmodules`, la barra laterale Refs ottiene una sez
 | Registrarlo in `.git/config` senza clonarlo | menu | `Ctrl+P`: `Refs: Inizializza il sottomodulo (selezionato)` |
 | Aggiornare tutti i sottomoduli | | `Ctrl+P`: `Git: Aggiorna tutti i sottomoduli` |
 | Saltare alla sezione | clic sull'intestazione | `Ctrl+P`: `Navigazione: Vai a Refs > Sottomoduli` |
+
+![Il menu del clic destro della riga modificata vendor/starfield: Aggiorna (clona se serve), Inizializza e Apri in una nuova scheda](../images/submodule-menu.png)
 
 Un aggiornamento può fare il fetch dal remoto del sottomodulo, quindi segue **Impostazioni > SSH e credenziali > Credenziali HTTPS** come ogni altro trasferimento. Un sottomodulo non clonato non ha nulla da aprire come scheda; la barra di stato lo dice e rimanda ad Aggiorna.
 

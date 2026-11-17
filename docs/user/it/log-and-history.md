@@ -192,7 +192,9 @@ STASH, per **Pop**, **Applica** (mantiene lo stash) o **Elimina**.
 dialogo che propone una cartella accanto al repository, il nome facoltativo di un
 nuovo branch e «Apri il nuovo worktree come scheda». I worktree compaiono nella
 sezione WORKTREES; doppio clic su uno per aprirlo, e la sua scheda si chiude da
-sola quando il worktree viene rimosso.
+sola quando il worktree viene rimosso. L'intera funzione (aprire in un altro
+strumento, fare il merge del branch di un worktree, rimuovere) è in [Worktrees](worktrees.md); la
+sezione SOTTOMODULI dello stesso pannello è in [Sottomoduli](submodules.md).
 
 ## Trascinare i ref sui commit
 

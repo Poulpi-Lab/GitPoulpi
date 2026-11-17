@@ -140,7 +140,7 @@ Se lavori da solo, o in un team che tiene le issue accanto al codice, la cartell
   `Shift+Left` / `Shift+Right`, o con **Bacheca: Sposta la card in...** (`m`), un elenco a discesa delle colonne. La card si sposta
   subito; lo `status` della nota viene riscritto come nella [sezione sulle note](#le-note), nient'altro nel file. Se la scrittura
   fallisce la card torna indietro e l'errore è nella barra di stato.
-- **Apri** una card con `Enter` o un doppio clic : si apre nella finestra la [conversazione](hosting-integration.md#5c-conversazioni) della nota, con il suo testo e i suoi commenti (**Apri nota** nel menu della card apre il file nel tuo programma predefinito per i `.md`). `e` modifica i suoi
+- **Apri** una card con `Enter` o un doppio clic : si apre nella finestra la [conversazione](conversations.md) della nota, con il suo testo e i suoi commenti (**Apri nota** nel menu della card apre il file nel tuo programma predefinito per i `.md`). `e` modifica i suoi
   assegnatari, etichette o milestone, `.` o un clic destro apre il menu della card, `n` avvia una nuova issue nella colonna
   selezionata (il modulo torna alla bacheca quando si chiude).
 - **Filtra** per assegnatario (`a`), etichetta (`l`), milestone (`M`) o testo (`/`); `x` li azzera. I filtri sono

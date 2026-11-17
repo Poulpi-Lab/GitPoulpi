@@ -34,7 +34,9 @@ rotella laterale), e non vanno mai a capo.
 ## Scegliere
 
 Ogni conflitto è un blocco incorniciato in A e in B, con una casella di controllo nell'intestazione e un
-`+` / `✓` davanti a ogni riga.
+`+` / `✓` davanti a ogni riga. Fai clic destro su un blocco per le scelte di quel conflitto:
+
+![Un menu del clic destro sul conflitto 2 dell'editor di merge: Prendi solo A, Prendi solo B, A poi B, B poi A, Non prendere nulla, Annulla la scelta, Modifica nel risultato e Suggerisci una risoluzione](../images/merge-editor-chunk-menu.png)
 
 | Per... | Tasto | Mouse |
 |---|---|---|
@@ -69,6 +71,10 @@ arancione finché richiede ancora una scelta, verde una volta gestito, blu per q
 Un clic su un segno salta a quel conflitto (un segno sotto il cursore della barra di scorrimento è
 già sullo schermo, quindi lì il clic trascina il cursore).
 
+Prendere entrambi (**A poi B**) scrive le righe di A e poi quelle di B sotto il marcatore del conflitto nel Risultato, ciascuna con l'indicazione del suo lato; i badge `1st` / `2nd` sui due blocchi dicono l'ordine, e `s` lo scambia:
+
+![Il conflitto 2 preso da entrambi i lati: la sua riga A e la sua riga B sono spuntate, e il Risultato le mostra una dopo l'altra, con l'indicazione A e B, mentre i conflitti 1 e 3 attendono ancora una scelta](../images/merge-editor-take-both.png)
+
 **File intero** mostra l'intero file in A e B con ogni differenza colorata, non solo i conflitti:
 
 ![Modalità File intero: l'intero file in A e B, con le modifiche colorate](../images/merge-editor-full-file.png)
@@ -77,6 +83,8 @@ Il Risultato è un vero editor: fai clic al suo interno e scrivi, seleziona, tag
 `Ctrl+F`. Una scelta su un conflitto che hai modificato a mano sostituisce la tua modifica (`Ctrl+Z`
 la recupera). Salvare con un conflitto in cui non è stato scelto nulla, o con una riga
 che sembra ancora un marcatore di conflitto, chiede prima conferma.
+
+![L'editor di merge con ogni conflitto gestito: conflitto 1 preso da A, conflitto 2 da entrambi i lati, conflitto 3 scritto a mano nel Risultato (segnato con una matita e contato come modificato), e il pulsante Salva e segna come risolto evidenziato nella barra degli strumenti](../images/merge-editor-output-edited.png)
 
 ### ✦ Suggerisci una risoluzione (IA)
 
@@ -91,10 +99,24 @@ anch'esso lì. Con l'IA disattivata nessuno di questi controlli esiste.
 
 Dopo **Salva e segna come risolto** il file è in stage e l'elenco dei file in conflitto è
 tornato; apri tu il file successivo. `Ctrl+Z` (o il pulsante Annulla)
-annulla l'ultimo "segna come risolto". Quando non resta nessun file, il banner offre
+annulla l'ultimo "segna come risolto".
+
+![Dopo Salva e segna come risolto: il banner dice "Merge in corso, 1 file in conflitto", orbit.rs è passato in File in stage e logo.bin è l'unico file rimasto in File non in stage, segnato con un ! rosso](../images/conflict-file-resolved.png)
+
+Quando non resta nessun file, il banner offre
 **Esegui il commit del merge** (o **Continua** per un cherry-pick, un revert o un rebase) e
 **Interrompi il merge**, che chiede prima conferma: rimette HEAD, l'indice e la directory di lavoro
 com'erano.
+
+![Il banner quando ogni file è risolto: "Merge in corso, tutti i conflitti risolti" con i pulsanti Esegui il commit del merge e Interrompi il merge, e il file risolto sotto File in stage](../images/conflict-commit-merge.png)
+
+Un rebase si ferma allo stesso modo, passo dopo passo. Il suo banner nomina il branch e ciò su cui è rebasato, e ha **Risolvi i conflitti...**, **Continua**, **Salta** e **Interrompi**:
+
+![Il banner di un rebase fermo su due conflitti: "Rebase di feature/cleanup su ..." con Risolvi i conflitti..., Continua, Salta e Interrompi, e i due file in conflitto nel pannello Stato](../images/conflict-banner-rebase.png)
+
+Quando l'ultimo file è risolto lo stesso banner è pronto per **Continua**:
+
+![Il banner del rebase dopo la risoluzione di entrambi i file: restano solo Continua, Salta e Interrompi, ed entrambi i file sono sotto File in stage](../images/conflict-banner-continue.png)
 
 Un merge il cui risultato è uguale a HEAD (hai preso il nostro lato ovunque) non ha nulla
 in stage e nessun file modificato, eppure può comunque essere concluso: **Esegui il commit del merge**
@@ -123,6 +145,8 @@ scelta; scegliere risolve il file e lo mette subito in stage.
 | Eliminato da un lato, modificato dall'altro | **Tieni il file** (`k`), **Accetta l'eliminazione** (`Shift+D`) |
 | Residuo di rinomina (il percorso esiste da un solo lato) | **Tieni il file** (`k`), **Elimina il file** (`Shift+D`) |
 | Collegamento simbolico, sottomodulo, modalità del file | **Tieni A**, **Prendi B**, **Prendi base** |
+
+![La scheda di un file modificato in A ed eliminato in B: il riquadro A mostra la dimensione e la modalità del file, il riquadro B dice "nessun file qui (eliminato)", il riquadro della base mostra l'originale, e i pulsanti sono Tieni il file e Accetta l'eliminazione](../images/merge-editor-deleted-card.png)
 
 Quando il file è un'immagine (PNG, JPEG, GIF, WebP, BMP, ICO), i riquadri mostrano anche
 le immagini A, B e Base, adattate e in sola lettura, in una finestra abbastanza larga per

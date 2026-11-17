@@ -6,6 +6,8 @@ Un worktree è una seconda copia in checkout del repository: un'altra cartella,
 su un altro branch, che condivide la stessa cronologia. La sezione WORKTREES del
 pannello Refs li elenca; quello principale è segnato con `(main)`.
 
+![Il pannello Refs di un repository con due worktree collegati: la sezione WORKTREES elenca main (main), hotfix/axis-labels e feature/legend, con la sezione SOTTOMODULI sotto](../images/worktrees.png)
+
 ## Mostrare la sezione
 
 La sezione è nascosta in un repository che non ha ancora alcun worktree
@@ -35,6 +37,8 @@ La palette ha le stesse tre voci (**Refs: Crea un worktree dal branch
 corrente**, **Git: Crea un worktree sul commit selezionato...**, **Refs: Crea
 un worktree scegliendo un branch**). Le voci precedenti funzionano ancora:
 **Crea un worktree da...** nel menu di un branch, di un tag o di un commit.
+
+![Il dialogo Crea worktree: i campi Nome, Cartella, Ref e Branch del worktree, la riga "nuovo branch da main", la casella Apri il nuovo worktree come scheda e i pulsanti Annulla e Crea](../images/worktree-create.png)
 
 Il dialogo propone tutto e ti lascia cambiarlo. Il **Nome** e il nuovo branch
 partono entrambi come `worktree-<id>`, dove `<id>` sono 8 cifre esadecimali
@@ -83,6 +87,13 @@ Clic destro su un worktree (oppure selezionalo e premi il tasto menu,
   conflitti. Un branch che non è in checkout da nessuna parte viene rifiutato,
   con il motivo. Non offerto per un worktree con HEAD scollegato.
 - **Rimuovi worktree...**: mai quello principale.
+
+![Il menu del clic destro di una riga di worktree: Apri in una nuova scheda, Apri in, Merge di hotfix/axis-labels in... e Rimuovi worktree...](../images/worktree-menu.png)
+
+**Apri in una nuova scheda** (o un doppio clic, o `Enter`) apre la cartella del worktree come
+scheda propria, con il suo Log, il suo stato e il suo branch:
+
+![Il worktree hotfix/axis-labels aperto come scheda propria accanto a quella principale, con il suo commit e il suo file modificato](../images/worktree-tab.png)
 
 La palette ha le stesse azioni sulla riga selezionata (**Refs: Apri il
 worktree in...**, **Refs: Merge del branch del worktree in...**, **Refs:

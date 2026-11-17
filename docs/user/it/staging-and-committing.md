@@ -18,6 +18,9 @@ le modifiche in corso:
 - **File non in stage**: file modificati, aggiunti (non tracciati) ed eliminati non ancora nel
   prossimo commit.
 - **File in stage**: ciò che conterrà il prossimo commit.
+- **File in conflitto** (un `!` rosso, mentre un merge, un rebase, un cherry-pick o un revert
+  è fermo): `Enter` apre l'editor di merge, vedi
+  [Risolvere i conflitti di merge](merge-conflicts.md).
 - **I file rinominati o spostati** sono una sola riga, `nuovo <- vecchio`, in entrambi gli elenchi (un file
   eliminato su disco e uno nuovo con almeno il 50% di contenuto uguale contano come uno
   spostamento anche prima di metterli in stage). Stage, Unstage e Scarta agiscono su entrambi i
@@ -185,8 +188,10 @@ nell'altro.
 - **Salta gli hook** (`Shift+H`, o **Commit: Attiva o disattiva «Salta gli hook»** nella palette)
   fa il commit senza eseguire gli hook `pre-commit` e `commit-msg` del repository. Vale per un
   singolo commit; **Impostazioni > Impostazioni specifiche del repository > Commit** lo fa partire
-  selezionato. Su una riga stretta la sua etichetta si accorcia in **No hook**, poi resta la sola
-  casella (il suggerimento la nomina); non sparisce mai.
+  selezionato. Ha una riga tutta sua subito sotto **Modifica il commit precedente**, con l'etichetta
+  intera; solo su un pannello molto stretto l'etichetta si accorcia in **No hook**, poi resta la sola
+  casella (il suggerimento la nomina). Non sparisce mai. In un modulo molto basso condivide invece
+  la riga di Modifica, accorciandosi allo stesso modo.
 - `c` nel pannello Stato porta il cursore nel modulo. `Esc` lo lascia.
 - `Ctrl+G c` e `Ctrl+G Enter` (**Git: Commit...** e **Git: Esegui ora il commit delle modifiche
   in stage** nella palette) sono un solo comando, il pulsante di commit da qualsiasi punto. Con un
@@ -212,8 +217,7 @@ modifichi; non viene fatto alcun commit finché non premi il pulsante di commit.
 **Componi commit con l'IA** sta all'estremità destra della riga Modifica e si riduce
 con il pannello destro invece di sparire: l'etichetta intera, poi **Componi con l'IA**, poi
 il solo **`✦`**. Mantiene il clic, il suggerimento e il tasto
-(`Ctrl+G Shift+C`) a ogni larghezza; l'etichetta Salta gli hook gli cede il posto
-(**No hook**, poi la sola casella) prima che lui si riduca.
+(`Ctrl+G Shift+C`) a ogni larghezza.
 
 I pulsanti **`✦`** (genera il messaggio) e **`#`** (inserisci un riferimento a un'issue) all'estremità destra
 della riga del riepilogo si riducono allo stesso modo: in un pannello stretto perdono i margini, poi si

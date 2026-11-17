@@ -9,7 +9,7 @@ lavoro in corso. È la finestra Home con la vista Radar sopra, così che nulla s
 rubare un clic o un tasto.
 
 Richiede un profilo di host di codice (vedi [Integrazioni di hosting e issue
-tracker](hosting-integration.md)) e dei repository collegati a esso, oppure un profilo con gli elenchi a livello di
+tracker](hosting-integration.md); gli elenchi di un repository sono in [Pull request e issue](pull-requests-and-issues.md), e la discussione di una riga si apre come [conversazione](conversations.md)) e dei repository collegati a esso, oppure un profilo con gli elenchi a livello di
 account attivati (vedi «Oltre l'ambito» più sotto). Un repository non
 collegato non viene mai interrogato: mostra invece una riga **Collega...** (vedi
 «Repository con qualcosa da dire» più sotto).

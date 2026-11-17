@@ -469,14 +469,14 @@ mod tests {
         let km = Keymap::defaults();
         let wide = nav_hint_rows(&km, 240).join(" ");
         for want in [
-            "y=theme",
-            "g=language",
+            "t=theme",
+            "l=language",
             ",=settings",
-            "t=select tab",
+            "Tab=select tab",
             "A=activity",
             "u=updates",
             "a=about",
-            "h=collapse Refs",
+            "H=collapse Refs",
             "?=help",
         ] {
             assert!(wide.contains(want), "{want} missing: {wide}");
@@ -488,7 +488,7 @@ mod tests {
                 let rows = nav_hint_rows(&km, width);
                 assert_fits(&rows, width, &format!("{lang:?} {width}"));
                 let text = rows.join(" ");
-                assert!(text.contains("y="), "{lang:?} {width}: theme key: {text}");
+                assert!(text.contains("t="), "{lang:?} {width}: theme key: {text}");
                 if width <= 60 {
                     assert!(text.contains("?="), "{lang:?} {width}: no help: {text}");
                 }

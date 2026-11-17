@@ -201,6 +201,7 @@ fn every_git_prefix_default_resolves_to_its_own_action() {
                 Key::Backspace => KeyCode::Backspace,
                 Key::Left => KeyCode::Left,
                 Key::Right => KeyCode::Right,
+                Key::Tab => KeyCode::Tab,
                 other => panic!("unexpected {other:?}"),
             };
             let mods = if chord.mods.shift {
@@ -223,7 +224,7 @@ fn labels_carry_the_effective_prefix() {
     let km = Keymap::defaults();
     assert_eq!(km.label(Action::GitStageFile), "Ctrl+G s");
     assert_eq!(km.label(Action::GitPush), "Ctrl+G Shift+P");
-    assert_eq!(km.label(Action::NavCollapseLeft), "Ctrl+N H");
+    assert_eq!(km.label(Action::NavCollapseLeft), "Ctrl+N Shift+H");
     assert_eq!(km.labels(Action::NavGrowSection), ["Ctrl+N +", "Ctrl+N ="]);
     assert_eq!(km.label(Action::GlobalSettings), "Ctrl+,");
     assert_eq!(km.label(Action::PromptAiStashMessage), "Ctrl+G");

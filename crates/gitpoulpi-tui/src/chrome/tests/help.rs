@@ -206,9 +206,9 @@ fn prefix_hint_lists_ai_keys_only_when_on() {
     assert!(off.starts_with("Ctrl+G: s=stage u=unstage"), "{off}");
     assert!(!off.contains("AI-message") && on.contains("i=AI-message w=AI-explain"));
     let nav = prefix_hint(&km, keymap::Ctx::NavPrefix, false);
-    assert!(nav.starts_with("Ctrl+N: h=collapse Refs  l=collapse Status  <badge>"));
+    assert!(nav.starts_with("Ctrl+N: H=collapse Refs  L=collapse Status  <badge>"));
     assert!(
-        nav.contains("y=theme") && nav.contains("g=language"),
+        nav.contains("t=theme") && nav.contains("l=language"),
         "{nav}"
     );
     assert!(nav.ends_with("?=help  (Esc to cancel)"), "{nav}");
@@ -225,7 +225,7 @@ fn prefix_hint_follows_the_keymap_and_drops_unbound_keys() {
     assert!(hint.starts_with("Ctrl+B: z=stage u=unstage"), "{hint}");
     assert!(!hint.contains("pull") && !hint.contains("Ctrl+G"), "{hint}");
     let km = km_with(&[("global", "nav_prefix", &["Alt+N"])]);
-    assert!(prefix_hint(&km, keymap::Ctx::NavPrefix, false).starts_with("Alt+N: h="));
+    assert!(prefix_hint(&km, keymap::Ctx::NavPrefix, false).starts_with("Alt+N: H="));
 }
 
 #[test]

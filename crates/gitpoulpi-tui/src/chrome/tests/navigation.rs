@@ -9,11 +9,11 @@ use super::*;
 #[test]
 fn navigation_key_action_maps_every_prefix_key() {
     assert_eq!(
-        navigation_key_action(KeyCode::Char('h')),
+        navigation_key_action_mods(KeyCode::Char('H'), crossterm::event::KeyModifiers::SHIFT),
         NavigationAction::CollapseLeft
     );
     assert_eq!(
-        navigation_key_action(KeyCode::Char('l')),
+        navigation_key_action_mods(KeyCode::Char('L'), crossterm::event::KeyModifiers::SHIFT),
         NavigationAction::CollapseRight
     );
     assert_eq!(
@@ -37,7 +37,7 @@ fn navigation_key_action_maps_every_prefix_key() {
         NavigationAction::ToggleHelp
     );
     assert_eq!(
-        navigation_key_action(KeyCode::Char('t')),
+        navigation_key_action(KeyCode::Tab),
         NavigationAction::SelectTab
     );
 }

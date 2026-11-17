@@ -103,7 +103,7 @@ tabblad.
 een nieuwe repository.
 In alle drie de dialogen (en in de mapkiezer die ze openen) toont `Ctrl+N` een badge op elk veld en elke knop: druk op het teken om de cursor in het veld te zetten of de knop in te drukken.
 
-| ![Het kloondialoogvenster: waarheen klonen, de URL, de mapnaam en de knop om de repo te klonen](../images/clone.png) | ![Het dialoogvenster Een repository initialiseren: de map, de naam en de eerste branch](../images/init.png) |
+| ![Het kloondialoogvenster: waarheen klonen, de URL, de mapnaam en de knoppen Annuleren en Klonen](../images/clone.png) | ![Het dialoogvenster Een repository initialiseren: de map, de naam en de eerste branch](../images/init.png) |
 |---|---|
 
 ### Gedeeltelijke checkout

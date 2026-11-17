@@ -130,7 +130,7 @@ pagina. Klik erop, of druk op `/` of `Ctrl+F`, en typ. Er klapt een lijst met tr
 Elke treffer toont de optie en haar pagina. `Up` / `Down` kiezen, `Enter` gaat naar de optie,
 `Esc` sluit de lijst.
 
-![De Instellingen doorzoeken op "diff": de overeenkomende opties van de pagina's Log & grafiek, Diff & editor en Git](../images/settings-search.png)
+![De Instellingen doorzoeken op "diff": de overeenkomende opties van de pagina's AI en Diff & editor](../images/settings-search.png)
 
 ## Instellingen via het opdrachtenpalet
 
@@ -208,7 +208,7 @@ logokleur (Over GitPoulpi > kleur); op Linux heeft elke kleur zijn eigen pictogr
 
 **Groeperen in taakbalk en Dock.** GitPoulpi draait in een terminalvenster, dus de taakbalk toont het normaal onder het pictogram van de terminal, zonder “actief”-stip onder het vastgemaakte GitPoulpi-pictogram. Windows: de snelkoppelingen dragen de AppUserModelID `GitPoulpi.GitPoulpi`, en een GitPoulpi dat vanuit een ervan is gestart geeft zijn terminalvenster dezelfde ID en zijn pictogram (het vindt het venster door het even een unieke titel te geven en zet de titel daarna terug), zodat het venster onder het vastgemaakte GitPoulpi-pictogram staat. Een terminalvenster met meerdere tabbladen verplaatst als geheel: al zijn tabbladen groeperen onder het GitPoulpi-pictogram zolang GitPoulpi erin draait. Eerder gemaakte snelkoppelingen en vastgemaakte taakbalkitems worden door dezelfde synchronisatie herschreven; toont een vastgemaakt item nog het pictogram van de terminal, maak het dan los en maak het opnieuw vast. Linux: kitty, foot, Alacritty, WezTerm en Ghostty worden gestart met de vensterklasse `gitpoulpi` en het `.desktop`-bestand noemt die (`StartupWMClass`), zodat een dock het venster onder het pictogram van de starter groepeert; andere terminals houden hun eigen pictogram. macOS: niets te doen, het Dock groepeert per app.
 
-![Instellingen > Starter: de terminal voor snelkoppelingen en de rij van de app-starter](../images/settings-launcher.png)
+![Instellingen > Starter: de terminal voor snelkoppelingen, de starterbuild, de opdracht en de aliassen voor een nieuw tabblad, de aliasstatus en de PATH-controle](../images/settings-launcher.png)
 
 #### Opdrachtalias en PATH, per systeem
 
@@ -411,7 +411,7 @@ de server bevatten; zie [MCP en agents](mcp-and-agents.md).
 
 ### Weergave
 
-![De pagina Weergave: thema, avatars, invoerkleur, kleurdiepte en grafiekkleuren (de datumformaten volgen hieronder)](../images/settings-ui.png)
+![De pagina Weergave naar beneden gescrold: avatarbronnen en terugval, invoerkleur, kleurdiepte, tekstcursor en het begin van de grafiekkleuren (de datumformaten volgen hieronder)](../images/settings-ui.png)
 
 ![De keuzelijst Thema open op Weergave met Licht gemarkeerd: het hele scherm Instellingen verft al in dat thema](../images/settings-appearance-theme.png)
 

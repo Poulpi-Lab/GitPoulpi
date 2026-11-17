@@ -100,7 +100,7 @@ kartě. `Ctrl+W` zavře aktuální kartu.
 repozitář.
 Ve všech třech dialozích (i ve výběru složky, který otevírají) `Ctrl+N` ukáže odznak na každém poli a tlačítku: stiskněte znak a kurzor skočí do pole, nebo se stiskne tlačítko.
 
-| ![Dialog Klonovat repozitář: kam klonovat, URL, název složky a tlačítko Naklonovat repozitář!](../images/clone.png) | ![Dialog Inicializovat repozitář: složka, název a počáteční větev](../images/init.png) |
+| ![Dialog Klonovat repozitář: kam klonovat, URL, název složky a tlačítka Zrušit a Naklonovat](../images/clone.png) | ![Dialog Inicializovat repozitář: složka, název a počáteční větev](../images/init.png) |
 |---|---|
 
 ### Částečný checkout

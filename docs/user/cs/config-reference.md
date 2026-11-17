@@ -585,6 +585,14 @@ zřídka.
 | `commit-template.txt` (soubor vedle `repo-state.toml`) | Šablona commitu; ukazuje na ni `commit.template` gitu | Nastavení > Nastavení repozitáře > Šablona zprávy |
 | `[preferences.ai_instructions]` | `text`, `mode = "add" \| "replace"`: instrukce AI tohoto repozitáře | Nastavení > Nastavení repozitáře > AI |
 | `[preferences.ai_overrides.<action>]` | `profile`, `instructions` pro jednu akci zde | Nastavení > Nastavení repozitáře > AI |
+| `[preferences] merge_fast_forward` | Přepíše zde `git.merge_fast_forward`: `never`, `allowed` nebo `only` | Nastavení > Nastavení repozitáře > Možnosti merge |
+| `[preferences] default_push_targets` | Remotes, na které nová větev také pushuje; zkopírují se do větve, až poprvé dostane upstream | Nastavení > Nastavení repozitáře > Git a kódování; viz [Několik remote](multiple-remotes.md) |
+| `[preferences.ai_review]`, `[preferences.ai_hosting_reply]` | Vlastní hodnoty tohoto repozitáře pro klíče `[ai.review]` a `[ai.hosting_reply]`; chybějící klíče dědí globální | Nastavení > Nastavení repozitáře > AI |
+| `hosting_post_as`, `hosting_identity` | Jméno, pod kterým se zde vaše zprávy odesílají hostiteli (přepisuje `general.hosting_post_as`), a login, který se GitPoulpi naučí z první zprávy odeslané botovým tokenem, když žádný není nastaven | Nastavení > Nastavení repozitáře > SSH a přihlášení; viz [Konverzace](conversations.md#odesílání-jako) |
+| `assignment_blocked` | V issues a pull requestech tohoto repozitáře nelze z GitPoulpi nikomu nic přiřadit | `gitpoulpi hosting assignment --block \| --allow` |
+| `board_labels` | Štítky, které jsou sloupci tabule issues u hostitele bez workflow, v pořadí tabule | tlačítko **Sloupce** tabule |
+| `conversation_seen`, `conversation_events`, `posted_comment_ids` | Co jste naposledy přečetli v každé konverzaci (zbytek je nepřečtený), zda se zobrazují systémové události, a komentáře, které tato instalace odeslala (ty smí bot upravit nebo smazat) | zapisuje pohled konverzace |
+| `reviews` | Místní stav revize v aplikaci pro každý požadavek: čekající komentáře, zobrazené soubory | zapisuje pohled revize |
 | `default_remote` | Remote, který používají jednoklikové Push/Pull/Fetch | nabídka remote, `gitpoulpi remote default <name>` |
 | `hosting_integration` | Zde připnutý profil `[[integrations]]` | `gitpoulpi hosting use --id` |
 | `pulls_source`, `issues_source` | Projekt poskytovatele, který čtou seznamy PR / issues, jako `{ integration, project, filter }`. `filter` je volitelný: další klauzule v syntaxi poskytovatele (fragment JQL Jiry, podmínka WIQL Azure, názvy seznamů Trella) připojená přes AND k dotazu na seznam; GitHub a GitLab ji ignorují. | sekce postranního panelu, `gitpoulpi hosting link` |

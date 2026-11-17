@@ -130,7 +130,7 @@ Klikněte do něj, nebo stiskněte `/` či `Ctrl+F`, a pište. Rozbalí se sezna
 shod. Každá shoda zobrazuje volbu a její stránku. `Up` / `Down` vybírají,
 `Enter` přejde na volbu, `Esc` seznam zavře.
 
-![Hledání „diff“ v Nastavení: odpovídající volby ze stránek Log a graf, Diff a editor a Git a kódování](../images/settings-search.png)
+![Hledání „diff“ v Nastavení: odpovídající volby ze stránek AI a Diff a editor](../images/settings-search.png)
 
 ## Nastavení z palety příkazů
 
@@ -209,7 +209,7 @@ barva vlastní název ikony, takže spouštěč, který ikony ukládá do mezipa
 
 **Seskupování na hlavním panelu a v docku.** GitPoulpi běží v okně terminálu, takže hlavní panel ho obvykle ukazuje pod ikonou terminálu, bez tečky „běží“ pod připnutou ikonou GitPoulpi. Windows: zástupci nesou AppUserModelID `GitPoulpi.GitPoulpi` a GitPoulpi spuštěný z některého z nich dá oknu svého terminálu stejné ID a svou ikonu (okno najde tak, že mu na okamžik nastaví jedinečný titulek a pak ho obnoví), takže okno leží pod připnutou ikonou GitPoulpi. Okno terminálu s více kartami se přesouvá jako celek: všechny jeho karty se seskupí pod ikonou GitPoulpi, dokud v něm GitPoulpi běží. Dříve vytvořené zástupce a připnutí na hlavním panelu přepíše stejná synchronizace; pokud připnutí stále ukazuje ikonu terminálu, odepněte ho a připněte znovu. Linux: kitty, foot, Alacritty, WezTerm a Ghostty se spouštějí s třídou okna `gitpoulpi` a záznam `.desktop` ji uvádí (`StartupWMClass`), takže dock seskupí okno pod ikonu spouštěče; ostatní terminály si nechávají vlastní ikonu. macOS: není co dělat, Dock seskupuje podle aplikace.
 
-![Nastavení > Spouštěč: terminál pro zástupce a řádek spouštěče aplikací](../images/settings-launcher.png)
+![Nastavení > Spouštěč: terminál pro zástupce, build spouštěče, aliasy příkazu a přidání karty, stav aliasu a kontrola PATH](../images/settings-launcher.png)
 
 #### Alias příkazu a PATH podle systému
 
@@ -406,7 +406,7 @@ obsahují; viz [MCP a agenti](mcp-and-agents.md).
 
 ### Vzhled
 
-![Stránka Vzhled: motiv, avatary, barva vstupů, barevná hloubka a barvy grafu (formáty data následují níže)](../images/settings-ui.png)
+![Stránka Vzhled posunutá dolů: zdroje avatarů a záložní avatar, barva vstupů, barevná hloubka, textový kurzor a začátek barev grafu (formáty data následují níže)](../images/settings-ui.png)
 
 ![Rozbalený seznam Motiv na stránce Vzhled se zvýrazněným motivem Light: celá obrazovka Nastavení se už v tomto motivu překreslila](../images/settings-appearance-theme.png)
 

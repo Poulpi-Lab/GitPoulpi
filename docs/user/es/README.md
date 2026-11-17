@@ -28,10 +28,31 @@ necesites.
 3. **[Recorrido por la interfaz](interface-tour.md)**: el nombre de cada zona de
    la ventana, con imágenes.
 
+## Encontrar una función
+
+| Quiero... | Página | Cómo llegar en la aplicación |
+|---|---|---|
+| Trabajar en dos ramas a la vez | [Worktrees](worktrees.md) | La sección **WORKTREES** de la barra lateral Refs (`+` crea uno; oculta hasta que existe uno: paleta **Panel izquierdo: Mostrar la sección Worktrees**); paleta **Refs: Crear worktree...** |
+| Trabajar con repositorios anidados | [Submódulos](submodules.md) | La sección **SUBMÓDULOS** de la barra lateral Refs; paleta **Git: Actualizar todos los submódulos**, **Refs: Actualizar submódulo (seleccionado)** |
+| Resolver un conflicto de merge | [Resolver conflictos de merge](merge-conflicts.md) | `Enter` sobre una fila `!` del panel Estado, el botón **Resolver conflictos...** del banner, o `Shift+E` en la vista Diff; paleta **Conflictos: Abrir el editor de merge** |
+| Revisar una pull o merge request | [Revisar una pull request](review.md) | `Enter` sobre una fila de la sección **PULL REQUESTS**, `e` sobre una fila del Radar, `Alt+R` en la búsqueda del espacio de trabajo; paleta **Alojamiento: Revisar solicitud...** |
+| Explorar, crear y gestionar pull requests e issues | [Pull requests e issues](pull-requests-and-issues.md) | Las secciones **PULL REQUESTS** e **ISSUES** de la barra lateral Refs (`n` crea uno); paleta **Pull requests: Crear pull request...**, **Alojamiento: Nuevo issue...**. Antes, conecta una cuenta: [Alojamiento y gestores de issues](hosting-integration.md) |
+| Leer y responder la discusión de un issue o de una request | [Conversaciones](conversations.md) | `Enter` sobre una fila de issue, una tarjeta del tablero o una fila del Radar; paleta **Alojamiento: Abrir la conversación de un issue...** |
+| Ver mis issues como un tablero | [El tablero de issues](pull-requests-and-issues.md#el-tablero-de-issues) | El botón **Tablero** del encabezado de ISSUES; paleta **Issues: Abrir tablero** |
+| Guardar issues como notas Markdown, sin token | [Issues locales y Obsidian](local-issues.md) | La sección ISSUES, proveedor `Local Markdown - <nombre>`; paleta **Issues locales: Abrir en Obsidian...** |
+| Reescribir autores, fechas, mensajes o archivos en muchos commits | [Reescritura del historial](history-rewrite.md) | `Ctrl+G Shift+H`; paleta **Reescritura: Editor del historial** |
+| Deshacer (o rehacer) una operación | [Deshacer y rehacer](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`; `Alt+Z` abre el historial de deshacer; paleta **Edición: Deshacer** |
+| Seguir archivos grandes con Git LFS | [Git LFS](lfs.md) | Paleta **LFS: Seguir patrón...**, **LFS: Inicializar en este repositorio** |
+| Encontrar una rama, un commit, una pull request o un issue en varios repositorios | [Búsqueda](search.md) | `Ctrl+Alt+F`, o el botón Búsqueda global de la barra de título; `f` busca en el grafo de commits del repositorio actual |
+| Ver en una sola lista todo lo que me espera | [El Radar](radar.md) | `Alt+R`; paleta **Radar: Abrir** |
+| Agrupar repositorios y hacerles fetch o pull juntos | [Espacios de trabajo](workspaces.md) | `Alt+W` cambia, `Alt+J` abre la pestaña Espacios de trabajo; paleta **Espacio de trabajo: Gestionar...** |
+| Recibir ayuda de IA (mensajes de commit, explicaciones, descripciones) | [Asistencia de IA](ai.md) | `Ctrl+,` > **IA** > **Activar IA**, y luego `Ctrl+G i` escribe un mensaje de commit; paleta **IA: ...** |
+| Encontrar cualquier comando o tecla | [Atajos de teclado](keybindings.md) | `?` en la aplicación lista las teclas, `Ctrl+P` encuentra cualquier comando |
+
 ## Uso diario
 
 4. **[Trabajar con el Log](log-and-history.md)**: leer el grafo, búsqueda,
-   ramas, tags, stashes, worktrees, arrastrar refs, rebase, cherry-pick,
+   ramas, tags, stashes, arrastrar refs, rebase, cherry-pick,
    reword y modificación de commits, banners, pull y push, auto-stash.
 5. **[Stage y commit](staging-and-committing.md)**: los cambios de trabajo,
    diffs, stage de hunks y de líneas sueltas, escribir commits, el compositor de
@@ -42,39 +63,46 @@ necesites.
    y B en paralelo sobre el resultado), elegir líneas y bloques, tarjetas para
    conflictos binarios, de LFS, de archivos borrados, de enlaces simbólicos y de
    submódulos, y cómo propone una resolución un agente.
-8. **[Deshacer y rehacer](undo-redo.md)**: `Ctrl+Z` / `Ctrl+Y`, qué se puede y
-   qué no se puede deshacer, cuándo se niega o pregunta, hasta dónde llega,
-   cómo desactivarlo.
-9. **[Git LFS](lfs.md)**: archivos grandes, seguimiento, bloqueos, y qué pasa
-   sin `git-lfs` instalado.
-10. **[Submódulos](submodules.md)**: la sección SUBMÓDULOS, cómo actualizarlos y
-    cómo mantenerlos al ritmo de los checkouts y los pulls.
-11. **[Temas](themes.md)**: los temas integrados, cualquier tema con cualquier
+8. **[Worktrees](worktrees.md)**: una segunda carpeta con checkout en otra rama:
+   la sección WORKTREES, crear, abrir, hacer merge y eliminar worktrees
+   vinculados.
+9. **[Submódulos](submodules.md)**: la sección SUBMÓDULOS, cómo actualizarlos y
+   cómo mantenerlos al ritmo de los checkouts y los pulls.
+10. **[Deshacer y rehacer](undo-redo.md)**: `Ctrl+Z` / `Ctrl+Y`, qué se puede y
+    qué no se puede deshacer, cuándo se niega o pregunta, hasta dónde llega,
+    cómo desactivarlo.
+11. **[Git LFS](lfs.md)**: archivos grandes, seguimiento, bloqueos, y qué pasa
+    sin `git-lfs` instalado.
+12. **[Temas](themes.md)**: los temas integrados, cualquier tema con cualquier
     paleta de carriles, vista previa en vivo, tus propios archivos de tema,
     `gitpoulpi theme`.
-12. **[Espacios de trabajo](workspaces.md)**: grupos con nombre de repositorios
+13. **[Espacios de trabajo](workspaces.md)**: grupos con nombre de repositorios
     con sus propias pestañas y un perfil de commit predeterminado opcional, el
     chip de la barra de pestañas, la pestaña Espacios de trabajo, Fetch todo, Pull todo, Clonar los ausentes.
-13. **[Búsqueda](search.md)**: un buscador aproximado (`Ctrl+Alt+F`) sobre las
+14. **[Búsqueda](search.md)**: un buscador aproximado (`Ctrl+Alt+F`) sobre las
     ramas, tags, worktrees, stashes, commits, pull/merge requests e issues de
     todos los repositorios del espacio de trabajo o de las pestañas abiertas.
-14. **[El Radar](radar.md)**: las pull y merge requests, los issues y el
+15. **[El Radar](radar.md)**: las pull y merge requests, los issues y el
     trabajo en curso de un espacio de trabajo (o de tus pestañas abiertas) en una
     sola lista: filtros, fijaciones, posposiciones y qué puede hacer cada fila.
-    Leer y revisar una de esas solicitudes dentro de la aplicación, con hilos de
-    comentarios, una revisión pendiente y Aprobar / Solicitar cambios:
-    **[Revisar una pull request](review.md)**.
-15. **[Abrir en](open-in.md)**: la lista de la barra de título que abre la
+16. **[Pull requests e issues](pull-requests-and-issues.md)**: las secciones
+    PULL REQUESTS e ISSUES de la barra lateral, el tablero de issues, crear una
+    pull request o un issue, el chip de la barra de herramientas, las referencias
+    en los mensajes de commit.
+17. **[Conversaciones](conversations.md)**: leer y responder la discusión de un
+    issue o de una request dentro de la ventana, publicar como, qué no puede
+    hacer cada host.
+18. **[Revisar una pull request](review.md)**: la vista de revisión con hilos de
+    comentarios, una revisión pendiente y Aprobar / Solicitar cambios.
+19. **[Abrir en](open-in.md)**: la lista de la barra de título que abre la
     carpeta de la pestaña activa en un terminal, un multiplexor, un editor o un
     gestor de archivos.
-16. **[Seguir la carpeta de la pestaña activa](following-the-tab-folder.md)**:
+20. **[Seguir la carpeta de la pestaña activa](following-the-tab-folder.md)**:
     «Salir y cd aquí», y la función `gitpoulpi shell-init` (`gp`) para bash,
     zsh, fish y PowerShell.
     Qué terminal muestra mejor GitPoulpi: **[Elegir un terminal](terminals.md)**.
     Qué pasa a través de tmux, zellij, screen, herdr y los paneles de terminal:
     **[Multiplexores](multiplexers.md)**.
-
-Además: **[Worktrees](worktrees.md)**: crear, abrir, hacer merge y eliminar worktrees vinculados.
 
 Además: **[Varios remotos para una rama](multiple-remotes.md)**: destinos de push y
 fuentes de pull, el diálogo Remotos, Push a todos o a remotos seleccionados, resolver un
@@ -90,34 +118,33 @@ muchos commits, con vista previa, scripts Lua y un único deshacer.
 
 ## Teclado y ratón
 
-17. **[Atajos de teclado](keybindings.md)**: cada tecla, por zona, y cada
+21. **[Atajos de teclado](keybindings.md)**: cada tecla, por zona, y cada
     comando de la paleta. En la aplicación, `?` muestra la misma lista y
     `Ctrl+P` encuentra cualquier comando.
-18. **[Ratón y gestos](mouse-and-gestures.md)**: hacer clic, arrastrar,
+22. **[Ratón y gestos](mouse-and-gestures.md)**: hacer clic, arrastrar,
     seleccionar y copiar, barras de desplazamiento y respuesta al pasar el
     puntero.
 
 ## Ajustes e integraciones
 
-19. **[Ajustes](settings.md)**: cada página y opción de la pantalla de Ajustes,
+23. **[Ajustes](settings.md)**: cada página y opción de la pantalla de Ajustes,
     el cuadro de búsqueda, los perfiles y cómo reasignar atajos.
-20. **[Asistencia de IA](ai.md)**: la IA propia de GitPoulpi (desactivada por
+24. **[Asistencia de IA](ai.md)**: la IA propia de GitPoulpi (desactivada por
     defecto): un agente local como `claude -p`, Anthropic, OpenAI, OpenRouter,
     Ollama o LM Studio; instrucciones; mensajes de commit, explicaciones,
     descripciones de pull requests y el compositor de commits; privacidad y
     solución de problemas.
-21. **[Alojamiento y gestores de issues](hosting-integration.md)**: GitHub, GitLab, Gitea y Forgejo,
-    Azure DevOps, Bitbucket, Gerrit y los gestores de issues: tokens y sus permisos, conexión,
-    vincular un repositorio, pull requests e issues, referencias en los mensajes
-    de commit, claves SSH, límites conocidos. También
+25. **[Alojamiento y gestores de issues](hosting-integration.md)**: GitHub, GitLab, Gitea y Forgejo,
+    Azure DevOps, Bitbucket, Gerrit y los gestores de issues: tokens y sus permisos,
+    conexión, vincular un repositorio, claves SSH, límites conocidos. También
     **[Issues locales y Obsidian](local-issues.md)**: una carpeta de notas
     Markdown como origen de issues, sin token, con una Base de Obsidian.
 
 ## Automatización
 
-22. **[Referencia de la CLI](cli-reference.md)**: cada comando de `gitpoulpi`,
+26. **[Referencia de la CLI](cli-reference.md)**: cada comando de `gitpoulpi`,
     con `--json` para scripts.
-23. **[MCP y agentes](mcp-and-agents.md)**: deja que un agente externo (Claude
+27. **[MCP y agentes](mcp-and-agents.md)**: deja que un agente externo (Claude
     Code, Cursor, Codex, ...) maneje GitPoulpi: registrar el servidor,
     `.mcp.json`, los interruptores de permisos y sus valores por defecto, cada
     herramienta y cómo te muestra cosas un agente en tu ventana. La skill de
@@ -126,10 +153,10 @@ muchos commits, con vista previa, scripts Lua y un único deshacer.
 
 ## Referencia y ayuda
 
-24. **[Referencia de configuración](config-reference.md)**: cada clave de
+28. **[Referencia de configuración](config-reference.md)**: cada clave de
     `config.toml`, su valor por defecto y su efecto, los ajustes por
     repositorio, las variables de entorno.
-25. **[Solución de problemas y preguntas frecuentes](troubleshooting.md)**:
+29. **[Solución de problemas y preguntas frecuentes](troubleshooting.md)**:
     iconos, dibujo del grafo, teclas que no llegan, daemons bloqueados,
     velocidad, punteros de LFS.
 

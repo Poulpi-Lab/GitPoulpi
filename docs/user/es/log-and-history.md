@@ -190,7 +190,9 @@ sección STASHES, para ver **Pop**, **Aplicar** (conserva el stash) o **Drop**.
 diálogo que propone una carpeta junto al repositorio, un nombre opcional de rama
 nueva y «Abrir el nuevo worktree en una pestaña». Los worktrees aparecen en la
 sección WORKTREES; haz doble clic en uno para abrirlo, y su pestaña se cierra sola
-cuando se elimina el worktree.
+cuando se elimina el worktree. La función completa (abrir en otra herramienta, hacer merge de la rama de un
+worktree, eliminar) está en [Worktrees](worktrees.md); la sección SUBMÓDULOS del mismo panel
+está en [Submódulos](submodules.md).
 
 ## Arrastrar refs sobre commits
 

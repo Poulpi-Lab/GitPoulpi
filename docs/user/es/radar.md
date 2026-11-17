@@ -9,7 +9,7 @@ curso. Es la ventana de Inicio con la vista Radar encima, para que nada de debaj
 pueda robar un clic ni una tecla.
 
 Necesita un perfil de host de código (consulta
-[Alojamiento e issue trackers](hosting-integration.md)) y repositorios vinculados
+[Alojamiento e issue trackers](hosting-integration.md); las listas de un repositorio están en [Pull requests e issues](pull-requests-and-issues.md), y la discusión de una fila se abre como [conversación](conversations.md)) y repositorios vinculados
 a él, o un perfil con sus listas de toda la cuenta activadas (consulta "Más allá del ámbito" más abajo).
 Un repositorio que no está vinculado nunca se consulta: muestra una línea
 **Vincular...** (consulta "Repositorios con algo que decir" más abajo).

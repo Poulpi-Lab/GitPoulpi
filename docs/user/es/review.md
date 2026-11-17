@@ -10,7 +10,7 @@ aprobación y peticiones de cambios. Necesita un perfil de uno de esos hosts (ve
 revisiones. Se respetan los límites de cada host: GitLab no tiene el veredicto *Solicitar cambios* y admite una línea por comentario.
 Esta página llama a todas ellas una *solicitud*.
 
-![La vista de revisión, página Resumen: la cabecera de la solicitud con sus botones de metadatos, la descripción y la conversación con una aprobación enviada](../images/review-overview.png)
+![La vista de revisión, página Resumen: la cabecera de la solicitud con sus botones de metadatos, la descripción, un hilo de código sin resolver y otro resuelto, los comentarios y la caja de comentario](../images/review-overview.png)
 
 ![La página Archivos: los archivos cambiados con sus casillas de visto, el diff con un hilo de comentarios bajo su línea, y un hilo resuelto fuera de las líneas mostradas](../images/review-files.png)
 
@@ -37,7 +37,7 @@ Siempre visible: el número y el título, el estado (Abierta, Borrador, Fusionad
 si se puede fusionar sin conflictos o tiene conflictos, el tamaño y **`3 comentarios pendientes`** cuando has escrito algunos.
 
 Los cuatro botones de metadatos - **Asignados**, **Revisores**, **Etiquetas**, **Hito** - abren los mismos selectores que
-la barra lateral (ver [Asignados, revisores, etiquetas e hito](hosting-integration.md#asignados-revisores-etiquetas-e-hito));
+la barra lateral (ver [Asignados, revisores, etiquetas e hito](pull-requests-and-issues.md#asignados-revisores-etiquetas-e-hito));
 la cabecera muestra el resultado en cuanto el host lo ha aceptado. Los botones de acción: **Cambiar a la rama** (el checkout
 habitual de la rama de la solicitud, que también cierra la vista), **Abrir en el navegador**, **Actualizar**
 (**`F5`**) y **Terminar revisión**.
@@ -50,7 +50,7 @@ Un control segmentado en el borde superior cambia de página: **Resumen**, **Arc
 ### Resumen
 
 El Resumen es **la conversación de la solicitud**, la misma línea de tiempo y la misma caja de comentario que tiene un
-issue ([Conversaciones](hosting-integration.md#5c-conversaciones)): primero la descripción (*abrió esto*), y después los
+issue ([Conversaciones](conversations.md)): primero la descripción (*abrió esto*), y después los
 comentarios, los hilos sobre código con su fragmento de diff, las revisiones enviadas con su veredicto (`aprobada`,
 `con cambios solicitados`, `comentada`, `descartada`; en GitLab los veredictos son sus aprobaciones) y los eventos, de la más
 antigua a la más reciente, en la ventana de lo más nuevo con **Cargar anteriores** arriba. La caja de comentario está
@@ -79,7 +79,7 @@ caja, salvo `Alt+1` / `Alt+2` / `Alt+3`; `Esc` devuelve el teclado a la línea d
 Un comentario escrito en otra ventana o con la CLI aparece aquí por sí solo: cada escritura de GitPoulpi (esta ventana
 incluida) avisa a la sesión, y las ventanas que muestran la misma solicitud lo leen de nuevo.
 
-La caja de comentario es el editor de Markdown compartido con [la vista de conversación](hosting-integration.md#escribir)
+La caja de comentario es el editor de Markdown compartido con [la vista de conversación](conversations.md#escribir)
 (también la de una respuesta a un hilo, la de un comentario sobre una línea y la del resumen de **Terminar revisión**):
 `Ctrl+Enter` (también `Ctrl+S`, `Alt+Enter`) envía, y donde la IA está activada `Alt+E` abre **Escribir con IA**
 ([el capítulo de IA](ai.md#ayuda-para-escribir-en-un-host)). La vista previa muestra el texto como lo mostrará el host,

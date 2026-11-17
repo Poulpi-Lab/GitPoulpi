@@ -128,7 +128,7 @@ Si trabajas solo, o en un equipo que guarda sus issues junto al código, la carp
   `Shift+Left` / `Shift+Right`, o con **Tablero: Mover tarjeta a...** (`m`), un desplegable con las columnas. La tarjeta se mueve
   al instante; el `status` de la nota se reescribe como en [la sección de las notas](#las-notas), sin tocar nada más del archivo. Si la escritura
   falla, la tarjeta vuelve y el error aparece en la barra de estado.
-- **Abre** una tarjeta con `Enter` o un doble clic: la [conversación](hosting-integration.md#5c-conversaciones) de la nota se abre en la ventana, con el texto de la nota y sus comentarios (el **Abrir nota** del menú de la tarjeta abre el archivo en tu programa predeterminado para `.md`). `e` edita sus
+- **Abre** una tarjeta con `Enter` o un doble clic: la [conversación](conversations.md) de la nota se abre en la ventana, con el texto de la nota y sus comentarios (el **Abrir nota** del menú de la tarjeta abre el archivo en tu programa predeterminado para `.md`). `e` edita sus
   asignados, etiquetas o hito, `.` o un clic derecho abre el menú de la tarjeta, `n` inicia un issue nuevo en la columna
   seleccionada (el formulario vuelve al tablero al cerrarse).
 - **Filtra** por asignado (`a`), etiqueta (`l`), hito (`M`) o texto (`/`); `x` los quita. Los filtros son

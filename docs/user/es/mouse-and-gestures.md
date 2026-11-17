@@ -134,7 +134,7 @@ GitPoulpi recuerda cada tamaño. Consulta
 
 ## Barra de título, fila de pestañas y barra de herramientas
 
-- **Haz clic en 🐙** en la barra de título para abrir **Acerca de**. En Acerca de,
+- **Haz clic en <img src="../../../assets/logo/gitpoulpi.png" alt="Icono de GitPoulpi" height="16">** en la barra de título para abrir **Acerca de**. En Acerca de,
   las pupilas del pulpo siguen al puntero; haz clic en el logo para hacerlo
   girar hasta el siguiente color, clic derecho para ver la lista de colores, y
   haz clic en un enlace para abrirlo.

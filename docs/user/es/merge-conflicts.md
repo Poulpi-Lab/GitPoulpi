@@ -34,7 +34,9 @@ horizontal), y nunca se parten.
 ## Elegir
 
 Cada conflicto es un bloque enmarcado en A y en B, con una casilla en su cabecera y un `+` /
-`✓` delante de cada línea.
+`✓` delante de cada línea. Haz clic derecho en un bloque para ver las opciones de ese conflicto:
+
+![Un menú contextual sobre el conflicto 2 del editor de merge: Tomar solo A, Tomar solo B, A y luego B, B y luego A, No tomar nada, Deshacer la elección, Editar en el resultado y Sugerir una resolución](../images/merge-editor-chunk-menu.png)
 
 | Para... | Tecla | Ratón |
 |---|---|---|
@@ -69,6 +71,10 @@ naranja mientras aún necesita una elección, verde una vez tratado, azul para e
 clic en una marca salta a ese conflicto (una marca bajo el tirador de la barra ya está en
 pantalla, así que ahí el clic arrastra el tirador).
 
+Tomar ambos (**A y luego B**) escribe las líneas de A y después las de B bajo el marcador del conflicto en el Resultado, cada una etiquetada con su lado; las insignias `1.º` / `2.º` de los dos bloques indican el orden, y `s` lo intercambia:
+
+![El conflicto 2 tomado de ambos lados: sus líneas de A y de B están marcadas, y el Resultado las muestra una tras otra, etiquetadas A y B, mientras los conflictos 1 y 3 siguen esperando una elección](../images/merge-editor-take-both.png)
+
 **Archivo entero** muestra el archivo completo en A y B con todas las diferencias coloreadas, no solo los conflictos:
 
 ![Modo Archivo entero: el archivo completo en A y B, con los cambios coloreados](../images/merge-editor-full-file.png)
@@ -77,6 +83,8 @@ El Resultado es un editor de verdad: haz clic en él y escribe, selecciona, cort
 con `Ctrl+F`. Una elección sobre un conflicto que editaste a mano sustituye tu edición
 (`Ctrl+Z` la recupera). Guardar con un conflicto sin nada elegido, o con una línea que aún
 parece un marcador de conflicto, pregunta antes.
+
+![El editor de merge con todos los conflictos tratados: el conflicto 1 tomado de A, el 2 de ambos lados, el 3 escrito a mano en el Resultado (marcado con un lápiz y contado como editado), y el botón Guardar y marcar resuelto resaltado en la barra de herramientas](../images/merge-editor-output-edited.png)
 
 ### ✦ Sugerir una resolución (IA)
 
@@ -91,9 +99,23 @@ se muestra ahí. Con la IA desactivada, ninguno de estos controles existe.
 
 Tras **Guardar y marcar resuelto**, el archivo queda en stage y vuelve la lista de archivos en
 conflicto; abre tú el siguiente archivo. `Ctrl+Z` (o el botón Deshacer)
-revierte el último «marcar como resuelto». Cuando no queda ningún archivo, el banner ofrece
+revierte el último «marcar como resuelto».
+
+![Tras Guardar y marcar resuelto: el banner dice «Merge en curso, 1 archivo en conflicto», orbit.rs pasó a Archivos staged y logo.bin es el único archivo que queda en Archivos unstaged, marcado con una ! roja](../images/conflict-file-resolved.png)
+
+Cuando no queda ningún archivo, el banner ofrece
 **Commit merge** (o **Continuar** para un cherry-pick, un revert o un rebase) y **Abortar
 merge**, que pregunta antes: devuelve HEAD, el índice y el árbol de trabajo a como estaban.
+
+![El banner cuando todos los archivos están resueltos: «Merge en curso, todos los conflictos resueltos» con los botones Commit merge y Abortar merge, y el archivo resuelto en Archivos staged](../images/conflict-commit-merge.png)
+
+Un rebase se detiene del mismo modo, paso a paso. Su banner nombra la rama y la base sobre la que se rebasa, y tiene **Resolver conflictos...**, **Continuar**, **Omitir** y **Abortar**:
+
+![El banner de un rebase detenido por dos conflictos: «Rebase de feature/cleanup sobre ...» con Resolver conflictos..., Continuar, Omitir y Abortar, y los dos archivos en conflicto en el panel Estado](../images/conflict-banner-rebase.png)
+
+Cuando se resuelve el último archivo, el mismo banner queda listo para **Continuar**:
+
+![El banner del rebase tras resolver los dos archivos: solo quedan Continuar, Omitir y Abortar, y ambos archivos están en Archivos staged](../images/conflict-banner-continue.png)
 
 Un merge cuyo resultado es igual a HEAD (tomaste nuestro lado en todas partes) no tiene nada
 en stage ni ningún archivo modificado, y aun así se puede concluir: **Commit merge** abre el
@@ -120,6 +142,8 @@ botón por opción; al elegir, el archivo se resuelve y se pone en stage al inst
 | Eliminado en un lado, modificado en el otro | **Conservar el archivo** (`k`), **Aceptar la eliminación** (`Shift+D`) |
 | Resto de renombrado (la ruta existe solo en un lado) | **Conservar el archivo** (`k`), **Eliminar el archivo** (`Shift+D`) |
 | Enlace simbólico, submódulo, modo de archivo | **Quedarse con A**, **Tomar B**, **Tomar base** |
+
+![La tarjeta de un archivo modificado en A y eliminado en B: el recuadro A muestra el tamaño y el modo del archivo, el recuadro B dice «no hay archivo aquí (eliminado)», el recuadro base muestra el original, y los botones son Conservar el archivo y Aceptar la eliminación](../images/merge-editor-deleted-card.png)
 
 Cuando el archivo es una imagen (PNG, JPEG, GIF, WebP, BMP, ICO), los recuadros muestran
 además las imágenes A, B y Base, ajustadas y de solo lectura, en una ventana lo bastante

@@ -17,6 +17,9 @@ los cambios de trabajo:
 - **Archivos unstaged**: archivos editados, añadidos (sin seguimiento) y eliminados que aún no
   están en el próximo commit.
 - **Archivos staged**: lo que contendrá el próximo commit.
+- **Archivos en conflicto** (una `!` roja, mientras un merge, un rebase, un cherry-pick o un revert
+  está detenido): `Enter` abre el editor de merge, ver
+  [Resolver conflictos de merge](merge-conflicts.md).
 - **Los archivos renombrados o movidos** son una sola fila, `nuevo <- antiguo`, en ambas listas (un archivo borrado en el
   disco y uno nuevo con al menos un 50% del mismo contenido cuentan como un movimiento incluso antes de hacer stage). Stage,
   Unstage y Descartar actúan sobre ambos nombres: hacer stage añade el borrado y el archivo nuevo, de modo que git ve un solo
@@ -172,7 +175,7 @@ la fila de cambios de trabajo del Log: lo que escribas en uno aparece en el otro
   lease).
 - **Omitir hooks** (`Shift+H`, o **Commit: Alternar omitir hooks** en la paleta) hace commit
   sin ejecutar los hooks `pre-commit` y `commit-msg` del repositorio. Vale para un solo
-  commit; **Ajustes > Ajustes del repositorio > Commit** hace que empiece marcada. En una fila estrecha su etiqueta se acorta a **Sin hooks** y después queda solo la casilla (su tooltip la nombra); nunca desaparece.
+  commit; **Ajustes > Ajustes del repositorio > Commit** hace que empiece marcada. Tiene su propia fila justo debajo de **Modificar el commit anterior**, con la etiqueta completa; solo en un panel muy estrecho la etiqueta se acorta a **Sin hooks** y después queda solo la casilla (su tooltip la nombra). Nunca desaparece. En un formulario muy bajo comparte la fila de Modificar, y se acorta del mismo modo.
 - `c` en el panel Estado lleva el cursor al formulario. `Esc` sale de él.
 - `Ctrl+G c` y `Ctrl+G Enter` (**Git: Commit...** y **Git: Hacer commit ya de los cambios en stage**
   en la paleta) son un solo comando, el botón de commit desde cualquier sitio. Con un resumen
@@ -197,7 +200,7 @@ edites; no se hace commit de nada hasta que pulses el botón de commit.
 
 **Componer commits con IA** está en el extremo derecho de la fila de Modificar y se encoge con el panel derecho en lugar de
 desaparecer: la etiqueta completa, después **Componer con IA**, después solo el **`✦`**. Conserva su clic, su tooltip y su
-tecla (`Ctrl+G Shift+C`) a cualquier ancho; la etiqueta de Omitir hooks cede ante él (**Sin hooks**, después solo la casilla) antes de que se encoja él mismo.
+tecla (`Ctrl+G Shift+C`) a cualquier ancho.
 
 Los botones **`✦`** (generar el mensaje) y **`#`** (insertar una referencia a un issue) del extremo derecho de la fila del resumen se encogen igual: en un panel estrecho pierden sus márgenes y después se funden en un solo botón **`⋯`** cuyo menú ofrece ambos, de modo que ninguno desaparece.
 

@@ -1519,11 +1519,11 @@ Para saber qué hacen los menús, consulta [Trabajar con el Log](log-and-history
 Con una integración adecuada, el panel Refs tiene una sección de pull requests
 (en GitLab: merge requests). Con un perfil de alojamiento conectado, también
 tiene una sección ISSUES. Consulta
-[Integraciones de alojamiento y de gestores de issues](hosting-integration.md#5-pull-requests-e-issues-en-la-barra-lateral).
+[Pull requests e issues](pull-requests-and-issues.md#pull-requests-e-issues-en-la-barra-lateral).
 
 | Tecla | Acción |
 |---|---|
-| `Enter` | Abrir la fila seleccionada: un issue (y una request de Azure DevOps o Bitbucket) como [conversación](hosting-integration.md#5c-conversaciones), una pull request en la [revisión](review.md) en los hosts que la tienen, cualquier otra cosa en el navegador. En una fila `Reconectar`: abrir los Ajustes en ese perfil |
+| `Enter` | Abrir la fila seleccionada: un issue (y una request de Azure DevOps o Bitbucket) como [conversación](conversations.md), una pull request en la [revisión](review.md) en los hosts que la tienen, cualquier otra cosa en el navegador. En una fila `Reconectar`: abrir los Ajustes en ese perfil |
 | `o` | Abrir la fila seleccionada en el navegador |
 | `Space` | Expandir o contraer la sección |
 | `v` | Abrir el filtro de la sección. Pull requests: Abiertas, Merged / cerradas, Todas. Issues: Abiertos, Asignados a mí, Cerrados, Todos |
@@ -1537,7 +1537,7 @@ tiene una sección ISSUES. Consulta
 ### El tablero de issues
 
 **Tablero** en el encabezado ISSUES (paleta: **Issues: Abrir tablero**) abre el tablero Kanban del origen de issues. Ver
-[el tablero](hosting-integration.md#5b-el-tablero-de-issues) y [los issues locales](local-issues.md#el-tablero-kanban). Cada tecla
+[el tablero](pull-requests-and-issues.md#el-tablero-de-issues) y [los issues locales](local-issues.md#el-tablero-kanban). Cada tecla
 de abajo es también un comando de la paleta (**Tablero: ...**).
 
 | Tecla | Acción |
@@ -1545,7 +1545,7 @@ de abajo es también un comando de la paleta (**Tablero: ...**).
 | Flechas | Seleccionar una tarjeta (`Up`, `Down`) o la columna vecina (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` saltan dentro de la columna |
 | `Shift+Left`, `Shift+Right` | Mover la tarjeta seleccionada a la columna anterior o siguiente |
 | `m` | **Mover tarjeta a...**: un desplegable con las columnas |
-| `Enter` | Abrir la [conversación](hosting-integration.md#5c-conversaciones) del issue (la página del host donde el host no tiene ninguna que leer) |
+| `Enter` | Abrir la [conversación](conversations.md) del issue (la página del host donde el host no tiene ninguna que leer) |
 | `e`, `.` | Editar asignados, etiquetas o hito; el menú de la tarjeta |
 | `n` | Issue nuevo en la columna seleccionada |
 | `a`, `l`, `M`, `/` | Filtrar por asignado, etiqueta, hito, texto. `x` quita los filtros |
@@ -1571,7 +1571,7 @@ una pull request nuevos) es el mismo editor. Sus teclas están en la tabla `md_e
 | `Alt+W` | En los formularios de issue y pull request nuevos: crear en la propia página web del proveedor |
 | `Esc` | En el panel de **Escribir con IA**: detiene un borrador en curso y, si no, cierra el panel |
 
-En la [vista de conversación](hosting-integration.md#5c-conversaciones) de un issue o de una request (filas de paleta
+En la [vista de conversación](conversations.md) de un issue o de una request (filas de paleta
 *Conversación: ...*; las filas con tecla están en la lista de la paleta de arriba):
 
 | Tecla | Acción |
@@ -1936,7 +1936,7 @@ Cada botón tiene su equivalente de teclado:
 
 | Botón | Tecla |
 |---|---|
-| 🐙 a la izquierda de la barra de título (Acerca de) | `Ayuda: Acerca de GitPoulpi` en la paleta |
+| <img src="../../../assets/logo/gitpoulpi.png" alt="Icono de GitPoulpi" height="16"> a la izquierda de la barra de título (Acerca de) | `Ayuda: Acerca de GitPoulpi` en la paleta |
 | **Abrir en** en la barra de título | `Alt+O`, `Ctrl+Alt+O` |
 | `×` a la derecha de la barra de título (salir) | `q` |
 | La versión en la barra de título (Notas de la versión) | `Ayuda: Notas de la versión` en la paleta |

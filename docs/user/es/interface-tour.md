@@ -13,9 +13,9 @@ de demostración con autores inventados.
 ### Barra de título
 
 El borde superior de la ventana dice
-`🐙 GitPoulpi vX.Y.Z -- <ruta del repositorio>` (el nombre de la sesión está en la barra de estado, abajo por defecto).
+<img src="../../../assets/logo/gitpoulpi.png" alt="Icono de GitPoulpi" height="16"> `GitPoulpi vX.Y.Z -- <ruta del repositorio>` (el nombre de la sesión está en la barra de estado, abajo por defecto).
 
-- **🐙** abre la ventana **Acerca de**: versión, funciones de la compilación,
+- **<img src="../../../assets/logo/gitpoulpi.png" alt="Icono de GitPoulpi" height="16">** abre la ventana **Acerca de**: versión, funciones de la compilación,
   licencia, enlaces, un breve aviso de que GitPoulpi es un proyecto independiente,
   los crates de terceros y las licencias y créditos. En un terminal que dibuja
   imágenes, el pulpo es el logo de píxeles, en el color de tu logo (en los

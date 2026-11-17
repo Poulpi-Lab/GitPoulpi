@@ -399,7 +399,7 @@ respuesta de la CLI y del MCP dice `"posted": false`, y un agente local se ejecu
 texto sale de GitPoulpi únicamente por el botón **Enviar** (`Ctrl+Enter`) o **Comentar** del propio cuadro de texto.
 
 **En el editor de Markdown.** Con la IA activada, cada cuadro de texto cuyo contenido va a un host (un comentario,
-una respuesta o una edición en [la vista de conversación](hosting-integration.md#5c-conversaciones), un comentario de
+una respuesta o una edición en [la vista de conversación](conversations.md), un comentario de
 revisión, el resumen de Finalizar revisión, la descripción de un issue nuevo y la descripción de una pull request)
 tiene un botón **Escribir con IA** (`Alt+E`, la misma tecla en todos) en el extremo derecho de su barra de modos. Abre
 un panel bajo la barra:

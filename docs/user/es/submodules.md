@@ -20,6 +20,8 @@ Una fila por submódulo: una marca de estado, su ruta y un commit corto.
 | `○` | sin clonar | declarado en `.gitmodules` y registrado, pero su carpeta está vacía: actualízalo para clonarlo |
 | `✗` | en conflicto | el repositorio tiene conflictos de merge en el submódulo |
 
+![La sección SUBMÓDULOS con tres filas: vendor/almanac sin clonar (○), vendor/ephemeris al día (✓) y vendor/starfield modificado (↑, en otro commit que el registrado), que también aparece como archivo modificado en el panel Estado](../images/submodules.png)
+
 | Acción | Ratón | Teclado |
 |---|---|---|
 | Abrir el submódulo en una pestaña propia | doble clic en la fila | selecciónalo, `Enter` (paleta: `Refs: Abrir submódulo en una pestaña`) |
@@ -28,6 +30,8 @@ Una fila por submódulo: una marca de estado, su ruta y un commit corto.
 | Registrarlo en `.git/config` sin clonarlo | menú | `Ctrl+P`: `Refs: Inicializar submódulo (seleccionado)` |
 | Actualizar todos los submódulos | | `Ctrl+P`: `Git: Actualizar todos los submódulos` |
 | Saltar a la sección | clic en su encabezado | `Ctrl+P`: `Navegación: Ir a Refs > Submódulos` |
+
+![El menú contextual de la fila modificada vendor/starfield: Actualizar (clonar si hace falta), Inicializar y Abrir en una pestaña nueva](../images/submodule-menu.png)
 
 Una actualización puede hacer fetch del remoto del submódulo, por lo que sigue
 **Ajustes > SSH y credenciales > Credenciales HTTPS** como cualquier otra

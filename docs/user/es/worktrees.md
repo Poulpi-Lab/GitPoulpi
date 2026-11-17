@@ -6,6 +6,8 @@ Un worktree es una segunda copia del repositorio con checkout: otra carpeta, en
 otra rama, que comparte el mismo historial. La sección WORKTREES del panel Refs
 los lista; el principal lleva la marca `(principal)`.
 
+![El panel Refs de un repositorio con dos worktrees vinculados: la sección WORKTREES lista main (principal), hotfix/axis-labels y feature/legend, con la sección SUBMÓDULOS debajo](../images/worktrees.png)
+
 ## Mostrar la sección
 
 La sección está oculta en un repositorio que aún no tiene ningún worktree
@@ -34,6 +36,8 @@ La paleta tiene las mismas tres (**Refs: Crear worktree desde la rama actual**,
 **Git: Crear worktree en el commit seleccionado...**, **Refs: Crear worktree
 eligiendo una rama**). Las entradas anteriores siguen funcionando: **Crear
 worktree desde...** en el menú de una rama, un tag o un commit.
+
+![El diálogo Crear worktree: los campos Nombre, Carpeta, Ref y Rama del worktree, la línea «rama nueva desde main», la casilla Abrir el worktree nuevo como pestaña y los botones Cancelar y Crear](../images/worktree-create.png)
 
 El diálogo lo propone todo y te deja cambiarlo. El **Nombre** y la rama nueva
 empiezan como `worktree-<id>`, donde `<id>` son 8 dígitos hexadecimales
@@ -81,6 +85,13 @@ Haz clic derecho en un worktree (o selecciónalo y pulsa la tecla de menú,
   ningún sitio se rechaza con el motivo. No se ofrece para un worktree
   desacoplado.
 - **Eliminar worktree...**: nunca el principal.
+
+![El menú contextual de una fila de worktree: Abrir en una pestaña nueva, Abrir en, Merge de hotfix/axis-labels en... y Eliminar worktree...](../images/worktree-menu.png)
+
+**Abrir en una pestaña nueva** (o un doble clic, o `Enter`) abre la carpeta del worktree como
+una pestaña propia, con su propio Log, su estado y su rama:
+
+![El worktree hotfix/axis-labels abierto como pestaña propia junto a la principal, con su commit y su archivo modificado](../images/worktree-tab.png)
 
 La paleta tiene las mismas acciones sobre la fila seleccionada (**Refs: Abrir
 worktree en...**, **Refs: Merge de la rama del worktree en...**, **Refs:

@@ -141,7 +141,7 @@ Jeśli pracujesz sam albo w zespole, który trzyma zgłoszenia obok kodu, folder
   `Shift+Left` / `Shift+Right` albo wierszem **Tablica: Przenieś kartę do...** (`m`), listą kolumn. Karta przenosi się
   od razu; `status` notatki jest przepisywany jak w [sekcji o notatkach](#notatki), nic więcej w pliku. Jeśli zapis
   się nie uda, karta wraca, a błąd jest na pasku stanu.
-- **Otwórz** kartę klawiszem `Enter` lub podwójnym kliknięciem: [rozmowa](hosting-integration.md#5c-rozmowy) notatki otwiera się w oknie, z tekstem notatki i jej komentarzami (**Otwórz notatkę** w menu karty otwiera plik w twoim domyślnym programie dla `.md`). `e` edytuje jej
+- **Otwórz** kartę klawiszem `Enter` lub podwójnym kliknięciem: [rozmowa](conversations.md) notatki otwiera się w oknie, z tekstem notatki i jej komentarzami (**Otwórz notatkę** w menu karty otwiera plik w twoim domyślnym programie dla `.md`). `e` edytuje jej
   przypisanych, etykiety lub kamień milowy, `.` albo prawy przycisk myszy otwiera menu karty, `n` zaczyna nowe zgłoszenie w zaznaczonej
   kolumnie (formularz wraca do tablicy po zamknięciu).
 - **Filtruj** według przypisanego (`a`), etykiety (`l`), kamienia milowego (`M`) lub tekstu (`/`); `x` je czyści. Filtry to

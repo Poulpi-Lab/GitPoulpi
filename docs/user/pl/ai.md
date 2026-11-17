@@ -387,7 +387,7 @@ odpowiedź CLI i MCP zawiera `"posted": false`, a lokalny agent działa tylko do
 GitPoulpi wyłącznie przez własny przycisk **Wyślij** (`Ctrl+Enter`) lub **Komentarz** edytora.
 
 **W edytorze Markdown.** Gdy AI jest włączone, każdy edytor, którego tekst trafia na hosta (komentarz, odpowiedź
-albo edycja w [widoku rozmowy](hosting-integration.md#5c-rozmowy), komentarz do przeglądu, podsumowanie w oknie
+albo edycja w [widoku rozmowy](conversations.md), komentarz do przeglądu, podsumowanie w oknie
 Zakończ przegląd, opis nowego zgłoszenia i opis pull requesta), ma po prawej stronie paska trybów przycisk
 **Pisz z AI** (`Alt+E`, ten sam klawisz wszędzie). Otwiera on panel pod paskiem:
 

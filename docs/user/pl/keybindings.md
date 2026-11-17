@@ -1507,11 +1507,11 @@ Co robią menu, opisuje [Praca z Logiem](log-and-history.md).
 
 Przy pasującej integracji panel Refs ma sekcję pull requestów (GitLab: merge
 requesty). Przy połączonym profilu hostingu ma też sekcję ZGŁOSZENIA. Zob.
-[Integracje z hostingiem i trackerami zgłoszeń](hosting-integration.md#5-pull-requesty-i-zgłoszenia-w-panelu-bocznym).
+[Integracje z hostingiem i trackerami zgłoszeń](pull-requests-and-issues.md#pull-requesty-i-zgłoszenia-w-panelu-bocznym).
 
 | Klawisz | Działanie |
 |---|---|
-| `Enter` | Otwiera zaznaczony wiersz: zgłoszenie (oraz żądanie w Azure DevOps lub Bitbucket) jako [rozmowę](hosting-integration.md#5c-rozmowy), pull request w [przeglądzie](review.md) na hostach, które go mają, wszystko inne w przeglądarce. Na wierszu `Połącz ponownie`: otwiera Ustawienia na tym profilu |
+| `Enter` | Otwiera zaznaczony wiersz: zgłoszenie (oraz żądanie w Azure DevOps lub Bitbucket) jako [rozmowę](conversations.md), pull request w [przeglądzie](review.md) na hostach, które go mają, wszystko inne w przeglądarce. Na wierszu `Połącz ponownie`: otwiera Ustawienia na tym profilu |
 | `Space` | Rozwija lub zwija sekcję |
 | `v` | Otwiera filtr sekcji. Pull requesty: Open, Merged / closed, All. Zgłoszenia: Open, Przypisane do mnie, Closed, All |
 | `n` | Sekcja pull requestów: tworzy pull request. Sekcja ZGŁOSZENIA: nowe zgłoszenie. (Przycisk `+` w nagłówku) |
@@ -1524,7 +1524,7 @@ requesty). Przy połączonym profilu hostingu ma też sekcję ZGŁOSZENIA. Zob.
 ### Tablica zgłoszeń
 
 **Tablica** w nagłówku ZGŁOSZENIA (paleta: **Zgłoszenia: Otwórz tablicę**) otwiera tablicę Kanban źródła zgłoszeń. Zob.
-[tablicę](hosting-integration.md#5b-tablica-zgłoszeń) i [zgłoszenia lokalne](local-issues.md#tablica-kanban). Każdy
+[tablicę](pull-requests-and-issues.md#tablica-zgłoszeń) i [zgłoszenia lokalne](local-issues.md#tablica-kanban). Każdy
 poniższy klawisz jest też poleceniem palety (**Tablica: ...**).
 
 | Klawisz | Działanie |
@@ -1532,7 +1532,7 @@ poniższy klawisz jest też poleceniem palety (**Tablica: ...**).
 | Strzałki | Zaznaczają kartę (`Up`, `Down`) albo sąsiednią kolumnę (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` skaczą w kolumnie |
 | `Shift+Left`, `Shift+Right` | Przenoszą zaznaczoną kartę do poprzedniej lub następnej kolumny |
 | `m` | **Tablica: Przenieś kartę do...**: lista rozwijana kolumn |
-| `Enter` | Otwiera [rozmowę](hosting-integration.md#5c-rozmowy) zgłoszenia (stronę hosta, gdy host nie ma jej do odczytu) |
+| `Enter` | Otwiera [rozmowę](conversations.md) zgłoszenia (stronę hosta, gdy host nie ma jej do odczytu) |
 | `e`, `.` | Edytuje przypisanych, etykiety lub kamień milowy; menu karty |
 | `n` | Nowe zgłoszenie w zaznaczonej kolumnie |
 | `a`, `l`, `M`, `/` | Filtrują według przypisanego, etykiety, kamienia milowego, tekstu. `x` czyści filtry |
@@ -1558,7 +1558,7 @@ pull requesta), jest tym samym edytorem. Jego klawisze są w tabeli `md_editor` 
 | `Alt+W` | Formularze nowego zgłoszenia i pull requesta: tworzy na własnej stronie WWW dostawcy |
 | `Esc` | W panelu **Pisz z AI**: zatrzymuje trwający szkic, w przeciwnym razie zamyka panel |
 
-W [widoku rozmowy](hosting-integration.md#5c-rozmowy) zgłoszenia lub żądania (wiersze palety
+W [widoku rozmowy](conversations.md) zgłoszenia lub żądania (wiersze palety
 *Rozmowa: ...*; wiersze z klawiszem są na powyższej liście palety):
 
 | Klawisz | Akcja |

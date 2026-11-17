@@ -189,7 +189,7 @@ Por padrão, uma linha abaixo dos painéis e acima da linha de status. **Configu
 | **Flow** `▾` | O menu do fluxo de trabalho de branches (iniciar, concluir, sincronizar, promover; `Ctrl+G Shift+W`). Só em um repositório que tem um fluxo de trabalho. Veja [Fluxos de trabalho de branches](branching-workflows.md). |
 | **Buscar** | Abre a barra de busca de commits sobre o Log (`f`). |
 
-Na extremidade (a direita de uma linha, a base de uma coluna), quando o repositório está vinculado a um host, um **chip** mostra o pull request da branch em checkout (por exemplo `GH #12` ou `GL !53`), ou um `+ PR` esmaecido. **Configurações > Aparência > Fixar o botão de pull request no fim** (ativado por padrão) o mantém ali; desativado, ele flui com os outros botões e segue o alinhamento deles. Veja [Integrações de hospedagem e de rastreadores de issues](hosting-integration.md).
+Na extremidade (a direita de uma linha, a base de uma coluna), quando o repositório está vinculado a um host, um **chip** mostra o pull request da branch em checkout (por exemplo `GH #12` ou `GL !53`), ou um `+ PR` esmaecido. **Configurações > Aparência > Fixar o botão de pull request no fim** (ativado por padrão) o mantém ali; desativado, ele flui com os outros botões e segue o alinhamento deles. Em uma linha estreita, o chip encolhe primeiro (`● #12`, depois só o glifo de estado) e só então passa para o menu `⋯`. Veja [Integrações de hospedagem e de rastreadores de issues](hosting-integration.md).
 
 Ao lado dele (em uma coluna, na última linha), quando você tem dois ou mais [perfis](settings.md#perfis),
 a **caixa de combinação de perfil** escolhe a identidade de commit deste repositório. A

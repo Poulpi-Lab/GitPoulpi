@@ -173,7 +173,7 @@ Ve výchozím stavu je to řádek pod panely a nad stavovým řádkem. **Nastave
 | **Flow** `▾` | Nabídka workflow větvení (zahájit, dokončit, synchronizovat, povýšit; `Ctrl+G Shift+W`). Jen v repozitáři, který má workflow. Viz [Workflow větvení](branching-workflows.md). |
 | **Hledat** | Otevře nad Logem lištu hledání commitů (`f`). |
 
-Na konci (vpravo v řádku, dole ve sloupci) se, když je repozitář propojen s hostingem, zobrazí **čip** s pull requestem právě přepnuté větve (například `GH #12` nebo `GL !53`), nebo tlumené `+ PR`. **Nastavení > Vzhled > Připnout tlačítko pull request na konec** (ve výchozím stavu zapnuto) ho tam drží; vypnuto, plyne s ostatními tlačítky a řídí se jejich zarovnáním. Viz [Hostingové služby a issue trackery](hosting-integration.md). Ve sloupci zabírá výběr profilu poslední řádek.
+Na konci (vpravo v řádku, dole ve sloupci) se, když je repozitář propojen s hostingem, zobrazí **čip** s pull requestem právě přepnuté větve (například `GH #12` nebo `GL !53`), nebo tlumené `+ PR`. **Nastavení > Vzhled > Připnout tlačítko pull request na konec** (ve výchozím stavu zapnuto) ho tam drží; vypnuto, plyne s ostatními tlačítky a řídí se jejich zarovnáním. V úzkém řádku se čip zmenšuje jako první (`● #12`, potom jen glyf stavu) a teprve poté se přesune do nabídky `⋯`. Viz [Hostingové služby a issue trackery](hosting-integration.md). Ve sloupci zabírá výběr profilu poslední řádek.
 
 Na pravém konci, když máte dva nebo více [profilů](settings.md#profily),
 **výběr profilu** určuje identitu pro commity v tomto repozitáři. První

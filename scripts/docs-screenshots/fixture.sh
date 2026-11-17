@@ -518,7 +518,7 @@ Worth double-checking:
 J
     ;;
   *"git commit messages"*)
-    printf '%s\n\n%s\n' "docs: add a status section and document the planet table" \
+    printf '%s\n\n%s\n' "docs: add a status section" \
       "Describe what the simulator draws, note that moons follow their planet and document the table functions."
     ;;
   *) echo "ok" ;;

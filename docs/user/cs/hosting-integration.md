@@ -20,6 +20,19 @@ ukládá do vašeho credential helperu, nikdy do `config.toml`. Běžné operace
 `git` (fetch, pull, push) integraci nepotřebují: používají přihlašovací údaje,
 které váš `git` už má.
 
+**Kam dál.** Tato stránka je nastavení: tokeny, připojení, propojení
+repozitáře, klíče SSH. Jakmile je účet připojen:
+
+- sekce PULL REQUESTY a ISSUES v postranním panelu, tabule issues, vytvoření
+  pull requestu nebo issue, čip na panelu nástrojů a odkazy ve zprávách
+  commitů: **[Pull requesty a issues](pull-requests-and-issues.md)**;
+- pohled jedné issue nebo žádosti v aplikaci s komentáři, psaním a odesíláním
+  jako: **[Konverzace](conversations.md)**;
+- čtení a kontrola žádosti s vlákny komentářů a čekající kontrolou:
+  **[Kontrola pull requestu](review.md)**;
+- pull requesty a issues celého workspace v jednom seznamu:
+  **[Radar](radar.md)**.
+
 ## 1. Vytvoření tokenu u hostitele
 
 Formulář připojení obsahuje odkaz *Vygenerovat token na <host>*. Otevře stránku
@@ -269,480 +282,7 @@ s poznámkou a důvod je v Protokolu aktivity.
 Pokud hostitel token odmítne, dialog místo seznamu zobrazí *nelze vypsat repozitáře*
 s důvodem (a uložená kopie se smaže); ostatní zdroje fungují dál.
 
-## 5. Pull requesty a issues v postranním panelu
-
-### PULL REQUESTY
-
-Sekce má záhlaví s počtem a `+` (vytvořit pull request), rozbalovací seznamy
-poskytovatele a projektu, vyhledávací pole a rozbalovací seznam stavu
-(*Otevřené*, *Merged / zavřené*, *Všechny*). Pak následují čtyři skupiny, každá
-se svým počtem:
-
-- **Moje pull requesty**: jste autor.
-- **Přiřazené mně**.
-- **Čekají na mou kontrolu**: jste požádáni o kontrolu.
-- **Všechny pull requesty**: na začátku sbaleno.
-
-Vyhledávací pole filtruje každou skupinu (název, číslo, autor, větev). Každá
-změna rozbalovacího seznamu stavu se znovu ptá hostitele.
-
-Řádek začíná glyfem stavu: `●` otevřený (zeleně), `○` koncept, `◆` sloučený
-(fialově), `✕` zavřený (červeně). Požadavek aktuálně přepnuté větve je
-tučně. Řádky vypadají `#12  title` (GitHub, Bitbucket) nebo `!53  title`
-(GitLab, Azure DevOps).
-
-### ISSUES
-
-Název sekce uvádí poskytovatele: `GITHUB ISSUES`, `JIRA ISSUES` a tak dále. U
-Azure DevOps zní `... PRACOVNÍ POLOŽKY` a u Trella `... KARTY`. Pod
-rozbalovacími seznamy: vyhledávací pole, rozbalovací seznam stavu (*Otevřené*,
-*Přiřazené mně*, *Zavřené*, *Všechny*) a issues. Řádek Jiry vypadá
-`ABC-12  title`, přičemž typ a stav jsou ztlumeny, je-li postranní panel dost
-široký.
-
-### Akce na řádku
-
-- `Enter` nebo dvojklik otevře řádek: pull request v [kontrole](review.md) (GitHub, GitLab, Gitea, Forgejo, Gerrit), issue a žádost na Azure DevOps nebo Bitbucketu jako [konverzaci](#5c-konverzace) v okně a cokoli jiného ve vašem prohlížeči. **Otevřít v prohlížeči** v nabídce řádku vždy otevře prohlížeč.
-- Pravé tlačítko myši nebo `.` otevře nabídku řádku:
-  - **Otevřít konverzaci** (issues a žádosti, které nemají pohled kontroly), **Otevřít v prohlížeči**, **Kopírovat URL**,
-    **Kopírovat číslo**.
-  - U pull requestu: **Upravit na <provider>**, **Checkout zdrojové větve**,
-    **Zobrazit commity zdrojové větve**. U požadavku z forku zní checkout
-    **Checkout pull request (fork)** a **Zobrazit** je zašedlé.
-  - U issue: **Vytvořit větev z issue**. Otevře výzvu k nové větvi s názvem
-    jako `12-fix-the-thing` (u Jiry `ABC-123-fix-the-thing`).
-  - Na GitHubu, GitLabu, Gitea a Forgejo má řádek pull requestu také **Zkontrolovat...**
-    (také **Enter** na řádku): kontrola v aplikaci, viz
-    [Kontrola pull requestu](review.md).
-  - Na GitHubu, GitLabu, Gitea a Forgejo mají oba druhy řádků také **Upravit řešitele...**,
-    **Upravit štítky...** a **Nastavit milník...** (a u pull requestu **Upravit recenzenty...**): viz
-    [Řešitelé, recenzenti, štítky a milník](#řešitelé-recenzenti-štítky-a-milník).
-- **Upravit na <provider>** má tři další vstupy: tužka `✎` na pravém konci
-  řádku pull requestu pod kurzorem nebo vybraného, `e` na vybraném řádku a
-  příkaz z palety *Integrace: Upravit propojený pull request u hostitele* (pro
-  požadavek aktuálně přepnuté větve).
-- Pokud zdrojová větev v repozitáři ještě není, GitPoulpi to oznámí. Nejdřív
-  proveďte fetch (`Ctrl+G f`).
-
-**Checkout pull requestu.** GitPoulpi načte požadavek do lokální větve
-`pr/<n>` (`mr/<n>` u GitLabu), která ho sleduje, a přepne na ni. U GitHubu,
-GitLabu, Gitea a Forgejo to funguje i pro forky (GitPoulpi načte zvláštní head ref hostitele).
-Azure DevOps a Bitbucket načtou zdrojovou větev požadavku. Požadavek z forku
-se tam odmítne: přidejte fork jako remote a jeho větev přepněte sami. Zpět
-vrátí na předchozí větev. CLI: `gitpoulpi hosting checkout-pr <n>`.
-
-**Kontrola pull requestu z příkazové řádky (a agentem).** Na GitHubu
-(včetně Enterprise), GitLabu (včetně self-managed), Gitea a Forgejo lze žádost
-číst a kontrolovat, aniž byste opustili GitPoulpi: `hosting review show <n>` (soubory,
-stav sloučení, kontroly), `hosting review threads <n>` (vlákna kontroly a
-konverzace), `hosting review comment`, `hosting review reply`, `hosting review resolve`
-a `hosting review submit <n> --event approve|request-changes|comment
---comment path:line[:side]:text`. Diff pochází z vašeho repozitáře, ne od
-hostitele: `hosting review fetch <n>` stáhne head žádosti do
-`refs/gitpoulpi/pr/<n>` a její cílovou větev do `refs/gitpoulpi/pr/<n>-base`
-(ani jedno není větev, nic se nepřepíná). Čísla řádků jsou z tohoto
-diffu: `new` je řádek v headu, `old` řádek v merge base. GitLab
-nemá stav kontroly „request changes“: odmítne se, nic se neodešle.
-Gitea a Forgejo berou komentář jen k jednomu řádku (žádné rozsahy); vlákno jsou
-komentáře k jednomu řádku souboru. Gitea umí vlákno vyřešit, Forgejo 11 ne
-(hostitel pro to nemá endpoint: volání to řekne). Odpověď na serveru
-bez endpointu pro odpovědi se odešle jako kontrola s jedním komentářem ke stejnému řádku.
-Gitea odmítne schválit nebo zamítnout vaši vlastní žádost.
-Bez klonu: přidejte `--project owner/name` (GitLab: `group/project`) k `review show`, `threads`,
-`comment`, `reply`, `resolve`, `submit` a `suggest`, abyste zkontrolovali projekt, který není aktuální repozitář;
-`hosting review diff <n> --project P` čte diff (hunky po souborech) z API hostitele a
-`hosting file <path> --project P [--ref R]` čte soubor v dané revizi (GitHub, GitLab, Gitea, Forgejo a Gerrit; u Gerritu se diff
-patch setu čte soubor po souboru a soubor pochází z větve nebo, pro id commitu, z commitu). Soubor, který hostitel
-v diffu neukáže (příliš velký), je označen `omitted`.
-Nástroje MCP jsou stejné příkazy (`hosting_review_show`, `hosting_review_submit`, `hosting_review_diff`,
-`hosting_file`...).
-
-### Řešitelé, recenzenti, štítky a milník
-
-Na GitHubu (včetně Enterprise), GitLabu (včetně self-managed), Gitea a
-Forgejo můžete, aniž byste opustili GitPoulpi, změnit, komu je pull request nebo issue přiřazen, kdo ho kontroluje, jeho štítky
-a milník. Jiní poskytovatelé nic z toho nezobrazují.
-
-- **Nabídka řádku**: **Upravit řešitele...**, **Upravit recenzenty...** (jen pull
-  requesty), **Upravit štítky...**, **Nastavit milník...**.
-- **Paleta**: *Hosting: Upravit řešitele...*, *Hosting: Upravit recenzenty...*,
-  *Hosting: Upravit štítky...*, *Hosting: Nastavit milník...* nejdřív vypíšou
-  žádosti a issues z postranního panelu k výběru. V
-  [Radaru](radar.md) stejné čtyři příkazy působí na vybraný řádek.
-- Výběr se otevře hned a z hostitele načte lidi nebo štítky projektu (a co
-  položka má teď). Po zhruba 150 ms se ukáže řádek se spinnerem.
-  Psaním filtrujete (fuzzy shoda), `Up` / `Down` pohybují, `Space` zaškrtne
-  nebo odškrtne, `Enter` použije, `Esc` zruší, `Tab` dosáhne na tlačítka. Kliknutí
-  na řádek ho zaškrtne a kolečko posouvá. Lidé mají odznak s iniciálami,
-  štítky svou barvu.
-- Milník je rozbalovací seznam (s volbou **Bez milníku**, která ho zruší).
-- Po **Použít** se aktualizuje hostitel a seznamy i Radar ukážou
-  změnu po svém dalším obnovení, které začne hned.
-
-Formuláře vytvoření (pull requestu, issue) mají stejné volby jako řadu
-tlačítek: `Řešitelé: žádný`, `Recenzenti: žádný`, `Štítky: žádný`,
-`Milník: žádný`. Na GitHubu, GitLabu, Gitea a Forgejo tlačítko Štítky nahrazuje psané
-pole štítků formuláře issue. Když hostitel nový pull request přijme, ale
-odmítne některé jeho štítky nebo lidi, řekne to stavový řádek.
-
-CLI: `gitpoulpi hosting members|labels|milestones`, `hosting pr-edit <n>`,
-`hosting issue edit <n>` a `--assignee`, `--reviewer`, `--label`,
-`--milestone` u `hosting pr` a `hosting issue create`; viz
-[referenční příručka CLI](cli-reference.md).
-
-### Klávesy v sekcích
-
-| Klávesa | Akce |
-|---|---|
-| `Enter` / dvojklik | otevře konverzaci v GitPoulpi, kde ji hostitel má (pull request na GitHubu, GitLabu, Gitea nebo Gerritu otevře kontrolu), jinak prohlížeč |
-| `o` | otevře řádek v prohlížeči |
-| `.` / pravé tlačítko | nabídka řádku |
-| `e` | upraví vybraný pull request u hostitele |
-| `n` | nový pull request (PULL REQUESTY) nebo nové issue (ISSUES) |
-| `v` | otevře rozbalovací seznam stavu |
-| `r` | obnoví |
-| `Enter` / `Space` na záhlaví | sbalí nebo rozbalí sekci |
-
-### Znovu připojit a offline
-
-Chybí-li token, byl odmítnut nebo mu chybí scope, první řádek sekce zní
-`Znovu připojit (token odmítnut)`. Kliknutím nebo klávesou `Enter` otevřete
-profil v Nastavení > Integrace.
-
-Když hostitele nelze dosáhnout, poslední seznamy zůstanou na obrazovce a
-záhlaví ukazuje jejich stáří (`· 5m old`). Poslední odpověď se také ukládá do
-mezipaměti na disku (`.gitpoulpi/hosting-cache.json`), takže se seznamy
-zobrazí dřív, než odpoví síť.
-
-## 5b. Tabule issues
-
-Tlačítko **Tabule** v záhlaví ISSUES (paleta: **Issues: Otevřít tabuli**) ukáže issues propojeného zdroje jako tabuli Kanban
-přes celé okno. Sloupce závisejí na zdroji:
-
-| Zdroj | Sloupce | Přesun karty |
-|---|---|---|
-| Lokální poznámky Markdown | stavy (`statuses` profilu, potom další používané) | přepíše `status` poznámky |
-| GitHub, GitLab, Gitea, Forgejo | **Otevřené**, potom vámi zvolené štítky, potom **Zavřené** | vymění štítek stavu; do **Zavřené** issue zavře, zpět do sloupce ho znovu otevře |
-| Trello | otevřené seznamy boardu, zleva doprava | přesune kartu do seznamu |
-| Redmine | stavy issues | změní stav issue (platí pravidla workflow Redmine) |
-| Jira (Cloud i Data Center) | stavy projektu, nejdřív to-do, nakonec hotovo | provede přechod workflow, který ke sloupci vede (`GET`, pak `POST .../transitions`); bez takového přechodu se karta vrátí a stavový řádek řekne `no transition from X to Y` |
-| Azure DevOps (Services i Server) | stavy typů pracovních položek projektu, podle kategorie stavu | nastaví `System.State`; pracovní položka, jejíž typ stav sloupce nemá, se vrátí s důvodem (`a Bug has no state Done`) |
-
-U projektu GitHub nebo GitLab se **Sloupce** (nebo `c`, nebo **Tabule: Nastavit štítky sloupců...**) zeptají na štítky, které jsou
-sloupci, v pořadí, například `status::todo, status::doing, status::review`. Navrhnou štítky projektu, které
-vypadají jako stavy. Volba se ukládá pro repozitář. Bez štítků je tabule Otevřené / Zavřené. Přesun karty
-se dotkne jen vámi uvedených štítků stavu: její další štítky zůstanou. Tabule hostitele uvádí otevřené issues a 60 naposledy
-zavřených.
-
-Přechod v Jiře, který žádá povinná pole (například rozlišení), Jira odmítne a karta se vrátí
-s vlastní zprávou Jiry: takový přechod proveďte na webu.
-
-Tutéž tabuli mají k dispozici skripty a agenti: `gitpoulpi hosting board` vypíše sloupce s kartami
-a `gitpoulpi hosting board move <card> <column>` jednu přesune (viz [referenční příručka CLI](cli-reference.md)).
-
-Karta ukazuje číslo, název, řešitele jako iniciály, štítky a milník. Přetáhněte ji do jiného sloupce,
-nebo `Shift+Left` / `Shift+Right`, nebo **Tabule: Přesunout kartu do...** (`m`). Přesune se hned; po zhruba 150 ms spinner
-ukáže, že hostitel ještě pracuje, a když hostitel odmítne, karta se vrátí a stavový řádek řekne proč. `Enter` otevře
-[konverzaci](#5c-konverzace) issue v GitPoulpi a po jejím zavření se tabule vrátí; `e` upraví řešitele, štítky a milník; `n` založí nové issue ve
-vybraném sloupci; `a`, `l`, `M` a `/` filtrují podle řešitele, štítku, milníku a textu, `x` filtry zruší; `r`
-znovu načte data od hostitele. Tabule se načte znovu, když se obnoví seznamy postranního panelu. Radar tabuli nemá.
-
-## 5c. Konverzace
-
-**Konverzace** je vše, co se řeklo o jedné issue, pracovní položce, kartě, změně nebo pull / merge requestu: popis, komentáře, kontroly, vlákna ke kódu a události (štítky, přiřazení, změny stavu, pushe). GitPoulpi ji přečte od hostitele, ukáže naformátovanou a nechá vás odpovědět, aniž byste opustili okno.
-
-### Otevření
-
-| Odkud | Jak |
-|---|---|
-| Řádek ISSUES | `Enter` nebo dvojklik; **Otevřít konverzaci** v nabídce řádku; paleta *Hosting: Otevřít konverzaci issue...* (seznam issues na obrazovce). **Otevřít v prohlížeči** v nabídce řádku ponechá prohlížeč. |
-| Řádek PULL REQUESTY na Azure DevOps nebo Bitbucketu | `Enter` nebo **Otevřít konverzaci**. Na GitHubu, GitLabu, Gitea, Forgejo a Gerritu řádek otevře [kontrolu](review.md), jejíž stránka Přehled je touž konverzací (časová osa, klávesy a pole pro komentář pod ní). |
-| Karta [tabule issues](#5b-tabule-issues) | `Enter` nebo dvojklik. |
-| [Radar](radar.md) | `i` na řádku issue nebo žádosti, **Otevřít konverzaci** v nabídce řádku, nebo *Radar: Otevřít konverzaci issue*. |
-| Odkaz v jiné konverzaci | Klikněte na něj (nebo `l` a pak ho vyberte): `#7`, `!12`, `ABC-12` propojeného zdroje se otevřou v aplikaci a zařadí se do zásobníku Zpět. |
-| Agent | `gitpoulpi ui show issue <n> --view conversation` (také `ui show pr`), viz [referenční příručka CLI](cli-reference.md). |
-
-**Repozitáře, které nejsou naklonované.** Řádek Radaru z repozitáře, který nemáte naklonovaný, také otevře jeho konverzaci: pohled potřebuje jen profil integrace a projekt, takže ho Radar hostí nad svým oknem a `Esc` vrátí Radar. Co potřebuje klon, se vynechá: odkaz na commit se otevře na hostiteli místo v Logu a *Nechat AI číst repozitář* je zašedlé s důvodem (viz [kapitola o AI](ai.md#pomoc-s-psaním-na-hostiteli)). Žádost naklonovaného repozitáře má místo toho svou kontrolu (`e`) a **Otevřít konverzaci** v Radaru u ní řekne, že tu není co číst; issue naklonovaného repozitáře ji otevře na kartě toho repozitáře.
-
-Issue u hostitele, který žádnou ke čtení nemá (Bitbucket a Gerrit issues nemají), otevře prohlížeč jako dřív a sestavení bez funkce `conversation` dělá totéž všude ([vlastní sestavení](custom-builds.md)).
-
-### Pohled
-
-Pohled přes celé okno: záhlaví (stav, kdo ji otevřel a kdy, štítky, počet komentářů, **Zobrazit události**, **Zpět**, **Obnovit**, **Otevřít v prohlížeči**), řádek **Odesíláte jako**, časová osa a pod ní pole komentáře.
-
-- Časová osa se čte od nejstaršího po nejnovější a začíná nejnovějším oknem (nejvýš 300 záznamů). **Načíst starší** nahoře (`m`, paleta *Konverzace: Načíst starší záznamy*) přečte okno před ním, s počtem toho, co ještě zbývá, když ho hostitel řekne.
-- Komentář ukazuje autora, datum, štítek `upraveno`, štítek `bot` u botů, `interní` u soukromých poznámek a tlačítka **Odpovědět**, **Citovat**, **Upravit**, **Smazat** a **Odkazy**, která vybraný záznam dovoluje. Vlákno ke kódu ukazuje `path:line`, `vyřešeno` nebo `nevyřešeno`, `zastaralé` a své komentáře. Kontrola ukazuje svůj verdikt.
-- Události jsou jeden tlumený řádek každá (*carol přidal(a) štítek lfs*). **Zobrazit události** (`v`) je skryje; volba se uchovává pro každý repozitář. Hostitelé bez historie událostí (YouTrack, pracovní položky Azure DevOps, lokální poznámky) takové políčko nemají.
-- Text je vykreslený Markdown: nadpisy, vnořené a úkolové seznamy, citace, upozornění ve stylu GitHubu, zvýrazněný kód, tabulky, odkazy, obrázky jako `[image: alt]`. Text, který přišel ve vlastním značkování hostitele, se nejdřív převede (viz [Převod značkování](#převod-značkování)). Blok kódu `mermaid` má tlačítko **Otevřít diagram**, které ukáže zdroj diagramu v posuvném prohlížeči (`Enter` ho zkopíruje); paleta má *Konverzace: Otevřít diagram záznamu*. Vyžaduje sestavení s `conversation` i `mermaid`.
-- V přehledu kontroly je `cesta:řádek` vlákna nad kódem odkaz na kód (`G`, *Konverzace: Otevřít kód vlákna*; viz [Kontrola](review.md)); v konverzaci otevřené samostatně (issue, řádek Radaru) není stránka s kódem, na kterou by se dalo přejít.
-- Pohled se znovu čte každých 60 sekund a na `F5` (**Obnovit**).
-
-**Klávesy.** Každá má tlačítko, řádek nabídky nebo řádek palety (*Konverzace: ...*) a `Ctrl+N` označí tlačítka čísly.
-
-| Klávesa | Akce |
-|---|---|
-| `Up`, `Down`, `Ctrl+J`, `Ctrl+K`, `j`, `k` | Předchozí / další záznam |
-| `PageUp`, `PageDown`, `Home`, `End`, kolečko, posuvník | Posun |
-| `Tab`, `Shift+Tab` | Časová osa, pole komentáře, potom tlačítka záhlaví |
-| `r` | Odpovědět: do vlákna vybraného záznamu, nebo s citací jeho textu, kde hostitel vlákna nemá |
-| `Q` | Citovat vybraný záznam v novém komentáři |
-| `c` | Nový komentář |
-| `e`, `d` | Upravit, smazat jeden z vašich komentářů (před smazáním přijde otázka) |
-| `l`, `Enter` | Odkazy záznamu: `Enter` následuje jediný, nebo otevře jejich nabídku |
-| `y`, `o` | Zkopírovat adresu záznamu, otevřít ji v prohlížeči |
-| `n` | Další nepřečtený záznam |
-| `v`, `m`, `F5` | Zobrazit nebo skrýt události, Načíst starší, Obnovit |
-| `Alt+Left`, `Backspace` | Zpět podle zásobníku Zpět |
-| `q`, `Esc` | Zavřít (nejdřív se zeptá, když pole obsahuje text) |
-
-### Psaní
-
-**Nový komentář** (`c`, nebo `Tab` do pole), **Odpovědět** (`r`), **Citovat** (`Q`) a **Upravit** (`e`) používají jediný Markdown editor: **Psát**, **Náhled** a **Vedle sebe** (`Alt+P` přepíná Psát a Náhled, `Alt+L` zapíná Vedle sebe a vyžaduje okno široké 100 sloupců). `Ctrl+Enter` (také `Ctrl+S` a `Alt+Enter`) nebo **Odeslat** odešle, **Zrušit** pole zahodí a `Alt+E` otevře **Napsat pomocí AI**, kde je AI zapnutá ([kapitola o AI](ai.md#pomoc-s-psaním-na-hostiteli)). Náhled vykresluje stejný vykreslovač jako časovou osu, se stejnými odkazy. Když hostitel Markdown nepřijímá, zápatí jmenuje značkování, ve kterém se text odešle (*Odesláno jako Jira wiki markup*, *Odesláno jako Textile*).
-
-- Komentář se přidá do časové osy hned a zaujme své místo, když hostitel odpoví. Pokud hostitel odmítne, záznam zmizí a pole se znovu otevře s vaším textem a důvodem.
-- Text, který jste neodeslali, se uchovává pro každou položku (`remote-conversations.toml` ve složce konfigurace) a je tam, až to pole příště otevřete; odeslání nebo zahození ho odstraní. Zavření pole, které obsahuje text, se nejdřív zeptá.
-- **Odpovědět** na vlákno (vlákno kontroly, diskuse GitLabu, komentář Linearu, vlákno Bitbucketu nebo Azure DevOps) odešle do tohoto vlákna. Kde hostitel má jen plochý seznam, **Odpovědět** začne nový komentář s vybraným záznamem v citaci (`> **autor**`), stejně jako **Citovat**.
-- **Interní poznámka** (zaškrtávací pole, `Alt+I`): na GitLabu a Redmine je komentář viditelný jen členům projektu. Ukazuje se jen u hostitelů, kteří takové poznámky mají, a jen u nového komentáře.
-- Odeslání je akce navenek: nic se nezapisuje do žurnálu a **z GitPoulpi nelze nic vrátit zpět**. Bez připojení pole zůstane, **Odeslat** je zašedlé s důvodem a záhlaví říká, že se ukazuje uložená kopie.
-
-**Kdo smí upravovat nebo mazat.** **Upravit** a **Smazat** mají jen vaše vlastní komentáře. Nejdřív rozhoduje vlastní slovo hostitele, když ho dává (`viewerCanUpdate` a `viewerCanDelete` GitHubu, jinde `can_edit`), pak váš login proti autorovi komentáře, porovnaný bez ohledu na velikost písmen; komentáře bota App musí navíc pocházet z účtu bota. Dokud login bota GitHub App není znám, počítají se jen komentáře, které odeslala tato instalace (repozitář si uchovává jejich id): nic se neodhaduje podle jména. Ve vlákně **Upravit** a **Smazat** působí na poslední komentář vlákna, který je váš. Hostitel, který neumí upravovat ani mazat (viz [tabulka](#co-který-hostitel-neumí)), ukazuje tlačítka zašedlá s důvodem.
-
-### Odesílání jako
-
-Řádek pod záhlavím říká, jako kdo se vaše zprávy odesílají, a tentýž řádek je v každém poli:
-
-| Řádek | Význam |
-|---|---|
-| *Odesíláte jako ann (osobní token)* | Token profilu: váš vlastní login (`GET /user`). |
-| *Odesíláte jako ci-bot (příkaz tokenu repozitáře)* | Pro API hostitele se používá [příkaz tokenu](#13d-vystupování-jako-bot-github-app) repozitáře. |
-| *Odesíláte jako my-app[bot] (bot GitHub App)* | Instalační token. Jméno pochází z **Odesílat jako**, jinak od hostitele. |
-| *Odesíláte jako bot GitHub App (jeho jméno zatím není známo: nastavte Odesílat jako v Nastavení)* | Žádné jméno nenastaveno, žádné zatím nezjištěno. |
-| *Odesíláte jako ... (bot projektu)* | Přístupový token projektu nebo skupiny GitLabu. |
-| *Píšete jako kai (lokální poznámka)* | Složka poznámek Markdown: `local.me` profilu, jinak připojený uživatel. |
-| *Zatím není známo, jako kdo budete odesílat. Nastavte Odesílat jako v Nastavení.* | Nic se nepodařilo zjistit. |
-
-**Odesílat jako** je jméno: u GitHub App je to `my-app[bot]`. Nastavte ho pro všechny repozitáře v **Nastavení > Integrace > Odesílat jako** (`general.hosting_post_as`), nebo pro jeden repozitář v **Nastavení > Nastavení repozitáře > SSH a přihlášení > Hosting**, což ho přepíše. Když je prázdné, GitPoulpi se zeptá GitHubu (GraphQL `viewer { login }`, na což instalační token může, ale nemusí odpovědět) a když to nejde, zjistí jméno z autora prvního komentáře, který odešle, a uchová ho s repozitářem. Osobní token ho nikdy nepotřebuje. Viz [Vystupování jako bot GitHub App](#13d-vystupování-jako-bot-github-app).
-
-### Křížové odkazy
-
-Odkazy v konverzaci jsou podtržené a klikací. Nejdřív se porovnají propojené zdroje ISSUES a PULL REQUESTY repozitáře, takže `ABC-12` propojeného projektu Jira se otevře v aplikaci i uvnitř komentáře z GitHubu; to, co přidá vlastní gramatika hostitele, otevře svou stránku po potvrzení odkazu. Id commitu se otevře v Logu, když je repozitář naklonovaný a id má aspoň 7 znaků, jinak na hostiteli. Nic uvnitř úseku kódu, bloku v ohrazení, odkazu Markdown, e-mailové adresy nebo URL není odkazem a `C#1`, `UTF-8`, `SHA-256` a `ISO-8601` také ne.
-
-| Hostitel | Rozpoznává |
-|---|---|
-| GitHub | `#7`, `GH-7`, `owner/repo#7`, `owner/repo@sha`, `@login`, id commitů |
-| GitLab | `#7`, `!7`, `group/project#7`, `group/project!7`, `project#7` (sourozenecký projekt), `@user`, `~label` a `%milestone` jako štítky, id commitů |
-| Gitea, Forgejo | `#7`, `!7`, `owner/repo#7`, `owner/repo@sha`, `@user`, id commitů |
-| Azure DevOps | `#7`, `!7`, `AB#7`, `@user` |
-| Bitbucket | `@user`, zmínky `{uuid}`, id commitů |
-| Gerrit | hodnoty `Change-Id` (`I` a 40 hexadecimálních číslic), id commitů |
-| Redmine | `#7`, revize `r123`, `commit:abc1234` |
-| Jira, Linear, YouTrack | `ABC-12`, jen pro projekt nebo tým propojeného zdroje |
-| Trello | adresy karet (`trello.com/c/...`) |
-| Lokální poznámky | `[[note]]`, `[[note\|alias]]` a relativní odkazy `.md` na jinou poznámku složky |
-
-`gitpoulpi hosting markdown --body T --id I` vypíše, co z textu aplikace udělá, včetně odkazů.
-
-### Převod značkování
-
-Hostitelé, kteří Markdown neumějí, se převádějí oběma směry, takže všude čtete a píšete Markdown. Co převodník nerozumí, zůstane čitelným textem.
-
-- **Jira** (Cloud i Data Center) ukládá komentáře jako wiki markup přes API v2. Co čtete, se převede na Markdown; co píšete, se převede na wiki markup a zápatí říká *Odesláno jako Jira wiki markup*.
-- **Redmine** formátuje text jako Textile nebo Markdown, což API neříká: řekne to GitPoulpi řádek profilu **Formát textu serveru** (Nastavení > Integrace, `markup`, ve výchozím stavu Textile). Textile se pro čtení převádí na Markdown a pro psaní zpět na Textile.
-- **Azure DevOps Server** vrací komentáře pracovních položek jako HTML a jako HTML je i přijímá: zobrazují se jako Markdown z něj převedený a zapisují se jako HTML. Azure DevOps Services a vlákna pull requestů přijímají Markdown.
-- **Gerrit** je prostý text: nevykresluje se jako Markdown a co napíšete, se odešle tak, jak je.
-- Každý importér nejdřív odstraní řídicí a escape sekvence, takže komentář nemůže pohnout terminálem.
-
-### Uložená kopie, Načíst starší, nepřečtené
-
-- Každá konverzace, kterou otevřete, se uloží (`<state dir>/conversations/<integration>/<project>/<kind>-<n>.json`, jen pro uživatele, bez tokenu, nejvýš 2 MB na soubor, uchovává se 50 nejnovějších souborů). Vykreslí se hned po otevření položky a na pozadí se obnoví. Když hostitele nelze zastihnout, uložená kopie zůstane na obrazovce pod textem *Offline: zobrazena kopie uložená před 3 min (důvod)* a Odeslat je zašedlé.
-- **Nepřečtené:** co jste viděli naposledy, se pamatuje pro každou konverzaci (uchovává se posledních 200). Novější záznamy od někoho jiného dostanou akcentový proužek a štítek `nové` a `n` skočí na další. Konverzace, kterou otevřete poprvé, nemá nic nového.
-
-### Co který hostitel neumí
-
-Každé `ne` níže je skutečný limit: ovládací prvek je skrytý nebo zašedlý s důvodem a CLI odpoví chybou jmenující hostitele ještě před odesláním.
-
-| Hostitel | Položky | Odpověď ve vlákně | Úprava a smazání vlastních | Vyřešení vlákna | Události | Interní poznámky | Zapisuje se jako |
-|---|---|---|---|---|---|---|---|
-| GitHub | issues, pull requesty | pull requesty | obojí | pull requesty | ano | ne | GitHub Markdown |
-| GitLab | issues, merge requesty | ano (diskuse) | obojí | merge requesty | ano | ano | GitLab Markdown |
-| Gitea | issues, pull requesty | pull requesty | obojí | pull requesty | ano | ne | Markdown |
-| Forgejo | issues, pull requesty | pull requesty | obojí | ne (hostitel nemá koncový bod) | ano | ne | Markdown |
-| Azure DevOps | pracovní položky, pull requesty | pull requesty | obojí | ne (stav se ukazuje, nemění) | jen pull requesty | ne | Markdown (HTML u pracovních položek Serveru) |
-| Bitbucket (Cloud, Data Center) | jen pull requesty | ano | obojí | ne (ukazuje se, nemění) | ano | ne | Markdown |
-| Gerrit | jen změny | ano | ne (nelze upravit ani smazat) | ano | ano | ne | prostý text |
-| Jira | issues | ne (plochý seznam) | obojí | ne | ano (changelog) | ne (vyžaduje roli v projektu) | wiki markup |
-| Linear | issues | ano (odpovědi na komentář) | obojí | ne | ano | ne | Markdown |
-| YouTrack | issues | ne | obojí | ne | ne | ne | Markdown |
-| Redmine | issues | ne | jen úprava (Redmine 5 a novější), nikdy smazání | ne | ano (žurnály) | ano (soukromé poznámky) | Markdown nebo Textile |
-| Trello | karty | ne | obojí | ne | ano (přesuny) | ne | Markdown |
-| Lokální poznámky | poznámky | ne | vlastní lokálního autora | ne | ne | ne | Markdown |
-
-Také: žádný hostitel nedovolí z konverzace založit nové vlákno na řádku (udělejte to v kontrole) a reakce se ukazují jen na GitHubu. Text delší, než hostitel přijme, se odmítne (GitHub 65 536 znaků, GitLab 1 000 000, Azure DevOps 150 000, Jira 32 767, Trello 16 384): CLI to zkontroluje předem, v aplikaci se ukáže vlastní zpráva hostitele a váš text se uchová. Lokální poznámka drží své komentáře v závěrečné sekci `## Comments` samotného souboru poznámky, každý jako záznam `### autor - čas`, takže je vidí i Obsidian a shell.
-
-Na příkazové řádce jsou tytéž konverzace `gitpoulpi hosting issue comments`, `issue comment`, `comment-edit` a `comment-delete` a `hosting review conversation` (viz [referenční příručka CLI](cli-reference.md)); agenti mají nástroje MCP stejných jmen (viz [MCP a agenti](mcp-and-agents.md)).
-
-## 6. Vytvoření pull requestu
-
-Formulář otevřete tlačítkem `+` v záhlaví PULL REQUESTY, klávesou `n` v sekci
-nebo příkazem z palety *Pull requesty: Vytvořit pull request...*. Nabídka větve
-má také **Založit pull request z <branch>...**.
-
-Formulář obsahuje:
-
-- Jednu kartu pro každý připojený profil, který má pull requesty (`Left` /
-  `Right` v pásu karet).
-- Výběry **Z repozitáře / Větev** a **Do repozitáře / Větev**. Dlouhé seznamy
-  lze prohledávat. Můžete zadat větev nebo repozitář, který seznamy nezobrazují.
-- **Název**, předvyplněný předmětem posledního commitu.
-- **Popis** na více řádků (`Enter` přidá nový řádek, `Tab` pole opustí).
-- Tlačítka **Řešitelé**, **Recenzenti**, **Štítky** a **Milník** (GitHub,
-  GitLab, Gitea a Forgejo), která otevírají výběr.
-- **Odeslat jako koncept**.
-- Při zapnuté [AI](ai.md): **Vygenerovat název a popis**.
-
-Formulář se otevře s profilem, repozitářem a větvemi aktuálně přepnuté větve
-(`feature -> main`). Jiný zdrojový repozitář vytvoří požadavek z forku.
-
-**Vytvořit pull request** (nebo `Ctrl+S`) požadavek na hostiteli vytvoří.
-Výsledek se otevře v prohlížeči a stavový řádek ho pojmenuje.
-
-## 7. Vytvoření issue
-
-Má-li sekce ISSUES poskytovatele **i** projekt, objeví se v jejím záhlaví `+`
-(*+ Nové issue*). Dále: `n` v sekci nebo příkaz z palety *Hosting: Nové
-issue...*.
-
-Formulář obsahuje **Název** (povinný), **Popis** (více řádků) a **Štítky**
-(oddělené čárkou, například `bug, ui`; na GitHubu, GitLabu, Gitea a Forgejo místo toho
-výběr otevírají tlačítka Štítky, Řešitelé a Milník). Jira a Azure DevOps přidávají
-rozbalovací seznam **Typ**. Trello přidává rozbalovací seznam **Seznam**. Linear a YouTrack
-přidávají rozbalovací seznam **Stav** (stav workflow, nebo hodnotu `State`, ve kterém issue
-začíná). Redmine přidává rozbalovací seznam **Typ** s trackery projektu (Bug, Feature,
-Support...); štítky nemá, takže pro něj tlačítko Štítky není a štítek zadaný
-na příkazové řádce se odmítne. Tyto
-seznamy formulář při otevření naplní daty od hostitele.
-
-**Vytvořit issue** (nebo `Ctrl+S`) issue na hostiteli vytvoří. `Esc` nebo
-**Zrušit** formulář zavře. Pokud hostitel odmítne (odmítnutý token, chybějící
-scope, neznámý projekt, neznámý štítek), formulář zobrazí důvod a zachová, co
-jste napsali. Po úspěchu stavový řádek pojmenuje nové issue a sekce ISSUES se
-obnoví.
-
-CLI: `gitpoulpi hosting issue create --title ... [--body ... | --body-file ...]
-[--label ...] [--type ...] [--list ...]`.
-
-## 8. Vytvoření na vlastní webové stránce hostitele
-
-Formulář Nové issue i formulář Vytvořit pull request mají vpravo nahoře
-tlačítko **Vytvořit na <provider>**. Klávesa je `Alt+W`. V prohlížeči otevře
-webový formulář hostitele, předvyplněný tím, co jste dosud zadali. Dialog zůstane
-otevřený. Nepotřebuje token a nevolá žádné API, takže funguje i po chybě API.
-
-- GitHub nemá pro *draft* žádný parametr URL, proto se zaškrtávací políčko konceptu
-  nepřenáší. GitLab dostane předponu názvu `Draft: `.
-- GitLab přijímá štítky jen podle id, proto se přidají jako rychlá akce
-  `/label ~"x"` na konci popisu.
-- Velmi dlouhý popis se zkrátí, aby URL zůstala pod 6000 znaky, s poznámkou
-  `[...truncated: paste the rest]`.
-- Bitbucket Data Center nemá adresu webového formuláře, proto nemá tlačítko
-  **Vytvořit na <provider>**.
-
-CLI: `gitpoulpi hosting issue create ... --web` a `gitpoulpi hosting pr --web`
-vypíší stejnou URL.
-
-## 9. Čip na panelu nástrojů
-
-Na konci panelu nástrojů (ve výchozím stavu vpravo) čip ukazuje požadavek aktuálně přepnuté větve:
-`GH #12` (GitHub), `GL !53` (GitLab), `AZ !12` (Azure DevOps) nebo `BB #12`
-(Bitbucket). Jeho barva značí stav: zelená otevřený, šedá koncept, fialová
-sloučený, červená zavřený.
-
-- Najetím zobrazíte název, stav a `source → target`.
-- Kliknutím nebo `Ctrl+G g` otevřete požadavek v prohlížeči.
-- Pravým tlačítkem získáte **Otevřít v prohlížeči**, **Kopírovat URL**,
-  **Obnovit** a **Přepnout profil**.
-
-Pushnutá větev bez požadavku ukazuje ztlumený čip `+ PR`. Kliknutím založíte
-pull request. Čip se nezobrazí, když žádný profil neodpovídá, větev není
-pushnutá nebo se hostitele nepodařilo dosáhnout. V úzkém okně je čip skrytý,
-aby zbylo místo pro tlačítka panelu nástrojů.
-
-## 10. Kdy se seznamy obnovují
-
-Seznamy se obnovují:
-
-- při otevření repozitáře;
-- při změně aktuálně přepnuté větve;
-- po push nebo fetch;
-- každých N minut podle *Obnovení (minuty): pull requesty a issues*
-  (`general.hosting_refresh_minutes`, výchozí 5, `0` časovač vypne;
-  Nastavení > Integrace);
-- při zavření Nastavení;
-- při stisku `r`, spuštění *Integrace: Obnovit pull requesty a issues* nebo
-  změně filtru.
-
-Požadavky nikdy neblokují okno.
-
-Hostitelé omezují počet volání. GitPoulpi odesílá zpět `ETag` poslední
-odpovědi, takže nezměněný seznam stojí málo (na GitHubu nic). Když hostitel
-oznámí, že zbývá málo volání, stavový řádek to uvede. Když nezbývá žádné,
-GitPoulpi se tohoto hostitele přestane ptát do obnovení limitu a seznamy zůstanou
-beze změny.
-
-## 11. Terminologie
-
-GitHub, Azure DevOps a Bitbucket říkají „pull request“. GitLab říká „merge
-request“. *Terminologie žádosti o kontrolu kódu* (`ui.pr_terminology`, v Nastavení >
-Integrace) volí slovo pro každý popisek, nabídku, příkaz z palety a zprávu:
-
-- **Auto (podle hostitele)**: řídí se propojeným poskytovatelem repozitáře
-  („Pull Request“, dokud není nic propojeno).
-- **Pull Request** nebo **Merge Request**: vždy toto slovo.
-
-Změna se projeví okamžitě. CLI a MCP vždy říkají „pull/merge request“. Tato
-stránka říká „pull request“.
-
-## 12. Odkazy ve zprávách commitů a názvech větví
-
-Jsou-li issues nebo pull requesty repozitáře propojeny, odkazy ve zprávě commitu
-v Podrobnostech commitu jsou podtržené. Kliknutí otevře propojenou stránku.
-Klávesnice: příkaz z palety
-*Integrace: Otevřít odkaz z commitu (#issue / !request)...* (nabídka, má-li
-zpráva několik odkazů). Repozitář bez propojení nemá žádné odkazy.
-
-Co je odkaz, závisí na poskytovateli sekce ISSUES:
-
-| ISSUES propojeno s | Ve zprávě | V názvu větve |
-|---|---|---|
-| GitHub, GitLab, Gitea, Forgejo | `#123` | `123-fix-login` |
-| Azure DevOps | `#123` a `AB#123` | `123-fix-login` |
-| Jira | `ABC-123`, jen když je `ABC` klíč propojeného projektu. Text jako `UTF-8`, `SHA-256` nebo `ISO-8601` nikdy není odkaz. | `ABC-123` kdekoli v názvu (`feature/ABC-123-x`), velkými písmeny |
-| Linear | `ENG-123`, jen když je `ENG` klíč propojeného týmu (nebo týmu ze seznamu týmů profilu). `UTF-8` nikdy není odkaz. | vlastní `branchName` Linearu, když větev vytvoříte z issue; `ENG-123` kdekoli v názvu se čte zpět |
-| YouTrack | `ABC-123`, jen když je `ABC` krátký název propojeného projektu (nebo projektu ze seznamu projektů profilu) | `ABC-123` kdekoli v názvu |
-| Redmine | `#123`, jen když je Redmine propojeným zdrojem ISSUES (zdroj pull requestů si ponechává vlastní značku) | `123-fix-login` |
-| Trello | adresa `https://trello.com/c/<shortLink>`; `#12` jen když má číslo 12 karta v mezipaměti | `12-fix-login` |
-
-| PULL REQUESTY propojeny s | Ve zprávě |
-|---|---|
-| GitLab, Azure DevOps | `!45` |
-| GitHub, Bitbucket, Gitea, Forgejo | `#45` |
-
-Pokud `#N` odpovídají oba seznamy, vyhraje issue. CLI:
-`gitpoulpi hosting refs --message TEXT | --commit REV | --branch NAME`.
-
-**V konverzacích.** Text issue nebo žádosti se čte s gramatikou jejího hostitele, která je širší než tabulka výše: `owner/repo#7`, `!7`, `GH-7`, `@login`, id commitů a další tvary uvedené v [Křížových odkazech](#křížové-odkazy). Nejdřív se porovnají propojené zdroje repozitáře, takže klíč Jiry v komentáři z GitHubu pořád otevře svou issue v aplikaci. `gitpoulpi hosting markdown --body TEXT --id I` ukáže, co aplikace v textu najde.
-
-### Vložení odkazu na issue
-
-V composeru commitů tlačítko `#▾` na pravém konci Souhrnu otevře filtrovatelný
-seznam propojených issues. Issue pojmenované aktuální větví je první a je
-označeno *(z větve)*. `Enter` nebo kliknutí vloží jeho odkaz (`ABC-123`, `#12`,
-`AB#12`) na pozici kurzoru. Klávesnice: `Alt+R` v composeru. Paleta: *Commit:
-Vložit odkaz na issue...*. Bez propojeného seznamu issues je tlačítko zašedlé a
-uvádí *nejdřív propojte seznam issues v postranním panelu*. GitPoulpi nikdy
-nepřidá odkaz sám.
-
-## 13. Klíče SSH
+## 5. Klíče SSH
 
 ### Klíč SSH pro profil
 
@@ -783,7 +323,7 @@ Globální klíč v Nastavení > SSH a přihlášení (*Cesta k privátnímu kl�
 *Vygenerovat pár klíčů*) platí pro každý repozitář bez vlastní volby. Soubor klíče
 nebo připnutí repozitáře má přednost.
 
-## 13b. Ochrana větví pro přepis historie
+## 6. Ochrana větví pro přepis historie
 
 Když přepisujete historii ([nástroj pro přepis](history-rewrite.md)), GitPoulpi se
 hostitele zeptá, které větve chrání, aby se z přepisu ve výchozím stavu
@@ -804,7 +344,7 @@ Stránka nastavení ochrany (a výchozí větve a smazání repozitáře) se ses
 remote repozitáře pro GitHub, GitLab, Azure DevOps a Bitbucket, i když repozitář
 propojený není, a zobrazí se se třemi cestami ven, když hostitel push odmítne.
 
-## 13c. Seznamy za celý účet v Radaru
+## 7. Seznamy za celý účet v Radaru
 
 Radar obvykle sleduje repozitáře, které jste naklonovali. Profil může také
 vypsat, co se vás týká na celém hostiteli, naklonované i ne, třemi přepínači v
@@ -860,7 +400,7 @@ zapne seznam, `gitpoulpi hosting radar --json` seznamy vypíše (a
 `--refresh` obejde mezipaměť). AI agenti mají stejné dva příkazy přes MCP
 (`hosting_radar`, `hosting_integrations_radar`).
 
-## 13d. Vystupování jako bot GitHub App
+## 8. Vystupování jako bot GitHub App
 
 Projekt, který nesmí ukazovat jméno člověka, může vše na hostiteli dělat přes **GitHub App**: každý komentář, kontrola, uzavření nebo znovuotevření a změna štítků se pak objeví jako `<app-slug>[bot]`. Funguje to pro jeden repozitář a vaše ostatní repozitáře nechává na vašem vlastním tokenu.
 
@@ -872,7 +412,7 @@ Co se pro ten repozitář změní:
 
 - Jeho volání issues a pull requestů (výpis, vytváření, komentování, kontrola, merge, uzavírání, štítky) používají token příkazu, se stejným limitem 30 sekund, cache v paměti a maskováním jako vlastní přihlášení gitu. Když hostitel odpoví 401, protože token vypršel, příkaz se zeptá znovu jednou. Pokud příkaz nelze spustit, volání se odmítne: váš osobní token není nikdy záložní řešení.
 - Neexistuje „já“: instalační token se nemůže zeptat, kdo je. Záhlaví sekce označuje profil **(App bot)** a filtry postavené na „já“ (*Přiřazené mně*, *Moje*, *Čeká na mou kontrolu*) nemají co spárovat. Nic se neukazuje jako chyba.
-- **Odesílat jako.** Každá zpráva, kterou GitPoulpi odešle, se ukazuje se jménem, jako které se odesílá (*Odesíláte jako my-app[bot] (bot GitHub App)* pod záhlavím [konverzace](#odesílání-jako) a v jejím poli komentáře; `posted_as` v odpovědi CLI). S osobním tokenem je to váš login (`GET /user`). S tokenem App je to jméno **Odesílat jako**, například `my-app[bot]`: nastavte ho pro všechny repozitáře v **Nastavení > Integrace** (`general.hosting_post_as`, také `gitpoulpi config set general.hosting_post_as my-app[bot]`) nebo pro jeden repozitář v **Nastavení > Nastavení repozitáře > SSH a přihlášení > Hosting**, což má přednost. Když je prázdné, GitPoulpi se zeptá GitHubu (GraphQL `viewer { login }`) a jinak zjistí jméno z autora prvního komentáře, který odešle, a uchová ho s repozitářem. Podle toho jména se také poznají vaše vlastní komentáře, takže úprava a smazání se nabízejí jen u nich (komentáře App musí navíc pocházet z účtu bota); dokud není známo, lze měnit jen komentáře, které odeslala tato instalace.
+- **Odesílat jako.** Každá zpráva, kterou GitPoulpi odešle, se ukazuje se jménem, jako které se odesílá (*Odesíláte jako my-app[bot] (bot GitHub App)* pod záhlavím [konverzace](conversations.md#odesílání-jako) a v jejím poli komentáře; `posted_as` v odpovědi CLI). S osobním tokenem je to váš login (`GET /user`). S tokenem App je to jméno **Odesílat jako**, například `my-app[bot]`: nastavte ho pro všechny repozitáře v **Nastavení > Integrace** (`general.hosting_post_as`, také `gitpoulpi config set general.hosting_post_as my-app[bot]`) nebo pro jeden repozitář v **Nastavení > Nastavení repozitáře > SSH a přihlášení > Hosting**, což má přednost. Když je prázdné, GitPoulpi se zeptá GitHubu (GraphQL `viewer { login }`) a jinak zjistí jméno z autora prvního komentáře, který odešle, a uchová ho s repozitářem. Podle toho jména se také poznají vaše vlastní komentáře, takže úprava a smazání se nabízejí jen u nich (komentáře App musí navíc pocházet z účtu bota); dokud není známo, lze měnit jen komentáře, které odeslala tato instalace.
 - App nelze přiřadit. Nastavení spojte se zablokovaným přiřazováním níže.
 - Zapnutí nebo vypnutí **Použít pro API hostitele** vyžaduje člověka, stejně jako nový příkaz.
 
@@ -888,7 +428,7 @@ Tímto způsobem používají token repozitáře jen profily GitHubu; ostatní h
 
 `gitpoulpi hosting assignment` ukáže nastavení, `--block` ho zapne a `--allow` ho zase vypne; znovu povolit smí jen člověk (server MCP nemůže).
 
-## 14. Z příkazové řádky
+## 9. Z příkazové řádky
 
 ```
 echo $TOKEN | gitpoulpi hosting login --id my-gitlab --token-stdin
@@ -920,7 +460,7 @@ token drží systémové úložiště přihlašovacích údajů, nebo `stored: "
 ## Známá omezení
 
 - **Pull requesty z forků:** Azure DevOps a Bitbucket neumějí udělat checkout
-  požadavku z forku (viz [Akce na řádku](#akce-na-řádku)). Azure DevOps neumí
+  požadavku z forku (viz [Akce na řádku](pull-requests-and-issues.md#akce-na-řádku)). Azure DevOps neumí
   vytvořit pull request z forku.
 - **Trello** zobrazí nejvýše prvních 1000 karet boardu. Zúžit je můžete
   filtrem seznamů. **Jira**, **Linear** a **YouTrack** vypíšou nejvýše 500
@@ -958,7 +498,7 @@ token drží systémové úložiště přihlašovacích údajů, nebo `stored: "
   vypisují po workspacích.
 - **Jira Cloud:** fungují jen klasické API tokeny (žádné tokeny se scopes, žádné
   OAuth). Nové issue v Jiře dostane popis jako prostý text.
-- **Konverzace:** nejdřív se načte nejnovějších 300 záznamů (zbytek přes **Načíst starší**); komentář, úprava nebo smazání odeslané z GitPoulpi je akce navenek a nelze je z něj vrátit zpět; co který hostitel neumí, je v [tabulce](#co-který-hostitel-neumí). Na Gerritu nelze zprávu ani komentář upravit či smazat a text Gerritu je prostý.
+- **Konverzace:** nejdřív se načte nejnovějších 300 záznamů (zbytek přes **Načíst starší**); komentář, úprava nebo smazání odeslané z GitPoulpi je akce navenek a nelze je z něj vrátit zpět; co který hostitel neumí, je v [tabulce](conversations.md#co-který-hostitel-neumí). Na Gerritu nelze zprávu ani komentář upravit či smazat a text Gerritu je prostý.
 - Vytvoření pull requestu, work itemu, issue nebo karty probíhá na hostiteli a
   z GitPoulpi **nelze vrátit zpět**. Checkout požadavku lze vrátit zpět
   normálně.

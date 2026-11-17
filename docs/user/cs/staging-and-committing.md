@@ -18,6 +18,9 @@ pracovní změny:
 - **Soubory unstaged**: upravené, přidané (untracked) a smazané soubory, které
   ještě nejsou v dalším commitu.
 - **Soubory staged**: co bude obsahovat další commit.
+- **Soubory v konfliktu** (červený `!`, dokud je merge, rebase, cherry-pick
+  nebo revert zastaven): `Enter` otevře editor merge, viz
+  [Řešení merge konfliktů](merge-conflicts.md).
 - **Přejmenované nebo přesunuté soubory** jsou jeden řádek, `nový <- starý`, v obou
   seznamech (soubor smazaný na disku a nový soubor, který má alespoň z 50 % stejný obsah,
   se počítá jako přesun už před stagingem). Stage, Unstage a Zahodit působí na oba názvy:
@@ -179,9 +182,10 @@ na řádku pracovních změn v Logu: psaní do jednoho se zobrazí i v druhém.
   vyžadovat force push (with lease).
 - **Přeskočit hooky** (`Shift+H`, nebo **Commit: Přepnout Přeskočit hooky** v paletě) commituje
   bez spuštění hooků `pre-commit` a `commit-msg` repozitáře. Platí pro jeden commit;
-  **Nastavení > Nastavení repozitáře > Commit** ho nastaví jako ve výchozím stavu zaškrtnuté. Na úzkém řádku
-  se jeho popisek zkrátí na **Bez hooků**, pak na samotné zaškrtávátko (jeho tooltip ho pojmenuje);
-  nikdy nezmizí.
+  **Nastavení > Nastavení repozitáře > Commit** ho nastaví jako ve výchozím stavu zaškrtnuté. Má vlastní řádek hned pod
+  **Amend předchozího commitu**, s plným popiskem; jen na velmi úzkém panelu se popisek zkrátí na **Bez hooků**,
+  pak na samotné zaškrtávátko (jeho tooltip ho pojmenuje). Nikdy nezmizí. Na velmi nízkém
+  formuláři sdílí místo s řádkem Amend a zkracuje se stejně.
 - `c` v panelu Stav přesune kurzor do formuláře. `Esc` ho opustí.
 - `Ctrl+G c` a `Ctrl+G Enter` (**Git: Commit...** a **Git: Hned commitnout změny
   ze stage** v paletě) jsou jeden příkaz, tlačítko commitu odkudkoli. Když je ve
@@ -206,8 +210,7 @@ upravili; nic se necommituje, dokud nestisknete tlačítko commitu.
 
 **Sestavit commity pomocí AI** je na pravém konci řádku Amend a s pravým panelem se
 zmenšuje, místo aby zmizelo: celý popisek, pak **Sestavit pomocí AI**, pak samotné **`✦`**.
-Při každé šířce si drží klik, tooltip i klávesu (`Ctrl+G Shift+C`); popisek Přeskočit hooky
-mu ustupuje (**Bez hooků**, pak jen políčko), než se zmenší on sám.
+Při každé šířce si drží klik, tooltip i klávesu (`Ctrl+G Shift+C`).
 
 Tlačítka **`✦`** (vygenerovat zprávu) a **`#`** (vložit odkaz na issue) na pravém konci
 řádku shrnutí se zmenšují stejně: v úzkém panelu přijdou o okraje, pak se složí do jednoho

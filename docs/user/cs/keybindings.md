@@ -1505,11 +1505,11 @@ K tomu, co nabídky dělají, viz [Práce s Logem](log-and-history.md).
 
 S odpovídající integrací má panel Refs sekci pull requestů (GitLab: merge
 requesty). S připojeným hostingovým profilem má také sekci ISSUES. Viz
-[Hostingové služby a issue trackery](hosting-integration.md#5-pull-requesty-a-issues-v-postranním-panelu).
+[Hostingové služby a issue trackery](pull-requests-and-issues.md#pull-requesty-a-issues-v-postranním-panelu).
 
 | Klávesa | Akce |
 |---|---|
-| `Enter` | Otevřít vybraný řádek: issue (a žádost na Azure DevOps nebo Bitbucketu) jako [konverzaci](hosting-integration.md#5c-konverzace), pull request v [kontrole](review.md) u hostitelů, kteří ji mají, cokoli jiného v prohlížeči. Na řádku `Reconnect`: otevřít Nastavení na tomto profilu |
+| `Enter` | Otevřít vybraný řádek: issue (a žádost na Azure DevOps nebo Bitbucketu) jako [konverzaci](conversations.md), pull request v [kontrole](review.md) u hostitelů, kteří ji mají, cokoli jiného v prohlížeči. Na řádku `Reconnect`: otevřít Nastavení na tomto profilu |
 | `Space` | Rozbalit nebo sbalit sekci |
 | `v` | Otevřít filtr sekce. Pull requesty: Otevřené, Merged / zavřené, Všechny. Issues: Otevřené, Přiřazené mně, Zavřené, Všechny |
 | `n` | Sekce pull requestů: vytvořit pull request. Sekce ISSUES: nové issue. (Tlačítko `+` v záhlaví) |
@@ -1522,7 +1522,7 @@ requesty). S připojeným hostingovým profilem má také sekci ISSUES. Viz
 ### Tabule issues
 
 **Tabule** v záhlaví ISSUES (paleta: **Issues: Otevřít tabuli**) otevře tabuli Kanban zdroje issues. Viz
-[tabule](hosting-integration.md#5b-tabule-issues) a [lokální issues](local-issues.md#tabule-kanban). Každá klávesa
+[tabule](pull-requests-and-issues.md#tabule-issues) a [lokální issues](local-issues.md#tabule-kanban). Každá klávesa
 níže je také příkazem z palety (**Tabule: ...**).
 
 | Klávesa | Akce |
@@ -1530,7 +1530,7 @@ níže je také příkazem z palety (**Tabule: ...**).
 | Šipky | Vybrat kartu (`Up`, `Down`) nebo sousední sloupec (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` skáčou ve sloupci |
 | `Shift+Left`, `Shift+Right` | Přesunout vybranou kartu do předchozího nebo dalšího sloupce |
 | `m` | **Přesunout kartu do...**: rozbalovací seznam sloupců |
-| `Enter` | Otevřít [konverzaci](hosting-integration.md#5c-konverzace) issue (stránku hostitele, kde hostitel žádnou ke čtení nemá) |
+| `Enter` | Otevřít [konverzaci](conversations.md) issue (stránku hostitele, kde hostitel žádnou ke čtení nemá) |
 | `e`, `.` | Upravit řešitele, štítky nebo milník; nabídka karty |
 | `n` | Nové issue ve vybraném sloupci |
 | `a`, `l`, `M`, `/` | Filtrovat podle řešitele, štítku, milníku, textu. `x` filtry zruší |
@@ -1555,7 +1555,7 @@ Každé pole, jehož text jde hostiteli (komentář, odpověď, shrnutí kontrol
 | `Alt+W` | Formuláře nové issue a pull requestu: vytvořit na vlastní webové stránce poskytovatele |
 | `Esc` | V panelu **Napsat pomocí AI**: zastavit běžící návrh, jinak zavřít panel |
 
-V [pohledu konverzace](hosting-integration.md#5c-konverzace) issue nebo žádosti (řádky palety *Konverzace: ...*; řádky s klávesou jsou v seznamu palety výše):
+V [pohledu konverzace](conversations.md) issue nebo žádosti (řádky palety *Konverzace: ...*; řádky s klávesou jsou v seznamu palety výše):
 
 | Klávesa | Akce |
 |---|---|
@@ -1914,7 +1914,7 @@ Každé tlačítko má klávesový protějšek:
 
 | Tlačítko | Klávesa |
 |---|---|
-| 🐙 vlevo v záhlaví okna (O aplikaci) | `Nápověda: O aplikaci GitPoulpi` v paletě |
+| <img src="../../../assets/logo/gitpoulpi.png" alt="Ikona GitPoulpi" height="16"> vlevo v záhlaví okna (O aplikaci) | `Nápověda: O aplikaci GitPoulpi` v paletě |
 | **Otevřít v** v záhlaví okna | `Alt+O`, `Ctrl+Alt+O` |
 | `×` vpravo v záhlaví okna (ukončit) | `q` |
 | Verze v záhlaví okna (Poznámky k vydání) | `Nápověda: Poznámky k vydání` v paletě |

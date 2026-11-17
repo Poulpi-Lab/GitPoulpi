@@ -119,7 +119,7 @@ GitPoulpi si pamatuje každou velikost. Viz
 
 ## Záhlaví okna, řádek karet a panel nástrojů
 
-- **Klikněte na 🐙** v záhlaví okna pro otevření **O aplikaci GitPoulpi**. V tomto okně
+- **Klikněte na <img src="../../../assets/logo/gitpoulpi.png" alt="Ikona GitPoulpi" height="16">** v záhlaví okna pro otevření **O aplikaci GitPoulpi**. V tomto okně
   sledují zorničky chobotnice ukazatel; kliknutím na logo ho roztočíte do další barvy,
   pravým tlačítkem na logo otevřete seznam barev, kliknutím na odkaz ho otevřete.
 - **Klikněte na Otevřít v ▾** v záhlaví okna pro seznam programů. Viz

@@ -6,6 +6,8 @@ Worktree je druhá přepnutá kopie repozitáře: jiná složka na jiné větvi,
 stejnou historií. Sekce WORKTREES v panelu Refs je vypisuje; hlavní je označen
 `(hlavní)`.
 
+![Panel Refs repozitáře se dvěma připojenými worktrees: sekce WORKTREES uvádí main (hlavní), hotfix/axis-labels a feature/legend a pod ní je sekce SUBMODULES](../images/worktrees.png)
+
 ## Zobrazení sekce
 
 V repozitáři, který ještě nemá žádný propojený worktree, je sekce skrytá. Chcete-li
@@ -33,6 +35,8 @@ Paleta má stejné tři (**Refs: Vytvořit worktree z aktuální větve**,
 **Git: Vytvořit worktree ve vybraném commitu...**, **Refs: Vytvořit worktree s
 výběrem větve**). Starší položky fungují dál: **Vytvořit worktree z...** v nabídce
 větve, tagu nebo commitu.
+
+![Dialog Vytvořit worktree: pole Název, Složka, Ref a Větev worktree, řádek „nová větev z main“, políčko Otevřít nový worktree na kartě a tlačítka Zrušit a Vytvořit](../images/worktree-create.png)
 
 Dialog všechno navrhne a nechá vás to změnit. **Název** i nová větev začínají
 jako `worktree-<id>`, kde `<id>` je 8 náhodných šestnáctkových číslic (u obou
@@ -78,6 +82,13 @@ Klikněte pravým tlačítkem na worktree (nebo ho vyberte a stiskněte klávesu
   konflikty. Větev, která není nikde přepnutá, se odmítne s uvedením důvodu.
   U odpojeného worktree se nenabízí.
 - **Odebrat worktree...**: nikdy ne hlavní.
+
+![Nabídka po kliknutí pravým tlačítkem na řádek worktree: Otevřít na nové kartě, Otevřít v, Merge hotfix/axis-labels do... a Odebrat worktree...](../images/worktree-menu.png)
+
+**Otevřít na nové kartě** (nebo dvojklik, nebo `Enter`) otevře složku worktree jako
+samostatnou kartu s vlastním Logem, stavem a větví:
+
+![Worktree hotfix/axis-labels otevřený jako vlastní karta vedle hlavní, s ukázaným svým commitem a změněným souborem](../images/worktree-tab.png)
 
 Paleta má stejné akce na vybraném řádku (**Refs: Otevřít worktree v...**,
 **Refs: Merge větve worktree do...**, **Refs: Odebrat worktree...**,

@@ -10,7 +10,7 @@ schválení a žádosti o změny. Potřebuje profil jednoho z těchto hostitelů
 kontroly nenabízejí. Omezení hostitele se respektují: GitLab nemá rozhodnutí *Požádat o změny* a bere jeden řádek na komentář.
 Tato stránka všem říká *žádost*.
 
-![Pohled kontroly, stránka Přehled: záhlaví žádosti s tlačítky metadat, popis a konverzace s odeslaným schválením](../images/review-overview.png)
+![Pohled kontroly, stránka Přehled: záhlaví žádosti s tlačítky metadat, popis, nevyřešené a vyřešené vlákno ke kódu, komentáře a pole komentáře](../images/review-overview.png)
 
 ![Stránka Soubory: změněné soubory s políčky zobrazeno, diff s vláknem komentářů pod řádkem a vyřešené vlákno mimo zobrazené řádky](../images/review-files.png)
 
@@ -37,7 +37,7 @@ Vždy viditelné: číslo a název, stav (Otevřená, Koncept, Sloučená, Zavř
 zda se sloučí čistě, nebo je v konfliktu, velikost a **`3 čekající komentáře`**, když jste nějaké napsali.
 
 Čtyři tlačítka metadat - **Řešitelé**, **Recenzenti**, **Štítky**, **Milník** - otevírají stejné výběry jako
-postranní panel (viz [Řešitelé, recenzenti, štítky a milník](hosting-integration.md#řešitelé-recenzenti-štítky-a-milník));
+postranní panel (viz [Řešitelé, recenzenti, štítky a milník](pull-requests-and-issues.md#řešitelé-recenzenti-štítky-a-milník));
 záhlaví ukáže výsledek, jakmile ho hostitel přijme. Tlačítka akcí: **Checkout** (obvyklý
 checkout větve žádosti, který pohled také zavře), **Otevřít v prohlížeči**, **Obnovit**
 (**`F5`**) a **Dokončit kontrolu**.
@@ -50,7 +50,7 @@ Segmentový přepínač v horním okraji mění stránku: **Přehled**, **Soubor
 ### Přehled
 
 Přehled je **konverzace žádosti**: stejná časová osa a stejné pole pro komentář, jaké má issue
-([Konverzace](hosting-integration.md#5c-konverzace)): nejdřív popis (*otevřel(a) toto*), pak komentáře, vlákna ke kódu
+([Konverzace](conversations.md)): nejdřív popis (*otevřel(a) toto*), pak komentáře, vlákna ke kódu
 s ukázkou diffu, odeslané kontroly s rozhodnutím (`schváleno`, `požadovány změny`, `okomentováno`, `zamítnuto`; na GitLabu
 jsou rozhodnutími jeho schválení) a události, od nejstarších, v nejnovějším okně s tlačítkem **Načíst starší** nahoře. Pole
 komentáře je ukotveno pod časovou osou (**Nový komentář**): **Psát**, **Náhled** a **Vedle sebe**, **Zrušit** a
@@ -84,7 +84,7 @@ v paletě; `a` (řešitelé), `p` (recenzenti), `f` (**Dokončit kontrolu**), `b
 Komentář napsaný v jiném okně nebo z CLI se tu objeví sám: každý zápis GitPoulpi (včetně tohoto okna) to oznámí relaci
 a okna, která ukazují stejnou žádost, ji načtou znovu.
 
-Pole komentáře je Markdown textové pole sdílené s [pohledem konverzace](hosting-integration.md#psaní) (je to i pole
+Pole komentáře je Markdown textové pole sdílené s [pohledem konverzace](conversations.md#psaní) (je to i pole
 odpovědi do vlákna, komentáře k řádku a shrnutí **Dokončit kontrolu**): `Ctrl+Enter` (také `Ctrl+S`, `Alt+Enter`)
 odešle a tam, kde je AI zapnutá, `Alt+E` otevře **Napsat pomocí AI** ([kapitola o AI](ai.md#pomoc-s-psaním-na-hostiteli)).
 Náhled ukazuje text tak, jak ho zobrazí hostitel, včetně odkazů (`#7`, `!12`, `ABC-12`, id commitů); neodeslaný text se

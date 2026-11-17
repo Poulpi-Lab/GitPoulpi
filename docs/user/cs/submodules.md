@@ -15,6 +15,8 @@ Když repozitář obsahuje `.gitmodules`, získá postranní panel Refs sekci **
 | `○` | nenaklonovaný | deklarovaný v `.gitmodules` a zaznamenaný, ale jeho složka je prázdná: aktualizací jej naklonujete |
 | `✗` | v konfliktu | repozitář má merge konflikty na submodulu |
 
+![Sekce SUBMODULES se třemi řádky: vendor/almanac nenaklonovaný (○), vendor/ephemeris aktuální (✓) a vendor/starfield změněný (↑, na jiném commitu, než je zaznamenaný), což se ukazuje i jako změněný soubor v panelu Stav](../images/submodules.png)
+
 | Akce | Myš | Klávesnice |
 |---|---|---|
 | Otevřít submodul jako samostatnou kartu | dvojklik na řádek | vybrat jej, `Enter` (paleta: `Refs: Otevřít submodul na kartě`) |
@@ -23,6 +25,8 @@ Když repozitář obsahuje `.gitmodules`, získá postranní panel Refs sekci **
 | Zaregistrovat jej v `.git/config` bez klonování | nabídka | `Ctrl+P`: `Refs: Inicializovat submodul (vybraný)` |
 | Aktualizovat každý submodul | | `Ctrl+P`: `Git: Aktualizovat všechny submoduly` |
 | Přeskočit na sekci | klik na její záhlaví | `Ctrl+P`: `Navigace: Přejít na Refs > Submoduly` |
+
+![Nabídka po kliknutí pravým tlačítkem na změněný řádek vendor/starfield: Aktualizovat (v případě potřeby naklonovat), Inicializovat a Otevřít na nové kartě](../images/submodule-menu.png)
 
 Aktualizace může provést fetch ze vzdáleného repozitáře submodulu, takže se řídí volbou **Nastavení > SSH a přihlášení > Přihlašovací údaje HTTPS** jako každý jiný přenos. Nenaklonovaný submodul nemá co otevřít jako kartu; stavový řádek to oznámí a odkáže na Aktualizovat.
 

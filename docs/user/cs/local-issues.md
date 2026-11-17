@@ -128,7 +128,7 @@ Pokud pracujete sami, nebo v týmu, který drží issues vedle kódu, je složka
   `Shift+Left` / `Shift+Right`, nebo příkazem **Tabule: Přesunout kartu do...** (`m`), rozbalovacím seznamem sloupců. Karta se přesune
   hned; `status` poznámky se přepíše jako v [sekci o poznámkách](#poznámky), nic jiného v souboru. Když
   zápis selže, karta se vrátí a chyba je na stavovém řádku.
-- **Otevření** karty klávesou `Enter` nebo dvojklikem: v okně se otevře [konverzace](hosting-integration.md#5c-konverzace) poznámky s jejím textem a komentáři (**Otevřít poznámku** v nabídce karty otevře soubor ve vašem výchozím programu pro `.md`). `e` upraví její
+- **Otevření** karty klávesou `Enter` nebo dvojklikem: v okně se otevře [konverzace](conversations.md) poznámky s jejím textem a komentáři (**Otevřít poznámku** v nabídce karty otevře soubor ve vašem výchozím programu pro `.md`). `e` upraví její
   řešitele, štítky nebo milník, `.` nebo pravé tlačítko otevře nabídku karty, `n` založí nové issue ve vybraném
   sloupci (formulář se po zavření vrátí na tabuli).
 - **Filtrování** podle řešitele (`a`), štítku (`l`), milníku (`M`) nebo textu (`/`); `x` je zruší. Filtry jsou

@@ -91,7 +91,7 @@ The first public release of GitPoulpi: a Git client for the terminal with a clic
 - Settings with search, inline actions and master-detail lists; every palette command can get its own shortcut. The Activity Log lists the session's messages and the application log. **Licenses and credits** in About and `gitpoulpi licenses`.
 
 #### Install & updates
-- Windows installer (per user, with PATH and alias choices), `install.sh` for Linux and macOS, and packages for Chocolatey, winget, Scoop, Homebrew, apt, MSI, AUR, cargo and Docker. `gitpoulpi uninstall` removes what was installed.
+- Windows installer (per user, with PATH and alias choices), `install.sh` for Linux and macOS, and packages for Chocolatey, Scoop, Homebrew, apt, MSI, cargo and Docker. `gitpoulpi uninstall` removes what was installed.
 - Every release file is signed with the project's minisign key and an update installs only when the signature verifies. **Update now** stages the update, **Restart to update** swaps it in, **Revert** goes back; `updates.mode` is `notify`, `auto` or `off`.
 - Security notices: the daily check reads the signed `security.json`, and a notice that names the running version turns the version chip red on every install channel.
 - Custom builds choose languages, integrations, features and themes (`xtask build-custom`).

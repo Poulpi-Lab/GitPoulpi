@@ -194,7 +194,7 @@ l'autre.
   par défaut). Sans rien de stagé, elle le dit. Rien ne se saisit dans la ligne
   d'état. Tant qu'une requête IA est en cours, elle ne commite rien et le signale
   (`Esc` annule la requête). `Ctrl+Z` annule le commit comme n'importe quel autre.
-- Par dépôt, les [Paramètres](settings.md#propre-au-dépôt-commit) peuvent **pousser après chaque commit**, faire
+- Par dépôt, les [Paramètres](settings.md#propre-au-dépôt--commit) peuvent **pousser après chaque commit**, faire
   démarrer le formulaire avec un **modèle de commit** (et retirer ses commentaires `#` du message) et rendre un merge
   **squash** : le formulaire s'ouvre alors avec le message de squash de git.
 - Avec une intégration d'hébergeur liée, `Alt+R` dans le formulaire insère une

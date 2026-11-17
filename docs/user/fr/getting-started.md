@@ -107,7 +107,7 @@ s'ouvre dans son propre onglet. `Ctrl+W` ferme l'onglet courant.
 nouveau dépôt.
 Dans ces trois boîtes (et dans le sélecteur de dossier qu'elles ouvrent), `Ctrl+N` affiche un badge sur chaque champ et chaque bouton : appuyez sur le caractère pour placer le curseur dans le champ ou actionner le bouton.
 
-| ![La boîte Cloner : où cloner, l'URL, le nom du dossier et le bouton Cloner le dépôt !](../images/clone.png) | ![La boîte Initialiser un dépôt : le dossier, le nom et la branche initiale](../images/init.png) |
+| ![La boîte Cloner : où cloner, l'URL, le nom du dossier, et les boutons Annuler et Cloner](../images/clone.png) | ![La boîte Initialiser un dépôt : le dossier, le nom et la branche initiale](../images/init.png) |
 |---|---|
 
 ### Extraction partielle

@@ -94,7 +94,7 @@ Det finns två sätt att använda AI med GitPoulpi:
 4. Med flera profiler väljer du **Standardprofil** längst ned; varje åtgärd kan
    fortfarande ange sin egen.
 
-![Blocket Profiler på AI-sidan för en lokal agent: Agenttyp (Claude Code), Kommando, Argument, Modell, två Env-rader, Lägg till och Ta bort en miljövariabel, Testa anslutning och Standardprofil](../images/settings-ai-agent.png)
+![Den nedre delen av blocket Profiler på AI-sidan för en lokal agent: Körläge, Argument, Modell, Arbetsmapp, Tidsgräns, två Env-rader, Lägg till en miljövariabel och Testa anslutning](../images/settings-ai-agent.png)
 
 **API-nycklar** skrivs in med `Enter` på raden **API-nyckel** och lagras i din
 credential helper (Git Credential Manager, libsecret / `pass`, Keychain) under

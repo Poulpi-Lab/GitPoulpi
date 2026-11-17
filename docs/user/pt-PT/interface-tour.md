@@ -192,7 +192,7 @@ Por predefinição, uma linha por baixo dos painéis e acima da barra de estado.
 | **Flow** `▾` | O menu do fluxo de trabalho de branches (iniciar, concluir, sincronizar, promover; `Ctrl+G Shift+W`). Só num repositório que tem um fluxo de trabalho. Consulte [Fluxos de trabalho de branches](branching-workflows.md). |
 | **Pesquisar** | Abre a barra de pesquisa de commits sobre o Log (`f`). |
 
-No extremo (à direita numa linha, no fundo numa coluna), quando o repositório está ligado a um host, um **chip** mostra o pull request da branch em checkout (por exemplo `GH #12` ou `GL !53`), ou um `+ PR` esbatido. **Definições > Aspeto > Fixar o botão de pull request no fim** (ativado por predefinição) mantém-no aí; desativado, segue os outros botões e o alinhamento deles. Consulte [Alojamento e gestores de issues](hosting-integration.md). Numa coluna, a caixa combinada de perfil ocupa a última linha.
+No extremo (à direita numa linha, no fundo numa coluna), quando o repositório está ligado a um host, um **chip** mostra o pull request da branch em checkout (por exemplo `GH #12` ou `GL !53`), ou um `+ PR` esbatido. **Definições > Aspeto > Fixar o botão de pull request no fim** (ativado por predefinição) mantém-no aí; desativado, segue os outros botões e o alinhamento deles. Numa linha estreita, o chip encolhe primeiro (`● #12`, depois só o glifo de estado) e só depois passa para o menu `⋯`. Consulte [Alojamento e gestores de issues](hosting-integration.md). Numa coluna, a caixa combinada de perfil ocupa a última linha.
 
 Na extremidade direita, quando tem dois ou mais [perfis](settings.md#perfis), a
 **caixa combinada de perfil** escolhe a identidade de commit deste repositório. A

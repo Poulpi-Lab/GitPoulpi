@@ -96,7 +96,7 @@ Es gibt zwei Wege, die KI mit GitPoulpi zu nutzen:
 4. Wählen Sie bei mehreren Profilen unten das **Standardprofil**; jede Aktion kann
    dennoch ihr eigenes nennen.
 
-![Der Block Profile der KI-Seite für einen lokalen Agenten: Agententyp (Claude Code), Befehl, Argumente, Modell, zwei Env-Zeilen, Umgebungsvariable hinzufügen und entfernen, Verbindung testen und Standardprofil](../images/settings-ai-agent.png)
+![Der untere Teil des Blocks Profile der KI-Seite für einen lokalen Agenten: Ausführungsmodus, Argumente, Modell, Arbeitsordner, Zeitlimit, zwei Env-Zeilen, Umgebungsvariable hinzufügen und Verbindung testen](../images/settings-ai-agent.png)
 
 **API-Schlüssel** werden mit `Enter` auf der Zeile **API-Schlüssel** eingegeben und im
 Credential-Helper Ihres Systems (Git Credential Manager, libsecret / `pass`, Keychain)

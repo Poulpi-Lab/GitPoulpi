@@ -97,7 +97,7 @@ GitPoulpi는 사용 중인 `git`이 이미 쓰는 인증(credential helper, ssh-
 **클론**은 URL과 폴더를 묻거나, 연결된 계정(GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit)에서 저장소를 고르게 해 줍니다([연결된 계정에서 클론하기](hosting-integration.md#연결된-계정에서-클론하기) 참고). **초기화**는 폴더를 새 저장소로 만듭니다.
 세 대화상자 모두(그리고 이들이 여는 폴더 선택기에서도) `Ctrl+N`이 각 필드와 버튼에 배지를 표시합니다. 해당 글자를 누르면 필드에 커서가 놓이거나 버튼이 눌립니다.
 
-| ![클론할 위치, URL, 폴더 이름, 클론 버튼이 있는 저장소 클론 대화상자](../images/clone.png) | ![폴더, 이름, 초기 브랜치가 있는 저장소 초기화 대화상자](../images/init.png) |
+| ![클론할 위치, URL, 폴더 이름, 취소와 클론 버튼이 있는 저장소 클론 대화상자](../images/clone.png) | ![폴더, 이름, 초기 브랜치가 있는 저장소 초기화 대화상자](../images/init.png) |
 |---|---|
 
 ### 스파스 체크아웃

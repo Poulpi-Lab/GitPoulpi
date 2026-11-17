@@ -561,6 +561,14 @@ stage_file = "z"
 | `default_remote` | 원클릭 Push/Pull/Fetch가 사용하는 리모트 | 리모트 메뉴, `gitpoulpi remote default <name>` |
 | `hosting_integration` | 여기에 고정된 `[[integrations]]` 프로필 | `gitpoulpi hosting use --id` |
 | `pulls_source`, `issues_source` | PR / 이슈 목록이 읽는 제공자 프로젝트, `{ integration, project, filter }` 형태. `filter`는 선택 사항입니다: 목록 쿼리에 AND로 붙는 제공자 고유의 추가 절(Jira JQL 조각, Azure WIQL 조건, Trello 목록 이름). GitHub와 GitLab은 무시합니다. | 사이드바 섹션, `gitpoulpi hosting link` |
+| `[preferences] merge_fast_forward` | 여기서 `git.merge_fast_forward`를 재정의합니다: `never`, `allowed`, `only` | 설정 > 저장소별 설정 > Merge 옵션 |
+| `[preferences] default_push_targets` | 새 브랜치가 함께 push되는 리모트. 브랜치가 처음 upstream을 얻을 때 브랜치에 복사됩니다 | 설정 > 저장소별 설정 > Git 및 인코딩. [여러 리모트](multiple-remotes.md) 참고 |
+| `[preferences.ai_review]`, `[preferences.ai_hosting_reply]` | `[ai.review]`와 `[ai.hosting_reply]` 키에 대한 이 저장소 자체의 값. 없는 키는 전역 값을 따릅니다 | 설정 > 저장소별 설정 > AI |
+| `hosting_post_as`, `hosting_identity` | 이 저장소에서 호스트로 보내는 메시지가 게시되는 이름(`general.hosting_post_as`를 재정의), 그리고 설정된 이름이 없을 때 봇 토큰으로 처음 게시한 메시지에서 GitPoulpi가 알아낸 로그인 | 설정 > 저장소별 설정 > SSH 및 자격 증명. [대화](conversations.md#게시-이름) 참고 |
+| `assignment_blocked` | 이 저장소의 이슈와 pull request에서는 GitPoulpi로 아무것도 할당할 수 없습니다 | `gitpoulpi hosting assignment --block \| --allow` |
+| `board_labels` | 워크플로가 없는 호스트에서 이슈 보드의 열이 되는 레이블, 보드 순서대로 | 보드의 **열** 버튼 |
+| `conversation_seen`, `conversation_events`, `posted_comment_ids` | 각 대화에서 마지막으로 읽은 곳(나머지는 읽지 않음), 시스템 이벤트 표시 여부, 이 설치가 게시한 댓글(봇이 편집하거나 삭제할 수 있는 것) | 대화 보기가 기록 |
+| `reviews` | 요청별 앱 안 리뷰의 로컬 상태: 보류 중인 댓글, 확인한 파일 | 리뷰 보기가 기록 |
 | `ref_visibility` | 숨기거나 솔로로 지정한 ref | Refs 사이드바, `gitpoulpi refs hide\|show\|solo` |
 | `hidden_remotes` | 그래프에서 통째로 숨긴 리모트(모든 브랜치, 나중에 fetch하는 것 포함) | 리모트의 ⊙와 메뉴, `gitpoulpi refs hide --remote` |
 | `folds`, `collapsed_*_ref_folders` | 접힌 사이드바 섹션과 브랜치 및 tag 폴더. `[folds]`에는 `status_folders`(스테이징 안 된 / 스테이징된 파일 트리의 접힌 폴더)와 `commit_folders`(commit의 변경된 파일 트리의 접힌 폴더. 모든 commit에 동일)도 있으며, 각각 500개 경로로 제한되고 오래된 것부터 삭제됩니다 | 사이드바, 파일 트리 |

@@ -94,7 +94,7 @@
 
 페이지 목록 위의 상자는 모든 페이지의 모든 옵션의 이름과 설명을 검색합니다. 클릭하거나 `/` 또는 `Ctrl+F`를 누른 뒤 입력하세요. 일치 항목 목록이 펼쳐지며 각 항목에는 옵션과 그 페이지가 표시됩니다. `Up` / `Down`으로 고르고 `Enter`로 옵션으로 이동하며 `Esc`로 목록을 닫습니다.
 
-![설정에서 "diff"를 검색: 로그 및 그래프, Diff 및 편집기, Git 페이지에서 일치하는 옵션](../images/settings-search.png)
+![설정에서 "diff"를 검색: AI 및 Diff 및 편집기 페이지에서 일치하는 옵션](../images/settings-search.png)
 
 ## 명령 팔레트에서 설정하기
 
@@ -165,7 +165,7 @@
 
 **작업 표시줄과 Dock 그룹화.** GitPoulpi는 터미널 창 안에서 실행되므로 작업 표시줄은 보통 터미널 아이콘 아래에 표시하며, 고정한 GitPoulpi 아이콘 아래에는 '실행 중' 점이 없습니다. Windows: 바로 가기에는 AppUserModelID `GitPoulpi.GitPoulpi`가 들어 있고, 바로 가기로 시작한 GitPoulpi는 자신의 터미널 창에 같은 ID와 자기 아이콘을 지정합니다(창을 찾기 위해 잠시 고유한 제목을 붙였다가 제목을 되돌립니다). 그래서 창이 고정한 GitPoulpi 아이콘 아래에 놓입니다. 탭이 여러 개인 터미널 창은 통째로 움직입니다. GitPoulpi가 실행되는 동안 그 창의 모든 탭이 GitPoulpi 아이콘 아래에 묶입니다. 이전에 만든 바로 가기와 작업 표시줄 고정 항목은 같은 동기화가 다시 씁니다. 고정 항목이 여전히 터미널 아이콘이면 고정을 해제했다가 다시 고정하세요. Linux: kitty, foot, Alacritty, WezTerm, Ghostty는 창 클래스 `gitpoulpi`로 시작하고 `.desktop` 항목이 이를 명시하므로(`StartupWMClass`) Dock이 창을 런처 아이콘 아래에 묶습니다. 다른 터미널은 자체 아이콘을 유지합니다. macOS: 할 일이 없습니다. Dock이 앱 단위로 묶습니다.
 
-![설정 > 런처: 바로 가기용 터미널과 앱 런처 행](../images/settings-launcher.png)
+![설정 > 런처: 바로 가기용 터미널, 런처 빌드, 명령 및 탭 추가 별칭, 별칭 상태와 PATH 점검](../images/settings-launcher.png)
 
 #### 시스템별 명령 별칭과 PATH
 
@@ -331,7 +331,7 @@ AI 에이전트가 이 창에서 할 수 있는 일, MCP 서버의 실행 허용
 
 ### 모양
 
-![모양 페이지: 테마, 아바타, 입력창 색상, 색상 깊이, 그래프 색상(날짜 형식은 그 아래)](../images/settings-ui.png)
+![아래로 스크롤한 모양 페이지: 아바타 소스와 대체 이미지, 입력창 색상, 색상 깊이, 텍스트 커서, 그래프 색상의 시작 부분(날짜 형식은 그 아래)](../images/settings-ui.png)
 
 ![모양에서 열린 테마 콤보와 강조 표시된 Light: 설정 화면 전체가 이미 그 테마로 다시 그려짐](../images/settings-appearance-theme.png)
 

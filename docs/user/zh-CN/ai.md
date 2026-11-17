@@ -46,7 +46,7 @@ GitPoulpi 从不要求账号，并且 **AI 默认关闭**。开启 AI 后，它�
 3. 按 **测试连接**：*上次测试* 显示 `connected: the model answered` 或 `failed: <reason>`。
 4. 有多个配置时，请在底部选择 **默认配置**；每个操作仍可指定自己的配置。
 
-![本地代理的 AI 页面“配置”区块：代理类型（Claude Code）、命令、参数、模型、两个 Env 行、添加和移除环境变量、测试连接和默认配置](../images/settings-ai-agent.png)
+![本地代理的 AI 页面“配置”区块的下半部分：运行模式、参数、模型、工作文件夹、超时（秒）、两个 Env 行、添加环境变量和测试连接](../images/settings-ai-agent.png)
 
 **API 密钥** 在 **API 密钥** 行上按 `Enter` 输入，并存储在系统凭据助手（Git Credential Manager、libsecret / `pass`、钥匙串）中，名称为 `ai:<profile id>`，绝不会写入 `config.toml`。没有凭据助手时，GitPoulpi 会如实说明，而不是假装保存了它。*设置 > SSH 与凭据 > 忘记所有用户名和密码* 会将它们移除。
 

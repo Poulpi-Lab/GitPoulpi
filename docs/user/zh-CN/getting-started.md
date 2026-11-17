@@ -73,7 +73,7 @@ GitPoulpi 使用你的 `git` 已在使用的认证方式（credential helper、s
 **克隆**会询问 URL 和文件夹，或让你从已连接的账户（GitHub、GitLab、Gitea、Forgejo、Azure DevOps、Bitbucket、Gerrit）中选择仓库（参见[从已连接的账户克隆](hosting-integration.md#从已连接的账户克隆)）。**初始化**会把一个文件夹变成新仓库。
 在这三个对话框中（以及它们打开的文件夹选择器中），`Ctrl+N` 会在每个字段和按钮上显示一个徽标：按下该字符即可把光标放进该字段，或按下该按钮。
 
-| ![克隆对话框：克隆到哪里、URL、文件夹名和克隆仓库按钮](../images/clone.png) | ![初始化仓库对话框：文件夹、名称和初始分支](../images/init.png) |
+| ![克隆对话框：克隆到哪里、URL、文件夹名，以及取消和克隆按钮](../images/clone.png) | ![初始化仓库对话框：文件夹、名称和初始分支](../images/init.png) |
 |---|---|
 
 ### 稀疏检出

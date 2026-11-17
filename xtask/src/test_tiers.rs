@@ -36,6 +36,9 @@ Usage: cargo run -p xtask -- test [--tier fast|pty|full] [--jobs N] [--serial] [
                 written by every run): builds just those targets and runs each with
                 its failing tests as exact filters. Rewrites the file, so repeating
                 it converges to nothing. Run the full tier again before a release tag
+  (xtask/run-alone.txt: tests that pass alone but fail under load run alone after
+                the pool; a test failing in the pool is rerun alone and, if it passes,
+                reported as 'passed only when run alone' without failing the run)
   --only PATTERN  with --failed: rerun only the recorded failures whose target or
                 test name contains PATTERN (repeatable), i.e. the ones a fix is
                 meant to cure. The other recorded failures stay in the file";
@@ -250,6 +253,9 @@ fn run_parallel(
     }
     if dry {
         println!("(dry run: then up to {jobs} test binaries at once)");
+        for l in crate::run_alone::describe(&crate::run_alone::entries()) {
+            println!("{l}");
+        }
         return Ok(0);
     }
     Ok(execute(queue, jobs, !no_fail_fast, started, false, &[]))
@@ -296,7 +302,9 @@ fn execute(
 ) -> i32 {
     use crate::test_runner as r;
     println!("running {} test jobs, {jobs} at a time", queue.len());
-    let mut outcomes = r::run_all(queue, jobs, r::default_pty_jobs(), fail_fast);
+    let (pool, listed) = crate::run_alone::split(queue, &crate::run_alone::entries());
+    let mut outcomes = r::run_all(pool.clone(), jobs, r::default_pty_jobs(), fail_fast);
+    r::alone_phase(&mut outcomes, &pool, listed, fail_fast);
     let failures = r::report(&mut outcomes, started.elapsed());
     let mut still = r::failures_of(&outcomes);
     still.extend_from_slice(kept);
@@ -424,6 +432,9 @@ fn run_failed(jobs: usize, dry: bool, only: &[String]) -> Result<i32, String> {
         println!("cargo {} --message-format=json", args.join(" "));
         if dry {
             println!("(dry run)");
+            for l in crate::run_alone::describe(&crate::run_alone::entries()) {
+                println!("{l}");
+            }
             return Ok(0);
         }
         for mut job in r::build(&args).map_err(build_failed)? {
@@ -441,6 +452,9 @@ fn run_failed(jobs: usize, dry: bool, only: &[String]) -> Result<i32, String> {
         }
     } else if dry {
         println!("(dry run)");
+        for l in crate::run_alone::describe(&crate::run_alone::entries()) {
+            println!("{l}");
+        }
         return Ok(0);
     }
     let missing = rows.len().saturating_sub(queue.len());

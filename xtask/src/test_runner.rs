@@ -43,6 +43,8 @@ pub struct Outcome {
     pub target: Option<TargetId>,
     /// Test names libtest reported as FAILED (empty: none parseable).
     pub failed_tests: Vec<String>,
+    /// Tests that failed in the pool but passed in the alone rerun.
+    pub saved: Vec<String>,
     /// Top-level entries the job left in its temp directory (then removed).
     pub leaked: usize,
     pub ok: bool,
@@ -277,6 +279,7 @@ fn run_job(job: &Job) -> Outcome {
         label: job.label.clone(),
         target: job.target.clone(),
         failed_tests,
+        saved: Vec::new(),
         leaked,
         ok,
         duration: started.elapsed(),
@@ -555,6 +558,70 @@ pub fn run_all(
     outcomes
 }
 
+/// The alone phase, after the pool: the listed jobs (`xtask/run-alone.txt`)
+/// one at a time, then every test that failed in the pool rerun alone with an
+/// exact filter. A pool failure whose tests all pass alone is turned green and
+/// remembered in `saved` (the report says to list them); one that fails alone
+/// too stays a real failure. `pool` is the jobs the pool ran, to rebuild the
+/// reruns. Appends the listed jobs' outcomes to `outcomes`.
+pub fn alone_phase(outcomes: &mut Vec<Outcome>, pool: &[Job], listed: Vec<Job>, fail_fast: bool) {
+    // The safety net first: a load flake must not stop the listed tests.
+    for o in outcomes.iter_mut().filter(|o| !o.ok) {
+        let Some(t) = &o.target else { continue };
+        if t.is_doc() || o.failed_tests.is_empty() {
+            continue;
+        }
+        let Some(base) = pool.iter().find(|j| j.label == o.label) else {
+            continue;
+        };
+        let names = o.failed_tests.clone();
+        let rerun = run_job(&crate::run_alone::rerun_job(base, &names));
+        let still: Vec<String> = if rerun.ok {
+            Vec::new()
+        } else if rerun.failed_tests.is_empty() {
+            names.clone()
+        } else {
+            rerun.failed_tests.clone()
+        };
+        o.saved = names
+            .iter()
+            .filter(|n| !still.contains(n))
+            .cloned()
+            .collect();
+        println!(
+            "[alone] {} {:>7.1}s  {} ({} of {} test(s) rerun alone passed)",
+            if still.is_empty() { "ok  " } else { "FAIL" },
+            rerun.duration.as_secs_f64(),
+            rerun.label,
+            o.saved.len(),
+            names.len()
+        );
+        if still.is_empty() {
+            o.ok = true;
+            o.failed_tests.clear();
+        } else {
+            o.failed_tests = still;
+            o.output
+                .push_str(&format!("\n--- rerun alone ---\n{}", rerun.output));
+        }
+    }
+    let n = listed.len();
+    for (i, job) in listed.iter().enumerate() {
+        if fail_fast && outcomes.iter().any(|o| !o.ok) {
+            break;
+        }
+        let o = run_job(job);
+        println!(
+            "[alone {}/{n}] {} {:>7.1}s  {}",
+            i + 1,
+            if o.ok { "ok  " } else { "FAIL" },
+            o.duration.as_secs_f64(),
+            o.label
+        );
+        outcomes.push(o);
+    }
+}
+
 /// The deterministic report: every binary sorted by label, the ten slowest,
 /// then the full output of each failure. Returns the number of failures.
 pub fn report(outcomes: &mut [Outcome], wall: Duration) -> usize {
@@ -592,13 +659,26 @@ pub fn report(outcomes: &mut [Outcome], wall: Duration) -> usize {
             println!("  {:>6}  {}", o.leaked, o.label);
         }
     }
+    let saved: Vec<(&Outcome, &String)> = outcomes
+        .iter()
+        .flat_map(|o| o.saved.iter().map(move |t| (o, t)))
+        .collect();
+    if !saved.is_empty() {
+        println!("\npassed only when run alone (add to xtask/run-alone.txt):");
+        for (o, t) in &saved {
+            if let Some(id) = &o.target {
+                println!("  {}::{}::{t}", id.package, id.name);
+            }
+        }
+    }
     for o in &failed {
         println!("\n===== FAILED: {} =====\n{}", o.label, o.output.trim_end());
     }
     println!(
-        "\n{} binaries, {} failed; wall {:.0}s, sum of binary times {:.0}s",
+        "\n{} binaries, {} failed; {} saved by the alone rerun; wall {:.0}s, sum of binary times {:.0}s",
         outcomes.len(),
         failed.len(),
+        saved.len(),
         wall.as_secs_f64(),
         busy
     );
@@ -705,6 +785,7 @@ warning: something else\n";
                 kind: "test".into(),
             }),
             failed_tests: names.iter().map(|s| s.to_string()).collect(),
+            saved: Vec::new(),
             leaked: 0,
             ok,
             duration: Duration::ZERO,

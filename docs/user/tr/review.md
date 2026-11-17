@@ -10,7 +10,7 @@ de burasıdır: yorumlar, onay ve değişiklik istekleri. Bu görünüm, bu bar�
 başka sağlayıcılar inceleme sunmaz. Barındırıcının sınırlarına uyulur: GitLab'da *Değişiklik iste* kararı yoktur ve yorum
 başına bir satır kabul eder. Bu sayfa hepsine *istek* der.
 
-![İnceleme görünümü, Genel Bakış sayfası: isteğin üst bilgisi ve üst veri düğmeleri, açıklama ve gönderilmiş bir onayın bulunduğu konuşma](../images/review-overview.png)
+![İnceleme görünümü, Genel Bakış sayfası: isteğin üst bilgisi ve üst veri düğmeleri, açıklama, çözülmemiş ve çözülmüş birer kod yorum dizisi, yorumlar ve yorum kutusu](../images/review-overview.png)
 
 ![Dosyalar sayfası: görüldü kutularıyla değişen dosyalar, satırının altında bir yorum dizisi olan diff ve gösterilen satırların dışında çözülmüş bir yorum dizisi](../images/review-files.png)
 
@@ -38,7 +38,7 @@ Her zaman görünür: numara ve başlık, durum (Açık, Taslak, Birleştirildi,
 yazdıysanız **`3 bekleyen yorum`**.
 
 Dört üst veri düğmesi - **Atananlar**, **İnceleyenler**, **Etiketler**, **Kilometre taşı** - kenar çubuğuyla aynı
-seçicileri açar (bkz. [Atananlar, inceleyenler, etiketler ve kilometre taşı](hosting-integration.md#atananlar-inceleyenler-etiketler-ve-kilometre-taşı));
+seçicileri açar (bkz. [Atananlar, inceleyenler, etiketler ve kilometre taşı](pull-requests-and-issues.md#atananlar-inceleyenler-etiketler-ve-kilometre-taşı));
 üst bilgi, barındırıcı kabul eder etmez sonucu gösterir. Eylem düğmeleri: **Checkout** (isteğin dalının olağan
 checkout'u, görünümü de kapatır), **Tarayıcıda aç**, **Yenile** (**`F5`**) ve **İncelemeyi bitir**.
 
@@ -50,7 +50,7 @@ checkout'u, görünümü de kapatır), **Tarayıcıda aç**, **Yenile** (**`F5`*
 ### Genel Bakış
 
 Genel Bakış **isteğin konuşmasıdır**: bir issue'nun sahip olduğu aynı zaman çizelgesi ve aynı yorum kutusu
-([Konuşmalar](hosting-integration.md#5c-konuşmalar)): önce açıklama (*bunu açtı*), sonra yorumlar, kod üzerindeki
+([Konuşmalar](conversations.md)): önce açıklama (*bunu açtı*), sonra yorumlar, kod üzerindeki
 dizeler diff alıntılarıyla, gönderilmiş incelemeler kararlarıyla (`onayladı`, `değişiklik istedi`, `yorum yaptı`,
 `yoksayıldı`; GitLab'da kararlar onaylarıdır) ve olaylar, en eskiden başlayarak, en yeni pencerede, en üstünde
 **Eskileri yükle** ile. Yorum kutusu zaman çizelgesinin altına yerleşiktir (**Yeni yorum**): **Yaz**, **Önizleme** ve
@@ -84,7 +84,7 @@ paletle kalır; `a` (atananlar), `p` (inceleyenler), `f` (**İncelemeyi bitir**)
 Başka bir pencerede veya CLI ile yazılan bir yorum burada kendiliğinden görünür: GitPoulpi'nin her yazması (bu pencere
 dahil) oturuma bildirir ve aynı isteği gösteren pencereler onu yeniden okur.
 
-Yorum kutusu, [konuşma görünümüyle](hosting-integration.md#yazma) paylaşılan Markdown yazma kutusudur (bir dizeye
+Yorum kutusu, [konuşma görünümüyle](conversations.md#yazma) paylaşılan Markdown yazma kutusudur (bir dizeye
 yanıtın, bir satıra yorumun ve **İncelemeyi bitir** özetinin kutusu da): `Ctrl+Enter` (ayrıca `Ctrl+S`, `Alt+Enter`)
 gönderir ve YZ açıkken `Alt+E` **YZ ile Yaz**'ı açar ([YZ bölümü](ai.md#sunucuda-yazma-yardımı)). Önizleme metni
 barındırıcının göstereceği gibi, referanslarla birlikte gösterir (`#7`, `!12`, `ABC-12`, commit kimlikleri);

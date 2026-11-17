@@ -129,7 +129,7 @@ panosudur. **ISSUE'LAR başlığı > Pano** ya da paletin **Issue'lar: Panoyu A�
   `Shift+Left` / `Shift+Right` kullanın ya da sütunların bir açılır listesi olan **Pano: Kartı Şuraya Taşı...** (`m`)
   komutunu kullanın. Kart hemen taşınır; notun `status` değeri [notlar bölümündeki](#notlar) gibi yeniden yazılır, dosyada
   başka hiçbir şey değişmez. Yazma başarısız olursa kart geri döner ve hata durum çubuğunda görünür.
-- Bir kartı `Enter` veya çift tıkla **açın**: notun [konuşması](hosting-integration.md#5c-konuşmalar), notun metni ve yorumlarıyla birlikte pencerede açılır (kart menüsündeki **Notu aç** dosyayı `.md` için varsayılan programınızda açar). `e` atananlarını,
+- Bir kartı `Enter` veya çift tıkla **açın**: notun [konuşması](conversations.md), notun metni ve yorumlarıyla birlikte pencerede açılır (kart menüsündeki **Notu aç** dosyayı `.md` için varsayılan programınızda açar). `e` atananlarını,
   etiketlerini veya kilometre taşını düzenler, `.` veya bir sağ tık kart menüsünü açar, `n` seçili sütunda yeni bir issue
   başlatır (form kapandığında panoya geri dönülür).
 - **Filtre**: atanana (`a`), etikete (`l`), kilometre taşına (`M`) veya metne (`/`) göre; `x` onları temizler. Filtreler

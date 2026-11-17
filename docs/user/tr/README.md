@@ -26,10 +26,31 @@ başvuru sayfalarına atlayın.
 3. **[Arayüz turu](interface-tour.md)**: pencerenin her bölgesinin adı,
    görsellerle.
 
+## Bir özelliği bulun
+
+| Şunu yapmak istiyorum... | Sayfa | Uygulamada nasıl ulaşılır |
+|---|---|---|
+| İki dalda aynı anda çalışmak | [Worktree'ler](worktrees.md) | Refs kenar çubuğunun **WORKTREE'LER** bölümü (`+` bir tane oluşturur; biri olana kadar gizlidir: palet **Sol panel: Worktree'ler Bölümünü Göster**); palet **Refs: Worktree Oluştur...** |
+| İç içe depolarla çalışmak | [Alt modüller](submodules.md) | Refs kenar çubuğunun **ALT MODÜLLER** bölümü; palet **Git: Tüm Alt Modülleri Güncelle**, **Refs: Alt Modül Güncelle (Seçili)** |
+| Bir merge çakışmasını çözmek | [Merge çakışmalarını çözmek](merge-conflicts.md) | Durum panelinde bir `!` satırında `Enter`, banner'ın **Çakışmaları çöz...** düğmesi veya Diff görünümünde `Shift+E`; palet **Çakışmalar: Merge Düzenleyiciyi Aç** |
+| Bir pull veya merge request'i incelemek | [Bir pull veya merge request'i incelemek](review.md) | **PULL REQUEST'LER** bölümünün bir satırında `Enter`, bir Radar satırında `e`, çalışma alanı aramasında `Alt+R`; palet **Barındırma: İsteği İncele...** |
+| Pull request'lere ve issue'lara göz atmak, onları oluşturmak ve yönetmek | [Pull request'ler ve issue'lar](pull-requests-and-issues.md) | Refs kenar çubuğunun **PULL REQUEST'LER** ve **ISSUE'LAR** bölümleri (`n` bir tane oluşturur); palet **Pull Request'ler: Pull Request Oluştur...**, **Barındırma: Yeni Issue...**. Önce bir hesap bağlayın: [Barındırma hizmetleri ve issue takipçileri](hosting-integration.md) |
+| Bir issue veya isteğin tartışmasını okumak ve yanıtlamak | [Konuşmalar](conversations.md) | Bir issue satırında, bir pano kartında veya bir Radar satırında `Enter`; palet **Barındırma: Issue Konuşmasını Aç...** |
+| Issue'larımı pano olarak görmek | [Issue panosu](pull-requests-and-issues.md#issue-panosu) | ISSUE'LAR başlığının **Pano** düğmesi; palet **Issue'lar: Panoyu Aç** |
+| Issue'ları Markdown notları olarak tutmak, token olmadan | [Yerel issue'lar ve Obsidian](local-issues.md) | ISSUE'LAR bölümü, `Local Markdown - <ad>` sağlayıcısı; palet **Yerel Issue'lar: Obsidian'da Aç...** |
+| Birçok commit boyunca yazarları, tarihleri, mesajları veya dosyaları yeniden yazmak | [Geçmişi yeniden yazma](history-rewrite.md) | `Ctrl+G Shift+H`; palet **Yeniden Yaz: Geçmiş Ekranı** |
+| Bir işlemi geri almak (veya yinelemek) | [Geri al ve yinele](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`; `Alt+Z` geri alma geçmişini açar; palet **Düzenle: Geri Al** |
+| Büyük dosyaları Git LFS ile izlemek | [Git LFS](lfs.md) | Palet **LFS: Deseni İzle...**, **LFS: Bu Depo İçin Başlat** |
+| Depolar arasında bir dalı, commit'i, pull request'i veya issue'yu bulmak | [Arama](search.md) | `Ctrl+Alt+F` veya başlık çubuğundaki Genel arama düğmesi; `f` geçerli deponun commit grafiğinde arar |
+| Beni bekleyen her şeyi tek listede görmek | [Radar](radar.md) | `Alt+R`; palet **Radar: Aç** |
+| Depoları gruplamak ve birlikte fetch veya pull etmek | [Çalışma alanları](workspaces.md) | `Alt+W` değiştirir, `Alt+J` Çalışma alanları sekmesini açar; palet **Çalışma Alanı: Yönet...** |
+| YZ yardımı almak (commit mesajları, açıklamalar, tanımlar) | [YZ desteği](ai.md) | `Ctrl+,` > **YZ** > **YZ'yi etkinleştir**, sonra `Ctrl+G i` bir commit mesajı yazar; palet **YZ: ...** |
+| Herhangi bir komutu veya tuşu bulmak | [Klavye kısayolları](keybindings.md) | Uygulamada `?` tuşları listeler, `Ctrl+P` her komutu bulur |
+
 ## Günlük kullanım
 
 4. **[Log ile çalışmak](log-and-history.md)**: grafiği okuma, arama, dallar,
-   tag'ler, stash'ler, worktree'ler, ref'leri sürükleme, rebase, cherry-pick,
+   tag'ler, stash'ler, ref'leri sürükleme, rebase, cherry-pick,
    reword ve amend, bannerlar, pull ve push, auto-stash.
 5. **[Stage'leme ve commit'leme](staging-and-committing.md)**: çalışma değişiklikleri,
    diff'ler, hunk'ları ve tek tek satırları stage'leme, commit yazma, commit
@@ -40,39 +61,46 @@ başvuru sayfalarına atlayın.
    ve B, Çıktı'nın üzerinde yan yana), satır ve parça seçme, ikili, LFS, silinmiş,
    sembolik bağlantı ve alt modül çakışmaları için kartlar ve bir ajanın nasıl
    çözüm önerdiği.
-8. **[Geri al ve yinele](undo-redo.md)**: `Ctrl+Z` / `Ctrl+Y`, nelerin geri
-   alınabildiği ve alınamadığı, ne zaman reddettiği veya sorduğu, ne kadar geriye
-   gittiği, kapatma.
-9. **[Git LFS](lfs.md)**: büyük dosyalar, izleme, kilitler ve `git-lfs` kurulu
-   değilken neler olduğu.
-10. **[Alt modüller](submodules.md)**: ALT MODÜLLER bölümü, bunları güncelleme ve
-    checkout'larla pull'larla uyum içinde tutma.
-11. **[Temalar](themes.md)**: yerleşik temalar, her temayı her şerit paletiyle
+8. **[Worktree'ler](worktrees.md)**: başka bir dalda ikinci bir checkout edilmiş
+   klasör: WORKTREE'LER bölümü, bağlı worktree'leri oluşturma, açma, merge etme ve
+   kaldırma.
+9. **[Alt modüller](submodules.md)**: ALT MODÜLLER bölümü, bunları güncelleme ve
+   checkout'larla pull'larla uyum içinde tutma.
+10. **[Geri al ve yinele](undo-redo.md)**: `Ctrl+Z` / `Ctrl+Y`, nelerin geri
+    alınabildiği ve alınamadığı, ne zaman reddettiği veya sorduğu, ne kadar geriye
+    gittiği, kapatma.
+11. **[Git LFS](lfs.md)**: büyük dosyalar, izleme, kilitler ve `git-lfs` kurulu
+    değilken neler olduğu.
+12. **[Temalar](themes.md)**: yerleşik temalar, her temayı her şerit paletiyle
     kullanma, canlı önizleme, kendi tema dosyalarınız, `gitpoulpi theme`.
-12. **[Çalışma alanları](workspaces.md)**: kendi sekmeleri ve isteğe bağlı bir
+13. **[Çalışma alanları](workspaces.md)**: kendi sekmeleri ve isteğe bağlı bir
     varsayılan commit profili olan, adlandırılmış depo grupları, sekme çubuğu
     rozeti, Çalışma alanları sekmesi, Tümünü fetch et, Tümünü pull
     et, Eksikleri klonla.
-13. **[Arama](search.md)**: çalışma alanının veya açık sekmelerin tüm depolarındaki
+14. **[Arama](search.md)**: çalışma alanının veya açık sekmelerin tüm depolarındaki
     dallar, tag'ler, worktree'ler, stash'ler, commit'ler, pull/merge request'ler
     ve issue'lar üzerinde tek bir bulanık arama (`Ctrl+Alt+F`).
-14. **[Radar](radar.md)**: bir çalışma alanının (veya açık sekmelerinizin)
+15. **[Radar](radar.md)**: bir çalışma alanının (veya açık sekmelerinizin)
     pull/merge request'leri, issue'ları ve süren işleri tek listede: filtreler,
     sabitleme, erteleme ve her satırın yapabilecekleri.
-    Bu request'leri uygulamada okumak ve incelemek, yorum dizileri, bekleyen bir
-    inceleme ve Onayla / Değişiklik iste ile:
-    **[Bir pull veya merge request'i incelemek](review.md)**.
-15. **[Şurada aç](open-in.md)**: etkin sekmenin klasörünü bir terminalde,
+16. **[Pull request'ler ve issue'lar](pull-requests-and-issues.md)**: kenar
+    çubuğunun PULL REQUEST'LER ve ISSUE'LAR bölümleri, issue panosu, bir pull
+    request veya issue oluşturma, araç çubuğu çipi, commit mesajlarındaki
+    referanslar.
+17. **[Konuşmalar](conversations.md)**: bir issue veya isteğin tartışmasını
+    pencerenin içinde okuma ve yanıtlama, şu adla gönderme, her barındırıcının
+    yapamadıkları.
+18. **[Bir pull veya merge request'i incelemek](review.md)**: yorum dizileri,
+    bekleyen bir inceleme ve Onayla / Değişiklik iste ile inceleme görünümü.
+19. **[Şurada aç](open-in.md)**: etkin sekmenin klasörünü bir terminalde,
     çoklayıcıda, düzenleyicide veya dosya yöneticisinde açan başlık çubuğu
     listesi.
-16. **[Etkin sekmenin klasörünü izlemek](following-the-tab-folder.md)**:
+20. **[Etkin sekmenin klasörünü izlemek](following-the-tab-folder.md)**:
     "Çık ve cd yap" ve bash, zsh, fish ve PowerShell için `gitpoulpi shell-init`
     sarmalayıcısı (`gp`).
     GitPoulpi'yi en iyi hangi terminal gösterir: **[Terminal seçmek](terminals.md)**.
     tmux, zellij, screen, herdr ve terminal panellerinden nelerin geçtiği:
     **[Çoklayıcılar](multiplexers.md)**.
-
-Ayrıca: **[Worktree'ler](worktrees.md)**: bağlı worktree'leri oluşturma, açma, merge etme ve kaldırma.
 
 Ayrıca: **[Bir dal için birden çok uzak depo](multiple-remotes.md)**: push hedefleri ve pull kaynakları,
 Uzak depolar penceresi, tüm uzak depolara veya seçililere Push, ilerleyen bir uzak depoyu çözme, çakışmadan sonra
@@ -88,32 +116,31 @@ tarihleri, iletileri ve dosya içeriklerini yeniden yazan yeniden yazma ekranı
 
 ## Klavye ve fare
 
-17. **[Klavye kısayolları](keybindings.md)**: bölgeye göre her tuş ve paletteki
+21. **[Klavye kısayolları](keybindings.md)**: bölgeye göre her tuş ve paletteki
     her komut. Uygulamada `?` aynı listeyi gösterir ve `Ctrl+P` her komutu bulur.
-18. **[Fare ve hareketler](mouse-and-gestures.md)**: tıklama, sürükleme, seçme
+22. **[Fare ve hareketler](mouse-and-gestures.md)**: tıklama, sürükleme, seçme
     ve kopyalama, kaydırma çubukları ve üzerine gelme geri bildirimi.
 
 ## Ayarlar ve entegrasyonlar
 
-19. **[Ayarlar](settings.md)**: Ayarlar ekranının her sayfası ve seçeneği, arama
+23. **[Ayarlar](settings.md)**: Ayarlar ekranının her sayfası ve seçeneği, arama
     kutusu, profiller ve kısayolları yeniden atama.
-20. **[YZ desteği](ai.md)**: GitPoulpi'nin kendi YZ'si (varsayılan olarak
+24. **[YZ desteği](ai.md)**: GitPoulpi'nin kendi YZ'si (varsayılan olarak
     kapalı): `claude -p` gibi yerel bir ajan, Anthropic, OpenAI, OpenRouter,
     Ollama veya LM Studio; yönergeler; commit mesajları, açıklamalar, pull
     request açıklamaları ve commit composer; gizlilik ve sorun giderme.
-21. **[Barındırma hizmetleri ve issue takipçileri](hosting-integration.md)**:
+25. **[Barındırma hizmetleri ve issue takipçileri](hosting-integration.md)**:
     GitHub, GitLab, Gitea ve Forgejo, Azure DevOps, Bitbucket, Gerrit ve issue
-    takipçileri: token'lar ve kapsamları, bağlanma, bir depoyu bağlama,
-    pull request'ler ve issue'lar, commit mesajlarındaki referanslar, SSH
+    takipçileri: token'lar ve kapsamları, bağlanma, bir depoyu bağlama, SSH
     anahtarları, bilinen sınırlar. Ayrıca
     **[Yerel issue'lar ve Obsidian](local-issues.md)**: issue kaynağı olarak bir
     Markdown notları klasörü, token yok, bir Obsidian Base ile.
 
 ## Otomasyon
 
-22. **[CLI başvurusu](cli-reference.md)**: her `gitpoulpi` komutu, betikler için
+26. **[CLI başvurusu](cli-reference.md)**: her `gitpoulpi` komutu, betikler için
     `--json` ile.
-23. **[MCP ve ajanlar](mcp-and-agents.md)**: harici bir ajanın (Claude Code,
+27. **[MCP ve ajanlar](mcp-and-agents.md)**: harici bir ajanın (Claude Code,
     Cursor, Codex, ...) GitPoulpi'yi yönetmesine izin verin: sunucuyu kaydetme,
     `.mcp.json`, izin anahtarları ve varsayılanları, her araç ve bir ajanın
     pencerenizde size bir şeyi nasıl gösterdiği. Hazır ajan skill'i
@@ -121,9 +148,9 @@ tarihleri, iletileri ve dosya içeriklerini yeniden yazan yeniden yazma ekranı
 
 ## Başvuru ve yardım
 
-24. **[Yapılandırma başvurusu](config-reference.md)**: her `config.toml` anahtarı,
+28. **[Yapılandırma başvurusu](config-reference.md)**: her `config.toml` anahtarı,
     varsayılanı ve etkisi, depo başına ayarlar, ortam değişkenleri.
-25. **[Sorun giderme ve SSS](troubleshooting.md)**: simgeler, grafik çizimi,
+29. **[Sorun giderme ve SSS](troubleshooting.md)**: simgeler, grafik çizimi,
     ulaşmayan tuşlar, takılı kalmış daemon'lar, hız, LFS işaretçileri.
 
 ## Ekran görüntüleri

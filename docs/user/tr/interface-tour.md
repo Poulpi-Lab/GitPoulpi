@@ -13,9 +13,9 @@ demo deposu kullanır.
 ### Başlık çubuğu
 
 Pencerenin üst kenarında
-`🐙 GitPoulpi vX.Y.Z -- <depo yolu>` yazar (oturum adı durum çubuğundadır, varsayılan olarak en altta).
+<img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi simgesi" height="16"> `GitPoulpi vX.Y.Z -- <depo yolu>` yazar (oturum adı durum çubuğundadır, varsayılan olarak en altta).
 
-- **🐙**, **GitPoulpi Hakkında** penceresini açar: sürüm, derleme özellikleri,
+- **<img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi simgesi" height="16">**, **GitPoulpi Hakkında** penceresini açar: sürüm, derleme özellikleri,
   lisans, bağlantılar, GitPoulpi'nin bağımsız bir proje olduğunu söyleyen kısa bir
   not, üçüncü taraf crate'ler ve lisanslar ile emeği geçenler. Görüntü çizen bir terminalde
   ahtapot piksel logodur ve logo renginizdedir (başka yerde emoji olarak kalır).

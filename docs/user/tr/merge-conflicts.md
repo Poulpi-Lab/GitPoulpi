@@ -37,7 +37,9 @@ kaydırılmazlar.
 ## Seçim yapma
 
 Her çakışma A'da ve B'de çerçeveli bir bloktur; başlığında bir onay kutusu ve
-her satırın önünde bir `+` / `✓` bulunur.
+her satırın önünde bir `+` / `✓` bulunur. O çakışmanın seçenekleri için bir parçaya sağ tıklayın:
+
+![Merge düzenleyicinin 2. çakışmasında sağ tık menüsü: Yalnızca A'yı al, Yalnızca B'yi al, A sonra B, B sonra A, Hiçbirini alma, Seçimi kaldır, Çıktıda düzenle ve Çözüm öner](../images/merge-editor-chunk-menu.png)
 
 | Şunun için... | Tuş | Fare |
 |---|---|---|
@@ -72,6 +74,10 @@ hâlâ seçim gerekiyorsa turuncu, ele alındıysa yeşil, geçerli olan için m
 işarete tıklamak o çakışmaya atlar (kaydırma çubuğunun tutamacının altındaki bir
 işaret zaten ekrandadır, bu yüzden orada tıklama tutamacı sürükler).
 
+İkisini birden almak (**A sonra B**), A'nın satırlarını ve ardından B'ninkileri Çıktıda çakışmanın işaretinin altına yazar; her biri tarafıyla etiketlenir. İki parçadaki `1st` / `2nd` rozetleri sırayı söyler ve `s` onu değiştirir:
+
+![2. çakışma iki taraftan alınmış: A satırı ve B satırı işaretli, Çıktı onları A ve B etiketiyle art arda gösteriyor, 1. ve 3. çakışma ise hâlâ seçim bekliyor](../images/merge-editor-take-both.png)
+
 **Tüm dosya**, A ve B'de tüm dosyayı gösterir; yalnızca çakışmalar değil, her fark renklidir:
 
 ![Tüm dosya kipi: A ve B'de tüm dosya, değişiklikler renkli](../images/merge-editor-full-file.png)
@@ -80,6 +86,8 @@ işaret zaten ekrandadır, bu yüzden orada tıklama tutamacı sürükler).
 `Ctrl+F` ile arayabilirsiniz. Elle düzenlediğiniz bir çakışmadaki seçim, düzenlemenizin yerine
 geçer (`Ctrl+Z` geri getirir). Hiçbir şey seçilmemiş bir çakışmayla veya hâlâ
 çakışma işaretine benzeyen bir satırla kaydetmek önce sorar.
+
+![Her çakışması ele alınmış merge düzenleyici: 1. çakışma A'dan, 2. çakışma iki taraftan, 3. çakışma Çıktıda elle yazılmış (kalem ile işaretli ve düzenlenmiş sayılır) ve araç çubuğunda vurgulanmış Kaydet ve Çözüldü İşaretle düğmesi](../images/merge-editor-output-edited.png)
 
 ### ✦ Çözüm öner (YZ)
 
@@ -95,10 +103,24 @@ denetimlerin hiçbiri yoktur.
 
 **Kaydet ve Çözüldü İşaretle**'den sonra dosya stage'lenir ve çakışmalı dosyalar
 listesi geri gelir; sonraki dosyayı kendiniz açın. `Ctrl+Z` (veya
-Geri al düğmesi) son "çözüldü işaretle"yi geri alır. Hiç dosya kalmadığında banner
+Geri al düğmesi) son "çözüldü işaretle"yi geri alır.
+
+![Kaydet ve Çözüldü İşaretle'den sonra: banner "Merge sürüyor, 1 çakışmalı dosya" diyor, orbit.rs Stage'lenen Dosyalar'a taşındı ve logo.bin, kırmızı ! ile işaretli, Stage'lenmeyen Dosyalar'da kalan tek dosya](../images/conflict-file-resolved.png)
+
+Hiç dosya kalmadığında banner
 **Commit (merge)** (cherry-pick, revert veya rebase için **Devam et**) ve
 **Merge işlemini iptal et** önerir; iptal önce sorar: HEAD'i, indeksi ve çalışma
 ağacını eski durumlarına döndürür.
+
+![Her dosya çözüldüğünde banner: "Merge sürüyor, tüm çakışmalar çözüldü", Commit (merge) ve Merge işlemini iptal et düğmeleriyle, çözülen dosya Stage'lenen Dosyalar'da](../images/conflict-commit-merge.png)
+
+Bir rebase da aynı şekilde, adım adım durur. Banner'ı dalı ve neyin üstüne rebase edildiğini söyler; **Çakışmaları çöz...**, **Devam et**, **Atla** ve **İptal et** düğmeleri vardır:
+
+![İki çakışmada duran bir rebase'in banner'ı: "feature/cleanup ... üstüne rebase ediliyor", Çakışmaları çöz..., Devam et, Atla ve İptal et düğmeleriyle; Durum panelinde iki çakışmalı dosya](../images/conflict-banner-rebase.png)
+
+Son dosya çözüldüğünde aynı banner **Devam et** için hazırdır:
+
+![Her iki dosya çözüldükten sonra rebase banner'ı: yalnızca Devam et, Atla ve İptal et kalır ve iki dosya da Stage'lenen Dosyalar'da durur](../images/conflict-banner-continue.png)
 
 Sonucu HEAD'e eşit olan bir merge (her yerde bizim tarafı aldınız) hiçbir şey
 stage'lenmemiş ve değişmiş dosyası olmasa da yine de tamamlanabilir: **Commit
@@ -127,6 +149,8 @@ dosyayı hemen çözer ve stage'ler.
 | Bir tarafta silinmiş, diğerinde değişmiş | **Dosyayı koru** (`k`), **Silmeyi kabul et** (`Shift+D`) |
 | Yeniden adlandırma artığı (yol yalnızca bir tarafta var) | **Dosyayı koru** (`k`), **Dosyayı sil** (`Shift+D`) |
 | Sembolik bağlantı, alt modül, dosya kipi | **A'yı koru**, **B'yi al**, **Temeli al** |
+
+![A'da değişmiş ve B'de silinmiş bir dosyanın kartı: A kutusu dosyanın boyutunu ve kipini gösterir, B kutusu "burada dosya yok (silinmiş)" der, temel kutusu özgün hâlini gösterir ve düğmeler Dosyayı koru ile Silmeyi kabul et](../images/merge-editor-deleted-card.png)
 
 Dosya bir resimse (PNG, JPEG, GIF, WebP, BMP, ICO) kutular A, B ve Temel
 resimlerini de gösterir; sığdırılmış ve salt okunur, onlara yetecek genişlikte bir

@@ -15,6 +15,8 @@ Bir deponun `.gitmodules` dosyası olduğunda Refs kenar çubuğuna bir **ALT MO
 | `○` | klonlanmamış | `.gitmodules` içinde tanımlı ve kayıtlı, ama klasörü boş: klonlamak için güncelleyin |
 | `✗` | çakışmalı | depoda alt modül üzerinde merge çakışmaları var |
 
+![ALT MODÜLLER bölümü, üç satırla: vendor/almanac klonlanmamış (○), vendor/ephemeris güncel (✓) ve vendor/starfield değiştirilmiş (↑, kaydedilenden başka bir commit'te); sonuncusu Durum panelinde de değişmiş dosya olarak görünür](../images/submodules.png)
+
 | Yapılacak | Fare | Klavye |
 |---|---|---|
 | Alt modülü kendi sekmesinde açmak | satıra çift tıklayın | seçin, `Enter` (palet: `Refs: Alt Modülü Sekmede Aç`) |
@@ -23,6 +25,8 @@ Bir deponun `.gitmodules` dosyası olduğunda Refs kenar çubuğuna bir **ALT MO
 | Klonlamadan `.git/config` içine kaydetmek | menü | `Ctrl+P`: `Refs: Alt Modül Başlat (Seçili)` |
 | Her alt modülü güncellemek | | `Ctrl+P`: `Git: Tüm Alt Modülleri Güncelle` |
 | Bölüme atlamak | başlığına tıklayın | `Ctrl+P`: `Gezinme: Refs > Alt Modüllere Odaklan` |
+
+![Değiştirilmiş vendor/starfield satırının sağ tık menüsü: Güncelle (gerekirse klonla), Başlat ve Yeni sekmede aç](../images/submodule-menu.png)
 
 Bir güncelleme alt modülün uzak deposundan fetch edebilir; bu yüzden diğer her aktarım gibi **Ayarlar > SSH ve kimlik bilgileri > HTTPS kimlik bilgileri** ayarını izler. Klonlanmamış bir alt modülün sekme olarak açılacak bir şeyi yoktur; durum çubuğu bunu söyler ve Güncelle'yi işaret eder.
 

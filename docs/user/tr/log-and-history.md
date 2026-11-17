@@ -190,7 +190,9 @@ STASH'LER bölümünde bir stash satırına sağ tıklayın.
 deponun yanında bir klasör öneren, isteğe bağlı yeni bir dal adı ve "Yeni
 worktree'yi sekme olarak aç" seçeneği olan bir iletişim kutusu açar.
 Worktree'ler WORKTREE'LER bölümünde görünür; açmak için birine çift tıklayın;
-worktree kaldırıldığında sekmesi kendiliğinden kapanır.
+worktree kaldırıldığında sekmesi kendiliğinden kapanır. Özelliğin tamamı (başka bir
+araçta açmak, bir worktree'nin dalını merge etmek, kaldırmak) [Worktree'ler](worktrees.md)
+sayfasındadır; aynı panelin ALT MODÜLLER bölümü [Alt modüller](submodules.md) sayfasındadır.
 
 ## Ref'leri commit'lerin üzerine sürüklemek
 

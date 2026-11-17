@@ -385,7 +385,7 @@ düzenleyemez, çözemez veya silemez, CLI ve MCP yanıtı `"posted": false` der
 (aşağıda). Metin GitPoulpi'den yalnızca yazma kutusunun kendi **Gönder** (`Ctrl+Enter`) veya **Yorum yap** düğmesiyle çıkar.
 
 **Markdown yazma kutusunda.** YZ açıkken, metni bir barındırıcıya giden her yazma kutusunun (bir [konuşma
-görünümündeki](hosting-integration.md#5c-konuşmalar) yorum, yanıt veya düzenleme, bir inceleme yorumu, İncelemeyi bitir
+görünümündeki](conversations.md) yorum, yanıt veya düzenleme, bir inceleme yorumu, İncelemeyi bitir
 özeti, yeni issue açıklaması ve pull request açıklaması) mod çubuğunun sağ ucunda bir **YZ ile Yaz** düğmesi (hepsinde
 aynı tuş `Alt+E`) vardır. Çubuğun altında bir panel açar:
 

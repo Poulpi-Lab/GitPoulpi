@@ -1504,11 +1504,11 @@ Menülerin ne yaptığı için bkz. [Log ile çalışmak](log-and-history.md).
 
 Eşleşen bir entegrasyonla Refs panelinde bir pull request bölümü bulunur (GitLab:
 merge request'ler). Bağlı bir barındırma profiliyle ISSUE'LAR bölümü de bulunur.
-Bkz. [Barındırma hizmetleri ve issue takipçileri](hosting-integration.md#5-kenar-çubuğundaki-pull-requestler-ve-issuelar).
+Bkz. [Barındırma hizmetleri ve issue takipçileri](pull-requests-and-issues.md#kenar-çubuğundaki-pull-requestler-ve-issuelar).
 
 | Tuş | Eylem |
 |---|---|
-| `Enter` | Seçili satırı aç: bir issue (ve Azure DevOps veya Bitbucket'ta bir istek) [konuşma](hosting-integration.md#5c-konuşmalar) olarak, incelemesi olan barındırıcılarda bir pull request [incelemede](review.md), geri kalan her şey tarayıcıda. Bir `Yeniden bağlan` satırında: Ayarlar'ı o profilde aç |
+| `Enter` | Seçili satırı aç: bir issue (ve Azure DevOps veya Bitbucket'ta bir istek) [konuşma](conversations.md) olarak, incelemesi olan barındırıcılarda bir pull request [incelemede](review.md), geri kalan her şey tarayıcıda. Bir `Yeniden bağlan` satırında: Ayarlar'ı o profilde aç |
 | `Space` | Bölümü genişlet veya daralt |
 | `v` | Bölümün filtresini aç. Pull request'ler: Açık, Merged / kapanan, Tümü. Issue'lar: Açık, Bana atanan, Kapalı, Tümü |
 | `n` | Pull request bölümü: bir pull request oluştur. ISSUE'LAR bölümü: yeni issue. (Başlıktaki `+` düğmesi) |
@@ -1521,7 +1521,7 @@ Bkz. [Barındırma hizmetleri ve issue takipçileri](hosting-integration.md#5-ke
 ### Issue panosu
 
 ISSUE'LAR başlığındaki **Pano** (palet: **Issue'lar: Panoyu Aç**), issue kaynağının Kanban panosunu açar. Bkz.
-[pano](hosting-integration.md#5b-issue-panosu) ve [yerel issue'lar](local-issues.md#kanban-panosu). Aşağıdaki her
+[pano](pull-requests-and-issues.md#issue-panosu) ve [yerel issue'lar](local-issues.md#kanban-panosu). Aşağıdaki her
 tuş aynı zamanda bir palet komutudur (**Pano: ...**).
 
 | Tuş | Eylem |
@@ -1529,7 +1529,7 @@ tuş aynı zamanda bir palet komutudur (**Pano: ...**).
 | Oklar | Bir kart (`Up`, `Down`) veya komşu sütun (`Left`, `Right`) seç; `Home`, `End`, `PageUp`, `PageDown` sütunda atlar |
 | `Shift+Left`, `Shift+Right` | Seçili kartı önceki veya sonraki sütuna taşı |
 | `m` | **Kartı Şuraya Taşı...**: sütunların bir açılır listesi |
-| `Enter` | Issue'nun [konuşmasını](hosting-integration.md#5c-konuşmalar) aç (barındırıcının okunacak konuşması yoksa barındırıcının sayfası) |
+| `Enter` | Issue'nun [konuşmasını](conversations.md) aç (barındırıcının okunacak konuşması yoksa barındırıcının sayfası) |
 | `e`, `.` | Atananları, etiketleri veya kilometre taşını düzenle; kart menüsü |
 | `n` | Seçili sütunda yeni issue |
 | `a`, `l`, `M`, `/` | Atanana, etikete, kilometre taşına, metne göre filtrele. `x` filtreleri temizler |
@@ -1556,7 +1556,7 @@ açıklaması) aynı yazma kutusudur. Tuşları yukarıdaki `md_editor` tablosun
 | `Alt+W` | Yeni issue ve pull request formları: sağlayıcının kendi web sayfasında oluştur |
 | `Esc` | **YZ ile Yaz** panelinde: çalışan bir taslağı durdur, yoksa paneli kapat |
 
-Bir issue veya isteğin [konuşma görünümünde](hosting-integration.md#5c-konuşmalar) (palet satırları *Konuşma: ...*;
+Bir issue veya isteğin [konuşma görünümünde](conversations.md) (palet satırları *Konuşma: ...*;
 tuşu olan satırlar yukarıdaki palet listesindedir):
 
 | Tuş | Eylem |
@@ -1918,7 +1918,7 @@ Her düğmenin bir klavye karşılığı vardır:
 
 | Düğme | Tuş |
 |---|---|
-| Başlık çubuğunun solundaki 🐙 (Hakkında) | Paletteki `Yardım: GitPoulpi Hakkında` |
+| Başlık çubuğunun solundaki <img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi simgesi" height="16"> (Hakkında) | Paletteki `Yardım: GitPoulpi Hakkında` |
 | Başlık çubuğundaki **Şurada aç** | `Alt+O`, `Ctrl+Alt+O` |
 | Başlık çubuğunun sağındaki `×` (çık) | `q` |
 | Başlık çubuğundaki sürüm (Sürüm notları) | Paletteki `Yardım: Sürüm Notları` |

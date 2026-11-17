@@ -35,7 +35,9 @@ en sida i taget bakom flikar. Långa rader rullas i sidled, A och B tillsammans
 ## Välja
 
 Varje konflikt är ett inramat block i A och i B, med en kryssruta på rubriken och
-ett `+` / `✓` framför varje rad.
+ett `+` / `✓` framför varje rad. Högerklicka på ett block för valen för den konflikten:
+
+![En högerklicksmeny på konflikt 2 i merge-redigeraren: Ta bara A, Ta bara B, A sedan B, B sedan A, Ta ingenting, Ångra val, Redigera i Resultat och Föreslå lösning](../images/merge-editor-chunk-menu.png)
 
 | För att... | Tangent | Mus |
 |---|---|---|
@@ -71,6 +73,10 @@ aktuella. Ett klick på en markering hoppar till den konflikten (en markering
 under rullningslistens handtag syns redan på skärmen, så där drar klicket i
 handtaget).
 
+Att ta båda (**A sedan B**) skriver A:s rader och sedan B:s under konfliktens markering i Resultat, var och en märkt med sin sida; märkena `1st` / `2nd` på de två blocken anger ordningen, och `s` byter den:
+
+![Konflikt 2 tagen från båda sidor: dess A-rad och B-rad är ikryssade, och Resultat visar dem efter varandra, märkta A och B, medan konflikt 1 och 3 fortfarande väntar på ett val](../images/merge-editor-take-both.png)
+
 **Hela filen** visar hela filen i A och B med varje skillnad färgad, inte bara konflikterna:
 
 ![Läget Hela filen: hela filen i A och B, med ändringarna färgade](../images/merge-editor-full-file.png)
@@ -80,6 +86,8 @@ klistra in, sök med `Ctrl+F`. Ett val på en konflikt som du har redigerat för
 ersätter din ändring (`Ctrl+Z` hämtar tillbaka den). Att spara med en konflikt
 som inget valts för, eller med en rad som fortfarande ser ut som en
 konfliktmarkör, frågar först.
+
+![Merge-redigeraren med varje konflikt hanterad: konflikt 1 tagen från A, konflikt 2 från båda sidor, konflikt 3 skriven för hand i Resultat (markerad med en penna och räknad som redigerad), och knappen Spara och markera löst markerad i verktygsfältet](../images/merge-editor-output-edited.png)
 
 ### ✦ Föreslå en lösning (AI)
 
@@ -95,10 +103,24 @@ kontrollerna.
 
 Efter **Spara och markera löst** är filen stagead och listan över filer med
 konflikt är tillbaka; öppna nästa fil själv. `Ctrl+Z` (eller
-knappen Ångra) tar tillbaka det senaste ”markera löst”. När ingen fil är kvar
+knappen Ångra) tar tillbaka det senaste ”markera löst”.
+
+![Efter Spara och markera löst: bannern lyder ”Merge pågår · 1 fil med konflikt”, orbit.rs har flyttat till Staged-filer och logo.bin är den enda filen kvar under Unstaged-filer, markerad med ett rött !](../images/conflict-file-resolved.png)
+
+När ingen fil är kvar
 erbjuder bannern **Commit merge** (eller **Fortsätt** för en cherry-pick, en
 revert eller en rebase) och **Avbryt merge**, som frågar först: den sätter
 tillbaka HEAD, indexet och arbetskatalogen som de var.
+
+![Bannern när varje fil är löst: ”Merge pågår · alla konflikter lösta” med knapparna Commit merge och Avbryt merge, och den lösta filen under Staged-filer](../images/conflict-commit-merge.png)
+
+En rebase stannar på samma sätt, steg för steg. Dess banner nämner grenen och vad den rebasas på, och har **Lös konflikter...**, **Fortsätt**, **Hoppa över** och **Avbryt**:
+
+![Bannern för en rebase som stannat på två konflikter: ”Rebase feature/cleanup på ...” med Lös konflikter..., Fortsätt, Hoppa över och Avbryt, och de två filerna med konflikt i Status-rutan](../images/conflict-banner-rebase.png)
+
+När den sista filen är löst är samma banner redo att **Fortsätta**:
+
+![Rebase-bannern när båda filerna är lösta: bara Fortsätt, Hoppa över och Avbryt återstår, och båda filerna ligger under Staged-filer](../images/conflict-banner-continue.png)
 
 En merge vars resultat är lika med HEAD (du tog vår sida överallt) har inget
 stageat och ingen ändrad fil, men kan ändå avslutas: **Commit merge** öppnar
@@ -127,6 +149,8 @@ sida innehåller och en knapp per val; ett val löser och stagear filen direkt.
 | Borttagen på ena sidan, ändrad på den andra | **Behåll filen** (`k`), **Godta borttagningen** (`Shift+D`) |
 | Kvarlämnad av namnbyte (sökvägen finns bara på ena sidan) | **Behåll filen** (`k`), **Ta bort filen** (`Shift+D`) |
 | Symlänk, submodul, fillägen | **Behåll A**, **Ta B**, **Ta bas** |
+
+![Kortet för en fil som ändrats i A och tagits bort i B: rutan A visar filens storlek och läge, rutan B lyder ”ingen fil här (borttagen)”, rutan Bas visar originalet, och knapparna är Behåll filen och Godta borttagningen](../images/merge-editor-deleted-card.png)
 
 När filen är en bild (PNG, JPEG, GIF, WebP, BMP, ICO) visar rutorna också
 bilderna för A, B och Bas, anpassade och skrivskyddade, i ett fönster som är

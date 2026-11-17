@@ -9,7 +9,7 @@ pågående arbete. Det är Hem-fönstret med Radar-vyn ovanpå,
 så att inget under den kan stjäla ett klick eller en tangent.
 
 Den kräver en kodvärdsprofil (se [Värdtjänster och
-ärendehantering](hosting-integration.md)) och repositories länkade till den, eller en profil med
+ärendehantering](hosting-integration.md); listorna för ett repository finns i [Pull requests och ärenden](pull-requests-and-issues.md), och en rads diskussion öppnas som en [konversation](conversations.md)) och repositories länkade till den, eller en profil med
 sina kontoövergripande listor påslagna (se ”Bortom omfånget” nedan).
 Ett repository som inte är länkat tillfrågas aldrig: det visar en rad **Länka...** i
 stället (se ”Repositories med något att säga” nedan).

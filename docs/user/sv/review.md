@@ -10,7 +10,7 @@ godkännande och begäran om ändringar. Den kräver en profil för någon av de
 erbjuder inga granskningar. Värdens begränsningar respekteras: GitLab har inget omdöme *Begär ändringar* och tar en rad per kommentar.
 Den här sidan kallar alla dessa en *begäran*.
 
-![Granskningsvyn, sidan Översikt: begärans huvud med sina metadataknappar, beskrivningen och konversationen med ett skickat godkännande](../images/review-overview.png)
+![Granskningsvyn, sidan Översikt: begärans huvud med sina metadataknappar, beskrivningen, en olöst och en löst kodtråd, kommentarerna och kommentarsrutan](../images/review-overview.png)
 
 ![Sidan Filer: de ändrade filerna med sina rutor för visad, diffen med en kommentarstråd under sin rad och en löst tråd utanför de visade raderna](../images/review-files.png)
 
@@ -37,7 +37,7 @@ Alltid synligt: numret och titeln, tillståndet (Open, Draft, Merged, Closed), g
 om den går att slå ihop utan konflikter eller har konflikter, storleken och **`3 väntande kommentarer`** när du har skrivit några.
 
 De fyra metadataknapparna - **Tilldelade**, **Granskare**, **Etiketter**, **Milstolpe** - öppnar samma väljare som
-sidofältet (se [Tilldelade, granskare, etiketter och milstolpe](hosting-integration.md#tilldelade-granskare-etiketter-och-milstolpe));
+sidofältet (se [Tilldelade, granskare, etiketter och milstolpe](pull-requests-and-issues.md#tilldelade-granskare-etiketter-och-milstolpe));
 huvudet visar resultatet så fort värden har tagit emot det. Åtgärdsknapparna: **Checka ut** (den vanliga
 utcheckningen av begärans gren, som också stänger vyn), **Öppna i webbläsaren**, **Uppdatera**
 (**`F5`**) och **Slutför granskning**.
@@ -50,7 +50,7 @@ En segmenterad kontroll i övre kanten växlar sida: **Översikt**, **Filer**, *
 ### Översikt
 
 Översikten är **begärans konversation**, samma tidslinje och samma kommentarsruta som ett ärende har
-([Konversationer](hosting-integration.md#5c-konversationer)): beskrivningen först (*öppnade detta*), sedan kommentarerna,
+([Konversationer](conversations.md)): beskrivningen först (*öppnade detta*), sedan kommentarerna,
 trådarna på kod med sitt diff-utdrag, de skickade granskningarna med sitt omdöme (`godkänd`, `begärde
 ändringar`, `kommenterade`, `avfärdad`; på GitLab är omdömena dess godkännanden) och händelserna, äldst först, i det
 nyaste fönstret med **Läs in äldre** överst. Kommentarsrutan sitter under tidslinjen (**Ny kommentar**):
@@ -86,7 +86,7 @@ i paletten; `a` (tilldelade), `p` (granskare), `f` (**Slutför granskning**), `b
 En kommentar som skrivits i ett annat fönster eller av CLI:t visas här av sig själv: varje skrivning i GitPoulpi (det här
 fönstret inräknat) berättar det för sessionen, och fönstren som visar samma begäran läser den igen.
 
-Kommentarsrutan är den Markdown-redigerare som delas med [konversationsvyn](hosting-integration.md#skriva)
+Kommentarsrutan är den Markdown-redigerare som delas med [konversationsvyn](conversations.md#skriva)
 (också rutan för ett svar i en tråd, en kommentar på en rad och sammanfattningen i **Slutför granskning**): `Ctrl+Enter` (också
 `Ctrl+S`, `Alt+Enter`) skickar, och där AI är på öppnar `Alt+E` **Skriv med AI**
 ([AI-kapitlet](ai.md#skrivhjälp-på-en-värd)). Förhandsvyn visar texten så som värden gör det, referenser inräknade

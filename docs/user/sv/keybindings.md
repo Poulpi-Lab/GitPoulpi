@@ -1507,11 +1507,11 @@ För vad menyerna gör, se [Arbeta med Log](log-and-history.md).
 
 Med en matchande integration har Refs-rutan ett avsnitt för pull requests
 (GitLab: merge requests). Med en ansluten värdprofil har den också ett avsnitt
-ÄRENDEN. Se [Värdtjänster och ärendehantering](hosting-integration.md#5-pull-requests-och-ärenden-i-sidopanelen).
+ÄRENDEN. Se [Värdtjänster och ärendehantering](pull-requests-and-issues.md#pull-requests-och-ärenden-i-sidopanelen).
 
 | Tangent | Åtgärd |
 |---|---|
-| `Enter` | Öppna den markerade raden: ett ärende (och en begäran på Azure DevOps eller Bitbucket) som en [konversation](hosting-integration.md#5c-konversationer), en pull request i [granskningen](review.md) på värdar som har en, allt annat i webbläsaren. På en `Anslut igen`-rad: öppna Inställningar på den profilen |
+| `Enter` | Öppna den markerade raden: ett ärende (och en begäran på Azure DevOps eller Bitbucket) som en [konversation](conversations.md), en pull request i [granskningen](review.md) på värdar som har en, allt annat i webbläsaren. På en `Anslut igen`-rad: öppna Inställningar på den profilen |
 | `Space` | Fäll ut eller ihop avsnittet |
 | `v` | Öppna avsnittets filter. Pull requests: Öppna, Mergade / stängda, Alla. Ärenden: Öppna, Tilldelade mig, Stängda, Alla |
 | `n` | Avsnittet pull requests: skapa en pull request. Avsnittet ÄRENDEN: nytt ärende. (Rubrikens `+`-knapp) |
@@ -1524,7 +1524,7 @@ Med en matchande integration har Refs-rutan ett avsnitt för pull requests
 ### Ärendetavlan
 
 **Tavla** i ÄRENDEN-huvudet (palett: **Ärenden: Öppna tavlan**) öppnar Kanban-tavlan för ärendekällan. Se
-[tavlan](hosting-integration.md#5b-ärendetavlan) och [lokala ärenden](local-issues.md#kanban-tavlan). Varje tangent
+[tavlan](pull-requests-and-issues.md#ärendetavlan) och [lokala ärenden](local-issues.md#kanban-tavlan). Varje tangent
 nedan är också ett palettkommando (**Tavla: ...**).
 
 | Tangent | Åtgärd |
@@ -1532,7 +1532,7 @@ nedan är också ett palettkommando (**Tavla: ...**).
 | Piltangenter | Markera ett kort (`Up`, `Down`) eller grannkolumnen (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` hoppar i kolumnen |
 | `Shift+Left`, `Shift+Right` | Flytta det markerade kortet till föregående eller nästa kolumn |
 | `m` | **Flytta kort till...**: en lista med kolumnerna |
-| `Enter` | Öppna ärendets [konversation](hosting-integration.md#5c-konversationer) (värdens sida där värden inte har någon att läsa) |
+| `Enter` | Öppna ärendets [konversation](conversations.md) (värdens sida där värden inte har någon att läsa) |
 | `e`, `.` | Redigera tilldelade, etiketter eller milstolpe; kortmenyn |
 | `n` | Nytt ärende i den markerade kolumnen |
 | `a`, `l`, `M`, `/` | Filtrera på tilldelad, etikett, milstolpe, text. `x` rensar filtren |
@@ -1558,7 +1558,7 @@ request) är samma redigerare. Dess tangenter står i tabellen `md_editor` ovan 
 | `Alt+W` | Formulären för nytt ärende och ny pull request: skapa på leverantörens egen webbsida |
 | `Esc` | I panelen för **Skriv med AI**: stoppa ett pågående utkast, annars stäng panelen |
 
-I [konversationsvyn](hosting-integration.md#5c-konversationer) för ett ärende eller en begäran (palettrader
+I [konversationsvyn](conversations.md) för ett ärende eller en begäran (palettrader
 *Konversation: ...*; raderna med en tangent finns i palettlistan ovan):
 
 | Tangent | Åtgärd |
@@ -1917,7 +1917,7 @@ Varje knapp har en tangentbordsmotsvarighet:
 
 | Knapp | Tangent |
 |---|---|
-| 🐙 till vänster i titelraden (Om) | `Hjälp: Om GitPoulpi` i paletten |
+| <img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi-ikon" height="16"> till vänster i titelraden (Om) | `Hjälp: Om GitPoulpi` i paletten |
 | **Öppna i** i titelraden | `Alt+O`, `Ctrl+Alt+O` |
 | `×` till höger i titelraden (avsluta) | `q` |
 | Versionen i titelraden (Versionsanteckningar) | `Hjälp: Versionsanteckningar` i paletten |

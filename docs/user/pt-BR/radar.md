@@ -7,7 +7,7 @@ requests que você escreveu, as que pedem a sua revisão, as issues atribuídas 
 os repositórios em que você deixou trabalho em andamento. É a janela Início com a
 visão Radar por cima, para que nada por baixo possa roubar um clique ou uma tecla.
 
-Ele precisa de um perfil de host de código (veja [Integrações de hospedagem e de rastreadores de issues](hosting-integration.md))
+Ele precisa de um perfil de host de código (veja [Integrações de hospedagem e de rastreadores de issues](hosting-integration.md); as listas de um repositório estão em [Pull requests e issues](pull-requests-and-issues.md), e a discussão de uma linha abre como [conversa](conversations.md))
 e de repositórios vinculados a ele, ou de um perfil com as listas de toda a conta ativadas (veja "Além do escopo: linhas de toda a conta" abaixo).
 Um repositório que não está vinculado nunca é consultado: ele mostra uma
 linha **Vincular...** (veja "Repositórios com algo a dizer" abaixo).

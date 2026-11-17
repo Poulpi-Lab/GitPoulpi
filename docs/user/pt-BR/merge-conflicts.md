@@ -37,7 +37,9 @@ quebradas.
 ## Escolhendo
 
 Cada conflito é um bloco emoldurado em A e em B, com uma caixa de seleção no
-cabeçalho e um `+` / `✓` na frente de cada linha.
+cabeçalho e um `+` / `✓` na frente de cada linha. Clique com o botão direito em um trecho para ver as escolhas desse conflito:
+
+![Um menu de clique direito no conflito 2 do editor de merge: Aceitar só A, Aceitar só B, A depois B, B depois A, Não aceitar nada, Desfazer a escolha, Editar no resultado e Sugerir resolução](../images/merge-editor-chunk-menu.png)
 
 | Para... | Tecla | Mouse |
 |---|---|---|
@@ -72,6 +74,10 @@ laranja enquanto ainda precisa de uma escolha, verde quando tratado, azul para o
 atual. Um clique em uma marca pula para esse conflito (uma marca sob o polegar da
 barra de rolagem já está na tela, então ali o clique arrasta o polegar).
 
+Aceitar os dois (**A depois B**) escreve as linhas de A e depois as de B sob o marcador do conflito no Resultado, cada uma etiquetada com o seu lado; os selos `1º` / `2º` dos dois trechos dizem a ordem, e `s` a troca:
+
+![Conflito 2 pego dos dois lados: a sua linha de A e a sua linha de B estão marcadas, e o Resultado as mostra uma depois da outra, etiquetadas A e B, enquanto os conflitos 1 e 3 ainda esperam uma escolha](../images/merge-editor-take-both.png)
+
 **Arquivo todo** mostra o arquivo inteiro em A e B com toda diferença colorida, não
 só os conflitos:
 
@@ -81,6 +87,8 @@ O Resultado é um editor de verdade: clique nele e digite, selecione, recorte e 
 busque com `Ctrl+F`. Uma escolha em um conflito que você editou à mão substitui sua
 edição (`Ctrl+Z` a traz de volta). Salvar com um conflito sem nada escolhido, ou
 com uma linha que ainda parece um marcador de conflito, pergunta antes.
+
+![O editor de merge com todos os conflitos tratados: conflito 1 pego de A, conflito 2 dos dois lados, conflito 3 digitado à mão no Resultado (marcado com um lápis e contado como editado), e o botão Salvar e marcar resolvido destacado na barra de ferramentas](../images/merge-editor-output-edited.png)
 
 ### ✦ Sugerir uma resolução (IA)
 
@@ -96,10 +104,24 @@ nenhum desses controles existe.
 
 Depois de **Salvar e marcar resolvido**, o arquivo fica em stage e a lista de
 arquivos em conflito volta; abra o próximo arquivo você mesmo.
-`Ctrl+Z` (ou o botão Desfazer) desfaz o último “marcar como resolvido”. Quando não
+`Ctrl+Z` (ou o botão Desfazer) desfaz o último “marcar como resolvido”.
+
+![Depois de Salvar e marcar resolvido: o aviso diz "Merge em andamento, 1 arquivo em conflito", orbit.rs passou para Arquivos staged e logo.bin é o único arquivo que resta em Arquivos unstaged, marcado com um ! vermelho](../images/conflict-file-resolved.png)
+
+Quando não
 sobra nenhum arquivo, o aviso oferece **Commit do merge** (ou **Continuar** para um
 cherry-pick, um revert ou um rebase) e **Abortar merge**, que pergunta antes: ele
 devolve HEAD, o índice e a árvore de trabalho a onde estavam.
+
+![O aviso quando todos os arquivos estão resolvidos: "Merge em andamento, todos os conflitos resolvidos" com os botões Commit do merge e Abortar merge, e o arquivo resolvido em Arquivos staged](../images/conflict-commit-merge.png)
+
+Um rebase para do mesmo modo, passo a passo. O aviso dele nomeia a branch e sobre o que ela sofre o rebase, e tem **Resolver conflitos...**, **Continuar**, **Pular** e **Abortar**:
+
+![O aviso de um rebase parado em dois conflitos: "Rebase de feature/cleanup sobre ..." com Resolver conflitos..., Continuar, Pular e Abortar, e os dois arquivos em conflito no painel Status](../images/conflict-banner-rebase.png)
+
+Quando o último arquivo está resolvido, o mesmo aviso fica pronto para **Continuar**:
+
+![O aviso do rebase depois de os dois arquivos serem resolvidos: só restam Continuar, Pular e Abortar, e os dois arquivos estão em Arquivos staged](../images/conflict-banner-continue.png)
 
 Um merge cujo resultado é igual a HEAD (você pegou o nosso lado em todo lugar) não
 tem nada em stage nem arquivo alterado, mas ainda pode ser concluído: **Commit do
@@ -129,6 +151,8 @@ stage na hora.
 | Excluído em um lado, alterado no outro | **Manter o arquivo** (`k`), **Aceitar a exclusão** (`Shift+D`) |
 | Resto de renomeação (o caminho existe só em um lado) | **Manter o arquivo** (`k`), **Excluir o arquivo** (`Shift+D`) |
 | Link simbólico, submódulo, modo do arquivo | **Manter A**, **Aceitar B**, **Aceitar Base** |
+
+![O cartão de um arquivo alterado em A e excluído em B: a caixa A mostra o tamanho e o modo do arquivo, a caixa B diz "nenhum arquivo aqui (excluído)", a caixa da base mostra o original, e os botões são Manter o arquivo e Aceitar a exclusão](../images/merge-editor-deleted-card.png)
 
 Quando o arquivo é uma imagem (PNG, JPEG, GIF, WebP, BMP, ICO), as caixas também
 mostram as imagens de A, B e Base, ajustadas e somente leitura, em uma janela larga

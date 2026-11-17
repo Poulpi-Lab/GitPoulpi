@@ -22,6 +22,7 @@ pub mod perf_rewrite;
 pub mod perf_search;
 pub mod perf_tui;
 pub mod pty;
+pub mod run_alone;
 pub mod script;
 pub mod sign;
 pub mod test_failures;

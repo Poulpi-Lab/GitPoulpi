@@ -1,0 +1,22 @@
+# Tests that pass alone but fail under load: `xtask test` runs them one at a
+# time after the parallel phase, with nothing else running.
+#
+#   <crate>::<binary>               a whole test binary (keeps its own thread count)
+#   <crate>::<binary>::<test name>  one test (exact name, as `-- --list` prints it;
+#                                   run with --test-threads=1)
+#
+# Lines starting with `#` are comments; text after ` #` on an entry is a reason.
+# Add a line only for a test that passes alone, and say why. The end-of-run
+# report prints the exact line to add. See docs/developer/testing.md.
+
+# Each starts a fake agent plus a daemon and waits on painted frames; seen
+# red in full-tier runs, green on rerun.
+gitpoulpi-tui::pty_hosting::conversation_ai::a_fake_agent_that_is_not_asked_is_never_called
+gitpoulpi-tui::pty_hosting::conversation_ai::a_follow_up_gives_the_earlier_turns_back_and_refresh_context_drops_them
+gitpoulpi-tui::pty_hosting::conversation_ai::an_agent_without_a_read_only_mode_cannot_be_let_into_the_repository
+gitpoulpi-tui::pty_hosting::conversation_ai::stop_kills_the_agent_and_the_text_stays
+gitpoulpi-tui::pty_hosting::conversation_ai::the_ai_field_drafts_into_the_description_previews_it_and_ctrl_z_restores_the_text
+gitpoulpi-tui::pty_hosting::conversation_ai::the_palette_reaches_write_with_ai_and_refresh_context_over_the_form
+gitpoulpi-tui::pty_hosting::conversation_ai::with_ai_off_the_composer_shows_no_button_and_no_panel
+gitpoulpi-tui::pty_hosting::conversation_ai::with_the_box_ticked_a_local_agent_reads_read_only_and_keeps_its_session
+gitpoulpi-tui::pty_hosting::conversation_ai::with_the_box_ticked_an_api_profile_gets_a_context_that_is_reused_until_refreshed

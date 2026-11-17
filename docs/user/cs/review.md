@@ -10,7 +10,7 @@ schválení a žádosti o změny. Potřebuje profil jednoho z těchto hostitelů
 kontroly nenabízejí. Omezení hostitele se respektují: GitLab nemá rozhodnutí *Požádat o změny* a bere jeden řádek na komentář.
 Tato stránka všem říká *žádost*.
 
-![Pohled kontroly, stránka Přehled: záhlaví žádosti s tlačítky metadat, popis a konverzace s odeslaným schválením](../images/review-overview.png)
+![Pohled kontroly, stránka Přehled: záhlaví žádosti s tlačítky metadat, popis, nevyřešené a vyřešené vlákno ke kódu, komentáře a pole komentáře](../images/review-overview.png)
 
 ![Stránka Soubory: změněné soubory s políčky zobrazeno, diff s vláknem komentářů pod řádkem a vyřešené vlákno mimo zobrazené řádky](../images/review-files.png)
 

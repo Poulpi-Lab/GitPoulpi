@@ -1914,7 +1914,7 @@ Každé tlačítko má klávesový protějšek:
 
 | Tlačítko | Klávesa |
 |---|---|
-| 🐙 vlevo v záhlaví okna (O aplikaci) | `Nápověda: O aplikaci GitPoulpi` v paletě |
+| <img src="../../../assets/logo/gitpoulpi.png" alt="Ikona GitPoulpi" height="16"> vlevo v záhlaví okna (O aplikaci) | `Nápověda: O aplikaci GitPoulpi` v paletě |
 | **Otevřít v** v záhlaví okna | `Alt+O`, `Ctrl+Alt+O` |
 | `×` vpravo v záhlaví okna (ukončit) | `q` |
 | Verze v záhlaví okna (Poznámky k vydání) | `Nápověda: Poznámky k vydání` v paletě |

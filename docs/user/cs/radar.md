@@ -9,7 +9,7 @@ rozpracovanou práci. Je to okno Domů se zobrazením Radar navrchu, aby nic
 pod ním nemohlo ukrást klik ani klávesu.
 
 Potřebuje profil hostitele kódu (viz
-[Hostingové služby a issue trackery](hosting-integration.md)) a repozitáře s ním
+[Hostingové služby a issue trackery](hosting-integration.md); seznamy jednoho repozitáře jsou v [Pull requestech a issues](pull-requests-and-issues.md) a diskuse řádku se otevře jako [konverzace](conversations.md)) a repozitáře s ním
 propojené, nebo profil se zapnutými seznamy za celý účet (viz „Mimo rozsah“ níže).
 Nepropojený repozitář se nikdy nedotazuje: místo toho ukáže řádek
 **Propojit...** (viz „Repozitáře, které mají co říct“ níže).

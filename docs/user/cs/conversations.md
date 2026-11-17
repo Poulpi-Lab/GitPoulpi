@@ -25,6 +25,10 @@ Issue u hostitele, který žádnou ke čtení nemá (Bitbucket a Gerrit issues n
 
 Pohled přes celé okno: záhlaví (stav, kdo ji otevřel a kdy, štítky, počet komentářů, **Zobrazit události**, **Zpět**, **Obnovit**, **Otevřít v prohlížeči**), řádek **Odesíláte jako**, časová osa a pod ní pole komentáře.
 
+![Konverzace issue #7: popis s odkazem na #9, dva komentáře, událost štítku zobrazená přes Zobrazit události a prázdné pole Nový komentář s Psát, Náhled a Vedle sebe](../images/issue-conversation.png)
+
+![Stránka Přehled merge requestu !58: popis, nevyřešené a vyřešené vlákno ke kódu s odkazy na soubor a řádek, komentáře, Odpovědět a Citovat u vybraného vlákna a pole komentáře](../images/pr-conversation.png)
+
 - Časová osa se čte od nejstaršího po nejnovější a začíná nejnovějším oknem (nejvýš 300 záznamů). **Načíst starší** nahoře (`m`, paleta *Konverzace: Načíst starší záznamy*) přečte okno před ním, s počtem toho, co ještě zbývá, když ho hostitel řekne.
 - Komentář ukazuje autora, datum, štítek `upraveno`, štítek `bot` u botů, `interní` u soukromých poznámek a tlačítka **Odpovědět**, **Citovat**, **Upravit**, **Smazat** a **Odkazy**, která vybraný záznam dovoluje. Vlákno ke kódu ukazuje `path:line`, `vyřešeno` nebo `nevyřešeno`, `zastaralé` a své komentáře. Kontrola ukazuje svůj verdikt.
 - Události jsou jeden tlumený řádek každá (*carol přidal(a) štítek lfs*). **Zobrazit události** (`v`) je skryje; volba se uchovává pro každý repozitář. Hostitelé bez historie událostí (YouTrack, pracovní položky Azure DevOps, lokální poznámky) takové políčko nemají.
@@ -53,6 +57,8 @@ Pohled přes celé okno: záhlaví (stav, kdo ji otevřel a kdy, štítky, poče
 ### Psaní
 
 **Nový komentář** (`c`, nebo `Tab` do pole), **Odpovědět** (`r`), **Citovat** (`Q`) a **Upravit** (`e`) používají jediný Markdown editor: **Psát**, **Náhled** a **Vedle sebe** (`Alt+P` přepíná Psát a Náhled, `Alt+L` zapíná Vedle sebe a vyžaduje okno široké 100 sloupců). `Ctrl+Enter` (také `Ctrl+S` a `Alt+Enter`) nebo **Odeslat** odešle, **Zrušit** pole zahodí a `Alt+E` otevře **Napsat pomocí AI**, kde je AI zapnutá ([kapitola o AI](ai.md#pomoc-s-psaním-na-hostiteli)). Náhled vykresluje stejný vykreslovač jako časovou osu, se stejnými odkazy. Když hostitel Markdown nepřijímá, zápatí jmenuje značkování, ve kterém se text odešle (*Odesláno jako Jira wiki markup*, *Odesláno jako Textile*).
+
+![Odpověď na issue psaná v zobrazení Vedle sebe: koncept v Markdownu vlevo, jeho vykreslený náhled vpravo a Odeslat](../images/issue-reply-composer.png)
 
 - Komentář se přidá do časové osy hned a zaujme své místo, když hostitel odpoví. Pokud hostitel odmítne, záznam zmizí a pole se znovu otevře s vaším textem a důvodem.
 - Text, který jste neodeslali, se uchovává pro každou položku (`remote-conversations.toml` ve složce konfigurace) a je tam, až to pole příště otevřete; odeslání nebo zahození ho odstraní. Zavření pole, které obsahuje text, se nejdřív zeptá.

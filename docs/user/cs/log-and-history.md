@@ -193,7 +193,9 @@ zobrazíte **Pop**, **Apply** (ponechat stash) nebo **Drop**.
 dialog, který navrhne složku vedle repozitáře, volitelný název nové větve
 a volbu „Otevřít nový worktree na kartě“. Worktree se objeví v sekci
 WORKTREES; dvojitým kliknutím jej otevřete a jeho karta se sama zavře, když
-je worktree odstraněn.
+je worktree odstraněn. Celá funkce (otevření v jiném nástroji, merge větve
+worktree, odebrání) je v [Worktrees](worktrees.md); sekce SUBMODULES téhož
+panelu je v [Submodulech](submodules.md).
 
 ## Přetahování refs na commity
 

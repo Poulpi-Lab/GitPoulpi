@@ -34,7 +34,9 @@ nebo boční kolečko), nikdy se nezalamují.
 ## Výběr
 
 Každý konflikt je orámovaný blok v A i v B se zaškrtávacím políčkem v záhlaví
-a znakem `+` / `✓` před každým řádkem.
+a znakem `+` / `✓` před každým řádkem. Kliknutím pravým tlačítkem na blok otevřete volby tohoto konfliktu:
+
+![Nabídka po kliknutí pravým tlačítkem na konflikt 2 v editoru merge: Vzít jen A, Vzít jen B, A pak B, B pak A, Nevzít nic, Zrušit výběr, Upravit ve Výstupu a Navrhnout řešení](../images/merge-editor-chunk-menu.png)
 
 | Chcete... | Klávesa | Myš |
 |---|---|---|
@@ -69,6 +71,10 @@ oranžovou, dokud potřebuje volbu, zelenou po vyřízení, modrou u aktuálníh
 Kliknutí na značku na tento konflikt skočí (značka pod jezdcem posuvníku je už
 na obrazovce, takže tam kliknutí jezdec táhne).
 
+Vzetí obou stran (**A pak B**) zapíše do Výstupu pod značku konfliktu nejdřív řádky A a pak řádky B, každé označené svou stranou; štítky `1st` / `2nd` na obou blocích říkají pořadí a `s` ho prohodí:
+
+![Konflikt 2 vzatý z obou stran: jeho řádek A i řádek B jsou zaškrtnuté a Výstup je ukazuje jeden za druhým, označené A a B, zatímco konflikty 1 a 3 stále čekají na volbu](../images/merge-editor-take-both.png)
+
 **Celý soubor** ukáže celý soubor v A a B se všemi rozdíly obarvenými, nejen konflikty:
 
 ![Režim Celý soubor: celý soubor v A a B s obarvenými změnami](../images/merge-editor-full-file.png)
@@ -77,6 +83,8 @@ Výstup je skutečný editor: klikněte do něj a pište, vybírejte, vyjímejte
 hledejte pomocí `Ctrl+F`. Výběr u konfliktu, který jste upravili ručně, vaši úpravu
 nahradí (`Ctrl+Z` ji vrátí). Uložení s konfliktem, u kterého nic není vybráno, nebo
 s řádkem, který stále vypadá jako značka konfliktu, se nejdřív zeptá.
+
+![Editor merge s vyřízenými všemi konflikty: konflikt 1 vzatý z A, konflikt 2 z obou stran, konflikt 3 napsaný ručně ve Výstupu (označený tužkou a započítaný jako upravený) a zvýrazněné tlačítko Uložit a označit jako vyřešené na panelu nástrojů](../images/merge-editor-output-edited.png)
 
 ### ✦ Navrhnout řešení (AI)
 
@@ -92,10 +100,24 @@ ovládacích prvků neexistuje.
 
 Po **Uložit a označit jako vyřešené** je soubor staged a vrátí se seznam souborů
 v konfliktu; další soubor otevřete sami. `Ctrl+Z` (nebo
-tlačítko Zpět) poslední „označení jako vyřešené“ vrátí. Když nezůstane žádný
+tlačítko Zpět) poslední „označení jako vyřešené“ vrátí.
+
+![Po Uložit a označit jako vyřešené: banner hlásí „Probíhá merge, 1 soubor v konfliktu“, orbit.rs se přesunul do Staged souborů a logo.bin je jediný zbylý soubor v Unstaged souborech, označený červeným !](../images/conflict-file-resolved.png)
+
+Když nezůstane žádný
 soubor, banner nabídne **Commit merge** (nebo **Pokračovat** u cherry-picku,
 revertu či rebase) a **Přerušit merge**, které se nejdřív zeptá: vrátí HEAD,
 index a pracovní strom do původního stavu.
+
+![Banner, když je každý soubor vyřešen: „Probíhá merge, všechny konflikty vyřešeny“ s tlačítky Commit merge a Přerušit merge a vyřešený soubor v Staged souborech](../images/conflict-commit-merge.png)
+
+Rebase se zastaví stejně, krok za krokem. Jeho banner uvádí větev a na co se přeskládává a má **Vyřešit konflikty...**, **Pokračovat**, **Přeskočit** a **Přerušit**:
+
+![Banner rebase zastaveného na dvou konfliktech: „Rebasing feature/cleanup onto ...“ s Vyřešit konflikty..., Pokračovat, Přeskočit a Přerušit a dva soubory v konfliktu v panelu Stav](../images/conflict-banner-rebase.png)
+
+Jakmile je poslední soubor vyřešen, týž banner je připraven k **Pokračovat**:
+
+![Banner rebase po vyřešení obou souborů: zůstávají jen Pokračovat, Přeskočit a Přerušit a oba soubory jsou v Staged souborech](../images/conflict-banner-continue.png)
 
 Merge, jehož výsledek se rovná HEAD (všude jste vzali naši stranu), nemá nic
 staged ani žádný změněný soubor, a přesto ho lze dokončit: **Commit merge**
@@ -125,6 +147,8 @@ do indexu.
 | Smazáno na jedné straně, změněno na druhé | **Ponechat soubor** (`k`), **Přijmout smazání** (`Shift+D`) |
 | Pozůstatek přejmenování (cesta existuje jen na jedné straně) | **Ponechat soubor** (`k`), **Smazat soubor** (`Shift+D`) |
 | Symbolický odkaz, submodul, režim souboru | **Ponechat A**, **Vzít B**, **Vzít Základ** |
+
+![Karta souboru změněného v A a smazaného v B: políčko A ukazuje velikost a režim souboru, políčko B hlásí „no file here (deleted)“, políčko základu ukazuje originál a tlačítka jsou Ponechat soubor a Přijmout smazání](../images/merge-editor-deleted-card.png)
 
 Když je soubor obrázek (PNG, JPEG, GIF, WebP, BMP, ICO), políčka ukážou také
 obrázky A, B a Základ, přizpůsobené a jen pro čtení, v dostatečně širokém okně;

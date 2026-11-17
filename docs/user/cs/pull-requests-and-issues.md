@@ -35,6 +35,8 @@ rozbalovacími seznamy: vyhledávací pole, rozbalovací seznam stavu (*Otevřen
 `ABC-12  title`, přičemž typ a stav jsou ztlumeny, je-li postranní panel dost
 široký.
 
+![Sekce ISSUES v postranním panelu s otevřenou nabídkou po kliknutí pravým tlačítkem na issue #7, první je Otevřít konverzaci](../images/issues-sidebar.png)
+
 ### Akce na řádku
 
 - `Enter` nebo dvojklik otevře řádek: pull request v [kontrole](review.md) (GitHub, GitLab, Gitea, Forgejo, Gerrit), issue a žádost na Azure DevOps nebo Bitbucketu jako [konverzaci](conversations.md) v okně a cokoli jiného ve vašem prohlížeči. **Otevřít v prohlížeči** v nabídce řádku vždy otevře prohlížeč.

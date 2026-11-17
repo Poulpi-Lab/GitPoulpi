@@ -109,7 +109,7 @@ den aktuellen Tab.
 Ordner ein neues Repository.
 In allen drei Dialogen (und in der Ordnerauswahl, die sie öffnen) zeigt `Ctrl+N` ein Badge an jedem Feld und jeder Schaltfläche: Drücken Sie das Zeichen, um den Cursor in das Feld zu setzen oder die Schaltfläche zu drücken.
 
-| ![Der Klonen-Dialog: wohin geklont wird, die URL, der Ordnername und die Schaltfläche Klonen](../images/clone.png) | ![Der Dialog Repository initialisieren: der Ordner, der Name und der Start-Branch](../images/init.png) |
+| ![Der Klonen-Dialog: wohin geklont wird, die URL, der Ordnername sowie die Schaltflächen Abbrechen und Klonen](../images/clone.png) | ![Der Dialog Repository initialisieren: der Ordner, der Name und der Start-Branch](../images/init.png) |
 |---|---|
 
 ### Sparse Checkout

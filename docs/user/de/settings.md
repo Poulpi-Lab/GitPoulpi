@@ -141,7 +141,7 @@ jeder Seite. Klicken Sie hinein oder drücken Sie `/` oder `Ctrl+F` und tippen S
 Eine Trefferliste klappt auf. Jeder Treffer zeigt die Option und ihre Seite. `Up` /
 `Down` wählen, `Enter` springt zur Option, `Esc` schließt die Liste.
 
-![Suche nach „diff“ in den Einstellungen: die passenden Optionen der Seiten Verlauf & Graph, Diff & Editor und Git](../images/settings-search.png)
+![Suche nach „diff“ in den Einstellungen: die passenden Optionen der Seiten KI und Diff & Editor](../images/settings-search.png)
 
 ## Einstellungen über die Befehlspalette
 
@@ -220,7 +220,7 @@ Logofarbe (Über GitPoulpi > Farbe); unter Linux hat jede Farbe ihren eigenen Sy
 
 **Gruppierung in Taskleiste und Dock.** GitPoulpi läuft in einem Terminalfenster, daher zeigt die Taskleiste es normalerweise unter dem Symbol des Terminals, ohne „läuft“-Punkt unter dem angehefteten GitPoulpi-Symbol. Windows: Die Verknüpfungen tragen die AppUserModelID `GitPoulpi.GitPoulpi`, und ein von ihnen gestartetes GitPoulpi gibt seinem Terminalfenster dieselbe ID und sein Symbol (es findet das Fenster, indem es ihm kurz einen eindeutigen Titel gibt, und stellt den Titel danach wieder her), sodass das Fenster unter dem angehefteten GitPoulpi-Symbol erscheint. Ein Terminalfenster mit mehreren Tabs wird als Ganzes behandelt: Alle seine Tabs werden unter dem GitPoulpi-Symbol gruppiert, solange GitPoulpi darin läuft. Früher angelegte Verknüpfungen und Taskleisten-Anheftungen werden von derselben Synchronisierung neu geschrieben; zeigt eine Anheftung noch das Terminal-Symbol, lösen Sie sie und heften Sie sie erneut an. Linux: kitty, foot, Alacritty, WezTerm und Ghostty werden mit der Fensterklasse `gitpoulpi` gestartet, und der `.desktop`-Eintrag nennt sie (`StartupWMClass`), sodass ein Dock das Fenster unter dem Symbol des Starters gruppiert; andere Terminals behalten ihr eigenes Symbol. macOS: Nichts zu tun, das Dock gruppiert nach App.
 
-![Einstellungen > Starter: das Terminal für Verknüpfungen und die Zeile des App-Starters](../images/settings-launcher.png)
+![Einstellungen > Starter: das Terminal für Verknüpfungen, Starter-Build, Befehls- und Tab-Alias, Alias-Status und die PATH-Prüfung](../images/settings-launcher.png)
 
 #### Befehlsalias und PATH je nach System
 
@@ -420,7 +420,7 @@ den Server enthalten; siehe [MCP und Agenten](mcp-and-agents.md).
 
 ### Darstellung
 
-![Die Seite Darstellung: Design, Avatare, Eingabefarbe, Farbtiefe und Graph-Farben (die Datumsformate folgen weiter unten)](../images/settings-ui.png)
+![Die Seite Darstellung, nach unten gescrollt: Avatarquellen und Ersatz, Eingabefarbe, Farbtiefe, Textcursor und der Anfang der Graph-Farben (die Datumsformate folgen weiter unten)](../images/settings-ui.png)
 
 ![Die Dropdownliste Design geöffnet auf Darstellung mit hervorgehobenem Hell: Der ganze Einstellungsbildschirm ist bereits in diesem Design gemalt](../images/settings-appearance-theme.png)
 

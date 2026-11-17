@@ -112,8 +112,8 @@ prefiksem (`Ctrl+G s`).
 | `git_prefix` | `lfs_push_all` | LFS: Push wszystkich obiektów | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS: Wyczyść lokalne obiekty | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | Otwórz warsztat przepisywania historii | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | Zwiń lub przywróć panel Refs | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | Zwiń lub przywróć panel Status | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | Zwiń lub przywróć panel Refs | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | Zwiń lub przywróć panel Status | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | Otwórz ustawienia | `Ctrl+N ,` |
 | `nav_prefix` | `about` | Otwórz „O programie” | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | Otwórz Dziennik aktywności | `Ctrl+N Shift+A` |
@@ -121,11 +121,11 @@ prefiksem (`Ctrl+G s`).
 | `nav_prefix` | `jobs` | Pokaż zadania w tle | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | Pokaż panel aktualizacji | `Ctrl+N u` |
 | `nav_prefix` | `help` | Przełącz pomoc | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | Wybierz kartę | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | Zmień motyw | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | Zmień język | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | Zmień motyw kolorów grafu | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | Przełącz zabarwienie wierszy grafu | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | Wybierz kartę | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | Zmień motyw | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | Zmień język | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | Zmień motyw kolorów grafu | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | Przełącz zabarwienie wierszy grafu | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | Powiększ sekcję Refs | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | Pomniejsz sekcję Refs | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | Powiększ blok opisu commita | `Ctrl+N ]` |
@@ -502,12 +502,12 @@ zastosowania. Klawisze są domyślne.
 | Nawigacja: Przejdź do następnego panelu | `Tab` |
 | Nawigacja: Przejdź do poprzedniego panelu | `Shift+Tab` |
 | Nawigacja: Szukaj commitów... | `f` |
-| Nawigacja: Zwiń/rozwiń panel Refs | `Ctrl+N h` |
+| Nawigacja: Zwiń/rozwiń panel Refs | `Ctrl+N H` |
 | Nawigacja: Poszerz panel Refs | `Ctrl+N Right` |
 | Nawigacja: Zwęź panel Refs | `Ctrl+N Left` |
 | Nawigacja: Poszerz panel Status | `Ctrl+N Shift+Left` |
 | Nawigacja: Zwęź panel Status | `Ctrl+N Shift+Right` |
-| Nawigacja: Zwiń/rozwiń panel Status | `Ctrl+N l` |
+| Nawigacja: Zwiń/rozwiń panel Status | `Ctrl+N L` |
 | Nawigacja: Powiększ sekcję Refs | `Ctrl+N +` |
 | Nawigacja: Pomniejsz sekcję Refs | `Ctrl+N -` |
 | Nawigacja: Resetuj rozmiary sekcji Refs |  |
@@ -1236,8 +1236,8 @@ zastosowania. Klawisze są domyślne.
 | Aplikacja: Motyw... |  |
 | Konflikty: Edytuj listy gałęzi bazowych... |  |
 | Konflikty: Gałęzie bazowe tego repozytorium... |  |
-| Aplikacja: Zmień motyw... | `Ctrl+N y` |
-| Aplikacja: Zmień język... | `Ctrl+N g` |
+| Aplikacja: Zmień motyw... | `Ctrl+N t` |
+| Aplikacja: Zmień język... | `Ctrl+N l` |
 | Uruchamianie: Utwórz skrót |  |
 | Uruchamianie: Utwórz skrót na pulpicie |  |
 | Uruchamianie: Usuń skróty |  |
@@ -1247,8 +1247,8 @@ zastosowania. Klawisze są domyślne.
 | Uruchamianie: Usuń z PATH |  |
 | Uruchamianie: Zainstaluj menu Otwórz w GitPoulpi |  |
 | Uruchamianie: Usuń menu Otwórz w GitPoulpi |  |
-| Aplikacja: Zmień motyw kolorów grafu... | `Ctrl+N Y` |
-| Aplikacja: Przełącz zabarwienie wierszy grafu | `Ctrl+N T` |
+| Aplikacja: Zmień motyw kolorów grafu... | `Ctrl+N T` |
+| Aplikacja: Przełącz zabarwienie wierszy grafu | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## Poruszanie się
@@ -1366,14 +1366,14 @@ przyjmuje. Następny klawisz uruchamia akcję albo anuluje.
 | Klawisz | Działanie |
 |---|---|
 | `Ctrl+N` potem plakietka | Fokus na części okna, która pokazuje tę plakietkę |
-| `Ctrl+N h` / `Ctrl+N l` | Zwija lub przywraca panel Refs / prawy panel |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | Zwija lub przywraca panel Refs / prawy panel |
 | `Ctrl+N Left` / `Ctrl+N Right` | Przesuwa separator między panelem Refs a Log o jeden krok w lewo / w prawo (zwinięty panel Refs wraca najpierw) |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | Przesuwa separator między Log a prawym panelem o jeden krok w lewo / w prawo |
 | `Ctrl+N +` / `Ctrl+N -` | Powiększa / zmniejsza aktywną sekcję Refs o jeden wiersz |
 | `Ctrl+N ]` / `Ctrl+N [` | Powiększa / zmniejsza blok opisu commita w prawym panelu o jeden wiersz |
-| `Ctrl+N t` | Wybiera kartę (selektor kart; samo `t` robi to samo) |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | Zmienia motyw / język / motyw kolorów grafu |
-| `Ctrl+N Shift+T` | Włącza lub wyłącza odcienie wierszy grafu |
+| `Ctrl+N Tab` | Wybiera kartę (selektor kart; samo `t` robi to samo) |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | Zmienia motyw / język / motyw kolorów grafu |
+| `Ctrl+N Shift+Y` | Włącza lub wyłącza odcienie wierszy grafu |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | Pokazuje widok przygotowany przez agenta / wraca (zob. [MCP i agenci](mcp-and-agents.md)) |
 | `Ctrl+N ,` | Otwiera Ustawienia |
 | `Ctrl+N ?` | Otwiera lub zamyka pomoc |

@@ -90,7 +90,7 @@ fn a_disabled_radar_has_no_tab_no_command_and_no_key() {
     assert!(!bar(&screen).contains("Radar"));
     // The tab picker lists repositories only.
     term.send_keys("C-n").unwrap();
-    term.send_text("t").unwrap();
+    term.send_keys("Tab").unwrap();
     term.wait_for("the tab picker", STEP, |s| s.contains("Select Tab"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(!term.screen().text().contains("Radar"));

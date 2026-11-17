@@ -1,5 +1,5 @@
 //! Reordering repository tabs by dragging: from the tab bar, and from the
-//! rows of the tab picker (`Ctrl+N t`).
+//! rows of the tab picker (`Ctrl+N Tab`).
 //!
 //! The keyboard twins are the picker's `Alt+Up/Down` and the palette's
 //! `Tab: Move Left/Right`; all three end in `tabs::reorder_tab`.

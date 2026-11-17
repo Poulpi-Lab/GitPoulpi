@@ -111,8 +111,8 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `git_prefix` | `lfs_push_all` | LFS: Push All Objects | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS: Prune Local Objects | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | Open the History Rewrite Workbench | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | Collapse or Restore Refs Pane | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | Collapse or Restore Status Pane | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | Collapse or Restore Refs Pane | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | Collapse or Restore Status Pane | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | Open Settings | `Ctrl+N ,` |
 | `nav_prefix` | `about` | Open About | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | Open the Activity Log | `Ctrl+N Shift+A` |
@@ -120,11 +120,11 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `nav_prefix` | `jobs` | Show the Background Jobs | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
 | `nav_prefix` | `help` | Toggle Help | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | Select Tab | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | Change Theme | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | Change Language | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | Change Graph Color Theme | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | Toggle Graph Row Tints | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | Select Tab | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | Change Theme | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | Change Language | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | Change Graph Color Theme | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | Toggle Graph Row Tints | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | Grow Refs Section | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | Shrink Refs Section | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | Grow Commit Message Block | `Ctrl+N ]` |
@@ -503,12 +503,12 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Navigation: Cycle Focus to Next Pane | `Tab` |
 | Navigation: Cycle Focus to Previous Pane | `Shift+Tab` |
 | Navigation: Search Commits... | `f` |
-| Navigation: Toggle Refs Pane Collapsed | `Ctrl+N h` |
+| Navigation: Toggle Refs Pane Collapsed | `Ctrl+N H` |
 | Navigation: Widen Refs Pane | `Ctrl+N Right` |
 | Navigation: Narrow Refs Pane | `Ctrl+N Left` |
 | Navigation: Widen Status Pane | `Ctrl+N Shift+Left` |
 | Navigation: Narrow Status Pane | `Ctrl+N Shift+Right` |
-| Navigation: Toggle Status Pane Collapsed | `Ctrl+N l` |
+| Navigation: Toggle Status Pane Collapsed | `Ctrl+N L` |
 | Navigation: Grow Refs Section | `Ctrl+N +` |
 | Navigation: Shrink Refs Section | `Ctrl+N -` |
 | Navigation: Reset Refs Section Sizes |  |
@@ -1237,8 +1237,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | App: Theme... |  |
 | Conflicts: Edit Base Branch Lists... |  |
 | Conflicts: Base Branches of This Repository... |  |
-| App: Change Theme... | `Ctrl+N y` |
-| App: Change Language... | `Ctrl+N g` |
+| App: Change Theme... | `Ctrl+N t` |
+| App: Change Language... | `Ctrl+N l` |
 | Launcher: Create Shortcut |  |
 | Launcher: Create Desktop Shortcut |  |
 | Launcher: Remove Shortcuts |  |
@@ -1248,8 +1248,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Launcher: Remove from PATH |  |
 | Launcher: Install Open in GitPoulpi Menu |  |
 | Launcher: Remove Open in GitPoulpi Menu |  |
-| App: Change Graph Color Theme... | `Ctrl+N Y` |
-| App: Toggle Graph Row Tints | `Ctrl+N T` |
+| App: Change Graph Color Theme... | `Ctrl+N T` |
+| App: Toggle Graph Row Tints | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## Moving around
@@ -1366,14 +1366,14 @@ next key runs an action, or cancels.
 | Key | Action |
 |---|---|
 | `Ctrl+N` then a badge | Focus the part of the window that shows this badge |
-| `Ctrl+N h` / `Ctrl+N l` | Collapse or restore the Refs pane / the right pane |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | Collapse or restore the Refs pane / the right pane |
 | `Ctrl+N Left` / `Ctrl+N Right` | Move the divider between the Refs pane and the Log one notch left / right (a collapsed Refs pane comes back first) |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | Move the divider between the Log and the right pane one notch left / right |
 | `Ctrl+N +` / `Ctrl+N -` | Grow / shrink the active Refs section by one row |
 | `Ctrl+N ]` / `Ctrl+N [` | Grow / shrink the commit message block of the right pane by one row |
-| `Ctrl+N t` | Choose a tab (the tab picker; `t` alone does the same) |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | Change the theme / the language / the graph color theme |
-| `Ctrl+N Shift+T` | Turn the graph row tints on or off |
+| `Ctrl+N Tab` | Choose a tab (the tab picker; `t` alone does the same) |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | Change the theme / the language / the graph color theme |
+| `Ctrl+N Shift+Y` | Turn the graph row tints on or off |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | Show the view an agent prepared / go back (see [MCP and agents](mcp-and-agents.md)) |
 | `Ctrl+N ,` | Open Settings |
 | `Ctrl+N ?` | Open or close the help |

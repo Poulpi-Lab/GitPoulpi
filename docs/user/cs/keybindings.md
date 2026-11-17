@@ -112,8 +112,8 @@ předponou (`Ctrl+G s`).
 | `git_prefix` | `lfs_push_all` | LFS: Push všech objektů | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS: Vyčistit lokální objekty | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | Otevřít nástroj pro přepis historie | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | Sbalit nebo obnovit panel Refs | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | Sbalit nebo obnovit panel Stav | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | Sbalit nebo obnovit panel Refs | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | Sbalit nebo obnovit panel Stav | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | Otevřít nastavení | `Ctrl+N ,` |
 | `nav_prefix` | `about` | Otevřít „O aplikaci“ | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | Otevřít Protokol aktivity | `Ctrl+N Shift+A` |
@@ -121,11 +121,11 @@ předponou (`Ctrl+G s`).
 | `nav_prefix` | `jobs` | Zobrazit úlohy na pozadí | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | Zobrazit panel aktualizací | `Ctrl+N u` |
 | `nav_prefix` | `help` | Přepnout nápovědu | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | Vybrat kartu | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | Změnit motiv | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | Změnit jazyk | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | Změnit barevný motiv grafu | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | Přepnout zbarvení řádků grafu | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | Vybrat kartu | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | Změnit motiv | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | Změnit jazyk | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | Změnit barevný motiv grafu | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | Přepnout zbarvení řádků grafu | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | Zvětšit sekci Refs | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | Zmenšit sekci Refs | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | Zvětšit blok zprávy commitu | `Ctrl+N ]` |
@@ -503,12 +503,12 @@ Klávesy jsou výchozí.
 | Navigace: Fokus na další panel | `Tab` |
 | Navigace: Fokus na předchozí panel | `Shift+Tab` |
 | Navigace: Hledat commity... | `f` |
-| Navigace: Sbalit/rozbalit panel Refs | `Ctrl+N h` |
+| Navigace: Sbalit/rozbalit panel Refs | `Ctrl+N H` |
 | Navigace: Rozšířit panel Refs | `Ctrl+N Right` |
 | Navigace: Zúžit panel Refs | `Ctrl+N Left` |
 | Navigace: Rozšířit panel Stav | `Ctrl+N Shift+Left` |
 | Navigace: Zúžit panel Stav | `Ctrl+N Shift+Right` |
-| Navigace: Sbalit/rozbalit panel Stav | `Ctrl+N l` |
+| Navigace: Sbalit/rozbalit panel Stav | `Ctrl+N L` |
 | Navigace: Zvětšit sekci Refs | `Ctrl+N +` |
 | Navigace: Zmenšit sekci Refs | `Ctrl+N -` |
 | Navigace: Obnovit velikosti sekcí Refs |  |
@@ -1237,8 +1237,8 @@ Klávesy jsou výchozí.
 | Aplikace: Motiv... |  |
 | Konflikty: Upravit seznamy základních větví... |  |
 | Konflikty: Základní větve tohoto repozitáře... |  |
-| Aplikace: Změnit motiv... | `Ctrl+N y` |
-| Aplikace: Změnit jazyk... | `Ctrl+N g` |
+| Aplikace: Změnit motiv... | `Ctrl+N t` |
+| Aplikace: Změnit jazyk... | `Ctrl+N l` |
 | Spouštěč: Vytvořit zástupce |  |
 | Spouštěč: Vytvořit zástupce na ploše |  |
 | Spouštěč: Odebrat zástupce |  |
@@ -1248,8 +1248,8 @@ Klávesy jsou výchozí.
 | Spouštěč: Odebrat z PATH |  |
 | Spouštěč: Nainstalovat nabídku Otevřít v GitPoulpi |  |
 | Spouštěč: Odebrat nabídku Otevřít v GitPoulpi |  |
-| Aplikace: Změnit barevný motiv grafu... | `Ctrl+N Y` |
-| Aplikace: Přepnout zbarvení řádků grafu | `Ctrl+N T` |
+| Aplikace: Změnit barevný motiv grafu... | `Ctrl+N T` |
+| Aplikace: Přepnout zbarvení řádků grafu | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## Pohyb po aplikaci
@@ -1365,14 +1365,14 @@ Další klávesa provede akci, nebo zruší.
 | Klávesa | Akce |
 |---|---|
 | `Ctrl+N`, poté odznak | Zaostřit část okna, která ukazuje tento odznak |
-| `Ctrl+N h` / `Ctrl+N l` | Sbalit nebo obnovit panel Refs / pravý panel |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | Sbalit nebo obnovit panel Refs / pravý panel |
 | `Ctrl+N +` / `Ctrl+N -` | Zvětšit / zmenšit aktivní sekci Refs o jeden řádek |
 | `Ctrl+N ]` / `Ctrl+N [` | Zvětšit / zmenšit blok zprávy commitu v pravém panelu o jeden řádek |
 | `Ctrl+N Left` / `Ctrl+N Right` | Posunout dělič mezi panelem Refs a Logem o krok doleva / doprava (sbalený panel Refs se nejdřív vrátí) |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | Posunout dělič mezi Logem a pravým panelem o krok doleva / doprava |
-| `Ctrl+N t` | Zvolit kartu (výběr karty; samotné `t` dělá totéž) |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | Změnit motiv / jazyk / barevný motiv grafu |
-| `Ctrl+N Shift+T` | Zapnout nebo vypnout zbarvení řádků grafu |
+| `Ctrl+N Tab` | Zvolit kartu (výběr karty; samotné `t` dělá totéž) |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | Změnit motiv / jazyk / barevný motiv grafu |
+| `Ctrl+N Shift+Y` | Zapnout nebo vypnout zbarvení řádků grafu |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | Ukázat zobrazení, které agent připravil / vrátit se (viz [MCP a agenti](mcp-and-agents.md)) |
 | `Ctrl+N ,` | Otevřít Nastavení |
 | `Ctrl+N ?` | Otevřít nebo zavřít nápovědu |

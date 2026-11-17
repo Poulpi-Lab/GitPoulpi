@@ -112,7 +112,7 @@ w stanie, w jakim były (strona, pozycja przewijania i niezapisane zmiany Przep�
 pracy lub szablonów zostają):
 
 - paleta poleceń (`Ctrl+P`),
-- wybór motywu (`Ctrl+N y`, **Aplikacja: Zmień motyw...**), który pokazuje każdy
+- wybór motywu (`Ctrl+N t`, **Aplikacja: Zmień motyw...**), który pokazuje każdy
   motyw podglądem na samych Ustawieniach; `Esc` przywraca poprzedni motyw,
 - wybór języka i kolorów grafu (`Ctrl+N`, potem te same litery co w oknie głównym),
 - wyszukiwanie w obszarze roboczym (`Ctrl+Alt+F`),
@@ -181,7 +181,7 @@ Lista stron ma dwie grupy:
 | **Pokaż czas trwania operacji**, **Rozszerzone logowanie** | Karta Operacje git Dziennika aktywności: czas trwania każdej operacji (`log.timings`, domyślnie włączone) oraz praca w tle, odświeżanie i auto-fetch (`log.extended`, domyślnie wyłączone). Zob. [Gdy coś się nie powiedzie](troubleshooting.md#dziennik-aktywności). |
 | **Cofanie włączone**, **Głębokość historii cofania**, **Zapisuj zmiany wykonane poza GitPoulpi** | Grupa **Historia cofania**. Włącza lub wyłącza Cofanie i ustawia, ile operacji zachowuje (domyślnie 100, `0` oznacza bez limitu). Wyłączenie Cofania kasuje historię cofania, po potwierdzeniu. Ostatnia opcja zapisuje też to, co powłoka lub agent robi z gałęziami, tagami, stashami i HEAD. Zob. [Cofnij i ponów](undo-redo.md). |
 
-Polecenie palety **Aplikacja: Zmień język...** (`Ctrl+N g`) otwiera tę samą
+Polecenie palety **Aplikacja: Zmień język...** (`Ctrl+N l`) otwiera tę samą
 listę języków. Wyróżniony język jest tam podglądany na żywo; `Enter` go zachowuje,
 a `Esc` przywraca poprzedni.
 
@@ -431,7 +431,7 @@ punkt końcowy HTTP. Wiersze MCP są widoczne tylko w kompilacjach zawierającyc
 | **Kolor pól tekstowych**, **Własny kolor pól tekstowych** | Tło pól tekstowych: **Zgodnie z motywem** (domyślnie), stały ciemny kolor albo własny `#rrggbb`. |
 | **Kursor tekstowy** | `ui.text_cursor`: **terminal** (domyślnie) ustawia własny kursor terminala w miejscu karetki aktywnego pola tekstowego, jako pionową kreskę (obowiązują ustawienia kursora Twojego terminala, a okno kandydatów metody wprowadzania otwiera się przy karetce); **drawn** rysuje własną karetkę GitPoulpi i zostawia kursor terminala ukryty. Działa od razu. Paleta: `Ustawienia: Kursor tekstowy...`. |
 | **Głębia kolorów** | **auto** (domyślnie), **truecolor**, **256** lub **16**. Zob. [Motywy](themes.md). |
-| **Motyw kolorów grafu** | **Zgodnie z motywem** (domyślnie: własne kolory ścieżek motywu) lub dowolna paleta ścieżek. Każda paleta pokazuje kilka swoich kolorów. Zmiana obowiązuje po zamknięciu Ustawień. Polecenie palety **Aplikacja: Zmień motyw kolorów grafu...** (`Ctrl+N Shift+Y`) podgląda każdą paletę na żywo. |
+| **Motyw kolorów grafu** | **Zgodnie z motywem** (domyślnie: własne kolory ścieżek motywu) lub dowolna paleta ścieżek. Każda paleta pokazuje kilka swoich kolorów. Zmiana obowiązuje po zamknięciu Ustawień. Polecenie palety **Aplikacja: Zmień motyw kolorów grafu...** (`Ctrl+N Shift+T`) podgląda każdą paletę na żywo. |
 | **Tło ścieżek grafu** | **Wył.** (przezroczyste) lub **Podbarwienie wiersza**: delikatny pas koloru ścieżki za kolumną grafu, z cienkim paskiem na brzegu. |
 | **Intensywność podbarwienia** | Jak blady jest pas podbarwienia: **Mocne**, **Średnie** (domyślnie) lub **Subtelne**. Pasek na brzegu zachowuje pełny kolor. |
 | **Położenie paska narzędzi** | `ui.toolbar_position`: Gdzie leży pasek narzędzi: U góry, Na dole (domyślnie), Po lewej lub Po prawej. Po lewej i Po prawej robią z niego kolumnę obok paneli; w oknie węższym niż 80 kolumn jest rysowany na dole. Działa od razu. |

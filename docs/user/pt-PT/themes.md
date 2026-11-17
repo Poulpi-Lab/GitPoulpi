@@ -323,7 +323,7 @@ anterior e não guarda nada. A entrada da paleta **Aplicação: tema...**
 
 ### Mudar de tema a partir da paleta
 
-**Aplicação: mudar tema...** (`Ctrl+P`, ou `Ctrl+N y`; a tecla pode ser
+**Aplicação: mudar tema...** (`Ctrl+P`, ou `Ctrl+N t`; a tecla pode ser
 reatribuída como `nav_prefix.change_theme`) abre uma lista dos mesmos temas sem
 passar pelas Definições: **Sistema (segue o terminal)**, as predefinições,
 depois os seus próprios ficheiros de tema, cada um com quatro pequenos chips de

@@ -29,7 +29,7 @@ ett spår bredvid commiten de gjordes på.
 
 Spårfärgerna kommer från temat. *Inställningar > Utseende > Färgtema för
 grafen* kombinerar vilket tema som helst med vilken spårpalett som helst, och
-palettens väljare *App: Byt färgtema för grafen...* (`Ctrl+N Shift+Y`)
+palettens väljare *App: Byt färgtema för grafen...* (`Ctrl+N Shift+T`)
 förhandsvisar varje palett direkt; se [Teman](themes.md). *Bakgrund för
 grafspår* inställd på **Radfärg** målar ett svagt band i spårfärgen bakom
 grafkolumnen och en tunn stapel vid dess kant. *Styrka på radfärgning*

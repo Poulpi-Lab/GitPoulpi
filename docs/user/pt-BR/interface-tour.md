@@ -120,7 +120,7 @@ mantém ali, para soltá-la depois das abas visíveis. `Ctrl+N` coloca um distin
   **SSH e credenciais...** e **Checkout parcial...**.
 - `Ctrl+PageUp` e `Ctrl+PageDown` alternam entre as abas. `Ctrl+W` fecha a aba
   atual. Um clique com o botão do meio em uma aba também a fecha (com a mesma pergunta).
-- `t` (ou `Ctrl+N t`) abre o seletor de abas, uma lista pesquisável das abas
+- `t` (ou `Ctrl+N Tab`) abre o seletor de abas, uma lista pesquisável das abas
   abertas.
 - **Reordenar abas:** pressione uma aba de repositório e arraste para o lado (um fantasma
   da aba acompanha o ponteiro e uma barra mostra onde ela vai cair; `Esc` cancela), ou
@@ -247,10 +247,10 @@ entre duas seções para redimensioná-las.
 Passe o mouse sobre uma linha para mostrar seus botões: ocultar ou mostrar a ref no Log, e **Solo**
 (mostrar só os commits dessa ref). Dê um clique duplo em uma branch local ou em uma tag para fazer
 checkout. Clique com o botão direito em uma linha para ver seu menu. O `‹` no título da barra lateral recolhe
-a barra lateral (`Ctrl+N h`).
+a barra lateral (`Ctrl+N Shift+H`).
 
-Os dois painéis laterais (a barra lateral Refs, `Ctrl+N h`, e o painel da direita,
-`Ctrl+N l`) pertencem ao Log: mostrar ou recolher um deles enquanto um diff, uma
+Os dois painéis laterais (a barra lateral Refs, `Ctrl+N Shift+H`, e o painel da direita,
+`Ctrl+N Shift+L`) pertencem ao Log: mostrar ou recolher um deles enquanto um diff, uma
 visualização de arquivo ou o editor está aberto vale só para essa visualização. Um diff ou uma
 visualização de arquivo também recolhe sozinho a barra lateral Refs, para dar espaço ao conteúdo. De volta
 ao Log, os dois painéis estão como você os deixou lá, e esse é o estado salvo para a próxima inicialização.

@@ -112,7 +112,7 @@ chaque flèche active.
   **Copier le chemin**, **Ouvrir dans ›**, **SSH et identifiants...** et **Extraction partielle...**.
 - `Ctrl+PageUp` et `Ctrl+PageDown` changent d'onglet. `Ctrl+W` ferme l'onglet
   courant. Un clic du milieu sur un onglet le ferme aussi (avec la même question).
-- `t` (ou `Ctrl+N t`) ouvre le sélecteur d'onglets, une liste filtrable des
+- `t` (ou `Ctrl+N Tab`) ouvre le sélecteur d'onglets, une liste filtrable des
   onglets ouverts.
 - **Réordonner les onglets :** appuyez sur un onglet de dépôt et faites-le glisser
   sur le côté (un fantôme de l'onglet suit le pointeur et une barre montre où il
@@ -237,9 +237,9 @@ la bordure entre deux sections pour les redimensionner.
 Survolez une ligne pour afficher ses boutons : masquer ou afficher la ref dans
 le Log, et **Solo** (n'afficher que les commits de cette ref). Double-cliquez sur
 une branche locale ou un tag pour l'extraire. Clic droit sur une ligne pour son
-menu. Le `‹` du titre du volet le replie (`Ctrl+N h`).
+menu. Le `‹` du titre du volet le replie (`Ctrl+N Shift+H`).
 
-Les deux volets latéraux (le panneau Refs, `Ctrl+N h`, et le volet de droite, `Ctrl+N l`) appartiennent au Log : en afficher ou en replier un pendant qu'un diff, une vue fichier ou l'éditeur est ouvert ne vaut que pour cette vue. Un diff ou une vue fichier replie aussi le panneau Refs de lui-même, pour laisser de la place au contenu. De retour dans le Log, les deux volets sont comme vous les y aviez laissés, et c'est cet état qui est enregistré pour le prochain lancement.
+Les deux volets latéraux (le panneau Refs, `Ctrl+N Shift+H`, et le volet de droite, `Ctrl+N Shift+L`) appartiennent au Log : en afficher ou en replier un pendant qu'un diff, une vue fichier ou l'éditeur est ouvert ne vaut que pour cette vue. Un diff ou une vue fichier replie aussi le panneau Refs de lui-même, pour laisser de la place au contenu. De retour dans le Log, les deux volets sont comme vous les y aviez laissés, et c'est cet état qui est enregistré pour le prochain lancement.
 
 ## Le Log (au centre)
 

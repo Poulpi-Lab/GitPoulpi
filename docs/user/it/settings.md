@@ -115,7 +115,7 @@ restituiscono com'erano (la pagina, la posizione di scorrimento e le modifiche n
 salvate al Workflow o ai modelli restano):
 
 - la palette dei comandi (`Ctrl+P`),
-- il selettore del tema (`Ctrl+N y`, **App: Cambia tema...**), che mostra l'anteprima
+- il selettore del tema (`Ctrl+N t`, **App: Cambia tema...**), che mostra l'anteprima
   di ogni tema sulle Impostazioni stesse; `Esc` rimette il tema precedente,
 - i selettori della lingua e dei colori del grafo (`Ctrl+N` poi le stesse lettere
   della finestra principale),
@@ -185,7 +185,7 @@ L'elenco delle pagine ha due gruppi:
 | **Mostra la durata delle operazioni**, **Registrazione estesa** | La scheda Operazioni git del Registro attività: la durata di ogni operazione (`log.timings`, attivo per impostazione predefinita) e anche il lavoro in background, aggiornamento e auto-fetch (`log.extended`, disattivo per impostazione predefinita). Vedi [Quando qualcosa non funziona](troubleshooting.md#il-registro-attività). |
 | **Annulla attivo**, **Profondità della cronologia di annullamento**, **Registra le modifiche fatte fuori da GitPoulpi** | Il gruppo **Cronologia annullamenti**. Attiva o disattiva Annulla, e imposta quante operazioni conserva (predefinito 100, `0` significa illimitato). Disattivare Annulla cancella la cronologia di annullamento, dopo una conferma. L'ultima registra anche ciò che una shell o un agente fa a branch, tag, stash e HEAD. Vedi [Annulla e ripeti](undo-redo.md). |
 
-Il comando della palette **App: Cambia lingua...** (`Ctrl+N g`) apre lo stesso
+Il comando della palette **App: Cambia lingua...** (`Ctrl+N l`) apre lo stesso
 elenco di lingue. Lì la lingua evidenziata mostra l'anteprima dal vivo; `Enter` la
 mantiene ed `Esc` ripristina la precedente.
 
@@ -436,7 +436,7 @@ build che includono il server; vedi [MCP e agenti](mcp-and-agents.md).
 | **Colore dei campi di input**, **Colore personalizzato dei campi di input** | Lo sfondo dei campi di testo: **Segui il tema** (predefinito), un colore scuro fisso o un tuo `#rrggbb`. |
 | **Cursore di testo** | `ui.text_cursor`: **terminal** (predefinito) mette il cursore del terminale stesso sul punto di inserimento del campo di testo attivo, come barra (valgono le impostazioni del cursore del tuo terminale e la finestra dei candidati di un metodo di input si apre lì); **drawn** disegna il cursore di GitPoulpi e tiene nascosto il cursore del terminale. Si applica subito. Palette: `Impostazioni: Cursore di testo...`. |
 | **Profondità colore** | **auto** (predefinito), **truecolor**, **256** o **16**. Vedi [Temi](themes.md). |
-| **Tema colori del grafo** | **Segui il tema** (predefinito: i colori delle corsie del tema stesso) o una qualsiasi tavolozza di corsie. Ogni tavolozza mostra alcuni suoi colori. Si applica alla chiusura delle Impostazioni. Il comando della palette **App: Cambia tema colori del grafo...** (`Ctrl+N Shift+Y`) mostra l'anteprima dal vivo di ogni tavolozza. |
+| **Tema colori del grafo** | **Segui il tema** (predefinito: i colori delle corsie del tema stesso) o una qualsiasi tavolozza di corsie. Ogni tavolozza mostra alcuni suoi colori. Si applica alla chiusura delle Impostazioni. Il comando della palette **App: Cambia tema colori del grafo...** (`Ctrl+N Shift+T`) mostra l'anteprima dal vivo di ogni tavolozza. |
 | **Sfondo delle corsie del grafo** | **Disattivato** (trasparente) o **Tinta di riga**: una tenue fascia del colore della corsia dietro la colonna del grafo, con una sottile barra sul bordo. |
 | **Intensità della tinta di riga** | Quanto è sbiadita la fascia Tinta di riga: **Forte**, **Media** (predefinita) o **Sottile**. La barra sul bordo mantiene il colore pieno. |
 | **Posizione della barra degli strumenti** | `ui.toolbar_position`: Dove sta la barra degli strumenti: In alto, In basso (predefinito), A sinistra o A destra. A sinistra e A destra ne fanno una colonna accanto ai pannelli; una finestra sotto le 80 colonne la disegna in basso. Si applica subito. |

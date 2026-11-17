@@ -197,7 +197,7 @@ fn the_tab_picker_reorders_with_alt_arrows_and_shows_the_hint() {
     let mut term = start(&t);
     wait_bar(&mut term, &["orbit", "moonbase", "comet"]);
     term.send_keys("C-n").unwrap();
-    term.send_text("t").unwrap();
+    term.send_keys("Tab").unwrap();
     term.wait_for("the tab picker", STEP, |s| {
         s.contains("Alt+Up/Down to reorder")
     })
@@ -222,7 +222,7 @@ fn dragging_a_picker_row_reorders_the_tabs() {
     let mut term = start(&t);
     wait_bar(&mut term, &["orbit", "moonbase", "comet"]);
     term.send_keys("C-n").unwrap();
-    term.send_text("t").unwrap();
+    term.send_keys("Tab").unwrap();
     term.wait_for("the tab picker", STEP, |s| {
         s.contains("Alt+Up/Down to reorder")
     })

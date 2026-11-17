@@ -105,7 +105,7 @@ przy każdej aktywnej strzałce.
 - `Ctrl+PageUp` i `Ctrl+PageDown` przełączają karty. `Ctrl+W` zamyka bieżącą
   kartę. Kliknięcie karty środkowym przyciskiem też ją zamyka (z tym samym
   pytaniem).
-- `t` (albo `Ctrl+N t`) otwiera selektor kart, przeszukiwalną listę otwartych
+- `t` (albo `Ctrl+N Tab`) otwiera selektor kart, przeszukiwalną listę otwartych
   kart.
 - **Zmiana kolejności kart:** naciśnij kartę repozytorium i przeciągnij ją w bok (cień
   karty podąża za wskaźnikiem, a pasek pokazuje, gdzie wyląduje; `Esc` anuluje),
@@ -231,10 +231,10 @@ Najedź na wiersz, aby pokazać jego przyciski: ukrycie lub pokazanie refa
 w Logu oraz **Solo** (pokaż tylko commity tego refa). Kliknij dwukrotnie
 gałąź lokalną lub tag, aby zrobić checkout. Kliknij wiersz prawym
 przyciskiem, aby zobaczyć jego menu. `‹` w tytule panelu zwija panel boczny
-(`Ctrl+N h`).
+(`Ctrl+N Shift+H`).
 
-Oba panele boczne (panel boczny Refs, `Ctrl+N h`, oraz prawy panel,
-`Ctrl+N l`) należą do Logu: pokazanie lub zwinięcie któregoś z nich, gdy
+Oba panele boczne (panel boczny Refs, `Ctrl+N Shift+H`, oraz prawy panel,
+`Ctrl+N Shift+L`) należą do Logu: pokazanie lub zwinięcie któregoś z nich, gdy
 otwarty jest diff, widok pliku albo edytor, dotyczy tylko tego widoku. Diff lub
 widok pliku sam też zwija panel boczny Refs, aby zrobić miejsce na treść. Po
 powrocie do Logu oba panele są takie, jak je tam zostawiono, i ten stan

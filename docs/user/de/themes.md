@@ -308,7 +308,7 @@ vorherige wieder her und speichert nichts. Der Paletteneintrag **App: Design...*
 
 ### Das Design über die Palette wechseln
 
-**App: Design wechseln...** (`Ctrl+P` oder `Ctrl+N y`; die Taste lässt sich unter
+**App: Design wechseln...** (`Ctrl+P` oder `Ctrl+N t`; die Taste lässt sich unter
 `nav_prefix.change_theme` neu belegen) öffnet eine Liste derselben Designs, ohne über die
 Einstellungen zu gehen: **System (folgt dem Terminal)**, die Voreinstellungen und dann Ihre
 eigenen Design-Dateien, jedes mit vier kleinen Farb-Chips. Das aktuelle Design ist

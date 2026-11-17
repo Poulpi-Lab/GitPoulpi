@@ -29,7 +29,7 @@ cuadraditos en un carril junto al commit sobre el que se hicieron.
 
 Los colores de los carriles vienen del tema. *Ajustes > Apariencia > Tema de color
 del grafo* combina cualquier tema con cualquier paleta de carriles, y el selector
-*App: Cambiar tema de color del grafo...* de la paleta (`Ctrl+N Shift+Y`)
+*App: Cambiar tema de color del grafo...* de la paleta (`Ctrl+N Shift+T`)
 previsualiza cada paleta en directo; consulta [Temas](themes.md). *Fondo de los
 carriles del grafo* en **Tinte de fila** pinta una banda tenue del color del carril
 detrás de la columna del grafo y una barra fina en su borde. *Intensidad del tinte

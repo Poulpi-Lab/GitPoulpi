@@ -307,7 +307,7 @@ fila.
 
 ### Cambiar de tema desde la paleta
 
-**App: Cambiar tema...** (`Ctrl+P`, o `Ctrl+N y`; la tecla se puede reasignar como
+**App: Cambiar tema...** (`Ctrl+P`, o `Ctrl+N t`; la tecla se puede reasignar como
 `nav_prefix.change_theme`) abre una lista de los mismos temas sin pasar por
 Ajustes: **Sistema (sigue el terminal)**, los presets y luego tus propios
 archivos de tema, cada uno con cuatro pequeños chips de color. El tema actual aparece marcado.

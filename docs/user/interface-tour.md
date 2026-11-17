@@ -133,7 +133,7 @@ past the tabs on screen. `Ctrl+N` puts a badge on each live arrow.
   **SSH & credentials...** and **Sparse checkout...**.
 - `Ctrl+PageUp` and `Ctrl+PageDown` switch tabs. `Ctrl+W` closes the current
   tab. A middle-click on a tab closes it too (with the same question).
-- `t` (or `Ctrl+N t`) opens the tab picker, a searchable list of the open
+- `t` (or `Ctrl+N Tab`) opens the tab picker, a searchable list of the open
   tabs.
 - **Reorder tabs:** press a repository tab and drag it sideways (a ghost of the
   tab follows the pointer and a bar shows where it will land; `Esc` cancels),
@@ -267,10 +267,10 @@ the pane, for a checklist of the sections (the last visible one stays). The choi
 Hover a row to show its buttons: hide or show the ref in the Log, and **Solo**
 (show only that ref's commits). Double-click a local branch or a tag to check
 it out. Right-click a row for its menu. The `‹` in the sidebar title collapses
-the sidebar (`Ctrl+N h`).
+the sidebar (`Ctrl+N Shift+H`).
 
-The two side panes (the Refs sidebar, `Ctrl+N h`, and the right pane,
-`Ctrl+N l`) belong to the Log: showing or collapsing one while a diff, file
+The two side panes (the Refs sidebar, `Ctrl+N Shift+H`, and the right pane,
+`Ctrl+N Shift+L`) belong to the Log: showing or collapsing one while a diff, file
 view or editor is open applies to that view only. A diff or file view also
 collapses the Refs sidebar on its own to give the content room. Back in the
 Log both panes are as you left them there, and that is the state saved for

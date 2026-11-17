@@ -100,12 +100,12 @@ pub(crate) enum PaletteCommand {
     /// toolbar's magnifier button.
     SearchLog,
     /// Collapses the Refs pane to a thin restore strip, or restores it --
-    /// same action as `Ctrl+N h`, the chevron on the pane's own border,
+    /// same action as `Ctrl+N Shift+H`, the chevron on the pane's own border,
     /// and the strip left behind once it's collapsed. Used to be a bare
     /// `Ctrl+K`; moved behind the `Ctrl+N` prefix because `Ctrl+K` clashes
     /// with terminal-reserved chords in real terminals.
     ToggleRefsPaneCollapsed,
-    /// The Status pane's half of the same toggle (`Ctrl+N l`, formerly the
+    /// The Status pane's half of the same toggle (`Ctrl+N Shift+L`, formerly the
     /// bare `Ctrl+L`, moved for the same reason).
     ToggleStatusPaneCollapsed,
     /// A notch of the Refs or the Status pane's width: the keyboard twin of
@@ -539,7 +539,7 @@ pub(crate) enum PaletteCommand {
     /// Closes the current repository's tab. The repository itself is
     /// untouched - nothing on disk changes.
     CloseRepositoryTab,
-    /// Opens the tab picker (`Ctrl+N t`): a popup listing every open
+    /// Opens the tab picker (`Ctrl+N Tab`): a popup listing every open
     /// repository tab, filtered by typing, that switches to the one
     /// chosen.
     SelectTab,

@@ -198,7 +198,7 @@ fn clicking_the_cross_closes_the_tab_picker() {
     let (mut term, _repo) = start("pty-cross-tab-picker");
     term.send_keys("C-n").unwrap();
     term.wait_for_text("select tab", STEP).unwrap();
-    term.send_keys("t").unwrap();
+    term.send_keys("Tab").unwrap();
     term.wait_for("the tab picker", STEP, |s| s.contains("Select Tab"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     click_popup_cross(&mut term, |s| {

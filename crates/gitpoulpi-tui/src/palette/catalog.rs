@@ -154,7 +154,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     ),
     entry(
         msg::palette::NAVIGATION_TOGGLE_REFS_PANE_COLLAPSED,
-        "Ctrl+N h",
+        "Ctrl+N H",
         PaletteCommand::ToggleRefsPaneCollapsed,
     ),
     entry(
@@ -179,7 +179,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     ),
     entry(
         msg::palette::NAVIGATION_TOGGLE_STATUS_PANE_COLLAPSED,
-        "Ctrl+N l",
+        "Ctrl+N L",
         PaletteCommand::ToggleStatusPaneCollapsed,
     ),
     entry(
@@ -2303,7 +2303,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     ),
     entry(
         msg::palette::REPOSITORY_SELECT_TAB,
-        "Ctrl+N t",
+        "Ctrl+N Tab",
         PaletteCommand::SelectTab,
     ),
     entry(

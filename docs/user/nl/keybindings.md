@@ -114,8 +114,8 @@ prefix getoond (`Ctrl+G s`).
 | `git_prefix` | `lfs_push_all` | LFS: Push (alle objecten) | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS: Lokale objecten opruimen | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | De werkbank voor geschiedenis herschrijven openen | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | Refs-paneel in-/uitklappen | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | Statuspaneel in-/uitklappen | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | Refs-paneel in-/uitklappen | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | Statuspaneel in-/uitklappen | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | Instellingen openen | `Ctrl+N ,` |
 | `nav_prefix` | `about` | Over GitPoulpi openen | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | Activiteitenlogboek openen | `Ctrl+N Shift+A` |
@@ -123,11 +123,11 @@ prefix getoond (`Ctrl+G s`).
 | `nav_prefix` | `jobs` | Achtergrondtaken tonen | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | Het updatepaneel tonen | `Ctrl+N u` |
 | `nav_prefix` | `help` | Help omschakelen | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | Tabblad kiezen | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | Thema wijzigen | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | Taal wijzigen | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | Kleurthema van de grafiek wijzigen | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | Rijkleuring van de grafiek omschakelen | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | Tabblad kiezen | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | Thema wijzigen | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | Taal wijzigen | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | Kleurthema van de grafiek wijzigen | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | Rijkleuring van de grafiek omschakelen | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | Refs-sectie vergroten | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | Refs-sectie verkleinen | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | Commit-berichtblok vergroten | `Ctrl+N ]` |
@@ -507,12 +507,12 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Navigatie: Focus naar volgend paneel | `Tab` |
 | Navigatie: Focus naar vorig paneel | `Shift+Tab` |
 | Navigatie: Commits zoeken... | `f` |
-| Navigatie: Refs-paneel in-/uitklappen | `Ctrl+N h` |
+| Navigatie: Refs-paneel in-/uitklappen | `Ctrl+N H` |
 | Navigatie: Refs-paneel verbreden | `Ctrl+N Right` |
 | Navigatie: Refs-paneel versmallen | `Ctrl+N Left` |
 | Navigatie: Statuspaneel verbreden | `Ctrl+N Shift+Left` |
 | Navigatie: Statuspaneel versmallen | `Ctrl+N Shift+Right` |
-| Navigatie: Statuspaneel in-/uitklappen | `Ctrl+N l` |
+| Navigatie: Statuspaneel in-/uitklappen | `Ctrl+N L` |
 | Navigatie: Refs-sectie vergroten | `Ctrl+N +` |
 | Navigatie: Refs-sectie verkleinen | `Ctrl+N -` |
 | Navigatie: Groottes Refs-secties resetten |  |
@@ -1241,8 +1241,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | App: Thema... |  |
 | Conflicten: Lijsten met basisbranches bewerken... |  |
 | Conflicten: Basisbranches van deze repository... |  |
-| App: Thema wijzigen... | `Ctrl+N y` |
-| App: Taal wijzigen... | `Ctrl+N g` |
+| App: Thema wijzigen... | `Ctrl+N t` |
+| App: Taal wijzigen... | `Ctrl+N l` |
 | Starter: Snelkoppeling maken |  |
 | Starter: Bureaublad-snelkoppeling maken |  |
 | Starter: Snelkoppelingen verwijderen |  |
@@ -1252,8 +1252,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Starter: Verwijderen uit PATH |  |
 | Starter: Menu Openen in GitPoulpi installeren |  |
 | Starter: Menu Openen in GitPoulpi verwijderen |  |
-| App: Kleurthema van de grafiek wijzigen... | `Ctrl+N Y` |
-| App: Rijkleuring van de grafiek omschakelen | `Ctrl+N T` |
+| App: Kleurthema van de grafiek wijzigen... | `Ctrl+N T` |
+| App: Rijkleuring van de grafiek omschakelen | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## Rondbewegen
@@ -1371,14 +1371,14 @@ accepteert. De volgende toets voert een actie uit, of annuleert.
 | Toets | Actie |
 |---|---|
 | `Ctrl+N` dan een badge | Focus op het deel van het venster dat deze badge toont |
-| `Ctrl+N h` / `Ctrl+N l` | Het Refs-paneel / het rechterpaneel inklappen of herstellen |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | Het Refs-paneel / het rechterpaneel inklappen of herstellen |
 | `Ctrl+N +` / `Ctrl+N -` | De actieve Refs-sectie met één rij laten groeien / krimpen |
 | `Ctrl+N ]` / `Ctrl+N [` | Het commit-berichtblok van het rechterpaneel met één rij laten groeien / krimpen |
 | `Ctrl+N Left` / `Ctrl+N Right` | De scheiding tussen het Refs-paneel en de Log een stap naar links / rechts verplaatsen (een ingeklapt Refs-paneel komt eerst terug) |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | De scheiding tussen de Log en het rechterpaneel een stap naar links / rechts verplaatsen |
-| `Ctrl+N t` | Een tabblad kiezen (de tabbladkiezer; `t` alleen doet hetzelfde) |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | Het thema / de taal / het grafiekkleurenthema wijzigen |
-| `Ctrl+N Shift+T` | De rijkleuring van de grafiek aan- of uitzetten |
+| `Ctrl+N Tab` | Een tabblad kiezen (de tabbladkiezer; `t` alleen doet hetzelfde) |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | Het thema / de taal / het grafiekkleurenthema wijzigen |
+| `Ctrl+N Shift+Y` | De rijkleuring van de grafiek aan- of uitzetten |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | De weergave tonen die een agent heeft voorbereid / teruggaan (zie [MCP en agents](mcp-and-agents.md)) |
 | `Ctrl+N ,` | De Instellingen openen |
 | `Ctrl+N ?` | De help openen of sluiten |

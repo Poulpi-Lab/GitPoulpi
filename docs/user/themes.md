@@ -307,7 +307,7 @@ row.
 
 ### Change theme from the palette
 
-**App: Change Theme...** (`Ctrl+P`, or `Ctrl+N y`; the key is rebindable as
+**App: Change Theme...** (`Ctrl+P`, or `Ctrl+N t`; the key is rebindable as
 `nav_prefix.change_theme`) opens a list of the same themes without going
 through Settings: **System (follows terminal)**, the presets, then your own
 theme files, each with four small color chips. The current theme is checked.

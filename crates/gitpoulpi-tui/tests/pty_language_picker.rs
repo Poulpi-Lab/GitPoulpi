@@ -89,7 +89,7 @@ fn the_palette_changes_the_language_and_escapes() {
 }
 
 #[test]
-fn ctrl_n_g_opens_the_picker_and_escape_closes_it() {
+fn ctrl_n_l_opens_the_picker_and_escape_closes_it() {
     let repo = fixture();
     let (mut term, _config) = common::launch(repo.root())
         .session("language-picker-key")
@@ -97,7 +97,7 @@ fn ctrl_n_g_opens_the_picker_and_escape_closes_it() {
         .ready_when("the fixture loaded", |s| s.contains(MESSAGE))
         .start();
     term.send_keys("C-n").unwrap();
-    term.send_text("g").unwrap();
+    term.send_text("l").unwrap();
     term.wait_for("the language list", STEP, |s| {
         s.contains("Change Language (")
     })

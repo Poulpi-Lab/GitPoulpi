@@ -123,7 +123,7 @@ depois dos separadores visíveis. `Ctrl+N` põe um distintivo em cada seta ativa
 - `Ctrl+PageUp` e `Ctrl+PageDown` mudam de separador. `Ctrl+W` fecha o separador
   atual. Um clique com o botão do meio num separador também o fecha (com a mesma
   pergunta).
-- `t` (ou `Ctrl+N t`) abre o seletor de separadores, uma lista pesquisável dos separadores
+- `t` (ou `Ctrl+N Tab`) abre o seletor de separadores, uma lista pesquisável dos separadores
   abertos.
 - **Reordenar separadores:** prima um separador de repositório e arraste-o para o lado (uma sombra do
   separador segue o ponteiro e uma barra mostra onde vai ficar; `Esc` cancela),
@@ -250,10 +250,10 @@ entre duas secções para as redimensionar.
 Passe o rato por cima de uma linha para mostrar os seus botões: ocultar ou mostrar a ref no Log, e **Solo**
 (mostrar apenas os commits dessa ref). Faça clique duplo numa branch local ou numa tag para
 fazer checkout. Clique com o botão direito numa linha para o seu menu. O `‹` no título da barra lateral recolhe
-a barra lateral (`Ctrl+N h`).
+a barra lateral (`Ctrl+N Shift+H`).
 
-Os dois painéis laterais (a barra lateral Refs, `Ctrl+N h`, e o painel direito,
-`Ctrl+N l`) pertencem ao Log: mostrar ou recolher um deles com um diff, uma vista
+Os dois painéis laterais (a barra lateral Refs, `Ctrl+N Shift+H`, e o painel direito,
+`Ctrl+N Shift+L`) pertencem ao Log: mostrar ou recolher um deles com um diff, uma vista
 de ficheiro ou um editor aberto aplica-se só a essa vista. Um diff ou uma vista de
 ficheiro também recolhe por si a barra lateral Refs, para dar espaço ao conteúdo.
 De volta ao Log, os dois painéis ficam como os deixou lá, e é esse o estado

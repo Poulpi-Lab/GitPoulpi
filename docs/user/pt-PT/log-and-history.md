@@ -37,7 +37,7 @@ como pequenos quadrados numa faixa ao lado do commit em que foram feitos.
 
 As cores das faixas vêm do tema. *Definições > Aspeto > Tema de cores do grafo*
 combina qualquer tema com qualquer paleta de faixas, e o seletor *Aplicação:
-mudar tema de cores do grafo...* da paleta (`Ctrl+N Shift+Y`) pré-visualiza cada
+mudar tema de cores do grafo...* da paleta (`Ctrl+N Shift+T`) pré-visualiza cada
 paleta em direto; veja [Temas](themes.md). *Fundo das faixas do grafo* em
 **Tom da linha** pinta uma banda ténue da cor da faixa por trás da coluna do
 grafo e uma barra fina na sua margem. *Intensidade do tom da linha* (**Forte**,

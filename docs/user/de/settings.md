@@ -121,7 +121,7 @@ Einige fensterweite Popups öffnen sich über den Einstellungen und geben sie so
 (die Seite, die Scrollposition und nicht gespeicherte Änderungen an Workflow oder Vorlage bleiben):
 
 - die Befehlspalette (`Ctrl+P`),
-- die Designauswahl (`Ctrl+N y`, **App: Design ändern...**), die jedes Design gleich auf den
+- die Designauswahl (`Ctrl+N t`, **App: Design ändern...**), die jedes Design gleich auf den
   Einstellungen selbst als Vorschau zeigt; `Esc` stellt das vorherige Design wieder her,
 - die Auswahl von Sprache und Graphfarben (`Ctrl+N`, dann dieselben Buchstaben wie im Hauptfenster),
 - die Suche im Workspace (`Ctrl+Alt+F`),
@@ -188,7 +188,7 @@ Die Seitenliste hat zwei Gruppen:
 | **Dauer der Vorgänge anzeigen**, **Erweiterte Protokollierung** | Der Tab Git-Vorgänge des Aktivitätsprotokolls: die Dauer jedes Vorgangs (`log.timings`, standardmäßig an) und auch die Hintergrundarbeit, Aktualisierung und Auto-Fetch (`log.extended`, standardmäßig aus). Siehe [Wenn etwas fehlschlägt](troubleshooting.md#das-aktivitätsprotokoll). |
 | **Rückgängig aktiviert**, **Tiefe des Rückgängig-Verlaufs**, **Änderungen außerhalb von GitPoulpi aufzeichnen** | Die Gruppe **Rückgängig-Verlauf**. Schaltet Rückgängig ein oder aus und legt fest, wie viele Vorgänge es aufbewahrt (Standard 100, `0` bedeutet unbegrenzt). Rückgängig auszuschalten löscht den Rückgängig-Verlauf, nach einer Bestätigung. Die letzte Option erfasst außerdem, was eine Shell oder ein Agent an Branches, Tags, Stashes und HEAD tut. Siehe [Rückgängig und Wiederholen](undo-redo.md). |
 
-Der Palettenbefehl **App: Sprache wechseln...** (`Ctrl+N g`) öffnet dieselbe
+Der Palettenbefehl **App: Sprache wechseln...** (`Ctrl+N l`) öffnet dieselbe
 Sprachliste. Dort wird die hervorgehobene Sprache live in der Vorschau gezeigt;
 `Enter` behält sie und `Esc` stellt die vorherige wieder her.
 
@@ -432,7 +432,7 @@ den Server enthalten; siehe [MCP und Agenten](mcp-and-agents.md).
 | **Eingabefarbe**, **Benutzerdefinierte Eingabefarbe** | Der Hintergrund von Textfeldern: **Design folgen** (Standard), eine feste dunkle Farbe oder Ihr eigenes `#rrggbb`. |
 | **Textcursor** | `ui.text_cursor`: **terminal** (Standard) setzt den eigenen Cursor des Terminals an die Einfügemarke des fokussierten Textfelds, als Balken (die Cursor-Einstellungen Ihres Terminals gelten, und das Kandidatenfenster einer Eingabemethode öffnet sich an der Einfügemarke); **drawn** zeichnet die eigene Einfügemarke von GitPoulpi und hält den Terminalcursor verborgen. Wirkt sofort. Palette: `Einstellungen: Textcursor...`. |
 | **Farbtiefe** | **auto** (Standard), **truecolor**, **256** oder **16**. Siehe [Designs](themes.md). |
-| **Farbschema des Graphen** | **Design folgen** (Standard: die eigenen Spurfarben des Designs) oder eine beliebige Spurpalette. Jede Palette zeigt einige ihrer Farben. Es gilt beim Schließen der Einstellungen. Der Palettenbefehl **App: Farbschema des Graphen wechseln...** (`Ctrl+N Shift+Y`) zeigt jede Palette live in der Vorschau. |
+| **Farbschema des Graphen** | **Design folgen** (Standard: die eigenen Spurfarben des Designs) oder eine beliebige Spurpalette. Jede Palette zeigt einige ihrer Farben. Es gilt beim Schließen der Einstellungen. Der Palettenbefehl **App: Farbschema des Graphen wechseln...** (`Ctrl+N Shift+T`) zeigt jede Palette live in der Vorschau. |
 | **Hintergrund der Graph-Spuren** | **Aus** (transparent) oder **Zeilentönung**: ein schwaches Band in der Spurfarbe hinter der Graph-Spalte, mit einem dünnen Balken an ihrem Rand. |
 | **Stärke der Zeilentönung** | Wie blass das Band der Zeilentönung ist: **Stark**, **Mittel** (Standard) oder **Dezent**. Der Randbalken behält seine volle Farbe. |
 | **Position der Symbolleiste** | `ui.toolbar_position`: Wo die Symbolleiste sitzt: Oben, Unten (Standard), Links oder Rechts. Links und Rechts machen daraus eine Spalte neben den Bereichen; ein Fenster unter 80 Spalten zeichnet sie unten. Wirkt sofort. |

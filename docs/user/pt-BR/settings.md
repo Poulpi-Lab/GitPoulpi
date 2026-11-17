@@ -114,7 +114,7 @@ estavam (a página, a posição de rolagem e as alterações não salvas de Flux
 trabalho ou do modelo continuam):
 
 - a paleta de comandos (`Ctrl+P`),
-- o seletor de tema (`Ctrl+N y`, **App: mudar tema...**), que mostra cada tema
+- o seletor de tema (`Ctrl+N t`, **App: mudar tema...**), que mostra cada tema
   nas próprias Configurações; `Esc` devolve o tema anterior,
 - os seletores de idioma e de cores do grafo (`Ctrl+N` e depois as mesmas letras
   da janela principal),
@@ -183,7 +183,7 @@ A lista de páginas tem dois grupos:
 | **Mostrar a duração das operações**, **Registro estendido** | A aba Operações do Git do Registro de atividade: a duração de cada operação (`log.timings`, ligado por padrão) e também o trabalho em segundo plano, atualização e auto-fetch (`log.extended`, desligado por padrão). Veja [Quando algo falha](troubleshooting.md#o-registro-de-atividade). |
 | **Desfazer ativado**, **Profundidade do histórico de desfazer**, **Registrar alterações feitas fora do GitPoulpi** | O grupo **Histórico de desfazer**. Ativa ou desativa o Desfazer, e define quantas operações ele mantém (padrão 100, `0` significa ilimitado). Desativar o Desfazer apaga o histórico de desfazer, após uma confirmação. A última opção também registra o que um shell ou um agente faz em branches, tags, stashes e HEAD. Veja [Desfazer e refazer](undo-redo.md). |
 
-O comando da paleta **App: mudar idioma...** (`Ctrl+N g`) abre a mesma lista de
+O comando da paleta **App: mudar idioma...** (`Ctrl+N l`) abre a mesma lista de
 idiomas. Ali, o idioma destacado é pré-visualizado ao vivo; `Enter` o mantém e
 `Esc` restaura o anterior.
 
@@ -437,7 +437,7 @@ o servidor; veja [MCP e agentes](mcp-and-agents.md).
 | **Cor dos campos**, **Cor personalizada dos campos** | O fundo dos campos de texto: **Seguir o tema** (padrão), uma cor escura fixa, ou o seu próprio `#rrggbb`. |
 | **Cursor de texto** | `ui.text_cursor`: **terminal** (padrão) coloca o cursor do próprio terminal no ponto de inserção do campo de texto em foco, como uma barra (valem as configurações de cursor do seu terminal, e a janela de candidatos de um método de entrada abre no ponto de inserção); **drawn** desenha o cursor do próprio GitPoulpi e mantém o cursor do terminal oculto. Vale na hora. Paleta: `Configurações: Cursor de texto...`. |
 | **Profundidade de cor** | **auto** (padrão), **truecolor**, **256** ou **16**. Veja [Temas](themes.md). |
-| **Tema de cores do grafo** | **Seguir o tema** (padrão: as cores de faixa do próprio tema) ou qualquer paleta de faixas. Cada paleta mostra algumas de suas cores. Aplica-se quando as Configurações se fecham. O comando da paleta **App: Mudar tema de cores do grafo...** (`Ctrl+N Shift+Y`) pré-visualiza cada paleta ao vivo. |
+| **Tema de cores do grafo** | **Seguir o tema** (padrão: as cores de faixa do próprio tema) ou qualquer paleta de faixas. Cada paleta mostra algumas de suas cores. Aplica-se quando as Configurações se fecham. O comando da paleta **App: Mudar tema de cores do grafo...** (`Ctrl+N Shift+T`) pré-visualiza cada paleta ao vivo. |
 | **Fundo das faixas do grafo** | **Desativado** (transparente) ou **Tom da linha**: uma faixa suave na cor da faixa atrás da coluna do grafo, com uma barra fina na sua borda. |
 | **Intensidade do tom da linha** | Quão esmaecida é a faixa de Tom da linha: **Forte**, **Média** (padrão) ou **Sutil**. A barra da borda mantém sua cor plena. |
 | **Posição da barra de ferramentas** | `ui.toolbar_position`: Onde fica a barra de ferramentas: Topo, Base (padrão), Esquerda ou Direita. Esquerda e Direita formam uma coluna ao lado dos painéis; uma janela com menos de 80 colunas a desenha na base. Aplicado imediatamente. |

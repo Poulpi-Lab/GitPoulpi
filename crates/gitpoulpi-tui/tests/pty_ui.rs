@@ -562,12 +562,12 @@ fn typing_a_path_in_the_folder_picker_and_pressing_enter_twice_opens_it_as_a_tab
     .unwrap_or_else(|e| panic!("{e}"));
 }
 
-/// `Ctrl+N` opens the navigation prefix (hint in the footer), `Ctrl+N h`
+/// `Ctrl+N` opens the navigation prefix (hint in the footer), `Ctrl+N Shift+H`
 /// toggles the Refs pane, and an unbound key cancels. Only the real
 /// crossterm decoder proves `C-n` arrives as `Char('n')` with `CONTROL`
 /// and is not intercepted by the terminal.
 #[test]
-fn ctrl_n_then_h_collapses_the_refs_pane_and_a_second_ctrl_n_h_restores_it() {
+fn ctrl_n_then_shift_h_collapses_the_refs_pane_and_a_second_ctrl_n_shift_h_restores_it() {
     let repo = fixture();
     let (mut term, _config) = launch(repo.root(), "pty-ctrl-n-collapse");
 
@@ -584,14 +584,14 @@ fn ctrl_n_then_h_collapses_the_refs_pane_and_a_second_ctrl_n_h_restores_it() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
-    term.send_keys("h").expect("collapse the Refs pane");
+    term.send_keys("H").expect("collapse the Refs pane");
     term.wait_for("the Refs pane collapsed to its restore strip", STEP, |s| {
         s.contains("Refs pane collapsed") && !s.contains("LOCAL")
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
-    // Restores on a second `Ctrl+N h`.
-    term.send_keys("C-n h").expect("restore the Refs pane");
+    // Restores on a second `Ctrl+N Shift+H`.
+    term.send_keys("C-n H").expect("restore the Refs pane");
     term.wait_for("the Refs pane restored, LOCAL back on screen", STEP, |s| {
         s.contains("Refs pane restored") && s.contains("LOCAL")
     })
@@ -776,10 +776,10 @@ fn ctrl_n_then_a_badge_focuses_that_subpane() {
     term.send_keys("Esc").expect("cancel the filter");
 }
 
-/// `Ctrl+N t` and plain `t` open the tab picker listing every open tab;
+/// `Ctrl+N Tab` and plain `t` open the tab picker listing every open tab;
 /// typing narrows it, Esc closes it, Enter on a filtered row switches.
 #[test]
-fn ctrl_n_then_t_opens_the_tab_picker_filters_and_switches_tabs() {
+fn ctrl_n_then_tab_opens_the_tab_picker_filters_and_switches_tabs() {
     let repo = fixture();
     let second = FixtureRepoBuilder::new()
         .unwrap()
@@ -846,13 +846,13 @@ fn ctrl_n_then_t_opens_the_tab_picker_filters_and_switches_tabs() {
     )
     .unwrap_or_else(|e| panic!("{e}"));
 
-    // `Ctrl+N t` opens the picker over the second repository, listing both.
+    // `Ctrl+N Tab` opens the picker over the second repository, listing both.
     term.send_keys("C-n").expect("enter navigation mode");
     term.wait_for("the navigation prefix's footer hint", STEP, |s| {
         s.contains("Ctrl+N") && s.contains("select tab")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    term.send_keys("t").expect("open the tab picker");
+    term.send_keys("Tab").expect("open the tab picker");
     term.wait_for("the tab picker, both tabs listed", STEP, |s| {
         s.contains("Select Tab (2/2)")
     })

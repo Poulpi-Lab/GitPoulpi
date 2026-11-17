@@ -1,4 +1,4 @@
-//! `App: Change Language...` (`Ctrl+N g`): the palette's second-level list of
+//! `App: Change Language...` (`Ctrl+N l`): the palette's second-level list of
 //! the languages the Settings > General > Language combo offers (`Auto`, then
 //! every language built into this binary, endonyms as labels). Typing narrows
 //! it, Enter applies the highlighted language live and writes `ui.language`,

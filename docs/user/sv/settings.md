@@ -110,7 +110,7 @@ dem som de var (sidan, rullningsläget och osparade ändringar i Arbetsflöde el
 mallar finns kvar):
 
 - kommandopaletten (`Ctrl+P`),
-- temaväljaren (`Ctrl+N y`, **App: Byt tema...**), som förhandsvisar varje tema
+- temaväljaren (`Ctrl+N t`, **App: Byt tema...**), som förhandsvisar varje tema
   på Inställningar själva; `Esc` sätter tillbaka det förra temat,
 - språk- och grafikfärgsväljarna (`Ctrl+N` och sedan samma bokstäver som i
   huvudfönstret),
@@ -180,7 +180,7 @@ Sidlistan har två grupper:
 | **Visa hur lång tid åtgärder tar**, **Utökad loggning** | Fliken Git-åtgärder i aktivitetsloggen: varje åtgärds tid (`log.timings`, på som standard) och även bakgrundsarbetet, uppdatering och auto-fetch (`log.extended`, av som standard). Se [När något misslyckas](troubleshooting.md#aktivitetsloggen). |
 | **Ångra aktiverat**, **Djup på ångrahistoriken**, **Spela in ändringar gjorda utanför GitPoulpi** | Gruppen **Ångrahistorik**. Slår på eller av Ångra och anger hur många operationer det behåller (standard 100, `0` betyder obegränsat). Att stänga av Ångra raderar ångrahistoriken, efter en bekräftelse. Den sista inställningen spelar också in vad ett skal eller en agent gör med grenar, taggar, stashar och HEAD. Se [Ångra och gör om](undo-redo.md). |
 
-Palettkommandot **App: Byt språk...** (`Ctrl+N g`) öppnar samma språklista. Där
+Palettkommandot **App: Byt språk...** (`Ctrl+N l`) öppnar samma språklista. Där
 förhandsvisas det markerade språket live; `Enter` behåller det och `Esc`
 återställer det förra.
 
@@ -425,7 +425,7 @@ servern; se [MCP och agenter](mcp-and-agents.md).
 | **Inmatningsfärg**, **Egen inmatningsfärg** | Bakgrunden på textfält: **Följ temat** (standard), en fast mörk färg eller din egen `#rrggbb`. |
 | **Textmarkör** | `ui.text_cursor`: **terminal** (standard) placerar terminalens egen markör vid skrivpositionen i det fokuserade textfältet, som ett streck (din terminals markörinställningar gäller, och en inmatningsmetods kandidatfönster öppnas vid skrivpositionen); **drawn** ritar GitPoulpis egen markör och håller terminalmarkören dold. Gäller direkt. Paletten: `Inställningar: Textmarkör...`. |
 | **Färgdjup** | **auto** (standard), **truecolor**, **256** eller **16**. Se [Teman](themes.md). |
-| **Färgtema för grafen** | **Följ temat** (standard: temats egna spårfärger) eller valfri spårpalett. Varje palett visar några av sina färger. Det gäller när Inställningar stängs. Palettkommandot **App: Byt färgtema för grafen...** (`Ctrl+N Shift+Y`) förhandsvisar varje palett live. |
+| **Färgtema för grafen** | **Följ temat** (standard: temats egna spårfärger) eller valfri spårpalett. Varje palett visar några av sina färger. Det gäller när Inställningar stängs. Palettkommandot **App: Byt färgtema för grafen...** (`Ctrl+N Shift+T`) förhandsvisar varje palett live. |
 | **Bakgrund för grafspår** | **Av** (transparent) eller **Radfärg**: ett svagt band av spårfärgen bakom grafkolumnen, med en tunn list i kanten. |
 | **Styrka på radfärgning** | Hur blekt Radfärg-bandet är: **Stark**, **Medel** (standard) eller **Svag**. Kantlisten behåller sin fulla färg. |
 | **Verktygsfältets position** | `ui.toolbar_position`: Var verktygsfältet sitter: Överst, Nederst (standard), Vänster eller Höger. Vänster och Höger gör det till en kolumn bredvid panelerna; i ett fönster smalare än 80 kolumner ritas det nederst. Gäller direkt. |

@@ -124,9 +124,9 @@ fn the_active_tab_scrolls_into_view_and_the_left_arrow_brings_the_first_back() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
-    // The keyboard: the tab picker (`Ctrl+N t`), filtered to the last tab.
+    // The keyboard: the tab picker (`Ctrl+N Tab`), filtered to the last tab.
     term.send_keys("C-n").unwrap();
-    term.send_text("t").unwrap();
+    term.send_keys("Tab").unwrap();
     term.wait_for("the tab picker", STEP, |s| s.contains("Select Tab"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_text("galaxy").unwrap();

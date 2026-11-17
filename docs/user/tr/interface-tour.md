@@ -123,7 +123,7 @@ rozet koyar.
   **Şurada aç ›**, **SSH ve kimlik bilgileri...** ve **Kısmi checkout...**.
 - `Ctrl+PageUp` ve `Ctrl+PageDown` sekmeler arasında geçiş yapar. `Ctrl+W`
   geçerli sekmeyi kapatır. Bir sekmeye orta tık da onu kapatır (aynı soruyla).
-- `t` (veya `Ctrl+N t`) sekme seçiciyi açar; açık sekmelerin aranabilir bir
+- `t` (veya `Ctrl+N Tab`) sekme seçiciyi açar; açık sekmelerin aranabilir bir
   listesidir.
 - **Sekmeleri yeniden sıralama:** bir depo sekmesine basıp yana sürükleyin (sekmenin bir gölgesi
   işaretçiyi izler ve bir çubuk nereye ineceğini gösterir; `Esc` iptal eder), ya da sekme
@@ -248,9 +248,9 @@ sürükleyerek boyutlarını değiştirin.
 Düğmelerini görmek için bir satırın üzerine gelin: ref'i Log'da gizleme veya
 gösterme ve **Solo** (yalnızca o ref'in commit'lerini gösterir). Checkout etmek
 için bir yerel dala veya bir tag'e çift tıklayın. Menüsü için bir satıra sağ
-tıklayın. Kenar çubuğu başlığındaki `‹` kenar çubuğunu daraltır (`Ctrl+N h`).
+tıklayın. Kenar çubuğu başlığındaki `‹` kenar çubuğunu daraltır (`Ctrl+N Shift+H`).
 
-İki yan bölme (Refs kenar çubuğu: `Ctrl+N h`; sağ bölme: `Ctrl+N l`) Log'a aittir: bir diff, dosya görünümü veya düzenleyici açıkken birini göstermek ya da daraltmak yalnızca o görünüm için geçerlidir. Bir diff veya dosya görünümü, içeriğe yer açmak için Refs kenar çubuğunu kendiliğinden de daraltır. Log'a dönünce iki bölme de orada bıraktığınız gibi durur ve bir sonraki açılış için kaydedilen durum odur.
+İki yan bölme (Refs kenar çubuğu: `Ctrl+N Shift+H`; sağ bölme: `Ctrl+N Shift+L`) Log'a aittir: bir diff, dosya görünümü veya düzenleyici açıkken birini göstermek ya da daraltmak yalnızca o görünüm için geçerlidir. Bir diff veya dosya görünümü, içeriğe yer açmak için Refs kenar çubuğunu kendiliğinden de daraltır. Log'a dönünce iki bölme de orada bıraktığınız gibi durur ve bir sonraki açılış için kaydedilen durum odur.
 
 ## Log (orta)
 

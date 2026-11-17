@@ -121,7 +121,7 @@ Quando le schede dei repository non ci stanno, la riga scorre invece di restring
 - `Ctrl+PageUp` e `Ctrl+PageDown` cambiano scheda. `Ctrl+W` chiude la scheda
   corrente. Anche un clic con il tasto centrale su una scheda la chiude (con la
   stessa domanda).
-- `t` (o `Ctrl+N t`) apre il selettore di schede, un elenco ricercabile delle
+- `t` (o `Ctrl+N Tab`) apre il selettore di schede, un elenco ricercabile delle
   schede aperte.
 - **Riordinare le schede:** premi una scheda di repository e trascinala di lato (un'ombra della
   scheda segue il puntatore e una barra mostra dove cadrà; `Esc` annulla), oppure trascina una
@@ -247,10 +247,10 @@ Trascina il bordo tra due sezioni per ridimensionarle.
 Passa il mouse su una riga per mostrarne i pulsanti: nascondere o mostrare il ref
 nel Log, e **Solo** (mostra solo i commit di quel ref). Doppio clic su un branch
 locale o su un tag per fare il checkout. Clic destro su una riga per il suo menu.
-Il `‹` nel titolo della barra laterale la comprime (`Ctrl+N h`).
+Il `‹` nel titolo della barra laterale la comprime (`Ctrl+N Shift+H`).
 
-I due pannelli laterali (la barra laterale Refs, `Ctrl+N h`, e il pannello
-destro, `Ctrl+N l`) appartengono al Log: mostrarne o comprimerne uno mentre sono
+I due pannelli laterali (la barra laterale Refs, `Ctrl+N Shift+H`, e il pannello
+destro, `Ctrl+N Shift+L`) appartengono al Log: mostrarne o comprimerne uno mentre sono
 aperti un diff, una vista file o l'editor vale solo per quella vista. Un diff o
 una vista file comprime inoltre da solo la barra laterale Refs, per lasciare
 spazio al contenuto. Tornando nel Log trovi entrambi i pannelli come li avevi

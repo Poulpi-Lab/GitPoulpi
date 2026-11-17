@@ -28,7 +28,7 @@ baan naast de commit waarop ze zijn gemaakt.
 
 De baankleuren komen uit het thema. *Instellingen > Weergave > Kleurthema van de grafiek*
 combineert elk thema met elk baanpalet, en de kiezer *App: Kleurthema van de grafiek
-wijzigen...* van het palet (`Ctrl+N Shift+Y`) toont elk palet live vooraf; zie
+wijzigen...* van het palet (`Ctrl+N Shift+T`) toont elk palet live vooraf; zie
 [Thema's](themes.md). *Achtergrond van grafiekbanen* op **Rijtint** schildert een zwakke band
 in de baankleur achter de grafiekkolom en een dunne balk aan de rand ervan. *Sterkte van
 rijtint* (**Sterk**, **Gemiddeld** (standaard), **Subtiel**) bepaalt hoe vervaagd de band is.

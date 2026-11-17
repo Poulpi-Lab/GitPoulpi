@@ -88,7 +88,7 @@ fn a_diff_collapses_the_refs_pane_restores_it_on_close_and_never_saves_the_colla
         s.contains("Ctrl+N") && s.contains("collapse")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    term.send_keys("l").unwrap();
+    term.send_keys("L").unwrap();
     term.wait_for("the Status pane collapsed", STEP, |s| {
         s.contains("Status pane collapsed")
     })
@@ -138,12 +138,12 @@ fn a_refs_pane_toggled_by_hand_during_the_diff_is_the_logs_again_after_it() {
     open_the_diff(&mut term);
     term.wait_for("auto-collapsed", STEP, |s| !s.contains("LOCAL"))
         .unwrap_or_else(|e| panic!("{e}"));
-    term.send_keys("C-n h").unwrap();
+    term.send_keys("C-n H").unwrap();
     term.wait_for("restored by hand", STEP, |s| {
         s.contains("Refs pane restored") && s.contains("LOCAL")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    term.send_keys("C-n h").unwrap();
+    term.send_keys("C-n H").unwrap();
     term.wait_for("collapsed by hand", STEP, |s| {
         s.contains("Refs pane collapsed") && !s.contains("LOCAL")
     })

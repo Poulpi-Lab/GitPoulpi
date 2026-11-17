@@ -130,7 +130,7 @@ fn the_palette_changes_the_theme_previews_and_escapes() {
 }
 
 #[test]
-fn ctrl_n_y_opens_the_picker_and_escape_closes_it() {
+fn ctrl_n_t_opens_the_picker_and_escape_closes_it() {
     let repo = fixture();
     let (mut term, _config) = common::launch(repo.root())
         .session("theme-picker-key")
@@ -138,7 +138,7 @@ fn ctrl_n_y_opens_the_picker_and_escape_closes_it() {
         .ready_when("the fixture loaded", |s| s.contains(MESSAGE))
         .start();
     term.send_keys("C-n").unwrap();
-    term.send_text("y").unwrap();
+    term.send_text("t").unwrap();
     term.wait_for("the theme list", STEP, |s| {
         s.contains("System (follows terminal)")
     })

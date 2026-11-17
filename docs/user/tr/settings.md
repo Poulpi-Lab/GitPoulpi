@@ -108,7 +108,7 @@ Birkaç pencere genelindeki açılır pencere Ayarlar'ın üzerinde açılır ve
 verir (sayfa, kaydırma konumu ve kaydedilmemiş İş Akışı ya da şablon değişiklikleri yerinde kalır):
 
 - komut paleti (`Ctrl+P`),
-- tema seçici (`Ctrl+N y`, **Uygulama: Temayı Değiştir...**); her temayı Ayarlar'ın kendisinde
+- tema seçici (`Ctrl+N t`, **Uygulama: Temayı Değiştir...**); her temayı Ayarlar'ın kendisinde
   önizler, `Esc` önceki temayı geri koyar,
 - dil ve grafik rengi seçicileri (`Ctrl+N` ardından ana penceredekiyle aynı harfler),
 - çalışma alanı araması (`Ctrl+Alt+F`),
@@ -175,7 +175,7 @@ Sayfa listesinde iki grup vardır:
 | **İşlem sürelerini göster**, **Genişletilmiş günlükleme** | Etkinlik Günlüğü'nün Git işlemleri sekmesi: her işlemin süresi (`log.timings`, varsayılan olarak açık) ve ayrıca arka plan işleri, yenileme ve otomatik fetch (`log.extended`, varsayılan olarak kapalı). Bkz. [Bir şey başarısız olduğunda](troubleshooting.md#etkinlik-günlüğü). |
 | **Geri alma açık**, **Geri alma geçmişi derinliği**, **GitPoulpi dışında yapılan değişiklikleri kaydet** | **Geri alma geçmişi** grubu. Geri Al'ı açar ya da kapatır ve kaç işlem tuttuğunu ayarlar (varsayılan 100, `0` sınırsız demektir). Geri Al'ı kapatmak, bir onaydan sonra geri alma geçmişini siler. Sonuncusu, bir kabuğun veya bir ajanın dallar, tag'ler, stash'ler ve HEAD üzerinde yaptıklarını da kaydeder. Bkz. [Geri al ve yinele](undo-redo.md). |
 
-**Uygulama: Dili Değiştir...** palet komutu (`Ctrl+N g`) aynı dil listesini açar. Orada
+**Uygulama: Dili Değiştir...** palet komutu (`Ctrl+N l`) aynı dil listesini açar. Orada
 vurgulanan dil canlı önizlenir; `Enter` onu korur, `Esc` öncekini geri getirir.
 
 ### Başlatıcı
@@ -421,7 +421,7 @@ görünür; bkz. [MCP ve ajanlar](mcp-and-agents.md).
 | **Girdi rengi**, **Özel girdi rengi** | Metin alanlarının arka planı: **Temayı izle** (varsayılan), sabit bir koyu renk ya da kendi `#rrggbb` değeriniz. |
 | **Metin imleci** | `ui.text_cursor`: **terminal** (varsayılan) terminalin kendi imlecini odaktaki metin alanının düzenleme noktasına çubuk olarak koyar (terminalinizin imleç ayarları geçerli olur ve bir giriş yönteminin aday penceresi o noktada açılır); **drawn** GitPoulpi'nin kendi imlecini çizer ve terminal imlecini gizli tutar. Hemen uygulanır. Palet: `Ayarlar: Metin imleci...`. |
 | **Renk derinliği** | **auto** (varsayılan), **truecolor**, **256** ya da **16**. Bkz. [Temalar](themes.md). |
-| **Grafik renk teması** | **Temayı izle** (varsayılan: temanın kendi şerit renkleri) ya da herhangi bir şerit paleti. Her palet renklerinden birkaçını gösterir. Ayarlar kapandığında uygulanır. **Uygulama: Grafik Renk Temasını Değiştir...** palet komutu (`Ctrl+N Shift+Y`) her paleti canlı önizler. |
+| **Grafik renk teması** | **Temayı izle** (varsayılan: temanın kendi şerit renkleri) ya da herhangi bir şerit paleti. Her palet renklerinden birkaçını gösterir. Ayarlar kapandığında uygulanır. **Uygulama: Grafik Renk Temasını Değiştir...** palet komutu (`Ctrl+N Shift+T`) her paleti canlı önizler. |
 | **Grafik şerit arka planı** | **Kapalı** (saydam) ya da **Satır tonu**: grafik sütununun arkasında şerit renginin soluk bir bandı ve kenarında ince bir çubuk. |
 | **Satır tonu gücü** | Satır tonu bandının ne kadar soluk olduğu: **Güçlü**, **Orta** (varsayılan) ya da **Hafif**. Kenardaki çubuk tam rengini korur. |
 | **Araç çubuğu konumu** | `ui.toolbar_position`: Araç çubuğunun yeri: Üst, Alt (varsayılan), Sol veya Sağ. Sol ve Sağ onu bölmelerin yanında bir sütun yapar; 80 sütundan dar bir pencerede altta çizilir. Hemen uygulanır. |

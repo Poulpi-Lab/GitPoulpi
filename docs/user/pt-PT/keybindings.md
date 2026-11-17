@@ -111,8 +111,8 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `git_prefix` | `lfs_push_all` | LFS: Push de todos os objetos | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS: Limpar objetos locais | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | Abrir o painel de reescrita do histórico | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | Recolher ou restaurar o painel Refs | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | Recolher ou restaurar o painel Status | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | Recolher ou restaurar o painel Refs | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | Recolher ou restaurar o painel Status | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | Abrir definições | `Ctrl+N ,` |
 | `nav_prefix` | `about` | Abrir Acerca de | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | Abrir o Registo de atividade | `Ctrl+N Shift+A` |
@@ -120,11 +120,11 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `nav_prefix` | `jobs` | Mostrar as tarefas em segundo plano | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | Mostrar o painel de atualizações | `Ctrl+N u` |
 | `nav_prefix` | `help` | Alternar ajuda | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | Selecionar separador | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | Mudar tema | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | Mudar idioma | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | Mudar tema de cores do grafo | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | Alternar tom das linhas do grafo | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | Selecionar separador | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | Mudar tema | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | Mudar idioma | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | Mudar tema de cores do grafo | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | Alternar tom das linhas do grafo | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | Aumentar a secção Refs | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | Diminuir a secção Refs | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | Aumentar o bloco de mensagem do commit | `Ctrl+N ]` |
@@ -501,12 +501,12 @@ As teclas são as predefinidas.
 | Navegação: levar o foco ao próximo painel | `Tab` |
 | Navegação: levar o foco ao painel anterior | `Shift+Tab` |
 | Navegação: pesquisar commits... | `f` |
-| Navegação: recolher/expandir o painel Refs | `Ctrl+N h` |
+| Navegação: recolher/expandir o painel Refs | `Ctrl+N H` |
 | Navegação: Alargar o painel Refs | `Ctrl+N Right` |
 | Navegação: Estreitar o painel Refs | `Ctrl+N Left` |
 | Navegação: Alargar o painel Status | `Ctrl+N Shift+Left` |
 | Navegação: Estreitar o painel Status | `Ctrl+N Shift+Right` |
-| Navegação: recolher/expandir o painel Status | `Ctrl+N l` |
+| Navegação: recolher/expandir o painel Status | `Ctrl+N L` |
 | Navegação: aumentar a secção Refs | `Ctrl+N +` |
 | Navegação: diminuir a secção Refs | `Ctrl+N -` |
 | Navegação: repor os tamanhos das secções Refs |  |
@@ -1235,8 +1235,8 @@ As teclas são as predefinidas.
 | Aplicação: tema... |  |
 | Conflitos: editar as listas de branches base... |  |
 | Conflitos: branches base deste repositório... |  |
-| Aplicação: mudar tema... | `Ctrl+N y` |
-| Aplicação: mudar idioma... | `Ctrl+N g` |
+| Aplicação: mudar tema... | `Ctrl+N t` |
+| Aplicação: mudar idioma... | `Ctrl+N l` |
 | Lançador: criar atalho |  |
 | Lançador: criar atalho do ambiente de trabalho |  |
 | Lançador: remover atalhos |  |
@@ -1246,8 +1246,8 @@ As teclas são as predefinidas.
 | Lançador: remover do PATH |  |
 | Lançador: instalar o menu Abrir no GitPoulpi |  |
 | Lançador: remover o menu Abrir no GitPoulpi |  |
-| Aplicação: mudar tema de cores do grafo... | `Ctrl+N Y` |
-| Aplicação: alternar tom das linhas do grafo | `Ctrl+N T` |
+| Aplicação: mudar tema de cores do grafo... | `Ctrl+N T` |
+| Aplicação: alternar tom das linhas do grafo | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## Mover-se
@@ -1366,14 +1366,14 @@ tecla seguinte executa uma ação, ou cancela.
 | Tecla | Ação |
 |---|---|
 | `Ctrl+N` e depois um selo | Focar a parte da janela que mostra este selo |
-| `Ctrl+N h` / `Ctrl+N l` | Recolher ou repor o painel Refs / o painel direito |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | Recolher ou repor o painel Refs / o painel direito |
 | `Ctrl+N Left` / `Ctrl+N Right` | Mover o divisor entre o painel Refs e o Log um passo para a esquerda / direita (um painel Refs recolhido volta primeiro) |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | Mover o divisor entre o Log e o painel direito um passo para a esquerda / direita |
 | `Ctrl+N +` / `Ctrl+N -` | Aumentar / reduzir a secção Refs ativa em uma linha |
 | `Ctrl+N ]` / `Ctrl+N [` | Aumentar / reduzir o bloco da mensagem de commit do painel direito em uma linha |
-| `Ctrl+N t` | Escolher um separador (o seletor de separadores; `t` sozinho faz o mesmo) |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | Mudar o tema / o idioma / o tema de cores do grafo |
-| `Ctrl+N Shift+T` | Ligar ou desligar as tonalidades das linhas do grafo |
+| `Ctrl+N Tab` | Escolher um separador (o seletor de separadores; `t` sozinho faz o mesmo) |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | Mudar o tema / o idioma / o tema de cores do grafo |
+| `Ctrl+N Shift+Y` | Ligar ou desligar as tonalidades das linhas do grafo |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | Mostrar a vista que um agente preparou / voltar atrás (consulte [MCP e agentes](mcp-and-agents.md)) |
 | `Ctrl+N ,` | Abrir as Definições |
 | `Ctrl+N ?` | Abrir ou fechar a ajuda |

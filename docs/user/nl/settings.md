@@ -110,7 +110,7 @@ Een paar pop-ups voor het hele venster openen over de Instellingen en geven ze t
 de scrollpositie en niet-opgeslagen wijzigingen aan Workflow of sjablonen blijven behouden):
 
 - het opdrachtenpalet (`Ctrl+P`),
-- de themakiezer (`Ctrl+N y`, **App: Thema wijzigen...**), die elk thema in de Instellingen zelf laat zien;
+- de themakiezer (`Ctrl+N t`, **App: Thema wijzigen...**), die elk thema in de Instellingen zelf laat zien;
   `Esc` zet het vorige thema terug,
 - de kiezers voor taal en grafiekkleuren (`Ctrl+N` en dan dezelfde letters als in het hoofdvenster),
 - het zoeken in de werkruimte (`Ctrl+Alt+F`),
@@ -177,7 +177,7 @@ De paginalijst heeft twee groepen:
 | **Duur van bewerkingen tonen**, **Uitgebreid loggen** | Het tabblad Git-bewerkingen van het activiteitenlogboek: de duur van elke bewerking (`log.timings`, standaard aan) en ook het achtergrondwerk, vernieuwen en auto-fetch (`log.extended`, standaard uit). Zie [Wanneer er iets mislukt](troubleshooting.md#het-activiteitenlogboek). |
 | **Ongedaan maken ingeschakeld**, **Diepte van de ongedaanmaakgeschiedenis**, **Wijzigingen buiten GitPoulpi vastleggen** | De groep **Geschiedenis van ongedaan maken**. Zet Ongedaan maken aan of uit en bepaalt hoeveel bewerkingen het bewaart (standaard 100, `0` betekent onbeperkt). Ongedaan maken uitzetten wist de ongedaanmaakgeschiedenis, na een bevestiging. De laatste legt ook vast wat een shell of een agent met branches, tags, stashes en HEAD doet. Zie [Ongedaan maken en opnieuw](undo-redo.md). |
 
-De opdracht **App: Taal wijzigen...** van het palet (`Ctrl+N g`) opent dezelfde talenlijst. Daar toont
+De opdracht **App: Taal wijzigen...** van het palet (`Ctrl+N l`) opent dezelfde talenlijst. Daar toont
 de gemarkeerde taal live een voorbeeld; `Enter` houdt haar en `Esc` herstelt de vorige.
 
 ### Starter
@@ -423,7 +423,7 @@ de server bevatten; zie [MCP en agents](mcp-and-agents.md).
 | **Invoerkleur**, **Aangepaste invoerkleur** | De achtergrond van tekstvelden: **Thema volgen** (standaard), een vaste donkere kleur of je eigen `#rrggbb`. |
 | **Tekstcursor** | `ui.text_cursor`: **terminal** (standaard) zet de eigen cursor van de terminal op de invoegpositie van het actieve tekstveld, als streepje (de cursorinstellingen van je terminal gelden, en het kandidatenvenster van een invoermethode opent bij de invoegpositie); **drawn** tekent de eigen invoegpositie van GitPoulpi en houdt de terminalcursor verborgen. Geldt meteen. Palet: `Instellingen: Tekstcursor...`. |
 | **Kleurdiepte** | **auto** (standaard), **truecolor**, **256** of **16**. Zie [Thema's](themes.md). |
-| **Kleurthema van de grafiek** | **Thema volgen** (standaard: de eigen baankleuren van het thema) of een willekeurig baanpalet. Elk palet toont enkele van zijn kleuren. Geldt als de Instellingen sluiten. De opdracht **App: Kleurthema van de grafiek wijzigen...** van het palet (`Ctrl+N Shift+Y`) toont elk palet live vooraf. |
+| **Kleurthema van de grafiek** | **Thema volgen** (standaard: de eigen baankleuren van het thema) of een willekeurig baanpalet. Elk palet toont enkele van zijn kleuren. Geldt als de Instellingen sluiten. De opdracht **App: Kleurthema van de grafiek wijzigen...** van het palet (`Ctrl+N Shift+T`) toont elk palet live vooraf. |
 | **Achtergrond van grafiekbanen** | **Uit** (transparant) of **Rijtint**: een zwakke band in de baankleur achter de grafiekkolom, met een dunne balk aan de rand ervan. |
 | **Sterkte van rijtint** | Hoe vervaagd de band van Rijtint is: **Sterk**, **Gemiddeld** (standaard) of **Subtiel**. De balk aan de rand behoudt zijn volle kleur. |
 | **Positie van de werkbalk** | `ui.toolbar_position`: Waar de werkbalk staat: Boven, Onder (standaard), Links of Rechts. Links en Rechts maken er een kolom naast de panelen van; in een venster smaller dan 80 kolommen staat hij onderaan. Werkt direct. |

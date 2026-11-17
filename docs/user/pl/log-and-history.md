@@ -29,7 +29,7 @@ kwadraty na ścieżce obok commita, na którym powstały.
 
 Kolory ścieżek pochodzą z motywu. *Ustawienia > Wygląd > Motyw kolorów grafu*
 łączy dowolny motyw z dowolną paletą ścieżek, a selektor *Aplikacja: Zmień
-motyw kolorów grafu...* w palecie (`Ctrl+N Shift+Y`) pokazuje na żywo podgląd
+motyw kolorów grafu...* w palecie (`Ctrl+N Shift+T`) pokazuje na żywo podgląd
 każdej palety; zob. [Motywy](themes.md). *Tło ścieżek grafu* ustawione na
 **Podbarwienie wiersza** maluje blady pas koloru ścieżki za kolumną grafu i cienki pasek
 na jego krawędzi. *Intensywność podbarwienia* (**Mocne**, **Średnie** (domyślnie),

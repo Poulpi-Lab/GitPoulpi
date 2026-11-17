@@ -311,7 +311,7 @@ under dig; **Enter** behåller det (det sparas), **Esc** eller ett klick utanfö
 
 ### Byt tema från paletten
 
-**App: Byt tema...** (`Ctrl+P`, eller `Ctrl+N y`; tangenten kan bindas om som
+**App: Byt tema...** (`Ctrl+P`, eller `Ctrl+N t`; tangenten kan bindas om som
 `nav_prefix.change_theme`) öppnar en lista med samma teman utan att gå via
 Inställningar: **System (följer terminalen)**, förinställningarna och sedan dina
 egna temafiler, var och en med fyra små färgchips. Det aktuella temat är

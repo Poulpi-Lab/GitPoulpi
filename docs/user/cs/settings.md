@@ -110,7 +110,7 @@ Několik oken platných pro celou aplikaci se otevírá nad Nastavením a vrací
 jak bylo (stránka, poloha posunu a neuložené změny Workflow nebo šablon zůstanou):
 
 - paleta příkazů (`Ctrl+P`),
-- výběr motivu (`Ctrl+N y`, **Aplikace: Změnit motiv...**), který ukazuje náhled každého
+- výběr motivu (`Ctrl+N t`, **Aplikace: Změnit motiv...**), který ukazuje náhled každého
   motivu přímo na Nastavení; `Esc` vrátí předchozí motiv,
 - výběry jazyka a barev grafu (`Ctrl+N` a pak stejná písmena jako v hlavním okně),
 - hledání v pracovním prostoru (`Ctrl+Alt+F`),
@@ -177,7 +177,7 @@ Seznam stránek má dvě skupiny:
 | **Zobrazit dobu trvání operací**, **Rozšířené protokolování** | Karta Operace gitu v Protokolu aktivity: doba trvání každé operace (`log.timings`, ve výchozím stavu zapnuto) a také práce na pozadí, obnovení a auto-fetch (`log.extended`, ve výchozím stavu vypnuto). Viz [Když něco selže](troubleshooting.md#protokol-aktivity). |
 | **Zpět povoleno**, **Hloubka historie Zpět**, **Zaznamenávat změny provedené mimo GitPoulpi** | Skupina **Historie vrácení**. Zapíná a vypíná Zpět a nastavuje, kolik operací uchová (výchozí 100, `0` znamená neomezeně). Vypnutí Zpět po potvrzení smaže historii vracení. Poslední volba zaznamenává i to, co shell nebo agent udělá s větvemi, tagy, stashi a HEADem. Viz [Zpět a znovu](undo-redo.md). |
 
-Příkaz z palety **Aplikace: Změnit jazyk...** (`Ctrl+N g`) otevře stejný seznam
+Příkaz z palety **Aplikace: Změnit jazyk...** (`Ctrl+N l`) otevře stejný seznam
 jazyků. Zvýrazněný jazyk se zde ukazuje živě; `Enter` ho ponechá a `Esc`
 obnoví předchozí.
 
@@ -418,7 +418,7 @@ obsahují; viz [MCP a agenti](mcp-and-agents.md).
 | **Barva vstupů**, **Vlastní barva vstupů** | Pozadí textových polí: **Podle motivu** (výchozí), pevná tmavá barva, nebo vaše vlastní `#rrggbb`. |
 | **Textový kurzor** | `ui.text_cursor`: **terminal** (výchozí) umístí vlastní kurzor terminálu na místo vkládání v aktivním textovém poli, jako svislou čárku (platí nastavení kurzoru vašeho terminálu a okno s návrhy metody zadávání se otevře u kurzoru); **drawn** vykreslí vlastní kurzor GitPoulpi a kurzor terminálu nechá skrytý. Platí okamžitě. Paleta: `Nastavení: Textový kurzor...`. |
 | **Barevná hloubka** | **auto** (výchozí), **truecolor**, **256** nebo **16**. Viz [Motivy](themes.md). |
-| **Barevný motiv grafu** | **Podle motivu** (výchozí: vlastní barvy drah motivu) nebo libovolná paleta drah. Každá paleta ukazuje několik svých barev. Použije se po zavření Nastavení. Příkaz z palety **Aplikace: Změnit barevný motiv grafu...** (`Ctrl+N Shift+Y`) ukazuje každou paletu živě. |
+| **Barevný motiv grafu** | **Podle motivu** (výchozí: vlastní barvy drah motivu) nebo libovolná paleta drah. Každá paleta ukazuje několik svých barev. Použije se po zavření Nastavení. Příkaz z palety **Aplikace: Změnit barevný motiv grafu...** (`Ctrl+N Shift+T`) ukazuje každou paletu živě. |
 | **Pozadí drah grafu** | **Vypnuto** (průhledné) nebo **Podbarvení řádku**: slabý pruh barvy dráhy za sloupcem grafu s tenkou lištou na okraji. |
 | **Síla podbarvení řádku** | Jak vybledlý je pruh podbarvení: **Silné**, **Střední** (výchozí) nebo **Jemné**. Okrajová lišta si ponechá plnou barvu. |
 | **Umístění panelu nástrojů** | `ui.toolbar_position`: Kde je panel nástrojů: Nahoře, Dole (výchozí), Vlevo nebo Vpravo. Vlevo a Vpravo z něj udělají sloupec vedle panelů; v okně užším než 80 sloupců se kreslí dole. Projeví se hned. |

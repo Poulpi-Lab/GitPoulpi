@@ -110,8 +110,8 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `git_prefix` | `lfs_push_all` | LFS: Push (alle Objekte) | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS: Lokale Objekte bereinigen | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | Werkbank zum Umschreiben des Verlaufs öffnen | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | Refs-Bereich ein- oder ausklappen | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | Status-Bereich ein- oder ausklappen | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | Refs-Bereich ein- oder ausklappen | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | Status-Bereich ein- oder ausklappen | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | Einstellungen öffnen | `Ctrl+N ,` |
 | `nav_prefix` | `about` | „Über GitPoulpi“ öffnen | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | Aktivitätsprotokoll öffnen | `Ctrl+N Shift+A` |
@@ -119,11 +119,11 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `nav_prefix` | `jobs` | Hintergrundaufgaben anzeigen | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | Update-Fenster anzeigen | `Ctrl+N u` |
 | `nav_prefix` | `help` | Hilfe umschalten | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | Tab auswählen | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | Design wechseln | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | Sprache wechseln | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | Farbschema des Graphen wechseln | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | Zeilenfärbung des Graphen umschalten | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | Tab auswählen | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | Design wechseln | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | Sprache wechseln | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | Farbschema des Graphen wechseln | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | Zeilenfärbung des Graphen umschalten | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | Refs-Abschnitt vergrößern | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | Refs-Abschnitt verkleinern | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | Commit-Nachrichtenblock vergrößern | `Ctrl+N ]` |
@@ -498,12 +498,12 @@ die Standardtasten.
 | Navigation: Fokus zum nächsten Bereich wechseln | `Tab` |
 | Navigation: Fokus zum vorherigen Bereich wechseln | `Shift+Tab` |
 | Navigation: Commits suchen... | `f` |
-| Navigation: Refs-Bereich ein-/ausklappen | `Ctrl+N h` |
+| Navigation: Refs-Bereich ein-/ausklappen | `Ctrl+N H` |
 | Navigation: Refs-Bereich verbreitern | `Ctrl+N Right` |
 | Navigation: Refs-Bereich verschmälern | `Ctrl+N Left` |
 | Navigation: Status-Bereich verbreitern | `Ctrl+N Shift+Left` |
 | Navigation: Status-Bereich verschmälern | `Ctrl+N Shift+Right` |
-| Navigation: Status-Bereich ein-/ausklappen | `Ctrl+N l` |
+| Navigation: Status-Bereich ein-/ausklappen | `Ctrl+N L` |
 | Navigation: Refs-Abschnitt vergrößern | `Ctrl+N +` |
 | Navigation: Refs-Abschnitt verkleinern | `Ctrl+N -` |
 | Navigation: Größen der Refs-Abschnitte zurücksetzen |  |
@@ -1232,8 +1232,8 @@ die Standardtasten.
 | App: Design... |  |
 | Konflikte: Basis-Branch-Listen bearbeiten... |  |
 | Konflikte: Basis-Branches dieses Repositorys... |  |
-| App: Design wechseln... | `Ctrl+N y` |
-| App: Sprache wechseln... | `Ctrl+N g` |
+| App: Design wechseln... | `Ctrl+N t` |
+| App: Sprache wechseln... | `Ctrl+N l` |
 | Starter: Verknüpfung erstellen |  |
 | Starter: Desktop-Verknüpfung erstellen |  |
 | Starter: Verknüpfungen entfernen |  |
@@ -1243,8 +1243,8 @@ die Standardtasten.
 | Starter: Aus dem PATH entfernen |  |
 | Starter: Menü „In GitPoulpi öffnen“ installieren |  |
 | Starter: Menü „In GitPoulpi öffnen“ entfernen |  |
-| App: Farbschema des Graphen wechseln... | `Ctrl+N Y` |
-| App: Zeilenfärbung des Graphen umschalten | `Ctrl+N T` |
+| App: Farbschema des Graphen wechseln... | `Ctrl+N T` |
+| App: Zeilenfärbung des Graphen umschalten | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## Sich bewegen
@@ -1362,14 +1362,14 @@ Die nächste Taste führt eine Aktion aus oder bricht ab.
 | Taste | Aktion |
 |---|---|
 | `Ctrl+N` dann ein Badge | Den Teil des Fensters fokussieren, der dieses Badge zeigt |
-| `Ctrl+N h` / `Ctrl+N l` | Den Refs-Bereich / den rechten Bereich einklappen oder wiederherstellen |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | Den Refs-Bereich / den rechten Bereich einklappen oder wiederherstellen |
 | `Ctrl+N Left` / `Ctrl+N Right` | Die Trennlinie zwischen Refs-Bereich und Log um eine Stufe nach links / rechts verschieben (ein eingeklappter Refs-Bereich kommt zuerst zurück) |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | Die Trennlinie zwischen Log und rechtem Bereich um eine Stufe nach links / rechts verschieben |
 | `Ctrl+N +` / `Ctrl+N -` | Den aktiven Refs-Abschnitt um eine Zeile vergrößern / verkleinern |
 | `Ctrl+N ]` / `Ctrl+N [` | Den Block der Commit-Nachricht des rechten Bereichs um eine Zeile vergrößern / verkleinern |
-| `Ctrl+N t` | Einen Tab wählen (die Tab-Auswahl; `t` allein tut dasselbe) |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | Das Design / die Sprache / das Farbschema des Graphen wechseln |
-| `Ctrl+N Shift+T` | Die Zeilentönung des Graphen ein- oder ausschalten |
+| `Ctrl+N Tab` | Einen Tab wählen (die Tab-Auswahl; `t` allein tut dasselbe) |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | Das Design / die Sprache / das Farbschema des Graphen wechseln |
+| `Ctrl+N Shift+Y` | Die Zeilentönung des Graphen ein- oder ausschalten |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | Die von einem Agenten vorbereitete Ansicht zeigen / zurückgehen (siehe [MCP und Agenten](mcp-and-agents.md)) |
 | `Ctrl+N ,` | Die Einstellungen öffnen |
 | `Ctrl+N ?` | Die Hilfe öffnen oder schließen |

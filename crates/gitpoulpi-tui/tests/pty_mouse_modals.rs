@@ -80,7 +80,7 @@ fn two_tabs(session: &str) -> (Terminal, tempfile::TempDir, [FixtureRepo; 2], [P
 fn open_picker(term: &mut Terminal) {
     term.send_keys("C-n").unwrap();
     term.wait_for_text("select tab", STEP).unwrap();
-    term.send_keys("t").unwrap();
+    term.send_keys("Tab").unwrap();
     term.wait_for_text("Select Tab (2/2)", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
 }

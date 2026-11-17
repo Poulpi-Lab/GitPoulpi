@@ -9,11 +9,11 @@ use super::*;
 #[test]
 fn navigation_key_action_maps_every_prefix_key() {
     assert_eq!(
-        navigation_key_action(KeyCode::Char('h')),
+        navigation_key_action_mods(KeyCode::Char('H'), crossterm::event::KeyModifiers::SHIFT),
         NavigationAction::CollapseLeft
     );
     assert_eq!(
-        navigation_key_action(KeyCode::Char('l')),
+        navigation_key_action_mods(KeyCode::Char('L'), crossterm::event::KeyModifiers::SHIFT),
         NavigationAction::CollapseRight
     );
     assert_eq!(
@@ -37,7 +37,7 @@ fn navigation_key_action_maps_every_prefix_key() {
         NavigationAction::ToggleHelp
     );
     assert_eq!(
-        navigation_key_action(KeyCode::Char('t')),
+        navigation_key_action(KeyCode::Tab),
         NavigationAction::SelectTab
     );
 }
@@ -155,16 +155,16 @@ fn navigation_badge_char_is_digits_then_letters() {
     assert_eq!(navigation_badge_char(10), 'c');
 }
 
-/// `h`/`l`/`q`/`t` are reserved and must never come back as a badge,
-/// at any index - otherwise `Ctrl+N h` would be ambiguous between
-/// "collapse the Refs pane" and "focus whatever got badge h", and
-/// likewise `Ctrl+N t` between "open the tab picker" and "focus
-/// whatever got badge t".
+/// `l`/`q`/`t` are reserved and must never come back as a badge,
+/// at any index - otherwise `Ctrl+N l` would be ambiguous between
+/// "open the language picker" and "focus whatever got badge l", and
+/// likewise `Ctrl+N t` between "open the theme picker" and "focus
+/// whatever got badge t". `g`, `h` and `y` are free badge letters now.
 #[test]
 fn navigation_badge_char_never_hands_out_a_reserved_letter() {
     for i in 9..80 {
         let c = navigation_badge_char(i);
-        assert!(!"ahlqt".contains(c), "index {i} handed out reserved '{c}'");
+        assert!(!"alqt".contains(c), "index {i} handed out reserved '{c}'");
     }
 }
 

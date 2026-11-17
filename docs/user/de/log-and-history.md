@@ -29,7 +29,7 @@ als kleine Quadrate auf einer Spur neben dem Commit, auf dem sie erstellt wurden
 
 Die Spurfarben stammen aus dem Design. *Einstellungen > Darstellung > Farbschema des
 Graphen* kombiniert jedes Design mit jeder Spurpalette, und die Auswahl der Palette
-*App: Farbschema des Graphen wechseln...* (`Ctrl+N Shift+Y`) zeigt jede Palette live
+*App: Farbschema des Graphen wechseln...* (`Ctrl+N Shift+T`) zeigt jede Palette live
 in der Vorschau; siehe [Designs](themes.md). *Hintergrund der Graph-Spuren* auf
 **Zeilentönung** gestellt malt ein schwaches Band in der Spurfarbe hinter die
 Graph-Spalte und einen dünnen Balken an ihren Rand. *Stärke der Zeilentönung*

@@ -309,7 +309,7 @@ przywraca poprzedni i niczego nie zapisuje. Pozycja palety **Aplikacja: Motyw...
 
 ### Zmiana motywu z palety
 
-**Aplikacja: Zmień motyw...** (`Ctrl+P` albo `Ctrl+N y`; klawisz można przypisać
+**Aplikacja: Zmień motyw...** (`Ctrl+P` albo `Ctrl+N t`; klawisz można przypisać
 na nowo jako `nav_prefix.change_theme`) otwiera listę tych samych motywów bez
 przechodzenia przez Ustawienia: **System (zgodny z terminalem)**, motywy wbudowane, potem
 własne pliki motywów, każdy z czterema małymi próbkami kolorów. Bieżący

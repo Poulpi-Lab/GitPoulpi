@@ -136,7 +136,7 @@ chaque option de chaque page. Cliquez dessus, ou appuyez sur `/` ou `Ctrl+F`, et
 tapez. Une liste de résultats se déroule. Chaque résultat montre l'option et sa
 page. `Up` / `Down` choisissent, `Enter` va à l'option, `Esc` ferme la liste.
 
-![Recherche de « diff » dans les Paramètres : les options correspondantes des pages Journal et graphe, Diff et éditeur et Git](../images/settings-search.png)
+![Recherche de « diff » dans les Paramètres : les options correspondantes des pages IA et Diff et éditeur](../images/settings-search.png)
 
 ## Paramètres depuis la palette de commandes
 
@@ -215,7 +215,7 @@ la couleur de votre logo (À propos > couleur) ; sous Linux, chaque couleur a s
 
 **Regroupement dans la barre des tâches et le dock.** GitPoulpi tourne dans une fenêtre de terminal, donc la barre des tâches l'affiche normalement sous l'icône du terminal, sans point « en cours d'exécution » sous l'icône GitPoulpi épinglée. Windows : les raccourcis portent l'AppUserModelID `GitPoulpi.GitPoulpi`, et un GitPoulpi lancé depuis l'un d'eux donne le même ID et son icône à la fenêtre de son terminal (il retrouve la fenêtre en lui donnant un instant un titre unique, puis rétablit le titre), si bien que la fenêtre se range sous l'icône GitPoulpi épinglée. Une fenêtre de terminal à plusieurs onglets se déplace d'un bloc : tous ses onglets se regroupent sous l'icône de GitPoulpi tant que GitPoulpi y tourne. Les raccourcis et les épingles de barre des tâches créés plus tôt sont réécrits par la même synchronisation ; si une épingle affiche encore l'icône du terminal, désépinglez-la puis épinglez-la de nouveau. Linux : kitty, foot, Alacritty, WezTerm et Ghostty démarrent avec la classe de fenêtre `gitpoulpi` et l'entrée `.desktop` la nomme (`StartupWMClass`), donc un dock range la fenêtre sous l'icône du lanceur ; les autres terminaux gardent leur propre icône. macOS : rien à faire, le Dock regroupe par application.
 
-![Paramètres > Lanceur : le terminal des raccourcis et la ligne du lanceur d'applications](../images/settings-launcher.png)
+![Paramètres > Lanceur : le terminal des raccourcis, le build du lanceur, les alias de commande et de nouvel onglet, l'état de l'alias et la vérification du PATH](../images/settings-launcher.png)
 
 #### Alias de commande et PATH, selon le système
 
@@ -414,7 +414,7 @@ que dans les builds qui incluent le serveur ; voir [MCP et agents](mcp-and-agen
 
 ### Apparence
 
-![La page Apparence : thème, avatars, couleur des champs, profondeur de couleur et couleurs du graphe (les formats de date suivent plus bas)](../images/settings-ui.png)
+![La page Apparence, défilée vers le bas : sources d'avatars et avatar de repli, couleur des champs, profondeur de couleur, curseur de texte et début des couleurs du graphe (les formats de date suivent plus bas)](../images/settings-ui.png)
 
 ![La liste Thème ouverte sur Apparence avec Clair en surbrillance : tout l'écran des Paramètres se repeint déjà dans ce thème](../images/settings-appearance-theme.png)
 
@@ -571,7 +571,7 @@ La partie globale de la détection proactive des conflits (`gitpoulpi ui show se
 | **Branches de base par défaut** | Sous l'option. La liste de motifs de branches de base qu'utilisent les dépôts qui n'ont pas la leur : **Intégrée (`**`)**, c'est-à-dire toutes les branches, ou l'une de vos listes nommées (`conflict_prevention.default_list`). S'applique aux dépôts ouverts à la fermeture des Paramètres. **Revenir à la valeur intégrée** revient à `**`. |
 | **Listes de branches de base** | Aussi sur cette page : vos listes nommées de motifs de branches de base (`[conflict_prevention.lists.<nom>]`), un bloc chacune avec son **Nom** (renommer la conserve par défaut si elle l'était ; un dépôt qui suivait l'ancien nom utilise la liste par défaut tant que vous ne la choisissez pas à nouveau), ses **Motifs** (un par ligne, `Enter` ou un clic ouvre l'éditeur, `Ctrl+S` le garde), **Définir par défaut** et **Supprimer la liste** (il demande d'abord, et précise que les dépôts qui la suivent utiliseront la liste par défaut). Saisissez un nom dans **Nouvelle liste** et appuyez sur `Enter` pour en ajouter une ; elle commence par `**`. Modifier une liste change chaque dépôt qui la suit. |
 
-### Propre au dépôt : Git et encodage
+### Propre au dépôt : Git et encodage
 
 ![La page Git et encodage pour ce dépôt](../images/settings-git.png)
 
@@ -581,7 +581,7 @@ La partie globale de la détection proactive des conflits (`gitpoulpi ui show se
 | **Bouton Pull** | Ce que fait le bouton Pull : merge (fast-forward si possible), fast-forward seul, ou rebase. Global. Les éléments `▾` ne le changent pas. |
 | **Bouton Push** | **direct** pousse aussitôt ; **ask** montre d'abord le menu des distants. Global. |
 | **Vérifier chaque distant avant un push** | Activé par défaut (`git.push_group_preflight`). Avant un push d'une branche qui a des cibles de push supplémentaires, regarde d'abord chaque distant (une requête rapide, plus un téléchargement de ce distant seulement quand il diffère), pour qu'un problème sur le troisième distant apparaisse avant le début du premier push. Désactivé : pousse vers chaque distant à tour de rôle et rend compte. Global. |
-| **Merge fast-forward** | Ce que fait un merge que vous lancez quand la branche pourrait simplement avancer en fast-forward : **never** (par défaut) crée toujours un commit de merge, **allowed** fait un fast-forward quand c'est possible (le comportement par défaut de git), **only** fait un fast-forward ou refuse. Global (`git.merge_fast_forward`) ; un dépôt le remplace sur sa page [Options de merge](#propre-au-dépôt-options-de-merge). |
+| **Merge fast-forward** | Ce que fait un merge que vous lancez quand la branche pourrait simplement avancer en fast-forward : **never** (par défaut) crée toujours un commit de merge, **allowed** fait un fast-forward quand c'est possible (le comportement par défaut de git), **only** fait un fast-forward ou refuse. Global (`git.merge_fast_forward`) ; un dépôt le remplace sur sa page [Options de merge](#propre-au-dépôt--options-de-merge). |
 | **Encodage par défaut** | L'encodage utilisé pour afficher le texte qui **n'est pas de l'UTF-8 valide** : contenus de fichiers, blame, diffs et messages de commit. La page a une ligne globale et une ligne pour ce dépôt ; celle du dépôt l'emporte. L'UTF-8 valide n'est jamais redécodé, et le stage ne réencode jamais rien. |
 | **core.autocrlf**, **core.eol** | Les paramètres git propres à ce dépôt. La ligne écrit `core.autocrlf` ou `core.eol` dans la configuration git du dépôt. **(hérité)** retire la valeur du dépôt, de sorte que votre configuration git globale s'applique. `Ctrl+Z` restaure la valeur précédente. L'équivalent CLI est `gitpoulpi repo-config`. |
 | **Cibles de push supplémentaires pour les nouvelles branches** | Ce dépôt seulement : sous ce titre, une case par distant du dépôt. Un distant coché devient une cible de push supplémentaire de chaque nouvelle branche, en plus de son amont, au moment où la branche reçoit son premier amont (un premier push qui le définit, ou une branche créée depuis une branche distante). Le choix est copié dans les clés `gitpoulpi-push-to` de la branche, donc les branches existantes ne changent pas : modifiez-les depuis le badge **Distants** de leur ligne Refs (ou `u` sur la ligne). Enregistré dans les données du dépôt (`default_push_targets` dans `repo-state.toml`). |
@@ -590,7 +590,7 @@ La partie globale de la détection proactive des conflits (`gitpoulpi ui show se
 | **Programme git-lfs** | Le programme `git-lfs` détecté (lecture seule). |
 | **Initialiser LFS pour ce dépôt** | Lance `git lfs install --local` maintenant. |
 
-### Propre au dépôt : SSH et identifiants
+### Propre au dépôt : SSH et identifiants
 
 `gitpoulpi ui show settings ssh-credentials`. Comment *ce dépôt* se connecte, conservé dans le dossier privé de
 GitPoulpi : rien n'est écrit dans le dépôt ni dans la configuration de git, et ce n'est pas annulable (comme tout
@@ -648,7 +648,7 @@ l'entrée), à côté de **Ouvrir les Intégrations** quand un compte d'intégra
 identifiants...** du menu de l'onglet ouvre aussi la page ; elle remplace l'ancien menu d'épingle **Clé SSH...** et son
 entrée de palette.
 
-### Propre au dépôt : Extraction partielle
+### Propre au dépôt : Extraction partielle
 
 Les mêmes commandes que la boîte Extraction partielle (`Dépôt : Extraction partielle...`), sous forme de page des
 paramètres de ce dépôt (`gitpoulpi ui show settings sparse-checkout`).
@@ -665,7 +665,7 @@ Les boutons s'exécutent comme des actions ordinaires en arrière-plan (la page 
 partielle... » pendant l'une d'elles). Comme la boîte, ils ne sont pas dans la pile d'annulation : rien n'est perdu,
 et **Arrêter** ramène tous les fichiers.
 
-### Propre au dépôt : LFS
+### Propre au dépôt : LFS
 
 L'état LFS de ce dépôt (`gitpoulpi ui show settings lfs` ; absent d'un build sans LFS).
 
@@ -686,7 +686,7 @@ lecture LFS d'un dépôt n'est pas arrivée, il peut donc apparaître un instant
 depuis cette page le fait apparaître. Les commandes de palette `LFS :` restent disponibles partout, **LFS : Initialiser
 pour ce dépôt** comprise.
 
-### Propre au dépôt : Commit
+### Propre au dépôt : Commit
 
 Comment se comporte un commit fait dans ce dépôt (`gitpoulpi ui show settings commit`). Les deux options sont
 **désactivées** par défaut et enregistrées pour ce dépôt seulement (`[preferences]` dans
@@ -701,7 +701,7 @@ Sans cette valeur par défaut, les hooks de commit d'un dépôt s'exécutent à 
 utilisé par GitPoulpi (un dépôt qui a des hooks de commit est commité par le `git` du système, car libgit2 n'en
 exécute aucun). Un hook qui échoue montre sa sortie dans son entrée du Journal d'activité (la ligne d'état dit que le commit a échoué) et rien n'est commité.
 
-### Propre au dépôt : Options de merge
+### Propre au dépôt : Options de merge
 
 Deux réglages. **Fast-forward** dit ce que fait un merge quand la branche pourrait simplement avancer en fast-forward :
 
@@ -726,7 +726,7 @@ conflit. Les modifications indexées ne sont pas une entrée d'annulation (aucun
 restaurer) ; la commande `gitpoulpi merge <branche> --squash` de la CLI fait la même chose, quel que soit le
 paramètre. Un squash l'emporte sur **Fast-forward**.
 
-### Propre au dépôt : Modèle de message
+### Propre au dépôt : Modèle de message
 
 Un message avec lequel le formulaire de commit démarre (`gitpoulpi ui show settings commit-template`).
 
@@ -743,7 +743,7 @@ Un message avec lequel le formulaire de commit démarre (`gitpoulpi ui show sett
   en ligne de commande et les autres outils l'utilisent aussi. Si `commit.template` pointe déjà vers un autre fichier,
   la page montre le chemin de ce fichier, modifie *ce fichier* et laisse le paramètre tel quel.
 
-### Propre au dépôt : Prévention des conflits
+### Propre au dépôt : Prévention des conflits
 
 `gitpoulpi ui show settings conflict-prevention`. La page de la détection proactive des conflits de ce dépôt
 (voir [Résoudre les conflits de merge](merge-conflicts.md#prévention-des-conflits)) :
@@ -780,7 +780,7 @@ Un message avec lequel le formulaire de commit démarre (`gitpoulpi ui show sett
   locale et comme branche de n'importe quel distant (`main` et `*/main`). Il les copie une fois ; il ne suit pas les
   changements ultérieurs du workflow.
 
-### Propre au dépôt : IA
+### Propre au dépôt : IA
 
 ![La page IA du dépôt : instructions du dépôt, avec Ajouter au global ou Remplacer le global, et un profil et des instructions pour chaque action](../images/settings-repo-ai.png)
 
@@ -793,7 +793,7 @@ racine du dépôt et un fichier du dépôt est stocké relativement à elle) ; 
 le fichier supplémentaire global pour ce dépôt, alors qu'un champ vide continue de le suivre ; **Revenir au global** (visible dès que
 le dépôt a ses propres valeurs) les remet tous à zéro. Elles sont stockées dans le `repo-state.toml` de ce dépôt.
 
-### Propre au dépôt : Workflow
+### Propre au dépôt : Workflow
 
 `gitpoulpi ui show settings workflow`. Le workflow de branches de ce dépôt (modèle, détection, branche de base) a son propre guide : [Workflows de branches](branching-workflows.md#paramètres--workflow). L'onglet
 **Général** contient ce qui n'est pas une règle (modèle, détection, hooks, flux de tickets, où c'est enregistré) ;

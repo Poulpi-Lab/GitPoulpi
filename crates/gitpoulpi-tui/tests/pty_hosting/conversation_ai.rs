@@ -620,6 +620,9 @@ fn palette_row(term: &mut xtask::pty::Terminal, query: &str, entry: &str) {
                 term.screen().text()
             )
         });
+    // Under load the frame paints before the palette reads keys: typed too
+    // early, the query is lost and the list stays unfiltered. Let it settle.
+    let _ = term.wait_for_stable(Duration::from_millis(300), STEP);
     term.send_text(query).unwrap();
     term.wait_for("the row", STEP, |s| s.contains(entry))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
@@ -668,6 +671,9 @@ fn the_palette_reaches_write_with_ai_and_refresh_context_over_the_form() {
 
     // Refresh context: grayed out while the repository box is unticked.
     term.send_keys("C-p").expect("the palette");
+    term.wait_for_text("Command Palette", STEP)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    let _ = term.wait_for_stable(Duration::from_millis(300), STEP);
     term.send_text("Refresh the AI Context").unwrap();
     term.wait_for("the reason", STEP, |s| {
         s.contains("Refresh the AI Context") && s.contains("tick \"Let the AI read")

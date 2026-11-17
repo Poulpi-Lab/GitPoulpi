@@ -18,6 +18,9 @@ panel çalışma değişikliklerini gösterir:
 - **Unstaged Dosyalar**: düzenlenmiş, eklenmiş (izlenmeyen) ve silinmiş, henüz
   sonraki commit'te olmayan dosyalar.
 - **Staged Dosyalar**: sonraki commit'in içereceği şey.
+- **Çakışmalı dosyalar** (kırmızı bir `!`; bir merge, rebase, cherry-pick veya revert
+  durmuşken): `Enter` merge düzenleyicisini açar, bkz.
+  [Merge çakışmalarını çözmek](merge-conflicts.md).
 - **Yeniden adlandırılmış veya taşınmış dosyalar** iki listede de tek bir satırdır,
   `yeni <- eski` (diskte silinmiş bir dosya ile içeriğinin en az %50'si aynı olan yeni
   bir dosya, stage'lemeden önce bile taşıma sayılır). Stage'le, Unstage'le ve At her iki
@@ -181,8 +184,10 @@ değişiklikleri satırındaki alandır: ikisinden birine yazmak diğerinde gör
 - **Hook'ları atla** (`Shift+H` veya paletteki **Commit: Hook'ları Atlamayı Aç/Kapat**),
   depodaki `pre-commit` ve `commit-msg` hook'larını çalıştırmadan commit yapar.
   Yalnızca o commit için geçerlidir; **Ayarlar > Depoya özel ayarlar > Commit**
-  bunu varsayılan olarak işaretli başlatır. Dar bir satırda etiketi **Hook yok** olarak kısalır, sonra yalnızca
-  onay kutusu kalır (ipucu adını söyler); asla kaybolmaz.
+  bunu varsayılan olarak işaretli başlatır. **Önceki commit'i amend et**'in hemen altında
+  kendi satırı vardır, tam etiketiyle; yalnızca çok dar bir panelde etiket **Hook yok** olarak
+  kısalır, sonra yalnızca onay kutusu kalır (ipucu adını söyler). Asla kaybolmaz. Çok kısa
+  bir formda bunun yerine Amend satırını paylaşır ve aynı şekilde kısalır.
 - Durum panelinde `c` imleci forma taşır. `Esc` formdan çıkarır.
 - `Ctrl+G c` ve `Ctrl+G Enter` (palette **Git: Commit...** ve **Git: Stage'lenen
   Değişiklikleri Şimdi Commit Et**) tek bir komuttur: her yerden çalışan commit
@@ -208,8 +213,7 @@ düğmesine basana kadar hiçbir şey commit'lenmez.
 
 **YZ ile commit'ler oluştur**, Amend satırının sağ ucunda durur ve sağ panelle birlikte
 kaybolmak yerine küçülür: önce tam etiket, sonra **YZ ile oluştur**, sonra yalnızca
-**`✦`**. Her genişlikte tıkını, ipucunu ve tuşunu (`Ctrl+G Shift+C`) korur; kendisi küçülmeden önce
-Hook'ları atla etiketi ona yer açar (**Hook yok**, sonra yalnızca kutu).
+**`✦`**. Her genişlikte tıkını, ipucunu ve tuşunu (`Ctrl+G Shift+C`) korur.
 
 Özet satırının sağ ucundaki **`✦`** (mesajı oluştur) ve **`#`** (issue referansı ekle) düğmeleri de aynı şekilde küçülür:
 dar bir panelde kenar boşluklarını yitirir, sonra ikisini de listeleyen tek bir **`⋯`** düğmesinin menüsüne girer; böylece

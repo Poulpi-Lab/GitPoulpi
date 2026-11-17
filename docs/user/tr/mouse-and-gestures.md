@@ -132,7 +132,7 @@ GitPoulpi her boyutu hatırlar. Bkz.
 
 ## Başlık çubuğu, sekme satırı ve araç çubuğu
 
-- Başlık çubuğunda **🐙'e tıklayın**: **GitPoulpi Hakkında** açılır. Hakkında
+- Başlık çubuğunda **<img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi simgesi" height="16"> simgesine tıklayın**: **GitPoulpi Hakkında** açılır. Hakkında
   penceresinde ahtapotun gözbebekleri imleci izler; logoya tıklamak onu bir sonraki
   renge döndürür, sağ tıklamak renklerin listesini açar, bir bağlantıya tıklamak onu
   açar.

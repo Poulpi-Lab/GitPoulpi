@@ -6,6 +6,8 @@ Worktree, deponun ikinci bir checkout edilmiş kopyasıdır: başka bir klasör,
 bir dal, aynı geçmiş. Refs panelinin WORKTREE'LER bölümü onları listeler; ana
 olan `(ana)` ile işaretlidir.
 
+![İki bağlı worktree'si olan bir deponun Refs paneli: WORKTREE'LER bölümü main (ana), hotfix/axis-labels ve feature/legend'i listeler, altında ALT MODÜLLER bölümü var](../images/worktrees.png)
+
 ## Bölümü göstermek
 
 Henüz bağlı bir worktree'si olmayan bir depoda bölüm gizlidir. Yine de görmek
@@ -33,6 +35,8 @@ Paletin aynı üçü vardır (**Refs: Geçerli Daldan Worktree Oluştur**, **Git
 Commit'te Worktree Oluştur...**, **Refs: Dal Seçerek Worktree Oluştur**). Eski
 girişler de çalışır: bir dal, tag veya commit menüsündeki **... üzerinden
 worktree oluştur...**.
+
+![Worktree oluştur iletişim kutusu: Ad, Klasör, Ref ve Worktree dalı alanları, "main üzerinden yeni dal" satırı, Yeni worktree'yi sekme olarak aç kutusu ve İptal ile Oluştur düğmeleri](../images/worktree-create.png)
 
 İletişim kutusu her şeyi önerir ve değiştirmenize izin verir. **Ad** ve yeni dal
 ikisi de `worktree-<id>` olarak başlar; `<id>` 8 rastgele onaltılık rakamdır (ikisinde
@@ -78,6 +82,13 @@ tuşuna basın):
   yerde checkout edilmemiş bir dal, nedeni belirtilerek reddedilir. Ayrık bir
   worktree için sunulmaz.
 - **Worktree'yi kaldır...**: ana worktree asla.
+
+![Bir worktree satırının sağ tık menüsü: Yeni sekmede aç, Şurada aç, hotfix/axis-labels dalını şuraya merge et... ve Worktree'yi kaldır...](../images/worktree-menu.png)
+
+**Yeni sekmede aç** (veya çift tıklama ya da `Enter`) worktree'nin klasörünü kendi Log'u,
+durumu ve dalı olan ayrı bir sekme olarak açar:
+
+![hotfix/axis-labels worktree'si ana olanın yanında kendi sekmesi olarak açık, commit'ini ve değişen dosyasını gösteriyor](../images/worktree-tab.png)
 
 Palet, seçili satır üzerinde aynı eylemlere sahiptir (**Refs: Worktree'yi Şurada
 Aç...**, **Refs: Worktree Dalını Başka Dala Merge Et...**, **Refs: Worktree'yi

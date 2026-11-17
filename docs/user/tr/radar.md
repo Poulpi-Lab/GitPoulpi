@@ -9,7 +9,7 @@ bıraktığınız depolar. Altındaki hiçbir şey tıkı veya tuşu çalamasın
 görünümü üstte olan Ana penceredir.
 
 Bir kod barındırıcısı profili gerektirir (bkz. [Barındırma hizmetleri ve issue
-takipçileri](hosting-integration.md)) ve ona bağlı depolar ya da hesap geneli listeleri açık bir profil (aşağıda
+takipçileri](hosting-integration.md); tek bir deponun listeleri [Pull request'ler ve issue'lar](pull-requests-and-issues.md) sayfasındadır ve bir satırın tartışması bir [konuşma](conversations.md) olarak açılır) ve ona bağlı depolar ya da hesap geneli listeleri açık bir profil (aşağıda
 "Kapsamın ötesi" bölümüne bakın). Bağlı olmayan bir
 depoya hiç sorulmaz; onun yerine bir **Bağla...** satırı gösterir (aşağıda
 "Söyleyecek bir şeyi olan depolar" bölümüne bakın).

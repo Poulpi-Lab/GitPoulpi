@@ -104,7 +104,7 @@ Nos três diálogos (e no seletor de pastas que eles abrem), `Ctrl+N` mostra um 
 **Clonar** pede um URL e uma pasta, ou deixa-o escolher um repositório de uma conta ligada (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit; veja [Clonar a partir de uma conta ligada](hosting-integration.md#clonar-a-partir-de-uma-conta-ligada)). **Init** transforma uma pasta num novo
 repositório.
 
-| ![A caixa de diálogo Clonar: para onde clonar, o URL, o nome da pasta e o botão Clonar](../images/clone.png) | ![A caixa de diálogo Inicializar um repositório: a pasta, o nome e a branch inicial](../images/init.png) |
+| ![A caixa de diálogo Clonar: para onde clonar, o URL, o nome da pasta e os botões Cancelar e Clonar](../images/clone.png) | ![A caixa de diálogo Inicializar um repositório: a pasta, o nome e a branch inicial](../images/init.png) |
 |---|---|
 
 ### Checkout parcial

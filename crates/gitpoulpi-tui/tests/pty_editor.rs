@@ -190,11 +190,11 @@ fn the_editor_gets_a_ctrl_n_badge() {
     term.stop().unwrap();
 }
 
-/// `Ctrl+N h` / `Ctrl+N l` (the pane collapse toggles) must work while the
+/// `Ctrl+N Shift+H` / `Ctrl+N Shift+L` (the pane collapse toggles) must work while the
 /// editor owns the central column, end to end through the real event loop.
 /// Uses `l`: opening the editor already auto-collapses the Refs pane.
 #[test]
-fn ctrl_n_l_collapses_the_status_pane_while_the_editor_has_focus() {
+fn ctrl_n_shift_l_collapses_the_status_pane_while_the_editor_has_focus() {
     let repo = FixtureRepoBuilder::new()
         .unwrap()
         .write_worktree("notes.txt", b"alpha\n")
@@ -254,7 +254,7 @@ fn ctrl_n_l_collapses_the_status_pane_while_the_editor_has_focus() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
-    term.send_keys("C-n l")
+    term.send_keys("C-n L")
         .expect("restore the Status pane from the editor");
     term.wait_for(
         "the Status pane restored, Unstaged Files back on screen",
@@ -264,7 +264,7 @@ fn ctrl_n_l_collapses_the_status_pane_while_the_editor_has_focus() {
     .unwrap_or_else(|e| panic!("{e}"));
 
     // `h` too, in the harder case: the Refs pane is already auto-collapsed, so
-    // `Ctrl+N h` must expand it (the user taking over), not fail silently.
+    // `Ctrl+N Shift+H` must expand it (the user taking over), not fail silently.
     assert!(
         !term.screen().contains("LOCAL"),
         "the Refs pane should already be auto-collapsed while the editor is the center"

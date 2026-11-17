@@ -29,7 +29,7 @@ commit'in yanında bir şeritte küçük kareler olarak görünür.
 
 Şerit renkleri temadan gelir. *Ayarlar > Görünüm > Grafik renk teması* herhangi
 bir temayı herhangi bir şerit paletiyle birleştirir; paletteki *Uygulama:
-Grafik Renk Temasını Değiştir...* seçicisi (`Ctrl+N Shift+Y`) her paleti
+Grafik Renk Temasını Değiştir...* seçicisi (`Ctrl+N Shift+T`) her paleti
 canlı önizler; bkz. [Temalar](themes.md). *Grafik şerit arka planı*
 **Satır tonu** olarak ayarlandığında grafik sütununun arkasına şerit renginin
 soluk bir bandı ve kenarına ince bir çubuk çizilir. *Satır tonu gücü*

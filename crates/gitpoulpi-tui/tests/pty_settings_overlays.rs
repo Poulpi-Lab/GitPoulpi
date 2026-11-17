@@ -186,7 +186,7 @@ fn the_theme_picker_previews_on_settings_and_cancelling_restores_it() {
     settings_with_draft(&mut term);
     let before = title_bg(&term.screen());
     term.send_keys("C-n").unwrap();
-    term.send_text("y").unwrap();
+    term.send_text("t").unwrap();
     term.wait_for("the theme list over Settings", STEP, |s| {
         s.contains("System (follows terminal)") && s.contains("Settings - Tab")
     })
@@ -242,7 +242,7 @@ fn about_opens_over_settings_by_key_and_a_chord_that_leaves_settings_is_refused(
         .unwrap_or_else(|e| panic!("{e}"));
     settings_intact(&term, "About");
     term.send_keys("C-n").unwrap();
-    term.send_text("t").unwrap();
+    term.send_keys("Tab").unwrap();
     term.wait_for("the refusal", STEP, |s| s.contains("close Settings first"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     settings_intact(&term, "a refused chord");
@@ -272,7 +272,7 @@ fn the_palette_and_the_picker_open_over_settings_opened_from_the_home_tab() {
     term.wait_for_text_to_go("Change Theme", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("C-n").unwrap();
-    term.send_text("y").unwrap();
+    term.send_text("t").unwrap();
     term.wait_for("the theme list over Settings", STEP, |s| {
         s.contains("System (follows terminal)") && s.contains("Settings - Tab")
     })

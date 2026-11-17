@@ -109,8 +109,8 @@ stage_file = "z"
 | `git_prefix` | `lfs_push_all` | LFS: 모든 객체 Push | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS: 로컬 객체 정리 | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | 기록 다시 쓰기 워크벤치 열기 | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | Refs 창 접기 또는 복원 | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | Status 창 접기 또는 복원 | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | Refs 창 접기 또는 복원 | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | Status 창 접기 또는 복원 | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | 설정 열기 | `Ctrl+N ,` |
 | `nav_prefix` | `about` | 정보 열기 | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | 활동 로그 열기 | `Ctrl+N Shift+A` |
@@ -118,11 +118,11 @@ stage_file = "z"
 | `nav_prefix` | `jobs` | 백그라운드 작업 표시 | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | 업데이트 패널 보기 | `Ctrl+N u` |
 | `nav_prefix` | `help` | 도움말 전환 | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | 탭 선택 | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | 테마 변경 | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | 언어 변경 | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | 그래프 색상 테마 변경 | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | 그래프 행 색조 전환 | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | 탭 선택 | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | 테마 변경 | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | 언어 변경 | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | 그래프 색상 테마 변경 | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | 그래프 행 색조 전환 | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | Refs 섹션 키우기 | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | Refs 섹션 줄이기 | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | Commit 메시지 영역 키우기 | `Ctrl+N ]` |
@@ -496,12 +496,12 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 탐색: 다음 창으로 포커스 이동 | `Tab` |
 | 탐색: 이전 창으로 포커스 이동 | `Shift+Tab` |
 | 탐색: Commit 검색... | `f` |
-| 탐색: Refs 창 접기 전환 | `Ctrl+N h` |
+| 탐색: Refs 창 접기 전환 | `Ctrl+N H` |
 | 탐색: Refs 창 넓히기 | `Ctrl+N Right` |
 | 탐색: Refs 창 좁히기 | `Ctrl+N Left` |
 | 탐색: Status 창 넓히기 | `Ctrl+N Shift+Left` |
 | 탐색: Status 창 좁히기 | `Ctrl+N Shift+Right` |
-| 탐색: Status 창 접기 전환 | `Ctrl+N l` |
+| 탐색: Status 창 접기 전환 | `Ctrl+N L` |
 | 탐색: Refs 섹션 키우기 | `Ctrl+N +` |
 | 탐색: Refs 섹션 줄이기 | `Ctrl+N -` |
 | 탐색: Refs 섹션 크기 초기화 |  |
@@ -1230,8 +1230,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 앱: 테마... |  |
 | 충돌: 기준 브랜치 목록 편집... |  |
 | 충돌: 이 저장소의 기준 브랜치... |  |
-| 앱: 테마 변경... | `Ctrl+N y` |
-| 앱: 언어 변경... | `Ctrl+N g` |
+| 앱: 테마 변경... | `Ctrl+N t` |
+| 앱: 언어 변경... | `Ctrl+N l` |
 | 런처: 바로 가기 만들기 |  |
 | 런처: 바탕 화면 바로 가기 만들기 |  |
 | 런처: 바로 가기 제거 |  |
@@ -1241,8 +1241,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 런처: PATH에서 제거 |  |
 | 런처: 'GitPoulpi에서 열기' 메뉴 설치 |  |
 | 런처: 'GitPoulpi에서 열기' 메뉴 제거 |  |
-| 앱: 그래프 색상 테마 변경... | `Ctrl+N Y` |
-| 앱: 그래프 행 색조 전환 | `Ctrl+N T` |
+| 앱: 그래프 색상 테마 변경... | `Ctrl+N T` |
+| 앱: 그래프 행 색조 전환 | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## 이동
@@ -1348,14 +1348,14 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 키 | 동작 |
 |---|---|
 | `Ctrl+N`, 그다음 배지 | 이 배지가 표시된 창 부분으로 포커스 이동 |
-| `Ctrl+N h` / `Ctrl+N l` | Refs 창 / 오른쪽 창 접기 또는 복원 |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | Refs 창 / 오른쪽 창 접기 또는 복원 |
 | `Ctrl+N Left` / `Ctrl+N Right` | Refs 창과 Log 사이의 구분선을 한 단계 왼쪽 / 오른쪽으로 옮기기(접힌 Refs 창이 먼저 복원됨) |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | Log와 오른쪽 창 사이의 구분선을 한 단계 왼쪽 / 오른쪽으로 옮기기 |
 | `Ctrl+N +` / `Ctrl+N -` | 활성 Refs 섹션을 한 행 늘리기 / 줄이기 |
 | `Ctrl+N ]` / `Ctrl+N [` | 오른쪽 창의 commit 메시지 블록을 한 행 늘리기 / 줄이기 |
-| `Ctrl+N t` | 탭 선택(탭 선택기. `t`만 눌러도 같음) |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | 테마 / 언어 / 그래프 색상 테마 변경 |
-| `Ctrl+N Shift+T` | 그래프 행 색조 켜기 또는 끄기 |
+| `Ctrl+N Tab` | 탭 선택(탭 선택기. `t`만 눌러도 같음) |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | 테마 / 언어 / 그래프 색상 테마 변경 |
+| `Ctrl+N Shift+Y` | 그래프 행 색조 켜기 또는 끄기 |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | 에이전트가 준비한 보기 표시 / 뒤로 가기([MCP와 에이전트](mcp-and-agents.md) 참고) |
 | `Ctrl+N ,` | 설정 열기 |
 | `Ctrl+N ?` | 도움말 열기 또는 닫기 |

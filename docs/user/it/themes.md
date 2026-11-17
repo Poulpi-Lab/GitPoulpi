@@ -312,7 +312,7 @@ apre Impostazioni su quella riga.
 
 ### Cambiare tema dalla palette
 
-**App: Cambia tema...** (`Ctrl+P`, oppure `Ctrl+N y`; il tasto è riassegnabile
+**App: Cambia tema...** (`Ctrl+P`, oppure `Ctrl+N t`; il tasto è riassegnabile
 come `nav_prefix.change_theme`) apre un elenco degli stessi temi senza passare da
 Impostazioni: **Sistema (segue il terminale)**, i preset, poi i tuoi file di tema,
 ciascuno con quattro piccoli chip di colore. Il tema corrente è spuntato. Scrivi

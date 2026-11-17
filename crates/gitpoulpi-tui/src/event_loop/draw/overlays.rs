@@ -441,7 +441,7 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
         );
     }
 
-    // The tab picker (`Ctrl+N t`, `Repository: Select Tab...`): the
+    // The tab picker (`Ctrl+N Tab`, `Repository: Select Tab...`): the
     // multi-repository counterpart of the command palette above, reusing its
     // `PalettePopup`/`palette_row_at` geometry and hit test.
     if let InputMode::TabPicker { draft, selected } = &input_mode {
@@ -1019,7 +1019,7 @@ pub(in crate::event_loop) fn draw_picker_popups(
     field_editor: &crate::text_edit::FieldEditor<MainField>,
     tab_picker_popup: &mut Option<PalettePopup>,
 ) {
-    // The theme picker (`Ctrl+N y`, `App: Change Theme...`).
+    // The theme picker (`Ctrl+N t`, `App: Change Theme...`).
     if let InputMode::ThemePicker(picker) = input_mode {
         *tab_picker_popup = Some(crate::theme_picker::render(frame, picker, field_editor));
     }

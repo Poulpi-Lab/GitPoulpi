@@ -110,7 +110,7 @@ za karty viditelné na obrazovce. `Ctrl+N` dá na každou živou šipku odznak.
   a **Částečný checkout...**.
 - `Ctrl+PageUp` a `Ctrl+PageDown` přepínají karty. `Ctrl+W` zavře aktuální
   kartu. Zavře ji i prostřední tlačítko na kartě (se stejnou otázkou).
-- `t` (nebo `Ctrl+N t`) otevře výběr karty, prohledávatelný seznam otevřených
+- `t` (nebo `Ctrl+N Tab`) otevře výběr karty, prohledávatelný seznam otevřených
   karet.
 - **Změna pořadí karet:** stiskněte kartu repozitáře a táhněte ji do strany (duch
   karty sleduje ukazatel a pruh ukazuje, kam dopadne; `Esc` zruší), nebo táhněte
@@ -230,9 +230,9 @@ jejich velikost.
 Najetím na řádek zobrazíte jeho tlačítka: skrýt nebo zobrazit ref v Logu
 a **Solo** (zobrazit jen commity dané ref). Dvojitým kliknutím na lokální větev
 nebo tag ji přepnete. Kliknutím pravým tlačítkem na řádek otevřete jeho
-nabídku. Šipka `‹` v záhlaví panelu sbalí postranní panel (`Ctrl+N h`).
+nabídku. Šipka `‹` v záhlaví panelu sbalí postranní panel (`Ctrl+N Shift+H`).
 
-Oba boční panely (postranní panel Refs, `Ctrl+N h`, a pravý panel, `Ctrl+N l`)
+Oba boční panely (postranní panel Refs, `Ctrl+N Shift+H`, a pravý panel, `Ctrl+N Shift+L`)
 patří Logu: když jeden z nich při otevřeném diffu, zobrazení Soubor nebo editoru
 zobrazíte či sbalíte, platí to jen pro to zobrazení. Diff nebo zobrazení Soubor také
 samo sbalí postranní panel Refs, aby měl obsah víc místa. Po návratu do Logu jsou

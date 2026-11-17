@@ -97,7 +97,7 @@ fn ctrl_g_prefix_hint_and_second_keys() {
     term.stop().unwrap();
 }
 
-/// `Ctrl+N h` / `Ctrl+N l` collapse and restore the side panes.
+/// `Ctrl+N Shift+H` / `Ctrl+N Shift+L` collapse and restore the side panes.
 #[test]
 fn ctrl_n_prefix_collapses_panes() {
     let repo = dirty_fixture();
@@ -113,13 +113,48 @@ fn ctrl_n_prefix_collapses_panes() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("C-n").unwrap();
-    term.send_text("h").unwrap();
+    term.send_text("H").unwrap();
     term.wait_for("the Refs pane restored", STEP, |s| {
         s.contains("Refs pane restored")
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("C-n").unwrap();
-    term.send_text("l").unwrap();
+    term.send_text("L").unwrap();
+    term.wait_for("the Status pane collapsed", STEP, |s| {
+        s.contains("Status pane collapsed")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.stop().unwrap();
+}
+
+/// The picker chords after `Ctrl+N`: `l` the language picker, `t` the theme
+/// picker, `Tab` the tab picker, `Shift+L` collapses the Status pane. Each
+/// picker is closed with Esc before the next chord.
+#[test]
+fn ctrl_n_l_t_tab_open_the_pickers_and_shift_l_collapses_status() {
+    let repo = dirty_fixture();
+    let (mut term, _c) = launch(repo.root(), "pty-keymap-nav-pickers");
+    for (key, title, gone) in [
+        ("l", "Change Language (", "Change Language ("),
+        (
+            "t",
+            "System (follows terminal)",
+            "System (follows terminal)",
+        ),
+        ("Tab", "Select Tab", "Select Tab"),
+    ] {
+        term.send_keys("C-n").unwrap();
+        term.wait_for_text("select tab", STEP).unwrap();
+        term.send_keys(key).unwrap();
+        term.wait_for(title, STEP, |s| s.contains(title))
+            .unwrap_or_else(|e| panic!("Ctrl+N {key}: {e}"));
+        term.send_keys("Escape").unwrap();
+        term.wait_for_text_to_go(gone, STEP)
+            .unwrap_or_else(|e| panic!("{e}"));
+    }
+    term.send_keys("C-n").unwrap();
+    term.wait_for_text("select tab", STEP).unwrap();
+    term.send_keys("L").unwrap();
     term.wait_for("the Status pane collapsed", STEP, |s| {
         s.contains("Status pane collapsed")
     })
@@ -205,9 +240,9 @@ fn rebound_nav_prefix_works() {
         "[keybindings.global]\nnav_prefix = \"Alt+n\"\n",
     );
     term.send_keys("C-n").unwrap();
-    term.send_text("h").unwrap();
+    term.send_text("H").unwrap();
     term.send_keys("M-n").unwrap();
-    term.send_text("h").unwrap();
+    term.send_text("H").unwrap();
     term.wait_for("the Refs pane collapsed by Alt+N h", STEP, |s| {
         s.contains("Refs pane collapsed")
     })

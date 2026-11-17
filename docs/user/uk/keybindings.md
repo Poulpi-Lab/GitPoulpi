@@ -109,8 +109,8 @@ stage_file = "z"
 | `git_prefix` | `lfs_push_all` | LFS: push усіх об'єктів | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS: очистити локальні об'єкти | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | Відкрити майстерню переписування історії | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | Згорнути чи відновити панель Refs | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | Згорнути чи відновити панель Status | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | Згорнути чи відновити панель Refs | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | Згорнути чи відновити панель Status | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | Відкрити налаштування | `Ctrl+N ,` |
 | `nav_prefix` | `about` | Відкрити «Про програму» | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | Відкрити Журнал активності | `Ctrl+N Shift+A` |
@@ -118,11 +118,11 @@ stage_file = "z"
 | `nav_prefix` | `jobs` | Показати фонові завдання | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | Показати панель оновлення | `Ctrl+N u` |
 | `nav_prefix` | `help` | Перемкнути довідку | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | Вибрати вкладку | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | Змінити тему | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | Змінити мову | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | Змінити колірну тему графа | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | Перемкнути підсвітку рядків графа | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | Вибрати вкладку | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | Змінити тему | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | Змінити мову | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | Змінити колірну тему графа | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | Перемкнути підсвітку рядків графа | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | Збільшити розділ Refs | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | Зменшити розділ Refs | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | Збільшити блок повідомлення commit'у | `Ctrl+N ]` |
@@ -497,12 +497,12 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Навігація: фокус на наступну панель | `Tab` |
 | Навігація: фокус на попередню панель | `Shift+Tab` |
 | Навігація: пошук commit'ів... | `f` |
-| Навігація: згорнути/розгорнути Refs | `Ctrl+N h` |
+| Навігація: згорнути/розгорнути Refs | `Ctrl+N H` |
 | Навігація: Розширити панель Refs | `Ctrl+N Right` |
 | Навігація: Звузити панель Refs | `Ctrl+N Left` |
 | Навігація: Розширити панель Status | `Ctrl+N Shift+Left` |
 | Навігація: Звузити панель Status | `Ctrl+N Shift+Right` |
-| Навігація: згорнути/розгорнути Status | `Ctrl+N l` |
+| Навігація: згорнути/розгорнути Status | `Ctrl+N L` |
 | Навігація: збільшити розділ Refs | `Ctrl+N +` |
 | Навігація: зменшити розділ Refs | `Ctrl+N -` |
 | Навігація: скинути розміри розділів Refs |  |
@@ -1231,8 +1231,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Застосунок: тема... |  |
 | Конфлікти: редагувати списки базових гілок... |  |
 | Конфлікти: базові гілки цього репозиторію... |  |
-| Застосунок: змінити тему... | `Ctrl+N y` |
-| Застосунок: змінити мову... | `Ctrl+N g` |
+| Застосунок: змінити тему... | `Ctrl+N t` |
+| Застосунок: змінити мову... | `Ctrl+N l` |
 | Лаунчер: створити ярлик |  |
 | Лаунчер: створити ярлик на робочому столі |  |
 | Лаунчер: видалити ярлики |  |
@@ -1242,8 +1242,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Лаунчер: прибрати з PATH |  |
 | Лаунчер: установити меню «Відкрити в GitPoulpi» |  |
 | Лаунчер: видалити меню «Відкрити в GitPoulpi» |  |
-| Застосунок: змінити колірну тему графа... | `Ctrl+N Y` |
-| Застосунок: перемкнути підсвітку рядків графа | `Ctrl+N T` |
+| Застосунок: змінити колірну тему графа... | `Ctrl+N T` |
+| Застосунок: перемкнути підсвітку рядків графа | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## Пересування
@@ -1357,14 +1357,14 @@ commit'у, поля й текстові редактори Налаштуван�
 | Клавіша | Дія |
 |---|---|
 | `Ctrl+N`, потім значок | Фокус на частину вікна з цим значком |
-| `Ctrl+N h` / `Ctrl+N l` | Згорнути чи відновити панель Refs / праву панель |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | Згорнути чи відновити панель Refs / праву панель |
 | `Ctrl+N Left` / `Ctrl+N Right` | Зсунути роздільник між панеллю Refs і Log на крок вліво / вправо (згорнута панель Refs спершу повертається) |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | Зсунути роздільник між Log і правою панеллю на крок вліво / вправо |
 | `Ctrl+N +` / `Ctrl+N -` | Збільшити / зменшити активний розділ Refs на один рядок |
 | `Ctrl+N ]` / `Ctrl+N [` | Збільшити / зменшити блок повідомлення commit'у правої панелі на один рядок |
-| `Ctrl+N t` | Вибрати вкладку (список вибору вкладок; `t` сама робить те саме) |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | Змінити тему / мову / колірну тему графа |
-| `Ctrl+N Shift+T` | Увімкнути чи вимкнути відтінки рядків графа |
+| `Ctrl+N Tab` | Вибрати вкладку (список вибору вкладок; `t` сама робить те саме) |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | Змінити тему / мову / колірну тему графа |
+| `Ctrl+N Shift+Y` | Увімкнути чи вимкнути відтінки рядків графа |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | Показати вигляд, підготовлений агентом / повернутися (див. [MCP та агенти](mcp-and-agents.md)) |
 | `Ctrl+N ,` | Відкрити Налаштування |
 | `Ctrl+N ?` | Відкрити чи закрити довідку |

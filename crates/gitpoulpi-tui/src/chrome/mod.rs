@@ -140,10 +140,10 @@ pub(crate) fn cycle_focus_skipping_collapsed(
 /// for".
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum NavigationAction {
-    /// `Ctrl+N h` - collapse/restore the Refs pane. Replaces the old bare
+    /// `Ctrl+N Shift+H` - collapse/restore the Refs pane. Replaces the old bare
     /// `Ctrl+K`.
     CollapseLeft,
-    /// `Ctrl+N l` - collapse/restore the Status pane. Replaces the old
+    /// `Ctrl+N Shift+L` - collapse/restore the Status pane. Replaces the old
     /// bare `Ctrl+L`.
     CollapseRight,
     /// `Ctrl+N <badge>` - focus whichever sub-pane that badge names in
@@ -172,21 +172,21 @@ pub(crate) enum NavigationAction {
     ShowUpdates,
     /// `Ctrl+N ?` - toggle the help overlay, the same place bare `?` goes.
     ToggleHelp,
-    /// `Ctrl+N t` - open the tab picker: a popup
+    /// `Ctrl+N Tab` - open the tab picker: a popup
     /// listing every open repository tab, filtered by typing, that
     /// switches to the one chosen. The same place the palette's
     /// `Repository: Select Tab...` goes (`PaletteCommand::SelectTab`).
     SelectTab,
-    /// `Ctrl+N y` - open the theme picker, the palette's `App: Change
+    /// `Ctrl+N t` - open the theme picker, the palette's `App: Change
     /// Theme...` (`PaletteCommand::ChangeTheme`).
     ChangeTheme,
-    /// `Ctrl+N g` - open the language picker, the palette's `App: Change
+    /// `Ctrl+N l` - open the language picker, the palette's `App: Change
     /// Language...` (`PaletteCommand::ChangeLanguage`).
     ChangeLanguage,
-    /// `Ctrl+N Shift+Y` - the graph color theme picker, the palette's
+    /// `Ctrl+N Shift+T` - the graph color theme picker, the palette's
     /// `App: Change Graph Color Theme...`.
     ChangeGraphColorTheme,
-    /// `Ctrl+N Shift+T` - the palette's `App: Toggle Graph Row Tints`.
+    /// `Ctrl+N Shift+Y` - the palette's `App: Toggle Graph Row Tints`.
     ToggleGraphRowTints,
     /// `Ctrl+N +` (or `=`) - grow the active Refs sidebar section by a
     /// row, the keyboard twin of dragging its bottom border down.
@@ -216,7 +216,7 @@ pub(crate) enum NavigationAction {
 }
 
 /// See [`NavigationAction`]. `Esc` and every unrecognized key both cancel -
-/// there is no way to type a wrong key here and get stuck. `h`/`l`/`,`/
+/// there is no way to type a wrong key here and get stuck. `l`/`,`/
 /// `?`/`t` are reserved (never handed out as badges, see
 /// `navigation_badge_alphabet`); every other letter or digit is a
 /// candidate badge and is looked up against the current frame's targets
@@ -540,13 +540,13 @@ pub(crate) enum FocusTarget {
 
 /// Badge characters, in the order they're handed out: `1`-`9` first, then
 /// `a`, `b`, `c`, ... - letters if there are more than nine focusable
-/// panes in one frame. `h`, `l`, `,`, `?`, `q`, `t` are skipped because
+/// panes in one frame. `l`, `,`, `?`, `q`, `t` are skipped because
 /// `navigation_key_action`/Normal mode already gives them a fixed meaning;
-/// handing one out as a badge would make `Ctrl+N h` ambiguous between
-/// "collapse the Refs pane" and "focus whatever got badge h".
+/// handing one out as a badge would make `Ctrl+N l` ambiguous between
+/// "open the language picker" and "focus whatever got badge l".
 pub(crate) fn navigation_badge_char(index: usize) -> char {
-    // Never a character some `nav_prefix` binding uses (`Ctrl+N h` must
-    // not be ambiguous with badge `h`), computed from the effective
+    // Never a character some `nav_prefix` binding uses (`Ctrl+N l` must
+    // not be ambiguous with badge `l`), computed from the effective
     // keymap; `q` stays reserved for Normal mode. Digits first, then
     // letters; past the end the letters wrap.
     let taken = keymap::current().nav_prefix_chars();

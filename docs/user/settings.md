@@ -121,7 +121,7 @@ A few window-wide popups open over Settings and give it back as it was (the page
 the scroll position and any unsaved Workflow or template changes stay):
 
 - the command palette (`Ctrl+P`),
-- the theme picker (`Ctrl+N y`, **App: Change Theme...**), which previews each
+- the theme picker (`Ctrl+N t`, **App: Change Theme...**), which previews each
   theme on Settings itself; `Esc` puts the previous theme back,
 - the language and graph color pickers (`Ctrl+N` then the same letters as in the main window),
 - the workspace search (`Ctrl+Alt+F`),
@@ -188,7 +188,7 @@ The page list has two groups:
 | **Show how long operations take**, **Extended logging** | The Activity Log's Git operations tab: the duration of each operation (`log.timings`, on by default) and the background work too, refresh and auto-fetch (`log.extended`, off by default). See [When something fails](troubleshooting.md#the-activity-log). |
 | **Undo enabled**, **Undo history depth**, **Record changes made outside GitPoulpi** | The **Undo history** group. Turns Undo on or off, and sets how many operations it keeps (default 100, `0` means unlimited). Turning Undo off erases the undo history, after a confirmation. The last one also records what a shell or an agent does to branches, tags, stashes and HEAD. See [Undo and redo](undo-redo.md). |
 
-The palette command **App: Change Language...** (`Ctrl+N g`) opens the same
+The palette command **App: Change Language...** (`Ctrl+N l`) opens the same
 language list. There, the highlighted language previews live; `Enter` keeps it
 and `Esc` restores the previous one.
 
@@ -438,7 +438,7 @@ the server; see [MCP and agents](mcp-and-agents.md).
 | **Input color**, **Custom input color** | The background of text fields: **Follow theme** (default), a fixed dark color, or your own `#rrggbb`. |
 | **Text cursor** | `ui.text_cursor`: **terminal** (default) puts the terminal's own cursor at the caret of the focused text field, as a bar (your terminal's cursor settings apply, and an input method's candidate window opens at the caret); **drawn** paints GitPoulpi's own caret and keeps the terminal cursor hidden. Applies at once. Palette: `Settings: Text cursor...`. |
 | **Color depth** | **auto** (default), **truecolor**, **256** or **16**. See [Themes](themes.md). |
-| **Graph color theme** | **Follow theme** (default: the theme's own lane colors) or any lane palette. Each palette shows a few of its colors. It applies when the Settings close. The palette command **App: Change Graph Color Theme...** (`Ctrl+N Shift+Y`) previews each palette live. |
+| **Graph color theme** | **Follow theme** (default: the theme's own lane colors) or any lane palette. Each palette shows a few of its colors. It applies when the Settings close. The palette command **App: Change Graph Color Theme...** (`Ctrl+N Shift+T`) previews each palette live. |
 | **Graph lane background** | **Off** (transparent) or **Row tint**: a faint band of the lane color behind the graph column, with a thin bar at its edge. |
 | **Row tint strength** | How faded the Row tint band is: **Strong**, **Medium** (default) or **Subtle**. The edge bar keeps its full color. |
 | **Toolbar position** | `ui.toolbar_position`: **Top**, **Bottom** (default), **Left** or **Right**. Left and Right make a column beside the panes; under 80 columns it is drawn at the bottom. Applies at once. Palette: `Settings: Toolbar position...`. |

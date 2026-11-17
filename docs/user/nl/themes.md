@@ -314,7 +314,7 @@ klik elders herstelt het vorige en bewaart niets. De opdracht
 
 ### Thema wijzigen vanuit het palet
 
-**App: Thema wijzigen...** (`Ctrl+P`, of `Ctrl+N y`; de toets is herbindbaar als
+**App: Thema wijzigen...** (`Ctrl+P`, of `Ctrl+N t`; de toets is herbindbaar als
 `nav_prefix.change_theme`) opent een lijst met dezelfde thema's zonder via
 Instellingen te gaan: **Systeem (volgt de terminal)**, de presets en daarna je
 eigen themabestanden, elk met vier kleine kleurchips. Het huidige thema is

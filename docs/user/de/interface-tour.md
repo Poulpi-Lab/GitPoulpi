@@ -92,7 +92,7 @@ Passen die Repository-Tabs nicht in die Zeile, scrollt sie, statt sie zu verklei
 - `Ctrl+PageUp` und `Ctrl+PageDown` wechseln die Tabs. `Ctrl+W` schließt den
   aktuellen Tab. Ein Mittelklick auf einen Tab schließt ihn ebenfalls (mit derselben
   Rückfrage).
-- `t` (oder `Ctrl+N t`) öffnet die Tab-Auswahl, eine durchsuchbare Liste der
+- `t` (oder `Ctrl+N Tab`) öffnet die Tab-Auswahl, eine durchsuchbare Liste der
   geöffneten Tabs.
 - **Tabs umordnen:** Drücken Sie auf einen Repository-Tab und ziehen Sie ihn seitwärts (ein
   Schatten des Tabs folgt dem Zeiger, ein Balken zeigt, wo er landet; `Esc` bricht ab), oder
@@ -217,9 +217,9 @@ Fahren Sie über eine Zeile, um ihre Schaltflächen zu zeigen: die Ref im Log
 ein- oder ausblenden, und **Solo** (nur die Commits dieser Ref zeigen).
 Doppelklick auf einen lokalen Branch oder einen Tag checkt ihn aus. Rechtsklick auf
 eine Zeile öffnet ihr Menü. Das `‹` im Titel der Seitenleiste klappt sie ein
-(`Ctrl+N h`).
+(`Ctrl+N Shift+H`).
 
-Die beiden seitlichen Bereiche (die Refs-Seitenleiste, `Ctrl+N h`, und der rechte Bereich, `Ctrl+N l`) gehören zum Log: Ein- oder Ausklappen, während ein Diff, eine Dateiansicht oder der Editor offen ist, gilt nur für diese Ansicht. Ein Diff oder eine Dateiansicht klappt die Refs-Seitenleiste außerdem von selbst ein, damit der Inhalt mehr Platz hat. Zurück im Log sind beide Bereiche so, wie Sie sie dort verlassen haben, und genau dieser Zustand wird für den nächsten Start gespeichert.
+Die beiden seitlichen Bereiche (die Refs-Seitenleiste, `Ctrl+N Shift+H`, und der rechte Bereich, `Ctrl+N Shift+L`) gehören zum Log: Ein- oder Ausklappen, während ein Diff, eine Dateiansicht oder der Editor offen ist, gilt nur für diese Ansicht. Ein Diff oder eine Dateiansicht klappt die Refs-Seitenleiste außerdem von selbst ein, damit der Inhalt mehr Platz hat. Zurück im Log sind beide Bereiche so, wie Sie sie dort verlassen haben, und genau dieser Zustand wird für den nächsten Start gespeichert.
 
 ## Das Log (Mitte)
 

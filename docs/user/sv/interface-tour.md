@@ -120,7 +120,7 @@ aktiv pil.
   i ›**, **SSH & inloggning...** och **Delvis utcheckning...**.
 - `Ctrl+PageUp` och `Ctrl+PageDown` byter flik. `Ctrl+W` stänger den aktuella
   fliken. Ett mittenklick på en flik stänger den också (med samma fråga).
-- `t` (eller `Ctrl+N t`) öppnar flikväljaren, en sökbar lista över de öppna
+- `t` (eller `Ctrl+N Tab`) öppnar flikväljaren, en sökbar lista över de öppna
   flikarna.
 - **Ändra flikarnas ordning:** tryck på en repositoryflik och dra den i sidled (ett
   spöke av fliken följer pekaren och ett streck visar var den hamnar; `Esc` avbryter),
@@ -241,9 +241,9 @@ gränsen mellan två avsnitt för att ändra deras storlek.
 Håll muspekaren över en rad för att visa dess knappar: dölj eller visa reffen i
 Log, och **Solo** (visa bara den reffens commits). Dubbelklicka på en lokal gren
 eller en tag för att checka ut den. Högerklicka på en rad för dess meny. `‹` i
-sidofältets rubrik fäller ihop sidofältet (`Ctrl+N h`).
+sidofältets rubrik fäller ihop sidofältet (`Ctrl+N Shift+H`).
 
-De två sidopanelerna (Refs-sidofältet, `Ctrl+N h`, och högerpanelen, `Ctrl+N l`) tillhör Log: att visa eller fälla ihop någon av dem medan en diff, filvy eller redigerare är öppen gäller bara den vyn. En diff eller filvy fäller också ihop Refs-sidofältet av sig själv för att ge innehållet plats. Tillbaka i Log är båda panelerna som du lämnade dem där, och det är det läget som sparas till nästa start.
+De två sidopanelerna (Refs-sidofältet, `Ctrl+N Shift+H`, och högerpanelen, `Ctrl+N Shift+L`) tillhör Log: att visa eller fälla ihop någon av dem medan en diff, filvy eller redigerare är öppen gäller bara den vyn. En diff eller filvy fäller också ihop Refs-sidofältet av sig själv för att ge innehållet plats. Tillbaka i Log är båda panelerna som du lämnade dem där, och det är det läget som sparas till nästa start.
 
 ## Log (mitten)
 

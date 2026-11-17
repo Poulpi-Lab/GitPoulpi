@@ -133,7 +133,7 @@ insignia en cada flecha activa.
 - `Ctrl+PageUp` y `Ctrl+PageDown` cambian de pestaña. `Ctrl+W` cierra la pestaña
   actual. Un clic central en una pestaña también la cierra (con la misma
   pregunta).
-- `t` (o `Ctrl+N t`) abre el selector de pestañas, una lista con búsqueda de las
+- `t` (o `Ctrl+N Tab`) abre el selector de pestañas, una lista con búsqueda de las
   pestañas abiertas.
 - **Reordenar pestañas:** pulsa una pestaña de repositorio y arrástrala hacia un lado
   (un fantasma de la pestaña sigue al puntero y una barra muestra dónde caerá; `Esc`
@@ -259,10 +259,10 @@ el borde entre dos secciones para cambiar su tamaño.
 Pasa el puntero sobre una fila para mostrar sus botones: ocultar o mostrar la ref
 en el Log, y **Solo** (mostrar solo los commits de esa ref). Haz doble clic en una
 rama local o en un tag para hacer checkout. Haz clic derecho en una fila para ver
-su menú. El `‹` del título de la barra lateral la contrae (`Ctrl+N h`).
+su menú. El `‹` del título de la barra lateral la contrae (`Ctrl+N Shift+H`).
 
-Los dos paneles laterales (la barra lateral Refs, `Ctrl+N h`, y el panel derecho,
-`Ctrl+N l`) pertenecen al Log: mostrar o contraer uno mientras hay un diff, una vista de
+Los dos paneles laterales (la barra lateral Refs, `Ctrl+N Shift+H`, y el panel derecho,
+`Ctrl+N Shift+L`) pertenecen al Log: mostrar o contraer uno mientras hay un diff, una vista de
 archivo o un editor abierto solo afecta a esa vista. Un diff o una vista de archivo también
 contrae por sí solo la barra lateral Refs para dejar sitio al contenido. De vuelta en el
 Log, ambos paneles quedan como los dejaste allí, y ese es el estado que se guarda para el

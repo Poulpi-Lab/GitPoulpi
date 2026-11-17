@@ -97,8 +97,8 @@ stage_file = "z"
 | `git_prefix` | `lfs_push_all` | LFS: すべてのオブジェクトをPush | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS: ローカルのオブジェクトを整理 | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | 履歴書き換えワークベンチを開く | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | Refs ペインの折りたたみ／復元 | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | Status ペインの折りたたみ／復元 | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | Refs ペインの折りたたみ／復元 | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | Status ペインの折りたたみ／復元 | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | 設定を開く | `Ctrl+N ,` |
 | `nav_prefix` | `about` | バージョン情報を開く | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | アクティビティログを開く | `Ctrl+N Shift+A` |
@@ -106,11 +106,11 @@ stage_file = "z"
 | `nav_prefix` | `jobs` | バックグラウンドタスクを表示 | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | 更新パネルを表示 | `Ctrl+N u` |
 | `nav_prefix` | `help` | ヘルプの表示切り替え | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | タブを選択 | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | テーマを変更 | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | 言語を変更 | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | グラフのカラーテーマを変更 | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | グラフの行の色付けを切り替え | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | タブを選択 | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | テーマを変更 | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | 言語を変更 | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | グラフのカラーテーマを変更 | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | グラフの行の色付けを切り替え | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | Refs のセクションを拡大 | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | Refs のセクションを縮小 | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | Commitメッセージ欄を拡大 | `Ctrl+N ]` |
@@ -469,12 +469,12 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | ナビゲーション: 次のペインにフォーカスを移動 | `Tab` |
 | ナビゲーション: 前のペインにフォーカスを移動 | `Shift+Tab` |
 | ナビゲーション: Commitを検索... | `f` |
-| ナビゲーション: Refs ペインの折りたたみを切り替え | `Ctrl+N h` |
+| ナビゲーション: Refs ペインの折りたたみを切り替え | `Ctrl+N H` |
 | ナビゲーション: Refs ペインを広げる | `Ctrl+N Right` |
 | ナビゲーション: Refs ペインを狭める | `Ctrl+N Left` |
 | ナビゲーション: Status ペインを広げる | `Ctrl+N Shift+Left` |
 | ナビゲーション: Status ペインを狭める | `Ctrl+N Shift+Right` |
-| ナビゲーション: Status ペインの折りたたみを切り替え | `Ctrl+N l` |
+| ナビゲーション: Status ペインの折りたたみを切り替え | `Ctrl+N L` |
 | ナビゲーション: Refs のセクションを拡大 | `Ctrl+N +` |
 | ナビゲーション: Refs のセクションを縮小 | `Ctrl+N -` |
 | ナビゲーション: Refs のセクションサイズをリセット |  |
@@ -1203,8 +1203,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | アプリ: テーマ... |  |
 | 競合: ベースブランチの一覧を編集... |  |
 | 競合: このリポジトリのベースブランチ... |  |
-| アプリ: テーマを変更... | `Ctrl+N y` |
-| アプリ: 言語を変更... | `Ctrl+N g` |
+| アプリ: テーマを変更... | `Ctrl+N t` |
+| アプリ: 言語を変更... | `Ctrl+N l` |
 | ランチャー: ショートカットを作成 |  |
 | ランチャー: デスクトップのショートカットを作成 |  |
 | ランチャー: ショートカットを削除 |  |
@@ -1214,8 +1214,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | ランチャー: PATH から削除 |  |
 | ランチャー: 「GitPoulpi で開く」メニューをインストール |  |
 | ランチャー: 「GitPoulpi で開く」メニューを削除 |  |
-| アプリ: グラフのカラーテーマを変更... | `Ctrl+N Y` |
-| アプリ: グラフの行の色付けを切り替え | `Ctrl+N T` |
+| アプリ: グラフのカラーテーマを変更... | `Ctrl+N T` |
+| アプリ: グラフの行の色付けを切り替え | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## 移動
@@ -1295,14 +1295,14 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | キー | 動作 |
 |---|---|
 | `Ctrl+N`、続けてバッジ | ウィンドウのこのバッジが表示されている部分にフォーカスする。手前のダイアログやポップアップなら、そのコントロールを押す |
-| `Ctrl+N h` / `Ctrl+N l` | Refs ペイン / 右ペインを折りたたむ、または復元する |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | Refs ペイン / 右ペインを折りたたむ、または復元する |
 | `Ctrl+N Left` / `Ctrl+N Right` | Refs ペインとログの間の区切りを 1 段階左 / 右へ動かす（折りたたまれた Refs ペインは先に戻ります） |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | ログと右ペインの間の区切りを 1 段階左 / 右へ動かす |
 | `Ctrl+N +` / `Ctrl+N -` | アクティブな Refs セクションを 1 行ぶん拡大 / 縮小する |
 | `Ctrl+N ]` / `Ctrl+N [` | 右ペインの commit メッセージ欄を 1 行ぶん拡大 / 縮小する |
-| `Ctrl+N t` | タブを選ぶ（タブピッカー。`t` だけでも同じ） |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | テーマ / 言語 / グラフカラーテーマを変更する |
-| `Ctrl+N Shift+T` | グラフの行の色付けをオン / オフにする |
+| `Ctrl+N Tab` | タブを選ぶ（タブピッカー。`t` だけでも同じ） |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | テーマ / 言語 / グラフカラーテーマを変更する |
+| `Ctrl+N Shift+Y` | グラフの行の色付けをオン / オフにする |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | エージェントが用意したビューを表示する / 戻る（[MCP とエージェント](mcp-and-agents.md)を参照） |
 | `Ctrl+N ,` | 設定を開く |
 | `Ctrl+N ?` | ヘルプを開く / 閉じる |

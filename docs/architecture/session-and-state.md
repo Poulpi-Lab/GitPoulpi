@@ -341,7 +341,7 @@ Plan: [mcp-show-ui](../developer/the mcp-show-ui design); user page: [mcp-and-ag
 - **Text fields share one core** (`text_edit`): a caret of byte offsets beside the field's `String` (never wrapping it, so every reader stays unchanged), clamped and floored to a char boundary on every use. Keys are decoded before they are applied, so a field's arm can claim editing keys ahead of pane shortcuts while Enter, Esc and Tab keep their field meaning. Field rects come from the render; a click is applied to the caret only after the ordinary click handling decided who has the keyboard, and never through a modal. `Ctrl+Alt` is AltGr and types, except for ASCII alphanumerics.
 - **A text input's width is chrome, not content**: fields have a reserved slot and scroll their text, measured in terminal columns (`display_width`), never bytes or chars (the find bar's buttons moved as the user typed).
 - **Count prefix**: computed as a plain `let` before the big key match, not by wrapping the match in a block (`cargo fmt` reindented a thousand-line match and produced a duplicate-arms merge bug).
-- `Ctrl+N h` / `Ctrl+N l` once failed to collapse panes while the Editor had focus; now pinned by `pty_editor.rs` `ctrl_n_l_collapses_the_status_pane_while_the_editor_has_focus`.
+- `Ctrl+N Shift+H` / `Ctrl+N Shift+L` once failed to collapse panes while the Editor had focus; now pinned by `pty_editor.rs` `ctrl_n_shift_l_collapses_the_status_pane_while_the_editor_has_focus`.
 - **OS pointer shape** uses OSC 22 (kitty, foot, xterm; not WezTerm or Windows Terminal), so every affordance is also drawn in the buffer; the pointer is a bonus, never the mechanism.
 
 ## Comparing the Log's multi-selection

@@ -32,7 +32,7 @@ ont été faits.
 Les couleurs des voies viennent du thème. *Paramètres > Apparence > Thème de
 couleurs du graphe* combine n'importe quel thème avec n'importe quelle palette de
 voies, et le sélecteur de la palette *Application : Changer le thème de couleurs du graphe...*
-(`Ctrl+N Shift+Y`) prévisualise chaque palette en direct ; voir
+(`Ctrl+N Shift+T`) prévisualise chaque palette en direct ; voir
 [Thèmes](themes.md). *Fond des voies du graphe* réglé sur **Teinte de ligne**
 peint une bande légère de la couleur de la voie derrière la colonne du graphe et
 une fine barre à son bord. *Force de la teinte* (**Forte**, **Moyenne** (par défaut),

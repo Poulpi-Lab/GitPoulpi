@@ -29,7 +29,7 @@ piccoli quadrati su una corsia, accanto al commit su cui sono stati creati.
 
 I colori delle corsie vengono dal tema. *Impostazioni > Aspetto > Tema colori del
 grafo* combina qualsiasi tema con qualsiasi tavolozza di corsie, e il selettore
-della palette *App: Cambia tema colori del grafo...* (`Ctrl+N Shift+Y`) mostra
+della palette *App: Cambia tema colori del grafo...* (`Ctrl+N Shift+T`) mostra
 l'anteprima dal vivo di ogni tavolozza; vedi [Temi](themes.md). *Sfondo delle
 corsie del grafo* impostato su **Tinta di riga** dipinge una tenue fascia del
 colore della corsia dietro la colonna del grafo e una sottile barra sul suo bordo.

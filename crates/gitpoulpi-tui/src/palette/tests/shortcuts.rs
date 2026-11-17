@@ -118,7 +118,7 @@ fn leader_rows_show_the_full_chord_not_the_bare_prefix() {
         .iter()
         .find(|e| e.label.get() == "Navigation: Toggle Refs Pane Collapsed")
         .unwrap();
-    assert_eq!(entry_shortcut(&km, collapse), "Ctrl+N h");
+    assert_eq!(entry_shortcut(&km, collapse), "Ctrl+N H");
     assert_eq!(entry_shortcut(&rebound, collapse), "Alt+N h");
     let stage = PALETTE_COMMANDS
         .iter()

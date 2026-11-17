@@ -97,8 +97,8 @@ stage_file = "z"
 | `git_prefix` | `lfs_push_all` | LFS：Push 所有对象 | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS：清理本地对象 | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | 打开历史重写工作台 | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | 折叠或恢复引用窗格 | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | 折叠或恢复状态窗格 | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | 折叠或恢复引用窗格 | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | 折叠或恢复状态窗格 | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | 打开设置 | `Ctrl+N ,` |
 | `nav_prefix` | `about` | 打开“关于” | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | 打开活动日志 | `Ctrl+N Shift+A` |
@@ -106,11 +106,11 @@ stage_file = "z"
 | `nav_prefix` | `jobs` | 显示后台任务 | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | 显示更新面板 | `Ctrl+N u` |
 | `nav_prefix` | `help` | 切换帮助 | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | 选择标签页 | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | 更改主题 | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | 更改语言 | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | 更改图配色主题 | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | 切换图行着色 | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | 选择标签页 | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | 更改主题 | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | 更改语言 | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | 更改图配色主题 | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | 切换图行着色 | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | 增大引用分区 | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | 缩小引用分区 | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | 增大 Commit 消息区 | `Ctrl+N ]` |
@@ -469,12 +469,12 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 导航：焦点切换到下一个窗格 | `Tab` |
 | 导航：焦点切换到上一个窗格 | `Shift+Tab` |
 | 导航：搜索 Commit… | `f` |
-| 导航：折叠/展开引用窗格 | `Ctrl+N h` |
+| 导航：折叠/展开引用窗格 | `Ctrl+N H` |
 | 导航：加宽引用窗格 | `Ctrl+N Right` |
 | 导航：收窄引用窗格 | `Ctrl+N Left` |
 | 导航：加宽状态窗格 | `Ctrl+N Shift+Left` |
 | 导航：收窄状态窗格 | `Ctrl+N Shift+Right` |
-| 导航：折叠/展开状态窗格 | `Ctrl+N l` |
+| 导航：折叠/展开状态窗格 | `Ctrl+N L` |
 | 导航：增大引用分区 | `Ctrl+N +` |
 | 导航：缩小引用分区 | `Ctrl+N -` |
 | 导航：重置引用分区大小 |  |
@@ -1203,8 +1203,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 应用：主题… |  |
 | 冲突：编辑基准分支列表… |  |
 | 冲突：此仓库的基准分支… |  |
-| 应用：更改主题… | `Ctrl+N y` |
-| 应用：更改语言… | `Ctrl+N g` |
+| 应用：更改主题… | `Ctrl+N t` |
+| 应用：更改语言… | `Ctrl+N l` |
 | 启动器：创建快捷方式 |  |
 | 启动器：创建桌面快捷方式 |  |
 | 启动器：移除快捷方式 |  |
@@ -1214,8 +1214,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 启动器：从 PATH 中移除 |  |
 | 启动器：安装“在 GitPoulpi 中打开”菜单 |  |
 | 启动器：移除“在 GitPoulpi 中打开”菜单 |  |
-| 应用：更改图配色主题… | `Ctrl+N Y` |
-| 应用：切换图行着色 | `Ctrl+N T` |
+| 应用：更改图配色主题… | `Ctrl+N T` |
+| 应用：切换图行着色 | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## 在界面中移动
@@ -1295,14 +1295,14 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 按键 | 操作 |
 |---|---|
 | `Ctrl+N`，然后按徽标 | 聚焦显示该徽标的窗口部分 |
-| `Ctrl+N h` / `Ctrl+N l` | 折叠或恢复引用窗格 / 右侧窗格 |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | 折叠或恢复引用窗格 / 右侧窗格 |
 | `Ctrl+N Left` / `Ctrl+N Right` | 将引用窗格与 Log 之间的分隔条向左 / 向右移动一档（已折叠的引用窗格会先恢复） |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | 将 Log 与右侧窗格之间的分隔条向左 / 向右移动一档 |
 | `Ctrl+N +` / `Ctrl+N -` | 将当前引用分区增大 / 缩小一行 |
 | `Ctrl+N ]` / `Ctrl+N [` | 将右侧窗格的 commit 消息块增大 / 缩小一行 |
-| `Ctrl+N t` | 选择标签页（标签页选择器；单独按 `t` 效果相同） |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | 更改主题 / 语言 / 图的配色主题 |
-| `Ctrl+N Shift+T` | 开启或关闭图的行着色 |
+| `Ctrl+N Tab` | 选择标签页（标签页选择器；单独按 `t` 效果相同） |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | 更改主题 / 语言 / 图的配色主题 |
+| `Ctrl+N Shift+Y` | 开启或关闭图的行着色 |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | 显示代理准备的视图 / 返回（参见 [MCP 与代理](mcp-and-agents.md)） |
 | `Ctrl+N ,` | 打开设置 |
 | `Ctrl+N ?` | 打开或关闭帮助 |

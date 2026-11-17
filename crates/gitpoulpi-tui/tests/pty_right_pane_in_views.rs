@@ -50,7 +50,7 @@ fn badge_before(screen: &Screen, tail: &str) -> Option<char> {
 
 fn toggle_right_pane(term: &mut Terminal) {
     term.send_keys("C-n").unwrap();
-    term.send_keys("l").unwrap();
+    term.send_keys("L").unwrap();
 }
 
 fn wait_shown(term: &mut Terminal, what: &str) {

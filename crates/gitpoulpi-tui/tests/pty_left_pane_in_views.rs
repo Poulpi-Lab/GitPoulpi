@@ -51,7 +51,7 @@ fn badge_before(screen: &Screen, tail: &str) -> Option<char> {
 
 fn toggle_left_pane(term: &mut Terminal) {
     term.send_keys("C-n").unwrap();
-    term.send_keys("h").unwrap();
+    term.send_keys("H").unwrap();
 }
 
 /// The Refs sidebar's `LOCAL` section header is on screen.

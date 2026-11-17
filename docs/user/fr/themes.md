@@ -308,7 +308,7 @@ ouvre les Paramètres sur cette ligne.
 
 ### Changer de thème depuis la palette
 
-**Application : Changer de thème...** (`Ctrl+P`, ou `Ctrl+N y` ; la touche est
+**Application : Changer de thème...** (`Ctrl+P`, ou `Ctrl+N t` ; la touche est
 réaffectable sous `nav_prefix.change_theme`) ouvre une liste des mêmes thèmes sans passer
 par les Paramètres : **Système (suit le terminal)**, les préréglages, puis vos propres
 fichiers de thème, chacun avec quatre petites pastilles de couleur. Le thème courant est

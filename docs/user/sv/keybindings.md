@@ -113,8 +113,8 @@ Varje tangent du kan binda om, med id:t som används i
 | `git_prefix` | `lfs_push_all` | LFS: Push (alla objekt) | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS: Rensa lokala objekt | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | Öppna omskrivningsvyn | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | Fäll ihop eller återställ Refs-rutan | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | Fäll ihop eller återställ Status-rutan | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | Fäll ihop eller återställ Refs-rutan | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | Fäll ihop eller återställ Status-rutan | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | Öppna inställningar | `Ctrl+N ,` |
 | `nav_prefix` | `about` | Öppna Om GitPoulpi | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | Öppna Aktivitetsloggen | `Ctrl+N Shift+A` |
@@ -122,11 +122,11 @@ Varje tangent du kan binda om, med id:t som används i
 | `nav_prefix` | `jobs` | Visa bakgrundsjobben | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | Visa uppdateringspanelen | `Ctrl+N u` |
 | `nav_prefix` | `help` | Växla hjälp | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | Välj flik | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | Byt tema | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | Byt språk | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | Byt färgtema för grafen | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | Växla radfärgning i grafen | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | Välj flik | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | Byt tema | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | Byt språk | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | Byt färgtema för grafen | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | Växla radfärgning i grafen | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | Förstora Refs-avsnitt | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | Förminska Refs-avsnitt | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | Förstora commit-meddelandets block | `Ctrl+N ]` |
@@ -505,12 +505,12 @@ Tangenterna är standardvärdena.
 | Navigering: Flytta fokus till nästa ruta | `Tab` |
 | Navigering: Flytta fokus till föregående ruta | `Shift+Tab` |
 | Navigering: Sök commits... | `f` |
-| Navigering: Fäll ihop/ut Refs-rutan | `Ctrl+N h` |
+| Navigering: Fäll ihop/ut Refs-rutan | `Ctrl+N H` |
 | Navigering: Bredda Refs-rutan | `Ctrl+N Right` |
 | Navigering: Smalna av Refs-rutan | `Ctrl+N Left` |
 | Navigering: Bredda Status-rutan | `Ctrl+N Shift+Left` |
 | Navigering: Smalna av Status-rutan | `Ctrl+N Shift+Right` |
-| Navigering: Fäll ihop/ut Status-rutan | `Ctrl+N l` |
+| Navigering: Fäll ihop/ut Status-rutan | `Ctrl+N L` |
 | Navigering: Förstora Refs-avsnitt | `Ctrl+N +` |
 | Navigering: Förminska Refs-avsnitt | `Ctrl+N -` |
 | Navigering: Återställ Refs-avsnittens storlek |  |
@@ -1239,8 +1239,8 @@ Tangenterna är standardvärdena.
 | App: Tema... |  |
 | Konflikter: Redigera listor över basgrenar... |  |
 | Konflikter: Basgrenar för det här repositoryt... |  |
-| App: Byt tema... | `Ctrl+N y` |
-| App: Byt språk... | `Ctrl+N g` |
+| App: Byt tema... | `Ctrl+N t` |
+| App: Byt språk... | `Ctrl+N l` |
 | Startare: Skapa genväg |  |
 | Startare: Skapa skrivbordsgenväg |  |
 | Startare: Ta bort genvägar |  |
@@ -1250,8 +1250,8 @@ Tangenterna är standardvärdena.
 | Startare: Ta bort från PATH |  |
 | Startare: Installera menyn Öppna i GitPoulpi |  |
 | Startare: Ta bort menyn Öppna i GitPoulpi |  |
-| App: Byt färgtema för grafen... | `Ctrl+N Y` |
-| App: Växla radfärgning i grafen | `Ctrl+N T` |
+| App: Byt färgtema för grafen... | `Ctrl+N T` |
+| App: Växla radfärgning i grafen | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## Förflyttning
@@ -1368,14 +1368,14 @@ tar emot. Nästa tangent kör en åtgärd, eller avbryter.
 | Tangent | Åtgärd |
 |---|---|
 | `Ctrl+N` sedan ett märke | Fokusera den del av fönstret som visar det märket |
-| `Ctrl+N h` / `Ctrl+N l` | Fäll ihop eller återställ Refs-rutan / högerpanelen |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | Fäll ihop eller återställ Refs-rutan / högerpanelen |
 | `Ctrl+N Left` / `Ctrl+N Right` | Flytta avdelaren mellan Refs-rutan och Log ett steg åt vänster / höger (en hopfälld Refs-ruta kommer tillbaka först) |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | Flytta avdelaren mellan Log och högra panelen ett steg åt vänster / höger |
 | `Ctrl+N +` / `Ctrl+N -` | Förstora / förminska det aktiva Refs-avsnittet med en rad |
 | `Ctrl+N ]` / `Ctrl+N [` | Förstora / förminska commit-meddelandets block i högerpanelen med en rad |
-| `Ctrl+N t` | Välj en flik (flikväljaren; bara `t` gör detsamma) |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | Byt tema / språk / färgtema för grafen |
-| `Ctrl+N Shift+T` | Slå på eller av radfärgningen i grafen |
+| `Ctrl+N Tab` | Välj en flik (flikväljaren; bara `t` gör detsamma) |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | Byt tema / språk / färgtema för grafen |
+| `Ctrl+N Shift+Y` | Slå på eller av radfärgningen i grafen |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | Visa vyn en agent förberedde / gå tillbaka (se [MCP och agenter](mcp-and-agents.md)) |
 | `Ctrl+N ,` | Öppna Inställningar |
 | `Ctrl+N ?` | Öppna eller stäng hjälpen |

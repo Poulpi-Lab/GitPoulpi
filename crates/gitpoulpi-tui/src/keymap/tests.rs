@@ -223,7 +223,7 @@ fn labels_carry_the_effective_prefix() {
     let km = Keymap::defaults();
     assert_eq!(km.label(Action::GitStageFile), "Ctrl+G s");
     assert_eq!(km.label(Action::GitPush), "Ctrl+G Shift+P");
-    assert_eq!(km.label(Action::NavCollapseLeft), "Ctrl+N h");
+    assert_eq!(km.label(Action::NavCollapseLeft), "Ctrl+N H");
     assert_eq!(km.labels(Action::NavGrowSection), ["Ctrl+N +", "Ctrl+N ="]);
     assert_eq!(km.label(Action::GlobalSettings), "Ctrl+,");
     assert_eq!(km.label(Action::PromptAiStashMessage), "Ctrl+G");
@@ -475,7 +475,7 @@ fn badges_never_equal_a_nav_prefix_key() {
     let km = Keymap::from_config(&cfg(&[("nav_prefix", "collapse_refs", &["b"])]));
     assert!(km.issues().is_empty());
     let taken = km.nav_prefix_chars();
-    assert!(taken.contains(&'b') && !taken.contains(&'h'));
+    assert!(taken.contains(&'b') && !taken.contains(&'H'));
     // The default keymap stays the installed one in unit tests, so check
     // the invariant on it: no badge is a default nav key.
     let defaults = Keymap::defaults().nav_prefix_chars();

@@ -56,7 +56,7 @@ fn the_picker_opens_on_the_active_tab_and_down_enter_lands_on_the_next() {
         .mouse_capture()
         .spawn();
     term.send_keys("C-n").unwrap();
-    term.send_text("t").unwrap();
+    term.send_keys("Tab").unwrap();
     term.wait_for("the tab picker", STEP, |s| {
         s.contains("Alt+Up/Down to reorder")
     })

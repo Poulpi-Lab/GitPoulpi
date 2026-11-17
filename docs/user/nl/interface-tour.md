@@ -89,7 +89,7 @@ rij zolang je het daar houdt, zodat je het voorbij de zichtbare tabbladen kunt n
   werkruimte verwijderen**, als je werkruimtes hebt), **Pad kopiëren**, **Openen in ›**,
   **SSH & inloggegevens...** en **Gedeeltelijke checkout...**.
 - `Ctrl+PageUp` en `Ctrl+PageDown` wisselen van tabblad. `Ctrl+W` sluit het huidige tabblad. Een middenklik op een tabblad sluit het ook (met dezelfde vraag).
-- `t` (of `Ctrl+N t`) opent de tabbladkiezer, een doorzoekbare lijst van de geopende
+- `t` (of `Ctrl+N Tab`) opent de tabbladkiezer, een doorzoekbare lijst van de geopende
   tabbladen.
 - **Tabbladen herordenen:** houd een repositorytabblad ingedrukt en sleep het opzij (een
   schim van het tabblad volgt de aanwijzer en een streep toont waar het terechtkomt; `Esc`
@@ -207,9 +207,9 @@ secties om ze van grootte te veranderen.
 Wijs een rij aan om haar knoppen te tonen: de ref in de Log verbergen of tonen, en **Solo**
 (alleen de commits van die ref tonen). Dubbelklik op een lokale branch of een tag om hem uit
 te checken. Klik met rechts op een rij voor haar menu. De `‹` in de titel van de zijbalk
-klapt de zijbalk in (`Ctrl+N h`).
+klapt de zijbalk in (`Ctrl+N Shift+H`).
 
-De twee zijpanelen (de zijbalk Refs, `Ctrl+N h`, en het rechterpaneel, `Ctrl+N l`) horen bij de Log: als je er een toont of inklapt terwijl een diff, bestandsweergave of editor open staat, geldt dat alleen voor die weergave. Een diff of bestandsweergave klapt de zijbalk Refs bovendien zelf in om ruimte te maken voor de inhoud. Terug in de Log staan beide panelen zoals je ze daar liet, en dat is de stand die voor de volgende start wordt opgeslagen.
+De twee zijpanelen (de zijbalk Refs, `Ctrl+N Shift+H`, en het rechterpaneel, `Ctrl+N Shift+L`) horen bij de Log: als je er een toont of inklapt terwijl een diff, bestandsweergave of editor open staat, geldt dat alleen voor die weergave. Een diff of bestandsweergave klapt de zijbalk Refs bovendien zelf in om ruimte te maken voor de inhoud. Terug in de Log staan beide panelen zoals je ze daar liet, en dat is de stand die voor de volgende start wordt opgeslagen.
 
 ## De Log (midden)
 

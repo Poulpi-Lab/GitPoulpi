@@ -28,7 +28,7 @@ lane beside the commit they were made on.
 
 The lane colors come from the theme. *Settings > Appearance > Graph color
 theme* combines any theme with any lane palette, and the palette's
-*App: Change Graph Color Theme...* picker (`Ctrl+N Shift+Y`) previews each palette live; see
+*App: Change Graph Color Theme...* picker (`Ctrl+N Shift+T`) previews each palette live; see
 [Themes](themes.md). *Graph lane background* set to **Row tint** paints a faint
 band of the lane color behind the graph column and a thin bar at its edge.
 *Row tint strength* (**Strong**, **Medium** (default), **Subtle**) sets how

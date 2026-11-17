@@ -115,7 +115,7 @@ et les rendent tels qu'ils étaient (la page, la position de défilement et les
 modifications non enregistrées du Workflow ou des modèles sont conservées) :
 
 - la palette de commandes (`Ctrl+P`),
-- le sélecteur de thème (`Ctrl+N y`, **Application : Changer de thème...**), qui
+- le sélecteur de thème (`Ctrl+N t`, **Application : Changer de thème...**), qui
   prévisualise chaque thème sur les Paramètres eux-mêmes ; `Esc` remet le thème précédent,
 - les sélecteurs de langue et de couleurs du graphe (`Ctrl+N` puis les mêmes lettres que dans la fenêtre principale),
 - la recherche dans l'espace de travail (`Ctrl+Alt+F`),
@@ -183,7 +183,7 @@ La liste des pages a deux groupes :
 | **Afficher la durée des opérations**, **Journalisation étendue** | L'onglet Opérations Git du Journal d'activité : la durée de chaque opération (`log.timings`, activé par défaut) et aussi le travail en arrière-plan, actualisation et auto-fetch (`log.extended`, désactivé par défaut). Voir [Quand quelque chose échoue](troubleshooting.md#le-journal-dactivité). |
 | **Annulation activée**, **Profondeur de l'historique**, **Enregistrer les changements faits hors de GitPoulpi** | Le groupe **Historique d'annulation**. Active ou désactive l'annulation, et règle combien d'opérations elle conserve (100 par défaut, `0` signifie illimité). Désactiver l'annulation efface l'historique d'annulation, après confirmation. La dernière option enregistre aussi ce qu'un shell ou un agent fait aux branches, aux tags, aux stashes et à HEAD. Voir [Annuler et rétablir](undo-redo.md). |
 
-La commande de palette **Application : Changer de langue...** (`Ctrl+N g`) ouvre
+La commande de palette **Application : Changer de langue...** (`Ctrl+N l`) ouvre
 la même liste de langues. Là, la langue en surbrillance est prévisualisée en
 direct ; `Enter` la garde et `Esc` rétablit la précédente.
 
@@ -426,7 +426,7 @@ que dans les builds qui incluent le serveur ; voir [MCP et agents](mcp-and-agen
 | **Couleur des champs**, **Couleur de champ personnalisée** | Le fond des champs de texte : **Suivre le thème** (par défaut), une couleur sombre fixe, ou votre propre `#rrggbb`. |
 | **Curseur de texte** | `ui.text_cursor` : **terminal** (par défaut) place le curseur du terminal lui-même au point d'insertion du champ de texte actif, en barre (les réglages de curseur de votre terminal s'appliquent, et la fenêtre de candidats d'une méthode de saisie s'ouvre à cet endroit) ; **drawn** dessine le curseur propre à GitPoulpi et garde le curseur du terminal masqué. S'applique immédiatement. Palette : `Paramètres : Curseur de texte...`. |
 | **Profondeur de couleur** | **auto** (par défaut), **truecolor**, **256** ou **16**. Voir [Thèmes](themes.md). |
-| **Thème de couleurs du graphe** | **Suivre le thème** (par défaut : les couleurs de voies propres au thème) ou n'importe quelle palette de voies. Chaque palette montre quelques-unes de ses couleurs. S'applique à la fermeture des Paramètres. La commande de palette **Application : Changer le thème de couleurs du graphe...** (`Ctrl+N Shift+Y`) prévisualise chaque palette en direct. |
+| **Thème de couleurs du graphe** | **Suivre le thème** (par défaut : les couleurs de voies propres au thème) ou n'importe quelle palette de voies. Chaque palette montre quelques-unes de ses couleurs. S'applique à la fermeture des Paramètres. La commande de palette **Application : Changer le thème de couleurs du graphe...** (`Ctrl+N Shift+T`) prévisualise chaque palette en direct. |
 | **Fond des voies du graphe** | **Désactivé** (transparent) ou **Teinte de ligne** : une bande légère de la couleur de la voie derrière la colonne du graphe, avec une fine barre à son bord. |
 | **Force de la teinte** | À quel point la bande de Teinte de ligne est estompée : **Forte**, **Moyenne** (par défaut) ou **Subtile**. La barre du bord garde sa couleur pleine. |
 | **Position de la barre d'outils** | `ui.toolbar_position` : où se place la barre d'outils : **Haut**, **Bas** (par défaut), **Gauche** ou **Droite**. Gauche et Droite en font une colonne à côté des volets ; une fenêtre de moins de 80 colonnes la dessine en bas. S'applique immédiatement. |

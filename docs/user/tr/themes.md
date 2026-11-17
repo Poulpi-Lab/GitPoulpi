@@ -304,7 +304,7 @@ o satırda açar.
 
 ### Temayı paletten değiştirme
 
-**Uygulama: Temayı Değiştir...** (`Ctrl+P` ya da `Ctrl+N y`; tuş
+**Uygulama: Temayı Değiştir...** (`Ctrl+P` ya da `Ctrl+N t`; tuş
 `nav_prefix.change_theme` olarak yeniden atanabilir) Ayarlar'a gitmeden aynı temaların
 bir listesini açar: **Sistem (terminali izler)**, hazır ayarlar, ardından kendi tema
 dosyalarınız; her biri dört küçük renk çipiyle gösterilir. Geçerli tema işaretlidir.

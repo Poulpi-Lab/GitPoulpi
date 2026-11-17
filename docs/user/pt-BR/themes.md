@@ -304,7 +304,7 @@ A entrada da paleta **App: tema...** (`Ctrl+P`) abre as Configurações nessa li
 
 ### Mudar o tema pela paleta
 
-**App: mudar tema...** (`Ctrl+P`, ou `Ctrl+N y`; a tecla pode ser reatribuída como
+**App: mudar tema...** (`Ctrl+P`, ou `Ctrl+N t`; a tecla pode ser reatribuída como
 `nav_prefix.change_theme`) abre uma lista dos mesmos temas sem passar pelas
 Configurações: **Sistema (segue o terminal)**, as predefinições e depois os seus
 próprios arquivos de tema, cada um com quatro pequenos chips de cor. O tema atual é

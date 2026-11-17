@@ -114,8 +114,8 @@ préfixe (`Ctrl+G s`).
 | `git_prefix` | `lfs_push_all` | LFS : Push de tous les objets | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS : Élaguer les objets locaux | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | Ouvrir l'atelier de réécriture de l'historique | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | Replier ou rétablir le volet Refs | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | Replier ou rétablir le volet Status | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | Replier ou rétablir le volet Refs | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | Replier ou rétablir le volet Status | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | Ouvrir les paramètres | `Ctrl+N ,` |
 | `nav_prefix` | `about` | Ouvrir À propos | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | Ouvrir le Journal d'activité | `Ctrl+N Shift+A` |
@@ -123,11 +123,11 @@ préfixe (`Ctrl+G s`).
 | `nav_prefix` | `jobs` | Afficher les tâches en arrière-plan | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | Afficher le panneau de mise à jour | `Ctrl+N u` |
 | `nav_prefix` | `help` | Afficher ou masquer l'aide | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | Sélectionner un onglet | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | Changer de thème | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | Changer de langue | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | Changer le thème de couleurs du graphe | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | Basculer la teinte de ligne du graphe | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | Sélectionner un onglet | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | Changer de thème | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | Changer de langue | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | Changer le thème de couleurs du graphe | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | Basculer la teinte de ligne du graphe | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | Agrandir la section Refs | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | Réduire la section Refs | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | Agrandir le bloc du message de commit | `Ctrl+N ]` |
@@ -505,12 +505,12 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Navigation : Passer au volet suivant | `Tab` |
 | Navigation : Passer au volet précédent | `Shift+Tab` |
 | Navigation : Rechercher des commits... | `f` |
-| Navigation : Replier ou déplier le volet Refs | `Ctrl+N h` |
+| Navigation : Replier ou déplier le volet Refs | `Ctrl+N H` |
 | Navigation : Élargir le volet Refs | `Ctrl+N Right` |
 | Navigation : Rétrécir le volet Refs | `Ctrl+N Left` |
 | Navigation : Élargir le volet Status | `Ctrl+N Shift+Left` |
 | Navigation : Rétrécir le volet Status | `Ctrl+N Shift+Right` |
-| Navigation : Replier ou déplier le volet Status | `Ctrl+N l` |
+| Navigation : Replier ou déplier le volet Status | `Ctrl+N L` |
 | Navigation : Agrandir la section Refs | `Ctrl+N +` |
 | Navigation : Réduire la section Refs | `Ctrl+N -` |
 | Navigation : Réinitialiser la taille des sections Refs |  |
@@ -1239,8 +1239,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Application : Thème... |  |
 | Conflits : Modifier les listes de branches de base... |  |
 | Conflits : Branches de base de ce dépôt... |  |
-| Application : Changer de thème... | `Ctrl+N y` |
-| Application : Changer de langue... | `Ctrl+N g` |
+| Application : Changer de thème... | `Ctrl+N t` |
+| Application : Changer de langue... | `Ctrl+N l` |
 | Lanceur : Créer le raccourci |  |
 | Lanceur : Créer le raccourci du bureau |  |
 | Lanceur : Supprimer les raccourcis |  |
@@ -1250,8 +1250,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Lanceur : Retirer du PATH |  |
 | Lanceur : Installer le menu Ouvrir dans GitPoulpi |  |
 | Lanceur : Supprimer le menu Ouvrir dans GitPoulpi |  |
-| Application : Changer le thème de couleurs du graphe... | `Ctrl+N Y` |
-| Application : Basculer la teinte de ligne du graphe | `Ctrl+N T` |
+| Application : Changer le thème de couleurs du graphe... | `Ctrl+N T` |
+| Application : Basculer la teinte de ligne du graphe | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## Se déplacer
@@ -1370,14 +1370,14 @@ touche suivante lance une action, ou annule.
 | Touche | Action |
 |---|---|
 | `Ctrl+N` puis un badge | Cibler la partie de la fenêtre qui affiche ce badge |
-| `Ctrl+N h` / `Ctrl+N l` | Replier ou restaurer le volet Refs / le volet de droite |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | Replier ou restaurer le volet Refs / le volet de droite |
 | `Ctrl+N Left` / `Ctrl+N Right` | Déplacer d'un cran vers la gauche / la droite le séparateur entre le volet Refs et le Log (un volet Refs replié revient d'abord) |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | Déplacer d'un cran vers la gauche / la droite le séparateur entre le Log et le volet de droite |
 | `Ctrl+N +` / `Ctrl+N -` | Agrandir / réduire la section Refs active d'une ligne |
 | `Ctrl+N ]` / `Ctrl+N [` | Agrandir / réduire d'une ligne le bloc du message de commit du volet de droite |
-| `Ctrl+N t` | Choisir un onglet (le sélecteur d'onglets ; `t` seul fait la même chose) |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | Changer le thème / la langue / le thème de couleurs du graphe |
-| `Ctrl+N Shift+T` | Activer ou désactiver les teintes de ligne du graphe |
+| `Ctrl+N Tab` | Choisir un onglet (le sélecteur d'onglets ; `t` seul fait la même chose) |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | Changer le thème / la langue / le thème de couleurs du graphe |
+| `Ctrl+N Shift+Y` | Activer ou désactiver les teintes de ligne du graphe |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | Afficher la vue qu'un agent a préparée / revenir en arrière (voir [MCP et agents](mcp-and-agents.md)) |
 | `Ctrl+N ,` | Ouvrir les Paramètres |
 | `Ctrl+N ?` | Ouvrir ou fermer l'aide |

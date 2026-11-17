@@ -113,8 +113,8 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `git_prefix` | `lfs_push_all` | LFS: Push (tüm nesneler) | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS: Yerel Nesneleri Temizle | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | Geçmişi Yeniden Yazma Ekranını Aç | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | Refs Panelini Daralt veya Geri Yükle | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | Durum Panelini Daralt veya Geri Yükle | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | Refs Panelini Daralt veya Geri Yükle | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | Durum Panelini Daralt veya Geri Yükle | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | Ayarları Aç | `Ctrl+N ,` |
 | `nav_prefix` | `about` | Hakkında Penceresini Aç | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | Etkinlik Günlüğünü Aç | `Ctrl+N Shift+A` |
@@ -122,11 +122,11 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `nav_prefix` | `jobs` | Arka plan görevlerini göster | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | Güncelleme Panelini Göster | `Ctrl+N u` |
 | `nav_prefix` | `help` | Yardımı Aç/Kapat | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | Sekme Seç | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | Temayı Değiştir | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | Dili Değiştir | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | Grafik Renk Temasını Değiştir | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | Grafik Satır Tonunu Aç/Kapat | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | Sekme Seç | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | Temayı Değiştir | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | Dili Değiştir | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | Grafik Renk Temasını Değiştir | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | Grafik Satır Tonunu Aç/Kapat | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | Refs Bölümünü Büyüt | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | Refs Bölümünü Küçült | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | Commit Mesaj Bloğunu Büyüt | `Ctrl+N ]` |
@@ -503,12 +503,12 @@ Tuşlar varsayılanlardır.
 | Gezinme: Odağı Sonraki Panele Geçir | `Tab` |
 | Gezinme: Odağı Önceki Panele Geçir | `Shift+Tab` |
 | Gezinme: Commit'lerde Ara... | `f` |
-| Gezinme: Refs Panelini Daralt/Genişlet | `Ctrl+N h` |
+| Gezinme: Refs Panelini Daralt/Genişlet | `Ctrl+N H` |
 | Gezinme: Refs Panelini Genişlet | `Ctrl+N Right` |
 | Gezinme: Refs Panelini Daralt | `Ctrl+N Left` |
 | Gezinme: Durum Panelini Genişlet | `Ctrl+N Shift+Left` |
 | Gezinme: Durum Panelini Daralt | `Ctrl+N Shift+Right` |
-| Gezinme: Durum Panelini Daralt/Genişlet | `Ctrl+N l` |
+| Gezinme: Durum Panelini Daralt/Genişlet | `Ctrl+N L` |
 | Gezinme: Refs Bölümünü Büyüt | `Ctrl+N +` |
 | Gezinme: Refs Bölümünü Küçült | `Ctrl+N -` |
 | Gezinme: Refs Bölüm Boyutlarını Sıfırla |  |
@@ -1237,8 +1237,8 @@ Tuşlar varsayılanlardır.
 | Uygulama: Tema... |  |
 | Çakışmalar: Temel Dal Listelerini Düzenle... |  |
 | Çakışmalar: Bu Deponun Temel Dalları... |  |
-| Uygulama: Temayı Değiştir... | `Ctrl+N y` |
-| Uygulama: Dili Değiştir... | `Ctrl+N g` |
+| Uygulama: Temayı Değiştir... | `Ctrl+N t` |
+| Uygulama: Dili Değiştir... | `Ctrl+N l` |
 | Başlatıcı: Kısayol Oluştur |  |
 | Başlatıcı: Masaüstü Kısayolu Oluştur |  |
 | Başlatıcı: Kısayolları Kaldır |  |
@@ -1248,8 +1248,8 @@ Tuşlar varsayılanlardır.
 | Başlatıcı: PATH'ten Kaldır |  |
 | Başlatıcı: GitPoulpi'de Aç Menüsünü Kur |  |
 | Başlatıcı: GitPoulpi'de Aç Menüsünü Kaldır |  |
-| Uygulama: Grafik Renk Temasını Değiştir... | `Ctrl+N Y` |
-| Uygulama: Grafik Satır Tonunu Aç/Kapat | `Ctrl+N T` |
+| Uygulama: Grafik Renk Temasını Değiştir... | `Ctrl+N T` |
+| Uygulama: Grafik Satır Tonunu Aç/Kapat | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## Gezinme
@@ -1366,14 +1366,14 @@ tuş bir eylem çalıştırır veya iptal eder.
 | Tuş | Eylem |
 |---|---|
 | `Ctrl+N`, sonra bir rozet | Bu rozeti gösteren pencere bölümüne odaklan |
-| `Ctrl+N h` / `Ctrl+N l` | Refs panelini / sağ paneli daralt veya geri yükle |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | Refs panelini / sağ paneli daralt veya geri yükle |
 | `Ctrl+N Left` / `Ctrl+N Right` | Refs paneli ile Log arasındaki ayırıcıyı bir adım sola / sağa kaydır (daralmış Refs paneli önce geri gelir) |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | Log ile sağ panel arasındaki ayırıcıyı bir adım sola / sağa kaydır |
 | `Ctrl+N +` / `Ctrl+N -` | Etkin Refs bölümünü bir satır büyüt / küçült |
 | `Ctrl+N ]` / `Ctrl+N [` | Sağ panelin commit mesajı bloğunu bir satır büyüt / küçült |
-| `Ctrl+N t` | Bir sekme seç (sekme seçici; tek başına `t` aynısını yapar) |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | Temayı / dili / grafik renk temasını değiştir |
-| `Ctrl+N Shift+T` | Grafik satır tonlarını aç veya kapat |
+| `Ctrl+N Tab` | Bir sekme seç (sekme seçici; tek başına `t` aynısını yapar) |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | Temayı / dili / grafik renk temasını değiştir |
+| `Ctrl+N Shift+Y` | Grafik satır tonlarını aç veya kapat |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | Bir ajanın hazırladığı görünümü göster / geri dön (bkz. [MCP ve ajanlar](mcp-and-agents.md)) |
 | `Ctrl+N ,` | Ayarlar'ı aç |
 | `Ctrl+N ?` | Yardımı aç veya kapat |

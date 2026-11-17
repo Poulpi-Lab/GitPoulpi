@@ -1,4 +1,4 @@
-//! `App: Change Theme...` (`Ctrl+N y`): the palette's second-level list of
+//! `App: Change Theme...` (`Ctrl+N t`): the palette's second-level list of
 //! every theme -- System first, the built-in presets in registry order, then
 //! the user's `<config>/themes/*.toml`. Typing narrows it (the palette's
 //! scorer), moving the highlight previews the theme live (the same

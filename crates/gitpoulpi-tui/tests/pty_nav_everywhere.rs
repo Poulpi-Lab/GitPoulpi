@@ -206,7 +206,7 @@ fn ctrl_n_badges_a_picker_and_the_help_overlay() {
     let (mut term, _config) = launch_in(&repo, "pty-nav-everywhere-picker");
     // The theme picker, opened by its own key: its filter box and list.
     term.send_keys("C-n").unwrap();
-    term.send_text("y").unwrap();
+    term.send_text("t").unwrap();
     wait(&mut term, "the theme list", |s| {
         s.contains("System (follows terminal)")
     });

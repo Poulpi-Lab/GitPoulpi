@@ -28,7 +28,7 @@ dráze vedle commitu, na kterém vznikly.
 
 Barvy drah pocházejí z motivu. *Nastavení > Vzhled > Barevný motiv grafu*
 spojí libovolný motiv s libovolnou paletou drah a výběr palety v paletě
-příkazů *Aplikace: Změnit barevný motiv grafu...* (`Ctrl+N Shift+Y`) ukazuje
+příkazů *Aplikace: Změnit barevný motiv grafu...* (`Ctrl+N Shift+T`) ukazuje
 každou paletu živě; viz [Motivy](themes.md). *Pozadí drah grafu* nastavené na
 **Podbarvení řádku** vykreslí slabý pruh barvy dráhy za sloupcem grafu a tenký proužek
 na jeho okraji. *Síla podbarvení řádku* (**Silné**, **Střední** (výchozí),

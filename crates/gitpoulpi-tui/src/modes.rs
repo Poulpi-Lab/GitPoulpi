@@ -13,12 +13,12 @@ pub(crate) enum MainField {
     LogFind,
     RefName,
     Palette,
-    /// The tab picker's filter field (`Ctrl+N t`, `Repository: Select
+    /// The tab picker's filter field (`Ctrl+N Tab`, `Repository: Select
     /// Tab...`).
     TabPicker,
-    /// The theme picker's filter field (`Ctrl+N y`, `App: Change Theme...`).
+    /// The theme picker's filter field (`Ctrl+N t`, `App: Change Theme...`).
     ThemePicker,
-    /// The language picker's filter field (`Ctrl+N g`, `App: Change Language...`).
+    /// The language picker's filter field (`Ctrl+N l`, `App: Change Language...`).
     LanguagePicker,
     /// The workspace search's query field (`Ctrl+Alt+F`, `Search: Workspace`).
     WorkspaceSearch,
@@ -202,7 +202,7 @@ pub(crate) enum InputMode {
     /// The history rewrite workbench (`rewrite_view/`): owns the keyboard
     /// while open, like the split editor.
     Rewrite(Box<crate::rewrite_view::RewriteView>),
-    /// The tab picker: `Ctrl+N t` or the palette's
+    /// The tab picker: `Ctrl+N Tab` or the palette's
     /// `Repository: Select Tab...`. A popup listing every open repository
     /// tab, filtered by `draft` as you type (the command palette's scorer);
     /// `selected` indexes the *filtered* list, as in `CommandPalette`, since
@@ -213,11 +213,11 @@ pub(crate) enum InputMode {
         draft: String,
         selected: usize,
     },
-    /// The theme picker (`Ctrl+N y`, `App: Change Theme...`): a popup like
+    /// The theme picker (`Ctrl+N t`, `App: Change Theme...`): a popup like
     /// the tab picker's, over every theme, previewing the highlighted one;
     /// Enter keeps it (and writes `ui.theme`), Esc restores the previous.
     ThemePicker(Box<crate::theme_picker::ThemePicker>),
-    /// The language picker (`Ctrl+N g`, `App: Change Language...`): Enter
+    /// The language picker (`Ctrl+N l`, `App: Change Language...`): Enter
     /// applies the highlighted language and writes `ui.language`.
     LanguagePicker(Box<crate::language_picker::LanguagePicker>),
     /// The workspace search (`Ctrl+Alt+F`, `Search: Workspace`): a fuzzy

@@ -114,8 +114,8 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `git_prefix` | `lfs_push_all` | LFS: Push di tutti gli oggetti | `Ctrl+G Shift+J` |
 | `git_prefix` | `lfs_prune` | LFS: Pulisci gli oggetti locali | `Ctrl+G Shift+V` |
 | `git_prefix` | `rewrite_workbench` | Apri il pannello di riscrittura della cronologia | `Ctrl+G Shift+H` |
-| `nav_prefix` | `collapse_refs` | Comprimi o ripristina il pannello Refs | `Ctrl+N h` |
-| `nav_prefix` | `collapse_status` | Comprimi o ripristina il pannello Stato | `Ctrl+N l` |
+| `nav_prefix` | `collapse_refs` | Comprimi o ripristina il pannello Refs | `Ctrl+N Shift+H` |
+| `nav_prefix` | `collapse_status` | Comprimi o ripristina il pannello Stato | `Ctrl+N Shift+L` |
 | `nav_prefix` | `settings` | Apri le impostazioni | `Ctrl+N ,` |
 | `nav_prefix` | `about` | Apri Informazioni | `Ctrl+N a` |
 | `nav_prefix` | `activity_log` | Apri il Registro attività | `Ctrl+N Shift+A` |
@@ -123,11 +123,11 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `nav_prefix` | `jobs` | Mostra le attività in background | `Ctrl+N Shift+J` |
 | `nav_prefix` | `updates` | Mostra il pannello degli aggiornamenti | `Ctrl+N u` |
 | `nav_prefix` | `help` | Mostra o nascondi l'aiuto | `Ctrl+N ?` |
-| `nav_prefix` | `select_tab` | Seleziona scheda | `Ctrl+N t` |
-| `nav_prefix` | `change_theme` | Cambia tema | `Ctrl+N y` |
-| `nav_prefix` | `change_language` | Cambia lingua | `Ctrl+N g` |
-| `nav_prefix` | `change_graph_color_theme` | Cambia tema colori del grafo | `Ctrl+N Shift+Y` |
-| `nav_prefix` | `toggle_graph_row_tints` | Attiva/disattiva tinta righe del grafo | `Ctrl+N Shift+T` |
+| `nav_prefix` | `select_tab` | Seleziona scheda | `Ctrl+N Tab` |
+| `nav_prefix` | `change_theme` | Cambia tema | `Ctrl+N t` |
+| `nav_prefix` | `change_language` | Cambia lingua | `Ctrl+N l` |
+| `nav_prefix` | `change_graph_color_theme` | Cambia tema colori del grafo | `Ctrl+N Shift+T` |
+| `nav_prefix` | `toggle_graph_row_tints` | Attiva/disattiva tinta righe del grafo | `Ctrl+N Shift+Y` |
 | `nav_prefix` | `grow_section` | Ingrandisci la sezione Refs | `Ctrl+N +`, `Ctrl+N =` |
 | `nav_prefix` | `shrink_section` | Riduci la sezione Refs | `Ctrl+N -` |
 | `nav_prefix` | `grow_message` | Ingrandisci il blocco del messaggio di commit | `Ctrl+N ]` |
@@ -507,12 +507,12 @@ applicano. I tasti sono quelli predefiniti.
 | Navigazione: Sposta il focus sul pannello successivo | `Tab` |
 | Navigazione: Sposta il focus sul pannello precedente | `Shift+Tab` |
 | Navigazione: Cerca commit... | `f` |
-| Navigazione: Comprimi o ripristina il pannello Refs | `Ctrl+N h` |
+| Navigazione: Comprimi o ripristina il pannello Refs | `Ctrl+N H` |
 | Navigazione: Allarga il pannello Refs | `Ctrl+N Right` |
 | Navigazione: Restringi il pannello Refs | `Ctrl+N Left` |
 | Navigazione: Allarga il pannello Stato | `Ctrl+N Shift+Left` |
 | Navigazione: Restringi il pannello Stato | `Ctrl+N Shift+Right` |
-| Navigazione: Comprimi o ripristina il pannello Stato | `Ctrl+N l` |
+| Navigazione: Comprimi o ripristina il pannello Stato | `Ctrl+N L` |
 | Navigazione: Ingrandisci la sezione Refs | `Ctrl+N +` |
 | Navigazione: Riduci la sezione Refs | `Ctrl+N -` |
 | Navigazione: Reimposta le dimensioni delle sezioni Refs |  |
@@ -1241,8 +1241,8 @@ applicano. I tasti sono quelli predefiniti.
 | App: Tema... |  |
 | Conflitti: Modifica le liste dei branch base... |  |
 | Conflitti: Branch base di questo repository... |  |
-| App: Cambia tema... | `Ctrl+N y` |
-| App: Cambia lingua... | `Ctrl+N g` |
+| App: Cambia tema... | `Ctrl+N t` |
+| App: Cambia lingua... | `Ctrl+N l` |
 | Launcher: Crea collegamento |  |
 | Launcher: Crea collegamento sul desktop |  |
 | Launcher: Rimuovi collegamenti |  |
@@ -1252,8 +1252,8 @@ applicano. I tasti sono quelli predefiniti.
 | Launcher: Rimuovi dal PATH |  |
 | Launcher: Installa il menu Apri in GitPoulpi |  |
 | Launcher: Rimuovi il menu Apri in GitPoulpi |  |
-| App: Cambia tema colori del grafo... | `Ctrl+N Y` |
-| App: Attiva/disattiva tinta righe del grafo | `Ctrl+N T` |
+| App: Cambia tema colori del grafo... | `Ctrl+N T` |
+| App: Attiva/disattiva tinta righe del grafo | `Ctrl+N Y` |
 <!-- palette:end -->
 
 ## Spostarsi
@@ -1372,14 +1372,14 @@ tasto successivo esegue un'azione, oppure annulla.
 | Tasto | Azione |
 |---|---|
 | `Ctrl+N` poi un badge | Porta il focus sulla parte della finestra che mostra quel badge |
-| `Ctrl+N h` / `Ctrl+N l` | Comprimono o ripristinano il pannello Refs / il pannello destro |
+| `Ctrl+N Shift+H` / `Ctrl+N Shift+L` | Comprimono o ripristinano il pannello Refs / il pannello destro |
 | `Ctrl+N +` / `Ctrl+N -` | Ingrandiscono / riducono di una riga la sezione Refs attiva |
 | `Ctrl+N ]` / `Ctrl+N [` | Ingrandiscono / riducono di una riga il blocco del messaggio di commit del pannello destro |
 | `Ctrl+N Left` / `Ctrl+N Right` | Spostano di un passo a sinistra / a destra il divisore tra il pannello Refs e il Log (un pannello Refs compresso torna prima) |
 | `Ctrl+N Shift+Left` / `Ctrl+N Shift+Right` | Spostano di un passo a sinistra / a destra il divisore tra il Log e il pannello destro |
-| `Ctrl+N t` | Sceglie una scheda (il selettore di schede; `t` da solo fa lo stesso) |
-| `Ctrl+N y` / `Ctrl+N g` / `Ctrl+N Shift+Y` | Cambiano il tema / la lingua / il tema colori del grafo |
-| `Ctrl+N Shift+T` | Attiva o disattiva la tinta delle righe del grafo |
+| `Ctrl+N Tab` | Sceglie una scheda (il selettore di schede; `t` da solo fa lo stesso) |
+| `Ctrl+N t` / `Ctrl+N l` / `Ctrl+N Shift+T` | Cambiano il tema / la lingua / il tema colori del grafo |
+| `Ctrl+N Shift+Y` | Attiva o disattiva la tinta delle righe del grafo |
 | `Ctrl+N Enter` / `Ctrl+N Backspace` | Mostrano la vista preparata da un agente / tornano indietro (vedi [MCP e agenti](mcp-and-agents.md)) |
 | `Ctrl+N ,` | Apre le Impostazioni |
 | `Ctrl+N ?` | Apre o chiude l'aiuto |

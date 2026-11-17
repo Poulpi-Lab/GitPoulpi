@@ -396,7 +396,7 @@ not closed since:
   Preview an author rule on a pushed branch: the Summary offers **Use .mailmap** (`m`); it opens the tab with the matches ticked.
   (6) Edit `.mailmap` in an editor: the Log follows without a restart. Not done: the Global search index shows stored names.
 
-- Tab picker (`Ctrl+N t`): with many tabs open and a late one active, the highlight starts on the active tab (scrolled into view),
+- Tab picker (`Ctrl+N Tab`): with many tabs open and a late one active, the highlight starts on the active tab (scrolled into view),
   Up/Down/Alt+Up/Down move from there; typing a filter jumps to the best match; a click outside closes it.
 - History rewrite workbench (S8, `docs/user/history-rewrite.md#the-workbench`): (1) `Ctrl+G Shift+H` opens it over the Log; the
   cross, Esc and a click outside (empty recipe) close it, a click outside with rules only flashes the cross. (2) Add an identity
@@ -634,7 +634,7 @@ and a scratch repository.
 - Recipe for terminal-mode settings (`ui.mouse_enabled`): check the escape
   sequences, not the screen: `script -q -c "gitpoulpi -s <probe>" out.raw`,
   then grep for `ESC[?1000h` / `ESC[?1006h`.
-- Settings with popups over it: with a Workflow draft unsaved, `Ctrl+P`, `Ctrl+N y` (the whole Settings screen
+- Settings with popups over it: with a Workflow draft unsaved, `Ctrl+P`, `Ctrl+N t` (the whole Settings screen
   re-colours while you move through themes; `Esc` restores), `Ctrl+Alt+F` and `Ctrl+N a` each open over Settings and
   `Esc` returns to it with the draft and page intact; the octopus in Settings' title line opens About; in the palette
   a command like "Toggle Word Wrap" is grayed with "close Settings first". Check at 80 columns too.

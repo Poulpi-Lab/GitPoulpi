@@ -58,7 +58,7 @@ fn the_palette_shows_the_full_chord_for_leader_commands() {
         .start();
     term.send_keys("C-p").unwrap();
     term.send_text("Toggle Refs Pane Collapsed").unwrap();
-    term.wait_for("the full chord", STEP, |s| s.contains("Ctrl+N h"))
+    term.wait_for("the full chord", STEP, |s| s.contains("Ctrl+N H"))
         .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Esc").unwrap();
     term.wait_for_text_to_go("Command Palette", STEP)

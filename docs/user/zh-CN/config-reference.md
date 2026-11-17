@@ -85,7 +85,7 @@ author_email = "jane@work.example"
 | `ui.image_protocol` | `"auto"` | 图片（图、头像）如何传送到终端：`auto`、`kitty`、`iterm2`、`sixel`、`none`。`auto` = 在 kitty、Ghostty、iTerm2 3.7.7 及更高版本以及设置了 `kitty_graphics = true` 的 herdr 中使用 Kitty 协议；在 WezTerm 和 Rio（透明度混合）、旧版 iTerm2 和 mintty（不透明背景）中使用 iTerm2 协议；在 Windows Terminal、foot、Tabby、Konsole、mlterm、背后的终端支持 sixel 的 tmux，以及启动应答中声明支持 sixel 的任何终端（以 `-ti vt340` 启动的 xterm、开启图像的 VS Code 终端）中使用 sixel（图所在的列和头像）；在 zellij、screen 和未知终端中使用字符。在 tmux 中，kitty 图片需要此处设为 `kitty`，并配合 `allow-passthrough on`（[多路复用器](multiplexers.md)）。当终端的伪控制台丢弃或错放图片时（Windows 上的 WezTerm 20240203、Rio 和 mintty），请使用 `ui.graph_renderer = "text"`（[选择终端](terminals.md#windows)）。**重启。** |
 | `ui.theme` | `"system"` | 配色主题：内置的 slug（`gitpoulpi theme list` 会列出全部）、`<config>/themes/` 中某个文件的 slug，或 `system`（跟随终端的浅色或深色背景，在启动时检测；旧值 `default` 含义相同）。`config set` 会拒绝未知的名称。参见[主题](themes.md)。 |
 | `ui.graph_color_theme` | `"theme"` | 车道调色板：`theme`（跟随主题）或任意车道调色板名称：`gitpoulpi`、`light`、`material`、`serie`，以及其他主题的调色板。 |
-| `ui.graph_lane_background` | `"off"` | `off` 或 `row_tint`（图后方有一条淡淡的车道颜色带，边缘还有一道竖条）。**应用：切换图行着色**（`Ctrl+N Shift+T`）可切换它；**应用：更改图配色主题…**（`Ctrl+N Shift+Y`）可选择 `ui.graph_color_theme`。 |
+| `ui.graph_lane_background` | `"off"` | `off` 或 `row_tint`（图后方有一条淡淡的车道颜色带，边缘还有一道竖条）。**应用：切换图行着色**（`Ctrl+N Shift+Y`）可切换它；**应用：更改图配色主题…**（`Ctrl+N Shift+T`）可选择 `ui.graph_color_theme`。 |
 | `ui.graph_row_tint_strength` | `"medium"` | `strong`、`medium`、`subtle`（仅配合 `row_tint`）。 |
 | `ui.toolbar_position` | `"bottom"` | `top`、`bottom`、`left`、`right`。`left` 和 `right` 绘制为一列；窗口窄于 80 列时回退为 `bottom`。 |
 | `ui.toolbar_align` | `"start"` | `start`、`center`、`end`：按钮在工具栏上的位置（一行的左、中、右；一列的上、中、下）。 |
@@ -106,7 +106,7 @@ author_email = "jane@work.example"
 | `ui.commit_column_columns_visible`, `ui.commit_column_columns_order`, `ui.commit_column_columns_widths` | 空 | diff 旁 [Commit 列](interface-tour.md#commit-列)自己的各栏，与 Log 的列相互独立：显示的栏按名称列出（`ref`、`graph`、`message`、`author`、`date`、`changes`、`sha`；为空表示泳道、消息、作者和日期），它们从左到右的顺序，用同样的名称表示（为空表示刚才列出的顺序；漏掉的名称按该顺序排在后面），以及拖动得到的各栏宽度（以单元格计，未列出的栏为自动宽度），在你选择、移动或调整各栏时写入。`message` 不能被隐藏。在这些键出现之前写入的会话文件会被读取一次并导入其中。 |
 | `ui.sidebar_sections_hidden` | 空 | 你隐藏的左侧窗格分区（`local`、`remote`、`worktrees`、`stashes`、`tags`、`pull_requests`、`issues`、`submodules`），通过窗格的右键菜单或命令面板写入。至少始终会保留一个存在的分区。 这是默认值：每个仓库可以隐藏自己的分区（保存在该仓库的状态文件中），此键适用于没有自己选择的仓库；*用于所有仓库* 会写入它。 |
 | `ui.sidebar_sections_scope` | `"repository"` | 左侧窗格分区由谁决定：`repository`（每个仓库各自保存，`ui.sidebar_sections_hidden` 是默认值）或 `global`（所有仓库都显示 `ui.sidebar_sections_hidden`，更改也写入它）。来回切换不会丢失任何一套：开启 `global` 期间，各仓库自己的选择仍保存在它们的状态文件中。设置：*左侧窗格分区*。 |
-| `ui.language` | `"auto"` | 界面语言：`auto`（系统区域设置，否则为英语）、`en`、`fr`、`es`、`pt-BR`、`pt-PT`、`it`、`de`、`zh-CN`、`ja`、`ko`、`ru`、`uk`、`pl`、`cs`、`nl`、`sv`、`tr`。**即时生效。** `GITPOULPI_LANG` 会覆盖它。本构建中没有的语言会显示英语。**应用：更改语言…**（`Ctrl+N g`）也可以设置它，并带有实时预览。CLI 和 MCP 的输出始终是英语。 |
+| `ui.language` | `"auto"` | 界面语言：`auto`（系统区域设置，否则为英语）、`en`、`fr`、`es`、`pt-BR`、`pt-PT`、`it`、`de`、`zh-CN`、`ja`、`ko`、`ru`、`uk`、`pl`、`cs`、`nl`、`sv`、`tr`。**即时生效。** `GITPOULPI_LANG` 会覆盖它。本构建中没有的语言会显示英语。**应用：更改语言…**（`Ctrl+N l`）也可以设置它，并带有实时预览。CLI 和 MCP 的输出始终是英语。 |
 | `ui.translate_git_terms` | `false` | `false`：commit、push、pull、stash、tag…… 在所有语言中都保持英语。`true`：使用所选语言的 git 词汇（法语的 “remiser”“étiquette”“valider”……）。**即时生效。** |
 | `ui.git_terms_english` | `false` | 仅限 ja、ko 和 zh-CN：显示英文的 git 词汇（stage、unstage、staged、unstaged……），而不是它们的音译或翻译。`ui.translate_git_terms` 为 `true` 时无效。**即时生效。** |
 | `ui.mouse_enabled` | `true` | `false` 会把鼠标（以及文本选择）留给终端。**重启。** |

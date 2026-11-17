@@ -583,6 +583,9 @@ nunca aparece como un cambio. Lo escriben la TUI y la CLI; rara vez lo editarás
 | `[preferences] conflict_base_branches` | Los patrones de Ramas base propios del repositorio, uno por línea (se siguen usando como **Lista propia**) | Ajustes > Ajustes del repositorio > Prevención de conflictos |
 | `[preferences] conflict_base_source` | De dónde vienen las Ramas base: `default` (la lista predeterminada global), `list` (`conflict_base_list`) u `own` (`conflict_base_branches`). Si falta: los patrones propios si los hay, si no la lista predeterminada | Ajustes > Ajustes del repositorio > Prevención de conflictos |
 | `[preferences] conflict_base_list` | La `[conflict_prevention.lists.<name>]` que sigue este repositorio cuando el origen es `list`; una lista eliminada vuelve a la predeterminada | Ajustes > Ajustes del repositorio > Prevención de conflictos |
+| `[preferences] merge_fast_forward` | Anula aquí `git.merge_fast_forward`: `never`, `allowed` u `only` | Ajustes > Ajustes del repositorio > Opciones de merge |
+| `[preferences] default_push_targets` | Los remotos a los que una rama nueva también hace push, copiados en la rama cuando recibe su primer upstream | Ajustes > Ajustes del repositorio > Git y codificación; ver [Varios remotos](multiple-remotes.md) |
+| `[preferences.ai_review]`, `[preferences.ai_hosting_reply]` | Los valores propios de este repositorio para las claves de `[ai.review]` y `[ai.hosting_reply]`; las claves ausentes heredan las globales | Ajustes > Ajustes del repositorio > IA |
 | `commit-template.txt` (un archivo junto a `repo-state.toml`) | La plantilla de commit; el `commit.template` de git apunta a él | Ajustes > Ajustes del repositorio > Plantilla de mensaje |
 | `[preferences.ai_instructions]` | `text`, `mode = "add" \| "replace"`: las instrucciones de IA de este repositorio | Ajustes > Ajustes del repositorio > IA |
 | `[preferences.ai_overrides.<action>]` | `profile`, `instructions` para una acción aquí | Ajustes > Ajustes del repositorio > IA |
@@ -592,6 +595,11 @@ nunca aparece como un cambio. Lo escriben la TUI y la CLI; rara vez lo editarás
 | `ref_visibility` | Refs ocultas / en solo | barra lateral Refs, `gitpoulpi refs hide\|show\|solo` |
 | `hidden_remotes` | Remotos ocultos del grafo enteros (todas sus ramas, también las que se obtengan después) | el ⊙ y el menú del remoto, `gitpoulpi refs hide --remote` |
 | `folds`, `collapsed_*_ref_folders` | Secciones de la barra lateral y carpetas de ramas y de tags contraídas. `[folds]` también guarda `status_folders` (carpetas contraídas de los árboles de archivos Unstaged / Staged) y `commit_folders` (carpetas contraídas del árbol de archivos cambiados de un commit, igual para todos los commits), cada uno limitado a 500 rutas, descartando primero las más antiguas | la barra lateral, los árboles de archivos |
+| `hosting_post_as`, `hosting_identity` | El nombre con el que se publican aquí los mensajes al host (anula `general.hosting_post_as`), y el login que se aprende del primer mensaje publicado con un token de bot cuando no hay ninguno definido | Ajustes > Ajustes del repositorio > SSH y credenciales; ver [Conversaciones](conversations.md#publicar-como) |
+| `assignment_blocked` | No se puede asignar nada desde GitPoulpi en los issues y pull requests de este repositorio | `gitpoulpi hosting assignment --block \| --allow` |
+| `board_labels` | Las etiquetas que son las columnas del tablero de issues en un host sin flujo de trabajo, en el orden del tablero | el botón **Columnas** del tablero |
+| `conversation_seen`, `conversation_events`, `posted_comment_ids` | Lo último que leíste de cada conversación (el resto aparece sin leer), si se muestran los eventos del sistema, y los comentarios que publicó esta instalación (los que un bot puede editar o borrar) | los escribe la vista de conversación |
+| `reviews` | El estado local de la revisión en la app por solicitud: comentarios pendientes, archivos vistos | lo escribe la vista de revisión |
 | `pending_auto_stash` | Un stash que GitPoulpi hizo y aún no ha devuelto | lo escribe el daemon; ver [Auto-stash](log-and-history.md#auto-stash) |
 
 ## Otras variables de entorno

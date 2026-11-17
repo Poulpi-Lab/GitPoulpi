@@ -107,7 +107,7 @@ repositorio se abre en su propia pestaña. `Ctrl+W` cierra la pestaña actual.
 repositorio nuevo.
 En los tres diálogos (y en el selector de carpetas que abren), `Ctrl+N` muestra una insignia en cada campo y botón: pulsa el carácter para poner el cursor en el campo o pulsar el botón.
 
-| ![El diálogo Clonar: dónde clonar, la URL, el nombre de la carpeta y el botón para clonar el repositorio](../images/clone.png) | ![El diálogo Inicializar un repositorio: la carpeta, el nombre y la rama inicial](../images/init.png) |
+| ![El diálogo Clonar: dónde clonar, la URL, el nombre de la carpeta, y los botones Cancelar y Clonar](../images/clone.png) | ![El diálogo Inicializar un repositorio: la carpeta, el nombre y la rama inicial](../images/init.png) |
 |---|---|
 
 ### Checkout parcial

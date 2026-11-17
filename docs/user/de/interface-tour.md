@@ -157,7 +157,7 @@ Standardmäßig eine Zeile unter den Bereichen und über der Statuszeile. **Eins
 | **Flow** `▾` | Das Menü des Branching-Workflows (starten, abschließen, synchronisieren, befördern; `Ctrl+G Shift+W`). Nur in einem Repository mit Workflow. Siehe [Branching-Workflows](branching-workflows.md). |
 | **Suchen** | Öffnet die Commit-Suchleiste über dem Log (`f`). |
 
-Am Ende (rechts in einer Zeile, unten in einer Spalte) zeigt, wenn das Repository mit einem Hoster verknüpft ist, ein **Chip** den Pull Request des ausgecheckten Branches (zum Beispiel `GH #12` oder `GL !53`) oder ein blasses `+ PR`. **Einstellungen > Darstellung > Pull-Request-Schaltfläche ans Ende heften** (standardmäßig an) hält ihn dort; aus, fließt er mit den anderen Schaltflächen und folgt deren Ausrichtung. Siehe [Hosting und Issue-Tracker](hosting-integration.md). In einer Spalte belegt das Profil-Kombinationsfeld die letzte Zeile.
+Am Ende (rechts in einer Zeile, unten in einer Spalte) zeigt, wenn das Repository mit einem Hoster verknüpft ist, ein **Chip** den Pull Request des ausgecheckten Branches (zum Beispiel `GH #12` oder `GL !53`) oder ein blasses `+ PR`. **Einstellungen > Darstellung > Pull-Request-Schaltfläche ans Ende heften** (standardmäßig an) hält ihn dort; aus, fließt er mit den anderen Schaltflächen und folgt deren Ausrichtung. In einer schmalen Zeile schrumpft der Chip zuerst (`● #12`, dann nur das Zustandssymbol) und wandert erst danach ins Menü `⋯`. Siehe [Hosting und Issue-Tracker](hosting-integration.md). In einer Spalte belegt das Profil-Kombinationsfeld die letzte Zeile.
 
 Am rechten Ende wählt, wenn Sie zwei oder mehr [Profile](settings.md#profile)
 haben, das **Profil-Kombinationsfeld** die Commit-Identität für dieses

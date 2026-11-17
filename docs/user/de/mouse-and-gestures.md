@@ -121,7 +121,7 @@ GitPoulpi merkt sich jede Größe. Siehe
 
 ## Titelleiste, Tab-Leiste und Symbolleiste
 
-- **Klicken Sie auf 🐙** in der Titelleiste, um **Über** zu öffnen. Im Info-Fenster
+- **Klicken Sie auf <img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi-Symbol" height="16">** in der Titelleiste, um **Über** zu öffnen. Im Info-Fenster
   folgen die Pupillen des Oktopus dem Zeiger; ein Klick auf das Logo dreht es zur nächsten
   Farbe, Rechtsklick darauf zeigt die Farbliste, ein Klick auf einen Link öffnet ihn.
 - **Klicken Sie auf Öffnen in ▾** in der Titelleiste für die Liste der Programme. Siehe

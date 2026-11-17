@@ -1502,11 +1502,11 @@ Was die Menüs tun, steht unter [Mit dem Log arbeiten](log-and-history.md).
 
 Mit einer passenden Integration hat der Refs-Bereich einen Abschnitt für Pull Requests
 (GitLab: Merge Requests). Mit einem verbundenen Hosting-Profil hat er auch einen Abschnitt
-ISSUES. Siehe [Hosting und Issue-Tracker](hosting-integration.md#5-pull-requests-und-issues-in-der-seitenleiste).
+ISSUES. Siehe [Hosting und Issue-Tracker](pull-requests-and-issues.md#pull-requests-und-issues-in-der-seitenleiste).
 
 | Taste | Aktion |
 |---|---|
-| `Enter` | Die ausgewählte Zeile öffnen: ein Issue (und ein Request bei Azure DevOps oder Bitbucket) als [Unterhaltung](hosting-integration.md#5c-unterhaltungen), einen Pull Request im [Review](review.md), wo der Host eines hat, alles andere im Browser. Auf einer Zeile `Reconnect`: die Einstellungen auf diesem Profil öffnen |
+| `Enter` | Die ausgewählte Zeile öffnen: ein Issue (und ein Request bei Azure DevOps oder Bitbucket) als [Unterhaltung](conversations.md), einen Pull Request im [Review](review.md), wo der Host eines hat, alles andere im Browser. Auf einer Zeile `Reconnect`: die Einstellungen auf diesem Profil öffnen |
 | `Space` | Den Abschnitt auf- oder zuklappen |
 | `v` | Den Filter des Abschnitts öffnen. Pull Requests: Offen, Gemergt / geschlossen, Alle. Issues: Offen, Mir zugewiesen, Geschlossen, Alle |
 | `n` | Abschnitt der Pull Requests: einen Pull Request erstellen. Abschnitt ISSUES: neues Issue. (Die Schaltfläche `+` der Kopfzeile) |
@@ -1519,7 +1519,7 @@ ISSUES. Siehe [Hosting und Issue-Tracker](hosting-integration.md#5-pull-requests
 ### Das Issue-Board
 
 **Board** in der Kopfzeile von ISSUES (Palette: **Issues: Board öffnen**) öffnet das Kanban-Board der Issue-Quelle. Siehe
-[das Board](hosting-integration.md#5b-das-issue-board) und [lokale Issues](local-issues.md#das-kanban-board). Jede Taste
+[das Board](pull-requests-and-issues.md#das-issue-board) und [lokale Issues](local-issues.md#das-kanban-board). Jede Taste
 unten ist auch ein Palettenbefehl (**Board: ...**).
 
 | Taste | Aktion |
@@ -1527,7 +1527,7 @@ unten ist auch ein Palettenbefehl (**Board: ...**).
 | Pfeile | Eine Karte auswählen (`Up`, `Down`) oder die benachbarte Spalte (`Left`, `Right`); `Home`, `End`, `PageUp`, `PageDown` springen in der Spalte |
 | `Shift+Left`, `Shift+Right` | Die ausgewählte Karte in die vorherige oder nächste Spalte verschieben |
 | `m` | **Karte verschieben nach...**: eine Dropdownliste der Spalten |
-| `Enter` | Die [Unterhaltung](hosting-integration.md#5c-unterhaltungen) des Issues öffnen (die Seite des Hosts, wo der Host keine zu lesen hat) |
+| `Enter` | Die [Unterhaltung](conversations.md) des Issues öffnen (die Seite des Hosts, wo der Host keine zu lesen hat) |
 | `e`, `.` | Zugewiesene, Labels oder Meilenstein bearbeiten; das Kartenmenü |
 | `n` | Neues Issue in der ausgewählten Spalte |
 | `a`, `l`, `M`, `/` | Nach Zugewiesenen, Label, Meilenstein, Text filtern. `x` setzt die Filter zurück |
@@ -1552,7 +1552,7 @@ Jedes Feld, dessen Text an einen Host geht (ein Kommentar, eine Antwort, eine Re
 | `Alt+W` | Die Formulare für neue Issues und Pull Requests: auf der eigenen Webseite des Anbieters erstellen |
 | `Esc` | Im Panel von **Mit KI schreiben**: einen laufenden Entwurf stoppen, sonst das Panel schließen |
 
-In der [Unterhaltungsansicht](hosting-integration.md#5c-unterhaltungen) eines Issues oder Requests (Palettenzeilen *Unterhaltung: ...*; die Zeilen mit einer Taste stehen in der Palettenliste oben):
+In der [Unterhaltungsansicht](conversations.md) eines Issues oder Requests (Palettenzeilen *Unterhaltung: ...*; die Zeilen mit einer Taste stehen in der Palettenliste oben):
 
 | Taste | Aktion |
 |---|---|
@@ -1911,7 +1911,7 @@ Jede Schaltfläche hat ein Tastatur-Gegenstück:
 
 | Schaltfläche | Taste |
 |---|---|
-| 🐙 links in der Titelleiste (Über) | `Hilfe: Über GitPoulpi` in der Palette |
+| <img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi-Symbol" height="16"> links in der Titelleiste (Über) | `Hilfe: Über GitPoulpi` in der Palette |
 | **Öffnen in** in der Titelleiste | `Alt+O`, `Ctrl+Alt+O` |
 | `×` rechts in der Titelleiste (beenden) | `q` |
 | Die Version in der Titelleiste (Versionshinweise) | `Hilfe: Versionshinweise` in der Palette |

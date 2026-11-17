@@ -39,7 +39,9 @@ Shift+Mausrad oder ein seitliches Mausrad), sie werden nie umbrochen.
 ## Auswählen
 
 Jeder Konflikt ist ein umrahmter Block in A und in B, mit einem Kontrollkästchen
-in seiner Kopfzeile und einem `+` / `✓` vor jeder Zeile.
+in seiner Kopfzeile und einem `+` / `✓` vor jeder Zeile. Rechtsklick auf einen Block zeigt die Wahlmöglichkeiten dieses Konflikts:
+
+![Ein Rechtsklickmenü auf Konflikt 2 des Merge-Editors: Nur A übernehmen, Nur B übernehmen, A, dann B, B, dann A, Nichts übernehmen, Auswahl aufheben, Im Ergebnis bearbeiten und Lösung vorschlagen](../images/merge-editor-chunk-menu.png)
 
 | Um... | Taste | Maus |
 |---|---|---|
@@ -75,6 +77,10 @@ für den aktuellen. Ein Klick auf eine Markierung springt zu diesem Konflikt (ei
 Markierung unter dem Schieber der Bildlaufleiste ist schon im Bild, dort zieht der
 Klick den Schieber).
 
+Beide zu übernehmen (**A, dann B**) schreibt die Zeilen von A und danach die von B unter die Markierung des Konflikts im Ergebnis, jede mit ihrer Seite gekennzeichnet; die Abzeichen `1st` / `2nd` an den beiden Blöcken nennen die Reihenfolge, und `s` tauscht sie:
+
+![Konflikt 2 von beiden Seiten übernommen: seine A-Zeile und seine B-Zeile sind angehakt, und das Ergebnis zeigt sie nacheinander, mit A und B gekennzeichnet, während Konflikt 1 und 3 noch auf eine Wahl warten](../images/merge-editor-take-both.png)
+
 **Ganze Datei** zeigt die ganze Datei in A und B mit jedem Unterschied farbig, nicht nur die Konflikte:
 
 ![Der Modus Ganze Datei: die ganze Datei in A und B, mit farbig markierten Änderungen](../images/merge-editor-full-file.png)
@@ -84,6 +90,8 @@ schneiden und einfügen, suchen mit `Ctrl+F`. Eine Auswahl auf einem von Hand
 bearbeiteten Konflikt ersetzt Ihre Bearbeitung (`Ctrl+Z` bringt sie zurück).
 Speichern mit einem Konflikt, bei dem nichts gewählt ist, oder mit einer Zeile, die
 noch wie eine Konfliktmarkierung aussieht, fragt vorher nach.
+
+![Der Merge-Editor mit allen bearbeiteten Konflikten: Konflikt 1 aus A, Konflikt 2 von beiden Seiten, Konflikt 3 von Hand im Ergebnis getippt (mit einem Stift markiert und als bearbeitet gezählt) und die Schaltfläche Speichern & als gelöst markieren in der Symbolleiste hervorgehoben](../images/merge-editor-output-edited.png)
 
 ### ✦ Lösung vorschlagen (KI)
 
@@ -101,10 +109,24 @@ Bei ausgeschalteter KI gibt es keines dieser Bedienelemente.
 Nach **Speichern & als gelöst markieren** ist die Datei gestagt, und die Liste
 der Dateien im Konflikt ist zurück; öffnen Sie die nächste
 Datei selbst. `Ctrl+Z` (oder die Schaltfläche Rückgängig) nimmt das letzte „als
-gelöst markieren“ zurück. Ist keine Datei mehr übrig, bietet das Banner **Merge
+gelöst markieren“ zurück.
+
+![Nach Speichern & als gelöst markieren: Das Banner lautet „Merge läuft, 1 Datei im Konflikt“, orbit.rs ist zu den Staged Dateien gewandert, und logo.bin ist die einzige Datei unter Unstaged Dateien, mit einem roten ! markiert](../images/conflict-file-resolved.png)
+
+Ist keine Datei mehr übrig, bietet das Banner **Merge
 per Commit abschließen** (oder **Fortsetzen** bei einem Cherry-Pick, Revert oder
 Rebase) und **Merge abbrechen** an, was vorher nachfragt: Es setzt HEAD, den
 Index und das Arbeitsverzeichnis dorthin zurück, wo sie waren.
+
+![Das Banner, sobald jede Datei gelöst ist: „Merge läuft, alle Konflikte gelöst“ mit den Schaltflächen Merge per Commit abschließen und Merge abbrechen, und die gelöste Datei unter Staged Dateien](../images/conflict-commit-merge.png)
+
+Ein Rebase hält auf dieselbe Weise an, Schritt für Schritt. Sein Banner nennt den Branch und worauf er neu aufgebaut wird und hat **Konflikte lösen...**, **Fortsetzen**, **Überspringen** und **Abbrechen**:
+
+![Das Banner eines Rebase, der bei zwei Konflikten angehalten hat: „Rebase von feature/cleanup auf ...“ mit Konflikte lösen..., Fortsetzen, Überspringen und Abbrechen, und die beiden Dateien im Konflikt im Status-Bereich](../images/conflict-banner-rebase.png)
+
+Sobald die letzte Datei gelöst ist, ist dasselbe Banner bereit zum **Fortsetzen**:
+
+![Das Rebase-Banner nach dem Lösen beider Dateien: Nur Fortsetzen, Überspringen und Abbrechen bleiben, und beide Dateien stehen unter Staged Dateien](../images/conflict-banner-continue.png)
 
 Ein Merge, dessen Ergebnis HEAD gleicht (Sie haben überall unsere Seite
 genommen), hat nichts gestagt und keine geänderte Datei, lässt sich aber
@@ -136,6 +158,8 @@ die Wahl löst die Datei auf und stagt sie sofort.
 | Auf einer Seite gelöscht, auf der anderen geändert | **Datei behalten** (`k`), **Löschung akzeptieren** (`Shift+D`) |
 | Umbenennungs-Überbleibsel (der Pfad existiert nur auf einer Seite) | **Datei behalten** (`k`), **Datei löschen** (`Shift+D`) |
 | Symlink, Submodul, Dateimodus | **A behalten**, **B übernehmen**, **Basis übernehmen** |
+
+![Die Karte einer Datei, die in A geändert und in B gelöscht wurde: Das Feld A zeigt Größe und Modus der Datei, das Feld B lautet „keine Datei hier (gelöscht)“, das Feld Basis zeigt das Original, und die Schaltflächen sind Datei behalten und Löschung akzeptieren](../images/merge-editor-deleted-card.png)
 
 Ist die Datei ein Bild (PNG, JPEG, GIF, WebP, BMP, ICO), zeigen die Felder auch
 die Bilder A, B und Basis, angepasst und schreibgeschützt, in einem dafür

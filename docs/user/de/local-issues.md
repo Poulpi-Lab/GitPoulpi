@@ -128,7 +128,7 @@ Wenn Sie allein arbeiten oder in einem Team, das seine Issues neben dem Code fü
   `Shift+Links` / `Shift+Rechts` oder mit **Board: Karte verschieben nach...** (`m`), einer Auswahlliste der Spalten. Die Karte bewegt sich sofort;
   der `status` der Notiz wird wie im [Abschnitt über die Notizen](#die-notizen) umgeschrieben, sonst nichts in der Datei. Schlägt das Schreiben
   fehl, springt die Karte zurück, und der Fehler steht in der Statuszeile.
-- **Öffnen** Sie eine Karte mit `Enter` oder einem Doppelklick (die [Unterhaltung](hosting-integration.md#5c-unterhaltungen) der Notiz öffnet sich im Fenster, mit dem Text der Notiz und ihren Kommentaren; **Notiz öffnen** im Kartenmenü öffnet die Datei in Ihrem Standardprogramm für `.md`). `e` bearbeitet ihre
+- **Öffnen** Sie eine Karte mit `Enter` oder einem Doppelklick (die [Unterhaltung](conversations.md) der Notiz öffnet sich im Fenster, mit dem Text der Notiz und ihren Kommentaren; **Notiz öffnen** im Kartenmenü öffnet die Datei in Ihrem Standardprogramm für `.md`). `e` bearbeitet ihre
   Zugewiesenen, Labels oder ihren Meilenstein, `.` oder ein Rechtsklick öffnet das Kartenmenü, `n` beginnt ein neues Issue in der ausgewählten
   Spalte (das Formular kehrt beim Schließen zum Board zurück).
 - **Filtern** nach Zugewiesenen (`a`), Label (`l`), Meilenstein (`M`) oder Text (`/`); `x` setzt sie zurück. Die Filter sind

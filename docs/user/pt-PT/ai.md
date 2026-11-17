@@ -98,7 +98,7 @@ Há duas formas de usar a IA com o GitPoulpi:
 4. Com vários perfis, escolha o **Perfil predefinido** em baixo; cada ação pode
    continuar a indicar o seu.
 
-![O bloco Perfis da página de IA para um agente local: Tipo de agente (Claude Code), Comando, Argumentos, Modelo, duas linhas Env, Adicionar e Remover uma variável de ambiente, Testar ligação e Perfil predefinido](../images/settings-ai-agent.png)
+![A parte inferior do bloco Perfis da página de IA para um agente local: Modo de execução, Argumentos, Modelo, Pasta de trabalho, Tempo limite, duas linhas Env, Adicionar uma variável de ambiente e Testar ligação](../images/settings-ai-agent.png)
 
 As **chaves de API** introduzem-se com `Enter` na linha **Chave de API** e são
 guardadas no credential helper do seu sistema (Git Credential Manager, libsecret

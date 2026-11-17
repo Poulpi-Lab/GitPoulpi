@@ -139,7 +139,7 @@ de todas as páginas. Clique nela, ou prima `/` ou `Ctrl+F`, e escreva. Abre-se
 uma lista de correspondências. Cada correspondência mostra a opção e a sua
 página. `Up` / `Down` escolhem, `Enter` vai para a opção, `Esc` fecha a lista.
 
-![Pesquisar "diff" nas Definições: as opções correspondentes das páginas Log e grafo, Diff e editor e Git](../images/settings-search.png)
+![Pesquisar "diff" nas Definições: as opções correspondentes das páginas IA e Diff e editor](../images/settings-search.png)
 
 ## Definições a partir da paleta de comandos
 
@@ -224,7 +224,7 @@ corre. Não há botão Atualizar; apenas **Criar** (para um atalho que ainda nã
 
 **Agrupamento na barra de tarefas e no dock.** O GitPoulpi corre dentro de uma janela de terminal, pelo que a barra de tarefas normalmente o mostra sob o ícone do terminal, sem o ponto de “em execução” sob o ícone afixado do GitPoulpi. Windows: os atalhos levam o AppUserModelID `GitPoulpi.GitPoulpi`, e um GitPoulpi iniciado por um deles dá à janela do seu terminal o mesmo ID e o seu ícone (encontra a janela dando-lhe por instantes um título único e depois repõe o título), de modo que a janela fica sob o ícone afixado do GitPoulpi. Uma janela de terminal com vários separadores move-se como um todo: todos os seus separadores se agrupam sob o ícone do GitPoulpi enquanto o GitPoulpi corre nela. Os atalhos e os itens afixados na barra de tarefas criados antes são reescritos pela mesma sincronização; se um item afixado ainda mostrar o ícone do terminal, desafixe-o e afixe-o de novo. Linux: kitty, foot, Alacritty, WezTerm e Ghostty são iniciados com a classe de janela `gitpoulpi` e a entrada `.desktop` indica-a (`StartupWMClass`), pelo que um dock agrupa a janela sob o ícone do lançador; os outros terminais mantêm o seu próprio ícone. macOS: nada a fazer, o Dock agrupa por aplicação.
 
-![Definições > Lançador: o terminal dos atalhos e a linha do lançador de aplicações](../images/settings-launcher.png)
+![Definições > Lançador: o terminal dos atalhos, o build do lançador, os alias de comando e de novo separador, o estado dos alias e a verificação do PATH](../images/settings-launcher.png)
 
 #### Alias de comando e PATH, por sistema
 
@@ -430,7 +430,7 @@ servidor; veja [MCP e agentes](mcp-and-agents.md).
 
 ### Aspeto
 
-![A página Aspeto: tema, avatares, cor dos campos, profundidade de cor e cores do grafo (os formatos de data vêm a seguir)](../images/settings-ui.png)
+![A página Aspeto deslocada para baixo: fontes e avatar alternativo, cor dos campos, profundidade de cor, cursor de texto e o início das cores do grafo (os formatos de data vêm a seguir)](../images/settings-ui.png)
 
 ![A lista Tema aberta em Aspeto com Claro realçado: todo o ecrã das Definições já se repinta nesse tema](../images/settings-appearance-theme.png)
 

@@ -64,7 +64,7 @@ no Registo de atividade, com o motivo, um passo seguinte e um
 Copiar para uma IA. Tudo isto é descrito em
 [Quando algo falha](troubleshooting.md#quando-algo-falha).
 
-No separador **Aplicação**, **Limpar registo** (`x`) esvazia os ficheiros do registo da aplicação depois de uma confirmação. À esquerda do botão **Atividade**, o indicador de tarefas mostra uma tarefa em segundo plano com um `[x]` para a cancelar. O separador Início tem a mesma barra de estado, com o botão **Atividade** no canto inferior direito (abre em Todos os repositórios).
+No separador **Aplicação**, **Limpar registo** (`x`) esvazia os ficheiros do registo da aplicação depois de uma confirmação. À esquerda do botão **Atividade**, o indicador de tarefas mostra uma tarefa em segundo plano com um `[x]` para a cancelar (a lista de tarefas tem **Cancelar tudo**, e a paleta tem *Tarefas: cancelar tudo o que for possível*; uma tarefa que não pode ser parada em segurança diz porquê). O separador Início tem a mesma barra de estado, com o botão **Atividade** no canto inferior direito (abre em Todos os repositórios).
 
 ### Sobreposições
 

@@ -199,7 +199,9 @@ secção STASHES, para **Pop**, **Apply** (mantém o stash) ou **Drop**.
 abre um diálogo que propõe uma pasta ao lado do repositório, um nome opcional
 de nova branch e "Abrir o novo worktree como separador". Os worktrees aparecem
 na secção WORKTREES; faça clique duplo num para o abrir, e o seu separador fecha
-sozinho quando o worktree é removido.
+sozinho quando o worktree é removido. A funcionalidade completa (abrir noutra ferramenta,
+fazer o merge da branch de um worktree, remover) está em [Worktrees](worktrees.md); a secção
+SUBMÓDULOS do mesmo painel está em [Submódulos](submodules.md).
 
 ## Arrastar refs para cima de commits
 

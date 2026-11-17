@@ -9,7 +9,7 @@ curso. É a janela Início com a vista Radar por cima, para que nada por baixo
 possa roubar um clique ou uma tecla.
 
 Precisa de um perfil de code host (ver [Integrações de alojamento e de
-gestores de issues](hosting-integration.md)) e de repositórios ligados a ele, ou de um perfil com as suas
+gestores de issues](hosting-integration.md); as listas de um repositório estão em [Pull requests e issues](pull-requests-and-issues.md), e a discussão de uma linha abre-se como [conversa](conversations.md)) e de repositórios ligados a ele, ou de um perfil com as suas
 listas de toda a conta ligadas (ver «Para além do âmbito» abaixo).
 Um repositório que não está ligado nunca é consultado: mostra antes uma linha
 **Ligar...** (ver «Repositórios com algo a dizer» abaixo).

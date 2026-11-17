@@ -20,6 +20,19 @@ seu gestor de credenciais, nunca em `config.toml`. As operações normais de `gi
 (fetch, pull, push) não precisam de uma integração: usam as credenciais que o seu
 `git` já tem.
 
+**Para onde ir a seguir.** Esta página é a configuração: tokens, ligar, associar um repositório,
+chaves SSH. Com uma conta ligada:
+
+- as secções PULL REQUESTS e ISSUES da barra lateral, o quadro de issues, criar um
+  pull request ou uma issue, o chip da barra de ferramentas e as referências em mensagens de commit:
+  **[Pull requests e issues](pull-requests-and-issues.md)**;
+- a vista, na aplicação, de uma issue ou de um pedido, com os seus comentários, a escrita e
+  o publicar como: **[Conversas](conversations.md)**;
+- ler e rever um pedido com tópicos de comentários e uma revisão pendente:
+  **[Rever um pull ou merge request](review.md)**;
+- os pull requests e as issues de um workspace inteiro numa só lista:
+  **[O Radar](radar.md)**.
+
 ## 1. Criar um token no host
 
 O formulário de ligação tem uma ligação *Gerar um token em <host>*. Abre a
@@ -269,566 +282,7 @@ A lista de um perfil que já abriu antes aparece de imediato a partir de uma có
 
 Se o host recusar o token, o diálogo mostra *não foi possível listar os repositórios* com o motivo no lugar da lista (e a cópia guardada é eliminada); as outras fontes continuam a funcionar.
 
-## 5. Pull requests e issues na barra lateral
-
-### PULL REQUESTS
-
-A secção tem um cabeçalho com a contagem e um `+` (criar um pull request),
-as listas pendentes de fornecedor e projeto, uma caixa de pesquisa e uma lista pendente de estado (*Abertos*,
-*Merged / fechados*, *Todos*). Seguem-se quatro grupos, cada um com a sua contagem:
-
-- **Meus pull requests**: é o autor.
-- **Atribuídos a mim**.
-- **A aguardar minha revisão**: é um revisor pedido.
-- **Todos os pull requests**: recolhido no início.
-
-A caixa de pesquisa filtra todos os grupos (título, número, autor, branch). Cada
-alteração da lista pendente de estado volta a perguntar ao host.
-
-Uma linha começa por um glifo de estado: `●` aberto (verde), `○` rascunho, `◆` merged
-(roxo), `✕` fechado (vermelho). O pedido da branch em checkout está a negrito.
-As linhas lêem-se `#12  título` (GitHub, Bitbucket) ou `!53  título` (GitLab,
-Azure DevOps).
-
-### ISSUES
-
-O título da secção nomeia o fornecedor: `ISSUES DO GITHUB`, `ISSUES DO JIRA`, e assim
-por diante. Lê-se `ITENS DE TRABALHO DO ...` no Azure DevOps e `CARTÕES DO ...` no Trello.
-Por baixo das listas pendentes: uma caixa de pesquisa, a lista pendente de estado (*Abertas*,
-*Atribuídas a mim*, *Fechadas*, *Todas*) e as issues. Uma linha do Jira lê-se
-`ABC-12  título`, com o tipo e o estado esbatidos quando a barra lateral é
-suficientemente larga.
-
-### Ações sobre uma linha
-
-- `Enter` ou um clique duplo abre a linha: um pull request na [revisão](review.md) (GitHub, GitLab, Gitea,
-  Forgejo, Gerrit), uma issue, e um pedido no Azure DevOps ou no Bitbucket, como uma [conversa](#5c-conversas)
-  na janela, e tudo o resto no navegador. **Abrir no navegador** do menu da linha abre sempre o navegador.
-- O botão direito, ou `.`, abre o menu da linha:
-  - **Abrir conversa** (issues, e pedidos que não têm vista de revisão), **Abrir no navegador**, **Copiar URL**,
-    **Copiar número**.
-  - Para um pull request: **Editar no <fornecedor>**, **Checkout da branch de origem**,
-    **Ver commits da branch de origem**. Para um pedido vindo de um fork, o checkout lê-se
-    **Checkout de pull request (fork)**, e **Ver** fica a cinzento.
-  - Para uma issue: **Criar branch a partir da issue**. Abre o pedido de nova branch
-    com um nome como `12-fix-the-thing` (ou `ABC-123-fix-the-thing` para
-    o Jira).
-  - No GitHub, GitLab, Gitea e Forgejo, uma linha de pull request tem também **Rever...**
-    (também **Enter** na linha): a revisão na própria aplicação, ver
-    [Rever um pull request](review.md).
-  - No GitHub, GitLab, Gitea e Forgejo, ambas as linhas têm também **Editar responsáveis...**,
-    **Editar etiquetas...** e **Definir marco...** (e **Editar revisores...** num
-    pull request): ver
-    [Responsáveis, revisores, etiquetas e marco](#responsáveis-revisores-etiquetas-e-marco).
-- **Editar no <fornecedor>** tem outras três formas de acesso: o lápis `✎` na extremidade direita
-  de uma linha de pull request com o rato por cima ou selecionada, `e` na linha selecionada, e
-  o comando da paleta *Integrações: editar pull request associado no host*
-  (para o pedido da branch em checkout).
-- Se a branch de origem ainda não estiver no repositório, o GitPoulpi di-lo. Faça
-  primeiro fetch (`Ctrl+G f`).
-
-**Checkout de um pull request.** O GitPoulpi faz fetch do pedido para uma branch
-local `pr/<n>` (`mr/<n>` no GitLab) que o acompanha, e muda para ela. No
-GitHub, GitLab, Gitea e Forgejo isto funciona também com forks (o GitPoulpi faz fetch da ref de head
-especial do host). O Azure DevOps e o Bitbucket fazem fetch da branch de origem do
-pedido. Um pedido de um fork é aí recusado: adicione o fork como remoto e
-faça manualmente o checkout da respetiva branch. Desfazer volta à branch anterior. CLI:
-`gitpoulpi hosting checkout-pr <n>`.
-
-**Rever um pull request na linha de comandos (e um agente).** No GitHub
-(incluindo Enterprise), GitLab (incluindo self-managed), Gitea e Forgejo um pedido pode ser
-lido e revisto sem sair do GitPoulpi: `hosting review show <n>` (ficheiros,
-estado de integração, verificações), `hosting review threads <n>` (discussões de revisão e
-conversa), `hosting review comment`, `hosting review reply`, `hosting review resolve`
-e `hosting review submit <n> --event approve|request-changes|comment
---comment path:line[:side]:text`. O diff vem do seu repositório, não do
-host: `hosting review fetch <n>` obtém o head do pedido para
-`refs/gitpoulpi/pr/<n>` e a sua branch de destino para `refs/gitpoulpi/pr/<n>-base`
-(nenhum é uma branch, nada fica com checkout). Os números de linha são os desse
-diff: `new` é a linha no head, `old` a linha na base de integração. O GitLab
-não tem o estado de revisão «pedir alterações»: é recusado aí, sem enviar nada.
-O Gitea e o Forgejo aceitam um comentário numa só linha (sem intervalos); uma discussão são os
-comentários de uma linha de um ficheiro. O Gitea pode resolver uma discussão, o Forgejo 11 não
-(o host não tem endpoint para isso: a chamada di-lo). Uma resposta num servidor
-sem o endpoint de resposta é publicada como uma revisão de um comentário na mesma linha.
-O Gitea recusa aprovar ou rejeitar o seu próprio pedido.
-Sem um clone: acrescente `--project owner/name` (GitLab: `group/project`) a `review show`, `threads`,
-`comment`, `reply`, `resolve`, `submit` e `suggest` para rever um projeto que não é o repositório atual,
-`hosting review diff <n> --project P` lê o diff (hunks por ficheiro) através da API do host, e
-`hosting file <path> --project P [--ref R]` lê um ficheiro numa revisão (GitHub, GitLab, Gitea, Forgejo e Gerrit; no Gerrit o diff de um
-patch set é lido ficheiro a ficheiro e o ficheiro vem da branch ou, para um id de commit, do commit). Um ficheiro que o host
-não mostra no diff (demasiado grande) é marcado `omitted`.
-As ferramentas MCP são os mesmos comandos (`hosting_review_show`, `hosting_review_submit`, `hosting_review_diff`,
-`hosting_file`...).
-
-### Responsáveis, revisores, etiquetas e marco
-
-No GitHub (incluindo Enterprise), GitLab (incluindo self-managed), Gitea e
-Forgejo, pode mudar a quem um pull request ou uma issue está atribuído, quem o revê, as suas etiquetas
-e o seu marco sem sair do GitPoulpi. Os outros fornecedores não mostram nada disto.
-
-- **Menu da linha**: **Editar responsáveis...**, **Editar revisores...** (só pull requests),
-  **Editar etiquetas...**, **Definir marco...**.
-- **Paleta**: *Alojamento: editar responsáveis...*, *Alojamento: editar revisores...*,
-  *Alojamento: editar etiquetas...*, *Alojamento: definir marco...* listam primeiro os
-  pedidos e as issues da barra lateral a escolher. No
-  [Radar](radar.md) os mesmos quatro atuam sobre a linha selecionada.
-- O seletor abre de imediato e carrega do host as pessoas ou as etiquetas do projeto (e o que
-  o item tem agora). Uma linha com indicador de atividade aparece passados cerca de 150 ms.
-  Escreva para filtrar (correspondência aproximada), `Up` / `Down` movem, `Space` marca ou
-  desmarca, `Enter` aplica, `Esc` cancela, `Tab` chega aos botões. Um clique
-  numa linha marca-a e a roda desloca. As pessoas mostram um selo com iniciais,
-  as etiquetas a sua cor.
-- O marco é uma lista pendente (com **Sem marco** para o limpar).
-- Depois de **Aplicar** o host é atualizado, e as listas e o Radar mostram a
-  alteração depois da sua atualização seguinte, que começa logo.
-
-Os formulários de criação (um pull request, uma issue) têm as mesmas escolhas como uma fila de
-botões: `Responsáveis: nenhum`, `Revisores: nenhum`, `Etiquetas: nenhum`,
-`Marco: nenhum`. No GitHub, GitLab, Gitea e Forgejo o botão Etiquetas substitui o campo
-de etiquetas escritas do formulário de issue. Se um host aceitar o novo pull request mas
-recusar algumas das suas etiquetas ou pessoas, a barra de estado di-lo.
-
-CLI: `gitpoulpi hosting members|labels|milestones`, `hosting pr-edit <n>`,
-`hosting issue edit <n>`, e `--assignee`, `--reviewer`, `--label`,
-`--milestone` em `hosting pr` e `hosting issue create`; ver a
-[referência da CLI](cli-reference.md).
-
-### Teclas nas secções
-
-| Tecla | Ação |
-|---|---|
-| `Enter` / clique duplo | abrir a conversa no GitPoulpi onde o host tem uma (um pull request no GitHub, GitLab, Gitea ou Gerrit abre a revisão), senão o navegador |
-| `o` | abrir a linha no navegador |
-| `.` / botão direito | menu da linha |
-| `e` | editar o pull request selecionado no host |
-| `n` | novo pull request (PULL REQUESTS) ou nova issue (ISSUES) |
-| `v` | abrir a lista pendente de estado |
-| `r` | atualizar |
-| `Enter` / `Space` num cabeçalho | recolher ou expandir a secção |
-
-### Religar e offline
-
-Quando o token falta, é rejeitado ou não tem um âmbito, a primeira linha da
-secção lê-se `Religar (token rejeitado)`. Clique nela, ou prima `Enter`, para abrir
-o perfil em Definições > Integrações.
-
-Quando o host não pode ser alcançado, as últimas listas ficam no ecrã e o cabeçalho
-mostra a sua idade (`· 5m de idade`). A última resposta fica também em cache no disco
-(`.gitpoulpi/hosting-cache.json`), por isso as listas aparecem antes de a rede
-responder.
-
-## 5b. O quadro de issues
-
-O botão **Quadro** do cabeçalho ISSUES (paleta: **Issues: abrir quadro**) mostra as issues da origem associada como um quadro
-Kanban sobre a janela. As colunas dependem da origem:
-
-| Origem | Colunas | Mover um cartão |
-|---|---|---|
-| Notas Markdown locais | os estados (`statuses` do perfil, depois os outros em uso) | reescreve o `status` da nota |
-| GitHub, GitLab, Gitea, Forgejo | **Abertas**, depois as etiquetas que escolheu, depois **Fechadas** | troca a etiqueta de estado; para **Fechadas** fecha a issue, para uma coluna outra vez reabre-a |
-| Trello | as listas abertas do quadro, da esquerda para a direita | move o cartão para a lista |
-| Redmine | os estados das issues | muda o estado da issue (aplicam-se as regras de fluxo do Redmine) |
-| Jira (Cloud e Data Center) | os estados do projeto, por fazer primeiro, concluído por último | executa a transição de fluxo que leva à coluna (`GET` e depois `POST .../transitions`); sem essa transição o cartão volta atrás e a barra de estado diz `no transition from X to Y` |
-| Azure DevOps (Services e Server) | os estados dos tipos de work item do projeto, por categoria de estado | define `System.State`; um work item cujo tipo não tem o estado da coluna volta atrás, com o motivo (`a Bug has no state Done`) |
-
-Num projeto do GitHub ou do GitLab, **Colunas** (ou `c`, ou **Quadro: definir etiquetas das colunas...**) pede as etiquetas que são as
-colunas, por ordem, por exemplo `status::todo, status::doing, status::review`. Propõe as etiquetas do projeto que
-parecem estados. A escolha é guardada para o repositório. Sem etiquetas o quadro é Abertas / Fechadas. Mover um cartão
-só mexe nas etiquetas de estado que listou: as suas outras etiquetas ficam. Um quadro de host lista as issues abertas e as 60 mais
-recentemente fechadas.
-
-Uma transição do Jira que pede campos obrigatórios (uma resolução, por exemplo) é recusada pelo Jira e o cartão volta atrás com
-a mensagem do próprio Jira: faça essa no site.
-
-O mesmo quadro está disponível para scripts e agentes: `gitpoulpi hosting board` imprime as colunas com os seus cartões e
-`gitpoulpi hosting board move <card> <column>` move um (ver [a referência da CLI](cli-reference.md)).
-
-Um cartão mostra o número, o título, os responsáveis como iniciais, as etiquetas e o marco. Arraste-o para outra coluna,
-ou `Shift+Left` / `Shift+Right`, ou **Quadro: mover cartão para...** (`m`). Move-se de imediato; passados cerca de 150 ms um indicador de atividade
-diz que o host ainda está a trabalhar, e se o host recusar, o cartão volta atrás e a barra de estado diz porquê. `Enter` abre
-a [conversa](#5c-conversas) da issue no GitPoulpi, e o quadro volta quando a fecha; `e` edita responsáveis, etiquetas e marco; `n` inicia uma nova issue na
-coluna selecionada; `a`, `l`, `M` e `/` filtram por responsável, etiqueta, marco e texto, `x` limpa os filtros; `r`
-lê o host de novo. O quadro é lido de novo quando as listas da barra lateral se atualizam. O Radar não tem quadro.
-
-## 5c. Conversas
-
-Uma **conversa** é tudo o que foi dito sobre uma issue, item de trabalho, cartão, alteração ou pull / merge request: a
-descrição, os comentários, as revisões, os tópicos no código e os eventos (etiquetas, atribuições, mudanças de estado,
-pushes). O GitPoulpi lê-a do host, mostra-a formatada e deixa-o responder sem sair da janela.
-
-### Abrir uma
-
-| A partir de | Como |
-|---|---|
-| Uma linha de ISSUES | `Enter` ou um clique duplo; **Abrir conversa** no menu da linha; paleta *Alojamento: abrir a conversa de uma issue...* (uma lista das issues no ecrã). **Abrir no navegador** no menu da linha mantém o navegador. |
-| Uma linha de PULL REQUESTS no Azure DevOps ou no Bitbucket | `Enter` ou **Abrir conversa**. No GitHub, GitLab, Gitea, Forgejo e Gerrit a linha abre a [revisão](review.md), cuja página Resumo é esta mesma conversa (a cronologia, as teclas e a caixa de comentário abaixo). |
-| Um cartão do [quadro de issues](#5b-o-quadro-de-issues) | `Enter` ou um clique duplo. |
-| O [Radar](radar.md) | `i` numa linha de issue ou de pedido, **Abrir conversa** no menu da linha, ou *Radar: abrir a conversa da issue*. |
-| Uma referência noutra conversa | Clique nela (ou `l` e depois escolha-a): `#7`, `!12`, `ABC-12` de uma fonte associada abrem na aplicação e entram numa pilha de Voltar. |
-| Um agente | `gitpoulpi ui show issue <n> --view conversation` (também `ui show pr`), veja [a referência da CLI](cli-reference.md). |
-
-**Repositórios que não estão clonados.** Uma linha do Radar de um repositório de que não tem clone abre também a sua
-conversa: a vista precisa apenas do perfil de integração e do projeto, por isso o Radar hospeda-a na sua própria janela,
-e `Esc` devolve o Radar. O que precisa de um clone fica de fora: uma referência a um commit abre no host em vez de no
-Log, e *Deixar a IA ler o repositório* fica a cinzento com o seu motivo (veja [o capítulo da IA](ai.md#ajuda-de-escrita-num-host)).
-Um pedido de um repositório clonado tem antes a sua revisão (`e`), e **Abrir conversa** do Radar diz que não há
-conversa para ler aqui para ele; uma issue de um repositório clonado abre-a no separador desse repositório.
-
-Uma issue de um host que não tem nenhuma para ler (o Bitbucket e o Gerrit não têm issues) abre o navegador como antes, e
-uma compilação sem a funcionalidade `conversation` faz o mesmo em todo o lado ([compilações personalizadas](custom-builds.md)).
-
-### A vista
-
-Uma vista de janela inteira: o cabeçalho (estado, quem a abriu e quando, as etiquetas, o número de comentários,
-**Mostrar eventos**, **Voltar**, **Atualizar**, **Abrir no navegador**), a linha **A publicar como**, a cronologia e,
-por baixo, a caixa de comentário.
-
-- A cronologia lê-se do mais antigo para o mais recente e começa na janela mais recente (no máximo 300 entradas).
-  **Carregar mais antigos** no seu topo (`m`, paleta *Conversa: carregar entradas mais antigas*) lê a janela anterior,
-  com o número ainda por vir quando o host o diz.
-- Um comentário mostra o autor, a data, uma marca `editado`, uma marca `bot` para bots, `interno` para notas privadas, e
-  os botões **Responder**, **Citar**, **Editar**, **Eliminar** e **Ligações** que a entrada selecionada permite. Um
-  tópico no código mostra `caminho:linha`, `resolvido` ou `por resolver`, `obsoleto`, e os seus comentários. Uma revisão
-  mostra o seu parecer.
-- Os eventos são uma linha esbatida cada (*carol adicionou a etiqueta lfs*). **Mostrar eventos** (`v`) oculta-os; a
-  escolha é guardada por repositório. Os hosts sem histórico de eventos (YouTrack, itens de trabalho do Azure DevOps,
-  notas locais) não têm essa caixa.
-- O texto é Markdown desenhado: títulos, listas aninhadas e de tarefas, citações, alertas ao estilo do GitHub, código
-  realçado, tabelas, ligações, imagens como `[image: alt]`. O texto que chegou na marcação própria do host é convertido
-  primeiro (veja [Conversão de marcação](#conversão-de-marcação)). Um bloco de código `mermaid` ganha um botão **Abrir
-  diagrama** que mostra o código do diagrama numa vista com deslocação (`Enter` copia-o); a paleta tem *Conversa: abrir o
-  diagrama da entrada*. Precisa de uma compilação com `conversation` e `mermaid`.
-- No Resumo da revisão, o `path:line` de uma discussão sobre código é uma ligação para o código (`G`, *Conversa: abrir o
-  código da discussão*; veja [Revisão](review.md)); numa conversa aberta isoladamente (um problema, uma linha do Radar)
-  não há página de código para onde ir.
-- A vista lê de novo a cada 60 segundos e com `F5` (**Atualizar**).
-
-**Teclas.** Cada uma tem um botão, uma linha de menu ou uma linha da paleta (*Conversa: ...*), e `Ctrl+N` põe emblemas
-nos botões.
-
-| Tecla | Ação |
-|---|---|
-| `Cima`, `Baixo`, `Ctrl+J`, `Ctrl+K`, `j`, `k` | Entrada anterior / seguinte |
-| `PageUp`, `PageDown`, `Home`, `End`, a roda, a barra de deslocação | Deslocar |
-| `Tab`, `Shift+Tab` | Cronologia, caixa de comentário e depois os botões do cabeçalho |
-| `r` | Responder: no tópico da entrada selecionada, ou com o seu texto citado onde o host não tem tópicos |
-| `Q` | Citar a entrada selecionada num novo comentário |
-| `c` | Novo comentário |
-| `e`, `d` | Editar, eliminar um dos seus comentários (uma pergunta precede a eliminação) |
-| `l`, `Enter` | As ligações da entrada: `Enter` segue a única, ou abre o menu delas |
-| `y`, `o` | Copiar o endereço da entrada, abri-la no navegador |
-| `n` | Próxima entrada nova |
-| `v`, `m`, `F5` | Mostrar ou ocultar eventos, Carregar mais antigos, Atualizar |
-| `Alt+Esquerda`, `Backspace` | Voltar pela pilha de Voltar |
-| `q`, `Esc` | Fechar (pergunta primeiro quando a caixa tem texto) |
-
-### Escrever
-
-**Novo comentário** (`c`, ou `Tab` até à caixa), **Responder** (`r`), **Citar** (`Q`) e **Editar** (`e`) usam a mesma
-caixa de texto Markdown: **Escrever**, **Prévia** e **Lado a lado** (`Alt+P` alterna entre Escrever e Prévia, `Alt+L`
-liga o Lado a lado e precisa de uma janela com 100 colunas). `Ctrl+Enter` (também `Ctrl+S` e `Alt+Enter`) ou **Enviar**
-publica, **Cancelar** larga a caixa, e `Alt+E` abre **Escrever com IA** onde a IA está ativa ([o capítulo da
-IA](ai.md#ajuda-de-escrita-num-host)). A prévia é desenhada pelo mesmo desenhador da cronologia, com as mesmas
-referências. Quando o host não aceita Markdown, o rodapé nomeia a marcação em que o texto é enviado (*Enviado como Jira
-wiki markup*, *Enviado como Textile*).
-
-- O comentário é adicionado à cronologia de imediato e ocupa o seu lugar quando o host responde. Se o host recusar, a
-  entrada desaparece e a caixa volta a abrir com o seu texto e o motivo.
-- Um texto que não enviou é guardado por item (`remote-conversations.toml` na pasta de configuração) e está lá da
-  próxima vez que abrir essa caixa; enviá-lo ou descartá-lo remove-o. Fechar uma caixa que tem texto pergunta primeiro.
-- **Responder** num tópico (um tópico de revisão, uma discussão do GitLab, um comentário do Linear, um tópico do Bitbucket
-  ou do Azure DevOps) publica nesse tópico. Onde o host só tem uma lista plana, **Responder** inicia um novo comentário
-  com a entrada selecionada citada (`> **autor**`), o mesmo que **Citar**.
-- **Nota interna** (caixa de seleção, `Alt+I`): no GitLab e no Redmine o comentário só é visível para os membros do
-  projeto. Só aparece nos hosts que têm essas notas, e só num novo comentário.
-- Publicar é uma ação para o exterior: nada é registado no histórico de desfazer e **nada se pode desfazer a partir do
-  GitPoulpi**. Sem ligação a caixa fica, **Enviar** fica a cinzento com o motivo, e o cabeçalho diz que a cópia guardada
-  está a ser mostrada.
-
-**Quem pode editar ou eliminar.** Só os seus próprios comentários têm **Editar** e **Eliminar**. A palavra do próprio
-host vem primeiro quando a dá (`viewerCanUpdate` e `viewerCanDelete` do GitHub, `can_edit` noutros), depois o seu login
-contra o autor do comentário, comparado sem distinguir maiúsculas; os comentários de um bot de App têm de vir também de
-uma conta de bot. Enquanto o login de um bot de GitHub App não é conhecido, só contam os comentários que esta instalação
-publicou (o repositório guarda os seus ids): nada é adivinhado a partir de um nome. Num tópico, **Editar** e **Eliminar**
-atuam sobre o último comentário dele que é seu. Um host que não consegue editar ou eliminar (veja [a
-tabela](#o-que-cada-host-não-consegue-fazer)) mostra os botões a cinzento com o motivo.
-
-### Publicar como
-
-A linha sob o cabeçalho diz com que nome as suas mensagens são publicadas, e a mesma linha está em todas as caixas:
-
-| Linha | Significado |
-|---|---|
-| *A publicar como ann (token pessoal)* | O token do perfil: o seu próprio login (`GET /user`). |
-| *A publicar como ci-bot (comando de token do repositório)* | O [comando de token](#13d-agir-como-um-bot-de-github-app) do repositório é usado para a API de hosting. |
-| *A publicar como my-app[bot] (bot de GitHub App)* | Um token de instalação. O nome vem de **Publicar como**, senão do host. |
-| *A publicar como o bot da GitHub App (o nome ainda não é conhecido: defina Publicar como nas Definições)* | Nenhum nome configurado, nenhum aprendido ainda. |
-| *A publicar como ... (bot do projeto)* | Um token de acesso de projeto ou de grupo do GitLab. |
-| *A escrever como kai (nota local)* | Uma pasta de notas Markdown: o `local.me` do perfil, senão o utilizador ligado. |
-| *Ainda não se sabe como iria publicar. Defina Publicar como nas Definições.* | Nada se conseguiu aprender. |
-
-**Publicar como** é um nome: para uma GitHub App é `my-app[bot]`. Defina-o para todos os repositórios em **Definições >
-Integrações > Publicar como** (`general.hosting_post_as`), ou para um repositório em **Definições > Definições do repositório > SSH e
-credenciais > Host**, que o substitui. Se ficar vazio, o GitPoulpi pergunta ao GitHub (GraphQL `viewer { login }`, a que
-um token de instalação pode ou não responder) e, na falta disso, aprende o nome com o autor do primeiro comentário que
-publica e guarda-o com o repositório. Um token pessoal nunca o precisa. Veja
-[Agir como um bot de GitHub App](#13d-agir-como-um-bot-de-github-app).
-
-### Referências cruzadas
-
-As referências numa conversa são sublinhadas e clicáveis. As fontes de ISSUES e de PULL REQUESTS associadas ao
-repositório são comparadas primeiro, por isso `ABC-12` de um projeto Jira associado abre na aplicação mesmo dentro de um
-comentário do GitHub; o que a gramática própria do host acrescenta abre a sua página depois da confirmação da ligação.
-Um id de commit abre no Log quando o repositório está clonado e o id tem pelo menos 7 carateres, no host caso contrário.
-Nada dentro de um trecho de código, de um bloco delimitado, de uma ligação Markdown, de um endereço de e-mail ou de um
-URL é uma referência, e `C#1`, `UTF-8`, `SHA-256` e `ISO-8601` também não.
-
-| Host | Reconhecido |
-|---|---|
-| GitHub | `#7`, `GH-7`, `owner/repo#7`, `owner/repo@sha`, `@login`, ids de commit |
-| GitLab | `#7`, `!7`, `group/project#7`, `group/project!7`, `project#7` (um projeto irmão), `@user`, `~label` e `%milestone` como marcas, ids de commit |
-| Gitea, Forgejo | `#7`, `!7`, `owner/repo#7`, `owner/repo@sha`, `@user`, ids de commit |
-| Azure DevOps | `#7`, `!7`, `AB#7`, `@user` |
-| Bitbucket | menções `@user`, `{uuid}`, ids de commit |
-| Gerrit | valores `Change-Id` (`I` e 40 dígitos hexadecimais), ids de commit |
-| Redmine | `#7`, revisões `r123`, `commit:abc1234` |
-| Jira, Linear, YouTrack | `ABC-12`, só para um projeto ou equipa de uma fonte associada |
-| Trello | endereços de cartões (`trello.com/c/...`) |
-| Notas locais | `[[nota]]`, `[[nota\|alias]]` e ligações `.md` relativas a outra nota da pasta |
-
-`gitpoulpi hosting markdown --body T --id I` imprime o que a aplicação faz de um texto, referências incluídas.
-
-### Conversão de marcação
-
-Os hosts que não falam Markdown são convertidos nos dois sentidos, para ler e escrever Markdown em todo o lado. O que um
-conversor não percebe fica como texto legível.
-
-- O **Jira** (Cloud e Data Center) guarda os comentários como wiki markup pela API v2. O que lê é convertido para
-  Markdown; o que escreve é convertido para wiki markup, e o rodapé diz *Enviado como Jira wiki markup*.
-- O **Redmine** formata o texto como Textile ou Markdown, o que a API não diz: a linha **Formato de texto do servidor**
-  do perfil (Definições > Integrações, `markup`, Textile por predefinição) diz-o ao GitPoulpi. O Textile é convertido em
-  Markdown para ler e de volta para Textile para escrever.
-- O **Azure DevOps Server** devolve os comentários dos itens de trabalho como HTML e aceita-os como HTML: são mostrados
-  como o Markdown convertido a partir dele e escritos como HTML. O Azure DevOps Services e os tópicos de pull request
-  aceitam Markdown.
-- O **Gerrit** é texto simples: não é desenhado como Markdown e o que escreve é enviado como escrito.
-- Cada importador remove primeiro as sequências de controlo e de escape, por isso um comentário não pode mexer no
-  terminal.
-
-### A cópia guardada, Carregar mais antigos, novos
-
-- Cada conversa que abre é guardada (`<pasta de estado>/conversations/<integração>/<projeto>/<tipo>-<n>.json`, só do
-  utilizador, sem token, no máximo 2 MB por ficheiro, os 50 ficheiros mais recentes mantidos). Aparece de imediato quando
-  o item abre e é atualizada por trás. Quando o host não é alcançável, a cópia guardada fica no ecrã sob *Sem ligação: a
-  mostrar a cópia guardada há 3 min (motivo)* e Enviar fica a cinzento.
-- **Novos:** o que viu pela última vez é lembrado por conversa (as últimas 200 são mantidas). As entradas de outra
-  pessoa que são mais recentes recebem uma barra de destaque e uma marca `novo`, e `n` salta para a seguinte. Uma
-  conversa que abre pela primeira vez não tem nada de novo.
-
-### O que cada host não consegue fazer
-
-Cada `não` abaixo é um limite real: o controlo fica oculto ou a cinzento com o motivo, e a CLI responde com um erro que
-nomeia o host antes de enviar seja o que for.
-
-| Host | Itens | Responder num tópico | Editar e eliminar os próprios | Resolver um tópico | Eventos | Notas internas | Escrito como |
-|---|---|---|---|---|---|---|---|
-| GitHub | issues, pull requests | pull requests | ambos | pull requests | sim | não | GitHub Markdown |
-| GitLab | issues, merge requests | sim (discussões) | ambos | merge requests | sim | sim | GitLab Markdown |
-| Gitea | issues, pull requests | pull requests | ambos | pull requests | sim | não | Markdown |
-| Forgejo | issues, pull requests | pull requests | ambos | não (o host não tem endpoint) | sim | não | Markdown |
-| Azure DevOps | itens de trabalho, pull requests | pull requests | ambos | não (o estado é mostrado, não alterado) | só pull requests | não | Markdown (HTML nos itens de trabalho do Server) |
-| Bitbucket (Cloud, Data Center) | só pull requests | sim | ambos | não (mostrado, não alterado) | sim | não | Markdown |
-| Gerrit | só alterações | sim | não (nenhum dos dois se pode editar nem eliminar) | sim | sim | não | texto simples |
-| Jira | issues | não (lista plana) | ambos | não | sim (changelog) | não (precisa de um papel no projeto) | wiki markup |
-| Linear | issues | sim (respostas a um comentário) | ambos | não | sim | não | Markdown |
-| YouTrack | issues | não | ambos | não | não | não | Markdown |
-| Redmine | issues | não | só editar (Redmine 5 e posterior), nunca eliminar | não | sim (journals) | sim (notas privadas) | Markdown ou Textile |
-| Trello | cartões | não | ambos | não | sim (movimentos) | não | Markdown |
-| Notas locais | notas | não | as do próprio autor local | não | não | não | Markdown |
-
-Além disso: nenhum host deixa iniciar um novo tópico numa linha a partir da conversa (faça-o na revisão), e as reações
-só são mostradas no GitHub. Um texto mais longo do que o host aceita é recusado (GitHub 65.536 carateres, GitLab
-1.000.000, Azure DevOps 150.000, Jira 32.767, Trello 16.384): a CLI verifica primeiro, na aplicação é mostrada a
-mensagem do próprio host e o seu texto é mantido. Uma nota local guarda os seus comentários numa secção final
-`## Comments` do próprio ficheiro da nota, uma entrada `### autor - hora` cada, para o Obsidian e uma shell também os
-verem.
-
-Na linha de comandos as mesmas conversas são `gitpoulpi hosting issue comments`, `issue comment`, `comment-edit` e
-`comment-delete`, e `hosting review conversation` (veja [a referência da CLI](cli-reference.md)); para os agentes são
-ferramentas MCP com os mesmos nomes (veja [MCP e agentes](mcp-and-agents.md)).
-
-## 6. Criar um pull request
-
-Abra o formulário com o `+` do cabeçalho de PULL REQUESTS, `n` na secção, ou
-o comando da paleta *Pull Requests: criar uma*. Um menu de branch tem também
-**Iniciar pull request a partir de <branch>...**.
-
-O formulário tem:
-
-- Um separador por perfil ligado que tenha pull requests (`Left` / `Right` na
-  linha de separadores).
-- Caixas combinadas **Repo de origem / Branch** e **Repo de destino / Branch**. As listas longas
-  permitem pesquisa. Pode escrever uma branch ou um repositório que as listas não mostrem.
-- **Título**, preenchido com o assunto do commit de topo.
-- **Descrição**, em várias linhas (`Enter` adiciona uma nova linha, `Tab` sai do
-  campo).
-- Botões **Responsáveis**, **Revisores**, **Etiquetas** e **Marco** (GitHub,
-  GitLab, Gitea e Forgejo), que abrem o seletor.
-- **Enviar como rascunho**.
-- Com a [IA](ai.md) ativa: **Gerar título e descrição**.
-
-O formulário abre no perfil, repositório e branches da branch em checkout
-(`feature -> main`). Um repositório de origem diferente cria um pedido
-a partir de um fork.
-
-**Criar pull request** (ou `Ctrl+S`) cria o pedido no host. O
-resultado abre no navegador e a barra de estado nomeia-o.
-
-## 7. Criar uma issue
-
-Quando a secção ISSUES tem um fornecedor **e** um projeto, o seu cabeçalho tem um
-`+` (*Nova issue*). Também: `n` na secção, ou o comando da paleta
-*Alojamento: nova issue...*.
-
-O formulário tem **Título** (obrigatório), **Descrição** (várias linhas) e
-**Labels** (separadas por vírgula, por exemplo `bug, ui`; no GitHub, GitLab, Gitea e Forgejo os
-botões Etiquetas, Responsáveis e Marco abrem antes o seletor). O Jira e o Azure DevOps
-acrescentam uma lista pendente **Tipo**. O Trello acrescenta uma lista pendente **Lista**. O Linear e o YouTrack
-acrescentam uma lista pendente **Estado** (o estado do fluxo, ou o valor de `State`, em que a issue
-começa). O Redmine acrescenta uma lista pendente **Tipo** com os trackers do projeto (Bug, Feature,
-Support...); não tem etiquetas, por isso não há botão Etiquetas para ele e uma etiqueta
-dada na linha de comandos é recusada. O formulário preenche estas
-listas pendentes a partir do host quando abre.
-
-**Criar issue** (ou `Ctrl+S`) cria-a no host. `Esc` ou **Cancelar**
-fecha o formulário. Se o host recusar (token rejeitado, âmbito em falta, projeto
-desconhecido, label desconhecida), o formulário mostra o motivo e mantém o que escreveu.
-Em caso de sucesso, a barra de estado nomeia a nova issue e a secção ISSUES é
-atualizada.
-
-CLI: `gitpoulpi hosting issue create --title ... [--body ... | --body-file ...]
-[--label ...] [--type ...] [--list ...]`.
-
-## 8. Criar na própria página web do host
-
-O formulário Nova issue e o formulário Criar pull request têm um botão
-**Criar no <fornecedor>**, em cima à direita. A tecla é `Alt+W`. Abre o
-formulário web do host no navegador, preenchido com o que escreveu até ao momento. A
-janela de diálogo fica aberta. Não precisa de token e não faz nenhuma chamada à API, por isso também funciona
-depois de um erro da API.
-
-- O GitHub não tem parâmetro de URL para *rascunho*, por isso a caixa de rascunho não é
-  transportada. O GitLab recebe um prefixo `Draft: ` no título.
-- O GitLab aceita labels apenas por id, por isso são acrescentadas como uma
-  ação rápida `/label ~"x"` no fim da descrição.
-- Uma descrição muito longa é cortada para que o URL fique abaixo de 6000 carateres,
-  com uma nota `[...truncated: paste the rest]`.
-- O Bitbucket Data Center não tem endereço de formulário web, por isso não tem
-  botão **Criar no <fornecedor>**.
-
-CLI: `gitpoulpi hosting issue create ... --web` e `gitpoulpi hosting pr --web`
-imprimem o mesmo URL.
-
-## 9. O chip da barra de ferramentas
-
-No extremo da barra de ferramentas (à direita por predefinição), um chip mostra o pedido da branch
-em checkout: `GH #12` (GitHub), `GL !53` (GitLab), `AZ !12` (Azure DevOps) ou
-`BB #12` (Bitbucket). A cor mostra o estado: verde aberto, cinzento rascunho,
-roxo merged, vermelho fechado.
-
-- Passe o rato por cima para ver o título, o estado e `origem → destino`.
-- Clique nele, ou prima `Ctrl+G g`, para abrir o pedido no navegador.
-- Clique com o botão direito para **Abrir no navegador**, **Copiar URL**, **Atualizar** e
-  **Mudar de perfil**.
-
-Uma branch enviada sem pedido mostra um chip `+ PR` esbatido. Clique nele para iniciar um
-pull request. Não há chip quando nenhum perfil corresponde, quando a branch não
-foi enviada, ou quando o host não pôde ser alcançado. Numa janela estreita o chip fica
-oculto para deixar espaço aos botões da barra de ferramentas.
-
-## 10. Quando as listas são atualizadas
-
-As listas são atualizadas:
-
-- quando abre um repositório;
-- quando a branch em checkout muda;
-- após um push ou um fetch;
-- a cada *Atualização de Pull Requests e Issues (minutos)*
-  (`general.hosting_refresh_minutes`, predefinição 5, `0` desliga o temporizador;
-  Definições > Integrações);
-- quando fecha as Definições;
-- quando prime `r`, executa *Integrações: atualizar pull requests e issues*, ou
-  altera um filtro.
-
-Os pedidos nunca bloqueiam a janela.
-
-Os hosts limitam quantas chamadas pode fazer. O GitPoulpi reenvia o `ETag` da
-última resposta, por isso uma lista inalterada custa pouco (nada no GitHub). Quando um
-host indica que restam poucas chamadas, a barra de estado di-lo. Quando já não
-restam nenhumas, o GitPoulpi deixa de perguntar a esse host até o limite repor, e as listas
-ficam como estão.
-
-## 11. Terminologia
-
-O GitHub, o Azure DevOps e o Bitbucket dizem "pull request". O GitLab diz "merge
-request". *Terminologia de pedido de revisão* (`ui.pr_terminology`, em
-Definições > Integrações) escolhe a palavra para todas as etiquetas, menus, comandos
-da paleta e mensagens:
-
-- **Auto (por host)**: segue o fornecedor ligado do repositório ("Pull
-  Request" enquanto nada estiver ligado).
-- **Pull Request** ou **Merge Request**: sempre essa palavra.
-
-A alteração aplica-se de imediato. A CLI e o MCP dizem sempre "pull/merge request".
-Esta página diz "pull request".
-
-## 12. Referências em mensagens de commit e nomes de branch
-
-Quando as issues ou os pull requests do repositório estão ligados, as referências na
-mensagem de commit dos Detalhes do commit aparecem sublinhadas. Um clique abre a
-página ligada. Teclado: o comando da paleta
-*Integrações: abrir referência do commit (#issue / !pedido)...* (um menu quando a
-mensagem tem várias referências). Um repositório sem nada ligado não tem
-ligações.
-
-O que conta como referência depende do fornecedor da secção ISSUES:
-
-| ISSUES ligadas a | Numa mensagem | Num nome de branch |
-|---|---|---|
-| GitHub, GitLab, Gitea, Forgejo | `#123` | `123-fix-login` |
-| Azure DevOps | `#123` e `AB#123` | `123-fix-login` |
-| Jira | `ABC-123`, apenas quando `ABC` é a chave do projeto ligado. Texto como `UTF-8`, `SHA-256` ou `ISO-8601` nunca é uma ligação. | `ABC-123` em qualquer ponto do nome (`feature/ABC-123-x`), em maiúsculas |
-| Linear | `ENG-123`, apenas quando `ENG` é a chave da equipa ligada (ou de uma equipa na lista de equipas do perfil). `UTF-8` nunca é uma ligação. | O `branchName` próprio do Linear quando cria a branch a partir de uma issue; `ENG-123` em qualquer ponto do nome é lido de volta |
-| YouTrack | `ABC-123`, apenas quando `ABC` é o nome curto do projeto ligado (ou de um da lista de projetos do perfil) | `ABC-123` em qualquer ponto do nome |
-| Redmine | `#123`, apenas quando o Redmine é a origem ISSUES ligada (uma origem de pull requests mantém o seu próprio sigilo) | `123-fix-login` |
-| Trello | um endereço `https://trello.com/c/<shortLink>`; `#12` apenas quando um cartão em cache tem o número 12 | `12-fix-login` |
-
-| PULL REQUESTS ligados a | Numa mensagem |
-|---|---|
-| GitLab, Azure DevOps | `!45` |
-| GitHub, Bitbucket, Gitea, Forgejo | `#45` |
-
-Quando ambas as listas correspondem a `#N`, a issue ganha. CLI:
-`gitpoulpi hosting refs --message TEXT | --commit REV | --branch NAME`.
-
-**Em conversas.** O texto de uma issue ou de um pedido é lido com a gramática do seu host, que é mais ampla do que a
-tabela acima: `owner/repo#7`, `!7`, `GH-7`, `@login`, ids de commit e as outras formas listadas em
-[Referências cruzadas](#referências-cruzadas). As fontes associadas ao repositório são comparadas primeiro, por isso uma
-chave do Jira num comentário do GitHub continua a abrir a sua issue na aplicação. `gitpoulpi hosting markdown --body
-TEXTO --id I` mostra o que a aplicação encontra num texto.
-
-### Inserir uma referência de issue
-
-No compositor de commits, o botão `#▾` na extremidade direita do Resumo abre
-uma lista filtrável das issues ligadas. A issue indicada pela branch atual
-vem primeiro, marcada com *(da branch)*. `Enter` ou um clique insere a sua referência
-(`ABC-123`, `#12`, `AB#12`) no cursor. Teclado: `Alt+R` no compositor.
-Paleta: *Commit: Inserir referência de issue...*. Sem uma lista de issues ligada, o
-botão fica a cinzento e diz *ligue primeiro uma lista de issues na barra lateral*.
-O GitPoulpi nunca acrescenta uma referência por si.
-
-## 13. Chaves SSH
+## 5. Chaves SSH
 
 ### Chave SSH por perfil
 
@@ -871,7 +325,7 @@ A chave global em Definições > SSH e credenciais (*Caminho da chave privada*, 
 *Gerar par de chaves*) aplica-se a todos os repositórios sem escolha própria.
 O ficheiro de chave ou a fixação de um repositório prevalece sobre ela.
 
-## 13b. Proteção de branches, para uma reescrita do histórico
+## 6. Proteção de branches, para uma reescrita do histórico
 
 Quando reescreve o histórico ([o painel de reescrita](history-rewrite.md)), o GitPoulpi
 pergunta ao alojamento que branches protege, para que fiquem de fora da reescrita
@@ -893,7 +347,7 @@ repositório) é construída a partir do URL remoto do repositório para
 GitHub, GitLab, Azure DevOps e Bitbucket, mesmo quando o repositório não está
 ligado, e é mostrada com os três caminhos possíveis quando o alojamento recusa um push.
 
-## 13c. Listas de toda a conta no Radar
+## 7. Listas de toda a conta no Radar
 
 O Radar normalmente vigia os repositórios que clonou. Um perfil também pode
 listar o que lhe diz respeito em todo o host, clonado ou não, com três interruptores na
@@ -949,7 +403,7 @@ liga uma lista, `gitpoulpi hosting radar --json` imprime as listas (e
 `--refresh` ignora a cache). Os agentes de IA têm os mesmos dois comandos por MCP
 (`hosting_radar`, `hosting_integrations_radar`).
 
-## 13d. Agir como um bot de GitHub App
+## 8. Agir como um bot de GitHub App
 
 Um projeto que não deve mostrar o nome de uma pessoa pode fazer tudo no host
 através de uma **GitHub App**: cada comentário, revisão, fecho ou reabertura e
@@ -983,7 +437,7 @@ O que muda nesse repositório:
   Nada é mostrado como erro.
 - **Publicar como.** Cada mensagem que o GitPoulpi publica é mostrada com o nome com
   que é publicada (*A publicar como my-app[bot] (bot de GitHub App)* sob o cabeçalho
-  de uma [conversa](#publicar-como) e na sua caixa de comentário; `posted_as` na
+  de uma [conversa](conversations.md#publicar-como) e na sua caixa de comentário; `posted_as` na
   resposta da CLI). Com um token pessoal é o seu login (`GET /user`). Com um token de
   App é o nome de **Publicar como**, por exemplo `my-app[bot]`: defina-o para todos os
   repositórios em **Definições > Integrações** (`general.hosting_post_as`, também
@@ -1025,7 +479,7 @@ que a peça:
 `gitpoulpi hosting assignment` mostra a definição, `--block` liga-a e `--allow`
 desliga-a outra vez; só uma pessoa pode voltar a permitir (o servidor MCP não pode).
 
-## 14. A partir da linha de comandos
+## 9. A partir da linha de comandos
 
 ```
 echo $TOKEN | gitpoulpi hosting login --id my-gitlab --token-stdin
@@ -1058,7 +512,7 @@ fica em memória apenas para esta sessão.
 ## Limites conhecidos
 
 - **Pull requests de forks:** o Azure DevOps e o Bitbucket não conseguem fazer checkout de um
-  pedido de um fork (consulte [Ações sobre uma linha](#ações-sobre-uma-linha)). O Azure
+  pedido de um fork (consulte [Ações sobre uma linha](pull-requests-and-issues.md#ações-sobre-uma-linha)). O Azure
   DevOps não consegue criar um pull request a partir de um fork.
 - O **Trello** mostra no máximo os primeiros 1000 cartões de um quadro. Use o filtro de
   listas para o restringir. O **Jira**, o **Linear** e o **YouTrack** listam no máximo 500
@@ -1098,7 +552,7 @@ fica em memória apenas para esta sessão.
   Uma nova issue do Jira recebe uma descrição em texto simples.
 - **Conversas:** as 300 entradas mais recentes carregam primeiro (**Carregar mais antigos** para o resto); um comentário,
   uma edição ou uma eliminação publicados a partir do GitPoulpi são para o exterior e não se podem desfazer a partir dele;
-  o que cada host não consegue fazer está na [tabela](#o-que-cada-host-não-consegue-fazer). No Gerrit uma mensagem ou um
+  o que cada host não consegue fazer está na [tabela](conversations.md#o-que-cada-host-não-consegue-fazer). No Gerrit uma mensagem ou um
   comentário não se pode editar nem eliminar, e o texto do Gerrit é simples.
 - Criar um pull request, work item, issue ou cartão acontece no host e
   **não pode ser desfeito** a partir do GitPoulpi. Um checkout de um pedido pode ser desfeito

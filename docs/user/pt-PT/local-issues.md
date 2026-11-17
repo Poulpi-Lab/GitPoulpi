@@ -142,7 +142,7 @@ Se trabalha sozinho, ou numa equipa que guarda as issues junto ao código, a pas
   `Shift+Left` / `Shift+Right`, ou com **Quadro: mover cartão para...** (`m`), uma lista de colunas. O cartão move-se de
   imediato; o `status` da nota é reescrito como em [a secção das notas](#as-notas), nada mais no ficheiro. Se a escrita
   falhar o cartão volta atrás e o erro aparece na barra de estado.
-- **Abra** um cartão com `Enter` ou um clique duplo: a [conversa](hosting-integration.md#5c-conversas) da nota abre-se na janela, com o texto da nota e os seus comentários (**Abrir nota** no menu do cartão abre o ficheiro no seu programa predefinido para `.md`). `e` edita os seus
+- **Abra** um cartão com `Enter` ou um clique duplo: a [conversa](conversations.md) da nota abre-se na janela, com o texto da nota e os seus comentários (**Abrir nota** no menu do cartão abre o ficheiro no seu programa predefinido para `.md`). `e` edita os seus
   responsáveis, etiquetas ou marco, `.` ou um clique com o botão direito abre o menu do cartão, `n` inicia uma nova issue na coluna
   selecionada (o formulário volta ao quadro quando fecha).
 - **Filtre** por responsável (`a`), etiqueta (`l`), marco (`M`) ou texto (`/`); `x` limpa-os. Os filtros são

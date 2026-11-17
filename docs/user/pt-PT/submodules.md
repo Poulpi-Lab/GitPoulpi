@@ -15,6 +15,8 @@ Quando um repositório tem um `.gitmodules`, a barra lateral Refs ganha uma sec�
 | `○` | não clonado | declarado em `.gitmodules` e registado, mas a sua pasta está vazia: atualize-o para o clonar |
 | `✗` | em conflito | o repositório tem conflitos de merge no submódulo |
 
+![A secção SUBMÓDULOS com três linhas: vendor/almanac não clonado (○), vendor/ephemeris atualizado (✓) e vendor/starfield modificado (↑, noutro commit que não o registado), que aparece também como ficheiro alterado no painel Estado](../images/submodules.png)
+
 | Fazer | Rato | Teclado |
 |---|---|---|
 | Abrir o submódulo num separador próprio | clique duplo na linha | selecioná-lo, `Enter` (paleta: `Refs: abrir submódulo num separador`) |
@@ -23,6 +25,8 @@ Quando um repositório tem um `.gitmodules`, a barra lateral Refs ganha uma sec�
 | Registá-lo em `.git/config` sem clonar | menu | `Ctrl+P`: `Refs: inicializar submódulo (selecionado)` |
 | Atualizar todos os submódulos | | `Ctrl+P`: `Git: atualizar todos os submódulos` |
 | Saltar para a secção | clicar no seu cabeçalho | `Ctrl+P`: `Navegação: focar Refs > Submódulos` |
+
+![O menu de clique direito da linha modificada vendor/starfield: Atualizar (clonar se preciso), Inicializar e Abrir em novo separador](../images/submodule-menu.png)
 
 Uma atualização pode fazer fetch do remoto do submódulo, por isso segue **Definições > SSH e credenciais > Credenciais HTTPS** como qualquer outra transferência. Um submódulo que não está clonado não tem nada para abrir como separador; a barra de estado diz-lho e aponta para Atualizar.
 

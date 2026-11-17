@@ -37,7 +37,9 @@ lateral); nunca são quebradas.
 ## Escolher
 
 Cada conflito é um bloco emoldurado em A e em B, com uma caixa de seleção no
-cabeçalho e um `+` / `✓` à frente de cada linha.
+cabeçalho e um `+` / `✓` à frente de cada linha. Clique com o botão direito num excerto para ver as escolhas desse conflito:
+
+![Um menu de clique direito no conflito 2 do editor de merge: Aceitar só A, Aceitar só B, A depois B, B depois A, Não aceitar nada, Desfazer a escolha (não resolvido), Editar no resultado e ✦ Sugerir resolução (IA)](../images/merge-editor-chunk-menu.png)
 
 | Para... | Tecla | Rato |
 |---|---|---|
@@ -73,6 +75,10 @@ tratado, azul para o atual. Um clique numa marca salta para esse conflito (uma
 marca sob o indicador da barra já está no ecrã, por isso aí o clique arrasta o
 indicador).
 
+Aceitar ambos (**A depois B**) escreve as linhas de A e depois as de B sob o marcador do conflito no Resultado, cada uma etiquetada com o seu lado; os emblemas `1st` / `2nd` nos dois excertos indicam a ordem, e `s` troca-a:
+
+![Conflito 2 aceite dos dois lados: a sua linha de A e a sua linha de B estão marcadas, e o Resultado mostra-as uma a seguir à outra, etiquetadas A e B, enquanto os conflitos 1 e 3 ainda aguardam uma escolha](../images/merge-editor-take-both.png)
+
 **Ficheiro todo** mostra o ficheiro inteiro em A e B com todas as diferenças
 coloridas, não só os conflitos:
 
@@ -82,6 +88,8 @@ O Resultado é um editor a sério: clique nele e escreva, selecione, corte e col
 pesquise com `Ctrl+F`. Uma escolha num conflito que editou à mão substitui a sua
 edição (`Ctrl+Z` recupera-a). Guardar com um conflito sem nada escolhido, ou com
 uma linha que ainda parece um marcador de conflito, pergunta primeiro.
+
+![O editor de merge com todos os conflitos tratados: o conflito 1 aceite de A, o conflito 2 dos dois lados, o conflito 3 escrito à mão no Resultado (marcado com um lápis e contado como editado), e o botão Guardar e marcar resolvido realçado na barra de ferramentas](../images/merge-editor-output-edited.png)
 
 ### ✦ Sugerir uma resolução (IA)
 
@@ -97,10 +105,23 @@ falha também aparece aí. Com a IA desligada, nenhum destes controlos existe.
 
 Depois de **Guardar e marcar resolvido**, o ficheiro fica staged e volta à lista
 de ficheiros em conflito; abra manualmente o ficheiro seguinte.
-`Ctrl+Z` (ou o botão Desfazer) desfaz o último "marcar resolvido". Quando já não
-resta nenhum ficheiro, o aviso oferece **Commit do merge** (ou **Continuar**
+`Ctrl+Z` (ou o botão Desfazer) desfaz o último "marcar resolvido".
+
+![Depois de Guardar e marcar resolvido: o aviso diz "Merge em curso, 1 ficheiro em conflito", o orbit.rs passou para Ficheiros staged e o logo.bin é o único ficheiro que resta em Ficheiros unstaged, marcado com um ! vermelho](../images/conflict-file-resolved.png)
+
+Quando já não resta nenhum ficheiro, o aviso oferece **Commit do merge** (ou **Continuar**
 para um cherry-pick, um revert ou um rebase) e **Abortar merge**, que pergunta
 primeiro: repõe HEAD, o índice e a cópia de trabalho onde estavam.
+
+![O aviso quando todos os ficheiros estão resolvidos: "Merge em curso, todos os conflitos resolvidos" com os botões Commit do merge e Abortar merge, e o ficheiro resolvido em Ficheiros staged](../images/conflict-commit-merge.png)
+
+Um rebase pára da mesma forma, passo a passo. O seu aviso nomeia a branch e aquilo sobre que é feito o rebase, e tem **Resolver conflitos...**, **Continuar**, **Saltar** e **Abortar**:
+
+![O aviso de um rebase parado em dois conflitos: "Rebase de feature/cleanup sobre ..." com Resolver conflitos..., Continuar, Saltar e Abortar, e os dois ficheiros em conflito no painel Status](../images/conflict-banner-rebase.png)
+
+Quando o último ficheiro está resolvido, o mesmo aviso fica pronto para **Continuar**:
+
+![O aviso do rebase depois de os dois ficheiros estarem resolvidos: só restam Continuar, Saltar e Abortar, e os dois ficheiros estão em Ficheiros staged](../images/conflict-banner-continue.png)
 
 Um merge cujo resultado é igual a HEAD (aceitou o nosso lado em todo o lado) não
 tem nada staged nem ficheiro alterado, mas ainda assim pode ser concluído:
@@ -130,6 +151,8 @@ escolha; escolher resolve e faz stage do ficheiro de imediato.
 | Eliminado num lado, alterado no outro | **Manter o ficheiro** (`k`), **Aceitar a eliminação** (`Shift+D`) |
 | Resto de renomeação (o caminho existe só num dos lados) | **Manter o ficheiro** (`k`), **Eliminar o ficheiro** (`Shift+D`) |
 | Ligação simbólica, submódulo, modo do ficheiro | **Manter A**, **Aceitar B**, **Aceitar Base** |
+
+![O cartão de um ficheiro alterado em A e eliminado em B: a caixa A mostra o tamanho e o modo do ficheiro, a caixa B diz "sem ficheiro aqui (eliminado)", a caixa da base mostra o original, e os botões são Manter o ficheiro e Aceitar a eliminação](../images/merge-editor-deleted-card.png)
 
 Quando o ficheiro é uma imagem (PNG, JPEG, GIF, WebP, BMP, ICO), as caixas
 mostram também as imagens de A, B e Base, ajustadas e só de leitura, numa janela

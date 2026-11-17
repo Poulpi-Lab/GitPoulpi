@@ -43,6 +43,8 @@ pub struct Outcome {
     pub target: Option<TargetId>,
     /// Test names libtest reported as FAILED (empty: none parseable).
     pub failed_tests: Vec<String>,
+    /// Top-level entries the job left in its temp directory (then removed).
+    pub leaked: usize,
     pub ok: bool,
     pub duration: Duration,
     pub output: String,
@@ -210,6 +212,23 @@ pub fn build(args: &[String]) -> Result<Vec<Job>, BuildError> {
     Ok(jobs_from_cargo_json(&stdout))
 }
 
+/// A fresh temp directory for one job, under the system temp dir, with a
+/// short name (`gpx-<pid>-<n>`): the job gets it as `TMPDIR`/`TMP`/`TEMP`, so
+/// whatever a test leaks there (a forgotten `TempDir`, a kept fixture, an
+/// image copy) is removed with the directory when the job ends.
+fn job_temp_dir() -> Option<PathBuf> {
+    static NEXT: AtomicUsize = AtomicUsize::new(0);
+    let n = NEXT.fetch_add(1, Ordering::SeqCst);
+    let dir = std::env::temp_dir().join(format!("gpx-{}-{n}", std::process::id()));
+    std::fs::create_dir_all(&dir).ok()?;
+    Some(dir)
+}
+
+/// Entries a job left in its temp directory (top level only).
+fn leaked_entries(dir: &Path) -> usize {
+    std::fs::read_dir(dir).map(|r| r.count()).unwrap_or(0)
+}
+
 fn run_job(job: &Job) -> Outcome {
     let started = Instant::now();
     let mut cmd = Command::new(&job.program);
@@ -218,6 +237,12 @@ fn run_job(job: &Job) -> Outcome {
         .stderr(Stdio::piped());
     if let Some(d) = &job.cwd {
         cmd.current_dir(d);
+    }
+    let temp = job_temp_dir();
+    if let Some(t) = &temp {
+        for k in ["TMPDIR", "TMP", "TEMP"] {
+            cmd.env(k, t);
+        }
     }
     for (k, v) in &job.envs {
         cmd.env(k, v);
@@ -242,10 +267,17 @@ fn run_job(job: &Job) -> Outcome {
     } else {
         test_failures::failed_test_names(&output)
     };
+    let leaked = temp.as_deref().map(leaked_entries).unwrap_or(0);
+    if let Some(t) = &temp {
+        // Best effort: on Windows a daemon a test left running can still hold
+        // a file; the next run's sweep (`sweep_stale_temp_dirs`) retries.
+        let _ = std::fs::remove_dir_all(t);
+    }
     Outcome {
         label: job.label.clone(),
         target: job.target.clone(),
         failed_tests,
+        leaked,
         ok,
         duration: started.elapsed(),
         output,
@@ -373,12 +405,37 @@ fn default_test_threads() -> String {
 /// PTY binaries, started only once no other binary is waiting) and prints
 /// progress. With `fail_fast`, no new job starts
 /// after the first failure.
+/// Removes the per-job temp dirs (`gpx-*`, see `job_temp_dir`) an earlier
+/// run could not delete (killed run, a Windows file still held), once they
+/// are older than any run.
+fn sweep_stale_temp_dirs() {
+    let Ok(entries) = std::fs::read_dir(std::env::temp_dir()) else {
+        return;
+    };
+    let max_age = Duration::from_secs(6 * 3600);
+    for e in entries.flatten() {
+        if !e.file_name().to_string_lossy().starts_with("gpx-") {
+            continue;
+        }
+        let old = e
+            .metadata()
+            .and_then(|m| m.modified())
+            .ok()
+            .and_then(|t| t.elapsed().ok())
+            .is_some_and(|age| age > max_age);
+        if old {
+            let _ = std::fs::remove_dir_all(e.path());
+        }
+    }
+}
+
 pub fn run_all(
     mut queue: Vec<Job>,
     jobs: usize,
     pty_limit: usize,
     fail_fast: bool,
 ) -> Vec<Outcome> {
+    sweep_stale_temp_dirs();
     let path = durations_path();
     let known = read_durations(&path);
     // Longest first; unknown binaries count as long so they are not left last.
@@ -523,6 +580,18 @@ pub fn report(outcomes: &mut [Outcome], wall: Duration) -> usize {
         println!("  {:>7.1}s  {}", o.duration.as_secs_f64(), o.label);
     }
     let busy: f64 = outcomes.iter().map(|o| o.duration.as_secs_f64()).sum();
+    let mut leaky: Vec<&Outcome> = outcomes.iter().filter(|o| o.leaked > 0).collect();
+    if !leaky.is_empty() {
+        leaky.sort_by(|a, b| b.leaked.cmp(&a.leaked).then_with(|| a.label.cmp(&b.label)));
+        let total: usize = leaky.iter().map(|o| o.leaked).sum();
+        println!(
+            "\ntemp leaks (removed with each binary's TMPDIR): {total} entries from {} binaries",
+            leaky.len()
+        );
+        for o in leaky.iter().take(15) {
+            println!("  {:>6}  {}", o.leaked, o.label);
+        }
+    }
     for o in &failed {
         println!("\n===== FAILED: {} =====\n{}", o.label, o.output.trim_end());
     }
@@ -636,6 +705,7 @@ warning: something else\n";
                 kind: "test".into(),
             }),
             failed_tests: names.iter().map(|s| s.to_string()).collect(),
+            leaked: 0,
             ok,
             duration: Duration::ZERO,
             output: String::new(),

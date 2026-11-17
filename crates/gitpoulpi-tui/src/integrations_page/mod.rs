@@ -459,7 +459,17 @@ impl Default for IntegrationsPage {
 fn default_trust_paths() -> Option<gitpoulpi_config::ConfigPaths> {
     #[cfg(test)]
     {
-        let dir = tempfile::tempdir().ok()?.keep();
+        // One parent per test process, a fresh child per page: a kept
+        // `tempdir()` per page left ~1700 empty folders in the system temp
+        // dir on every run of the unit tests.
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        static ROOT: std::sync::OnceLock<Option<tempfile::TempDir>> = std::sync::OnceLock::new();
+        static NEXT: AtomicUsize = AtomicUsize::new(0);
+        let root = ROOT.get_or_init(|| tempfile::tempdir().ok()).as_ref()?;
+        let dir = root
+            .path()
+            .join(NEXT.fetch_add(1, Ordering::Relaxed).to_string());
+        std::fs::create_dir(&dir).ok()?;
         Some(gitpoulpi_config::ConfigPaths::for_dir(dir))
     }
     #[cfg(not(test))]

@@ -396,6 +396,7 @@ impl FolderPicker {
                     self.content_scroll = (self.content_scroll as isize + delta).max(0) as usize;
                 } else if self.left_area.contains((col, row).into()) {
                     self.left_scroll = (self.left_scroll as isize + delta).max(0) as usize;
+                    self.reveal_current = false;
                 }
                 PickerOutcome::Stay
             }

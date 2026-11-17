@@ -138,3 +138,38 @@ fn the_checkbox_and_a_sibling_row_work_by_mouse_and_draw_the_fold_marks() {
     click(&mut picker, PickerHit::Left(a), false);
     assert_eq!(picker.dir, tmp.path().join("a"));
 }
+
+/// The open folder sits below many siblings (a busy temp dir): the tree
+/// scrolls to its row instead of staying on the first siblings, and keeps it
+/// in view when the siblings are turned on after the first draw.
+#[test]
+fn the_tree_scrolls_to_the_open_folder_below_many_siblings() {
+    let tmp = tempfile::tempdir().unwrap();
+    for i in 0..60 {
+        std::fs::create_dir(tmp.path().join(format!("aa-{i:02}"))).unwrap();
+    }
+    std::fs::create_dir_all(tmp.path().join("zz-open").join("leaf-inside")).unwrap();
+    let mut picker = picker_at(&tmp.path().join("zz-open"));
+    picker.on_key(alt_s());
+    settle(&mut picker);
+    assert!(picker.show_siblings);
+    let text = draw(&mut picker, 120, 30);
+    assert!(text.contains("zz-open"), "{text}");
+    assert!(text.contains("leaf-inside"), "{text}");
+    assert!(!text.contains("aa-00"), "{text}");
+
+    // A wheel scroll by the user is not undone by the next draw.
+    let before = picker.left_scroll;
+    let area = picker.left_area;
+    picker.on_mouse(
+        MouseEvent {
+            kind: MouseEventKind::ScrollUp,
+            column: area.x + 1,
+            row: area.y + 1,
+            modifiers: KeyModifiers::NONE,
+        },
+        false,
+    );
+    draw(&mut picker, 120, 30);
+    assert!(picker.left_scroll < before);
+}

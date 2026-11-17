@@ -417,6 +417,20 @@ impl FolderPicker {
     ) {
         let rows = self.left_rows();
         let height = area.height as usize;
+        if self.left_sel.is_some() {
+            self.reveal_current = false;
+        }
+        if self.reveal_current {
+            let current = rows
+                .iter()
+                .position(|r| matches!(r, LeftRow::Tree { current: true, .. }));
+            if let Some(cur) = current {
+                if cur < self.left_scroll || cur >= self.left_scroll + height {
+                    // A few rows of context above it, when there is room.
+                    self.left_scroll = cur.saturating_sub(height / 3);
+                }
+            }
+        }
         if self.follow {
             if let Some(sel) = self.left_sel {
                 if sel < self.left_scroll {

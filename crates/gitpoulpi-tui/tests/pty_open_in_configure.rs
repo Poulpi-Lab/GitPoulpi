@@ -31,14 +31,20 @@ fn click_text(term: &mut Terminal, text: &str) {
 /// A `PATH` that is the real one plus many empty directories: every program
 /// not found costs a probe per directory when asked one name at a time.
 fn long_path(junk: &std::path::Path) -> String {
-    // Windows caps the whole environment block at 32 KiB: fewer directories there.
-    let count = if cfg!(windows) { 500 } else { 6000 };
+    // A byte budget, not a directory count, so the temp dir's own length
+    // does not matter: Linux refuses a single variable over 128 KiB
+    // (MAX_ARG_STRLEN) and Windows caps the whole environment block at 32 KiB.
+    let budget = if cfg!(windows) { 24_000 } else { 100_000 };
     let mut dirs: Vec<std::path::PathBuf> =
         std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()).collect();
-    for i in 0..count {
+    let mut len: usize = dirs.iter().map(|d| d.as_os_str().len() + 1).sum();
+    let mut i = 0;
+    while len < budget {
         let d = junk.join(i.to_string());
         std::fs::create_dir(&d).unwrap();
+        len += d.as_os_str().len() + 1;
         dirs.push(d);
+        i += 1;
     }
     std::env::join_paths(dirs)
         .unwrap()

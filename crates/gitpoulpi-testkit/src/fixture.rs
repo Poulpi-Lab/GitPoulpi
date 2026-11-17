@@ -408,22 +408,38 @@ const FIXTURE_LOCAL_CONFIG: &str = concat!(
 /// Called by every `FixtureRepoBuilder`; the public name stays for tests
 /// that name the submodule allowance.
 pub fn allow_file_submodules() {
-    static GLOBAL: std::sync::OnceLock<tempfile::NamedTempFile> = std::sync::OnceLock::new();
-    let file = GLOBAL.get_or_init(|| {
-        let file = tempfile::NamedTempFile::new().expect("temp gitconfig");
-        std::fs::write(
-            file.path(),
-            "[protocol \"file\"]\n\tallow = always\n[core]\n\tautocrlf = false\n\teol = lf\n",
-        )
-        .expect("write the temp gitconfig");
+    // One shared file per temp dir, not a `NamedTempFile` per process: a
+    // static is never dropped, so each test binary used to leave its copy
+    // behind (tens of thousands in the system temp dir over a few gates).
+    static GLOBAL: std::sync::OnceLock<std::path::PathBuf> = std::sync::OnceLock::new();
+    const CONTENT: &str =
+        "[protocol \"file\"]\n\tallow = always\n[core]\n\tautocrlf = false\n\teol = lf\n";
+    let path = GLOBAL.get_or_init(|| {
+        let path = std::env::temp_dir().join("gitpoulpi-testkit-gitconfig");
+        if std::fs::read_to_string(&path).ok().as_deref() != Some(CONTENT) {
+            // Written beside, then renamed: a concurrent test binary never
+            // reads a half-written file.
+            let tmp =
+                tempfile::NamedTempFile::new_in(std::env::temp_dir()).expect("temp gitconfig");
+            std::fs::write(tmp.path(), CONTENT).expect("write the temp gitconfig");
+            if let Err(e) = tmp.persist(&path) {
+                // Another binary won the race (Windows refuses to replace an
+                // open file): fine as long as the content is the same.
+                assert_eq!(
+                    std::fs::read_to_string(&path).ok().as_deref(),
+                    Some(CONTENT),
+                    "shared test gitconfig: {e}"
+                );
+            }
+        }
         // A test that points `GIT_CONFIG_GLOBAL` at its own file keeps it.
         if std::env::var_os("GIT_CONFIG_GLOBAL").is_none() {
-            std::env::set_var("GIT_CONFIG_GLOBAL", file.path());
+            std::env::set_var("GIT_CONFIG_GLOBAL", &path);
         }
         std::env::set_var("GIT_CONFIG_NOSYSTEM", "1");
-        file
+        path
     });
-    debug_assert!(file.path().exists());
+    debug_assert!(path.exists());
 }
 
 /// The date `FixtureRepoBuilder::fixed_dates` stamps on every commit.

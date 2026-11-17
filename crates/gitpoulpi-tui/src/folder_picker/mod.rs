@@ -259,6 +259,10 @@ pub(crate) struct FolderPicker {
     drop_bar: bars::PickerBar,
     /// A key moved a selection: the next draw scrolls it into view.
     follow: bool,
+    /// The open folder changed (or the siblings appeared): draws scroll the
+    /// tree so its row is in view, again as ancestor listings arrive and
+    /// grow the tree above it, until the user scrolls or selects a row.
+    reveal_current: bool,
     pub message: Option<String>,
     pub hover: Option<PickerHit>,
     /// The last draw's hit rects, inner-first.
@@ -371,6 +375,7 @@ impl FolderPicker {
             content_bar: Default::default(),
             drop_bar: Default::default(),
             follow: false,
+            reveal_current: true,
             message: None,
             hover: None,
             hits: Vec::new(),
@@ -411,6 +416,7 @@ impl FolderPicker {
         self.want_ancestors();
         self.left_scroll = 0;
         self.left_sel = None;
+        self.reveal_current = true;
     }
 
     /// Queues the reads of the open path's ancestors (their sub-folders are the
@@ -547,6 +553,7 @@ impl FolderPicker {
         self.content_sel = None;
         self.content_scroll = 0;
         self.left_sel = None;
+        self.reveal_current = true;
         self.message = None;
         self.filter.clear();
     }

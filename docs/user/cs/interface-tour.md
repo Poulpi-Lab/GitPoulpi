@@ -47,7 +47,7 @@ Na jeho pravém konci tlačítko **Aktivita** otevře Protokol aktivity: kartu O
 a tlačítkem **Vymazat protokol**) a pole Rozsah, které obě zúží na tento repozitář, pracovní
 prostor nebo všechny repozitáře. Číslo na tlačítku počítá chyby, na které jste se ještě
 nepodívali. Vlevo od něj ukazuje indikátor úloh běžící úlohu na pozadí s `[x]` pro její
-zrušení. Karta **Domů** má stejný stavový řádek s tlačítkem Aktivita vpravo dole (otevře se
+zrušení (seznam úloh má **Zrušit vše** a paleta příkazů *Úlohy: zrušit vše, co jde zrušit*; úloha, kterou nelze bezpečně zastavit, uvede proč). Karta **Domů** má stejný stavový řádek s tlačítkem Aktivita vpravo dole (otevře se
 na volbě Všechny repozitáře). Když operace selže, stavový řádek ukáže důvod červeně
 v jakémkoli zobrazení a kliknutí na něj (nebo `Protokol aktivity: Otevřít poslední chybu`) otevře záznam v Protokolu aktivity s podrobnostmi, Kopírovat a navrženým dalším krokem. Obojí popisuje
 [Když něco selže](troubleshooting.md#když-něco-selže).

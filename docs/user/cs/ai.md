@@ -95,7 +95,7 @@ AI s GitPoulpi lze používat dvěma způsoby:
 4. Při více profilech zvolte dole **Výchozí profil**; každá akce může stále
    pojmenovat svůj vlastní.
 
-![Blok Profily na stránce AI pro lokálního agenta: Typ agenta (Claude Code), Příkaz, Argumenty, Model, dva řádky Env, Přidat a Odebrat proměnnou prostředí, Otestovat připojení a Výchozí profil](../images/settings-ai-agent.png)
+![Dolní část bloku Profily na stránce AI pro lokálního agenta: Režim spuštění, Argumenty, Model, Pracovní složka, Časový limit, dva řádky Env, Přidat proměnnou prostředí a Otestovat připojení](../images/settings-ai-agent.png)
 
 **Klíče API** se zadávají klávesou `Enter` na řádku **Klíč API** a ukládají se do
 systémového credential helperu (Git Credential Manager, libsecret / `pass`,

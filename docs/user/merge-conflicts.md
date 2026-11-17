@@ -35,7 +35,9 @@ sideways wheel), they are never wrapped.
 ## Picking
 
 Each conflict is a framed block in A and in B, with a checkbox on its header and a
-`+` / `✓` in front of every line.
+`+` / `✓` in front of every line. Right-click a chunk for the choices of that conflict:
+
+![A right-click menu on conflict 2 of the merge editor: Take A only, Take B only, A then B, B then A, Take nothing, Unpick, Edit in Output and Suggest resolution](images/merge-editor-chunk-menu.png)
 
 | To... | Key | Mouse |
 |---|---|---|
@@ -70,6 +72,10 @@ orange while it still needs a choice, green once handled, blue for the current o
 A click on a mark jumps to that conflict (a mark under the scrollbar's thumb is
 already on screen, so there the click drags the thumb).
 
+Taking both (**A then B**) writes A's lines and then B's under the conflict's marker in the Output, each tagged with its side; the `1st` / `2nd` badges on the two chunks say the order, and `s` swaps it:
+
+![Conflict 2 taken from both sides: its A line and its B line are checked, and the Output shows them one after the other, tagged A and B, while conflicts 1 and 3 still await a choice](images/merge-editor-take-both.png)
+
 **Full file** shows the whole file in A and B with every difference colored, not only the conflicts:
 
 ![Full file mode: the whole file in A and B, with the changes colored](images/merge-editor-full-file.png)
@@ -78,6 +84,8 @@ The Output is a real editor: click in it and type, select, cut and paste, find w
 `Ctrl+F`. A pick on a conflict you edited by hand replaces your edit (`Ctrl+Z`
 brings it back). Saving with a conflict that has nothing picked, or with a line
 that still looks like a conflict marker, asks first.
+
+![The merge editor with every conflict handled: conflict 1 taken from A, conflict 2 from both sides, conflict 3 typed by hand in the Output (marked with a pencil and counted as edited), and the Save & mark resolved button highlighted in the toolbar](images/merge-editor-output-edited.png)
 
 ### ✦ Suggest a resolution (AI)
 
@@ -92,10 +100,24 @@ there too. With AI off none of these controls exist.
 
 After **Save & mark resolved** the file is staged and the conflicted-files list is
 back; open the next file yourself. `Ctrl+Z` (or the Undo button)
-takes the last "mark resolved" back. When no file is left, the banner offers
+takes the last "mark resolved" back.
+
+![After Save & mark resolved: the banner reads "Merge in progress, 1 conflicted file", orbit.rs moved to Staged Files and logo.bin is the only file left under Unstaged Files, marked with a red !](images/conflict-file-resolved.png)
+
+When no file is left, the banner offers
 **Commit merge** (or **Continue** for a cherry-pick, a revert or a rebase) and
 **Abort merge**, which asks first: it puts HEAD, the index and the working tree
 back where they were.
+
+![The banner once every file is resolved: "Merge in progress, all conflicts resolved" with the Commit merge and Abort merge buttons, and the resolved file under Staged Files](images/conflict-commit-merge.png)
+
+A rebase stops the same way, step by step. Its banner names the branch and what it is rebased onto, and has **Resolve conflicts...**, **Continue**, **Skip** and **Abort**:
+
+![The banner of a rebase stopped on two conflicts: "Rebasing feature/cleanup onto ..." with Resolve conflicts..., Continue, Skip and Abort, and the two conflicted files in the Status pane](images/conflict-banner-rebase.png)
+
+Once the last file is resolved the same banner is ready to **Continue**:
+
+![The rebase banner after both files are resolved: only Continue, Skip and Abort remain, and both files sit under Staged Files](images/conflict-banner-continue.png)
 
 A merge whose result equals HEAD (you took our side everywhere) has nothing
 staged and no changed file, yet it can still be concluded: **Commit merge**
@@ -124,6 +146,8 @@ choice; choosing resolves and stages the file at once.
 | Deleted in one side, changed in the other | **Keep the file** (`k`), **Accept the deletion** (`Shift+D`) |
 | Rename leftover (the path exists on one side only) | **Keep the file** (`k`), **Delete the file** (`Shift+D`) |
 | Symlink, submodule, file mode | **Keep A**, **Take B**, **Take base** |
+
+![The card of a file changed in A and deleted in B: the A box shows the file's size and mode, the B box reads "no file here (deleted)", the base box shows the original, and the buttons are Keep the file and Accept the deletion](images/merge-editor-deleted-card.png)
 
 When the file is a picture (PNG, JPEG, GIF, WebP, BMP, ICO), the boxes also show
 the A, B and Base pictures, fitted and read-only, in a window wide enough for

@@ -125,6 +125,7 @@ Każdy z poniższych kanałów zapisuje obok programów ten sam znacznik `.gitpo
 | **MSI** (Windows, zarządzane) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Dla administratorów: wszyscy użytkownicy, bez aktualizacji w aplikacji. Zob. [Dystrybucja w przedsiębiorstwie](enterprise-distribution.md#msi-z-intune-lub-zasadami-grupy). |
 | **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (lub `paru -S gitpoulpi-bin`) | Bez pomocnika: `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, potem `cd gitpoulpi-bin && makepkg -si`. |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Pobiera archiwum wydania zamiast kompilować. |
+| **cargo, z crates.io** | `cargo install --locked gitpoulpi-cli` | Kompiluje; wymaga toolchaina Rust. Instaluje `gitpoulpi`, który uruchomiony bez podpolecenia otwiera interfejs terminalowy i obsługuje też MCP (`gitpoulpi mcp`). `gitpoulpi-tui` i `gitpoulpi-mcp` to te same programy jako samodzielne crate'y. |
 | **cargo, ze źródeł** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Kompiluje; wymaga toolchaina Rust. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | Zob. [Uruchamianie w Dockerze](docker.md). Ten sam obraz jest w `ghcr.io/poulpi-lab/gitpoulpi`. |
 

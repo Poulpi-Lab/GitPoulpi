@@ -138,7 +138,7 @@ ogni opzione di ogni pagina. Cliccala, oppure premi `/` o `Ctrl+F`, e scrivi.
 Compare un elenco di risultati. Ogni risultato mostra l'opzione e la sua pagina.
 `Su` / `Giù` scelgono, `Enter` va all'opzione, `Esc` chiude l'elenco.
 
-![Ricerca di «diff» nelle Impostazioni: le opzioni corrispondenti delle pagine Log e grafo, Diff ed editor e Git](../images/settings-search.png)
+![Ricerca di «diff» nelle Impostazioni: le opzioni corrispondenti delle pagine IA e Diff ed editor](../images/settings-search.png)
 
 ## Impostazioni dalla palette dei comandi
 
@@ -223,7 +223,7 @@ Aggiorna; solo **Crea** (per un collegamento che non esiste ancora) e **Rimuovi*
 
 **Raggruppamento nella barra delle applicazioni e nel dock.** GitPoulpi gira in una finestra di terminale, quindi la barra delle applicazioni di norma la mostra sotto l'icona del terminale, senza il punto «in esecuzione» sotto l'icona di GitPoulpi bloccata. Windows: i collegamenti portano l'AppUserModelID `GitPoulpi.GitPoulpi`, e un GitPoulpi avviato da uno di essi dà alla finestra del suo terminale lo stesso ID e la sua icona (trova la finestra dandole per un attimo un titolo univoco, poi ripristina il titolo), così la finestra si colloca sotto l'icona di GitPoulpi bloccata. Una finestra di terminale con più schede si sposta come un tutt'uno: tutte le sue schede si raggruppano sotto l'icona di GitPoulpi finché GitPoulpi vi gira. I collegamenti e i blocchi nella barra creati prima vengono riscritti dalla stessa sincronizzazione; se un blocco mostra ancora l'icona del terminale, sbloccalo e bloccalo di nuovo. Linux: kitty, foot, Alacritty, WezTerm e Ghostty vengono avviati con la classe di finestra `gitpoulpi` e la voce `.desktop` la nomina (`StartupWMClass`), così un dock raggruppa la finestra sotto l'icona del lanciatore; gli altri terminali mantengono la propria icona. macOS: niente da fare, il Dock raggruppa per app.
 
-![Impostazioni > Launcher: il terminale dei collegamenti e la riga del launcher delle applicazioni](../images/settings-launcher.png)
+![Impostazioni > Launcher: il terminale dei collegamenti, il launcher, i comandi e gli alias per aggiungere schede, lo stato degli alias e il controllo del PATH](../images/settings-launcher.png)
 
 #### Alias del comando e PATH, sistema per sistema
 
@@ -424,7 +424,7 @@ build che includono il server; vedi [MCP e agenti](mcp-and-agents.md).
 
 ### Aspetto
 
-![La pagina Aspetto: tema, avatar, colore dei campi di input, profondità colore e colori del grafo (i formati di data seguono sotto)](../images/settings-ui.png)
+![La pagina Aspetto scorsa verso il basso: sorgenti degli avatar e fallback, colore dei campi di input, profondità colore, cursore del testo e l'inizio dei colori del grafo (i formati di data seguono sotto)](../images/settings-ui.png)
 
 ![Il menu Tema aperto in Aspetto con Chiaro evidenziato: l'intera schermata delle Impostazioni si ridisegna già con quel tema](../images/settings-appearance-theme.png)
 

@@ -103,7 +103,7 @@ apre in una scheda propria. `Ctrl+W` chiude la scheda corrente.
 nuovo repository.
 In tutte e tre le finestre (e nel selettore di cartelle che aprono), `Ctrl+N` mostra un badge su ogni campo e pulsante: premi il carattere per portare il cursore nel campo o premere il pulsante.
 
-| ![La finestra Clona: dove clonare, l'URL, il nome della cartella e il pulsante Clona il repo](../images/clone.png) | ![La finestra Inizializza un repository: la cartella, il nome e il branch iniziale](../images/init.png) |
+| ![La finestra Clona: dove clonare, l'URL, il nome della cartella e i pulsanti Annulla e Clona](../images/clone.png) | ![La finestra Inizializza un repository: la cartella, il nome e il branch iniziale](../images/init.png) |
 |---|---|
 
 ### Checkout parziale

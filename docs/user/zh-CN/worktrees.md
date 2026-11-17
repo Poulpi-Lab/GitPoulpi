@@ -4,6 +4,8 @@
 
 worktree 是仓库的第二份检出副本：另一个文件夹，位于另一个分支上，共用同一份历史。引用窗格的 **WORKTREE** 分区会列出它们；主 worktree 标有 `（主）`。
 
+![一个带有两个关联 worktree 的仓库的引用窗格：WORKTREE 分区列出 main（主）、hotfix/axis-labels 和 feature/legend，其下是 SUBMODULES 分区](../images/worktrees.png)
+
 ## 显示该分区
 
 在还没有任何关联 worktree 的仓库中，该分区是隐藏的。若想仍然看到它（此时会显示“还没有 worktree：按 + 创建”），可以使用命令面板命令 **左侧窗格：显示 worktree 分区**，在侧栏的显示/隐藏列表中勾选 **WORKTREE**（右键点击某个分区标题），或者运行下面任何一个创建命令。GitPoulpi 会为该仓库记住这一选择（参见[设置](settings.md)中的 **左侧窗格分区**）；另一个没有 worktree 的仓库启动时仍然隐藏该分区。
@@ -17,6 +19,8 @@ WORKTREE 标题上的 **+**（键盘：在该分区中按 `+`；命令面板：*
 - **选择分支…**：对话框打开时停在它的 **worktree 分支** 列表上，用来打开一个已存在的分支。
 
 命令面板里有同样的三项（**引用：从当前分支创建 worktree**、**Git：在所选 commit 处创建 worktree…**、**引用：选择分支创建 worktree**）。旧的入口仍然可用：分支、tag 或 commit 菜单中的 **从 … 创建 worktree…**。
+
+![“创建 worktree”对话框：名称、文件夹、引用和 worktree 分支字段，“从 main 新建分支”一行，“将新 worktree 作为标签页打开”复选框，以及取消和创建按钮](../images/worktree-create.png)
 
 对话框会给出所有建议，你可以修改。**名称** 和新分支一开始都是 `worktree-<id>`，其中 `<id>` 是 8 位随机十六进制数（两者相同），因此两个 worktree 不会冲突。
 
@@ -44,6 +48,12 @@ WORKTREE 标题上的 **+**（键盘：在该分区中按 `+`；命令面板：*
 - **打开方式**：勾选了 **可打开 worktree** 的[打开方式](open-in.md)条目（设置 > 打开方式；默认每个条目都已勾选）。它们以该 worktree 的文件夹作为 `${cwd}` 运行。
 - **将 <branch> merge 到…**：选择要 merge 到的分支（默认是主 worktree 的分支）。普通的 merge 会在该分支被检出的那个 worktree 中运行，并使用你的 merge 选项；冲突由常规的冲突流程在那里解决。未在任何地方检出的分支会被拒绝，并说明原因。detached 的 worktree 不提供此项。
 - **移除 worktree…**：主 worktree 永远不行。
+
+![worktree 行的右键菜单：在新标签页中打开、打开方式、将 hotfix/axis-labels merge 到… 和移除 worktree…](../images/worktree-menu.png)
+
+**在新标签页中打开**（或双击，或 `Enter`）会把该 worktree 的文件夹作为独立的标签页打开，有它自己的 Log、状态和分支：
+
+![hotfix/axis-labels worktree 作为独立的标签页打开，位于主标签页旁边，显示它的 commit 和已更改的文件](../images/worktree-tab.png)
 
 命令面板对所选行有同样的操作（**引用：worktree 的打开方式…**、**引用：将 worktree 的分支 merge 到…**、**引用：移除 worktree…**、**引用：在标签页中打开 worktree**）。
 

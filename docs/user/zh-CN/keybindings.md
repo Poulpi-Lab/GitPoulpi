@@ -1410,11 +1410,11 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 
 ### Pull request 和议题
 
-有匹配的集成时，引用窗格会有一个 pull request 分区（GitLab：merge request）。有已连接的托管平台配置时，它还有一个议题分区。参见[托管平台与议题跟踪器](hosting-integration.md#5-侧栏中的-pull-request-和议题)。
+有匹配的集成时，引用窗格会有一个 pull request 分区（GitLab：merge request）。有已连接的托管平台配置时，它还有一个议题分区。参见[托管平台与议题跟踪器](pull-requests-and-issues.md#侧栏中的-pull-request-和议题)。
 
 | 按键 | 操作 |
 |---|---|
-| `Enter` | 打开所选行：议题（以及 Azure DevOps 或 Bitbucket 上的请求）以[对话](hosting-integration.md#5c-对话)打开，有评审的托管平台上的 pull request 在[评审](review.md)中打开，其他情况在浏览器中打开。在 `重新连接` 行上：打开该配置的设置 |
+| `Enter` | 打开所选行：议题（以及 Azure DevOps 或 Bitbucket 上的请求）以[对话](conversations.md)打开，有评审的托管平台上的 pull request 在[评审](review.md)中打开，其他情况在浏览器中打开。在 `重新连接` 行上：打开该配置的设置 |
 | `Space` | 展开或折叠该分区 |
 | `v` | 打开该分区的筛选。Pull request：打开、已 merge / 已关闭、全部。议题：打开、指派给我、已关闭、全部 |
 | `n` | Pull request 分区：创建 pull request。议题分区：新建议题。（标题栏的 `+` 按钮） |
@@ -1426,14 +1426,14 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 
 ### 议题看板
 
-议题标题上的**看板**（面板：**议题：打开看板**）会打开该议题来源的 Kanban 看板。见[看板](hosting-integration.md#5b-议题看板)和[本地议题](local-issues.md#kanban-看板)。下面的每个按键同时也是一条面板命令（**看板：…**）。
+议题标题上的**看板**（面板：**议题：打开看板**）会打开该议题来源的 Kanban 看板。见[看板](pull-requests-and-issues.md#议题看板)和[本地议题](local-issues.md#kanban-看板)。下面的每个按键同时也是一条面板命令（**看板：…**）。
 
 | 按键 | 动作 |
 |---|---|
 | 方向键 | 选择卡片（`Up`、`Down`）或相邻的列（`Left`、`Right`）；`Home`、`End`、`PageUp`、`PageDown` 在列内跳转 |
 | `Shift+Left`、`Shift+Right` | 把所选卡片移到上一列或下一列 |
 | `m` | **将卡片移到…**：列的下拉列表 |
-| `Enter` | 打开议题的[对话](hosting-integration.md#5c-对话)（托管平台没有可读对话时打开它的页面） |
+| `Enter` | 打开议题的[对话](conversations.md)（托管平台没有可读对话时打开它的页面） |
 | `e`、`.` | 编辑指派人、标签或里程碑；卡片菜单 |
 | `n` | 在所选列中新建议题 |
 | `a`、`l`、`M`、`/` | 按指派人、标签、里程碑、文本筛选。`x` 清除筛选 |
@@ -1457,7 +1457,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | `Alt+W` | 新建议题和 pull request 表单：在托管平台自己的网页上创建 |
 | `Esc` | 在 **AI 写作**面板中：停止正在运行的草稿，否则关闭面板 |
 
-在议题或请求的[对话视图](hosting-integration.md#5c-对话)中（命令面板行 *对话：…*；带按键的行在上面的面板列表中）：
+在议题或请求的[对话视图](conversations.md)中（命令面板行 *对话：…*；带按键的行在上面的面板列表中）：
 
 | 按键 | 操作 |
 |---|---|
@@ -1762,7 +1762,7 @@ AI 按键仅在 AI 开启时有效（参见 [AI 辅助](ai.md)）。`Esc` 取消
 
 | 按钮 | 按键 |
 |---|---|
-| 标题栏左侧的 🐙（关于） | 面板中的 `帮助：关于 GitPoulpi` |
+| 标题栏左侧的 <img src="../../../assets/logo/gitpoulpi.png" alt="GitPoulpi 图标" height="16">（关于） | 面板中的 `帮助：关于 GitPoulpi` |
 | 标题栏中的**打开方式** | `Alt+O`, `Ctrl+Alt+O` |
 | 标题栏右侧的 `×`（退出） | `q` |
 | 标题栏中的版本号（发行说明） | 面板中的 `帮助：发行说明` |

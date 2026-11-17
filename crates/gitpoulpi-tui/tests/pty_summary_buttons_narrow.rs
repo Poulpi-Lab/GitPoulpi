@@ -28,11 +28,11 @@ fn fixture() -> FixtureRepo {
         .build()
 }
 
-/// The summary row: two below the commit-options row ("[ ] Am", the Amend label may be clipped), past the box's
+/// The summary row: three below the commit-options row (the Skip hooks row sits between) ("[ ] Am", the Amend label may be clipped), past the box's
 /// top border.
 fn summary_row(screen: &Screen) -> Option<(u16, String)> {
     let (_, row) = screen.find("[ ] Am")?;
-    Some((row + 2, screen.line(row + 2)))
+    Some((row + 3, screen.line(row + 3)))
 }
 
 #[test]

@@ -184,8 +184,10 @@ other.
 - **Skip hooks** (`Shift+H`, or **Commit: Toggle Skip Hooks** in the palette) commits
   without running the repository's `pre-commit` and `commit-msg` hooks. It is
   per commit; **Settings > Repo-specific settings > Commit** makes it start
-  checked. On a narrow row its label shrinks to **No hooks**, then to the
-  checkbox alone (its tooltip names it); it never disappears.
+  checked. It has its own row right under **Amend previous commit**, with its full
+  label; only on a very narrow pane does the label shrink to **No hooks**, then to
+  the checkbox alone (its tooltip names it). It never disappears. On a very short
+  form it shares the Amend row instead, shrinking the same way.
 - `c` in the Status pane moves the caret to the form. `Esc` leaves it.
 - `Ctrl+G c` and `Ctrl+G Enter` (**Git: Commit...** and **Git: Commit Staged
   Changes Now** in the palette) are one command, the commit button from
@@ -212,8 +214,7 @@ edit; nothing is committed until you press the commit button.
 **Compose commits with AI** sits at the right end of the Amend row and shrinks
 with the right pane instead of disappearing: the full label, then **Compose
 with AI**, then the **`✦`** alone. It keeps its click, its tooltip and its
-key (`Ctrl+G Shift+C`) at every width; the Skip hooks label gives way to it
-(**No hooks**, then the box alone) before it shrinks itself.
+key (`Ctrl+G Shift+C`) at every width.
 
 The **`✦`** (generate the message) and **`#`** (insert an issue reference)
 buttons at the right end of the summary row shrink the same way: on a narrow

@@ -141,7 +141,7 @@ every option on every page. Click it, or press `/` or `Ctrl+F`, and type. A list
 of matches drops down. Each match shows the option and its page. `Up` / `Down`
 choose, `Enter` goes to the option, `Esc` closes the list.
 
-![Searching the Settings for "diff": the matching options from the Log & graph, Diff & editor and Git pages](images/settings-search.png)
+![Searching the Settings for "diff": the matching options from the AI and Diff & editor pages](images/settings-search.png)
 
 ## Settings from the command palette
 
@@ -222,7 +222,7 @@ shortcut that does not exist yet) and **Remove**.
 
 **Taskbar and dock grouping.** GitPoulpi runs inside a terminal window, so a taskbar normally shows it under the terminal's icon, with no "running" dot under the pinned GitPoulpi icon. Windows: the shortcuts carry the AppUserModelID `GitPoulpi.GitPoulpi`, and a GitPoulpi started from one gives its terminal window the same ID and icon (it finds the window through the terminal program that runs it, else by giving it a unique title for a moment, and keeps `GitPoulpi` as the window title; the steps are in the Activity log as `window grouping: ...`), so the window sits under the pinned GitPoulpi icon. Hold **Shift** while clicking the pinned icon to open a new window instead of showing the open one. A terminal window with several tabs moves as a whole: all its tabs group under GitPoulpi's icon while GitPoulpi runs in it. Shortcuts and taskbar pins made earlier are rewritten by the same sync; if a pin still shows the terminal's icon, unpin it and pin it again. The icon file name carries a hash of the picture (`gitpoulpi-<hash>.ico` in the GitPoulpi folder of the local app data), so a new logo color reaches the pinned button too; older files are deleted once no shortcut uses them. Linux: kitty, foot, Alacritty, WezTerm and Ghostty are started with the window class `gitpoulpi` and the `.desktop` entry names it (`StartupWMClass`), so a dock groups the window under the launcher's icon; other terminals keep their own icon. macOS: nothing to do, the Dock groups by app.
 
-![Settings > Launcher: terminal for shortcuts and the app launcher row](images/settings-launcher.png)
+![Settings > Launcher: terminal for shortcuts, launcher build, command and add-tab aliases, alias status and the PATH check](images/settings-launcher.png)
 
 #### Command alias and PATH, per system
 
@@ -426,7 +426,7 @@ the server; see [MCP and agents](mcp-and-agents.md).
 
 ### Appearance
 
-![The Appearance page: theme, avatars, input color, color depth and graph colors (the date formats follow below)](images/settings-ui.png)
+![The Appearance page scrolled down: avatar sources and fallback, input color, color depth, text cursor and the start of the graph colors (the date formats follow below)](images/settings-ui.png)
 
 ![The Theme combo open on Appearance with Light highlighted: the whole Settings screen already repaints in that theme](images/settings-appearance-theme.png)
 

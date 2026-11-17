@@ -303,7 +303,7 @@ shot_local-issues() {
   GPD_CONFIG_EXTRA=$(printf '\n[[integrations]]\nid = "notes"\nkind = "local_markdown"\nurl = "docs/issues"\ntoken_ref = "integration:notes"\nname = "notes"\nuser = { login = "mara" }\n'); export GPD_CONFIG_EXTRA
   restart_tui ""
   wait_text "Orbit chart flickers" 20
-  rclick_text "Orbit chart flickers" 1 2; wait_text "Close issue"; sleep 0.5
+  rclick_text "Orbit chart flickers" 1 25; wait_text "Close issue"   # click far right: the menu must not cover the section title; sleep 0.5
   shot local-issues; esc_all
   rm -rf "$GPD_ROOT/fx/orbit/docs/issues" "$GPD_ROOT/fx/orbit/.git/gitpoulpi"; unset GPD_CONFIG_EXTRA; stop_tui
 }
@@ -527,7 +527,12 @@ shot_settings-conflict-prevention() {   # the global Conflict prevention page
   shot settings-conflict-prevention
 }
 shot_settings-search()   { click_text "Search settings" 1 2; text "diff"; sleep 0.8; shot settings-search; esc; esc; }
-shot_settings-profiles() { settings_open; settings_page "Profiles"; settings_tab "Profiles"; shot settings-profiles; }
+shot_settings-profiles() {   # two identity profiles defined, the first selected
+  GPD_CONFIG_EXTRA=$(printf '\n[[profiles]]\nid = "work"\nname = "Work"\nauthor_name = "Mara Vance"\nauthor_email = "mara@orbit.example"\n\n[[profiles]]\nid = "personal"\nname = "Personal"\nauthor_name = "Mara Vance"\nauthor_email = ""\n'); export GPD_CONFIG_EXTRA
+  restart_tui ""
+  settings_open; settings_page "Profiles"; settings_tab "Profiles"; shot settings-profiles
+  esc_all; unset GPD_CONFIG_EXTRA; restart_tui ""
+}
 shot_settings-ssh()      { settings_page "SSH"; shot settings-ssh; }
 shot_settings-integrations() { settings_page "Integrations"; shot settings-integrations; }
 shot_settings-connect()  { settings_page "Integrations"; click_text "Connect" 2 2; sleep 0.8; shot settings-connect; click_text "Cancel" 1 2; }
@@ -544,7 +549,10 @@ shot_settings-log-graph-lanes() {
 }
 shot_settings-open-in() { GPD_CLEAN_ENV=1 restart_tui ""; settings_page "Open in"; settings_tab "Entries"; sleep 0.5; shot settings-open-in; }
 shot_settings-open-in-presets() { settings_page "Open in"; settings_tab "Entries"; click_text "+ Add" 1 3; sleep 0.8; shot settings-open-in-presets; esc; esc_all; GPD_CLEAN_ENV= restart_tui ""; }
-shot_settings-ui()       { settings_page "Appearance"; shot settings-ui; }
+shot_settings-ui()       {   # scrolled down to the color depth and graph colors
+  settings_page "Appearance"; local i; for i in $(seq 1 12); do find_text "Graph color theme" >/dev/null && break; wheel 100 30 1; sleep 0.3; done; sleep 0.5
+  shot settings-ui
+}
 shot_settings-editor()   { settings_page "Diff & editor"; shot settings-editor; }
 shot_settings-git()      { settings_page "Git & encoding"; shot settings-git; }
 shot_settings-repo-ai()  { settings_page "AI" 2; shot settings-repo-ai; esc_all; }
@@ -678,7 +686,7 @@ shot_open-with() {
 # --- toolbar and menus -------------------------------------------------------
 shot_undo-toolbar() {
   select_wip; click_text "Stage all changes" 1 3; sleep 1
-  hover_text "Undo" 1 2; shot undo-toolbar
+  raw '\e[<35;100;40M'; sleep 0.6; shot undo-toolbar   # pointer away: a tooltip would cover the lit Undo button
   click_text "Undo" 1 2; sleep 1; raw '\e[<35;5;30M'
 }
 shot_open-in-menu() { GPD_CLEAN_ENV=1 restart_tui ""; click_text "Open in ▾" 1 3; sleep 0.8; shot open-in-menu; esc; GPD_CLEAN_ENV= restart_tui ""; }
@@ -898,11 +906,13 @@ open_conflict() { # open_conflict <file>
 }
 shot_merge-editor-chunk-menu() {
   conflict_fresh orbit-conflict; open_conflict orbit.rs
+  key F7; sleep 0.5   # conflict 2 becomes the current one (the toolbar reads 2/3)
   rclick_text "] Conflict 2" 1 3; wait_text "A then B"; sleep 0.4
   shot merge-editor-chunk-menu; esc
 }
 shot_merge-editor-take-both() {
   conflict_fresh orbit-conflict; open_conflict orbit.rs
+  key F7; sleep 0.5   # conflict 2 becomes the current one (the toolbar reads 2/3)
   rclick_text "] Conflict 2" 1 3; wait_text "A then B"; click_text "A then B" 1 2; sleep 0.6
   shot merge-editor-take-both
 }
@@ -910,6 +920,7 @@ shot_merge-editor-take-both() {
 resolve_orbit() {
   open_conflict orbit.rs
   rclick_text "] Conflict 1" 1 3; wait_text "Take A only"; click_text "Take A only" 1 2; sleep 0.4
+  key F7; sleep 0.5   # conflict 2 becomes the current one (the toolbar reads 2/3)
   rclick_text "] Conflict 2" 1 3; wait_text "A then B"; click_text "A then B" 1 2; sleep 0.4
   rclick_text "] Conflict 3" 1 3; wait_text "Edit in Output"; click_text "Edit in Output" 1 2; sleep 0.6
   text "    (1.0 / a).sqrt().max(0.01)"; wait_text "1 edited"; sleep 0.4
@@ -973,7 +984,7 @@ open_issue() { # the conversation of issue #7, from its sidebar row
 shot_issues-sidebar() {
   conv_up
   wait_text "Crash when the planet" 20
-  GPD_MAXCOL=38 rclick_text "Crash when the planet" 1 2; wait_text "Open conversation"; sleep 0.4
+  GPD_MAXCOL=38 rclick_text "Crash when the planet" 1 25; wait_text "Open conversation"   # far right: the menu must not cover the section title; sleep 0.4
   shot issues-sidebar; esc
   conv_down
 }

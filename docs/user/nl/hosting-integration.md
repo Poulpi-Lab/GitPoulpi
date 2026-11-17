@@ -20,6 +20,17 @@ credential helper, nooit in `config.toml`. Gewone `git`-bewerkingen (fetch, pull
 push) hebben geen integratie nodig: ze gebruiken de inloggegevens die je `git`
 al heeft.
 
+**Waar nu heen.** Deze pagina is de installatie: tokens, verbinden, een repository koppelen, SSH-sleutels. Zodra een account is verbonden:
+
+- de secties PULL REQUESTS en ISSUES van de zijbalk, het issuebord, een pull request of issue maken, de chip in de werkbalk en verwijzingen in commit-berichten:
+  **[Pull requests en issues](pull-requests-and-issues.md)**;
+- de weergave in de app van één issue of verzoek, met zijn opmerkingen, schrijven en plaatsen als:
+  **[Gesprekken](conversations.md)**;
+- een verzoek lezen en reviewen met opmerkingendiscussies en een openstaande review:
+  **[Een pull of merge request reviewen](review.md)**;
+- de pull requests en issues van een hele workspace in één lijst:
+  **[De Radar](radar.md)**.
+
 ## 1. Maak een token op de host
 
 Het verbindingsformulier heeft een link *Een token genereren op <host>*. Die opent de tokenpagina
@@ -270,559 +281,7 @@ De lijst van een profiel dat je eerder hebt geopend, verschijnt meteen uit een o
 
 Weigert de host het token, dan toont het dialoogvenster in plaats van de lijst *kon repositories niet weergeven* met de reden (en de opgeslagen kopie wordt verwijderd); de andere bronnen blijven werken.
 
-## 5. Pull requests en issues in de zijbalk
-
-### PULL REQUESTS
-
-De sectie heeft een kop met het aantal en een `+` (een pull request maken),
-de keuzelijsten voor provider en project, een zoekvak en een statuskeuzelijst (*Open*,
-*Merged / gesloten*, *Alle*). Daarna komen vier groepen, elk met hun aantal:
-
-- **Mijn Pull Requests**: jij bent de auteur.
-- **Aan mij toegewezen**.
-- **Wacht op mijn review**: jij bent een gevraagde reviewer.
-- **Alle Pull Requests**: aan het begin ingeklapt.
-
-Het zoekvak filtert elke groep (titel, nummer, auteur, branch). Elke wijziging van de
-statuskeuzelijst vraagt de host opnieuw.
-
-Een rij begint met een statussymbool: `●` open (groen), `○` concept, `◆` merged
-(paars), `✕` gesloten (rood). Het verzoek van de uitgecheckte branch is vetgedrukt.
-Rijen lezen `#12  title` (GitHub, Bitbucket) of `!53  title` (GitLab,
-Azure DevOps).
-
-### ISSUES
-
-De sectietitel noemt de provider: `GITHUB ISSUES`, `JIRA ISSUES`, enzovoort.
-Hij leest `... WERKITEMS` voor Azure DevOps en `... KAARTEN` voor Trello.
-Onder de keuzelijsten: een zoekvak, de statuskeuzelijst (*Open*,
-*Aan mij toegewezen*, *Gesloten*, *Alle*) en de issues. Een Jira-rij leest
-`ABC-12  title`, met het type en de status gedimd als de zijbalk breed genoeg
-is.
-
-### Acties op een rij
-
-- `Enter` of een dubbelklik opent de rij: een pull request in de [review](review.md) (GitHub, GitLab, Gitea,
-  Forgejo, Gerrit), een issue, en een verzoek op Azure DevOps of Bitbucket, als [gesprek](#5c-gesprekken)
-  in het venster, en al het andere in je browser. **Openen in browser** in het rijmenu opent altijd de browser.
-- Rechtsklik, of `.`, opent het rijmenu:
-  - **Gesprek openen** (issues, en verzoeken die geen reviewweergave hebben), **Openen in browser**, **URL kopiëren**,
-    **Nummer kopiëren**.
-  - Voor een pull request: **Bewerken op <provider>**, **Bronbranch uitchecken**,
-    **Commits van bronbranch tonen**. Voor een verzoek uit een fork heet uitchecken
-    **Pull request uitchecken (fork)**, en **Tonen** is grijs.
-  - Voor een issue: **Branch maken van issue**. Het opent de prompt voor een nieuwe branch
-    met een naam als `12-fix-the-thing` (of `ABC-123-fix-the-thing` voor
-    Jira).
-  - Op GitHub, GitLab, Gitea en Forgejo heeft een rij met pull request ook **Reviewen...**
-    (ook **Enter** op de rij): de review in de app, zie
-    [Een pull request reviewen](review.md).
-  - Op GitHub, GitLab, Gitea en Forgejo hebben beide soorten rijen ook **Toegewezenen bewerken...**,
-    **Labels bewerken...** en **Mijlpaal instellen...** (en **Reviewers bewerken...** bij
-    een pull request): zie
-    [Toegewezenen, reviewers, labels en mijlpaal](#toegewezenen-reviewers-labels-en-mijlpaal).
-- **Bewerken op <provider>** heeft drie andere ingangen: het potlood `✎` aan het
-  rechteruiteinde van een rij met pull request waar je overheen beweegt of die is geselecteerd, `e` op de geselecteerde rij, en
-  de opdracht *Integraties: Gekoppelde pull request bewerken op de host*
-  (voor het verzoek van de uitgecheckte branch).
-- Als de bronbranch nog niet in de repository zit, zegt GitPoulpi dat. Fetch
-  eerst (`Ctrl+G f`).
-
-**Een pull request uitchecken.** GitPoulpi fetcht het verzoek in een lokale
-branch `pr/<n>` (`mr/<n>` op GitLab) die het volgt, en schakelt ernaar over. Op
-GitHub, GitLab, Gitea en Forgejo werkt dit ook voor forks (GitPoulpi fetcht de speciale head-
-ref van de host). Azure DevOps en Bitbucket fetchen de bronbranch van het
-verzoek. Een verzoek uit een fork wordt daar geweigerd: voeg de fork als remote toe en
-check zijn branch zelf uit. Ongedaan maken keert terug naar de vorige branch. CLI:
-`gitpoulpi hosting checkout-pr <n>`.
-
-**Een pull request reviewen vanaf de opdrachtregel (en door een agent).** Op GitHub
-(ook Enterprise), GitLab (ook self-managed), Gitea en Forgejo kan een verzoek worden
-gelezen en gereviewd zonder GitPoulpi te verlaten: `hosting review show <n>` (bestanden,
-samenvoegstatus, checks), `hosting review threads <n>` (reviewdiscussies en
-gesprek), `hosting review comment`, `hosting review reply`, `hosting review resolve`
-en `hosting review submit <n> --event approve|request-changes|comment
---comment path:line[:side]:text`. Het verschil komt uit je repository, niet van de
-host: `hosting review fetch <n>` haalt de head van het verzoek op naar
-`refs/gitpoulpi/pr/<n>` en zijn doelbranch naar `refs/gitpoulpi/pr/<n>-base`
-(geen van beide is een branch, er wordt niets uitgecheckt). Regelnummers zijn die van dat
-verschil: `new` is de regel in de head, `old` de regel in de merge base. GitLab
-kent geen reviewstatus "wijzigingen aanvragen": die wordt daar geweigerd, zonder dat er iets wordt verstuurd.
-Gitea en Forgejo nemen een opmerking op slechts één regel (geen bereiken); een discussie zijn de
-opmerkingen bij één regel van een bestand. Gitea kan een discussie oplossen, Forgejo 11 niet
-(de host heeft er geen endpoint voor: de aanroep zegt het). Een reactie op een server
-zonder reactie-endpoint wordt geplaatst als een review met één opmerking op dezelfde regel.
-Gitea weigert je eigen verzoek goed te keuren of af te wijzen.
-Zonder kloon: voeg `--project owner/name` (GitLab: `group/project`) toe aan `review show`, `threads`,
-`comment`, `reply`, `resolve`, `submit` en `suggest` om een project te reviewen dat niet de huidige repository is,
-`hosting review diff <n> --project P` leest het verschil (hunks per bestand) uit de API van de host, en
-`hosting file <path> --project P [--ref R]` leest een bestand op een revisie (GitHub, GitLab, Gitea, Forgejo en Gerrit; bij Gerrit wordt het verschil van een
-patchset bestand voor bestand gelezen en komt het bestand van de branch of, voor een commit-id, van de commit). Een bestand dat de host
-niet in het verschil toont (te groot) is gemarkeerd als `omitted`.
-De MCP-tools zijn dezelfde opdrachten (`hosting_review_show`, `hosting_review_submit`, `hosting_review_diff`,
-`hosting_file`...).
-
-### Toegewezenen, reviewers, labels en mijlpaal
-
-Op GitHub (ook Enterprise), GitLab (ook self-managed), Gitea en
-Forgejo kun je wijzigen aan wie een pull request of issue is toegewezen, wie het reviewt, zijn labels
-en zijn mijlpaal zonder GitPoulpi te verlaten. Andere providers tonen niets daarvan.
-
-- **Rijmenu**: **Toegewezenen bewerken...**, **Reviewers bewerken...** (alleen pull requests),
-  **Labels bewerken...**, **Mijlpaal instellen...**.
-- **Palet**: *Hosting: Toegewezenen bewerken...*, *Hosting: Reviewers bewerken...*,
-  *Hosting: Labels bewerken...*, *Hosting: Mijlpaal instellen...* tonen elk eerst de
-  verzoeken en issues van de zijbalk om uit te kiezen. In het
-  [Radar](radar.md) werken dezelfde vier op de geselecteerde rij.
-- De kiezer opent meteen en laadt de mensen of labels van het project (en wat
-  het item nu heeft) van de host. Na ongeveer 150 ms verschijnt een spinnerrij.
-  Typ om te filteren (een fuzzy match), `Up` / `Down` bewegen, `Space` vinkt aan of
-  uit, `Enter` past toe, `Esc` annuleert, `Tab` bereikt de knoppen. Een klik
-  op een rij vinkt hem aan, en het wiel scrolt. Mensen tonen een initialenbadge,
-  labels hun kleur.
-- De mijlpaal is een keuzelijst (met **Geen mijlpaal** om hem te wissen).
-- Na **Toepassen** is de host bijgewerkt, en tonen de lijsten en de Radar de
-  wijziging na hun volgende vernieuwing, die meteen start.
-
-De formulieren voor maken (een pull request, een issue) hebben dezelfde keuzes als een rij
-knoppen: `Toegewezen: geen`, `Reviewers: geen`, `Labels: geen`,
-`Mijlpaal: geen`. Op GitHub, GitLab, Gitea en Forgejo vervangt de knop Labels het getypte
-labelveld van het issueformulier. Als een host de nieuwe pull request aanneemt maar
-sommige van zijn labels of mensen weigert, zegt de statusbalk dat.
-
-CLI: `gitpoulpi hosting members|labels|milestones`, `hosting pr-edit <n>`,
-`hosting issue edit <n>`, en `--assignee`, `--reviewer`, `--label`,
-`--milestone` bij `hosting pr` en `hosting issue create`; zie de
-[CLI-naslag](cli-reference.md).
-
-### Toetsen in de secties
-
-| Toets | Actie |
-|---|---|
-| `Enter` / dubbelklik | open het gesprek in GitPoulpi waar de host er een heeft (een pull request op GitHub, GitLab, Gitea of Gerrit opent de review), anders de browser |
-| `o` | open de rij in de browser |
-| `.` / rechtsklik | rijmenu |
-| `e` | bewerk de geselecteerde pull request op de host |
-| `n` | nieuwe pull request (PULL REQUESTS) of nieuw issue (ISSUES) |
-| `v` | open de statuskeuzelijst |
-| `r` | vernieuwen |
-| `Enter` / `Space` op een kop | klap de sectie in of uit |
-
-### Opnieuw verbinden en offline
-
-Als het token ontbreekt, is geweigerd of een scope mist, leest de eerste rij van de
-sectie `Opnieuw verbinden (token geweigerd)`. Klik erop, of druk op `Enter`, om
-het profiel te openen in Instellingen > Integraties.
-
-Als de host niet bereikbaar is, blijven de laatste lijsten op het scherm staan en toont de kop
-hun leeftijd (`· 5m oud`). Het laatste antwoord wordt ook op schijf gecachet
-(`.gitpoulpi/hosting-cache.json`), zodat de lijsten verschijnen voordat het netwerk
-antwoordt.
-
-## 5b. Het issuebord
-
-De knop **Bord** in de kop van ISSUES (palet: **Issues: Bord openen**) toont de issues van de gekoppelde bron als kanban-
-bord over het venster. De kolommen hangen van de bron af:
-
-| Bron | Kolommen | Een kaart verplaatsen |
-|---|---|---|
-| Lokale Markdown-notities | de statussen (`statuses` van het profiel, daarna elke andere die in gebruik is) | herschrijft de `status` van de notitie |
-| GitHub, GitLab, Gitea, Forgejo | **Open**, dan de labels die je koos, dan **Gesloten** | verwisselt het statuslabel; naar **Gesloten** sluit het het issue, naar een kolom opnieuw heropent het |
-| Trello | de open lijsten van het board, van links naar rechts | verplaatst de kaart naar de lijst |
-| Redmine | de issuestatussen | wijzigt de status van het issue (de workflowregels van Redmine gelden) |
-| Jira (Cloud en Data Center) | de statussen van het project, to-do eerst, klaar laatst | voert de workflowovergang uit die naar de kolom leidt (`GET`, dan `POST .../transitions`); zonder zo'n overgang gaat de kaart terug en zegt de statusbalk `no transition from X to Y` |
-| Azure DevOps (Services en Server) | de staten van de work-itemtypen van het project, per statuscategorie | stelt `System.State` in; een work-item waarvan het type de staat van de kolom mist gaat terug, met de reden (`a Bug has no state Done`) |
-
-Op een GitHub- of GitLab-project vraagt **Kolommen** (of `c`, of **Bord: Kolomlabels instellen...**) om de labels die de
-kolommen zijn, op volgorde, bijvoorbeeld `status::todo, status::doing, status::review`. Het stelt de labels van het project voor die
-op statussen lijken. De keuze wordt voor de repository bewaard. Zonder labels is het bord Open / Gesloten. Een kaart verplaatsen
-raakt alleen de statuslabels die je noemde: zijn andere labels blijven. Een hostbord toont de open issues en de 60 meest
-recent gesloten.
-
-Een Jira-overgang die om verplichte velden vraagt (bijvoorbeeld een resolutie) wordt door Jira geweigerd en de kaart gaat
-terug met de eigen melding van Jira: doe die op de site.
-
-Hetzelfde bord is beschikbaar voor scripts en agents: `gitpoulpi hosting board` drukt de kolommen met hun kaarten af en
-`gitpoulpi hosting board move <card> <column>` verplaatst er een (zie [de CLI-referentie](cli-reference.md)).
-
-Een kaart toont het nummer, de titel, de toegewezenen als initialen, de labels en de mijlpaal. Sleep hem naar een andere kolom,
-of `Shift+Left` / `Shift+Right`, of **Bord: Kaart verplaatsen naar...** (`m`). Hij verplaatst direct; na ongeveer 150 ms zegt een spinner
-dat de host nog bezig is, en als de host weigert, gaat de kaart terug en zegt de statusbalk waarom. `Enter` opent
-het [gesprek](#5c-gesprekken) van het issue in GitPoulpi, en het bord komt terug als je het sluit; `e` bewerkt toegewezenen, labels en mijlpaal; `n` start een nieuw issue in
-de geselecteerde kolom; `a`, `l`, `M` en `/` filteren op toegewezene, label, mijlpaal en tekst, `x` wist de filters; `r`
-leest de host opnieuw. Het bord leest opnieuw als de lijsten van de zijbalk vernieuwen. De Radar heeft geen bord.
-
-## 5c. Gesprekken
-
-Een **gesprek** is alles wat over één issue, werkitem, kaart, wijziging of pull / merge request is gezegd: de
-beschrijving, de opmerkingen, de reviews, de discussies bij code en de gebeurtenissen (labels, toewijzingen,
-statuswijzigingen, pushes). GitPoulpi leest het van de host, toont het opgemaakt en laat je antwoorden zonder het venster te
-verlaten.
-
-### Een gesprek openen
-
-| Vanuit | Hoe |
-|---|---|
-| Een rij ISSUES | `Enter` of een dubbelklik; **Gesprek openen** in het rijmenu; palet *Hosting: Issuegesprek openen...* (een lijst van de issues op het scherm). **Openen in browser** in het rijmenu houdt de browser. |
-| Een rij PULL REQUESTS op Azure DevOps of Bitbucket | `Enter` of **Gesprek openen**. Op GitHub, GitLab, Gitea, Forgejo en Gerrit opent de rij de [review](review.md), waarvan de pagina Overzicht ditzelfde gesprek is (de tijdlijn, de toetsen en het opmerkingenvak eronder). |
-| Een kaart van het [issuebord](#5b-het-issuebord) | `Enter` of een dubbelklik. |
-| De [Radar](radar.md) | `i` op een issue- of verzoekrij, **Gesprek openen** in het rijmenu, of *Radar: Issuegesprek openen*. |
-| Een verwijzing in een ander gesprek | Klik erop (of `l`, kies dan): `#7`, `!12`, `ABC-12` van een gekoppelde bron openen in de app en komen op een Terug-stapel. |
-| Een agent | `gitpoulpi ui show issue <n> --view conversation` (ook `ui show pr`), zie [de CLI-naslag](cli-reference.md). |
-
-**Repositories die niet gekloond zijn.** Een Radar-rij van een repository waarvan je geen kloon hebt, opent ook zijn gesprek: de
-weergave heeft alleen het integratieprofiel en het project nodig, dus de Radar toont hem over zijn eigen venster, en `Esc` geeft
-de Radar terug. Wat een kloon nodig heeft, valt weg: een commitverwijzing opent op de host in plaats van in het Log, en
-*AI de repository laten lezen* is grijs met zijn reden (zie [het hoofdstuk over AI](ai.md#schrijfhulp-op-een-host)). Een verzoek
-van een gekloonde repository heeft in plaats daarvan zijn review (`e`), en **Gesprek openen** in de Radar zegt dat er hier
-geen gesprek te lezen is; een issue van een gekloonde repository opent het in het tabblad van die repository.
-
-Een issue van een host die er geen heeft om te lezen (Bitbucket en Gerrit hebben geen issues) opent de browser zoals eerder, en een
-build zonder de feature `conversation` doet overal hetzelfde ([aangepaste builds](custom-builds.md)).
-
-### De weergave
-
-Een weergave over het hele venster: de kop (status, wie het opende en wanneer, de labels, het aantal opmerkingen,
-**Gebeurtenissen tonen**, **Terug**, **Vernieuwen**, **Openen in browser**), de regel **Plaatsen als**, de tijdlijn, en eronder het
-opmerkingsvak.
-
-- De tijdlijn leest van oud naar nieuw en begint op het nieuwste venster (hoogstens 300 items). **Oudere laden** bovenaan
-  (`m`, palet *Gesprek: Oudere items laden*) leest het venster ervoor, met het aantal dat nog komt als de host dat zegt.
-- Een opmerking toont zijn auteur, datum, een chip `bewerkt`, een chip `bot` voor bots, `intern` voor privénotities, en de
-  knoppen **Antwoorden**, **Citeren**, **Bewerken**, **Verwijderen** en **Links** die het geselecteerde item toestaat. Een
-  discussie bij code toont `pad:regel`, `opgelost` of `niet opgelost`, `verouderd`, en zijn opmerkingen. Een review toont zijn
-  oordeel.
-- Gebeurtenissen zijn elk één gedempte regel (*carol voegde het label lfs toe*). **Gebeurtenissen tonen** (`v`) verbergt ze; de
-  keuze wordt per repository bewaard. Hosts zonder gebeurtenissengeschiedenis (YouTrack, werkitems van Azure DevOps, lokale
-  notities) hebben dat selectievakje niet.
-- De tekst wordt als Markdown weergegeven: koppen, geneste lijsten en takenlijsten, citaten, meldingen in GitHub-stijl,
-  gemarkeerde code, tabellen, links, afbeeldingen als `[image: alt]`. Tekst die in de eigen opmaak van de host binnenkwam, wordt
-  eerst omgezet (zie [Opmaakconversie](#opmaakconversie)). Een codeblok `mermaid` krijgt een knop **Diagram openen** die de bron
-  van het diagram in een scrollbare weergave toont (`Enter` kopieert hem); het palet heeft *Gesprek: Diagram van item openen*.
-  Het vereist een build met zowel `conversation` als `mermaid`.
-- In het Overzicht van de review is de `pad:regel` van een codediscussie een link naar de code (`G`, *Gesprek: Code van discussie openen*;
-  zie [Review](review.md)); in een gesprek dat los is geopend (een issue, een Radar-rij) is er geen codepagina om naartoe te gaan.
-- De weergave leest elke 60 seconden opnieuw en bij `F5` (**Vernieuwen**).
-
-**Toetsen.** Elke heeft een knop, een menurij of een paletrij (*Gesprek: ...*), en `Ctrl+N` geeft de knoppen een badge.
-
-| Toets | Actie |
-|---|---|
-| `Up`, `Down`, `Ctrl+J`, `Ctrl+K`, `j`, `k` | Vorig / volgend item |
-| `PageUp`, `PageDown`, `Home`, `End`, het wiel, de schuifbalk | Scrollen |
-| `Tab`, `Shift+Tab` | Tijdlijn, opmerkingsvak, daarna de knoppen in de kop |
-| `r` | Antwoorden: in de discussie van het geselecteerde item, of met zijn tekst geciteerd waar de host geen discussies heeft |
-| `Q` | Het geselecteerde item citeren in een nieuwe opmerking |
-| `c` | Nieuwe opmerking |
-| `e`, `d` | Een van je eigen opmerkingen bewerken, verwijderen (voor een verwijdering komt een vraag) |
-| `l`, `Enter` | De links van het item: `Enter` volgt de enige, of opent het menu ervan |
-| `y`, `o` | Het adres van het item kopiëren, het in de browser openen |
-| `n` | Volgend nieuw item |
-| `v`, `m`, `F5` | Gebeurtenissen tonen of verbergen, Oudere laden, Vernieuwen |
-| `Alt+Left`, `Backspace` | Terug langs de Terug-stapel |
-| `q`, `Esc` | Sluiten (vraagt eerst als het vak tekst bevat) |
-
-### Schrijven
-
-**Nieuwe opmerking** (`c`, of `Tab` naar het vak), **Antwoorden** (`r`), **Citeren** (`Q`) en **Bewerken** (`e`) gebruiken
-dezelfde Markdown-composer: **Schrijven**, **Voorbeeld** en **Gesplitst** (`Alt+P` wisselt Schrijven en Voorbeeld, `Alt+L` zet
-Gesplitst aan en vraagt een venster van 100 kolommen). `Ctrl+Enter` (ook `Ctrl+S` en `Alt+Enter`) of **Verzenden** plaatst,
-**Annuleren** laat het vak vallen, en `Alt+E` opent **Schrijven met AI** waar AI aan staat ([het hoofdstuk over
-AI](ai.md#schrijfhulp-op-een-host)). Het voorbeeld wordt door dezelfde renderer opgemaakt als de tijdlijn, met dezelfde
-verwijzingen. Als de host geen Markdown aanneemt, noemt de voettekst de opmaak waarin de tekst wordt verstuurd (*Verzonden als
-Jira wiki markup*, *Verzonden als Textile*).
-
-- De opmerking wordt direct aan de tijdlijn toegevoegd en neemt zijn plaats in als de host antwoordt. Weigert de host, dan
-  verdwijnt het item en opent het vak opnieuw met je tekst en de reden.
-- Een tekst die je niet hebt verzonden, wordt per item bewaard (`remote-conversations.toml` in de configuratiemap) en staat er de
-  volgende keer dat je dat vak opent; verzenden of weggooien verwijdert hem. Een vak met tekst sluiten vraagt eerst.
-- **Antwoorden** op een discussie (een reviewdiscussie, een GitLab-discussie, een Linear-opmerking, een discussie van Bitbucket
-  of Azure DevOps) plaatst in die discussie. Waar de host alleen een platte lijst heeft, begint **Antwoorden** een nieuwe
-  opmerking met het geselecteerde item geciteerd (`> **auteur**`), net als **Citeren**.
-- **Interne notitie** (selectievakje, `Alt+I`): op GitLab en Redmine is de opmerking alleen zichtbaar voor projectleden. Het
-  wordt alleen getoond op hosts die zulke notities hebben, en alleen bij een nieuwe opmerking.
-- Plaatsen is een uitgaande actie: niets wordt gejournaliseerd en **niets kan vanuit GitPoulpi ongedaan worden gemaakt**. Zonder
-  verbinding blijft het vak staan, is **Verzenden** grijs met de reden, en zegt de kop dat de bewaarde kopie wordt getoond.
-
-**Wie mag bewerken of verwijderen.** Alleen je eigen opmerkingen hebben **Bewerken** en **Verwijderen**. Het eigen woord van de host
-gaat voor als hij er een geeft (`viewerCanUpdate` en `viewerCanDelete` van GitHub, elders `can_edit`), daarna je login tegen de
-auteur van de opmerking, vergeleken zonder hoofdlettergevoeligheid; opmerkingen van een App-bot moeten ook van een botaccount
-komen. Zolang de login van een GitHub App-bot niet bekend is, tellen alleen opmerkingen die deze installatie plaatste (de
-repository bewaart hun id's): uit een naam wordt niets geraden. In een discussie werken **Bewerken** en **Verwijderen** op de
-laatste opmerking ervan die van jou is. Een host die niet kan bewerken of verwijderen (zie [de tabel](#wat-elke-host-niet-kan))
-toont de knoppen grijs met de reden.
-
-### Plaatsen als
-
-De regel onder de kop zegt als wie je berichten worden geplaatst, en dezelfde regel staat in elk vak:
-
-| Regel | Betekenis |
-|---|---|
-| *Plaatsen als ann (persoonlijk token)* | Het token van het profiel: je eigen login (`GET /user`). |
-| *Plaatsen als ci-bot (tokencommando van de repository)* | Het [tokencommando](#13d-optreden-als-github-app-bot) van de repository wordt voor de host-API gebruikt. |
-| *Plaatsen als my-app[bot] (GitHub App-bot)* | Een installatietoken. De naam komt van **Plaatsen als**, anders van de host. |
-| *Plaatsen als de GitHub App-bot (zijn naam is nog niet bekend: stel Plaatsen als in bij Instellingen)* | Geen naam ingesteld, nog geen geleerd. |
-| *Plaatsen als ... (projectbot)* | Een toegangstoken van een GitLab-project of -groep. |
-| *Schrijven als kai (lokale notitie)* | Een map Markdown-notities: de `local.me` van het profiel, anders de verbonden gebruiker. |
-| *Nog niet bekend als wie je zou plaatsen. Stel Plaatsen als in bij Instellingen.* | Er kon niets worden geleerd. |
-
-**Plaatsen als** is een naam: voor een GitHub App is het `my-app[bot]`. Stel hem in voor elke repository in **Instellingen >
-Integraties > Plaatsen als** (`general.hosting_post_as`), of voor één repository in **Instellingen > Repositoryspecifieke
-instellingen > SSH & inloggegevens > Hosting**, wat voorgaat. Leeg gelaten vraagt GitPoulpi het aan GitHub (GraphQL `viewer {
-login }`, wat een installatietoken wel of niet kan beantwoorden) en leert anders de naam van de auteur van de eerste opmerking
-die het plaatst en bewaart hem bij de repository. Een persoonlijk token heeft hem nooit nodig. Zie
-[Optreden als GitHub App-bot](#13d-optreden-als-github-app-bot).
-
-### Kruisverwijzingen
-
-Verwijzingen in een gesprek zijn onderstreept en klikbaar. De gekoppelde bronnen ISSUES en PULL REQUESTS van de repository worden
-eerst gematcht, dus `ABC-12` van een gekoppeld Jira-project opent in de app, zelfs binnen een GitHub-opmerking; wat de eigen
-grammatica van de host toevoegt, opent zijn pagina na de linkbevestiging. Een commit-id opent in het Log als de repository
-gekloond is en het id minstens 7 tekens heeft, anders op de host. Niets in een codefragment, een afgeschermd blok, een
-Markdown-link, een e-mailadres of een URL is een verwijzing, en `C#1`, `UTF-8`, `SHA-256` en `ISO-8601` ook niet.
-
-| Host | Herkend |
-|---|---|
-| GitHub | `#7`, `GH-7`, `owner/repo#7`, `owner/repo@sha`, `@login`, commit-id's |
-| GitLab | `#7`, `!7`, `group/project#7`, `group/project!7`, `project#7` (een zusterproject), `@user`, `~label` en `%milestone` als chips, commit-id's |
-| Gitea, Forgejo | `#7`, `!7`, `owner/repo#7`, `owner/repo@sha`, `@user`, commit-id's |
-| Azure DevOps | `#7`, `!7`, `AB#7`, `@user` |
-| Bitbucket | `@user`, vermeldingen met `{uuid}`, commit-id's |
-| Gerrit | `Change-Id`-waarden (`I` en 40 hexadecimale cijfers), commit-id's |
-| Redmine | `#7`, revisies `r123`, `commit:abc1234` |
-| Jira, Linear, YouTrack | `ABC-12`, alleen voor een project of team van een gekoppelde bron |
-| Trello | kaartadressen (`trello.com/c/...`) |
-| Lokale notities | `[[note]]`, `[[note\|alias]]` en relatieve `.md`-links naar een andere notitie van de map |
-
-`gitpoulpi hosting markdown --body T --id I` drukt af wat de app van een tekst maakt, verwijzingen inbegrepen.
-
-### Opmaakconversie
-
-Hosts die geen Markdown spreken, worden in beide richtingen omgezet, zodat je overal Markdown leest en schrijft. Wat een
-converter niet begrijpt, blijft leesbare tekst.
-
-- **Jira** (Cloud en Data Center) bewaart opmerkingen als wiki-markup via API v2. Wat je leest, wordt naar Markdown omgezet; wat
-  je schrijft, wordt naar wiki-markup omgezet, en de voettekst zegt *Verzonden als Jira wiki markup*.
-- **Redmine** maakt tekst op als Textile of Markdown, wat de API niet zegt: de rij **Tekstindeling van de server** van het profiel
-  (Instellingen > Integraties, `markup`, standaard Textile) vertelt het aan GitPoulpi. Textile wordt voor het lezen naar Markdown
-  omgezet en voor het schrijven terug naar Textile.
-- **Azure DevOps Server** geeft opmerkingen van werkitems als HTML en neemt ze als HTML aan: ze worden getoond als de Markdown
-  die ervan is omgezet en als HTML geschreven. Azure DevOps Services en discussies van pull requests nemen Markdown.
-- **Gerrit** is platte tekst: het wordt niet als Markdown weergegeven en wat je schrijft, wordt verstuurd zoals getypt.
-- Elke importeur verwijdert eerst stuur- en escapesequenties, zodat een opmerking de terminal niet kan verplaatsen.
-
-### De bewaarde kopie, Oudere laden, ongelezen
-
-- Elk gesprek dat je opent, wordt bewaard (`<statusmap>/conversations/<integratie>/<project>/<soort>-<n>.json`, alleen voor de
-  gebruiker, geen token erin, hoogstens 2 MB per bestand, de 50 meest recente bestanden bewaard). Het wordt direct getekend als
-  het item opent en erachter vernieuwd. Als de host niet bereikbaar is, blijft de bewaarde kopie op het scherm onder *Offline:
-  kopie getoond die 3 min geleden is bewaard (reden)* en is Verzenden grijs.
-- **Ongelezen:** wat je het laatst zag, wordt per gesprek onthouden (de laatste 200 worden bewaard). Items van iemand anders die
-  nieuwer zijn, krijgen een accentbalk en een chip `nieuw`, en `n` springt naar het volgende. Een gesprek dat je voor het eerst
-  opent, heeft niets nieuws.
-
-### Wat elke host niet kan
-
-Elke `nee` hieronder is een echte limiet: het bedieningselement is verborgen of grijs met de reden, en de CLI antwoordt met een
-fout die de host noemt voordat er iets wordt verstuurd.
-
-| Host | Items | Antwoord in een discussie | Eigen bewerken en verwijderen | Een discussie oplossen | Gebeurtenissen | Interne notities | Geschreven als |
-|---|---|---|---|---|---|---|---|
-| GitHub | issues, pull requests | pull requests | beide | pull requests | ja | nee | GitHub Markdown |
-| GitLab | issues, merge requests | ja (discussies) | beide | merge requests | ja | ja | GitLab Markdown |
-| Gitea | issues, pull requests | pull requests | beide | pull requests | ja | nee | Markdown |
-| Forgejo | issues, pull requests | pull requests | beide | nee (de host heeft geen endpoint) | ja | nee | Markdown |
-| Azure DevOps | werkitems, pull requests | pull requests | beide | nee (status getoond, niet gewijzigd) | alleen pull requests | nee | Markdown (HTML bij werkitems van Server) |
-| Bitbucket (Cloud, Data Center) | alleen pull requests | ja | beide | nee (getoond, niet gewijzigd) | ja | nee | Markdown |
-| Gerrit | alleen wijzigingen | ja | nee (geen van beide kan worden bewerkt of verwijderd) | ja | ja | nee | platte tekst |
-| Jira | issues | nee (platte lijst) | beide | nee | ja (changelog) | nee (vraagt een projectrol) | wiki-markup |
-| Linear | issues | ja (antwoorden op een opmerking) | beide | nee | ja | nee | Markdown |
-| YouTrack | issues | nee | beide | nee | nee | nee | Markdown |
-| Redmine | issues | nee | alleen bewerken (Redmine 5 en later), nooit verwijderen | nee | ja (journals) | ja (privénotities) | Markdown of Textile |
-| Trello | kaarten | nee | beide | nee | ja (verplaatsingen) | nee | Markdown |
-| Lokale notities | notities | nee | alleen die van de lokale auteur | nee | nee | nee | Markdown |
-
-Ook: geen host laat je vanuit het gesprek een nieuwe discussie bij een regel beginnen (doe dat in de review), en reacties worden
-alleen op GitHub getoond. Een tekst die langer is dan de host aanneemt, wordt geweigerd (GitHub 65.536 tekens, GitLab 1.000.000,
-Azure DevOps 150.000, Jira 32.767, Trello 16.384): de CLI controleert eerst, in de app wordt het eigen bericht van de host getoond
-en blijft je tekst bewaard. Een lokale notitie bewaart zijn opmerkingen in een laatste sectie `## Comments` van het notitiebestand
-zelf, elk als een item `### auteur - tijd`, dus ook Obsidian en een shell zien ze.
-
-Op de opdrachtregel zijn dezelfde gesprekken `gitpoulpi hosting issue comments`, `issue comment`, `comment-edit` en
-`comment-delete`, en `hosting review conversation` (zie [de CLI-naslag](cli-reference.md)); voor agents zijn het MCP-tools met
-dezelfde namen (zie [MCP en agents](mcp-and-agents.md)).
-
-## 6. Een pull request maken
-
-Open het formulier met de `+` in de kop PULL REQUESTS, `n` in de sectie, of
-de opdracht *Pull requests: Pull request maken...*. Een branchmenu
-heeft ook **Een pull request starten vanaf <branch>...**.
-
-Het formulier heeft:
-
-- Eén tabblad per verbonden profiel dat pull requests heeft (`Left` / `Right` op
-  de tabbalk).
-- Keuzevakken **Van repo / Branch** en **Naar repo / Branch**. Lange lijsten zijn
-  doorzoekbaar. Je kunt een branch of repository typen die de lijsten niet tonen.
-- **Titel**, ingevuld met het onderwerp van de tip-commit.
-- **Beschrijving**, op meerdere regels (`Enter` voegt een nieuwe regel toe, `Tab` verlaat het
-  veld).
-- Knoppen **Toegewezen**, **Reviewers**, **Labels** en **Mijlpaal** (GitHub,
-  GitLab, Gitea en Forgejo), die de kiezer openen.
-- **Als concept indienen**.
-- Met [AI](ai.md) aan: **Titel en beschrijving genereren**.
-
-Het formulier opent op het profiel, de repository en de branches van de uitgecheckte
-branch (`feature -> main`). Een andere bronrepository maakt een verzoek
-vanuit een fork.
-
-**Pull Request maken** (of `Ctrl+S`) maakt het verzoek op de host. Het
-resultaat opent in je browser en de statusbalk noemt het.
-
-## 7. Een issue maken
-
-Als de sectie ISSUES een provider **en** een project heeft, heeft de kop een
-`+` (*Nieuw issue*). Ook: `n` in de sectie, of de opdracht
-*Hosting: Nieuw issue...*.
-
-Het formulier heeft **Titel** (verplicht), **Beschrijving** (meerdere regels) en
-**Labels** (door komma's gescheiden, bijvoorbeeld `bug, ui`; op GitHub, GitLab, Gitea en Forgejo openen de
-knoppen Labels, Toegewezen en Mijlpaal in plaats daarvan de kiezer). Jira en Azure DevOps
-voegen een keuzelijst **Type** toe. Trello voegt een keuzelijst **Lijst** toe. Linear en YouTrack
-voegen een keuzelijst **Status** toe (de workflowstatus, of de waarde van `State`, waarin het issue
-begint). Redmine voegt een keuzelijst **Type** toe met de trackers van het project (Bug, Feature,
-Support...); het heeft geen labels, dus er is geen knop Labels voor en een label
-op de opdrachtregel wordt geweigerd. Het formulier vult deze
-keuzelijsten vanaf de host als het opent.
-
-**Issue maken** (of `Ctrl+S`) maakt het op de host. `Esc` of **Annuleren**
-sluit het formulier. Als de host weigert (token geweigerd, ontbrekende scope, onbekend
-project, onbekend label), toont het formulier de reden en behoudt het wat je typte.
-Bij succes noemt de statusbalk het nieuwe issue en wordt de sectie ISSUES
-vernieuwd.
-
-CLI: `gitpoulpi hosting issue create --title ... [--body ... | --body-file ...]
-[--label ...] [--type ...] [--list ...]`.
-
-## 8. Maak aan op de eigen webpagina van de host
-
-Het formulier Nieuw issue en het formulier Pull Request maken hebben een
-knop **Maak aan op <provider>**, rechtsboven. De toets is `Alt+W`. Het opent het
-webformulier van de host in je browser, ingevuld met wat je tot nu toe hebt getypt. Het
-dialoogvenster blijft open. Het heeft geen token nodig en doet geen API-aanroep, dus het werkt ook
-na een API-fout.
-
-- GitHub heeft geen URL-parameter voor *concept*, dus het conceptvakje wordt niet
-  meegenomen. GitLab krijgt een titelvoorvoegsel `Draft: `.
-- GitLab neemt labels alleen op id aan, dus ze worden toegevoegd als een snelle actie `/label ~"x"`
-  aan het eind van de beschrijving.
-- Een zeer lange beschrijving wordt afgekapt zodat de URL onder 6000 tekens blijft,
-  met een opmerking `[...truncated: paste the rest]`.
-- Bitbucket Data Center heeft geen adres voor een webformulier, dus het heeft geen
-  knop **Maak aan op <provider>**.
-
-CLI: `gitpoulpi hosting issue create ... --web` en `gitpoulpi hosting pr --web`
-drukken dezelfde URL af.
-
-## 9. De chip in de werkbalk
-
-Aan het uiteinde van de werkbalk (standaard rechts) toont een chip het verzoek van de uitgecheckte
-branch: `GH #12` (GitHub), `GL !53` (GitLab), `AZ !12` (Azure DevOps) of
-`BB #12` (Bitbucket). Zijn kleur toont de status: groen open, grijs concept,
-paars merged, rood gesloten.
-
-- Beweeg erover voor de titel, de status en `source → target`.
-- Klik erop, of druk op `Ctrl+G g`, om het verzoek in de browser te openen.
-- Rechtsklik erop voor **Openen in browser**, **URL kopiëren**, **Vernieuwen** en
-  **Profiel wisselen**.
-
-Een gepushte branch zonder verzoek toont een gedimde chip `+ PR`. Klik erop om een
-pull request te starten. Er is geen chip als geen profiel overeenkomt, als de branch niet
-is gepusht, of als de host niet bereikt kon worden. In een smal venster is de chip
-verborgen om ruimte te houden voor de werkbalkknoppen.
-
-## 10. Wanneer de lijsten vernieuwen
-
-De lijsten vernieuwen:
-
-- als je een repository opent;
-- als de uitgecheckte branch verandert;
-- na een push of een fetch;
-- elke *Vernieuwing pull requests & issues (minuten)*
-  (`general.hosting_refresh_minutes`, standaard 5, `0` zet de timer uit;
-  Instellingen > Integraties);
-- als je Instellingen sluit;
-- als je `r` indrukt, *Integraties: Pull requests en issues vernieuwen* uitvoert, of
-  een filter wijzigt.
-
-Verzoeken blokkeren het venster nooit.
-
-Hosts beperken hoeveel aanroepen je kunt doen. GitPoulpi stuurt de `ETag` van het
-laatste antwoord terug, dus een ongewijzigde lijst kost weinig (niets op GitHub). Als een
-host meldt dat er weinig aanroepen over zijn, zegt de statusbalk dat. Als er geen
-over zijn, stopt GitPoulpi met die host te vragen tot de limiet reset, en blijven de lijsten
-zoals ze zijn.
-
-## 11. Terminologie
-
-GitHub, Azure DevOps en Bitbucket zeggen "pull request". GitLab zegt "merge
-request". *Terminologie voor reviewverzoeken* (`ui.pr_terminology`, op
-Instellingen > Integraties) kiest het woord voor elk label, menu, palet-
-opdracht en elke melding:
-
-- **Auto (per host)**: volgt de gekoppelde provider van de repository ("Pull
-  Request" zolang niets is gekoppeld).
-- **Pull request** of **Merge request**: altijd dat woord.
-
-De wijziging geldt meteen. De CLI en MCP zeggen altijd "pull/merge request".
-Deze pagina zegt "pull request".
-
-## 12. Verwijzingen in commit-berichten en branchnamen
-
-Als de issues of pull requests van de repository zijn gekoppeld, zijn verwijzingen in
-het commit-bericht van de Commit-details onderstreept. Een klik opent de gekoppelde
-pagina. Toetsenbord: de opdracht
-*Integraties: Commit-verwijzing openen (#issue / !verzoek)...* (een menu als het
-bericht meerdere verwijzingen heeft). Een repository zonder koppeling heeft geen
-links.
-
-Wat als verwijzing telt, hangt af van de provider van de sectie ISSUES:
-
-| ISSUES gekoppeld aan | In een bericht | In een branchnaam |
-|---|---|---|
-| GitHub, GitLab, Gitea, Forgejo | `#123` | `123-fix-login` |
-| Azure DevOps | `#123` en `AB#123` | `123-fix-login` |
-| Jira | `ABC-123`, alleen als `ABC` de sleutel van het gekoppelde project is. Tekst als `UTF-8`, `SHA-256` of `ISO-8601` is nooit een link. | `ABC-123` overal in de naam (`feature/ABC-123-x`), in hoofdletters |
-| Linear | `ENG-123`, alleen als `ENG` de sleutel van het gekoppelde team is (of van een team in de teamlijst van het profiel). `UTF-8` is nooit een link. | De eigen `branchName` van Linear als je de branch van een issue maakt; `ENG-123` overal in de naam wordt teruggelezen |
-| YouTrack | `ABC-123`, alleen als `ABC` de korte naam van het gekoppelde project is (of van een project in de projectlijst van het profiel) | `ABC-123` overal in de naam |
-| Redmine | `#123`, alleen als Redmine de gekoppelde ISSUES-bron is (een pull-requestbron houdt zijn eigen teken) | `123-fix-login` |
-| Trello | een adres `https://trello.com/c/<shortLink>`; `#12` alleen als een gecachete kaart nummer 12 heeft | `12-fix-login` |
-
-| PULL REQUESTS gekoppeld aan | In een bericht |
-|---|---|
-| GitLab, Azure DevOps | `!45` |
-| GitHub, Bitbucket, Gitea, Forgejo | `#45` |
-
-Als beide lijsten `#N` herkennen, wint het issue. CLI:
-`gitpoulpi hosting refs --message TEXT | --commit REV | --branch NAME`.
-
-**In gesprekken.** De tekst van een issue of verzoek wordt gelezen met de grammatica van zijn host, die breder is dan de tabel
-hierboven: `owner/repo#7`, `!7`, `GH-7`, `@login`, commit-id's en de andere vormen die staan in
-[Kruisverwijzingen](#kruisverwijzingen). De gekoppelde bronnen van de repository worden eerst gematcht, dus een Jira-sleutel in een
-GitHub-opmerking opent nog steeds zijn issue in de app. `gitpoulpi hosting markdown --body TEXT --id I` toont wat de app in een
-tekst vindt.
-
-### Een issueverwijzing invoegen
-
-In de commit-composer opent de knop `#▾` aan het rechteruiteinde van de Samenvatting
-een filterbare lijst van de gekoppelde issues. Het issue dat de huidige branch noemt
-staat eerst, gemarkeerd met *(van branch)*. `Enter` of een klik voegt de verwijzing
-(`ABC-123`, `#12`, `AB#12`) in bij de cursor. Toetsenbord: `Alt+R` in de composer.
-Palet: *Commit: Issue-verwijzing invoegen...*. Zonder gekoppelde issuelijst is de
-knop grijs en zegt hij *koppel eerst een issuelijst in de zijbalk*.
-GitPoulpi voegt nooit zelf een verwijzing toe.
-
-## 13. SSH-sleutels
+## 5. SSH-sleutels
 
 ### SSH-sleutel per profiel
 
@@ -863,7 +322,7 @@ De globale sleutel op Instellingen > SSH & inloggegevens (*Pad van privésleutel
 *Sleutelpaar genereren*) geldt voor elke repository zonder eigen keuze.
 Het sleutelbestand of de pin van een repository wint ervan.
 
-## 13b. Branchbescherming, voor het herschrijven van de geschiedenis
+## 6. Branchbescherming, voor het herschrijven van de geschiedenis
 
 Als je de geschiedenis herschrijft ([de werkbank](history-rewrite.md)), vraagt GitPoulpi de host
 welke branches hij beschermt, zodat ze standaard buiten de herschrijving blijven. Dat gebeurt alleen
@@ -885,7 +344,7 @@ repository) wordt voor GitHub, GitLab, Azure DevOps en Bitbucket opgebouwd uit d
 repository, ook als de repository niet is gekoppeld, en getoond met de drie uitwegen als de host een
 push weigert.
 
-## 13c. Accountbrede lijsten in de Radar
+## 7. Accountbrede lijsten in de Radar
 
 De Radar bewaakt normaal de repositories die je hebt gekloond. Een profiel kan ook tonen wat jou aangaat op de
 hele host, gekloond of niet, met drie schakelaars in zijn tabel `[integrations.radar]` (standaard allemaal uit; zie de
@@ -940,7 +399,7 @@ zet een lijst aan, `gitpoulpi hosting radar --json` drukt de lijsten af (en
 `--refresh` slaat de cache over). AI-agents hebben dezelfde twee opdrachten via MCP
 (`hosting_radar`, `hosting_integrations_radar`).
 
-## 13d. Optreden als GitHub App-bot
+## 8. Optreden als GitHub App-bot
 
 Een project dat de naam van een persoon niet mag tonen, kan alles op de host doen
 via een **GitHub App**: elke opmerking, review, sluiting of heropening en labelwijziging
@@ -975,7 +434,7 @@ Wat er voor die repository verandert:
   Niets wordt als fout getoond.
 - **Plaatsen als.** Elk bericht dat GitPoulpi plaatst, wordt getoond met de naam waarmee het wordt geplaatst
   (*Plaatsen als my-app[bot] (GitHub App-bot)* onder de kop van een
-  [gesprek](#plaatsen-als) en in zijn opmerkingsvak; `posted_as` in het CLI-antwoord). Met een persoonlijk token is dat
+  [gesprek](conversations.md#plaatsen-als) en in zijn opmerkingsvak; `posted_as` in het CLI-antwoord). Met een persoonlijk token is dat
   je login (`GET /user`). Met een App-token is het de naam **Plaatsen als**, bijvoorbeeld `my-app[bot]`: stel hem in voor
   elke repository in **Instellingen > Integraties** (`general.hosting_post_as`, ook
   `gitpoulpi config set general.hosting_post_as my-app[bot]`) of voor één repository in **Instellingen > Repositoryspecifieke
@@ -1012,7 +471,7 @@ onmogelijk in de issues en pull requests van die repository, wie het ook vraagt:
 `--allow` zet hem weer uit; alleen een persoon kan weer toestaan (de MCP-server
 kan het niet).
 
-## 14. Vanaf de opdrachtregel
+## 9. Vanaf de opdrachtregel
 
 ```
 echo $TOKEN | gitpoulpi hosting login --id my-gitlab --token-stdin
@@ -1045,7 +504,7 @@ deze sessie in het geheugen leeft.
 ## Bekende beperkingen
 
 - **Pull requests uit forks:** Azure DevOps en Bitbucket kunnen een verzoek uit een fork niet
-  uitchecken (zie [Acties op een rij](#acties-op-een-rij)). Azure
+  uitchecken (zie [Acties op een rij](pull-requests-and-issues.md#acties-op-een-rij)). Azure
   DevOps kan geen pull request maken vanuit een fork.
 - **Trello** toont hooguit de eerste 1000 kaarten van een board. Gebruik het lijstfilter
   om het te beperken. **Jira**, **Linear** en **YouTrack** tonen hooguit 500
@@ -1085,7 +544,7 @@ deze sessie in het geheugen leeft.
   Een nieuw Jira-issue krijgt een beschrijving in platte tekst.
 - **Gesprekken:** de nieuwste 300 items laden eerst (**Oudere laden** voor de rest); een opmerking, een bewerking of een
   verwijdering die vanuit GitPoulpi is geplaatst, is uitgaand en kan er niet mee ongedaan worden gemaakt; wat elke host niet kan, staat in
-  [de tabel](#wat-elke-host-niet-kan). Op Gerrit kan een bericht of opmerking niet worden bewerkt of verwijderd, en Gerrit-tekst
+  [de tabel](conversations.md#wat-elke-host-niet-kan). Op Gerrit kan een bericht of opmerking niet worden bewerkt of verwijderd, en Gerrit-tekst
   is plat.
 - Het maken van een pull request, werkitem, issue of kaart gebeurt op de host en
   **kan niet ongedaan worden gemaakt** vanuit GitPoulpi. Het uitchecken van een verzoek kan normaal

@@ -7,7 +7,7 @@ je schreef, die waarin om jouw review wordt gevraagd, de issues die aan jou zijn
 gemaakt, en de repositories waarin je werk in uitvoering liet staan. Het is het venster Start met de
 Radar-weergave erbovenop, zodat niets eronder een klik of toets kan afpakken.
 
-Hij heeft een codehost-profiel nodig (zie [Hosting en issuetrackers](hosting-integration.md)) en
+Hij heeft een codehost-profiel nodig (zie [Hosting en issuetrackers](hosting-integration.md); de lijsten van één repository staan in [Pull requests en issues](pull-requests-and-issues.md), en de discussie van een rij opent als [gesprek](conversations.md)) en
 repositories die eraan gekoppeld zijn, of een profiel met zijn accountbrede lijsten ingeschakeld (zie "Voorbij het bereik: accountbrede rijen" hieronder).
 Een repository die niet gekoppeld is wordt nooit bevraagd: ze toont
 een regel **Koppelen...** (zie "Repositories met iets te melden" hieronder).

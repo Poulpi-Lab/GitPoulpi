@@ -10,7 +10,7 @@ goedkeuring en verzoeken om wijzigingen. Je hebt een profiel nodig voor een van 
 geen reviews. De grenzen van een host worden gerespecteerd: GitLab kent geen oordeel *Wijzigingen aanvragen* en neemt
 één regel per opmerking. Deze pagina noemt ze allemaal een *verzoek*.
 
-![De reviewweergave, pagina Overzicht: de kop van het verzoek met zijn metadataknoppen, de beschrijving en het gesprek met een ingediende goedkeuring](../images/review-overview.png)
+![De reviewweergave, pagina Overzicht: de kop van het verzoek met zijn metadataknoppen, de beschrijving, een onopgeloste en een opgeloste codediscussie, de opmerkingen en het opmerkingenvak](../images/review-overview.png)
 
 ![De pagina Bestanden: de gewijzigde bestanden met hun vakjes voor bekeken, het verschil met een opmerkingendiscussie onder zijn regel, en een opgeloste discussie buiten de getoonde regels](../images/review-files.png)
 
@@ -37,7 +37,7 @@ Altijd zichtbaar: het nummer en de titel, de status (Open, Concept, Samengevoegd
 of het zonder conflicten kan worden samengevoegd of conflicten heeft, de omvang, en **`3 conceptopmerkingen`** als je er hebt geschreven.
 
 De vier metadataknoppen - **Toegewezen**, **Reviewers**, **Labels**, **Mijlpaal** - openen dezelfde kiezers als
-de zijbalk (zie [Toegewezenen, reviewers, labels en mijlpaal](hosting-integration.md#toegewezenen-reviewers-labels-en-mijlpaal));
+de zijbalk (zie [Toegewezenen, reviewers, labels en mijlpaal](pull-requests-and-issues.md#toegewezenen-reviewers-labels-en-mijlpaal));
 de kop toont het resultaat zodra de host het heeft overgenomen. De actieknoppen: **Uitchecken** (de gebruikelijke
 checkout van de branch van het verzoek, die ook de weergave sluit), **Openen in browser**, **Vernieuwen**
 (**`F5`**) en **Review afronden**.
@@ -50,7 +50,7 @@ Een segmentbesturing in de bovenrand wisselt van pagina: **Overzicht**, **Bestan
 ### Overzicht
 
 Het Overzicht is **het gesprek van het verzoek**, dezelfde tijdlijn en hetzelfde opmerkingenvak als een issue heeft
-([Gesprekken](hosting-integration.md#5c-gesprekken)): eerst de beschrijving (*opende dit*), dan de opmerkingen, de
+([Gesprekken](conversations.md)): eerst de beschrijving (*opende dit*), dan de opmerkingen, de
 discussies bij code met hun diff-fragment, de ingediende reviews met hun oordeel (`goedgekeurd`, `wijzigingen
 aangevraagd`, `opmerking geplaatst`, `ingetrokken`; op GitLab zijn de oordelen de goedkeuringen) en de gebeurtenissen,
 oudste eerst, in het nieuwste venster met bovenaan **Oudere laden**. Het opmerkingenvak zit onder de tijdlijn vast
@@ -88,7 +88,7 @@ de review.
 Een opmerking die in een ander venster of via de CLI is geschreven, verschijnt hier vanzelf: elke schrijfactie van
 GitPoulpi (dit venster inbegrepen) meldt het aan de sessie, en de vensters die hetzelfde verzoek tonen, lezen het opnieuw.
 
-Het opmerkingenvak is de Markdown-composer die het deelt met [de gespreksweergave](hosting-integration.md#schrijven)
+Het opmerkingenvak is de Markdown-composer die het deelt met [de gespreksweergave](conversations.md#schrijven)
 (ook het vak van een antwoord op een discussie, een opmerking bij een regel en de samenvatting van **Review afronden**):
 `Ctrl+Enter` (ook `Ctrl+S`, `Alt+Enter`) verzendt, en waar AI aan staat opent `Alt+E` **Schrijven met AI**
 ([het hoofdstuk over AI](ai.md#schrijfhulp-op-een-host)). Het voorbeeld toont de tekst zoals de host hem toont,

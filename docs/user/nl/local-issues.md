@@ -142,7 +142,7 @@ Als je alleen werkt, of in een team dat zijn issues naast de code bewaart, is de
   `Shift+Left` / `Shift+Right`, of met **Bord: Kaart verplaatsen naar...** (`m`), een keuzelijst van de kolommen. De kaart verplaatst
   direct; de `status` van de notitie wordt herschreven zoals in [de sectie over de notities](#de-notities), verder niets in het bestand. Als het schrijven
   mislukt, gaat de kaart terug en staat de fout op de statusbalk.
-- **Een kaart openen** doe je met `Enter` of een dubbelklik : het [gesprek](hosting-integration.md#5c-gesprekken) van de notitie opent in het venster, met de tekst van de notitie en zijn opmerkingen (**Notitie openen** in het kaartmenu opent het bestand in je standaardprogramma voor `.md`). `e` bewerkt zijn
+- **Een kaart openen** doe je met `Enter` of een dubbelklik : het [gesprek](conversations.md) van de notitie opent in het venster, met de tekst van de notitie en zijn opmerkingen (**Notitie openen** in het kaartmenu opent het bestand in je standaardprogramma voor `.md`). `e` bewerkt zijn
   toegewezenen, labels of mijlpaal, `.` of een rechtsklik opent het kaartmenu, `n` start een nieuw issue in de geselecteerde
   kolom (het formulier keert terug naar het bord als het sluit).
 - **Filteren** kan op toegewezene (`a`), label (`l`), mijlpaal (`M`) of tekst (`/`); `x` wist ze. De filters zijn

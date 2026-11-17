@@ -182,7 +182,9 @@ behouden) of **Drop**.
 **Worktrees.** *Worktree maken van...* (op een branch, tag of commit) opent een dialoogvenster
 dat een map naast de repository voorstelt, een optionele nieuwe branchnaam en "De nieuwe
 worktree als tabblad openen". Worktrees verschijnen in de sectie WORKTREES; dubbelklik op een
-om hem te openen, en zijn tabblad sluit vanzelf als de worktree wordt verwijderd.
+om hem te openen, en zijn tabblad sluit vanzelf als de worktree wordt verwijderd. De hele functie (openen in een
+ander hulpmiddel, de branch van een worktree mergen, verwijderen) staat in [Worktrees](worktrees.md); de sectie
+SUBMODULES van hetzelfde paneel staat in [Submodules](submodules.md).
 
 ## Refs op commits slepen
 

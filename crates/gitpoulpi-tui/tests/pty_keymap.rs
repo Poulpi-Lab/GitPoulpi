@@ -107,7 +107,7 @@ fn ctrl_n_prefix_collapses_panes() {
         s.contains("Ctrl+N:") && s.contains("collapse Refs")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    term.send_text("h").unwrap();
+    term.send_text("H").unwrap();
     term.wait_for("the Refs pane collapsed", STEP, |s| {
         s.contains("Refs pane collapsed")
     })

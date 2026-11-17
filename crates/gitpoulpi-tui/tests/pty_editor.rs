@@ -238,7 +238,7 @@ fn ctrl_n_shift_l_collapses_the_status_pane_while_the_editor_has_focus() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
-    term.send_keys("l")
+    term.send_keys("L")
         .expect("collapse the Status pane from the editor");
     term.wait_for(
         "the Status pane collapsed to its restore strip",
@@ -275,7 +275,7 @@ fn ctrl_n_shift_l_collapses_the_status_pane_while_the_editor_has_focus() {
         s.contains("Ctrl+N") && s.contains("collapse")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    term.send_keys("h")
+    term.send_keys("H")
         .expect("expand the auto-collapsed Refs pane from the editor");
     term.wait_for("the Refs pane expanded, LOCAL back on screen", STEP, |s| {
         s.contains("Refs pane restored") && s.contains("LOCAL")

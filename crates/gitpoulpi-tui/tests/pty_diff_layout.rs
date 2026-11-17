@@ -88,7 +88,7 @@ fn a_diff_collapses_the_refs_pane_restores_it_on_close_and_never_saves_the_colla
         s.contains("Ctrl+N") && s.contains("collapse")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    term.send_keys("l").unwrap();
+    term.send_keys("L").unwrap();
     term.wait_for("the Status pane collapsed", STEP, |s| {
         s.contains("Status pane collapsed")
     })

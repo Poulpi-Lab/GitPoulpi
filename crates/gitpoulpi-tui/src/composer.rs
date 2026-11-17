@@ -21,7 +21,14 @@ pub(crate) const COMPOSER_MIN_HEIGHT: u16 = 6;
 /// Description lines. `composer_height_for` never returns more than this,
 /// however much room the pane has - the file list above it always keeps
 /// some space of its own.
-pub(crate) const COMPOSER_MAX_HEIGHT: u16 = COMPOSER_MIN_HEIGHT + 1 + MAX_DESCRIPTION_LINES;
+pub(crate) const COMPOSER_MAX_HEIGHT: u16 =
+    COMPOSER_MIN_HEIGHT + 1 + MAX_DESCRIPTION_LINES + SKIP_ROW_HEIGHT;
+
+/// The Skip hooks checkbox's own row, under the options row. Only drawn from
+/// [`SKIP_ROW_MIN_HEIGHT`] up: below it the box keeps its rows and the
+/// checkbox shares the options row (shrinking), exactly as it did before.
+const SKIP_ROW_HEIGHT: u16 = 1;
+const SKIP_ROW_MIN_HEIGHT: u16 = COMPOSER_MIN_HEIGHT + 2;
 
 const MAX_DESCRIPTION_LINES: u16 = 3;
 
@@ -268,9 +275,12 @@ pub(crate) fn render_commit_composer(
         return None;
     }
 
-    let [sep, amend_row, rest] = Layout::vertical([
+    let dedicated = area.height >= SKIP_ROW_MIN_HEIGHT;
+    let skip_h = if dedicated { SKIP_ROW_HEIGHT } else { 0 };
+    let [sep, amend_row, skip_row, rest] = Layout::vertical([
         Constraint::Length(1),
         Constraint::Length(1),
+        Constraint::Length(skip_h),
         Constraint::Min(0),
     ])
     .areas(area);
@@ -299,7 +309,9 @@ pub(crate) fn render_commit_composer(
         amend_style
     };
     let amend_w = display_width(&amend_label) as u16;
-    // Skip hooks sits after the Amend label. On a narrow row it degrades
+    // Skip hooks has its own row under the options row (from
+    // `SKIP_ROW_MIN_HEIGHT` up); on a short composer it sits after the Amend
+    // label instead. Either way, on a narrow row it degrades
     // instead of vanishing: full label, short label, then the box alone (its
     // tooltip, the palette and `Shift+H` reach it at every width). The AI
     // Compose button shrinks with it (long, short, icon); the pairs are tried
@@ -316,40 +328,54 @@ pub(crate) fn render_commit_composer(
         }
     };
     let amend_row_w = amend_row.width;
-    let fits = |skip: &str, c: ComposeLabel| {
-        amend_row_w > amend_w + 2 + display_width(skip) as u16 + compose_w(c)
+    let (skip_label, skip_rect) = if dedicated {
+        // Its own row: the full label, and only on a very narrow pane the
+        // short one, then the box alone.
+        [&skip_full, &skip_short, &skip_box]
+            .into_iter()
+            .find(|skip| skip_row.width as usize >= display_width(skip))
+            .map(|skip| {
+                let w = display_width(skip) as u16;
+                (skip.clone(), Some(Rect::new(skip_row.x, skip_row.y, w, 1)))
+            })
+            .unwrap_or_else(|| (skip_box.clone(), None))
+    } else {
+        let fits = |skip: &str, c: ComposeLabel| {
+            amend_row_w > amend_w + 2 + display_width(skip) as u16 + compose_w(c)
+        };
+        [
+            (&skip_full, ComposeLabel::Long),
+            (&skip_short, ComposeLabel::Long),
+            (&skip_box, ComposeLabel::Long),
+            (&skip_box, ComposeLabel::Short),
+            (&skip_box, ComposeLabel::Icon),
+        ]
+        .into_iter()
+        .find(|(skip, c)| fits(skip, *c))
+        .map(|(skip, _)| {
+            let w = display_width(skip) as u16;
+            (
+                skip.clone(),
+                Some(Rect::new(amend_row.x + amend_w + 2, amend_row.y, w, 1)),
+            )
+        })
+        .unwrap_or_else(|| {
+            // Even the box does not fit after the full Amend label: the Amend
+            // text gives way (clipped) and the box keeps the room left of the
+            // icon.
+            let box_w = 3u16;
+            let x = amend_row
+                .right()
+                .saturating_sub(compose_w(ComposeLabel::Icon) + box_w + 1);
+            let rect = (x > amend_row.x).then(|| Rect::new(x, amend_row.y, box_w, 1));
+            (skip_box.clone(), rect)
+        })
     };
-    let (skip_label, skip_rect) = [
-        (&skip_full, ComposeLabel::Long),
-        (&skip_short, ComposeLabel::Long),
-        (&skip_box, ComposeLabel::Long),
-        (&skip_box, ComposeLabel::Short),
-        (&skip_box, ComposeLabel::Icon),
-    ]
-    .into_iter()
-    .find(|(skip, c)| fits(skip, *c))
-    .map(|(skip, _)| {
-        let w = display_width(skip) as u16;
-        (
-            skip.clone(),
-            Some(Rect::new(amend_row.x + amend_w + 2, amend_row.y, w, 1)),
-        )
-    })
-    .unwrap_or_else(|| {
-        // Even the box does not fit after the full Amend label: the Amend
-        // text gives way (clipped) and the box keeps the room left of the
-        // icon.
-        let box_w = 3u16;
-        let x = amend_row
-            .right()
-            .saturating_sub(compose_w(ComposeLabel::Icon) + box_w + 1);
-        let rect = (x > amend_row.x).then(|| Rect::new(x, amend_row.y, box_w, 1));
-        (skip_box.clone(), rect)
-    });
     // The Amend label never runs under the Skip hooks box.
-    let amend_draw_w = skip_rect.map_or(amend_w, |r| {
-        amend_w.min(r.x.saturating_sub(amend_row.x + 1))
-    });
+    let amend_draw_w = match skip_rect {
+        Some(r) if !dedicated => amend_w.min(r.x.saturating_sub(amend_row.x + 1)),
+        _ => amend_w,
+    };
     frame.render_clipped(
         Paragraph::new(Line::from(Span::styled(amend_label, amend_style))),
         Rect::new(
@@ -378,7 +404,10 @@ pub(crate) fn render_commit_composer(
     // First registered wins a hit: the AI button sits on the amend row's
     // right end and must precede the amend hit; the amend hit is its label's
     // width (the Skip hooks checkbox has its own).
-    let reserved = skip_rect.map_or(amend_w, |r| r.right() - amend_row.x);
+    let reserved = match skip_rect {
+        Some(r) if !dedicated => r.right() - amend_row.x,
+        _ => amend_w,
+    };
     render_compose_button(frame, amend_row, hits, hover.ai, reserved as usize);
     if let Some(rect) = skip_rect {
         hits.push((rect, HitTarget::SkipHooksCheckbox));
@@ -931,8 +960,8 @@ mod tests {
             .expect("compose hit")
             .0;
         assert_eq!(
-            gen_rect.y, 3,
-            "summary row: sep, amend, box border, summary"
+            gen_rect.y, 4,
+            "summary row: sep, amend, skip hooks, box border, summary"
         );
         assert_eq!(compose_rect.y, 1, "the amend (commit-options) row");
         assert_eq!(buf[(gen_rect.x + 1, gen_rect.y)].symbol(), SPARK);
@@ -986,7 +1015,7 @@ mod tests {
         assert_eq!(kind_at(90), "long");
         assert_eq!(kind_at(60), "long");
         assert_eq!(kind_at(52), "short");
-        assert_eq!(kind_at(46), "icon");
+        assert_eq!(kind_at(46), "short");
         assert_eq!(kind_at(40), "icon");
         assert_eq!(kind_at(20), "icon");
         assert_eq!(kind_at(3), "icon");
@@ -1061,63 +1090,102 @@ mod tests {
         }
     }
 
-    /// Skip hooks degrades with the row (full label, short label, the box
-    /// alone) and keeps its hit target; with AI on, Compose degrades with it.
+    /// Paints the composer at `height` and returns the Skip hooks hit, the
+    /// text of the row it sits on and the hits of that row.
+    fn paint_skip(width: u16, height: u16, ai: bool) -> (Rect, String, Vec<(Rect, HitTarget)>) {
+        use ratatui::backend::TestBackend;
+        use ratatui::Terminal;
+        let mut terminal = Terminal::new(TestBackend::new(width, height)).unwrap();
+        let mut hits: Vec<(Rect, HitTarget)> = Vec::new();
+        terminal
+            .draw(|frame| {
+                render_commit_composer(
+                    frame,
+                    Rect::new(0, 0, width, height),
+                    &mut hits,
+                    "",
+                    "",
+                    false,
+                    None,
+                    1,
+                    false,
+                    ComposerHover {
+                        ai: ComposerAi {
+                            enabled: ai,
+                            ..ComposerAi::default()
+                        },
+                        ..ComposerHover::default()
+                    },
+                    &text_edit::FieldEditor::default(),
+                );
+            })
+            .unwrap();
+        let buf = terminal.backend().buffer().clone();
+        let rect = hits
+            .iter()
+            .find(|(_, t)| *t == HitTarget::SkipHooksCheckbox)
+            .unwrap_or_else(|| panic!("no Skip hooks hit at width {width}, ai {ai}"))
+            .0;
+        let text = row_text(&buf, rect.y, width);
+        let on_row = hits.into_iter().filter(|(r, _)| r.y == rect.y).collect();
+        (rect, text, on_row)
+    }
+
+    fn skip_kind(text: &str) -> &'static str {
+        if text.contains("Skip hooks") {
+            "full"
+        } else if text.contains("No hooks") {
+            "short"
+        } else {
+            "box"
+        }
+    }
+
+    /// Skip hooks has its own row under the options row, with its full label
+    /// at every usual width; only a very narrow pane shortens it (short
+    /// label, then the box alone), and it always keeps its hit target. The
+    /// options row keeps Amend and Compose, which no longer give way to it.
     #[test]
-    fn skip_hooks_degrades_and_never_vanishes() {
+    fn skip_hooks_has_its_own_row_and_never_vanishes() {
+        for ai in [false, true] {
+            let mut kinds = Vec::new();
+            for width in [90u16, 60, 44, 30, 20, 16, 15, 12, 8, 5, 4, 3] {
+                let (rect, text, on_row) = paint_skip(width, 12, ai);
+                assert_eq!(rect.y, 2, "the row under the options row, width {width}");
+                assert_eq!(rect.x, 0, "left-aligned with the other checkboxes");
+                assert!(text.contains("[ ]"), "width {width}: {text:?}");
+                assert!(!text.contains("Amend"), "own row, width {width}: {text:?}");
+                kinds.push((width, skip_kind(&text)));
+                for (i, (a, ta)) in on_row.iter().enumerate() {
+                    for (b, tb) in on_row.iter().skip(i + 1) {
+                        let overlap = a.x < b.right() && b.x < a.right();
+                        assert!(!overlap, "{ta:?} overlaps {tb:?} at width {width}");
+                    }
+                }
+            }
+            let at = |w: u16| kinds.iter().find(|(x, _)| *x == w).unwrap().1;
+            for w in [90, 60, 44, 30, 20, 16] {
+                assert_eq!(at(w), "full", "ai {ai} width {w}");
+            }
+            assert_eq!(at(12), "short", "ai {ai}");
+            assert_eq!(at(3), "box", "ai {ai}");
+        }
+    }
+
+    /// On a short composer (no room for the extra row) Skip hooks keeps the
+    /// old shrinking ladder on the options row, never vanishing.
+    #[test]
+    fn skip_hooks_on_a_short_composer_shares_the_options_row() {
         for ai in [false, true] {
             let mut kinds = Vec::new();
             for width in [90u16, 68, 66, 60, 50, 44, 40, 34, 30, 26, 22, 18, 14, 12] {
-                use ratatui::backend::TestBackend;
-                use ratatui::Terminal;
-                let mut terminal = Terminal::new(TestBackend::new(width, 12)).unwrap();
-                let mut hits: Vec<(Rect, HitTarget)> = Vec::new();
-                terminal
-                    .draw(|frame| {
-                        render_commit_composer(
-                            frame,
-                            Rect::new(0, 0, width, 12),
-                            &mut hits,
-                            "",
-                            "",
-                            false,
-                            None,
-                            1,
-                            false,
-                            ComposerHover {
-                                ai: ComposerAi {
-                                    enabled: ai,
-                                    ..ComposerAi::default()
-                                },
-                                ..ComposerHover::default()
-                            },
-                            &text_edit::FieldEditor::default(),
-                        );
-                    })
-                    .unwrap();
-                let buf = terminal.backend().buffer().clone();
-                let rect = hits
-                    .iter()
-                    .find(|(_, t)| *t == HitTarget::SkipHooksCheckbox)
-                    .unwrap_or_else(|| panic!("no Skip hooks hit at width {width}, ai {ai}"))
-                    .0;
+                let (rect, text, on_row) = paint_skip(width, COMPOSER_MIN_HEIGHT, ai);
                 assert_eq!(rect.y, 1);
-                let text = row_text(&buf, 1, width);
-                assert!(text.contains("[ ]"), "width {width}: {text:?}");
                 assert!(
                     text.matches("[ ]").count() >= 2,
                     "the Skip hooks box is drawn at width {width}: {text:?}"
                 );
-                let kind = if text.contains("Skip hooks") {
-                    "full"
-                } else if text.contains("No hooks") {
-                    "short"
-                } else {
-                    "box"
-                };
-                kinds.push((width, kind));
-                // No hit overlaps another on the row.
-                let on_row: Vec<_> = hits.iter().filter(|(r, _)| r.y == 1).collect();
+                kinds.push((width, skip_kind(&text)));
                 for (i, (a, ta)) in on_row.iter().enumerate() {
                     for (b, tb) in on_row.iter().skip(i + 1) {
                         let overlap = a.x < b.right() && b.x < a.right();
@@ -1599,12 +1667,12 @@ mod tests {
         }
     }
 
-    /// Skip hooks: a checkbox beside Amend with its own hit rect and hover
+    /// Skip hooks: a checkbox under Amend with its own hit rect and hover
     /// (the click is `HitTarget::SkipHooksCheckbox`, the keyboard twin
     /// `Shift+H` and the palette command), checked or not as the state says,
     /// and gone on a row too narrow for it so Amend and Compose keep their room.
     #[test]
-    fn skip_hooks_sits_beside_amend_with_its_own_hit_and_state() {
+    fn skip_hooks_sits_under_amend_with_its_own_hit_and_state() {
         use ratatui::backend::TestBackend;
         use ratatui::Terminal;
         let paint_with = |width: u16, skip: bool, hovered: bool| {
@@ -1634,27 +1702,25 @@ mod tests {
             (terminal.backend().buffer().clone(), hits)
         };
         let (buf, hits) = paint_with(80, false, false);
-        assert!(row_text(&buf, 1, 80).contains("[ ] Skip hooks"));
+        assert!(row_text(&buf, 2, 80).contains("[ ] Skip hooks"));
         let rect = hits
             .iter()
             .find(|(_, t)| *t == HitTarget::SkipHooksCheckbox)
             .expect("skip hooks hit")
             .0;
-        assert_eq!(rect.y, 1, "the amend row");
+        assert_eq!(rect.y, 2, "its own row, under the amend row");
         assert_eq!(buf[(rect.x, rect.y)].symbol(), "[");
         let amend = hits
             .iter()
             .find(|(_, t)| *t == HitTarget::AmendCheckbox)
             .unwrap()
             .0;
-        assert!(amend.right() <= rect.x, "the two hits do not overlap");
+        assert_eq!(amend.y, 1);
+        assert_eq!(amend.x, rect.x, "same left alignment");
 
         let (buf, _) = paint_with(80, true, false);
-        let row = row_text(&buf, 1, 80);
-        assert!(
-            row.contains("[x] Skip hooks") && row.contains("[ ] Amend"),
-            "{row}"
-        );
+        assert!(row_text(&buf, 2, 80).contains("[x] Skip hooks"));
+        assert!(row_text(&buf, 1, 80).contains("[ ] Amend"));
         let (hover, _) = paint_with(80, true, true);
         assert_ne!(
             buf[(rect.x, rect.y)].style(),
@@ -1662,12 +1728,12 @@ mod tests {
             "hover lights the label"
         );
 
-        // Too narrow for the label: the shorter one, never a missing control.
-        let (buf, hits) = paint_with(40, false, false);
-        assert!(row_text(&buf, 1, 40).contains("[ ] No hooks"));
+        // Very narrow: the shorter label, then the box; never a missing control.
+        let (buf, hits) = paint_with(12, false, false);
+        assert!(row_text(&buf, 2, 12).contains("[ ] No hooks"));
         assert!(hits.iter().any(|(_, t)| *t == HitTarget::SkipHooksCheckbox));
-        let (buf, hits) = paint_with(30, false, false);
-        assert!(!row_text(&buf, 1, 30).contains("Skip hooks"));
+        let (buf, hits) = paint_with(5, false, false);
+        assert!(!row_text(&buf, 2, 5).contains("hooks"));
         assert!(hits.iter().any(|(_, t)| *t == HitTarget::SkipHooksCheckbox));
         assert!(hits.iter().any(|(_, t)| *t == HitTarget::AmendCheckbox));
     }

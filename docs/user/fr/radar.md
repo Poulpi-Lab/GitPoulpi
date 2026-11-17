@@ -10,7 +10,7 @@ Accueil avec la vue Radar par-dessus, pour que rien en dessous ne puisse voler u
 clic ou une touche.
 
 Il demande un profil d'hébergeur de code (voir
-[Hébergeurs et suivi de tickets](hosting-integration.md)) et des dépôts liés à
+[Hébergeurs et suivi de tickets](hosting-integration.md) ; les listes d'un seul dépôt sont dans [Pull requests et tickets](pull-requests-and-issues.md), et la discussion d'une ligne s'ouvre comme une [conversation](conversations.md)) et des dépôts liés à
 celui-ci, ou un profil dont les listes à l'échelle du compte sont activées (voir « Au-delà du périmètre » plus bas).
 Un dépôt qui n'est pas lié n'est jamais interrogé : il affiche à la place une ligne « Lier... » (voir « Dépôts qui ont quelque chose à dire » plus bas).
 

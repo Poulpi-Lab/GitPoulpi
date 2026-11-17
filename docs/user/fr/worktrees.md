@@ -6,6 +6,8 @@ Un worktree est une seconde copie extraite du dépôt : un autre dossier, sur u
 autre branche, avec le même historique. La section WORKTREES du volet Refs les
 liste ; le principal est marqué `(main)`.
 
+![Le volet Refs d'un dépôt avec deux worktrees liés : la section WORKTREES liste main (main), hotfix/axis-labels et feature/legend, avec la section SUBMODULES en dessous](../images/worktrees.png)
+
 ## Afficher la section
 
 La section est masquée dans un dépôt qui n'a pas encore de worktree lié. Pour
@@ -36,6 +38,8 @@ courante**, **Git : Créer un worktree sur le commit sélectionné...**, **Refs
 Créer un worktree en choisissant une branche**). Les anciennes entrées
 fonctionnent toujours : **Créer un worktree depuis...** dans le menu d'une
 branche, d'un tag ou d'un commit.
+
+![La boîte de dialogue Créer un worktree : les champs Nom, Dossier, Réf et Branche du worktree, la ligne « nouvelle branche depuis main », la case Ouvrir le nouveau worktree dans un onglet et les boutons Annuler et Créer](../images/worktree-create.png)
 
 La boîte de dialogue propose tout et vous laisse tout changer. Le **Nom** et la
 nouvelle branche commencent tous deux par `worktree-<id>`, où `<id>` est formé de 8
@@ -84,6 +88,12 @@ Clic droit sur un worktree (ou sélectionnez-le et appuyez sur la touche menu,
   s'y résout par le flux habituel des conflits. Une branche extraite nulle part
   est refusée, avec la raison. Non proposé pour un worktree détaché.
 - **Retirer le worktree...** : jamais le principal.
+
+![Le menu clic droit d'une ligne de worktree : Ouvrir dans un nouvel onglet, Ouvrir dans, Merge de hotfix/axis-labels dans... et Retirer le worktree...](../images/worktree-menu.png)
+
+**Ouvrir dans un nouvel onglet** (ou un double-clic, ou `Enter`) ouvre le dossier du worktree comme un onglet à part, avec son propre Log, son propre état et sa propre branche :
+
+![Le worktree hotfix/axis-labels ouvert comme son propre onglet à côté du principal, avec son commit et son fichier modifié](../images/worktree-tab.png)
 
 La palette offre les mêmes actions sur la ligne sélectionnée (**Refs : Ouvrir le
 worktree dans...**, **Refs : Merge de la branche du worktree dans...**, **Refs :

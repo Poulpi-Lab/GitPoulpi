@@ -15,6 +15,8 @@ Quand un dépôt a un `.gitmodules`, le panneau latéral Refs reçoit une sectio
 | `○` | non cloné | déclaré dans `.gitmodules` et enregistré, mais son dossier est vide : mettez-le à jour pour le cloner |
 | `✗` | en conflit | le dépôt a des conflits de merge sur le sous-module |
 
+![La section SUBMODULES avec trois lignes : vendor/almanac non cloné (○), vendor/ephemeris à jour (✓) et vendor/starfield modifié (↑, à un autre commit que celui enregistré), qui apparaît aussi comme fichier modifié dans le volet Status](../images/submodules.png)
+
 | Action | Souris | Clavier |
 |---|---|---|
 | Ouvrir le sous-module dans son propre onglet | double-clic sur la ligne | le sélectionner, `Enter` (palette : `Refs : Ouvrir le sous-module dans un onglet`) |
@@ -23,6 +25,8 @@ Quand un dépôt a un `.gitmodules`, le panneau latéral Refs reçoit une sectio
 | L'enregistrer dans `.git/config` sans le cloner | menu | `Ctrl+P` : `Refs : Initialiser le sous-module (sélection)` |
 | Mettre à jour tous les sous-modules | | `Ctrl+P` : `Git : Mettre à jour tous les sous-modules` |
 | Aller à la section | clic sur son en-tête | `Ctrl+P` : `Navigation : Aller à Refs > Sous-modules` |
+
+![Le menu clic droit de la ligne modifiée vendor/starfield : Mettre à jour (cloner au besoin), Initialiser et Ouvrir dans un nouvel onglet](../images/submodule-menu.png)
 
 Une mise à jour peut faire un fetch depuis le distant du sous-module ; elle suit donc **Paramètres > SSH et identifiants > Identifiants HTTPS** comme tout autre transfert. Un sous-module non cloné n'a rien à ouvrir dans un onglet ; la ligne d'état le dit et renvoie vers Mettre à jour.
 

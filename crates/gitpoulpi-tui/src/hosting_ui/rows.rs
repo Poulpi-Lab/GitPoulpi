@@ -316,6 +316,8 @@ impl HostingUi {
         if let Some(pr) = self.shown_head_pr() {
             return Some(ToolbarChip {
                 text: format!("{} {}", provider_tag(snap.kind), pr.iid_label),
+                short: format!("{} {}", state_glyph(pr.state), pr.iid_label),
+                icon: state_glyph(pr.state).to_string(),
                 fg: th().hosting.chip_fg,
                 bg: Some(state_color(pr.state)),
                 hit: HostingHit::LinkedPrChip,
@@ -327,6 +329,8 @@ impl HostingUi {
         let known_none = snap.head_branch == inputs.head_branch && snap.problem.is_none();
         (inputs.head_pushed && known_none && inputs.head_branch.is_some()).then(|| ToolbarChip {
             text: format!("+ {}", msg::hosting_ui::PR_ABBR.get()),
+            short: "+".to_string(),
+            icon: "+".to_string(),
             fg: th().ui.muted,
             bg: None,
             hit: HostingHit::NewPrChip,

@@ -160,6 +160,8 @@ pub(crate) fn command_unavailable_from(
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct ToolbarChip {
     pub(crate) text: String,
+    pub(crate) short: String,
+    pub(crate) icon: String,
     pub(crate) fg: Color,
     pub(crate) bg: Option<Color>,
     pub(crate) hit: HostingHit,

@@ -168,6 +168,44 @@ pub(crate) fn paint_left(
         .collect()
 }
 
+/// A row with buttons at both ends: `left` from `x`, `right` ending at
+/// `right`, on one row `y` of `room` columns starting at `x`. When both sides
+/// do not fit, every button moves into one right-aligned row with clipped
+/// labels instead (none is dropped). Returns `(left rects, right rects)`.
+pub(crate) fn paint_split(
+    buf: &mut Buffer,
+    x: u16,
+    y: u16,
+    room: u16,
+    left: &[Btn],
+    right: &[Btn],
+) -> (Vec<Rect>, Vec<Rect>) {
+    let side = |items: &[Btn]| -> u16 {
+        items
+            .iter()
+            .map(|b| display_width(b.label) as u16 + 2 + GAP)
+            .sum()
+    };
+    let end = x + room;
+    if side(left) + side(right) <= room + GAP {
+        let right_w = side(right).saturating_sub(GAP);
+        let l = paint_left(buf, x, y, room.saturating_sub(right_w + GAP), GAP, left);
+        let r = paint(buf, end, y, right_w, 0, right);
+        return (l, r);
+    }
+    let all: Vec<Btn> = left
+        .iter()
+        .chain(right)
+        .map(|b| Btn {
+            label: b.label,
+            state: b.state,
+        })
+        .collect();
+    let mut rects = paint(buf, end, y, room, 0, &all);
+    let r = rects.split_off(left.len());
+    (rects, r)
+}
+
 /// A button right-aligned at `right` that is clipped, never dropped, when the
 /// row is short: it keeps at most `avail - reserve` cells (and never fewer than
 /// five), so the text it shares the row with keeps `reserve` columns.
@@ -284,5 +322,47 @@ mod tests {
     fn a_very_narrow_row_without_spare_rows_still_keeps_all_buttons() {
         let slots = layout(&[6, 6], 9, 0);
         assert_eq!(slots.len(), 2);
+    }
+
+    fn labels() -> (Vec<&'static str>, Vec<&'static str>) {
+        (vec!["Undo [u]", "Redo [r]", "Pick [p]"], vec!["Close"])
+    }
+
+    fn split_on(width: u16) -> (Vec<Rect>, Vec<Rect>) {
+        let (l, r) = labels();
+        let mk = |v: &[&'static str]| -> Vec<Btn<'static>> {
+            v.iter()
+                .map(|label| Btn {
+                    label,
+                    state: ButtonState::Normal {
+                        hovered: false,
+                        focused: false,
+                    },
+                })
+                .collect()
+        };
+        let mut buf = Buffer::empty(Rect::new(0, 0, width, 1));
+        paint_split(&mut buf, 0, 0, width, &mk(&l), &mk(&r))
+    }
+
+    #[test]
+    fn a_split_row_keeps_its_sides_apart_when_roomy() {
+        let (l, r) = split_on(80);
+        assert_eq!(l[0].x, 0);
+        assert_eq!(r[0].right(), 80);
+        assert!(l[2].right() < r[0].x);
+    }
+
+    #[test]
+    fn a_narrow_split_row_keeps_every_button_inside_the_row() {
+        let (l, r) = split_on(30);
+        assert_eq!((l.len(), r.len()), (3, 1));
+        for rect in l.iter().chain(&r) {
+            assert!(rect.right() <= 30 && rect.width >= 5, "{rect:?}");
+        }
+        let all: Vec<&Rect> = l.iter().chain(&r).collect();
+        for pair in all.windows(2) {
+            assert!(pair[0].right() < pair[1].x, "{pair:?}");
+        }
     }
 }

@@ -48,3 +48,26 @@ fn turning_the_setting_off_keeps_the_merged_request_chip() {
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(!screen.contains("+ MR"), "{}", screen.text());
 }
+
+/// Rule 13: a toolbar too narrow for `GL !53` shows the short label (the
+/// state glyph and `!53`) before the chip folds into the `...` menu.
+#[test]
+fn a_narrow_toolbar_shows_the_chips_short_label_before_dropping_it() {
+    let (mut term, _config) =
+        launch_with_merged_head("hide_finished_pr_chip = false\n", "pty-hosting-chip-narrow");
+    term.wait_for("the full chip at the roomy width", STARTUP, |s| {
+        s.contains("GL !53")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    // 26 columns (24 inside the window frame): the full label needs 25, the short one 24.
+    term.resize(26, ROWS).expect("shrink the window");
+    // On the toolbar's own row (the one with the `...` button), not in a list.
+    let on_toolbar = |s: &xtask::pty::Screen| {
+        s.find("\u{22EF}")
+            .is_some_and(|(_, row)| s.line(row).contains("\u{25C6} !53"))
+    };
+    let screen = term
+        .wait_for("the short chip label on the toolbar row", STEP, on_toolbar)
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert!(!screen.contains("GL !53"), "{}", screen.text());
+}

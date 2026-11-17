@@ -17,6 +17,7 @@ use ratatui::layout::Rect;
 use ratatui::style::Style;
 
 use crate::combo::{Combo, ComboOption, ComboOutcome};
+use crate::dialog_kit::button_row::Btn;
 use crate::dialog_kit::{self, ButtonState};
 use crate::keymap::Action as Bind;
 use crate::text_edit::{FieldEditor, KeyEdit};
@@ -404,30 +405,33 @@ impl AiBox {
         );
         let cancel_label = m::CANCEL.get();
         let apply_label = m::APPLY.get();
-        let apply_w = dialog_kit::button_width(apply_label);
-        let cancel_w = dialog_kit::button_width(cancel_label);
-        let apply_x = inner.right().saturating_sub(apply_w);
-        let cancel_x = apply_x.saturating_sub(cancel_w + 1);
-        let cancel = dialog_kit::button(
+        // Right-aligned; a narrow box clips the labels, never drops a button.
+        let [cancel, apply] = dialog_kit::button_row::paint(
             buf,
-            cancel_x,
+            inner.right(),
             button_y,
-            cancel_label,
-            ButtonState::Normal {
-                hovered: self.hover == Some(Part::Cancel),
-                focused: self.focus == Part::Cancel,
-            },
-        );
-        let apply = dialog_kit::button(
-            buf,
-            apply_x,
-            button_y,
-            apply_label,
-            ButtonState::Primary {
-                hovered: self.hover == Some(Part::Apply),
-                focused: self.focus == Part::Apply,
-            },
-        );
+            inner.width,
+            0,
+            &[
+                Btn {
+                    label: cancel_label,
+                    state: ButtonState::Normal {
+                        hovered: self.hover == Some(Part::Cancel),
+                        focused: self.focus == Part::Cancel,
+                    },
+                },
+                Btn {
+                    label: apply_label,
+                    state: ButtonState::Primary {
+                        hovered: self.hover == Some(Part::Apply),
+                        focused: self.focus == Part::Apply,
+                    },
+                },
+            ],
+        )[..] else {
+            unreachable!("two buttons in, two rects out")
+        };
+        let cancel_x = cancel.x;
         // Buttons and combos before the text area they do not overlap.
         hits.insert(0, (cancel, Part::Cancel));
         hits.insert(0, (apply, Part::Apply));

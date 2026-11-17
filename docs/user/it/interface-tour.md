@@ -191,7 +191,7 @@ Per impostazione predefinita, una riga sotto i pannelli e sopra la barra di stat
 | **Flow** `▾` | Il menu del workflow di branching (avvia, concludi, sincronizza, promuovi; `Ctrl+G Shift+W`). Solo in un repository che ha un workflow. Vedi [Workflow di branching](branching-workflows.md). |
 | **Cerca** | Apre la barra di ricerca dei commit sopra il Log (`f`). |
 
-All'estremità (la destra di una riga, il fondo di una colonna), quando il repository è collegato a un host, un **chip** mostra la pull request del branch attivo (per esempio `GH #12` o `GL !53`), oppure un tenue `+ PR`. **Impostazioni > Aspetto > Fissa il pulsante pull request in fondo** (attivo per impostazione predefinita) lo tiene lì; disattivo, scorre con gli altri pulsanti e ne segue l'allineamento. Vedi [Hosting e issue tracker](hosting-integration.md). In una colonna, la combobox dei profili occupa l'ultima riga.
+All'estremità (la destra di una riga, il fondo di una colonna), quando il repository è collegato a un host, un **chip** mostra la pull request del branch attivo (per esempio `GH #12` o `GL !53`), oppure un tenue `+ PR`. **Impostazioni > Aspetto > Fissa il pulsante pull request in fondo** (attivo per impostazione predefinita) lo tiene lì; disattivo, scorre con gli altri pulsanti e ne segue l'allineamento. In una riga stretta il chip si riduce per primo (`● #12`, poi solo il glifo di stato) e solo dopo passa nel menu `⋯`. Vedi [Hosting e issue tracker](hosting-integration.md). In una colonna, la combobox dei profili occupa l'ultima riga.
 
 All'estremità destra, quando hai due o più [profili](settings.md#profili), la
 **combobox dei profili** sceglie l'identità di commit per questo repository. La

@@ -100,7 +100,7 @@ git 不为 tag 保存远程跟踪引用，所以 GitPoulpi 是根据你上一次
 
 **Stash。**工具栏的 **Stash** 会 stash 所有内容（包括未跟踪文件）；`Ctrl+G m` 会先询问消息（开启 AI 时，在该提示中按 `Ctrl+G` 会给出建议）。右键点击 Log 或 STASHES 分区中的 stash 行，可使用 **Pop**、**Apply**（保留该 stash）或 **Drop**。
 
-**Worktree。***从…创建 worktree*（在分支、tag 或 commit 上）会打开一个对话框，建议仓库旁边的一个文件夹、一个可选的新分支名，以及“将新 worktree 作为标签页打开”。worktree 出现在 WORKTREE 分区中；双击其中一个即可打开，当 worktree 被移除时，它的标签页会自动关闭。
+**Worktree。***从…创建 worktree*（在分支、tag 或 commit 上）会打开一个对话框，建议仓库旁边的一个文件夹、一个可选的新分支名，以及“将新 worktree 作为标签页打开”。worktree 出现在 WORKTREE 分区中；双击其中一个即可打开，当 worktree 被移除时，它的标签页会自动关闭。整个功能（在其他工具中打开、合并 worktree 的分支、移除）见 [Worktrees](worktrees.md)；同一窗格的 SUBMODULES 分区见 [Submodules](submodules.md)。
 
 ## 把引用拖到 commit 上
 

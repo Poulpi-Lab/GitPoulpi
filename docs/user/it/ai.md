@@ -100,7 +100,7 @@ Ci sono due modi di usare l'IA con GitPoulpi:
 4. Con più profili, scegli il **Profilo predefinito** in fondo; ogni azione può
    comunque indicare il proprio.
 
-![Il blocco Profili della pagina IA per un agente locale: Tipo di agente (Claude Code), Comando, Argomenti, Modello, due righe Env, Aggiungi e Rimuovi una variabile d'ambiente, Prova la connessione e Profilo predefinito](../images/settings-ai-agent.png)
+![La parte bassa del blocco Profili della pagina IA per un agente locale: Modalità di esecuzione, Argomenti, Modello, Cartella di lavoro, Timeout, due righe Env, Aggiungi una variabile d'ambiente e Prova la connessione](../images/settings-ai-agent.png)
 
 Le **chiavi API** si inseriscono con `Enter` sulla riga **Chiave API** e sono
 conservate nel credential helper del sistema (Git Credential Manager,

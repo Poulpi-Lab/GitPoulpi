@@ -63,7 +63,9 @@ un pulsante **Svuota il registro**, `x`, che svuota i file del registro dopo una
 conferma) e una casella Ambito che le restringe entrambe a questo repository, a
 un'area di lavoro o a tutti i repository. Un numero sul pulsante conta gli errori
 che non hai ancora guardato. A sinistra del pulsante, l'indicatore dei lavori mostra
-un lavoro in background con una `[x]` per annullarlo. La scheda **Home** ha la stessa
+un lavoro in background con una `[x]` per annullarlo (l'elenco dei lavori
+ha **Annulla tutto**, e la palette ha *Attività: annulla tutto ciò che si può
+annullare*; un lavoro che non si può fermare in sicurezza ne spiega il motivo). La scheda **Home** ha la stessa
 barra di stato, con il pulsante **Attività** in basso a destra (si apre su Tutti i
 repository). Quando un'operazione fallisce, la barra di stato ne dice il motivo in rosso, ovunque
 tu sia; un clic su di essa (o sulla palette `Registro attività: Apri l'ultimo errore`)

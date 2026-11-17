@@ -93,7 +93,7 @@
 
 页面列表顶部的框会搜索每一页上每个选项的名称和说明。点击它，或按 `/` 或 `Ctrl+F`，然后输入。匹配项列表会下拉显示。每个匹配项显示选项及其所在页面。`Up` / `Down` 选择，`Enter` 跳转到该选项，`Esc` 关闭列表。
 
-![在设置中搜索 “diff”：来自“日志与图”“Diff 与编辑器”和“Git 与编码”页面的匹配选项](../images/settings-search.png)
+![在设置中搜索 “diff”：来自“AI”和“Diff 与编辑器”页面的匹配选项](../images/settings-search.png)
 
 ## 通过命令面板修改设置
 
@@ -163,7 +163,7 @@
 
 **任务栏与 Dock 分组。** GitPoulpi 运行在终端窗口里，因此任务栏通常把它显示在终端的图标下，固定的 GitPoulpi 图标下没有“正在运行”的圆点。Windows：快捷方式带有 AppUserModelID `GitPoulpi.GitPoulpi`，从快捷方式启动的 GitPoulpi 会给自己的终端窗口设置同样的 ID 和自己的图标（它通过暂时给窗口设置唯一标题来找到窗口，随后恢复标题），于是窗口归入固定的 GitPoulpi 图标之下。有多个标签页的终端窗口会作为一个整体：GitPoulpi 在其中运行时，它的所有标签页都归在 GitPoulpi 的图标下。之前创建的快捷方式和任务栏固定项会由同一套同步重写；如果某个固定项仍显示终端的图标，请取消固定后重新固定。Linux：kitty、foot、Alacritty、WezTerm 和 Ghostty 以窗口类 `gitpoulpi` 启动，`.desktop` 条目写明了它（`StartupWMClass`），所以 Dock 会把窗口归在启动器的图标下；其他终端保留自己的图标。macOS：无需操作，Dock 按应用分组。
 
-![设置 > 启动器：快捷方式使用的终端和应用启动器行](../images/settings-launcher.png)
+![设置 > 启动器：快捷方式使用的终端、启动器构建、命令别名和新标签页别名、别名状态以及 PATH 检查](../images/settings-launcher.png)
 
 #### 命令别名与 PATH，按系统
 
@@ -328,7 +328,7 @@ AI 代理在此窗口中可以做什么、MCP 服务器是否可以运行，以�
 
 ### 外观
 
-![“外观”页：主题、头像、输入框颜色、色深和图配色（日期格式在下方）](../images/settings-ui.png)
+![向下滚动后的“外观”页：头像来源和头像回退、输入框颜色、色深、文本光标以及图配色的开头（日期格式在下方）](../images/settings-ui.png)
 
 ![“外观”页上已打开的主题下拉列表，高亮“浅色”：整个设置界面已经以该主题重绘](../images/settings-appearance-theme.png)
 

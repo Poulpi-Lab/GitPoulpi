@@ -504,6 +504,14 @@ stage_file = "z"
 | `[preferences] conflict_base_branches` | 仓库自己的“基础分支”模式，每行一个（仍作为 **自有列表** 使用） | 设置 > 仓库专属设置 > 冲突预防 |
 | `[preferences] conflict_base_source` | 基础分支的来源：`default`（全局默认列表）、`list`（`conflict_base_list`）或 `own`（`conflict_base_branches`）。不存在时：有自有模式就用自有模式，否则用默认列表 | 设置 > 仓库专属设置 > 冲突预防 |
 | `[preferences] conflict_base_list` | 来源为 `list` 时，此仓库沿用的 `[conflict_prevention.lists.<name>]`；已删除的列表会回落到默认列表 | 设置 > 仓库专属设置 > 冲突预防 |
+| `[preferences] merge_fast_forward` | 在此仓库中覆盖 `git.merge_fast_forward`：`never`、`allowed` 或 `only` | 设置 > 仓库专属设置 > Merge 选项 |
+| `[preferences] default_push_targets` | 新分支同时 push 到的远程，在分支首次有上游时复制到该分支中 | 设置 > 仓库专属设置 > Git 与编码；参见[一个分支对应多个远程](multiple-remotes.md) |
+| `[preferences.ai_review]`、`[preferences.ai_hosting_reply]` | 此仓库自己对 `[ai.review]` 和 `[ai.hosting_reply]` 各键的取值；不存在的键沿用全局值 | 设置 > 仓库专属设置 > AI |
+| `hosting_post_as`、`hosting_identity` | 你在此仓库中发给托管平台的消息所使用的名称（覆盖 `general.hosting_post_as`），以及未设置时 GitPoulpi 根据首条用机器人令牌发布的消息得知的登录名 | 设置 > 仓库专属设置 > SSH 与凭据；参见[对话](conversations.md#以谁的身份发布) |
+| `assignment_blocked` | 在此仓库的议题和 PR 中，不能从 GitPoulpi 指派任何人 | `gitpoulpi hosting assignment --block \| --allow` |
+| `board_labels` | 在没有工作流的托管平台上，作为议题看板各列的标签，按看板顺序排列 | 看板的**列**按钮 |
+| `conversation_seen`、`conversation_events`、`posted_comment_ids` | 你上次读到每个对话的位置（其余为未读）、是否显示系统事件，以及此安装发布过的评论（机器人可以编辑或删除的那些） | 由对话视图写入 |
+| `reviews` | 应用内评审对每个请求的本地状态：待发布的评论、已查看的文件 | 由评审视图写入 |
 | `commit-template.txt`（`repo-state.toml` 旁边的文件） | commit 模板；git 的 `commit.template` 指向它 | 设置 > 仓库专属设置 > 消息模板 |
 | `[preferences.ai_instructions]` | `text`，`mode = "add" \| "replace"`：此仓库的 AI 指令 | 设置 > 仓库专属设置 > AI |
 | `[preferences.ai_overrides.<action>]` | 此处某个操作的 `profile`、`instructions` | 设置 > 仓库专属设置 > AI |

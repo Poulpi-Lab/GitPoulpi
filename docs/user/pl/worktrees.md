@@ -6,6 +6,8 @@ Worktree to druga rozpakowana kopia repozytorium: inny folder, na innej
 gałęzi, ze wspólną historią. Sekcja WORKTREES panelu Refs je wylicza; główny
 jest oznaczony `(główny)`.
 
+![Panel Refs repozytorium z dwoma powiązanymi worktree: sekcja WORKTREES wylicza main (główny), hotfix/axis-labels i feature/legend, a pod nią jest sekcja SUBMODUŁY](../images/worktrees.png)
+
 ## Pokazywanie sekcji
 
 W repozytorium, które nie ma jeszcze powiązanego worktree, sekcja jest ukryta.
@@ -34,6 +36,8 @@ Paleta ma te same trzy (**Refs: Utwórz worktree z bieżącej gałęzi**,
 **Git: Utwórz worktree dla zaznaczonego commita...**, **Refs: Utwórz worktree z
 wybranej gałęzi**). Starsze pozycje nadal działają: **Utwórz worktree z...** w
 menu gałęzi, tagu lub commita.
+
+![Okno Utwórz worktree: pola Nazwa, Folder, Ref i Gałąź worktree, wiersz „nowa gałąź z main”, pole Otwórz nowy worktree jako kartę oraz przyciski Anuluj i Utwórz](../images/worktree-create.png)
 
 Okno proponuje wszystko i pozwala to zmienić. **Nazwa** i nowa gałąź zaczynają
 od `worktree-<id>`, gdzie `<id>` to 8 losowych cyfr szesnastkowych (te same dla
@@ -79,6 +83,13 @@ menu, `Shift+F10` lub `.`):
   przepływem konfliktów. Gałąź przełączona nigdzie jest odrzucana z podaniem
   powodu. Niedostępne dla odłączonego worktree.
 - **Usuń worktree...**: nigdy głównego.
+
+![Menu prawego przycisku wiersza worktree: Otwórz w nowej karcie, Otwórz w, Merge hotfix/axis-labels do... i Usuń worktree...](../images/worktree-menu.png)
+
+**Otwórz w nowej karcie** (albo dwukrotne kliknięcie, albo `Enter`) otwiera folder
+worktree jako osobną kartę, z własnym Logiem, statusem i gałęzią:
+
+![Worktree hotfix/axis-labels otwarty jako własna karta obok głównej, z jego commitem i zmienionym plikiem](../images/worktree-tab.png)
 
 Paleta ma te same akcje na zaznaczonym wierszu (**Refs: Otwórz worktree w...**,
 **Refs: Merge gałęzi worktree do...**, **Refs: Usuń worktree...**,

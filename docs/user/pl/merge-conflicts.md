@@ -35,7 +35,9 @@ kółko poziome), nigdy nie są zawijane.
 ## Wybieranie
 
 Każdy konflikt to blok w ramce w A i w B, z polem wyboru w nagłówku i
-`+` / `✓` przed każdą linią.
+`+` / `✓` przed każdą linią. Kliknij blok prawym przyciskiem, by zobaczyć wybory dla tego konfliktu:
+
+![Menu prawego przycisku na konflikcie 2 edytora merge: Tylko A, Tylko B, A, potem B, B, potem A, Nic nie bierz, Cofnij wybór (znów nierozwiązany), Edytuj w Wyniku i Zasugeruj rozwiązanie (AI)](../images/merge-editor-chunk-menu.png)
 
 | Aby... | Klawisz | Mysz |
 |---|---|---|
@@ -70,6 +72,10 @@ pomarańczowy, gdy nadal wymaga wyboru, zielony po obsłużeniu, niebieski dla b
 Kliknięcie znacznika przeskakuje do tego konfliktu (znacznik pod suwakiem paska
 jest już na ekranie, więc tam kliknięcie przeciąga suwak).
 
+Wzięcie obu stron (**A, potem B**) zapisuje w Wyniku, pod znacznikiem konfliktu, najpierw linie A, a potem B, każdą oznaczoną swoją stroną; plakietki `1st` / `2nd` na obu blokach mówią o kolejności, a `s` ją zamienia:
+
+![Konflikt 2 wzięty z obu stron: jego linia A i linia B są zaznaczone, a Wynik pokazuje je jedną po drugiej, oznaczone A i B, podczas gdy konflikty 1 i 3 nadal czekają na wybór](../images/merge-editor-take-both.png)
+
 **Cały plik** pokazuje cały plik w A i B z pokolorowaną każdą różnicą, nie tylko konfliktami:
 
 ![Tryb Cały plik: cały plik w A i B z pokolorowanymi zmianami](../images/merge-editor-full-file.png)
@@ -78,6 +84,8 @@ Wynik to prawdziwy edytor: kliknij w nim i pisz, zaznaczaj, wycinaj i wklejaj, s
 `Ctrl+F`. Wybór na konflikcie, który edytowano ręcznie, zastępuje twoją edycję (`Ctrl+Z`
 ją przywraca). Zapis z konfliktem, w którym nic nie wybrano, albo z linią,
 która nadal wygląda jak znacznik konfliktu, pyta najpierw.
+
+![Edytor merge z każdym konfliktem obsłużonym: konflikt 1 wzięty z A, konflikt 2 z obu stron, konflikt 3 wpisany ręcznie w Wyniku (oznaczony ołówkiem i policzony jako edytowany), a przycisk Zapisz i oznacz jako rozwiązany podświetlony na pasku narzędzi](../images/merge-editor-output-edited.png)
 
 ### ✦ Zasugeruj rozwiązanie (AI)
 
@@ -92,10 +100,24 @@ pokazany. Przy wyłączonym AI żadna z tych kontrolek nie istnieje.
 
 Po **Zapisz i oznacz jako rozwiązany** plik jest w stage, a lista plików z konfliktem
 wraca; następny plik otwierasz sam. `Ctrl+Z` (lub przycisk Cofnij)
-cofa ostatnie „oznacz jako rozwiązany”. Gdy nie zostaje żaden plik, baner oferuje
+cofa ostatnie „oznacz jako rozwiązany”.
+
+![Po Zapisz i oznacz jako rozwiązany: baner „Trwa merge, 1 plik z konfliktem”, orbit.rs przeniesiony do Plików staged, a logo.bin jest jedynym plikiem zostającym w Plikach unstaged, oznaczonym czerwonym !](../images/conflict-file-resolved.png)
+
+Gdy nie zostaje żaden plik, baner oferuje
 **Commit merge** (albo **Kontynuuj** dla cherry-pick, revert lub rebase) oraz
 **Przerwij merge**, który pyta najpierw: przywraca HEAD, indeks i drzewo robocze
 do poprzedniego stanu.
+
+![Baner, gdy każdy plik jest rozwiązany: „Trwa merge, wszystkie konflikty rozwiązane” z przyciskami Commit merge i Przerwij merge oraz rozwiązanym plikiem w Plikach staged](../images/conflict-commit-merge.png)
+
+Rebase zatrzymuje się tak samo, krok po kroku. Jego baner podaje gałąź i to, na co jest przebazowana, oraz ma **Rozwiąż konflikty...**, **Kontynuuj**, **Pomiń** i **Przerwij**:
+
+![Baner rebase zatrzymanego na dwóch konfliktach: „Rebase feature/cleanup na ...” z przyciskami Rozwiąż konflikty..., Kontynuuj, Pomiń i Przerwij oraz dwoma plikami z konfliktem w panelu Status](../images/conflict-banner-rebase.png)
+
+Gdy ostatni plik jest rozwiązany, ten sam baner jest gotowy do **Kontynuuj**:
+
+![Baner rebase po rozwiązaniu obu plików: zostają tylko Kontynuuj, Pomiń i Przerwij, a oba pliki leżą w Plikach staged](../images/conflict-banner-continue.png)
 
 Merge, którego wynik równa się HEAD (wszędzie wzięto naszą stronę), nie ma niczego
 w stage ani zmienionego pliku, a mimo to można go zakończyć: **Commit merge**
@@ -124,6 +146,8 @@ wybór; wybranie rozwiązuje i dodaje plik do stage od razu.
 | Usunięty po jednej stronie, zmieniony po drugiej | **Zachowaj plik** (`k`), **Zaakceptuj usunięcie** (`Shift+D`) |
 | Pozostałość po zmianie nazwy (ścieżka istnieje tylko po jednej stronie) | **Zachowaj plik** (`k`), **Usuń plik** (`Shift+D`) |
 | Dowiązanie symboliczne, submoduł, tryb pliku | **Zachowaj A**, **Użyj B**, **Użyj Bazy** |
+
+![Karta pliku zmienionego w A i usuniętego w B: ramka A pokazuje rozmiar i tryb pliku, ramka B mówi „brak pliku (usunięty)”, ramka bazy pokazuje oryginał, a przyciski to Zachowaj plik i Zaakceptuj usunięcie](../images/merge-editor-deleted-card.png)
 
 Gdy plik jest obrazem (PNG, JPEG, GIF, WebP, BMP, ICO), ramki pokazują też
 obrazy A, B i Bazy, dopasowane i tylko do odczytu, w oknie dość szerokim, by je

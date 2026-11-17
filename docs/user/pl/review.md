@@ -10,7 +10,7 @@ akceptację i prośby o zmiany. Wymaga profilu jednego z tych hostów (zob.
 oferują przeglądów. Ograniczenia hosta są respektowane: GitLab nie ma werdyktu *Zażądaj zmian* i przyjmuje jedną linię na komentarz.
 Ta strona nazywa je wszystkie *żądaniem*.
 
-![Widok przeglądu, strona Podsumowanie: nagłówek żądania z przyciskami metadanych, opis i dyskusja z wysłaną akceptacją](../images/review-overview.png)
+![Widok przeglądu, strona Podsumowanie: nagłówek żądania z przyciskami metadanych, opis, nierozwiązany i rozwiązany wątek w kodzie, komentarze i pole komentarza](../images/review-overview.png)
 
 ![Strona Pliki: zmienione pliki z polami przejrzenia, diff z wątkiem komentarzy pod linią i rozwiązany wątek poza pokazanymi liniami](../images/review-files.png)
 
@@ -37,7 +37,7 @@ Zawsze widoczny: numer i tytuł, stan (Otwarte, Szkic, Scalone, Zamknięte), ga�
 informacja, czy scala się bez konfliktów, czy z konfliktami, rozmiar oraz **`3 oczekujące komentarze`**, gdy jakieś napisałeś.
 
 Cztery przyciski metadanych - **Przypisani**, **Recenzenci**, **Etykiety**, **Kamień milowy** - otwierają te same
-selektory co pasek boczny (zob. [Przypisani, recenzenci, etykiety i kamień milowy](hosting-integration.md#przypisani-recenzenci-etykiety-i-kamień-milowy));
+selektory co pasek boczny (zob. [Przypisani, recenzenci, etykiety i kamień milowy](pull-requests-and-issues.md#przypisani-recenzenci-etykiety-i-kamień-milowy));
 nagłówek pokazuje wynik, gdy tylko host go przyjmie. Przyciski akcji: **Checkout** (zwykły
 checkout gałęzi żądania, który zamyka też widok), **Otwórz w przeglądarce**, **Odśwież**
 (**`F5`**) i **Zakończ przegląd**.
@@ -51,7 +51,7 @@ nazywa się **Zatwierdzenia**.
 ### Podsumowanie
 
 Podsumowanie to **rozmowa żądania**: ta sama oś czasu i to samo pole komentarza co przy zgłoszeniu
-([Rozmowy](hosting-integration.md#5c-rozmowy)). Najpierw opis (*otworzył(a) to*), potem komentarze,
+([Rozmowy](conversations.md)). Najpierw opis (*otworzył(a) to*), potem komentarze,
 wątki w kodzie z fragmentem diffu, wysłane przeglądy z werdyktem (`zaakceptowano`, `zażądano zmian`,
 `skomentowano`, `uchylono`; w GitLab werdyktami są jego akceptacje) i zdarzenia, od najstarszego, w oknie
 najnowszych wpisów z przyciskiem **Wczytaj starsze** na górze. Pole komentarza jest zadokowane pod osią czasu
@@ -89,7 +89,7 @@ każdy klawisz należy do pola, z wyjątkiem `Alt+1` / `Alt+2` / `Alt+3`; `Esc` 
 Komentarz napisany w innym oknie lub przez CLI pokazuje się tu sam: każdy zapis GitPoulpi (także z tego okna)
 informuje sesję, a okna pokazujące to samo żądanie czytają je ponownie.
 
-Pole komentarza to edytor Markdown wspólny z [widokiem rozmowy](hosting-integration.md#pisanie) (także pole
+Pole komentarza to edytor Markdown wspólny z [widokiem rozmowy](conversations.md#pisanie) (także pole
 odpowiedzi w wątku, komentarza do linii i podsumowania w **Zakończ przegląd**): `Ctrl+Enter` (także `Ctrl+S`,
 `Alt+Enter`) wysyła, a gdy AI jest włączone, `Alt+E` otwiera **Pisz z AI**
 ([rozdział o AI](ai.md#pomoc-w-pisaniu-na-hoście)). Podgląd pokazuje tekst tak, jak pokaże go host, z odwołaniami

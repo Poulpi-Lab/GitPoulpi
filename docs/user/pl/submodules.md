@@ -15,6 +15,8 @@ Gdy repozytorium ma `.gitmodules`, panel boczny Refs dostaje sekcję **SUBMODUŁ
 | `○` | niesklonowany | zadeklarowany w `.gitmodules` i zapisany, ale jego folder jest pusty: zaktualizuj go, aby go sklonować |
 | `✗` | w konflikcie | repozytorium ma konflikty merge na submodule |
 
+![Sekcja SUBMODUŁY z trzema wierszami: vendor/almanac niesklonowany (○), vendor/ephemeris aktualny (✓) i vendor/starfield zmodyfikowany (↑, na innym commicie niż zapisany), co widać też jako zmieniony plik w panelu Status](../images/submodules.png)
+
 | Czynność | Mysz | Klawiatura |
 |---|---|---|
 | Otworzyć submoduł we własnej karcie | dwukrotne kliknięcie wiersza | zaznacz go, `Enter` (paleta: `Refs: Otwórz submoduł w karcie`) |
@@ -23,6 +25,8 @@ Gdy repozytorium ma `.gitmodules`, panel boczny Refs dostaje sekcję **SUBMODUŁ
 | Zarejestrować go w `.git/config` bez klonowania | menu | `Ctrl+P`: `Refs: Inicjuj submoduł (zaznaczony)` |
 | Zaktualizować każdy submoduł | | `Ctrl+P`: `Git: Aktualizuj wszystkie submoduły` |
 | Przejść do sekcji | kliknięcie jej nagłówka | `Ctrl+P`: `Nawigacja: Przejdź do Refs > Submodules` |
+
+![Menu prawego przycisku zmodyfikowanego wiersza vendor/starfield: Aktualizuj (sklonuj w razie potrzeby), Zainicjuj i Otwórz w nowej karcie](../images/submodule-menu.png)
 
 Aktualizacja może pobierać dane ze zdalnego repozytorium submodułu, więc podlega ustawieniu **Ustawienia > SSH i poświadczenia > Poświadczenia HTTPS** jak każdy inny transfer. Niesklonowany submoduł nie ma czego otworzyć w karcie; pasek stanu to mówi i wskazuje aktualizację.
 

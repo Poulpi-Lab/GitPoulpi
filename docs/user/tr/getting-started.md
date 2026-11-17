@@ -106,7 +106,7 @@ bir depo seçmenizi sağlar (bkz.
 **Init** bir klasörü yeni bir depoya dönüştürür.
 Üçünde de (ve açtıkları klasör seçicide) `Ctrl+N` her alanın ve düğmenin üzerinde bir rozet gösterir: karakterine basın, imleç alana gelir ya da düğmeye basılır.
 
-| ![Depo klonla iletişim kutusu: nereye klonlanacağı, URL, klasör adı ve Depoyu klonla! düğmesi](../images/clone.png) | ![Depo başlat iletişim kutusu: klasör, ad ve ilk dal](../images/init.png) |
+| ![Depo klonla iletişim kutusu: nereye klonlanacağı, URL, klasör adı ve İptal ile Klonla düğmeleri](../images/clone.png) | ![Depo başlat iletişim kutusu: klasör, ad ve ilk dal](../images/init.png) |
 |---|---|
 
 ### Kısmi checkout

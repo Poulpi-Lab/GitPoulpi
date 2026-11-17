@@ -128,7 +128,7 @@ Sayfa listesinin üstündeki kutu, her sayfadaki her seçeneğin adında ve aç�
 açılır. Her eşleşme seçeneği ve sayfasını gösterir. `Up` / `Down` seçer, `Enter` seçeneğe
 gider, `Esc` listeyi kapatır.
 
-![Ayarlar'da "diff" araması: Log ve grafik, Diff ve düzenleyici ve Git sayfalarından eşleşen seçenekler](../images/settings-search.png)
+![Ayarlar'da "diff" araması: YZ ile Diff ve düzenleyici sayfalarından eşleşen seçenekler](../images/settings-search.png)
 
 ## Komut paletinden ayarlar
 
@@ -212,7 +212,7 @@ olmayan bir kısayol için) ve **Kaldır** vardır.
 
 **Görev çubuğu ve dock gruplaması.** GitPoulpi bir terminal penceresinde çalışır; bu yüzden görev çubuğu onu normalde terminalin simgesi altında, sabitlenmiş GitPoulpi simgesinin altında “çalışıyor” noktası olmadan gösterir. Windows: kısayollar `GitPoulpi.GitPoulpi` AppUserModelID'sini taşır ve onlardan başlatılan GitPoulpi, terminal penceresine aynı kimliği ve kendi simgesini verir (pencereyi, ona bir an benzersiz bir başlık vererek bulur, sonra başlığı geri yükler); böylece pencere sabitlenmiş GitPoulpi simgesinin altında yer alır. Birden çok sekmeli bir terminal penceresi bir bütün olarak taşınır: GitPoulpi içinde çalıştığı sürece tüm sekmeleri GitPoulpi simgesi altında gruplanır. Daha önce yapılmış kısayollar ve görev çubuğu sabitlemeleri aynı eşitlemeyle yeniden yazılır; bir sabitleme hâlâ terminalin simgesini gösteriyorsa sabitlemeyi kaldırıp yeniden sabitleyin. Linux: kitty, foot, Alacritty, WezTerm ve Ghostty `gitpoulpi` pencere sınıfıyla başlatılır ve `.desktop` girdisi bunu belirtir (`StartupWMClass`); böylece dock pencereyi başlatıcının simgesi altında gruplar; diğer terminaller kendi simgelerini korur. macOS: yapılacak bir şey yok, Dock uygulamaya göre gruplar.
 
-![Ayarlar > Başlatıcı: kısayollar için terminal ve uygulama başlatıcısı satırı](../images/settings-launcher.png)
+![Ayarlar > Başlatıcı: kısayollar için terminal, başlatıcı girdileri, komut ve yeni sekme takma adları, takma ad durumu ve PATH denetimi](../images/settings-launcher.png)
 
 #### Komut takma adı ve PATH, sisteme göre
 
@@ -409,7 +409,7 @@ görünür; bkz. [MCP ve ajanlar](mcp-and-agents.md).
 
 ### Görünüm
 
-![Görünüm sayfası: tema, avatarlar, girdi rengi, renk derinliği ve grafik renkleri (tarih biçimleri aşağıda devam eder)](../images/settings-ui.png)
+![Aşağı kaydırılmış Görünüm sayfası: avatar kaynakları ve yedeği, girdi rengi, renk derinliği, metin imleci ve grafik renklerinin başı (tarih biçimleri aşağıda devam eder)](../images/settings-ui.png)
 
 ![Görünüm sayfasında Açık vurgulanmış Tema açılır listesi: Ayarlar ekranının tamamı o temayla yeniden boyanmış](../images/settings-appearance-theme.png)
 

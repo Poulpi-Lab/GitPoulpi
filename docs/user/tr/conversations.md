@@ -50,7 +50,7 @@ Tam pencere bir görünüm: başlık (durum, kimin ne zaman açtığı, etiketle
   bir onay kutusu yoktur.
 - Metin çizilmiş Markdown'dır: başlıklar, iç içe ve görev listeleri, alıntılar, GitHub tarzı uyarı blokları, vurgulanmış
   kod, tablolar, bağlantılar, `[image: alt]` olarak görseller. Barındırıcının kendi işaretlemesiyle gelen metin önce
-  dönüştürülür ([İşaretleme dönüştürme](#işaretleme-dönüştürme) bölümüne bakın). Bir `mermaid` kod bloğu, diyagramın
+  dönüştürülür ([İşaretleme dönüştürme](#i̇şaretleme-dönüştürme) bölümüne bakın). Bir `mermaid` kod bloğu, diyagramın
   kaynağını kaydırılabilir bir görüntüleyicide gösteren bir **Diyagramı aç** düğmesi alır (`Enter` onu kopyalar); paletin
   *Konuşma: Kaydın Diyagramını Aç* satırı da vardır. Hem `conversation` hem `mermaid` içeren bir derleme gerekir.
 - İncelemenin Genel Bakış sayfasında koda ait bir dizinin `path:line` değeri koda giden bir bağlantıdır (`G`, *Konuşma: Dizinin

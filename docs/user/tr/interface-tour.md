@@ -65,7 +65,8 @@ Uygulama sekmesi (düzey kutusu ve **Günlüğü temizle** düğmesi olan uygula
 günlüğü) ve ikisini bu depoya, bir çalışma alanına ya da tüm depolara daraltan
 bir Kapsam kutusu. Düğmenin üzerindeki sayı, henüz bakmadığınız hataları sayar.
 Solunda, iş göstergesi çalışan bir arka plan işini ve onu iptal eden bir `[x]`
-gösterir. **Ana** sekmede de aynı durum çubuğu vardır; Etkinlik düğmesi sağ alttadır
+gösterir (iş listesinde **Hepsini iptal et** vardır, palette de *Görevler: İptal
+Edilebilen Her Şeyi İptal Et*; güvenle durdurulamayan bir iş nedenini söyler). **Ana** sekmede de aynı durum çubuğu vardır; Etkinlik düğmesi sağ alttadır
 (Tüm depolar kapsamında açılır). Bir işlem başarısız olduğunda durum çubuğu kırmızıyla nedenini söyler; Etkinlik
 Günlüğü'ndeki girdisi bir sonraki adımı, ayrıntıları ve bir YZ için Kopyala
 seçeneğini sunar. İkisi de

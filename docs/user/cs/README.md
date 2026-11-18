@@ -167,3 +167,5 @@ vydáních.
 ---
 
 GitKraken je ochranná známka svého příslušného vlastníka. GitPoulpi je nezávislý projekt, který není s tímto vlastníkem spojen ani jím schválen či sponzorován; název je uveden pouze pro popis kompatibility a inspirace.
+
+Všechny ostatní názvy produktů a služeb uvedené v GitPoulpi a jeho dokumentaci jsou ochranné známky svých příslušných vlastníků, například hostingy kódu (GitHub, GitLab, Bitbucket atd.), systémy pro sledování úkolů (Jira, Trello, Linear atd.) a editory a nástroje, které GitPoulpi umí otevřít (Visual Studio Code, JetBrains IDE, lazygit atd.). Slouží pouze k pojmenování toho, s čím GitPoulpi pracuje; GitPoulpi není s žádným z nich spojen ani jimi schválen či sponzorován.

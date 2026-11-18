@@ -105,6 +105,7 @@ author_email = "jane@work.example"
 | `ui.column_resize` | `"line"` | Log, Radar, diff·파일·blame 보기의 commit 열에서 열 경계를 잡는 방식. `line`: 각 경계는 한 칸 폭의 틈이고 머리글에 작은 눈금이 있으며, 포인터가 경계 위(머리글 또는 표의 어디든)에 있는 동안 전체 높이에 걸쳐 가는 강조선이 그려지고 그 선의 어느 지점에서든 드래그하면 크기가 바뀝니다. `header`: 틈도 눈금도 없고, 경계 뒤 머리글 셀의 첫 글자가 밝아지며 거기서 드래그하면 크기가 바뀝니다(머리글에서만). 키보드 크기 조절 키와 팔레트 항목은 두 모드에서 같습니다. |
 | `ui.ref_tree` | `true` | Refs 사이드바에서 브랜치와 tag를 `/` 기준으로 폴더로 묶습니다(`y`로 전환). |
 | `ui.graph_ghost_ref` | `true` | Log의 Ref 열은 자체 ref가 없는 마우스를 올린 commit에, 열에 공간이 있으면, 소속 브랜치(없으면 원격 브랜치)의 이름을 흐린 알약 모양으로 표시하며, tag는 절대 표시하지 않습니다. 삭제된 브랜치는 그것을 병합한 merge commit의 제목에서 추론해 취소선으로 그립니다. 알약에 마우스를 올리면 종류가 표시됩니다. |
+| `ui.tree_folders_first` | `true` | 파일 창(Changes, 상세, 비교)의 트리 보기에서 폴더가 파일보다 하위 폴더를 먼저 나열합니다. `false`이면 경로 순서를 그대로 유지합니다. 평평한 목록은 바뀌지 않습니다(설정 > Log와 그래프). |
 | `ui.reveal_on_ref_click` | `true` | Refs 창에서 ref(브랜치, tag, 리모트 브랜치, stash)를 한 번 클릭하면 Log가 해당 commit으로 스크롤하고 행이 깜박입니다. commit 선택은 움직이지 않습니다. |
 | `ui.log_wip_counts_in_message` | `true` | 변경 열이 숨겨져 있을 때 WIP 메시지에 WIP 변경 수를 표시합니다. |
 | `ui.log_columns_layout` | `"fit"` | Log가 열을 배치하는 방식. `fit`: 보이는 모든 열이 창에 정확히 맞춰지고 `message`만 늘어나며, 창이 좁으면 열이 통째로 양보합니다. `scroll`: 열이 너비를 유지하고(`message`도), 양보하는 열이 없으며, 표가 창보다 넓으면 옆으로 스크롤됩니다. |

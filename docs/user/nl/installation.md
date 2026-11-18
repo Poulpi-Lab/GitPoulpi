@@ -198,7 +198,7 @@ Wat het paneel doet hangt af van hoe GitPoulpi is geïnstalleerd: een releasearc
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version` toont de versie en de commit waarvan de build gemaakt is. Volg

@@ -189,7 +189,7 @@ GitPoulpi は 1 日に 1 回、バックグラウンドで、リリースの公�
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version` はバージョンと、ビルド元の commit を表示します。その後は

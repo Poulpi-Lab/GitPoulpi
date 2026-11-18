@@ -196,7 +196,7 @@ O que o painel faz depende de como o GitPoulpi foi instalado: um arquivo de rele
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version` mostra a versão e o commit a partir do qual a build foi feita. Depois

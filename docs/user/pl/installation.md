@@ -195,7 +195,7 @@ To, co robi panel, zależy od sposobu instalacji GitPoulpi: archiwum wydania lub
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version` wypisuje wersję i commit, z którego zbudowano program. Potem przejdź

@@ -167,7 +167,7 @@ GitPoulpi 每天在后台到发布其版本的地方（默认是 GitHub）检查
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version` 会打印版本以及构建所用的 commit。然后请按照[快速上手](getting-started.md)继续。

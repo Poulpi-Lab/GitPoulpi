@@ -195,7 +195,7 @@ Co panel dělá, závisí na způsobu instalace GitPoulpi: archiv vydání nebo 
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version` vypíše verzi a commit, ze kterého bylo sestavení pořízeno. Poté

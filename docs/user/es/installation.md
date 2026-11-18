@@ -198,7 +198,7 @@ Lo que hace el panel depende de cómo se instaló GitPoulpi: un archivo de versi
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version` muestra la versión y el commit a partir del cual se hizo la build.

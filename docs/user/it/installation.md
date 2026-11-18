@@ -196,7 +196,7 @@ Cosa fa il pannello dipende da come è stato installato GitPoulpi: un archivio d
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version` stampa la versione e il commit da cui è stata fatta la build. Poi

@@ -98,7 +98,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 
 Il choisit l'archive adaptée à votre système et à votre processeur, vérifie son
 `.sha256`, s'installe (canal `archive` : GitPoulpi se met à jour sur place) dans `~/.local/opt/gitpoulpi` et crée des liens
-`gitpoulpi`, `gitpoulpi-tui` et `gitpoulpi-mcp` dans `~/.local/bin`. Aucun accès root n'est
+`gitpoulpi` (qui ouvre l'interface terminal quand on le lance sans sous-commande) et `gitpoulpi-mcp` dans `~/.local/bin`. Aucun accès root n'est
 nécessaire et rien en dehors de votre dossier personnel n'est touché. Sans
 `--yes`, il pose la question de l'alias (`gp` par défaut), du PATH et des
 raccourcis.
@@ -202,7 +202,7 @@ Ce que fait le panneau dépend de la façon dont GitPoulpi a été installé : 
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version` affiche la version et le commit à partir duquel le build a été

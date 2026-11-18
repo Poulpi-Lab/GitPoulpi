@@ -198,7 +198,7 @@ Was das Fenster tut, hängt vom Installationsweg von GitPoulpi ab: Ein Release-A
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version` gibt die Version und den Commit aus, aus dem der Build entstand.

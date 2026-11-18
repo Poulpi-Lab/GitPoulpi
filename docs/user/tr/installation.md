@@ -197,7 +197,7 @@ Panelin ne yaptığı GitPoulpi'nin nasıl kurulduğuna bağlıdır: bir sürüm
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version` sürümü ve derlemenin yapıldığı commit'i yazdırır. Ardından

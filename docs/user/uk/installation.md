@@ -195,7 +195,7 @@ cargo run -p xtask -- dist
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version` виводить версію та commit, з якого зібрано. Далі див.

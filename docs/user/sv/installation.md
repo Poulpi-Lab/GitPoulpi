@@ -195,7 +195,7 @@ Vad panelen gör beror på hur GitPoulpi installerades: ett releasearkiv eller W
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version` skriver ut versionen och den commit bygget gjordes från. Följ sedan

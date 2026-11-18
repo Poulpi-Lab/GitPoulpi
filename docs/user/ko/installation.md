@@ -193,7 +193,7 @@ cargo run -p xtask -- dist
 ```
 gitpoulpi --version
 cd path/to/a/git/repository
-gitpoulpi-tui
+gitpoulpi
 ```
 
 `--version`은 버전과 빌드에 사용된 commit을 출력합니다. 그런 다음

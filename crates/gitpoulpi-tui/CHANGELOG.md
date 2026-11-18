@@ -7,7 +7,7 @@ IPC surfaces are stable within a major version).
 
 ## [Unreleased]
 
-## [1.0.0] - Unreleased
+## [1.0.0] - 2026-11-18
 
 The first public release of GitPoulpi: a Git client for the terminal with a clickable commit graph, a keyboard-first command palette, and a CLI and MCP server that do everything the interface does. No Electron, no account.
 

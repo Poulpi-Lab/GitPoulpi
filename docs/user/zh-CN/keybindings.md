@@ -1328,7 +1328,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 |---|---|
 | `Ctrl+O`，或点击 `⌂` | 转到主页标签页（在主页标签页上：聚焦搜索框；已打开 Radar 或发行说明时：先关闭它） |
 | `Ctrl+Shift+N` | 打开主页标签页并显示克隆对话框 |
-| `Ctrl+PageDown` / `Ctrl+PageUp` | 下一个 / 上一个标签页 |
+| `Ctrl+PageDown` / `Ctrl+PageUp`，`Ctrl+Tab` / `Ctrl+Shift+Tab` | 下一个 / 上一个标签页（`Ctrl+Tab` 这一对仅在终端会发送它时可用） |
 | `t` | 从可筛选的列表中选择标签页 |
 | `Ctrl+W` | 关闭当前标签页（会先确认；仓库不会被更改） |
 | `Ctrl+T`，或右键点击标签页 | 标签页菜单（各行列在[标签行](interface-tour.md#标签行)中） |

@@ -97,6 +97,7 @@ author_email = "jane@work.example"
 | `ui.ref_connector` | `true` | 从引用标签到其 commit 的一条细线。 |
 | `ui.column_resize` | `"line"` | 在 Log、Radar 以及 diff、文件和 Blame 视图的 commit 列中如何抓取列边界。`line`：每条边界是一个单元格宽的间隙，表头中带一个小刻度；指针位于边界上时（在表头或表格中的任意位置），会在全高范围内画出一条细的强调色线，从线上任意位置拖动都可调整宽度。`header`：没有间隙和刻度；边界之后的表头单元格的第一个字符会亮起，从那里拖动即可调整（仅限表头）。键盘调整键和命令面板中的各行在两种模式下相同。 |
 | `ui.ref_tree` | `true` | 在引用侧栏中按 `/` 将分支和 tag 分组为文件夹（`y` 可切换）。 |
+| `ui.tree_folders_first` | `true` | 在文件窗格（更改、详情、比较）的树视图中，文件夹先列出其子文件夹，再列出文件；`false` 保持普通的路径顺序。平铺列表不变（设置 > 日志与图）。 |
 | `ui.graph_ghost_ref` | `true` | Log 的 Ref 列会为没有自身 ref 的悬停 commit，在列里有空间时，显示一个淡色药丸，内含它所属分支（否则为远程分支）的名称；绝不显示 tag。已删除的分支由合并它的 merge commit 的标题推断，并以删除线绘制。悬停在药丸上会显示其类型。 |
 | `ui.reveal_on_ref_click` | `true` | 在引用窗格中点击某个引用（分支、tag、远程分支、stash）会将 Log 滚动到其 commit 并让该行闪烁；commit 的选择不会移动。 |
 | `ui.log_wip_counts_in_message` | `true` | 更改列被隐藏时，在 WIP 消息中显示 WIP 的更改数量。 |

@@ -575,8 +575,8 @@ blame_width = { git = "Blame 注释宽度", local = "追溯注释宽度" }
 blame_width_help = { git = "注释列的宽度，以单元格计（24 到 90）。在 Blame 视图中拖动其边框，或使用加宽 / 收窄键；新宽度会保存在这里。", local = "注释列的宽度，以单元格计（24 到 90）。在追溯视图中拖动其边框，或使用加宽 / 收窄键；新宽度会保存在这里。" }
 ref_tree = "分支文件夹树"
 ref_tree_help = "引用侧栏按 `/` 将分支名分组为可折叠的文件夹，每个远程作为单独的顶级节点。关闭则每个分支占一行平铺显示。引用窗格中按 `y` 可实时切换并将选择写入此处。"
-tree_folders_first = "Folders first in the tree view"
-tree_folders_first_help = "The file panes' tree view (Changes, details, compare) lists the sub-folders of a folder before its files. Off keeps the plain alphabetical path order. The flat list is not affected."
+tree_folders_first = "树视图中文件夹优先"
+tree_folders_first_help = "文件窗格的树视图（更改、详情、比较）会先列出文件夹的子文件夹，再列出其中的文件。关闭后保持按路径的字母顺序。平铺列表不受影响。"
 reveal_on_ref_click = "点击引用时在图中定位"
 reveal_on_ref_click_help = "在 Refs 窗格中点击一个引用，Log 会滚动到它所指的位置并让该行短暂闪烁。Log 中的选择和右侧面板保持不变。关闭后，点击只会选中侧栏中的行。引用菜单中的“在图中定位”、Refs 窗格中的按键和命令面板命令在两种设置下都可用。"
 graph_ghost_ref = { git = "在悬停的 {$commit} 上显示虚影分支", local = "在悬停的{$commit}上显示虚影分支" }

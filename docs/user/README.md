@@ -166,3 +166,5 @@ and the [roadmap](../roadmap.md) describe the design and what is planned;
 ---
 
 GitKraken is a trademark of its respective owner. GitPoulpi is an independent project, not affiliated with, endorsed or sponsored by it; the name is mentioned only to describe compatibility and inspiration.
+
+All other product and service names mentioned in GitPoulpi and its documentation are trademarks of their respective owners, for example code hosts (GitHub, GitLab, Bitbucket, etc.), issue trackers (Jira, Trello, Linear, etc.) and the editors and tools GitPoulpi can open (Visual Studio Code, JetBrains IDEs, lazygit, etc.). They are used only to name what GitPoulpi works with; GitPoulpi is not affiliated with, endorsed or sponsored by any of them.

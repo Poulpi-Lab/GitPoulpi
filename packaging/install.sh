@@ -9,8 +9,8 @@
 # local one with --archive), checks the .sha256 next to it, copies the program
 # files into --prefix (gitpoulpi, gitpoulpi-tui, gitpoulpi-mcp, gitpoulpi-launch
 # and gitpoulpi-updater, with the .gitpoulpi-dist marker that records
-# channel=archive, so GitPoulpi updates itself in place) and links `gitpoulpi` and `gitpoulpi-mcp` into
-# ~/.local/bin. The command alias, the PATH entry and the shortcuts are made by
+# channel=archive, so GitPoulpi updates itself in place) and links `gitpoulpi`, `gitpoulpi-tui` and `gitpoulpi-mcp`
+# into ~/.local/bin. The command alias, the PATH entry and the shortcuts are made by
 # the installed `gitpoulpi` itself (`alias create`, `path add`, `desktop
 # shortcut install`), the same code as Settings > General > Launcher, so the
 # installer and Settings never disagree. --uninstall calls `gitpoulpi uninstall`
@@ -169,7 +169,7 @@ if [ "$UNINSTALL" -eq 1 ]; then
         warn "no gitpoulpi in $PREFIX: only the links are removed"
     fi
     # The links this installer made (never a file that is not ours).
-    for name in gitpoulpi gitpoulpi-mcp; do
+    for name in gitpoulpi gitpoulpi-tui gitpoulpi-mcp; do
         link="$BIN_DIR/$name"
         if [ -L "$link" ]; then
             case "$(readlink "$link")" in
@@ -284,9 +284,7 @@ for f in "$src"/* "$src/$MARKER"; do
     cp -p "$f" "$PREFIX/$base.installing"
     mv -f "$PREFIX/$base.installing" "$PREFIX/$base"
 done
-# The TUI is not linked: `gitpoulpi` with no subcommand opens it, and a link
-# named gitpoulpi-tui would read as a command alias to `gitpoulpi alias`.
-for name in gitpoulpi gitpoulpi-mcp; do
+for name in gitpoulpi gitpoulpi-tui gitpoulpi-mcp; do
     link="$BIN_DIR/$name"
     if [ -e "$link" ] && [ ! -L "$link" ]; then
         warn "$link exists and is not a link: left alone"

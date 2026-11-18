@@ -120,7 +120,9 @@ Quando le schede dei repository non ci stanno, la riga scorre invece di restring
   ai preferiti** (o **Rimuovi dai preferiti**), **Aggiungi all'area di lavoro** (o
   **Rimuovi dall'area di lavoro**, quando hai delle aree di lavoro), **Copia il percorso**,
   **Apri in ›**, **SSH e credenziali...** e **Checkout parziale...**.
-- `Ctrl+PageUp` e `Ctrl+PageDown` cambiano scheda. `Ctrl+W` chiude la scheda
+- `Ctrl+PageUp` e `Ctrl+PageDown` cambiano scheda, così come `Ctrl+Shift+Tab` e
+  `Ctrl+Tab` dove il terminale li inoltra (protocollo tastiera kitty; alcuni
+  terminali e multiplexer li tengono per sé). `Ctrl+W` chiude la scheda
   corrente. Anche un clic con il tasto centrale su una scheda la chiude (con la
   stessa domanda).
 - `t` (o `Ctrl+N Tab`) apre il selettore di schede, un elenco ricercabile delle

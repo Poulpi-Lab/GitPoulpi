@@ -1418,7 +1418,7 @@ La palette ha le stesse azioni, per esempio
 |---|---|
 | `Ctrl+O`, o un clic su `⌂` | Va alla scheda Home (nella scheda Home: dà il focus al campo di ricerca; con il Radar o le note di rilascio aperti: chiudili prima) |
 | `Ctrl+Shift+N` | Apre la scheda Home con la finestra Clona |
-| `Ctrl+PageDown` / `Ctrl+PageUp` | Scheda successiva / precedente |
+| `Ctrl+PageDown` / `Ctrl+PageUp`, `Ctrl+Tab` / `Ctrl+Shift+Tab` | Scheda successiva / precedente (la coppia `Ctrl+Tab` solo dove il terminale la invia) |
 | `t` | Sceglie una scheda da un elenco filtrabile |
 | `Ctrl+W` | Chiude la scheda corrente (chiede prima; il repository non viene modificato) |
 | `Ctrl+T`, o un clic destro su una scheda | Il menu della scheda (le sue voci sono elencate in [Barra delle schede](interface-tour.md#barra-delle-schede)) |

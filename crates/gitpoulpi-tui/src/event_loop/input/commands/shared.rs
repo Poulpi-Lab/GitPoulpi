@@ -987,3 +987,11 @@ pub(in crate::event_loop) fn resize_pane(
         cx.right_auto_collapse.persisted(*cx.right_pane_collapsed),
     );
 }
+
+/// Tab / Shift+Tab landed on the commit graph: it, not a sub-region left
+/// over from the last visit (the changed-files list, its filter), owns the
+/// arrows and `j`/`k`.
+pub(in crate::event_loop) fn graph_takes_keys(cx: &mut CommandCtx<'_>) {
+    *cx.commit_file_focus = false;
+    *cx.commit_filter_focus = false;
+}

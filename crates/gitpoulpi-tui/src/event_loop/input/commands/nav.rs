@@ -135,6 +135,7 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             );
             if *cx.focus == Focus::Log {
                 *cx.right_panel = RightPanel::CommitDetail;
+                super::graph_takes_keys(cx);
             }
             if *cx.focus == Focus::Refs {
                 land_on_open_ref_section(

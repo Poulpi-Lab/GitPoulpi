@@ -21,8 +21,20 @@ use xtask::pty::{Screen, Terminal};
 const STEP: Duration = Duration::from_secs(30);
 
 fn launch(repo: &Path, session: &str, cols: u16, rows: u16) -> (Terminal, tempfile::TempDir) {
+    launch_with(repo, session, cols, rows, "")
+}
+
+/// [`launch`] with `config_toml` seeded into the throwaway config.
+fn launch_with(
+    repo: &Path,
+    session: &str,
+    cols: u16,
+    rows: u16,
+    config_toml: &str,
+) -> (Terminal, tempfile::TempDir) {
     common::launch(repo)
         .session(session)
+        .config(config_toml)
         .size(cols, rows)
         .no_exit_pause()
         .ready_when("the conflicted file in the Status pane", |s| {
@@ -1415,8 +1427,15 @@ fn panes_by_digit_h_l_on_the_same_conflict_and_vim_counts() {
 #[test]
 fn the_scrollbars_mark_the_conflicts_and_a_click_on_a_mark_jumps() {
     let fixture = ConflictFixture::multi_conflict();
-    // Short enough that a.txt (30 lines) scrolls.
-    let (mut term, _config) = launch(fixture.root(), "pty-merge-marks", 200, 24);
+    // Short enough that a.txt (30 lines) scrolls. At 24 rows the Unstaged
+    // list shows one row, so keep a.txt above the docs/ folder.
+    let (mut term, _config) = launch_with(
+        fixture.root(),
+        "pty-merge-marks",
+        200,
+        24,
+        "[ui]\ntree_folders_first = false\n",
+    );
     open_with_enter(&mut term, "a.txt", "Conflict 1 / 3");
     // The scrollbar's column (the up arrow of the A / B track) and the marks
     // on both tracks are one whole state: the frame that opens the editor

@@ -273,6 +273,14 @@ impl KeyChord {
             return false;
         };
         let want = self.class();
+        // `Shift+Tab` spells itself two ways: `BackTab` (legacy, and
+        // crossterm's decoding of most kitty reports) or `Tab` with Shift.
+        // A `Tab` binding with Shift accepts both.
+        let actual = if want.key == Key::Tab && want.mods.shift && actual.key == Key::BackTab {
+            KeyChord::new(actual.mods, Key::Tab)
+        } else {
+            actual
+        };
         if want.key != actual.key {
             return false;
         }

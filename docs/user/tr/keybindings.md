@@ -63,8 +63,8 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `global` | `tab_open_in_popup` | Şurada aç (liste) | `Alt+O` |
 | `global` | `tab_open_in_default` | Varsayılanda aç | `Ctrl+Alt+O` |
 | `global` | `close_tab` | Sekmeyi Kapat | `Ctrl+W` |
-| `global` | `next_tab` | Sonraki Sekme | `Ctrl+PageDown` |
-| `global` | `prev_tab` | Önceki Sekme | `Ctrl+PageUp` |
+| `global` | `next_tab` | Sonraki Sekme | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | Önceki Sekme | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | Yardım | `?` |
 | `global` | `quit` | Çık | `q` |
 | `global` | `refresh` | Yenile | `r` |

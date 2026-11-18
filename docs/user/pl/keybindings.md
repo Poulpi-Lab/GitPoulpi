@@ -62,8 +62,8 @@ prefiksem (`Ctrl+G s`).
 | `global` | `tab_open_in_popup` | Otwórz w (lista) | `Alt+O` |
 | `global` | `tab_open_in_default` | Otwórz w domyślnym | `Ctrl+Alt+O` |
 | `global` | `close_tab` | Zamknij kartę | `Ctrl+W` |
-| `global` | `next_tab` | Następna karta | `Ctrl+PageDown` |
-| `global` | `prev_tab` | Poprzednia karta | `Ctrl+PageUp` |
+| `global` | `next_tab` | Następna karta | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | Poprzednia karta | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | Pomoc | `?` |
 | `global` | `quit` | Zakończ | `q` |
 | `global` | `refresh` | Odśwież | `r` |

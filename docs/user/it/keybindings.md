@@ -64,8 +64,8 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `global` | `tab_open_in_popup` | Apri in (elenco) | `Alt+O` |
 | `global` | `tab_open_in_default` | Apri nella voce predefinita | `Ctrl+Alt+O` |
 | `global` | `close_tab` | Chiudi scheda | `Ctrl+W` |
-| `global` | `next_tab` | Scheda successiva | `Ctrl+PageDown` |
-| `global` | `prev_tab` | Scheda precedente | `Ctrl+PageUp` |
+| `global` | `next_tab` | Scheda successiva | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | Scheda precedente | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | Aiuto | `?` |
 | `global` | `quit` | Esci | `q` |
 | `global` | `refresh` | Aggiorna | `r` |

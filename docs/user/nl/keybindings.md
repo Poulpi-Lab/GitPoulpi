@@ -64,8 +64,8 @@ prefix getoond (`Ctrl+G s`).
 | `global` | `tab_open_in_popup` | Openen in (lijst) | `Alt+O` |
 | `global` | `tab_open_in_default` | Openen in standaard | `Ctrl+Alt+O` |
 | `global` | `close_tab` | Tabblad sluiten | `Ctrl+W` |
-| `global` | `next_tab` | Volgend tabblad | `Ctrl+PageDown` |
-| `global` | `prev_tab` | Vorig tabblad | `Ctrl+PageUp` |
+| `global` | `next_tab` | Volgend tabblad | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | Vorig tabblad | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | Help | `?` |
 | `global` | `quit` | Afsluiten | `q` |
 | `global` | `refresh` | Vernieuwen | `r` |

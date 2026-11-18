@@ -64,8 +64,8 @@ préfixe (`Ctrl+G s`).
 | `global` | `tab_open_in_popup` | Ouvrir dans (liste) | `Alt+O` |
 | `global` | `tab_open_in_default` | Ouvrir dans l'entrée par défaut | `Ctrl+Alt+O` |
 | `global` | `close_tab` | Fermer l'onglet | `Ctrl+W` |
-| `global` | `next_tab` | Onglet suivant | `Ctrl+PageDown` |
-| `global` | `prev_tab` | Onglet précédent | `Ctrl+PageUp` |
+| `global` | `next_tab` | Onglet suivant | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | Onglet précédent | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | Aide | `?` |
 | `global` | `quit` | Quitter | `q` |
 | `global` | `refresh` | Actualiser | `r` |
@@ -1415,7 +1415,7 @@ La palette a les mêmes actions, par exemple
 |---|---|
 | `Ctrl+O`, ou un clic sur `⌂` | Aller à l'onglet Accueil (sur l'onglet Accueil : cibler la zone de recherche ; avec le Radar ou les notes de version ouverts : le fermer d'abord) |
 | `Ctrl+Shift+N` | Ouvrir l'onglet Accueil avec la boîte Cloner |
-| `Ctrl+PageDown` / `Ctrl+PageUp` | Onglet suivant / précédent |
+| `Ctrl+PageDown` / `Ctrl+PageUp`, `Ctrl+Tab` / `Ctrl+Shift+Tab` | Onglet suivant / précédent (la paire `Ctrl+Tab` seulement si le terminal l'envoie) |
 | `t` | Choisir un onglet dans une liste filtrable |
 | `Ctrl+W` | Fermer l'onglet courant (demande d'abord ; le dépôt n'est pas modifié) |
 | `Ctrl+T`, ou un clic droit sur un onglet | Le menu de l'onglet (ses lignes sont listées dans [Barre d'onglets](interface-tour.md#barre-donglets)) |

@@ -61,8 +61,8 @@ As teclas depois de um prefixo aparecem com o prefixo (`Ctrl+G s`).
 | `global` | `tab_open_in_popup` | Abrir em (lista) | `Alt+O` |
 | `global` | `tab_open_in_default` | Abrir no padrão | `Ctrl+Alt+O` |
 | `global` | `close_tab` | Fechar aba | `Ctrl+W` |
-| `global` | `next_tab` | Próxima aba | `Ctrl+PageDown` |
-| `global` | `prev_tab` | Aba anterior | `Ctrl+PageUp` |
+| `global` | `next_tab` | Próxima aba | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | Aba anterior | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | Ajuda | `?` |
 | `global` | `quit` | Sair | `q` |
 | `global` | `refresh` | Atualizar | `r` |

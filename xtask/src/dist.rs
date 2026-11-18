@@ -1,5 +1,5 @@
 //! `cargo run -p xtask -- dist`: build the binaries with the `dist`
-//! profile (fat LTO) and pack them into `target/dist/`.
+//! profile (thin LTO) and pack them into `target/dist/`.
 //!
 //! The archive is `gitpoulpi-<version>-<target>.zip` on Windows targets and
 //! `.tar.gz` everywhere else, next to a `.sha256` file in the format
@@ -353,7 +353,7 @@ pub fn run(args: &[String]) -> Result<i32, String> {
         if let Some(t) = &target {
             cmd.args(["--target", t]);
         }
-        eprintln!("xtask dist: building with --profile dist (fat LTO, this takes a while)");
+        eprintln!("xtask dist: building with --profile dist (thin LTO, this takes a while)");
         let status = cmd.status().map_err(|e| format!("cannot run cargo: {e}"))?;
         if !status.success() {
             return Err("cargo build --profile dist failed".into());

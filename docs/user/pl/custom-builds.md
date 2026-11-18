@@ -165,7 +165,7 @@ Zmierzone w Linuksie dnia 2026-10-29 na commicie `65999ef5c`, z pełnej kompilac
 
 ## Uwagi
 
-- Własna kompilacja jest wolna jak każda kompilacja `dist` (fat LTO, kilka minut).
+- Własna kompilacja jest wolna jak każda kompilacja `dist` (thin LTO, kilka minut).
 - Działa bez sccache, tak jak `build-opti`.
 - Kody języków są sprawdzane względem dostarczanych lokalizacji; nieznany kod jest
   odrzucany wraz z listą poprawnych.

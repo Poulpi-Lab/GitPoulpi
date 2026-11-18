@@ -139,6 +139,6 @@ PowerShell 的名称：`-Langs -Integrations -Themes -LogoColors -LogoDefault -I
 
 ## 注意事项
 
-- 自定义构建和任何 `dist` 构建一样慢（fat LTO，几分钟）。
+- 自定义构建和任何 `dist` 构建一样慢（thin LTO，几分钟）。
 - 它和 `build-opti` 一样，不使用 sccache 运行。
 - 语言代码会与随附的语言环境进行核对；未知代码会被拒绝，并列出有效的代码。

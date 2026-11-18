@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Builds gitpoulpi (CLI + TUI + daemon), gitpoulpi-tui, gitpoulpi-mcp and gitpoulpi-launch
-    with the `dist` profile (fat LTO, one codegen unit, stripped): slow to
+    with the `dist` profile (thin LTO, 16 codegen units, stripped): slow to
     build, smallest and fastest binaries. Outputs land in target\dist\.
     Linux/macOS twin: scripts/build-opti.sh.
 

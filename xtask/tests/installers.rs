@@ -618,3 +618,11 @@ fn the_packaging_files_hold_no_em_dash() {
         assert!(!read(file).contains('\u{2014}'), "{file}");
     }
 }
+#[test]
+fn the_dist_profile_uses_thin_lto() {
+    let cargo = read("Cargo.toml");
+    let dist = cargo.split("[profile.dist]").nth(1).unwrap();
+    let dist = dist.split("\n[").next().unwrap();
+    assert!(dist.contains("lto = \"thin\""), "{dist}");
+    assert!(dist.contains("codegen-units = 16"), "{dist}");
+}

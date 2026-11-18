@@ -164,7 +164,7 @@ Uppmätt på Linux 2026-10-29 vid commit `65999ef5c`, från det fulla bygget, sk
 
 ## Anteckningar
 
-- Ett anpassat bygge är långsamt som varje `dist`-bygge (fat LTO, några minuter).
+- Ett anpassat bygge är långsamt som varje `dist`-bygge (thin LTO, några minuter).
 - Det körs utan sccache, som `build-opti`.
 - Språkkoder kontrolleras mot de levererade locale-filerna; en okänd kod vägras
   med listan över giltiga.

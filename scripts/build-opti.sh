@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Optimized build for official releases: the `dist` profile (fat LTO, one
-# codegen unit, stripped). Slow to build, smallest and fastest binaries.
+# Optimized build for official releases: the `dist` profile (thin LTO, 16
+# codegen units, stripped). Slow to build, smallest and fastest binaries.
 # Outputs land in target/dist/. Windows twin: scripts/build-opti.ps1.
 #
 #   scripts/build-opti.sh            (or ./build-opti.sh at the root; extra args go to cargo)

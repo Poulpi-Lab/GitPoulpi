@@ -8,7 +8,7 @@
 #     repository and the tag with `/` turned into `-`, which `_srcdir` below assumes;
 #   - regenerate .SRCINFO: makepkg --printsrcinfo > .SRCINFO, and build in a clean chroot.
 #
-# The build uses the `dist` profile of the official archives (fat LTO, one codegen unit): several minutes
+# The build uses the `dist` profile of the official archives (thin LTO, 16 codegen units): several minutes
 # and a few GB of RAM. `--release` builds faster with slightly larger binaries if that matters more.
 # A `.gitpoulpi-dist` marker with channel=aur is installed next to the programs in /usr/lib/gitpoulpi, so
 # GitPoulpi never replaces its own files; /usr/bin holds symlinks.

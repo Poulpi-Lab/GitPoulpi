@@ -6,7 +6,7 @@ name: Release
 #
 #   preflight cargo-deny (advisories, bans, sources, licenses) and the minimum age of every crates.io version
 #             added since the previous release tag (xtask lock-age). CI is disabled, so this is where they run.
-#   build     every OS and CPU: `cargo run -p xtask -- dist` (fat LTO), then the installers (Inno Setup and MSI on
+#   build     every OS and CPU: `cargo run -p xtask -- dist` (thin LTO), then the installers (Inno Setup and MSI on
 #             Windows, a .deb on Linux), each with a .sha256.
 #   publish   one GitHub release with every archive, installer, .deb, install.sh, latest.json, security.json, the SBOM,
 #             the .sha256 files and a minisign .minisig for every asset (xtask sign). Runs in the `release`

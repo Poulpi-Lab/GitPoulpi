@@ -164,7 +164,7 @@ Změřeno na Linuxu dne 2026-10-29 na commitu `65999ef5c`, od plného buildu, ro
 
 ## Poznámky
 
-- Vlastní build je pomalý jako každý build `dist` (fat LTO, několik minut).
+- Vlastní build je pomalý jako každý build `dist` (thin LTO, několik minut).
 - Běží bez sccache, stejně jako `build-opti`.
 - Kódy jazyků se kontrolují proti dodaným locale; neznámý kód je odmítnut se
   seznamem platných.

@@ -663,9 +663,18 @@ fn the_palette_reaches_write_with_ai_and_refresh_context_over_the_form() {
     // Write with AI, from the palette: the panel opens, the text is intact.
     palette_row(&mut term, "Write with AI", "Markdown Editor: Write with AI");
     let screen = term
-        .wait_for("the AI field", STEP, |s| {
-            s.contains("What I want in this answer")
-        })
+        // The frame that paints the panel can reach the screen before the one
+        // that clears the palette: wait for the whole picture, not for the
+        // panel alone, or the palette's leftover rows hide the typed text.
+        .wait_for(
+            "the AI field, the palette gone, the text intact",
+            STEP,
+            |s| {
+                s.contains("What I want in this answer")
+                    && s.contains("my own words")
+                    && !s.contains("Command Palette")
+            },
+        )
         .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
     assert!(screen.contains("my own words"), "{}", screen.text());
 

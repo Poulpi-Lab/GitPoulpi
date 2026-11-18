@@ -1407,7 +1407,7 @@ Die Palette hat dieselben Aktionen, zum Beispiel
 |---|---|
 | `Ctrl+O` oder ein Klick auf `⌂` | Zum Home-Tab gehen (im Home-Tab: das Suchfeld fokussieren; bei geöffnetem Radar oder geöffneten Versionshinweisen: zuerst schließen) |
 | `Ctrl+Shift+N` | Den Home-Tab mit dem Klon-Dialog öffnen |
-| `Ctrl+PageDown` / `Ctrl+PageUp` | Nächster / vorheriger Tab |
+| `Ctrl+PageDown` / `Ctrl+PageUp`, `Ctrl+Tab` / `Ctrl+Shift+Tab` | Nächster / vorheriger Tab (das Paar mit `Ctrl+Tab` nur, wo das Terminal es sendet) |
 | `t` | Einen Tab aus einer filterbaren Liste wählen |
 | `Ctrl+W` | Den aktuellen Tab schließen (fragt vorher; das Repository wird nicht geändert) |
 | `Ctrl+T` oder ein Rechtsklick auf einen Tab | Das Tab-Menü (seine Zeilen stehen unter [Tab-Leiste](interface-tour.md#tab-leiste)) |

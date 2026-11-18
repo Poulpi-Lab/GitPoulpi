@@ -89,7 +89,9 @@ Passen die Repository-Tabs nicht in die Zeile, scrollt sie, statt sie zu verklei
   (oder **Aus Favoriten entfernen**), **Zum Workspace hinzufügen** (oder **Aus dem
   Workspace entfernen**, wenn Sie Workspaces haben), **Pfad kopieren**, **Öffnen in ›**,
   **SSH & Zugangsdaten...** und **Sparse Checkout...**.
-- `Ctrl+PageUp` und `Ctrl+PageDown` wechseln die Tabs. `Ctrl+W` schließt den
+- `Ctrl+PageUp` und `Ctrl+PageDown` wechseln die Tabs, ebenso `Ctrl+Shift+Tab` und
+  `Ctrl+Tab`, wo Ihr Terminal sie weiterreicht (Kitty-Tastaturprotokoll; manche
+  Terminals und Multiplexer behalten sie für sich). `Ctrl+W` schließt den
   aktuellen Tab. Ein Mittelklick auf einen Tab schließt ihn ebenfalls (mit derselben
   Rückfrage).
 - `t` (oder `Ctrl+N Tab`) öffnet die Tab-Auswahl, eine durchsuchbare Liste der

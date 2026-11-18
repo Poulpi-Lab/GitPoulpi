@@ -114,10 +114,12 @@ pub(crate) fn close_tab_prompt(tabs: &[repo_switcher::RepoTab], index: usize) ->
 /// test can call it without a live terminal.
 pub(crate) fn repo_tab_cycle_chord(key: &KeyEvent) -> Option<bool> {
     let km = keymap::current();
-    if km.is(keymap::Action::GlobalNextTab, key) {
-        Some(true)
-    } else if km.is(keymap::Action::GlobalPrevTab, key) {
+    // Previous first: `Ctrl+Tab` is lenient about extra modifiers, so it
+    // would also swallow `Ctrl+Shift+Tab`.
+    if km.is(keymap::Action::GlobalPrevTab, key) {
         Some(false)
+    } else if km.is(keymap::Action::GlobalNextTab, key) {
+        Some(true)
     } else {
         None
     }
@@ -1215,6 +1217,30 @@ mod tests {
         let ctrl_page_up = KeyEvent::new(KeyCode::PageUp, KeyModifiers::CONTROL);
         assert_eq!(repo_tab_cycle_chord(&ctrl_page_down), Some(true));
         assert_eq!(repo_tab_cycle_chord(&ctrl_page_up), Some(false));
+
+        // Ctrl+Tab / Ctrl+Shift+Tab, in every spelling a terminal uses.
+        let m = KeyModifiers::CONTROL;
+        assert_eq!(
+            repo_tab_cycle_chord(&KeyEvent::new(KeyCode::Tab, m)),
+            Some(true)
+        );
+        assert_eq!(
+            repo_tab_cycle_chord(&KeyEvent::new(KeyCode::BackTab, m)),
+            Some(false)
+        );
+        assert_eq!(
+            repo_tab_cycle_chord(&KeyEvent::new(KeyCode::BackTab, m | KeyModifiers::SHIFT)),
+            Some(false)
+        );
+        assert_eq!(
+            repo_tab_cycle_chord(&KeyEvent::new(KeyCode::Tab, m | KeyModifiers::SHIFT)),
+            Some(false)
+        );
+        // Plain Tab keeps cycling focus.
+        assert_eq!(
+            repo_tab_cycle_chord(&KeyEvent::new(KeyCode::Tab, KeyModifiers::NONE)),
+            None
+        );
 
         // The Log's own paging: no Ctrl, must not be claimed by this chord.
         let plain_page_down = KeyEvent::new(KeyCode::PageDown, KeyModifiers::NONE);

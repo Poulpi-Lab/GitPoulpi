@@ -131,7 +131,9 @@ past the tabs on screen. `Ctrl+N` puts a badge on each live arrow.
   **Remove from favorites**), **Add to workspace** (or **Remove from
   workspace**, when you have workspaces), **Copy path**, **Open in ›**,
   **SSH & credentials...** and **Sparse checkout...**.
-- `Ctrl+PageUp` and `Ctrl+PageDown` switch tabs. `Ctrl+W` closes the current
+- `Ctrl+PageUp` and `Ctrl+PageDown` switch tabs, and so do `Ctrl+Shift+Tab` and
+  `Ctrl+Tab` where your terminal passes them on (kitty keyboard protocol; some
+  terminals and multiplexers keep them for themselves). `Ctrl+W` closes the current
   tab. A middle-click on a tab closes it too (with the same question).
 - `t` (or `Ctrl+N Tab`) opens the tab picker, a searchable list of the open
   tabs.

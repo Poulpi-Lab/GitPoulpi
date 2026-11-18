@@ -60,8 +60,8 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `global` | `tab_open_in_popup` | Öffnen in (Liste) | `Alt+O` |
 | `global` | `tab_open_in_default` | Im Standardeintrag öffnen | `Ctrl+Alt+O` |
 | `global` | `close_tab` | Tab schließen | `Ctrl+W` |
-| `global` | `next_tab` | Nächster Tab | `Ctrl+PageDown` |
-| `global` | `prev_tab` | Vorheriger Tab | `Ctrl+PageUp` |
+| `global` | `next_tab` | Nächster Tab | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | Vorheriger Tab | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | Hilfe | `?` |
 | `global` | `quit` | Beenden | `q` |
 | `global` | `refresh` | Aktualisieren | `r` |

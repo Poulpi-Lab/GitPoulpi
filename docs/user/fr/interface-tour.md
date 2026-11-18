@@ -110,7 +110,9 @@ chaque flèche active.
   **Ajouter aux favoris** (ou **Retirer des favoris**), **Ajouter à l'espace de travail**
   (ou **Retirer de l'espace de travail**, quand vous avez des espaces de travail),
   **Copier le chemin**, **Ouvrir dans ›**, **SSH et identifiants...** et **Extraction partielle...**.
-- `Ctrl+PageUp` et `Ctrl+PageDown` changent d'onglet. `Ctrl+W` ferme l'onglet
+- `Ctrl+PageUp` et `Ctrl+PageDown` changent d'onglet, tout comme `Ctrl+Shift+Tab` et
+  `Ctrl+Tab` quand votre terminal les transmet (protocole clavier kitty ; certains
+  terminaux et multiplexeurs les gardent pour eux). `Ctrl+W` ferme l'onglet
   courant. Un clic du milieu sur un onglet le ferme aussi (avec la même question).
 - `t` (ou `Ctrl+N Tab`) ouvre le sélecteur d'onglets, une liste filtrable des
   onglets ouverts.

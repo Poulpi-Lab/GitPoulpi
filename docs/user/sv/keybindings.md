@@ -63,8 +63,8 @@ Varje tangent du kan binda om, med id:t som används i
 | `global` | `tab_open_in_popup` | Öppna i (lista) | `Alt+O` |
 | `global` | `tab_open_in_default` | Öppna i standard | `Ctrl+Alt+O` |
 | `global` | `close_tab` | Stäng flik | `Ctrl+W` |
-| `global` | `next_tab` | Nästa flik | `Ctrl+PageDown` |
-| `global` | `prev_tab` | Föregående flik | `Ctrl+PageUp` |
+| `global` | `next_tab` | Nästa flik | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | Föregående flik | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | Hjälp | `?` |
 | `global` | `quit` | Avsluta | `q` |
 | `global` | `refresh` | Uppdatera | `r` |

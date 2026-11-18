@@ -65,8 +65,8 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `global` | `tab_open_in_popup` | Abrir en (lista) | `Alt+O` |
 | `global` | `tab_open_in_default` | Abrir en el predeterminado | `Ctrl+Alt+O` |
 | `global` | `close_tab` | Cerrar pestaña | `Ctrl+W` |
-| `global` | `next_tab` | Pestaña siguiente | `Ctrl+PageDown` |
-| `global` | `prev_tab` | Pestaña anterior | `Ctrl+PageUp` |
+| `global` | `next_tab` | Pestaña siguiente | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | Pestaña anterior | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | Ayuda | `?` |
 | `global` | `quit` | Salir | `q` |
 | `global` | `refresh` | Actualizar | `r` |

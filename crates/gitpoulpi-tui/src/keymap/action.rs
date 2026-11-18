@@ -389,8 +389,8 @@ actions! {
     TabOpenInPopup => (Global, "global.tab_open_in_popup", GLOBAL_TAB_OPEN_IN_POPUP, ["Alt+O"]),
     TabOpenInDefault => (Global, "global.tab_open_in_default", GLOBAL_TAB_OPEN_IN_DEFAULT, ["Ctrl+Alt+O"]),
     GlobalCloseTab => (Global, "global.close_tab", GLOBAL_CLOSE_TAB, ["Ctrl+W"]),
-    GlobalNextTab => (Global, "global.next_tab", GLOBAL_NEXT_TAB, ["Ctrl+PageDown"]),
-    GlobalPrevTab => (Global, "global.prev_tab", GLOBAL_PREV_TAB, ["Ctrl+PageUp"]),
+    GlobalNextTab => (Global, "global.next_tab", GLOBAL_NEXT_TAB, ["Ctrl+PageDown", "Ctrl+Tab"]),
+    GlobalPrevTab => (Global, "global.prev_tab", GLOBAL_PREV_TAB, ["Ctrl+PageUp", "Ctrl+Shift+Tab"]),
     // ---- global: plain keys ----
     GlobalHelp => (Global, "global.help", GLOBAL_HELP, ["?"]),
     GlobalQuit => (Global, "global.quit", GLOBAL_QUIT, ["q"]),

@@ -47,8 +47,8 @@ stage_file = "z"
 | `global` | `tab_open_in_popup` | 打开方式（列表） | `Alt+O` |
 | `global` | `tab_open_in_default` | 用默认方式打开 | `Ctrl+Alt+O` |
 | `global` | `close_tab` | 关闭标签页 | `Ctrl+W` |
-| `global` | `next_tab` | 下一个标签页 | `Ctrl+PageDown` |
-| `global` | `prev_tab` | 上一个标签页 | `Ctrl+PageUp` |
+| `global` | `next_tab` | 下一个标签页 | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | 上一个标签页 | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | 帮助 | `?` |
 | `global` | `quit` | 退出 | `q` |
 | `global` | `refresh` | 刷新 | `r` |

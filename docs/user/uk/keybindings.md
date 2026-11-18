@@ -59,8 +59,8 @@ stage_file = "z"
 | `global` | `tab_open_in_popup` | Відкрити в (список) | `Alt+O` |
 | `global` | `tab_open_in_default` | Відкрити в типовому | `Ctrl+Alt+O` |
 | `global` | `close_tab` | Закрити вкладку | `Ctrl+W` |
-| `global` | `next_tab` | Наступна вкладка | `Ctrl+PageDown` |
-| `global` | `prev_tab` | Попередня вкладка | `Ctrl+PageUp` |
+| `global` | `next_tab` | Наступна вкладка | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | Попередня вкладка | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | Довідка | `?` |
 | `global` | `quit` | Вийти | `q` |
 | `global` | `refresh` | Оновити | `r` |

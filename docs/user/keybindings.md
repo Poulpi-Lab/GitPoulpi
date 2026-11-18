@@ -61,8 +61,8 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `global` | `tab_open_in_popup` | Open In (list) | `Alt+O` |
 | `global` | `tab_open_in_default` | Open in Default | `Ctrl+Alt+O` |
 | `global` | `close_tab` | Close Tab | `Ctrl+W` |
-| `global` | `next_tab` | Next Tab | `Ctrl+PageDown` |
-| `global` | `prev_tab` | Previous Tab | `Ctrl+PageUp` |
+| `global` | `next_tab` | Next Tab | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | Previous Tab | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | Help | `?` |
 | `global` | `quit` | Quit | `q` |
 | `global` | `refresh` | Refresh | `r` |
@@ -1411,7 +1411,7 @@ The palette has the same actions, for example
 |---|---|
 | `Ctrl+O`, or a click on `⌂` | Go to the Home tab (on the Home tab: focus the search field; with the Radar or the release notes open: close it first) |
 | `Ctrl+Shift+N` | Open the Home tab with the Clone dialog |
-| `Ctrl+PageDown` / `Ctrl+PageUp` | Next / previous tab |
+| `Ctrl+PageDown` / `Ctrl+PageUp`, `Ctrl+Tab` / `Ctrl+Shift+Tab` | Next / previous tab (the `Ctrl+Tab` pair only where the terminal sends it) |
 | `t` | Choose a tab from a filterable list |
 | `Ctrl+W` | Close the current tab (asks first; the repository is not changed) |
 | `Ctrl+T`, or a right-click on a tab | The tab menu (its rows are listed in [Tab row](interface-tour.md#tab-row)) |

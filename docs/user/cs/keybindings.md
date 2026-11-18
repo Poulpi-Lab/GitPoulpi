@@ -62,8 +62,8 @@ předponou (`Ctrl+G s`).
 | `global` | `tab_open_in_popup` | Otevřít v (seznam) | `Alt+O` |
 | `global` | `tab_open_in_default` | Otevřít ve výchozí položce | `Ctrl+Alt+O` |
 | `global` | `close_tab` | Zavřít kartu | `Ctrl+W` |
-| `global` | `next_tab` | Další karta | `Ctrl+PageDown` |
-| `global` | `prev_tab` | Předchozí karta | `Ctrl+PageUp` |
+| `global` | `next_tab` | Další karta | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | Předchozí karta | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | Nápověda | `?` |
 | `global` | `quit` | Ukončit | `q` |
 | `global` | `refresh` | Obnovit | `r` |

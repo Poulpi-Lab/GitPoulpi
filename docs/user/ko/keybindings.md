@@ -59,8 +59,8 @@ stage_file = "z"
 | `global` | `tab_open_in_popup` | 열기 위치 (목록) | `Alt+O` |
 | `global` | `tab_open_in_default` | 기본 위치에서 열기 | `Ctrl+Alt+O` |
 | `global` | `close_tab` | 탭 닫기 | `Ctrl+W` |
-| `global` | `next_tab` | 다음 탭 | `Ctrl+PageDown` |
-| `global` | `prev_tab` | 이전 탭 | `Ctrl+PageUp` |
+| `global` | `next_tab` | 다음 탭 | `Ctrl+PageDown`, `Ctrl+Tab` |
+| `global` | `prev_tab` | 이전 탭 | `Ctrl+PageUp`, `Ctrl+Shift+Tab` |
 | `global` | `help` | 도움말 | `?` |
 | `global` | `quit` | 종료 | `q` |
 | `global` | `refresh` | 새로 고침 | `r` |

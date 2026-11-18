@@ -1409,7 +1409,7 @@ Paleta má stejné akce, například `Navigace: Přejít na Refs > Lokální` ne
 |---|---|
 | `Ctrl+O`, nebo klik na `⌂` | Přejít na kartu Domů (na kartě Domů: zaostřit vyhledávací pole; s otevřeným Radarem nebo poznámkami k vydání: nejprve je zavřít) |
 | `Ctrl+Shift+N` | Otevřít kartu Domů s dialogem Klonovat |
-| `Ctrl+PageDown` / `Ctrl+PageUp` | Další / předchozí karta |
+| `Ctrl+PageDown` / `Ctrl+PageUp`, `Ctrl+Tab` / `Ctrl+Shift+Tab` | Další / předchozí karta (dvojice s `Ctrl+Tab` jen tam, kde ji terminál pošle) |
 | `t` | Zvolit kartu z filtrovatelného seznamu |
 | `Ctrl+W` | Zavřít aktuální kartu (nejdřív se zeptá; repozitář se nezmění) |
 | `Ctrl+T`, nebo pravé tlačítko na kartě | Nabídka karty (její řádky jsou vypsány v části [Řádek karet](interface-tour.md#řádek-karet)) |

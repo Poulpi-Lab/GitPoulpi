@@ -108,7 +108,9 @@ za karty viditelné na obrazovce. `Ctrl+N` dá na každou živou šipku odznak.
   **Přidat do pracovního prostoru** (nebo **Odebrat z pracovního prostoru**, když
   máte pracovní prostory), **Kopírovat cestu**, **Otevřít v ›**, **SSH a přihlášení...**
   a **Částečný checkout...**.
-- `Ctrl+PageUp` a `Ctrl+PageDown` přepínají karty. `Ctrl+W` zavře aktuální
+- `Ctrl+PageUp` a `Ctrl+PageDown` přepínají karty, stejně tak `Ctrl+Shift+Tab` a
+  `Ctrl+Tab`, pokud je váš terminál předá (protokol kláves kitty; některé
+  terminály a multiplexery si je nechávají pro sebe). `Ctrl+W` zavře aktuální
   kartu. Zavře ji i prostřední tlačítko na kartě (se stejnou otázkou).
 - `t` (nebo `Ctrl+N Tab`) otevře výběr karty, prohledávatelný seznam otevřených
   karet.

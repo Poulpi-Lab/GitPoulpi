@@ -698,3 +698,37 @@ fn the_release_and_the_cache_workflows_share_the_cache_keys_and_only_main_saves(
     };
     assert_eq!(toolchain(&release), toolchain(&warm));
 }
+#[test]
+fn the_build_waits_for_the_early_installer_checks_built_from_dummy_files() {
+    let yml = read(".github/workflows/release.yml");
+    let build = job(&yml, "build");
+    for early in ["installers-windows", "installers-linux"] {
+        assert!(
+            build.contains("needs: [preflight, installers-windows, installers-linux]")
+                && build.contains(early),
+            "build must need {early}"
+        );
+        // Nothing to wait for: the check starts with the run.
+        assert!(!job(&yml, early).contains("needs:"), "{early}");
+    }
+    let windows = job(&yml, "installers-windows");
+    assert!(windows.contains("runs-on: windows-latest"));
+    assert!(windows.contains("choco install innosetup"));
+    assert!(windows.contains("packaging/windows/gitpoulpi.iss"));
+    assert!(windows.contains("dotnet tool install --global wix --version 5.0.2"));
+    assert!(windows.contains("wix build packaging/msi/gitpoulpi.wxs -arch x64"));
+    assert!(windows.contains("-d \"MarkerFile="));
+    // No compile: the early job must stay cheap.
+    assert!(!windows.contains("cargo build") && !windows.contains("xtask"));
+    let linux = job(&yml, "installers-linux");
+    assert!(linux.contains("cargo deb -p gitpoulpi-cli --no-build"));
+    assert!(linux.contains("target/deb-stage"));
+    assert!(!linux.contains("cargo build") && !linux.contains("xtask"));
+    // The real MSI step uses the same wix version and architecture.
+    let real = steps(&build)
+        .into_iter()
+        .find(|s| s.contains("wix build"))
+        .unwrap();
+    assert!(real.contains("dotnet tool install --global wix --version 5.0.2"));
+    assert!(real.contains("-arch x64"));
+}

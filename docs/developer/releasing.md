@@ -13,7 +13,8 @@ A tag with a `-` in the version (`releases/v0.2.0-rc.1`) is published as a GitHu
 | Job | What it does |
 |---|---|
 | `preflight` | `cargo-deny` (`advisories bans sources licenses`, policy in `deny.toml`) and `xtask lock-age` against the previous `releases/v*` tag. CI is disabled, so this is where they run before a build. |
-| `build` (matrix, after `preflight`) | One row per target: Linux x86_64 and arm64 (the arm64 row feeds the multi-arch image and the arm64 `.deb`), Windows x86_64, macOS arm64 and x86_64. `cargo run -p xtask -- dist` builds the archive and its `.sha256`. Windows also builds the Inno Setup installer and the MSI (WiX v5, `packaging/msi/gitpoulpi.wxs`); Linux also builds the `.deb` (`cargo deb --no-build`). Every file has a `.sha256`. |
+| `installers-windows`, `installers-linux` | Start with the run, no compile (a few minutes). Build the Inno Setup installer and the MSI (WiX 5.0.2) from dummy files, and the `.deb` from copies of `/bin/true`, with the same arguments as the real steps, so a packaging error fails the run at the start instead of after the build. Nothing is uploaded. |
+| `build` (matrix, after `preflight` and both installer checks) | One row per target: Linux x86_64 and arm64 (the arm64 row feeds the multi-arch image and the arm64 `.deb`), Windows x86_64, macOS arm64 and x86_64. `cargo run -p xtask -- dist` builds the archive and its `.sha256`. Windows also builds the Inno Setup installer and the MSI (WiX v5, `packaging/msi/gitpoulpi.wxs`); Linux also builds the `.deb` (`cargo deb --no-build`). Every file has a `.sha256`. |
 | `publish` | One GitHub release with every archive, installer, `.deb`, `install.sh`, `latest.json` (generated from the `.sha256` files, with the current advisories), `security.json`, the SBOM, the `.sha256` files and a `.minisig` for every asset except the `.sha256` files (see "Signing and supply chain"). Notes are the tag's `## [x.y.z]` section of `CHANGELOG.md`, else GitHub's generated notes. Skipped by a dry run. |
 | `chocolatey` | Fills the templates in `packaging/chocolatey/`, `choco pack`, `choco push`. |
 | `winget` | Runs only when the variable `PUBLISH_WINGET` is `true` (off for now). `komac update GitPoulpi.GitPoulpi --version <v> --urls <setup> --submit`, from the fork `Poulpi-Lab/winget-pkgs`, as the App's bot. |
@@ -33,7 +34,7 @@ GitHub scopes an Actions cache to the ref that created it plus the default branc
 
 - The key must be the same in both files: `shared-key: release-<target>` (`release-preflight` for the supply-chain job). Without `shared-key` rust-cache appends the job id and the keys differ. `xtask/tests/installers.rs` pins both keys, `save-if: false` and the matrix rows.
 - `release-cache.yml` runs on a weekly schedule and by hand (`gh workflow run release-cache.yml`, only from `main`). It builds the `dist` profile of the same four packages as `xtask dist` for every target, plus the dev-profile `xtask`, and saves the caches.
-- Run it by hand after any `Cargo.lock` change, after a new stable Rust release, and before tagging. A release whose caches are stale or missing still works: it only compiles the missing dependencies, about 10 minutes more per target.
+- Run it by hand after any `Cargo.lock` change, after a new stable Rust release, and before tagging. A release whose caches are stale or missing still works: it only compiles what is missing, so it is slower.
 - The `dist` profile is thin LTO with 16 codegen units (a cold build on a 20-core Linux machine: 7 minutes, against 17 with fat LTO and one codegen unit); a release with warm caches targets 15 to 20 minutes.
 
 ## Secrets and variables

@@ -93,8 +93,69 @@ jobs:
           echo "comparing with $prev"
           cargo run -q -p xtask -- lock-age --base "$prev" --min-days 2
 
+  # Early packaging check: the installers are built from dummy files in a few minutes, so a broken script
+  # (an MSI error once appeared only after a 38 minute compile) fails the run at the start. Nothing here is
+  # uploaded. The real steps in `build` use the same arguments.
+  installers-windows:
+    name: installers (windows, dummy files)
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.TAG }}
+      - name: Dummy files
+        shell: pwsh
+        run: |
+          $src = "$PWD\dummy-src"
+          New-Item -ItemType Directory -Force -Path $src | Out-Null
+          foreach ($f in 'gitpoulpi.exe','gitpoulpi-tui.exe','gitpoulpi-mcp.exe','gitpoulpi-launch.exe','gitpoulpi-updater.exe','LICENSE','THIRD-PARTY-LICENSES.txt','INSTALL.txt') {
+            Set-Content -Path "$src\$f" -Value "dummy"
+          }
+          Set-Content -Path "$src\.gitpoulpi-dist" -Value "channel=portable"
+          Set-Content -Path "$PWD\marker-msi" -Value "channel=msi"
+      - name: Inno Setup
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=1.0.0" "/DSourceDir=$PWD\dummy-src" "/DOutputDir=$PWD\dummy-out" packaging/windows/gitpoulpi.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed" }
+      - name: MSI (WiX)
+        shell: pwsh
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          wix build packaging/msi/gitpoulpi.wxs -arch x64 -d "Version=1.0.0" -d "SourceDir=$PWD\dummy-src" -d "MarkerFile=$PWD\marker-msi" -o "dummy-out/dummy.msi"
+          if ($LASTEXITCODE -ne 0) { throw "wix build failed" }
+
+  installers-linux:
+    name: installers (deb, dummy files)
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.TAG }}
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
+      - uses: taiki-e/install-action@c509219cf42fba86913069efd0ade2458c59337b # v2.90.1
+        with:
+          tool: cargo-deb
+      # Real ELF programs (a copy of /bin/true) so the dependency detection of cargo-deb has something to read.
+      - name: Dummy files and .deb
+        shell: bash
+        run: |
+          rm -rf target/deb-stage
+          mkdir -p target/deb-stage target/dummy-out
+          for b in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch gitpoulpi-updater; do
+            cp /bin/true "target/deb-stage/$b"
+          done
+          echo "channel=apt" > target/deb-stage/.gitpoulpi-dist
+          echo dummy > target/deb-stage/THIRD-PARTY-LICENSES.txt
+          cargo deb -p gitpoulpi-cli --no-build --no-strip -o target/dummy-out/
+
   build:
-    needs: preflight
+    needs: [preflight, installers-windows, installers-linux]
     name: ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:

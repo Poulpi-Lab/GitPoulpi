@@ -171,3 +171,5 @@ ve [yol haritası](../../roadmap.md) tasarımı ve nelerin planlandığını anl
 ---
 
 GitKraken, ilgili sahibinin ticari markasıdır. GitPoulpi bağımsız bir projedir; bu marka sahibiyle bağlantılı değildir, onun tarafından onaylanmamış veya desteklenmemiştir; ad yalnızca uyumluluğu ve ilham kaynağını anlatmak için anılır.
+
+GitPoulpi içinde ve belgelerinde anılan diğer tüm ürün ve hizmet adları ilgili sahiplerinin ticari markalarıdır; örneğin kod barındırma hizmetleri (GitHub, GitLab, Bitbucket vb.), iş takip araçları (Jira, Trello, Linear vb.) ile GitPoulpi'nin açabildiği düzenleyiciler ve araçlar (Visual Studio Code, JetBrains IDE'leri, lazygit vb.). Bu adlar yalnızca GitPoulpi'nin birlikte çalıştığı ürünleri belirtmek için kullanılır; GitPoulpi bunların hiçbiriyle bağlantılı değildir, hiçbiri tarafından onaylanmamış veya desteklenmemiştir.

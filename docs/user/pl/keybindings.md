@@ -1411,7 +1411,7 @@ Paleta ma te same akcje, na przykład
 |---|---|
 | `Ctrl+O` albo kliknięcie `⌂` | Przechodzi na kartę Home (na karcie Home: fokus na polu wyszukiwania; przy otwartym Radarze lub otwartych informacjach o wersji: najpierw je zamyka) |
 | `Ctrl+Shift+N` | Otwiera kartę Home z oknem Klonuj |
-| `Ctrl+PageDown` / `Ctrl+PageUp` | Następna / poprzednia karta |
+| `Ctrl+PageDown` / `Ctrl+PageUp`, `Ctrl+Tab` / `Ctrl+Shift+Tab` | Następna / poprzednia karta (para z `Ctrl+Tab` tylko tam, gdzie terminal ją wysyła) |
 | `t` | Wybiera kartę z filtrowalnej listy |
 | `Ctrl+W` | Zamyka bieżącą kartę (najpierw pyta; repozytorium się nie zmienia) |
 | `Ctrl+T` albo prawy klik na karcie | Menu karty (jego wiersze wymienia [Rząd kart](interface-tour.md#rząd-kart)) |

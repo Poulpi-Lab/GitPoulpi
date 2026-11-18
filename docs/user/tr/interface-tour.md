@@ -122,7 +122,9 @@ rozet koyar.
   **Favorilere ekle** (veya **Favorilerden kaldır**), **Çalışma alanına ekle** (veya
   **Çalışma alanından çıkar**, çalışma alanlarınız varken), **Yolu kopyala**,
   **Şurada aç ›**, **SSH ve kimlik bilgileri...** ve **Kısmi checkout...**.
-- `Ctrl+PageUp` ve `Ctrl+PageDown` sekmeler arasında geçiş yapar. `Ctrl+W`
+- `Ctrl+PageUp` ve `Ctrl+PageDown` sekmeler arasında geçiş yapar; terminaliniz
+  ilettiği sürece `Ctrl+Shift+Tab` ve `Ctrl+Tab` de öyle (kitty klavye
+  protokolü; bazı terminaller ve çoklayıcılar bunları kendilerine ayırır). `Ctrl+W`
   geçerli sekmeyi kapatır. Bir sekmeye orta tık da onu kapatır (aynı soruyla).
 - `t` (veya `Ctrl+N Tab`) sekme seçiciyi açar; açık sekmelerin aranabilir bir
   listesidir.

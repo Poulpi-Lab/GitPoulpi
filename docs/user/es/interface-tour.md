@@ -130,7 +130,9 @@ insignia en cada flecha activa.
   **Añadir al espacio de trabajo** (o **Quitar del espacio de trabajo**, cuando tienes
   espacios de trabajo), **Copiar ruta**, **Abrir en ›**, **SSH y credenciales...** y
   **Checkout parcial...**.
-- `Ctrl+PageUp` y `Ctrl+PageDown` cambian de pestaña. `Ctrl+W` cierra la pestaña
+- `Ctrl+PageUp` y `Ctrl+PageDown` cambian de pestaña, y también `Ctrl+Shift+Tab` y
+  `Ctrl+Tab` cuando tu terminal los transmite (protocolo de teclado de kitty; algunos
+  terminales y multiplexores se los reservan). `Ctrl+W` cierra la pestaña
   actual. Un clic central en una pestaña también la cierra (con la misma
   pregunta).
 - `t` (o `Ctrl+N Tab`) abre el selector de pestañas, una lista con búsqueda de las

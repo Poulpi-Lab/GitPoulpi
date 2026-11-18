@@ -1421,7 +1421,7 @@ La paleta tiene las mismas acciones, por ejemplo
 |---|---|
 | `Ctrl+O`, o un clic en `⌂` | Ir a la pestaña Inicio (en la pestaña Inicio: dar el foco al campo de búsqueda; con el Radar o las notas de la versión abiertos: ciérralos primero) |
 | `Ctrl+Shift+N` | Abrir la pestaña Inicio con el diálogo Clonar |
-| `Ctrl+PageDown` / `Ctrl+PageUp` | Pestaña siguiente / anterior |
+| `Ctrl+PageDown` / `Ctrl+PageUp`, `Ctrl+Tab` / `Ctrl+Shift+Tab` | Pestaña siguiente / anterior (el par `Ctrl+Tab` solo donde el terminal lo envía) |
 | `t` | Elegir una pestaña en una lista filtrable |
 | `Ctrl+W` | Cerrar la pestaña actual (pregunta antes; el repositorio no cambia) |
 | `Ctrl+T`, o un clic derecho en una pestaña | El menú de la pestaña (sus filas se enumeran en [Fila de pestañas](interface-tour.md#fila-de-pestañas)) |

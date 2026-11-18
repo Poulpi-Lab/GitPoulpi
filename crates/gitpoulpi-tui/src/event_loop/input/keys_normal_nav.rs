@@ -47,6 +47,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
             );
             if *cx.focus == Focus::Log {
                 *cx.right_panel = RightPanel::CommitDetail;
+                commands::graph_takes_keys(cx);
             }
             if *cx.focus == Focus::Refs {
                 land_on_open_ref_section(
@@ -498,7 +499,9 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 *cx.commit_files_follow = true;
             }
             Focus::Log => {
-                move_table_selection(&mut *cx.log_state, *cx.log_len, -count);
+                if !land_unselected_log(cx) {
+                    move_table_selection(&mut *cx.log_state, *cx.log_len, -count);
+                }
                 *cx.log_follow = true;
                 *cx.right_panel = RightPanel::CommitDetail;
             }
@@ -552,7 +555,9 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 *cx.commit_files_follow = true;
             }
             Focus::Log => {
-                move_table_selection(&mut *cx.log_state, *cx.log_len, count);
+                if !land_unselected_log(cx) {
+                    move_table_selection(&mut *cx.log_state, *cx.log_len, count);
+                }
                 *cx.log_follow = true;
                 *cx.right_panel = RightPanel::CommitDetail;
             }
@@ -655,4 +660,23 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         _ => {}
     }
     Ok(Flow::Handled)
+}
+
+/// With no graph row selected, the first move selects one instead of
+/// stepping from a phantom row 0: HEAD's row when it is shown, else the
+/// first visible row. Returns whether it selected (the caller then skips
+/// the step).
+fn land_unselected_log(cx: &mut CommandCtx<'_>) -> bool {
+    if cx.log_state.selected().is_some() || *cx.log_len == 0 {
+        return false;
+    }
+    let head = cx.refs_result.as_deref().ok().and_then(head_oid);
+    let on_head = head.is_some_and(|oid| {
+        select_log_commit(&*cx.log_result, &*cx.log_order, &mut *cx.log_state, oid)
+    });
+    if !on_head {
+        let first = cx.log_state.offset().min(*cx.log_len - 1);
+        cx.log_state.select(Some(first));
+    }
+    true
 }

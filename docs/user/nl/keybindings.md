@@ -1416,7 +1416,7 @@ Het palet heeft dezelfde acties, bijvoorbeeld
 |---|---|
 | `Ctrl+O`, of een klik op `⌂` | Naar het tabblad Start gaan (op het tabblad Start: focus op het zoekveld; met de Radar of de Releasenotes open: sluit die eerst) |
 | `Ctrl+Shift+N` | Het tabblad Start openen met het kloondialoogvenster |
-| `Ctrl+PageDown` / `Ctrl+PageUp` | Volgend / vorig tabblad |
+| `Ctrl+PageDown` / `Ctrl+PageUp`, `Ctrl+Tab` / `Ctrl+Shift+Tab` | Volgend / vorig tabblad (het paar `Ctrl+Tab` alleen waar de terminal het verstuurt) |
 | `t` | Een tabblad kiezen uit een filterbare lijst |
 | `Ctrl+W` | Het huidige tabblad sluiten (vraagt eerst; de repository wordt niet gewijzigd) |
 | `Ctrl+T`, of een rechtsklik op een tabblad | Het tabbladmenu (de rijen staan bij [Tabbalk](interface-tour.md#tabbalk)) |

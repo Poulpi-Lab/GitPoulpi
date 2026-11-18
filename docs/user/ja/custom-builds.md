@@ -161,7 +161,7 @@ PowerShell の名前：`-Langs -Integrations -Themes -LogoColors -LogoDefault -I
 
 ## 注意
 
-- カスタムビルドは、ほかの `dist` ビルドと同様に遅いです（fat LTO、数分）。
+- カスタムビルドは、ほかの `dist` ビルドと同様に遅いです（thin LTO、数分）。
 - `build-opti` と同様に、sccache なしで実行されます。
 - 言語コードは同梱のロケールと照合されます。未知のコードは、
   有効なコードの一覧とともに拒否されます。

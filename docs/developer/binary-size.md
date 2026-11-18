@@ -1,6 +1,6 @@
 # Binary size
 
-Official builds: `scripts/build-opti.sh` / `.ps1` (the `dist` profile: fat LTO, one codegen unit, stripped, `panic = unwind`). Speed comes first: nothing here trades runtime speed for bytes.
+Official builds: `scripts/build-opti.sh` / `.ps1` (the `dist` profile: thin LTO, 16 codegen units, stripped, `panic = unwind`). Speed comes first: nothing here trades runtime speed for bytes.
 
 **The current figures are in "Re-measured 2026-10-29" below; every older section of this page is historical and kept for the reasoning, its numbers are out of date.**
 
@@ -8,7 +8,7 @@ Dist sizes on Linux x86_64, 2026-10-23 (rustc 1.98.1, MB = MiB): `gitpoulpi` 62.
 
 ## Re-measured 2026-10-29
 
-Linux x86_64, commit `65999ef5c`, rustc as installed that day. One reference `dist` build (`./build-opti.sh`, fat LTO, one codegen unit, stripped), then one `custom` build per row (same settings) with `cargo run -p xtask -- build-custom <flags>`, one row at a time with `target/custom` deleted between rows (`CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0`). The Full row is the `dist` build. Each build took 8 to 18 minutes (the whole run, 20 builds, 4 h 47 min). Flags per row: `--langs en`, `--no-mcp`, `--no-ai`, `--integrations none`, `--no-ai --integrations none --no-avatar-fetch`, `--no-history-rewrite`, `--no-rewrite-scripts`, `--no-global-search`, `--no-workspaces`, `--no-radar`, `--no-board`, `--no-review`, `--no-mermaid`, `--no-lfs`, `--no-worktree`, `--no-submodules`, `--no-avatar-fetch`, `--no-image-view`; the last two rows are `--langs en --integrations none` plus every `--no-*` feature flag (the first keeping LFS, the second with `--no-lfs`).
+Linux x86_64, commit `65999ef5c`, rustc as installed that day. One reference `dist` build (`./build-opti.sh`, fat LTO, one codegen unit, stripped: the `dist` profile of that day, now thin LTO with 16 codegen units), then one `custom` build per row (same settings) with `cargo run -p xtask -- build-custom <flags>`, one row at a time with `target/custom` deleted between rows (`CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0`). The Full row is the `dist` build. Each build took 8 to 18 minutes (the whole run, 20 builds, 4 h 47 min). Flags per row: `--langs en`, `--no-mcp`, `--no-ai`, `--integrations none`, `--no-ai --integrations none --no-avatar-fetch`, `--no-history-rewrite`, `--no-rewrite-scripts`, `--no-global-search`, `--no-workspaces`, `--no-radar`, `--no-board`, `--no-review`, `--no-mermaid`, `--no-lfs`, `--no-worktree`, `--no-submodules`, `--no-avatar-fetch`, `--no-image-view`; the last two rows are `--langs en --integrations none` plus every `--no-*` feature flag (the first keeping LFS, the second with `--no-lfs`).
 
 Exact sizes, bytes:
 
@@ -102,7 +102,7 @@ Remaining i18n tables in `.rodata` (unstripped `nm --size-sort`): `ARG_MSGS` 0.9
 
 ## Custom builds, measured (2026-10-06, S10)
 
-Linux x86_64, `--profile custom` (the `dist` settings: fat LTO, one codegen unit, stripped), 2026-10-06, MiB, difference from the full build in parentheses. One `cargo build` over the three binary crates per row, via `cargo run -p xtask -- build-custom`.
+Linux x86_64, `--profile custom` (the `dist` settings of that day: fat LTO, one codegen unit, stripped; the profile is now thin LTO with 16 codegen units), 2026-10-06, MiB, difference from the full build in parentheses. One `cargo build` over the three binary crates per row, via `cargo run -p xtask -- build-custom`.
 
 | Build (from `full` unless noted) | `gitpoulpi` | `gitpoulpi-tui` | `gitpoulpi-mcp` |
 |---|---|---|---|

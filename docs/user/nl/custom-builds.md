@@ -143,6 +143,6 @@ Gemeten op Linux op 2026-10-29 bij commit `65999ef5c`, vanaf de volledige build,
 
 ## Opmerkingen
 
-- Een aangepaste build is traag zoals elke `dist`-build (fat LTO, een paar minuten).
+- Een aangepaste build is traag zoals elke `dist`-build (thin LTO, een paar minuten).
 - Hij draait zonder sccache, zoals `build-opti`.
 - Taalcodes worden gecontroleerd tegen de meegeleverde locales; een onbekende code wordt geweigerd met de lijst van geldige.

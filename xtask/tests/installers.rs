@@ -604,6 +604,7 @@ fn the_apt_repository_script_signs_and_keeps_five_versions() {
 fn the_packaging_files_hold_no_em_dash() {
     for file in [
         ".github/workflows/release.yml",
+        ".github/workflows/release-cache.yml",
         ".github/workflows/ci.yml",
         "packaging/windows/gitpoulpi.iss",
         "packaging/msi/gitpoulpi.wxs",
@@ -617,4 +618,117 @@ fn the_packaging_files_hold_no_em_dash() {
     ] {
         assert!(!read(file).contains('\u{2014}'), "{file}");
     }
+}
+#[test]
+fn the_dist_profile_uses_thin_lto() {
+    let cargo = read("Cargo.toml");
+    let dist = cargo.split("[profile.dist]").nth(1).unwrap();
+    let dist = dist.split("\n[").next().unwrap();
+    assert!(dist.contains("lto = \"thin\""), "{dist}");
+    assert!(dist.contains("codegen-units = 16"), "{dist}");
+}
+/// The `uses: Swatinem/rust-cache` step (with its `with:` block) of a job.
+fn rust_cache_step(job_text: &str) -> String {
+    steps(job_text)
+        .into_iter()
+        .find(|s| s.starts_with("uses: Swatinem/rust-cache@"))
+        .unwrap_or_else(|| panic!("no rust-cache step in:\n{job_text}"))
+}
+
+#[test]
+fn the_release_and_the_cache_workflows_share_the_cache_keys_and_only_main_saves() {
+    let release = read(".github/workflows/release.yml");
+    let warm = read(".github/workflows/release-cache.yml");
+    // A tag run reads the cache but never saves it: a tag's cache is invisible to the next tag and would only
+    // eat the repository quota.
+    for (job_name, key) in [
+        ("build", "shared-key: release-${{ matrix.target }}"),
+        ("preflight", "shared-key: release-preflight"),
+    ] {
+        let step = rust_cache_step(&job(&release, job_name));
+        assert!(step.contains(key), "release.yml {job_name}: {key}");
+        assert!(step.contains("save-if: false"), "release.yml {job_name}");
+        let warm_step = rust_cache_step(&job(&warm, job_name));
+        assert!(
+            warm_step.contains(key),
+            "release-cache.yml {job_name}: {key}"
+        );
+        assert!(
+            !warm_step.contains("save-if: false"),
+            "release-cache.yml {job_name}"
+        );
+        // Without shared-key rust-cache appends the job id, and the keys would differ.
+        assert!(!step.contains("\n          key:"), "release.yml {job_name}");
+        assert!(
+            !warm_step.contains("\n          key:"),
+            "release-cache.yml {job_name}"
+        );
+    }
+    // The warm workflow runs by hand and weekly, on main only, over the same matrix rows.
+    assert!(warm.contains("workflow_dispatch:"));
+    assert!(warm.contains("schedule:"));
+    assert!(!warm.contains("tags:"));
+    assert!(!warm.contains("pull_request"));
+    assert!(warm.contains("github.ref == 'refs/heads/main'"));
+    let rows = |yml: &str| -> Vec<String> {
+        yml.lines()
+            .filter(|l| l.trim_start().starts_with("- { os: "))
+            .map(|l| l.trim().to_string())
+            .collect()
+    };
+    assert_eq!(rows(&release), rows(&warm));
+    assert_eq!(rows(&release).len(), 5);
+    // It builds what `xtask dist` builds, with the same profile.
+    assert!(warm.contains("cargo build --profile dist --target ${{ matrix.target }}"));
+    for package in [
+        "gitpoulpi-tui",
+        "gitpoulpi-cli",
+        "gitpoulpi-mcp",
+        "gitpoulpi-updater",
+    ] {
+        assert!(warm.contains(&format!("-p {package}")), "{package}");
+    }
+    // The toolchain step (and its pinned SHA) is the same in both files.
+    let toolchain = |yml: &str| -> String {
+        yml.lines()
+            .find(|l| l.contains("dtolnay/rust-toolchain@"))
+            .unwrap()
+            .trim()
+            .to_string()
+    };
+    assert_eq!(toolchain(&release), toolchain(&warm));
+}
+#[test]
+fn the_build_waits_for_the_early_installer_checks_built_from_dummy_files() {
+    let yml = read(".github/workflows/release.yml");
+    let build = job(&yml, "build");
+    for early in ["installers-windows", "installers-linux"] {
+        assert!(
+            build.contains("needs: [preflight, installers-windows, installers-linux]")
+                && build.contains(early),
+            "build must need {early}"
+        );
+        // Nothing to wait for: the check starts with the run.
+        assert!(!job(&yml, early).contains("needs:"), "{early}");
+    }
+    let windows = job(&yml, "installers-windows");
+    assert!(windows.contains("runs-on: windows-latest"));
+    assert!(windows.contains("choco install innosetup"));
+    assert!(windows.contains("packaging/windows/gitpoulpi.iss"));
+    assert!(windows.contains("dotnet tool install --global wix --version 5.0.2"));
+    assert!(windows.contains("wix build packaging/msi/gitpoulpi.wxs -arch x64"));
+    assert!(windows.contains("-d \"MarkerFile="));
+    // No compile: the early job must stay cheap.
+    assert!(!windows.contains("cargo build") && !windows.contains("xtask"));
+    let linux = job(&yml, "installers-linux");
+    assert!(linux.contains("cargo deb -p gitpoulpi-cli --no-build"));
+    assert!(linux.contains("target/deb-stage"));
+    assert!(!linux.contains("cargo build") && !linux.contains("xtask"));
+    // The real MSI step uses the same wix version and architecture.
+    let real = steps(&build)
+        .into_iter()
+        .find(|s| s.contains("wix build"))
+        .unwrap();
+    assert!(real.contains("dotnet tool install --global wix --version 5.0.2"));
+    assert!(real.contains("-arch x64"));
 }

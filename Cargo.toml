@@ -264,7 +264,8 @@ opt-level = 1
 # `release` is the maintainer's daily build, rebuilt after every merge batch:
 # tuned for build time (incremental, parallel codegen, no cross-crate LTO).
 # For a TUI the runtime cost is not noticeable. `dist` is the packaging
-# build (fat LTO, one codegen unit): slow to build, smallest/fastest binary.
+# build (thin LTO, 16 codegen units): a release must finish in about 15-20 minutes on a hosted runner (fat LTO with
+# one codegen unit took about 1 hour); the binaries are a fifth to a quarter larger and run at the same speed (perf --tui, 2026-11-18).
 [profile.release]
 strip = true
 incremental = true
@@ -274,8 +275,8 @@ codegen-units = 16
 [profile.dist]
 inherits = "release"
 incremental = false
-lto = "fat"
-codegen-units = 1
+lto = "thin"
+codegen-units = 16
 
 # Custom builds (`cargo run -p xtask -- build-custom`): the packaging profile,
 # in its own `target/custom/` so an official `target/dist/` binary is never

@@ -140,6 +140,6 @@ PowerShell 이름: `-Langs -Integrations -Themes -LogoColors -LogoDefault -IconC
 
 ## 참고
 
-- 사용자 지정 빌드는 다른 `dist` 빌드처럼 느립니다(fat LTO, 몇 분).
+- 사용자 지정 빌드는 다른 `dist` 빌드처럼 느립니다(thin LTO, 몇 분).
 - `build-opti`처럼 sccache 없이 실행됩니다.
 - 언어 코드는 제공되는 로캘과 대조해 확인하며, 알 수 없는 코드는 유효한 코드 목록과 함께 거부됩니다.

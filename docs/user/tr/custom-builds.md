@@ -139,6 +139,6 @@ Linux'ta, 2026-10-29 tarihinde `65999ef5c` commit'inde, tam derlemeden ölçüld
 
 ## Notlar
 
-- Özel bir derleme, her `dist` derlemesi gibi yavaştır (fat LTO, birkaç dakika).
+- Özel bir derleme, her `dist` derlemesi gibi yavaştır (thin LTO, birkaç dakika).
 - `build-opti` gibi sccache olmadan çalışır.
 - Dil kodları gönderilen yerel ayarlara göre denetlenir; bilinmeyen bir kod, geçerli olanların listesiyle reddedilir.

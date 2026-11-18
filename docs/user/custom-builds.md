@@ -166,7 +166,7 @@ Measured on Linux on 2026-10-29 at commit `65999ef5c`, from the full build, diff
 
 ## Notes
 
-- A custom build is slow like any `dist` build (fat LTO, a few minutes).
+- A custom build is slow like any `dist` build (thin LTO, a few minutes).
 - It runs without sccache, like `build-opti`.
 - Language codes are checked against the shipped locales; an unknown code is
   refused with the list of valid ones.

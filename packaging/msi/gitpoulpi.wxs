@@ -73,7 +73,8 @@
     </ComponentGroup>
 
     <ComponentGroup Id="PathEntry" Directory="INSTALLFOLDER">
-      <Component Condition="ADDTOPATH = 1">
+      <!-- An Environment element cannot be a key path, so this component needs a fixed GUID. -->
+      <Component Id="PathEntryComponent" Guid="AC90B3E9-EF8F-4218-901F-82FD57DA26AF" Condition="ADDTOPATH = 1">
         <Environment Id="GitPoulpiPath" Name="PATH" Value="[INSTALLFOLDER]" Part="last" Action="set"
                      System="yes" Permanent="no" />
       </Component>

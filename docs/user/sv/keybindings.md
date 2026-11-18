@@ -1412,7 +1412,7 @@ Paletten har samma åtgärder, till exempel
 |---|---|
 | `Ctrl+O`, eller ett klick på `⌂` | Gå till fliken Hem (på fliken Hem: fokusera sökfältet; med Radarn eller versionsanteckningarna öppna: stäng dem först) |
 | `Ctrl+Shift+N` | Öppna fliken Hem med dialogen Klona |
-| `Ctrl+PageDown` / `Ctrl+PageUp` | Nästa / föregående flik |
+| `Ctrl+PageDown` / `Ctrl+PageUp`, `Ctrl+Tab` / `Ctrl+Shift+Tab` | Nästa / föregående flik (paret med `Ctrl+Tab` bara där terminalen skickar det) |
 | `t` | Välj en flik i en filtrerbar lista |
 | `Ctrl+W` | Stäng aktuell flik (frågar först; repositoryt ändras inte) |
 | `Ctrl+T`, eller ett högerklick på en flik | Flikmenyn (dess rader listas i [Flikraden](interface-tour.md#flikraden)) |

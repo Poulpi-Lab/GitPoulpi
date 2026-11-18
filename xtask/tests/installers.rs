@@ -166,7 +166,7 @@ fn the_release_workflow_builds_and_uploads_what_the_installers_are_named() {
     // The setup and its checksum are written into target/dist, which is what
     // the build job uploads; install.sh joins them in the publish job.
     assert!(yml.contains("/DOutputDir=$PWD\\target\\dist"));
-    assert!(yml.contains("path: target/dist/*"));
+    assert!(yml.contains("target/dist/gitpoulpi*.*"));
     assert!(yml.contains("cp packaging/install.sh dist/install.sh"));
     assert!(yml.contains("files: dist/*"));
 }
@@ -731,4 +731,17 @@ fn the_build_waits_for_the_early_installer_checks_built_from_dummy_files() {
         .unwrap();
     assert!(real.contains("dotnet tool install --global wix --version 5.0.2"));
     assert!(real.contains("-arch x64"));
+}
+
+/// The build uploads only the deliverables: with `--target`, `target/dist` also holds the host build scripts
+/// and proc macros, over the 1024 subjects the provenance attestation accepts (release 1.0.0, first attempt).
+#[test]
+fn the_build_uploads_only_the_deliverables() {
+    let yml = read(".github/workflows/release.yml");
+    assert!(
+        !yml.contains("path: target/dist/*\n"),
+        "the whole target/dist must not be uploaded"
+    );
+    assert!(yml.contains("target/dist/gitpoulpi*.*"));
+    assert!(yml.contains("!target/dist/*.wixpdb"));
 }

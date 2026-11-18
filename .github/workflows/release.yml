@@ -257,7 +257,11 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dist-${{ matrix.target }}
-          path: target/dist/*
+          # Only the deliverables: with --target, target/dist also holds the host build scripts and proc macros
+          # (over 1000 files, beyond the 1024 subjects of the provenance attestation), and WiX's debug file.
+          path: |
+            target/dist/gitpoulpi*.*
+            !target/dist/*.wixpdb
           if-no-files-found: error
           # The release keeps the files; the artifacts are only the hand-over to the publish and channel jobs (and
           # what a dry run inspects). Short retention keeps a private repository's Actions storage quota free.

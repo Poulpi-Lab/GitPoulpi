@@ -171,3 +171,5 @@ en de [roadmap](../../roadmap.md) beschrijven het ontwerp en wat er gepland is;
 ---
 
 GitKraken is een merk van de respectieve eigenaar. GitPoulpi is een onafhankelijk project, niet gelieerd aan, goedgekeurd door of gesponsord door deze eigenaar; de naam wordt alleen genoemd om compatibiliteit en inspiratie te beschrijven.
+
+Alle andere product- en dienstnamen die in GitPoulpi en de bijbehorende documentatie worden genoemd, zijn merken van hun respectieve eigenaren, bijvoorbeeld codehosts (GitHub, GitLab, Bitbucket enz.), issuetrackers (Jira, Trello, Linear enz.) en de editors en tools die GitPoulpi kan openen (Visual Studio Code, JetBrains-IDE's, lazygit enz.). Ze worden alleen gebruikt om aan te geven waarmee GitPoulpi werkt; GitPoulpi is niet gelieerd aan, goedgekeurd door of gesponsord door een van hen.

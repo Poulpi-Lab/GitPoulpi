@@ -1,0 +1,78 @@
+name: Release cache
+
+# Warms the build caches of release.yml. GitHub scopes an Actions cache to the ref that created it plus the
+# default branch, so a cache saved by a tag run is never read by the next tag. Only this workflow, on main,
+# saves them (release.yml sets `save-if: false`), and every release then restores them. The cache keys are the
+# same in both files: `shared-key` is `release-<target>` (`release-preflight` for the supply-chain job);
+# without `shared-key` rust-cache appends the job id and the keys would differ.
+#
+# Run it by hand (Actions > Release cache > Run workflow, or `gh workflow run release-cache.yml`) after a
+# Cargo.lock change and before tagging; the weekly schedule keeps the caches from expiring (7 days unused) and
+# follows a new stable rustc (the compiler version is part of the key). docs/developer/releasing.md.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-cache
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  # As in `xtask dist`: the build script output must match the release build.
+  GITPOULPI_DIST: '1'
+
+jobs:
+  preflight:
+    name: supply chain (cache)
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          shared-key: release-preflight
+      # release.yml runs `cargo run -q -p xtask -- lock-age`, a dev-profile build of xtask.
+      - name: Build xtask
+        run: cargo build -q -p xtask
+
+  build:
+    name: ${{ matrix.target }} (cache)
+    if: github.ref == 'refs/heads/main'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Same rows as release.yml.
+          - { os: ubuntu-22.04, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-22.04-arm, target: aarch64-unknown-linux-gnu }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc }
+          - { os: macos-latest, target: aarch64-apple-darwin }
+          - { os: macos-latest, target: x86_64-apple-darwin }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          shared-key: release-${{ matrix.target }}
+          save-if: true
+      # The same packages and profile as `xtask dist` (xtask/src/dist.rs, PACKAGES). The dev-profile xtask build
+      # is what release.yml runs to drive it.
+      - name: Build the dist profile
+        shell: bash
+        run: |
+          cargo build -q -p xtask
+          cargo build --profile dist --target ${{ matrix.target }} -p gitpoulpi-tui -p gitpoulpi-cli -p gitpoulpi-mcp -p gitpoulpi-updater

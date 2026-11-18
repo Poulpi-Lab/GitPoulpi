@@ -27,6 +27,15 @@ Every channel job starts with an `env` flag that says whether its secrets exist 
 
 Every push to another repository and every pull request goes out as the Poulpi-Lab GitHub App's bot (`actions/create-github-app-token`), never as a personal account.
 
+## The build cache comes from main
+
+GitHub scopes an Actions cache to the ref that created it plus the default branch. A cache saved by a tag run is therefore never restored by the next tag, and it eats the 10 GB repository quota. So `release.yml` only restores: its `Swatinem/rust-cache` steps (`build` and `preflight`) have `save-if: false`, and `.github/workflows/release-cache.yml` saves them from `main`.
+
+- The key must be the same in both files: `shared-key: release-<target>` (`release-preflight` for the supply-chain job). Without `shared-key` rust-cache appends the job id and the keys differ. `xtask/tests/installers.rs` pins both keys, `save-if: false` and the matrix rows.
+- `release-cache.yml` runs on a weekly schedule and by hand (`gh workflow run release-cache.yml`, only from `main`). It builds the `dist` profile of the same four packages as `xtask dist` for every target, plus the dev-profile `xtask`, and saves the caches.
+- Run it by hand after any `Cargo.lock` change, after a new stable Rust release, and before tagging. A release whose caches are stale or missing still works: it only compiles the missing dependencies, about 10 minutes more per target.
+- The `dist` profile is thin LTO with 16 codegen units (a cold build on a 20-core Linux machine: 7 minutes, against 17 with fat LTO and one codegen unit); a release with warm caches targets 15 to 20 minutes.
+
 ## Secrets and variables
 
 The owner creates them in the repository settings. Signing keys and accounts belong to Poulpi-Lab, never to a person.

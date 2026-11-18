@@ -80,7 +80,9 @@ jobs:
           toolchain: stable
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
-          key: release-preflight
+          shared-key: release-preflight
+          # Only main saves (release-cache.yml): a tag's own cache is never read by the next tag.
+          save-if: false
       - name: Minimum age of crates.io versions added since the previous release
         run: |
           prev=$(git describe --tags --abbrev=0 --match 'releases/v*' "${TAG}^" 2>/dev/null || true)
@@ -128,7 +130,9 @@ jobs:
           targets: ${{ matrix.target }}
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
-          key: release-${{ matrix.target }}
+          shared-key: release-${{ matrix.target }}
+          # Only main saves (release-cache.yml warms it), so tag caches never eat the repository quota.
+          save-if: false
       - name: Build and pack
         run: cargo run -q -p xtask -- dist --target ${{ matrix.target }}
       # Windows only: the Inno Setup installer is compiled from the zip that

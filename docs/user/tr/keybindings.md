@@ -1409,7 +1409,7 @@ Paletin aynı eylemleri vardır; örneğin `Gezinme: Refs > Yerel'e Odaklan` vey
 |---|---|
 | `Ctrl+O` veya `⌂` üzerine tık | Ana sekmeye git (Ana sekmede: arama alanına odaklan; Radar ya da sürüm notları açıkken: önce onu kapat) |
 | `Ctrl+Shift+N` | Ana sekmeyi Klonla iletişim kutusuyla aç |
-| `Ctrl+PageDown` / `Ctrl+PageUp` | Sonraki / önceki sekme |
+| `Ctrl+PageDown` / `Ctrl+PageUp`, `Ctrl+Tab` / `Ctrl+Shift+Tab` | Sonraki / önceki sekme (`Ctrl+Tab` çifti yalnızca terminal gönderiyorsa) |
 | `t` | Filtrelenebilir bir listeden sekme seç |
 | `Ctrl+W` | Geçerli sekmeyi kapat (önce sorar; depo değişmez) |
 | `Ctrl+T` veya bir sekmeye sağ tık | Sekme menüsü (satırları [Sekme satırı](interface-tour.md#sekme-satırı) içinde listelenir) |

@@ -172,3 +172,5 @@ o [CHANGELOG.md](../../../CHANGELOG.md) lista o que mudou em cada lançamento.
 ---
 
 GitKraken é uma marca do respetivo titular. O GitPoulpi é um projeto independente, sem afiliação, aprovação ou patrocínio por parte deste; o nome é mencionado apenas para descrever compatibilidade e inspiração.
+
+Todos os outros nomes de produtos e serviços mencionados no GitPoulpi e na sua documentação são marcas dos respetivos titulares, por exemplo plataformas de alojamento de código (GitHub, GitLab, Bitbucket, etc.), gestores de tarefas e problemas (Jira, Trello, Linear, etc.) e os editores e ferramentas que o GitPoulpi pode abrir (Visual Studio Code, IDEs da JetBrains, lazygit, etc.). São usados apenas para designar aquilo com que o GitPoulpi funciona; o GitPoulpi não tem afiliação, aprovação ou patrocínio por parte de nenhum deles.

@@ -118,7 +118,9 @@ mantém ali, para soltá-la depois das abas visíveis. `Ctrl+N` coloca um distin
   **Remover dos favoritos**), **Adicionar ao espaço de trabalho** (ou **Remover do
   espaço de trabalho**, quando você tem espaços de trabalho), **Copiar caminho**, **Abrir em ›**,
   **SSH e credenciais...** e **Checkout parcial...**.
-- `Ctrl+PageUp` e `Ctrl+PageDown` alternam entre as abas. `Ctrl+W` fecha a aba
+- `Ctrl+PageUp` e `Ctrl+PageDown` alternam entre as abas, assim como `Ctrl+Shift+Tab` e
+  `Ctrl+Tab` onde o seu terminal os repassa (protocolo de teclado kitty; alguns
+  terminais e multiplexadores os guardam para si). `Ctrl+W` fecha a aba
   atual. Um clique com o botão do meio em uma aba também a fecha (com a mesma pergunta).
 - `t` (ou `Ctrl+N Tab`) abre o seletor de abas, uma lista pesquisável das abas
   abertas.

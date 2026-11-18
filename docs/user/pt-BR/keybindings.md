@@ -1408,7 +1408,7 @@ A paleta tem as mesmas ações, por exemplo
 |---|---|
 | `Ctrl+O`, ou um clique em `⌂` | Vai para a aba Início (na aba Início: foca o campo de busca; com o Radar ou as notas da versão abertos: fecha-os primeiro) |
 | `Ctrl+Shift+N` | Abre a aba Início com o diálogo Clonar |
-| `Ctrl+PageDown` / `Ctrl+PageUp` | Aba seguinte / anterior |
+| `Ctrl+PageDown` / `Ctrl+PageUp`, `Ctrl+Tab` / `Ctrl+Shift+Tab` | Aba seguinte / anterior (o par `Ctrl+Tab` só onde o terminal o envia) |
 | `t` | Escolhe uma aba em uma lista filtrável |
 | `Ctrl+W` | Fecha a aba atual (pergunta antes; o repositório não é alterado) |
 | `Ctrl+T`, ou um clique com o botão direito em uma aba | O menu da aba (as linhas dele estão listadas em [Linha de abas](interface-tour.md#linha-de-abas)) |

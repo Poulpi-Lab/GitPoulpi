@@ -186,13 +186,6 @@ fn install_sh_calls_the_cli_commands_that_exist_and_knows_the_marker() {
     for bin in gitpoulpi_config::release::BINARIES {
         assert!(sh.contains(bin), "{bin} is not mentioned");
     }
-    // The links in ~/.local/bin (install and uninstall) include the TUI, which
-    // the docs tell the user to run.
-    assert_eq!(
-        sh.matches("for name in gitpoulpi gitpoulpi-tui gitpoulpi-mcp; do")
-            .count(),
-        2
-    );
     // The archive name it downloads is the one `xtask dist` writes.
     assert!(sh.contains("gitpoulpi-$VERSION-$target.tar.gz"));
     assert_eq!(

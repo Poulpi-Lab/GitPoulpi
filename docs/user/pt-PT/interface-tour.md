@@ -120,7 +120,9 @@ depois dos separadores visíveis. `Ctrl+N` põe um distintivo em cada seta ativa
   **Remover dos favoritos**), **Adicionar à área de trabalho** (ou **Remover da área de
   trabalho**, quando tem áreas de trabalho), **Copiar caminho**, **Abrir em ›**,
   **SSH e credenciais...** e **Checkout parcial...**.
-- `Ctrl+PageUp` e `Ctrl+PageDown` mudam de separador. `Ctrl+W` fecha o separador
+- `Ctrl+PageUp` e `Ctrl+PageDown` mudam de separador, tal como `Ctrl+Shift+Tab` e
+  `Ctrl+Tab` onde o terminal os deixa passar (protocolo de teclado kitty; alguns
+  terminais e multiplexers guardam-nos para si). `Ctrl+W` fecha o separador
   atual. Um clique com o botão do meio num separador também o fecha (com a mesma
   pergunta).
 - `t` (ou `Ctrl+N Tab`) abre o seletor de separadores, uma lista pesquisável dos separadores

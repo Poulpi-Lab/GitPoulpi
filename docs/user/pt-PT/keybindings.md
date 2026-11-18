@@ -1411,7 +1411,7 @@ A paleta tem as mesmas ações, por exemplo
 |---|---|
 | `Ctrl+O`, ou um clique em `⌂` | Ir para o separador Início (no separador Início: focar o campo de pesquisa; com o Radar ou as notas de versão abertos: fechá-lo primeiro) |
 | `Ctrl+Shift+N` | Abrir o separador Início com o diálogo Clonar |
-| `Ctrl+PageDown` / `Ctrl+PageUp` | Separador seguinte / anterior |
+| `Ctrl+PageDown` / `Ctrl+PageUp`, `Ctrl+Tab` / `Ctrl+Shift+Tab` | Separador seguinte / anterior (o par `Ctrl+Tab` só onde o terminal o envia) |
 | `t` | Escolher um separador a partir de uma lista filtrável |
 | `Ctrl+W` | Fechar o separador atual (pergunta primeiro; o repositório não é alterado) |
 | `Ctrl+T`, ou um clique com o botão direito num separador | O menu do separador (as suas linhas estão listadas em [Linha de separadores](interface-tour.md#linha-de-separadores)) |

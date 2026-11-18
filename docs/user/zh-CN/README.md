@@ -95,3 +95,5 @@ GitPoulpi 是一个终端 Git 客户端，拥有可点击的 commit 图、命令
 ---
 
 GitKraken 是其各自所有者的商标。GitPoulpi 是独立项目，与其所有者没有隶属关系，也未获得其认可或赞助；提及该名称仅用于说明兼容性和灵感来源。
+
+GitPoulpi 及其文档中提到的所有其他产品和服务名称均为其各自所有者的商标，例如代码托管平台（GitHub、GitLab、Bitbucket 等）、问题跟踪工具（Jira、Trello、Linear 等）以及 GitPoulpi 可以打开的编辑器和工具（Visual Studio Code、JetBrains IDE、lazygit 等）。使用这些名称仅用于说明 GitPoulpi 所配合使用的对象；GitPoulpi 与它们均没有隶属关系，也未获得它们的认可或赞助。

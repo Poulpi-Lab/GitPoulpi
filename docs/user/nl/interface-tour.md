@@ -88,7 +88,7 @@ rij zolang je het daar houdt, zodat je het voorbij de zichtbare tabbladen kunt n
   toevoegen** (of **Uit favorieten verwijderen**), **Aan werkruimte toevoegen** (of **Uit
   werkruimte verwijderen**, als je werkruimtes hebt), **Pad kopiëren**, **Openen in ›**,
   **SSH & inloggegevens...** en **Gedeeltelijke checkout...**.
-- `Ctrl+PageUp` en `Ctrl+PageDown` wisselen van tabblad. `Ctrl+W` sluit het huidige tabblad. Een middenklik op een tabblad sluit het ook (met dezelfde vraag).
+- `Ctrl+PageUp` en `Ctrl+PageDown` wisselen van tabblad, net als `Ctrl+Shift+Tab` en `Ctrl+Tab` waar je terminal die doorgeeft (kitty-toetsenbordprotocol; sommige terminals en multiplexers houden ze voor zichzelf). `Ctrl+W` sluit het huidige tabblad. Een middenklik op een tabblad sluit het ook (met dezelfde vraag).
 - `t` (of `Ctrl+N Tab`) opent de tabbladkiezer, een doorzoekbare lijst van de geopende
   tabbladen.
 - **Tabbladen herordenen:** houd een repositorytabblad ingedrukt en sleep het opzij (een

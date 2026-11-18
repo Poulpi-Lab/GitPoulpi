@@ -155,3 +155,5 @@ Trunk-based 프리셋 또는 직접 정의한 베이스, 브랜치 이름 패턴
 ---
 
 GitKraken은 해당 소유자의 상표입니다. GitPoulpi는 독립 프로젝트이며 해당 소유자와 제휴, 승인 또는 후원 관계가 없습니다. 이 이름은 호환성과 영감을 설명하기 위해서만 언급됩니다.
+
+그 외 GitPoulpi와 그 문서에서 언급되는 모든 제품 및 서비스 이름은 해당 소유자의 상표입니다. 예를 들어 코드 호스팅 서비스(GitHub, GitLab, Bitbucket 등), 이슈 트래커(Jira, Trello, Linear 등), GitPoulpi가 열 수 있는 편집기와 도구(Visual Studio Code, JetBrains IDE, lazygit 등)가 있습니다. 이 이름들은 GitPoulpi가 함께 동작하는 대상을 가리키기 위해서만 사용되며, GitPoulpi는 이들 중 어느 것과도 제휴, 승인 또는 후원 관계가 없습니다.

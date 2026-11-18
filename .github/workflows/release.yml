@@ -361,7 +361,8 @@ jobs:
     # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
     environment: release
     needs: publish
-    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    # Off until the variable PUBLISH_WINGET is 'true' (the first winget version is submitted by hand).
+    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' && vars.PUBLISH_WINGET == 'true' }}
     runs-on: ubuntu-latest
     env:
       HAS: ${{ secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '' }}

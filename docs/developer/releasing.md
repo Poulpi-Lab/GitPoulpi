@@ -16,7 +16,7 @@ A tag with a `-` in the version (`releases/v0.2.0-rc.1`) is published as a GitHu
 | `build` (matrix, after `preflight`) | One row per target: Linux x86_64 and arm64 (the arm64 row feeds the multi-arch image and the arm64 `.deb`), Windows x86_64, macOS arm64 and x86_64. `cargo run -p xtask -- dist` builds the archive and its `.sha256`. Windows also builds the Inno Setup installer and the MSI (WiX v5, `packaging/msi/gitpoulpi.wxs`); Linux also builds the `.deb` (`cargo deb --no-build`). Every file has a `.sha256`. |
 | `publish` | One GitHub release with every archive, installer, `.deb`, `install.sh`, `latest.json` (generated from the `.sha256` files, with the current advisories), `security.json`, the SBOM, the `.sha256` files and a `.minisig` for every asset except the `.sha256` files (see "Signing and supply chain"). Notes are the tag's `## [x.y.z]` section of `CHANGELOG.md`, else GitHub's generated notes. Skipped by a dry run. |
 | `chocolatey` | Fills the templates in `packaging/chocolatey/`, `choco pack`, `choco push`. |
-| `winget` | `komac update GitPoulpi.GitPoulpi --version <v> --urls <setup> --submit`, from the fork `Poulpi-Lab/winget-pkgs`, as the App's bot. |
+| `winget` | Runs only when the variable `PUBLISH_WINGET` is `true` (off for now). `komac update GitPoulpi.GitPoulpi --version <v> --urls <setup> --submit`, from the fork `Poulpi-Lab/winget-pkgs`, as the App's bot. |
 | `scoop`, `homebrew` | Fill the manifest or formula and commit it to `Poulpi-Lab/scoop-gitpoulpi` and `Poulpi-Lab/homebrew-gitpoulpi`, as the App's bot. |
 | `aur` | In an Arch container fills `gitpoulpi-bin` and `gitpoulpi`, runs `makepkg --printsrcinfo` and pushes over SSH. |
 | `apt` | Checks out `Poulpi-Lab/apt-gitpoulpi` (the `gh-pages` branch), adds the `.deb` files, runs `packaging/apt/build-repo.sh` (signs `Release` into `InRelease` and `Release.gpg`, keeps the last 5 versions) and commits. |
@@ -50,7 +50,7 @@ The owner creates them in the repository settings. Signing keys and accounts bel
 
 ## The first winget submission is by hand
 
-`komac update` needs the package to exist in `microsoft/winget-pkgs`. Submit the first version yourself (the three manifests of `packaging/winget/`, filled in, as a pull request from the fork), wait for it to be merged, and from then on the `winget` job opens one pull request per release. An App installation token may be refused for cross-repository pull requests to `microsoft/winget-pkgs`; the fallback is a token of a dedicated Poulpi-Lab machine account, an owner decision.
+`komac update` needs the package to exist in `microsoft/winget-pkgs`. Submit the first version yourself (the three manifests of `packaging/winget/`, filled in, as a pull request from the fork), wait for it to be merged, set the variable `PUBLISH_WINGET` to `true`, and from then on the `winget` job opens one pull request per release. An App installation token may be refused for cross-repository pull requests to `microsoft/winget-pkgs`; the fallback is a token of a dedicated Poulpi-Lab machine account, an owner decision.
 
 ## The Docker Hub overview comes from the repository
 

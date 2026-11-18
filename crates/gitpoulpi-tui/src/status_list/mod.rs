@@ -78,6 +78,9 @@ pub(crate) fn move_status_selection(
     let len = section_lines(lines, *active).len();
     let cur = states.state(*active).selected();
     let next = match (cur, delta) {
+        // Nothing selected yet: the first press lands on the first row
+        // instead of stepping past it.
+        (None, _) if len > 0 => Some(0),
         (Some(i), d) if d < 0 && i == 0 => None,
         (Some(i), d) if d > 0 && i + 1 >= len => None,
         _ => move_index(cur, len, delta),

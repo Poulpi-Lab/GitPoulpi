@@ -372,3 +372,26 @@ fn a_keyboard_move_after_a_wheel_scroll_snaps_the_pane_back_to_following() {
          goes through StatusStates::select) must re-arm following"
     );
 }
+
+/// With nothing selected, the first j/Down (or k/Up) lands on the first
+/// row; it must not step past it to row 1.
+#[test]
+fn the_first_move_with_nothing_selected_lands_on_the_first_row() {
+    let t = tree(&[
+        ("a.rs", false, true),
+        ("b.rs", false, true),
+        ("c.rs", false, true),
+    ]);
+    let all = lines_of(&t, FileListMode::Path);
+    for delta in [1, -1] {
+        let mut st = states();
+        let mut active = StatusSection::Unstaged;
+        move_status_selection(&mut st, &all, &HashSet::new(), &mut active, delta);
+        assert_eq!(active, StatusSection::Unstaged);
+        assert_eq!(
+            st.state(StatusSection::Unstaged).selected(),
+            Some(0),
+            "delta {delta}"
+        );
+    }
+}

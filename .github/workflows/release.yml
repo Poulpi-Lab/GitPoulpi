@@ -807,6 +807,8 @@ jobs:
     needs: publish
     if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' && vars.PUBLISH_CRATES == 'true' }}
     runs-on: ubuntu-latest
+    # 19 new crates: crates.io allows a burst of 5, then one per ~10 minutes (scripts/publish-crates.sh waits).
+    timeout-minutes: 240
     permissions:
       contents: read
       # The OIDC identity crates.io Trusted Publishing trusts.

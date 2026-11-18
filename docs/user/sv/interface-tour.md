@@ -118,7 +118,9 @@ aktiv pil.
   favoriter** (eller **Ta bort från favoriter**), **Lägg till i arbetsytan** (eller
   **Ta bort från arbetsytan**, när du har arbetsytor), **Kopiera sökväg**, **Öppna
   i ›**, **SSH & inloggning...** och **Delvis utcheckning...**.
-- `Ctrl+PageUp` och `Ctrl+PageDown` byter flik. `Ctrl+W` stänger den aktuella
+- `Ctrl+PageUp` och `Ctrl+PageDown` byter flik, och det gör även `Ctrl+Shift+Tab` och
+  `Ctrl+Tab` där din terminal skickar vidare dem (kittys tangentbordsprotokoll; vissa
+  terminaler och multiplexrar behåller dem själva). `Ctrl+W` stänger den aktuella
   fliken. Ett mittenklick på en flik stänger den också (med samma fråga).
 - `t` (eller `Ctrl+N Tab`) öppnar flikväljaren, en sökbar lista över de öppna
   flikarna.

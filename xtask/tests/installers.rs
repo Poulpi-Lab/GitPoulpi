@@ -451,7 +451,7 @@ fn every_channel_job_is_gated_and_skips_a_missing_secret() {
             continue;
         }
         for step in steps(&text) {
-            let gated = step.contains("if: env.HAS");
+            let gated = step.contains("if: env.HAS") || step.contains("if: inputs.dry_run");
             assert!(gated, "{name}: ungated step\n{step}");
         }
     }
@@ -474,6 +474,160 @@ fn every_channel_job_is_gated_and_skips_a_missing_secret() {
             .trim();
         let version = reference.split_once('@').map_or("", |(_, v)| v);
         assert!(version.len() == 40, "unpinned action: {line}");
+    }
+}
+
+const CHANNEL_JOBS: [&str; 8] = [
+    "chocolatey",
+    "winget",
+    "scoop",
+    "homebrew",
+    "aur",
+    "apt",
+    "docker",
+    "crates",
+];
+
+/// The `if:` line of a step (empty when it has none).
+fn step_if(step: &str) -> String {
+    step.lines()
+        .find(|l| l.trim_start().starts_with("if: ") || l.trim_start().starts_with("- if: "))
+        .unwrap_or("")
+        .to_string()
+}
+
+/// The step whose text contains `needle`.
+fn step_with(job_text: &str, needle: &str) -> String {
+    steps(job_text)
+        .into_iter()
+        .find(|s| s.contains(needle))
+        .unwrap_or_else(|| panic!("no step contains {needle}"))
+}
+
+#[test]
+fn a_dry_run_runs_publish_and_every_channel_job() {
+    let yml = read(".github/workflows/release.yml");
+    let publish = job(&yml, "publish");
+    // `inputs` is empty on a tag push, so a job-level `!inputs.dry_run` would skip the rehearsal.
+    assert!(!publish.contains("\n    if:"), "publish has a job-level if");
+    for name in CHANNEL_JOBS {
+        let text = job(&yml, name);
+        let job_if = text
+            .lines()
+            .find(|l| l.starts_with("    if: "))
+            .unwrap_or_else(|| panic!("{name}: no job-level if"));
+        assert!(
+            job_if.contains("${{ inputs.dry_run || ("),
+            "{name}: a dry run must pass the job gate: {job_if}"
+        );
+        assert!(!job_if.contains("!inputs.dry_run"), "{name}: {job_if}");
+    }
+}
+
+#[test]
+fn every_side_effect_of_publish_is_off_in_a_dry_run() {
+    let yml = read(".github/workflows/release.yml");
+    let publish = job(&yml, "publish");
+    for needle in [
+        "uses: actions/attest-build-provenance@",
+        "uses: softprops/action-gh-release@",
+        "name: Upload the SBOM to Dependency-Track",
+        "name: Sign the assets\n",
+    ] {
+        let step = step_with(&publish, needle);
+        assert!(
+            step_if(&step).contains("!inputs.dry_run"),
+            "publish: `{needle}` must be guarded by not-dry-run\n{step}"
+        );
+    }
+    // The rehearsal replaces them: a throwaway key, a subject count, a list of the would-be upload.
+    let sign = step_with(&publish, "name: Sign the assets with a throwaway key");
+    assert!(step_if(&sign).contains("inputs.dry_run") && !step_if(&sign).contains("!inputs"));
+    assert!(sign.contains("--throwaway-key"));
+    let check = step_with(&publish, "name: Check the attestation subjects");
+    assert!(step_if(&check).contains("inputs.dry_run"));
+    assert!(check.contains("-le 1024") && check.contains("-type f"));
+    let list = step_with(&publish, "name: List what the release would upload");
+    assert!(step_if(&list).contains("inputs.dry_run"));
+    // The outputs the channels need are set by an unguarded step.
+    let meta = step_with(&publish, "id: meta");
+    assert!(step_if(&meta).is_empty());
+    assert!(meta.contains("prerelease="));
+}
+
+#[test]
+fn every_push_and_upload_step_of_the_channels_is_off_in_a_dry_run() {
+    let yml = read(".github/workflows/release.yml");
+    // (job, a marker of the outward step)
+    for (name, marker) in [
+        ("chocolatey", "choco push"),
+        ("winget", "komac update"),
+        ("scoop", "git push"),
+        ("homebrew", "git push"),
+        ("aur", "git push"),
+        ("apt", "git push"),
+        ("crates", "scripts/publish-crates.sh"),
+        ("docker", "uses: docker/login-action@"),
+        ("docker", "uses: peter-evans/dockerhub-description@"),
+    ] {
+        let text = job(&yml, name);
+        for step in steps(&text).into_iter().filter(|s| s.contains(marker)) {
+            let cond = step_if(&step);
+            // Either the HAS flag (false in a dry run, pinned below) or an explicit guard.
+            assert!(
+                cond.contains("env.HAS") || cond.contains("!inputs.dry_run"),
+                "{name}: `{marker}` step has no flag\n{step}"
+            );
+        }
+    }
+    // The flags are false in a dry run, so a step behind only the flag cannot run there.
+    for name in CHANNEL_JOBS {
+        let text = job(&yml, name);
+        for line in text.lines().filter(|l| {
+            let t = l.trim_start();
+            t.starts_with("HAS") && t.contains(": ${{") && t.contains("secrets.")
+                || t.starts_with("HAS_GHCR:")
+                || t.starts_with("HAS_TRUSTED:")
+        }) {
+            assert!(
+                line.contains("${{ !inputs.dry_run && "),
+                "{name}: the flag is not false in a dry run: {line}"
+            );
+        }
+    }
+    // Docker still builds (both platforms) but never pushes in a dry run.
+    let docker = job(&yml, "docker");
+    assert!(docker.contains("push: ${{ env.HAS_DOCKERHUB == 'true' || env.HAS_GHCR == 'true' }}"));
+    // The rehearsal builds what would be pushed.
+    assert!(step_with(&job(&yml, "chocolatey"), "name: Pack\n").contains("choco pack"));
+    assert!(step_with(&job(&yml, "homebrew"), "name: Fill the formula\n").contains("ruby -c"));
+    assert!(step_with(&job(&yml, "scoop"), "name: Fill the manifest\n").contains("jq ."));
+    assert!(job(&yml, "crates").contains("cargo publish --workspace --dry-run"));
+    assert!(job(&yml, "apt").contains("quick-gen-key"));
+}
+
+#[test]
+fn a_dry_run_never_reads_the_release_environment_secrets() {
+    let yml = read(".github/workflows/release.yml");
+    let env_line = "environment: ${{ inputs.dry_run && 'dryrun' || 'release' }}";
+    for name in std::iter::once("publish").chain(CHANNEL_JOBS) {
+        let text = job(&yml, name);
+        // The `release` environment (and its secrets) is for a real tag only.
+        assert!(text.contains(env_line), "{name}: environment line");
+        assert!(!text.contains("environment: release"), "{name}");
+        for step in steps(&text) {
+            let uses_secret = step
+                .lines()
+                .any(|l| l.contains("secrets.") && !l.contains("secrets.GITHUB_TOKEN"));
+            if !uses_secret {
+                continue;
+            }
+            let cond = step_if(&step);
+            assert!(
+                cond.contains("env.HAS") || cond.contains("!inputs.dry_run"),
+                "{name}: a step reads a secret without a flag that is false in a dry run\n{step}"
+            );
+        }
     }
 }
 

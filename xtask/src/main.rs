@@ -36,7 +36,7 @@ Tasks:
   lock-age --base <ref> [--min-days N]
                     fail when Cargo.lock takes a crates.io version younger
                     than N days (default 2) against <ref> (--help).
-  sign --dir <dist> [--version <v>]
+  sign --dir <dist> [--version <v>] [--throwaway-key]
                     minisign every release asset (MINISIGN_SECRET_KEY and
                     MINISIGN_PASSWORD from the environment) (--help).
   advisories [--json|--markdown] [--no-paths]

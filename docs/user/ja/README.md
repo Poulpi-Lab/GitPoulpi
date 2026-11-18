@@ -153,3 +153,5 @@ GitPoulpi は、クリックできる commit グラフ、コマンドパレッ�
 ---
 
 GitKraken はそれぞれの所有者の商標です。GitPoulpi は独立したプロジェクトであり、その所有者とは提携しておらず、承認やスポンサーも受けていません。この名称は互換性とインスピレーションを説明する目的でのみ記載しています。
+
+本書および GitPoulpi で言及しているその他すべての製品名およびサービス名は、それぞれの所有者の商標です。たとえば、コードホスティング (GitHub、GitLab、Bitbucket など)、課題管理ツール (Jira、Trello、Linear など)、GitPoulpi から開けるエディターやツール (Visual Studio Code、JetBrains 製 IDE、lazygit など) が該当します。これらの名称は GitPoulpi が連携する対象を示す目的でのみ使用しており、GitPoulpi はそのいずれとも提携しておらず、承認やスポンサーも受けていません。

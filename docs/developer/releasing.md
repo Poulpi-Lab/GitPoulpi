@@ -15,7 +15,7 @@ A tag with a `-` in the version (`releases/v0.2.0-rc.1`) is published as a GitHu
 | `preflight` | `cargo-deny` (`advisories bans sources licenses`, policy in `deny.toml`) and `xtask lock-age` against the previous `releases/v*` tag. CI is disabled, so this is where they run before a build. |
 | `installers-windows`, `installers-linux` | Start with the run, no compile (a few minutes). Build the Inno Setup installer and the MSI (WiX 5.0.2) from dummy files, and the `.deb` from copies of `/bin/true`, with the same arguments as the real steps, so a packaging error fails the run at the start instead of after the build. Nothing is uploaded. |
 | `build` (matrix, after `preflight` and both installer checks) | One row per target: Linux x86_64 and arm64 (the arm64 row feeds the multi-arch image and the arm64 `.deb`), Windows x86_64, macOS arm64 and x86_64. `cargo run -p xtask -- dist` builds the archive and its `.sha256`. Windows also builds the Inno Setup installer and the MSI (WiX v5, `packaging/msi/gitpoulpi.wxs`); Linux also builds the `.deb` (`cargo deb --no-build`). Every file has a `.sha256`. |
-| `publish` | One GitHub release with every archive, installer, `.deb`, `install.sh`, `latest.json` (generated from the `.sha256` files, with the current advisories), `security.json`, the SBOM, the `.sha256` files and a `.minisig` for every asset except the `.sha256` files (see "Signing and supply chain"). Notes are the tag's `## [x.y.z]` section of `CHANGELOG.md`, else GitHub's generated notes. Skipped by a dry run. |
+| `publish` | One GitHub release with every archive, installer, `.deb`, `install.sh`, `latest.json` (generated from the `.sha256` files, with the current advisories), `security.json`, the SBOM, the `.sha256` files and a `.minisig` for every asset except the `.sha256` files (see "Signing and supply chain"). Notes are the tag's `## [x.y.z]` section of `CHANGELOG.md`, else GitHub's generated notes. A dry run prepares and signs the same files with a throwaway key and creates nothing (see "Dry run"). |
 | `chocolatey` | Fills the templates in `packaging/chocolatey/`, `choco pack`, `choco push`. |
 | `winget` | Runs only when the variable `PUBLISH_WINGET` is `true` (off for now). `komac update GitPoulpi.GitPoulpi --version <v> --urls <setup> --submit`, from the fork `Poulpi-Lab/winget-pkgs`, as the App's bot. |
 | `scoop`, `homebrew` | Fill the manifest or formula and commit it to `Poulpi-Lab/scoop-gitpoulpi` and `Poulpi-Lab/homebrew-gitpoulpi`, as the App's bot. |
@@ -95,14 +95,28 @@ gitpoulpi-core, -i18n, -logo-build, -pty, -secrets, -cli-backend, -config, -git2
 
 ## Dry run
 
-A dry run builds every archive and installer and publishes nothing:
+The step before tagging: a rehearsal of the whole workflow that pushes and publishes nothing. If it is green, the real tag meets no job it has not already run.
 
 ```
-git tag dryrun/v0.1.0 && git push origin dryrun/v0.1.0
-gh workflow run release.yml -f tag=dryrun/v0.1.0 -f dry_run=true
+git tag dryrun/v1.0.0 && git push origin dryrun/v1.0.0
+gh workflow run release.yml -f tag=dryrun/v1.0.0 -f dry_run=true
 ```
 
-Download the run's artifacts and check them: the archives' `.sha256`, the setup and MSI installing in a clean Windows machine, the `.deb` with `dpkg -c`. The tag's version must still match `Cargo.toml`. A dry run skips `publish`, so the channel jobs (which need it) do not run either.
+The tag's version must still match `Cargo.toml`. Expect about 20 minutes (the `build` matrix dominates; `crates` and `docker` run alongside the others). What each job does:
+
+| Job | In a dry run |
+|---|---|
+| `preflight`, `build` | As for a tag. |
+| `publish` | Prepares every file (`install.sh`, version and notes, `latest.json`, `security.json`, SBOM, `.sha256` files) and signs with a throwaway minisign key generated in memory (`xtask sign --throwaway-key`, each signature verified). It checks that `dist` holds only files and at most 1024 of them (the limit of the provenance attestation, which a dry run does not call), creates no release and lists what would be uploaded. The outputs (`version`, `prerelease`) are set as usual. No Dependency-Track upload. |
+| `chocolatey` | `choco pack`, no push. |
+| `winget`, `scoop`, `homebrew`, `aur` | Templates rendered; winget YAML and the scoop JSON parsed, `ruby -c` on the formula, `makepkg --printsrcinfo` on the PKGBUILDs. No App token, no clone of the target repository, no push. |
+| `apt` | The repository is built and signed with a throwaway GnuPG key in an empty folder, and the signature checked. The apt signing key is not read. |
+| `docker` | The same multi-arch build (amd64 and arm64) as a release, never pushed: no login, no overview update. |
+| `crates` | `cargo publish --workspace --dry-run`: every crate packaged and built, nothing uploaded. |
+
+The channel jobs run whatever `PUBLISH_PACKAGES`, `PUBLISH_WINGET`, `PUBLISH_CRATES` and the tag's pre-release flag say. A dry run uses the secret-less environment `dryrun` instead of `release` (GitHub creates it on first use; keep it free of secrets and protection rules), so no secret of `release` is readable, and every step that pushes or uploads is behind `!inputs.dry_run` or a `HAS` flag that is false in a dry run. `xtask/tests/installers.rs` pins this.
+
+What a dry run cannot show: crates.io's rate limit on new crates (`scripts/publish-crates.sh` waits it out), the real signing key and the real credentials, the attestation call itself (needs `ATTESTATIONS`), and an actual install. Download the run's artifacts to check the archives, the setup and MSI on a clean Windows machine, and the `.deb` with `dpkg -c`.
 
 ## Before the first public tag
 

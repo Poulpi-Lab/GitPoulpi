@@ -33,7 +33,10 @@ name: Release
 #
 # Dry run (builds every archive and installer, publishes nothing): push a tag under another prefix, for example
 # `git tag dryrun/v0.1.0 && git push origin dryrun/v0.1.0`, then
-# `gh workflow run release.yml -f tag=dryrun/v0.1.0 -f dry_run=true` and download the run's artifacts.
+# `gh workflow run release.yml -f tag=dryrun/v0.1.0 -f dry_run=true` and download the run's artifacts. A dry run
+# runs every job, including publish and the channels, but only the steps that prepare files: no release, no
+# attestation, no push, no upload, no secret (the signing key and the apt key are throwaway). Every step with an
+# outward effect carries a not-dry-run guard (xtask/tests/installers.rs pins them).
 # The tag's version must equal the workspace version in Cargo.toml (the archive names come from it): the first
 # step of each build checks that. see the release-and-packaging design.
 on:
@@ -45,7 +48,7 @@ on:
         description: 'Existing tag to (re)build and publish, e.g. releases/v0.2.0'
         required: true
       dry_run:
-        description: 'Build and upload the artifacts only; publish no release'
+        description: 'Rehearsal: run every job, push and publish nothing (docs/developer/releasing.md, Dry run)'
         type: boolean
         default: false
 
@@ -269,11 +272,10 @@ jobs:
 
   publish:
     needs: build
-    # `inputs` is empty on a tag push, so only a manual dry run skips this job.
-    if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-latest
-    # The signing secrets live in the `release` environment.
-    environment: release
+    # The signing secrets live in the `release` environment, which only `releases/v*` tags may use. A dry run
+    # (`inputs` is empty on a tag push) uses `dryrun`, an environment without secrets.
+    environment: ${{ inputs.dry_run && 'dryrun' || 'release' }}
     permissions:
       contents: write
       id-token: write
@@ -349,6 +351,7 @@ jobs:
             > "dist/gitpoulpi-${version}-sbom.cdx.json"
       # Optional: a Dependency-Track server. Skipped with a notice when its secrets are absent.
       - name: Upload the SBOM to Dependency-Track
+        if: ${{ !inputs.dry_run }}
         env:
           DTRACK_URL: ${{ secrets.DTRACK_URL }}
           DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
@@ -364,17 +367,32 @@ jobs:
             -F "bom=@dist/gitpoulpi-${VERSION}-sbom.cdx.json"
       # One minisign signature per asset (not .sha256 or .minisig), trusted comment `file:<name> version:<v>`.
       - name: Sign the assets
+        if: ${{ !inputs.dry_run }}
         env:
           MINISIGN_SECRET_KEY: ${{ secrets.MINISIGN_SECRET_KEY }}
           MINISIGN_PASSWORD: ${{ secrets.MINISIGN_PASSWORD }}
         run: cargo run -q -p xtask -- sign --dir dist --version "${{ steps.meta.outputs.version }}"
+      # Dry run: the same signing code with a key generated in memory and thrown away, each signature verified.
+      - name: Sign the assets with a throwaway key
+        if: ${{ inputs.dry_run }}
+        run: cargo run -q -p xtask -- sign --dir dist --version "${{ steps.meta.outputs.version }}" --throwaway-key
       # Build provenance. Private repositories need GitHub Enterprise Cloud for attestations, hence the variable.
       # Verify with `gh attestation verify <file> --repo <owner>/gitpoulpi`.
       - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
-        if: ${{ vars.ATTESTATIONS == 'true' }}
+        if: ${{ !inputs.dry_run && vars.ATTESTATIONS == 'true' }}
         with:
           subject-path: dist/*
+      # Dry run: the attestation refuses more than 1024 subjects (the 1.0.0 release hit it) and a directory.
+      - name: Check the attestation subjects
+        if: ${{ inputs.dry_run }}
+        run: |
+          count=$(find dist -mindepth 1 -maxdepth 1 -type f | wc -l)
+          dirs=$(find dist -mindepth 1 -maxdepth 1 ! -type f | wc -l)
+          echo "attestation subjects: $count files, $dirs other entries"
+          [ "$dirs" -eq 0 ] || { echo "::error::dist holds entries that are not files"; exit 1; }
+          [ "$count" -le 1024 ] || { echo "::error::$count subjects, the attestation accepts at most 1024"; exit 1; }
       - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
+        if: ${{ !inputs.dry_run }}
         with:
           tag_name: ${{ env.TAG }}
           name: ${{ steps.notes.outputs.title }}
@@ -383,6 +401,14 @@ jobs:
           prerelease: ${{ contains(env.TAG, '-') }}
           files: dist/*
           fail_on_unmatched_files: true
+      # Dry run: no release; what the release would hold.
+      - name: List what the release would upload
+        if: ${{ inputs.dry_run }}
+        run: |
+          echo "would create release '${{ steps.notes.outputs.title }}' on ${TAG} (prerelease: ${{ steps.meta.outputs.prerelease }})"
+          ls -l dist
+          echo "---- release notes"
+          cat notes.md
 
   # ---------------------------------------------------------------- channels
   # Every job below runs after `publish`, only for a stable tag and only when PUBLISH_PACKAGES is 'true'. A job
@@ -390,55 +416,59 @@ jobs:
   # `if: env.HAS... == 'true'`, so a missing secret skips the step and the job stays green with a notice.
 
   chocolatey:
-    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
-    environment: release
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use; a dry run uses `dryrun`.
+    environment: ${{ inputs.dry_run && 'dryrun' || 'release' }}
     needs: publish
-    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    if: ${{ inputs.dry_run || (needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true') }}
     runs-on: windows-latest
     env:
-      HAS: ${{ secrets.CHOCO_API_KEY != '' }}
+      HAS: ${{ !inputs.dry_run && secrets.CHOCO_API_KEY != '' }}
       VERSION: ${{ needs.publish.outputs.version }}
     steps:
       - name: Notice when the secret is missing
-        if: env.HAS != 'true'
+        if: env.HAS != 'true' && !inputs.dry_run
         shell: bash
         run: echo "::notice::CHOCO_API_KEY is not set, the Chocolatey package was not pushed"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: env.HAS == 'true'
+        if: env.HAS == 'true' || inputs.dry_run
         with:
           ref: ${{ env.TAG }}
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        if: env.HAS == 'true'
+        if: env.HAS == 'true' || inputs.dry_run
         with:
           path: dist
           merge-multiple: true
       - name: Fill the templates
-        if: env.HAS == 'true'
+        if: env.HAS == 'true' || inputs.dry_run
         shell: bash
         run: sh packaging/fill-templates.sh "$VERSION" dist filled
-      - name: Pack and push
+      # Dry run: the package is built, never pushed.
+      - name: Pack
+        if: env.HAS == 'true' || inputs.dry_run
+        shell: bash
+        working-directory: filled/chocolatey
+        run: choco pack
+      - name: Push
         if: env.HAS == 'true'
         shell: bash
         working-directory: filled/chocolatey
         env:
           CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
-        run: |
-          choco pack
-          choco push "gitpoulpi.$VERSION.nupkg" --source https://push.chocolatey.org/ --api-key "$CHOCO_API_KEY"
+        run: choco push "gitpoulpi.$VERSION.nupkg" --source https://push.chocolatey.org/ --api-key "$CHOCO_API_KEY"
 
   winget:
-    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
-    environment: release
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use; a dry run uses `dryrun`.
+    environment: ${{ inputs.dry_run && 'dryrun' || 'release' }}
     needs: publish
     # Off until the variable PUBLISH_WINGET is 'true' (the first winget version is submitted by hand).
-    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' && vars.PUBLISH_WINGET == 'true' }}
+    if: ${{ inputs.dry_run || (needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' && vars.PUBLISH_WINGET == 'true') }}
     runs-on: ubuntu-latest
     env:
-      HAS: ${{ secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '' }}
+      HAS: ${{ !inputs.dry_run && (secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '') }}
       VERSION: ${{ needs.publish.outputs.version }}
     steps:
       - name: Notice when the bot credentials are missing
-        if: env.HAS != 'true'
+        if: env.HAS != 'true' && !inputs.dry_run
         run: echo "::notice::POULPI_BOT_PRIVATE_KEY or POULPI_BOT_APP_ID is not set, the winget update was not submitted"
       # The App installation covers the fork Poulpi-Lab/winget-pkgs. komac needs the package to exist in
       # winget-pkgs already (the first version is submitted by hand), then it opens one pull request per release.
@@ -461,19 +491,37 @@ jobs:
         run: |
           url="https://github.com/${{ github.repository }}/releases/download/${TAG}/gitpoulpi-${VERSION}-x86_64-pc-windows-msvc-setup.exe"
           komac update GitPoulpi.GitPoulpi --version "$VERSION" --urls "$url" --submit
+      # Dry run: the three manifests are rendered and parsed, nothing is submitted.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: inputs.dry_run
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        if: inputs.dry_run
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Render and check the manifests
+        if: inputs.dry_run
+        run: |
+          sh packaging/fill-templates.sh "$VERSION" dist filled
+          for f in filled/winget/*.yaml; do
+            ruby -ryaml -e 'YAML.load_file(ARGV[0])' "$f"
+            ! grep -n '@[A-Z0-9_]*@' "$f" || { echo "::error::$f has an unfilled placeholder"; exit 1; }
+          done
 
   scoop:
-    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
-    environment: release
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use; a dry run uses `dryrun`.
+    environment: ${{ inputs.dry_run && 'dryrun' || 'release' }}
     needs: publish
-    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    if: ${{ inputs.dry_run || (needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true') }}
     runs-on: ubuntu-latest
     env:
-      HAS: ${{ secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '' }}
+      HAS: ${{ !inputs.dry_run && (secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '') }}
       VERSION: ${{ needs.publish.outputs.version }}
     steps:
       - name: Notice when the bot credentials are missing
-        if: env.HAS != 'true'
+        if: env.HAS != 'true' && !inputs.dry_run
         run: echo "::notice::POULPI_BOT_PRIVATE_KEY or POULPI_BOT_APP_ID is not set, the Scoop bucket was not updated"
       - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         if: env.HAS == 'true'
@@ -484,7 +532,7 @@ jobs:
           owner: Poulpi-Lab
           repositories: scoop-gitpoulpi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: env.HAS == 'true'
+        if: env.HAS == 'true' || inputs.dry_run
         with:
           ref: ${{ env.TAG }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -494,17 +542,22 @@ jobs:
           token: ${{ steps.app.outputs.token }}
           path: target-repo
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        if: env.HAS == 'true'
+        if: env.HAS == 'true' || inputs.dry_run
         with:
           path: dist
           merge-multiple: true
-      - name: Fill the manifest and push as the bot
+      # Dry run: the manifest is rendered and parsed, never pushed.
+      - name: Fill the manifest
+        if: env.HAS == 'true' || inputs.dry_run
+        run: |
+          sh packaging/fill-templates.sh "$VERSION" dist filled
+          jq . filled/scoop/gitpoulpi.json
+      - name: Push as the bot
         if: env.HAS == 'true'
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           BOT_SLUG: ${{ steps.app.outputs.app-slug }}
         run: |
-          sh packaging/fill-templates.sh "$VERSION" dist filled
           mkdir -p target-repo/bucket
           cp filled/scoop/gitpoulpi.json target-repo/bucket/gitpoulpi.json
           cd target-repo
@@ -517,17 +570,17 @@ jobs:
           git push
 
   homebrew:
-    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
-    environment: release
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use; a dry run uses `dryrun`.
+    environment: ${{ inputs.dry_run && 'dryrun' || 'release' }}
     needs: publish
-    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    if: ${{ inputs.dry_run || (needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true') }}
     runs-on: ubuntu-latest
     env:
-      HAS: ${{ secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '' }}
+      HAS: ${{ !inputs.dry_run && (secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '') }}
       VERSION: ${{ needs.publish.outputs.version }}
     steps:
       - name: Notice when the bot credentials are missing
-        if: env.HAS != 'true'
+        if: env.HAS != 'true' && !inputs.dry_run
         run: echo "::notice::POULPI_BOT_PRIVATE_KEY or POULPI_BOT_APP_ID is not set, the Homebrew tap was not updated"
       - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         if: env.HAS == 'true'
@@ -538,7 +591,7 @@ jobs:
           owner: Poulpi-Lab
           repositories: homebrew-gitpoulpi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: env.HAS == 'true'
+        if: env.HAS == 'true' || inputs.dry_run
         with:
           ref: ${{ env.TAG }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -548,17 +601,22 @@ jobs:
           token: ${{ steps.app.outputs.token }}
           path: target-repo
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        if: env.HAS == 'true'
+        if: env.HAS == 'true' || inputs.dry_run
         with:
           path: dist
           merge-multiple: true
-      - name: Fill the formula and push as the bot
+      # Dry run: the formula is rendered and syntax-checked, never pushed.
+      - name: Fill the formula
+        if: env.HAS == 'true' || inputs.dry_run
+        run: |
+          sh packaging/fill-templates.sh "$VERSION" dist filled
+          ruby -c filled/homebrew/gitpoulpi.rb
+      - name: Push as the bot
         if: env.HAS == 'true'
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           BOT_SLUG: ${{ steps.app.outputs.app-slug }}
         run: |
-          sh packaging/fill-templates.sh "$VERSION" dist filled
           mkdir -p target-repo/Formula
           cp filled/homebrew/gitpoulpi.rb target-repo/Formula/gitpoulpi.rb
           cd target-repo
@@ -571,35 +629,35 @@ jobs:
           git push
 
   aur:
-    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
-    environment: release
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use; a dry run uses `dryrun`.
+    environment: ${{ inputs.dry_run && 'dryrun' || 'release' }}
     needs: publish
-    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    if: ${{ inputs.dry_run || (needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true') }}
     runs-on: ubuntu-latest
     container: archlinux:latest
     env:
-      HAS: ${{ secrets.AUR_SSH_PRIVATE_KEY != '' }}
+      HAS: ${{ !inputs.dry_run && secrets.AUR_SSH_PRIVATE_KEY != '' }}
       VERSION: ${{ needs.publish.outputs.version }}
     steps:
       - name: Notice when the secret is missing
-        if: env.HAS != 'true'
+        if: env.HAS != 'true' && !inputs.dry_run
         run: echo "::notice::AUR_SSH_PRIVATE_KEY is not set, the AUR packages were not pushed"
       - name: Install the tools
-        if: env.HAS == 'true'
+        if: env.HAS == 'true' || inputs.dry_run
         run: pacman -Syu --noconfirm base-devel git openssh curl
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: env.HAS == 'true'
+        if: env.HAS == 'true' || inputs.dry_run
         with:
           ref: ${{ env.TAG }}
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        if: env.HAS == 'true'
+        if: env.HAS == 'true' || inputs.dry_run
         with:
           path: dist
           merge-multiple: true
       # The source package needs the tag's source tarball checksum, which only exists for a public repository:
       # without it the folder is skipped with a notice and gitpoulpi-bin is still pushed.
       - name: Fill the templates
-        if: env.HAS == 'true'
+        if: env.HAS == 'true' || inputs.dry_run
         run: |
           src_url="https://github.com/${{ github.repository }}/archive/refs/tags/${TAG}.tar.gz"
           if curl -fsSL -o source.tar.gz "$src_url"; then
@@ -609,12 +667,22 @@ jobs:
             echo "::notice::the source tarball is not downloadable, the gitpoulpi source package is skipped"
           fi
           sh packaging/fill-templates.sh "$VERSION" dist filled
-      - name: Generate .SRCINFO and push to the AUR
+      # Dry run: .SRCINFO is generated from each rendered PKGBUILD, nothing is cloned or pushed.
+      - name: Generate .SRCINFO
+        if: env.HAS == 'true' || inputs.dry_run
+        run: |
+          useradd -m builder
+          for pkg in gitpoulpi-bin gitpoulpi; do
+            [ -d "filled/aur/$pkg" ] || continue
+            chown -R builder "filled/aur/$pkg"
+            su builder -c "cd filled/aur/$pkg && makepkg --printsrcinfo > .SRCINFO"
+            grep -q "pkgver = ${VERSION}" "filled/aur/$pkg/.SRCINFO"
+          done
+      - name: Push to the AUR
         if: env.HAS == 'true'
         env:
           AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
         run: |
-          useradd -m builder
           install -d -m 700 ~/.ssh
           printf '%s\n' "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
           chmod 600 ~/.ssh/aur
@@ -624,8 +692,6 @@ jobs:
           git config --global user.email "noreply@users.noreply.github.com"
           for pkg in gitpoulpi-bin gitpoulpi; do
             [ -d "filled/aur/$pkg" ] || continue
-            chown -R builder "filled/aur/$pkg"
-            su builder -c "cd filled/aur/$pkg && makepkg --printsrcinfo > .SRCINFO"
             git clone "ssh://aur@aur.archlinux.org/$pkg.git" "aur-$pkg"
             cp "filled/aur/$pkg/PKGBUILD" "filled/aur/$pkg/.SRCINFO" "aur-$pkg/"
             cd "aur-$pkg"
@@ -638,17 +704,17 @@ jobs:
           done
 
   apt:
-    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
-    environment: release
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use; a dry run uses `dryrun`.
+    environment: ${{ inputs.dry_run && 'dryrun' || 'release' }}
     needs: publish
-    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    if: ${{ inputs.dry_run || (needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true') }}
     runs-on: ubuntu-latest
     env:
-      HAS: ${{ secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '' && secrets.APT_GPG_PRIVATE_KEY != '' }}
+      HAS: ${{ !inputs.dry_run && (secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '' && secrets.APT_GPG_PRIVATE_KEY != '') }}
       VERSION: ${{ needs.publish.outputs.version }}
     steps:
       - name: Notice when a secret is missing
-        if: env.HAS != 'true'
+        if: env.HAS != 'true' && !inputs.dry_run
         run: echo "::notice::POULPI_BOT_PRIVATE_KEY, POULPI_BOT_APP_ID or APT_GPG_PRIVATE_KEY is not set, the apt repository was not updated"
       - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         if: env.HAS == 'true'
@@ -659,7 +725,7 @@ jobs:
           owner: Poulpi-Lab
           repositories: apt-gitpoulpi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: env.HAS == 'true'
+        if: env.HAS == 'true' || inputs.dry_run
         with:
           ref: ${{ env.TAG }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -670,7 +736,7 @@ jobs:
           token: ${{ steps.app.outputs.token }}
           path: apt-repo
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        if: env.HAS == 'true'
+        if: env.HAS == 'true' || inputs.dry_run
         with:
           path: dist
           merge-multiple: true
@@ -688,6 +754,24 @@ jobs:
           cp dist/*.deb apt-repo/pool/
           sh packaging/apt/build-repo.sh apt-repo
           cp packaging/apt/gitpoulpi.sources apt-repo/gitpoulpi.sources
+      # Dry run: the repository is built in an empty folder with a key generated in a temporary GnuPG home and
+      # thrown away. The apt signing key is never read and nothing is pushed.
+      - name: Build the repository with a throwaway key
+        if: inputs.dry_run
+        run: |
+          sudo apt-get install -y --no-install-recommends apt-utils
+          export GNUPGHOME="$(mktemp -d)"
+          gpg --batch --passphrase '' --quick-gen-key 'GitPoulpi dry run <dryrun@invalid.example>' default default 1d
+          APT_GPG_KEY_ID=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr/ { print $10; exit }')
+          export APT_GPG_KEY_ID
+          mkdir -p apt-repo/pool
+          cp dist/*.deb apt-repo/pool/
+          sh packaging/apt/build-repo.sh apt-repo
+          cp packaging/apt/gitpoulpi.sources apt-repo/gitpoulpi.sources
+          for f in dists/stable/InRelease dists/stable/Release.gpg dists/stable/main/binary-amd64/Packages gitpoulpi-archive-keyring.gpg; do
+            test -s "apt-repo/$f" || { echo "::error::apt-repo/$f is missing"; exit 1; }
+          done
+          gpg --verify apt-repo/dists/stable/InRelease
       - name: Push as the bot
         if: env.HAS == 'true'
         env:
@@ -708,21 +792,21 @@ jobs:
   # from the build job's Linux archives (amd64 and arm64). Without any login the build still runs and checks the
   # Dockerfile, but pushes nothing. The Docker Hub overview is packaging/docker/README.md, replaced on every release.
   docker:
-    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
-    environment: release
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use; a dry run uses `dryrun`.
+    environment: ${{ inputs.dry_run && 'dryrun' || 'release' }}
     needs: publish
-    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    if: ${{ inputs.dry_run || (needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     env:
-      HAS_DOCKERHUB: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
-      HAS_GHCR: ${{ vars.PUBLISH_GHCR == 'true' }}
+      HAS_DOCKERHUB: ${{ !inputs.dry_run && (secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '') }}
+      HAS_GHCR: ${{ !inputs.dry_run && vars.PUBLISH_GHCR == 'true' }}
       VERSION: ${{ needs.publish.outputs.version }}
     steps:
       - name: Notice when Docker Hub is not configured
-        if: env.HAS_DOCKERHUB != 'true'
+        if: env.HAS_DOCKERHUB != 'true' && !inputs.dry_run
         run: echo "::notice::DOCKERHUB_USERNAME or DOCKERHUB_TOKEN is not set, nothing is pushed to Docker Hub"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -802,10 +886,10 @@ jobs:
   # first release uses the token; neither set means a notice and nothing published. The crates go out in
   # dependency order with retries (scripts/publish-crates.sh), and a re-run skips the versions already there.
   crates:
-    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
-    environment: release
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use; a dry run uses `dryrun`.
+    environment: ${{ inputs.dry_run && 'dryrun' || 'release' }}
     needs: publish
-    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' && vars.PUBLISH_CRATES == 'true' }}
+    if: ${{ inputs.dry_run || (needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' && vars.PUBLISH_CRATES == 'true') }}
     runs-on: ubuntu-latest
     # 19 new crates: crates.io allows a burst of 5, then one per ~10 minutes (scripts/publish-crates.sh waits).
     timeout-minutes: 240
@@ -814,18 +898,18 @@ jobs:
       # The OIDC identity crates.io Trusted Publishing trusts.
       id-token: write
     env:
-      HAS_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN != '' }}
-      HAS_TRUSTED: ${{ vars.CRATES_TRUSTED_PUBLISHING == 'true' }}
+      HAS_TOKEN: ${{ !inputs.dry_run && secrets.CARGO_REGISTRY_TOKEN != '' }}
+      HAS_TRUSTED: ${{ !inputs.dry_run && vars.CRATES_TRUSTED_PUBLISHING == 'true' }}
     steps:
       - name: Notice when no credential is configured
-        if: env.HAS_TOKEN != 'true' && env.HAS_TRUSTED != 'true'
+        if: env.HAS_TOKEN != 'true' && env.HAS_TRUSTED != 'true' && !inputs.dry_run
         run: echo "::notice::Neither CRATES_TRUSTED_PUBLISHING nor CARGO_REGISTRY_TOKEN is set, nothing was published to crates.io"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: env.HAS_TOKEN == 'true' || env.HAS_TRUSTED == 'true'
+        if: env.HAS_TOKEN == 'true' || env.HAS_TRUSTED == 'true' || inputs.dry_run
         with:
           ref: ${{ env.TAG }}
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
-        if: env.HAS_TOKEN == 'true' || env.HAS_TRUSTED == 'true'
+        if: env.HAS_TOKEN == 'true' || env.HAS_TRUSTED == 'true' || inputs.dry_run
         with:
           toolchain: stable
       - uses: rust-lang/crates-io-auth-action@3268eb413133e2960fa4ae0e963ca76380c54cd9 # v1.0.6
@@ -837,3 +921,8 @@ jobs:
           # The short-lived token wins when Trusted Publishing is on.
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token || secrets.CARGO_REGISTRY_TOKEN }}
         run: bash scripts/publish-crates.sh
+      # Dry run: every crate is packaged and built against the packaged siblings, nothing is uploaded and no
+      # token is read. It cannot show crates.io's rate limit on new crates (scripts/publish-crates.sh waits it out).
+      - name: Package and build every crate without publishing
+        if: inputs.dry_run
+        run: cargo publish --workspace --dry-run --exclude xtask --exclude gitpoulpi-testkit --exclude gitpoulpi-updater

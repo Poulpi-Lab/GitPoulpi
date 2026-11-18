@@ -18,13 +18,15 @@ use std::path::{Path, PathBuf};
 use minisign::{SecretKey, SecretKeyBox};
 
 const HELP: &str = "\
-Usage: cargo run -p xtask -- sign --dir <dist> [--version <v>]
+Usage: cargo run -p xtask -- sign --dir <dist> [--version <v>] [--throwaway-key]
 
 Signs every file of <dist> except *.sha256 and *.minisig with minisign and
 writes <file>.minisig. Reads MINISIGN_SECRET_KEY (the key box text) and
 MINISIGN_PASSWORD from the environment. The trusted comment of each signature
 is `file:<name> version:<v>`. Without --version the version of
-<dist>/latest.json is used.";
+<dist>/latest.json is used. --throwaway-key (the release workflow's dry run)
+signs with a key generated in memory and discarded, reads no environment
+value, and verifies every signature it wrote.";
 
 /// The trusted comment bound to one asset.
 pub fn trusted_comment(name: &str, version: &str) -> String {
@@ -73,6 +75,27 @@ pub fn sign_dir(dir: &Path, version: &str, secret: &SecretKey) -> Result<Vec<Str
     Ok(names)
 }
 
+/// Verifies every `<name>.minisig` of `names` against `public`.
+fn verify_dir(
+    dir: &Path,
+    version: &str,
+    public: &minisign::PublicKey,
+    names: &[String],
+) -> Result<(), String> {
+    for name in names {
+        let text = std::fs::read_to_string(dir.join(format!("{name}.minisig")))
+            .map_err(|e| format!("{name}.minisig: {e}"))?;
+        let sig = minisign::SignatureBox::from_string(&text).map_err(|e| format!("{name}: {e}"))?;
+        let bytes = std::fs::read(dir.join(name)).map_err(|e| format!("{name}: {e}"))?;
+        minisign::verify(public, &sig, Cursor::new(bytes), true, false, false)
+            .map_err(|e| format!("{name}: signature does not verify: {e}"))?;
+        if sig.trusted_comment().ok().as_deref() != Some(&trusted_comment(name, version)) {
+            return Err(format!("{name}: unexpected trusted comment"));
+        }
+    }
+    Ok(())
+}
+
 /// Reads the secret key from the two environment values.
 pub fn secret_key(box_text: &str, password: Option<String>) -> Result<SecretKey, String> {
     let key_box = SecretKeyBox::from_string(box_text.trim_start())
@@ -101,6 +124,7 @@ fn version_of_manifest(dir: &Path) -> Result<String, String> {
 pub fn run(args: &[String]) -> Result<i32, String> {
     let mut dir: Option<PathBuf> = None;
     let mut version = None;
+    let mut throwaway = false;
     let mut it = args.iter();
     while let Some(arg) = it.next() {
         match arg.as_str() {
@@ -110,6 +134,7 @@ pub fn run(args: &[String]) -> Result<i32, String> {
             }
             "--dir" => dir = it.next().map(PathBuf::from),
             "--version" => version = it.next().cloned(),
+            "--throwaway-key" => throwaway = true,
             other => return Err(format!("unknown argument '{other}'\n\n{HELP}")),
         }
     }
@@ -118,6 +143,17 @@ pub fn run(args: &[String]) -> Result<i32, String> {
         Some(v) => v,
         None => version_of_manifest(&dir)?,
     };
+    if throwaway {
+        let pair = minisign::KeyPair::generate_unencrypted_keypair()
+            .map_err(|e| format!("throwaway key: {e}"))?;
+        let signed = sign_dir(&dir, &version, &pair.sk)?;
+        verify_dir(&dir, &version, &pair.pk, &signed)?;
+        println!(
+            "sign: {} file(s) signed with a throwaway key and verified for version {version}",
+            signed.len()
+        );
+        return Ok(0);
+    }
     let key_text = std::env::var("MINISIGN_SECRET_KEY")
         .map_err(|_| "MINISIGN_SECRET_KEY is not set".to_string())?;
     let secret = secret_key(&key_text, std::env::var("MINISIGN_PASSWORD").ok())?;
@@ -165,6 +201,18 @@ mod tests {
             false,
         )
         .unwrap();
+    }
+
+    #[test]
+    fn verify_dir_accepts_good_signatures_and_rejects_tampering() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(dir.path().join("a.bin"), b"payload").unwrap();
+        let pair = KeyPair::generate_unencrypted_keypair().unwrap();
+        let signed = sign_dir(dir.path(), "1.0.0", &pair.sk).unwrap();
+        verify_dir(dir.path(), "1.0.0", &pair.pk, &signed).unwrap();
+        assert!(verify_dir(dir.path(), "2.0.0", &pair.pk, &signed).is_err());
+        std::fs::write(dir.path().join("a.bin"), b"tampered").unwrap();
+        assert!(verify_dir(dir.path(), "1.0.0", &pair.pk, &signed).is_err());
     }
 
     #[test]

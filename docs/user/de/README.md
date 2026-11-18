@@ -179,3 +179,5 @@ jedem Release geändert hat.
 ---
 
 GitKraken ist eine Marke des jeweiligen Inhabers. GitPoulpi ist ein unabhängiges Projekt, steht in keiner Verbindung zu diesem und wird von ihm weder unterstützt noch gesponsert; der Name wird nur genannt, um Kompatibilität und Inspiration zu beschreiben.
+
+Alle anderen in GitPoulpi und seiner Dokumentation genannten Produkt- und Dienstnamen sind Marken ihrer jeweiligen Inhaber, zum Beispiel Code-Hosts (GitHub, GitLab, Bitbucket usw.), Issue-Tracker (Jira, Trello, Linear usw.) sowie die Editoren und Werkzeuge, die GitPoulpi öffnen kann (Visual Studio Code, JetBrains-IDEs, lazygit usw.). Sie werden nur genannt, um zu bezeichnen, womit GitPoulpi arbeitet; GitPoulpi steht zu keinem von ihnen in Verbindung und wird von keinem unterstützt oder gesponsert.

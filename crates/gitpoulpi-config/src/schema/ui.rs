@@ -616,6 +616,10 @@ pub struct UiConfig {
     /// without moving the commit selection. **On by default.** The
     /// `Reveal in graph` menu item, palette command and key work either way.
     pub reveal_on_ref_click: bool,
+    /// Live: in a file pane's tree view (Status, commit details, compare) the
+    /// sub-folders of a folder are listed before its files. **On by
+    /// default.** Off keeps the plain path order. The flat list is unchanged.
+    pub tree_folders_first: bool,
     /// Live: the Log's Ref column shows a faded "ghost" pill naming the ref a
     /// hovered commit belongs to (deduced from the history) when the commit
     /// has no ref of its own; hovering the pill shows its kind. It is not a
@@ -1178,6 +1182,7 @@ impl Default for UiConfig {
             ref_connector: true,
             log_wip_counts_in_message: true,
             reveal_on_ref_click: true,
+            tree_folders_first: true,
             graph_ghost_ref: true,
             allow_agent_view_control: true,
             launch: "off".into(),

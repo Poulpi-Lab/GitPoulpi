@@ -237,6 +237,17 @@ pub(crate) fn reveal_on_ref_click() -> bool {
     REVEAL_ON_REF_CLICK.load(Ordering::Relaxed)
 }
 
+/// `ui.tree_folders_first`, published like `AUTO_PRUNE`.
+static TREE_FOLDERS_FIRST: AtomicBool = AtomicBool::new(true);
+
+pub(crate) fn install_tree_folders_first(on: bool) {
+    TREE_FOLDERS_FIRST.store(on, Ordering::Relaxed);
+}
+
+pub(crate) fn tree_folders_first() -> bool {
+    TREE_FOLDERS_FIRST.load(Ordering::Relaxed)
+}
+
 /// `ui.sidebar_sections_scope == global`, published like `AUTO_PRUNE`.
 static SIDEBAR_SECTIONS_GLOBAL: AtomicBool = AtomicBool::new(false);
 

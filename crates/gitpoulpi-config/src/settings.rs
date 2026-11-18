@@ -111,6 +111,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "ui.ref_connector",
     "ui.log_wip_counts_in_message",
     "ui.reveal_on_ref_click",
+    "ui.tree_folders_first",
     "ui.graph_ghost_ref",
     "ui.allow_agent_view_control",
     "ui.launch",

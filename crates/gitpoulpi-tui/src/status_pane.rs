@@ -136,6 +136,48 @@ pub(crate) fn build_tree_rows(
     collapsed: &HashSet<PathBuf>,
     filter: &str,
 ) -> Vec<TreeRow> {
+    build_tree_rows_ordered(
+        paths,
+        mode,
+        collapsed,
+        filter,
+        crate::live_settings::tree_folders_first(),
+    )
+}
+
+/// Orders two paths for the tree walk. Component by component; at the first
+/// difference a folder (the component is not the path's last) sorts before a
+/// sibling file when `folders_first`, else plain name order.
+fn tree_cmp(a: &Path, b: &Path, folders_first: bool) -> std::cmp::Ordering {
+    if !folders_first {
+        return a.cmp(b);
+    }
+    let mut ai = a.components().peekable();
+    let mut bi = b.components().peekable();
+    loop {
+        match (ai.next(), bi.next()) {
+            (Some(x), Some(y)) => {
+                if x != y {
+                    let x_dir = ai.peek().is_some();
+                    let y_dir = bi.peek().is_some();
+                    return y_dir.cmp(&x_dir).then_with(|| x.cmp(&y));
+                }
+            }
+            (None, None) => return std::cmp::Ordering::Equal,
+            (None, Some(_)) => return std::cmp::Ordering::Less,
+            (Some(_), None) => return std::cmp::Ordering::Greater,
+        }
+    }
+}
+
+/// `build_tree_rows` with the folder ordering given (tests pin both).
+pub(crate) fn build_tree_rows_ordered(
+    paths: &[PathBuf],
+    mode: FileListMode,
+    collapsed: &HashSet<PathBuf>,
+    filter: &str,
+    folders_first: bool,
+) -> Vec<TreeRow> {
     let needle = filter.to_lowercase();
     let mut kept: Vec<(usize, &PathBuf)> = paths
         .iter()
@@ -154,8 +196,9 @@ pub(crate) fn build_tree_rows(
             .collect();
     }
 
-    // Directories before their siblings' files, stable within a level.
-    kept.sort_by_key(|(_, p)| *p);
+    // Folders before their siblings' files when `folders_first`, stable
+    // within a level.
+    kept.sort_by(|(_, a), (_, b)| tree_cmp(a, b, folders_first));
 
     let mut rows = Vec::new();
     // The directory stack currently "open" in the output, as components.
@@ -817,6 +860,28 @@ mod tests {
                 label: "lib.rs".into(),
                 index: 0,
             }
+        );
+    }
+
+    #[test]
+    fn folders_first_lists_sub_folders_before_files_at_every_level() {
+        let p = paths(&["a.txt", "z/f.txt", "b/g.txt", "b/a.txt", "b/c/h.txt"]);
+        let labels = |first: bool| -> Vec<String> {
+            build_tree_rows_ordered(&p, FileListMode::Tree, &HashSet::new(), "", first)
+                .into_iter()
+                .map(|r| match r {
+                    TreeRow::Folder { label, .. } => format!("{label}/"),
+                    TreeRow::File { label, .. } => label,
+                })
+                .collect()
+        };
+        assert_eq!(
+            labels(true),
+            ["b/", "c/", "h.txt", "a.txt", "g.txt", "z/", "f.txt", "a.txt"]
+        );
+        assert_eq!(
+            labels(false),
+            ["a.txt", "b/", "a.txt", "c/", "h.txt", "g.txt", "z/", "f.txt"]
         );
     }
 

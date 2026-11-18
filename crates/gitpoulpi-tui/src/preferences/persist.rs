@@ -83,6 +83,11 @@ impl PreferencesState {
                 if key == "ui.log_wip_counts_in_message" {
                     install_log_wip_counts_in_message(self.config.ui.log_wip_counts_in_message);
                 }
+                if key == "ui.tree_folders_first" {
+                    crate::live_settings::install_tree_folders_first(
+                        self.config.ui.tree_folders_first,
+                    );
+                }
                 if key == "ui.reveal_on_ref_click" {
                     crate::live_settings::install_reveal_on_ref_click(
                         self.config.ui.reveal_on_ref_click,

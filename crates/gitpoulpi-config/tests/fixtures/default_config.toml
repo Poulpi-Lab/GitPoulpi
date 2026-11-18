@@ -62,6 +62,7 @@ graph_show_stashes = true
 ref_connector = true
 log_wip_counts_in_message = true
 reveal_on_ref_click = true
+tree_folders_first = true
 graph_ghost_ref = true
 allow_agent_view_control = true
 launch = "off"

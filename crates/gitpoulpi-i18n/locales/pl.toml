@@ -575,6 +575,8 @@ blame_width = "Szerokość adnotacji Blame"
 blame_width_help = "Szerokość kolumny adnotacji w komórkach (od 24 do 90). Przeciągnij jej krawędź w widoku Blame albo użyj klawiszy poszerzania / zwężania; nowa szerokość jest zapisywana tutaj."
 ref_tree = "Drzewo folderów gałęzi"
 ref_tree_help = "Panel Refs grupuje nazwy gałęzi po `/` w zwijane foldery, a każde zdalne repozytorium ma własny węzeł najwyższego poziomu. Wyłączone daje jeden płaski wiersz na gałąź. `y` w panelu Refs przełącza to na żywo i zapisuje wybór tutaj."
+tree_folders_first = "Folders first in the tree view"
+tree_folders_first_help = "The file panes' tree view (Changes, details, compare) lists the sub-folders of a folder before its files. Off keeps the plain alphabetical path order. The flat list is not affected."
 reveal_on_ref_click = "Kliknięcie refu pokazuje go w grafie"
 reveal_on_ref_click_help = "Pojedyncze kliknięcie refu w panelu Refs przewija Log do miejsca, na które ref wskazuje, i na chwilę podświetla wiersz. Zaznaczenie w Logu i prawy panel pozostają bez zmian. Po wyłączeniu kliknięcie tylko zaznacza wiersz paska bocznego. „Pokaż w grafie” w menu refu, jego klawisz w panelu Refs i polecenie w palecie działają w obu przypadkach."
 graph_ghost_ref = { git = "Pokaż widmową gałąź dla najechanego commita", local = "Pokaż widmową gałąź dla najechanego zatwierdzenia" }

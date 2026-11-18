@@ -102,7 +102,9 @@ przy każdej aktywnej strzałce.
   prawej...**, **Dodaj do ulubionych** (albo **Usuń z ulubionych**), **Dodaj do
   obszaru roboczego** (albo **Usuń z obszaru roboczego**, gdy masz obszary robocze),
   **Kopiuj ścieżkę**, **Otwórz w ›**, **SSH i poświadczenia...** i **Częściowy checkout...**.
-- `Ctrl+PageUp` i `Ctrl+PageDown` przełączają karty. `Ctrl+W` zamyka bieżącą
+- `Ctrl+PageUp` i `Ctrl+PageDown` przełączają karty, podobnie `Ctrl+Shift+Tab` i
+  `Ctrl+Tab`, jeśli terminal je przekazuje (protokół klawiatury kitty; niektóre
+  terminale i multiplexery zatrzymują je dla siebie). `Ctrl+W` zamyka bieżącą
   kartę. Kliknięcie karty środkowym przyciskiem też ją zamyka (z tym samym
   pytaniem).
 - `t` (albo `Ctrl+N Tab`) otwiera selektor kart, przeszukiwalną listę otwartych

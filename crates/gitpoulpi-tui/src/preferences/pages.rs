@@ -150,6 +150,7 @@ pub(super) const LOG_GRAPH: &[Row] = &[
     Key("ui.log_columns_layout"),
     Key("ui.log_wip_counts_in_message"),
     Key("ui.ref_tree"),
+    Key("ui.tree_folders_first"),
     Key("ui.sidebar_sections_scope"),
     Key("ui.reveal_on_ref_click"),
     Key("ui.composer_files"),

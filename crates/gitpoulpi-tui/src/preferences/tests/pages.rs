@@ -136,6 +136,7 @@ fn each_setting_is_on_the_page_the_owner_chose() {
                 "ui.ref_connector",
                 "ui.log_wip_counts_in_message",
                 "ui.ref_tree",
+                "ui.tree_folders_first",
                 "ui.reveal_on_ref_click",
                 "ui.composer_files",
                 "general.initial_commits_in_graph",

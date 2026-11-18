@@ -157,6 +157,7 @@ pub(super) fn init(
         settings.config().ui.log_wip_counts_in_message,
     );
     live_settings::install_reveal_on_ref_click(settings.config().ui.reveal_on_ref_click);
+    live_settings::install_tree_folders_first(settings.config().ui.tree_folders_first);
     live_settings::install_sidebar_sections_global(
         settings.config().ui.sidebar_sections_scope
             == gitpoulpi_config::SidebarSectionsScope::Global,

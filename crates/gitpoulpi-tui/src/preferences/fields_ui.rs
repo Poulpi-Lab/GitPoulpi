@@ -424,6 +424,12 @@ impl PreferencesState {
             )
             .with_help(msg::settings_ui::REF_TREE_HELP.get()),
             Field::global(
+                msg::settings_ui::TREE_FOLDERS_FIRST.get(),
+                "ui.tree_folders_first",
+                Control::Toggle(ui.tree_folders_first),
+            )
+            .with_help(msg::settings_ui::TREE_FOLDERS_FIRST_HELP.get()),
+            Field::global(
                 msg::settings_ui::REVEAL_ON_REF_CLICK.get(),
                 "ui.reveal_on_ref_click",
                 Control::Toggle(ui.reveal_on_ref_click),

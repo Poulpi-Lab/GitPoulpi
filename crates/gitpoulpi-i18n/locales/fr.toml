@@ -575,6 +575,8 @@ blame_width = "Largeur des annotations du blame"
 blame_width_help = "Largeur de la colonne d'annotation en cellules (24 à 90). Tirez sa bordure dans la vue Blame ou utilisez les touches élargir / réduire ; la nouvelle largeur est enregistrée ici."
 ref_tree = "Arbre de dossiers des branches"
 ref_tree_help = "Le volet Refs regroupe les noms de branches sur `/` en dossiers repliables, chaque distant étant un nœud de premier niveau. Désactivé, une ligne simple par branche. `y` dans le panneau Refs le bascule en direct et écrit le choix ici."
+tree_folders_first = "Dossiers en premier dans l'arbre"
+tree_folders_first_help = "La vue arbre des volets de fichiers (Modifications, détails, comparaison) liste les sous-dossiers d'un dossier avant ses fichiers. Désactivé, on garde l'ordre alphabétique des chemins. La liste à plat n'est pas touchée."
 reveal_on_ref_click = "Un clic sur une ref la révèle dans le graphe"
 reveal_on_ref_click_help = "Un simple clic sur une ref du volet Refs fait défiler le Log jusqu'à l'endroit où elle pointe et fait clignoter la ligne. La sélection du Log et le panneau de droite ne bougent pas. Désactivé, un clic ne fait que sélectionner la ligne du panneau. « Révéler dans le graphe » du menu de la ref, sa touche dans le panneau Refs et la commande de la palette fonctionnent dans les deux cas."
 graph_ghost_ref = { git = "Afficher une branche fantôme sur le {$commit} survolé", local = "Afficher une branche fantôme sur la {$commit} survolée" }

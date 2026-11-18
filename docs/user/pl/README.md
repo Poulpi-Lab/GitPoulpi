@@ -175,3 +175,5 @@ i [plan rozwoju](../../roadmap.md) opisują projekt i to, co jest planowane;
 ---
 
 GitKraken jest znakiem towarowym swojego właściciela. GitPoulpi jest niezależnym projektem, niepowiązanym z tym właścicielem, niezatwierdzonym i niesponsorowanym przez niego; nazwa jest wymieniona wyłącznie w celu opisania zgodności i inspiracji.
+
+Wszystkie pozostałe nazwy produktów i usług wymienione w GitPoulpi i jego dokumentacji są znakami towarowymi swoich właścicieli, na przykład hostingi kodu (GitHub, GitLab, Bitbucket itd.), systemy śledzenia zgłoszeń (Jira, Trello, Linear itd.) oraz edytory i narzędzia, które GitPoulpi potrafi otworzyć (Visual Studio Code, środowiska IDE JetBrains, lazygit itp.). Służą wyłącznie do nazwania tego, z czym GitPoulpi współpracuje; GitPoulpi nie jest powiązany z żadnym z nich, przez żaden z nich zatwierdzony ani sponsorowany.

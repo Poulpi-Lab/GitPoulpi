@@ -35,9 +35,10 @@ GitPoulpi fournit trois exécutables :
 
 Une archive de release s'appelle `gitpoulpi-<version>-<target>.zip` (Windows)
 ou `.tar.gz` (Linux, macOS), avec un fichier `.sha256` à côté. Vérifiez
-l'archive avec le fichier `.sha256`, décompressez-la et placez les trois
-exécutables dans un dossier de votre `PATH` (gardez `gitpoulpi-updater` et le marqueur
-`.gitpoulpi-dist` à côté d'eux : le marqueur dit `channel=archive`, pour que cette version puisse se
+l'archive avec le fichier `.sha256`, décompressez-la et placez ses cinq
+exécutables (`gitpoulpi`, `gitpoulpi-tui`, `gitpoulpi-mcp`, `gitpoulpi-launch`, qui lance l'interface depuis un raccourci, et `gitpoulpi-updater`)
+dans un dossier de votre `PATH`, avec le marqueur
+`.gitpoulpi-dist` (`gitpoulpi-updater` et le marqueur doivent rester à côté des autres : le marqueur dit `channel=archive`, pour que cette version puisse se
 mettre à jour elle-même, voir [Mises à jour](updates.md)). Le fichier `INSTALL.txt` de l'archive
 donne les mêmes étapes.
 
@@ -97,7 +98,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 
 Il choisit l'archive adaptée à votre système et à votre processeur, vérifie son
 `.sha256`, s'installe (canal `archive` : GitPoulpi se met à jour sur place) dans `~/.local/opt/gitpoulpi` et crée des liens
-`gitpoulpi` et `gitpoulpi-mcp` dans `~/.local/bin`. Aucun accès root n'est
+`gitpoulpi`, `gitpoulpi-tui` et `gitpoulpi-mcp` dans `~/.local/bin`. Aucun accès root n'est
 nécessaire et rien en dehors de votre dossier personnel n'est touché. Sans
 `--yes`, il pose la question de l'alias (`gp` par défaut), du PATH et des
 raccourcis.
@@ -184,7 +185,7 @@ cargo run -p xtask -- dist
 
 Cette commande compile le profil `dist` et écrit
 `target/dist/gitpoulpi-<version>-<target>.zip` (Windows) ou `.tar.gz` (autres
-systèmes). L'archive contient les trois exécutables, `INSTALL.txt`,
+systèmes). L'archive contient les cinq exécutables, `INSTALL.txt`,
 `README.md`, `LICENSE` et `CHANGELOG.md`. Un fichier `.sha256` est écrit à
 côté.
 
@@ -215,7 +216,7 @@ de fichiers (avec leur clé App Paths sous Windows) créés par GitPoulpi, puis 
 fichiers du programme d'une installation depuis une version publiée ; il refuse
 de s'exécuter sur un build sans le marqueur `.gitpoulpi-dist` (un build cargo), et
 `--keep-files` laisse les fichiers du programme. Il est indisponible pour les
-agents MCP. Sans installateur, supprimez les trois exécutables. GitPoulpi conserve
+agents MCP. Sans installateur, supprimez les fichiers du programme. GitPoulpi conserve
 aussi ces fichiers :
 
 | Quoi | Où |

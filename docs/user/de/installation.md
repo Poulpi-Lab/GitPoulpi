@@ -106,7 +106,6 @@ und den Verknüpfungen.
 Die Suche nach dem neuesten Release setzt ein öffentliches Repository voraus; bei einem privaten laden Sie das Archiv im
 Browser herunter und nutzen `--archive`.
 
-
 ## Mit einem Paketmanager
 
 Jeder der folgenden Kanäle schreibt dieselbe Markierung `.gitpoulpi-dist` neben die Programme, mit seinem eigenen Kanalnamen. GitPoulpi liest sie, um zu wissen, wem die Updates gehören: dem Paketmanager, GitPoulpi tauscht daher nie Dateien hinter dessen Rücken aus. Das Update-Fenster (auf die Version in der Titelleiste klicken) führt dann den eigenen Befehl des Paketmanagers aus oder zeigt ihn zum Kopieren. Siehe [Updates](updates.md).
@@ -209,7 +208,7 @@ diese Dateien an:
 | Was | Wo |
 |---|---|
 | Einstellungen (`config.toml`) und Sitzungen | Der Konfigurationsordner Ihres Betriebssystems. `GITPOULPI_CONFIG_DIR` ändert ihn. |
-| Zustand pro Repository | `.gitpoulpi/` in jedem Repository. |
+| Zustand pro Repository | Standardmäßig `gitpoulpi/` im `.git`-Ordner des Repositorys (`session.per_repo_state_dir` kann ihn nach `.gitpoulpi/` im Arbeitsverzeichnis oder in den Benutzerdatenordner verlegen). |
 | Caches (Avatare) | Der Cache-Ordner Ihres Betriebssystems. |
 | Tokens und API-Schlüssel | Ihr Credential-Helper. **Einstellungen > SSH & Zugangsdaten > Alle Benutzernamen und Passwörter vergessen** entfernt sie. |
 

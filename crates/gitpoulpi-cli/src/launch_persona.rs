@@ -1,6 +1,7 @@
 //! What the `gitpoulpi-launch` program does, as a function: the
-//! `gitpoulpi-launch` bin and the `gitpoulpi-launch` persona of `gitpoulpi`
-//! both call [`run`]. See the module docs of `src/bin/gitpoulpi-launch.rs`.
+//! `gitpoulpi-launch` persona of `gitpoulpi` calls [`run`]. The
+//! `gitpoulpi-launch` bin is a stub that starts that persona (see the module
+//! docs of `src/bin/gitpoulpi-launch.rs`).
 
 use gitpoulpi_commands::launch::{self, LaunchArgs};
 

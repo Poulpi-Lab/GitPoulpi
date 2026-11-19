@@ -925,4 +925,4 @@ jobs:
       # token is read. It cannot show crates.io's rate limit on new crates (scripts/publish-crates.sh waits it out).
       - name: Package and build every crate without publishing
         if: inputs.dry_run
-        run: cargo publish --workspace --dry-run --exclude xtask --exclude gitpoulpi-testkit --exclude gitpoulpi-updater
+        run: cargo publish --workspace --dry-run --exclude xtask --exclude gitpoulpi-testkit --exclude gitpoulpi-updater --exclude gitpoulpi-shim

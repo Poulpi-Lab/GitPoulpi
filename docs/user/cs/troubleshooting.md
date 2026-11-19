@@ -86,6 +86,56 @@ v terminálech Linuxu a macOS; `Ctrl+Shift+N` vypadá jako `Ctrl+N`). Použijte
 alternativy (`Ctrl+N` a poté `,` otevře Nastavení; `Ctrl+P` dosáhne na každý
 příkaz) nebo akord přemapujte: viz [Nastavení](settings.md#klávesnice-a-myš).
 
+**`Ctrl+Tab` nepřepíná karty.** kitty, WezTerm, Ghostty a Windows
+Terminal si `Ctrl+Tab` a `Ctrl+Shift+Tab` ponechávají pro vlastní karty, takže
+klávesa GitPoulpi nikdy nedorazí. `Ctrl+PageDown` / `Ctrl+PageUp` fungují vždy.
+Aby dvojici dostal GitPoulpi, uvolněte ji v konfiguraci terminálu a pak terminál
+restartujte (nebo znovu načtěte jeho konfiguraci):
+
+- kitty, v `kitty.conf` (`map` bez akce zruší výchozí přiřazení; s
+  `--when-focus-on` a kritériem okna, například `title:...`, ho kitty umí
+  zrušit jen tehdy, když je zaměřené odpovídající okno, viz dokumentace kitty k
+  mapování):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, v `wezterm.lua`:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, v jeho konfiguračním souboru:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, v `settings.json` (`"id": null` zruší výchozí
+  přiřazení):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (Starší soubory nastavení uvádějí `nextTab` / `prevTab` v `actions` s těmito
+  klávesami: tam je odstraňte.)
+
+Terminál pak přijde o vlastní přepínání karet pomocí `Ctrl+Tab`. Terminál, který
+umí tu klávesu poslat jen přes klávesnicový protokol kitty, potřebuje tento protokol
+zapnutý (výchozí stav, viz
+[Klávesové zkratky](keybindings.md#klávesy-které-terminál-neumí-poslat-a-klávesnicový-protokol-kitty)).
+
 **Nepamatuji si zkratku.** Stiskněte `Ctrl+P` a napište, co chcete; každý
 výsledek ukazuje svou zkratku. `?` vypíše vše.
 

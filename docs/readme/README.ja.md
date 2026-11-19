@@ -47,34 +47,81 @@ GitPoulpi には、クリック、ドラッグ、右クリックができる本�
 
 システムの `git` が必要です。`git-lfs` は任意です。
 
-- **インストーラーを使う：** Windows 用の `...-setup.exe`、または Linux と macOS 用の `install.sh`（ユーザー単位、root 不要）が各リリースに添付されています。リリースアーカイブからインストールしたビルドは、ステータスバーのバージョンチップから自分で更新することもできます。
-- **リリースアーカイブから：** 展開して、中の `INSTALL.txt` に従ってください。
-- **ソースから：**
+### Linux と macOS (`install.sh`)
 
-  ```
-  git clone https://github.com/Poulpi-Lab/GitPoulpi.git
-  cd GitPoulpi
-  cargo build --release
-  ```
+```
+curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
+```
 
-  バイナリは `target/release/` にできます。`gitpoulpi`（CLI。サブコマンドなしで実行すると UI）、
-  `gitpoulpi-tui`、`gitpoulpi-mcp` です。
-- **自分でリリースアーカイブをビルド：** `cargo run -p xtask -- dist` は
-  `target/dist/gitpoulpi-<version>-<target>.zip`（Windows）または `.tar.gz` と、
-  `.sha256` ファイルを生成します。
-- **必要なものだけの小さなバイナリ：** `./build-custom.sh`（Windows では
-  `build-custom`）が、ビルドする言語、連携、機能（AI、MCP、LFS、worktree、サブモジュール、
-  アバターのダウンロード）を尋ねます。詳しくは
-  [docs/user/ja/custom-builds.md](../../docs/user/ja/custom-builds.md) を参照してください。
+### Homebrew (macOS、Linux)
 
-詳細、任意のツール、OS ごとの注意点：
-[docs/user/ja/installation.md](../../docs/user/ja/installation.md)。
+```
+brew install Poulpi-Lab/gitpoulpi/gitpoulpi
+```
+
+### apt (Debian、Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+### Scoop (Windows)
+
+```
+scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi
+scoop install gitpoulpi
+```
+
+### Windows インストーラー
+
+[最新リリース](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest)から
+`gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe` をダウンロードして実行します。
+管理者向けには MSI があります。
+
+```
+msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn
+```
+
+### Docker
+
+```
+docker pull poulpilab/gitpoulpi
+```
+
+[Docker での実行](../user/ja/docker.md)を参照してください。
+
+### cargo
+
+```
+cargo binstall gitpoulpi-cli          # prebuilt
+cargo install --locked gitpoulpi-cli  # compiles
+```
+
+### リリースアーカイブ
+
+[最新リリース](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest)からダウンロードし、
+展開して、中の `INSTALL.txt` に従ってください。
+
+### ソースから
+
+```
+git clone https://github.com/Poulpi-Lab/GitPoulpi.git
+cd GitPoulpi
+cargo build --release
+```
+
+自分でリリースアーカイブをビルドする方法、より小さなカスタムビルド、OS ごとの注意点：
+[docs/user/ja/installation.md](../user/ja/installation.md) と
+[docs/user/ja/custom-builds.md](../user/ja/custom-builds.md)。
 
 ## クイックスタート
 
 ```
 cd path/to/your/repository
-gitpoulpi-tui          # or just: gitpoulpi
+gitpoulpi
 ```
 
 - `?` ですべてのキーと操作を載せたヘルプ、`Ctrl+P` でコマンドパレット、

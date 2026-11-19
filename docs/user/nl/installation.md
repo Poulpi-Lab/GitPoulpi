@@ -212,7 +212,7 @@ deze bestanden:
 | Wat | Waar |
 |---|---|
 | Instellingen (`config.toml`) en sessies | De configuratiemap van je besturingssysteem. `GITPOULPI_CONFIG_DIR` wijzigt dit. |
-| Status per repository | `.gitpoulpi/` in elke repository. |
+| Status per repository | Standaard `gitpoulpi/` in de map `.git` van de repository (`session.per_repo_state_dir` kan het verplaatsen naar `.gitpoulpi/` in de werkmap of naar de gebruikersgegevensmap). |
 | Caches (avatars) | De cachemap van je besturingssysteem. |
 | Tokens en API-sleutels | Je credential helper. **Instellingen > SSH & inloggegevens > Alle gebruikersnamen en wachtwoorden vergeten** verwijdert ze. |
 

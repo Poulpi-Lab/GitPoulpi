@@ -2,15 +2,9 @@
 
 # Installatie
 
-GitPoulpi bestaat uit drie uitvoerbare bestanden:
+GitPoulpi is één programma, `gitpoulpi`. Zonder subcommando opent het de terminal-UI; met een subcommando is het de opdrachtregelinterface (`--json` voor scripts); `gitpoulpi mcp serve` is de MCP-server voor AI-agents (zie [MCP en agents](mcp-and-agents.md)). Naast dat programma bevat het archief `gitpoulpi-updater`, het aparte kleine programma dat een installatie bijwerkt (zie [Updates](updates.md)).
 
-| Uitvoerbaar bestand | Wat het is |
-|---|---|
-| `gitpoulpi-tui` | De terminal-UI. |
-| `gitpoulpi` | De opdrachtregelinterface (`--json` voor scripts). Zonder subcommando opent hij de UI. |
-| `gitpoulpi-mcp` | De MCP-server voor AI-agents. Zie [MCP en agents](mcp-and-agents.md). |
-
-Naast die bestanden bevat het archief `gitpoulpi-launch`, een klein programma dat de snelkoppelingen uitvoeren om een al geopend GitPoulpi-venster te tonen (`gitpoulpi launch`). Op Windows heeft het geen consolevenster, dus een klik laat er nooit een oplichten. Het wordt samen met de andere geïnstalleerd, bijgewerkt en verwijderd.
+Voor compatibiliteit bevat het archief ook drie kleine relays die alleen `gitpoulpi` starten: `gitpoulpi-tui` (opent de UI; het verdwijnt in een latere release), `gitpoulpi-mcp` (start de MCP-server; het blijft de hele 1.x-lijn bestaan, zodat bestaande agentconfiguraties blijven werken) en `gitpoulpi-launch` (wat snelkoppelingen uitvoeren om een al geopend GitPoulpi-venster te tonen, `gitpoulpi launch`; op Windows heeft het geen consolevenster, dus een klik laat er nooit een oplichten). Alles wordt samen geïnstalleerd, bijgewerkt en verwijderd.
 
 ## Wat je nodig hebt
 
@@ -34,8 +28,8 @@ Naast die bestanden bevat het archief `gitpoulpi-launch`, een klein programma da
 
 Een releasearchief heet `gitpoulpi-<version>-<target>.zip` (Windows) of
 `.tar.gz` (Linux, macOS), met ernaast een `.sha256`-bestand. Controleer het
-archief aan de hand van het `.sha256`-bestand, pak het uit en zet de drie
-uitvoerbare bestanden in een map op je `PATH` (houd `gitpoulpi-updater` en de
+archief aan de hand van het `.sha256`-bestand, pak het uit en zet de uitvoerbare bestanden
+(`gitpoulpi`, `gitpoulpi-updater` en de relays `gitpoulpi-tui`, `gitpoulpi-mcp` en `gitpoulpi-launch`) in een map op je `PATH` (houd `gitpoulpi-updater` en de
 markering `.gitpoulpi-dist` ernaast: de markering zegt `channel=archive`, zodat de build
 zichzelf kan bijwerken, zie [Updates](updates.md)). `INSTALL.txt` in het archief geeft dezelfde stappen.
 
@@ -94,8 +88,8 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 ```
 
 Het script kiest het archief voor je besturingssysteem en processor, controleert het
-`.sha256`-bestand, installeert (kanaal `archive`: GitPoulpi werkt zichzelf ter plekke bij) in `~/.local/opt/gitpoulpi` en koppelt `gitpoulpi` en
-`gitpoulpi-mcp` in `~/.local/bin`. Er is geen root nodig en er wordt niets buiten je
+`.sha256`-bestand, installeert (kanaal `archive`: GitPoulpi werkt zichzelf ter plekke bij) in `~/.local/opt/gitpoulpi` en koppelt `gitpoulpi` (dat de terminal-UI opent als je het zonder subcommando start) en
+`gitpoulpi-mcp` (de relay) in `~/.local/bin`. Er is geen root nodig en er wordt niets buiten je
 thuismap aangeraakt. Zonder `--yes` vraagt het naar het alias (standaard `gp`), de PATH
 en de snelkoppelingen.
 
@@ -125,7 +119,7 @@ Elk kanaal hieronder schrijft dezelfde markering `.gitpoulpi-dist` naast de prog
 | **apt** (Debian, Ubuntu) | zie [de apt-repository](#apt-debian-en-ubuntu) | Ondertekende repository; een `.deb` is ook bij elke release bijgevoegd. |
 | **MSI** (Windows, beheerd) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Voor beheerders: alle gebruikers, geen updates vanuit de app. Zie [Distributie voor organisaties](enterprise-distribution.md#msi-met-intune-of-groepsbeleid). |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Downloadt het releasearchief in plaats van te compileren. |
-| **cargo, vanuit crates.io** | `cargo install --locked gitpoulpi-cli` | Compileert; heeft een Rust-toolchain nodig. Installeert `gitpoulpi`, dat de terminal-UI opent als je het zonder subcommando start en ook MCP aanbiedt (`gitpoulpi mcp`). `gitpoulpi-tui` en `gitpoulpi-mcp` zijn dezelfde programma's als losse crates. |
+| **cargo, vanuit crates.io** | `cargo install --locked gitpoulpi-cli` | Compileert; heeft een Rust-toolchain nodig. Installeert `gitpoulpi`, dat de terminal-UI opent als je het zonder subcommando start en ook MCP aanbiedt (`gitpoulpi mcp`). |
 | **cargo, vanuit de broncode** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Compileert; heeft een Rust-toolchain nodig. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | Zie [GitPoulpi in Docker draaien](docker.md). |
 
@@ -162,8 +156,8 @@ profiel `dist`. Dat duurt langer om te bouwen:
 cargo build --profile dist
 ```
 
-De `build-opti`-scripts in de root van de repository voeren deze build uit voor
-de drie uitvoerbare bestanden en tonen hun grootte:
+De `build-opti`-scripts in de root van de repository voeren deze build uit en tonen de
+grootte van de uitvoerbare bestanden:
 
 ```
 ./build-opti.sh                  # Linux, macOS
@@ -181,7 +175,7 @@ cargo run -p xtask -- dist
 
 Dit bouwt het profiel `dist` en schrijft
 `target/dist/gitpoulpi-<version>-<target>.zip` (Windows) of `.tar.gz` (andere
-systemen). Het archief bevat de drie uitvoerbare bestanden, `INSTALL.txt`,
+systemen). Het archief bevat de uitvoerbare bestanden, `INSTALL.txt`,
 `README.md`, `LICENSE` en `CHANGELOG.md`. Ernaast wordt een `.sha256`-bestand
 geschreven.
 
@@ -212,7 +206,7 @@ App Paths-sleutel op Windows) die GitPoulpi heeft gemaakt, en
 daarna de programmabestanden van een releaseinstallatie; het weigert op een build zonder
 het bestand `.gitpoulpi-dist` (een cargo-build), en `--keep-files` laat de
 programmabestanden staan. Het is niet beschikbaar voor MCP-agents. Zonder
-installatieprogramma verwijder je de drie uitvoerbare bestanden. GitPoulpi bewaart ook
+installatieprogramma verwijder je de programmabestanden. GitPoulpi bewaart ook
 deze bestanden:
 
 | Wat | Waar |

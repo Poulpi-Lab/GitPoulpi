@@ -31,7 +31,7 @@ geïnspireerd door GitKraken en helemaal opnieuw in Rust geschreven: native bina
   worktrees en patches.
 - **Hosting en issuetrackers ingebouwd.** Blader door pull en merge requests (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket), check ze uit en maak ze, en review Gerrit-changes. Blader door issues, work items en kaarten (ook Jira, Trello, Linear, YouTrack, Redmine en lokale Markdown-notities) en maak ze aan, desgewenst op een Kanban-bord. Kloon vanuit je account en beheer SSH-sleutels.
 - **CLI en MCP voor agents.** `gitpoulpi <commando> --json` dekt alles wat de UI
-  doet, en `gitpoulpi-mcp` biedt het aan als MCP-tools. Eén achtergronddaemon per
+  doet, en `gitpoulpi mcp serve` biedt het aan als MCP-tools. Eén achtergronddaemon per
   repository houdt elke frontend live en gesynchroniseerd.
 - **Optionele AI, nooit verplicht.** Standaard uit en zonder account: gebruik je
   eigen API-sleutel of een lokale agent-CLI zoals `claude -p`. Genereer
@@ -149,7 +149,7 @@ deel van het scherm.
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 AI is optioneel en standaard uit: schakel de eigen AI van GitPoulpi in via

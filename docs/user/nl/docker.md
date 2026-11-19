@@ -2,7 +2,7 @@
 
 # GitPoulpi in Docker draaien
 
-De image `poulpilab/gitpoulpi` bevat de officiële release-binaries (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) op `debian:bookworm-slim`, met `git`, `git-lfs`, `openssh-client`, `less` en `tini`. Hij draait op `linux/amd64` en `linux/arm64`. Hij staat op Docker Hub.
+De image `poulpilab/gitpoulpi` bevat de officiële release-binaries (`gitpoulpi`, plus de relays `gitpoulpi-tui` en `gitpoulpi-mcp`) op `debian:bookworm-slim`, met `git`, `git-lfs`, `openssh-client`, `less` en `tini`. Hij draait op `linux/amd64` en `linux/arm64`. Hij staat op Docker Hub.
 
 ## De UI starten
 
@@ -81,10 +81,10 @@ Het toegangspunt start de UI. De andere programma's bereik je door het te oversc
 docker run --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi status
 
 # de MCP-server, via standaardinvoer en -uitvoer, voor een agent die hem start
-docker run -i --rm --entrypoint gitpoulpi-mcp -v "$PWD":/work poulpilab/gitpoulpi
+docker run -i --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi mcp serve
 ```
 
-Elke `docker run` is een eigen container met een eigen achtergronddaemon van GitPoulpi, dus wijzigingen via de CLI verschijnen niet live in een UI die in een andere container draait. Om één UI vanuit de CLI te bedienen, draai je beide in dezelfde container: start de UI met `--name gp` en gebruik `docker exec gp gitpoulpi ...`. Registreer voor een agent `docker run -i --rm --entrypoint gitpoulpi-mcp ...` als opdracht van de MCP-server, zie [MCP en agents](mcp-and-agents.md); de MCP-rechtenschakelaars in de gekoppelde `config.toml` gelden zoals gewoonlijk.
+Elke `docker run` is een eigen container met een eigen achtergronddaemon van GitPoulpi, dus wijzigingen via de CLI verschijnen niet live in een UI die in een andere container draait. Om één UI vanuit de CLI te bedienen, draai je beide in dezelfde container: start de UI met `--name gp` en gebruik `docker exec gp gitpoulpi ...`. Registreer voor een agent `docker run -i --rm --entrypoint gitpoulpi ... mcp serve` als opdracht van de MCP-server, zie [MCP en agents](mcp-and-agents.md); de MCP-rechtenschakelaars in de gekoppelde `config.toml` gelden zoals gewoonlijk.
 
 ## Tags en bijwerken
 

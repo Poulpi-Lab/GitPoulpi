@@ -12,10 +12,10 @@ Volg [Installatie](installation.md). Open daarna een terminal in een
 Git-repository en voer uit:
 
 ```
-gitpoulpi-tui
+gitpoulpi
 ```
 
-`gitpoulpi` zonder subopdracht doet hetzelfde. GitPoulpi opent de repository
+GitPoulpi opent de repository
 die de huidige map bevat. Buiten een repository opent het het tabblad **Start**,
 waar je een repository kunt zoeken, klonen of initialiseren (zie
 [stap 7](#7-repositories-openen-klonen-en-initialiseren)).

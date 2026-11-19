@@ -905,8 +905,8 @@ die Standardtasten.
 | Aktivitätsprotokoll: Letzten Fehler öffnen |  |
 | Tab: Beenden und cd hierher |  |
 | Repository: Klonen... | `Ctrl+Shift+N` |
-| Repository: Nächster Tab | `Ctrl+PageDown` |
-| Repository: Vorheriger Tab | `Ctrl+PageUp` |
+| Repository: Nächster Tab | `Ctrl+PageDown / Ctrl+Tab` |
+| Repository: Vorheriger Tab | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | Tab: Nach links verschieben |  |
 | Tab: Nach rechts verschieben |  |
 | Repository: Tab schließen | `Ctrl+W` |

@@ -876,8 +876,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 活动日志：打开最近的错误 |  |
 | 标签页：退出并 cd 到此处 |  |
 | 仓库：克隆… | `Ctrl+Shift+N` |
-| 仓库：下一个标签页 | `Ctrl+PageDown` |
-| 仓库：上一个标签页 | `Ctrl+PageUp` |
+| 仓库：下一个标签页 | `Ctrl+PageDown / Ctrl+Tab` |
+| 仓库：上一个标签页 | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | 标签页：左移 |  |
 | 标签页：右移 |  |
 | 仓库：关闭标签页 | `Ctrl+W` |

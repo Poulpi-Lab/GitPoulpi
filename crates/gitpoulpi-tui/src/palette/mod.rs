@@ -1093,6 +1093,12 @@ pub(crate) fn entry_shortcut(km: &crate::keymap::Keymap, entry: &PaletteEntry) -
         return settings::value_text(op);
     }
     match command_action(entry) {
+        // The tab-switch rows list every binding (joined like the help
+        // overlay does): Ctrl+Tab is as much "the" key as Ctrl+PageDown.
+        // Other rows keep showing the primary one.
+        Some(action) if matches!(entry.command, PaletteCommand::CycleRepositoryTab(_)) => {
+            km.shown_labels(action).join(" / ")
+        }
         Some(action) => km.shown(action),
         None => {
             // A key the user gave the command shows in place of the hint.
@@ -1134,6 +1140,8 @@ pub(crate) fn command_action(entry: &PaletteEntry) -> Option<crate::keymap::Acti
     use crate::keymap::Action as A;
     match entry.command {
         PaletteCommand::ToggleHelp => Some(A::GlobalHelp),
+        PaletteCommand::CycleRepositoryTab(true) => Some(A::GlobalNextTab),
+        PaletteCommand::CycleRepositoryTab(false) => Some(A::GlobalPrevTab),
         PaletteCommand::Safety(crate::safety_panel::SafetyCmd::ArrangeDialog) => {
             Some(A::NavArrangeDialog)
         }

@@ -910,8 +910,8 @@ Klávesy jsou výchozí.
 | Protokol aktivity: Otevřít poslední chybu |  |
 | Karta: Ukončit a cd sem |  |
 | Repozitář: Klonovat... | `Ctrl+Shift+N` |
-| Repozitář: Další karta | `Ctrl+PageDown` |
-| Repozitář: Předchozí karta | `Ctrl+PageUp` |
+| Repozitář: Další karta | `Ctrl+PageDown / Ctrl+Tab` |
+| Repozitář: Předchozí karta | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | Karta: Přesunout doleva |  |
 | Karta: Přesunout doprava |  |
 | Repozitář: Zavřít kartu | `Ctrl+W` |

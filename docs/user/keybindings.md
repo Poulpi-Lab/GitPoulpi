@@ -910,8 +910,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Activity Log: Open the Last Error |  |
 | Tab: Quit and cd Here |  |
 | Repository: Clone... | `Ctrl+Shift+N` |
-| Repository: Next Tab | `Ctrl+PageDown` |
-| Repository: Previous Tab | `Ctrl+PageUp` |
+| Repository: Next Tab | `Ctrl+PageDown / Ctrl+Tab` |
+| Repository: Previous Tab | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | Tab: Move Left |  |
 | Tab: Move Right |  |
 | Repository: Close Tab | `Ctrl+W` |

@@ -903,8 +903,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 활동 로그: 마지막 오류 열기 |  |
 | 탭: 종료 후 여기로 cd |  |
 | 저장소: 클론... | `Ctrl+Shift+N` |
-| 저장소: 다음 탭 | `Ctrl+PageDown` |
-| 저장소: 이전 탭 | `Ctrl+PageUp` |
+| 저장소: 다음 탭 | `Ctrl+PageDown / Ctrl+Tab` |
+| 저장소: 이전 탭 | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | 탭: 왼쪽으로 이동 |  |
 | 탭: 오른쪽으로 이동 |  |
 | 저장소: 탭 닫기 | `Ctrl+W` |

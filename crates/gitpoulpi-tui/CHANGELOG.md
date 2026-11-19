@@ -7,6 +7,15 @@ IPC surfaces are stable within a major version).
 
 ## [Unreleased]
 
+### Changed
+- **One program:** GitPoulpi ships a single `gitpoulpi` executable. Without a subcommand it opens the terminal UI; `gitpoulpi mcp serve` is the MCP server. `gitpoulpi-updater` stays a separate small program.
+- `gitpoulpi-tui`, `gitpoulpi-mcp` and `gitpoulpi-launch` are now small relays that start `gitpoulpi` (existing MCP configs keep working; `gitpoulpi-mcp` stays for all of 1.x, `gitpoulpi-tui` will be removed in a later release).
+- The `gp` alias and the shortcuts start `gitpoulpi`; ones written for `gitpoulpi-tui` are rewritten automatically.
+- Smaller downloads and installs: the archive no longer carries three full copies of the program.
+
+### Added
+- `gitpoulpi mcp serve --bind <ADDR>`: the address for `--http` (same as `--http ADDR`).
+
 ## [1.0.0] - 2026-11-18
 
 The first public release of GitPoulpi: a Git client for the terminal with a clickable commit graph, a keyboard-first command palette, and a CLI and MCP server that do everything the interface does. No Electron, no account.

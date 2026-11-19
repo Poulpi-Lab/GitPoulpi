@@ -18,7 +18,7 @@ when this file and the code disagree, fix this file.
   repository tabs and a Repository Management (`⌂`) tab.
 - **CLI**: every `GitBackend` operation as a `gitpoulpi` subcommand with
   `--json`, through the session daemon like every other frontend.
-- **MCP** (`gitpoulpi-mcp`, ADR 0007): one tool per `gitpoulpi-commands::cli::Cli`
+- **MCP** (`gitpoulpi mcp serve`, crate `gitpoulpi-mcp`, ADR 0007; the `gitpoulpi-mcp` file in an archive is a relay to it): one tool per `gitpoulpi-commands::cli::Cli`
   leaf, generated from the clap tree and run through the same `execute` as the
   CLI, plus `ui_*` tools that let an agent show things in a running TUI and
   propose changes for the user to confirm.

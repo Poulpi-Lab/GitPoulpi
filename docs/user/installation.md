@@ -2,15 +2,9 @@
 
 # Installation
 
-GitPoulpi has three executables:
+GitPoulpi is one program, `gitpoulpi`. Run without a subcommand it opens the terminal UI; with one it is the command-line interface (`--json` for scripts); `gitpoulpi mcp serve` is the MCP server for AI agents (see [MCP and agents](mcp-and-agents.md)). Next to it the archive holds `gitpoulpi-updater`, the separate small program that updates an install (see [Updates](updates.md)).
 
-| Executable | What it is |
-|---|---|
-| `gitpoulpi-tui` | The terminal UI. |
-| `gitpoulpi` | The command-line interface (`--json` for scripts). With no subcommand, it opens the UI. |
-| `gitpoulpi-mcp` | The MCP server for AI agents. See [MCP and agents](mcp-and-agents.md). |
-
-Next to them the archive holds `gitpoulpi-launch`, a tiny program the shortcuts run to show a GitPoulpi window that is already open (`gitpoulpi launch`). On Windows it has no console window, so a click never flashes one. It is installed, updated and removed with the others.
+For compatibility the archive also holds three small relays that only start `gitpoulpi`: `gitpoulpi-tui` (opens the UI; it will be removed in a later release), `gitpoulpi-mcp` (starts the MCP server; it stays for the whole 1.x line, so existing agent configs keep working) and `gitpoulpi-launch` (what shortcuts run to show a GitPoulpi window that is already open, `gitpoulpi launch`; on Windows it has no console window, so a click never flashes one). Everything is installed, updated and removed together.
 
 ## What you need
 
@@ -36,8 +30,8 @@ Next to them the archive holds `gitpoulpi-launch`, a tiny program the shortcuts 
 
 A release archive is `gitpoulpi-<version>-<target>.zip` (Windows) or
 `.tar.gz` (Linux, macOS), with a `.sha256` file next to it. Check the
-archive against the `.sha256` file, unpack it, and put its five executables
-(`gitpoulpi`, `gitpoulpi-tui`, `gitpoulpi-mcp`, `gitpoulpi-launch`, which starts the UI from a shortcut, and `gitpoulpi-updater`)
+archive against the `.sha256` file, unpack it, and put its executables
+(`gitpoulpi`, `gitpoulpi-updater` and the relays `gitpoulpi-tui`, `gitpoulpi-mcp` and `gitpoulpi-launch`)
 in a folder on your `PATH`, together with the `.gitpoulpi-dist`
 marker (`gitpoulpi-updater` and the marker must stay next to the others: the marker says `channel=archive`, so the build can update
 itself, see [Updates](updates.md)). `INSTALL.txt` in the archive gives the same steps.
@@ -96,7 +90,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 ```
 
 It picks the archive for your OS and CPU, checks its `.sha256`, installs (channel `archive`: GitPoulpi updates itself in place) into
-`~/.local/opt/gitpoulpi` and links `gitpoulpi` (which opens the terminal UI when run without a subcommand) and `gitpoulpi-mcp` into
+`~/.local/opt/gitpoulpi` and links `gitpoulpi` (which opens the terminal UI when run without a subcommand) and `gitpoulpi-mcp` (the relay) into
 `~/.local/bin`. No root is needed and nothing outside your home is touched.
 Without `--yes` it asks about the alias (default `gp`), the PATH and shortcuts.
 
@@ -126,7 +120,7 @@ Every channel below writes the same `.gitpoulpi-dist` marker next to the program
 | **apt** (Debian, Ubuntu) | see [the apt repository](#apt-debian-and-ubuntu) | Signed repository; a `.deb` is also attached to every release. |
 | **MSI** (Windows, managed) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | For administrators: all users, no in-app updates. See [Enterprise distribution](enterprise-distribution.md#msi-with-intune-or-group-policy). |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Downloads the release archive instead of compiling. |
-| **cargo, from crates.io** | `cargo install --locked gitpoulpi-cli` | Compiles; needs a Rust toolchain. Installs `gitpoulpi`, which opens the terminal UI when run without a subcommand and also serves MCP (`gitpoulpi mcp`). `gitpoulpi-tui` and `gitpoulpi-mcp` are the same programs as standalone crates. |
+| **cargo, from crates.io** | `cargo install --locked gitpoulpi-cli` | Compiles; needs a Rust toolchain. Installs `gitpoulpi`, which opens the terminal UI when run without a subcommand and also serves MCP (`gitpoulpi mcp`). |
 | **cargo, from source** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Compiles; needs a Rust toolchain. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | See [Running in Docker](docker.md). |
 
@@ -163,8 +157,8 @@ takes longer to build:
 cargo build --profile dist
 ```
 
-The `build-opti` scripts at the root of the repository run this build for the
-three executables and print their sizes:
+The `build-opti` scripts at the root of the repository run this build and print the
+executable sizes:
 
 ```
 ./build-opti.sh                  # Linux, macOS
@@ -182,7 +176,7 @@ cargo run -p xtask -- dist
 
 This builds the `dist` profile and writes
 `target/dist/gitpoulpi-<version>-<target>.zip` (Windows) or `.tar.gz` (other
-systems). The archive holds the five executables, `INSTALL.txt`,
+systems). The archive holds the executables, `INSTALL.txt`,
 `README.md`, `LICENSE` and `CHANGELOG.md`. A `.sha256` file is written next
 to it.
 

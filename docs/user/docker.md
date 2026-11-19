@@ -2,7 +2,7 @@
 
 # Running in Docker
 
-The `poulpilab/gitpoulpi` image holds the official release binaries (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) on `debian:bookworm-slim`, with `git`, `git-lfs`, `openssh-client`, `less` and `tini`. It runs on `linux/amd64` and `linux/arm64`. It is on Docker Hub.
+The `poulpilab/gitpoulpi` image holds the official release binaries (`gitpoulpi`, plus the relays `gitpoulpi-tui` and `gitpoulpi-mcp`) on `debian:bookworm-slim`, with `git`, `git-lfs`, `openssh-client`, `less` and `tini`. It runs on `linux/amd64` and `linux/arm64`. It is on Docker Hub.
 
 ## Start the UI
 
@@ -81,10 +81,10 @@ The entry point starts the UI. The other programs are reachable by overriding it
 docker run --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi status
 
 # the MCP server, over standard input and output, for an agent that launches it
-docker run -i --rm --entrypoint gitpoulpi-mcp -v "$PWD":/work poulpilab/gitpoulpi
+docker run -i --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi mcp serve
 ```
 
-Each `docker run` is its own container with its own GitPoulpi background daemon, so changes made through the CLI do not show up live in a UI running in another container. To drive one UI from the CLI, run both in the same container: start the UI with `--name gp` and use `docker exec gp gitpoulpi ...`. For an agent, register `docker run -i --rm --entrypoint gitpoulpi-mcp ...` as the MCP server command, see [MCP and agents](mcp-and-agents.md); the MCP permission switches in the mounted `config.toml` apply as usual.
+Each `docker run` is its own container with its own GitPoulpi background daemon, so changes made through the CLI do not show up live in a UI running in another container. To drive one UI from the CLI, run both in the same container: start the UI with `--name gp` and use `docker exec gp gitpoulpi ...`. For an agent, register `docker run -i --rm --entrypoint gitpoulpi ... mcp serve` as the MCP server command, see [MCP and agents](mcp-and-agents.md); the MCP permission switches in the mounted `config.toml` apply as usual.
 
 ## Tags and updating
 

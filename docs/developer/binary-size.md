@@ -1,5 +1,7 @@
 # Binary size
 
+A release ships one real program, `gitpoulpi` (UI, CLI, MCP server), plus `gitpoulpi-updater` and a std-only relay (`gitpoulpi-shim`, about 0.3 MiB) copied as `gitpoulpi-tui` and `gitpoulpi-mcp`. The `gitpoulpi-tui` and `gitpoulpi-mcp` columns below measure those crates' own binaries, which are built only for tests and `cargo run`: read the `gitpoulpi` column for what a release weighs.
+
 Official builds: `scripts/build-opti.sh` / `.ps1` (the `dist` profile: thin LTO, 16 codegen units, stripped, `panic = unwind`). Speed comes first: nothing here trades runtime speed for bytes.
 
 **The current figures are in "Re-measured 2026-10-29" below; every older section of this page is historical and kept for the reasoning, its numbers are out of date.**

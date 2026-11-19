@@ -25,7 +25,7 @@ that build exists. It also writes `BUILD-FEATURES.txt` next to the binaries.
 | Logo colors | The pixel octopus of the About window comes in 20 colorways (`--list-logo-colors`). Pick the ones to compile in (at least one), the default one (About shows it first; it is also what a stored `ui.logo_color` that is not compiled in falls back to; it must be one of the compiled ones; official default: lavender) and the color of the Windows executable icon (any colorway, default: the logo default). With a single colorway the logo still spins on click but stays that color, and the color list (`c`, right click) is not offered. |
 | Integrations (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine) | With none: clone by URL only; no issues, no pull/merge requests. |
 | AI | No AI buttons, commands or `ai` CLI/MCP tools. |
-| MCP | No `gitpoulpi-mcp` binary and no `gitpoulpi mcp` command. The `ui` agent commands stay. |
+| MCP | No `gitpoulpi-mcp` relay and no `gitpoulpi mcp` command. The `ui` agent commands stay. |
 | LFS, Worktree, Submodules | The matching management screens and commands are gone; a typed "not built into this binary" answer is returned. |
 | Avatar download | Initials badges only, no network fetch. |
 | Image preview | Image files show the plain binary notice; **Edit in** still works. |
@@ -95,13 +95,13 @@ The logo choices are the environment variables `GITPOULPI_LOGO_COLORS`
 (`all` or a comma list of slugs), `GITPOULPI_LOGO_DEFAULT` and
 `GITPOULPI_ICON_COLOR`, read by the build scripts of `gitpoulpi-tui` (it
 filters `crates/gitpoulpi-logo-build/colourways.json` into the table the About window
-embeds) and of the three binary crates (the icon). The source of the colors
+embeds) and of `gitpoulpi-cli` (the icon). The source of the colors
 stays `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Windows executable icon
 
-When the target is Windows, the `gitpoulpi`, `gitpoulpi-tui` and `gitpoulpi-mcp`
-executables get the octopus as their icon, generated at build time (no
+When the target is Windows, the `gitpoulpi`
+executable gets the octopus as its icon, generated at build time (no
 Python or ImageMagick needed) in the chosen icon color, sizes 16 to 128 px.
 It is embedded with the `winresource` crate and needs the platform resource
 compiler (`rc.exe` from the Windows SDK on MSVC, `windres` on GNU). If it is
@@ -137,32 +137,32 @@ When a saved selection exists, the interactive mode first offers "Start from" (p
 
 ## What it saves
 
-Measured on Linux on 2026-10-29 at commit `65999ef5c`, from the full build, difference from it in parentheses
-(details in `docs/developer/binary-size.md`):
+Measured on Linux on 2026-10-29 at commit `65999ef5c`, size of `gitpoulpi` (the whole program: UI, CLI and MCP server) from the full build, difference from it in parentheses
+(details in `docs/developer/binary-size.md`). The relays `gitpoulpi-tui`, `gitpoulpi-mcp` and `gitpoulpi-launch` are well under 1 MiB whatever you choose:
 
-| Build (from `full` unless noted) | `gitpoulpi` (MiB) | `gitpoulpi-tui` (MiB) | `gitpoulpi-mcp` (MiB) |
-|---|---|---|---|
-| Full (everything on) | 64.6 | 50.5 | 31.7 |
-| English only | 52.0 (-12.6) | 40.2 (-10.3) | 31.7 (0.0) |
-| MCP off | 61.6 (-3.0) | 49.6 (-0.8) | not built |
-| AI off | 62.6 (-2.0) | 48.6 (-1.8) | 30.5 (-1.3) |
-| All integrations off | 56.3 (-8.2) | 43.7 (-6.7) | 26.7 (-5.0) |
-| AI + integrations + avatar fetch off | 52.2 (-12.3) | 39.9 (-10.6) | 23.0 (-8.8) |
-| History workbench off (`--no-history-rewrite`) | 61.6 (-3.0) | 48.9 (-1.5) | 28.5 (-3.2) |
-| Rewrite scripts off | 63.1 (-1.5) | 49.0 (-1.5) | 31.1 (-0.7) |
-| Global search off | 63.5 (-1.1) | 49.5 (-1.0) | 31.6 (-0.1) |
-| Workspaces off | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.2) |
-| Radar off | 63.4 (-1.2) | 49.3 (-1.2) | 31.7 (0.0) |
-| Board off | 63.6 (-1.0) | 49.5 (-1.0) | 31.7 (0.0) |
-| Review off | 63.2 (-1.4) | 49.0 (-1.4) | 31.7 (0.0) |
-| Mermaid off | 63.6 (-1.0) | 49.5 (-0.9) | 31.6 (-0.1) |
-| LFS off | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.3) |
-| Worktree off | 63.7 (-0.9) | 49.6 (-0.8) | 31.7 (0.0) |
-| Submodules off | 63.7 (-0.9) | 49.6 (-0.9) | 31.6 (-0.1) |
-| Avatar fetch off | 63.7 (-0.9) | 49.6 (-0.9) | 31.7 (0.0) |
-| Image view off | 63.3 (-1.2) | 49.2 (-1.3) | 31.7 (0.0) |
-| Everything off, English only (LFS kept) | 35.2 (-29.4) | 28.9 (-21.5) | not built |
-| **Everything off, English only** | **34.9 (-29.7)** | **28.8 (-21.6)** | not built |
+| Build (from `full` unless noted) | `gitpoulpi` (MiB) |
+|---|---|
+| Full (everything on) | 64.6 |
+| English only | 52.0 (-12.6) |
+| MCP off | 61.6 (-3.0) |
+| AI off | 62.6 (-2.0) |
+| All integrations off | 56.3 (-8.2) |
+| AI + integrations + avatar fetch off | 52.2 (-12.3) |
+| History workbench off (`--no-history-rewrite`) | 61.6 (-3.0) |
+| Rewrite scripts off | 63.1 (-1.5) |
+| Global search off | 63.5 (-1.1) |
+| Workspaces off | 63.5 (-1.1) |
+| Radar off | 63.4 (-1.2) |
+| Board off | 63.6 (-1.0) |
+| Review off | 63.2 (-1.4) |
+| Mermaid off | 63.6 (-1.0) |
+| LFS off | 63.5 (-1.1) |
+| Worktree off | 63.7 (-0.9) |
+| Submodules off | 63.7 (-0.9) |
+| Avatar fetch off | 63.7 (-0.9) |
+| Image view off | 63.3 (-1.2) |
+| Everything off, English only (LFS kept) | 35.2 (-29.4) |
+| **Everything off, English only** | **34.9 (-29.7)** |
 
 ## Notes
 

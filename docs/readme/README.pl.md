@@ -30,7 +30,7 @@ GitPoulpi jest inspirowany GitKraken i napisany od nowa w Rust: natywne pliki bi
   commitów, przewijaj fast-forward, twórz worktree i patche.
 - **Wbudowane hostingi i trackery zgłoszeń.** Przeglądaj, wykonuj checkout i twórz pull i merge requesty (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket) oraz recenzuj zmiany w Gerrit. Przeglądaj i twórz zgłoszenia, work items i karty (także Jira, Trello, Linear, YouTrack, Redmine i lokalne notatki Markdown), w razie potrzeby na tablicy Kanban. Klonuj ze swojego konta i zarządzaj kluczami SSH.
 - **CLI i MCP dla agentów.** `gitpoulpi <polecenie> --json` obejmuje wszystko,
-  co robi interfejs, a `gitpoulpi-mcp` udostępnia to jako narzędzia MCP. Jeden
+  co robi interfejs, a `gitpoulpi mcp serve` udostępnia to jako narzędzia MCP. Jeden
   demon w tle na repozytorium utrzymuje każdy interfejs aktualny i zsynchronizowany.
 - **Opcjonalne AI, nigdy wymagane.** Domyślnie wyłączone i bez konta: użyj
   własnego klucza API albo lokalnego agenta CLI, takiego jak `claude -p`.
@@ -146,7 +146,7 @@ obszar ekranu.
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 AI jest opcjonalne i domyślnie wyłączone: włącz własne AI GitPoulpi w

@@ -12,10 +12,10 @@ Postępuj według [Instalacji](installation.md). Potem otwórz terminal w
 repozytorium Git i uruchom:
 
 ```
-gitpoulpi-tui
+gitpoulpi
 ```
 
-`gitpoulpi` bez podpolecenia robi to samo. GitPoulpi otwiera repozytorium
+GitPoulpi otwiera repozytorium
 zawierające bieżący folder. Poza repozytorium otwiera kartę **Home**, na której
 można przeglądać, klonować lub inicjować repozytorium (zob.
 [krok 7](#7-otwieranie-klonowanie-i-inicjowanie-repozytoriów)).

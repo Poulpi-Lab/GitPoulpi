@@ -2,7 +2,7 @@
 
 # Uruchamianie w Dockerze
 
-Obraz `poulpilab/gitpoulpi` zawiera oficjalne pliki wykonywalne wydań (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) na `debian:bookworm-slim`, razem z `git`, `git-lfs`, `openssh-client`, `less` i `tini`. Działa na `linux/amd64` i `linux/arm64`. Jest w Docker Hub.
+Obraz `poulpilab/gitpoulpi` zawiera oficjalne pliki wykonywalne wydań (`gitpoulpi` oraz przekaźniki `gitpoulpi-tui` i `gitpoulpi-mcp`) na `debian:bookworm-slim`, razem z `git`, `git-lfs`, `openssh-client`, `less` i `tini`. Działa na `linux/amd64` i `linux/arm64`. Jest w Docker Hub.
 
 ## Uruchomienie interfejsu
 
@@ -81,10 +81,10 @@ Punkt wejścia uruchamia interfejs. Pozostałe programy są dostępne po jego na
 docker run --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi status
 
 # serwer MCP, przez standardowe wejście i wyjście, dla agenta, który go uruchamia
-docker run -i --rm --entrypoint gitpoulpi-mcp -v "$PWD":/work poulpilab/gitpoulpi
+docker run -i --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi mcp serve
 ```
 
-Każde `docker run` to osobny kontener z własnym demonem GitPoulpi w tle, więc zmiany wykonane przez CLI nie pokazują się na żywo w interfejsie działającym w innym kontenerze. Aby sterować jednym interfejsem z CLI, uruchom oba w tym samym kontenerze: wystartuj interfejs z `--name gp` i używaj `docker exec gp gitpoulpi ...`. Dla agenta zarejestruj `docker run -i --rm --entrypoint gitpoulpi-mcp ...` jako polecenie serwera MCP, zob. [MCP i agenci](mcp-and-agents.md); przełączniki uprawnień MCP w zamontowanym `config.toml` działają jak zwykle.
+Każde `docker run` to osobny kontener z własnym demonem GitPoulpi w tle, więc zmiany wykonane przez CLI nie pokazują się na żywo w interfejsie działającym w innym kontenerze. Aby sterować jednym interfejsem z CLI, uruchom oba w tym samym kontenerze: wystartuj interfejs z `--name gp` i używaj `docker exec gp gitpoulpi ...`. Dla agenta zarejestruj `docker run -i --rm --entrypoint gitpoulpi ... mcp serve` jako polecenie serwera MCP, zob. [MCP i agenci](mcp-and-agents.md); przełączniki uprawnień MCP w zamontowanym `config.toml` działają jak zwykle.
 
 ## Tagi i aktualizowanie
 

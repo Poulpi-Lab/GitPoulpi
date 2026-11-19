@@ -1,8 +1,8 @@
-[English](README.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · **Français** · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [简体中文](README.zh-CN.md)
+[English](../../README.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · **Français** · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [简体中文](README.zh-CN.md)
 
 # GitPoulpi
 
-<p align="center"><img src="assets/logo/gitpoulpi-512.png" alt="La pieuvre GitPoulpi" width="128"></p>
+<p align="center"><img src="../../assets/logo/gitpoulpi-512.png" alt="La pieuvre GitPoulpi" width="128"></p>
 
 **Un client Git pour le terminal qui se prend pour une application de bureau.**
 GitPoulpi vous offre un vrai graphe de commits sur lequel cliquer, glisser et
@@ -10,9 +10,9 @@ faire un clic droit, une palette de commandes pilotée au clavier qui atteint
 chaque fonction, l’intégration des hébergeurs de code (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, dans le cloud ou auto-hébergés) et des outils de suivi de tickets (Jira, Trello, Linear, YouTrack, Redmine, ou un dossier de notes Markdown), et les mêmes
 opérations en CLI scriptable et en serveur MCP, pour qu’un agent IA le pilote
 exactement comme vous. GitPoulpi s’inspire de GitKraken et a été entièrement
-réécrit en Rust : des binaires natifs, légers sur le disque et en mémoire, sans Electron, sans compte, sans télémétrie. Il tourne dans votre terminal préféré ([lequel ?](docs/user/fr/terminals.md)), parce que certains d’entre nous y vivent.
+réécrit en Rust : des binaires natifs, légers sur le disque et en mémoire, sans Electron, sans compte, sans télémétrie. Il tourne dans votre terminal préféré ([lequel ?](../../docs/user/fr/terminals.md)), parce que certains d’entre nous y vivent.
 
-![GitPoulpi affichant le graphe de commits avec branches, tags et un stash, le panneau Refs à gauche, et les modifications locales avec le formulaire de commit à droite](docs/user/images/hero.png)
+![GitPoulpi affichant le graphe de commits avec branches, tags et un stash, le panneau Refs à gauche, et les modifications locales avec le formulaire de commit à droite](../../docs/user/images/hero.png)
 
 - **Souris et clavier, à égalité.** Cliquez, double-cliquez, faites un clic
   droit et glissez-déposez des refs sur des commits ; ou appuyez sur `Ctrl+P` et
@@ -47,11 +47,11 @@ réécrit en Rust : des binaires natifs, légers sur le disque et en mémoire, 
 
 | | |
 |---|---|
-| ![Le graphe du Log avec le thème Material et la teinte de ligne activée](docs/user/images/theme-material.png) **Le graphe de commits**, ici avec le thème Material et la teinte de ligne. | ![Le diff d’un fichier modifié avec les boutons Stage du hunk et Abandonner le hunk sur chaque hunk](docs/user/images/diff.png) **Le diff**, avec stage et abandon par hunk ou par ligne. |
-| ![La palette de commandes filtrée sur le mot stash](docs/user/images/palette.png) **La palette de commandes** (`Ctrl+P`) atteint chaque commande. | ![Le compositeur de commits proposant quatre commits pour les modifications locales, prêts à être relus](docs/user/images/composer.png) **Le compositeur de commits** fait relire les commits proposés par l’IA avant que quoi que ce soit soit commité. |
-| ![Le menu clic droit d’un commit avec les actions cherry-pick, revert, reset, rebase, branche et tag](docs/user/images/context-menu.png) **Clic droit** sur n’importe quoi pour ses actions. | ![La page IA des Préférences avec les profils, les instructions par action et l’interrupteur d’activation](docs/user/images/settings-ai.png) **Les Préférences**, avec recherche, y compris la page IA facultative. |
+| ![Le graphe du Log avec le thème Material et la teinte de ligne activée](../../docs/user/images/theme-material.png) **Le graphe de commits**, ici avec le thème Material et la teinte de ligne. | ![Le diff d’un fichier modifié avec les boutons Stage du hunk et Abandonner le hunk sur chaque hunk](../../docs/user/images/diff.png) **Le diff**, avec stage et abandon par hunk ou par ligne. |
+| ![La palette de commandes filtrée sur le mot stash](../../docs/user/images/palette.png) **La palette de commandes** (`Ctrl+P`) atteint chaque commande. | ![Le compositeur de commits proposant quatre commits pour les modifications locales, prêts à être relus](../../docs/user/images/composer.png) **Le compositeur de commits** fait relire les commits proposés par l’IA avant que quoi que ce soit soit commité. |
+| ![Le menu clic droit d’un commit avec les actions cherry-pick, revert, reset, rebase, branche et tag](../../docs/user/images/context-menu.png) **Clic droit** sur n’importe quoi pour ses actions. | ![La page IA des Préférences avec les profils, les instructions par action et l’interrupteur d’activation](../../docs/user/images/settings-ai.png) **Les Préférences**, avec recherche, y compris la page IA facultative. |
 
-D’autres images, avec des explications, se trouvent dans la [documentation utilisateur](docs/user/fr/README.md).
+D’autres images, avec des explications, se trouvent dans la [documentation utilisateur](../../docs/user/fr/README.md).
 
 ## Installation
 
@@ -78,10 +78,10 @@ Il vous faut un `git` système ; `git-lfs` est facultatif.
   `./build-custom.sh` (Windows : `build-custom`) demande quelles langues,
   intégrations et fonctions (IA, MCP, LFS, worktrees, sous-modules,
   téléchargement d’avatars) compiler ; voir
-  [docs/user/fr/custom-builds.md](docs/user/fr/custom-builds.md).
+  [docs/user/fr/custom-builds.md](../../docs/user/fr/custom-builds.md).
 
 Détails complets, outils facultatifs et notes par OS :
-[docs/user/fr/installation.md](docs/user/fr/installation.md).
+[docs/user/fr/installation.md](../../docs/user/fr/installation.md).
 
 ## Démarrage rapide
 
@@ -98,8 +98,8 @@ gitpoulpi-tui          # or just: gitpoulpi
   est dessiné en pixels. Dans les autres (une console Windows simple,
   tmux), il bascule automatiquement en caractères.
 
-La version pas à pas est dans [Premiers pas](docs/user/fr/getting-started.md),
-et [la visite de l’interface](docs/user/fr/interface-tour.md) nomme chaque zone
+La version pas à pas est dans [Premiers pas](../../docs/user/fr/getting-started.md),
+et [la visite de l’interface](../../docs/user/fr/interface-tour.md) nomme chaque zone
 de l’écran.
 
 ```
@@ -109,38 +109,38 @@ claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
 ```
 
 L’IA est facultative et désactivée par défaut : activez l’IA propre à
-GitPoulpi dans *Préférences > IA* ([Assistance IA](docs/user/fr/ai.md)) ; laissez
-un agent externe piloter GitPoulpi avec [MCP et agents](docs/user/fr/mcp-and-agents.md)
+GitPoulpi dans *Préférences > IA* ([Assistance IA](../../docs/user/fr/ai.md)) ; laissez
+un agent externe piloter GitPoulpi avec [MCP et agents](../../docs/user/fr/mcp-and-agents.md)
 (permissions, chaque outil) et la skill d’agent
-[`skills/gitpoulpi/SKILL.md`](skills/gitpoulpi/SKILL.md).
+[`skills/gitpoulpi/SKILL.md`](../../skills/gitpoulpi/SKILL.md).
 
 ## Documentation
 
-La documentation utilisateur complète commence à **[docs/user/fr/README.md](docs/user/fr/README.md)** :
+La documentation utilisateur complète commence à **[docs/user/fr/README.md](../../docs/user/fr/README.md)** :
 
 | | |
 |---|---|
-| [Premiers pas](docs/user/fr/getting-started.md) | Installer, ouvrir un dépôt, faire un premier commit |
-| [Visite de l’interface](docs/user/fr/interface-tour.md) | Chaque zone de la fenêtre, nommée |
-| [Travailler avec le Log](docs/user/fr/log-and-history.md) | Graphe, refs, branches, tags, stashes, rebase, cherry-pick |
-| [Stage et commit](docs/user/fr/staging-and-committing.md) | Statut, diff, hunks et lignes, le compositeur, l’éditeur |
-| [Préférences](docs/user/fr/settings.md) | Chaque page et chaque option des Préférences |
-| [Assistance IA](docs/user/fr/ai.md) | Configurer l’IA intégrée, chaque action IA, confidentialité |
-| [Hébergeurs et suivi de tickets](docs/user/fr/hosting-integration.md) | GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine : jetons, lier un dépôt, pull et merge requests |
-| [CLI](docs/user/fr/cli-reference.md) et [MCP](docs/user/fr/mcp-and-agents.md) | Le scripter, ou laisser un agent le piloter (permissions, chaque outil) |
-| [Raccourcis clavier](docs/user/fr/keybindings.md) (et chaque commande de la palette), [souris](docs/user/fr/mouse-and-gestures.md), [configuration](docs/user/fr/config-reference.md), [LFS](docs/user/fr/lfs.md), [annuler](docs/user/fr/undo-redo.md), [dépannage](docs/user/fr/troubleshooting.md) | Référence et aide |
+| [Premiers pas](../../docs/user/fr/getting-started.md) | Installer, ouvrir un dépôt, faire un premier commit |
+| [Visite de l’interface](../../docs/user/fr/interface-tour.md) | Chaque zone de la fenêtre, nommée |
+| [Travailler avec le Log](../../docs/user/fr/log-and-history.md) | Graphe, refs, branches, tags, stashes, rebase, cherry-pick |
+| [Stage et commit](../../docs/user/fr/staging-and-committing.md) | Statut, diff, hunks et lignes, le compositeur, l’éditeur |
+| [Préférences](../../docs/user/fr/settings.md) | Chaque page et chaque option des Préférences |
+| [Assistance IA](../../docs/user/fr/ai.md) | Configurer l’IA intégrée, chaque action IA, confidentialité |
+| [Hébergeurs et suivi de tickets](../../docs/user/fr/hosting-integration.md) | GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine : jetons, lier un dépôt, pull et merge requests |
+| [CLI](../../docs/user/fr/cli-reference.md) et [MCP](../../docs/user/fr/mcp-and-agents.md) | Le scripter, ou laisser un agent le piloter (permissions, chaque outil) |
+| [Raccourcis clavier](../../docs/user/fr/keybindings.md) (et chaque commande de la palette), [souris](../../docs/user/fr/mouse-and-gestures.md), [configuration](../../docs/user/fr/config-reference.md), [LFS](../../docs/user/fr/lfs.md), [annuler](../../docs/user/fr/undo-redo.md), [dépannage](../../docs/user/fr/troubleshooting.md) | Référence et aide |
 
-Développeurs : [CLAUDE.md](CLAUDE.md) et `docs/architecture/overview.md`
-décrivent les crates et la conception ; [CHANGELOG.md](CHANGELOG.md) liste le
+Développeurs : [CLAUDE.md](../../CLAUDE.md) et `docs/architecture/overview.md`
+décrivent les crates et la conception ; [CHANGELOG.md](../../CHANGELOG.md) liste le
 contenu de chaque release.
 
 ## Licence
 
-[MIT](LICENSE).
+[MIT](../../LICENSE).
 
 ## Crédits et licences tierces
 
-GitPoulpi repose sur des bibliothèques open source et utilise des valeurs de couleur issues de thèmes publiés. Leurs licences et crédits, auteurs des thèmes compris, figurent dans [THIRD-PARTY-LICENSES.txt](THIRD-PARTY-LICENSES.txt). Ce fichier est livré avec chaque version ; la fenêtre À propos et `gitpoulpi licenses` l'affichent aussi.
+GitPoulpi repose sur des bibliothèques open source et utilise des valeurs de couleur issues de thèmes publiés. Leurs licences et crédits, auteurs des thèmes compris, figurent dans [THIRD-PARTY-LICENSES.txt](../../THIRD-PARTY-LICENSES.txt). Ce fichier est livré avec chaque version ; la fenêtre À propos et `gitpoulpi licenses` l'affichent aussi.
 
 ## Marques
 

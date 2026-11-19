@@ -2,15 +2,9 @@
 
 # Instalacja
 
-GitPoulpi ma trzy pliki wykonywalne:
+GitPoulpi to jeden program, `gitpoulpi`. Uruchomiony bez podpolecenia otwiera interfejs terminalowy; z podpoleceniem jest interfejsem wiersza poleceń (`--json` dla skryptów); `gitpoulpi mcp serve` to serwer MCP dla agentów AI (zob. [MCP i agenci](mcp-and-agents.md)). Obok niego archiwum zawiera `gitpoulpi-updater`, osobny mały program, który aktualizuje instalację (zob. [Aktualizacje](updates.md)).
 
-| Plik wykonywalny | Co to jest |
-|---|---|
-| `gitpoulpi-tui` | Interfejs terminalowy. |
-| `gitpoulpi` | Interfejs wiersza poleceń (`--json` dla skryptów). Bez podpolecenia otwiera interfejs. |
-| `gitpoulpi-mcp` | Serwer MCP dla agentów AI. Zob. [MCP i agenci](mcp-and-agents.md). |
-
-Obok nich archiwum zawiera `gitpoulpi-launch`, malutki program, który skróty uruchamiają, by pokazać już otwarte okno GitPoulpi (`gitpoulpi launch`). W Windows nie ma okna konsoli, więc kliknięcie nigdy żadnego nie błyska. Jest instalowany, aktualizowany i usuwany razem z pozostałymi.
+Dla zgodności archiwum zawiera też trzy małe przekaźniki, które tylko uruchamiają `gitpoulpi`: `gitpoulpi-tui` (otwiera interfejs; zostanie usunięty w jednym z kolejnych wydań), `gitpoulpi-mcp` (uruchamia serwer MCP; zostaje przez całą linię 1.x, więc istniejące konfiguracje agentów nadal działają) i `gitpoulpi-launch` (to uruchamiają skróty, by pokazać już otwarte okno GitPoulpi, `gitpoulpi launch`; w Windows nie ma okna konsoli, więc kliknięcie nigdy żadnego nie błyska). Wszystko jest instalowane, aktualizowane i usuwane razem.
 
 ## Czego potrzeba
 
@@ -34,7 +28,8 @@ Obok nich archiwum zawiera `gitpoulpi-launch`, malutki program, który skróty u
 
 Archiwum wydania to `gitpoulpi-<version>-<target>.zip` (Windows) lub
 `.tar.gz` (Linux, macOS), z plikiem `.sha256` obok. Sprawdź archiwum względem
-pliku `.sha256`, rozpakuj je i umieść trzy pliki wykonywalne w folderze
+pliku `.sha256`, rozpakuj je i umieść jego pliki wykonywalne
+(`gitpoulpi`, `gitpoulpi-updater` oraz przekaźniki `gitpoulpi-tui`, `gitpoulpi-mcp` i `gitpoulpi-launch`) w folderze
 znajdującym się w `PATH` (zostaw `gitpoulpi-updater` i znacznik `.gitpoulpi-dist`
 obok nich: znacznik mówi `channel=archive`, więc ta kompilacja może sama się
 aktualizować, zob. [Aktualizacje](updates.md)). `INSTALL.txt` w archiwum podaje te same kroki.
@@ -93,7 +88,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 ```
 
 Wybiera archiwum dla twojego systemu i procesora, sprawdza jego `.sha256`, instaluje (kanał `archive`: GitPoulpi aktualizuje się sam na miejscu) w
-`~/.local/opt/gitpoulpi` i dowiązuje `gitpoulpi` oraz `gitpoulpi-mcp` w
+`~/.local/opt/gitpoulpi` i dowiązuje `gitpoulpi` (który uruchomiony bez podpolecenia otwiera interfejs terminalowy) oraz `gitpoulpi-mcp` (przekaźnik) w
 `~/.local/bin`. Nie jest potrzebny root i nic poza twoim katalogiem domowym nie jest ruszane.
 Bez `--yes` pyta o alias (domyślnie `gp`), PATH i skróty.
 
@@ -123,7 +118,7 @@ Każdy z poniższych kanałów zapisuje obok programów ten sam znacznik `.gitpo
 | **apt** (Debian, Ubuntu) | zob. [repozytorium apt](#apt-debian-i-ubuntu) | Podpisane repozytorium; `.deb` jest też dołączany do każdego wydania. |
 | **MSI** (Windows, zarządzane) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Dla administratorów: wszyscy użytkownicy, bez aktualizacji w aplikacji. Zob. [Dystrybucja w przedsiębiorstwie](enterprise-distribution.md#msi-z-intune-lub-zasadami-grupy). |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Pobiera archiwum wydania zamiast kompilować. |
-| **cargo, z crates.io** | `cargo install --locked gitpoulpi-cli` | Kompiluje; wymaga toolchaina Rust. Instaluje `gitpoulpi`, który uruchomiony bez podpolecenia otwiera interfejs terminalowy i obsługuje też MCP (`gitpoulpi mcp`). `gitpoulpi-tui` i `gitpoulpi-mcp` to te same programy jako samodzielne crate'y. |
+| **cargo, z crates.io** | `cargo install --locked gitpoulpi-cli` | Kompiluje; wymaga toolchaina Rust. Instaluje `gitpoulpi`, który uruchomiony bez podpolecenia otwiera interfejs terminalowy i obsługuje też MCP (`gitpoulpi mcp`). |
 | **cargo, ze źródeł** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Kompiluje; wymaga toolchaina Rust. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | Zob. [Uruchamianie w Dockerze](docker.md). |
 
@@ -160,8 +155,8 @@ dłużej:
 cargo build --profile dist
 ```
 
-Skrypty `build-opti` w katalogu głównym repozytorium wykonują to budowanie dla
-trzech plików wykonywalnych i wypisują ich rozmiary:
+Skrypty `build-opti` w katalogu głównym repozytorium wykonują to budowanie
+i wypisują rozmiary plików wykonywalnych:
 
 ```
 ./build-opti.sh                  # Linux, macOS
@@ -179,7 +174,7 @@ cargo run -p xtask -- dist
 
 Buduje profil `dist` i zapisuje
 `target/dist/gitpoulpi-<version>-<target>.zip` (Windows) lub `.tar.gz` (inne
-systemy). Archiwum zawiera trzy pliki wykonywalne, `INSTALL.txt`, `README.md`,
+systemy). Archiwum zawiera pliki wykonywalne, `INSTALL.txt`, `README.md`,
 `LICENSE` i `CHANGELOG.md`. Obok zapisywany jest plik `.sha256`.
 
 ## Aktualizacje
@@ -208,7 +203,7 @@ wpisy w PATH, skróty i wpisy menu menedżera plików (w Windows razem z kluczem
 App Paths) utworzone przez GitPoulpi, a potem pliki programu
 instalacji z wydania; odmawia dla kompilacji bez znacznika `.gitpoulpi-dist`
 (kompilacja przez cargo), a `--keep-files` zostawia pliki programu. Nie jest
-dostępne dla agentów MCP. Bez instalatora usuń trzy pliki wykonywalne.
+dostępne dla agentów MCP. Bez instalatora usuń pliki wykonywalne.
 GitPoulpi zostawia też te pliki:
 
 | Co | Gdzie |

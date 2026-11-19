@@ -44,7 +44,7 @@ server MCP, così un agente IA può pilotarlo esattamente come fai tu. GitPoulpi
 
 | | |
 |---|---|
-| ![Il grafo del Log con il tema di colore Material e la tinta delle righe attiva](../../docs/user/images/theme-material.png) **Il grafo dei commit**, qui nel tema Material con la tinta delle righe. | ![Il diff di un file modificato con i pulsanti Stage dell’hunk e Scarta l’hunk su ogni hunk](../../docs/user/images/diff.png) **Il diff**, con stage e scarto per hunk o per riga. |
+| ![Il grafo del Log con la tavolozza di corsie Material e la tinta delle righe attiva](../../docs/user/images/theme-material.png) **Il grafo dei commit**, qui con la tavolozza di corsie Material e la tinta delle righe. | ![Il diff di un file modificato con i pulsanti Stage dell’hunk e Scarta l’hunk su ogni hunk](../../docs/user/images/diff.png) **Il diff**, con stage e scarto per hunk o per riga. |
 | ![La palette dei comandi filtrata sulla parola stash](../../docs/user/images/palette.png) **La palette dei comandi** (`Ctrl+P`) raggiunge ogni comando. | ![Il compositore di commit che propone quattro commit per le modifiche in corso, pronti da rivedere](../../docs/user/images/composer.png) **Il compositore di commit** fa rivedere i commit proposti dall’IA prima di crearli. |
 | ![Il menu del clic destro di un commit con le azioni cherry-pick, revert, reset, rebase, branch e tag](../../docs/user/images/context-menu.png) **Clic destro** su qualsiasi elemento per le sue azioni. | ![La pagina IA delle Impostazioni con profili, istruzioni per azione e interruttore di attivazione](../../docs/user/images/settings-ai.png) **Impostazioni**, con ricerca, inclusa la pagina IA facoltativa. |
 

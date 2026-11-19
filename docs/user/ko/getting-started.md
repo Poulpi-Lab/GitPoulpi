@@ -48,7 +48,7 @@ GitPoulpi는 현재 폴더가 속한
 - `j` / `k` 또는 화살표 키로 선택을 이동합니다. `f`는 commit을 검색합니다.
 - commit을 오른쪽 클릭하면 메뉴가 나옵니다.
 
-![merge commit을 선택한 Log: 오른쪽에 메시지, 작성자, 추가한 두 파일이 보입니다](../images/log-graph.png)
+![merge commit을 선택한 Log: 오른쪽에 메시지, 작성자, 추가한 파일이 보입니다](../images/log-graph.png)
 
 ## 4. 변경하고 스테이징하기
 

@@ -86,6 +86,56 @@ sık sık düz bir `,` olarak gelir; `Ctrl+Shift+N`, `Ctrl+N` gibi görünür).
 Alternatifleri kullanın (`Ctrl+N` sonra `,` Ayarlar'ı açar; `Ctrl+P` her komuta
 ulaşır) ya da akoru yeniden atayın: bkz. [Ayarlar](settings.md#klavye-ve-fare).
 
+**`Ctrl+Tab` sekmeleri değiştirmiyor.** kitty, WezTerm, Ghostty ve Windows
+Terminal `Ctrl+Tab` ile `Ctrl+Shift+Tab` tuşlarını kendi sekmeleri için ayırır;
+bu yüzden tuş GitPoulpi'ye hiç ulaşmaz. `Ctrl+PageDown` / `Ctrl+PageUp` her
+zaman çalışır. Çifti GitPoulpi'ye vermek için terminalin yapılandırmasında
+serbest bırakın, sonra terminali yeniden başlatın (ya da yapılandırmasını
+yeniden yükleyin):
+
+- kitty, `kitty.conf` içinde (eylemsiz bir `map` varsayılanı kaldırır;
+  `--when-focus-on` ile `title:...` gibi bir pencere ölçütü kullanırsanız kitty
+  tuşu yalnızca eşleşen bir pencere odaktayken serbest bırakabilir, bkz. kitty'nin
+  eşleme belgeleri):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, `wezterm.lua` içinde:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, yapılandırma dosyasında:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, `settings.json` içinde (`"id": null` varsayılanı kaldırır):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (Eski ayar dosyaları bu tuşlarla `actions` altında `nextTab` / `prevTab`
+  listeler: tuşları oradan kaldırın.)
+
+Terminal bu durumda kendi `Ctrl+Tab` sekme geçişini kaybeder. Tuşu yalnızca
+kitty klavye protokolü üzerinden gönderebilen bir terminalde protokolün açık
+olması gerekir (varsayılan, bkz.
+[Klavye kısayolları](keybindings.md#terminalin-gönderemediği-tuşlar-ve-kitty-klavye-protokolü)).
+
 **Bir kısayolu hatırlamıyorum.** `Ctrl+P` tuşuna basıp istediğinizi yazın; her
 sonuç kısayolunu gösterir. `?` her şeyi listeler.
 

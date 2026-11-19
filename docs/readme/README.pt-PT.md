@@ -44,7 +44,7 @@ inspira-se no GitKraken e foi reescrito de raiz em Rust: binários nativos, leve
 
 | | |
 |---|---|
-| ![O grafo do Log com o tema de cores Material e o tom de linha ativado](../../docs/user/images/theme-material.png) **O grafo de commits**, aqui no tema Material com tom de linha. | ![O diff de um ficheiro modificado com os botões Stage hunk e Descartar hunk em cada hunk](../../docs/user/images/diff.png) **O diff**, com stage e descarte por hunk ou por linha. |
+| ![O grafo do Log com a paleta de faixas Material e o tom de linha ativado](../../docs/user/images/theme-material.png) **O grafo de commits**, aqui com a paleta de faixas Material e tom de linha. | ![O diff de um ficheiro modificado com os botões Stage hunk e Descartar hunk em cada hunk](../../docs/user/images/diff.png) **O diff**, com stage e descarte por hunk ou por linha. |
 | ![A paleta de comandos filtrada pela palavra stash](../../docs/user/images/palette.png) **A paleta de comandos** (`Ctrl+P`) chega a todos os comandos. | ![O compositor de commits a propor quatro commits para as alterações em curso, prontos para revisão](../../docs/user/images/composer.png) **O compositor de commits** revê os commits propostos pela IA antes de se fazer qualquer commit. |
 | ![O menu de contexto de um commit com ações de cherry-pick, revert, reset, rebase, branch e tag](../../docs/user/images/context-menu.png) **Clique com o botão direito** em qualquer coisa para ver as suas ações. | ![A página IA das Definições com perfis, instruções por ação e o interruptor de ativação](../../docs/user/images/settings-ai.png) **As Definições**, com pesquisa, incluindo a página opcional de IA. |
 

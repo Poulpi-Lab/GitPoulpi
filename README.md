@@ -57,36 +57,82 @@ More pictures, with explanations, are in the [user documentation](docs/user/READ
 
 You need a system `git`; `git-lfs` is optional.
 
-- **With an installer:** a Windows `...-setup.exe` or `install.sh` for Linux and
-  macOS (per user, no root), attached to each release. A build installed from a
-  release archive can also update itself from the title bar's version chip.
-- **From a release archive:** unpack it and follow `INSTALL.txt` inside.
-- **From source:**
+### Linux and macOS (`install.sh`)
 
-  ```
-  git clone https://github.com/Poulpi-Lab/GitPoulpi.git
-  cd GitPoulpi
-  cargo build --release
-  ```
+```
+curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
+```
 
-  The binaries land in `target/release/`: `gitpoulpi` (CLI, and the UI when run
-  with no subcommand), `gitpoulpi-tui` and `gitpoulpi-mcp`.
-- **Build your own release archive:** `cargo run -p xtask -- dist` produces
-  `target/dist/gitpoulpi-<version>-<target>.zip` (Windows) or `.tar.gz`, with a
-  `.sha256` file.
-- **Smaller binary with only what you need:** `./build-custom.sh` (Windows:
-  `build-custom`) asks which languages, integrations and features (AI, MCP,
-  LFS, worktrees, submodules, avatar download) to build; see
-  [docs/user/custom-builds.md](docs/user/custom-builds.md).
+### Homebrew (macOS, Linux)
 
-Full details, optional tools and per-OS notes:
-[docs/user/installation.md](docs/user/installation.md).
+```
+brew install Poulpi-Lab/gitpoulpi/gitpoulpi
+```
+
+### apt (Debian, Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+### Scoop (Windows)
+
+```
+scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi
+scoop install gitpoulpi
+```
+
+### Windows installer
+
+Download `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe` from the
+[latest release](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest) and
+run it. For administrators, the MSI:
+
+```
+msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn
+```
+
+### Docker
+
+```
+docker pull poulpilab/gitpoulpi
+```
+
+See [Running in Docker](docs/user/docker.md).
+
+### cargo
+
+```
+cargo binstall gitpoulpi-cli          # prebuilt
+cargo install --locked gitpoulpi-cli  # compiles
+```
+
+### Release archive
+
+Download it from the
+[latest release](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest),
+unpack it and follow `INSTALL.txt` inside.
+
+### From source
+
+```
+git clone https://github.com/Poulpi-Lab/GitPoulpi.git
+cd GitPoulpi
+cargo build --release
+```
+
+Your own release archive, a smaller custom build and per-OS notes:
+[docs/user/installation.md](docs/user/installation.md) and
+[docs/user/custom-builds.md](docs/user/custom-builds.md).
 
 ## Quick start
 
 ```
 cd path/to/your/repository
-gitpoulpi-tui          # or just: gitpoulpi
+gitpoulpi
 ```
 
 - `?` opens the help with every key and gesture, `Ctrl+P` the command palette,

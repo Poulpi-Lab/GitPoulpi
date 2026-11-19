@@ -15,6 +15,58 @@ pub const BINARIES: [&str; 5] = [
     "gitpoulpi-updater",
 ];
 
+/// Where an archive file comes from.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BuiltFrom {
+    /// A binary of this cargo package, copied under its own name.
+    Package(&'static str),
+    /// A copy of the `gitpoulpi-shim` binary under the archive name: a
+    /// stub that starts the `gitpoulpi` next to it as that persona.
+    Shim,
+}
+
+/// The cargo package `xtask dist` builds the shim from.
+pub const SHIM_PACKAGE: &str = "gitpoulpi-shim";
+/// The shim's binary name (what cargo writes).
+pub const SHIM_BINARY: &str = "gitpoulpi-shim";
+
+/// How each name of [`BINARIES`] is produced. The archive file names stay
+/// the old ones (an old updater relies on them); only the source changed.
+pub const BUILT_FROM: [(&str, BuiltFrom); 5] = [
+    ("gitpoulpi-tui", BuiltFrom::Shim),
+    ("gitpoulpi", BuiltFrom::Package("gitpoulpi-cli")),
+    ("gitpoulpi-mcp", BuiltFrom::Shim),
+    ("gitpoulpi-launch", BuiltFrom::Package("gitpoulpi-cli")),
+    ("gitpoulpi-updater", BuiltFrom::Package("gitpoulpi-updater")),
+];
+
+/// The package `-p` list a release build needs: every package of
+/// [`BUILT_FROM`] once (the shim package for the shim copies).
+pub fn build_packages() -> Vec<&'static str> {
+    let mut v: Vec<&'static str> = Vec::new();
+    for (_, from) in BUILT_FROM {
+        let p = match from {
+            BuiltFrom::Package(p) => p,
+            BuiltFrom::Shim => SHIM_PACKAGE,
+        };
+        if !v.contains(&p) {
+            v.push(p);
+        }
+    }
+    v
+}
+
+/// The binary name cargo writes for archive file `name` (no suffix).
+pub fn built_binary(name: &str) -> Option<&'static str> {
+    BUILT_FROM
+        .iter()
+        .find(|(n, _)| *n == name)
+        .map(|(n, f)| match f {
+            BuiltFrom::Shim => SHIM_BINARY,
+            BuiltFrom::Package(_) => *n,
+        })
+}
+
 /// Program names a release no longer ships (without the platform suffix).
 /// Empty for now: the archive still carries every name of [`BINARIES`].
 /// When a name moves here, the updater deletes its file and its `.old` copy
@@ -232,6 +284,31 @@ pub fn host_target() -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn built_from_covers_exactly_the_archive_names() {
+        let names: Vec<&str> = BUILT_FROM.iter().map(|(n, _)| *n).collect();
+        assert_eq!(names, BINARIES);
+    }
+
+    #[test]
+    fn tui_and_mcp_are_shim_copies_and_the_rest_are_real_binaries() {
+        for (name, from) in BUILT_FROM {
+            let shim = name == "gitpoulpi-tui" || name == "gitpoulpi-mcp";
+            assert_eq!(from == BuiltFrom::Shim, shim, "{name}");
+            let expect = if shim { SHIM_BINARY } else { name };
+            assert_eq!(built_binary(name), Some(expect));
+        }
+        assert_eq!(built_binary("nope"), None);
+    }
+
+    #[test]
+    fn a_release_builds_only_cli_updater_and_shim() {
+        assert_eq!(
+            build_packages(),
+            ["gitpoulpi-shim", "gitpoulpi-cli", "gitpoulpi-updater"]
+        );
+    }
 
     #[test]
     fn archive_is_zip_on_windows_and_tar_gz_elsewhere() {

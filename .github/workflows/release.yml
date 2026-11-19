@@ -340,14 +340,15 @@ jobs:
       - name: SBOM
         run: |
           version="${{ steps.meta.outputs.version }}"
-          for crate in gitpoulpi-cli gitpoulpi-tui gitpoulpi-mcp gitpoulpi-updater; do
+          # tui and mcp are libraries of gitpoulpi-cli: its SBOM carries their dependencies.
+          for crate in gitpoulpi-cli gitpoulpi-updater gitpoulpi-shim; do
             (cd "crates/$crate" && cargo cyclonedx --format json --override-filename sbom)
           done
           jq -s '.[0] * {
                    components: ([.[].components[]?] | unique_by(."bom-ref")),
                    dependencies: ([.[].dependencies[]?] | unique_by(.ref))
-                 }' crates/gitpoulpi-cli/sbom.json crates/gitpoulpi-tui/sbom.json \
-                    crates/gitpoulpi-mcp/sbom.json crates/gitpoulpi-updater/sbom.json \
+                 }' crates/gitpoulpi-cli/sbom.json crates/gitpoulpi-updater/sbom.json \
+                    crates/gitpoulpi-shim/sbom.json \
             > "dist/gitpoulpi-${version}-sbom.cdx.json"
       # Optional: a Dependency-Track server. Skipped with a notice when its secrets are absent.
       - name: Upload the SBOM to Dependency-Track

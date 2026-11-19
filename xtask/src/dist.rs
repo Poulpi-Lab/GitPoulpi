@@ -15,20 +15,15 @@ use std::process::Command;
 
 use sha2::{Digest, Sha256};
 
-/// The packages (and therefore the binaries) a release ships.
-const PACKAGES: [&str; 4] = [
-    "gitpoulpi-tui",
-    "gitpoulpi-cli",
-    "gitpoulpi-mcp",
-    "gitpoulpi-updater",
-];
-/// The binary names those packages produce.
+/// The file names the archive carries (the packages come from
+/// `release::build_packages`: the shim stands in for tui and mcp).
 const BINARIES: [&str; 5] = gitpoulpi_config::release::BINARIES;
 
 const USAGE: &str = "\
 Usage: cargo run -p xtask -- dist [--target <triple>] [--no-build]
 
-Builds gitpoulpi, gitpoulpi-tui, gitpoulpi-mcp, gitpoulpi-launch and gitpoulpi-updater with `--profile dist` and
+Builds gitpoulpi-cli, gitpoulpi-updater and gitpoulpi-shim with `--profile dist` (gitpoulpi-tui
+and gitpoulpi-mcp are copies of the shim) and
 writes target/dist/gitpoulpi-<version>-<target>.<zip|tar.gz> plus a .sha256
 file. Windows targets get a .zip, everything else a .tar.gz.
 
@@ -240,8 +235,8 @@ pub fn install_text(version: &str, target: &str) -> String {
          \n\
          Contents\n\
          \x20 {cli}      the CLI; with no subcommand it opens the terminal UI\n\
-         \x20 {tui}  the terminal UI on its own\n\
-         \x20 {mcp}  the MCP server for AI agents\n\
+         \x20 {tui}  starts the terminal UI (a small stub that runs {cli})\n\
+         \x20 {mcp}  starts the MCP server for AI agents (a small stub that runs {cli})\n\
          \x20 {launch}  what the shortcuts run: shows the open window, else starts one\n\
          \x20 {updater}  replaces GitPoulpi during an update; GitPoulpi runs it, not you\n\
          \n\
@@ -347,7 +342,7 @@ pub fn run(args: &[String]) -> Result<i32, String> {
         // A release archive shows no commit hash next to the version.
         cmd.env("GITPOULPI_DIST", "1");
         cmd.current_dir(&root).args(["build", "--profile", "dist"]);
-        for p in PACKAGES {
+        for p in gitpoulpi_config::release::build_packages() {
             cmd.args(["-p", p]);
         }
         if let Some(t) = &target {
@@ -369,8 +364,13 @@ pub fn run(args: &[String]) -> Result<i32, String> {
     let mut sizes = Vec::new();
     for b in BINARIES {
         let file = exe_name(b, &triple);
-        let data = fs::read(bin_dir.join(&file))
-            .map_err(|e| format!("cannot read {}: {e}", bin_dir.join(&file).display()))?;
+        let built = exe_name(
+            gitpoulpi_config::release::built_binary(b)
+                .ok_or_else(|| format!("{b} has no built-from entry"))?,
+            &triple,
+        );
+        let data = fs::read(bin_dir.join(&built))
+            .map_err(|e| format!("cannot read {}: {e}", bin_dir.join(&built).display()))?;
         sizes.push((file.clone(), data.len()));
         entries.push(Entry {
             name: file,
@@ -621,6 +621,19 @@ mod tests {
         assert_eq!(e.name, ".gitpoulpi-dist");
         let m = gitpoulpi_config::release::Marker::parse(&String::from_utf8(e.data).unwrap());
         assert_eq!(m.unwrap().target, "x86_64-pc-windows-msvc");
+    }
+
+    #[test]
+    fn dist_files_are_the_archive_names_and_tui_and_mcp_come_from_the_shim() {
+        use gitpoulpi_config::release::{build_packages, built_binary, BINARIES};
+        assert_eq!(BINARIES, super::BINARIES);
+        assert_eq!(built_binary("gitpoulpi-tui"), Some("gitpoulpi-shim"));
+        assert_eq!(built_binary("gitpoulpi-mcp"), Some("gitpoulpi-shim"));
+        assert_eq!(built_binary("gitpoulpi"), Some("gitpoulpi"));
+        assert_eq!(built_binary("gitpoulpi-launch"), Some("gitpoulpi-launch"));
+        let p = build_packages();
+        assert!(!p.contains(&"gitpoulpi-tui") && !p.contains(&"gitpoulpi-mcp"));
+        assert!(p.contains(&"gitpoulpi-shim"));
     }
 
     #[test]

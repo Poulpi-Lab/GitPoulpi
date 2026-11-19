@@ -274,11 +274,9 @@ impl Choices {
     }
 
     pub fn packages(&self) -> Vec<&'static str> {
-        let mut p = vec!["gitpoulpi-cli", "gitpoulpi-tui", "gitpoulpi-updater"];
-        if self.mcp {
-            p.push("gitpoulpi-mcp");
-        }
-        p
+        // tui and mcp are libraries of gitpoulpi-cli (features pass through
+        // as `gitpoulpi-tui/...`); the shim makes their archive names.
+        vec!["gitpoulpi-cli", "gitpoulpi-updater", "gitpoulpi-shim"]
     }
 
     /// Arguments after `cargo`.
@@ -1120,8 +1118,16 @@ pub fn run(args: &[String]) -> Result<i32, String> {
 
     let out = out_dir(&root, &o.profile, &o.extra);
     let _ = std::fs::write(out.join("BUILD-FEATURES.txt"), o.choices.summary());
-    println!("\nCustom binaries ({}):", out.display());
     let exe = std::env::consts::EXE_SUFFIX;
+    // gitpoulpi-tui and gitpoulpi-mcp are copies of the shim, as in a release
+    // archive (a build without MCP gets no gitpoulpi-mcp).
+    for bin in shim_copies(o.choices.mcp) {
+        let from = out.join(format!("{}{exe}", gitpoulpi_config::release::SHIM_BINARY));
+        let to = out.join(format!("{bin}{exe}"));
+        std::fs::copy(&from, &to)
+            .map_err(|e| format!("copying {} to {}: {e}", from.display(), to.display()))?;
+    }
+    println!("\nCustom binaries ({}):", out.display());
     for bin in [
         "gitpoulpi",
         "gitpoulpi-tui",
@@ -1142,6 +1148,17 @@ pub fn run(args: &[String]) -> Result<i32, String> {
         println!("{line}");
     }
     Ok(0)
+}
+
+/// The archive names a custom build writes as copies of the shim.
+fn shim_copies(mcp: bool) -> Vec<&'static str> {
+    gitpoulpi_config::release::BUILT_FROM
+        .iter()
+        .filter(|(n, f)| {
+            *f == gitpoulpi_config::release::BuiltFrom::Shim && (mcp || *n != "gitpoulpi-mcp")
+        })
+        .map(|(n, _)| *n)
+        .collect()
 }
 
 #[cfg(test)]
@@ -1171,7 +1188,7 @@ mod tests {
         let a = c.cargo_args("custom", false, &[]);
         assert_eq!(
             a.join(" "),
-            "build --profile custom --locked -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-updater -p gitpoulpi-mcp \
+            "build --profile custom --locked -p gitpoulpi-cli -p gitpoulpi-updater -p gitpoulpi-shim \
              --no-default-features --features \
              gitpoulpi-cli/lang-fr,gitpoulpi-cli/github,gitpoulpi-cli/mcp,\
              gitpoulpi-tui/lang-fr,gitpoulpi-tui/github,gitpoulpi-tui/mcp,\
@@ -1205,6 +1222,16 @@ mod tests {
         }
         assert_eq!(parse_integrations("all").unwrap().len(), INTEGRATIONS.len());
         assert!(parse_integrations("forgejo").is_err());
+    }
+
+    #[test]
+    fn packages_are_cli_updater_and_shim_and_mcp_is_a_shim_copy_only_when_on() {
+        assert_eq!(
+            Choices::none().packages(),
+            ["gitpoulpi-cli", "gitpoulpi-updater", "gitpoulpi-shim"]
+        );
+        assert_eq!(shim_copies(true), ["gitpoulpi-tui", "gitpoulpi-mcp"]);
+        assert_eq!(shim_copies(false), ["gitpoulpi-tui"]);
     }
 
     #[test]

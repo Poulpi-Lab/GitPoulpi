@@ -69,10 +69,10 @@ jobs:
         with:
           shared-key: release-${{ matrix.target }}
           save-if: true
-      # The same packages and profile as `xtask dist` (xtask/src/dist.rs, PACKAGES). The dev-profile xtask build
+      # The same packages and profile as `xtask dist` (gitpoulpi_config::release::build_packages). The dev-profile xtask build
       # is what release.yml runs to drive it.
       - name: Build the dist profile
         shell: bash
         run: |
           cargo build -q -p xtask
-          cargo build --profile dist --target ${{ matrix.target }} -p gitpoulpi-tui -p gitpoulpi-cli -p gitpoulpi-mcp -p gitpoulpi-updater
+          cargo build --profile dist --target ${{ matrix.target }} -p gitpoulpi-cli -p gitpoulpi-updater -p gitpoulpi-shim

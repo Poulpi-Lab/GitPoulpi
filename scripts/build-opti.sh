@@ -9,7 +9,11 @@ cd "$(dirname "$0")/.."
 
 # sccache cannot cache LTO'd final links and gains little here: build without it.
 RUSTC_WRAPPER= cargo build --profile dist --locked \
-    -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-mcp -p gitpoulpi-updater "$@"
+    -p gitpoulpi-cli -p gitpoulpi-updater -p gitpoulpi-shim "$@"
+
+# gitpoulpi-tui and gitpoulpi-mcp are copies of the shim (as in the release archives).
+cp -f target/dist/gitpoulpi-shim target/dist/gitpoulpi-tui
+cp -f target/dist/gitpoulpi-shim target/dist/gitpoulpi-mcp
 
 echo
 echo "Optimized binaries (target/dist):"

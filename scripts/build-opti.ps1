@@ -3,7 +3,7 @@
     Optimized build for official releases.
 
 .DESCRIPTION
-    Builds gitpoulpi (CLI + TUI + daemon), gitpoulpi-tui, gitpoulpi-mcp and gitpoulpi-launch
+    Builds gitpoulpi (CLI + TUI + daemon), gitpoulpi-launch, gitpoulpi-updater and the shim (copied as gitpoulpi-tui and gitpoulpi-mcp)
     with the `dist` profile (thin LTO, 16 codegen units, stripped): slow to
     build, smallest and fastest binaries. Outputs land in target\dist\.
     Linux/macOS twin: scripts/build-opti.sh.
@@ -32,8 +32,11 @@ foreach ($bin in $bins) {
 
 # sccache cannot cache LTO'd final links and gains little here: build without it.
 $env:RUSTC_WRAPPER = ''
-cargo build --profile dist --locked -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-mcp -p gitpoulpi-updater @args
+cargo build --profile dist --locked -p gitpoulpi-cli -p gitpoulpi-updater -p gitpoulpi-shim @args
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+# gitpoulpi-tui and gitpoulpi-mcp are copies of the shim (as in the release archives).
+foreach ($n in 'gitpoulpi-tui', 'gitpoulpi-mcp') { Copy-Item -Force 'target\dist\gitpoulpi-shim.exe' "target\dist\$n.exe" }
 
 Write-Host ''
 Write-Host 'Optimized binaries (target\dist):'

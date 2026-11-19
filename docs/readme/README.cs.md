@@ -45,7 +45,7 @@ přepsán v Rustu: nativní binární soubory, nenáročné na disk i paměť, b
 
 | | |
 |---|---|
-| ![Graf Logu s barevným motivem Material a zapnutým podbarvením řádků](../../docs/user/images/theme-material.png) **Graf commitů**, zde v motivu Material s podbarvením řádků. | ![Diff změněného souboru s tlačítky Stage hunk a Zahodit hunk u každého hunku](../../docs/user/images/diff.png) **Diff** se stage a zahozením po hunku nebo po řádku. |
+| ![Graf Logu s paletou drah Material a zapnutým podbarvením řádků](../../docs/user/images/theme-material.png) **Graf commitů**, zde s paletou drah Material a podbarvením řádků. | ![Diff změněného souboru s tlačítky Stage hunk a Zahodit hunk u každého hunku](../../docs/user/images/diff.png) **Diff** se stage a zahozením po hunku nebo po řádku. |
 | ![Paleta příkazů filtrovaná na slovo stash](../../docs/user/images/palette.png) **Paleta příkazů** (`Ctrl+P`) dosáhne na každý příkaz. | ![Editor commitů navrhující čtyři commity pro rozpracované změny, připravené ke kontrole](../../docs/user/images/composer.png) **Editor commitů** dá ke kontrole commity navržené AI, než se cokoli commitne. |
 | ![Nabídka pravého tlačítka u commitu s akcemi cherry-pick, revert, reset, rebase, větev a tag](../../docs/user/images/context-menu.png) **Pravé tlačítko** na čemkoli otevře jeho akce. | ![Stránka AI v Nastavení s profily, instrukcemi pro jednotlivé akce a přepínačem zapnutí](../../docs/user/images/settings-ai.png) **Nastavení** s hledáním, včetně volitelné stránky AI. |
 

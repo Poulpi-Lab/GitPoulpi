@@ -98,7 +98,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 | **cargo** | `cargo binstall gitpoulpi-cli` | 下载发布压缩包而不是编译。 |
 | **cargo，来自 crates.io** | `cargo install --locked gitpoulpi-cli` | 需要编译；需要 Rust 工具链。安装 `gitpoulpi`，不带子命令运行时打开终端界面，同时提供 MCP 服务（`gitpoulpi mcp`）。 |
 | **cargo，从源码** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | 需要编译；需要 Rust 工具链。 |
-| **Docker** | `docker pull poulpilab/gitpoulpi` | 见[在 Docker 中运行](docker.md)。同一个镜像也在 `ghcr.io/poulpi-lab/gitpoulpi` 上。 |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | 见[在 Docker 中运行](docker.md)。 |
 
 上面的名称是发布流程所发布到的名称（见[发布](../../developer/releasing.md)）：尚未上线的通道会回答“not found”，而发布压缩包或安装程序始终可用。
 

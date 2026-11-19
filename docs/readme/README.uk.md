@@ -31,7 +31,7 @@ GitPoulpi дає повноцінний граф комітів, по якому
   робіть cherry-pick кількох комітів, fast-forward, створюйте worktree і патчі.
 - **Хостинги та трекери задач вбудовано.** Переглядайте, отримуйте й створюйте pull і merge request (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket) і переглядайте зміни Gerrit. Переглядайте й створюйте задачі, робочі елементи та картки (також Jira, Trello, Linear, YouTrack, Redmine і локальні нотатки Markdown), за бажання на дошці Kanban. Клонуйте зі свого облікового запису й керуйте ключами SSH.
 - **CLI і MCP для агентів.** `gitpoulpi <команда> --json` охоплює все, що робить
-  інтерфейс, а `gitpoulpi-mcp` віддає це як інструменти MCP. Один фоновий демон
+  інтерфейс, а `gitpoulpi mcp serve` віддає це як інструменти MCP. Один фоновий демон
   на репозиторій підтримує всі інтерфейси живими й синхронними.
 - **ШІ за бажанням, ніколи не обов'язковий.** Вимкнений за замовчуванням,
   обліковий запис не потрібен: використайте власний ключ API або локальний CLI
@@ -148,7 +148,7 @@ gitpoulpi
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 ШІ необов'язковий і за замовчуванням вимкнений: увімкніть власний ШІ GitPoulpi

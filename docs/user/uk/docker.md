@@ -1,6 +1,6 @@
 # Запуск у Docker
 
-Образ `poulpilab/gitpoulpi` містить офіційні виконувані файли випуску (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) на `debian:bookworm-slim`, із `git`, `git-lfs`, `openssh-client`, `less` і `tini`. Він працює на `linux/amd64` і `linux/arm64`. Він є на Docker Hub.
+Образ `poulpilab/gitpoulpi` містить офіційні виконувані файли випуску (`gitpoulpi`, а також ретранслятори `gitpoulpi-tui` і `gitpoulpi-mcp`) на `debian:bookworm-slim`, із `git`, `git-lfs`, `openssh-client`, `less` і `tini`. Він працює на `linux/amd64` і `linux/arm64`. Він є на Docker Hub.
 
 ## Запуск інтерфейсу
 
@@ -79,10 +79,10 @@ docker run -it --rm \
 docker run --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi status
 
 # сервер MCP через стандартні ввід і вивід, для агента, що його запускає
-docker run -i --rm --entrypoint gitpoulpi-mcp -v "$PWD":/work poulpilab/gitpoulpi
+docker run -i --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi mcp serve
 ```
 
-Кожен `docker run` - це окремий контейнер із власним фоновим демоном GitPoulpi, тож зміни, зроблені через CLI, не з'являються наживо в інтерфейсі, що працює в іншому контейнері. Щоб керувати одним інтерфейсом із CLI, запустіть обидва в одному контейнері: запустіть інтерфейс з `--name gp` і використовуйте `docker exec gp gitpoulpi ...`. Для агента зареєструйте `docker run -i --rm --entrypoint gitpoulpi-mcp ...` як команду сервера MCP, див. [MCP та агенти](mcp-and-agents.md); перемикачі дозволів MCP у змонтованому `config.toml` діють як завжди.
+Кожен `docker run` - це окремий контейнер із власним фоновим демоном GitPoulpi, тож зміни, зроблені через CLI, не з'являються наживо в інтерфейсі, що працює в іншому контейнері. Щоб керувати одним інтерфейсом із CLI, запустіть обидва в одному контейнері: запустіть інтерфейс з `--name gp` і використовуйте `docker exec gp gitpoulpi ...`. Для агента зареєструйте `docker run -i --rm --entrypoint gitpoulpi ... mcp serve` як команду сервера MCP, див. [MCP та агенти](mcp-and-agents.md); перемикачі дозволів MCP у змонтованому `config.toml` діють як завжди.
 
 ## Теги й оновлення
 

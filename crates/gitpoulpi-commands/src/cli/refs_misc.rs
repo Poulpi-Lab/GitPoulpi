@@ -1046,6 +1046,9 @@ pub enum McpAction {
         /// `--allow-remote`.
         #[arg(long, value_name = "ADDR", num_args = 0..=1, default_missing_value = "")]
         http: Option<String>,
+        /// Address for `--http` (same as `--http ADDR`; wins over it).
+        #[arg(long, requires = "http")]
+        bind: Option<String>,
         /// Allow `--http` on a non-loopback address. Refused unless
         /// `[mcp] http_auth` is on with a token in place and the traffic is
         /// encrypted (`[mcp] tls`, or `behind_proxy` for a tunnel or reverse

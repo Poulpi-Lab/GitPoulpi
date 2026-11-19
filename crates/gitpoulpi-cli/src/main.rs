@@ -1,6 +1,8 @@
 mod config_cmd;
 mod daemon_cmd;
 mod desktop_cmd;
+mod launch_persona;
+mod persona;
 mod uninstall_cmd;
 
 #[cfg(feature = "mcp")]
@@ -26,19 +28,56 @@ fn runtime() -> tokio::runtime::Runtime {
         .expect("failed to start tokio runtime")
 }
 
-fn main() {
+fn main() -> std::process::ExitCode {
     // Started by git as the credential helper of an account-authenticated
     // transfer (ADR-0010)? Then this is all the process does.
     gitpoulpi_ipc::git_credential::run_if_requested();
-    gitpoulpi_ipc::auth::set_client_name("CLI");
+    let args: Vec<String> = std::env::args_os()
+        .skip(1)
+        .map(|a| a.to_string_lossy().into_owned())
+        .collect();
+    let argv0 = std::env::args_os().next();
+    let (persona, rest) = match persona::choose(argv0.as_deref(), args) {
+        Ok(chosen) => chosen,
+        Err(message) => {
+            eprintln!("gitpoulpi: {message}");
+            return std::process::ExitCode::from(2);
+        }
+    };
+    if persona == persona::Persona::Cli {
+        gitpoulpi_ipc::auth::set_client_name("CLI");
+    }
     let worker = std::thread::Builder::new()
         .name("gitpoulpi-main".into())
         .stack_size(STACK_BYTES)
-        .spawn(real_main)
+        .spawn(move || match persona {
+            persona::Persona::Cli => {
+                real_main();
+                std::process::ExitCode::SUCCESS
+            }
+            persona::Persona::Tui => gitpoulpi_tui::standalone::main(rest),
+            persona::Persona::Mcp => run_mcp_persona(rest),
+            persona::Persona::Launch => {
+                let code = launch_persona::run(&rest);
+                std::process::ExitCode::from(u8::try_from(code).unwrap_or(1))
+            }
+        })
         .expect("failed to spawn the main worker thread");
-    if worker.join().is_err() {
-        std::process::exit(101);
-    }
+    worker
+        .join()
+        .unwrap_or_else(|_| std::process::ExitCode::from(101))
+}
+
+#[cfg(feature = "mcp")]
+fn run_mcp_persona(args: Vec<String>) -> std::process::ExitCode {
+    gitpoulpi_mcp::standalone::main(args)
+}
+
+/// Custom builds without `mcp` have no server to be: say so, do not start.
+#[cfg(not(feature = "mcp"))]
+fn run_mcp_persona(_args: Vec<String>) -> std::process::ExitCode {
+    eprintln!("gitpoulpi: this build has no MCP server (it was built without the `mcp` feature)");
+    std::process::ExitCode::from(2)
 }
 
 fn real_main() {
@@ -295,10 +334,12 @@ fn run_mcp_command(session: &str, action: McpAction, backend: DefaultBackend) {
         }
         McpAction::Serve {
             http: Some(addr),
+            bind,
             allow_remote,
             ui_control,
             ..
         } => {
+            let addr = gitpoulpi_mcp::standalone::http_addr(&addr, bind.as_deref());
             let cfg = mcp_config(ui_control.as_deref());
             let runtime = runtime();
             if let Err(err) = runtime.block_on(gitpoulpi_mcp::serve_http(

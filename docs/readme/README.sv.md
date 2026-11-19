@@ -28,7 +28,7 @@ omskrivet från grunden i Rust: nativa binärer, lätta på disk och i minne, in
   patchar.
 - **Värdtjänster och ärendehantering inbyggt.** Bläddra bland, checka ut och skapa pull och merge requests (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket) och granska Gerrit-changes. Bläddra bland och skapa ärenden, work items och kort (även Jira, Trello, Linear, YouTrack, Redmine och lokala Markdown-anteckningar), om du vill på en Kanban-tavla. Klona från ditt konto och hantera SSH-nycklar.
 - **CLI och MCP för agenter.** `gitpoulpi <command> --json` täcker allt
-  gränssnittet gör, och `gitpoulpi-mcp` serverar det som MCP-verktyg. En
+  gränssnittet gör, och `gitpoulpi mcp serve` serverar det som MCP-verktyg. En
   bakgrundsdaemon per repository håller varje frontend levande och synkad.
 - **Valfri AI, aldrig ett krav.** Av som standard och inget konto behövs: ta med
   din egen API-nyckel eller en lokal agent-CLI som `claude -p`. Generera
@@ -145,7 +145,7 @@ område på skärmen.
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 AI är valfritt och av som standard: slå på GitPoulpis egen AI under

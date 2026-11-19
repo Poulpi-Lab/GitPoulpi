@@ -25,7 +25,7 @@ det bygget finns. Det skriver också `BUILD-FEATURES.txt` bredvid binärerna.
 | Logotypfärger | Pixelbläckfisken i Om-fönstret finns i 20 färgsättningar (`--list-logo-colors`). Välj de som ska kompileras in (minst en), standardfärgen (Om-fönstret visar den först; det är också vad en lagrad `ui.logo_color` som inte är inkompilerad faller tillbaka på; den måste vara en av de kompilerade; officiell standard: lavender) och färgen på den körbara Windows-filens ikon (vilken färgsättning som helst, standard: logotypens standard). Med en enda färgsättning snurrar logotypen fortfarande vid klick men behåller den färgen, och färglistan (`c`, högerklick) erbjuds inte. |
 | Integrationer (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine) | Utan några: bara clone via URL; inga ärenden, inga pull/merge requests. |
 | AI | Inga AI-knappar, kommandon eller `ai` CLI/MCP-verktyg. |
-| MCP | Ingen binär `gitpoulpi-mcp` och inget kommando `gitpoulpi mcp`. Agentkommandona `ui` finns kvar. |
+| MCP | Inget relä `gitpoulpi-mcp` och inget kommando `gitpoulpi mcp`. Agentkommandona `ui` finns kvar. |
 | LFS, Worktree, Submoduler | De matchande hanteringsskärmarna och kommandona är borta; ett typat svar, ”not built into this binary”, returneras. |
 | Nedladdning av avatarer | Bara initialmärken, ingen nätverkshämtning. |
 | Bildförhandsvisning | Bildfiler visar det vanliga binärmeddelandet; **Redigera i** fungerar fortfarande. |
@@ -93,14 +93,14 @@ om du föredrar det. `gitpoulpi --version` skriver ut en rad `themes:` med den u
 Logotypvalen är miljövariablerna `GITPOULPI_LOGO_COLORS`
 (`all` eller en kommalista med slugs), `GITPOULPI_LOGO_DEFAULT` och
 `GITPOULPI_ICON_COLOR`, lästa av byggskripten för `gitpoulpi-tui` (det filtrerar
-`crates/gitpoulpi-logo-build/colourways.json` till tabellen som Om-fönstret bäddar in) och för de
-tre binärcraten (ikonen). Källan till färgerna förblir
+`crates/gitpoulpi-logo-build/colourways.json` till tabellen som Om-fönstret bäddar in) och för
+`gitpoulpi-cli` (ikonen). Källan till färgerna förblir
 `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Den körbara Windows-filens ikon
 
-När målet är Windows får de körbara filerna `gitpoulpi`, `gitpoulpi-tui` och
-`gitpoulpi-mcp` bläckfisken som ikon, genererad vid bygget (ingen Python eller
+När målet är Windows får den körbara filen `gitpoulpi`
+bläckfisken som ikon, genererad vid bygget (ingen Python eller
 ImageMagick behövs) i den valda ikonfärgen, storlekar 16 till 128 px. Den bäddas
 in med craten `winresource` och behöver plattformens resurskompilator
 (`rc.exe` från Windows SDK på MSVC, `windres` på GNU). Saknas den skriver bygget
@@ -135,32 +135,32 @@ När ett sparat val finns erbjuder det interaktiva läget först "Utgå från" (
 
 ## Vad det sparar
 
-Uppmätt på Linux 2026-10-29 vid commit `65999ef5c`, från det fulla bygget, skillnaden mot det inom parentes
-(detaljer i `docs/developer/binary-size.md`):
+Uppmätt på Linux 2026-10-29 vid commit `65999ef5c`, storleken på `gitpoulpi` (hela programmet: gränssnitt, CLI och MCP-server) från det fulla bygget, skillnaden mot det inom parentes
+(detaljer i `docs/developer/binary-size.md`). Relänen `gitpoulpi-tui`, `gitpoulpi-mcp` och `gitpoulpi-launch` är långt under 1 MiB vad du än väljer:
 
-| Bygge (från `full` om inget annat anges) | `gitpoulpi` (MiB) | `gitpoulpi-tui` (MiB) | `gitpoulpi-mcp` (MiB) |
-|---|---|---|---|
-| Full (allt på) | 64,6 | 50,5 | 31,7 |
-| Bara engelska | 52,0 (-12,6) | 40,2 (-10,3) | 31,7 (0,0) |
-| MCP av | 61,6 (-3,0) | 49,6 (-0,8) | inte byggd |
-| AI av | 62,6 (-2,0) | 48,6 (-1,8) | 30,5 (-1,3) |
-| Alla integrationer av | 56,3 (-8,2) | 43,7 (-6,7) | 26,7 (-5,0) |
-| AI + integrationer + avatarhämtning av | 52,2 (-12,3) | 39,9 (-10,6) | 23,0 (-8,8) |
-| Omskrivningsvy av (`--no-history-rewrite`) | 61,6 (-3,0) | 48,9 (-1,5) | 28,5 (-3,2) |
-| Omskrivningsskript av | 63,1 (-1,5) | 49,0 (-1,5) | 31,1 (-0,7) |
-| Global sökning av | 63,5 (-1,1) | 49,5 (-1,0) | 31,6 (-0,1) |
-| Arbetsytor av | 63,5 (-1,1) | 49,5 (-0,9) | 31,5 (-0,2) |
-| Radar av | 63,4 (-1,2) | 49,3 (-1,2) | 31,7 (0,0) |
-| Board av | 63,6 (-1,0) | 49,5 (-1,0) | 31,7 (0,0) |
-| Review av | 63,2 (-1,4) | 49,0 (-1,4) | 31,7 (0,0) |
-| Mermaid av | 63,6 (-1,0) | 49,5 (-0,9) | 31,6 (-0,1) |
-| LFS av | 63,5 (-1,1) | 49,5 (-0,9) | 31,5 (-0,3) |
-| Worktree av | 63,7 (-0,9) | 49,6 (-0,8) | 31,7 (0,0) |
-| Submoduler av | 63,7 (-0,9) | 49,6 (-0,9) | 31,6 (-0,1) |
-| Avatarhämtning av | 63,7 (-0,9) | 49,6 (-0,9) | 31,7 (0,0) |
-| Bildförhandsvisning av | 63,3 (-1,2) | 49,2 (-1,3) | 31,7 (0,0) |
-| Allt av, bara engelska (LFS kvar) | 35,2 (-29,4) | 28,9 (-21,5) | inte byggd |
-| **Allt av, bara engelska** | **34,9 (-29,7)** | **28,8 (-21,6)** | inte byggd |
+| Bygge (från `full` om inget annat anges) | `gitpoulpi` (MiB) |
+|---|---|
+| Full (allt på) | 64,6 |
+| Bara engelska | 52,0 (-12,6) |
+| MCP av | 61,6 (-3,0) |
+| AI av | 62,6 (-2,0) |
+| Alla integrationer av | 56,3 (-8,2) |
+| AI + integrationer + avatarhämtning av | 52,2 (-12,3) |
+| Omskrivningsvy av (`--no-history-rewrite`) | 61,6 (-3,0) |
+| Omskrivningsskript av | 63,1 (-1,5) |
+| Global sökning av | 63,5 (-1,1) |
+| Arbetsytor av | 63,5 (-1,1) |
+| Radar av | 63,4 (-1,2) |
+| Board av | 63,6 (-1,0) |
+| Review av | 63,2 (-1,4) |
+| Mermaid av | 63,6 (-1,0) |
+| LFS av | 63,5 (-1,1) |
+| Worktree av | 63,7 (-0,9) |
+| Submoduler av | 63,7 (-0,9) |
+| Avatarhämtning av | 63,7 (-0,9) |
+| Bildförhandsvisning av | 63,3 (-1,2) |
+| Allt av, bara engelska (LFS kvar) | 35,2 (-29,4) |
+| **Allt av, bara engelska** | **34,9 (-29,7)** |
 
 ## Anteckningar
 

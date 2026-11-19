@@ -30,7 +30,7 @@ inspirado en GitKraken y reescrito desde cero en Rust: binarios nativos, ligeros
   cherry-pick de varios commits, fast-forward, crea worktrees y parches.
 - **Alojamiento e issue trackers integrados.** Explora, haz checkout y crea pull y merge requests (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket) y revisa los cambios de Gerrit. Explora y crea issues, work items y tarjetas (también Jira, Trello, Linear, YouTrack, Redmine y notas Markdown locales), si lo prefieres en un tablero Kanban. Clona desde tu cuenta y gestiona las claves SSH.
 - **CLI y MCP para agentes.** `gitpoulpi <comando> --json` cubre todo lo que
-  hace la interfaz, y `gitpoulpi-mcp` lo sirve como herramientas MCP. Un daemon
+  hace la interfaz, y `gitpoulpi mcp serve` lo sirve como herramientas MCP. Un daemon
   en segundo plano por repositorio mantiene todos los frontends en directo y
   sincronizados.
 - **IA opcional, nunca obligatoria.** Desactivada por defecto y sin cuenta: usa
@@ -149,7 +149,7 @@ zona de la pantalla.
 ```
 gitpoulpi --json status            # la CLI, automatizable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # da a un agente de IA las mismas herramientas
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # da a un agente de IA las mismas herramientas
 ```
 
 La IA es opcional y está desactivada por defecto: activa la IA propia de

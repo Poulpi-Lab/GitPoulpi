@@ -56,34 +56,82 @@ GitPoulpi даёт полноценный граф коммитов, по кот
 
 Нужен системный `git`; `git-lfs` необязателен.
 
-- **С установщиком:** `...-setup.exe` для Windows или `install.sh` для Linux и macOS (для пользователя, без root) прилагается к каждому выпуску. Сборка, установленная из архива выпуска, может также обновляться сама через значок версии в строке состояния.
-- **Из архива релиза:** распакуйте его и следуйте `INSTALL.txt` внутри.
-- **Из исходников:**
+### Linux и macOS (`install.sh`)
 
-  ```
-  git clone https://github.com/Poulpi-Lab/GitPoulpi.git
-  cd GitPoulpi
-  cargo build --release
-  ```
+```
+curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
+```
 
-  Бинарные файлы окажутся в `target/release/`: `gitpoulpi` (CLI, а также
-  интерфейс при запуске без подкоманды), `gitpoulpi-tui` и `gitpoulpi-mcp`.
-- **Собрать собственный архив релиза:** `cargo run -p xtask -- dist` создаёт
-  `target/dist/gitpoulpi-<version>-<target>.zip` (Windows) или `.tar.gz` вместе
-  с файлом `.sha256`.
-- **Бинарный файл поменьше, только с нужным:** `./build-custom.sh` (Windows:
-  `build-custom`) спрашивает, какие языки, интеграции и функции (ИИ, MCP, LFS,
-  worktree, подмодули, загрузка аватаров) собирать; см.
-  [docs/user/ru/custom-builds.md](../../docs/user/ru/custom-builds.md).
+### Homebrew (macOS, Linux)
 
-Подробности, необязательные инструменты и заметки по ОС:
-[docs/user/ru/installation.md](../../docs/user/ru/installation.md).
+```
+brew install Poulpi-Lab/gitpoulpi/gitpoulpi
+```
+
+### apt (Debian, Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+### Scoop (Windows)
+
+```
+scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi
+scoop install gitpoulpi
+```
+
+### Установщик для Windows
+
+Скачайте `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe` из
+[последнего выпуска](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest) и
+запустите его. Для администраторов есть MSI:
+
+```
+msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn
+```
+
+### Docker
+
+```
+docker pull poulpilab/gitpoulpi
+```
+
+См. [Запуск в Docker](../user/ru/docker.md).
+
+### cargo
+
+```
+cargo binstall gitpoulpi-cli          # prebuilt
+cargo install --locked gitpoulpi-cli  # compiles
+```
+
+### Архив выпуска
+
+Скачайте его из
+[последнего выпуска](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest),
+распакуйте и следуйте `INSTALL.txt` внутри.
+
+### Из исходников
+
+```
+git clone https://github.com/Poulpi-Lab/GitPoulpi.git
+cd GitPoulpi
+cargo build --release
+```
+
+Собственный архив выпуска, сборка поменьше и заметки по ОС:
+[docs/user/ru/installation.md](../user/ru/installation.md) и
+[docs/user/ru/custom-builds.md](../user/ru/custom-builds.md).
 
 ## Быстрый старт
 
 ```
 cd path/to/your/repository
-gitpoulpi-tui          # or just: gitpoulpi
+gitpoulpi
 ```
 
 - `?` открывает справку со всеми клавишами и жестами, `Ctrl+P` палитру команд,

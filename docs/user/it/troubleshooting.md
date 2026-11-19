@@ -87,6 +87,54 @@ le alternative (`Ctrl+N` poi `,` apre le Impostazioni; `Ctrl+P` raggiunge ogni
 comando), oppure riassegna la sequenza: vedi
 [Impostazioni](settings.md#tastiera-e-mouse).
 
+**`Ctrl+Tab` non cambia scheda.** kitty, WezTerm, Ghostty e Windows Terminal
+tengono `Ctrl+Tab` e `Ctrl+Shift+Tab` per le proprie schede, quindi il tasto
+non arriva mai a GitPoulpi. `Ctrl+PageDown` / `Ctrl+PageUp` funzionano sempre.
+Per lasciare la coppia a GitPoulpi, liberala nella configurazione del terminale,
+poi riavvia il terminale (o ricarica la sua configurazione):
+
+- kitty, in `kitty.conf` (un `map` senza azione rimuove l'assegnazione
+  predefinita; con `--when-focus-on` più un criterio di finestra come
+  `title:...` kitty può rimuoverla solo mentre ha il focus una finestra
+  corrispondente, vedi la documentazione dei mapping di kitty):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, in `wezterm.lua`:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, nel suo file di configurazione:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, in `settings.json` (`"id": null` rimuove l'assegnazione predefinita):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (I vecchi file di impostazioni elencano `nextTab` / `prevTab` sotto `actions`
+  con questi tasti: rimuovi lì quei tasti.)
+
+Il terminale perde poi il proprio cambio scheda con `Ctrl+Tab`. Un terminale che
+può inviare il tasto solo tramite il protocollo tastiera kitty ha bisogno che sia
+attivo (lo è di base, vedi [Scorciatoie da tastiera](keybindings.md#tasti-che-il-terminale-non-può-inviare-e-il-protocollo-tastiera-kitty)).
+
 **Non ricordo una scorciatoia.** Premi `Ctrl+P` e scrivi ciò che vuoi; ogni
 risultato mostra la sua scorciatoia. `?` elenca tutto.
 

@@ -109,8 +109,8 @@ fn install_then_uninstall_round_trip() {
     );
     assert_eq!(
         std::fs::read_link(bin.join("gp")).unwrap(),
-        prefix.join("gitpoulpi-tui"),
-        "the alias starts the TUI"
+        prefix.join("gitpoulpi"),
+        "the alias starts gitpoulpi (the TUI is its default)"
     );
     let rc_text = std::fs::read_to_string(&rc).unwrap();
     assert!(rc_text.starts_with("export KEEP=1\n"));

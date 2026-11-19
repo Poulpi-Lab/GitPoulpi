@@ -15,6 +15,30 @@ pub const BINARIES: [&str; 5] = [
     "gitpoulpi-updater",
 ];
 
+/// Program names a release no longer ships (without the platform suffix).
+/// Empty for now: the archive still carries every name of [`BINARIES`].
+/// When a name moves here, the updater deletes its file and its `.old` copy
+/// after a successful swap, `gitpoulpi uninstall` removes it, and a restart
+/// that was recorded against it (see the updater's relaunch mapping) starts
+/// `gitpoulpi` instead. Never add a name here in the same release that
+/// removes it from the archive: an old updater would leave a stale copy.
+pub const RETIRED: [&str; 0] = [];
+
+/// Whether `stem` (a program name without suffix, any case) is in `retired`.
+pub fn is_retired_in(retired: &[&str], stem: &str) -> bool {
+    retired.iter().any(|r| r.eq_ignore_ascii_case(stem))
+}
+
+/// The file names of `retired` for `target` (with the platform suffix).
+pub fn retired_names_in(retired: &[&str], target: &str) -> Vec<String> {
+    retired.iter().map(|b| exe_name(b, target)).collect()
+}
+
+/// The file names of [`RETIRED`] for `target`.
+pub fn retired_names(target: &str) -> Vec<String> {
+    retired_names_in(&RETIRED, target)
+}
+
 /// The file `xtask dist` writes next to the binaries inside a release
 /// archive. A running build may replace itself (the self-updater of
 /// the updates-and-install design, slice B) only when this

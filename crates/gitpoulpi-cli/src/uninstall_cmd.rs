@@ -100,13 +100,20 @@ fn uninstall(keep_files: bool) -> Result<Value, String> {
 }
 
 /// The files of a release install in `dir`: every shipped binary and the
-/// marker, plus the updater's `.old`, `.new` and `.swap` leftovers.
+/// marker and every retired program, plus the updater's `.old`, `.new` and `.swap` leftovers.
 fn owned_files(dir: &Path) -> Vec<PathBuf> {
+    owned_files_with(dir, &release::RETIRED)
+}
+
+/// [`owned_files`] with an explicit retired list (a retired program's files
+/// are removed too).
+fn owned_files_with(dir: &Path, retired: &[&str]) -> Vec<PathBuf> {
     let target = release::host_target();
     let mut names: Vec<String> = release::BINARIES
         .iter()
         .map(|b| release::exe_name(b, &target))
         .collect();
+    names.extend(release::retired_names_in(retired, &target));
     names.push(MARKER_FILE.to_string());
     let mut files = Vec::new();
     for name in &names {
@@ -152,4 +159,29 @@ fn human(v: &Value) -> String {
             String::new()
         }
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_retired_program_is_part_of_what_uninstall_removes() {
+        let dir = Path::new("/gp");
+        let target = release::host_target();
+        let retired = release::exe_name("gitpoulpi-old", &target);
+        let has = |files: &[PathBuf], name: &str| {
+            files
+                .iter()
+                .any(|f| f.file_name().is_some_and(|n| n == name))
+        };
+        assert!(!has(&owned_files_with(dir, &[]), &retired));
+        let files = owned_files_with(dir, &["gitpoulpi-old"]);
+        for suffix in ["", ".old", ".new", ".swap"] {
+            assert!(has(&files, &format!("{retired}{suffix}")), "{suffix}");
+        }
+        // Shipped names stay, the marker still goes last.
+        assert!(has(&files, &release::exe_name("gitpoulpi", &target)));
+        assert_eq!(files.last().unwrap().file_name().unwrap(), MARKER_FILE);
+    }
 }

@@ -307,5 +307,26 @@ pub fn cleanup(fs: &dyn FileOps, dir: &Path, all: &[String]) -> Cleanup {
     out
 }
 
+/// Deletes the files of programs a release retired (`names`, with the
+/// platform suffix) with their `.old`, `.new` and `.swap` copies: after a
+/// successful swap nothing starts them any more. Missing files are fine.
+pub fn cleanup_retired(fs: &dyn FileOps, dir: &Path, names: &[String]) -> Cleanup {
+    let mut out = Cleanup::default();
+    for name in names {
+        for suffix in ["", OLD, TMP, ".new"] {
+            let path = with(dir, name, suffix);
+            if !fs.exists(&path) {
+                continue;
+            }
+            let label = format!("{name}{suffix}");
+            match fs.remove_file(&path) {
+                Ok(()) => out.removed.push(label),
+                Err(_) => out.kept.push(label),
+            }
+        }
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests;

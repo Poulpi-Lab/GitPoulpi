@@ -122,6 +122,7 @@ struct World {
     policy: FakePolicy,
     own_exe: PathBuf,
     signer: TestSigner,
+    retired: &'static [&'static str],
 }
 
 impl World {
@@ -152,6 +153,7 @@ impl World {
             },
             own_exe: fx.updates.join("bin").join(fx.exe("gitpoulpi-updater")),
             signer: TestSigner::new(),
+            retired: &[],
             log,
         }
     }
@@ -174,6 +176,7 @@ impl World {
             own_exe: self.own_exe.clone(),
             own_pid: 77,
             echo: false,
+            retired: self.retired,
         }
     }
 
@@ -844,6 +847,62 @@ fn unix_replaces_the_process_and_windows_goes_through_the_launcher() {
         (unix.program, unix.args),
         (j.relaunch.exe.clone(), j.relaunch.args.clone())
     );
+}
+
+#[test]
+fn a_missing_or_retired_relaunch_exe_restarts_gitpoulpi() {
+    let fx = fx(Some(InstallChannel::Archive));
+    let mut w = World::new(&fx);
+    let j = job(&fx, Action::Apply, JobElevation::None);
+    let new = fx.install.join(fx.exe("gitpoulpi"));
+
+    // Recorded exe present and not retired: kept.
+    let kept = flow::relaunch_plan(&w.env(), &j);
+    assert_eq!(kept.program, fx.install.join(fx.exe("gitpoulpi-tui")));
+
+    // Retired name: gitpoulpi, same arguments.
+    w.retired = &["gitpoulpi-tui"];
+    let plan = flow::relaunch_plan(&w.env(), &j);
+    assert_eq!(plan.program, new);
+    assert_eq!(plan.args, j.relaunch.args);
+    assert!(plan.replace_process || release::is_windows(&fx.target));
+
+    // Missing file (a user who skipped versions): gitpoulpi as well.
+    w.retired = &[];
+    std::fs::remove_file(fx.install.join(fx.exe("gitpoulpi-tui"))).unwrap();
+    assert_eq!(flow::relaunch_plan(&w.env(), &j).program, new);
+
+    // Windows goes through the launcher with the mapped target.
+    let mut env = w.env();
+    env.host_target = "x86_64-pc-windows-msvc".into();
+    std::fs::write(fx.install.join("gitpoulpi-launch.exe"), b"").unwrap();
+    let win = flow::relaunch_plan(&env, &j);
+    assert_eq!(
+        win.args[2],
+        env.exe_in(&fx.install, "gitpoulpi").to_string_lossy()
+    );
+}
+
+#[test]
+fn a_swap_deletes_the_retired_files_and_their_old_copies() {
+    let fx = fx(Some(InstallChannel::Archive));
+    let mut w = World::new(&fx);
+    w.retired = &["gitpoulpi-mcp"];
+    let name = fx.exe("gitpoulpi-mcp");
+    for suffix in [".swap", ".new"] {
+        std::fs::write(fx.install.join(format!("{name}{suffix}")), b"x").unwrap();
+    }
+    let out = run(&fx, &w, &job(&fx, Action::Apply, JobElevation::None));
+    assert_eq!(out.code(), 0, "{out:?}");
+    for suffix in ["", ".old", ".swap", ".new"] {
+        assert!(
+            !fx.install.join(format!("{name}{suffix}")).exists(),
+            "{name}{suffix} should be gone"
+        );
+    }
+    // What is still shipped stays.
+    assert!(fx.install.join(fx.exe("gitpoulpi")).exists());
+    assert!(fx.install.join(fx.exe("gitpoulpi-tui")).exists());
 }
 
 // --- the command line -------------------------------------------------------------

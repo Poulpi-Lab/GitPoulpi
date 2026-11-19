@@ -59,7 +59,10 @@ impl Env {
                 std::path::Path::new("."),
             )
         };
-        let exe = std::env::current_exe().unwrap_or_default();
+        // The one `gitpoulpi` executable, also when a `gitpoulpi-tui` stub (or
+        // the cargo test bin) is what runs: shortcuts never name the stub.
+        let exe =
+            gitpoulpi_config::desktop::alias::tui_exe(&std::env::current_exe().unwrap_or_default());
         let newest = gitpoulpi_config::dev_mode::launcher_newest_on_disk(&exe);
         Env {
             os,

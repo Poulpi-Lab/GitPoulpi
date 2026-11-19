@@ -29,9 +29,10 @@ const REQUESTER_WAIT: Duration = Duration::from_secs(10);
 /// which opens the user's terminal) starts it detached.
 pub fn relaunch_plan(env: &Env, job: &UpdateJob) -> LaunchPlan {
     let r = &job.relaunch;
+    let exe = relaunch_exe(env, job);
     if !release::is_windows(&env.host_target) {
         return LaunchPlan {
-            program: r.exe.clone(),
+            program: exe,
             args: r.args.clone(),
             cwd: r.cwd.clone(),
             replace_process: true,
@@ -42,7 +43,7 @@ pub fn relaunch_plan(env: &Env, job: &UpdateJob) -> LaunchPlan {
         let mut args = vec![
             "--new-window".to_string(),
             "--".to_string(),
-            r.exe.to_string_lossy().into_owned(),
+            exe.to_string_lossy().into_owned(),
         ];
         args.extend(r.args.iter().cloned());
         LaunchPlan {
@@ -53,11 +54,27 @@ pub fn relaunch_plan(env: &Env, job: &UpdateJob) -> LaunchPlan {
         }
     } else {
         LaunchPlan {
-            program: r.exe.clone(),
+            program: exe,
             args: r.args.clone(),
             cwd: r.cwd.clone(),
             replace_process: false,
         }
+    }
+}
+
+/// The program that starts again: the recorded one, unless it is gone or a
+/// name the new release retired (a user who skipped versions recorded a
+/// program that no longer exists), then `gitpoulpi` in the install folder.
+/// The arguments carry over: `gitpoulpi` with no subcommand is the TUI.
+fn relaunch_exe(env: &Env, job: &UpdateJob) -> PathBuf {
+    let recorded = &job.relaunch.exe;
+    let retired = recorded
+        .file_stem()
+        .is_some_and(|s| release::is_retired_in(env.retired, &s.to_string_lossy()));
+    if retired || !env.fs.exists(recorded) {
+        env.exe_in(&job.install_dir, "gitpoulpi")
+    } else {
+        recorded.clone()
     }
 }
 

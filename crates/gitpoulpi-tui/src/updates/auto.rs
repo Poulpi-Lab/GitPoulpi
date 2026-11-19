@@ -282,7 +282,12 @@ pub(super) fn cleanup_now(fs: &dyn FileOps) {
         return;
     };
     let names = managed_names(&updatable.marker.target);
-    let done = install::cleanup(fs, &updatable.dir, &names);
+    let mut done = install::cleanup(fs, &updatable.dir, &names);
+    // Programs this release retired: no longer started by anything.
+    let retired = release::retired_names(&updatable.marker.target);
+    let gone = install::cleanup_retired(fs, &updatable.dir, &retired);
+    done.removed.extend(gone.removed);
+    done.kept.extend(gone.kept);
     if !done.removed.is_empty() {
         tracing::info!(target: "updates", "removed the previous version's files: {:?}", done.removed);
     }

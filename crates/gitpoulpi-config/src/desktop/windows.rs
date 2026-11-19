@@ -368,6 +368,16 @@ fn names_launch(bytes: &[u8], req: &Request) -> bool {
     })
 }
 
+/// Does `bytes` name the retired `gitpoulpi-tui` spelling of the exe? Such a
+/// shortcut still works (the stub) but is stale: it is rewritten to name
+/// `gitpoulpi`.
+fn names_legacy_exe(bytes: &[u8], req: &Request) -> bool {
+    exe_spellings(req.exe, req.newest)
+        .iter()
+        .filter_map(|e| super::alias::legacy_tui_exe(Path::new(e)))
+        .any(|l| contains_text(bytes, &l.to_string_lossy()))
+}
+
 fn exe_spellings(exe: &Path, newest: bool) -> Vec<String> {
     if newest {
         crate::dev_mode::build_variants(exe)
@@ -404,6 +414,7 @@ pub(super) fn status(place: Place, dirs: &Dirs, req: &Request) -> Status {
     // every click and groups under the terminal, so it must read `Outdated`.
     let current = inner(req).is_ok_and(|(program, _)| {
         names_exe(&bytes, req)
+            && !names_legacy_exe(&bytes, req)
             && (req.terminal == "console" || contains_text(&bytes, &program))
             && contains_text(&bytes, terminals::LAUNCHER_FLAG)
             && names_launch(&bytes, req)
@@ -489,10 +500,17 @@ pub(super) fn install(place: Place, dirs: &Dirs, req: &Request) -> Result<PathBu
 /// our marker (the description survives the copy) or the path of our exe (the
 /// target, or the argument of a terminal's command line). Sorted.
 pub(super) fn pinned_ours(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
-    let exes: Vec<String> = exe_spellings(req.exe, req.newest)
+    let mut exes: Vec<String> = exe_spellings(req.exe, req.newest)
         .into_iter()
         .filter(|e| !e.is_empty())
         .collect();
+    // A pin an older release wrote names `gitpoulpi-tui`: still ours.
+    let legacy: Vec<String> = exes
+        .iter()
+        .filter_map(|e| super::alias::legacy_tui_exe(Path::new(e)))
+        .map(|p| p.to_string_lossy().into_owned())
+        .collect();
+    exes.extend(legacy);
     let mut found: Vec<PathBuf> = pinned_lnks(dirs)
         .into_iter()
         .filter(|p| {
@@ -624,7 +642,9 @@ pub(super) fn pinned_stale(dirs: &Dirs, req: &Request) -> Vec<(PathBuf, bool)> {
             let flag = contains_text(&bytes, terminals::LAUNCHER_FLAG);
             let launch = names_launch(&bytes, req);
             let current = if owned {
-                flag && launch && contains_text(&bytes, terminals::AUMID)
+                flag && launch
+                    && !names_legacy_exe(&bytes, req)
+                    && contains_text(&bytes, terminals::AUMID)
             } else {
                 flag
             };
@@ -1176,6 +1196,52 @@ otepad.exe",
                 "{term}"
             );
         }
+    }
+
+    #[test]
+    fn a_shortcut_or_pin_naming_the_retired_tui_is_outdated_and_rewritten() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dirs = pinned_dirs(tmp.path());
+        dirs.start_menu = Some(tmp.path().join("Programs"));
+        std::fs::create_dir_all(dirs.start_menu.as_ref().unwrap()).unwrap();
+        let pins = dirs.taskbar_pinned.clone().unwrap();
+        std::fs::create_dir_all(&pins).unwrap();
+        let exe = PathBuf::from(r"C:\gp\gitpoulpi.exe");
+        let old = r"C:\gp\gitpoulpi-tui.exe";
+        let icons = IconSet::default();
+        let r = req(&exe, "console", &icons);
+        // Everything else current: flag, AUMID, marker; only the target is old.
+        let text = |target: &str| {
+            utf16(&format!(
+                "{target} --launcher {} GitPoulpi {MARKER}",
+                terminals::AUMID
+            ))
+        };
+        let lnk = dirs.start_menu.as_ref().unwrap().join(FILE);
+        std::fs::write(&lnk, text(&exe.to_string_lossy())).unwrap();
+        assert_eq!(status(Place::StartMenu, &dirs, &r).state, State::Installed);
+        std::fs::write(&lnk, text(old)).unwrap();
+        assert_eq!(status(Place::StartMenu, &dirs, &r).state, State::Outdated);
+        // Pins: found by the old path alone, stale while they name it.
+        std::fs::write(pins.join("old.lnk"), text(old)).unwrap();
+        std::fs::write(pins.join("new.lnk"), text(&exe.to_string_lossy())).unwrap();
+        std::fs::write(pins.join("user.lnk"), utf16(&format!("wt.exe {old}"))).unwrap();
+        let ours: Vec<_> = pinned_ours(&dirs, &r)
+            .iter()
+            .map(|p| p.file_name().unwrap().to_string_lossy().to_string())
+            .collect();
+        assert_eq!(ours, ["new.lnk", "old.lnk", "user.lnk"]);
+        let stale: Vec<_> = pinned_stale(&dirs, &r)
+            .into_iter()
+            .map(|(p, owned)| (p.file_name().unwrap().to_string_lossy().to_string(), owned))
+            .collect();
+        assert_eq!(
+            stale,
+            [
+                ("old.lnk".to_string(), true),
+                ("user.lnk".to_string(), false)
+            ]
+        );
     }
 
     #[test]

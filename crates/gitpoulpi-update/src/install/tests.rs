@@ -432,3 +432,24 @@ fn staging_from_an_archive_into_a_folder_round_trips() {
     let wrong = stage_from_archive_into(&fs, &dir, &bytes, "0.3.0", LINUX);
     assert!(wrong.is_err());
 }
+
+#[test]
+fn cleanup_retired_removes_a_retired_program_with_its_copies_and_nothing_else() {
+    let (fs, dir, names) = install(LINUX, false, "0.1.0", "0.2.0");
+    apply(&fs, &dir, &names, Replace::Atomic, "gitpoulpi").unwrap();
+    // gitpoulpi-mcp now has a live file and an .old copy.
+    assert!(fs.text(&dir.join("gitpoulpi-mcp")).is_some());
+    assert!(fs.text(&dir.join("gitpoulpi-mcp.old")).is_some());
+    let retired = gitpoulpi_config::release::retired_names_in(&["gitpoulpi-mcp"], LINUX);
+    let done = cleanup_retired(&fs, &dir, &retired);
+    assert_eq!(done.removed, ["gitpoulpi-mcp", "gitpoulpi-mcp.old"]);
+    assert!(fs.text(&dir.join("gitpoulpi-mcp")).is_none());
+    assert!(fs.text(&dir.join("gitpoulpi-mcp.old")).is_none());
+    assert!(fs.text(&dir.join("gitpoulpi")).is_some(), "not retired");
+    assert_eq!(cleanup_retired(&fs, &dir, &retired), Cleanup::default());
+    // The shipped list is empty today: nothing is touched.
+    assert_eq!(
+        cleanup_retired(&fs, &dir, &gitpoulpi_config::release::retired_names(LINUX)),
+        Cleanup::default()
+    );
+}

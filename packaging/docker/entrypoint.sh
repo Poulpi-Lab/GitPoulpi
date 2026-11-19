@@ -10,4 +10,4 @@ if [ "${GITPOULPI_SAFE_DIRECTORY:-}" = "*" ]; then
     git config --global --add safe.directory '*' || echo "entrypoint: could not set safe.directory" >&2
 fi
 
-exec tini -- gitpoulpi-tui "$@"
+exec tini -- gitpoulpi "$@"

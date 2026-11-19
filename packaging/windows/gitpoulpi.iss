@@ -52,7 +52,7 @@ Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
 UninstallDisplayName=GitPoulpi
-UninstallDisplayIcon={app}\gitpoulpi-tui.exe
+UninstallDisplayIcon={app}\gitpoulpi.exe
 OutputDir={#OutputDir}
 OutputBaseFilename=gitpoulpi-{#AppVersion}-x86_64-pc-windows-msvc-setup
 

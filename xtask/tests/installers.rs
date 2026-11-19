@@ -699,7 +699,8 @@ fn the_dockerfile_copies_the_binaries_writes_the_channel_and_declares_the_volume
     }
     let entrypoint = read("packaging/docker/entrypoint.sh");
     assert!(entrypoint.contains("GITPOULPI_SAFE_DIRECTORY"));
-    assert!(entrypoint.contains("exec tini -- gitpoulpi-tui"));
+    assert!(entrypoint.contains("exec tini -- gitpoulpi \"$@\""));
+    assert!(!entrypoint.contains("gitpoulpi-tui"));
     // The context the workflow builds is the one the Dockerfile expects.
     let yml = read(".github/workflows/release.yml");
     assert!(yml.contains("docker-ctx/dist/$1"));
@@ -897,4 +898,29 @@ fn the_build_uploads_only_the_deliverables() {
     );
     assert!(yml.contains("target/dist/gitpoulpi*.*"));
     assert!(yml.contains("!target/dist/*.wixpdb"));
+}
+
+#[test]
+fn no_installer_entry_point_starts_gitpoulpi_tui() {
+    // The files still ship (compat), but nothing that starts the UI goes through the shim.
+    let iss = read("packaging/windows/gitpoulpi.iss");
+    assert!(iss.contains("UninstallDisplayIcon={app}\\gitpoulpi.exe"));
+    for line in iss.lines() {
+        if line.starts_with("Filename:") || line.starts_with("UninstallDisplayIcon") {
+            assert!(!line.contains("gitpoulpi-tui"), "{line}");
+        }
+    }
+    let scoop = read("packaging/scoop/gitpoulpi.json");
+    let shortcuts = scoop.split("\"shortcuts\"").nth(1).unwrap();
+    assert!(!shortcuts
+        .split(']')
+        .next()
+        .unwrap()
+        .contains("gitpoulpi-tui"));
+    let docker = read("packaging/docker/Dockerfile");
+    for line in docker.lines() {
+        assert!(!line.contains("ENTRYPOINT") || !line.contains("gitpoulpi-tui"));
+    }
+    assert!(!read("packaging/docker/entrypoint.sh").contains("gitpoulpi-tui"));
+    assert!(!read("packaging/install.sh").contains("exec gitpoulpi-tui"));
 }

@@ -12,10 +12,10 @@ Suivez [Installation](installation.md). Ouvrez ensuite un terminal dans un
 dépôt Git et lancez :
 
 ```
-gitpoulpi-tui
+gitpoulpi
 ```
 
-`gitpoulpi` sans sous-commande fait la même chose. GitPoulpi ouvre le dépôt qui
+GitPoulpi ouvre le dépôt qui
 contient le dossier courant. En dehors d'un dépôt, il ouvre l'onglet
 **Accueil**, où vous pouvez parcourir, cloner ou initialiser un dépôt (voir
 l'[étape 7](#7-ouvrir-cloner-et-initialiser-des-dépôts)).

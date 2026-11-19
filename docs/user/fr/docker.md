@@ -2,7 +2,7 @@
 
 # Exécuter dans Docker
 
-L'image `poulpilab/gitpoulpi` contient les binaires officiels des versions (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) sur `debian:bookworm-slim`, avec `git`, `git-lfs`, `openssh-client`, `less` et `tini`. Elle fonctionne sur `linux/amd64` et `linux/arm64`. Elle est sur Docker Hub.
+L'image `poulpilab/gitpoulpi` contient les binaires officiels des versions (`gitpoulpi`, plus les relais `gitpoulpi-tui` et `gitpoulpi-mcp`) sur `debian:bookworm-slim`, avec `git`, `git-lfs`, `openssh-client`, `less` et `tini`. Elle fonctionne sur `linux/amd64` et `linux/arm64`. Elle est sur Docker Hub.
 
 ## Lancer l'interface
 
@@ -81,10 +81,10 @@ Le point d'entrée démarre l'interface. Les autres programmes sont accessibles 
 docker run --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi status
 
 # le serveur MCP, sur l'entrée et la sortie standard, pour un agent qui le lance
-docker run -i --rm --entrypoint gitpoulpi-mcp -v "$PWD":/work poulpilab/gitpoulpi
+docker run -i --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi mcp serve
 ```
 
-Chaque `docker run` est son propre conteneur avec son propre démon GitPoulpi d'arrière-plan : les changements faits par la CLI n'apparaissent donc pas en direct dans une interface lancée dans un autre conteneur. Pour piloter une interface depuis la CLI, lancez les deux dans le même conteneur : démarrez l'interface avec `--name gp` et utilisez `docker exec gp gitpoulpi ...`. Pour un agent, enregistrez `docker run -i --rm --entrypoint gitpoulpi-mcp ...` comme commande du serveur MCP, voir [MCP et agents](mcp-and-agents.md) ; les options de permissions MCP du `config.toml` monté s'appliquent comme d'habitude.
+Chaque `docker run` est son propre conteneur avec son propre démon GitPoulpi d'arrière-plan : les changements faits par la CLI n'apparaissent donc pas en direct dans une interface lancée dans un autre conteneur. Pour piloter une interface depuis la CLI, lancez les deux dans le même conteneur : démarrez l'interface avec `--name gp` et utilisez `docker exec gp gitpoulpi ...`. Pour un agent, enregistrez `docker run -i --rm --entrypoint gitpoulpi ... mcp serve` comme commande du serveur MCP, voir [MCP et agents](mcp-and-agents.md) ; les options de permissions MCP du `config.toml` monté s'appliquent comme d'habitude.
 
 ## Étiquettes et mise à jour
 

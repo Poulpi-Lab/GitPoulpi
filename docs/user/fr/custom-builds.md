@@ -26,7 +26,7 @@ différence avec `target/dist/` quand ce build existe. Il écrit aussi
 | Couleurs du logo | La pieuvre en pixels de la fenêtre À propos existe en 20 coloris (`--list-logo-colors`). Choisissez ceux à compiler (au moins un), celui par défaut (À propos l'affiche en premier ; c'est aussi la valeur de repli d'un `ui.logo_color` enregistré qui n'est pas compilé ; il doit faire partie des coloris compilés ; défaut officiel : lavande) et la couleur de l'icône de l'exécutable Windows (n'importe quel coloris, défaut : celui du logo par défaut). Avec un seul coloris, le logo tourne toujours au clic mais garde cette couleur, et la liste des couleurs (`c`, clic droit) n'est pas proposée. |
 | Intégrations (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine) | Sans aucune : clonage par URL uniquement ; pas de tickets, pas de pull/merge requests. |
 | IA | Pas de boutons ni de commandes IA, pas d'outils `ai` en CLI/MCP. |
-| MCP | Pas de binaire `gitpoulpi-mcp` ni de commande `gitpoulpi mcp`. Les commandes d'agent `ui` restent. |
+| MCP | Pas de relais `gitpoulpi-mcp` ni de commande `gitpoulpi mcp`. Les commandes d'agent `ui` restent. |
 | LFS, Worktree, Sous-modules | Les écrans et commandes de gestion correspondants disparaissent ; une réponse typée « not built into this binary » est renvoyée. |
 | Téléchargement des avatars | Seulement des pastilles d'initiales, aucun accès réseau. |
 | Aperçu des images | Les fichiers image affichent l'avis binaire simple ; **Éditer avec** fonctionne toujours. |
@@ -97,14 +97,13 @@ Les choix de logo sont les variables d'environnement
 `GITPOULPI_LOGO_COLORS` (`all` ou une liste de slugs séparés par des
 virgules), `GITPOULPI_LOGO_DEFAULT` et `GITPOULPI_ICON_COLOR`, lues par les
 scripts de build de `gitpoulpi-tui` (il filtre `crates/gitpoulpi-logo-build/colourways.json`
-pour produire le tableau qu'embarque la fenêtre À propos) et des trois crates
-binaires (l'icône). La source des couleurs reste
+pour produire le tableau qu'embarque la fenêtre À propos) et de `gitpoulpi-cli` (l'icône). La source des couleurs reste
 `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Icône de l'exécutable Windows
 
-Quand la cible est Windows, les exécutables `gitpoulpi`, `gitpoulpi-tui` et
-`gitpoulpi-mcp` reçoivent la pieuvre comme icône, générée à la compilation
+Quand la cible est Windows, l'exécutable `gitpoulpi`
+reçoit la pieuvre comme icône, générée à la compilation
 (sans Python ni ImageMagick) dans la couleur d'icône choisie, en tailles de 16
 à 128 px. Elle est embarquée avec la crate `winresource` et demande le
 compilateur de ressources de la plateforme (`rc.exe` du SDK Windows avec MSVC,
@@ -140,32 +139,32 @@ Quand une sélection enregistrée existe, le mode interactif propose d'abord «�
 
 ## Ce que ça économise
 
-Mesuré sous Linux le 2026-10-29 au commit `65999ef5c`, à partir du build complet, écart par rapport à celui-ci entre parenthèses
-(détails dans `docs/developer/binary-size.md`) :
+Mesuré sous Linux le 2026-10-29 au commit `65999ef5c`, taille de `gitpoulpi` (le programme entier : interface, CLI et serveur MCP) à partir du build complet, écart par rapport à celui-ci entre parenthèses
+(détails dans `docs/developer/binary-size.md`). Les relais `gitpoulpi-tui`, `gitpoulpi-mcp` et `gitpoulpi-launch` font bien moins de 1 Mio, quels que soient vos choix :
 
-| Build (à partir de `full` sauf indication) | `gitpoulpi` (Mio) | `gitpoulpi-tui` (Mio) | `gitpoulpi-mcp` (Mio) |
-|---|---|---|---|
-| Complet (tout activé) | 64.6 | 50.5 | 31.7 |
-| Anglais seulement | 52.0 (-12.6) | 40.2 (-10.3) | 31.7 (0.0) |
-| MCP désactivé | 61.6 (-3.0) | 49.6 (-0.8) | non compilé |
-| IA désactivée | 62.6 (-2.0) | 48.6 (-1.8) | 30.5 (-1.3) |
-| Toutes les intégrations désactivées | 56.3 (-8.2) | 43.7 (-6.7) | 26.7 (-5.0) |
-| IA + intégrations + téléchargement des avatars désactivés | 52.2 (-12.3) | 39.9 (-10.6) | 23.0 (-8.8) |
-| Atelier de réécriture de l'historique désactivé (`--no-history-rewrite`) | 61.6 (-3.0) | 48.9 (-1.5) | 28.5 (-3.2) |
-| Scripts de réécriture désactivés | 63.1 (-1.5) | 49.0 (-1.5) | 31.1 (-0.7) |
-| Recherche globale désactivée | 63.5 (-1.1) | 49.5 (-1.0) | 31.6 (-0.1) |
-| Espaces de travail désactivés | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.2) |
-| Radar désactivé | 63.4 (-1.2) | 49.3 (-1.2) | 31.7 (0.0) |
-| Board désactivé | 63.6 (-1.0) | 49.5 (-1.0) | 31.7 (0.0) |
-| Review désactivé | 63.2 (-1.4) | 49.0 (-1.4) | 31.7 (0.0) |
-| Mermaid désactivé | 63.6 (-1.0) | 49.5 (-0.9) | 31.6 (-0.1) |
-| LFS désactivé | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.3) |
-| Worktree désactivé | 63.7 (-0.9) | 49.6 (-0.8) | 31.7 (0.0) |
-| Sous-modules désactivés | 63.7 (-0.9) | 49.6 (-0.9) | 31.6 (-0.1) |
-| Téléchargement des avatars désactivé | 63.7 (-0.9) | 49.6 (-0.9) | 31.7 (0.0) |
-| Aperçu des images désactivé | 63.3 (-1.2) | 49.2 (-1.3) | 31.7 (0.0) |
-| Tout désactivé, anglais seulement (LFS conservé) | 35.2 (-29.4) | 28.9 (-21.5) | non compilé |
-| **Tout désactivé, anglais seulement** | **34.9 (-29.7)** | **28.8 (-21.6)** | non compilé |
+| Build (à partir de `full` sauf indication) | `gitpoulpi` (Mio) |
+|---|---|
+| Complet (tout activé) | 64.6 |
+| Anglais seulement | 52.0 (-12.6) |
+| MCP désactivé | 61.6 (-3.0) |
+| IA désactivée | 62.6 (-2.0) |
+| Toutes les intégrations désactivées | 56.3 (-8.2) |
+| IA + intégrations + téléchargement des avatars désactivés | 52.2 (-12.3) |
+| Atelier de réécriture de l'historique désactivé (`--no-history-rewrite`) | 61.6 (-3.0) |
+| Scripts de réécriture désactivés | 63.1 (-1.5) |
+| Recherche globale désactivée | 63.5 (-1.1) |
+| Espaces de travail désactivés | 63.5 (-1.1) |
+| Radar désactivé | 63.4 (-1.2) |
+| Board désactivé | 63.6 (-1.0) |
+| Review désactivé | 63.2 (-1.4) |
+| Mermaid désactivé | 63.6 (-1.0) |
+| LFS désactivé | 63.5 (-1.1) |
+| Worktree désactivé | 63.7 (-0.9) |
+| Sous-modules désactivés | 63.7 (-0.9) |
+| Téléchargement des avatars désactivé | 63.7 (-0.9) |
+| Aperçu des images désactivé | 63.3 (-1.2) |
+| Tout désactivé, anglais seulement (LFS conservé) | 35.2 (-29.4) |
+| **Tout désactivé, anglais seulement** | **34.9 (-29.7)** |
 
 ## Notes
 

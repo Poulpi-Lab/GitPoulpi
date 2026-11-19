@@ -46,7 +46,7 @@ vollständig in Rust neu geschrieben: native Binärdateien, sparsam bei Speicher
 
 | | |
 |---|---|
-| ![Der Log-Graph mit dem Design Material und aktivierter Zeilenfärbung](../../docs/user/images/theme-material.png) **Der Commit-Graph**, hier im Design Material mit Zeilenfärbung. | ![Ein Diff einer geänderten Datei mit den Schaltflächen Hunk stagen und Hunk verwerfen an jedem Hunk](../../docs/user/images/diff.png) **Der Diff**, mit Stagen und Verwerfen pro Hunk oder pro Zeile. |
+| ![Der Log-Graph mit der Spurpalette Material und Zeilentönung](../../docs/user/images/theme-material.png) **Der Commit-Graph**, hier mit der Spurpalette Material und Zeilentönung. | ![Ein Diff einer geänderten Datei mit den Schaltflächen Hunk stagen und Hunk verwerfen an jedem Hunk](../../docs/user/images/diff.png) **Der Diff**, mit Stagen und Verwerfen pro Hunk oder pro Zeile. |
 | ![Die Befehlspalette, gefiltert nach dem Wort stash](../../docs/user/images/palette.png) **Die Befehlspalette** (`Ctrl+P`) erreicht jeden Befehl. | ![Der Commit-Composer schlägt vier Commits für die Änderungen vor, bereit zur Prüfung](../../docs/user/images/composer.png) **Der Commit-Composer** lässt von der KI vorgeschlagene Commits prüfen, bevor etwas committet wird. |
 | ![Das Rechtsklick-Menü eines Commits mit den Aktionen Cherry-Pick, Revert, Reset, Rebase, Branch und Tag](../../docs/user/images/context-menu.png) **Rechtsklick** auf alles zeigt seine Aktionen. | ![Die KI-Seite der Einstellungen mit Profilen, Anweisungen pro Aktion und dem Schalter zum Aktivieren](../../docs/user/images/settings-ai.png) **Die Einstellungen**, mit Suche, einschließlich der optionalen KI-Seite. |
 

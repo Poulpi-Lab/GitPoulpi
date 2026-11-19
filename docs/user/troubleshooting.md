@@ -82,6 +82,53 @@ Linux and macOS terminals; `Ctrl+Shift+N` looks like `Ctrl+N`). Use the
 alternatives (`Ctrl+N` then `,` opens the Settings; `Ctrl+P` reaches every
 command), or rebind the chord: see [Settings](settings.md#keyboard--mouse).
 
+**`Ctrl+Tab` does not switch tabs.** kitty, WezTerm, Ghostty and Windows
+Terminal keep `Ctrl+Tab` and `Ctrl+Shift+Tab` for their own tabs, so the key
+never reaches GitPoulpi. `Ctrl+PageDown` / `Ctrl+PageUp` always work. To give
+the pair to GitPoulpi, free it in the terminal's config, then restart the
+terminal (or reload its config):
+
+- kitty, in `kitty.conf` (a `map` with no action unmaps the default; with
+  `--when-focus-on` plus a window criterion such as `title:...` kitty can
+  unmap it only while a matching window has focus, see kitty's mapping docs):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, in `wezterm.lua`:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, in its config file:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, in `settings.json` (`"id": null` unbinds the default):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (Older settings files list `nextTab` / `prevTab` under `actions` with these
+  keys: remove those keys there.)
+
+The terminal then loses its own `Ctrl+Tab` tab switching. A terminal that can
+send the key only through the kitty keyboard protocol needs it on (the
+default, see [Keybindings](keybindings.md#keys-the-terminal-cannot-send-and-the-kitty-keyboard-protocol)).
+
 **I do not remember a shortcut.** Press `Ctrl+P` and type what you want; each
 result shows its shortcut. `?` lists everything.
 

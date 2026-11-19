@@ -52,34 +52,82 @@ Fler bilder, med förklaringar, finns i [användardokumentationen](../../docs/us
 
 Du behöver en `git` i systemet; `git-lfs` är valfritt.
 
-- **Med ett installationsprogram:** en `...-setup.exe` för Windows eller `install.sh` för Linux och macOS (per användare, utan root), bifogad varje utgåva. Ett bygge som installerats från ett utgåvearkiv kan också uppdatera sig självt från versionsmärket i statusraden.
-- **Från ett releasearkiv:** packa upp det och följ `INSTALL.txt` i det.
-- **Från källkod:**
+### Linux och macOS (`install.sh`)
 
-  ```
-  git clone https://github.com/Poulpi-Lab/GitPoulpi.git
-  cd GitPoulpi
-  cargo build --release
-  ```
+```
+curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
+```
 
-  Binärerna hamnar i `target/release/`: `gitpoulpi` (CLI, och gränssnittet när
-  det körs utan underkommando), `gitpoulpi-tui` och `gitpoulpi-mcp`.
-- **Bygg ditt eget releasearkiv:** `cargo run -p xtask -- dist` skapar
-  `target/dist/gitpoulpi-<version>-<target>.zip` (Windows) eller `.tar.gz`, med
-  en `.sha256`-fil.
-- **Mindre binär med bara det du behöver:** `./build-custom.sh` (Windows:
-  `build-custom`) frågar vilka språk, integrationer och funktioner (AI, MCP,
-  LFS, worktrees, submoduler, nedladdning av avatarer) som ska byggas; se
-  [docs/user/sv/custom-builds.md](../../docs/user/sv/custom-builds.md).
+### Homebrew (macOS, Linux)
 
-Alla detaljer, valfria verktyg och anteckningar per OS:
-[docs/user/sv/installation.md](../../docs/user/sv/installation.md).
+```
+brew install Poulpi-Lab/gitpoulpi/gitpoulpi
+```
+
+### apt (Debian, Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+### Scoop (Windows)
+
+```
+scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi
+scoop install gitpoulpi
+```
+
+### Windows-installationsprogram
+
+Ladda ner `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe` från den
+[senaste utgåvan](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest) och
+kör den. För administratörer finns MSI-paketet:
+
+```
+msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn
+```
+
+### Docker
+
+```
+docker pull poulpilab/gitpoulpi
+```
+
+Se [Köra i Docker](../user/sv/docker.md).
+
+### cargo
+
+```
+cargo binstall gitpoulpi-cli          # prebuilt
+cargo install --locked gitpoulpi-cli  # compiles
+```
+
+### Utgåvearkiv
+
+Ladda ner det från den
+[senaste utgåvan](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest),
+packa upp det och följ `INSTALL.txt` i det.
+
+### Från källkod
+
+```
+git clone https://github.com/Poulpi-Lab/GitPoulpi.git
+cd GitPoulpi
+cargo build --release
+```
+
+Ditt eget utgåvearkiv, ett mindre anpassat bygge och anteckningar per OS:
+[docs/user/sv/installation.md](../user/sv/installation.md) och
+[docs/user/sv/custom-builds.md](../user/sv/custom-builds.md).
 
 ## Snabbstart
 
 ```
 cd path/to/your/repository
-gitpoulpi-tui          # or just: gitpoulpi
+gitpoulpi
 ```
 
 - `?` öppnar hjälpen med varje tangent och gest, `Ctrl+P` kommandopaletten,

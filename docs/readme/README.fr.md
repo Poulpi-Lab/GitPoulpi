@@ -47,7 +47,7 @@ réécrit en Rust : des binaires natifs, légers sur le disque et en mémoire, 
 
 | | |
 |---|---|
-| ![Le graphe du Log avec le thème Material et la teinte de ligne activée](../../docs/user/images/theme-material.png) **Le graphe de commits**, ici avec le thème Material et la teinte de ligne. | ![Le diff d’un fichier modifié avec les boutons Stage du hunk et Abandonner le hunk sur chaque hunk](../../docs/user/images/diff.png) **Le diff**, avec stage et abandon par hunk ou par ligne. |
+| ![Le graphe du Log avec la palette de voies Material et la teinte de ligne activée](../../docs/user/images/theme-material.png) **Le graphe de commits**, ici avec la palette de voies Material et la teinte de ligne. | ![Le diff d’un fichier modifié avec les boutons Stage du hunk et Abandonner le hunk sur chaque hunk](../../docs/user/images/diff.png) **Le diff**, avec stage et abandon par hunk ou par ligne. |
 | ![La palette de commandes filtrée sur le mot stash](../../docs/user/images/palette.png) **La palette de commandes** (`Ctrl+P`) atteint chaque commande. | ![Le compositeur de commits proposant quatre commits pour les modifications locales, prêts à être relus](../../docs/user/images/composer.png) **Le compositeur de commits** fait relire les commits proposés par l’IA avant que quoi que ce soit soit commité. |
 | ![Le menu clic droit d’un commit avec les actions cherry-pick, revert, reset, rebase, branche et tag](../../docs/user/images/context-menu.png) **Clic droit** sur n’importe quoi pour ses actions. | ![La page IA des Préférences avec les profils, les instructions par action et l’interrupteur d’activation](../../docs/user/images/settings-ai.png) **Les Préférences**, avec recherche, y compris la page IA facultative. |
 

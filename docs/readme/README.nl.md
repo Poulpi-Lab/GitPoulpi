@@ -55,34 +55,83 @@ Meer afbeeldingen, met uitleg, staan in de [gebruikersdocumentatie](../../docs/u
 
 Je hebt een `git` op je systeem nodig; `git-lfs` is optioneel.
 
-- **Met een installatieprogramma:** een `...-setup.exe` voor Windows of `install.sh` voor Linux en macOS (per gebruiker, zonder root), bij elke release gevoegd. Een build die uit een release-archief is geïnstalleerd kan zichzelf ook bijwerken via de versiechip in de statusbalk.
-- **Vanuit een releasearchief:** pak het uit en volg `INSTALL.txt` erin.
-- **Vanuit de broncode:**
+### Linux en macOS (`install.sh`)
 
-  ```
-  git clone https://github.com/Poulpi-Lab/GitPoulpi.git
-  cd GitPoulpi
-  cargo build --release
-  ```
+```
+curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
+```
 
-  De binaries komen in `target/release/`: `gitpoulpi` (CLI, en de UI als je het
-  zonder subcommando start), `gitpoulpi-tui` en `gitpoulpi-mcp`.
-- **Je eigen releasearchief bouwen:** `cargo run -p xtask -- dist` maakt
-  `target/dist/gitpoulpi-<version>-<target>.zip` (Windows) of `.tar.gz`, met een
-  `.sha256`-bestand.
-- **Kleinere binary met alleen wat je nodig hebt:** `./build-custom.sh`
-  (Windows: `build-custom`) vraagt welke talen, integraties en functies (AI,
-  MCP, LFS, worktrees, submodules, avatar-download) je wilt bouwen; zie
-  [docs/user/nl/custom-builds.md](../../docs/user/nl/custom-builds.md).
+### Homebrew (macOS, Linux)
 
-Alle details, optionele tools en opmerkingen per besturingssysteem:
-[docs/user/nl/installation.md](../../docs/user/nl/installation.md).
+```
+brew install Poulpi-Lab/gitpoulpi/gitpoulpi
+```
+
+### apt (Debian, Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+### Scoop (Windows)
+
+```
+scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi
+scoop install gitpoulpi
+```
+
+### Windows-installatieprogramma
+
+Download `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe` van de
+[nieuwste release](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest) en
+voer het uit. Voor beheerders is er de MSI:
+
+```
+msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn
+```
+
+### Docker
+
+```
+docker pull poulpilab/gitpoulpi
+```
+
+Zie [Draaien in Docker](../user/nl/docker.md).
+
+### cargo
+
+```
+cargo binstall gitpoulpi-cli          # prebuilt
+cargo install --locked gitpoulpi-cli  # compiles
+```
+
+### Releasearchief
+
+Download het van de
+[nieuwste release](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest),
+pak het uit en volg `INSTALL.txt` erin.
+
+### Vanuit de broncode
+
+```
+git clone https://github.com/Poulpi-Lab/GitPoulpi.git
+cd GitPoulpi
+cargo build --release
+```
+
+Je eigen releasearchief, een kleinere aangepaste build en opmerkingen per
+besturingssysteem:
+[docs/user/nl/installation.md](../user/nl/installation.md) en
+[docs/user/nl/custom-builds.md](../user/nl/custom-builds.md).
 
 ## Snel starten
 
 ```
 cd path/to/your/repository
-gitpoulpi-tui          # or just: gitpoulpi
+gitpoulpi
 ```
 
 - `?` opent de help met elke toets en elk gebaar, `Ctrl+P` het opdrachtenpalet,

@@ -86,6 +86,55 @@ as alternativas (`Ctrl+N` e depois `,` abre as Definições; `Ctrl+P` chega a to
 os comandos), ou reatribua a combinação: veja
 [Definições](settings.md#teclado-e-rato).
 
+**`Ctrl+Tab` não muda de separador.** O kitty, o WezTerm, o Ghostty e o Windows
+Terminal ficam com `Ctrl+Tab` e `Ctrl+Shift+Tab` para os seus próprios
+separadores, pelo que a tecla nunca chega ao GitPoulpi. `Ctrl+PageDown` /
+`Ctrl+PageUp` funcionam sempre. Para entregar o par ao GitPoulpi, liberte-o na
+configuração do terminal e reinicie o terminal (ou recarregue a configuração):
+
+- kitty, em `kitty.conf` (um `map` sem ação remove a predefinição; com
+  `--when-focus-on` e um critério de janela como `title:...`, o kitty pode
+  removê-la só enquanto uma janela correspondente tem o foco, veja a
+  documentação de mapeamentos do kitty):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, em `wezterm.lua`:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, no seu ficheiro de configuração:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, em `settings.json` (`"id": null` remove a associação predefinida):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (Os ficheiros de definições mais antigos listam `nextTab` / `prevTab` em
+  `actions` com estas teclas: remova essas teclas aí.)
+
+O terminal deixa então de ter a sua própria mudança de separador com `Ctrl+Tab`.
+Um terminal que só consegue enviar a tecla através do protocolo de teclado do
+kitty precisa de o ter ligado (é a predefinição, veja
+[Atalhos de teclado](keybindings.md#teclas-que-o-terminal-não-consegue-enviar-e-o-protocolo-de-teclado-do-kitty)).
+
 **Não me lembro de um atalho.** Prima `Ctrl+P` e escreva o que quer; cada
 resultado mostra o seu atalho. `?` lista tudo.
 

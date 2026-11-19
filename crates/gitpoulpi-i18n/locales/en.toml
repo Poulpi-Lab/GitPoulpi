@@ -3520,6 +3520,7 @@ taken_tmux = "tmux (default prefix)"
 taken_screen = "GNU screen (default prefix)"
 taken_zellij = "zellij (its mode keys, unless locked)"
 taken_windows_terminal = "Windows Terminal"
+taken_terminal_tabs = "terminal tab switching (kitty, WezTerm, Ghostty, Windows Terminal)"
 # context: {reason} is one of the fixed_* messages
 chord_reason = "{chord}: {reason}"
 no_modifier_after_prefix = "{chord}: the key after a prefix cannot carry Ctrl or Alt"

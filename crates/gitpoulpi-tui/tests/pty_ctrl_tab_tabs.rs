@@ -47,6 +47,9 @@ fn ctrl_tab_and_ctrl_shift_tab_switch_tabs() {
         .no_exit_pause()
         .ready("sub-one-only")
         .mouse_capture()
+        // Answers the `CSI ? u` query like kitty does, so the app pushes
+        // the disambiguate flag: the path a real kitty-protocol terminal takes.
+        .kitty_answers()
         .spawn();
     // Ctrl+Tab (CSI u, modifiers 5): the next tab.
     term.send_text("\x1b[9;5u").unwrap();

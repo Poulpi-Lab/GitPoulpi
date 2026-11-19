@@ -2,15 +2,9 @@
 
 # インストール
 
-GitPoulpi には 3 つの実行ファイルがあります。
+GitPoulpi は 1 つのプログラム `gitpoulpi` です。サブコマンドなしで実行するとターミナル UI が開き、サブコマンドを付けるとコマンドラインインターフェース（スクリプト向けの `--json`）になります。`gitpoulpi mcp serve` は AI エージェント向けの MCP サーバーです（[MCP とエージェント](mcp-and-agents.md)を参照）。アーカイブには、これと並んで `gitpoulpi-updater` が入っています。これはインストールを更新する、独立した小さなプログラムです（[更新](updates.md)を参照）。
 
-| 実行ファイル | 内容 |
-|---|---|
-| `gitpoulpi-tui` | ターミナル UI。 |
-| `gitpoulpi` | コマンドラインインターフェース（スクリプト向けの `--json`）。サブコマンドなしで実行すると UI が開きます。 |
-| `gitpoulpi-mcp` | AI エージェント向けの MCP サーバー。[MCP とエージェント](mcp-and-agents.md)を参照してください。 |
-
-アーカイブには、これらに加えて `gitpoulpi-launch` が入っています。これはショートカットが、すでに開いている GitPoulpi のウィンドウを表示するために実行する小さなプログラムです（`gitpoulpi launch`）。Windows ではコンソールウィンドウを持たないため、クリックしても一瞬表示されることはありません。ほかのファイルと一緒にインストール、更新、削除されます。
+互換性のために、アーカイブには `gitpoulpi` を起動するだけの小さな中継プログラムが 3 つ入っています。`gitpoulpi-tui`（UI を開きます。今後のリリースで削除されます）、`gitpoulpi-mcp`（MCP サーバーを起動します。1.x の間は残るので、既存のエージェント設定はそのまま動きます）、`gitpoulpi-launch`（ショートカットが、すでに開いている GitPoulpi のウィンドウを表示するために実行するもので、`gitpoulpi launch` です。Windows ではコンソールウィンドウを持たないため、クリックしても一瞬表示されることはありません）です。すべてまとめてインストール、更新、削除されます。
 
 ## 必要なもの
 
@@ -33,7 +27,8 @@ GitPoulpi には 3 つの実行ファイルがあります。
 
 リリースアーカイブは `gitpoulpi-<version>-<target>.zip`（Windows）または
 `.tar.gz`（Linux、macOS）で、隣に `.sha256` ファイルがあります。
-アーカイブを `.sha256` ファイルで確認し、展開して、3 つの実行ファイルを
+アーカイブを `.sha256` ファイルで確認し、展開して、その実行ファイル
+（`gitpoulpi`、`gitpoulpi-updater`、中継プログラムの `gitpoulpi-tui`、`gitpoulpi-mcp`、`gitpoulpi-launch`）を
 `PATH` 上のフォルダーに置いてください（`gitpoulpi-updater` と `.gitpoulpi-dist`
 マーカーはその隣に残してください。マーカーには `channel=archive` と書かれていて、
 これによりビルドが自己更新できます。[更新](updates.md)を参照）。
@@ -89,7 +84,7 @@ gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoul
 curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
 ```
 
-OS と CPU に合ったアーカイブを選び、`.sha256` を確認して、`~/.local/opt/gitpoulpi` にインストールし（チャンネルは `archive`：GitPoulpi はその場で自己更新します）、`gitpoulpi` と `gitpoulpi-mcp` を `~/.local/bin` にリンクします。root 権限は不要で、ホームの外には何も触れません。`--yes` を付けない場合は、エイリアス（既定は `gp`）、PATH、ショートカットについて尋ねます。
+OS と CPU に合ったアーカイブを選び、`.sha256` を確認して、`~/.local/opt/gitpoulpi` にインストールし（チャンネルは `archive`：GitPoulpi はその場で自己更新します）、`gitpoulpi` と `gitpoulpi-mcp`（中継プログラム）を `~/.local/bin` にリンクします。root 権限は不要で、ホームの外には何も触れません。`--yes` を付けない場合は、エイリアス（既定は `gp`）、PATH、ショートカットについて尋ねます。
 
 | フラグ | 効果 |
 |---|---|
@@ -116,7 +111,7 @@ OS と CPU に合ったアーカイブを選び、`.sha256` を確認して、`~
 | **apt**（Debian、Ubuntu） | [apt リポジトリ](#aptdebian-と-ubuntu)を参照 | 署名付きのリポジトリ。すべてのリリースに `.deb` も添付されています。 |
 | **MSI**（Windows、管理対象） | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | 管理者向け：全ユーザー、アプリ内更新なし。[エンタープライズ配布](enterprise-distribution.md#intune-またはグループポリシーでの-msi)を参照。 |
 | **cargo** | `cargo binstall gitpoulpi-cli` | コンパイルせず、リリースアーカイブをダウンロードします。 |
-| **cargo（crates.io から）** | `cargo install --locked gitpoulpi-cli` | コンパイルします。Rust ツールチェーンが必要です。`gitpoulpi` をインストールし、サブコマンドなしで実行すると端末 UI が開き、MCP（`gitpoulpi mcp`）も提供します。`gitpoulpi-tui` と `gitpoulpi-mcp` は、同じプログラムを単独のクレートにしたものです。 |
+| **cargo（crates.io から）** | `cargo install --locked gitpoulpi-cli` | コンパイルします。Rust ツールチェーンが必要です。`gitpoulpi` をインストールし、サブコマンドなしで実行すると端末 UI が開き、MCP（`gitpoulpi mcp`）も提供します。 |
 | **cargo（ソースから）** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | コンパイルします。Rust ツールチェーンが必要です。 |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | [Docker で実行する](docker.md)を参照。同じイメージは `ghcr.io/poulpi-lab/gitpoulpi` にもあります。 |
 
@@ -153,8 +148,8 @@ cargo build --release
 cargo build --profile dist
 ```
 
-リポジトリのルートにある `build-opti` スクリプトは、3 つの実行ファイルに対してこのビルドを実行し、
-そのサイズを表示します。
+リポジトリのルートにある `build-opti` スクリプトは、このビルドを実行し、
+実行ファイルのサイズを表示します。
 
 ```
 ./build-opti.sh                  # Linux, macOS
@@ -172,7 +167,7 @@ cargo run -p xtask -- dist
 
 これは `dist` プロファイルをビルドし、
 `target/dist/gitpoulpi-<version>-<target>.zip`（Windows）または `.tar.gz`（その他の
-システム）を書き出します。アーカイブには 3 つの実行ファイル、`INSTALL.txt`、
+システム）を書き出します。アーカイブには実行ファイル、`INSTALL.txt`、
 `README.md`、`LICENSE`、`CHANGELOG.md` が入ります。`.sha256` ファイルが
 その隣に書き出されます。
 
@@ -197,7 +192,7 @@ gitpoulpi
 
 ## アンインストール
 
-`gitpoulpi uninstall`（どちらのインストーラーも実行します）は、GitPoulpi が作成したコマンドのエイリアス、PATH のエントリ、ショートカット、ファイルマネージャーのメニューのエントリ（Windows ではその App Paths キーも）を削除し、リリース版のインストールではプログラムファイルも削除します。`.gitpoulpi-dist` マーカーのないビルド（cargo のビルド）では実行を拒否し、`--keep-files` を付けるとプログラムファイルは残します。MCP エージェントからは使えません。インストーラーを使っていない場合は、3 つの実行ファイルを削除してください。GitPoulpi は次のファイルも保持しています。
+`gitpoulpi uninstall`（どちらのインストーラーも実行します）は、GitPoulpi が作成したコマンドのエイリアス、PATH のエントリ、ショートカット、ファイルマネージャーのメニューのエントリ（Windows ではその App Paths キーも）を削除し、リリース版のインストールではプログラムファイルも削除します。`.gitpoulpi-dist` マーカーのないビルド（cargo のビルド）では実行を拒否し、`--keep-files` を付けるとプログラムファイルは残します。MCP エージェントからは使えません。インストーラーを使っていない場合は、実行ファイルを削除してください。GitPoulpi は次のファイルも保持しています。
 
 | 内容 | 場所 |
 |---|---|

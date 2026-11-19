@@ -8,7 +8,7 @@ AI エージェント（Claude Code、Cursor、Codex など）は、**MCP サー
 
 ## クイックセットアップ
 
-1. `gitpoulpi` と `gitpoulpi-mcp` を `PATH` に置きます（[インストール](installation.md)）。
+1. `gitpoulpi` を `PATH` に置きます（[インストール](installation.md)）。サーバーは `gitpoulpi mcp serve` です。アーカイブ内の中継プログラム `gitpoulpi-mcp` も別名としてそのまま使えるので、これを指定している既存のエージェント設定も動き続けます。
 2. エージェントにサーバーを登録します。標準入出力（stdio）で通信するため、起動するものも、ポートもありません。
 3. 必要に応じて、`config.toml` の `[mcp]` テーブル（後述）で、エージェントに許可することを選びます。既定では、エージェントはリポジトリを読み取れ（`allow_mutations = true` を設定するまで変更は拒否されます）、ユーザーへの表示は確認後にのみ行われ、ダイアログが入力済みになることはありません。
 
@@ -42,13 +42,13 @@ claude mcp add gitpoulpi -- gitpoulpi mcp serve --stdio
 |---|---|---|
 | Cursor、Windsurf、Claude Desktop、VS Code | クライアントの MCP JSON ファイル | 上記の `mcpServers` ブロック（VS Code ではキー名が `servers`） |
 | OpenAI Codex CLI | `~/.codex/config.toml` | `[mcp_servers.gitpoulpi]`、`command = "gitpoulpi"`、`args = ["mcp", "serve", "--stdio"]` |
-| その他 | そのドキュメント | コマンド `gitpoulpi-mcp`（単体のバイナリ。同じサーバーで、引数は不要） |
+| その他 | そのドキュメント | コマンド `gitpoulpi mcp serve`（既定は stdio。すでに `gitpoulpi-mcp` を使っている設定向けに、`gitpoulpi-mcp` も同じサーバーです） |
 
 **HTTP 経由**（URL に接続するクライアント向け）：
 
 ```
-gitpoulpi-mcp --http                         # [mcp] bind, default http://127.0.0.1:8808/mcp
-gitpoulpi mcp serve --http 127.0.0.1:9000
+gitpoulpi mcp serve --http                   # [mcp] bind, default http://127.0.0.1:8808/mcp
+gitpoulpi mcp serve --http 127.0.0.1:9000    # or: --bind 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
@@ -88,7 +88,7 @@ claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
 
 | スイッチ | 既定値 | 効果 |
 |---|---|---|
-| `[mcp] enabled` | `true` | `false`：`gitpoulpi mcp serve` / `gitpoulpi-mcp` は起動を拒否します（設定 > エージェントと MCP > *MCP サーバー*）。サーバーの起動時に読み込まれ、起動中のサーバーは設定をそのまま保ちます。 |
+| `[mcp] enabled` | `true` | `false`：`gitpoulpi mcp serve`（とその別名 `gitpoulpi-mcp`）は起動を拒否します（設定 > エージェントと MCP > *MCP サーバー*）。サーバーの起動時に読み込まれ、起動中のサーバーは設定をそのまま保ちます。 |
 | `[mcp] bind` | `"127.0.0.1:8808"` | アドレスが指定されないときに `--http` が使うアドレス（`--allow-remote` がなければループバックのみ。`--allow-remote` には認証と暗号化が必要です。上記を参照）。設定 > エージェントと MCP > *MCP サーバーのポート*でポートを編集でき、ホストは維持されます。 |
 | `[mcp] http_auth` | `true` | `--http` には `Authorization: Bearer <token>`（`gitpoulpi mcp token`）が必要です。設定 > エージェントと MCP > *HTTP 認証*。 |
 | `[mcp] tls`、`tls_cert`、`tls_key` | `"off"` | `off`、`self_signed`、`files`（PEM のパス）：サーバー自身が TLS を終端します。設定 > エージェントと MCP > *TLS*。 |

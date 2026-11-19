@@ -26,7 +26,7 @@ GitPoulpi には、クリック、ドラッグ、右クリックができる本�
   複数の commit の cherry-pick、fast-forward、worktree とパッチの作成ができます。
 - **ホスティングとイシュートラッカーを内蔵。** pull request と merge request（GitHub、GitLab、Gitea、Forgejo、Azure DevOps、Bitbucket）の閲覧、チェックアウト、作成と、Gerrit の change のレビューができます。Issue、ワークアイテム、カード（Jira、Trello、Linear、YouTrack、Redmine、ローカルの Markdown ノートも）の閲覧と作成ができ、カンバンボードでも扱えます。アカウントからのクローンと SSH 鍵の管理もできます。
 - **エージェント向けの CLI と MCP。** `gitpoulpi <command> --json` は UI のすべての操作をカバーし、
-  `gitpoulpi-mcp` はそれを MCP ツールとして提供します。リポジトリごとに 1 つのバックグラウンド
+  `gitpoulpi mcp serve` はそれを MCP ツールとして提供します。リポジトリごとに 1 つのバックグラウンド
   デーモンが、すべてのフロントエンドをライブに同期した状態に保ちます。
 - **AI は任意で、必須ではありません。** 既定ではオフで、アカウントも不要です。自分の API キーか、
   `claude -p` のようなローカルのエージェント CLI を使います。commit メッセージの生成、変更の説明、
@@ -137,7 +137,7 @@ gitpoulpi
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 AI は任意で、既定ではオフです。GitPoulpi 自身の AI は *設定 > AI* でオンにします

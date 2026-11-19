@@ -55,34 +55,81 @@ Açıklamalı daha fazla görsel [kullanıcı belgelerinde](../../docs/user/tr/R
 
 Sistemde bir `git` gerekir; `git-lfs` isteğe bağlıdır.
 
-- **Bir yükleyiciyle:** Windows için bir `...-setup.exe` veya Linux ve macOS için `install.sh` (kullanıcı başına, root gerekmez); her sürüme eklenir. Bir sürüm arşivinden kurulan derleme, durum çubuğundaki sürüm rozetinden kendini de güncelleyebilir.
-- **Bir sürüm arşivinden:** arşivi açın ve içindeki `INSTALL.txt` dosyasını izleyin.
-- **Kaynaktan:**
+### Linux ve macOS (`install.sh`)
 
-  ```
-  git clone https://github.com/Poulpi-Lab/GitPoulpi.git
-  cd GitPoulpi
-  cargo build --release
-  ```
+```
+curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
+```
 
-  İkili dosyalar `target/release/` içine yerleşir: `gitpoulpi` (CLI; alt komut
-  verilmeden çalıştırıldığında arayüz), `gitpoulpi-tui` ve `gitpoulpi-mcp`.
-- **Kendi sürüm arşivinizi oluşturun:** `cargo run -p xtask -- dist`,
-  `target/dist/gitpoulpi-<sürüm>-<hedef>.zip` (Windows) veya `.tar.gz` dosyasını
-  bir `.sha256` dosyasıyla birlikte üretir.
-- **Yalnızca ihtiyacınız olanı içeren daha küçük bir ikili:** `./build-custom.sh`
-  (Windows: `build-custom`) hangi dillerin, entegrasyonların ve özelliklerin (YZ,
-  MCP, LFS, worktree'ler, alt modüller, avatar indirme) derleneceğini sorar;
-  bkz. [docs/user/tr/custom-builds.md](../../docs/user/tr/custom-builds.md).
+### Homebrew (macOS, Linux)
 
-Tüm ayrıntılar, isteğe bağlı araçlar ve işletim sistemine göre notlar:
-[docs/user/tr/installation.md](../../docs/user/tr/installation.md).
+```
+brew install Poulpi-Lab/gitpoulpi/gitpoulpi
+```
+
+### apt (Debian, Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+### Scoop (Windows)
+
+```
+scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi
+scoop install gitpoulpi
+```
+
+### Windows yükleyicisi
+
+`gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe` dosyasını
+[son sürümden](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest) indirin
+ve çalıştırın. Yöneticiler için MSI:
+
+```
+msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn
+```
+
+### Docker
+
+```
+docker pull poulpilab/gitpoulpi
+```
+
+Bkz. [Docker'da çalıştırma](../user/tr/docker.md).
+
+### cargo
+
+```
+cargo binstall gitpoulpi-cli          # prebuilt
+cargo install --locked gitpoulpi-cli  # compiles
+```
+
+### Sürüm arşivi
+
+[Son sürümden](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest)
+indirin, açın ve içindeki `INSTALL.txt` dosyasını izleyin.
+
+### Kaynaktan
+
+```
+git clone https://github.com/Poulpi-Lab/GitPoulpi.git
+cd GitPoulpi
+cargo build --release
+```
+
+Kendi sürüm arşivinizi oluşturma, daha küçük bir özel derleme ve işletim sistemine göre notlar:
+[docs/user/tr/installation.md](../user/tr/installation.md) ve
+[docs/user/tr/custom-builds.md](../user/tr/custom-builds.md).
 
 ## Hızlı başlangıç
 
 ```
 cd path/to/your/repository
-gitpoulpi-tui          # or just: gitpoulpi
+gitpoulpi
 ```
 
 - `?` her tuş ve hareketi içeren yardımı, `Ctrl+P` komut paletini, `Ctrl+,`

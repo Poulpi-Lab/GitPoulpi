@@ -54,34 +54,80 @@ Altre immagini, con spiegazioni, sono nella [documentazione utente](../../docs/u
 
 Serve un `git` di sistema; `git-lfs` è facoltativo.
 
-- **Con un installer:** un `...-setup.exe` per Windows o `install.sh` per Linux e macOS (per utente, senza root), allegato a ogni release. Una build installata da un archivio di release può anche aggiornarsi da sola dal chip della versione nella barra di stato.
-- **Da un archivio di release:** decomprimilo e segui `INSTALL.txt` al suo interno.
-- **Dai sorgenti:**
+### Linux e macOS (`install.sh`)
 
-  ```
-  git clone https://github.com/Poulpi-Lab/GitPoulpi.git
-  cd GitPoulpi
-  cargo build --release
-  ```
+```
+curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
+```
 
-  I binari finiscono in `target/release/`: `gitpoulpi` (la CLI, e la UI se
-  eseguito senza sottocomando), `gitpoulpi-tui` e `gitpoulpi-mcp`.
-- **Crea il tuo archivio di release:** `cargo run -p xtask -- dist` produce
-  `target/dist/gitpoulpi-<version>-<target>.zip` (Windows) o `.tar.gz`, con un
-  file `.sha256`.
-- **Un binario più piccolo con solo ciò che serve:** `./build-custom.sh`
-  (Windows: `build-custom`) chiede quali lingue, integrazioni e funzioni (IA,
-  MCP, LFS, worktree, sottomoduli, download degli avatar) compilare; vedi
-  [docs/user/it/custom-builds.md](../../docs/user/it/custom-builds.md).
+### Homebrew (macOS, Linux)
 
-Tutti i dettagli, gli strumenti facoltativi e le note per sistema operativo:
-[docs/user/it/installation.md](../../docs/user/it/installation.md).
+```
+brew install Poulpi-Lab/gitpoulpi/gitpoulpi
+```
+
+### apt (Debian, Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+### Scoop (Windows)
+
+```
+scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi
+scoop install gitpoulpi
+```
+
+### Installer per Windows
+
+Scarica `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe` dall'[ultima release](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest) ed
+eseguilo. Per gli amministratori, l'MSI:
+
+```
+msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn
+```
+
+### Docker
+
+```
+docker pull poulpilab/gitpoulpi
+```
+
+Vedi [Esecuzione in Docker](../user/it/docker.md).
+
+### cargo
+
+```
+cargo binstall gitpoulpi-cli          # prebuilt
+cargo install --locked gitpoulpi-cli  # compiles
+```
+
+### Archivio di release
+
+Scaricalo dall'[ultima release](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest),
+decomprimilo e segui `INSTALL.txt` al suo interno.
+
+### Dai sorgenti
+
+```
+git clone https://github.com/Poulpi-Lab/GitPoulpi.git
+cd GitPoulpi
+cargo build --release
+```
+
+Il tuo archivio di release, una build personalizzata più piccola e le note per sistema operativo:
+[docs/user/it/installation.md](../user/it/installation.md) e
+[docs/user/it/custom-builds.md](../user/it/custom-builds.md).
 
 ## Avvio rapido
 
 ```
 cd path/to/your/repository
-gitpoulpi-tui          # or just: gitpoulpi
+gitpoulpi
 ```
 
 - `?` apre l’aiuto con ogni tasto e gesto, `Ctrl+P` la palette dei comandi,

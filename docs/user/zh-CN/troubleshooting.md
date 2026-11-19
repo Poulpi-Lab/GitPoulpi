@@ -69,6 +69,44 @@ GitPoulpi 会捕获鼠标，以便点击能到达它。要用终端自身选择�
 
 **某个快捷键不起作用。** 你的终端、tmux 或 AutoHotkey 脚本可能在 GitPoulpi 看到按键之前就把它截走了（在 Linux 和 macOS 终端中，`Ctrl+,` 经常只会作为普通的 `,` 到达；`Ctrl+Shift+N` 看起来像 `Ctrl+N`）。请使用替代方式（`Ctrl+N` 然后按 `,` 打开设置；`Ctrl+P` 可到达每一条命令），或者重新绑定该组合键：参见[设置](settings.md#键盘与鼠标)。
 
+**`Ctrl+Tab` 无法切换标签页。** kitty、WezTerm、Ghostty 和 Windows Terminal 把 `Ctrl+Tab` 和 `Ctrl+Shift+Tab` 留给自己的标签页，所以这个按键根本到不了 GitPoulpi。`Ctrl+PageDown` / `Ctrl+PageUp` 始终可用。若想把这一对按键交给 GitPoulpi，请在终端的配置中释放它们，然后重启终端（或重新加载其配置）：
+
+- kitty，在 `kitty.conf` 中（不带动作的 `map` 会取消默认映射；配合 `--when-focus-on` 和 `title:...` 之类的窗口条件，kitty 可以只在匹配的窗口获得焦点时取消映射，参见 kitty 的映射文档）：
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm，在 `wezterm.lua` 中：
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty，在其配置文件中：
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal，在 `settings.json` 中（`"id": null` 会取消默认绑定）：
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  （较旧的设置文件会在 `actions` 下列出带有这些按键的 `nextTab` / `prevTab`：请在那里删掉这些按键。）
+
+此后终端自己的 `Ctrl+Tab` 标签页切换就不再可用。只能通过 kitty 键盘协议发送该按键的终端需要开启它（默认即开启，参见[键盘快捷键](keybindings.md#终端无法发送的按键以及-kitty-键盘协议)）。
+
 **我不记得某个快捷键。** 按 `Ctrl+P` 并输入你想要的内容；每个结果都会显示它的快捷键。`?` 会列出全部。
 
 **设置中的某个选项是灰色的。** 它依赖于另一个选项。该行会说明是哪一个（例如，*行着色强度*需要把*图泳道背景*设为*行着色*）。

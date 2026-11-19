@@ -26,7 +26,7 @@ script mostra o tamanho de cada binário e a diferença em relação a
 | Cores do logo | O polvo em pixels da janela Sobre vem em 20 combinações de cores (`--list-logo-colors`). Escolha as que serão compiladas (pelo menos uma), a padrão (o Sobre mostra essa primeiro; é também a que um `ui.logo_color` guardado que não esteja compilado usa como alternativa; deve ser uma das compiladas; padrão oficial: lavender) e a cor do ícone do executável do Windows (qualquer combinação, padrão: a padrão do logo). Com uma única combinação o logo ainda gira ao clicar mas continua daquela cor, e a lista de cores (`c`, botão direito) não é oferecida. |
 | Integrações (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine) | Sem nenhuma: só clone por URL; sem issues, sem pull/merge requests. |
 | IA | Sem botões nem comandos de IA, nem ferramentas `ai` na CLI/MCP. |
-| MCP | Sem o binário `gitpoulpi-mcp` e sem o comando `gitpoulpi mcp`. Os comandos de agente `ui` continuam. |
+| MCP | Sem o relay `gitpoulpi-mcp` e sem o comando `gitpoulpi mcp`. Os comandos de agente `ui` continuam. |
 | LFS, Worktree, Submódulos | As telas de gerenciamento e os comandos correspondentes somem; é devolvida uma resposta tipada “not built into this binary”. |
 | Download de avatares | Só emblemas com iniciais, sem buscar nada na rede. |
 | Pré-visualização de imagens | Os arquivos de imagem mostram o aviso binário simples; **Editar em** continua funcionando. |
@@ -96,14 +96,13 @@ preferir. `gitpoulpi
 As escolhas do logo são as variáveis de ambiente `GITPOULPI_LOGO_COLORS`
 (`all` ou uma lista de slugs separados por vírgula), `GITPOULPI_LOGO_DEFAULT` e
 `GITPOULPI_ICON_COLOR`, lidas pelos build scripts do `gitpoulpi-tui` (que filtra
-`crates/gitpoulpi-logo-build/colourways.json` na tabela que a janela Sobre incorpora) e dos três
-crates de binário (o ícone). A fonte das cores continua sendo
+`crates/gitpoulpi-logo-build/colourways.json` na tabela que a janela Sobre incorpora) e do `gitpoulpi-cli` (o ícone). A fonte das cores continua sendo
 `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Ícone do executável do Windows
 
-Quando o alvo é o Windows, os executáveis `gitpoulpi`, `gitpoulpi-tui` e
-`gitpoulpi-mcp` recebem o polvo como ícone, gerado em tempo de compilação (sem
+Quando o alvo é o Windows, o executável `gitpoulpi`
+recebe o polvo como ícone, gerado em tempo de compilação (sem
 precisar de Python nem de ImageMagick) na cor de ícone escolhida, em tamanhos de
 16 a 128 px. Ele é incorporado com o crate `winresource` e precisa do compilador
 de recursos da plataforma (`rc.exe` do Windows SDK no MSVC, `windres` no GNU). Se
@@ -139,32 +138,32 @@ Quando existe uma seleção salva, o modo interativo oferece primeiro "Partir de
 
 ## O que ela economiza
 
-Medido no Linux em 2026-10-29 no commit `65999ef5c`, a partir da compilação completa, com a diferença em relação a ela entre parênteses
-(detalhes em `docs/developer/binary-size.md`):
+Medido no Linux em 2026-10-29 no commit `65999ef5c`, tamanho do `gitpoulpi` (o programa inteiro: interface, CLI e servidor MCP) a partir da compilação completa, com a diferença em relação a ela entre parênteses
+(detalhes em `docs/developer/binary-size.md`). Os relays `gitpoulpi-tui`, `gitpoulpi-mcp` e `gitpoulpi-launch` ficam bem abaixo de 1 MiB, qualquer que seja a escolha:
 
-| Compilação (a partir de `full`, salvo indicação) | `gitpoulpi` (MiB) | `gitpoulpi-tui` (MiB) | `gitpoulpi-mcp` (MiB) |
-|---|---|---|---|
-| Completa (tudo ativado) | 64.6 | 50.5 | 31.7 |
-| Só inglês | 52.0 (-12.6) | 40.2 (-10.3) | 31.7 (0.0) |
-| MCP desativado | 61.6 (-3.0) | 49.6 (-0.8) | não compilado |
-| IA desativada | 62.6 (-2.0) | 48.6 (-1.8) | 30.5 (-1.3) |
-| Todas as integrações desativadas | 56.3 (-8.2) | 43.7 (-6.7) | 26.7 (-5.0) |
-| IA + integrações + download de avatares desativados | 52.2 (-12.3) | 39.9 (-10.6) | 23.0 (-8.8) |
-| Painel do histórico desativado (`--no-history-rewrite`) | 61.6 (-3.0) | 48.9 (-1.5) | 28.5 (-3.2) |
-| Scripts de reescrita desativados | 63.1 (-1.5) | 49.0 (-1.5) | 31.1 (-0.7) |
-| Busca global desativada | 63.5 (-1.1) | 49.5 (-1.0) | 31.6 (-0.1) |
-| Espaços de trabalho desativados | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.2) |
-| Radar desativado | 63.4 (-1.2) | 49.3 (-1.2) | 31.7 (0.0) |
-| Board desativado | 63.6 (-1.0) | 49.5 (-1.0) | 31.7 (0.0) |
-| Review desativado | 63.2 (-1.4) | 49.0 (-1.4) | 31.7 (0.0) |
-| Mermaid desativado | 63.6 (-1.0) | 49.5 (-0.9) | 31.6 (-0.1) |
-| LFS desativado | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.3) |
-| Worktree desativado | 63.7 (-0.9) | 49.6 (-0.8) | 31.7 (0.0) |
-| Submódulos desativados | 63.7 (-0.9) | 49.6 (-0.9) | 31.6 (-0.1) |
-| Download de avatares desativado | 63.7 (-0.9) | 49.6 (-0.9) | 31.7 (0.0) |
-| Pré-visualização de imagens desativada | 63.3 (-1.2) | 49.2 (-1.3) | 31.7 (0.0) |
-| Tudo desativado, só inglês (LFS mantido) | 35.2 (-29.4) | 28.9 (-21.5) | não compilado |
-| **Tudo desativado, só inglês** | **34.9 (-29.7)** | **28.8 (-21.6)** | não compilado |
+| Compilação (a partir de `full`, salvo indicação) | `gitpoulpi` (MiB) |
+|---|---|
+| Completa (tudo ativado) | 64.6 |
+| Só inglês | 52.0 (-12.6) |
+| MCP desativado | 61.6 (-3.0) |
+| IA desativada | 62.6 (-2.0) |
+| Todas as integrações desativadas | 56.3 (-8.2) |
+| IA + integrações + download de avatares desativados | 52.2 (-12.3) |
+| Painel do histórico desativado (`--no-history-rewrite`) | 61.6 (-3.0) |
+| Scripts de reescrita desativados | 63.1 (-1.5) |
+| Busca global desativada | 63.5 (-1.1) |
+| Espaços de trabalho desativados | 63.5 (-1.1) |
+| Radar desativado | 63.4 (-1.2) |
+| Board desativado | 63.6 (-1.0) |
+| Review desativado | 63.2 (-1.4) |
+| Mermaid desativado | 63.6 (-1.0) |
+| LFS desativado | 63.5 (-1.1) |
+| Worktree desativado | 63.7 (-0.9) |
+| Submódulos desativados | 63.7 (-0.9) |
+| Download de avatares desativado | 63.7 (-0.9) |
+| Pré-visualização de imagens desativada | 63.3 (-1.2) |
+| Tudo desativado, só inglês (LFS mantido) | 35.2 (-29.4) |
+| **Tudo desativado, só inglês** | **34.9 (-29.7)** |
 
 ## Notas
 

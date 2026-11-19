@@ -2,7 +2,7 @@
 
 # Executando no Docker
 
-A imagem `poulpilab/gitpoulpi` contém os binários oficiais da release (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) sobre `debian:bookworm-slim`, com `git`, `git-lfs`, `openssh-client`, `less` e `tini`. Ela roda em `linux/amd64` e `linux/arm64`. Está no Docker Hub.
+A imagem `poulpilab/gitpoulpi` contém os binários oficiais da release (`gitpoulpi`, mais os relays `gitpoulpi-tui` e `gitpoulpi-mcp`) sobre `debian:bookworm-slim`, com `git`, `git-lfs`, `openssh-client`, `less` e `tini`. Ela roda em `linux/amd64` e `linux/arm64`. Está no Docker Hub.
 
 ## Iniciar a interface
 
@@ -81,10 +81,10 @@ O ponto de entrada inicia a interface. Os outros programas são alcançáveis su
 docker run --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi status
 
 # o servidor MCP, pela entrada e saída padrão, para um agente que o inicia
-docker run -i --rm --entrypoint gitpoulpi-mcp -v "$PWD":/work poulpilab/gitpoulpi
+docker run -i --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi mcp serve
 ```
 
-Cada `docker run` é um contêiner próprio, com o seu próprio daemon do GitPoulpi em segundo plano, então as mudanças feitas pela CLI não aparecem ao vivo em uma interface rodando em outro contêiner. Para conduzir uma interface pela CLI, execute as duas no mesmo contêiner: inicie a interface com `--name gp` e use `docker exec gp gitpoulpi ...`. Para um agente, registre `docker run -i --rm --entrypoint gitpoulpi-mcp ...` como o comando do servidor MCP, veja [MCP e agentes](mcp-and-agents.md); as chaves de permissão do MCP no `config.toml` montado valem como de costume.
+Cada `docker run` é um contêiner próprio, com o seu próprio daemon do GitPoulpi em segundo plano, então as mudanças feitas pela CLI não aparecem ao vivo em uma interface rodando em outro contêiner. Para conduzir uma interface pela CLI, execute as duas no mesmo contêiner: inicie a interface com `--name gp` e use `docker exec gp gitpoulpi ...`. Para um agente, registre `docker run -i --rm --entrypoint gitpoulpi ... mcp serve` como o comando do servidor MCP, veja [MCP e agentes](mcp-and-agents.md); as chaves de permissão do MCP no `config.toml` montado valem como de costume.
 
 ## Tags e atualização
 

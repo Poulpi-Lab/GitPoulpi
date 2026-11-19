@@ -106,6 +106,7 @@ pub fn main_with(args: &[String]) -> i32 {
         own_exe: std::env::current_exe().unwrap_or_default(),
         own_pid: std::process::id(),
         echo: true,
+        retired: &gitpoulpi_config::release::RETIRED,
     };
     let outcome = match command {
         Command::Run { job } => flow::coordinator(&env, &job),

@@ -14,7 +14,7 @@
 
 use std::path::Path;
 
-use gitpoulpi_config::release::{Marker, MARKER_FILE};
+use gitpoulpi_config::release::{self, Marker, MARKER_FILE};
 use gitpoulpi_hosting::updates::download_host_allowed_with;
 use gitpoulpi_update::channel::{Channel, Hive};
 use gitpoulpi_update::fetch;
@@ -182,6 +182,11 @@ pub fn swap(
                 "{why}; the previous version could not be put back: {e}"
             )),
         };
+    }
+    // The new version runs: what a release retired has no use any more.
+    if forward {
+        let retired = release::retired_names_in(env.retired, &env.host_target);
+        install::cleanup_retired(env.fs, dir, &retired);
     }
     let mut message = format!("Updated to {}", job.to_version);
     if !forward {

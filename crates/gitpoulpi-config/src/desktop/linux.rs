@@ -526,6 +526,22 @@ mod tests {
     }
 
     #[test]
+    fn an_entry_that_runs_the_retired_tui_is_outdated_and_rewritten() {
+        let tmp = tempfile::tempdir().unwrap();
+        let d = dirs(tmp.path());
+        let icons = IconSet::default();
+        let old = PathBuf::from("/opt/gp/gitpoulpi-tui");
+        let new = PathBuf::from("/opt/gp/gitpoulpi");
+        let path = install(Place::Launcher, &d, &req(&old, "kitty", &icons)).unwrap();
+        let r = req(&new, "kitty", &icons);
+        assert_eq!(status(Place::Launcher, &d, &r).state, State::Outdated);
+        install(Place::Launcher, &d, &r).unwrap();
+        assert_eq!(status(Place::Launcher, &d, &r).state, State::Installed);
+        let text = std::fs::read_to_string(path).unwrap();
+        assert!(!text.contains("gitpoulpi-tui"), "{text}");
+    }
+
+    #[test]
     fn a_file_without_our_marker_is_never_overwritten_or_removed() {
         let tmp = tempfile::tempdir().unwrap();
         let d = dirs(tmp.path());

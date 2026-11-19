@@ -39,6 +39,10 @@ pub struct Env<'a> {
     pub own_pid: u32,
     /// Print each status message on the console.
     pub echo: bool,
+    /// Programs the new release no longer ships (production:
+    /// `release::RETIRED`). Their files are deleted after a successful swap,
+    /// and a relaunch recorded against one starts `gitpoulpi` instead.
+    pub retired: &'a [&'a str],
 }
 
 /// Lower-case, forward slashes, no trailing separator.

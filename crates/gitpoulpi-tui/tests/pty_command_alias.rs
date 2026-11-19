@@ -69,7 +69,6 @@ fn create_gp_from_the_palette_then_remove_it_from_the_row() {
         .no_exit_pause();
     // Windows: the alias also owns App Paths `gp.exe`, written when the
     // launcher sits beside the exe. The registry is a file, never the real one.
-    #[cfg(windows)]
     let install = tempfile::tempdir().unwrap();
     #[cfg(windows)]
     let registry = home.path().join("reg.txt");
@@ -84,6 +83,18 @@ fn create_gp_from_the_palette_then_remove_it_from_the_row() {
         builder
             .binary(&exe)
             .env("GITPOULPI_TEST_REGISTRY_FILE", &registry)
+    };
+    // Unix: the TUI runs as a `gitpoulpi-tui` stub beside the real
+    // `gitpoulpi`, which is what the alias must point at.
+    #[cfg(unix)]
+    let builder = {
+        let built = std::path::Path::new(env!("CARGO_BIN_EXE_gitpoulpi-tui"));
+        let exe = install.path().join("gitpoulpi-tui");
+        std::fs::hard_link(built, &exe).unwrap_or_else(|_| {
+            std::fs::copy(built, &exe).unwrap();
+        });
+        std::fs::write(install.path().join("gitpoulpi"), "dummy").unwrap();
+        builder.binary(&exe)
     };
     let mut term = builder.ready(MESSAGE).spawn();
     let link = common::alias_file(home.path(), "gp");
@@ -101,17 +112,21 @@ fn create_gp_from_the_palette_then_remove_it_from_the_row() {
         let target = std::fs::read_link(&link).expect("the alias is a symlink");
         assert_eq!(
             target.file_name().unwrap().to_string_lossy(),
-            "gitpoulpi-tui",
-            "it points at the running TUI: {}",
+            "gitpoulpi",
+            "it points at gitpoulpi, never the retired stub: {}",
             target.display()
         );
+        assert_eq!(target.parent(), Some(install.path()));
         assert!(target.exists(), "{}", target.display());
     }
     #[cfg(windows)]
     {
         let text = std::fs::read_to_string(&link).expect("the alias is a .cmd file");
         assert!(text.contains("REM X-GitPoulpi=1"), "{text}");
-        assert!(text.contains("gitpoulpi-tui"), "it starts the TUI: {text}");
+        assert!(
+            !text.contains("gitpoulpi-tui") && text.contains("gitpoulpi.exe"),
+            "it starts gitpoulpi: {text}"
+        );
         assert!(
             text.contains("set \"GITPOULPI_CMDCMDLINE=%CMDCMDLINE%\""),
             "the shim exports the cmd command line: {text}"

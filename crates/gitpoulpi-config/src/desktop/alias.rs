@@ -57,8 +57,12 @@ impl Kind {
     }
 }
 
-/// The program name a Unix link must point at to count as ours.
-const TUI_STEM: &str = "gitpoulpi-tui";
+/// The program an alias starts: the one executable (the TUI is its default
+/// mode).
+const TUI_STEM: &str = "gitpoulpi";
+/// The retired name aliases used to point at. Such an alias is still ours
+/// (never `Foreign`) but stale: `create` rewrites it to [`TUI_STEM`].
+pub const LEGACY_TUI_STEM: &str = "gitpoulpi-tui";
 /// Every binary of ours starts with it, the TUI included.
 const CLI_STEM: &str = "gitpoulpi";
 
@@ -75,7 +79,7 @@ pub struct Env {
     pub os: Os,
     /// Where aliases are written.
     pub bin_dir: PathBuf,
-    /// The `gitpoulpi-tui` executable an alias starts.
+    /// The `gitpoulpi` executable an alias starts.
     pub exe: PathBuf,
     /// Newest-build mode ([`crate::dev_mode::launcher_newest`]): `create`
     /// points the alias at the newest build of `exe` as of creation (a `.cmd`
@@ -136,7 +140,23 @@ impl Env {
     }
 }
 
-/// The `gitpoulpi-tui` executable next to (or being) `current`.
+/// The retired `gitpoulpi-tui` spelling of `exe` when `exe` is the
+/// `gitpoulpi` executable: what an item written by an older release names.
+pub fn legacy_tui_exe(exe: &Path) -> Option<PathBuf> {
+    // On the text, so a Windows path reads the same on any host.
+    let text = exe.to_string_lossy();
+    let cut = text.rfind(['/', '\\']).map_or(0, |i| i + 1);
+    let (dir, file) = text.split_at(cut);
+    let (stem, ext) = match file.rfind('.') {
+        Some(i) => file.split_at(i),
+        None => (file, ""),
+    };
+    stem.eq_ignore_ascii_case(TUI_STEM)
+        .then(|| PathBuf::from(format!("{dir}{LEGACY_TUI_STEM}{ext}")))
+}
+
+/// The `gitpoulpi` executable next to (or being) `current`. A `gitpoulpi-tui`
+/// or `gitpoulpi-mcp` stub running maps to the real `gitpoulpi` beside it.
 pub fn tui_exe(current: &Path) -> PathBuf {
     let tui = format!("{TUI_STEM}{}", std::env::consts::EXE_SUFFIX);
     if current.file_name().is_some_and(|n| *n == *tui) {
@@ -571,7 +591,7 @@ mod tests {
         Env {
             os,
             bin_dir: root.join("bin"),
-            exe: PathBuf::from("/opt/gp/gitpoulpi-tui"),
+            exe: PathBuf::from("/opt/gp/gitpoulpi"),
             newest: false,
             path_var: None,
             pathext: None,
@@ -593,15 +613,79 @@ mod tests {
     }
 
     #[test]
-    fn the_tui_is_found_next_to_the_cli() {
+    fn aliases_start_gitpoulpi_even_when_a_stub_runs() {
         let tmp = tempfile::tempdir().unwrap();
         let sfx = std::env::consts::EXE_SUFFIX;
         let cli = tmp.path().join(format!("gitpoulpi{sfx}"));
-        let tui = tmp.path().join(format!("gitpoulpi-tui{sfx}"));
-        assert_eq!(tui_exe(&cli), cli, "no sibling: the program itself");
-        std::fs::write(&tui, "").unwrap();
-        assert_eq!(tui_exe(&cli), tui);
-        assert_eq!(tui_exe(&tui), tui);
+        let stub = tmp.path().join(format!("gitpoulpi-tui{sfx}"));
+        assert_eq!(tui_exe(&stub), stub, "no sibling: the program itself");
+        std::fs::write(&cli, "").unwrap();
+        assert_eq!(tui_exe(&cli), cli);
+        assert_eq!(tui_exe(&stub), cli, "the stub maps to the real program");
+        let mcp = tmp.path().join(format!("gitpoulpi-mcp{sfx}"));
+        assert_eq!(tui_exe(&mcp), cli);
+    }
+
+    #[test]
+    fn the_retired_spelling_of_an_exe_is_known() {
+        assert_eq!(
+            legacy_tui_exe(Path::new("/o/gitpoulpi")),
+            Some(PathBuf::from("/o/gitpoulpi-tui"))
+        );
+        assert_eq!(
+            legacy_tui_exe(Path::new("C:/GP/gitpoulpi.exe")),
+            Some(PathBuf::from("C:/GP/gitpoulpi-tui.exe"))
+        );
+        assert_eq!(legacy_tui_exe(Path::new("/o/gitpoulpi-tui")), None);
+        assert_eq!(legacy_tui_exe(Path::new("/o/other")), None);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn an_alias_to_the_retired_tui_is_ours_stale_and_rewritten() {
+        let tmp = tempfile::tempdir().unwrap();
+        let e = Env {
+            exe: PathBuf::from("/opt/gp/gitpoulpi"),
+            ..env(tmp.path(), Os::Linux)
+        };
+        std::fs::create_dir_all(&e.bin_dir).unwrap();
+        let (open, add) = (e.bin_dir.join("gp"), e.bin_dir.join("gpa"));
+        std::os::unix::fs::symlink("/opt/gp/gitpoulpi-tui", &open).unwrap();
+        std::fs::write(
+            &add,
+            format!("#!/bin/sh\n{UNIX_MARKER}\nexec '/opt/gp/gitpoulpi-tui' --add \"$@\"\n"),
+        )
+        .unwrap();
+        assert_eq!(status(&e, "gp").state, State::Outdated, "never Foreign");
+        assert_eq!(
+            status_kind(&e, "gpa", Kind::Add).state,
+            State::Outdated,
+            "never Foreign"
+        );
+        create(&e, "gp").unwrap();
+        create_kind(&e, "gpa", Kind::Add).unwrap();
+        assert_eq!(std::fs::read_link(&open).unwrap(), e.exe);
+        assert_eq!(status(&e, "gp").state, State::Installed);
+        assert_eq!(status_kind(&e, "gpa", Kind::Add).state, State::Installed);
+        assert!(std::fs::read_to_string(&add)
+            .unwrap()
+            .contains("exec '/opt/gp/gitpoulpi' --add"));
+    }
+
+    #[test]
+    fn a_cmd_shim_of_the_retired_tui_is_ours_stale_and_rewritten() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut e = env(tmp.path(), Os::Windows);
+        e.exe = PathBuf::from("C:/GP/gitpoulpi.exe");
+        std::fs::create_dir_all(&e.bin_dir).unwrap();
+        let path = e.bin_dir.join("gp.cmd");
+        std::fs::write(&path, cmd_shim_text(Path::new("C:/GP/gitpoulpi-tui.exe"))).unwrap();
+        assert_eq!(status(&e, "gp").state, State::Outdated, "never Foreign");
+        create(&e, "gp").unwrap();
+        assert_eq!(status(&e, "gp").state, State::Installed);
+        let text = std::fs::read_to_string(&path).unwrap();
+        assert!(text.contains("\"C:/GP/gitpoulpi.exe\""), "{text}");
+        assert!(!text.contains("gitpoulpi-tui"), "{text}");
     }
 
     #[cfg(unix)]
@@ -730,7 +814,7 @@ mod tests {
         let text = std::fs::read_to_string(&path).unwrap();
         assert_eq!(
             text,
-            format!("#!/bin/sh\n{UNIX_MARKER}\nexec '/opt/gp/gitpoulpi-tui' --add \"$@\"\n")
+            format!("#!/bin/sh\n{UNIX_MARKER}\nexec '/opt/gp/gitpoulpi' --add \"$@\"\n")
         );
         use std::os::unix::fs::PermissionsExt;
         assert_eq!(

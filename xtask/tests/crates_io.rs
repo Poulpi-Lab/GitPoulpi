@@ -16,7 +16,12 @@ fn root() -> PathBuf {
 }
 
 /// Never published: the dev tasks, the test kit, the elevated install helper.
-const UNPUBLISHED: &[&str] = &["xtask", "gitpoulpi-testkit", "gitpoulpi-updater"];
+const UNPUBLISHED: &[&str] = &[
+    "xtask",
+    "gitpoulpi-testkit",
+    "gitpoulpi-updater",
+    "gitpoulpi-shim",
+];
 
 fn packages() -> Vec<Value> {
     let out = Command::new(std::env::var("CARGO").unwrap_or_else(|_| "cargo".into()))

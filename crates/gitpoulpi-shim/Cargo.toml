@@ -1,0 +1,19 @@
+[package]
+name = "gitpoulpi-shim"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+description = "The small stub shipped as gitpoulpi-tui and gitpoulpi-mcp: it starts the gitpoulpi program next to it as that persona. Std only."
+
+[[bin]]
+name = "gitpoulpi-shim"
+path = "src/main.rs"
+
+[dependencies]
+
+[dev-dependencies]
+tempfile.workspace = true

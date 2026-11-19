@@ -226,6 +226,10 @@ async fn ask_to_raise(window: &Window) -> Option<RaiseAnswer> {
     .await
 }
 
+/// CREATE_NEW_PROCESS_GROUP | CREATE_NEW_CONSOLE.
+#[cfg_attr(not(windows), allow(dead_code))]
+const WINDOWS_NEW_CONSOLE_FLAGS: u32 = 0x0000_0200 | 0x0000_0010;
+
 /// Starts `command` detached from this process.
 pub fn spawn_detached(command: &[String]) -> Result<(), String> {
     let (program, args) = command
@@ -241,14 +245,17 @@ pub fn spawn_detached(command: &[String]) -> Result<(), String> {
             .stderr(std::process::Stdio::null())
             .process_group(0);
     }
-    // Windows: the standard handles stay as they are. This process has no
-    // console of its own (`gitpoulpi-launch.exe`), so a console program
-    // (the plain-console shortcut) gets a fresh one, which a redirection to
-    // NUL would break.
+    // Windows: this runs as the launch persona of `gitpoulpi.exe`, started
+    // by the `gitpoulpi-launch.exe` stub with CREATE_NO_WINDOW, so it sits in
+    // a hidden console. A console program (the plain-console shortcut) must
+    // not inherit that one, or its window would be invisible: it gets a new
+    // visible console. A GUI terminal (wt.exe) creates none, so nothing
+    // flashes. The standard handles stay as they are (a redirection to NUL
+    // would break the new console); checked by hand on Windows 11.
     #[cfg(windows)]
     {
         use std::os::windows::process::CommandExt;
-        cmd.creation_flags(0x0000_0200); // CREATE_NEW_PROCESS_GROUP
+        cmd.creation_flags(WINDOWS_NEW_CONSOLE_FLAGS);
     }
     cmd.spawn()
         .map(|_| ())
@@ -663,6 +670,14 @@ mod tests {
             json!({"action": "raised", "session": "s", "viewer": "tui-1"})
         );
         assert_eq!(Outcome::Failed("x".into()).exit_code(), 1);
+    }
+
+    /// The launch persona runs in a hidden console: a started terminal must
+    /// get a NEW console (0x10), in its own process group (0x200).
+    #[test]
+    fn windows_start_gets_a_new_console() {
+        assert_eq!(WINDOWS_NEW_CONSOLE_FLAGS & 0x10, 0x10);
+        assert_eq!(WINDOWS_NEW_CONSOLE_FLAGS & 0x200, 0x200);
     }
 
     #[test]

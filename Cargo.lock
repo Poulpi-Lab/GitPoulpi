@@ -1574,6 +1574,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "gitpoulpi-shim"
+version = "1.0.0"
+dependencies = [
+ "tempfile",
+]
+
+[[package]]
 name = "gitpoulpi-testkit"
 version = "1.0.0"
 dependencies = [

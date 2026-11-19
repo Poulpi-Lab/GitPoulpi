@@ -21,6 +21,7 @@ members = [
     "crates/gitpoulpi-cli",
     "crates/gitpoulpi-mcp",
     "crates/gitpoulpi-updater",
+    "crates/gitpoulpi-shim",
     "crates/gitpoulpi-testkit",
     "xtask",
 ]

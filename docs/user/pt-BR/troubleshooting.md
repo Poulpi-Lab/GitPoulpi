@@ -84,6 +84,54 @@ nos terminais Linux e macOS; `Ctrl+Shift+N` parece `Ctrl+N`). Use as alternativa
 (`Ctrl+N` e depois `,` abre as Configurações; `Ctrl+P` alcança todos os comandos), ou
 reatribua o atalho: veja [Configurações](settings.md#teclado-e-mouse).
 
+**`Ctrl+Tab` não troca de aba.** O kitty, o WezTerm, o Ghostty e o Windows
+Terminal reservam `Ctrl+Tab` e `Ctrl+Shift+Tab` para as abas deles, então a tecla
+nunca chega ao GitPoulpi. `Ctrl+PageDown` / `Ctrl+PageUp` sempre funcionam. Para
+entregar o par ao GitPoulpi, libere-o na configuração do terminal e reinicie o
+terminal (ou recarregue a configuração):
+
+- kitty, no `kitty.conf` (um `map` sem ação remove o atalho padrão; com
+  `--when-focus-on` mais um critério de janela como `title:...`, o kitty pode
+  remover o atalho só enquanto uma janela correspondente tem o foco, veja a
+  documentação de mapeamentos do kitty):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, no `wezterm.lua`:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, no arquivo de configuração dele:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, no `settings.json` (`"id": null` remove o atalho padrão):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (Arquivos de configuração mais antigos listam `nextTab` / `prevTab` em
+  `actions` com essas teclas: remova essas teclas ali.)
+
+O terminal então perde a troca de abas dele com `Ctrl+Tab`. Um terminal que só
+consegue enviar a tecla pelo protocolo de teclado do kitty precisa dele ativado
+(o padrão, veja [Atalhos de teclado](keybindings.md#teclas-que-o-terminal-não-consegue-enviar-e-o-protocolo-de-teclado-do-kitty)).
+
 **Não lembro de um atalho.** Pressione `Ctrl+P` e digite o que você quer; cada
 resultado mostra seu atalho. `?` lista tudo.
 

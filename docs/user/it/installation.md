@@ -79,7 +79,7 @@ Le caselle: collegamento nel menu Start, collegamento sul Desktop, aggiunta al P
 
 L'installer copia gli eseguibili (compreso `gitpoulpi-updater`, il piccolo programma che scambia i file durante un aggiornamento) e il marcatore `.gitpoulpi-dist`. Il marcatore registra come è stato installato GitPoulpi (`inno-user` o `inno-machine`), ed è ciò che il pannello degli aggiornamenti mostra come **Installato con**. Eseguire di nuovo il setup mantiene le tue scelte (ambito, collegamenti, alias).
 
-Si disinstalla da Impostazioni di Windows > App: esegue `gitpoulpi uninstall` (alias, voci del PATH, collegamenti, voci del menu del file manager) ed elimina i file, compresi gli avanzi `.old` dell'aggiornamento. Le tue impostazioni e i tuoi repository restano.
+Si disinstalla da Impostazioni di Windows > App: esegue `gitpoulpi uninstall` (alias, voci del PATH, collegamenti) ed elimina i file, compresi gli avanzi `.old` dell'aggiornamento. Le tue impostazioni e i tuoi repository restano.
 
 ### Linux e macOS: `install.sh`
 
@@ -199,16 +199,17 @@ segui [Per iniziare](getting-started.md).
 
 ## Disinstallazione
 
-`gitpoulpi uninstall` (ciò che eseguono entrambi gli installer) rimuove gli alias del comando, le voci
-del PATH e i collegamenti creati da GitPoulpi, poi i file del programma di un'installazione da release;
+`gitpoulpi uninstall` (ciò che eseguono entrambi gli installer) rimuove gli alias del comando,
+le voci del PATH, i collegamenti e le voci del menu del file manager (con la chiave App Paths
+su Windows) creati da GitPoulpi, poi i file del programma di un'installazione da release;
 rifiuta di agire su una build senza il marcatore `.gitpoulpi-dist` (una build di cargo), e `--keep-files`
-lascia i file del programma. Non è disponibile per gli agenti MCP. Senza un installer, elimina i tre
-eseguibili. GitPoulpi conserva anche questi file:
+lascia i file del programma. Non è disponibile per gli agenti MCP. Senza un installer, elimina i file del programma.
+GitPoulpi conserva anche questi file:
 
 | Cosa | Dove |
 |---|---|
 | Impostazioni (`config.toml`) e sessioni | La cartella di configurazione del tuo sistema operativo. `GITPOULPI_CONFIG_DIR` la cambia. |
-| Stato per repository | `.gitpoulpi/` dentro ogni repository. |
+| Stato per repository | Di base `gitpoulpi/` dentro la cartella `.git` del repository (`session.per_repo_state_dir` può spostarlo in `.gitpoulpi/` nell'albero di lavoro o nella cartella dei dati dell'utente). |
 | Cache (avatar) | La cartella della cache del tuo sistema operativo. |
 | Token e chiavi API | Il tuo credential helper. **Impostazioni > SSH e credenziali > Dimentica tutti i nomi utente e le password** li rimuove. |
 

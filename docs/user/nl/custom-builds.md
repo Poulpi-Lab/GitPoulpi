@@ -20,7 +20,7 @@ De uitvoer komt in `target/custom/`, nooit over de officiële `target/dist/` hee
 | Logokleuren | De pixeloctopus van het venster Over komt in 20 kleurstellingen (`--list-logo-colors`). Kies degene die je meecompileert (minstens één), de standaard (Over toont die eerst; het is ook waarop een opgeslagen `ui.logo_color` terugvalt die niet is meegecompileerd; hij moet een van de gecompileerde zijn; officiële standaard: lavender) en de kleur van het pictogram van het Windows-uitvoerbestand (elke kleurstelling, standaard: de logostandaard). Met één enkele kleurstelling draait het logo nog steeds bij een klik maar blijft die kleur, en de kleurenlijst (`c`, rechtsklik) wordt niet aangeboden. |
 | Integraties (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine) | Zonder: alleen klonen via URL; geen issues, geen pull/merge requests. |
 | AI | Geen AI-knoppen, -opdrachten of `ai` CLI/MCP-tools. |
-| MCP | Geen `gitpoulpi-mcp`-binary en geen `gitpoulpi mcp`-opdracht. De `ui`-agentopdrachten blijven. |
+| MCP | Geen `gitpoulpi-mcp`-relay en geen `gitpoulpi mcp`-opdracht. De `ui`-agentopdrachten blijven. |
 | LFS, Worktree, Submodules | De bijbehorende beheerschermen en opdrachten zijn weg; er komt een getypeerd antwoord "not built into this binary" terug. |
 | Avatar-download | Alleen initialenbadges, geen netwerkophaal. |
 | Afbeeldingsvoorbeeld | Afbeeldingsbestanden tonen de gewone binaire melding; **Bewerken in** werkt nog. |
@@ -81,11 +81,11 @@ De themaselectie bereikt de build als omgevingsvariabele
 
 De logokeuzes zijn de omgevingsvariabelen `GITPOULPI_LOGO_COLORS`
 (`all` of een kommalijst van slugs), `GITPOULPI_LOGO_DEFAULT` en
-`GITPOULPI_ICON_COLOR`, gelezen door de buildscripts van `gitpoulpi-tui` (dat `crates/gitpoulpi-logo-build/colourways.json` filtert tot de tabel die het venster Over insluit) en van de drie binarycrates (het pictogram). De bron van de kleuren blijft `crates/gitpoulpi-logo-build/colourways.json`.
+`GITPOULPI_ICON_COLOR`, gelezen door de buildscripts van `gitpoulpi-tui` (dat `crates/gitpoulpi-logo-build/colourways.json` filtert tot de tabel die het venster Over insluit) en van `gitpoulpi-cli` (het pictogram). De bron van de kleuren blijft `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Pictogram van het Windows-uitvoerbestand
 
-Als het doel Windows is, krijgen de uitvoerbare bestanden `gitpoulpi`, `gitpoulpi-tui` en `gitpoulpi-mcp` de octopus als pictogram, tijdens de build gegenereerd (geen Python of ImageMagick nodig) in de gekozen pictogramkleur, formaten 16 tot 128 px. Het wordt ingesloten met de crate `winresource` en heeft de resourcecompiler van het platform nodig (`rc.exe` uit de Windows SDK met MSVC, `windres` met GNU). Ontbreekt die, dan toont de build alleen een waarschuwing en houdt het uitvoerbare bestand het standaardpictogram. Met de GNU-toolchain draagt alleen `gitpoulpi` het pictogram (de resource zou anders twee keer worden gelinkt). Builds voor Linux en macOS negeren dit alles behalve de kleurentabel.
+Als het doel Windows is, krijgt het uitvoerbare bestand `gitpoulpi` de octopus als pictogram, tijdens de build gegenereerd (geen Python of ImageMagick nodig) in de gekozen pictogramkleur, formaten 16 tot 128 px. Het wordt ingesloten met de crate `winresource` en heeft de resourcecompiler van het platform nodig (`rc.exe` uit de Windows SDK met MSVC, `windres` met GNU). Ontbreekt die, dan toont de build alleen een waarschuwing en houdt het uitvoerbare bestand het standaardpictogram. Met de GNU-toolchain draagt alleen `gitpoulpi` het pictogram (de resource zou anders twee keer worden gelinkt). Builds voor Linux en macOS negeren dit alles behalve de kleurentabel.
 
 ## Opgeslagen selecties
 
@@ -114,32 +114,32 @@ Als er een opgeslagen selectie bestaat, biedt de interactieve modus eerst "Begin
 
 ## Wat het bespaart
 
-Gemeten op Linux op 2026-10-29 bij commit `65999ef5c`, vanaf de volledige build, het verschil daarmee tussen haakjes
-(details in `docs/developer/binary-size.md`):
+Gemeten op Linux op 2026-10-29 bij commit `65999ef5c`, grootte van `gitpoulpi` (het hele programma: UI, CLI en MCP-server) vanaf de volledige build, het verschil daarmee tussen haakjes
+(details in `docs/developer/binary-size.md`). De relays `gitpoulpi-tui`, `gitpoulpi-mcp` en `gitpoulpi-launch` zijn ruim onder 1 MiB, wat je ook kiest:
 
-| Build (vanaf `full` tenzij anders vermeld) | `gitpoulpi` (MiB) | `gitpoulpi-tui` (MiB) | `gitpoulpi-mcp` (MiB) |
-|---|---|---|---|
-| Volledig (alles aan) | 64,6 | 50,5 | 31,7 |
-| Alleen Engels | 52,0 (-12,6) | 40,2 (-10,3) | 31,7 (0,0) |
-| MCP uit | 61,6 (-3,0) | 49,6 (-0,8) | niet gebouwd |
-| AI uit | 62,6 (-2,0) | 48,6 (-1,8) | 30,5 (-1,3) |
-| Alle integraties uit | 56,3 (-8,2) | 43,7 (-6,7) | 26,7 (-5,0) |
-| AI + integraties + avatar-ophaal uit | 52,2 (-12,3) | 39,9 (-10,6) | 23,0 (-8,8) |
-| Werkbank voor geschiedenis uit (`--no-history-rewrite`) | 61,6 (-3,0) | 48,9 (-1,5) | 28,5 (-3,2) |
-| Herschrijfscripts uit | 63,1 (-1,5) | 49,0 (-1,5) | 31,1 (-0,7) |
-| Globaal zoeken uit | 63,5 (-1,1) | 49,5 (-1,0) | 31,6 (-0,1) |
-| Werkruimtes uit | 63,5 (-1,1) | 49,5 (-0,9) | 31,5 (-0,2) |
-| Radar uit | 63,4 (-1,2) | 49,3 (-1,2) | 31,7 (0,0) |
-| Bord uit | 63,6 (-1,0) | 49,5 (-1,0) | 31,7 (0,0) |
-| Review uit | 63,2 (-1,4) | 49,0 (-1,4) | 31,7 (0,0) |
-| Mermaid uit | 63,6 (-1,0) | 49,5 (-0,9) | 31,6 (-0,1) |
-| LFS uit | 63,5 (-1,1) | 49,5 (-0,9) | 31,5 (-0,3) |
-| Worktree uit | 63,7 (-0,9) | 49,6 (-0,8) | 31,7 (0,0) |
-| Submodules uit | 63,7 (-0,9) | 49,6 (-0,9) | 31,6 (-0,1) |
-| Avatar-ophaal uit | 63,7 (-0,9) | 49,6 (-0,9) | 31,7 (0,0) |
-| Afbeeldingsvoorbeeld uit | 63,3 (-1,2) | 49,2 (-1,3) | 31,7 (0,0) |
-| Alles uit, alleen Engels (LFS behouden) | 35,2 (-29,4) | 28,9 (-21,5) | niet gebouwd |
-| **Alles uit, alleen Engels** | **34,9 (-29,7)** | **28,8 (-21,6)** | niet gebouwd |
+| Build (vanaf `full` tenzij anders vermeld) | `gitpoulpi` (MiB) |
+|---|---|
+| Volledig (alles aan) | 64,6 |
+| Alleen Engels | 52,0 (-12,6) |
+| MCP uit | 61,6 (-3,0) |
+| AI uit | 62,6 (-2,0) |
+| Alle integraties uit | 56,3 (-8,2) |
+| AI + integraties + avatar-ophaal uit | 52,2 (-12,3) |
+| Werkbank voor geschiedenis uit (`--no-history-rewrite`) | 61,6 (-3,0) |
+| Herschrijfscripts uit | 63,1 (-1,5) |
+| Globaal zoeken uit | 63,5 (-1,1) |
+| Werkruimtes uit | 63,5 (-1,1) |
+| Radar uit | 63,4 (-1,2) |
+| Bord uit | 63,6 (-1,0) |
+| Review uit | 63,2 (-1,4) |
+| Mermaid uit | 63,6 (-1,0) |
+| LFS uit | 63,5 (-1,1) |
+| Worktree uit | 63,7 (-0,9) |
+| Submodules uit | 63,7 (-0,9) |
+| Avatar-ophaal uit | 63,7 (-0,9) |
+| Afbeeldingsvoorbeeld uit | 63,3 (-1,2) |
+| Alles uit, alleen Engels (LFS behouden) | 35,2 (-29,4) |
+| **Alles uit, alleen Engels** | **34,9 (-29,7)** |
 
 ## Opmerkingen
 

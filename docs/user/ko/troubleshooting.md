@@ -69,6 +69,44 @@ GitPoulpi는 클릭이 전달되도록 마우스를 캡처합니다. 터미널 �
 
 **단축키가 동작하지 않습니다.** 터미널, tmux, AutoHotkey 스크립트가 GitPoulpi보다 먼저 키를 가져갈 수 있습니다(Linux와 macOS 터미널에서는 `Ctrl+,`가 그냥 `,`로 전달되는 경우가 많고, `Ctrl+Shift+N`은 `Ctrl+N`처럼 보입니다). 대체 방법을 사용하거나(`Ctrl+N` 다음 `,`를 누르면 설정이 열리고, `Ctrl+P`로 모든 명령에 접근할 수 있습니다), 코드를 다시 할당하세요. [설정](settings.md#키보드-및-마우스)을 참고하세요.
 
+**`Ctrl+Tab`으로 탭이 전환되지 않습니다.** kitty, WezTerm, Ghostty, Windows Terminal은 `Ctrl+Tab`과 `Ctrl+Shift+Tab`을 자체 탭 전환에 사용하므로 이 키가 GitPoulpi에 전달되지 않습니다. `Ctrl+PageDown` / `Ctrl+PageUp`은 항상 동작합니다. 이 키 쌍을 GitPoulpi에 넘기려면 터미널 설정에서 해제한 뒤 터미널을 다시 시작하세요(또는 설정을 다시 불러오세요).
+
+- kitty, `kitty.conf`에서(동작 없이 `map`만 쓰면 기본 매핑이 해제됩니다. `--when-focus-on`에 `title:...` 같은 창 조건을 함께 쓰면 일치하는 창에 포커스가 있을 때만 해제할 수도 있습니다. kitty의 매핑 문서를 참고하세요):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, `wezterm.lua`에서:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, 설정 파일에서:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, `settings.json`에서(`"id": null`이 기본 바인딩을 해제합니다):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (오래된 설정 파일은 `actions` 아래에 이 키로 `nextTab` / `prevTab`을 나열합니다. 그 경우 해당 항목에서 이 키를 제거하세요.)
+
+그러면 터미널은 자체 `Ctrl+Tab` 탭 전환을 잃습니다. kitty 키보드 프로토콜로만 이 키를 보낼 수 있는 터미널에서는 프로토콜이 켜져 있어야 합니다(기본값, [키 바인딩](keybindings.md#터미널이-보낼-수-없는-키와-kitty-키보드-프로토콜) 참고).
+
 **단축키가 기억나지 않습니다.** `Ctrl+P`를 누르고 원하는 것을 입력하세요. 각 결과에 단축키가 표시됩니다. `?`는 전체 목록을 보여 줍니다.
 
 **설정에서 옵션이 회색으로 표시됩니다.** 다른 옵션에 의존하는 옵션입니다. 해당 행에 어느 옵션인지 표시됩니다(예: *행 색조 강도*는 *그래프 레인 배경*을 *행 색조*로 설정해야 합니다).

@@ -13,7 +13,7 @@ messages, explanations, the commit composer) are configured separately: see
 
 ## Quick setup
 
-1. Put `gitpoulpi` and `gitpoulpi-mcp` on your `PATH` ([Installation](installation.md)).
+1. Put `gitpoulpi` on your `PATH` ([Installation](installation.md)). The server is `gitpoulpi mcp serve`; the `gitpoulpi-mcp` relay in the archive still works as an alias, so an existing agent config that names it keeps running.
 2. Register the server with your agent. It speaks stdio: nothing to start, no port.
 3. Optionally choose what the agent may do in `config.toml`'s `[mcp]` table
    (below). The defaults let it read the repository (changes are refused until you set
@@ -54,13 +54,13 @@ who opens the project gets it. The same file by hand, with the optional extras:
 |---|---|---|
 | Cursor, Windsurf, Claude Desktop, VS Code | the client's MCP JSON file | the `mcpServers` block above (VS Code names the key `servers`) |
 | OpenAI Codex CLI | `~/.codex/config.toml` | `[mcp_servers.gitpoulpi]`, `command = "gitpoulpi"`, `args = ["mcp", "serve", "--stdio"]` |
-| Anything else | its documentation | the command `gitpoulpi-mcp` (standalone binary, same server, no arguments needed) |
+| Anything else | its documentation | the command `gitpoulpi mcp serve` (stdio by default; `gitpoulpi-mcp` is the same server for configs that already use it) |
 
 **Over HTTP** (clients that connect to a URL):
 
 ```
-gitpoulpi-mcp --http                         # [mcp] bind, default http://127.0.0.1:8808/mcp
-gitpoulpi mcp serve --http 127.0.0.1:9000
+gitpoulpi mcp serve --http                   # [mcp] bind, default http://127.0.0.1:8808/mcp
+gitpoulpi mcp serve --http 127.0.0.1:9000    # or: --bind 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
@@ -128,7 +128,7 @@ and how to use GitPoulpi instead of raw `git`.
 
 | Switch | Default | Effect |
 |---|---|---|
-| `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` / `gitpoulpi-mcp` refuse to start (Settings > Agents & MCP > *MCP server*). Read when the server starts: a running server keeps its settings. |
+| `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` (and its `gitpoulpi-mcp` alias) refuse to start (Settings > Agents & MCP > *MCP server*). Read when the server starts: a running server keeps its settings. |
 | `[mcp] bind` | `"127.0.0.1:8808"` | Address `--http` uses when none is given (loopback only unless `--allow-remote`, which needs authentication and encryption, see above). Settings > Agents & MCP > *MCP server port* edits its port and keeps the host. |
 | `[mcp] http_auth` | `true` | `--http` needs `Authorization: Bearer <token>` (`gitpoulpi mcp token`). Settings > Agents & MCP > *HTTP authentication*. |
 | `[mcp] tls`, `tls_cert`, `tls_key` | `"off"` | `off`, `self_signed` or `files` (your PEM paths): the server terminates TLS itself. Settings > Agents & MCP > *TLS*. |

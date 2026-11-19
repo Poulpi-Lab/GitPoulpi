@@ -21,6 +21,8 @@ GitPoulpi is a Cargo workspace built hexagonal (ports & adapters): `gitpoulpi-co
                                     (ratatui client) (clap client) (MCP client)
 ```
 
+The release ships these three frontends as one program, `gitpoulpi` (no subcommand: the UI; `mcp serve`: the MCP server). The `gitpoulpi-tui` and `gitpoulpi-mcp` files in an archive are tiny relays (`gitpoulpi-shim`) that start it; `gitpoulpi-updater` stays a separate program.
+
 `gitpoulpi-config`, `gitpoulpi-secrets`, `gitpoulpi-session`, `gitpoulpi-hosting` and `gitpoulpi-ai` are secondary adapters consumed by the daemon (and, where relevant, directly by the CLI for local-only concerns like `gitpoulpi config path`) - never duplicated between frontends. `gitpoulpi-commands` holds the clap tree and its one `execute` mapping shared by the CLI and the MCP server; `gitpoulpi-i18n` holds the compiled-in UI catalogs (`../developer/i18n.md`).
 
 Pure logic that more than one adapter needs lives in `gitpoulpi-core` as plain functions, not behind the trait: `textconv` (encodings, line breaks, indentation: the editor and the daemon's file conversion) and `domain::rules` (where an ignore or attribute rule is written, and its exact line: both backends, the TUI picker and the CLI). `gitpoulpi-config::os_apps` parses what the OS registers for a file type (the "Open with" list) from a file system or registry handed in, so it never reads the real desktop in a test.
@@ -46,10 +48,10 @@ Cross-platform (Windows primary, Linux incl. Wayland/Hyprland, macOS best-effort
 
 ## Cargo features
 
-The three binary crates (`gitpoulpi-cli`, `-tui`, `-mcp`) have `default = ["full"]`, so a plain `cargo build` is everything on. Features switch off languages (`lang-*`, `all-langs`), the integrations (`github`, `gitlab`, `azure-devops`, `bitbucket`, `jira`, `trello`), and `ai`, `mcp`, `lfs`, `worktree`, `submodule`, `avatar-fetch`, `image-view`; theme presets are chosen at build time with `GITPOULPI_THEMES` (`gitpoulpi-config/build.rs`). `gitpoulpi-core`, `-config`, `-ipc`, `-session` and `-secrets` have none, so the domain, the config schema and the IPC protocol are identical in every build; whatever is not built answers with a typed "not built into this binary" result (`Error::NotBuilt`). The graph and its rules: `../developer/the custom-builds design.
+The three frontend crates (`gitpoulpi-cli`, `-tui`, `-mcp`; the release ships them as the one `gitpoulpi` program) have `default = ["full"]`, so a plain `cargo build` is everything on. Features switch off languages (`lang-*`, `all-langs`), the integrations (`github`, `gitlab`, `azure-devops`, `bitbucket`, `jira`, `trello`), and `ai`, `mcp`, `lfs`, `worktree`, `submodule`, `avatar-fetch`, `image-view`; theme presets are chosen at build time with `GITPOULPI_THEMES` (`gitpoulpi-config/build.rs`). `gitpoulpi-core`, `-config`, `-ipc`, `-session` and `-secrets` have none, so the domain, the config schema and the IPC protocol are identical in every build; whatever is not built answers with a typed "not built into this binary" result (`Error::NotBuilt`). The graph and its rules: `../developer/the custom-builds design.
 
 - `cargo run -p xtask -- build-custom` (or `scripts/build-custom.sh` / `.ps1`) builds a chosen combination with the `custom` profile into `target/custom/`.
-- `cargo run -p xtask -- features` is the matrix gate: clippy of the three binaries with each feature off once, plus the off-build tests. `--quick` runs three clippy builds (everything off; `lang-fr` + github; `lang-fr` + jira, a provider outside GitHub/GitLab). `scripts/check.ps1 -Features` runs the quick form.
+- `cargo run -p xtask -- features` is the matrix gate: clippy of the three frontend crates with each feature off once, plus the off-build tests. `--quick` runs three clippy builds (everything off; `lang-fr` + github; `lang-fr` + jira, a provider outside GitHub/GitLab). `scripts/check.ps1 -Features` runs the quick form.
 - Sizes: `../developer/binary-size.md`.
 
 ## Where to look next

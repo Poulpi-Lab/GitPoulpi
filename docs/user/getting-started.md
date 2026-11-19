@@ -12,10 +12,10 @@ Follow [Installation](installation.md). Then open a terminal in a Git
 repository and run:
 
 ```
-gitpoulpi-tui
+gitpoulpi
 ```
 
-`gitpoulpi` with no subcommand does the same. GitPoulpi opens the repository
+GitPoulpi opens the repository
 that contains the current folder. Outside a repository, it opens the **Home**
 tab, where you can browse, clone or initialize a repository (see
 [step 7](#7-open-clone-and-initialize-repositories)).

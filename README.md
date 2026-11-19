@@ -34,7 +34,7 @@ do. GitPoulpi is inspired by GitKraken, rewritten from scratch in Rust: native b
   (also Jira, Trello, Linear, YouTrack, Redmine and local Markdown notes), on a
   Kanban board if you like. Clone from your account and manage SSH keys.
 - **CLI and MCP for agents.** `gitpoulpi <command> --json` covers everything
-  the UI does, and `gitpoulpi-mcp` serves it as MCP tools. One background
+  the UI does, and `gitpoulpi mcp serve` serves it as MCP tools. One background
   daemon per repository keeps every frontend live and in sync.
 - **Optional AI, never required.** Off by default and no account needed: bring
   your own API key or a local agent CLI such as `claude -p`. Generate commit
@@ -150,7 +150,7 @@ screen.
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 AI is optional and off by default: turn on GitPoulpi's own AI in *Settings > AI*

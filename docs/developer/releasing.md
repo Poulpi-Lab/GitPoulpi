@@ -33,7 +33,7 @@ Every push to another repository and every pull request goes out as the Poulpi-L
 GitHub scopes an Actions cache to the ref that created it plus the default branch. A cache saved by a tag run is therefore never restored by the next tag, and it eats the 10 GB repository quota. So `release.yml` only restores: its `Swatinem/rust-cache` steps (`build` and `preflight`) have `save-if: false`, and `.github/workflows/release-cache.yml` saves them from `main`.
 
 - The key must be the same in both files: `shared-key: release-<target>` (`release-preflight` for the supply-chain job). Without `shared-key` rust-cache appends the job id and the keys differ. `xtask/tests/installers.rs` pins both keys, `save-if: false` and the matrix rows.
-- `release-cache.yml` runs on a weekly schedule and by hand (`gh workflow run release-cache.yml`, only from `main`). It builds the `dist` profile of the same four packages as `xtask dist` for every target, plus the dev-profile `xtask`, and saves the caches.
+- `release-cache.yml` runs on a weekly schedule and by hand (`gh workflow run release-cache.yml`, only from `main`). It builds the `dist` profile of the same three packages as `xtask dist` (`gitpoulpi-cli`, `gitpoulpi-updater`, `gitpoulpi-shim`) for every target, plus the dev-profile `xtask`, and saves the caches.
 - Run it by hand after any `Cargo.lock` change, after a new stable Rust release, and before tagging. A release whose caches are stale or missing still works: it only compiles what is missing, so it is slower.
 - The `dist` profile is thin LTO with 16 codegen units (a cold build on a 20-core Linux machine: 7 minutes, against 17 with fat LTO and one codegen unit); a release with warm caches targets 15 to 20 minutes.
 
@@ -68,7 +68,7 @@ The owner creates them in the repository settings. Signing keys and accounts bel
 
 ## crates.io
 
-`cargo install --locked gitpoulpi-cli` installs the `gitpoulpi` program (it is the whole product: the terminal UI when run without a subcommand, the CLI, and `gitpoulpi mcp`). That crate is named after its role, not `gitpoulpi`, on purpose: the package name is what `cargo binstall` and the install-channel metadata already use, a second package carrying the same `gitpoulpi` binary would collide with it, and a `gitpoulpi` crate that only forwards to it would need the whole CLI moved into a library for no gain. `gitpoulpi-tui` and `gitpoulpi-mcp` are standalone binaries of the same code. The default features of those crates are the full set the release archives ship (`xtask dist` builds with the defaults too).
+`cargo install --locked gitpoulpi-cli` installs the `gitpoulpi` program (it is the whole product: the terminal UI when run without a subcommand, the CLI, and `gitpoulpi mcp`). That crate is named after its role, not `gitpoulpi`, on purpose: the package name is what `cargo binstall` and the install-channel metadata already use, a second package carrying the same `gitpoulpi` binary would collide with it, and a `gitpoulpi` crate that only forwards to it would need the whole CLI moved into a library for no gain. `gitpoulpi-tui` and `gitpoulpi-mcp` are libraries of it (their own binaries exist only for tests and `cargo run`); an archive carries `gitpoulpi-tui` and `gitpoulpi-mcp` as copies of the std-only `gitpoulpi-shim` relay, which starts the `gitpoulpi` next to it. The default features of those crates are the full set the release archives ship (`xtask dist` builds with the defaults too).
 
 **What is published.** Every crate except `xtask`, `gitpoulpi-testkit` and `gitpoulpi-updater` (`publish = false`; the updater is the install helper of the archive, installer and package channels, useless from crates.io, and `xtask` is a name somebody else owns). The testkit and `xtask` appear in `[dev-dependencies]` of published crates without a version, which cargo drops from the published manifest. The order, which `scripts/publish-crates.sh` follows and `xtask/tests/crates_io.rs` checks against `cargo metadata`:
 
@@ -163,7 +163,7 @@ The client accepts a list of compiled-in keys (the current one and the next). To
 
 ### SBOM
 
-`publish` runs `cargo cyclonedx --format json` for the binary crates, merges the results into `gitpoulpi-<v>-sbom.cdx.json`, signs it and attaches it. When the secrets `DTRACK_URL` and `DTRACK_API_KEY` exist, the SBOM is also posted to `<DTRACK_URL>/api/v1/bom` (`autoCreate`, project `GitPoulpi`, the release version). Without them the step prints a notice and skips.
+`publish` runs `cargo cyclonedx --format json` for `gitpoulpi-cli`, `gitpoulpi-updater` and `gitpoulpi-shim` (the TUI and MCP crates are libraries of `gitpoulpi-cli`, so its SBOM carries their dependencies), merges the results into `gitpoulpi-<v>-sbom.cdx.json`, signs it and attaches it. When the secrets `DTRACK_URL` and `DTRACK_API_KEY` exist, the SBOM is also posted to `<DTRACK_URL>/api/v1/bom` (`autoCreate`, project `GitPoulpi`, the release version). Without them the step prints a notice and skips.
 
 ### Dependencies
 

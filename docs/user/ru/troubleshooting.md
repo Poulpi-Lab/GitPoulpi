@@ -88,6 +88,54 @@ macOS часто приходит как обычная `,`; `Ctrl+Shift+N` вы
 открывает доступ к любой команде) или переназначьте сочетание: см.
 [Настройки](settings.md#клавиатура-и-мышь).
 
+**`Ctrl+Tab` не переключает вкладки.** kitty, WezTerm, Ghostty и Windows
+Terminal оставляют `Ctrl+Tab` и `Ctrl+Shift+Tab` для собственных вкладок, поэтому
+клавиша не доходит до GitPoulpi. `Ctrl+PageDown` / `Ctrl+PageUp` работают всегда.
+Чтобы отдать эту пару GitPoulpi, освободите её в настройках терминала, затем
+перезапустите терминал (или перезагрузите его конфигурацию):
+
+- kitty, в `kitty.conf` (`map` без действия снимает привязку по умолчанию; с
+  `--when-focus-on` и критерием окна, например `title:...`, kitty может снять её
+  только пока в фокусе подходящее окно, см. документацию kitty по привязкам):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, в `wezterm.lua`:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, в его файле конфигурации:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, в `settings.json` (`"id": null` снимает привязку по умолчанию):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (В старых файлах настроек `nextTab` / `prevTab` перечислены в `actions` с этими
+  клавишами: удалите там эти записи.)
+
+Терминал после этого теряет собственное переключение вкладок по `Ctrl+Tab`.
+Терминалу, который может отправить эту клавишу только через клавиатурный
+протокол kitty, он нужен включённым (по умолчанию так и есть, см.
+[Сочетания клавиш](keybindings.md#клавиши-которые-терминал-не-может-отправить-и-клавиатурный-протокол-kitty)).
+
 **Я не помню сочетание клавиш.** Нажмите `Ctrl+P` и введите, что нужно; в каждом
 результате показано его сочетание. `?` показывает всё.
 

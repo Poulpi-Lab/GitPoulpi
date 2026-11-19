@@ -216,7 +216,7 @@ aussi ces fichiers :
 | Quoi | Où |
 |---|---|
 | Paramètres (`config.toml`) et sessions | Le dossier de configuration de votre OS. `GITPOULPI_CONFIG_DIR` le change. |
-| État par dépôt | `.gitpoulpi/` dans chaque dépôt. |
+| État par dépôt | `gitpoulpi/` dans le dossier `.git` du dépôt par défaut (`session.per_repo_state_dir` peut le déplacer vers `.gitpoulpi/` dans l'arbre de travail ou vers le dossier de données de l'utilisateur). |
 | Caches (avatars) | Le dossier de cache de votre OS. |
 | Jetons et clés d'API | Votre assistant d'identifiants. **Paramètres > SSH et identifiants > Oublier tous les noms d'utilisateur et mots de passe** les supprime. |
 

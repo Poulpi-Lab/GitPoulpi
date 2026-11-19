@@ -85,6 +85,57 @@ simple `,` dans les terminaux Linux et macOS ; `Ctrl+Shift+N` ressemble à `Ctr
 Utilisez les alternatives (`Ctrl+N` puis `,` ouvre les Paramètres ; `Ctrl+P` atteint chaque
 commande), ou réaffectez l'enchaînement : voir [Paramètres](settings.md#clavier-et-souris).
 
+**`Ctrl+Tab` ne change pas d'onglet.** kitty, WezTerm, Ghostty et Windows
+Terminal gardent `Ctrl+Tab` et `Ctrl+Shift+Tab` pour leurs propres onglets : la
+touche n'arrive donc jamais à GitPoulpi. `Ctrl+PageDown` / `Ctrl+PageUp`
+marchent toujours. Pour donner ce couple à GitPoulpi, libérez-le dans la
+configuration du terminal, puis redémarrez le terminal (ou rechargez sa
+configuration) :
+
+- kitty, dans `kitty.conf` (un `map` sans action supprime l'affectation par
+  défaut ; avec `--when-focus-on` et un critère de fenêtre comme `title:...`,
+  kitty peut la supprimer seulement tant qu'une fenêtre correspondante a le
+  focus, voir la documentation des mappings de kitty) :
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, dans `wezterm.lua` :
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, dans son fichier de configuration :
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, dans `settings.json` (`"id": null` supprime l'affectation
+  par défaut) :
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (Les anciens fichiers de paramètres listent `nextTab` / `prevTab` sous
+  `actions` avec ces touches : supprimez-y ces touches.)
+
+Le terminal perd alors son propre changement d'onglet par `Ctrl+Tab`. Un
+terminal qui ne peut envoyer cette touche que par le protocole clavier kitty
+a besoin qu'il soit activé (c'est le cas par défaut, voir
+[Raccourcis clavier](keybindings.md#touches-que-le-terminal-ne-peut-pas-envoyer-et-le-protocole-clavier-kitty)).
+
 **Je ne me souviens pas d'un raccourci.** Appuyez sur `Ctrl+P` et tapez ce que vous
 voulez ; chaque résultat montre son raccourci. `?` liste tout.
 

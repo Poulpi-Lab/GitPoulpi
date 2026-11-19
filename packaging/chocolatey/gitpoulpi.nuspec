@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TEMPLATE, NOT PUBLISHED. see the release-and-packaging design ("Chocolatey").
+  Template filled at release time, see the release-and-packaging design ("Chocolatey").
   packaging/fill-templates.sh fills the version and checksum placeholders here and in tools/chocolateyinstall.ps1; then
   `choco pack` in this folder and `choco install gitpoulpi -s . -y` in a VM before `choco push`.
   The package downloads the release's Inno Setup installer; it embeds no binary, so no VERIFICATION.txt
@@ -10,11 +10,12 @@
   <metadata>
     <id>gitpoulpi</id>
     <version>@VERSION@</version>
+    <packageSourceUrl>https://github.com/Poulpi-Lab/GitPoulpi/tree/main/packaging/chocolatey</packageSourceUrl>
     <title>GitPoulpi</title>
     <authors>GitPoulpi contributors</authors>
     <owners>@CHOCOLATEY_USER@</owners>
     <projectUrl>https://github.com/Poulpi-Lab/GitPoulpi</projectUrl>
-    <projectSourceUrl>https://github.com/Poulpi-Lab/GitPoulpi</projectSourceUrl>
+    <projectSourceUrl>https://github.com/Poulpi-Lab/GitPoulpi/tree/main/crates</projectSourceUrl>
     <bugTrackerUrl>https://github.com/Poulpi-Lab/GitPoulpi/issues</bugTrackerUrl>
     <docsUrl>https://github.com/Poulpi-Lab/GitPoulpi/blob/main/docs/user/README.md</docsUrl>
     <licenseUrl>https://github.com/Poulpi-Lab/GitPoulpi/blob/main/LICENSE</licenseUrl>

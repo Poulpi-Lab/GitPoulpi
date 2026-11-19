@@ -55,34 +55,82 @@ Další obrázky s vysvětlením najdete v [uživatelské dokumentaci](../../doc
 
 Potřebujete systémový `git`; `git-lfs` je volitelný.
 
-- **S instalátorem:** `...-setup.exe` pro Windows nebo `install.sh` pro Linux a macOS (pro uživatele, bez root), přiložené ke každému vydání. Sestavení nainstalované z archivu vydání se umí aktualizovat samo z čipu verze ve stavovém řádku.
-- **Z archivu vydání:** rozbalte jej a postupujte podle `INSTALL.txt` uvnitř.
-- **Ze zdrojových kódů:**
+### Linux a macOS (`install.sh`)
 
-  ```
-  git clone https://github.com/Poulpi-Lab/GitPoulpi.git
-  cd GitPoulpi
-  cargo build --release
-  ```
+```
+curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
+```
 
-  Binární soubory skončí v `target/release/`: `gitpoulpi` (CLI, a bez
-  podpříkazu také rozhraní), `gitpoulpi-tui` a `gitpoulpi-mcp`.
-- **Vlastní archiv vydání:** `cargo run -p xtask -- dist` vytvoří
-  `target/dist/gitpoulpi-<version>-<target>.zip` (Windows) nebo `.tar.gz` se
-  souborem `.sha256`.
-- **Menší binární soubor jen s tím, co potřebujete:** `./build-custom.sh`
-  (Windows: `build-custom`) se zeptá, které jazyky, integrace a funkce (AI, MCP,
-  LFS, worktrees, submoduly, stahování avatarů) sestavit; viz
-  [docs/user/cs/custom-builds.md](../../docs/user/cs/custom-builds.md).
+### Homebrew (macOS, Linux)
 
-Úplné podrobnosti, volitelné nástroje a poznámky pro jednotlivé systémy:
-[docs/user/cs/installation.md](../../docs/user/cs/installation.md).
+```
+brew install Poulpi-Lab/gitpoulpi/gitpoulpi
+```
+
+### apt (Debian, Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+### Scoop (Windows)
+
+```
+scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi
+scoop install gitpoulpi
+```
+
+### Instalátor pro Windows
+
+Stáhněte `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe` z
+[nejnovějšího vydání](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest) a
+spusťte jej. Pro správce je k dispozici MSI:
+
+```
+msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn
+```
+
+### Docker
+
+```
+docker pull poulpilab/gitpoulpi
+```
+
+Viz [Spuštění v Dockeru](../user/cs/docker.md).
+
+### cargo
+
+```
+cargo binstall gitpoulpi-cli          # prebuilt
+cargo install --locked gitpoulpi-cli  # compiles
+```
+
+### Archiv vydání
+
+Stáhněte jej z
+[nejnovějšího vydání](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest),
+rozbalte jej a postupujte podle `INSTALL.txt` uvnitř.
+
+### Ze zdrojových kódů
+
+```
+git clone https://github.com/Poulpi-Lab/GitPoulpi.git
+cd GitPoulpi
+cargo build --release
+```
+
+Vlastní archiv vydání, menší vlastní sestavení a poznámky pro jednotlivé systémy:
+[docs/user/cs/installation.md](../user/cs/installation.md) a
+[docs/user/cs/custom-builds.md](../user/cs/custom-builds.md).
 
 ## Rychlý start
 
 ```
 cd path/to/your/repository
-gitpoulpi-tui          # or just: gitpoulpi
+gitpoulpi
 ```
 
 - `?` otevře nápovědu se všemi klávesami a gesty, `Ctrl+P` paletu příkazů,

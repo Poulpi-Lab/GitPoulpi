@@ -604,6 +604,7 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
         // was `Text` in that case, the table has already drawn real
         // glyphs, and `GraphImage::render` returns without touching
         // the buffer.
+        let mut avatar_slots = Vec::new();
         if graph_image.capability().draws_graph() {
             if let Some((gx, gw)) = log_offsets
                 .iter()
@@ -677,10 +678,31 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
                             }
                         }
                     }
+                    // Where each picture landed, for the hover tooltip
+                    // (`graph::avatar_hover`): the rows that got one, after
+                    // the compact / scrolled-off reductions above.
+                    if let (true, Some(nodes)) = (in_graph, solo_nodes.as_ref()) {
+                        let cell = graph_image.capability().cell;
+                        avatar_slots =
+                            graph::visible_commit_rows(graph_order, nodes.len(), &window)
+                                .into_iter()
+                                .filter_map(|v| {
+                                    let row = raster_rows.get(usize::from(v.row))?;
+                                    row.avatar.as_ref()?;
+                                    let node =
+                                        u16::try_from(graph::node_column(&row.cells)?).ok()?;
+                                    let (first, count) = graph::picture_cells(cell, node);
+                                    let slot = Rect::new(gx + first, top + v.row, count, 1)
+                                        .intersection(area);
+                                    (!slot.is_empty()).then_some((slot, nodes[v.commit].id))
+                                })
+                                .collect();
+                    }
                     graph_image.render(frame.buffer_mut(), area, &raster_rows);
                 }
             }
         }
+        graph::set_avatar_slots(avatar_slots);
 
         // The Author column's avatars, as pixels, over the two-letter
         // initials the table just drew in each row's slot -- same

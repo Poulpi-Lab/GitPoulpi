@@ -118,6 +118,16 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io
             log_hover_column(&offsets, col).map(|hover_col| (commit_id, hover_col, col, row))
         });
 
+    // `ui.avatars = "graph"`: the pointer on a commit's picture in the Graph
+    // column hovers like that row's Author cell (same tooltip). The cells come
+    // from the draw pass (`graph::avatar_hover`); the lanes and a plain dot
+    // have none.
+    if let Some((id, LogColumn::Graph, c, r)) = *cx.hovered_commit {
+        if graph::avatar_slot_at(c, r) == Some(id) {
+            *cx.hovered_commit = Some((id, LogColumn::Author, c, r));
+        }
+    }
+
     // A commit row of the commit column hovers like a row of the Log: the
     // same tooltip (`overlay_menus`), by the part under the pointer (the
     // title is the message, then the author and the date; the lanes have

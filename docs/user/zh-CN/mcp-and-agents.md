@@ -8,7 +8,7 @@ AI 代理（Claude Code、Cursor、Codex 等）可以通过它的 **MCP 服务�
 
 ## 快速设置
 
-1. 把 `gitpoulpi` 和 `gitpoulpi-mcp` 放到你的 `PATH` 上（[安装](installation.md)）。
+1. 把 `gitpoulpi` 放到你的 `PATH` 上（[安装](installation.md)）。服务器就是 `gitpoulpi mcp serve`；压缩包里的 `gitpoulpi-mcp` 中继程序仍可作为别名使用，因此已有的、写着它的代理配置会继续运行。
 2. 在你的代理中注册服务器。它使用 stdio：无需启动任何东西，也没有端口。
 3. 可选地在 `config.toml` 的 `[mcp]` 表中选择代理可以做什么（见下文）。默认设置允许它读取仓库（在你设置 `allow_mutations = true` 之前，更改会被拒绝），仅在你确认之后才向你展示内容，并且从不预填对话框。
 
@@ -42,13 +42,13 @@ claude mcp add gitpoulpi -- gitpoulpi mcp serve --stdio
 |---|---|---|
 | Cursor、Windsurf、Claude Desktop、VS Code | 客户端的 MCP JSON 文件 | 上面的 `mcpServers` 块（VS Code 把键命名为 `servers`） |
 | OpenAI Codex CLI | `~/.codex/config.toml` | `[mcp_servers.gitpoulpi]`、`command = "gitpoulpi"`、`args = ["mcp", "serve", "--stdio"]` |
-| 其他任何客户端 | 它的文档 | 命令 `gitpoulpi-mcp`（独立的二进制文件，同一个服务器，无需参数） |
+| 其他任何客户端 | 它的文档 | 命令 `gitpoulpi mcp serve`（默认使用 stdio；`gitpoulpi-mcp` 是同一个服务器，供已经在使用它的配置使用） |
 
 **通过 HTTP**（连接到某个 URL 的客户端）：
 
 ```
-gitpoulpi-mcp --http                         # [mcp] bind, default http://127.0.0.1:8808/mcp
-gitpoulpi mcp serve --http 127.0.0.1:9000
+gitpoulpi mcp serve --http                   # [mcp] bind, default http://127.0.0.1:8808/mcp
+gitpoulpi mcp serve --http 127.0.0.1:9000    # or: --bind 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
@@ -88,7 +88,7 @@ claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
 
 | 开关 | 默认值 | 效果 |
 |---|---|---|
-| `[mcp] enabled` | `true` | `false`：`gitpoulpi mcp serve` / `gitpoulpi-mcp` 拒绝启动（设置 > 代理与 MCP > *MCP 服务器*）。在服务器启动时读取：已在运行的服务器沿用其设置。 |
+| `[mcp] enabled` | `true` | `false`：`gitpoulpi mcp serve`（及其别名 `gitpoulpi-mcp`）拒绝启动（设置 > 代理与 MCP > *MCP 服务器*）。在服务器启动时读取：已在运行的服务器沿用其设置。 |
 | `[mcp] bind` | `"127.0.0.1:8808"` | 未给出地址时 `--http` 使用的地址（除非 `--allow-remote`，否则仅限回环；`--allow-remote` 需要身份验证和加密，见上文）。设置 > 代理与 MCP > *MCP 服务器端口* 编辑其端口并保留主机。 |
 | `[mcp] http_auth` | `true` | `--http` 需要 `Authorization: Bearer <token>`（`gitpoulpi mcp token`）。设置 > 代理与 MCP > *HTTP 身份验证*。 |
 | `[mcp] tls`、`tls_cert`、`tls_key` | `"off"` | `off`、`self_signed` 或 `files`（你的 PEM 路径）：服务器自己终结 TLS。设置 > 代理与 MCP > *TLS*。 |

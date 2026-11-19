@@ -2,15 +2,9 @@
 
 # 安装
 
-GitPoulpi 有三个可执行文件：
+GitPoulpi 是一个程序，`gitpoulpi`。不带子命令运行时它会打开终端界面；带子命令时它是命令行界面（脚本可使用 `--json`）；`gitpoulpi mcp serve` 是面向 AI 代理的 MCP 服务器（参见 [MCP 与代理](mcp-and-agents.md)）。压缩包里还有 `gitpoulpi-updater`，这是另一个负责更新安装的小程序（参见[更新](updates.md)）。
 
-| 可执行文件 | 说明 |
-|---|---|
-| `gitpoulpi-tui` | 终端界面。 |
-| `gitpoulpi` | 命令行界面（脚本可使用 `--json`）。不带子命令时，它会打开界面。 |
-| `gitpoulpi-mcp` | 面向 AI 代理的 MCP 服务器。参见 [MCP 与代理](mcp-and-agents.md)。 |
-
-除这些文件外，压缩包里还有 `gitpoulpi-launch`，这是快捷方式用来显示已打开的 GitPoulpi 窗口的小程序（`gitpoulpi launch`）。在 Windows 上它没有控制台窗口，所以点击时不会闪出窗口。它与其他文件一起安装、更新和删除。
+为了兼容，压缩包里还有三个只负责启动 `gitpoulpi` 的小型中继程序：`gitpoulpi-tui`（打开界面；将在后续版本中移除）、`gitpoulpi-mcp`（启动 MCP 服务器；它在整个 1.x 系列中都会保留，因此现有的代理配置可继续使用）和 `gitpoulpi-launch`（快捷方式用它来显示已打开的 GitPoulpi 窗口，即 `gitpoulpi launch`；在 Windows 上它没有控制台窗口，所以点击时不会闪出窗口）。它们会一起安装、更新和删除。
 
 ## 你需要什么
 
@@ -23,7 +17,7 @@ GitPoulpi 有三个可执行文件：
 
 ## 从发布压缩包安装
 
-发布压缩包为 `gitpoulpi-<version>-<target>.zip`（Windows）或 `.tar.gz`（Linux、macOS），旁边附有一个 `.sha256` 文件。请对照 `.sha256` 文件检查压缩包，解压后，把三个可执行文件放进 `PATH` 中的某个文件夹（请把 `gitpoulpi-updater` 和 `.gitpoulpi-dist` 标记文件放在它们旁边：标记写的是 `channel=archive`，这样该构建才能自行更新，见[更新](updates.md)）。压缩包内的 `INSTALL.txt` 给出相同的步骤。
+发布压缩包为 `gitpoulpi-<version>-<target>.zip`（Windows）或 `.tar.gz`（Linux、macOS），旁边附有一个 `.sha256` 文件。请对照 `.sha256` 文件检查压缩包，解压后，把这些可执行文件（`gitpoulpi`、`gitpoulpi-updater` 以及中继程序 `gitpoulpi-tui`、`gitpoulpi-mcp` 和 `gitpoulpi-launch`）放进 `PATH` 中的某个文件夹，并附上 `.gitpoulpi-dist` 标记文件（请把 `gitpoulpi-updater` 和标记文件放在其他文件旁边：标记写的是 `channel=archive`，这样该构建才能自行更新，见[更新](updates.md)）。压缩包内的 `INSTALL.txt` 给出相同的步骤。
 
 ### 验证下载
 
@@ -75,7 +69,7 @@ gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoul
 curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
 ```
 
-它会选择适合你的系统和 CPU 的压缩包，检查其 `.sha256`，安装（通道为 `archive`：GitPoulpi 会原地自行更新）到 `~/.local/opt/gitpoulpi`，并把 `gitpoulpi` 和 `gitpoulpi-mcp` 链接到 `~/.local/bin`。不需要 root 权限，也不会改动主目录之外的任何内容。不加 `--yes` 时，它会询问别名（默认 `gp`）、PATH 和快捷方式。
+它会选择适合你的系统和 CPU 的压缩包，检查其 `.sha256`，安装（通道为 `archive`：GitPoulpi 会原地自行更新）到 `~/.local/opt/gitpoulpi`，并把 `gitpoulpi` 和 `gitpoulpi-mcp`（中继程序）链接到 `~/.local/bin`。不需要 root 权限，也不会改动主目录之外的任何内容。不加 `--yes` 时，它会询问别名（默认 `gp`）、PATH 和快捷方式。
 
 | 参数 | 作用 |
 |---|---|
@@ -102,7 +96,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 | **apt**（Debian、Ubuntu） | 见 [apt 软件源](#aptdebian-和-ubuntu) | 已签名的软件源；每个发布版本还附带一个 `.deb`。 |
 | **MSI**（Windows，受管理） | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | 面向管理员：所有用户，没有应用内更新。见[企业分发](enterprise-distribution.md#msi使用-intune-或组策略)。 |
 | **cargo** | `cargo binstall gitpoulpi-cli` | 下载发布压缩包而不是编译。 |
-| **cargo，来自 crates.io** | `cargo install --locked gitpoulpi-cli` | 需要编译；需要 Rust 工具链。安装 `gitpoulpi`，不带子命令运行时打开终端界面，同时提供 MCP 服务（`gitpoulpi mcp`）。`gitpoulpi-tui` 和 `gitpoulpi-mcp` 是作为独立 crate 提供的同一批程序。 |
+| **cargo，来自 crates.io** | `cargo install --locked gitpoulpi-cli` | 需要编译；需要 Rust 工具链。安装 `gitpoulpi`，不带子命令运行时打开终端界面，同时提供 MCP 服务（`gitpoulpi mcp`）。 |
 | **cargo，从源码** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | 需要编译；需要 Rust 工具链。 |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | 见[在 Docker 中运行](docker.md)。同一个镜像也在 `ghcr.io/poulpi-lab/gitpoulpi` 上。 |
 
@@ -137,7 +131,7 @@ cargo build --release
 cargo build --profile dist
 ```
 
-仓库根目录下的 `build-opti` 脚本会为这三个可执行文件执行此构建，并打印它们的大小：
+仓库根目录下的 `build-opti` 脚本会执行此构建，并打印可执行文件的大小：
 
 ```
 ./build-opti.sh                  # Linux, macOS
@@ -152,7 +146,7 @@ build-opti                       # Windows (cmd or PowerShell)
 cargo run -p xtask -- dist
 ```
 
-这会构建 `dist` 配置，并写出 `target/dist/gitpoulpi-<version>-<target>.zip`（Windows）或 `.tar.gz`（其他系统）。压缩包内含三个可执行文件、`INSTALL.txt`、`README.md`、`LICENSE` 和 `CHANGELOG.md`。旁边还会写出一个 `.sha256` 文件。
+这会构建 `dist` 配置，并写出 `target/dist/gitpoulpi-<version>-<target>.zip`（Windows）或 `.tar.gz`（其他系统）。压缩包内含这些可执行文件、`INSTALL.txt`、`README.md`、`LICENSE` 和 `CHANGELOG.md`。旁边还会写出一个 `.sha256` 文件。
 
 ## 更新
 
@@ -174,7 +168,7 @@ gitpoulpi
 
 ## 卸载
 
-`gitpoulpi uninstall`（两个安装程序都会运行它）会移除 GitPoulpi 创建的命令别名、PATH 条目、快捷方式和文件管理器菜单项（Windows 上还有它们的 App Paths 键），然后移除发布版安装的程序文件；在没有 `.gitpoulpi-dist` 标记的构建（cargo 构建）上它会拒绝执行，`--keep-files` 则保留程序文件。MCP 代理无法使用它。不用安装程序时，直接删除这三个可执行文件即可。GitPoulpi 还会保留以下文件：
+`gitpoulpi uninstall`（两个安装程序都会运行它）会移除 GitPoulpi 创建的命令别名、PATH 条目、快捷方式和文件管理器菜单项（Windows 上还有它们的 App Paths 键），然后移除发布版安装的程序文件；在没有 `.gitpoulpi-dist` 标记的构建（cargo 构建）上它会拒绝执行，`--keep-files` 则保留程序文件。MCP 代理无法使用它。不用安装程序时，直接删除程序文件即可。GitPoulpi 还会保留以下文件：
 
 | 内容 | 位置 |
 |---|---|

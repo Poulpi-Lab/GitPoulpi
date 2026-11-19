@@ -267,7 +267,7 @@ pub(crate) struct Panes {
     /// The file list's rows: rebuilt when the commit, the mode or a folder
     /// changes.
     pub(crate) tree: Vec<TreeRow>,
-    tree_key: Option<(Option<Oid>, FileListMode, u64, usize)>,
+    tree_key: Option<(Option<Oid>, FileListMode, u64, usize, bool)>,
     revision: u64,
     pub(crate) diff: DiffPane,
     /// Lines the diff box has (set by the paint, for its scrollbar).
@@ -318,7 +318,15 @@ impl Panes {
     /// Rebuilds the file rows when something they depend on changed, and puts
     /// the cursor on the first file after a new commit.
     pub(crate) fn rebuild(&mut self, paths: &[PathBuf]) {
-        let key = (self.commit, self.mode, self.revision, paths.len());
+        // The folders-first setting is part of the key: Settings can change it
+        // while the panel is open, and the cached rows carry the old order.
+        let key = (
+            self.commit,
+            self.mode,
+            self.revision,
+            paths.len(),
+            crate::live_settings::tree_folders_first(),
+        );
         if self.tree_key == Some(key) {
             return;
         }

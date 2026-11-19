@@ -319,7 +319,7 @@ review_mode = "ask"       # ask | clone | api
 | `mcp.ui_control` | `"ask"` | `ask`（ウィンドウに確認用のチップを表示）、`auto`（ユーザーが操作中でなければ適用）、`off`。サーバーコマンドの `--ui-control` でエージェントごとに上書きできます。`gitpoulpi ui show` にも適用されます。 |
 | `mcp.allow_ui_propose` | `false` | `ui_propose_*` / `gitpoulpi ui propose` を許可します。ユーザー自身が確定する、入力済みのダイアログです。 |
 | `mcp.allow_history_purge` | `false` | `config.toml` のみ（設定に行はありません）。`true` にすると、エージェント向けにツール `rewrite_purge` が一覧に表示されます（`allow_mutations` も必要です）。オフでは、エージェントにはこのツールがまったく見えません。消去は、履歴の書き換えの古い履歴と、その undo、reflog を完全に削除するためです。CLI と TUI は、この設定の制限を受けません。 |
-| `mcp.enabled` | `true` | `false`：`gitpoulpi mcp serve` と `gitpoulpi-mcp` は、このキーを挙げたメッセージを出して起動を拒否します。設定 > エージェントと MCP > *MCP サーバー*。エージェントがサーバーを起動するときに読み込まれます。 |
+| `mcp.enabled` | `true` | `false`：`gitpoulpi mcp serve`（とその別名 `gitpoulpi-mcp`）は、このキーを挙げたメッセージを出して起動を拒否します。設定 > エージェントと MCP > *MCP サーバー*。エージェントがサーバーを起動するときに読み込まれます。 |
 | `mcp.bind` | `"127.0.0.1:8808"` | アドレスを指定しないときに `--http` が待ち受けるアドレスです（`--http ADDR` / `--bind` が優先）。`--allow-remote` がない限りループバックのみです。空、または古い `"stdio"` は既定値を意味します。設定 > エージェントと MCP > *MCP サーバーのポート*でポートを編集でき、ホストは維持されます。 |
 | `mcp.http_auth` | `true` | `--http` は、`Authorization: Bearer <token>`（`gitpoulpi mcp token` のトークン）を持つリクエストにだけ応答します。`false` にするとチェックがなくなり、サーバーは stderr に警告を出し、`--allow-remote` は拒否されます。設定 > エージェントと MCP > *HTTP 認証*。 |
 | `mcp.tls` | `"off"` | `off`、`self_signed`（プライベートデータフォルダーの下に一度だけ生成される証明書。起動時に SHA-256 フィンガープリントを出力）、`files`（`tls_cert` と `tls_key`）。TLS をオンにすると、サーバー自身が TLS を終端し、平文のリスナーは存在しません。設定 > エージェントと MCP > *TLS*。 |

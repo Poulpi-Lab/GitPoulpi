@@ -170,7 +170,7 @@
 
 | システム | エイリアス | PATH |
 |---|---|---|
-| Linux、macOS | `~/.local/bin/<name>` から `gitpoulpi-tui` へのシンボリックリンク。リンクにはマーカーを持たせられないため、リンク先が `gitpoulpi-tui` という名前のファイルである場合に GitPoulpi のものとみなします。通常のファイル、または別のものへのリンクは**自分のものではない**扱いで、置き換えも削除もされません。 | `~/.bashrc` と `~/.zshrc`（存在するほう。どちらもなければ macOS では `~/.zshrc`、それ以外では `~/.bashrc`）の `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>` と `# <<< GitPoulpi PATH <<<` の間のブロック。fish を使っている場合は `~/.config/fish/conf.d/gitpoulpi-path.fish`。削除はこのブロック（または fish のファイル）だけを取り除きます。 |
+| Linux、macOS | `~/.local/bin/<name>` から `gitpoulpi` へのシンボリックリンク。リンクにはマーカーを持たせられないため、リンク先が `gitpoulpi`（または古いリンク先である `gitpoulpi-tui`。自動的に `gitpoulpi` へ書き換えられます）という名前のファイルである場合に GitPoulpi のものとみなします。通常のファイル、または別のものへのリンクは**自分のものではない**扱いで、置き換えも削除もされません。 | `~/.bashrc` と `~/.zshrc`（存在するほう。どちらもなければ macOS では `~/.zshrc`、それ以外では `~/.bashrc`）の `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>` と `# <<< GitPoulpi PATH <<<` の間のブロック。fish を使っている場合は `~/.config/fish/conf.d/gitpoulpi-path.fish`。削除はこのブロック（または fish のファイル）だけを取り除きます。 |
 | Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd`。`REM X-GitPoulpi=1` を含む短いシムです（`GITPOULPI_CMDCMDLINE` もエクスポートし、これでアドレスバーからの起動だと判別します）。 | `HKCU\Environment` のユーザー PATH。PowerShell 経由で書き込み、その後 `WM_SETTINGCHANGE` をブロードキャストして新しいプログラムに反映させます。値 `GitPoulpiPathAdded` に追加した内容を記録し、削除ではそれだけを取り除きます。 |
 
 PATH の変更が見えるのは新しいターミナルで、すでに開いているものには反映されません。どちらの操作も履歴には記録されず、元に戻す機能の対象ではありません。戻すには**削除**を使います。

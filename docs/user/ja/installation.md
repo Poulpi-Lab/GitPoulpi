@@ -113,7 +113,7 @@ OS と CPU に合ったアーカイブを選び、`.sha256` を確認して、`~
 | **cargo** | `cargo binstall gitpoulpi-cli` | コンパイルせず、リリースアーカイブをダウンロードします。 |
 | **cargo（crates.io から）** | `cargo install --locked gitpoulpi-cli` | コンパイルします。Rust ツールチェーンが必要です。`gitpoulpi` をインストールし、サブコマンドなしで実行すると端末 UI が開き、MCP（`gitpoulpi mcp`）も提供します。 |
 | **cargo（ソースから）** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | コンパイルします。Rust ツールチェーンが必要です。 |
-| **Docker** | `docker pull poulpilab/gitpoulpi` | [Docker で実行する](docker.md)を参照。同じイメージは `ghcr.io/poulpi-lab/gitpoulpi` にもあります。 |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | [Docker で実行する](docker.md)を参照。 |
 
 上の名前は、リリースの手順が公開先としているものです（[リリース](../../developer/releasing.md)を参照）。まだ公開されていないチャンネルは「見つかりません」と応答しますが、リリースアーカイブやインストーラーはつねに使えます。
 

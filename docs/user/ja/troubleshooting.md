@@ -69,6 +69,44 @@ GitPoulpi はクリックを受け取るためにマウスをキャプチャし�
 
 **ショートカットが動きません。** ターミナル、tmux、AutoHotkey のスクリプトなどが、GitPoulpi より先にそのキーを受け取っている可能性があります（Linux や macOS のターミナルでは、`Ctrl+,` が単なる `,` として届くことがよくあります。`Ctrl+Shift+N` は `Ctrl+N` に見えます）。代わりのキーを使うか（`Ctrl+N` の次に `,` で設定が開きます。`Ctrl+P` ですべてのコマンドに届きます）、コードを割り当て直してください。[設定](settings.md#キーボードとマウス)を参照してください。
 
+**`Ctrl+Tab` でタブが切り替わりません。** kitty、WezTerm、Ghostty、Windows Terminal は `Ctrl+Tab` と `Ctrl+Shift+Tab` を自分のタブ用に使うため、このキーは GitPoulpi に届きません。`Ctrl+PageDown` / `Ctrl+PageUp` は常に使えます。この 2 つを GitPoulpi に渡すには、ターミナルの設定で解除し、ターミナルを再起動（または設定を再読み込み）してください。
+
+- kitty：`kitty.conf` に書きます（アクションのない `map` は既定の割り当てを解除します。`--when-focus-on` とウィンドウ条件（`title:...` など）を併用すると、一致するウィンドウにフォーカスがあるときだけ解除することもできます。kitty のマッピングのドキュメントを参照してください）。
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm：`wezterm.lua` に書きます。
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty：設定ファイルに書きます。
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal：`settings.json` に書きます（`"id": null` で既定の割り当てを解除します）。
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  （古い設定ファイルでは、`actions` に `nextTab` / `prevTab` がこれらのキーで並んでいます。その場合はそこからキーを削除してください。）
+
+これでターミナル自身の `Ctrl+Tab` によるタブ切り替えは使えなくなります。このキーを kitty キーボードプロトコル経由でしか送れないターミナルでは、プロトコルをオンにしておく必要があります（既定でオンです。[キーバインド](keybindings.md#ターミナルが送れないキーと-kitty-キーボードプロトコル)を参照）。
+
 **ショートカットを思い出せません。** `Ctrl+P` を押して、したいことを入力してください。各結果にショートカットが表示されます。`?` ですべてが一覧できます。
 
 **設定の項目がグレーになっています。** ほかの項目に依存しています。その行に、どの項目か表示されます（たとえば、*行の色付けの強さ*は、*グラフのレーン背景*が*行の色付け*のときに有効になります）。

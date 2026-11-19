@@ -1,17 +1,17 @@
 //! The command alias (`gp` or any name): a launcher in a per-user `bin`
-//! directory that starts `gitpoulpi-tui` (Settings > Launcher,
+//! directory that starts `gitpoulpi` (Settings > Launcher,
 //! `gitpoulpi alias ...`).
 //!
 //! | OS | What is written | How it is known to be ours |
 //! |---|---|---|
-//! | Linux, macOS | `~/.local/bin/<name>`, a symlink to `gitpoulpi-tui` | the link's target is a file called `gitpoulpi-tui` |
+//! | Linux, macOS | `~/.local/bin/<name>`, a symlink to `gitpoulpi` | the link's target is a file called `gitpoulpi` (or the older `gitpoulpi-tui`, then rewritten) |
 //! | Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd` | the file holds [`CMD_MARKER`] |
 //!
 //! The *add* variant (`gpa`: `gitpoulpi --add`, which opens the current folder
 //! as a tab of the GitPoulpi that is already running) needs an argument, so it
 //! cannot be a link. It is a two-line shim with the same marker idea: the
 //! `.cmd` on Windows, and on Linux/macOS a `/bin/sh` script holding
-//! [`UNIX_MARKER`] that `exec`s `gitpoulpi-tui --add "$@"` (no extra process).
+//! [`UNIX_MARKER`] that `exec`s `gitpoulpi --add "$@"` (no extra process).
 //!
 //! A symlink cannot carry a marker, and a shim script would add a process
 //! hop to every start, so on Unix the link itself is the proof: a file or a

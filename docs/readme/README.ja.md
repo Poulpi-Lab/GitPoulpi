@@ -37,7 +37,7 @@ GitPoulpi には、クリック、ドラッグ、右クリックができる本�
 
 | | |
 |---|---|
-| ![Material カラーテーマと行の色付けを有効にした ログのグラフ](../../docs/user/images/theme-material.png) **commit グラフ**。ここでは Material テーマで行の色付けを有効にしています。 | ![各ハンクにハンクをステージとハンクを破棄のボタンがある、変更したファイルの diff](../../docs/user/images/diff.png) **diff**。ハンク単位または行単位でステージと破棄ができます。 |
+| ![Material レーンパレットと行の色付けを有効にした ログのグラフ](../../docs/user/images/theme-material.png) **commit グラフ**。ここでは Material レーンパレットと行の色付けを使っています。 | ![各ハンクにハンクをステージとハンクを破棄のボタンがある、変更したファイルの diff](../../docs/user/images/diff.png) **diff**。ハンク単位または行単位でステージと破棄ができます。 |
 | ![stash という語で絞り込んだコマンドパレット](../../docs/user/images/palette.png) **コマンドパレット**（`Ctrl+P`）から、すべてのコマンドに届きます。 | ![作業中の変更に対して 4 つの commit を提案し、確認できる状態の commit コンポーザー](../../docs/user/images/composer.png) **commit コンポーザー**は、AI が提案した commit を、何かを commit する前に確認できます。 |
 | ![cherry-pick、revert、reset、rebase、ブランチ、tag の操作がある commit の右クリックメニュー](../../docs/user/images/context-menu.png) どこでも**右クリック**すると、その操作が表示されます。 | ![プロファイル、操作ごとの指示、有効化スイッチがある設定の AI ページ](../../docs/user/images/settings-ai.png) **設定**には検索があり、任意の AI ページもあります。 |
 

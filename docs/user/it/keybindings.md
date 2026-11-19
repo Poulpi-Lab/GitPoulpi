@@ -914,8 +914,8 @@ applicano. I tasti sono quelli predefiniti.
 | Registro attività: Apri l'ultimo errore |  |
 | Scheda: Esci e cd qui |  |
 | Repository: Clona... | `Ctrl+Shift+N` |
-| Repository: Scheda successiva | `Ctrl+PageDown` |
-| Repository: Scheda precedente | `Ctrl+PageUp` |
+| Repository: Scheda successiva | `Ctrl+PageDown / Ctrl+Tab` |
+| Repository: Scheda precedente | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | Scheda: Sposta a sinistra |  |
 | Scheda: Sposta a destra |  |
 | Repository: Chiudi scheda | `Ctrl+W` |

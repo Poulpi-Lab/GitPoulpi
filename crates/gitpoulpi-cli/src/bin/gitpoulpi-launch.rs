@@ -9,8 +9,10 @@
 //!
 //! It is built for the Windows GUI subsystem so that a click on a shortcut
 //! never flashes a console window, and starts `gitpoulpi` with
-//! `CREATE_NO_WINDOW` for the same reason. It prints nothing. On other
-//! systems it is the same stub with a console, which nothing runs. Std only.
+//! `CREATE_NO_WINDOW` for the same reason. It prints nothing, except for a
+//! lone `--version` / `-V`: that prints the `gitpoulpi --version` line (on
+//! Windows into the parent console, when there is one). On other systems it
+//! is the same stub with a console, which nothing runs. Std only.
 #![cfg_attr(windows, windows_subsystem = "windows")]
 
 use std::path::PathBuf;
@@ -29,10 +31,38 @@ fn target() -> Option<PathBuf> {
     Some(own.parent()?.join(TARGET))
 }
 
+/// Gives this GUI-subsystem process the console of the program that started
+/// it, so what it prints is seen. No parent console (a shortcut, Explorer):
+/// the call fails and nothing is printed anywhere, which is harmless.
+#[cfg(windows)]
+fn attach_parent_console() {
+    const ATTACH_PARENT_PROCESS: u32 = u32::MAX;
+    #[link(name = "kernel32")]
+    extern "system" {
+        fn AttachConsole(process_id: u32) -> i32;
+    }
+    // SAFETY: plain Win32 call with a constant argument; its failure is ignored.
+    unsafe {
+        AttachConsole(ATTACH_PARENT_PROCESS);
+    }
+}
+
 fn main() {
     let Some(target) = target() else {
         std::process::exit(127);
     };
+    let mut args = std::env::args_os().skip(1);
+    if let (Some(a), None) = (args.next(), args.next()) {
+        if a == "--version" || a == "-V" {
+            #[cfg(windows)]
+            attach_parent_console();
+            let code = match Command::new(target).arg("--version").status() {
+                Ok(status) => status.code().unwrap_or(1),
+                Err(_) => 127,
+            };
+            std::process::exit(code);
+        }
+    }
     let mut cmd = Command::new(target);
     cmd.arg("--gitpoulpi-as")
         .arg("gitpoulpi-launch")

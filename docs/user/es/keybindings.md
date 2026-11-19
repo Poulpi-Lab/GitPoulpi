@@ -915,8 +915,8 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Registro de actividad: Abrir el último error |  |
 | Pestaña: Salir y cd aquí |  |
 | Repositorio: Clonar... | `Ctrl+Shift+N` |
-| Repositorio: Pestaña siguiente | `Ctrl+PageDown` |
-| Repositorio: Pestaña anterior | `Ctrl+PageUp` |
+| Repositorio: Pestaña siguiente | `Ctrl+PageDown / Ctrl+Tab` |
+| Repositorio: Pestaña anterior | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | Pestaña: Mover a la izquierda |  |
 | Pestaña: Mover a la derecha |  |
 | Repositorio: Cerrar pestaña | `Ctrl+W` |

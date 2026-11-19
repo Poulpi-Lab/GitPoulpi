@@ -909,8 +909,8 @@ zastosowania. Klawisze są domyślne.
 | Dziennik aktywności: Otwórz ostatni błąd |  |
 | Karta: Zakończ i cd tutaj |  |
 | Repozytorium: Klonuj... | `Ctrl+Shift+N` |
-| Repozytorium: Następna karta | `Ctrl+PageDown` |
-| Repozytorium: Poprzednia karta | `Ctrl+PageUp` |
+| Repozytorium: Następna karta | `Ctrl+PageDown / Ctrl+Tab` |
+| Repozytorium: Poprzednia karta | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | Karta: Przesuń w lewo |  |
 | Karta: Przesuń w prawo |  |
 | Repozytorium: Zamknij kartę | `Ctrl+W` |

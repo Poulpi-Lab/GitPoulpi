@@ -912,8 +912,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Journal d'activité : Ouvrir la dernière erreur |  |
 | Onglet : Quitter et faire cd ici |  |
 | Dépôt : Cloner... | `Ctrl+Shift+N` |
-| Dépôt : Onglet suivant | `Ctrl+PageDown` |
-| Dépôt : Onglet précédent | `Ctrl+PageUp` |
+| Dépôt : Onglet suivant | `Ctrl+PageDown / Ctrl+Tab` |
+| Dépôt : Onglet précédent | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | Onglet : Déplacer à gauche |  |
 | Onglet : Déplacer à droite |  |
 | Dépôt : Fermer l'onglet | `Ctrl+W` |

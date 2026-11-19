@@ -914,8 +914,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Activiteitenlogboek: Laatste fout openen |  |
 | Tabblad: Afsluiten en cd hier |  |
 | Repository: Klonen... | `Ctrl+Shift+N` |
-| Repository: Volgend tabblad | `Ctrl+PageDown` |
-| Repository: Vorig tabblad | `Ctrl+PageUp` |
+| Repository: Volgend tabblad | `Ctrl+PageDown / Ctrl+Tab` |
+| Repository: Vorig tabblad | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | Tabblad: Naar links verplaatsen |  |
 | Tabblad: Naar rechts verplaatsen |  |
 | Repository: Tabblad sluiten | `Ctrl+W` |

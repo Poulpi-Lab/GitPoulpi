@@ -908,8 +908,8 @@ As teclas são as padrão.
 | Registro de atividade: abrir o último erro |  |
 | Aba: sair e cd aqui |  |
 | Repositório: clonar... | `Ctrl+Shift+N` |
-| Repositório: próxima aba | `Ctrl+PageDown` |
-| Repositório: aba anterior | `Ctrl+PageUp` |
+| Repositório: próxima aba | `Ctrl+PageDown / Ctrl+Tab` |
+| Repositório: aba anterior | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | Aba: mover para a esquerda |  |
 | Aba: mover para a direita |  |
 | Repositório: fechar aba | `Ctrl+W` |

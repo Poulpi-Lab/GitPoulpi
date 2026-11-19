@@ -908,8 +908,8 @@ As teclas são as predefinidas.
 | Registo de atividade: abrir o último erro |  |
 | Separador: sair e cd aqui |  |
 | Repositório: clonar... | `Ctrl+Shift+N` |
-| Repositório: próximo separador | `Ctrl+PageDown` |
-| Repositório: separador anterior | `Ctrl+PageUp` |
+| Repositório: próximo separador | `Ctrl+PageDown / Ctrl+Tab` |
+| Repositório: separador anterior | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | Separador: mover para a esquerda |  |
 | Separador: mover para a direita |  |
 | Repositório: fechar separador | `Ctrl+W` |

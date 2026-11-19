@@ -912,8 +912,8 @@ Tangenterna är standardvärdena.
 | Aktivitetslogg: Öppna det senaste felet |  |
 | Flik: Avsluta och cd hit |  |
 | Repository: Klona... | `Ctrl+Shift+N` |
-| Repository: Nästa flik | `Ctrl+PageDown` |
-| Repository: Föregående flik | `Ctrl+PageUp` |
+| Repository: Nästa flik | `Ctrl+PageDown / Ctrl+Tab` |
+| Repository: Föregående flik | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | Flik: Flytta åt vänster |  |
 | Flik: Flytta åt höger |  |
 | Repository: Stäng flik | `Ctrl+W` |

@@ -285,3 +285,19 @@ fn every_prefix_shortcut_in_the_catalogue_is_an_action() {
         }
     }
 }
+
+/// A multi-bound action shows every binding in the palette, not only the
+/// first: "Tab: next" lists Ctrl+PageDown and Ctrl+Tab.
+#[test]
+fn tab_cycle_rows_show_every_binding() {
+    let row = |c: PaletteCommand| PALETTE_COMMANDS.iter().find(|e| e.command == c).unwrap();
+    let km = crate::keymap::Keymap::defaults();
+    assert_eq!(
+        entry_shortcut(&km, row(PaletteCommand::CycleRepositoryTab(true))),
+        "Ctrl+PageDown / Ctrl+Tab"
+    );
+    assert_eq!(
+        entry_shortcut(&km, row(PaletteCommand::CycleRepositoryTab(false))),
+        "Ctrl+PageUp / Ctrl+Shift+Tab"
+    );
+}

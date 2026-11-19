@@ -910,8 +910,8 @@ Tuşlar varsayılanlardır.
 | Etkinlik Günlüğü: Son Hatayı Aç |  |
 | Sekme: Çık ve cd Yap |  |
 | Depo: Klonla... | `Ctrl+Shift+N` |
-| Depo: Sonraki Sekme | `Ctrl+PageDown` |
-| Depo: Önceki Sekme | `Ctrl+PageUp` |
+| Depo: Sonraki Sekme | `Ctrl+PageDown / Ctrl+Tab` |
+| Depo: Önceki Sekme | `Ctrl+PageUp / Ctrl+Shift+Tab` |
 | Sekme: Sola Taşı |  |
 | Sekme: Sağa Taşı |  |
 | Depo: Sekmeyi Kapat | `Ctrl+W` |

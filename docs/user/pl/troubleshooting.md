@@ -86,6 +86,54 @@ terminalach Linuksa i macOS; `Ctrl+Shift+N` wygląda jak `Ctrl+N`). Użyj
 alternatyw (`Ctrl+N`, potem `,` otwiera Ustawienia; `Ctrl+P` dociera do każdego
 polecenia) lub przypisz akord na nowo: zob. [Ustawienia](settings.md#klawiatura-i-mysz).
 
+**`Ctrl+Tab` nie przełącza kart.** kitty, WezTerm, Ghostty i Windows Terminal
+zachowują `Ctrl+Tab` i `Ctrl+Shift+Tab` dla własnych kart, więc ten klawisz
+nigdy nie dociera do GitPoulpi. `Ctrl+PageDown` / `Ctrl+PageUp` działają zawsze.
+Aby oddać tę parę GitPoulpi, zwolnij ją w konfiguracji terminala, a potem
+uruchom terminal ponownie (albo przeładuj jego konfigurację):
+
+- kitty, w `kitty.conf` (`map` bez akcji usuwa domyślne przypisanie; z
+  `--when-focus-on` i kryterium okna, takim jak `title:...`, kitty może je
+  usunąć tylko wtedy, gdy fokus ma pasujące okno, zob. dokumentację mapowania
+  kitty):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, w `wezterm.lua`:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, w jego pliku konfiguracyjnym:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, w `settings.json` (`"id": null` usuwa przypisanie domyślne):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (Starsze pliki ustawień wymieniają `nextTab` / `prevTab` w `actions` z tymi
+  klawiszami: usuń tam te klawisze.)
+
+Terminal traci wtedy własne przełączanie kart przez `Ctrl+Tab`. Terminal, który
+potrafi wysłać ten klawisz tylko przez protokół klawiatury kitty, wymaga jego
+włączenia (domyślnie jest włączony, zob. [Skróty klawiszowe](keybindings.md#klawisze-których-terminal-nie-może-wysłać-i-protokół-klawiatury-kitty)).
+
 **Jak znaleźć zapomniany skrót.** Naciśnij `Ctrl+P` i wpisz, czego chcesz; każdy
 wynik pokazuje swój skrót. `?` wypisuje wszystko.
 

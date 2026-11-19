@@ -2,7 +2,7 @@
 
 # Eseguire in Docker
 
-L'immagine `poulpilab/gitpoulpi` contiene i binari ufficiali di rilascio (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) su `debian:bookworm-slim`, con `git`, `git-lfs`, `openssh-client`, `less` e `tini`. Gira su `linux/amd64` e `linux/arm64`. È su Docker Hub.
+L'immagine `poulpilab/gitpoulpi` contiene i binari ufficiali di rilascio (`gitpoulpi`, più i relay `gitpoulpi-tui` e `gitpoulpi-mcp`) su `debian:bookworm-slim`, con `git`, `git-lfs`, `openssh-client`, `less` e `tini`. Gira su `linux/amd64` e `linux/arm64`. È su Docker Hub.
 
 ## Avviare la TUI
 
@@ -81,10 +81,10 @@ Il punto di ingresso avvia la TUI. Gli altri programmi si raggiungono sostituend
 docker run --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi status
 
 # il server MCP, su standard input e output, per un agente che lo avvia
-docker run -i --rm --entrypoint gitpoulpi-mcp -v "$PWD":/work poulpilab/gitpoulpi
+docker run -i --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi mcp serve
 ```
 
-Ogni `docker run` è un container a sé, con il proprio daemon in background di GitPoulpi, quindi le modifiche fatte tramite la CLI non compaiono in tempo reale in una TUI in esecuzione in un altro container. Per pilotare una TUI dalla CLI, esegui entrambe nello stesso container: avvia la TUI con `--name gp` e usa `docker exec gp gitpoulpi ...`. Per un agente, registra `docker run -i --rm --entrypoint gitpoulpi-mcp ...` come comando del server MCP, vedi [MCP e agenti](mcp-and-agents.md); gli interruttori dei permessi MCP nel `config.toml` montato si applicano come al solito.
+Ogni `docker run` è un container a sé, con il proprio daemon in background di GitPoulpi, quindi le modifiche fatte tramite la CLI non compaiono in tempo reale in una TUI in esecuzione in un altro container. Per pilotare una TUI dalla CLI, esegui entrambe nello stesso container: avvia la TUI con `--name gp` e usa `docker exec gp gitpoulpi ...`. Per un agente, registra `docker run -i --rm --entrypoint gitpoulpi ... mcp serve` come comando del server MCP, vedi [MCP e agenti](mcp-and-agents.md); gli interruttori dei permessi MCP nel `config.toml` montato si applicano come al solito.
 
 ## Tag e aggiornamento
 

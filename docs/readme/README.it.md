@@ -30,7 +30,7 @@ server MCP, così un agente IA può pilotarlo esattamente come fai tu. GitPoulpi
   worktree e patch.
 - **Hosting e issue tracker integrati.** Sfoglia, fai il checkout e crea pull e merge request (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket) e rivedi le modifiche di Gerrit. Sfoglia e crea issue, work item e card (anche Jira, Trello, Linear, YouTrack, Redmine e note Markdown locali), se vuoi su una bacheca Kanban. Clona dal tuo account e gestisci le chiavi SSH.
 - **CLI e MCP per gli agenti.** `gitpoulpi <comando> --json` copre tutto
-  ciò che fa la UI, e `gitpoulpi-mcp` lo espone come strumenti MCP. Un demone
+  ciò che fa la UI, e `gitpoulpi mcp serve` lo espone come strumenti MCP. Un demone
   in background per repository mantiene ogni frontend aggiornato e sincronizzato.
 - **IA facoltativa, mai obbligatoria.** Disattivata per impostazione predefinita
   e senza account: porta la tua chiave API o una CLI di agente locale come
@@ -145,7 +145,7 @@ area dello schermo.
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 L’IA è facoltativa e disattivata per impostazione predefinita: attiva l’IA di

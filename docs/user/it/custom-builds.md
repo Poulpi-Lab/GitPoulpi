@@ -25,7 +25,7 @@ quella build esiste. Scrive anche `BUILD-FEATURES.txt` accanto ai binari.
 | Colori del logo | Il polpo a pixel della finestra Informazioni esiste in 20 varianti di colore (`--list-logo-colors`). Scegli quelle da compilare (almeno una), quella predefinita (Informazioni la mostra per prima; è anche il valore a cui ripiega un `ui.logo_color` memorizzato che non è compilato; deve essere una di quelle compilate; predefinito ufficiale: lavender) e il colore dell'icona dell'eseguibile Windows (qualsiasi variante, predefinito: quello predefinito del logo). Con una sola variante il logo gira comunque al clic ma resta di quel colore, e l'elenco dei colori (`c`, clic destro) non viene offerto. |
 | Integrazioni (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine) | Senza nessuna: solo clone tramite URL; niente issue, né pull/merge request. |
 | IA | Niente pulsanti, comandi né strumenti `ai` della CLI/MCP. |
-| MCP | Niente binario `gitpoulpi-mcp` né comando `gitpoulpi mcp`. I comandi agente `ui` restano. |
+| MCP | Niente relay `gitpoulpi-mcp` né comando `gitpoulpi mcp`. I comandi agente `ui` restano. |
 | LFS, Worktree, Sottomoduli | Le schermate di gestione e i comandi corrispondenti spariscono; viene restituita una risposta tipizzata "not built into this binary". |
 | Download degli avatar | Solo badge con le iniziali, nessun download dalla rete. |
 | Anteprima immagini | I file immagine mostrano il semplice avviso binario; **Modifica in** funziona comunque. |
@@ -95,13 +95,13 @@ Le scelte del logo sono le variabili d'ambiente `GITPOULPI_LOGO_COLORS`
 (`all` o un elenco di slug separati da virgola), `GITPOULPI_LOGO_DEFAULT` e
 `GITPOULPI_ICON_COLOR`, lette dagli script di build di `gitpoulpi-tui` (che
 filtra `crates/gitpoulpi-logo-build/colourways.json` nella tabella che la finestra Informazioni
-incorpora) e dei tre crate binari (l'icona). La fonte dei colori
+incorpora) e di `gitpoulpi-cli` (l'icona). La fonte dei colori
 resta `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Icona dell'eseguibile Windows
 
-Quando il target è Windows, gli eseguibili `gitpoulpi`, `gitpoulpi-tui` e `gitpoulpi-mcp`
-ricevono il polpo come icona, generata in fase di compilazione (non servono
+Quando il target è Windows, l'eseguibile `gitpoulpi`
+riceve il polpo come icona, generata in fase di compilazione (non servono
 Python né ImageMagick) nel colore di icona scelto, in dimensioni da 16 a 128 px.
 Viene incorporata con il crate `winresource` e richiede il compilatore di risorse
 della piattaforma (`rc.exe` dal Windows SDK con MSVC, `windres` con GNU). Se manca,
@@ -136,31 +136,32 @@ Quando esiste una selezione salvata, la modalità interattiva propone prima «Pa
 
 ## Cosa fa risparmiare
 
-Misurato su Linux il 2026-10-29 al commit `65999ef5c`, dalla build completa, con la differenza rispetto a essa tra parentesi (dettagli in `docs/developer/binary-size.md`):
+Misurato su Linux il 2026-10-29 al commit `65999ef5c`, dimensione di `gitpoulpi` (il programma intero: UI, CLI e server MCP) dalla build completa, con la differenza rispetto a essa tra parentesi
+(dettagli in `docs/developer/binary-size.md`). I relay `gitpoulpi-tui`, `gitpoulpi-mcp` e `gitpoulpi-launch` restano ben sotto 1 MiB qualunque cosa scegli:
 
-| Build (dalla `full` salvo indicazione contraria) | `gitpoulpi` (MiB) | `gitpoulpi-tui` (MiB) | `gitpoulpi-mcp` (MiB) |
-|---|---|---|---|
-| Completa (tutto attivo) | 64,6 | 50,5 | 31,7 |
-| Solo inglese | 52,0 (-12,6) | 40,2 (-10,3) | 31,7 (0,0) |
-| MCP disattivato | 61,6 (-3,0) | 49,6 (-0,8) | non compilato |
-| IA disattivata | 62,6 (-2,0) | 48,6 (-1,8) | 30,5 (-1,3) |
-| Tutte le integrazioni disattivate | 56,3 (-8,2) | 43,7 (-6,7) | 26,7 (-5,0) |
-| IA + integrazioni + download avatar disattivati | 52,2 (-12,3) | 39,9 (-10,6) | 23,0 (-8,8) |
-| Pannello della cronologia disattivato (`--no-history-rewrite`) | 61,6 (-3,0) | 48,9 (-1,5) | 28,5 (-3,2) |
-| Script di riscrittura disattivati | 63,1 (-1,5) | 49,0 (-1,5) | 31,1 (-0,7) |
-| Ricerca globale disattivata | 63,5 (-1,1) | 49,5 (-1,0) | 31,6 (-0,1) |
-| Aree di lavoro disattivate | 63,5 (-1,1) | 49,5 (-0,9) | 31,5 (-0,2) |
-| Radar disattivato | 63,4 (-1,2) | 49,3 (-1,2) | 31,7 (0,0) |
-| Board disattivata | 63,6 (-1,0) | 49,5 (-1,0) | 31,7 (0,0) |
-| Review disattivata | 63,2 (-1,4) | 49,0 (-1,4) | 31,7 (0,0) |
-| Mermaid disattivato | 63,6 (-1,0) | 49,5 (-0,9) | 31,6 (-0,1) |
-| LFS disattivato | 63,5 (-1,1) | 49,5 (-0,9) | 31,5 (-0,3) |
-| Worktree disattivato | 63,7 (-0,9) | 49,6 (-0,8) | 31,7 (0,0) |
-| Sottomoduli disattivati | 63,7 (-0,9) | 49,6 (-0,9) | 31,6 (-0,1) |
-| Download avatar disattivato | 63,7 (-0,9) | 49,6 (-0,9) | 31,7 (0,0) |
-| Anteprima immagini disattivata | 63,3 (-1,2) | 49,2 (-1,3) | 31,7 (0,0) |
-| Tutto disattivato, solo inglese (LFS mantenuto) | 35,2 (-29,4) | 28,9 (-21,5) | non compilato |
-| **Tutto disattivato, solo inglese** | **34,9 (-29,7)** | **28,8 (-21,6)** | non compilato |
+| Build (dalla `full` salvo indicazione contraria) | `gitpoulpi` (MiB) |
+|---|---|
+| Completa (tutto attivo) | 64,6 |
+| Solo inglese | 52,0 (-12,6) |
+| MCP disattivato | 61,6 (-3,0) |
+| IA disattivata | 62,6 (-2,0) |
+| Tutte le integrazioni disattivate | 56,3 (-8,2) |
+| IA + integrazioni + download avatar disattivati | 52,2 (-12,3) |
+| Pannello della cronologia disattivato (`--no-history-rewrite`) | 61,6 (-3,0) |
+| Script di riscrittura disattivati | 63,1 (-1,5) |
+| Ricerca globale disattivata | 63,5 (-1,1) |
+| Aree di lavoro disattivate | 63,5 (-1,1) |
+| Radar disattivato | 63,4 (-1,2) |
+| Board disattivata | 63,6 (-1,0) |
+| Review disattivata | 63,2 (-1,4) |
+| Mermaid disattivato | 63,6 (-1,0) |
+| LFS disattivato | 63,5 (-1,1) |
+| Worktree disattivato | 63,7 (-0,9) |
+| Sottomoduli disattivati | 63,7 (-0,9) |
+| Download avatar disattivato | 63,7 (-0,9) |
+| Anteprima immagini disattivata | 63,3 (-1,2) |
+| Tutto disattivato, solo inglese (LFS mantenuto) | 35,2 (-29,4) |
+| **Tutto disattivato, solo inglese** | **34,9 (-29,7)** |
 
 ## Note
 

@@ -20,7 +20,7 @@ build-custom                     # Windows, cmd veya PowerShell (scripts/build-c
 | Logo renkleri | Hakkında penceresinin piksel ahtapotu 20 renk düzeniyle gelir (`--list-logo-colors`). Derlemeye girecek olanları (en az bir), varsayılanı (Hakkında onu ilk gösterir; derlenmemiş olan kayıtlı bir `ui.logo_color` değerinin de düştüğü yerdir; derlenenlerden biri olmalıdır; resmî varsayılan: lavender) ve Windows çalıştırılabilir dosya simgesinin rengini (herhangi bir renk düzeni, varsayılan: logo varsayılanı) seçin. Tek renk düzeniyle logo tıklayınca yine döner ama o renkte kalır ve renk listesi (`c`, sağ tık) sunulmaz. |
 | Entegrasyonlar (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine) | Hiçbiri olmadan: yalnızca URL ile klonlama; issue yok, pull/merge request yok. |
 | YZ | YZ düğmeleri, komutları ya da `ai` CLI/MCP araçları yok. |
-| MCP | `gitpoulpi-mcp` ikilisi ve `gitpoulpi mcp` komutu yok. `ui` ajan komutları kalır. |
+| MCP | `gitpoulpi-mcp` aktarıcısı ve `gitpoulpi mcp` komutu yok. `ui` ajan komutları kalır. |
 | LFS, Worktree, Alt modüller | İlgili yönetim ekranları ve komutlar yok olur; "not built into this binary" türlü bir yanıt döner. |
 | Avatar indirme | Yalnızca baş harf rozetleri, ağdan getirme yok. |
 | Görsel önizleme | Görsel dosyaları sade ikili dosya uyarısını gösterir; **Şununla düzenle** yine çalışır. |
@@ -77,11 +77,11 @@ PowerShell adları: `-Langs -Integrations -Themes -LogoColors -LogoDefault -Icon
 
 Tema seçimi derlemeye `GITPOULPI_THEMES` ortam değişkeni olarak ulaşır (`all`, `none` ya da virgülle ayrılmış bir aile listesi); `gitpoulpi-config`'in derleme betiği bunu okur ve diğer paletleri derleme zamanında atar; tercih ederseniz sade bir `cargo build` için kendiniz ayarlayın. `gitpoulpi --version` derlenen kümeyi gösteren bir `themes:` satırı yazdırır.
 
-Logo seçimleri `GITPOULPI_LOGO_COLORS` (`all` ya da virgülle ayrılmış slug listesi), `GITPOULPI_LOGO_DEFAULT` ve `GITPOULPI_ICON_COLOR` ortam değişkenleridir; bunları `gitpoulpi-tui`'nin (`crates/gitpoulpi-logo-build/colourways.json` dosyasını Hakkında penceresinin gömdüğü tabloya süzer) ve üç ikili crate'in (simge) derleme betikleri okur. Renklerin kaynağı `crates/gitpoulpi-logo-build/colourways.json` olarak kalır.
+Logo seçimleri `GITPOULPI_LOGO_COLORS` (`all` ya da virgülle ayrılmış slug listesi), `GITPOULPI_LOGO_DEFAULT` ve `GITPOULPI_ICON_COLOR` ortam değişkenleridir; bunları `gitpoulpi-tui`'nin (`crates/gitpoulpi-logo-build/colourways.json` dosyasını Hakkında penceresinin gömdüğü tabloya süzer) ve `gitpoulpi-cli`'nin (simge) derleme betikleri okur. Renklerin kaynağı `crates/gitpoulpi-logo-build/colourways.json` olarak kalır.
 
 ### Windows çalıştırılabilir dosya simgesi
 
-Hedef Windows olduğunda `gitpoulpi`, `gitpoulpi-tui` ve `gitpoulpi-mcp` çalıştırılabilir dosyaları simge olarak ahtapotu alır; seçilen simge renginde, 16 ila 128 px boyutlarında, derleme zamanında üretilir (Python ya da ImageMagick gerekmez). `winresource` crate'iyle gömülür ve platformun kaynak derleyicisini ister (MSVC'de Windows SDK'dan `rc.exe`, GNU'da `windres`). Eksikse derleme yalnızca bir uyarı yazdırır ve çalıştırılabilir dosya varsayılan simgesini korur. GNU araç zincirinde yalnızca `gitpoulpi` simgeyi taşır (kaynak aksi halde iki kez bağlanırdı). Linux ve macOS derlemeleri, renk tablosu dışında bunların hepsini yok sayar.
+Hedef Windows olduğunda `gitpoulpi` çalıştırılabilir dosyası simge olarak ahtapotu alır; seçilen simge renginde, 16 ila 128 px boyutlarında, derleme zamanında üretilir (Python ya da ImageMagick gerekmez). `winresource` crate'iyle gömülür ve platformun kaynak derleyicisini ister (MSVC'de Windows SDK'dan `rc.exe`, GNU'da `windres`). Eksikse derleme yalnızca bir uyarı yazdırır ve çalıştırılabilir dosya varsayılan simgesini korur. GNU araç zincirinde yalnızca `gitpoulpi` simgeyi taşır (kaynak aksi halde iki kez bağlanırdı). Linux ve macOS derlemeleri, renk tablosu dışında bunların hepsini yok sayar.
 
 ## Kayıtlı seçimler
 
@@ -110,32 +110,32 @@ Kayıtlı bir seçim varsa etkileşimli kip önce "Şuradan başla" seçeneğini
 
 ## Neyi tasarruf eder
 
-Linux'ta, 2026-10-29 tarihinde `65999ef5c` commit'inde, tam derlemeden ölçüldü; ondan farkı parantez içinde
-(ayrıntılar `docs/developer/binary-size.md` içinde):
+Linux'ta, 2026-10-29 tarihinde `65999ef5c` commit'inde, `gitpoulpi` programının (tüm program: arayüz, CLI ve MCP sunucusu) tam derlemeden ölçülen boyutu; ondan farkı parantez içinde
+(ayrıntılar `docs/developer/binary-size.md` içinde). `gitpoulpi-tui`, `gitpoulpi-mcp` ve `gitpoulpi-launch` aktarıcıları seçiminiz ne olursa olsun 1 MiB'nin çok altındadır:
 
-| Derleme (aksi belirtilmedikçe `full`'dan) | `gitpoulpi` (MiB) | `gitpoulpi-tui` (MiB) | `gitpoulpi-mcp` (MiB) |
-|---|---|---|---|
-| Tam (her şey açık) | 64.6 | 50.5 | 31.7 |
-| Yalnızca İngilizce | 52.0 (-12.6) | 40.2 (-10.3) | 31.7 (0.0) |
-| MCP kapalı | 61.6 (-3.0) | 49.6 (-0.8) | derlenmedi |
-| YZ kapalı | 62.6 (-2.0) | 48.6 (-1.8) | 30.5 (-1.3) |
-| Tüm entegrasyonlar kapalı | 56.3 (-8.2) | 43.7 (-6.7) | 26.7 (-5.0) |
-| YZ + entegrasyonlar + avatar getirme kapalı | 52.2 (-12.3) | 39.9 (-10.6) | 23.0 (-8.8) |
-| Geçmiş ekranı kapalı (`--no-history-rewrite`) | 61.6 (-3.0) | 48.9 (-1.5) | 28.5 (-3.2) |
-| Yeniden yazma betikleri kapalı | 63.1 (-1.5) | 49.0 (-1.5) | 31.1 (-0.7) |
-| Genel arama kapalı | 63.5 (-1.1) | 49.5 (-1.0) | 31.6 (-0.1) |
-| Çalışma alanları kapalı | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.2) |
-| Radar kapalı | 63.4 (-1.2) | 49.3 (-1.2) | 31.7 (0.0) |
-| Board kapalı | 63.6 (-1.0) | 49.5 (-1.0) | 31.7 (0.0) |
-| Review kapalı | 63.2 (-1.4) | 49.0 (-1.4) | 31.7 (0.0) |
-| Mermaid kapalı | 63.6 (-1.0) | 49.5 (-0.9) | 31.6 (-0.1) |
-| LFS kapalı | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.3) |
-| Worktree kapalı | 63.7 (-0.9) | 49.6 (-0.8) | 31.7 (0.0) |
-| Alt modüller kapalı | 63.7 (-0.9) | 49.6 (-0.9) | 31.6 (-0.1) |
-| Avatar getirme kapalı | 63.7 (-0.9) | 49.6 (-0.9) | 31.7 (0.0) |
-| Görsel önizleme kapalı | 63.3 (-1.2) | 49.2 (-1.3) | 31.7 (0.0) |
-| Her şey kapalı, yalnızca İngilizce (LFS açık) | 35.2 (-29.4) | 28.9 (-21.5) | derlenmedi |
-| **Her şey kapalı, yalnızca İngilizce** | **34.9 (-29.7)** | **28.8 (-21.6)** | derlenmedi |
+| Derleme (aksi belirtilmedikçe `full`'dan) | `gitpoulpi` (MiB) |
+|---|---|
+| Tam (her şey açık) | 64.6 |
+| Yalnızca İngilizce | 52.0 (-12.6) |
+| MCP kapalı | 61.6 (-3.0) |
+| YZ kapalı | 62.6 (-2.0) |
+| Tüm entegrasyonlar kapalı | 56.3 (-8.2) |
+| YZ + entegrasyonlar + avatar getirme kapalı | 52.2 (-12.3) |
+| Geçmiş ekranı kapalı (`--no-history-rewrite`) | 61.6 (-3.0) |
+| Yeniden yazma betikleri kapalı | 63.1 (-1.5) |
+| Genel arama kapalı | 63.5 (-1.1) |
+| Çalışma alanları kapalı | 63.5 (-1.1) |
+| Radar kapalı | 63.4 (-1.2) |
+| Board kapalı | 63.6 (-1.0) |
+| Review kapalı | 63.2 (-1.4) |
+| Mermaid kapalı | 63.6 (-1.0) |
+| LFS kapalı | 63.5 (-1.1) |
+| Worktree kapalı | 63.7 (-0.9) |
+| Alt modüller kapalı | 63.7 (-0.9) |
+| Avatar getirme kapalı | 63.7 (-0.9) |
+| Görsel önizleme kapalı | 63.3 (-1.2) |
+| Her şey kapalı, yalnızca İngilizce (LFS açık) | 35.2 (-29.4) |
+| **Her şey kapalı, yalnızca İngilizce** | **34.9 (-29.7)** |
 
 ## Notlar
 

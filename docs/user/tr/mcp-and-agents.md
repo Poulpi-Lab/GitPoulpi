@@ -13,7 +13,7 @@ desteği](ai.md).
 
 ## Hızlı kurulum
 
-1. `gitpoulpi` ve `gitpoulpi-mcp` dosyalarını `PATH` üzerine koyun ([Kurulum](installation.md)).
+1. `gitpoulpi` dosyasını `PATH` üzerine koyun ([Kurulum](installation.md)). Sunucu `gitpoulpi mcp serve` komutudur; arşivdeki `gitpoulpi-mcp` aktarıcısı takma ad olarak hâlâ çalışır, bu yüzden onu adlandıran mevcut bir ajan yapılandırması çalışmayı sürdürür.
 2. Sunucuyu ajanınıza kaydedin. stdio konuşur: başlatılacak bir şey yok, port yok.
 3. İsteğe bağlı olarak ajanın neler yapabileceğini `config.toml` dosyasının
    `[mcp]` tablosunda seçin (aşağıda). Varsayılanlar, deponun okunmasına izin
@@ -56,13 +56,13 @@ projeyi açan herkes alır. Aynı dosya elle, isteğe bağlı eklerle:
 |---|---|---|
 | Cursor, Windsurf, Claude Desktop, VS Code | istemcinin MCP JSON dosyası | yukarıdaki `mcpServers` bloğu (VS Code anahtarı `servers` olarak adlandırır) |
 | OpenAI Codex CLI | `~/.codex/config.toml` | `[mcp_servers.gitpoulpi]`, `command = "gitpoulpi"`, `args = ["mcp", "serve", "--stdio"]` |
-| Başka herhangi biri | kendi belgeleri | `gitpoulpi-mcp` komutu (bağımsız ikili, aynı sunucu, argüman gerekmez) |
+| Başka herhangi biri | kendi belgeleri | `gitpoulpi mcp serve` komutu (varsayılan olarak stdio; `gitpoulpi-mcp` onu zaten kullanan yapılandırmalar için aynı sunucudur) |
 
 **HTTP üzerinden** (bir URL'ye bağlanan istemciler):
 
 ```
-gitpoulpi-mcp --http                         # [mcp] bind, varsayılan http://127.0.0.1:8808/mcp
-gitpoulpi mcp serve --http 127.0.0.1:9000
+gitpoulpi mcp serve --http                   # [mcp] bind, varsayılan http://127.0.0.1:8808/mcp
+gitpoulpi mcp serve --http 127.0.0.1:9000    # or: --bind 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
@@ -131,7 +131,7 @@ zaman ve nasıl kullanılacağını söyleyen hazır
 
 | Anahtar | Varsayılan | Etki |
 |---|---|---|
-| `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` / `gitpoulpi-mcp` başlamayı reddeder (Ayarlar > Ajanlar ve MCP > *MCP sunucusu*). Sunucu başlarken okunur: çalışan bir sunucu ayarlarını korur. |
+| `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` (ve `gitpoulpi-mcp` takma adı) başlamayı reddeder (Ayarlar > Ajanlar ve MCP > *MCP sunucusu*). Sunucu başlarken okunur: çalışan bir sunucu ayarlarını korur. |
 | `[mcp] bind` | `"127.0.0.1:8808"` | Hiçbiri verilmediğinde `--http`'nin kullandığı adres (`--allow-remote` olmadıkça yalnızca loopback; bu kimlik doğrulama ve şifreleme ister, bkz. yukarısı). Ayarlar > Ajanlar ve MCP > *MCP sunucu portu* portu düzenler ve ana makine kısmını korur. |
 | `[mcp] http_auth` | `true` | `--http`, `Authorization: Bearer <token>` ister (`gitpoulpi mcp token`). Ayarlar > Ajanlar ve MCP > *HTTP kimlik doğrulaması*. |
 | `[mcp] tls`, `tls_cert`, `tls_key` | `"off"` | `off`, `self_signed` veya `files` (PEM yollarınız): sunucu TLS'yi kendisi sonlandırır. Ayarlar > Ajanlar ve MCP > *TLS*. |

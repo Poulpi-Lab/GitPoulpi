@@ -12,10 +12,10 @@ Bu sayfa sizi yeni bir kurulumdan ilk commit'inize götürür.
 terminal açın ve şunu çalıştırın:
 
 ```
-gitpoulpi-tui
+gitpoulpi
 ```
 
-Alt komut verilmeyen `gitpoulpi` aynı işi yapar. GitPoulpi, geçerli klasörü
+GitPoulpi, geçerli klasörü
 içeren depoyu açar. Bir deponun dışındaysanız **Ana** sekmesini açar; orada bir
 depoya göz atabilir, klonlayabilir veya başlatabilirsiniz
 (bkz. [7. adım](#7-depoları-açma-klonlama-ve-başlatma)).

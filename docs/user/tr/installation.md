@@ -2,15 +2,9 @@
 
 # Kurulum
 
-GitPoulpi'nin üç çalıştırılabilir dosyası vardır:
+GitPoulpi tek bir programdır: `gitpoulpi`. Alt komutsuz çalıştırıldığında terminal arayüzünü açar; bir alt komutla komut satırı arayüzüdür (betikler için `--json`); `gitpoulpi mcp serve` YZ ajanları için MCP sunucusudur (bkz. [MCP ve ajanlar](mcp-and-agents.md)). Yanında arşiv, bir kurulumu güncelleyen ayrı küçük program `gitpoulpi-updater`'ı içerir (bkz. [Güncellemeler](updates.md)).
 
-| Çalıştırılabilir dosya | Nedir |
-|---|---|
-| `gitpoulpi-tui` | Terminal arayüzü. |
-| `gitpoulpi` | Komut satırı arayüzü (betikler için `--json`). Alt komut verilmezse arayüzü açar. |
-| `gitpoulpi-mcp` | YZ ajanları için MCP sunucusu. Bkz. [MCP ve ajanlar](mcp-and-agents.md). |
-
-Bunların yanında arşiv, kısayolların zaten açık bir GitPoulpi penceresini göstermek için çalıştırdığı küçük bir program olan `gitpoulpi-launch`'ı içerir (`gitpoulpi launch`). Windows'ta konsol penceresi yoktur, bu yüzden tıklama hiç pencere yanıp söndürmez. Diğerleriyle birlikte kurulur, güncellenir ve kaldırılır.
+Uyumluluk için arşiv ayrıca yalnızca `gitpoulpi` programını başlatan üç küçük aktarıcı içerir: `gitpoulpi-tui` (arayüzü açar; sonraki bir sürümde kaldırılacaktır), `gitpoulpi-mcp` (MCP sunucusunu başlatır; tüm 1.x serisi boyunca kalır, böylece mevcut ajan yapılandırmaları çalışmaya devam eder) ve `gitpoulpi-launch` (kısayolların zaten açık bir GitPoulpi penceresini göstermek için çalıştırdığı program, `gitpoulpi launch`; Windows'ta konsol penceresi yoktur, bu yüzden tıklama hiç pencere yanıp söndürmez). Hepsi birlikte kurulur, güncellenir ve kaldırılır.
 
 ## Nelere ihtiyacınız var
 
@@ -35,7 +29,8 @@ Bunların yanında arşiv, kısayolların zaten açık bir GitPoulpi penceresini
 
 Bir sürüm arşivi `gitpoulpi-<sürüm>-<hedef>.zip` (Windows) veya `.tar.gz`
 (Linux, macOS) dosyasıdır ve yanında bir `.sha256` dosyası bulunur. Arşivi
-`.sha256` dosyasına göre doğrulayın, açın ve üç çalıştırılabilir dosyayı
+`.sha256` dosyasına göre doğrulayın, açın ve çalıştırılabilir dosyalarını
+(`gitpoulpi`, `gitpoulpi-updater` ve aktarıcılar `gitpoulpi-tui`, `gitpoulpi-mcp` ile `gitpoulpi-launch`)
 `PATH` üzerindeki bir klasöre koyun (`gitpoulpi-updater` ve `.gitpoulpi-dist` işaretini
 onların yanında tutun: işaret `channel=archive` der, böylece derleme kendini güncelleyebilir,
 bkz. [Güncellemeler](updates.md)). Arşivdeki `INSTALL.txt` aynı adımları verir.
@@ -94,7 +89,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 ```
 
 İşletim sisteminiz ve işlemcinize uygun arşivi seçer, `.sha256` dosyasını denetler,
-`~/.local/opt/gitpoulpi` içine kurar (kanal `archive`: GitPoulpi kendini yerinde günceller) ve `gitpoulpi` ile `gitpoulpi-mcp` programlarını
+`~/.local/opt/gitpoulpi` içine kurar (kanal `archive`: GitPoulpi kendini yerinde günceller) ve `gitpoulpi` ile `gitpoulpi-mcp` (aktarıcı) programlarını
 `~/.local/bin` içine bağlar. Root gerekmez ve ana klasörünüzün dışındaki hiçbir şeye
 dokunulmaz. `--yes` olmadan takma adı (varsayılan `gp`), PATH'i ve kısayolları sorar.
 
@@ -124,7 +119,7 @@ Aşağıdaki her kanal, programların yanına kendi kanal adıyla aynı `.gitpou
 | **apt** (Debian, Ubuntu) | bkz. [apt deposu](#apt-debian-ve-ubuntu) | İmzalı depo; her sürüme bir `.deb` de eklenir. |
 | **MSI** (Windows, yönetilen) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Yöneticiler için: tüm kullanıcılar, uygulama içi güncelleme yok. Bkz. [Kurumsal dağıtım](enterprise-distribution.md#msi-intune-veya-grup-politikası-ile). |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Derlemek yerine sürüm arşivini indirir. |
-| **cargo, crates.io'dan** | `cargo install --locked gitpoulpi-cli` | Derler; bir Rust araç zinciri gerekir. Alt komutsuz çalıştırıldığında terminal arayüzünü açan ve MCP'yi de sunan (`gitpoulpi mcp`) `gitpoulpi` programını kurar. `gitpoulpi-tui` ve `gitpoulpi-mcp` aynı programların bağımsız crate olarak sunulmuş halidir. |
+| **cargo, crates.io'dan** | `cargo install --locked gitpoulpi-cli` | Derler; bir Rust araç zinciri gerekir. Alt komutsuz çalıştırıldığında terminal arayüzünü açan ve MCP'yi de sunan (`gitpoulpi mcp`) `gitpoulpi` programını kurar. |
 | **cargo, kaynaktan** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Derler; bir Rust araç zinciri gerekir. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | Bkz. [Docker'da çalıştırma](docker.md). |
 
@@ -161,8 +156,8 @@ kullanın. Derlemesi daha uzun sürer:
 cargo build --profile dist
 ```
 
-Deponun kökündeki `build-opti` betikleri bu derlemeyi üç çalıştırılabilir dosya
-için çalıştırır ve boyutlarını yazdırır:
+Deponun kökündeki `build-opti` betikleri bu derlemeyi çalıştırır ve çalıştırılabilir
+dosyaların boyutlarını yazdırır:
 
 ```
 ./build-opti.sh                  # Linux, macOS
@@ -180,7 +175,7 @@ cargo run -p xtask -- dist
 
 Bu komut `dist` profilini derler ve
 `target/dist/gitpoulpi-<sürüm>-<hedef>.zip` (Windows) veya `.tar.gz` (diğer
-sistemler) dosyasını yazar. Arşiv üç çalıştırılabilir dosyayı, `INSTALL.txt`,
+sistemler) dosyasını yazar. Arşiv çalıştırılabilir dosyaları, `INSTALL.txt`,
 `README.md`, `LICENSE` ve `CHANGELOG.md` dosyalarını içerir. Yanına bir `.sha256`
 dosyası yazılır.
 
@@ -210,7 +205,7 @@ komut takma adlarını, PATH girdilerini, kısayolları ve dosya yöneticisi men
 (Windows'ta App Paths anahtarıyla birlikte), ardından bir sürüm kurulumunun program
 dosyalarını kaldırır; `.gitpoulpi-dist` işareti olmayan bir derlemede (bir cargo derlemesi)
 reddeder ve `--keep-files` program dosyalarını bırakır. MCP ajanlarına sunulmaz. Yükleyici
-kullanmadıysanız üç çalıştırılabilir dosyayı silin. GitPoulpi ayrıca şu dosyaları tutar:
+kullanmadıysanız çalıştırılabilir dosyaları silin. GitPoulpi ayrıca şu dosyaları tutar:
 
 | Ne | Nerede |
 |---|---|

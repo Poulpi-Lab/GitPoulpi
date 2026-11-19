@@ -2,7 +2,7 @@
 
 # Docker'da çalıştırma
 
-`poulpilab/gitpoulpi` imajı, resmi sürüm çalıştırılabilir dosyalarını (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) `debian:bookworm-slim` üzerinde, `git`, `git-lfs`, `openssh-client`, `less` ve `tini` ile birlikte taşır. `linux/amd64` ve `linux/arm64` üzerinde çalışır. Docker Hub'dadır.
+`poulpilab/gitpoulpi` imajı, resmi sürüm çalıştırılabilir dosyalarını (`gitpoulpi` ve aktarıcılar `gitpoulpi-tui` ile `gitpoulpi-mcp`) `debian:bookworm-slim` üzerinde, `git`, `git-lfs`, `openssh-client`, `less` ve `tini` ile birlikte taşır. `linux/amd64` ve `linux/arm64` üzerinde çalışır. Docker Hub'dadır.
 
 ## Arayüzü başlatın
 
@@ -81,10 +81,10 @@ Giriş noktası arayüzü başlatır. Diğer programlara onu geçersiz kılarak 
 docker run --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi status
 
 # standart girdi ve çıktı üzerinden MCP sunucusu, onu başlatan bir ajan için
-docker run -i --rm --entrypoint gitpoulpi-mcp -v "$PWD":/work poulpilab/gitpoulpi
+docker run -i --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi mcp serve
 ```
 
-Her `docker run`, kendi GitPoulpi arka plan daemon'ına sahip kendi kapsayıcısıdır; bu yüzden CLI üzerinden yapılan değişiklikler başka bir kapsayıcıda çalışan bir arayüzde canlı görünmez. Bir arayüzü CLI'dan yönetmek için ikisini aynı kapsayıcıda çalıştırın: arayüzü `--name gp` ile başlatın ve `docker exec gp gitpoulpi ...` kullanın. Bir ajan için `docker run -i --rm --entrypoint gitpoulpi-mcp ...` komutunu MCP sunucu komutu olarak kaydedin, bkz. [MCP ve ajanlar](mcp-and-agents.md); bağlanan `config.toml` içindeki MCP izin anahtarları her zamanki gibi uygulanır.
+Her `docker run`, kendi GitPoulpi arka plan daemon'ına sahip kendi kapsayıcısıdır; bu yüzden CLI üzerinden yapılan değişiklikler başka bir kapsayıcıda çalışan bir arayüzde canlı görünmez. Bir arayüzü CLI'dan yönetmek için ikisini aynı kapsayıcıda çalıştırın: arayüzü `--name gp` ile başlatın ve `docker exec gp gitpoulpi ...` kullanın. Bir ajan için `docker run -i --rm --entrypoint gitpoulpi ... mcp serve` komutunu MCP sunucu komutu olarak kaydedin, bkz. [MCP ve ajanlar](mcp-and-agents.md); bağlanan `config.toml` içindeki MCP izin anahtarları her zamanki gibi uygulanır.
 
 ## Etiketler ve güncelleme
 

@@ -31,7 +31,7 @@ yeniden yazılmıştır: yerel ikili dosyalar, diskte ve bellekte hafif, Electro
   cherry-pick edin, fast-forward yapın, worktree'ler ve yamalar oluşturun.
 - **Barındırma hizmetleri ve issue takipçileri yerleşik.** Pull ve merge request'lere göz atın, checkout edin ve oluşturun (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket) ve Gerrit değişikliklerini inceleyin. Issue'lara, work item'lara ve kartlara göz atın ve oluşturun (ayrıca Jira, Trello, Linear, YouTrack, Redmine ve yerel Markdown notları), isterseniz Kanban panosunda. Hesabınızdan klonlayın ve SSH anahtarlarınızı yönetin.
 - **Ajanlar için CLI ve MCP.** `gitpoulpi <komut> --json` arayüzün yaptığı her
-  şeyi kapsar ve `gitpoulpi-mcp` bunu MCP araçları olarak sunar. Depo başına bir
+  şeyi kapsar ve `gitpoulpi mcp serve` bunu MCP araçları olarak sunar. Depo başına bir
   arka plan daemon'u her ön yüzü canlı ve eşzamanlı tutar.
 - **İsteğe bağlı YZ, asla zorunlu değil.** Varsayılan olarak kapalıdır ve hesap
   gerekmez: kendi API anahtarınızı ya da `claude -p` gibi yerel bir ajan CLI'sini
@@ -146,7 +146,7 @@ Adım adım anlatım [Başlarken](../../docs/user/tr/getting-started.md) sayfas�
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 YZ isteğe bağlıdır ve varsayılan olarak kapalıdır: GitPoulpi'nin kendi YZ'sini

@@ -417,7 +417,10 @@ pub(crate) fn commonly_taken_by(chord: KeyChord) -> Option<gitpoulpi_i18n::M> {
             msg::TAKEN_ZELLIJ
         }
         "Ctrl+," | "Ctrl+Shift+T" | "Ctrl+Shift+W" | "Ctrl+Shift+N" | "Ctrl+Shift+P"
-        | "Ctrl+Shift+C" | "Ctrl+Shift+V" | "Alt+Enter" | "Ctrl+Tab" => msg::TAKEN_WINDOWS_TERMINAL,
+        | "Ctrl+Shift+C" | "Ctrl+Shift+V" | "Alt+Enter" => msg::TAKEN_WINDOWS_TERMINAL,
+        // kitty, WezTerm, Ghostty and Windows Terminal all bind these to
+        // their own tab switching by default.
+        "Ctrl+Tab" | "Ctrl+Shift+Tab" => msg::TAKEN_TERMINAL_TABS,
         _ => return None,
     })
 }

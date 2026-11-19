@@ -722,3 +722,47 @@ fn the_radar_key_shared_with_view_contexts_is_not_a_conflict() {
         assert!(found.is_empty(), "{found:?}");
     }
 }
+
+/// Ctrl+Tab / Ctrl+Shift+Tab resolve to the tab actions for every spelling
+/// a terminal's decoder can produce: kitty `CSI 9;5u` (Tab+Ctrl), `CSI 9;6u`
+/// (BackTab+Ctrl+Shift in crossterm), a Windows console (BackTab+Ctrl) and
+/// Tab+Ctrl+Shift.
+#[test]
+fn ctrl_tab_spellings_resolve_to_the_tab_actions() {
+    use KeyModifiers as M;
+    let km = Keymap::defaults();
+    let ctrl = M::CONTROL;
+    let both = M::CONTROL | M::SHIFT;
+    for (code, mods) in [
+        (KeyCode::BackTab, both),
+        (KeyCode::BackTab, ctrl),
+        (KeyCode::Tab, both),
+    ] {
+        assert_eq!(
+            km.action_in(Ctx::Global, &ev(code, mods)),
+            Some(Action::GlobalPrevTab),
+            "{code:?} {mods:?}"
+        );
+    }
+    assert_eq!(
+        km.action_in(Ctx::Global, &ev(KeyCode::Tab, ctrl)),
+        Some(Action::GlobalNextTab)
+    );
+    assert_eq!(km.action_in(Ctx::Global, &ev(KeyCode::Tab, M::NONE)), None);
+    assert_eq!(
+        km.action_in(Ctx::Global, &ev(KeyCode::BackTab, M::SHIFT)),
+        None
+    );
+}
+
+#[test]
+fn ctrl_tab_pair_is_attributed_to_terminal_tab_switching() {
+    use super::chord::{commonly_taken_by, KeyChord};
+    for text in ["Ctrl+Tab", "Ctrl+Shift+Tab"] {
+        let chord = KeyChord::parse(text).unwrap();
+        let tool = commonly_taken_by(chord).unwrap().get();
+        for name in ["kitty", "WezTerm", "Ghostty", "Windows Terminal"] {
+            assert!(tool.contains(name), "{text}: {tool}");
+        }
+    }
+}

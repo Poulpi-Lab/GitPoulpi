@@ -25,7 +25,7 @@ existuje. Vedle binárek také zapíše `BUILD-FEATURES.txt`.
 | Barvy loga | Pixelová chobotnice v okně O aplikaci existuje ve 20 barevných provedeních (`--list-logo-colors`). Vyberte ta, která se zkompilují (alespoň jedno), výchozí (okno O aplikaci ho ukáže první; vrací se k němu i uložená hodnota `ui.logo_color`, která není zkompilována; musí patřit mezi zkompilovaná; oficiální výchozí: lavender) a barvu ikony spustitelného souboru pro Windows (libovolné provedení, výchozí: výchozí barva loga). S jediným provedením se logo po kliknutí stále otáčí, ale zůstává v téže barvě, a seznam barev (`c`, pravé tlačítko) se nenabízí. |
 | Integrace (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine) | Bez nich: jen klonování z URL; žádné issues, pull/merge requesty. |
 | AI | Žádná tlačítka AI, příkazy ani nástroje `ai` v CLI/MCP. |
-| MCP | Žádná binárka `gitpoulpi-mcp` a žádný příkaz `gitpoulpi mcp`. Agentní příkazy `ui` zůstávají. |
+| MCP | Žádné přesměrování `gitpoulpi-mcp` a žádný příkaz `gitpoulpi mcp`. Agentní příkazy `ui` zůstávají. |
 | LFS, Worktree, Submoduly | Odpovídající obrazovky a příkazy pro správu zmizí; vrací se typovaná odpověď „not built into this binary“. |
 | Stahování avatarů | Jen odznaky s iniciálami, žádné stahování ze sítě. |
 | Náhled obrázků | Soubory obrázků ukazují obyčejné upozornění na binární soubor; **Upravit v** stále funguje. |
@@ -94,13 +94,13 @@ odstraní; nastavte ji sami pro prostý `cargo build`, chcete-li. `gitpoulpi
 Volby loga jsou proměnné prostředí `GITPOULPI_LOGO_COLORS` (`all` nebo seznam
 slugů oddělený čárkami), `GITPOULPI_LOGO_DEFAULT` a `GITPOULPI_ICON_COLOR`,
 které čtou build skripty `gitpoulpi-tui` (filtruje `crates/gitpoulpi-logo-build/colourways.json`
-do tabulky, kterou okno O aplikaci vkládá) a tří binárních crates (ikona).
+do tabulky, kterou okno O aplikaci vkládá) a `gitpoulpi-cli` (ikona).
 Zdrojem barev zůstává `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Ikona spustitelného souboru pro Windows
 
-Když je cílem Windows, spustitelné soubory `gitpoulpi`, `gitpoulpi-tui` a
-`gitpoulpi-mcp` dostanou jako ikonu chobotnici, generovanou při buildu (není
+Když je cílem Windows, spustitelný soubor `gitpoulpi`
+dostane jako ikonu chobotnici, generovanou při buildu (není
 třeba Python ani ImageMagick) ve zvolené barvě ikony, velikosti 16 až 128 px.
 Vkládá se pomocí crate `winresource` a potřebuje překladač prostředků platformy
 (`rc.exe` z Windows SDK u MSVC, `windres` u GNU). Pokud chybí, build jen vypíše
@@ -135,32 +135,32 @@ Pokud existuje uložený výběr, interaktivní režim nejprve nabídne „Zač�
 
 ## Kolik ušetří
 
-Změřeno na Linuxu dne 2026-10-29 na commitu `65999ef5c`, od plného buildu, rozdíl oproti němu v závorkách
-(podrobnosti v `docs/developer/binary-size.md`):
+Změřeno na Linuxu dne 2026-10-29 na commitu `65999ef5c`, velikost `gitpoulpi` (celý program: rozhraní, CLI a server MCP) od plného buildu, rozdíl oproti němu v závorkách
+(podrobnosti v `docs/developer/binary-size.md`). Přesměrování `gitpoulpi-tui`, `gitpoulpi-mcp` a `gitpoulpi-launch` mají hluboko pod 1 MiB, ať zvolíte cokoli:
 
-| Build (z `full`, pokud není uvedeno jinak) | `gitpoulpi` (MiB) | `gitpoulpi-tui` (MiB) | `gitpoulpi-mcp` (MiB) |
-|---|---|---|---|
-| Plný (vše zapnuto) | 64,6 | 50,5 | 31,7 |
-| Jen angličtina | 52,0 (-12,6) | 40,2 (-10,3) | 31,7 (0,0) |
-| MCP vypnuto | 61,6 (-3,0) | 49,6 (-0,8) | nesestaveno |
-| AI vypnuto | 62,6 (-2,0) | 48,6 (-1,8) | 30,5 (-1,3) |
-| Všechny integrace vypnuty | 56,3 (-8,2) | 43,7 (-6,7) | 26,7 (-5,0) |
-| AI + integrace + stahování avatarů vypnuto | 52,2 (-12,3) | 39,9 (-10,6) | 23,0 (-8,8) |
-| Nástroj pro přepis historie vypnut (`--no-history-rewrite`) | 61,6 (-3,0) | 48,9 (-1,5) | 28,5 (-3,2) |
-| Přepisovací skripty vypnuty | 63,1 (-1,5) | 49,0 (-1,5) | 31,1 (-0,7) |
-| Globální hledání vypnuto | 63,5 (-1,1) | 49,5 (-1,0) | 31,6 (-0,1) |
-| Pracovní prostory vypnuty | 63,5 (-1,1) | 49,5 (-0,9) | 31,5 (-0,2) |
-| Radar vypnut | 63,4 (-1,2) | 49,3 (-1,2) | 31,7 (0,0) |
-| Tabule vypnuta | 63,6 (-1,0) | 49,5 (-1,0) | 31,7 (0,0) |
-| Kontrola vypnuta | 63,2 (-1,4) | 49,0 (-1,4) | 31,7 (0,0) |
-| Mermaid vypnut | 63,6 (-1,0) | 49,5 (-0,9) | 31,6 (-0,1) |
-| LFS vypnuto | 63,5 (-1,1) | 49,5 (-0,9) | 31,5 (-0,3) |
-| Worktree vypnuto | 63,7 (-0,9) | 49,6 (-0,8) | 31,7 (0,0) |
-| Submoduly vypnuty | 63,7 (-0,9) | 49,6 (-0,9) | 31,6 (-0,1) |
-| Stahování avatarů vypnuto | 63,7 (-0,9) | 49,6 (-0,9) | 31,7 (0,0) |
-| Náhled obrázků vypnut | 63,3 (-1,2) | 49,2 (-1,3) | 31,7 (0,0) |
-| Vše vypnuto, jen angličtina (LFS ponecháno) | 35,2 (-29,4) | 28,9 (-21,5) | nesestaveno |
-| **Vše vypnuto, jen angličtina** | **34,9 (-29,7)** | **28,8 (-21,6)** | nesestaveno |
+| Build (z `full`, pokud není uvedeno jinak) | `gitpoulpi` (MiB) |
+|---|---|
+| Plný (vše zapnuto) | 64,6 |
+| Jen angličtina | 52,0 (-12,6) |
+| MCP vypnuto | 61,6 (-3,0) |
+| AI vypnuto | 62,6 (-2,0) |
+| Všechny integrace vypnuty | 56,3 (-8,2) |
+| AI + integrace + stahování avatarů vypnuto | 52,2 (-12,3) |
+| Nástroj pro přepis historie vypnut (`--no-history-rewrite`) | 61,6 (-3,0) |
+| Přepisovací skripty vypnuty | 63,1 (-1,5) |
+| Globální hledání vypnuto | 63,5 (-1,1) |
+| Pracovní prostory vypnuty | 63,5 (-1,1) |
+| Radar vypnut | 63,4 (-1,2) |
+| Tabule vypnuta | 63,6 (-1,0) |
+| Kontrola vypnuta | 63,2 (-1,4) |
+| Mermaid vypnut | 63,6 (-1,0) |
+| LFS vypnuto | 63,5 (-1,1) |
+| Worktree vypnuto | 63,7 (-0,9) |
+| Submoduly vypnuty | 63,7 (-0,9) |
+| Stahování avatarů vypnuto | 63,7 (-0,9) |
+| Náhled obrázků vypnut | 63,3 (-1,2) |
+| Vše vypnuto, jen angličtina (LFS ponecháno) | 35,2 (-29,4) |
+| **Vše vypnuto, jen angličtina** | **34,9 (-29,7)** |
 
 ## Poznámky
 

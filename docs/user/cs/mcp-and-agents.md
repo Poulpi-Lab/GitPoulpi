@@ -13,7 +13,7 @@ commitů, vysvětlení, commit composer) se konfigurují zvlášť: viz
 
 ## Rychlé nastavení
 
-1. Dejte `gitpoulpi` a `gitpoulpi-mcp` na `PATH` ([Instalace](installation.md)).
+1. Dejte `gitpoulpi` na `PATH` ([Instalace](installation.md)). Server je `gitpoulpi mcp serve`; přesměrování `gitpoulpi-mcp` v archivu dál funguje jako alias, takže stávající konfigurace agenta, která ho uvádí, běží dál.
 2. Zaregistrujte server u svého agenta. Mluví přes stdio: není co spouštět, žádný port.
 3. Volitelně zvolte, co agent smí, v tabulce `[mcp]` v `config.toml`
    (níže). Výchozí hodnoty mu dovolí číst repozitář (změny se odmítnou, dokud
@@ -54,13 +54,13 @@ každý, kdo projekt otevře. Stejný soubor ručně, s volitelnými doplňky:
 |---|---|---|
 | Cursor, Windsurf, Claude Desktop, VS Code | soubor JSON MCP klienta | blok `mcpServers` výše (VS Code pojmenovává klíč `servers`) |
 | OpenAI Codex CLI | `~/.codex/config.toml` | `[mcp_servers.gitpoulpi]`, `command = "gitpoulpi"`, `args = ["mcp", "serve", "--stdio"]` |
-| Cokoli jiného | jeho dokumentace | příkaz `gitpoulpi-mcp` (samostatný binární soubor, stejný server, žádné argumenty nejsou třeba) |
+| Cokoli jiného | jeho dokumentace | příkaz `gitpoulpi mcp serve` (ve výchozím stavu stdio; `gitpoulpi-mcp` je tentýž server pro konfigurace, které ho už používají) |
 
 **Přes HTTP** (klienti, kteří se připojují k URL):
 
 ```
-gitpoulpi-mcp --http                         # [mcp] bind, default http://127.0.0.1:8808/mcp
-gitpoulpi mcp serve --http 127.0.0.1:9000
+gitpoulpi mcp serve --http                   # [mcp] bind, default http://127.0.0.1:8808/mcp
+gitpoulpi mcp serve --http 127.0.0.1:9000    # or: --bind 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
@@ -128,7 +128,7 @@ a jak používat GitPoulpi místo holého `git`.
 
 | Přepínač | Výchozí | Účinek |
 |---|---|---|
-| `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` / `gitpoulpi-mcp` odmítnou startovat (Nastavení > Agenti a MCP > *Server MCP*). Čte se při startu serveru: běžící server si ponechá svá nastavení. |
+| `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` (a jeho alias `gitpoulpi-mcp`) odmítnou startovat (Nastavení > Agenti a MCP > *Server MCP*). Čte se při startu serveru: běžící server si ponechá svá nastavení. |
 | `[mcp] bind` | `"127.0.0.1:8808"` | Adresa, kterou `--http` použije, když žádná není zadána (jen loopback, pokud není `--allow-remote`, které vyžaduje ověřování a šifrování, viz výše). Nastavení > Agenti a MCP > *Port serveru MCP* upraví jeho port a ponechá hostitele. |
 | `[mcp] http_auth` | `true` | `--http` potřebuje `Authorization: Bearer <token>` (`gitpoulpi mcp token`). Nastavení > Agenti a MCP > *Ověřování HTTP*. |
 | `[mcp] tls`, `tls_cert`, `tls_key` | `"off"` | `off`, `self_signed` nebo `files` (vaše cesty PEM): server ukončuje TLS sám. Nastavení > Agenti a MCP > *TLS*. |

@@ -12,10 +12,10 @@ Postupujte podle [Instalace](installation.md). Poté otevřete terminál v
 repozitáři Gitu a spusťte:
 
 ```
-gitpoulpi-tui
+gitpoulpi
 ```
 
-`gitpoulpi` bez podpříkazu dělá totéž. GitPoulpi otevře repozitář, který
+GitPoulpi otevře repozitář, který
 obsahuje aktuální složku. Mimo repozitář otevře kartu **Domů**, kde můžete
 procházet, klonovat nebo inicializovat repozitář (viz
 [krok 7](#7-otevření-klonování-a-inicializace-repozitářů)).

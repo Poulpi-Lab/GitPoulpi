@@ -36,7 +36,7 @@ script mostra o tamanho de cada binário e a diferença em relação a
 | Conversa | Sem vista de [conversa](conversations.md) de uma issue ou pedido na aplicação: Enter numa linha de issue, num cartão do quadro ou numa linha do Radar abre o navegador como antes, não há linha *Abrir conversa* nem comando da paleta *Conversa: ...*, e não há **Escrever com IA** numa conversa (as caixas de texto da revisão, do formulário de issue e do formulário de pull request mantêm a sua). Os comandos de conversa da CLI e do MCP (`hosting issue comments`, `comment`, `comment-edit`, `comment-delete`, `hosting review conversation`) e `ai hosting-reply` mantêm-se. Precisa de uma integração. |
 | Review | A página Resumo da revisão é a vista de conversa, pelo que uma compilação com Review contém também a vista de conversa, diga o que disser *Conversa*. Sem vista de revisão de código na aplicação (menu da linha, Enter numa linha de pull request, paleta, `Rever` do Radar) e sem assistência de revisão por IA. Os comandos `hosting review` da CLI/MCP mantêm-se (o Gerrit e os agentes usam-nos). Precisa de uma integração. |
 | Painel do histórico (reescrita avançada do histórico: autores, datas, mensagens, conteúdo) | Sem painel de reescrita do histórico: sem comandos `Reescrever:` na paleta, sem acorde, teclas nem secção de ajuda do painel, sem linhas «Reescrever histórico» nos menus do Log, sem botão «Modificar o histórico mais a fundo...» no diálogo Emendar, sem «Criar regras com IA» nem IA para scripts, sem limites de scripts na página de definições Sincronização e sem blocos de IA de reescrita do histórico nas definições de IA. Os comandos `rewrite` da CLI/MCP, `ai rewrite-script`, `ai rewrite-rules` e `ui propose rewrite` deixam de existir na árvore de comandos. As identidades do `.mailmap` (`mailmap`, `log.use_mailmap`) não fazem parte dele e mantêm-se. |
-| Pesquisa global | Sem botão de pesquisa global na barra de título, sem `Ctrl+Alt+F`, sem o comando `Pesquisar na área de trabalho` na paleta e sem o comando `gitpoulpi search` da CLI/MCP. A barra de pesquisa do Log (`ui show search`) é outra funcionalidade e mantém-se. |
+| Pesquisa global | Sem botão de pesquisa global na barra de título, sem `Ctrl+Alt+F`, sem o comando `Pesquisar: área de trabalho...` na paleta e sem o comando `gitpoulpi search` da CLI/MCP. A barra de pesquisa do Log (`ui show search`) é outra funcionalidade e mantém-se. |
 | Áreas de trabalho | A janela trabalha com a única lista de separadores predefinida («Sem área de trabalho»): sem chip de área de trabalho, sem separador Áreas de trabalho, sem `Alt+W` / `Alt+J`, sem comandos `Área de trabalho:` na paleta, sem linhas «Adicionar à área de trabalho» nos separadores, sem comandos `gitpoulpi workspace` da CLI/MCP e sem a opção `--workspace` em `commit` e `search`. Separadores e sessões funcionam como de costume. Um `workspaces.toml` escrito por outro build não é lido nem alterado; o perfil predefinido e as instruções de IA de uma área de trabalho não se aplicam. O Radar e a pesquisa global cobrem os separadores abertos. |
 | Scripts de reescrita (Lua incorporado) | As regras Script de uma reescrita do histórico são recusadas com uma resposta tipada «não incluído neste binário», e nenhum Lua é ligado. O painel do histórico em si mantém-se (tem a sua própria escolha). Sem sentido, e com aviso, quando o painel do histórico está desativado. |
 
@@ -64,7 +64,7 @@ Qualquer argumento salta as perguntas e vai direto a
 | Opção | Significado |
 |---|---|
 | `--langs fr,de` / `all` / `en` | Idiomas além do inglês. Os códigos são os nomes dos ficheiros de locale (`pt-br`, `zh-cn`...). |
-| `--integrations github,gitlab,azure-devops,bitbucket,jira,trello,gitea,linear,youtrack,redmine,gerrit,local-issues` / `all` / `none` | Fornecedores: GitHub, GitLab (incl. self-managed), Azure DevOps (Services e Server), Bitbucket (Cloud e Data Center) (alojamento), Gitea e Forgejo incl. Codeberg (`gitea`) (alojamento), Jira, Trello, Linear, YouTrack (Cloud e Server), Redmine (gestores de issues), Gerrit Code Review (`gerrit`, só revisão), issues Markdown locais (`local-issues`, uma pasta ou um cofre do Obsidian). Cada um de `azure-devops`, `bitbucket`, `gerrit`, `gitea`, `jira`, `linear`, `local-issues`, `redmine`, `trello`, `youtrack` é a sua própria feature do cargo; tamanhos em [binary-size](../../developer/binary-size.md). |
+| `--integrations github,gitlab,azure-devops,bitbucket,jira,trello,gitea,linear,youtrack,redmine,gerrit,local-issues` / `all` / `none` | Fornecedores: GitHub, GitLab (incl. self-managed), Azure DevOps (Services e Server), Bitbucket (Cloud e Data Center) (alojamento), Gitea e Forgejo incl. Codeberg (`gitea`), Gerrit Code Review (`gerrit`, só revisão) (alojamento), Jira, Trello, Linear, YouTrack (Cloud e Server), Redmine (gestores de issues), issues Markdown locais (`local-issues`, uma pasta ou um cofre do Obsidian). Cada um de `azure-devops`, `bitbucket`, `gerrit`, `gitea`, `jira`, `linear`, `local-issues`, `redmine`, `trello`, `youtrack` é a sua própria feature do cargo; tamanhos em [binary-size](../../developer/binary-size.md). |
 | `--themes all` / `none` / `nord,catppuccin` | Famílias de temas a compilar (predefinição `all`). `--list-themes` imprime as famílias. |
 | `--logo-colors all` / `violet,teal` | Combinações de cores do logótipo a compilar (predefinição `all`, mantidas pela ordem da tabela, que é a ordem de rotação). `--list-logo-colors` imprime-as (`*` = predefinição oficial). |
 | `--logo-default teal` | A combinação predefinida; tem de estar entre as compiladas (predefinição: lavender, senão a primeira compilada). |
@@ -96,9 +96,9 @@ foi compilado.
 As escolhas do logótipo são as variáveis de ambiente `GITPOULPI_LOGO_COLORS`
 (`all` ou uma lista de slugs separados por vírgulas), `GITPOULPI_LOGO_DEFAULT` e
 `GITPOULPI_ICON_COLOR`, lidas pelos build scripts do `gitpoulpi-tui` (que filtra
-`assets/logo/colorways.json` para a tabela que a janela Acerca do GitPoulpi
+`crates/gitpoulpi-logo-build/colourways.json` para a tabela que a janela Acerca do GitPoulpi
 incorpora) e do `gitpoulpi-cli` (o ícone). A fonte das cores continua a
-ser `assets/logo/colorways.json`.
+ser `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Ícone do executável do Windows
 
@@ -169,7 +169,7 @@ Medido em Linux a 2026-10-29 no commit `65999ef5c`, tamanho do `gitpoulpi` (o pr
 ## Notas
 
 - Uma compilação personalizada é lenta como qualquer compilação `dist` (LTO
-  completo, alguns minutos).
+  thin, alguns minutos).
 - Corre sem sccache, como o `build-opti`.
 - Os códigos de idioma são verificados contra os locales distribuídos; um código
   desconhecido é recusado com a lista dos válidos.

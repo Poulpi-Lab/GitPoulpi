@@ -124,7 +124,7 @@ Cada canal abaixo escreve o mesmo marcador `.gitpoulpi-dist` ao lado dos program
 
 Os nomes acima são aqueles para onde o processo de lançamento publica (veja [Lançamentos](../../developer/releasing.md)): um canal que ainda não está ativo responde "não encontrado", e o arquivo da versão ou o instalador funcionam sempre.
 
-Aplica-se o tratamento do PATH do próprio gestor de pacotes: o Chocolatey, o o Scoop e o Homebrew colocam eles próprios os programas no PATH, e nenhum deles cria o alias `gp` (execute `gitpoulpi alias create gp`, ou Definições > Lançador).
+Aplica-se o tratamento do PATH do próprio gestor de pacotes: o Chocolatey, o Scoop e o Homebrew colocam eles próprios os programas no PATH, e nenhum deles cria o alias `gp` (execute `gitpoulpi alias create gp`, ou Definições > Lançador).
 
 ### apt (Debian e Ubuntu)
 
@@ -202,13 +202,13 @@ Depois siga os [Primeiros passos](getting-started.md).
 as entradas do PATH, os atalhos e as entradas do menu do gestor de ficheiros (com a chave App Paths no Windows) que o GitPoulpi criou e, numa instalação a partir de uma versão,
 os ficheiros do programa; recusa-se a correr numa compilação sem o marcador `.gitpoulpi-dist`
 (uma compilação com cargo), e `--keep-files` deixa os ficheiros do programa. Não está
-disponível para os agentes MCP. Sem instalador, apague os executáveis.
+disponível para os agentes MCP. Sem instalador, apague os ficheiros do programa.
 O GitPoulpi também guarda estes ficheiros:
 
 | O quê | Onde |
 |---|---|
 | Definições (`config.toml`) e sessões | A pasta de configuração do seu SO. `GITPOULPI_CONFIG_DIR` altera-a. |
-| Estado por repositório | `.gitpoulpi/` dentro de cada repositório. |
+| Estado por repositório | Por predefinição, `gitpoulpi/` dentro da pasta `.git` do repositório (`session.per_repo_state_dir` pode movê-lo para `.gitpoulpi/` na árvore de trabalho ou para a pasta de dados do utilizador). |
 | Caches (avatares) | A pasta de cache do seu SO. |
 | Tokens e chaves de API | O seu credential helper. **Definições > SSH e credenciais > Esquecer todos os utilizadores e palavras-passe** remove-os. |
 

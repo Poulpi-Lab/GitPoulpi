@@ -31,7 +31,7 @@ em Rust: binários nativos, leves em disco e na memória, sem Electron, sem cont
   cherry-pick de vários commits, fast-forward, crie worktrees e patches.
 - **Hospedagem e issue trackers integrados.** Explore, faça checkout e crie pull e merge requests (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket) e revise as changes do Gerrit. Explore e crie issues, work items e cartões (também Jira, Trello, Linear, YouTrack, Redmine e notas Markdown locais), se quiser em um quadro Kanban. Clone a partir da sua conta e gerencie as chaves SSH.
 - **CLI e MCP para agentes.** `gitpoulpi <comando> --json` cobre tudo o que a
-  interface faz, e `gitpoulpi-mcp` o oferece como ferramentas MCP. Um daemon em
+  interface faz, e `gitpoulpi mcp serve` o oferece como ferramentas MCP. Um daemon em
   segundo plano por repositório mantém todos os frontends ao vivo e
   sincronizados.
 - **IA opcional, nunca obrigatória.** Desativada por padrão e sem conta: use sua
@@ -149,7 +149,7 @@ da tela.
 ```
 gitpoulpi --json status            # a CLI, automatizável
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # dá a um agente de IA as mesmas ferramentas
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # dá a um agente de IA as mesmas ferramentas
 ```
 
 A IA é opcional e vem desativada por padrão: ative a IA própria do GitPoulpi em

@@ -1,8 +1,8 @@
-[English](README.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [Türkçe](README.tr.md) · **Українська** · [简体中文](README.zh-CN.md)
+[English](../../README.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [Türkçe](README.tr.md) · **Українська** · [简体中文](README.zh-CN.md)
 
 # GitPoulpi
 
-<p align="center"><img src="assets/logo/gitpoulpi-512.png" alt="Восьминіг GitPoulpi" width="128"></p>
+<p align="center"><img src="../../assets/logo/gitpoulpi-512.png" alt="Восьминіг GitPoulpi" width="128"></p>
 
 **Клієнт Git для термінала, що відчувається як програма для робочого столу.**
 GitPoulpi дає повноцінний граф комітів, по якому можна клікати, який можна
@@ -10,9 +10,9 @@ GitPoulpi дає повноцінний граф комітів, по якому
 клавіатури, що сягає будь-якої функції, інтеграцію з хостингами коду (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit; хмарними та самостійно розгорнутими) і трекерами задач (Jira, Trello, Linear, YouTrack, Redmine або текою нотаток Markdown), а ті
 самі операції доступні як CLI для скриптів і сервер MCP, тож ШІ-агент керує ним
 достеменно так, як ви. GitPoulpi натхненний GitKraken і
-повністю переписаний з нуля на Rust: нативні виконувані файли, легкі на диску й у пам'яті, без Electron, без облікового запису, без телеметрії. Він працює у вашому улюбленому терміналі ([в якому?](docs/user/uk/terminals.md)), бо дехто з нас живе саме там.
+повністю переписаний з нуля на Rust: нативні виконувані файли, легкі на диску й у пам'яті, без Electron, без облікового запису, без телеметрії. Він працює у вашому улюбленому терміналі ([в якому?](../../docs/user/uk/terminals.md)), бо дехто з нас живе саме там.
 
-![GitPoulpi показує граф комітів із гілками, тегами та stash, бічну панель Refs ліворуч, а праворуч робочі зміни з формою коміту](docs/user/images/hero.png)
+![GitPoulpi показує граф комітів із гілками, тегами та stash, бічну панель Refs ліворуч, а праворуч робочі зміни з формою коміту](../../docs/user/images/hero.png)
 
 - **Миша й клавіатура нарівні.** Клікайте, двічі клікайте, викликайте правий
   клік і перетягуйте refs на коміти; або натисніть `Ctrl+P` і введіть, що
@@ -45,11 +45,11 @@ GitPoulpi дає повноцінний граф комітів, по якому
 
 | | |
 |---|---|
-| ![Граф Журналу з колірною темою Material і ввімкненим підсвічуванням рядків](docs/user/images/theme-material.png) **Граф комітів**, тут у темі Material з підсвічуванням рядків. | ![Diff зміненого файлу з кнопками Stage hunk і Відкинути hunk біля кожного hunk](docs/user/images/diff.png) **Diff**, з індексацією та відкиданням по hunk або по рядку. |
-| ![Палітра команд, відфільтрована за словом stash](docs/user/images/palette.png) **Палітра команд** (`Ctrl+P`) сягає будь-якої команди. | ![Форма комітів пропонує чотири коміти для робочих змін, готові до перегляду](docs/user/images/composer.png) **Форма комітів** дає переглянути коміти, запропоновані ШІ, перш ніж щось буде закомічено. |
-| ![Контекстне меню коміту з діями cherry-pick, revert, reset, rebase, гілка й тег](docs/user/images/context-menu.png) **Правий клік** по чому завгодно відкриває його дії. | ![Сторінка ШІ в налаштуваннях з профілями, інструкціями для кожної дії та перемикачем увімкнення](docs/user/images/settings-ai.png) **Налаштування**, з пошуком, зокрема з необов'язковою сторінкою ШІ. |
+| ![Граф Журналу з колірною темою Material і ввімкненим підсвічуванням рядків](../../docs/user/images/theme-material.png) **Граф комітів**, тут у темі Material з підсвічуванням рядків. | ![Diff зміненого файлу з кнопками Stage hunk і Відкинути hunk біля кожного hunk](../../docs/user/images/diff.png) **Diff**, з індексацією та відкиданням по hunk або по рядку. |
+| ![Палітра команд, відфільтрована за словом stash](../../docs/user/images/palette.png) **Палітра команд** (`Ctrl+P`) сягає будь-якої команди. | ![Форма комітів пропонує чотири коміти для робочих змін, готові до перегляду](../../docs/user/images/composer.png) **Форма комітів** дає переглянути коміти, запропоновані ШІ, перш ніж щось буде закомічено. |
+| ![Контекстне меню коміту з діями cherry-pick, revert, reset, rebase, гілка й тег](../../docs/user/images/context-menu.png) **Правий клік** по чому завгодно відкриває його дії. | ![Сторінка ШІ в налаштуваннях з профілями, інструкціями для кожної дії та перемикачем увімкнення](../../docs/user/images/settings-ai.png) **Налаштування**, з пошуком, зокрема з необов'язковою сторінкою ШІ. |
 
-Більше малюнків із поясненнями є в [документації користувача](docs/user/uk/README.md).
+Більше малюнків із поясненнями є в [документації користувача](../../docs/user/uk/README.md).
 
 ## Встановлення
 
@@ -73,10 +73,10 @@ GitPoulpi дає повноцінний граф комітів, по якому
 - **Менший виконуваний файл лише з потрібним:** `./build-custom.sh` (Windows:
   `build-custom`) питає, які мови, інтеграції та функції (ШІ, MCP, LFS,
   worktree, підмодулі, завантаження аватарів) збирати; див.
-  [docs/user/uk/custom-builds.md](docs/user/uk/custom-builds.md).
+  [docs/user/uk/custom-builds.md](../../docs/user/uk/custom-builds.md).
 
 Докладно, про необов'язкові інструменти та нотатки щодо ОС:
-[docs/user/uk/installation.md](docs/user/uk/installation.md).
+[docs/user/uk/installation.md](../../docs/user/uk/installation.md).
 
 ## Швидкий старт
 
@@ -93,8 +93,8 @@ gitpoulpi-tui          # or just: gitpoulpi
   малюється пікселями. В інших (звичайна консоль Windows, tmux) він
   автоматично перемикається на символи.
 
-Покрокова версія є в розділі [Початок роботи](docs/user/uk/getting-started.md),
-а [огляд інтерфейсу](docs/user/uk/interface-tour.md) називає кожну ділянку
+Покрокова версія є в розділі [Початок роботи](../../docs/user/uk/getting-started.md),
+а [огляд інтерфейсу](../../docs/user/uk/interface-tour.md) називає кожну ділянку
 екрана.
 
 ```
@@ -104,38 +104,38 @@ claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
 ```
 
 ШІ необов'язковий і за замовчуванням вимкнений: увімкніть власний ШІ GitPoulpi
-у *Налаштування > ШІ* ([Допомога ШІ](docs/user/uk/ai.md)); дозвольте зовнішньому
-агентові керувати GitPoulpi через [MCP та агентів](docs/user/uk/mcp-and-agents.md)
+у *Налаштування > ШІ* ([Допомога ШІ](../../docs/user/uk/ai.md)); дозвольте зовнішньому
+агентові керувати GitPoulpi через [MCP та агентів](../../docs/user/uk/mcp-and-agents.md)
 (дозволи, усі інструменти) і навичку агента
-[`skills/gitpoulpi/SKILL.md`](skills/gitpoulpi/SKILL.md).
+[`skills/gitpoulpi/SKILL.md`](../../skills/gitpoulpi/SKILL.md).
 
 ## Документація
 
-Повна документація користувача починається з **[docs/user/uk/README.md](docs/user/uk/README.md)**:
+Повна документація користувача починається з **[docs/user/uk/README.md](../../docs/user/uk/README.md)**:
 
 | | |
 |---|---|
-| [Початок роботи](docs/user/uk/getting-started.md) | Встановлення, відкриття репозиторію, перший коміт |
-| [Огляд інтерфейсу](docs/user/uk/interface-tour.md) | Усі ділянки вікна з назвами |
-| [Робота з Журналом](docs/user/uk/log-and-history.md) | Граф, refs, гілки, теги, stash, rebase, cherry-pick |
-| [Індексація та коміти](docs/user/uk/staging-and-committing.md) | Стан, diff, hunk і рядки, форма коміту, редактор |
-| [Налаштування](docs/user/uk/settings.md) | Кожна сторінка й параметр налаштувань |
-| [Допомога ШІ](docs/user/uk/ai.md) | Налаштування вбудованого ШІ, усі дії ШІ, приватність |
-| [Хостинги та трекери задач](docs/user/uk/hosting-integration.md) | GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine: токени, прив'язка репозиторію, pull і merge request |
-| [CLI](docs/user/uk/cli-reference.md) і [MCP](docs/user/uk/mcp-and-agents.md) | Автоматизуйте або дайте керувати агентові (дозволи, усі інструменти) |
-| [Скорочення клавіш](docs/user/uk/keybindings.md) (і всі команди палітри), [миша](docs/user/uk/mouse-and-gestures.md), [конфігурація](docs/user/uk/config-reference.md), [LFS](docs/user/uk/lfs.md), [скасування](docs/user/uk/undo-redo.md), [усунення несправностей](docs/user/uk/troubleshooting.md) | Довідка та допомога |
+| [Початок роботи](../../docs/user/uk/getting-started.md) | Встановлення, відкриття репозиторію, перший коміт |
+| [Огляд інтерфейсу](../../docs/user/uk/interface-tour.md) | Усі ділянки вікна з назвами |
+| [Робота з Журналом](../../docs/user/uk/log-and-history.md) | Граф, refs, гілки, теги, stash, rebase, cherry-pick |
+| [Індексація та коміти](../../docs/user/uk/staging-and-committing.md) | Стан, diff, hunk і рядки, форма коміту, редактор |
+| [Налаштування](../../docs/user/uk/settings.md) | Кожна сторінка й параметр налаштувань |
+| [Допомога ШІ](../../docs/user/uk/ai.md) | Налаштування вбудованого ШІ, усі дії ШІ, приватність |
+| [Хостинги та трекери задач](../../docs/user/uk/hosting-integration.md) | GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine: токени, прив'язка репозиторію, pull і merge request |
+| [CLI](../../docs/user/uk/cli-reference.md) і [MCP](../../docs/user/uk/mcp-and-agents.md) | Автоматизуйте або дайте керувати агентові (дозволи, усі інструменти) |
+| [Скорочення клавіш](../../docs/user/uk/keybindings.md) (і всі команди палітри), [миша](../../docs/user/uk/mouse-and-gestures.md), [конфігурація](../../docs/user/uk/config-reference.md), [LFS](../../docs/user/uk/lfs.md), [скасування](../../docs/user/uk/undo-redo.md), [усунення несправностей](../../docs/user/uk/troubleshooting.md) | Довідка та допомога |
 
-Розробникам: [CLAUDE.md](CLAUDE.md) і `docs/architecture/overview.md`
-описують крейти та устрій; [CHANGELOG.md](CHANGELOG.md) перелічує, що ввійшло в
+Розробникам: [CLAUDE.md](../../CLAUDE.md) і `docs/architecture/overview.md`
+описують крейти та устрій; [CHANGELOG.md](../../CHANGELOG.md) перелічує, що ввійшло в
 кожен реліз.
 
 ## Ліцензія
 
-[MIT](LICENSE).
+[MIT](../../LICENSE).
 
 ## Подяки та ліцензії сторонніх компонентів
 
-GitPoulpi побудований на бібліотеках з відкритим кодом і використовує значення кольорів з опублікованих тем. Їхні ліцензії та подяки, включно з авторами тем, містяться у [THIRD-PARTY-LICENSES.txt](THIRD-PARTY-LICENSES.txt). Файл постачається з кожним випуском; його також показують вікно «Про GitPoulpi» і команда `gitpoulpi licenses`.
+GitPoulpi побудований на бібліотеках з відкритим кодом і використовує значення кольорів з опублікованих тем. Їхні ліцензії та подяки, включно з авторами тем, містяться у [THIRD-PARTY-LICENSES.txt](../../THIRD-PARTY-LICENSES.txt). Файл постачається з кожним випуском; його також показують вікно «Про GitPoulpi» і команда `gitpoulpi licenses`.
 
 ## Торговельні марки
 

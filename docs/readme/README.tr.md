@@ -1,8 +1,8 @@
-[English](README.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · **Türkçe** · [Українська](README.uk.md) · [简体中文](README.zh-CN.md)
+[English](../../README.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · **Türkçe** · [Українська](README.uk.md) · [简体中文](README.zh-CN.md)
 
 # GitPoulpi
 
-<p align="center"><img src="assets/logo/gitpoulpi-512.png" alt="GitPoulpi ahtapotu" width="128"></p>
+<p align="center"><img src="../../assets/logo/gitpoulpi-512.png" alt="GitPoulpi ahtapotu" width="128"></p>
 
 **Masaüstü uygulaması gibi hissettiren, terminalde çalışan bir Git istemcisi.**
 GitPoulpi size tıklayabileceğiniz, sürükleyebileceğiniz ve sağ tıklayabileceğiniz
@@ -10,9 +10,9 @@ tam bir commit grafiği, her özelliğe ulaşan klavye öncelikli bir komut pale
 kod barındırma hizmetleri (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit; bulutta veya kendi barındırdığınız) ve issue takipçileri (Jira, Trello, Linear, YouTrack, Redmine ya da bir Markdown notları klasörü) entegrasyonu ve aynı işlemlerin betiklenebilir bir CLI ile bir MCP
 sunucusu olarak sunulmasını sağlar; böylece bir YZ ajanı onu tıpkı sizin gibi
 yönetebilir. GitPoulpi, GitKraken'dan esinlenmiştir ve baştan sona Rust ile
-yeniden yazılmıştır: yerel ikili dosyalar, diskte ve bellekte hafif, Electron yok, hesap yok, telemetri yok. En sevdiğiniz terminalde çalışır ([hangisi?](docs/user/tr/terminals.md)), çünkü bazılarımız orada yaşıyor.
+yeniden yazılmıştır: yerel ikili dosyalar, diskte ve bellekte hafif, Electron yok, hesap yok, telemetri yok. En sevdiğiniz terminalde çalışır ([hangisi?](../../docs/user/tr/terminals.md)), çünkü bazılarımız orada yaşıyor.
 
-![GitPoulpi: dal, tag ve bir stash içeren commit grafiği, solda Refs kenar çubuğu, sağda commit formuyla birlikte çalışma değişiklikleri](docs/user/images/hero.png)
+![GitPoulpi: dal, tag ve bir stash içeren commit grafiği, solda Refs kenar çubuğu, sağda commit formuyla birlikte çalışma değişiklikleri](../../docs/user/images/hero.png)
 
 - **Fare ve klavye, eşit ölçüde.** Tıklayın, çift tıklayın, sağ tıklayın ve
   ref'leri commit'lerin üzerine sürükleyip bırakın; ya da `Ctrl+P` tuşuna basıp
@@ -45,11 +45,11 @@ yeniden yazılmıştır: yerel ikili dosyalar, diskte ve bellekte hafif, Electro
 
 | | |
 |---|---|
-| ![Material renk temalı ve satır tonu açık Log grafiği](docs/user/images/theme-material.png) **Commit grafiği**, burada Material temasında ve satır tonuyla. | ![Her hunk üzerinde Stage Hunk ve Discard Hunk düğmeleri bulunan, değiştirilmiş bir dosyanın diff'i](docs/user/images/diff.png) **Diff**, hunk veya satır bazında stage ve atma ile. |
-| ![stash sözcüğüyle filtrelenmiş komut paleti](docs/user/images/palette.png) **Komut paleti** (`Ctrl+P`) her komuta ulaşır. | ![Çalışma değişiklikleri için dört commit öneren, incelemeye hazır commit composer](docs/user/images/composer.png) **Commit composer**, hiçbir şey commit'lenmeden önce YZ'nin önerdiği commit'leri incelemenizi sağlar. |
-| ![Cherry-pick, revert, reset, rebase, dal ve tag eylemleri olan bir commit'in sağ tık menüsü](docs/user/images/context-menu.png) Eylemleri için her şeye **sağ tıklayın**. | ![Profilleri, eylem başına yönergeleri ve etkinleştirme anahtarı olan Ayarlar'ın YZ sayfası](docs/user/images/settings-ai.png) **Ayarlar**, arama ile, isteğe bağlı YZ sayfası dahil. |
+| ![Material renk temalı ve satır tonu açık Log grafiği](../../docs/user/images/theme-material.png) **Commit grafiği**, burada Material temasında ve satır tonuyla. | ![Her hunk üzerinde Stage Hunk ve Discard Hunk düğmeleri bulunan, değiştirilmiş bir dosyanın diff'i](../../docs/user/images/diff.png) **Diff**, hunk veya satır bazında stage ve atma ile. |
+| ![stash sözcüğüyle filtrelenmiş komut paleti](../../docs/user/images/palette.png) **Komut paleti** (`Ctrl+P`) her komuta ulaşır. | ![Çalışma değişiklikleri için dört commit öneren, incelemeye hazır commit composer](../../docs/user/images/composer.png) **Commit composer**, hiçbir şey commit'lenmeden önce YZ'nin önerdiği commit'leri incelemenizi sağlar. |
+| ![Cherry-pick, revert, reset, rebase, dal ve tag eylemleri olan bir commit'in sağ tık menüsü](../../docs/user/images/context-menu.png) Eylemleri için her şeye **sağ tıklayın**. | ![Profilleri, eylem başına yönergeleri ve etkinleştirme anahtarı olan Ayarlar'ın YZ sayfası](../../docs/user/images/settings-ai.png) **Ayarlar**, arama ile, isteğe bağlı YZ sayfası dahil. |
 
-Açıklamalı daha fazla görsel [kullanıcı belgelerinde](docs/user/tr/README.md) yer alır.
+Açıklamalı daha fazla görsel [kullanıcı belgelerinde](../../docs/user/tr/README.md) yer alır.
 
 ## Kurulum
 
@@ -73,10 +73,10 @@ Sistemde bir `git` gerekir; `git-lfs` isteğe bağlıdır.
 - **Yalnızca ihtiyacınız olanı içeren daha küçük bir ikili:** `./build-custom.sh`
   (Windows: `build-custom`) hangi dillerin, entegrasyonların ve özelliklerin (YZ,
   MCP, LFS, worktree'ler, alt modüller, avatar indirme) derleneceğini sorar;
-  bkz. [docs/user/tr/custom-builds.md](docs/user/tr/custom-builds.md).
+  bkz. [docs/user/tr/custom-builds.md](../../docs/user/tr/custom-builds.md).
 
 Tüm ayrıntılar, isteğe bağlı araçlar ve işletim sistemine göre notlar:
-[docs/user/tr/installation.md](docs/user/tr/installation.md).
+[docs/user/tr/installation.md](../../docs/user/tr/installation.md).
 
 ## Hızlı başlangıç
 
@@ -93,8 +93,8 @@ gitpoulpi-tui          # or just: gitpoulpi
   olarak çizilir. Diğerlerinde (sade bir Windows konsolu, tmux) kendiliğinden
   karakterlere geçer.
 
-Adım adım anlatım [Başlarken](docs/user/tr/getting-started.md) sayfasındadır;
-[arayüz turu](docs/user/tr/interface-tour.md) ekranın her bölgesini adlandırır.
+Adım adım anlatım [Başlarken](../../docs/user/tr/getting-started.md) sayfasındadır;
+[arayüz turu](../../docs/user/tr/interface-tour.md) ekranın her bölgesini adlandırır.
 
 ```
 gitpoulpi --json status            # the CLI, scriptable
@@ -103,38 +103,38 @@ claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
 ```
 
 YZ isteğe bağlıdır ve varsayılan olarak kapalıdır: GitPoulpi'nin kendi YZ'sini
-*Ayarlar > YZ* içinden açın ([YZ desteği](docs/user/tr/ai.md)); harici bir ajanın
-GitPoulpi'yi yönetmesine [MCP ve ajanlar](docs/user/tr/mcp-and-agents.md)
+*Ayarlar > YZ* içinden açın ([YZ desteği](../../docs/user/tr/ai.md)); harici bir ajanın
+GitPoulpi'yi yönetmesine [MCP ve ajanlar](../../docs/user/tr/mcp-and-agents.md)
 (izinler, her araç) ve ajan skill'i
-[`skills/gitpoulpi/SKILL.md`](skills/gitpoulpi/SKILL.md) ile izin verin.
+[`skills/gitpoulpi/SKILL.md`](../../skills/gitpoulpi/SKILL.md) ile izin verin.
 
 ## Belgeler
 
-Kullanıcı belgelerinin tamamı **[docs/user/tr/README.md](docs/user/tr/README.md)** ile başlar:
+Kullanıcı belgelerinin tamamı **[docs/user/tr/README.md](../../docs/user/tr/README.md)** ile başlar:
 
 | | |
 |---|---|
-| [Başlarken](docs/user/tr/getting-started.md) | Kurulum, bir depo açma, ilk commit |
-| [Arayüz turu](docs/user/tr/interface-tour.md) | Pencerenin her bölgesi, adlarıyla |
-| [Log ile çalışmak](docs/user/tr/log-and-history.md) | Grafik, ref'ler, dallar, tag'ler, stash'ler, rebase, cherry-pick |
-| [Stage ve commit](docs/user/tr/staging-and-committing.md) | Durum, diff, hunk'lar ve satırlar, composer, düzenleyici |
-| [Ayarlar](docs/user/tr/settings.md) | Ayarlar'ın her sayfası ve seçeneği |
-| [YZ desteği](docs/user/tr/ai.md) | Yerleşik YZ'yi yapılandırma, her YZ eylemi, gizlilik |
-| [Barındırma hizmetleri ve issue takipçileri](docs/user/tr/hosting-integration.md) | GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine: token'lar, bir depoyu bağlama, pull ve merge request'ler |
-| [CLI](docs/user/tr/cli-reference.md) ve [MCP](docs/user/tr/mcp-and-agents.md) | Betikleyin ya da bir ajanın yönetmesine izin verin (izinler, her araç) |
-| [Klavye kısayolları](docs/user/tr/keybindings.md) (ve paletteki her komut), [fare](docs/user/tr/mouse-and-gestures.md), [yapılandırma](docs/user/tr/config-reference.md), [LFS](docs/user/tr/lfs.md), [geri alma](docs/user/tr/undo-redo.md), [sorun giderme](docs/user/tr/troubleshooting.md) | Başvuru ve yardım |
+| [Başlarken](../../docs/user/tr/getting-started.md) | Kurulum, bir depo açma, ilk commit |
+| [Arayüz turu](../../docs/user/tr/interface-tour.md) | Pencerenin her bölgesi, adlarıyla |
+| [Log ile çalışmak](../../docs/user/tr/log-and-history.md) | Grafik, ref'ler, dallar, tag'ler, stash'ler, rebase, cherry-pick |
+| [Stage ve commit](../../docs/user/tr/staging-and-committing.md) | Durum, diff, hunk'lar ve satırlar, composer, düzenleyici |
+| [Ayarlar](../../docs/user/tr/settings.md) | Ayarlar'ın her sayfası ve seçeneği |
+| [YZ desteği](../../docs/user/tr/ai.md) | Yerleşik YZ'yi yapılandırma, her YZ eylemi, gizlilik |
+| [Barındırma hizmetleri ve issue takipçileri](../../docs/user/tr/hosting-integration.md) | GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine: token'lar, bir depoyu bağlama, pull ve merge request'ler |
+| [CLI](../../docs/user/tr/cli-reference.md) ve [MCP](../../docs/user/tr/mcp-and-agents.md) | Betikleyin ya da bir ajanın yönetmesine izin verin (izinler, her araç) |
+| [Klavye kısayolları](../../docs/user/tr/keybindings.md) (ve paletteki her komut), [fare](../../docs/user/tr/mouse-and-gestures.md), [yapılandırma](../../docs/user/tr/config-reference.md), [LFS](../../docs/user/tr/lfs.md), [geri alma](../../docs/user/tr/undo-redo.md), [sorun giderme](../../docs/user/tr/troubleshooting.md) | Başvuru ve yardım |
 
-Geliştiriciler: [CLAUDE.md](CLAUDE.md) ve `docs/architecture/overview.md`
-crate'leri ve tasarımı anlatır; [CHANGELOG.md](CHANGELOG.md) her sürümde nelerin
+Geliştiriciler: [CLAUDE.md](../../CLAUDE.md) ve `docs/architecture/overview.md`
+crate'leri ve tasarımı anlatır; [CHANGELOG.md](../../CHANGELOG.md) her sürümde nelerin
 olduğunu listeler.
 
 ## Lisans
 
-[MIT](LICENSE).
+[MIT](../../LICENSE).
 
 ## Katkıda bulunanlar ve üçüncü taraf lisansları
 
-GitPoulpi açık kaynak kütüphaneler üzerine kuruludur ve yayımlanmış temalardan renk değerleri kullanır. Tema yazarları dahil, lisansları ve teşekkürleri [THIRD-PARTY-LICENSES.txt](THIRD-PARTY-LICENSES.txt) dosyasındadır. Dosya her sürümle birlikte gelir; Hakkında penceresi ve `gitpoulpi licenses` komutu da onu gösterir.
+GitPoulpi açık kaynak kütüphaneler üzerine kuruludur ve yayımlanmış temalardan renk değerleri kullanır. Tema yazarları dahil, lisansları ve teşekkürleri [THIRD-PARTY-LICENSES.txt](../../THIRD-PARTY-LICENSES.txt) dosyasındadır. Dosya her sürümle birlikte gelir; Hakkında penceresi ve `gitpoulpi licenses` komutu da onu gösterir.
 
 ## Ticari markalar
 

@@ -1,17 +1,17 @@
-[English](README.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · **Nederlands** · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [简体中文](README.zh-CN.md)
+[English](../../README.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · **Nederlands** · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [简体中文](README.zh-CN.md)
 
 # GitPoulpi
 
-<p align="center"><img src="assets/logo/gitpoulpi-512.png" alt="De octopus van GitPoulpi" width="128"></p>
+<p align="center"><img src="../../assets/logo/gitpoulpi-512.png" alt="De octopus van GitPoulpi" width="128"></p>
 
 **Een Git-client voor de terminal die aanvoelt als een desktopapp.** GitPoulpi
 geeft je een volledige commitgrafiek waarin je kunt klikken, slepen en
 rechtsklikken, een opdrachtenpalet voor het toetsenbord dat elke functie
 bereikt, integratie met codehostingdiensten (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit; in de cloud of zelf beheerd) en issuetrackers (Jira, Trello, Linear, YouTrack, Redmine of een map met Markdown-notities), en dezelfde handelingen als scriptbare CLI en
 als MCP-server, zodat een AI-agent het precies zo kan bedienen als jij. GitPoulpi is
-geïnspireerd door GitKraken en helemaal opnieuw in Rust geschreven: native binaries, zuinig met schijfruimte en geheugen, geen Electron, geen account, geen telemetrie. Het draait in je favoriete terminal ([welke?](docs/user/nl/terminals.md)), want sommigen van ons wonen daarin.
+geïnspireerd door GitKraken en helemaal opnieuw in Rust geschreven: native binaries, zuinig met schijfruimte en geheugen, geen Electron, geen account, geen telemetrie. Het draait in je favoriete terminal ([welke?](../../docs/user/nl/terminals.md)), want sommigen van ons wonen daarin.
 
-![GitPoulpi toont de commitgrafiek met branches, tags en een stash, links de zijbalk Refs en rechts de werkwijzigingen met het commitformulier](docs/user/images/hero.png)
+![GitPoulpi toont de commitgrafiek met branches, tags en een stash, links de zijbalk Refs en rechts de werkwijzigingen met het commitformulier](../../docs/user/images/hero.png)
 
 - **Muis en toetsenbord, even volwaardig.** Klik, dubbelklik, rechtsklik en
   sleep refs naar commits; of druk op `Ctrl+P` en typ wat je wilt. Elk
@@ -45,11 +45,11 @@ geïnspireerd door GitKraken en helemaal opnieuw in Rust geschreven: native bina
 
 | | |
 |---|---|
-| ![De Log-grafiek met het kleurthema Material en rijkleuring ingeschakeld](docs/user/images/theme-material.png) **De commitgrafiek**, hier in het thema Material met rijkleuring. | ![De diff van een gewijzigd bestand met knoppen Hunk stagen en Hunk verwerpen bij elke hunk](docs/user/images/diff.png) **De diff**, met stage en verwerpen per hunk of per regel. |
-| ![Het opdrachtenpalet gefilterd op het woord stash](docs/user/images/palette.png) **Het opdrachtenpalet** (`Ctrl+P`) bereikt elke opdracht. | ![De commitcomposer die vier commits voorstelt voor de werkwijzigingen, klaar om te controleren](docs/user/images/composer.png) **De commitcomposer** laat door AI voorgestelde commits controleren voordat er iets wordt gecommit. |
-| ![Het rechtsklikmenu van een commit met acties voor cherry-pick, revert, reset, rebase, branch en tag](docs/user/images/context-menu.png) **Rechtsklik** op alles voor de bijbehorende acties. | ![De pagina AI van de Instellingen met profielen, instructies per actie en de aan/uit-schakelaar](docs/user/images/settings-ai.png) **De Instellingen**, met zoekfunctie, inclusief de optionele pagina AI. |
+| ![De Log-grafiek met het kleurthema Material en rijkleuring ingeschakeld](../../docs/user/images/theme-material.png) **De commitgrafiek**, hier in het thema Material met rijkleuring. | ![De diff van een gewijzigd bestand met knoppen Hunk stagen en Hunk verwerpen bij elke hunk](../../docs/user/images/diff.png) **De diff**, met stage en verwerpen per hunk of per regel. |
+| ![Het opdrachtenpalet gefilterd op het woord stash](../../docs/user/images/palette.png) **Het opdrachtenpalet** (`Ctrl+P`) bereikt elke opdracht. | ![De commitcomposer die vier commits voorstelt voor de werkwijzigingen, klaar om te controleren](../../docs/user/images/composer.png) **De commitcomposer** laat door AI voorgestelde commits controleren voordat er iets wordt gecommit. |
+| ![Het rechtsklikmenu van een commit met acties voor cherry-pick, revert, reset, rebase, branch en tag](../../docs/user/images/context-menu.png) **Rechtsklik** op alles voor de bijbehorende acties. | ![De pagina AI van de Instellingen met profielen, instructies per actie en de aan/uit-schakelaar](../../docs/user/images/settings-ai.png) **De Instellingen**, met zoekfunctie, inclusief de optionele pagina AI. |
 
-Meer afbeeldingen, met uitleg, staan in de [gebruikersdocumentatie](docs/user/nl/README.md).
+Meer afbeeldingen, met uitleg, staan in de [gebruikersdocumentatie](../../docs/user/nl/README.md).
 
 ## Installeren
 
@@ -73,10 +73,10 @@ Je hebt een `git` op je systeem nodig; `git-lfs` is optioneel.
 - **Kleinere binary met alleen wat je nodig hebt:** `./build-custom.sh`
   (Windows: `build-custom`) vraagt welke talen, integraties en functies (AI,
   MCP, LFS, worktrees, submodules, avatar-download) je wilt bouwen; zie
-  [docs/user/nl/custom-builds.md](docs/user/nl/custom-builds.md).
+  [docs/user/nl/custom-builds.md](../../docs/user/nl/custom-builds.md).
 
 Alle details, optionele tools en opmerkingen per besturingssysteem:
-[docs/user/nl/installation.md](docs/user/nl/installation.md).
+[docs/user/nl/installation.md](../../docs/user/nl/installation.md).
 
 ## Snel starten
 
@@ -93,8 +93,8 @@ gitpoulpi-tui          # or just: gitpoulpi
   grafiek als pixels getekend. In andere (een gewone Windows-console,
   tmux) valt hij automatisch terug op tekens.
 
-De stapsgewijze versie staat in [Aan de slag](docs/user/nl/getting-started.md),
-en de [rondleiding door de interface](docs/user/nl/interface-tour.md) benoemt elk
+De stapsgewijze versie staat in [Aan de slag](../../docs/user/nl/getting-started.md),
+en de [rondleiding door de interface](../../docs/user/nl/interface-tour.md) benoemt elk
 deel van het scherm.
 
 ```
@@ -104,38 +104,38 @@ claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
 ```
 
 AI is optioneel en standaard uit: schakel de eigen AI van GitPoulpi in via
-*Instellingen > AI* ([AI-ondersteuning](docs/user/nl/ai.md)); laat een externe
-agent GitPoulpi bedienen met [MCP en agents](docs/user/nl/mcp-and-agents.md)
+*Instellingen > AI* ([AI-ondersteuning](../../docs/user/nl/ai.md)); laat een externe
+agent GitPoulpi bedienen met [MCP en agents](../../docs/user/nl/mcp-and-agents.md)
 (rechten, elke tool) en de agentskill
-[`skills/gitpoulpi/SKILL.md`](skills/gitpoulpi/SKILL.md).
+[`skills/gitpoulpi/SKILL.md`](../../skills/gitpoulpi/SKILL.md).
 
 ## Documentatie
 
-De volledige gebruikersdocumentatie begint bij **[docs/user/nl/README.md](docs/user/nl/README.md)**:
+De volledige gebruikersdocumentatie begint bij **[docs/user/nl/README.md](../../docs/user/nl/README.md)**:
 
 | | |
 |---|---|
-| [Aan de slag](docs/user/nl/getting-started.md) | Installeren, een repository openen, een eerste commit maken |
-| [Rondleiding door de interface](docs/user/nl/interface-tour.md) | Elk deel van het venster, benoemd |
-| [Werken met de Log](docs/user/nl/log-and-history.md) | Grafiek, refs, branches, tags, stashes, rebase, cherry-pick |
-| [Stagen en committen](docs/user/nl/staging-and-committing.md) | Status, diff, hunks en regels, de composer, de editor |
-| [Instellingen](docs/user/nl/settings.md) | Elke pagina en optie van de Instellingen |
-| [AI-ondersteuning](docs/user/nl/ai.md) | De ingebouwde AI instellen, elke AI-actie, privacy |
-| [Hosting en issuetrackers](docs/user/nl/hosting-integration.md) | GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine: tokens, een repository koppelen, pull en merge requests |
-| [CLI](docs/user/nl/cli-reference.md) en [MCP](docs/user/nl/mcp-and-agents.md) | Automatiseer het, of laat een agent het bedienen (rechten, elke tool) |
-| [Sneltoetsen](docs/user/nl/keybindings.md) (en elke paletopdracht), [muis](docs/user/nl/mouse-and-gestures.md), [configuratie](docs/user/nl/config-reference.md), [LFS](docs/user/nl/lfs.md), [ongedaan maken](docs/user/nl/undo-redo.md), [probleemoplossing](docs/user/nl/troubleshooting.md) | Naslag en hulp |
+| [Aan de slag](../../docs/user/nl/getting-started.md) | Installeren, een repository openen, een eerste commit maken |
+| [Rondleiding door de interface](../../docs/user/nl/interface-tour.md) | Elk deel van het venster, benoemd |
+| [Werken met de Log](../../docs/user/nl/log-and-history.md) | Grafiek, refs, branches, tags, stashes, rebase, cherry-pick |
+| [Stagen en committen](../../docs/user/nl/staging-and-committing.md) | Status, diff, hunks en regels, de composer, de editor |
+| [Instellingen](../../docs/user/nl/settings.md) | Elke pagina en optie van de Instellingen |
+| [AI-ondersteuning](../../docs/user/nl/ai.md) | De ingebouwde AI instellen, elke AI-actie, privacy |
+| [Hosting en issuetrackers](../../docs/user/nl/hosting-integration.md) | GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine: tokens, een repository koppelen, pull en merge requests |
+| [CLI](../../docs/user/nl/cli-reference.md) en [MCP](../../docs/user/nl/mcp-and-agents.md) | Automatiseer het, of laat een agent het bedienen (rechten, elke tool) |
+| [Sneltoetsen](../../docs/user/nl/keybindings.md) (en elke paletopdracht), [muis](../../docs/user/nl/mouse-and-gestures.md), [configuratie](../../docs/user/nl/config-reference.md), [LFS](../../docs/user/nl/lfs.md), [ongedaan maken](../../docs/user/nl/undo-redo.md), [probleemoplossing](../../docs/user/nl/troubleshooting.md) | Naslag en hulp |
 
-Ontwikkelaars: [CLAUDE.md](CLAUDE.md) en `docs/architecture/overview.md`
-beschrijven de crates en het ontwerp; [CHANGELOG.md](CHANGELOG.md) toont wat er
+Ontwikkelaars: [CLAUDE.md](../../CLAUDE.md) en `docs/architecture/overview.md`
+beschrijven de crates en het ontwerp; [CHANGELOG.md](../../CHANGELOG.md) toont wat er
 in elke release zit.
 
 ## Licentie
 
-[MIT](LICENSE).
+[MIT](../../LICENSE).
 
 ## Dankbetuiging en licenties van derden
 
-GitPoulpi is gebouwd op open-sourcebibliotheken en gebruikt kleurwaarden uit gepubliceerde thema's. Hun licenties en dankbetuigingen, thema-auteurs inbegrepen, staan in [THIRD-PARTY-LICENSES.txt](THIRD-PARTY-LICENSES.txt). Het bestand wordt met elke release meegeleverd; het venster Over GitPoulpi en `gitpoulpi licenses` tonen het ook.
+GitPoulpi is gebouwd op open-sourcebibliotheken en gebruikt kleurwaarden uit gepubliceerde thema's. Hun licenties en dankbetuigingen, thema-auteurs inbegrepen, staan in [THIRD-PARTY-LICENSES.txt](../../THIRD-PARTY-LICENSES.txt). Het bestand wordt met elke release meegeleverd; het venster Over GitPoulpi en `gitpoulpi licenses` tonen het ook.
 
 ## Handelsmerken
 

@@ -3,7 +3,7 @@
     Daily incremental build.
 
 .DESCRIPTION
-    Builds gitpoulpi (CLI + TUI + daemon), gitpoulpi-tui, gitpoulpi-mcp and gitpoulpi-launch
+    Builds gitpoulpi (CLI + TUI + daemon), gitpoulpi-launch, gitpoulpi-updater and the shim (copied as gitpoulpi-tui and gitpoulpi-mcp)
     with the `release` profile (incremental, 16 codegen units, no LTO): fast
     rebuilds, optimized binaries. Outputs land in target\release\.
     Packaging stays on build-opti (the `dist` profile).
@@ -30,8 +30,11 @@ foreach ($bin in $bins) {
     }
 }
 
-cargo build --release --locked -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-mcp -p gitpoulpi-updater @args
+cargo build --release --locked -p gitpoulpi-cli -p gitpoulpi-updater -p gitpoulpi-shim @args
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+# gitpoulpi-tui and gitpoulpi-mcp are copies of the shim (as in the release archives).
+foreach ($n in 'gitpoulpi-tui', 'gitpoulpi-mcp') { Copy-Item -Force 'target\release\gitpoulpi-shim.exe' "target\release\$n.exe" }
 
 Write-Host ''
 Write-Host 'Binaries (target\release):'

@@ -834,13 +834,12 @@ fn the_release_and_the_cache_workflows_share_the_cache_keys_and_only_main_saves(
     assert_eq!(rows(&release).len(), 5);
     // It builds what `xtask dist` builds, with the same profile.
     assert!(warm.contains("cargo build --profile dist --target ${{ matrix.target }}"));
-    for package in [
-        "gitpoulpi-tui",
-        "gitpoulpi-cli",
-        "gitpoulpi-mcp",
-        "gitpoulpi-updater",
-    ] {
+    for package in gitpoulpi_config::release::build_packages() {
         assert!(warm.contains(&format!("-p {package}")), "{package}");
+    }
+    // Never the bin targets that the shim replaced: they would link the old programs again.
+    for gone in ["gitpoulpi-tui", "gitpoulpi-mcp"] {
+        assert!(!warm.contains(&format!("-p {gone}")), "{gone}");
     }
     // The toolchain step (and its pinned SHA) is the same in both files.
     let toolchain = |yml: &str| -> String {

@@ -9,7 +9,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 cargo build --release --locked \
-    -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-mcp -p gitpoulpi-updater "$@"
+    -p gitpoulpi-cli -p gitpoulpi-updater -p gitpoulpi-shim "$@"
+
+# gitpoulpi-tui and gitpoulpi-mcp are copies of the shim (as in the release archives).
+cp -f target/release/gitpoulpi-shim target/release/gitpoulpi-tui
+cp -f target/release/gitpoulpi-shim target/release/gitpoulpi-mcp
 
 echo
 echo "Binaries (target/release):"

@@ -44,7 +44,10 @@ build() {
     export RUSTUP_TOOLCHAIN=stable
     export CARGO_TARGET_DIR=target
     # GITPOULPI_DIST: the version string carries no commit hash, as in the release archives.
-    GITPOULPI_DIST=1 cargo build --frozen --profile dist -p gitpoulpi-tui -p gitpoulpi-cli -p gitpoulpi-mcp -p gitpoulpi-updater
+    GITPOULPI_DIST=1 cargo build --frozen --profile dist -p gitpoulpi-cli -p gitpoulpi-updater -p gitpoulpi-shim
+    # gitpoulpi-tui and gitpoulpi-mcp are copies of the shim, as in the release archives.
+    cp target/dist/gitpoulpi-shim target/dist/gitpoulpi-tui
+    cp target/dist/gitpoulpi-shim target/dist/gitpoulpi-mcp
 }
 
 check() {

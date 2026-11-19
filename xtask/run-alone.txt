@@ -26,3 +26,5 @@ gitpoulpi-tui::pty_push_group_force_confirm::confirming_the_force_push_runs_it_a
 gitpoulpi-tui::pty_push_group_force_confirm::a_rewritten_remote_defaults_to_force_and_esc_on_the_confirmation_pushes_nothing
 gitpoulpi-cli::shim::a_symlinked_stub_finds_gitpoulpi_next_to_the_real_file
 gitpoulpi-cli::shim::the_exit_code_passes_through
+gitpoulpi-tui::pty_diff_cjk::the_split_separator_is_on_one_column_with_japanese_text
+gitpoulpi-tui::pty_diff_cjk::the_split_separator_is_on_one_column_in_a_narrow_terminal

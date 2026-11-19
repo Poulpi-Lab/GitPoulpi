@@ -87,6 +87,56 @@ en los terminales de Linux y macOS; `Ctrl+Shift+N` se ve como `Ctrl+N`). Usa las
 alternativas (`Ctrl+N` y luego `,` abre los Ajustes; `Ctrl+P` llega a todos los
 comandos), o reasigna la combinación: consulta [Ajustes](settings.md#teclado-y-ratón).
 
+**`Ctrl+Tab` no cambia de pestaña.** kitty, WezTerm, Ghostty y Windows
+Terminal se quedan con `Ctrl+Tab` y `Ctrl+Shift+Tab` para sus propias pestañas,
+así que la tecla nunca llega a GitPoulpi. `Ctrl+PageDown` / `Ctrl+PageUp`
+funcionan siempre. Para dejar el par a GitPoulpi, libéralo en la configuración
+del terminal y reinicia el terminal (o recarga su configuración):
+
+- kitty, en `kitty.conf` (un `map` sin acción quita la asignación por defecto;
+  con `--when-focus-on` y un criterio de ventana como `title:...`, kitty puede
+  quitarla solo mientras una ventana que coincida tiene el foco, consulta la
+  documentación de asignaciones de kitty):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, en `wezterm.lua`:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, en su archivo de configuración:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, en `settings.json` (`"id": null` quita la asignación por
+  defecto):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (Los archivos de configuración antiguos listan `nextTab` / `prevTab` en
+  `actions` con estas teclas: quita esas teclas allí.)
+
+Después, el terminal pierde su propio cambio de pestaña con `Ctrl+Tab`. Un
+terminal que solo puede enviar la tecla mediante el protocolo de teclado de
+kitty necesita tenerlo activado (lo está por defecto, consulta
+[Atajos de teclado](keybindings.md#teclas-que-el-terminal-no-puede-enviar-y-el-protocolo-de-teclado-de-kitty)).
+
 **No recuerdo un atajo.** Pulsa `Ctrl+P` y escribe lo que quieres; cada resultado
 muestra su atajo. `?` lista todo.
 

@@ -42,7 +42,7 @@ omskrivet från grunden i Rust: nativa binärer, lätta på disk och i minne, in
 
 | | |
 |---|---|
-| ![Log-grafen med färgtemat Material och radfärgning påslagen](../../docs/user/images/theme-material.png) **Commit-grafen**, här i temat Material med radfärgning. | ![En diff av en ändrad fil med knapparna Stage hunk och Förkasta hunken på varje hunk](../../docs/user/images/diff.png) **Diffen**, med stage och förkasta per hunk eller per rad. |
+| ![Log-grafen med spårpaletten Material och radfärgning påslagen](../../docs/user/images/theme-material.png) **Commit-grafen**, här med spårpaletten Material och radfärgning. | ![En diff av en ändrad fil med knapparna Stage hunk och Förkasta hunken på varje hunk](../../docs/user/images/diff.png) **Diffen**, med stage och förkasta per hunk eller per rad. |
 | ![Kommandopaletten filtrerad på ordet stash](../../docs/user/images/palette.png) **Kommandopaletten** (`Ctrl+P`) når varje kommando. | ![Commit-composern föreslår fyra commits för arbetsändringarna, redo att granskas](../../docs/user/images/composer.png) **Commit-composern** låter dig granska AI-föreslagna commits innan något committas. |
 | ![Högerklicksmenyn för en commit med åtgärderna cherry-pick, revert, reset, rebase, gren och tag](../../docs/user/images/context-menu.png) **Högerklicka** på vad som helst för dess åtgärder. | ![AI-sidan i Inställningar med profiler, instruktioner per åtgärd och på/av-knappen](../../docs/user/images/settings-ai.png) **Inställningar**, med sökning, inklusive den valfria AI-sidan. |
 

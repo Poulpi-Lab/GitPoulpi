@@ -14,6 +14,7 @@
 //! - `tests` -- including the exhaustive connectivity check that made
 //!   "is every node joined to its lanes?" a property instead of a hope.
 
+mod avatar_hover;
 mod cache;
 #[cfg(test)]
 mod cache_tests;
@@ -35,6 +36,9 @@ mod walk_filter;
 
 use ratatui::style::Color;
 
+pub(crate) use avatar_hover::{
+    picture_cells, set_slots as set_avatar_slots, slot_at as avatar_slot_at,
+};
 pub(crate) use cache::{LayoutInputs, LogLayout, LogLayoutCache};
 #[cfg(test)]
 pub(crate) use compact::COMPACT_W;

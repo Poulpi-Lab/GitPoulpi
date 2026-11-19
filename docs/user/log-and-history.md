@@ -42,7 +42,9 @@ faded the band is.
 by default. Turning them on sends a hash of each author's email address to
 Gravatar, and asks your hosting provider. *Avatar sources* and *Avatar
 fallback* on the same page choose where pictures come from and what is drawn
-when there is none.
+when there is none. With the picture in the graph dot, resting the pointer on
+it shows the same tooltip as the Author cell (name and email); a plain dot has
+no tooltip.
 
 If your terminal cannot show pictures, the graph is drawn with characters.
 *Graph renderer* and *Image protocol* force either one; see

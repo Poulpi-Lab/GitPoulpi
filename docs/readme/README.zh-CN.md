@@ -13,7 +13,7 @@
 - **精确 stage。** 直接在 diff 中对文件、文件夹、hunk 或单行进行 stage、unstage 或丢弃。支持内联或并排显示，并带有缩略图。
 - **安全地编辑历史。** 改写或修订任意 commit（消息、作者、日期），通过审阅界面进行交互式 rebase，一次重写多个 commit（先预览，一次撤销即可还原），cherry-pick 多个 commit，快进，创建 worktree 和补丁。
 - **内置托管平台和议题跟踪器。** 浏览、检出和创建 pull request 与 merge request（GitHub、GitLab、Gitea、Forgejo、Azure DevOps、Bitbucket），并审阅 Gerrit 的 change。浏览和创建议题、工作项和卡片（还支持 Jira、Trello、Linear、YouTrack、Redmine 和本地 Markdown 笔记），也可以用看板（Kanban）查看。从您的账号克隆并管理 SSH 密钥。
-- **面向代理的 CLI 和 MCP。** `gitpoulpi <command> --json` 涵盖界面所做的一切，`gitpoulpi-mcp` 则将其作为 MCP 工具提供。每个仓库一个后台守护进程，让所有前端保持实时同步。
+- **面向代理的 CLI 和 MCP。** `gitpoulpi <command> --json` 涵盖界面所做的一切，`gitpoulpi mcp serve` 则将其作为 MCP 工具提供。每个仓库一个后台守护进程，让所有前端保持实时同步。
 - **可选的 AI，绝非必需。** 默认关闭，无需账号：使用您自己的 API 密钥或本地代理 CLI（例如 `claude -p`）。可以生成 commit 消息、解释更改、撰写 pull request 描述，把您的工作更改拆分为多个 commit，以及起草历史重写规则。
 - **Git LFS、子模块、worktree、补丁、blame 和文件历史、图像 diff、内置编辑器。**
 
@@ -117,7 +117,7 @@ gitpoulpi
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 AI 是可选的，默认关闭：在 *设置 > AI* 中开启 GitPoulpi 自带的 AI（[AI 辅助](../../docs/user/zh-CN/ai.md)）；让外部代理通过 [MCP 与代理](../../docs/user/zh-CN/mcp-and-agents.md)（权限、所有工具）以及代理技能 [`skills/gitpoulpi/SKILL.md`](../../skills/gitpoulpi/SKILL.md) 来操控 GitPoulpi。

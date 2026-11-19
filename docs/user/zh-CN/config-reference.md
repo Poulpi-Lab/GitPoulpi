@@ -317,7 +317,7 @@ review_mode = "ask"       # ask | clone | api
 | `mcp.ui_control` | `"ask"` | `ask`（窗口显示一个由你确认的标签）、`auto`（除非你正忙，否则直接应用）、`off`。服务器命令上的 `--ui-control` 会按代理覆盖它。也适用于 `gitpoulpi ui show`。 |
 | `mcp.allow_ui_propose` | `false` | 允许 `ui_propose_*` / `gitpoulpi ui propose`：预先填好的对话框，由你自己确认。 |
 | `mcp.allow_history_purge` | `false` | 仅存在于 `config.toml`（设置中没有对应行）。`true` 会向代理列出工具 `rewrite_purge`（仍需要 `allow_mutations`）。关闭时，代理根本看不到这个工具：清除会永久删除历史重写留下的旧历史、它的撤销记录及其 reflog。CLI 和 TUI 不受它限制。 |
-| `mcp.enabled` | `true` | `false`：`gitpoulpi mcp serve` 和 `gitpoulpi-mcp` 拒绝启动，并给出点名此键的提示。设置 > 代理与 MCP > *MCP 服务器*。在代理启动服务器时读取。 |
+| `mcp.enabled` | `true` | `false`：`gitpoulpi mcp serve`（及其别名 `gitpoulpi-mcp`）拒绝启动，并给出点名此键的提示。设置 > 代理与 MCP > *MCP 服务器*。在代理启动服务器时读取。 |
 | `mcp.bind` | `"127.0.0.1:8808"` | 未指定时 `--http` 监听的地址（`--http ADDR` / `--bind` 优先）。除非使用 `--allow-remote`，否则仅限回环地址。留空或旧的 `"stdio"` 表示默认值。设置 > 代理与 MCP > *MCP 服务器端口* 编辑端口并保留主机。 |
 | `mcp.http_auth` | `true` | `--http` 只响应带有 `Authorization: Bearer <token>`（`gitpoulpi mcp token` 的令牌）的请求。`false` 会取消该检查；服务器随后会在 stderr 上警告，并且 `--allow-remote` 会被拒绝。设置 > 代理与 MCP > *HTTP 身份验证*。 |
 | `mcp.tls` | `"off"` | `off`、`self_signed`（在私有数据文件夹下一次性生成的证书，启动时会打印其 SHA-256 指纹）或 `files`（`tls_cert` 和 `tls_key`）。开启 TLS 后，服务器自己终结 TLS，不存在纯文本监听器。设置 > 代理与 MCP > *TLS*。 |

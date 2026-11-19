@@ -20,7 +20,7 @@ build-custom                     # Windows, cmd or PowerShell (scripts/build-cus
 | 徽标颜色 | “关于”窗口中的像素章鱼有 20 种配色（`--list-logo-colors`）。选择要编译进去的配色（至少一个）、默认配色（“关于”首先显示它；当存储的 `ui.logo_color` 未被编译进去时也会回退到它；它必须是已编译的配色之一；正式默认：lavender），以及 Windows 可执行文件图标的颜色（任意配色，默认：徽标默认值）。只有一种配色时，徽标点击后仍会旋转，但保持该颜色，也不会提供颜色列表（`c`、右键点击）。 |
 | 集成（GitHub、GitLab、Gitea、Forgejo、Azure DevOps、Bitbucket、Gerrit、Jira、Trello、Linear、YouTrack、Redmine） | 全部关闭时：只能通过 URL 克隆；没有议题，没有 pull/merge request。 |
 | AI | 没有 AI 按钮、命令，也没有 `ai` CLI/MCP 工具。 |
-| MCP | 没有 `gitpoulpi-mcp` 二进制文件，也没有 `gitpoulpi mcp` 命令。`ui` 代理命令保留。 |
+| MCP | 没有 `gitpoulpi-mcp` 中继程序，也没有 `gitpoulpi mcp` 命令。`ui` 代理命令保留。 |
 | LFS、Worktree、子模块 | 对应的管理界面和命令都会消失；返回一个带类型的“未内置于此二进制文件”应答。 |
 | 头像下载 | 仅显示首字母徽章，不进行网络获取。 |
 | 图像预览 | 图像文件显示普通的二进制提示；**编辑方式**仍可使用。 |
@@ -77,11 +77,11 @@ PowerShell 的名称：`-Langs -Integrations -Themes -LogoColors -LogoDefault -I
 
 主题选择以环境变量 `GITPOULPI_THEMES`（`all`、`none` 或以逗号分隔的系列列表）传递给构建，由 `gitpoulpi-config` 的构建脚本读取，并在编译时丢弃其他调色板；如果你愿意，也可以为普通的 `cargo build` 自行设置它。`gitpoulpi --version` 会打印一行 `themes:`，列出已构建的集合。
 
-徽标选择是环境变量 `GITPOULPI_LOGO_COLORS`（`all` 或以逗号分隔的 slug 列表）、`GITPOULPI_LOGO_DEFAULT` 和 `GITPOULPI_ICON_COLOR`，由 `gitpoulpi-tui` 的构建脚本（它把 `crates/gitpoulpi-logo-build/colourways.json` 过滤成“关于”窗口所嵌入的表）以及三个二进制 crate 的构建脚本（图标）读取。颜色的来源仍是 `crates/gitpoulpi-logo-build/colourways.json`。
+徽标选择是环境变量 `GITPOULPI_LOGO_COLORS`（`all` 或以逗号分隔的 slug 列表）、`GITPOULPI_LOGO_DEFAULT` 和 `GITPOULPI_ICON_COLOR`，由 `gitpoulpi-tui` 的构建脚本（它把 `crates/gitpoulpi-logo-build/colourways.json` 过滤成“关于”窗口所嵌入的表）以及 `gitpoulpi-cli` 的构建脚本（图标）读取。颜色的来源仍是 `crates/gitpoulpi-logo-build/colourways.json`。
 
 ### Windows 可执行文件图标
 
-当目标是 Windows 时，`gitpoulpi`、`gitpoulpi-tui` 和 `gitpoulpi-mcp` 可执行文件会以章鱼作为图标，在构建时生成（无需 Python 或 ImageMagick），颜色为所选的图标颜色，尺寸从 16 到 128 px。它通过 `winresource` crate 嵌入，并需要平台的资源编译器（MSVC 上是 Windows SDK 的 `rc.exe`，GNU 上是 `windres`）。如果缺失，构建只会打印警告，可执行文件保留默认图标。在 GNU 工具链上，只有 `gitpoulpi` 带有该图标（否则资源会被链接两次）。面向 Linux 和 macOS 的构建会忽略以上所有内容，只保留颜色表。
+当目标是 Windows 时，`gitpoulpi` 可执行文件会以章鱼作为图标，在构建时生成（无需 Python 或 ImageMagick），颜色为所选的图标颜色，尺寸从 16 到 128 px。它通过 `winresource` crate 嵌入，并需要平台的资源编译器（MSVC 上是 Windows SDK 的 `rc.exe`，GNU 上是 `windres`）。如果缺失，构建只会打印警告，可执行文件保留默认图标。在 GNU 工具链上，只有 `gitpoulpi` 带有该图标（否则资源会被链接两次）。面向 Linux 和 macOS 的构建会忽略以上所有内容，只保留颜色表。
 
 ## 已保存的选择
 
@@ -110,32 +110,32 @@ PowerShell 的名称：`-Langs -Integrations -Themes -LogoColors -LogoDefault -I
 
 ## 它能节省多少
 
-在 Linux 上于 2026-10-29 测得，commit 为 `65999ef5c`，基于完整构建，括号内为与完整构建的差值
-（详情见 `docs/developer/binary-size.md`）：
+在 Linux 上于 2026-10-29 测得，commit 为 `65999ef5c`，为 `gitpoulpi`（整个程序：界面、CLI 和 MCP 服务器）基于完整构建的大小，括号内为与完整构建的差值
+（详情见 `docs/developer/binary-size.md`）。无论如何选择，中继程序 `gitpoulpi-tui`、`gitpoulpi-mcp` 和 `gitpoulpi-launch` 都远小于 1 MiB：
 
-| 构建（除非另有说明，均基于 `full`） | `gitpoulpi` (MiB) | `gitpoulpi-tui` (MiB) | `gitpoulpi-mcp` (MiB) |
-|---|---|---|---|
-| 完整（全部开启） | 64.6 | 50.5 | 31.7 |
-| 仅英语 | 52.0 (-12.6) | 40.2 (-10.3) | 31.7 (0.0) |
-| 关闭 MCP | 61.6 (-3.0) | 49.6 (-0.8) | 不构建 |
-| 关闭 AI | 62.6 (-2.0) | 48.6 (-1.8) | 30.5 (-1.3) |
-| 关闭所有集成 | 56.3 (-8.2) | 43.7 (-6.7) | 26.7 (-5.0) |
-| 关闭 AI + 集成 + 头像获取 | 52.2 (-12.3) | 39.9 (-10.6) | 23.0 (-8.8) |
-| 关闭历史重写工作台（`--no-history-rewrite`） | 61.6 (-3.0) | 48.9 (-1.5) | 28.5 (-3.2) |
-| 关闭重写脚本 | 63.1 (-1.5) | 49.0 (-1.5) | 31.1 (-0.7) |
-| 关闭全局搜索 | 63.5 (-1.1) | 49.5 (-1.0) | 31.6 (-0.1) |
-| 关闭工作空间 | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.2) |
-| 关闭 Radar | 63.4 (-1.2) | 49.3 (-1.2) | 31.7 (0.0) |
-| 关闭 Board | 63.6 (-1.0) | 49.5 (-1.0) | 31.7 (0.0) |
-| 关闭 Review | 63.2 (-1.4) | 49.0 (-1.4) | 31.7 (0.0) |
-| 关闭 Mermaid | 63.6 (-1.0) | 49.5 (-0.9) | 31.6 (-0.1) |
-| 关闭 LFS | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.3) |
-| 关闭 Worktree | 63.7 (-0.9) | 49.6 (-0.8) | 31.7 (0.0) |
-| 关闭子模块 | 63.7 (-0.9) | 49.6 (-0.9) | 31.6 (-0.1) |
-| 关闭头像获取 | 63.7 (-0.9) | 49.6 (-0.9) | 31.7 (0.0) |
-| 关闭图片查看 | 63.3 (-1.2) | 49.2 (-1.3) | 31.7 (0.0) |
-| 全部关闭，仅英语（保留 LFS） | 35.2 (-29.4) | 28.9 (-21.5) | 不构建 |
-| **全部关闭，仅英语** | **34.9 (-29.7)** | **28.8 (-21.6)** | 不构建 |
+| 构建（除非另有说明，均基于 `full`） | `gitpoulpi` (MiB) |
+|---|---|
+| 完整（全部开启） | 64.6 |
+| 仅英语 | 52.0 (-12.6) |
+| 关闭 MCP | 61.6 (-3.0) |
+| 关闭 AI | 62.6 (-2.0) |
+| 关闭所有集成 | 56.3 (-8.2) |
+| 关闭 AI + 集成 + 头像获取 | 52.2 (-12.3) |
+| 关闭历史重写工作台（`--no-history-rewrite`） | 61.6 (-3.0) |
+| 关闭重写脚本 | 63.1 (-1.5) |
+| 关闭全局搜索 | 63.5 (-1.1) |
+| 关闭工作空间 | 63.5 (-1.1) |
+| 关闭 Radar | 63.4 (-1.2) |
+| 关闭 Board | 63.6 (-1.0) |
+| 关闭 Review | 63.2 (-1.4) |
+| 关闭 Mermaid | 63.6 (-1.0) |
+| 关闭 LFS | 63.5 (-1.1) |
+| 关闭 Worktree | 63.7 (-0.9) |
+| 关闭子模块 | 63.7 (-0.9) |
+| 关闭头像获取 | 63.7 (-0.9) |
+| 关闭图片查看 | 63.3 (-1.2) |
+| 全部关闭，仅英语（保留 LFS） | 35.2 (-29.4) |
+| **全部关闭，仅英语** | **34.9 (-29.7)** |
 
 ## 注意事项
 

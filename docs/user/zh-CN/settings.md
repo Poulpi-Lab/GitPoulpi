@@ -169,7 +169,7 @@
 
 | 系统 | 别名 | PATH |
 |---|---|---|
-| Linux、macOS | 一个符号链接 `~/.local/bin/<name>`，指向 `gitpoulpi-tui`。链接里无法放标记，所以当它的目标是名为 `gitpoulpi-tui` 的文件时才算我们创建的；普通文件，或指向其他任何东西的链接，**不是我们的**，绝不会被替换或移除。 | 在 `~/.bashrc` 和 `~/.zshrc`（存在哪个写哪个；两者都没有时，macOS 写 `~/.zshrc`，其他系统写 `~/.bashrc`）中写入位于 `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>` 与 `# <<< GitPoulpi PATH <<<` 之间的代码块；已配置 fish 时还会写 `~/.config/fish/conf.d/gitpoulpi-path.fish`。移除时只删除该代码块（或 fish 文件），不碰其他内容。 |
+| Linux、macOS | 一个符号链接 `~/.local/bin/<name>`，指向 `gitpoulpi`。链接里无法放标记，所以当它的目标是名为 `gitpoulpi` 的文件（或 `gitpoulpi-tui`，即旧目标，它会被自动重写为 `gitpoulpi`）时才算我们创建的；普通文件，或指向其他任何东西的链接，**不是我们的**，绝不会被替换或移除。 | 在 `~/.bashrc` 和 `~/.zshrc`（存在哪个写哪个；两者都没有时，macOS 写 `~/.zshrc`，其他系统写 `~/.bashrc`）中写入位于 `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>` 与 `# <<< GitPoulpi PATH <<<` 之间的代码块；已配置 fish 时还会写 `~/.config/fish/conf.d/gitpoulpi-path.fish`。移除时只删除该代码块（或 fish 文件），不碰其他内容。 |
 | Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd`，一个简短的小脚本，里面有 `REM X-GitPoulpi=1`（它还会导出 `GITPOULPI_CMDCMDLINE`，用来识别从地址栏启动）。 | `HKCU\Environment` 中的用户 PATH，通过 PowerShell 写入，随后广播 `WM_SETTINGCHANGE`，让新程序能看到。值 `GitPoulpiPathAdded` 记录了添加的内容，移除时只取走它。 |
 
 新打开的终端能看到 PATH 的变化，已经打开的看不到。这两个操作都不记入撤销日志：没有对应的撤销，**移除** 就是退回的办法。

@@ -2,7 +2,7 @@
 
 # 在 Docker 中运行
 
-`poulpilab/gitpoulpi` 镜像基于 `debian:bookworm-slim`，内含官方发布的可执行文件（`gitpoulpi-tui`、`gitpoulpi`、`gitpoulpi-mcp`），以及 `git`、`git-lfs`、`openssh-client`、`less` 和 `tini`。它可运行在 `linux/amd64` 和 `linux/arm64` 上。镜像位于 Docker Hub。
+`poulpilab/gitpoulpi` 镜像基于 `debian:bookworm-slim`，内含官方发布的可执行文件（`gitpoulpi`，以及中继程序 `gitpoulpi-tui` 和 `gitpoulpi-mcp`），以及 `git`、`git-lfs`、`openssh-client`、`less` 和 `tini`。它可运行在 `linux/amd64` 和 `linux/arm64` 上。镜像位于 Docker Hub。
 
 ## 启动界面
 
@@ -81,10 +81,10 @@ docker run -it --rm \
 docker run --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi status
 
 # MCP 服务器，通过标准输入和输出，供启动它的代理使用
-docker run -i --rm --entrypoint gitpoulpi-mcp -v "$PWD":/work poulpilab/gitpoulpi
+docker run -i --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi mcp serve
 ```
 
-每次 `docker run` 都是一个独立的容器，有它自己的 GitPoulpi 后台守护进程，所以通过 CLI 所做的更改不会实时显示在另一个容器中运行的界面里。要用 CLI 操控某个界面，请在同一个容器中运行两者：用 `--name gp` 启动界面，然后使用 `docker exec gp gitpoulpi ...`。对于代理，请把 `docker run -i --rm --entrypoint gitpoulpi-mcp ...` 注册为 MCP 服务器命令，见 [MCP 与代理](mcp-and-agents.md)；挂载的 `config.toml` 中的 MCP 权限开关照常生效。
+每次 `docker run` 都是一个独立的容器，有它自己的 GitPoulpi 后台守护进程，所以通过 CLI 所做的更改不会实时显示在另一个容器中运行的界面里。要用 CLI 操控某个界面，请在同一个容器中运行两者：用 `--name gp` 启动界面，然后使用 `docker exec gp gitpoulpi ...`。对于代理，请把 `docker run -i --rm --entrypoint gitpoulpi ... mcp serve` 注册为 MCP 服务器命令，见 [MCP 与代理](mcp-and-agents.md)；挂载的 `config.toml` 中的 MCP 权限开关照常生效。
 
 ## 标签和更新
 

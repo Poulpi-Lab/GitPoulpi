@@ -43,7 +43,7 @@ GitPoulpi jest inspirowany GitKraken i napisany od nowa w Rust: natywne pliki bi
 
 | | |
 |---|---|
-| ![Graf Log z motywem kolorów Material i włączonym zabarwieniem wierszy](../../docs/user/images/theme-material.png) **Graf commitów**, tu w motywie Material z zabarwieniem wierszy. | ![Diff zmodyfikowanego pliku z przyciskami Stage hunk i Odrzuć hunk przy każdym hunku](../../docs/user/images/diff.png) **Diff**, ze stage i odrzucaniem dla hunka lub pojedynczej linii. |
+| ![Graf Log z paletą ścieżek Material i włączonym zabarwieniem wierszy](../../docs/user/images/theme-material.png) **Graf commitów**, tu z paletą ścieżek Material i zabarwieniem wierszy. | ![Diff zmodyfikowanego pliku z przyciskami Stage hunk i Odrzuć hunk przy każdym hunku](../../docs/user/images/diff.png) **Diff**, ze stage i odrzucaniem dla hunka lub pojedynczej linii. |
 | ![Paleta poleceń przefiltrowana słowem stash](../../docs/user/images/palette.png) **Paleta poleceń** (`Ctrl+P`) sięga każdego polecenia. | ![Kompozytor commitów proponujący cztery commity dla zmian roboczych, gotowe do przeglądu](../../docs/user/images/composer.png) **Kompozytor commitów** pozwala przejrzeć commity zaproponowane przez AI, zanim cokolwiek zostanie zatwierdzone. |
 | ![Menu prawego przycisku commita z akcjami cherry-pick, revert, reset, rebase, gałąź i tag](../../docs/user/images/context-menu.png) **Prawy przycisk** na czymkolwiek pokazuje jego akcje. | ![Strona AI w Ustawieniach z profilami, instrukcjami dla poszczególnych akcji i przełącznikiem włączenia](../../docs/user/images/settings-ai.png) **Ustawienia**, z wyszukiwaniem, także ze stroną opcjonalnego AI. |
 

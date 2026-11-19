@@ -150,5 +150,22 @@ fn new_window_starts_the_command_with_its_own_reason() {
     assert!(wait_for(&marker));
 }
 
+#[test]
+fn the_launch_stub_prints_the_version_line() {
+    for flag in ["--version", "-V"] {
+        let out = Command::cargo_bin("gitpoulpi-launch")
+            .unwrap()
+            .arg(flag)
+            .output()
+            .unwrap();
+        assert!(out.status.success(), "{flag}");
+        let text = String::from_utf8_lossy(&out.stdout);
+        assert!(
+            text.contains(env!("CARGO_PKG_VERSION")),
+            "{flag} printed {text:?}"
+        );
+    }
+}
+
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();

@@ -51,34 +51,81 @@ GitPoulpi는 GitKraken에서 영감을 받아 Rust로 처음부터 다시 작성
 
 시스템 `git`이 필요합니다. `git-lfs`는 선택 사항입니다.
 
-- **설치 프로그램으로:** Windows용 `...-setup.exe` 또는 Linux와 macOS용 `install.sh`(사용자별, root 불필요)가 각 릴리스에 첨부됩니다. 릴리스 아카이브로 설치한 빌드는 상태 표시줄의 버전 칩에서 스스로 업데이트할 수도 있습니다.
-- **릴리스 아카이브에서:** 압축을 풀고 안에 있는 `INSTALL.txt`를 따르십시오.
-- **소스에서:**
+### Linux와 macOS (`install.sh`)
 
-  ```
-  git clone https://github.com/Poulpi-Lab/GitPoulpi.git
-  cd GitPoulpi
-  cargo build --release
-  ```
+```
+curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
+```
 
-  바이너리는 `target/release/`에 생성됩니다: `gitpoulpi`(CLI이며, 하위 명령 없이
-  실행하면 UI), `gitpoulpi-tui`, `gitpoulpi-mcp`.
-- **자신만의 릴리스 아카이브 빌드:** `cargo run -p xtask -- dist`는
-  `target/dist/gitpoulpi-<version>-<target>.zip`(Windows) 또는 `.tar.gz`를
-  `.sha256` 파일과 함께 만듭니다.
-- **필요한 것만 담은 더 작은 바이너리:** `./build-custom.sh`(Windows:
-  `build-custom`)는 어떤 언어, 연동, 기능(AI, MCP, LFS, worktree, 서브모듈,
-  아바타 다운로드)을 빌드할지 묻습니다. 자세한 내용은
-  [docs/user/ko/custom-builds.md](../../docs/user/ko/custom-builds.md)를 참고하십시오.
+### Homebrew (macOS, Linux)
 
-전체 설명, 선택 도구, OS별 참고 사항:
-[docs/user/ko/installation.md](../../docs/user/ko/installation.md).
+```
+brew install Poulpi-Lab/gitpoulpi/gitpoulpi
+```
+
+### apt (Debian, Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+### Scoop (Windows)
+
+```
+scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi
+scoop install gitpoulpi
+```
+
+### Windows 설치 프로그램
+
+[최신 릴리스](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest)에서
+`gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`를 내려받아 실행하십시오.
+관리자용으로는 MSI가 있습니다.
+
+```
+msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn
+```
+
+### Docker
+
+```
+docker pull poulpilab/gitpoulpi
+```
+
+[Docker에서 실행하기](../user/ko/docker.md)를 참고하십시오.
+
+### cargo
+
+```
+cargo binstall gitpoulpi-cli          # prebuilt
+cargo install --locked gitpoulpi-cli  # compiles
+```
+
+### 릴리스 아카이브
+
+[최신 릴리스](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest)에서
+내려받아 압축을 풀고, 안에 있는 `INSTALL.txt`를 따르십시오.
+
+### 소스에서
+
+```
+git clone https://github.com/Poulpi-Lab/GitPoulpi.git
+cd GitPoulpi
+cargo build --release
+```
+
+자신만의 릴리스 아카이브, 더 작은 맞춤 빌드, OS별 참고 사항:
+[docs/user/ko/installation.md](../user/ko/installation.md),
+[docs/user/ko/custom-builds.md](../user/ko/custom-builds.md).
 
 ## 빠른 시작
 
 ```
 cd path/to/your/repository
-gitpoulpi-tui          # or just: gitpoulpi
+gitpoulpi
 ```
 
 - `?`는 모든 키와 동작이 담긴 도움말을, `Ctrl+P`는 명령 팔레트를, `Ctrl+,`는

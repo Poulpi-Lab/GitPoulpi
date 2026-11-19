@@ -102,7 +102,7 @@ git tag dryrun/v1.0.0 && git push origin dryrun/v1.0.0
 gh workflow run release.yml -f tag=dryrun/v1.0.0 -f dry_run=true
 ```
 
-The tag's version must still match `Cargo.toml`. Expect about 20 minutes (the `build` matrix dominates; `crates` and `docker` run alongside the others). What each job does:
+The tag's version must still match `Cargo.toml`. Once the real `releases/v*` tag is published, delete the rehearsal tag (`git push origin --delete dryrun/v1.0.0 && git tag -d dryrun/v1.0.0`): only the `releases/` tags stay. Expect about 20 minutes (the `build` matrix dominates; `crates` and `docker` run alongside the others). What each job does:
 
 | Job | In a dry run |
 |---|---|

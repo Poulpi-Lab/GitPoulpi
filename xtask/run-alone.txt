@@ -25,3 +25,4 @@ gitpoulpi-tui::pty_hosting::conversation::a_github_app_bot_is_named_and_edits_on
 gitpoulpi-tui::pty_push_group_force_confirm::confirming_the_force_push_runs_it_and_the_dialog_becomes_the_progress_view
 gitpoulpi-tui::pty_push_group_force_confirm::a_rewritten_remote_defaults_to_force_and_esc_on_the_confirmation_pushes_nothing
 gitpoulpi-cli::shim::a_symlinked_stub_finds_gitpoulpi_next_to_the_real_file
+gitpoulpi-cli::shim::the_exit_code_passes_through

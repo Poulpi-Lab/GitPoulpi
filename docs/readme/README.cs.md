@@ -31,7 +31,7 @@ přepsán v Rustu: nativní binární soubory, nenáročné na disk i paměť, b
   commitů, fast-forward, vytvářejte worktrees a patche.
 - **Zabudované hostingové služby a issue trackery.** Procházejte, stahujte (checkout) a vytvářejte pull a merge requesty (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket) a kontrolujte změny v Gerritu. Procházejte a vytvářejte issues, work items a karty (také Jira, Trello, Linear, YouTrack, Redmine a lokální poznámky v Markdownu), chcete-li, na tabuli Kanban. Klonujte ze svého účtu a spravujte klíče SSH.
 - **CLI a MCP pro agenty.** `gitpoulpi <příkaz> --json` pokrývá vše, co dělá
-  rozhraní, a `gitpoulpi-mcp` to nabízí jako nástroje MCP. Jeden démon na
+  rozhraní, a `gitpoulpi mcp serve` to nabízí jako nástroje MCP. Jeden démon na
   pozadí pro každý repozitář udržuje všechna rozhraní živá a synchronizovaná.
 - **Volitelná AI, nikdy povinná.** Ve výchozím stavu vypnutá a bez účtu:
   použijte vlastní API klíč nebo lokální agentní CLI, například `claude -p`.
@@ -148,7 +148,7 @@ obrazovky.
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 AI je volitelná a ve výchozím stavu vypnutá: vlastní AI GitPoulpi zapnete v

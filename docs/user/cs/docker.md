@@ -2,7 +2,7 @@
 
 # Běh v Dockeru
 
-Obraz `poulpilab/gitpoulpi` obsahuje oficiální binárky vydání (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) na `debian:bookworm-slim`, spolu s `git`, `git-lfs`, `openssh-client`, `less` a `tini`. Běží na `linux/amd64` a `linux/arm64`. Je na Docker Hubu.
+Obraz `poulpilab/gitpoulpi` obsahuje oficiální binárky vydání (`gitpoulpi` a přesměrování `gitpoulpi-tui` a `gitpoulpi-mcp`) na `debian:bookworm-slim`, spolu s `git`, `git-lfs`, `openssh-client`, `less` a `tini`. Běží na `linux/amd64` a `linux/arm64`. Je na Docker Hubu.
 
 ## Spuštění rozhraní
 
@@ -81,10 +81,10 @@ Vstupní bod spouští rozhraní. K ostatním programům se dostanete jeho přep
 docker run --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi status
 
 # the MCP server, over standard input and output, for an agent that launches it
-docker run -i --rm --entrypoint gitpoulpi-mcp -v "$PWD":/work poulpilab/gitpoulpi
+docker run -i --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi mcp serve
 ```
 
-Každé `docker run` je samostatný kontejner s vlastním daemonem GitPoulpi na pozadí, takže změny provedené přes CLI se živě neukážou v rozhraní běžícím v jiném kontejneru. Chcete-li ovládat jedno rozhraní z CLI, spusťte obojí ve stejném kontejneru: rozhraní spusťte s `--name gp` a použijte `docker exec gp gitpoulpi ...`. Pro agenta zaregistrujte `docker run -i --rm --entrypoint gitpoulpi-mcp ...` jako příkaz serveru MCP, viz [MCP a agenti](mcp-and-agents.md); přepínače oprávnění MCP v připojeném `config.toml` platí jako obvykle.
+Každé `docker run` je samostatný kontejner s vlastním daemonem GitPoulpi na pozadí, takže změny provedené přes CLI se živě neukážou v rozhraní běžícím v jiném kontejneru. Chcete-li ovládat jedno rozhraní z CLI, spusťte obojí ve stejném kontejneru: rozhraní spusťte s `--name gp` a použijte `docker exec gp gitpoulpi ...`. Pro agenta zaregistrujte `docker run -i --rm --entrypoint gitpoulpi ... mcp serve` jako příkaz serveru MCP, viz [MCP a agenti](mcp-and-agents.md); přepínače oprávnění MCP v připojeném `config.toml` platí jako obvykle.
 
 ## Tagy a aktualizace
 

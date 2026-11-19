@@ -2,15 +2,9 @@
 
 # Instalace
 
-GitPoulpi má tři spustitelné soubory:
+GitPoulpi je jeden program, `gitpoulpi`. Spuštěný bez podpříkazu otevře terminálové rozhraní; s podpříkazem je to rozhraní příkazového řádku (`--json` pro skripty); `gitpoulpi mcp serve` je server MCP pro AI agenty (viz [MCP a agenti](mcp-and-agents.md)). Vedle něj archiv obsahuje `gitpoulpi-updater`, samostatný malý program, který instalaci aktualizuje (viz [Aktualizace](updates.md)).
 
-| Spustitelný soubor | Co to je |
-|---|---|
-| `gitpoulpi-tui` | Terminálové rozhraní. |
-| `gitpoulpi` | Rozhraní příkazového řádku (`--json` pro skripty). Bez podpříkazu otevře rozhraní. |
-| `gitpoulpi-mcp` | Server MCP pro AI agenty. Viz [MCP a agenti](mcp-and-agents.md). |
-
-Vedle nich archiv obsahuje `gitpoulpi-launch`, drobný program, který zástupci spouštějí, aby zobrazili už otevřené okno GitPoulpi (`gitpoulpi launch`). Ve Windows nemá okno konzoly, takže kliknutí žádné nezabliká. Instaluje se, aktualizuje a odebírá spolu s ostatními.
+Kvůli kompatibilitě archiv obsahuje také tři malá přesměrování, která jen spouštějí `gitpoulpi`: `gitpoulpi-tui` (otevře rozhraní; v některém z dalších vydání bude odstraněno), `gitpoulpi-mcp` (spustí server MCP; zůstává po celou řadu 1.x, takže stávající konfigurace agentů dál fungují) a `gitpoulpi-launch` (co spouštějí zástupci, aby zobrazili už otevřené okno GitPoulpi, `gitpoulpi launch`; ve Windows nemá okno konzoly, takže kliknutí žádné nezabliká). Vše se instaluje, aktualizuje a odebírá společně.
 
 ## Co potřebujete
 
@@ -34,7 +28,8 @@ Vedle nich archiv obsahuje `gitpoulpi-launch`, drobný program, který zástupci
 
 Archiv vydání je `gitpoulpi-<version>-<target>.zip` (Windows) nebo
 `.tar.gz` (Linux, macOS) se souborem `.sha256` vedle něj. Ověřte archiv podle
-souboru `.sha256`, rozbalte jej a dejte tři spustitelné soubory do složky v
+souboru `.sha256`, rozbalte jej a dejte jeho spustitelné soubory
+(`gitpoulpi`, `gitpoulpi-updater` a přesměrování `gitpoulpi-tui`, `gitpoulpi-mcp` a `gitpoulpi-launch`) do složky v
 `PATH` (ponechte vedle nich `gitpoulpi-updater` a značku `.gitpoulpi-dist`:
 značka říká `channel=archive`, takže se sestavení umí samo aktualizovat, viz
 [Aktualizace](updates.md)). Stejné kroky uvádí `INSTALL.txt` v archivu.
@@ -93,7 +88,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 ```
 
 Vybere archiv pro váš systém a procesor, ověří jeho `.sha256`, nainstaluje (kanál `archive`: GitPoulpi se aktualizuje na místě) do
-`~/.local/opt/gitpoulpi` a odkazy `gitpoulpi` a `gitpoulpi-mcp` zapíše do
+`~/.local/opt/gitpoulpi` a odkazy `gitpoulpi` a `gitpoulpi-mcp` (přesměrování) zapíše do
 `~/.local/bin`. Nepotřebuje root a nic mimo váš domovský adresář se nemění.
 Bez `--yes` se zeptá na alias (výchozí `gp`), PATH a zástupce.
 
@@ -123,7 +118,7 @@ Každý kanál níže zapisuje vedle programů stejnou značku `.gitpoulpi-dist`
 | **apt** (Debian, Ubuntu) | viz [repozitář apt](#apt-debian-a-ubuntu) | Podepsaný repozitář; `.deb` je také přiložen ke každému vydání. |
 | **MSI** (Windows, spravované) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Pro správce: všichni uživatelé, žádné aktualizace v aplikaci. Viz [Podniková distribuce](enterprise-distribution.md#msi-s-intune-nebo-group-policy). |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Stáhne archiv vydání místo kompilace. |
-| **cargo, z crates.io** | `cargo install --locked gitpoulpi-cli` | Kompiluje; potřebuje toolchain Rustu. Nainstaluje `gitpoulpi`, který bez podpříkazu otevře terminálové UI a zároveň slouží jako server MCP (`gitpoulpi mcp`). `gitpoulpi-tui` a `gitpoulpi-mcp` jsou tytéž programy jako samostatné crates. |
+| **cargo, z crates.io** | `cargo install --locked gitpoulpi-cli` | Kompiluje; potřebuje toolchain Rustu. Nainstaluje `gitpoulpi`, který bez podpříkazu otevře terminálové UI a zároveň slouží jako server MCP (`gitpoulpi mcp`). |
 | **cargo, ze zdrojových kódů** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Kompiluje; potřebuje toolchain Rustu. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | Viz [Běh v Dockeru](docker.md). |
 
@@ -160,8 +155,8 @@ Sestavení trvá déle:
 cargo build --profile dist
 ```
 
-Skripty `build-opti` v kořeni repozitáře toto sestavení spustí pro všechny tři
-spustitelné soubory a vypíšou jejich velikosti:
+Skripty `build-opti` v kořeni repozitáře toto sestavení spustí a vypíšou
+velikosti spustitelných souborů:
 
 ```
 ./build-opti.sh                  # Linux, macOS
@@ -179,7 +174,7 @@ cargo run -p xtask -- dist
 
 Tím se sestaví profil `dist` a zapíše se
 `target/dist/gitpoulpi-<version>-<target>.zip` (Windows) nebo `.tar.gz` (ostatní
-systémy). Archiv obsahuje tři spustitelné soubory, `INSTALL.txt`,
+systémy). Archiv obsahuje spustitelné soubory, `INSTALL.txt`,
 `README.md`, `LICENSE` a `CHANGELOG.md`. Vedle něj se zapíše soubor `.sha256`.
 
 ## Aktualizace
@@ -208,7 +203,7 @@ záznamy v PATH, zástupce a položky nabídky správce souborů (ve Windows s j
 klíčem App Paths), které GitPoulpi vytvořil, a potom soubory programu
 instalace z vydání; odmítne sestavení bez značky `.gitpoulpi-dist`
 (sestavení přes cargo) a `--keep-files` soubory programu ponechá. Agentům MCP
-není k dispozici. Bez instalátoru smažte tři spustitelné soubory.
+není k dispozici. Bez instalátoru smažte spustitelné soubory.
 GitPoulpi uchovává také tyto soubory:
 
 | Co | Kde |

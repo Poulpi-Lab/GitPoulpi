@@ -85,6 +85,53 @@ macOS-Terminals oft als einfaches `,` an; `Ctrl+Shift+N` sieht aus wie `Ctrl+N`)
 die Alternativen (`Ctrl+N` dann `,` öffnet die Einstellungen; `Ctrl+P` erreicht jeden Befehl)
 oder belegen Sie die Tastenfolge neu: siehe [Einstellungen](settings.md#tastatur--maus).
 
+**`Ctrl+Tab` wechselt die Tabs nicht.** kitty, WezTerm, Ghostty und Windows
+Terminal behalten `Ctrl+Tab` und `Ctrl+Shift+Tab` für ihre eigenen Tabs, sodass die Taste
+GitPoulpi nie erreicht. `Ctrl+PageDown` / `Ctrl+PageUp` funktionieren immer. Um das Paar
+GitPoulpi zu überlassen, geben Sie es in der Konfiguration des Terminals frei und starten
+Sie das Terminal dann neu (oder laden Sie seine Konfiguration neu):
+
+- kitty, in `kitty.conf` (ein `map` ohne Aktion hebt die Standardbelegung auf; mit
+  `--when-focus-on` plus einem Fensterkriterium wie `title:...` kann kitty sie nur aufheben,
+  solange ein passendes Fenster den Fokus hat, siehe die Mapping-Dokumentation von kitty):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, in `wezterm.lua`:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, in seiner Konfigurationsdatei:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, in `settings.json` (`"id": null` hebt die Standardbelegung auf):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (Ältere Einstellungsdateien führen `nextTab` / `prevTab` unter `actions` mit diesen
+  Tasten auf: Entfernen Sie die Tasten dort.)
+
+Das Terminal verliert dann seinen eigenen Tabwechsel mit `Ctrl+Tab`. Ein Terminal, das die
+Taste nur über das Kitty-Tastaturprotokoll senden kann, braucht es eingeschaltet (der
+Standard, siehe [Tastenkürzel](keybindings.md#tasten-die-das-terminal-nicht-senden-kann-und-das-kitty-tastaturprotokoll)).
+
 **Ich weiß ein Tastenkürzel nicht mehr.** Drücken Sie `Ctrl+P` und tippen Sie, was
 Sie wollen; jedes Ergebnis zeigt sein Tastenkürzel. `?` listet alles auf.
 

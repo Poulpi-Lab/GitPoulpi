@@ -89,6 +89,55 @@ Push, відхилений віддаленим репозиторієм, бо �
 `Ctrl+P` дає доступ до кожної команди) або змініть комбінацію: див.
 [Налаштування](settings.md#клавіатура-й-миша).
 
+**`Ctrl+Tab` не перемикає вкладки.** kitty, WezTerm, Ghostty і Windows
+Terminal залишають `Ctrl+Tab` та `Ctrl+Shift+Tab` для власних вкладок, тож
+клавіша ніколи не доходить до GitPoulpi. `Ctrl+PageDown` / `Ctrl+PageUp`
+працюють завжди. Щоб віддати цю пару GitPoulpi, звільніть її в конфігурації
+термінала, потім перезапустіть термінал (або перезавантажте його конфігурацію):
+
+- kitty, у `kitty.conf` (`map` без дії скасовує типове призначення; з
+  `--when-focus-on` і критерієм вікна на кшталт `title:...` kitty може
+  скасувати його лише поки у фокусі відповідне вікно, див. документацію kitty
+  про призначення клавіш):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, у `wezterm.lua`:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, у його файлі конфігурації:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, у `settings.json` (`"id": null` скасовує типове призначення):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (У старіших файлах налаштувань `nextTab` / `prevTab` перелічені в `actions`
+  із цими клавішами: приберіть ці клавіші там.)
+
+Після цього термінал утрачає власне перемикання вкладок на `Ctrl+Tab`.
+Термінал, що може надіслати цю клавішу лише через протокол клавіатури kitty,
+потребує його ввімкненим (типово так і є, див.
+[Скорочення клавіатури](keybindings.md#клавіші-яких-термінал-не-може-надіслати-і-протокол-клавіатури-kitty)).
+
 **Я не пам'ятаю скорочення.** Натисніть `Ctrl+P` і введіть, що вам потрібно;
 кожен результат показує своє скорочення. `?` показує все.
 

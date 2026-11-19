@@ -171,7 +171,7 @@
 
 | 시스템 | 별칭 | PATH |
 |---|---|---|
-| Linux, macOS | `~/.local/bin/<name>`에서 `gitpoulpi-tui`로 가는 심볼릭 링크. 링크에는 표시를 넣을 수 없으므로 대상이 `gitpoulpi-tui`라는 파일일 때만 GitPoulpi의 것으로 봅니다. 일반 파일이나 다른 것을 가리키는 링크는 **GitPoulpi의 것이 아니며** 교체하거나 제거하지 않습니다. | `~/.bashrc`와 `~/.zshrc`(있는 것. 둘 다 없으면 macOS는 `~/.zshrc`, 그 외에는 `~/.bashrc`)의 `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>`와 `# <<< GitPoulpi PATH <<<` 사이의 블록, 그리고 fish를 설정했다면 `~/.config/fish/conf.d/gitpoulpi-path.fish`. 제거하면 그 블록(또는 fish 파일)만 삭제합니다. |
+| Linux, macOS | `~/.local/bin/<name>`에서 `gitpoulpi`로 가는 심볼릭 링크. 링크에는 표시를 넣을 수 없으므로 대상이 `gitpoulpi`(또는 이전 대상인 `gitpoulpi-tui`, 자동으로 `gitpoulpi`로 다시 쓰입니다)라는 파일일 때만 GitPoulpi의 것으로 봅니다. 일반 파일이나 다른 것을 가리키는 링크는 **GitPoulpi의 것이 아니며** 교체하거나 제거하지 않습니다. | `~/.bashrc`와 `~/.zshrc`(있는 것. 둘 다 없으면 macOS는 `~/.zshrc`, 그 외에는 `~/.bashrc`)의 `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>`와 `# <<< GitPoulpi PATH <<<` 사이의 블록, 그리고 fish를 설정했다면 `~/.config/fish/conf.d/gitpoulpi-path.fish`. 제거하면 그 블록(또는 fish 파일)만 삭제합니다. |
 | Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd`. `REM X-GitPoulpi=1`이 든 짧은 shim입니다(주소 표시줄 시작을 알아보는 `GITPOULPI_CMDCMDLINE`도 내보냅니다). | `HKCU\Environment`의 사용자 PATH. PowerShell로 쓰고 `WM_SETTINGCHANGE`를 브로드캐스트해 새 프로그램이 볼 수 있게 합니다. 값 `GitPoulpiPathAdded`가 추가한 것을 기록하며 제거는 그것만 제거합니다. |
 
 새 터미널에는 PATH 변경이 적용되고, 이미 열려 있는 터미널에는 적용되지 않습니다. 두 동작 모두 실행 취소

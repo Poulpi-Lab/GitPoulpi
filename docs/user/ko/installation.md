@@ -2,15 +2,9 @@
 
 # 설치
 
-GitPoulpi에는 실행 파일이 세 개 있습니다:
+GitPoulpi는 `gitpoulpi` 하나의 프로그램입니다. 하위 명령 없이 실행하면 터미널 UI를 열고, 하위 명령과 함께 실행하면 명령줄 인터페이스(스크립트용 `--json`)이며, `gitpoulpi mcp serve`는 AI 에이전트용 MCP 서버입니다([MCP와 에이전트](mcp-and-agents.md) 참고). 아카이브에는 이 옆에 설치를 업데이트하는 별도의 작은 프로그램인 `gitpoulpi-updater`도 들어 있습니다([업데이트](updates.md) 참고).
 
-| 실행 파일 | 설명 |
-|---|---|
-| `gitpoulpi-tui` | 터미널 UI. |
-| `gitpoulpi` | 명령줄 인터페이스(스크립트용 `--json`). 하위 명령 없이 실행하면 UI를 엽니다. |
-| `gitpoulpi-mcp` | AI 에이전트용 MCP 서버. [MCP와 에이전트](mcp-and-agents.md)를 참고하세요. |
-
-아카이브에는 이들 옆에 `gitpoulpi-launch`도 들어 있습니다. 바로 가기가 이미 열려 있는 GitPoulpi 창을 보여 주려고 실행하는 아주 작은 프로그램입니다(`gitpoulpi launch`). Windows에서는 콘솔 창이 없어서 클릭해도 창이 깜박이지 않습니다. 나머지와 함께 설치, 업데이트, 제거됩니다.
+호환성을 위해 아카이브에는 `gitpoulpi`를 시작하기만 하는 작은 릴레이 세 개도 들어 있습니다. `gitpoulpi-tui`(UI를 엽니다. 이후 릴리스에서 제거됩니다), `gitpoulpi-mcp`(MCP 서버를 시작합니다. 1.x 전체 기간 동안 유지되므로 기존 에이전트 설정이 계속 작동합니다), `gitpoulpi-launch`(바로 가기가 이미 열려 있는 GitPoulpi 창을 보여 주려고 실행하는 것, `gitpoulpi launch`. Windows에서는 콘솔 창이 없어서 클릭해도 창이 깜박이지 않습니다)입니다. 모두 함께 설치, 업데이트, 제거됩니다.
 
 ## 필요한 것
 
@@ -33,7 +27,7 @@ GitPoulpi에는 실행 파일이 세 개 있습니다:
 
 릴리스 아카이브는 `gitpoulpi-<version>-<target>.zip`(Windows) 또는
 `.tar.gz`(Linux, macOS)이며 옆에 `.sha256` 파일이 있습니다. 아카이브를
-`.sha256` 파일과 대조해 확인하고, 압축을 풀고, 실행 파일 세 개를 `PATH`에 있는
+`.sha256` 파일과 대조해 확인하고, 압축을 풀고, 실행 파일(`gitpoulpi`, `gitpoulpi-updater`와 릴레이 `gitpoulpi-tui`, `gitpoulpi-mcp`, `gitpoulpi-launch`)을 `PATH`에 있는
 폴더에 넣으세요(`gitpoulpi-updater`와 `.gitpoulpi-dist` 표시 파일은 그 옆에 두세요.
 표시 파일에 `channel=archive`가 적혀 있어 이 빌드가 스스로 업데이트할 수 있습니다.
 [업데이트](updates.md) 참고). 아카이브 안의 `INSTALL.txt`에도 같은 단계가 있습니다.
@@ -92,7 +86,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 ```
 
 OS와 CPU에 맞는 아카이브를 고르고 `.sha256`을 확인한 뒤 `~/.local/opt/gitpoulpi`에
-설치하고(채널 `archive`: GitPoulpi가 제자리에서 스스로 업데이트), `gitpoulpi`와 `gitpoulpi-mcp`를 `~/.local/bin`에 링크합니다. root 권한이
+설치하고(채널 `archive`: GitPoulpi가 제자리에서 스스로 업데이트), `gitpoulpi`와 `gitpoulpi-mcp`(릴레이)를 `~/.local/bin`에 링크합니다. root 권한이
 필요 없으며 홈 폴더 밖은 건드리지 않습니다. `--yes`가 없으면 별칭(기본값 `gp`),
 PATH, 바로 가기에 대해 묻습니다.
 
@@ -121,7 +115,7 @@ PATH, 바로 가기에 대해 묻습니다.
 | **apt** (Debian, Ubuntu) | [apt 저장소](#apt-debian-ubuntu) 참고 | 서명된 저장소. 모든 릴리스에 `.deb`도 첨부됩니다. |
 | **MSI** (Windows, 관리형) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | 관리자용: 모든 사용자, 앱 내 업데이트 없음. [엔터프라이즈 배포](enterprise-distribution.md#msi-intune-또는-그룹-정책)를 참고하세요. |
 | **cargo** | `cargo binstall gitpoulpi-cli` | 컴파일하지 않고 릴리스 아카이브를 내려받습니다. |
-| **cargo, crates.io에서** | `cargo install --locked gitpoulpi-cli` | 컴파일합니다. Rust 툴체인이 필요합니다. 하위 명령 없이 실행하면 터미널 UI를 여는 `gitpoulpi`를 설치하며, MCP(`gitpoulpi mcp`)도 제공합니다. `gitpoulpi-tui`와 `gitpoulpi-mcp`는 같은 프로그램을 독립 크레이트로 낸 것입니다. |
+| **cargo, crates.io에서** | `cargo install --locked gitpoulpi-cli` | 컴파일합니다. Rust 툴체인이 필요합니다. 하위 명령 없이 실행하면 터미널 UI를 여는 `gitpoulpi`를 설치하며, MCP(`gitpoulpi mcp`)도 제공합니다. |
 | **cargo, 소스에서** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | 컴파일합니다. Rust 툴체인이 필요합니다. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | [Docker에서 실행하기](docker.md)를 참고하세요. |
 
@@ -158,7 +152,7 @@ cargo build --release
 cargo build --profile dist
 ```
 
-저장소 루트의 `build-opti` 스크립트는 세 실행 파일에 대해 이 빌드를 실행하고 크기를
+저장소 루트의 `build-opti` 스크립트는 이 빌드를 실행하고 실행 파일 크기를
 출력합니다:
 
 ```
@@ -176,7 +170,7 @@ cargo run -p xtask -- dist
 ```
 
 `dist` 프로필을 빌드하고 `target/dist/gitpoulpi-<version>-<target>.zip`(Windows)
-또는 `.tar.gz`(다른 시스템)를 만듭니다. 아카이브에는 실행 파일 세 개,
+또는 `.tar.gz`(다른 시스템)를 만듭니다. 아카이브에는 실행 파일,
 `INSTALL.txt`, `README.md`, `LICENSE`, `CHANGELOG.md`가 들어 있습니다. 옆에
 `.sha256` 파일도 만들어집니다.
 
@@ -201,7 +195,7 @@ gitpoulpi
 
 ## 제거
 
-`gitpoulpi uninstall`(두 설치 프로그램이 실행하는 것)은 GitPoulpi가 만든 명령 별칭, PATH 항목, 바로 가기, 파일 관리자 메뉴 항목(Windows에서는 App Paths 키 포함)을 제거한 뒤 릴리스 설치라면 프로그램 파일도 제거합니다. `.gitpoulpi-dist` 표시가 없는 빌드(cargo 빌드)에서는 거부하며 `--keep-files`는 프로그램 파일을 남겨 둡니다. MCP 에이전트는 사용할 수 없습니다. 설치 프로그램 없이 설치했다면 실행 파일 세 개를 삭제하세요. GitPoulpi는 다음 파일도 보관합니다:
+`gitpoulpi uninstall`(두 설치 프로그램이 실행하는 것)은 GitPoulpi가 만든 명령 별칭, PATH 항목, 바로 가기, 파일 관리자 메뉴 항목(Windows에서는 App Paths 키 포함)을 제거한 뒤 릴리스 설치라면 프로그램 파일도 제거합니다. `.gitpoulpi-dist` 표시가 없는 빌드(cargo 빌드)에서는 거부하며 `--keep-files`는 프로그램 파일을 남겨 둡니다. MCP 에이전트는 사용할 수 없습니다. 설치 프로그램 없이 설치했다면 실행 파일을 삭제하세요. GitPoulpi는 다음 파일도 보관합니다:
 
 | 항목 | 위치 |
 |---|---|

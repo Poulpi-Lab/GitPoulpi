@@ -2,7 +2,7 @@
 
 # Docker에서 실행하기
 
-`poulpilab/gitpoulpi` 이미지에는 `debian:bookworm-slim` 위에 공식 릴리스 바이너리(`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`)와 `git`, `git-lfs`, `openssh-client`, `less`, `tini`가 들어 있습니다. `linux/amd64`와 `linux/arm64`에서 실행됩니다. Docker Hub에 있습니다.
+`poulpilab/gitpoulpi` 이미지에는 `debian:bookworm-slim` 위에 공식 릴리스 바이너리(`gitpoulpi`와 릴레이 `gitpoulpi-tui`, `gitpoulpi-mcp`)와 `git`, `git-lfs`, `openssh-client`, `less`, `tini`가 들어 있습니다. `linux/amd64`와 `linux/arm64`에서 실행됩니다. Docker Hub에 있습니다.
 
 ## UI 시작하기
 
@@ -81,10 +81,10 @@ docker run -it --rm \
 docker run --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi status
 
 # 표준 입출력을 통한 MCP 서버, 이를 실행하는 에이전트용
-docker run -i --rm --entrypoint gitpoulpi-mcp -v "$PWD":/work poulpilab/gitpoulpi
+docker run -i --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi mcp serve
 ```
 
-각 `docker run`은 자체 GitPoulpi 백그라운드 데몬을 가진 별도의 컨테이너이므로, CLI로 한 변경이 다른 컨테이너에서 실행 중인 UI에 실시간으로 나타나지 않습니다. CLI로 UI 하나를 조작하려면 둘을 같은 컨테이너에서 실행하세요. UI를 `--name gp`로 시작하고 `docker exec gp gitpoulpi ...`를 사용합니다. 에이전트에는 `docker run -i --rm --entrypoint gitpoulpi-mcp ...`를 MCP 서버 명령으로 등록하세요([MCP와 에이전트](mcp-and-agents.md) 참고). 마운트한 `config.toml`의 MCP 권한 스위치는 평소처럼 적용됩니다.
+각 `docker run`은 자체 GitPoulpi 백그라운드 데몬을 가진 별도의 컨테이너이므로, CLI로 한 변경이 다른 컨테이너에서 실행 중인 UI에 실시간으로 나타나지 않습니다. CLI로 UI 하나를 조작하려면 둘을 같은 컨테이너에서 실행하세요. UI를 `--name gp`로 시작하고 `docker exec gp gitpoulpi ...`를 사용합니다. 에이전트에는 `docker run -i --rm --entrypoint gitpoulpi ... mcp serve`를 MCP 서버 명령으로 등록하세요([MCP와 에이전트](mcp-and-agents.md) 참고). 마운트한 `config.toml`의 MCP 권한 스위치는 평소처럼 적용됩니다.
 
 ## 태그와 업데이트
 

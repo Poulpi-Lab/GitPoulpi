@@ -31,7 +31,7 @@ vollständig in Rust neu geschrieben: native Binärdateien, sparsam bei Speicher
   mehrere Commits cherry-picken, Fast-Forward, Worktrees und Patches erstellen.
 - **Hosting und Issue-Tracker eingebaut.** Pull und Merge Requests durchsuchen, auschecken und erstellen (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket) sowie Gerrit-Changes prüfen. Issues, Work Items und Karten durchsuchen und erstellen (auch Jira, Trello, Linear, YouTrack, Redmine und lokale Markdown-Notizen), auf Wunsch auf einem Kanban-Board. Aus Ihrem Konto klonen und SSH-Schlüssel verwalten.
 - **CLI und MCP für Agenten.** `gitpoulpi <Befehl> --json` deckt alles ab, was
-  die Oberfläche kann, und `gitpoulpi-mcp` stellt es als MCP-Tools bereit. Ein
+  die Oberfläche kann, und `gitpoulpi mcp serve` stellt es als MCP-Tools bereit. Ein
   Hintergrund-Daemon pro Repository hält jede Oberfläche aktuell und
   synchron.
 - **Optionale KI, nie Pflicht.** Standardmäßig aus und ohne Konto: Bringen Sie
@@ -151,7 +151,7 @@ jeden Bereich des Bildschirms.
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 KI ist optional und standardmäßig aus: Schalten Sie GitPoulpis eigene KI unter

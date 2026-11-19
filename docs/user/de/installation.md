@@ -2,15 +2,9 @@
 
 # Installation
 
-GitPoulpi besteht aus drei ausführbaren Dateien:
+GitPoulpi ist ein einziges Programm, `gitpoulpi`. Ohne Unterbefehl gestartet öffnet es die Terminal-Oberfläche; mit einem Unterbefehl ist es die Kommandozeile (`--json` für Skripte); `gitpoulpi mcp serve` ist der MCP-Server für KI-Agenten (siehe [MCP und Agenten](mcp-and-agents.md)). Daneben enthält das Archiv `gitpoulpi-updater`, das separate kleine Programm, das eine Installation aktualisiert (siehe [Updates](updates.md)).
 
-| Programm | Was es ist |
-|---|---|
-| `gitpoulpi-tui` | Die Terminal-Oberfläche. |
-| `gitpoulpi` | Die Kommandozeile (`--json` für Skripte). Ohne Unterbefehl öffnet sie die Oberfläche. |
-| `gitpoulpi-mcp` | Der MCP-Server für KI-Agenten. Siehe [MCP und Agenten](mcp-and-agents.md). |
-
-Neben diesen enthält das Archiv `gitpoulpi-launch`, ein winziges Programm, das die Verknüpfungen ausführen, um ein bereits geöffnetes GitPoulpi-Fenster zu zeigen (`gitpoulpi launch`). Unter Windows hat es kein Konsolenfenster, ein Klick lässt also nie eines aufblitzen. Es wird mit den anderen installiert, aktualisiert und entfernt.
+Aus Kompatibilitätsgründen enthält das Archiv außerdem drei kleine Relays, die nur `gitpoulpi` starten: `gitpoulpi-tui` (öffnet die Oberfläche; es wird in einem späteren Release entfernt), `gitpoulpi-mcp` (startet den MCP-Server; es bleibt für die gesamte 1.x-Linie erhalten, damit bestehende Agent-Konfigurationen weiter funktionieren) und `gitpoulpi-launch` (was die Verknüpfungen ausführen, um ein bereits geöffnetes GitPoulpi-Fenster zu zeigen, `gitpoulpi launch`; unter Windows hat es kein Konsolenfenster, ein Klick lässt also nie eines aufblitzen). Alles wird zusammen installiert, aktualisiert und entfernt.
 
 ## Voraussetzungen
 
@@ -34,8 +28,8 @@ Neben diesen enthält das Archiv `gitpoulpi-launch`, ein winziges Programm, das 
 
 Ein Release-Archiv heißt `gitpoulpi-<version>-<target>.zip` (Windows) oder
 `.tar.gz` (Linux, macOS) und liegt neben einer `.sha256`-Datei. Prüfen Sie das
-Archiv anhand der `.sha256`-Datei, entpacken Sie es und legen Sie die drei
-Programme in einen Ordner im `PATH` (lassen Sie `gitpoulpi-updater` und die Markierung
+Archiv anhand der `.sha256`-Datei, entpacken Sie es und legen Sie die Programme
+(`gitpoulpi`, `gitpoulpi-updater` und die Relays `gitpoulpi-tui`, `gitpoulpi-mcp` und `gitpoulpi-launch`) in einen Ordner im `PATH` (lassen Sie `gitpoulpi-updater` und die Markierung
 `.gitpoulpi-dist` daneben liegen: Die Markierung sagt `channel=archive`, damit sich der Build selbst
 aktualisieren kann, siehe [Updates](updates.md)). `INSTALL.txt` im Archiv nennt dieselben
 Schritte.
@@ -94,7 +88,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 ```
 
 Es wählt das Archiv für Ihr Betriebssystem und Ihre CPU, prüft dessen `.sha256`, installiert (Kanal `archive`: GitPoulpi aktualisiert sich an Ort und Stelle selbst) nach
-`~/.local/opt/gitpoulpi` und verlinkt `gitpoulpi` und `gitpoulpi-mcp` nach `~/.local/bin`. Root wird nicht gebraucht,
+`~/.local/opt/gitpoulpi` und verlinkt `gitpoulpi` (das ohne Unterbefehl die Terminal-Oberfläche öffnet) und `gitpoulpi-mcp` (das Relay) nach `~/.local/bin`. Root wird nicht gebraucht,
 und außerhalb Ihres Home-Ordners wird nichts angefasst. Ohne `--yes` fragt es nach dem Alias (Standard `gp`), dem PATH
 und den Verknüpfungen.
 
@@ -125,7 +119,7 @@ Jeder der folgenden Kanäle schreibt dieselbe Markierung `.gitpoulpi-dist` neben
 | **apt** (Debian, Ubuntu) | siehe [das apt-Repository](#apt-debian-und-ubuntu) | Signiertes Repository; jedem Release hängt außerdem eine `.deb` an. |
 | **MSI** (Windows, verwaltet) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Für Administratoren: alle Benutzer, keine Updates in der App. Siehe [Unternehmensverteilung](enterprise-distribution.md#msi-mit-intune-oder-gruppenrichtlinie). |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Lädt das Release-Archiv herunter, statt zu kompilieren. |
-| **cargo, von crates.io** | `cargo install --locked gitpoulpi-cli` | Kompiliert; braucht eine Rust-Toolchain. Installiert `gitpoulpi`, das ohne Unterbefehl die Terminal-Oberfläche öffnet und auch MCP bereitstellt (`gitpoulpi mcp`). `gitpoulpi-tui` und `gitpoulpi-mcp` sind dieselben Programme als eigenständige Crates. |
+| **cargo, von crates.io** | `cargo install --locked gitpoulpi-cli` | Kompiliert; braucht eine Rust-Toolchain. Installiert `gitpoulpi`, das ohne Unterbefehl die Terminal-Oberfläche öffnet und auch MCP bereitstellt (`gitpoulpi mcp`). |
 | **cargo, aus dem Quellcode** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Kompiliert; braucht eine Rust-Toolchain. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | Siehe [In Docker ausführen](docker.md). |
 
@@ -163,7 +157,7 @@ cargo build --profile dist
 ```
 
 Die `build-opti`-Skripte im Wurzelverzeichnis des Repositorys führen diesen
-Build für die drei Programme aus und geben ihre Größen aus:
+Build aus und geben die Größen der Programme aus:
 
 ```
 ./build-opti.sh                  # Linux, macOS
@@ -181,7 +175,7 @@ cargo run -p xtask -- dist
 
 Das baut das Profil `dist` und schreibt
 `target/dist/gitpoulpi-<version>-<target>.zip` (Windows) oder `.tar.gz`
-(andere Systeme). Das Archiv enthält die drei Programme, `INSTALL.txt`,
+(andere Systeme). Das Archiv enthält die Programme, `INSTALL.txt`,
 `README.md`, `LICENSE` und `CHANGELOG.md`. Daneben entsteht eine
 `.sha256`-Datei.
 
@@ -209,7 +203,7 @@ Weiter geht es mit [Erste Schritte](getting-started.md).
 `gitpoulpi uninstall` (das führen beide Installationsprogramme aus) entfernt die von GitPoulpi angelegten
 Befehlsaliasse, PATH-Einträge, Verknüpfungen und die Menüeinträge des Dateimanagers (unter Windows samt App-Paths-Schlüssel) und danach die Programmdateien einer Release-Installation; bei einem Build
 ohne die Markierung `.gitpoulpi-dist` (ein cargo-Build) lehnt es ab, und `--keep-files` lässt die Programmdateien stehen.
-Für MCP-Agenten ist es nicht verfügbar. Ohne Installationsprogramm löschen Sie die drei Programme. GitPoulpi legt außerdem
+Für MCP-Agenten ist es nicht verfügbar. Ohne Installationsprogramm löschen Sie die Programme. GitPoulpi legt außerdem
 diese Dateien an:
 
 | Was | Wo |

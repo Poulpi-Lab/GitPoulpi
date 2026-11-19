@@ -26,7 +26,7 @@ Unterschied zu `target/dist/`, wenn dieser Build existiert. Es schreibt außerde
 | Logo-Farben | Den Pixel-Oktopus im Fenster „Über GitPoulpi“ gibt es in 20 Farbvarianten (`--list-logo-colors`). Wählen Sie die einzukompilierenden (mindestens eine), die Standardvariante (das Fenster „Über GitPoulpi“ zeigt sie zuerst; auf sie fällt auch ein gespeichertes `ui.logo_color` zurück, das nicht einkompiliert ist; sie muss zu den einkompilierten gehören; offizieller Standard: Lavendel) und die Farbe des Windows-Programmsymbols (jede Variante, Standard: die Logo-Standardvariante). Mit nur einer Variante dreht sich das Logo weiter beim Klick, behält aber diese Farbe, und die Farbliste (`c`, Rechtsklick) wird nicht angeboten. |
 | Integrationen (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine) | Ohne jede: nur Klonen per URL; keine Issues, keine Pull Requests oder Merge Requests. |
 | KI | Keine KI-Schaltflächen, -Befehle oder `ai`-CLI/MCP-Tools. |
-| MCP | Keine Binärdatei `gitpoulpi-mcp` und kein Befehl `gitpoulpi mcp`. Die `ui`-Agentenbefehle bleiben. |
+| MCP | Kein Relay `gitpoulpi-mcp` und kein Befehl `gitpoulpi mcp`. Die `ui`-Agentenbefehle bleiben. |
 | LFS, Worktree, Submodule | Die zugehörigen Verwaltungsbildschirme und Befehle entfallen; als Antwort kommt ein typisiertes „not built into this binary“. |
 | Avatar-Download | Nur Initialen-Abzeichen, kein Netzabruf. |
 | Bildvorschau | Bilddateien zeigen den einfachen Binärhinweis; **Bearbeiten in** funktioniert weiterhin. |
@@ -79,7 +79,7 @@ Jedes Argument überspringt die Fragen und führt direkt
 | `--list-presets`, `--delete-preset <name>` | Gibt die gespeicherten Auswahlen und ihren Ordner aus / löscht eine per Name. |
 | `--last` | Verwendet `target/custom-build/last-choices.env` erneut; andere Optionen überschreiben es. |
 | `--full` | Gar keine Auswahl (alles an). |
-| `--profile custom\|dist\|release` | Standard `custom` (die Einstellungen von `dist`, getrenntes Ausgabeverzeichnis). |
+| `--profile custom\|dist\|
 | `--dry-run` | Gibt den genauen Cargo-Befehl aus und hält an. |
 | `-- <cargo args>` | Wird an Cargo weitergereicht, zum Beispiel `--target x86_64-unknown-linux-musl`. |
 
@@ -96,13 +96,13 @@ Die Logo-Auswahl sind die Umgebungsvariablen `GITPOULPI_LOGO_COLORS` (`all`
 oder eine kommagetrennte Liste von Slugs), `GITPOULPI_LOGO_DEFAULT` und
 `GITPOULPI_ICON_COLOR`, gelesen von den Build-Skripten von `gitpoulpi-tui`
 (es filtert `crates/gitpoulpi-logo-build/colourways.json` in die Tabelle, die das Fenster „Über GitPoulpi“
-einbettet) und der drei Binär-Crates (das Symbol). Die Quelle der Farben
+einbettet) und von `gitpoulpi-cli` (das Symbol). Die Quelle der Farben
 bleibt `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Windows-Programmsymbol
 
-Ist das Ziel Windows, erhalten die Programme `gitpoulpi`, `gitpoulpi-tui` und
-`gitpoulpi-mcp` den Oktopus als Symbol, beim Build erzeugt (ohne Python oder
+Ist das Ziel Windows, erhält das Programm `gitpoulpi`
+den Oktopus als Symbol, beim Build erzeugt (ohne Python oder
 ImageMagick) in der gewählten Symbolfarbe, in Größen von 16 bis 128 px. Es wird
 mit der Crate `winresource` eingebettet und braucht den Ressourcen-Compiler der
 Plattform (`rc.exe` aus dem Windows SDK bei MSVC, `windres` bei GNU). Fehlt er,
@@ -138,32 +138,32 @@ Gibt es eine gespeicherte Auswahl, bietet der interaktive Modus zuerst „Ausgeh
 
 ## Was es spart
 
-Gemessen unter Linux am 2026-10-29 beim Commit `65999ef5c`, vom vollständigen Build aus, die Differenz dazu in Klammern
-(Details in `docs/developer/binary-size.md`):
+Gemessen unter Linux am 2026-10-29 beim Commit `65999ef5c`, Größe von `gitpoulpi` (das ganze Programm: Oberfläche, CLI und MCP-Server) vom vollständigen Build aus, die Differenz dazu in Klammern
+(Details in `docs/developer/binary-size.md`). Die Relays `gitpoulpi-tui`, `gitpoulpi-mcp` und `gitpoulpi-launch` sind bei jeder Wahl deutlich unter 1 MiB:
 
-| Build (ausgehend von `full`, sofern nicht anders angegeben) | `gitpoulpi` (MiB) | `gitpoulpi-tui` (MiB) | `gitpoulpi-mcp` (MiB) |
-|---|---|---|---|
-| Vollständig (alles an) | 64.6 | 50.5 | 31.7 |
-| Nur Englisch | 52.0 (-12.6) | 40.2 (-10.3) | 31.7 (0.0) |
-| MCP aus | 61.6 (-3.0) | 49.6 (-0.8) | nicht gebaut |
-| KI aus | 62.6 (-2.0) | 48.6 (-1.8) | 30.5 (-1.3) |
-| Alle Integrationen aus | 56.3 (-8.2) | 43.7 (-6.7) | 26.7 (-5.0) |
-| KI + Integrationen + Avatar-Download aus | 52.2 (-12.3) | 39.9 (-10.6) | 23.0 (-8.8) |
-| Werkbank für den Verlauf aus (`--no-history-rewrite`) | 61.6 (-3.0) | 48.9 (-1.5) | 28.5 (-3.2) |
-| Rewrite-Skripte aus | 63.1 (-1.5) | 49.0 (-1.5) | 31.1 (-0.7) |
-| Globale Suche aus | 63.5 (-1.1) | 49.5 (-1.0) | 31.6 (-0.1) |
-| Workspaces aus | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.2) |
-| Radar aus | 63.4 (-1.2) | 49.3 (-1.2) | 31.7 (0.0) |
-| Board aus | 63.6 (-1.0) | 49.5 (-1.0) | 31.7 (0.0) |
-| Review aus | 63.2 (-1.4) | 49.0 (-1.4) | 31.7 (0.0) |
-| Mermaid aus | 63.6 (-1.0) | 49.5 (-0.9) | 31.6 (-0.1) |
-| LFS aus | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.3) |
-| Worktree aus | 63.7 (-0.9) | 49.6 (-0.8) | 31.7 (0.0) |
-| Submodule aus | 63.7 (-0.9) | 49.6 (-0.9) | 31.6 (-0.1) |
-| Avatar-Download aus | 63.7 (-0.9) | 49.6 (-0.9) | 31.7 (0.0) |
-| Bildansicht aus | 63.3 (-1.2) | 49.2 (-1.3) | 31.7 (0.0) |
-| Alles aus, nur Englisch (LFS bleibt) | 35.2 (-29.4) | 28.9 (-21.5) | nicht gebaut |
-| **Alles aus, nur Englisch** | **34.9 (-29.7)** | **28.8 (-21.6)** | nicht gebaut |
+| Build (ausgehend von `full`, sofern nicht anders angegeben) | `gitpoulpi` (MiB) |
+|---|---|
+| Vollständig (alles an) | 64.6 |
+| Nur Englisch | 52.0 (-12.6) |
+| MCP aus | 61.6 (-3.0) |
+| KI aus | 62.6 (-2.0) |
+| Alle Integrationen aus | 56.3 (-8.2) |
+| KI + Integrationen + Avatar-Download aus | 52.2 (-12.3) |
+| Werkbank für den Verlauf aus (`--no-history-rewrite`) | 61.6 (-3.0) |
+| Rewrite-Skripte aus | 63.1 (-1.5) |
+| Globale Suche aus | 63.5 (-1.1) |
+| Workspaces aus | 63.5 (-1.1) |
+| Radar aus | 63.4 (-1.2) |
+| Board aus | 63.6 (-1.0) |
+| Review aus | 63.2 (-1.4) |
+| Mermaid aus | 63.6 (-1.0) |
+| LFS aus | 63.5 (-1.1) |
+| Worktree aus | 63.7 (-0.9) |
+| Submodule aus | 63.7 (-0.9) |
+| Avatar-Download aus | 63.7 (-0.9) |
+| Bildansicht aus | 63.3 (-1.2) |
+| Alles aus, nur Englisch (LFS bleibt) | 35.2 (-29.4) |
+| **Alles aus, nur Englisch** | **34.9 (-29.7)** |
 
 ## Hinweise
 

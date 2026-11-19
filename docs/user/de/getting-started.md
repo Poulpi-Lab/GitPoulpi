@@ -12,10 +12,10 @@ Folgen Sie [Installation](installation.md). Öffnen Sie dann ein Terminal in
 einem Git-Repository und starten Sie:
 
 ```
-gitpoulpi-tui
+gitpoulpi
 ```
 
-`gitpoulpi` ohne Unterbefehl tut dasselbe. GitPoulpi öffnet das Repository,
+GitPoulpi öffnet das Repository,
 das den aktuellen Ordner enthält. Außerhalb eines Repositorys öffnet es den
 **Home**-Tab, in dem Sie ein Repository durchsuchen, klonen oder initialisieren
 können (siehe [Schritt 7](#7-repositories-öffnen-klonen-und-initialisieren)).

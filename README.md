@@ -47,7 +47,7 @@ do. GitPoulpi is inspired by GitKraken, rewritten from scratch in Rust: native b
 
 | | |
 |---|---|
-| ![The Log graph with the Material color theme and row tint enabled](docs/user/images/theme-material.png) **The commit graph**, here in the Material theme with row tint. | ![A diff of a modified file with Stage Hunk and Discard Hunk buttons on each hunk](docs/user/images/diff.png) **The diff**, with stage and discard per hunk or per line. |
+| ![The Log graph with the Material lane palette and row tint enabled](docs/user/images/theme-material.png) **The commit graph**, here with the Material lane palette and row tint. | ![A diff of a modified file with Stage Hunk and Discard Hunk buttons on each hunk](docs/user/images/diff.png) **The diff**, with stage and discard per hunk or per line. |
 | ![The command palette filtered on the word stash](docs/user/images/palette.png) **The command palette** (`Ctrl+P`) reaches every command. | ![The commit composer proposing four commits for the working changes, ready to review](docs/user/images/composer.png) **The commit composer** reviews AI-proposed commits before anything is committed. |
 | ![The right-click menu of a commit with cherry-pick, revert, reset, rebase, branch and tag actions](docs/user/images/context-menu.png) **Right-click** anything for its actions. | ![The AI page of the Settings with profiles, per-action instructions and the enable switch](docs/user/images/settings-ai.png) **Settings**, with search, including the optional AI page. |
 

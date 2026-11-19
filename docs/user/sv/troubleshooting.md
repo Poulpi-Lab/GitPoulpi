@@ -85,6 +85,54 @@ alternativen (`Ctrl+N` och sedan `,` öppnar Inställningar; `Ctrl+P` når varje
 kommando), eller bind om tangentkombinationen: se
 [Inställningar](settings.md#tangentbord--mus).
 
+**`Ctrl+Tab` byter inte flik.** kitty, WezTerm, Ghostty och Windows Terminal
+behåller `Ctrl+Tab` och `Ctrl+Shift+Tab` för sina egna flikar, så tangenten når
+aldrig GitPoulpi. `Ctrl+PageDown` / `Ctrl+PageUp` fungerar alltid. För att ge
+paret till GitPoulpi, frigör det i terminalens konfiguration och starta sedan om
+terminalen (eller läs om dess konfiguration):
+
+- kitty, i `kitty.conf` (en `map` utan åtgärd tar bort standardbindningen; med
+  `--when-focus-on` plus ett fönsterkriterium som `title:...` kan kitty ta bort
+  den bara medan ett matchande fönster har fokus, se kittys dokumentation om
+  mappningar):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, i `wezterm.lua`:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, i dess konfigurationsfil:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, i `settings.json` (`"id": null` tar bort standardbindningen):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (Äldre inställningsfiler listar `nextTab` / `prevTab` under `actions` med
+  dessa tangenter: ta bort tangenterna där.)
+
+Terminalen förlorar då sitt eget flikbyte med `Ctrl+Tab`. En terminal som bara
+kan skicka tangenten via kitty-tangentbordsprotokollet behöver ha det på
+(standard, se [Kortkommandon](keybindings.md#tangenter-som-terminalen-inte-kan-skicka-och-kitty-tangentbordsprotokollet)).
+
 **Jag kommer inte ihåg en genväg.** Tryck på `Ctrl+P` och skriv vad du vill;
 varje resultat visar sin genväg. `?` listar allt.
 

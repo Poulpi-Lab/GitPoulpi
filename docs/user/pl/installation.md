@@ -179,7 +179,7 @@ systemy). Archiwum zawiera pliki wykonywalne, `INSTALL.txt`, `README.md`,
 
 ## Aktualizacje
 
-Pasek tytułu pokazuje działającą wersję (`v1.0.0`) między nazwą aplikacji a ścieżką repozytorium. Kliknięcie jej otwiera panel aktualizacji tylko wtedy, gdy istnieje nowsze wydanie albo trwa aktualizacja; w przeciwnym razie otwiera kartę **Informacje o wersji**. Panel otwierają też `Ctrl+N`, a potem `u`, oraz **Aktualizacje: Pokaż aktualizację** z palety poleceń (`Ctrl+P`). Panel pokazuje wersję, sposobem instalacji GitPoulpi i tym, co zrobić z nowszym wydaniem. **Pomoc: Informacje o wersji** otwiera dziennik zmian.
+Pasek tytułu pokazuje działającą wersję (`v1.0.0`) między nazwą aplikacji a ścieżką repozytorium. Gdy znane jest nowsze wydanie (albo trwa aktualizacja), kliknięcie jej otwiera panel aktualizacji z wersją, sposobem instalacji GitPoulpi i tym, co zrobić z nowszym wydaniem; gdy nie ma nowszego wydania ani trwającej aktualizacji, kliknięcie otwiera kartę **Informacje o wersji**. Panel aktualizacji zawsze otwierają `Ctrl+N`, a potem `u`, oraz **Aktualizacje: Pokaż aktualizację** z palety poleceń (`Ctrl+P`), a dziennik zmian zawsze otwiera **Pomoc: Informacje o wersji**.
 
 Raz dziennie, w tle, GitPoulpi sprawdza miejsce, w którym publikowane są jego wydania (domyślnie GitHub), czy jest nowsze (`updates.mode`, [Ustawienia > Synchronizacja](settings.md#synchronizacja)). Gdy tak, znaczek czyta `v0.2.0 dostępna` w kolorze akcentu.
 
@@ -203,13 +203,13 @@ wpisy w PATH, skróty i wpisy menu menedżera plików (w Windows razem z kluczem
 App Paths) utworzone przez GitPoulpi, a potem pliki programu
 instalacji z wydania; odmawia dla kompilacji bez znacznika `.gitpoulpi-dist`
 (kompilacja przez cargo), a `--keep-files` zostawia pliki programu. Nie jest
-dostępne dla agentów MCP. Bez instalatora usuń pliki wykonywalne.
+dostępne dla agentów MCP. Bez instalatora usuń pliki programu.
 GitPoulpi zostawia też te pliki:
 
 | Co | Gdzie |
 |---|---|
 | Ustawienia (`config.toml`) i sesje | Folder konfiguracji systemu. Zmienia go `GITPOULPI_CONFIG_DIR`. |
-| Stan poszczególnych repozytoriów | `.gitpoulpi/` wewnątrz każdego repozytorium. |
+| Stan poszczególnych repozytoriów | domyślnie `gitpoulpi/` wewnątrz folderu `.git` repozytorium (`session.per_repo_state_dir` może go przenieść do `.gitpoulpi/` w drzewie roboczym albo do folderu danych użytkownika). |
 | Pamięć podręczna (awatary) | Folder pamięci podręcznej systemu. |
 | Tokeny i klucze API | Menedżer poświadczeń. Usuwa je **Ustawienia > SSH i poświadczenia > Zapomnij wszystkie nazwy użytkowników i hasła**. |
 

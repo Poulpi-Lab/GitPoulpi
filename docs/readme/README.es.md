@@ -45,7 +45,7 @@ inspirado en GitKraken y reescrito desde cero en Rust: binarios nativos, ligeros
 
 | | |
 |---|---|
-| ![El grafo del Log con el tema de color Material y el tinte de fila activado](../../docs/user/images/theme-material.png) **El grafo de commits**, aquí con el tema Material y el tinte de fila. | ![El diff de un archivo modificado con botones Stage hunk y Descartar hunk en cada hunk](../../docs/user/images/diff.png) **El diff**, con stage y descarte por hunk o por línea. |
+| ![El grafo del Log con la paleta de carriles Material y el tinte de fila activado](../../docs/user/images/theme-material.png) **El grafo de commits**, aquí con la paleta de carriles Material y el tinte de fila. | ![El diff de un archivo modificado con botones Stage hunk y Descartar hunk en cada hunk](../../docs/user/images/diff.png) **El diff**, con stage y descarte por hunk o por línea. |
 | ![La paleta de comandos filtrada por la palabra stash](../../docs/user/images/palette.png) **La paleta de comandos** (`Ctrl+P`) da acceso a todos los comandos. | ![El compositor de commits proponiendo cuatro commits para los cambios de trabajo, listos para revisar](../../docs/user/images/composer.png) **El compositor de commits** revisa los commits propuestos por la IA antes de confirmar nada. |
 | ![El menú contextual de un commit con acciones de cherry-pick, revert, reset, rebase, rama y tag](../../docs/user/images/context-menu.png) **Clic derecho** en cualquier elemento para ver sus acciones. | ![La página IA de los Ajustes con perfiles, instrucciones por acción y el interruptor de activación](../../docs/user/images/settings-ai.png) **Los Ajustes**, con búsqueda, incluida la página opcional de IA. |
 

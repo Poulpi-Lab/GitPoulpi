@@ -31,27 +31,81 @@
 
 您需要系统自带的 `git`；`git-lfs` 是可选的。
 
-- **使用安装程序：** 每个发行版都附带 Windows 用的 `...-setup.exe`，以及 Linux 和 macOS 用的 `install.sh`（按用户安装，无需 root）。从发行版压缩包安装的构建，也可以通过状态栏中的版本标签自行更新。
-- **从发布压缩包安装：** 解压后按其中的 `INSTALL.txt` 操作。
-- **从源码安装：**
+### Linux 和 macOS（`install.sh`）
 
-  ```
-  git clone https://github.com/Poulpi-Lab/GitPoulpi.git
-  cd GitPoulpi
-  cargo build --release
-  ```
+```
+curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
+```
 
-  二进制文件位于 `target/release/`：`gitpoulpi`（CLI；不带子命令运行时即为界面）、`gitpoulpi-tui` 和 `gitpoulpi-mcp`。
-- **自行构建发布压缩包：** `cargo run -p xtask -- dist` 会生成 `target/dist/gitpoulpi-<version>-<target>.zip`（Windows）或 `.tar.gz`，以及一个 `.sha256` 文件。
-- **只包含所需内容的更小二进制文件：** `./build-custom.sh`（Windows：`build-custom`）会询问要构建哪些语言、集成和功能（AI、MCP、LFS、worktree、子模块、头像下载）；参见 [docs/user/zh-CN/custom-builds.md](../../docs/user/zh-CN/custom-builds.md)。
+### Homebrew（macOS、Linux）
 
-完整细节、可选工具和各操作系统的说明：[docs/user/zh-CN/installation.md](../../docs/user/zh-CN/installation.md)。
+```
+brew install Poulpi-Lab/gitpoulpi/gitpoulpi
+```
+
+### apt（Debian、Ubuntu）
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+### Scoop（Windows）
+
+```
+scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi
+scoop install gitpoulpi
+```
+
+### Windows 安装程序
+
+从[最新发行版](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest)下载
+`gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe` 并运行。
+管理员可以使用 MSI：
+
+```
+msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn
+```
+
+### Docker
+
+```
+docker pull poulpilab/gitpoulpi
+```
+
+参见[在 Docker 中运行](../user/zh-CN/docker.md)。
+
+### cargo
+
+```
+cargo binstall gitpoulpi-cli          # prebuilt
+cargo install --locked gitpoulpi-cli  # compiles
+```
+
+### 发布压缩包
+
+从[最新发行版](https://github.com/Poulpi-Lab/GitPoulpi/releases/latest)下载，
+解压后按其中的 `INSTALL.txt` 操作。
+
+### 从源码安装
+
+```
+git clone https://github.com/Poulpi-Lab/GitPoulpi.git
+cd GitPoulpi
+cargo build --release
+```
+
+自行构建发布压缩包、更小的自定义构建以及各操作系统的说明：
+[docs/user/zh-CN/installation.md](../user/zh-CN/installation.md) 和
+[docs/user/zh-CN/custom-builds.md](../user/zh-CN/custom-builds.md)。
 
 ## 快速开始
 
 ```
 cd path/to/your/repository
-gitpoulpi-tui          # or just: gitpoulpi
+gitpoulpi
 ```
 
 - `?` 打开列出所有按键和手势的帮助，`Ctrl+P` 打开命令面板，`Ctrl+,` 打开设置，`q` 退出。

@@ -32,7 +32,7 @@ réécrit en Rust : des binaires natifs, légers sur le disque et en mémoire, 
   des worktrees et des patches.
 - **Hébergeurs et suivi de tickets intégrés.** Parcourez, récupérez et créez des pull et merge requests (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket) et relisez les changes Gerrit. Parcourez et créez des tickets, work items et cartes (aussi Jira, Trello, Linear, YouTrack, Redmine et des notes Markdown locales), au besoin sur un tableau Kanban. Clonez depuis votre compte et gérez vos clés SSH.
 - **CLI et MCP pour les agents.** `gitpoulpi <commande> --json` couvre tout ce
-  que fait l’interface, et `gitpoulpi-mcp` l’expose sous forme d’outils MCP. Un
+  que fait l’interface, et `gitpoulpi mcp serve` l’expose sous forme d’outils MCP. Un
   démon d’arrière-plan par dépôt garde chaque interface vivante et
   synchronisée.
 - **IA facultative, jamais obligatoire.** Désactivée par défaut et sans compte :
@@ -150,7 +150,7 @@ de l’écran.
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 L’IA est facultative et désactivée par défaut : activez l’IA propre à

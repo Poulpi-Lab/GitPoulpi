@@ -12,10 +12,10 @@ Följ [Installation](installation.md). Öppna sedan en terminal i ett
 Git-repository och kör:
 
 ```
-gitpoulpi-tui
+gitpoulpi
 ```
 
-`gitpoulpi` utan underkommando gör samma sak. GitPoulpi öppnar det repository som
+GitPoulpi öppnar det repository som
 innehåller den aktuella mappen. Utanför ett repository öppnas fliken **Hem**,
 där du kan bläddra, klona eller initiera ett repository (se
 [steg 7](#7-öppna-klona-och-initiera-repositories)).

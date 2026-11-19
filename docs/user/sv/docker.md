@@ -2,7 +2,7 @@
 
 # Köra i Docker
 
-Avbilden `poulpilab/gitpoulpi` innehåller de officiella releasebinärerna (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) på `debian:bookworm-slim`, med `git`, `git-lfs`, `openssh-client`, `less` och `tini`. Den körs på `linux/amd64` och `linux/arm64`. Den finns på Docker Hub.
+Avbilden `poulpilab/gitpoulpi` innehåller de officiella releasebinärerna (`gitpoulpi`, plus relänen `gitpoulpi-tui` och `gitpoulpi-mcp`) på `debian:bookworm-slim`, med `git`, `git-lfs`, `openssh-client`, `less` och `tini`. Den körs på `linux/amd64` och `linux/arm64`. Den finns på Docker Hub.
 
 ## Starta gränssnittet
 
@@ -81,10 +81,10 @@ Startpunkten startar gränssnittet. De andra programmen nås genom att åsidosä
 docker run --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi status
 
 # the MCP server, over standard input and output, for an agent that launches it
-docker run -i --rm --entrypoint gitpoulpi-mcp -v "$PWD":/work poulpilab/gitpoulpi
+docker run -i --rm --entrypoint gitpoulpi -v "$PWD":/work poulpilab/gitpoulpi mcp serve
 ```
 
-Varje `docker run` är en egen container med sin egen GitPoulpi-bakgrundsdaemon, så ändringar gjorda via CLI:t syns inte live i ett gränssnitt som körs i en annan container. För att styra ett gränssnitt från CLI:t kör du båda i samma container: starta gränssnittet med `--name gp` och använd `docker exec gp gitpoulpi ...`. För en agent registrerar du `docker run -i --rm --entrypoint gitpoulpi-mcp ...` som MCP-serverns kommando, se [MCP och agenter](mcp-and-agents.md); MCP-behörighetsbrytarna i den monterade `config.toml` gäller som vanligt.
+Varje `docker run` är en egen container med sin egen GitPoulpi-bakgrundsdaemon, så ändringar gjorda via CLI:t syns inte live i ett gränssnitt som körs i en annan container. För att styra ett gränssnitt från CLI:t kör du båda i samma container: starta gränssnittet med `--name gp` och använd `docker exec gp gitpoulpi ...`. För en agent registrerar du `docker run -i --rm --entrypoint gitpoulpi ... mcp serve` som MCP-serverns kommando, se [MCP och agenter](mcp-and-agents.md); MCP-behörighetsbrytarna i den monterade `config.toml` gäller som vanligt.
 
 ## Taggar och uppdatering
 

@@ -21,7 +21,7 @@
 
 | | |
 |---|---|
-| ![启用行着色的 Material 配色主题下的 Log 图](../../docs/user/images/theme-material.png) **commit 图**，此处为带行着色的 Material 主题。 | ![已修改文件的 diff，每个 hunk 上都有 stage Hunk 和丢弃 Hunk 按钮](../../docs/user/images/diff.png) **diff**，可按 hunk 或按行 stage 和丢弃。 |
+| ![采用 Material 泳道配色并启用行着色的 Log 图](../../docs/user/images/theme-material.png) **commit 图**，此处为 Material 泳道配色加行着色。 | ![已修改文件的 diff，每个 hunk 上都有 stage Hunk 和丢弃 Hunk 按钮](../../docs/user/images/diff.png) **diff**，可按 hunk 或按行 stage 和丢弃。 |
 | ![按 stash 一词筛选的命令面板](../../docs/user/images/palette.png) **命令面板**（`Ctrl+P`）可触达每条命令。 | ![commit 撰写器为工作更改提出四个 commit，等待审阅](../../docs/user/images/composer.png) **commit 撰写器**会在 commit 任何内容之前，先让您审阅 AI 提出的 commit。 |
 | ![commit 的右键菜单，含 cherry-pick、revert、reset、rebase、分支和 tag 操作](../../docs/user/images/context-menu.png) **右键点击**任何内容即可看到其操作。 | ![设置中的 AI 页面，含配置、各操作的指令和启用开关](../../docs/user/images/settings-ai.png) **设置**，带搜索，包括可选的 AI 页面。 |
 

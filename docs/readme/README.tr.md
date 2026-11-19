@@ -45,7 +45,7 @@ yeniden yazılmıştır: yerel ikili dosyalar, diskte ve bellekte hafif, Electro
 
 | | |
 |---|---|
-| ![Material renk temalı ve satır tonu açık Log grafiği](../../docs/user/images/theme-material.png) **Commit grafiği**, burada Material temasında ve satır tonuyla. | ![Her hunk üzerinde Stage Hunk ve Discard Hunk düğmeleri bulunan, değiştirilmiş bir dosyanın diff'i](../../docs/user/images/diff.png) **Diff**, hunk veya satır bazında stage ve atma ile. |
+| ![Material şerit paletli ve satır tonlu Log grafiği](../../docs/user/images/theme-material.png) **Commit grafiği**, burada Material şerit paleti ve satır tonuyla. | ![Her hunk üzerinde Stage Hunk ve Discard Hunk düğmeleri bulunan, değiştirilmiş bir dosyanın diff'i](../../docs/user/images/diff.png) **Diff**, hunk veya satır bazında stage ve atma ile. |
 | ![stash sözcüğüyle filtrelenmiş komut paleti](../../docs/user/images/palette.png) **Komut paleti** (`Ctrl+P`) her komuta ulaşır. | ![Çalışma değişiklikleri için dört commit öneren, incelemeye hazır commit composer](../../docs/user/images/composer.png) **Commit composer**, hiçbir şey commit'lenmeden önce YZ'nin önerdiği commit'leri incelemenizi sağlar. |
 | ![Cherry-pick, revert, reset, rebase, dal ve tag eylemleri olan bir commit'in sağ tık menüsü](../../docs/user/images/context-menu.png) Eylemleri için her şeye **sağ tıklayın**. | ![Profilleri, eylem başına yönergeleri ve etkinleştirme anahtarı olan Ayarlar'ın YZ sayfası](../../docs/user/images/settings-ai.png) **Ayarlar**, arama ile, isteğe bağlı YZ sayfası dahil. |
 

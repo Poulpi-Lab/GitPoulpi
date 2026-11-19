@@ -84,13 +84,13 @@ command), or rebind the chord: see [Settings](settings.md#keyboard--mouse).
 
 **`Ctrl+Tab` does not switch tabs.** kitty, WezTerm, Ghostty and Windows
 Terminal keep `Ctrl+Tab` and `Ctrl+Shift+Tab` for their own tabs, so the key
-never reaches GitPoulpi. `Ctrl+PageDown` / `Ctrl+PageUp` always work. To give
-the pair to GitPoulpi, free it in the terminal's config, then restart the
+never reaches GitPoulpi. `Ctrl+PageDown` / `Ctrl+PageUp` always work. To hand
+the pair to GitPoulpi, unbind it in the terminal's config, then restart the
 terminal (or reload its config):
 
-- kitty, in `kitty.conf` (a `map` with no action unmaps the default; with
-  `--when-focus-on` plus a window criterion such as `title:...` kitty can
-  unmap it only while a matching window has focus, see kitty's mapping docs):
+- kitty, in `kitty.conf` (a `map` with no action unmaps the default; to unmap
+  it only while a matching window has focus, add `--when-focus-on` with a
+  criterion such as `title:...`, see kitty's mapping docs):
 
   ```
   map ctrl+tab

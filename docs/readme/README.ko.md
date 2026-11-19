@@ -41,7 +41,7 @@ GitPoulpi는 GitKraken에서 영감을 받아 Rust로 처음부터 다시 작성
 
 | | |
 |---|---|
-| ![Material 색상 테마와 행 색조가 켜진 Log 그래프](../../docs/user/images/theme-material.png) **commit 그래프**, 여기서는 행 색조를 켠 Material 테마입니다. | ![각 hunk에 Stage Hunk와 Discard Hunk 버튼이 있는 수정된 파일의 diff](../../docs/user/images/diff.png) **diff**, hunk별 또는 줄별로 스테이징과 버리기를 할 수 있습니다. |
+| ![Material 레인 팔레트와 행 색조가 켜진 Log 그래프](../../docs/user/images/theme-material.png) **commit 그래프**, 여기서는 행 색조를 켠 Material 레인 팔레트입니다. | ![각 hunk에 Stage Hunk와 Discard Hunk 버튼이 있는 수정된 파일의 diff](../../docs/user/images/diff.png) **diff**, hunk별 또는 줄별로 스테이징과 버리기를 할 수 있습니다. |
 | ![stash라는 단어로 필터링한 명령 팔레트](../../docs/user/images/palette.png) **명령 팔레트**(`Ctrl+P`)는 모든 명령에 닿습니다. | ![작업 중인 변경 사항에 대해 commit 네 개를 제안하고 검토를 기다리는 commit composer](../../docs/user/images/composer.png) **commit composer**는 commit하기 전에 AI가 제안한 commit을 검토합니다. |
 | ![cherry-pick, revert, reset, rebase, branch, tag 동작이 있는 commit의 오른쪽 클릭 메뉴](../../docs/user/images/context-menu.png) 무엇이든 **오른쪽 클릭**하면 해당 동작이 나옵니다. | ![프로필, 동작별 지침, 활성화 스위치가 있는 설정의 AI 페이지](../../docs/user/images/settings-ai.png) **설정**, 검색과 선택 사항인 AI 페이지를 포함합니다. |
 

@@ -88,6 +88,54 @@ alternatieven (`Ctrl+N` en dan `,` opent de Instellingen; `Ctrl+P` bereikt elke
 opdracht) of wijs de toetscombinatie opnieuw toe: zie
 [Instellingen](settings.md#toetsenbord--muis).
 
+**`Ctrl+Tab` wisselt niet van tabblad.** kitty, WezTerm, Ghostty en Windows
+Terminal houden `Ctrl+Tab` en `Ctrl+Shift+Tab` voor hun eigen tabbladen, dus de
+toets komt nooit bij GitPoulpi aan. `Ctrl+PageDown` / `Ctrl+PageUp` werken altijd.
+Om het paar aan GitPoulpi te geven, maak je het vrij in de configuratie van de
+terminal en herstart je de terminal (of laad je de configuratie opnieuw):
+
+- kitty, in `kitty.conf` (een `map` zonder actie heft de standaardtoewijzing op;
+  met `--when-focus-on` plus een vensterfilter zoals `title:...` kan kitty haar
+  alleen opheffen zolang een passend venster focus heeft, zie de documentatie van
+  kitty over `map`):
+
+  ```
+  map ctrl+tab
+  map ctrl+shift+tab
+  ```
+
+- WezTerm, in `wezterm.lua`:
+
+  ```lua
+  config.keys = {
+    { key = 'Tab', mods = 'CTRL', action = wezterm.action.DisableDefaultAssignment },
+    { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  }
+  ```
+
+- Ghostty, in zijn configuratiebestand:
+
+  ```
+  keybind = ctrl+tab=unbind
+  keybind = ctrl+shift+tab=unbind
+  ```
+
+- Windows Terminal, in `settings.json` (`"id": null` heft de standaardtoewijzing op):
+
+  ```json
+  "keybindings": [
+    { "id": null, "keys": "ctrl+tab" },
+    { "id": null, "keys": "ctrl+shift+tab" }
+  ]
+  ```
+
+  (Oudere instellingenbestanden vermelden `nextTab` / `prevTab` onder `actions`
+  met deze toetsen: verwijder die toetsen daar.)
+
+De terminal verliest dan zijn eigen tabbladwisseling met `Ctrl+Tab`. Een terminal
+die de toets alleen via het kitty-toetsenbordprotocol kan sturen, heeft dat aan
+nodig (de standaard, zie [Sneltoetsen](keybindings.md#toetsen-die-de-terminal-niet-kan-sturen-en-het-kitty-toetsenbordprotocol)).
+
 **Ik weet een sneltoets niet meer.** Druk op `Ctrl+P` en typ wat je wilt; elk
 resultaat toont zijn sneltoets. `?` toont alles.
 

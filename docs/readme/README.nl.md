@@ -45,7 +45,7 @@ geïnspireerd door GitKraken en helemaal opnieuw in Rust geschreven: native bina
 
 | | |
 |---|---|
-| ![De Log-grafiek met het kleurthema Material en rijkleuring ingeschakeld](../../docs/user/images/theme-material.png) **De commitgrafiek**, hier in het thema Material met rijkleuring. | ![De diff van een gewijzigd bestand met knoppen Hunk stagen en Hunk verwerpen bij elke hunk](../../docs/user/images/diff.png) **De diff**, met stage en verwerpen per hunk of per regel. |
+| ![De Log-grafiek met het baanpalet Material en rijkleuring](../../docs/user/images/theme-material.png) **De commitgrafiek**, hier met het baanpalet Material en rijkleuring. | ![De diff van een gewijzigd bestand met knoppen Hunk stagen en Hunk verwerpen bij elke hunk](../../docs/user/images/diff.png) **De diff**, met stage en verwerpen per hunk of per regel. |
 | ![Het opdrachtenpalet gefilterd op het woord stash](../../docs/user/images/palette.png) **Het opdrachtenpalet** (`Ctrl+P`) bereikt elke opdracht. | ![De commitcomposer die vier commits voorstelt voor de werkwijzigingen, klaar om te controleren](../../docs/user/images/composer.png) **De commitcomposer** laat door AI voorgestelde commits controleren voordat er iets wordt gecommit. |
 | ![Het rechtsklikmenu van een commit met acties voor cherry-pick, revert, reset, rebase, branch en tag](../../docs/user/images/context-menu.png) **Rechtsklik** op alles voor de bijbehorende acties. | ![De pagina AI van de Instellingen met profielen, instructies per actie en de aan/uit-schakelaar](../../docs/user/images/settings-ai.png) **De Instellingen**, met zoekfunctie, inclusief de optionele pagina AI. |
 

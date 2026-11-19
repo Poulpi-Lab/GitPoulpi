@@ -32,7 +32,7 @@ GitPoulpi даёт полноценный граф коммитов, по кот
   worktree и патчи.
 - **Хостинги и трекеры задач встроены.** Просматривайте, получайте и создавайте pull и merge request (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket) и проверяйте изменения Gerrit. Просматривайте и создавайте задачи, рабочие элементы и карточки (также Jira, Trello, Linear, YouTrack, Redmine и локальные заметки Markdown), при желании на доске Kanban. Клонируйте из своего аккаунта и управляйте SSH-ключами.
 - **CLI и MCP для агентов.** `gitpoulpi <команда> --json` покрывает всё, что
-  делает интерфейс, а `gitpoulpi-mcp` отдаёт это как инструменты MCP. Один
+  делает интерфейс, а `gitpoulpi mcp serve` отдаёт это как инструменты MCP. Один
   фоновый демон на репозиторий держит все интерфейсы живыми и синхронными.
 - **ИИ по желанию, никогда не обязательный.** Выключен по умолчанию, аккаунт не
   нужен: используйте свой ключ API или локальный CLI агента, например
@@ -149,7 +149,7 @@ gitpoulpi
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 ИИ необязателен и по умолчанию выключен: включите собственный ИИ GitPoulpi в

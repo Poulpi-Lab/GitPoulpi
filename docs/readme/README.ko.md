@@ -28,7 +28,7 @@ GitPoulpi는 GitKraken에서 영감을 받아 Rust로 처음부터 다시 작성
   fast-forward하고, worktree와 patch를 만들 수 있습니다.
 - **호스팅과 이슈 트래커 내장.** pull request와 merge request(GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket)를 둘러보고, 체크아웃하고, 만들 수 있으며 Gerrit change를 리뷰할 수 있습니다. 이슈, 작업 항목, 카드(Jira, Trello, Linear, YouTrack, Redmine, 로컬 Markdown 노트 포함)를 둘러보고 만들 수 있고, 칸반 보드로도 볼 수 있습니다. 계정에서 클론하고 SSH 키를 관리합니다.
 - **에이전트를 위한 CLI와 MCP.** `gitpoulpi <command> --json`이 UI가 하는
-  모든 것을 다루고, `gitpoulpi-mcp`가 이를 MCP 도구로 제공합니다. 저장소마다
+  모든 것을 다루고, `gitpoulpi mcp serve`가 이를 MCP 도구로 제공합니다. 저장소마다
   백그라운드 데몬 하나가 모든 프런트엔드를 실시간으로 동기화합니다.
 - **선택 사항인 AI, 필수가 아님.** 기본적으로 꺼져 있고 계정이 필요 없습니다:
   자신의 API 키나 `claude -p` 같은 로컬 에이전트 CLI를 가져오십시오. commit
@@ -143,7 +143,7 @@ gitpoulpi
 ```
 gitpoulpi --json status            # the CLI, scriptable
 gitpoulpi --json log --limit 20
-claude mcp add gitpoulpi -- gitpoulpi-mcp   # give an AI agent the same tools
+claude mcp add gitpoulpi -- gitpoulpi mcp serve   # give an AI agent the same tools
 ```
 
 AI는 선택 사항이며 기본적으로 꺼져 있습니다: *설정 > AI*에서 GitPoulpi 자체 AI를

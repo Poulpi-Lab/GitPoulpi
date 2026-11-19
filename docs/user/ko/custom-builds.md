@@ -20,7 +20,7 @@ build-custom                     # Windows, cmd or PowerShell (scripts/build-cus
 | 로고 색상 | 정보 창의 픽셀 문어는 20가지 색 구성으로 제공됩니다(`--list-logo-colors`). 컴파일해 넣을 것(하나 이상), 기본값(정보 창이 가장 먼저 보여 주며, 컴파일되지 않은 `ui.logo_color`가 저장되어 있을 때 대체되는 값이기도 합니다. 컴파일된 것 중 하나여야 하며, 공식 기본값: lavender), Windows 실행 파일 아이콘의 색상(아무 색 구성이나 가능, 기본값: 로고 기본값)을 고르세요. 색 구성이 하나뿐이면 로고는 클릭하면 여전히 회전하지만 그 색으로 남고, 색 목록(`c`, 오른쪽 클릭)은 제공되지 않습니다. |
 | 연동(GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine) | 아무것도 없으면: URL로만 클론하며, 이슈와 pull/merge request가 없습니다. |
 | AI | AI 버튼, 명령, `ai` CLI/MCP 도구가 없습니다. |
-| MCP | `gitpoulpi-mcp` 바이너리와 `gitpoulpi mcp` 명령이 없습니다. `ui` 에이전트 명령은 남습니다. |
+| MCP | `gitpoulpi-mcp` 릴레이와 `gitpoulpi mcp` 명령이 없습니다. `ui` 에이전트 명령은 남습니다. |
 | LFS, Worktree, 서브모듈 | 해당 관리 화면과 명령이 사라지고, 형식을 갖춘 "이 바이너리에 포함되지 않음" 응답이 반환됩니다. |
 | 아바타 다운로드 | 이니셜 배지만 표시되고 네트워크 가져오기가 없습니다. |
 | 이미지 미리 보기 | 이미지 파일에 일반 바이너리 안내가 표시되며, **편집 프로그램**은 그대로 동작합니다. |
@@ -78,11 +78,11 @@ PowerShell 이름: `-Langs -Integrations -Themes -LogoColors -LogoDefault -IconC
 테마 선택은 환경 변수 `GITPOULPI_THEMES`(`all`, `none` 또는 쉼표로 구분한 계열 목록)로 빌드에 전달되며, `gitpoulpi-config`의 빌드 스크립트가 이를 읽어 컴파일 시점에 다른 팔레트를 제외합니다. 원한다면 일반 `cargo build`에서 직접 설정해도 됩니다. `gitpoulpi
 --version`은 빌드된 집합을 담은 `themes:` 줄을 출력합니다.
 
-로고 선택은 환경 변수 `GITPOULPI_LOGO_COLORS`(`all` 또는 slug를 쉼표로 구분한 목록), `GITPOULPI_LOGO_DEFAULT`, `GITPOULPI_ICON_COLOR`이며, `gitpoulpi-tui`의 빌드 스크립트(`crates/gitpoulpi-logo-build/colourways.json`을 걸러 정보 창이 내장하는 표로 만듦)와 세 바이너리 크레이트의 빌드 스크립트(아이콘)가 읽습니다. 색상의 원본은 계속 `crates/gitpoulpi-logo-build/colourways.json`입니다.
+로고 선택은 환경 변수 `GITPOULPI_LOGO_COLORS`(`all` 또는 slug를 쉼표로 구분한 목록), `GITPOULPI_LOGO_DEFAULT`, `GITPOULPI_ICON_COLOR`이며, `gitpoulpi-tui`의 빌드 스크립트(`crates/gitpoulpi-logo-build/colourways.json`을 걸러 정보 창이 내장하는 표로 만듦)와 `gitpoulpi-cli`의 빌드 스크립트(아이콘)가 읽습니다. 색상의 원본은 계속 `crates/gitpoulpi-logo-build/colourways.json`입니다.
 
 ### Windows 실행 파일 아이콘
 
-대상이 Windows이면 `gitpoulpi`, `gitpoulpi-tui`, `gitpoulpi-mcp` 실행 파일이 문어를 아이콘으로 갖게 되며, 이 아이콘은 빌드할 때 선택한 아이콘 색상으로 16~128 px 크기로 생성됩니다(Python이나 ImageMagick 불필요). `winresource` 크레이트로 내장되며 플랫폼의 리소스 컴파일러(MSVC에서는 Windows SDK의 `rc.exe`, GNU에서는 `windres`)가 필요합니다. 없으면 빌드가 경고만 출력하고 실행 파일은 기본 아이콘을 유지합니다. GNU 툴체인에서는 `gitpoulpi`만 아이콘을 갖습니다(그렇지 않으면 리소스가 두 번 링크됩니다). Linux와 macOS용 빌드는 색상 표를 제외하고 이 모든 것을 무시합니다.
+대상이 Windows이면 `gitpoulpi` 실행 파일이 문어를 아이콘으로 갖게 되며, 이 아이콘은 빌드할 때 선택한 아이콘 색상으로 16~128 px 크기로 생성됩니다(Python이나 ImageMagick 불필요). `winresource` 크레이트로 내장되며 플랫폼의 리소스 컴파일러(MSVC에서는 Windows SDK의 `rc.exe`, GNU에서는 `windres`)가 필요합니다. 없으면 빌드가 경고만 출력하고 실행 파일은 기본 아이콘을 유지합니다. GNU 툴체인에서는 `gitpoulpi`만 아이콘을 갖습니다(그렇지 않으면 리소스가 두 번 링크됩니다). Linux와 macOS용 빌드는 색상 표를 제외하고 이 모든 것을 무시합니다.
 
 ## 저장된 선택
 
@@ -111,32 +111,32 @@ PowerShell 이름: `-Langs -Integrations -Themes -LogoColors -LogoDefault -IconC
 
 ## 절약되는 크기
 
-2026-10-29, 커밋 `65999ef5c`의 Linux에서 전체 빌드를 기준으로 측정했으며, 괄호 안은 전체 빌드와의 차이입니다
-(자세한 내용은 `docs/developer/binary-size.md`):
+2026-10-29, 커밋 `65999ef5c`의 Linux에서 `gitpoulpi`(프로그램 전체: UI, CLI, MCP 서버)의 크기를 전체 빌드를 기준으로 측정했으며, 괄호 안은 전체 빌드와의 차이입니다
+(자세한 내용은 `docs/developer/binary-size.md`). 릴레이 `gitpoulpi-tui`, `gitpoulpi-mcp`, `gitpoulpi-launch`는 무엇을 고르든 1 MiB를 훨씬 밑돕니다:
 
-| 빌드(별도 표시가 없으면 `full` 기준) | `gitpoulpi` (MiB) | `gitpoulpi-tui` (MiB) | `gitpoulpi-mcp` (MiB) |
-|---|---|---|---|
-| 전체(모두 켜짐) | 64.6 | 50.5 | 31.7 |
-| 영어만 | 52.0 (-12.6) | 40.2 (-10.3) | 31.7 (0.0) |
-| MCP 끔 | 61.6 (-3.0) | 49.6 (-0.8) | 빌드되지 않음 |
-| AI 끔 | 62.6 (-2.0) | 48.6 (-1.8) | 30.5 (-1.3) |
-| 연동 모두 끔 | 56.3 (-8.2) | 43.7 (-6.7) | 26.7 (-5.0) |
-| AI + 연동 + 아바타 가져오기 끔 | 52.2 (-12.3) | 39.9 (-10.6) | 23.0 (-8.8) |
-| 기록 워크벤치 끔 (`--no-history-rewrite`) | 61.6 (-3.0) | 48.9 (-1.5) | 28.5 (-3.2) |
-| 다시 쓰기 스크립트 끔 | 63.1 (-1.5) | 49.0 (-1.5) | 31.1 (-0.7) |
-| 전체 검색 끔 | 63.5 (-1.1) | 49.5 (-1.0) | 31.6 (-0.1) |
-| 워크스페이스 끔 | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.2) |
-| Radar 끔 | 63.4 (-1.2) | 49.3 (-1.2) | 31.7 (0.0) |
-| Board 끔 | 63.6 (-1.0) | 49.5 (-1.0) | 31.7 (0.0) |
-| Review 끔 | 63.2 (-1.4) | 49.0 (-1.4) | 31.7 (0.0) |
-| Mermaid 끔 | 63.6 (-1.0) | 49.5 (-0.9) | 31.6 (-0.1) |
-| LFS 끔 | 63.5 (-1.1) | 49.5 (-0.9) | 31.5 (-0.3) |
-| Worktree 끔 | 63.7 (-0.9) | 49.6 (-0.8) | 31.7 (0.0) |
-| 서브모듈 끔 | 63.7 (-0.9) | 49.6 (-0.9) | 31.6 (-0.1) |
-| 아바타 가져오기 끔 | 63.7 (-0.9) | 49.6 (-0.9) | 31.7 (0.0) |
-| 이미지 보기 끔 | 63.3 (-1.2) | 49.2 (-1.3) | 31.7 (0.0) |
-| 모두 끔, 영어만 (LFS 유지) | 35.2 (-29.4) | 28.9 (-21.5) | 빌드되지 않음 |
-| **모두 끔, 영어만** | **34.9 (-29.7)** | **28.8 (-21.6)** | 빌드되지 않음 |
+| 빌드(별도 표시가 없으면 `full` 기준) | `gitpoulpi` (MiB) |
+|---|---|
+| 전체(모두 켜짐) | 64.6 |
+| 영어만 | 52.0 (-12.6) |
+| MCP 끔 | 61.6 (-3.0) |
+| AI 끔 | 62.6 (-2.0) |
+| 연동 모두 끔 | 56.3 (-8.2) |
+| AI + 연동 + 아바타 가져오기 끔 | 52.2 (-12.3) |
+| 기록 워크벤치 끔 (`--no-history-rewrite`) | 61.6 (-3.0) |
+| 다시 쓰기 스크립트 끔 | 63.1 (-1.5) |
+| 전체 검색 끔 | 63.5 (-1.1) |
+| 워크스페이스 끔 | 63.5 (-1.1) |
+| Radar 끔 | 63.4 (-1.2) |
+| Board 끔 | 63.6 (-1.0) |
+| Review 끔 | 63.2 (-1.4) |
+| Mermaid 끔 | 63.6 (-1.0) |
+| LFS 끔 | 63.5 (-1.1) |
+| Worktree 끔 | 63.7 (-0.9) |
+| 서브모듈 끔 | 63.7 (-0.9) |
+| 아바타 가져오기 끔 | 63.7 (-0.9) |
+| 이미지 보기 끔 | 63.3 (-1.2) |
+| 모두 끔, 영어만 (LFS 유지) | 35.2 (-29.4) |
+| **모두 끔, 영어만** | **34.9 (-29.7)** |
 
 ## 참고
 

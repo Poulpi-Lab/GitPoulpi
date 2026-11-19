@@ -12,7 +12,7 @@ AI 에이전트(Claude Code, Cursor, Codex 등)는 **MCP 서버** 또는 **CLI**
 
 ## 빠른 설정
 
-1. `gitpoulpi`와 `gitpoulpi-mcp`를 `PATH`에 둡니다([설치](installation.md)).
+1. `gitpoulpi`를 `PATH`에 둡니다([설치](installation.md)). 서버는 `gitpoulpi mcp serve`이며, 아카이브의 `gitpoulpi-mcp` 릴레이도 별칭으로 계속 작동하므로 이 이름을 쓰는 기존 에이전트 설정은 그대로 실행됩니다.
 2. 에이전트에 서버를 등록합니다. 서버는 stdio로 통신하므로 따로 시작할 것도, 포트도
    없습니다.
 3. 필요하면 `config.toml`의 `[mcp]` 테이블(아래)에서 에이전트가 할 수 있는 일을
@@ -54,13 +54,13 @@ claude mcp add gitpoulpi -- gitpoulpi mcp serve --stdio
 |---|---|---|
 | Cursor, Windsurf, Claude Desktop, VS Code | 클라이언트의 MCP JSON 파일 | 위의 `mcpServers` 블록 (VS Code는 키 이름이 `servers`) |
 | OpenAI Codex CLI | `~/.codex/config.toml` | `[mcp_servers.gitpoulpi]`, `command = "gitpoulpi"`, `args = ["mcp", "serve", "--stdio"]` |
-| 그 밖의 모든 것 | 해당 문서 | 명령 `gitpoulpi-mcp` (독립 실행 바이너리, 같은 서버, 인자 불필요) |
+| 그 밖의 모든 것 | 해당 문서 | 명령 `gitpoulpi mcp serve` (기본은 stdio. `gitpoulpi-mcp`는 이미 그것을 쓰는 설정을 위한 같은 서버) |
 
 **HTTP로** (URL에 연결하는 클라이언트):
 
 ```
-gitpoulpi-mcp --http                         # [mcp] bind, default http://127.0.0.1:8808/mcp
-gitpoulpi mcp serve --http 127.0.0.1:9000
+gitpoulpi mcp serve --http                   # [mcp] bind, default http://127.0.0.1:8808/mcp
+gitpoulpi mcp serve --http 127.0.0.1:9000    # or: --bind 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
@@ -125,7 +125,7 @@ claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
 
 | 스위치 | 기본값 | 효과 |
 |---|---|---|
-| `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` / `gitpoulpi-mcp`가 시작을 거부합니다(설정 > 에이전트 및 MCP > *MCP 서버*). 서버가 시작될 때 읽으므로 실행 중인 서버는 기존 설정을 유지합니다. |
+| `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve`(및 그 별칭 `gitpoulpi-mcp`)가 시작을 거부합니다(설정 > 에이전트 및 MCP > *MCP 서버*). 서버가 시작될 때 읽으므로 실행 중인 서버는 기존 설정을 유지합니다. |
 | `[mcp] bind` | `"127.0.0.1:8808"` | 주소 없이 `--http`를 쓸 때의 주소 (`--allow-remote`가 없으면 루프백만. `--allow-remote`에는 인증과 암호화가 필요합니다. 위 참고). 설정 > 에이전트 및 MCP > *MCP 서버 포트*가 포트를 편집하고 호스트는 유지합니다. |
 | `[mcp] http_auth` | `true` | `--http`는 `Authorization: Bearer <token>`(`gitpoulpi mcp token`)이 필요합니다. 설정 > 에이전트 및 MCP > *HTTP 인증*. |
 | `[mcp] tls`, `tls_cert`, `tls_key` | `"off"` | `off`, `self_signed` 또는 `files`(PEM 경로): 서버가 직접 TLS를 종료합니다. 설정 > 에이전트 및 MCP > *TLS*. |

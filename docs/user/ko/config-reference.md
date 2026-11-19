@@ -355,7 +355,7 @@ review_mode = "ask"       # ask | clone | api
 | `mcp.ui_control` | `"ask"` | `ask`(창에 확인용 칩이 표시됨), `auto`(바쁘지 않으면 적용), `off`. 서버 명령의 `--ui-control`이 에이전트별로 이를 재정의합니다. `gitpoulpi ui show`에도 적용됩니다. |
 | `mcp.allow_ui_propose` | `false` | `ui_propose_*` / `gitpoulpi ui propose`를 허용합니다: 미리 채워진 대화상자를 사용자가 직접 확인합니다. |
 | `mcp.allow_history_purge` | `false` | `config.toml`에서만 설정합니다(설정 화면에는 행이 없음). `true`이면 에이전트에게 도구 `rewrite_purge`가 나열됩니다(`allow_mutations`도 여전히 필요). 꺼져 있으면 에이전트에게 도구가 아예 보이지 않습니다. 영구 삭제는 기록 다시 쓰기의 이전 기록과 그 실행 취소, reflog를 완전히 지우기 때문입니다. CLI와 TUI는 이 설정의 제한을 받지 않습니다. |
-| `mcp.enabled` | `true` | `false`: `gitpoulpi mcp serve`와 `gitpoulpi-mcp`가 이 키를 알려 주는 메시지와 함께 시작을 거부합니다. 설정 > 에이전트 및 MCP > *MCP 서버*. 에이전트가 서버를 시작할 때 읽습니다. |
+| `mcp.enabled` | `true` | `false`: `gitpoulpi mcp serve`(및 그 별칭 `gitpoulpi-mcp`)가 이 키를 알려 주는 메시지와 함께 시작을 거부합니다. 설정 > 에이전트 및 MCP > *MCP 서버*. 에이전트가 서버를 시작할 때 읽습니다. |
 | `mcp.bind` | `"127.0.0.1:8808"` | 주소를 지정하지 않았을 때 `--http`가 수신하는 주소(`--http ADDR` / `--bind`가 우선). `--allow-remote`가 없으면 루프백만 허용됩니다. 비어 있거나 예전 `"stdio"`는 기본값을 뜻합니다. 설정 > 에이전트 및 MCP > *MCP 서버 포트*가 포트를 편집하고 호스트는 유지합니다. |
 | `mcp.http_auth` | `true` | `--http`는 `Authorization: Bearer <token>`(`gitpoulpi mcp token`의 토큰)이 있는 요청에만 응답합니다. `false`는 이 검사를 없애며, 이때 서버는 stderr에 경고하고 `--allow-remote`는 거부됩니다. 설정 > 에이전트 및 MCP > *HTTP 인증*. |
 | `mcp.tls` | `"off"` | `off`, `self_signed`(비공개 데이터 폴더에 한 번 생성되는 인증서이며 시작할 때 SHA-256 지문을 출력), 또는 `files`(`tls_cert`와 `tls_key`). TLS를 켜면 서버가 직접 TLS를 종료하며 평문 수신기는 존재하지 않습니다. 설정 > 에이전트 및 MCP > *TLS*. |

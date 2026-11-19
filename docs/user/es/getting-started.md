@@ -12,10 +12,10 @@ Sigue la [Instalación](installation.md). Después, abre un terminal en un
 repositorio Git y ejecuta:
 
 ```
-gitpoulpi-tui
+gitpoulpi
 ```
 
-`gitpoulpi` sin subcomando hace lo mismo. GitPoulpi abre el repositorio que
+GitPoulpi abre el repositorio que
 contiene la carpeta actual. Fuera de un repositorio, abre la pestaña **Inicio**,
 donde puedes examinar, clonar o inicializar un repositorio (consulta el
 [paso 7](#7-abrir-clonar-e-inicializar-repositorios)).

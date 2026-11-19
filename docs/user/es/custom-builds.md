@@ -24,7 +24,7 @@ existe. También escribe `BUILD-FEATURES.txt` junto a los binarios.
 | Colores del logo | El pulpo de píxeles de la ventana Acerca de viene en 20 combinaciones de color (`--list-logo-colors`). Elige las que compilar (al menos una), la predeterminada (Acerca de la muestra primero; también es a la que recurre un `ui.logo_color` guardado que no esté compilado; debe ser una de las compiladas; predeterminada oficial: lavender) y el color del icono del ejecutable de Windows (cualquier combinación, por defecto: la predeterminada del logo). Con una sola combinación, el logo sigue girando al hacer clic pero conserva ese color, y no se ofrece la lista de colores (`c`, clic derecho). |
 | Integraciones (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine) | Sin ninguna: solo clonar por URL; sin issues ni pull/merge requests. |
 | IA | Sin botones ni comandos de IA, y sin las herramientas `ai` de la CLI y del MCP. |
-| MCP | Sin binario `gitpoulpi-mcp` ni comando `gitpoulpi mcp`. Los comandos de agente `ui` se mantienen. |
+| MCP | Sin relé `gitpoulpi-mcp` ni comando `gitpoulpi mcp`. Los comandos de agente `ui` se mantienen. |
 | LFS, worktree, submódulos | Las pantallas de gestión y los comandos correspondientes desaparecen; se devuelve una respuesta tipada «not built into this binary». |
 | Descarga de avatares | Solo insignias con iniciales, sin descarga por red. |
 | Vista previa de imágenes | Los archivos de imagen muestran el aviso binario simple; **Editar en** sigue funcionando. |
@@ -93,14 +93,13 @@ compilación; defínela tú mismo para un `cargo build` normal si lo prefieres. 
 Las elecciones del logo son las variables de entorno `GITPOULPI_LOGO_COLORS`
 (`all` o una lista de slugs separados por comas), `GITPOULPI_LOGO_DEFAULT` y
 `GITPOULPI_ICON_COLOR`, que leen los scripts de compilación de `gitpoulpi-tui` (filtra
-`crates/gitpoulpi-logo-build/colourways.json` hasta la tabla que incrusta la ventana Acerca de) y de los tres
-crates binarios (el icono). La fuente de los colores sigue siendo
+`crates/gitpoulpi-logo-build/colourways.json` hasta la tabla que incrusta la ventana Acerca de) y de `gitpoulpi-cli` (el icono). La fuente de los colores sigue siendo
 `crates/gitpoulpi-logo-build/colourways.json`.
 
 ### Icono del ejecutable de Windows
 
-Cuando el destino es Windows, los ejecutables `gitpoulpi`, `gitpoulpi-tui` y `gitpoulpi-mcp`
-reciben el pulpo como icono, generado durante la compilación (sin necesidad de Python ni
+Cuando el destino es Windows, el ejecutable `gitpoulpi`
+recibe el pulpo como icono, generado durante la compilación (sin necesidad de Python ni
 ImageMagick) en el color de icono elegido, con tamaños de 16 a 128 px. Se incrusta con el
 crate `winresource` y necesita el compilador de recursos de la plataforma (`rc.exe` del
 Windows SDK con MSVC, `windres` con GNU). Si falta, la compilación solo imprime una
@@ -135,32 +134,32 @@ Cuando existe una selección guardada, el modo interactivo ofrece primero «Part
 
 ## Cuánto ahorra
 
-Medido en Linux el 2026-10-29 en el commit `65999ef5c`, a partir de la compilación completa, con la diferencia respecto a ella entre paréntesis
-(detalles en `docs/developer/binary-size.md`):
+Medido en Linux el 2026-10-29 en el commit `65999ef5c`, tamaño de `gitpoulpi` (el programa completo: interfaz, CLI y servidor MCP) a partir de la compilación completa, con la diferencia respecto a ella entre paréntesis
+(detalles en `docs/developer/binary-size.md`). Los relés `gitpoulpi-tui`, `gitpoulpi-mcp` y `gitpoulpi-launch` pesan mucho menos de 1 MiB elijas lo que elijas:
 
-| Compilación (desde `full` salvo indicación) | `gitpoulpi` (MiB) | `gitpoulpi-tui` (MiB) | `gitpoulpi-mcp` (MiB) |
-|---|---|---|---|
-| Completa (todo activado) | 64,6 | 50,5 | 31,7 |
-| Solo inglés | 52,0 (-12,6) | 40,2 (-10,3) | 31,7 (0,0) |
-| MCP desactivado | 61,6 (-3,0) | 49,6 (-0,8) | no se compila |
-| IA desactivada | 62,6 (-2,0) | 48,6 (-1,8) | 30,5 (-1,3) |
-| Todas las integraciones desactivadas | 56,3 (-8,2) | 43,7 (-6,7) | 26,7 (-5,0) |
-| IA + integraciones + descarga de avatares desactivadas | 52,2 (-12,3) | 39,9 (-10,6) | 23,0 (-8,8) |
-| Editor del historial desactivado (`--no-history-rewrite`) | 61,6 (-3,0) | 48,9 (-1,5) | 28,5 (-3,2) |
-| Scripts de reescritura desactivados | 63,1 (-1,5) | 49,0 (-1,5) | 31,1 (-0,7) |
-| Búsqueda global desactivada | 63,5 (-1,1) | 49,5 (-1,0) | 31,6 (-0,1) |
-| Espacios de trabajo desactivados | 63,5 (-1,1) | 49,5 (-0,9) | 31,5 (-0,2) |
-| Radar desactivado | 63,4 (-1,2) | 49,3 (-1,2) | 31,7 (0,0) |
-| Board desactivado | 63,6 (-1,0) | 49,5 (-1,0) | 31,7 (0,0) |
-| Review desactivado | 63,2 (-1,4) | 49,0 (-1,4) | 31,7 (0,0) |
-| Mermaid desactivado | 63,6 (-1,0) | 49,5 (-0,9) | 31,6 (-0,1) |
-| LFS desactivado | 63,5 (-1,1) | 49,5 (-0,9) | 31,5 (-0,3) |
-| Worktree desactivado | 63,7 (-0,9) | 49,6 (-0,8) | 31,7 (0,0) |
-| Submódulos desactivados | 63,7 (-0,9) | 49,6 (-0,9) | 31,6 (-0,1) |
-| Descarga de avatares desactivada | 63,7 (-0,9) | 49,6 (-0,9) | 31,7 (0,0) |
-| Vista previa de imágenes desactivada | 63,3 (-1,2) | 49,2 (-1,3) | 31,7 (0,0) |
-| Todo desactivado, solo inglés (LFS se mantiene) | 35,2 (-29,4) | 28,9 (-21,5) | no se compila |
-| **Todo desactivado, solo inglés** | **34,9 (-29,7)** | **28,8 (-21,6)** | no se compila |
+| Compilación (desde `full` salvo indicación) | `gitpoulpi` (MiB) |
+|---|---|
+| Completa (todo activado) | 64,6 |
+| Solo inglés | 52,0 (-12,6) |
+| MCP desactivado | 61,6 (-3,0) |
+| IA desactivada | 62,6 (-2,0) |
+| Todas las integraciones desactivadas | 56,3 (-8,2) |
+| IA + integraciones + descarga de avatares desactivadas | 52,2 (-12,3) |
+| Editor del historial desactivado (`--no-history-rewrite`) | 61,6 (-3,0) |
+| Scripts de reescritura desactivados | 63,1 (-1,5) |
+| Búsqueda global desactivada | 63,5 (-1,1) |
+| Espacios de trabajo desactivados | 63,5 (-1,1) |
+| Radar desactivado | 63,4 (-1,2) |
+| Board desactivado | 63,6 (-1,0) |
+| Review desactivado | 63,2 (-1,4) |
+| Mermaid desactivado | 63,6 (-1,0) |
+| LFS desactivado | 63,5 (-1,1) |
+| Worktree desactivado | 63,7 (-0,9) |
+| Submódulos desactivados | 63,7 (-0,9) |
+| Descarga de avatares desactivada | 63,7 (-0,9) |
+| Vista previa de imágenes desactivada | 63,3 (-1,2) |
+| Todo desactivado, solo inglés (LFS se mantiene) | 35,2 (-29,4) |
+| **Todo desactivado, solo inglés** | **34,9 (-29,7)** |
 
 ## Notas
 

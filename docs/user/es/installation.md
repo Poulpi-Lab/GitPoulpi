@@ -2,15 +2,9 @@
 
 # Instalación
 
-GitPoulpi tiene tres ejecutables:
+GitPoulpi es un solo programa, `gitpoulpi`. Sin subcomando abre la interfaz de terminal; con uno es la interfaz de línea de comandos (`--json` para scripts); `gitpoulpi mcp serve` es el servidor MCP para agentes de IA (consulta [MCP y agentes](mcp-and-agents.md)). Junto a él, el archivo contiene `gitpoulpi-updater`, el programa pequeño y aparte que actualiza una instalación (consulta [Actualizaciones](updates.md)).
 
-| Ejecutable | Qué es |
-|---|---|
-| `gitpoulpi-tui` | La interfaz de terminal. |
-| `gitpoulpi` | La interfaz de línea de comandos (`--json` para scripts). Sin subcomando, abre la interfaz. |
-| `gitpoulpi-mcp` | El servidor MCP para agentes de IA. Consulta [MCP y agentes](mcp-and-agents.md). |
-
-Junto a ellos, el archivo contiene `gitpoulpi-launch`, un programa diminuto que ejecutan los accesos directos para mostrar una ventana de GitPoulpi ya abierta (`gitpoulpi launch`). En Windows no tiene ventana de consola, así que un clic nunca hace parpadear una. Se instala, actualiza y elimina junto con los demás.
+Por compatibilidad, el archivo contiene además tres relés pequeños que solo inician `gitpoulpi`: `gitpoulpi-tui` (abre la interfaz; se eliminará en una versión posterior), `gitpoulpi-mcp` (inicia el servidor MCP; se mantiene durante toda la serie 1.x, así que las configuraciones de agentes existentes siguen funcionando) y `gitpoulpi-launch` (lo que ejecutan los accesos directos para mostrar una ventana de GitPoulpi ya abierta, `gitpoulpi launch`; en Windows no tiene ventana de consola, así que un clic nunca hace parpadear una). Todo se instala, actualiza y elimina junto.
 
 ## Qué necesitas
 
@@ -35,9 +29,9 @@ Junto a ellos, el archivo contiene `gitpoulpi-launch`, un programa diminuto que 
 
 Un archivo de release es `gitpoulpi-<version>-<target>.zip` (Windows) o
 `.tar.gz` (Linux, macOS), con un archivo `.sha256` al lado. Comprueba el
-archivo con el `.sha256`, descomprímelo y coloca los tres ejecutables en una
-carpeta de tu `PATH` (mantén `gitpoulpi-updater` y la marca `.gitpoulpi-dist`
-junto a ellos: la marca dice `channel=archive`, para que la compilación pueda
+archivo con el `.sha256`, descomprímelo y coloca sus ejecutables
+(`gitpoulpi`, `gitpoulpi-updater` y los relés `gitpoulpi-tui`, `gitpoulpi-mcp` y `gitpoulpi-launch`) en una
+carpeta de tu `PATH`, junto con la marca `.gitpoulpi-dist` (`gitpoulpi-updater` y la marca deben quedar junto a los demás: la marca dice `channel=archive`, para que la compilación pueda
 actualizarse sola, consulta [Actualizaciones](updates.md)). `INSTALL.txt`, dentro
 del archivo, da los mismos pasos.
 
@@ -96,7 +90,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 ```
 
 Elige el archivo para tu sistema operativo y tu CPU, comprueba su `.sha256`, instala (canal `archive`: GitPoulpi se actualiza en el sitio) en `~/.local/opt/gitpoulpi` y
-enlaza `gitpoulpi` y `gitpoulpi-mcp` en `~/.local/bin`. No hace falta root y no se toca nada fuera de tu carpeta
+enlaza `gitpoulpi` (que abre la interfaz de terminal al ejecutarse sin subcomando) y `gitpoulpi-mcp` (el relé) en `~/.local/bin`. No hace falta root y no se toca nada fuera de tu carpeta
 personal. Sin `--yes`, pregunta por el alias (`gp` por defecto), el PATH y los accesos directos.
 
 | Opción | Efecto |
@@ -125,7 +119,7 @@ Cada canal de abajo escribe la misma marca `.gitpoulpi-dist` junto a los program
 | **apt** (Debian, Ubuntu) | consulta [el repositorio apt](#apt-debian-y-ubuntu) | Repositorio firmado; también se adjunta un `.deb` a cada versión. |
 | **MSI** (Windows, gestionado) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Para administradores: todos los usuarios, sin actualizaciones desde la aplicación. Consulta [Distribución en empresas](enterprise-distribution.md#msi-con-intune-o-directiva-de-grupo). |
 | **cargo** | `cargo binstall gitpoulpi-cli` | Descarga el archivo de la versión en lugar de compilar. |
-| **cargo, desde crates.io** | `cargo install --locked gitpoulpi-cli` | Compila; necesita una toolchain de Rust. Instala `gitpoulpi`, que abre la interfaz de terminal al ejecutarse sin subcomando y también sirve MCP (`gitpoulpi mcp`). `gitpoulpi-tui` y `gitpoulpi-mcp` son los mismos programas como crates independientes. |
+| **cargo, desde crates.io** | `cargo install --locked gitpoulpi-cli` | Compila; necesita una toolchain de Rust. Instala `gitpoulpi`, que abre la interfaz de terminal al ejecutarse sin subcomando y también sirve MCP (`gitpoulpi mcp`). |
 | **cargo, desde el código fuente** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Compila; necesita una toolchain de Rust. |
 | **Docker** | `docker pull poulpilab/gitpoulpi` | Consulta [Ejecutar en Docker](docker.md). |
 
@@ -163,7 +157,7 @@ cargo build --profile dist
 ```
 
 Los scripts `build-opti` de la raíz del repositorio ejecutan esta compilación
-para los tres ejecutables y muestran sus tamaños:
+y muestran los tamaños de los ejecutables:
 
 ```
 ./build-opti.sh                  # Linux, macOS
@@ -181,7 +175,7 @@ cargo run -p xtask -- dist
 
 Esto compila el perfil `dist` y escribe
 `target/dist/gitpoulpi-<version>-<target>.zip` (Windows) o `.tar.gz` (otros
-sistemas). El archivo contiene los tres ejecutables, `INSTALL.txt`,
+sistemas). El archivo contiene los ejecutables, `INSTALL.txt`,
 `README.md`, `LICENSE` y `CHANGELOG.md`. Junto a él se escribe un archivo
 `.sha256`.
 
@@ -209,7 +203,7 @@ Después, sigue [Primeros pasos](getting-started.md).
 `gitpoulpi uninstall` (lo que ejecutan los dos instaladores) quita los alias del comando, las entradas del PATH, los
 accesos directos y las entradas del menú del administrador de archivos (con su clave App Paths en Windows) que creó GitPoulpi y, después, los archivos del programa de una instalación de una versión publicada;
 se niega en una compilación sin la marca `.gitpoulpi-dist` (una compilación con cargo), y `--keep-files` deja los
-archivos del programa. No está disponible para los agentes MCP. Sin instalador, borra los tres ejecutables. GitPoulpi
+archivos del programa. No está disponible para los agentes MCP. Sin instalador, borra los archivos del programa. GitPoulpi
 también conserva estos archivos:
 
 | Qué | Dónde |

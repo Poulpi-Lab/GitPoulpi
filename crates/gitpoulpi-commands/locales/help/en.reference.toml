@@ -258,6 +258,7 @@ lfs = "Git LFS: large files stored outside the repository's history. Needs the `
 "log --range" = "Mermaid: the commits `A..B` (reachable from B, not from A), like `git log A..B`; a bare `A` means `A..HEAD`"
 "log --subject_width" = "Mermaid: cut commit subjects to this many characters. Default: `ui.mermaid_subject_width` (40)"
 "mcp serve --allow_remote" = "Allow `--http` on a non-loopback address. Refused unless `[mcp] http_auth` is on with a token in place and the traffic is encrypted (`[mcp] tls`, or `behind_proxy` for a tunnel or reverse proxy you vouch for); `ssh -L` to a loopback endpoint is safer"
+"mcp serve --bind" = "Address for `--http` (same as `--http ADDR`; wins over it)"
 "mcp serve --http" = "Listen address for streamable HTTP, e.g. 127.0.0.1:8808 (endpoint `/mcp`); without an address, `[mcp] bind` (default 127.0.0.1:8808). Requests need the bearer token (`mcp token`) unless `[mcp] http_auth` is off. Loopback only unless `--allow-remote`"
 "mcp serve --ui_control" = "How far the agent may move the user's window with the `ui_*` tools: `ask` (default: the window shows a chip the user confirms), `auto` or `off`. Overrides `[mcp] ui_control`"
 "mcp token" = "The bearer token of the HTTP endpoint (`mcp serve --http`): shows it masked as JSON `{token_hint, path, rotated}`, creating it on first use. A client sends it as `Authorization: Bearer <token>`. Not an MCP tool: an agent never reads or rotates its own key"

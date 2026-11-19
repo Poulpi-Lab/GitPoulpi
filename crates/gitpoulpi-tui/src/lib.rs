@@ -218,6 +218,7 @@ mod sidebar_layout;
 #[cfg(test)]
 mod source_scan;
 mod sparse_dialog;
+pub mod standalone;
 mod startup_probe;
 mod startup_tab;
 mod status_optimistic;

@@ -16,6 +16,7 @@ pub mod registry;
 pub mod schema;
 pub mod security;
 pub mod server;
+pub mod standalone;
 pub mod update_watch;
 
 use gitpoulpi_config::DefaultBackend;

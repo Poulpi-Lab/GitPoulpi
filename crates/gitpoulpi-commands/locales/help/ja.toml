@@ -254,6 +254,7 @@ lfs = "Git LFS：リポジトリの履歴の外に保存される大きなファ
 "log --range" = "Mermaid：`A..B` のコミット（B から到達でき、A から到達できないもの）。`git log A..B` と同じです。`A` だけなら `A..HEAD` の意味になります"
 "log --subject_width" = "Mermaid：コミットの件名をこの文字数で切り詰めます。既定：`ui.mermaid_subject_width`（40）"
 "mcp serve --allow_remote" = "ループバック以外のアドレスでの `--http` を許可します。`[mcp] http_auth` がオンでトークンがあり、かつ通信が暗号化されている（`[mcp] tls`、または申告に基づくトンネルやリバースプロキシ向けの `behind_proxy`）場合を除き拒否されます。ループバックのエンドポイントへの `ssh -L` のほうが安全です"
+"mcp serve --bind" = "`--http` のアドレス（`--http ADDR` と同じ。こちらが優先されます）"
 "mcp serve --http" = "streamable HTTP の待ち受けアドレス（例：127.0.0.1:8808、エンドポイントは `/mcp`）。アドレスを省略すると `[mcp] bind`（既定は 127.0.0.1:8808）。`[mcp] http_auth` がオフでない限り、リクエストにはベアラートークン（`mcp token`）が必要です。`--allow-remote` を付けない限りループバックのみ"
 "mcp serve --ui_control" = "エージェントが `ui_*` ツールでユーザーのウィンドウをどこまで動かせるか：`ask`（既定：ウィンドウにチップが表示され、ユーザーが承認）、`auto`、または `off`。`[mcp] ui_control` を上書きします"
 "mcp token" = "HTTP エンドポイント（`mcp serve --http`）のベアラートークン：初回はトークンを作成し、マスクした状態で JSON `{token_hint, path, rotated}` として表示します。クライアントは `Authorization: Bearer <token>` として送ります。MCP ツールではありません。エージェントが自分のキーを読んだり再発行したりすることはありません"

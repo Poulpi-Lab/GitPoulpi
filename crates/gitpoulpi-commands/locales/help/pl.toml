@@ -254,6 +254,7 @@ lfs = "Git LFS: duże pliki przechowywane poza historią repozytorium. Wymaga pr
 "log --range" = "Mermaid: commity `A..B` (osiągalne z B, nie z A), jak `git log A..B`; samo `A` oznacza `A..HEAD`"
 "log --subject_width" = "Mermaid: przycina opisy commitów do tylu znaków. Domyślnie: `ui.mermaid_subject_width` (40)"
 "mcp serve --allow_remote" = "Zezwala na `--http` pod adresem innym niż pętla zwrotna. Odmowa, chyba że `[mcp] http_auth` jest włączone i token istnieje, a ruch jest szyfrowany (`[mcp] tls`, albo `behind_proxy` dla tunelu lub zwrotnego proxy, za które ręczysz); bezpieczniejsze jest `ssh -L` do punktu końcowego na pętli zwrotnej"
+"mcp serve --bind" = "Adres dla `--http` (to samo co `--http ADDR`; ma pierwszeństwo przed nim)"
 "mcp serve --http" = "Adres nasłuchu dla streamable HTTP, np. 127.0.0.1:8808 (punkt końcowy `/mcp`); bez adresu `[mcp] bind` (domyślnie 127.0.0.1:8808). Żądania wymagają tokenu bearer (`mcp token`), chyba że `[mcp] http_auth` jest wyłączone. Tylko pętla zwrotna, chyba że `--allow-remote`"
 "mcp serve --ui_control" = "Jak daleko agent może poruszać oknem użytkownika narzędziami `ui_*`: `ask` (domyślnie: okno pokazuje chip, który użytkownik potwierdza), `auto` lub `off`. Nadpisuje `[mcp] ui_control`"
 "mcp token" = "Token bearer punktu końcowego HTTP (`mcp serve --http`): pokazuje go zamaskowany jako JSON `{token_hint, path, rotated}`, tworząc go przy pierwszym użyciu. Klient wysyła go jako `Authorization: Bearer <token>`. To nie jest narzędzie MCP: agent nigdy nie odczytuje ani nie wymienia własnego klucza"

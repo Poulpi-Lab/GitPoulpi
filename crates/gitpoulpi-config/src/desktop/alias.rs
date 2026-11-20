@@ -90,6 +90,8 @@ pub struct Env {
     pub path_var: Option<OsString>,
     /// Windows `PATHEXT`.
     pub pathext: Option<String>,
+    /// Who writes (owner tag, names). Not read yet.
+    pub ctx: super::InstallCtx,
 }
 
 impl Env {
@@ -115,6 +117,7 @@ impl Env {
             newest: false,
             path_var: env("PATH").map(OsString::from),
             pathext: env("PATHEXT"),
+            ctx: super::InstallCtx::legacy(),
         }
     }
 
@@ -595,6 +598,7 @@ mod tests {
             newest: false,
             path_var: None,
             pathext: None,
+            ctx: crate::desktop::InstallCtx::legacy(),
         }
     }
 

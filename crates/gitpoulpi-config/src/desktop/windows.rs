@@ -762,6 +762,7 @@ mod tests {
             launch_exe: None,
             newest: false,
             icons,
+            ctx: crate::desktop::InstallCtx::legacy_ref(),
             refresh_icon_cache: false,
         }
     }

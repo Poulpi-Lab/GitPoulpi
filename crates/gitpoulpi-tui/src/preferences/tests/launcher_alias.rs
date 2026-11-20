@@ -31,6 +31,7 @@ fn machine(root: &Path, path_var: &str) -> Machine {
         newest: false,
         path_var: Some(path_var.into()),
         pathext: None,
+        ctx: gitpoulpi_config::desktop::InstallCtx::legacy(),
     };
     let path = user_path::Env {
         os: Os::Linux,

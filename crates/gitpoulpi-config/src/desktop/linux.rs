@@ -343,6 +343,7 @@ mod tests {
             terminal_exe: None,
             launch_exe: None,
             icons,
+            ctx: crate::desktop::InstallCtx::legacy_ref(),
             refresh_icon_cache: false,
             newest: false,
         }

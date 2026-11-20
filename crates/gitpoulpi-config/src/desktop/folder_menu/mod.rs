@@ -125,6 +125,8 @@ pub struct Env {
     pub icon_png: Option<Vec<u8>>,
     /// Run the cache refreshers (`gtk-update-icon-cache`, `pbs`). Off in tests.
     pub refresh_hooks: bool,
+    /// Who writes (owner tag, entry names). Not read yet.
+    pub ctx: super::InstallCtx,
 }
 
 impl Env {
@@ -149,6 +151,7 @@ impl Env {
             registry,
             icon_png: None,
             refresh_hooks: false,
+            ctx: crate::desktop::InstallCtx::legacy(),
         }
     }
 

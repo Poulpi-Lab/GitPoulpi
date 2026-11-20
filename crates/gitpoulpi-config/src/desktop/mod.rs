@@ -17,6 +17,7 @@ pub mod folder_menu;
 pub mod icons;
 mod linux;
 mod macos;
+pub mod owner;
 pub mod path;
 pub mod registry;
 pub mod terminals;
@@ -33,6 +34,95 @@ use crate::open_in::Os;
 
 /// Written into everything we create; its presence is what allows removal.
 pub const MARKER: &str = "X-GitPoulpi=1";
+
+/// The owner tag: `X-GitPoulpi-Install=<id>` names the installation an
+/// artifact belongs to ([`owner::decide`]). Only the primary also writes the
+/// legacy [`MARKER`], the one old builds look for.
+pub const OWNER_TAG: &str = "X-GitPoulpi-Install";
+
+/// Another installation known from the config, and whether its exe is still there.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KnownInstall {
+    pub id: String,
+    pub exists: bool,
+}
+
+/// Who is writing: the running installation, as the artifact writers and
+/// [`owner::decide`] need it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InstallCtx {
+    /// The installation id ([`crate::installation::Identity::id`]).
+    pub id: String,
+    /// `i<8hex>`, for file names, classes and GTK ids.
+    pub short: String,
+    /// The launcher name.
+    pub name: String,
+    /// The id of the primary installation, `None` while nobody is.
+    pub primary: Option<String>,
+    /// Every installation of the config.
+    pub known: Vec<KnownInstall>,
+}
+
+impl InstallCtx {
+    /// Today's behaviour: the running installation is the only one and owns
+    /// the legacy names. What the writers still assume until later slices
+    /// switch them over.
+    pub fn sole(identity: &crate::installation::Identity) -> Self {
+        Self {
+            id: identity.id.clone(),
+            short: identity.short(),
+            name: crate::installation::PRIMARY_NAME.to_string(),
+            primary: Some(identity.id.clone()),
+            known: Vec::new(),
+        }
+    }
+
+    /// [`InstallCtx::sole`] without an identity (tests, fakes).
+    pub fn legacy() -> Self {
+        Self::sole(&crate::installation::Identity {
+            id: String::new(),
+            kind: crate::Kind::default(),
+            root: String::new(),
+            channel: None,
+        })
+    }
+
+    /// One shared [`InstallCtx::legacy`], for a `Request` that must borrow it.
+    pub fn legacy_ref() -> &'static InstallCtx {
+        static LEGACY: std::sync::OnceLock<InstallCtx> = std::sync::OnceLock::new();
+        LEGACY.get_or_init(InstallCtx::legacy)
+    }
+
+    /// From the config: the effective name, the primary and every entry;
+    /// `exists(path)` tells whether an installation's folder is still there.
+    pub fn from_config(
+        config: &crate::Config,
+        identity: &crate::installation::Identity,
+        exists: &dyn Fn(&str) -> bool,
+    ) -> Self {
+        let eff = crate::installation::effective(config, identity);
+        Self {
+            id: identity.id.clone(),
+            short: identity.short(),
+            name: eff.name,
+            primary: config.installation.primary.clone(),
+            known: config
+                .installation
+                .settings
+                .iter()
+                .map(|(id, e)| KnownInstall {
+                    id: id.clone(),
+                    exists: exists(&e.path),
+                })
+                .collect(),
+        }
+    }
+
+    /// Is the running installation the primary?
+    pub fn is_primary(&self) -> bool {
+        self.primary.as_deref() == Some(self.id.as_str())
+    }
+}
 
 /// Where a shortcut goes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -196,6 +286,8 @@ pub struct Request<'a> {
     /// newest build. `launch` swaps in the newest build again at click time.
     pub newest: bool,
     pub icons: &'a IconSet,
+    /// Who writes (names, tags, classes). Not read by the writers yet.
+    pub ctx: &'a InstallCtx,
     /// Linux: run `gtk-update-icon-cache` after writing the icon. Off in tests.
     pub refresh_icon_cache: bool,
 }
@@ -296,7 +388,7 @@ pub fn sync_pinned(dirs: &Dirs, req: &Request) -> bool {
 }
 
 /// Deletes the shortcut if it is ours. `Ok(false)`: there was none.
-pub fn remove(place: Place, dirs: &Dirs, os: Os) -> Result<bool, String> {
+pub fn remove(place: Place, dirs: &Dirs, os: Os, _ctx: &InstallCtx) -> Result<bool, String> {
     match os {
         Os::Linux => linux::remove(place, dirs),
         Os::Windows => windows::remove(place, dirs),
@@ -434,6 +526,7 @@ mod tests {
             launch_exe: Some(launch),
             newest,
             icons,
+            ctx: InstallCtx::legacy_ref(),
             refresh_icon_cache: false,
         };
         let leak = |p: &PathBuf| -> &'static Path { Box::leak(p.clone().into_boxed_path()) };

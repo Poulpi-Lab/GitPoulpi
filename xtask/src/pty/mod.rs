@@ -475,6 +475,11 @@ impl Terminal {
         // starts refuse non-loopback hosts (`gitpoulpi_hosting::http::
         // external_host_refusal`) unless the live-test switch is set.
         cmd.env("GITPOULPI_BLOCK_EXTERNAL_HOSTS", "1");
+        // Without a pinned identity the debug binary is a dev checkout
+        // installation (yellow octopus, "(dev)" names) and every colour and
+        // name assertion would change. A pinned id is a plain installation;
+        // a test about installations overrides it with `.env(..)`.
+        cmd.env("GITPOULPI_INSTALL_ID", "pty");
         // Tests never touch the developer's real user state: when the child
         // has its own config dir, its home, app-data folders and global git
         // config (and with it the credential helper) live inside it.

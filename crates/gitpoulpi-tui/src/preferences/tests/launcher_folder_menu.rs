@@ -23,6 +23,7 @@ fn menu_env(root: &Path, helper: bool, present: &'static [&'static str]) -> Menu
         registry: Arc::new(MemoryRegistry::new()),
         icon_png: Some(vec![1, 2, 3]),
         refresh_hooks: false,
+        ctx: gitpoulpi_config::desktop::InstallCtx::legacy(),
     }
 }
 

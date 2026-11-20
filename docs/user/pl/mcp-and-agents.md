@@ -66,6 +66,16 @@ gitpoulpi mcp serve --http 127.0.0.1:9000    # lub: --bind 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
+Jeden serwer MCP HTTP na port. Kilka instalacji GitPoulpi może działać obok
+siebie i wszystkie domyślnie używają `127.0.0.1:8808`, więc druga, która startuje
+na zajętym porcie, odmawia z `address already in use` (sama nigdy nie wybiera
+innego portu) i kończy się błędem. Każda instalacja używa własnego adresu MCP,
+jeśli go ma (`gitpoulpi installation set mcp_bind HOST:PORT`), w przeciwnym razie
+`[mcp] bind`. Aby wybrać inny port, użyj Ustawienia > Agenci i MCP > *Zaproponuj
+wolny port* (lub polecenia palety *MCP: Zaproponuj wolny port*): znajduje wolny
+port na tym samym hoście i zapisuje go jako adres MCP tej instalacji. Stdio nie
+jest dotknięte.
+
 Bezstanowy JSON, te same narzędzia, te same bramki `[mcp]`. Każde żądanie wymaga
 tokenu bearer (`[mcp] http_auth`, domyślnie włączone): wypisz go przez `gitpoulpi mcp token
 --show` (albo `--copy`, `--rotate`; token leży w pliku dostępnym tylko dla użytkownika w

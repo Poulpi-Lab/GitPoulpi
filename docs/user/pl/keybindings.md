@@ -1243,7 +1243,7 @@ zastosowania. Klawisze są domyślne.
 | Uruchamianie: Usuń skróty |  |
 | Uruchamianie: Utwórz alias polecenia |  |
 | Uruchamianie: Usuń alias polecenia |  |
-| MCP: Suggest a free port |  |
+| MCP: Zaproponuj wolny port |  |
 | Uruchamianie: Dodaj do PATH |  |
 | Uruchamianie: Usuń z PATH |  |
 | Uruchamianie: Zainstaluj menu Otwórz w GitPoulpi |  |

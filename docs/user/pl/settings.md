@@ -190,6 +190,22 @@ a `Esc` przywraca poprzedni.
 Strona **Uruchamianie z systemu** (`gitpoulpi ui show settings launcher`) tworzy skrót, który uruchamia GitPoulpi
 z menu aplikacji systemu, w wybranym terminalu.
 
+**Ta instalacja** (pierwsza grupa strony). Każde GitPoulpi na komputerze (repozytorium deweloperskie, pakiet, kopia przenośna) ma własną nazwę programu uruchamiającego, kolor, aliasy i wpis menu folderów, zapisane we własnej tabeli `[installation.settings.<id>]` pliku `config.toml`; zmiana tutaj nigdy nie dotyka innej instalacji. Nic z tego nie trafia do dziennika cofania (to integracja z systemem; drogą powrotu jest **Usuń**).
+
+| Wiersz | Co robi |
+|---|---|
+| **Instalacja** | Tylko do odczytu: rodzaj, folder i środowisko tej instalacji. Na wąskiej stronie folder jest skracany w środku wielokropkiem; pełny tekst jest w wierszu pomocy pod pozycją. |
+| **Nazwa programu uruchamiającego** | Nazwa skrótów tej instalacji i jej wpisu w menu folderów. Odrzucana, gdy ma ją inna instalacja, która nadal istnieje. Instalacja główna zawsze nazywa się `GitPoulpi`. |
+| **Dodaj wersję do nazwy programu uruchamiającego** | Dodaje `<główna>.<podrzędna>` do nazwy (`GitPoulpi 1.2`); domyślnie wyłączone, bo skróty są zmieniane przy każdej aktualizacji. |
+| **Kolor ośmiornicy** | Kolor ośmiornicy tej instalacji i jej skrótów (te same wybory co w oknie O programie). |
+| **Zostań instalacją główną** | Instalacja główna ma nazwę `GitPoulpi` bez dopisków, starsze skróty i klucze `ui.*` odczytywane przez starsze wersje; domyślnie nikt nią nie jest. Pyta najpierw, gdy inna instalacja już jest główna. Poprzednia instalacja główna zachowuje skróty pod własną nazwą (Windows i Linux). |
+| **Środowisko** | Instalacje jednego środowiska współdzielą okna, demony i historię cofania; domyślnie jest to środowisko własne instalacji. Zmiana wymaga ponownego uruchomienia otwartych okien tej instalacji. |
+| **Podmenu menu folderów** | Grupuje wpis menu folderów w podmenu o tej nazwie; instalacje o tej samej nazwie współdzielą jedno. Niedostępne w macOS; Nemo i Thunar zawsze pokazują wpis na najwyższym poziomie. |
+| **Inna: \<nazwa\>** | Pozostałe instalacje na tym komputerze. Ta, której folder zniknął, ma przycisk **Zapomnij** (pyta najpierw), który usuwa jej wpis oraz skróty, aliasy i wpisy menu folderów, które po niej zostały. |
+| **Starsze skróty** | Dopóki nikt nie jest instalacją główną, skróty utworzone przez starszą wersję pod nazwą bez dopisków są wymienione z przyciskami **Zostań instalacją główną** i **Usuń starsze skróty** (pyta najpierw). Jednorazowa uwaga w wierszu stanu wskazuje to miejsce. |
+
+Paleta ma **Uruchamianie: Zostań instalacją główną**, **Uruchamianie: Usuń starsze skróty** i **Uruchamianie: Zapomnij usunięte instalacje**, a każdy wiersz jest wpisem `Ustawienia:`. Wiersze aliasów poniżej należą do tej instalacji (dla repozytorium deweloperskiego sugerowane są `gpd` i `gpda`); alias utworzony przez inną instalację ma opis **Używany przez: \<nazwa\>** i nie można go tu utworzyć.
+
 | Wiersz | Co robi |
 |---|---|
 | **Terminal dla skrótów** | `ui.launch_terminal`: **Automatycznie**, **Domyślny systemu** lub jeden z terminali znalezionych na tym komputerze (to samo wykrywanie co w **Otwórz w**). Automatycznie: Windows Terminal w Windows (w przeciwnym razie WezTerm, Alacritty, zwykła konsola), `xdg-terminal-exec` w Linuksie (Omarchy; w przeciwnym razie pierwszy znaleziony terminal), Terminal w macOS, chyba że zainstalowano iTerm2, Ghostty, WezTerm lub kitty. |

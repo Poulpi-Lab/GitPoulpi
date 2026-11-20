@@ -29,3 +29,6 @@ gitpoulpi-cli::shim::the_exit_code_passes_through
 gitpoulpi-tui::pty_diff_cjk::the_split_separator_is_on_one_column_with_japanese_text
 gitpoulpi-tui::pty_diff_cjk::the_split_separator_is_on_one_column_in_a_narrow_terminal
 gitpoulpi-cli::shim::the_tui_stub_answers_version_like_the_tui
+gitpoulpi-tui::pty_file_menu::stash_file_stashes_only_that_file
+gitpoulpi-tui::pty_file_pane::a_file_open_in_the_editor_blocks_the_conversion_and_nothing_is_written
+gitpoulpi-tui::pty_image_edit_in::a_working_tree_picture_is_edited_in_place_from_the_file_menu

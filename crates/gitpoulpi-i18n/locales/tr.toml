@@ -6014,7 +6014,7 @@ installation_help = "Bunun hangi GitPoulpi olduğu: nasıl kurulduğu, nerede du
 # context: value of the Installation row; {kind} is the install kind (dev, portable...), {path} its folder, {env} the environment name
 installation_info = "{kind}, {path}, ortam {env}"
 # context: end of the help line of the Installation row, which shows the whole folder when the value is cut; {path} is the install folder
-installation_folder = "Folder: {path}"
+installation_folder = "Klasör: {path}"
 name = "Başlatıcı adı"
 name_help = "Bu kurulumun kısayollarının ve dosya yöneticisi menüsündeki girdisinin adı. Yalnızca bu kurulumun adı değişir."
 name_primary = "birincil kurulumun adı her zaman GitPoulpi'dir"
@@ -9182,17 +9182,17 @@ token_failed = "Erişim token'ı saklanamadı: {reason}"
 # context: status line when there is no access token to show or copy
 token_missing = "Henüz erişim token'ı yok."
 # context: button in Settings > Agents & MCP under the MCP server port; looks for a port nobody listens on and saves it. Width budget: 24 cells
-suggest_port = "Suggest a free port"
+suggest_port = "Boş port öner"
 # context: help under the suggest-a-free-port button
-suggest_port_help = "Several GitPoulpi installations default to the same MCP port, and only one MCP HTTP server can use a port: a second one refuses to start. This looks for a free port on the same host address and saves it as this installation's MCP bind."
+suggest_port_help = "Birden çok GitPoulpi kurulumu varsayılan olarak aynı MCP portunu kullanır, oysa bir portu yalnızca tek bir MCP HTTP sunucusu kullanabilir: ikincisi başlamayı reddeder. Bu düğme aynı ana makine adresinde boş bir port arar ve onu bu kurulumun MCP bind adresi olarak kaydeder."
 # context: status line while the free port is being looked for
-suggest_port_working = "Looking for a free port..."
+suggest_port_working = "Boş port aranıyor..."
 # context: status line after a free port was saved; {bind} is a host address and port such as 127.0.0.1:8809
-suggested = "MCP bind set to {bind}. It applies the next time the server starts."
+suggested = "MCP bind adresi {bind} olarak ayarlandı. Sunucu bir sonraki başlatıldığında uygulanır."
 # context: status line when no free port was found
-suggest_port_failed = "Could not find a free port on that address."
+suggest_port_failed = "Bu adreste boş bir port bulunamadı."
 # context: command palette entry: opens Settings > Agents & MCP and suggests a free MCP port
-palette_suggest_port = "MCP: Suggest a free port"
+palette_suggest_port = "MCP: Boş Bir Port Öner"
 # context: label of a choice in Settings > Agents & MCP: how the MCP HTTP endpoint is encrypted (TLS)
 tls = "TLS"
 # context: help under the TLS choice

@@ -422,7 +422,8 @@ punkt końcowy HTTP. Wiersze MCP są widoczne tylko w kompilacjach zawierającyc
 | Opcja | Działanie |
 |---|---|
 | **Serwer MCP** | Włączone (domyślnie): agent może uruchomić serwer (`gitpoulpi mcp serve`). Wyłączone: odmawia startu. Zapisywane jako `mcp.enabled`. Zmiana działa od następnego uruchomienia serwera przez agenta; już działający serwer zachowuje swoje ustawienia. |
-| **Port serwera MCP** | Port, na którym nasłuchuje `--http`, gdy nie podano adresu, od 1 do 65535 (domyślnie 8808). Zapisywany w porcie `mcp.bind`; część hosta zostaje (`127.0.0.1`, gdy pusta). Działa od następnego uruchomienia serwera przez agenta. |
+| **Port serwera MCP** | Port, na którym nasłuchuje `--http`, gdy nie podano adresu, od 1 do 65535 (domyślnie 8808). Zapisywany w porcie `mcp.bind`; część hosta zostaje (`127.0.0.1`, gdy pusta). Działa od następnego uruchomienia serwera przez agenta. Instalacja z własnym adresem MCP edytuje właśnie ten adres. |
+| **Zaproponuj wolny port** | Szuka wolnego portu na tym samym adresie hosta i zapisuje go jako adres MCP tej instalacji (`mcp.bind` dla instalacji głównej bez nadpisania). Na port przypada jeden serwer MCP HTTP: druga instalacja na zajętym porcie odmawia startu, więc użyj tego, aby wybrać inny. Dostępne też w palecie jako *MCP: Zaproponuj wolny port*. |
 | **Pozwól agentom AI sterować widokiem** | Pozwala agentom pokazać w tym oknie commit, plik lub powiadomienie (`ui show`). Wyłączone: żaden agent nie sięga do okna. |
 | **Pozwól agentom AI proponować zmiany do mojego potwierdzenia** | Pozwala agentom otwierać wstępnie wypełnione okna Reword, commit, gałęzi lub tagu, które potwierdzasz. Domyślnie wyłączone. Zob. [MCP i agenci](mcp-and-agents.md#uprawnienia). |
 | **Otwórz okno dla agentów**, **Polecenie uruchomienia (custom)** | Czy agent może otworzyć okno GitPoulpi, gdy żadne nie jest otwarte, i w jakim terminalu lub multiplekserze. Domyślnie wyłączone. |

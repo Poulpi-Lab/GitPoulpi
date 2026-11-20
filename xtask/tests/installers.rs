@@ -766,6 +766,89 @@ fn the_apt_repository_script_signs_and_keeps_five_versions() {
 }
 
 #[test]
+fn the_chocolatey_nuspec_never_uses_raw_hosts_and_pins_the_icon_to_the_commit() {
+    let nuspec = read("packaging/chocolatey/gitpoulpi.nuspec");
+    // Only the XML after the header comment counts (the comment names the forbidden host).
+    let body = &nuspec[nuspec.find("<package").unwrap()..];
+    assert!(
+        !body.contains("githubusercontent"),
+        "moderation rejects raw hosts"
+    );
+    let icon = body
+        .split("<iconUrl>")
+        .nth(1)
+        .and_then(|s| s.split("</iconUrl>").next())
+        .unwrap();
+    assert_eq!(
+        icon,
+        "https://cdn.jsdelivr.net/gh/Poulpi-Lab/GitPoulpi@@COMMIT@/assets/logo/gitpoulpi-512.png"
+    );
+    for tag in [
+        "packageSourceUrl",
+        "projectSourceUrl",
+        "projectUrl",
+        "docsUrl",
+        "licenseUrl",
+    ] {
+        assert!(
+            body.contains(&format!("<{tag}>https://github.com/Poulpi-Lab/GitPoulpi")),
+            "{tag}"
+        );
+    }
+    assert!(read("packaging/fill-templates.sh").contains("\"COMMIT=$commit\""));
+    assert!(read(".github/workflows/release.yml")
+        .contains("COMMIT=$(git rev-parse HEAD) sh packaging/fill-templates.sh"));
+}
+
+#[test]
+fn filling_the_templates_leaves_no_placeholder_and_pins_the_commit() {
+    let dir = std::env::temp_dir().join(format!("gp-fill-{}", std::process::id()));
+    let dist = dir.join("dist");
+    std::fs::create_dir_all(&dist).unwrap();
+    let v = "1.2.3";
+    for t in [
+        "x86_64-pc-windows-msvc-setup.exe",
+        "x86_64-pc-windows-msvc.zip",
+        "aarch64-apple-darwin.tar.gz",
+        "x86_64-apple-darwin.tar.gz",
+        "x86_64-unknown-linux-gnu.tar.gz",
+        "aarch64-unknown-linux-gnu.tar.gz",
+    ] {
+        std::fs::write(
+            dist.join(format!("gitpoulpi-{v}-{t}.sha256")),
+            format!("{} file\n", "ab".repeat(32)),
+        )
+        .unwrap();
+    }
+    let sha = "0123456789abcdef0123456789abcdef01234567";
+    let run = |commit: &str| {
+        std::process::Command::new("sh")
+            .arg(root().join("packaging/fill-templates.sh"))
+            .arg(v)
+            .arg(&dist)
+            .arg(dir.join("out"))
+            .env("SOURCE_SHA256", "cd".repeat(32))
+            .env("COMMIT", commit)
+            .output()
+            .unwrap()
+    };
+    let ok = run(sha);
+    assert!(
+        ok.status.success(),
+        "{}",
+        String::from_utf8_lossy(&ok.stderr)
+    );
+    let filled = std::fs::read_to_string(dir.join("out/chocolatey/gitpoulpi.nuspec")).unwrap();
+    assert!(filled.contains(&format!("GitPoulpi@{sha}/assets/logo/gitpoulpi-512.png")));
+    assert!(!filled.contains("@COMMIT@"));
+    // A COMMIT that is not a full sha fails clearly.
+    let bad = run("main");
+    assert!(!bad.status.success());
+    assert!(String::from_utf8_lossy(&bad.stderr).contains("COMMIT"));
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
 fn the_packaging_files_hold_no_em_dash() {
     for file in [
         ".github/workflows/release.yml",

@@ -62,6 +62,14 @@ The owner creates them in the repository settings. Signing keys and accounts bel
 
 `komac update` needs the package to exist in `microsoft/winget-pkgs`. Submit the first version yourself (the three manifests of `packaging/winget/`, filled in, as a pull request from the fork), wait for it to be merged, set the variable `PUBLISH_WINGET` to `true`, and from then on the `winget` job opens one pull request per release. An App installation token may be refused for cross-repository pull requests to `microsoft/winget-pkgs`; the fallback is a token of a dedicated Poulpi-Lab machine account, an owner decision.
 
+## Chocolatey moderation
+
+Rules the community moderators enforced, all pinned by `xtask/tests/installers.rs`:
+
+- No `raw.githubusercontent.com` URL in the nuspec. `<iconUrl>` is the logo on jsDelivr pinned to the release commit, `https://cdn.jsdelivr.net/gh/Poulpi-Lab/GitPoulpi@<full sha>/assets/logo/gitpoulpi-512.png`; `packaging/fill-templates.sh` fills `@COMMIT@` from `COMMIT` or `git rev-parse HEAD` (the `chocolatey` job checks out the tag, so that is the tag commit). A branch name instead of a sha would let the icon change under a published version.
+- `packageSourceUrl` and `projectSourceUrl` are required and must point at the source.
+- A published version cannot be edited. After a moderator request, resubmit the same version from its tag: `gh workflow run chocolatey-repush.yml -f tag=releases/vX.Y.Z -f dry_run=true` (pack only, nupkg as artifact), then the same without `dry_run`. It packs from the tag's own templates with the released `.sha256` files, so for a tag older than a template fix the workflow rewrites the field itself (today only a raw `iconUrl`); any other fix needs a rewrite added there.
+
 ## The Docker Hub overview comes from the repository
 
 `packaging/docker/README.md` is the Docker Hub page. The `docker` job pushes it on every release (`peter-evans/dockerhub-description`), replacing whatever is there, so it is never edited on Docker Hub. The test `xtask/tests/installers.rs` keeps it under Docker Hub's 25,000-byte limit, free of relative links (they break there), and pins the short description (at most 100 characters) and the image name `DOCKER_IMAGE` in `crates/gitpoulpi-config/src/release.rs`. A namespace change is that constant, the workflow and the README.

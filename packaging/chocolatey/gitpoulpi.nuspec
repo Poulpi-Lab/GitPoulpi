@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Template filled at release time, see the release-and-packaging design ("Chocolatey").
-  packaging/fill-templates.sh fills the version and checksum placeholders here and in tools/chocolateyinstall.ps1; then
+  Moderation rules: no raw.githubusercontent.com URL anywhere (the icon is on jsDelivr, pinned to the tag
+  commit through @COMMIT@), packageSourceUrl and projectSourceUrl are required. docs/developer/releasing.md.
+  packaging/fill-templates.sh fills the version, commit and checksum placeholders here and in tools/chocolateyinstall.ps1; then
   `choco pack` in this folder and `choco install gitpoulpi -s . -y` in a VM before `choco push`.
   The package downloads the release's Inno Setup installer; it embeds no binary, so no VERIFICATION.txt
   is needed. Uninstall goes through Chocolatey's automatic uninstaller (the installer's registry entry).
@@ -20,7 +22,7 @@
     <docsUrl>https://github.com/Poulpi-Lab/GitPoulpi/blob/main/docs/user/README.md</docsUrl>
     <licenseUrl>https://github.com/Poulpi-Lab/GitPoulpi/blob/main/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <iconUrl>https://raw.githubusercontent.com/Poulpi-Lab/GitPoulpi/main/assets/logo/gitpoulpi-512.png</iconUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/Poulpi-Lab/GitPoulpi@@COMMIT@/assets/logo/gitpoulpi-512.png</iconUrl>
     <tags>git tui terminal version-control cli mcp</tags>
     <summary>Git client for the terminal with a clickable commit graph, a CLI and an MCP server.</summary>
     <description>GitPoulpi is a Git client for the terminal that feels like a desktop app: a commit graph you can click, drag and right-click, a command palette that reaches every feature, pull and merge requests and issues from the main code hosts and issue trackers, and the same operations as a scriptable CLI and an MCP server for AI agents. It needs a system git.</description>

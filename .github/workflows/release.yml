@@ -442,7 +442,9 @@ jobs:
       - name: Fill the templates
         if: env.HAS == 'true' || inputs.dry_run
         shell: bash
-        run: sh packaging/fill-templates.sh "$VERSION" dist filled
+        run: |
+          # The job checked out the tag: HEAD is the tag commit, which the nuspec pins the jsDelivr icon URL to.
+          COMMIT=$(git rev-parse HEAD) sh packaging/fill-templates.sh "$VERSION" dist filled
       # Dry run: the package is built, never pushed.
       - name: Pack
         if: env.HAS == 'true' || inputs.dry_run

@@ -2,9 +2,10 @@ name: Chocolatey repush
 
 # Re-pushes the Chocolatey package of an already published release, with the same version, when the community
 # moderators ask for a metadata fix and a resubmission of that version. The package is built from the release's own
-# tag and its published .sha256 files, so the installer URL and checksum stay exactly as released. The one rewrite:
-# an iconUrl on raw.githubusercontent.com (not allowed by Chocolatey) becomes the same file on jsDelivr, pinned to
-# the tag's commit. Later changes on main are never part of the repushed package.
+# tag and its published .sha256 files, so the installer URL and checksum stay exactly as released. The one rewrite,
+# only for tags older than the jsDelivr template: an iconUrl on raw.githubusercontent.com (not allowed by
+# Chocolatey) becomes the same file on jsDelivr, pinned to the tag's commit (newer tags already have it).
+# Later changes on main are never part of the repushed package.
 #
 #   gh workflow run chocolatey-repush.yml -f tag=releases/v1.0.0 -f dry_run=true   # pack only, nupkg as artifact
 #   gh workflow run chocolatey-repush.yml -f tag=releases/v1.0.0                   # pack and push
@@ -46,9 +47,9 @@ jobs:
         run: |
           version="${TAG#releases/v}"
           echo "VERSION=$version" >> "$GITHUB_ENV"
-          sh packaging/fill-templates.sh "$version" dist filled
           nuspec=filled/chocolatey/gitpoulpi.nuspec
           commit=$(git rev-parse HEAD)
+          COMMIT="$commit" sh packaging/fill-templates.sh "$version" dist filled
           sed -i "s|<iconUrl>https://raw.githubusercontent.com/[^<]*/\(assets/[^<]*\)</iconUrl>|<iconUrl>https://cdn.jsdelivr.net/gh/${GITHUB_REPOSITORY}@${commit}/\1</iconUrl>|" "$nuspec"
           grep -q 'raw.githubusercontent.com' "$nuspec" && { echo "::error::iconUrl still on raw.githubusercontent.com"; exit 1; }
           cat "$nuspec"

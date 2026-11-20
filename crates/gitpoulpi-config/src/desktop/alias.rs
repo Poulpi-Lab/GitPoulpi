@@ -1088,7 +1088,10 @@ mod tests {
         let reg = MemoryRegistry::new();
         create(&mine, "gpm").unwrap();
         remove_all_with_app_paths(&mine, &reg).unwrap();
-        assert!(!parent.exists(), "the empty parent goes with the bin folder");
+        assert!(
+            !parent.exists(),
+            "the empty parent goes with the bin folder"
+        );
         assert!(tmp.path().join("Programs").exists(), "only our own folders");
         // A file of an installer next to `bin`: both stay.
         create(&mine, "gpm").unwrap();

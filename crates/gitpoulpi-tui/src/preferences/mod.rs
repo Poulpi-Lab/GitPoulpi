@@ -713,10 +713,7 @@ impl PreferencesState {
     /// (the poll that applies the answer runs in a frame) is never left for
     /// the next key press.
     fn launcher_jobs_running(&self) -> bool {
-        self.launcher.busy()
-            || self.tools.busy()
-            || self.folder_menu.busy()
-            || self.install.busy()
+        self.launcher.busy() || self.tools.busy() || self.folder_menu.busy() || self.install.busy()
     }
 
     /// A spinner is on screen: the render loop keeps drawing.

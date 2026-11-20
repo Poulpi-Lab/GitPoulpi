@@ -236,7 +236,8 @@ impl PreferencesState {
             PrefAction::McpSecurity(McpButton::SuggestPort),
         );
         btn.enabled = self.mcp_sec.suggest.is_none();
-        let mut field = Field::buttons(t::SUGGEST_PORT.get(), vec![btn]).with_help(t::SUGGEST_PORT_HELP.get());
+        let mut field =
+            Field::buttons(t::SUGGEST_PORT.get(), vec![btn]).with_help(t::SUGGEST_PORT_HELP.get());
         field.target = Target::Global("mcp.suggest_port");
         field
     }

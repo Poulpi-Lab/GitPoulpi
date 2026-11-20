@@ -388,11 +388,11 @@ pub fn sync_pinned(dirs: &Dirs, req: &Request) -> bool {
 }
 
 /// Deletes the shortcut if it is ours. `Ok(false)`: there was none.
-pub fn remove(place: Place, dirs: &Dirs, os: Os, _ctx: &InstallCtx) -> Result<bool, String> {
+pub fn remove(place: Place, dirs: &Dirs, os: Os, ctx: &InstallCtx) -> Result<bool, String> {
     match os {
-        Os::Linux => linux::remove(place, dirs),
+        Os::Linux => linux::remove(place, dirs, ctx),
         Os::Windows => windows::remove(place, dirs),
-        Os::Macos => macos::remove(place, dirs),
+        Os::Macos => macos::remove(place, dirs, ctx),
     }
 }
 
@@ -412,7 +412,7 @@ pub fn refresh_icon(dirs: &Dirs, req: &Request) -> Result<(), String> {
         Os::Windows => windows::refresh_icon(dirs, req),
         Os::Macos => {
             macos::write_icon(dirs, req)?;
-            macos::touch_bundle(dirs);
+            macos::touch_bundle(dirs, req.ctx);
             Ok(())
         }
     }

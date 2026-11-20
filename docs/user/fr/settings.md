@@ -192,6 +192,22 @@ direct ; `Enter` la garde et `Esc` rétablit la précédente.
 La page **Lanceur** (`gitpoulpi ui show settings launcher`) crée un raccourci qui démarre
 GitPoulpi depuis le lanceur du système, dans le terminal de votre choix.
 
+**Cette installation** (premier groupe de la page). Chaque GitPoulpi d'une machine (un dépôt de développement, un paquet, une copie portable) a son propre nom de lanceur, sa couleur, ses alias et son entrée de menu de dossier, conservés dans sa propre table `[installation.settings.<id>]` de `config.toml` ; modifier l'un ici ne touche jamais une autre installation. Rien de tout cela n'est journalisé (c'est de l'intégration au système ; **Supprimer** est le moyen de revenir en arrière).
+
+| Ligne | Ce qu'elle fait |
+|---|---|
+| **Installation** | Lecture seule : le type, le dossier et l'environnement de cette installation. Sur une page étroite, le dossier est coupé au milieu par une ellipse ; la ligne d'aide sous la ligne donne le texte complet. |
+| **Nom du lanceur** | Le nom des raccourcis et de l'entrée de menu de dossier de cette installation. Refusé quand une autre installation qui existe encore porte ce nom. L'installation principale s'appelle toujours `GitPoulpi`. |
+| **Inclure la version dans le nom du lanceur** | Ajoute `<majeure>.<mineure>` au nom (`GitPoulpi 1.2`) ; désactivé par défaut, car les raccourcis sont renommés à chaque mise à jour. |
+| **Couleur de la pieuvre** | La couleur de la pieuvre de cette installation et de ses raccourcis (mêmes choix que la fenêtre À propos). |
+| **Devenir l'installation principale** | L'installation principale possède le nom simple `GitPoulpi`, les anciens raccourcis et les clés `ui.*` que lisent les builds plus anciens ; personne ne l'est par défaut. Demande confirmation quand une autre installation l'est déjà. L'ancienne installation principale garde ses lanceurs sous son propre nom (Windows et Linux). |
+| **Environnement** | Les installations d'un même environnement partagent fenêtres, démons et historique d'annulation ; par défaut, c'est celui de l'installation elle-même. Le changer demande de rouvrir les fenêtres ouvertes de cette installation. |
+| **Sous-menu du menu de dossier** | Regroupe l'entrée du menu de dossier dans un sous-menu de ce nom ; les installations qui donnent le même nom en partagent un seul. Indisponible sous macOS ; Nemo et Thunar placent toujours l'entrée à la racine du menu. |
+| **Autre : \<nom\>** | Les autres installations de cette machine. Celle dont le dossier a disparu a un bouton **Oublier** (avec confirmation) qui supprime son entrée ainsi que les lanceurs, alias et entrées de menu de dossier qu'elle a laissés. |
+| **Anciens lanceurs** | Tant que personne n'est l'installation principale, les lanceurs qu'un ancien build a créés sous le nom simple sont listés avec **Devenir l'installation principale** et **Supprimer les anciens lanceurs** (avec confirmation). Une note unique dans la barre d'état y renvoie. |
+
+La palette propose **Lanceur : Devenir l'installation principale**, **Lanceur : Supprimer les anciens lanceurs** et **Lanceur : Oublier les installations disparues**, et chaque ligne est une entrée `Paramètres :`. Les lignes d'alias de commande ci-dessous sont celles de cette installation (`gpd` / `gpda` sont suggérés pour un dépôt de développement) ; un alias créé par une autre installation affiche **Utilisé par \<nom\>** et ne peut pas être créé ici.
+
 | Ligne | Ce qu'elle fait |
 |---|---|
 | **Terminal des raccourcis** | `ui.launch_terminal` : **Automatique**, **Par défaut (système)**, ou l'un des terminaux trouvés sur cette machine (la même détection que **Ouvrir dans**). Automatique : Windows Terminal sous Windows (sinon WezTerm, Alacritty, la console simple), `xdg-terminal-exec` sous Linux (Omarchy ; sinon le premier terminal trouvé), Terminal sous macOS, sauf si iTerm2, Ghostty, WezTerm ou kitty est installé. |

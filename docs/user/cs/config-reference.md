@@ -542,6 +542,15 @@ Které větve smí proaktivní detekce konfliktů vzít za základ aktuální v�
 
 Který seznam repozitář sleduje, je v jeho `repo-state.toml` (níže). Pořadí přednosti: vlastní vzory repozitáře, pak pojmenovaný seznam, který sleduje, pak `default_list`, pak `**`.
 
+## `[installation]` (jeden záznam na každé GitPoulpi na tomto počítači)
+
+Jeden `config.toml` může sdílet několik instalací (balíček, vývojová kopie, sestavení přes cargo, rozbalený archiv). Každá se pozná podle své složky (16místné hexadecimální id) a vzhled a názvy si drží ve vlastní `[installation.settings.<id>]`, takže barva ani aliasy jedné instalace nikdy nezmění jinou. Nikdo není hlavní instalací, dokud ji nezvolíte; hlavní vlastní prosté názvy spouštěčů `GitPoulpi` a sdílené klíče `ui.logo_color`, `ui.command_alias` a `ui.command_alias_add`, které čtou starší verze. Zapisuje je GitPoulpi samo (a `set_installation_in_file`), ne `config set`.
+
+| Klíč | Výchozí | Hodnoty a účinek |
+|---|---|---|
+| `installation.primary` | chybí | Id hlavní instalace. Chybí: žádná. |
+| `installation.settings.<id>` | žádná | Jedna tabulka na instalaci: `path` (její složka, obnoví se při přesunu), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informativní), `name` (název spouštěče, `GitPoulpi (<label>)`, zafixovaný při prvním spuštění), `name_with_version` (vypnuto: přidat k názvu `<major>.<minor>`), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (prázdné: položka nabídky složek je v kořeni), `env` (prázdné: vlastní id; instalace se stejným názvem sdílejí démony, relace a historii vrácení), `mcp_bind` (prázdné: `mcp.bind`). Prázdná hodnota se vrací k `ui.*` u hlavní instalace, jinak k výchozí hodnotě druhu (vývojová kopie nosí `sun`). |
+
 ## `[keybindings]`
 
 Přiřazuje zkratky TUI znovu; upravuje je Nastavení > Klávesnice a myš.

@@ -196,14 +196,32 @@ gitpoulpi
 `--version` vypíše verzi a commit, ze kterého bylo sestavení pořízeno. Poté
 pokračujte podle [První kroky](getting-started.md).
 
+## Několik instalací vedle sebe
+
+Balíček, vývojová kopie, sestavení přes cargo i rozbalený archiv můžete mít nainstalované současně. Každé je samostatná instalace: má vlastní název spouštěče (`GitPoulpi (Chocolatey)`, `GitPoulpi (dev)`, ...), barvu chobotnice, aliasy příkazu, položku nabídky „Otevřít v“ a démony, takže dvě verze běží vedle sebe a nikdy si nepřebírají okna. Nastavení, repozitáře a tokeny jsou sdílené. Prostý název spouštěče `GitPoulpi` nepatří nikomu, dokud ho nepřidělíte volbou **Stát se hlavní instalací** v Nastavení > Spouštěč. [Nastavení](settings.md#spouštěč) uvádí ostatní instalace a má tlačítko **Zapomenout** pro tu, která zmizela.
+
 ## Odinstalace
 
-`gitpoulpi uninstall` (to spouští oba instalátory) odebere aliasy příkazu,
-záznamy v PATH, zástupce a položky nabídky správce souborů (ve Windows s jejich
-klíčem App Paths), které GitPoulpi vytvořil, a potom soubory programu
-instalace z vydání; odmítne sestavení bez značky `.gitpoulpi-dist`
-(sestavení přes cargo) a `--keep-files` soubory programu ponechá. Agentům MCP
-není k dispozici. Bez instalátoru smažte spustitelné soubory.
+`gitpoulpi uninstall` odebere aliasy příkazu (ve Windows i jejich klíče App
+Paths), záznamy v PATH, zástupce a položky nabídky správce souborů **jen této
+instalace**: ostatní zůstanou a PATH si ponechá jejich složky i sdílenou složku
+s aliasy, dokud v ní některá z nich ještě má alias. Připnutí na hlavní panel a do
+Docku zůstanou (Windows neumí odepnout zvenčí) a v nastavení zůstane záznam této
+instalace, takže po opětovné instalaci do stejné složky se vrátí její vzhled.
+Potom smaže soubory programu instalace z vydání; tato část odmítne sestavení bez
+značky `.gitpoulpi-dist` (sestavení přes cargo). S `--keep-files` soubory programu
+ponechá a funguje na jakémkoli sestavení, včetně vývojové kopie. Agentům MCP není
+k dispozici.
+
+| Jak jste instalovali | Co odebere spouštěče a aliasy |
+|---|---|
+| Instalátor pro Windows (uživatel nebo všichni uživatelé), winget | Odinstalátor spustí `gitpoulpi uninstall --keep-files` a pak smaže soubory. |
+| Chocolatey | Jeho automatický odinstalátor spustí odinstalátor instalátoru. |
+| Scoop | `scoop uninstall gitpoulpi` nejdřív spustí `gitpoulpi uninstall --keep-files`. |
+| MSI | Odebrání ho spustí jako instalující uživatel. Při odebrání jiným účtem zůstanou spouštěče uživatele a v Nastavení ostatních instalací se zobrazí jako osiřelé (**Zapomenout**). |
+| apt, AUR, Homebrew, cargo, vývojová kopie | Žádný hook se nespustí: před odebráním balíčku spusťte `gitpoulpi uninstall --keep-files`. |
+| Archiv, `install.sh --uninstall` | Spusťte `gitpoulpi uninstall` nebo `install.sh --uninstall` a pak smažte složku. |
+
 GitPoulpi uchovává také tyto soubory:
 
 | Co | Kde |

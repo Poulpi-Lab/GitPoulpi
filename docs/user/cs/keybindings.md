@@ -1248,9 +1248,9 @@ Klávesy jsou výchozí.
 | Spouštěč: Odebrat z PATH |  |
 | Spouštěč: Nainstalovat nabídku Otevřít v GitPoulpi |  |
 | Spouštěč: Odebrat nabídku Otevřít v GitPoulpi |  |
-| Launcher: Become the Primary Installation |  |
-| Launcher: Remove Legacy Launchers |  |
-| Launcher: Forget Gone Installations |  |
+| Spouštěč: Stát se hlavní instalací |  |
+| Spouštěč: Odebrat starší spouštěče |  |
+| Spouštěč: Zapomenout zmizelé instalace |  |
 | Aplikace: Změnit barevný motiv grafu... | `Ctrl+N T` |
 | Aplikace: Přepnout zbarvení řádků grafu | `Ctrl+N Y` |
 <!-- palette:end -->

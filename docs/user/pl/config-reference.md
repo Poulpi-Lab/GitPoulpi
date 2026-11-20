@@ -549,6 +549,15 @@ To, które gałęzie proaktywne wykrywanie konfliktów może uznać za bazę bie
 
 Którą listę repozytorium śledzi, jest w jego `repo-state.toml` (poniżej). Kolejność: własne wzorce repozytorium, potem nazwana lista, którą śledzi, potem `default_list`, potem `**`.
 
+## `[installation]` (jeden wpis na każde GitPoulpi na tym komputerze)
+
+Kilka instalacji może dzielić jeden `config.toml` (pakiet, repozytorium deweloperskie, kompilacja cargo, rozpakowane archiwum). Każda jest rozpoznawana po swoim folderze (16-cyfrowy identyfikator szesnastkowy) i trzyma własny wygląd i nazwy w `[installation.settings.<id>]`, więc kolor lub aliasy jednej instalacji nigdy nie zmieniają innej. Nikt nie jest instalacją główną, dopóki jej nie wybierzesz; instalacja główna ma nazwy skrótów `GitPoulpi` bez dopisków oraz wspólne klucze `ui.logo_color`, `ui.command_alias` i `ui.command_alias_add`, które czytają starsze wersje. Zapisywane przez samo GitPoulpi (i `set_installation_in_file`), nie przez `config set`.
+
+| Klucz | Domyślnie | Wartości i działanie |
+|---|---|---|
+| `installation.primary` | brak | Identyfikator instalacji głównej. Brak: nikt. |
+| `installation.settings.<id>` | brak | Jedna tabela na instalację: `path` (jej folder, odświeżany po przeniesieniu), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informacyjnie), `name` (nazwa programu uruchamiającego, `GitPoulpi (<etykieta>)`, zamrożona przy pierwszym uruchomieniu), `name_with_version` (wyłączone: dopisuje `<główna>.<podrzędna>` do nazwy), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (puste: wpis menu folderów jest na najwyższym poziomie), `env` (puste: własny identyfikator; instalacje o tej samej nazwie współdzielą demony, sesje i historię cofania), `mcp_bind` (puste: `mcp.bind`). Pusta wartość wraca do `ui.*` dla instalacji głównej, a w przeciwnym razie do domyślnej dla rodzaju (repozytorium deweloperskie nosi `sun`). |
+
 ## `[keybindings]`
 
 Zmienia przypisania skrótów TUI; edytuje je Ustawienia > Klawiatura i mysz.

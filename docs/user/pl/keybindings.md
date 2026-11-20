@@ -1247,9 +1247,9 @@ zastosowania. Klawisze są domyślne.
 | Uruchamianie: Usuń z PATH |  |
 | Uruchamianie: Zainstaluj menu Otwórz w GitPoulpi |  |
 | Uruchamianie: Usuń menu Otwórz w GitPoulpi |  |
-| Launcher: Become the Primary Installation |  |
-| Launcher: Remove Legacy Launchers |  |
-| Launcher: Forget Gone Installations |  |
+| Uruchamianie: Zostań instalacją główną |  |
+| Uruchamianie: Usuń starsze skróty |  |
+| Uruchamianie: Zapomnij usunięte instalacje |  |
 | Aplikacja: Zmień motyw kolorów grafu... | `Ctrl+N T` |
 | Aplikacja: Przełącz zabarwienie wierszy grafu | `Ctrl+N Y` |
 <!-- palette:end -->

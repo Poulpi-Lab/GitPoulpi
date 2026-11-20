@@ -196,14 +196,32 @@ gitpoulpi
 `--version` wypisuje wersję i commit, z którego zbudowano program. Potem przejdź
 do [Pierwszych kroków](getting-started.md).
 
+## Kilka instalacji obok siebie
+
+Pakiet, repozytorium deweloperskie, kompilacja przez cargo i rozpakowane archiwum mogą być zainstalowane jednocześnie. Każde z nich jest osobną instalacją: ma własną nazwę programu uruchamiającego (`GitPoulpi (Chocolatey)`, `GitPoulpi (dev)`, ...), kolor ośmiornicy, aliasy poleceń, wpis menu „Otwórz w” i demony, więc dwie wersje działają równolegle i nie przejmują nawzajem swoich okien. Ustawienia, repozytoria i tokeny są wspólne. Nikt nie ma nazwy `GitPoulpi` bez dopisków, dopóki jej nie wybierzesz przez **Zostań instalacją główną** w Ustawienia > Uruchamianie z systemu. [Ustawienia](settings.md#uruchamianie-z-systemu) wymieniają pozostałe instalacje i mają przycisk **Zapomnij** dla tej, która już nie istnieje.
+
 ## Odinstalowanie
 
-`gitpoulpi uninstall` (to uruchamiają oba instalatory) usuwa aliasy poleceń,
-wpisy w PATH, skróty i wpisy menu menedżera plików (w Windows razem z kluczem
-App Paths) utworzone przez GitPoulpi, a potem pliki programu
-instalacji z wydania; odmawia dla kompilacji bez znacznika `.gitpoulpi-dist`
-(kompilacja przez cargo), a `--keep-files` zostawia pliki programu. Nie jest
-dostępne dla agentów MCP. Bez instalatora usuń pliki programu.
+`gitpoulpi uninstall` usuwa aliasy poleceń (w Windows razem z ich kluczami
+App Paths), wpisy w PATH, skróty i wpisy menu menedżera plików **tylko tej
+instalacji**: wpisy pozostałych zostają, a `PATH` zachowuje ich foldery i
+wspólny folder aliasów, dopóki któraś z nich ma tam alias. Przypięcia do paska
+zadań i Docka zostają (Windows nie pozwala odpiąć ich z zewnątrz), a ustawienia
+zachowują wpis tej instalacji, więc ponowna instalacja do tego samego folderu
+przywraca jej wygląd. Potem usuwa pliki programu instalacji z wydania; ta część
+odmawia dla kompilacji bez znacznika `.gitpoulpi-dist` (kompilacja przez cargo).
+Z `--keep-files` zostawia pliki programu i działa w każdej kompilacji, także w
+repozytorium deweloperskim. Nie jest dostępne dla agentów MCP.
+
+| Jak zainstalowano | Co usuwa skróty i aliasy |
+|---|---|
+| Instalator Windows (dla użytkownika lub wszystkich użytkowników), winget | Deinstalator uruchamia `gitpoulpi uninstall --keep-files`, a potem usuwa pliki. |
+| Chocolatey | Jego automatyczny deinstalator uruchamia deinstalator instalatora. |
+| Scoop | `scoop uninstall gitpoulpi` najpierw uruchamia `gitpoulpi uninstall --keep-files`. |
+| MSI | Usunięcie uruchamia go jako instalującego użytkownika. Po usunięciu przez inne konto skróty użytkownika zostają i widać je jako osierocone w Ustawieniach pozostałych instalacji (**Zapomnij**). |
+| apt, AUR, Homebrew, cargo, repozytorium deweloperskie | Żaden hak nie działa za ciebie: uruchom `gitpoulpi uninstall --keep-files` przed usunięciem pakietu. |
+| Archiwum, `install.sh --uninstall` | Uruchom `gitpoulpi uninstall` albo `install.sh --uninstall`, a potem usuń folder. |
+
 GitPoulpi zostawia też te pliki:
 
 | Co | Gdzie |

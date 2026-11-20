@@ -186,6 +186,22 @@ obnoví předchozí.
 Stránka **Spouštěč** (`gitpoulpi ui show settings launcher`) vytvoří zástupce, který spouští
 GitPoulpi ze spouštěče systému ve zvoleném terminálu.
 
+**Tato instalace** (první skupina stránky). Každé GitPoulpi na počítači (vývojová kopie, balíček, přenosná kopie) má vlastní název spouštěče, barvu, aliasy a položku nabídky složek, uložené ve vlastní tabulce `[installation.settings.<id>]` v `config.toml`; změna zde se jiné instalace nikdy nedotkne. Nic z toho se neukládá do žurnálu (jde o integraci do systému; cesta zpět je **Odebrat**).
+
+| Řádek | Co dělá |
+|---|---|
+| **Instalace** | Jen pro čtení: druh, složka a prostředí této instalace. Na úzké stránce se složka uprostřed zkrátí výpustkou; celý text je v nápovědě pod řádkem. |
+| **Název spouštěče** | Název zástupců této instalace a její položky v nabídce složek. Odmítne se, pokud ho už má jiná existující instalace. Hlavní instalace se vždy jmenuje `GitPoulpi`. |
+| **Uvádět verzi v názvu spouštěče** | Přidá k názvu `<major>.<minor>` (`GitPoulpi 1.2`); ve výchozím stavu vypnuto, protože se zástupci při každé aktualizaci přejmenují. |
+| **Barva chobotnice** | Barva chobotnice této instalace a jejích zástupců (stejná nabídka jako v okně O aplikaci). |
+| **Stát se hlavní instalací** | Hlavní instalace vlastní prostý název `GitPoulpi`, starší zástupce a klíče `ui.*`, které čtou starší verze; ve výchozím stavu není hlavní žádná. Pokud už jiná je, nejdřív se zeptá. Dosavadní hlavní si ponechá své spouštěče pod vlastním názvem (Windows a Linux). |
+| **Prostředí** | Instalace jednoho prostředí sdílejí okna, démony a historii vrácení; výchozí je prostředí samotné instalace. Po změně je třeba restartovat otevřená okna této instalace. |
+| **Podnabídka správce souborů** | Seskupí položku nabídky složek do podnabídky s tímto názvem; instalace se stejným názvem sdílejí jednu. Na macOS není k dispozici; Nemo a Thunar vždy zobrazují položku v kořeni. |
+| **Jiná: \<název\>** | Ostatní instalace na tomto počítači. U té, jejíž složka zmizela, je tlačítko **Zapomenout** (nejdřív se zeptá), které odebere její záznam a spouštěče, aliasy a položky nabídky složek, které po ní zbyly. |
+| **Starší spouštěče** | Dokud není hlavní žádná instalace, jsou spouštěče, které starší verze vytvořila pod prostým názvem, uvedeny s tlačítky **Stát se hlavní instalací** a **Odebrat starší spouštěče** (nejdřív se zeptá). Jednorázová poznámka ve stavovém řádku sem odkazuje. |
+
+V paletě jsou **Spouštěč: Stát se hlavní instalací**, **Spouštěč: Odebrat starší spouštěče** a **Spouštěč: Zapomenout zmizelé instalace** a každý řádek je položka **Nastavení:**. Řádky s aliasy příkazu níže patří této instalaci (pro vývojovou kopii se navrhují `gpd` / `gpda`); alias, který vytvořila jiná instalace, se zobrazí jako **Používá \<název\>** a nelze ho zde vytvořit.
+
 | Řádek | Co dělá |
 |---|---|
 | **Terminál pro zástupce** | `ui.launch_terminal`: **Automaticky**, **Výchozí v systému** nebo jeden z terminálů nalezených na tomto počítači (stejné zjišťování jako u **Otevřít v**). Automaticky: ve Windows Windows Terminal (jinak WezTerm, Alacritty, běžná konzole), v Linuxu `xdg-terminal-exec` (Omarchy; jinak první nalezený terminál), v macOS Terminal, pokud není nainstalován iTerm2, Ghostty, WezTerm nebo kitty. |

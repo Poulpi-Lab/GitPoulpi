@@ -43,7 +43,7 @@ struct Package {
 }
 
 fn collect(root: &Path, lock: &str) -> Option<String> {
-    let lock: toml::Value = lock.parse().ok()?;
+    let lock: toml::Value = toml::from_str(lock).ok()?;
     let mut packages: HashMap<String, Vec<Package>> = HashMap::new();
     for p in lock.get("package")?.as_array()? {
         let name = p.get("name")?.as_str()?.to_string();
@@ -110,7 +110,7 @@ fn normal_deps(manifest: &Path) -> BTreeSet<String> {
     println!("cargo:rerun-if-changed={}", manifest.display());
     let Some(doc) = std::fs::read_to_string(manifest)
         .ok()
-        .and_then(|t| t.parse::<toml::Value>().ok())
+        .and_then(|t| toml::from_str::<toml::Value>(&t).ok())
     else {
         return BTreeSet::new();
     };
@@ -160,7 +160,7 @@ fn manifest_of(name: &str, version: &str) -> Option<String> {
 
 /// The `package.repository` of a manifest when it is a web address.
 fn parse_repository(manifest: &str) -> Option<String> {
-    let doc: toml::Value = manifest.parse().ok()?;
+    let doc: toml::Value = toml::from_str(manifest).ok()?;
     let text = doc.get("package")?.get("repository")?.as_str()?.trim();
     (text.starts_with("https://") || text.starts_with("http://")).then(|| text.to_string())
 }
@@ -185,7 +185,7 @@ fn link_for(repository: Option<&str>, source: Option<&str>, name: &str, version:
 /// The `package.license` of a manifest, whitespace collapsed to single
 /// spaces (a few crates break the expression over lines).
 fn parse_license(manifest: &str) -> Option<String> {
-    let doc: toml::Value = manifest.parse().ok()?;
+    let doc: toml::Value = toml::from_str(manifest).ok()?;
     let text = doc.get("package")?.get("license")?.as_str()?;
     let one_line = text.split_whitespace().collect::<Vec<_>>().join(" ");
     (!one_line.is_empty()).then_some(one_line)

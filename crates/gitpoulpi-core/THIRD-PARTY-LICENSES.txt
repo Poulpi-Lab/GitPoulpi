@@ -14,7 +14,7 @@ GitKraken is a trademark of its respective owner. GitPoulpi is an independent
 project, not affiliated with, endorsed or sponsored by it; the name is
 mentioned only to describe compatibility and inspiration.
 
-Cargo.lock sha256: ed3fb2933c120b44d149ec82b9b4f9dc598adc9416005ca7236f91c83be53dd1
+Cargo.lock sha256: fcf0ce4a7f25ba3510c7b9f4f2b3a452b7110e505ae87e49411f683e034cb907
 
 
 
@@ -1705,7 +1705,7 @@ option-ext 0.2.0 - Mozilla Public License 2.0
 3. RUST CRATES
 ############################################################################################
 
-484 crates, one per line: name version (license).
+485 crates, one per line: name version (license).
 
 adler2 2.0.1 (0BSD OR MIT OR Apache-2.0)
 aho-corasick 1.1.5 (Unlicense OR MIT)
@@ -1747,10 +1747,10 @@ cfg-if 1.0.4 (MIT OR Apache-2.0)
 chacha20 0.10.2 (MIT OR Apache-2.0)
 chrono 0.4.45 (MIT OR Apache-2.0)
 cipher 0.4.4 (MIT OR Apache-2.0)
-clap 4.6.7 (MIT OR Apache-2.0)
+clap 4.6.8 (MIT OR Apache-2.0)
 clap_builder 4.6.7 (MIT OR Apache-2.0)
-clap_complete 4.6.11 (MIT OR Apache-2.0)
-clap_derive 4.6.7 (MIT OR Apache-2.0)
+clap_complete 4.6.12 (MIT OR Apache-2.0)
+clap_derive 4.6.8 (MIT OR Apache-2.0)
 clap_lex 1.1.1 (MIT OR Apache-2.0)
 clipboard-win 5.4.3 (BSL-1.0)
 colorchoice 1.0.5 (MIT OR Apache-2.0)
@@ -1902,12 +1902,13 @@ minisign-verify 0.3.0 (MIT)
 miniz_oxide 0.8.9 (MIT OR Zlib OR Apache-2.0)
 miniz_oxide 0.9.1 (MIT OR Zlib OR Apache-2.0)
 mio 1.2.3 (MIT)
-mlua 0.11.6 (MIT)
-mlua-sys 0.10.0 (MIT)
+mlua 0.12.2 (MIT)
+mlua-sys 0.13.0 (MIT)
 multiversion_no_op 1.0.0 (Apache-2.0 OR MIT)
 nix 0.28.0 (MIT)
 nix 0.29.0 (MIT)
 nix 0.31.3 (MIT)
+nix 0.32.0 (MIT)
 nom 7.1.3 (MIT)
 nom 8.0.0 (MIT)
 num-bigint-dig 0.8.6 (MIT/Apache-2.0)
@@ -2009,7 +2010,7 @@ rustc-hash 2.1.3 (Apache-2.0 OR MIT)
 rustix 1.1.6 (Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT)
 rustls 0.23.46 (Apache-2.0 OR ISC OR MIT)
 rustls-native-certs 0.8.5 (Apache-2.0 OR ISC OR MIT)
-rustls-pki-types 1.15.1 (MIT OR Apache-2.0)
+rustls-pki-types 1.16.0 (MIT OR Apache-2.0)
 rustls-webpki 0.103.16 (ISC)
 rustversion 1.0.23 (MIT OR Apache-2.0)
 ryu 1.0.23 (Apache-2.0 OR BSL-1.0)
@@ -2030,10 +2031,10 @@ serde_core 1.0.229 (MIT OR Apache-2.0)
 serde_derive 1.0.229 (MIT OR Apache-2.0)
 serde_derive_internals 0.30.0 (MIT OR Apache-2.0)
 serde_json 1.0.154 (MIT OR Apache-2.0)
-serde_spanned 0.6.9 (MIT OR Apache-2.0)
+serde_spanned 1.1.3 (MIT OR Apache-2.0)
 serde_urlencoded 0.7.1 (MIT/Apache-2.0)
 serial2 0.2.38 (BSD-2-Clause OR Apache-2.0)
-sha1 0.10.7 (MIT OR Apache-2.0)
+sha1 0.11.0 (MIT OR Apache-2.0)
 sha2 0.10.9 (MIT OR Apache-2.0)
 sha2 0.11.1 (MIT OR Apache-2.0)
 shared_library 0.1.9 (Apache-2.0/MIT)
@@ -2063,7 +2064,7 @@ strum_macros 0.28.0 (MIT)
 subtle 2.6.1 (BSD-3-Clause)
 syn 1.0.109 (MIT OR Apache-2.0)
 syn 2.0.119 (MIT OR Apache-2.0)
-syn 3.0.5 (MIT OR Apache-2.0)
+syn 3.0.10 (MIT OR Apache-2.0)
 sync_wrapper 1.0.2 (Apache-2.0)
 synstructure 0.14.0 (MIT)
 syntect 5.3.0 (MIT)
@@ -2088,10 +2089,10 @@ tokio-macros 2.7.2 (MIT)
 tokio-rustls 0.26.6 (MIT OR Apache-2.0)
 tokio-stream 0.1.19 (MIT)
 tokio-util 0.7.20 (MIT)
-toml 0.8.23 (MIT OR Apache-2.0)
-toml_datetime 0.6.11 (MIT OR Apache-2.0)
-toml_edit 0.22.27 (MIT OR Apache-2.0)
-toml_write 0.1.2 (MIT OR Apache-2.0)
+toml 1.2.1+spec-1.1.0 (MIT OR Apache-2.0)
+toml_datetime 1.1.3+spec-1.1.0 (MIT OR Apache-2.0)
+toml_parser 1.1.5+spec-1.1.0 (MIT OR Apache-2.0)
+toml_writer 1.2.0+spec-1.1.0 (MIT OR Apache-2.0)
 tower 0.5.3 (MIT)
 tower-http 0.6.11 (MIT)
 tower-layer 0.3.3 (MIT)
@@ -2138,7 +2139,7 @@ wayland-scanner 0.31.11 (MIT)
 wayland-sys 0.31.11 (MIT)
 web-sys 0.3.105 (MIT OR Apache-2.0)
 web-time 1.1.0 (MIT OR Apache-2.0)
-webpki-roots 1.0.11 (CDLA-Permissive-2.0)
+webpki-roots 1.0.12 (CDLA-Permissive-2.0)
 weezl 0.1.12 (MIT OR Apache-2.0)
 wezterm-bidi 0.2.3 (MIT AND Unicode-DFS-2016)
 wezterm-blob-leases 0.1.1 (MIT)
@@ -2167,7 +2168,7 @@ windows_i686_msvc 0.52.6 (MIT OR Apache-2.0)
 windows_x86_64_gnu 0.52.6 (MIT OR Apache-2.0)
 windows_x86_64_gnullvm 0.52.6 (MIT OR Apache-2.0)
 windows_x86_64_msvc 0.52.6 (MIT OR Apache-2.0)
-winnow 0.7.15 (MIT)
+winnow 1.0.5 (MIT)
 winreg 0.10.1 (MIT)
 winresource 0.1.34 (MIT)
 wit-bindgen 0.57.1 (Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT)
@@ -2187,7 +2188,7 @@ zeroize_derive 1.5.0 (Apache-2.0 OR MIT)
 zerotrie 0.2.5 (Unicode-3.0)
 zerovec 0.11.8 (Unicode-3.0)
 zerovec-derive 0.11.6 (Unicode-3.0)
-zip 9.5.0 (MIT)
+zip 9.6.1 (MIT)
 zlib-rs 0.6.8 (Zlib)
 zmij 1.0.23 (MIT)
 zopfli 0.8.3 (Apache-2.0)
@@ -2431,7 +2432,7 @@ erased-serde 0.4.10, fastrand 2.5.0, finl_unicode 1.5.1, group 0.13.0, indoc 2.0
 pin-project-lite 0.2.17, portable-atomic 1.15.0, proc-macro2 1.0.107, quote 1.0.47, ref-cast
 1.0.27, ref-cast-impl 1.0.27, rsa 0.9.10, rustc-hash 2.1.3, rustix 1.1.6, rustversion
 1.0.23, semver 1.0.28, serde 1.0.229, serde_core 1.0.229, serde_derive 1.0.229,
-serde_derive_internals 0.30.0, serde_json 1.0.154, syn 1.0.109, syn 2.0.119, syn 3.0.5,
+serde_derive_internals 0.30.0, serde_json 1.0.154, syn 1.0.109, syn 2.0.119, syn 3.0.10,
 thiserror 1.0.69, thiserror 2.0.20, thiserror-impl 1.0.69, thiserror-impl 2.0.20, typed-path
 0.13.0, typeid 1.0.3, unicode-ident 1.0.24, wasi 0.11.1+wasi-snapshot-preview1, wasip2
 1.0.4+wasi-0.2.12, wit-bindgen 0.57.1, zmij 1.0.23
@@ -2529,12 +2530,12 @@ dyn-clone 1.0.20, erased-serde 0.4.10, finl_unicode 1.5.1, indoc 2.0.7, itoa 1.0
 0.2.191, litrs 1.0.1, pastey 0.2.3, proc-macro2 1.0.107, quote 1.0.47, ref-cast 1.0.27,
 ref-cast-impl 1.0.27, rustc-hash 2.1.3, rustversion 1.0.23, ryu 1.0.23, semver 1.0.28, serde
 1.0.229, serde_core 1.0.229, serde_derive 1.0.229, serde_derive_internals 0.30.0, serde_json
-1.0.154, serde_urlencoded 0.7.1, syn 2.0.119, syn 3.0.5, thiserror 1.0.69, thiserror 2.0.20,
-thiserror-impl 1.0.69, thiserror-impl 2.0.20, typed-path 0.13.0, typeid 1.0.3, unicode-ident
-1.0.24, utf8parse 0.2.2, vte 0.11.1, vte_generate_state_changes 0.1.2, r-efi 5.3.0 (its
-package has no license file: the same license's standard text), r-efi 6.0.0 (its package has
-no license file: the same license's standard text), yasna 0.5.2 (its package has no license
-file: the same license's standard text)
+1.0.154, serde_urlencoded 0.7.1, syn 2.0.119, syn 3.0.10, thiserror 1.0.69, thiserror
+2.0.20, thiserror-impl 1.0.69, thiserror-impl 2.0.20, typed-path 0.13.0, typeid 1.0.3,
+unicode-ident 1.0.24, utf8parse 0.2.2, vte 0.11.1, vte_generate_state_changes 0.1.2, r-efi
+5.3.0 (its package has no license file: the same license's standard text), r-efi 6.0.0 (its
+package has no license file: the same license's standard text), yasna 0.5.2 (its package has
+no license file: the same license's standard text)
 --------------------------------------------------------------------------------------------
 Apache License
                         Version 2.0, January 2004
@@ -2757,8 +2758,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ============================================================================================
 Used by: anstream 1.0.0, anstyle 1.0.14, anstyle-parse 1.0.0, anstyle-query 1.1.5,
 anstyle-wincon 3.0.11, colorchoice 1.0.5, crc32fast 1.5.2, hex 0.4.3, is_terminal_polyfill
-1.70.2, once_cell_polyfill 1.70.2, quick-error 2.0.1, serde_spanned 0.6.9, toml 0.8.23,
-toml_datetime 0.6.11, toml_edit 0.22.27, toml_write 0.1.2, winapi 0.3.9
+1.70.2, once_cell_polyfill 1.70.2, quick-error 2.0.1, winapi 0.3.9
 --------------------------------------------------------------------------------------------
 Apache License
                            Version 2.0, January 2004
@@ -2964,10 +2964,10 @@ Apache License
 
 ============================================================================================
 Used by: anstream 1.0.0, anstyle 1.0.14, anstyle-parse 1.0.0, anstyle-query 1.1.5,
-anstyle-wincon 3.0.11, clap 4.6.7, clap_builder 4.6.7, clap_complete 4.6.11, clap_derive
-4.6.7, clap_lex 1.1.1, colorchoice 1.0.5, is_terminal_polyfill 1.70.2, once_cell_polyfill
-1.70.2, serde_spanned 0.6.9, toml 0.8.23, toml_datetime 0.6.11, toml_edit 0.22.27,
-toml_write 0.1.2
+anstyle-wincon 3.0.11, clap 4.6.8, clap_builder 4.6.7, clap_complete 4.6.12, clap_derive
+4.6.8, clap_lex 1.1.1, colorchoice 1.0.5, is_terminal_polyfill 1.70.2, once_cell_polyfill
+1.70.2, serde_spanned 1.1.3, toml 1.2.1+spec-1.1.0, toml_datetime 1.1.3+spec-1.1.0,
+toml_parser 1.1.5+spec-1.1.0, toml_writer 1.2.0+spec-1.1.0
 --------------------------------------------------------------------------------------------
 Copyright (c) Individual contributors
 
@@ -3752,7 +3752,7 @@ Used by: base16ct 0.2.0, base64ct 1.8.3, block-buffer 0.10.4, block-buffer 0.12.
 0.3.1, crypto-bigint 0.5.5, crypto-common 0.1.7, crypto-common 0.2.2, der 0.7.10, digest
 0.10.7, digest 0.11.3, elliptic-curve 0.13.8, hmac 0.12.1, hybrid-array 0.4.15, inout 0.1.4,
 p256 0.13.2, p384 0.13.1, p521 0.13.3, pbkdf2 0.12.2, pem-rfc7468 0.7.0, pkcs1 0.7.5, pkcs8
-0.10.2, primeorder 0.13.6, salsa20 0.10.2, scrypt 0.11.0, sec1 0.7.3, sha1 0.10.7, sha2
+0.10.2, primeorder 0.13.6, salsa20 0.10.2, scrypt 0.11.0, sec1 0.7.3, sha1 0.11.0, sha2
 0.10.9, sha2 0.11.1, signature 2.2.0, spki 0.7.3, ssh-cipher 0.2.0, ssh-encoding 0.2.0,
 ssh-key 0.6.7
 --------------------------------------------------------------------------------------------
@@ -4069,7 +4069,7 @@ IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
 ============================================================================================
-Used by: bincode 1.3.3, mlua-sys 0.10.0 (its package has no license file: the same license's
+Used by: bincode 1.3.3, mlua-sys 0.13.0 (its package has no license file: the same license's
 standard text), objc2 0.6.4 (its package has no license file: the same license's standard
 text), objc2-encode 4.1.0 (its package has no license file: the same license's standard
 text), objc2-foundation 0.3.2 (its package has no license file: the same license's standard
@@ -4946,8 +4946,9 @@ IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
 ============================================================================================
-Used by: clap 4.6.7, clap_builder 4.6.7, clap_complete 4.6.11, clap_derive 4.6.7, clap_lex
-1.1.1
+Used by: clap 4.6.8, clap_builder 4.6.7, clap_complete 4.6.12, clap_derive 4.6.8, clap_lex
+1.1.1, serde_spanned 1.1.3, toml 1.2.1+spec-1.1.0, toml_datetime 1.1.3+spec-1.1.0,
+toml_parser 1.1.5+spec-1.1.0, toml_writer 1.2.0+spec-1.1.0
 --------------------------------------------------------------------------------------------
 Apache License
                            Version 2.0, January 2004
@@ -11505,7 +11506,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ============================================================================================
-Used by: mlua 0.11.6
+Used by: mlua 0.12.2
 --------------------------------------------------------------------------------------------
 Both mlua and rlua are distributed under the MIT license, which is reproduced
 below:
@@ -11553,7 +11554,7 @@ See the Licenses for the specific language governing permissions and
 limitations under the Licenses.
 
 ============================================================================================
-Used by: nix 0.28.0, nix 0.29.0, nix 0.31.3
+Used by: nix 0.28.0, nix 0.29.0, nix 0.31.3, nix 0.32.0
 --------------------------------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -15110,7 +15111,7 @@ respectively.  You may use this software under the terms of any
 of these licenses, at your option.
 
 ============================================================================================
-Used by: rustls-pki-types 1.15.1
+Used by: rustls-pki-types 1.16.0
 --------------------------------------------------------------------------------------------
 Apache License
                         Version 2.0, January 2004
@@ -15315,7 +15316,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 ============================================================================================
-Used by: rustls-pki-types 1.15.1
+Used by: rustls-pki-types 1.16.0
 --------------------------------------------------------------------------------------------
 Copyright (c) 2023 Dirkjan Ochtman <dirkjan@ochtman.nl>
 
@@ -15646,11 +15647,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 ============================================================================================
-Used by: sha1 0.10.7, sha2 0.10.9
+Used by: sha1 0.11.0, sha2 0.11.1
 --------------------------------------------------------------------------------------------
-Copyright (c) 2006-2009 Graydon Hoare
-Copyright (c) 2009-2013 Mozilla Foundation
+Copyright (c) 2016-2026 The RustCrypto Project Developers
 Copyright (c) 2016 Artyom Pavlov
+Copyright (c) 2009-2013 Mozilla Foundation
+Copyright (c) 2006-2009 Graydon Hoare
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -15677,12 +15679,11 @@ IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
 ============================================================================================
-Used by: sha2 0.11.1
+Used by: sha2 0.10.9
 --------------------------------------------------------------------------------------------
-Copyright (c) 2016-2026 The RustCrypto Project Developers
-Copyright (c) 2016 Artyom Pavlov
-Copyright (c) 2009-2013 Mozilla Foundation
 Copyright (c) 2006-2009 Graydon Hoare
+Copyright (c) 2009-2013 Mozilla Foundation
+Copyright (c) 2016 Artyom Pavlov
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -16116,7 +16117,7 @@ IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
 ============================================================================================
-Used by: spin 0.9.9, zip 9.5.0
+Used by: spin 0.9.9, zip 9.6.1
 --------------------------------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -18120,7 +18121,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ============================================================================================
-Used by: webpki-roots 1.0.11
+Used by: webpki-roots 1.0.12
 --------------------------------------------------------------------------------------------
 # Community Data License Agreement - Permissive - Version 2.0
 
@@ -18608,7 +18609,7 @@ MIT License
     SOFTWARE
 
 ============================================================================================
-Used by: winnow 0.7.15
+Used by: winnow 1.0.5
 --------------------------------------------------------------------------------------------
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

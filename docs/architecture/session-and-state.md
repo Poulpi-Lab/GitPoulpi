@@ -1275,3 +1275,49 @@ The TUI side of the grouped run: selection, plan and progress in one movable fra
   an unstaged move's untracked side is appended and merged by `merge_rename`. The header row is
   `old -> new (N% similar)`; a pure rename shows "No content change". Hunk staging is not offered on an untracked
   side (as before); a staged-with-edits rename diffs against the old path.
+
+## Installations and environments
+
+Several GitPoulpi installations can live on one machine (a package, a dev checkout, a cargo build, an unpacked archive) and share one `config.toml`. They are independent: one installation's launchers, colour, aliases, daemons and undo history never change another's. Code: `gitpoulpi_config::installation` (identity, effective values, `current()`), `desktop::owner` (who owns an artifact), the writers in `desktop/`, `paths.rs` (environment layout).
+
+**Identity.** `identify(exe, env)` is pure (tests inject the file system, OS, cargo home and environment). First match wins: `GITPOULPI_INSTALL_ID` (id `p-<value>`, kind `pinned`), a dev checkout (dist, release and debug builds of one checkout are one installation; checked before the marker so a marker under `target/` cannot split it), a `.gitpoulpi-dist` next to the exe (Scoop `apps\<app>\<ver>` maps to `current`, Homebrew `Cellar/<f>/<ver>/bin` to the formula), `$CARGO_HOME/bin`, else portable. The id is 16 hex digits of FNV-1a-64 over the normalised root folder (`i<8hex>` in file names and ids). The channel and the kind are not hashed: a legacy marker gains `channel=` at its first update, which would change the id. A random id in the folder was rejected (Program Files is read-only, package managers rewrite folders). A moved checkout or archive is a new installation; its leftovers show as orphans.
+
+**The owner tag and the legacy marker.** Every artifact (shortcut, `.desktop`, bundle, alias, folder-menu entry, App Paths value) carries `X-GitPoulpi-Install=<id>`. The old marker `X-GitPoulpi=1` is written only by the primary, because old builds recognise exactly that marker on exactly the fixed legacy names: an artifact without it is invisible to them, so a 1.0 Chocolatey build cannot rewrite `GitPoulpi (dev).lnk` or `gpd.cmd`.
+
+**No primary by default; "Become the primary".** `installation.primary` is written only by that toggle (Settings > Launcher, `gitpoulpi installation`). The primary owns the legacy names (`GitPoulpi.lnk`, `gitpoulpi.desktop`, `GitPoulpi.app`, the folder-menu key `shell\GitPoulpi`, App Paths `gitpoulpi.exe`) and the legacy `ui.*` keys. Everyone else is `GitPoulpi (<label>)` with its own file names, AUMID and WM class, frozen at first run (the suffix even for a lone installation: the name never changes when a second one appears, and the plain name stays free for the primary). The handover copies the old primary's effective values into its entry first, then renames its legacy-named files to its own names (a rename, contents untouched; its next sync rewrites them).
+
+**Owner rule** (`owner::decide`):
+
+| Facts | Result |
+|---|---|
+| tag is mine | `Mine` |
+| tag is X, X known and its exe exists | `Other(X)` |
+| tag is X, X gone | `Orphan(X)` |
+| no tag, legacy marker, a primary exists | the primary's (`Adopt` when I am it) |
+| no tag, legacy marker, no primary | `Legacy`: listed, never rewritten |
+| no tag, no marker, names my exe (a pin the user made) | `Adopt`, only `--launcher` is appended |
+| anything else | `Foreign` |
+
+Sync, repoint and cleanups touch only `Mine` and `Adopt`. Uninstall removes only `Mine`: shortcuts and their icons, aliases and their App Paths, its folder entries, App Paths `gitpoulpi.exe` only as the primary, and from `PATH` only its own folder plus the shared alias `bin` folder when no other installation has an alias left there. Pins are never touched (Windows has no unpin API). The config entry stays, so reinstalling into the same folder brings the settings back. `uninstall --keep-files` needs no marker (a dev or cargo build can clean up); deleting files still does.
+
+**Folder menu.** One entry per installation ("Open in {launcher name}", in its colour). The label must therefore name the installation: a shared label would make the second entry read as foreign. With `folder_menu_submenu` set, entries go into a submenu; installations giving the same name (trimmed, lower-cased) share it. A submenu container carries `X-GitPoulpi-Menu=<name>` and no owner; its members are the tagged children. Install creates it if missing and adds its child; remove deletes its own child, then the container only when empty (last one out). Two removals at once are safe because a delete of a non-empty container fails. Never `DeleteTree` a container: the registry seam has `DeleteIfEmpty`, scripts use `rmdir`. Nemo and Thunar have no submenus, macOS Quick Actions neither (and no custom icon).
+
+**Environments.** `env` defaults to the installation id (dist and release of a dev checkout share it); `installation.settings.<id>.env` shares one on purpose, `GITPOULPI_ENV` overrides. Everything a daemon or window coordinates through lives under it; user data and per-repository choices stay shared.
+
+| Per environment | Stays shared |
+|---|---|
+| Discovery files `.port/.token/.pid/.host` and tab lists, `last-session` (`sessions/env/<env>/`; the first use copies the legacy tab lists, never moves them) | `config.toml`, keybindings, themes, workspaces, favorites, recent, secrets |
+| Undo journal (`<git-dir>/gitpoulpi/env/<env>/journal.json`) and pins (`refs/gitpoulpi/undo/e<8hex>/...`), outside-change snapshot | `repo-state.toml` (filters, folds, preferences, `pending_auto_stash`), workflow file, commit template |
+| `hosting-cache.<env>.json`, AI CLI caches `<state>/ai/<env>/` | avatars, clone lists, rewrite runs, `merge-tmp` |
+| `updates/<install-id>/` (job, status, lock) | per-repo locks stay in each daemon's memory |
+| log lines are tagged `env=<8hex>` (one daily file) | `[mcp]`, plus a per-installation `mcp_bind` override |
+
+Two environments on one repository are safe: each records the other's operations as outside entries (as for a shell `git`), git's own `index.lock` and ref locks make the loser of a concurrent write fail with a lock error, and undo plans only when the state is exactly as the entry left it, so it refuses rather than corrupts. A background auto-fetch that hits a lock is retried at the next interval. The legacy journal (pre-upgrade `journal.json` and pins) is adopted by copy into the first environment that opens the repository, left in place for old builds, and recorded (`legacy-journal-adopted`) so it happens once; a pin collision with a still-running old build makes undo refuse, never corrupt.
+
+**Traps.**
+- Explorer caches Start menu names and icons: rename by delete + create plus change notifications, keep hashed icon names. Changing a non-primary AUMID loses the running dot of an existing pin until it is pinned again. Windows 10 tiles break on a rename, which is why the version in the name is off by default.
+- App Paths is one key per exe name, so only the primary writes `gitpoulpi.exe`; address-bar access per installation goes through the aliases' own App Paths. `PATH` still beats App Paths in the address bar.
+- `PATH` order decides which `gitpoulpi` a bare name reaches; agents should use an absolute path or the installation's alias.
+- Under `GITPOULPI_CONFIG_DIR` the flat legacy layout stays (an explicit config folder is its own world, and every test that reads a `.port` file keeps working). `GITPOULPI_ENV` forces the environment layout; tests set it on the child only, with `ConfigPaths::with_env` in the test, never a process-wide `set_var`.
+- The PTY harness pins `GITPOULPI_INSTALL_ID`; without it the debug binary is a dev installation (yellow). Tests that need the legacy names declare `[installation] primary = "p-pty"`.
+- Production code never saves a whole `Config` to `config.toml`: writers go through `set_in_file` / `set_installation_in_file`, which keep tables they do not know.

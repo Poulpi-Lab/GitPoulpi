@@ -4,7 +4,10 @@
 //! aliases, the PATH entries and the shortcuts (each through the code that made
 //! them, so only what is ours goes), then the program files.
 //!
-//! It refuses unless the folder of the running exe carries the
+//! Only this installation's artifacts go (the others' aliases, launchers and
+//! folder entries, and the shared PATH and submenu entries they still need,
+//! stay: see `installation::current`). `--keep-files` works without a marker.
+//! Deleting files refuses unless the folder of the running exe carries the
 //! `.gitpoulpi-dist` marker: a `cargo` build (the aliases of which point into
 //! `target/`) must not delete itself or its checkout. The files removed are
 //! only the names a release ships plus their `.old`/`.new` leftovers, never
@@ -41,7 +44,9 @@ pub fn run(keep_files: bool, json_output: bool) {
 fn uninstall(keep_files: bool) -> Result<Value, String> {
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
     let dir = exe.parent().ok_or("the exe has no folder")?.to_path_buf();
-    if !dir.join(MARKER_FILE).is_file() {
+    // Undoing this installation's launchers, aliases and folder entries needs
+    // no marker (a dev or cargo build cleans up too); deleting files does.
+    if !keep_files && !dir.join(MARKER_FILE).is_file() {
         return Err(format!(
             "{} is not a release install ({MARKER_FILE} is missing); not uninstalling a development build",
             dir.display()

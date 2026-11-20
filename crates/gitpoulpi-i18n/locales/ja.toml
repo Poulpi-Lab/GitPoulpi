@@ -6008,6 +6008,8 @@ installation = "インストール"
 installation_help = "この GitPoulpi の情報です。インストール方法、場所、ウィンドウや履歴を共有する環境を表します。このマシンにある他のインストール（開発ビルド、パッケージなど）は、それぞれ独自のランチャー名、色、エイリアスを持ちます。"
 # context: value of the Installation row; {kind} is the install kind (dev, portable...), {path} its folder, {env} the environment name
 installation_info = "{kind}、{path}、環境 {env}"
+# context: end of the help line of the Installation row, which shows the whole folder when the value is cut; {path} is the install folder
+installation_folder = "Folder: {path}"
 name = "ランチャー名"
 name_help = "このインストールのショートカットと、ファイルマネージャーのメニュー項目に使う名前です。名前が変わるのはこのインストールだけです。"
 name_primary = "プライマリは常に GitPoulpi という名前です"

@@ -21,7 +21,7 @@ use std::path::Path;
 use crate::release::{InstallChannel, Marker, MARKER_FILE};
 use crate::{
     insert_dotted, remove_dotted, secure_fs, AiConfig, Config, Error, InstallationConfig,
-    InstallationEntry, Kind, Result,
+    InstallationEntry, Kind, Result, UiBefore,
 };
 
 /// The plain launcher name, owned by the primary installation only.
@@ -709,6 +709,9 @@ pub struct PrimaryHandover {
     pub installation: InstallationConfig,
     /// The new `ui.*` values; `None` when `ui.*` stays as it is.
     pub ui: Option<UiLook>,
+    /// The `ui.*` keys as the file had them before the first primary: set
+    /// back (and the keys it did not have removed) when the last one resigns.
+    pub ui_restore: Option<UiBefore>,
     /// The installation that stops being primary, if any.
     pub demoted: Option<String>,
     /// The installation that becomes primary, if any.
@@ -782,7 +785,17 @@ pub fn plan_primary(config: &Config, new: &Identity) -> Option<PrimaryHandover> 
     entry.command_alias.clear();
     entry.command_alias_add.clear();
     inst.primary = Some(new.id.clone());
+    // Behind nobody, `ui.*` is about to become a primary's: remember it (a
+    // handover between primaries keeps what was remembered).
+    if demoted.is_none() && inst.ui_before.is_none() {
+        inst.ui_before = Some(UiBefore {
+            logo_color: Some(config.ui.logo_color.clone()),
+            command_alias: Some(config.ui.command_alias.clone()),
+            command_alias_add: Some(config.ui.command_alias_add.clone()),
+        });
+    }
     Some(PrimaryHandover {
+        ui_restore: None,
         installation: inst,
         ui: Some(UiLook {
             logo_color: inherit(
@@ -807,7 +820,9 @@ pub fn plan_primary(config: &Config, new: &Identity) -> Option<PrimaryHandover> 
 }
 
 /// The handover for `id` stopping being the primary; `None` when it is not.
-/// Its values move from `ui.*` into its entry; `ui.*` itself stays for old builds.
+/// Its values move from `ui.*` into its entry, and `ui.*` goes back to what
+/// the file held before the first primary (so older builds do not wear a
+/// colour or aliases nobody owns).
 pub fn plan_resign(config: &Config, id: &str) -> Option<PrimaryHandover> {
     if config.installation.primary.as_deref() != Some(id) {
         return None;
@@ -815,15 +830,20 @@ pub fn plan_resign(config: &Config, id: &str) -> Option<PrimaryHandover> {
     let mut inst = config.installation.clone();
     freeze_own_values(config, &mut inst, id);
     inst.primary = None;
+    let ui_restore = inst.ui_before.take();
     Some(PrimaryHandover {
         installation: inst,
         ui: None,
+        ui_restore,
         demoted: Some(id.to_string()),
         promoted: None,
     })
 }
 
 // -------------------------------------------------------------- the file
+
+/// One `ui.<key>` change of a handover: set it, or remove it (`None`).
+type UiAction = (&'static str, Option<String>);
 
 fn read_raw(path: &Path) -> Result<String> {
     Ok(if path.exists() {
@@ -889,7 +909,7 @@ fn splice(
     raw: &str,
     document: &toml::Value,
     installation: &InstallationConfig,
-    ui: Option<&UiLook>,
+    ui: &[UiAction],
 ) -> Result<String> {
     let table = if installation.is_empty() {
         String::new()
@@ -902,15 +922,14 @@ fn splice(
         toml::to_string(&toml::Value::Table(root))?
     };
     let mut text = text_edit::replace_table(raw, "installation", &table);
-    if let Some(ui) = ui {
-        for (key, value) in [
-            ("logo_color", &ui.logo_color),
-            ("command_alias", &ui.command_alias),
-            ("command_alias_add", &ui.command_alias_add),
-        ] {
-            let quoted = toml::Value::String(value.clone()).to_string();
-            text = text.and_then(|t| text_edit::set_key(&t, "ui", key, &quoted));
-        }
+    for (key, value) in ui {
+        text = text.and_then(|t| match value {
+            Some(v) => {
+                let quoted = toml::Value::String(v.clone()).to_string();
+                text_edit::set_key(&t, "ui", key, &quoted)
+            }
+            None => text_edit::remove_key(&t, "ui", key),
+        });
     }
     match text {
         Some(t) => Ok(t),
@@ -937,7 +956,7 @@ pub fn set_installation_in_file(
     edit(&mut installation);
     put_installation(&mut document, &installation)?;
     validate(&document)?;
-    let text = splice(&raw, &document, &installation, None)?;
+    let text = splice(&raw, &document, &installation, &[])?;
     write_text(path, &raw, &text)
 }
 
@@ -948,26 +967,63 @@ fn apply_handover(
     let raw = read_raw(path)?;
     let mut document = parse_document(&raw)?;
     let config = Config::from_toml_str(&toml::to_string(&document)?)?.0;
-    let Some(handover) = plan(&config) else {
+    let Some(mut handover) = plan(&config) else {
         return Ok(None);
     };
-    put_installation(&mut document, &handover.installation)?;
+    let present = |key: &str| document.get("ui").and_then(|u| u.get(key)).is_some();
+    // A look remembered just now keeps only the keys the file really had.
+    if config.installation.ui_before.is_none() {
+        if let Some(before) = handover.installation.ui_before.as_mut() {
+            for (key, slot) in [
+                ("logo_color", &mut before.logo_color),
+                ("command_alias", &mut before.command_alias),
+                ("command_alias_add", &mut before.command_alias_add),
+            ] {
+                if !present(key) {
+                    *slot = None;
+                }
+            }
+        }
+    }
+    // Only what changes is touched, so a key keeps its line and comment.
+    let mut actions: Vec<UiAction> = Vec::new();
+    let current = [
+        ("logo_color", &config.ui.logo_color),
+        ("command_alias", &config.ui.command_alias),
+        ("command_alias_add", &config.ui.command_alias_add),
+    ];
     if let Some(ui) = &handover.ui {
-        for (key, value) in [
-            ("ui.logo_color", &ui.logo_color),
-            ("ui.command_alias", &ui.command_alias),
-            ("ui.command_alias_add", &ui.command_alias_add),
-        ] {
-            insert_dotted(&mut document, key, toml::Value::String(value.clone()))?;
+        let wanted = [&ui.logo_color, &ui.command_alias, &ui.command_alias_add];
+        for ((key, now), want) in current.iter().zip(wanted) {
+            if now != &want {
+                actions.push((key, Some(want.clone())));
+            }
+        }
+    }
+    if let Some(before) = &handover.ui_restore {
+        let old = [
+            &before.logo_color,
+            &before.command_alias,
+            &before.command_alias_add,
+        ];
+        for ((key, now), old) in current.iter().zip(old) {
+            match old {
+                Some(v) if v != *now || !present(key) => actions.push((key, Some(v.clone()))),
+                None if present(key) => actions.push((key, None)),
+                _ => {}
+            }
+        }
+    }
+    put_installation(&mut document, &handover.installation)?;
+    for (key, value) in &actions {
+        let dotted = format!("ui.{key}");
+        match value {
+            Some(v) => insert_dotted(&mut document, &dotted, toml::Value::String(v.clone()))?,
+            None => remove_dotted(&mut document, &dotted),
         }
     }
     validate(&document)?;
-    let text = splice(
-        &raw,
-        &document,
-        &handover.installation,
-        handover.ui.as_ref(),
-    )?;
+    let text = splice(&raw, &document, &handover.installation, &actions)?;
     write_text(path, &raw, &text)?;
     Ok(Some(handover))
 }

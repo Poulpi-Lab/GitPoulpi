@@ -6006,6 +6006,8 @@ installation = "설치"
 installation_help = "지금 실행 중인 GitPoulpi가 어떻게 설치되었고, 어디에 있으며, 어떤 환경(창과 기록을 공유하는 범위)에 속하는지 보여 줍니다. 이 컴퓨터의 다른 설치(개발 빌드, 패키지)는 런처 이름, 색상, 별칭을 따로 가집니다."
 # context: value of the Installation row; {kind} is the install kind (dev, portable...), {path} its folder, {env} the environment name
 installation_info = "{kind}, {path}, 환경 {env}"
+# context: end of the help line of the Installation row, which shows the whole folder when the value is cut; {path} is the install folder
+installation_folder = "Folder: {path}"
 name = "런처 이름"
 name_help = "이 설치의 바로 가기와 파일 관리자 메뉴 항목에 쓰는 이름입니다. 이 설치의 이름만 바뀝니다."
 name_primary = "주 설치의 이름은 항상 GitPoulpi입니다"

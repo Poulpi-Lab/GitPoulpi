@@ -6009,6 +6009,8 @@ this_heading = "Ta instalacja"
 installation = "Instalacja"
 installation_help = "Która to instalacja GitPoulpi: jak została zainstalowana, gdzie się znajduje i jakie środowisko, którego okna i historię współdzieli. Inna instalacja na tym komputerze (wersja deweloperska, pakiet) ma własną nazwę programu uruchamiającego, kolor i aliasy."
 installation_info = "{kind}, {path}, środowisko {env}"
+# context: end of the help line of the Installation row, which shows the whole folder when the value is cut; {path} is the install folder
+installation_folder = "Folder: {path}"
 name = "Nazwa programu uruchamiającego"
 name_help = "Nazwa skrótów tej instalacji i jej pozycji w menu menedżera plików. Zmienia się nazwa tylko tej instalacji."
 name_primary = "instalacja główna zawsze nazywa się GitPoulpi"

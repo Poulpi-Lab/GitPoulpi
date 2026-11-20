@@ -138,6 +138,27 @@ pub(super) fn replace_table(raw: &str, table: &str, new_text: &str) -> Option<St
     Some(out)
 }
 
+/// Removes the `key = ...` line of the plain `[table]` section (nothing to do
+/// when it is not there).
+pub(super) fn remove_key(raw: &str, table: &str, key: &str) -> Option<String> {
+    let (blocks, root_end) = scan(raw);
+    if root_mentions(raw, root_end, table) {
+        return None;
+    }
+    let Some(b) = blocks.iter().find(|b| b.name == [table]) else {
+        return Some(raw.to_string());
+    };
+    let mut offset = b.start;
+    for (i, line) in raw[b.start..b.end].split_inclusive('\n').enumerate() {
+        let start = offset;
+        offset += line.len();
+        if i > 0 && line_key(line).as_deref() == Some(key) {
+            return Some(format!("{}{}", &raw[..start], &raw[offset..]));
+        }
+    }
+    Some(raw.to_string())
+}
+
 /// Sets `key = value` (`value` already TOML text) in the plain `[table]`
 /// section: replaces the key's line, else adds one after the section's last
 /// non-blank line, else appends a new section.

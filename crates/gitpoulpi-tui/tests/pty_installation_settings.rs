@@ -295,6 +295,60 @@ fn becoming_primary_takes_the_legacy_names() {
     let _ = s.term.stop();
 }
 
+/// The screen shows the Become the primary row with `mark` as its checkbox.
+fn primary_row(screen: &str, mark: &str) -> bool {
+    screen
+        .lines()
+        .any(|l| l.contains("Become the primary") && l.contains(mark))
+}
+
+#[test]
+fn the_primary_checkbox_follows_the_state_and_enter_toggles_like_space() {
+    let ui = format!("{UI}logo_color = \"violet\"\n");
+    let mut s = start("installation-primary-row", &ui, |_| {});
+    palette(
+        &mut s.term,
+        "settings: become the primary",
+        "Settings: Become the primary...",
+    );
+    s.term
+        .wait_for("Settings on the primary row", STEP, |t| {
+            primary_row(&t.text(), "[ ]")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    s.term.send_keys("Space").unwrap();
+    s.term
+        .wait_for("the checkbox is checked", STEP, |t| {
+            primary_row(&t.text(), "[x]")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    assert_eq!(
+        s.config_toml()["installation"]["primary"].as_str(),
+        Some("p-pty")
+    );
+    s.term
+        .wait_for("the name row says the primary is GitPoulpi", STEP, |t| {
+            t.contains("the primary is always called GitPoulpi")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    // Enter toggles like Space (the Settings checkbox convention).
+    s.term.send_keys("Enter").unwrap();
+    s.term
+        .wait_for("the checkbox is cleared", STEP, |t| {
+            primary_row(&t.text(), "[ ]")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    let file = s.config_toml();
+    assert!(file["installation"].get("primary").is_none(), "{file}");
+    assert_eq!(
+        file["ui"]["logo_color"].as_str(),
+        Some("violet"),
+        "ui.* is what it was before the primary: {file}"
+    );
+    assert!(file["installation"].get("ui_before").is_none(), "{file}");
+    let _ = s.term.stop();
+}
+
 #[test]
 fn the_environment_row_writes_this_installations_env() {
     let other = tempfile::tempdir().unwrap();

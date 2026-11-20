@@ -22,6 +22,7 @@ fn run(scratch: &Path, args: &[&str]) -> (bool, Value) {
         .env("XDG_DATA_HOME", scratch.join("data"))
         .env("XDG_CONFIG_HOME", home.join(".config"))
         .env("PATH", "/usr/bin:/bin")
+        .env("GITPOULPI_INSTALL_ID", "alias-add")
         .env_remove("LOCALAPPDATA")
         .current_dir(scratch)
         .arg("--json")
@@ -53,7 +54,9 @@ fn the_add_variant_is_a_script_that_runs_the_tui_with_add_and_is_listed_by_kind(
         text.contains(&format!("exec '{target}' --add \"$@\"")),
         "{text}"
     );
-    assert!(text.contains("X-GitPoulpi=1"), "{text}");
+    // Tagged with the installation; the legacy marker is the primary's alone.
+    assert!(text.contains("# X-GitPoulpi-Install=p-alias-add"), "{text}");
+    assert!(!text.contains("# X-GitPoulpi=1"), "{text}");
 
     let (ok, plain) = run(tmp.path(), &["alias", "create", "gp"]);
     assert!(ok, "{plain}");
@@ -85,7 +88,8 @@ fn the_configured_add_name_is_reported_by_status() {
     std::fs::create_dir_all(tmp.path().join("cfg")).unwrap();
     std::fs::write(
         tmp.path().join("cfg/config.toml"),
-        "[ui]\ncommand_alias = \"gp\"\ncommand_alias_add = \"gpa\"\n",
+        // The shared `ui.*` names are the primary's.
+        "[ui]\ncommand_alias = \"gp\"\ncommand_alias_add = \"gpa\"\n[installation]\nprimary = \"p-alias-add\"\n",
     )
     .unwrap();
     let (ok, status) = run(tmp.path(), &["alias", "status"]);

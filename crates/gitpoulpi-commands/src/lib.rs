@@ -43,6 +43,7 @@ pub mod commands;
 pub mod config_cmd;
 #[cfg(feature = "hosting")]
 pub mod hosting_cmd;
+pub mod installation_cmd;
 pub mod job_cmd;
 pub mod launch;
 #[cfg(feature = "mcp")]

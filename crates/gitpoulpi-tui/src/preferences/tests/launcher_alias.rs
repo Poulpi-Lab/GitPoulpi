@@ -32,6 +32,7 @@ fn machine(root: &Path, path_var: &str) -> Machine {
         path_var: Some(path_var.into()),
         pathext: None,
         ctx: gitpoulpi_config::desktop::InstallCtx::legacy(),
+        cargo_home: None,
     };
     let path = user_path::Env {
         os: Os::Linux,
@@ -39,6 +40,7 @@ fn machine(root: &Path, path_var: &str) -> Machine {
         config_home: root.join("home/.config"),
         wanted: vec![PathBuf::from("/opt/gp"), alias.bin_dir.clone()],
         path_var: Some(path_var.into()),
+        keep: Vec::new(),
     };
     Machine {
         alias,

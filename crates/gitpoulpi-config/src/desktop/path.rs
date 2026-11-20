@@ -37,6 +37,10 @@ pub struct Env {
     pub wanted: Vec<PathBuf>,
     /// The current process `PATH`.
     pub path_var: Option<OsString>,
+    /// Folders other live installations rely on: the shared record is a list
+    /// several installations add to, so Add and Remove leave an entry that is
+    /// one of these (or inside one) as it is. [`Env::keeping`] fills it.
+    pub keep: Vec<PathBuf>,
 }
 
 impl Env {
@@ -65,7 +69,22 @@ impl Env {
             config_home: var("XDG_CONFIG_HOME").unwrap_or_else(|| home.join(".config")),
             wanted,
             path_var: env("PATH").map(OsString::from),
+            keep: Vec::new(),
         }
+    }
+
+    /// The same machine, leaving `keep` (other installations' folders) alone.
+    /// The shared alias `bin` folder is added to it by the caller while
+    /// another installation still has an alias there
+    /// ([`super::alias::others_have_aliases`]).
+    pub fn keeping(mut self, keep: Vec<PathBuf>) -> Env {
+        self.keep = keep;
+        self
+    }
+
+    /// Is `dir` a folder another installation relies on?
+    fn kept(&self, dir: &Path) -> bool {
+        self.keep.iter().any(|k| within(self.os, dir, k))
     }
 
     fn on_path(&self, dir: &Path) -> bool {
@@ -86,6 +105,19 @@ fn norm(os: Os, s: &str) -> String {
 
 fn same_dir(os: Os, a: &Path, b: &Path) -> bool {
     norm(os, &a.to_string_lossy()) == norm(os, &b.to_string_lossy())
+}
+
+/// Is `dir` the folder `root` or inside it?
+fn within(os: Os, dir: &Path, root: &Path) -> bool {
+    let (d, r) = (
+        norm(os, &dir.to_string_lossy()),
+        norm(os, &root.to_string_lossy()),
+    );
+    if r.is_empty() {
+        return false;
+    }
+    let sep = if os == Os::Windows { '\\' } else { '/' };
+    d == r || d.strip_prefix(&r).is_some_and(|rest| rest.starts_with(sep))
 }
 
 /// What the user's `PATH` holds of ours.
@@ -360,11 +392,23 @@ fn win_dir(dir: &Path) -> String {
 /// The new `Path` value and record for Add: what we added before is taken
 /// out first, then every wanted directory that is missing goes on the end.
 pub fn windows_add(values: &UserPathValues, wanted: &[PathBuf]) -> (String, Option<String>) {
-    let before = values
+    windows_add_keeping(values, wanted, &|_| false)
+}
+
+/// [`windows_add`] where `keep(entry)` names recorded entries (other
+/// installations') that stay recorded instead of being replaced.
+pub fn windows_add_keeping(
+    values: &UserPathValues,
+    wanted: &[PathBuf],
+    keep: &dyn Fn(&str) -> bool,
+) -> (String, Option<String>) {
+    let before: Vec<&str> = values
         .added
         .as_deref()
         .map(split_entries)
         .unwrap_or_default();
+    let kept: Vec<&str> = before.iter().copied().filter(|e| keep(e)).collect();
+    let before: Vec<&str> = before.into_iter().filter(|e| !keep(e)).collect();
     let mut entries: Vec<&str> = split_entries(&values.path)
         .into_iter()
         .filter(|e| !contains(Os::Windows, &before, e))
@@ -376,22 +420,35 @@ pub fn windows_add(values: &UserPathValues, wanted: &[PathBuf]) -> (String, Opti
         .filter(|d| !contains(Os::Windows, &entries, d))
         .collect();
     entries.extend(&missing);
-    let added = (!missing.is_empty()).then(|| missing.join(";"));
+    let record: Vec<&str> = kept.into_iter().chain(missing).collect();
+    let added = (!record.is_empty()).then(|| record.join(";"));
     (entries.join(";"), added)
 }
 
 /// The new `Path` value for Remove: exactly what the record lists goes.
 pub fn windows_remove(values: &UserPathValues) -> String {
-    let added = values
+    windows_remove_keeping(values, &|_| false).0
+}
+
+/// [`windows_remove`] that leaves the recorded entries `keep` names (other
+/// installations') on `PATH` and in the record. Returns the new `Path` and
+/// what is still recorded.
+pub fn windows_remove_keeping(
+    values: &UserPathValues,
+    keep: &dyn Fn(&str) -> bool,
+) -> (String, Option<String>) {
+    let recorded: Vec<&str> = values
         .added
         .as_deref()
         .map(split_entries)
         .unwrap_or_default();
-    split_entries(&values.path)
+    let (stay, go): (Vec<&str>, Vec<&str>) = recorded.into_iter().partition(|e| keep(e));
+    let path = split_entries(&values.path)
         .into_iter()
-        .filter(|e| !contains(Os::Windows, &added, e))
+        .filter(|e| !contains(Os::Windows, &go, e))
         .collect::<Vec<_>>()
-        .join(";")
+        .join(";");
+    (path, (!stay.is_empty()).then(|| stay.join(";")))
 }
 
 // ---- The three operations ----------------------------------------------
@@ -467,21 +524,30 @@ pub fn status(env: &Env, user: &dyn UserPath) -> Result<Status, String> {
 pub fn add(env: &Env, user: &dyn UserPath) -> Result<Vec<PathBuf>, String> {
     if env.os == Os::Windows {
         let values = user.read()?;
-        let (path, added) = windows_add(&values, &env.wanted);
+        let (path, added) = windows_add_keeping(&values, &env.wanted, &|e| env.kept(Path::new(e)));
         if added.is_none() && values.added.is_none() {
             return Ok(Vec::new());
         }
         user.write(&path, added.as_deref())?;
         return Ok(vec![PathBuf::from("HKCU\\Environment")]);
     }
-    let missing: Vec<PathBuf> = env
+    let existing = unix_entries(env);
+    let mut missing: Vec<PathBuf> = env
         .wanted
         .iter()
-        .filter(|d| !env.on_path(d) || unix_entries(env).iter().any(|(_, ds)| ds.contains(d)))
+        .filter(|d| !env.on_path(d) || existing.iter().any(|(_, ds)| ds.contains(d)))
         .cloned()
         .collect();
     if missing.is_empty() {
         return Ok(Vec::new());
+    }
+    // Other installations' folders recorded by an earlier Add stay recorded.
+    for (_, dirs) in &existing {
+        for d in dirs.iter().filter(|d| env.kept(d)) {
+            if !missing.iter().any(|m| same_dir(env.os, m, d)) {
+                missing.push(d.clone());
+            }
+        }
     }
     let (rcs, fish) = shell_files(env);
     let mut written = Vec::new();
@@ -512,17 +578,34 @@ pub fn remove(env: &Env, user: &dyn UserPath) -> Result<Vec<PathBuf>, String> {
         if values.added.is_none() {
             return Ok(Vec::new());
         }
-        user.write(&windows_remove(&values), None)?;
+        let (path, left) = windows_remove_keeping(&values, &|e| env.kept(Path::new(e)));
+        if path == values.path && left == values.added {
+            return Ok(Vec::new());
+        }
+        user.write(&path, left.as_deref())?;
         return Ok(vec![PathBuf::from("HKCU\\Environment")]);
     }
     let mut changed = Vec::new();
-    for (path, _) in unix_entries(env) {
+    for (path, dirs) in unix_entries(env) {
+        let (stay, go): (Vec<PathBuf>, Vec<PathBuf>) = dirs.into_iter().partition(|d| env.kept(d));
+        if go.is_empty() && !stay.is_empty() {
+            continue; // only other installations' folders: nothing of mine
+        }
         if path.ends_with(FISH_FILE) {
-            std::fs::remove_file(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+            if stay.is_empty() {
+                std::fs::remove_file(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+            } else {
+                std::fs::write(&path, fish_text(&stay))
+                    .map_err(|e| format!("{}: {e}", path.display()))?;
+            }
         } else {
             let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
-            let (rest, _) = strip_block(&text);
-            std::fs::write(&path, rest).map_err(|e| format!("{}: {e}", path.display()))?;
+            let new = if stay.is_empty() {
+                strip_block(&text).0
+            } else {
+                with_block(&text, &stay)
+            };
+            std::fs::write(&path, new).map_err(|e| format!("{}: {e}", path.display()))?;
         }
         changed.push(path);
     }
@@ -557,6 +640,7 @@ mod tests {
             config_home: root.join(".config"),
             wanted: vec![PathBuf::from("/opt/gp"), root.join(".local/bin")],
             path_var: Some(path_var.into()),
+            keep: Vec::new(),
         }
     }
 
@@ -712,6 +796,7 @@ mod tests {
             config_home: tmp.path().to_path_buf(),
             wanted: vec![PathBuf::from("C:/Apps/GP")],
             path_var: Some("C:\\Windows".into()),
+            keep: Vec::new(),
         };
         let user = Memory(RefCell::new(UserPathValues {
             path: "C:\\Windows".into(),
@@ -750,5 +835,92 @@ mod tests {
         assert_eq!(v.path, "C:\\a;%X%\\b");
         assert_eq!(v.added.as_deref(), Some("C:\\a"));
         assert_eq!(parse_registry_read("PATH=\n"), UserPathValues::default());
+    }
+
+    #[test]
+    fn path_remove_keeps_other_folders_and_the_bin_dir_while_others_have_aliases() {
+        let tmp = tempfile::tempdir().unwrap();
+        let machine = |keep: &[&str]| Env {
+            os: Os::Windows,
+            home: tmp.path().to_path_buf(),
+            config_home: tmp.path().to_path_buf(),
+            wanted: vec![PathBuf::from("C:/Apps/A"), PathBuf::from("C:/Apps/bin")],
+            path_var: Some("C:\\Windows".into()),
+            keep: keep.iter().map(PathBuf::from).collect(),
+        };
+        let store = || {
+            Memory(RefCell::new(UserPathValues {
+                path: "C:\\Windows;C:\\Apps\\A;C:\\Apps\\B\\bin;C:\\Apps\\bin".into(),
+                added: Some("C:\\Apps\\A;C:\\Apps\\B\\bin;C:\\Apps\\bin".into()),
+            }))
+        };
+        // Another installation lives in C:\Apps\B and still has an alias in the bin folder.
+        let user = store();
+        let e = machine(&["C:/Apps/B", "C:/Apps/bin"]);
+        assert_eq!(remove(&e, &user).unwrap().len(), 1);
+        assert_eq!(
+            *user.0.borrow(),
+            UserPathValues {
+                path: "C:\\Windows;C:\\Apps\\B\\bin;C:\\Apps\\bin".into(),
+                added: Some("C:\\Apps\\B\\bin;C:\\Apps\\bin".into()),
+            },
+            "only my folder went; a folder inside the other's root stays"
+        );
+        // Nothing of mine left: a second Remove writes nothing.
+        assert!(remove(&e, &user).unwrap().is_empty());
+        // The last alias of the others is gone: the shared bin folder goes too.
+        let user = store();
+        remove(&machine(&["C:/Apps/B"]), &user).unwrap();
+        assert_eq!(user.0.borrow().path, "C:\\Windows;C:\\Apps\\B\\bin");
+        assert_eq!(user.0.borrow().added.as_deref(), Some("C:\\Apps\\B\\bin"));
+        // Add by another installation keeps what an earlier Add recorded for the others.
+        let user = store();
+        let (path, added) =
+            windows_add_keeping(&user.read().unwrap(), &[PathBuf::from("C:/Apps/C")], &|e| {
+                e.contains("\\B\\")
+            });
+        assert!(path.ends_with(";C:\\Apps\\C"), "{path}");
+        assert_eq!(added.as_deref(), Some("C:\\Apps\\B\\bin;C:\\Apps\\C"));
+        // Nobody else: Remove takes it all, as before.
+        let user = store();
+        remove(&machine(&[]), &user).unwrap();
+        assert_eq!(
+            *user.0.borrow(),
+            UserPathValues {
+                path: "C:\\Windows".into(),
+                added: None
+            }
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn unix_remove_rewrites_the_block_for_the_folders_others_keep() {
+        let tmp = tempfile::tempdir().unwrap();
+        let rc = tmp.path().join(".bashrc");
+        let dirs = [
+            PathBuf::from("/opt/a"),
+            PathBuf::from("/opt/b"),
+            tmp.path().join(".local/bin"),
+        ];
+        std::fs::write(&rc, with_block("export X=1\n", &dirs)).unwrap();
+        let mut e = unix_env(tmp.path(), "/usr/bin");
+        e.keep = vec![PathBuf::from("/opt/b"), tmp.path().join(".local/bin")];
+        assert_eq!(
+            remove(&e, &Memory::default()).unwrap(),
+            std::slice::from_ref(&rc)
+        );
+        let (rest, left) = strip_block(&std::fs::read_to_string(&rc).unwrap());
+        assert_eq!(rest, "export X=1\n");
+        assert_eq!(
+            left.unwrap(),
+            [PathBuf::from("/opt/b"), tmp.path().join(".local/bin")]
+        );
+        // Only the others' folders are left: nothing of mine, nothing written.
+        assert!(remove(&e, &Memory::default()).unwrap().is_empty());
+        e.keep = vec![PathBuf::from("/opt/b")];
+        remove(&e, &Memory::default()).unwrap();
+        let (_, left) = strip_block(&std::fs::read_to_string(&rc).unwrap());
+        assert_eq!(left.unwrap(), [PathBuf::from("/opt/b")]);
     }
 }

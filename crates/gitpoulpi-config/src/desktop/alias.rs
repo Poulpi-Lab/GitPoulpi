@@ -4,8 +4,14 @@
 //!
 //! | OS | What is written | How it is known to be ours |
 //! |---|---|---|
-//! | Linux, macOS | `~/.local/bin/<name>`, a symlink to `gitpoulpi` | the link's target is a file called `gitpoulpi` (or the older `gitpoulpi-tui`, then rewritten) |
-//! | Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd` | the file holds [`CMD_MARKER`] |
+//! | Linux, macOS | `~/.local/bin/<name>`, a symlink to `gitpoulpi` | the link's target is a file called `gitpoulpi` (or the older `gitpoulpi-tui`, then rewritten); its owner is the installation that target belongs to ([`crate::installation::identify`]) |
+//! | Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd` | the file holds [`CMD_MARKER`] (the primary only) or an owner tag ([`CMD_OWNER_PREFIX`]) |
+//!
+//! **Several installations share the bin directory.** Each alias is owned
+//! (see [`super::owner::decide`]): another live installation's alias reads
+//! [`State::Other`] (never `Outdated`), `create` refuses its name but replaces
+//! an orphan's, and `list`, `remove` without a name and the sync touch only
+//! mine. Only the primary also writes the legacy marker old builds look for.
 //!
 //! The *add* variant (`gpa`: `gitpoulpi --add`, which opens the current folder
 //! as a tab of the GitPoulpi that is already running) needs an argument, so it
@@ -22,8 +28,9 @@
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
-use super::folder_menu::windows::{app_path_is_ours, app_path_ops, app_path_remove};
-use super::registry::Registry;
+use super::folder_menu::windows::{app_path_key, app_path_remove};
+use super::owner::{decide, Facts, Owner};
+use super::registry::{RegOp, Registry};
 use crate::open_in::Os;
 
 /// Second line of every `.cmd` shim we write.
@@ -37,6 +44,11 @@ pub const CMDLINE_ENV: &str = "GITPOULPI_CMDCMDLINE";
 
 /// Second line of the `/bin/sh` shim of the add variant on Linux and macOS.
 pub const UNIX_MARKER: &str = "# X-GitPoulpi=1";
+
+/// The owner tag line of a `.cmd` shim: followed by the installation id.
+pub const CMD_OWNER_PREFIX: &str = "REM X-GitPoulpi-Install=";
+/// The owner tag line of a `/bin/sh` shim: followed by the installation id.
+pub const UNIX_OWNER_PREFIX: &str = "# X-GitPoulpi-Install=";
 
 /// What an alias runs.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -90,8 +102,10 @@ pub struct Env {
     pub path_var: Option<OsString>,
     /// Windows `PATHEXT`.
     pub pathext: Option<String>,
-    /// Who writes (owner tag, names). Not read yet.
+    /// Who writes: the owner tag and the verdict on every alias found.
     pub ctx: super::InstallCtx,
+    /// `$CARGO_HOME`, to identify the installation a symlink points at.
+    pub cargo_home: Option<String>,
 }
 
 impl Env {
@@ -118,7 +132,16 @@ impl Env {
             path_var: env("PATH").map(OsString::from),
             pathext: env("PATHEXT"),
             ctx: super::InstallCtx::legacy(),
+            cargo_home: env("CARGO_HOME")
+                .filter(|v| !v.is_empty())
+                .or_else(|| Some(home.join(".cargo").to_string_lossy().into_owned())),
         }
+    }
+
+    /// The same machine, written by `ctx`.
+    pub fn with_ctx(mut self, ctx: super::InstallCtx) -> Env {
+        self.ctx = ctx;
+        self
     }
 
     /// Is `target` what this alias should start?
@@ -231,12 +254,15 @@ pub fn validate_name(name: &str) -> Result<(), NameError> {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum State {
     NotInstalled,
-    /// Ours and starting the current exe.
+    /// Mine and starting the current exe.
     Installed,
     /// Ours, but the exe moved: Create fixes it.
     Outdated,
     /// A file of that name exists and is not ours; it is left alone.
     Foreign,
+    /// Another installation that still exists owns it: never touched, and
+    /// never `Outdated` (it is right for its owner).
+    Other,
 }
 
 impl State {
@@ -246,6 +272,7 @@ impl State {
             State::Installed => "installed",
             State::Outdated => "outdated",
             State::Foreign => "foreign",
+            State::Other => "other",
         }
     }
 }
@@ -253,6 +280,8 @@ impl State {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Status {
     pub state: State,
+    /// The installation the alias belongs to, when there is one and it is known.
+    pub owner: Option<String>,
     /// Not installed here, but the name already resolves on `PATH` to this
     /// (a shell alias or function cannot be seen from here).
     pub shadowed_by: Option<PathBuf>,
@@ -266,22 +295,57 @@ pub fn cmd_shim_text(exe: &Path) -> String {
 }
 
 /// [`cmd_shim_text`] for either kind: the add variant passes `--add` first.
+/// Written as the sole installation (legacy marker, no owner tag).
 pub fn cmd_shim_text_for(exe: &Path, kind: Kind) -> String {
+    cmd_shim_text_owned(exe, kind, None, true)
+}
+
+/// The `.cmd` text with its owner lines: `tag` is the installation id,
+/// `legacy` adds the marker old builds look for (the primary only).
+pub fn cmd_shim_text_owned(exe: &Path, kind: Kind, tag: Option<&str>, legacy: bool) -> String {
     let flag = match kind {
         Kind::Open => "",
         Kind::Add => " --add",
     };
+    let mut owner = String::new();
+    if legacy {
+        owner.push_str(&format!("{CMD_MARKER}\r\n"));
+    }
+    if let Some(tag) = tag {
+        owner.push_str(&format!("{CMD_OWNER_PREFIX}{tag}\r\n"));
+    }
     format!(
-        "@echo off\r\n{CMD_MARKER}\r\nset \"{CMDLINE_ENV}=%CMDCMDLINE%\"\r\n\"{}\"{flag} %*\r\n",
+        "@echo off\r\n{owner}set \"{CMDLINE_ENV}=%CMDCMDLINE%\"\r\n\"{}\"{flag} %*\r\n",
         exe.display().to_string().replace('"', "")
     )
 }
 
 /// The `/bin/sh` text of the add variant: a marker and an `exec`.
 pub fn sh_shim_text(exe: &Path) -> String {
+    sh_shim_text_owned(exe, None, true)
+}
+
+/// [`sh_shim_text`] with its owner lines, like [`cmd_shim_text_owned`].
+pub fn sh_shim_text_owned(exe: &Path, tag: Option<&str>, legacy: bool) -> String {
+    let mut owner = String::new();
+    if legacy {
+        owner.push_str(&format!("{UNIX_MARKER}\n"));
+    }
+    if let Some(tag) = tag {
+        owner.push_str(&format!("{UNIX_OWNER_PREFIX}{tag}\n"));
+    }
     format!(
-        "#!/bin/sh\n{UNIX_MARKER}\nexec {} --add \"$@\"\n",
+        "#!/bin/sh\n{owner}exec {} --add \"$@\"\n",
         sh_quote(&exe.display().to_string())
+    )
+}
+
+/// What this installation writes into a shim: its tag (none for the blank
+/// legacy context) and whether it is the primary.
+fn owner_lines(ctx: &super::InstallCtx) -> (Option<&str>, bool) {
+    (
+        Some(ctx.id.as_str()).filter(|t| !t.is_empty()),
+        ctx.is_primary(),
     )
 }
 
@@ -308,11 +372,29 @@ fn sh_unquote(text: &str) -> Option<(String, &str)> {
     }
 }
 
-/// The exe and kind of a `.cmd` shim of ours.
-fn shim_parts(text: &str) -> Option<(PathBuf, Kind)> {
-    if !text.lines().any(|l| l.trim() == CMD_MARKER) {
-        return None;
-    }
+/// What a shim of ours says about itself.
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct Shim {
+    exe: PathBuf,
+    kind: Kind,
+    /// The owner tag, when there is one.
+    tag: Option<String>,
+    /// The legacy marker line is there.
+    legacy: bool,
+}
+
+fn owner_facts(text: &str, marker: &str, prefix: &str) -> Option<(Option<String>, bool)> {
+    let legacy = text.lines().any(|l| l.trim() == marker);
+    let tag = text
+        .lines()
+        .find_map(|l| l.trim().strip_prefix(prefix))
+        .map(|t| t.trim().to_string());
+    (legacy || tag.is_some()).then_some((tag, legacy))
+}
+
+/// The exe, kind and owner lines of a `.cmd` shim of ours.
+fn shim_parts(text: &str) -> Option<Shim> {
+    let (tag, legacy) = owner_facts(text, CMD_MARKER, CMD_OWNER_PREFIX)?;
     let line = text
         .lines()
         .find_map(|l| l.trim().strip_suffix("%*"))?
@@ -329,41 +411,128 @@ fn shim_parts(text: &str) -> Option<(PathBuf, Kind)> {
     } else {
         Kind::Open
     };
-    Some((PathBuf::from(exe), kind))
+    Some(Shim {
+        exe: PathBuf::from(exe),
+        kind,
+        tag,
+        legacy,
+    })
 }
 
 /// The exe a `.cmd` shim of ours starts.
 #[cfg(test)]
 fn shim_target(text: &str) -> Option<PathBuf> {
-    shim_parts(text).map(|(exe, _)| exe)
+    shim_parts(text).map(|s| s.exe)
 }
 
-/// The exe and kind of a `/bin/sh` shim of ours.
-fn sh_parts(text: &str) -> Option<(PathBuf, Kind)> {
-    if !text.lines().any(|l| l.trim() == UNIX_MARKER) {
-        return None;
-    }
+/// The exe, kind and owner lines of a `/bin/sh` shim of ours.
+fn sh_parts(text: &str) -> Option<Shim> {
+    let (tag, legacy) = owner_facts(text, UNIX_MARKER, UNIX_OWNER_PREFIX)?;
     let line = text.lines().find_map(|l| l.trim().strip_prefix("exec "))?;
     let (exe, rest) = sh_unquote(line.trim())?;
-    (rest.trim() == "--add \"$@\"").then(|| (PathBuf::from(exe), Kind::Add))
+    (rest.trim() == "--add \"$@\"").then(|| Shim {
+        exe: PathBuf::from(exe),
+        kind: Kind::Add,
+        tag,
+        legacy,
+    })
 }
 
-/// `Some((target, kind))` when `path` is an alias of ours.
-fn ours(env: &Env, path: &Path) -> Option<(PathBuf, Kind)> {
+/// An alias of ours found on disk.
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct Found {
+    target: PathBuf,
+    kind: Kind,
+    owner: Owner,
+    /// The installation id it belongs to, when known.
+    id: Option<String>,
+}
+
+impl Found {
+    /// Mine to rewrite and remove: tagged with my id, or untagged and naming
+    /// my exe.
+    fn is_mine(&self) -> bool {
+        matches!(self.owner, Owner::Mine | Owner::Adopt)
+    }
+}
+
+/// The installation a symlink target belongs to ([`crate::installation::identify`]).
+/// The caller settles the running exe first: a pinned identity cannot be
+/// recomputed from the path. A neighbour in the same folder (the retired
+/// `gitpoulpi-tui`) is the caller's too.
+fn target_owner_id(env: &Env, target: &Path, link: &Path) -> String {
+    let absolute = if target.is_relative() {
+        link.parent()
+            .map_or_else(|| target.to_path_buf(), |d| d.join(target))
+    } else {
+        target.to_path_buf()
+    };
+    let fs = crate::installation::RealFs;
+    let ident = crate::installation::IdentityEnv {
+        windows: env.os == Os::Windows,
+        host_target: crate::release::host_target(),
+        cargo_home: env.cargo_home.clone(),
+        install_id: None,
+        env_override: None,
+        fs: &fs,
+    };
+    crate::installation::identify(&absolute, &ident).id
+}
+
+/// `Some(found)` when `path` is an alias of ours (anybody's).
+fn ours(env: &Env, path: &Path) -> Option<Found> {
+    let from_shim = |shim: Shim| {
+        let facts = Facts {
+            tag: shim.tag.as_deref(),
+            legacy_marker: shim.legacy,
+            names_my_exe: shim.tag.is_none() && env.is_current(&shim.exe),
+        };
+        let owner = decide(&facts, &env.ctx);
+        let id = shim.tag.clone().or_else(|| match &owner {
+            Owner::Other(id) | Owner::Orphan(Some(id)) => Some(id.clone()),
+            Owner::Adopt => Some(env.ctx.id.clone()),
+            _ => None,
+        });
+        Found {
+            target: shim.exe,
+            kind: shim.kind,
+            owner,
+            id,
+        }
+    };
     match env.os {
-        Os::Windows => shim_parts(&std::fs::read_to_string(path).ok()?),
+        Os::Windows => shim_parts(&std::fs::read_to_string(path).ok()?).map(from_shim),
         _ => {
             if let Ok(target) = std::fs::read_link(path) {
                 let name = target.file_name()?.to_string_lossy().into_owned();
                 // The CLI itself when no TUI sits next to it (`exe_for`).
-                return name.starts_with(CLI_STEM).then_some((target, Kind::Open));
+                if !name.starts_with(CLI_STEM) {
+                    return None;
+                }
+                let (owner, id) = if env.is_current(&target) || target.parent() == env.exe.parent()
+                {
+                    (Owner::Mine, env.ctx.id.clone())
+                } else {
+                    let id = target_owner_id(env, &target, path);
+                    let facts = Facts {
+                        tag: Some(&id),
+                        ..Facts::default()
+                    };
+                    (decide(&facts, &env.ctx), id)
+                };
+                return Some(Found {
+                    target,
+                    kind: Kind::Open,
+                    owner,
+                    id: Some(id),
+                });
             }
             // A regular file: only ever a small script of ours.
             let meta = std::fs::metadata(path).ok()?;
             if !meta.is_file() || meta.len() > 4096 {
                 return None;
             }
-            sh_parts(&std::fs::read_to_string(path).ok()?)
+            sh_parts(&std::fs::read_to_string(path).ok()?).map(from_shim)
         }
     }
 }
@@ -388,37 +557,53 @@ fn resolve_on_path(env: &Env, name: &str) -> Option<PathBuf> {
 }
 
 /// Windows: a shim of ours whose text is not what this version writes (an
-/// older one lacks the `GITPOULPI_CMDCMDLINE` line) is `Outdated`. Other
-/// systems have no text to compare.
+/// older one lacks the `GITPOULPI_CMDCMDLINE` line or the owner tag) is
+/// `Outdated`. Other systems have no text to compare, except the add script.
 fn shim_text_current(env: &Env, path: &Path) -> bool {
-    if env.os != Os::Windows {
+    let (tag, legacy) = owner_lines(&env.ctx);
+    let Ok(text) = std::fs::read_to_string(path) else {
         return true;
+    };
+    match env.os {
+        Os::Windows => shim_parts(&text)
+            .map(|s| text == cmd_shim_text_owned(&s.exe, s.kind, tag, legacy))
+            .unwrap_or(true),
+        _ => sh_parts(&text)
+            .map(|s| text == sh_shim_text_owned(&s.exe, tag, legacy))
+            .unwrap_or(true),
     }
-    std::fs::read_to_string(path)
-        .ok()
-        .and_then(|t| shim_parts(&t).map(|(exe, kind)| t == cmd_shim_text_for(&exe, kind)))
-        .unwrap_or(true)
 }
 
 pub fn status(env: &Env, name: &str) -> Status {
     status_kind(env, name, Kind::Open)
 }
 
+/// The state of an alias found on disk; `kind` is the one it should be, if asked.
+fn state_of(env: &Env, found: &Found, kind: Option<Kind>, path: &Path) -> State {
+    if matches!(found.owner, Owner::Other(_)) {
+        return State::Other;
+    }
+    if found.is_mine()
+        && kind.is_none_or(|k| k == found.kind)
+        && env.is_current(&found.target)
+        && shim_text_current(env, path)
+    {
+        State::Installed
+    } else {
+        State::Outdated
+    }
+}
+
 /// [`status`] for the alias `name` as it should be of `kind`: one of the other
 /// kind (or pointing at another exe) is ours but `Outdated`, and Create fixes it.
 pub fn status_kind(env: &Env, name: &str, kind: Kind) -> Status {
     let path = env.file(name);
-    let state = if std::fs::symlink_metadata(&path).is_err() {
-        State::NotInstalled
+    let (state, owner) = if std::fs::symlink_metadata(&path).is_err() {
+        (State::NotInstalled, None)
     } else {
         match ours(env, &path) {
-            Some((target, k))
-                if k == kind && env.is_current(&target) && shim_text_current(env, &path) =>
-            {
-                State::Installed
-            }
-            Some(_) => State::Outdated,
-            None => State::Foreign,
+            Some(found) => (state_of(env, &found, Some(kind), &path), found.id),
+            None => (State::Foreign, None),
         }
     };
     let shadowed_by = (state == State::NotInstalled)
@@ -426,6 +611,7 @@ pub fn status_kind(env: &Env, name: &str, kind: Kind) -> Status {
         .flatten();
     Status {
         state,
+        owner,
         shadowed_by,
         powershell_builtin: env.os == Os::Windows
             && POWERSHELL_ALIASES.contains(&name.to_ascii_lowercase().as_str()),
@@ -437,23 +623,34 @@ pub fn create(env: &Env, name: &str) -> Result<PathBuf, String> {
     create_kind(env, name, Kind::Open)
 }
 
-/// [`create`] for either kind.
+/// [`create`] for either kind. Refuses a name another live installation owns;
+/// an orphan's or a legacy alias is replaced.
 pub fn create_kind(env: &Env, name: &str, kind: Kind) -> Result<PathBuf, String> {
     validate_name(name).map_err(|e| e.describe().to_string())?;
     let path = env.file(name);
     if std::fs::symlink_metadata(&path).is_ok() {
-        if ours(env, &path).is_none() {
-            return Err(format!("{} is not ours; not replacing it", path.display()));
+        match ours(env, &path) {
+            None => return Err(format!("{} is not ours; not replacing it", path.display())),
+            Some(Found {
+                owner: Owner::Other(id),
+                ..
+            }) => {
+                return Err(format!(
+                    "{name} belongs to another installation ({id}); pick another name"
+                ))
+            }
+            Some(_) => {}
         }
         std::fs::remove_file(&path).map_err(|e| format!("{}: {e}", path.display()))?;
     }
     std::fs::create_dir_all(&env.bin_dir).map_err(|e| format!("{}: {e}", env.bin_dir.display()))?;
     let exe = env.wanted_exe();
+    let (tag, legacy) = owner_lines(&env.ctx);
     match (env.os, kind) {
-        (Os::Windows, kind) => std::fs::write(&path, cmd_shim_text_for(&exe, kind))
+        (Os::Windows, kind) => std::fs::write(&path, cmd_shim_text_owned(&exe, kind, tag, legacy))
             .map_err(|e| format!("{}: {e}", path.display()))?,
         (_, Kind::Open) => symlink(&exe, &path)?,
-        (_, Kind::Add) => write_script(&path, &sh_shim_text(&exe))?,
+        (_, Kind::Add) => write_script(&path, &sh_shim_text_owned(&exe, tag, legacy))?,
     }
     Ok(path)
 }
@@ -481,15 +678,25 @@ fn symlink(_exe: &Path, _path: &Path) -> Result<(), String> {
     Err("symbolic links are not available on this system".into())
 }
 
-/// Deletes the alias if it is ours. `Ok(false)`: there was none.
+/// Deletes the alias if it is ours (mine, an orphan's or a legacy one; never
+/// another live installation's). `Ok(false)`: there was none.
 pub fn remove(env: &Env, name: &str) -> Result<bool, String> {
     validate_name(name).map_err(|e| e.describe().to_string())?;
     let path = env.file(name);
     if std::fs::symlink_metadata(&path).is_err() {
         return Ok(false);
     }
-    if ours(env, &path).is_none() {
-        return Err(format!("{} is not ours; not removing it", path.display()));
+    match ours(env, &path) {
+        None => return Err(format!("{} is not ours; not removing it", path.display())),
+        Some(Found {
+            owner: Owner::Other(id),
+            ..
+        }) => {
+            return Err(format!(
+                "{name} belongs to another installation ({id}); not removing it"
+            ))
+        }
+        Some(_) => {}
     }
     std::fs::remove_file(&path).map_err(|e| format!("{}: {e}", path.display()))?;
     Ok(true)
@@ -500,11 +707,68 @@ pub fn app_path_name(name: &str) -> String {
     format!("{name}.exe")
 }
 
+const APP_MARK_NAME: &str = "X-GitPoulpi";
+const APP_MARK_VALUE: &str = "1";
+
+/// Who owns the App Paths key `key` (`gp.exe`)? `None`: absent.
+fn app_path_owner(
+    registry: &dyn Registry,
+    key: &str,
+    ctx: &super::InstallCtx,
+) -> Result<Option<Owner>, String> {
+    let got = registry.read(&[app_path_key(key)])?;
+    let Some((values, _)) = got.into_iter().next().flatten() else {
+        return Ok(None);
+    };
+    let value = |n: &str| {
+        values
+            .iter()
+            .find(|(k, _)| k.eq_ignore_ascii_case(n))
+            .map(|(_, v)| v.as_str())
+    };
+    let facts = Facts {
+        tag: value(super::OWNER_TAG),
+        legacy_marker: value(APP_MARK_NAME) == Some(APP_MARK_VALUE),
+        names_my_exe: false,
+    };
+    Ok(Some(decide(&facts, ctx)))
+}
+
+/// The values of App Paths `<alias>.exe`, pointing at `helper`: the legacy
+/// marker only from the primary, the owner tag from everyone.
+fn app_path_ops(key: &str, helper: &Path, ctx: &super::InstallCtx) -> Vec<RegOp> {
+    let (tag, legacy) = owner_lines(ctx);
+    let dir = helper
+        .parent()
+        .map(|p| p.display().to_string())
+        .unwrap_or_default();
+    let mut values = vec![
+        (String::new(), helper.display().to_string()),
+        ("Path".to_string(), dir),
+    ];
+    if legacy {
+        values.push((APP_MARK_NAME.to_string(), APP_MARK_VALUE.to_string()));
+    }
+    if let Some(tag) = tag {
+        values.push((super::OWNER_TAG.to_string(), tag.to_string()));
+    }
+    let full = app_path_key(key);
+    values
+        .into_iter()
+        .map(|(name, value)| RegOp::Set {
+            key: full.clone(),
+            name,
+            value,
+        })
+        .collect()
+}
+
 /// [`create_kind`], and on Windows for the Open alias also App Paths
 /// `<name>.exe` pointing at the console-less launcher beside the exe, so that
 /// typing the alias in the File Explorer address bar finds it even where the
 /// bin directory is not on `PATH`. No launcher beside the exe: no key, no
-/// error. A key of that name that is not ours is left alone.
+/// error. A key of that name that is not ours, or another installation's, is
+/// left alone.
 pub fn create_with_app_path(
     env: &Env,
     registry: &dyn Registry,
@@ -524,18 +788,22 @@ fn create_with_app_path_in(
     let path = create_kind(env, name, kind)?;
     if env.os == Os::Windows && kind == Kind::Open {
         let key = app_path_name(name);
-        let ours = app_path_is_ours(registry, &key)?;
+        let writable = !matches!(
+            app_path_owner(registry, &key, &env.ctx)?,
+            Some(Owner::Other(_) | Owner::Foreign)
+        );
         if let (Some(helper), true) = (
             super::terminals::folder_helper(env.os, &env.wanted_exe(), exists),
-            ours != Some(false),
+            writable,
         ) {
-            registry.apply(&app_path_ops(&key, &helper))?;
+            registry.apply(&app_path_ops(&key, &helper, &env.ctx))?;
         }
     }
     Ok(path)
 }
 
-/// [`remove`], and on Windows the App Paths key of that name when it is ours.
+/// [`remove`], and on Windows the App Paths key of that name when it goes
+/// with the alias (mine, an orphan's or a legacy one).
 pub fn remove_with_app_path(
     env: &Env,
     registry: &dyn Registry,
@@ -544,14 +812,32 @@ pub fn remove_with_app_path(
     let removed = remove(env, name)?;
     if removed && env.os == Os::Windows {
         let key = app_path_name(name);
-        if app_path_is_ours(registry, &key)? == Some(true) {
+        if matches!(
+            app_path_owner(registry, &key, &env.ctx)?,
+            Some(Owner::Mine | Owner::Adopt | Owner::Orphan(_) | Owner::Legacy)
+        ) {
             registry.apply(&[app_path_remove(&key)])?;
         }
     }
     Ok(removed)
 }
 
-/// Every alias of ours in the bin directory, by name.
+/// Removes every alias that is mine, and their App Paths keys: another
+/// installation's stay. Returns the names removed.
+pub fn remove_all_with_app_paths(
+    env: &Env,
+    registry: &dyn Registry,
+) -> Result<Vec<String>, String> {
+    let mut gone = Vec::new();
+    for (name, _) in list(env) {
+        if remove_with_app_path(env, registry, &name)? {
+            gone.push(name);
+        }
+    }
+    Ok(gone)
+}
+
+/// Every alias of mine in the bin directory, by name.
 pub fn list(env: &Env) -> Vec<(String, State)> {
     list_kinds(env)
         .into_iter()
@@ -561,10 +847,31 @@ pub fn list(env: &Env) -> Vec<(String, State)> {
 
 /// [`list`] with what each one runs.
 pub fn list_kinds(env: &Env) -> Vec<(String, Kind, State)> {
+    list_all(env)
+        .into_iter()
+        .filter(|e| e.mine)
+        .map(|e| (e.name, e.kind, e.state))
+        .collect()
+}
+
+/// One alias of ours in the bin directory, whoever it belongs to.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Entry {
+    pub name: String,
+    pub kind: Kind,
+    pub state: State,
+    /// The installation it belongs to, when known (`None`: a legacy alias nobody owns).
+    pub owner: Option<String>,
+    /// It is the running installation's.
+    pub mine: bool,
+}
+
+/// Every alias of ours in the bin directory, each with its owner.
+pub fn list_all(env: &Env) -> Vec<Entry> {
     let Ok(read) = std::fs::read_dir(&env.bin_dir) else {
         return Vec::new();
     };
-    let mut out: Vec<(String, Kind, State)> = read
+    let mut out: Vec<Entry> = read
         .flatten()
         .filter_map(|e| {
             let file = e.file_name().to_string_lossy().into_owned();
@@ -572,23 +879,41 @@ pub fn list_kinds(env: &Env) -> Vec<(String, Kind, State)> {
                 Os::Windows => file.strip_suffix(".cmd")?.to_string(),
                 _ => file,
             };
-            let (target, kind) = ours(env, &e.path())?;
-            let state = if env.is_current(&target) && shim_text_current(env, &e.path()) {
-                State::Installed
-            } else {
-                State::Outdated
-            };
-            Some((name, kind, state))
+            let found = ours(env, &e.path())?;
+            Some(Entry {
+                state: state_of(env, &found, None, &e.path()),
+                mine: found.is_mine(),
+                owner: found.id,
+                kind: found.kind,
+                name,
+            })
         })
         .collect();
-    out.sort_by(|a, b| a.0.cmp(&b.0));
+    out.sort_by(|a, b| a.name.cmp(&b.name));
     out
+}
+
+/// The exe the alias `name` starts, whoever owns it; `None` without such an alias.
+pub fn target_of(env: &Env, name: &str) -> Option<PathBuf> {
+    let path = env.file(name);
+    std::fs::symlink_metadata(&path).ok()?;
+    ours(env, &path).map(|f| f.target)
+}
+
+/// Does another live installation still have an alias in the bin directory?
+/// (`path remove` then keeps the shared folder on `PATH`.)
+pub fn others_have_aliases(env: &Env) -> bool {
+    list_all(env).iter().any(|e| e.state == State::Other)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::desktop::folder_menu::windows::app_path_key;
+    use crate::desktop::folder_menu::windows::{app_path_is_ours, app_path_key};
+
+    fn parts(shim: Option<Shim>) -> Option<(PathBuf, Kind)> {
+        shim.map(|s| (s.exe, s.kind))
+    }
 
     fn env(root: &Path, os: Os) -> Env {
         Env {
@@ -599,7 +924,243 @@ mod tests {
             path_var: None,
             pathext: None,
             ctx: crate::desktop::InstallCtx::legacy(),
+            cargo_home: None,
         }
+    }
+
+    /// `id` writing next to the installations `known` (id, still there), with
+    /// `primary` the primary, if any.
+    fn ctx_of(
+        id: &str,
+        primary: Option<&str>,
+        known: &[(&str, bool)],
+    ) -> crate::desktop::InstallCtx {
+        crate::desktop::InstallCtx {
+            id: id.into(),
+            short: format!("i{id}"),
+            name: format!("GitPoulpi ({id})"),
+            primary: primary.map(str::to_string),
+            known: known
+                .iter()
+                .map(|(id, exists)| crate::desktop::KnownInstall {
+                    id: (*id).into(),
+                    exists: *exists,
+                })
+                .collect(),
+        }
+    }
+
+    const KNOWN: [(&str, bool); 3] = [("aaaa", true), ("bbbb", true), ("cccc", false)];
+
+    /// A Windows machine where `id` writes, its exe `C:/<id>/gitpoulpi.exe`.
+    fn windows_as(root: &Path, id: &str, primary: Option<&str>) -> Env {
+        let mut e = env(root, Os::Windows);
+        e.exe = PathBuf::from(format!("C:/{id}/gitpoulpi.exe"));
+        e.ctx = ctx_of(id, primary, &KNOWN);
+        e
+    }
+
+    #[test]
+    fn only_the_primary_writes_the_legacy_marker_everyone_the_tag() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mine = windows_as(tmp.path(), "aaaa", None);
+        let text = std::fs::read_to_string(create(&mine, "gpd").unwrap()).unwrap();
+        assert!(
+            text.contains("\r\nREM X-GitPoulpi-Install=aaaa\r\n"),
+            "{text}"
+        );
+        assert!(
+            !text.contains(CMD_MARKER),
+            "old builds must not see it: {text}"
+        );
+        let primary = windows_as(tmp.path(), "bbbb", Some("bbbb"));
+        let text = std::fs::read_to_string(create(&primary, "gp").unwrap()).unwrap();
+        assert!(
+            text.contains(CMD_MARKER) && text.contains("Install=bbbb"),
+            "{text}"
+        );
+        assert_eq!(status(&mine, "gpd").state, State::Installed);
+        assert_eq!(status(&primary, "gp").state, State::Installed);
+        // A legacy shim naming my exe is mine, and reads Outdated until it is tagged.
+        std::fs::write(
+            mine.bin_dir.join("old.cmd"),
+            cmd_shim_text(Path::new("C:/aaaa/gitpoulpi.exe")),
+        )
+        .unwrap();
+        assert_eq!(status(&mine, "old").state, State::Outdated);
+        create(&mine, "old").unwrap();
+        assert_eq!(status(&mine, "old").state, State::Installed);
+    }
+
+    #[test]
+    fn another_installations_shim_reads_other_not_outdated() {
+        let tmp = tempfile::tempdir().unwrap();
+        let theirs = windows_as(tmp.path(), "bbbb", None);
+        create(&theirs, "gpd").unwrap();
+        create_kind(&theirs, "gpda", Kind::Add).unwrap();
+        let mine = windows_as(tmp.path(), "aaaa", None);
+        // Another exe, another text: still not Outdated, it is right for its owner.
+        for (name, kind) in [("gpd", Kind::Open), ("gpda", Kind::Add)] {
+            let st = status_kind(&mine, name, kind);
+            assert_eq!(st.state, State::Other, "{name}");
+            assert_eq!(st.owner.as_deref(), Some("bbbb"));
+        }
+        assert!(list_kinds(&mine).is_empty(), "only mine are listed");
+        let all = list_all(&mine);
+        assert_eq!(all.len(), 2);
+        assert!(all
+            .iter()
+            .all(|e| e.state == State::Other && !e.mine && e.owner.as_deref() == Some("bbbb")));
+        assert!(others_have_aliases(&mine));
+        assert!(!others_have_aliases(&theirs));
+        // The other way round, a legacy marker alone belongs to the primary.
+        let legacy = mine.bin_dir.join("lp.cmd");
+        std::fs::write(&legacy, cmd_shim_text(Path::new("C:/zzzz/gitpoulpi.exe"))).unwrap();
+        let with_primary = Env {
+            ctx: ctx_of("aaaa", Some("bbbb"), &KNOWN),
+            ..mine.clone()
+        };
+        assert_eq!(status(&with_primary, "lp").state, State::Other);
+        assert_eq!(
+            status(&mine, "lp").state,
+            State::Outdated,
+            "no primary: legacy"
+        );
+    }
+
+    #[test]
+    fn create_refuses_a_name_another_installation_owns_but_replaces_an_orphan() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mine = windows_as(tmp.path(), "aaaa", None);
+        let theirs = windows_as(tmp.path(), "bbbb", None);
+        let gone = windows_as(tmp.path(), "cccc", None);
+        create(&theirs, "gpb").unwrap();
+        create(&gone, "gpc").unwrap();
+        let err = create(&mine, "gpb").unwrap_err();
+        assert!(err.contains("another installation"), "{err}");
+        assert!(remove(&mine, "gpb").is_err(), "not removable either");
+        let kept = std::fs::read_to_string(theirs.bin_dir.join("gpb.cmd")).unwrap();
+        assert!(kept.contains("Install=bbbb"), "left as it was: {kept}");
+        // cccc is gone: its alias is an orphan, shown outdated and replaced.
+        assert_eq!(status(&mine, "gpc").state, State::Outdated);
+        let text = std::fs::read_to_string(create(&mine, "gpc").unwrap()).unwrap();
+        assert!(
+            text.contains("Install=aaaa") && !text.contains("cccc"),
+            "{text}"
+        );
+        assert_eq!(status(&mine, "gpc").state, State::Installed);
+    }
+
+    #[test]
+    fn remove_all_removes_only_my_aliases_and_app_paths() {
+        use crate::desktop::registry::MemoryRegistry;
+        let tmp = tempfile::tempdir().unwrap();
+        let mine = windows_as(tmp.path(), "aaaa", None);
+        let theirs = windows_as(tmp.path(), "bbbb", None);
+        let reg = MemoryRegistry::new();
+        let helper = |id: &str| PathBuf::from(format!("C:/{id}/gitpoulpi-launch.exe"));
+        let has = |p: &Path| p == helper("aaaa") || p == helper("bbbb");
+        create_with_app_path_in(&mine, &reg, "gpm", Kind::Open, &has).unwrap();
+        create_with_app_path_in(&mine, &reg, "gpma", Kind::Add, &has).unwrap();
+        create_with_app_path_in(&theirs, &reg, "gpt", Kind::Open, &has).unwrap();
+        let ours_in_registry = |reg: &MemoryRegistry, key: &str| {
+            let key = app_path_key(key);
+            reg.dump()
+                .iter()
+                .any(|(k, _, _)| k.eq_ignore_ascii_case(&key))
+        };
+        assert!(ours_in_registry(&reg, "gpm.exe") && ours_in_registry(&reg, "gpt.exe"));
+        let gone = remove_all_with_app_paths(&mine, &reg).unwrap();
+        assert_eq!(gone, ["gpm", "gpma"]);
+        assert!(!mine.bin_dir.join("gpm.cmd").exists());
+        assert!(
+            theirs.bin_dir.join("gpt.cmd").exists(),
+            "the other's shim stays"
+        );
+        assert!(!ours_in_registry(&reg, "gpm.exe"));
+        assert!(
+            ours_in_registry(&reg, "gpt.exe"),
+            "the other's App Paths stays"
+        );
+        // Their App Paths key is tagged with their id.
+        let dump = reg.dump();
+        assert!(
+            dump.iter()
+                .any(|(_, n, v)| n == crate::desktop::OWNER_TAG && v == "bbbb"),
+            "{dump:?}"
+        );
+        // A key tagged by another installation is never overwritten by my create.
+        reg.apply(&[RegOp::Set {
+            key: app_path_key("gpx.exe"),
+            name: crate::desktop::OWNER_TAG.into(),
+            value: "bbbb".into(),
+        }])
+        .unwrap();
+        create_with_app_path_in(&mine, &reg, "gpx", Kind::Open, &has).unwrap();
+        assert_eq!(
+            app_path_owner(&reg, "gpx.exe", &mine.ctx).unwrap(),
+            Some(Owner::Other("bbbb".into()))
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn unix_symlink_owner_follows_the_target() {
+        use crate::installation::{identify, IdentityEnv, RealFs};
+        let tmp = tempfile::tempdir().unwrap();
+        let root = std::fs::canonicalize(tmp.path()).unwrap();
+        let exe = |name: &str| {
+            let dir = root.join(name);
+            std::fs::create_dir_all(&dir).unwrap();
+            let exe = dir.join("gitpoulpi");
+            std::fs::write(&exe, "").unwrap();
+            exe
+        };
+        let (a, b, c) = (exe("a"), exe("b"), exe("c"));
+        let fs = RealFs;
+        let ident = IdentityEnv {
+            windows: false,
+            host_target: crate::release::host_target(),
+            cargo_home: None,
+            install_id: None,
+            env_override: None,
+            fs: &fs,
+        };
+        let (ida, idb, idc) = (
+            identify(&a, &ident).id,
+            identify(&b, &ident).id,
+            identify(&c, &ident).id,
+        );
+        assert!(ida != idb && idb != idc);
+        let mut e = env(&root, Os::Linux);
+        e.exe = a.clone();
+        e.ctx = ctx_of(&ida, None, &[(&ida, true), (&idb, true), (&idc, false)]);
+        std::fs::create_dir_all(&e.bin_dir).unwrap();
+        let link = |name: &str, to: &Path| {
+            std::os::unix::fs::symlink(to, e.bin_dir.join(name)).unwrap();
+        };
+        link("mine", &a);
+        link("theirs", &b);
+        link("orphan", &c);
+        assert_eq!(status(&e, "mine").state, State::Installed);
+        let theirs = status(&e, "theirs");
+        assert_eq!(
+            (theirs.state, theirs.owner),
+            (State::Other, Some(idb.clone()))
+        );
+        assert_eq!(status(&e, "orphan").state, State::Outdated);
+        assert_eq!(list(&e), [("mine".to_string(), State::Installed)]);
+        // Mine and an orphan's are replaced; the other's is refused.
+        assert!(create(&e, "theirs").is_err());
+        assert_eq!(std::fs::read_link(e.bin_dir.join("theirs")).unwrap(), b);
+        create(&e, "orphan").unwrap();
+        assert_eq!(std::fs::read_link(e.bin_dir.join("orphan")).unwrap(), a);
+        assert_eq!(
+            remove_all_with_app_paths(&e, &crate::desktop::registry::MemoryRegistry::new())
+                .unwrap(),
+            ["mine", "orphan"]
+        );
+        assert!(e.bin_dir.join("theirs").is_symlink());
     }
 
     #[test]
@@ -871,7 +1432,7 @@ mod tests {
         assert!(list_kinds(&e).is_empty());
         let odd = Path::new("/it's here/gitpoulpi-tui");
         let text = sh_shim_text(odd);
-        assert_eq!(sh_parts(&text), Some((odd.to_path_buf(), Kind::Add)));
+        assert_eq!(parts(sh_parts(&text)), Some((odd.to_path_buf(), Kind::Add)));
     }
 
     #[test]
@@ -881,9 +1442,9 @@ mod tests {
         e.exe = PathBuf::from("C:/Program Files/GP/gitpoulpi-tui.exe");
         let text = cmd_shim_text_for(&e.exe, Kind::Add);
         assert!(text.ends_with("gitpoulpi-tui.exe\" --add %*\r\n"), "{text}");
-        assert_eq!(shim_parts(&text), Some((e.exe.clone(), Kind::Add)));
+        assert_eq!(parts(shim_parts(&text)), Some((e.exe.clone(), Kind::Add)));
         assert_eq!(
-            shim_parts(&cmd_shim_text(&e.exe)),
+            parts(shim_parts(&cmd_shim_text(&e.exe))),
             Some((e.exe.clone(), Kind::Open))
         );
         let path = create_kind(&e, "gpa", Kind::Add).unwrap();
@@ -948,7 +1509,7 @@ mod tests {
                     "@echo off\r\nREM X-GitPoulpi=1\r\nset \"GITPOULPI_CMDCMDLINE=%CMDCMDLINE%\"\r\n\"C:/GP/gitpoulpi-tui.exe\"{flag} %*\r\n"
                 )
             );
-            assert_eq!(shim_parts(&text), Some((exe.to_path_buf(), kind)));
+            assert_eq!(parts(shim_parts(&text)), Some((exe.to_path_buf(), kind)));
         }
     }
 

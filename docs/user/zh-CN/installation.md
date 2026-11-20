@@ -166,9 +166,24 @@ gitpoulpi
 
 `--version` 会打印版本以及构建所用的 commit。然后请按照[快速上手](getting-started.md)继续。
 
+## 并行安装多个 GitPoulpi
+
+软件包、开发版检出、cargo 构建和解压的压缩包可以同时安装。每一个都是独立的安装：有自己的启动器名称（`GitPoulpi (Chocolatey)`、`GitPoulpi (dev)` 等）、章鱼颜色、命令别名、“在 GitPoulpi 中打开”菜单项和守护进程，因此两个版本可以并行运行，互不抢占对方的窗口。设置、仓库和令牌则是共享的。在你于 设置 > 启动器 中点击 **设为主安装** 之前，没有任何安装拥有纯名称 `GitPoulpi` 的启动器。[设置](settings.md#启动器)中列出了其他安装，并为已不存在的安装提供 **清除** 按钮。
+
 ## 卸载
 
-`gitpoulpi uninstall`（两个安装程序都会运行它）会移除 GitPoulpi 创建的命令别名、PATH 条目、快捷方式和文件管理器菜单项（Windows 上还有它们的 App Paths 键），然后移除发布版安装的程序文件；在没有 `.gitpoulpi-dist` 标记的构建（cargo 构建）上它会拒绝执行，`--keep-files` 则保留程序文件。MCP 代理无法使用它。不用安装程序时，直接删除程序文件即可。GitPoulpi 还会保留以下文件：
+`gitpoulpi uninstall` 会移除命令别名（Windows 上还有它们的 App Paths 键）、PATH 条目、快捷方式和文件管理器菜单项，**仅限当前这个安装**：其他安装的保持不变，`PATH` 中会保留它们的文件夹，以及仍有别名存放其中的共享别名文件夹。任务栏和 Dock 的固定项会保留（Windows 无法从外部取消固定），你的设置中也会保留这个安装的条目，因此重新安装到同一文件夹时外观会恢复。随后它会删除发布版安装的程序文件；这一步在没有 `.gitpoulpi-dist` 标记的构建（cargo 构建）上会拒绝执行。加上 `--keep-files` 则保留程序文件，并且可在任何构建上使用，包括开发版检出。MCP 代理无法使用它。
+
+| 安装方式 | 由谁移除启动器和别名 |
+|---|---|
+| Windows 安装程序（当前用户或所有用户）、winget | 卸载程序先运行 `gitpoulpi uninstall --keep-files`，然后删除文件。 |
+| Chocolatey | 其自动卸载程序会运行安装程序的卸载程序。 |
+| Scoop | `scoop uninstall gitpoulpi` 会先运行 `gitpoulpi uninstall --keep-files`。 |
+| MSI | 移除时以安装它的用户身份运行。若由其他账户移除，该用户的启动器会保留，并在其他安装的设置中显示为孤立项（**清除**）。 |
+| apt、AUR、Homebrew、cargo、开发版检出 | 不会自动运行任何钩子：请在移除软件包之前运行 `gitpoulpi uninstall --keep-files`。 |
+| 压缩包、`install.sh --uninstall` | 运行 `gitpoulpi uninstall` 或 `install.sh --uninstall`，然后删除文件夹。 |
+
+GitPoulpi 还会保留以下文件：
 
 | 内容 | 位置 |
 |---|---|

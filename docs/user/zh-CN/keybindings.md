@@ -1214,9 +1214,9 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 启动器：从 PATH 中移除 |  |
 | 启动器：安装“在 GitPoulpi 中打开”菜单 |  |
 | 启动器：移除“在 GitPoulpi 中打开”菜单 |  |
-| Launcher: Become the Primary Installation |  |
-| Launcher: Remove Legacy Launchers |  |
-| Launcher: Forget Gone Installations |  |
+| 启动器：设为主安装 |  |
+| 启动器：移除旧版启动器 |  |
+| 启动器：清除已不存在的安装 |  |
 | 应用：更改图配色主题… | `Ctrl+N T` |
 | 应用：切换图行着色 | `Ctrl+N Y` |
 <!-- palette:end -->

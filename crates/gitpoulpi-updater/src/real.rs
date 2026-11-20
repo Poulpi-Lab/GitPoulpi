@@ -38,13 +38,19 @@ fn runtime() -> tokio::runtime::Runtime {
 
 impl DaemonOps for RealDaemons {
     fn sessions(&self, config_dir: &Path) -> Vec<SessionDaemon> {
-        let dir = gitpoulpi_config::ConfigPaths::for_dir(config_dir).sessions_dir();
-        let Ok(entries) = std::fs::read_dir(dir) else {
-            return Vec::new();
-        };
-        let mut found: Vec<SessionDaemon> = entries
-            .flatten()
-            .map(|e| e.path())
+        // Until the stop logic is per environment (a later slice) the updater
+        // keeps stopping every daemon of the profile: the flat folder and
+        // every environment folder under it.
+        let paths = gitpoulpi_config::ConfigPaths::for_dir(config_dir);
+        let flat = paths.sessions_dir();
+        let mut dirs = vec![flat.clone()];
+        if let Ok(envs) = std::fs::read_dir(flat.join("env")) {
+            dirs.extend(envs.flatten().map(|e| e.path()).filter(|p| p.is_dir()));
+        }
+        let mut found: Vec<SessionDaemon> = dirs
+            .into_iter()
+            .filter_map(|dir| std::fs::read_dir(dir).ok())
+            .flat_map(|entries| entries.flatten().map(|e| e.path()))
             .filter(|p| p.extension().is_some_and(|e| e == "port"))
             .filter_map(|p| {
                 let name = p.file_stem()?.to_str()?.to_string();

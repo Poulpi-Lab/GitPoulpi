@@ -31,7 +31,7 @@ config_enum! {
 
 /// The settings of one installation. Empty text means "not set": the value
 /// then comes from `ui.*` (primary) or the kind's default.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct InstallationEntry {
     /// The installation's root folder, refreshed only when it changes.
@@ -65,10 +65,14 @@ pub struct InstallationEntry {
     /// `mcp.bind` override, so two HTTP MCP servers need not fight for a port.
     #[serde(skip_serializing_if = "String::is_empty")]
     pub mcp_bind: String,
+    /// Keys a newer build wrote that this one does not know, kept so that an
+    /// older build rewriting the entry never drops them.
+    #[serde(flatten)]
+    pub extra: BTreeMap<String, toml::Value>,
 }
 
 /// The `[installation]` table.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct InstallationConfig {
     /// The id of the installation that owns the legacy names and the legacy
@@ -83,5 +87,23 @@ impl InstallationConfig {
     /// Nothing recorded; the table is then left out of the file entirely.
     pub fn is_empty(&self) -> bool {
         self.primary.is_none() && self.settings.is_empty()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn installation_entry_keeps_unknown_keys() {
+        let text = "path = \"/x\"\nkind = \"dev\"\nfuture_flag = true\nfuture_table = { a = 1 }\n";
+        let entry: InstallationEntry = toml::from_str(text).unwrap();
+        assert_eq!(entry.path, "/x");
+        assert_eq!(entry.extra.len(), 2, "{:?}", entry.extra);
+        let back = toml::to_string(&entry).unwrap();
+        let again: toml::Value = toml::from_str(&back).unwrap();
+        assert_eq!(again["future_flag"].as_bool(), Some(true));
+        assert_eq!(again["future_table"]["a"].as_integer(), Some(1));
+        assert_eq!(again["path"].as_str(), Some("/x"));
     }
 }

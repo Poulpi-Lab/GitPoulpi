@@ -52,6 +52,7 @@ fn absolute(path: &str) -> Result<std::path::PathBuf, String> {
 fn session_file(session: &str) -> Result<std::path::PathBuf, String> {
     let paths = gitpoulpi_config::ConfigPaths::discover()
         .ok_or_else(|| "could not determine the config directory for this OS".to_string())?;
+    paths.seed_env_from_legacy();
     Ok(paths.session_file(session))
 }
 

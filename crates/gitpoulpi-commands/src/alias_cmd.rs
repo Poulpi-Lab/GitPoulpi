@@ -71,6 +71,7 @@ fn record_name(name: &str, kind: Kind) {
         return;
     };
     let id = cur.identity.id.clone();
+    let identity = cur.identity.clone();
     let name = name.to_string();
     let primary = cur.effective.primary;
     let (field, current) = match kind {
@@ -81,11 +82,18 @@ fn record_name(name: &str, kind: Kind) {
         return;
     }
     let _ = installation::set_installation_in_file(file, |c| {
-        if let Some(entry) = c.settings.get_mut(&id) {
-            match kind {
-                Kind::Open => entry.command_alias = name.clone(),
-                Kind::Add => entry.command_alias_add = name.clone(),
-            }
+        // A pinned id is never seeded on disk, so its entry may be new here.
+        let entry =
+            c.settings
+                .entry(id.clone())
+                .or_insert_with(|| gitpoulpi_config::InstallationEntry {
+                    path: identity.root.clone(),
+                    kind: identity.kind,
+                    ..Default::default()
+                });
+        match kind {
+            Kind::Open => entry.command_alias = name.clone(),
+            Kind::Add => entry.command_alias_add = name.clone(),
         }
     });
     if primary {

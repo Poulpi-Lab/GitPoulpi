@@ -64,9 +64,24 @@ pub async fn bind(bind: &str, allow_remote: bool) -> Result<TcpListener, String>
              needs authentication (mcp.http_auth) and TLS (mcp.tls) or mcp.behind_proxy"
         ));
     }
-    TcpListener::bind(addr)
-        .await
-        .map_err(|e| format!("failed to listen on {addr}: {e}"))
+    TcpListener::bind(addr).await.map_err(|e| {
+        if e.kind() == std::io::ErrorKind::AddrInUse {
+            addr_in_use_message(addr)
+        } else {
+            format!("failed to listen on {addr}: {e}")
+        }
+    })
+}
+
+/// The refusal when the MCP HTTP address is taken. One server per port: a
+/// second installation (they share the default) must pick another one.
+pub fn addr_in_use_message(addr: SocketAddr) -> String {
+    format!(
+        "address already in use: {addr} is used by another program (possibly another GitPoulpi \
+         installation's MCP server); not starting. Change this installation's MCP bind \
+         (Settings > Agents & MCP > \"Suggest a free port\", or `gitpoulpi installation set \
+         mcp_bind HOST:PORT`, or `[mcp] bind` in config.toml), or pass `--bind HOST:PORT`"
+    )
 }
 
 /// Serves MCP over HTTP (any path; the conventional one is `/mcp`) on

@@ -374,3 +374,49 @@ fn the_palette_lists_the_security_rows() {
     let token = rows.iter().find(|r| r.key == "mcp.token").unwrap();
     assert_eq!(token.kind, SettingKind::Page);
 }
+
+/// Presses the Suggest a free port row and waits for the thread's answer.
+fn suggest(st: &mut PreferencesState) {
+    on_row(st, "mcp.suggest_port");
+    press(st, KeyCode::Enter);
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(10);
+    while st.mcp_sec.suggest.is_some() {
+        assert!(std::time::Instant::now() < deadline, "no answer");
+        st.poll_token_presence();
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+}
+
+#[test]
+fn suggest_a_free_port_saves_this_installations_own_bind_and_keeps_the_host() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state(dir.path());
+    st.config.mcp.bind = "127.0.0.1:8808".into();
+    suggest(&mut st);
+    let file = stored(dir.path());
+    assert!(file.contains("mcp_bind = \"127.0.0.1:"), "{file}");
+    assert!(!file.contains("8808\""), "{file}");
+    // The port row now shows that installation bind.
+    assert_ne!(st.mcp_bind_in_force(), "127.0.0.1:8808");
+    let shown = st
+        .fields()
+        .into_iter()
+        .find(|f| f.target == Target::Global("mcp.port"))
+        .unwrap();
+    let (_, port) = st.mcp_in_force().bind_parts();
+    assert!(matches!(shown.control, Control::Number { value, .. } if Some(value as u16) == port));
+    assert!(st.take_message().unwrap().contains("MCP bind set to"));
+}
+
+#[test]
+fn the_primary_without_an_override_writes_mcp_bind() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state(dir.path());
+    let this = crate::preferences::launcher_install::fake_current(true);
+    st.config.installation.primary = this.config.installation.primary.clone();
+    st.set_this(this);
+    suggest(&mut st);
+    let file = stored(dir.path());
+    assert!(file.contains("[mcp]") && file.contains("bind = "), "{file}");
+    assert!(!file.contains("mcp_bind"), "{file}");
+}

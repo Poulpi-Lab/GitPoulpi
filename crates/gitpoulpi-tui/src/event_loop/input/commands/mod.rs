@@ -336,6 +336,7 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::LauncherRemove
         | PaletteCommand::LauncherAliasCreate
         | PaletteCommand::LauncherAliasRemove
+        | PaletteCommand::McpSuggestPort
         | PaletteCommand::LauncherPathAdd
         | PaletteCommand::LauncherPathRemove
         | PaletteCommand::LauncherFolderMenuInstall

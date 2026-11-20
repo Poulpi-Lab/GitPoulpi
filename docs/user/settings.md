@@ -429,7 +429,8 @@ the server; see [MCP and agents](mcp-and-agents.md).
 | Option | What it does |
 |---|---|
 | **MCP server** | On (default): an agent can start the server (`gitpoulpi mcp serve`). Off: it refuses to start. Saved as `mcp.enabled`. A change applies the next time an agent starts the server; a server that is already running keeps its settings. |
-| **MCP server port** | The port `--http` listens on when no address is given, 1 to 65535 (default 8808). Saved in the port of `mcp.bind`; its host part is kept (`127.0.0.1` when empty). Applies the next time an agent starts the server. |
+| **MCP server port** | The port `--http` listens on when no address is given, 1 to 65535 (default 8808). Saved in the port of `mcp.bind`; its host part is kept (`127.0.0.1` when empty). Applies the next time an agent starts the server. An installation with its own MCP bind edits that one. |
+| **Suggest a free port** | Looks for a free port on the same host address and saves it as this installation's MCP bind (`mcp.bind` for the primary installation without an override). There is one MCP HTTP server per port: a second installation on a port already in use refuses to start, so use this to pick another. Also in the palette as *MCP: Suggest a free port*. |
 | **Allow AI agents to drive the view** | Lets agents show you a commit, a file or a notice in this window (`ui show`). Off: no agent reaches the window. |
 | **Let AI agents propose changes for me to confirm** | Lets agents open pre-filled Reword, commit, branch or tag dialogs that you confirm. Off by default. See [MCP and agents](mcp-and-agents.md#permissions). |
 | **Open a window for agents**, **Launch command (custom)** | Whether an agent may open a GitPoulpi window when none is open, and with which terminal or multiplexer. Off by default. |

@@ -728,6 +728,8 @@ impl PreferencesState {
         self.poll_tools();
         self.poll_folder_menu();
         self.poll_install();
+        #[cfg(feature = "mcp")]
+        self.poll_mcp_suggest();
         let Some(rx) = &self.token_presence_rx else {
             return;
         };

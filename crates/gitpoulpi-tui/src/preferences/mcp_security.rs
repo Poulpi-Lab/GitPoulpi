@@ -29,6 +29,9 @@ pub(super) enum McpButton {
     Rotate,
     /// Make the first token.
     Create,
+    /// Look for a free port on the bind's host and save it as this
+    /// installation's MCP bind.
+    SuggestPort,
 }
 
 /// What the rows remember between frames.
@@ -39,6 +42,8 @@ pub(super) struct McpSecurityState {
     pub(super) token: Option<String>,
     /// The token is drawn in full.
     pub(super) shown: bool,
+    /// The free-port search running off the render thread.
+    pub(super) suggest: Option<std::sync::mpsc::Receiver<Option<String>>>,
 }
 
 impl McpSecurityState {
@@ -49,6 +54,7 @@ impl McpSecurityState {
             paths,
             token,
             shown: false,
+            suggest: None,
         }
     }
 }
@@ -182,6 +188,7 @@ impl PreferencesState {
                     Err(why) => why,
                 });
             }
+            McpButton::SuggestPort => self.suggest_port_start(),
             McpButton::Rotate | McpButton::Create => {
                 let Some(paths) = self.mcp_sec.paths.as_ref() else {
                     self.message = Some(
@@ -200,6 +207,116 @@ impl PreferencesState {
                 }
             }
         }
+    }
+}
+
+impl PreferencesState {
+    /// The bind this installation serves on: its own override when it has
+    /// one, else `[mcp] bind`.
+    pub(super) fn mcp_bind_in_force(&self) -> String {
+        let own = self.own_entry().mcp_bind;
+        if own.trim().is_empty() {
+            self.config.mcp.bind.clone()
+        } else {
+            own
+        }
+    }
+
+    /// `[mcp]` as this installation sees it: its bind in force.
+    pub(super) fn mcp_in_force(&self) -> gitpoulpi_config::McpConfig {
+        let mut mcp = self.config.mcp.clone();
+        mcp.bind = self.mcp_bind_in_force();
+        mcp
+    }
+
+    /// The Suggest a free port row, right under the port row.
+    pub(super) fn mcp_suggest_row(&self) -> Field {
+        let mut btn = Btn::new(
+            t::SUGGEST_PORT.get(),
+            PrefAction::McpSecurity(McpButton::SuggestPort),
+        );
+        btn.enabled = self.mcp_sec.suggest.is_none();
+        let mut field = Field::buttons("", vec![btn]).with_help(t::SUGGEST_PORT_HELP.get());
+        field.target = Target::Global("mcp.suggest_port");
+        field
+    }
+
+    /// The palette's route: show the row, then run the search.
+    pub(crate) fn mcp_suggest_command(&mut self) {
+        let _ = self.show_page(None, Some("mcp.suggest_port"));
+        self.mcp_button(McpButton::SuggestPort);
+    }
+
+    /// Looks for the port on a thread (a host name lookup can block).
+    fn suggest_port_start(&mut self) {
+        if self.mcp_sec.suggest.is_some() {
+            return;
+        }
+        let bind = self.mcp_bind_in_force();
+        let (tx, rx) = std::sync::mpsc::channel();
+        self.mcp_sec.suggest = Some(rx);
+        self.message = Some(t::SUGGEST_PORT_WORKING.get().into());
+        std::thread::spawn(move || {
+            let _ = tx.send_notify(gitpoulpi_config::mcp_port::suggest_free_bind(&bind));
+        });
+    }
+
+    /// Applies a finished search. Never blocks; called once a frame.
+    pub(crate) fn poll_mcp_suggest(&mut self) {
+        let Some(rx) = &self.mcp_sec.suggest else {
+            return;
+        };
+        let Ok(found) = rx.try_recv() else { return };
+        self.mcp_sec.suggest = None;
+        match found {
+            Some(bind) => {
+                if self.write_mcp_bind(&bind) {
+                    self.message = Some(t::suggested(&bind));
+                }
+            }
+            None => self.message = Some(t::SUGGEST_PORT_FAILED.get().into()),
+        }
+    }
+
+    /// Saves `bind` where this installation reads it: its own entry (the
+    /// primary only when it already has an override), else `mcp.bind`.
+    /// Byte-preserving, like the other installation rows.
+    pub(super) fn write_mcp_bind(&mut self, bind: &str) -> bool {
+        let Some(file) = self.config_file() else {
+            self.message = Some(
+                gitpoulpi_i18n::msg::settings_screen::NO_CONFIG_DIR
+                    .get()
+                    .into(),
+            );
+            return false;
+        };
+        let seeded = self.own_entry();
+        let own = !seeded.mcp_bind.trim().is_empty();
+        if self.this_effective().primary && !own {
+            return self.write_global("mcp.bind", bind);
+        }
+        let identity = self.this().identity.clone();
+        let id = identity.id.clone();
+        let edit = |i: &mut gitpoulpi_config::InstallationConfig| {
+            let entry = i.settings.entry(id.clone()).or_insert_with(|| {
+                if seeded.path.is_empty() {
+                    gitpoulpi_config::InstallationEntry {
+                        path: identity.root.clone(),
+                        kind: identity.kind,
+                        ..Default::default()
+                    }
+                } else {
+                    seeded.clone()
+                }
+            });
+            entry.mcp_bind = bind.to_string();
+        };
+        if let Err(e) = gitpoulpi_config::set_installation_in_file(&file, edit) {
+            self.message = Some(format!("installation.mcp_bind: {e}"));
+            return false;
+        }
+        self.config = Config::load(&file).unwrap_or_else(|_| self.config.clone());
+        true
     }
 }
 

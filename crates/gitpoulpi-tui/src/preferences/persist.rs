@@ -44,7 +44,19 @@ impl PreferencesState {
                 self.message = Some(screen::not_whole_number(key, format!("{value:?}")));
                 return false;
             };
-            bind = self.config.mcp.bind_with_port(port);
+            #[cfg(feature = "mcp")]
+            {
+                // An installation with its own bind edits that one.
+                let mcp = self.mcp_in_force();
+                bind = mcp.bind_with_port(port);
+                if !self.own_entry().mcp_bind.trim().is_empty() {
+                    return self.write_mcp_bind(&bind);
+                }
+            }
+            #[cfg(not(feature = "mcp"))]
+            {
+                bind = self.config.mcp.bind_with_port(port);
+            }
             ("mcp.bind", bind.as_str())
         } else {
             (key, value)

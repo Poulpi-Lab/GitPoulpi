@@ -1244,6 +1244,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Launcher: Remove Shortcuts |  |
 | Launcher: Create Command Alias |  |
 | Launcher: Remove Command Alias |  |
+| MCP: Suggest a free port |  |
 | Launcher: Add to PATH |  |
 | Launcher: Remove from PATH |  |
 | Launcher: Install Open in GitPoulpi Menu |  |

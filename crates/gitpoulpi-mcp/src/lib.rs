@@ -88,7 +88,17 @@ pub async fn serve_http(
     cfg: McpConfig,
 ) -> Result<(), String> {
     ensure_enabled(&cfg)?;
-    let bind = http::resolve_bind(bind, &cfg);
+    // This installation's effective bind (its own override, else `[mcp] bind`)
+    // unless an address was given.
+    let own = if bind.trim().is_empty() {
+        gitpoulpi_config::installation::current()
+            .effective
+            .mcp_bind
+            .clone()
+    } else {
+        String::new()
+    };
+    let bind = http::resolve_bind(if own.is_empty() { bind } else { &own }, &cfg);
     let wanted = http::parse_bind(&bind)?;
     let paths = gitpoulpi_config::ConfigPaths::discover();
     let security = security::prepare(&cfg, paths.as_ref(), wanted, allow_remote)?;

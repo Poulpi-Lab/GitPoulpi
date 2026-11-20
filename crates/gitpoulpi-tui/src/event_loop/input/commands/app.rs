@@ -498,6 +498,16 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             state.launcher_command(false, true);
             *cx.preferences = Some(state);
         }
+        PaletteCommand::McpSuggestPort => {
+            #[cfg_attr(not(feature = "mcp"), allow(unused_mut))]
+            let mut state = PreferencesState::open(cx.repo_root);
+            #[cfg(feature = "mcp")]
+            {
+                state.mcp_suggest_command();
+                *cx.last_message = state.take_message();
+            }
+            *cx.preferences = Some(state);
+        }
         PaletteCommand::LauncherAliasCreate
         | PaletteCommand::LauncherAliasRemove
         | PaletteCommand::LauncherPathAdd

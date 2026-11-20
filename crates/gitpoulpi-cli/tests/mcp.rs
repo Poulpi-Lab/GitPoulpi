@@ -84,6 +84,56 @@ fn mcp_serve_http_refuses_a_non_loopback_address() {
     assert!(stderr.contains("--allow-remote"), "{stderr}");
 }
 
+/// A second MCP HTTP server on a taken address refuses to start: non-zero
+/// exit, the address named, "already in use", and the setting to change. The
+/// port is held by the test, so there is no race.
+#[test]
+fn mcp_serve_http_refuses_an_address_in_use() {
+    let held = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = held.local_addr().unwrap().to_string();
+    let config = tempfile::tempdir().unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_gitpoulpi"))
+        .env("GITPOULPI_CONFIG_DIR", config.path())
+        .args(["--session", "cli-mcp-http-in-use"])
+        .args(["mcp", "serve", "--http", &addr])
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    assert!(output.stdout.is_empty());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("address already in use"), "{stderr}");
+    assert!(stderr.contains(&addr), "{stderr}");
+    assert!(stderr.contains("mcp_bind"), "{stderr}");
+}
+
+/// Without an address the installation's own `mcp_bind` is what is checked.
+#[test]
+fn mcp_serve_http_checks_the_installations_own_bind() {
+    let held = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = held.local_addr().unwrap().to_string();
+    let config = tempfile::tempdir().unwrap();
+    let set = Command::new(env!("CARGO_BIN_EXE_gitpoulpi"))
+        .env("GITPOULPI_CONFIG_DIR", config.path())
+        .args(["installation", "set", "mcp_bind", &addr])
+        .output()
+        .unwrap();
+    assert!(
+        set.status.success(),
+        "{}",
+        String::from_utf8_lossy(&set.stderr)
+    );
+    let output = Command::new(env!("CARGO_BIN_EXE_gitpoulpi"))
+        .env("GITPOULPI_CONFIG_DIR", config.path())
+        .args(["--session", "cli-mcp-http-own-bind"])
+        .args(["mcp", "serve", "--http"])
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("address already in use"), "{stderr}");
+    assert!(stderr.contains(&addr), "{stderr}");
+}
+
 /// Drives `mcp serve --stdio` through initialize, `tools/list` and two
 /// `tools/call`s, in one process, and returns the responses by id.
 fn mcp_conversation(config: &Path, calls: Vec<Value>) -> Vec<Value> {

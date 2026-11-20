@@ -390,3 +390,125 @@ fn the_environment_row_writes_this_installations_env() {
     );
     let _ = s.term.stop();
 }
+
+/// Waits until the terminal has written nothing for `quiet`.
+fn settle(term: &Terminal, quiet: Duration) {
+    let deadline = Instant::now() + STARTUP;
+    let mut last = term.bytes_received();
+    let mut since = Instant::now();
+    while since.elapsed() < quiet {
+        assert!(Instant::now() < deadline, "never quiet\n{}", term.text());
+        std::thread::sleep(Duration::from_millis(50));
+        let now = term.bytes_received();
+        if now != last {
+            last = now;
+            since = Instant::now();
+        }
+    }
+}
+
+/// A job that outlives the key press that started it repaints the rows when
+/// it ends, with no key pressed meanwhile (the worker's answer wakes the
+/// loop). Another installation is the primary and its legacy-named launcher
+/// is a FIFO: only the handover job reads it, and the read blocks until the
+/// test opens the gate, after the screen went quiet. Resigning follows.
+#[test]
+fn a_slow_primary_job_repaints_the_rows_without_a_key_press() {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    const OLD: &str = "bbbb000000000002";
+    let other = tempfile::tempdir().unwrap();
+    let config = format!(
+        "{UI}logo_color = \"violet\"\n[installation]\nprimary = \"{OLD}\"\n\n[installation.settings.{OLD}]\npath = {:?}\nkind = \"dev\"\nname = \"GitPoulpi\"\n",
+        other.path().display().to_string()
+    );
+    let fifo = std::cell::RefCell::new(PathBuf::new());
+    let mut s = start("installation-primary-idle", &config, |home| {
+        let apps = home.join("data/applications");
+        std::fs::create_dir_all(&apps).unwrap();
+        let path = apps.join("gitpoulpi.desktop");
+        assert!(std::process::Command::new("mkfifo")
+            .arg(&path)
+            .status()
+            .unwrap()
+            .success());
+        *fifo.borrow_mut() = path;
+    });
+    let path = fifo.into_inner();
+    let gate = std::sync::Arc::new(AtomicBool::new(false));
+    let open = gate.clone();
+    let served = format!(
+        "[Desktop Entry]\nType=Application\nName=GitPoulpi\nExec=/x\nX-GitPoulpi=1\nX-GitPoulpi-Install={OLD}\n"
+    );
+    let stop = std::sync::Arc::new(AtomicBool::new(false));
+    let stopped = stop.clone();
+    std::thread::spawn(move || {
+        use std::io::Write;
+        while !open.load(Ordering::SeqCst) {
+            std::thread::sleep(Duration::from_millis(20));
+        }
+        // Opening for write waits for a reader (the Read at the page's open,
+        // then the handover job), which then sees EOF. Never creates the file.
+        while !stopped.load(Ordering::SeqCst) {
+            match std::fs::OpenOptions::new().write(true).open(&path) {
+                Ok(mut f) => {
+                    let _ = f.write_all(served.as_bytes());
+                }
+                Err(_) => std::thread::sleep(Duration::from_millis(5)),
+            }
+        }
+    });
+    palette(
+        &mut s.term,
+        "settings: become the primary",
+        "Settings: Become the primary...",
+    );
+    s.term
+        .wait_for("Settings on the primary row", STARTUP, |t| {
+            primary_row(&t.text(), "[ ]")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    s.term.send_keys("Space").unwrap();
+    // The question: click the button to the right of Cancel.
+    let screen = s
+        .term
+        .wait_for("the confirmation", STEP, |t| {
+            t.contains("Take over the name") && t.contains("Cancel")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    let (cancel_col, row) = screen.find("Cancel").expect("the Cancel button");
+    let mut col = cancel_col + "Cancel".len() as u16;
+    while screen
+        .cell(col, row)
+        .is_some_and(|c| c.text.trim().is_empty())
+    {
+        col += 1;
+    }
+    s.term.click(col + 1, row).unwrap();
+    // The job is stuck on the FIFO. Once the screen is quiet, release it; no
+    // key follows, only the worker's answer can change the screen.
+    settle(&s.term, Duration::from_secs(2));
+    assert!(primary_row(&s.term.text(), "[ ]"), "{}", s.term.text());
+    gate.store(true, Ordering::SeqCst);
+    s.term
+        .wait_for(
+            "the checkbox is checked by itself",
+            Duration::from_millis(1500),
+            |t| {
+                primary_row(&t.text(), "[x]")
+                    && t.contains("the primary is always called GitPoulpi")
+            },
+        )
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    stop.store(true, Ordering::SeqCst);
+    // Resigning repaints the same way.
+    settle(&s.term, Duration::from_secs(2));
+    s.term.send_keys("Space").unwrap();
+    s.term
+        .wait_for(
+            "the checkbox is cleared by itself",
+            Duration::from_millis(1500),
+            |t| primary_row(&t.text(), "[ ]"),
+        )
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    let _ = s.term.stop();
+}

@@ -81,9 +81,14 @@ fn place_label(place: Place) -> &'static str {
 }
 
 impl LauncherState {
+    /// A job runs or waits.
+    pub(super) fn busy(&self) -> bool {
+        self.rx.is_some() || self.pending.is_some()
+    }
+
     #[cfg(test)]
     pub(super) fn is_idle(&self) -> bool {
-        self.rx.is_none() && self.pending.is_none()
+        !self.busy()
     }
 }
 

@@ -708,9 +708,21 @@ impl PreferencesState {
         std::mem::take(&mut self.repo_config_requests)
     }
 
+    /// A Launcher job (shortcuts, alias, folder menu, installation) runs or
+    /// waits: the render loop keeps drawing, so the frame that follows its end
+    /// (the poll that applies the answer runs in a frame) is never left for
+    /// the next key press.
+    fn launcher_jobs_running(&self) -> bool {
+        self.launcher.busy()
+            || self.tools.busy()
+            || self.folder_menu.busy()
+            || self.install.busy()
+    }
+
     /// A spinner is on screen: the render loop keeps drawing.
     pub(crate) fn animating(&self) -> bool {
-        self.integrations.animating()
+        self.launcher_jobs_running()
+            || self.integrations.animating()
             || self.open_in_detecting()
             || self.images_detecting()
             || self.ra_animating()

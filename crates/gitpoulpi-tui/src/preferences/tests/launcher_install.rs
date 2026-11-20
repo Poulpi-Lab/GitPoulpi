@@ -426,6 +426,22 @@ fn resigning_moves_the_launcher_to_its_own_name_and_leaves_one() {
 }
 
 #[test]
+fn the_loop_keeps_drawing_while_an_installation_job_runs() {
+    // The poll that applies a finished job runs in a frame: while a job is in
+    // flight the page counts as animating, so no frame waits for a key press.
+    let tmp = tempfile::tempdir().unwrap();
+    let mut st = install_state(tmp.path());
+    let root = tmp.path().join("machine");
+    st.set_launcher_env(move || temp_machine(&root));
+    assert!(!st.launcher_jobs_running());
+    st.install_read();
+    assert!(st.launcher_jobs_running());
+    assert!(st.animating());
+    settle_install(&mut st);
+    assert!(!st.launcher_jobs_running());
+}
+
+#[test]
 fn the_rows_reread_the_file_when_a_job_ends_even_one_that_only_reads() {
     let tmp = tempfile::tempdir().unwrap();
     let mut st = install_state(tmp.path());

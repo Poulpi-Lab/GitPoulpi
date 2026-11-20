@@ -192,6 +192,22 @@ idiomas. Ali, o idioma destacado é pré-visualizado ao vivo; `Enter` o mantém 
 A página **Lançador** (`gitpoulpi ui show settings launcher`) cria um atalho que inicia o GitPoulpi pelo
 lançador do sistema operacional, no terminal que você escolher.
 
+**Esta instalação** (primeiro grupo da página). Cada GitPoulpi de uma máquina (um checkout de desenvolvimento, um pacote, uma cópia portátil) tem o próprio nome de lançador, cor, aliases e entrada do menu de pastas, guardados na própria tabela `[installation.settings.<id>]` do `config.toml`; mudar uma aqui nunca afeta outra instalação. Nada disso entra no diário de desfazer (é integração com o sistema; **Remover** é o caminho de volta).
+
+| Linha | O que faz |
+|---|---|
+| **Instalação** | Somente leitura: o tipo, a pasta e o ambiente desta instalação. Em uma página estreita, a pasta é cortada no meio com reticências; a linha de ajuda sob a linha tem o texto completo. |
+| **Nome do lançador** | O nome dos atalhos e da entrada do menu de pastas desta instalação. Recusado quando outra instalação que ainda existe tem esse nome. A principal sempre se chama `GitPoulpi`. |
+| **Incluir a versão no nome do lançador** | Acrescenta `<major>.<minor>` ao nome (`GitPoulpi 1.2`); desligado por padrão, porque os atalhos são renomeados a cada atualização. |
+| **Cor do polvo** | A cor do polvo desta instalação e dos atalhos dela (as mesmas escolhas da janela Sobre). |
+| **Tornar-se a principal** | A principal fica com o nome simples `GitPoulpi`, os atalhos legados e as chaves `ui.*` que as builds mais antigas leem; por padrão, ninguém é a principal. Pergunta antes quando outra instalação é. A principal anterior mantém os lançadores dela com o próprio nome (Windows e Linux). |
+| **Ambiente** | Instalações do mesmo ambiente compartilham janelas, daemons e histórico de desfazer; o padrão é o ambiente próprio da instalação. Mudá-lo exige reiniciar as janelas abertas desta instalação. |
+| **Submenu do menu de pastas** | Agrupa a entrada do menu de pastas em um submenu com esse nome; instalações que dão o mesmo nome compartilham um. Indisponível no macOS; o Nemo e o Thunar sempre listam a entrada na raiz. |
+| **Outra: \<nome\>** | As outras instalações desta máquina. Uma cuja pasta não existe mais tem um botão **Esquecer** (pergunta antes) que remove a entrada dela e os lançadores, aliases e entradas do menu de pastas que ela deixou. |
+| **Lançadores legados** | Enquanto ninguém é a principal, os lançadores que uma build mais antiga criou com o nome simples são listados com **Tornar-se a principal** e **Remover lançadores legados** (pergunta antes). Uma nota única na linha de status aponta para cá. |
+
+A paleta tem **Lançador: tornar esta a instalação principal**, **Lançador: remover lançadores legados** e **Lançador: esquecer instalações que sumiram**, e cada linha é uma entrada `Configurações:`. As linhas de alias de comando abaixo são as desta instalação (`gpd` / `gpda` são sugeridos para um checkout de desenvolvimento); um alias que outra instalação criou mostra **Usado por \<nome\>** e não pode ser criado aqui.
+
 | Linha | O que faz |
 |---|---|
 | **Terminal dos atalhos** | `ui.launch_terminal`: **Automático**, **Padrão do sistema** ou um dos terminais encontrados nesta máquina (a mesma detecção de **Abrir em**). Automático: Windows Terminal no Windows (senão WezTerm, Alacritty, o console simples), `xdg-terminal-exec` no Linux (Omarchy; senão o primeiro terminal encontrado), Terminal no macOS, a menos que iTerm2, Ghostty, WezTerm ou kitty estejam instalados. |

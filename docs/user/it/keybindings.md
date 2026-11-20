@@ -1248,7 +1248,7 @@ applicano. I tasti sono quelli predefiniti.
 | Launcher: Rimuovi collegamenti |  |
 | Launcher: Crea alias del comando |  |
 | Launcher: Rimuovi alias del comando |  |
-| MCP: Suggest a free port |  |
+| MCP: Suggerisci una porta libera |  |
 | Launcher: Aggiungi al PATH |  |
 | Launcher: Rimuovi dal PATH |  |
 | Launcher: Installa il menu Apri in GitPoulpi |  |

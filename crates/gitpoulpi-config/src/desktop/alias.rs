@@ -836,9 +836,14 @@ pub fn remove_all_with_app_paths(
             gone.push(name);
         }
     }
-    // The shared Windows folder goes with its last alias; never with a file left.
-    if env.os == Os::Windows && !gone.is_empty() {
-        let _ = std::fs::remove_dir(&env.bin_dir);
+    // The shared Windows folder goes with its last alias, then its parent
+    // (`Programs\GitPoulpi`). `remove_dir` only ever removes an empty folder,
+    // so a file left (an installer's per-user install lives in that parent)
+    // keeps both.
+    if env.os == Os::Windows && !gone.is_empty() && std::fs::remove_dir(&env.bin_dir).is_ok() {
+        if let Some(parent) = env.bin_dir.parent() {
+            let _ = std::fs::remove_dir(parent);
+        }
     }
     Ok(gone)
 }
@@ -1071,6 +1076,26 @@ mod tests {
         std::fs::write(mine.bin_dir.join("notes.txt"), "x").unwrap();
         remove_all_with_app_paths(&mine, &reg).unwrap();
         assert!(mine.bin_dir.join("notes.txt").exists());
+    }
+
+    #[test]
+    fn remove_all_drops_the_emptied_parent_of_the_bin_folder_too_but_never_one_with_a_file() {
+        use crate::desktop::registry::MemoryRegistry;
+        let tmp = tempfile::tempdir().unwrap();
+        let mut mine = windows_as(tmp.path(), "aaaa", None);
+        let parent = tmp.path().join("Programs").join("GitPoulpi");
+        mine.bin_dir = parent.join("bin");
+        let reg = MemoryRegistry::new();
+        create(&mine, "gpm").unwrap();
+        remove_all_with_app_paths(&mine, &reg).unwrap();
+        assert!(!parent.exists(), "the empty parent goes with the bin folder");
+        assert!(tmp.path().join("Programs").exists(), "only our own folders");
+        // A file of an installer next to `bin`: both stay.
+        create(&mine, "gpm").unwrap();
+        std::fs::write(parent.join("gitpoulpi.exe"), "x").unwrap();
+        remove_all_with_app_paths(&mine, &reg).unwrap();
+        assert!(!mine.bin_dir.exists());
+        assert!(parent.join("gitpoulpi.exe").exists());
     }
 
     #[test]

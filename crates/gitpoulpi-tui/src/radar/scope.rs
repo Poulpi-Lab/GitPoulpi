@@ -140,7 +140,7 @@ pub(crate) fn name_of(path: &Path) -> String {
 }
 
 fn session_file(config_dir: &Path, session: &str) -> PathBuf {
-    config_dir.join("sessions").join(format!("{session}.toml"))
+    crate::session_store::session_file_in(config_dir, session)
 }
 
 /// The workspaces, for the combobox.

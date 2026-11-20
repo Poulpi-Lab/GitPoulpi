@@ -92,8 +92,14 @@ pub(crate) struct Paths {
     pub(crate) download: PathBuf,
 }
 
+#[cfg(test)]
 pub(crate) fn paths_in(data_dir: &Path) -> Paths {
-    let dir = data_dir.join("updates");
+    paths_under(data_dir.join("updates"))
+}
+
+/// The files under an installation's own updates folder
+/// (`ConfigPaths::updates_dir`).
+pub(crate) fn paths_under(dir: PathBuf) -> Paths {
     Paths {
         job: dir.join("job.json"),
         status: dir.join("status.json"),
@@ -105,7 +111,7 @@ pub(crate) fn paths_in(data_dir: &Path) -> Paths {
 
 /// The real location, `None` without a config location.
 pub(crate) fn paths() -> Option<Paths> {
-    gitpoulpi_config::ConfigPaths::discover().map(|p| paths_in(&p.data_dir()))
+    gitpoulpi_config::ConfigPaths::discover().map(|p| paths_under(p.updates_dir()))
 }
 
 pub(crate) fn updater_name(target: &str) -> String {

@@ -703,7 +703,7 @@ pub struct UiLook {
 /// The config side of changing the primary: one write, computed here, applied
 /// by [`become_primary_in_file`] / [`resign_primary_in_file`]. The desktop side
 /// (renaming the legacy-named launchers) follows `demoted` and `promoted`.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct PrimaryHandover {
     /// The `[installation]` table after the change.
     pub installation: InstallationConfig,

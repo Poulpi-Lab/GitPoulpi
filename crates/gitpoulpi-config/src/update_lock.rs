@@ -1,6 +1,6 @@
 //! The "an update is running" lock files (the install-channels design, 1.3).
 //!
-//! Two files say it: `<data>/updates/updating.lock` and, when the updater
+//! Two files say it: `<data>/updates/<install-id>/updating.lock` and, when the updater
 //! can write there, `<install_dir>/.gitpoulpi-updating`. Both hold the
 //! updater's pid and the time it took the lock. The CLI and the daemon
 //! auto-start refuse while one is live; the updater itself ignores one that

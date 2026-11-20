@@ -358,3 +358,75 @@ fn session_delete_and_rename_refuse_while_a_daemon_is_live() {
 
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();
+
+/// `run`, with `GITPOULPI_ENV` set in the child's environment only.
+fn run_in_env(env: &str, config_dir: &Path, cwd: &Path, args: &[&str]) -> Value {
+    let output = Command::cargo_bin("gitpoulpi")
+        .unwrap()
+        .env("GITPOULPI_CONFIG_DIR", config_dir)
+        .env("GITPOULPI_ENV", env)
+        .current_dir(cwd)
+        .args(args)
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "exit {:?}: {}",
+        output.status.code(),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    serde_json::from_slice(&output.stdout).unwrap()
+}
+
+fn session_names(json: &Value) -> Vec<String> {
+    json["sessions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|s| s["name"].as_str().unwrap().to_string())
+        .collect()
+}
+
+#[test]
+fn two_envs_list_only_their_own_sessions() {
+    let config = tempfile::tempdir().unwrap();
+    let cwd = tempfile::tempdir().unwrap();
+    run_in_env(
+        "one",
+        config.path(),
+        cwd.path(),
+        &["session", "new", "only-one", "--json"],
+    );
+    run_in_env(
+        "two",
+        config.path(),
+        cwd.path(),
+        &["session", "new", "only-two", "--json"],
+    );
+
+    let one = run_in_env(
+        "one",
+        config.path(),
+        cwd.path(),
+        &["session", "list", "--json"],
+    );
+    let two = run_in_env(
+        "two",
+        config.path(),
+        cwd.path(),
+        &["session", "list", "--json"],
+    );
+    assert_eq!(session_names(&one), vec!["only-one"], "{one}");
+    assert_eq!(session_names(&two), vec!["only-two"], "{two}");
+    assert!(config
+        .path()
+        .join("sessions/env/one/only-one.toml")
+        .exists());
+    assert!(config
+        .path()
+        .join("sessions/env/two/only-two.toml")
+        .exists());
+    // The flat layout is untouched and sees neither.
+    let flat = run(config.path(), cwd.path(), &["session", "list", "--json"]);
+    assert!(session_names(&flat).is_empty(), "{flat}");
+}

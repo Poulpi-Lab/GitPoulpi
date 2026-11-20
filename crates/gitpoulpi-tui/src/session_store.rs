@@ -29,8 +29,18 @@ pub(crate) fn config_dir() -> Option<PathBuf> {
     gitpoulpi_config::ConfigPaths::discover().map(|p| p.config_dir().to_path_buf())
 }
 
+/// The paths seam for `config_dir`: the discovered paths (environment
+/// layout) when `config_dir` is the real config folder, else the flat layout
+/// of that folder (what the tests, which pass a temp dir, rely on).
+pub(crate) fn paths_in(config_dir: &Path) -> gitpoulpi_config::ConfigPaths {
+    match gitpoulpi_config::ConfigPaths::discover() {
+        Some(paths) if paths.config_dir() == config_dir => paths,
+        _ => gitpoulpi_config::ConfigPaths::for_dir(config_dir),
+    }
+}
+
 pub(crate) fn session_file_in(config_dir: &Path, session: &str) -> PathBuf {
-    config_dir.join("sessions").join(format!("{session}.toml"))
+    paths_in(config_dir).session_file(session)
 }
 
 fn recent_file_in(config_dir: &Path) -> PathBuf {
@@ -264,7 +274,8 @@ pub fn activate_tab(session: &str, index: usize) {
 /// Sessions are derived from the launch folder's repository root, so the
 /// tabs a user left open sit in the session file of whichever repository
 /// they launched from last, not the one they launch from now.
-/// `last-session` (a one-line file beside `sessions/`) names that session.
+/// `last-session` (a one-line file: beside the tab lists in the environment
+/// layout, beside `sessions/` in the flat one) names that session.
 ///
 /// * `remember` on and `implicit_session` (no `-s`): `session` is seeded
 ///   with the last session's tabs (its own extra tabs are kept after them,
@@ -317,7 +328,7 @@ pub fn active_tab_path(session: &str) -> Option<PathBuf> {
 }
 
 fn last_session_file_in(config_dir: &Path) -> PathBuf {
-    config_dir.join("last-session")
+    paths_in(config_dir).last_session_file()
 }
 
 #[cfg(test)]
@@ -346,6 +357,8 @@ fn restore_launch_tabs_with(
     implicit_session: bool,
     activate_launch: bool,
 ) {
+    // The first use of an environment copies the legacy tab lists.
+    paths_in(config_dir).seed_env_from_legacy();
     let last_file = last_session_file_in(config_dir);
     if remember && implicit_session {
         let last = std::fs::read_to_string(&last_file)

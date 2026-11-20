@@ -36,6 +36,7 @@ const PROBE_TIMEOUT: Duration = Duration::from_millis(250);
 pub fn run(current_session: &str, action: SessionAction) -> Result<Emitted, String> {
     let paths = ConfigPaths::discover()
         .ok_or_else(|| "could not determine the config directory for this OS".to_string())?;
+    paths.seed_env_from_legacy();
     match action {
         SessionAction::List => Ok(list(&paths, current_session)),
         SessionAction::New { name } => new(&paths, &name),

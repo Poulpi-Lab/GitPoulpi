@@ -52,7 +52,7 @@ fn push_unique(repos: &mut Vec<ScopeRepo>, path: &Path) {
 /// workspace (a stale id that names no workspace counts as none), else the
 /// open tabs `open_tabs`.
 pub(crate) fn search_scope_in(config_dir: &Path, session: &str, open_tabs: &[RepoTab]) -> Scope {
-    let file = config_dir.join("sessions").join(format!("{session}.toml"));
+    let file = crate::session_store::session_file_in(config_dir, session);
     let active = GlobalSession::load(&file)
         .ok()
         .and_then(|s| s.active_workspace);

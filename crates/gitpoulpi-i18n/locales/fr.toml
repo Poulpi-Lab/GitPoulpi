@@ -6072,9 +6072,9 @@ done_resigned = "{name} n'est plus l'installation principale"
 done_forgot = "{name} oubliée"
 done_legacy_removed = "Anciens lanceurs supprimés"
 done_legacy_nothing = "Aucun ancien lanceur à supprimer"
-palette_become_primary = "Lanceur : Devenir l'installation principale"
-palette_remove_legacy = "Lanceur : Supprimer les anciens lanceurs"
-palette_forget = "Lanceur : Oublier les installations disparues"
+palette_become_primary = "Lanceur : Devenir l'installation principale"
+palette_remove_legacy = "Lanceur : Supprimer les anciens lanceurs"
+palette_forget = "Lanceur : Oublier les installations disparues"
 # context: the entry in the file manager's right-click menu of an installation that is not the primary; {name} its launcher name
 folder_menu_label_named = "Ouvrir dans {name}"
 

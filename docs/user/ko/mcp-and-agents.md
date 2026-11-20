@@ -64,6 +64,15 @@ gitpoulpi mcp serve --http 127.0.0.1:9000    # or: --bind 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
+포트당 MCP HTTP 서버는 하나입니다. 여러 GitPoulpi 설치가 나란히 실행될 수 있고
+모두 기본값이 `127.0.0.1:8808`이므로, 이미 사용 중인 포트에서 시작하는 두 번째
+서버는 `address already in use`와 함께 거부하고(스스로 다른 포트를 고르지
+않습니다) 오류로 종료합니다. 각 설치는 자신의 MCP 바인드가 있으면 그것을
+사용하고(`gitpoulpi installation set mcp_bind HOST:PORT`), 없으면 `[mcp] bind`를
+사용합니다. 다른 포트를 고르려면 설정 > 에이전트 및 MCP > *빈 포트 제안*(또는
+팔레트 명령 *MCP: 빈 포트 제안*)을 사용하세요. 같은 호스트에서 빈 포트를 찾아
+이 설치의 MCP 바인드로 저장합니다. stdio는 영향을 받지 않습니다.
+
 상태 없는 JSON, 같은 도구, 같은 `[mcp]` 게이트입니다. 모든 요청에 bearer 토큰이
 필요합니다(`[mcp] http_auth`, 기본값 켜짐). `gitpoulpi mcp token --show`로 출력하고
 (`--copy`, `--rotate`도 있으며, 토큰은 비공개 데이터 폴더 아래 사용자 전용 파일에

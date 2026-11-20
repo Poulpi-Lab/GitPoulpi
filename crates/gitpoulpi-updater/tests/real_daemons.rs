@@ -8,13 +8,13 @@ use std::time::{Duration, Instant};
 use gitpoulpi_cli_backend::SystemGitBackend;
 use gitpoulpi_config::ConfigPaths;
 use gitpoulpi_daemon::Daemon;
-use gitpoulpi_updater::ops::DaemonOps;
+use gitpoulpi_updater::ops::{DaemonOps, StopScope};
 use gitpoulpi_updater::real::RealDaemons;
 
 #[test]
 fn a_session_daemon_is_found_stopped_and_seen_gone() {
     let dir = tempfile::tempdir().unwrap();
-    let paths = ConfigPaths::for_dir(dir.path());
+    let paths = ConfigPaths::for_dir(dir.path()).with_env("e");
     let session = "updater-real-daemons";
 
     // The daemon runs on its own runtime thread: `RealDaemons` blocks on
@@ -43,7 +43,12 @@ fn a_session_daemon_is_found_stopped_and_seen_gone() {
     }
 
     let daemons = RealDaemons;
-    let found = daemons.sessions(dir.path());
+    let scope = StopScope {
+        config_dir: dir.path().to_path_buf(),
+        env: Some("e".into()),
+        install_pids: Vec::new(),
+    };
+    let found = daemons.sessions(&scope);
     assert_eq!(found.len(), 1, "{found:?}");
     assert_eq!(found[0].name, session);
     assert!(daemons.is_up(&found[0]));
@@ -55,7 +60,7 @@ fn a_session_daemon_is_found_stopped_and_seen_gone() {
         std::thread::sleep(Duration::from_millis(20));
     }
     host.join().unwrap().unwrap();
-    assert!(daemons.sessions(dir.path()).is_empty());
+    assert!(daemons.sessions(&scope).is_empty());
 }
 
 gitpoulpi_testkit::isolate_binary!();

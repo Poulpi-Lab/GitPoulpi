@@ -123,6 +123,8 @@ fn a_whole_update_swaps_verifies_and_execs_the_new_file() {
         requester_pid,
         config_dir: tmp.path().join("config"),
         status_path: updates.join("status.json"),
+        environment: None,
+        install_id: None,
     };
     let job_path = updates.join("job.json");
     std::fs::write(&job_path, job.render()).unwrap();

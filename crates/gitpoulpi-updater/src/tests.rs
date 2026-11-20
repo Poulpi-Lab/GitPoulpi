@@ -104,6 +104,8 @@ fn job(fx: &Fx, action: Action, elevation: JobElevation) -> UpdateJob {
         requester_pid: 4242,
         config_dir: fx.config.clone(),
         status_path: fx.status_path(),
+        environment: None,
+        install_id: None,
     }
 }
 
@@ -137,6 +139,7 @@ impl World {
                 stubborn: false,
                 down: Default::default(),
                 lock_path: fx.updates.join("updating.lock"),
+                scope: Default::default(),
             },
             registry: FakeRegistry {
                 log: log.clone(),
@@ -928,4 +931,107 @@ fn the_command_line_is_parsed() {
     assert!(parse_args(&a(&["run"])).is_err());
     assert!(parse_args(&a(&["elevated", "--job", "j"])).is_err());
     assert!(parse_args(&a(&[])).is_err());
+}
+
+// --- installations: whose daemons, whose files ------------------------------
+
+fn port(dir: &std::path::Path, name: &str, pid: Option<u32>) {
+    std::fs::create_dir_all(dir).unwrap();
+    std::fs::write(dir.join(format!("{name}.port")), "1").unwrap();
+    if let Some(pid) = pid {
+        std::fs::write(dir.join(format!("{name}.pid")), pid.to_string()).unwrap();
+    }
+}
+
+fn names(found: Vec<crate::ops::SessionDaemon>) -> Vec<String> {
+    found.into_iter().map(|d| d.name).collect()
+}
+
+#[test]
+fn the_updater_stops_only_its_envs_daemons() {
+    let tmp = tempfile::tempdir().unwrap();
+    let sessions = tmp.path().join("sessions");
+    port(&sessions.join("env").join("a"), "mine", None);
+    port(&sessions.join("env").join("b"), "theirs", None);
+    let scope = |env: &str| crate::ops::StopScope {
+        config_dir: tmp.path().to_path_buf(),
+        env: Some(env.into()),
+        install_pids: vec![],
+    };
+    assert_eq!(names(crate::real::scan_sessions(&scope("a"))), vec!["mine"]);
+    assert_eq!(
+        names(crate::real::scan_sessions(&scope("b"))),
+        vec!["theirs"]
+    );
+
+    // The job's environment is what reaches the daemon lookup.
+    let fx = fx(Some(InstallChannel::Archive));
+    let w = World::new(&fx);
+    let mut j = job(&fx, Action::Apply, JobElevation::None);
+    j.environment = Some("a".into());
+    crate::stop::stop_daemons(&w.env(), &j);
+    let seen = w.daemons.scope.borrow().clone().unwrap();
+    assert_eq!(seen.env.as_deref(), Some("a"));
+}
+
+#[test]
+fn a_flat_layout_daemon_is_stopped_only_when_hosted_from_this_install_folder() {
+    let tmp = tempfile::tempdir().unwrap();
+    let sessions = tmp.path().join("sessions");
+    port(&sessions, "old-mine", Some(100));
+    port(&sessions, "old-other", Some(200));
+    port(&sessions, "old-unknown", None);
+    port(&sessions.join("env").join("a"), "mine", None);
+    let scope = crate::ops::StopScope {
+        config_dir: tmp.path().to_path_buf(),
+        env: Some("a".into()),
+        install_pids: vec![100],
+    };
+    assert_eq!(
+        names(crate::real::scan_sessions(&scope)),
+        vec!["mine", "old-mine"]
+    );
+    // A job without an environment (an old build) still reaches its own
+    // flat daemons, and only those.
+    let flat_only = crate::ops::StopScope { env: None, ..scope };
+    assert_eq!(
+        names(crate::real::scan_sessions(&flat_only)),
+        vec!["old-mine"]
+    );
+
+    // The pids come from the process image lookup of the install folder.
+    let fx = fx(Some(InstallChannel::Archive));
+    let w = World::new(&fx);
+    w.proc.running.borrow_mut().push(process(100, &fx));
+    crate::stop::stop_daemons(&w.env(), &job(&fx, Action::Apply, JobElevation::None));
+    assert_eq!(
+        w.daemons.scope.borrow().clone().unwrap().install_pids,
+        vec![100]
+    );
+}
+
+#[test]
+fn status_and_lock_live_under_the_installation() {
+    let fx = fx(Some(InstallChannel::Archive));
+    let own = fx.updates.join("abc123");
+    std::fs::create_dir_all(&own).unwrap();
+    let mut w = World::new(&fx);
+    w.daemons.names = vec!["work".into()];
+    w.daemons.lock_path = own.join("updating.lock");
+    let mut j = job(&fx, Action::Apply, JobElevation::None);
+    j.status_path = own.join("status.json");
+    j.install_id = Some("abc123".into());
+    let out = run(&fx, &w, &j);
+    assert_eq!(out.code(), 0, "{out:?}");
+    assert_eq!(
+        w.lines()[0],
+        "shutdown:work:lock=true",
+        "the lock sat in the installation's folder"
+    );
+    assert!(own.join("status.json").exists());
+    assert!(!own.join("updating.lock").exists());
+    assert!(
+        !fx.updates.join("status.json").exists() && !fx.updates.join("updating.lock").exists(),
+        "nothing in the shared folder"
+    );
 }

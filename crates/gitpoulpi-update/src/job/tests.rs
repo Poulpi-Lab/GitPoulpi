@@ -27,6 +27,8 @@ fn job() -> UpdateJob {
         requester_pid: 4242,
         config_dir: abs("/home/u/.config/gitpoulpi"),
         status_path: abs("/home/u/.local/share/gitpoulpi/updates/status.json"),
+        environment: Some("env1".into()),
+        install_id: Some("abc123".into()),
     }
 }
 
@@ -184,4 +186,25 @@ fn the_exit_codes_are_the_documented_ones() {
         ],
         [0, 1, 2, 3, 4, 5, 6]
     );
+}
+
+#[test]
+fn a_job_carries_its_environment_and_installation_id() {
+    let v: serde_json::Value = serde_json::from_str(&job().render()).unwrap();
+    assert_eq!(v["environment"], "env1");
+    assert_eq!(v["install_id"], "abc123");
+    let back = UpdateJob::parse(&job().render()).unwrap();
+    assert_eq!(back.environment.as_deref(), Some("env1"));
+    assert_eq!(back.install_id.as_deref(), Some("abc123"));
+}
+
+#[test]
+fn an_older_job_without_them_still_parses() {
+    let mut v: serde_json::Value = serde_json::from_str(&job().render()).unwrap();
+    let obj = v.as_object_mut().unwrap();
+    obj.remove("environment");
+    obj.remove("install_id");
+    let parsed = UpdateJob::parse(&v.to_string()).unwrap();
+    assert_eq!(parsed.environment, None);
+    assert_eq!(parsed.install_id, None);
 }

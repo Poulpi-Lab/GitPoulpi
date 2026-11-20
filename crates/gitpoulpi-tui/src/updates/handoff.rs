@@ -54,6 +54,8 @@ pub(crate) struct Inputs {
     pub(crate) pid: u32,
     pub(crate) config_dir: PathBuf,
     pub(crate) status_path: PathBuf,
+    pub(crate) environment: Option<String>,
+    pub(crate) install_id: Option<String>,
 }
 
 pub(crate) fn build_job(i: Inputs) -> UpdateJob {
@@ -77,6 +79,8 @@ pub(crate) fn build_job(i: Inputs) -> UpdateJob {
         requester_pid: i.pid,
         config_dir: i.config_dir,
         status_path: i.status_path,
+        environment: i.environment,
+        install_id: i.install_id,
     }
 }
 

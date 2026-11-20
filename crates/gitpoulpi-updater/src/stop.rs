@@ -14,7 +14,7 @@ use std::time::Duration;
 use gitpoulpi_update::job::UpdateJob;
 
 use crate::env::Env;
-use crate::ops::{Proc, SessionDaemon};
+use crate::ops::{Proc, SessionDaemon, StopScope};
 
 pub const DAEMON_GRACE: Duration = Duration::from_secs(5);
 pub const EXIT_GRACE: Duration = Duration::from_secs(5);
@@ -40,10 +40,20 @@ pub fn wait_until(env: &Env, limit: Duration, mut done: impl FnMut() -> bool) ->
     }
 }
 
-/// Asks every session daemon to stop for the update, then waits for them to
+/// Asks the session daemons of this installation to stop for the update, then waits for them to
 /// go. A daemon that does not go is dealt with by [`stop_processes`].
 pub fn stop_daemons(env: &Env, job: &UpdateJob) -> Vec<SessionDaemon> {
-    let daemons = env.daemons.sessions(&job.config_dir);
+    let scope = StopScope {
+        config_dir: job.config_dir.clone(),
+        env: job.environment.clone(),
+        install_pids: env
+            .proc
+            .in_dir(&job.install_dir, &[])
+            .into_iter()
+            .map(|p| p.pid)
+            .collect(),
+    };
+    let daemons = env.daemons.sessions(&scope);
     for d in &daemons {
         env.daemons.request_shutdown(d);
     }

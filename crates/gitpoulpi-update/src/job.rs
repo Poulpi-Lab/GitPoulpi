@@ -150,6 +150,14 @@ pub struct UpdateJob {
     pub requester_pid: u32,
     pub config_dir: PathBuf,
     pub status_path: PathBuf,
+    /// The requester's environment: the updater stops only the daemons of
+    /// `sessions/env/<environment>/`. Absent in a job from a build without
+    /// environments (flat layout).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub environment: Option<String>,
+    /// The requester's installation id (names its `updates/<id>/` folder).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub install_id: Option<String>,
 }
 
 /// Why a job file was refused.

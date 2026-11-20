@@ -18,6 +18,8 @@ fn inputs(dir: &Path) -> Inputs {
         pid: 4242,
         config_dir: dir.join("config"),
         status_path: dir.join("data").join("updates").join("status.json"),
+        environment: None,
+        install_id: None,
     }
 }
 

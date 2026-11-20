@@ -12,7 +12,8 @@ use gitpoulpi_config::policy::PolicySource;
 use gitpoulpi_update::channel::{ChannelEnv, Hive, RegistryOps};
 
 use crate::ops::{
-    Clock, DaemonOps, LaunchPlan, Proc, ProcessOps, Registry, RunError, SessionDaemon, Transfer,
+    Clock, DaemonOps, LaunchPlan, Proc, ProcessOps, Registry, RunError, SessionDaemon, StopScope,
+    Transfer,
 };
 
 pub type Log = Rc<RefCell<Vec<String>>>;
@@ -155,10 +156,13 @@ pub struct FakeDaemons {
     pub down: RefCell<Vec<String>>,
     /// Recorded at each shutdown request: was the lock file there?
     pub lock_path: PathBuf,
+    /// The scope the last `sessions` call got.
+    pub scope: RefCell<Option<StopScope>>,
 }
 
 impl DaemonOps for FakeDaemons {
-    fn sessions(&self, _config_dir: &Path) -> Vec<SessionDaemon> {
+    fn sessions(&self, scope: &StopScope) -> Vec<SessionDaemon> {
+        *self.scope.borrow_mut() = Some(scope.clone());
         self.names
             .iter()
             .map(|n| SessionDaemon {

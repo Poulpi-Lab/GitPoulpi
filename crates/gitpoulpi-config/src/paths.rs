@@ -76,6 +76,11 @@ impl ConfigPaths {
         self.env.as_deref()
     }
 
+    /// The installation id naming `updates/`, `None` for the flat folder.
+    pub fn install_id(&self) -> Option<&str> {
+        self.install_id.as_deref()
+    }
+
     /// The paths of the running installation.
     ///
     /// * [`CONFIG_DIR_ENV`] set: the flat legacy layout (an explicit config

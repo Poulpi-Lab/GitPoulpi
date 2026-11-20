@@ -11,7 +11,7 @@ use std::time::Duration;
 use gitpoulpi_core::domain::OperationKind;
 use gitpoulpi_ipc::{discovery, Client, Request, ShutdownArgs};
 
-use crate::ops::{Clock, DaemonOps, LaunchPlan, RunError, SessionDaemon, Transfer};
+use crate::ops::{Clock, DaemonOps, LaunchPlan, RunError, SessionDaemon, StopScope, Transfer};
 
 pub struct RealClock;
 
@@ -36,29 +36,46 @@ fn runtime() -> tokio::runtime::Runtime {
         .expect("a current-thread runtime always builds")
 }
 
+fn port_files(dir: &Path) -> Vec<SessionDaemon> {
+    std::fs::read_dir(dir)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| p.extension().is_some_and(|e| e == "port"))
+        .filter_map(|p| {
+            let name = p.file_stem()?.to_str()?.to_string();
+            Some(SessionDaemon { name, port_file: p })
+        })
+        .collect()
+}
+
+/// The daemons an update stops: those of `sessions/env/<env>/`, and the
+/// flat `sessions/*.port` ones (older builds) whose recorded process (a
+/// standalone daemon's pid, an embedded one's host) runs from the install
+/// folder. Another installation's daemons, in its own environment or hosted
+/// from its own folder, are left alone.
+pub(crate) fn scan_sessions(scope: &StopScope) -> Vec<SessionDaemon> {
+    let paths = gitpoulpi_config::ConfigPaths::for_dir(&scope.config_dir);
+    let flat = paths.sessions_dir();
+    let mut found = match &scope.env {
+        Some(env) => port_files(
+            &flat
+                .join("env")
+                .join(gitpoulpi_config::installation::sanitize(env)),
+        ),
+        None => Vec::new(),
+    };
+    found.extend(port_files(&flat).into_iter().filter(|d| {
+        discovery::recorded_pid(&d.port_file).is_some_and(|pid| scope.install_pids.contains(&pid))
+    }));
+    found.sort_by(|a, b| a.name.cmp(&b.name));
+    found
+}
+
 impl DaemonOps for RealDaemons {
-    fn sessions(&self, config_dir: &Path) -> Vec<SessionDaemon> {
-        // Until the stop logic is per environment (a later slice) the updater
-        // keeps stopping every daemon of the profile: the flat folder and
-        // every environment folder under it.
-        let paths = gitpoulpi_config::ConfigPaths::for_dir(config_dir);
-        let flat = paths.sessions_dir();
-        let mut dirs = vec![flat.clone()];
-        if let Ok(envs) = std::fs::read_dir(flat.join("env")) {
-            dirs.extend(envs.flatten().map(|e| e.path()).filter(|p| p.is_dir()));
-        }
-        let mut found: Vec<SessionDaemon> = dirs
-            .into_iter()
-            .filter_map(|dir| std::fs::read_dir(dir).ok())
-            .flat_map(|entries| entries.flatten().map(|e| e.path()))
-            .filter(|p| p.extension().is_some_and(|e| e == "port"))
-            .filter_map(|p| {
-                let name = p.file_stem()?.to_str()?.to_string();
-                Some(SessionDaemon { name, port_file: p })
-            })
-            .collect();
-        found.sort_by(|a, b| a.name.cmp(&b.name));
-        found
+    fn sessions(&self, scope: &StopScope) -> Vec<SessionDaemon> {
+        scan_sessions(scope)
     }
 
     fn request_shutdown(&self, daemon: &SessionDaemon) -> bool {

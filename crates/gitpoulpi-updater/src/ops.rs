@@ -61,8 +61,19 @@ pub struct SessionDaemon {
     pub port_file: PathBuf,
 }
 
+/// Whose daemons an update stops: its own environment's, plus flat-layout
+/// ones (older builds) running from its own install folder.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StopScope {
+    pub config_dir: PathBuf,
+    /// `None`: a job from a build without environments.
+    pub env: Option<String>,
+    /// Pids of the processes whose image lies in the install folder.
+    pub install_pids: Vec<u32>,
+}
+
 pub trait DaemonOps {
-    fn sessions(&self, config_dir: &Path) -> Vec<SessionDaemon>;
+    fn sessions(&self, scope: &StopScope) -> Vec<SessionDaemon>;
     /// Asks the daemon to stop for an update (`Shutdown {reason: update}`).
     /// `false` when nothing answered.
     fn request_shutdown(&self, daemon: &SessionDaemon) -> bool;

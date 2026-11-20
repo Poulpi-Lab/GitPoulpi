@@ -815,9 +815,9 @@ fn begin_handoff(kind: Kind, to_version: String) -> Option<String> {
         move || {
             let result = (|| {
                 let paths = handoff::paths().ok_or_else(|| "no data folder".to_string())?; // i18n-english
-                let config_dir = gitpoulpi_config::ConfigPaths::discover()
-                    .map(|p| p.config_dir().to_path_buf())
+                let config = gitpoulpi_config::ConfigPaths::discover()
                     .ok_or_else(|| "no config folder".to_string())?; // i18n-english
+                let config_dir = config.config_dir().to_path_buf();
                 let job = handoff::build_job(handoff::Inputs {
                     action,
                     install_dir,
@@ -835,6 +835,8 @@ fn begin_handoff(kind: Kind, to_version: String) -> Option<String> {
                     pid: std::process::id(),
                     config_dir,
                     status_path: paths.status.clone(),
+                    environment: config.env().map(str::to_string),
+                    install_id: config.install_id().map(str::to_string),
                 });
                 handoff::prepare(&job, &paths, &release::host_target())
             })();

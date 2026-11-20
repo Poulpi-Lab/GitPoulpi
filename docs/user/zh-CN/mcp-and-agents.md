@@ -71,6 +71,8 @@ claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
 }
 ```
 
+每个端口只能有一个 MCP HTTP 服务器。多个 GitPoulpi 安装可以并存，且都默认使用 `127.0.0.1:8808`，因此第二个在已被占用的端口上启动的服务器会以 `address already in use` 拒绝启动（它从不自行改用其他端口）并报错退出。每个安装在有自己的 MCP 绑定地址时使用它（`gitpoulpi installation set mcp_bind HOST:PORT`），否则使用 `[mcp] bind`。要改用其他端口，请使用 设置 > 代理与 MCP > *建议空闲端口*（或命令面板命令 *MCP：建议空闲端口*）：它会在同一主机上查找空闲端口，并将其保存为此安装的 MCP 绑定地址。stdio 不受影响。
+
 缺少令牌或令牌错误会得到 `401` 和 `WWW-Authenticate: Bearer`。更换后的令牌立即生效，无需重启服务器。关闭 `http_auth` 只适用于你信任本机每个账户的回环端点；此时服务器会在 stderr 上发出警告。
 
 ### 从另一台机器访问端点

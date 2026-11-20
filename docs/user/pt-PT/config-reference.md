@@ -550,6 +550,15 @@ Que branches a deteção proativa de conflitos pode tomar como base da branch at
 
 A lista que um repositório segue está no seu `repo-state.toml` (abaixo). Precedência: os padrões próprios do repositório, depois a lista com nome que segue, depois `default_list`, depois `**`.
 
+## `[installation]` (uma entrada por GitPoulpi neste computador)
+
+Várias instalações podem partilhar o mesmo `config.toml` (um pacote, um checkout de desenvolvimento, uma compilação com cargo, um arquivo descompactado). Cada uma é identificada pela sua pasta (um id hexadecimal de 16 dígitos) e guarda o seu aspeto e os seus nomes em `[installation.settings.<id>]`, por isso a cor ou os aliases de uma instalação nunca alteram os de outra. Ninguém é a instalação principal até a escolher; a principal fica com os nomes de lançador simples `GitPoulpi` e com as chaves partilhadas `ui.logo_color`, `ui.command_alias` e `ui.command_alias_add`, que as versões mais antigas leem. Escrito pelo próprio GitPoulpi (e por `set_installation_in_file`), não por `config set`.
+
+| Chave | Predefinição | Valores e efeito |
+|---|---|---|
+| `installation.primary` | ausente | O id da instalação principal. Ausente: nenhuma. |
+| `installation.settings.<id>` | nenhuma | Uma tabela por instalação: `path` (a sua pasta, atualizada quando se muda), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informativo), `name` (o nome do lançador, `GitPoulpi (<etiqueta>)`, fixado no primeiro arranque), `name_with_version` (desativado: acrescenta `<major>.<minor>` ao nome), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (vazio: a entrada do menu de pastas fica na raiz), `env` (vazio: o seu próprio id; as instalações que partilham um nome partilham daemons, sessões e histórico de anulações), `mcp_bind` (vazio: `mcp.bind`). Um valor vazio recorre a `ui.*` para a principal e, senão, à predefinição do tipo (um checkout de desenvolvimento usa `sun`). |
+
 ## `[keybindings]`
 
 Reatribui os atalhos da TUI; as Definições > Teclado e rato editam-no.

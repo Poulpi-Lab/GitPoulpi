@@ -1297,7 +1297,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.20",
  "tokio",
  "toml",
 ]
@@ -1384,7 +1384,7 @@ dependencies = [
  "serde_json",
  "sha2 0.10.9",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.20",
  "toml",
  "windows-sys 0.61.2",
 ]
@@ -1401,7 +1401,7 @@ dependencies = [
  "serde_json",
  "sha2 0.10.9",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.20",
  "toml",
 ]
 
@@ -1425,7 +1425,7 @@ dependencies = [
  "serde_json",
  "sha2 0.10.9",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.20",
  "tokio",
  "tracing",
 ]
@@ -1463,7 +1463,7 @@ dependencies = [
  "sha2 0.10.9",
  "ssh-key",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.20",
  "tokio",
  "toml",
  "url",
@@ -1490,7 +1490,7 @@ dependencies = [
  "serde_json",
  "subtle",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.20",
  "tokio",
  "windows-sys 0.61.2",
 ]
@@ -1557,7 +1557,7 @@ dependencies = [
 name = "gitpoulpi-secrets"
 version = "1.0.0"
 dependencies = [
- "thiserror 1.0.69",
+ "thiserror 2.0.20",
 ]
 
 [[package]]
@@ -1569,7 +1569,7 @@ dependencies = [
  "gitpoulpi-core",
  "serde",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.20",
  "toml",
 ]
 
@@ -1591,7 +1591,7 @@ dependencies = [
  "png",
  "serde_json",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.20",
  "tokio",
 ]
 
@@ -1653,7 +1653,7 @@ dependencies = [
  "sha2 0.10.9",
  "tar",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.20",
  "tokio",
  "windows-sys 0.61.2",
  "xtask",
@@ -5364,7 +5364,7 @@ dependencies = [
  "sha2 0.10.9",
  "tar",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.20",
  "tokio",
  "toml",
  "ureq",

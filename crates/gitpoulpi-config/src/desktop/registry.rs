@@ -28,6 +28,11 @@ pub enum RegOp {
     DeleteTree(String),
     /// Deletes the key only when it has no subkeys and no values.
     DeleteIfEmpty(String),
+    /// Deletes the key only when it has no subkeys (its own values go with
+    /// it). For a shared container: a delete that races with another
+    /// installation adding a member fails instead of taking it along.
+    /// `DeleteTree` is never used on a container.
+    DeleteIfNoSubkeys(String),
 }
 
 pub trait Registry {
@@ -35,6 +40,8 @@ pub trait Registry {
     /// subkeys.
     fn read(&self, keys: &[String]) -> Result<Vec<Option<(Values, bool)>>, String>;
     fn apply(&self, ops: &[RegOp]) -> Result<(), String>;
+    /// The names of `key`'s subkeys (none when it is absent).
+    fn subkeys(&self, key: &str) -> Result<Vec<String>, String>;
 }
 
 /// The shared handle the callers hold.
@@ -97,6 +104,10 @@ fn ops_text(ops: &[RegOp]) -> Result<String, String> {
                 check(k)?;
                 out.push_str(&format!("E\t{k}\n"));
             }
+            RegOp::DeleteIfNoSubkeys(k) => {
+                check(k)?;
+                out.push_str(&format!("N\t{k}\n"));
+            }
         }
     }
     Ok(out)
@@ -109,7 +120,11 @@ if($l -eq ''){continue};\
 $f=$l -split \"`t\",4;\
 if($f[0] -eq 'S'){$k=$root.CreateSubKey($f[1]);$k.SetValue($f[2],$f[3],[Microsoft.Win32.RegistryValueKind]::String);$k.Close()}\
 elseif($f[0] -eq 'T'){$root.DeleteSubKeyTree($f[1],$false)}\
-elseif($f[0] -eq 'E'){$k=$root.OpenSubKey($f[1]);if($k){$e=($k.SubKeyCount -eq 0 -and $k.ValueCount -eq 0);$k.Close();if($e){$root.DeleteSubKey($f[1],$false)}}}}";
+elseif($f[0] -eq 'E'){$k=$root.OpenSubKey($f[1]);if($k){$e=($k.SubKeyCount -eq 0 -and $k.ValueCount -eq 0);$k.Close();if($e){try{$root.DeleteSubKey($f[1],$false)}catch{}}}}\
+elseif($f[0] -eq 'N'){$k=$root.OpenSubKey($f[1]);if($k){$e=($k.SubKeyCount -eq 0);$k.Close();if($e){try{$root.DeleteSubKey($f[1],$false)}catch{}}}}}";
+
+const LIST_SCRIPT: &str = "$k=[Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($env:GP_KEYS);\
+if($k){foreach($n in $k.GetSubKeyNames()){[Console]::Out.Write($n+\"`n\")};$k.Close()}";
 
 const READ_SCRIPT: &str = "$root=[Microsoft.Win32.Registry]::CurrentUser;\
 foreach($key in ($env:GP_KEYS -split \"`n\")){\
@@ -169,6 +184,16 @@ impl Registry for PowerShellRegistry {
         let text = ops_text(ops)?;
         run_powershell(APPLY_SCRIPT, &[("GP_OPS", &text)]).map(|_| ())
     }
+
+    fn subkeys(&self, key: &str) -> Result<Vec<String>, String> {
+        check(key)?;
+        run_powershell(LIST_SCRIPT, &[("GP_KEYS", key)]).map(|o| {
+            o.lines()
+                .map(|l| l.trim_end_matches('\r').to_string())
+                .filter(|l| !l.is_empty())
+                .collect()
+        })
+    }
 }
 
 /// Lower-cased key path -> (value name -> value). Names keep their case.
@@ -225,9 +250,27 @@ fn apply_tree(tree: &mut Tree, ops: &[RegOp]) -> Result<(), String> {
                     tree.remove(&n);
                 }
             }
+            RegOp::DeleteIfNoSubkeys(k) => {
+                let n = norm(k);
+                let prefix = format!("{n}\\");
+                if !tree.keys().any(|o| o.starts_with(&prefix)) {
+                    tree.remove(&n);
+                }
+            }
         }
     }
     Ok(())
+}
+
+fn subkeys_of(tree: &Tree, key: &str) -> Vec<String> {
+    let prefix = format!("{}\\", norm(key));
+    let mut names: Vec<String> = tree
+        .keys()
+        .filter_map(|k| k.strip_prefix(&prefix))
+        .map(|rest| rest.split('\\').next().unwrap_or(rest).to_string())
+        .collect();
+    names.dedup();
+    names
 }
 
 /// A registry in memory, for tests.
@@ -263,6 +306,10 @@ impl Registry for MemoryRegistry {
 
     fn apply(&self, ops: &[RegOp]) -> Result<(), String> {
         apply_tree(&mut self.0.lock().unwrap(), ops)
+    }
+
+    fn subkeys(&self, key: &str) -> Result<Vec<String>, String> {
+        Ok(subkeys_of(&self.0.lock().unwrap(), key))
     }
 }
 
@@ -317,6 +364,10 @@ impl Registry for FileRegistry {
         apply_tree(&mut tree, ops)?;
         self.save(&tree)
     }
+
+    fn subkeys(&self, key: &str) -> Result<Vec<String>, String> {
+        Ok(subkeys_of(&self.load(), key))
+    }
 }
 
 #[cfg(test)]
@@ -369,6 +420,48 @@ mod tests {
         assert_eq!(r.read(&["P".into()]).unwrap()[0], None);
         r.apply(&[RegOp::DeleteTree("Q".into())]).unwrap();
         assert!(r.dump().is_empty());
+    }
+
+    #[test]
+    fn delete_if_empty_never_removes_a_key_with_children() {
+        let r = MemoryRegistry::new();
+        r.apply(&[set("C", "MUIVerb", "m"), set("C\\shell\\i1", "", "x")])
+            .unwrap();
+        // A key with values and a child: both ops refuse.
+        r.apply(&[
+            RegOp::DeleteIfEmpty("C".into()),
+            RegOp::DeleteIfNoSubkeys("C".into()),
+            RegOp::DeleteIfEmpty("C\\shell".into()),
+            RegOp::DeleteIfNoSubkeys("C\\shell".into()),
+        ])
+        .unwrap();
+        assert!(r
+            .read(&["C".into(), "C\\shell".into(), "C\\shell\\i1".into()])
+            .unwrap()
+            .iter()
+            .all(Option::is_some));
+        assert_eq!(r.subkeys("C").unwrap(), ["shell"]);
+        assert_eq!(r.subkeys("C\\shell").unwrap(), ["i1"]);
+        // Without children its own values go with it.
+        r.apply(&[
+            RegOp::DeleteTree("C\\shell".into()),
+            RegOp::DeleteIfNoSubkeys("C".into()),
+        ])
+        .unwrap();
+        assert!(r.dump().is_empty());
+        // Same through the file model.
+        let tmp = tempfile::tempdir().unwrap();
+        let f = FileRegistry(tmp.path().join("reg.txt"));
+        f.apply(&[set("C", "v", "1"), set("C\\s", "", "x")])
+            .unwrap();
+        f.apply(&[RegOp::DeleteIfNoSubkeys("C".into())]).unwrap();
+        assert!(f.read(&["C".into()]).unwrap()[0].is_some());
+        f.apply(&[
+            RegOp::DeleteTree("C\\s".into()),
+            RegOp::DeleteIfNoSubkeys("C".into()),
+        ])
+        .unwrap();
+        assert!(f.read(&["C".into()]).unwrap()[0].is_none());
     }
 
     #[test]

@@ -738,3 +738,86 @@ fn become_primary_in_file_is_one_write_that_moves_the_values() {
     assert_eq!(effective(&config, &b).name, "GitPoulpi");
     assert!(become_primary_in_file(&path, &b).unwrap().is_none());
 }
+
+#[test]
+fn a_seed_write_keeps_every_byte_outside_the_installation_table() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("config.toml");
+    let before = "\n# my notes\n[ui]\nzeta = 1 # last\nlogo_color = \"violet\"\n\n\n[general]\nundo_depth = 7\n  # indented\n\n[installation.settings.old]\nname = \"Old\"\n\n[future]\nknob = 3\n";
+    std::fs::write(&path, before).unwrap();
+    set_installation_in_file(&path, |inst| {
+        inst.settings.insert(
+            "new".into(),
+            InstallationEntry {
+                name: "New".into(),
+                ..InstallationEntry::default()
+            },
+        );
+    })
+    .unwrap();
+    let after = std::fs::read_to_string(&path).unwrap();
+    let (head, tail) = before.split_once("[installation.settings.old]").unwrap();
+    let tail = tail.split_once("[future]").unwrap().1;
+    assert!(after.starts_with(head), "{after}");
+    assert!(after.ends_with(&format!("[future]{tail}")), "{after}");
+    assert!(after.contains("[installation.settings.new]"), "{after}");
+    assert_eq!(
+        Config::load(&path).unwrap().installation.settings["old"].name,
+        "Old"
+    );
+
+    // No existing table: the new one is appended, nothing else moves.
+    let path = dir.path().join("second.toml");
+    let plain = "\n# top\nb = 1\n\n[ui]\nz = 2\n";
+    std::fs::write(&path, plain).unwrap();
+    set_installation_in_file(&path, |inst| {
+        inst.settings
+            .insert("x".into(), InstallationEntry::default());
+    })
+    .unwrap();
+    assert!(std::fs::read_to_string(&path).unwrap().starts_with(plain));
+}
+
+#[test]
+fn a_handover_write_keeps_the_formatting_too() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("config.toml");
+    let before = "# hi\n[ui]\nz = 1\ncommand_alias = \"gp\"\n\n[general]\nundo_depth = 7\n";
+    std::fs::write(&path, before).unwrap();
+    let id = pinned("a");
+    let done = become_primary_in_file(&path, &id).unwrap();
+    assert!(done.is_some());
+    let after = std::fs::read_to_string(&path).unwrap();
+    assert!(after.starts_with("# hi\n[ui]\nz = 1\n"), "{after}");
+    assert!(after.contains("[general]\nundo_depth = 7\n"), "{after}");
+    assert_eq!(
+        Config::load(&path).unwrap().installation.primary.as_deref(),
+        Some("p-a")
+    );
+}
+
+#[test]
+fn a_pinned_id_is_not_seeded_into_the_file_but_a_discovered_one_is() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("config.toml");
+    let entry = InstallationEntry::default();
+    let mut id = pinned("pty");
+    id.kind = Kind::Pinned;
+    assert!(persist_seed(&path, &id, &entry));
+    assert!(!path.exists(), "a pinned id writes nothing");
+
+    let found = pinned("found");
+    assert!(persist_seed(&path, &found, &entry));
+    let config = Config::load(&path).unwrap();
+    assert!(config.installation.settings.contains_key("p-found"));
+}
+
+#[test]
+fn seed_returns_nothing_for_an_unchanged_entry() {
+    let id = pinned("same");
+    let fs = FakeFs::default();
+    let mut config = Config::default();
+    let entry = seed(&config, &id, &env(&fs), &NoAliases, &live).unwrap();
+    with(&mut config, &id, entry);
+    assert!(seed(&config, &id, &env(&fs), &NoAliases, &live).is_none());
+}

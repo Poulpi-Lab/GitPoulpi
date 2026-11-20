@@ -825,16 +825,19 @@ pub fn plan_resign(config: &Config, id: &str) -> Option<PrimaryHandover> {
 
 // -------------------------------------------------------------- the file
 
-fn read_document(path: &Path) -> Result<toml::Value> {
-    let raw = if path.exists() {
+fn read_raw(path: &Path) -> Result<String> {
+    Ok(if path.exists() {
         std::fs::read_to_string(path)?
     } else {
         String::new()
-    };
+    })
+}
+
+fn parse_document(raw: &str) -> Result<toml::Value> {
     let mut document = if raw.trim().is_empty() {
         toml::Value::Table(toml::map::Map::new())
     } else {
-        toml::from_str(&raw)?
+        toml::from_str(raw)?
     };
     AiConfig::migrate_document(&mut document);
     Ok(document)
@@ -855,7 +858,7 @@ fn put_installation(document: &mut toml::Value, installation: &InstallationConfi
 
 /// Validates the edited document as a whole `Config` (like `set_in_file`)
 /// before anything touches the disk.
-fn write_document(path: &Path, document: &toml::Value) -> Result<()> {
+fn validate(document: &toml::Value) -> Result<()> {
     let _: Config = document
         .clone()
         .try_into()
@@ -864,38 +867,86 @@ fn write_document(path: &Path, document: &toml::Value) -> Result<()> {
             value: "<table>".to_string(),
             expected: err.to_string(),
         })?;
-    if let Some(parent) = path.parent() {
-        secure_fs::create_private_dir_all(parent)?;
-    }
-    secure_fs::write_private(path, toml::to_string_pretty(document)?.as_bytes())?;
     Ok(())
 }
 
+fn write_text(path: &Path, raw: &str, text: &str) -> Result<()> {
+    if text == raw {
+        return Ok(());
+    }
+    if let Some(parent) = path.parent() {
+        secure_fs::create_private_dir_all(parent)?;
+    }
+    secure_fs::write_private(path, text.as_bytes())?;
+    Ok(())
+}
+
+/// The edited `[installation]` table (and the `ui.*` look of a handover)
+/// written into `raw` as text, so every byte outside them survives. A file
+/// spelling those tables in a way the scanner does not handle (dotted or
+/// inline) is rewritten whole from `document` instead.
+fn splice(
+    raw: &str,
+    document: &toml::Value,
+    installation: &InstallationConfig,
+    ui: Option<&UiLook>,
+) -> Result<String> {
+    let table = if installation.is_empty() {
+        String::new()
+    } else {
+        let mut root = toml::map::Map::new();
+        root.insert(
+            "installation".to_string(),
+            toml::Value::try_from(installation)?,
+        );
+        toml::to_string(&toml::Value::Table(root))?
+    };
+    let mut text = text_edit::replace_table(raw, "installation", &table);
+    if let Some(ui) = ui {
+        for (key, value) in [
+            ("logo_color", &ui.logo_color),
+            ("command_alias", &ui.command_alias),
+            ("command_alias_add", &ui.command_alias_add),
+        ] {
+            let quoted = toml::Value::String(value.clone()).to_string();
+            text = text.and_then(|t| text_edit::set_key(&t, "ui", key, &quoted));
+        }
+    }
+    match text {
+        Some(t) => Ok(t),
+        None => Ok(toml::to_string_pretty(document)?),
+    }
+}
+
 /// Reads the `[installation]` table of the document at `path`, lets `edit`
-/// change it and writes it back, leaving every other key as the file had it.
-/// Read and write are one call, so two installations updating their own
-/// entries do not overwrite each other's unless they race inside it. An empty
-/// table is removed rather than written empty. Comments are not preserved
-/// (the document goes through `toml::Value`, like `set_in_file`).
+/// change it and writes it back. Read and write are one call, so two
+/// installations updating their own entries do not overwrite each other's
+/// unless they race inside it. An empty table is removed rather than written
+/// empty. Everything outside the `[installation]` tables (comments, key
+/// order, blank lines) keeps its bytes.
 pub fn set_installation_in_file(
     path: &Path,
     edit: impl FnOnce(&mut InstallationConfig),
 ) -> Result<()> {
-    let mut document = read_document(path)?;
+    let raw = read_raw(path)?;
+    let mut document = parse_document(&raw)?;
     let mut installation: InstallationConfig = match document.get("installation") {
         Some(v) => v.clone().try_into()?,
         None => InstallationConfig::default(),
     };
     edit(&mut installation);
     put_installation(&mut document, &installation)?;
-    write_document(path, &document)
+    validate(&document)?;
+    let text = splice(&raw, &document, &installation, None)?;
+    write_text(path, &raw, &text)
 }
 
 fn apply_handover(
     path: &Path,
     plan: impl FnOnce(&Config) -> Option<PrimaryHandover>,
 ) -> Result<Option<PrimaryHandover>> {
-    let mut document = read_document(path)?;
+    let raw = read_raw(path)?;
+    let mut document = parse_document(&raw)?;
     let config = Config::from_toml_str(&toml::to_string(&document)?)?.0;
     let Some(handover) = plan(&config) else {
         return Ok(None);
@@ -910,7 +961,14 @@ fn apply_handover(
             insert_dotted(&mut document, key, toml::Value::String(value.clone()))?;
         }
     }
-    write_document(path, &document)?;
+    validate(&document)?;
+    let text = splice(
+        &raw,
+        &document,
+        &handover.installation,
+        handover.ui.as_ref(),
+    )?;
+    write_text(path, &raw, &text)?;
     Ok(Some(handover))
 }
 
@@ -951,6 +1009,22 @@ impl AliasEvidence for DiskAliases {
     }
 }
 
+/// Writes a freshly seeded `entry` into the file; true when the caller may
+/// use it. A pinned id (`GITPOULPI_INSTALL_ID`) is an explicit override, not a
+/// discovered installation: its entry stays in memory only (still true) until
+/// the user changes a per-installation setting, which writes it.
+fn persist_seed(file: &Path, identity: &Identity, entry: &InstallationEntry) -> bool {
+    if identity.kind == Kind::Pinned {
+        return true;
+    }
+    let id = identity.id.clone();
+    let stored = entry.clone();
+    set_installation_in_file(file, |i| {
+        i.settings.insert(id, stored);
+    })
+    .is_ok()
+}
+
 /// Identifies the running exe, seeds its entry in `config.toml` the first time
 /// (or refreshes its path and channel) and returns the result, worked out once
 /// per process. Frontends (`alias`, `desktop`, `folder-menu`, `uninstall`)
@@ -981,13 +1055,7 @@ pub fn current() -> &'static Current {
                 seed(&config, &identity, &env, &aliases, &live),
                 config_file.as_deref(),
             ) {
-                let id = identity.id.clone();
-                let stored = entry.clone();
-                if set_installation_in_file(file, |i| {
-                    i.settings.insert(id, stored);
-                })
-                .is_ok()
-                {
+                if persist_seed(file, &identity, &entry) {
                     config
                         .installation
                         .settings
@@ -1036,3 +1104,4 @@ pub fn other_live_paths(config: &Config, id: &str) -> Vec<std::path::PathBuf> {
 
 #[cfg(test)]
 mod tests;
+mod text_edit;

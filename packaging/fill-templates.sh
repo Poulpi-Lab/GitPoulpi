@@ -12,6 +12,7 @@
 #   SOURCE_SHA256     sha256 of the tag's source tarball, for aur/gitpoulpi (the folder is skipped without it)
 #   MAINTAINER        the PKGBUILD Maintainer line (default: Poulpi-Lab)
 #   CHOCOLATEY_USER   the nuspec owner (default: Poulpi-Lab)
+#   COMMIT            full sha of the release commit, for the nuspec icon URL (default: git rev-parse HEAD of the checkout)
 set -eu
 
 version="${1:?usage: fill-templates.sh VERSION DIST_DIR OUT_DIR}"
@@ -40,11 +41,18 @@ fill() {
     done
 }
 
+commit="${COMMIT:-}"
+[ -n "$commit" ] || commit=$(git -C "$here" rev-parse HEAD 2>/dev/null) || commit=""
+case "$commit" in
+    *[!0-9a-f]* | "") echo "fill-templates.sh: no commit sha: set COMMIT or run inside a git checkout" >&2; exit 1 ;;
+esac
+[ "${#commit}" -eq 40 ] || { echo "fill-templates.sh: COMMIT must be a full 40 character sha, got $commit" >&2; exit 1; }
+
 win="gitpoulpi-$version-x86_64-pc-windows-msvc"
 setup_sha=$(sha "$win-setup.exe")
 zip_sha=$(sha "$win.zip")
 
-fill "$here/chocolatey/gitpoulpi.nuspec" "$out/chocolatey/gitpoulpi.nuspec" "CHOCOLATEY_USER=$choco_user"
+fill "$here/chocolatey/gitpoulpi.nuspec" "$out/chocolatey/gitpoulpi.nuspec" "CHOCOLATEY_USER=$choco_user" "COMMIT=$commit"
 fill "$here/chocolatey/tools/chocolateyinstall.ps1" "$out/chocolatey/tools/chocolateyinstall.ps1" "SHA256_WINDOWS_SETUP=$setup_sha"
 
 for f in GitPoulpi.GitPoulpi.yaml GitPoulpi.GitPoulpi.locale.en-US.yaml GitPoulpi.GitPoulpi.installer.yaml; do

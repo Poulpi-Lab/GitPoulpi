@@ -189,6 +189,22 @@ förhandsvisas det markerade språket live; `Enter` behåller det och `Esc`
 Sidan **Startare** (`gitpoulpi ui show settings launcher`) skapar en genväg som startar GitPoulpi från
 operativsystemets startare, i den terminal du väljer.
 
+**Den här installationen** (sidans första grupp). Varje GitPoulpi på en dator (en dev-utcheckning, ett paket, en portabel kopia) har sitt eget startarnamn, sin egen färg, sina egna alias och sin egen filhanterarpost, sparade i en egen tabell `[installation.settings.<id>]` i `config.toml`; en ändring här rör aldrig en annan installation. Inget av det journalförs (det är systemintegration; **Ta bort** är vägen tillbaka).
+
+| Rad | Vad den gör |
+|---|---|
+| **Installation** | Skrivskyddad: sorten, mappen och miljön för den här installationen. På en smal sida klipps mappen i mitten med en ellips; hjälpraden under raden har hela texten. |
+| **Startarnamn** | Namnet på den här installationens genvägar och filhanterarpost. Vägras när en annan installation som fortfarande finns har det namnet. Den primära heter alltid `GitPoulpi`. |
+| **Ta med versionen i startarnamnet** | Lägger till `<major>.<minor>` i namnet (`GitPoulpi 1.2`); av som standard, eftersom genvägarna byter namn vid varje uppdatering. |
+| **Bläckfiskens färg** | Färgen på den här installationens bläckfisk och genvägar (samma val som i Om-fönstret). |
+| **Gör till primär** | Den primära äger det vanliga namnet `GitPoulpi`, de äldre genvägarna och de `ui.*`-nycklar som äldre byggen läser; ingen är primär som standard. Frågar först när en annan installation är det. Den tidigare primära behåller sina startare under sitt eget namn (Windows och Linux). |
+| **Miljö** | Installationer i samma miljö delar fönster, daemoner och ångrahistorik; standard är installationens egen. En ändring kräver att den här installationens öppna fönster startas om. |
+| **Undermeny i filhanterarmenyn** | Samlar filhanterarposten under en undermeny med det namnet; installationer som anger samma namn delar en. Inte tillgängligt i macOS; Nemo och Thunar visar alltid posten i roten. |
+| **Annan: \<namn\>** | De andra installationerna på den här datorn. En vars mapp är borta har en knapp **Glöm** (frågar först) som tar bort dess post och de startare, alias och filhanterarposter den lämnade efter sig. |
+| **Äldre startare** | Så länge ingen är primär listas startare som ett äldre bygge har skapat under det vanliga namnet, med **Gör till primär** och **Ta bort äldre startare** (frågar först). En engångsnotis i statusraden pekar hit. |
+
+Paletten har **Startare: Gör till primär installation**, **Startare: Ta bort äldre startare** och **Startare: Glöm borta installationer**, och varje rad är en `Settings:`-post. Kommandoaliasraderna nedan hör till den här installationen (`gpd` / `gpda` föreslås för en dev-utcheckning); ett alias som en annan installation har skapat visas som **Används av \<namn\>** och kan inte skapas här.
+
 | Rad | Vad den gör |
 |---|---|
 | **Terminal för genvägar** | `ui.launch_terminal`: **Automatiskt**, **Systemets standard** eller en av terminalerna som hittats på den här datorn (samma identifiering som för **Öppna i**). Automatiskt: Windows Terminal på Windows (annars WezTerm, Alacritty, den vanliga konsolen), `xdg-terminal-exec` på Linux (Omarchy; annars den första terminal som hittas), Terminal på macOS, om inte iTerm2, Ghostty, WezTerm eller kitty är installerad. |

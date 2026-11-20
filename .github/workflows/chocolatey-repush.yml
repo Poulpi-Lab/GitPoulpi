@@ -1,0 +1,69 @@
+name: Chocolatey repush
+
+# Re-pushes the Chocolatey package of an already published release, with the same version, when the community
+# moderators ask for a metadata fix and a resubmission of that version. The package is built from the release's own
+# tag and its published .sha256 files, so the installer URL and checksum stay exactly as released. The one rewrite:
+# an iconUrl on raw.githubusercontent.com (not allowed by Chocolatey) becomes the same file on jsDelivr, pinned to
+# the tag's commit. Later changes on main are never part of the repushed package.
+#
+#   gh workflow run chocolatey-repush.yml -f tag=releases/v1.0.0 -f dry_run=true   # pack only, nupkg as artifact
+#   gh workflow run chocolatey-repush.yml -f tag=releases/v1.0.0                   # pack and push
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Published release tag, e.g. releases/v1.0.0'
+        required: true
+      dry_run:
+        description: 'Pack only, push nothing'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  chocolatey:
+    environment: ${{ inputs.dry_run && 'dryrun' || 'release' }}
+    runs-on: windows-latest
+    env:
+      TAG: ${{ inputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag }}
+      - name: Download the release checksums
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          case "$TAG" in releases/v*) ;; *) echo "::error::not a release tag: $TAG"; exit 1 ;; esac
+          mkdir dist
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern '*.sha256' --dir dist
+          ls dist
+      - name: Fill the templates and fix the icon URL
+        shell: bash
+        run: |
+          version="${TAG#releases/v}"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          sh packaging/fill-templates.sh "$version" dist filled
+          nuspec=filled/chocolatey/gitpoulpi.nuspec
+          commit=$(git rev-parse HEAD)
+          sed -i "s|<iconUrl>https://raw.githubusercontent.com/[^<]*/\(assets/[^<]*\)</iconUrl>|<iconUrl>https://cdn.jsdelivr.net/gh/${GITHUB_REPOSITORY}@${commit}/\1</iconUrl>|" "$nuspec"
+          grep -q 'raw.githubusercontent.com' "$nuspec" && { echo "::error::iconUrl still on raw.githubusercontent.com"; exit 1; }
+          cat "$nuspec"
+      - name: Pack
+        shell: bash
+        working-directory: filled/chocolatey
+        run: choco pack
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: chocolatey-nupkg
+          path: filled/chocolatey/*.nupkg
+      - name: Push
+        if: ${{ !inputs.dry_run }}
+        shell: bash
+        working-directory: filled/chocolatey
+        env:
+          CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
+        run: choco push "gitpoulpi.$VERSION.nupkg" --source https://push.chocolatey.org/ --api-key "$CHOCO_API_KEY"

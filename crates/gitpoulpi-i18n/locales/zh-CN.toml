@@ -6011,7 +6011,7 @@ installation_help = "当前运行的是哪个 GitPoulpi：安装方式、所在�
 # context: value of the Installation row; {kind} is the install kind (dev, portable...), {path} its folder, {env} the environment name
 installation_info = "{kind}，{path}，环境 {env}"
 # context: end of the help line of the Installation row, which shows the whole folder when the value is cut; {path} is the install folder
-installation_folder = "Folder: {path}"
+installation_folder = "文件夹：{path}"
 name = "启动器名称"
 name_help = "此安装的快捷方式及其在文件管理器菜单中的条目所用的名称。只会重命名当前这个安装。"
 name_primary = "主安装始终名为 GitPoulpi"
@@ -9179,17 +9179,17 @@ token_failed = "无法保存访问令牌：{reason}"
 # context: status line when there is no access token to show or copy
 token_missing = "尚无访问令牌。"
 # context: button in Settings > Agents & MCP under the MCP server port; looks for a port nobody listens on and saves it. Width budget: 24 cells
-suggest_port = "Suggest a free port"
+suggest_port = "建议空闲端口"
 # context: help under the suggest-a-free-port button
-suggest_port_help = "Several GitPoulpi installations default to the same MCP port, and only one MCP HTTP server can use a port: a second one refuses to start. This looks for a free port on the same host address and saves it as this installation's MCP bind."
+suggest_port_help = "多个 GitPoulpi 安装默认使用相同的 MCP 端口，而一个端口只能被一个 MCP HTTP 服务器使用：第二个会拒绝启动。此操作会在同一主机地址上查找空闲端口，并将其保存为此安装的 MCP 绑定地址。"
 # context: status line while the free port is being looked for
-suggest_port_working = "Looking for a free port..."
+suggest_port_working = "正在查找空闲端口..."
 # context: status line after a free port was saved; {bind} is a host address and port such as 127.0.0.1:8809
-suggested = "MCP bind set to {bind}. It applies the next time the server starts."
+suggested = "MCP 绑定地址已设为 {bind}。下次启动服务器时生效。"
 # context: status line when no free port was found
-suggest_port_failed = "Could not find a free port on that address."
+suggest_port_failed = "在该地址上找不到空闲端口。"
 # context: command palette entry: opens Settings > Agents & MCP and suggests a free MCP port
-palette_suggest_port = "MCP: Suggest a free port"
+palette_suggest_port = "MCP：建议空闲端口"
 # context: label of a choice in Settings > Agents & MCP: how the MCP HTTP endpoint is encrypted (TLS)
 tls = "TLS"
 # context: help under the TLS choice

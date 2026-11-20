@@ -398,6 +398,7 @@ pub(super) fn install(place: Place, dirs: &Dirs, req: &Request) -> Result<PathBu
 pub(super) fn remove(place: Place, dirs: &Dirs, ctx: &InstallCtx) -> Result<bool, String> {
     let path = entry_path(place, dirs, ctx)?;
     let Ok(text) = std::fs::read_to_string(&path) else {
+        release_icons(dirs, ctx);
         return Ok(false);
     };
     if !is_mine(&text, ctx) {
@@ -413,6 +414,18 @@ pub(super) fn remove(place: Place, dirs: &Dirs, ctx: &InstallCtx) -> Result<bool
         remove_icons(dirs, ctx, None);
     }
     Ok(true)
+}
+
+/// [`super::release_icons`]: the icons go unless one of `ctx`'s entries is left.
+pub(super) fn release_icons(dirs: &Dirs, ctx: &InstallCtx) {
+    let name = file_name(ctx);
+    let kept = [Some(&dirs.applications), dirs.desktop.as_ref()]
+        .into_iter()
+        .flatten()
+        .any(|d| d.join(&name).exists());
+    if !kept {
+        remove_icons(dirs, ctx, None);
+    }
 }
 
 /// Primary handover: renames the old primary's `gitpoulpi.desktop` (applications
@@ -710,6 +723,25 @@ mod tests {
         assert!(icon_path(&d, &icon_name(&r)).exists());
         remove(Place::Desktop, &d, InstallCtx::legacy_ref()).unwrap();
         assert!(!icon_path(&d, &icon_name(&r)).exists());
+    }
+
+    #[test]
+    fn releasing_drops_the_icon_left_with_no_entry_but_never_one_an_entry_names() {
+        let tmp = tempfile::tempdir().unwrap();
+        let d = dirs(tmp.path());
+        let icons = IconSet {
+            pngs: vec![(256, vec![5])],
+        };
+        let exe = PathBuf::from("/x/gp");
+        let r = req(&exe, "kitty", &icons);
+        install(Place::Launcher, &d, &r).unwrap();
+        let icon = icon_path(&d, &icon_name(&r));
+        release_icons(&d, InstallCtx::legacy_ref());
+        assert!(icon.exists(), "an entry still names it");
+        std::fs::remove_file(d.applications.join(FILE)).unwrap();
+        // Removing where no entry is left carries the cleanup.
+        assert!(!remove(Place::Launcher, &d, InstallCtx::legacy_ref()).unwrap());
+        assert!(!icon.exists());
     }
 
     #[test]

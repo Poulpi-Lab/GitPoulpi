@@ -521,6 +521,22 @@ pub(super) fn cleanup_icons(dirs: &Dirs, keep: &Path, ctx: &InstallCtx) {
     }
 }
 
+/// Deletes every icon `ctx` wrote when it keeps no shortcut of its own in the
+/// Start menu or on the Desktop and nothing else points at it: a pin, or the
+/// legacy-named `GitPoulpi.lnk` (the primary's name, which the holders of a
+/// primary `ctx` include). The icons the window or a handed-over shortcut left
+/// behind otherwise stay for good. Another installation's icons are never
+/// touched.
+pub(super) fn release_icons(dirs: &Dirs, ctx: &InstallCtx) {
+    let kept = [dirs.start_menu.as_ref(), dirs.desktop.as_ref()]
+        .into_iter()
+        .flatten()
+        .any(|d| d.join(file_name(ctx)).exists());
+    if !kept {
+        cleanup_icons(dirs, Path::new(""), ctx);
+    }
+}
+
 /// Writes `icons` as `ctx`'s current `.ico` (when missing or different) and
 /// says where; the running GitPoulpi puts it on its terminal window.
 pub(super) fn ensure_ico(dirs: &Dirs, icons: &IconSet, ctx: &InstallCtx) -> Option<PathBuf> {
@@ -1061,6 +1077,9 @@ pub(super) fn remove_with(
 ) -> Result<bool, String> {
     let path = lnk_path(place, dirs, ctx)?;
     let Ok(bytes) = std::fs::read(&path) else {
+        // No shortcut here; with none anywhere, icons left by the window or an
+        // earlier shortcut go too (unless something still points at them).
+        release_icons(dirs, ctx);
         return Ok(false);
     };
     if !is_mine(&owner_at_own_path(&bytes, ctx)) {
@@ -1354,6 +1373,57 @@ mod tests {
         .unwrap();
         assert!(remove(Place::StartMenu, &dirs, InstallCtx::legacy_ref()).unwrap());
         assert_eq!(ico_files(&dirs), ["notes.ico"]);
+    }
+
+    #[test]
+    fn releasing_deletes_the_primary_named_icons_nothing_names_and_keeps_the_rest() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dirs = pinned_dirs(tmp.path());
+        dirs.start_menu = Some(tmp.path().join("Programs"));
+        std::fs::create_dir_all(dirs.start_menu.as_ref().unwrap()).unwrap();
+        let exe = PathBuf::from(r"C:\gp\gitpoulpi.exe");
+        let primary = InstallCtx::legacy_ref();
+        let other = ctx_of(ID_A, "GitPoulpi (a)", Some(ID_B));
+        // The window's icons: the primary's and another installation's.
+        let (new, theirs) = (icon_set(1), icon_set(2));
+        write_icon(&dirs, &req(&exe, "console", &new)).unwrap();
+        let rt = req_with(&exe, &theirs, &other);
+        write_icon(&dirs, &rt).unwrap();
+        let mine = ico_name_for(&new, primary);
+        let others = ico_name_for(&theirs, &other);
+        assert_eq!(ico_files(&dirs).len(), 2);
+
+        // The legacy GitPoulpi.lnk of somebody still names it: it stays.
+        let legacy = dirs.start_menu.as_ref().unwrap().join(FILE);
+        std::fs::write(&legacy, utf16(&ico_path(&dirs, &new).to_string_lossy())).unwrap();
+        release_icons(&dirs, primary);
+        assert!(ico_files(&dirs).contains(&mine));
+        std::fs::remove_file(&legacy).unwrap();
+
+        // A pin that names it keeps it too.
+        let pin = tmp.path().join("TaskBar").join("GitPoulpi.lnk");
+        std::fs::create_dir_all(pin.parent().unwrap()).unwrap();
+        std::fs::write(&pin, utf16(&ico_path(&dirs, &new).to_string_lossy())).unwrap();
+        release_icons(&dirs, primary);
+        assert!(ico_files(&dirs).contains(&mine));
+        std::fs::remove_file(&pin).unwrap();
+
+        // Nothing names it: gone, and only that one.
+        release_icons(&dirs, primary);
+        assert_eq!(ico_files(&dirs), [others]);
+    }
+
+    #[test]
+    fn removing_with_no_shortcut_left_still_drops_the_icons_of_ours() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dirs = pinned_dirs(tmp.path());
+        dirs.start_menu = Some(tmp.path().join("Programs"));
+        std::fs::create_dir_all(dirs.start_menu.as_ref().unwrap()).unwrap();
+        let exe = PathBuf::from(r"C:\gp\gitpoulpi.exe");
+        write_icon(&dirs, &req(&exe, "console", &icon_set(1))).unwrap();
+        assert_eq!(ico_files(&dirs).len(), 1);
+        assert!(!remove(Place::StartMenu, &dirs, InstallCtx::legacy_ref()).unwrap());
+        assert!(ico_files(&dirs).is_empty(), "{:?}", ico_files(&dirs));
     }
 
     #[test]

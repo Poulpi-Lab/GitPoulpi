@@ -426,6 +426,51 @@ fn resigning_moves_the_launcher_to_its_own_name_and_leaves_one() {
 }
 
 #[test]
+fn resigning_leaves_no_icon_under_the_primary_names() {
+    let tmp = tempfile::tempdir().unwrap();
+    let mut st = state(tmp.path());
+    std::fs::write(
+        tmp.path().join("config.toml"),
+        format!("[installation]\nprimary = \"{ME}\"\n"),
+    )
+    .unwrap();
+    st.config = Config::load(&tmp.path().join("config.toml")).unwrap();
+    st.set_this(fake_current(true));
+    let root = tmp.path().join("machine");
+    let r = root.clone();
+    st.set_launcher_env(move || temp_machine(&r));
+    // An icon left under the primary's name with no launcher carrying it.
+    let icons = root.join("data/icons/hicolor/256x256/apps");
+    std::fs::create_dir_all(&icons).unwrap();
+    std::fs::write(icons.join("gitpoulpi-0a1b2c3d.png"), b"x").unwrap();
+    assert!(st.write_global("installation.primary", "false"));
+    settle_install(&mut st);
+    let left: Vec<String> = std::fs::read_dir(&icons)
+        .unwrap()
+        .flatten()
+        .map(|e| e.file_name().to_string_lossy().into_owned())
+        .filter(|n| !n.starts_with("gitpoulpi-i"))
+        .collect();
+    assert!(left.is_empty(), "{left:?}");
+}
+
+#[test]
+fn the_loop_keeps_drawing_while_an_installation_job_runs() {
+    // The poll that applies a finished job runs in a frame: while a job is in
+    // flight the page counts as animating, so no frame waits for a key press.
+    let tmp = tempfile::tempdir().unwrap();
+    let mut st = install_state(tmp.path());
+    let root = tmp.path().join("machine");
+    st.set_launcher_env(move || temp_machine(&root));
+    assert!(!st.launcher_jobs_running());
+    st.install_read();
+    assert!(st.launcher_jobs_running());
+    assert!(st.animating());
+    settle_install(&mut st);
+    assert!(!st.launcher_jobs_running());
+}
+
+#[test]
 fn the_rows_reread_the_file_when_a_job_ends_even_one_that_only_reads() {
     let tmp = tempfile::tempdir().unwrap();
     let mut st = install_state(tmp.path());

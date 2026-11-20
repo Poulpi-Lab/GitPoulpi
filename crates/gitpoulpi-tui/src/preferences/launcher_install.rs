@@ -853,6 +853,12 @@ impl JobMachine {
         // Launchers left under the plain name (no owner tag) are this
         // installation's now: the sync rewrites them.
         let _ = launcher::sync_shortcuts(&env, &self.setting, &logo);
+        // The icons of the names left behind (the window's, or a shortcut's
+        // that moved) go unless a pin, a legacy shortcut or another place
+        // still names them. After the sync, which re-points the pins first.
+        if old_ctx.is_primary() != ctx.is_primary() {
+            desktop::release_icons(&env.dirs, env.os, &old_ctx);
+        }
         if becoming {
             Done::Primary(ctx.name)
         } else {

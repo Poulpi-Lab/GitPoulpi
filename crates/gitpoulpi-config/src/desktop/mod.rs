@@ -431,6 +431,19 @@ pub fn ico_path_for(dirs: &Dirs, icons: &IconSet, ctx: &InstallCtx) -> PathBuf {
     windows::ico_path_for(dirs, icons, ctx)
 }
 
+/// Deletes the icons `ctx` wrote once it keeps no shortcut of its own and
+/// nothing else (a pin, a legacy `GitPoulpi.lnk`, another place's entry) still
+/// names them: what a primary handover (the one that resigns, or the one that
+/// takes over from its own names) and an uninstall leave behind when no
+/// shortcut was there to carry the cleanup. Another installation's icons stay.
+pub fn release_icons(dirs: &Dirs, os: Os, ctx: &InstallCtx) {
+    match os {
+        Os::Windows => windows::release_icons(dirs, ctx),
+        Os::Linux => linux::release_icons(dirs, ctx),
+        Os::Macos => {}
+    }
+}
+
 /// [`ensure_ico`] for `ctx`.
 pub fn ensure_ico_for(dirs: &Dirs, icons: &IconSet, ctx: &InstallCtx) -> Option<PathBuf> {
     windows::ensure_ico(dirs, icons, ctx)

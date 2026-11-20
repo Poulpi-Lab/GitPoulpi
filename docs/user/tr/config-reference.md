@@ -542,6 +542,15 @@ Proaktif çakışma algılamanın geçerli dalın temel dalı olarak alabileceğ
 
 Bir deponun hangi listeyi izlediği `repo-state.toml` dosyasındadır (aşağıda). Öncelik sırası: deponun kendi desenleri, sonra izlediği adlandırılmış liste, sonra `default_list`, sonra `**`.
 
+## `[installation]` (bu makinedeki her GitPoulpi için bir girdi)
+
+Birkaç kurulum tek bir `config.toml` dosyasını paylaşabilir (bir paket, bir geliştirme çalışma kopyası, bir cargo derlemesi, açılmış bir arşiv). Her biri klasörüyle (16 haneli onaltılık bir kimlik) tanımlanır ve görünümünü ile adlarını `[installation.settings.<id>]` içinde tutar; böylece bir kurulumun rengi veya takma adları diğerininkini asla değiştirmez. Siz birini seçene kadar hiç kimse birincil kurulum değildir; birincil kurulum düz `GitPoulpi` başlatıcı adlarının ve eski sürümlerin okuduğu ortak `ui.logo_color`, `ui.command_alias` ve `ui.command_alias_add` anahtarlarının sahibidir. Bunu `config set` değil, GitPoulpi'nin kendisi (ve `set_installation_in_file`) yazar.
+
+| Anahtar | Varsayılan | Değerler ve etki |
+|---|---|---|
+| `installation.primary` | yok | Birincil kurulumun kimliği. Yoksa: hiçbiri. |
+| `installation.settings.<id>` | yok | Kurulum başına bir tablo: `path` (klasörü, taşındığında yenilenir), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (bilgilendirici), `name` (başlatıcı adı, `GitPoulpi (<label>)`, ilk çalıştırmada dondurulur), `name_with_version` (kapalı: ada `<major>.<minor>` ekle), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (boş: klasör menüsü girdisi kökte durur), `env` (boş: kendi kimliği; aynı adı paylaşan kurulumlar daemon'ları, oturumları ve geri alma geçmişini paylaşır), `mcp_bind` (boş: `mcp.bind`). Boş bir değer, birincil kurulum için `ui.*` değerine, aksi halde türün varsayılanına döner (bir geliştirme çalışma kopyası `sun` giyer). |
+
 ## `[keybindings]`
 
 TUI'nin kısayollarını yeniden atar; Ayarlar > Klavye ve fare bunu düzenler.

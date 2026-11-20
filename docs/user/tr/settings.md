@@ -183,6 +183,22 @@ vurgulanan dil canlı önizlenir; `Enter` onu korur, `Esc` öncekini geri getiri
 **Başlatıcı** sayfası (`gitpoulpi ui show settings launcher`), GitPoulpi'yi işletim sisteminin
 başlatıcısından, seçtiğiniz terminalde başlatan bir kısayol oluşturur.
 
+**Bu kurulum** (sayfanın ilk grubu). Bir makinedeki her GitPoulpi'nin (bir geliştirme çalışma kopyası, bir paket, taşınabilir bir kopya) `config.toml` içinde kendi `[installation.settings.<id>]` tablosunda tutulan kendi başlatıcı adı, rengi, takma adları ve klasör menüsü girdisi vardır; burada birini değiştirmek diğerine asla dokunmaz. Hiçbiri günlüğe işlenmez (sistem entegrasyonudur; geri dönüş yolu **Kaldır**'dır).
+
+| Satır | Ne yapar |
+|---|---|
+| **Kurulum** | Salt okunur: bu kurulumun türü, klasörü ve ortamı. Dar bir sayfada klasör ortadan üç noktayla kısaltılır; satırın altındaki yardım satırında tam metin bulunur. |
+| **Başlatıcı adı** | Bu kurulumun kısayollarının ve klasör menüsü girdisinin adı. Hâlâ var olan başka bir kurulum bu adı taşıyorsa reddedilir. Birincil kurulumun adı her zaman `GitPoulpi`'dir. |
+| **Başlatıcı adına sürümü ekle** | Ada `<major>.<minor>` ekler (`GitPoulpi 1.2`); kısayollar her güncellemede yeniden adlandırıldığı için varsayılan olarak kapalıdır. |
+| **Ahtapot rengi** | Bu kurulumun ahtapotunun ve kısayollarının rengi (Hakkında penceresiyle aynı seçenekler). |
+| **Birincil kurulum ol** | Birincil kurulum düz `GitPoulpi` adını, eski kısayolları ve eski sürümlerin okuduğu `ui.*` anahtarlarını üstlenir; varsayılan olarak hiçbiri birincil değildir. Başka bir kurulum birincilse önce sorar. Önceki birincil, başlatıcılarını kendi adı altında korur (Windows ve Linux). |
+| **Ortam** | Aynı ortamdaki kurulumlar pencereleri, daemon'ları ve geri alma geçmişini paylaşır; varsayılan, kurulumun kendi ortamıdır. Değiştirmek, bu kurulumun açık pencerelerinin yeniden başlatılmasını gerektirir. |
+| **Klasör menüsü alt menüsü** | Klasör menüsü girdisini bu adı taşıyan bir alt menüde toplar; aynı adı veren kurulumlar tek alt menüyü paylaşır. macOS'ta kullanılamaz; Nemo ve Thunar girdiyi her zaman kök menüde listeler. |
+| **Diğer: \<ad\>** | Bu makinedeki diğer kurulumlar. Klasörü kaybolmuş olanın, girdisini ve geride bıraktığı başlatıcıları, takma adları ve klasör menüsü girdilerini kaldıran bir **Unut** düğmesi vardır (önce sorar). |
+| **Eski başlatıcılar** | Kimse birincil değilken, eski bir sürümün düz adla oluşturduğu başlatıcılar **Birincil kurulum ol** ve **Eski başlatıcıları kaldır** (önce sorar) ile listelenir. Durum satırındaki tek seferlik bir not buraya yönlendirir. |
+
+Paletin **Başlatıcı: Birincil Kurulum Ol**, **Başlatıcı: Eski Başlatıcıları Kaldır** ve **Başlatıcı: Kayıp Kurulumları Unut** girdileri vardır ve her satır bir `Ayarlar:` girdisidir. Aşağıdaki komut takma adı satırları bu kurulumun kendisine aittir (bir geliştirme çalışma kopyası için `gpd` / `gpda` önerilir); başka bir kurulumun oluşturduğu takma ad **\<ad\> tarafından kullanılıyor** olarak görünür ve burada oluşturulamaz.
+
 | Satır | Ne yapar |
 |---|---|
 | **Kısayollar için terminal** | `ui.launch_terminal`: **Otomatik**, **Sistem varsayılanı** veya bu bilgisayarda bulunan terminallerden biri (**Şurada aç** ile aynı algılama). Otomatik: Windows'ta Windows Terminal (yoksa WezTerm, Alacritty, düz konsol), Linux'ta `xdg-terminal-exec` (Omarchy; yoksa bulunan ilk terminal), macOS'ta iTerm2, Ghostty, WezTerm veya kitty kurulu değilse Terminal. |

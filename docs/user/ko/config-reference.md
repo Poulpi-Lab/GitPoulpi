@@ -516,6 +516,15 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 
 저장소가 어느 목록을 따르는지는 그 `repo-state.toml`(아래)에 있습니다. 우선순위: 저장소 자체의 패턴, 그다음 따르는 이름 붙인 목록, 그다음 `default_list`, 그다음 `**`.
 
+## `[installation]` (이 컴퓨터의 GitPoulpi마다 항목 하나)
+
+여러 설치(패키지, 개발 체크아웃, cargo 빌드, 풀어 놓은 아카이브)가 하나의 `config.toml`을 공유할 수 있습니다. 각 설치는 자기 폴더(16자리 16진수 id)로 식별되며, 자기 모양과 이름을 `[installation.settings.<id>]`에 따로 보관하므로 한 설치의 색상이나 별칭이 다른 설치에 영향을 주지 않습니다. 직접 고르기 전에는 주 설치가 없으며, 주 설치가 기본 `GitPoulpi` 런처 이름과, 이전 버전이 읽는 공용 `ui.logo_color`, `ui.command_alias`, `ui.command_alias_add` 키를 소유합니다. GitPoulpi가 직접 기록하며(`set_installation_in_file`), `config set`으로는 쓰지 않습니다.
+
+| 키 | 기본값 | 값과 효과 |
+|---|---|---|
+| `installation.primary` | 없음 | 주 설치의 id. 없으면 주 설치가 없습니다. |
+| `installation.settings.<id>` | 없음 | 설치마다 테이블 하나: `path`(설치 폴더, 이동하면 갱신됨), `kind`(`dev`, `install`, `cargo`, `portable`, `pinned`), `channel`(참고용), `name`(런처 이름, `GitPoulpi (<label>)`, 첫 실행 때 고정됨), `name_with_version`(꺼짐: 이름에 `<major>.<minor>`를 붙임), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu`(비어 있으면 폴더 메뉴 항목이 최상위에 놓임), `env`(비어 있으면 자기 id. 이름이 같은 설치끼리 데몬, 세션, 실행 취소 기록을 공유함), `mcp_bind`(비어 있으면 `mcp.bind`). 빈 값은 주 설치라면 `ui.*`로, 아니면 종류별 기본값으로 대체됩니다(개발 체크아웃은 `sun`). |
+
 ## `[keybindings]`
 
 TUI의 단축키를 다시 할당합니다. 설정 > 키보드 및 마우스에서 편집합니다.

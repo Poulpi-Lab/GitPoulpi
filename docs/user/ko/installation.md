@@ -194,9 +194,24 @@ gitpoulpi
 `--version`은 버전과 빌드에 사용된 commit을 출력합니다. 그런 다음
 [시작하기](getting-started.md)를 따르세요.
 
+## 여러 설치를 나란히 두기
+
+패키지, 개발 체크아웃, cargo 빌드, 풀어 놓은 아카이브를 한꺼번에 설치해 둘 수 있습니다. 각각이 별개의 설치이며, 자기 런처 이름(`GitPoulpi (Chocolatey)`, `GitPoulpi (dev)` 등), 문어 색상, 명령 별칭, '열기' 메뉴 항목, 데몬을 가지므로 두 버전이 동시에 실행되어도 서로의 창을 가로채지 않습니다. 설정, 저장소, 토큰은 공유합니다. 설정 > 런처에서 **주 설치로 지정**을 고르기 전에는 누구도 기본 런처 이름 `GitPoulpi`를 소유하지 않습니다. [설정](settings.md#런처)에는 다른 설치 목록이 있고, 없어진 설치에는 **잊기** 버튼이 있습니다.
+
 ## 제거
 
-`gitpoulpi uninstall`(두 설치 프로그램이 실행하는 것)은 GitPoulpi가 만든 명령 별칭, PATH 항목, 바로 가기, 파일 관리자 메뉴 항목(Windows에서는 App Paths 키 포함)을 제거한 뒤 릴리스 설치라면 프로그램 파일도 제거합니다. `.gitpoulpi-dist` 표시가 없는 빌드(cargo 빌드)에서는 거부하며 `--keep-files`는 프로그램 파일을 남겨 둡니다. MCP 에이전트는 사용할 수 없습니다. 설치 프로그램 없이 설치했다면 실행 파일을 삭제하세요. GitPoulpi는 다음 파일도 보관합니다:
+`gitpoulpi uninstall`은 **이 설치만의** 명령 별칭(Windows에서는 App Paths 키 포함), PATH 항목, 바로 가기, 파일 관리자 메뉴 항목을 제거합니다. 다른 설치의 것은 남으며, 다른 설치가 아직 별칭을 두고 있는 동안에는 `PATH`에 그 설치의 폴더와 공용 별칭 폴더도 남습니다. 작업 표시줄과 Dock에 고정한 항목은 그대로 두고(Windows에는 바깥에서 고정을 해제할 방법이 없습니다), 설정에는 이 설치의 항목이 남으므로 같은 폴더에 다시 설치하면 모양이 되돌아옵니다. 그다음 릴리스 설치라면 프로그램 파일을 삭제하며, 이 부분은 `.gitpoulpi-dist` 표시가 없는 빌드(cargo 빌드)에서는 거부합니다. `--keep-files`를 주면 프로그램 파일을 남겨 두고 어떤 빌드에서도(개발 체크아웃 포함) 동작합니다. MCP 에이전트는 사용할 수 없습니다.
+
+| 설치 방법 | 런처와 별칭을 제거하는 것 |
+|---|---|
+| Windows 설치 프로그램(사용자 또는 모든 사용자), winget | 제거 프로그램이 `gitpoulpi uninstall --keep-files`를 실행한 뒤 파일을 삭제합니다. |
+| Chocolatey | 자동 제거 스크립트가 설치 프로그램의 제거 프로그램을 실행합니다. |
+| Scoop | `scoop uninstall gitpoulpi`가 먼저 `gitpoulpi uninstall --keep-files`를 실행합니다. |
+| MSI | 제거 시 설치한 사용자 권한으로 실행합니다. 다른 계정이 제거하면 그 사용자의 런처는 남고, 다른 설치의 설정에 고아로 표시됩니다(**잊기**). |
+| apt, AUR, Homebrew, cargo, 개발 체크아웃 | 대신 실행되는 훅이 없습니다. 패키지를 제거하기 전에 `gitpoulpi uninstall --keep-files`를 실행하세요. |
+| 아카이브, `install.sh --uninstall` | `gitpoulpi uninstall` 또는 `install.sh --uninstall`을 실행한 뒤 폴더를 삭제하세요. |
+
+GitPoulpi는 다음 파일도 보관합니다:
 
 | 항목 | 위치 |
 |---|---|

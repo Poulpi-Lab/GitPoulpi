@@ -1241,9 +1241,9 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 런처: PATH에서 제거 |  |
 | 런처: 'GitPoulpi에서 열기' 메뉴 설치 |  |
 | 런처: 'GitPoulpi에서 열기' 메뉴 제거 |  |
-| Launcher: Become the Primary Installation |  |
-| Launcher: Remove Legacy Launchers |  |
-| Launcher: Forget Gone Installations |  |
+| 런처: 주 설치로 지정 |  |
+| 런처: 기존 런처 제거 |  |
+| 런처: 없어진 설치 잊기 |  |
 | 앱: 그래프 색상 테마 변경... | `Ctrl+N T` |
 | 앱: 그래프 행 색조 전환 | `Ctrl+N Y` |
 <!-- palette:end -->

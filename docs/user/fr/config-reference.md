@@ -545,6 +545,15 @@ Les branches que la détection proactive des conflits peut prendre pour base de 
 
 La liste qu'un dépôt suit se trouve dans son `repo-state.toml` (ci-dessous). Priorité : les motifs propres au dépôt, puis la liste nommée qu'il suit, puis `default_list`, puis `**`.
 
+## `[installation]` (une entrée par GitPoulpi sur cette machine)
+
+Plusieurs installations peuvent partager un même `config.toml` (un paquet, un dépôt de développement, un build cargo, une archive décompressée). Chacune est identifiée par son dossier (un identifiant hexadécimal de 16 chiffres) et garde son apparence et ses noms dans `[installation.settings.<id>]`, si bien que la couleur ou les alias d'une installation ne changent jamais ceux d'une autre. Personne n'est l'installation principale tant que vous n'en avez pas choisi une ; l'installation principale possède les noms de lanceur simples `GitPoulpi` et les clés partagées `ui.logo_color`, `ui.command_alias` et `ui.command_alias_add`, que lisent les builds plus anciens. Écrit par GitPoulpi lui-même (et `set_installation_in_file`), pas par `config set`.
+
+| Clé | Défaut | Valeurs et effet |
+|---|---|---|
+| `installation.primary` | absente | L'identifiant de l'installation principale. Absente : aucune. |
+| `installation.settings.<id>` | aucune | Une table par installation : `path` (son dossier, rafraîchi quand il est déplacé), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informatif), `name` (le nom du lanceur, `GitPoulpi (<label>)`, figé au premier lancement), `name_with_version` (désactivé : ajoute `<majeure>.<mineure>` au nom), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (vide : l'entrée du menu de dossier est à la racine), `env` (vide : son propre identifiant ; les installations qui partagent un nom partagent démons, sessions et historique d'annulation), `mcp_bind` (vide : `mcp.bind`). Une valeur vide se replie sur `ui.*` pour l'installation principale, sinon sur le défaut de son type (un dépôt de développement porte `sun`). |
+
 ## `[keybindings]`
 
 Réaffecte les raccourcis de la TUI ; Paramètres > Clavier et souris la modifie.

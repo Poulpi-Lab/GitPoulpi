@@ -392,7 +392,7 @@ jobs:
           echo "attestation subjects: $count files, $dirs other entries"
           [ "$dirs" -eq 0 ] || { echo "::error::dist holds entries that are not files"; exit 1; }
           [ "$count" -le 1024 ] || { echo "::error::$count subjects, the attestation accepts at most 1024"; exit 1; }
-      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
+      - uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         if: ${{ !inputs.dry_run }}
         with:
           tag_name: ${{ env.TAG }}

@@ -350,6 +350,11 @@ pub struct RepoState {
     /// (`FlowTrustHooks`; the MCP server cannot). Capped at 50.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub trusted_hooks: Vec<TrustedHooks>,
+    /// Keys this build does not know, kept as they are: the file is shared by
+    /// every installation of the repository (the installations design, 1.5),
+    /// and a newer build's key must survive an older build saving it.
+    #[serde(flatten)]
+    pub extra: BTreeMap<String, toml::Value>,
 }
 
 /// One hook command of a trust record.
@@ -657,8 +662,28 @@ impl RepoState {
 
     /// Where the hosting snapshot cache (`hosting-cache.json`) sits: beside
     /// the state file. The TUI writes it; the workspace search reads it.
+    ///
+    /// A cache, so it is per environment (`hosting-cache.<env>.json`): two
+    /// installations' daemons never race on one file or trip on each other's
+    /// format. The flat layout (`GITPOULPI_CONFIG_DIR`) keeps
+    /// `hosting-cache.json`.
     pub fn hosting_cache_path_for(repo_root: &Path, state_dir: &str) -> std::path::PathBuf {
-        gitpoulpi_config::repo_data_file(repo_root, state_dir, "hosting-cache.json")
+        let env =
+            gitpoulpi_config::ConfigPaths::discover().and_then(|p| p.env().map(str::to_owned));
+        Self::hosting_cache_path_in(repo_root, state_dir, env.as_deref())
+    }
+
+    /// [`Self::hosting_cache_path_for`] for an explicit environment.
+    pub fn hosting_cache_path_in(
+        repo_root: &Path,
+        state_dir: &str,
+        env: Option<&str>,
+    ) -> std::path::PathBuf {
+        let name = match env {
+            Some(env) => format!("hosting-cache.{env}.json"),
+            None => "hosting-cache.json".to_string(),
+        };
+        gitpoulpi_config::repo_data_file(repo_root, state_dir, &name)
     }
 }
 
@@ -1214,5 +1239,49 @@ stash_message = \"builtin:stash_message\"
             prefs.ai_override("commit_message", &AiConfig::default()),
             None
         );
+    }
+
+    /// The file is shared by every installation: a key a newer build wrote
+    /// (a scalar, a list and a table, whatever its place) survives an older
+    /// build loading and saving the state.
+    #[test]
+    fn repo_state_keeps_unknown_keys() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("repo-state.toml");
+        std::fs::write(
+            &path,
+            "future_flag = true\nfuture_list = [1, 2]\ndefault_remote = \"up\"\n\
+             [future_table]\nname = \"x\"\n",
+        )
+        .unwrap();
+        let mut state = RepoState::load(&path).unwrap();
+        assert_eq!(state.default_remote.as_deref(), Some("up"));
+        state.hosting_identity = Some("me".into());
+        state.save(&path).unwrap();
+        let back = RepoState::load(&path).unwrap();
+        assert_eq!(back.hosting_identity.as_deref(), Some("me"));
+        assert_eq!(
+            back.extra.get("future_flag"),
+            Some(&toml::Value::Boolean(true))
+        );
+        assert_eq!(back.extra.len(), 3, "{:?}", back.extra);
+        let raw: toml::Value = toml::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        assert_eq!(raw["future_table"]["name"].as_str(), Some("x"));
+        assert_eq!(raw["future_list"].as_array().map(Vec::len), Some(2));
+    }
+
+    #[test]
+    fn hosting_cache_is_per_env() {
+        let repo = tempfile::tempdir().unwrap();
+        let name = |env| {
+            RepoState::hosting_cache_path_in(repo.path(), "in_git_dir", env)
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .into_owned()
+        };
+        assert_eq!(name(None), "hosting-cache.json");
+        assert_eq!(name(Some("a1")), "hosting-cache.a1.json");
+        assert_ne!(name(Some("a1")), name(Some("b2")));
     }
 }

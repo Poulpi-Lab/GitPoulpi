@@ -56,6 +56,17 @@ pub(crate) fn report_truncated(out: &mut serde_json::Value, human: &mut String, 
     }
 }
 
+/// Where the CLI keeps its AI caches (the installations design, 1.5): a
+/// cache, so one folder per environment (`<private>/ai/<env>/`) and two
+/// installations never race on a file or trip on each other's format. The
+/// flat layout keeps `<private>` itself.
+fn ai_cache_dir(private: &std::path::Path, env: Option<&str>) -> std::path::PathBuf {
+    match env {
+        Some(env) => private.join("ai").join(env),
+        None => private.to_path_buf(),
+    }
+}
+
 fn cut_name(part: gitpoulpi_ai::Part) -> &'static str {
     use gitpoulpi_ai::Part;
     match part {
@@ -795,7 +806,7 @@ async fn hosting_reply(
         }
         let paths = gitpoulpi_config::ConfigPaths::discover()
             .ok_or_else(|| "could not determine this OS's data directory".to_string())?;
-        let private = paths.private_dir();
+        let private = ai_cache_dir(&paths.private_dir(), paths.env());
         let ttl = reply_settings.context_ttl_minutes_clamped();
         let mut cache = gitpoulpi_ai::hosting_reply::cache::ContextCache::on_disk(
             &private.join("ai-context"),
@@ -1111,4 +1122,21 @@ pub(crate) fn trust(
         }),
         human,
     ))
+}
+
+#[cfg(test)]
+mod env_cache_tests {
+    use super::ai_cache_dir;
+    use std::path::Path;
+
+    #[test]
+    fn the_ai_cache_is_per_env_and_flat_without_one() {
+        let private = Path::new("/p");
+        assert_eq!(ai_cache_dir(private, None), private);
+        assert_eq!(ai_cache_dir(private, Some("a")), Path::new("/p/ai/a"));
+        assert_ne!(
+            ai_cache_dir(private, Some("a")),
+            ai_cache_dir(private, Some("b"))
+        );
+    }
 }

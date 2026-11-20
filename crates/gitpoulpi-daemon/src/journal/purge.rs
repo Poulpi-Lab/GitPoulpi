@@ -142,8 +142,15 @@ fn choose(journal: &Journal, args: &PurgeArgs) -> Result<Chosen> {
 /// worktree's pin).
 fn pin_owner(journal: &Journal, pin: &str) -> Option<u64> {
     let rest = pin.strip_prefix(UNDO_PIN_PREFIX)?;
-    let rest = rest.strip_prefix(journal.pin_ns.as_str())?;
-    rest.split('/').next()?.parse().ok()
+    if let Some(rest) = rest.strip_prefix(journal.pin_ns.as_str()) {
+        return rest.split('/').next()?.parse().ok();
+    }
+    // A pin adopted from the legacy journal (`store::adopt_legacy`) keeps its
+    // legacy name: the entry that lists it owns it.
+    journal
+        .all_entries()
+        .find(|e| e.pins.iter().any(|p| p.name == pin))
+        .map(|e| e.id)
 }
 
 /// Dry-runs the purge; every undo pin of another entry that holds the old

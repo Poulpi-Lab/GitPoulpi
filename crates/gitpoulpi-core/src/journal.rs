@@ -317,16 +317,42 @@ pub fn pin_name(ns: &str, id: u64, n: usize) -> String {
     format!("{UNDO_PIN_PREFIX}{ns}{id}/{n}")
 }
 
-/// The pin namespace of the journal kept in `git_dir`: empty for a main
-/// worktree, and `wt-<name>-<hash>/` for a linked one (`<common>/worktrees/<name>`),
-/// the name made safe for a ref.
+/// The pin namespace of the journal kept in `git_dir` in the flat layout
+/// (no environment): see [`pin_namespace_in`].
 pub fn pin_namespace(git_dir: &std::path::Path) -> String {
+    pin_namespace_in(git_dir, None)
+}
+
+/// The pin ref prefix of an environment, `e<8hex>/`: the hash keeps any
+/// environment name a safe ref component, and the leading `e` cannot be
+/// mistaken for a legacy main-worktree pin (a digit) or a linked worktree's
+/// (`wt-`).
+pub fn env_pin_prefix(env: &str) -> String {
+    format!("e{}/", env_tag(env))
+}
+
+/// The 8 hex digits that stand for an environment in pin names and in the
+/// application log (`env=<8hex>`).
+pub fn env_tag(env: &str) -> String {
+    let hash = env.bytes().fold(0xcbf2_9ce4_8422_2325_u64, |h, b| {
+        (h ^ u64::from(b)).wrapping_mul(0x100_0000_01b3)
+    });
+    format!("{:08x}", hash as u32)
+}
+
+/// The pin namespace of the journal kept in `git_dir` for `env` (the
+/// installations design, 1.5): `<env prefix><worktree part>`. The worktree
+/// part is empty for a main worktree, and `wt-<name>-<hash>/` for a linked
+/// one (`<common>/worktrees/<name>`), the name made safe for a ref. `None` is
+/// the flat layout, whose pins carry no environment prefix.
+pub fn pin_namespace_in(git_dir: &std::path::Path, env: Option<&str>) -> String {
+    let prefix = env.map(env_pin_prefix).unwrap_or_default();
     let linked = git_dir
         .parent()
         .and_then(|p| p.file_name())
         .is_some_and(|n| n == "worktrees");
     let Some(name) = git_dir.file_name().filter(|_| linked) else {
-        return String::new();
+        return prefix;
     };
     let name = name.to_string_lossy();
     let safe: String = name
@@ -342,7 +368,26 @@ pub fn pin_namespace(git_dir: &std::path::Path) -> String {
     let hash = name.bytes().fold(0xcbf2_9ce4_8422_2325_u64, |h, b| {
         (h ^ u64::from(b)).wrapping_mul(0x100_0000_01b3)
     });
-    format!("wt-{safe}-{:08x}/", hash as u32)
+    format!("{prefix}wt-{safe}-{:08x}/", hash as u32)
+}
+
+/// Whether the pin whose name is `rest` (after `refs/gitpoulpi/undo/`) is
+/// one of the pins of the journal whose namespace is `ns`: a main worktree
+/// owns the pins whose id follows its environment prefix directly, a linked
+/// one those under its `wt-` folder.
+pub fn pin_in_namespace(ns: &str, rest: &str) -> bool {
+    let (env, wt) = match ns.find('/') {
+        Some(i) if !ns.starts_with("wt-") => ns.split_at(i + 1),
+        _ => ("", ns),
+    };
+    let Some(rest) = rest.strip_prefix(env) else {
+        return false;
+    };
+    if wt.is_empty() {
+        rest.starts_with(|c: char| c.is_ascii_digit())
+    } else {
+        rest.starts_with(wt)
+    }
 }
 
 /// What the daemon captured about the repository right now.

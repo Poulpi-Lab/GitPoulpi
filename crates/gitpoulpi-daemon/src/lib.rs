@@ -59,6 +59,15 @@ pub fn forget_rewrite_plans_for_tests() {
     rewrite_runs::forget_all();
 }
 
+/// Sets the environment (the installations design, 1.5) the undo journal,
+/// its pins and the outside-change snapshot live under, for every daemon of
+/// this process. The real program calls it once at start; a process that
+/// never does (every in-process test) keeps the flat layout, the paths builds
+/// without environments use.
+pub fn set_journal_env(env: Option<&str>) {
+    journal::set_env(env);
+}
+
 /// Writes the undo journal bytes still waiting behind a staging
 /// operation (see `journal_store`). Shutdown does it; tests that read
 /// `journal.json` call it.

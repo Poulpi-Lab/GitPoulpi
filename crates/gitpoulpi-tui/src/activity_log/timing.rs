@@ -76,6 +76,16 @@ fn take_background_fetch(action: &Action) -> bool {
     false
 }
 
+/// A fetch the window started on its own gave up on a git lock (another
+/// process, often another installation, was writing the refs): it is not an
+/// error to show, the next interval tries again. Only a debug line.
+pub(crate) fn background_fetch_skipped(repo: &Path) {
+    if take_background_fetch(&Action::FetchAll) {
+        let repo = super::repo_text(repo);
+        tracing::debug!(target: "tui", repo = repo.as_str(), "auto-fetch skipped: a git lock is held");
+    }
+}
+
 /// What an action is called in the list; `None` for the many small
 /// mutations (stage a file, create a tag) that are not worth a line.
 pub(crate) fn label_for(action: &Action) -> Option<String> {

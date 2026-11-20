@@ -55,9 +55,9 @@ pub(crate) use problem::{
     report_in as report_problem_in, Source as ProblemSource,
 };
 pub(crate) use timing::{
-    background as timing_background, background_fetch_pending, expect_background_fetch,
-    install as install_timings, install_from_settings as install_timings_from_settings,
-    record as timing_record,
+    background as timing_background, background_fetch_pending, background_fetch_skipped,
+    expect_background_fetch, install as install_timings,
+    install_from_settings as install_timings_from_settings, record as timing_record,
 };
 
 /// The details of the newest failure recorded (tests of launches read it).

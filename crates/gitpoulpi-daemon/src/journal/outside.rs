@@ -2,7 +2,8 @@
 //! (the outside-operations design).
 //!
 //! The daemon keeps the refs it last saw (`<git-dir>/gitpoulpi/refs-snapshot.json`,
-//! next to `journal.json`). [`sync`] diffs the repository against it and
+//! next to `journal.json`; both under `env/<env>/` in the environment layout,
+//! so one environment records another's operations as outside changes). [`sync`] diffs the repository against it and
 //! records one `OperationKind::Outside` entry per coherent change; [`adopt`]
 //! refreshes the snapshot after one of the daemon's own mutations, so those
 //! are never recorded twice.
@@ -87,7 +88,15 @@ impl Drop for Busy {
 }
 
 fn snapshot_path(repo: &RepoRef) -> Option<PathBuf> {
-    git_dir(&repo.root).map(|d| d.join("gitpoulpi").join("refs-snapshot.json"))
+    // Per environment, like the journal: each environment records the other's
+    // operations as outside changes.
+    git_dir(&repo.root).map(|d| {
+        super::store::env_file(
+            &d,
+            super::store::current_env().as_deref(),
+            "refs-snapshot.json",
+        )
+    })
 }
 
 /// The directory refs, `packed-refs` and the stash live in: the common git

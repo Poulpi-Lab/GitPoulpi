@@ -6009,7 +6009,7 @@ installation_help = "この GitPoulpi の情報です。インストール方法
 # context: value of the Installation row; {kind} is the install kind (dev, portable...), {path} its folder, {env} the environment name
 installation_info = "{kind}、{path}、環境 {env}"
 # context: end of the help line of the Installation row, which shows the whole folder when the value is cut; {path} is the install folder
-installation_folder = "Folder: {path}"
+installation_folder = "フォルダー: {path}"
 name = "ランチャー名"
 name_help = "このインストールのショートカットと、ファイルマネージャーのメニュー項目に使う名前です。名前が変わるのはこのインストールだけです。"
 name_primary = "プライマリは常に GitPoulpi という名前です"
@@ -9179,17 +9179,17 @@ token_failed = "アクセストークンを保存できませんでした：{rea
 # context: status line when there is no access token to show or copy
 token_missing = "アクセストークンはまだありません。"
 # context: button in Settings > Agents & MCP under the MCP server port; looks for a port nobody listens on and saves it. Width budget: 24 cells
-suggest_port = "Suggest a free port"
+suggest_port = "空きポートを提案"
 # context: help under the suggest-a-free-port button
-suggest_port_help = "Several GitPoulpi installations default to the same MCP port, and only one MCP HTTP server can use a port: a second one refuses to start. This looks for a free port on the same host address and saves it as this installation's MCP bind."
+suggest_port_help = "複数の GitPoulpi インストールは既定で同じ MCP ポートを使いますが、1 つのポートで動かせる MCP HTTP サーバーは 1 つだけで、2 つ目は起動を拒否します。同じホストアドレスで空いているポートを探し、このインストールの MCP バインドとして保存します。"
 # context: status line while the free port is being looked for
-suggest_port_working = "Looking for a free port..."
+suggest_port_working = "空きポートを探しています..."
 # context: status line after a free port was saved; {bind} is a host address and port such as 127.0.0.1:8809
-suggested = "MCP bind set to {bind}. It applies the next time the server starts."
+suggested = "MCP バインドを {bind} に設定しました。次にサーバーを起動するときに反映されます。"
 # context: status line when no free port was found
-suggest_port_failed = "Could not find a free port on that address."
+suggest_port_failed = "そのアドレスで空きポートが見つかりませんでした。"
 # context: command palette entry: opens Settings > Agents & MCP and suggests a free MCP port
-palette_suggest_port = "MCP: Suggest a free port"
+palette_suggest_port = "MCP: 空きポートを提案"
 # context: label of a choice in Settings > Agents & MCP: how the MCP HTTP endpoint is encrypted (TLS)
 tls = "TLS"
 # context: help under the TLS choice

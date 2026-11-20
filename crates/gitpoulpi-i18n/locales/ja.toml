@@ -9176,6 +9176,18 @@ token_rotated = "アクセストークンを再発行しました。"
 token_failed = "アクセストークンを保存できませんでした：{reason}"
 # context: status line when there is no access token to show or copy
 token_missing = "アクセストークンはまだありません。"
+# context: button in Settings > Agents & MCP under the MCP server port; looks for a port nobody listens on and saves it. Width budget: 24 cells
+suggest_port = "Suggest a free port"
+# context: help under the suggest-a-free-port button
+suggest_port_help = "Several GitPoulpi installations default to the same MCP port, and only one MCP HTTP server can use a port: a second one refuses to start. This looks for a free port on the same host address and saves it as this installation's MCP bind."
+# context: status line while the free port is being looked for
+suggest_port_working = "Looking for a free port..."
+# context: status line after a free port was saved; {bind} is a host address and port such as 127.0.0.1:8809
+suggested = "MCP bind set to {bind}. It applies the next time the server starts."
+# context: status line when no free port was found
+suggest_port_failed = "Could not find a free port on that address."
+# context: command palette entry: opens Settings > Agents & MCP and suggests a free MCP port
+palette_suggest_port = "MCP: Suggest a free port"
 # context: label of a choice in Settings > Agents & MCP: how the MCP HTTP endpoint is encrypted (TLS)
 tls = "TLS"
 # context: help under the TLS choice

@@ -470,6 +470,15 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 
 仓库沿用哪个列表记录在它的 `repo-state.toml` 中（见下）。优先顺序：仓库自己的模式，然后是它沿用的命名列表，然后是 `default_list`，最后是 `**`。
 
+## `[installation]`（这台电脑上每个 GitPoulpi 一条记录）
+
+多个安装（软件包、开发版检出、cargo 构建、解压的压缩包）可以共用同一个 `config.toml`。每个安装由它的文件夹标识（16 位十六进制 id），并在 `[installation.settings.<id>]` 中保存自己的外观和名称，因此一个安装的颜色或别名绝不会改变另一个的。在你选定之前，没有主安装；主安装拥有纯名称 `GitPoulpi` 的启动器，以及旧版本读取的共享键 `ui.logo_color`、`ui.command_alias` 和 `ui.command_alias_add`。由 GitPoulpi 自己写入（以及 `set_installation_in_file`），不能用 `config set` 修改。
+
+| 键 | 默认值 | 取值和效果 |
+|---|---|---|
+| `installation.primary` | 不存在 | 主安装的 id。不存在表示没有主安装。 |
+| `installation.settings.<id>` | 无 | 每个安装一张表：`path`（它的文件夹，移动后会刷新）、`kind`（`dev`、`install`、`cargo`、`portable`、`pinned`）、`channel`（仅供参考）、`name`（启动器名称，`GitPoulpi (<label>)`，首次运行时固定）、`name_with_version`（关闭：在名称中加入 `<major>.<minor>`）、`logo_color`、`command_alias`、`command_alias_add`、`folder_menu_submenu`（为空：文件夹菜单项位于根菜单）、`env`（为空：使用它自己的 id；名称相同的安装共享守护进程、会话和撤销历史）、`mcp_bind`（为空：使用 `mcp.bind`）。空值对主安装回退到 `ui.*`，否则回退到该类型的默认值（开发版检出使用 `sun`）。 |
+
 ## `[keybindings]`
 
 重新绑定 TUI 的快捷键；设置 > 键盘与鼠标可编辑它。

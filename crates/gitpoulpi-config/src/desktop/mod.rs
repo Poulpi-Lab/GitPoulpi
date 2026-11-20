@@ -436,14 +436,15 @@ pub fn ensure_ico_for(dirs: &Dirs, icons: &IconSet, ctx: &InstallCtx) -> Option<
     windows::ensure_ico(dirs, icons, ctx)
 }
 
-/// Windows, primary handover: renames the old primary's legacy-named
+/// Windows and Linux, primary handover: renames the old primary's legacy-named
 /// shortcuts (Start menu, Desktop) to its own name, contents untouched, and
 /// tells the shell. `old` is the installation that was primary. Elsewhere, and
 /// when there is nothing to rename: an empty list.
 pub fn hand_over_shortcuts(dirs: &Dirs, os: Os, old: &InstallCtx) -> Result<Vec<PathBuf>, String> {
     match os {
         Os::Windows => windows::hand_over(dirs, old),
-        _ => Ok(Vec::new()),
+        Os::Linux => linux::hand_over(dirs, old),
+        Os::Macos => Ok(Vec::new()),
     }
 }
 

@@ -1242,6 +1242,9 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Лаунчер: прибрати з PATH |  |
 | Лаунчер: установити меню «Відкрити в GitPoulpi» |  |
 | Лаунчер: видалити меню «Відкрити в GitPoulpi» |  |
+| Launcher: Become the Primary Installation |  |
+| Launcher: Remove Legacy Launchers |  |
+| Launcher: Forget Gone Installations |  |
 | Застосунок: змінити колірну тему графа... | `Ctrl+N T` |
 | Застосунок: перемкнути підсвітку рядків графа | `Ctrl+N Y` |
 <!-- palette:end -->

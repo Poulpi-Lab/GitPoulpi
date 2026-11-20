@@ -33,6 +33,10 @@ impl PreferencesState {
             self.message = Some(screen::NO_CONFIG_DIR.get().into());
             return false;
         };
+        // `installation.*` are virtual keys: this installation's own entry.
+        if let Some(field) = key.strip_prefix("installation.") {
+            return self.write_installation(field, value);
+        }
         // `mcp.port` is not a stored key: it is the port of `mcp.bind`.
         let bind;
         let (key, value) = if key == "mcp.port" {

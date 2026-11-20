@@ -24,6 +24,7 @@ fn temp_env(root: &Path) -> Env {
         which: std::sync::Arc::new(|_| None),
         ctx: gitpoulpi_config::desktop::InstallCtx::legacy(),
         refresh_icon_cache: false,
+        submenu: String::new(),
     }
 }
 

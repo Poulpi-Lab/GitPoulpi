@@ -50,8 +50,17 @@ fn machine(root: &Path, path_var: &str) -> Machine {
     }
 }
 
+/// The state of a test whose installation is the primary: it wears the shared
+/// `ui.*` aliases the rows below set directly.
+fn as_primary(st: &mut PreferencesState) {
+    let current = crate::preferences::launcher_install::fake_current(true);
+    st.config.installation.primary = Some(current.identity.id.clone());
+    st.set_this(current);
+}
+
 fn tools_state(dir: &Path, path_var: &'static str) -> PreferencesState {
     let mut st = state(dir);
+    as_primary(&mut st);
     let root = dir.join("machine");
     std::fs::create_dir_all(root.join("home")).unwrap();
     st.set_tools_machine(move || machine(&root, path_var));
@@ -96,7 +105,7 @@ fn the_alias_row_is_a_combobox_with_none_and_gp_and_free_text() {
     let tmp = tempfile::tempdir().unwrap();
     let st = tools_state(tmp.path(), "/usr/bin");
     let f = row(&st, "Command alias").expect("the alias row");
-    assert_eq!(f.target, Target::Global("ui.command_alias"));
+    assert_eq!(f.target, Target::Global("installation.command_alias"));
     let Control::Combo {
         options,
         value,
@@ -178,7 +187,7 @@ fn the_add_alias_row_is_a_combobox_offering_none_gpa_and_the_alias_name_with_an_
     let tmp = tempfile::tempdir().unwrap();
     let mut st = tools_state(tmp.path(), "/usr/bin");
     let f = row(&st, "Add-tab alias").expect("the add alias row");
-    assert_eq!(f.target, Target::Global("ui.command_alias_add"));
+    assert_eq!(f.target, Target::Global("installation.command_alias_add"));
     let Control::Combo {
         options,
         value,

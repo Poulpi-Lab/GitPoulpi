@@ -450,6 +450,8 @@ pub(super) enum PrefAction {
     ImageEditor(OpenInButton),
     /// A shortcut button of General's Launcher group.
     Launcher(super::launcher_page::LauncherButton),
+    /// A button of the "This installation" rows.
+    Installation(super::launcher_install::InstallButton),
     /// A button of General's command alias and PATH rows.
     Tools(super::launcher_alias::ToolsButton),
     /// A button of the File manager menu rows.
@@ -492,6 +494,9 @@ pub(super) struct Field {
     /// What an empty `Area` shows grayed instead of `(empty)` (the global
     /// text a repository override would inherit).
     pub(super) placeholder: Option<String>,
+    /// A read-only value's piece that gives way first when the row is narrow:
+    /// cut in the middle with an ellipsis, never dropped (the install path).
+    pub(super) ellipsize: Option<String>,
 }
 
 impl Field {
@@ -506,6 +511,7 @@ impl Field {
             live: Settings::key_is_implemented(key),
             coming: None,
             placeholder: None,
+            ellipsize: None,
         }
     }
 
@@ -520,6 +526,7 @@ impl Field {
             live: false,
             coming: None,
             placeholder: None,
+            ellipsize: None,
         }
     }
 
@@ -534,6 +541,7 @@ impl Field {
             live: true,
             coming: None,
             placeholder: None,
+            ellipsize: None,
         }
     }
 
@@ -572,11 +580,19 @@ impl Field {
             live: true,
             coming: None,
             placeholder: None,
+            ellipsize: None,
         }
     }
 
     pub(super) fn with_help(mut self, help: &str) -> Self {
         self.help = Some(help.to_string());
+        self
+    }
+
+    /// Marks `piece` of the value as the part that is cut in the middle when
+    /// the row is too narrow for the whole text.
+    pub(super) fn with_ellipsis_of(mut self, piece: &str) -> Self {
+        self.ellipsize = Some(piece.to_string());
         self
     }
 

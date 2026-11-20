@@ -1248,6 +1248,9 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Launcher: Remove from PATH |  |
 | Launcher: Install Open in GitPoulpi Menu |  |
 | Launcher: Remove Open in GitPoulpi Menu |  |
+| Launcher: Become the Primary Installation |  |
+| Launcher: Remove Legacy Launchers |  |
+| Launcher: Forget Gone Installations |  |
 | App: Change Graph Color Theme... | `Ctrl+N T` |
 | App: Toggle Graph Row Tints | `Ctrl+N Y` |
 <!-- palette:end -->

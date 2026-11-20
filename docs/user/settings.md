@@ -197,6 +197,22 @@ and `Esc` restores the previous one.
 The **Launcher** page (`gitpoulpi ui show settings launcher`) creates a shortcut that starts
 GitPoulpi from the OS launcher, in the terminal you choose.
 
+**This installation** (first group of the page). Each GitPoulpi on a machine (a dev checkout, a package, a portable copy) has its own launcher name, colour, aliases and folder-menu entry, kept in its own `[installation.settings.<id>]` table of `config.toml`; changing one here never touches another installation. None of it is journaled (it is system integration; **Remove** is the way back).
+
+| Row | What it does |
+|---|---|
+| **Installation** | Read-only: the kind, the folder and the environment of this installation. On a narrow page the folder is cut in the middle with an ellipsis; the help line under the row has the full text. |
+| **Launcher name** | The name of this installation's shortcuts and folder-menu entry. Refused when another installation that still exists has that name. The primary is always called `GitPoulpi`. |
+| **Include version in the launcher name** | Adds `<major>.<minor>` to the name (`GitPoulpi 1.2`); off by default, because the shortcuts are renamed at each update. |
+| **Octopus colour** | The colour of this installation's octopus and its shortcuts (same choices as the About window). |
+| **Become the primary** | The primary owns the plain name `GitPoulpi`, the legacy shortcuts and the `ui.*` keys older builds read; nobody is primary by default. Asks first when another installation is. The previous primary keeps its launchers under its own name (Windows and Linux). |
+| **Environment** | Installations of one environment share windows, daemons and undo history; the default is the installation's own. Changing it needs this installation's open windows restarted. |
+| **Folder-menu submenu** | Groups the folder-menu entry under a submenu of that name; installations that give the same name share one. Not available on macOS; Nemo and Thunar always list the entry at the root. |
+| **Other: \<name\>** | The other installations on this machine. One whose folder is gone has a **Forget** button (asks first) that removes its entry and the launchers, aliases and folder-menu entries it left. |
+| **Legacy launchers** | While nobody is primary, launchers an older build made under the plain name are listed with **Become the primary** and **Remove legacy launchers** (asks first). A one-time note in the status line points here. |
+
+The palette has **Launcher: Become the Primary Installation**, **Launcher: Remove Legacy Launchers** and **Launcher: Forget Gone Installations**, and every row is a `Settings:` entry. The command alias rows below are this installation's own (`gpd` / `gpda` are suggested for a dev checkout); an alias another installation made reads **Used by \<name\>** and cannot be created here.
+
 | Row | What it does |
 |---|---|
 | **Terminal for shortcuts** | `ui.launch_terminal`: **Automatic**, **OS default**, or one of the terminals found on this machine (the same detection as **Open in**). Automatic: Windows Terminal on Windows (else WezTerm, Alacritty, the plain console), `xdg-terminal-exec` on Linux (Omarchy; else the first terminal found), Terminal on macOS unless iTerm2, Ghostty, WezTerm or kitty is installed. |

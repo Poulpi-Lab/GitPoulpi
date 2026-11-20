@@ -1252,6 +1252,9 @@ applicano. I tasti sono quelli predefiniti.
 | Launcher: Rimuovi dal PATH |  |
 | Launcher: Installa il menu Apri in GitPoulpi |  |
 | Launcher: Rimuovi il menu Apri in GitPoulpi |  |
+| Launcher: Become the Primary Installation |  |
+| Launcher: Remove Legacy Launchers |  |
+| Launcher: Forget Gone Installations |  |
 | App: Cambia tema colori del grafo... | `Ctrl+N T` |
 | App: Attiva/disattiva tinta righe del grafo | `Ctrl+N Y` |
 <!-- palette:end -->

@@ -60,7 +60,9 @@ pub(crate) enum Edit {
 
 /// Choices whose options are discovered at run time (installed terminals):
 /// the page lists them, a fixed palette sub-list cannot.
-const PAGE_ONLY: &[&str] = &["ui.launch_terminal", "ui.language"];
+/// "Become the primary" asks first when another installation is primary, which
+/// only the page can show.
+const PAGE_ONLY: &[&str] = &["ui.launch_terminal", "ui.language", "installation.primary"];
 
 impl PreferencesState {
     /// A state that edits `config.toml` and nothing else: no repository,

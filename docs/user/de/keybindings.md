@@ -1243,6 +1243,9 @@ die Standardtasten.
 | Starter: Aus dem PATH entfernen |  |
 | Starter: Menü „In GitPoulpi öffnen“ installieren |  |
 | Starter: Menü „In GitPoulpi öffnen“ entfernen |  |
+| Launcher: Become the Primary Installation |  |
+| Launcher: Remove Legacy Launchers |  |
+| Launcher: Forget Gone Installations |  |
 | App: Farbschema des Graphen wechseln... | `Ctrl+N T` |
 | App: Zeilenfärbung des Graphen umschalten | `Ctrl+N Y` |
 <!-- palette:end -->

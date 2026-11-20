@@ -21,6 +21,10 @@ pub(super) fn is_destructive(action: PrefAction) -> bool {
     use super::repo_pages::RpButton;
     match action {
         PrefAction::ForgetCredentials => true,
+        PrefAction::Installation(
+            super::launcher_install::InstallButton::RemoveLegacy
+            | super::launcher_install::InstallButton::Forget(_),
+        ) => true,
         PrefAction::Launcher(L::Remove(_)) => true,
         PrefAction::Tools(T::AliasRemove | T::PathRemove) => true,
         PrefAction::FolderMenu(super::launcher_folder_menu::FolderMenuButton::Remove) => true,
@@ -193,10 +197,11 @@ impl PreferencesState {
         if !button.enabled {
             return;
         }
-        if is_destructive(button.action) {
+        if is_destructive(button.action) || self.install_asks(button.action) {
             let confirm = Confirm::new(
                 button.label.clone(),
-                self.conflict_confirm_text(button.action)
+                self.install_confirm_text(button.action)
+                    .or_else(|| self.conflict_confirm_text(button.action))
                     .unwrap_or_else(|| screen::confirm_action(&button.label)),
                 vec![
                     (screen::CANCEL.get().to_string(), false),

@@ -307,6 +307,15 @@ impl PreferencesState {
                         .add_modifier(Modifier::ITALIC),
                 )]
             } else if matches!(field.control, Control::Info(_)) {
+                // The path of the Installation row gives way in its middle.
+                let text = match &field.ellipsize {
+                    Some(piece) if display_width(&text) > room && text.contains(piece.as_str()) => {
+                        let others = display_width(&text) - display_width(piece);
+                        let budget = room.saturating_sub(others).max(8);
+                        text.replacen(piece.as_str(), &crate::ui_kit::fit_middle(piece, budget), 1)
+                    }
+                    _ => text,
+                };
                 let mut wrapped = wrap_words(&text, room);
                 let first = if wrapped.is_empty() {
                     String::new()

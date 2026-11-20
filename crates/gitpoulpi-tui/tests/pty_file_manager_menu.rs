@@ -209,6 +209,149 @@ fn install_from_the_palette_then_remove_with_the_keyboard_restores_thunar_byte_f
     let _ = term.stop();
 }
 
+/// A submenu name typed in Settings puts this installation's entry next to
+/// another installation's in one shared folder, and removing it leaves the
+/// other's entry and the folder alone (the last one out takes the folder).
+#[cfg(all(unix, not(target_os = "macos")))]
+#[test]
+fn a_submenu_typed_in_settings_groups_two_installations() {
+    use std::os::unix::fs::PermissionsExt;
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit(MESSAGE)
+        .unwrap()
+        .build();
+    let config = tempfile::tempdir().unwrap();
+    let home = tempfile::tempdir().unwrap();
+    let other = tempfile::tempdir().unwrap();
+    let data = home.path().join("data");
+    let bin = home.path().join("bin");
+    std::fs::create_dir_all(&bin).unwrap();
+    let nautilus = bin.join("nautilus");
+    std::fs::write(&nautilus, "#!/bin/sh\n").unwrap();
+    std::fs::set_permissions(&nautilus, std::fs::Permissions::from_mode(0o755)).unwrap();
+    let path = format!(
+        "{}:{}",
+        bin.display(),
+        std::env::var("PATH").unwrap_or_default()
+    );
+    // Another live installation, with its entry already in the "Tools" submenu.
+    let tools = data.join("nautilus/scripts/Tools");
+    std::fs::create_dir_all(&tools).unwrap();
+    let theirs = tools.join("Open in GitPoulpi (dev)");
+    let their_text = "#!/bin/sh\n# X-GitPoulpi-Install=bbbb000000000002\nexec /opt/other/gitpoulpi launch --folder \"$1\"\n";
+    std::fs::write(&theirs, their_text).unwrap();
+    std::fs::set_permissions(&theirs, std::fs::Permissions::from_mode(0o755)).unwrap();
+    std::fs::write(
+        config.path().join("config.toml"),
+        format!(
+            "[ui]\ngraph_renderer = \"text\"\n\n[installation.settings.bbbb000000000002]\npath = {:?}\nkind = \"dev\"\nname = \"GitPoulpi (dev)\"\nfolder_menu_submenu = \"Tools\"\n",
+            other.path().display().to_string()
+        ),
+    )
+    .unwrap();
+    let install = tempfile::tempdir().unwrap();
+    let exe = install_copy(install.path(), "gitpoulpi");
+    let mut term = common::launch(repo.root())
+        .session("folder-menu-submenu")
+        .config_dir(config.path())
+        .binary(&exe)
+        .env("GITPOULPI_DESKTOP_NO_HOOKS", "1")
+        .env("HOME", home.path())
+        .env("PATH", &path)
+        .env("XDG_DATA_HOME", &data)
+        .env("XDG_CONFIG_HOME", home.path().join("config"))
+        .size(200, 120)
+        .no_exit_pause()
+        .ready(MESSAGE)
+        .spawn();
+
+    // The submenu row: the list offers what the other installation uses.
+    term.send_keys("C-p").unwrap();
+    term.send_text("settings: folder-menu submenu").unwrap();
+    term.wait_for("the palette entry", STEP, |s| {
+        s.contains("Settings: Folder-menu submenu...")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Enter").unwrap();
+    term.wait_for("Settings on the submenu row", STEP, |s| {
+        s.contains("Folder-menu submenu") && s.contains("Settings - Tab")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Enter").unwrap();
+    term.wait_for("the list with Tools", STEP, |s| {
+        s.contains("None (at the root)") && s.contains("Tools")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_text("Tools").unwrap();
+    term.send_keys("Enter").unwrap();
+    let wait_config = |what: &str, ok: &dyn Fn(&str) -> bool| {
+        let deadline = std::time::Instant::now() + STARTUP;
+        loop {
+            let text = std::fs::read_to_string(config.path().join("config.toml")).unwrap();
+            if ok(&text) {
+                return;
+            }
+            assert!(std::time::Instant::now() < deadline, "{what}\n{text}");
+            std::thread::sleep(Duration::from_millis(200));
+        }
+    };
+    wait_config("the submenu reached this installation's entry", &|t| {
+        toml::from_str::<toml::Value>(t).is_ok_and(|v| {
+            v.get("installation")
+                .and_then(|i| i.get("settings"))
+                .and_then(|s| s.get("p-pty"))
+                .and_then(|e| e.get("folder_menu_submenu"))
+                .and_then(|m| m.as_str())
+                == Some("Tools")
+        })
+    });
+
+    term.send_keys("Esc").unwrap();
+    term.wait_for("Settings closed", STEP, |s| {
+        !s.contains("Launcher - global")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    install_from_the_palette(&mut term);
+    term.wait_for("the GNOME Files row reads created", STARTUP, |s| {
+        row_is(s, "GNOME Files", "created")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let ours = |dir: &Path| -> Vec<PathBuf> {
+        std::fs::read_dir(dir)
+            .unwrap()
+            .flatten()
+            .map(|e| e.path())
+            .filter(|p| {
+                std::fs::read_to_string(p).is_ok_and(|t| t.contains("X-GitPoulpi-Install=p-pty"))
+            })
+            .collect()
+    };
+    assert_eq!(
+        ours(&tools).len(),
+        1,
+        "this installation's entry sits in the shared folder: {:?}",
+        std::fs::read_dir(&tools)
+            .unwrap()
+            .flatten()
+            .collect::<Vec<_>>()
+    );
+    assert_eq!(std::fs::read_to_string(&theirs).unwrap(), their_text);
+    assert!(
+        ours(&data.join("nautilus/scripts")).is_empty(),
+        "nothing at the root: the submenu holds it"
+    );
+
+    remove_with_the_keyboard(&mut term, |s| row_is(s, "GNOME Files", "not created"));
+    assert!(ours(&tools).is_empty(), "this installation's entry is gone");
+    assert_eq!(
+        std::fs::read_to_string(&theirs).unwrap(),
+        their_text,
+        "the other installation's entry and the shared folder stay"
+    );
+    let _ = term.stop();
+}
+
 /// Windows: the Explorer verbs and App Paths `gitpoulpi.exe`, in a file that
 /// stands in for `HKCU`.
 #[cfg(windows)]

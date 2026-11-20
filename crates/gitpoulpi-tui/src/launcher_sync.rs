@@ -135,6 +135,8 @@ pub(crate) fn install(config: &gitpoulpi_config::Config) {
 static STATE: Mutex<Option<Watch>> = Mutex::new(None);
 static BUSY: AtomicBool = AtomicBool::new(false);
 static UPDATED: AtomicBool = AtomicBool::new(false);
+/// The one-time note about legacy launchers is due.
+static LEGACY_NOTE: AtomicBool = AtomicBool::new(false);
 
 fn with<R>(f: impl FnOnce(&mut Watch) -> R) -> R {
     let mut guard = STATE.lock().unwrap_or_else(|e| e.into_inner());
@@ -166,12 +168,18 @@ pub(crate) fn poll() -> Option<String> {
                 if crate::launcher::sync_shortcuts(&env, &terminal, &slug) {
                     UPDATED.store(true, Ordering::SeqCst);
                 }
+                if crate::launcher::legacy_note_due(&env, &terminal) {
+                    LEGACY_NOTE.store(true, Ordering::SeqCst);
+                }
                 // The running window wears the colour too (Windows).
                 crate::window_ctl::refresh_window_icon();
                 BUSY.store(false, Ordering::SeqCst);
                 crate::redraw::poke();
             });
         }
+    }
+    if LEGACY_NOTE.swap(false, Ordering::SeqCst) {
+        return Some(gitpoulpi_i18n::msg::launcher::LEGACY_NOTE.get().to_string());
     }
     UPDATED.swap(false, Ordering::SeqCst).then(|| {
         gitpoulpi_i18n::msg::launcher::ICONS_UPDATED

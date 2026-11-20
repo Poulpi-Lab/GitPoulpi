@@ -76,12 +76,14 @@ mod fields;
 mod fields_ui;
 pub(crate) use fields_ui::{language_choices, language_options};
 pub(crate) use launcher_alias::ToolsButton;
+pub(crate) use launcher_install::InstallButton;
 pub(crate) use repo_pages::SparseRequest;
 mod images_page;
 mod input;
 mod keybindings_page;
 mod launcher_alias;
 mod launcher_folder_menu;
+mod launcher_install;
 mod launcher_page;
 pub(crate) mod list_editor;
 mod list_page;
@@ -231,6 +233,8 @@ pub(crate) struct PreferencesState {
     tools: launcher_alias::ToolsState,
     /// The File manager menu rows under the shortcuts, read on a thread.
     folder_menu: launcher_folder_menu::FolderMenuState,
+    /// The "This installation" rows (`launcher_install`).
+    install: launcher_install::InstallState,
     /// The MCP endpoint's access token rows (`mcp_security`).
     #[cfg(feature = "mcp")]
     mcp_sec: mcp_security::McpSecurityState,
@@ -501,6 +505,7 @@ impl PreferencesState {
         state.launcher_start(None);
         state.tools_start(None);
         state.folder_menu_start(None);
+        state.install_read();
         state
     }
 
@@ -565,6 +570,7 @@ impl PreferencesState {
             launcher: Default::default(),
             tools: Default::default(),
             folder_menu: Default::default(),
+            install: Default::default(),
             #[cfg(feature = "mcp")]
             mcp_sec: mcp_security::McpSecurityState::read(),
             image_detected: std::cell::OnceCell::new(),
@@ -721,6 +727,7 @@ impl PreferencesState {
         self.poll_launcher();
         self.poll_tools();
         self.poll_folder_menu();
+        self.poll_install();
         let Some(rx) = &self.token_presence_rx else {
             return;
         };

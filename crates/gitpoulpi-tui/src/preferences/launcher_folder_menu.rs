@@ -106,6 +106,21 @@ fn names(managers: &[Manager]) -> String {
 }
 
 impl PreferencesState {
+    /// Where the machine comes from, for the jobs of the installation rows.
+    pub(super) fn folder_menu_env_factory(&self) -> MakeEnv {
+        Arc::clone(&self.folder_menu.env)
+    }
+
+    /// A file manager found here lists the entry at the root whatever the
+    /// submenu asks (Nemo, Thunar).
+    pub(super) fn folder_menu_lacks_submenus(&self) -> bool {
+        self.folder_menu.snapshot.as_ref().is_some_and(|s| {
+            s.entries
+                .iter()
+                .any(|e| e.detected && matches!(e.manager, Manager::Nemo | Manager::Thunar))
+        })
+    }
+
     /// Test hook: where the menu is written (never the real one).
     #[cfg(test)]
     pub(super) fn set_folder_menu_env(
@@ -127,8 +142,8 @@ impl PreferencesState {
         let (tx, rx) = mpsc::channel();
         self.folder_menu.rx = Some(rx);
         let make = Arc::clone(&self.folder_menu.env);
-        let logo = self.config.ui.logo_color.clone();
-        let label = t::FOLDER_MENU_LABEL.get().to_string();
+        let logo = self.this_colour();
+        let label = crate::launcher::folder_menu_label(&self.this_effective().name);
         std::thread::spawn(move || {
             let env = make(&logo);
             let done = button.map(|b| run(&env, &label, b));

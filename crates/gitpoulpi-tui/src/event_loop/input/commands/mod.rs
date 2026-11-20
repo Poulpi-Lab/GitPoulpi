@@ -340,6 +340,9 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::LauncherPathRemove
         | PaletteCommand::LauncherFolderMenuInstall
         | PaletteCommand::LauncherFolderMenuRemove
+        | PaletteCommand::LauncherBecomePrimary
+        | PaletteCommand::LauncherRemoveLegacy
+        | PaletteCommand::LauncherForgetGone
         | PaletteCommand::ChangeGraphColorTheme
         | PaletteCommand::ToggleGraphRowTints
         | PaletteCommand::AgentShowPending

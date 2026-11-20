@@ -57,7 +57,7 @@ fn create_gp_from_the_palette_then_remove_it_from_the_row() {
     let home = tempfile::tempdir().unwrap();
     std::fs::write(
         config.path().join("config.toml"),
-        "[ui]\ngraph_renderer = \"text\"\ncommand_alias = \"gp\"\n",
+        "[ui]\ngraph_renderer = \"text\"\ncommand_alias = \"gp\"\n\n[installation]\nprimary = \"p-pty\"\n",
     )
     .unwrap();
     let builder = common::launch(repo.root())
@@ -195,7 +195,7 @@ fn pick_the_name_in_the_combobox_then_add_and_remove_gitpoulpi_on_path() {
     let home = tempfile::tempdir().unwrap();
     std::fs::write(
         config.path().join("config.toml"),
-        "[ui]\ngraph_renderer = \"text\"\n",
+        "[ui]\ngraph_renderer = \"text\"\n\n[installation]\nprimary = \"p-pty\"\n",
     )
     .unwrap();
     std::fs::write(home.path().join(".bashrc"), "export KEEP=1\n").unwrap();
@@ -372,5 +372,75 @@ fn the_alias_list_hints_that_a_name_can_be_typed_and_saves_it() {
         std::fs::read_to_string(config.path().join("config.toml"))
             .is_ok_and(|t| t.contains("command_alias = \"gpx\""))
     });
+    let _ = term.stop();
+}
+
+/// An alias another live installation made reads "Used by {name}" under the
+/// add-tab alias, its Create is disabled, and nothing of the other's is touched.
+#[cfg(unix)]
+#[test]
+fn an_alias_of_another_installation_shows_its_owner_and_create_is_disabled() {
+    use std::os::unix::fs::PermissionsExt;
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit(MESSAGE)
+        .unwrap()
+        .build();
+    let config = tempfile::tempdir().unwrap();
+    let home = tempfile::tempdir().unwrap();
+    let other = tempfile::tempdir().unwrap();
+    // The other installation's add-tab alias: a shim carrying its owner tag.
+    let shim = common::alias_file(home.path(), "gpxa");
+    std::fs::create_dir_all(shim.parent().unwrap()).unwrap();
+    let text = gitpoulpi_config::desktop::alias::sh_shim_text_owned(
+        std::path::Path::new("/opt/other/gitpoulpi"),
+        Some("bbbb000000000002"),
+        false,
+    );
+    std::fs::write(&shim, &text).unwrap();
+    std::fs::set_permissions(&shim, std::fs::Permissions::from_mode(0o755)).unwrap();
+    // This installation (pinned `p-pty`) wants the same name.
+    std::fs::write(
+        config.path().join("config.toml"),
+        format!(
+            "[ui]\ngraph_renderer = \"text\"\n\n[installation.settings.p-pty]\npath = \"/opt/me\"\nkind = \"portable\"\ncommand_alias_add = \"gpxa\"\n\n[installation.settings.bbbb000000000002]\npath = {:?}\nkind = \"dev\"\nname = \"GitPoulpi (dev)\"\n",
+            other.path().display().to_string()
+        ),
+    )
+    .unwrap();
+    let mut term = common::launch(repo.root())
+        .session("command-alias-owner")
+        .config_dir(config.path())
+        .env("GITPOULPI_DESKTOP_NO_HOOKS", "1")
+        .scratch_home(home.path())
+        .size(200, 70)
+        .no_exit_pause()
+        .ready(MESSAGE)
+        .spawn();
+
+    palette(
+        &mut term,
+        "settings: add-tab alias",
+        "Settings: Add-tab alias...",
+    );
+    // The status row names the owner; Create says why it cannot.
+    common::scroll_settings_to(&mut term, "Used by GitPoulpi (dev)", STEP);
+    assert!(
+        term.screen()
+            .text()
+            .lines()
+            .any(|l| { l.contains("Add-tab status") && l.contains("Used by GitPoulpi (dev)") }),
+        "the status row names the owner:\n{}",
+        term.text()
+    );
+    // The palette's Create never replaces it.
+    term.send_keys("Esc").unwrap();
+    palette(&mut term, "command alias", "Launcher: Create Command Alias");
+    std::thread::sleep(Duration::from_millis(1500));
+    assert_eq!(
+        std::fs::read_to_string(&shim).unwrap(),
+        text,
+        "another installation's alias is left alone"
+    );
     let _ = term.stop();
 }

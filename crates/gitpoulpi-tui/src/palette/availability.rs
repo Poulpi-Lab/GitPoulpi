@@ -1131,6 +1131,9 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::LauncherPathRemove
         | C::LauncherFolderMenuInstall
         | C::LauncherFolderMenuRemove
+        | C::LauncherBecomePrimary
+        | C::LauncherRemoveLegacy
+        | C::LauncherForgetGone
         | C::ChangeGraphColorTheme
         | C::ToggleGraphRowTints
         | C::RebaseContinue

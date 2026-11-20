@@ -6002,6 +6002,64 @@ done_folder_menu_removed = "「GitPoulpi で開く」を削除しました：{ma
 done_folder_menu_nothing = "削除する「GitPoulpi で開く」メニューはありません"
 palette_folder_menu_install = "ランチャー: 「GitPoulpi で開く」メニューをインストール"
 palette_folder_menu_remove = "ランチャー: 「GitPoulpi で開く」メニューを削除"
+# context: sub-heading of the Launcher page: the settings of the GitPoulpi installation that is running
+this_heading = "This installation"
+installation = "Installation"
+installation_help = "Which GitPoulpi this is: how it was installed, where it lives and the environment whose windows and history it shares. Another installation on this machine (a dev build, a package) has its own launcher name, colour and aliases."
+# context: value of the Installation row; {kind} is the install kind (dev, portable...), {path} its folder, {env} the environment name
+installation_info = "{kind}, {path}, environment {env}"
+name = "Launcher name"
+name_help = "The name of this installation's shortcuts and of its entry in the file manager menu. Only this installation is renamed."
+name_primary = "the primary is always called GitPoulpi"
+# context: refusal under the Launcher name row; {name} is what was typed
+name_taken = "{name} is already the name of another installation"
+name_invalid = "That is not a valid launcher name: 1 to 64 characters, none of / : * ? < > | and quotes or backslashes, no trailing dot or space"
+name_with_version = "Include version in the launcher name"
+name_with_version_help = "Adds the major and minor version to the name (GitPoulpi 1.2). The shortcuts are renamed at each update, so a pin to the Start menu or the Dock can break then."
+color = "Octopus colour"
+color_help = "The colour of this installation's octopus, in the title bar and on its shortcuts. The About window changes the same setting."
+primary = "Become the primary"
+primary_help = "The primary installation owns the plain name GitPoulpi, the legacy shortcuts and the settings older builds read. Only one installation is the primary; none is by default."
+# context: confirmation; {name} is the installation that is the primary now
+primary_confirm = "{name} is the primary installation. Take over the name GitPoulpi, its legacy launchers and the keys older builds read? {name} keeps its own launchers under its own name."
+env = "Environment"
+env_own = "own (default)"
+env_help = "Installations of one environment share their windows, daemons and undo history. By default every installation is its own environment, so versions run side by side. Type a name to share one with another installation."
+env_restart = "Restart this installation's open windows for the new environment to apply."
+submenu = "Folder-menu submenu"
+submenu_none = "None (at the root)"
+submenu_help = "Groups this installation's Open in entry under a submenu with this name in the file manager. Installations that give the same name share one submenu."
+submenu_unavailable = "not available here"
+submenu_root_only = "Nemo and Thunar always list the entry at the root."
+# context: label of a row listing another GitPoulpi installation; {name} is its launcher name
+other_installation = "Other: {name}"
+# context: value of that row; {kind} install kind, {path} its folder
+other_installation_info = "{kind}, {path}"
+# context: value of that row when its folder is gone; {path} the folder
+other_installation_gone = "gone, {path}"
+forget = "Forget"
+forget_none = "No installation is gone"
+# context: confirmation; {name} is the installation that is gone
+forget_confirm = "Forget {name}? Its settings entry and the launchers, aliases and folder-menu entries it left behind are removed."
+legacy = "Legacy launchers"
+# context: value of the Legacy launchers row; {places} lists where they are
+legacy_found = "found: {places}"
+legacy_help = "Launchers an older GitPoulpi made under the plain name GitPoulpi. They keep working and are never rewritten while no installation is the primary. Take them over, or remove them."
+remove_legacy = "Remove legacy launchers"
+# context: shown under an alias that another installation made; {name} is that installation
+alias_used_by = "Used by {name}"
+legacy_note = "Legacy launchers found: see Settings > Launcher"
+# context: status line; {name} is the installation
+done_primary = "{name} is now the primary installation"
+done_resigned = "{name} is no longer the primary installation"
+done_forgot = "Forgot {name}"
+done_legacy_removed = "Removed the legacy launchers"
+done_legacy_nothing = "No legacy launcher to remove"
+palette_become_primary = "Launcher: Become the Primary Installation"
+palette_remove_legacy = "Launcher: Remove Legacy Launchers"
+palette_forget = "Launcher: Forget Gone Installations"
+# context: the entry in the file manager's right-click menu of an installation that is not the primary; {name} its launcher name
+folder_menu_label_named = "Open in {name}"
 
 [sparse]
 palette = "リポジトリ: スパースチェックアウト..."

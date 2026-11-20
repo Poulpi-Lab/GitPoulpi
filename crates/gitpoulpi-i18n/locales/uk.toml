@@ -6013,7 +6013,7 @@ installation_help = "Яка це інсталяція GitPoulpi: як її вс�
 # context: value of the Installation row; {kind} is the install kind (dev, portable...), {path} its folder, {env} the environment name
 installation_info = "{kind}, {path}, середовище {env}"
 # context: end of the help line of the Installation row, which shows the whole folder when the value is cut; {path} is the install folder
-installation_folder = "Folder: {path}"
+installation_folder = "Тека: {path}"
 name = "Назва лаунчера"
 name_help = "Назва ярликів цієї інсталяції та її пункту в меню файлового менеджера. Перейменовується лише ця інсталяція."
 name_primary = "основна інсталяція завжди називається GitPoulpi"
@@ -9181,17 +9181,17 @@ token_failed = "Не вдалося зберегти токен доступу: 
 # context: status line when there is no access token to show or copy
 token_missing = "Токена доступу ще немає."
 # context: button in Settings > Agents & MCP under the MCP server port; looks for a port nobody listens on and saves it. Width budget: 24 cells
-suggest_port = "Suggest a free port"
+suggest_port = "Знайти вільний порт"
 # context: help under the suggest-a-free-port button
-suggest_port_help = "Several GitPoulpi installations default to the same MCP port, and only one MCP HTTP server can use a port: a second one refuses to start. This looks for a free port on the same host address and saves it as this installation's MCP bind."
+suggest_port_help = "Кілька інсталяцій GitPoulpi типово використовують той самий порт MCP, а один порт може обслуговувати лише один HTTP-сервер MCP: другий відмовляється запускатися. Тут шукається вільний порт на тій самій адресі хоста, і він зберігається як адреса MCP цієї інсталяції."
 # context: status line while the free port is being looked for
-suggest_port_working = "Looking for a free port..."
+suggest_port_working = "Пошук вільного порту..."
 # context: status line after a free port was saved; {bind} is a host address and port such as 127.0.0.1:8809
-suggested = "MCP bind set to {bind}. It applies the next time the server starts."
+suggested = "Адресу MCP встановлено на {bind}. Вона діє, коли сервер запуститься наступного разу."
 # context: status line when no free port was found
-suggest_port_failed = "Could not find a free port on that address."
+suggest_port_failed = "Не вдалося знайти вільний порт на цій адресі."
 # context: command palette entry: opens Settings > Agents & MCP and suggests a free MCP port
-palette_suggest_port = "MCP: Suggest a free port"
+palette_suggest_port = "MCP: Знайти вільний порт"
 # context: label of a choice in Settings > Agents & MCP: how the MCP HTTP endpoint is encrypted (TLS)
 tls = "TLS"
 # context: help under the TLS choice

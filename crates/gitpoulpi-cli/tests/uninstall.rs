@@ -128,5 +128,239 @@ fn keep_files_leaves_the_program_alone() {
     assert!(exe.exists());
 }
 
+// ------------------------------------------------- several installations
+
+/// One scratch machine with a shared config, home and a fake `nautilus` on the
+/// PATH, and any number of installations (a copy of the binary beside a
+/// release marker, each its own folder and so its own installation).
+struct Machine {
+    tmp: tempfile::TempDir,
+}
+
+impl Machine {
+    fn new() -> Machine {
+        let tmp = tempfile::tempdir().unwrap();
+        let bin = tmp.path().join("fakebin");
+        std::fs::create_dir_all(&bin).unwrap();
+        let nautilus = bin.join("nautilus");
+        std::fs::write(&nautilus, "#!/bin/sh\n").unwrap();
+        make_executable(&nautilus);
+        std::fs::create_dir_all(tmp.path().join("cfg")).unwrap();
+        std::fs::write(
+            tmp.path().join("cfg/config.toml"),
+            "[ui]\nlaunch_terminal = \"kitty\"\n",
+        )
+        .unwrap();
+        Machine { tmp }
+    }
+
+    fn scratch(&self) -> &Path {
+        self.tmp.path()
+    }
+
+    /// An install in `<scratch>/<name>`; `marker`: it carries the release marker.
+    fn install(&self, name: &str, marker: bool) -> std::path::PathBuf {
+        let dir = self.tmp.path().join(name);
+        std::fs::create_dir_all(&dir).unwrap();
+        let exe = dir.join("gitpoulpi");
+        std::fs::copy(built(), &exe).unwrap();
+        if marker {
+            std::fs::write(dir.join(".gitpoulpi-dist"), "version=0.0.1\ntarget=x\n").unwrap();
+        }
+        exe
+    }
+
+    fn run(&self, exe: &Path, args: &[&str]) -> (bool, Value) {
+        let mut attempt = 0;
+        let home = self.tmp.path().join("home");
+        std::fs::create_dir_all(&home).unwrap();
+        let path = format!("{}/fakebin:/usr/bin:/bin", self.tmp.path().display());
+        let output = loop {
+            let mut cmd = Command::new(exe);
+            cmd.env("GITPOULPI_CONFIG_DIR", self.tmp.path().join("cfg"))
+                .env("GITPOULPI_DESKTOP_NO_HOOKS", "1")
+                .env("HOME", &home)
+                .env("XDG_DATA_HOME", self.tmp.path().join("data"))
+                .env("XDG_CONFIG_HOME", home.join(".config"))
+                .env("PATH", &path)
+                .env_remove("LOCALAPPDATA")
+                .env_remove("GITPOULPI_INSTALL_ID")
+                .env_remove("GITPOULPI_ENV")
+                .current_dir(self.tmp.path())
+                .arg("--json")
+                .args(args);
+            match cmd.output() {
+                Ok(output) => break output,
+                Err(e) if e.raw_os_error() == Some(26) && attempt < 50 => {
+                    attempt += 1;
+                    std::thread::sleep(std::time::Duration::from_millis(40));
+                }
+                Err(e) => panic!("running {}: {e}", exe.display()),
+            }
+        };
+        let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
+        let json = serde_json::from_str(&stdout).unwrap_or_else(|e| {
+            panic!(
+                "not JSON ({e}): {stdout} / {}",
+                String::from_utf8_lossy(&output.stderr)
+            )
+        });
+        (output.status.success(), json)
+    }
+
+    fn ok(&self, exe: &Path, args: &[&str]) -> Value {
+        let (ok, out) = self.run(exe, args);
+        assert!(ok, "{args:?}: {out}");
+        out
+    }
+
+    fn applications(&self) -> std::path::PathBuf {
+        self.tmp.path().join("data/applications")
+    }
+
+    fn scripts(&self) -> std::path::PathBuf {
+        self.tmp.path().join("data/nautilus/scripts")
+    }
+
+    fn bin(&self) -> std::path::PathBuf {
+        self.tmp.path().join("home/.local/bin")
+    }
+
+    fn desktop_files(&self) -> Vec<String> {
+        names(&self.applications())
+            .into_iter()
+            .filter(|n| n.ends_with(".desktop"))
+            .collect()
+    }
+}
+
+fn make_executable(path: &Path) {
+    use std::os::unix::fs::PermissionsExt;
+    std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).unwrap();
+}
+
+/// The sorted entries of `dir`, folders as `name/` and their files as `name/file`.
+fn names(dir: &Path) -> Vec<String> {
+    let mut out = Vec::new();
+    let Ok(read) = std::fs::read_dir(dir) else {
+        return out;
+    };
+    for entry in read.flatten() {
+        let name = entry.file_name().to_string_lossy().into_owned();
+        if entry.path().is_dir() {
+            for inner in names(&entry.path()) {
+                out.push(format!("{name}/{inner}"));
+            }
+            out.push(format!("{name}/"));
+        } else {
+            out.push(name);
+        }
+    }
+    out.sort();
+    out
+}
+
+fn folders(list: &[String]) -> usize {
+    list.iter().filter(|n| n.ends_with('/')).count()
+}
+
+fn set_up(m: &Machine, exe: &Path, alias: &str, submenu: Option<&str>) {
+    m.ok(exe, &["alias", "create", alias]);
+    m.ok(exe, &["desktop", "shortcut", "install"]);
+    if let Some(name) = submenu {
+        m.ok(exe, &["installation", "set", "folder_menu_submenu", name]);
+    }
+    m.ok(exe, &["desktop", "folder-menu", "install"]);
+}
+
+#[test]
+fn uninstall_keep_files_removes_only_this_installations_launchers_aliases_and_folder_entries() {
+    let m = Machine::new();
+    let a = m.install("a", true);
+    let b = m.install("b", true);
+    set_up(&m, &a, "gpa", None);
+    set_up(&m, &b, "gpb", None);
+    m.ok(&a, &["path", "add"]);
+    m.ok(&b, &["path", "add"]);
+
+    let launchers = m.desktop_files();
+    assert_eq!(launchers.len(), 2, "{launchers:?}");
+    assert_eq!(names(&m.scripts()).len(), 2, "{:?}", names(&m.scripts()));
+    assert!(m.bin().join("gpa").exists() && m.bin().join("gpb").exists());
+
+    let out = m.ok(&a, &["uninstall", "--keep-files"]);
+    assert_eq!(out["kept_files"], true);
+    assert_eq!(out["aliases_removed"], serde_json::json!(["gpa"]), "{out}");
+
+    // A's alias, launcher and folder entry are gone; B keeps all three.
+    assert!(std::fs::symlink_metadata(m.bin().join("gpa")).is_err());
+    assert!(std::fs::symlink_metadata(m.bin().join("gpb")).is_ok());
+    let left = m.desktop_files();
+    assert_eq!(left.len(), 1, "{left:?}");
+    assert!(launchers.contains(&left[0]));
+    assert_eq!(names(&m.scripts()).len(), 1, "{:?}", names(&m.scripts()));
+    assert!(a.exists(), "--keep-files deletes nothing");
+    // The alias folder stays on the PATH while B has an alias there.
+    let rc: String = [".bashrc", ".zshrc", ".profile"]
+        .iter()
+        .filter_map(|f| std::fs::read_to_string(m.scratch().join("home").join(f)).ok())
+        .collect();
+    assert!(rc.contains(".local/bin"), "PATH kept for B: {rc}");
+
+    // B was untouched: its own uninstall finds and removes exactly its own.
+    let out = m.ok(&b, &["uninstall", "--keep-files"]);
+    assert_eq!(out["aliases_removed"], serde_json::json!(["gpb"]), "{out}");
+    assert!(std::fs::symlink_metadata(m.bin().join("gpb")).is_err());
+    assert!(m.desktop_files().is_empty());
+    assert!(names(&m.scripts()).is_empty());
+}
+
+#[test]
+fn uninstall_keep_files_works_without_a_marker_and_files_still_need_one() {
+    let m = Machine::new();
+    let dev = m.install("dev", false);
+    set_up(&m, &dev, "gpd", None);
+    assert!(std::fs::symlink_metadata(m.bin().join("gpd")).is_ok());
+
+    // Deleting files is refused for a build without a marker, nothing is touched.
+    let (ok, out) = m.run(&dev, &["uninstall"]);
+    assert!(!ok);
+    assert!(
+        out["error"].as_str().unwrap().contains("not a release"),
+        "{out}"
+    );
+    assert!(std::fs::symlink_metadata(m.bin().join("gpd")).is_ok());
+    assert!(dev.exists());
+
+    // Cleaning up the launchers and aliases needs no marker.
+    let out = m.ok(&dev, &["uninstall", "--keep-files"]);
+    assert_eq!(out["aliases_removed"], serde_json::json!(["gpd"]), "{out}");
+    assert!(std::fs::symlink_metadata(m.bin().join("gpd")).is_err());
+    assert!(m.desktop_files().is_empty());
+    assert!(names(&m.scripts()).is_empty());
+    assert!(dev.exists(), "the program stays");
+}
+
+#[test]
+fn uninstall_leaves_a_shared_submenu_used_by_another_installation() {
+    let m = Machine::new();
+    let a = m.install("a", true);
+    let b = m.install("b", true);
+    set_up(&m, &a, "gpa", Some("Dev tools"));
+    set_up(&m, &b, "gpb", Some("dev tools "));
+    let shared = names(&m.scripts());
+    assert_eq!(folders(&shared), 1, "one shared submenu folder: {shared:?}");
+    assert_eq!(shared.len() - 1, 2, "{shared:?}");
+
+    m.ok(&a, &["uninstall", "--keep-files"]);
+    let after = names(&m.scripts());
+    assert_eq!(folders(&after), 1, "{after:?}");
+    assert_eq!(after.len() - 1, 1, "{after:?}");
+
+    // The last one out takes the empty container with it.
+    m.ok(&b, &["uninstall", "--keep-files"]);
+    assert!(names(&m.scripts()).is_empty(), "{:?}", names(&m.scripts()));
+}
+
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();

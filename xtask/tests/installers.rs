@@ -143,6 +143,10 @@ fn the_msi_ships_every_program_and_the_policy_properties() {
         assert!(wxs.contains(property), "{property}");
     }
     assert!(wxs.contains("SOFTWARE\\Policies\\GitPoulpi\\Updates"));
+    // Removal runs `uninstall --keep-files` as the user and never fails the removal.
+    assert!(wxs.contains("uninstall --keep-files"));
+    assert!(wxs.contains("Impersonate=\"yes\"") && wxs.contains("Return=\"ignore\""));
+    assert!(wxs.contains("REMOVE=&quot;ALL&quot;"));
     assert_channel("msi");
 }
 
@@ -318,6 +322,12 @@ fn the_package_templates_name_the_release_assets_and_ship_every_binary() {
         !scoop.contains("Remove-Item"),
         "scoop must not delete the marker"
     );
+    // Removal undoes this installation's launchers, aliases and folder entries (never an update's old version).
+    assert!(
+        scoop.contains("\"pre_uninstall\"") && scoop.contains("uninstall --keep-files"),
+        "scoop pre_uninstall"
+    );
+    assert!(scoop.contains("$cmd -eq 'uninstall'"));
     // Chocolatey and winget run the Inno installer with /CHANNEL=, which the script writes into the marker.
     for (file, channel) in [
         (

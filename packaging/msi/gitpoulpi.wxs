@@ -104,6 +104,18 @@
       </Component>
     </ComponentGroup>
 
+    <!-- On removal, the installing user's launchers, aliases and folder-menu entries go the way Settings
+         removes them (`uninstall --keep-files`; the files are the MSI's). Impersonated: as SYSTEM the user's
+         Start menu and registry are out of reach, so a removal run by another account leaves them as orphans
+         that the other installations list with "Forget". Never fails the removal, and skipped on an upgrade. -->
+    <CustomAction Id="GitPoulpiUninstall" Directory="INSTALLFOLDER"
+                  ExeCommand="&quot;[INSTALLFOLDER]gitpoulpi.exe&quot; uninstall --keep-files"
+                  Execute="deferred" Impersonate="yes" Return="ignore" />
+    <InstallExecuteSequence>
+      <Custom Action="GitPoulpiUninstall" Before="RemoveFiles"
+              Condition="REMOVE=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE" />
+    </InstallExecuteSequence>
+
     <Feature Id="Main" Title="GitPoulpi" Level="1">
       <ComponentGroupRef Id="Programs" />
       <ComponentGroupRef Id="PathEntry" />

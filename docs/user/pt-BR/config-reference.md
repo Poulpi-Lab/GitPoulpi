@@ -568,6 +568,15 @@ As branches que a detecção proativa de conflitos pode tomar como base da branc
 
 Qual lista um repositório segue fica no `repo-state.toml` dele (abaixo). Precedência: os padrões próprios do repositório, depois a lista com nome que ele segue, depois `default_list`, depois `**`.
 
+## `[installation]` (uma entrada por GitPoulpi nesta máquina)
+
+Várias instalações podem compartilhar um só `config.toml` (um pacote, um checkout de desenvolvimento, uma build do cargo, um arquivo descompactado). Cada uma é identificada pela sua pasta (um id hexadecimal de 16 dígitos) e guarda a própria aparência e os próprios nomes em `[installation.settings.<id>]`, então a cor ou os aliases de uma instalação nunca mudam os de outra. Ninguém é a instalação principal até você escolher uma; a principal fica com os nomes de lançador simples `GitPoulpi` e as chaves compartilhadas `ui.logo_color`, `ui.command_alias` e `ui.command_alias_add`, que as builds mais antigas leem. Escrito pelo próprio GitPoulpi (e por `set_installation_in_file`), não por `config set`.
+
+| Chave | Padrão | Valores e efeito |
+|---|---|---|
+| `installation.primary` | ausente | O id da instalação principal. Ausente: nenhuma. |
+| `installation.settings.<id>` | nenhuma | Uma tabela por instalação: `path` (a pasta dela, atualizada quando muda de lugar), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informativo), `name` (o nome do lançador, `GitPoulpi (<label>)`, fixado na primeira execução), `name_with_version` (desligado: acrescenta `<major>.<minor>` ao nome), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (vazio: a entrada do menu de pastas fica na raiz), `env` (vazio: o próprio id; instalações que compartilham um nome compartilham daemons, sessões e histórico de desfazer), `mcp_bind` (vazio: `mcp.bind`). Um valor vazio recorre a `ui.*` para a principal, senão ao padrão do tipo (um checkout de desenvolvimento usa `sun`). |
+
 ## `[keybindings]`
 
 Remapeia os atalhos da TUI; Configurações > Teclado e mouse o edita.

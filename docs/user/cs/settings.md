@@ -409,7 +409,8 @@ obsahují; viz [MCP a agenti](mcp-and-agents.md).
 | Volba | Co dělá |
 |---|---|
 | **Server MCP** | Zapnuto (výchozí): agent může spustit server (`gitpoulpi mcp serve`). Vypnuto: odmítne startovat. Ukládá se jako `mcp.enabled`. Změna se projeví při dalším spuštění serveru agentem; již běžící server si ponechá svá nastavení. |
-| **Port serveru MCP** | Port, na kterém `--http` naslouchá, není-li zadána adresa, 1 až 65535 (výchozí 8808). Ukládá se do portu `mcp.bind`; jeho hostitelská část zůstává (`127.0.0.1`, je-li prázdná). Projeví se při dalším spuštění serveru agentem. |
+| **Port serveru MCP** | Port, na kterém `--http` naslouchá, není-li zadána adresa, 1 až 65535 (výchozí 8808). Ukládá se do portu `mcp.bind`; jeho hostitelská část zůstává (`127.0.0.1`, je-li prázdná). Projeví se při dalším spuštění serveru agentem. Instalace s vlastní adresou MCP upravuje tu. |
+| **Navrhnout volný port** | Najde volný port na stejné adrese hostitele a uloží ho jako adresu MCP této instalace (`mcp.bind` u hlavní instalace bez přepsání). Na port běží jeden HTTP server MCP: druhá instalace na už používaném portu odmítne nastartovat, proto tímto zvolte jiný. Také v paletě jako *MCP: Navrhnout volný port*. |
 | **Povolit AI agentům ovládat zobrazení** | Umožní agentům ukázat vám v tomto okně commit, soubor nebo oznámení (`ui show`). Vypnuto: žádný agent okno neovlivní. |
 | **Nechat AI agenty navrhovat změny k mému potvrzení** | Umožní agentům otevírat předvyplněné dialogy Reword, commit, větev nebo tag, které potvrdíte vy. Ve výchozím stavu vypnuto. Viz [MCP a agenti](mcp-and-agents.md#oprávnění). |
 | **Otevřít okno pro agenty**, **Příkaz ke spuštění (custom)** | Zda smí agent otevřít okno GitPoulpi, když žádné není otevřené, a pomocí kterého terminálu nebo multiplexeru. Ve výchozím stavu vypnuto. |

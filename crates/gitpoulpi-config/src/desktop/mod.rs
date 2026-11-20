@@ -391,7 +391,7 @@ pub fn sync_pinned(dirs: &Dirs, req: &Request) -> bool {
 pub fn remove(place: Place, dirs: &Dirs, os: Os, ctx: &InstallCtx) -> Result<bool, String> {
     match os {
         Os::Linux => linux::remove(place, dirs, ctx),
-        Os::Windows => windows::remove(place, dirs),
+        Os::Windows => windows::remove(place, dirs, ctx),
         Os::Macos => macos::remove(place, dirs, ctx),
     }
 }
@@ -425,10 +425,32 @@ pub fn ico_path(dirs: &Dirs, icons: &IconSet) -> PathBuf {
     windows::ico_path(dirs, icons)
 }
 
+/// [`ico_path`] for `ctx`: the primary keeps `gitpoulpi-<hash>.ico`, every
+/// other installation gets `gitpoulpi-i<8hex>-<hash>.ico`.
+pub fn ico_path_for(dirs: &Dirs, icons: &IconSet, ctx: &InstallCtx) -> PathBuf {
+    windows::ico_path_for(dirs, icons, ctx)
+}
+
+/// [`ensure_ico`] for `ctx`.
+pub fn ensure_ico_for(dirs: &Dirs, icons: &IconSet, ctx: &InstallCtx) -> Option<PathBuf> {
+    windows::ensure_ico(dirs, icons, ctx)
+}
+
+/// Windows, primary handover: renames the old primary's legacy-named
+/// shortcuts (Start menu, Desktop) to its own name, contents untouched, and
+/// tells the shell. `old` is the installation that was primary. Elsewhere, and
+/// when there is nothing to rename: an empty list.
+pub fn hand_over_shortcuts(dirs: &Dirs, os: Os, old: &InstallCtx) -> Result<Vec<PathBuf>, String> {
+    match os {
+        Os::Windows => windows::hand_over(dirs, old),
+        _ => Ok(Vec::new()),
+    }
+}
+
 /// Windows: makes sure the `.ico` for `icons` exists and returns its path
 /// (`None` for no icons or when it cannot be written).
 pub fn ensure_ico(dirs: &Dirs, icons: &IconSet) -> Option<PathBuf> {
-    windows::ensure_ico(dirs, icons)
+    windows::ensure_ico(dirs, icons, InstallCtx::legacy_ref())
 }
 
 /// Writes `bytes`, creating parents; `executable` sets mode 755 on Unix.

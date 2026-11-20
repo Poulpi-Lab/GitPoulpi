@@ -1254,9 +1254,9 @@ stage_file = "z"
 | Лаунчер: убрать из PATH |  |
 | Лаунчер: установить меню «Открыть в GitPoulpi» |  |
 | Лаунчер: удалить меню «Открыть в GitPoulpi» |  |
-| Launcher: Become the Primary Installation |  |
-| Launcher: Remove Legacy Launchers |  |
-| Launcher: Forget Gone Installations |  |
+| Лаунчер: сделать основной установкой |  |
+| Лаунчер: удалить устаревшие лаунчеры |  |
+| Лаунчер: забыть удалённые установки |  |
 | Приложение: сменить цветовую тему графа... | `Ctrl+N T` |
 | Приложение: переключить подсветку строк графа | `Ctrl+N Y` |
 <!-- palette:end -->

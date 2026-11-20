@@ -37,5 +37,5 @@ pub use replay::undo_redo;
 pub use restore::{reflog_restore, restore_entry};
 pub use start_over::{forget_staging_above, start_over_target};
 pub use state::{read_list, read_state, state_after_mutation};
-pub use store::git_dir;
 pub(crate) use store::in_progress;
+pub use store::{git_dir, set_env};

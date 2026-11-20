@@ -84,6 +84,9 @@ fn real_main() {
     // User-only app directories (best effort, once per start).
     if let Some(paths) = gitpoulpi_config::ConfigPaths::discover() {
         gitpoulpi_config::secure_fs::harden_app_dirs(&paths);
+        // The undo journal of every daemon this process runs (embedded,
+        // standalone, TUI) lives under this installation's environment.
+        gitpoulpi_daemon::set_journal_env(paths.env());
     }
     let cli = cli::parse_localized();
     if cli.add.is_some() && cli.command.is_some() {

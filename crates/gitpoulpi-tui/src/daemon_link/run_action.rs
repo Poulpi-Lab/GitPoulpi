@@ -68,6 +68,19 @@ pub(super) async fn run_action(
             let _ = action_error_tx.send_notify(error_text::pending_autostash(&operation, stash.0));
             false
         }
+        // The window's own fetch met a git lock (another installation or a
+        // shell `git` writing the refs): skipped silently, retried at the
+        // next interval.
+        Err(e)
+            if crate::event_loop::fetch_policy::skip_silently(
+                matches!(original, Action::FetchAll)
+                    && crate::activity_log::background_fetch_pending(),
+                &e.to_string(),
+            ) =>
+        {
+            crate::activity_log::background_fetch_skipped(&conn.repo.root);
+            false
+        }
         Err(e) => {
             let context = failed_op.unwrap_or_else(|| original.op_context());
             crate::activity_log::report_failure(

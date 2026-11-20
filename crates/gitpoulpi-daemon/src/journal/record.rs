@@ -24,7 +24,22 @@ pub(super) fn release_pins(backend: &dyn GitBackend, repo: &RepoRef, entries: &[
             crate::opstate::remove(&dir, &os.after);
         }
     }
-    let pins: Vec<&Pin> = entries.iter().flat_map(|e| e.pins.iter()).collect();
+    // Only this environment's own pins: one adopted from the legacy journal
+    // (`store::adopt_legacy`) is still the old build's.
+    let own = super::store::current_env()
+        .map(|env| {
+            format!(
+                "{}{}",
+                gitpoulpi_core::domain::UNDO_PIN_PREFIX,
+                gitpoulpi_core::journal::env_pin_prefix(&env)
+            )
+        })
+        .unwrap_or_default();
+    let pins: Vec<&Pin> = entries
+        .iter()
+        .flat_map(|e| e.pins.iter())
+        .filter(|p| p.name.starts_with(&own))
+        .collect();
     if pins.is_empty() {
         return;
     }

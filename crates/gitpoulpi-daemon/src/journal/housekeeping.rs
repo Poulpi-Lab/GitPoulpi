@@ -80,7 +80,9 @@ pub(super) fn erase_history(backend: &dyn GitBackend, repo: &RepoRef) {
     // Only this worktree's pins: a linked worktree's journal lives apart
     // and keeps its own (`pin_name`).
     let ns = git_dir(&repo.root)
-        .map(|d| gitpoulpi_core::journal::pin_namespace(&d))
+        .map(|d| {
+            gitpoulpi_core::journal::pin_namespace_in(&d, super::store::current_env().as_deref())
+        })
         .unwrap_or_default();
     let all: Vec<_> = snapshot
         .refs
@@ -89,11 +91,7 @@ pub(super) fn erase_history(backend: &dyn GitBackend, repo: &RepoRef) {
             let rest = name
                 .strip_prefix(gitpoulpi_core::domain::UNDO_PIN_PREFIX)
                 .unwrap_or("");
-            if ns.is_empty() {
-                rest.starts_with(|c: char| c.is_ascii_digit())
-            } else {
-                rest.starts_with(&ns)
-            }
+            gitpoulpi_core::journal::pin_in_namespace(&ns, rest)
         })
         .map(|(name, oid)| gitpoulpi_core::domain::RefUpdate::Delete {
             name: name.clone(),

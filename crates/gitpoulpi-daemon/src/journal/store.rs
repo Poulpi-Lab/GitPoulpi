@@ -16,8 +16,114 @@ pub fn git_dir(root: &Path) -> Option<PathBuf> {
     gitpoulpi_core::paths::git_dir(root)
 }
 
+/// The environment (the installations design, 1.5) this process keeps its
+/// undo journal in: `None` (the flat layout, where the journal and its pins
+/// stay exactly where builds without environments put them) until the real
+/// program calls [`set_env`], so in-process tests never depend on the
+/// machine's own installation.
+pub(crate) fn current_env() -> Option<String> {
+    ENV.read().unwrap_or_else(|e| e.into_inner()).clone()
+}
+
+static ENV: std::sync::RwLock<Option<String>> = std::sync::RwLock::new(None);
+
+/// See `crate::set_journal_env`.
+pub fn set_env(env: Option<&str>) {
+    *ENV.write().unwrap_or_else(|e| e.into_inner()) = env.map(str::to_owned);
+}
+
+/// `<git-dir>/gitpoulpi/<what>` in the flat layout, and
+/// `<git-dir>/gitpoulpi/env/<env>/<what>` in the environment layout.
+pub(super) fn env_file(git_dir: &Path, env: Option<&str>, what: &str) -> PathBuf {
+    let base = git_dir.join("gitpoulpi");
+    match env {
+        Some(env) => base.join("env").join(env).join(what),
+        None => base.join(what),
+    }
+}
+
 pub(super) fn journal_path(repo: &RepoRef) -> Option<PathBuf> {
-    git_dir(&repo.root).map(|dir| dir.join("gitpoulpi").join("journal.json"))
+    git_dir(&repo.root).map(|dir| env_file(&dir, current_env().as_deref(), "journal.json"))
+}
+
+/// A journal file's git directory and environment (`None` for the flat
+/// `<git-dir>/gitpoulpi/journal.json`).
+fn locate(path: &Path) -> Option<(PathBuf, Option<String>)> {
+    let dir = path.parent()?;
+    let up = dir.parent()?;
+    if up.file_name().is_some_and(|n| n == "env") {
+        let env = dir.file_name()?.to_string_lossy().into_owned();
+        Some((up.parent()?.parent()?.to_path_buf(), Some(env)))
+    } else {
+        Some((up.to_path_buf(), None))
+    }
+}
+
+/// Marks that the legacy journal of a repository has been adopted.
+const ADOPTED_MARKER: &str = "legacy-journal-adopted";
+
+/// The first environment that opens a repository adopts the legacy journal
+/// (`<git-dir>/gitpoulpi/journal.json`, written by builds without
+/// environments) BY COPY: the file stays for old builds, and a marker
+/// (`legacy-journal-adopted`, beside it) makes this happen once per
+/// repository, however many environments come later.
+///
+/// The copied entries keep their legacy pin names
+/// (`refs/gitpoulpi/undo/<id>/<n>`), referenced read-only. Re-pointing them
+/// into the environment's namespace would need a backend (this runs while
+/// the journal is read) and could leave half of the copies behind. Instead
+/// `release_pins` never deletes a pin outside the environment's own
+/// namespace, so an old build that is still running keeps the pins of its
+/// journal, and the history-rewrite purge, which scans the whole
+/// `refs/gitpoulpi/undo/` prefix, still finds every pin (`purge::pin_owner`
+/// resolves a legacy pin through the entry that lists it). If the old build
+/// later prunes an entry, the adopted copy's undo of it refuses (its
+/// snapshot is gone); nothing is corrupted.
+fn adopt_legacy(path: &Path) {
+    let Some((root, Some(env))) = locate(path) else {
+        return;
+    };
+    if path.exists() {
+        return;
+    }
+    let base = root.join("gitpoulpi");
+    let marker = base.join(ADOPTED_MARKER);
+    let legacy = base.join("journal.json");
+    if marker.exists() || !legacy.is_file() {
+        return;
+    }
+    // Another environment already has its own history: this one is not the
+    // first to open the repository.
+    for sibling in std::fs::read_dir(base.join("env"))
+        .into_iter()
+        .flatten()
+        .flatten()
+    {
+        if sibling.file_name().to_string_lossy() != env
+            && sibling.path().join("journal.json").exists()
+        {
+            return;
+        }
+    }
+    let Ok(text) = std::fs::read_to_string(&legacy) else {
+        return;
+    };
+    // Unreadable or of another version: left alone, nothing adopted.
+    if !serde_json::from_str::<Journal>(&text).is_ok_and(|j| j.version == JOURNAL_VERSION) {
+        return;
+    }
+    let copy = || -> std::io::Result<()> {
+        if let Some(dir) = path.parent() {
+            std::fs::create_dir_all(dir)?;
+        }
+        let tmp = path.with_extension(format!("json.adopt{}", std::process::id()));
+        std::fs::write(&tmp, text.as_bytes())?;
+        std::fs::rename(&tmp, path)?;
+        std::fs::write(&marker, env.as_bytes())
+    };
+    if let Err(e) = copy() {
+        tracing::warn!("could not adopt the legacy undo journal: {e}");
+    }
 }
 
 /// Reads the journal; a missing file is an empty one. A version this
@@ -26,6 +132,7 @@ pub(super) fn load(path: &Path) -> std::result::Result<Journal, String> {
     if let Some(journal) = crate::journal_store::cached(path) {
         return Ok(journal);
     }
+    adopt_legacy(path);
     // The stamp is taken before the read: a write landing in between
     // makes the copy look stale next time, never fresh.
     let stamp = crate::journal_store::stamp(path);
@@ -54,10 +161,10 @@ pub(super) fn load(path: &Path) -> std::result::Result<Journal, String> {
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Journal::default(),
         Err(e) => return Err(format!("could not read {}: {e}", path.display())),
     };
-    journal.pin_ns = path
-        .parent()
-        .and_then(Path::parent)
-        .map(gitpoulpi_core::journal::pin_namespace)
+    let located = locate(path);
+    journal.pin_ns = located
+        .as_ref()
+        .map(|(dir, env)| gitpoulpi_core::journal::pin_namespace_in(dir, env.as_deref()))
         .unwrap_or_default();
     let first_time = RECOVERED
         .lock()
@@ -66,10 +173,9 @@ pub(super) fn load(path: &Path) -> std::result::Result<Journal, String> {
         .insert(path.to_path_buf());
     // A conflicted merge or rebase keeps its `Pending` entry across a
     // restart: it is finished (or dropped) when the operation ends.
-    let running = path
-        .parent()
-        .and_then(Path::parent)
-        .is_some_and(|git_dir| in_progress(git_dir).is_some());
+    let running = located
+        .as_ref()
+        .is_some_and(|(git_dir, _)| in_progress(git_dir).is_some());
     if first_time && !running && journal.recover() {
         let _ = save(path, &journal);
     } else {

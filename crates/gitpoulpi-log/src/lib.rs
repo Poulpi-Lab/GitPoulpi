@@ -141,6 +141,14 @@ fn unescape_repo(text: &str) -> String {
 impl Record {
     /// The record as its one text line (plus tab-led continuation lines).
     pub fn to_line(&self) -> String {
+        self.to_line_in(None)
+    }
+
+    /// [`Self::to_line`] tagged with the environment of the writing process
+    /// (`env=<8hex>`, after the `[process:pid]` tag): several installations
+    /// append to one daily file (the installations design, 1.5). `None` (the
+    /// flat layout) writes the line as builds without environments did.
+    pub fn to_line_in(&self, env_tag: Option<&str>) -> String {
         let when = DateTime::<Utc>::from_timestamp_millis(self.ts_ms)
             .unwrap_or_default()
             .with_timezone(&Local)
@@ -151,8 +159,9 @@ impl Record {
             .as_deref()
             .map(|r| format!("|{}", escape_repo(r)))
             .unwrap_or_default();
+        let env = env_tag.map(|t| format!("env={t} ")).unwrap_or_default();
         format!(
-            "{when} {:<5} [{}:{}{repo}] {}: {message}",
+            "{when} {:<5} [{}:{}{repo}] {env}{}: {message}",
             self.level.as_str(),
             self.process,
             self.pid,
@@ -219,6 +228,7 @@ fn parse_line(line: &str) -> Option<Record> {
         Some((pid, repo)) => (pid, Some(unescape_repo(repo))),
         None => (pid, None),
     };
+    let rest = strip_env_tag(rest).1;
     let (target, message) = rest.split_once(": ").unwrap_or(("", rest));
     Some(Record {
         ts_ms,
@@ -229,6 +239,24 @@ fn parse_line(line: &str) -> Option<Record> {
         message: message.to_string(),
         repo,
     })
+}
+
+/// Splits a leading `env=<8hex> ` off what follows a line's tag.
+fn strip_env_tag(rest: &str) -> (Option<&str>, &str) {
+    if let Some(after) = rest.strip_prefix("env=") {
+        if let Some((tag, tail)) = after.split_once(' ') {
+            if tag.len() == 8 && tag.bytes().all(|b| b.is_ascii_hexdigit()) {
+                return (Some(tag), tail);
+            }
+        }
+    }
+    (None, rest)
+}
+
+/// The `env=<8hex>` tag of a log line, `None` for a line without one.
+pub fn line_env(line: &str) -> Option<String> {
+    let rest = line.split_once("] ")?.1;
+    strip_env_tag(rest).0.map(str::to_string)
 }
 
 /// The records as text, one line each, oldest first.
@@ -266,6 +294,9 @@ pub struct Logger {
     level: AtomicU8,
     max_file_bytes: Arc<AtomicU64>,
     process: &'static str,
+    /// `<8hex>` of the environment this process runs in, written on every
+    /// line; `None` in the flat layout.
+    env_tag: Option<String>,
     dir: Option<PathBuf>,
     tx: Option<Mutex<mpsc::Sender<Msg>>>,
     ring: Mutex<VecDeque<Record>>,
@@ -275,6 +306,13 @@ impl Logger {
     /// Starts the writer thread when there is a directory. Pruning old files
     /// runs on a thread of its own: opening the app never waits for the disk.
     pub fn new(options: Options) -> Arc<Logger> {
+        let env =
+            gitpoulpi_config::ConfigPaths::discover().and_then(|p| p.env().map(str::to_owned));
+        Self::new_for_env(options, env.as_deref())
+    }
+
+    /// [`Logger::new`] for an explicit environment (`None`: the flat layout).
+    pub fn new_for_env(options: Options, env: Option<&str>) -> Arc<Logger> {
         let max = Arc::new(AtomicU64::new(options.max_file_bytes.max(1024)));
         let tx = options.dir.clone().map(|dir| {
             let retention = options.retention_days.max(1);
@@ -295,6 +333,7 @@ impl Logger {
             level: AtomicU8::new(options.level as u8),
             max_file_bytes: max,
             process: options.process,
+            env_tag: env.map(gitpoulpi_core::journal::env_tag),
             dir: options.dir,
             tx,
             ring: Mutex::new(VecDeque::new()),
@@ -344,7 +383,7 @@ impl Logger {
             repo: repo.filter(|r| !r.is_empty()).map(str::to_string),
         };
         if let Some(tx) = &self.tx {
-            let line = record.to_line();
+            let line = record.to_line_in(self.env_tag.as_deref());
             if let Ok(tx) = tx.lock() {
                 let _ = tx.send(Msg::Line(line));
             }
@@ -783,6 +822,39 @@ mod tests {
         assert_eq!(parse_records(&format!("{text}\n")), vec![r]);
         // Garbage lines are skipped, not fatal.
         assert!(parse_records("not a record\n\tstray continuation").is_empty());
+    }
+
+    #[test]
+    fn log_lines_carry_the_env() {
+        let dir = tempfile::tempdir().unwrap();
+        let options = |d: &Path| Options {
+            dir: Some(d.to_path_buf()),
+            level: Level::Info,
+            retention_days: 1,
+            max_file_bytes: 1024 * 1024,
+            process: "test",
+        };
+        let tagged = Logger::new_for_env(options(dir.path()), Some("beta"));
+        tagged.emit(Level::Info, "t", "from beta");
+        tagged.flush();
+        let text = read_tail(&dir.path().join(file_name_days_ago(0)));
+        let line = text.lines().next().unwrap();
+        let tag = gitpoulpi_core::journal::env_tag("beta");
+        assert_eq!(tag.len(), 8);
+        assert_eq!(line_env(line).as_deref(), Some(tag.as_str()), "{line}");
+        // It still parses as the same record.
+        let parsed = parse_records(&format!("{line}\n"));
+        assert_eq!(
+            (parsed[0].target.as_str(), parsed[0].message.as_str()),
+            ("t", "from beta")
+        );
+        // The flat layout writes today's line, untagged.
+        let flat_dir = tempfile::tempdir().unwrap();
+        let flat = Logger::new_for_env(options(flat_dir.path()), None);
+        flat.emit(Level::Info, "t", "flat");
+        flat.flush();
+        let text = read_tail(&flat_dir.path().join(file_name_days_ago(0)));
+        assert_eq!(line_env(text.lines().next().unwrap()), None);
     }
 
     #[test]

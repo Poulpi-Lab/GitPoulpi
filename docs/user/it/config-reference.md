@@ -546,6 +546,15 @@ I branch che il rilevamento proattivo dei conflitti può prendere come base del 
 
 La lista che un repository segue sta nel suo `repo-state.toml` (qui sotto). Precedenza: i pattern propri del repository, poi la lista con nome che segue, poi `default_list`, poi `**`.
 
+## `[installation]` (una voce per ogni GitPoulpi di questa macchina)
+
+Più installazioni possono condividere un solo `config.toml` (un pacchetto, un checkout di sviluppo, una build di cargo, un archivio decompresso). Ognuna è identificata dalla sua cartella (un id esadecimale di 16 cifre) e conserva aspetto e nomi propri in `[installation.settings.<id>]`, così il colore o gli alias di un'installazione non cambiano mai quelli di un'altra. Nessuna è l'installazione principale finché non ne scegli una; quella principale possiede i nomi semplici dei launcher `GitPoulpi` e le chiavi condivise `ui.logo_color`, `ui.command_alias` e `ui.command_alias_add`, che le versioni più vecchie leggono. Scritta da GitPoulpi stesso (e da `set_installation_in_file`), non da `config set`.
+
+| Chiave | Predefinito | Valori ed effetto |
+|---|---|---|
+| `installation.primary` | assente | L'id dell'installazione principale. Assente: nessuna. |
+| `installation.settings.<id>` | nessuna | Una tabella per installazione: `path` (la sua cartella, aggiornata quando si sposta), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informativo), `name` (il nome del launcher, `GitPoulpi (<etichetta>)`, fissato al primo avvio), `name_with_version` (disattivato: aggiunge `<maggiore>.<minore>` al nome), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (vuoto: la voce del menu cartelle sta nella radice), `env` (vuoto: il proprio id; le installazioni con lo stesso nome condividono daemon, sessioni e cronologia di annullamento), `mcp_bind` (vuoto: `mcp.bind`). Un valore vuoto ricade su `ui.*` per l'installazione principale, altrimenti sul predefinito del tipo (un checkout di sviluppo porta `sun`). |
+
 ## `[keybindings]`
 
 Riassegna le scorciatoie della TUI; le modifichi in Impostazioni > Tastiera e mouse.

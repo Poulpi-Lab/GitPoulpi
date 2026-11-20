@@ -194,6 +194,22 @@ mantiene ed `Esc` ripristina la precedente.
 La pagina **Launcher** (`gitpoulpi ui show settings launcher`) crea un collegamento che avvia
 GitPoulpi dal launcher del sistema, nel terminale che scegli.
 
+**Questa installazione** (il primo gruppo della pagina). Ogni GitPoulpi di una macchina (un checkout di sviluppo, un pacchetto, una copia portatile) ha il proprio nome del launcher, colore, alias e voce del menu cartelle, conservati nella propria tabella `[installation.settings.<id>]` di `config.toml`; cambiarne una qui non tocca mai un'altra installazione. Niente di tutto questo viene registrato nel registro di annullamento (è integrazione di sistema; **Rimuovi** è la via del ritorno).
+
+| Riga | Cosa fa |
+|---|---|
+| **Installazione** | Sola lettura: il tipo, la cartella e l'ambiente di questa installazione. In una pagina stretta la cartella viene tagliata a metà con dei puntini di sospensione; la riga di aiuto sotto la riga ha il testo completo. |
+| **Nome del launcher** | Il nome dei collegamenti di questa installazione e della sua voce del menu cartelle. Rifiutato se un'altra installazione ancora esistente ha quel nome. L'installazione principale si chiama sempre `GitPoulpi`. |
+| **Includi la versione nel nome del launcher** | Aggiunge `<maggiore>.<minore>` al nome (`GitPoulpi 1.2`); disattivato per impostazione predefinita, perché i collegamenti vengono rinominati a ogni aggiornamento. |
+| **Colore del polpo** | Il colore del polpo di questa installazione e dei suoi collegamenti (le stesse scelte della finestra Informazioni). |
+| **Diventa quella principale** | L'installazione principale possiede il nome semplice `GitPoulpi`, i collegamenti legacy e le chiavi `ui.*` lette dalle versioni più vecchie; per impostazione predefinita nessuna lo è. Chiede conferma se lo è già un'altra. L'installazione principale precedente mantiene i propri launcher con il proprio nome (Windows e Linux). |
+| **Ambiente** | Le installazioni di uno stesso ambiente condividono finestre, daemon e cronologia di annullamento; il predefinito è quello proprio dell'installazione. Cambiarlo richiede di riavviare le finestre aperte di questa installazione. |
+| **Sottomenu del menu cartelle** | Raggruppa la voce del menu cartelle in un sottomenu con quel nome; le installazioni che usano lo stesso nome ne condividono uno. Non disponibile su macOS; Nemo e Thunar mostrano sempre la voce nella radice. |
+| **Altra: \<nome\>** | Le altre installazioni di questa macchina. Quella la cui cartella non esiste più ha un pulsante **Dimentica** (chiede conferma) che rimuove la sua voce e i launcher, gli alias e le voci del menu cartelle che ha lasciato. |
+| **Launcher legacy** | Finché nessuna è quella principale, i launcher creati da una versione più vecchia con il nome semplice sono elencati con **Diventa quella principale** e **Rimuovi i launcher legacy** (chiede conferma). Una nota una tantum nella riga di stato rimanda qui. |
+
+La palette ha **Launcher: Diventa l'installazione principale**, **Launcher: Rimuovi i launcher legacy** e **Launcher: Dimentica le installazioni scomparse**, e ogni riga è una voce `Impostazioni:`. Le righe degli alias del comando qui sotto sono quelle di questa installazione (`gpd` / `gpda` vengono suggeriti per un checkout di sviluppo); un alias creato da un'altra installazione riporta **Usato da \<nome\>** e non può essere creato qui.
+
 | Riga | Cosa fa |
 |---|---|
 | **Terminale dei collegamenti** | `ui.launch_terminal`: **Automatico**, **Predefinito del sistema** o uno dei terminali trovati su questa macchina (lo stesso rilevamento di **Apri in**). Automatico: Windows Terminal su Windows (altrimenti WezTerm, Alacritty, la console semplice), `xdg-terminal-exec` su Linux (Omarchy; altrimenti il primo terminale trovato), Terminal su macOS, a meno che non siano installati iTerm2, Ghostty, WezTerm o kitty. |

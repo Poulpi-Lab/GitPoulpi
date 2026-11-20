@@ -472,6 +472,15 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 
 リポジトリがどの一覧に従うかは、その `repo-state.toml` にあります（下記）。優先順位：リポジトリ自身のパターン、従っている名前付きの一覧、`default_list`、`**` の順です。
 
+## `[installation]`（このマシンの GitPoulpi ごとに1項目）
+
+複数のインストール（パッケージ、開発用のチェックアウト、cargo のビルド、展開したアーカイブ）が、1つの `config.toml` を共有できます。各インストールはフォルダー（16桁の16進数の ID）で識別され、見た目と名前を `[installation.settings.<id>]` に個別に保持するため、あるインストールの色やエイリアスが他のインストールを変えることはありません。選ぶまでプライマリのインストールはなく、プライマリは `GitPoulpi` というランチャー名と、古いビルドが読む共有の `ui.logo_color`、`ui.command_alias`、`ui.command_alias_add` キーを所有します。GitPoulpi 自身（と `set_installation_in_file`）が書き込み、`config set` では書き込みません。
+
+| キー | 既定値 | 値と効果 |
+|---|---|---|
+| `installation.primary` | なし | プライマリのインストールの ID。なしの場合、プライマリはありません。 |
+| `installation.settings.<id>` | なし | インストールごとに1つのテーブル：`path`（フォルダー。移動すると更新されます）、`kind`（`dev`、`install`、`cargo`、`portable`、`pinned`）、`channel`（参考情報）、`name`（ランチャー名、`GitPoulpi (<label>)`。初回起動時に固定されます）、`name_with_version`（オフ：名前に `<major>.<minor>` を加えます）、`logo_color`、`command_alias`、`command_alias_add`、`folder_menu_submenu`（空：フォルダーメニューの項目は最上位に置かれます）、`env`（空：自分の ID。名前を共有するインストールは、デーモン、セッション、取り消し履歴を共有します）、`mcp_bind`（空：`mcp.bind`）。空の値は、プライマリでは `ui.*` に、それ以外ではその種類の既定値にフォールバックします（開発用のチェックアウトは `sun` を使います）。 |
+
 ## `[keybindings]`
 
 TUI のショートカットを割り当て直します。設定 > キーボードとマウスで編集できます。

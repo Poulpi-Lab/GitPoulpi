@@ -885,7 +885,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 検索: ワークスペース... | `Ctrl+Alt+F` |
 | 編集: 元に戻す | `Ctrl+Z` |
 | 編集: やり直す | `Ctrl+Y` |
-| 編集: ブロックされた元に戻す項目を履歴から外す |  |
+| ランチャー: 見つからないインストールの登録を削除 |  |
 | 編集: 元に戻す履歴... | `Alt+Z` |
 | 編集: Reflog... |  |
 | 編集: 失われたCommitsを復旧... |  |
@@ -1214,9 +1214,9 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | ランチャー: PATH から削除 |  |
 | ランチャー: 「GitPoulpi で開く」メニューをインストール |  |
 | ランチャー: 「GitPoulpi で開く」メニューを削除 |  |
-| Launcher: Become the Primary Installation |  |
-| Launcher: Remove Legacy Launchers |  |
-| Launcher: Forget Gone Installations |  |
+| ランチャー: プライマリのインストールにする |  |
+| ランチャー: 従来のランチャーを削除 |  |
+| ランチャー: 見つからないインストールの登録を削除 |  |
 | アプリ: グラフのカラーテーマを変更... | `Ctrl+N T` |
 | アプリ: グラフの行の色付けを切り替え | `Ctrl+N Y` |
 <!-- palette:end -->

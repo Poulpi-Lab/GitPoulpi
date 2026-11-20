@@ -147,6 +147,8 @@ fn split_crate(line: &str) -> (&str, &str, &str, &str) {
     let (name, rest) = line.split_once(' ').unwrap_or((line, ""));
     let (version, rest) = rest.split_once(' ').unwrap_or((rest, ""));
     let (url, license) = rest.split_once(' ').unwrap_or((rest, "?"));
+    // Semver build metadata (`1.2.1+spec-1.1.0`) only widens the column.
+    let version = version.split_once('+').map_or(version, |(v, _)| v);
     (
         name,
         version,
@@ -1323,6 +1325,11 @@ mod tests {
             )
         );
         assert_eq!(split_crate("x 1.0.0 - ?"), ("x", "1.0.0", "-", "?"));
+        assert_eq!(
+            split_crate("toml 1.2.1+spec-1.1.0 https://x MIT").1,
+            "1.2.1",
+            "build metadata is not displayed"
+        );
         assert_eq!(
             short_url("https://crates.io/crates/x/1.0.0"),
             "crates.io/crates/x/1.0.0"

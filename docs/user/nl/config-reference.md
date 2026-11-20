@@ -539,6 +539,15 @@ Welke branches de proactieve conflictdetectie als basis van de huidige branch ma
 
 Welke lijst een repository volgt, staat in zijn `repo-state.toml` (hieronder). Voorrang: de eigen patronen van de repository, dan de lijst die hij volgt, dan `default_list`, dan `**`.
 
+## `[installation]` (één item per GitPoulpi op deze machine)
+
+Meerdere installaties kunnen één `config.toml` delen (een pakket, een dev-checkout, een cargo-build, een uitgepakt archief). Elke installatie wordt herkend aan haar map (een hex-id van 16 cijfers) en bewaart haar eigen uiterlijk en namen in `[installation.settings.<id>]`, zodat de kleur of aliassen van de ene installatie die van een andere nooit wijzigen. Niemand is de primaire installatie tot je er een kiest; de primaire heeft de gewone starternamen `GitPoulpi` en de gedeelde sleutels `ui.logo_color`, `ui.command_alias` en `ui.command_alias_add`, die oudere versies lezen. Geschreven door GitPoulpi zelf (en `set_installation_in_file`), niet door `config set`.
+
+| Sleutel | Standaard | Waarden en effect |
+|---|---|---|
+| `installation.primary` | afwezig | De id van de primaire installatie. Afwezig: geen. |
+| `installation.settings.<id>` | geen | Eén tabel per installatie: `path` (haar map, bijgewerkt als ze verhuist), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informatief), `name` (de starternaam, `GitPoulpi (<label>)`, vastgelegd bij het eerste gebruik), `name_with_version` (uit: voeg `<major>.<minor>` aan de naam toe), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (leeg: het item van het bestandsbeheermenu staat op het hoofdniveau), `env` (leeg: haar eigen id; installaties met dezelfde naam delen daemons, sessies en ongedaanmaakgeschiedenis), `mcp_bind` (leeg: `mcp.bind`). Een lege waarde valt terug op `ui.*` voor de primaire, anders op de standaard van de soort (een dev-checkout draagt `sun`). |
+
 ## `[keybindings]`
 
 Herbindt de sneltoetsen van de TUI; Instellingen > Toetsenbord & muis bewerkt het.

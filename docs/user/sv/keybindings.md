@@ -1250,9 +1250,9 @@ Tangenterna är standardvärdena.
 | Startare: Ta bort från PATH |  |
 | Startare: Installera menyn Öppna i GitPoulpi |  |
 | Startare: Ta bort menyn Öppna i GitPoulpi |  |
-| Launcher: Become the Primary Installation |  |
-| Launcher: Remove Legacy Launchers |  |
-| Launcher: Forget Gone Installations |  |
+| Startare: Gör till primär installation |  |
+| Startare: Ta bort äldre startare |  |
+| Startare: Glöm borta installationer |  |
 | App: Byt färgtema för grafen... | `Ctrl+N T` |
 | App: Växla radfärgning i grafen | `Ctrl+N Y` |
 <!-- palette:end -->

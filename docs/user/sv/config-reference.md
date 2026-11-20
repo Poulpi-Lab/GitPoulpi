@@ -544,6 +544,15 @@ Vilka grenar proaktiv konfliktdetektering får ta som bas för den aktuella gren
 
 Vilken lista ett repository följer finns i dess `repo-state.toml` (nedan). Företräde: repositoryts egna mönster, sedan den namngivna lista det följer, sedan `default_list`, sedan `**`.
 
+## `[installation]` (en post per GitPoulpi på den här datorn)
+
+Flera installationer kan dela en `config.toml` (ett paket, en dev-utcheckning, ett cargo-bygge, ett uppackat arkiv). Varje installation identifieras av sin mapp (ett hexadecimalt id på 16 siffror) och har sitt eget utseende och sina egna namn i `[installation.settings.<id>]`, så en installations färg eller alias ändrar aldrig en annans. Ingen är den primära installationen förrän du väljer en; den primära äger de vanliga startarnamnen `GitPoulpi` och de delade nycklarna `ui.logo_color`, `ui.command_alias` och `ui.command_alias_add`, som äldre byggen läser. Skrivs av GitPoulpi själv (och `set_installation_in_file`), inte av `config set`.
+
+| Nyckel | Standard | Värden och effekt |
+|---|---|---|
+| `installation.primary` | saknas | Id:t för den primära installationen. Saknas: ingen. |
+| `installation.settings.<id>` | ingen | En tabell per installation: `path` (dess mapp, uppdateras när den flyttas), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (upplysande), `name` (startarnamnet, `GitPoulpi (<etikett>)`, fryst vid första körningen), `name_with_version` (av: lägg `<major>.<minor>` till namnet), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (tomt: filhanterarposten ligger i roten), `env` (tomt: det egna id:t; installationer med samma namn delar bakgrundsprocesser, sessioner och ångrahistorik), `mcp_bind` (tomt: `mcp.bind`). Ett tomt värde faller tillbaka på `ui.*` för den primära, annars på standarden för sorten (en dev-utcheckning bär `sun`). |
+
 ## `[keybindings]`
 
 Binder om TUI:ts genvägar; Inställningar > Tangentbord & mus redigerar den.

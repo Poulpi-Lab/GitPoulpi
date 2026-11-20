@@ -196,14 +196,33 @@ gitpoulpi
 `--version` skriver ut versionen och den commit bygget gjordes från. Följ sedan
 [Komma igång](getting-started.md).
 
+## Flera installationer sida vid sida
+
+Ett paket, en dev-utcheckning, ett cargo-bygge och ett uppackat arkiv kan alla vara installerade samtidigt. Var och en är en egen installation: eget startarnamn (`GitPoulpi (Chocolatey)`, `GitPoulpi (dev)`, ...), egen bläckfiskfärg, egna kommandoalias, egen post Öppna i och egna daemoner, så två versioner körs parallellt och tar aldrig över varandras fönster. Inställningar, repositories och tokens delas. Ingen äger det vanliga startarnamnet `GitPoulpi` förrän du väljer det med **Gör till primär** i Inställningar > Startare. [Inställningar](settings.md#startare) listar de andra installationerna och har en knapp **Glöm** för en som är borta.
+
 ## Avinstallera
 
-`gitpoulpi uninstall` (det som båda installationsprogrammen kör) tar bort kommandoaliasen,
-PATH-posterna, genvägarna och filhanterarmenyns poster (med deras App Paths-nyckel i
-Windows) som GitPoulpi har skapat, och sedan programfilerna i en
-releaseinstallation; det vägrar köra på ett bygge utan markeringen `.gitpoulpi-dist`
-(ett cargo-bygge), och `--keep-files` lämnar programfilerna. Det är inte
-tillgängligt för MCP-agenter. Utan ett installationsprogram, ta bort programfilerna.
+`gitpoulpi uninstall` tar bort kommandoaliasen (och deras App Paths-nycklar i
+Windows), PATH-posterna, genvägarna och filhanterarmenyns poster **bara för den här
+installationen**: de andras ligger kvar, och `PATH` behåller deras mappar och den
+delade aliasmappen så länge någon av dem fortfarande har ett alias där. Fästa objekt
+i aktivitetsfältet och Dock ligger kvar (Windows kan inte lossa dem utifrån), och
+dina inställningar behåller den här installationens post, så en ominstallation i
+samma mapp ger tillbaka dess utseende. Sedan raderar det programfilerna i en
+releaseinstallation; den delen vägrar köra på ett bygge utan markeringen
+`.gitpoulpi-dist` (ett cargo-bygge). Med `--keep-files` lämnar det programfilerna
+och fungerar på vilket bygge som helst, en dev-utcheckning inräknad. Det är inte
+tillgängligt för MCP-agenter.
+
+| Hur du installerade | Vad som tar bort startare och alias |
+|---|---|
+| Windows-installationsprogram (användare eller alla användare), winget | Avinstallationsprogrammet kör `gitpoulpi uninstall --keep-files` och raderar sedan filerna. |
+| Chocolatey | Dess automatiska avinstallation kör installationsprogrammets avinstallationsprogram. |
+| Scoop | `scoop uninstall gitpoulpi` kör först `gitpoulpi uninstall --keep-files`. |
+| MSI | Borttagningen kör det som den installerande användaren. Tas den bort av ett annat konto ligger användarens startare kvar och visas som föräldralösa i de andra installationernas Inställningar (**Glöm**). |
+| apt, AUR, Homebrew, cargo, en dev-utcheckning | Ingen krok körs åt dig: kör `gitpoulpi uninstall --keep-files` innan du tar bort paketet. |
+| Arkiv, `install.sh --uninstall` | Kör `gitpoulpi uninstall`, eller `install.sh --uninstall`, och radera sedan mappen. |
+
 GitPoulpi sparar också följande:
 
 | Vad | Var |

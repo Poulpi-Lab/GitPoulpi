@@ -544,6 +544,15 @@ Las ramas que la detección proactiva de conflictos puede tomar como base de la 
 
 La lista que sigue un repositorio está en su `repo-state.toml` (abajo). Precedencia: los patrones propios del repositorio, luego la lista con nombre que sigue, luego `default_list` y por último `**`.
 
+## `[installation]` (una entrada por cada GitPoulpi de este equipo)
+
+Varias instalaciones pueden compartir un mismo `config.toml` (un paquete, una copia de desarrollo, una compilación con cargo, un archivo descomprimido). Cada una se identifica por su carpeta (un id hexadecimal de 16 dígitos) y guarda su propio aspecto y sus nombres en `[installation.settings.<id>]`, de modo que el color o los alias de una nunca cambian los de otra. Nadie es la instalación principal hasta que eliges una; la principal se queda con los nombres de lanzador `GitPoulpi` a secas y con las claves compartidas `ui.logo_color`, `ui.command_alias` y `ui.command_alias_add`, que leen las compilaciones anteriores. Lo escribe el propio GitPoulpi (y `set_installation_in_file`), no `config set`.
+
+| Clave | Por defecto | Valores y efecto |
+|---|---|---|
+| `installation.primary` | ausente | El id de la instalación principal. Ausente: ninguna. |
+| `installation.settings.<id>` | ninguna | Una tabla por instalación: `path` (su carpeta, que se actualiza si se mueve), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informativo), `name` (el nombre del lanzador, `GitPoulpi (<label>)`, fijado en el primer arranque), `name_with_version` (desactivado: añade `<major>.<minor>` al nombre), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (vacío: la entrada del menú de carpetas está en la raíz), `env` (vacío: su propio id; las instalaciones que comparten un nombre comparten daemons, sesiones e historial de deshacer), `mcp_bind` (vacío: `mcp.bind`). Un valor vacío recurre a `ui.*` en la principal y, si no, al valor por defecto del tipo (una copia de desarrollo lleva `sun`). |
+
 ## `[keybindings]`
 
 Reasigna los atajos de la TUI; Ajustes > Teclado y ratón lo edita.

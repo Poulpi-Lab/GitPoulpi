@@ -6012,7 +6012,7 @@ name_help = "El nombre de los accesos directos de esta instalación y de su entr
 name_primary = "la principal siempre se llama GitPoulpi"
 # context: refusal under the Launcher name row; {name} is what was typed
 name_taken = "{name} ya es el nombre de otra instalación"
-name_invalid = "Ese nombre de lanzador no es válido: de 1 a 64 caracteres, sin / : * ? < > |, sin comillas ni barras invertidas, y sin punto ni espacio al final"
+name_invalid = "Nombre de lanzador no válido: usa de 1 a 64 caracteres, sin / \\ : * ? < > | ni comillas, y sin punto ni espacio al final"
 name_with_version = "Incluir la versión en el nombre del lanzador"
 name_with_version_help = "Añade la versión mayor y menor al nombre (GitPoulpi 1.2). Los accesos directos cambian de nombre en cada actualización, así que un anclaje al menú Inicio o al Dock puede romperse entonces."
 color = "Color del pulpo"

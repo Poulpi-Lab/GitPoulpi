@@ -306,28 +306,63 @@ pub(super) fn description(ctx: &InstallCtx) -> String {
 }
 
 /// The value of the owner tag in a `.lnk`'s bytes (ANSI or UTF-16LE).
+///
+/// A `.lnk` StringData field has no terminator: a 16-bit character count, the
+/// characters, then the next field's count right away. That count can itself
+/// be an id character (0x35 is `5`), so reading "while id characters" can
+/// swallow it. The UTF-16 description is therefore bounded by its own count
+/// prefix; where that cannot be located, a hashed id is cut to its exact 16
+/// lowercase hex digits (pinned `p-<name>` ids have no fixed length).
 pub(super) fn read_tag(bytes: &[u8]) -> Option<String> {
     let key = format!("{OWNER_TAG}=");
     let is_id = |c: u8| c.is_ascii_alphanumeric() || matches!(c, b'-' | b'_' | b'.');
     let at = |hay: &[u8], pat: &[u8]| hay.windows(pat.len()).position(|w| w == pat);
+    let bound = |mut v: String| {
+        if !v.starts_with("p-") && v.len() > 16 && v.as_bytes()[..16].iter().all(is_lower_hex) {
+            v.truncate(16);
+        }
+        v
+    };
     if let Some(p) = at(bytes, key.as_bytes()) {
         let value: Vec<u8> = bytes[p + key.len()..]
             .iter()
             .copied()
             .take_while(|b| is_id(*b))
             .collect();
-        return Some(String::from_utf8_lossy(&value).into_owned());
+        return Some(bound(String::from_utf8_lossy(&value).into_owned()));
     }
-    let wide: Vec<u8> = key.encode_utf16().flat_map(u16::to_le_bytes).collect();
+    let wide_of = |t: &str| -> Vec<u8> { t.encode_utf16().flat_map(u16::to_le_bytes).collect() };
+    let wide = wide_of(&key);
     let p = at(bytes, &wide)?;
-    let value: Vec<u8> = bytes[p + wide.len()..]
+    let from = p + wide.len();
+    // The description starts with "GitPoulpi" (see `description`); the count
+    // prefix sits right before it. A hit inside the description (the legacy
+    // marker `X-GitPoulpi=1`) is skipped, hence the `-` test below.
+    let head = wide_of("GitPoulpi");
+    let counted_end = bytes[..p]
+        .windows(head.len())
+        .rposition(|w| w == head.as_slice())
+        // The legacy marker `X-GitPoulpi=1` inside the description is no start.
+        .filter(|ds| *ds >= 2 && bytes[ds - 2..*ds] != [b'-', 0])
+        .and_then(|ds| {
+            let n = u16::from_le_bytes([bytes[ds - 2], bytes[ds - 1]]) as usize;
+            let end = ds + 2 * n;
+            (end >= from && end <= bytes.len()).then_some(end)
+        });
+    let limit = counted_end.unwrap_or(bytes.len());
+    let value: Vec<u8> = bytes[from..limit]
         .as_chunks::<2>()
         .0
         .iter()
         .take_while(|c| c[1] == 0 && is_id(c[0]))
         .map(|c| c[0])
         .collect();
-    Some(String::from_utf8_lossy(&value).into_owned())
+    let v = String::from_utf8_lossy(&value).into_owned();
+    Some(if counted_end.is_some() { v } else { bound(v) })
+}
+
+fn is_lower_hex(c: &u8) -> bool {
+    matches!(c, b'0'..=b'9' | b'a'..=b'f')
 }
 
 /// Facts of a `.lnk` for [`owner::decide`]; `exes` are the spellings of the
@@ -1911,7 +1946,15 @@ otepad.exe",
                 let len = script[from..].find("')").unwrap();
                 let lnk = PathBuf::from(script[from..from + len].replace("''", "'"));
                 std::fs::create_dir_all(lnk.parent().unwrap()).unwrap();
-                std::fs::write(lnk, utf16(script)).unwrap();
+                // Like a real .lnk, the description is preceded by its count
+                // (a character of that code, right before the text).
+                let mut text = script.to_string();
+                if let Some(d) = script.find("$s.Description = '") {
+                    let d = d + "$s.Description = '".len();
+                    let n = script[d..].find('\'').unwrap_or(0) as u32;
+                    text.insert(d, char::from_u32(n).unwrap());
+                }
+                std::fs::write(lnk, utf16(&text)).unwrap();
             }
             Ok(())
         }
@@ -1951,6 +1994,73 @@ otepad.exe",
         m.dirs.start_menu.as_deref().unwrap()
     }
 
+    /// A `.lnk` StringData field: 16-bit count, then the UTF-16 characters.
+    fn string_data(text: &str) -> Vec<u8> {
+        let mut out = (text.encode_utf16().count() as u16).to_le_bytes().to_vec();
+        out.extend(text.encode_utf16().flat_map(u16::to_le_bytes));
+        out
+    }
+
+    #[test]
+    fn the_tag_is_bounded_by_its_stringdata_count_not_by_the_next_field() {
+        // The next field's count is 0x35 ('5'): an id character right after the tag.
+        for next in [0x35u16, 0x61, 0x30] {
+            let mut b = vec![0u8; 8];
+            b.extend(string_data(&format!("GitPoulpi {OWNER_TAG}={ID_A}")));
+            b.extend(next.to_le_bytes());
+            b.extend(
+                "C:\\Program Files\\GitPoulpi"
+                    .encode_utf16()
+                    .flat_map(u16::to_le_bytes),
+            );
+            assert_eq!(read_tag(&b).as_deref(), Some(ID_A), "next count {next:#x}");
+        }
+        // Without a locatable description the hashed id is cut to 16 digits.
+        let b = format!("{OWNER_TAG}={ID_A}5").into_bytes();
+        assert_eq!(read_tag(&b).as_deref(), Some(ID_A));
+        // A pinned id is read whole.
+        let mut b = string_data(&format!("GitPoulpi {OWNER_TAG}=p-pty"));
+        b.extend(0x2eu16.to_le_bytes());
+        assert_eq!(read_tag(&b).as_deref(), Some("p-pty"));
+    }
+
+    #[test]
+    fn a_desktop_shortcut_whose_next_field_count_is_an_id_character_stays_ours() {
+        // A real .lnk: the Description StringData, then the next field's count
+        // (0x35) and a target path. The fake writes that layout.
+        let log = RefCell::new(Vec::new());
+        let m = machine();
+        let exe_text = m.exe.display().to_string();
+        let write_real = |script: &str| -> Result<(), String> {
+            log.borrow_mut().push(script.to_string());
+            if script.contains("$s.Save()") {
+                let from = script.find("CreateShortcut('").unwrap() + "CreateShortcut('".len();
+                let len = script[from..].find("')").unwrap();
+                let lnk = PathBuf::from(script[from..from + len].replace("''", "'"));
+                let d = script.find("$s.Description = '").unwrap() + "$s.Description = '".len();
+                let desc = &script[d..d + script[d..].find('\'').unwrap()];
+                let mut b = vec![0u8; 76];
+                b.extend(string_data(desc));
+                b.extend(0x35u16.to_le_bytes());
+                b.extend(exe_text.encode_utf16().flat_map(u16::to_le_bytes));
+                // The rest of the facts (arguments, icon, AppUserModelID).
+                b.extend(utf16(script));
+                std::fs::create_dir_all(lnk.parent().unwrap()).unwrap();
+                std::fs::write(lnk, b).unwrap();
+            }
+            Ok(())
+        };
+        let icons = icon_set(1);
+        let ctx = ctx_of(ID_A, "GitPoulpi (dev)", None);
+        let r = req_with(&m.exe, &icons, &ctx);
+        let path = install_with(Place::Desktop, &m.dirs, &r, &write_real).unwrap();
+        assert_eq!(status(Place::Desktop, &m.dirs, &r).state, State::Installed);
+        // A second install is not refused as foreign.
+        install_with(Place::Desktop, &m.dirs, &r, &write_real).unwrap();
+        assert!(remove_with(Place::Desktop, &m.dirs, &ctx, &write_real).unwrap());
+        assert!(!path.exists());
+    }
+
     #[test]
     fn a_non_primary_shortcut_is_named_after_its_installation_and_tagged() {
         let m = machine();
@@ -1964,7 +2074,7 @@ otepad.exe",
         assert_eq!(read_tag(&bytes).as_deref(), Some(ID_A));
         assert!(contains_text(
             &bytes,
-            &format!("$s.Description = 'GitPoulpi {OWNER_TAG}={ID_A}'")
+            &format!("GitPoulpi {OWNER_TAG}={ID_A}'")
         ));
         // Its own AppUserModelID, its own icon name.
         assert!(contains_text(&bytes, &format!("GitPoulpi.I{ID_A}")));
@@ -2079,10 +2189,20 @@ otepad.exe",
         // the user made by hand naming my exe, and an unrelated one.
         std::fs::write(
             pins.join("a-mine.lnk"),
-            utf16(&format!("{exe} GitPoulpi {OWNER_TAG}={ID_A} old.ico")),
+            [
+                utf16(&format!("{exe} ")),
+                string_data(&format!("GitPoulpi {OWNER_TAG}={ID_A}")),
+                utf16(" old.ico"),
+            ]
+            .concat(),
         )
         .unwrap();
-        let theirs = utf16(&format!("b.exe GitPoulpi {OWNER_TAG}={ID_B} old.ico"));
+        let theirs = [
+            utf16("b.exe "),
+            string_data(&format!("GitPoulpi {OWNER_TAG}={ID_B}")),
+            utf16(" old.ico"),
+        ]
+        .concat();
         std::fs::write(pins.join("b-theirs.lnk"), &theirs).unwrap();
         let legacy = utf16(&format!("{exe} GitPoulpi {MARKER} old.ico"));
         std::fs::write(pins.join("c-legacy.lnk"), &legacy).unwrap();

@@ -15,13 +15,14 @@ fn run(scratch: &Path, args: &[&str]) -> (bool, Value) {
     std::fs::create_dir_all(&config).unwrap();
     std::fs::write(
         config.join("config.toml"),
-        "[ui]\nlaunch_terminal = \"kitty\"\n",
+        "[ui]\nlaunch_terminal = \"kitty\"\n\n[installation]\nprimary = \"p-desktop-test\"\n",
     )
     .unwrap();
     let output = Command::cargo_bin("gitpoulpi")
         .unwrap()
         .env("GITPOULPI_CONFIG_DIR", &config)
         .env("GITPOULPI_DESKTOP_NO_HOOKS", "1")
+        .env("GITPOULPI_INSTALL_ID", "desktop-test")
         .env("HOME", scratch)
         .env("XDG_DATA_HOME", scratch.join("data"))
         .env("XDG_CONFIG_HOME", scratch.join("xdg-config"))

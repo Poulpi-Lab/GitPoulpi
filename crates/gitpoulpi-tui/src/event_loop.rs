@@ -368,7 +368,7 @@ pub(crate) fn apply_live_settings(
             );
             live_settings::install_active_profile(config);
             live_settings::install_commit_count(config.log.commit_count);
-            crate::about::install(&config.ui);
+            crate::about::install(&crate::launcher_sync::effective_color(config));
             crate::launcher_sync::install(config);
             external_tools::install(config);
             if let Some(message) = keymap::issues_message(&keymap::install_from_config(config)) {

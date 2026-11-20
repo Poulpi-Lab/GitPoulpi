@@ -661,6 +661,41 @@ mod tests {
         );
     }
 
+    /// `gitpoulpi launch`, folder clicks and `--add` look for windows in the
+    /// environment's own sessions folder, so another environment's windows
+    /// (another installation's) are never raised.
+    #[tokio::test]
+    async fn launch_raises_only_windows_of_this_environment() {
+        let dir = tempfile::tempdir().unwrap();
+        let mine = gitpoulpi_config::ConfigPaths::for_dir(dir.path()).with_env("mine");
+        let other = gitpoulpi_config::ConfigPaths::for_dir(dir.path()).with_env("other");
+        for (paths, session, port) in [(&mine, "w1", 11u16), (&other, "w2", 22)] {
+            std::fs::create_dir_all(paths.sessions_dir()).unwrap();
+            std::fs::write(
+                paths.sessions_dir().join(format!("{session}.port")),
+                port.to_string(),
+            )
+            .unwrap();
+        }
+        let scan = |paths: &gitpoulpi_config::ConfigPaths| {
+            let dir = paths.sessions_dir();
+            async move {
+                scan_dir(
+                    &dir,
+                    None,
+                    Duration::from_millis(100),
+                    &|_| true,
+                    |_, _| async { Some(vec![viewer("v", "r", &["r"])]) },
+                )
+                .await
+            }
+        };
+        let names =
+            |found: Vec<SessionViewers>| found.into_iter().map(|f| f.session).collect::<Vec<_>>();
+        assert_eq!(names(scan(&mine).await), ["w1"]);
+        assert_eq!(names(scan(&other).await), ["w2"]);
+    }
+
     #[tokio::test]
     async fn a_scan_skips_dead_process_files_and_keeps_the_order() {
         let dir = tempfile::tempdir().unwrap();

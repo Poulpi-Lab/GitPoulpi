@@ -53,7 +53,7 @@ fn start(
     let dir = tempfile::tempdir().unwrap();
     std::fs::write(
         dir.path().join("config.toml"),
-        "[ui]\ngraph_renderer = \"text\"\nlogo_color = \"sun\"\n",
+        "[ui]\ngraph_renderer = \"text\"\nlogo_color = \"sun\"\n\n[installation]\nprimary = \"p-pty\"\n",
     )
     .unwrap();
     let data = dir.path().join("xdg-data");

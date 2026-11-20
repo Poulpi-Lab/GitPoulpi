@@ -314,9 +314,11 @@ fn with<R>(f: impl FnOnce(&mut State) -> R) -> R {
     f(&mut STATE.lock().unwrap_or_else(|e| e.into_inner()))
 }
 
-/// Publishes `ui.logo_color` (startup and every live settings change).
-pub(crate) fn install(ui: &gitpoulpi_config::UiConfig) {
-    let idx = logo_colors::index_of(&ui.logo_color);
+/// Publishes the colour this installation wears (`launcher_sync::effective_color`:
+/// its own entry, `ui.logo_color` only for the primary), at startup and on
+/// every live settings change. Another installation's colour never arrives here.
+pub(crate) fn install(slug: &str) {
+    let idx = logo_colors::index_of(slug);
     with(|s| {
         if s.spin.is_none() {
             s.way = Some(idx);
@@ -390,15 +392,43 @@ fn start_spin() {
     });
 }
 
-/// Saves the colorway in `config.toml` (the file every Settings edit uses).
+/// Saves the colorway in `config.toml` (the file every Settings edit uses):
+/// in this installation's entry, or in `ui.logo_color` when it is the primary
+/// (the key old builds read). Never another installation's colour.
 fn persist(idx: usize) {
     let slug = &logo_colors::ways()[idx].slug;
     if let Some(path) = gitpoulpi_config::Settings::resolve_ambient()
         .ok()
         .and_then(|s| s.file().map(std::path::Path::to_path_buf))
     {
-        let _ = gitpoulpi_config::set_in_file(&path, "ui.logo_color", slug);
+        let cur = gitpoulpi_config::installation::current();
+        let primary = crate::launcher_sync::effective().primary;
+        let _ = write_colour(&path, &cur.identity.id, primary, &cur.config, slug);
     }
+}
+
+/// Writes `slug` as the colour of installation `id` into the file at `path`.
+/// `seeded` supplies the entry when the file has none yet (a pinned id keeps
+/// its seeded entry in memory only).
+fn write_colour(
+    path: &std::path::Path,
+    id: &str,
+    primary: bool,
+    seeded: &gitpoulpi_config::Config,
+    slug: &str,
+) -> gitpoulpi_config::Result<()> {
+    if primary {
+        return gitpoulpi_config::set_in_file(path, "ui.logo_color", slug).map(drop);
+    }
+    let base = seeded
+        .installation
+        .settings
+        .get(id)
+        .cloned()
+        .unwrap_or_default();
+    gitpoulpi_config::set_installation_in_file(path, |i| {
+        i.settings.entry(id.to_string()).or_insert(base).logo_color = slug.to_string();
+    })
 }
 
 /// Picks colorway `idx` outright and saves it.
@@ -1288,6 +1318,44 @@ mod build_crates;
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn about_click_writes_only_this_installations_colour() {
+        use gitpoulpi_config::{Config, InstallationEntry};
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("config.toml");
+        std::fs::write(
+            &file,
+            "[ui]\nlogo_color = \"violet\"\n\n[installation.settings.bbbb]\nlogo_color = \"sun\"\n",
+        )
+        .unwrap();
+        let mut seeded = Config::default();
+        seeded.installation.settings.insert(
+            "aaaa".into(),
+            InstallationEntry {
+                logo_color: "teal".into(),
+                name: "GitPoulpi (cargo)".into(),
+                ..Default::default()
+            },
+        );
+        // A non-primary installation: its entry changes, `ui.*` and the
+        // other installation's entry do not.
+        write_colour(&file, "aaaa", false, &seeded, "green").unwrap();
+        let config = Config::load(&file).unwrap();
+        assert_eq!(config.installation.settings["aaaa"].logo_color, "green");
+        assert_eq!(
+            config.installation.settings["aaaa"].name, "GitPoulpi (cargo)",
+            "the seeded entry came along"
+        );
+        assert_eq!(config.installation.settings["bbbb"].logo_color, "sun");
+        assert_eq!(config.ui.logo_color, "violet");
+        // The primary writes the key old builds read, and nothing else.
+        write_colour(&file, "aaaa", true, &seeded, "ocean").unwrap();
+        let config = Config::load(&file).unwrap();
+        assert_eq!(config.ui.logo_color, "ocean");
+        assert_eq!(config.installation.settings["aaaa"].logo_color, "green");
+        assert_eq!(config.installation.settings["bbbb"].logo_color, "sun");
+    }
 
     /// The reference is the eyes (half-way across the logo, 6/16 down), not
     /// the logo's edge: a pointer just beside the eyes, still over the logo,

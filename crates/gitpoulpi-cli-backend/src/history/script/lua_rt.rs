@@ -27,9 +27,10 @@ use std::rc::Rc;
 use std::time::{Duration, Instant};
 
 use gitpoulpi_core::domain::rewrite::trailers::{self, TrailerIfExists};
+use mlua::chunk::ChunkMode;
+use mlua::serde::{DeserializeOptions, SerializeOptions};
 use mlua::{
-    ChunkMode, DeserializeOptions, Function, HookTriggers, Lua, LuaOptions, LuaSerdeExt,
-    SerializeOptions, StdLib, Table, Value as LuaValue, VmState,
+    Function, HookTriggers, Lua, LuaOptions, LuaSerdeExt, StdLib, Table, Value as LuaValue, VmState,
 };
 use regex::RegexBuilder;
 use serde_json::Value;

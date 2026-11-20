@@ -66,6 +66,16 @@ gitpoulpi mcp serve --http 127.0.0.1:9000    # or: --bind 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
+Port başına bir MCP HTTP sunucusu. Birkaç GitPoulpi kurulumu yan yana çalışabilir
+ve hepsi varsayılan olarak `127.0.0.1:8808` kullanır; bu yüzden kullanımda olan bir
+portta başlayan ikinci sunucu `address already in use` hatasıyla reddedilir (kendi
+kendine başka bir port seçmez) ve hatayla çıkar. Her kurulum, varsa kendi MCP bind
+adresini (`gitpoulpi installation set mcp_bind HOST:PORT`), yoksa `[mcp] bind`
+değerini kullanır. Başka bir port seçmek için Ayarlar > Ajanlar ve MCP > *Boş port
+öner* düğmesini (ya da *MCP: Boş Bir Port Öner* palet komutunu) kullanın: aynı ana
+makinede boş bir port bulur ve onu bu kurulumun MCP bind adresi olarak kaydeder.
+Stdio bundan etkilenmez.
+
 Durumsuz JSON, aynı araçlar, aynı `[mcp]` kapıları. Her istek bearer token'ı
 gerektirir (`[mcp] http_auth`, varsayılan olarak açık): onu `gitpoulpi mcp token
 --show` ile yazdırın (veya `--copy`, `--rotate`; token, özel veri klasörünün

@@ -1242,6 +1242,7 @@ As teclas são as padrão.
 | Lançador: remover atalhos |  |
 | Lançador: criar alias de comando |  |
 | Lançador: remover alias de comando |  |
+| MCP: Suggest a free port |  |
 | Lançador: adicionar ao PATH |  |
 | Lançador: remover do PATH |  |
 | Lançador: instalar o menu Abrir no GitPoulpi |  |

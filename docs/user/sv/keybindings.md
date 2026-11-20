@@ -1246,6 +1246,7 @@ Tangenterna är standardvärdena.
 | Startare: Ta bort genvägar |  |
 | Startare: Skapa kommandoalias |  |
 | Startare: Ta bort kommandoalias |  |
+| MCP: Suggest a free port |  |
 | Startare: Lägg till i PATH |  |
 | Startare: Ta bort från PATH |  |
 | Startare: Installera menyn Öppna i GitPoulpi |  |

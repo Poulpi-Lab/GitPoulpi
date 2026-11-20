@@ -1244,6 +1244,7 @@ Tuşlar varsayılanlardır.
 | Başlatıcı: Kısayolları Kaldır |  |
 | Başlatıcı: Komut Takma Adı Oluştur |  |
 | Başlatıcı: Komut Takma Adını Kaldır |  |
+| MCP: Suggest a free port |  |
 | Başlatıcı: PATH'e Ekle |  |
 | Başlatıcı: PATH'ten Kaldır |  |
 | Başlatıcı: GitPoulpi'de Aç Menüsünü Kur |  |

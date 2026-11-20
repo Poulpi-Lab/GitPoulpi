@@ -98,11 +98,6 @@ impl InstallState {
     pub(super) fn busy(&self) -> bool {
         self.rx.is_some() || self.pending.is_some()
     }
-
-    #[cfg(test)]
-    pub(super) fn is_idle(&self) -> bool {
-        !self.busy()
-    }
 }
 
 /// A stand-in installation for tests: never the machine's real one.
@@ -245,11 +240,7 @@ impl PreferencesState {
         let entry = self.own_entry();
         let others = self.others();
         let path = this.identity.root.clone();
-        let full = t::installation_info(
-            this.identity.kind.as_str(),
-            &path,
-            &this.environment,
-        );
+        let full = t::installation_info(this.identity.kind.as_str(), &path, &this.environment);
         let info = Field::global(t::INSTALLATION.get(), INFO, Control::Info(full.clone()))
             .with_help(&format!("{full}. {}", t::INSTALLATION_HELP.get()))
             .with_ellipsis_of(&path)
@@ -273,7 +264,12 @@ impl PreferencesState {
             Control::Combo {
                 options: crate::logo_colors::ways()
                     .iter()
-                    .map(|w| (crate::logo_colors::name(&w.slug).to_string(), w.slug.clone()))
+                    .map(|w| {
+                        (
+                            crate::logo_colors::name(&w.slug).to_string(),
+                            w.slug.clone(),
+                        )
+                    })
                     .collect(),
                 value: if eff.logo_color.is_empty() {
                     crate::logo_colors::default_slug().to_string()
@@ -313,11 +309,7 @@ impl PreferencesState {
         let mut submenus = vec![(t::SUBMENU_NONE.get().to_string(), String::new())];
         for other in &others {
             let name = other.effective.folder_menu_submenu.trim();
-            if !name.is_empty()
-                && submenus
-                    .iter()
-                    .all(|(_, v)| !v.eq_ignore_ascii_case(name))
-            {
+            if !name.is_empty() && submenus.iter().all(|(_, v)| !v.eq_ignore_ascii_case(name)) {
                 submenus.push((name.to_string(), name.to_string()));
             }
         }
@@ -427,9 +419,10 @@ impl PreferencesState {
                     self.message = Some(t::NAME_INVALID.get().to_string());
                     return false;
                 }
-                let taken = self.others().iter().any(|o| {
-                    o.exists && o.effective.name.trim().eq_ignore_ascii_case(value)
-                });
+                let taken = self
+                    .others()
+                    .iter()
+                    .any(|o| o.exists && o.effective.name.trim().eq_ignore_ascii_case(value));
                 if taken {
                     self.message = Some(t::name_taken(value));
                     return false;
@@ -447,8 +440,7 @@ impl PreferencesState {
             "command_alias" | "command_alias_add" => {
                 if !value.is_empty() {
                     if let Err(e) = desktop::alias::validate_name(value) {
-                        self.message =
-                            Some(super::launcher_alias::name_error_text(e).to_string());
+                        self.message = Some(super::launcher_alias::name_error_text(e).to_string());
                         return false;
                     }
                 }
@@ -550,11 +542,9 @@ impl PreferencesState {
             InstallButton::BecomePrimary => self
                 .other_primary()
                 .map(|(_, name)| t::primary_confirm(name)),
-            InstallButton::RemoveLegacy => {
-                Some(gitpoulpi_i18n::msg::settings_screen::confirm_action(
-                t::REMOVE_LEGACY.get(),
-            ))
-            }
+            InstallButton::RemoveLegacy => Some(
+                gitpoulpi_i18n::msg::settings_screen::confirm_action(t::REMOVE_LEGACY.get()),
+            ),
             InstallButton::Forget(i) => self
                 .others()
                 .get(usize::from(i))
@@ -710,7 +700,9 @@ impl PreferencesState {
 }
 
 fn screen_no_dir() -> String {
-    gitpoulpi_i18n::msg::settings_screen::NO_CONFIG_DIR.get().into()
+    gitpoulpi_i18n::msg::settings_screen::NO_CONFIG_DIR
+        .get()
+        .into()
 }
 
 fn place_name(place: Place) -> &'static str {
@@ -828,10 +820,7 @@ impl JobMachine {
             let _ = launcher::run(&env, &self.setting, &logo, launcher::Op::Install(*place));
         }
         if had_folder {
-            let _ = folder_menu::install(
-                &fe,
-                &launcher::folder_menu_label(&ctx.name),
-            );
+            let _ = folder_menu::install(&fe, &launcher::folder_menu_label(&ctx.name));
         }
         // Launchers left under the plain name (no owner tag) are this
         // installation's now: the sync rewrites them.

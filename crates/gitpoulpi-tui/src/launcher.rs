@@ -189,7 +189,9 @@ pub(crate) fn this_view() -> (InstallCtx, gitpoulpi_config::installation::Effect
 /// every installation's entry is told apart.
 pub(crate) fn folder_menu_label(name: &str) -> String {
     if name == gitpoulpi_config::installation::PRIMARY_NAME {
-        gitpoulpi_i18n::msg::launcher::FOLDER_MENU_LABEL.get().to_string()
+        gitpoulpi_i18n::msg::launcher::FOLDER_MENU_LABEL
+            .get()
+            .to_string()
     } else {
         gitpoulpi_i18n::msg::launcher::folder_menu_label_named(name)
     }
@@ -436,10 +438,17 @@ pub(crate) fn legacy_note_due(env: &Env, setting: &str) -> bool {
     }
     let (id, base) = (
         cur.identity.id.clone(),
-        cur.config.installation.settings.get(&cur.identity.id).cloned(),
+        cur.config
+            .installation
+            .settings
+            .get(&cur.identity.id)
+            .cloned(),
     );
     gitpoulpi_config::set_installation_in_file(file, |i| {
-        let entry = i.settings.entry(id).or_insert_with(|| base.unwrap_or_default());
+        let entry = i
+            .settings
+            .entry(id)
+            .or_insert_with(|| base.unwrap_or_default());
         entry
             .extra
             .insert(LEGACY_NOTE_KEY.to_string(), toml::Value::Boolean(true));

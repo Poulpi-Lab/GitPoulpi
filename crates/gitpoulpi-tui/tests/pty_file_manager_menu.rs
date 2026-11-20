@@ -297,10 +297,21 @@ fn a_submenu_typed_in_settings_groups_two_installations() {
         }
     };
     wait_config("the submenu reached this installation's entry", &|t| {
-        let v: toml::Value = toml::from_str(t).unwrap();
-        v["installation"]["settings"]["p-pty"]["folder_menu_submenu"].as_str() == Some("Tools")
+        toml::from_str::<toml::Value>(t).is_ok_and(|v| {
+            v.get("installation")
+                .and_then(|i| i.get("settings"))
+                .and_then(|s| s.get("p-pty"))
+                .and_then(|e| e.get("folder_menu_submenu"))
+                .and_then(|m| m.as_str())
+                == Some("Tools")
+        })
     });
 
+    term.send_keys("Esc").unwrap();
+    term.wait_for("Settings closed", STEP, |s| {
+        !s.contains("Launcher - global")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     install_from_the_palette(&mut term);
     term.wait_for("the GNOME Files row reads created", STARTUP, |s| {
         row_is(s, "GNOME Files", "created")
@@ -312,8 +323,7 @@ fn a_submenu_typed_in_settings_groups_two_installations() {
             .flatten()
             .map(|e| e.path())
             .filter(|p| {
-                std::fs::read_to_string(p)
-                    .is_ok_and(|t| t.contains("X-GitPoulpi-Install=p-pty"))
+                std::fs::read_to_string(p).is_ok_and(|t| t.contains("X-GitPoulpi-Install=p-pty"))
             })
             .collect()
     };
@@ -321,7 +331,10 @@ fn a_submenu_typed_in_settings_groups_two_installations() {
         ours(&tools).len(),
         1,
         "this installation's entry sits in the shared folder: {:?}",
-        std::fs::read_dir(&tools).unwrap().flatten().collect::<Vec<_>>()
+        std::fs::read_dir(&tools)
+            .unwrap()
+            .flatten()
+            .collect::<Vec<_>>()
     );
     assert_eq!(std::fs::read_to_string(&theirs).unwrap(), their_text);
     assert!(

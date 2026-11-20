@@ -102,14 +102,8 @@ fn a_narrow_page_ellipsises_the_path_never_drops_it() {
         .find(|l| l.contains('\u{2026}') && l.contains("portable, /"))
         .unwrap_or_else(|| panic!("the Installation row is drawn:\n{screen}"));
     assert!(line.contains('\u{2026}'), "cut in the middle: {line}");
-    assert!(
-        line.contains("/ver"),
-        "the start of the path stays: {line}"
-    );
-    assert!(
-        line.contains("ols"),
-        "the end of the path stays: {line}"
-    );
+    assert!(line.contains("/ver"), "the start of the path stays: {line}");
+    assert!(line.contains("ols"), "the end of the path stays: {line}");
     // The full text stays one key away: the help line under the row.
     let full = row(&st, "Installation");
     assert!(full
@@ -278,7 +272,9 @@ fn a_gone_installation_gets_a_forget_button_and_a_live_one_does_not() {
             .count()
     };
     assert_eq!(forgets(&st), 1, "only the gone one");
-    assert!(row(&st, "Other: GitPoulpi (old)").value_text().starts_with("gone, "));
+    assert!(row(&st, "Other: GitPoulpi (old)")
+        .value_text()
+        .starts_with("gone, "));
     assert!(row(&st, "Other: GitPoulpi (dev)")
         .value_text()
         .starts_with("dev, "));

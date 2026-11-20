@@ -43,7 +43,8 @@ impl Machine {
         // As the running installation: it touches only its own aliases.
         let cur = gitpoulpi_config::installation::current();
         // The config as it is now (a name or primary change just made).
-        let mut alias = alias::Env::discover(os, &env, &home, &exe).with_ctx(crate::launcher::this_ctx());
+        let mut alias =
+            alias::Env::discover(os, &env, &home, &exe).with_ctx(crate::launcher::this_ctx());
         alias.newest = gitpoulpi_config::dev_mode::launcher_newest_on_disk(&exe);
         let keep = gitpoulpi_config::installation::path_keep(cur, &alias);
         let path = user_path::Env::discover(os, &env, &home, &alias).keeping(keep);
@@ -272,7 +273,8 @@ impl PreferencesState {
     /// Applies a finished job. Never blocks; called once a frame.
     pub(crate) fn poll_tools(&mut self) {
         let Some(rx) = &self.tools.rx else {
-            if self.tools.snapshot.is_some() && self.tools.for_name.as_ref() != Some(&self.alias_names())
+            if self.tools.snapshot.is_some()
+                && self.tools.for_name.as_ref() != Some(&self.alias_names())
             {
                 self.tools_start(None);
             }
@@ -428,7 +430,9 @@ impl PreferencesState {
             Some(alias::State::Installed) => t::ALIAS_CREATED.get().to_string(),
             Some(alias::State::Outdated) => t::ALIAS_OUTDATED.get().to_string(),
             Some(alias::State::Foreign) => t::STATE_FOREIGN.get().to_string(),
-            Some(alias::State::Other) => state.map(|s| self.alias_owner_text(s)).unwrap_or_default(),
+            Some(alias::State::Other) => {
+                state.map(|s| self.alias_owner_text(s)).unwrap_or_default()
+            }
         }
     }
 
@@ -442,7 +446,10 @@ impl PreferencesState {
             options.push((add.to_string(), add.to_string()));
         }
         let derived = format!("{main}a");
-        if !main.is_empty() && Some(derived.as_str()) != suggested && alias::validate_name(&derived).is_ok() {
+        if !main.is_empty()
+            && Some(derived.as_str()) != suggested
+            && alias::validate_name(&derived).is_ok()
+        {
             options.push((derived.clone(), derived));
         }
         let mut row = Field::global(

@@ -195,7 +195,7 @@ fn pick_the_name_in_the_combobox_then_add_and_remove_gitpoulpi_on_path() {
     let home = tempfile::tempdir().unwrap();
     std::fs::write(
         config.path().join("config.toml"),
-        "[ui]\ngraph_renderer = \"text\"\n",
+        "[ui]\ngraph_renderer = \"text\"\n\n[installation]\nprimary = \"p-pty\"\n",
     )
     .unwrap();
     std::fs::write(home.path().join(".bashrc"), "export KEEP=1\n").unwrap();
@@ -426,9 +426,10 @@ fn an_alias_of_another_installation_shows_its_owner_and_create_is_disabled() {
     // The status row names the owner; Create says why it cannot.
     common::scroll_settings_to(&mut term, "Used by GitPoulpi (dev)", STEP);
     assert!(
-        term.screen().text().lines().any(|l| {
-            l.contains("Add-tab status") && l.contains("Used by GitPoulpi (dev)")
-        }),
+        term.screen()
+            .text()
+            .lines()
+            .any(|l| { l.contains("Add-tab status") && l.contains("Used by GitPoulpi (dev)") }),
         "the status row names the owner:\n{}",
         term.text()
     );

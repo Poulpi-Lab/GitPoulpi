@@ -36,8 +36,8 @@ impl Setup {
     }
 
     fn config_toml(&self) -> toml::Value {
-        let text = std::fs::read_to_string(self.config.path().join("config.toml"))
-            .unwrap_or_default();
+        let text =
+            std::fs::read_to_string(self.config.path().join("config.toml")).unwrap_or_default();
         toml::from_str(&text).unwrap_or_else(|e| panic!("config.toml: {e}\n{text}"))
     }
 
@@ -228,7 +228,9 @@ fn name_colour_and_version_from_the_keyboard_write_this_installation_only() {
         "ui.logo_color is the primary's: {file}"
     );
     assert!(
-        file.get("ui").and_then(|u| u.get("command_alias")).is_none(),
+        file.get("ui")
+            .and_then(|u| u.get("command_alias"))
+            .is_none(),
         "{file}"
     );
     let entries = file["installation"]["settings"].as_table().unwrap();
@@ -271,10 +273,15 @@ fn becoming_primary_takes_the_legacy_names() {
             .and_then(|p| p.as_str())
             == Some("p-pty")
     });
-    wait_until("the legacy launcher is this installation's", &s.term, || {
-        std::fs::read_to_string(&legacy)
-            .is_ok_and(|t| t.contains("X-GitPoulpi-Install=p-pty") && t.contains("X-GitPoulpi=1"))
-    });
+    wait_until(
+        "the legacy launcher is this installation's",
+        &s.term,
+        || {
+            std::fs::read_to_string(&legacy).is_ok_and(|t| {
+                t.contains("X-GitPoulpi-Install=p-pty") && t.contains("X-GitPoulpi=1")
+            })
+        },
+    );
     assert_eq!(
         desktop_name(&legacy).as_deref(),
         Some("GitPoulpi"),
@@ -323,6 +330,9 @@ fn the_environment_row_writes_this_installations_env() {
         Some("keepme"),
         "another installation's environment is not ours to change: {file}"
     );
-    assert!(file.get("ui").and_then(|u| u.get("env")).is_none(), "{file}");
+    assert!(
+        file.get("ui").and_then(|u| u.get("env")).is_none(),
+        "{file}"
+    );
     let _ = s.term.stop();
 }

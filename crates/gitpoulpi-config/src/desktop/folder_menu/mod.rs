@@ -4,8 +4,8 @@
 //! | OS | Where | What |
 //! |---|---|---|
 //! | Windows | `HKCU\Software\Classes\{Directory,Directory\Background,Drive}\shell\GitPoulpi[.i<8hex>]` | one verb per installation (optionally in a shared submenu), plus the primary's App Paths `gitpoulpi.exe` |
-//! | Linux | each file manager's own mechanism ([`linux`], [`thunar`]) | a script, service menu or action |
-//! | macOS | `~/Library/Services/<label>.workflow` | a Finder Quick Action ([`macos`]) |
+//! | Linux | each file manager's own mechanism ([`linux`], [`thunar`]) | per installation: a script, service menu or action, with its own coloured icon (submenus: GNOME Files, Caja, Dolphin, PCManFM) |
+//! | macOS | `~/Library/Services/<label>.workflow` | one Finder Quick Action per installation ([`macos`]; no submenu, no coloured icon) |
 //!
 //! Every entry runs `<helper> [launch] --folder <dir>`; the terminal is chosen
 //! when it is clicked (`gitpoulpi launch --folder`), so changing the terminal
@@ -23,8 +23,9 @@ pub mod windows;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use super::owner::{decide, Facts, Owner};
 use super::registry::SharedRegistry;
-use super::State;
+use super::{State, OWNER_TAG};
 use crate::open_in::Os;
 
 pub use super::MARKER;
@@ -335,8 +336,124 @@ pub fn names(managers: &[Manager]) -> String {
         .join(", ")
 }
 
-/// A file of ours: `MARKER` is a line of its own (`# MARKER` in a script).
-pub(crate) fn is_ours(text: &str) -> bool {
-    text.lines()
-        .any(|l| l == MARKER || l.strip_prefix("# ") == Some(MARKER))
+/// The running installation as the Linux and macOS writers see it: which
+/// names it owns and which submenu it asks for.
+#[derive(Debug, Clone)]
+pub(crate) struct Who {
+    pub id: String,
+    /// `i<8hex>`.
+    pub short: String,
+    /// The primary keeps the legacy file names and the legacy marker.
+    pub primary: bool,
+    /// The submenu label, trimmed; empty = the root.
+    pub submenu: String,
+}
+
+impl Who {
+    pub(crate) fn of(env: &Env) -> Who {
+        Who {
+            id: env.ctx.id.clone(),
+            short: env.ctx.short.clone(),
+            primary: env.ctx.is_primary(),
+            submenu: env.submenu.trim().replace(|c: char| c.is_control(), " "),
+        }
+    }
+
+    /// `""` for the primary, `-i<8hex>` otherwise: appended to every name.
+    pub(crate) fn suffix(&self) -> String {
+        if self.primary {
+            String::new()
+        } else {
+            format!("-{}", self.short)
+        }
+    }
+
+    /// `gitpoulpi-folder[-i<8hex>]`: this installation's icon.
+    pub(crate) fn icon_name(&self) -> String {
+        format!("{ICON_NAME}{}", self.suffix())
+    }
+
+    /// The owner lines of a file, each ending in a newline, behind `prefix`
+    /// (`""`, or `"# "` in a script). Only the primary writes the legacy
+    /// marker, so old builds never see the others.
+    pub(crate) fn owner_lines(&self, prefix: &str) -> String {
+        let mut out = String::new();
+        if self.primary {
+            out.push_str(&format!("{prefix}{MARKER}\n"));
+        }
+        if !self.id.is_empty() {
+            out.push_str(&format!("{prefix}{OWNER_TAG}={}\n", self.id));
+        }
+        out
+    }
+
+    /// The normalized submenu name, `None` at the root.
+    pub(crate) fn submenu_norm(&self) -> Option<String> {
+        Some(normalize(&self.submenu)).filter(|n| !n.is_empty())
+    }
+}
+
+/// Submenu names are equal when trimmed and lower-cased alike.
+pub(crate) fn normalize(name: &str) -> String {
+    name.trim().to_lowercase()
+}
+
+/// 8 hex digits identifying a normalized submenu name.
+pub(crate) fn menu_hash(norm: &str) -> String {
+    format!(
+        "{:08x}",
+        crate::installation::fnv1a64(norm.as_bytes()) & 0xffff_ffff
+    )
+}
+
+/// What the owner rule needs from a text file: the tag and the legacy marker,
+/// each a line of its own (behind `# ` in a script).
+pub(crate) fn facts_of(text: &str) -> Facts<'_> {
+    let mut facts = Facts::default();
+    let tag_prefix = format!("{OWNER_TAG}=");
+    for line in text.lines() {
+        let l = line.strip_prefix("# ").unwrap_or(line);
+        if l == MARKER {
+            facts.legacy_marker = true;
+        } else if let Some(t) = l.strip_prefix(&tag_prefix) {
+            facts.tag = Some(t);
+        }
+    }
+    facts
+}
+
+/// May the running installation rewrite and remove something with these facts?
+pub(crate) fn may_touch(env: &Env, facts: &Facts) -> bool {
+    matches!(decide(facts, &env.ctx), Owner::Mine | Owner::Adopt)
+}
+
+/// [`may_touch`] for a text file.
+pub(crate) fn is_mine(env: &Env, text: &str) -> bool {
+    may_touch(env, &facts_of(text))
+}
+
+/// Fixtures shared by the Linux and macOS tests: installations with real ids.
+#[cfg(test)]
+pub(crate) mod testing {
+    use super::super::{InstallCtx, KnownInstall};
+
+    pub const A: &str = "aaaaaaaa11111111";
+    pub const B: &str = "bbbbbbbb22222222";
+
+    /// The context of installation `id`, with `primary` as the config's primary.
+    pub fn ctx(id: &str, primary: Option<&str>) -> InstallCtx {
+        InstallCtx {
+            id: id.to_string(),
+            short: crate::installation::short_id(id),
+            name: format!("GitPoulpi {id}"),
+            primary: primary.map(str::to_string),
+            known: [A, B]
+                .iter()
+                .map(|k| KnownInstall {
+                    id: k.to_string(),
+                    exists: true,
+                })
+                .collect(),
+        }
+    }
 }

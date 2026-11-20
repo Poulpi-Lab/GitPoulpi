@@ -28,3 +28,4 @@ gitpoulpi-cli::shim::a_symlinked_stub_finds_gitpoulpi_next_to_the_real_file
 gitpoulpi-cli::shim::the_exit_code_passes_through
 gitpoulpi-tui::pty_diff_cjk::the_split_separator_is_on_one_column_with_japanese_text
 gitpoulpi-tui::pty_diff_cjk::the_split_separator_is_on_one_column_in_a_narrow_terminal
+gitpoulpi-cli::shim::the_tui_stub_answers_version_like_the_tui

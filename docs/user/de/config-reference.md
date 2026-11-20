@@ -546,6 +546,15 @@ Welche Branches die proaktive Konflikterkennung als Basis des aktuellen Branches
 
 Welcher Liste ein Repository folgt, steht in seiner `repo-state.toml` (unten). Vorrang: die eigenen Muster des Repositorys, dann die benannte Liste, der es folgt, dann `default_list`, dann `**`.
 
+## `[installation]` (ein Eintrag pro GitPoulpi auf diesem Rechner)
+
+Mehrere Installationen können sich eine `config.toml` teilen (ein Paket, ein Dev-Checkout, ein cargo-Build, ein entpacktes Archiv). Jede wird an ihrem Ordner erkannt (eine 16-stellige Hex-ID) und führt ihr Aussehen und ihre Namen in `[installation.settings.<id>]`, sodass Farbe oder Aliasse einer Installation nie die einer anderen ändern. Bis Sie eine wählen, ist keine Installation die primäre; die primäre besitzt die schlichten Starternamen `GitPoulpi` und die gemeinsamen Schlüssel `ui.logo_color`, `ui.command_alias` und `ui.command_alias_add`, die ältere Versionen lesen. Von GitPoulpi selbst geschrieben (und von `set_installation_in_file`), nicht von `config set`.
+
+| Schlüssel | Standard | Werte und Wirkung |
+|---|---|---|
+| `installation.primary` | fehlt | Die ID der primären Installation. Fehlt sie: keine. |
+| `installation.settings.<id>` | keine | Eine Tabelle pro Installation: `path` (ihr Ordner, bei einem Umzug aktualisiert), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informativ), `name` (der Startername, `GitPoulpi (<Label>)`, beim ersten Start festgeschrieben), `name_with_version` (aus: `<Hauptversion>.<Nebenversion>` an den Namen anhängen), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (leer: der Dateimanager-Eintrag steht auf der obersten Ebene), `env` (leer: die eigene ID; Installationen mit gleichem Namen teilen Daemons, Sitzungen und Rückgängig-Verlauf), `mcp_bind` (leer: `mcp.bind`). Ein leerer Wert fällt bei der primären Installation auf `ui.*` zurück, sonst auf den Standard der Art (ein Dev-Checkout trägt `sun`). |
+
 ## `[keybindings]`
 
 Belegt die Tastenkürzel der TUI neu; Einstellungen > Tastatur & Maus bearbeitet sie.

@@ -197,12 +197,32 @@ gitpoulpi
 `--version` gibt die Version und den Commit aus, aus dem der Build entstand.
 Weiter geht es mit [Erste Schritte](getting-started.md).
 
+## Mehrere Installationen nebeneinander
+
+Ein Paket, ein Dev-Checkout, ein cargo-Build und ein entpacktes Archiv können gleichzeitig installiert sein. Jedes ist eine eigene Installation: mit eigenem Starternamen (`GitPoulpi (Chocolatey)`, `GitPoulpi (dev)`, ...), eigener Oktopus-Farbe, eigenen Befehlsaliassen, eigenem Eintrag „In GitPoulpi öffnen“ und eigenen Daemons, sodass zwei Versionen parallel laufen und sich nie gegenseitig die Fenster wegnehmen. Einstellungen, Repositories und Tokens werden geteilt. Den schlichten Starternamen `GitPoulpi` besitzt niemand, bis Sie ihn unter Einstellungen > Starter mit **Primäre Installation werden** wählen. [Einstellungen](settings.md#starter) listet die anderen Installationen auf und hat eine Schaltfläche **Vergessen** für eine, die nicht mehr existiert.
+
 ## Deinstallation
 
-`gitpoulpi uninstall` (das führen beide Installationsprogramme aus) entfernt die von GitPoulpi angelegten
-Befehlsaliasse, PATH-Einträge, Verknüpfungen und die Menüeinträge des Dateimanagers (unter Windows samt App-Paths-Schlüssel) und danach die Programmdateien einer Release-Installation; bei einem Build
-ohne die Markierung `.gitpoulpi-dist` (ein cargo-Build) lehnt es ab, und `--keep-files` lässt die Programmdateien stehen.
-Für MCP-Agenten ist es nicht verfügbar. Ohne Installationsprogramm löschen Sie die Programme. GitPoulpi legt außerdem
+`gitpoulpi uninstall` entfernt die Befehlsaliasse (unter Windows samt App-Paths-Schlüsseln), die PATH-Einträge, die Verknüpfungen und die Menüeinträge des Dateimanagers
+**nur dieser Installation**: Die der anderen bleiben, und der `PATH` behält deren Ordner
+und den gemeinsamen Alias-Ordner, solange eine davon dort noch einen Alias hat. Anheftungen an Taskleiste
+und Dock bleiben (Windows kann von außen nichts lösen), und Ihre Einstellungen
+behalten den Eintrag dieser Installation, sodass eine Neuinstallation in denselben Ordner ihr Aussehen
+zurückbringt. Danach löscht es die Programmdateien einer Release-Installation; dieser Teil
+lehnt einen Build ohne die Markierung `.gitpoulpi-dist` ab (ein cargo-Build). Mit
+`--keep-files` lässt es die Programmdateien stehen und funktioniert bei jedem Build, auch bei einem Dev-Checkout.
+Für MCP-Agenten ist es nicht verfügbar.
+
+| So installiert | Was Starter und Aliasse entfernt |
+|---|---|
+| Windows-Installationsprogramm (Benutzer oder alle Benutzer), winget | Das Deinstallationsprogramm führt `gitpoulpi uninstall --keep-files` aus und löscht dann die Dateien. |
+| Chocolatey | Sein automatisches Deinstallationsprogramm führt das Deinstallationsprogramm des Installers aus. |
+| Scoop | `scoop uninstall gitpoulpi` führt zuerst `gitpoulpi uninstall --keep-files` aus. |
+| MSI | Die Entfernung führt es als installierender Benutzer aus. Wird es von einem anderen Konto entfernt, bleiben die Starter des Benutzers und erscheinen als Waisen in den Einstellungen der anderen Installationen (**Vergessen**). |
+| apt, AUR, Homebrew, cargo, ein Dev-Checkout | Es läuft kein Hook für Sie: Führen Sie `gitpoulpi uninstall --keep-files` aus, bevor Sie das Paket entfernen. |
+| Archiv, `install.sh --uninstall` | Führen Sie `gitpoulpi uninstall` oder `install.sh --uninstall` aus und löschen Sie dann den Ordner. |
+
+GitPoulpi legt außerdem
 diese Dateien an:
 
 | Was | Wo |

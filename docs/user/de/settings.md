@@ -197,6 +197,22 @@ Sprachliste. Dort wird die hervorgehobene Sprache live in der Vorschau gezeigt;
 Die Seite **Starter** (`gitpoulpi ui show settings launcher`) legt eine Verknüpfung an, die GitPoulpi
 über den Starter des Betriebssystems startet, in dem Terminal Ihrer Wahl.
 
+**Diese Installation** (erste Gruppe der Seite). Jedes GitPoulpi auf einem Rechner (ein Dev-Checkout, ein Paket, eine portable Kopie) hat einen eigenen Starternamen, eine eigene Farbe, eigene Aliasse und einen eigenen Dateimanager-Eintrag, gespeichert in einer eigenen Tabelle `[installation.settings.<id>]` der `config.toml`; eine Änderung hier berührt nie eine andere Installation. Nichts davon wird im Journal erfasst (es ist Systemintegration; **Entfernen** ist der Weg zurück).
+
+| Zeile | Was sie tut |
+|---|---|
+| **Installation** | Nur lesbar: Art, Ordner und Umgebung dieser Installation. Auf einer schmalen Seite wird der Ordner in der Mitte mit einer Ellipse gekürzt; die Hilfezeile unter der Zeile hat den vollen Text. |
+| **Startername** | Der Name der Verknüpfungen und des Dateimanager-Eintrags dieser Installation. Wird abgelehnt, wenn eine andere, noch vorhandene Installation diesen Namen trägt. Die primäre Installation heißt immer `GitPoulpi`. |
+| **Version im Starternamen anzeigen** | Hängt `<Hauptversion>.<Nebenversion>` an den Namen an (`GitPoulpi 1.2`); standardmäßig aus, weil die Verknüpfungen bei jedem Update umbenannt werden. |
+| **Oktopus-Farbe** | Die Farbe des Oktopus dieser Installation und ihrer Verknüpfungen (dieselbe Auswahl wie im Fenster „Über GitPoulpi“). |
+| **Primäre Installation werden** | Die primäre Installation trägt den schlichten Namen `GitPoulpi`, die alten Verknüpfungen und die `ui.*`-Schlüssel, die ältere Versionen lesen; standardmäßig ist keine primär. Fragt vorher nach, wenn bereits eine andere es ist. Die bisherige primäre Installation behält ihre Starter unter ihrem eigenen Namen (Windows und Linux). |
+| **Umgebung** | Installationen derselben Umgebung teilen Fenster, Daemons und Rückgängig-Verlauf; Standard ist die eigene der Installation. Eine Änderung erfordert einen Neustart der geöffneten Fenster dieser Installation. |
+| **Untermenü im Dateimanager** | Fasst den Dateimanager-Eintrag unter einem Untermenü mit diesem Namen zusammen; Installationen mit demselben Namen teilen sich eines. Unter macOS nicht verfügbar; Nemo und Thunar zeigen den Eintrag immer auf der obersten Ebene. |
+| **Andere: \<Name\>** | Die anderen Installationen auf diesem Rechner. Eine, deren Ordner nicht mehr existiert, hat eine Schaltfläche **Vergessen** (fragt vorher nach), die ihren Eintrag sowie die Starter, Aliasse und Dateimanager-Einträge entfernt, die sie hinterlassen hat. |
+| **Alte Starter** | Solange niemand primär ist, werden Starter, die ein älterer Build unter dem schlichten Namen angelegt hat, mit **Primäre Installation werden** und **Alte Starter entfernen** (fragt vorher nach) aufgelistet. Ein einmaliger Hinweis in der Statuszeile verweist hierher. |
+
+Die Palette hat **Starter: Primäre Installation werden**, **Starter: Alte Starter entfernen** und **Starter: Verschwundene Installationen vergessen**, und jede Zeile ist ein `Settings:`-Eintrag. Die Zeilen für Befehlsaliasse weiter unten gehören dieser Installation (für einen Dev-Checkout werden `gpd` / `gpda` vorgeschlagen); ein Alias, den eine andere Installation angelegt hat, zeigt **Genutzt von \<Name\>** und lässt sich hier nicht erstellen.
+
 | Zeile | Was sie tut |
 |---|---|
 | **Terminal für Verknüpfungen** | `ui.launch_terminal`: **Automatisch**, **Systemstandard** oder eines der auf diesem Rechner gefundenen Terminals (dieselbe Erkennung wie bei **Öffnen in**). Automatisch: Windows Terminal unter Windows (sonst WezTerm, Alacritty, die einfache Konsole), `xdg-terminal-exec` unter Linux (Omarchy; sonst das erste gefundene Terminal), Terminal unter macOS, außer iTerm2, Ghostty, WezTerm oder kitty ist installiert. |

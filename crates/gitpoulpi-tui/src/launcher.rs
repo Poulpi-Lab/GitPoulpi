@@ -9,7 +9,9 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use gitpoulpi_config::desktop::{self, terminals, Dirs, IconSet, Place, Request, Status};
+use gitpoulpi_config::desktop::{
+    self, terminals, Dirs, IconSet, InstallCtx, Place, Request, Status,
+};
 use gitpoulpi_config::open_in::Os;
 
 type Which = Arc<dyn Fn(&str) -> Option<PathBuf> + Send + Sync>;
@@ -34,6 +36,9 @@ pub(crate) struct Env {
     pub which: Which,
     /// Run `gtk-update-icon-cache` after writing the icon (never in tests).
     pub refresh_icon_cache: bool,
+    /// Who writes. Today every writer still acts as the only installation
+    /// (the primary); later slices switch on the per-installation names.
+    pub ctx: InstallCtx,
 }
 
 impl Env {
@@ -64,7 +69,13 @@ impl Env {
         let exe =
             gitpoulpi_config::desktop::alias::tui_exe(&std::env::current_exe().unwrap_or_default());
         let newest = gitpoulpi_config::dev_mode::launcher_newest_on_disk(&exe);
+        let real_fs = gitpoulpi_config::installation::RealFs;
+        let identity = gitpoulpi_config::installation::identify(
+            &exe,
+            &gitpoulpi_config::installation::IdentityEnv::real(&real_fs),
+        );
         Env {
+            ctx: InstallCtx::sole(&identity),
             os,
             dirs,
             launch_exe: terminals::launch_helper(os, &exe, &|p| p.is_file()),
@@ -280,6 +291,7 @@ fn request<'a>(
         launch_exe: env.launch_exe.as_deref(),
         newest: env.newest,
         icons,
+        ctx: &env.ctx,
         refresh_icon_cache: env.refresh_icon_cache,
     }
 }
@@ -300,13 +312,14 @@ pub(crate) fn folder_menu_env(env: &Env, logo: Option<&str>) -> desktop::folder_
     );
     fe.icon_png = logo.and_then(|l| icon_set(l).largest().map(<[u8]>::to_vec));
     fe.refresh_hooks = env.refresh_icon_cache;
+    fe.ctx = env.ctx.clone();
     fe
 }
 
 /// Runs `op`. Blocking.
 pub(crate) fn run(env: &Env, setting: &str, logo: &str, op: Op) -> Done {
     match op {
-        Op::Remove(place) => match desktop::remove(place, &env.dirs, env.os) {
+        Op::Remove(place) => match desktop::remove(place, &env.dirs, env.os, &env.ctx) {
             Ok(true) => Done::Removed(place),
             Ok(false) => Done::NothingToRemove(place),
             Err(e) => Done::Failed(e),
@@ -347,6 +360,7 @@ mod tests {
             has: Arc::new(move |p| has.contains(&p)),
             which: Arc::new(|_| None),
             refresh_icon_cache: false,
+            ctx: InstallCtx::legacy(),
         }
     }
 
@@ -508,6 +522,7 @@ mod sync_tests {
             has: Arc::new(move |p| has.contains(&p)),
             which: Arc::new(|_| None),
             refresh_icon_cache: false,
+            ctx: InstallCtx::legacy(),
         }
     }
 

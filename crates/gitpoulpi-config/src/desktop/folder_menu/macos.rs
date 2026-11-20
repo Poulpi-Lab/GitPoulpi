@@ -304,6 +304,7 @@ mod tests {
             registry: Arc::new(MemoryRegistry::new()),
             icon_png: None,
             refresh_hooks: false,
+            ctx: crate::desktop::InstallCtx::legacy(),
         }
     }
 

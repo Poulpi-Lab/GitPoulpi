@@ -258,6 +258,7 @@ mod tests {
             registry: reg,
             icon_png: None,
             refresh_hooks: false,
+            ctx: crate::desktop::InstallCtx::legacy(),
         }
     }
 

@@ -22,6 +22,7 @@ fn temp_env(root: &Path) -> Env {
         newest: false,
         has: std::sync::Arc::new(|p| matches!(p, "kitty" | "foot")),
         which: std::sync::Arc::new(|_| None),
+        ctx: gitpoulpi_config::desktop::InstallCtx::legacy(),
         refresh_icon_cache: false,
     }
 }

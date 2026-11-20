@@ -374,6 +374,7 @@ mod tests {
             registry: Arc::new(MemoryRegistry::new()),
             icon_png: Some(vec![1, 2, 3]),
             refresh_hooks: false,
+            ctx: crate::desktop::InstallCtx::legacy(),
         }
     }
 

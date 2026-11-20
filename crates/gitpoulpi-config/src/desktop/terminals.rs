@@ -5,6 +5,7 @@
 //! installed", so the caller decides what to look at (`PATH`, `/Applications`)
 //! and tests pass a fake list.
 
+use super::InstallCtx;
 use crate::open_in::Os;
 
 /// The setting's two non-terminal values.
@@ -186,6 +187,41 @@ pub fn wm_class(os: Os, id: &str) -> Option<&'static str> {
         "ghostty" => Some(GHOSTTY_CLASS),
         _ => None,
     }
+}
+
+/// 16 lower-case hex digits for an installation id: the id itself when it
+/// is one, else its FNV-1a-64 (a pinned `p-<name>` id).
+fn hex16(id: &str) -> String {
+    if id.len() == 16 && id.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f')) {
+        id.to_string()
+    } else {
+        format!("{:016x}", crate::installation::fnv1a64(id.as_bytes()))
+    }
+}
+
+/// The AppUserModelID of `ctx`'s shortcuts and terminal window: the primary
+/// keeps [`AUMID`], every other installation gets `GitPoulpi.I<16hex>` so its
+/// windows and pins group apart on the taskbar.
+pub fn aumid_for(ctx: &InstallCtx) -> String {
+    if ctx.is_primary() {
+        AUMID.to_string()
+    } else {
+        format!("GitPoulpi.I{}", hex16(&ctx.id))
+    }
+}
+
+/// [`wm_class`] for `ctx`: the primary keeps today's class, the others get
+/// `gitpoulpi-i<8hex>` (Ghostty: `io.github.poulpi_lab.gitpoulpi.i<8hex>`, a
+/// valid GTK application id). `xdg-terminal-exec` keeps `TUI.tile` for all.
+pub fn wm_class_for(os: Os, id: &str, ctx: &InstallCtx) -> Option<String> {
+    let base = wm_class(os, id)?;
+    if ctx.is_primary() || base == "TUI.tile" {
+        return Some(base.to_string());
+    }
+    Some(match id {
+        "ghostty" => format!("{base}.{}", ctx.short),
+        _ => format!("{base}-{}", ctx.short),
+    })
 }
 
 /// The command that runs `inner` through `gitpoulpi launch`: it shows the
@@ -645,6 +681,76 @@ mod tests {
         assert_eq!(wm_class(Os::Linux, "xdg-terminal-exec"), Some("TUI.tile"));
         assert_eq!(wm_class(Os::Linux, "konsole"), None);
         assert_eq!(wm_class(Os::Windows, "wezterm"), None);
+    }
+
+    fn ctx(id: &str, primary: Option<&str>) -> InstallCtx {
+        InstallCtx {
+            id: id.into(),
+            short: crate::installation::short_id(id),
+            name: "n".into(),
+            primary: primary.map(str::to_string),
+            known: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn primary_keeps_gitpoulpi_class_and_aumid_others_get_their_own() {
+        let id = "0123456789abcdef";
+        let primary = ctx(id, Some(id));
+        let other = ctx(id, Some("ffffffffffffffff"));
+        let nobody = ctx(id, None);
+        assert_eq!(aumid_for(&primary), "GitPoulpi.GitPoulpi");
+        assert_eq!(aumid_for(&other), "GitPoulpi.I0123456789abcdef");
+        assert_eq!(aumid_for(&nobody), aumid_for(&other));
+        assert_eq!(
+            wm_class_for(Os::Linux, "kitty", &primary).unwrap(),
+            "gitpoulpi"
+        );
+        assert_eq!(
+            wm_class_for(Os::Linux, "kitty", &other).unwrap(),
+            "gitpoulpi-i01234567"
+        );
+        assert_eq!(
+            wm_class_for(Os::Linux, "ghostty", &primary).unwrap(),
+            "io.github.poulpi_lab.gitpoulpi"
+        );
+        // Omarchy's window rules match TUI.tile whoever asks.
+        assert_eq!(
+            wm_class_for(Os::Linux, "xdg-terminal-exec", &other).unwrap(),
+            "TUI.tile"
+        );
+        assert_eq!(wm_class_for(Os::Windows, "wezterm", &other), None);
+        assert_eq!(wm_class_for(Os::Linux, "konsole", &other), None);
+        // A pinned id hashes to 16 hex too.
+        assert_eq!(
+            aumid_for(&ctx("p-ci", None)).len(),
+            "GitPoulpi.I".len() + 16
+        );
+    }
+
+    #[test]
+    fn ghostty_ids_stay_valid_gtk_ids() {
+        // GTK: two or more dot-separated elements of [A-Za-z0-9_-], none empty,
+        // none starting with a digit.
+        fn valid(id: &str) -> bool {
+            let parts: Vec<&str> = id.split('.').collect();
+            parts.len() >= 2
+                && parts.iter().all(|p| {
+                    !p.is_empty()
+                        && !p.starts_with(|c: char| c.is_ascii_digit())
+                        && p.chars()
+                            .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
+                })
+        }
+        for c in [
+            ctx("0123456789abcdef", Some("0123456789abcdef")),
+            ctx("0123456789abcdef", None),
+            ctx("9999999999999999", None),
+            ctx("p-ci_1", None),
+        ] {
+            let class = wm_class_for(Os::Linux, "ghostty", &c).unwrap();
+            assert!(valid(&class), "{class}");
+        }
     }
 
     #[test]

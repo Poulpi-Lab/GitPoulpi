@@ -198,14 +198,32 @@ gitpoulpi
 `--version` sürümü ve derlemenin yapıldığı commit'i yazdırır. Ardından
 [Başlarken](getting-started.md) sayfasını izleyin.
 
+## Yan yana birkaç kurulum
+
+Bir paket, bir geliştirme çalışma kopyası, bir cargo derlemesi ve açılmış bir arşiv aynı anda kurulu olabilir. Her biri ayrı bir kurulumdur: kendi başlatıcı adı (`GitPoulpi (Chocolatey)`, `GitPoulpi (dev)`, ...), ahtapot rengi, komut takma adları, "Şurada aç" menü girdisi ve daemon'ları vardır; böylece iki sürüm paralel çalışır ve birbirinin pencerelerini asla devralmaz. Ayarlar, depolar ve token'lar ortaktır. Siz Ayarlar > Başlatıcı bölümünde **Birincil kurulum ol** ile seçene kadar düz `GitPoulpi` başlatıcı adı kimsenin değildir. [Ayarlar](settings.md#başlatıcı) sayfası diğer kurulumları listeler ve kaybolmuş olan için bir **Unut** düğmesi sunar.
+
 ## Kaldırma
 
-`gitpoulpi uninstall` (iki yükleyicinin de çalıştırdığı komut), GitPoulpi'nin oluşturduğu
-komut takma adlarını, PATH girdilerini, kısayolları ve dosya yöneticisi menü girdilerini
-(Windows'ta App Paths anahtarıyla birlikte), ardından bir sürüm kurulumunun program
-dosyalarını kaldırır; `.gitpoulpi-dist` işareti olmayan bir derlemede (bir cargo derlemesi)
-reddeder ve `--keep-files` program dosyalarını bırakır. MCP ajanlarına sunulmaz. Yükleyici
-kullanmadıysanız çalıştırılabilir dosyaları silin. GitPoulpi ayrıca şu dosyaları tutar:
+`gitpoulpi uninstall`, komut takma adlarını (Windows'ta App Paths anahtarlarıyla birlikte),
+PATH girdilerini, kısayolları ve dosya yöneticisi menü girdilerini **yalnızca bu kurulumun**
+kaldırır: diğerlerininkiler kalır; `PATH` de onların klasörlerini ve, hâlâ içinde takma adı
+olan bir kurulum varsa, ortak takma ad klasörünü korur. Görev çubuğu ve Dock sabitlemeleri
+kalır (Windows'ta dışarıdan sabitlemeyi kaldırmanın yolu yoktur) ve ayarlarınız bu kurulumun
+girdisini korur; böylece aynı klasöre yeniden kurmak görünümünü geri getirir. Ardından bir
+sürüm kurulumunun program dosyalarını siler; bu kısım `.gitpoulpi-dist` işareti olmayan bir
+derlemede (bir cargo derlemesi) reddeder. `--keep-files` ile program dosyalarını bırakır ve
+bir geliştirme çalışma kopyası dahil her derlemede çalışır. MCP ajanlarına sunulmaz.
+
+| Nasıl kurdunuz | Başlatıcıları ve takma adları ne kaldırır |
+|---|---|
+| Windows yükleyicisi (kullanıcı veya tüm kullanıcılar), winget | Kaldırıcı `gitpoulpi uninstall --keep-files` komutunu çalıştırır, sonra dosyaları siler. |
+| Chocolatey | Otomatik kaldırıcısı, yükleyicinin kaldırıcısını çalıştırır. |
+| Scoop | `scoop uninstall gitpoulpi` önce `gitpoulpi uninstall --keep-files` komutunu çalıştırır. |
+| MSI | Kaldırma, onu kurulumu yapan kullanıcı olarak çalıştırır. Başka bir hesap kaldırırsa kullanıcının başlatıcıları kalır ve diğer kurulumların Ayarlar sayfasında yetim olarak görünür (**Unut**). |
+| apt, AUR, Homebrew, cargo, bir geliştirme çalışma kopyası | Sizin için hiçbir kanca çalışmaz: paketi kaldırmadan önce `gitpoulpi uninstall --keep-files` komutunu çalıştırın. |
+| Arşiv, `install.sh --uninstall` | `gitpoulpi uninstall` veya `install.sh --uninstall` komutunu çalıştırın, sonra klasörü silin. |
+
+Yükleyici kullanmadıysanız çalıştırılabilir dosyaları silin. GitPoulpi ayrıca şu dosyaları tutar:
 
 | Ne | Nerede |
 |---|---|

@@ -6026,7 +6026,7 @@ installation_help = "De quel GitPoulpi il s'agit : son mode d'installation, son 
 # context: value of the Installation row; {kind} is the install kind (dev, portable...), {path} its folder, {env} the environment name
 installation_info = "{kind}, {path}, environnement {env}"
 # context: end of the help line of the Installation row, which shows the whole folder when the value is cut; {path} is the install folder
-installation_folder = "Folder: {path}"
+installation_folder = "Dossier : {path}"
 name = "Nom du lanceur"
 name_help = "Le nom des raccourcis de cette installation et de son entrée dans le menu du gestionnaire de fichiers. Seule cette installation est renommée."
 name_primary = "l'installation principale s'appelle toujours GitPoulpi"

@@ -7,14 +7,22 @@
 //! bundle shows only under Services. The first use may need enabling in System
 //! Settings > Keyboard > Keyboard Shortcuts > Services.
 //!
+//! One Quick Action `<label>.workflow` per installation, each tagged with its
+//! owner ([`OWNER_TAG`]; only the primary also writes the legacy marker).
+//! There is no submenu (Finder lists Quick Actions flat, so `Env::submenu` is
+//! ignored here) and no coloured icon: a service can only name a system
+//! `NSIconName`, never a picture of its own, so every installation shows the
+//! same system symbol and is told apart by its label.
+//!
 //! This is the one piece built from an undocumented file format; it lives in
 //! its own file so it can be switched off alone (`coming(...)` on the page).
 
 use std::path::{Path, PathBuf};
 
 use super::thunar::xml_escape;
-use super::Env;
-use crate::desktop::{sh_quote, write_file, State, MARKER};
+use super::{may_touch, Env, Who};
+use crate::desktop::owner::Facts;
+use crate::desktop::{sh_quote, write_file, State, MARKER, OWNER_TAG};
 
 const PLIST_HEAD: &str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n";
 
@@ -28,8 +36,37 @@ fn file_label(label: &str) -> String {
     label.replace(['/', ':', '\0'], "-")
 }
 
+/// The owner keys of `Info.plist`: the legacy marker (primary only) and the tag.
+fn owner_keys(who: &Who) -> String {
+    let mut out = String::new();
+    if who.primary {
+        out.push_str(&format!("\t<key>{MARKER}</key>\n\t<true/>\n"));
+    }
+    if !who.id.is_empty() {
+        out.push_str(&format!(
+            "\t<key>{OWNER_TAG}</key>\n\t<string>{}</string>\n",
+            xml_escape(&who.id)
+        ));
+    }
+    out
+}
+
+/// What the owner rule needs from an `Info.plist`.
+fn plist_facts(text: &str) -> Facts<'_> {
+    let tag = text
+        .split_once(&format!("<key>{OWNER_TAG}</key>"))
+        .and_then(|(_, rest)| rest.split_once("<string>"))
+        .and_then(|(_, rest)| rest.split_once("</string>"))
+        .map(|(t, _)| t);
+    Facts {
+        tag,
+        legacy_marker: text.contains(&format!("<key>{MARKER}</key>")),
+        names_my_exe: false,
+    }
+}
+
 /// `Contents/Info.plist`: the service Finder lists for folders.
-pub fn info_plist(label: &str) -> String {
+pub(crate) fn info_plist(label: &str, who: &Who) -> String {
     let l = xml_escape(label);
     format!(
         "{PLIST_HEAD}<dict>\n\
@@ -58,9 +95,8 @@ pub fn info_plist(label: &str) -> String {
          \t\t\t</array>\n\
          \t\t</dict>\n\
          \t</array>\n\
-         \t<key>{MARKER}</key>\n\
-         \t<true/>\n\
-         </dict>\n</plist>\n"
+         {}</dict>\n</plist>\n",
+        owner_keys(who)
     )
 }
 
@@ -146,7 +182,8 @@ pub fn wflow(script: &str) -> String {
     )
 }
 
-/// Our bundles in `~/Library/Services`: `(bundle path, label)`.
+/// The running installation's bundles in `~/Library/Services`: `(bundle path,
+/// label)`.
 fn ours(env: &Env) -> Vec<(PathBuf, String)> {
     let Ok(read) = std::fs::read_dir(services(env)) else {
         return Vec::new();
@@ -157,7 +194,7 @@ fn ours(env: &Env) -> Vec<(PathBuf, String)> {
         .filter(|p| p.extension().is_some_and(|x| x == EXT))
         .filter(|p| {
             std::fs::read_to_string(p.join("Contents/Info.plist"))
-                .is_ok_and(|t| t.contains(&format!("<key>{MARKER}</key>")))
+                .is_ok_and(|t| may_touch(env, &plist_facts(&t)))
         })
         .filter_map(|p| {
             let label = p.file_stem()?.to_string_lossy().into_owned();
@@ -183,11 +220,12 @@ pub(super) fn state(env: &Env, label: &str) -> State {
     let Some(helper) = env.helper.as_deref() else {
         return State::Outdated;
     };
+    let who = Who::of(env);
     let same = |rel: &str, want: String| {
         std::fs::read_to_string(path.join(rel)).ok().as_deref() == Some(want.as_str())
     };
     if mine.len() == 1
-        && same("Contents/Info.plist", info_plist(found))
+        && same("Contents/Info.plist", info_plist(found, &who))
         && same("Contents/document.wflow", wflow(&script(helper)))
     {
         State::Installed
@@ -198,6 +236,7 @@ pub(super) fn state(env: &Env, label: &str) -> State {
 
 pub(super) fn install(env: &Env, label: &str) -> Result<(), String> {
     let helper = env.helper_path()?;
+    let who = Who::of(env);
     let root = services(env).join(format!("{}.{EXT}", file_label(label)));
     let mine = ours(env);
     if root.exists() && !mine.iter().any(|(p, _)| *p == root) {
@@ -211,7 +250,7 @@ pub(super) fn install(env: &Env, label: &str) -> Result<(), String> {
     }
     write_file(
         &root.join("Contents/Info.plist"),
-        info_plist(label).as_bytes(),
+        info_plist(label, &who).as_bytes(),
         false,
     )?;
     write_file(
@@ -310,9 +349,69 @@ mod tests {
         }
     }
 
+    fn legacy() -> Who {
+        Who {
+            id: String::new(),
+            short: "i".into(),
+            primary: true,
+            submenu: String::new(),
+        }
+    }
+
+    fn env_of(root: &Path, id: &str, primary: Option<&str>) -> Env {
+        Env {
+            ctx: crate::desktop::folder_menu::testing::ctx(id, primary),
+            // A submenu is not possible here and must change nothing.
+            submenu: "Dev".into(),
+            ..env(root)
+        }
+    }
+
+    #[test]
+    fn macos_writes_one_quick_action_per_installation() {
+        use crate::desktop::folder_menu::testing::{A, B};
+        let tmp = tempfile::tempdir().unwrap();
+        let (a, b) = (env_of(tmp.path(), A, None), env_of(tmp.path(), B, None));
+        let services = tmp.path().join("Library/Services");
+        // A legacy bundle (marker, no tag) belongs to nobody while there is no primary.
+        let legacy_bundle = services.join("Open in GitPoulpi.workflow");
+        std::fs::create_dir_all(legacy_bundle.join("Contents")).unwrap();
+        let legacy_plist = info_plist("Open in GitPoulpi", &legacy());
+        std::fs::write(legacy_bundle.join("Contents/Info.plist"), &legacy_plist).unwrap();
+
+        assert_eq!(folder_menu::install(&a, "Open in A").unwrap().len(), 1);
+        assert_eq!(folder_menu::install(&b, "Open in B").unwrap().len(), 1);
+        let plist = |n: &str| {
+            std::fs::read_to_string(services.join(format!("{n}.workflow/Contents/Info.plist")))
+                .unwrap()
+        };
+        for (n, id) in [("Open in A", A), ("Open in B", B)] {
+            let p = plist(n);
+            assert!(p.contains(&format!("<key>{OWNER_TAG}</key>\n\t<string>{id}</string>")));
+            assert!(
+                !p.contains(&format!("<key>{MARKER}</key>")),
+                "only the primary writes the legacy marker"
+            );
+        }
+        assert_eq!(
+            folder_menu::status(&a, "Open in A").entries[0].state,
+            State::Installed
+        );
+        // A removes its own bundle only.
+        assert_eq!(folder_menu::remove(&a).unwrap(), [Manager::Finder]);
+        assert!(!services.join("Open in A.workflow").exists());
+        assert!(services.join("Open in B.workflow").exists());
+        assert!(legacy_bundle.join("Contents/Info.plist").is_file());
+        assert!(folder_menu::remove(&b).unwrap().len() == 1);
+        assert_eq!(
+            std::fs::read_to_string(legacy_bundle.join("Contents/Info.plist")).unwrap(),
+            legacy_plist
+        );
+    }
+
     #[test]
     fn the_plists_hold_the_service_the_marker_and_the_script() {
-        let p = info_plist("Open & Go");
+        let p = info_plist("Open & Go", &legacy());
         for needle in [
             "NSSendFileTypes",
             "public.folder",

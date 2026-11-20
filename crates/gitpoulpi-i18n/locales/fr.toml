@@ -9194,6 +9194,18 @@ token_rotated = "Jeton d'accès remplacé."
 token_failed = "Impossible de conserver le jeton d'accès : {reason}"
 # context: status line when there is no access token to show or copy
 token_missing = "Il n'y a pas encore de jeton d'accès."
+# context: button in Settings > Agents & MCP under the MCP server port; looks for a port nobody listens on and saves it. Width budget: 24 cells
+suggest_port = "Suggérer un port libre"
+# context: help under the suggest-a-free-port button
+suggest_port_help = "Plusieurs installations de GitPoulpi utilisent par défaut le même port MCP, et un seul serveur MCP HTTP peut occuper un port : le second refuse de démarrer. Cherche un port libre sur la même adresse d'hôte et l'enregistre comme adresse MCP de cette installation."
+# context: status line while the free port is being looked for
+suggest_port_working = "Recherche d'un port libre..."
+# context: status line after a free port was saved; {bind} is a host address and port such as 127.0.0.1:8809
+suggested = "Adresse MCP réglée sur {bind}. Prise en compte au prochain démarrage du serveur."
+# context: status line when no free port was found
+suggest_port_failed = "Aucun port libre trouvé sur cette adresse."
+# context: command palette entry: opens Settings > Agents & MCP and suggests a free MCP port
+palette_suggest_port = "MCP : Suggérer un port libre"
 # context: label of a choice in Settings > Agents & MCP: how the MCP HTTP endpoint is encrypted (TLS)
 tls = "TLS"
 # context: help under the TLS choice

@@ -40,7 +40,7 @@ impl PreferencesState {
     /// (`mcp.port`): it edits the port of `mcp.bind` and keeps its host.
     #[cfg(feature = "mcp")]
     pub(super) fn mcp_rows(&self) -> Vec<Field> {
-        let mcp = &self.config.mcp;
+        let mcp = &self.mcp_in_force();
         let (_, port) = mcp.bind_parts();
         let mut port_row = Field::global(
             msg::settings_general::MCP_PORT.get(),
@@ -65,6 +65,7 @@ impl PreferencesState {
             )
             .with_help(msg::settings_general::MCP_SERVER_HELP.get()),
             port_row,
+            self.mcp_suggest_row(),
         ]
     }
 

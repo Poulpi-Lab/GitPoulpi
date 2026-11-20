@@ -7,6 +7,7 @@ pub mod installation;
 mod integration;
 mod keybindings;
 pub mod launch;
+pub mod mcp_port;
 pub mod mcp_secrets;
 pub mod open_in;
 pub mod os_apps;

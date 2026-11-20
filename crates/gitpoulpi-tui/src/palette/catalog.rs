@@ -3976,6 +3976,12 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "",
         PaletteCommand::LauncherAliasRemove,
     ),
+    #[cfg(feature = "mcp")]
+    entry(
+        msg::mcp_security::PALETTE_SUGGEST_PORT,
+        "",
+        PaletteCommand::McpSuggestPort,
+    ),
     entry(
         msg::launcher::PALETTE_PATH_ADD,
         "",

@@ -109,6 +109,7 @@ pub(super) const INTEGRATIONS: &[Row] = &[
 pub(super) const AGENTS: &[Row] = &[
     Key("mcp.enabled"),
     Key("mcp.port"),
+    Key("mcp.suggest_port"),
     Key("ui.allow_agent_view_control"),
     Key("mcp.allow_ui_propose"),
     Key("ui.launch"),

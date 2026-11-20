@@ -1248,6 +1248,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Starter: Snelkoppelingen verwijderen |  |
 | Starter: Opdrachtalias maken |  |
 | Starter: Opdrachtalias verwijderen |  |
+| MCP: Suggest a free port |  |
 | Starter: Toevoegen aan PATH |  |
 | Starter: Verwijderen uit PATH |  |
 | Starter: Menu Openen in GitPoulpi installeren |  |

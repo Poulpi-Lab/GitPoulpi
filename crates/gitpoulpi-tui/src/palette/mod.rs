@@ -756,6 +756,11 @@ pub(crate) enum PaletteCommand {
     LauncherAliasCreate,
     /// Removes the command aliases GitPoulpi made.
     LauncherAliasRemove,
+    /// Opens Settings > Agents & MCP and saves a free port as this
+    /// installation's MCP bind.
+    #[cfg_attr(not(feature = "mcp"), allow(dead_code))]
+    // only a build with the MCP server lists it
+    McpSuggestPort,
     /// Adds GitPoulpi to the user PATH.
     LauncherPathAdd,
     /// Removes what GitPoulpi added to the user PATH.

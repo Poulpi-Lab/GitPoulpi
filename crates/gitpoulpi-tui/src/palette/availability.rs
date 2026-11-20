@@ -1127,6 +1127,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::LauncherRemove
         | C::LauncherAliasCreate
         | C::LauncherAliasRemove
+        | C::McpSuggestPort
         | C::LauncherPathAdd
         | C::LauncherPathRemove
         | C::LauncherFolderMenuInstall

@@ -1239,6 +1239,7 @@ die Standardtasten.
 | Starter: Verknüpfungen entfernen |  |
 | Starter: Befehlsalias erstellen |  |
 | Starter: Befehlsalias entfernen |  |
+| MCP: Suggest a free port |  |
 | Starter: Zum PATH hinzufügen |  |
 | Starter: Aus dem PATH entfernen |  |
 | Starter: Menü „In GitPoulpi öffnen“ installieren |  |

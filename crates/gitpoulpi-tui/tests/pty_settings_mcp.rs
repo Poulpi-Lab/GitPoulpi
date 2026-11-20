@@ -120,3 +120,51 @@ fn the_switch_and_the_port_are_saved_and_the_port_is_editable_while_off() {
         stored(config.path())
     );
 }
+
+#[test]
+fn suggest_a_free_port_writes_this_installations_bind_and_keeps_the_host() {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("mcp base")
+        .unwrap()
+        .build();
+    let config = tempfile::tempdir().unwrap();
+    std::fs::write(
+        config.path().join("config.toml"),
+        "[mcp]\nbind = \"127.0.0.2:7000\"\n",
+    )
+    .unwrap();
+    let mut term = common::launch(repo.root())
+        .session("pty-settings-mcp-suggest")
+        .config_dir(config.path())
+        .size(200, 100)
+        .ready("mcp base")
+        .spawn();
+    let (gear_col, gear_row) = term.wait_for_text("\u{2699}", STEP).unwrap();
+    term.click(gear_col, gear_row).expect("click the gear");
+    term.wait_for("Settings open", STEP, |s| {
+        s.contains("Repo-specific settings")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    common::settings_page(&mut term, "Agents & MCP");
+    click_text(&mut term, "Suggest a free port");
+    wait_stored(config.path(), "mcp_bind = ");
+
+    let value: toml::Value = toml::from_str(&stored(config.path())).unwrap();
+    let bind = value["installation"]["settings"]["p-pty"]["mcp_bind"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let (host, port) = bind.rsplit_once(':').unwrap();
+    assert_eq!(host, "127.0.0.2", "{bind}");
+    assert_ne!(port, "7000", "{bind}");
+    // The shared `mcp.bind` is untouched.
+    assert!(stored(config.path()).contains("bind = \"127.0.0.2:7000\""));
+    // The port row shows the new port.
+    term.wait_for("the port row showing the suggestion", STEP, |s| {
+        s.text()
+            .lines()
+            .any(|l| l.contains("MCP server port") && l.contains(port))
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+}

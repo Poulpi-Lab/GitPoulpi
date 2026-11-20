@@ -1246,6 +1246,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Lanceur : Supprimer les raccourcis |  |
 | Lanceur : Créer l'alias de commande |  |
 | Lanceur : Supprimer l'alias de commande |  |
+| MCP : Suggérer un port libre |  |
 | Lanceur : Ajouter au PATH |  |
 | Lanceur : Retirer du PATH |  |
 | Lanceur : Installer le menu Ouvrir dans GitPoulpi |  |

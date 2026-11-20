@@ -97,6 +97,8 @@ fn each_setting_is_on_the_page_the_owner_chose() {
                 #[cfg(feature = "mcp")]
                 "mcp.port",
                 #[cfg(feature = "mcp")]
+                "mcp.suggest_port",
+                #[cfg(feature = "mcp")]
                 "mcp.http_auth",
                 #[cfg(feature = "mcp")]
                 "mcp.token",

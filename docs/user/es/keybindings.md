@@ -1249,6 +1249,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Lanzador: Quitar accesos directos |  |
 | Lanzador: Crear alias del comando |  |
 | Lanzador: Quitar alias del comando |  |
+| MCP: Suggest a free port |  |
 | Lanzador: Añadir al PATH |  |
 | Lanzador: Quitar del PATH |  |
 | Lanzador: Instalar menú Abrir en GitPoulpi |  |

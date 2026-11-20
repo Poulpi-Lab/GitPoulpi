@@ -534,6 +534,8 @@ Not exposed as tools:
 | `gitpoulpi desktop shortcut remove` | deletes files from the user's launcher, Start menu and Desktop |
 | `gitpoulpi alias create` | writes a command into the user's PATH; an agent never changes the user's shell |
 | `gitpoulpi alias remove` | deletes a command from the user's PATH; an agent never changes the user's shell |
+| `gitpoulpi installation show` | describes this machine's GitPoulpi installations (folders, environments); local, like desktop and alias |
+| `gitpoulpi installation set` | changes this installation's own names, colour, aliases and environment in the user's config |
 | `gitpoulpi path add` | edits the user's shell rc files or Windows user PATH |
 | `gitpoulpi path remove` | edits the user's shell rc files or Windows user PATH |
 | `gitpoulpi uninstall` | removes GitPoulpi's own program files, aliases, PATH entries and shortcuts from the machine |

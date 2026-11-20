@@ -272,6 +272,7 @@ pub(crate) fn is_local(command: &Commands) -> bool {
         | Commands::Theme { .. }
         | Commands::Licenses
         | Commands::Alias { .. }
+        | Commands::Installation { .. }
         | Commands::Path { .. } => true,
         Commands::Flow {
             action: crate::cli::FlowAction::Templates,
@@ -307,6 +308,7 @@ async fn run_local(
             gitpoulpi_core::licenses::THIRD_PARTY.trim_end(),
         )),
         Commands::Alias { action } => crate::alias_cmd::alias(action),
+        Commands::Installation { action } => crate::installation_cmd::execute(action),
         Commands::Path { action } => crate::alias_cmd::path(action),
         Commands::Flow { .. } => flow::templates(),
         Commands::Config { action } => {
@@ -1539,6 +1541,7 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
         | Commands::Theme { .. }
         | Commands::Licenses
         | Commands::Alias { .. }
+        | Commands::Installation { .. }
         | Commands::Path { .. } => {
             unreachable!("local commands are handled before dispatch")
         }

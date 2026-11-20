@@ -3,9 +3,14 @@
 //! "Add GitPoulpi to PATH" rows, and what the installers call. The work is
 //! `gitpoulpi_config::desktop::{alias, path}`; nothing here needs a daemon or
 //! a repository. Not journaled: there is no git state to undo.
+//!
+//! Several installations share the alias folder and the user PATH: every
+//! action runs as the current installation (`installation::current`), touches
+//! only its own aliases and keeps what the others need.
 
 use gitpoulpi_config::desktop::alias::{self, Kind, NameError};
 use gitpoulpi_config::desktop::path::{self as user_path, UserPath};
+use gitpoulpi_config::installation;
 use gitpoulpi_config::open_in::Os;
 use serde_json::{json, Value};
 
@@ -25,9 +30,13 @@ fn machine() -> Result<Machine, String> {
     let home = gitpoulpi_config::home_dir().ok_or("no home directory")?;
     let env = |k: &str| std::env::var(k).ok();
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
-    let mut alias = alias::Env::discover(os, &env, &home, &exe);
+    let cur = installation::current();
+    let mut alias = alias::Env::discover(os, &env, &home, &exe).with_ctx(cur.ctx.clone());
     alias.newest = gitpoulpi_config::dev_mode::launcher_newest_on_disk(&exe);
-    let path = user_path::Env::discover(os, &env, &home, &alias);
+    // The shared record on PATH keeps what other installations rely on: their
+    // folders, and the alias folder while one of them still has an alias there.
+    let keep = installation::path_keep(cur, &alias);
+    let path = user_path::Env::discover(os, &env, &home, &alias).keeping(keep);
     Ok(Machine {
         alias,
         path,
@@ -35,13 +44,53 @@ fn machine() -> Result<Machine, String> {
     })
 }
 
-/// `ui.command_alias` and `ui.command_alias_add`.
+/// This installation's command alias and add-tab alias settings (its entry,
+/// else `ui.*` when it is the primary).
 fn configured_names() -> (String, String) {
-    let ui = gitpoulpi_config::ConfigPaths::discover()
-        .and_then(|p| gitpoulpi_config::Config::load(&p.config_file()).ok())
-        .unwrap_or_default()
-        .ui;
-    (ui.command_alias, ui.command_alias_add)
+    let e = &installation::current().effective;
+    (e.command_alias.clone(), e.command_alias_add.clone())
+}
+
+/// `{ "id": .., "name": .. }` for the installation an alias belongs to.
+fn installation_json(id: Option<&str>) -> Value {
+    let cur = installation::current();
+    let Some(id) = id else { return Value::Null };
+    let name = if id == cur.identity.id {
+        Some(cur.effective.name.clone())
+    } else {
+        installation::effective_of(&cur.config, id).map(|e| e.name)
+    };
+    json!({ "id": id, "name": name, "mine": id == cur.identity.id })
+}
+
+/// An alias made through `alias create` is recorded in this installation's
+/// settings when it has none, so an alias an installer made shows in Settings.
+fn record_name(name: &str, kind: Kind) {
+    let cur = installation::current();
+    let Some(file) = cur.config_file.as_deref() else {
+        return;
+    };
+    let id = cur.identity.id.clone();
+    let name = name.to_string();
+    let primary = cur.effective.primary;
+    let (field, current) = match kind {
+        Kind::Open => ("ui.command_alias", &cur.effective.command_alias),
+        Kind::Add => ("ui.command_alias_add", &cur.effective.command_alias_add),
+    };
+    if !current.is_empty() {
+        return;
+    }
+    let _ = installation::set_installation_in_file(file, |c| {
+        if let Some(entry) = c.settings.get_mut(&id) {
+            match kind {
+                Kind::Open => entry.command_alias = name.clone(),
+                Kind::Add => entry.command_alias_add = name.clone(),
+            }
+        }
+    });
+    if primary {
+        let _ = gitpoulpi_config::set_in_file(file, field, &name);
+    }
 }
 
 fn paths(list: &[std::path::PathBuf]) -> Vec<String> {
@@ -56,6 +105,7 @@ fn alias_json(m: &Machine, name: &str, kind: Kind) -> Value {
         "state": st.state.as_str(),
         "shadowed_by": st.shadowed_by.map(|p| p.display().to_string()),
         "powershell_builtin": st.powershell_builtin,
+        "installation": installation_json(st.owner.as_deref()),
     })
 }
 
@@ -74,10 +124,15 @@ pub fn alias(action: AliasAction) -> Result<Emitted, String> {
     match action {
         AliasAction::Status => {
             let (configured, configured_add) = configured_names();
-            let existing: Vec<Value> = alias::list_kinds(&m.alias)
+            let existing: Vec<Value> = alias::list_all(&m.alias)
                 .into_iter()
-                .map(|(name, kind, state)| {
-                    json!({ "name": name, "kind": kind.as_str(), "state": state.as_str() })
+                .map(|e| {
+                    json!({
+                        "name": e.name,
+                        "kind": e.kind.as_str(),
+                        "state": e.state.as_str(),
+                        "installation": installation_json(e.owner.as_deref()),
+                    })
                 })
                 .collect();
             let setting = (alias::validate_name(&configured).is_ok())
@@ -118,6 +173,7 @@ pub fn alias(action: AliasAction) -> Result<Emitted, String> {
             let kind = if add { Kind::Add } else { Kind::Open };
             let before = alias_json(&m, &name, kind);
             let path = alias::create_with_app_path(&m.alias, &*m.registry, &name, kind)?;
+            record_name(&name, kind);
             Ok(emitted(
                 json!({
                     "created": name,
@@ -141,15 +197,7 @@ pub fn alias(action: AliasAction) -> Result<Emitted, String> {
                     .then_some(name)
                     .into_iter()
                     .collect(),
-                None => {
-                    let mut gone = Vec::new();
-                    for (name, _) in alias::list(&m.alias) {
-                        if alias::remove_with_app_path(&m.alias, &*m.registry, &name)? {
-                            gone.push(name);
-                        }
-                    }
-                    gone
-                }
+                None => alias::remove_all_with_app_paths(&m.alias, &*m.registry)?,
             };
             let human = if removed.is_empty() {
                 "no command alias to remove".to_string()

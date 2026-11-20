@@ -40,9 +40,12 @@ impl Machine {
         let home = gitpoulpi_config::home_dir().unwrap_or_default();
         let env = |k: &str| std::env::var(k).ok();
         let exe = std::env::current_exe().unwrap_or_default();
-        let mut alias = alias::Env::discover(os, &env, &home, &exe);
+        // As the running installation: it touches only its own aliases.
+        let cur = gitpoulpi_config::installation::current();
+        let mut alias = alias::Env::discover(os, &env, &home, &exe).with_ctx(cur.ctx.clone());
         alias.newest = gitpoulpi_config::dev_mode::launcher_newest_on_disk(&exe);
-        let path = user_path::Env::discover(os, &env, &home, &alias);
+        let keep = gitpoulpi_config::installation::path_keep(cur, &alias);
+        let path = user_path::Env::discover(os, &env, &home, &alias).keeping(keep);
         Machine {
             alias,
             path,
@@ -443,7 +446,7 @@ impl PreferencesState {
                 Some(alias::State::NotInstalled) => t::STATE_NONE.get(),
                 Some(alias::State::Installed) => t::ALIAS_CREATED.get(),
                 Some(alias::State::Outdated) => t::ALIAS_OUTDATED.get(),
-                Some(alias::State::Foreign) => t::STATE_FOREIGN.get(),
+                Some(alias::State::Foreign | alias::State::Other) => t::STATE_FOREIGN.get(),
             }
         };
         fields.push(Field::plain(
@@ -471,7 +474,7 @@ impl PreferencesState {
                     Some(alias::State::NotInstalled) => t::STATE_NONE.get(),
                     Some(alias::State::Installed) => t::ALIAS_CREATED.get(),
                     Some(alias::State::Outdated) => t::ALIAS_OUTDATED.get(),
-                    Some(alias::State::Foreign) => t::STATE_FOREIGN.get(),
+                    Some(alias::State::Foreign | alias::State::Other) => t::STATE_FOREIGN.get(),
                 }
             };
             fields.push(Field::plain(

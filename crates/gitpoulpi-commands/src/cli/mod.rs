@@ -43,10 +43,10 @@ pub use refs_misc::SubmoduleAction;
 pub use refs_misc::WorktreeAction;
 pub use refs_misc::{
     AliasAction, AutoStashAction, BranchAction, ConfigAction, DaemonAction, DesktopAction,
-    FolderMenuAction, OnOff, PatchAction, PathAction, PullModeArg, ReflogModeArg, RefsAction,
-    RemoteAction, RemoteGroupAction, RepoAction, RepoConfigAction, ResetModeArg, ReviewFlags,
-    RunInRepoArg, SessionAction, ShortcutAction, SparseAction, SshCommandAction, StashAction,
-    TagAction, ThemeAction, UpstreamAction,
+    FolderMenuAction, InstallationAction, OnOff, PatchAction, PathAction, PullModeArg,
+    ReflogModeArg, RefsAction, RemoteAction, RemoteGroupAction, RepoAction, RepoConfigAction,
+    ResetModeArg, ReviewFlags, RunInRepoArg, SessionAction, ShortcutAction, SparseAction,
+    SshCommandAction, StashAction, TagAction, ThemeAction, UpstreamAction,
 };
 pub use repo_auth::RepoAuthAction;
 #[cfg(feature = "history-rewrite")]
@@ -1169,6 +1169,13 @@ pub enum Commands {
     Alias {
         #[command(subcommand)]
         action: AliasAction,
+    },
+    /// Which GitPoulpi installation this is, and its own settings (colour,
+    /// name, aliases, environment). Several installations can live side by
+    /// side on one machine.
+    Installation {
+        #[command(subcommand)]
+        action: InstallationAction,
     },
     /// Puts GitPoulpi on the user PATH, for new terminals.
     Path {

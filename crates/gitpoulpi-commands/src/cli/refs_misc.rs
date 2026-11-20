@@ -985,6 +985,25 @@ pub enum AliasAction {
 }
 
 #[derive(Debug, Subcommand)]
+pub enum InstallationAction {
+    /// Shows which GitPoulpi installation this is (its id, kind, folder and
+    /// environment), whether it is the primary, its own settings and the
+    /// other installations of this machine.
+    Show,
+    /// Sets one of this installation's own settings: `name`,
+    /// `name_with_version`, `logo_color`, `command_alias`,
+    /// `command_alias_add`, `folder_menu_submenu`, `env` or `mcp_bind`. An
+    /// empty value clears it. The primary's colour and aliases are also
+    /// written to the shared `ui.*` keys that older builds read.
+    Set {
+        /// The field to set.
+        field: String,
+        /// The new value (empty clears it).
+        value: String,
+    },
+}
+
+#[derive(Debug, Subcommand)]
 pub enum PathAction {
     /// Shows whether the folder GitPoulpi lives in and the alias folder are on
     /// the user PATH, and what GitPoulpi added.

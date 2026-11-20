@@ -102,6 +102,14 @@ pub const EXCLUDED: &[(&[&str], &str)] = &[
         "deletes a command from the user's PATH; an agent never changes the user's shell",
     ),
     (
+        &["installation", "show"],
+        "describes this machine's GitPoulpi installations (folders, environments); local, like desktop and alias",
+    ),
+    (
+        &["installation", "set"],
+        "changes this installation's own names, colour, aliases and environment in the user's config",
+    ),
+    (
         &["path", "add"],
         "edits the user's shell rc files or Windows user PATH",
     ),

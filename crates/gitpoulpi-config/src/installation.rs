@@ -925,5 +925,114 @@ pub fn resign_primary_in_file(path: &Path, id: &str) -> Result<Option<PrimaryHan
     apply_handover(path, |config| plan_resign(config, id))
 }
 
+// ----------------------------------------------------------------- current
+
+/// The running installation as every frontend needs it: who it is, its
+/// seeded config and the context the desktop writers take.
+#[derive(Debug, Clone)]
+pub struct Current {
+    pub identity: Identity,
+    /// The config after seeding this installation's entry.
+    pub config: Config,
+    pub effective: Effective,
+    /// The environment in force (`GITPOULPI_ENV` included).
+    pub environment: String,
+    pub ctx: crate::desktop::InstallCtx,
+    /// The `config.toml` the entry lives in, when the config folder is known.
+    pub config_file: Option<std::path::PathBuf>,
+}
+
+/// Where each alias file points, read off the real bin directory.
+struct DiskAliases(crate::desktop::alias::Env);
+
+impl AliasEvidence for DiskAliases {
+    fn target_of(&self, alias: &str) -> Option<String> {
+        crate::desktop::alias::target_of(&self.0, alias).map(|p| p.to_string_lossy().into_owned())
+    }
+}
+
+/// Identifies the running exe, seeds its entry in `config.toml` the first time
+/// (or refreshes its path and channel) and returns the result, worked out once
+/// per process. Frontends (`alias`, `desktop`, `folder-menu`, `uninstall`)
+/// act through it. Tests of the pure rules use [`identify`] and [`seed`]
+/// directly; this reads the real machine.
+pub fn current() -> &'static Current {
+    static CURRENT: std::sync::OnceLock<Current> = std::sync::OnceLock::new();
+    CURRENT.get_or_init(|| {
+        let fs = RealFs;
+        let env = IdentityEnv::real(&fs);
+        let exe = std::env::current_exe().unwrap_or_default();
+        let identity = identify(&exe, &env);
+        let config_file = crate::ConfigPaths::discover().map(|p| p.config_file());
+        let mut config = config_file
+            .as_deref()
+            .and_then(|f| Config::load(f).ok())
+            .unwrap_or_default();
+        let live = |e: &InstallationEntry| !e.path.is_empty() && Path::new(&e.path).exists();
+        if let Some(home) = crate::home_dir() {
+            let lookup = |k: &str| std::env::var(k).ok();
+            let aliases = DiskAliases(crate::desktop::alias::Env::discover(
+                crate::open_in::Os::current(),
+                &lookup,
+                &home,
+                &exe,
+            ));
+            if let (Some(entry), Some(file)) = (
+                seed(&config, &identity, &env, &aliases, &live),
+                config_file.as_deref(),
+            ) {
+                let id = identity.id.clone();
+                let stored = entry.clone();
+                if set_installation_in_file(file, |i| {
+                    i.settings.insert(id, stored);
+                })
+                .is_ok()
+                {
+                    config
+                        .installation
+                        .settings
+                        .insert(identity.id.clone(), entry);
+                }
+            }
+        }
+        let effective = effective(&config, &identity);
+        let environment = environment(&config, &identity, &env);
+        let ctx = crate::desktop::InstallCtx::from_config(&config, &identity, &|path| {
+            !path.is_empty() && Path::new(path).exists()
+        });
+        Current {
+            identity,
+            config,
+            effective,
+            environment,
+            ctx,
+            config_file,
+        }
+    })
+}
+
+/// The folders on the user `PATH` that `path add` and `path remove` of `cur`
+/// leave alone: other live installations' folders, and the shared alias `bin`
+/// folder while another installation still has an alias in it.
+pub fn path_keep(cur: &Current, aliases: &crate::desktop::alias::Env) -> Vec<std::path::PathBuf> {
+    let mut keep = other_live_paths(&cur.config, &cur.identity.id);
+    if crate::desktop::alias::others_have_aliases(aliases) {
+        keep.push(aliases.bin_dir.clone());
+    }
+    keep
+}
+
+/// The entries' paths of the other live installations.
+pub fn other_live_paths(config: &Config, id: &str) -> Vec<std::path::PathBuf> {
+    config
+        .installation
+        .settings
+        .iter()
+        .filter(|(other, e)| other.as_str() != id && !e.path.is_empty())
+        .filter(|(_, e)| Path::new(&e.path).exists())
+        .map(|(_, e)| std::path::PathBuf::from(&e.path))
+        .collect()
+}
+
 #[cfg(test)]
 mod tests;

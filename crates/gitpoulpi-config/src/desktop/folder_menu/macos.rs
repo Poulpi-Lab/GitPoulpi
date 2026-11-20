@@ -305,6 +305,8 @@ mod tests {
             icon_png: None,
             refresh_hooks: false,
             ctx: crate::desktop::InstallCtx::legacy(),
+            ico: None,
+            submenu: String::new(),
         }
     }
 

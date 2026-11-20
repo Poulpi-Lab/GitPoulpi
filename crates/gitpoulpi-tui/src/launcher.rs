@@ -311,6 +311,10 @@ pub(crate) fn folder_menu_env(env: &Env, logo: Option<&str>) -> desktop::folder_
         desktop::registry::from_env(),
     );
     fe.icon_png = logo.and_then(|l| icon_set(l).largest().map(<[u8]>::to_vec));
+    // Windows: the verbs show the installation's colour `.ico`.
+    fe.ico = logo
+        .filter(|_| env.os == gitpoulpi_config::open_in::Os::Windows)
+        .and_then(|l| desktop::ensure_ico(&env.dirs, &icon_set(l)));
     fe.refresh_hooks = env.refresh_icon_cache;
     fe.ctx = env.ctx.clone();
     fe

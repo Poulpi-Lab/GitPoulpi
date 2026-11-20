@@ -3,7 +3,7 @@
 //!
 //! | OS | Where | What |
 //! |---|---|---|
-//! | Windows | `HKCU\Software\Classes\{Directory,Directory\Background,Drive}\shell\GitPoulpi` | one verb, plus App Paths `gitpoulpi.exe` |
+//! | Windows | `HKCU\Software\Classes\{Directory,Directory\Background,Drive}\shell\GitPoulpi[.i<8hex>]` | one verb per installation (optionally in a shared submenu), plus the primary's App Paths `gitpoulpi.exe` |
 //! | Linux | each file manager's own mechanism ([`linux`], [`thunar`]) | a script, service menu or action |
 //! | macOS | `~/Library/Services/<label>.workflow` | a Finder Quick Action ([`macos`]) |
 //!
@@ -125,8 +125,13 @@ pub struct Env {
     pub icon_png: Option<Vec<u8>>,
     /// Run the cache refreshers (`gtk-update-icon-cache`, `pbs`). Off in tests.
     pub refresh_hooks: bool,
-    /// Who writes (owner tag, entry names). Not read yet.
+    /// Who writes (owner tag, entry names).
     pub ctx: super::InstallCtx,
+    /// Windows: the installation's colour `.ico` (`desktop::ensure_ico`) the
+    /// verbs show. `None`: the exe's own icon.
+    pub ico: Option<PathBuf>,
+    /// `folder_menu_submenu`: the submenu the entry goes into, `""` = the root.
+    pub submenu: String,
 }
 
 impl Env {
@@ -152,6 +157,8 @@ impl Env {
             icon_png: None,
             refresh_hooks: false,
             ctx: crate::desktop::InstallCtx::legacy(),
+            ico: None,
+            submenu: String::new(),
         }
     }
 

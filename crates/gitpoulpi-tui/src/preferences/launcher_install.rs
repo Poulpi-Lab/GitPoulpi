@@ -200,6 +200,26 @@ impl PreferencesState {
             .unwrap_or_default()
     }
 
+    /// Takes the installation table and the look keys older builds read from
+    /// the file again (the rest of the page's config stays), and publishes
+    /// the look when it changed.
+    pub(super) fn reread_installation(&mut self) {
+        let Some(file) = self.config_file() else {
+            return;
+        };
+        let Ok(loaded) = Config::load(&file) else {
+            return;
+        };
+        let before = self.this_effective();
+        self.config.installation = loaded.installation;
+        self.config.ui.logo_color = loaded.ui.logo_color;
+        self.config.ui.command_alias = loaded.ui.command_alias;
+        self.config.ui.command_alias_add = loaded.ui.command_alias_add;
+        if self.this_effective() != before {
+            self.publish_installation();
+        }
+    }
+
     fn others(&self) -> Vec<Other> {
         let me = &self.this().identity.id;
         self.config
@@ -242,7 +262,11 @@ impl PreferencesState {
         let path = this.identity.root.clone();
         let full = t::installation_info(this.identity.kind.as_str(), &path, &this.environment);
         let info = Field::global(t::INSTALLATION.get(), INFO, Control::Info(full.clone()))
-            .with_help(&format!("{full}. {}", t::INSTALLATION_HELP.get()))
+            .with_help(&format!(
+                "{} {}",
+                t::INSTALLATION_HELP.get(),
+                t::installation_folder(&path)
+            ))
             .with_ellipsis_of(&path)
             .live();
         let mut name = Field::global(t::NAME.get(), "installation.name", Control::Text(eff.name))
@@ -667,20 +691,18 @@ impl PreferencesState {
         let Ok(reply) = rx.try_recv() else { return };
         self.install.rx = None;
         self.install.legacy = Some(reply.legacy);
+        // The file is the truth, whatever the job made of it: a handover that
+        // fails half way has still written the primary, and another
+        // installation may have changed it since the page opened.
+        self.reread_installation();
         if let Some(done) = reply.done {
-            let changed = !matches!(done, Done::Failed(_) | Done::LegacyRemoved(_));
             if let Done::Failed(e) = &done {
                 crate::activity_log::report_problem(
                     crate::activity_log::ProblemSource::Tool,
                     &t::failed(e),
                 );
             }
-            if changed {
-                if let Some(file) = self.config_file() {
-                    if let Ok(config) = Config::load(&file) {
-                        self.config = config;
-                    }
-                }
+            if !matches!(done, Done::Failed(_) | Done::LegacyRemoved(_)) {
                 self.publish_installation();
             }
             self.message = Some(match &done {
@@ -763,6 +785,8 @@ impl JobMachine {
     /// keeps its own launchers under its own name.
     fn change_primary(&self, file: &Path, becoming: bool) -> Done {
         let mut env = (self.launcher)();
+        // The role as the file has it now, whatever the factory captured.
+        env.ctx = self.ctx(file);
         let logo = self.logo(file);
         let mut fe = (self.folder)(&logo);
         fe.ctx = env.ctx.clone();
@@ -780,12 +804,10 @@ impl JobMachine {
             .map(|r| r.place)
             .collect();
         let had_folder = folder_menu::has_any_ours(&folder_menu::status(&fe, &label));
-        for place in &had {
-            let _ = desktop::remove(*place, &env.dirs, env.os, &env.ctx);
-        }
-        if had_folder {
-            let _ = folder_menu::remove(&fe);
-        }
+        // The launchers under the names of the old role are removed only after
+        // the ones of the new role exist: a launcher is always there (Explorer
+        // takes seconds to settle a delete followed by a create).
+        let (old_ctx, old_fe) = (env.ctx.clone(), fe.clone());
         let handover = if becoming {
             installation::become_primary_in_file(file, &self.identity)
         } else {
@@ -821,6 +843,12 @@ impl JobMachine {
         }
         if had_folder {
             let _ = folder_menu::install(&fe, &launcher::folder_menu_label(&ctx.name));
+        }
+        for place in &had {
+            let _ = desktop::remove(*place, &env.dirs, env.os, &old_ctx);
+        }
+        if had_folder {
+            let _ = folder_menu::remove(&old_fe);
         }
         // Launchers left under the plain name (no owner tag) are this
         // installation's now: the sync rewrites them.
@@ -863,6 +891,7 @@ impl JobMachine {
             i.settings.remove(&id);
             if was_primary {
                 i.primary = None;
+                i.ui_before = None;
             }
         });
         match result {

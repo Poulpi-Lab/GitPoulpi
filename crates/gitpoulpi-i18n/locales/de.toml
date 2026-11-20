@@ -6014,6 +6014,8 @@ installation = "Installation"
 installation_help = "Welches GitPoulpi das hier ist: wie es installiert wurde, wo es liegt und zu welcher Umgebung es gehört, deren Fenster und Verlauf es teilt. Eine andere Installation auf diesem Rechner (ein Dev-Build, ein Paket) hat einen eigenen Starternamen, eine eigene Farbe und eigene Aliasse."
 # context: value of the Installation row; {kind} is the install kind (dev, portable...), {path} its folder, {env} the environment name
 installation_info = "{kind}, {path}, Umgebung {env}"
+# context: end of the help line of the Installation row, which shows the whole folder when the value is cut; {path} is the install folder
+installation_folder = "Folder: {path}"
 name = "Startername"
 name_help = "Der Name der Verknüpfungen dieser Installation und ihres Eintrags im Menü des Dateimanagers. Umbenannt wird nur diese Installation."
 name_primary = "die primäre Installation heißt immer GitPoulpi"

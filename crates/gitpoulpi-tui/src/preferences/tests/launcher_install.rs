@@ -106,11 +106,11 @@ fn a_narrow_page_ellipsises_the_path_never_drops_it() {
     assert!(line.contains("ols"), "the end of the path stays: {line}");
     // The full text stays one key away: the help line under the row.
     let full = row(&st, "Installation");
-    assert!(full
-        .help
-        .as_deref()
-        .unwrap()
-        .contains("/very/long/folder/of/an/install/gitpoulpi-tools"));
+    let help = full.help.as_deref().unwrap();
+    assert!(help.contains("Folder: /very/long/folder/of/an/install/gitpoulpi-tools"));
+    // ... without repeating the value's sentence.
+    assert!(!help.contains("portable, /"), "{help}");
+    assert!(!help.contains("environment aaaa"), "{help}");
 }
 
 #[test]
@@ -309,4 +309,138 @@ fn an_alias_of_another_installation_reads_used_by_and_create_is_disabled() {
     // The reason is shown as the row's value, not behind "coming".
     let row = Field::plain("x", Control::Info(String::new()), Target::None).coming(&text);
     assert_eq!(row.value_text(), text);
+}
+
+/// A launcher machine under `root` (never the real one).
+fn temp_machine(root: &Path) -> crate::launcher::Env {
+    use gitpoulpi_config::desktop::Dirs;
+    std::fs::create_dir_all(root.join("Desktop")).unwrap();
+    crate::launcher::Env {
+        os: gitpoulpi_config::open_in::Os::Linux,
+        dirs: Dirs {
+            applications: root.join("data/applications"),
+            icon_root: root.join("data/icons/hicolor"),
+            desktop: Some(root.join("Desktop")),
+            ..Dirs::default()
+        },
+        exe: PathBuf::from("/opt/gp/gitpoulpi"),
+        launch_exe: None,
+        newest: false,
+        has: std::sync::Arc::new(|p| matches!(p, "kitty" | "foot")),
+        which: std::sync::Arc::new(|_| None),
+        ctx: gitpoulpi_config::desktop::InstallCtx::legacy(),
+        refresh_icon_cache: false,
+        submenu: String::new(),
+    }
+}
+
+/// Polls until the background installation job has been applied.
+fn settle_install(st: &mut PreferencesState) {
+    for _ in 0..500 {
+        st.poll_install();
+        if !st.install.busy() {
+            return;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    panic!("the installation job never finished");
+}
+
+#[test]
+fn the_primary_rows_follow_the_state_after_the_job() {
+    let tmp = tempfile::tempdir().unwrap();
+    let mut st = install_state(tmp.path());
+    let root = tmp.path().join("machine");
+    st.set_launcher_env(move || temp_machine(&root));
+    assert!(matches!(
+        row(&st, "Become the primary").control,
+        Control::Toggle(false)
+    ));
+    assert_eq!(
+        row(&st, "Launcher name").value_text(),
+        "GitPoulpi (portable)"
+    );
+    assert!(st.write_global("installation.primary", "true"));
+    settle_install(&mut st);
+    assert!(
+        matches!(
+            row(&st, "Become the primary").control,
+            Control::Toggle(true)
+        ),
+        "the checkbox shows the new state"
+    );
+    let name = row(&st, "Launcher name");
+    assert_eq!(name.value_text(), "the primary is always called GitPoulpi");
+    assert!(name.coming.is_some());
+    // And back.
+    assert!(st.write_global("installation.primary", "false"));
+    settle_install(&mut st);
+    assert!(matches!(
+        row(&st, "Become the primary").control,
+        Control::Toggle(false)
+    ));
+    assert_eq!(
+        row(&st, "Launcher name").value_text(),
+        "GitPoulpi (portable)"
+    );
+}
+
+#[test]
+fn resigning_moves_the_launcher_to_its_own_name_and_leaves_one() {
+    let tmp = tempfile::tempdir().unwrap();
+    let mut st = state(tmp.path());
+    std::fs::write(
+        tmp.path().join("config.toml"),
+        format!("[installation]\nprimary = \"{ME}\"\n"),
+    )
+    .unwrap();
+    st.config = Config::load(&tmp.path().join("config.toml")).unwrap();
+    st.set_this(fake_current(true));
+    let root = tmp.path().join("machine");
+    let r = root.clone();
+    st.set_launcher_env(move || temp_machine(&r));
+    // The primary's launcher, under the plain name.
+    let mut env = temp_machine(&root);
+    env.ctx = crate::launcher::ctx_in(&st.config, &st.this().identity, &st.this().config);
+    let logo = st.this_colour();
+    let _ = crate::launcher::run(
+        &env,
+        "",
+        &logo,
+        crate::launcher::Op::Install(Place::Launcher),
+    );
+    let apps = root.join("data/applications");
+    assert!(apps.join("gitpoulpi.desktop").exists());
+    assert!(st.write_global("installation.primary", "false"));
+    settle_install(&mut st);
+    let names: Vec<String> = std::fs::read_dir(&apps)
+        .unwrap()
+        .flatten()
+        .map(|e| e.file_name().to_string_lossy().into_owned())
+        .collect();
+    assert_eq!(
+        names,
+        ["gitpoulpi-iaaaa0000.desktop".to_string()],
+        "only the launcher of the new role is left"
+    );
+}
+
+#[test]
+fn the_rows_reread_the_file_when_a_job_ends_even_one_that_only_reads() {
+    let tmp = tempfile::tempdir().unwrap();
+    let mut st = install_state(tmp.path());
+    let root = tmp.path().join("machine");
+    st.set_launcher_env(move || temp_machine(&root));
+    // Another process (or a handover that failed half way) wrote the primary.
+    std::fs::write(
+        tmp.path().join("config.toml"),
+        format!("[installation]\nprimary = \"{ME}\"\n"),
+    )
+    .unwrap();
+    st.install_read();
+    settle_install(&mut st);
+    assert!(matches!(
+        row(&st, "Become the primary").control,
+        Control::Toggle(true)
+    ));
 }

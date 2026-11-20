@@ -6013,6 +6013,8 @@ installation = "Kurulum"
 installation_help = "Bunun hangi GitPoulpi olduğu: nasıl kurulduğu, nerede durduğu ve pencerelerini ile geçmişini paylaştığı ortam. Bu makinedeki başka bir kurulumun (geliştirme derlemesi, paket) kendi başlatıcı adı, rengi ve takma adları vardır."
 # context: value of the Installation row; {kind} is the install kind (dev, portable...), {path} its folder, {env} the environment name
 installation_info = "{kind}, {path}, ortam {env}"
+# context: end of the help line of the Installation row, which shows the whole folder when the value is cut; {path} is the install folder
+installation_folder = "Folder: {path}"
 name = "Başlatıcı adı"
 name_help = "Bu kurulumun kısayollarının ve dosya yöneticisi menüsündeki girdisinin adı. Yalnızca bu kurulumun adı değişir."
 name_primary = "birincil kurulumun adı her zaman GitPoulpi'dir"

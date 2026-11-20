@@ -74,7 +74,7 @@ jobs:
         with:
           ref: ${{ env.TAG }}
           fetch-depth: 0
-      - uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2.1.1
+      - uses: EmbarkStudios/cargo-deny-action@70f81531115945ba6eb6b941ec9d39d063438eb9 # v2.1.2
         with:
           command: check
           command-arguments: advisories bans sources licenses
@@ -379,7 +379,7 @@ jobs:
         run: cargo run -q -p xtask -- sign --dir dist --version "${{ steps.meta.outputs.version }}" --throwaway-key
       # Build provenance. Private repositories need GitHub Enterprise Cloud for attestations, hence the variable.
       # Verify with `gh attestation verify <file> --repo <owner>/gitpoulpi`.
-      - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         if: ${{ !inputs.dry_run && vars.ATTESTATIONS == 'true' }}
         with:
           subject-path: dist/*
@@ -392,7 +392,7 @@ jobs:
           echo "attestation subjects: $count files, $dirs other entries"
           [ "$dirs" -eq 0 ] || { echo "::error::dist holds entries that are not files"; exit 1; }
           [ "$count" -le 1024 ] || { echo "::error::$count subjects, the attestation accepts at most 1024"; exit 1; }
-      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
+      - uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         if: ${{ !inputs.dry_run }}
         with:
           tag_name: ${{ env.TAG }}
@@ -832,7 +832,7 @@ jobs:
       - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
         with:
           platforms: arm64
-      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
       - uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         id: meta
         with:
@@ -872,7 +872,7 @@ jobs:
             SOURCE_URL=https://github.com/${{ github.repository }}
       - name: Docker Hub overview
         if: env.HAS_DOCKERHUB == 'true'
-        uses: peter-evans/dockerhub-description@432a30c9e07499fd01da9f8a49f0faf9e0ca5b77 # v4.0.2
+        uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}

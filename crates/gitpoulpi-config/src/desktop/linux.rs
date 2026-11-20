@@ -4,11 +4,31 @@
 
 use std::path::{Path, PathBuf};
 
-use super::{terminals, Dirs, Place, Request, State, Status, MARKER};
+use super::owner::{self, Facts, Owner};
+use super::{terminals, Dirs, InstallCtx, Place, Request, State, Status, MARKER, OWNER_TAG};
 use crate::open_in::Os;
 
 pub(super) const FILE: &str = "gitpoulpi.desktop";
 const ICON_STEM: &str = "gitpoulpi";
+
+/// The file name of `ctx`'s entry: the primary keeps [`FILE`], every other
+/// installation gets `gitpoulpi-i<8hex>.desktop`.
+fn file_name(ctx: &InstallCtx) -> String {
+    if ctx.is_primary() {
+        FILE.to_string()
+    } else {
+        format!("{ICON_STEM}-{}.desktop", ctx.short)
+    }
+}
+
+/// The stem of `ctx`'s icon names: `gitpoulpi` or `gitpoulpi-i<8hex>`.
+fn icon_stem(ctx: &InstallCtx) -> String {
+    if ctx.is_primary() {
+        ICON_STEM.to_string()
+    } else {
+        format!("{ICON_STEM}-{}", ctx.short)
+    }
+}
 
 /// One `Exec=` argument: quoted when it holds a reserved character, with
 /// the escapes the Desktop Entry spec asks for (and `\` doubled twice, once
@@ -70,6 +90,38 @@ pub fn entry_text_with_action(
     icon: &str,
     wm_class: Option<&str>,
 ) -> String {
+    entry_text_owned(
+        "GitPoulpi",
+        argv,
+        new_window,
+        icon,
+        wm_class,
+        &format!("{MARKER}\n"),
+    )
+}
+
+/// The ownership lines of `ctx`'s entry: the legacy marker only for the
+/// primary (old builds look for that exact line), then the owner tag.
+fn owner_lines(ctx: &InstallCtx) -> String {
+    let mut out = String::new();
+    if ctx.is_primary() {
+        out.push_str(MARKER);
+        out.push('\n');
+    }
+    if !ctx.id.is_empty() {
+        out.push_str(&format!("{OWNER_TAG}={}\n", ctx.id));
+    }
+    out
+}
+
+fn entry_text_owned(
+    name: &str,
+    argv: &[String],
+    new_window: Option<&[String]>,
+    icon: &str,
+    wm_class: Option<&str>,
+    owner: &str,
+) -> String {
     let join = |argv: &[String]| {
         argv.iter()
             .map(|a| exec_quote(a))
@@ -86,20 +138,47 @@ pub fn entry_text_with_action(
         )
     });
     format!(
-        "[Desktop Entry]\nVersion=1.0\nType=Application\nName=GitPoulpi\n\
+        "[Desktop Entry]\nVersion=1.0\nType=Application\nName={name}\n\
          Comment=Git client for the terminal\nExec={exec}\nTerminal=false\n\
-         Icon={icon}\nCategories=Development;RevisionControl;\nStartupNotify=true\n{actions}{class}{MARKER}\n{section}"
+         Icon={icon}\nCategories=Development;RevisionControl;\nStartupNotify=true\n{actions}{class}{owner}{section}"
     )
+}
+
+/// `token` with the base window class `base` swapped for `class`: the class
+/// itself, or the value of a `--flag=<class>` word.
+fn swap_class(token: &str, base: &str, class: &str) -> String {
+    if token == base {
+        return class.to_string();
+    }
+    match token.strip_suffix(base) {
+        Some(pre) if pre.ends_with('=') => format!("{pre}{class}"),
+        _ => token.to_string(),
+    }
 }
 
 /// The `Exec=` command: the terminal's, run through `gitpoulpi launch` when
 /// there is one (it shows a GitPoulpi window that is already open). The
 /// second value is the same command with `--new-window`, for the desktop
 /// action (only when there is a launch helper to run it).
+///
+/// A non-primary installation starts its terminal with its own window class
+/// ([`terminals::wm_class_for`]), so its windows group apart in a dock.
 fn argv(req: &Request) -> Result<(Vec<String>, Option<Vec<String>>), String> {
     let exe = req.exe.to_string_lossy();
-    let inner = terminals::argv(Os::Linux, req.terminal, &exe)
+    let mut inner = terminals::argv(Os::Linux, req.terminal, &exe)
         .ok_or_else(|| format!("no terminal to start GitPoulpi in ({})", req.terminal))?;
+    if let (Some(base), Some(class)) = (
+        terminals::wm_class(Os::Linux, req.terminal),
+        terminals::wm_class_for(Os::Linux, req.terminal, req.ctx),
+    ) {
+        if base != class {
+            // The last two words are the exe and `--launcher`.
+            let n = inner.len().saturating_sub(2);
+            for t in &mut inner[..n] {
+                *t = swap_class(t, base, &class);
+            }
+        }
+    }
     Ok(match req.launch_exe {
         Some(launch) => {
             let launch = launch.to_string_lossy();
@@ -119,21 +198,41 @@ fn argv(req: &Request) -> Result<(Vec<String>, Option<Vec<String>>), String> {
 
 fn entry(req: &Request, icon: &str) -> Result<String, String> {
     let (argv, new_window) = argv(req)?;
-    Ok(entry_text_with_action(
+    Ok(entry_text_owned(
+        &req.ctx.name,
         &argv,
         new_window.as_deref(),
         icon,
-        terminals::wm_class(Os::Linux, req.terminal),
+        terminals::wm_class_for(Os::Linux, req.terminal, req.ctx).as_deref(),
+        &owner_lines(req.ctx),
     ))
 }
 
-fn entry_path(place: Place, dirs: &Dirs) -> Result<PathBuf, String> {
+/// Who owns an entry's text ([`owner::decide`]).
+fn owner_of(text: &str, ctx: &InstallCtx) -> Owner {
+    let prefix = format!("{OWNER_TAG}=");
+    owner::decide(
+        &Facts {
+            tag: text.lines().find_map(|l| l.strip_prefix(prefix.as_str())),
+            legacy_marker: text.lines().any(|l| l == MARKER),
+            names_my_exe: false,
+        },
+        ctx,
+    )
+}
+
+/// Whether the running installation may rewrite or remove an entry.
+fn is_mine(text: &str, ctx: &InstallCtx) -> bool {
+    matches!(owner_of(text, ctx), Owner::Mine | Owner::Adopt)
+}
+
+fn entry_path(place: Place, dirs: &Dirs, ctx: &InstallCtx) -> Result<PathBuf, String> {
     match place {
-        Place::Launcher => Ok(dirs.applications.join(FILE)),
+        Place::Launcher => Ok(dirs.applications.join(file_name(ctx))),
         Place::Desktop => dirs
             .desktop
             .as_ref()
-            .map(|d| d.join(FILE))
+            .map(|d| d.join(file_name(ctx)))
             .ok_or_else(|| "there is no Desktop folder".to_string()),
         Place::StartMenu => Err("the Start menu is Windows only".into()),
     }
@@ -144,15 +243,16 @@ fn entry_path(place: Place, dirs: &Dirs) -> Result<PathBuf, String> {
 /// (omarchy-shell's Qt image cache never re-reads a file it has shown), so
 /// rewriting the same file in place left the old color on screen.
 fn icon_name(req: &Request) -> String {
+    let stem = icon_stem(req.ctx);
     match req.icons.largest() {
         Some(png) => {
             // FNV-1a: stable across builds, unlike `DefaultHasher`.
             let hash = png.iter().fold(0x811c_9dc5_u32, |h, b| {
                 (h ^ u32::from(*b)).wrapping_mul(0x0100_0193)
             });
-            format!("{ICON_STEM}-{hash:08x}")
+            format!("{stem}-{hash:08x}")
         }
-        None => ICON_STEM.to_string(),
+        None => stem,
     }
 }
 
@@ -164,28 +264,31 @@ fn icon_path(dirs: &Dirs, name: &str) -> PathBuf {
     icon_dir(dirs).join(format!("{name}.png"))
 }
 
-/// Whether `file` is an icon we wrote: `gitpoulpi.png` (before the names
-/// carried a hash) or `gitpoulpi-<8 hex>.png`.
-fn is_our_icon(file: &str) -> bool {
-    let Some(stem) = file.strip_suffix(".png") else {
+/// Whether `file` is an icon of the installation whose stem is `stem`:
+/// `<stem>.png` (before the names carried a hash) or `<stem>-<8 hex>.png`.
+/// The primary's `gitpoulpi-<8 hex>` never matches another installation's
+/// `gitpoulpi-i<8 hex>-<8 hex>`.
+fn is_our_icon(file: &str, stem: &str) -> bool {
+    let Some(name) = file.strip_suffix(".png") else {
         return false;
     };
-    stem == ICON_STEM
-        || stem
-            .strip_prefix(ICON_STEM)
+    name == stem
+        || name
+            .strip_prefix(stem)
             .and_then(|r| r.strip_prefix('-'))
             .is_some_and(|h| h.len() == 8 && h.bytes().all(|b| b.is_ascii_hexdigit()))
 }
 
-/// Deletes our icon files except `keep`.
-fn remove_icons(dirs: &Dirs, keep: Option<&str>) {
+/// Deletes `ctx`'s icon files except `keep`; another installation's stay.
+fn remove_icons(dirs: &Dirs, ctx: &InstallCtx, keep: Option<&str>) {
     let Ok(read) = std::fs::read_dir(icon_dir(dirs)) else {
         return;
     };
+    let stem = icon_stem(ctx);
     let keep = keep.map(|k| format!("{k}.png"));
     for e in read.flatten() {
         let name = e.file_name().to_string_lossy().into_owned();
-        if is_our_icon(&name) && keep.as_deref() != Some(name.as_str()) {
+        if is_our_icon(&name, &stem) && keep.as_deref() != Some(name.as_str()) {
             let _ = std::fs::remove_file(e.path());
         }
     }
@@ -219,13 +322,13 @@ pub(super) fn status(place: Place, dirs: &Dirs, req: &Request) -> Status {
         state: State::NotInstalled,
         icon_stale: false,
     };
-    let Ok(path) = entry_path(place, dirs) else {
+    let Ok(path) = entry_path(place, dirs, req.ctx) else {
         return none;
     };
     let Ok(text) = std::fs::read_to_string(&path) else {
         return none;
     };
-    if !text.lines().any(|l| l == MARKER) {
+    if !is_mine(&text, req.ctx) {
         return Status {
             state: State::Foreign,
             icon_stale: false,
@@ -246,7 +349,7 @@ pub(super) fn status(place: Place, dirs: &Dirs, req: &Request) -> Status {
 }
 
 /// Writes the icon under its color's name, points our entries at it and
-/// deletes the icons of the previous colors.
+/// deletes the icons of the previous colors (this installation's only).
 pub(super) fn write_icon(dirs: &Dirs, req: &Request) -> Result<(), String> {
     let Some(png) = req.icons.largest() else {
         return Ok(());
@@ -254,19 +357,19 @@ pub(super) fn write_icon(dirs: &Dirs, req: &Request) -> Result<(), String> {
     let name = icon_name(req);
     super::write_file(&icon_path(dirs, &name), png, false)?;
     for place in [Place::Launcher, Place::Desktop] {
-        let Ok(path) = entry_path(place, dirs) else {
+        let Ok(path) = entry_path(place, dirs, req.ctx) else {
             continue;
         };
         let Ok(text) = std::fs::read_to_string(&path) else {
             continue;
         };
-        if text.lines().any(|l| l == MARKER) && entry_icon(&text) != Some(name.as_str()) {
+        if is_mine(&text, req.ctx) && entry_icon(&text) != Some(name.as_str()) {
             // Rewriting the entry is also what makes a launcher that
             // watches the applications folder reload it.
             super::write_file(&path, with_icon(&text, &name).as_bytes(), true)?;
         }
     }
-    remove_icons(dirs, Some(&name));
+    remove_icons(dirs, req.ctx, Some(&name));
     if req.refresh_icon_cache {
         // Best effort, like omarchy-tui-install.
         let _ = std::process::Command::new("gtk-update-icon-cache")
@@ -279,7 +382,7 @@ pub(super) fn write_icon(dirs: &Dirs, req: &Request) -> Result<(), String> {
 }
 
 pub(super) fn install(place: Place, dirs: &Dirs, req: &Request) -> Result<PathBuf, String> {
-    let path = entry_path(place, dirs)?;
+    let path = entry_path(place, dirs, req.ctx)?;
     if status(place, dirs, req).state == State::Foreign {
         return Err(format!(
             "{} is not ours; not overwriting it",
@@ -292,22 +395,22 @@ pub(super) fn install(place: Place, dirs: &Dirs, req: &Request) -> Result<PathBu
     Ok(path)
 }
 
-pub(super) fn remove(place: Place, dirs: &Dirs) -> Result<bool, String> {
-    let path = entry_path(place, dirs)?;
+pub(super) fn remove(place: Place, dirs: &Dirs, ctx: &InstallCtx) -> Result<bool, String> {
+    let path = entry_path(place, dirs, ctx)?;
     let Ok(text) = std::fs::read_to_string(&path) else {
         return Ok(false);
     };
-    if !text.lines().any(|l| l == MARKER) {
+    if !is_mine(&text, ctx) {
         return Err(format!("{} is not ours; not removing it", path.display()));
     }
     std::fs::remove_file(&path).map_err(|e| e.to_string())?;
     // The icon goes with the last entry that names it.
     let other = match place {
-        Place::Launcher => dirs.desktop.as_ref().map(|d| d.join(FILE)),
-        _ => Some(dirs.applications.join(FILE)),
+        Place::Launcher => dirs.desktop.as_ref().map(|d| d.join(file_name(ctx))),
+        _ => Some(dirs.applications.join(file_name(ctx))),
     };
     if !other.is_some_and(|p| p.exists()) {
-        remove_icons(dirs, None);
+        remove_icons(dirs, ctx, None);
     }
     Ok(true)
 }
@@ -521,9 +624,9 @@ mod tests {
         let st = status(Place::Launcher, &d, &req(&exe, "kitty", &icons2));
         assert_eq!((st.state, st.icon_stale), (State::Installed, true));
 
-        assert!(remove(Place::Launcher, &d).unwrap());
+        assert!(remove(Place::Launcher, &d, InstallCtx::legacy_ref()).unwrap());
         assert!(!path.exists() && !icon_path(&d, &icon_name(&r)).exists());
-        assert!(!remove(Place::Launcher, &d).unwrap());
+        assert!(!remove(Place::Launcher, &d, InstallCtx::legacy_ref()).unwrap());
     }
 
     #[test]
@@ -554,7 +657,7 @@ mod tests {
         let r = req(&exe, "kitty", &icons);
         assert_eq!(status(Place::Launcher, &d, &r).state, State::Foreign);
         assert!(install(Place::Launcher, &d, &r).is_err());
-        assert!(remove(Place::Launcher, &d).is_err());
+        assert!(remove(Place::Launcher, &d, InstallCtx::legacy_ref()).is_err());
         assert_eq!(
             std::fs::read_to_string(&path).unwrap(),
             "[Desktop Entry]\nName=mine\n"
@@ -573,9 +676,9 @@ mod tests {
         let r = req(&exe, "kitty", &icons);
         install(Place::Launcher, &d, &r).unwrap();
         install(Place::Desktop, &d, &r).unwrap();
-        remove(Place::Launcher, &d).unwrap();
+        remove(Place::Launcher, &d, InstallCtx::legacy_ref()).unwrap();
         assert!(icon_path(&d, &icon_name(&r)).exists());
-        remove(Place::Desktop, &d).unwrap();
+        remove(Place::Desktop, &d, InstallCtx::legacy_ref()).unwrap();
         assert!(!icon_path(&d, &icon_name(&r)).exists());
     }
 
@@ -605,7 +708,9 @@ mod tests {
 
         write_icon(&d, &r2).unwrap();
         for place in [Place::Launcher, Place::Desktop] {
-            let text = std::fs::read_to_string(entry_path(place, &d).unwrap()).unwrap();
+            let text =
+                std::fs::read_to_string(entry_path(place, &d, InstallCtx::legacy_ref()).unwrap())
+                    .unwrap();
             assert_eq!(entry_icon(&text), Some(new_name.as_str()), "{place:?}");
             let st = status(place, &d, &r2);
             assert_eq!((st.state, st.icon_stale), (State::Installed, false));
@@ -629,5 +734,226 @@ mod tests {
         .unwrap();
         assert_eq!(desktop_dir(&home, &cfg), Some(home.join("Bureau")));
         assert_eq!(desktop_dir(&home, &tmp.path().join("none")), None);
+    }
+
+    use crate::desktop::KnownInstall;
+
+    const A: &str = "aaaaaaaaaaaaaaaa";
+    const B: &str = "bbbbbbbbbbbbbbbb";
+
+    /// `id`'s context; `primary` is the id of the primary, if any.
+    fn ctx_of(id: &str, primary: Option<&str>, name: &str) -> InstallCtx {
+        InstallCtx {
+            id: id.into(),
+            short: format!("i{}", &id[..8]),
+            name: name.into(),
+            primary: primary.map(str::to_string),
+            known: [A, B]
+                .iter()
+                .map(|i| KnownInstall {
+                    id: (*i).into(),
+                    exists: true,
+                })
+                .collect(),
+        }
+    }
+
+    fn req_ctx<'a>(
+        exe: &'a Path,
+        term: &'a str,
+        icons: &'a IconSet,
+        ctx: &'a InstallCtx,
+    ) -> Request<'a> {
+        Request {
+            ctx,
+            ..req(exe, term, icons)
+        }
+    }
+
+    fn icon_set(b: u8) -> IconSet {
+        IconSet {
+            pngs: vec![(256, vec![b, b])],
+        }
+    }
+
+    fn files(dir: &Path) -> Vec<String> {
+        let mut v: Vec<String> = std::fs::read_dir(dir)
+            .map(|r| {
+                r.flatten()
+                    .map(|e| e.file_name().to_string_lossy().into_owned())
+                    .collect()
+            })
+            .unwrap_or_default();
+        v.sort();
+        v
+    }
+
+    #[test]
+    fn a_non_primary_entry_has_its_own_file_class_and_icon() {
+        let tmp = tempfile::tempdir().unwrap();
+        let d = dirs(tmp.path());
+        let icons = icon_set(3);
+        let exe = PathBuf::from("/opt/dev/gitpoulpi");
+        let ctx = ctx_of(B, None, "GitPoulpi (dev)");
+        let short = ctx.short.clone();
+
+        let r = req_ctx(&exe, "kitty", &icons, &ctx);
+        let path = install(Place::Launcher, &d, &r).unwrap();
+        assert_eq!(
+            path,
+            d.applications.join(format!("gitpoulpi-{short}.desktop"))
+        );
+        let text = std::fs::read_to_string(&path).unwrap();
+        let l = lines(&text);
+        assert!(l.contains(&"Name=GitPoulpi (dev)"), "{text}");
+        assert!(l.contains(&format!("StartupWMClass=gitpoulpi-{short}").as_str()));
+        assert!(l.contains(
+            &format!("Exec=kitty --class gitpoulpi-{short} /opt/dev/gitpoulpi --launcher").as_str()
+        ));
+        assert!(l.contains(&format!("{OWNER_TAG}={B}").as_str()));
+        // Old builds look for this exact line: only the primary writes it.
+        assert!(!l.contains(&MARKER), "{text}");
+        let icon = icon_name(&r);
+        assert!(icon.starts_with(&format!("gitpoulpi-{short}-")), "{icon}");
+        assert_eq!(entry_icon(&text), Some(icon.as_str()));
+        assert!(icon_path(&d, &icon).is_file());
+        assert!(!d.applications.join(FILE).exists());
+        assert_eq!(status(Place::Launcher, &d, &r).state, State::Installed);
+
+        // The other terminals carry the class in their own flag.
+        for (term, want) in [
+            ("foot", format!("Exec=foot --app-id=gitpoulpi-{short} ")),
+            (
+                "ghostty",
+                format!("Exec=ghostty --class=io.github.poulpi_lab.gitpoulpi.{short} -e "),
+            ),
+            (
+                "wezterm",
+                format!("Exec=wezterm start --class gitpoulpi-{short} -- "),
+            ),
+        ] {
+            let text = entry(&req_ctx(&exe, term, &icons, &ctx), "x").unwrap();
+            assert!(text.contains(&want), "{term}: {text}");
+        }
+        // Omarchy's window rules match TUI.tile: it stays for everyone.
+        let text = entry(&req_ctx(&exe, "xdg-terminal-exec", &icons, &ctx), "x").unwrap();
+        assert!(text.contains("--app-id=TUI.tile") && text.contains("StartupWMClass=TUI.tile"));
+
+        // The primary keeps today's names and writes the marker and the tag.
+        let pctx = ctx_of(A, Some(A), "GitPoulpi");
+        let pr = req_ctx(&exe, "kitty", &icons, &pctx);
+        let ppath = install(Place::Launcher, &d, &pr).unwrap();
+        assert_eq!(ppath, d.applications.join(FILE));
+        let ptext = std::fs::read_to_string(&ppath).unwrap();
+        assert!(ptext.lines().any(|l| l == MARKER), "{ptext}");
+        assert!(ptext.contains(&format!("{OWNER_TAG}={A}\n")));
+        assert!(ptext.contains("Name=GitPoulpi\n"));
+        assert!(!icon_name(&pr).contains("-i"));
+    }
+
+    #[test]
+    fn icon_cleanup_spares_the_other_installation() {
+        let tmp = tempfile::tempdir().unwrap();
+        let d = dirs(tmp.path());
+        let exe = PathBuf::from("/x/gp");
+        let a = ctx_of(A, Some(A), "GitPoulpi");
+        let b = ctx_of(B, Some(A), "GitPoulpi (dev)");
+        let (ia, ib) = (icon_set(1), icon_set(2));
+        install(Place::Launcher, &d, &req_ctx(&exe, "kitty", &ia, &a)).unwrap();
+        install(Place::Launcher, &d, &req_ctx(&exe, "kitty", &ib, &b)).unwrap();
+        let name_a = icon_name(&req_ctx(&exe, "kitty", &ia, &a));
+        let name_b = icon_name(&req_ctx(&exe, "kitty", &ib, &b));
+        assert!(icon_path(&d, &name_a).exists() && icon_path(&d, &name_b).exists());
+
+        // B changes color: only B's old icon goes.
+        let ib2 = icon_set(9);
+        let rb2 = req_ctx(&exe, "kitty", &ib2, &b);
+        write_icon(&d, &rb2).unwrap();
+        assert!(icon_path(&d, &name_a).exists(), "A's icon was deleted");
+        assert!(!icon_path(&d, &name_b).exists());
+        assert!(icon_path(&d, &icon_name(&rb2)).exists());
+
+        // The same the other way round, and on remove.
+        let ia2 = icon_set(7);
+        write_icon(&d, &req_ctx(&exe, "kitty", &ia2, &a)).unwrap();
+        assert!(
+            icon_path(&d, &icon_name(&rb2)).exists(),
+            "B's icon was deleted"
+        );
+        assert!(remove(Place::Launcher, &d, &a).unwrap());
+        assert!(d.applications.join(file_name(&b)).exists());
+        assert_eq!(files(&icon_dir(&d)), [format!("{}.png", icon_name(&rb2))]);
+    }
+
+    #[test]
+    fn sync_leaves_another_installations_entry_alone() {
+        let tmp = tempfile::tempdir().unwrap();
+        let d = dirs(tmp.path());
+        std::fs::create_dir_all(&d.applications).unwrap();
+        let exe = PathBuf::from("/x/gp");
+        let icons = icon_set(4);
+        // B was the primary and wrote gitpoulpi.desktop; A is primary now.
+        let b_primary = ctx_of(B, Some(B), "GitPoulpi");
+        let theirs = entry(&req_ctx(&exe, "kitty", &icons, &b_primary), "gitpoulpi").unwrap();
+        let path = d.applications.join(FILE);
+        std::fs::write(&path, &theirs).unwrap();
+
+        let a = ctx_of(A, Some(A), "GitPoulpi");
+        let r = req_ctx(&exe, "alacritty", &icons, &a);
+        assert_eq!(status(Place::Launcher, &d, &r).state, State::Foreign);
+        assert!(install(Place::Launcher, &d, &r).is_err());
+        assert!(write_icon(&d, &r).is_ok());
+        assert!(remove(Place::Launcher, &d, &a).is_err());
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), theirs);
+
+        // An untagged legacy entry is nobody's while there is no primary:
+        // a non-primary installation writes its own file and leaves it be.
+        let legacy = "[Desktop Entry]\nName=GitPoulpi\nX-GitPoulpi=1\n";
+        std::fs::write(&path, legacy).unwrap();
+        let b = ctx_of(B, None, "GitPoulpi (dev)");
+        let rb = req_ctx(&exe, "kitty", &icons, &b);
+        assert_eq!(status(Place::Launcher, &d, &rb).state, State::NotInstalled);
+        install(Place::Launcher, &d, &rb).unwrap();
+        assert!(remove(Place::Launcher, &d, &b).unwrap());
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), legacy);
+        // The primary adopts it (rewritten with its tag).
+        assert_eq!(status(Place::Launcher, &d, &r).state, State::Outdated);
+        install(Place::Launcher, &d, &r).unwrap();
+        assert!(std::fs::read_to_string(&path).unwrap().contains(A));
+    }
+
+    #[test]
+    fn a_version_change_only_rewrites_name() {
+        let tmp = tempfile::tempdir().unwrap();
+        let d = dirs(tmp.path());
+        let exe = PathBuf::from("/x/gp");
+        let icons = icon_set(5);
+        let before = ctx_of(B, None, "GitPoulpi (dev)");
+        let after = ctx_of(B, None, "GitPoulpi 1.2 (dev)");
+        let path = install(
+            Place::Launcher,
+            &d,
+            &req_ctx(&exe, "kitty", &icons, &before),
+        )
+        .unwrap();
+        let old = std::fs::read_to_string(&path).unwrap();
+
+        let r = req_ctx(&exe, "kitty", &icons, &after);
+        assert_eq!(status(Place::Launcher, &d, &r).state, State::Outdated);
+        assert_eq!(install(Place::Launcher, &d, &r).unwrap(), path);
+        assert_eq!(status(Place::Launcher, &d, &r).state, State::Installed);
+        let new = std::fs::read_to_string(&path).unwrap();
+        let changed: Vec<(&str, &str)> = old
+            .lines()
+            .zip(new.lines())
+            .filter(|(a, b)| a != b)
+            .collect();
+        assert_eq!(
+            changed,
+            [("Name=GitPoulpi (dev)", "Name=GitPoulpi 1.2 (dev)")]
+        );
+        assert_eq!(old.lines().count(), new.lines().count());
+        assert_eq!(files(&d.applications).len(), 1);
+        assert_eq!(files(&icon_dir(&d)).len(), 1);
     }
 }

@@ -191,7 +191,7 @@ pub fn wm_class(os: Os, id: &str) -> Option<&'static str> {
 
 /// 16 lower-case hex digits for an installation id: the id itself when it
 /// is one, else its FNV-1a-64 (a pinned `p-<name>` id).
-fn hex16(id: &str) -> String {
+pub(super) fn hex16(id: &str) -> String {
     if id.len() == 16 && id.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f')) {
         id.to_string()
     } else {

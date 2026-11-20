@@ -14,7 +14,7 @@ pub struct ShortcutState {
     pub place: &'static str,
     /// `not_installed`, `installed`, `outdated` or `foreign`.
     pub state: &'static str,
-    /// The icon file is not the one the current logo color makes.
+    /// The icon file is not the one this installation's color makes.
     pub icon_stale: bool,
 }
 
@@ -28,11 +28,12 @@ pub struct Report {
     pub shortcuts: Vec<ShortcutState>,
 }
 
+/// The terminal setting and the colour this installation wears (its entry,
+/// else `ui.logo_color` when it is the primary; never another installation's).
 pub(crate) fn settings() -> (String, String) {
     let config = gitpoulpi_config::ConfigPaths::discover()
         .and_then(|p| gitpoulpi_config::Config::load(&p.config_file()).ok())
         .unwrap_or_default();
-    // The colour this installation wears, never another one's.
     let logo = crate::launcher_sync::effective_color(&config);
     (config.ui.launch_terminal, logo)
 }
@@ -194,16 +195,25 @@ pub struct FolderMenuReport {
     pub error: Option<String>,
 }
 
-/// The label the CLI writes: English, like all CLI text.
-const CLI_LABEL: &str = "Open in GitPoulpi"; // i18n-english
+/// The label the CLI writes: English, like all CLI text, naming this
+/// installation so that two installations never share an entry.
+fn cli_label() -> String {
+    format!("Open in {}", launcher::this_ctx().name) // i18n-english
+}
 
 fn cli_env(with_icon: bool) -> folder_menu::Env {
     let (_, logo) = settings();
-    launcher::folder_menu_env(&Env::real(), with_icon.then_some(logo.as_str()))
+    let mut env = launcher::folder_menu_env(&Env::real(), with_icon.then_some(logo.as_str()));
+    // The submenu this installation asks for (its own setting, never another's).
+    env.submenu = gitpoulpi_config::installation::current()
+        .effective
+        .folder_menu_submenu
+        .clone();
+    env
 }
 
 pub fn folder_menu_status() -> FolderMenuReport {
-    let s = folder_menu::status(&cli_env(false), CLI_LABEL);
+    let s = folder_menu::status(&cli_env(false), &cli_label());
     FolderMenuReport {
         entries: s
             .entries
@@ -231,7 +241,7 @@ fn managers_lines(verb: &str, done: &[folder_menu::Manager]) -> Vec<String> {
 }
 
 pub fn folder_menu_install() -> Result<Vec<String>, String> {
-    let done = folder_menu::install(&cli_env(true), CLI_LABEL)?;
+    let done = folder_menu::install(&cli_env(true), &cli_label())?;
     Ok(managers_lines("installed", &done))
 }
 

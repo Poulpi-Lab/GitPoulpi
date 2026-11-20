@@ -199,14 +199,32 @@ gitpoulpi
 `--version` prints the version and the commit the build was made from. Then
 follow [Getting started](getting-started.md).
 
+## Several installations side by side
+
+A package, a dev checkout, a cargo build and an unpacked archive can all be installed at once. Each is its own installation: its own launcher name (`GitPoulpi (Chocolatey)`, `GitPoulpi (dev)`, ...), octopus colour, command aliases, "Open in" menu entry and daemons, so two versions run in parallel and never take each other's windows over. Settings, repositories and tokens are shared. Nobody owns the plain `GitPoulpi` launcher name until you choose it with **Become the primary** in Settings > Launcher. [Settings](settings.md#launcher) lists the other installations and has a **Forget** button for one that is gone.
+
 ## Uninstall
 
-`gitpoulpi uninstall` (what both installers run) removes the command aliases,
-the PATH entries, the shortcuts and the file manager menu entries (with their
-App Paths key on Windows) GitPoulpi made, then the program files of a
-release install; it refuses on a build without the `.gitpoulpi-dist` marker
-(a cargo build), and `--keep-files` leaves the program files. It is not
-available to MCP agents. Without an installer, delete the program files.
+`gitpoulpi uninstall` removes the command aliases (and their App Paths keys on
+Windows), the PATH entries, the shortcuts and the file manager menu entries
+**of this installation only**: the others' stay, and `PATH` keeps their folders
+and the shared alias folder while one of them still has an alias there. Taskbar
+and Dock pins stay (Windows has no way to unpin from outside), and your settings
+keep this installation's entry, so reinstalling into the same folder brings its
+look back. Then it deletes the program files of a release install; that part
+refuses on a build without the `.gitpoulpi-dist` marker (a cargo build). With
+`--keep-files` it leaves the program files and works on any build, a dev checkout
+included. It is not available to MCP agents.
+
+| How you installed | What removes the launchers and aliases |
+|---|---|
+| Windows installer (user or all users), winget | The uninstaller runs `gitpoulpi uninstall --keep-files`, then deletes the files. |
+| Chocolatey | Its automatic uninstaller runs the installer's uninstaller. |
+| Scoop | `scoop uninstall gitpoulpi` runs `gitpoulpi uninstall --keep-files` first. |
+| MSI | The removal runs it as the installing user. Removed by another account, the user's launchers stay and show as orphans in the other installations' Settings (**Forget**). |
+| apt, AUR, Homebrew, cargo, a dev checkout | No hook runs for you: run `gitpoulpi uninstall --keep-files` before removing the package. |
+| Archive, `install.sh --uninstall` | Run `gitpoulpi uninstall`, or `install.sh --uninstall`, then delete the folder. |
+
 GitPoulpi also keeps these files:
 
 | What | Where |

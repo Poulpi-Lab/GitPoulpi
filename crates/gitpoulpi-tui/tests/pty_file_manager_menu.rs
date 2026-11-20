@@ -143,9 +143,10 @@ fn install_from_the_palette_then_remove_with_the_keyboard_restores_thunar_byte_f
     std::fs::create_dir_all(uca.parent().unwrap()).unwrap();
     let seed = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<actions>\n<action>\n\t<icon>utilities-terminal</icon>\n\t<name>Open Terminal Here</name>\n\t<unique-id>1-1</unique-id>\n\t<command>exo-open --working-directory %f --launch TerminalEmulator</command>\n\t<description>Example for a custom action</description>\n\t<patterns>*</patterns>\n\t<startup-notify/>\n\t<directories/>\n</action>\n</actions>\n";
     std::fs::write(&uca, seed).unwrap();
+    // Primary, so the entries keep the legacy file names this test reads.
     std::fs::write(
         config.path().join("config.toml"),
-        "[ui]\ngraph_renderer = \"text\"\n",
+        "[ui]\ngraph_renderer = \"text\"\n\n[installation]\nprimary = \"p-pty\"\n",
     )
     .unwrap();
     let install = tempfile::tempdir().unwrap();

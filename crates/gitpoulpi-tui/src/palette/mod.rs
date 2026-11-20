@@ -764,6 +764,12 @@ pub(crate) enum PaletteCommand {
     LauncherFolderMenuInstall,
     /// Removes the "Open in GitPoulpi" menu entries GitPoulpi wrote.
     LauncherFolderMenuRemove,
+    /// Makes the running installation the primary (asks first when another is).
+    LauncherBecomePrimary,
+    /// Removes the launchers an older build made under the plain name (asks first).
+    LauncherRemoveLegacy,
+    /// Forgets an installation whose folder is gone (asks first).
+    LauncherForgetGone,
     /// Opens the graph color theme picker (`ui.graph_color_theme`).
     ChangeGraphColorTheme,
     /// Flips `ui.graph_lane_background` between `off` and `row_tint`.

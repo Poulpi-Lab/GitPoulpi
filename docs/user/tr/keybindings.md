@@ -1248,6 +1248,9 @@ Tuşlar varsayılanlardır.
 | Başlatıcı: PATH'ten Kaldır |  |
 | Başlatıcı: GitPoulpi'de Aç Menüsünü Kur |  |
 | Başlatıcı: GitPoulpi'de Aç Menüsünü Kaldır |  |
+| Launcher: Become the Primary Installation |  |
+| Launcher: Remove Legacy Launchers |  |
+| Launcher: Forget Gone Installations |  |
 | Uygulama: Grafik Renk Temasını Değiştir... | `Ctrl+N T` |
 | Uygulama: Grafik Satır Tonunu Aç/Kapat | `Ctrl+N Y` |
 <!-- palette:end -->

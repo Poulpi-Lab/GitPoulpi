@@ -3997,6 +3997,21 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::LauncherFolderMenuRemove,
     ),
     entry(
+        msg::launcher::PALETTE_BECOME_PRIMARY,
+        "",
+        PaletteCommand::LauncherBecomePrimary,
+    ),
+    entry(
+        msg::launcher::PALETTE_REMOVE_LEGACY,
+        "",
+        PaletteCommand::LauncherRemoveLegacy,
+    ),
+    entry(
+        msg::launcher::PALETTE_FORGET,
+        "",
+        PaletteCommand::LauncherForgetGone,
+    ),
+    entry(
         msg::palette::APP_CHANGE_GRAPH_COLOR_THEME,
         "",
         PaletteCommand::ChangeGraphColorTheme,

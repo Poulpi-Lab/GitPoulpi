@@ -415,6 +415,36 @@ pub(super) fn remove(place: Place, dirs: &Dirs, ctx: &InstallCtx) -> Result<bool
     Ok(true)
 }
 
+/// Primary handover: renames the old primary's `gitpoulpi.desktop` (applications
+/// and Desktop) to its own `gitpoulpi-<short>.desktop`, contents untouched;
+/// its next sync rewrites the name and the icon. Returns the new paths.
+pub(super) fn hand_over(dirs: &Dirs, old: &InstallCtx) -> Result<Vec<PathBuf>, String> {
+    let own = InstallCtx {
+        primary: None,
+        ..old.clone()
+    };
+    let (legacy, named) = (file_name(old), file_name(&own));
+    if legacy == named {
+        return Err("the old primary has no name of its own".into());
+    }
+    let mut moved = Vec::new();
+    for dir in [Some(&dirs.applications), dirs.desktop.as_ref()]
+        .into_iter()
+        .flatten()
+    {
+        let (from, to) = (dir.join(&legacy), dir.join(&named));
+        let Ok(text) = std::fs::read_to_string(&from) else {
+            continue;
+        };
+        if !is_mine(&text, old) || to.exists() {
+            continue;
+        }
+        std::fs::rename(&from, &to).map_err(|e| format!("{}: {e}", from.display()))?;
+        moved.push(to);
+    }
+    Ok(moved)
+}
+
 /// The XDG Desktop folder, if it exists (`user-dirs.dirs`, else `~/Desktop`).
 pub(super) fn desktop_dir(home: &Path, config_home: &Path) -> Option<PathBuf> {
     let from_file = std::fs::read_to_string(config_home.join("user-dirs.dirs"))

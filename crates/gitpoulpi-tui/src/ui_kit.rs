@@ -483,6 +483,41 @@ pub(crate) fn tail_fit(text: &str, width: usize) -> String {
     format!("\u{2026}{}", out.into_iter().collect::<String>())
 }
 
+/// Fits `text` in `width` columns by cutting its **middle** (`/data/Pro...ulpi`):
+/// the start and the end of a path both say where it is.
+pub(crate) fn fit_middle(text: &str, width: usize) -> String {
+    if display_width(text) <= width {
+        return text.to_string();
+    }
+    if width <= 1 {
+        return "\u{2026}".repeat(width);
+    }
+    let room = width - 1;
+    let (head_w, tail_w) = (room.div_ceil(2), room / 2);
+    let mut head = String::new();
+    let mut used = 0usize;
+    for c in text.chars() {
+        let w = display_width(&c.to_string());
+        if used + w > head_w {
+            break;
+        }
+        head.push(c);
+        used += w;
+    }
+    let mut tail: Vec<char> = Vec::new();
+    let mut used = 0usize;
+    for c in text.chars().rev() {
+        let w = display_width(&c.to_string());
+        if used + w > tail_w {
+            break;
+        }
+        tail.push(c);
+        used += w;
+    }
+    tail.reverse();
+    format!("{head}\u{2026}{}", tail.into_iter().collect::<String>())
+}
+
 /// Greedy word wrap, in terminal columns.
 pub(crate) fn wrap_words(text: &str, width: usize) -> Vec<String> {
     if width == 0 {

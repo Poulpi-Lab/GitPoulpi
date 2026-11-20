@@ -68,6 +68,7 @@ pub(super) fn is_note(reason: &str) -> bool {
     ]
     .iter()
     .any(|m| m.get() == reason)
+        || super::launcher_install::is_note(reason)
 }
 
 fn place_label(place: Place) -> &'static str {
@@ -109,7 +110,8 @@ impl PreferencesState {
         self.launcher.rx = Some(rx);
         let make_env = Arc::clone(&self.launcher.env);
         let setting = self.config.ui.launch_terminal.clone();
-        let logo = self.config.ui.logo_color.clone();
+        // This installation's colour, never another one's.
+        let logo = self.this_colour();
         let config = self.config.clone();
         self.launcher.for_terminal = Some(self.launcher_key());
         std::thread::spawn(move || {
@@ -126,11 +128,22 @@ impl PreferencesState {
     /// What the snapshot depends on besides the machine: the terminal and
     /// whether shortcuts follow the newest build.
     fn launcher_key(&self) -> String {
-        format!(
-            "{} {}",
-            self.config.ui.launch_terminal,
-            self.launcher_newest()
-        )
+        let eff = self.this_effective();
+        crate::launcher_sync::sync_key(
+            &eff.logo_color,
+            &gitpoulpi_config::installation::launcher_name(
+                &eff.name,
+                eff.name_with_version,
+                env!("CARGO_PKG_VERSION"),
+            ),
+            &self.config.ui.launch_terminal,
+            self.launcher_newest(),
+        ) + &format!("\n{}\n{}", eff.primary, eff.folder_menu_submenu)
+    }
+
+    /// Where the machine comes from, for the jobs of the installation rows.
+    pub(super) fn launcher_env_factory(&self) -> Arc<dyn Fn() -> launcher::Env + Send + Sync> {
+        Arc::clone(&self.launcher.env)
     }
 
     /// Dev mode with `ui.launcher_build = "newest"`.
@@ -228,6 +241,7 @@ impl PreferencesState {
             || self.launcher.rx.is_some()
             || self.launcher.pending.is_some()
             || self.tools.busy()
+            || self.install.busy()
             || self.folder_menu.busy()
             || (self.launcher.snapshot.is_none()
                 && !self.tools.has_read()

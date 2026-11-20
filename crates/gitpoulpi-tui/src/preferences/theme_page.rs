@@ -108,6 +108,7 @@ impl PreferencesState {
             live: true,
             coming: None,
             placeholder: None,
+            ellipsize: None,
         }
     }
 

@@ -39,6 +39,9 @@ pub(crate) struct Env {
     /// Who writes: the running installation, so launchers, pins, folder-menu
     /// entries and aliases of the others are never touched.
     pub ctx: InstallCtx,
+    /// `folder_menu_submenu` of the running installation: the submenu its
+    /// folder-menu entry goes into (`""`: the root).
+    pub submenu: String,
 }
 
 impl Env {
@@ -69,8 +72,10 @@ impl Env {
         let exe =
             gitpoulpi_config::desktop::alias::tui_exe(&std::env::current_exe().unwrap_or_default());
         let newest = gitpoulpi_config::dev_mode::launcher_newest_on_disk(&exe);
+        let (ctx, effective) = this_view();
         Env {
-            ctx: this_ctx(),
+            ctx,
+            submenu: effective.folder_menu_submenu,
             os,
             dirs,
             launch_exe: terminals::launch_helper(os, &exe, &|p| p.is_file()),
@@ -159,14 +164,34 @@ pub(crate) fn ctx_in(
 /// Blocking: reads `config.toml` and looks at the disk. The identity is the
 /// one `installation::current()` worked out once at startup.
 pub(crate) fn this_ctx() -> InstallCtx {
+    this_view().0
+}
+
+/// The writer context and the effective values of the running installation,
+/// from one read of the config as it is now. Blocking.
+pub(crate) fn this_view() -> (InstallCtx, gitpoulpi_config::installation::Effective) {
     let cur = gitpoulpi_config::installation::current();
     let loaded = cur
         .config_file
         .as_deref()
         .and_then(|f| gitpoulpi_config::Config::load(f).ok());
     match loaded {
-        Some(config) => ctx_in(&config, &cur.identity, &cur.config),
-        None => cur.ctx.clone(),
+        Some(config) => (
+            ctx_in(&config, &cur.identity, &cur.config),
+            crate::launcher_sync::effective_in(&config, &cur.identity, &cur.config),
+        ),
+        None => (cur.ctx.clone(), cur.effective.clone()),
+    }
+}
+
+/// The label of the folder-menu entry of an installation called `name`:
+/// "Open in GitPoulpi" for the primary, "Open in <name>" for the others, so
+/// every installation's entry is told apart.
+pub(crate) fn folder_menu_label(name: &str) -> String {
+    if name == gitpoulpi_config::installation::PRIMARY_NAME {
+        gitpoulpi_i18n::msg::launcher::FOLDER_MENU_LABEL.get().to_string()
+    } else {
+        gitpoulpi_i18n::msg::launcher::folder_menu_label_named(name)
     }
 }
 
@@ -308,8 +333,8 @@ pub(crate) fn sync_shortcuts(env: &Env, setting: &str, logo: &str) -> bool {
     }
     // The file-manager entries that are ours follow the exe too (and the
     // icon); a missing one is never created.
-    let label = gitpoulpi_i18n::msg::launcher::FOLDER_MENU_LABEL.get();
-    changed |= desktop::folder_menu::sync(&folder_menu_env(env, Some(logo)), label)
+    let label = folder_menu_label(&env.ctx.name);
+    changed |= desktop::folder_menu::sync(&folder_menu_env(env, Some(logo)), &label)
         .is_ok_and(|done| !done.is_empty());
     refresh_icons(env, setting, logo) || changed
 }
@@ -361,7 +386,81 @@ pub(crate) fn folder_menu_env(env: &Env, logo: Option<&str>) -> desktop::folder_
         .and_then(|l| desktop::ensure_ico_for(&env.dirs, &icon_set(l), &env.ctx));
     fe.refresh_hooks = env.refresh_icon_cache;
     fe.ctx = env.ctx.clone();
+    fe.submenu = env.submenu.clone();
     fe
+}
+
+/// The places holding a launcher an older GitPoulpi made under the plain name
+/// (the legacy marker, no owner tag). Blocking.
+pub(crate) fn legacy_places(env: &Env, setting: &str) -> Vec<Place> {
+    let legacy = InstallCtx::legacy();
+    let terminal = env.resolve(setting).unwrap_or("");
+    let terminal_exe = (!terminal.is_empty())
+        .then(|| terminal_exe(env, terminal))
+        .flatten();
+    let icons = IconSet::default();
+    let mut req = request(env, terminal, terminal_exe.as_deref(), &icons);
+    req.ctx = &legacy;
+    env.dirs
+        .places(env.os)
+        .into_iter()
+        .filter(|place| {
+            matches!(
+                desktop::status(*place, &env.dirs, &req).state,
+                desktop::State::Installed | desktop::State::Outdated
+            )
+        })
+        .collect()
+}
+
+/// The key of the entry that says the legacy-launchers note was shown.
+const LEGACY_NOTE_KEY: &str = "legacy_note_shown";
+
+/// Whether the one-time note about legacy launchers is due: nobody is the
+/// primary, such launchers exist and the note was never shown. Marks it shown
+/// in this installation's entry when it is due. Blocking.
+pub(crate) fn legacy_note_due(env: &Env, setting: &str) -> bool {
+    if env.ctx.primary.is_some() {
+        return false;
+    }
+    let cur = gitpoulpi_config::installation::current();
+    let Some(file) = cur.config_file.as_deref() else {
+        return false;
+    };
+    let shown = gitpoulpi_config::Config::load(file)
+        .ok()
+        .and_then(|c| c.installation.settings.get(&cur.identity.id).cloned())
+        .is_some_and(|e| e.extra.contains_key(LEGACY_NOTE_KEY));
+    if shown || legacy_places(env, setting).is_empty() {
+        return false;
+    }
+    let (id, base) = (
+        cur.identity.id.clone(),
+        cur.config.installation.settings.get(&cur.identity.id).cloned(),
+    );
+    gitpoulpi_config::set_installation_in_file(file, |i| {
+        let entry = i.settings.entry(id).or_insert_with(|| base.unwrap_or_default());
+        entry
+            .extra
+            .insert(LEGACY_NOTE_KEY.to_string(), toml::Value::Boolean(true));
+    })
+    .is_ok()
+}
+
+/// Deletes the legacy launchers (shortcuts and the folder-menu entries made
+/// under the plain name, untagged); how many were removed. Blocking.
+pub(crate) fn remove_legacy(env: &Env, folder: &desktop::folder_menu::Env) -> usize {
+    let legacy = InstallCtx::legacy();
+    let mut removed = 0;
+    for place in env.dirs.places(env.os) {
+        if desktop::remove(place, &env.dirs, env.os, &legacy) == Ok(true) {
+            removed += 1;
+        }
+    }
+    let mut fe = folder.clone();
+    fe.ctx = legacy;
+    removed += desktop::folder_menu::remove(&fe).map_or(0, |done| done.len());
+    removed
 }
 
 /// Runs `op`. Blocking.
@@ -409,6 +508,7 @@ mod tests {
             which: Arc::new(|_| None),
             refresh_icon_cache: false,
             ctx: InstallCtx::legacy(),
+            submenu: String::new(),
         }
     }
 
@@ -571,6 +671,7 @@ mod sync_tests {
             which: Arc::new(|_| None),
             refresh_icon_cache: false,
             ctx: InstallCtx::legacy(),
+            submenu: String::new(),
         }
     }
 

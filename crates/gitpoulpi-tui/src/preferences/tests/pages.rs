@@ -41,11 +41,18 @@ fn each_setting_is_on_the_page_the_owner_chose() {
         (
             PrefSection::Launcher,
             &[
+                "installation.info",
+                "installation.name",
+                "installation.name_with_version",
+                "installation.logo_color",
+                "installation.primary",
+                "installation.env",
+                "installation.folder_menu_submenu",
                 "ui.launch_terminal",
                 "ui.relaunch_in_terminal",
                 "ui.reuse_window",
-                "ui.command_alias",
-                "ui.command_alias_add",
+                "installation.command_alias",
+                "installation.command_alias_add",
             ],
         ),
         (

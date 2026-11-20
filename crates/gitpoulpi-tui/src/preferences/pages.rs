@@ -49,13 +49,21 @@ pub(super) const GENERAL: &[Row] = &[
 /// The Launcher page: the launcher's own rows; its per-place rows are
 /// appended after these (see `launcher_fields`), so nothing above them shifts.
 pub(super) const LAUNCHER: &[Row] = &[
+    Heading(|| msg::launcher::THIS_HEADING.get()),
+    Key("installation.info"),
+    Key("installation.name"),
+    Key("installation.name_with_version"),
+    Key("installation.logo_color"),
+    Key("installation.primary"),
+    Key("installation.env"),
+    Key("installation.folder_menu_submenu"),
     Heading(|| msg::launcher::HEADING.get()),
     Key("ui.launch_terminal"),
     Key("ui.launcher_build"),
     Key("ui.relaunch_in_terminal"),
     Key("ui.reuse_window"),
-    Key("ui.command_alias"),
-    Key("ui.command_alias_add"),
+    Key("installation.command_alias"),
+    Key("installation.command_alias_add"),
 ];
 
 /// The global part of proactive conflict detection: the default switch; the
@@ -237,6 +245,7 @@ impl PreferencesState {
         let mut pool = self.general_rows();
         pool.extend(self.ui_rows());
         pool.extend(self.editor_rows());
+        pool.extend(self.installation_rows());
         pool.extend(self.launcher_rows());
         #[cfg(feature = "mcp")]
         {
@@ -296,9 +305,16 @@ impl PreferencesState {
         // per-place shortcut rows follow.
         let alias_at = fields
             .iter()
-            .position(|f| f.target == Target::Global("ui.command_alias_add"))
+            .position(|f| f.target == Target::Global("installation.command_alias_add"))
             .map_or(fields.len(), |i| i + 1);
         fields.splice(alias_at..alias_at, self.tools_action_rows());
+        // The other installations and the legacy launchers close the
+        // "This installation" group, right under the submenu row.
+        let group_end = fields
+            .iter()
+            .position(|f| f.target == Target::Global("installation.folder_menu_submenu"))
+            .map_or(0, |i| i + 1);
+        fields.splice(group_end..group_end, self.installation_action_rows());
         fields.extend(self.launcher_action_rows());
         fields.extend(self.folder_menu_rows());
         fields

@@ -59,6 +59,7 @@ fn field(fields: &[Field], label: &str) -> Field {
         target: found.target.clone(),
         live: found.live,
         coming: found.coming.clone(),
+        ellipsize: found.ellipsize.clone(),
         placeholder: found.placeholder.clone(),
     }
 }

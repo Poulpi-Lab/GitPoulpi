@@ -22,7 +22,7 @@ fn open_settings(page: &str, session: &str) -> (Terminal, tempfile::TempDir, tem
     let home = tempfile::tempdir().unwrap();
     std::fs::write(
         config.path().join("config.toml"),
-        "[ui]\ngraph_renderer = \"text\"\ncommand_alias = \"gp\"\n",
+        "[ui]\ngraph_renderer = \"text\"\ncommand_alias = \"gp\"\n\n[installation]\nprimary = \"p-pty\"\n",
     )
     .unwrap();
     let mut term = common::launch(repo.root())

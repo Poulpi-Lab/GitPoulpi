@@ -1250,6 +1250,9 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Lanceur : Retirer du PATH |  |
 | Lanceur : Installer le menu Ouvrir dans GitPoulpi |  |
 | Lanceur : Supprimer le menu Ouvrir dans GitPoulpi |  |
+| Lanceur : Devenir l'installation principale |  |
+| Lanceur : Supprimer les anciens lanceurs |  |
+| Lanceur : Oublier les installations disparues |  |
 | Application : Changer le thème de couleurs du graphe... | `Ctrl+N T` |
 | Application : Basculer la teinte de ligne du graphe | `Ctrl+N Y` |
 <!-- palette:end -->

@@ -29,11 +29,12 @@ pub struct Report {
 }
 
 pub(crate) fn settings() -> (String, String) {
-    let ui = gitpoulpi_config::ConfigPaths::discover()
+    let config = gitpoulpi_config::ConfigPaths::discover()
         .and_then(|p| gitpoulpi_config::Config::load(&p.config_file()).ok())
-        .unwrap_or_default()
-        .ui;
-    (ui.launch_terminal, ui.logo_color)
+        .unwrap_or_default();
+    // The colour this installation wears, never another one's.
+    let logo = crate::launcher_sync::effective_color(&config);
+    (config.ui.launch_terminal, logo)
 }
 
 fn state_name(state: State) -> &'static str {

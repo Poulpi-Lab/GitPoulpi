@@ -42,7 +42,8 @@ impl Machine {
         let exe = std::env::current_exe().unwrap_or_default();
         // As the running installation: it touches only its own aliases.
         let cur = gitpoulpi_config::installation::current();
-        let mut alias = alias::Env::discover(os, &env, &home, &exe).with_ctx(cur.ctx.clone());
+        // The config as it is now (a name or primary change just made).
+        let mut alias = alias::Env::discover(os, &env, &home, &exe).with_ctx(crate::launcher::this_ctx());
         alias.newest = gitpoulpi_config::dev_mode::launcher_newest_on_disk(&exe);
         let keep = gitpoulpi_config::installation::path_keep(cur, &alias);
         let path = user_path::Env::discover(os, &env, &home, &alias).keeping(keep);
@@ -201,7 +202,7 @@ fn run(machine: &Machine, op: Op) -> Done {
     }
 }
 
-fn name_error_text(e: NameError) -> &'static str {
+pub(super) fn name_error_text(e: NameError) -> &'static str {
     match e {
         NameError::Empty => t::ALIAS_SET_NAME.get(),
         NameError::Space => t::ALIAS_BAD_SPACE.get(),
@@ -232,6 +233,11 @@ pub(super) fn is_note(reason: &str) -> bool {
 }
 
 impl PreferencesState {
+    /// Where the machine comes from, for the jobs of the installation rows.
+    pub(super) fn tools_machine_factory(&self) -> Arc<dyn Fn() -> Machine + Send + Sync> {
+        Arc::clone(&self.tools.machine)
+    }
+
     /// Test hook: where aliases and PATH entries are made (never the real ones).
     #[cfg(test)]
     pub(super) fn set_tools_machine(
@@ -253,8 +259,7 @@ impl PreferencesState {
         let (tx, rx) = mpsc::channel();
         self.tools.rx = Some(rx);
         let make = Arc::clone(&self.tools.machine);
-        let name = self.config.ui.command_alias.clone();
-        let name_add = self.config.ui.command_alias_add.clone();
+        let (name, name_add) = self.alias_names();
         self.tools.for_name = Some((name.clone(), name_add.clone()));
         std::thread::spawn(move || {
             let machine = make();
@@ -267,12 +272,7 @@ impl PreferencesState {
     /// Applies a finished job. Never blocks; called once a frame.
     pub(crate) fn poll_tools(&mut self) {
         let Some(rx) = &self.tools.rx else {
-            if self.tools.snapshot.is_some()
-                && self.tools.for_name.as_ref()
-                    != Some(&(
-                        self.config.ui.command_alias.clone(),
-                        self.config.ui.command_alias_add.clone(),
-                    ))
+            if self.tools.snapshot.is_some() && self.tools.for_name.as_ref() != Some(&self.alias_names())
             {
                 self.tools_start(None);
             }
@@ -311,8 +311,7 @@ impl PreferencesState {
     pub(super) fn tools_button(&mut self, button: ToolsButton) {
         let op = match button {
             ToolsButton::AliasCreate => {
-                let name = self.config.ui.command_alias.clone();
-                let name_add = self.config.ui.command_alias_add.clone();
+                let (name, name_add) = self.alias_names();
                 let mut names = Vec::new();
                 for (name, kind) in [(name, Kind::Open), (name_add, Kind::Add)] {
                     match alias::validate_name(&name) {
@@ -343,7 +342,7 @@ impl PreferencesState {
     /// The palette's route: show the Launcher group, run `button` and
     /// leave the acted-on row selected (and so scrolled into view).
     pub(crate) fn tools_command(&mut self, button: ToolsButton) {
-        let _ = self.show_page(None, Some("ui.command_alias"));
+        let _ = self.show_page(None, Some("installation.command_alias"));
         self.tools_button(button);
         let counterpart = match button {
             ToolsButton::AliasCreate => ToolsButton::AliasRemove,
@@ -357,21 +356,22 @@ impl PreferencesState {
     /// The alias combobox: a suggestion, "none", or any typed name. A name
     /// that would run something else already gets a warning under it.
     pub(super) fn tools_alias_row(&self) -> Field {
-        let name = self.config.ui.command_alias.clone();
-        let options = vec![
-            (t::ALIAS_NONE.get().to_string(), String::new()),
-            ("gp".to_string(), "gp".to_string()),
-        ];
+        let name = self.alias_names().0;
+        let mut options = vec![(t::ALIAS_NONE.get().to_string(), String::new())];
+        if let Some((main, _)) = self.alias_suggestion() {
+            options.push((main.to_string(), main.to_string()));
+        }
         let mut row = Field::global(
             t::ALIAS.get(),
-            "ui.command_alias",
+            "installation.command_alias",
             Control::Combo {
                 options,
                 value: name.clone(),
                 custom: true,
             },
         )
-        .with_help(t::ALIAS_HELP.get());
+        .with_help(t::ALIAS_HELP.get())
+        .live();
         let status = self
             .tools
             .snapshot
@@ -388,29 +388,74 @@ impl PreferencesState {
         row
     }
 
-    /// The add variant's combobox (`ui.command_alias_add`): none, `gpa`, the
+    /// The aliases this installation uses: its own, or the shared `ui.*` ones
+    /// while it is the primary (never another installation's).
+    pub(super) fn alias_names(&self) -> (String, String) {
+        let eff = self.this_effective();
+        (eff.command_alias, eff.command_alias_add)
+    }
+
+    /// The names suggested for this installation: `gp` / `gpa` for the
+    /// primary, `gpd` / `gpda` for a development checkout, none otherwise.
+    fn alias_suggestion(&self) -> Option<(&'static str, &'static str)> {
+        let this = self.this();
+        if self.this_effective().primary {
+            Some(("gp", "gpa"))
+        } else if this.identity.kind == gitpoulpi_config::Kind::Dev {
+            Some(("gpd", "gpda"))
+        } else {
+            None
+        }
+    }
+
+    /// "Used by {name}": the installation that made the alias.
+    pub(super) fn alias_owner_text(&self, status: &alias::Status) -> String {
+        let name = status
+            .owner
+            .as_deref()
+            .and_then(|id| gitpoulpi_config::installation::effective_of(&self.config, id))
+            .map(|e| e.name)
+            .or_else(|| status.owner.clone())
+            .unwrap_or_default();
+        t::alias_used_by(name)
+    }
+
+    /// What the alias status row says for `state`.
+    fn alias_state_text(&self, state: Option<&alias::Status>) -> String {
+        match state.map(|s| s.state) {
+            None => t::CHECKING.get().to_string(),
+            Some(alias::State::NotInstalled) => t::STATE_NONE.get().to_string(),
+            Some(alias::State::Installed) => t::ALIAS_CREATED.get().to_string(),
+            Some(alias::State::Outdated) => t::ALIAS_OUTDATED.get().to_string(),
+            Some(alias::State::Foreign) => t::STATE_FOREIGN.get().to_string(),
+            Some(alias::State::Other) => state.map(|s| self.alias_owner_text(s)).unwrap_or_default(),
+        }
+    }
+
+    /// The add variant's combobox (`installation.command_alias_add`): none, `gpa`, the
     /// alias name with an `a` after it, or any typed name.
     pub(super) fn tools_alias_add_row(&self) -> Field {
-        let name = self.config.ui.command_alias_add.clone();
-        let main = &self.config.ui.command_alias;
-        let mut options = vec![
-            (t::ALIAS_NONE.get().to_string(), String::new()),
-            ("gpa".to_string(), "gpa".to_string()),
-        ];
+        let (main, name) = self.alias_names();
+        let mut options = vec![(t::ALIAS_NONE.get().to_string(), String::new())];
+        let suggested = self.alias_suggestion().map(|(_, add)| add);
+        if let Some(add) = suggested {
+            options.push((add.to_string(), add.to_string()));
+        }
         let derived = format!("{main}a");
-        if !main.is_empty() && derived != "gpa" && alias::validate_name(&derived).is_ok() {
+        if !main.is_empty() && Some(derived.as_str()) != suggested && alias::validate_name(&derived).is_ok() {
             options.push((derived.clone(), derived));
         }
         let mut row = Field::global(
             t::ALIAS_ADD.get(),
-            "ui.command_alias_add",
+            "installation.command_alias_add",
             Control::Combo {
                 options,
                 value: name.clone(),
                 custom: true,
             },
         )
-        .with_help(t::ALIAS_ADD_HELP.get());
+        .with_help(t::ALIAS_ADD_HELP.get())
+        .live();
         let status = self
             .tools
             .snapshot
@@ -430,32 +475,26 @@ impl PreferencesState {
     /// The state rows and the four buttons, below the shortcuts.
     pub(super) fn tools_action_rows(&self) -> Vec<Field> {
         let mut fields = Vec::new();
-        let name = &self.config.ui.command_alias;
+        let (name, name_add) = self.alias_names();
+        let (name, name_add) = (&name, &name_add);
         let snap = self.tools.snapshot.as_ref();
         // ---- the command alias ----
         let checking = snap.is_none();
         let state = snap.and_then(|s| (s.name == *name).then_some(s.alias.as_ref()).flatten());
         let invalid = alias::validate_name(name).err();
         let alias_text = if checking {
-            t::CHECKING.get()
+            t::CHECKING.get().to_string()
         } else if let Some(e) = invalid {
-            name_error_text(e)
+            name_error_text(e).to_string()
         } else {
-            match state.map(|s| s.state) {
-                None => t::CHECKING.get(),
-                Some(alias::State::NotInstalled) => t::STATE_NONE.get(),
-                Some(alias::State::Installed) => t::ALIAS_CREATED.get(),
-                Some(alias::State::Outdated) => t::ALIAS_OUTDATED.get(),
-                Some(alias::State::Foreign | alias::State::Other) => t::STATE_FOREIGN.get(),
-            }
+            self.alias_state_text(state)
         };
         fields.push(Field::plain(
             t::ALIAS_STATUS.get(),
-            Control::Info(alias_text.to_string()),
+            Control::Info(alias_text),
             Target::None,
         ));
         // ---- the add variant ----
-        let name_add = &self.config.ui.command_alias_add;
         let state_add = snap.and_then(|s| {
             (s.name_add == *name_add)
                 .then_some(s.alias_add.as_ref())
@@ -465,21 +504,15 @@ impl PreferencesState {
         let wants_add = invalid_add.is_none();
         if !name_add.is_empty() {
             let text = if checking {
-                t::CHECKING.get()
+                t::CHECKING.get().to_string()
             } else if let Some(e) = invalid_add {
-                name_error_text(e)
+                name_error_text(e).to_string()
             } else {
-                match state_add.map(|s| s.state) {
-                    None => t::CHECKING.get(),
-                    Some(alias::State::NotInstalled) => t::STATE_NONE.get(),
-                    Some(alias::State::Installed) => t::ALIAS_CREATED.get(),
-                    Some(alias::State::Outdated) => t::ALIAS_OUTDATED.get(),
-                    Some(alias::State::Foreign | alias::State::Other) => t::STATE_FOREIGN.get(),
-                }
+                self.alias_state_text(state_add)
             };
             fields.push(Field::plain(
                 t::ALIAS_ADD_STATUS.get(),
-                Control::Info(text.to_string()),
+                Control::Info(text),
                 Target::None,
             ));
         }
@@ -516,6 +549,13 @@ impl PreferencesState {
             create = create.coming(name_error_text(e));
         } else if let Some(e) = invalid_add.filter(|e| *e != NameError::Empty) {
             create = create.coming(name_error_text(e));
+        } else if let Some(owner) = [state, state_add]
+            .into_iter()
+            .flatten()
+            .find(|s| s.state == alias::State::Other)
+        {
+            // Another installation made it: this one cannot take the name.
+            create = create.coming(&self.alias_owner_text(owner));
         } else if state.map(|s| s.state) == Some(alias::State::Foreign)
             || state_add.map(|s| s.state) == Some(alias::State::Foreign)
         {

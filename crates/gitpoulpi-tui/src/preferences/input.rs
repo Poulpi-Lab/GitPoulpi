@@ -617,6 +617,7 @@ impl PreferencesState {
             PrefAction::OpenIn(button) => self.open_in_button(button),
             PrefAction::ImageEditor(button) => self.images_button(button),
             PrefAction::Launcher(button) => self.launcher_button(button),
+            PrefAction::Installation(button) => self.install_button(button),
             PrefAction::Tools(button) => self.tools_button(button),
             PrefAction::FolderMenu(button) => self.folder_menu_button(button),
             #[cfg(feature = "mcp")]

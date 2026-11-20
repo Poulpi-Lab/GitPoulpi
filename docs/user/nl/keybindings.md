@@ -1252,6 +1252,9 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Starter: Verwijderen uit PATH |  |
 | Starter: Menu Openen in GitPoulpi installeren |  |
 | Starter: Menu Openen in GitPoulpi verwijderen |  |
+| Launcher: Become the Primary Installation |  |
+| Launcher: Remove Legacy Launchers |  |
+| Launcher: Forget Gone Installations |  |
 | App: Kleurthema van de grafiek wijzigen... | `Ctrl+N T` |
 | App: Rijkleuring van de grafiek omschakelen | `Ctrl+N Y` |
 <!-- palette:end -->

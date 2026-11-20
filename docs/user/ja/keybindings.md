@@ -1214,6 +1214,9 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | ランチャー: PATH から削除 |  |
 | ランチャー: 「GitPoulpi で開く」メニューをインストール |  |
 | ランチャー: 「GitPoulpi で開く」メニューを削除 |  |
+| Launcher: Become the Primary Installation |  |
+| Launcher: Remove Legacy Launchers |  |
+| Launcher: Forget Gone Installations |  |
 | アプリ: グラフのカラーテーマを変更... | `Ctrl+N T` |
 | アプリ: グラフの行の色付けを切り替え | `Ctrl+N Y` |
 <!-- palette:end -->

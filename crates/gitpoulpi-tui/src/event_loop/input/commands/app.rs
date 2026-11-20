@@ -520,6 +520,20 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             *cx.last_message = state.take_message();
             *cx.preferences = Some(state);
         }
+        PaletteCommand::LauncherBecomePrimary
+        | PaletteCommand::LauncherRemoveLegacy
+        | PaletteCommand::LauncherForgetGone => {
+            use crate::preferences::InstallButton as B;
+            let button = match cmd {
+                PaletteCommand::LauncherBecomePrimary => B::BecomePrimary,
+                PaletteCommand::LauncherRemoveLegacy => B::RemoveLegacy,
+                _ => B::Forget(0),
+            };
+            let mut state = PreferencesState::open(cx.repo_root);
+            state.installation_command(button);
+            *cx.last_message = state.take_message();
+            *cx.preferences = Some(state);
+        }
         PaletteCommand::ChangeGraphColorTheme => {
             *cx.input_mode = InputMode::LanguagePicker(Box::new(
                 crate::language_picker::LanguagePicker::open_graph_color_theme(),

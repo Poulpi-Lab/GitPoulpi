@@ -1246,6 +1246,9 @@ As teclas são as predefinidas.
 | Lançador: remover do PATH |  |
 | Lançador: instalar o menu Abrir no GitPoulpi |  |
 | Lançador: remover o menu Abrir no GitPoulpi |  |
+| Launcher: Become the Primary Installation |  |
+| Launcher: Remove Legacy Launchers |  |
+| Launcher: Forget Gone Installations |  |
 | Aplicação: mudar tema de cores do grafo... | `Ctrl+N T` |
 | Aplicação: alternar tom das linhas do grafo | `Ctrl+N Y` |
 <!-- palette:end -->

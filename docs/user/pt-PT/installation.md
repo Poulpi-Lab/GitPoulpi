@@ -196,13 +196,33 @@ gitpoulpi
 `--version` mostra a versão e o commit a partir do qual a compilação foi feita.
 Depois siga os [Primeiros passos](getting-started.md).
 
+## Várias instalações lado a lado
+
+Um pacote, um checkout de desenvolvimento, uma compilação com cargo e um arquivo descompactado podem estar todos instalados ao mesmo tempo. Cada um é a sua própria instalação: tem o seu próprio nome de lançador (`GitPoulpi (Chocolatey)`, `GitPoulpi (dev)`, ...), cor do polvo, alias de comando, entrada do menu "Abrir em" e daemons, por isso duas versões correm em paralelo e nunca se apoderam das janelas uma da outra. As definições, os repositórios e os tokens são partilhados. Ninguém fica com o nome de lançador simples `GitPoulpi` até o escolher com **Tornar principal** em Definições > Lançador. As [Definições](settings.md#lançador) listam as outras instalações e têm um botão **Esquecer** para uma que já não existe.
+
 ## Desinstalar
 
-`gitpoulpi uninstall` (o que ambos os instaladores executam) remove os alias de comando,
-as entradas do PATH, os atalhos e as entradas do menu do gestor de ficheiros (com a chave App Paths no Windows) que o GitPoulpi criou e, numa instalação a partir de uma versão,
-os ficheiros do programa; recusa-se a correr numa compilação sem o marcador `.gitpoulpi-dist`
-(uma compilação com cargo), e `--keep-files` deixa os ficheiros do programa. Não está
-disponível para os agentes MCP. Sem instalador, apague os ficheiros do programa.
+`gitpoulpi uninstall` remove os alias de comando (e as respetivas chaves App Paths
+no Windows), as entradas do PATH, os atalhos e as entradas do menu do gestor de ficheiros
+**só desta instalação**: os das outras ficam, e o `PATH` mantém as pastas delas
+e a pasta de alias partilhada enquanto uma delas ainda tiver lá um alias. As
+fixações na barra de tarefas e na Dock ficam (o Windows não permite desafixar
+a partir de fora) e as suas definições mantêm a entrada desta instalação, por isso reinstalar
+na mesma pasta devolve-lhe o aspeto. Depois apaga os ficheiros do programa de uma instalação
+a partir de uma versão; essa parte recusa-se a correr numa compilação sem o marcador
+`.gitpoulpi-dist` (uma compilação com cargo). Com `--keep-files` deixa os ficheiros do programa
+e funciona em qualquer compilação, incluindo um checkout de desenvolvimento. Não está
+disponível para os agentes MCP.
+
+| Como instalou | O que remove os lançadores e os alias |
+|---|---|
+| Instalador do Windows (utilizador ou todos os utilizadores), winget | O desinstalador executa `gitpoulpi uninstall --keep-files` e depois apaga os ficheiros. |
+| Chocolatey | O desinstalador automático executa o desinstalador do instalador. |
+| Scoop | `scoop uninstall gitpoulpi` executa primeiro `gitpoulpi uninstall --keep-files`. |
+| MSI | A remoção executa-o como o utilizador que instalou. Se for removido por outra conta, os lançadores do utilizador ficam e aparecem como órfãos nas Definições das outras instalações (**Esquecer**). |
+| apt, AUR, Homebrew, cargo, um checkout de desenvolvimento | Nenhum gancho corre por si: execute `gitpoulpi uninstall --keep-files` antes de remover o pacote. |
+| Arquivo, `install.sh --uninstall` | Execute `gitpoulpi uninstall`, ou `install.sh --uninstall`, e depois apague a pasta. |
+
 O GitPoulpi também guarda estes ficheiros:
 
 | O quê | Onde |

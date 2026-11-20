@@ -416,7 +416,8 @@ servern; se [MCP och agenter](mcp-and-agents.md).
 | Alternativ | Vad det gör |
 |---|---|
 | **MCP-server** | På (standard): en agent kan starta servern (`gitpoulpi mcp serve`). Av: den vägrar starta. Sparas som `mcp.enabled`. En ändring gäller nästa gång en agent startar servern; en server som redan körs behåller sina inställningar. |
-| **MCP-serverns port** | Porten som `--http` lyssnar på när ingen adress anges, 1 till 65535 (standard 8808). Sparas i porten i `mcp.bind`; värddelen behålls (`127.0.0.1` när den är tom). Gäller nästa gång en agent startar servern. |
+| **MCP-serverns port** | Porten som `--http` lyssnar på när ingen adress anges, 1 till 65535 (standard 8808). Sparas i porten i `mcp.bind`; värddelen behålls (`127.0.0.1` när den är tom). Gäller nästa gång en agent startar servern. En installation med egen MCP-bindning redigerar den. |
+| **Föreslå en ledig port** | Söker en ledig port på samma värdadress och sparar den som den här installationens MCP-bindning (`mcp.bind` för den primära installationen utan egen åsidosättning). Det finns en MCP-HTTP-server per port: en andra installation på en port som redan används vägrar starta, så använd det här för att välja en annan. Finns också i paletten som *MCP: Föreslå en ledig port*. |
 | **Låt AI-agenter styra vyn** | Låter agenter visa dig en commit, en fil eller ett meddelande i det här fönstret (`ui show`). Av: ingen agent når fönstret. |
 | **Låt AI-agenter föreslå ändringar som jag bekräftar** | Låter agenter öppna förifyllda dialoger för reword, commit, gren eller tag som du bekräftar. Av som standard. Se [MCP och agenter](mcp-and-agents.md#behörigheter). |
 | **Öppna ett fönster för agenter**, **Startkommando (custom)** | Om en agent får öppna ett GitPoulpi-fönster när inget är öppet, och med vilken terminal eller multiplexer. Av som standard. |

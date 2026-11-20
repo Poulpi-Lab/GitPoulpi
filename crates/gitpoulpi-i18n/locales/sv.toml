@@ -6015,7 +6015,7 @@ installation_help = "Vilken GitPoulpi det här är: hur den installerades, var d
 # context: value of the Installation row; {kind} is the install kind (dev, portable...), {path} its folder, {env} the environment name
 installation_info = "{kind}, {path}, miljö {env}"
 # context: end of the help line of the Installation row, which shows the whole folder when the value is cut; {path} is the install folder
-installation_folder = "Folder: {path}"
+installation_folder = "Mapp: {path}"
 name = "Startarnamn"
 name_help = "Namnet på den här installationens genvägar och på dess post i filhanterarmenyn. Bara den här installationen byter namn."
 name_primary = "den primära heter alltid GitPoulpi"
@@ -9183,17 +9183,17 @@ token_failed = "Kunde inte spara åtkomsttoken: {reason}"
 # context: status line when there is no access token to show or copy
 token_missing = "Det finns ingen åtkomsttoken ännu."
 # context: button in Settings > Agents & MCP under the MCP server port; looks for a port nobody listens on and saves it. Width budget: 24 cells
-suggest_port = "Suggest a free port"
+suggest_port = "Föreslå en ledig port"
 # context: help under the suggest-a-free-port button
-suggest_port_help = "Several GitPoulpi installations default to the same MCP port, and only one MCP HTTP server can use a port: a second one refuses to start. This looks for a free port on the same host address and saves it as this installation's MCP bind."
+suggest_port_help = "Flera GitPoulpi-installationer använder samma MCP-port som standard, och bara en MCP-HTTP-server kan använda en port: en andra vägrar starta. Det här söker en ledig port på samma värdadress och sparar den som den här installationens MCP-bindning."
 # context: status line while the free port is being looked for
-suggest_port_working = "Looking for a free port..."
+suggest_port_working = "Söker en ledig port..."
 # context: status line after a free port was saved; {bind} is a host address and port such as 127.0.0.1:8809
-suggested = "MCP bind set to {bind}. It applies the next time the server starts."
+suggested = "MCP-bindningen är satt till {bind}. Den gäller nästa gång servern startar."
 # context: status line when no free port was found
-suggest_port_failed = "Could not find a free port on that address."
+suggest_port_failed = "Hittade ingen ledig port på den adressen."
 # context: command palette entry: opens Settings > Agents & MCP and suggests a free MCP port
-palette_suggest_port = "MCP: Suggest a free port"
+palette_suggest_port = "MCP: Föreslå en ledig port"
 # context: label of a choice in Settings > Agents & MCP: how the MCP HTTP endpoint is encrypted (TLS)
 tls = "TLS"
 # context: help under the TLS choice

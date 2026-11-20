@@ -121,7 +121,9 @@ impl Env {
         let bin_dir = match os {
             Os::Windows => var("LOCALAPPDATA")
                 .unwrap_or_else(|| home.join("AppData/Local"))
-                .join("Programs/GitPoulpi/bin"),
+                .join("Programs")
+                .join("GitPoulpi")
+                .join("bin"),
             Os::Linux | Os::Macos => home.join(".local/bin"),
         };
         Env {
@@ -834,6 +836,10 @@ pub fn remove_all_with_app_paths(
             gone.push(name);
         }
     }
+    // The shared Windows folder goes with its last alias; never with a file left.
+    if env.os == Os::Windows && !gone.is_empty() {
+        let _ = std::fs::remove_dir(&env.bin_dir);
+    }
     Ok(gone)
 }
 
@@ -1049,6 +1055,32 @@ mod tests {
             "{text}"
         );
         assert_eq!(status(&mine, "gpc").state, State::Installed);
+    }
+
+    #[test]
+    fn remove_all_drops_the_emptied_windows_bin_folder_but_never_one_with_a_file() {
+        use crate::desktop::registry::MemoryRegistry;
+        let tmp = tempfile::tempdir().unwrap();
+        let mine = windows_as(tmp.path(), "aaaa", None);
+        let reg = MemoryRegistry::new();
+        create(&mine, "gpm").unwrap();
+        let gone = remove_all_with_app_paths(&mine, &reg).unwrap();
+        assert_eq!(gone, ["gpm"]);
+        assert!(!mine.bin_dir.exists(), "the empty bin folder stays");
+        create(&mine, "gpm").unwrap();
+        std::fs::write(mine.bin_dir.join("notes.txt"), "x").unwrap();
+        remove_all_with_app_paths(&mine, &reg).unwrap();
+        assert!(mine.bin_dir.join("notes.txt").exists());
+    }
+
+    #[test]
+    fn the_windows_bin_dir_is_built_from_components() {
+        let env = |k: &str| (k == "LOCALAPPDATA").then(|| "/u/AppData/Local".to_string());
+        let w = Env::discover(Os::Windows, &env, Path::new("/h"), Path::new("/x/gp.exe"));
+        let want: PathBuf = ["/u/AppData/Local", "Programs", "GitPoulpi", "bin"]
+            .iter()
+            .collect();
+        assert_eq!(w.bin_dir, want);
     }
 
     #[test]

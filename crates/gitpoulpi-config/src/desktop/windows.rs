@@ -20,7 +20,10 @@
 
 use std::path::{Path, PathBuf};
 
-use super::{terminals, Dirs, IconSet, Place, Request, State, Status, MARKER};
+use super::owner::{self, Facts, Owner};
+use super::{
+    terminals, Dirs, IconSet, InstallCtx, Place, Request, State, Status, MARKER, OWNER_TAG,
+};
 use crate::open_in::Os;
 
 pub(super) const FILE: &str = "GitPoulpi.lnk";
@@ -100,7 +103,15 @@ fn ps_quote(s: &str) -> String {
 }
 
 /// The PowerShell script that writes one shortcut.
-pub(super) fn script(lnk: &Path, target: &str, args: &str, workdir: &Path, icon: &Path) -> String {
+pub(super) fn script(
+    lnk: &Path,
+    target: &str,
+    args: &str,
+    workdir: &Path,
+    icon: &Path,
+    desc: &str,
+    aumid: &str,
+) -> String {
     format!(
         "$ErrorActionPreference = 'Stop'\n\
          $s = (New-Object -ComObject WScript.Shell).CreateShortcut({lnk})\n\
@@ -115,8 +126,8 @@ pub(super) fn script(lnk: &Path, target: &str, args: &str, workdir: &Path, icon:
         args = ps_quote(args),
         dir = ps_quote(&workdir.to_string_lossy()),
         icon = ps_quote(&format!("{},0", icon.to_string_lossy())),
-        desc = ps_quote(&format!("GitPoulpi {MARKER}")),
-        aumid = aumid_script(&[lnk.to_path_buf()]),
+        desc = ps_quote(desc),
+        aumid = aumid_script(&[lnk.to_path_buf()], aumid),
         notify = notify_script(&[lnk.to_path_buf()], false),
     )
 }
@@ -128,7 +139,7 @@ pub(super) fn script(lnk: &Path, target: &str, args: &str, workdir: &Path, icon:
 /// which is what makes the taskbar show it under the pinned icon with the
 /// "running" dot. Best effort: a failure here leaves a working shortcut that
 /// just does not group.
-pub(super) fn aumid_script(lnks: &[PathBuf]) -> String {
+pub(super) fn aumid_script(lnks: &[PathBuf], aumid: &str) -> String {
     if lnks.is_empty() {
         return String::new();
     }
@@ -137,7 +148,7 @@ pub(super) fn aumid_script(lnks: &[PathBuf]) -> String {
         s.push_str(&format!(
             "try {{ [GpAumid]::Set({lnk}, {id}) }} catch {{ }}\n",
             lnk = ps_quote(&lnk.to_string_lossy()),
-            id = ps_quote(terminals::AUMID),
+            id = ps_quote(aumid),
         ));
     }
     s
@@ -227,53 +238,192 @@ pub(super) fn contains_text(bytes: &[u8], needle: &str) -> bool {
     find(bytes, needle.as_bytes()) || find(bytes, &utf16)
 }
 
-fn lnk_path(place: Place, dirs: &Dirs) -> Result<PathBuf, String> {
+/// The file name of `ctx`'s shortcut: the primary keeps [`FILE`] (the name old
+/// builds look for), every other installation is `<launcher name>.lnk`.
+pub(super) fn file_name(ctx: &InstallCtx) -> String {
+    if ctx.is_primary() {
+        FILE.to_string()
+    } else {
+        named_file(ctx)
+    }
+}
+
+/// `<launcher name>.lnk`, the name a non-primary installation uses (and the
+/// one a primary handover renames the old primary's legacy file to).
+fn named_file(ctx: &InstallCtx) -> String {
+    let clean: String = ctx
+        .name
+        .chars()
+        .map(|c| {
+            if c.is_control() || "\\/:*?\"<>|".contains(c) {
+                '_'
+            } else {
+                c
+            }
+        })
+        .collect();
+    let clean = clean.trim_end_matches(['.', ' ']).trim_start();
+    if clean.is_empty() {
+        format!("GitPoulpi ({}).lnk", ctx.short)
+    } else {
+        format!("{clean}.lnk")
+    }
+}
+
+fn dir_of(place: Place, dirs: &Dirs) -> Result<&Path, String> {
     match place {
-        Place::StartMenu => dirs.start_menu.as_ref(),
-        Place::Desktop => dirs.desktop.as_ref(),
+        Place::StartMenu => dirs.start_menu.as_deref(),
+        Place::Desktop => dirs.desktop.as_deref(),
         Place::Launcher => return Err("Windows has the Start menu, not a launcher".into()),
     }
-    .map(|d| d.join(FILE))
     .ok_or_else(|| "that folder was not found".to_string())
 }
 
-/// `gitpoulpi-<hash of the .ico bytes>.ico`: a new colour is a new name.
-/// FNV-1a: stable across builds, unlike `DefaultHasher`.
-pub(super) fn ico_name(icons: &IconSet) -> String {
+fn lnk_path(place: Place, dirs: &Dirs, ctx: &InstallCtx) -> Result<PathBuf, String> {
+    dir_of(place, dirs).map(|d| d.join(file_name(ctx)))
+}
+
+/// The owner tag written into the `.lnk` description: `X-GitPoulpi-Install=<id>`.
+/// Nothing without an id (the id-less legacy context of tests and fakes).
+fn tag_text(ctx: &InstallCtx) -> Option<String> {
+    (!ctx.id.is_empty()).then(|| format!("{OWNER_TAG}={}", ctx.id))
+}
+
+/// The description of `ctx`'s shortcut. The legacy marker is written by the
+/// primary only: old builds look for exactly that, so a non-primary shortcut
+/// is invisible to them.
+pub(super) fn description(ctx: &InstallCtx) -> String {
+    let mut d = String::from("GitPoulpi");
+    if ctx.is_primary() {
+        d.push(' ');
+        d.push_str(MARKER);
+    }
+    if let Some(tag) = tag_text(ctx) {
+        d.push(' ');
+        d.push_str(&tag);
+    }
+    d
+}
+
+/// The value of the owner tag in a `.lnk`'s bytes (ANSI or UTF-16LE).
+pub(super) fn read_tag(bytes: &[u8]) -> Option<String> {
+    let key = format!("{OWNER_TAG}=");
+    let is_id = |c: u8| c.is_ascii_alphanumeric() || matches!(c, b'-' | b'_' | b'.');
+    let at = |hay: &[u8], pat: &[u8]| hay.windows(pat.len()).position(|w| w == pat);
+    if let Some(p) = at(bytes, key.as_bytes()) {
+        let value: Vec<u8> = bytes[p + key.len()..]
+            .iter()
+            .copied()
+            .take_while(|b| is_id(*b))
+            .collect();
+        return Some(String::from_utf8_lossy(&value).into_owned());
+    }
+    let wide: Vec<u8> = key.encode_utf16().flat_map(u16::to_le_bytes).collect();
+    let p = at(bytes, &wide)?;
+    let value: Vec<u8> = bytes[p + wide.len()..]
+        .as_chunks::<2>()
+        .0
+        .iter()
+        .take_while(|c| c[1] == 0 && is_id(c[0]))
+        .map(|c| c[0])
+        .collect();
+    Some(String::from_utf8_lossy(&value).into_owned())
+}
+
+/// Facts of a `.lnk` for [`owner::decide`]; `exes` are the spellings of the
+/// running exe (a pin the user made names it, with neither tag nor marker).
+fn facts_of<'a>(bytes: &[u8], tag: Option<&'a str>, exes: &[String]) -> Facts<'a> {
+    Facts {
+        tag,
+        legacy_marker: contains_text(bytes, MARKER),
+        names_my_exe: exes.iter().any(|e| contains_text(bytes, e)),
+    }
+}
+
+/// Who owns the shortcut at `ctx`'s own path. An untagged legacy file there
+/// can only be one the primary handover renamed to this installation's name
+/// (contents untouched): it is mine, and the next sync rewrites it.
+fn owner_at_own_path(bytes: &[u8], ctx: &InstallCtx) -> Owner {
+    let tag = read_tag(bytes);
+    let facts = facts_of(bytes, tag.as_deref(), &[]);
+    if !ctx.is_primary() && facts.tag.is_none() && facts.legacy_marker {
+        return Owner::Mine;
+    }
+    owner::decide(&facts, ctx)
+}
+
+fn is_mine(owner: &Owner) -> bool {
+    matches!(owner, Owner::Mine | Owner::Adopt)
+}
+
+/// `gitpoulpi-<hash of the .ico bytes>.ico` (the primary) or
+/// `gitpoulpi-i<8hex>-<hash>.ico` (every other installation): a new colour is
+/// a new name. FNV-1a: stable across builds, unlike `DefaultHasher`.
+pub(super) fn ico_name_for(icons: &IconSet, ctx: &InstallCtx) -> String {
     let hash = icons.ico().iter().fold(0xcbf2_9ce4_8422_2325_u64, |h, b| {
         (h ^ u64::from(*b)).wrapping_mul(0x0000_0100_0000_01b3)
     });
-    format!(
-        "{ICON_PREFIX}{:0width$x}.ico",
+    let digits = format!(
+        "{:0width$x}",
         hash & ((1u64 << (4 * ICON_HASH_DIGITS)) - 1),
         width = ICON_HASH_DIGITS
-    )
+    );
+    if ctx.is_primary() {
+        format!("{ICON_PREFIX}{digits}.ico")
+    } else {
+        format!("{ICON_PREFIX}{}-{digits}.ico", ctx.short)
+    }
 }
 
+/// [`ico_name_for`] the primary.
+#[cfg(test)]
+pub(super) fn ico_name(icons: &IconSet) -> String {
+    ico_name_for(icons, InstallCtx::legacy_ref())
+}
+
+pub(super) fn ico_path_for(dirs: &Dirs, icons: &IconSet, ctx: &InstallCtx) -> PathBuf {
+    dirs.assets.join(ico_name_for(icons, ctx))
+}
+
+/// [`ico_path_for`] the primary.
 pub(super) fn ico_path(dirs: &Dirs, icons: &IconSet) -> PathBuf {
-    dirs.assets.join(ico_name(icons))
+    ico_path_for(dirs, icons, InstallCtx::legacy_ref())
 }
 
-/// Whether `file` is an icon we wrote: `gitpoulpi.ico` (before the names
-/// carried a hash) or `gitpoulpi-<12 hex>.ico`. Nothing else in the folder is
-/// ever touched.
+fn is_hash(h: &str) -> bool {
+    h.len() == ICON_HASH_DIGITS && h.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
+}
+
+/// Whether `file` is an icon the primary wrote: `gitpoulpi.ico` (before the
+/// names carried a hash) or `gitpoulpi-<12 hex>.ico`.
 pub(super) fn is_our_ico(file: &str) -> bool {
-    if file == LEGACY_ICON_FILE {
-        return true;
+    file == LEGACY_ICON_FILE
+        || file
+            .strip_prefix(ICON_PREFIX)
+            .and_then(|r| r.strip_suffix(".ico"))
+            .is_some_and(is_hash)
+}
+
+/// Whether `file` is an icon `ctx` wrote: the primary's names, or for another
+/// installation `gitpoulpi-i<8hex>-<12 hex>.ico` with its own short id. Nothing
+/// else in the folder is ever touched, another installation's icons included.
+pub(super) fn is_my_ico(file: &str, ctx: &InstallCtx) -> bool {
+    if ctx.is_primary() {
+        return is_our_ico(file);
     }
     file.strip_prefix(ICON_PREFIX)
+        .and_then(|r| r.strip_prefix(ctx.short.as_str()))
+        .and_then(|r| r.strip_prefix('-'))
         .and_then(|r| r.strip_suffix(".ico"))
-        .is_some_and(|h| {
-            h.len() == ICON_HASH_DIGITS && h.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
-        })
+        .is_some_and(is_hash)
 }
 
-fn our_icos(dirs: &Dirs) -> Vec<PathBuf> {
+fn my_icos(dirs: &Dirs, ctx: &InstallCtx) -> Vec<PathBuf> {
     std::fs::read_dir(&dirs.assets)
         .into_iter()
         .flatten()
         .flatten()
-        .filter(|e| is_our_ico(&e.file_name().to_string_lossy()))
+        .filter(|e| is_my_ico(&e.file_name().to_string_lossy(), ctx))
         .map(|e| e.path())
         .collect()
 }
@@ -307,27 +457,27 @@ pub(super) fn pinned_lnks(dirs: &Dirs) -> Vec<PathBuf> {
     out
 }
 
-/// Every shortcut that may name one of our icons: the Start menu and Desktop
-/// entries and ALL shortcuts pinned to the taskbar (a pin whose marker
+/// Every shortcut that may name one of `ctx`'s icons: its own Start menu and
+/// Desktop entries and ALL shortcuts pinned to the taskbar (a pin whose marker
 /// Windows stripped still points at our file, and must not lose it).
-fn icon_holders(dirs: &Dirs) -> Vec<PathBuf> {
+fn icon_holders(dirs: &Dirs, ctx: &InstallCtx) -> Vec<PathBuf> {
     let mut all: Vec<PathBuf> = [dirs.start_menu.as_ref(), dirs.desktop.as_ref()]
         .into_iter()
         .flatten()
-        .map(|d| d.join(FILE))
+        .map(|d| d.join(file_name(ctx)))
         .collect();
     all.extend(pinned_lnks(dirs));
     all
 }
 
-/// Deletes the icon files of ours that are not `keep` and that no shortcut
+/// Deletes the icon files of `ctx` that are not `keep` and that no shortcut
 /// points at any more.
-pub(super) fn cleanup_icons(dirs: &Dirs, keep: &Path) {
-    let holders: Vec<Vec<u8>> = icon_holders(dirs)
+pub(super) fn cleanup_icons(dirs: &Dirs, keep: &Path, ctx: &InstallCtx) {
+    let holders: Vec<Vec<u8>> = icon_holders(dirs, ctx)
         .iter()
         .filter_map(|p| std::fs::read(p).ok())
         .collect();
-    for ico in our_icos(dirs) {
+    for ico in my_icos(dirs, ctx) {
         let name = ico.to_string_lossy();
         if ico == keep || holders.iter().any(|b| contains_text(b, &name)) {
             continue;
@@ -336,13 +486,13 @@ pub(super) fn cleanup_icons(dirs: &Dirs, keep: &Path) {
     }
 }
 
-/// Writes `icons` as our current `.ico` (when missing or different) and says
-/// where; the running GitPoulpi puts it on its terminal window.
-pub(super) fn ensure_ico(dirs: &Dirs, icons: &IconSet) -> Option<PathBuf> {
+/// Writes `icons` as `ctx`'s current `.ico` (when missing or different) and
+/// says where; the running GitPoulpi puts it on its terminal window.
+pub(super) fn ensure_ico(dirs: &Dirs, icons: &IconSet, ctx: &InstallCtx) -> Option<PathBuf> {
     if icons.pngs.is_empty() {
         return None;
     }
-    let path = ico_path(dirs, icons);
+    let path = ico_path_for(dirs, icons, ctx);
     let bytes = icons.ico();
     if std::fs::read(&path).ok().as_deref() != Some(bytes.as_slice()) {
         super::write_file(&path, &bytes, false).ok()?;
@@ -394,13 +544,15 @@ pub(super) fn status(place: Place, dirs: &Dirs, req: &Request) -> Status {
         state: State::NotInstalled,
         icon_stale: false,
     };
-    let Ok(path) = lnk_path(place, dirs) else {
+    let Ok(path) = lnk_path(place, dirs, req.ctx) else {
         return none;
     };
     let Ok(bytes) = std::fs::read(&path) else {
         return none;
     };
-    if !contains_text(&bytes, MARKER) {
+    // Another installation's file, a legacy one without a primary, or not ours
+    // at all: shown as `Foreign`, never rewritten.
+    if !is_mine(&owner_at_own_path(&bytes, req.ctx)) {
         return Status {
             state: State::Foreign,
             icon_stale: false,
@@ -412,16 +564,17 @@ pub(super) fn status(place: Place, dirs: &Dirs, req: &Request) -> Status {
     // The launch helper and the AppUserModelID count too: a shortcut written
     // before them has the right exe and terminal but starts a new window on
     // every click and groups under the terminal, so it must read `Outdated`.
+    let aumid = terminals::aumid_for(req.ctx);
     let current = inner(req).is_ok_and(|(program, _)| {
         names_exe(&bytes, req)
             && !names_legacy_exe(&bytes, req)
             && (req.terminal == "console" || contains_text(&bytes, &program))
             && contains_text(&bytes, terminals::LAUNCHER_FLAG)
             && names_launch(&bytes, req)
-            && contains_text(&bytes, terminals::AUMID)
+            && contains_text(&bytes, &aumid)
     });
     // Stale: the current icon is not on disk, or this shortcut names another.
-    let ico = ico_path(dirs, req.icons);
+    let ico = ico_path_for(dirs, req.icons, req.ctx);
     let icon_stale = !req.icons.pngs.is_empty()
         && (std::fs::read(&ico).ok().as_deref() != Some(req.icons.ico().as_slice())
             || !contains_text(&bytes, &ico.to_string_lossy())
@@ -442,19 +595,23 @@ pub(super) fn write_icon(dirs: &Dirs, req: &Request) -> Result<(), String> {
     if req.icons.pngs.is_empty() {
         return Ok(());
     }
-    super::write_file(&ico_path(dirs, req.icons), &req.icons.ico(), false)
+    super::write_file(
+        &ico_path_for(dirs, req.icons, req.ctx),
+        &req.icons.ico(),
+        false,
+    )
 }
 
 /// The logo colour changed: writes the new `.ico` under its new name,
 /// re-points every shortcut of ours at it (PowerShell; skipped in tests),
-/// then deletes the older files nothing points at.
+/// then deletes the older files of this installation nothing points at.
 pub(super) fn refresh_icon(dirs: &Dirs, req: &Request) -> Result<(), String> {
     write_icon(dirs, req)?;
     if req.refresh_icon_cache && !req.icons.pngs.is_empty() {
-        repoint_shortcuts(dirs, req);
+        repoint_shortcuts(dirs, req, &run_powershell);
         flush_icon_cache();
     }
-    cleanup_icons(dirs, &ico_path(dirs, req.icons));
+    cleanup_icons(dirs, &ico_path_for(dirs, req.icons, req.ctx), req.ctx);
     Ok(())
 }
 
@@ -468,8 +625,20 @@ pub(super) fn flush_icon_cache() {
         .status();
 }
 
+/// Runs one PowerShell script; a test swaps in a fake that records it.
+pub(super) type Run<'a> = &'a dyn Fn(&str) -> Result<(), String>;
+
 pub(super) fn install(place: Place, dirs: &Dirs, req: &Request) -> Result<PathBuf, String> {
-    let path = lnk_path(place, dirs)?;
+    install_with(place, dirs, req, &run_powershell)
+}
+
+pub(super) fn install_with(
+    place: Place,
+    dirs: &Dirs,
+    req: &Request,
+    run: Run,
+) -> Result<PathBuf, String> {
+    let path = lnk_path(place, dirs, req.ctx)?;
     if status(place, dirs, req).state == State::Foreign {
         return Err(format!(
             "{} is not ours; not overwriting it",
@@ -485,21 +654,67 @@ pub(super) fn install(place: Place, dirs: &Dirs, req: &Request) -> Result<PathBu
     let icon = if req.icons.pngs.is_empty() {
         req.exe.to_path_buf()
     } else {
-        ico_path(dirs, req.icons)
+        ico_path_for(dirs, req.icons, req.ctx)
     };
-    run_powershell(&script(&path, &program, &args, workdir, &icon))?;
-    if req.refresh_icon_cache && !req.icons.pngs.is_empty() {
-        repoint_shortcuts(dirs, req);
+    let renamed = !path.exists();
+    run(&script(
+        &path,
+        &program,
+        &args,
+        workdir,
+        &icon,
+        &description(req.ctx),
+        &terminals::aumid_for(req.ctx),
+    ))?;
+    // The version in the name (or the primary toggle) changed the file name:
+    // this installation's own tagged files under the old name go, the shell is
+    // told. Another installation's file is never looked at.
+    let old = stale_own_lnks(&path, req.ctx);
+    for lnk in &old {
+        let _ = std::fs::remove_file(lnk);
     }
-    sync_pinned_args(dirs, req);
-    cleanup_icons(dirs, &ico_path(dirs, req.icons));
+    if !old.is_empty() || renamed {
+        let _ = run(&gone_script(&old, Some(&path)));
+    }
+    if req.refresh_icon_cache && !req.icons.pngs.is_empty() {
+        repoint_shortcuts(dirs, req, run);
+    }
+    sync_pinned_args_with(dirs, req, run);
+    cleanup_icons(dirs, &ico_path_for(dirs, req.icons, req.ctx), req.ctx);
     Ok(path)
 }
 
-/// The shortcuts in `User Pinned\TaskBar` that start GitPoulpi: they carry
-/// our marker (the description survives the copy) or the path of our exe (the
-/// target, or the argument of a terminal's command line). Sorted.
-pub(super) fn pinned_ours(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
+/// The other `.lnk` files in `current`'s folder tagged with this
+/// installation's id: what its shortcut was called before the name changed.
+fn stale_own_lnks(current: &Path, ctx: &InstallCtx) -> Vec<PathBuf> {
+    let Some(dir) = current.parent() else {
+        return Vec::new();
+    };
+    if ctx.id.is_empty() {
+        return Vec::new();
+    }
+    let mut out: Vec<PathBuf> = std::fs::read_dir(dir)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| p != current && p.extension().is_some_and(|x| x.eq_ignore_ascii_case("lnk")))
+        .filter(|p| {
+            std::fs::read(p).is_ok_and(|b| read_tag(&b).as_deref() == Some(ctx.id.as_str()))
+        })
+        .collect();
+    out.sort();
+    out
+}
+
+/// The shortcuts in `User Pinned` that start this installation's GitPoulpi,
+/// each with whether it is a copy of a shortcut of ours (it carries our tag, or
+/// the legacy marker while this is the primary: its whole target is ours to
+/// rewrite) or one the user made (only our exe path identifies it: just the
+/// missing launcher flag is appended). Every pin goes through
+/// [`owner::decide`]: another installation's pin, a legacy one without a
+/// primary and a foreign one are never touched. Sorted.
+pub(super) fn pinned_owned(dirs: &Dirs, req: &Request) -> Vec<(PathBuf, bool)> {
     let mut exes: Vec<String> = exe_spellings(req.exe, req.newest)
         .into_iter()
         .filter(|e| !e.is_empty())
@@ -511,37 +726,52 @@ pub(super) fn pinned_ours(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
         .map(|p| p.to_string_lossy().into_owned())
         .collect();
     exes.extend(legacy);
-    let mut found: Vec<PathBuf> = pinned_lnks(dirs)
+    let mut found: Vec<(PathBuf, bool)> = pinned_lnks(dirs)
         .into_iter()
-        .filter(|p| {
-            std::fs::read(p).is_ok_and(|b| {
-                contains_text(&b, MARKER) || exes.iter().any(|e| contains_text(&b, e))
-            })
+        .filter_map(|p| {
+            let bytes = std::fs::read(&p).ok()?;
+            let tag = read_tag(&bytes);
+            let facts = facts_of(&bytes, tag.as_deref(), &exes);
+            is_mine(&owner::decide(&facts, req.ctx))
+                .then_some((p, facts.tag.is_some() || facts.legacy_marker))
         })
         .collect();
     found.sort();
     found
 }
 
+/// [`pinned_owned`] without the flag.
+pub(super) fn pinned_ours(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
+    pinned_owned(dirs, req)
+        .into_iter()
+        .map(|(p, _)| p)
+        .collect()
+}
+
 /// The pinned copies whose icon is not our current `.ico` yet.
 pub(super) fn pinned_to_repoint(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
-    let ico = ico_path(dirs, req.icons).to_string_lossy().to_string();
+    let ico = ico_path_for(dirs, req.icons, req.ctx)
+        .to_string_lossy()
+        .to_string();
     pinned_ours(dirs, req)
         .into_iter()
         .filter(|p| std::fs::read(p).is_ok_and(|b| !contains_text(&b, &ico)))
         .collect()
 }
 
-/// Every shortcut of ours (Start menu, Desktop, pinned copies) whose icon is
-/// not the current `.ico`.
+/// Every shortcut of this installation (Start menu, Desktop, pinned copies)
+/// whose icon is not the current `.ico`.
 pub(super) fn shortcuts_to_repoint(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
-    let ico = ico_path(dirs, req.icons).to_string_lossy().to_string();
+    let ico = ico_path_for(dirs, req.icons, req.ctx)
+        .to_string_lossy()
+        .to_string();
     let own = [dirs.start_menu.as_ref(), dirs.desktop.as_ref()]
         .into_iter()
         .flatten()
-        .map(|d| d.join(FILE))
+        .map(|d| d.join(file_name(req.ctx)))
         .filter(|p| {
-            std::fs::read(p).is_ok_and(|b| contains_text(&b, MARKER) && !contains_text(&b, &ico))
+            std::fs::read(p)
+                .is_ok_and(|b| is_mine(&owner_at_own_path(&b, req.ctx)) && !contains_text(&b, &ico))
         });
     let mut all: Vec<PathBuf> = own.chain(pinned_to_repoint(dirs, req)).collect();
     all.sort();
@@ -554,7 +784,7 @@ pub(super) fn shortcuts_to_repoint(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
 /// it again) and that icons changed (`SHCNE_ASSOCCHANGED`). Saving through
 /// `WScript.Shell` drops the AppUserModelID of a shortcut, so it is written
 /// again after.
-pub(super) fn pinned_script(lnks: &[PathBuf], icon: &Path) -> String {
+pub(super) fn pinned_script(lnks: &[PathBuf], icon: &Path, aumid: &str) -> String {
     // One shortcut that cannot be saved (locked, read-only) must not stop the
     // others nor the notification: each is its own `try`.
     let mut s = String::from("$ErrorActionPreference = 'Stop'\n");
@@ -568,7 +798,7 @@ pub(super) fn pinned_script(lnks: &[PathBuf], icon: &Path) -> String {
             icon = ps_quote(&format!("{},0", icon.to_string_lossy())),
         ));
     }
-    s.push_str(&aumid_script(lnks));
+    s.push_str(&aumid_script(lnks, aumid));
     s.push_str(&notify_script(lnks, true));
     s
 }
@@ -617,14 +847,55 @@ fn notify_script(lnks: &[PathBuf], assoc: bool) -> String {
     s
 }
 
+/// `SHCNE_DELETE` / `SHCNE_CREATE`: a file went away / appeared.
+const SHCNE_DELETE: u32 = 0x0000_0004;
+const SHCNE_CREATE: u32 = 0x0000_0002;
+
+/// The PowerShell that tells the shell `gone` were deleted and `created` (when
+/// there is one) appeared: a rename is both. Empty for nothing to say.
+pub(super) fn gone_script(gone: &[PathBuf], created: Option<&Path>) -> String {
+    if gone.is_empty() && created.is_none() {
+        return String::new();
+    }
+    let mut s = String::from(NOTIFY_DECL);
+    let item = |event: u32, p: &Path| {
+        format!(
+            "[Gp.Shell]::SHChangeNotifyPath({event:#x}, {SHCNF_PATHW_NOWAIT:#x}, {p}, [IntPtr]::Zero)\n",
+            p = ps_quote(&p.to_string_lossy()),
+        )
+    };
+    for p in gone {
+        s.push_str(&item(SHCNE_DELETE, p));
+    }
+    if let Some(p) = created {
+        s.push_str(&item(SHCNE_CREATE, p));
+    }
+    let mut dirs: Vec<&Path> = gone
+        .iter()
+        .map(PathBuf::as_path)
+        .chain(created)
+        .filter_map(Path::parent)
+        .collect();
+    dirs.sort();
+    dirs.dedup();
+    for dir in dirs {
+        s.push_str(&item(SHCNE_UPDATEDIR, dir));
+    }
+    s
+}
+
 /// Best effort: re-points our shortcuts (Start menu, Desktop, and the copies
 /// pinned to the taskbar) at the current `.ico` and notifies the shell. A pin
 /// the user made from the Start menu entry is a copy; if Windows stripped our
 /// marker AND the exe path it is not found and the user unpins and pins again
 /// (documented in the settings guide).
-pub(super) fn repoint_shortcuts(dirs: &Dirs, req: &Request) {
+pub(super) fn repoint_shortcuts(dirs: &Dirs, req: &Request, run: Run) {
     let lnks = shortcuts_to_repoint(dirs, req);
-    let _ = run_powershell(&pinned_script(&lnks, &ico_path(dirs, req.icons)));
+    let _ = run(&pinned_script(
+        &lnks,
+        &ico_path_for(dirs, req.icons, req.ctx),
+        &terminals::aumid_for(req.ctx),
+    ));
 }
 
 /// The pinned copies to rewrite, each with whether it carries our marker
@@ -634,17 +905,15 @@ pub(super) fn repoint_shortcuts(dirs: &Dirs, req: &Request) {
 /// A copy of ours is stale when it lacks the flag, the launch helper (when
 /// there is one) or the AppUserModelID; a user's copy when it lacks the flag.
 pub(super) fn pinned_stale(dirs: &Dirs, req: &Request) -> Vec<(PathBuf, bool)> {
-    pinned_ours(dirs, req)
+    let aumid = terminals::aumid_for(req.ctx);
+    pinned_owned(dirs, req)
         .into_iter()
-        .filter_map(|p| {
+        .filter_map(|(p, owned)| {
             let bytes = std::fs::read(&p).ok()?;
-            let owned = contains_text(&bytes, MARKER);
             let flag = contains_text(&bytes, terminals::LAUNCHER_FLAG);
             let launch = names_launch(&bytes, req);
             let current = if owned {
-                flag && launch
-                    && !names_legacy_exe(&bytes, req)
-                    && contains_text(&bytes, terminals::AUMID)
+                flag && launch && !names_legacy_exe(&bytes, req) && contains_text(&bytes, &aumid)
             } else {
                 flag
             };
@@ -656,7 +925,12 @@ pub(super) fn pinned_stale(dirs: &Dirs, req: &Request) -> Vec<(PathBuf, bool)> {
 /// The script that gives pinned copies the current command line: a copy of
 /// our shortcut (`owned`) gets our `TargetPath` and `Arguments`, one the user
 /// made only gets the flag appended. Explorer is told afterwards.
-pub(super) fn pinned_args_script(items: &[(PathBuf, bool)], program: &str, args: &str) -> String {
+pub(super) fn pinned_args_script(
+    items: &[(PathBuf, bool)],
+    program: &str,
+    args: &str,
+    aumid: &str,
+) -> String {
     let mut s = String::from("$ErrorActionPreference = 'Stop'\n");
     if !items.is_empty() {
         s.push_str("$sh = New-Object -ComObject WScript.Shell\n");
@@ -682,7 +956,7 @@ pub(super) fn pinned_args_script(items: &[(PathBuf, bool)], program: &str, args:
         .filter(|(_, owned)| *owned)
         .map(|(lnk, _)| lnk.clone())
         .collect();
-    s.push_str(&aumid_script(&owned));
+    s.push_str(&aumid_script(&owned, aumid));
     let all: Vec<PathBuf> = items.iter().map(|(lnk, _)| lnk.clone()).collect();
     s.push_str(&notify_script(&all, true));
     s
@@ -694,6 +968,10 @@ pub(super) fn pinned_args_script(items: &[(PathBuf, bool)], program: &str, args:
 /// rewrite was run. Skipped when `refresh_icon_cache` is off (tests: no
 /// PowerShell is spawned).
 pub(super) fn sync_pinned_args(dirs: &Dirs, req: &Request) -> bool {
+    sync_pinned_args_with(dirs, req, &run_powershell)
+}
+
+fn sync_pinned_args_with(dirs: &Dirs, req: &Request, run: Run) -> bool {
     if !req.refresh_icon_cache {
         return false;
     }
@@ -701,7 +979,14 @@ pub(super) fn sync_pinned_args(dirs: &Dirs, req: &Request) -> bool {
     let Ok((program, args)) = target(req) else {
         return false;
     };
-    !items.is_empty() && run_powershell(&pinned_args_script(&items, &program, &args)).is_ok()
+    !items.is_empty()
+        && run(&pinned_args_script(
+            &items,
+            &program,
+            &args,
+            &terminals::aumid_for(req.ctx),
+        ))
+        .is_ok()
 }
 
 fn run_powershell(script: &str) -> Result<(), String> {
@@ -727,12 +1012,23 @@ fn run_powershell(script: &str) -> Result<(), String> {
     }
 }
 
-pub(super) fn remove(place: Place, dirs: &Dirs) -> Result<bool, String> {
-    let path = lnk_path(place, dirs)?;
+pub(super) fn remove(place: Place, dirs: &Dirs, ctx: &InstallCtx) -> Result<bool, String> {
+    remove_with(place, dirs, ctx, &run_powershell)
+}
+
+/// Deletes this installation's own shortcut (and, once no other place keeps
+/// one, its own icons). Another installation's shortcut and icons stay.
+pub(super) fn remove_with(
+    place: Place,
+    dirs: &Dirs,
+    ctx: &InstallCtx,
+    run: Run,
+) -> Result<bool, String> {
+    let path = lnk_path(place, dirs, ctx)?;
     let Ok(bytes) = std::fs::read(&path) else {
         return Ok(false);
     };
-    if !contains_text(&bytes, MARKER) {
+    if !is_mine(&owner_at_own_path(&bytes, ctx)) {
         return Err(format!("{} is not ours; not removing it", path.display()));
     }
     std::fs::remove_file(&path).map_err(|e| e.to_string())?;
@@ -740,12 +1036,56 @@ pub(super) fn remove(place: Place, dirs: &Dirs) -> Result<bool, String> {
         Place::StartMenu => dirs.desktop.as_ref(),
         _ => dirs.start_menu.as_ref(),
     };
-    if !other.is_some_and(|d| d.join(FILE).exists()) {
-        for ico in our_icos(dirs) {
+    if !other.is_some_and(|d| d.join(file_name(ctx)).exists()) {
+        for ico in my_icos(dirs, ctx) {
             let _ = std::fs::remove_file(ico);
         }
     }
+    let _ = run(&gone_script(std::slice::from_ref(&path), None));
     Ok(true)
+}
+
+/// The primary handover: `old` (the installation that was primary) keeps its
+/// launchers under its own name. Each place's legacy-named `GitPoulpi.lnk` that
+/// is `old`'s (tagged with its id, or untagged with the legacy marker) is
+/// renamed to `<old name>.lnk`, contents untouched; `old`'s next sync rewrites
+/// it. The caller then writes the new primary's own `GitPoulpi.lnk`. Returns
+/// the new paths.
+pub(super) fn hand_over(dirs: &Dirs, old: &InstallCtx) -> Result<Vec<PathBuf>, String> {
+    hand_over_with(dirs, old, &run_powershell)
+}
+
+pub(super) fn hand_over_with(
+    dirs: &Dirs,
+    old: &InstallCtx,
+    run: Run,
+) -> Result<Vec<PathBuf>, String> {
+    let named = named_file(old);
+    if named == FILE {
+        return Err("the old primary has no name of its own".into());
+    }
+    let mut moved = Vec::new();
+    for dir in [dirs.start_menu.as_deref(), dirs.desktop.as_deref()]
+        .into_iter()
+        .flatten()
+    {
+        let (from, to) = (dir.join(FILE), dir.join(&named));
+        let Ok(bytes) = std::fs::read(&from) else {
+            continue;
+        };
+        let tag = read_tag(&bytes);
+        let is_old = match tag.as_deref() {
+            Some(t) => t == old.id,
+            None => contains_text(&bytes, MARKER),
+        };
+        if !is_old || to.exists() {
+            continue;
+        }
+        std::fs::rename(&from, &to).map_err(|e| format!("{}: {e}", from.display()))?;
+        let _ = run(&gone_script(std::slice::from_ref(&from), Some(&to)));
+        moved.push(to);
+    }
+    Ok(moved)
 }
 
 #[cfg(test)]
@@ -803,6 +1143,8 @@ mod tests {
             "\"x y\"",
             Path::new(r"C:\gp"),
             Path::new(r"C:\gp\gitpoulpi.ico"),
+            &description(InstallCtx::legacy_ref()),
+            terminals::AUMID,
         );
         assert!(s.contains(r"CreateShortcut('C:\Users\O''Neil\Desktop\GitPoulpi.lnk')"));
         assert!(s.contains("$s.TargetPath = 'wt.exe'"));
@@ -904,7 +1246,7 @@ mod tests {
             utf16(&ico_path(&dirs, &mid).to_string_lossy()),
         )
         .unwrap();
-        cleanup_icons(&dirs, &ico_path(&dirs, &new));
+        cleanup_icons(&dirs, &ico_path(&dirs, &new), InstallCtx::legacy_ref());
         let left = ico_files(&dirs);
         assert!(left.contains(&ico_name(&new)), "{left:?}");
         assert!(left.contains(&ico_name(&mid)), "a pin still points at it");
@@ -914,7 +1256,7 @@ mod tests {
         assert!(left.contains(&"gitpoulpi-extra.ico".to_string()));
         // The pin is repointed later: now nothing names the middle one.
         std::fs::remove_file(pins.join("pin.lnk")).unwrap();
-        cleanup_icons(&dirs, &ico_path(&dirs, &new));
+        cleanup_icons(&dirs, &ico_path(&dirs, &new), InstallCtx::legacy_ref());
         assert!(!ico_files(&dirs).contains(&ico_name(&mid)));
     }
 
@@ -975,14 +1317,18 @@ mod tests {
             utf16(&format!("GitPoulpi {MARKER}")),
         )
         .unwrap();
-        assert!(remove(Place::StartMenu, &dirs).unwrap());
+        assert!(remove(Place::StartMenu, &dirs, InstallCtx::legacy_ref()).unwrap());
         assert_eq!(ico_files(&dirs), ["notes.ico"]);
     }
 
     #[test]
     fn repointing_tells_the_shell_about_each_shortcut_and_keeps_the_app_id() {
         let lnk = PathBuf::from(r"C:\u\Pins\GitPoulpi.lnk");
-        let s = pinned_script(&[lnk], Path::new(r"C:\gp\gitpoulpi-0123456789ab.ico"));
+        let s = pinned_script(
+            &[lnk],
+            Path::new(r"C:\gp\gitpoulpi-0123456789ab.ico"),
+            terminals::AUMID,
+        );
         assert!(s.contains(r"$p.IconLocation = 'C:\gp\gitpoulpi-0123456789ab.ico,0'"));
         assert!(s.contains(
             r"SHChangeNotifyPath(0x2000, 0x3005, 'C:\u\Pins\GitPoulpi.lnk', [IntPtr]::Zero)"
@@ -993,7 +1339,8 @@ mod tests {
         assert!(
             s.find("Add-Type -Namespace Gp").unwrap() < s.find("SHChangeNotifyPath(0x").unwrap()
         );
-        assert!(!pinned_script(&[], Path::new("x.ico")).contains("SHChangeNotifyPath(0x"));
+        assert!(!pinned_script(&[], Path::new("x.ico"), terminals::AUMID)
+            .contains("SHChangeNotifyPath(0x"));
     }
 
     #[test]
@@ -1040,7 +1387,7 @@ mod tests {
     fn one_unsaveable_pin_does_not_stop_the_others_or_the_notification() {
         let a = PathBuf::from("C:/u/Pins/A.lnk");
         let b = PathBuf::from("C:/u/Pins/B.lnk");
-        let s = pinned_script(&[a, b], Path::new("x.ico"));
+        let s = pinned_script(&[a, b], Path::new("x.ico"), terminals::AUMID);
         assert_eq!(s.matches("try { $p = $sh.CreateShortcut(").count(), 2);
         assert!(s.contains(r"SHChangeNotifyPath(0x1000, 0x3005, 'C:/u/Pins', [IntPtr]::Zero)"));
         assert!(s.contains("SHChangeNotify(0x08000000"));
@@ -1156,12 +1503,15 @@ otepad.exe",
         std::fs::write(pins.join("new.lnk"), utf16(&format!("{MARKER} {ico},0"))).unwrap();
         let todo = pinned_to_repoint(&dirs, &r);
         assert_eq!(todo, [pins.join("old.lnk")]);
-        let s = pinned_script(&todo, &ico_path(&dirs, &icons));
+        let s = pinned_script(&todo, &ico_path(&dirs, &icons), terminals::AUMID);
         assert!(s.contains("old.lnk"));
         assert!(!s.contains("new.lnk"));
         assert!(s.contains(&format!("$p.IconLocation = '{ico},0'")));
         assert!(s.contains("SHChangeNotify(0x08000000"));
-        assert!(!pinned_script(&[], &ico_path(&dirs, &icons)).contains("CreateShortcut"));
+        assert!(
+            !pinned_script(&[], &ico_path(&dirs, &icons), terminals::AUMID)
+                .contains("CreateShortcut")
+        );
     }
 
     #[test]
@@ -1287,7 +1637,7 @@ otepad.exe",
             ]
         );
         let (program, args) = target(&r).unwrap();
-        let s = pinned_args_script(&todo, &program, &args);
+        let s = pinned_args_script(&todo, &program, &args, terminals::AUMID);
         assert!(s.contains("a-ours-old.lnk"));
         assert!(s.contains("$p.TargetPath = 'wt.exe'"));
         assert!(s.contains(r#"$p.Arguments = 'C:\gp\gitpoulpi.exe --launcher'"#));
@@ -1387,10 +1737,13 @@ otepad.exe",
 
     #[test]
     fn the_script_gives_every_shortcut_the_app_user_model_id_and_never_fails_the_install() {
-        let s = aumid_script(&[
-            PathBuf::from(r"C:\u\Start\GitPoulpi.lnk"),
-            PathBuf::from(r"C:\u\Pins\O'Neil.lnk"),
-        ]);
+        let s = aumid_script(
+            &[
+                PathBuf::from(r"C:\u\Start\GitPoulpi.lnk"),
+                PathBuf::from(r"C:\u\Pins\O'Neil.lnk"),
+            ],
+            terminals::AUMID,
+        );
         assert!(
             s.contains("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3"),
             "PKEY_AppUserModel_ID"
@@ -1400,7 +1753,7 @@ otepad.exe",
         assert!(s.contains(r"O''Neil.lnk"));
         // Every call, and the type itself, are inside try/catch.
         assert_eq!(s.matches("catch").count(), 3);
-        assert!(aumid_script(&[]).is_empty());
+        assert!(aumid_script(&[], terminals::AUMID).is_empty());
         // The install script carries it.
         let full = script(
             Path::new(r"C:\u\GitPoulpi.lnk"),
@@ -1408,6 +1761,8 @@ otepad.exe",
             "",
             Path::new(r"C:\gp"),
             Path::new(r"C:\gp\i.ico"),
+            &description(InstallCtx::legacy_ref()),
+            terminals::AUMID,
         );
         assert!(full.contains("[GpAumid]::Set("));
     }
@@ -1450,7 +1805,7 @@ otepad.exe",
         );
         std::fs::write(&path, b"foreign").unwrap();
         assert_eq!(status(Place::StartMenu, &dirs, &r).state, State::Foreign);
-        assert!(remove(Place::StartMenu, &dirs).is_err());
+        assert!(remove(Place::StartMenu, &dirs, InstallCtx::legacy_ref()).is_err());
 
         let ours: Vec<u8> = format!(
             "{} --launcher {} GitPoulpi {MARKER}",
@@ -1467,7 +1822,7 @@ otepad.exe",
             status(Place::StartMenu, &dirs, &req(&moved, "console", &icons)).state,
             State::Outdated
         );
-        assert!(remove(Place::StartMenu, &dirs).unwrap());
+        assert!(remove(Place::StartMenu, &dirs, InstallCtx::legacy_ref()).unwrap());
         assert!(!path.exists());
     }
 
@@ -1515,5 +1870,457 @@ otepad.exe",
             status(Place::StartMenu, &dirs, &elsewhere).state,
             State::Outdated
         );
+    }
+
+    // ---- several installations on one machine -------------------------------
+
+    use std::cell::RefCell;
+
+    const ID_A: &str = "9c1e0b7a55d2e3f4";
+    const ID_B: &str = "1111222233334444";
+
+    fn ctx_of(id: &str, name: &str, primary: Option<&str>) -> InstallCtx {
+        let exists = |i: &str| crate::desktop::KnownInstall {
+            id: i.to_string(),
+            exists: true,
+        };
+        InstallCtx {
+            id: id.to_string(),
+            short: format!("i{}", &id[..8]),
+            name: name.to_string(),
+            primary: primary.map(str::to_string),
+            known: vec![exists(ID_A), exists(ID_B)],
+        }
+    }
+
+    fn req_with<'a>(exe: &'a Path, icons: &'a IconSet, ctx: &'a InstallCtx) -> Request<'a> {
+        Request {
+            ctx,
+            ..req(exe, "console", icons)
+        }
+    }
+
+    /// A PowerShell that records its scripts and, for a shortcut script, writes
+    /// the `.lnk` as the script's own text (UTF-16), so what the real spawn
+    /// would store (description, target, icon, AppUserModelID) can be read back.
+    fn fake(log: &RefCell<Vec<String>>) -> impl Fn(&str) -> Result<(), String> + '_ {
+        move |script: &str| {
+            log.borrow_mut().push(script.to_string());
+            if script.contains("$s.Save()") {
+                let from = script.find("CreateShortcut('").unwrap() + "CreateShortcut('".len();
+                let len = script[from..].find("')").unwrap();
+                let lnk = PathBuf::from(script[from..from + len].replace("''", "'"));
+                std::fs::create_dir_all(lnk.parent().unwrap()).unwrap();
+                std::fs::write(lnk, utf16(script)).unwrap();
+            }
+            Ok(())
+        }
+    }
+
+    struct Machine {
+        _tmp: tempfile::TempDir,
+        dirs: Dirs,
+        exe: PathBuf,
+    }
+
+    fn machine() -> Machine {
+        let tmp = tempfile::tempdir().unwrap();
+        let dirs = Dirs {
+            start_menu: Some(tmp.path().join("Programs")),
+            desktop: Some(tmp.path().join("Desktop")),
+            taskbar_pinned: Some(tmp.path().join("TaskBar")),
+            assets: tmp.path().join("assets"),
+            ..Dirs::default()
+        };
+        for d in [
+            dirs.start_menu.as_ref().unwrap(),
+            dirs.desktop.as_ref().unwrap(),
+            dirs.taskbar_pinned.as_ref().unwrap(),
+        ] {
+            std::fs::create_dir_all(d).unwrap();
+        }
+        let exe = tmp.path().join("apps").join("gitpoulpi.exe");
+        Machine {
+            _tmp: tmp,
+            dirs,
+            exe,
+        }
+    }
+
+    fn start(m: &Machine) -> &Path {
+        m.dirs.start_menu.as_deref().unwrap()
+    }
+
+    #[test]
+    fn a_non_primary_shortcut_is_named_after_its_installation_and_tagged() {
+        let m = machine();
+        let icons = icon_set(1);
+        let ctx = ctx_of(ID_A, "GitPoulpi (dev)", None);
+        let log = RefCell::new(Vec::new());
+        let r = req_with(&m.exe, &icons, &ctx);
+        let path = install_with(Place::StartMenu, &m.dirs, &r, &fake(&log)).unwrap();
+        assert_eq!(path, start(&m).join("GitPoulpi (dev).lnk"));
+        let bytes = std::fs::read(&path).unwrap();
+        assert_eq!(read_tag(&bytes).as_deref(), Some(ID_A));
+        assert!(contains_text(
+            &bytes,
+            &format!("$s.Description = 'GitPoulpi {OWNER_TAG}={ID_A}'")
+        ));
+        // Its own AppUserModelID, its own icon name.
+        assert!(contains_text(&bytes, &format!("GitPoulpi.I{ID_A}")));
+        assert!(contains_text(&bytes, "gitpoulpi-i9c1e0b7a-"));
+        assert_eq!(
+            status(Place::StartMenu, &m.dirs, &r).state,
+            State::Installed
+        );
+        // The primary keeps the legacy name, marker and AppUserModelID.
+        let primary = ctx_of(ID_B, "GitPoulpi", Some(ID_B));
+        let rp = req_with(&m.exe, &icons, &primary);
+        let p = install_with(Place::StartMenu, &m.dirs, &rp, &fake(&log)).unwrap();
+        assert_eq!(p, start(&m).join(FILE));
+        let pb = std::fs::read(&p).unwrap();
+        assert!(contains_text(&pb, MARKER) && contains_text(&pb, terminals::AUMID));
+        assert_eq!(read_tag(&pb).as_deref(), Some(ID_B));
+    }
+
+    #[test]
+    fn non_primary_bytes_never_contain_the_legacy_marker() {
+        let m = machine();
+        let icons = icon_set(1);
+        let ctx = ctx_of(ID_A, "GitPoulpi (dev)", Some(ID_B));
+        let log = RefCell::new(Vec::new());
+        let r = req_with(&m.exe, &icons, &ctx);
+        for place in [Place::StartMenu, Place::Desktop] {
+            let path = install_with(place, &m.dirs, &r, &fake(&log)).unwrap();
+            assert!(
+                !contains_text(&std::fs::read(path).unwrap(), MARKER),
+                "{place:?}"
+            );
+        }
+        assert!(!description(&ctx).contains(MARKER));
+        for s in log.borrow().iter() {
+            assert!(!s.contains(MARKER), "{s}");
+        }
+        // Old builds look for exactly the marker: nothing of ours matches.
+        assert!(description(&ctx_of(ID_B, "GitPoulpi", Some(ID_B))).contains(MARKER));
+    }
+
+    #[test]
+    fn sync_never_rewrites_another_installations_shortcut() {
+        let m = machine();
+        let icons = icon_set(1);
+        let ctx = ctx_of(ID_A, "GitPoulpi (dev)", None);
+        let r = req_with(&m.exe, &icons, &ctx);
+        let theirs = start(&m).join("GitPoulpi (B).lnk");
+        let before = utf16(&format!("other.exe GitPoulpi {OWNER_TAG}={ID_B} old.ico"));
+        std::fs::write(&theirs, &before).unwrap();
+        // The same name, but tagged with another installation: not mine.
+        let clash = start(&m).join("GitPoulpi (dev).lnk");
+        std::fs::write(&clash, &before).unwrap();
+        assert_eq!(status(Place::StartMenu, &m.dirs, &r).state, State::Foreign);
+        let log = RefCell::new(Vec::new());
+        assert!(install_with(Place::StartMenu, &m.dirs, &r, &fake(&log)).is_err());
+        assert!(remove_with(Place::StartMenu, &m.dirs, &ctx, &fake(&log)).is_err());
+        assert_eq!(std::fs::read(&clash).unwrap(), before);
+        // Free the name: only my own file is written, theirs is never touched.
+        std::fs::remove_file(&clash).unwrap();
+        install_with(Place::StartMenu, &m.dirs, &r, &fake(&log)).unwrap();
+        assert_eq!(std::fs::read(&theirs).unwrap(), before);
+        for s in log.borrow().iter() {
+            assert!(!s.contains("GitPoulpi (B).lnk"), "{s}");
+        }
+        assert!(shortcuts_to_repoint(&m.dirs, &r).is_empty());
+    }
+
+    #[test]
+    fn legacy_shortcut_is_untouched_without_a_primary() {
+        let m = machine();
+        let icons = icon_set(1);
+        let ctx = ctx_of(ID_A, "GitPoulpi (dev)", None);
+        let mut r = req_with(&m.exe, &icons, &ctx);
+        r.refresh_icon_cache = true;
+        let legacy = start(&m).join(FILE);
+        let before = utf16(&format!("{} GitPoulpi {MARKER} old.ico", m.exe.display()));
+        std::fs::write(&legacy, &before).unwrap();
+        let pin = m
+            .dirs
+            .taskbar_pinned
+            .as_ref()
+            .unwrap()
+            .join("GitPoulpi.lnk");
+        std::fs::write(&pin, &before).unwrap();
+        let log = RefCell::new(Vec::new());
+        install_with(Place::StartMenu, &m.dirs, &r, &fake(&log)).unwrap();
+        install_with(Place::Desktop, &m.dirs, &r, &fake(&log)).unwrap();
+        refresh_icon(&m.dirs, &r).ok();
+        assert_eq!(std::fs::read(&legacy).unwrap(), before);
+        assert_eq!(std::fs::read(&pin).unwrap(), before);
+        assert!(pinned_ours(&m.dirs, &r).is_empty());
+        assert!(shortcuts_to_repoint(&m.dirs, &r).is_empty());
+        assert!(!sync_pinned_args_with(&m.dirs, &r, &fake(&log)));
+        for s in log.borrow().iter() {
+            assert!(!s.contains("GitPoulpi.lnk"), "{s}");
+        }
+        // Removing mine leaves it alone too.
+        assert!(remove_with(Place::StartMenu, &m.dirs, &ctx, &fake(&log)).unwrap());
+        assert_eq!(std::fs::read(&legacy).unwrap(), before);
+    }
+
+    #[test]
+    fn pins_of_another_installation_are_not_repointed() {
+        let m = machine();
+        let icons = icon_set(1);
+        let ctx = ctx_of(ID_A, "GitPoulpi (dev)", Some(ID_B));
+        let mut r = req_with(&m.exe, &icons, &ctx);
+        r.refresh_icon_cache = true;
+        let pins = m.dirs.taskbar_pinned.clone().unwrap();
+        let exe = m.exe.display();
+        // Mine (tagged), B's (tagged), a legacy one (B is the primary), a pin
+        // the user made by hand naming my exe, and an unrelated one.
+        std::fs::write(
+            pins.join("a-mine.lnk"),
+            utf16(&format!("{exe} GitPoulpi {OWNER_TAG}={ID_A} old.ico")),
+        )
+        .unwrap();
+        let theirs = utf16(&format!("b.exe GitPoulpi {OWNER_TAG}={ID_B} old.ico"));
+        std::fs::write(pins.join("b-theirs.lnk"), &theirs).unwrap();
+        let legacy = utf16(&format!("{exe} GitPoulpi {MARKER} old.ico"));
+        std::fs::write(pins.join("c-legacy.lnk"), &legacy).unwrap();
+        std::fs::write(
+            pins.join("d-user.lnk"),
+            utf16(&format!("wt.exe -p X {exe}")),
+        )
+        .unwrap();
+        std::fs::write(pins.join("e-other.lnk"), utf16("notepad.exe")).unwrap();
+        let names = |v: Vec<PathBuf>| -> Vec<String> {
+            v.iter()
+                .map(|p| p.file_name().unwrap().to_string_lossy().to_string())
+                .collect()
+        };
+        assert_eq!(
+            names(pinned_ours(&m.dirs, &r)),
+            ["a-mine.lnk", "d-user.lnk"]
+        );
+        let log = RefCell::new(Vec::new());
+        repoint_shortcuts(&m.dirs, &r, &fake(&log));
+        assert!(sync_pinned_args_with(&m.dirs, &r, &fake(&log)));
+        let all = log.borrow().join("\n");
+        assert!(
+            all.contains("a-mine.lnk") && all.contains("d-user.lnk"),
+            "{all}"
+        );
+        for other in ["b-theirs.lnk", "c-legacy.lnk", "e-other.lnk"] {
+            assert!(!all.contains(other), "{other} was touched: {all}");
+        }
+        assert_eq!(std::fs::read(pins.join("b-theirs.lnk")).unwrap(), theirs);
+        assert_eq!(std::fs::read(pins.join("c-legacy.lnk")).unwrap(), legacy);
+        // The primary has its own pin and adopts the untagged legacy one.
+        let primary = ctx_of(ID_B, "GitPoulpi", Some(ID_B));
+        let rb = req_with(&m.exe, &icons, &primary);
+        assert_eq!(
+            names(pinned_ours(&m.dirs, &rb)),
+            ["b-theirs.lnk", "c-legacy.lnk", "d-user.lnk"]
+        );
+    }
+
+    #[test]
+    fn icon_cleanup_keeps_another_installations_icons() {
+        let m = machine();
+        let (old, new) = (icon_set(1), icon_set(2));
+        let a = ctx_of(ID_A, "GitPoulpi (dev)", None);
+        let b = ctx_of(ID_B, "GitPoulpi (cargo)", None);
+        let primary = ctx_of(ID_B, "GitPoulpi", Some(ID_B));
+        // Names: `i<8hex>-<12hex>` for the others, the old shape for the primary.
+        let name_a = ico_name_for(&new, &a);
+        assert!(
+            is_my_ico(&name_a, &a) && !is_my_ico(&name_a, &b),
+            "{name_a}"
+        );
+        assert!(name_a.starts_with("gitpoulpi-i9c1e0b7a-"), "{name_a}");
+        let name_p = ico_name_for(&new, &primary);
+        assert!(is_our_ico(&name_p) && !is_our_ico(&name_a), "{name_p}");
+        assert!(!is_my_ico(&name_p, &a));
+        std::fs::create_dir_all(&m.dirs.assets).unwrap();
+        let mut files = vec!["gitpoulpi.ico".to_string(), "notes.ico".to_string()];
+        for set in [&old, &new] {
+            for c in [&a, &b, &primary] {
+                files.push(ico_name_for(set, c));
+            }
+        }
+        for f in &files {
+            std::fs::write(m.dirs.assets.join(f), b"x").unwrap();
+        }
+        cleanup_icons(&m.dirs, &ico_path_for(&m.dirs, &new, &a), &a);
+        let left = ico_files(&m.dirs);
+        // Mine: the old one is gone, the current one stays.
+        assert!(!left.contains(&ico_name_for(&old, &a)), "{left:?}");
+        assert!(left.contains(&ico_name_for(&new, &a)), "{left:?}");
+        // Everybody else's, the primary's and the legacy one included, stay.
+        assert!(left.contains(&ico_name_for(&old, &b)), "{left:?}");
+        assert!(left.contains(&ico_name_for(&new, &b)), "{left:?}");
+        assert!(left.contains(&ico_name_for(&old, &primary)), "{left:?}");
+        for keep in ["gitpoulpi.ico", "notes.ico"] {
+            assert!(left.contains(&keep.to_string()), "{left:?}");
+        }
+        // The primary cleans only its own shape.
+        cleanup_icons(&m.dirs, &ico_path_for(&m.dirs, &new, &primary), &primary);
+        let left = ico_files(&m.dirs);
+        assert!(!left.contains(&ico_name_for(&old, &primary)), "{left:?}");
+        assert!(!left.contains(&"gitpoulpi.ico".to_string()), "{left:?}");
+        assert!(left.contains(&ico_name_for(&old, &b)), "{left:?}");
+    }
+
+    #[test]
+    fn a_version_change_renames_only_my_shortcut() {
+        let m = machine();
+        let icons = icon_set(1);
+        let before = ctx_of(ID_A, "GitPoulpi (Scoop)", None);
+        let after = ctx_of(ID_A, "GitPoulpi 1.2 (Scoop)", None);
+        let log = RefCell::new(Vec::new());
+        let old = install_with(
+            Place::StartMenu,
+            &m.dirs,
+            &req_with(&m.exe, &icons, &before),
+            &fake(&log),
+        )
+        .unwrap();
+        let theirs = start(&m).join("GitPoulpi (B).lnk");
+        let theirs_bytes = utf16(&format!("b.exe GitPoulpi {OWNER_TAG}={ID_B}"));
+        std::fs::write(&theirs, &theirs_bytes).unwrap();
+        let legacy = start(&m).join(FILE);
+        std::fs::write(&legacy, utf16(&format!("GitPoulpi {MARKER}"))).unwrap();
+        log.borrow_mut().clear();
+        let new = install_with(
+            Place::StartMenu,
+            &m.dirs,
+            &req_with(&m.exe, &icons, &after),
+            &fake(&log),
+        )
+        .unwrap();
+        assert_eq!(new, start(&m).join("GitPoulpi 1.2 (Scoop).lnk"));
+        assert!(new.exists() && !old.exists(), "renamed, not duplicated");
+        assert_eq!(std::fs::read(&theirs).unwrap(), theirs_bytes);
+        assert!(legacy.exists());
+        // The shell hears about the deletion and the creation.
+        let all = log.borrow().join("\n");
+        assert!(
+            all.contains(&format!(
+                "SHChangeNotifyPath(0x4, 0x3005, '{}'",
+                old.display()
+            )),
+            "{all}"
+        );
+        assert!(
+            all.contains(&format!(
+                "SHChangeNotifyPath(0x2, 0x3005, '{}'",
+                new.display()
+            )),
+            "{all}"
+        );
+        assert!(!all.contains("GitPoulpi (B).lnk"), "{all}");
+    }
+
+    #[test]
+    fn handover_renames_the_old_primarys_lnk_without_rewriting_it() {
+        let m = machine();
+        let old = ctx_of(ID_A, "GitPoulpi (dev)", Some(ID_A));
+        let tagged = utf16(&format!(
+            "a.exe GitPoulpi {MARKER} {OWNER_TAG}={ID_A} i.ico"
+        ));
+        let untagged = utf16(&format!("a.exe GitPoulpi {MARKER} i.ico"));
+        let desktop = m.dirs.desktop.clone().unwrap();
+        std::fs::write(start(&m).join(FILE), &tagged).unwrap();
+        std::fs::write(desktop.join(FILE), &untagged).unwrap();
+        let log = RefCell::new(Vec::new());
+        let moved = hand_over_with(&m.dirs, &old, &fake(&log)).unwrap();
+        assert_eq!(
+            moved,
+            [
+                start(&m).join("GitPoulpi (dev).lnk"),
+                desktop.join("GitPoulpi (dev).lnk")
+            ]
+        );
+        assert!(!start(&m).join(FILE).exists() && !desktop.join(FILE).exists());
+        assert_eq!(
+            std::fs::read(&moved[0]).unwrap(),
+            tagged,
+            "contents untouched"
+        );
+        assert_eq!(std::fs::read(&moved[1]).unwrap(), untagged);
+        // Nothing was written: the shell was only told.
+        for s in log.borrow().iter() {
+            assert!(
+                !s.contains("CreateShortcut") && !s.contains("Save()"),
+                "{s}"
+            );
+            assert!(s.contains("SHChangeNotifyPath(0x4,"), "{s}");
+        }
+        // After the handover B is primary; A still owns its renamed files
+        // (tagged, or untagged at its own name) and is free to fix them.
+        let a_now = ctx_of(ID_A, "GitPoulpi (dev)", Some(ID_B));
+        let icons = icon_set(1);
+        for place in [Place::StartMenu, Place::Desktop] {
+            let st = status(place, &m.dirs, &req_with(&m.exe, &icons, &a_now));
+            assert_ne!(st.state, State::Foreign, "{place:?}");
+        }
+        // A file of someone else, or a name already taken, is not renamed.
+        for p in &moved {
+            std::fs::remove_file(p).unwrap();
+        }
+        std::fs::write(
+            start(&m).join(FILE),
+            utf16(&format!("GitPoulpi {MARKER} {OWNER_TAG}={ID_B}")),
+        )
+        .unwrap();
+        assert!(hand_over_with(&m.dirs, &old, &fake(&log))
+            .unwrap()
+            .is_empty());
+        assert!(start(&m).join(FILE).exists());
+        std::fs::write(desktop.join(FILE), &untagged).unwrap();
+        std::fs::write(&moved[1], b"taken").unwrap();
+        assert!(hand_over_with(&m.dirs, &old, &fake(&log))
+            .unwrap()
+            .is_empty());
+        assert!(desktop.join(FILE).exists(), "never overwrites a file");
+    }
+
+    #[test]
+    fn remove_deletes_only_my_shortcut_and_icons() {
+        let m = machine();
+        let icons = icon_set(1);
+        let a = ctx_of(ID_A, "GitPoulpi (dev)", None);
+        let b = ctx_of(ID_B, "GitPoulpi (cargo)", None);
+        let log = RefCell::new(Vec::new());
+        for c in [&a, &b] {
+            for place in [Place::StartMenu, Place::Desktop] {
+                install_with(place, &m.dirs, &req_with(&m.exe, &icons, c), &fake(&log)).unwrap();
+            }
+        }
+        let desktop = m.dirs.desktop.clone().unwrap();
+        let legacy = start(&m).join(FILE);
+        std::fs::write(&legacy, utf16(&format!("GitPoulpi {MARKER}"))).unwrap();
+        std::fs::write(m.dirs.assets.join("notes.ico"), b"mine").unwrap();
+        let (ico_a, ico_b) = (ico_name_for(&icons, &a), ico_name_for(&icons, &b));
+        assert!(m.dirs.assets.join(&ico_a).exists() && m.dirs.assets.join(&ico_b).exists());
+        log.borrow_mut().clear();
+        // One place: my icon stays while the other place still has my shortcut.
+        assert!(remove_with(Place::StartMenu, &m.dirs, &a, &fake(&log)).unwrap());
+        assert!(!start(&m).join("GitPoulpi (dev).lnk").exists());
+        assert!(start(&m).join("GitPoulpi (cargo).lnk").exists());
+        assert!(m.dirs.assets.join(&ico_a).exists());
+        assert!(log
+            .borrow()
+            .iter()
+            .any(|s| s.contains("SHChangeNotifyPath(0x4,")));
+        // The last one: my icons go, nobody else's.
+        assert!(remove_with(Place::Desktop, &m.dirs, &a, &fake(&log)).unwrap());
+        assert!(!desktop.join("GitPoulpi (dev).lnk").exists());
+        assert!(!m.dirs.assets.join(&ico_a).exists());
+        assert!(m.dirs.assets.join(&ico_b).exists());
+        assert!(m.dirs.assets.join("notes.ico").exists());
+        assert!(desktop.join("GitPoulpi (cargo).lnk").exists());
+        assert!(legacy.exists(), "the legacy file is not mine");
+        // Nothing left to remove.
+        assert!(!remove_with(Place::Desktop, &m.dirs, &a, &fake(&log)).unwrap());
     }
 }

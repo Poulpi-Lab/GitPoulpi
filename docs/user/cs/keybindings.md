@@ -1244,7 +1244,7 @@ Klávesy jsou výchozí.
 | Spouštěč: Odebrat zástupce |  |
 | Spouštěč: Vytvořit alias příkazu |  |
 | Spouštěč: Odebrat alias příkazu |  |
-| MCP: Suggest a free port |  |
+| MCP: Navrhnout volný port |  |
 | Spouštěč: Přidat do PATH |  |
 | Spouštěč: Odebrat z PATH |  |
 | Spouštěč: Nainstalovat nabídku Otevřít v GitPoulpi |  |

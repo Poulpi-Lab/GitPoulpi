@@ -739,6 +739,128 @@ fn become_primary_in_file_is_one_write_that_moves_the_values() {
     assert!(become_primary_in_file(&path, &b).unwrap().is_none());
 }
 
+/// What `ui.*` looks like in `text`, for the three look keys.
+fn look(text: &str) -> (Option<String>, Option<String>, Option<String>) {
+    let v: toml::Value = toml::from_str(text).unwrap();
+    let get = |k: &str| {
+        v.get("ui")
+            .and_then(|u| u.get(k))
+            .and_then(|s| s.as_str())
+            .map(str::to_string)
+    };
+    (
+        get("logo_color"),
+        get("command_alias"),
+        get("command_alias_add"),
+    )
+}
+
+#[test]
+fn resigning_gives_ui_back_to_what_it_held_before_the_first_primary() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("config.toml");
+    // logo_color and one alias set (with a comment), the second alias absent.
+    let before = "# hi\n[ui]\nz = 1\nlogo_color = \"violet\" # mine\ncommand_alias = \"gp\"\n\n[general]\nundo_depth = 7\n";
+    std::fs::write(&path, before).unwrap();
+    let mut b = pinned("b");
+    b.kind = Kind::Dev;
+    set_installation_in_file(&path, |i| {
+        i.settings.insert(
+            b.id.clone(),
+            InstallationEntry {
+                logo_color: "sun".into(),
+                command_alias: "gpd".into(),
+                command_alias_add: "gpdd".into(),
+                ..new_entry(&b, String::new())
+            },
+        );
+    })
+    .unwrap();
+    let seeded = std::fs::read_to_string(&path).unwrap();
+    become_primary_in_file(&path, &b).unwrap().unwrap();
+    let during = std::fs::read_to_string(&path).unwrap();
+    assert_eq!(
+        look(&during),
+        (Some("sun".into()), Some("gpd".into()), Some("gpdd".into())),
+        "the primary's look is in ui.*: {during}"
+    );
+    resign_primary_in_file(&path, &b.id).unwrap().unwrap();
+    let after = std::fs::read_to_string(&path).unwrap();
+    assert_eq!(
+        look(&after),
+        (Some("violet".into()), Some("gp".into()), None),
+        "ui.* is what it was, the absent key absent again: {after}"
+    );
+    let config = Config::load(&path).unwrap();
+    assert!(config.installation.primary.is_none());
+    assert!(config.installation.ui_before.is_none(), "{after}");
+    // B keeps its own look in its entry.
+    let e = &config.installation.settings[&b.id];
+    assert_eq!(
+        (e.logo_color.as_str(), e.command_alias.as_str()),
+        ("sun", "gpd")
+    );
+    // The untouched keys kept their bytes.
+    assert!(
+        after.starts_with("# hi\n[ui]\nz = 1\nlogo_color = \"violet\""),
+        "{after}"
+    );
+    assert!(after.contains("[general]\nundo_depth = 7\n"), "{after}");
+    let _ = seeded;
+}
+
+#[test]
+fn resigning_with_nothing_changed_gives_the_ui_bytes_back_exactly() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("config.toml");
+    let before = "[ui]\nlogo_color = \"violet\" # mine\ncommand_alias = \"gp\"\n\n[general]\nundo_depth = 7\n";
+    std::fs::write(&path, before).unwrap();
+    let a = pinned("a");
+    become_primary_in_file(&path, &a).unwrap().unwrap();
+    resign_primary_in_file(&path, &a.id).unwrap().unwrap();
+    let after = std::fs::read_to_string(&path).unwrap();
+    let ui_part = |t: &str| t.split_once("[general]").unwrap().0.to_string();
+    assert_eq!(ui_part(&after), ui_part(before), "{after}");
+}
+
+#[test]
+fn a_handover_between_primaries_keeps_the_first_look_and_the_old_primarys_entry() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("config.toml");
+    std::fs::write(&path, "[ui]\nlogo_color = \"violet\"\n").unwrap();
+    let (a, b) = (pinned("a"), pinned("b"));
+    set_installation_in_file(&path, |i| {
+        i.settings.insert(
+            b.id.clone(),
+            InstallationEntry {
+                logo_color: "sun".into(),
+                ..new_entry(&b, String::new())
+            },
+        );
+    })
+    .unwrap();
+    become_primary_in_file(&path, &a).unwrap().unwrap();
+    become_primary_in_file(&path, &b).unwrap().unwrap();
+    let config = Config::load(&path).unwrap();
+    // A wore the inherited violet: it keeps it in its own entry now.
+    assert_eq!(config.installation.settings[&a.id].logo_color, "violet");
+    assert_eq!(config.ui.logo_color, "sun");
+    assert_eq!(
+        config
+            .installation
+            .ui_before
+            .as_ref()
+            .and_then(|u| u.logo_color.as_deref()),
+        Some("violet"),
+        "the look from before any primary is still remembered"
+    );
+    resign_primary_in_file(&path, &b.id).unwrap().unwrap();
+    let after = Config::load(&path).unwrap();
+    assert_eq!(after.ui.logo_color, "violet");
+    assert_eq!(after.installation.settings[&b.id].logo_color, "sun");
+    assert_eq!(after.installation.settings[&a.id].logo_color, "violet");
+}
+
 #[test]
 fn a_seed_write_keeps_every_byte_outside_the_installation_table() {
     let dir = tempfile::tempdir().unwrap();

@@ -81,12 +81,31 @@ pub struct InstallationConfig {
     pub primary: Option<String>,
     /// Entries by installation id.
     pub settings: BTreeMap<String, InstallationEntry>,
+    /// The `ui.*` look the file had before the first primary took those keys
+    /// over (a key left out was not in the file). Written when an installation
+    /// becomes primary behind no other primary, restored and removed when the
+    /// last primary resigns, so older builds see their own values again.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ui_before: Option<UiBefore>,
+}
+
+/// The `ui.*` keys a primary owns, as the file held them (see
+/// [`InstallationConfig::ui_before`]). `None`: the key was not in the file.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct UiBefore {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub logo_color: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub command_alias: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub command_alias_add: Option<String>,
 }
 
 impl InstallationConfig {
     /// Nothing recorded; the table is then left out of the file entirely.
     pub fn is_empty(&self) -> bool {
-        self.primary.is_none() && self.settings.is_empty()
+        self.primary.is_none() && self.settings.is_empty() && self.ui_before.is_none()
     }
 }
 

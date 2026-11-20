@@ -189,6 +189,22 @@ conserva y `Esc` restaura el anterior.
 La página **Lanzador** (`gitpoulpi ui show settings launcher`) crea un acceso directo que inicia
 GitPoulpi desde el lanzador del sistema, en el terminal que elijas.
 
+**Esta instalación** (primer grupo de la página). Cada GitPoulpi de un equipo (una copia de desarrollo, un paquete, una copia portable) tiene su propio nombre de lanzador, color, alias y entrada del menú de carpetas, guardados en su propia tabla `[installation.settings.<id>]` de `config.toml`; cambiar uno aquí nunca toca otra instalación. Nada de esto se registra en el diario de deshacer (es integración con el sistema; **Quitar** es la forma de volver atrás).
+
+| Fila | Qué hace |
+|---|---|
+| **Instalación** | Solo lectura: el tipo, la carpeta y el entorno de esta instalación. En una página estrecha la carpeta se recorta por el medio con puntos suspensivos; la línea de ayuda bajo la fila tiene el texto completo. |
+| **Nombre del lanzador** | El nombre de los accesos directos de esta instalación y de su entrada del menú de carpetas. Se rechaza si otra instalación que aún existe tiene ese nombre. La principal siempre se llama `GitPoulpi`. |
+| **Incluir la versión en el nombre del lanzador** | Añade `<mayor>.<menor>` al nombre (`GitPoulpi 1.2`); desactivado por defecto, porque los accesos directos cambian de nombre en cada actualización. |
+| **Color del pulpo** | El color del pulpo de esta instalación y de sus accesos directos (las mismas opciones que la ventana Acerca de). |
+| **Convertir en la principal** | La principal se queda con el nombre `GitPoulpi` a secas, los accesos directos heredados y las claves `ui.*` que leen las compilaciones anteriores; por defecto nadie es la principal. Pregunta antes cuando otra instalación lo es. La principal anterior conserva sus lanzadores con su propio nombre (Windows y Linux). |
+| **Entorno** | Las instalaciones de un mismo entorno comparten ventanas, daemons e historial de deshacer; por defecto es el propio de la instalación. Cambiarlo exige reiniciar las ventanas abiertas de esta instalación. |
+| **Submenú del menú de carpetas** | Agrupa la entrada del menú de carpetas en un submenú con ese nombre; las instalaciones que dan el mismo nombre comparten uno. No disponible en macOS; Nemo y Thunar siempre muestran la entrada en la raíz. |
+| **Otra: \<nombre\>** | Las demás instalaciones de este equipo. Una cuya carpeta ha desaparecido tiene un botón **Olvidar** (pregunta antes) que elimina su entrada y los lanzadores, alias y entradas del menú de carpetas que dejó. |
+| **Lanzadores heredados** | Mientras nadie sea la principal, los lanzadores que creó una compilación anterior con el nombre a secas se listan con **Convertir en la principal** y **Quitar lanzadores heredados** (pregunta antes). Una nota única en la línea de estado remite aquí. |
+
+La paleta tiene **Lanzador: Convertir en la instalación principal**, **Lanzador: Quitar lanzadores heredados** y **Lanzador: Olvidar instalaciones desaparecidas**, y cada fila es una entrada `Settings:`. Las filas del alias del comando de más abajo son las propias de esta instalación (para una copia de desarrollo se sugieren `gpd` / `gpda`); un alias que creó otra instalación dice **Lo usa \<nombre\>** y no se puede crear aquí.
+
 | Fila | Qué hace |
 |---|---|
 | **Terminal de los accesos directos** | `ui.launch_terminal`: **Automático**, **Predeterminado del sistema** o uno de los terminales encontrados en este equipo (la misma detección que **Abrir en**). Automático: Windows Terminal en Windows (si no, WezTerm, Alacritty, la consola simple), `xdg-terminal-exec` en Linux (Omarchy; si no, el primer terminal encontrado), Terminal en macOS salvo que estén instalados iTerm2, Ghostty, WezTerm o kitty. |

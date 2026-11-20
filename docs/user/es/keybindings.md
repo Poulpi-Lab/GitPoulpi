@@ -1253,9 +1253,9 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Lanzador: Quitar del PATH |  |
 | Lanzador: Instalar menú Abrir en GitPoulpi |  |
 | Lanzador: Quitar menú Abrir en GitPoulpi |  |
-| Launcher: Become the Primary Installation |  |
-| Launcher: Remove Legacy Launchers |  |
-| Launcher: Forget Gone Installations |  |
+| Lanzador: Convertir en la instalación principal |  |
+| Lanzador: Quitar lanzadores heredados |  |
+| Lanzador: Olvidar instalaciones desaparecidas |  |
 | App: Cambiar tema de color del grafo... | `Ctrl+N T` |
 | App: Alternar tinte de filas del grafo | `Ctrl+N Y` |
 <!-- palette:end -->

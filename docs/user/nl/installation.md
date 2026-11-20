@@ -198,15 +198,33 @@ gitpoulpi
 `--version` toont de versie en de commit waarvan de build gemaakt is. Volg
 daarna [Aan de slag](getting-started.md).
 
+## Meerdere installaties naast elkaar
+
+Een pakket, een dev-checkout, een cargo-build en een uitgepakt archief kunnen allemaal tegelijk geïnstalleerd zijn. Elk is een eigen installatie: met een eigen starternaam (`GitPoulpi (Chocolatey)`, `GitPoulpi (dev)`, ...), octopuskleur, opdrachtaliassen, item "Openen in" en daemons, zodat twee versies naast elkaar draaien en elkaars vensters nooit overnemen. Instellingen, repositories en tokens worden gedeeld. Niemand heeft de gewone starternaam `GitPoulpi` tot je hem kiest met **Primair maken** in Instellingen > Starter. [Instellingen](settings.md#starter) toont de andere installaties en heeft een knop **Vergeten** voor een installatie die verdwenen is.
+
 ## Verwijderen
 
-`gitpoulpi uninstall` (wat beide installatieprogramma's uitvoeren) verwijdert de
-opdrachtaliassen, de PATH-items, de snelkoppelingen en de items van het bestandsbeheermenu (met hun
-App Paths-sleutel op Windows) die GitPoulpi heeft gemaakt, en
-daarna de programmabestanden van een releaseinstallatie; het weigert op een build zonder
-het bestand `.gitpoulpi-dist` (een cargo-build), en `--keep-files` laat de
-programmabestanden staan. Het is niet beschikbaar voor MCP-agents. Zonder
-installatieprogramma verwijder je de programmabestanden. GitPoulpi bewaart ook
+`gitpoulpi uninstall` verwijdert de opdrachtaliassen (en op Windows hun App Paths-sleutels),
+de PATH-items, de snelkoppelingen en de items van het bestandsbeheermenu
+**alleen van deze installatie**: die van de andere blijven staan, en `PATH` behoudt hun mappen
+en de gedeelde aliasmap zolang een van hen daar nog een alias heeft. Vastgemaakte items in de taakbalk
+en het Dock blijven staan (Windows kan van buitenaf niets losmaken), en je instellingen
+bewaren het item van deze installatie, zodat een herinstallatie in dezelfde map haar
+uiterlijk terugbrengt. Daarna verwijdert het de programmabestanden van een releaseinstallatie; dat deel
+weigert op een build zonder het bestand `.gitpoulpi-dist` (een cargo-build). Met
+`--keep-files` blijven de programmabestanden staan en werkt het op elke build, ook op een dev-checkout.
+Het is niet beschikbaar voor MCP-agents.
+
+| Hoe je installeerde | Wat de starters en aliassen verwijdert |
+|---|---|
+| Windows-installatieprogramma (gebruiker of alle gebruikers), winget | Het verwijderprogramma voert `gitpoulpi uninstall --keep-files` uit en verwijdert daarna de bestanden. |
+| Chocolatey | Het automatische verwijderscript voert het verwijderprogramma van het installatieprogramma uit. |
+| Scoop | `scoop uninstall gitpoulpi` voert eerst `gitpoulpi uninstall --keep-files` uit. |
+| MSI | De verwijdering voert het uit als de gebruiker die installeerde. Verwijderd door een ander account blijven de starters van de gebruiker staan en verschijnen ze als wezen bij de andere installaties in Instellingen (**Vergeten**). |
+| apt, AUR, Homebrew, cargo, een dev-checkout | Er draait geen hook voor je: voer `gitpoulpi uninstall --keep-files` uit voordat je het pakket verwijdert. |
+| Archief, `install.sh --uninstall` | Voer `gitpoulpi uninstall` of `install.sh --uninstall` uit en verwijder daarna de map. |
+
+GitPoulpi bewaart ook
 deze bestanden:
 
 | Wat | Waar |

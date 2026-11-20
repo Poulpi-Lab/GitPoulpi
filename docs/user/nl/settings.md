@@ -185,6 +185,22 @@ de gemarkeerde taal live een voorbeeld; `Enter` houdt haar en `Esc` herstelt de 
 De pagina **Starter** (`gitpoulpi ui show settings launcher`) maakt een snelkoppeling die GitPoulpi
 start vanuit de starter van het besturingssysteem, in de terminal die je kiest.
 
+**Deze installatie** (eerste groep van de pagina). Elke GitPoulpi op een machine (een dev-checkout, een pakket, een draagbare kopie) heeft een eigen starternaam, kleur, aliassen en item in het bestandsbeheermenu, bewaard in een eigen tabel `[installation.settings.<id>]` van `config.toml`; een wijziging hier raakt nooit een andere installatie. Niets hiervan wordt gejournaald (het is systeemintegratie; **Verwijderen** is de weg terug).
+
+| Rij | Wat ze doet |
+|---|---|
+| **Installatie** | Alleen-lezen: de soort, de map en de omgeving van deze installatie. Op een smalle pagina wordt de map in het midden afgekapt met een weglatingsteken; de hulpregel onder de rij heeft de volledige tekst. |
+| **Starternaam** | De naam van de snelkoppelingen en van het item in het bestandsbeheermenu van deze installatie. Geweigerd als een andere installatie die nog bestaat die naam heeft. De primaire heet altijd `GitPoulpi`. |
+| **Versie in de starternaam opnemen** | Voegt `<major>.<minor>` aan de naam toe (`GitPoulpi 1.2`); standaard uit, omdat de snelkoppelingen bij elke update worden hernoemd. |
+| **Octopuskleur** | De kleur van de octopus van deze installatie en van haar snelkoppelingen (dezelfde keuzes als in het venster Over). |
+| **Primair maken** | De primaire installatie heeft de gewone naam `GitPoulpi`, de oude snelkoppelingen en de `ui.*`-sleutels die oudere versies lezen; standaard is niemand primair. Vraagt eerst bevestiging als een andere installatie het is. De vorige primaire behoudt zijn starters onder zijn eigen naam (Windows en Linux). |
+| **Omgeving** | Installaties met dezelfde omgeving delen vensters, daemons en ongedaanmaakgeschiedenis; standaard is dat de eigen omgeving van de installatie. Na een wijziging moeten de geopende vensters van deze installatie opnieuw worden gestart. |
+| **Submenu in bestandsbeheermenu** | Groepeert het item van het bestandsbeheermenu onder een submenu met die naam; installaties met dezelfde naam delen er één. Niet beschikbaar op macOS; Nemo en Thunar tonen het item altijd op het hoofdniveau. |
+| **Andere: \<naam\>** | De andere installaties op deze machine. Een installatie waarvan de map verdwenen is, heeft een knop **Vergeten** (vraagt eerst bevestiging) die haar item en de starters, aliassen en items in het bestandsbeheermenu die ze naliet, verwijdert. |
+| **Oude starters** | Zolang niemand primair is, staan starters die een oudere versie onder de gewone naam maakte hier, met **Primair maken** en **Oude starters verwijderen** (vraagt eerst bevestiging). Een eenmalige melding in de statusregel wijst hierheen. |
+
+Het palet heeft **Starter: Primaire installatie maken**, **Starter: Oude starters verwijderen** en **Starter: Verdwenen installaties vergeten**, en elke rij is een `Settings:`-item. De rijen voor het opdrachtalias hieronder zijn van deze installatie zelf (`gpd` / `gpda` worden voorgesteld voor een dev-checkout); een alias dat een andere installatie maakte, heet **Gebruikt door \<naam\>** en kan hier niet worden gemaakt.
+
 | Rij | Wat ze doet |
 |---|---|
 | **Terminal voor snelkoppelingen** | `ui.launch_terminal`: **Automatisch**, **Standaard van het systeem** of een van de terminals die op deze computer zijn gevonden (dezelfde detectie als bij **Openen in**). Automatisch: Windows Terminal op Windows (anders WezTerm, Alacritty, de gewone console), `xdg-terminal-exec` op Linux (Omarchy; anders de eerste gevonden terminal), Terminal op macOS, tenzij iTerm2, Ghostty, WezTerm of kitty is geïnstalleerd. |

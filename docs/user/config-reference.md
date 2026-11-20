@@ -541,6 +541,15 @@ Which branches proactive conflict detection may take as the base of the current 
 
 Which list a repository follows is in its `repo-state.toml` (below). Precedence: the repository's own patterns, then the named list it follows, then `default_list`, then `**`.
 
+## `[installation]` (one entry per GitPoulpi on this machine)
+
+Several installations can share one `config.toml` (a package, a dev checkout, a cargo build, an unpacked archive). Each is identified by its folder (a 16-digit hex id) and keeps its own look and names in `[installation.settings.<id>]`, so one installation's colour or aliases never change another's. Nobody is the primary installation until you choose one; the primary owns the plain `GitPoulpi` launcher names and the shared `ui.logo_color`, `ui.command_alias` and `ui.command_alias_add` keys, which older builds read. Written by GitPoulpi itself (and `set_installation_in_file`), not by `config set`.
+
+| Key | Default | Values and effect |
+|---|---|---|
+| `installation.primary` | absent | The id of the primary installation. Absent: none. |
+| `installation.settings.<id>` | none | One table per installation: `path` (its folder, refreshed when it moves), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informative), `name` (the launcher name, `GitPoulpi (<label>)`, frozen at first run), `name_with_version` (off: add `<major>.<minor>` to the name), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (empty: the folder-menu entry sits at the root), `env` (empty: its own id; installations that share a name share daemons, sessions and undo history), `mcp_bind` (empty: `mcp.bind`). An empty value falls back to `ui.*` for the primary, else to the kind's default (a dev checkout wears `sun`). |
+
 ## `[keybindings]`
 
 Rebinds the TUI's shortcuts; Settings > Keyboard & mouse edits it.

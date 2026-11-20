@@ -3,6 +3,7 @@ pub mod browser;
 pub mod desktop;
 pub mod dev_mode;
 pub mod image_editors;
+pub mod installation;
 mod integration;
 mod keybindings;
 pub mod launch;
@@ -35,6 +36,7 @@ pub use ai::{
     MAX_CONTEXT_TTL_MINUTES, MAX_HOSTING_REPLY_HITS, MAX_HOSTING_REPLY_TERMS, MAX_LIMIT_BYTES,
     MIN_CONFLICT_BYTES, MIN_HOSTING_REPLY_HITS, MIN_HOSTING_REPLY_TERMS, MIN_LIMIT_BYTES,
 };
+pub use installation::set_installation_in_file;
 pub use integration::{
     clean_namespaces, normalize_azure_url, parse_namespace_text, AccountField, ApiFamily,
     AuthMethod, Capabilities, ConnectedUser, Integration, IntegrationCategory, IntegrationKind,
@@ -59,21 +61,22 @@ pub use schema::{
     ConflictPreventionConfig, CredentialsConfig, DefaultBackend, DialogGeometry, DiffLayout,
     DisplayUnit, EditorConfig, EditorEol, EolMode, GeneralConfig, GitConfig, GraphColorization,
     GraphLaneBackground, GraphRenderer, GraphRowTintStrength, HostingInstance, HttpsMode,
-    ImagePixelatedFrom, ImageProtocol, ImageTextFallback, KittyKeyboard, LauncherBuild,
-    LegacyDiffViewMode, LogColumnsLayout, LogConfig, LogLevel, McpConfig, McpTls, MergeConfig,
-    PrTerminology, PrivacyConfig, Profile, PullButtonMode, PushBehavior, ReposConfig,
-    ResolvedBases, RetentionUnit, RewriteConfig, SearchConfig, SessionConfig, SidebarSectionsScope,
-    SshConfig, StartupTab, StatusbarPosition, TabDirFollow, TabsPosition, TextCursor, ToolbarAlign,
-    ToolbarPosition, UiConfig, UiLanguage, UpdateChannel, UpdateMode, UpdatesConfig,
-    BASE_SOURCE_DEFAULT, BASE_SOURCE_LIST, BASE_SOURCE_OWN, DEFAULT_BLAME_WIDTH,
-    DEFAULT_COMMITS_PER_LAZY_PAGE, DEFAULT_EDITOR_TAB_SIZE, DEFAULT_HOSTING_REFRESH_MINUTES,
-    DEFAULT_INITIAL_COMMITS_IN_GRAPH, DEFAULT_LOG_RETENTION_DAYS, DEFAULT_MAX_COMMITS_IN_GRAPH,
-    DEFAULT_MERGE_SIDE_BY_SIDE_MIN_WIDTH, DEFAULT_MOUSE_SCROLL_LINES, DEFAULT_SEARCH_COMMIT_LIMIT,
-    DEFAULT_UPDATES_REPO, GRAPH_COLOR_FOLLOW_THEME, MAX_AUTO_FETCH_INTERVAL_MINUTES,
-    MAX_BLAME_WIDTH, MAX_EDITOR_TAB_SIZE, MAX_HOSTING_REFRESH_MINUTES, MAX_IMAGE_VIEW_MAX_MIB,
-    MAX_LOG_MAX_FILE_MB, MAX_LOG_RETENTION_DAYS, MAX_MERGE_SIDE_BY_SIDE_MIN_WIDTH,
-    MAX_MOUSE_SCROLL_LINES, MAX_SCRIPT_TIMEOUT_MS, MAX_SCRIPT_TOTAL_TIMEOUT_S, MCP_DEFAULT_PORT,
-    MIB_OR_GIB, MINUTES_OR_HOURS, MIN_BLAME_WIDTH, MIN_COMMITS_PER_LAZY_PAGE, MIN_EDITOR_TAB_SIZE,
+    ImagePixelatedFrom, ImageProtocol, ImageTextFallback, InstallationConfig, InstallationEntry,
+    Kind, KittyKeyboard, LauncherBuild, LegacyDiffViewMode, LogColumnsLayout, LogConfig, LogLevel,
+    McpConfig, McpTls, MergeConfig, PrTerminology, PrivacyConfig, Profile, PullButtonMode,
+    PushBehavior, ReposConfig, ResolvedBases, RetentionUnit, RewriteConfig, SearchConfig,
+    SessionConfig, SidebarSectionsScope, SshConfig, StartupTab, StatusbarPosition, TabDirFollow,
+    TabsPosition, TextCursor, ToolbarAlign, ToolbarPosition, UiConfig, UiLanguage, UpdateChannel,
+    UpdateMode, UpdatesConfig, BASE_SOURCE_DEFAULT, BASE_SOURCE_LIST, BASE_SOURCE_OWN,
+    DEFAULT_BLAME_WIDTH, DEFAULT_COMMITS_PER_LAZY_PAGE, DEFAULT_EDITOR_TAB_SIZE,
+    DEFAULT_HOSTING_REFRESH_MINUTES, DEFAULT_INITIAL_COMMITS_IN_GRAPH, DEFAULT_LOG_RETENTION_DAYS,
+    DEFAULT_MAX_COMMITS_IN_GRAPH, DEFAULT_MERGE_SIDE_BY_SIDE_MIN_WIDTH, DEFAULT_MOUSE_SCROLL_LINES,
+    DEFAULT_SEARCH_COMMIT_LIMIT, DEFAULT_UPDATES_REPO, GRAPH_COLOR_FOLLOW_THEME,
+    MAX_AUTO_FETCH_INTERVAL_MINUTES, MAX_BLAME_WIDTH, MAX_EDITOR_TAB_SIZE,
+    MAX_HOSTING_REFRESH_MINUTES, MAX_IMAGE_VIEW_MAX_MIB, MAX_LOG_MAX_FILE_MB,
+    MAX_LOG_RETENTION_DAYS, MAX_MERGE_SIDE_BY_SIDE_MIN_WIDTH, MAX_MOUSE_SCROLL_LINES,
+    MAX_SCRIPT_TIMEOUT_MS, MAX_SCRIPT_TOTAL_TIMEOUT_S, MCP_DEFAULT_PORT, MIB_OR_GIB,
+    MINUTES_OR_HOURS, MIN_BLAME_WIDTH, MIN_COMMITS_PER_LAZY_PAGE, MIN_EDITOR_TAB_SIZE,
     MIN_INITIAL_COMMITS_IN_GRAPH, MIN_MERGE_SIDE_BY_SIDE_MIN_WIDTH, MIN_MOUSE_SCROLL_LINES,
     SCRIPT_TIMEOUT_UNITS, SCRIPT_TOTAL_TIMEOUT_UNITS, THEME_SYSTEM,
 };
@@ -170,6 +173,10 @@ pub struct Config {
     /// `conflict_prevention.default_list`, `[conflict_prevention.lists.<name>]`.
     #[serde(default)]
     pub conflict_prevention: ConflictPreventionConfig,
+    /// Per-installation look and names: `[installation]`. Left out of the
+    /// file while empty. See [`installation`].
+    #[serde(default, skip_serializing_if = "InstallationConfig::is_empty")]
+    pub installation: InstallationConfig,
 }
 
 /// What [`Config::profile_for`] needs of a workspace: its default profile id

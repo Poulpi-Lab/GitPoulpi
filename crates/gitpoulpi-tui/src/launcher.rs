@@ -36,8 +36,8 @@ pub(crate) struct Env {
     pub which: Which,
     /// Run `gtk-update-icon-cache` after writing the icon (never in tests).
     pub refresh_icon_cache: bool,
-    /// Who writes. Today every writer still acts as the only installation
-    /// (the primary); later slices switch on the per-installation names.
+    /// Who writes: the running installation, so launchers, pins, folder-menu
+    /// entries and aliases of the others are never touched.
     pub ctx: InstallCtx,
 }
 
@@ -69,13 +69,8 @@ impl Env {
         let exe =
             gitpoulpi_config::desktop::alias::tui_exe(&std::env::current_exe().unwrap_or_default());
         let newest = gitpoulpi_config::dev_mode::launcher_newest_on_disk(&exe);
-        let real_fs = gitpoulpi_config::installation::RealFs;
-        let identity = gitpoulpi_config::installation::identify(
-            &exe,
-            &gitpoulpi_config::installation::IdentityEnv::real(&real_fs),
-        );
         Env {
-            ctx: InstallCtx::sole(&identity),
+            ctx: this_ctx(),
             os,
             dirs,
             launch_exe: terminals::launch_helper(os, &exe, &|p| p.is_file()),
@@ -124,6 +119,55 @@ fn windows_alias(program: &str) -> Option<PathBuf> {
 
 fn windows_alias_exists(program: &str) -> bool {
     windows_alias(program).is_some_and(|p| p.exists())
+}
+
+/// The version a launcher name carries when the setting asks for it.
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// The writer context of installation `identity` in `config`: the effective
+/// launcher name (with `<major>.<minor>` when the installation asks), the
+/// primary and every known installation. A config lacking the installation's
+/// entry (a pinned id keeps it in memory only) falls back to `seeded`'s.
+pub(crate) fn ctx_in(
+    config: &gitpoulpi_config::Config,
+    identity: &gitpoulpi_config::installation::Identity,
+    seeded: &gitpoulpi_config::Config,
+) -> InstallCtx {
+    let eff = crate::launcher_sync::effective_in(config, identity, seeded);
+    let mut merged;
+    let config = if config.installation.settings.contains_key(&identity.id) {
+        config
+    } else {
+        merged = config.clone();
+        if let Some(entry) = seeded.installation.settings.get(&identity.id) {
+            merged
+                .installation
+                .settings
+                .insert(identity.id.clone(), entry.clone());
+        }
+        &merged
+    };
+    let mut ctx = InstallCtx::from_config(config, identity, &|path| {
+        !path.is_empty() && std::path::Path::new(path).exists()
+    });
+    ctx.name =
+        gitpoulpi_config::installation::launcher_name(&eff.name, eff.name_with_version, VERSION);
+    ctx
+}
+
+/// The running installation as a writer, from the config as it is now.
+/// Blocking: reads `config.toml` and looks at the disk. The identity is the
+/// one `installation::current()` worked out once at startup.
+pub(crate) fn this_ctx() -> InstallCtx {
+    let cur = gitpoulpi_config::installation::current();
+    let loaded = cur
+        .config_file
+        .as_deref()
+        .and_then(|f| gitpoulpi_config::Config::load(f).ok());
+    match loaded {
+        Some(config) => ctx_in(&config, &cur.identity, &cur.config),
+        None => cur.ctx.clone(),
+    }
 }
 
 /// A shortcut row as Settings shows it.
@@ -314,7 +358,7 @@ pub(crate) fn folder_menu_env(env: &Env, logo: Option<&str>) -> desktop::folder_
     // Windows: the verbs show the installation's colour `.ico`.
     fe.ico = logo
         .filter(|_| env.os == gitpoulpi_config::open_in::Os::Windows)
-        .and_then(|l| desktop::ensure_ico(&env.dirs, &icon_set(l)));
+        .and_then(|l| desktop::ensure_ico_for(&env.dirs, &icon_set(l), &env.ctx));
     fe.refresh_hooks = env.refresh_icon_cache;
     fe.ctx = env.ctx.clone();
     fe

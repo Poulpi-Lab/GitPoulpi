@@ -5,7 +5,7 @@
 //! A terminal-hosted app has no window of its own, so the taskbar shows the
 //! terminal's icon, and Windows has no "running" dot under the pinned
 //! GitPoulpi icon. The fix is the AppUserModelID: our shortcuts carry
-//! `terminals::AUMID`, and the TUI finds its terminal's top-level window and
+//! `terminals::aumid_for`, and the TUI finds its terminal's top-level window and
 //! gives it the same ID (and our icon).
 //!
 //! The window is found, first, through our ancestor processes: the terminal
@@ -699,7 +699,8 @@ mod win {
         let slug = crate::logo_colors::ways()[crate::about::way_index()]
             .slug
             .clone();
-        gitpoulpi_config::desktop::ensure_ico(&dirs, &crate::launcher::icon_set(&slug))
+        let ctx = crate::launcher::this_ctx();
+        gitpoulpi_config::desktop::ensure_ico_for(&dirs, &crate::launcher::icon_set(&slug), &ctx)
     }
 
     /// Our icon (the current colour's `.ico`) on the window, so the taskbar
@@ -742,7 +743,8 @@ mod win {
     /// The ID and the icon on `hwnd`, logged step by step.
     fn apply(hwnd: Hwnd, round: &str) {
         let pid = window_pid(hwnd);
-        match set_app_id(hwnd, gitpoulpi_config::desktop::terminals::AUMID) {
+        let aumid = gitpoulpi_config::desktop::terminals::aumid_for(&crate::launcher::this_ctx());
+        match set_app_id(hwnd, &aumid) {
             Ok((set, commit)) => tracing::info!(
                 "window grouping: AppUserModelID set ({round}; hwnd {hwnd:#x}, pid {pid}, SetValue hr {set:#x}, Commit hr {commit:#x})"
             ),

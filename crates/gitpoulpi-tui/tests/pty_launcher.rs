@@ -78,7 +78,7 @@ fn changing_the_terminal_in_the_settings_rewrites_a_created_shortcut_by_itself()
     );
     std::fs::write(
         config.path().join("config.toml"),
-        "[ui]\ngraph_renderer = \"text\"\nlaunch_terminal = \"kitty\"\n",
+        "[ui]\ngraph_renderer = \"text\"\nlaunch_terminal = \"kitty\"\n\n[installation]\nprimary = \"p-pty\"\n",
     )
     .unwrap();
     let mut term = common::launch(repo.root())
@@ -157,7 +157,7 @@ fn create_from_the_palette_then_remove_from_the_settings_row() {
     let data = home.path().join("data");
     std::fs::write(
         config.path().join("config.toml"),
-        "[ui]\ngraph_renderer = \"text\"\nlaunch_terminal = \"kitty\"\n",
+        "[ui]\ngraph_renderer = \"text\"\nlaunch_terminal = \"kitty\"\n\n[installation]\nprimary = \"p-pty\"\n",
     )
     .unwrap();
     let mut term = common::launch(repo.root())
@@ -268,7 +268,7 @@ fn windows_create_from_the_palette_then_remove_from_the_settings_row() {
     let home = tempfile::tempdir().unwrap();
     std::fs::write(
         config.path().join("config.toml"),
-        "[ui]\ngraph_renderer = \"text\"\n",
+        "[ui]\ngraph_renderer = \"text\"\n\n[installation]\nprimary = \"p-pty\"\n",
     )
     .unwrap();
     let mut term = common::launch(repo.root())

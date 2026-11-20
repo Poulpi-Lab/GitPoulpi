@@ -316,7 +316,7 @@ pub(super) fn init(
     minimap::init(avatar_capability);
     crate::about::init(avatar_capability);
     crate::title_logo::init(avatar_capability);
-    crate::about::install(&settings.config().ui);
+    crate::about::install(&crate::launcher_sync::effective_color(settings.config()));
     crate::launcher_sync::install(settings.config());
     crate::image_view::pane::init(avatar_capability);
     crate::image_view::split::init(avatar_capability);

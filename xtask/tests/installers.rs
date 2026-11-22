@@ -121,6 +121,20 @@ fn the_inno_script_writes_the_channel_marker_after_the_copy() {
     assert!(iss.contains("gitpoulpi-updater.exe"));
 }
 
+/// XML forbids `--` inside a comment (WiX refuses the file with WIX0104), and only the Windows release job builds
+/// the MSI, so a CLI flag quoted in a comment would first fail there.
+#[test]
+fn the_msi_comments_hold_no_double_hyphen() {
+    let wxs = read("packaging/msi/gitpoulpi.wxs");
+    for part in wxs.split("<!--").skip(1) {
+        let body = part.split("-->").next().unwrap_or_default();
+        assert!(
+            !body.contains("--") && !body.ends_with('-'),
+            "XML comment with '--': {body}"
+        );
+    }
+}
+
 #[test]
 fn the_msi_ships_every_program_and_the_policy_properties() {
     let wxs = read("packaging/msi/gitpoulpi.wxs");

@@ -105,7 +105,7 @@
     </ComponentGroup>
 
     <!-- On removal, the installing user's launchers, aliases and folder-menu entries go the way Settings
-         removes them (`uninstall --keep-files`; the files are the MSI's). Impersonated: as SYSTEM the user's
+         removes them (uninstall with keep-files; the files are the MSI's). Impersonated: as SYSTEM the user's
          Start menu and registry are out of reach, so a removal run by another account leaves them as orphans
          that the other installations list with "Forget". Never fails the removal, and skipped on an upgrade. -->
     <CustomAction Id="GitPoulpiUninstall" Directory="INSTALLFOLDER"

@@ -14,7 +14,7 @@ GitKraken is a trademark of its respective owner. GitPoulpi is an independent
 project, not affiliated with, endorsed or sponsored by it; the name is
 mentioned only to describe compatibility and inspiration.
 
-Cargo.lock sha256: e0ef4046d662648617f3889fedbcf32a6c09f160702d22dd6beb3880096d801b
+Cargo.lock sha256: 0924e4803bdb9adf597d7e10f18a871e4409b97898683d574ddb6d6d364f6da3
 
 
 
@@ -1818,7 +1818,7 @@ flate2 1.1.11 (MIT OR Apache-2.0)
 fnv 1.0.7 (Apache-2.0 / MIT)
 foldhash 0.1.5 (Zlib)
 foldhash 0.2.0 (Zlib)
-form_urlencoded 1.2.2 (MIT OR Apache-2.0)
+form_urlencoded 1.2.3 (MIT OR Apache-2.0)
 futures 0.3.34 (MIT OR Apache-2.0)
 futures-channel 0.3.34 (MIT OR Apache-2.0)
 futures-core 0.3.34 (MIT OR Apache-2.0)
@@ -2113,7 +2113,7 @@ unicode-truncate 2.0.1 (MIT OR Apache-2.0)
 unicode-width 0.1.14 (MIT OR Apache-2.0)
 unicode-width 0.2.0 (MIT OR Apache-2.0)
 untrusted 0.9.0 (ISC)
-url 2.5.8 (MIT OR Apache-2.0)
+url 2.5.9 (MIT OR Apache-2.0)
 utf8_iter 1.0.4 (Apache-2.0 OR MIT)
 utf8parse 0.2.2 (Apache-2.0 OR MIT)
 uuid 1.26.1 (Apache-2.0 OR MIT)
@@ -3412,7 +3412,7 @@ bstr 1.13.1, bumpalo 3.20.3, by_address 1.2.1, cfg-if 1.0.4, core-foundation 0.1
 core-foundation-sys 0.8.7, core_detect 1.0.0, critical-section 1.2.0,
 curve25519-dalek-derive 0.1.1, displaydoc 0.2.7, downcast-rs 1.2.1, either 1.18.0,
 equivalent 1.0.2, errno 0.3.14, euclid 0.22.14, fastrand 2.5.0, ff 0.13.1, filetime 0.2.29,
-fixedbitset 0.4.2, fixedbitset 0.5.7, flate2 1.1.11, fnv 1.0.7, form_urlencoded 1.2.2,
+fixedbitset 0.4.2, fixedbitset 0.5.7, flate2 1.1.11, fnv 1.0.7, form_urlencoded 1.2.3,
 gethostname 1.1.0, gif 0.14.2, git2 0.21.0, group 0.13.0, hashbrown 0.15.5, hashbrown
 0.17.1, heck 0.5.0, httparse 1.10.1, hyper-rustls 0.27.10, idna 1.1.0, idna_adapter 1.2.2,
 imara-diff 0.2.0, indexmap 2.14.2, itertools 0.14.0, jpeg-decoder 0.3.2, js-sys 0.3.105,
@@ -3428,7 +3428,7 @@ security-framework-sys 2.17.0, shared_library 0.1.9, signal-hook 0.3.18, signal-
 0.2.5, signal-hook-registry 1.4.8, smallvec 1.16.1, socket2 0.6.5, stable_deref_trait 1.2.1,
 stacker 0.1.25, syn 1.0.109, tar 0.4.46, tempfile 3.27.0, ucd-trie 0.1.7, unicase 2.10.0,
 unicode-segmentation 1.13.3, unicode-truncate 2.0.1, unicode-width 0.1.14, unicode-width
-0.2.0, url 2.5.8, uuid 1.26.1, version_check 0.9.5, wasi 0.11.1+wasi-snapshot-preview1,
+0.2.0, url 2.5.9, uuid 1.26.1, version_check 0.9.5, wasi 0.11.1+wasi-snapshot-preview1,
 wasip2 1.0.4+wasi-0.2.12, wasm-bindgen 0.2.128, wasm-bindgen-futures 0.4.78,
 wasm-bindgen-macro 0.2.128, wasm-bindgen-macro-support 0.2.128, wasm-bindgen-shared 0.2.128,
 web-sys 0.3.105, weezl 0.1.12, wit-bindgen 0.57.1, wl-clipboard-rs 0.9.3,
@@ -7688,7 +7688,7 @@ the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 
 ============================================================================================
-Used by: form_urlencoded 1.2.2
+Used by: form_urlencoded 1.2.3
 --------------------------------------------------------------------------------------------
 Copyright (c) 2013-2016 The rust-url developers
 
@@ -9351,7 +9351,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ============================================================================================
-Used by: idna 1.1.0, percent-encoding 2.3.2, url 2.5.8
+Used by: idna 1.1.0, percent-encoding 2.3.2, url 2.5.9
 --------------------------------------------------------------------------------------------
 Copyright (c) 2013-2025 The rust-url developers
 

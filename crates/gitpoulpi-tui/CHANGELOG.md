@@ -7,14 +7,49 @@ IPC surfaces are stable within a major version).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-22
+
+Several GitPoulpi installations can now live side by side on one machine (a package, a portable copy, a cargo build, a dev checkout), each with its own launchers, colour, aliases and background processes, so two versions run at once without getting in each other's way. GitPoulpi also ships as a single program.
+
+### Highlights
+- **Side-by-side installations:** every installation has its own launcher name (`GitPoulpi (Chocolatey)`, `GitPoulpi (dev)`, ...), octopus colour, command aliases, "Open in" folder-menu entry and daemons. Settings, repositories and tokens stay shared.
+- **Environments:** sessions, windows, daemons and the undo history belong to an environment, by default one per installation, so two versions never take each other's windows or undo entries.
+- **One program:** a single `gitpoulpi` executable is the terminal UI, the CLI and the MCP server, for smaller downloads and installs.
+
+### Added
+- **Settings > Launcher, "This installation":** the installation's kind, folder and environment, its launcher name (optionally with the version), its octopus colour, **Become the primary**, the environment, a folder-menu submenu, the other installations of the machine (with **Forget** for one whose folder is gone) and the launchers an older build left (**Remove legacy launchers**). Palette: **Launcher: Become the Primary Installation**, **Launcher: Remove Legacy Launchers**, **Launcher: Forget Gone Installations**.
+- **The primary installation:** nobody is primary by default. The primary owns the plain `GitPoulpi` launcher name, the legacy shortcuts and the shared `ui.*` keys; resigning gives back the look you had before.
+- **Folder menu per installation:** one "Open in" entry per installation on Windows, Linux and macOS, with the icon in the installation's colour. Installations that choose the same submenu name share it, and the last one to leave removes it.
+- **Shortcuts per installation:** Windows shortcuts with their own icon and taskbar identity, Linux `.desktop` entries and macOS bundles per installation; changing the primary renames launchers in place, with no gap.
+- **Command aliases per installation:** `gp` and `gpa` belong to the installation that made them (`gpd` and `gpda` are suggested for a dev checkout); creating an alias another installation owns is refused.
+- **`gitpoulpi installation show` and `gitpoulpi installation set <field> <value>`:** which installation this is, its environment, its settings and the others on the machine. `GITPOULPI_INSTALL_ID` pins the identity and `GITPOULPI_ENV` forces the environment (scripts and tests).
+- **Per-environment undo history:** each environment keeps its own journal and caches (hosting, AI); undoing an operation made in another environment is refused without touching the repository. Two windows of the same environment share their history.
+- **MCP port check:** `gitpoulpi mcp serve --http` refuses to start on a port already in use and says so, instead of colliding with another installation's server. Settings > MCP has **Suggest a free port** (palette: **MCP: Suggest a free port**), saved per installation.
+- `gitpoulpi mcp serve --bind <ADDR>`: the address for `--http` (same as `--http ADDR`).
+- Hovering an author avatar in the graph shows the author.
+
 ### Changed
 - **One program:** GitPoulpi ships a single `gitpoulpi` executable. Without a subcommand it opens the terminal UI; `gitpoulpi mcp serve` is the MCP server. `gitpoulpi-updater` stays a separate small program.
 - `gitpoulpi-tui`, `gitpoulpi-mcp` and `gitpoulpi-launch` are now small relays that start `gitpoulpi` (existing MCP configs keep working; `gitpoulpi-mcp` stays for all of 1.x, `gitpoulpi-tui` will be removed in a later release).
 - The `gp` alias and the shortcuts start `gitpoulpi`; ones written for `gitpoulpi-tui` are rewritten automatically.
 - Smaller downloads and installs: the archive no longer carries three full copies of the program.
+- **Updates stop only their own installation:** the updater closes the processes of the installation it updates and leaves the others running.
+- **Uninstall removes only this installation:** `gitpoulpi uninstall` takes out this installation's aliases, PATH entries, shortcuts and folder-menu entries, never another's. Scoop and the MSI installer now run it on uninstall too.
+- Writing installation settings keeps the formatting and comments of `config.toml`.
 
-### Added
-- `gitpoulpi mcp serve --bind <ADDR>`: the address for `--http` (same as `--http ADDR`).
+### Fixed
+- The Safety panel's tree rows follow the folders-first setting.
+- `gitpoulpi-launch --version` prints the version line.
+- The palette shows every binding of the tab-switch commands, and the `Ctrl+Tab` hint names the terminals that keep that key for themselves (see Troubleshooting).
+- The About window lists crate versions without build metadata.
+
+### Upgrading from 1.0.0
+- Launchers made by 1.0.0 under the plain name `GitPoulpi` are kept and listed in Settings > Launcher: choose **Become the primary** to keep that name for this installation, or **Remove legacy launchers**.
+- The undo history of 1.0.0 is carried over to the installation's environment the first time it opens a repository.
+- Nothing to change in your MCP client configuration: `gitpoulpi-mcp` still works.
+
+### Dependencies
+- `toml` 1.x, `mlua` 0.12, `thiserror` 2, `sha1` 0.11 and other crate updates; release workflow actions updated.
 
 ## [1.0.0] - 2026-11-18
 

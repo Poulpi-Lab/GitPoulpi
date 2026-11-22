@@ -69,6 +69,7 @@ Rules the community moderators enforced, all pinned by `xtask/tests/installers.r
 - No `raw.githubusercontent.com` URL in the nuspec. `<iconUrl>` is the logo on jsDelivr pinned to the release commit, `https://cdn.jsdelivr.net/gh/Poulpi-Lab/GitPoulpi@<full sha>/assets/logo/gitpoulpi-512.png`; `packaging/fill-templates.sh` fills `@COMMIT@` from `COMMIT` or `git rev-parse HEAD` (the `chocolatey` job checks out the tag, so that is the tag commit). A branch name instead of a sha would let the icon change under a published version.
 - `packageSourceUrl` and `projectSourceUrl` are required and must point at the source.
 - A published version cannot be edited. After a moderator request, resubmit the same version from its tag: `gh workflow run chocolatey-repush.yml -f tag=releases/vX.Y.Z -f dry_run=true` (pack only, nupkg as artifact), then the same without `dry_run`. It packs from the tag's own templates with the released `.sha256` files, so for a tag older than a template fix the workflow rewrites the field itself (today only a raw `iconUrl`); any other fix needs a rewrite added there.
+- A new version can wait while an earlier one is still in moderation: set the repository variable `CHOCOLATEY_HOLD` to `true` before tagging, and the `chocolatey` job skips its push (with a notice). Once the earlier version is approved, delete the variable and push the held release with `chocolatey-repush.yml -f tag=releases/vX.Y.Z`.
 
 ## The Docker Hub overview comes from the repository
 

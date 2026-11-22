@@ -22,7 +22,7 @@ name: Release
 #
 # Secrets: CHOCO_API_KEY, AUR_SSH_PRIVATE_KEY, APT_GPG_PRIVATE_KEY, APT_GPG_PASSPHRASE, POULPI_BOT_PRIVATE_KEY,
 # DOCKERHUB_USERNAME, DOCKERHUB_TOKEN, CARGO_REGISTRY_TOKEN (optional, crates.io).
-# Variables: POULPI_BOT_APP_ID, PUBLISH_PACKAGES, PUBLISH_GHCR (optional), PUBLISH_CRATES (optional),
+# Variables: POULPI_BOT_APP_ID, PUBLISH_PACKAGES, CHOCOLATEY_HOLD (optional), PUBLISH_GHCR (optional), PUBLISH_CRATES (optional),
 # CRATES_TRUSTED_PUBLISHING (optional, crates.io Trusted Publishing instead of the token).
 # Pushes to the other repositories go out as the Poulpi-Lab GitHub App bot (actions/create-github-app-token),
 # never as a personal account.
@@ -423,13 +423,15 @@ jobs:
     if: ${{ inputs.dry_run || (needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true') }}
     runs-on: windows-latest
     env:
-      HAS: ${{ !inputs.dry_run && secrets.CHOCO_API_KEY != '' }}
+      # CHOCOLATEY_HOLD = 'true' keeps the package built but unpushed (for example while an earlier version still
+      # waits for moderation); push it later with chocolatey-repush.yml.
+      HAS: ${{ !inputs.dry_run && secrets.CHOCO_API_KEY != '' && vars.CHOCOLATEY_HOLD != 'true' }}
       VERSION: ${{ needs.publish.outputs.version }}
     steps:
-      - name: Notice when the secret is missing
+      - name: Notice when the secret is missing or the channel is held
         if: env.HAS != 'true' && !inputs.dry_run
         shell: bash
-        run: echo "::notice::CHOCO_API_KEY is not set, the Chocolatey package was not pushed"
+        run: echo "::notice::CHOCO_API_KEY is not set or CHOCOLATEY_HOLD is 'true', the Chocolatey package was not pushed"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: env.HAS == 'true' || inputs.dry_run
         with:

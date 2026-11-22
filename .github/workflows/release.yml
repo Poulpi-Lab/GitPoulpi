@@ -671,6 +671,9 @@ jobs:
           else
             echo "::notice::the source tarball is not downloadable, the gitpoulpi source package is skipped"
           fi
+          # The container runs as root over a checkout owned by the runner user: without this, git refuses the
+          # repository and fill-templates.sh finds no commit for the Chocolatey icon URL.
+          git config --global --add safe.directory "$PWD"
           sh packaging/fill-templates.sh "$VERSION" dist filled
       # Dry run: .SRCINFO is generated from each rendered PKGBUILD, nothing is cloned or pushed.
       - name: Generate .SRCINFO

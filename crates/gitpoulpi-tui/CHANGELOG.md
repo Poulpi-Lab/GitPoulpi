@@ -7,6 +7,17 @@ IPC surfaces are stable within a major version).
 
 ## [Unreleased]
 
+### Added
+- **Pull all branches:** the Pull menu fetches, then brings every local branch that is behind its upstream up to date in one action (`Ctrl+G` then `Ctrl+P`, also in the palette). The checked-out branch is integrated like the Pull button, with rows for the other pull modes; the other branches are only fast-forwarded, and diverged ones are skipped and listed. When a behind branch is checked out in another worktree, GitPoulpi asks whether to update that worktree too. One undo restores every branch. CLI: `gitpoulpi pull --all-branches`.
+
+### Changed
+- A `Ctrl` key after a prefix (`Ctrl+G`, `Ctrl+N`) can now have its own binding; when it has none it still acts as the plain key. `Ctrl+G` then `Ctrl+P` is now **Pull all branches** (`Ctrl+G` then `p` stays Pull).
+- A mouse click while a `Ctrl+G` or `Ctrl+N` chord waits for its second key cancels the chord, then acts as usual.
+
+### Fixed
+- Windows: a GitPoulpi pinned to the taskbar before 1.1.0 follows the octopus colour again.
+- Windows: changing the octopus colour is fast again.
+
 ## [1.1.1] - 2026-11-23
 
 Fixes for several installations side by side on one machine, and two theme fixes.

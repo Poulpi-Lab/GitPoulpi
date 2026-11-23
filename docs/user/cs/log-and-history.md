@@ -490,6 +490,17 @@ Otevřete ji segmentem `Historie` přepínače `Historie │ Vše` v liště dif
   (fast-forward, pokud lze)*, *Pull (jen fast-forward)* nebo *Pull (rebase)*,
   aniž by tlačítko změnilo. Režim se gitu vždy předává explicitně, takže vás
   `pull.rebase` z konfigurace gitu nemůže překvapit.
+- **Pull všechny větve** (`Ctrl+G Ctrl+P`, položka `▾` u Pull) stáhne data
+  z remote, která vaše větve sledují, a pak v jednom kroku posune každou
+  lokální větev na její upstream. Větev, která není přepnutá, se jen posune
+  fast-forwardem (žádný soubor se nezmění); rozešlá větev se nechá být
+  a ohlásí se. Přepnutá větev se stáhne tak, jak je nastaveno tlačítko Pull,
+  a `▾` má i položku pro každý další režim (*Pull všechny větve (jen
+  fast-forward)*, *(rebase)*, *(fast-forward, pokud lze)*). Když zaostávající
+  větev je přepnutá v jiném worktree, dialog se nejdřív zeptá, zda ty worktree
+  také aktualizovat, přeskočit, nebo zrušit. Stavový řádek běh shrne a Protokol
+  aktivity má jeden řádek pro každou větev; Zpět vrátí všechny větve jedním
+  krokem. `Ctrl+G p` zůstává obyčejným Pull.
 - **Push** (`Ctrl+G Shift+P`) odešle přepnutou větev do výchozího remote
   a poprvé nastaví upstream. Jeho `▾` jednou odešle do jiného remote, který
   zvolíte. Pokud má remote commity, které vy nemáte, dialog nabídne **Pull

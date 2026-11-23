@@ -1936,6 +1936,7 @@ Každé tlačítko má klávesový protějšek:
 | **Aktivita** ve stavovém řádku | `Ctrl+N Shift+A` |
 | Panel nástrojů: **Zpět**, **Znovu** | `Ctrl+Z`, `Ctrl+Y` |
 | Panel nástrojů: **Pull** / jeho `▾` | `Ctrl+G p` / `Git: Možnosti pullu...` |
+| **Pull všechny větve** (položka `▾` u Pull) | `Ctrl+G Ctrl+P` |
 | Panel nástrojů: **Push** / jeho `▾` | `Ctrl+G Shift+P` / `Git: Push do remote...` |
 | Panel nástrojů: **Větev**, **Tag** | `Ctrl+G b`, `Ctrl+G t` |
 | Panel nástrojů: **Stash**, **Pop** | `Ctrl+G Shift+T`, `Ctrl+G o` |

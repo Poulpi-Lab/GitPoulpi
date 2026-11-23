@@ -319,7 +319,7 @@ pub(crate) fn analyse(
             out.refusal = Some(msg::chord_reason(chord, reason.get()));
             return out;
         }
-        if d.ctx.ignores_modifiers() && (chord.mods.ctrl || chord.mods.alt) {
+        if d.ctx.ignores_modifiers() && chord.mods.alt {
             out.refusal = Some(msg::no_modifier_after_prefix(chord));
             return out;
         }

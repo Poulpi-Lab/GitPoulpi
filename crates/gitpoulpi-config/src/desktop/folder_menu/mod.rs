@@ -199,6 +199,42 @@ fn detected(env: &Env, m: Manager) -> bool {
     }
 }
 
+/// Is the label `found` in an existing entry still the entry's label for the
+/// launcher called `name`? Every writer is handed the label in the current
+/// language, so a different spelling alone (a language change) must not make
+/// an entry outdated, but a different launcher name must. The labels put the
+/// name at one end ("Open in {name}", "{name} ..."), so `found` follows the
+/// name when it starts or ends with it as a whole word.
+pub(crate) fn follows_name(found: &str, name: &str) -> bool {
+    let name = name.trim();
+    if name.is_empty() {
+        return false;
+    }
+    let word = |c: char| c.is_alphanumeric() || c == '_';
+    found
+        .strip_suffix(name)
+        .is_some_and(|rest| !rest.chars().next_back().is_some_and(word))
+        || found
+            .strip_prefix(name)
+            .is_some_and(|rest| !rest.chars().next().is_some_and(word))
+}
+
+/// `found` is acceptable as it stands: it is what is wanted, or only its
+/// language differs ([`follows_name`]).
+pub(crate) fn label_current(found: &str, label: &str, name: &str) -> bool {
+    found == label || follows_name(found, name)
+}
+
+/// The label to compare an entry against: its own when [`label_current`],
+/// else the wanted one (the entry is then outdated).
+pub(crate) fn current_label(found: &str, label: &str, name: &str) -> String {
+    if label_current(found, label, name) {
+        found.to_string()
+    } else {
+        label.to_string()
+    }
+}
+
 fn state_of(env: &Env, label: &str, m: Manager) -> Result<State, String> {
     match m {
         Manager::Explorer => windows::state(env, label),

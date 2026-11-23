@@ -373,6 +373,9 @@ pub(super) fn state(env: &Env, label: &str, m: Manager) -> State {
         let current = has_helper
             && ours.len() == 1
             && ours[0].parent() == Some(dir.as_path())
+            && ours[0].file_name().is_some_and(|f| {
+                super::label_current(&f.to_string_lossy(), &file_label(label), &env.ctx.name)
+            })
             && std::fs::read_to_string(&ours[0]).ok().as_deref()
                 == Some(script_text(helper, &who).as_str())
             && executable(&ours[0]);
@@ -390,6 +393,7 @@ pub(super) fn state(env: &Env, label: &str, m: Manager) -> State {
         let Some(found) = thunar::label_of(&text, &uid) else {
             return State::NotInstalled;
         };
+        let found = super::current_label(&found, label, &env.ctx.name);
         let want = thunar::block(helper, &found, &uid, &who.icon_name());
         return if has_helper && thunar::block_of(&text, &uid) == Some(want.as_str()) {
             State::Installed
@@ -413,6 +417,7 @@ pub(super) fn state(env: &Env, label: &str, m: Manager) -> State {
     // Compare with the label the files carry, so a language change alone is
     // not "outdated".
     let found = ours.first().and_then(|t| first_name(t)).unwrap_or_default();
+    let found = super::current_label(&found, label, &env.ctx.name);
     let (_, wanted) = fixed(env, helper, &found, m, &who);
     let current = has_helper
         && wanted.iter().zip(&read).all(|((name, text, exec), got)| {
@@ -801,6 +806,43 @@ mod tests {
         assert!(folder_menu::all_installed(&folder_menu::status(
             &moved, LABEL
         )));
+    }
+
+    #[test]
+    fn a_launcher_rename_makes_every_entry_outdated_and_sync_renames_the_label() {
+        let tmp = tempfile::tempdir().unwrap();
+        let named = |name: &str| {
+            let mut e = env(tmp.path(), ALL);
+            e.ctx.name = name.to_string();
+            e
+        };
+        let before = named("GitPoulpi (Chocolatey)");
+        folder_menu::install(&before, "Open in GitPoulpi (Chocolatey)").unwrap();
+        let after = named("GitPoulpi Test");
+        let label = "Open in GitPoulpi Test";
+        let st = folder_menu::status(&after, label);
+        assert!(
+            st.entries
+                .iter()
+                .filter(|x| x.detected)
+                .all(|x| x.state == State::Outdated),
+            "{st:?}"
+        );
+        assert_eq!(folder_menu::sync(&after, label).unwrap().len(), 6);
+        assert!(folder_menu::all_installed(&folder_menu::status(
+            &after, label
+        )));
+        let dolphin = read(
+            &after
+                .data_home
+                .join("kio/servicemenus/gitpoulpi-open.desktop"),
+        );
+        assert!(dolphin.contains("Name=Open in GitPoulpi Test"), "{dolphin}");
+        assert!(!dolphin.contains("Chocolatey"));
+        // Only the language changed: nothing to do.
+        assert!(folder_menu::sync(&after, "Ouvrir dans GitPoulpi Test")
+            .unwrap()
+            .is_empty());
     }
 
     #[test]

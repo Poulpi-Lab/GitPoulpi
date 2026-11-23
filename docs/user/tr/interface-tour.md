@@ -184,7 +184,7 @@ Varsayılan olarak bölmelerin altındaki, durum çubuğunun üstündeki satırd
 | Düğme | Ne yapar |
 |---|---|
 | **Geri al**, **Yinele** | Son işlemi geri alır veya yeniden uygular (`Ctrl+Z`, `Ctrl+Y`). Geri Al kapalıyken gizlidir. Bkz. [Geri al ve yinele](undo-redo.md). |
-| **Pull** `▾` | **Ayarlar > Git ve Kodlama > Pull düğmesi** ayarının dediği gibi pull yapar. `▾` listesinde **Fetch All**, **Pull (mümkünse fast-forward)**, **Pull (yalnızca fast-forward)** ve **Pull (rebase)** vardır. Listeden seçilen öğe bir kez çalışır ve düğmeyi değiştirmez. |
+| **Pull** `▾` | **Ayarlar > Git ve Kodlama > Pull düğmesi** ayarının dediği gibi pull yapar. `▾` listesinde **Fetch All**, **Pull (mümkünse fast-forward)**, **Pull (yalnızca fast-forward)** ve **Pull (rebase)** vardır; ardından **Pull: tüm dallar** (`Ctrl+G Ctrl+P`) ve checkout yapılmış dal için her diğer modla aynısı gelir. Listeden seçilen öğe bir kez çalışır ve düğmeyi değiştirmez. |
 | **Push** `▾` | Checkout yapılmış dalı push eder. `▾` listesi, seçtiğiniz uzak depoya bir kez push eder. |
 | **Dal** | Checkout yapılmış commit'te bir dal oluşturur. |
 | **Tag** | Checkout yapılmış commit'te bir tag oluşturur. |

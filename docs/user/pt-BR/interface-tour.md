@@ -182,7 +182,7 @@ Por padrão, uma linha abaixo dos painéis e acima da linha de status. **Configu
 | Botão | O que faz |
 |---|---|
 | **Desfazer**, **Refazer** | Desfazem ou restauram a última operação (`Ctrl+Z`, `Ctrl+Y`). Ocultos quando Desfazer está desligado. Veja [Desfazer e refazer](undo-redo.md). |
-| **Pull** `▾` | Faz pull do jeito que **Configurações > Git e codificação > Botão Pull** define. A lista `▾` tem **Fetch All**, **Pull (fast-forward se possível)**, **Pull (só fast-forward)** e **Pull (rebase)**. Um item da lista roda uma vez e não muda o botão. |
+| **Pull** `▾` | Faz pull do jeito que **Configurações > Git e codificação > Botão Pull** define. A lista `▾` tem **Fetch All**, **Pull (fast-forward se possível)**, **Pull (só fast-forward)** e **Pull (rebase)**, depois **Pull de todas as branches** (`Ctrl+G Ctrl+P`) e o mesmo com cada um dos outros modos para a branch em checkout. Um item da lista roda uma vez e não muda o botão. |
 | **Push** `▾` | Faz push da branch em checkout. A lista `▾` faz push uma vez para o remoto que você escolher. |
 | **Branch** | Cria uma branch no commit em checkout. |
 | **Tag** | Cria uma tag no commit em checkout. |

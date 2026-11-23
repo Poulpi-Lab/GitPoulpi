@@ -145,7 +145,7 @@ pedido de nome que o botão.
 | Commits | commit, amend, reword, o compositor de commits com IA (todos os seus commits como um único passo) |
 | Branches e tags | criar, excluir, renomear, definir ou remover o upstream, criar uma branch de rastreamento, criar / excluir / anotar uma tag, fast-forward, fazer checkout de um pull request como branch |
 | Navegação | checkout de uma branch ou de um commit (inclusive um HEAD desanexado) |
-| Histórico | merge (fast-forward ou commit de merge), rebase (simples e interativo, depois de concluído), cherry-pick, revert, reset (soft, mixed e hard), a parte local de um pull |
+| Histórico | merge (fast-forward ou commit de merge), rebase (simples e interativo, depois de concluído), cherry-pick, revert, reset (soft, mixed e hard), a parte local de um pull, **pull de todas as branches** (todas as branches movidas, como um único passo; os arquivos da branch em checkout voltam junto) |
 | Alterações em andamento | stage e unstage (arquivo, pasta, hunk, linhas, tudo), descartar (arquivo, pasta, hunk, linhas, um checkout de arquivo), aplicar um patch, **excluir um arquivo do disco**, **ignorar** (arquivo, extensão ou pasta: a linha do `.gitignore` escolhido), **tratar como binário ou texto** (a linha do `.gitattributes`) |
 | Stashes | push, apply, pop, drop |
 | Remotos e configuração | adicionar, remover, renomear, alterar a URL ou a URL de push de um remoto, track e untrack do Git LFS |

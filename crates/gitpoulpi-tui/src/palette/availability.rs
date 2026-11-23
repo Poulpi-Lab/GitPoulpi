@@ -349,6 +349,8 @@ fn blocked_by_auto_stash(command: PaletteCommand) -> bool {
             | C::FastForwardCurrentToSelected
             | C::Pull
             | C::PullWithMode(_)
+            | C::PullAllBranches
+            | C::PullAllBranchesWithMode(_)
             | C::CherryPickSelectedCommit
             | C::RevertSelectedCommit
             | C::EditSelectedCommitMessage
@@ -737,6 +739,8 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         C::Fetch
         | C::Pull
         | C::PullWithMode(_)
+        | C::PullAllBranches
+        | C::PullAllBranchesWithMode(_)
         | C::Push
         | C::PushToRemote
         | C::ForcePushWithLease

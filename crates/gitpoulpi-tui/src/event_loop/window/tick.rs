@@ -560,6 +560,10 @@ impl WindowState {
                 .map(|h| h.name.as_str()),
         );
         crate::push_group_ui::drain(&self.link);
+        if crate::branch_sync_dialog::is_checking() {
+            let requester = self.link.activity_handle().raw.requester();
+            crate::branch_sync_dialog::tick(&self.repo.root, &requester, &self.link);
+        }
         if self.link.take_pending_auto_stash_changed() {
             self.pending_auto_stash = crate::autostash_banner::load(&self.repo.root);
         }

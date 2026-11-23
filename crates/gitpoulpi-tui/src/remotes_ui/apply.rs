@@ -45,6 +45,12 @@ pub(crate) fn run_remote_palette_command(
         PaletteCommand::PullWithMode(mode) => {
             *ctx.last_message = Some(ctx.ui.run_pull_mode(mode, refs, ctx.link))
         }
+        PaletteCommand::PullAllBranches => {
+            *ctx.last_message = Some(ctx.ui.run_pull_all_branches(None, refs, ctx.link))
+        }
+        PaletteCommand::PullAllBranchesWithMode(mode) => {
+            *ctx.last_message = Some(ctx.ui.run_pull_all_branches(Some(mode), refs, ctx.link))
+        }
         PaletteCommand::ChoosePullButtonAction => {
             let (c, r) = ctx.ui.pull_anchor();
             ctx.ui.open_pull_menu(refs, c, r);
@@ -306,6 +312,9 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
             Some(msg::FETCHING_ALL.get().into())
         }
         RemoteUiAction::RunPull(mode) => Some(ui.run_pull_mode(mode, refs, link)),
+        RemoteUiAction::RunPullAllBranches(mode) => {
+            Some(ui.run_pull_all_branches(mode, refs, link))
+        }
         RemoteUiAction::PushTo(remote) => match head_branch(refs) {
             Some(head) => {
                 link.submit_action(push_action(&remote, &head, false));

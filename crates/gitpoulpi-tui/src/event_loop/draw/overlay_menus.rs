@@ -172,6 +172,8 @@ pub(in crate::event_loop) fn draw_overlay_menus(
     crate::revert_mainline::render(frame);
     // The tag delete scope dialog, the same way.
     crate::tag_delete_dialog::render(frame);
+    // The "Pull all branches" worktree question, the same way.
+    crate::branch_sync_dialog::render(frame);
     // The sensitive-files question of a refused stage, the same way.
     crate::stage_guard_dialog::render(frame);
     // The grouped push dialog (selection, plan, progress), the same way; it
@@ -254,6 +256,7 @@ pub(in crate::event_loop) fn draw_overlay_menus(
         || crate::open_in_bar::is_open()
         || crate::revert_mainline::is_open()
         || crate::tag_delete_dialog::is_open()
+        || crate::branch_sync_dialog::is_open()
         || crate::stage_guard_dialog::is_open()
         || crate::push_group_ui::is_open()
         || crate::ai_sent_dialog::is_open()

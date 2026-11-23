@@ -61,6 +61,7 @@ pub(crate) fn title_for(action: &Action) -> String {
         | Action::PullThenPush { .. }
         | Action::FetchThenForcePush { .. } => g::TITLE_PUSH,
         Action::Pull(_) => g::TITLE_PULL,
+        Action::PullAllBranches(_) => g::TITLE_PULL_ALL_BRANCHES,
         Action::Fetch(_) | Action::FetchAll => g::TITLE_FETCH,
         Action::CheckoutBranch(_) | Action::CheckoutCommit(_) | Action::CheckoutThen { .. } => {
             g::TITLE_CHECKOUT
@@ -92,6 +93,7 @@ pub(crate) fn done_title(action: &Action) -> Option<String> {
         }
         Action::PushForReview { .. } => Some(g::DONE_PUSH_REVIEW.get().to_string()),
         Action::Pull(_) => Some(g::DONE_PULL.get().to_string()),
+        Action::PullAllBranches(_) => Some(g::DONE_PULL_ALL_BRANCHES.get().to_string()),
         _ => None,
     }
 }
@@ -148,6 +150,7 @@ fn stashable(action: &Action) -> bool {
     matches!(
         action,
         Action::Pull(_)
+            | Action::PullAllBranches(_)
             | Action::CheckoutBranch(_)
             | Action::CheckoutCommit(_)
             | Action::CheckoutThen { .. }

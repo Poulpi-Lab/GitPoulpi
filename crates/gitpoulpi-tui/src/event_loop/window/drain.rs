@@ -232,6 +232,7 @@ impl WindowState {
                             || crate::updates::panel::is_open()
                             // The tag delete dialog's rows are picked by their digit.
                             || crate::tag_delete_dialog::is_open()
+                            || crate::branch_sync_dialog::is_open()
                             // The security check's answers are digits too.
                             || crate::trust_dialog::is_open()
                             // The sensitive-files question: 1 and 2 answer it.
@@ -292,6 +293,7 @@ impl WindowState {
                         || crate::ai_limit_dialog::is_open()
                         || crate::link_confirm::is_open()
                         || crate::stage_guard_dialog::is_open()
+                        || crate::branch_sync_dialog::is_open()
                         || crate::push_group_ui::is_open() => {}
                 // A pasted token goes into Preferences' Integrations form.
                 Event::Paste(text) if self.preferences.is_some() => {

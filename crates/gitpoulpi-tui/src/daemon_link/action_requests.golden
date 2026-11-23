@@ -78,6 +78,10 @@
   Pull {"opts":{"mode":"fast_forward_only","remote":"origin","remote_branch":null}}
   message: already up to date
   ok: true
+== PullAllBranches(PullAllBranchesRequest { fetch: true, fetch_opts: FetchOptions { prune: false, prune_tags: false }, head_mode: Some(Rebase), worktrees: Update })
+  PullAllBranches {"fetch":true,"fetch_opts":{"prune":false,"prune_tags":false},"head_mode":"rebase","worktrees":"update"}
+  message: all branches are up to date
+  ok: true
 == Push { remote: "origin", opts: PushOptions { force_with_lease: false, set_upstream: true, branch: Some("main"), lease: None, remote_branch: None } }
   Push {"opts":{"branch":"main","force_with_lease":false,"lease":null,"remote_branch":null,"set_upstream":true},"remote":"origin"}
   message: pushed main to origin

@@ -146,6 +146,10 @@ pub enum Action {
     /// Integrate as `PullOptions::mode` says, from the upstream or from
     /// `PullOptions::remote` for a branch that has none.
     Pull(PullOptions),
+    /// Fetch, then bring every local branch up to its upstream (the checked-out
+    /// one through the pull path in `head_mode`, the others by fast-forward).
+    /// One journal entry; the outcome is summed up in the status line.
+    PullAllBranches(gitpoulpi_core::domain::PullAllBranchesRequest),
     /// Push a branch (`opts.branch`, or the checked-out one) to `remote`.
     /// A rejection because the remote diverged comes back typed on
     /// `DaemonLink::push_rejected_rx`, not as an error string.
@@ -904,6 +908,7 @@ impl Action {
                 plain(l::ACT_FETCHING)
             }
             Action::Pull(_) => plain(l::ACT_PULLING),
+            Action::PullAllBranches(_) => plain(l::ACT_PULLING_ALL_BRANCHES),
             Action::Push { .. }
             | Action::PushForReview { .. }
             | Action::FetchThenForcePush { .. } => plain(l::ACT_PUSHING),
@@ -990,6 +995,7 @@ impl Action {
                 | Action::SubmoduleUpdate { .. }
                 | Action::CheckoutPullRequestHead { .. }
                 | Action::Pull(_)
+                | Action::PullAllBranches(_)
                 | Action::Push { .. }
                 | Action::PushForReview { .. }
                 | Action::PullThenPush { .. }

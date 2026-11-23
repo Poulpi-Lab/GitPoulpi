@@ -265,6 +265,7 @@ mod board_cmd;
 #[cfg(feature = "hosting")]
 #[cfg_attr(not(feature = "board"), path = "board_view_stub.rs")]
 mod board_view;
+mod branch_sync_dialog;
 mod button_bar;
 mod cell_text;
 mod chrome;

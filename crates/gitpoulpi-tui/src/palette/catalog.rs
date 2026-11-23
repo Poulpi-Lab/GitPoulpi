@@ -997,6 +997,26 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::PullWithMode(PullButtonMode::Rebase),
     ),
     entry(
+        msg::palette::GIT_PULL_ALL_BRANCHES,
+        "Ctrl+G Ctrl+P",
+        PaletteCommand::PullAllBranches,
+    ),
+    entry(
+        msg::palette::GIT_PULL_ALL_BRANCHES_FAST_FORWARD_IF_POSSIBLE,
+        "",
+        PaletteCommand::PullAllBranchesWithMode(PullButtonMode::Merge),
+    ),
+    entry(
+        msg::palette::GIT_PULL_ALL_BRANCHES_FAST_FORWARD_ONLY,
+        "",
+        PaletteCommand::PullAllBranchesWithMode(PullButtonMode::FfOnly),
+    ),
+    entry(
+        msg::palette::GIT_PULL_ALL_BRANCHES_REBASE,
+        "",
+        PaletteCommand::PullAllBranchesWithMode(PullButtonMode::Rebase),
+    ),
+    entry(
         msg::palette::GIT_PULL_OPTIONS,
         "",
         PaletteCommand::ChoosePullButtonAction,

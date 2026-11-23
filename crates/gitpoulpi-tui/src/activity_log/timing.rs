@@ -99,6 +99,7 @@ pub(crate) fn label_for(action: &Action) -> Option<String> {
             | Action::PullThenPush { .. }
             | Action::FetchThenForcePush { .. } => msg::OP_PUSH,
             Action::Pull(_) => msg::OP_PULL,
+            Action::PullAllBranches(_) => msg::OP_PULL_ALL_BRANCHES,
             Action::Fetch(_) | Action::FetchAll => msg::OP_FETCH,
             Action::CheckoutBranch(_)
             | Action::CheckoutCommit(_)

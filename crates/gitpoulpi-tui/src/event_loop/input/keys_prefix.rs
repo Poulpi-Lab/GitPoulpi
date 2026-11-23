@@ -99,6 +99,7 @@ pub(super) fn leader(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         // so the chord and the palette cannot drift.
         Some(
             bind @ (Bind::GitPull
+            | Bind::GitPullAllBranches
             | Bind::GitPush
             | Bind::GitOpenLinkedPr
             | Bind::GitPushTags
@@ -116,6 +117,7 @@ pub(super) fn leader(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         ) => {
             let cmd = match bind {
                 Bind::GitPull => PaletteCommand::Pull,
+                Bind::GitPullAllBranches => PaletteCommand::PullAllBranches,
                 Bind::GitPush => PaletteCommand::Push,
                 // The linked pull/merge request of the
                 // checked-out branch, in the browser: the

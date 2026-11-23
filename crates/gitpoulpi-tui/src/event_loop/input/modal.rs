@@ -335,6 +335,15 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         return Ok(Flow::Handled);
     }
 
+    // The "Pull all branches" worktree question owns the keyboard while open.
+    if key.kind == KeyEventKind::Press
+        && matches!(*cx.input_mode, InputMode::Normal)
+        && crate::branch_sync_dialog::is_open()
+    {
+        crate::branch_sync_dialog::on_key(key, cx.link);
+        return Ok(Flow::Handled);
+    }
+
     // The tag delete scope dialog owns the keyboard while open.
     if key.kind == KeyEventKind::Press
         && matches!(*cx.input_mode, InputMode::Normal)

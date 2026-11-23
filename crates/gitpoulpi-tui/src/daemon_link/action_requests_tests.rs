@@ -125,6 +125,12 @@ fn every_action() -> Vec<Action> {
             remote: Some(s("origin")),
             ..PullOptions::default()
         }),
+        Action::PullAllBranches(gitpoulpi_core::domain::PullAllBranchesRequest {
+            fetch: true,
+            fetch_opts: Default::default(),
+            head_mode: Some(PullMode::Rebase),
+            worktrees: gitpoulpi_core::domain::WorktreePolicy::Update,
+        }),
         Action::Push {
             remote: s("origin"),
             opts: PushOptions {
@@ -432,6 +438,12 @@ fn answer(command: OperationKind) -> serde_json::Value {
         OperationKind::Pull | OperationKind::Merge | OperationKind::FastForward => {
             json!("UpToDate")
         }
+        OperationKind::PullAllBranches => json!({
+            "fetched": ["origin"],
+            "fetch_failed": [],
+            "branches": [],
+            "head_mode": null,
+        }),
         OperationKind::Push | OperationKind::TagPush => json!({ "pushed_refs": ["main"] }),
         OperationKind::Rebase
         | OperationKind::RebaseInteractive

@@ -2153,23 +2153,23 @@ not_a_file = "{path} är inte en fil"
 
 [remotes]
 # context: row of the Pull dropdown: fetch, then bring every local branch up to its upstream; the checked-out one follows the mode of the Pull button
-pull_all_branches = "{$Pull} all branches"
+pull_all_branches = "{$Pull} alla grenar"
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is fast-forwarded, or merged when it has diverged
-pull_all_branches_merge = "{$Pull} all branches (fast-forward if possible)"
+pull_all_branches_merge = "{$Pull} alla grenar (fast-forward om möjligt)"
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is only fast-forwarded
-pull_all_branches_ff_only = "{$Pull} all branches (fast-forward only)"
+pull_all_branches_ff_only = "{$Pull} alla grenar (bara fast-forward)"
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is rebased onto its upstream
-pull_all_branches_rebase = "{$Pull} all branches ({$rebase})"
+pull_all_branches_rebase = "{$Pull} alla grenar ({$rebase})"
 # context: tooltip of the "Pull all branches" row
-tip_pull_all_branches = "{$Fetch} from the remotes, then fast-forward every local branch that is only behind its upstream. The checked-out branch follows the mode of the {$Pull} button; a diverged branch is left alone and reported."
+tip_pull_all_branches = "{$Fetch} från remotes och gör sedan fast-forward på varje lokal gren som bara ligger efter sin upstream. Den utcheckade grenen följer läget för knappen {$Pull}; en divergerad gren lämnas orörd och rapporteras."
 # context: tooltip of the "Pull all branches (fast-forward if possible)" row
-tip_pull_all_branches_merge = "Like {$Pull} all branches, but the checked-out branch is fast-forwarded, or gets a {$merge} when it has diverged."
+tip_pull_all_branches_merge = "Som {$Pull} alla grenar, men den utcheckade grenen får fast-forward, eller en {$merge} om den har divergerat."
 # context: tooltip of the "Pull all branches (fast-forward only)" row
-tip_pull_all_branches_ff_only = "Like {$Pull} all branches, but the checked-out branch is only fast-forwarded; when it has diverged it is left as it is."
+tip_pull_all_branches_ff_only = "Som {$Pull} alla grenar, men den utcheckade grenen får bara fast-forward; har den divergerat lämnas den orörd."
 # context: tooltip of the "Pull all branches (rebase)" row
-tip_pull_all_branches_rebase = "Like {$Pull} all branches, but the checked-out branch is moved onto its upstream with a {$rebase}."
+tip_pull_all_branches_rebase = "Som {$Pull} alla grenar, men den utcheckade grenen flyttas till sin upstream med en {$rebase}."
 # context: status line while "Pull all branches" runs
-pulling_all_branches = "Pulling all branches..."
+pulling_all_branches = "Pullar alla grenar..."
 menu_title = "remote {name}"
 fetch_remote = { git = "Fetch {name}", local = "Hämta {name}" }
 copy_name = "Kopiera remotens namn"
@@ -2287,7 +2287,7 @@ pulling_from_all = { git = "pullar {branch} från {remotes}...", local = "pullar
 no_pull_remote = "{branch} har ingen remote att {$pull} från"
 
 [keymap_action]
-git_prefix_pull_all_branches = "{$Pull} All Branches"
+git_prefix_pull_all_branches = "{$Pull} alla grenar"
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
 global_commit_column = { git = "Visa eller dölj commit-kolumnen", local = "Visa eller dölj kolumnen med incheckningar" }
 git_prefix_amend = "Ändra vald {$commit}"
@@ -2675,7 +2675,7 @@ taken_zellij = "zellij (dess lägestangenter, om inte låst)"
 taken_windows_terminal = "Windows Terminal"
 taken_terminal_tabs = "flikbyte i terminalen (kitty, WezTerm, Ghostty, Windows Terminal)"
 chord_reason = "{chord}: {reason}"
-no_modifier_after_prefix = "{chord}: tangenten efter ett prefix kan inte ha Alt"
+no_modifier_after_prefix = "{chord}: tangenten efter ett prefix kan inte kombineras med Alt"
 this_key_fixed = "den här tangenten är fast"
 fixed_esc = "Esc är fast: den avbryter alltid"
 fixed_editing_chord = "en textredigeringskombination, fast i redigeraren"
@@ -3001,10 +3001,10 @@ action_issue_body = "Ärendebeskrivning"
 title_hosting_base = "Grundprompt för svar"
 
 [palette]
-git_pull_all_branches = "Git: {$Pull} All Branches"
-git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} All Branches (fast-forward if possible)"
-git_pull_all_branches_fast_forward_only = "Git: {$Pull} All Branches (fast-forward only)"
-git_pull_all_branches_rebase = "Git: {$Pull} All Branches ({$rebase})"
+git_pull_all_branches = "Git: {$Pull} alla grenar"
+git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} alla grenar (fast-forward om möjligt)"
+git_pull_all_branches_fast_forward_only = "Git: {$Pull} alla grenar (bara fast-forward)"
+git_pull_all_branches_rebase = "Git: {$Pull} alla grenar ({$rebase})"
 sidebar_show_worktrees = "Sidopanel: Visa avsnittet Worktrees"
 refs_open_worktree_in = "Refs: Öppna worktree i..."
 refs_merge_worktree_branch_into = { git = "Refs: Merge worktreens gren i...", local = "Refs: Slå ihop worktreens gren i..." }
@@ -3812,7 +3812,7 @@ split = "Dela upp en {$commit}"
 markdown_editor = "Markdown-redigerare (kommentarer, beskrivningar, sammanfattningar)"
 
 [help_text]
-git_actions_then_pull_all_branches = "{$pull} all branches: {$fetch}, fast-forward every branch that is only behind its upstream, {$pull} the checked-out one (also a row of the {$Pull} ▾)"
+git_actions_then_pull_all_branches = "{$pull} alla grenar: {$fetch}, gör fast-forward på varje gren som bara ligger efter sin upstream, {$pull} den utcheckade (också en rad i {$Pull} ▾)"
 git_actions_then_amend = "ändra vald {$commit}: sammanfattning, beskrivning, författarens namn, e-post och datum i ett fönster"
 git_actions_then_edit_author = { git = "ändra bara författaren för den valda commiten (namn, e-post, datum)", local = "ändra bara författaren för den valda incheckningen (namn, e-post, datum)" }
 rewrite_1 = "öppnar omskrivningsvyn: ändra författare, datum, meddelanden, filinnehåll eller sökvägar i hela historiken eller i ett urval"
@@ -5091,53 +5091,53 @@ desc_rebasing = { git = "gör rebase av {branch} på {onto}", local = "gör reba
 desc_rebasing_step = { git = "gör rebase av {branch} på {onto} · steg {k}/{n}", local = "gör rebase av {branch} på {onto} · steg {k}/{n}" }
 
 [link]
-act_pulling_all_branches = "{$pull} all branches..."
+act_pulling_all_branches = "{$pull} alla grenar..."
 # context: status line after Pull all branches when every branch was already up to date
-pulled_all_nothing = "all branches are up to date"
+pulled_all_nothing = "alla grenar är redan aktuella"
 # context: status line after Pull all branches; {n} branches were moved to their upstream
-pulled_all_updated = { one = "updated {n} branch", other = "updated {n} branches" }
+pulled_all_updated = { one = "uppdaterade {n} gren", other = "uppdaterade {n} grenar" }
 # context: status line after Pull all branches; {n} branches were updated, {m} were left alone for the reasons in {why}
-pulled_all_updated_skipped = { one = "updated {n} branch, skipped {m} ({why})", other = "updated {n} branches, skipped {m} ({why})" }
+pulled_all_updated_skipped = { one = "uppdaterade {n} gren, hoppade över {m} ({why})", other = "uppdaterade {n} grenar, hoppade över {m} ({why})" }
 # context: status line after Pull all branches; nothing moved, {m} branches were left alone for the reasons in {why}
-pulled_all_none_skipped = "nothing updated, skipped {m} ({why})"
+pulled_all_none_skipped = "inget uppdaterades, hoppade över {m} ({why})"
 # context: status line after Pull all branches stopped on conflicts in the checked-out branch {branch}; {n} other branches were updated before
-pulled_all_conflict = { one = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branch updated)", other = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branches updated)" }
+pulled_all_conflict = { one = "konflikter i {branch}: lös dem eller avbryt, som vid en vanlig {$pull_noun} ({n} annan gren uppdaterad)", other = "konflikter i {branch}: lös dem eller avbryt, som vid en vanlig {$pull_noun} ({n} andra grenar uppdaterade)" }
 # context: end of the Pull all branches status line; {summary} is the rest of the line, {remotes} lists the remotes that could not be downloaded
-pulled_all_fetch_failed = "{summary}; {$fetch} failed for {remotes}"
+pulled_all_fetch_failed = "{summary}; {$fetch} misslyckades för {remotes}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_diverged = "{n} diverged"
+skip_diverged = "{n} divergerade"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_upstream_gone = "{n} with the upstream gone"
+skip_upstream_gone = "{n} vars upstream saknas"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_worktree = "{n} checked out in another worktree"
+skip_worktree = "{n} utcheckade i en annan worktree"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_local_upstream = "{n} tracking a local branch"
+skip_local_upstream = "{n} som följer en lokal gren"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_not_downloaded = "{n} not downloaded"
+skip_not_downloaded = "{n} inte nedladdade"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_branch_failed = "{n} failed"
+skip_branch_failed = "{n} misslyckades"
 # context: one Activity Log line of Pull all branches; {branch} moved from {from} to {to}
-pulled_all_line_updated = "{branch}: updated {from} to {to}"
+pulled_all_line_updated = "{branch}: uppdaterad från {from} till {to}"
 # context: one Activity Log line of Pull all branches; the branch was already at its upstream
-pulled_all_line_up_to_date = "{branch}: up to date"
+pulled_all_line_up_to_date = "{branch}: redan aktuell"
 # context: one Activity Log line of Pull all branches; the branch has commits its upstream lacks and nothing to pull
-pulled_all_line_ahead = "{branch}: ahead of {upstream}, nothing to {$pull}"
+pulled_all_line_ahead = "{branch}: ligger före {upstream}, inget att {$pull}"
 # context: one Activity Log line of Pull all branches; neither side contains the other
-pulled_all_line_diverged = "{branch}: diverged from {upstream}, left as it is"
+pulled_all_line_diverged = "{branch}: har divergerat från {upstream}, lämnad orörd"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_upstream_gone = "{branch}: {upstream} no longer exists"
+pulled_all_line_upstream_gone = "{branch}: {upstream} finns inte längre"
 # context: one Activity Log line of Pull all branches; {path} is the other worktree
-pulled_all_line_elsewhere = "{branch}: checked out in {path}, skipped"
+pulled_all_line_elsewhere = "{branch}: utcheckad i {path}, hoppades över"
 # context: one Activity Log line of Pull all branches; {path} is the other worktree that was fast-forwarded
-pulled_all_line_worktree = "{branch}: updated in {path}"
+pulled_all_line_worktree = "{branch}: uppdaterad i {path}"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_local_upstream = "{branch}: follows the local branch {upstream}, skipped"
+pulled_all_line_local_upstream = "{branch}: följer den lokala grenen {upstream}, hoppades över"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_not_downloaded = "{branch}: not downloaded, left as it is"
+pulled_all_line_not_downloaded = "{branch}: inte nedladdad, lämnad orörd"
 # context: one Activity Log line of Pull all branches; {why} is the reason
-pulled_all_line_failed = "{branch}: failed ({why})"
+pulled_all_line_failed = "{branch}: misslyckades ({why})"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_conflicted = "{branch}: conflicts, resolve them or abort"
+pulled_all_line_conflicted = "{branch}: konflikter, lös dem eller avbryt"
 # context: {path} is the folder of the removed worktree
 worktree_removed = "tog bort worktree {path}"
 worktree_removed_branch_deleted = "tog bort worktree {path} och raderade grenen {branch} (Ångra ger tillbaka grenen)"
@@ -5799,7 +5799,7 @@ unknown_action = "okänd åtgärd '{name}' i [{ctx}]"
 unknown_context = "okänd kontext '{ctx}'"
 not_rebindable = "kan inte ändras ännu"
 key_fixed = "den här tangenten är fast"
-prefix_mods = "'{text}': tangenten efter ett prefix kan inte ha Alt"
+prefix_mods = "'{text}': tangenten efter ett prefix kan inte kombineras med Alt"
 ignored_one = "tangentbindningar: 1 post ignorerades ({id}: {message})"
 ignored_many = "tangentbindningar: {n} poster ignorerades (första: {id}: {message})"
 
@@ -6274,7 +6274,7 @@ keymap_next_card = "Gå till nästa jämförda rad"
 help_next_card = "flytta Log-markören till nästa jämförda rad (markeringen behålls); ett klick på ett kort i högerpanelen gör detsamma"
 
 [activity_log]
-op_pull_all_branches = "{$Pull} all branches"
+op_pull_all_branches = "{$Pull} alla grenar"
 title = "Aktivitetslogg"
 tab_application = "Program"
 op_open = "Öppna repository"
@@ -6392,8 +6392,8 @@ app_select_first = "Markera en rad först: klicka på den eller tryck på ] för
 app_no_operation = "Den här raden hör inte till någon åtgärd."
 
 [git_error]
-title_pull_all_branches = "{$Pull} all branches failed"
-done_pull_all_branches = "{$Pull} all branches done"
+title_pull_all_branches = "{$Pull} alla grenar misslyckades"
+done_pull_all_branches = "{$Pull} alla grenar klar"
 summary_host_key = "SSH-värdnyckeln för remoten är ännu inte känd."
 hint_host_key = "Kör `ssh -T git@<host>` en gång i en terminal, kontrollera fingeravtrycket och svara yes, och försök sedan igen. Eller ange en known_hosts-fil för det här repositoryt under SSH & inloggning."
 title_push = "{$Push} misslyckades"
@@ -10357,24 +10357,24 @@ gave_up = "{short} redigerades inte: grenen checkades inte ut"
 
 [branch_sync]
 # context: title of the dialog asked before Pull all branches when a branch is checked out in another worktree
-dlg_title = "{$Pull} all branches"
+dlg_title = "{$Pull} alla grenar"
 # context: question of that dialog; the branches and their worktrees are listed under it
-dlg_question = "These branches are behind and checked out in other worktrees:"
+dlg_question = "De här grenarna ligger efter och är utcheckade i andra worktrees:"
 # context: one line of that list; {branch} is a branch, {path} the worktree folder
-row = "{branch}  in  {path}"
+row = "{branch}  i  {path}"
 # context: first answer: also fast-forward the other worktrees
-opt_update = "Update those worktrees too"
+opt_update = "Uppdatera de worktreesen också"
 # context: second answer: leave the other worktrees alone
-opt_skip = "Skip them"
+opt_skip = "Hoppa över dem"
 # context: third answer: do not run
-opt_cancel = "Cancel"
+opt_cancel = "Avbryt"
 # context: explanation under the highlighted first answer
-detail_update = "Each worktree is fast-forwarded in its own folder. One whose local changes the update would overwrite is left as it is and reported."
+detail_update = "Varje worktree får fast-forward i sin egen mapp. En vars lokala ändringar uppdateringen skulle skriva över lämnas orörd och rapporteras."
 # context: explanation under the highlighted second answer
-detail_skip = "They are left as they are and listed as skipped in the summary."
+detail_skip = "De lämnas orörda och listas som överhoppade i sammanfattningen."
 # context: explanation under the highlighted third answer
-detail_cancel = "Nothing is downloaded or changed."
+detail_cancel = "Inget hämtas eller ändras."
 # context: key hints of that dialog
-dlg_hint = "Up/Down or 1-3 choose  Enter confirm  Esc cancel"
+dlg_hint = "Upp/Ned eller 1-3 väljer  Enter bekräftar  Esc avbryter"
 # context: last line of the list of that dialog when more branches exist than fit; {n} is how many
-more = "and {n} more"
+more = "och {n} till"

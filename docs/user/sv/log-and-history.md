@@ -495,6 +495,18 @@ Blame visar hela filen med radnummer och syntaxfärger, och en annoteringskolumn
   möjligt)*, *Pull (bara fast-forward)* eller *Pull (rebase)* en gång, utan att
   ändra knappen. Läget skickas alltid uttryckligen till git, så din
   git-konfigurations `pull.rebase` kan inte överraska dig.
+- **Pull alla grenar** (`Ctrl+G Ctrl+P`, en rad i Pull-`▾`) hämtar från de remotes
+  som dina grenar följer och för sedan varje lokal gren fram till sin upstream i
+  ett svep. En gren som inte är utcheckad får bara fast-forward (ingen fil
+  rörs); en som har divergerat lämnas orörd och rapporteras. Den utcheckade
+  grenen pullas som Pull-knappen är inställd, och `▾` har också raden för
+  vart och ett av de andra lägena (*Pull alla grenar (bara fast-forward)*,
+  *(rebase)*, *(fast-forward om möjligt)*). När en gren som ligger efter är
+  utcheckad i en annan worktree frågar en dialogruta först om de worktreesen
+  också ska uppdateras, hoppas över eller om körningen ska avbrytas.
+  Statusraden sammanfattar körningen och Aktivitetsloggen har en rad per gren;
+  Ångra för tillbaka alla grenar i ett steg. `Ctrl+G p` är fortfarande en
+  vanlig Pull.
 - **Push** (`Ctrl+G Shift+P`) skickar den utcheckade grenen till
   standard-remoten och ställer in upstream första gången. Dess `▾` pushar en
   gång till en annan remote du väljer. Om remoten har commits som du inte har

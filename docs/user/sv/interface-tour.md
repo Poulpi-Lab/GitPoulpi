@@ -176,7 +176,7 @@ Som standard är det en rad under panelerna och ovanför statusraden. **Inställ
 | Knapp | Vad den gör |
 |---|---|
 | **Ångra**, **Gör om** | Tar tillbaka eller återställer den senaste operationen (`Ctrl+Z`, `Ctrl+Y`). Dold när Ångra är av. Se [Ångra och gör om](undo-redo.md). |
-| **Pull** `▾` | Gör pull som **Inställningar > Git & kodning > Pull-knapp** säger. Listan under `▾` har **Fetch All**, **Pull (fast-forward om möjligt)**, **Pull (bara fast-forward)** och **Pull (rebase)**. Ett listalternativ körs en gång och ändrar inte knappen. |
+| **Pull** `▾` | Gör pull som **Inställningar > Git & kodning > Pull-knapp** säger. Listan under `▾` har **Fetch All**, **Pull (fast-forward om möjligt)**, **Pull (bara fast-forward)** och **Pull (rebase)**, sedan **Pull alla grenar** (`Ctrl+G Ctrl+P`) och samma sak med vart och ett av de andra lägena för den utcheckade grenen. Ett listalternativ körs en gång och ändrar inte knappen. |
 | **Push** `▾` | Pushar den utcheckade grenen. Listan under `▾` pushar en gång till den remote du väljer. |
 | **Gren** | Skapar en gren vid den utcheckade commiten. |
 | **Tag** | Skapar en tag vid den utcheckade commiten. |

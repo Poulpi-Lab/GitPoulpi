@@ -313,9 +313,7 @@ pub(in crate::event_loop) fn handle_mouse(
 ) -> io::Result<Flow> {
     let slots = open_menu::MenuSlots::of(cx);
     cx.tooltip.take_fed();
-    if cancel_pending_prefix(cx, mouse) {
-        return Ok(Flow::Handled);
-    }
+    cancel_pending_prefix(cx, mouse);
     let mut ordinary = false;
     let flow = handle_mouse_inner(cx, env, mouse, forced_hit, &mut ordinary);
     // The ordinary path set the pointer in `mouse_moved`; every surface that
@@ -340,19 +338,19 @@ pub(in crate::event_loop) fn handle_mouse(
 
 /// A pending chord prefix (`Ctrl+G`, `Ctrl+N`, and the `Ctrl+N` badges over a
 /// framed dialog) is cancelled by a mouse press, as `Esc` does (same reset,
-/// same status line). Decision: the press is swallowed, like every modal's
-/// outside click (a click outside closes it and never reaches the pane below);
-/// the wheel and the pointer moving alone leave the chord pending, as they do
-/// for an open menu. The hint lives in the footer and has no clickable entry.
-fn cancel_pending_prefix(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> bool {
+/// same status line). Decision: the press is not swallowed: it cancels the
+/// chord and then goes on to the normal mouse handling (a click still selects,
+/// opens its menu...). The wheel and the pointer moving alone leave the chord
+/// pending, as they do for an open menu. The hint lives in the footer and has no clickable entry.
+fn cancel_pending_prefix(cx: &mut CommandCtx<'_>, mouse: MouseEvent) {
     if !matches!(mouse.kind, MouseEventKind::Down(_)) {
-        return false;
+        return;
     }
     let message = match &*cx.input_mode {
         InputMode::Leader => None,
         InputMode::Navigation => Some(gitpoulpi_i18n::msg::input::NAVIGATION_CANCELED.get()),
         _ if crate::dialog_kit::frame::armed() => Some(gitpoulpi_i18n::msg::input::CANCELED.get()),
-        _ => return false,
+        _ => return,
     };
     if matches!(*cx.input_mode, InputMode::Leader | InputMode::Navigation) {
         *cx.input_mode = InputMode::Normal;
@@ -362,7 +360,6 @@ fn cancel_pending_prefix(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> bool {
     if let Some(message) = message {
         *cx.last_message = Some(message.into());
     }
-    true
 }
 
 fn handle_mouse_inner(

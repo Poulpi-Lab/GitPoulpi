@@ -39,7 +39,7 @@ same rules everywhere:
   outside click never closes a full view (Settings, the Diff view, the File
   View, the editors, Review, Board): they have no outside.
 - A click **inside** a panel never closes it.
-- A mouse press (left or right) while a `Ctrl+G` or `Ctrl+N` chord waits for its second key cancels the chord like `Esc`, and does nothing else.
+- A mouse press (left or right) while a `Ctrl+G` or `Ctrl+N` chord waits for its second key cancels the chord like `Esc`, and then acts as usual (a click still selects, a right click still opens its menu).
 - A form that holds text you typed (a new issue, a pull or merge request) ignores
   an outside click, so a stray click cannot lose it. `✕` and `Esc` ask
   **Discard changes?** first; **Keep editing** goes back. A form with nothing

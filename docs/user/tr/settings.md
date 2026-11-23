@@ -188,7 +188,7 @@ başlatıcısından, seçtiğiniz terminalde başlatan bir kısayol oluşturur.
 | Satır | Ne yapar |
 |---|---|
 | **Kurulum** | Salt okunur: bu kurulumun türü, klasörü ve ortamı. Dar bir sayfada klasör ortadan üç noktayla kısaltılır; satırın altındaki yardım satırında tam metin bulunur. |
-| **Başlatıcı adı** | Bu kurulumun kısayollarının ve klasör menüsü girdisinin adı. Hâlâ var olan başka bir kurulum bu adı taşıyorsa reddedilir. Birincil kurulumun adı her zaman `GitPoulpi`'dir. |
+| **Başlatıcı adı** | Bu kurulumun kısayollarının ve klasör menüsü girdisinin adı. Hâlâ var olan başka bir kurulum bu adı taşıyorsa reddedilir. Değiştirmek, bu kurulumun zaten sahip olduğu kısayolları (Başlat menüsü, Masaüstü, uygulama başlatıcı girdisi) yeniden adlandırır ve klasör menüsü girdisinin etiketini yerinde günceller; hiçbiri oluşturulmaz. Birincil kurulumun adı her zaman `GitPoulpi`'dir. |
 | **Başlatıcı adına sürümü ekle** | Ada `<major>.<minor>` ekler (`GitPoulpi 1.2`); kısayollar her güncellemede yeniden adlandırıldığı için varsayılan olarak kapalıdır. |
 | **Ahtapot rengi** | Bu kurulumun ahtapotunun ve kısayollarının rengi (Hakkında penceresiyle aynı seçenekler). |
 | **Birincil kurulum ol** | Birincil kurulum düz `GitPoulpi` adını, eski kısayolları ve eski sürümlerin okuduğu `ui.*` anahtarlarını üstlenir; varsayılan olarak hiçbiri birincil değildir. Başka bir kurulum birincilse önce sorar. Önceki birincil, başlatıcılarını kendi adı altında korur (Windows ve Linux). Rol değiştirmek (birincil olmak ya da birincilikten ayrılmak) bu kurulumun kısayollarını yerinde yeniden adlandırır, yani kısayolsuz bir an hiç olmaz, ve dosya yöneticisi girdisini yeni ada taşır. |

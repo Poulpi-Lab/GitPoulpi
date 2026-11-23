@@ -552,6 +552,17 @@ of the Diff view (hunks / whole file, inline / split, word diff, minimap, wrap).
   All*, *Pull (fast-forward if possible)*, *Pull (fast-forward only)* or *Pull
   (rebase)* once, without changing the button. The mode is always passed to git
   explicitly, so your git config's `pull.rebase` cannot surprise you.
+- **Pull all branches** (`Ctrl+G Ctrl+P`, a row of the Pull `▾`) downloads from
+  the remotes your branches follow, then brings every local branch up to its
+  upstream in one go. A branch that is not checked out is only ever
+  fast-forwarded (no file is touched); one that has diverged is left alone and
+  reported. The checked-out branch is pulled the way the Pull button is set to,
+  and the `▾` also has the row for each other mode (*Pull all branches
+  (fast-forward only)*, *(rebase)*, *(fast-forward if possible)*). When a
+  behind branch is checked out in another worktree, a dialog asks first whether
+  to update those worktrees too, skip them or cancel. The status line sums the
+  run up and the Activity Log has one line per branch; Undo brings every branch
+  back in one step. `Ctrl+G p` stays a plain Pull.
 - **Push** (`Ctrl+G Shift+P`) sends the checked-out branch to the default
   remote, setting the upstream the first time. Its `▾` pushes once to another
   remote you choose. If the remote has commits you do not, a dialog

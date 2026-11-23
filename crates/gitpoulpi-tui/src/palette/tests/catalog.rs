@@ -226,6 +226,8 @@ fn every_mouse_affordance_maps_to_a_palette_command() {
             R::AddRemote => PaletteCommand::AddRemote,
             R::FetchAllRemotes => PaletteCommand::Fetch,
             R::RunPull(mode) => PaletteCommand::PullWithMode(*mode),
+            R::RunPullAllBranches(None) => PaletteCommand::PullAllBranches,
+            R::RunPullAllBranches(Some(mode)) => PaletteCommand::PullAllBranchesWithMode(*mode),
             R::PushTo(_) | R::PushOne { .. } => PaletteCommand::PushToRemote,
             R::PushAll { .. } => PaletteCommand::PushToAllTargets,
             R::PushSelected { .. } => PaletteCommand::PushToSelectedRemotes,

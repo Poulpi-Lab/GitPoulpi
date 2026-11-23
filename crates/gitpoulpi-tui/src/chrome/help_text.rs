@@ -124,6 +124,7 @@ pub(crate) const HELP_TEXT: &[HelpEntry] = &[
     Item(keys!("{git_prefix.ai_explain}"), msg::help_text::GIT_ACTIONS_THEN_8),
     Item(keys!("{git_prefix.ai_compose}"), msg::help_text::GIT_ACTIONS_THEN_9),
     Item(keys!("{git_prefix.pull}"), msg::help_text::GIT_ACTIONS_THEN_10),
+    Item(keys!("{git_prefix.pull_all_branches}"), msg::help_text::GIT_ACTIONS_THEN_PULL_ALL_BRANCHES),
     Item(keys!("{git_prefix.push}"), msg::help_text::GIT_ACTIONS_THEN_11),
     Item(keys!("{git_prefix.fetch_all}"), msg::help_text::GIT_ACTIONS_THEN_12),
     Item(keys!("{git_prefix.new_branch}"), msg::help_text::GIT_ACTIONS_THEN_13),

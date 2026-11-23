@@ -207,6 +207,9 @@ fn every_git_prefix_default_resolves_to_its_own_action() {
             };
             let mods = if chord.mods.shift {
                 crossterm::event::KeyModifiers::SHIFT
+            } else if chord.mods.ctrl {
+                // A Ctrl chord after a prefix (`Ctrl+G Ctrl+P`) matches exactly.
+                crossterm::event::KeyModifiers::CONTROL
             } else {
                 crossterm::event::KeyModifiers::NONE
             };

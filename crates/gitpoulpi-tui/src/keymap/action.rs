@@ -417,6 +417,7 @@ actions! {
     GitStageFile => (GitPrefix, "git_prefix.stage_file", GIT_PREFIX_STAGE_FILE, ["s"]),
     GitUnstageFile => (GitPrefix, "git_prefix.unstage_file", GIT_PREFIX_UNSTAGE_FILE, ["u"]),
     GitPull => (GitPrefix, "git_prefix.pull", GIT_PREFIX_PULL, ["p"]),
+    GitPullAllBranches => (GitPrefix, "git_prefix.pull_all_branches", GIT_PREFIX_PULL_ALL_BRANCHES, ["Ctrl+P"]),
     GitPush => (GitPrefix, "git_prefix.push", GIT_PREFIX_PUSH, ["Shift+P"]),
     GitOpenLinkedPr => (GitPrefix, "git_prefix.open_linked_pr", GIT_PREFIX_OPEN_LINKED_PR, ["g"], @Hosting),
     GitPushTags => (GitPrefix, "git_prefix.push_tags", GIT_PREFIX_PUSH_TAGS, ["Shift+U"]),

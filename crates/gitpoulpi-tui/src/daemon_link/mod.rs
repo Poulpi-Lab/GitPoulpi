@@ -50,6 +50,7 @@ use crate::commit_files_cache::{
 };
 
 mod action;
+mod branch_sync_summary;
 mod conn;
 mod convert_summary;
 pub(crate) mod error_text;

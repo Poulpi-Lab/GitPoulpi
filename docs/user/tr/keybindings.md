@@ -89,6 +89,7 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `git_prefix` | `stage_file` | Seçili Dosyayı Stage'le | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | Seçili Dosyayı Unstage'le | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
+| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | Bağlı Pull Request Aç | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | Push: Tüm Tag'ler | `Ctrl+G Shift+U` |
@@ -658,6 +659,10 @@ Tuşlar varsayılanlardır.
 | Git: Pull (mümkünse fast-forward) |  |
 | Git: Pull (yalnızca fast-forward) |  |
 | Git: Pull (rebase) |  |
+| Git: Pull All Branches | `Ctrl+G Ctrl+P` |
+| Git: Pull All Branches (fast-forward if possible) |  |
+| Git: Pull All Branches (fast-forward only) |  |
+| Git: Pull All Branches (Rebase) |  |
 | Git: Pull Seçenekleri... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Uzak Depoya Push Et... |  |

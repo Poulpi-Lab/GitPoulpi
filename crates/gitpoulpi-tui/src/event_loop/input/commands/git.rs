@@ -209,6 +209,8 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
         PaletteCommand::Fetch
         | PaletteCommand::Pull
         | PaletteCommand::PullWithMode(_)
+        | PaletteCommand::PullAllBranches
+        | PaletteCommand::PullAllBranchesWithMode(_)
         | PaletteCommand::ChoosePullButtonAction
         | PaletteCommand::LfsMenu
         | PaletteCommand::Push

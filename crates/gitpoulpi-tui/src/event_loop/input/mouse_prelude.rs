@@ -446,6 +446,15 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
         }
         return Ok(None);
     }
+    // The "Pull all branches" worktree question is modal the same way.
+    if crate::branch_sync_dialog::is_open() && matches!(*cx.input_mode, InputMode::Normal) {
+        *cx.hovered_target = None;
+        *cx.hovered_tab_index = None;
+        *cx.hovered_close_tab = None;
+        *cx.hovered_status_row = None;
+        crate::branch_sync_dialog::on_mouse(mouse, cx.link);
+        return Ok(None);
+    }
     // The tag delete scope dialog is modal the same way.
     if crate::tag_delete_dialog::is_open() {
         *cx.hovered_target = None;

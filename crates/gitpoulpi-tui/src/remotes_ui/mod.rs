@@ -256,6 +256,9 @@ pub(crate) enum RemoteUiAction {
     /// The Pull dropdown's pull items: run at once. The button itself
     /// stays "Pull" and keeps following `git.pull_mode`.
     RunPull(PullButtonMode),
+    /// The Pull dropdown's "Pull all branches" rows: `None` pulls the
+    /// checked-out branch in the Pull button's mode, `Some` in that one.
+    RunPullAllBranches(Option<PullButtonMode>),
     /// A row of the toolbar's `LFS` dropdown: runs at once.
     Lfs(crate::lfs_ui::LfsMenuItem),
     /// A row of the toolbar's `Flow` dropdown: the window opens the dialog
@@ -337,6 +340,16 @@ impl RemoteUiAction {
             RemoteUiAction::RunPull(PullButtonMode::Merge) => msg::TIP_PULL_MERGE.get().into(),
             RemoteUiAction::RunPull(PullButtonMode::FfOnly) => msg::TIP_PULL_FF_ONLY.get().into(),
             RemoteUiAction::RunPull(PullButtonMode::Rebase) => msg::TIP_PULL_REBASE.get().into(),
+            RemoteUiAction::RunPullAllBranches(None) => msg::TIP_PULL_ALL_BRANCHES.get().into(),
+            RemoteUiAction::RunPullAllBranches(Some(PullButtonMode::Merge)) => {
+                msg::TIP_PULL_ALL_BRANCHES_MERGE.get().into()
+            }
+            RemoteUiAction::RunPullAllBranches(Some(PullButtonMode::FfOnly)) => {
+                msg::TIP_PULL_ALL_BRANCHES_FF_ONLY.get().into()
+            }
+            RemoteUiAction::RunPullAllBranches(Some(PullButtonMode::Rebase)) => {
+                msg::TIP_PULL_ALL_BRANCHES_REBASE.get().into()
+            }
             RemoteUiAction::PushTo(remote) => msg::tip_push_to(remote),
             RemoteUiAction::FetchRemote(remote) => msg::tip_fetch_remote(remote),
             RemoteUiAction::SetDefaultRemote(remote) => msg::tip_set_default(remote),
@@ -492,10 +505,24 @@ pub(crate) fn pull_mode_label(mode: PullButtonMode) -> M {
     }
 }
 
+/// The dropdown's wording of "Pull all branches" with the checked-out
+/// branch's mode (`None`: the Pull button's own).
+pub(crate) fn pull_all_branches_label(mode: Option<PullButtonMode>) -> M {
+    match mode {
+        None => msg::PULL_ALL_BRANCHES,
+        Some(PullButtonMode::Merge) => msg::PULL_ALL_BRANCHES_MERGE,
+        Some(PullButtonMode::FfOnly) => msg::PULL_ALL_BRANCHES_FF_ONLY,
+        Some(PullButtonMode::Rebase) => msg::PULL_ALL_BRANCHES_REBASE,
+    }
+}
+
 /// The Pull dropdown: Fetch All and the pull variants, each of
-/// which runs when chosen (the button is always "Pull").
+/// which runs when chosen (the button is always "Pull"), then "Pull all
+/// branches" in the button's mode and in each other mode (the mode only
+/// reaches the checked-out branch; the others are fast-forwarded).
 pub(crate) fn pull_mode_entries() -> Vec<Entry<RemoteUiAction>> {
-    std::iter::once(Entry::action(
+    let (current, _) = sync_settings();
+    let mut entries: Vec<Entry<RemoteUiAction>> = std::iter::once(Entry::action(
         glyph_label("\u{21BB}", msg::FETCH_ALL.get()),
         RemoteUiAction::FetchAllRemotes,
     ))
@@ -505,7 +532,36 @@ pub(crate) fn pull_mode_entries() -> Vec<Entry<RemoteUiAction>> {
             RemoteUiAction::RunPull(*m),
         )
     }))
-    .collect()
+    .collect();
+    entries.push(Entry::Separator);
+    entries.push(
+        Entry::action(
+            glyph_label("\u{21CA}", pull_all_branches_label(None).get()),
+            RemoteUiAction::RunPullAllBranches(None),
+        )
+        .with_key(crate::keymap::Action::GitPullAllBranches),
+    );
+    entries.extend(
+        PullButtonMode::ALL
+            .iter()
+            .filter(|m| **m != current)
+            .map(|m| {
+                Entry::action(
+                    glyph_label("\u{21CA}", pull_all_branches_label(Some(*m)).get()),
+                    RemoteUiAction::RunPullAllBranches(Some(*m)),
+                )
+            }),
+    );
+    entries
+}
+
+/// The core pull mode a dropdown mode stands for.
+pub(crate) fn core_pull_mode(mode: PullButtonMode) -> PullMode {
+    match mode {
+        PullButtonMode::Merge => PullMode::Merge,
+        PullButtonMode::FfOnly => PullMode::FastForwardOnly,
+        PullButtonMode::Rebase => PullMode::Rebase,
+    }
 }
 
 /// The toolbar's `Flow` dropdown: one row per command (`flow::menu_rows`).

@@ -94,6 +94,7 @@ pub(crate) fn uses_network(action: &Action) -> bool {
         Action::Fetch(_)
             | Action::FetchAll
             | Action::Pull(_)
+            | Action::PullAllBranches(_)
             | Action::Push { .. }
             | Action::PushForReview { .. }
             | Action::PullThenPush { .. }

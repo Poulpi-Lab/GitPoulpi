@@ -90,6 +90,7 @@ préfixe (`Ctrl+G s`).
 | `git_prefix` | `stage_file` | Stage du fichier sélectionné | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | Unstage du fichier sélectionné | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
+| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | Ouvrir la pull request liée | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | Push de tous les tags | `Ctrl+G Shift+U` |
@@ -660,6 +661,10 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Git : Pull (fast-forward si possible) |  |
 | Git : Pull (fast-forward uniquement) |  |
 | Git : Pull (rebase) |  |
+| Git : Pull de toutes les branches | `Ctrl+G Ctrl+P` |
+| Git : Pull de toutes les branches (fast-forward si possible) |  |
+| Git : Pull de toutes les branches (fast-forward uniquement) |  |
+| Git : Pull de toutes les branches (rebase) |  |
 | Git : Options de pull... |  |
 | Git : Push | `Ctrl+G P` |
 | Git : Push vers un distant... |  |

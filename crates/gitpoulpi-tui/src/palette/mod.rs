@@ -324,6 +324,11 @@ pub(crate) enum PaletteCommand {
     Pull,
     /// One specific pull mode, whatever the button is set to.
     PullWithMode(PullButtonMode),
+    /// Fetch, then bring every local branch up to its upstream; the
+    /// checked-out one goes through the Pull button's mode.
+    PullAllBranches,
+    /// The same, with one specific pull mode for the checked-out branch.
+    PullAllBranchesWithMode(PullButtonMode),
     /// Opens the Pull button's dropdown: choose what a click on Pull does.
     ChoosePullButtonAction,
     /// Push to the default remote (or ask, per `git.push_behavior`).

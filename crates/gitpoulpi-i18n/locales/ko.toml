@@ -2149,6 +2149,24 @@ choose_key_path = "개인 키 파일의 경로를 선택하거나 입력하세�
 not_a_file = "{path}은(는) 파일이 아닙니다"
 
 [remotes]
+# context: row of the Pull dropdown: fetch, then bring every local branch up to its upstream; the checked-out one follows the mode of the Pull button
+pull_all_branches = "{$Pull} all branches"
+# context: row of the Pull dropdown: like the row above, but the checked-out branch is fast-forwarded, or merged when it has diverged
+pull_all_branches_merge = "{$Pull} all branches (fast-forward if possible)"
+# context: row of the Pull dropdown: like the row above, but the checked-out branch is only fast-forwarded
+pull_all_branches_ff_only = "{$Pull} all branches (fast-forward only)"
+# context: row of the Pull dropdown: like the row above, but the checked-out branch is rebased onto its upstream
+pull_all_branches_rebase = "{$Pull} all branches ({$rebase})"
+# context: tooltip of the "Pull all branches" row
+tip_pull_all_branches = "{$Fetch} from the remotes, then fast-forward every local branch that is only behind its upstream. The checked-out branch follows the mode of the {$Pull} button; a diverged branch is left alone and reported."
+# context: tooltip of the "Pull all branches (fast-forward if possible)" row
+tip_pull_all_branches_merge = "Like {$Pull} all branches, but the checked-out branch is fast-forwarded, or gets a {$merge} when it has diverged."
+# context: tooltip of the "Pull all branches (fast-forward only)" row
+tip_pull_all_branches_ff_only = "Like {$Pull} all branches, but the checked-out branch is only fast-forwarded; when it has diverged it is left as it is."
+# context: tooltip of the "Pull all branches (rebase)" row
+tip_pull_all_branches_rebase = "Like {$Pull} all branches, but the checked-out branch is moved onto its upstream with a {$rebase}."
+# context: status line while "Pull all branches" runs
+pulling_all_branches = "Pulling all branches..."
 menu_title = "리모트 {name}"
 fetch_remote = "{$Fetch} {name}"
 copy_name = "리모트 이름 복사"
@@ -2266,6 +2284,7 @@ pulling_from_all = { git = "{remotes}에서 {branch}을(를) pull하는 중...",
 no_pull_remote = "{branch}에는 {$pull}할 리모트가 없습니다"
 
 [keymap_action]
+git_prefix_pull_all_branches = "{$Pull} All Branches"
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
 global_commit_column = "{$Commit} 열 표시 또는 숨기기"
 git_prefix_amend = "선택한 {$Commit} 수정"
@@ -2978,6 +2997,10 @@ action_issue_body = "이슈 설명"
 title_hosting_base = "답글 기본 프롬프트"
 
 [palette]
+git_pull_all_branches = "Git: {$Pull} All Branches"
+git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} All Branches (fast-forward if possible)"
+git_pull_all_branches_fast_forward_only = "Git: {$Pull} All Branches (fast-forward only)"
+git_pull_all_branches_rebase = "Git: {$Pull} All Branches ({$rebase})"
 sidebar_show_worktrees = "왼쪽 창: 워크트리 섹션 표시"
 refs_open_worktree_in = "Refs: 워크트리를 열 위치..."
 refs_merge_worktree_branch_into = "Refs: 워크트리 브랜치를 다른 브랜치로 {$merge}..."
@@ -3785,6 +3808,7 @@ split = "{$Commit} 분할"
 markdown_editor = "Markdown 편집기 (댓글, 설명, 요약)"
 
 [help_text]
+git_actions_then_pull_all_branches = "{$pull} all branches: {$fetch}, fast-forward every branch that is only behind its upstream, {$pull} the checked-out one (also a row of the {$Pull} ▾)"
 git_actions_then_amend = "선택한 {$commit} 수정: 요약, 설명, 작성자 이름·이메일·날짜를 한 팝업에서"
 git_actions_then_edit_author = "선택한 {$commit}의 작성자(이름, 이메일, 날짜)만 수정"
 rewrite_1 = "기록 다시 쓰기 워크벤치를 엽니다. 전체 기록 또는 선택한 범위의 작성자, 날짜, 메시지, 파일 내용, 경로를 바꿀 수 있습니다"
@@ -5060,6 +5084,53 @@ desc_rebasing = { git = "{branch}을(를) {onto} 위로 rebase 중", local = "{b
 desc_rebasing_step = { git = "{branch}을(를) {onto} 위로 rebase 중 · 단계 {k}/{n}", local = "{branch}을(를) {onto} 위로 리베이스 중 · 단계 {k}/{n}" }
 
 [link]
+act_pulling_all_branches = "{$pull} all branches..."
+# context: status line after Pull all branches when every branch was already up to date
+pulled_all_nothing = "all branches are up to date"
+# context: status line after Pull all branches; {n} branches were moved to their upstream
+pulled_all_updated = { one = "updated {n} branch", other = "updated {n} branches" }
+# context: status line after Pull all branches; {n} branches were updated, {m} were left alone for the reasons in {why}
+pulled_all_updated_skipped = { one = "updated {n} branch, skipped {m} ({why})", other = "updated {n} branches, skipped {m} ({why})" }
+# context: status line after Pull all branches; nothing moved, {m} branches were left alone for the reasons in {why}
+pulled_all_none_skipped = "nothing updated, skipped {m} ({why})"
+# context: status line after Pull all branches stopped on conflicts in the checked-out branch {branch}; {n} other branches were updated before
+pulled_all_conflict = { one = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branch updated)", other = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branches updated)" }
+# context: end of the Pull all branches status line; {summary} is the rest of the line, {remotes} lists the remotes that could not be downloaded
+pulled_all_fetch_failed = "{summary}; {$fetch} failed for {remotes}"
+# context: reason a branch was left alone by Pull all branches, with a count
+skip_diverged = "{n} diverged"
+# context: reason a branch was left alone by Pull all branches, with a count
+skip_upstream_gone = "{n} with the upstream gone"
+# context: reason a branch was left alone by Pull all branches, with a count
+skip_worktree = "{n} checked out in another worktree"
+# context: reason a branch was left alone by Pull all branches, with a count
+skip_local_upstream = "{n} tracking a local branch"
+# context: reason a branch was left alone by Pull all branches, with a count
+skip_not_downloaded = "{n} not downloaded"
+# context: reason a branch was left alone by Pull all branches, with a count
+skip_branch_failed = "{n} failed"
+# context: one Activity Log line of Pull all branches; {branch} moved from {from} to {to}
+pulled_all_line_updated = "{branch}: updated {from} to {to}"
+# context: one Activity Log line of Pull all branches; the branch was already at its upstream
+pulled_all_line_up_to_date = "{branch}: up to date"
+# context: one Activity Log line of Pull all branches; the branch has commits its upstream lacks and nothing to pull
+pulled_all_line_ahead = "{branch}: ahead of {upstream}, nothing to {$pull}"
+# context: one Activity Log line of Pull all branches; neither side contains the other
+pulled_all_line_diverged = "{branch}: diverged from {upstream}, left as it is"
+# context: one Activity Log line of Pull all branches
+pulled_all_line_upstream_gone = "{branch}: {upstream} no longer exists"
+# context: one Activity Log line of Pull all branches; {path} is the other worktree
+pulled_all_line_elsewhere = "{branch}: checked out in {path}, skipped"
+# context: one Activity Log line of Pull all branches; {path} is the other worktree that was fast-forwarded
+pulled_all_line_worktree = "{branch}: updated in {path}"
+# context: one Activity Log line of Pull all branches
+pulled_all_line_local_upstream = "{branch}: follows the local branch {upstream}, skipped"
+# context: one Activity Log line of Pull all branches
+pulled_all_line_not_downloaded = "{branch}: not downloaded, left as it is"
+# context: one Activity Log line of Pull all branches; {why} is the reason
+pulled_all_line_failed = "{branch}: failed ({why})"
+# context: one Activity Log line of Pull all branches
+pulled_all_line_conflicted = "{branch}: conflicts, resolve them or abort"
 # context: {path} is the folder of the removed worktree
 worktree_removed = "워크트리 {path}을(를) 제거했습니다"
 worktree_removed_branch_deleted = "워크트리 {path}을(를) 제거하고 브랜치 {branch}을(를) 삭제했습니다 (실행 취소하면 브랜치가 돌아옵니다)"
@@ -6195,6 +6266,7 @@ keymap_next_card = "다음 비교 행으로 이동"
 help_next_card = "Log 커서를 다음 비교 행으로 이동 (선택은 유지); 오른쪽 창의 카드를 클릭해도 같습니다"
 
 [activity_log]
+op_pull_all_branches = "{$Pull} all branches"
 title = "활동 로그"
 tab_application = "애플리케이션"
 op_open = "저장소 열기"
@@ -6312,6 +6384,8 @@ app_select_first = "먼저 줄을 선택하세요: 클릭하거나 ]를 눌러 �
 app_no_operation = "이 줄은 작업과 연결되어 있지 않습니다."
 
 [git_error]
+title_pull_all_branches = "{$Pull} all branches failed"
+done_pull_all_branches = "{$Pull} all branches done"
 summary_host_key = "리모트의 SSH 호스트 키를 아직 알 수 없습니다."
 hint_host_key = "터미널에서 `ssh -T git@<host>`를 한 번 실행해 지문을 확인하고 yes로 답한 뒤 다시 시도하세요. 또는 SSH 및 자격 증명에서 이 저장소용 known hosts 파일을 지정하세요."
 title_push = "{$Push} 실패"
@@ -10399,3 +10473,27 @@ key_create = "b"
 key_cancel = "c"
 # context: status line when the checkout did not happen and the edit was dropped; {short} is the short commit id
 gave_up = "{short}을(를) 편집하지 않았습니다: 브랜치가 체크아웃되지 않았습니다"
+
+[branch_sync]
+# context: title of the dialog asked before Pull all branches when a branch is checked out in another worktree
+dlg_title = "{$Pull} all branches"
+# context: question of that dialog; the branches and their worktrees are listed under it
+dlg_question = "These branches are behind and checked out in other worktrees:"
+# context: one line of that list; {branch} is a branch, {path} the worktree folder
+row = "{branch}  in  {path}"
+# context: first answer: also fast-forward the other worktrees
+opt_update = "Update those worktrees too"
+# context: second answer: leave the other worktrees alone
+opt_skip = "Skip them"
+# context: third answer: do not run
+opt_cancel = "Cancel"
+# context: explanation under the highlighted first answer
+detail_update = "Each worktree is fast-forwarded in its own folder. One whose local changes the update would overwrite is left as it is and reported."
+# context: explanation under the highlighted second answer
+detail_skip = "They are left as they are and listed as skipped in the summary."
+# context: explanation under the highlighted third answer
+detail_cancel = "Nothing is downloaded or changed."
+# context: key hints of that dialog
+dlg_hint = "Up/Down or 1-3 choose  Enter confirm  Esc cancel"
+# context: last line of the list of that dialog when more branches exist than fit; {n} is how many
+more = "and {n} more"

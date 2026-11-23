@@ -177,6 +177,8 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::Fetch
         | PaletteCommand::Pull
         | PaletteCommand::PullWithMode(..)
+        | PaletteCommand::PullAllBranches
+        | PaletteCommand::PullAllBranchesWithMode(..)
         | PaletteCommand::ChoosePullButtonAction
         | PaletteCommand::LfsMenu
         | PaletteCommand::LfsFetchAll

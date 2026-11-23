@@ -260,6 +260,28 @@ impl RemoteUi {
         self.run_pull_mode(mode, refs, link)
     }
 
+    /// "Pull all branches": the Pull button's mode (`None`) or `mode` for the
+    /// checked-out branch. A behind branch checked out in another worktree
+    /// is asked about first (`branch_sync_dialog`), so the run starts from
+    /// there. Returns the status line.
+    pub(crate) fn run_pull_all_branches(
+        &self,
+        mode: Option<PullButtonMode>,
+        refs: &[Ref],
+        link: &DaemonLink,
+    ) -> String {
+        crate::branch_sync_dialog::begin(
+            link,
+            &self.repo_root,
+            refs,
+            mode.map(core_pull_mode),
+            crate::live_settings::fetch_options(),
+        );
+        gitpoulpi_i18n::msg::remotes::PULLING_ALL_BRANCHES
+            .get()
+            .to_string()
+    }
+
     /// One specific pull mode, for the palette's per-mode entries.
     pub(crate) fn run_pull_mode(
         &self,

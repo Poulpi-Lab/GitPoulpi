@@ -390,6 +390,16 @@ fn every_toolbar_button_and_dropdown_has_a_tooltip() {
         };
         assert!(action.tooltip().is_some(), "{label} needs a tooltip");
     }
+    // ... and the Pull all branches rows are part of that walk.
+    assert!(crate::remotes_ui::pull_mode_entries()
+        .iter()
+        .any(|e| matches!(
+            e,
+            crate::context_menu::Entry::Action {
+                action: crate::RemoteUiAction::RunPullAllBranches(None),
+                ..
+            }
+        )));
 }
 
 /// One representative value per `HitTarget` variant, for

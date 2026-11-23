@@ -88,6 +88,7 @@ prefiksem (`Ctrl+G s`).
 | `git_prefix` | `stage_file` | Stage zaznaczony plik | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | Unstage zaznaczony plik | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
+| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | Otwórz powiązany pull request | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | Push wszystkich tagów | `Ctrl+G Shift+U` |
@@ -657,6 +658,10 @@ zastosowania. Klawisze są domyślne.
 | Git: Pull (fast-forward, jeśli się da) |  |
 | Git: Pull (tylko fast-forward) |  |
 | Git: Pull (rebase) |  |
+| Git: Pull All Branches | `Ctrl+G Ctrl+P` |
+| Git: Pull All Branches (fast-forward if possible) |  |
+| Git: Pull All Branches (fast-forward only) |  |
+| Git: Pull All Branches (rebase) |  |
 | Git: Opcje pull... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push do zdalnego... |  |

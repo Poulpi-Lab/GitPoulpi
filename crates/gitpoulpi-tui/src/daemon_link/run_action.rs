@@ -380,6 +380,22 @@ async fn dispatch(
             )
             .await
         }
+        Action::PullAllBranches(request) => {
+            reported::<gitpoulpi_core::domain::PullAllBranchesOutcome>(
+                conn,
+                action_message_tx,
+                OperationKind::PullAllBranches,
+                autostash_args(serde_json::to_value(&request).unwrap_or_default()),
+                |outcome| {
+                    // One Activity Log line per branch, then the status line.
+                    for line in super::branch_sync_summary::lines(&outcome) {
+                        crate::activity_log::note_message(&line, &conn.repo.root);
+                    }
+                    super::branch_sync_summary::text(outcome)
+                },
+            )
+            .await
+        }
         Action::Push { remote, opts } => push_now(conn, &remote, &opts, action_message_tx).await,
         // Sequenced here, on the link's own task, so the push only
         // starts once the pull really succeeded -- and a pull that stops

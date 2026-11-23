@@ -1939,6 +1939,7 @@ Varje knapp har en tangentbordsmotsvarighet:
 | **Aktivitet** på statusraden | `Ctrl+N Shift+A` |
 | Verktygsfält: **Ångra**, **Gör om** | `Ctrl+Z`, `Ctrl+Y` |
 | Verktygsfält: **Pull** / dess `▾` | `Ctrl+G p` / `Git: Pull-alternativ...` |
+| **Pull alla grenar** (rad i Pull-`▾`) | `Ctrl+G Ctrl+P` |
 | Verktygsfält: **Push** / dess `▾` | `Ctrl+G Shift+P` / `Git: Push till remote...` |
 | Verktygsfält: **Gren**, **Tag** | `Ctrl+G b`, `Ctrl+G t` |
 | Verktygsfält: **Stash**, **Pop** | `Ctrl+G Shift+T`, `Ctrl+G o` |

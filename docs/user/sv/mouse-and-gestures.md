@@ -39,6 +39,7 @@ samma regler gäller överallt:
   stänga den. Ett klick utanför stänger aldrig en helskärmsvy (Inställningar,
   Diff-vyn, Filvyn, redigerarna, granskningen, tavlan): de har ingen utsida.
 - Ett klick **inuti** en panel stänger den aldrig.
+- Ett musklick (vänster eller höger) medan en `Ctrl+G`- eller `Ctrl+N`-kedja väntar på sin andra tangent avbryter kedjan som `Esc` och fungerar sedan som vanligt (ett klick markerar fortfarande, ett högerklick öppnar fortfarande sin meny).
 - Ett formulär som innehåller text du skrivit (ett nytt ärende, en pull eller merge
   request) ignorerar ett klick utanför, så att ett felklick inte kan förlora den.
   `✕` och `Esc` frågar **Förkasta ändringar?** först; **Fortsätt redigera** går

@@ -193,7 +193,7 @@ vidare. Raderna med `...` öppnar samma bekräftelse eller namnfråga som knappe
 | Commits | commit, amend, reword, AI-commit-composern (alla dess commits som ett steg) |
 | Grenar och tags | skapa, ta bort, byta namn, ställa in eller ta bort upstream, skapa en spårande gren, skapa / ta bort / annotera en tag, fast-forward, checka ut en pull request som gren |
 | Förflyttning | checkout av en gren eller en commit (även en frånkopplad HEAD) |
-| Historik | merge (fast-forward eller merge-commit), rebase (vanlig och interaktiv, när den har avslutats), cherry-pick, revert, reset (soft, mixed och hard), den lokala delen av en pull |
+| Historik | merge (fast-forward eller merge-commit), rebase (vanlig och interaktiv, när den har avslutats), cherry-pick, revert, reset (soft, mixed och hard), den lokala delen av en pull, **pull alla grenar** (varje gren den flyttade, som ett steg; den utcheckade grenens filer går tillbaka med den) |
 | Lokala ändringar | stage och unstage (fil, mapp, hunk, rader, alla), förkasta (fil, mapp, hunk, rader, en fil-checkout), tillämpa en patch eller en commits ändringar (`apply-commit`), **ta bort en fil från disk**, **ignorera** (fil, filändelse eller mapp: raden i den `.gitignore` du valde), **behandla som binär eller text** (raden i `.gitattributes`) |
 | Stashes | push, apply, pop, drop, spara en commits ändringar som stash (`stash from-commit`) |
 | Remotes och konfiguration | lägga till, ta bort, byta namn på, ändra URL eller push-URL för en remote, Git LFS track och untrack |

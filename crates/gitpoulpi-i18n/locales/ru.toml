@@ -2143,23 +2143,23 @@ not_a_file = "{path} - не файл"
 
 [remotes]
 # context: row of the Pull dropdown: fetch, then bring every local branch up to its upstream; the checked-out one follows the mode of the Pull button
-pull_all_branches = "{$Pull} all branches"
+pull_all_branches = "{$Pull} все ветки"
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is fast-forwarded, or merged when it has diverged
-pull_all_branches_merge = "{$Pull} all branches (fast-forward if possible)"
+pull_all_branches_merge = "{$Pull} все ветки (fast-forward, если возможно)"
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is only fast-forwarded
-pull_all_branches_ff_only = "{$Pull} all branches (fast-forward only)"
+pull_all_branches_ff_only = "{$Pull} все ветки (только fast-forward)"
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is rebased onto its upstream
-pull_all_branches_rebase = "{$Pull} all branches ({$rebase})"
+pull_all_branches_rebase = "{$Pull} все ветки ({$rebase})"
 # context: tooltip of the "Pull all branches" row
-tip_pull_all_branches = "{$Fetch} from the remotes, then fast-forward every local branch that is only behind its upstream. The checked-out branch follows the mode of the {$Pull} button; a diverged branch is left alone and reported."
+tip_pull_all_branches = "{$Fetch} из remote, затем fast-forward каждой локальной ветки, которая только отстаёт от своего upstream. Текущая ветка обновляется в режиме кнопки «{$Pull}»; разошедшаяся ветка не трогается, о ней сообщается."
 # context: tooltip of the "Pull all branches (fast-forward if possible)" row
-tip_pull_all_branches_merge = "Like {$Pull} all branches, but the checked-out branch is fast-forwarded, or gets a {$merge} when it has diverged."
+tip_pull_all_branches_merge = "Как «{$Pull} все ветки», но текущая ветка перематывается fast-forward, а если она разошлась, получает {$merge}."
 # context: tooltip of the "Pull all branches (fast-forward only)" row
-tip_pull_all_branches_ff_only = "Like {$Pull} all branches, but the checked-out branch is only fast-forwarded; when it has diverged it is left as it is."
+tip_pull_all_branches_ff_only = "Как «{$Pull} все ветки», но текущая ветка только перематывается fast-forward; если она разошлась, остаётся как есть."
 # context: tooltip of the "Pull all branches (rebase)" row
-tip_pull_all_branches_rebase = "Like {$Pull} all branches, but the checked-out branch is moved onto its upstream with a {$rebase}."
+tip_pull_all_branches_rebase = "Как «{$Pull} все ветки», но текущая ветка переносится на свой upstream через {$rebase}."
 # context: status line while "Pull all branches" runs
-pulling_all_branches = "Pulling all branches..."
+pulling_all_branches = { git = "pull всех веток...", local = "получение изменений всех веток..." }
 menu_title = "remote {name}"
 fetch_remote = { git = "Fetch {name}", local = "Загрузить {name}" }
 copy_name = "Копировать имя remote"
@@ -2277,7 +2277,7 @@ pulling_from_all = { git = "pull {branch} из {remotes}...", local = "полу�
 no_pull_remote = "у {branch} нет remote, откуда можно {$pull}"
 
 [keymap_action]
-git_prefix_pull_all_branches = "{$Pull} All Branches"
+git_prefix_pull_all_branches = "{$Pull} все ветки"
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
 global_commit_column = { git = "Показать или скрыть колонку commit'ов", local = "Показать или скрыть колонку коммитов" }
 git_prefix_amend = { git = "Изменить выбранный commit", local = "Изменить выбранный коммит" }
@@ -2991,10 +2991,10 @@ action_issue_body = "Описание задачи"
 title_hosting_base = "Базовый промпт для ответов"
 
 [palette]
-git_pull_all_branches = "Git: {$Pull} All Branches"
-git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} All Branches (fast-forward if possible)"
-git_pull_all_branches_fast_forward_only = "Git: {$Pull} All Branches (fast-forward only)"
-git_pull_all_branches_rebase = "Git: {$Pull} All Branches ({$rebase})"
+git_pull_all_branches = "Git: {$Pull} все ветки"
+git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} все ветки (fast-forward, если возможно)"
+git_pull_all_branches_fast_forward_only = "Git: {$Pull} все ветки (только fast-forward)"
+git_pull_all_branches_rebase = "Git: {$Pull} все ветки ({$rebase})"
 sidebar_show_worktrees = "Левая панель: показать раздел Worktrees"
 refs_open_worktree_in = "Refs: открыть worktree в..."
 refs_merge_worktree_branch_into = { git = "Refs: {$merge} ветки worktree в...", local = "Refs: слить ветку worktree в..." }
@@ -3803,7 +3803,7 @@ split = { git = "Разделение commit'а", local = "Разделение 
 markdown_editor = "Редактор Markdown (комментарии, описания, резюме)"
 
 [help_text]
-git_actions_then_pull_all_branches = "{$pull} all branches: {$fetch}, fast-forward every branch that is only behind its upstream, {$pull} the checked-out one (also a row of the {$Pull} ▾)"
+git_actions_then_pull_all_branches = "{$pull} все ветки: {$fetch}, затем fast-forward тех, что только отстают от своего upstream; текущая ветка обновляется, как при обычном {$pull_noun} (также пункт списка {$Pull} ▾)"
 git_actions_then_amend = { git = "изменить выбранный commit: заголовок, описание, имя, email и дату автора в одном окне", local = "изменить выбранный коммит: заголовок, описание, имя, email и дату автора в одном окне" }
 git_actions_then_edit_author = { git = "изменить только автора выбранного commit'а (имя, email, дата)", local = "изменить только автора выбранного коммита (имя, email, дата)" }
 rewrite_1 = "открывает окно переписывания истории: меняйте авторов, даты, сообщения, содержимое файлов или пути во всей истории или в выбранной её части"
@@ -5080,53 +5080,53 @@ desc_rebasing = { git = "rebase {branch} на {onto}", local = "перебази
 desc_rebasing_step = { git = "rebase {branch} на {onto} · шаг {k}/{n}", local = "перебазирование {branch} на {onto} · шаг {k}/{n}" }
 
 [link]
-act_pulling_all_branches = "{$pull} all branches..."
+act_pulling_all_branches = "{$pull} все ветки..."
 # context: status line after Pull all branches when every branch was already up to date
-pulled_all_nothing = "all branches are up to date"
+pulled_all_nothing = "все ветки актуальны"
 # context: status line after Pull all branches; {n} branches were moved to their upstream
-pulled_all_updated = { one = "updated {n} branch", other = "updated {n} branches" }
+pulled_all_updated = { one = "обновлено веток: {n}", few = "обновлено веток: {n}", many = "обновлено веток: {n}", other = "обновлено веток: {n}" }
 # context: status line after Pull all branches; {n} branches were updated, {m} were left alone for the reasons in {why}
-pulled_all_updated_skipped = { one = "updated {n} branch, skipped {m} ({why})", other = "updated {n} branches, skipped {m} ({why})" }
+pulled_all_updated_skipped = { one = "обновлено веток: {n}, пропущено: {m} ({why})", few = "обновлено веток: {n}, пропущено: {m} ({why})", many = "обновлено веток: {n}, пропущено: {m} ({why})", other = "обновлено веток: {n}, пропущено: {m} ({why})" }
 # context: status line after Pull all branches; nothing moved, {m} branches were left alone for the reasons in {why}
-pulled_all_none_skipped = "nothing updated, skipped {m} ({why})"
+pulled_all_none_skipped = "ничего не обновлено, пропущено: {m} ({why})"
 # context: status line after Pull all branches stopped on conflicts in the checked-out branch {branch}; {n} other branches were updated before
-pulled_all_conflict = { one = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branch updated)", other = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branches updated)" }
+pulled_all_conflict = { one = "конфликты в {branch}: разрешите их или отмените, как при обычном {$pull_noun} (других веток обновлено: {n})", few = "конфликты в {branch}: разрешите их или отмените, как при обычном {$pull_noun} (других веток обновлено: {n})", many = "конфликты в {branch}: разрешите их или отмените, как при обычном {$pull_noun} (других веток обновлено: {n})", other = "конфликты в {branch}: разрешите их или отмените, как при обычном {$pull_noun} (других веток обновлено: {n})" }
 # context: end of the Pull all branches status line; {summary} is the rest of the line, {remotes} lists the remotes that could not be downloaded
-pulled_all_fetch_failed = "{summary}; {$fetch} failed for {remotes}"
+pulled_all_fetch_failed = "{summary}; не удалось {$fetch}: {remotes}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_diverged = "{n} diverged"
+skip_diverged = "разошлись: {n}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_upstream_gone = "{n} with the upstream gone"
+skip_upstream_gone = "upstream удалён: {n}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_worktree = "{n} checked out in another worktree"
+skip_worktree = "открыты в другом worktree: {n}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_local_upstream = "{n} tracking a local branch"
+skip_local_upstream = "следуют за локальной веткой: {n}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_not_downloaded = "{n} not downloaded"
+skip_not_downloaded = "не загружены: {n}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_branch_failed = "{n} failed"
+skip_branch_failed = "с ошибкой: {n}"
 # context: one Activity Log line of Pull all branches; {branch} moved from {from} to {to}
-pulled_all_line_updated = "{branch}: updated {from} to {to}"
+pulled_all_line_updated = "{branch}: обновлена с {from} до {to}"
 # context: one Activity Log line of Pull all branches; the branch was already at its upstream
-pulled_all_line_up_to_date = "{branch}: up to date"
+pulled_all_line_up_to_date = "{branch}: актуальна"
 # context: one Activity Log line of Pull all branches; the branch has commits its upstream lacks and nothing to pull
-pulled_all_line_ahead = "{branch}: ahead of {upstream}, nothing to {$pull}"
+pulled_all_line_ahead = "{branch}: впереди {upstream}, для {$pull_noun} ничего нет"
 # context: one Activity Log line of Pull all branches; neither side contains the other
-pulled_all_line_diverged = "{branch}: diverged from {upstream}, left as it is"
+pulled_all_line_diverged = "{branch}: разошлась с {upstream}, оставлена как есть"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_upstream_gone = "{branch}: {upstream} no longer exists"
+pulled_all_line_upstream_gone = "{branch}: {upstream} больше не существует"
 # context: one Activity Log line of Pull all branches; {path} is the other worktree
-pulled_all_line_elsewhere = "{branch}: checked out in {path}, skipped"
+pulled_all_line_elsewhere = "{branch}: открыта в {path}, пропущена"
 # context: one Activity Log line of Pull all branches; {path} is the other worktree that was fast-forwarded
-pulled_all_line_worktree = "{branch}: updated in {path}"
+pulled_all_line_worktree = "{branch}: обновлена в {path}"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_local_upstream = "{branch}: follows the local branch {upstream}, skipped"
+pulled_all_line_local_upstream = "{branch}: следует за локальной веткой {upstream}, пропущена"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_not_downloaded = "{branch}: not downloaded, left as it is"
+pulled_all_line_not_downloaded = "{branch}: не загружена, оставлена как есть"
 # context: one Activity Log line of Pull all branches; {why} is the reason
-pulled_all_line_failed = "{branch}: failed ({why})"
+pulled_all_line_failed = "{branch}: сбой ({why})"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_conflicted = "{branch}: conflicts, resolve them or abort"
+pulled_all_line_conflicted = "{branch}: конфликты, разрешите их или отмените"
 # context: {path} is the folder of the removed worktree
 worktree_removed = "worktree {path} удалён"
 worktree_removed_branch_deleted = "worktree {path} удалён, ветка {branch} удалена (Отменить вернёт ветку)"
@@ -6264,7 +6264,7 @@ keymap_next_card = "Перейти к следующей сравниваемо�
 help_next_card = "переместить курсор Log на следующую сравниваемую строку (выбор сохраняется); щелчок по карточке справа делает то же"
 
 [activity_log]
-op_pull_all_branches = "{$Pull} all branches"
+op_pull_all_branches = "{$Pull} все ветки"
 title = "Журнал активности"
 tab_application = "Приложение"
 op_open = "Открытие репозитория"
@@ -6382,8 +6382,8 @@ app_select_first = "Сначала выберите строку: щёлкнит
 app_no_operation = "Эта строка не связана с операцией."
 
 [git_error]
-title_pull_all_branches = "{$Pull} all branches failed"
-done_pull_all_branches = "{$Pull} all branches done"
+title_pull_all_branches = "{$Pull} всех веток: сбой"
+done_pull_all_branches = "{$Pull} всех веток: готово"
 summary_host_key = "Ключ SSH-хоста этого remote пока неизвестен."
 hint_host_key = "Один раз выполните `ssh -T git@<host>` в терминале, сверьте отпечаток, ответьте yes и повторите. Или задайте файл known hosts для этого репозитория в «SSH и учётные данные»."
 title_push = { git = "{$Push}: сбой", local = "Отправка: сбой" }
@@ -10487,24 +10487,24 @@ gave_up = "{short} не изменён: на ветку не переключи�
 
 [branch_sync]
 # context: title of the dialog asked before Pull all branches when a branch is checked out in another worktree
-dlg_title = "{$Pull} all branches"
+dlg_title = "{$Pull} все ветки"
 # context: question of that dialog; the branches and their worktrees are listed under it
-dlg_question = "These branches are behind and checked out in other worktrees:"
+dlg_question = "Эти ветки отстают и открыты в других worktree:"
 # context: one line of that list; {branch} is a branch, {path} the worktree folder
-row = "{branch}  in  {path}"
+row = "{branch}  в  {path}"
 # context: first answer: also fast-forward the other worktrees
-opt_update = "Update those worktrees too"
+opt_update = "Обновить и эти worktree"
 # context: second answer: leave the other worktrees alone
-opt_skip = "Skip them"
+opt_skip = "Пропустить их"
 # context: third answer: do not run
-opt_cancel = "Cancel"
+opt_cancel = "Отмена"
 # context: explanation under the highlighted first answer
-detail_update = "Each worktree is fast-forwarded in its own folder. One whose local changes the update would overwrite is left as it is and reported."
+detail_update = "В папке каждого worktree выполняется fast-forward. Worktree, где обновление перезаписало бы локальные изменения, остаётся как есть, о нём сообщается."
 # context: explanation under the highlighted second answer
-detail_skip = "They are left as they are and listed as skipped in the summary."
+detail_skip = "Они остаются как есть и значатся пропущенными в итоговом сообщении."
 # context: explanation under the highlighted third answer
-detail_cancel = "Nothing is downloaded or changed."
+detail_cancel = "Ничего не загружается и не меняется."
 # context: key hints of that dialog
-dlg_hint = "Up/Down or 1-3 choose  Enter confirm  Esc cancel"
+dlg_hint = "Вверх/Вниз или 1-3 выбор  Enter подтвердить  Esc отмена"
 # context: last line of the list of that dialog when more branches exist than fit; {n} is how many
-more = "and {n} more"
+more = "и ещё {n}"

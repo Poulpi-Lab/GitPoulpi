@@ -51,6 +51,11 @@ pub fn refs(repo: &RepoRef) -> Result<Vec<Ref>> {
             // Peeled, like the tag rows below: a mirror ref written by a
             // fetch points at the annotated tag *object*, one written by our
             // own push at the commit, and both must answer the same question.
+            // A mirror whose remote is gone (removed outside GitPoulpi) is
+            // stale: skipped, so no tag reads as on a remote that is not there.
+            if !remote_names.contains(&remote) {
+                continue;
+            }
             let commit_oid = reference.peel_to_commit().map(|c| c.id()).unwrap_or(target);
             mirror
                 .entry(tag.to_string())

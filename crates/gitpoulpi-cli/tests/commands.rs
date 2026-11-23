@@ -221,6 +221,34 @@ fn tags_are_created_listed_and_deleted() {
     assert!(tags.is_empty());
 }
 
+/// A tag mirror left by a remote removed outside GitPoulpi is ignored: the
+/// tag is local only and a tag only that mirror knew is not listed.
+#[test]
+fn tag_list_ignores_the_mirror_of_a_removed_remote() {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("initial")
+        .unwrap()
+        .build();
+    let session = "cli-test-tag-stale-mirror";
+    run_json(repo.root(), session, &["tag", "create", "v1"]);
+    let head = repo.git(&["rev-parse", "HEAD"]);
+    for name in ["v1", "ghost"] {
+        repo.git(&[
+            "update-ref",
+            &format!("refs/gitpoulpi/remote-tags/archive/{name}"),
+            &head,
+        ]);
+    }
+
+    let tags = run_json(repo.root(), session, &["tag", "list"]);
+    let rows = tags.as_array().expect("an array of tags");
+    assert_eq!(rows.len(), 1, "{tags}");
+    assert_eq!(rows[0]["name"], "v1");
+    assert_eq!(rows[0]["where"], "local");
+    assert_eq!(rows[0]["remote"], serde_json::json!([]));
+}
+
 /// `tag list` says where each tag lives and `tag delete` does what its
 /// scope says (the maintainer's report: the red delete only deleted locally and
 /// the next fetch brought the tag back).

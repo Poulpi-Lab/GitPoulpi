@@ -2,12 +2,29 @@
 //! its own settings. Local (no daemon, no repository), like `alias` and
 //! `desktop`. The work is `gitpoulpi_config::installation`.
 
+use std::sync::OnceLock;
+
 use gitpoulpi_config::installation::{self, Current};
+use gitpoulpi_config::Config;
 use serde_json::{json, Value};
 
 use crate::cli::InstallationAction;
 use crate::commands::emitted;
 use crate::repo_cmd::Emitted;
+
+/// What moves the installation's launchers when its launcher name changes:
+/// given the config before and after, it renames the shortcuts and the
+/// folder-menu entry in place. The shortcut machinery lives in the TUI crate,
+/// which this one does not link, so the program registers it at start.
+pub type NameChangeHook = fn(&Config, &Config);
+
+static NAME_CHANGE: OnceLock<NameChangeHook> = OnceLock::new();
+
+/// Registers the launcher rename run after `installation set name` and
+/// `installation set name_with_version`. The first registration wins.
+pub fn on_launcher_name_change(hook: NameChangeHook) {
+    let _ = NAME_CHANGE.set(hook);
+}
 
 /// The settings of one installation as JSON.
 fn settings_json(e: &installation::Effective) -> Value {
@@ -129,6 +146,7 @@ fn set(cur: &Current, field: &str, value: &str) -> Result<Emitted, String> {
     };
     let id = cur.identity.id.clone();
     let identity = cur.identity.clone();
+    let before = Config::load(file).unwrap_or_default();
     installation::set_installation_in_file(file, |config| {
         let entry =
             config
@@ -162,6 +180,13 @@ fn set(cur: &Current, field: &str, value: &str) -> Result<Emitted, String> {
         };
         if let Some(key) = key {
             gitpoulpi_config::set_in_file(file, key, &cleaned).map_err(|e| e.to_string())?;
+        }
+    }
+    // The launcher name is part of the shortcuts' names: they follow it now,
+    // never waiting for the next `desktop shortcut install`.
+    if matches!(field, "name" | "name_with_version") {
+        if let (Some(hook), Ok(after)) = (NAME_CHANGE.get(), Config::load(file)) {
+            hook(&before, &after);
         }
     }
     Ok(emitted(

@@ -341,6 +341,61 @@ pub(crate) fn sync_shortcuts(env: &Env, setting: &str, logo: &str) -> bool {
     refresh_icons(env, setting, logo) || changed
 }
 
+/// This installation's launchers follow a change of its launcher name (the
+/// name itself, or the version in it): the shortcuts it has move to the new
+/// names by a rename (Windows names the file after the launcher), their text
+/// and the folder-menu label are rewritten, and nothing is created that was
+/// not there. A launcher is always there: the rename comes first, the rewrite
+/// after. The primary's launchers keep the plain names, so a role whose name
+/// did not change is a no-op. True when anything moved or was rewritten.
+/// Blocking.
+pub(crate) fn rename_launchers(
+    env: &Env,
+    fe: &desktop::folder_menu::Env,
+    setting: &str,
+    logo: &str,
+    old: &InstallCtx,
+    new: &InstallCtx,
+) -> bool {
+    if old.name == new.name {
+        return false;
+    }
+    let mut env = env.clone();
+    env.ctx = old.clone();
+    let had: Vec<Place> = snapshot(&env, setting, logo)
+        .rows
+        .iter()
+        .filter(|r| {
+            matches!(
+                r.status.state,
+                desktop::State::Installed | desktop::State::Outdated
+            )
+        })
+        .map(|r| r.place)
+        .collect();
+    let mut changed =
+        desktop::rename_shortcuts(&env.dirs, env.os, old, new).is_ok_and(|moved| !moved.is_empty());
+    env.ctx = new.clone();
+    for place in &had {
+        changed |= matches!(
+            run(&env, setting, logo, Op::Install(*place)),
+            Done::Installed(_)
+        );
+    }
+    // macOS bundles are named after the launcher and are not renamed: the one
+    // under the old name goes once the new one is written.
+    if env.os == Os::Macos {
+        for place in &had {
+            let _ = desktop::remove(*place, &env.dirs, env.os, old);
+        }
+    }
+    let mut fe = fe.clone();
+    fe.ctx = new.clone();
+    changed |= desktop::folder_menu::sync(&fe, &folder_menu_label(&new.name))
+        .is_ok_and(|done| !done.is_empty());
+    changed
+}
+
 pub(crate) fn terminal_exe(env: &Env, terminal: &str) -> Option<PathBuf> {
     let program = terminals::find(env.os, terminal)?.probe;
     (!program.is_empty() && !program.starts_with("app:"))

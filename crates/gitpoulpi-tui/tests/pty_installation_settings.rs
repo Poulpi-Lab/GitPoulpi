@@ -512,3 +512,50 @@ fn a_slow_primary_job_repaints_the_rows_without_a_key_press() {
         .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
     let _ = s.term.stop();
 }
+
+/// Resigning with launchers installed (the primary's legacy-named one, a
+/// Desktop copy) ends with the Become the primary row cleared on its own: the
+/// job moves files and rewrites aliases, and the checkbox must follow the file
+/// the moment the job ends, with no key pressed.
+#[test]
+fn resigning_with_launchers_clears_the_primary_checkbox_by_itself() {
+    let config = format!("{UI}[installation]\nprimary = \"p-pty\"\n");
+    let text = "[Desktop Entry]\nType=Application\nName=GitPoulpi\nExec=/x\nX-GitPoulpi=1\nX-GitPoulpi-Install=p-pty\n";
+    let mut s = start("installation-resign-row", &config, |home| {
+        let apps = home.join("data/applications");
+        std::fs::create_dir_all(&apps).unwrap();
+        std::fs::write(apps.join("gitpoulpi.desktop"), text).unwrap();
+        std::fs::create_dir_all(home.join("Desktop")).unwrap();
+        std::fs::write(home.join("Desktop/gitpoulpi.desktop"), text).unwrap();
+    });
+    palette(
+        &mut s.term,
+        "settings: become the primary",
+        "Settings: Become the primary...",
+    );
+    s.term
+        .wait_for("the primary row is checked", STEP, |t| {
+            primary_row(&t.text(), "[x]")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    settle(&s.term, Duration::from_secs(2));
+    // The pointer's way: a click on the checkbox itself.
+    let screen = s.term.screen();
+    let (col, row) = screen
+        .find_all("[x]")
+        .into_iter()
+        .find(|(_, r)| screen.line(*r).contains("Become the primary"))
+        .expect("the checked box on its row");
+    s.term.click(col + 1, row).unwrap();
+    wait_until("the config no longer names a primary", &s.term, || {
+        s.config_toml()["installation"].get("primary").is_none()
+    });
+    s.term
+        .wait_for(
+            "the checkbox is cleared by itself",
+            Duration::from_secs(5),
+            |t| primary_row(&t.text(), "[ ]"),
+        )
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    let _ = s.term.stop();
+}

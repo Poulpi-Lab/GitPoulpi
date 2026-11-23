@@ -21,6 +21,9 @@ use gitpoulpi_i18n::msg::launcher as t;
 use std::sync::mpsc;
 use std::sync::Arc;
 
+/// The version the launcher name carries when the setting asks for it.
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 /// A button of the installation rows. Copy, so it can ride in a [`PrefAction`]:
 /// a Forget names the other installation by its place in [`PreferencesState::others`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -39,6 +42,9 @@ enum Job {
     Resign,
     RemoveLegacy,
     Forget(Gone),
+    /// The launcher name changed (this is the one it had, with the version
+    /// when asked): the launchers move to the new names.
+    Rename(String),
 }
 
 /// An installation whose folder is gone, as Forget needs it.
@@ -56,12 +62,31 @@ enum Done {
     Resigned(String),
     Forgot(String),
     LegacyRemoved(usize),
+    /// The launchers followed a new name; the row's own message stays.
+    Renamed,
     Failed(String),
 }
 
 struct Reply {
     legacy: Vec<Place>,
     done: Option<Done>,
+    /// The file as the job left it, read on the job's thread (a read that
+    /// fails for a moment, an antivirus or a sync tool holding the file just
+    /// written, is tried again there and never blocks a frame).
+    loaded: Option<Config>,
+}
+
+/// Reads `file`, trying again a few times when it cannot be read for a moment.
+fn load_settled(file: &Path) -> Option<Config> {
+    for attempt in 0..5 {
+        if let Ok(config) = Config::load(file) {
+            return Some(config);
+        }
+        if attempt < 4 {
+            std::thread::sleep(std::time::Duration::from_millis(40));
+        }
+    }
+    None
 }
 
 /// Where this installation comes from; tests give it a fake.
@@ -203,11 +228,11 @@ impl PreferencesState {
     /// Takes the installation table and the look keys older builds read from
     /// the file again (the rest of the page's config stays), and publishes
     /// the look when it changed.
-    pub(super) fn reread_installation(&mut self) {
-        let Some(file) = self.config_file() else {
-            return;
-        };
-        let Ok(loaded) = Config::load(&file) else {
+    pub(super) fn reread_installation(&mut self, loaded: Option<Config>) {
+        let Some(loaded) = loaded.or_else(|| {
+            let file = self.config_file()?;
+            Config::load(&file).ok()
+        }) else {
             return;
         };
         let before = self.this_effective();
@@ -430,6 +455,7 @@ impl PreferencesState {
             self.own_entry(),
         );
         let eff = self.this_effective();
+        let old_name = installation::launcher_name(&eff.name, eff.name_with_version, VERSION);
         // What the entry takes, after the checks.
         let cleaned = match field {
             "info" => return true,
@@ -529,6 +555,15 @@ impl PreferencesState {
         }
         self.config = Config::load(&file).unwrap_or_else(|_| self.config.clone());
         self.publish_installation();
+        // The shortcuts carry the launcher name: they move to the new one now,
+        // not at the next Create.
+        if matches!(field, "name" | "name_with_version") {
+            let now = self.this_effective();
+            let new_name = installation::launcher_name(&now.name, now.name_with_version, VERSION);
+            if new_name != old_name {
+                self.install_start(Job::Rename(old_name));
+            }
+        }
         self.message = Some(if field == "env" {
             t::ENV_RESTART.get().to_string()
         } else {
@@ -679,8 +714,26 @@ impl PreferencesState {
                 job => Some(machine.run(job)),
             };
             let legacy = launcher::legacy_places(&(machine.launcher)(), &machine.setting);
-            let _ = tx.send_notify(Reply { legacy, done });
+            let loaded = machine.file.as_deref().and_then(load_settled);
+            let _ = tx.send_notify(Reply {
+                legacy,
+                done,
+                loaded,
+            });
         });
+    }
+
+    /// A handover job that finished says who the primary is, whatever the
+    /// re-read made of the file.
+    fn settle_primary(&mut self, done: &Done) {
+        let me = self.this().identity.id.clone();
+        let primary = &mut self.config.installation.primary;
+        match done {
+            Done::Primary(_) if primary.as_deref() != Some(me.as_str()) => *primary = Some(me),
+            Done::Resigned(_) if primary.as_deref() == Some(me.as_str()) => *primary = None,
+            _ => return,
+        }
+        self.publish_installation();
     }
 
     /// Applies a finished job. Never blocks; called once a frame.
@@ -694,25 +747,35 @@ impl PreferencesState {
         // The file is the truth, whatever the job made of it: a handover that
         // fails half way has still written the primary, and another
         // installation may have changed it since the page opened.
-        self.reread_installation();
+        self.reread_installation(reply.loaded);
         if let Some(done) = reply.done {
+            // The job's own answer settles the role when the file could not be
+            // read back: the row never keeps the state the job just ended.
+            self.settle_primary(&done);
             if let Done::Failed(e) = &done {
                 crate::activity_log::report_problem(
                     crate::activity_log::ProblemSource::Tool,
                     &t::failed(e),
                 );
             }
-            if !matches!(done, Done::Failed(_) | Done::LegacyRemoved(_)) {
+            if !matches!(
+                done,
+                Done::Failed(_) | Done::LegacyRemoved(_) | Done::Renamed
+            ) {
                 self.publish_installation();
             }
-            self.message = Some(match &done {
-                Done::Primary(name) => t::done_primary(name),
-                Done::Resigned(name) => t::done_resigned(name),
-                Done::Forgot(name) => t::done_forgot(name),
-                Done::LegacyRemoved(0) => t::DONE_LEGACY_NOTHING.get().to_string(),
-                Done::LegacyRemoved(_) => t::DONE_LEGACY_REMOVED.get().to_string(),
-                Done::Failed(e) => t::failed(e),
-            });
+            let text = match &done {
+                Done::Renamed => None,
+                Done::Primary(name) => Some(t::done_primary(name)),
+                Done::Resigned(name) => Some(t::done_resigned(name)),
+                Done::Forgot(name) => Some(t::done_forgot(name)),
+                Done::LegacyRemoved(0) => Some(t::DONE_LEGACY_NOTHING.get().to_string()),
+                Done::LegacyRemoved(_) => Some(t::DONE_LEGACY_REMOVED.get().to_string()),
+                Done::Failed(e) => Some(t::failed(e)),
+            };
+            if text.is_some() {
+                self.message = text;
+            }
         }
         if let Some(job) = self.install.pending.take() {
             self.install_start(job);
@@ -764,6 +827,7 @@ impl JobMachine {
                 Done::LegacyRemoved(removed)
             }
             Job::Forget(gone) => self.forget(&file, &gone),
+            Job::Rename(old) => self.rename(&file, old),
         }
     }
 
@@ -875,11 +939,31 @@ impl JobMachine {
         if old_ctx.is_primary() != ctx.is_primary() {
             desktop::release_icons(&env.dirs, env.os, &old_ctx);
         }
+        // The alias files this installation made carry the role's own text (the
+        // legacy marker is the primary's alone): rewritten now, so they read
+        // installed and not outdated. Another installation's are never touched.
+        super::launcher_alias::rewrite_own(&(self.aliases)(), &ctx);
         if becoming {
             Done::Primary(ctx.name)
         } else {
             Done::Resigned(ctx.name)
         }
+    }
+
+    /// The launcher name changed from `old_name`: this installation's
+    /// shortcuts and folder-menu entry move to the new one, in place.
+    fn rename(&self, file: &Path, old_name: String) -> Done {
+        let env = (self.launcher)();
+        let logo = self.logo(file);
+        let ctx = self.ctx(file);
+        let old = InstallCtx {
+            name: old_name,
+            ..ctx.clone()
+        };
+        let mut fe = (self.folder)(&logo);
+        fe.ctx = ctx.clone();
+        launcher::rename_launchers(&env, &fe, &self.setting, &logo, &old, &ctx);
+        Done::Renamed
     }
 
     /// Forgets a gone installation: its launchers, aliases and folder-menu
@@ -921,5 +1005,30 @@ impl JobMachine {
             Ok(()) => Done::Forgot(gone.name.clone()),
             Err(e) => Done::Failed(e.to_string()),
         }
+    }
+}
+
+#[cfg(test)]
+mod settle_tests {
+    use super::*;
+
+    /// A job that ended says who the primary is even when the file could not
+    /// be read back: the checkbox never keeps the state the job just left.
+    #[test]
+    fn a_finished_handover_settles_the_primary_row_when_the_reread_failed() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut st = crate::preferences::tests::state(tmp.path());
+        st.set_this(fake_current(true));
+        st.config.installation.primary = Some("aaaa000000000001".to_string());
+        let checked = |st: &PreferencesState| st.this_effective().primary;
+        assert!(checked(&st));
+        // The file could not be read back: the job's own answer still counts.
+        st.settle_primary(&Done::Resigned("name".to_string()));
+        assert!(!checked(&st), "resigned: the box is clear");
+        st.settle_primary(&Done::Primary("name".to_string()));
+        assert!(checked(&st), "became the primary: the box is checked");
+        // Other answers change nothing.
+        st.settle_primary(&Done::Renamed);
+        assert!(checked(&st));
     }
 }

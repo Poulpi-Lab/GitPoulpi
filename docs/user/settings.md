@@ -202,7 +202,7 @@ GitPoulpi from the OS launcher, in the terminal you choose.
 | Row | What it does |
 |---|---|
 | **Installation** | Read-only: the kind, the folder and the environment of this installation. On a narrow page the folder is cut in the middle with an ellipsis; the help line under the row has the full text. |
-| **Launcher name** | The name of this installation's shortcuts and folder-menu entry. Refused when another installation that still exists has that name. The primary is always called `GitPoulpi`. |
+| **Launcher name** | The name of this installation's shortcuts and folder-menu entry. Refused when another installation that still exists has that name. Changing it renames the shortcuts this installation already has (Start menu, Desktop, the app launcher entry) and relabels its folder-menu entry in place; none is created. The primary is always called `GitPoulpi`. |
 | **Include version in the launcher name** | Adds `<major>.<minor>` to the name (`GitPoulpi 1.2`); off by default, because the shortcuts are renamed at each update. |
 | **Octopus colour** | The colour of this installation's octopus and its shortcuts (same choices as the About window). |
 | **Become the primary** | The primary owns the plain name `GitPoulpi`, the legacy shortcuts and the `ui.*` keys older builds read; nobody is primary by default. Asks first when another installation is. The previous primary keeps its launchers under its own name (Windows and Linux). Changing role (becoming the primary, or resigning) renames this installation's shortcuts in place, so there is never a moment without one, and moves its file-manager entry to the new name. |

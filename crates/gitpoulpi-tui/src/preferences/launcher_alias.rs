@@ -153,6 +153,19 @@ pub(super) fn sync_shims(machine: &Machine) {
     }
 }
 
+/// A role change (this installation became the primary, or stopped being it):
+/// its own alias files are rewritten to the text of the new role, which
+/// differs by the legacy marker only the primary writes. Any system. An alias
+/// of another installation reads `Other`, never `Outdated`, so it stays as it is.
+pub(super) fn rewrite_own(machine: &Machine, ctx: &gitpoulpi_config::desktop::InstallCtx) {
+    let env = machine.alias.clone().with_ctx(ctx.clone());
+    for (name, kind, state) in alias::list_kinds(&env) {
+        if state == alias::State::Outdated {
+            let _ = alias::create_with_app_path(&env, &*machine.registry, &name, kind);
+        }
+    }
+}
+
 fn read(machine: &Machine, name: &str, name_add: &str) -> Snapshot {
     sync_shims(machine);
     let valid = alias::validate_name(name).is_ok();

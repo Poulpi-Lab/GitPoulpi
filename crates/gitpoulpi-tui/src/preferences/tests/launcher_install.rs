@@ -637,6 +637,46 @@ fn the_folder_menu_entry_survives_becoming_the_primary_and_resigning() {
 }
 
 #[test]
+fn the_handover_leaves_exactly_one_folder_menu_verb_per_installation() {
+    use gitpoulpi_config::desktop::registry::Registry;
+    let tmp = tempfile::tempdir().unwrap();
+    let mut st = windows_state(tmp.path());
+    let reg = std::sync::Arc::new(MemoryRegistry::new());
+    let root = tmp.path().join("machine");
+    let (r, g) = (root.clone(), reg.clone());
+    st.set_folder_menu_env(move |_| windows_menu_env(&r, g.clone()));
+    let verbs = || {
+        let mut v: Vec<String> = reg
+            .subkeys("Software\\Classes\\Directory\\shell")
+            .unwrap()
+            .into_iter()
+            .filter(|n| n.starts_with("gitpoulpi"))
+            .collect();
+        v.dedup();
+        v
+    };
+    let mut e = windows_menu_env(&root, reg.clone());
+    e.ctx = crate::launcher::ctx_in(&st.config, &st.this().identity, &st.this().config);
+    gitpoulpi_config::desktop::folder_menu::install(
+        &e,
+        &crate::launcher::folder_menu_label(&e.ctx.name),
+    )
+    .unwrap();
+    let own = format!("gitpoulpi.{}", e.ctx.short);
+    assert_eq!(verbs(), std::slice::from_ref(&own));
+    assert!(st.write_global("installation.primary", "true"));
+    settle_install(&mut st);
+    assert_eq!(
+        verbs(),
+        ["gitpoulpi"],
+        "the primary has the plain verb only"
+    );
+    assert!(st.write_global("installation.primary", "false"));
+    settle_install(&mut st);
+    assert_eq!(verbs(), [own], "resigned: its own verb only, no plain one");
+}
+
+#[test]
 fn a_script_folder_entry_is_replaced_never_deleted_by_the_handover() {
     use gitpoulpi_config::desktop::folder_menu;
     // GNOME Files finds its scripts by the owner tag, not by name: removing

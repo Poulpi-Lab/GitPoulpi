@@ -272,8 +272,14 @@ fn strays(env: &Env, lay: &Layout) -> Result<Vec<String>, String> {
         let wanted = lay.wanted_rel(class).to_ascii_lowercase();
         let names = env.registry.subkeys(&full(&format!("{class}\\shell")))?;
         for name in names {
-            let rel = if name.eq_ignore_ascii_case(&lay.verb()) {
-                lay.root_rel(class)
+            // Both root names: an installation has exactly one verb, so the
+            // one of its other role (the plain key as a resigned primary, its
+            // own `.i<8hex>` key as the primary) is left over, whatever
+            // changed its role.
+            let rel = if name.eq_ignore_ascii_case(LEGACY_VERB)
+                || name.eq_ignore_ascii_case(&format!("{LEGACY_VERB}.{}", lay.short))
+            {
+                format!("{class}\\shell\\{name}")
             } else if name
                 .get(..MENU_PREFIX.len())
                 .is_some_and(|p| p.eq_ignore_ascii_case(MENU_PREFIX))
@@ -416,15 +422,28 @@ pub(super) fn install(env: &Env, label: &str) -> Result<(), String> {
     keys.extend(containers.iter().cloned());
     keys.push(app_key.clone());
     let got = read_map(env, &keys)?;
-    let mut ops = delete_entries(&strays(env, &lay)?);
+    let mut ops = Vec::new();
     for class in CLASSES {
         let key = full(&lay.wanted_rel(class));
         match get(&got, &key) {
             Some((v, _)) if !mine(env, v) => {
                 return Err(format!("{key} is not ours; not overwriting it"));
             }
-            // Drop stale values and keys before writing again.
-            Some(_) => ops.push(RegOp::DeleteTree(key)),
+            // A value the new verb does not have (the legacy marker after a
+            // role change) goes with the key. Otherwise the key is
+            // overwritten in place: deleting it first would leave the
+            // installation without an entry for a moment.
+            Some((v, _)) => {
+                let new_values = wanted
+                    .iter()
+                    .find(|(k, _)| k.eq_ignore_ascii_case(&key))
+                    .map(|(_, w)| w);
+                let stale =
+                    new_values.is_some_and(|w| v.iter().any(|(n, _)| value(w, n).is_none()));
+                if stale {
+                    ops.push(RegOp::DeleteTree(key));
+                }
+            }
             None => {}
         }
     }
@@ -450,7 +469,85 @@ pub(super) fn install(env: &Env, label: &str) -> Result<(), String> {
     if lay.primary && get(&got, &app_key).as_ref().is_none_or(|(v, _)| marked(v)) {
         ops.extend(app_path_ops("gitpoulpi.exe", helper));
     }
+    // The verbs of the installation's other role go last: the new one exists
+    // before the old one is deleted, so there is no moment without an entry.
+    ops.extend(delete_entries(&strays(env, &lay)?));
     env.registry.apply(&ops)
+}
+
+/// The installation `env` describes stops being the primary and is not here to
+/// rewrite its own verbs: its plain `GitPoulpi` verbs move to its own
+/// `GitPoulpi.i<8hex>` names (same values and command, without the legacy
+/// marker). The new key is written before the plain one is deleted, so it
+/// has an entry at every moment. Its next sync rewrites them. App Paths
+/// `gitpoulpi.exe` is the primary's and is removed. Returns whether anything
+/// moved.
+pub(super) fn demote(env: &Env) -> Result<bool, String> {
+    let lay = Layout::of(env);
+    let own = format!("{LEGACY_VERB}.{}", lay.short);
+    let app_key = app_path_key("gitpoulpi.exe");
+    let mut keys = Vec::new();
+    for class in CLASSES {
+        for rel in [
+            format!("{class}\\shell\\{LEGACY_VERB}"),
+            format!("{class}\\shell\\{LEGACY_VERB}\\command"),
+            format!("{class}\\shell\\{own}"),
+        ] {
+            keys.push(full(&rel));
+        }
+    }
+    keys.push(app_key.clone());
+    let got = read_map(env, &keys)?;
+    let mut ops = Vec::new();
+    let mut deletes = Vec::new();
+    for class in CLASSES {
+        let plain = full(&format!("{class}\\shell\\{LEGACY_VERB}"));
+        let target = full(&format!("{class}\\shell\\{own}"));
+        let Some((values, _)) = get(&got, &plain).as_ref().filter(|(v, _)| mine(env, v)) else {
+            continue;
+        };
+        if get(&got, &target).is_some() {
+            // Its own verb exists already: the plain one is only a duplicate.
+            deletes.push(RegOp::DeleteTree(plain));
+            continue;
+        }
+        for (name, v) in values {
+            if name.eq_ignore_ascii_case(MARK_NAME) {
+                continue;
+            }
+            ops.push(RegOp::Set {
+                key: target.clone(),
+                name: name.clone(),
+                value: v.clone(),
+            });
+        }
+        if !lay.id.is_empty() && value(values, OWNER_TAG).is_none() {
+            ops.push(RegOp::Set {
+                key: target.clone(),
+                name: s(OWNER_TAG),
+                value: lay.id.clone(),
+            });
+        }
+        if let Some((cmd, _)) = get(&got, &format!("{plain}\\command")) {
+            for (name, v) in cmd {
+                ops.push(RegOp::Set {
+                    key: format!("{target}\\command"),
+                    name: name.clone(),
+                    value: v.clone(),
+                });
+            }
+        }
+        deletes.push(RegOp::DeleteTree(plain));
+    }
+    if get(&got, &app_key).as_ref().is_some_and(|(v, _)| marked(v)) {
+        deletes.push(app_path_remove("gitpoulpi.exe"));
+    }
+    if ops.is_empty() && deletes.is_empty() {
+        return Ok(false);
+    }
+    ops.extend(deletes);
+    env.registry.apply(&ops)?;
+    Ok(true)
 }
 
 pub(super) fn remove(env: &Env) -> Result<bool, String> {
@@ -969,5 +1066,200 @@ mod tests {
         assert!(folder_menu::install(&a, LABEL).unwrap().is_empty());
         assert!(folder_menu::remove(&a).unwrap().is_empty());
         assert_eq!(reg.dump(), before);
+    }
+
+    // ---- one verb per installation at every moment ----
+
+    /// A registry that applies one operation at a time and checks, after each,
+    /// that installation `watched` still has a verb (plain or its own) in every
+    /// class: the moment without an entry Explorer would show. It also notes
+    /// the keys deleted.
+    struct Watch {
+        inner: MemoryRegistry,
+        watched: String,
+        deleted: std::sync::Mutex<Vec<String>>,
+        gaps: std::sync::Mutex<Vec<String>>,
+    }
+
+    impl Watch {
+        fn new(watched: &str) -> Arc<Watch> {
+            Arc::new(Watch {
+                inner: MemoryRegistry::new(),
+                watched: watched.to_string(),
+                deleted: Default::default(),
+                gaps: Default::default(),
+            })
+        }
+
+        /// The classes where the watched installation has no verb now.
+        fn missing(&self) -> Vec<String> {
+            let tagged = |rel: String| {
+                self.inner
+                    .read(&[full(&rel)])
+                    .unwrap()
+                    .remove(0)
+                    .is_some_and(|(v, _)| value(&v, OWNER_TAG) == Some(self.watched.as_str()))
+            };
+            CLASSES
+                .iter()
+                .filter(|c| {
+                    let plain = format!("{c}\\shell\\GitPoulpi");
+                    let own = format!("{c}\\shell\\GitPoulpi.{}", short(&self.watched));
+                    !(tagged(plain) || tagged(own))
+                })
+                .map(|c| c.to_string())
+                .collect()
+        }
+    }
+
+    impl Registry for Watch {
+        fn read(&self, keys: &[String]) -> Result<Vec<Option<(Values, bool)>>, String> {
+            self.inner.read(keys)
+        }
+        fn subkeys(&self, key: &str) -> Result<Vec<String>, String> {
+            self.inner.subkeys(key)
+        }
+        fn apply(&self, ops: &[RegOp]) -> Result<(), String> {
+            let had_one = self.missing().is_empty();
+            for op in ops {
+                if let RegOp::DeleteTree(k) = op {
+                    self.deleted.lock().unwrap().push(k.clone());
+                }
+                self.inner.apply(std::slice::from_ref(op))?;
+                if had_one {
+                    let missing = self.missing();
+                    if !missing.is_empty() {
+                        self.gaps
+                            .lock()
+                            .unwrap()
+                            .push(format!("{op:?}: {missing:?}"));
+                    }
+                }
+            }
+            Ok(())
+        }
+    }
+
+    fn env_over(reg: &Arc<Watch>, id: &str, primary: Option<&str>) -> Env {
+        Env {
+            registry: reg.clone(),
+            ..env_for(&Arc::new(MemoryRegistry::new()), id, primary, "", None)
+        }
+    }
+
+    fn roots_of(reg: &Watch) -> Vec<String> {
+        let mut names: Vec<String> = reg
+            .inner
+            .subkeys(&full("Directory\\shell"))
+            .unwrap()
+            .into_iter()
+            .filter(|n| n.to_ascii_lowercase().starts_with("gitpoulpi"))
+            .collect();
+        names.sort();
+        names.dedup();
+        names
+    }
+
+    fn own_verb(id: &str) -> String {
+        format!("gitpoulpi.{}", short(id))
+    }
+
+    #[test]
+    fn becoming_the_primary_leaves_one_verb_and_never_none() {
+        let reg = Watch::new(A);
+        folder_menu::install(&env_over(&reg, A, None), LABEL).unwrap();
+        assert_eq!(roots_of(&reg), [own_verb(A)]);
+        let primary = env_over(&reg, A, Some(A));
+        // Its own verb is the leftover of the old role.
+        assert_eq!(state_of(&primary), State::Outdated);
+        folder_menu::install(&primary, LABEL).unwrap();
+        assert_eq!(roots_of(&reg), ["gitpoulpi"], "the plain verb only");
+        assert_eq!(state_of(&primary), State::Installed);
+        assert!(reg.gaps.lock().unwrap().is_empty(), "{:?}", reg.gaps);
+    }
+
+    #[test]
+    fn resigning_leaves_one_verb_written_before_the_plain_one_goes() {
+        let reg = Watch::new(A);
+        folder_menu::install(&env_over(&reg, A, Some(A)), LABEL).unwrap();
+        assert_eq!(roots_of(&reg), ["gitpoulpi"]);
+        let own = env_over(&reg, A, None);
+        assert_eq!(state_of(&own), State::Outdated);
+        folder_menu::install(&own, LABEL).unwrap();
+        assert_eq!(roots_of(&reg), [own_verb(A)]);
+        assert_eq!(state_of(&own), State::Installed);
+        assert!(reg.gaps.lock().unwrap().is_empty(), "{:?}", reg.gaps);
+    }
+
+    #[test]
+    fn rewriting_a_verb_in_place_never_deletes_it_first() {
+        let reg = Watch::new(A);
+        let own = env_over(&reg, A, None);
+        folder_menu::install(&own, LABEL).unwrap();
+        // Outdated (its helper moved) and rewritten: overwritten, not recreated.
+        let moved = Env {
+            helper: Some(PathBuf::from("C:/elsewhere/gitpoulpi-launch.exe")),
+            ..own
+        };
+        assert_eq!(state_of(&moved), State::Outdated);
+        folder_menu::sync(&moved, LABEL).unwrap();
+        assert_eq!(state_of(&moved), State::Installed);
+        assert!(reg.deleted.lock().unwrap().is_empty(), "{:?}", reg.deleted);
+    }
+
+    #[test]
+    fn the_verb_of_another_installation_is_never_a_leftover() {
+        let reg = Watch::new(A);
+        // B is the primary with the plain verb; A has its own.
+        folder_menu::install(&env_over(&reg, B, Some(B)), LABEL).unwrap();
+        folder_menu::install(&env_over(&reg, A, Some(B)), LABEL).unwrap();
+        assert_eq!(roots_of(&reg), ["gitpoulpi".to_string(), own_verb(A)]);
+        // A is told it is the primary but B still holds the plain key: A's
+        // install leaves it alone.
+        let a_primary = env_over(&reg, A, Some(A));
+        assert_eq!(state_of(&a_primary), State::Foreign);
+        assert!(folder_menu::install(&a_primary, LABEL).unwrap().is_empty());
+        assert_eq!(roots_of(&reg), ["gitpoulpi".to_string(), own_verb(A)]);
+    }
+
+    #[test]
+    fn demoting_the_primary_moves_its_verbs_to_its_own_names_without_a_gap() {
+        let reg = Watch::new(A);
+        let primary = env_over(&reg, A, Some(A));
+        folder_menu::install(&primary, LABEL).unwrap();
+        assert_eq!(folder_menu::demote(&primary).unwrap(), [Manager::Explorer]);
+        assert_eq!(roots_of(&reg), [own_verb(A)]);
+        let rel = format!("Directory\\shell\\{}", own_verb(A));
+        assert_eq!(val(&reg.inner, &rel, OWNER_TAG).as_deref(), Some(A));
+        assert_eq!(val(&reg.inner, &rel, "X-GitPoulpi"), None);
+        let command = format!("{rel}\\command");
+        assert!(val(&reg.inner, &command, "").is_some());
+        assert_eq!(state_of(&env_over(&reg, A, Some(B))), State::Installed);
+        assert!(reg.gaps.lock().unwrap().is_empty(), "{:?}", reg.gaps);
+        let app = reg.inner.read(&[app_path_key("gitpoulpi.exe")]).unwrap();
+        assert!(app[0].is_none(), "App Paths is the primary's");
+        // Nothing left to move.
+        assert!(folder_menu::demote(&primary).unwrap().is_empty());
+    }
+
+    #[test]
+    fn uninstalling_the_primary_removes_both_its_verbs_and_only_its_own() {
+        let reg = Watch::new(A);
+        folder_menu::install(&env_over(&reg, B, Some(A)), LABEL).unwrap();
+        folder_menu::install(&env_over(&reg, A, Some(A)), LABEL).unwrap();
+        // The orphan an old build left: its own key next to the plain one.
+        for class in CLASSES {
+            let rel = format!("{class}\\shell\\{}", own_verb(A));
+            reg.apply(&[
+                set(&full(&rel), OWNER_TAG, A),
+                set(&full(&format!("{rel}\\command")), "", "x"),
+            ])
+            .unwrap();
+        }
+        assert_eq!(roots_of(&reg).len(), 3, "{:?}", roots_of(&reg));
+        let primary = env_over(&reg, A, Some(A));
+        assert_eq!(folder_menu::remove(&primary).unwrap(), [Manager::Explorer]);
+        assert_eq!(roots_of(&reg), [own_verb(B)]);
+        assert_eq!(state_of(&env_over(&reg, B, Some(A))), State::Installed);
     }
 }

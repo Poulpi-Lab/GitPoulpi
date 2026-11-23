@@ -832,7 +832,7 @@ impl JobMachine {
                 let _ = desktop::hand_over_shortcuts(&env.dirs, env.os, &old_ctx);
                 let mut old_fe = fe.clone();
                 old_fe.ctx = old_ctx;
-                let _ = folder_menu::remove(&old_fe);
+                let _ = folder_menu::demote(&old_fe);
             }
         }
         let ctx = self.ctx(file);

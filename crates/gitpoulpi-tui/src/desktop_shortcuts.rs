@@ -132,6 +132,20 @@ fn apply(
     Ok(out)
 }
 
+/// The launcher name of this installation changed between `before` and `after`
+/// (`gitpoulpi installation set name|name_with_version`): its shortcuts and
+/// folder-menu entry follow by a rename, then a rewrite. Does nothing for a
+/// shortcut that does not exist. Blocking, best effort.
+pub fn launcher_name_changed(before: &gitpoulpi_config::Config, after: &gitpoulpi_config::Config) {
+    let cur = gitpoulpi_config::installation::current();
+    let old = launcher::ctx_in(before, &cur.identity, &cur.config);
+    let new = launcher::ctx_in(after, &cur.identity, &cur.config);
+    let logo = crate::launcher_sync::effective_in(after, &cur.identity, &cur.config).logo_color;
+    let env = Env::real();
+    let fe = launcher::folder_menu_env(&env, Some(&logo));
+    launcher::rename_launchers(&env, &fe, &after.ui.launch_terminal, &logo, &old, &new);
+}
+
 /// The terminal command that opens `folder` (or only GitPoulpi, with `None`),
 /// built when a file-manager entry is clicked from `ui.launch_terminal`, so
 /// changing the terminal never leaves an entry outdated. `gitpoulpi launch

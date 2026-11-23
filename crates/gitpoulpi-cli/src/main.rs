@@ -32,6 +32,10 @@ fn main() -> std::process::ExitCode {
     // Started by git as the credential helper of an account-authenticated
     // transfer (ADR-0010)? Then this is all the process does.
     gitpoulpi_ipc::git_credential::run_if_requested();
+    // `installation set name` renames this installation's shortcuts too.
+    gitpoulpi_commands::installation_cmd::on_launcher_name_change(
+        gitpoulpi_tui::desktop_shortcuts::launcher_name_changed,
+    );
     let args: Vec<String> = std::env::args_os()
         .skip(1)
         .map(|a| a.to_string_lossy().into_owned())

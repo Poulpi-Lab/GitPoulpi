@@ -686,3 +686,158 @@ fn a_script_folder_entry_is_replaced_never_deleted_by_the_handover() {
     settle_install(&mut st);
     assert_eq!(names(), ["Open in GitPoulpi".to_string()]);
 }
+
+/// An alias machine under `root`, as `ctx` writes (never the real home).
+fn alias_machine(root: &Path) -> crate::preferences::launcher_alias::Machine {
+    use gitpoulpi_config::desktop::path as user_path;
+    struct Nothing;
+    impl user_path::UserPath for Nothing {
+        fn read(&self) -> Result<user_path::UserPathValues, String> {
+            Ok(user_path::UserPathValues::default())
+        }
+        fn write(&self, _: &str, _: Option<&str>) -> Result<(), String> {
+            Ok(())
+        }
+    }
+    let alias = gitpoulpi_config::desktop::alias::Env {
+        os: gitpoulpi_config::open_in::Os::Linux,
+        bin_dir: root.join("bin"),
+        exe: PathBuf::from("/opt/gp/gitpoulpi"),
+        newest: false,
+        path_var: Some(std::ffi::OsString::new()),
+        pathext: None,
+        ctx: gitpoulpi_config::desktop::InstallCtx::legacy(),
+        cargo_home: None,
+    };
+    let path = user_path::Env {
+        os: gitpoulpi_config::open_in::Os::Linux,
+        home: root.join("home"),
+        config_home: root.join("home/.config"),
+        wanted: Vec::new(),
+        path_var: Some(std::ffi::OsString::new()),
+        keep: Vec::new(),
+    };
+    crate::preferences::launcher_alias::Machine {
+        alias,
+        path,
+        user: std::sync::Arc::new(Nothing),
+        registry: std::sync::Arc::new(MemoryRegistry::new()),
+    }
+}
+
+#[test]
+fn a_role_change_rewrites_this_installations_own_aliases_and_nobody_elses() {
+    use gitpoulpi_config::desktop::alias::{self, Kind, State};
+    const OTHER: &str = "bbbb000000000002";
+    let tmp = tempfile::tempdir().unwrap();
+    let mut st = install_state(tmp.path());
+    let other_dir = tmp.path().join("other");
+    std::fs::create_dir_all(&other_dir).unwrap();
+    st.config.installation.settings.insert(
+        OTHER.to_string(),
+        other_entry("GitPoulpi (dev)", &other_dir.display().to_string(), "", ""),
+    );
+    std::fs::write(
+        tmp.path().join("config.toml"),
+        format!(
+            "[installation.settings.{OTHER}]\npath = {:?}\nkind = \"dev\"\nname = \"GitPoulpi (dev)\"\n",
+            other_dir.display().to_string()
+        ),
+    )
+    .unwrap();
+    st.config = Config::load(&tmp.path().join("config.toml")).unwrap();
+    let root = tmp.path().join("machine");
+    let r = root.clone();
+    st.set_launcher_env(move || temp_machine(&r));
+    let r = root.clone();
+    st.set_tools_machine(move || alias_machine(&r));
+    // The aliases as the running installation made them before the change
+    // (no legacy marker), and one of the other installation's.
+    let ctx_of = |st: &PreferencesState| {
+        crate::launcher::ctx_in(&st.config, &st.this().identity, &st.this().config)
+    };
+    let mine = alias_machine(&root).alias.with_ctx(ctx_of(&st));
+    alias::create_kind(&mine, "gpa", Kind::Add).unwrap();
+    let mut theirs_ctx = ctx_of(&st);
+    theirs_ctx.id = OTHER.to_string();
+    theirs_ctx.short = "ibbbb0000".to_string();
+    let theirs = alias_machine(&root).alias.with_ctx(theirs_ctx);
+    alias::create_kind(&theirs, "gpd", Kind::Add).unwrap();
+    let their_text = std::fs::read_to_string(root.join("bin/gpd")).unwrap();
+    assert!(!std::fs::read_to_string(root.join("bin/gpa"))
+        .unwrap()
+        .contains("X-GitPoulpi=1"));
+
+    // Becoming the primary: the alias takes the role's text.
+    assert!(st.write_global("installation.primary", "true"));
+    settle_install(&mut st);
+    let now = alias_machine(&root).alias.with_ctx(ctx_of(&st));
+    assert!(now.ctx.is_primary());
+    assert_eq!(
+        alias::status_kind(&now, "gpa", Kind::Add).state,
+        State::Installed,
+        "{}",
+        std::fs::read_to_string(root.join("bin/gpa")).unwrap()
+    );
+    assert!(std::fs::read_to_string(root.join("bin/gpa"))
+        .unwrap()
+        .contains("X-GitPoulpi=1"));
+    assert_eq!(
+        std::fs::read_to_string(root.join("bin/gpd")).unwrap(),
+        their_text,
+        "another installation's alias is left as it is"
+    );
+
+    // And back: the legacy marker goes again.
+    assert!(st.write_global("installation.primary", "false"));
+    settle_install(&mut st);
+    let now = alias_machine(&root).alias.with_ctx(ctx_of(&st));
+    assert!(!now.ctx.is_primary());
+    assert_eq!(
+        alias::status_kind(&now, "gpa", Kind::Add).state,
+        State::Installed
+    );
+    assert_eq!(
+        std::fs::read_to_string(root.join("bin/gpd")).unwrap(),
+        their_text
+    );
+}
+
+#[test]
+fn changing_the_launcher_name_or_the_version_renames_the_shortcuts_in_place() {
+    let tmp = tempfile::tempdir().unwrap();
+    let mut st = windows_state(tmp.path());
+    let machine = tmp.path().join("machine");
+    let _ = windows_machine(&machine);
+    let (start, desktop) = (machine.join("start"), machine.join("Desktop"));
+    let own = "GitPoulpi (portable).lnk";
+    std::fs::write(start.join(own), lnk_of(ME, false)).unwrap();
+    std::fs::write(desktop.join(own), lnk_of(ME, false)).unwrap();
+    // Somebody else's shortcut next to ours is not looked at.
+    std::fs::write(start.join("GitPoulpi (dev).lnk"), lnk_of("bbbb", false)).unwrap();
+
+    assert!(st.write_global("installation.name", "Poulpi Test"));
+    settle_install(&mut st);
+    for dir in [&start, &desktop] {
+        assert!(
+            dir.join("Poulpi Test.lnk").exists(),
+            "{dir:?}: the new name"
+        );
+        assert!(!dir.join(own).exists(), "{dir:?}: the old name is gone");
+    }
+    assert!(start.join("GitPoulpi (dev).lnk").exists());
+
+    // The version in the name changes the effective name: same treatment.
+    assert!(st.write_global("installation.name_with_version", "true"));
+    settle_install(&mut st);
+    let version = {
+        let mut parts = env!("CARGO_PKG_VERSION").split('.');
+        format!("{}.{}", parts.next().unwrap(), parts.next().unwrap())
+    };
+    let versioned = format!("Poulpi Test {version}.lnk");
+    for dir in [&start, &desktop] {
+        assert!(dir.join(&versioned).exists(), "{dir:?}: {versioned}");
+        assert!(!dir.join("Poulpi Test.lnk").exists(), "{dir:?}");
+    }
+    assert!(start.join("GitPoulpi (dev).lnk").exists());
+}

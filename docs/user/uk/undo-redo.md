@@ -190,7 +190,7 @@ commit'и...`, також перемикають відкриту панель �
 | Commit'и | commit, amend, reword, композер commit'ів ШІ (усі його commit'и як один крок) |
 | Гілки та tag'и | створення, видалення, перейменування, задання чи скасування upstream, створення гілки, що відстежує, створення / видалення / анотування tag'а, fast-forward, checkout pull request'а як гілки |
 | Переміщення | checkout гілки чи commit'у (зокрема відокремлений HEAD) |
-| Історія | merge (fast-forward чи merge-commit), rebase (звичайний та інтерактивний, після завершення), cherry-pick, revert, reset (soft, mixed і hard), локальна частина pull |
+| Історія | merge (fast-forward чи merge-commit), rebase (звичайний та інтерактивний, після завершення), cherry-pick, revert, reset (soft, mixed і hard), локальна частина pull, **Pull усіх гілок** (кожна зсунута гілка як один крок; файли поточної гілки повертаються разом із нею) |
 | Робочі зміни | stage і unstage (файл, папка, hunk, рядки, усе), відкидання (файл, папка, hunk, рядки, checkout файлу), застосування патча чи змін commit'а (`apply-commit`), **видалення файлу з диска**, **ігнорування** (файл, розширення чи папка: рядок у вибраному вами `.gitignore`), **вважати двійковим або текстовим** (рядок `.gitattributes`) |
 | Stash'і | push, apply, pop, drop, збереження змін commit'а як stash (`stash from-commit`) |
 | Remote'и та конфігурація | додавання, видалення, перейменування, зміна URL або push URL remote'а, Git LFS track і untrack |

@@ -140,16 +140,24 @@ pub(super) fn script(
 /// "running" dot. Best effort: a failure here leaves a working shortcut that
 /// just does not group.
 pub(super) fn aumid_script(lnks: &[PathBuf], aumid: &str) -> String {
-    if lnks.is_empty() {
+    aumid_script_groups(&[(lnks, aumid)])
+}
+
+/// [`aumid_script`] for groups of shortcuts with their own ID, the helper
+/// compiled once for all of them (`Add-Type` is the slow part).
+fn aumid_script_groups(groups: &[(&[PathBuf], &str)]) -> String {
+    if groups.iter().all(|(lnks, _)| lnks.is_empty()) {
         return String::new();
     }
     let mut s = String::from(AUMID_TYPE);
-    for lnk in lnks {
-        s.push_str(&format!(
-            "try {{ [GpAumid]::Set({lnk}, {id}) }} catch {{ }}\n",
-            lnk = ps_quote(&lnk.to_string_lossy()),
-            id = ps_quote(aumid),
-        ));
+    for (lnks, aumid) in groups {
+        for lnk in *lnks {
+            s.push_str(&format!(
+                "try {{ [GpAumid]::Set({lnk}, {id}) }} catch {{ }}\n",
+                lnk = ps_quote(&lnk.to_string_lossy()),
+                id = ps_quote(aumid),
+            ));
+        }
     }
     s
 }
@@ -632,7 +640,8 @@ pub(super) fn status(place: Place, dirs: &Dirs, req: &Request) -> Status {
             || !contains_text(&bytes, &ico.to_string_lossy())
             // A pinned copy still on the old icon: the Start menu entry may
             // already be current (an earlier run, the CLI) while the pin is not.
-            || !pinned_to_repoint(dirs, req).is_empty());
+            || !pinned_to_repoint(dirs, req).is_empty()
+            || !legacy_pins_to_repoint(dirs, req).is_empty());
     Status {
         state: if current {
             State::Installed
@@ -658,10 +667,16 @@ pub(super) fn write_icon(dirs: &Dirs, req: &Request) -> Result<(), String> {
 /// re-points every shortcut of ours at it (PowerShell; skipped in tests),
 /// then deletes the older files of this installation nothing points at.
 pub(super) fn refresh_icon(dirs: &Dirs, req: &Request) -> Result<(), String> {
+    refresh_icon_with(dirs, req, &run_powershell, &flush_icon_cache)
+}
+
+/// [`refresh_icon`] with its two process spawns as seams: `run` runs the one
+/// PowerShell script, `flush` asks Explorer to drop its icon cache.
+fn refresh_icon_with(dirs: &Dirs, req: &Request, run: Run, flush: &dyn Fn()) -> Result<(), String> {
     write_icon(dirs, req)?;
     if req.refresh_icon_cache && !req.icons.pngs.is_empty() {
-        repoint_shortcuts(dirs, req, &run_powershell);
-        flush_icon_cache();
+        repoint_shortcuts(dirs, req, run);
+        flush();
     }
     cleanup_icons(dirs, &ico_path_for(dirs, req.icons, req.ctx), req.ctx);
     Ok(())
@@ -811,6 +826,44 @@ pub(super) fn pinned_to_repoint(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
         .collect()
 }
 
+/// The taskbar pins of the pre-1.1.0 shortcut (legacy marker, no owner tag)
+/// that start this installation's exe. With no primary the owner rule calls
+/// them `Legacy`: their command line and AppUserModelID are never rewritten,
+/// but they are this installation's button, so they follow its colour (only
+/// their icon changes). With a primary they are the primary's, and another
+/// exe's are nobody's of ours. Sorted.
+pub(super) fn legacy_pins(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
+    let exes: Vec<String> = exe_spellings(req.exe, req.newest)
+        .into_iter()
+        .filter(|e| !e.is_empty())
+        .collect();
+    let mut found: Vec<PathBuf> = pinned_lnks(dirs)
+        .into_iter()
+        .filter(|p| {
+            std::fs::read(p).is_ok_and(|bytes| {
+                let tag = read_tag(&bytes);
+                let facts = facts_of(&bytes, tag.as_deref(), &exes);
+                facts.tag.is_none()
+                    && facts.names_my_exe
+                    && owner::decide(&facts, req.ctx) == Owner::Legacy
+            })
+        })
+        .collect();
+    found.sort();
+    found
+}
+
+/// [`legacy_pins`] whose icon is not the current `.ico` yet.
+pub(super) fn legacy_pins_to_repoint(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
+    let ico = ico_path_for(dirs, req.icons, req.ctx)
+        .to_string_lossy()
+        .to_string();
+    legacy_pins(dirs, req)
+        .into_iter()
+        .filter(|p| std::fs::read(p).is_ok_and(|b| !contains_text(&b, &ico)))
+        .collect()
+}
+
 /// Every shortcut of this installation (Start menu, Desktop, pinned copies)
 /// whose icon is not the current `.ico`.
 pub(super) fn shortcuts_to_repoint(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
@@ -836,22 +889,39 @@ pub(super) fn shortcuts_to_repoint(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
 /// it again) and that icons changed (`SHCNE_ASSOCCHANGED`). Saving through
 /// `WScript.Shell` drops the AppUserModelID of a shortcut, so it is written
 /// again after.
+#[cfg(test)]
 pub(super) fn pinned_script(lnks: &[PathBuf], icon: &Path, aumid: &str) -> String {
+    pinned_script_with(lnks, &[], icon, aumid)
+}
+
+/// [`pinned_script`] plus `legacy` pins (copies of the pre-1.1.0 shortcut that
+/// start this installation's exe): they get the icon and keep the plain
+/// legacy AppUserModelID they had, nothing else of them changes.
+pub(super) fn pinned_script_with(
+    lnks: &[PathBuf],
+    legacy: &[PathBuf],
+    icon: &Path,
+    aumid: &str,
+) -> String {
     // One shortcut that cannot be saved (locked, read-only) must not stop the
     // others nor the notification: each is its own `try`.
     let mut s = String::from("$ErrorActionPreference = 'Stop'\n");
-    if !lnks.is_empty() {
+    if !(lnks.is_empty() && legacy.is_empty()) {
         s.push_str("$sh = New-Object -ComObject WScript.Shell\n");
     }
-    for lnk in lnks {
+    for lnk in lnks.iter().chain(legacy) {
         s.push_str(&format!(
             "try {{ $p = $sh.CreateShortcut({lnk}); $p.IconLocation = {icon}; $p.Save() }} catch {{ }}\n",
             lnk = ps_quote(&lnk.to_string_lossy()),
             icon = ps_quote(&format!("{},0", icon.to_string_lossy())),
         ));
     }
-    s.push_str(&aumid_script(lnks, aumid));
-    s.push_str(&notify_script(lnks, true));
+    s.push_str(&aumid_script_groups(&[
+        (lnks, aumid),
+        (legacy, terminals::AUMID),
+    ]));
+    let all: Vec<PathBuf> = lnks.iter().chain(legacy).cloned().collect();
+    s.push_str(&notify_script(&all, true));
     s
 }
 
@@ -943,8 +1013,10 @@ pub(super) fn gone_script(gone: &[PathBuf], created: Option<&Path>) -> String {
 /// (documented in the settings guide).
 pub(super) fn repoint_shortcuts(dirs: &Dirs, req: &Request, run: Run) {
     let lnks = shortcuts_to_repoint(dirs, req);
-    let _ = run(&pinned_script(
+    let legacy = legacy_pins_to_repoint(dirs, req);
+    let _ = run(&pinned_script_with(
         &lnks,
+        &legacy,
         &ico_path_for(dirs, req.icons, req.ctx),
         &terminals::aumid_for(req.ctx),
     ));
@@ -2271,8 +2343,12 @@ otepad.exe",
         assert!(pinned_ours(&m.dirs, &r).is_empty());
         assert!(shortcuts_to_repoint(&m.dirs, &r).is_empty());
         assert!(!sync_pinned_args_with(&m.dirs, &r, &fake(&log)));
+        // The Start menu file is never written; the pin of this exe follows
+        // the colour only (icon and its old AppUserModelID, no new command
+        // line: that stays the primary's business).
         for s in log.borrow().iter() {
-            assert!(!s.contains("GitPoulpi.lnk"), "{s}");
+            assert!(!s.contains(&*legacy.to_string_lossy()), "{s}");
+            assert!(!s.contains("$p.TargetPath"), "{s}");
         }
         // Removing mine leaves it alone too.
         assert!(remove_with(Place::StartMenu, &m.dirs, &ctx, &fake(&log)).unwrap());
@@ -2344,6 +2420,119 @@ otepad.exe",
             names(pinned_ours(&m.dirs, &rb)),
             ["b-theirs.lnk", "c-legacy.lnk", "d-user.lnk"]
         );
+    }
+
+    /// A recolour is one PowerShell script and one cache flush, whatever the
+    /// number of shortcuts, and names only this installation's artifacts: its
+    /// own Start menu entry and the pins that are its own.
+    #[test]
+    fn a_recolour_runs_one_script_and_touches_only_this_installations_shortcuts() {
+        let m = machine();
+        let (one, two) = (icon_set(1), icon_set(2));
+        let ctx = ctx_of(ID_A, "GitPoulpi (Chocolatey)", None);
+        let other = ctx_of(ID_B, "GitPoulpi (dev)", None);
+        let log = RefCell::new(Vec::new());
+        let mut mine = req_with(&m.exe, &one, &ctx);
+        let theirs = req_with(&m.exe, &one, &other);
+        let a = install_with(Place::StartMenu, &m.dirs, &mine, &fake(&log)).unwrap();
+        let b = install_with(Place::StartMenu, &m.dirs, &theirs, &fake(&log)).unwrap();
+        let b_before = std::fs::read(&b).unwrap();
+        let pins = m.dirs.taskbar_pinned.clone().unwrap();
+        // The pin of this installation (a copy of its entry), another
+        // installation's pin, and an unrelated one.
+        std::fs::copy(&a, pins.join("mine.lnk")).unwrap();
+        std::fs::copy(&b, pins.join("theirs.lnk")).unwrap();
+        std::fs::write(pins.join("notepad.lnk"), utf16("notepad.exe")).unwrap();
+        let pin = pins.join("mine.lnk");
+        assert!(pinned_ours(&m.dirs, &mine).contains(&pin));
+
+        mine.icons = &two;
+        mine.refresh_icon_cache = true;
+        log.borrow_mut().clear();
+        let flushes = std::cell::Cell::new(0);
+        refresh_icon_with(&m.dirs, &mine, &fake(&log), &|| {
+            flushes.set(flushes.get() + 1)
+        })
+        .unwrap();
+
+        let log = log.borrow();
+        assert_eq!(log.len(), 1, "one PowerShell for every shortcut: {log:?}");
+        assert_eq!(flushes.get(), 1);
+        let script = &log[0];
+        let new_ico = ico_path_for(&m.dirs, &two, &ctx);
+        assert!(script.contains(&*new_ico.to_string_lossy()));
+        for lnk in [&a, &pin] {
+            assert!(
+                script.contains(&*lnk.to_string_lossy()),
+                "{lnk:?} in {script}"
+            );
+        }
+        for not_ours in [pins.join("theirs.lnk"), pins.join("notepad.lnk"), b.clone()] {
+            assert!(
+                !script.contains(&*not_ours.to_string_lossy()),
+                "{not_ours:?} was touched"
+            );
+        }
+        assert_eq!(std::fs::read(&b).unwrap(), b_before);
+    }
+
+    /// A pin made from the pre-1.1.0 shortcut carries the legacy marker and no
+    /// owner tag. With no primary it reads `Legacy` to the owner rule, yet it
+    /// starts this installation's exe: it must follow the colour. A legacy pin
+    /// that names another exe, and any pin of another installation, never does.
+    #[test]
+    fn a_legacy_pin_naming_my_exe_follows_the_colour_without_a_primary() {
+        let m = machine();
+        let (one, two) = (icon_set(1), icon_set(2));
+        let ctx = ctx_of(ID_A, "GitPoulpi (Chocolatey)", None);
+        let mut r = req_with(&m.exe, &one, &ctx);
+        let pins = m.dirs.taskbar_pinned.clone().unwrap();
+        let exe = m.exe.display();
+        let old_ico = ico_path_for(&m.dirs, &one, &ctx);
+        let legacy = utf16(&format!(
+            "{exe} --launcher GitPoulpi {MARKER} {}",
+            old_ico.display()
+        ));
+        std::fs::write(pins.join("legacy-mine.lnk"), &legacy).unwrap();
+        let elsewhere = utf16(&format!(
+            "elsewhere/gitpoulpi.exe GitPoulpi {MARKER} old.ico"
+        ));
+        std::fs::write(pins.join("legacy-elsewhere.lnk"), &elsewhere).unwrap();
+        let tagged_b = [
+            utf16("b.exe "),
+            string_data(&format!("GitPoulpi {OWNER_TAG}={ID_B}")),
+            utf16(" old.ico"),
+        ]
+        .concat();
+        std::fs::write(pins.join("theirs.lnk"), &tagged_b).unwrap();
+
+        // Its command line and AppUserModelID are the primary's business: the
+        // rewrite of whole pins skips it, only the icon follows.
+        assert!(pinned_ours(&m.dirs, &r).is_empty());
+        assert_eq!(
+            legacy_pins(&m.dirs, &r)
+                .iter()
+                .map(|p| p.file_name().unwrap().to_string_lossy().to_string())
+                .collect::<Vec<_>>(),
+            ["legacy-mine.lnk"]
+        );
+        r.icons = &two;
+        r.refresh_icon_cache = true;
+        let log = RefCell::new(Vec::new());
+        refresh_icon_with(&m.dirs, &r, &fake(&log), &|| {}).unwrap();
+        let script = log.borrow().join("\n");
+        assert!(script.contains("legacy-mine.lnk"), "{script}");
+        assert!(
+            script.contains("legacy-mine.lnk', 'GitPoulpi.GitPoulpi')"),
+            "{script}"
+        );
+        assert!(!script.contains("legacy-elsewhere.lnk"), "{script}");
+        assert!(!script.contains("theirs.lnk"), "{script}");
+        assert_eq!(
+            std::fs::read(pins.join("legacy-elsewhere.lnk")).unwrap(),
+            elsewhere
+        );
+        assert_eq!(std::fs::read(pins.join("theirs.lnk")).unwrap(), tagged_b);
     }
 
     #[test]

@@ -42,6 +42,11 @@ pub trait Registry {
     fn apply(&self, ops: &[RegOp]) -> Result<(), String>;
     /// The names of `key`'s subkeys (none when it is absent).
     fn subkeys(&self, key: &str) -> Result<Vec<String>, String>;
+    /// [`Registry::subkeys`] of several keys at once, in request order. One
+    /// call: the PowerShell registry answers all of them from one process.
+    fn subkeys_many(&self, keys: &[String]) -> Result<Vec<Vec<String>>, String> {
+        keys.iter().map(|k| self.subkeys(k)).collect()
+    }
 }
 
 /// The shared handle the callers hold.
@@ -126,6 +131,32 @@ elseif($f[0] -eq 'N'){$k=$root.OpenSubKey($f[1]);if($k){$e=($k.SubKeyCount -eq 0
 const LIST_SCRIPT: &str = "$k=[Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($env:GP_KEYS);\
 if($k){foreach($n in $k.GetSubKeyNames()){[Console]::Out.Write($n+\"`n\")};$k.Close()}";
 
+/// Prints `P<TAB><key>` per requested key, then `N<TAB><name>` per subkey.
+const LIST_MANY_SCRIPT: &str = "$root=[Microsoft.Win32.Registry]::CurrentUser;\
+foreach($key in ($env:GP_KEYS -split \"`n\")){\
+if($key -eq ''){continue};\
+[Console]::Out.Write('P'+\"`t\"+$key+\"`n\");\
+$k=$root.OpenSubKey($key);\
+if($k){foreach($n in $k.GetSubKeyNames()){[Console]::Out.Write('N'+\"`t\"+$n+\"`n\")};$k.Close()}}";
+
+/// Parses [`LIST_MANY_SCRIPT`]'s output into one list per requested key.
+fn parse_list_many(keys: &[String], out: &str) -> Vec<Vec<String>> {
+    let mut lists: Vec<Vec<String>> = vec![Vec::new(); keys.len()];
+    let mut at = None;
+    for line in out.lines().map(|l| l.trim_end_matches('\r')) {
+        match line.split_once('\t') {
+            Some(("P", key)) => at = keys.iter().position(|k| k == key),
+            Some(("N", name)) => {
+                if let Some(i) = at {
+                    lists[i].push(name.to_string());
+                }
+            }
+            _ => {}
+        }
+    }
+    lists
+}
+
 const READ_SCRIPT: &str = "$root=[Microsoft.Win32.Registry]::CurrentUser;\
 foreach($key in ($env:GP_KEYS -split \"`n\")){\
 if($key -eq ''){continue};\
@@ -193,6 +224,17 @@ impl Registry for PowerShellRegistry {
                 .filter(|l| !l.is_empty())
                 .collect()
         })
+    }
+
+    fn subkeys_many(&self, keys: &[String]) -> Result<Vec<Vec<String>>, String> {
+        if keys.is_empty() {
+            return Ok(Vec::new());
+        }
+        for k in keys {
+            check(k)?;
+        }
+        let joined = keys.join("\n");
+        run_powershell(LIST_MANY_SCRIPT, &[("GP_KEYS", &joined)]).map(|o| parse_list_many(keys, &o))
     }
 }
 
@@ -470,6 +512,17 @@ mod tests {
         assert!(r.apply(&[set("K", "n", "a\tb")]).is_err());
         assert!(r.apply(&[set("K", "n", "a\nb")]).is_err());
         assert!(r.dump().is_empty());
+    }
+
+    #[test]
+    fn the_listing_script_output_is_split_per_requested_key() {
+        let keys: Vec<String> = ["a", "b", "c"].map(String::from).to_vec();
+        let out = "P\ta\nN\tx\nN\ty z\r\nP\tb\nP\tc\nN\tq\n";
+        assert_eq!(
+            parse_list_many(&keys, out),
+            vec![vec!["x", "y z"], vec![], vec!["q"]]
+        );
+        assert!(MemoryRegistry::new().subkeys_many(&keys).unwrap()[0].is_empty());
     }
 
     #[test]

@@ -267,9 +267,29 @@ en felaktig färg ignoreras, en okänd `base` faller tillbaka på `dark`, och
 `gitpoulpi theme list` rapporterar varje problem under `warnings` (appen visar
 dem en gång på statusraden).
 
-Filerna läses om när Tema-kombolistan öppnas och när Inställningar stängs; det
-finns ingen filbevakare. Ett körande fönster tillämpar ett tema som satts från
-CLI nästa gång dess Inställningar stängs, som varje annan live-nyckel.
+Filerna läses om när Tema-kombolistan öppnas och när Inställningar stängs. Ett
+körande fönster märker också när `config.toml` (ett `gitpoulpi config set ui.theme ...`
+från ett skal) och det aktiva temats fil skrivs om, och tillämpar de nya
+färgerna inom ungefär en sekund, utan omstart.
+
+### `ui.border_focused`
+
+Ramen runt den ruta som har tangentbordsfokus: Loggen, Refs-sidofältet, rutorna
+Köade och Ej köade, incheckningsdetaljerna, historik-, gransknings- och
+omskrivningsrutorna samt diff-, fil- och redigeringsramarna. Den målar bara
+ramar; text, etiketter och ikoner (etiketten "commit :", Hem-ikonen,
+flikknapparna) använder fortfarande `ui.accent`. Då kan ett tema rama in den
+aktiva rutan i en färg som vore oläslig som text, till exempel klargul på ett
+ljust tema. När ett tema inte sätter den följer den `ui.accent` (även i en
+användarfil: en fil som bara ändrar `accent` ger den accenten även på de
+fokuserade ramarna), så alla inbyggda teman ser ut som förut. Dialoger och
+popup-fönster behåller en accentram.
+
+```toml
+[ui]
+accent = "#1f5fbf"
+border_focused = "#e7df00"
+```
 
 ## Systemdetektering
 

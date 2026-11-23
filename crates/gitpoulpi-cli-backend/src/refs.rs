@@ -72,10 +72,14 @@ pub fn refs(repo: &RepoRef) -> Result<Vec<Ref>> {
         let target = peeled.get(&listed).copied().unwrap_or(listed);
 
         if let Some((remote, tag)) = parse_remote_tag_mirror_ref(refname, &remote_names) {
-            mirror
-                .entry(tag.to_string())
-                .or_default()
-                .push((remote, target));
+            // A mirror whose remote is gone (removed outside GitPoulpi) is
+            // stale: skipped, so no tag reads as on a remote that is not there.
+            if remote_names.contains(&remote) {
+                mirror
+                    .entry(tag.to_string())
+                    .or_default()
+                    .push((remote, target));
+            }
             continue;
         }
         let Some(kind) = parse_ref_kind(refname, &remote_names) else {

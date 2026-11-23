@@ -15,6 +15,7 @@ IPC surfaces are stable within a major version).
 - A mouse click while a `Ctrl+G` or `Ctrl+N` chord waits for its second key cancels the chord, then acts as usual.
 
 ### Fixed
+- Tags no longer show as being on a remote that was removed from the repository outside GitPoulpi (for example with `git remote remove`); the leftover tag record of that remote is ignored.
 - Windows: a GitPoulpi pinned to the taskbar before 1.1.0 follows the octopus colour again.
 - Windows: changing the octopus colour is fast again.
 

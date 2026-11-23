@@ -379,6 +379,7 @@ macro_rules! for_each_contract_check {
             check_a_fetch_learns_the_tags_the_remote_already_had,
             check_tag_delete_remote_keeps_the_local_tag,
             check_a_tag_reports_where_it_lives,
+            check_a_mirror_of_a_removed_remote_is_ignored,
             check_tag_delete_scopes_are_independent,
             check_a_fetch_brings_a_tag_back_unless_deleted_on_the_remote,
             check_tag_fetch_brings_one_remote_only_tag,

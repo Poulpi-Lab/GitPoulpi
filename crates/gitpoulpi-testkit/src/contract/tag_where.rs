@@ -75,6 +75,42 @@ pub fn check_a_tag_reports_where_it_lives(backend: &dyn GitBackend) {
     );
 }
 
+/// A mirror ref left by a remote that was removed outside GitPoulpi (a
+/// plain `git remote remove` run by hand cannot know about it) is stale:
+/// its tags are not "on" that remote and no row may name it. A tag only
+/// that mirror had reads as local only; a tag the live remote also has
+/// keeps only the live remote.
+pub fn check_a_mirror_of_a_removed_remote_is_ignored(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new().with_initial().with_origin().build();
+    let r = repo.repo_ref();
+    let first = head_oid(backend, &r);
+    for name in ["only-archive", "shared"] {
+        backend.tag_create(&r, name, first, None).unwrap();
+    }
+    push(backend, &r, "shared");
+    let head = repo.git(&["rev-parse", "HEAD"]);
+    for name in ["only-archive", "shared"] {
+        repo.git(&[
+            "update-ref",
+            &format!("refs/gitpoulpi/remote-tags/archive/{name}"),
+            &head,
+        ]);
+    }
+    // A remote-only ghost recorded just by the stale mirror must not be listed.
+    repo.git(&[
+        "update-ref",
+        "refs/gitpoulpi/remote-tags/archive/ghost",
+        &head,
+    ]);
+
+    assert_eq!(where_of(backend, &r, "only-archive"), Some(TagWhere::Local));
+    assert!(tag(backend, &r, "only-archive").unwrap().is_unpushed_tag());
+    assert_eq!(where_of(backend, &r, "shared"), Some(TagWhere::Both));
+    let sync = tag(backend, &r, "shared").unwrap().tag_sync.unwrap();
+    assert_eq!(sync.pushed_to, vec!["origin".to_string()]);
+    assert!(tag(backend, &r, "ghost").is_none());
+}
+
 /// Delete locally keeps the remote's copy (the tag is then remote only);
 /// delete on the remote keeps the local one (then local only); both leaves
 /// neither - asked of git on both sides.

@@ -281,6 +281,30 @@ fn a_remote_only_tag_is_marked_and_can_be_fetched() {
     wait_marked(&term, "v1", BOTH);
 }
 
+/// A mirror left by a remote removed outside GitPoulpi (`git remote remove`
+/// does not know about it) must not make a tag read as on that remote: `mine`
+/// stays "only here" and a tag only the stale mirror knew is not listed.
+#[test]
+fn a_tag_mirrored_only_for_a_removed_remote_is_not_shown_on_it() {
+    let repo = fixture();
+    let head = repo.git(&["rev-parse", "HEAD"]);
+    for name in ["mine", "ghost"] {
+        repo.git(&[
+            "update-ref",
+            &format!("refs/gitpoulpi/remote-tags/archive/{name}"),
+            &head,
+        ]);
+    }
+    let (term, _config) = launch_fetched(repo.root(), "pty-tag-where-stale-mirror");
+    wait_marked(&term, "v1", BOTH);
+    wait_marked(&term, "mine", LOCAL);
+    assert!(
+        !term.text().contains("ghost"),
+        "a tag only a removed remote had is not listed\n{}",
+        term.text()
+    );
+}
+
 fn remote_tags(repo: &FixtureRepo) -> String {
     repo.git_in_remote(&["tag", "--list"])
 }

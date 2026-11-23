@@ -2151,23 +2151,23 @@ not_a_file = "{path} 不是文件"
 
 [remotes]
 # context: row of the Pull dropdown: fetch, then bring every local branch up to its upstream; the checked-out one follows the mode of the Pull button
-pull_all_branches = "{$Pull} all branches"
+pull_all_branches = { git = "{$Pull} 所有分支", local = "{$Pull}所有分支" }
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is fast-forwarded, or merged when it has diverged
-pull_all_branches_merge = "{$Pull} all branches (fast-forward if possible)"
+pull_all_branches_merge = { git = "{$Pull} 所有分支（可能时 fast-forward）", local = "{$Pull}所有分支（可能时快进）" }
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is only fast-forwarded
-pull_all_branches_ff_only = "{$Pull} all branches (fast-forward only)"
+pull_all_branches_ff_only = { git = "{$Pull} 所有分支（仅 fast-forward）", local = "{$Pull}所有分支（仅快进）" }
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is rebased onto its upstream
-pull_all_branches_rebase = "{$Pull} all branches ({$rebase})"
+pull_all_branches_rebase = { git = "{$Pull} 所有分支（{$rebase}）", local = "{$Pull}所有分支（{$rebase}）" }
 # context: tooltip of the "Pull all branches" row
-tip_pull_all_branches = "{$Fetch} from the remotes, then fast-forward every local branch that is only behind its upstream. The checked-out branch follows the mode of the {$Pull} button; a diverged branch is left alone and reported."
+tip_pull_all_branches = { git = "先从各远程 {$Fetch}，然后 fast-forward 每个仅落后于其 upstream 的本地分支。当前检出的分支遵循 {$Pull} 按钮的模式；已分叉的分支不会被改动，只会报告。", local = "先从各远程{$Fetch}，然后快进每个仅落后于其上游的本地分支。当前检出的分支遵循{$Pull}按钮的模式；已分叉的分支不会被改动，只会报告。" }
 # context: tooltip of the "Pull all branches (fast-forward if possible)" row
-tip_pull_all_branches_merge = "Like {$Pull} all branches, but the checked-out branch is fast-forwarded, or gets a {$merge} when it has diverged."
+tip_pull_all_branches_merge = { git = "与 {$Pull} 所有分支类似，但当前检出的分支会被 fast-forward，已分叉时则进行 {$merge}。", local = "与{$Pull}所有分支类似，但当前检出的分支会被快进，已分叉时则进行{$merge}。" }
 # context: tooltip of the "Pull all branches (fast-forward only)" row
-tip_pull_all_branches_ff_only = "Like {$Pull} all branches, but the checked-out branch is only fast-forwarded; when it has diverged it is left as it is."
+tip_pull_all_branches_ff_only = { git = "与 {$Pull} 所有分支类似，但当前检出的分支只会被 fast-forward；已分叉时保持原样。", local = "与{$Pull}所有分支类似，但当前检出的分支只会被快进；已分叉时保持原样。" }
 # context: tooltip of the "Pull all branches (rebase)" row
-tip_pull_all_branches_rebase = "Like {$Pull} all branches, but the checked-out branch is moved onto its upstream with a {$rebase}."
+tip_pull_all_branches_rebase = { git = "与 {$Pull} 所有分支类似，但当前检出的分支会通过 {$rebase} 移到其 upstream 之上。", local = "与{$Pull}所有分支类似，但当前检出的分支会通过{$rebase}移到其上游之上。" }
 # context: status line while "Pull all branches" runs
-pulling_all_branches = "Pulling all branches..."
+pulling_all_branches = { git = "正在 {$pull} 所有分支…", local = "正在{$pull}所有分支…" }
 menu_title = "远程 {name}"
 fetch_remote = "{$Fetch} {name}"
 copy_name = "复制远程名称"
@@ -2285,7 +2285,7 @@ pulling_from_all = "正在从 {remotes} {$pull} {branch}…"
 no_pull_remote = { git = "{branch} 没有可 {$pull} 的远程", local = "{branch} 没有可{$pull}的远程" }
 
 [keymap_action]
-git_prefix_pull_all_branches = "{$Pull} All Branches"
+git_prefix_pull_all_branches = { git = "{$Pull} 所有分支", local = "{$Pull}所有分支" }
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
 global_commit_column = { git = "显示或隐藏 {$Commit} 列", local = "显示或隐藏{$Commit}列" }
 git_prefix_amend = { git = "修订所选 {$commit}", local = "修订所选{$commit}" }
@@ -2998,10 +2998,10 @@ action_issue_body = "议题描述"
 title_hosting_base = "回复的基础提示词"
 
 [palette]
-git_pull_all_branches = "Git: {$Pull} All Branches"
-git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} All Branches (fast-forward if possible)"
-git_pull_all_branches_fast_forward_only = "Git: {$Pull} All Branches (fast-forward only)"
-git_pull_all_branches_rebase = "Git: {$Pull} All Branches ({$rebase})"
+git_pull_all_branches = { git = "Git：{$Pull} 所有分支", local = "Git：{$Pull}所有分支" }
+git_pull_all_branches_fast_forward_if_possible = { git = "Git：{$Pull} 所有分支（可能时快进）", local = "Git：{$Pull}所有分支（可能时快进）" }
+git_pull_all_branches_fast_forward_only = { git = "Git：{$Pull} 所有分支（仅快进）", local = "Git：{$Pull}所有分支（仅快进）" }
+git_pull_all_branches_rebase = { git = "Git：{$Pull} 所有分支（{$rebase}）", local = "Git：{$Pull}所有分支（{$rebase}）" }
 sidebar_show_worktrees = { git = "左侧窗格：显示 worktree 分区", local = "左侧窗格：显示工作树分区" }
 refs_open_worktree_in = { git = "引用：worktree 的打开方式…", local = "引用：工作树的打开方式…" }
 refs_merge_worktree_branch_into = { git = "引用：将 worktree 的分支 {$merge} 到…", local = "引用：将工作树的分支{$merge}到…" }
@@ -3809,7 +3809,7 @@ split = { git = "拆分 {$commit}", local = "拆分{$commit}" }
 markdown_editor = "Markdown 编辑器（评论、描述、摘要）"
 
 [help_text]
-git_actions_then_pull_all_branches = "{$pull} all branches: {$fetch}, fast-forward every branch that is only behind its upstream, {$pull} the checked-out one (also a row of the {$Pull} ▾)"
+git_actions_then_pull_all_branches = { git = "{$pull} 所有分支：{$fetch}，fast-forward 每个仅落后于其 upstream 的分支，再 {$pull} 当前检出的分支（也是 {$Pull} ▾ 中的一行）", local = "{$pull}所有分支：{$fetch}，快进每个仅落后于其上游的分支，再{$pull}当前检出的分支（也是{$Pull} ▾ 中的一行）" }
 git_actions_then_amend = { git = "修订所选 {$commit}：在同一个弹窗中修改摘要、描述、作者姓名、邮箱和日期", local = "修订所选{$commit}：在同一个弹窗中修改摘要、描述、作者姓名、邮箱和日期" }
 git_actions_then_edit_author = { git = "仅修订所选 {$commit} 的作者（姓名、邮箱、日期）", local = "仅修订所选{$commit}的作者（姓名、邮箱、日期）" }
 rewrite_1 = "打开历史重写工作台：可对全部历史或所选范围，更改作者、日期、消息、文件内容或路径"
@@ -5087,53 +5087,53 @@ desc_rebasing = { git = "正在将 {branch} {$rebase} 到 {onto}", local = "正�
 desc_rebasing_step = { git = "正在将 {branch} {$rebase} 到 {onto} · 第 {k}/{n} 步", local = "正在将 {branch} 变基到 {onto} · 第 {k}/{n} 步" }
 
 [link]
-act_pulling_all_branches = "{$pull} all branches..."
+act_pulling_all_branches = { git = "正在 {$pull} 所有分支…", local = "正在{$pull}所有分支…" }
 # context: status line after Pull all branches when every branch was already up to date
-pulled_all_nothing = "all branches are up to date"
+pulled_all_nothing = "所有分支都是最新的"
 # context: status line after Pull all branches; {n} branches were moved to their upstream
-pulled_all_updated = { one = "updated {n} branch", other = "updated {n} branches" }
+pulled_all_updated = { one = "已更新 {n} 个分支", other = "已更新 {n} 个分支" }
 # context: status line after Pull all branches; {n} branches were updated, {m} were left alone for the reasons in {why}
-pulled_all_updated_skipped = { one = "updated {n} branch, skipped {m} ({why})", other = "updated {n} branches, skipped {m} ({why})" }
+pulled_all_updated_skipped = { one = "已更新 {n} 个分支，跳过 {m} 个（{why}）", other = "已更新 {n} 个分支，跳过 {m} 个（{why}）" }
 # context: status line after Pull all branches; nothing moved, {m} branches were left alone for the reasons in {why}
-pulled_all_none_skipped = "nothing updated, skipped {m} ({why})"
+pulled_all_none_skipped = "没有更新，跳过 {m} 个（{why}）"
 # context: status line after Pull all branches stopped on conflicts in the checked-out branch {branch}; {n} other branches were updated before
-pulled_all_conflict = { one = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branch updated)", other = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branches updated)" }
+pulled_all_conflict = { one = { git = "{branch} 上有冲突：请像普通 {$pull_noun} 那样解决或中止（另有 {n} 个分支已更新）", local = "{branch} 上有冲突：请像普通{$pull_noun}那样解决或中止（另有 {n} 个分支已更新）" }, other = { git = "{branch} 上有冲突：请像普通 {$pull_noun} 那样解决或中止（另有 {n} 个分支已更新）", local = "{branch} 上有冲突：请像普通{$pull_noun}那样解决或中止（另有 {n} 个分支已更新）" } }
 # context: end of the Pull all branches status line; {summary} is the rest of the line, {remotes} lists the remotes that could not be downloaded
-pulled_all_fetch_failed = "{summary}; {$fetch} failed for {remotes}"
+pulled_all_fetch_failed = { git = "{summary}；{remotes} 的 {$fetch} 失败", local = "{summary}；{remotes} 的{$fetch}失败" }
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_diverged = "{n} diverged"
+skip_diverged = "{n} 个已分叉"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_upstream_gone = "{n} with the upstream gone"
+skip_upstream_gone = { git = "{n} 个的 upstream 已不存在", local = "{n} 个的上游已不存在" }
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_worktree = "{n} checked out in another worktree"
+skip_worktree = { git = "{n} 个在其他 worktree 中检出", local = "{n} 个在其他工作树中检出" }
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_local_upstream = "{n} tracking a local branch"
+skip_local_upstream = "{n} 个跟踪本地分支"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_not_downloaded = "{n} not downloaded"
+skip_not_downloaded = "{n} 个尚未下载"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_branch_failed = "{n} failed"
+skip_branch_failed = "{n} 个失败"
 # context: one Activity Log line of Pull all branches; {branch} moved from {from} to {to}
-pulled_all_line_updated = "{branch}: updated {from} to {to}"
+pulled_all_line_updated = "{branch}：已从 {from} 更新到 {to}"
 # context: one Activity Log line of Pull all branches; the branch was already at its upstream
-pulled_all_line_up_to_date = "{branch}: up to date"
+pulled_all_line_up_to_date = "{branch}：已是最新"
 # context: one Activity Log line of Pull all branches; the branch has commits its upstream lacks and nothing to pull
-pulled_all_line_ahead = "{branch}: ahead of {upstream}, nothing to {$pull}"
+pulled_all_line_ahead = { git = "{branch}：领先于 {upstream}，无需 {$pull}", local = "{branch}：领先于 {upstream}，无需{$pull}" }
 # context: one Activity Log line of Pull all branches; neither side contains the other
-pulled_all_line_diverged = "{branch}: diverged from {upstream}, left as it is"
+pulled_all_line_diverged = "{branch}：与 {upstream} 已分叉，保持原样"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_upstream_gone = "{branch}: {upstream} no longer exists"
+pulled_all_line_upstream_gone = "{branch}：{upstream} 已不存在"
 # context: one Activity Log line of Pull all branches; {path} is the other worktree
-pulled_all_line_elsewhere = "{branch}: checked out in {path}, skipped"
+pulled_all_line_elsewhere = "{branch}：已在 {path} 中检出，已跳过"
 # context: one Activity Log line of Pull all branches; {path} is the other worktree that was fast-forwarded
-pulled_all_line_worktree = "{branch}: updated in {path}"
+pulled_all_line_worktree = "{branch}：已在 {path} 中更新"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_local_upstream = "{branch}: follows the local branch {upstream}, skipped"
+pulled_all_line_local_upstream = "{branch}：跟踪本地分支 {upstream}，已跳过"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_not_downloaded = "{branch}: not downloaded, left as it is"
+pulled_all_line_not_downloaded = "{branch}：尚未下载，保持原样"
 # context: one Activity Log line of Pull all branches; {why} is the reason
-pulled_all_line_failed = "{branch}: failed ({why})"
+pulled_all_line_failed = "{branch}：失败（{why}）"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_conflicted = "{branch}: conflicts, resolve them or abort"
+pulled_all_line_conflicted = "{branch}：有冲突，请解决或中止"
 # context: {path} is the folder of the removed worktree
 worktree_removed = { git = "已移除 worktree {path}", local = "已移除工作树 {path}" }
 worktree_removed_branch_deleted = { git = "已移除 worktree {path} 并删除分支 {branch}（撤销可找回该分支）", local = "已移除工作树 {path} 并删除分支 {branch}（撤销可找回该分支）" }
@@ -6270,7 +6270,7 @@ keymap_next_card = "转到下一个比较行"
 help_next_card = "将 Log 光标移到下一个比较行（保持选择）；点击右侧窗格中的卡片效果相同"
 
 [activity_log]
-op_pull_all_branches = "{$Pull} all branches"
+op_pull_all_branches = { git = "{$Pull} 所有分支", local = "{$Pull}所有分支" }
 title = "活动日志"
 tab_application = "应用程序"
 op_open = "打开仓库"
@@ -6388,8 +6388,8 @@ app_select_first = "请先选择一行：点击它，或按 ] 跳到下一个失
 app_no_operation = "此行与任何操作无关。"
 
 [git_error]
-title_pull_all_branches = "{$Pull} all branches failed"
-done_pull_all_branches = "{$Pull} all branches done"
+title_pull_all_branches = { git = "{$Pull} 所有分支失败", local = "{$Pull}所有分支失败" }
+done_pull_all_branches = { git = "{$Pull} 所有分支已完成", local = "{$Pull}所有分支已完成" }
 summary_host_key = "尚不认识该远程的 SSH 主机密钥。"
 hint_host_key = "在终端中运行一次 `ssh -T git@<host>`，核对指纹并回答 yes，然后重试。或在“SSH 与凭据”中为此仓库设置已知主机文件。"
 title_push = { git = "{$Push} 失败", local = "{$Push}失败" }
@@ -10353,24 +10353,24 @@ gave_up = "未编辑 {short}：分支未被检出"
 
 [branch_sync]
 # context: title of the dialog asked before Pull all branches when a branch is checked out in another worktree
-dlg_title = "{$Pull} all branches"
+dlg_title = { git = "{$Pull} 所有分支", local = "{$Pull}所有分支" }
 # context: question of that dialog; the branches and their worktrees are listed under it
-dlg_question = "These branches are behind and checked out in other worktrees:"
+dlg_question = { git = "以下分支已落后，且在其他 worktree 中检出：", local = "以下分支已落后，且在其他工作树中检出：" }
 # context: one line of that list; {branch} is a branch, {path} the worktree folder
-row = "{branch}  in  {path}"
+row = "{branch}  在  {path}"
 # context: first answer: also fast-forward the other worktrees
-opt_update = "Update those worktrees too"
+opt_update = { git = "也更新这些 worktree", local = "也更新这些工作树" }
 # context: second answer: leave the other worktrees alone
-opt_skip = "Skip them"
+opt_skip = "跳过它们"
 # context: third answer: do not run
-opt_cancel = "Cancel"
+opt_cancel = "取消"
 # context: explanation under the highlighted first answer
-detail_update = "Each worktree is fast-forwarded in its own folder. One whose local changes the update would overwrite is left as it is and reported."
+detail_update = { git = "每个 worktree 会在各自的文件夹中被 fast-forward。若更新会覆盖某个 worktree 中的本地更改，则该 worktree 保持原样并被报告。", local = "每个工作树会在各自的文件夹中被快进。若更新会覆盖某个工作树中的本地更改，则该工作树保持原样并被报告。" }
 # context: explanation under the highlighted second answer
-detail_skip = "They are left as they are and listed as skipped in the summary."
+detail_skip = "它们保持原样，并在摘要中列为已跳过。"
 # context: explanation under the highlighted third answer
-detail_cancel = "Nothing is downloaded or changed."
+detail_cancel = "不会下载或更改任何内容。"
 # context: key hints of that dialog
-dlg_hint = "Up/Down or 1-3 choose  Enter confirm  Esc cancel"
+dlg_hint = "↑/↓ 或 1-3 选择  Enter 确认  Esc 取消"
 # context: last line of the list of that dialog when more branches exist than fit; {n} is how many
-more = "and {n} more"
+more = "另有 {n} 个"

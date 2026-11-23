@@ -1784,6 +1784,7 @@ AI 按键仅在 AI 开启时有效（参见 [AI 辅助](ai.md)）。`Esc` 取消
 | 状态栏中的**活动** | `Ctrl+N Shift+A` |
 | 工具栏：**撤销**、**重做** | `Ctrl+Z`, `Ctrl+Y` |
 | 工具栏：**Pull** / 它的 `▾` | `Ctrl+G p` / `Git: Pull Options...` |
+| **Pull 所有分支**（Pull `▾` 的一行） | `Ctrl+G Ctrl+P` |
 | 工具栏：**Push** / 它的 `▾` | `Ctrl+G Shift+P` / `Git: Push to Remote...` |
 | 工具栏：**分支**、**Tag** | `Ctrl+G b`, `Ctrl+G t` |
 | 工具栏：**Stash**、**弹出** | `Ctrl+G Shift+T`, `Ctrl+G o` |

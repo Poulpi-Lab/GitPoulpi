@@ -529,6 +529,17 @@ Aprila dal segmento `File` del selettore `File │ Tutti` della barra del diff, 
   *Pull (fast-forward se possibile)*, *Pull (solo fast-forward)* o *Pull (rebase)*,
   senza cambiare il pulsante. La modalità viene sempre passata a git in modo
   esplicito, quindi il `pull.rebase` della tua config git non può sorprenderti.
+- **Pull tutti i branch** (`Ctrl+G Ctrl+P`, una voce del `▾` di Pull) scarica dai
+  remoti che i tuoi branch seguono, poi porta ogni branch locale al passo con il
+  suo upstream in un colpo solo. Un branch senza checkout viene solo portato in
+  fast-forward (nessun file viene toccato); uno divergente viene lasciato com'è e
+  segnalato. Il branch attivo fa il pull come impostato sul pulsante Pull, e il `▾`
+  ha anche la voce per ciascun altro modo (*Pull tutti i branch (solo
+  fast-forward)*, *(rebase)*, *(fast-forward se possibile)*). Quando un branch
+  indietro ha il checkout in un altro worktree, un dialogo chiede prima se
+  aggiornare anche quei worktree, saltarli o annullare. La riga di stato riassume
+  l'esecuzione e il Registro attività ha una riga per branch; Annulla riporta
+  indietro tutti i branch in un solo passo. `Ctrl+G p` resta un Pull semplice.
 - **Push** (`Ctrl+G Shift+P`) invia il branch attivo al remoto predefinito,
   impostando l'upstream la prima volta. Il suo `▾` fa il push una volta sola verso
   un altro remoto a tua scelta. Se il remoto ha commit che tu non hai, un dialogo

@@ -192,7 +192,7 @@ righe con `...` aprono la stessa conferma o lo stesso prompt del nome del pulsan
 | Commit | commit, amend, reword, il compositore di commit con IA (tutti i suoi commit come un unico passaggio) |
 | Branch e tag | creare, eliminare, rinominare, impostare o rimuovere l'upstream, creare un branch di tracking, creare / eliminare / annotare un tag, fast-forward, fare il checkout di una pull request come branch |
 | Spostarsi | checkout di un branch o di un commit (compreso un HEAD staccato) |
-| Cronologia | merge (fast-forward o merge commit), rebase (semplice e interattivo, una volta terminato), cherry-pick, revert, reset (soft, mixed e hard), la parte locale di un pull |
+| Cronologia | merge (fast-forward o merge commit), rebase (semplice e interattivo, una volta terminato), cherry-pick, revert, reset (soft, mixed e hard), la parte locale di un pull, **pull di tutti i branch** (tutti i branch spostati, come un unico passo; con il branch attivo tornano indietro anche i suoi file) |
 | Modifiche in corso | stage e unstage (file, cartella, hunk, righe, tutto), scarto (file, cartella, hunk, righe, un checkout di file), applicare una patch o le modifiche di un commit (`apply-commit`), **eliminare un file dal disco**, **ignorare** (file, estensione o cartella: la riga del `.gitignore` che hai scelto), **trattare come binario o testo** (la riga di `.gitattributes`) |
 | Stash | push, apply, pop, drop, salvare le modifiche di un commit come stash (`stash from-commit`) |
 | Remoti e configurazione | aggiungere, rimuovere, rinominare, cambiare l'URL o l'URL di push di un remoto, track e untrack di Git LFS |

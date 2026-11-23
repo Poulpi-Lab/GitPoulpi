@@ -1955,6 +1955,7 @@ Ogni pulsante ha un gemello da tastiera:
 | **Attività** nella barra di stato | `Ctrl+N Shift+A` |
 | Barra degli strumenti: **Annulla**, **Ripeti** | `Ctrl+Z`, `Ctrl+Y` |
 | Barra degli strumenti: **Pull** / il suo `▾` | `Ctrl+G p` / `Git: Opzioni di pull...` |
+| **Pull tutti i branch** (voce del `▾` di Pull) | `Ctrl+G Ctrl+P` |
 | Barra degli strumenti: **Push** / il suo `▾` | `Ctrl+G Shift+P` / `Git: Push verso un remote...` |
 | Barra degli strumenti: **Branch**, **Tag** | `Ctrl+G b`, `Ctrl+G t` |
 | Barra degli strumenti: **Stash**, **Pop** | `Ctrl+G Shift+T`, `Ctrl+G o` |

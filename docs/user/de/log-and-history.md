@@ -496,6 +496,19 @@ Blame zeigt die ganze Datei mit Zeilennummern und Syntaxfarben und rechts vom Co
   wenn möglich)*, *Pull (nur Fast-Forward)* oder *Pull (Rebase)* einmal aus, ohne die
   Schaltfläche zu ändern. Der Modus wird git immer ausdrücklich übergeben, sodass
   das `pull.rebase` Ihrer Git-Konfiguration Sie nicht überraschen kann.
+- **Pull aller Branches** (`Ctrl+G Ctrl+P`, ein Eintrag des Pull-`▾`) lädt von den
+  Remotes, denen Ihre Branches folgen, und bringt dann jeden lokalen Branch in
+  einem Zug auf den Stand seines Upstreams. Ein nicht ausgecheckter Branch wird
+  immer nur per Fast-Forward vorgespult (keine Datei wird angefasst); ein
+  abweichender bleibt unberührt und wird gemeldet. Der ausgecheckte Branch wird so
+  gepullt, wie es die Pull-Schaltfläche festlegt, und das `▾` hat für jeden
+  anderen Modus ebenfalls einen Eintrag (*Pull aller Branches (nur
+  Fast-Forward)*, *(Rebase)*, *(Fast-Forward, wenn möglich)*). Ist ein
+  zurückliegender Branch in einem anderen Worktree ausgecheckt, fragt zuerst ein
+  Dialog, ob diese Worktrees auch aktualisiert, übersprungen oder der Vorgang
+  abgebrochen werden soll. Die Statuszeile fasst den Lauf zusammen, das
+  Aktivitätsprotokoll hat eine Zeile pro Branch; Rückgängig bringt alle Branches
+  in einem Schritt zurück. `Ctrl+G p` bleibt ein einfacher Pull.
 - **Push** (`Ctrl+G Shift+P`) sendet den ausgecheckten Branch an das Standard-Remote
   und setzt beim ersten Mal den Upstream. Sein `▾` pusht einmal zu einem anderen
   Remote Ihrer Wahl. Hat das Remote Commits, die Sie nicht haben, bietet ein Dialog

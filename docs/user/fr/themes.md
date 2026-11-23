@@ -263,9 +263,28 @@ couleur est ignorée, une `base` inconnue retombe sur `dark`, et `gitpoulpi them
 signale chaque problème sous `warnings` (l'application les montre une fois dans la ligne
 d'état).
 
-Les fichiers sont relus à l'ouverture de la liste Thème et à la fermeture des Paramètres ;
-il n'y a pas de surveillance de fichiers. Une fenêtre en cours applique un thème réglé
-depuis la CLI à la prochaine fermeture de ses Paramètres, comme toute autre clé en direct.
+Les fichiers sont relus à l'ouverture de la liste Thème et à la fermeture des Paramètres.
+Une fenêtre en cours remarque aussi que `config.toml` (un `gitpoulpi config set ui.theme ...`
+lancé depuis un shell) ou le fichier du thème actif a été réécrit, et applique les nouvelles
+couleurs en environ une seconde, sans redémarrage.
+
+### `ui.border_focused`
+
+Le cadre du volet qui a le focus clavier : le Log, la barre latérale Refs, les volets Non
+indexés et Indexés, le détail du commit, les volets d'historique, de revue et de réécriture,
+les cadres du diff, des fichiers et de l'éditeur. Elle ne peint que des bordures ; le texte,
+les libellés et les icônes (le libellé « commit : », l'icône Accueil, les boutons d'onglet)
+continuent d'utiliser `ui.accent`. Un thème peut ainsi encadrer le volet actif d'une couleur
+qui serait illisible en texte, par exemple un jaune vif sur un thème clair. Quand un thème ne
+la définit pas, elle suit `ui.accent` (dans un fichier utilisateur aussi : un fichier qui
+ne change que `accent` donne cet accent à ses cadres focalisés), donc chaque thème intégré
+garde son aspect. Les dialogues et les fenêtres contextuelles gardent un cadre d'accent.
+
+```toml
+[ui]
+accent = "#1f5fbf"
+border_focused = "#e7df00"
+```
 
 ## Détection du système
 

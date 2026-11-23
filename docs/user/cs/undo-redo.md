@@ -189,7 +189,7 @@ obnovit samostatně, „zpět lze přesunout jen větev nebo HEAD“ a podobně.
 | Commity | commit, amend, reword, AI composer commitů (všechny jeho commity jako jeden krok) |
 | Větve a tagy | vytvoření, smazání, přejmenování, nastavení nebo zrušení upstreamu, vytvoření sledující větve, vytvoření / smazání / anotace tagu, fast-forward, checkout pull requestu jako větve |
 | Pohyb po repozitáři | checkout větve nebo commitu (včetně odpojeného HEAD) |
-| Historie | merge (fast-forward nebo merge commit), rebase (obyčejný i interaktivní, až skončí), cherry-pick, revert, reset (soft, mixed i hard), lokální část pullu |
+| Historie | merge (fast-forward nebo merge commit), rebase (obyčejný i interaktivní, až skončí), cherry-pick, revert, reset (soft, mixed i hard), lokální část pullu, **pull všech větví** (každá posunutá větev jedním krokem; soubory přepnuté větve se vrátí s ní) |
 | Pracovní změny | stage a unstage (soubor, složka, hunk, řádky, vše), zahození (soubor, složka, hunk, řádky, checkout souboru), aplikace patche nebo změn commitu (`apply-commit`), **smazání souboru z disku**, **ignorování** (soubor, přípona nebo složka: řádek v `.gitignore`, který jste zvolili), **považování za binární nebo textový** (řádek v `.gitattributes`) |
 | Stashe | push, apply, pop, drop, uložení změn commitu jako stashe (`stash from-commit`) |
 | Remoty a konfigurace | přidání, odebrání, přejmenování, změna URL nebo push URL remotu, Git LFS track a untrack |

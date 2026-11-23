@@ -40,6 +40,7 @@ stejná pravidla:
   zavřete. Kliknutí mimo nikdy nezavře celé zobrazení (Nastavení, zobrazení Diff,
   zobrazení Soubor, editory, Kontrolu, Tabuli): to nemá žádné "mimo".
 - Kliknutí **dovnitř** panelu ho nikdy nezavře.
+- Stisk tlačítka myši (levého nebo pravého), zatímco akord `Ctrl+G` nebo `Ctrl+N` čeká na druhou klávesu, akord zruší jako `Esc` a pak se chová jako obvykle (kliknutí stále vybírá, pravé kliknutí stále otevře nabídku).
 - Formulář s textem, který jste napsali (nové issue, pull nebo merge request),
   kliknutí mimo ignoruje, aby o text nešlo přijít omylem. `✕` a `Esc` se nejdřív
   zeptají **Zahodit změny?**; **Upravovat dál** vás vrátí zpět. Formulář bez

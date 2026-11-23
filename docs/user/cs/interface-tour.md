@@ -166,7 +166,7 @@ Ve výchozím stavu je to řádek pod panely a nad stavovým řádkem. **Nastave
 | Tlačítko | Co dělá |
 |---|---|
 | **Zpět**, **Znovu** | Vezmou zpět nebo obnoví poslední operaci (`Ctrl+Z`, `Ctrl+Y`). Skryté, když je Zpět vypnuto. Viz [Zpět a znovu](undo-redo.md). |
-| **Pull** `▾` | Provede pull podle nastavení **Nastavení > Git a kódování > Tlačítko Pull**. Seznam `▾` obsahuje **Fetch všech**, **Pull (fast-forward, pokud lze)**, **Pull (jen fast-forward)** a **Pull (rebase)**. Položka seznamu se provede jednou a tlačítko nemění. |
+| **Pull** `▾` | Provede pull podle nastavení **Nastavení > Git a kódování > Tlačítko Pull**. Seznam `▾` obsahuje **Fetch všech**, **Pull (fast-forward, pokud lze)**, **Pull (jen fast-forward)** **Pull (rebase)**, pak **Pull všechny větve** (`Ctrl+G Ctrl+P`) a totéž s každým dalším režimem pro přepnutou větev. Položka seznamu se provede jednou a tlačítko nemění. |
 | **Push** `▾` | Provede push právě přepnuté větve. Seznam `▾` provede push jednou do remote, který zvolíte. |
 | **Větev** | Vytvoří větev na právě přepnutém commitu. |
 | **Tag** | Vytvoří tag na právě přepnutém commitu. |

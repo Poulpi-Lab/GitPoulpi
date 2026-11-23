@@ -2151,23 +2151,23 @@ not_a_file = "{path} není soubor"
 
 [remotes]
 # context: row of the Pull dropdown: fetch, then bring every local branch up to its upstream; the checked-out one follows the mode of the Pull button
-pull_all_branches = "{$Pull} all branches"
+pull_all_branches = "{$Pull} všechny větve"
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is fast-forwarded, or merged when it has diverged
-pull_all_branches_merge = "{$Pull} all branches (fast-forward if possible)"
+pull_all_branches_merge = "{$Pull} všechny větve (fast-forward, pokud lze)"
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is only fast-forwarded
-pull_all_branches_ff_only = "{$Pull} all branches (fast-forward only)"
+pull_all_branches_ff_only = "{$Pull} všechny větve (jen fast-forward)"
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is rebased onto its upstream
-pull_all_branches_rebase = "{$Pull} all branches ({$rebase})"
+pull_all_branches_rebase = "{$Pull} všechny větve ({$rebase})"
 # context: tooltip of the "Pull all branches" row
-tip_pull_all_branches = "{$Fetch} from the remotes, then fast-forward every local branch that is only behind its upstream. The checked-out branch follows the mode of the {$Pull} button; a diverged branch is left alone and reported."
+tip_pull_all_branches = "{$Fetch} ze všech remote, poté fast-forward každé lokální větve, která jen zaostává za svým upstreamem. Aktuální větev se řídí režimem tlačítka {$Pull}; rozešlá větev se nechá být a ohlásí se."
 # context: tooltip of the "Pull all branches (fast-forward if possible)" row
-tip_pull_all_branches_merge = "Like {$Pull} all branches, but the checked-out branch is fast-forwarded, or gets a {$merge} when it has diverged."
+tip_pull_all_branches_merge = "Jako {$Pull} všechny větve, ale aktuální větev se posune fast-forwardem, nebo dostane {$merge}, pokud se rozešla."
 # context: tooltip of the "Pull all branches (fast-forward only)" row
-tip_pull_all_branches_ff_only = "Like {$Pull} all branches, but the checked-out branch is only fast-forwarded; when it has diverged it is left as it is."
+tip_pull_all_branches_ff_only = "Jako {$Pull} všechny větve, ale aktuální větev se jen posune fast-forwardem; pokud se rozešla, zůstane beze změny."
 # context: tooltip of the "Pull all branches (rebase)" row
-tip_pull_all_branches_rebase = "Like {$Pull} all branches, but the checked-out branch is moved onto its upstream with a {$rebase}."
+tip_pull_all_branches_rebase = "Jako {$Pull} všechny větve, ale aktuální větev se přesune na svůj upstream pomocí {$rebase}."
 # context: status line while "Pull all branches" runs
-pulling_all_branches = "Pulling all branches..."
+pulling_all_branches = "stahování všech větví..."
 menu_title = "remote {name}"
 fetch_remote = "{$Fetch} {name}"
 copy_name = "Kopírovat název remote"
@@ -2285,7 +2285,7 @@ pulling_from_all = { git = "pull větve {branch} z {remotes}...", local = "staho
 no_pull_remote = "Větev {branch} nemá žádný remote pro {$pull_noun}"
 
 [keymap_action]
-git_prefix_pull_all_branches = "{$Pull} All Branches"
+git_prefix_pull_all_branches = "{$Pull} všechny větve"
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
 global_commit_column = "Zobrazit nebo skrýt sloupec commitů"
 git_prefix_amend = "Upravit vybraný {$commit}"
@@ -2998,10 +2998,10 @@ action_issue_body = "Popis issue"
 title_hosting_base = "Základní prompt odpovědí"
 
 [palette]
-git_pull_all_branches = "Git: {$Pull} All Branches"
-git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} All Branches (fast-forward if possible)"
-git_pull_all_branches_fast_forward_only = "Git: {$Pull} All Branches (fast-forward only)"
-git_pull_all_branches_rebase = "Git: {$Pull} All Branches ({$rebase})"
+git_pull_all_branches = "Git: {$Pull} všechny větve"
+git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} všechny větve (fast-forward, pokud lze)"
+git_pull_all_branches_fast_forward_only = "Git: {$Pull} všechny větve (jen fast-forward)"
+git_pull_all_branches_rebase = "Git: {$Pull} všechny větve ({$rebase})"
 sidebar_show_worktrees = "Levý panel: Zobrazit sekci Worktrees"
 refs_open_worktree_in = "Refs: Otevřít worktree v..."
 refs_merge_worktree_branch_into = { git = "Refs: Merge větve worktree do...", local = "Refs: Sloučit větev worktree do..." }
@@ -3809,7 +3809,7 @@ split = "Rozdělení {$commit}u"
 markdown_editor = "Markdown editor (komentáře, popisy, shrnutí)"
 
 [help_text]
-git_actions_then_pull_all_branches = "{$pull} all branches: {$fetch}, fast-forward every branch that is only behind its upstream, {$pull} the checked-out one (also a row of the {$Pull} ▾)"
+git_actions_then_pull_all_branches = "{$pull} všech větví: {$fetch}, fast-forward každé větve, která jen zaostává za upstreamem, a {$pull} aktuální větve (také položka {$Pull} ▾)"
 git_actions_then_amend = "upravit vybraný {$commit}: souhrn, popis, jméno, e-mail a datum autora v jednom okně"
 git_actions_then_edit_author = "upravit jen autora vybraného {$commit}u (jméno, e-mail, datum)"
 rewrite_1 = "otevře nástroj pro přepis historie: změna autorů, dat, zpráv, obsahu souborů nebo cest v celé historii nebo ve výběru"
@@ -5085,53 +5085,53 @@ desc_rebasing = { git = "rebase {branch} na {onto}", local = "rebase {branch} na
 desc_rebasing_step = { git = "rebase {branch} na {onto} · krok {k}/{n}", local = "rebase {branch} na {onto} · krok {k}/{n}" }
 
 [link]
-act_pulling_all_branches = "{$pull} all branches..."
+act_pulling_all_branches = "{$pull} všech větví..."
 # context: status line after Pull all branches when every branch was already up to date
-pulled_all_nothing = "all branches are up to date"
+pulled_all_nothing = "všechny větve jsou aktuální"
 # context: status line after Pull all branches; {n} branches were moved to their upstream
-pulled_all_updated = { one = "updated {n} branch", other = "updated {n} branches" }
+pulled_all_updated = { one = "aktualizována {n} větev", few = "aktualizovány {n} větve", other = "aktualizováno {n} větví" }
 # context: status line after Pull all branches; {n} branches were updated, {m} were left alone for the reasons in {why}
-pulled_all_updated_skipped = { one = "updated {n} branch, skipped {m} ({why})", other = "updated {n} branches, skipped {m} ({why})" }
+pulled_all_updated_skipped = { one = "aktualizována {n} větev, přeskočeno {m} ({why})", few = "aktualizovány {n} větve, přeskočeno {m} ({why})", other = "aktualizováno {n} větví, přeskočeno {m} ({why})" }
 # context: status line after Pull all branches; nothing moved, {m} branches were left alone for the reasons in {why}
-pulled_all_none_skipped = "nothing updated, skipped {m} ({why})"
+pulled_all_none_skipped = "nic neaktualizováno, přeskočeno {m} ({why})"
 # context: status line after Pull all branches stopped on conflicts in the checked-out branch {branch}; {n} other branches were updated before
-pulled_all_conflict = { one = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branch updated)", other = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branches updated)" }
+pulled_all_conflict = { one = "konflikty ve větvi {branch}: vyřešte je nebo zrušte, jako u běžného {$pull_noun} (aktualizována {n} další větev)", few = "konflikty ve větvi {branch}: vyřešte je nebo zrušte, jako u běžného {$pull_noun} (aktualizovány {n} další větve)", other = "konflikty ve větvi {branch}: vyřešte je nebo zrušte, jako u běžného {$pull_noun} (aktualizováno {n} dalších větví)" }
 # context: end of the Pull all branches status line; {summary} is the rest of the line, {remotes} lists the remotes that could not be downloaded
-pulled_all_fetch_failed = "{summary}; {$fetch} failed for {remotes}"
+pulled_all_fetch_failed = "{summary}; {$fetch} selhal pro {remotes}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_diverged = "{n} diverged"
+skip_diverged = "{n} rozešlých"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_upstream_gone = "{n} with the upstream gone"
+skip_upstream_gone = "{n} s upstreamem, který zmizel"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_worktree = "{n} checked out in another worktree"
+skip_worktree = "{n} načtených v jiném worktree"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_local_upstream = "{n} tracking a local branch"
+skip_local_upstream = "{n} sledujících lokální větev"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_not_downloaded = "{n} not downloaded"
+skip_not_downloaded = "{n} nestažených"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_branch_failed = "{n} failed"
+skip_branch_failed = "{n} selhalo"
 # context: one Activity Log line of Pull all branches; {branch} moved from {from} to {to}
-pulled_all_line_updated = "{branch}: updated {from} to {to}"
+pulled_all_line_updated = "{branch}: aktualizováno z {from} na {to}"
 # context: one Activity Log line of Pull all branches; the branch was already at its upstream
-pulled_all_line_up_to_date = "{branch}: up to date"
+pulled_all_line_up_to_date = "{branch}: aktuální"
 # context: one Activity Log line of Pull all branches; the branch has commits its upstream lacks and nothing to pull
-pulled_all_line_ahead = "{branch}: ahead of {upstream}, nothing to {$pull}"
+pulled_all_line_ahead = "{branch}: před {upstream}, není co {$pull}"
 # context: one Activity Log line of Pull all branches; neither side contains the other
-pulled_all_line_diverged = "{branch}: diverged from {upstream}, left as it is"
+pulled_all_line_diverged = "{branch}: rozešla se s {upstream}, ponechána beze změny"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_upstream_gone = "{branch}: {upstream} no longer exists"
+pulled_all_line_upstream_gone = "{branch}: {upstream} už neexistuje"
 # context: one Activity Log line of Pull all branches; {path} is the other worktree
-pulled_all_line_elsewhere = "{branch}: checked out in {path}, skipped"
+pulled_all_line_elsewhere = "{branch}: načtena v {path}, přeskočeno"
 # context: one Activity Log line of Pull all branches; {path} is the other worktree that was fast-forwarded
-pulled_all_line_worktree = "{branch}: updated in {path}"
+pulled_all_line_worktree = "{branch}: aktualizována v {path}"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_local_upstream = "{branch}: follows the local branch {upstream}, skipped"
+pulled_all_line_local_upstream = "{branch}: sleduje lokální větev {upstream}, přeskočeno"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_not_downloaded = "{branch}: not downloaded, left as it is"
+pulled_all_line_not_downloaded = "{branch}: nestažena, ponechána beze změny"
 # context: one Activity Log line of Pull all branches; {why} is the reason
-pulled_all_line_failed = "{branch}: failed ({why})"
+pulled_all_line_failed = "{branch}: selhalo ({why})"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_conflicted = "{branch}: conflicts, resolve them or abort"
+pulled_all_line_conflicted = "{branch}: konflikty, vyřešte je nebo zrušte"
 # context: {path} is the folder of the removed worktree
 worktree_removed = "worktree {path} odebrán"
 worktree_removed_branch_deleted = "worktree {path} odebrán a větev {branch} smazána (Zpět větev vrátí)"
@@ -6267,7 +6267,7 @@ keymap_next_card = "Přejít na další porovnávaný řádek"
 help_next_card = "přesunout kurzor Log na další porovnávaný řádek (výběr zůstane); kliknutí na kartu v pravém panelu dělá totéž"
 
 [activity_log]
-op_pull_all_branches = "{$Pull} all branches"
+op_pull_all_branches = "{$Pull} všechny větve"
 title = "Protokol aktivity"
 tab_application = "Aplikace"
 op_open = "Otevřít repozitář"
@@ -6385,8 +6385,8 @@ app_select_first = "Nejdřív vyberte řádek: klikněte na něj, nebo stiskem ]
 app_no_operation = "Tento řádek se neváže k žádné operaci."
 
 [git_error]
-title_pull_all_branches = "{$Pull} all branches failed"
-done_pull_all_branches = "{$Pull} all branches done"
+title_pull_all_branches = "{$Pull} všech větví selhal"
+done_pull_all_branches = "{$Pull} všech větví dokončen"
 summary_host_key = "Hostitelský klíč SSH tohoto remote zatím není znám."
 hint_host_key = "Jednou spusťte v terminálu `ssh -T git@<host>`, zkontrolujte otisk, odpovězte yes a zkuste to znovu. Nebo v části SSH a přihlášení nastavte pro tento repozitář soubor known_hosts."
 title_push = "{$Push}: selhání"
@@ -10476,24 +10476,24 @@ gave_up = "{short} nebyl upraven: větev nebyla přepnuta"
 
 [branch_sync]
 # context: title of the dialog asked before Pull all branches when a branch is checked out in another worktree
-dlg_title = "{$Pull} all branches"
+dlg_title = "{$Pull} všechny větve"
 # context: question of that dialog; the branches and their worktrees are listed under it
-dlg_question = "These branches are behind and checked out in other worktrees:"
+dlg_question = "Tyto větve zaostávají a jsou načtené v jiných worktree:"
 # context: one line of that list; {branch} is a branch, {path} the worktree folder
-row = "{branch}  in  {path}"
+row = "{branch}  v  {path}"
 # context: first answer: also fast-forward the other worktrees
-opt_update = "Update those worktrees too"
+opt_update = "Aktualizovat i tyto worktree"
 # context: second answer: leave the other worktrees alone
-opt_skip = "Skip them"
+opt_skip = "Přeskočit je"
 # context: third answer: do not run
-opt_cancel = "Cancel"
+opt_cancel = "Zrušit"
 # context: explanation under the highlighted first answer
-detail_update = "Each worktree is fast-forwarded in its own folder. One whose local changes the update would overwrite is left as it is and reported."
+detail_update = "Každý worktree se posune fast-forwardem ve své vlastní složce. Worktree, jehož lokální změny by aktualizace přepsala, zůstane beze změny a ohlásí se."
 # context: explanation under the highlighted second answer
-detail_skip = "They are left as they are and listed as skipped in the summary."
+detail_skip = "Zůstanou beze změny a v souhrnu se uvedou jako přeskočené."
 # context: explanation under the highlighted third answer
-detail_cancel = "Nothing is downloaded or changed."
+detail_cancel = "Nic se nestáhne ani nezmění."
 # context: key hints of that dialog
-dlg_hint = "Up/Down or 1-3 choose  Enter confirm  Esc cancel"
+dlg_hint = "Nahoru/Dolů nebo 1-3 výběr  Enter potvrdit  Esc zrušit"
 # context: last line of the list of that dialog when more branches exist than fit; {n} is how many
-more = "and {n} more"
+more = "a {n} dalších"

@@ -89,7 +89,7 @@ Varje tangent du kan binda om, med id:t som används i
 | `git_prefix` | `stage_file` | Stage vald fil | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | Unstage vald fil | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
-| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
+| `git_prefix` | `pull_all_branches` | Pull alla grenar | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | Öppna länkad pull request | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | Push alla tags | `Ctrl+G Shift+U` |
@@ -661,10 +661,10 @@ Tangenterna är standardvärdena.
 | Git: Pull (fast-forward om möjligt) |  |
 | Git: Pull (bara fast-forward) |  |
 | Git: Pull (rebase) |  |
-| Git: Pull All Branches | `Ctrl+G Ctrl+P` |
-| Git: Pull All Branches (fast-forward if possible) |  |
-| Git: Pull All Branches (fast-forward only) |  |
-| Git: Pull All Branches (rebase) |  |
+| Git: Pull alla grenar | `Ctrl+G Ctrl+P` |
+| Git: Pull alla grenar (fast-forward om möjligt) |  |
+| Git: Pull alla grenar (bara fast-forward) |  |
+| Git: Pull alla grenar (rebase) |  |
 | Git: Pull-alternativ... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push till remote... |  |

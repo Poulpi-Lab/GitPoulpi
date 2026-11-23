@@ -91,7 +91,7 @@ stage_file = "z"
 | `git_prefix` | `stage_file` | Stage выбранного файла | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | Unstage выбранного файла | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
-| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
+| `git_prefix` | `pull_all_branches` | Pull все ветки | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | Открыть связанный pull request | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | Push всех tags | `Ctrl+G Shift+U` |
@@ -665,10 +665,10 @@ stage_file = "z"
 | Git: pull (fast-forward, если возможно) |  |
 | Git: pull (только fast-forward) |  |
 | Git: pull (rebase) |  |
-| Git: Pull All Branches | `Ctrl+G Ctrl+P` |
-| Git: Pull All Branches (fast-forward if possible) |  |
-| Git: Pull All Branches (fast-forward only) |  |
-| Git: Pull All Branches (rebase) |  |
+| Git: Pull все ветки | `Ctrl+G Ctrl+P` |
+| Git: Pull все ветки (fast-forward, если возможно) |  |
+| Git: Pull все ветки (только fast-forward) |  |
+| Git: Pull все ветки (rebase) |  |
 | Git: параметры pull... |  |
 | Git: push | `Ctrl+G P` |
 | Git: push на remote... |  |

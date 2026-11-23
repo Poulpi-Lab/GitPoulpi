@@ -88,7 +88,7 @@ předponou (`Ctrl+G s`).
 | `git_prefix` | `stage_file` | Stage vybraný soubor | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | Unstage vybraný soubor | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
-| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
+| `git_prefix` | `pull_all_branches` | Pull všechny větve | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | Otevřít propojený pull request | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | Push všech tagů | `Ctrl+G Shift+U` |
@@ -659,10 +659,10 @@ Klávesy jsou výchozí.
 | Git: Pull (fast-forward, pokud lze) |  |
 | Git: Pull (jen fast-forward) |  |
 | Git: Pull (rebase) |  |
-| Git: Pull All Branches | `Ctrl+G Ctrl+P` |
-| Git: Pull All Branches (fast-forward if possible) |  |
-| Git: Pull All Branches (fast-forward only) |  |
-| Git: Pull All Branches (rebase) |  |
+| Git: Pull všechny větve | `Ctrl+G Ctrl+P` |
+| Git: Pull všechny větve (fast-forward, pokud lze) |  |
+| Git: Pull všechny větve (jen fast-forward) |  |
+| Git: Pull všechny větve (rebase) |  |
 | Git: Možnosti pullu... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push do remote... |  |

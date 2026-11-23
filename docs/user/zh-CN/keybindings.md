@@ -73,7 +73,7 @@ stage_file = "z"
 | `git_prefix` | `stage_file` | stage 所选文件 | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | unstage 所选文件 | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
-| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
+| `git_prefix` | `pull_all_branches` | Pull 所有分支 | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | 打开关联的 pull request | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | Push 所有 Tag | `Ctrl+G Shift+U` |
@@ -625,10 +625,10 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Git：Pull（可能时快进） |  |
 | Git：Pull（仅快进） |  |
 | Git：Pull（rebase） |  |
-| Git: Pull All Branches | `Ctrl+G Ctrl+P` |
-| Git: Pull All Branches (fast-forward if possible) |  |
-| Git: Pull All Branches (fast-forward only) |  |
-| Git: Pull All Branches (rebase) |  |
+| Git：Pull 所有分支 | `Ctrl+G Ctrl+P` |
+| Git：Pull 所有分支（可能时快进） |  |
+| Git：Pull 所有分支（仅快进） |  |
+| Git：Pull 所有分支（rebase） |  |
 | Git：Pull 选项… |  |
 | Git：Push | `Ctrl+G P` |
 | Git：Push 到远程… |  |

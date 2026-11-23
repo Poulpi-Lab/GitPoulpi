@@ -90,7 +90,7 @@ prefix getoond (`Ctrl+G s`).
 | `git_prefix` | `stage_file` | Geselecteerd bestand stagen | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | Geselecteerd bestand unstagen | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
-| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
+| `git_prefix` | `pull_all_branches` | Alle branches pullen | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | Gekoppelde pull request openen | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | Alle tags pushen | `Ctrl+G Shift+U` |
@@ -663,10 +663,10 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Git: Pull (fast-forward indien mogelijk) |  |
 | Git: Pull (alleen fast-forward) |  |
 | Git: Pull (rebase) |  |
-| Git: Pull All Branches | `Ctrl+G Ctrl+P` |
-| Git: Pull All Branches (fast-forward if possible) |  |
-| Git: Pull All Branches (fast-forward only) |  |
-| Git: Pull All Branches (rebase) |  |
+| Git: Alle branches pullen | `Ctrl+G Ctrl+P` |
+| Git: Alle branches pullen (fast-forward indien mogelijk) |  |
+| Git: Alle branches pullen (alleen fast-forward) |  |
+| Git: Alle branches pullen (rebase) |  |
 | Git: Pull-opties... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Pushen naar remote... |  |

@@ -87,7 +87,7 @@ As teclas depois de um prefixo aparecem com o prefixo (`Ctrl+G s`).
 | `git_prefix` | `stage_file` | Stage do arquivo selecionado | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | Unstage do arquivo selecionado | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
-| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
+| `git_prefix` | `pull_all_branches` | Pull de todas as branches | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | Abrir pull request vinculado | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | Push de todas as tags | `Ctrl+G Shift+U` |
@@ -657,10 +657,10 @@ As teclas são as padrão.
 | Git: Pull (fast-forward se possível) |  |
 | Git: Pull (só fast-forward) |  |
 | Git: Pull (rebase) |  |
-| Git: Pull All Branches | `Ctrl+G Ctrl+P` |
-| Git: Pull All Branches (fast-forward if possible) |  |
-| Git: Pull All Branches (fast-forward only) |  |
-| Git: Pull All Branches (rebase) |  |
+| Git: Pull de todas as branches | `Ctrl+G Ctrl+P` |
+| Git: Pull de todas as branches (fast-forward se possível) |  |
+| Git: Pull de todas as branches (só fast-forward) |  |
+| Git: Pull de todas as branches (rebase) |  |
 | Git: opções de pull... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push para um remoto... |  |

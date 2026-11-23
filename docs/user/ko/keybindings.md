@@ -85,7 +85,7 @@ stage_file = "z"
 | `git_prefix` | `stage_file` | 선택한 파일 스테이징 | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | 선택한 파일 스테이징 해제 | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
-| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
+| `git_prefix` | `pull_all_branches` | 모든 브랜치 Pull | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | 연결된 Pull request 열기 | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | 모든 Tag Push | `Ctrl+G Shift+U` |
@@ -652,10 +652,10 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Git: Pull (가능하면 fast-forward) |  |
 | Git: Pull (fast-forward만) |  |
 | Git: Pull (rebase) |  |
-| Git: Pull All Branches | `Ctrl+G Ctrl+P` |
-| Git: Pull All Branches (fast-forward if possible) |  |
-| Git: Pull All Branches (fast-forward only) |  |
-| Git: Pull All Branches (rebase) |  |
+| Git: 모든 브랜치 Pull | `Ctrl+G Ctrl+P` |
+| Git: 모든 브랜치 Pull (가능하면 fast-forward) |  |
+| Git: 모든 브랜치 Pull (fast-forward만) |  |
+| Git: 모든 브랜치 Pull (rebase) |  |
 | Git: Pull 옵션... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: 리모트로 Push... |  |

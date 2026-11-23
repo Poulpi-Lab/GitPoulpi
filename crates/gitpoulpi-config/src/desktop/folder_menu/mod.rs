@@ -330,6 +330,14 @@ pub fn sync(env: &Env, label: &str) -> Result<Vec<Manager>, String> {
     }
     let mut done = Vec::new();
     for &m in Manager::for_os(env.os) {
+        if m == Manager::Explorer {
+            // One read serves the verdict and the rewrite: every registry
+            // call is a process.
+            if windows::sync(env, label)? {
+                done.push(m);
+            }
+            continue;
+        }
         if state_of(env, label, m)? == State::Outdated {
             write_one(env, label, m)?;
             done.push(m);

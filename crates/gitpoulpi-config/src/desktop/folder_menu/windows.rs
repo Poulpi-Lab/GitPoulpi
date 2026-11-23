@@ -252,12 +252,30 @@ type Read = Option<(Values, bool)>;
 
 /// Reads `keys` into a lookup by lower-cased key.
 fn read_map(env: &Env, keys: &[String]) -> Result<std::collections::HashMap<String, Read>, String> {
+    if keys.is_empty() {
+        return Ok(std::collections::HashMap::new());
+    }
     let got = env.registry.read(keys)?;
     Ok(keys
         .iter()
         .map(|k| k.to_ascii_lowercase())
         .zip(got)
         .collect())
+}
+
+/// `keys` read and the verbs of every class listed, in one registry call.
+#[allow(clippy::type_complexity)]
+fn snapshot(
+    env: &Env,
+    keys: &[String],
+) -> Result<(std::collections::HashMap<String, Read>, Vec<Vec<String>>), String> {
+    let (got, listed) = env.registry.snapshot(keys, &shell_parents())?;
+    let map = keys
+        .iter()
+        .map(|k| k.to_ascii_lowercase())
+        .zip(got)
+        .collect();
+    Ok((map, listed))
 }
 
 fn get<'a>(map: &'a std::collections::HashMap<String, Read>, key: &str) -> &'a Read {
@@ -267,10 +285,23 @@ fn get<'a>(map: &'a std::collections::HashMap<String, Read>, key: &str) -> &'a R
 /// Our verbs that are not where the settings say: the root verb after a move
 /// into a submenu, a member of another submenu. Relative keys.
 fn strays(env: &Env, lay: &Layout) -> Result<Vec<String>, String> {
+    let listed = env.registry.subkeys_many(&shell_parents())?;
+    strays_from(env, lay, listed)
+}
+
+/// The `shell` key of each class: where the verbs are listed.
+fn shell_parents() -> Vec<String> {
+    CLASSES
+        .iter()
+        .map(|class| full(&format!("{class}\\shell")))
+        .collect()
+}
+
+/// [`strays`] from the listing of [`shell_parents`] (one list per class).
+fn strays_from(env: &Env, lay: &Layout, listed: Vec<Vec<String>>) -> Result<Vec<String>, String> {
     let mut candidates = Vec::new();
-    for class in CLASSES {
+    for (class, names) in CLASSES.iter().zip(listed) {
         let wanted = lay.wanted_rel(class).to_ascii_lowercase();
-        let names = env.registry.subkeys(&full(&format!("{class}\\shell")))?;
         for name in names {
             // Both root names: an installation has exactly one verb, so the
             // one of its other role (the plain key as a resigned primary, its
@@ -335,6 +366,18 @@ fn delete_entries(entries: &[String]) -> Vec<RegOp> {
 }
 
 pub(super) fn state(env: &Env, label: &str) -> Result<State, String> {
+    inspect(env, label).map(|seen| seen.state)
+}
+
+/// What one read of the registry says: the state, and the data the verdict
+/// came from, so a rewrite does not read it again.
+struct Seen {
+    state: State,
+    got: std::collections::HashMap<String, Read>,
+    stray: Vec<String>,
+}
+
+fn inspect(env: &Env, label: &str) -> Result<Seen, String> {
     let lay = Layout::of(env);
     let app_key = app_path_key("gitpoulpi.exe");
     // The label and icon come from our own verbs, so a language change alone
@@ -342,26 +385,32 @@ pub(super) fn state(env: &Env, label: &str) -> Result<State, String> {
     let probe = wanted_keys(&lay, Path::new(""), "", "");
     let mut keys: Vec<String> = probe.iter().map(|(k, _)| k.clone()).collect();
     keys.push(app_key.clone());
-    let got = read_map(env, &keys)?;
+    let (got, listed) = snapshot(env, &keys)?;
     let entry_keys: Vec<String> = CLASSES.iter().map(|c| full(&lay.wanted_rel(c))).collect();
     let at: Vec<&Read> = entry_keys.iter().map(|k| get(&got, k)).collect();
     if at
         .iter()
         .any(|g| g.as_ref().is_some_and(|(v, _)| !mine(env, v)))
     {
-        return Ok(State::Foreign);
+        return Ok(Seen {
+            state: State::Foreign,
+            got,
+            stray: Vec::new(),
+        });
     }
-    let stray = strays(env, &lay)?;
+    let stray = strays_from(env, &lay, listed)?;
+    let seen = |state: State, got, stray| Ok(Seen { state, got, stray });
     let have = at.iter().any(|g| g.is_some());
     if !have {
-        return Ok(if stray.is_empty() {
+        let state = if stray.is_empty() {
             State::NotInstalled
         } else {
             State::Outdated
-        });
+        };
+        return seen(state, got, stray);
     }
     let Some(helper) = env.helper.as_deref() else {
-        return Ok(State::Outdated);
+        return seen(State::Outdated, got, stray);
     };
     let found = at
         .iter()
@@ -404,11 +453,25 @@ pub(super) fn state(env: &Env, label: &str) -> Result<State, String> {
             Some(_) => {}
         }
     }
-    Ok(if current {
+    let state = if current {
         State::Installed
     } else {
         State::Outdated
-    })
+    };
+    seen(state, got, stray)
+}
+
+/// Rewrites the verbs of an entry that is ours and outdated from the data
+/// [`inspect`] already read: one registry call to write, none to read again.
+/// `Ok(false)`: nothing to rewrite (current, not installed, or not ours).
+pub(super) fn sync(env: &Env, label: &str) -> Result<bool, String> {
+    let seen = inspect(env, label)?;
+    if seen.state != State::Outdated {
+        return Ok(false);
+    }
+    let ops = plan(env, label, &seen.got, &seen.stray)?;
+    env.registry.apply(&ops)?;
+    Ok(true)
 }
 
 pub(super) fn install(env: &Env, label: &str) -> Result<(), String> {
@@ -417,18 +480,40 @@ pub(super) fn install(env: &Env, label: &str) -> Result<(), String> {
     let app_key = app_path_key("gitpoulpi.exe");
     let wanted = wanted_keys(&lay, helper, label, &icon_value(env, helper));
     let mut keys: Vec<String> = CLASSES.iter().map(|c| full(&lay.wanted_rel(c))).collect();
+    keys.extend(
+        wanted
+            .iter()
+            .filter(|(_, v)| value(v, MENU_TAG).is_some())
+            .map(|(k, _)| k.clone()),
+    );
+    keys.push(app_key);
+    let (got, listed) = snapshot(env, &keys)?;
+    let stray = strays_from(env, &lay, listed)?;
+    env.registry.apply(&plan(env, label, &got, &stray)?)
+}
+
+/// The ops that write the verbs of `env` (and delete `stray`), given the
+/// registry as it was read. `got` holds at least the entry and container keys
+/// and the App Paths key.
+fn plan(
+    env: &Env,
+    label: &str,
+    got: &std::collections::HashMap<String, Read>,
+    stray: &[String],
+) -> Result<Vec<RegOp>, String> {
+    let helper = env.helper_path()?;
+    let lay = Layout::of(env);
+    let app_key = app_path_key("gitpoulpi.exe");
+    let wanted = wanted_keys(&lay, helper, label, &icon_value(env, helper));
     let containers: Vec<String> = wanted
         .iter()
         .filter(|(_, v)| value(v, MENU_TAG).is_some())
         .map(|(k, _)| k.clone())
         .collect();
-    keys.extend(containers.iter().cloned());
-    keys.push(app_key.clone());
-    let got = read_map(env, &keys)?;
     let mut ops = Vec::new();
     for class in CLASSES {
         let key = full(&lay.wanted_rel(class));
-        match get(&got, &key) {
+        match get(got, &key) {
             Some((v, _)) if !mine(env, v) => {
                 return Err(format!("{key} is not ours; not overwriting it"));
             }
@@ -451,7 +536,7 @@ pub(super) fn install(env: &Env, label: &str) -> Result<(), String> {
         }
     }
     for key in &containers {
-        if let Some((v, _)) = get(&got, key) {
+        if let Some((v, _)) = get(got, key) {
             if value(v, MENU_TAG).is_none() {
                 return Err(format!(
                     "{key} is not a GitPoulpi submenu; not overwriting it"
@@ -469,13 +554,13 @@ pub(super) fn install(env: &Env, label: &str) -> Result<(), String> {
         }
     }
     // App Paths: only the primary writes it; skip a key somebody else owns.
-    if lay.primary && get(&got, &app_key).as_ref().is_none_or(|(v, _)| marked(v)) {
+    if lay.primary && get(got, &app_key).as_ref().is_none_or(|(v, _)| marked(v)) {
         ops.extend(app_path_ops("gitpoulpi.exe", helper));
     }
     // The verbs of the installation's other role go last: the new one exists
     // before the old one is deleted, so there is no moment without an entry.
-    ops.extend(delete_entries(&strays(env, &lay)?));
-    env.registry.apply(&ops)
+    ops.extend(delete_entries(stray));
+    Ok(ops)
 }
 
 /// The installation `env` describes stops being the primary and is not here to
@@ -1311,5 +1396,105 @@ mod tests {
         assert_eq!(folder_menu::remove(&primary).unwrap(), [Manager::Explorer]);
         assert_eq!(roots_of(&reg), [own_verb(B)]);
         assert_eq!(state_of(&env_over(&reg, B, Some(A))), State::Installed);
+    }
+
+    // ---- a colour change is cheap ----
+
+    /// A registry that counts its calls (each one is a PowerShell process on
+    /// Windows) and keeps what was applied.
+    struct Counting {
+        inner: MemoryRegistry,
+        calls: std::sync::Mutex<Vec<&'static str>>,
+    }
+
+    impl Counting {
+        fn new() -> Arc<Counting> {
+            Arc::new(Counting {
+                inner: MemoryRegistry::new(),
+                calls: Default::default(),
+            })
+        }
+
+        fn note(&self, what: &'static str) {
+            self.calls.lock().unwrap().push(what);
+        }
+
+        fn take(&self) -> Vec<&'static str> {
+            std::mem::take(&mut *self.calls.lock().unwrap())
+        }
+    }
+
+    impl Registry for Counting {
+        fn read(&self, keys: &[String]) -> Result<Vec<Option<(Values, bool)>>, String> {
+            self.note("read");
+            self.inner.read(keys)
+        }
+        fn subkeys(&self, key: &str) -> Result<Vec<String>, String> {
+            self.note("subkeys");
+            self.inner.subkeys(key)
+        }
+        fn subkeys_many(&self, keys: &[String]) -> Result<Vec<Vec<String>>, String> {
+            self.note("subkeys_many");
+            keys.iter().map(|k| self.inner.subkeys(k)).collect()
+        }
+        #[allow(clippy::type_complexity)]
+        fn snapshot(
+            &self,
+            keys: &[String],
+            parents: &[String],
+        ) -> Result<(Vec<Option<(Values, bool)>>, Vec<Vec<String>>), String> {
+            self.note("snapshot");
+            Ok((
+                self.inner.read(keys)?,
+                parents
+                    .iter()
+                    .map(|k| self.inner.subkeys(k))
+                    .collect::<Result<_, _>>()?,
+            ))
+        }
+        fn apply(&self, ops: &[RegOp]) -> Result<(), String> {
+            self.note("apply");
+            self.inner.apply(ops)
+        }
+    }
+
+    #[test]
+    fn a_colour_change_is_at_most_two_registry_calls_and_rewrites_only_its_own_icon() {
+        let reg = Counting::new();
+        let over = |id: &str, ico: &str| Env {
+            registry: reg.clone(),
+            ..env_for(&Arc::new(MemoryRegistry::new()), id, None, "", Some(ico))
+        };
+        folder_menu::install(&over(A, "C:/a/gitpoulpi-old.ico"), LABEL).unwrap();
+        folder_menu::install(&over(B, "C:/b/gitpoulpi-b.ico"), LABEL).unwrap();
+        let before = reg.inner.dump();
+        reg.take();
+
+        let changed = folder_menu::sync(&over(A, "C:/a/gitpoulpi-new.ico"), LABEL).unwrap();
+        assert_eq!(changed, [Manager::Explorer]);
+        let calls = reg.take();
+        assert_eq!(
+            calls,
+            ["snapshot", "apply"],
+            "each call is a PowerShell process"
+        );
+
+        // Exactly this installation's three Icon values moved.
+        let after = reg.inner.dump();
+        let moved: Vec<_> = after.iter().filter(|e| !before.contains(e)).collect();
+        assert_eq!(moved.len(), CLASSES.len(), "{moved:?}");
+        for (key, name, value) in moved {
+            assert!(key
+                .to_ascii_lowercase()
+                .ends_with(&format!("gitpoulpi.{}", short(A))));
+            assert_eq!(name, "Icon");
+            assert_eq!(value, "\"C:/a/gitpoulpi-new.ico\"");
+        }
+        assert_eq!(after.len(), before.len());
+        // Nothing to do the second time: reads only, no write.
+        assert!(folder_menu::sync(&over(A, "C:/a/gitpoulpi-new.ico"), LABEL)
+            .unwrap()
+            .is_empty());
+        assert!(!reg.take().contains(&"apply"));
     }
 }

@@ -264,9 +264,27 @@ fehlerhafte Farbe wird ignoriert, eine unbekannte `base` fällt auf `dark` zurü
 der Statuszeile).
 
 Dateien werden neu gelesen, wenn die Design-Auswahl sich öffnet und wenn die Einstellungen
-schließen; es gibt keine Dateiüberwachung. Ein laufendes Fenster wendet ein von der CLI
-gesetztes Design beim nächsten Schließen seiner Einstellungen an, wie jeden anderen
-Live-Schlüssel.
+schließen. Ein laufendes Fenster bemerkt außerdem, wenn `config.toml` (ein
+`gitpoulpi config set ui.theme ...` aus einer Shell) oder die Datei des aktiven Designs neu
+geschrieben wird, und wendet die neuen Farben innerhalb von etwa einer Sekunde ohne Neustart an.
+
+### `ui.border_focused`
+
+Der Rahmen des Bereichs, der den Tastaturfokus hat: das Log, die Refs-Seitenleiste, die
+Bereiche Staged und Unstaged, die Commit-Details, die Bereiche für Verlauf, Review und
+Rewrite, die Rahmen von Diff, Datei und Editor. Er färbt nur Rahmen; Text, Beschriftungen
+und Symbole (die Beschriftung „commit :“, das Home-Symbol, die Tab-Schaltflächen) verwenden
+weiterhin `ui.accent`. So kann ein Design den aktiven Bereich in einer Farbe einrahmen, die
+als Text unlesbar wäre, zum Beispiel ein leuchtendes Gelb auf einem hellen Design. Setzt ein
+Design ihn nicht, folgt er `ui.accent` (auch in einer Benutzerdatei: Eine Datei, die nur
+`accent` ändert, bekommt diesen Akzent auch auf ihren fokussierten Rahmen), sodass jedes
+mitgelieferte Design aussieht wie bisher. Dialoge und Popups behalten einen Akzentrahmen.
+
+```toml
+[ui]
+accent = "#1f5fbf"
+border_focused = "#e7df00"
+```
 
 ## Systemerkennung
 

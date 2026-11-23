@@ -230,7 +230,17 @@ add_bg = "#2f3b2f"
 
 Barvy jsou `"#rrggbb"`, `"ansi:N"` (položka N palety terminálu) nebo `"default"` (vlastní barva terminálu). Skupiny a klíče jsou ty z `gitpoulpi theme export <slug>`. Nic není fatální: neznámý klíč nebo špatná barva se ignorují, neznámý `base` se vrátí na `dark` a `gitpoulpi theme list` hlásí každý problém pod `warnings` (aplikace je jednou ukáže ve stavovém řádku).
 
-Soubory se znovu čtou při otevření seznamu Motiv a při zavření Nastavení; žádné sledování souborů neexistuje. Běžící okno použije motiv nastavený z CLI při dalším zavření svého Nastavení, jako každý jiný živý klíč.
+Soubory se znovu čtou při otevření seznamu Motiv a při zavření Nastavení. Běžící okno si navíc všimne přepsání `config.toml` (například `gitpoulpi config set ui.theme ...` z shellu) i souboru aktivního motivu a nové barvy použije přibližně do jedné sekundy, bez restartu.
+
+### `ui.border_focused`
+
+Rámeček panelu, který má fokus klávesnice: Log, postranní panel Refs, panely Soubory staged a Soubory unstaged, detail commitu, panely historie, revize a přepisu, rámečky diffu, souborů a editoru. Vykresluje jen okraje; text, popisky a ikony (popisek „commit :“, ikona Domů, tlačítka karet) nadále používají `ui.accent`. Motiv tak může aktivní panel orámovat barvou, která by jako text byla nečitelná, například jasně žlutou na světlém motivu. Když ji motiv nenastaví, řídí se `ui.accent` (i v uživatelském souboru: soubor, který změní jen `accent`, dá tento akcent i rámečkům s fokusem), takže každý vestavěný motiv vypadá jako dřív. Dialogy a vyskakovací okna si ponechávají rámeček v barvě akcentu.
+
+```toml
+[ui]
+accent = "#1f5fbf"
+border_focused = "#e7df00"
+```
 
 ## Detekce systému
 

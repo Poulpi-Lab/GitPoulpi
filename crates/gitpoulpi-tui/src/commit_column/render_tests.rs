@@ -134,6 +134,30 @@ fn draw(layout: &LogLayout, state: &mut CommitColumn, width: u16, height: u16) -
     terminal.backend().buffer().clone()
 }
 
+/// The focused column's frame is `ui.border_focused`, never `ui.accent`.
+#[test]
+fn a_focused_column_is_framed_in_border_focused() {
+    let mut theme = crate::theme::Theme::dark();
+    theme.ui.accent = ratatui::style::Color::Rgb(1, 2, 3);
+    theme.ui.border_focused = ratatui::style::Color::Rgb(231, 223, 0);
+    let _guard = crate::theme::override_theme(&theme);
+    let cache = layout_cache(history(5), false, Vec::new());
+    let layout = cache.layout();
+    let mut state = CommitColumn::new(0, 0);
+    let mut paint = paint_in(layout, None);
+    paint.focused = true;
+    let mut terminal = Terminal::new(TestBackend::new(60, 12)).unwrap();
+    terminal
+        .draw(|f| {
+            let area = f.area();
+            render(f, area, &mut state, &paint, None);
+        })
+        .unwrap();
+    let buf = terminal.backend().buffer().clone();
+    assert_eq!(buf[(0, 0)].fg, theme.ui.border_focused);
+    assert_ne!(buf[(0, 0)].fg, theme.ui.accent);
+}
+
 fn row_text(buf: &Buffer, y: u16) -> String {
     (0..buf.area.width)
         .map(|x| buf[(x, y)].symbol().to_string())

@@ -831,7 +831,7 @@ impl ListEditor {
 
     fn paint_list(&mut self, buf: &mut Buffer, list: Rect, focused: bool) {
         let border = if focused {
-            th().ui.accent
+            th().ui.border_focused
         } else {
             th().ui.muted
         };

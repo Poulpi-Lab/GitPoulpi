@@ -108,7 +108,7 @@ pub(crate) fn render(
     picture: Option<&mut ColumnPicture<'_>>,
 ) -> Vec<(Rect, HitTarget)> {
     let border = if paint.focused {
-        th().ui.accent
+        th().ui.border_focused
     } else {
         th().ui.border
     };

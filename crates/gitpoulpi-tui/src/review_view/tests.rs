@@ -20,6 +20,22 @@ use gitpoulpi_hosting::{
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 
+/// The focused pane's frame is `ui.border_focused`, the unfocused one
+/// `ui.border`; `ui.accent` frames neither.
+#[test]
+fn a_focused_review_pane_is_framed_in_border_focused() {
+    let mut theme = crate::theme::Theme::dark();
+    theme.ui.accent = ratatui::style::Color::Rgb(1, 2, 3);
+    theme.ui.border_focused = ratatui::style::Color::Rgb(231, 223, 0);
+    let _guard = crate::theme::override_theme(&theme);
+    let area = Rect::new(0, 0, 20, 5);
+    let mut buf = Buffer::empty(area);
+    super::draw::block(&mut buf, area, "Files", true);
+    assert_eq!(buf[(0, 0)].fg, theme.ui.border_focused);
+    super::draw::block(&mut buf, area, "Files", false);
+    assert_eq!(buf[(0, 0)].fg, theme.ui.border);
+}
+
 use super::draw::Hit;
 use super::popups::ComposeFor;
 use super::*;

@@ -49,7 +49,7 @@ impl Editor {
             ]))
             .border_type(BorderType::Rounded)
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(th().ui.accent));
+            .border_style(Style::default().fg(th().ui.border_focused));
         self.minimap_pad = minimap::padding_for(body, live_settings::minimap());
         self.minimap_rect = (self.minimap_pad > 0)
             .then(|| minimap::rect_in(body))

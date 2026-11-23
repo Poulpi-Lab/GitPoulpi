@@ -167,6 +167,16 @@ pub fn parse_user_themes(sources: &[(String, String)]) -> ThemeSet {
         for link in chain.iter().rev() {
             link.apply(&mut spec);
         }
+        // `ui.border_focused` nobody in the chain set follows the accent the
+        // file chose, not the base preset's.
+        let sets_focus = chain.iter().any(|r| {
+            r.colors
+                .iter()
+                .any(|(g, k, _)| g == "ui" && k == "border_focused")
+        });
+        if !sets_focus {
+            spec.ui.border_focused = spec.ui.accent;
+        }
         // Inherited names must not leak: the label is this file's own.
         spec.slug = raw.slug.clone();
         spec.name = raw.name.clone().unwrap_or_else(|| raw.slug.clone());

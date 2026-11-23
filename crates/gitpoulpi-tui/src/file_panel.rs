@@ -449,7 +449,7 @@ pub(crate) fn render_file_panel_in(
     let block = block
         .border_type(BorderType::Rounded)
         .borders(Borders::ALL)
-        .border_style(Style::default().fg(th().ui.accent))
+        .border_style(Style::default().fg(th().ui.border_focused))
         .padding(ratatui::widgets::Padding::right(map_pad));
     let inner = block.inner(body);
     frame.render_clipped(block, body);

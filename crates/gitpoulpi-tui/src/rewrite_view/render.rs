@@ -465,7 +465,7 @@ pub(super) fn pane(buf: &mut Buffer, area: Rect, title: &str, focused: bool) -> 
         .border_type(BorderType::Rounded)
         .borders(Borders::ALL)
         .border_style(Style::default().fg(if focused {
-            th().ui.accent
+            th().ui.border_focused
         } else {
             th().ui.muted
         }))

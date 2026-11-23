@@ -532,3 +532,36 @@ fn a_config_naming_a_missing_theme_parses_and_finds_no_preset() {
         assert!(lane_palette(slug).is_none(), "{slug}");
     }
 }
+
+#[test]
+fn every_preset_frames_the_focused_pane_in_its_accent() {
+    for spec in presets() {
+        assert_eq!(spec.ui.border_focused, spec.ui.accent, "{}", spec.slug);
+    }
+}
+
+#[test]
+fn a_user_theme_that_sets_only_accent_frames_the_focus_in_that_accent() {
+    let set = parse(&[("mine", "[ui]\naccent = \"#ff0000\"\n")]);
+    assert_eq!(set.themes[0].ui.border_focused, ThemeColor::Rgb(255, 0, 0));
+}
+
+#[test]
+fn a_user_theme_can_frame_the_focus_in_its_own_color() {
+    let set = parse(&[
+        (
+            "mine",
+            "[ui]\naccent = \"#112233\"\nborder_focused = \"#e7df00\"\n",
+        ),
+        ("child", "base = \"mine\"\n[ui]\naccent = \"#445566\"\n"),
+    ]);
+    assert_eq!(
+        set.themes[0].ui.border_focused,
+        ThemeColor::Rgb(231, 223, 0)
+    );
+    // Inherited from the explicit one, not reset to the child's accent.
+    assert_eq!(
+        set.themes[1].ui.border_focused,
+        ThemeColor::Rgb(231, 223, 0)
+    );
+}

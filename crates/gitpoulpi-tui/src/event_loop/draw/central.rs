@@ -412,7 +412,7 @@ fn draw_central_in(frame: &mut Frame, ctx: &mut CentralDrawCtx<'_>) {
             .title(title)
             .border_type(BorderType::Rounded)
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(th().ui.accent));
+            .border_style(Style::default().fg(th().ui.border_focused));
         let inner = block.inner(log_area);
         frame.render_clipped(block, log_area);
         if let Some(rect) =
@@ -655,7 +655,7 @@ fn draw_central_in(frame: &mut Frame, ctx: &mut CentralDrawCtx<'_>) {
             .title(title)
             .border_type(BorderType::Rounded)
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(th().ui.accent))
+            .border_style(Style::default().fg(th().ui.border_focused))
             .padding(ratatui::widgets::Padding::right(minimap_pad));
         let inner = body_block.inner(body);
         frame.render_clipped(body_block, body);

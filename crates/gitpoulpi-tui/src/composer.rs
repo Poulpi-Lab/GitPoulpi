@@ -431,7 +431,7 @@ pub(crate) fn render_commit_composer(
         .border_type(BorderType::Rounded)
         .borders(Borders::ALL)
         .border_style(if box_focused {
-            Style::default().fg(th().ui.accent)
+            Style::default().fg(th().ui.border_focused)
         } else {
             Style::default().fg(th().ui.muted)
         });

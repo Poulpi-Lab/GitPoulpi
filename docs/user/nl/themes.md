@@ -269,9 +269,29 @@ ongeldige kleur wordt genegeerd, een onbekende `base` valt terug op `dark`, en
 één keer in de statusbalk).
 
 Bestanden worden opnieuw gelezen wanneer het keuzelijst Thema opent en wanneer
-de Instellingen sluiten; er is geen bestandswatcher. Een draaiend venster past een thema
-dat via de CLI is ingesteld toe de volgende keer dat de Instellingen sluiten,
-zoals elke andere live sleutel.
+de Instellingen sluiten. Een draaiend venster merkt ook dat `config.toml` (een
+`gitpoulpi config set ui.theme ...` vanuit een shell) of het bestand van het
+actieve thema is herschreven, en past de nieuwe kleuren binnen ongeveer een
+seconde toe, zonder herstart.
+
+### `ui.border_focused`
+
+De rand van het paneel dat de toetsenbordfocus heeft: het Log, het Refs-paneel,
+de panelen Staged en Unstaged, het commitdetail, de panelen voor geschiedenis,
+review en herschrijven, en de randen van diff, bestand en editor. Het kleurt
+alleen randen; tekst, labels en pictogrammen (het label "commit :", het
+Home-pictogram, de tabknoppen) blijven `ui.accent` gebruiken. Zo kan een thema
+het actieve paneel omranden in een kleur die als tekst onleesbaar zou zijn, bijvoorbeeld
+een felgeel op een licht thema. Stelt een thema het niet in, dan volgt het
+`ui.accent` (ook in een gebruikersbestand: een bestand dat alleen `accent`
+wijzigt, geeft dat accent aan zijn gefocuste randen), zodat elk ingebouwd thema
+er hetzelfde uitziet als voorheen. Dialogen en pop-ups houden een accentrand.
+
+```toml
+[ui]
+accent = "#1f5fbf"
+border_focused = "#e7df00"
+```
 
 ## Systeemdetectie
 

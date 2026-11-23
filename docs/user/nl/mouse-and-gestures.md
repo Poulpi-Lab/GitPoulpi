@@ -35,6 +35,7 @@ Elk venster met een kader en elke dialoog heeft rechtsboven in de rand een `✕`
 - **Klik op `✕`** om te sluiten. `Esc` doet hetzelfde en sluit eerst het binnenste ding (een open keuzelijst, een tekstveld, een bevestiging) en dan pas het venster.
 - **Klik buiten** een dialoog, een hulp- of infopaneel of een pop-up om die te sluiten. Een klik buiten sluit nooit een volledige weergave (Instellingen, de Diff-weergave, de Bestandsweergave, de editors, Review, Board): die hebben geen buitenkant.
 - Een klik **binnen** een paneel sluit het nooit.
+- Een muisklik (links of rechts) terwijl een `Ctrl+G`- of `Ctrl+N`-combinatie op haar tweede toets wacht, annuleert de combinatie zoals `Esc` en werkt daarna als gewoonlijk (een klik selecteert nog steeds, een rechtsklik opent nog steeds zijn menu).
 - Een formulier met tekst die je hebt getypt (een nieuw issue, een pull of merge request) negeert een klik buiten, zodat een verdwaalde klik niets kwijtraakt. `✕` en `Esc` vragen eerst **Wijzigingen verwerpen?**; met **Verder bewerken** ga je terug. Een formulier waarin niets is getypt sluit meteen, en een dialoog met één regel ook.
 - Het opdrachtpalet, de kiezers (tab, thema, taal), de kleine review-, board-, merge- en composerdialogen en de bevestigingsvraag hebben ook een `✕`. Contextmenu's en keuzelijsten hebben er geen: ze sluiten met `Esc` of een klik buiten.
 

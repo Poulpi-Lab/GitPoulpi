@@ -474,6 +474,17 @@ Open haar via het segment `Bestand` van de keuze `Bestand │ Alles` in de diffb
   fast-forward)* of *Pull (rebase)* uit, zonder de knop te veranderen. De modus wordt altijd
   expliciet aan git doorgegeven, zodat de `pull.rebase` uit je git-configuratie je niet kan
   verrassen.
+- **Pull alle branches** (`Ctrl+G Ctrl+P`, een rij van de `▾` van Pull) downloadt van de
+  remotes die je branches volgen en brengt daarna elke lokale branch in één keer bij met zijn
+  upstream. Een branch die niet is uitgecheckt krijgt alleen een fast-forward (er wordt geen
+  bestand aangeraakt); een uiteengelopen branch blijft ongemoeid en wordt gemeld. De
+  uitgecheckte branch wordt gepulld zoals de knop Pull is ingesteld, en de `▾` heeft ook de
+  rij voor elke andere modus (*Pull alle branches (alleen fast-forward)*, *(rebase)*,
+  *(fast-forward indien mogelijk)*). Loopt een branch achter en is hij uitgecheckt in een
+  andere worktree, dan vraagt een dialoogvenster eerst of die worktrees ook moeten worden
+  bijgewerkt, overgeslagen of dat je annuleert. De statusbalk vat de run samen en het
+  Activiteitenlogboek heeft één regel per branch; Ongedaan maken zet elke branch in één stap
+  terug. `Ctrl+G p` blijft een gewone Pull.
 - **Push** (`Ctrl+G Shift+P`) stuurt de uitgecheckte branch naar de standaardremote en stelt
   de eerste keer de upstream in. Zijn `▾` pusht eenmalig naar een andere remote die je kiest.
   Heeft de remote commits die jij niet hebt, dan biedt een dialoogvenster **Pull (merge), dan

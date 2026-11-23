@@ -144,7 +144,7 @@ Standaard een rij onder de panelen en boven de statusbalk. **Instellingen > Weer
 | Knop | Wat hij doet |
 |---|---|
 | **Ongedaan**, **Opnieuw** | Maken de laatste bewerking ongedaan of herstellen die (`Ctrl+Z`, `Ctrl+Y`). Verborgen als Ongedaan maken uit staat. Zie [Ongedaan maken en opnieuw](undo-redo.md). |
-| **Pull** `▾` | Doet een pull zoals **Instellingen > Git & codering > Pull-knop** zegt. De lijst `▾` heeft **Fetch All**, **Pull (fast-forward indien mogelijk)**, **Pull (alleen fast-forward)** en **Pull (rebase)**. Een item uit de lijst wordt eenmalig uitgevoerd en wijzigt de knop niet. |
+| **Pull** `▾` | Doet een pull zoals **Instellingen > Git & codering > Pull-knop** zegt. De lijst `▾` heeft **Fetch All**, **Pull (fast-forward indien mogelijk)**, **Pull (alleen fast-forward)** en **Pull (rebase)**, daarna **Pull alle branches** (`Ctrl+G Ctrl+P`) en hetzelfde met elk van de andere modi voor de uitgecheckte branch. Een item uit de lijst wordt eenmalig uitgevoerd en wijzigt de knop niet. |
 | **Push** `▾` | Pusht de uitgecheckte branch. De lijst `▾` doet eenmalig een push naar de remote die je kiest. |
 | **Branch** | Maakt een branch op de uitgecheckte commit. |
 | **Tag** | Maakt een tag op de uitgecheckte commit. |

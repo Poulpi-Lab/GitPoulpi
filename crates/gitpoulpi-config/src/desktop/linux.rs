@@ -216,6 +216,7 @@ fn owner_of(text: &str, ctx: &InstallCtx) -> Owner {
             tag: text.lines().find_map(|l| l.strip_prefix(prefix.as_str())),
             legacy_marker: text.lines().any(|l| l == MARKER),
             names_my_exe: false,
+            claimed_by: None,
         },
         ctx,
     )
@@ -810,6 +811,7 @@ mod tests {
             short: format!("i{}", &id[..8]),
             name: name.into(),
             primary: primary.map(str::to_string),
+            alias_claims: Vec::new(),
             known: [A, B]
                 .iter()
                 .map(|i| KnownInstall {

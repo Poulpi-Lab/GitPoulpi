@@ -531,6 +531,15 @@ fn effective_from(
             default.to_string()
         }
     };
+    // `ui.*` may hold what a 1.0 build wrote for another installation: a name
+    // another entry holds stays that installation's, the primary's too.
+    let ui_alias = |name: &str| {
+        if claimed_by_another(config, id, name) {
+            String::new()
+        } else {
+            name.to_string()
+        }
+    };
     let kind_color = if kind == Kind::Dev {
         DEV_LOGO_COLOR
     } else {
@@ -549,8 +558,12 @@ fn effective_from(
         },
         name_with_version: e.name_with_version,
         logo_color: pick(&e.logo_color, &config.ui.logo_color, kind_color),
-        command_alias: pick(&e.command_alias, &config.ui.command_alias, ""),
-        command_alias_add: pick(&e.command_alias_add, &config.ui.command_alias_add, ""),
+        command_alias: pick(&e.command_alias, &ui_alias(&config.ui.command_alias), ""),
+        command_alias_add: pick(
+            &e.command_alias_add,
+            &ui_alias(&config.ui.command_alias_add),
+            "",
+        ),
         folder_menu_submenu: e.folder_menu_submenu.clone(),
         env: if e.env.trim().is_empty() {
             id.to_string()
@@ -584,6 +597,40 @@ pub fn effective_of(config: &Config, id: &str) -> Option<Effective> {
         e.kind,
         InstallChannel::parse(&e.channel),
     ))
+}
+
+/// Which installation each alias name belongs to: every entry's own
+/// `command_alias(_add)`, then the primary's `ui.*` fallback for the names no
+/// entry claims (`ui.*` may hold what a 1.0 build wrote for another
+/// installation, whose entry then wins). Names are lower-cased.
+pub fn alias_claims(config: &Config) -> Vec<(String, String)> {
+    let mut claims: Vec<(String, String)> = Vec::new();
+    let mut claim = |name: &str, id: &str| {
+        let name = name.trim().to_ascii_lowercase();
+        if !name.is_empty() && !claims.iter().any(|(n, _)| *n == name) {
+            claims.push((name, id.to_string()));
+        }
+    };
+    for (id, e) in &config.installation.settings {
+        claim(&e.command_alias, id);
+        claim(&e.command_alias_add, id);
+    }
+    if let Some(primary) = config.installation.primary.as_deref() {
+        claim(&config.ui.command_alias, primary);
+        claim(&config.ui.command_alias_add, primary);
+    }
+    claims
+}
+
+/// Does an installation other than `id` have `name` in its own entry?
+fn claimed_by_another(config: &Config, id: &str, name: &str) -> bool {
+    !name.is_empty()
+        && config.installation.settings.iter().any(|(other, e)| {
+            other != id
+                && [&e.command_alias, &e.command_alias_add]
+                    .iter()
+                    .any(|n| n.eq_ignore_ascii_case(name))
+        })
 }
 
 // ----------------------------------------------------------------- seeding
@@ -769,6 +816,17 @@ pub fn plan_primary(config: &Config, new: &Identity) -> Option<PrimaryHandover> 
         _ if demoted.is_none() => legacy.to_string(),
         _ => wanted,
     };
+    // `ui.*` aliases another installation's entry holds (a 1.0 dev build wrote
+    // them) are that installation's: the new primary does not take them.
+    // (`effective` already leaves them out; the inherited `ui.*` text is raw.)
+    let inherit_alias = |own: Option<&str>, wanted: String, legacy: &str| {
+        let name = inherit(own, wanted, legacy);
+        if claimed_by_another(config, &new.id, &name) {
+            String::new()
+        } else {
+            name
+        }
+    };
     if let Some(old) = &demoted {
         freeze_own_values(config, &mut inst, old);
     }
@@ -803,12 +861,12 @@ pub fn plan_primary(config: &Config, new: &Identity) -> Option<PrimaryHandover> 
                 wanted.logo_color,
                 &config.ui.logo_color,
             ),
-            command_alias: inherit(
+            command_alias: inherit_alias(
                 own.map(|e| e.command_alias.as_str()),
                 wanted.command_alias,
                 &config.ui.command_alias,
             ),
-            command_alias_add: inherit(
+            command_alias_add: inherit_alias(
                 own.map(|e| e.command_alias_add.as_str()),
                 wanted.command_alias_add,
                 &config.ui.command_alias_add,

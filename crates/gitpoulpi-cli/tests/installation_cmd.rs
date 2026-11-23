@@ -155,3 +155,86 @@ fn alias_status_json_names_each_aliases_installation() {
         .iter()
         .any(|o| o["name"].is_string()));
 }
+
+/// A config a 1.0 dev build left: `ui.*` holds `gpd` / `gpda` and the dev
+/// installation's entry (its folder exists) claims both.
+fn write_legacy_dev_config(scratch: &Path, primary: Option<&str>) {
+    let cfg = scratch.join("cfg");
+    std::fs::create_dir_all(&cfg).unwrap();
+    let dev_dir = scratch.join("dev");
+    std::fs::create_dir_all(&dev_dir).unwrap();
+    let primary = primary
+        .map(|p| format!("primary = \"{p}\"\n"))
+        .unwrap_or_default();
+    std::fs::write(
+        cfg.join("config.toml"),
+        format!(
+            "[ui]\ncommand_alias = \"gpd\"\ncommand_alias_add = \"gpda\"\n\n[installation]\n{primary}\n[installation.settings.p-dev]\npath = \"{}\"\nkind = \"portable\"\ncommand_alias = \"gpd\"\ncommand_alias_add = \"gpda\"\n\n[installation.settings.p-choco]\npath = \"/opt/choco\"\nkind = \"portable\"\n",
+            dev_dir.display()
+        ),
+    )
+    .unwrap();
+}
+
+fn as_choco(scratch: &Path) -> Command {
+    let mut cmd = command(None, scratch);
+    cmd.env("GITPOULPI_INSTALL_ID", "choco");
+    cmd
+}
+
+#[test]
+fn a_non_primary_has_no_alias_of_its_own_until_alias_create_records_one() {
+    let tmp = tempfile::tempdir().unwrap();
+    write_legacy_dev_config(tmp.path(), Some("p-dev"));
+    let (ok, show) = json_of(as_choco(tmp.path()), &["installation", "show"]);
+    assert!(ok, "{show}");
+    assert_eq!(show["primary"], false);
+    assert_eq!(show["settings"]["command_alias"], "");
+    assert_eq!(show["settings"]["command_alias_add"], "");
+    let (ok, made) = json_of(as_choco(tmp.path()), &["alias", "create", "gp"]);
+    assert!(ok, "{made}");
+    let (_, show) = json_of(as_choco(tmp.path()), &["installation", "show"]);
+    assert_eq!(show["settings"]["command_alias"], "gp", "{show}");
+    assert_eq!(show["settings"]["command_alias_add"], "");
+    // The shared keys older builds read are left alone.
+    let text = std::fs::read_to_string(tmp.path().join("cfg/config.toml")).unwrap();
+    assert!(text.contains("command_alias = \"gpd\""), "{text}");
+}
+
+#[test]
+fn the_primary_does_not_take_a_legacy_alias_the_dev_installation_claims() {
+    let tmp = tempfile::tempdir().unwrap();
+    write_legacy_dev_config(tmp.path(), Some("p-choco"));
+    // The untagged add script a 1.0 dev build made, running the dev's program.
+    let bin = tmp.path().join("home/.local/bin");
+    std::fs::create_dir_all(&bin).unwrap();
+    let legacy = "#!/bin/sh\n# X-GitPoulpi=1\nexec '/dev/gitpoulpi' --add \"$@\"\n";
+    std::fs::write(bin.join("gpda"), legacy).unwrap();
+    let (ok, show) = json_of(as_choco(tmp.path()), &["installation", "show"]);
+    assert!(ok, "{show}");
+    assert_eq!(show["primary"], true);
+    assert_eq!(
+        show["settings"]["command_alias_add"], "",
+        "the dev's name is not the primary's: {show}"
+    );
+    let (ok, status) = json_of(as_choco(tmp.path()), &["alias", "status"]);
+    assert!(ok, "{status}");
+    if let Some(gpda) = status["aliases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|a| a["name"] == "gpda")
+    {
+        assert_eq!(gpda["state"], "other", "{gpda}");
+        assert_eq!(gpda["installation"]["id"], "p-dev", "{gpda}");
+    }
+    let (ok, err) = json_of(as_choco(tmp.path()), &["alias", "create", "gpda", "--add"]);
+    assert!(
+        !ok && err["error"]
+            .as_str()
+            .unwrap()
+            .contains("another installation"),
+        "{err}"
+    );
+    assert_eq!(std::fs::read_to_string(bin.join("gpda")).unwrap(), legacy);
+}

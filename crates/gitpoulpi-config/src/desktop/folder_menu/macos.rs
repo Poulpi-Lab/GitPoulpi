@@ -62,6 +62,7 @@ fn plist_facts(text: &str) -> Facts<'_> {
         tag,
         legacy_marker: text.contains(&format!("<key>{MARKER}</key>")),
         names_my_exe: false,
+        claimed_by: None,
     }
 }
 

@@ -78,6 +78,7 @@ fn owner_of(plist: &str, ctx: &InstallCtx) -> Owner {
             tag,
             legacy_marker: plist.contains(MARKER),
             names_my_exe: false,
+            claimed_by: None,
         },
         ctx,
     )
@@ -366,6 +367,7 @@ mod tests {
             short: format!("i{}", &id[..8]),
             name: name.into(),
             primary: primary.map(str::to_string),
+            alias_claims: Vec::new(),
             known: [A, B]
                 .iter()
                 .map(|i| KnownInstall {

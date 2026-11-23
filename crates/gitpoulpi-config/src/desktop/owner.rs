@@ -18,6 +18,9 @@ pub struct Facts<'a> {
     /// Neither tag nor marker, but it starts the running exe (a pin the user
     /// made by hand).
     pub names_my_exe: bool,
+    /// The installation whose settings claim this artifact's name (aliases):
+    /// an untagged legacy artifact goes to it, never to whoever is primary.
+    pub claimed_by: Option<&'a str>,
 }
 
 /// The verdict.
@@ -56,6 +59,15 @@ pub fn decide(facts: &Facts, ctx: &InstallCtx) -> Owner {
         };
     }
     if facts.legacy_marker {
+        if let Some(claimant) = facts.claimed_by {
+            return if claimant == ctx.id {
+                Owner::Adopt
+            } else if alive(claimant) {
+                Owner::Other(claimant.to_string())
+            } else {
+                Owner::Orphan(Some(claimant.to_string()))
+            };
+        }
         return match ctx.primary.as_deref() {
             None => Owner::Legacy,
             Some(p) if p == ctx.id => Owner::Adopt,
@@ -81,6 +93,7 @@ mod tests {
             short: "iaaaa".into(),
             name: "GitPoulpi (dev)".into(),
             primary: primary.map(str::to_string),
+            alias_claims: Vec::new(),
             known: vec![
                 KnownInstall {
                     id: "aaaa".into(),
@@ -116,6 +129,7 @@ mod tests {
             tag: Some("bbbb"),
             legacy_marker: true,
             names_my_exe: true,
+            claimed_by: None,
         };
         assert_eq!(decide(&both, &c), Owner::Other("bbbb".into()));
     }
@@ -147,6 +161,28 @@ mod tests {
             ..Facts::default()
         };
         assert_eq!(decide(&pin, &ctx(None)), Owner::Adopt);
+    }
+
+    #[test]
+    fn an_untagged_legacy_artifact_goes_to_the_installation_that_claims_its_name() {
+        let claimed = |by| Facts {
+            legacy_marker: true,
+            claimed_by: Some(by),
+            ..Facts::default()
+        };
+        // aaaa is me; bbbb is the primary but does not claim it.
+        let c = ctx(Some("bbbb"));
+        assert_eq!(decide(&claimed("aaaa"), &c), Owner::Adopt);
+        assert_eq!(decide(&claimed("bbbb"), &c), Owner::Other("bbbb".into()));
+        assert_eq!(
+            decide(&claimed("cccc"), &c),
+            Owner::Orphan(Some("cccc".into()))
+        );
+        // Even the primary leaves what another installation claims.
+        assert_eq!(
+            decide(&claimed("bbbb"), &ctx(Some("aaaa"))),
+            Owner::Other("bbbb".into())
+        );
     }
 
     #[test]

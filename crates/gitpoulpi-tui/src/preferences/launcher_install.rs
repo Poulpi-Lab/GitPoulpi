@@ -827,6 +827,7 @@ impl JobMachine {
                     primary: Some(old.clone()),
                     id: old,
                     known,
+                    alias_claims: Vec::new(),
                 };
                 let _ = desktop::hand_over_shortcuts(&env.dirs, env.os, &old_ctx);
                 let mut old_fe = fe.clone();
@@ -878,6 +879,7 @@ impl JobMachine {
             name: gone.name.clone(),
             primary: config.installation.primary.clone(),
             known: Vec::new(),
+            alias_claims: Vec::new(),
         };
         for place in env.dirs.places(env.os) {
             let _ = desktop::remove(place, &env.dirs, env.os, &ctx);

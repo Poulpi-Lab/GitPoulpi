@@ -61,6 +61,9 @@ pub struct InstallCtx {
     pub primary: Option<String>,
     /// Every installation of the config.
     pub known: Vec<KnownInstall>,
+    /// Which installation each alias name belongs to by the config (name,
+    /// installation id): decides who owns an untagged legacy alias file.
+    pub alias_claims: Vec<(String, String)>,
 }
 
 impl InstallCtx {
@@ -74,6 +77,7 @@ impl InstallCtx {
             name: crate::installation::PRIMARY_NAME.to_string(),
             primary: Some(identity.id.clone()),
             known: Vec::new(),
+            alias_claims: Vec::new(),
         }
     }
 
@@ -115,7 +119,16 @@ impl InstallCtx {
                     exists: exists(&e.path),
                 })
                 .collect(),
+            alias_claims: crate::installation::alias_claims(config),
         }
+    }
+
+    /// The installation the config gives the alias `name` to, if any.
+    pub fn alias_claimed_by(&self, name: &str) -> Option<&str> {
+        self.alias_claims
+            .iter()
+            .find(|(n, _)| n.eq_ignore_ascii_case(name))
+            .map(|(_, id)| id.as_str())
     }
 
     /// Is the running installation the primary?

@@ -74,9 +74,25 @@ fn record_name(name: &str, kind: Kind) {
     let identity = cur.identity.clone();
     let name = name.to_string();
     let primary = cur.effective.primary;
-    let (field, current) = match kind {
+    let (field, effective) = match kind {
         Kind::Open => ("ui.command_alias", &cur.effective.command_alias),
         Kind::Add => ("ui.command_alias_add", &cur.effective.command_alias_add),
+    };
+    // The primary's value may come from `ui.*`; anyone else's is its own
+    // entry's, so only that decides (never another installation's name).
+    let own = cur
+        .config
+        .installation
+        .settings
+        .get(&id)
+        .map(|e| match kind {
+            Kind::Open => &e.command_alias,
+            Kind::Add => &e.command_alias_add,
+        });
+    let current = if primary {
+        effective
+    } else {
+        own.unwrap_or(effective)
     };
     if !current.is_empty() {
         return;

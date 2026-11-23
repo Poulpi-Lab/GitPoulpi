@@ -1895,6 +1895,7 @@ LFS가 켜져 있으면 LFS 행이 있습니다. **변경 사항 버리기...**�
 | 상태 표시줄의 **활동** | `Ctrl+N Shift+A` |
 | 도구 모음: **실행 취소**, **다시 실행** | `Ctrl+Z`, `Ctrl+Y` |
 | 도구 모음: **Pull** / 그 `▾` | `Ctrl+G p` / `Git: Pull 옵션...` |
+| **모든 브랜치 Pull** (Pull `▾`의 행) | `Ctrl+G Ctrl+P` |
 | 도구 모음: **Push** / 그 `▾` | `Ctrl+G Shift+P` / `Git: 리모트로 Push...` |
 | 도구 모음: **브랜치**, **Tag** | `Ctrl+G b`, `Ctrl+G t` |
 | 도구 모음: **Stash**, **Pop** | `Ctrl+G Shift+T`, `Ctrl+G o` |

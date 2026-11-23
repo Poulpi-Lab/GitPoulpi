@@ -7,6 +7,20 @@ IPC surfaces are stable within a major version).
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-11-23
+
+Fixes for several installations side by side on one machine, and two theme fixes.
+
+### Fixed
+- **Aliases stay with their installation:** an installation that is not the primary no longer picks up the shared `ui.command_alias` / `ui.command_alias_add` of another one, and `gitpoulpi alias create` records the name for the installation that made it. Aliases left by an older build go to the installation that claims them, never to whoever becomes the primary.
+- **Primary handover without a gap:** becoming the primary or resigning renames this installation's shortcuts (Start menu, Desktop, app launcher entry) in place and moves its "Open in" folder-menu entry, so neither ever disappears. Its own command aliases are rewritten for the new role.
+- **One folder-menu entry per installation (Windows):** the primary no longer shows two "Open in" entries, resigning leaves exactly one, and uninstalling the primary removes all of its entries.
+- **Launcher renames:** changing the launcher name, or showing the version in it, renames the existing shortcuts and folder-menu entry in place, from Settings or `gitpoulpi installation set`.
+- **Windows installer:** a package install names its shortcuts after its channel (for example `GitPoulpi (Chocolatey)`) from the start.
+- **Settings > Launcher:** the primary checkbox follows a resign as soon as it finishes.
+- **Themes reload live:** a running window applies a changed `config.toml` or active theme file within about a second, including `gitpoulpi config set ui.theme ...` from a shell.
+- **`ui.border_focused` is used:** focused pane borders take this theme color (default: the accent), so a theme can frame the active pane in a color that would be unreadable as text.
+
 ## [1.1.0] - 2026-11-22
 
 Several GitPoulpi installations can now live side by side on one machine (a package, a portable copy, a cargo build, a dev checkout), each with its own launchers, colour, aliases and background processes, so two versions run at once without getting in each other's way. GitPoulpi also ships as a single program.

@@ -1284,7 +1284,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-ai"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "async-trait",
  "chrono",
@@ -1304,7 +1304,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-cli"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "assert_cmd",
  "gitpoulpi-commands",
@@ -1329,7 +1329,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-cli-backend"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "async-trait",
  "flate2",
@@ -1350,7 +1350,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-commands"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "async-trait",
  "clap",
@@ -1373,7 +1373,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-config"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "base64 0.22.1",
  "directories",
@@ -1391,7 +1391,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-core"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "async-trait",
  "encoding_rs",
@@ -1407,7 +1407,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-daemon"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "async-trait",
  "gitpoulpi-cli-backend",
@@ -1432,7 +1432,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-git2-backend"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "async-trait",
  "git2",
@@ -1443,7 +1443,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-hosting"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "async-trait",
  "gitpoulpi-config",
@@ -1472,7 +1472,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-i18n"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "sys-locale",
  "toml",
@@ -1480,7 +1480,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-ipc"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "getrandom 0.4.3",
  "gitpoulpi-config",
@@ -1497,7 +1497,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-log"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "chrono",
  "gitpoulpi-config",
@@ -1508,7 +1508,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-logo-build"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "serde_json",
  "winresource",
@@ -1516,7 +1516,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-mcp"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "bytes",
  "clap",
@@ -1547,7 +1547,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-pty"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "portable-pty",
  "vt100",
@@ -1555,14 +1555,14 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-secrets"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "thiserror 2.0.20",
 ]
 
 [[package]]
 name = "gitpoulpi-session"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "chrono",
  "gitpoulpi-config",
@@ -1575,14 +1575,14 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-shim"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "tempfile",
 ]
 
 [[package]]
 name = "gitpoulpi-testkit"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "git2",
  "gitpoulpi-core",
@@ -1597,7 +1597,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-tui"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "arboard",
  "async-trait",
@@ -1641,7 +1641,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-update"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "flate2",
  "gitpoulpi-config",
@@ -1662,7 +1662,7 @@ dependencies = [
 
 [[package]]
 name = "gitpoulpi-updater"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "assert_cmd",
  "gitpoulpi-cli-backend",
@@ -5352,7 +5352,7 @@ checksum = "ea6fc2961e4ef194dcbfe56bb845534d0dc8098940c7e5c012a258bfec6701bd"
 
 [[package]]
 name = "xtask"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "flate2",
  "gitpoulpi-cli-backend",

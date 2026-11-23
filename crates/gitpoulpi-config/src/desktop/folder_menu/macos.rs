@@ -221,6 +221,10 @@ pub(super) fn state(env: &Env, label: &str) -> State {
     let Some(helper) = env.helper.as_deref() else {
         return State::Outdated;
     };
+    // The bundle is named after the label: another name is another bundle.
+    if !super::label_current(found, &file_label(label), &env.ctx.name) {
+        return State::Outdated;
+    }
     let who = Who::of(env);
     let same = |rel: &str, want: String| {
         std::fs::read_to_string(path.join(rel)).ok().as_deref() == Some(want.as_str())
@@ -468,6 +472,37 @@ mod tests {
         );
         assert_eq!(folder_menu::remove(&e).unwrap(), [Manager::Finder]);
         assert!(!bundle.exists());
+    }
+
+    #[test]
+    fn a_launcher_rename_is_outdated_and_sync_replaces_the_bundle() {
+        let tmp = tempfile::tempdir().unwrap();
+        let named = |name: &str| {
+            let mut e = env(tmp.path());
+            e.ctx.name = name.to_string();
+            e
+        };
+        folder_menu::install(
+            &named("GitPoulpi (Chocolatey)"),
+            "Open in GitPoulpi (Chocolatey)",
+        )
+        .unwrap();
+        let after = named("GitPoulpi Test");
+        let label = "Open in GitPoulpi Test";
+        assert_eq!(
+            folder_menu::status(&after, label).entries[0].state,
+            State::Outdated
+        );
+        assert_eq!(folder_menu::sync(&after, label).unwrap(), [Manager::Finder]);
+        let services = tmp.path().join("Library/Services");
+        assert!(services.join("Open in GitPoulpi Test.workflow").is_dir());
+        assert!(!services
+            .join("Open in GitPoulpi (Chocolatey).workflow")
+            .exists());
+        assert_eq!(
+            folder_menu::status(&after, label).entries[0].state,
+            State::Installed
+        );
     }
 
     #[test]

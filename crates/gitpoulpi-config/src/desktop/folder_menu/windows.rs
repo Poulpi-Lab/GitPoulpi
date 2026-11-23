@@ -367,7 +367,10 @@ pub(super) fn state(env: &Env, label: &str) -> Result<State, String> {
         .iter()
         .filter_map(|g| g.as_ref())
         .find_map(|(v, _)| value(v, "MUIVerb"))
-        .map_or_else(|| label.to_string(), str::to_string);
+        .map_or_else(
+            || label.to_string(),
+            |f| super::current_label(f, label, &env.ctx.name),
+        );
     let found_icon = at
         .iter()
         .filter_map(|g| g.as_ref())
@@ -814,6 +817,10 @@ mod tests {
         folder_menu::status(e, LABEL).entries[0].state
     }
 
+    fn state_of_label(e: &Env, label: &str) -> State {
+        folder_menu::status(e, label).entries[0].state
+    }
+
     /// The container names under `Directory\shell`.
     fn containers(reg: &MemoryRegistry) -> Vec<String> {
         reg.subkeys(&full("Directory\\shell"))
@@ -1205,6 +1212,49 @@ mod tests {
         folder_menu::sync(&moved, LABEL).unwrap();
         assert_eq!(state_of(&moved), State::Installed);
         assert!(reg.deleted.lock().unwrap().is_empty(), "{:?}", reg.deleted);
+    }
+
+    #[test]
+    fn a_launcher_rename_rewrites_the_verb_label_in_place() {
+        let reg = Watch::new(A);
+        let named = |name: &str| {
+            let mut e = env_over(&reg, A, None);
+            e.ctx.name = name.to_string();
+            e
+        };
+        let label = |name: &str| format!("Open in {name}");
+        let before = named("GitPoulpi (Chocolatey)");
+        folder_menu::install(&before, &label("GitPoulpi (Chocolatey)")).unwrap();
+        let verb = format!("Directory\\shell\\GitPoulpi.{}", short(A));
+        assert_eq!(
+            val(&reg.inner, &verb, "MUIVerb").as_deref(),
+            Some("Open in GitPoulpi (Chocolatey)")
+        );
+        // The name changed: the verb is outdated, a sync rewrites it, and the
+        // install after it has nothing left to do.
+        let after = named("GitPoulpi Test");
+        let new_label = label("GitPoulpi Test");
+        assert_eq!(state_of_label(&after, &new_label), State::Outdated);
+        assert_eq!(
+            folder_menu::sync(&after, &new_label).unwrap(),
+            [Manager::Explorer]
+        );
+        for name in ["", "MUIVerb"] {
+            assert_eq!(
+                val(&reg.inner, &verb, name).as_deref(),
+                Some("Open in GitPoulpi Test"),
+                "{name:?}"
+            );
+        }
+        assert_eq!(state_of_label(&after, &new_label), State::Installed);
+        assert!(folder_menu::install(&after, &new_label).unwrap().is_empty());
+        assert!(reg.deleted.lock().unwrap().is_empty());
+        assert!(reg.gaps.lock().unwrap().is_empty(), "{:?}", reg.gaps);
+        // A language change alone, name unchanged, stays current.
+        assert_eq!(
+            state_of_label(&after, "Ouvrir dans GitPoulpi Test"),
+            State::Installed
+        );
     }
 
     #[test]

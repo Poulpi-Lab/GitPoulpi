@@ -637,6 +637,49 @@ fn the_folder_menu_entry_survives_becoming_the_primary_and_resigning() {
 }
 
 #[test]
+fn a_launcher_rename_rewrites_the_folder_menu_label() {
+    use gitpoulpi_config::desktop::registry::Registry;
+    use gitpoulpi_config::desktop::{folder_menu, State};
+    let tmp = tempfile::tempdir().unwrap();
+    let env = windows_machine(&tmp.path().join("machine"));
+    let reg = std::sync::Arc::new(MemoryRegistry::new());
+    let ctx = |name: &str| {
+        let mut c = gitpoulpi_config::desktop::InstallCtx::legacy();
+        c.name = name.to_string();
+        c
+    };
+    let (old, new) = (ctx("GitPoulpi (Chocolatey)"), ctx("GitPoulpi Test"));
+    let fe_of = |c: &gitpoulpi_config::desktop::InstallCtx| {
+        let mut fe = windows_menu_env(&tmp.path().join("machine"), reg.clone());
+        fe.ctx = c.clone();
+        fe
+    };
+    let label =
+        |c: &gitpoulpi_config::desktop::InstallCtx| crate::launcher::folder_menu_label(&c.name);
+    folder_menu::install(&fe_of(&old), &label(&old)).unwrap();
+    let muiverb = || {
+        reg.read(&["Software\\Classes\\Directory\\shell\\GitPoulpi".to_string()])
+            .unwrap()
+            .remove(0)
+            .and_then(|(v, _)| v.into_iter().find(|(n, _)| n == "MUIVerb").map(|(_, x)| x))
+    };
+    assert_eq!(muiverb().as_deref(), Some(label(&old).as_str()));
+    assert!(crate::launcher::rename_launchers(
+        &env,
+        &fe_of(&old),
+        "",
+        "",
+        &old,
+        &new
+    ));
+    assert_eq!(muiverb().as_deref(), Some(label(&new).as_str()));
+    assert_eq!(
+        folder_menu::status(&fe_of(&new), &label(&new)).entries[0].state,
+        State::Installed
+    );
+}
+
+#[test]
 fn the_handover_leaves_exactly_one_folder_menu_verb_per_installation() {
     use gitpoulpi_config::desktop::registry::Registry;
     let tmp = tempfile::tempdir().unwrap();

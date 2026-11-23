@@ -327,6 +327,21 @@ pub fn remove(env: &Env) -> Result<Vec<Manager>, String> {
     Ok(done)
 }
 
+/// `old` is an installation that stopped being the primary and cannot rewrite
+/// its own entries now. On Windows its plain verbs move to its own names
+/// without a moment without an entry (its next sync rewrites them); elsewhere
+/// the entries under the primary's names are [`remove`]d.
+pub fn demote(old: &Env) -> Result<Vec<Manager>, String> {
+    if old.os == Os::Windows {
+        return Ok(if windows::demote(old)? {
+            vec![Manager::Explorer]
+        } else {
+            Vec::new()
+        });
+    }
+    remove(old)
+}
+
 /// After [`install`] wrote `new`'s entries: removes what `old` (the same
 /// installation in its previous role, so the old names) left under the old
 /// names. Installing already replaced every entry of ours where entries are

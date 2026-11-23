@@ -8,8 +8,8 @@
 ; It writes gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe.
 ;
 ; Design: the installer only copies the files (the exes and the
-; .gitpoulpi-dist marker) and, after the copy, rewrites the marker with the
-; install channel: inno-user or inno-machine by the privileges the user chose,
+; .gitpoulpi-dist marker, which it writes itself when the install step starts,
+; before the copy and before any command below) with the install channel: inno-user or inno-machine by the privileges the user chose,
 ; or whatever /CHANNEL= says (Chocolatey, winget). /FEED=<url> adds the feed
 ; line an internalised Chocolatey package needs. The channel, not the marker's
 ; presence, decides how GitPoulpi updates (the install-channels design). Every
@@ -75,7 +75,8 @@ Source: "{#SourceDir}\gitpoulpi-tui.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#SourceDir}\gitpoulpi-mcp.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#SourceDir}\gitpoulpi-launch.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#SourceDir}\gitpoulpi-updater.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#SourceDir}\.gitpoulpi-dist"; DestDir: "{app}"; Flags: ignoreversion
+; The marker is not copied: WriteMarker writes it (with the final channel) when
+; the install step starts, before any [Run] command can name an installation.
 Source: "{#SourceDir}\INSTALL.txt"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#SourceDir}\README.md"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#SourceDir}\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
@@ -98,6 +99,7 @@ Filename: "{app}\gitpoulpi.exe"; Parameters: "uninstall --keep-files"; RunOnceId
 Type: files; Name: "{app}\*.old"
 Type: files; Name: "{app}\*.new"
 Type: files; Name: "{app}\*.swap"
+Type: files; Name: "{app}\.gitpoulpi-dist"
 Type: files; Name: "{app}\.gitpoulpi-dist.old"
 Type: files; Name: "{app}\.gitpoulpi-dist.new"
 Type: dirifempty; Name: "{app}\bin"
@@ -188,8 +190,11 @@ begin
   end;
 end;
 
-{ The archive's marker says channel=archive; the installed one names the real
-  channel, and the feed an internalised Chocolatey package was built for. }
+{ The marker names the real channel, and the feed an internalised Chocolatey
+  package was built for. It is written before the files are copied and before
+  any [Run] command: the shortcut command names the launcher (GitPoulpi
+  (Chocolatey)) from the channel in the marker, so a marker still saying
+  channel=archive would name it GitPoulpi (portable). }
 procedure WriteMarker;
 var
   Text, Feed: String;
@@ -199,12 +204,13 @@ begin
   Feed := Trim(ExpandConstant('{param:FEED|}'));
   if (Feed <> '') and (Pos(#10, Feed) = 0) and (Pos(#13, Feed) = 0) then
     Text := Text + 'feed=' + Feed + #10;
+  ForceDirectories(ExpandConstant('{app}'));
   if not SaveStringToFile(ExpandConstant('{app}\.gitpoulpi-dist'), Text, False) then
     Log('Could not write the install marker');
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
-  if CurStep = ssPostInstall then
+  if CurStep = ssInstall then
     WriteMarker;
 end;

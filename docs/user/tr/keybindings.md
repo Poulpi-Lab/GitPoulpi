@@ -1940,6 +1940,7 @@ Her düğmenin bir klavye karşılığı vardır:
 | Durum çubuğundaki **Etkinlik** | `Ctrl+N Shift+A` |
 | Araç çubuğu: **Geri al**, **Yinele** | `Ctrl+Z`, `Ctrl+Y` |
 | Araç çubuğu: **Pull** / `▾` düğmesi | `Ctrl+G p` / `Git: Pull Seçenekleri...` |
+| **Pull: tüm dallar** (Pull `▾` listesinin bir satırı) | `Ctrl+G Ctrl+P` |
 | Araç çubuğu: **Push** / `▾` düğmesi | `Ctrl+G Shift+P` / `Git: Uzak Depoya Push Et...` |
 | Araç çubuğu: **Dal**, **Tag** | `Ctrl+G b`, `Ctrl+G t` |
 | Araç çubuğu: **Stash**, **Pop** | `Ctrl+G Shift+T`, `Ctrl+G o` |

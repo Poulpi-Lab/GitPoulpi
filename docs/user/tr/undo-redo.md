@@ -191,7 +191,7 @@ satırları düğmeyle aynı onayı ya da ad istemini açar.
 | Commit'ler | commit, amend, reword, YZ commit composer (tüm commit'leri tek adım olarak) |
 | Dallar ve tag'ler | oluşturma, silme, yeniden adlandırma, upstream'i ayarlama veya kaldırma, izleme dalı oluşturma, tag oluşturma / silme / not ekleme, fast-forward, bir pull request'i dal olarak checkout etme |
 | Dolaşma | bir dalın veya bir commit'in checkout'u (ayrık HEAD dahil) |
-| Geçmiş | merge (fast-forward ya da merge commit), rebase (sade ve etkileşimli, bittikten sonra), cherry-pick, revert, reset (soft, mixed ve hard), bir pull'un yerel kısmı |
+| Geçmiş | merge (fast-forward ya da merge commit), rebase (sade ve etkileşimli, bittikten sonra), cherry-pick, revert, reset (soft, mixed ve hard), bir pull'un yerel kısmı, **Pull: tüm dallar** (taşıdığı her dal tek adımda; checkout yapılmış dalın dosyaları da onunla geri gelir) |
 | Çalışma değişiklikleri | stage ve unstage (dosya, klasör, hunk, satırlar, tümü), atma (dosya, klasör, hunk, satırlar, bir dosya checkout'u), yama veya bir commit'in değişikliklerini uygulama (`apply-commit`), **bir dosyayı diskten silme**, **yok sayma** (dosya, uzantı veya klasör: seçtiğiniz `.gitignore` dosyasındaki satır), **ikili ya da metin olarak ele alma** (`.gitattributes` satırı) |
 | Stash'ler | push, apply, pop, drop, bir commit'in değişikliklerini stash olarak kaydetme (`stash from-commit`) |
 | Uzak depolar ve yapılandırma | bir uzak depoyu ekleme, kaldırma, yeniden adlandırma, URL'sini veya push URL'sini değiştirme, Git LFS izleme ve izlemeyi bırakma |

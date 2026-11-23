@@ -40,6 +40,7 @@ vardır ve kurallar her yerde aynıdır:
   görünümü, Dosya Görünümü, düzenleyiciler, İnceleme, Pano) asla kapatmaz: onların
   dışı yoktur.
 - Bir panelin **içine** tıklamak onu asla kapatmaz.
+- `Ctrl+G` veya `Ctrl+N` kısayol dizisi ikinci tuşunu beklerken yapılan bir fare tıklaması (sol veya sağ), diziyi `Esc` gibi iptal eder ve ardından her zamanki işini yapar (tıklama yine seçer, sağ tık yine menüsünü açar).
 - Yazdığınız metni tutan bir form (yeni bir issue, bir pull veya merge request)
   dışa tıklamayı yok sayar; böylece yanlışlıkla yapılan bir tıklama metni
   kaybettirmez. `✕` ve `Esc` önce **Değişiklikler atılsın mı?** diye sorar;

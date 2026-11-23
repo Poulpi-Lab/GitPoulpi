@@ -519,6 +519,17 @@ Diff çubuğundaki `Geçmiş │ Tümü` seçicisinin `Geçmiş` parçasından, 
   düğmeyi değiştirmeden bir kez çalıştırır. Mod git'e her zaman açıkça
   iletilir; bu yüzden git yapılandırmanızdaki `pull.rebase` sizi
   şaşırtamaz.
+- **Pull: tüm dallar** (`Ctrl+G Ctrl+P`, Pull `▾` listesinin bir satırı), dallarınızın
+  izlediği uzak depolardan indirir, sonra her yerel dalı tek seferde upstream'ine
+  getirir. Checkout yapılmamış bir dal yalnızca fast-forward edilir (hiçbir dosyaya
+  dokunulmaz); ayrışmış bir dala dokunulmaz, yalnızca bildirilir. Checkout yapılmış
+  dal Pull düğmesinin ayarına göre pull edilir; `▾` listesinde her diğer mod için de
+  bir satır vardır (*Pull: tüm dallar (yalnızca fast-forward)*, *(rebase)*,
+  *(mümkünse fast-forward)*). Geride kalan bir dal başka bir worktree'de checkout
+  yapılmışsa, bir iletişim kutusu önce o worktree'lerin de güncellenip
+  güncellenmeyeceğini, atlanıp atlanmayacağını veya iptal edilip edilmeyeceğini sorar.
+  Durum satırı çalıştırmayı özetler, Etkinlik Günlüğü'nde her dal için bir satır olur;
+  Geri Al her dalı tek adımda geri getirir. `Ctrl+G p` sıradan bir Pull olarak kalır.
 - **Push** (`Ctrl+G Shift+P`), checkout yapılmış dalı varsayılan uzak depoya
   gönderir ve ilk seferde upstream'i ayarlar. `▾` listesi, seçtiğiniz başka bir
   uzak depoya bir kez push eder. Uzak depoda sizde olmayan commit'ler varsa bir

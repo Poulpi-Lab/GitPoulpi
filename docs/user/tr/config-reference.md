@@ -337,7 +337,7 @@ review_requests = true    # incelememi bekleyen request'ler, her depo
 open_requests = false     # ad alanlarımın her açık request'i
 include_drafts = false    # bu listelerde taslak request'leri tut
 assigned_issues = true    # bana atanan açık issue'lar, her depo
-namespaces = ["acme", "ptm/produits"]  # Ayarlar'da satır başına bir giriş; boş = sınır yok
+namespaces = ["acme", "orbit/products"]  # Ayarlar'da satır başına bir giriş; boş = sınır yok
 namespaces_regex = false  # true: her giriş, tam depo yolu üzerinde bir düzenli ifadedir
 review_mode = "ask"       # ask | clone | api
 ```
@@ -348,8 +348,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | Kendi ad alanınızın ve üye olduğunuz her org veya grubun (ya da `namespaces` değerinin) her açık request'i; asla "token'ın gördüğü her şey" değil |
 | `include_drafts` | `false` | Bu açılmadıkça taslak request'ler bu listelerin dışında bırakılır |
 | `assigned_issues` | `false` | Size atanan açık issue'lar, her depo |
-| `namespaces` | `[]` | Her listenin hangi depoları tuttuğu (incelenecek request'ler, atanan issue'lar, açık request'ler); boş, sınır yok demektir ve `open_requests` o zaman kendi ad alanınızı artı her üyeliğinizi arar (GitHub: en fazla 12 aranır, GitLab: 10 grup ve 10 sahip olunan proje, Gitea, Forgejo ve Gerrit: 10). Bir giriş, deponun tam yoluyla (`group/sub/project`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`) eşitse veya `/` ile biten bir yol öneğiyse eşleşir: `ptm`, `ptm/produits/x`'i tutar, `ptmx/y`'yi değil; büyük/küçük harf yok sayılır. Ayarlar satır başına bir giriş gösterir; eski bir dosya virgülle ayrılmış tek bir dize (`"ptm, formation"`) tutabilir, o yine yüklenir ve liste olarak geri kaydedilir |
-| `namespaces_regex` | `false` | Her `namespaces` girdisini, tam depo yoluna yazdığınız haliyle uygulanan bir düzenli ifade olarak okur (yani `^ptm/(produits\|infra)/` başa sabitlenir; `^` veya `$` olmadan yolun herhangi bir yerinde eşleşir; büyük/küçük harfi yok saymak için `(?i)` ekleyin). `open_requests` o zaman üyeliklerinizi arar ve ifadeler satırları süzer. Geçersiz bir ifade Ayarlar'da alanın altında gösterilir ve kaydedilmez; elle düzenlenen bir dosyada listeleri bir notla boş bırakır |
+| `namespaces` | `[]` | Her listenin hangi depoları tuttuğu (incelenecek request'ler, atanan issue'lar, açık request'ler); boş, sınır yok demektir ve `open_requests` o zaman kendi ad alanınızı artı her üyeliğinizi arar (GitHub: en fazla 12 aranır, GitLab: 10 grup ve 10 sahip olunan proje, Gitea, Forgejo ve Gerrit: 10). Bir giriş, deponun tam yoluyla (`group/sub/project`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`) eşitse veya `/` ile biten bir yol öneğiyse eşleşir: `orbit`, `orbit/products/x`'i tutar, `orbitx/y`'yi değil; büyük/küçük harf yok sayılır. Ayarlar satır başına bir giriş gösterir; eski bir dosya virgülle ayrılmış tek bir dize (`"orbit, formation"`) tutabilir, o yine yüklenir ve liste olarak geri kaydedilir |
+| `namespaces_regex` | `false` | Her `namespaces` girdisini, tam depo yoluna yazdığınız haliyle uygulanan bir düzenli ifade olarak okur (yani `^orbit/(products\|infra)/` başa sabitlenir; `^` veya `$` olmadan yolun herhangi bir yerinde eşleşir; büyük/küçük harfi yok saymak için `(?i)` ekleyin). `open_requests` o zaman üyeliklerinizi arar ve ifadeler satırları süzer. Geçersiz bir ifade Ayarlar'da alanın altında gösterilir ve kaydedilmez; elle düzenlenen bir dosyada listeleri bir notla boş bırakır |
 | `review_mode` | `"ask"` | Deposu klonlanmamış bir request'i incelemenin ne yapacağı: `ask`, `clone` (klonla, sonra incele) veya `api` (barındırıcının API'si üzerinden incele) |
 
 Yanıtlar profil başına, `config.toml`'un yanındaki `radar-account.json` içinde beş dakika önbelleğe alınır;

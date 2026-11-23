@@ -352,8 +352,8 @@ swojej tabeli `[integrations.radar]` (wszystkie domyślnie wyłączone; zob.
   grupy, do której należysz, albo przestrzeni nazw, które podasz. Nigdy cały host;
   **Przestrzenie nazw** profilu (po jednej w wierszu w Ustawienia > Integracje > Radar, opcjonalnie
   jako wyrażenia regularne) ograniczają wszystkie trzy listy: wiersz pasuje do pełnej ścieżki
-  repozytorium, gdy jest jej równy albo jest jej prefiksem kończącym się na `/` (`ptm` zachowuje
-  `ptm/produits/x`, nie `ptmx/y`), i jest stosowany do wierszy zwracanych przez host, a także po
+  repozytorium, gdy jest jej równy albo jest jej prefiksem kończącym się na `/` (`orbit` zachowuje
+  `orbit/products/x`, nie `orbitx/y`), i jest stosowany do wierszy zwracanych przez host, a także po
   stronie serwera, gdy wyszukiwanie hosta na to pozwala (kwalifikatory `user:` / `repo:` GitHuba);
 - **przypisane zgłoszenia**: otwarte zgłoszenia przypisane do ciebie.
 

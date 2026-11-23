@@ -300,7 +300,7 @@ moldura com a cor de destaque.
 ```toml
 [ui]
 accent = "#1f5fbf"
-border_focused = "#e7df00"
+border_focused = "#ffd700"
 ```
 
 ## Deteção do sistema

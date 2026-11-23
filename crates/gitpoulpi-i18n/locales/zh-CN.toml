@@ -9035,9 +9035,9 @@ namespaces = "命名空间"
 # context: hint in the empty Namespaces text area (one entry per line)
 namespaces_hint = "每行一项，例如 acme（留空：我自己的以及我所属的全部）"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "每行一项。名称匹配该组或所有者及其下的全部内容（ptm 匹配 ptm/produits/x，不匹配 ptmx/y）。留空则匹配你自己的以及你所属的全部。"
+namespaces_help = "每行一项。名称匹配该组或所有者及其下的全部内容（orbit 匹配 orbit/products/x，不匹配 orbitx/y）。留空则匹配你自己的以及你所属的全部。"
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "每行是一个正则表达式，匹配完整的仓库路径，按你输入的原样匹配（例如：^ptm/(produits|infra)/）。"
+namespaces_regex_help = "每行是一个正则表达式，匹配完整的仓库路径，按你输入的原样匹配（例如：^orbit/(products|infra)/）。"
 # context: checkbox under the Namespaces field: read each line as a regular expression
 regex = "正则表达式"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason

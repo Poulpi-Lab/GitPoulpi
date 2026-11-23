@@ -278,7 +278,7 @@ die [Konfigurationsreferenz](config-reference.md) und die [CLI-Referenz](cli-ref
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center und Gerrit antworten; Bitbucket Cloud hat keinen
 kontoweiten Endpunkt, daher zeigen seine Requests nur die verknüpften Repositories des Umfangs.
 
-Die **Namespaces** des Profils begrenzen alle seine Listen auf bestimmte Repositories (Einstellungen > Integrationen > Radar: ein Textbereich mit einem Eintrag pro Zeile und ein Kontrollkästchen **Reguläre Ausdrücke**). Eine Zeile passt auf den vollständigen Pfad eines Repositorys, wenn sie ihm entspricht oder ein Pfadpräfix ist, das an einem `/` endet: `ptm` behält `ptm/produits/x` und verwirft `ptmx/y` und `formation/y`. Ist das Kontrollkästchen an, ist jede Zeile ein regulärer Ausdruck, der gegen den vollständigen Pfad geprüft wird, so wie Sie ihn schreiben (`^ptm/(produits|infra)/`); eine ungültige Zeile wird unter dem Feld angezeigt und nicht gespeichert. Leer heißt keine Begrenzung.
+Die **Namespaces** des Profils begrenzen alle seine Listen auf bestimmte Repositories (Einstellungen > Integrationen > Radar: ein Textbereich mit einem Eintrag pro Zeile und ein Kontrollkästchen **Reguläre Ausdrücke**). Eine Zeile passt auf den vollständigen Pfad eines Repositorys, wenn sie ihm entspricht oder ein Pfadpräfix ist, das an einem `/` endet: `orbit` behält `orbit/products/x` und verwirft `orbitx/y` und `training/y`. Ist das Kontrollkästchen an, ist jede Zeile ein regulärer Ausdruck, der gegen den vollständigen Pfad geprüft wird, so wie Sie ihn schreiben (`^orbit/(products|infra)/`); eine ungültige Zeile wird unter dem Feld angezeigt und nicht gespeichert. Leer heißt keine Begrenzung.
 
 Wie die Zeilen eingeordnet werden:
 

@@ -9037,9 +9037,9 @@ namespaces = "Простори імен"
 # context: hint in the empty Namespaces text area (one entry per line)
 namespaces_hint = "Один на рядок, напр. acme (порожньо: мої власні та всі, де я учасник)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "Один запис на рядок. Ім'я збігається з цією групою чи власником і всім, що нижче (ptm збігається з ptm/produits/x, але не з ptmx/y). Залиште порожнім, щоб збігалися ваші власні та всі, де ви учасник."
+namespaces_help = "Один запис на рядок. Ім'я збігається з цією групою чи власником і всім, що нижче (orbit збігається з orbit/products/x, але не з orbitx/y). Залиште порожнім, щоб збігалися ваші власні та всі, де ви учасник."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Кожен рядок - регулярний вираз, що зіставляється з повним шляхом репозиторію так, як ви його пишете (приклад: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Кожен рядок - регулярний вираз, що зіставляється з повним шляхом репозиторію так, як ви його пишете (приклад: ^orbit/(products|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
 regex = "Регулярні вирази"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason

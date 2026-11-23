@@ -9022,9 +9022,9 @@ namespaces = "Przestrzenie nazw"
 # context: hint in the empty Namespaces text area (one entry per line)
 namespaces_hint = "Jeden na wiersz, np. acme (puste: moje własne i wszystkie, do których należę)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "Jeden wpis na wiersz. Nazwa pasuje do tej grupy lub właściciela i wszystkiego pod nią (ptm pasuje do ptm/produits/x, nie do ptmx/y). Puste: moje własne i wszystkie, do których należę."
+namespaces_help = "Jeden wpis na wiersz. Nazwa pasuje do tej grupy lub właściciela i wszystkiego pod nią (orbit pasuje do orbit/products/x, nie do orbitx/y). Puste: moje własne i wszystkie, do których należę."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Każdy wiersz to wyrażenie regularne dopasowywane do pełnej ścieżki repozytorium, tak jak ją zapisujesz (przykład: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Każdy wiersz to wyrażenie regularne dopasowywane do pełnej ścieżki repozytorium, tak jak ją zapisujesz (przykład: ^orbit/(products|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
 regex = "Wyrażenia regularne"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason

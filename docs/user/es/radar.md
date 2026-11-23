@@ -277,7 +277,7 @@ la [referencia de configuración](config-reference.md) y la [referencia de la CL
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center y Gerrit; Bitbucket Cloud no tiene un endpoint de toda la cuenta,
 así que sus solicitudes solo aparecen para los repositorios vinculados del ámbito.
 
-Los **Espacios de nombres** del perfil limitan todas sus listas a ciertos repositorios (Ajustes > Integraciones > Radar: un área de texto con una entrada por línea y una casilla **Expresiones regulares**). Una línea coincide con la ruta completa de un repositorio cuando es igual a ella o es un prefijo de ruta que termina en `/`: `ptm` conserva `ptm/produits/x` y descarta `ptmx/y` y `formation/y`. Con la casilla activada, cada línea es una expresión regular que se aplica a la ruta completa tal como la escribes (`^ptm/(produits|infra)/`); una línea no válida se muestra bajo el campo y no se guarda. Vacío significa sin límite.
+Los **Espacios de nombres** del perfil limitan todas sus listas a ciertos repositorios (Ajustes > Integraciones > Radar: un área de texto con una entrada por línea y una casilla **Expresiones regulares**). Una línea coincide con la ruta completa de un repositorio cuando es igual a ella o es un prefijo de ruta que termina en `/`: `orbit` conserva `orbit/products/x` y descarta `orbitx/y` y `training/y`. Con la casilla activada, cada línea es una expresión regular que se aplica a la ruta completa tal como la escribes (`^orbit/(products|infra)/`); una línea no válida se muestra bajo el campo y no se guarda. Vacío significa sin límite.
 
 Cómo se colocan las filas:
 

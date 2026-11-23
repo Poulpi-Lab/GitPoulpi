@@ -254,7 +254,7 @@ a [referência de configuração](config-reference.md) e a [referência da CLI](
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center e Gerrit respondem; o Bitbucket Cloud não tem endpoint de
 toda a conta, então suas solicitações aparecem só para os repositórios vinculados do escopo.
 
-Os **Namespaces** do perfil limitam todas as suas listas a alguns repositórios (Configurações > Integrações > Radar: uma área de texto com uma entrada por linha e uma caixa **Expressões regulares**). Uma linha corresponde ao caminho completo de um repositório quando é igual a ele ou é um prefixo de caminho que termina em `/`: `ptm` mantém `ptm/produits/x` e descarta `ptmx/y` e `formation/y`. Com a caixa marcada, cada linha é uma expressão regular aplicada ao caminho completo como você a escreve (`^ptm/(produits|infra)/`); uma linha inválida aparece sob o campo e não é salva. Vazio significa sem limite.
+Os **Namespaces** do perfil limitam todas as suas listas a alguns repositórios (Configurações > Integrações > Radar: uma área de texto com uma entrada por linha e uma caixa **Expressões regulares**). Uma linha corresponde ao caminho completo de um repositório quando é igual a ele ou é um prefixo de caminho que termina em `/`: `orbit` mantém `orbit/products/x` e descarta `orbitx/y` e `training/y`. Com a caixa marcada, cada linha é uma expressão regular aplicada ao caminho completo como você a escreve (`^orbit/(products|infra)/`); uma linha inválida aparece sob o campo e não é salva. Vazio significa sem limite.
 
 Como as linhas são colocadas:
 

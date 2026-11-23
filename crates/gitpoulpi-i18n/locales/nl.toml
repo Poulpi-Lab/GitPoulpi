@@ -9033,9 +9033,9 @@ namespaces = "Namespaces"
 # context: hint in the empty Namespaces text area (one entry per line)
 namespaces_hint = "Eén per regel, bijv. acme (leeg: je eigen en alle waarvan je lid bent)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "Eén item per regel. Een naam komt overeen met die groep of eigenaar en alles eronder (ptm komt overeen met ptm/produits/x, niet met ptmx/y). Laat leeg voor je eigen namespaces en alle waarvan je lid bent."
+namespaces_help = "Eén item per regel. Een naam komt overeen met die groep of eigenaar en alles eronder (orbit komt overeen met orbit/products/x, niet met orbitx/y). Laat leeg voor je eigen namespaces en alle waarvan je lid bent."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Elke regel is een reguliere expressie die wordt vergeleken met het volledige repositorypad, zoals je het schrijft (voorbeeld: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Elke regel is een reguliere expressie die wordt vergeleken met het volledige repositorypad, zoals je het schrijft (voorbeeld: ^orbit/(products|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
 regex = "Reguliere expressies"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason

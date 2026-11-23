@@ -5,7 +5,7 @@
 //!
 //! Plain mode: a line matches a repository's full path (`group/sub/proj`)
 //! when it equals the path or is a path prefix ending at a `/` boundary
-//! (`ptm` matches `ptm/produits/x`, never `ptmx/y`), ignoring case. Regex
+//! (`orbit` matches `orbit/products/x`, never `orbitx/y`), ignoring case. Regex
 //! mode: each line is a regular expression run against the full path as the
 //! user wrote it (unanchored unless the pattern says `^` / `$`).
 
@@ -106,30 +106,30 @@ mod tests {
 
     #[test]
     fn a_plain_namespace_is_a_path_prefix_at_a_slash() {
-        let f = plain(&["ptm"]);
-        assert!(f.matches("ptm/produits/x"));
-        assert!(f.matches("ptm/x"));
-        assert!(f.matches("ptm"));
-        assert!(f.matches("PTM/x"));
-        assert!(!f.matches("ptmx/y"));
-        assert!(!f.matches("formation/ptm/x"));
-        assert!(!f.matches("formation/a"));
+        let f = plain(&["orbit"]);
+        assert!(f.matches("orbit/products/x"));
+        assert!(f.matches("orbit/x"));
+        assert!(f.matches("orbit"));
+        assert!(f.matches("ORBIT/x"));
+        assert!(!f.matches("orbitx/y"));
+        assert!(!f.matches("training/orbit/x"));
+        assert!(!f.matches("training/a"));
     }
 
     #[test]
     fn a_nested_namespace_and_a_full_project_path_match() {
-        let f = plain(&["ptm/produits", "other/repo"]);
-        assert!(f.matches("ptm/produits/x/y"));
+        let f = plain(&["orbit/products", "other/repo"]);
+        assert!(f.matches("orbit/products/x/y"));
         assert!(f.matches("other/repo"));
-        assert!(!f.matches("ptm/formation/x"));
+        assert!(!f.matches("orbit/training/x"));
         assert!(!f.matches("other/repo2"));
-        assert!(plain(&["/ptm/"]).matches("ptm/x"));
+        assert!(plain(&["/orbit/"]).matches("orbit/x"));
     }
 
     #[test]
     fn several_lines_are_alternatives_and_none_keeps_everything() {
-        let f = plain(&["ptm", "acme"]);
-        assert!(f.matches("acme/a") && f.matches("ptm/b") && !f.matches("formation/c"));
+        let f = plain(&["orbit", "acme"]);
+        assert!(f.matches("acme/a") && f.matches("orbit/b") && !f.matches("training/c"));
         let none = plain(&[]);
         assert!(none.is_empty() && none.matches("anything/at/all"));
         assert!(plain(&["  ", ""]).is_empty());
@@ -137,15 +137,15 @@ mod tests {
 
     #[test]
     fn regex_lines_match_the_full_path_as_written() {
-        let f = NamespaceFilter::new(&lines(&["^ptm/(produits|infra)/", "docs$"]), true).unwrap();
-        assert!(f.matches("ptm/produits/x"));
-        assert!(f.matches("ptm/infra/y"));
-        assert!(f.matches("formation/docs"));
-        assert!(!f.matches("ptm/formation/x"));
-        assert!(!f.matches("formation/docs2"));
+        let f = NamespaceFilter::new(&lines(&["^orbit/(products|infra)/", "docs$"]), true).unwrap();
+        assert!(f.matches("orbit/products/x"));
+        assert!(f.matches("orbit/infra/y"));
+        assert!(f.matches("training/docs"));
+        assert!(!f.matches("orbit/training/x"));
+        assert!(!f.matches("training/docs2"));
         // Unanchored: a bare word matches anywhere in the path.
-        let loose = NamespaceFilter::new(&lines(&["ptm"]), true).unwrap();
-        assert!(loose.matches("formation/ptmx/y"));
+        let loose = NamespaceFilter::new(&lines(&["orbit"]), true).unwrap();
+        assert!(loose.matches("training/orbitx/y"));
     }
 
     #[test]

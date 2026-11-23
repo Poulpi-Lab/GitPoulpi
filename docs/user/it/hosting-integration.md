@@ -363,8 +363,8 @@ disattivati per impostazione predefinita; vedi il
   gruppo di cui sei membro, o dei namespace che indichi. Mai l'intero host;
   i **Namespace** del profilo (uno per riga in Impostazioni > Integrazioni > Radar, facoltativamente
   come espressioni regolari) limitano tutti e tre gli elenchi: una riga corrisponde al percorso completo
-  di un repository quando è uguale o è un prefisso di percorso a un `/` (`ptm` mantiene `ptm/produits/x`,
-  non `ptmx/y`), ed è applicata alle righe che l'host restituisce, più lato server dove la ricerca
+  di un repository quando è uguale o è un prefisso di percorso a un `/` (`orbit` mantiene `orbit/products/x`,
+  non `orbitx/y`), ed è applicata alle righe che l'host restituisce, più lato server dove la ricerca
   dell'host lo permette (i qualificatori `user:` / `repo:` di GitHub);
 - **issue assegnate**: issue aperte assegnate a te.
 

@@ -239,7 +239,7 @@ Rámeček panelu, který má fokus klávesnice: Log, postranní panel Refs, pane
 ```toml
 [ui]
 accent = "#1f5fbf"
-border_focused = "#e7df00"
+border_focused = "#ffd700"
 ```
 
 ## Detekce systému

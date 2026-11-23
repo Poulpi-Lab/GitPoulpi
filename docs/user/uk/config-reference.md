@@ -339,7 +339,7 @@ review_requests = true    # requests waiting for my review, every repository
 open_requests = false     # every open request of my namespaces
 include_drafts = false    # keep draft requests in these lists
 assigned_issues = true    # open issues assigned to me, every repository
-namespaces = ["acme", "ptm/produits"]  # one entry per line in Settings; empty = no limit
+namespaces = ["acme", "orbit/products"]  # one entry per line in Settings; empty = no limit
 namespaces_regex = false  # true: each entry is a regular expression over the full repository path
 review_mode = "ask"       # ask | clone | api
 ```
@@ -350,8 +350,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | Усі відкриті запити вашого власного простору імен і кожної організації чи групи, до якої ви належите (або з `namespaces`), ніколи не «усе, що бачить токен» |
 | `include_drafts` | `false` | Запити-чернетки пропускаються в цих списках, якщо це не ввімкнено |
 | `assigned_issues` | `false` | Відкриті issues, призначені вам, у всіх репозиторіях |
-| `namespaces` | `[]` | Які репозиторії залишає кожен список (запити на рев'ю, призначені issues, відкриті запити); порожньо означає без обмеження, і тоді `open_requests` шукає ваш власний простір імен плюс усі членства (GitHub: шукається не більше 12, GitLab: 10 груп і 10 власних проєктів, Gitea, Forgejo і Gerrit: 10). Запис збігається з повним шляхом репозиторію (`group/sub/project`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`), коли дорівнює йому або є префіксом шляху, що закінчується на `/`: `ptm` залишає `ptm/produits/x`, але не `ptmx/y`; регістр ігнорується. Налаштування показують один запис на рядок; старіший файл може містити один рядок через кому (`"ptm, formation"`), який усе ще завантажується й зберігається назад як список |
-| `namespaces_regex` | `false` | Читати кожен запис `namespaces` як регулярний вираз, що зіставляється з повним шляхом репозиторію так, як ви його пишете (тож `^ptm/(produits\|infra)/` прив'язується до початку; без `^` чи `$` він збігається будь-де в шляху; додайте `(?i)`, щоб ігнорувати регістр). `open_requests` тоді шукає ваші членства, а вирази фільтрують рядки. Некоректний вираз показується під полем у Налаштуваннях і не зберігається; у файлі, відредагованому вручну, він залишає списки порожніми з приміткою |
+| `namespaces` | `[]` | Які репозиторії залишає кожен список (запити на рев'ю, призначені issues, відкриті запити); порожньо означає без обмеження, і тоді `open_requests` шукає ваш власний простір імен плюс усі членства (GitHub: шукається не більше 12, GitLab: 10 груп і 10 власних проєктів, Gitea, Forgejo і Gerrit: 10). Запис збігається з повним шляхом репозиторію (`group/sub/project`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`), коли дорівнює йому або є префіксом шляху, що закінчується на `/`: `orbit` залишає `orbit/products/x`, але не `orbitx/y`; регістр ігнорується. Налаштування показують один запис на рядок; старіший файл може містити один рядок через кому (`"orbit, formation"`), який усе ще завантажується й зберігається назад як список |
+| `namespaces_regex` | `false` | Читати кожен запис `namespaces` як регулярний вираз, що зіставляється з повним шляхом репозиторію так, як ви його пишете (тож `^orbit/(products\|infra)/` прив'язується до початку; без `^` чи `$` він збігається будь-де в шляху; додайте `(?i)`, щоб ігнорувати регістр). `open_requests` тоді шукає ваші членства, а вирази фільтрують рядки. Некоректний вираз показується під полем у Налаштуваннях і не зберігається; у файлі, відредагованому вручну, він залишає списки порожніми з приміткою |
 | `review_mode` | `"ask"` | Що робить рев'ю запиту, чий репозиторій не клоновано: `ask`, `clone` (клонувати, потім рев'ю) або `api` (рев'ю через API хостингу) |
 
 Відповіді кешуються для кожного профілю в `radar-account.json` поруч із

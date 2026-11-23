@@ -338,7 +338,7 @@ review_requests = true    # begäranden som väntar på min granskning, alla rep
 open_requests = false     # alla öppna begäranden i mina namnrymder
 include_drafts = false    # behåll utkast till begäranden i de här listorna
 assigned_issues = true    # öppna ärenden tilldelade mig, alla repositories
-namespaces = ["acme", "ptm/produits"]  # en post per rad i Inställningar; tomt = ingen gräns
+namespaces = ["acme", "orbit/products"]  # en post per rad i Inställningar; tomt = ingen gräns
 namespaces_regex = false  # true: varje post är ett reguljärt uttryck över hela repositorysökvägen
 review_mode = "ask"       # ask | clone | api
 ```
@@ -349,8 +349,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | Alla öppna begäranden i din egen namnrymd och i varje organisation eller grupp du tillhör (eller i `namespaces`), aldrig "allt token ser" |
 | `include_drafts` | `false` | Utkast till begäranden lämnas utanför de här listorna om inte detta är på |
 | `assigned_issues` | `false` | Öppna ärenden tilldelade dig, alla repositories |
-| `namespaces` | `[]` | Vilka repositories varje lista behåller (granskningsbegäranden, tilldelade ärenden, öppna begäranden); tomt betyder ingen gräns, och `open_requests` söker då i din egen namnrymd plus varje medlemskap (GitHub: högst 12 genomsöks, GitLab: 10 grupper och 10 ägda projekt, Gitea, Forgejo och Gerrit: 10). En post matchar ett repositorys fulla sökväg (`group/sub/project`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`) när den är lika med den eller är ett sökvägsprefix som slutar vid ett `/`: `ptm` behåller `ptm/produits/x`, inte `ptmx/y`; skiftläge ignoreras. Inställningar visar en post per rad; en äldre fil kan innehålla en kommaseparerad sträng (`"ptm, formation"`), som fortfarande läses in och sparas tillbaka som en lista |
-| `namespaces_regex` | `false` | Läs varje post i `namespaces` som ett reguljärt uttryck som matchas mot hela repositorysökvägen, som du skriver den (så `^ptm/(produits\|infra)/` förankras i början; utan `^` eller `$` matchar det var som helst i sökvägen; lägg till `(?i)` för att ignorera skiftläge). `open_requests` söker då i dina medlemskap och uttrycken filtrerar raderna. Ett ogiltigt uttryck visas under fältet i Inställningar och sparas inte; i en handredigerad fil lämnar det listorna tomma med en notering |
+| `namespaces` | `[]` | Vilka repositories varje lista behåller (granskningsbegäranden, tilldelade ärenden, öppna begäranden); tomt betyder ingen gräns, och `open_requests` söker då i din egen namnrymd plus varje medlemskap (GitHub: högst 12 genomsöks, GitLab: 10 grupper och 10 ägda projekt, Gitea, Forgejo och Gerrit: 10). En post matchar ett repositorys fulla sökväg (`group/sub/project`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`) när den är lika med den eller är ett sökvägsprefix som slutar vid ett `/`: `orbit` behåller `orbit/products/x`, inte `orbitx/y`; skiftläge ignoreras. Inställningar visar en post per rad; en äldre fil kan innehålla en kommaseparerad sträng (`"orbit, formation"`), som fortfarande läses in och sparas tillbaka som en lista |
+| `namespaces_regex` | `false` | Läs varje post i `namespaces` som ett reguljärt uttryck som matchas mot hela repositorysökvägen, som du skriver den (så `^orbit/(products\|infra)/` förankras i början; utan `^` eller `$` matchar det var som helst i sökvägen; lägg till `(?i)` för att ignorera skiftläge). `open_requests` söker då i dina medlemskap och uttrycken filtrerar raderna. Ett ogiltigt uttryck visas under fältet i Inställningar och sparas inte; i en handredigerad fil lämnar det listorna tomma med en notering |
 | `review_mode` | `"ask"` | Vad granskning av en begäran vars repository inte är klonat gör: `ask`, `clone` (klona det, granska sedan) eller `api` (granska via värdens API) |
 
 Svaren cachas per profil i `radar-account.json` bredvid

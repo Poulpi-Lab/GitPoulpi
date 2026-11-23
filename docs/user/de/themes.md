@@ -283,7 +283,7 @@ mitgelieferte Design aussieht wie bisher. Dialoge und Popups behalten einen Akze
 ```toml
 [ui]
 accent = "#1f5fbf"
-border_focused = "#e7df00"
+border_focused = "#ffd700"
 ```
 
 ## Systemerkennung

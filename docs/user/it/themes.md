@@ -289,7 +289,7 @@ mantengono una cornice con l'accento.
 ```toml
 [ui]
 accent = "#1f5fbf"
-border_focused = "#e7df00"
+border_focused = "#ffd700"
 ```
 
 ## Rilevamento del sistema

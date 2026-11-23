@@ -285,7 +285,7 @@ il [riferimento della configurazione](config-reference.md) e il [riferimento del
 GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket Data Center e Gerrit rispondono; Bitbucket Cloud non ha un endpoint a
 livello di account, quindi le sue richieste compaiono solo per i repository collegati dell'ambito.
 
-I **Namespace** del profilo limitano tutti i suoi elenchi ad alcuni repository (Impostazioni > Integrazioni > Radar: un'area di testo con una voce per riga e una casella **Espressioni regolari**). Una riga corrisponde al percorso completo di un repository quando è uguale o è un prefisso di percorso che termina a un `/`: `ptm` mantiene `ptm/produits/x` e scarta `ptmx/y` e `formation/y`. Con la casella attiva, ogni riga è un'espressione regolare eseguita sul percorso completo così come lo scrivi (`^ptm/(produits|infra)/`); una riga non valida viene mostrata sotto il campo e non viene salvata. Vuoto significa nessun limite.
+I **Namespace** del profilo limitano tutti i suoi elenchi ad alcuni repository (Impostazioni > Integrazioni > Radar: un'area di testo con una voce per riga e una casella **Espressioni regolari**). Una riga corrisponde al percorso completo di un repository quando è uguale o è un prefisso di percorso che termina a un `/`: `orbit` mantiene `orbit/products/x` e scarta `orbitx/y` e `training/y`. Con la casella attiva, ogni riga è un'espressione regolare eseguita sul percorso completo così come lo scrivi (`^orbit/(products|infra)/`); una riga non valida viene mostrata sotto il campo e non viene salvata. Vuoto significa nessun limite.
 
 Come vengono collocate le righe:
 

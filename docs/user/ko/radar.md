@@ -215,7 +215,7 @@ push할 commit, `↓` pull할 commit입니다.
 
 **켜기**를 클릭하거나, 그 줄에서 `Enter`를 누르거나, `T`를 누르거나, `Radar: 계정 전체 리뷰 요청 켜기...`를 실행하면 `config.toml`의 해당 프로필에 `integrations.radar.review_requests = true`를 쓰고 곧바로 호스트에 묻습니다. 다른 목록(내 네임스페이스의 열린 요청 전부, 나에게 할당된 이슈, 초안, 네임스페이스)은 `gitpoulpi hosting integrations radar`나 프로필 설정에서 지정합니다. [설정 참조](config-reference.md)와 [CLI 참조](cli-reference.md)를 참고하세요. GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket Data Center, Gerrit이 응답하며, Bitbucket Cloud에는 계정 전체 엔드포인트가 없어 그 요청은 범위의 연결된 저장소에서만 표시됩니다.
 
-프로필의 **네임스페이스**는 그 프로필의 모든 목록을 일부 저장소로 제한합니다(설정 > 연동 > Radar: 한 줄에 항목 하나인 텍스트 영역과 **정규 표현식** 체크박스). 한 줄은 저장소의 전체 경로와 같거나 `/`에서 끝나는 경로 접두사이면 일치합니다. `ptm`은 `ptm/produits/x`를 유지하고 `ptmx/y`와 `formation/y`는 제외합니다. 체크박스를 켜면 각 줄이 전체 경로에 쓴 그대로 적용되는 정규 표현식이 됩니다(`^ptm/(produits|infra)/`). 유효하지 않은 줄은 필드 아래에 표시되고 저장되지 않습니다. 비어 있으면 제한 없음입니다.
+프로필의 **네임스페이스**는 그 프로필의 모든 목록을 일부 저장소로 제한합니다(설정 > 연동 > Radar: 한 줄에 항목 하나인 텍스트 영역과 **정규 표현식** 체크박스). 한 줄은 저장소의 전체 경로와 같거나 `/`에서 끝나는 경로 접두사이면 일치합니다. `orbit`은 `orbit/products/x`를 유지하고 `orbitx/y`와 `training/y`는 제외합니다. 체크박스를 켜면 각 줄이 전체 경로에 쓴 그대로 적용되는 정규 표현식이 됩니다(`^orbit/(products|infra)/`). 유효하지 않은 줄은 필드 아래에 표시되고 저장되지 않습니다. 비어 있으면 제한 없음입니다.
 
 행이 놓이는 방식:
 

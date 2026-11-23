@@ -283,7 +283,7 @@ every built-in theme looks as it did. Dialogs and popups keep an accent frame.
 ```toml
 [ui]
 accent = "#1f5fbf"
-border_focused = "#e7df00"
+border_focused = "#ffd700"
 ```
 
 ## System detection

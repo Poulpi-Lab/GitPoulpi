@@ -259,7 +259,7 @@ taslaklar, ad alanları) `gitpoulpi hosting integrations radar` ile ya da profil
 Forgejo, Azure DevOps, Bitbucket Data Center ve Gerrit yanıt verir; Bitbucket Cloud'un hesap geneli uç noktası
 yoktur, bu yüzden request'leri yalnızca kapsamın bağlı depoları için görünür.
 
-Profilin **Ad alanları** tüm listelerini bazı depolarla sınırlar (Ayarlar > Entegrasyonlar > Radar: satır başına bir giriş olan bir metin alanı ve bir **Düzenli ifadeler** onay kutusu). Bir satır, deponun tam yoluyla eşitse veya `/` ile biten bir yol öneğiyse eşleşir: `ptm`, `ptm/produits/x`'i tutar, `ptmx/y` ile `formation/y`'yi dışarıda bırakır. Onay kutusu açıkken her satır, tam yola yazdığınız haliyle uygulanan bir düzenli ifadedir (`^ptm/(produits|infra)/`); geçerli olmayan bir satır alanın altında gösterilir ve kaydedilmez. Boş, sınır yok demektir.
+Profilin **Ad alanları** tüm listelerini bazı depolarla sınırlar (Ayarlar > Entegrasyonlar > Radar: satır başına bir giriş olan bir metin alanı ve bir **Düzenli ifadeler** onay kutusu). Bir satır, deponun tam yoluyla eşitse veya `/` ile biten bir yol öneğiyse eşleşir: `orbit`, `orbit/products/x`'i tutar, `orbitx/y` ile `training/y`'yi dışarıda bırakır. Onay kutusu açıkken her satır, tam yola yazdığınız haliyle uygulanan bir düzenli ifadedir (`^orbit/(products|infra)/`); geçerli olmayan bir satır alanın altında gösterilir ve kaydedilmez. Boş, sınır yok demektir.
 
 Satırların nasıl yerleştirildiği:
 

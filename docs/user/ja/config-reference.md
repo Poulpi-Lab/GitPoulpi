@@ -287,7 +287,7 @@ review_requests = true    # requests waiting for my review, every repository
 open_requests = false     # every open request of my namespaces
 include_drafts = false    # keep draft requests in these lists
 assigned_issues = true    # open issues assigned to me, every repository
-namespaces = ["acme", "ptm/produits"]  # one entry per line in Settings; empty = no limit
+namespaces = ["acme", "orbit/products"]  # one entry per line in Settings; empty = no limit
 namespaces_regex = false  # true: each entry is a regular expression over the full repository path
 review_mode = "ask"       # ask | clone | api
 ```
@@ -298,8 +298,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | 自分の名前空間と、所属する各組織／グループ（または `namespaces`）の未完了のリクエストすべて。「トークンから見えるすべて」ではありません |
 | `include_drafts` | `false` | これをオンにしない限り、ドラフトのリクエストはこれらの一覧から除外されます |
 | `assigned_issues` | `false` | 自分に割り当てられた未完了の Issue（すべてのリポジトリ） |
-| `namespaces` | `[]` | 各一覧（レビュー依頼、割り当てられた Issue、未完了のリクエスト）に残すリポジトリ。空なら制限なしで、`open_requests` は自分の名前空間と所属するすべてを検索します（GitHub：最大 12 件を検索、GitLab：10 グループと自分が所有する 10 プロジェクト、Gitea、Forgejo、Gerrit：10 件）。項目は、リポジトリの完全なパス（`group/sub/project`、Azure DevOps は `Project/repo`、Bitbucket Data Center は `KEY/repo`）と等しいか、`/` で終わるパスのプレフィックスのときに一致します：`ptm` は `ptm/produits/x` を残し、`ptmx/y` は残しません。大文字小文字は区別しません。設定では 1 行に 1 項目で表示されます。古いファイルではカンマ区切りの 1 つの文字列（`"ptm, formation"`）のことがあり、これも読み込めて、リストとして保存し直されます |
-| `namespaces_regex` | `false` | 各 `namespaces` の項目を、リポジトリの完全なパスに対して（表示どおりの形で）照合される正規表現として読みます（`^ptm/(produits\|infra)/` は先頭に固定され、`^` や `$` がなければパスのどこにでも一致し、大文字小文字を無視するには `(?i)` を付けます）。この場合 `open_requests` は所属先を検索し、正規表現が行を絞り込みます。無効な式は設定のフィールドの下に表示されて保存されません。手で編集したファイルでは、一覧が空になって注記が出ます |
+| `namespaces` | `[]` | 各一覧（レビュー依頼、割り当てられた Issue、未完了のリクエスト）に残すリポジトリ。空なら制限なしで、`open_requests` は自分の名前空間と所属するすべてを検索します（GitHub：最大 12 件を検索、GitLab：10 グループと自分が所有する 10 プロジェクト、Gitea、Forgejo、Gerrit：10 件）。項目は、リポジトリの完全なパス（`group/sub/project`、Azure DevOps は `Project/repo`、Bitbucket Data Center は `KEY/repo`）と等しいか、`/` で終わるパスのプレフィックスのときに一致します：`orbit` は `orbit/products/x` を残し、`orbitx/y` は残しません。大文字小文字は区別しません。設定では 1 行に 1 項目で表示されます。古いファイルではカンマ区切りの 1 つの文字列（`"orbit, formation"`）のことがあり、これも読み込めて、リストとして保存し直されます |
+| `namespaces_regex` | `false` | 各 `namespaces` の項目を、リポジトリの完全なパスに対して（表示どおりの形で）照合される正規表現として読みます（`^orbit/(products\|infra)/` は先頭に固定され、`^` や `$` がなければパスのどこにでも一致し、大文字小文字を無視するには `(?i)` を付けます）。この場合 `open_requests` は所属先を検索し、正規表現が行を絞り込みます。無効な式は設定のフィールドの下に表示されて保存されません。手で編集したファイルでは、一覧が空になって注記が出ます |
 | `review_mode` | `"ask"` | リポジトリをクローンしていないリクエストをレビューするときの動作：`ask`、`clone`（クローンしてからレビュー）、`api`（ホストの API 経由でレビュー） |
 
 回答はプロファイルごとに、`config.toml` の隣の `radar-account.json` に 5 分間キャッシュされます。このファイルはキャッシュなので、

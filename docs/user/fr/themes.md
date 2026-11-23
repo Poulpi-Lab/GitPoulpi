@@ -283,7 +283,7 @@ garde son aspect. Les dialogues et les fenêtres contextuelles gardent un cadre 
 ```toml
 [ui]
 accent = "#1f5fbf"
-border_focused = "#e7df00"
+border_focused = "#ffd700"
 ```
 
 ## Détection du système

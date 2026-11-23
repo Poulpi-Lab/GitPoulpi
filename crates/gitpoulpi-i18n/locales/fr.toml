@@ -9051,9 +9051,9 @@ namespaces = "Espaces de noms"
 # context: hint in the empty Namespaces text area (one entry per line)
 namespaces_hint = "Un par ligne, ex. acme (vide : le mien et tous ceux dont je suis membre)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "Une entrée par ligne. Un nom correspond à ce groupe ou propriétaire et à tout ce qu'il contient (ptm correspond à ptm/produits/x, pas à ptmx/y). Laissez vide pour retenir le vôtre et tous ceux dont vous êtes membre."
+namespaces_help = "Une entrée par ligne. Un nom correspond à ce groupe ou propriétaire et à tout ce qu'il contient (orbit correspond à orbit/products/x, pas à orbitx/y). Laissez vide pour retenir le vôtre et tous ceux dont vous êtes membre."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Chaque ligne est une expression régulière comparée au chemin complet du dépôt, tel que vous l'écrivez (exemple : ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Chaque ligne est une expression régulière comparée au chemin complet du dépôt, tel que vous l'écrivez (exemple : ^orbit/(products|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
 regex = "Expressions régulières"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason

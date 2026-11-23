@@ -359,8 +359,8 @@ sin tabell `[integrations.radar]` (alla av som standard; se
   grupp du är medlem i, eller i de namnrymder du anger. Aldrig hela värden;
   profilens **Namnrymder** (en per rad i Inställningar > Integrationer > Radar, valfritt
   som reguljära uttryck) begränsar alla tre listorna: en rad matchar ett repositorys fulla
-  sökväg när den är lika med den eller är ett sökvägsprefix vid ett `/` (`ptm` behåller
-  `ptm/produits/x`, inte `ptmx/y`), och tillämpas på de rader värden returnerar, plus på
+  sökväg när den är lika med den eller är ett sökvägsprefix vid ett `/` (`orbit` behåller
+  `orbit/products/x`, inte `orbitx/y`), och tillämpas på de rader värden returnerar, plus på
   serversidan där värdens sökning tillåter det (GitHubs kvalificerare `user:` / `repo:`);
 - **tilldelade ärenden**: öppna ärenden tilldelade dig.
 

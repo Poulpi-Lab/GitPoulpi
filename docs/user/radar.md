@@ -252,7 +252,7 @@ the [config reference](config-reference.md) and the [CLI reference](cli-referenc
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center and Gerrit answer; Bitbucket Cloud has no account-wide
 endpoint, so its requests show only for the linked repositories of the scope.
 
-The profile's **Namespaces** limit all of its lists to some repositories (Settings > Integrations > Radar: a text area with one entry per line, and a **Regular expressions** checkbox). A line matches a repository's full path when it equals it or is a path prefix ending at a `/`: `ptm` keeps `ptm/produits/x` and drops `ptmx/y` and `formation/y`. With the checkbox on, each line is a regular expression run against the full path as you write it (`^ptm/(produits|infra)/`); a line that is not valid is shown under the field and not saved. Empty means no limit.
+The profile's **Namespaces** limit all of its lists to some repositories (Settings > Integrations > Radar: a text area with one entry per line, and a **Regular expressions** checkbox). A line matches a repository's full path when it equals it or is a path prefix ending at a `/`: `orbit` keeps `orbit/products/x` and drops `orbitx/y` and `training/y`. With the checkbox on, each line is a regular expression run against the full path as you write it (`^orbit/(products|infra)/`); a line that is not valid is shown under the field and not saved. Empty means no limit.
 
 How the rows are placed:
 

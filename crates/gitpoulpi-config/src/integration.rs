@@ -1371,10 +1371,10 @@ token_ref = "integration:corp"
                 .radar_options()
         };
         assert_eq!(
-            load("namespaces = \"ptm, formation\"\n").namespaces,
-            ["ptm", "formation"]
+            load("namespaces = \"orbit, training\"\n").namespaces,
+            ["orbit", "training"]
         );
-        assert_eq!(load("namespaces = \"ptm\"\n").namespaces, ["ptm"]);
+        assert_eq!(load("namespaces = \"orbit\"\n").namespaces, ["orbit"]);
         assert_eq!(
             load("namespaces = [\"a\", \" b \", \"a\", \"\"]\n").namespaces,
             ["a", "b"]
@@ -1382,10 +1382,10 @@ token_ref = "integration:corp"
         assert!(!load("namespaces = [\"a\"]\n").namespaces_regex);
         assert!(load("namespaces = [\"a\"]\nnamespaces_regex = true\n").namespaces_regex);
         let mut i = Integration::new("gh", IntegrationKind::Github, "https://github.com");
-        i.radar = Some(load("namespaces = \"ptm, formation\"\n"));
+        i.radar = Some(load("namespaces = \"orbit, training\"\n"));
         let raw = toml::to_string(&i).unwrap();
         assert!(
-            raw.contains("namespaces = [\"ptm\", \"formation\"]"),
+            raw.contains("namespaces = [\"orbit\", \"training\"]"),
             "{raw}"
         );
         assert!(!raw.contains("namespaces_regex"), "{raw}");

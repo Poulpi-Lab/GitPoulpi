@@ -9029,9 +9029,9 @@ namespaces = "네임스페이스"
 # context: hint in the empty Namespaces text area (one entry per line)
 namespaces_hint = "한 줄에 하나, 예: acme (비워 두면: 내 것과 소속된 모든 것)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "한 줄에 항목 하나. 이름은 해당 그룹 또는 소유자와 그 아래 모든 것과 일치합니다 (ptm은 ptm/produits/x와 일치하고 ptmx/y와는 일치하지 않음). 비워 두면 내 것과 소속된 모든 것과 일치합니다."
+namespaces_help = "한 줄에 항목 하나. 이름은 해당 그룹 또는 소유자와 그 아래 모든 것과 일치합니다 (orbit은 orbit/products/x와 일치하고 orbitx/y와는 일치하지 않음). 비워 두면 내 것과 소속된 모든 것과 일치합니다."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "각 줄은 저장소 경로 전체에 대해 쓴 그대로 일치시키는 정규 표현식입니다 (예: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "각 줄은 저장소 경로 전체에 대해 쓴 그대로 일치시키는 정규 표현식입니다 (예: ^orbit/(products|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
 regex = "정규 표현식"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason

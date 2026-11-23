@@ -336,7 +336,7 @@ review_requests = true    # requests waiting for my review, every repository
 open_requests = false     # every open request of my namespaces
 include_drafts = false    # keep draft requests in these lists
 assigned_issues = true    # open issues assigned to me, every repository
-namespaces = ["acme", "ptm/produits"]  # one entry per line in Settings; empty = no limit
+namespaces = ["acme", "orbit/products"]  # one entry per line in Settings; empty = no limit
 namespaces_regex = false  # true: each entry is a regular expression over the full repository path
 review_mode = "ask"       # ask | clone | api
 ```
@@ -347,8 +347,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | Every open request of your own namespace and of each org or group you belong to (or of `namespaces`), never "everything the token sees" |
 | `include_drafts` | `false` | Draft requests are left out of these lists unless this is on |
 | `assigned_issues` | `false` | Open issues assigned to you, every repository |
-| `namespaces` | `[]` | Which repositories every list keeps (review requests, assigned issues, open requests); empty means no limit, and `open_requests` then searches your own namespace plus every membership (GitHub: at most 12 are searched, GitLab: 10 groups and 10 owned projects, Gitea, Forgejo and Gerrit: 10). An entry matches a repository's full path (`group/sub/project`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`) when it equals it or is a path prefix ending at a `/`: `ptm` keeps `ptm/produits/x`, not `ptmx/y`; case is ignored. Settings shows one entry per line; an older file may hold one comma-separated string (`"ptm, formation"`), which still loads and is saved back as a list |
-| `namespaces_regex` | `false` | Read each `namespaces` entry as a regular expression matched against the full repository path, as you write it (so `^ptm/(produits\|infra)/` anchors at the start; without `^` or `$` it matches anywhere in the path; add `(?i)` to ignore case). `open_requests` then searches your memberships and the expressions filter the rows. An invalid expression is shown under the field in Settings and not saved; in a hand-edited file it leaves the lists empty with a note |
+| `namespaces` | `[]` | Which repositories every list keeps (review requests, assigned issues, open requests); empty means no limit, and `open_requests` then searches your own namespace plus every membership (GitHub: at most 12 are searched, GitLab: 10 groups and 10 owned projects, Gitea, Forgejo and Gerrit: 10). An entry matches a repository's full path (`group/sub/project`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`) when it equals it or is a path prefix ending at a `/`: `orbit` keeps `orbit/products/x`, not `orbitx/y`; case is ignored. Settings shows one entry per line; an older file may hold one comma-separated string (`"orbit, formation"`), which still loads and is saved back as a list |
+| `namespaces_regex` | `false` | Read each `namespaces` entry as a regular expression matched against the full repository path, as you write it (so `^orbit/(products\|infra)/` anchors at the start; without `^` or `$` it matches anywhere in the path; add `(?i)` to ignore case). `open_requests` then searches your memberships and the expressions filter the rows. An invalid expression is shown under the field in Settings and not saved; in a hand-edited file it leaves the lists empty with a note |
 | `review_mode` | `"ask"` | What reviewing a request whose repository is not cloned does: `ask`, `clone` (clone it, then review) or `api` (review through the host's API) |
 
 The answers are cached per profile in `radar-account.json` next to

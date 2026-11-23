@@ -357,7 +357,7 @@ sa table `[integrations.radar]` (tous désactivés par défaut ; voir la
   groupe dont vous êtes membre, ou des espaces de noms que vous nommez. Jamais tout l'hébergeur ;
   les **Espaces de noms** du profil (un par ligne dans Paramètres > Intégrations > Radar, éventuellement
   en expressions régulières) limitent les trois listes : une ligne correspond au chemin complet d'un dépôt
-  quand elle lui est égale ou en est un préfixe qui s'arrête à un `/` (`ptm` garde `ptm/produits/x`, pas `ptmx/y`), et
+  quand elle lui est égale ou en est un préfixe qui s'arrête à un `/` (`orbit` garde `orbit/products/x`, pas `orbitx/y`), et
   s'applique aux lignes renvoyées par l'hébergeur, ainsi que côté serveur là où la recherche de l'hébergeur
   le permet (les qualificateurs `user:` / `repo:` de GitHub) ;
 - **tickets assignés** : les tickets ouverts qui vous sont assignés.

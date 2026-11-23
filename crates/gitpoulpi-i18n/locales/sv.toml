@@ -9039,9 +9039,9 @@ namespaces = "Namnrymder"
 # context: hint in the empty Namespaces text area (one entry per line)
 namespaces_hint = "En per rad, t.ex. acme (tomt: min egen och alla jag är medlem i)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "En post per rad. Ett namn matchar den gruppen eller ägaren och allt under den (ptm matchar ptm/produits/x, inte ptmx/y). Lämna tomt för att matcha din egen och alla du är medlem i."
+namespaces_help = "En post per rad. Ett namn matchar den gruppen eller ägaren och allt under den (orbit matchar orbit/products/x, inte orbitx/y). Lämna tomt för att matcha din egen och alla du är medlem i."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Varje rad är ett reguljärt uttryck som matchas mot hela repositorysökvägen, som du skriver den (exempel: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Varje rad är ett reguljärt uttryck som matchas mot hela repositorysökvägen, som du skriver den (exempel: ^orbit/(products|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
 regex = "Reguljära uttryck"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason

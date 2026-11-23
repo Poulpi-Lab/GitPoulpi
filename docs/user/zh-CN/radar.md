@@ -174,7 +174,7 @@ pull 或 merge request 行上的**评审…**（或 `e`）会打开该仓库，�
 `gitpoulpi hosting integrations radar` 或在该配置的设置中设置；见[配置参考](config-reference.md)和 [CLI 参考](cli-reference.md)。
 GitHub、GitLab、Gitea、Forgejo、Azure DevOps、Bitbucket Data Center 和 Gerrit 会应答；Bitbucket Cloud 没有账户范围的端点，所以它的请求只显示范围内已关联的仓库。
 
-配置的**命名空间**会把它的所有列表限制在某些仓库内（设置 > 集成 > Radar：一个每行一项的文本区域，外加一个**正则表达式**复选框）。一行与仓库的完整路径相等，或是以 `/` 结尾的路径前缀时即匹配：`ptm` 保留 `ptm/produits/x`，排除 `ptmx/y` 和 `formation/y`。勾选该复选框后，每一行是一个正则表达式，按你输入的原样对完整路径匹配（`^ptm/(produits|infra)/`）；无效的行会显示在字段下方且不会保存。留空表示不限制。
+配置的**命名空间**会把它的所有列表限制在某些仓库内（设置 > 集成 > Radar：一个每行一项的文本区域，外加一个**正则表达式**复选框）。一行与仓库的完整路径相等，或是以 `/` 结尾的路径前缀时即匹配：`orbit` 保留 `orbit/products/x`，排除 `orbitx/y` 和 `training/y`。勾选该复选框后，每一行是一个正则表达式，按你输入的原样对完整路径匹配（`^orbit/(products|infra)/`）；无效的行会显示在字段下方且不会保存。留空表示不限制。
 
 行的放置方式：
 

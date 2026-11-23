@@ -124,17 +124,17 @@ fn namespaces_are_typed_one_per_line_and_saved_as_a_list() {
         key(&mut page, &mut h, KeyCode::Down);
     }
     assert_eq!(page.current_item(&h.config), Some(Item::RadarNamespaces));
-    type_str(&mut page, &mut h, "ptm");
+    type_str(&mut page, &mut h, "orbit");
     key(&mut page, &mut h, KeyCode::Enter);
-    type_str(&mut page, &mut h, "formation/docs");
+    type_str(&mut page, &mut h, "training/docs");
     assert_eq!(
         saved(&h).integrations[0].radar_options().namespaces,
-        vec!["ptm".to_string(), "formation/docs".to_string()]
+        vec!["orbit".to_string(), "training/docs".to_string()]
     );
     // Both lines are on screen, one per row.
     let screen = text(&draw(&mut page, &h, 100, 60, None));
-    assert!(screen.contains("ptm"), "{screen}");
-    assert!(screen.contains("formation/docs"), "{screen}");
+    assert!(screen.contains("orbit"), "{screen}");
+    assert!(screen.contains("training/docs"), "{screen}");
     // Up on the second line moves inside the area; on the first it leaves it.
     key(&mut page, &mut h, KeyCode::Up);
     assert_eq!(page.current_item(&h.config), Some(Item::RadarNamespaces));
@@ -150,13 +150,13 @@ fn the_regular_expressions_checkbox_saves_and_an_invalid_line_is_shown_not_saved
     for _ in 0..4 {
         key(&mut page, &mut h, KeyCode::Down);
     }
-    type_str(&mut page, &mut h, "^ptm/");
+    type_str(&mut page, &mut h, "^orbit/");
     key(&mut page, &mut h, KeyCode::Tab);
     assert_eq!(page.current_item(&h.config), Some(Item::RadarRegex));
     key(&mut page, &mut h, KeyCode::Char(' '));
     let radar = saved(&h).integrations[0].radar_options();
     assert!(radar.namespaces_regex);
-    assert_eq!(radar.namespaces, vec!["^ptm/".to_string()]);
+    assert_eq!(radar.namespaces, vec!["^orbit/".to_string()]);
     let screen = text(&draw(&mut page, &h, 100, 60, None));
     assert!(screen.contains("[x] Regular expressions"), "{screen}");
 
@@ -166,19 +166,19 @@ fn the_regular_expressions_checkbox_saves_and_an_invalid_line_is_shown_not_saved
     type_str(&mut page, &mut h, "(oops");
     let screen = text(&draw(&mut page, &h, 100, 60, None));
     assert!(
-        screen.contains("Invalid expression: ^ptm/(oops"),
+        screen.contains("Invalid expression: ^orbit/(oops"),
         "{screen}"
     );
     assert_eq!(
         saved(&h).integrations[0].radar_options().namespaces,
-        vec!["^ptm/".to_string()],
+        vec!["^orbit/".to_string()],
         "the last good list stays"
     );
     // Fixing it saves again.
     type_str(&mut page, &mut h, ")");
     assert_eq!(
         saved(&h).integrations[0].radar_options().namespaces,
-        vec!["^ptm/(oops)".to_string()]
+        vec!["^orbit/(oops)".to_string()]
     );
 }
 
@@ -201,14 +201,17 @@ fn an_old_comma_line_in_the_file_shows_as_lines_and_saves_as_a_list() {
     let mut h = H::new();
     let mut page = radar_page(&mut h, IntegrationKind::GitlabSelfManaged).unwrap();
     h.config.integrations[0].radar = Some(gitpoulpi_config::IntegrationRadar {
-        namespaces: gitpoulpi_config::parse_namespace_text("ptm, formation", false),
+        namespaces: gitpoulpi_config::parse_namespace_text("orbit, training", false),
         ..Default::default()
     });
     let screen = text(&draw(&mut page, &h, 100, 60, None));
     let rows: Vec<&str> = screen.lines().collect();
     let at = |needle: &str| rows.iter().position(|l| l.contains(needle));
-    assert!(at("ptm").is_some() && at("formation").is_some(), "{screen}");
-    assert_ne!(at("ptm"), at("formation"), "one entry per row:\n{screen}");
+    assert!(
+        at("orbit").is_some() && at("training").is_some(),
+        "{screen}"
+    );
+    assert_ne!(at("orbit"), at("training"), "one entry per row:\n{screen}");
 }
 
 #[test]

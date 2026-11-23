@@ -337,7 +337,7 @@ review_requests = true    # žádosti čekající na mou kontrolu, každý repoz
 open_requests = false     # každá otevřená žádost mých jmenných prostorů
 include_drafts = false    # ponechat koncepty žádostí v těchto seznamech
 assigned_issues = true    # otevřené issues přiřazené mně, každý repozitář
-namespaces = ["acme", "ptm/produits"]  # jedna položka na řádek v Nastavení; prázdné = bez omezení
+namespaces = ["acme", "orbit/products"]  # jedna položka na řádek v Nastavení; prázdné = bez omezení
 namespaces_regex = false  # true: každá položka je regulární výraz nad celou cestou repozitáře
 review_mode = "ask"       # ask | clone | api
 ```
@@ -348,8 +348,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | Každá otevřená žádost vašeho vlastního jmenného prostoru a každé organizace nebo skupiny, jejímž jste členem (nebo `namespaces`), nikdy „vše, co token vidí“ |
 | `include_drafts` | `false` | Koncepty žádostí jsou z těchto seznamů vynechány, pokud to není zapnuto |
 | `assigned_issues` | `false` | Otevřené issues přiřazené vám, každý repozitář |
-| `namespaces` | `[]` | Které repozitáře si každý seznam ponechá (žádosti ke kontrole, přiřazené issues, otevřené žádosti); prázdné znamená bez omezení a `open_requests` pak prohledá váš vlastní jmenný prostor plus každé členství (GitHub: prohledá se nejvýše 12, GitLab: 10 skupin a 10 vlastních projektů, Gitea, Forgejo a Gerrit: 10). Položka odpovídá celé cestě repozitáře (`skupina/podskupina/projekt`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`), když se jí rovná nebo je její předponou končící na `/`: `ptm` ponechá `ptm/produits/x`, ne `ptmx/y`; velikost písmen se ignoruje. Nastavení ukazuje jednu položku na řádek; starší soubor může držet jeden řetězec oddělený čárkami (`"ptm, formation"`), který se stále načte a uloží zpět jako seznam |
-| `namespaces_regex` | `false` | Číst každou položku `namespaces` jako regulární výraz porovnávaný s celou cestou repozitáře tak, jak ji zapisujete (takže `^ptm/(produits\|infra)/` kotví na začátku; bez `^` nebo `$` odpovídá kdekoli v cestě; `(?i)` přidáte pro ignorování velikosti písmen). `open_requests` pak prohledá vaše členství a výrazy filtrují řádky. Neplatný výraz se ukáže pod polem v Nastavení a neuloží se; v ručně upraveném souboru nechá seznamy prázdné s poznámkou |
+| `namespaces` | `[]` | Které repozitáře si každý seznam ponechá (žádosti ke kontrole, přiřazené issues, otevřené žádosti); prázdné znamená bez omezení a `open_requests` pak prohledá váš vlastní jmenný prostor plus každé členství (GitHub: prohledá se nejvýše 12, GitLab: 10 skupin a 10 vlastních projektů, Gitea, Forgejo a Gerrit: 10). Položka odpovídá celé cestě repozitáře (`skupina/podskupina/projekt`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`), když se jí rovná nebo je její předponou končící na `/`: `orbit` ponechá `orbit/products/x`, ne `orbitx/y`; velikost písmen se ignoruje. Nastavení ukazuje jednu položku na řádek; starší soubor může držet jeden řetězec oddělený čárkami (`"orbit, formation"`), který se stále načte a uloží zpět jako seznam |
+| `namespaces_regex` | `false` | Číst každou položku `namespaces` jako regulární výraz porovnávaný s celou cestou repozitáře tak, jak ji zapisujete (takže `^orbit/(products\|infra)/` kotví na začátku; bez `^` nebo `$` odpovídá kdekoli v cestě; `(?i)` přidáte pro ignorování velikosti písmen). `open_requests` pak prohledá vaše členství a výrazy filtrují řádky. Neplatný výraz se ukáže pod polem v Nastavení a neuloží se; v ručně upraveném souboru nechá seznamy prázdné s poznámkou |
 | `review_mode` | `"ask"` | Co udělá kontrola žádosti, jejíž repozitář není naklonovaný: `ask`, `clone` (naklonovat, pak zkontrolovat) nebo `api` (zkontrolovat přes API hostitele) |
 
 Odpovědi se pro každý profil na pět minut ukládají do mezipaměti `radar-account.json` vedle

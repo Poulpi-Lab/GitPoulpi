@@ -359,8 +359,8 @@ sua tabela `[integrations.radar]` (todos desligados por predefinição; ver a
   grupo de que é membro, ou dos namespaces que indicar. Nunca o host inteiro;
   os **Namespaces** do perfil (um por linha em Definições > Integrações > Radar, opcionalmente
   como expressões regulares) limitam as três listas: uma linha corresponde ao caminho completo de um
-  repositório quando é igual a ele ou é um prefixo de caminho numa `/` (`ptm` mantém `ptm/produits/x`,
-  não `ptmx/y`), e é aplicada às linhas que o host devolve, mais no servidor onde a pesquisa do host
+  repositório quando é igual a ele ou é um prefixo de caminho numa `/` (`orbit` mantém `orbit/products/x`,
+  não `orbitx/y`), e é aplicada às linhas que o host devolve, mais no servidor onde a pesquisa do host
   o permite (os qualificadores `user:` / `repo:` do GitHub);
 - **issues atribuídas**: issues abertas atribuídas a si.
 

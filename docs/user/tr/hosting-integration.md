@@ -359,7 +359,7 @@ de, klonlanmış olsun olmasın, listeleyebilir:
   her açık request'i. Asla tüm barındırıcı değil;
   profilin **Ad alanları** alanı (Ayarlar > Entegrasyonlar > Radar'da satır başına bir giriş, isteğe bağlı olarak
   düzenli ifade) üç listeyi de sınırlar: bir satır, bir deponun tam yoluna eşit olduğunda ya da bir `/` sınırında
-  yol öneki olduğunda eşleşir (`ptm`, `ptm/produits/x`'i tutar, `ptmx/y`'yi tutmaz) ve barındırıcının döndürdüğü
+  yol öneki olduğunda eşleşir (`orbit`, `orbit/products/x`'i tutar, `orbitx/y`'yi tutmaz) ve barındırıcının döndürdüğü
   satırlara uygulanır, barındırıcının araması izin veriyorsa ayrıca sunucu tarafında da (GitHub'ın `user:` /
   `repo:` niteleyicileri);
 - **atanan issue'lar**: size atanan açık issue'lar.

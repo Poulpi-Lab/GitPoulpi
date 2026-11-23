@@ -264,7 +264,7 @@ utkast, namnrymder) ställs in med `gitpoulpi hosting integrations radar` eller 
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center och Gerrit svarar; Bitbucket Cloud har ingen kontoövergripande
 slutpunkt, så dess begäranden visas bara för de länkade repositories i omfånget.
 
-Profilens **Namnrymder** begränsar alla dess listor till vissa repositories (Inställningar > Integrationer > Radar: ett textområde med en post per rad och en kryssruta **Reguljära uttryck**). En rad matchar ett repositorys fulla sökväg när den är lika med den eller är ett sökvägsprefix som slutar vid ett `/`: `ptm` behåller `ptm/produits/x` och tar bort `ptmx/y` och `formation/y`. Med kryssrutan på är varje rad ett reguljärt uttryck som körs mot hela sökvägen som du skriver den (`^ptm/(produits|infra)/`); en rad som inte är giltig visas under fältet och sparas inte. Tomt betyder ingen gräns.
+Profilens **Namnrymder** begränsar alla dess listor till vissa repositories (Inställningar > Integrationer > Radar: ett textområde med en post per rad och en kryssruta **Reguljära uttryck**). En rad matchar ett repositorys fulla sökväg när den är lika med den eller är ett sökvägsprefix som slutar vid ett `/`: `orbit` behåller `orbit/products/x` och tar bort `orbitx/y` och `training/y`. Med kryssrutan på är varje rad ett reguljärt uttryck som körs mot hela sökvägen som du skriver den (`^orbit/(products|infra)/`); en rad som inte är giltig visas under fältet och sparas inte. Tomt betyder ingen gräns.
 
 Så placeras raderna:
 

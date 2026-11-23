@@ -259,7 +259,7 @@ koncepty, jmenné prostory) se nastavují příkazem `gitpoulpi hosting integrat
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center a Gerrit; Bitbucket Cloud nemá koncový bod pro celý účet,
 takže se jeho žádosti ukazují jen pro propojené repozitáře rozsahu.
 
-**Jmenné prostory** profilu omezují všechny jeho seznamy na některé repozitáře (Nastavení > Integrace > Radar: textová oblast s jednou položkou na řádek a zaškrtávátko **Regulární výrazy**). Řádek odpovídá celé cestě repozitáře, když se jí rovná nebo je její předponou končící na `/`: `ptm` ponechá `ptm/produits/x` a vyřadí `ptmx/y` i `formation/y`. Se zapnutým zaškrtávátkem je každý řádek regulární výraz spuštěný nad celou cestou tak, jak ho zapíšete (`^ptm/(produits|infra)/`); neplatný řádek se ukáže pod polem a neuloží se. Prázdné znamená bez omezení.
+**Jmenné prostory** profilu omezují všechny jeho seznamy na některé repozitáře (Nastavení > Integrace > Radar: textová oblast s jednou položkou na řádek a zaškrtávátko **Regulární výrazy**). Řádek odpovídá celé cestě repozitáře, když se jí rovná nebo je její předponou končící na `/`: `orbit` ponechá `orbit/products/x` a vyřadí `orbitx/y` i `training/y`. Se zapnutým zaškrtávátkem je každý řádek regulární výraz spuštěný nad celou cestou tak, jak ho zapíšete (`^orbit/(products|infra)/`); neplatný řádek se ukáže pod polem a neuloží se. Prázdné znamená bez omezení.
 
 Jak se řádky řadí:
 

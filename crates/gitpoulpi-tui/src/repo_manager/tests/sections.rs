@@ -58,11 +58,11 @@ fn collapsing_a_section_hides_its_rows_and_counts_survive() {
 #[test]
 fn two_repositories_with_one_name_show_their_parent_folder() {
     let mut a = repo("app");
-    a.path = PathBuf::from("/work/ptm/utilitaires/app");
+    a.path = PathBuf::from("/work/orbit/tools/app");
     let mut b = repo("app");
     b.path = PathBuf::from("/work/scratch/app");
-    assert_eq!(a.column_text(false), "utilitaires");
-    assert!(a.column_text(true).contains("ptm/utilitaires"));
+    assert_eq!(a.column_text(false), "tools");
+    assert!(a.column_text(true).contains("orbit/tools"));
     assert!(b.column_text(true).contains("scratch"));
     let dup = duplicate_names(&[a, b, repo("solo")]);
     assert!(dup.contains("app") && !dup.contains("solo"));

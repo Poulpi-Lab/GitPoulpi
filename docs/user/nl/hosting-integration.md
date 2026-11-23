@@ -355,8 +355,8 @@ hele host, gekloond of niet, met drie schakelaars in zijn tabel `[integrations.r
   groep waarvan je lid bent, of van de namespaces die je noemt. Nooit de hele host;
   de **Namespaces** van het profiel (één per regel in Instellingen > Integraties > Radar, desgewenst
   als reguliere expressies) beperken alle drie de lijsten: een regel komt overeen met het volledige pad
-  van een repository als hij eraan gelijk is of een padvoorvoegsel is bij een `/` (`ptm` houdt
-  `ptm/produits/x`, niet `ptmx/y`), en wordt toegepast op de rijen die de host teruggeeft, plus aan
+  van een repository als hij eraan gelijk is of een padvoorvoegsel is bij een `/` (`orbit` houdt
+  `orbit/products/x`, niet `orbitx/y`), en wordt toegepast op de rijen die de host teruggeeft, plus aan
   serverzijde waar de zoekopdracht van de host het toelaat (de kwalificaties `user:` / `repo:` van GitHub);
 - **toegewezen issues**: openstaande issues die aan jou zijn toegewezen.
 

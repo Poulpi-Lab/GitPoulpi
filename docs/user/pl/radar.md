@@ -255,7 +255,7 @@ szkice, przestrzenie nazw) ustawia się przez `gitpoulpi hosting integrations ra
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center i Gerrit; Bitbucket Cloud nie ma punktu końcowego dla całego
 konta, więc jego requesty pokazują się tylko dla powiązanych repozytoriów zakresu.
 
-**Przestrzenie nazw** profilu ograniczają wszystkie jego listy do wybranych repozytoriów (Ustawienia > Integracje > Radar: pole tekstowe z jednym wpisem w wierszu i pole wyboru **Wyrażenia regularne**). Wiersz pasuje do pełnej ścieżki repozytorium, gdy jest jej równy albo jest jej prefiksem kończącym się na `/`: `ptm` zachowuje `ptm/produits/x`, a odrzuca `ptmx/y` i `formation/y`. Przy włączonym polu każdy wiersz jest wyrażeniem regularnym uruchamianym na pełnej ścieżce, tak jak ją zapisujesz (`^ptm/(produits|infra)/`); wiersz nieprawidłowy jest pokazany pod polem i nie jest zapisywany. Puste oznacza brak limitu.
+**Przestrzenie nazw** profilu ograniczają wszystkie jego listy do wybranych repozytoriów (Ustawienia > Integracje > Radar: pole tekstowe z jednym wpisem w wierszu i pole wyboru **Wyrażenia regularne**). Wiersz pasuje do pełnej ścieżki repozytorium, gdy jest jej równy albo jest jej prefiksem kończącym się na `/`: `orbit` zachowuje `orbit/products/x`, a odrzuca `orbitx/y` i `training/y`. Przy włączonym polu każdy wiersz jest wyrażeniem regularnym uruchamianym na pełnej ścieżce, tak jak ją zapisujesz (`^orbit/(products|infra)/`); wiersz nieprawidłowy jest pokazany pod polem i nie jest zapisywany. Puste oznacza brak limitu.
 
 Jak wiersze są umieszczane:
 

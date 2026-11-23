@@ -324,7 +324,7 @@ review_requests = true    # requests waiting for my review, every repository
 open_requests = false     # every open request of my namespaces
 include_drafts = false    # keep draft requests in these lists
 assigned_issues = true    # open issues assigned to me, every repository
-namespaces = ["acme", "ptm/produits"]  # one entry per line in Settings; empty = no limit
+namespaces = ["acme", "orbit/products"]  # one entry per line in Settings; empty = no limit
 namespaces_regex = false  # true: each entry is a regular expression over the full repository path
 review_mode = "ask"       # ask | clone | api
 ```
@@ -335,8 +335,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | 내 네임스페이스와 내가 속한 각 org 또는 그룹(또는 `namespaces`)의 열린 요청 전부. "토큰이 볼 수 있는 모든 것"은 아닙니다 |
 | `include_drafts` | `false` | 이 값을 켜지 않으면 초안 요청은 이 목록에서 제외됩니다 |
 | `assigned_issues` | `false` | 나에게 할당된 열린 이슈, 모든 저장소 |
-| `namespaces` | `[]` | 모든 목록(리뷰 요청, 할당된 이슈, 열린 요청)이 유지할 저장소. 비어 있으면 제한 없음이며, 이때 `open_requests`는 내 네임스페이스와 소속된 모든 곳을 검색합니다(GitHub: 최대 12개 검색, GitLab: 그룹 10개와 소유 프로젝트 10개, Gitea, Forgejo, Gerrit: 10개). 항목은 저장소의 전체 경로(`group/sub/project`, Azure DevOps는 `Project/repo`, Bitbucket Data Center는 `KEY/repo`)와 같거나 `/`에서 끝나는 경로 접두사이면 일치합니다. `ptm`은 `ptm/produits/x`를 유지하고 `ptmx/y`는 유지하지 않으며 대소문자는 무시합니다. 설정은 한 줄에 항목 하나를 보여 주며, 이전 파일에 쉼표로 구분한 문자열 하나(`"ptm, formation"`)가 있어도 계속 읽히고 목록으로 다시 저장됩니다 |
-| `namespaces_regex` | `false` | 각 `namespaces` 항목을 저장소의 전체 경로에 쓴 그대로 일치시키는 정규 표현식으로 읽습니다(그래서 `^ptm/(produits\|infra)/`는 시작에 고정되고, `^`나 `$`가 없으면 경로 어디서든 일치하며, 대소문자를 무시하려면 `(?i)`를 붙입니다). 이때 `open_requests`는 소속된 모든 곳을 검색하고 표현식이 행을 걸러 냅니다. 잘못된 표현식은 설정의 필드 아래에 표시되고 저장되지 않으며, 직접 편집한 파일에서는 메모와 함께 목록이 비게 됩니다 |
+| `namespaces` | `[]` | 모든 목록(리뷰 요청, 할당된 이슈, 열린 요청)이 유지할 저장소. 비어 있으면 제한 없음이며, 이때 `open_requests`는 내 네임스페이스와 소속된 모든 곳을 검색합니다(GitHub: 최대 12개 검색, GitLab: 그룹 10개와 소유 프로젝트 10개, Gitea, Forgejo, Gerrit: 10개). 항목은 저장소의 전체 경로(`group/sub/project`, Azure DevOps는 `Project/repo`, Bitbucket Data Center는 `KEY/repo`)와 같거나 `/`에서 끝나는 경로 접두사이면 일치합니다. `orbit`은 `orbit/products/x`를 유지하고 `orbitx/y`는 유지하지 않으며 대소문자는 무시합니다. 설정은 한 줄에 항목 하나를 보여 주며, 이전 파일에 쉼표로 구분한 문자열 하나(`"orbit, formation"`)가 있어도 계속 읽히고 목록으로 다시 저장됩니다 |
+| `namespaces_regex` | `false` | 각 `namespaces` 항목을 저장소의 전체 경로에 쓴 그대로 일치시키는 정규 표현식으로 읽습니다(그래서 `^orbit/(products\|infra)/`는 시작에 고정되고, `^`나 `$`가 없으면 경로 어디서든 일치하며, 대소문자를 무시하려면 `(?i)`를 붙입니다). 이때 `open_requests`는 소속된 모든 곳을 검색하고 표현식이 행을 걸러 냅니다. 잘못된 표현식은 설정의 필드 아래에 표시되고 저장되지 않으며, 직접 편집한 파일에서는 메모와 함께 목록이 비게 됩니다 |
 | `review_mode` | `"ask"` | 클론되지 않은 저장소의 요청을 리뷰할 때의 동작: `ask`, `clone`(클론한 뒤 리뷰) 또는 `api`(호스트 API로 리뷰) |
 
 응답은 프로필별로 `config.toml` 옆의 `radar-account.json`에 5분간 캐시됩니다. 이 파일은 캐시이므로 삭제해도 안전합니다.

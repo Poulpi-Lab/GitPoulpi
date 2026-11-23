@@ -272,7 +272,7 @@ la [référence de configuration](config-reference.md) et la [référence CLI](c
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center et Gerrit répondent ; Bitbucket Cloud n'a pas de point d'accès
 à l'échelle du compte, donc ses demandes ne s'affichent que pour les dépôts liés du périmètre.
 
-Les **Espaces de noms** du profil limitent toutes ses listes à certains dépôts (Paramètres > Intégrations > Radar : une zone de texte avec une entrée par ligne, et une case **Expressions régulières**). Une ligne correspond au chemin complet d'un dépôt quand elle lui est égale ou en est un préfixe qui s'arrête à un `/` : `ptm` garde `ptm/produits/x` et écarte `ptmx/y` et `formation/y`. Avec la case cochée, chaque ligne est une expression régulière appliquée au chemin complet tel que vous l'écrivez (`^ptm/(produits|infra)/`) ; une ligne invalide s'affiche sous le champ et n'est pas enregistrée. Vide signifie pas de limite.
+Les **Espaces de noms** du profil limitent toutes ses listes à certains dépôts (Paramètres > Intégrations > Radar : une zone de texte avec une entrée par ligne, et une case **Expressions régulières**). Une ligne correspond au chemin complet d'un dépôt quand elle lui est égale ou en est un préfixe qui s'arrête à un `/` : `orbit` garde `orbit/products/x` et écarte `orbitx/y` et `training/y`. Avec la case cochée, chaque ligne est une expression régulière appliquée au chemin complet tel que vous l'écrivez (`^orbit/(products|infra)/`) ; une ligne invalide s'affiche sous le champ et n'est pas enregistrée. Vide signifie pas de limite.
 
 Comment les lignes sont placées :
 

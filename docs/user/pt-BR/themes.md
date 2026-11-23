@@ -282,7 +282,7 @@ com a aparência de antes. Diálogos e popups mantêm uma moldura com a cor de d
 ```toml
 [ui]
 accent = "#1f5fbf"
-border_focused = "#e7df00"
+border_focused = "#ffd700"
 ```
 
 ## Detecção do sistema

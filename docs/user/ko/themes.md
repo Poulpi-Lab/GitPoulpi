@@ -232,7 +232,7 @@ add_bg = "#2f3b2f"
 ```toml
 [ui]
 accent = "#1f5fbf"
-border_focused = "#e7df00"
+border_focused = "#ffd700"
 ```
 
 ## 시스템 감지

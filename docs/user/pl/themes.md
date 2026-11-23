@@ -284,7 +284,7 @@ ramkę w kolorze akcentu.
 ```toml
 [ui]
 accent = "#1f5fbf"
-border_focused = "#e7df00"
+border_focused = "#ffd700"
 ```
 
 ## Wykrywanie systemu

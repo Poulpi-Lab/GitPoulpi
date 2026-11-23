@@ -232,7 +232,7 @@ de [configuratienaslag](config-reference.md) en de [CLI-naslag](cli-reference.md
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center en Gerrit antwoorden; Bitbucket Cloud heeft geen accountbreed
 eindpunt, dus zijn aanvragen verschijnen alleen voor de gekoppelde repositories van het bereik.
 
-De **Namespaces** van het profiel beperken al zijn lijsten tot bepaalde repositories (Instellingen > Integraties > Radar: een tekstgebied met één item per regel, en een selectievakje **Reguliere expressies**). Een regel komt overeen met het volledige pad van een repository als hij eraan gelijk is of een padvoorvoegsel is dat bij een `/` eindigt: `ptm` houdt `ptm/produits/x` en laat `ptmx/y` en `formation/y` vallen. Met het selectievakje aan is elke regel een reguliere expressie die op het volledige pad wordt uitgevoerd zoals je hem schrijft (`^ptm/(produits|infra)/`); een regel die niet geldig is, wordt onder het veld getoond en niet opgeslagen. Leeg betekent geen limiet.
+De **Namespaces** van het profiel beperken al zijn lijsten tot bepaalde repositories (Instellingen > Integraties > Radar: een tekstgebied met één item per regel, en een selectievakje **Reguliere expressies**). Een regel komt overeen met het volledige pad van een repository als hij eraan gelijk is of een padvoorvoegsel is dat bij een `/` eindigt: `orbit` houdt `orbit/products/x` en laat `orbitx/y` en `training/y` vallen. Met het selectievakje aan is elke regel een reguliere expressie die op het volledige pad wordt uitgevoerd zoals je hem schrijft (`^orbit/(products|infra)/`); een regel die niet geldig is, wordt onder het veld getoond en niet opgeslagen. Leeg betekent geen limiet.
 
 Hoe de rijen worden geplaatst:
 

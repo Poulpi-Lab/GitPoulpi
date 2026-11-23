@@ -290,7 +290,7 @@ er hetzelfde uitziet als voorheen. Dialogen en pop-ups houden een accentrand.
 ```toml
 [ui]
 accent = "#1f5fbf"
-border_focused = "#e7df00"
+border_focused = "#ffd700"
 ```
 
 ## Systeemdetectie

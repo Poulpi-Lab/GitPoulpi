@@ -358,8 +358,8 @@ ganzen Host betrifft, geklont oder nicht, mit drei Schaltern in seiner Tabelle `
   Gruppe, in der Sie Mitglied sind, oder der Namespaces, die Sie nennen. Nie der ganze Host;
   die **Namespaces** des Profils (einer pro Zeile in Einstellungen > Integrationen > Radar, auf Wunsch
   als reguläre Ausdrücke) begrenzen alle drei Listen: Eine Zeile passt auf den vollständigen Pfad eines
-  Repositorys, wenn sie ihm gleicht oder ein Pfadpräfix an einem `/` ist (`ptm` behält `ptm/produits/x`,
-  nicht `ptmx/y`); sie wird auf die vom Host gelieferten Zeilen angewendet, zusätzlich serverseitig,
+  Repositorys, wenn sie ihm gleicht oder ein Pfadpräfix an einem `/` ist (`orbit` behält `orbit/products/x`,
+  nicht `orbitx/y`); sie wird auf die vom Host gelieferten Zeilen angewendet, zusätzlich serverseitig,
   wo die Suche des Hosts es erlaubt (GitHubs Qualifizierer `user:` / `repo:`);
 - **assigned issues**: offene Issues, die Ihnen zugewiesen sind.
 

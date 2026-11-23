@@ -551,17 +551,17 @@ fn a_user_theme_can_frame_the_focus_in_its_own_color() {
     let set = parse(&[
         (
             "mine",
-            "[ui]\naccent = \"#112233\"\nborder_focused = \"#e7df00\"\n",
+            "[ui]\naccent = \"#112233\"\nborder_focused = \"#ffd700\"\n",
         ),
         ("child", "base = \"mine\"\n[ui]\naccent = \"#445566\"\n"),
     ]);
     assert_eq!(
         set.themes[0].ui.border_focused,
-        ThemeColor::Rgb(231, 223, 0)
+        ThemeColor::Rgb(255, 215, 0)
     );
     // Inherited from the explicit one, not reset to the child's accent.
     assert_eq!(
         set.themes[1].ui.border_focused,
-        ThemeColor::Rgb(231, 223, 0)
+        ThemeColor::Rgb(255, 215, 0)
     );
 }

@@ -9040,9 +9040,9 @@ namespaces = "Пространства имён"
 # context: hint in the empty Namespaces text area (one entry per line)
 namespaces_hint = "По одной в строке, напр. acme (пусто: свои и все, к которым вы принадлежите)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "По одной записи в строке. Имя соответствует этой группе или владельцу и всему, что ниже (ptm соответствует ptm/produits/x, но не ptmx/y). Пусто: свои и все, к которым вы принадлежите."
+namespaces_help = "По одной записи в строке. Имя соответствует этой группе или владельцу и всему, что ниже (orbit соответствует orbit/products/x, но не orbitx/y). Пусто: свои и все, к которым вы принадлежите."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Каждая строка - регулярное выражение, которое сопоставляется с полным путём репозитория в том виде, как вы его пишете (пример: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Каждая строка - регулярное выражение, которое сопоставляется с полным путём репозитория в том виде, как вы его пишете (пример: ^orbit/(products|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
 regex = "Регулярные выражения"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason

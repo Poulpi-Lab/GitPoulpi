@@ -9032,9 +9032,9 @@ namespaces = "Namespace"
 # context: hint in the empty Namespaces text area (one entry per line)
 namespaces_hint = "Uno per riga, es. acme (vuoto: il mio e tutti quelli di cui faccio parte)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "Una voce per riga. Un nome corrisponde a quel gruppo o proprietario e a tutto ciò che sta sotto (ptm corrisponde a ptm/produits/x, non a ptmx/y). Vuoto: il mio e tutti quelli di cui faccio parte."
+namespaces_help = "Una voce per riga. Un nome corrisponde a quel gruppo o proprietario e a tutto ciò che sta sotto (orbit corrisponde a orbit/products/x, non a orbitx/y). Vuoto: il mio e tutti quelli di cui faccio parte."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Ogni riga è un'espressione regolare confrontata con il percorso completo del repository, come lo scrivi (esempio: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Ogni riga è un'espressione regolare confrontata con il percorso completo del repository, come lo scrivi (esempio: ^orbit/(products|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
 regex = "Espressioni regolari"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason

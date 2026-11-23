@@ -1,7 +1,7 @@
 //! The Namespaces filter on every account-wide list, over fake transports:
 //! the review requests and the assigned issues come from global host queries,
-//! so only the filter on the project path keeps `formation/...` out of a
-//! `ptm` profile.
+//! so only the filter on the project path keeps `training/...` out of a
+//! `orbit` profile.
 
 use std::sync::Arc;
 
@@ -73,16 +73,16 @@ fn gitlab_transport() -> Arc<RecordedTransport> {
     let mrs = format!(
         "[{}]",
         [
-            gl_mr(1, "ptm/produits/x"),
-            gl_mr(2, "formation/y"),
-            gl_mr(3, "ptmx/z"),
-            gl_mr(4, "ptm/w"),
+            gl_mr(1, "orbit/products/x"),
+            gl_mr(2, "training/y"),
+            gl_mr(3, "orbitx/z"),
+            gl_mr(4, "orbit/w"),
         ]
         .join(",")
     );
     let issues = format!(
         "[{}]",
-        [gl_issue(5, "formation/y"), gl_issue(6, "ptm/produits/x")].join(",")
+        [gl_issue(5, "training/y"), gl_issue(6, "orbit/products/x")].join(",")
     );
     Arc::new(
         RecordedTransport::new()
@@ -109,12 +109,12 @@ fn gitlab_every_section_keeps_only_the_namespace() {
         "https://gitlab.example",
         &transport,
     );
-    let items = block_on(c.account_items(&spaces(&["ptm"], false))).unwrap();
+    let items = block_on(c.account_items(&spaces(&["orbit"], false))).unwrap();
     let (prs, issues) = projects(&items);
-    // `formation/y` and `ptmx/z` are gone from the review list, the group
-    // list and the issues alike; `ptm/w` and `ptm/produits/x` stay.
-    assert_eq!(prs, ["ptm/produits/x", "ptm/w"]);
-    assert_eq!(issues, ["ptm/produits/x"]);
+    // `training/y` and `orbitx/z` are gone from the review list, the group
+    // list and the issues alike; `orbit/w` and `orbit/products/x` stay.
+    assert_eq!(prs, ["orbit/products/x", "orbit/w"]);
+    assert_eq!(issues, ["orbit/products/x"]);
 }
 
 #[test]
@@ -139,10 +139,10 @@ fn gitlab_two_lines_and_a_subgroup_are_alternatives() {
         "https://gitlab.example",
         &transport,
     );
-    let items = block_on(c.account_items(&spaces(&["ptm/produits", "formation"], false))).unwrap();
+    let items = block_on(c.account_items(&spaces(&["orbit/products", "training"], false))).unwrap();
     let (prs, issues) = projects(&items);
-    assert_eq!(prs, ["formation/y", "ptm/produits/x"]);
-    assert_eq!(issues, ["formation/y", "ptm/produits/x"]);
+    assert_eq!(prs, ["orbit/products/x", "training/y"]);
+    assert_eq!(issues, ["orbit/products/x", "training/y"]);
 }
 
 #[test]
@@ -153,10 +153,10 @@ fn gitlab_regex_mode_filters_every_section_and_searches_by_membership() {
         "https://gitlab.example",
         &transport,
     );
-    let items = block_on(c.account_items(&spaces(&["^ptm/.*/x$", "^formation/"], true))).unwrap();
+    let items = block_on(c.account_items(&spaces(&["^orbit/.*/x$", "^training/"], true))).unwrap();
     let (prs, issues) = projects(&items);
-    assert_eq!(prs, ["formation/y", "ptm/produits/x"]);
-    assert_eq!(issues, ["formation/y", "ptm/produits/x"]);
+    assert_eq!(prs, ["orbit/products/x", "training/y"]);
+    assert_eq!(issues, ["orbit/products/x", "training/y"]);
     // A pattern is not a group: the open-request walk is the membership one.
     let seen: Vec<String> = transport.requests().into_iter().map(|r| r.url).collect();
     assert!(
@@ -202,18 +202,18 @@ fn github_scopes_the_global_searches_and_filters_every_section() {
     let body = format!(
         r#"{{"total_count":3,"items":[{}]}}"#,
         [
-            gh_row(1, "ptm/api"),
-            gh_row(2, "formation/web"),
-            gh_row(3, "ptmx/q")
+            gh_row(1, "orbit/api"),
+            gh_row(2, "training/web"),
+            gh_row(3, "orbitx/q")
         ]
         .join(",")
     );
     let transport = Arc::new(RecordedTransport::new().on("/search/issues", 200, &body));
     let c = client(IntegrationKind::Github, "https://github.com", &transport);
-    let items = block_on(c.account_items(&spaces(&["ptm", "acme/tools"], false))).unwrap();
+    let items = block_on(c.account_items(&spaces(&["orbit", "acme/tools"], false))).unwrap();
     let (prs, issues) = projects(&items);
-    assert_eq!(prs, ["ptm/api"]);
-    assert_eq!(issues, ["ptm/api"]);
+    assert_eq!(prs, ["orbit/api"]);
+    assert_eq!(issues, ["orbit/api"]);
     let seen: Vec<String> = transport.requests().into_iter().map(|r| r.url).collect();
     let decoded: Vec<String> = seen
         .iter()
@@ -229,13 +229,13 @@ fn github_scopes_the_global_searches_and_filters_every_section() {
     assert!(
         decoded
             .iter()
-            .any(|u| u.contains("review-requested:@me user:ptm repo:acme/tools")),
+            .any(|u| u.contains("review-requested:@me user:orbit repo:acme/tools")),
         "{decoded:?}"
     );
     assert!(
         decoded
             .iter()
-            .any(|u| u.contains("assignee:@me user:ptm repo:acme/tools")),
+            .any(|u| u.contains("assignee:@me user:orbit repo:acme/tools")),
         "{decoded:?}"
     );
 }
@@ -261,8 +261,8 @@ fn gitea_filters_the_global_review_and_issue_searches() {
                 200,
                 &format!(
                     "[{},{}]",
-                    row(1, "ptm/a", true),
-                    row(2, "formation/b", true)
+                    row(1, "orbit/a", true),
+                    row(2, "training/b", true)
                 ),
             )
             .on(
@@ -270,8 +270,8 @@ fn gitea_filters_the_global_review_and_issue_searches() {
                 200,
                 &format!(
                     "[{},{}]",
-                    row(3, "ptm/c", false),
-                    row(4, "formation/d", false)
+                    row(3, "orbit/c", false),
+                    row(4, "training/d", false)
                 ),
             ),
     );
@@ -279,13 +279,13 @@ fn gitea_filters_the_global_review_and_issue_searches() {
     let query = AccountQuery {
         review_requests: true,
         assigned_issues: true,
-        namespaces: vec!["ptm".into()],
+        namespaces: vec!["orbit".into()],
         ..AccountQuery::default()
     };
     let items = block_on(c.account_items(&query)).unwrap();
     let (prs, issues) = projects(&items);
-    assert_eq!(prs, ["ptm/a"]);
-    assert_eq!(issues, ["ptm/c"]);
+    assert_eq!(prs, ["orbit/a"]);
+    assert_eq!(issues, ["orbit/c"]);
 }
 
 #[test]

@@ -356,8 +356,8 @@ tabulce `[integrations.radar]` (všechny ve výchozím stavu vypnuté; viz
   skupiny, jejímž jste členem, nebo jmenných prostorů, které uvedete. Nikdy ne celý hostitel;
   **Jmenné prostory** profilu (jeden na řádek v Nastavení > Integrace > Radar, volitelně
   jako regulární výrazy) omezují všechny tři seznamy: řádek odpovídá celé cestě repozitáře,
-  když se jí rovná nebo je její předponou na hranici `/` (`ptm` ponechá `ptm/produits/x`, ne
-  `ptmx/y`), a uplatňuje se na řádky, které hostitel vrátí, a také na straně serveru, kde to
+  když se jí rovná nebo je její předponou na hranici `/` (`orbit` ponechá `orbit/products/x`, ne
+  `orbitx/y`), a uplatňuje se na řádky, které hostitel vrátí, a také na straně serveru, kde to
   vyhledávání hostitele dovolí (kvalifikátory GitHubu `user:` / `repo:`);
 - **přiřazené issues**: otevřené issues přiřazené vám.
 

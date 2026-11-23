@@ -9038,9 +9038,9 @@ namespaces = "Ad alanları"
 # context: hint in the empty Namespaces text area (one entry per line)
 namespaces_hint = "Her satıra bir tane, örn. acme (boş: kendi alanım ve üye olduğum tümü)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "Her satıra bir giriş. Bir ad, o grubu veya sahibi ve altındaki her şeyi eşler (ptm, ptm/produits/x ile eşleşir, ptmx/y ile değil). Boş bırakırsanız kendi alanlarınız ve üye olduğunuz tümü eşlenir."
+namespaces_help = "Her satıra bir giriş. Bir ad, o grubu veya sahibi ve altındaki her şeyi eşler (orbit, orbit/products/x ile eşleşir, orbitx/y ile değil). Boş bırakırsanız kendi alanlarınız ve üye olduğunuz tümü eşlenir."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Her satır, tam depo yoluyla yazdığınız haliyle eşlenen bir düzenli ifadedir (örnek: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Her satır, tam depo yoluyla yazdığınız haliyle eşlenen bir düzenli ifadedir (örnek: ^orbit/(products|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
 regex = "Düzenli ifadeler"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason

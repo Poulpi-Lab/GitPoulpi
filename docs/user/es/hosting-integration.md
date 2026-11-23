@@ -360,8 +360,8 @@ su tabla `[integrations.radar]` (todos desactivados por defecto; ver la
   grupo del que eres miembro, o de los espacios de nombres que indiques. Nunca todo el host;
   los **Espacios de nombres** del perfil (uno por línea en Ajustes > Integraciones > Radar, opcionalmente
   como expresiones regulares) limitan las tres listas: una línea coincide con la ruta completa de un
-  repositorio cuando es igual a ella o es un prefijo de ruta que termina en `/` (`ptm` conserva
-  `ptm/produits/x`, no `ptmx/y`), y se aplica a las filas que devuelve el host, además de en el servidor
+  repositorio cuando es igual a ella o es un prefijo de ruta que termina en `/` (`orbit` conserva
+  `orbit/products/x`, no `orbitx/y`), y se aplica a las filas que devuelve el host, además de en el servidor
   donde la búsqueda del host lo permite (los calificadores `user:` / `repo:` de GitHub);
 - **issues asignados**: issues abiertos asignados a ti.
 

@@ -286,7 +286,7 @@ review_requests = true    # requests waiting for my review, every repository
 open_requests = false     # every open request of my namespaces
 include_drafts = false    # keep draft requests in these lists
 assigned_issues = true    # open issues assigned to me, every repository
-namespaces = ["acme", "ptm/produits"]  # one entry per line in Settings; empty = no limit
+namespaces = ["acme", "orbit/products"]  # one entry per line in Settings; empty = no limit
 namespaces_regex = false  # true: each entry is a regular expression over the full repository path
 review_mode = "ask"       # ask | clone | api
 ```
@@ -297,8 +297,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | 你自己的命名空间以及你所属的每个组织或群组（或 `namespaces`）中所有未关闭的请求，绝不是“令牌能看到的一切” |
 | `include_drafts` | `false` | 除非开启，否则这些列表不含草稿请求 |
 | `assigned_issues` | `false` | 指派给你的未关闭议题，所有仓库 |
-| `namespaces` | `[]` | 每个列表（评审请求、指派的议题、未关闭的请求）保留哪些仓库；留空表示不限制，此时 `open_requests` 会搜索你自己的命名空间加上你所属的每一个（GitHub：最多搜索 12 个；GitLab：10 个群组和 10 个自己的项目；Gitea、Forgejo 和 Gerrit：10 个）。条目与仓库的完整路径（`group/sub/project`，Azure DevOps 为 `Project/repo`，Bitbucket Data Center 为 `KEY/repo`）相等，或是以 `/` 结尾的路径前缀时即匹配：`ptm` 保留 `ptm/produits/x`，不保留 `ptmx/y`；忽略大小写。设置中每行显示一个条目；旧文件可能是一个逗号分隔的字符串（`"ptm, formation"`），仍可加载，并会以列表形式存回 |
-| `namespaces_regex` | `false` | 把每个 `namespaces` 条目当作正则表达式，按你输入的原样匹配完整的仓库路径（因此 `^ptm/(produits\|infra)/` 锚定在开头；没有 `^` 或 `$` 时匹配路径中的任意位置；加上 `(?i)` 可忽略大小写）。此时 `open_requests` 会搜索你的所属范围，由这些表达式筛选行。无效的表达式会显示在设置中该字段下方且不会保存；在手工编辑的文件中，它会让列表为空并附一条说明 |
+| `namespaces` | `[]` | 每个列表（评审请求、指派的议题、未关闭的请求）保留哪些仓库；留空表示不限制，此时 `open_requests` 会搜索你自己的命名空间加上你所属的每一个（GitHub：最多搜索 12 个；GitLab：10 个群组和 10 个自己的项目；Gitea、Forgejo 和 Gerrit：10 个）。条目与仓库的完整路径（`group/sub/project`，Azure DevOps 为 `Project/repo`，Bitbucket Data Center 为 `KEY/repo`）相等，或是以 `/` 结尾的路径前缀时即匹配：`orbit` 保留 `orbit/products/x`，不保留 `orbitx/y`；忽略大小写。设置中每行显示一个条目；旧文件可能是一个逗号分隔的字符串（`"orbit, formation"`），仍可加载，并会以列表形式存回 |
+| `namespaces_regex` | `false` | 把每个 `namespaces` 条目当作正则表达式，按你输入的原样匹配完整的仓库路径（因此 `^orbit/(products\|infra)/` 锚定在开头；没有 `^` 或 `$` 时匹配路径中的任意位置；加上 `(?i)` 可忽略大小写）。此时 `open_requests` 会搜索你的所属范围，由这些表达式筛选行。无效的表达式会显示在设置中该字段下方且不会保存；在手工编辑的文件中，它会让列表为空并附一条说明 |
 | `review_mode` | `"ask"` | 评审仓库未克隆的请求时怎么做：`ask`、`clone`（先克隆，再评审）或 `api`（通过托管平台的 API 评审） |
 
 答复按配置缓存在 `config.toml` 旁边的 `radar-account.json` 中，保留五分钟；该文件只是缓存，可以放心删除。

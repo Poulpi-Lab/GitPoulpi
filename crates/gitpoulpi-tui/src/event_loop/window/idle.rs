@@ -138,6 +138,7 @@ impl WindowState {
             crate::launcher_sync::next_deadline(),
             crate::diff_recode::next_deadline(),
             crate::workspace_ui::watch::next_deadline(),
+            crate::theme_watch::next_deadline(),
             self.management
                 .as_ref()
                 .and_then(|m| m.radar.next_deadline()),

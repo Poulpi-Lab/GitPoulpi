@@ -109,6 +109,7 @@ pub(crate) fn install_theme(slug: &str, user_themes: &[ThemeSpec]) {
 /// Makes the user themes under `<config>/themes` (if any) available and
 /// installs `slug`. Warnings are returned for the caller to surface.
 pub(crate) fn install_theme_from_config(slug: &str) -> Vec<String> {
+    crate::theme_watch::set_active_slug(slug);
     let set = gitpoulpi_config::ConfigPaths::discover()
         .map(|p| gitpoulpi_config::theme::load_user_themes(&p.themes_dir()))
         .unwrap_or_default();
@@ -133,5 +134,35 @@ pub(crate) fn override_theme(theme: &Theme) -> ThemeGuard {
 impl Drop for ThemeGuard {
     fn drop(&mut self) {
         OVERRIDE.with(|o| o.set(self.0));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ratatui::style::Color;
+
+    fn write(dir: &std::path::Path, accent: &str) {
+        std::fs::write(
+            dir.join("mine.toml"),
+            format!("base = \"dark\"\n[ui]\naccent = \"{accent}\"\n"),
+        )
+        .unwrap();
+    }
+
+    fn accent_of(dir: &std::path::Path, slug: &str) -> Color {
+        let set = gitpoulpi_config::theme::load_user_themes(dir);
+        resolve_theme(slug, &set.themes).ui.accent
+    }
+
+    #[test]
+    fn an_edited_user_theme_file_is_applied_when_its_slug_is_resolved_again() {
+        let dir = tempfile::tempdir().unwrap();
+        write(dir.path(), "#ff0000");
+        assert_eq!(accent_of(dir.path(), "mine"), Color::Rgb(255, 0, 0));
+        write(dir.path(), "#00ff00");
+        // Switch away and back, as `config set ui.theme` does.
+        let _ = accent_of(dir.path(), "dark");
+        assert_eq!(accent_of(dir.path(), "mine"), Color::Rgb(0, 255, 0));
     }
 }

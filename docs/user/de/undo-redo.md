@@ -206,7 +206,7 @@ Schaltfläche.
 | Commits | Commit, Amend, Reword, der KI-Commit-Composer (alle seine Commits als ein Schritt) |
 | Branches und Tags | anlegen, löschen, umbenennen, den Upstream setzen oder entfernen, einen Tracking-Branch anlegen, einen Tag anlegen / löschen / annotieren, Fast-Forward, einen Pull Request als Branch auschecken |
 | Wechseln | Checkout eines Branches oder Commits (auch ein losgelöster HEAD) |
-| Verlauf | Merge (Fast-Forward oder Merge-Commit), Rebase (einfach und interaktiv, sobald er abgeschlossen ist), Cherry-Pick, Revert, Reset (soft, mixed und hard), der lokale Teil eines Pulls |
+| Verlauf | Merge (Fast-Forward oder Merge-Commit), Rebase (einfach und interaktiv, sobald er abgeschlossen ist), Cherry-Pick, Revert, Reset (soft, mixed und hard), der lokale Teil eines Pulls, **Pull aller Branches** (jeder bewegte Branch, als ein Schritt; die Dateien des ausgecheckten Branches gehen mit zurück) |
 | Änderungen | stagen und unstagen (Datei, Ordner, Hunk, Zeilen, alles), verwerfen (Datei, Ordner, Hunk, Zeilen, ein Datei-Checkout), einen Patch oder die Änderungen eines Commits anwenden (`apply-commit`), **eine Datei vom Datenträger löschen**, **ignorieren** (Datei, Endung oder Ordner: die Zeile in der von Ihnen gewählten `.gitignore`), **als Binär- oder Textdatei behandeln** (die `.gitattributes`-Zeile) |
 | Stashes | push, apply, pop, drop, die Änderungen eines Commits als Stash sichern (`stash from-commit`) |
 | Remotes und Konfiguration | ein Remote hinzufügen, entfernen, umbenennen, die URL oder Push-URL ändern, Git-LFS-Tracking an- und abschalten |

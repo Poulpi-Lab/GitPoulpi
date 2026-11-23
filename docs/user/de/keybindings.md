@@ -1933,6 +1933,7 @@ Jede Schaltfläche hat ein Tastatur-Gegenstück:
 | **Aktivität** in der Statuszeile | `Ctrl+N Shift+A` |
 | Symbolleiste: **Rückgängig**, **Wiederholen** | `Ctrl+Z`, `Ctrl+Y` |
 | Symbolleiste: **Pull** / sein `▾` | `Ctrl+G p` / `Git: Pull-Optionen...` |
+| **Pull aller Branches** (Eintrag des Pull-`▾`) | `Ctrl+G Ctrl+P` |
 | Symbolleiste: **Push** / sein `▾` | `Ctrl+G Shift+P` / `Git: Push an Remote...` |
 | Symbolleiste: **Branch**, **Tag** | `Ctrl+G b`, `Ctrl+G t` |
 | Symbolleiste: **Stash**, **Pop** | `Ctrl+G Shift+T`, `Ctrl+G o` |

@@ -150,7 +150,7 @@ Standardmäßig eine Zeile unter den Bereichen und über der Statuszeile. **Eins
 | Schaltfläche | Was sie tut |
 |---|---|
 | **Rückg.**, **Wiederh.** | Nehmen den letzten Vorgang zurück oder stellen sie wieder her (`Ctrl+Z`, `Ctrl+Y`). Ausgeblendet, wenn Rückgängig ausgeschaltet ist. Siehe [Rückgängig und Wiederholen](undo-redo.md). |
-| **Pull** `▾` | Führt einen Pull so aus, wie es **Einstellungen > Git & Kodierung > Pull-Schaltfläche** festlegt. Die `▾`-Liste enthält **Fetch All**, **Pull (Fast-Forward, wenn möglich)**, **Pull (nur Fast-Forward)** und **Pull (Rebase)**. Ein Listeneintrag läuft einmal und ändert die Schaltfläche nicht. |
+| **Pull** `▾` | Führt einen Pull so aus, wie es **Einstellungen > Git & Kodierung > Pull-Schaltfläche** festlegt. Die `▾`-Liste enthält **Fetch All**, **Pull (Fast-Forward, wenn möglich)**, **Pull (nur Fast-Forward)** und **Pull (Rebase)**, danach **Pull aller Branches** (`Ctrl+G Ctrl+P`) und dasselbe mit jedem anderen Modus für den ausgecheckten Branch. Ein Listeneintrag läuft einmal und ändert die Schaltfläche nicht. |
 | **Push** `▾` | Pusht den ausgecheckten Branch. Die `▾`-Liste pusht einmal zu dem Remote, das Sie wählen. |
 | **Branch** | Legt einen Branch am ausgecheckten Commit an. |
 | **Tag** | Legt einen Tag am ausgecheckten Commit an. |

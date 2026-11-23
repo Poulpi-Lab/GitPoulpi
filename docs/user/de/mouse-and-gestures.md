@@ -40,6 +40,7 @@ gelten dieselben Regeln:
   um es zu schließen. Ein Klick außerhalb schließt nie eine Vollansicht (Einstellungen,
   Diff-Ansicht, Dateiansicht, Editoren, Review, Board): Sie haben kein Außerhalb.
 - Ein Klick **innerhalb** eines Panels schließt es nie.
+- Ein Mausklick (links oder rechts), während ein `Ctrl+G`- oder `Ctrl+N`-Kürzel auf seine zweite Taste wartet, bricht das Kürzel ab wie `Esc` und wirkt dann wie üblich (ein Klick wählt weiterhin aus, ein Rechtsklick öffnet weiterhin sein Menü).
 - Ein Formular mit von Ihnen getipptem Text (ein neues Issue, ein Pull oder Merge
   Request) ignoriert einen Klick außerhalb, damit ein versehentlicher Klick nichts
   verliert. `✕` und `Esc` fragen zuerst **Änderungen verwerfen?**; **Weiter bearbeiten**

@@ -264,9 +264,28 @@ zły kolor jest ignorowany, nieznany `base` przechodzi na `dark`, a
 raz na pasku stanu).
 
 Pliki są wczytywane ponownie, gdy otwiera się lista Motyw i gdy Ustawienia się
-zamykają; nie ma obserwatora plików. Działające okno stosuje motyw ustawiony z
-CLI przy następnym zamknięciu Ustawień, jak każdy inny klucz działający na
-żywo.
+zamykają. Działające okno zauważa też przepisanie `config.toml` (na przykład
+przez `gitpoulpi config set ui.theme ...` z powłoki) oraz pliku aktywnego motywu
+i stosuje nowe kolory w ciągu około sekundy, bez restartu.
+
+### `ui.border_focused`
+
+Ramka panelu, który ma fokus klawiatury: Log, panel Refs, panele Staged i
+Unstaged, szczegóły commita, panele historii, przeglądu i przepisywania, ramki
+diffu, plików i edytora. Maluje wyłącznie obramowania; tekst, etykiety i ikony
+(etykieta „commit :", ikona Home, przyciski kart) nadal używają `ui.accent`.
+Dzięki temu motyw może obramować aktywny panel kolorem, który jako tekst byłby
+nieczytelny, na przykład jaskrawożółtym w jasnym motywie. Gdy motyw go nie
+ustawia, klucz podąża za `ui.accent` (także w pliku użytkownika: plik, który
+zmienia sam `accent`, nadaje ten akcent ramkom z fokusem), więc każdy motyw
+wbudowany wygląda jak dotąd. Okna dialogowe i wyskakujące okienka zachowują
+ramkę w kolorze akcentu.
+
+```toml
+[ui]
+accent = "#1f5fbf"
+border_focused = "#e7df00"
+```
 
 ## Wykrywanie systemu
 

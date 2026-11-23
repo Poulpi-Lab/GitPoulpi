@@ -153,7 +153,7 @@
 | **启动器名称** | 此安装的快捷方式和文件夹菜单项所用的名称。若另一个仍然存在的安装已使用该名称，则会被拒绝。主安装始终名为 `GitPoulpi`。 |
 | **在启动器名称中包含版本号** | 在名称中加入 `<major>.<minor>`（`GitPoulpi 1.2`）；默认关闭，因为每次更新时快捷方式都会被重命名。 |
 | **章鱼颜色** | 此安装的章鱼及其快捷方式的颜色（可选项与“关于”窗口相同）。 |
-| **设为主安装** | 主安装拥有纯名称 `GitPoulpi`、旧版快捷方式以及旧版本读取的 `ui.*` 键；默认没有主安装。若已有其他主安装，会先询问。原来的主安装以自己的名称保留它的启动器（Windows 和 Linux）。 |
+| **设为主安装** | 主安装拥有纯名称 `GitPoulpi`、旧版快捷方式以及旧版本读取的 `ui.*` 键；默认没有主安装。若已有其他主安装，会先询问。原来的主安装以自己的名称保留它的启动器（Windows 和 Linux）。更改角色（成为主安装或卸任）时，此安装的快捷方式会原地重命名，因此任何时候都不会出现没有快捷方式的空档，其文件管理器菜单项也会移到新名称下。 |
 | **环境** | 同一环境中的安装共享窗口、守护进程和撤销历史；默认是安装自己独立的环境。更改后需要重新启动此安装已打开的窗口。 |
 | **文件夹菜单子菜单** | 把文件夹菜单项归入同名的子菜单；使用相同名称的安装共用同一个。macOS 上不可用；Nemo 和 Thunar 始终将该项放在根菜单。 |
 | **其他：\<name\>** | 这台电脑上的其他安装。文件夹已不存在的安装有一个 **清除** 按钮（会先询问），用于移除它的条目以及它遗留的启动器、别名和文件夹菜单项。 |
@@ -166,7 +166,7 @@
 | **快捷方式使用的终端** | `ui.launch_terminal`：**自动**、**系统默认**，或在本机找到的某个终端（检测方式与 **打开方式** 相同）。自动：Windows 上为 Windows Terminal（否则依次为 WezTerm、Alacritty、普通控制台），Linux 上为 `xdg-terminal-exec`（Omarchy；否则为找到的第一个终端），macOS 上为 Terminal，除非安装了 iTerm2、Ghostty、WezTerm 或 kitty。 |
 | **双击时在该终端中重新打开** | 仅限 Windows（`ui.relaunch_in_terminal`）。双击 exe 会打开默认控制台，而它无法正确绘制图片：GitPoulpi 会在所选终端中重新打开，并关闭第一个窗口。从终端启动时不会这样做。 |
 | **点击时显示已打开的窗口** | `ui.reuse_window`（默认开启）。点击 GitPoulpi 快捷方式（`gitpoulpi launch`）时，显示已打开的 GitPoulpi 的窗口，而不是再启动一个。 只有在没有已打开的窗口、此设置关闭，或窗口无法置前时，才会启动新的终端。窗口能置前的环境是 Windows、WezTerm 和 Hyprland；在其他 Linux 桌面上，点击仍会启动新窗口。macOS 不使用此项（Dock 已经这样做）。 若要有意再打开一个窗口，请在点击时按住 **Shift**（Windows），或使用启动器的 **New Window** 操作（Linux）；脚本中可用 `gitpoulpi launch --new-window`。 |
-| **命令别名** | `ui.command_alias`：下拉列表提供 **无** 和 `gp`，也可以输入任意名称（字母、数字、`-`、`_`、`.`；不能有空格或路径分隔符）。行内的 **创建** 按钮让该名称启动 GitPoulpi（别名存在后它会变成 **移除**，移除 GitPoulpi 创建的所有别名）。当该名称在你的 PATH 中已经运行着别的程序时，行下方会显示警告；在 Windows 上，如果 PowerShell 有同名的内置别名，也会警告（那里的 `gp` 是 `Get-ItemProperty`，它优先于任何文件）。shell 别名或函数在这里看不到：oh-my-zsh 自己就定义了 `gp`，它优先于我们的。 |
+| **命令别名** | `ui.command_alias`：下拉列表提供 **无** 和 `gp`，也可以输入任意名称（字母、数字、`-`、`_`、`.`；不能有空格或路径分隔符）。行内的 **创建** 按钮让该名称启动 GitPoulpi（别名存在后它会变成 **移除**，移除 GitPoulpi 创建的所有别名）。当该名称在你的 PATH 中已经运行着别的程序时，行下方会显示警告；在 Windows 上，如果 PowerShell 有同名的内置别名，也会警告（那里的 `gp` 是 `Get-ItemProperty`，它优先于任何文件）。shell 别名或函数在这里看不到：oh-my-zsh 自己就定义了 `gp`，它优先于我们的。每个安装都有自己的名称；只有主安装从共享的 `ui.command_alias` 起步，并且绝不会使用其他安装已在用的名称。 |
 | **新标签页别名** | `ui.command_alias_add`：第二个命令，例如 `gpa`，它会把当前文件夹作为新标签页在已运行的 GitPoulpi 中打开（`gitpoulpi --add`），而不是再启动一个；没有正在运行的则照常启动 GitPoulpi，有多个时会询问加入哪一个。下拉列表提供 **无**、`gpa` 以及命令别名加上 `a` 的名称，也可以输入任意名称（规则同上）。同一个 **创建** 按钮会同时创建两个命令，**移除** 会移除 GitPoulpi 创建的所有命令；两者各有自己的状态行。在 Linux 和 macOS 上它是一个两行的脚本，在 Windows 上是一个 `.cmd`。参见 [CLI 参考](cli-reference.md#将文件夹添加到已打开的窗口)。 |
 | **将 GitPoulpi 添加到 PATH** | 把 GitPoulpi 运行所在的文件夹和别名文件夹加入你的 PATH，供新打开的终端使用。该行的按钮显示为 **添加** 或 **移除**，**移除** 只取走当初添加的内容。PATH 中已有的文件夹不会被改动（此时该行显示 **已在 PATH 中**）。 |
 | **应用启动器**（Linux） | 写入 `~/.local/share/applications/gitpoulpi.desktop`（遵循 `XDG_DATA_HOME`），并把图标写入 `~/.local/share/icons/hicolor/256x256/apps`。在 Omarchy 上，该条目与 `omarchy-tui-install` 创建的相同（`xdg-terminal-exec --app-id=TUI.tile -e <exe>`）；对其他终端则使用相应的命令（`kitty`、`wezterm start --`、`alacritty -e`、`ghostty -e`、`foot` 等）。 |

@@ -1958,6 +1958,7 @@ Cada botón tiene su equivalente de teclado:
 | **Actividad** en la barra de estado | `Ctrl+N Shift+A` |
 | Barra de herramientas: **Deshacer**, **Rehacer** | `Ctrl+Z`, `Ctrl+Y` |
 | Barra de herramientas: **Pull** / su `▾` | `Ctrl+G p` / `Git: Opciones de pull...` |
+| **Pull de todas las ramas** (fila del `▾` de Pull) | `Ctrl+G Ctrl+P` |
 | Barra de herramientas: **Push** / su `▾` | `Ctrl+G Shift+P` / `Git: Push a un remoto...` |
 | Barra de herramientas: **Rama**, **Tag** | `Ctrl+G b`, `Ctrl+G t` |
 | Barra de herramientas: **Stash**, **Pop** | `Ctrl+G Shift+T`, `Ctrl+G o` |

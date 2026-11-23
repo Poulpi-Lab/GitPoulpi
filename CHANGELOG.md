@@ -7,6 +7,8 @@ IPC surfaces are stable within a major version).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-23
+
 ### Added
 - **Pull all branches:** the Pull menu fetches, then brings every local branch that is behind its upstream up to date in one action (`Ctrl+G` then `Ctrl+P`, also in the palette). The checked-out branch is integrated like the Pull button, with rows for the other pull modes; the other branches are only fast-forwarded, and diverged ones are skipped and listed. When a behind branch is checked out in another worktree, GitPoulpi asks whether to update that worktree too. One undo restores every branch. CLI: `gitpoulpi pull --all-branches`.
 
@@ -18,6 +20,9 @@ IPC surfaces are stable within a major version).
 - Tags no longer show as being on a remote that was removed from the repository outside GitPoulpi (for example with `git remote remove`); the leftover tag record of that remote is ignored.
 - Windows: a GitPoulpi pinned to the taskbar before 1.1.0 follows the octopus colour again.
 - Windows: changing the octopus colour is fast again.
+
+### Security
+- The `cookie` dependency is updated to 0.18.3 (RUSTSEC-2026-0594).
 
 ## [1.1.1] - 2026-11-23
 

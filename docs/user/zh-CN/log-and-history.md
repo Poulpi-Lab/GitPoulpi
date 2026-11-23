@@ -301,6 +301,7 @@ Blame 显示整个文件，带行号和语法着色，并在代码**右侧**给�
 ## Fetch、pull 和 push
 
 - **Pull**（`Ctrl+G p`）按 *设置 > Git 与编码 > Pull 按钮* 所指定的方式 pull（`git.pull_mode`：merge、仅 fast-forward、rebase；按仓库的设置）。它的 `▾` 会一次性运行 *Fetch 全部*、*Pull（尽可能 fast-forward）*、*Pull（仅 fast-forward）* 或 *Pull（rebase）*，而不改变按钮。模式总是显式传给 git，所以你的 git 配置中的 `pull.rebase` 不会让你意外。
+- **Pull 所有分支**（`Ctrl+G Ctrl+P`，Pull `▾` 的一行）会先从你的分支所跟踪的远程下载，然后一次性让每个本地分支都追上其 upstream。未检出的分支只会被 fast-forward（不触碰任何文件）；已分叉的分支保持原样并被报告。当前检出的分支按 Pull 按钮的设置来 pull，`▾` 中还有针对其他各模式的行（*Pull 所有分支（仅 fast-forward）*、*（rebase）*、*（可能时 fast-forward）*）。当某个落后的分支在另一个 worktree 中检出时，会先弹出对话框，询问是否也更新那些 worktree、跳过它们或取消。状态栏会汇总这次运行，活动日志每个分支一行；撤销会一步带回所有分支。`Ctrl+G p` 仍然是普通的 Pull。
 - **Push**（`Ctrl+G Shift+P`）把已检出的分支发送到默认远程，第一次时设置上游。它的 `▾` 会一次性 push 到你选择的另一个远程。如果远程有你没有的 commit，对话框会提供 **Pull（merge），然后 push**、**Force push（with lease）…**（绝不使用裸的 `--force`）或 **取消**。
 - `Ctrl+G f` 会 fetch 所有远程。在 *设置 > 同步* 中，*自动 Prune*决定 fetch 是否 prune，*自动 Fetch 间隔（分钟）*则在后台 fetch。
 

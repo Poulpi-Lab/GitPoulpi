@@ -81,7 +81,7 @@
 | 按钮 | 作用 |
 |---|---|
 | **撤销**、**重做** | 撤回或恢复上一次操作（`Ctrl+Z`、`Ctrl+Y`）。撤销关闭时隐藏。参见[撤销与重做](undo-redo.md)。 |
-| **Pull** `▾` | 按 **设置 > Git 与编码 > Pull 按钮** 所指定的方式 pull。`▾` 列表有 **Fetch 全部**、**Pull（尽可能 fast-forward）**、**Pull（仅 fast-forward）** 和 **Pull（rebase）**。列表项只运行一次，不会改变按钮。 |
+| **Pull** `▾` | 按 **设置 > Git 与编码 > Pull 按钮** 所指定的方式 pull。`▾` 列表有 **Fetch 全部**、**Pull（尽可能 fast-forward）**、**Pull（仅 fast-forward）** 和 **Pull（rebase）**，然后是 **Pull 所有分支**（`Ctrl+G Ctrl+P`），以及针对当前检出分支的其他各模式的同类行。列表项只运行一次，不会改变按钮。 |
 | **Push** `▾` | push 已检出的分支。`▾` 列表会一次性 push 到你选择的远程。 |
 | **分支** | 在已检出的 commit 处创建分支。 |
 | **Tag** | 在已检出的 commit 处创建 tag。 |

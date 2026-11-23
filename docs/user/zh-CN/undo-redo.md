@@ -84,7 +84,7 @@ Reflog 和丢失的工作在左侧显示 commit 列表，右侧显示所选 comm
 | commit | commit、amend、reword、AI commit 撰写器（它的所有 commit 算作一步） |
 | 分支和 tag | 创建、删除、重命名、设置或取消上游、创建跟踪分支、创建/删除/注解 tag、fast-forward、把 pull request 检出为分支 |
 | 切换位置 | 检出分支或 commit（包括分离 HEAD） |
-| 历史 | merge（fast-forward 或 mergecommit）、rebase（普通和交互式，完成之后）、cherry-pick、revert、reset（soft、mixed 和 hard）、pull 的本地部分 |
+| 历史 | merge（fast-forward 或 mergecommit）、rebase（普通和交互式，完成之后）、cherry-pick、revert、reset（soft、mixed 和 hard）、pull 的本地部分、**pull 所有分支**（它移动的所有分支算一步；当前检出分支的文件会随之恢复） |
 | 工作更改 | stage 和 unstage（文件、文件夹、hunk、行、全部）、丢弃（文件、文件夹、hunk、行、文件检出）、应用补丁或某个 commit 的更改（`apply-commit`）、**从磁盘删除文件**、**忽略**（文件、扩展名或文件夹：你所选 `.gitignore` 中的那一行），**视为二进制或文本**（`.gitattributes` 中的那一行） |
 | stash | push、apply、pop、drop、把某个 commit 的更改保存为 stash（`stash from-commit`） |
 | 远程和配置 | 添加、移除、重命名远程，更改远程的 URL 或 push URL，Git LFS 的 track 和 untrack |

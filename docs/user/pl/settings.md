@@ -195,7 +195,7 @@ z menu aplikacji systemu, w wybranym terminalu.
 | Wiersz | Co robi |
 |---|---|
 | **Instalacja** | Tylko do odczytu: rodzaj, folder i środowisko tej instalacji. Na wąskiej stronie folder jest skracany w środku wielokropkiem; pełny tekst jest w wierszu pomocy pod pozycją. |
-| **Nazwa programu uruchamiającego** | Nazwa skrótów tej instalacji i jej wpisu w menu folderów. Odrzucana, gdy ma ją inna instalacja, która nadal istnieje. Instalacja główna zawsze nazywa się `GitPoulpi`. |
+| **Nazwa programu uruchamiającego** | Nazwa skrótów tej instalacji i jej wpisu w menu folderów. Odrzucana, gdy ma ją inna instalacja, która nadal istnieje. Zmiana nazwy zmienia nazwy skrótów, które ta instalacja już ma (menu Start, Pulpit, wpis w menu aplikacji), i w miejscu zmienia etykietę jej wpisu w menu folderów; żaden nowy nie powstaje. Instalacja główna zawsze nazywa się `GitPoulpi`. |
 | **Dodaj wersję do nazwy programu uruchamiającego** | Dodaje `<główna>.<podrzędna>` do nazwy (`GitPoulpi 1.2`); domyślnie wyłączone, bo skróty są zmieniane przy każdej aktualizacji. |
 | **Kolor ośmiornicy** | Kolor ośmiornicy tej instalacji i jej skrótów (te same wybory co w oknie O programie). |
 | **Zostań instalacją główną** | Instalacja główna ma nazwę `GitPoulpi` bez dopisków, starsze skróty i klucze `ui.*` odczytywane przez starsze wersje; domyślnie nikt nią nie jest. Pyta najpierw, gdy inna instalacja już jest główna. Poprzednia instalacja główna zachowuje skróty pod własną nazwą (Windows i Linux). Zmiana roli (zostanie instalacją główną albo rezygnacja) zmienia nazwy skrótów tej instalacji w miejscu, więc nigdy nie ma chwili bez skrótu, i przenosi jej wpis w menedżerze plików pod nową nazwę. |

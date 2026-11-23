@@ -484,10 +484,12 @@ fn target_owner_id(env: &Env, target: &Path, link: &Path) -> String {
 /// `Some(found)` when `path` is an alias of ours (anybody's).
 fn ours(env: &Env, path: &Path) -> Option<Found> {
     let from_shim = |shim: Shim| {
+        let name = path.file_stem().map(|s| s.to_string_lossy().into_owned());
         let facts = Facts {
             tag: shim.tag.as_deref(),
             legacy_marker: shim.legacy,
             names_my_exe: shim.tag.is_none() && env.is_current(&shim.exe),
+            claimed_by: name.as_deref().and_then(|n| env.ctx.alias_claimed_by(n)),
         };
         let owner = decide(&facts, &env.ctx);
         let id = shim.tag.clone().or_else(|| match &owner {
@@ -731,6 +733,7 @@ fn app_path_owner(
     let facts = Facts {
         tag: value(super::OWNER_TAG),
         legacy_marker: value(APP_MARK_NAME) == Some(APP_MARK_VALUE),
+        claimed_by: None,
         names_my_exe: false,
     };
     Ok(Some(decide(&facts, ctx)))
@@ -951,6 +954,7 @@ mod tests {
             short: format!("i{id}"),
             name: format!("GitPoulpi ({id})"),
             primary: primary.map(str::to_string),
+            alias_claims: Vec::new(),
             known: known
                 .iter()
                 .map(|(id, exists)| crate::desktop::KnownInstall {
@@ -1037,6 +1041,63 @@ mod tests {
             State::Outdated,
             "no primary: legacy"
         );
+    }
+
+    #[test]
+    fn a_legacy_alias_goes_to_the_installation_that_claims_it_not_to_the_primary() {
+        let tmp = tempfile::tempdir().unwrap();
+        // bbbb (the 1.0 dev build) made gpd.cmd / gpda.cmd with the legacy
+        // marker and no tag; aaaa is now the primary, and the config gives
+        // gpd / gpda to bbbb.
+        let dev_exe = Path::new("C:/bbbb/gitpoulpi.exe");
+        let mut primary = windows_as(tmp.path(), "aaaa", Some("aaaa"));
+        primary.ctx.alias_claims = vec![
+            ("gpd".into(), "bbbb".into()),
+            ("gpda".into(), "bbbb".into()),
+            ("gp".into(), "aaaa".into()),
+        ];
+        std::fs::create_dir_all(&primary.bin_dir).unwrap();
+        let legacy = |exe: &Path, kind| cmd_shim_text_owned(exe, kind, None, true);
+        std::fs::write(primary.bin_dir.join("gpd.cmd"), legacy(dev_exe, Kind::Open)).unwrap();
+        std::fs::write(primary.bin_dir.join("gpda.cmd"), legacy(dev_exe, Kind::Add)).unwrap();
+        std::fs::write(primary.bin_dir.join("gp.cmd"), legacy(dev_exe, Kind::Open)).unwrap();
+        for (name, kind) in [("gpd", Kind::Open), ("gpda", Kind::Add)] {
+            let st = status_kind(&primary, name, kind);
+            assert_eq!(st.state, State::Other, "{name}");
+            assert_eq!(st.owner.as_deref(), Some("bbbb"), "{name}");
+        }
+        // Not rewritten, not removed, not listed as the primary's.
+        let before = std::fs::read_to_string(primary.bin_dir.join("gpd.cmd")).unwrap();
+        assert!(create(&primary, "gpd").is_err());
+        assert!(remove(&primary, "gpd").is_err());
+        assert_eq!(
+            std::fs::read_to_string(primary.bin_dir.join("gpd.cmd")).unwrap(),
+            before
+        );
+        assert!(!before.contains("Install="), "still untagged: {before}");
+        let owners: Vec<_> = list_all(&primary)
+            .into_iter()
+            .map(|e| (e.name, e.owner))
+            .collect();
+        assert_eq!(
+            owners,
+            [
+                ("gp".to_string(), Some("aaaa".to_string())),
+                ("gpd".to_string(), Some("bbbb".to_string())),
+                ("gpda".to_string(), Some("bbbb".to_string())),
+            ]
+        );
+        // The primary's own name is adopted, as before.
+        create(&primary, "gp").unwrap();
+        assert_eq!(status(&primary, "gp").state, State::Installed);
+        // The claimant adopts its own legacy files even though it is no primary.
+        let mut dev = windows_as(tmp.path(), "bbbb", Some("aaaa"));
+        dev.ctx.alias_claims = primary.ctx.alias_claims.clone();
+        assert_eq!(
+            status_kind(&dev, "gpd", Kind::Open).owner.as_deref(),
+            Some("bbbb")
+        );
+        assert!(list_all(&dev).iter().any(|e| e.name == "gpd" && e.mine));
     }
 
     #[test]

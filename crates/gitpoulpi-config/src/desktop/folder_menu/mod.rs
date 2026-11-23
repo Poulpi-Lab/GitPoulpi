@@ -447,6 +447,7 @@ pub(crate) mod testing {
             short: crate::installation::short_id(id),
             name: format!("GitPoulpi {id}"),
             primary: primary.map(str::to_string),
+            alias_claims: Vec::new(),
             known: [A, B]
                 .iter()
                 .map(|k| KnownInstall {

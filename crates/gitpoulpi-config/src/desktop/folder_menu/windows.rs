@@ -242,6 +242,7 @@ fn mine(env: &Env, values: &Values) -> bool {
     let facts = Facts {
         tag: value(values, OWNER_TAG),
         legacy_marker: marked(values),
+        claimed_by: None,
         names_my_exe: false,
     };
     matches!(decide(&facts, &env.ctx), Owner::Mine | Owner::Adopt)
@@ -692,6 +693,7 @@ mod tests {
                 name: format!("GitPoulpi {id}"),
                 primary: primary.map(str::to_string),
                 known: Vec::new(),
+                alias_claims: Vec::new(),
             },
             ico: ico.map(PathBuf::from),
             submenu: submenu.to_string(),

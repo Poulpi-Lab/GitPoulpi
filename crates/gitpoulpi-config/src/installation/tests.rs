@@ -943,3 +943,99 @@ fn seed_returns_nothing_for_an_unchanged_entry() {
     with(&mut config, &id, entry);
     assert!(seed(&config, &id, &env(&fs), &NoAliases, &live).is_none());
 }
+
+// ------------------------------------------------- aliases and ownership
+
+/// A 1.0 dev build left `gpd` / `gpda` in `ui.*`; the dev installation's own
+/// entry claims them.
+fn legacy_dev_config() -> (Config, Identity, Identity) {
+    let (dev, choco) = (
+        Identity {
+            kind: Kind::Dev,
+            ..pinned("dev")
+        },
+        pinned("choco"),
+    );
+    let mut config = Config::default();
+    config.ui.command_alias = "gpd".into();
+    config.ui.command_alias_add = "gpda".into();
+    with(
+        &mut config,
+        &dev,
+        InstallationEntry {
+            command_alias: "gpd".into(),
+            command_alias_add: "gpda".into(),
+            ..new_entry(&dev, String::new())
+        },
+    );
+    with(&mut config, &choco, new_entry(&choco, String::new()));
+    (config, dev, choco)
+}
+
+#[test]
+fn a_non_primary_never_falls_back_to_the_ui_aliases() {
+    let (mut config, dev, choco) = legacy_dev_config();
+    let eff = effective(&config, &choco);
+    assert!(eff.command_alias.is_empty() && eff.command_alias_add.is_empty());
+    // Not even when another installation is the primary and ui.* is its look.
+    config.installation.primary = Some(dev.id.clone());
+    let eff = effective(&config, &choco);
+    assert!(eff.command_alias.is_empty() && eff.command_alias_add.is_empty());
+}
+
+#[test]
+fn the_first_primary_does_not_inherit_aliases_another_installation_claims() {
+    let (config, dev, choco) = legacy_dev_config();
+    let plan = plan_primary(&config, &choco).unwrap();
+    let ui = plan.ui.unwrap();
+    assert!(
+        ui.command_alias.is_empty() && ui.command_alias_add.is_empty(),
+        "gpd / gpda are the dev installation's: {ui:?}"
+    );
+    // The dev entry keeps its names.
+    let d = &plan.installation.settings[&dev.id];
+    assert_eq!(
+        (d.command_alias.as_str(), d.command_alias_add.as_str()),
+        ("gpd", "gpda")
+    );
+    // A name nobody else claims is still inherited.
+    let mut free = config.clone();
+    free.ui.command_alias = "gp".into();
+    let ui = plan_primary(&free, &choco).unwrap().ui.unwrap();
+    assert_eq!(ui.command_alias, "gp");
+}
+
+#[test]
+fn resigning_does_not_freeze_aliases_another_installation_claims() {
+    // A config an earlier build left: the primary wears ui.* = the dev's names.
+    let (mut config, dev, choco) = legacy_dev_config();
+    config.installation.primary = Some(choco.id.clone());
+    // Even as the primary it does not wear the name the dev entry holds.
+    assert!(effective(&config, &choco).command_alias.is_empty());
+    let plan = plan_resign(&config, &choco.id).unwrap();
+    let e = &plan.installation.settings[&choco.id];
+    assert!(
+        e.command_alias.is_empty() && e.command_alias_add.is_empty(),
+        "{e:?}"
+    );
+    assert_eq!(plan.installation.settings[&dev.id].command_alias, "gpd");
+}
+
+#[test]
+fn alias_claims_prefer_the_entries_over_the_primarys_ui_fallback() {
+    let (mut config, dev, choco) = legacy_dev_config();
+    config.installation.primary = Some(choco.id.clone());
+    let claims = alias_claims(&config);
+    assert!(
+        claims.contains(&("gpd".to_string(), dev.id.clone())),
+        "{claims:?}"
+    );
+    assert!(
+        claims.contains(&("gpda".to_string(), dev.id.clone())),
+        "{claims:?}"
+    );
+    assert!(!claims.iter().any(|(_, id)| *id == choco.id), "{claims:?}");
+    // A name only ui.* has goes to the primary.
+    config.ui.command_alias = "gp".into();
+    assert!(alias_claims(&config).contains(&("gp".to_string(), choco.id.clone())));
+}

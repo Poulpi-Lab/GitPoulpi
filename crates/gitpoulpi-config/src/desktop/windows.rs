@@ -370,6 +370,7 @@ fn is_lower_hex(c: &u8) -> bool {
 fn facts_of<'a>(bytes: &[u8], tag: Option<&'a str>, exes: &[String]) -> Facts<'a> {
     Facts {
         tag,
+        claimed_by: None,
         legacy_marker: contains_text(bytes, MARKER),
         names_my_exe: exes.iter().any(|e| contains_text(bytes, e)),
     }
@@ -1994,6 +1995,7 @@ otepad.exe",
             short: format!("i{}", &id[..8]),
             name: name.to_string(),
             primary: primary.map(str::to_string),
+            alias_claims: Vec::new(),
             known: vec![exists(ID_A), exists(ID_B)],
         }
     }

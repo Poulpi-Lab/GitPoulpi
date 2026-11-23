@@ -689,6 +689,7 @@ mod tests {
             short: crate::installation::short_id(id),
             name: "n".into(),
             primary: primary.map(str::to_string),
+            alias_claims: Vec::new(),
             known: Vec::new(),
         }
     }

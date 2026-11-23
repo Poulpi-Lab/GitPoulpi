@@ -263,9 +263,30 @@ color incorrecto se ignora, una `base` desconocida recurre a `dark`, y
 `gitpoulpi theme list` informa de cada problema en `warnings` (la aplicación los
 muestra una vez en la barra de estado).
 
-Los archivos se vuelven a leer al abrir el combo Tema y al cerrar Ajustes; no hay
-vigilante de archivos. Una ventana en marcha aplica un tema fijado desde la CLI la
-próxima vez que se cierran sus Ajustes, como cualquier otra clave en vivo.
+Los archivos se vuelven a leer al abrir el combo Tema y al cerrar Ajustes. Una
+ventana en marcha también nota cuando se reescriben `config.toml` (un
+`gitpoulpi config set ui.theme ...` desde una shell) y el archivo del tema activo,
+y aplica los colores nuevos en aproximadamente un segundo, sin reiniciar.
+
+### `ui.border_focused`
+
+El marco del panel que tiene el foco del teclado: el Log, la barra lateral de
+Refs, los paneles Staged y Unstaged, el detalle del commit, los paneles de
+historial, revisión y reescritura, y los marcos del diff, de los archivos y del
+editor. Pinta solo bordes; el texto, las etiquetas y los iconos (la etiqueta
+"commit :", el icono de Inicio, los botones de pestaña) siguen usando
+`ui.accent`. Así un tema puede enmarcar el panel activo con un color que sería
+ilegible como texto, por ejemplo un amarillo vivo en un tema claro. Cuando un
+tema no lo define, sigue a `ui.accent` (también en un archivo de usuario: un
+archivo que cambia solo `accent` da ese acento a sus marcos con foco), de modo
+que todos los temas integrados se ven como antes. Los diálogos y las ventanas
+emergentes conservan un marco con el acento.
+
+```toml
+[ui]
+accent = "#1f5fbf"
+border_focused = "#e7df00"
+```
 
 ## Detección del sistema
 

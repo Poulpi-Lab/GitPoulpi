@@ -493,6 +493,17 @@ Ouvrez-le depuis le segment `Fichier` du sélecteur `Fichier │ Tout` de la bar
   (fast-forward seul)* ou *Pull (rebase)* une fois, sans changer le bouton. Le mode
   est toujours passé explicitement à git, si bien que le `pull.rebase` de votre
   configuration git ne peut pas vous surprendre.
+- **Pull de toutes les branches** (`Ctrl+G Ctrl+P`, une entrée du `▾` de Pull) télécharge
+  depuis les distants que vos branches suivent, puis amène d'un coup chaque branche
+  locale au niveau de son amont. Une branche non extraite est seulement avancée en
+  fast-forward (aucun fichier n'est touché) ; une branche qui a divergé est laissée telle
+  quelle et signalée. La branche extraite est tirée comme le bouton Pull le prévoit, et
+  le `▾` propose aussi l'entrée de chaque autre mode (*Pull de toutes les branches
+  (fast-forward seul)*, *(rebase)*, *(fast-forward si possible)*). Quand une branche en
+  retard est extraite dans un autre worktree, une fenêtre demande d'abord s'il faut
+  mettre à jour ces worktrees aussi, les ignorer ou annuler. La ligne d'état résume la
+  passe et le Journal d'activité a une ligne par branche ; Annuler remet toutes les
+  branches comme avant en une seule étape. `Ctrl+G p` reste un pull ordinaire.
 - **Push** (`Ctrl+G Shift+P`) envoie la branche extraite vers le distant par défaut,
   en définissant l'amont la première fois. Son `▾` pousse une fois vers un autre
   distant de votre choix. Si le distant a des commits que vous n'avez pas, une boîte

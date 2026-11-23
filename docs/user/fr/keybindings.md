@@ -1943,6 +1943,7 @@ Chaque bouton a son jumeau au clavier :
 | **Activité** dans la ligne d'état | `Ctrl+N Shift+A` |
 | Barre d'outils : **Annuler**, **Rétablir** | `Ctrl+Z`, `Ctrl+Y` |
 | Barre d'outils : **Pull** / son `▾` | `Ctrl+G p` / `Git : Options de pull...` |
+| **Pull de toutes les branches** (entrée du `▾` de Pull) | `Ctrl+G Ctrl+P` |
 | Barre d'outils : **Push** / son `▾` | `Ctrl+G Shift+P` / `Git : Push vers un distant...` |
 | Barre d'outils : **Branche**, **Tag** | `Ctrl+G b`, `Ctrl+G t` |
 | Barre d'outils : **Stash**, **Pop** | `Ctrl+G Shift+T`, `Ctrl+G o` |

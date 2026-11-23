@@ -261,9 +261,28 @@ Renkler `"#rrggbb"`, `"ansi:N"` (terminal paletinin N. girdisi) ya da `"default"
 renk yok sayılır, bilinmeyen bir `base` değeri `dark`'a döner ve `gitpoulpi theme list`
 her sorunu `warnings` altında bildirir (uygulama bunları durum çubuğunda bir kez gösterir).
 
-Dosyalar Tema açılır listesi açıldığında ve Ayarlar kapandığında yeniden okunur; dosya
-izleyici yoktur. Çalışan bir pencere, CLI'dan ayarlanan bir temayı, diğer tüm canlı
-anahtarlar gibi, Ayarlar'ı bir sonraki kapatışında uygular.
+Dosyalar Tema açılır listesi açıldığında ve Ayarlar kapandığında yeniden okunur. Çalışan
+bir pencere ayrıca `config.toml` dosyasının (kabuktan yapılan bir
+`gitpoulpi config set ui.theme ...`) ve etkin temanın dosyasının yeniden yazıldığını fark
+eder ve yeni renkleri yeniden başlatmadan yaklaşık bir saniye içinde uygular.
+
+### `ui.border_focused`
+
+Klavye odağı olan panelin çerçevesi: Log, Refs kenar çubuğu, Staged ve Unstaged
+panelleri, commit ayrıntısı, geçmiş, inceleme ve yeniden yazma panelleri, diff, dosya ve
+düzenleyici çerçeveleri. Yalnızca kenarlıkları boyar; metin, etiketler ve simgeler
+("commit :" etiketi, Home simgesi, sekme düğmeleri) `ui.accent` kullanmaya devam eder.
+Böylece bir tema etkin paneli, metin olarak okunamayacak bir renkle çerçeveleyebilir,
+örneğin açık bir temada parlak sarı. Tema bunu ayarlamadığında `ui.accent` değerini izler
+(kullanıcı dosyasında da: yalnızca `accent` değerini değiştiren bir dosya, odaklı
+çerçevelerinde de o vurgu rengini alır), bu yüzden yerleşik her tema eskisi gibi görünür.
+Diyaloglar ve açılır pencereler vurgu renginde çerçeve kullanmaya devam eder.
+
+```toml
+[ui]
+accent = "#1f5fbf"
+border_focused = "#e7df00"
+```
 
 ## Sistem algılama
 

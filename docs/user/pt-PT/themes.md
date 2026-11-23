@@ -278,9 +278,30 @@ inválida é ignorada, uma `base` desconhecida recua para `dark`, e
 uma vez na barra de estado).
 
 Os ficheiros são relidos quando a lista Tema abre e quando as Definições se
-fecham; não há observador de ficheiros. Uma janela em execução aplica um tema
-definido a partir da CLI da próxima vez que as suas Definições se fecharem, como
-qualquer outra chave em direto.
+fecham. Uma janela em execução também repara quando o `config.toml` (um
+`gitpoulpi config set ui.theme ...` feito a partir de uma shell) ou o ficheiro do
+tema ativo são reescritos, e aplica as novas cores em cerca de um segundo, sem
+reiniciar.
+
+### `ui.border_focused`
+
+A moldura do painel que tem o foco do teclado: o Log, a barra lateral Refs, os
+painéis Staged e Unstaged, os detalhes do commit, os painéis de histórico, de
+revisão e de reescrita, e as molduras do diff, dos ficheiros e do editor. Pinta
+apenas bordas; o texto, as etiquetas e os ícones (a etiqueta «commit :», o ícone
+de Início, os botões dos separadores) continuam a usar `ui.accent`. Assim, um
+tema pode emoldurar o painel ativo com uma cor que seria ilegível como texto, por
+exemplo um amarelo vivo num tema claro. Quando um tema não a define, segue
+`ui.accent` (também num ficheiro do utilizador: um ficheiro que altera só o
+`accent` dá esse destaque às suas molduras com foco), pelo que todos os temas
+incorporados ficam como estavam. Os diálogos e as janelas pop-up mantêm uma
+moldura com a cor de destaque.
+
+```toml
+[ui]
+accent = "#1f5fbf"
+border_focused = "#e7df00"
+```
 
 ## Deteção do sistema
 

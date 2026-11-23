@@ -2152,23 +2152,23 @@ not_a_file = "{path} はファイルではありません"
 
 [remotes]
 # context: row of the Pull dropdown: fetch, then bring every local branch up to its upstream; the checked-out one follows the mode of the Pull button
-pull_all_branches = "{$Pull} all branches"
+pull_all_branches = "すべてのブランチを{$Pull}"
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is fast-forwarded, or merged when it has diverged
-pull_all_branches_merge = "{$Pull} all branches (fast-forward if possible)"
+pull_all_branches_merge = "すべてのブランチを{$Pull}（可能なら早送り）"
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is only fast-forwarded
-pull_all_branches_ff_only = "{$Pull} all branches (fast-forward only)"
+pull_all_branches_ff_only = "すべてのブランチを{$Pull}（早送りのみ）"
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is rebased onto its upstream
-pull_all_branches_rebase = "{$Pull} all branches ({$rebase})"
+pull_all_branches_rebase = "すべてのブランチを{$Pull}（{$rebase}）"
 # context: tooltip of the "Pull all branches" row
-tip_pull_all_branches = "{$Fetch} from the remotes, then fast-forward every local branch that is only behind its upstream. The checked-out branch follows the mode of the {$Pull} button; a diverged branch is left alone and reported."
+tip_pull_all_branches = "リモートから{$Fetch}し、アップストリームより遅れているだけのローカルブランチをすべて早送りします。チェックアウト中のブランチは{$Pull}ボタンの動作に従い、分岐したブランチは変更せずに報告します。"
 # context: tooltip of the "Pull all branches (fast-forward if possible)" row
-tip_pull_all_branches_merge = "Like {$Pull} all branches, but the checked-out branch is fast-forwarded, or gets a {$merge} when it has diverged."
+tip_pull_all_branches_merge = "「すべてのブランチを{$Pull}」と同じですが、チェックアウト中のブランチは早送りし、分岐している場合は{$merge}します。"
 # context: tooltip of the "Pull all branches (fast-forward only)" row
-tip_pull_all_branches_ff_only = "Like {$Pull} all branches, but the checked-out branch is only fast-forwarded; when it has diverged it is left as it is."
+tip_pull_all_branches_ff_only = "「すべてのブランチを{$Pull}」と同じですが、チェックアウト中のブランチは早送りのみ行い、分岐している場合はそのままにします。"
 # context: tooltip of the "Pull all branches (rebase)" row
-tip_pull_all_branches_rebase = "Like {$Pull} all branches, but the checked-out branch is moved onto its upstream with a {$rebase}."
+tip_pull_all_branches_rebase = "「すべてのブランチを{$Pull}」と同じですが、チェックアウト中のブランチはアップストリームに{$rebase}します。"
 # context: status line while "Pull all branches" runs
-pulling_all_branches = "Pulling all branches..."
+pulling_all_branches = "すべてのブランチを{$pull}中..."
 menu_title = "リモート {name}"
 fetch_remote = { git = "{name} を{$Fetch}", local = "{name} を{$Fetch}" }
 copy_name = "リモート名をコピー"
@@ -2286,7 +2286,7 @@ pulling_from_all = { git = "{branch} を {remotes} から{$pull}中...", local =
 no_pull_remote = "{branch} には{$pull}元のリモートがありません"
 
 [keymap_action]
-git_prefix_pull_all_branches = "{$Pull} All Branches"
+git_prefix_pull_all_branches = "すべてのブランチを{$Pull}"
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
 global_commit_column = "{$Commit}列の表示/非表示"
 git_prefix_amend = "選択した{$Commit}を修正"
@@ -2999,10 +2999,10 @@ action_issue_body = "Issue の説明"
 title_hosting_base = "返信のベースプロンプト"
 
 [palette]
-git_pull_all_branches = "Git: {$Pull} All Branches"
-git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} All Branches (fast-forward if possible)"
-git_pull_all_branches_fast_forward_only = "Git: {$Pull} All Branches (fast-forward only)"
-git_pull_all_branches_rebase = "Git: {$Pull} All Branches ({$rebase})"
+git_pull_all_branches = "Git: すべてのブランチを{$Pull}"
+git_pull_all_branches_fast_forward_if_possible = "Git: すべてのブランチを{$Pull}（可能なら早送り）"
+git_pull_all_branches_fast_forward_only = "Git: すべてのブランチを{$Pull}（早送りのみ）"
+git_pull_all_branches_rebase = "Git: すべてのブランチを{$Pull}（{$rebase}）"
 sidebar_show_worktrees = { git = "サイドバー: worktree セクションを表示", local = "サイドバー: ワークツリーセクションを表示" }
 refs_open_worktree_in = { git = "Refs: worktree を開く場所...", local = "Refs: ワークツリーを開く場所..." }
 refs_merge_worktree_branch_into = { git = "Refs: worktree のブランチを別のブランチに{$merge}...", local = "Refs: ワークツリーのブランチを別のブランチにマージ..." }
@@ -3810,7 +3810,7 @@ split = "{$commit}の分割"
 markdown_editor = "Markdown エディター（コメント、説明、要約）"
 
 [help_text]
-git_actions_then_pull_all_branches = "{$pull} all branches: {$fetch}, fast-forward every branch that is only behind its upstream, {$pull} the checked-out one (also a row of the {$Pull} ▾)"
+git_actions_then_pull_all_branches = "すべてのブランチを{$pull}：{$fetch}し、アップストリームより遅れているだけのブランチをすべて早送りし、チェックアウト中のブランチを{$pull}します（{$Pull} ▾ の行でもあります）"
 git_actions_then_amend = "選択した{$commit}を修正：概要・説明・作成者の名前・メール・日付を 1 つのポップアップで"
 git_actions_then_edit_author = "選択した{$commit}の作成者（名前・メール・日付）だけを修正"
 rewrite_1 = "履歴書き換えワークベンチを開く：履歴全体または選択範囲の作成者、日付、メッセージ、ファイルの内容、パスを変更"
@@ -5086,53 +5086,53 @@ desc_rebasing = { git = "{branch} を {onto} に{$rebase}中", local = "{branch}
 desc_rebasing_step = { git = "{branch} を {onto} に{$rebase}中 · ステップ {k}/{n}", local = "{branch} を {onto} に{$rebase}中 · ステップ {k}/{n}" }
 
 [link]
-act_pulling_all_branches = "{$pull} all branches..."
+act_pulling_all_branches = "すべてのブランチを{$pull}中..."
 # context: status line after Pull all branches when every branch was already up to date
-pulled_all_nothing = "all branches are up to date"
+pulled_all_nothing = "すべてのブランチが最新です"
 # context: status line after Pull all branches; {n} branches were moved to their upstream
-pulled_all_updated = { one = "updated {n} branch", other = "updated {n} branches" }
+pulled_all_updated = { one = "{n} 個のブランチを更新しました", other = "{n} 個のブランチを更新しました" }
 # context: status line after Pull all branches; {n} branches were updated, {m} were left alone for the reasons in {why}
-pulled_all_updated_skipped = { one = "updated {n} branch, skipped {m} ({why})", other = "updated {n} branches, skipped {m} ({why})" }
+pulled_all_updated_skipped = { one = "{n} 個のブランチを更新し、{m} 個をスキップしました（{why}）", other = "{n} 個のブランチを更新し、{m} 個をスキップしました（{why}）" }
 # context: status line after Pull all branches; nothing moved, {m} branches were left alone for the reasons in {why}
-pulled_all_none_skipped = "nothing updated, skipped {m} ({why})"
+pulled_all_none_skipped = "更新したブランチはありません。{m} 個をスキップしました（{why}）"
 # context: status line after Pull all branches stopped on conflicts in the checked-out branch {branch}; {n} other branches were updated before
-pulled_all_conflict = { one = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branch updated)", other = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branches updated)" }
+pulled_all_conflict = { one = "{branch} で競合しました：通常の{$pull_noun}と同様に、解決するか中止してください（ほか {n} 個のブランチは更新済み）", other = "{branch} で競合しました：通常の{$pull_noun}と同様に、解決するか中止してください（ほか {n} 個のブランチは更新済み）" }
 # context: end of the Pull all branches status line; {summary} is the rest of the line, {remotes} lists the remotes that could not be downloaded
-pulled_all_fetch_failed = "{summary}; {$fetch} failed for {remotes}"
+pulled_all_fetch_failed = "{summary}。{remotes} の{$fetch}に失敗しました"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_diverged = "{n} diverged"
+skip_diverged = "{n} 個が分岐"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_upstream_gone = "{n} with the upstream gone"
+skip_upstream_gone = "{n} 個はアップストリームが無い"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_worktree = "{n} checked out in another worktree"
+skip_worktree = "{n} 個は別のワークツリーでチェックアウト中"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_local_upstream = "{n} tracking a local branch"
+skip_local_upstream = "{n} 個はローカルブランチを追跡"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_not_downloaded = "{n} not downloaded"
+skip_not_downloaded = "{n} 個は未ダウンロード"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_branch_failed = "{n} failed"
+skip_branch_failed = "{n} 個が失敗"
 # context: one Activity Log line of Pull all branches; {branch} moved from {from} to {to}
-pulled_all_line_updated = "{branch}: updated {from} to {to}"
+pulled_all_line_updated = "{branch}：{from} から {to} に更新"
 # context: one Activity Log line of Pull all branches; the branch was already at its upstream
-pulled_all_line_up_to_date = "{branch}: up to date"
+pulled_all_line_up_to_date = "{branch}：最新です"
 # context: one Activity Log line of Pull all branches; the branch has commits its upstream lacks and nothing to pull
-pulled_all_line_ahead = "{branch}: ahead of {upstream}, nothing to {$pull}"
+pulled_all_line_ahead = "{branch}：{upstream} より進んでいます。{$pull}するものはありません"
 # context: one Activity Log line of Pull all branches; neither side contains the other
-pulled_all_line_diverged = "{branch}: diverged from {upstream}, left as it is"
+pulled_all_line_diverged = "{branch}：{upstream} から分岐しています。そのままにしました"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_upstream_gone = "{branch}: {upstream} no longer exists"
+pulled_all_line_upstream_gone = "{branch}：{upstream} はもう存在しません"
 # context: one Activity Log line of Pull all branches; {path} is the other worktree
-pulled_all_line_elsewhere = "{branch}: checked out in {path}, skipped"
+pulled_all_line_elsewhere = "{branch}：{path} でチェックアウト中のためスキップしました"
 # context: one Activity Log line of Pull all branches; {path} is the other worktree that was fast-forwarded
-pulled_all_line_worktree = "{branch}: updated in {path}"
+pulled_all_line_worktree = "{branch}：{path} で更新しました"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_local_upstream = "{branch}: follows the local branch {upstream}, skipped"
+pulled_all_line_local_upstream = "{branch}：ローカルブランチ {upstream} を追跡しているためスキップしました"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_not_downloaded = "{branch}: not downloaded, left as it is"
+pulled_all_line_not_downloaded = "{branch}：未ダウンロードのため、そのままにしました"
 # context: one Activity Log line of Pull all branches; {why} is the reason
-pulled_all_line_failed = "{branch}: failed ({why})"
+pulled_all_line_failed = "{branch}：失敗しました（{why}）"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_conflicted = "{branch}: conflicts, resolve them or abort"
+pulled_all_line_conflicted = "{branch}：競合しました。解決するか中止してください"
 # context: {path} is the folder of the removed worktree
 worktree_removed = "ワークツリー {path} を削除しました"
 worktree_removed_branch_deleted = "ワークツリー {path} を削除し、ブランチ {branch} も削除しました（「元に戻す」でブランチを復元できます）"
@@ -6268,7 +6268,7 @@ keymap_next_card = "次の比較対象の行へ移動"
 help_next_card = "Log のカーソルを次の比較対象の行へ移動（選択は維持）。右ペインのカードをクリックしても同じ"
 
 [activity_log]
-op_pull_all_branches = "{$Pull} all branches"
+op_pull_all_branches = "すべてのブランチを{$Pull}"
 title = "アクティビティログ"
 tab_application = "アプリケーション"
 op_open = "リポジトリを開く"
@@ -6386,8 +6386,8 @@ app_select_first = "先に行を選択してください。クリックするか
 app_no_operation = "この行は操作に紐づいていません。"
 
 [git_error]
-title_pull_all_branches = "{$Pull} all branches failed"
-done_pull_all_branches = "{$Pull} all branches done"
+title_pull_all_branches = "すべてのブランチの{$Pull}に失敗しました"
+done_pull_all_branches = "すべてのブランチの{$Pull}が完了しました"
 summary_host_key = "リモートの SSH ホスト鍵がまだ登録されていません。"
 hint_host_key = "ターミナルで一度 `ssh -T git@<host>` を実行し、フィンガープリントを確認して yes と答えてから、もう一度試してください。または、SSH と認証情報でこのリポジトリ用の known_hosts ファイルを設定してください。"
 title_push = "{$Push}に失敗しました"
@@ -10353,24 +10353,24 @@ gave_up = "{short} は編集されませんでした：ブランチがチェッ�
 
 [branch_sync]
 # context: title of the dialog asked before Pull all branches when a branch is checked out in another worktree
-dlg_title = "{$Pull} all branches"
+dlg_title = "すべてのブランチを{$Pull}"
 # context: question of that dialog; the branches and their worktrees are listed under it
-dlg_question = "These branches are behind and checked out in other worktrees:"
+dlg_question = "次のブランチは遅れていて、別のワークツリーでチェックアウトされています："
 # context: one line of that list; {branch} is a branch, {path} the worktree folder
-row = "{branch}  in  {path}"
+row = "{branch}  （{path}）"
 # context: first answer: also fast-forward the other worktrees
-opt_update = "Update those worktrees too"
+opt_update = "それらのワークツリーも更新する"
 # context: second answer: leave the other worktrees alone
-opt_skip = "Skip them"
+opt_skip = "スキップする"
 # context: third answer: do not run
-opt_cancel = "Cancel"
+opt_cancel = "キャンセル"
 # context: explanation under the highlighted first answer
-detail_update = "Each worktree is fast-forwarded in its own folder. One whose local changes the update would overwrite is left as it is and reported."
+detail_update = "各ワークツリーを、それぞれのフォルダーで早送りします。更新するとローカルの変更が上書きされるものは、そのままにして報告します。"
 # context: explanation under the highlighted second answer
-detail_skip = "They are left as they are and listed as skipped in the summary."
+detail_skip = "そのままにして、まとめにスキップとして表示します。"
 # context: explanation under the highlighted third answer
-detail_cancel = "Nothing is downloaded or changed."
+detail_cancel = "ダウンロードも変更も行いません。"
 # context: key hints of that dialog
-dlg_hint = "Up/Down or 1-3 choose  Enter confirm  Esc cancel"
+dlg_hint = "↑/↓ または 1-3 で選択  Enter 決定  Esc キャンセル"
 # context: last line of the list of that dialog when more branches exist than fit; {n} is how many
-more = "and {n} more"
+more = "ほか {n} 件"

@@ -1788,6 +1788,7 @@ commit コンポーザーでは次のとおりです。
 | ステータスバーの **アクティビティ** | `Ctrl+N Shift+A` |
 | ツールバー：**元に戻す**、**やり直す** | `Ctrl+Z`、`Ctrl+Y` |
 | ツールバー：**Pull** / その `▾` | `Ctrl+G p` / `Git: Pullのオプション...` |
+| **すべてのブランチをPull**（Pull の `▾` の項目） | `Ctrl+G Ctrl+P` |
 | ツールバー：**Push** / その `▾` | `Ctrl+G Shift+P` / `Git: リモートへPush...` |
 | ツールバー：**ブランチ**、**Tag** | `Ctrl+G b`、`Ctrl+G t` |
 | ツールバー：**Stash**、**Pop** | `Ctrl+G Shift+T`、`Ctrl+G o` |

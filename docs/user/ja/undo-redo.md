@@ -158,7 +158,7 @@ Reflog と失われた作業では、左に commit の一覧、右に選択し�
 | commit | commit、amend、reword、AI の commit コンポーザー（そのすべての commit を 1 ステップとして） |
 | ブランチと tag | 作成、削除、名前変更、upstream の設定または解除、追跡ブランチの作成、tag の作成 / 削除 / 注釈付け、fast-forward、pull request のブランチとしての checkout |
 | 移動 | ブランチまたは commit の checkout（detached HEAD を含む） |
-| 履歴 | merge（fast-forward または merge commit）、rebase（通常と対話的、完了後）、cherry-pick、revert、reset（soft、mixed、hard）、pull のローカル部分 |
+| 履歴 | merge（fast-forward または merge commit）、rebase（通常と対話的、完了後）、cherry-pick、revert、reset（soft、mixed、hard）、pull のローカル部分、**すべてのブランチを Pull**（動かしたブランチ全体で 1 つの項目。チェックアウト中のブランチのファイルも一緒に戻ります） |
 | 作業中の変更 | ステージとステージ解除（ファイル、フォルダー、ハンク、行、すべて）、破棄（ファイル、フォルダー、ハンク、行、ファイルの checkout）、パッチまたは commit の変更の適用（`apply-commit`）、**ディスクからのファイルの削除**、**無視**（ファイル、拡張子、フォルダー：選んだ `.gitignore` の行）、**バイナリまたはテキストとして扱う**（`.gitattributes` の行） |
 | stash | push、apply、pop、drop、commit の変更を stash として保存（`stash from-commit`） |
 | リモートと設定 | リモートの追加、削除、名前変更、URL または push URL の変更、Git LFS の track と untrack |

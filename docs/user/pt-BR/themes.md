@@ -262,9 +262,28 @@ inválida é ignorada, uma `base` desconhecida volta para `dark`, e
 `gitpoulpi theme list` reporta cada problema em `warnings` (o aplicativo os mostra
 uma vez na linha de status).
 
-Os arquivos são relidos quando a lista suspensa Tema abre e quando as Configurações fecham;
-não há observador de arquivos. Uma janela em execução aplica um tema definido pela
-CLI na próxima vez que suas Configurações fecharem, como toda outra chave ao vivo.
+Os arquivos são relidos quando a lista suspensa Tema abre e quando as Configurações fecham.
+Uma janela em execução também percebe quando o `config.toml` (um
+`gitpoulpi config set ui.theme ...` feito em um shell) e o arquivo do tema ativo são
+reescritos, e aplica as novas cores em cerca de um segundo, sem reiniciar.
+
+### `ui.border_focused`
+
+A moldura do painel que tem o foco do teclado: o Log, a barra lateral Refs, os painéis
+Staged e Unstaged, os detalhes do commit, os painéis de histórico, revisão e
+reescrita, e as molduras do diff, dos arquivos e do editor. Ela pinta só bordas; texto,
+rótulos e ícones (o rótulo "commit :", o ícone Início, os botões das abas) continuam
+usando `ui.accent`. Isso permite que um tema emoldure o painel ativo com uma cor que
+seria ilegível como texto, por exemplo um amarelo vivo em um tema claro. Quando um tema
+não a define, ela segue `ui.accent` (também em um arquivo do usuário: um arquivo que muda
+só o `accent` leva esse destaque às molduras com foco), então todo tema embutido continua
+com a aparência de antes. Diálogos e popups mantêm uma moldura com a cor de destaque.
+
+```toml
+[ui]
+accent = "#1f5fbf"
+border_focused = "#e7df00"
+```
 
 ## Detecção do sistema
 

@@ -263,6 +263,21 @@ fn read_map(env: &Env, keys: &[String]) -> Result<std::collections::HashMap<Stri
         .collect())
 }
 
+/// `keys` read and the verbs of every class listed, in one registry call.
+#[allow(clippy::type_complexity)]
+fn snapshot(
+    env: &Env,
+    keys: &[String],
+) -> Result<(std::collections::HashMap<String, Read>, Vec<Vec<String>>), String> {
+    let (got, listed) = env.registry.snapshot(keys, &shell_parents())?;
+    let map = keys
+        .iter()
+        .map(|k| k.to_ascii_lowercase())
+        .zip(got)
+        .collect();
+    Ok((map, listed))
+}
+
 fn get<'a>(map: &'a std::collections::HashMap<String, Read>, key: &str) -> &'a Read {
     map.get(&key.to_ascii_lowercase()).unwrap_or(&None)
 }
@@ -270,13 +285,21 @@ fn get<'a>(map: &'a std::collections::HashMap<String, Read>, key: &str) -> &'a R
 /// Our verbs that are not where the settings say: the root verb after a move
 /// into a submenu, a member of another submenu. Relative keys.
 fn strays(env: &Env, lay: &Layout) -> Result<Vec<String>, String> {
-    let mut candidates = Vec::new();
-    // One listing for the three classes: each registry call is a process.
-    let parents: Vec<String> = CLASSES
+    let listed = env.registry.subkeys_many(&shell_parents())?;
+    strays_from(env, lay, listed)
+}
+
+/// The `shell` key of each class: where the verbs are listed.
+fn shell_parents() -> Vec<String> {
+    CLASSES
         .iter()
         .map(|class| full(&format!("{class}\\shell")))
-        .collect();
-    let listed = env.registry.subkeys_many(&parents)?;
+        .collect()
+}
+
+/// [`strays`] from the listing of [`shell_parents`] (one list per class).
+fn strays_from(env: &Env, lay: &Layout, listed: Vec<Vec<String>>) -> Result<Vec<String>, String> {
+    let mut candidates = Vec::new();
     for (class, names) in CLASSES.iter().zip(listed) {
         let wanted = lay.wanted_rel(class).to_ascii_lowercase();
         for name in names {
@@ -362,7 +385,7 @@ fn inspect(env: &Env, label: &str) -> Result<Seen, String> {
     let probe = wanted_keys(&lay, Path::new(""), "", "");
     let mut keys: Vec<String> = probe.iter().map(|(k, _)| k.clone()).collect();
     keys.push(app_key.clone());
-    let got = read_map(env, &keys)?;
+    let (got, listed) = snapshot(env, &keys)?;
     let entry_keys: Vec<String> = CLASSES.iter().map(|c| full(&lay.wanted_rel(c))).collect();
     let at: Vec<&Read> = entry_keys.iter().map(|k| get(&got, k)).collect();
     if at
@@ -375,7 +398,7 @@ fn inspect(env: &Env, label: &str) -> Result<Seen, String> {
             stray: Vec::new(),
         });
     }
-    let stray = strays(env, &lay)?;
+    let stray = strays_from(env, &lay, listed)?;
     let seen = |state: State, got, stray| Ok(Seen { state, got, stray });
     let have = at.iter().any(|g| g.is_some());
     if !have {
@@ -464,8 +487,8 @@ pub(super) fn install(env: &Env, label: &str) -> Result<(), String> {
             .map(|(k, _)| k.clone()),
     );
     keys.push(app_key);
-    let got = read_map(env, &keys)?;
-    let stray = strays(env, &lay)?;
+    let (got, listed) = snapshot(env, &keys)?;
+    let stray = strays_from(env, &lay, listed)?;
     env.registry.apply(&plan(env, label, &got, &stray)?)
 }
 
@@ -1414,6 +1437,21 @@ mod tests {
             self.note("subkeys_many");
             keys.iter().map(|k| self.inner.subkeys(k)).collect()
         }
+        #[allow(clippy::type_complexity)]
+        fn snapshot(
+            &self,
+            keys: &[String],
+            parents: &[String],
+        ) -> Result<(Vec<Option<(Values, bool)>>, Vec<Vec<String>>), String> {
+            self.note("snapshot");
+            Ok((
+                self.inner.read(keys)?,
+                parents
+                    .iter()
+                    .map(|k| self.inner.subkeys(k))
+                    .collect::<Result<_, _>>()?,
+            ))
+        }
         fn apply(&self, ops: &[RegOp]) -> Result<(), String> {
             self.note("apply");
             self.inner.apply(ops)
@@ -1421,7 +1459,7 @@ mod tests {
     }
 
     #[test]
-    fn a_colour_change_is_at_most_three_registry_calls_and_rewrites_only_its_own_icon() {
+    fn a_colour_change_is_at_most_two_registry_calls_and_rewrites_only_its_own_icon() {
         let reg = Counting::new();
         let over = |id: &str, ico: &str| Env {
             registry: reg.clone(),
@@ -1435,9 +1473,10 @@ mod tests {
         let changed = folder_menu::sync(&over(A, "C:/a/gitpoulpi-new.ico"), LABEL).unwrap();
         assert_eq!(changed, [Manager::Explorer]);
         let calls = reg.take();
-        assert!(
-            calls.len() <= 3,
-            "each call is a PowerShell process: {calls:?}"
+        assert_eq!(
+            calls,
+            ["snapshot", "apply"],
+            "each call is a PowerShell process"
         );
 
         // Exactly this installation's three Icon values moved.

@@ -303,6 +303,28 @@ fn credential_helper_line(stderr: &str) -> Option<(&str, bool)> {
     None
 }
 
+/// The phrases (lowercase) with which git or libgit2 says that local changes
+/// are in the way of an operation. The daemon's auto-stash reads them to tell
+/// "blocked by local changes" from any other failure; the backend contract
+/// suite checks that both backends' refusals contain one of them.
+pub const LOCAL_CHANGES_NEEDLES: [&str; 8] = [
+    "would be overwritten",
+    "local changes",
+    "prevent checkout",
+    "prevents checkout",
+    "uncommitted changes",
+    "working tree is not clean",
+    "unstaged changes",
+    "cannot pull with rebase",
+];
+
+/// Whether an error message says local changes are in the way (see
+/// [`LOCAL_CHANGES_NEEDLES`]).
+pub fn is_local_changes_message(message: &str) -> bool {
+    let message = message.to_lowercase();
+    LOCAL_CHANGES_NEEDLES.iter().any(|n| message.contains(n))
+}
+
 /// The last `n` lines of `text`, trimmed of surrounding blank lines.
 pub fn tail_lines(text: &str, n: usize) -> String {
     let lines: Vec<&str> = text.trim().lines().collect();

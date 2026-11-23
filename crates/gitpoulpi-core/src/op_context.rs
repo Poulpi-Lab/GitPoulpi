@@ -244,6 +244,7 @@ pub fn operation_label(kind: OperationKind) -> String {
         K::RemoteGroupStatus => "Remote group status",
         K::RemoteGroupPlan => "Plan a grouped push or pull",
         K::RemoteGroupRun => "Run a grouped push or pull",
+        K::PullAllBranches => "Pull all branches",
         K::TagCreate => "Create tag",
         K::TagDelete => "Delete tag",
         K::TagDeleteRemote => "Delete remote tag",

@@ -129,6 +129,7 @@ const GOLDEN: &[(OperationKind, &str, &str)] = &[
     (K::RepoAuthClear, "", "NONE"),
     (K::RepoAuthTest, "N", "NONE"),
     (K::Pull, "NCJH", "ALL"),
+    (K::PullAllBranches, "NCJ", "ALL"),
     (K::Push, "NS", "ALL"),
     (K::PushForReview, "NS", "ALL"),
     (K::Clone, "N", "ALL"),

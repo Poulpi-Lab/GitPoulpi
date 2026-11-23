@@ -3,6 +3,7 @@ mod auto_resolve;
 mod autostash;
 mod autostash_start_over;
 mod backend;
+mod branch_sync;
 mod cache;
 mod command_trust;
 pub mod conflict_prevention;

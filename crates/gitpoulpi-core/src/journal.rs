@@ -988,7 +988,9 @@ impl Journal {
         let moves_files = entry.effect == Effect::Files
             || matches!(
                 entry.kind,
-                OperationKind::FastForward | OperationKind::FetchRefAsBranch
+                OperationKind::FastForward
+                    | OperationKind::FetchRefAsBranch
+                    | OperationKind::PullAllBranches
             );
         if moves_files {
             if let HeadState::Branch(branch) = &facts.snapshot.head {

@@ -1661,6 +1661,31 @@ pub fn check_fast_forward_of_the_checked_out_branch_keeps_local_changes(backend:
     );
 }
 
+/// The refusal of a fast-forward over local changes reads as "local changes
+/// are in the way" (`gitpoulpi_core::failure::LOCAL_CHANGES_NEEDLES`) on every
+/// backend: the daemon's auto-stash recognises it by those phrases, so a
+/// backend wording it differently would silently disable the auto-stash of
+/// "Pull all branches".
+pub fn check_fast_forward_over_local_changes_reads_as_local_changes(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .commit_file("shared.txt", "one\n", "initial")
+        .branch("feature")
+        .commit_file("shared.txt", "two\n", "feature edits shared")
+        .checkout("main")
+        .build();
+    let repo_ref = repo.repo_ref();
+    let feature = rev(&repo, "feature");
+    std::fs::write(repo.root().join("shared.txt"), "my local edit\n").unwrap();
+
+    let error = backend
+        .fast_forward(&repo_ref, "main", feature)
+        .expect_err("the move would overwrite the local edit");
+    assert!(
+        gitpoulpi_core::failure::is_local_changes_message(&error.to_string()),
+        "not read as local changes: {error}"
+    );
+}
+
 /// A merge commit of `feature` (adds `feature.txt`) into `main` (adds
 /// `main.txt`), made with `--no-ff`.
 fn repo_with_a_merge_commit() -> crate::fixture::FixtureRepo {

@@ -83,6 +83,7 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::WorktreeAdd
         | K::WorktreeRemove
         | K::RemoteGroupRun
+        | K::PullAllBranches
         | K::FlowRun => Family::Branch,
         K::TagCreate
         | K::TagDelete
@@ -579,6 +580,7 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         | K::RemoteGroupStatus
         | K::RemoteGroupPlan
         | K::RemoteGroupRun
+        | K::PullAllBranches
         | K::SparseStatus
         | K::Conflicts
         | K::ConflictEntries

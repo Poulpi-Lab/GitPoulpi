@@ -448,6 +448,7 @@ async fn dispatch_network_authed(
         request.command,
         OperationKind::FetchRefAsBranch
             | OperationKind::Pull
+            | OperationKind::PullAllBranches
             | OperationKind::FlowRun
             | OperationKind::RemoteGroupRun
     ) {

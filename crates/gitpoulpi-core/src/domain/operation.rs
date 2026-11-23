@@ -331,6 +331,14 @@ pub enum OperationKind {
     /// network read, like `RemoteAccessCheck`.
     RepoAuthTest,
     Pull,
+    /// Bring every local branch that tracks an upstream up to date in one
+    /// run (see `domain::branch_sync`): fetch, fast-forward the branches
+    /// that are only behind (never a merge or rebase for those), integrate
+    /// the checked-out branch like `Pull` does, in the mode asked. One
+    /// journal entry covers the moved refs (a conflict on the checked-out
+    /// branch ends the entry before that step: the conflicted pull follows
+    /// `Pull`'s rules). Network.
+    PullAllBranches,
     Push,
     /// Push `HEAD` to `refs/for/<branch>` to open a Gerrit change (see
     /// `GitBackend::push_for_review`). Network, not journaled, not undoable.
@@ -840,6 +848,11 @@ impl OperationKind {
                 .can_conflict()
                 .journaled()
                 .history(),
+            // Fetches, moves refs and integrates the checked-out branch; the
+            // daemon journals it by hand (heads snapshot), so it is not
+            // `history` like `Pull`: a conflict ends its entry before the
+            // pull step, which has its own.
+            K::PullAllBranches => OpTraits::NONE.network().can_conflict().journaled(),
             K::Clone | K::LfsPull | K::LfsLocks => OpTraits::NONE.network(),
             // Reads a remote with the repository's credentials; changes nothing.
             K::RemoteAccessCheck | K::RepoAuthTest => {
@@ -890,7 +903,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 187] = [
+    pub const ALL: [OperationKind; 188] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -1012,6 +1025,7 @@ impl OperationKind {
         OperationKind::RepoAuthClear,
         OperationKind::RepoAuthTest,
         OperationKind::Pull,
+        OperationKind::PullAllBranches,
         OperationKind::Push,
         OperationKind::PushForReview,
         OperationKind::Clone,

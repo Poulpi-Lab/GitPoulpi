@@ -325,6 +325,31 @@ pub(super) fn after_state(
                 label: Some(label),
             })
         }
+        OperationKind::PullAllBranches => {
+            let after =
+                crate::journal_snap::ref_snapshot(backend, repo, &RefScope::heads()).ok()?;
+            let refs = diff_snapshots(before.snapshot.as_ref()?, &after);
+            // The checked-out branch's integration stopped on a conflict:
+            // the repository is mid-merge or mid-rebase (a detached HEAD
+            // then). This entry ends before that step, which has its own
+            // pending entry; HEAD stays what it was.
+            let stopped = git_dir(&repo.root).is_some_and(|d| in_progress(&d).is_some());
+            let head = if stopped {
+                before.head.clone()
+            } else {
+                Some(after.head)
+            };
+            let label = match refs.len() {
+                0 => "Pull all branches".to_string(),
+                n => format!("Pull all branches ({n} updated)"),
+            };
+            Some(After {
+                head,
+                refs,
+                config: Vec::new(),
+                label: Some(label),
+            })
+        }
         OperationKind::Merge
         | OperationKind::CherryPick
         | OperationKind::Revert

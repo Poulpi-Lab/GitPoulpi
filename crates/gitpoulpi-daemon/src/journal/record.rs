@@ -404,7 +404,9 @@ pub fn finish_record(
                 }
                 if matches!(
                     request.command,
-                    OperationKind::FlowRun | OperationKind::RemoteGroupRun
+                    OperationKind::FlowRun
+                        | OperationKind::RemoteGroupRun
+                        | OperationKind::PullAllBranches
                 ) {
                     entry.effect =
                         flow_effect(before.head.as_ref(), after.head.as_ref(), &after.refs);

@@ -231,6 +231,76 @@ async fn a_pull_canceled_while_it_downloads_changes_nothing_and_journals_nothing
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn pull_all_branches_canceled_while_it_downloads_changes_nothing_and_journals_nothing() {
+    let (handle, mut conn) = daemon().await;
+    let repo = behind();
+    let r = repo.repo_ref();
+    let head = repo.git(&["rev-parse", "HEAD"]);
+    let before = journal(&mut conn, &r).await;
+
+    let run = conn
+        .send(Some(&r), OperationKind::PullAllBranches, json!({}))
+        .await;
+    let job = conn
+        .job_where("the run is downloading", |j| {
+            j.kind == OperationKind::PullAllBranches && j.phase.as_deref() == Some("fetch")
+        })
+        .await;
+    assert!(job.not_cancellable.is_none(), "{job:?}");
+
+    let canceled = conn.cancel(job.id).await;
+    assert!(canceled.result.is_ok(), "{canceled:?}");
+    let answer = conn.wait(run).await;
+    assert_eq!(
+        kind_of(&answer),
+        Some(TypedError::Canceled { job: job.id }),
+        "{answer:?}"
+    );
+    assert_eq!(repo.git(&["rev-parse", "HEAD"]), head, "HEAD did not move");
+    assert_eq!(repo.git(&["status", "--porcelain"]).trim(), "");
+    assert_eq!(
+        journal(&mut conn, &r).await,
+        before,
+        "a canceled run records nothing in the undo journal"
+    );
+    handle.shutdown().await.unwrap();
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn pull_all_branches_past_its_point_of_no_return_refuses_cancel_and_completes() {
+    let (handle, mut conn) = daemon().await;
+    let repo = behind();
+    let r = repo.repo_ref();
+    let theirs = repo.git_in_remote(&["rev-parse", "main"]);
+
+    let run = conn
+        .send(Some(&r), OperationKind::PullAllBranches, json!({}))
+        .await;
+    let job = conn
+        .job_where("the run is integrating", |j| {
+            j.kind == OperationKind::PullAllBranches && j.phase.as_deref() == Some("integrate")
+        })
+        .await;
+    assert_eq!(
+        job.not_cancellable,
+        Some(NotCancellableReason::Integrating),
+        "{job:?}"
+    );
+    let refused = conn.cancel(job.id).await;
+    assert_eq!(
+        kind_of(&refused),
+        Some(TypedError::NotCancellable {
+            reason: NotCancellableReason::Integrating
+        }),
+        "{refused:?}"
+    );
+    let answer = conn.wait(run).await;
+    assert!(answer.result.is_ok(), "{answer:?}");
+    assert_eq!(repo.git(&["rev-parse", "HEAD"]).trim(), theirs.trim());
+    handle.shutdown().await.unwrap();
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn a_pull_past_its_point_of_no_return_refuses_cancel_and_completes() {
     let (handle, mut conn) = daemon().await;
     let repo = behind();

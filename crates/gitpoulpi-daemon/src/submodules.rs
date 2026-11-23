@@ -14,7 +14,7 @@ use crate::dispatch::{err_kind, Dispatched};
 
 fn applies(request: &Request) -> bool {
     match request.command {
-        OperationKind::Pull => true,
+        OperationKind::Pull | OperationKind::PullAllBranches => true,
         OperationKind::Checkout => request
             .args
             .get("target")

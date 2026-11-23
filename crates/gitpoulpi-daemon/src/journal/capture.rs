@@ -307,6 +307,27 @@ pub(super) fn capture_before(
             before.scope = Some(scope);
             before.snapshot = Some(snap);
         }
+        // Pull all branches: every local branch tip is read (a snapshot of
+        // the heads, never the remote-tracking refs the fetch moves). Only
+        // the checked-out branch can lose commits (a rebase), so only its tip
+        // is pinned: a fast-forwarded branch's old tip stays reachable from
+        // the new one.
+        OperationKind::PullAllBranches => {
+            let scope = RefScope::heads();
+            let snap = crate::journal_snap::ref_snapshot(backend, repo, &scope)?;
+            match &snap.head {
+                HeadState::Branch(name) => {
+                    let tip = snap.refs.get(&head_ref(name)).copied();
+                    before.refs.push((head_ref(name), tip));
+                    before.pins.extend(tip);
+                }
+                HeadState::Detached(oid) => before.pins.push(*oid),
+            }
+            before.head = Some(snap.head.clone());
+            before.require_head = true;
+            before.scope = Some(scope);
+            before.snapshot = Some(snap);
+        }
         // One entry for the whole run: every ref the plan moves (branches,
         // tags, notes) with its old value, and a pin per distinct old tip,
         // so the whole old history stays reachable through the pins.

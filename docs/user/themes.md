@@ -263,9 +263,28 @@ color is ignored, an unknown `base` falls back to `dark`, and
 `gitpoulpi theme list` reports each problem under `warnings` (the app shows
 them once in the status line).
 
-Files are re-read when the Theme combo opens and when Settings close; there is
-no file watcher. A running window applies a theme set from the CLI the next
-time its Settings close, like every other live key.
+Files are re-read when the Theme combo opens and when Settings close. A
+running window also notices `config.toml` (a `gitpoulpi config set ui.theme ...`
+from a shell) and the active theme's file being rewritten, and applies the new
+colors within about a second, without a restart.
+
+### `ui.border_focused`
+
+The frame of the pane that has the keyboard focus: the Log, the Refs sidebar,
+the Staged and Unstaged panes, the commit detail, the history, review and
+rewrite panes, the diff, file and editor frames. It paints borders only; text,
+labels and icons (the "commit :" label, the Home icon, the tab buttons) keep
+using `ui.accent`. That lets a theme frame the active pane in a color that
+would be unreadable as text, for example a bright yellow on a light theme.
+When a theme does not set it, it follows `ui.accent` (in a user file too: a
+file that changes `accent` alone gets that accent on its focused frames), so
+every built-in theme looks as it did. Dialogs and popups keep an accent frame.
+
+```toml
+[ui]
+accent = "#1f5fbf"
+border_focused = "#e7df00"
+```
 
 ## System detection
 

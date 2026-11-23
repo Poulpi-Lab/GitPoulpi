@@ -144,7 +144,7 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
         .unwrap_or(empty_groups);
 
     let refs_border_style = if focus == Focus::Refs {
-        Style::default().fg(th().ui.accent)
+        Style::default().fg(th().ui.border_focused)
     } else {
         Style::default()
     };

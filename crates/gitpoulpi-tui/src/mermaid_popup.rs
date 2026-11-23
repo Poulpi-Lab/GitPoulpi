@@ -635,7 +635,7 @@ pub(crate) fn render(frame: &mut Frame) {
         .borders(Borders::ALL)
         .border_type(BorderType::Rounded)
         .border_style(Style::default().fg(if focus == Field::Preview {
-            th().ui.accent
+            th().ui.border_focused
         } else {
             th().ui.muted
         }))

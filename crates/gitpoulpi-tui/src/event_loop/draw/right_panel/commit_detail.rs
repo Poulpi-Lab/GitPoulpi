@@ -64,7 +64,7 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
     // pane; a meta half that is always ACCENT makes the selection look
     // half-applied.
     let detail_border_style = if commit_file_focus {
-        Style::default().fg(th().ui.accent)
+        Style::default().fg(th().ui.border_focused)
     } else {
         Style::default()
     };

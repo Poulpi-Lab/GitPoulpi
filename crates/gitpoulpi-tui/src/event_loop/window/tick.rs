@@ -80,6 +80,8 @@ impl WindowState {
         }
         // `workspaces.toml` edited from a shell or the CLI.
         crate::workspace_ui::watch::poll(&self.session);
+        // `config.toml` or the active user theme file edited from outside.
+        crate::theme_watch::poll();
         self.agent_view_tick();
         // What the Radar asked of this repository's window.
         #[cfg(feature = "hosting")]

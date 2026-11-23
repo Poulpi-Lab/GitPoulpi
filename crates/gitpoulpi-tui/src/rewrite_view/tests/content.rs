@@ -3,6 +3,19 @@
 
 use super::render::{paint, previewed, rect_of, row, text};
 use super::*;
+/// The focused pane's frame is `ui.border_focused`, not `ui.accent`.
+#[test]
+fn a_focused_rewrite_pane_is_framed_in_border_focused() {
+    let mut theme = crate::theme::Theme::dark();
+    theme.ui.accent = ratatui::style::Color::Rgb(1, 2, 3);
+    theme.ui.border_focused = ratatui::style::Color::Rgb(231, 223, 0);
+    let _guard = crate::theme::override_theme(&theme);
+    let area = ratatui::layout::Rect::new(0, 0, 20, 5);
+    let mut buf = ratatui::buffer::Buffer::empty(area);
+    super::super::render::pane(&mut buf, area, "Plan", true);
+    assert_eq!(buf[(0, 0)].fg, theme.ui.border_focused);
+}
+
 use crate::daemon_link::Reply;
 use gitpoulpi_core::domain::rewrite::{
     BlobChange, BlobChangeKind, BlobHunk, BlobLine, BlobLineKind, PathChange, PruneEmpty,

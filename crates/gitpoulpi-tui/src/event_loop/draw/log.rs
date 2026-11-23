@@ -460,7 +460,7 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
         },
     };
     let log_border_style = if focus == Focus::Log {
-        Style::default().fg(th().ui.accent)
+        Style::default().fg(th().ui.border_focused)
     } else {
         Style::default()
     };

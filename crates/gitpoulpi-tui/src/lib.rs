@@ -370,6 +370,7 @@ mod tag_where_ui;
 mod test_support;
 mod theme;
 mod theme_picker;
+mod theme_watch;
 mod tooltip;
 mod tree_fold;
 #[cfg_attr(not(feature = "hosting"), path = "trust_dialog_stub.rs")]

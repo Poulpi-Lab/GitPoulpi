@@ -88,7 +88,7 @@ pub(crate) fn render_list(
         .border_type(BorderType::Rounded)
         .borders(Borders::ALL)
         .border_style(Style::default().fg(if focused {
-            th().ui.accent
+            th().ui.border_focused
         } else {
             th().ui.border
         }));

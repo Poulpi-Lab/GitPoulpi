@@ -37,7 +37,7 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
     // `Unstaged Files` and `Staged Files` are two real sub-panes (own border,
     // chevron+count title and scroll), shaped like the Refs sidebar's sections.
     let status_border_style = if focus == Focus::Status {
-        Style::default().fg(th().ui.accent)
+        Style::default().fg(th().ui.border_focused)
     } else {
         Style::default()
     };

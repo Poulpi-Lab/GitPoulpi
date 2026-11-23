@@ -85,7 +85,7 @@ fn policy_for(kind: OperationKind) -> Policy {
         K::Clone => Policy::Clone,
         // A pull is a download (`fetch`) then an integrate that rewrites the
         // index and the working tree: stoppable until the integrate starts.
-        K::Pull => Policy::UntilPoint(NotCancellableReason::Integrating),
+        K::Pull | K::PullAllBranches => Policy::UntilPoint(NotCancellableReason::Integrating),
         // `git lfs fetch` then the checkout of the real files.
         K::LfsPull => Policy::UntilPoint(NotCancellableReason::RewritingFiles),
         K::LfsCheckout => Policy::QueuedOnly(NotCancellableReason::RewritingFiles),
@@ -132,6 +132,7 @@ fn label_for(request: &Request) -> String {
         K::RemoteAccessCheck => format!("Testing the connection to {remote}"),
         K::RepoAuthTest => "Testing the connection of every remote".into(),
         K::Pull => "Pulling".into(),
+        K::PullAllBranches => "Pulling all branches".into(),
         K::Push => {
             let branch = request
                 .args
@@ -220,6 +221,7 @@ fn dedupe_for(request: &Request) -> Dedupe {
         | K::FetchRefspec
         | K::RemoteGroupPlan
         | K::Pull
+        | K::PullAllBranches
         | K::Push
         | K::PushForReview
         | K::LfsFetch

@@ -50,6 +50,11 @@ gitpoulpi --json branch upstream list      # a branch's primary upstream + extra
 gitpoulpi --json branch upstream add gitlab[:dst] [--pull]   # extra push target (also remove, pull <r> --on|--off, primary <r/b>); undoable; exit 2 = refused
 gitpoulpi --json checkout feature --autostash
 gitpoulpi --json pull --mode ff-only
+gitpoulpi --json pull --all-branches [--mode merge|ff-only|rebase] [--no-fetch] [--prune] [--worktrees skip|update]
+                                            # every branch with an upstream: fetch, fast-forward the behind ones (never merge/rebase for
+                                            # those), integrate the checked-out one in --mode; {fetched, fetch_failed, branches:[{branch,
+                                            # status, from, to, ...}], head_mode}; one undo entry; exit 4 = a branch/fetch failed, 2 = refused
+                                            # (needs_autostash: pass --autostash); diverged branches are skipped, not an error
 gitpoulpi --json push -u
 gitpoulpi --json push --all-targets         # primary + extra push targets: plans, runs when every remote is a plain push (exit 0);
                                             # exit 3 {"needs_resolution": {plan}} = nothing changed, decide per remote:

@@ -57,6 +57,7 @@ fn blocked_word(request: &Request) -> Option<&'static str> {
         OperationKind::Merge => "merge",
         OperationKind::Rebase | OperationKind::RebaseInteractive => "rebase",
         OperationKind::Pull => "pull",
+        OperationKind::PullAllBranches => "pull all branches",
         OperationKind::FastForward => "fast-forward",
         OperationKind::CherryPick => "cherry-pick",
         OperationKind::Revert => "revert",
@@ -321,6 +322,7 @@ fn operation_word(request: &Request) -> Option<&'static str> {
         OperationKind::Merge => Some("merge"),
         OperationKind::Rebase => Some("rebase"),
         OperationKind::Pull => Some("pull"),
+        OperationKind::PullAllBranches => Some("pull all branches"),
         OperationKind::FlowRun => Some("workflow action"),
         OperationKind::RemoteGroupRun => Some("grouped push or pull"),
         _ => None,
@@ -356,19 +358,7 @@ fn blocked_by_local_changes(dispatched: &Dispatched) -> bool {
     if error.kind.is_some() {
         return false;
     }
-    let message = error.message.to_lowercase();
-    [
-        "would be overwritten",
-        "local changes",
-        "prevent checkout",
-        "prevents checkout",
-        "uncommitted changes",
-        "working tree is not clean",
-        "unstaged changes",
-        "cannot pull with rebase",
-    ]
-    .iter()
-    .any(|needle| message.contains(needle))
+    gitpoulpi_core::failure::is_local_changes_message(&error.message)
 }
 
 /// What `git stash` would take (repo-relative, `/`-separated), `None` when

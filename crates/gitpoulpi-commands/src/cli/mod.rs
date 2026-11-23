@@ -44,9 +44,9 @@ pub use refs_misc::WorktreeAction;
 pub use refs_misc::{
     AliasAction, AutoStashAction, BranchAction, ConfigAction, DaemonAction, DesktopAction,
     FolderMenuAction, InstallationAction, OnOff, PatchAction, PathAction, PullModeArg,
-    ReflogModeArg, RefsAction, RemoteAction, RemoteGroupAction, RepoAction, RepoConfigAction,
-    ResetModeArg, ReviewFlags, RunInRepoArg, SessionAction, ShortcutAction, SparseAction,
-    SshCommandAction, StashAction, TagAction, ThemeAction, UpstreamAction,
+    PullWorktreesArg, ReflogModeArg, RefsAction, RemoteAction, RemoteGroupAction, RepoAction,
+    RepoConfigAction, ResetModeArg, ReviewFlags, RunInRepoArg, SessionAction, ShortcutAction,
+    SparseAction, SshCommandAction, StashAction, TagAction, ThemeAction, UpstreamAction,
 };
 pub use repo_auth::RepoAuthAction;
 #[cfg(feature = "history-rewrite")]
@@ -930,12 +930,36 @@ pub enum Commands {
         remote: Option<String>,
         /// How to integrate: `merge` (fast-forward if possible), `ff-only`
         /// or `rebase`. Always passed to git explicitly.
-        #[arg(long, value_enum, default_value = "merge")]
-        mode: PullModeArg,
+        #[arg(long, value_enum)]
+        mode: Option<PullModeArg>,
         /// Stash local changes that block this, run it, then pop the
         /// stash (what `general.auto_stash = "always"` does).
         #[arg(long)]
         autostash: bool,
+        /// Pull every local branch that has an upstream: fetches their
+        /// remotes, fast-forwards the branches that are only behind (never a
+        /// merge or rebase for those), then integrates the checked-out branch
+        /// like a plain pull, in `--mode` (default: the configured pull
+        /// mode). Diverged branches are skipped and reported. A conflict on
+        /// the checked-out branch leaves the state a conflicting pull leaves,
+        /// the other branches already updated. One undo entry covers the
+        /// moved branches. Exit code 4: a branch or a fetch failed; 2:
+        /// refused (an auto-stash is pending or needed)
+        #[arg(long, conflicts_with_all = ["remote", "all_sources"])]
+        all_branches: bool,
+        /// With `--all-branches`: do not fetch first, use the remote-tracking
+        /// branches as they are
+        #[arg(long, requires = "all_branches")]
+        no_fetch: bool,
+        /// With `--all-branches`: drop the remote-tracking branches the
+        /// remote no longer has while fetching
+        #[arg(long, requires = "all_branches")]
+        prune: bool,
+        /// With `--all-branches`: what to do with a behind branch checked out
+        /// in another worktree: `skip` (default) reports it, `update`
+        /// fast-forwards it there
+        #[arg(long, value_enum, requires = "all_branches")]
+        worktrees: Option<PullWorktreesArg>,
         /// Pull the primary upstream and every pull source of the branch
         /// (see `branch upstream pull`), each with `--mode`. Plans first:
         /// anything but a fast-forward or the mode's own integration asks

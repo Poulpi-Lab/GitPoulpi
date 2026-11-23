@@ -44,7 +44,10 @@ pub(crate) fn run(
 ) {
     if !matches!(
         operation,
-        OperationKind::Pull | OperationKind::Push | OperationKind::RewritePush
+        OperationKind::Pull
+            | OperationKind::PullAllBranches
+            | OperationKind::Push
+            | OperationKind::RewritePush
     ) || !wanted(repo)
     {
         return;
@@ -56,7 +59,7 @@ pub(crate) fn run(
         return;
     }
     let missing = match operation {
-        OperationKind::Pull => !status.filters_configured,
+        OperationKind::Pull | OperationKind::PullAllBranches => !status.filters_configured,
         _ => !status.hooks_installed,
     };
     if missing

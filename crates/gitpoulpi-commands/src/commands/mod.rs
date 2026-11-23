@@ -39,6 +39,7 @@ mod lfs;
 #[cfg(feature = "mermaid")]
 mod log_mermaid;
 mod mailmap;
+mod pull_all;
 mod rebase;
 mod refs;
 mod remote;
@@ -1347,6 +1348,27 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
         }
 
         Commands::Pull {
+            all_branches: true,
+            mode,
+            autostash,
+            no_fetch,
+            prune,
+            worktrees,
+            ..
+        } => {
+            pull_all::pull_all_branches(
+                session,
+                pull_all::AllBranches {
+                    mode,
+                    no_fetch,
+                    prune,
+                    worktrees,
+                    autostash,
+                },
+            )
+            .await
+        }
+        Commands::Pull {
             all_sources: true,
             mode,
             autostash,
@@ -1366,7 +1388,7 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
                     tags: false,
                     yes: false,
                     autostash,
-                    pull_mode: Some(mode),
+                    pull_mode: Some(mode.unwrap_or(PullModeArg::Merge)),
                 },
             )
             .await
@@ -1378,7 +1400,7 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
             ..
         } => {
             let opts = PullOptions {
-                mode: match mode {
+                mode: match mode.unwrap_or(PullModeArg::Merge) {
                     PullModeArg::Merge => PullMode::Merge,
                     PullModeArg::FfOnly => PullMode::FastForwardOnly,
                     PullModeArg::Rebase => PullMode::Rebase,

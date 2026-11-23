@@ -87,6 +87,7 @@ const WITHOUT_WORDS: &[K] = &[
     K::ApplyCommit,
     K::RemoteGroupPlan,
     K::RemoteGroupRun,
+    K::PullAllBranches,
     K::StashFromCommit,
     K::Init,
     K::Fetch,

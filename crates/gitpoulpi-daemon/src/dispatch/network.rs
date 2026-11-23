@@ -150,6 +150,7 @@ pub(super) async fn dispatch_network_plain(
             .await;
             to_json!(pulled)
         }
+        OperationKind::PullAllBranches => crate::branch_sync::run(backend, request, &repo).await,
         OperationKind::Push => {
             let remote: String = arg_or_err!(args, "remote", request.id);
             let opts: PushOptions = args

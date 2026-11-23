@@ -1,5 +1,6 @@
 mod amend;
 pub mod b64;
+mod branch_sync;
 mod change_scope;
 mod conflict;
 pub mod conflict_prevention;
@@ -36,6 +37,11 @@ mod undo;
 mod worktree;
 
 pub use amend::{parse_git_date, CommitAmend, GitDate, ResolvedAmend};
+pub use branch_sync::{
+    plan as plan_branch_sync, BranchFacts, BranchSyncItem, BranchSyncStatus, PlannedAction,
+    PlannedBranch, PullAllBranchesOutcome, PullAllBranchesRequest, RemoteFetchFailure,
+    UpstreamFacts, UpstreamKind, WorktreePolicy,
+};
 pub use change_scope::ChangeScope;
 pub use conflict::{
     encode_text, ConflictEntry, ConflictKind, ConflictRefusal, ConflictResolution, ConflictSet,

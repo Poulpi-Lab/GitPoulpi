@@ -460,6 +460,7 @@ macro_rules! for_each_contract_check {
             check_fast_forward_of_the_checked_out_branch_updates_the_working_tree,
             check_fast_forward_refuses_diverged_and_elsewhere_checked_out_branches,
             check_fast_forward_of_the_checked_out_branch_keeps_local_changes,
+            check_fast_forward_over_local_changes_reads_as_local_changes,
             check_patch_create_from_a_commit_round_trips_through_apply,
             check_patch_create_from_a_range_applies_both_commits_to_the_same_file,
             check_patch_create_from_the_working_tree_covers_staged_and_unstaged_only,

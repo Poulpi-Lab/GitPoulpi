@@ -27,7 +27,8 @@ fn the_inno_script_installs_the_archives_files_under_the_expected_name() {
             "{exe} is not installed by the script"
         );
     }
-    assert!(iss.contains(&format!(
+    // The marker is not copied from the archive: the script writes it.
+    assert!(!iss.contains(&format!(
         "{{#SourceDir}}\\{}",
         gitpoulpi_config::release::MARKER_FILE
     )));
@@ -101,7 +102,7 @@ fn the_inno_script_writes_the_channel_marker_after_the_copy() {
     // The channel comes from /CHANNEL=, else from the privileges the user chose.
     assert!(iss.contains("{param:CHANNEL|}"));
     assert!(iss.contains("{param:FEED|}"));
-    assert!(iss.contains("CurStep = ssPostInstall"));
+    assert!(iss.contains("CurStep = ssInstall"));
     assert!(iss.contains("IsAdminInstallMode"));
     for channel in ["inno-user", "inno-machine"] {
         assert_channel(channel);
@@ -119,6 +120,70 @@ fn the_inno_script_writes_the_channel_marker_after_the_copy() {
         assert!(!read(file).contains("NOSELFUPDATE"), "{file}");
     }
     assert!(iss.contains("gitpoulpi-updater.exe"));
+}
+
+/// The launcher names come from the channel in the marker (`GitPoulpi
+/// (Chocolatey)`), so every command that names an installation (`desktop`,
+/// `alias`, `path`) must run after the marker holds the final channel. Inno
+/// runs its `[Run]` entries after the `ssInstall` step has copied the files and
+/// before `ssPostInstall`, so the marker has to be written at the start of
+/// `ssInstall`, and the archive's own marker (channel=archive) never copied.
+#[test]
+fn the_inno_marker_holds_its_final_channel_before_any_command_names_an_installation() {
+    let iss = read("packaging/windows/gitpoulpi.iss");
+    let (head, code) = iss.split_once("\n[Code]").expect("a [Code] section");
+    // The marker is not a [Files] entry: a copy would bring channel=archive.
+    let files = head
+        .split("\n[Files]")
+        .nth(1)
+        .and_then(|s| s.split("\n[").next())
+        .expect("a [Files] section");
+    assert!(
+        !files.contains(".gitpoulpi-dist"),
+        "the archive's marker is copied, then rewritten after the commands ran"
+    );
+    // Written when the install step starts, never after it (ssPostInstall
+    // comes after the [Run] entries).
+    assert!(!code.contains("ssPostInstall"), "marker written too late");
+    let step = code
+        .split("procedure CurStepChanged")
+        .nth(1)
+        .expect("CurStepChanged");
+    let at_install = step
+        .find("CurStep = ssInstall")
+        .expect("the ssInstall step");
+    assert!(
+        step[at_install..].contains("WriteMarker"),
+        "WriteMarker runs at ssInstall"
+    );
+    // No command of the installer names an installation from [Code].
+    for cmd in ["desktop shortcut", "alias create", "path add"] {
+        assert!(!code.contains(cmd), "`{cmd}` runs from [Code]");
+    }
+    // The commands that do are [Run] entries, which Inno starts after the
+    // install step: none may be a `postinstall` checkbox run or `before*`.
+    let run = head.split("\n[Run]").nth(1).expect("a [Run] section");
+    let run = run.split("\n[").next().unwrap();
+    for line in run.lines().filter(|l| {
+        ["desktop ", "alias ", "path "]
+            .iter()
+            .any(|c| l.contains(&format!("Parameters: \"{c}")))
+    }) {
+        assert!(!line.contains("postinstall"), "{line}");
+    }
+}
+
+/// The MSI carries its marker (channel msi) as a file and runs no command that
+/// names an installation at install time, only the uninstall one: there is no
+/// order to get wrong, and this keeps it that way.
+#[test]
+fn the_msi_runs_no_installation_naming_command_at_install_time() {
+    let wxs = read("packaging/msi/gitpoulpi.wxs");
+    for cmd in ["desktop shortcut", "alias create", "path add", "desktop "] {
+        assert!(!wxs.contains(cmd), "the MSI runs `{cmd}`");
+    }
+    assert!(wxs.contains("uninstall --keep-files"));
+    assert!(wxs.contains("Name=\".gitpoulpi-dist\" Source=\"$(MarkerFile)\""));
 }
 
 /// XML forbids `--` inside a comment (WiX refuses the file with WIX0104), and only the Windows release job builds

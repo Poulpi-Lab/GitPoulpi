@@ -184,7 +184,7 @@ Per impostazione predefinita, una riga sotto i pannelli e sopra la barra di stat
 | Pulsante | Cosa fa |
 |---|---|
 | **Annulla**, **Ripeti** | Annullano o ripristinano l'ultima operazione (`Ctrl+Z`, `Ctrl+Y`). Nascosti quando Annulla è disattivato. Vedi [Annulla e ripeti](undo-redo.md). |
-| **Pull** `▾` | Fa il pull come stabilito da **Impostazioni > Git e codifica > Pulsante Pull**. L'elenco `▾` ha **Fetch All**, **Pull (fast-forward se possibile)**, **Pull (solo fast-forward)** e **Pull (rebase)**. Una voce dell'elenco agisce una volta sola e non cambia il pulsante. |
+| **Pull** `▾` | Fa il pull come stabilito da **Impostazioni > Git e codifica > Pulsante Pull**. L'elenco `▾` ha **Fetch All**, **Pull (fast-forward se possibile)**, **Pull (solo fast-forward)** e **Pull (rebase)**, poi **Pull tutti i branch** (`Ctrl+G Ctrl+P`) e lo stesso con ciascun altro modo per il branch attivo. Una voce dell'elenco agisce una volta sola e non cambia il pulsante. |
 | **Push** `▾` | Fa il push del branch attivo. L'elenco `▾` fa il push una volta sola verso il remoto che scegli. |
 | **Branch** | Crea un branch sul commit attivo. |
 | **Tag** | Crea un tag sul commit attivo. |

@@ -2151,23 +2151,23 @@ not_a_file = "{path} non è un file"
 
 [remotes]
 # context: row of the Pull dropdown: fetch, then bring every local branch up to its upstream; the checked-out one follows the mode of the Pull button
-pull_all_branches = "{$Pull} all branches"
+pull_all_branches = "{$Pull} tutti i branch"
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is fast-forwarded, or merged when it has diverged
-pull_all_branches_merge = "{$Pull} all branches (fast-forward if possible)"
+pull_all_branches_merge = { git = "{$Pull} tutti i branch (fast-forward se possibile)", local = "{$Pull} tutti i branch (avanzamento rapido se possibile)" }
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is only fast-forwarded
-pull_all_branches_ff_only = "{$Pull} all branches (fast-forward only)"
+pull_all_branches_ff_only = { git = "{$Pull} tutti i branch (solo fast-forward)", local = "{$Pull} tutti i branch (solo avanzamento rapido)" }
 # context: row of the Pull dropdown: like the row above, but the checked-out branch is rebased onto its upstream
-pull_all_branches_rebase = "{$Pull} all branches ({$rebase})"
+pull_all_branches_rebase = "{$Pull} tutti i branch ({$rebase})"
 # context: tooltip of the "Pull all branches" row
-tip_pull_all_branches = "{$Fetch} from the remotes, then fast-forward every local branch that is only behind its upstream. The checked-out branch follows the mode of the {$Pull} button; a diverged branch is left alone and reported."
+tip_pull_all_branches = { git = "{$Fetch} dai remoti, poi fast-forward di ogni branch locale che è solo indietro rispetto al suo upstream. Il branch corrente segue la modalità del pulsante {$Pull}; un branch divergente viene lasciato com'è e segnalato.", local = "{$Fetch} dai remoti, poi avanzamento rapido di ogni branch locale che è solo indietro rispetto al suo upstream. Il branch corrente segue la modalità del pulsante {$Pull}; un branch divergente viene lasciato com'è e segnalato." }
 # context: tooltip of the "Pull all branches (fast-forward if possible)" row
-tip_pull_all_branches_merge = "Like {$Pull} all branches, but the checked-out branch is fast-forwarded, or gets a {$merge} when it has diverged."
+tip_pull_all_branches_merge = { git = "Come {$Pull} tutti i branch, ma il branch corrente avanza con un fast-forward, oppure riceve un {$merge} se è divergente.", local = "Come {$Pull} tutti i branch, ma il branch corrente avanza in modo rapido, oppure riceve un {$merge} se è divergente." }
 # context: tooltip of the "Pull all branches (fast-forward only)" row
-tip_pull_all_branches_ff_only = "Like {$Pull} all branches, but the checked-out branch is only fast-forwarded; when it has diverged it is left as it is."
+tip_pull_all_branches_ff_only = { git = "Come {$Pull} tutti i branch, ma il branch corrente avanza solo con un fast-forward; se è divergente viene lasciato com'è.", local = "Come {$Pull} tutti i branch, ma il branch corrente avanza solo in modo rapido; se è divergente viene lasciato com'è." }
 # context: tooltip of the "Pull all branches (rebase)" row
-tip_pull_all_branches_rebase = "Like {$Pull} all branches, but the checked-out branch is moved onto its upstream with a {$rebase}."
+tip_pull_all_branches_rebase = "Come {$Pull} tutti i branch, ma il branch corrente viene spostato sul suo upstream con un {$rebase}."
 # context: status line while "Pull all branches" runs
-pulling_all_branches = "Pulling all branches..."
+pulling_all_branches = "{$pull_noun} di tutti i branch..."
 menu_title = "remoto {name}"
 fetch_remote = "{$Fetch} {name}"
 copy_name = "Copia il nome del remoto"
@@ -2285,7 +2285,7 @@ pulling_from_all = { git = "pull di {branch} da {remotes}...", local = "scaricam
 no_pull_remote = "{branch} non ha alcun remoto da cui fare {$pull}"
 
 [keymap_action]
-git_prefix_pull_all_branches = "{$Pull} All Branches"
+git_prefix_pull_all_branches = "{$Pull} tutti i branch"
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
 global_commit_column = "Mostra o nascondi la colonna dei {$commits}"
 git_prefix_amend = "Modifica il {$commit} selezionato"
@@ -2998,10 +2998,10 @@ action_issue_body = "Descrizione della issue"
 title_hosting_base = "Prompt di base per le risposte"
 
 [palette]
-git_pull_all_branches = "Git: {$Pull} All Branches"
-git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} All Branches (fast-forward if possible)"
-git_pull_all_branches_fast_forward_only = "Git: {$Pull} All Branches (fast-forward only)"
-git_pull_all_branches_rebase = "Git: {$Pull} All Branches ({$rebase})"
+git_pull_all_branches = "Git: {$Pull} tutti i branch"
+git_pull_all_branches_fast_forward_if_possible = { git = "Git: {$Pull} tutti i branch (fast-forward se possibile)", local = "Git: {$Pull} tutti i branch (avanzamento rapido se possibile)" }
+git_pull_all_branches_fast_forward_only = { git = "Git: {$Pull} tutti i branch (solo fast-forward)", local = "Git: {$Pull} tutti i branch (solo avanzamento rapido)" }
+git_pull_all_branches_rebase = "Git: {$Pull} tutti i branch ({$rebase})"
 sidebar_show_worktrees = "Barra laterale: Mostra la sezione Worktrees"
 refs_open_worktree_in = "Refs: Apri il worktree in..."
 refs_merge_worktree_branch_into = { git = "Refs: Merge del branch del worktree in...", local = "Refs: Unisci il branch dell'albero di lavoro in..." }
@@ -3809,7 +3809,7 @@ split = "Dividi un {$commit}"
 markdown_editor = "Editor Markdown (commenti, descrizioni, riepiloghi)"
 
 [help_text]
-git_actions_then_pull_all_branches = "{$pull} all branches: {$fetch}, fast-forward every branch that is only behind its upstream, {$pull} the checked-out one (also a row of the {$Pull} ▾)"
+git_actions_then_pull_all_branches = { git = "{$pull} tutti i branch: {$fetch}, fast-forward di ogni branch che è solo indietro rispetto al suo upstream, poi {$pull} il branch corrente (anche una voce di {$Pull} ▾)", local = "{$pull} tutti i branch: {$fetch}, avanzamento rapido di ogni branch che è solo indietro rispetto al suo upstream, poi {$pull} il branch corrente (anche una voce di {$Pull} ▾)" }
 git_actions_then_amend = "modifica il {$commit} selezionato: riepilogo, descrizione, nome, e-mail e data dell'autore in un'unica finestra"
 git_actions_then_edit_author = "modifica solo l'autore del {$commit} selezionato (nome, e-mail, data)"
 rewrite_1 = "apre il pannello di riscrittura della cronologia: cambia autori, date, messaggi, contenuto o percorsi dei file su tutta la cronologia o su una selezione"
@@ -5085,53 +5085,53 @@ desc_rebasing = { git = "rebase di {branch} su {onto}", local = "ribasamento di 
 desc_rebasing_step = { git = "rebase di {branch} su {onto} · passo {k}/{n}", local = "ribasamento di {branch} su {onto} · passo {k}/{n}" }
 
 [link]
-act_pulling_all_branches = "{$pull} all branches..."
+act_pulling_all_branches = "{$pull} tutti i branch..."
 # context: status line after Pull all branches when every branch was already up to date
-pulled_all_nothing = "all branches are up to date"
+pulled_all_nothing = "tutti i branch sono aggiornati"
 # context: status line after Pull all branches; {n} branches were moved to their upstream
-pulled_all_updated = { one = "updated {n} branch", other = "updated {n} branches" }
+pulled_all_updated = { one = "aggiornato {n} branch", other = "aggiornati {n} branch" }
 # context: status line after Pull all branches; {n} branches were updated, {m} were left alone for the reasons in {why}
-pulled_all_updated_skipped = { one = "updated {n} branch, skipped {m} ({why})", other = "updated {n} branches, skipped {m} ({why})" }
+pulled_all_updated_skipped = { one = "aggiornato {n} branch, saltati: {m} ({why})", other = "aggiornati {n} branch, saltati: {m} ({why})" }
 # context: status line after Pull all branches; nothing moved, {m} branches were left alone for the reasons in {why}
-pulled_all_none_skipped = "nothing updated, skipped {m} ({why})"
+pulled_all_none_skipped = "nessun branch aggiornato, saltati: {m} ({why})"
 # context: status line after Pull all branches stopped on conflicts in the checked-out branch {branch}; {n} other branches were updated before
-pulled_all_conflict = { one = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branch updated)", other = "conflicts on {branch}: resolve them or abort, as for a normal {$pull_noun} ({n} other branches updated)" }
+pulled_all_conflict = { one = "conflitti su {branch}: risolvili o interrompi, come per un normale {$pull_noun} ({n} altro branch aggiornato)", other = "conflitti su {branch}: risolvili o interrompi, come per un normale {$pull_noun} ({n} altri branch aggiornati)" }
 # context: end of the Pull all branches status line; {summary} is the rest of the line, {remotes} lists the remotes that could not be downloaded
-pulled_all_fetch_failed = "{summary}; {$fetch} failed for {remotes}"
+pulled_all_fetch_failed = "{summary}; {$fetch} non riuscito per {remotes}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_diverged = "{n} diverged"
+skip_diverged = "divergenti: {n}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_upstream_gone = "{n} with the upstream gone"
+skip_upstream_gone = "upstream non più esistente: {n}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_worktree = "{n} checked out in another worktree"
+skip_worktree = "in un altro worktree: {n}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_local_upstream = "{n} tracking a local branch"
+skip_local_upstream = "che seguono un branch locale: {n}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_not_downloaded = "{n} not downloaded"
+skip_not_downloaded = "non scaricati: {n}"
 # context: reason a branch was left alone by Pull all branches, with a count
-skip_branch_failed = "{n} failed"
+skip_branch_failed = "non riusciti: {n}"
 # context: one Activity Log line of Pull all branches; {branch} moved from {from} to {to}
-pulled_all_line_updated = "{branch}: updated {from} to {to}"
+pulled_all_line_updated = "{branch}: aggiornato da {from} a {to}"
 # context: one Activity Log line of Pull all branches; the branch was already at its upstream
-pulled_all_line_up_to_date = "{branch}: up to date"
+pulled_all_line_up_to_date = "{branch}: aggiornato"
 # context: one Activity Log line of Pull all branches; the branch has commits its upstream lacks and nothing to pull
-pulled_all_line_ahead = "{branch}: ahead of {upstream}, nothing to {$pull}"
+pulled_all_line_ahead = { git = "{branch}: ahead di {upstream}, nessun {$pull_noun} da fare", local = "{branch}: in avanti rispetto a {upstream}, nessun {$pull_noun} da fare" }
 # context: one Activity Log line of Pull all branches; neither side contains the other
-pulled_all_line_diverged = "{branch}: diverged from {upstream}, left as it is"
+pulled_all_line_diverged = "{branch}: divergente da {upstream}, lasciato com'è"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_upstream_gone = "{branch}: {upstream} no longer exists"
+pulled_all_line_upstream_gone = "{branch}: {upstream} non esiste più"
 # context: one Activity Log line of Pull all branches; {path} is the other worktree
-pulled_all_line_elsewhere = "{branch}: checked out in {path}, skipped"
+pulled_all_line_elsewhere = "{branch}: checkout eseguito in {path}, saltato"
 # context: one Activity Log line of Pull all branches; {path} is the other worktree that was fast-forwarded
-pulled_all_line_worktree = "{branch}: updated in {path}"
+pulled_all_line_worktree = "{branch}: aggiornato in {path}"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_local_upstream = "{branch}: follows the local branch {upstream}, skipped"
+pulled_all_line_local_upstream = "{branch}: segue il branch locale {upstream}, saltato"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_not_downloaded = "{branch}: not downloaded, left as it is"
+pulled_all_line_not_downloaded = "{branch}: non scaricato, lasciato com'è"
 # context: one Activity Log line of Pull all branches; {why} is the reason
-pulled_all_line_failed = "{branch}: failed ({why})"
+pulled_all_line_failed = "{branch}: non riuscito ({why})"
 # context: one Activity Log line of Pull all branches
-pulled_all_line_conflicted = "{branch}: conflicts, resolve them or abort"
+pulled_all_line_conflicted = "{branch}: conflitti, risolvili o interrompi"
 # context: {path} is the folder of the removed worktree
 worktree_removed = "worktree {path} rimosso"
 worktree_removed_branch_deleted = "worktree {path} rimosso e branch {branch} eliminato (Annulla ripristina il branch)"
@@ -6267,7 +6267,7 @@ keymap_next_card = "Vai alla riga confrontata successiva"
 help_next_card = "sposta il cursore del Log sulla riga confrontata successiva (la selezione resta); un clic su una scheda nel pannello destro fa lo stesso"
 
 [activity_log]
-op_pull_all_branches = "{$Pull} all branches"
+op_pull_all_branches = "{$Pull} tutti i branch"
 title = "Registro attività"
 tab_application = "Applicazione"
 op_open = "Apri repository"
@@ -6385,8 +6385,8 @@ app_select_first = "Seleziona prima una riga: cliccala, oppure premi ] per passa
 app_no_operation = "Questa riga non è legata a un'operazione."
 
 [git_error]
-title_pull_all_branches = "{$Pull} all branches failed"
-done_pull_all_branches = "{$Pull} all branches done"
+title_pull_all_branches = { git = "{$Pull} di tutti i branch non riuscito", local = "Scaricamento di tutti i branch non riuscito" }
+done_pull_all_branches = { git = "{$Pull} di tutti i branch completato", local = "Scaricamento di tutti i branch completato" }
 summary_host_key = "La chiave host SSH del remoto non è ancora nota."
 hint_host_key = "Esegui una volta `ssh -T git@<host>` in un terminale, controlla l'impronta e rispondi yes, poi riprova. Oppure imposta un file known_hosts per questo repository in SSH e credenziali."
 title_push = { git = "{$Push} non riuscito", local = "Invio non riuscito" }
@@ -10350,24 +10350,24 @@ gave_up = "{short} non è stato modificato: il checkout del branch non è avvenu
 
 [branch_sync]
 # context: title of the dialog asked before Pull all branches when a branch is checked out in another worktree
-dlg_title = "{$Pull} all branches"
+dlg_title = "{$Pull} tutti i branch"
 # context: question of that dialog; the branches and their worktrees are listed under it
-dlg_question = "These branches are behind and checked out in other worktrees:"
+dlg_question = "Questi branch sono indietro e hanno il checkout in altri worktree:"
 # context: one line of that list; {branch} is a branch, {path} the worktree folder
 row = "{branch}  in  {path}"
 # context: first answer: also fast-forward the other worktrees
-opt_update = "Update those worktrees too"
+opt_update = "Aggiorna anche quei worktree"
 # context: second answer: leave the other worktrees alone
-opt_skip = "Skip them"
+opt_skip = "Salta"
 # context: third answer: do not run
-opt_cancel = "Cancel"
+opt_cancel = "Annulla"
 # context: explanation under the highlighted first answer
-detail_update = "Each worktree is fast-forwarded in its own folder. One whose local changes the update would overwrite is left as it is and reported."
+detail_update = { git = "Ogni worktree avanza in fast-forward nella propria cartella. Se l'aggiornamento sovrascriverebbe modifiche locali, quel worktree viene lasciato com'è e segnalato.", local = "Ogni worktree avanza in modo rapido nella propria cartella. Se l'aggiornamento sovrascriverebbe modifiche locali, quel worktree viene lasciato com'è e segnalato." }
 # context: explanation under the highlighted second answer
-detail_skip = "They are left as they are and listed as skipped in the summary."
+detail_skip = "Restano come sono e vengono elencati come saltati nel riepilogo."
 # context: explanation under the highlighted third answer
-detail_cancel = "Nothing is downloaded or changed."
+detail_cancel = "Non viene scaricato né modificato nulla."
 # context: key hints of that dialog
-dlg_hint = "Up/Down or 1-3 choose  Enter confirm  Esc cancel"
+dlg_hint = "Su/Giù o 1-3 scelgono  Invio conferma  Esc annulla"
 # context: last line of the list of that dialog when more branches exist than fit; {n} is how many
-more = "and {n} more"
+more = "e altri {n}"

@@ -39,6 +39,7 @@ valgono le stesse regole:
   per chiuderlo. Un clic all'esterno non chiude mai una vista a tutto schermo (Impostazioni,
   vista Diff, vista file, editor, Revisione, Board): non hanno un esterno.
 - Un clic **dentro** un pannello non lo chiude mai.
+- Una pressione del mouse (sinistro o destro) mentre un chord `Ctrl+G` o `Ctrl+N` attende il secondo tasto annulla il chord come `Esc`, poi agisce come al solito (un clic seleziona ancora, un clic destro apre ancora il suo menu).
 - Un modulo che contiene testo digitato da te (una nuova issue, una pull o merge request)
   ignora un clic all'esterno, così un clic involontario non te lo fa perdere. `✕` e `Esc`
   chiedono prima **Scartare le modifiche?**; **Modifica ancora** torna indietro. Un modulo

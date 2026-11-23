@@ -191,7 +191,7 @@ GitPoulpi ze spouštěče systému ve zvoleném terminálu.
 | Řádek | Co dělá |
 |---|---|
 | **Instalace** | Jen pro čtení: druh, složka a prostředí této instalace. Na úzké stránce se složka uprostřed zkrátí výpustkou; celý text je v nápovědě pod řádkem. |
-| **Název spouštěče** | Název zástupců této instalace a její položky v nabídce složek. Odmítne se, pokud ho už má jiná existující instalace. Hlavní instalace se vždy jmenuje `GitPoulpi`. |
+| **Název spouštěče** | Název zástupců této instalace a její položky v nabídce složek. Odmítne se, pokud ho už má jiná existující instalace. Změna přejmenuje zástupce, které tato instalace už má (nabídka Start, Plocha, položka ve spouštěči aplikací), a přepíše popisek její položky v nabídce složek na místě; žádný nový se nevytvoří. Hlavní instalace se vždy jmenuje `GitPoulpi`. |
 | **Uvádět verzi v názvu spouštěče** | Přidá k názvu `<major>.<minor>` (`GitPoulpi 1.2`); ve výchozím stavu vypnuto, protože se zástupci při každé aktualizaci přejmenují. |
 | **Barva chobotnice** | Barva chobotnice této instalace a jejích zástupců (stejná nabídka jako v okně O aplikaci). |
 | **Stát se hlavní instalací** | Hlavní instalace vlastní prostý název `GitPoulpi`, starší zástupce a klíče `ui.*`, které čtou starší verze; ve výchozím stavu není hlavní žádná. Pokud už jiná je, nejdřív se zeptá. Dosavadní hlavní si ponechá své spouštěče pod vlastním názvem (Windows a Linux). Změna role (stát se hlavní instalací nebo se jí vzdát) přejmenuje zástupce této instalace na místě, takže nikdy nenastane okamžik bez zástupce, a přesune její položku správce souborů pod nový název. |

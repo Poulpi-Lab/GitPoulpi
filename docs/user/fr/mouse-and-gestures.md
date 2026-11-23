@@ -39,6 +39,7 @@ valent partout :
   contextuelle pour la fermer. Un clic à l'extérieur ne ferme jamais une vue plein écran (Paramètres, vue Diff,
   vue Fichier, éditeurs, Revue, Tableau) : elles n'ont pas d'extérieur.
 - Un clic **à l'intérieur** d'un panneau ne le ferme jamais.
+- Un appui de souris (gauche ou droit) pendant qu'un enchaînement `Ctrl+G` ou `Ctrl+N` attend sa seconde touche annule l'enchaînement comme `Esc`, puis agit comme d'habitude (un clic sélectionne toujours, un clic droit ouvre toujours son menu).
 - Un formulaire qui contient du texte saisi (un nouveau ticket, une pull ou merge request) ignore un clic à
   l'extérieur, pour qu'un clic égaré ne fasse rien perdre. `✕` et `Esc` demandent d'abord **Abandonner les
   modifications ?** ; **Continuer** revient au formulaire. Un formulaire où rien n'a été saisi se ferme

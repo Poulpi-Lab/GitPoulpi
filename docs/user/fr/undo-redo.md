@@ -205,7 +205,7 @@ saisie de nom que le bouton.
 | Commits | commit, amend, reword, le compositeur de commits IA (tous ses commits en une seule étape) |
 | Branches et tags | créer, supprimer, renommer, définir ou retirer l'amont, créer une branche de suivi, créer / supprimer / annoter un tag, fast-forward, extraire une pull request comme branche |
 | Se déplacer | checkout d'une branche ou d'un commit (y compris un HEAD détaché) |
-| Historique | merge (fast-forward ou commit de merge), rebase (simple et interactif, une fois terminé), cherry-pick, revert, reset (soft, mixed et hard), la partie locale d'un pull |
+| Historique | merge (fast-forward ou commit de merge), rebase (simple et interactif, une fois terminé), cherry-pick, revert, reset (soft, mixed et hard), la partie locale d'un pull, **pull de toutes les branches** (toutes les branches déplacées, en une seule étape ; les fichiers de la branche extraite reviennent avec) |
 | Modifications locales | stage et unstage (fichier, dossier, hunk, lignes, tout), abandon (fichier, dossier, hunk, lignes, un checkout de fichier), appliquer un patch ou les changements d'un commit (`apply-commit`), **supprimer un fichier du disque**, **ignorer** (fichier, extension ou dossier : la ligne du `.gitignore` choisi), **traiter comme binaire ou texte** (la ligne de `.gitattributes`) |
 | Stashes | push, apply, pop, drop, enregistrer en stash les changements d'un commit (`stash from-commit`) |
 | Distants et configuration | ajouter, retirer, renommer, changer l'URL ou l'URL de push d'un distant, suivre et ne plus suivre avec Git LFS |

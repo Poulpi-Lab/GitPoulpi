@@ -790,6 +790,13 @@ pub enum SshCommandAction {
     Clear,
 }
 
+/// `pull --all-branches --worktrees`.
+#[derive(Debug, Clone, Copy, clap::ValueEnum)]
+pub enum PullWorktreesArg {
+    Skip,
+    Update,
+}
+
 #[derive(Debug, Clone, Copy, clap::ValueEnum)]
 pub enum PullModeArg {
     Merge,

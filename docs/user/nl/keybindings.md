@@ -1952,6 +1952,7 @@ Elke knop heeft een toetsenbordtegenhanger:
 | **Activiteit** in de statusbalk | `Ctrl+N Shift+A` |
 | Werkbalk: **Ongedaan**, **Opnieuw** | `Ctrl+Z`, `Ctrl+Y` |
 | Werkbalk: **Pull** / zijn `▾` | `Ctrl+G p` / `Git: Pull-opties...` |
+| **Pull alle branches** (rij van de `▾` van Pull) | `Ctrl+G Ctrl+P` |
 | Werkbalk: **Push** / zijn `▾` | `Ctrl+G Shift+P` / `Git: Pushen naar remote...` |
 | Werkbalk: **Branch**, **Tag** | `Ctrl+G b`, `Ctrl+G t` |
 | Werkbalk: **Stash**, **Pop** | `Ctrl+G Shift+T`, `Ctrl+G o` |

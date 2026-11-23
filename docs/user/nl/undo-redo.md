@@ -191,7 +191,7 @@ De rijen zijn grijs (met de reden) zolang hun weergave niet open is; de drie ope
 | Commits | commit, amend, reword, de AI-commit-composer (al zijn commits als één stap) |
 | Branches en tags | maken, verwijderen, hernoemen, de upstream instellen of wissen, een trackingbranch maken, een tag maken / verwijderen / annoteren, fast-forward, een pull request als branch uitchecken |
 | Rondbewegen | checkout van een branch of een commit (ook een detached HEAD) |
-| Geschiedenis | merge (fast-forward of merge-commit), rebase (gewoon en interactief, zodra hij klaar is), cherry-pick, revert, reset (soft, mixed en hard), het lokale deel van een pull |
+| Geschiedenis | merge (fast-forward of merge-commit), rebase (gewoon en interactief, zodra hij klaar is), cherry-pick, revert, reset (soft, mixed en hard), het lokale deel van een pull, **pull alle branches** (elke branch die het verplaatste, als één stap; de bestanden van de uitgecheckte branch gaan mee terug) |
 | Lokale wijzigingen | stage en unstage (bestand, map, hunk, regels, alles), verwerpen (bestand, map, hunk, regels, een bestandscheckout), een patch of de wijzigingen van een commit toepassen (`apply-commit`), **een bestand van schijf verwijderen**, **negeren** (bestand, extensie of map: de regel in het `.gitignore` dat je koos), **als binair of tekst behandelen** (de regel in `.gitattributes`) |
 | Stashes | push, apply, pop, drop, de wijzigingen van een commit als stash bewaren (`stash from-commit`) |
 | Remotes en configuratie | een remote toevoegen, verwijderen, hernoemen, de URL of push-URL wijzigen, Git LFS track en untrack |

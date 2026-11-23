@@ -493,6 +493,17 @@ Otwórz ją segmentem `Plik` przełącznika `Plik │ Wszystkie` na pasku diffu,
   (rebase)*, nie zmieniając przycisku. Tryb jest zawsze przekazywany gitowi
   jawnie, więc `pull.rebase` z twojej konfiguracji gita nie może cię
   zaskoczyć.
+- **Pull wszystkie gałęzie** (`Ctrl+G Ctrl+P`, pozycja `▾` przy Pull) robi
+  fetch ze zdalnych, za którymi idą twoje gałęzie, a potem w jednym przebiegu
+  doprowadza każdą lokalną gałąź do jej upstreamu. Gałąź bez checkoutu jest
+  zawsze tylko przewijana fast-forward (żaden plik nie jest ruszany); rozbieżna
+  zostaje nietknięta i jest zgłaszana. Bieżąca gałąź jest aktualizowana tak, jak
+  ustawiono przycisk Pull, a `▾` ma też pozycję dla każdego innego trybu (*Pull
+  wszystkie gałęzie (tylko fast-forward)*, *(rebase)*, *(fast-forward, jeśli się
+  da)*). Gdy gałąź za upstreamem ma checkout w innym worktree, okno najpierw
+  pyta, czy zaktualizować też te worktree, pominąć je, czy anulować. Pasek stanu
+  podsumowuje przebieg, a Dziennik aktywności ma jeden wiersz na gałąź; Cofnij
+  przywraca wszystkie gałęzie jednym krokiem. `Ctrl+G p` pozostaje zwykłym Pull.
 - **Push** (`Ctrl+G Shift+P`) wysyła bieżącą gałąź do domyślnego zdalnego,
   ustawiając upstream za pierwszym razem. Jego `▾` jednorazowo wypycha do
   innego wybranego zdalnego. Jeśli zdalne ma commity, których ty nie masz,

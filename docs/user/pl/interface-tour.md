@@ -163,7 +163,7 @@ Domyślnie rząd pod panelami i nad paskiem stanu. **Ustawienia > Wygląd > Poł
 | Przycisk | Co robi |
 |---|---|
 | **Cofnij**, **Ponów** | Cofają lub przywracają ostatnią operację (`Ctrl+Z`, `Ctrl+Y`). Ukryte, gdy Cofnij jest wyłączone. Zob. [Cofnij i ponów](undo-redo.md). |
-| **Pull** `▾` | Wykonuje pull zgodnie z ustawieniem **Ustawienia > Git i kodowanie > Przycisk Pull**. Lista `▾` ma **Fetch wszystkich**, **Pull (fast-forward, jeśli się da)**, **Pull (tylko fast-forward)** i **Pull (rebase)**. Pozycja listy działa jeden raz i nie zmienia przycisku. |
+| **Pull** `▾` | Wykonuje pull zgodnie z ustawieniem **Ustawienia > Git i kodowanie > Przycisk Pull**. Lista `▾` ma **Fetch wszystkich**, **Pull (fast-forward, jeśli się da)**, **Pull (tylko fast-forward)** i **Pull (rebase)**, potem **Pull wszystkie gałęzie** (`Ctrl+G Ctrl+P`) oraz to samo z każdym innym trybem dla bieżącej gałęzi. Pozycja listy działa jeden raz i nie zmienia przycisku. |
 | **Push** `▾` | Wypycha bieżącą gałąź. Lista `▾` wypycha jednorazowo do wybranego zdalnego repozytorium. |
 | **Gałąź** | Tworzy gałąź w bieżącym commicie. |
 | **Tag** | Tworzy tag w bieżącym commicie. |

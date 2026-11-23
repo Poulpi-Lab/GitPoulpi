@@ -40,6 +40,7 @@ obowiązują te same reguły:
   zamknąć. Kliknięcie poza nigdy nie zamyka pełnego widoku (Ustawienia, widok Diff,
   Widok pliku, edytory, Przegląd, Tablica): one nie mają „poza”.
 - Kliknięcie **wewnątrz** panelu nigdy go nie zamyka.
+- Naciśnięcie przycisku myszy (lewego lub prawego), gdy akord `Ctrl+G` lub `Ctrl+N` czeka na drugi klawisz, anuluje akord tak jak `Esc`, a potem działa jak zwykle (kliknięcie nadal zaznacza, prawy przycisk nadal otwiera menu).
 - Formularz z wpisanym tekstem (nowe zgłoszenie, pull lub merge request) ignoruje
   kliknięcie poza, więc przypadkowe kliknięcie nie zgubi tekstu. `✕` i `Esc` najpierw
   pytają **Odrzucić zmiany?**; **Edytuj dalej** wraca do formularza. Formularz bez

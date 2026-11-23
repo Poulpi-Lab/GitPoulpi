@@ -73,6 +73,7 @@ stage_file = "z"
 | `git_prefix` | `stage_file` | 選択中のファイルをステージ | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | 選択中のファイルをステージ解除 | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
+| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | 関連するPull Requestを開く | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | すべてのTagをPush | `Ctrl+G Shift+U` |
@@ -624,6 +625,10 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Git: Pull（可能なら早送り） |  |
 | Git: Pull（早送りのみ） |  |
 | Git: Pull（rebase） |  |
+| Git: Pull All Branches | `Ctrl+G Ctrl+P` |
+| Git: Pull All Branches (fast-forward if possible) |  |
+| Git: Pull All Branches (fast-forward only) |  |
+| Git: Pull All Branches (rebase) |  |
 | Git: Pullのオプション... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: リモートへPush... |  |

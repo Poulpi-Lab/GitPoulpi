@@ -87,6 +87,7 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `git_prefix` | `stage_file` | Stage Selected File | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | Unstage Selected File | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
+| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | Open Linked Pull Request | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | Push All Tags | `Ctrl+G Shift+U` |
@@ -658,6 +659,10 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Git: Pull (fast-forward if possible) |  |
 | Git: Pull (fast-forward only) |  |
 | Git: Pull (rebase) |  |
+| Git: Pull All Branches | `Ctrl+G Ctrl+P` |
+| Git: Pull All Branches (fast-forward if possible) |  |
+| Git: Pull All Branches (fast-forward only) |  |
+| Git: Pull All Branches (rebase) |  |
 | Git: Pull Options... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push to Remote... |  |
@@ -1942,6 +1947,7 @@ Every button has a keyboard twin:
 | **Activity** in the status line | `Ctrl+N Shift+A` |
 | Toolbar: **Undo**, **Redo** | `Ctrl+Z`, `Ctrl+Y` |
 | Toolbar: **Pull** / its `▾` | `Ctrl+G p` / `Git: Pull Options...` |
+| **Pull all branches** (row of the Pull `▾`) | `Ctrl+G Ctrl+P` |
 | Toolbar: **Push** / its `▾` | `Ctrl+G Shift+P` / `Git: Push to Remote...` |
 | Toolbar: **Branch**, **Tag** | `Ctrl+G b`, `Ctrl+G t` |
 | Toolbar: **Stash**, **Pop** | `Ctrl+G Shift+T`, `Ctrl+G o` |

@@ -85,6 +85,7 @@ stage_file = "z"
 | `git_prefix` | `stage_file` | Stage вибраного файлу | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | Unstage вибраного файлу | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
+| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | Відкрити пов'язаний pull request | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | Push усіх tags | `Ctrl+G Shift+U` |
@@ -652,6 +653,10 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Git: Pull (fast-forward, якщо можливо) |  |
 | Git: Pull (лише fast-forward) |  |
 | Git: Pull (rebase) |  |
+| Git: Pull All Branches | `Ctrl+G Ctrl+P` |
+| Git: Pull All Branches (fast-forward if possible) |  |
+| Git: Pull All Branches (fast-forward only) |  |
+| Git: Pull All Branches (rebase) |  |
 | Git: параметри Pull... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push на remote... |  |

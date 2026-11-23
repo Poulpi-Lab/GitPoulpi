@@ -90,6 +90,7 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `git_prefix` | `stage_file` | Stage del file selezionato | `Ctrl+G s` |
 | `git_prefix` | `unstage_file` | Unstage del file selezionato | `Ctrl+G u` |
 | `git_prefix` | `pull` | Pull | `Ctrl+G p` |
+| `git_prefix` | `pull_all_branches` | Pull All Branches | `Ctrl+G Ctrl+P` |
 | `git_prefix` | `push` | Push | `Ctrl+G Shift+P` |
 | `git_prefix` | `open_linked_pr` | Apri la pull request collegata | `Ctrl+G g` |
 | `git_prefix` | `push_tags` | Push di tutti i tag | `Ctrl+G Shift+U` |
@@ -662,6 +663,10 @@ applicano. I tasti sono quelli predefiniti.
 | Git: Pull (fast-forward se possibile) |  |
 | Git: Pull (solo fast-forward) |  |
 | Git: Pull (rebase) |  |
+| Git: Pull All Branches | `Ctrl+G Ctrl+P` |
+| Git: Pull All Branches (fast-forward if possible) |  |
+| Git: Pull All Branches (fast-forward only) |  |
+| Git: Pull All Branches (rebase) |  |
 | Git: Opzioni di pull... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: Push verso un remoto... |  |

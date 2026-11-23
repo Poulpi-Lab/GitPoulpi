@@ -197,7 +197,7 @@ has its own icon color, which the theme sets (see [Themes](themes.md)). When the
 | Button | What it does |
 |---|---|
 | **Undo**, **Redo** | Take back or restore the last operation (`Ctrl+Z`, `Ctrl+Y`). Hidden when Undo is off. See [Undo and redo](undo-redo.md). |
-| **Pull** `▾` | Pulls the way **Settings > Git & encoding > Pull button** says. The `▾` list has **Fetch All**, **Pull (fast-forward if possible)**, **Pull (fast-forward only)** and **Pull (rebase)**. A list item runs once and does not change the button. |
+| **Pull** `▾` | Pulls the way **Settings > Git & encoding > Pull button** says. The `▾` list has **Fetch All**, **Pull (fast-forward if possible)**, **Pull (fast-forward only)** and **Pull (rebase)**, then **Pull all branches** (`Ctrl+G Ctrl+P`) and the same with each other mode for the checked-out branch. A list item runs once and does not change the button. |
 | **Push** `▾` | Pushes the checked-out branch. The `▾` list pushes once to the remote you choose. |
 | **Branch** | Creates a branch at the checked-out commit. |
 | **Tag** | Creates a tag at the checked-out commit. |

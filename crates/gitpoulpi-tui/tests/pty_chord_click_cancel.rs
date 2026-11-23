@@ -1,7 +1,7 @@
 //! A mouse press while a chord prefix waits for its second key (`Ctrl+N`,
-//! `Ctrl+G`) cancels the chord like `Esc`, and the press is swallowed. The key
-//! that would have completed the chord then does not run the chord's action
-//! and the hint is gone.
+//! `Ctrl+G`) cancels the chord like `Esc`, and then acts as usual. The key
+//! that would have completed the chord does not run the chord's action, the
+//! hint is gone, and the click's own effect happened.
 //!
 //! The rules are `pty_ui.rs`'s: nothing is located by a hard-coded
 //! coordinate, every wait describes the state it waits for.
@@ -52,6 +52,12 @@ fn a_click_cancels_the_navigation_chord() {
         |s| s.contains("navigation canceled") && !s.contains("collapse"),
     )
     .unwrap_or_else(|e| panic!("{e}"));
+    // The click then acted as usual: the commit row is selected, so the
+    // working-changes view (selected at start) is gone.
+    term.wait_for("the clicked commit row selected", STEP, |s| {
+        !s.contains("Unstaged Files")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     // `Shift+H` would have collapsed the Refs pane.
     term.send_keys("H").unwrap();
     let s = term.wait_for_stable(SETTLE, STEP).unwrap();
@@ -78,6 +84,16 @@ fn a_right_click_cancels_the_git_chord() {
         STEP,
         |s| s.contains("Ctrl+P: commands"),
     )
+    .unwrap_or_else(|e| panic!("{e}"));
+    // The right click then acted as usual: the row's context menu is open.
+    term.wait_for("the row's context menu", STEP, |s| {
+        s.contains("Cherry-pick onto")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("Escape").unwrap();
+    term.wait_for("the context menu closed", STEP, |s| {
+        !s.contains("Cherry-pick onto")
+    })
     .unwrap_or_else(|e| panic!("{e}"));
     // `a` would have staged everything.
     term.send_keys("a").unwrap();

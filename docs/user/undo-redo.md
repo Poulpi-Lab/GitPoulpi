@@ -189,7 +189,7 @@ open the same confirmation or name prompt as the button.
 | Commits | commit, amend, reword, the AI commit composer (all its commits as one step) |
 | Branches and tags | create, delete, rename, set or unset the upstream, create a tracking branch, create / delete / annotate a tag, fast-forward, check a pull request out as a branch |
 | Moving around | checkout of a branch or a commit (including a detached HEAD) |
-| History | merge (fast-forward or merge commit), rebase (plain and interactive, once it has finished), cherry-pick, revert, reset (soft, mixed and hard), the local part of a pull |
+| History | merge (fast-forward or merge commit), rebase (plain and interactive, once it has finished), cherry-pick, revert, reset (soft, mixed and hard), the local part of a pull, **pull all branches** (every branch it moved, as one step; the checked-out branch's files go back with it) |
 | Working changes | stage and unstage (file, folder, hunk, lines, all), discard (file, folder, hunk, lines, a file checkout), apply a patch or a commit's changes (`apply-commit`), **delete a file from disk**, **ignore** (file, extension or folder: the line in the `.gitignore` you chose), **treat as binary or text** (the `.gitattributes` line) |
 | Stashes | push, apply, pop, drop, save a commit's changes as a stash (`stash from-commit`) |
 | Remotes and config | add, remove, rename, change the URL or push URL of a remote, Git LFS track and untrack |

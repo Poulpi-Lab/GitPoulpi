@@ -185,7 +185,7 @@ Por predefinição, uma linha por baixo dos painéis e acima da barra de estado.
 | Botão | O que faz |
 |---|---|
 | **Desfazer**, **Refazer** | Desfazem ou refazem a última operação (`Ctrl+Z`, `Ctrl+Y`). Ocultos quando Desfazer está desativado. Consulte [Desfazer e refazer](undo-redo.md). |
-| **Pull** `▾` | Faz pull como diz **Definições > Git e codificação > Botão Pull**. A lista `▾` tem **Fetch All**, **Pull (fast-forward se possível)**, **Pull (só fast-forward)** e **Pull (rebase)**. Um item da lista executa uma vez e não altera o botão. |
+| **Pull** `▾` | Faz pull como diz **Definições > Git e codificação > Botão Pull**. A lista `▾` tem **Fetch All**, **Pull (fast-forward se possível)**, **Pull (só fast-forward)** e **Pull (rebase)**, depois **Pull de todas as branches** (`Ctrl+G Ctrl+P`) e o mesmo com cada um dos outros modos para a branch em checkout. Um item da lista executa uma vez e não altera o botão. |
 | **Push** `▾` | Faz push da branch em checkout. A lista `▾` faz push uma vez para o remoto que escolher. |
 | **Branch** | Cria uma branch no commit em checkout. |
 | **Tag** | Cria uma tag no commit em checkout. |

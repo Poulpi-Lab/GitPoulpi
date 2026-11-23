@@ -42,6 +42,7 @@ borda, e as mesmas regras valem em todo o lado:
   vista de diff, a vista de ficheiro, os editores, a Revisão, o Quadro): essas não
   têm "fora".
 - Um clique **dentro** de um painel nunca o fecha.
+- Premir o rato (botão esquerdo ou direito) enquanto um acorde `Ctrl+G` ou `Ctrl+N` espera pela segunda tecla cancela o acorde como `Esc` e depois age como de costume (um clique continua a selecionar, um clique direito continua a abrir o seu menu).
 - Um formulário com texto que escreveu (uma nova issue, um pull ou merge request)
   ignora um clique fora, para que um clique perdido não o faça perder. `✕` e `Esc`
   perguntam primeiro **Descartar alterações?**; **Continuar a editar** volta atrás.

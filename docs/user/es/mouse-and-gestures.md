@@ -41,6 +41,7 @@ borde, y las mismas reglas valen en todas partes:
   (Ajustes, la vista de diff, la vista de archivo, los editores, Review, Board):
   no tienen un fuera.
 - Un clic **dentro** de un panel nunca lo cierra.
+- Una pulsación del ratón (izquierda o derecha) mientras un acorde `Ctrl+G` o `Ctrl+N` espera su segunda tecla cancela el acorde como `Esc` y después actúa como siempre (un clic sigue seleccionando, un clic derecho sigue abriendo su menú).
 - Un formulario que contiene texto que escribiste (un issue nuevo, una pull o merge
   request) ignora un clic fuera, para que un clic perdido no te haga perderlo. La
   `✕` y `Esc` preguntan antes **¿Descartar los cambios?**; **Seguir editando**

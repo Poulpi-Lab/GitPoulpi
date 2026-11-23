@@ -185,7 +185,7 @@ de nombre que el botón.
 | Commits | commit, amend, reword, el compositor de commits con IA (todos sus commits como un solo paso) |
 | Ramas y tags | crear, eliminar, renombrar, establecer o quitar el upstream, crear una rama de seguimiento, crear / eliminar / anotar un tag, fast-forward, hacer checkout de una pull request como rama |
 | Moverse | checkout de una rama o de un commit (incluido un HEAD desacoplado) |
-| Historial | merge (fast-forward o commit de merge), rebase (simple e interactivo, una vez terminado), cherry-pick, revert, reset (soft, mixed y hard), la parte local de un pull |
+| Historial | merge (fast-forward o commit de merge), rebase (simple e interactivo, una vez terminado), cherry-pick, revert, reset (soft, mixed y hard), la parte local de un pull, **pull de todas las ramas** (todas las ramas que movió, como un solo paso; los archivos de la rama con checkout vuelven con ella) |
 | Cambios de trabajo | stage y unstage (archivo, carpeta, hunk, líneas, todo), descartar (archivo, carpeta, hunk, líneas, un checkout de archivo), aplicar un parche o los cambios de un commit (`apply-commit`), **eliminar un archivo del disco**, **ignorar** (archivo, extensión o carpeta: la línea del `.gitignore` que elijas), **tratar como binario o texto** (la línea de `.gitattributes`) |
 | Stashes | push, apply, pop, drop, guardar los cambios de un commit como stash (`stash from-commit`) |
 | Remotos y configuración | añadir, quitar, renombrar, cambiar la URL o la URL de push de un remoto, track y untrack de Git LFS |

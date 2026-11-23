@@ -194,7 +194,7 @@ Por defecto, una fila bajo los paneles y sobre la barra de estado. **Ajustes > A
 | Botón | Qué hace |
 |---|---|
 | **Deshacer**, **Rehacer** | Deshacen o restauran la última operación (`Ctrl+Z`, `Ctrl+Y`). Ocultos cuando Deshacer está desactivado. Consulta [Deshacer y rehacer](undo-redo.md). |
-| **Pull** `▾` | Hace pull como indica **Ajustes > Git y codificación > Botón Pull**. La lista `▾` tiene **Fetch All**, **Pull (fast-forward si es posible)**, **Pull (solo fast-forward)** y **Pull (rebase)**. Un elemento de la lista se ejecuta una vez y no cambia el botón. |
+| **Pull** `▾` | Hace pull como indica **Ajustes > Git y codificación > Botón Pull**. La lista `▾` tiene **Fetch All**, **Pull (fast-forward si es posible)**, **Pull (solo fast-forward)** y **Pull (rebase)**, y luego **Pull de todas las ramas** (`Ctrl+G Ctrl+P`) y lo mismo con cada otro modo para la rama con checkout. Un elemento de la lista se ejecuta una vez y no cambia el botón. |
 | **Push** `▾` | Hace push de la rama con checkout. La lista `▾` hace push una vez al remoto que elijas. |
 | **Rama** | Crea una rama en el commit con checkout. |
 | **Tag** | Crea un tag en el commit con checkout. |

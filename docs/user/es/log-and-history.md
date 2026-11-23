@@ -523,6 +523,18 @@ Blame muestra todo el archivo con números de línea y colores de sintaxis, y un
   posible)*, *Pull (solo fast-forward)* o *Pull (rebase)*, sin cambiar el botón.
   El modo se pasa siempre a git de forma explícita, así que el `pull.rebase` de tu
   config de git no puede sorprenderte.
+- **Pull de todas las ramas** (`Ctrl+G Ctrl+P`, una fila del `▾` de Pull) hace
+  fetch de los remotos que siguen tus ramas y luego lleva cada rama local hasta
+  su upstream de una vez. Una rama sin checkout solo avanza con fast-forward
+  (no se toca ningún archivo); una divergente se deja como está y se informa. La
+  rama con checkout hace pull como esté configurado el botón Pull, y el `▾`
+  también tiene la fila de cada otro modo (*Pull de todas las ramas (solo
+  fast-forward)*, *(rebase)*, *(fast-forward si es posible)*). Si una rama
+  atrasada tiene checkout en otro worktree, un diálogo pregunta antes si
+  actualizar también esos worktrees, omitirlos o cancelar. La línea de estado
+  resume la ejecución y el Registro de actividad tiene una línea por rama;
+  Deshacer devuelve todas las ramas de una vez. `Ctrl+G p` sigue siendo un pull
+  normal.
 - **Push** (`Ctrl+G Shift+P`) envía la rama con checkout al remoto por defecto,
   fijando el upstream la primera vez. Su `▾` hace push una vez a otro remoto que
   elijas. Si el remoto tiene commits que tú no tienes, un diálogo ofrece **Pull

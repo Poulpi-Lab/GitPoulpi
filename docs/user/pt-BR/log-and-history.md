@@ -517,6 +517,18 @@ Abra-o pelo segmento `Histórico` do seletor `Histórico │ Todos` da barra do 
   (fast-forward se possível)*, *Pull (só fast-forward)* ou *Pull (rebase)*, sem
   mudar o botão. O modo é sempre passado explicitamente ao git, então o
   `pull.rebase` da sua configuração do git não pode lhe pregar peças.
+- **Pull de todas as branches** (`Ctrl+G Ctrl+P`, uma linha do `▾` do Pull) baixa
+  dos remotos que suas branches seguem e depois leva cada branch local até o
+  upstream de uma só vez. Uma branch que não está em checkout só recebe
+  fast-forward (nenhum arquivo é tocado); uma que divergiu é deixada como está e
+  informada. A branch em checkout recebe pull do jeito que o botão Pull está
+  configurado, e o `▾` também tem a linha para cada um dos outros modos (*Pull de
+  todas as branches (só fast-forward)*, *(rebase)*, *(fast-forward se possível)*).
+  Quando uma branch atrasada está em checkout em outro worktree, um diálogo
+  pergunta antes se esses worktrees também devem ser atualizados, ignorados ou se
+  a operação deve ser cancelada. A linha de status resume a execução e o Registro
+  de atividade tem uma linha por branch; Desfazer traz todas as branches de volta
+  em um só passo. `Ctrl+G p` continua sendo um Pull simples.
 - **Push** (`Ctrl+G Shift+P`) envia a branch em checkout para o remoto padrão,
   definindo o upstream na primeira vez. Seu `▾` faz push uma vez para outro remoto
   de sua escolha. Se o remoto tem commits que você não tem, um diálogo oferece

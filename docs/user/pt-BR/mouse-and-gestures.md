@@ -39,6 +39,7 @@ mesmas regras valem em todo lugar:
   para fechá-lo. Um clique fora nunca fecha uma visão inteira (Configurações, a visão
   Diff, a Visualização de arquivo, os editores, Revisão, Quadro): elas não têm um fora.
 - Um clique **dentro** de um painel nunca o fecha.
+- Um pressionar do mouse (esquerdo ou direito) enquanto um acorde `Ctrl+G` ou `Ctrl+N` espera pela segunda tecla cancela o acorde como `Esc` e depois age como de costume (um clique ainda seleciona, um clique direito ainda abre o menu).
 - Um formulário que guarda texto digitado por você (uma nova issue, um pull ou merge
   request) ignora um clique fora, para que um clique perdido não o apague. O `✕` e o
   `Esc` perguntam antes **Descartar alterações?**; **Voltar a editar** retorna. Um

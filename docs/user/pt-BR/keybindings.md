@@ -1938,6 +1938,7 @@ Todo botão tem um equivalente no teclado:
 | **Atividade** na linha de status | `Ctrl+N Shift+A` |
 | Barra de ferramentas: **Desfazer**, **Refazer** | `Ctrl+Z`, `Ctrl+Y` |
 | Barra de ferramentas: **Pull** / seu `▾` | `Ctrl+G p` / `Git: opções de pull...` |
+| **Pull de todas as branches** (linha do `▾` do Pull) | `Ctrl+G Ctrl+P` |
 | Barra de ferramentas: **Push** / seu `▾` | `Ctrl+G Shift+P` / `Git: Push para um remoto...` |
 | Barra de ferramentas: **Branch**, **Tag** | `Ctrl+G b`, `Ctrl+G t` |
 | Barra de ferramentas: **Stash**, **Pop** | `Ctrl+G Shift+T`, `Ctrl+G o` |

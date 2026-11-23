@@ -92,7 +92,7 @@ Reflog와 잃어버린 작업은 왼쪽에 commit 목록을, 오른쪽에 선택
 | Commit | commit, amend, 메시지 수정(reword), AI commit 작성기(모든 commit을 한 단계로) |
 | 브랜치와 tag | 만들기, 삭제, 이름 바꾸기, upstream 설정 또는 해제, 추적 브랜치 만들기, tag 만들기 / 삭제 / 주석 달기, fast-forward, pull request를 브랜치로 체크아웃 |
 | 이동 | 브랜치 또는 commit 체크아웃(detached HEAD 포함) |
-| 기록 | merge(fast-forward 또는 merge commit), rebase(일반 및 대화형, 끝난 뒤), cherry-pick, revert, reset(soft, mixed, hard), pull의 로컬 부분 |
+| 기록 | merge(fast-forward 또는 merge commit), rebase(일반 및 대화형, 끝난 뒤), cherry-pick, revert, reset(soft, mixed, hard), pull의 로컬 부분, **모든 브랜치 pull**(옮겨진 모든 브랜치가 한 단계이며, 체크아웃된 브랜치의 파일도 함께 되돌아감) |
 | 작업 변경 사항 | 스테이징과 스테이징 해제(파일, 폴더, hunk, 줄, 모두), 버리기(파일, 폴더, hunk, 줄, 파일 체크아웃), 패치 또는 commit의 변경 사항 적용(`apply-commit`), **디스크에서 파일 삭제**, **무시**(파일, 확장자 또는 폴더: `.gitignore` 줄), **바이너리 또는 텍스트로 처리**(`.gitattributes` 줄) |
 | Stash | push, apply, pop, drop, commit의 변경 사항을 stash로 저장(`stash from-commit`) |
 | 리모트와 설정 | 리모트 추가, 제거, 이름 바꾸기, URL 또는 push URL 변경, Git LFS track 및 untrack |

@@ -1,7 +1,7 @@
 import subprocess, time, os, statistics, glob, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 EXE = os.environ.get("GITPOULPI_EXE") or os.path.join(os.path.dirname(os.path.dirname(HERE)), "target", "release", "gitpoulpi" + (".exe" if os.name == "nt" else ""))
-FIX = r"C:\Projets\_gp_perf\fix"
+FIX = r"C:\src\_gp_perf\fix"
 CFG = os.path.join(HERE, "cfg-cli"); os.makedirs(CFG, exist_ok=True)
 env = dict(os.environ, GITPOULPI_CONFIG_DIR=CFG)
 def t(name, args, n=5, stdin=None):

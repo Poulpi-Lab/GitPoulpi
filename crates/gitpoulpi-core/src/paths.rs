@@ -101,8 +101,8 @@ mod tests {
     #[test]
     fn strips_the_plain_verbatim_prefix() {
         assert_eq!(
-            strip_verbatim_prefix(Path::new(r"\\?\C:\Projets\GitPoulpi")),
-            PathBuf::from(r"C:\Projets\GitPoulpi")
+            strip_verbatim_prefix(Path::new(r"\\?\C:\src\GitPoulpi")),
+            PathBuf::from(r"C:\src\GitPoulpi")
         );
     }
 
@@ -117,8 +117,8 @@ mod tests {
     #[test]
     fn leaves_a_path_without_the_prefix_untouched() {
         assert_eq!(
-            strip_verbatim_prefix(Path::new(r"C:\Projets")),
-            PathBuf::from(r"C:\Projets")
+            strip_verbatim_prefix(Path::new(r"C:\src")),
+            PathBuf::from(r"C:\src")
         );
         assert_eq!(
             strip_verbatim_prefix(Path::new("/home/user/repo")),

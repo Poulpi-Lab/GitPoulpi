@@ -699,10 +699,10 @@ mod tests {
     fn the_verbatim_prefix_is_actually_stripped() {
         use gitpoulpi_core::paths::strip_verbatim_prefix;
 
-        let plain = PathBuf::from(r"\\?\C:\Projets\GitPoulpi");
+        let plain = PathBuf::from(r"\\?\C:\src\GitPoulpi");
         assert_eq!(
             strip_verbatim_prefix(&plain).to_string_lossy(),
-            r"C:\Projets\GitPoulpi"
+            r"C:\src\GitPoulpi"
         );
 
         let unc = PathBuf::from(r"\\?\UNC\server\share\repo");
@@ -712,7 +712,7 @@ mod tests {
         );
 
         // And a path that never carried one is returned untouched.
-        let untouched = PathBuf::from(r"C:\Projets\GitPoulpi");
+        let untouched = PathBuf::from(r"C:\src\GitPoulpi");
         assert_eq!(
             strip_verbatim_prefix(&untouched),
             untouched,

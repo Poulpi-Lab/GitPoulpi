@@ -1,5 +1,5 @@
 import subprocess, time, os
-FIX = r"C:\Projets\_gp_perf\fix"
+FIX = r"C:\src\_gp_perf\fix"
 GIT = r"C:\Program Files\Git\mingw64\bin\git.exe"
 def t(name, *a):
     s = time.perf_counter(); r = subprocess.run([GIT, *a], cwd=FIX, capture_output=True); print(f"{name:<55} {(time.perf_counter()-s)*1000:9.1f} ms rc={r.returncode}", flush=True)

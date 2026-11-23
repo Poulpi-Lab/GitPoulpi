@@ -5,13 +5,13 @@
 //! ```text
 //! ╭ Create worktree from main ───────────────────────────────────╮
 //! │  Name            worktree-1a2b3c4d    [ Name after branch ]  │
-//! │  Folder          C:\Projets\GitPoulpi-worktree-1a2b3c4d      │
+//! │  Folder          C:\src\GitPoulpi-worktree-1a2b3c4d      │
 //! │  Ref             main                                 ▾      │
 //! │  Worktree branch worktree-1a2b3c4d      ▾     [ Regenerate ] │
 //! │                  new branch from main     [ ✦ Name with AI ] │
 //! │                                                              │
 //! │  [x] Open the new worktree as a tab                          │
-//! │  Will create C:\Projets\GitPoulpi-worktree-1a2b3c4d on ...   │
+//! │  Will create C:\src\GitPoulpi-worktree-1a2b3c4d on ...   │
 //! │  Tab next · Enter create               [ Cancel ] [ Create ] │
 //! ╰──────────────────────────────────────────────────────────────╯
 //! ```

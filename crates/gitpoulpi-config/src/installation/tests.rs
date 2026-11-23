@@ -317,8 +317,8 @@ fn the_id_is_golden() {
     assert_eq!(i.id, "9d5b6e78a990a026");
     assert_eq!(i.short(), "i9d5b6e78");
     let unix = FakeFs::new(false);
-    let u = id_of(&unix, "/home/seb/gitpoulpi/gitpoulpi");
-    assert_eq!(u.id, "b7b0b24e011deb20");
+    let u = id_of(&unix, "/home/user/src/gitpoulpi");
+    assert_eq!(u.id, "06513ff34d7897bc");
     assert_eq!(
         short_id("p-test"),
         format!("i{}", &format!("{:016x}", fnv1a64(b"p-test"))[..8])

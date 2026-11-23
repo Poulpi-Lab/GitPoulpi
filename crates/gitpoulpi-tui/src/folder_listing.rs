@@ -178,8 +178,8 @@ pub enum PlaceKind {
 pub fn quick_places(home: Option<&Path>, extra: &[(String, PathBuf)]) -> Vec<Place> {
     fn push(label: String, path: PathBuf, kind: PlaceKind, places: &mut Vec<Place>) {
         // Windows' verbatim prefix is stripped before the comparison (and
-        // before the path is kept): two spellings of one folder, "C:\Projets"
-        // from a favourite's parent and "\\?\C:\Projets" from one built off a
+        // before the path is kept): two spellings of one folder, "C:\src"
+        // from a favourite's parent and "\\?\C:\src" from one built off a
         // canonicalized `RepoRef::root`, must collapse to one QUICK ACCESS
         // row.
         let path = gitpoulpi_core::paths::strip_verbatim_prefix(&path);
@@ -189,8 +189,8 @@ pub fn quick_places(home: Option<&Path>, extra: &[(String, PathBuf)]) -> Vec<Pla
     }
 
     /// Windows paths are case-insensitive; two quick places built from
-    /// different labels for the same folder ("Projets" the clone root's
-    /// parent, "Projets" a favourite's parent) must be recognized as one
+    /// different labels for the same folder ("src" the clone root's
+    /// parent, "src" a favourite's parent) must be recognized as one
     /// even when they were typed or cased differently.
     fn same_place(a: &Path, b: &Path) -> bool {
         if cfg!(windows) {
@@ -385,7 +385,7 @@ mod tests {
 
     /// Two spellings of one folder - one with the
     /// Windows verbatim prefix, one without - must collapse to a single
-    /// QUICK ACCESS row rather than listing "Projets" twice.
+    /// QUICK ACCESS row rather than listing "src" twice.
     #[test]
     fn a_verbatim_prefixed_duplicate_of_an_already_listed_place_is_dropped() {
         let tmp = tempfile::tempdir().unwrap();
@@ -394,7 +394,7 @@ mod tests {
             None,
             &[
                 ("Clone folder".into(), tmp.path().to_path_buf()),
-                ("Projets".into(), verbatim),
+                ("src".into(), verbatim),
             ],
         );
         let matches = places.iter().filter(|p| p.kind != PlaceKind::Drive).count();

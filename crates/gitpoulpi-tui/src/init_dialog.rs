@@ -3,12 +3,12 @@
 //!
 //! ```text
 //! ╭ Initialize a repository ─────────────────────────────────────╮
-//! │  Initialize in   C:\Projets█                    [ Browse… ]  │
+//! │  Initialize in   C:\src█                    [ Browse… ]  │
 //! │  Name            my-project                                  │
 //! │  Initial branch  main                                        │
 //! │                  general.default_branch_name; empty = git's  │
 //! │                                                              │
-//! │  Will create C:\Projets\my-project                           │
+//! │  Will create C:\src\my-project                           │
 //! │  Tab next · Enter create               [ Cancel ] [ Create ] │
 //! ╰──────────────────────────────────────────────────────────────╯
 //! ```

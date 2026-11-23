@@ -7,7 +7,7 @@ fn the_folder_name_comes_from_the_url_whatever_its_shape() {
         ("https://github.com/owner/project/", "project"),
         ("git@github.com:owner/project.git", "project"),
         ("ssh://git@host:22/group/sub/tool", "tool"),
-        ("C:\\Projets\\fixture", "fixture"),
+        ("C:\\src\\fixture", "fixture"),
         ("/srv/git/thing.git", "thing"),
         ("", "repo"),
     ] {

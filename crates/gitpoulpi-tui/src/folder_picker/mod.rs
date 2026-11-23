@@ -3,7 +3,7 @@
 //!
 //! ```text
 //! ╭ Open a repository ─────────────────────────────────────────────╮
-//! │ [↑] C:\Projets\GitPoulpi█                                      │
+//! │ [↑] C:\src\GitPoulpi█                                      │
 //! │                                                                │
 //! │ QUICK ACCESS         │ Name                                    │
 //! │  Home                │  ..                                     │
@@ -11,10 +11,10 @@
 //! │  C:\                 │  docs\                                  │
 //! │ FOLDERS              │  Cargo.toml                   (dimmed)  │
 //! │  C:\                 │                                         │
-//! │   Projets            │                                         │
+//! │   src            │                                         │
 //! │    GitPoulpi         │                                         │
 //! │     crates           │                                         │
-//! │ Selected: C:\Projets\GitPoulpi   git repository                │
+//! │ Selected: C:\src\GitPoulpi   git repository                │
 //! │ Tab zones · Enter open · Ctrl+S select   [ Cancel ] [ Open ]   │
 //! ╰────────────────────────────────────────────────────────────────╯
 //! ```

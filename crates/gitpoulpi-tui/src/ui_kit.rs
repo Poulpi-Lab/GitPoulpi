@@ -1075,10 +1075,10 @@ mod tests {
     /// path and never the word "backend".
     #[test]
     fn loading_lines_names_the_repository_and_never_says_backend() {
-        let root = std::path::Path::new("C:/Projets/Brain2");
+        let root = std::path::Path::new("C:/src/notes");
         let lines = loading_lines(root, std::time::Duration::from_secs(0));
         assert!(lines[0].starts_with("Loading repository"), "{lines:?}");
-        assert!(lines.iter().any(|l| l.contains("Brain2")), "{lines:?}");
+        assert!(lines.iter().any(|l| l.contains("notes")), "{lines:?}");
         assert!(
             !lines.iter().any(|l| l.contains("backend")),
             "the loading message must never mention the old placeholder: {lines:?}"

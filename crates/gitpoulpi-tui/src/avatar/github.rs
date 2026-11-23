@@ -263,7 +263,7 @@ mod tests {
             "https://github.example.com/o/r.git",
             "git@github.com:onlyowner.git",
             "https://github.com/o/r/extra",
-            "C:\\Projets\\GitPoulpi",
+            "C:\\src\\GitPoulpi",
             "",
         ] {
             assert_eq!(repo_of_remote(url), None, "{url}");

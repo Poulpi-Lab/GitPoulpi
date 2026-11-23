@@ -1115,30 +1115,61 @@ pub(super) fn hand_over_with(
     old: &InstallCtx,
     run: Run,
 ) -> Result<Vec<PathBuf>, String> {
-    let named = named_file(old);
-    if named == FILE {
+    let own = InstallCtx {
+        primary: None,
+        ..old.clone()
+    };
+    if file_name(&own) == FILE {
         return Err("the old primary has no name of its own".into());
     }
+    rename_with(dirs, old, &own, run)
+}
+
+/// [`rename_with`] telling the shell through PowerShell.
+pub(super) fn rename(
+    dirs: &Dirs,
+    from: &InstallCtx,
+    to: &InstallCtx,
+) -> Result<Vec<PathBuf>, String> {
+    rename_with(dirs, from, to, &run_powershell)
+}
+
+/// Renames `from`'s shortcuts (Start menu, Desktop) to the names `to` (the same
+/// installation in its new role) uses, contents untouched, and tells the shell.
+/// A rename leaves no gap; the next install or sync rewrites the content. Only
+/// a file that is `from`'s (tagged with its id, or untagged with the legacy
+/// marker while `from` is the primary) moves, and never onto an existing file.
+/// Returns the new paths.
+pub(super) fn rename_with(
+    dirs: &Dirs,
+    from: &InstallCtx,
+    to: &InstallCtx,
+    run: Run,
+) -> Result<Vec<PathBuf>, String> {
+    let (old_name, new_name) = (file_name(from), file_name(to));
     let mut moved = Vec::new();
+    if old_name == new_name {
+        return Ok(moved);
+    }
     for dir in [dirs.start_menu.as_deref(), dirs.desktop.as_deref()]
         .into_iter()
         .flatten()
     {
-        let (from, to) = (dir.join(FILE), dir.join(&named));
-        let Ok(bytes) = std::fs::read(&from) else {
+        let (src, dst) = (dir.join(&old_name), dir.join(&new_name));
+        let Ok(bytes) = std::fs::read(&src) else {
             continue;
         };
         let tag = read_tag(&bytes);
         let is_old = match tag.as_deref() {
-            Some(t) => t == old.id,
-            None => contains_text(&bytes, MARKER),
+            Some(t) => t == from.id,
+            None => from.is_primary() && contains_text(&bytes, MARKER),
         };
-        if !is_old || to.exists() {
+        if !is_old || dst.exists() {
             continue;
         }
-        std::fs::rename(&from, &to).map_err(|e| format!("{}: {e}", from.display()))?;
-        let _ = run(&gone_script(std::slice::from_ref(&from), Some(&to)));
-        moved.push(to);
+        std::fs::rename(&src, &dst).map_err(|e| format!("{}: {e}", src.display()))?;
+        let _ = run(&gone_script(std::slice::from_ref(&src), Some(&dst)));
+        moved.push(dst);
     }
     Ok(moved)
 }
@@ -2474,6 +2505,48 @@ otepad.exe",
             .unwrap()
             .is_empty());
         assert!(desktop.join(FILE).exists(), "never overwrites a file");
+    }
+
+    #[test]
+    fn a_role_change_renames_my_own_lnks_both_ways_and_leaves_others() {
+        let m = machine();
+        let before = ctx_of(ID_A, "GitPoulpi (Chocolatey)", None);
+        let after = ctx_of(ID_A, "GitPoulpi", Some(ID_A));
+        let desktop = m.dirs.desktop.clone().unwrap();
+        // As the shell stores it: the description behind its length.
+        let counted = |id: &str| {
+            let d = format!("GitPoulpi {OWNER_TAG}={id}");
+            let mut b = (d.encode_utf16().count() as u16).to_le_bytes().to_vec();
+            b.extend(utf16(&d));
+            b.extend(utf16(" i.ico"));
+            b
+        };
+        let mine = counted(ID_A);
+        std::fs::write(start(&m).join("GitPoulpi (Chocolatey).lnk"), &mine).unwrap();
+        std::fs::write(desktop.join("GitPoulpi (Chocolatey).lnk"), &mine).unwrap();
+        let theirs = counted(ID_B);
+        std::fs::write(start(&m).join("GitPoulpi (dev).lnk"), &theirs).unwrap();
+        let log = RefCell::new(Vec::new());
+        let moved = rename_with(&m.dirs, &before, &after, &fake(&log)).unwrap();
+        assert_eq!(moved, [start(&m).join(FILE), desktop.join(FILE)]);
+        assert_eq!(std::fs::read(start(&m).join(FILE)).unwrap(), mine);
+        assert!(!start(&m).join("GitPoulpi (Chocolatey).lnk").exists());
+        assert!(start(&m).join("GitPoulpi (dev).lnk").exists());
+        // And back: the primary's plain file goes to its own name.
+        let back = rename_with(&m.dirs, &after, &before, &fake(&log)).unwrap();
+        assert_eq!(
+            back,
+            [
+                start(&m).join("GitPoulpi (Chocolatey).lnk"),
+                desktop.join("GitPoulpi (Chocolatey).lnk")
+            ]
+        );
+        // A plain file that is another installation's stays.
+        std::fs::write(start(&m).join(FILE), &theirs).unwrap();
+        assert!(rename_with(&m.dirs, &after, &before, &fake(&log))
+            .unwrap()
+            .is_empty());
+        assert!(start(&m).join(FILE).exists());
     }
 
     #[test]

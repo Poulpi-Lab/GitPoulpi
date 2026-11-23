@@ -474,6 +474,25 @@ pub fn hand_over_shortcuts(dirs: &Dirs, os: Os, old: &InstallCtx) -> Result<Vec<
     }
 }
 
+/// Renames `from`'s shortcuts (Start menu, Desktop, the Linux entry) to the
+/// names `to` uses, `to` being the same installation in its new role (it became
+/// the primary, or stopped being it). Contents untouched and nothing removed
+/// first: the shortcut is always there, and the install or sync that follows
+/// rewrites it. Only `from`'s own files move. Returns the new paths; macOS
+/// bundles are not renamed (an empty list).
+pub fn rename_shortcuts(
+    dirs: &Dirs,
+    os: Os,
+    from: &InstallCtx,
+    to: &InstallCtx,
+) -> Result<Vec<PathBuf>, String> {
+    match os {
+        Os::Windows => windows::rename(dirs, from, to),
+        Os::Linux => linux::rename_entries(dirs, from, to),
+        Os::Macos => Ok(Vec::new()),
+    }
+}
+
 /// Windows: makes sure the `.ico` for `icons` exists and returns its path
 /// (`None` for no icons or when it cannot be written).
 pub fn ensure_ico(dirs: &Dirs, icons: &IconSet) -> Option<PathBuf> {

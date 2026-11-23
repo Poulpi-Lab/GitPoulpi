@@ -4,6 +4,8 @@
 
 use super::*;
 use crate::preferences::launcher_install::{fake_current, InstallButton};
+use gitpoulpi_config::desktop::folder_menu::Env as MenuEnv;
+use gitpoulpi_config::desktop::registry::MemoryRegistry;
 use gitpoulpi_config::desktop::Place;
 use gitpoulpi_config::{InstallationEntry, Kind};
 
@@ -488,4 +490,199 @@ fn the_rows_reread_the_file_when_a_job_ends_even_one_that_only_reads() {
         row(&st, "Become the primary").control,
         Control::Toggle(true)
     ));
+}
+
+/// The machine of `temp_machine`, but a Windows one: a Start menu and a
+/// Desktop folder under `root`. Nothing runs PowerShell here, so only what the
+/// handover does by itself (renames) shows on disk.
+fn windows_machine(root: &Path) -> crate::launcher::Env {
+    let mut env = temp_machine(root);
+    let start = root.join("start");
+    std::fs::create_dir_all(&start).unwrap();
+    env.os = gitpoulpi_config::open_in::Os::Windows;
+    env.dirs.start_menu = Some(start);
+    env.exe = PathBuf::from("/opt/gp/gitpoulpi.exe");
+    env
+}
+
+/// A state whose installation is not the primary, on a Windows machine whose
+/// folder is `machine`.
+fn windows_state(dir: &Path) -> PreferencesState {
+    let mut st = install_state(dir);
+    let root = dir.join("machine");
+    st.set_launcher_env(move || windows_machine(&root));
+    st
+}
+
+/// A shortcut file as the shell reads it: the owner tag is all that matters.
+fn lnk_of(id: &str, marker: bool) -> Vec<u8> {
+    let marker = if marker { " X-GitPoulpi=1" } else { "" };
+    format!("GitPoulpi{marker} X-GitPoulpi-Install={id} icon.ico").into_bytes()
+}
+
+#[test]
+fn becoming_the_primary_renames_the_shortcuts_in_place() {
+    let tmp = tempfile::tempdir().unwrap();
+    let mut st = windows_state(tmp.path());
+    let machine = tmp.path().join("machine");
+    let _ = windows_machine(&machine);
+    let (start, desktop) = (machine.join("start"), machine.join("Desktop"));
+    let own = "GitPoulpi (portable).lnk";
+    std::fs::write(start.join(own), lnk_of(ME, false)).unwrap();
+    std::fs::write(desktop.join(own), lnk_of(ME, false)).unwrap();
+    // Somebody else's shortcut next to ours is not looked at.
+    std::fs::write(start.join("GitPoulpi (dev).lnk"), lnk_of("bbbb", false)).unwrap();
+    assert!(st.write_global("installation.primary", "true"));
+    settle_install(&mut st);
+    for dir in [&start, &desktop] {
+        assert!(dir.join("GitPoulpi.lnk").exists(), "{dir:?}: plain name");
+        assert!(!dir.join(own).exists(), "{dir:?}: old name is gone");
+    }
+    assert!(start.join("GitPoulpi (dev).lnk").exists());
+    // The Launcher page no longer reads "not created".
+    let mut env = windows_machine(&machine);
+    env.ctx = crate::launcher::ctx_in(&st.config, &st.this().identity, &st.this().config);
+    let snap = crate::launcher::snapshot(&env, "", &st.this_colour());
+    let start_row = snap
+        .rows
+        .iter()
+        .find(|r| r.place == Place::StartMenu)
+        .unwrap();
+    assert_ne!(
+        start_row.status.state,
+        gitpoulpi_config::desktop::State::NotInstalled
+    );
+}
+
+#[test]
+fn resigning_renames_the_shortcuts_in_place() {
+    let tmp = tempfile::tempdir().unwrap();
+    let mut st = windows_state(tmp.path());
+    std::fs::write(
+        tmp.path().join("config.toml"),
+        format!("[installation]\nprimary = \"{ME}\"\n"),
+    )
+    .unwrap();
+    st.config = Config::load(&tmp.path().join("config.toml")).unwrap();
+    st.set_this(fake_current(true));
+    let machine = tmp.path().join("machine");
+    let _ = windows_machine(&machine);
+    let (start, desktop) = (machine.join("start"), machine.join("Desktop"));
+    std::fs::write(start.join("GitPoulpi.lnk"), lnk_of(ME, true)).unwrap();
+    std::fs::write(desktop.join("GitPoulpi.lnk"), lnk_of(ME, true)).unwrap();
+    assert!(st.write_global("installation.primary", "false"));
+    settle_install(&mut st);
+    for dir in [&start, &desktop] {
+        assert!(dir.join("GitPoulpi (portable).lnk").exists(), "{dir:?}");
+        assert!(!dir.join("GitPoulpi.lnk").exists(), "{dir:?}");
+    }
+}
+
+fn windows_menu_env(root: &Path, registry: std::sync::Arc<MemoryRegistry>) -> MenuEnv {
+    let bin = root.join("bin");
+    MenuEnv {
+        os: gitpoulpi_config::open_in::Os::Windows,
+        data_home: root.join("data"),
+        config_home: root.join("config"),
+        home: root.join("home"),
+        exe: bin.join("gitpoulpi.exe"),
+        helper: Some(bin.join("gitpoulpi-launch.exe")),
+        has: std::sync::Arc::new(|_| false),
+        registry,
+        icon_png: None,
+        refresh_hooks: false,
+        ctx: gitpoulpi_config::desktop::InstallCtx::legacy(),
+        ico: None,
+        submenu: String::new(),
+    }
+}
+
+#[test]
+fn the_folder_menu_entry_survives_becoming_the_primary_and_resigning() {
+    use gitpoulpi_config::desktop::{folder_menu, State};
+    let tmp = tempfile::tempdir().unwrap();
+    let mut st = windows_state(tmp.path());
+    let reg = std::sync::Arc::new(MemoryRegistry::new());
+    let root = tmp.path().join("machine");
+    let (r, g) = (root.clone(), reg.clone());
+    st.set_folder_menu_env(move |_| windows_menu_env(&r, g.clone()));
+    let env_now = |st: &PreferencesState| {
+        let mut e = windows_menu_env(&root, reg.clone());
+        e.ctx = crate::launcher::ctx_in(&st.config, &st.this().identity, &st.this().config);
+        e
+    };
+    let status_now = |st: &PreferencesState| {
+        let e = env_now(st);
+        let label = crate::launcher::folder_menu_label(&e.ctx.name);
+        folder_menu::status(&e, &label).entries[0].state
+    };
+    // The entry as the installation has it before: its own name.
+    let e = env_now(&st);
+    folder_menu::install(&e, &crate::launcher::folder_menu_label(&e.ctx.name)).unwrap();
+    assert_eq!(status_now(&st), State::Installed);
+    assert!(st.write_global("installation.primary", "true"));
+    settle_install(&mut st);
+    assert_eq!(
+        status_now(&st),
+        State::Installed,
+        "the entry of the primary is there"
+    );
+    assert!(st.write_global("installation.primary", "false"));
+    settle_install(&mut st);
+    assert_eq!(
+        status_now(&st),
+        State::Installed,
+        "and back under its own name"
+    );
+}
+
+#[test]
+fn a_script_folder_entry_is_replaced_never_deleted_by_the_handover() {
+    use gitpoulpi_config::desktop::folder_menu;
+    // GNOME Files finds its scripts by the owner tag, not by name: removing
+    // "the old one" after writing the new one would delete the new one.
+    let tmp = tempfile::tempdir().unwrap();
+    let mut st = install_state(tmp.path());
+    let root = tmp.path().join("machine");
+    let env_for = {
+        let root = root.clone();
+        move || {
+            let bin = root.join("bin");
+            std::fs::create_dir_all(&bin).unwrap();
+            MenuEnv {
+                os: gitpoulpi_config::open_in::Os::Linux,
+                data_home: root.join("data"),
+                config_home: root.join("config"),
+                home: root.join("home"),
+                exe: bin.join("gitpoulpi"),
+                helper: Some(bin.join("gitpoulpi")),
+                has: std::sync::Arc::new(|p| p == "nautilus"),
+                registry: std::sync::Arc::new(MemoryRegistry::new()),
+                icon_png: Some(vec![1, 2, 3]),
+                refresh_hooks: false,
+                ctx: gitpoulpi_config::desktop::InstallCtx::legacy(),
+                ico: None,
+                submenu: String::new(),
+            }
+        }
+    };
+    let r = root.clone();
+    st.set_launcher_env(move || temp_machine(&r));
+    let e = env_for.clone();
+    st.set_folder_menu_env(move |_| e());
+    let mut e = env_for();
+    e.ctx = crate::launcher::ctx_in(&st.config, &st.this().identity, &st.this().config);
+    folder_menu::install(&e, &crate::launcher::folder_menu_label(&e.ctx.name)).unwrap();
+    let scripts = root.join("data/nautilus/scripts");
+    let names = || -> Vec<String> {
+        std::fs::read_dir(&scripts)
+            .unwrap()
+            .flatten()
+            .map(|e| e.file_name().to_string_lossy().into_owned())
+            .collect()
+    };
+    assert_eq!(names().len(), 1);
+    assert!(st.write_global("installation.primary", "true"));
+    settle_install(&mut st);
+    assert_eq!(names(), ["Open in GitPoulpi".to_string()]);
 }

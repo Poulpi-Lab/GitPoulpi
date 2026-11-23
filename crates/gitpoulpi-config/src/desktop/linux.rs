@@ -437,24 +437,39 @@ pub(super) fn hand_over(dirs: &Dirs, old: &InstallCtx) -> Result<Vec<PathBuf>, S
         primary: None,
         ..old.clone()
     };
-    let (legacy, named) = (file_name(old), file_name(&own));
-    if legacy == named {
+    if file_name(old) == file_name(&own) {
         return Err("the old primary has no name of its own".into());
     }
+    rename_entries(dirs, old, &own)
+}
+
+/// Renames `from`'s entries (applications and Desktop) to the file name `to`
+/// (the same installation in its new role) uses, contents untouched: no gap
+/// between the two names. Only `from`'s own files move, never onto an existing
+/// file. The next install or sync rewrites the content and the icon.
+pub(super) fn rename_entries(
+    dirs: &Dirs,
+    from: &InstallCtx,
+    to: &InstallCtx,
+) -> Result<Vec<PathBuf>, String> {
+    let (old_name, new_name) = (file_name(from), file_name(to));
     let mut moved = Vec::new();
+    if old_name == new_name {
+        return Ok(moved);
+    }
     for dir in [Some(&dirs.applications), dirs.desktop.as_ref()]
         .into_iter()
         .flatten()
     {
-        let (from, to) = (dir.join(&legacy), dir.join(&named));
-        let Ok(text) = std::fs::read_to_string(&from) else {
+        let (src, dst) = (dir.join(&old_name), dir.join(&new_name));
+        let Ok(text) = std::fs::read_to_string(&src) else {
             continue;
         };
-        if !is_mine(&text, old) || to.exists() {
+        if !is_mine(&text, from) || dst.exists() {
             continue;
         }
-        std::fs::rename(&from, &to).map_err(|e| format!("{}: {e}", from.display()))?;
-        moved.push(to);
+        std::fs::rename(&src, &dst).map_err(|e| format!("{}: {e}", src.display()))?;
+        moved.push(dst);
     }
     Ok(moved)
 }

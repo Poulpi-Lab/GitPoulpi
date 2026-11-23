@@ -327,6 +327,35 @@ pub fn remove(env: &Env) -> Result<Vec<Manager>, String> {
     Ok(done)
 }
 
+/// After [`install`] wrote `new`'s entries: removes what `old` (the same
+/// installation in its previous role, so the old names) left under the old
+/// names. Installing already replaced every entry of ours where entries are
+/// found by their owner tag (Explorer, Finder, GNOME Files, Caja), and
+/// [`remove`] there would delete the new entry as well: those are skipped.
+/// The managers that keep fixed names per role (the primary has the plain
+/// ones) are cleaned by `old`'s names only. Returns the managers cleaned.
+pub fn remove_replaced(old: &Env, new: &Env) -> Result<Vec<Manager>, String> {
+    if old.ctx.is_primary() == new.ctx.is_primary() {
+        return Ok(Vec::new());
+    }
+    let mut done = Vec::new();
+    for &m in Manager::for_os(old.os) {
+        if matches!(
+            m,
+            Manager::Explorer | Manager::Finder | Manager::Nautilus | Manager::Caja
+        ) {
+            continue;
+        }
+        if remove_one(old, m)? {
+            done.push(m);
+        }
+    }
+    if old.os == Os::Linux {
+        linux::remove_icon_if_unused(old);
+    }
+    Ok(done)
+}
+
 /// The managers' brand names, joined for a message.
 pub fn names(managers: &[Manager]) -> String {
     managers

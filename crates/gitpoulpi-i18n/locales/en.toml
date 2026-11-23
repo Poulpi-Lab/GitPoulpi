@@ -3523,7 +3523,7 @@ taken_windows_terminal = "Windows Terminal"
 taken_terminal_tabs = "terminal tab switching (kitty, WezTerm, Ghostty, Windows Terminal)"
 # context: {reason} is one of the fixed_* messages
 chord_reason = "{chord}: {reason}"
-no_modifier_after_prefix = "{chord}: the key after a prefix cannot carry Ctrl or Alt"
+no_modifier_after_prefix = "{chord}: the key after a prefix cannot carry Alt"
 this_key_fixed = "this key is fixed"
 fixed_esc = "Esc is fixed: it always cancels"
 fixed_editing_chord = "a text-editing chord, fixed in the editor"
@@ -7049,7 +7049,7 @@ unknown_context = "unknown context '{ctx}'"
 not_rebindable = "not rebindable yet"
 key_fixed = "this key is fixed"
 # context: {text} is the key as typed in the config
-prefix_mods = "'{text}': the key after a prefix cannot carry Ctrl or Alt"
+prefix_mods = "'{text}': the key after a prefix cannot carry Alt"
 # context: status line at start-up or reload; {id} is an action id, {message} the reason
 ignored_one = "keybindings: 1 entry ignored ({id}: {message})"
 ignored_many = "keybindings: {n} entries ignored (first: {id}: {message})"

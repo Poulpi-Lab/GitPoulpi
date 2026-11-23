@@ -114,7 +114,7 @@ impl Keymap {
             let mut bad = None;
             for text in texts {
                 match KeyChord::parse(text) {
-                    Ok(c) if def.ctx.ignores_modifiers() && (c.mods.ctrl || c.mods.alt) => {
+                    Ok(c) if def.ctx.ignores_modifiers() && c.mods.alt => {
                         bad = Some(gitpoulpi_i18n::msg::keymap_issue::prefix_mods(text));
                     }
                     Ok(c) => match conflict::fixed_reason(def.ctx.scope(), c) {
@@ -243,6 +243,20 @@ impl Keymap {
     /// `Ctrl+N` one for the event that spells both.
     pub(crate) fn action_in(&self, ctx: Ctx, ev: &KeyEvent) -> Option<Action> {
         if ctx.ignores_modifiers() {
+            // A prefix table looks at the key code, but a Ctrl chord bound
+            // after the prefix (`Ctrl+G Ctrl+P`) matches exactly first; an
+            // unbound Ctrl+<key> falls back to the bare key, so holding Ctrl
+            // through the second key still works.
+            if ev
+                .modifiers
+                .contains(crossterm::event::KeyModifiers::CONTROL)
+            {
+                let exact =
+                    self.action_in_code_mods(ctx, ev.code, crossterm::event::KeyModifiers::CONTROL);
+                if exact.is_some() {
+                    return exact;
+                }
+            }
             return self.action_in_code(ctx, ev.code);
         }
         let in_ctx = || self.entries.iter().filter(|e| e.ctx == ctx);

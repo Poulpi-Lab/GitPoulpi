@@ -176,6 +176,7 @@ fn prefix_tables_look_at_the_code_alone() {
     let km = Keymap::defaults();
     let git = |c, m| km.action_in(Ctx::GitPrefix, &ev(KeyCode::Char(c), m));
     assert_eq!(git('s', M::NONE), Some(Action::GitStageFile));
+    // An unbound Ctrl+<key> falls back to the bare key.
     assert_eq!(git('s', M::CONTROL), Some(Action::GitStageFile));
     assert_eq!(git('P', M::SHIFT), Some(Action::GitPush));
     assert_eq!(git('P', M::NONE), Some(Action::GitPush));
@@ -300,7 +301,7 @@ fn bad_entries_give_issues_and_keep_defaults() {
         ("global", "no_such", &["F5"]),
         ("nowhere", "x", &["F5"]),
         ("global", "quit", &["Enter"]),
-        ("git_prefix", "pull", &["Ctrl+p"]),
+        ("git_prefix", "pull", &["Alt+p"]),
     ]));
     assert_eq!(km.issues().len(), 5, "{:?}", km.issues());
     assert_eq!(km.label(Action::GlobalGitPrefix), "Ctrl+G");
@@ -381,8 +382,8 @@ fn ctrl_j_and_ctrl_enter_conflict_through_the_spelling_class() {
 }
 
 #[test]
-fn prefix_second_key_cannot_carry_modifiers() {
-    let km = Keymap::from_config(&cfg(&[("git_prefix", "pull", &["Ctrl+X"])]));
+fn prefix_second_key_cannot_carry_alt() {
+    let km = Keymap::from_config(&cfg(&[("git_prefix", "pull", &["Alt+X"])]));
     assert_eq!(km.issues().len(), 1);
 }
 
@@ -765,4 +766,39 @@ fn ctrl_tab_pair_is_attributed_to_terminal_tab_switching() {
             assert!(tool.contains(name), "{text}: {tool}");
         }
     }
+}
+
+#[test]
+fn a_ctrl_chord_after_a_prefix_matches_exactly_before_the_bare_key() {
+    use KeyModifiers as M;
+    let km = test_keymap(&[("git_prefix", "stage_all", &["Ctrl+X", "a"])]);
+    let git = |c, m| km.action_in(Ctx::GitPrefix, &ev(KeyCode::Char(c), m));
+    // Ctrl+X is its own key: it is not the discard `x`, and `x` is unchanged.
+    assert_eq!(git('x', M::CONTROL), Some(Action::GitStageAll));
+    assert_eq!(git('x', M::NONE), Some(Action::GitDiscardAll));
+    // An unbound Ctrl+S still means `s`.
+    assert_eq!(git('s', M::CONTROL), Some(Action::GitStageFile));
+    assert_eq!(git('P', M::SHIFT), Some(Action::GitPush));
+    assert_eq!(git('a', M::NONE), Some(Action::GitStageAll));
+    assert_eq!(git('z', M::CONTROL), None);
+    assert!(detect(&km, LINUX).iter().all(|c| c.level != Level::Error));
+}
+
+#[test]
+fn only_alt_is_refused_after_a_prefix() {
+    let km = Keymap::from_config(&cfg(&[("git_prefix", "stage_all", &["Alt+X"])]));
+    assert_eq!(km.issues().len(), 1, "{:?}", km.issues());
+    let ok = Keymap::from_config(&cfg(&[("git_prefix", "stage_all", &["Ctrl+X"])]));
+    assert!(ok.issues().is_empty(), "{:?}", ok.issues());
+    let d = Keymap::defaults();
+    let a = |chord: &str| {
+        super::conflict::analyse(
+            &d,
+            LINUX,
+            Action::GitStageAll,
+            &[KeyChord::parse(chord).unwrap()],
+        )
+    };
+    assert!(a("Alt+X").refusal.is_some());
+    assert!(a("Ctrl+X").refusal.is_none());
 }

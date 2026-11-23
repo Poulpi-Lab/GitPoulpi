@@ -838,17 +838,32 @@ impl JobMachine {
         let logo = self.logo(file);
         env.ctx = ctx.clone();
         fe.ctx = ctx.clone();
+        // The shortcuts move to the names of the new role by a rename, before
+        // anything is written: there is no moment without one, whether or not
+        // the rewrite below works (Explorer settles a delete followed by a
+        // create slowly, and a failed create must not leave nothing).
+        let _ = desktop::rename_shortcuts(&env.dirs, env.os, &old_ctx, &ctx);
+        let mut installed = Vec::new();
         for place in &had {
-            let _ = launcher::run(&env, &self.setting, &logo, launcher::Op::Install(*place));
+            if matches!(
+                launcher::run(&env, &self.setting, &logo, launcher::Op::Install(*place)),
+                launcher::Done::Installed(_)
+            ) {
+                installed.push(*place);
+            }
         }
-        if had_folder {
-            let _ = folder_menu::install(&fe, &launcher::folder_menu_label(&ctx.name));
-        }
-        for place in &had {
+        // What is left under the old names goes only where the new one is
+        // written (macOS bundles are not renamed).
+        for place in &installed {
             let _ = desktop::remove(*place, &env.dirs, env.os, &old_ctx);
         }
         if had_folder {
-            let _ = folder_menu::remove(&old_fe);
+            let label = launcher::folder_menu_label(&ctx.name);
+            let written = folder_menu::install(&fe, &label).is_ok()
+                && folder_menu::has_any_ours(&folder_menu::status(&fe, &label));
+            if written {
+                let _ = folder_menu::remove_replaced(&old_fe, &fe);
+            }
         }
         // Launchers left under the plain name (no owner tag) are this
         // installation's now: the sync rewrites them.

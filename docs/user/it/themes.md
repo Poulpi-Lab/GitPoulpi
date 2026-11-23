@@ -267,9 +267,30 @@ colore errato viene ignorato, una `base` sconosciuta ripiega su `dark`, e
 una volta nella barra di stato).
 
 I file vengono riletti quando si apre il combo Tema e quando si chiude
-Impostazioni; non c'è nessun file watcher. Una finestra in esecuzione applica un
-tema impostato dalla CLI alla successiva chiusura di Impostazioni, come ogni
-altra chiave live.
+Impostazioni. Una finestra in esecuzione nota anche quando `config.toml` (un
+`gitpoulpi config set ui.theme ...` da una shell) o il file del tema attivo
+vengono riscritti, e applica i nuovi colori entro circa un secondo, senza
+riavvio.
+
+### `ui.border_focused`
+
+La cornice del pannello che ha il focus della tastiera: il Log, la barra laterale
+Refs, i pannelli Staged e Unstaged, il dettaglio del commit, i pannelli della
+cronologia, della revisione e della riscrittura, le cornici del diff, dei file e
+dell'editor. Colora solo i bordi; testo, etichette e icone (l'etichetta
+"commit :", l'icona Home, i pulsanti delle schede) continuano a usare
+`ui.accent`. Così un tema può incorniciare il pannello attivo con un colore che
+come testo sarebbe illeggibile, per esempio un giallo acceso su un tema chiaro.
+Quando un tema non lo imposta, segue `ui.accent` (anche in un file utente: un
+file che cambia solo `accent` ottiene quell'accento sulle cornici con il focus),
+quindi ogni tema integrato appare come prima. Finestre di dialogo e popup
+mantengono una cornice con l'accento.
+
+```toml
+[ui]
+accent = "#1f5fbf"
+border_focused = "#e7df00"
+```
 
 ## Rilevamento del sistema
 

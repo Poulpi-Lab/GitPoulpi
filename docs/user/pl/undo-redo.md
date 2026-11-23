@@ -196,7 +196,7 @@ potwierdzenie lub pole nazwy co przycisk.
 | Commity | commit, amend, reword, kompozytor commitów AI (wszystkie jego commity jako jeden krok) |
 | Gałęzie i tagi | tworzenie, usuwanie, zmiana nazwy, ustawienie lub usunięcie upstreamu, utworzenie gałęzi śledzącej, utworzenie / usunięcie / opisanie tagu, fast-forward, checkout pull requesta jako gałęzi |
 | Przemieszczanie się | checkout gałęzi lub commita (także odłączony HEAD) |
-| Historia | merge (fast-forward lub commit scalający), rebase (zwykły i interaktywny, po zakończeniu), cherry-pick, revert, reset (soft, mixed i hard), lokalna część pulla |
+| Historia | merge (fast-forward lub commit scalający), rebase (zwykły i interaktywny, po zakończeniu), cherry-pick, revert, reset (soft, mixed i hard), lokalna część pulla, **pull wszystkich gałęzi** (każda przesunięta gałąź jako jeden krok; pliki bieżącej gałęzi wracają razem z nią) |
 | Zmiany robocze | stage i unstage (plik, folder, hunk, linie, wszystko), odrzucenie (plik, folder, hunk, linie, checkout pliku), zastosowanie patcha lub zmian commita (`apply-commit`), **usunięcie pliku z dysku**, **ignorowanie** (plik, rozszerzenie lub folder: wiersz w wybranym `.gitignore`), **traktowanie jako binarny lub tekstowy** (wiersz w `.gitattributes`) |
 | Stashe | push, apply, pop, drop, zapisanie zmian commita jako stasha (`stash from-commit`) |
 | Zdalne repozytoria i konfiguracja | dodanie, usunięcie, zmiana nazwy, zmiana adresu URL lub push URL zdalnego repozytorium, Git LFS track i untrack |

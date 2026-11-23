@@ -1942,6 +1942,7 @@ Każdy przycisk ma odpowiednik na klawiaturze:
 | **Aktywność** na pasku stanu | `Ctrl+N Shift+A` |
 | Pasek narzędzi: **Cofnij**, **Ponów** | `Ctrl+Z`, `Ctrl+Y` |
 | Pasek narzędzi: **Pull** / jego `▾` | `Ctrl+G p` / `Git: Opcje pull...` |
+| **Pull wszystkie gałęzie** (pozycja `▾` przy Pull) | `Ctrl+G Ctrl+P` |
 | Pasek narzędzi: **Push** / jego `▾` | `Ctrl+G Shift+P` / `Git: Push do zdalnego...` |
 | Pasek narzędzi: **Gałąź**, **Tag** | `Ctrl+G b`, `Ctrl+G t` |
 | Pasek narzędzi: **Stash**, **Pop** | `Ctrl+G Shift+T`, `Ctrl+G o` |

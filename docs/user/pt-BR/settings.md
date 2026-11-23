@@ -197,7 +197,7 @@ lançador do sistema operacional, no terminal que você escolher.
 | Linha | O que faz |
 |---|---|
 | **Instalação** | Somente leitura: o tipo, a pasta e o ambiente desta instalação. Em uma página estreita, a pasta é cortada no meio com reticências; a linha de ajuda sob a linha tem o texto completo. |
-| **Nome do lançador** | O nome dos atalhos e da entrada do menu de pastas desta instalação. Recusado quando outra instalação que ainda existe tem esse nome. A principal sempre se chama `GitPoulpi`. |
+| **Nome do lançador** | O nome dos atalhos e da entrada do menu de pastas desta instalação. Recusado quando outra instalação que ainda existe tem esse nome. Mudá-lo renomeia os atalhos que esta instalação já tem (menu Iniciar, Área de trabalho, a entrada do lançador de aplicativos) e reetiqueta no lugar a entrada do menu de pastas dela; nenhum é criado. A principal sempre se chama `GitPoulpi`. |
 | **Incluir a versão no nome do lançador** | Acrescenta `<major>.<minor>` ao nome (`GitPoulpi 1.2`); desligado por padrão, porque os atalhos são renomeados a cada atualização. |
 | **Cor do polvo** | A cor do polvo desta instalação e dos atalhos dela (as mesmas escolhas da janela Sobre). |
 | **Tornar-se a principal** | A principal fica com o nome simples `GitPoulpi`, os atalhos legados e as chaves `ui.*` que as builds mais antigas leem; por padrão, ninguém é a principal. Pergunta antes quando outra instalação é. A principal anterior mantém os lançadores dela com o próprio nome (Windows e Linux). Mudar de papel (tornar-se a principal ou deixar de ser) renomeia os atalhos desta instalação no próprio lugar, então nunca há um momento sem atalho, e move a entrada do gerenciador de arquivos para o novo nome. |

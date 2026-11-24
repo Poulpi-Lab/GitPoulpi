@@ -162,10 +162,30 @@ letras maiúsculas: **`V`** layout, **`H`** hunks ou arquivo todo, **`S`** espa�
 anterior hunk, **`E`** a codificação, **`M`** o minimapa. Cada um tem uma linha na paleta (*Revisão: alternar layout inline / dividido*,
 ...).
 
+Na **Visão geral**, a conversa e o bloco de rascunho ✦ selecionam do mesmo modo: arraste sobre o texto,
+**`Ctrl+C`** o copia (um link ou um botão que você pressiona mantém a ação, e um arrasto que começa em um deles não seleciona
+nada). Sem uma seleção, **`Ctrl+C`** (ou *Conversa: copiar texto*) copia a entrada selecionada como o host a
+guarda. O cursor em I aparece sobre o texto e a mão fica sobre botões e links. Uma seleção acompanha o que está
+na tela: rolar a move com o texto dela (ela continua selecionada enquanto está fora de vista), uma atualização que reescreve
+o texto a descarta, e um parágrafo quebrado é copiado como as linhas que mostra.
+
+Os comentários dentro do diff na página **Arquivos** (uma conversa, as suas notas pendentes, as sugestões ✦) também selecionam: arraste
+sobre as palavras deles, **`Ctrl+C`** (ou *Revisão: copiar o texto selecionado ou a linha*) as copia, **`Esc`** descarta a seleção. Um clique em
+um dos botões deles, ou um clique simples no cabeçalho de uma conversa (ela dobra), continua agindo; um arrasto que começa no cabeçalho seleciona as palavras
+dele e deixa a conversa como está.
+
 ### Commits
 
 Só os commits da solicitação (não o histórico por trás dela), do mais novo para o mais antigo, e o diff do selecionado
 (as suas alterações em relação ao pai), com todos os seus arquivos um sob o outro e as mesmas opções de exibição.
+
+## Voltando a uma revisão
+
+Uma revisão continua aberta enquanto você trabalha em outra aba. Saia da aba com a revisão aberta (clique em outra aba, `Ctrl+PageDown`, o **Repositório: próxima aba** da paleta) e, ao voltar, ela reabre na mesma solicitação, na mesma página (Visão geral, Arquivos ou Commits), no mesmo arquivo e na mesma linha, com o teclado do mesmo lado. O mesmo vale para uma revisão pela API sobre o Radar: mostre a aba Radar de novo e a revisão volta sobre ela.
+
+Uma revisão está **em andamento** enquanto a página dela está aberta. Fechá-la (`Esc`, a cruz, **Revisão: fechar**), enviá-la (**Concluir revisão**, ou enviar ou abandonar uma mudança do Gerrit) ou fazer checkout da branch dela a encerra, e ela não é reaberta. Sair do GitPoulpi com uma revisão aberta conta como sair da aba: o próximo início a reabre do mesmo modo.
+
+Se a solicitação foi integrada ou fechada nesse meio-tempo, ou o host não responde, nenhuma página abre: a linha de status diz por quê e nada é reaberto da próxima vez. Comentários pendentes, arquivos vistos e o rascunho são mantidos como sempre (veja **Escrevendo uma revisão**). Uma execução de sugestões ainda em andamento quando você sai não é levada adiante.
 
 ## Escrevendo uma revisão
 

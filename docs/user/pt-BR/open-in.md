@@ -20,6 +20,13 @@ lista. Nada é fixo no código: cada entrada é um rótulo e um comando.
   hora. Paleta (`Ctrl+P`): `Aba: abrir em...` e `Aba: abrir no padrão`. Os comandos da
   paleta funcionam mesmo quando a barra de título não tem espaço para o botão. As
   duas teclas podem ser reatribuídas; veja [Atalhos de teclado](keybindings.md).
+- **Por rótulo**: um passo `tab_open_in` de uma [sequência](config-reference.md#sequences) executa a entrada
+  cujo **rótulo** você nomeia (`label = "VS Code"`), então reordenar a lista nunca muda o que
+  ela executa. Um rótulo desconhecido interrompe o passo com "nenhuma entrada de “Abrir em” tem o rótulo ...".
+  `Aba: terminal aqui` (paleta) abre o seu terminal na pasta, o antigo botão
+  "Terminal aqui" da barra de abas.
+- **Um agente de IA na pasta**: `Aba: abrir agente de IA aqui` abre o seu terminal na
+  pasta da aba executando um agente de IA local; veja [IA](ai.md#abrir-o-agente-na-pasta-de-uma-aba).
 - **Clique com o botão direito em uma aba de repositório**: o menu da aba tem um submenu **Abrir
   em** com as mesmas entradas.
 - A lista começa na entrada que você usou por último nesta sessão.

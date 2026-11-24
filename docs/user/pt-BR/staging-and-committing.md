@@ -29,7 +29,14 @@ direita mostra as alterações em andamento:
   para os arquivos de um commit, e `gitpoulpi status` / `gitpoulpi diff` informam `renamed_from`.
 - **Caminho** ou **Árvore** (`m`) lista os arquivos de forma plana ou em pastas.
   **Recolher tudo** (`z`) recolhe as pastas. **Ver todos os arquivos** (`a`) mostra a
-  árvore inteira em vez de só os arquivos alterados. Clique com o botão direito no espaço
+  árvore inteira em vez de só os arquivos alterados. Uma pasta recolhida mostra, depois do nome, uma
+  pequena contagem esmaecida dos arquivos dentro dela, subpastas incluídas (`src/ (12)`);
+  uma pasta aberta não mostra nenhuma. Em um painel estreito o nome é encurtado primeiro para que a
+  contagem continue à vista. Em um repositório que tem arquivos guardados com Git LFS, uma caixa
+  **Só LFS** (`o`, ou **Arquivos: alternar só LFS**) reduz toda lista de arquivos
+  (Unstaged, Staged, **Ver todos os arquivos**, os arquivos de um commit) a esses arquivos;
+  as contagens das pastas acompanham, e ela não é oferecida quando nenhum arquivo usa LFS.
+  Clique com o botão direito no espaço
   vazio da lista para **Expandir tudo** / **Recolher tudo**, ou em uma linha de pasta para
   **Expandir todas as subpastas** / **Recolher todas as subpastas**; teclas `=`, `-`, `*`, `_`
   (veja [Mouse e gestos](mouse-and-gestures.md)).

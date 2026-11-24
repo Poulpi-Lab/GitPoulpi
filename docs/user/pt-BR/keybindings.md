@@ -471,6 +471,8 @@ Cada linha da paleta termina com um botão de tecla (`[k]`), e `Alt+K` faz o mes
 
 No `config.toml` é a tabela `[keybindings.palette]`, com o nome do comando (`toggle_minimap = "Ctrl+Alt+M"`). Uma tecla que conflita com outra ação aparece em vermelho, e `c` na linha lista todas as ações com as quais ela conflita.
 
+Uma sequência que você definiu (uma cadeia nomeada de comandos da paleta) recebe uma tecla do mesmo modo: `[keybindings.sequence]` recebe o id da sequência (`backup = "Ctrl+Alt+B"`), uma tecla para um id que não existe é informada e ignorada, e a tabela acompanha o `config.toml` enquanto o aplicativo roda. Cada sequência também é uma linha da paleta, `Sequência: <nome>`, mostrando a tecla dela.
+
 A faixa de dica abaixo da lista mostra essa tecla (`Alt+K` por padrão). É a ação `palette.configure_shortcut`, então pode ser redefinida como qualquer outra.
 
 A paleta e os seletores (tema, idioma, aba, busca no workspace) se movem e se redimensionam como um diálogo: arraste a borda superior, pressione `Ctrl+N` e depois `m` (como sobre todo diálogo) ou pressione `Alt+G`. `Alt+G` é a ação `palette.arrange` ("Diálogo: mover ou redimensionar o diálogo da frente"): um jeito extra, válido sobre todo diálogo e popup, de iniciar o modo de ajuste do que está na frente (as linhas da paleta `Diálogo: mover ou redimensionar` e `Diálogo: restaurar posição e tamanho` agem na própria paleta enquanto ela está aberta). As setas movem, `Shift`+setas redimensionam, `0` restaura, `Enter` ou `Esc` saem do modo e o popup continua aberto. `ui.dialog_geometry` decide se o lugar é mantido.

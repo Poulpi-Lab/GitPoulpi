@@ -265,6 +265,7 @@ const TOOLS: &[(&str, &str, bool)] = &[
     ("ui_propose_resolution", "propose", false),
     ("ui_propose_split", "propose", false),
     ("ui_propose_tag", "propose", false),
+    ("ui_sequence_run", "propose", false),
     ("ui_show_commit", "view", false),
     ("ui_show_conflict", "view", false),
     ("ui_show_diff", "view", false),

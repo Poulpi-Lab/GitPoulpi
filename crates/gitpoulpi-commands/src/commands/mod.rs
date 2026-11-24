@@ -48,7 +48,7 @@ mod repo_auth;
 pub(crate) mod rewrite;
 #[cfg(feature = "history-rewrite")]
 mod rewrite_host;
-mod sequence;
+pub(crate) mod sequence;
 pub(crate) mod split;
 mod stash;
 #[cfg(feature = "submodule")]
@@ -129,7 +129,8 @@ pub async fn run(
         let proposing = matches!(
             cli.command,
             Some(Commands::Ui {
-                action: crate::cli::UiAction::Propose { .. },
+                action: crate::cli::UiAction::Propose { .. }
+                    | crate::cli::UiAction::Sequence { .. },
                 ..
             })
         );

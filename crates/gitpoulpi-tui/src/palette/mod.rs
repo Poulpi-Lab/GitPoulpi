@@ -869,6 +869,13 @@ pub(crate) enum PaletteCommand {
     SequenceCancel,
     /// `Sequence: Continue`: the go-ahead a paused sequence waits for.
     SequenceContinue,
+    /// Lists the steps of the repository's own sequences before trusting them.
+    SequenceRepoReview,
+    /// Trusts the repository's own sequences as they are now.
+    SequenceRepoTrust,
+    /// Hides the "this repository defines sequences" notice until the file
+    /// changes.
+    SequenceRepoIgnore,
 }
 
 /// The Repository Management tab's actions, as palette commands. Each

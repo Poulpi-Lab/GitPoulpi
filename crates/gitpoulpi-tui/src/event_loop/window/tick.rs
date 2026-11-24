@@ -61,6 +61,10 @@ impl WindowState {
     pub(in crate::event_loop) fn tick(&mut self) -> FrameInputs {
         self.note_message();
         crate::activity_log::set_active_repo(&self.repo.root);
+        // The repository's own sequences file and the trust given to it.
+        if self.management.is_none() {
+            crate::sequence_run::repo::sync(&self.repo.root);
+        }
         if let Some(note) = crate::launcher_sync::poll() {
             self.last_message = Some(note);
         }

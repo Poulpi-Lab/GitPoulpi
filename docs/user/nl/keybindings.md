@@ -1228,6 +1228,9 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Agent: Terug | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | Sneltoetsen: Alles resetten... |  |
 | Integraties: Gekoppelde pull request openen | `Ctrl+G g` |
 | Integraties: Gekoppelde pull request bewerken op de host | `e (op een rij)` |

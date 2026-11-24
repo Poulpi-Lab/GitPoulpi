@@ -586,10 +586,12 @@ mod ui {
         ] {
             assert!(names.contains(&expected), "{expected} not in {names:?}");
         }
-        assert_eq!(ui.len(), 26, "{names:?}");
+        assert_eq!(ui.len(), 27, "{names:?}");
         for tool in ui {
             let a = &tool["annotations"];
-            if tool["name"].as_str().unwrap().starts_with("ui_propose_") {
+            if tool["name"].as_str().unwrap().starts_with("ui_propose_")
+                || tool["name"] == "ui_sequence_run"
+            {
                 // Their own class: a change the user confirms.
                 assert_eq!(a["readOnlyHint"], json!(false), "{}", tool["name"]);
                 assert_eq!(a["destructiveHint"], json!(false), "{}", tool["name"]);

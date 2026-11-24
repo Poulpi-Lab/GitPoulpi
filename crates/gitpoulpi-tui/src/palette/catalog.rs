@@ -3831,6 +3831,21 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::SequenceContinue,
     ),
     entry(
+        msg::palette::SEQUENCE_REPO_REVIEW,
+        "",
+        PaletteCommand::SequenceRepoReview,
+    ),
+    entry(
+        msg::palette::SEQUENCE_REPO_TRUST,
+        "",
+        PaletteCommand::SequenceRepoTrust,
+    ),
+    entry(
+        msg::palette::SEQUENCE_REPO_IGNORE,
+        "",
+        PaletteCommand::SequenceRepoIgnore,
+    ),
+    entry(
         msg::palette::KEYBINDINGS_RESET_ALL,
         "",
         PaletteCommand::KeybindingsResetAll,

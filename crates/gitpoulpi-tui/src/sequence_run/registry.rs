@@ -29,9 +29,11 @@ struct Slot {
     problem: Option<String>,
 }
 
-struct Registry {
+pub(super) struct Registry {
     slots: Vec<Slot>,
     generation: u64,
+    /// The active repository's own sequences file (`repo`).
+    pub(super) repo: Option<super::repo::Entry>,
 }
 
 impl Registry {
@@ -39,6 +41,7 @@ impl Registry {
         Registry {
             slots: Vec::new(),
             generation: 0,
+            repo: None,
         }
     }
 }
@@ -56,7 +59,7 @@ thread_local! {
     static REGISTRY: std::cell::RefCell<Registry> = const { std::cell::RefCell::new(Registry::new()) };
 }
 
-fn with<R>(f: impl FnOnce(&mut Registry) -> R) -> R {
+pub(super) fn with<R>(f: impl FnOnce(&mut Registry) -> R) -> R {
     #[cfg(not(test))]
     {
         f(&mut REGISTRY.lock().unwrap_or_else(|e| e.into_inner()))
@@ -92,15 +95,30 @@ pub(crate) struct Refused {
     pub(crate) slugs: Vec<String>,
 }
 
-/// Brings the registry in line with the sequences visible to `install_id`
-/// (repository sequences are not offered until their trust prompt exists).
+/// Brings the registry in line with the sequences visible to `install_id`:
+/// the user's own, the machine's, and the active repository's file when the
+/// user trusted it exactly as it is (`repo`).
 pub(crate) fn refresh(config: &Config, install_id: &str) -> Refused {
-    let defs: Vec<SequenceDef> =
+    let mut defs: Vec<SequenceDef> =
         gitpoulpi_config::sequences::visible_sequences(config, install_id, None)
             .into_iter()
             .map(|(d, _)| d)
             .collect();
+    defs.extend(super::repo::trusted_defs());
     refresh_defs(&defs)
+}
+
+/// Rebuilds the registry and the keymap from the config on disk (a live
+/// window: the repository's trust or file changed). Unit tests never read
+/// the machine's config.
+pub(crate) fn rebuild() {
+    #[cfg(not(test))]
+    {
+        if let Ok(settings) = gitpoulpi_config::Settings::resolve_ambient() {
+            let own = crate::launcher_sync::own_config(settings.config());
+            crate::keymap::install_from_config(&own);
+        }
+    }
 }
 
 /// [`refresh`] over an explicit list.
@@ -265,10 +283,7 @@ pub(crate) fn reload_if_changed() {
             }
             *seen = now;
         }
-        if let Ok(settings) = gitpoulpi_config::Settings::resolve_ambient() {
-            let own = crate::launcher_sync::own_config(settings.config());
-            crate::keymap::install_from_config(&own);
-        }
+        rebuild();
     }
 }
 

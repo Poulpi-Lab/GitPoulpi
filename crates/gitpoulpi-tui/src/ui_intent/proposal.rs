@@ -42,6 +42,9 @@ pub(crate) enum Dialog {
     Conflict,
     /// The history rewrite workbench, open on the proposed recipe.
     Rewrite,
+    /// A proposed sequence run: a banner with Run and Dismiss, nothing runs
+    /// until the user presses Run.
+    Sequence,
 }
 
 /// The proposal whose dialog is open.
@@ -178,10 +181,75 @@ pub(crate) fn guards_enter() -> bool {
     })
 }
 
+/// Whether a proposed sequence run waits for the user's answer.
+pub(crate) fn sequence_pending() -> bool {
+    lock(&ACTIVE)
+        .as_ref()
+        .is_some_and(|a| a.dialog == Dialog::Sequence && a.confirmed.is_none())
+}
+
+/// The user pressed Run on the sequence banner: the window starts it on its
+/// next tick (`agent_propose_tick`).
+pub(crate) fn run_sequence() {
+    if let Some(active) = lock(&ACTIVE).as_mut() {
+        if active.dialog == Dialog::Sequence {
+            active.confirmed = Some(active.proposed.clone());
+        }
+    }
+    crate::redraw::poke();
+}
+
+/// The user dismissed the sequence banner: nothing runs, the proposal is
+/// settled as rejected.
+pub(crate) fn dismiss_sequence() {
+    let closed = {
+        let mut slot = lock(&ACTIVE);
+        if slot.as_ref().is_some_and(|a| a.dialog == Dialog::Sequence) {
+            slot.take()
+        } else {
+            None
+        }
+    };
+    if let Some(active) = closed {
+        settle(&active.id, ProposalStatus::Rejected);
+        crate::redraw::poke();
+    }
+}
+
+/// The two buttons of the sequence banner.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum BannerButton {
+    Run,
+    Dismiss,
+}
+
+static BANNER_HITS: Mutex<Vec<(ratatui::layout::Rect, BannerButton)>> = Mutex::new(Vec::new());
+
+/// The banner button under a click, from the last paint.
+pub(crate) fn banner_hit(column: u16, row: u16) -> Option<BannerButton> {
+    lock(&BANNER_HITS)
+        .iter()
+        .find(|(r, _)| r.contains(ratatui::layout::Position::new(column, row)))
+        .map(|(_, b)| *b)
+}
+
 /// The "✦ Proposed by" line drawn while a proposal's dialog is open.
 pub(crate) fn banner() -> Option<String> {
     let active = active()?;
     let confirm = match active.dialog {
+        Dialog::Sequence => {
+            let km = crate::keymap::current();
+            let accept = format!(
+                "{} {}",
+                km.shown(crate::keymap::Action::GlobalNavPrefix),
+                km.shown_key(crate::keymap::Action::NavAgentShow)
+            );
+            return Some(format!(
+                "{} {}",
+                crate::theme::AI_SPARK,
+                msg::banner_sequence(&active.client, &active.what, accept)
+            ));
+        }
         Dialog::Reword(_) => {
             msg::accepts_key(crate::keymap::current().shown(crate::keymap::Action::RewordApply))
         }
@@ -208,13 +276,62 @@ pub(crate) fn banner() -> Option<String> {
 /// Draws [`banner`] at the right of the row above the chip's (the chip and
 /// the toast keep their own row), in the AI purple.
 pub(crate) fn render_banner(frame: &mut ratatui::Frame<'_>, area: ratatui::layout::Rect) {
+    lock(&BANNER_HITS).clear();
     let Some(text) = banner() else {
         return;
     };
     let text = format!(" {text} ");
-    let width = (crate::ui_kit::display_width(&text) as u16).min(area.width);
+    let sequence = sequence_pending();
+    // The sequence banner carries its two buttons after the words.
+    let (run, dismiss) = (
+        format!(" {} ", msg::BUTTON_RUN.get()),
+        format!(" {} ", msg::BUTTON_DISMISS.get()),
+    );
+    let buttons_width = if sequence {
+        (crate::ui_kit::display_width(&run) + crate::ui_kit::display_width(&dismiss) + 2) as u16
+    } else {
+        0
+    };
+    let text_width = crate::ui_kit::display_width(&text) as u16;
+    let width = (text_width + buttons_width).min(area.width);
     let rect = ratatui::layout::Rect::new(area.right() - width, area.bottom() - 3, width, 1);
     frame.render_widget(crate::wide_edge::Clear, rect);
+    if sequence {
+        let style = Style::default()
+            .fg(th().ui.on_button)
+            .bg(th().chrome.proposal_bg)
+            .add_modifier(Modifier::BOLD);
+        let button = Style::default().fg(th().ui.on_button).bg(th().ui.button);
+        let room = width.saturating_sub(buttons_width);
+        frame.render_widget(
+            ratatui::widgets::Paragraph::new(text).style(style),
+            ratatui::layout::Rect::new(rect.x, rect.y, room, 1),
+        );
+        let run_rect = ratatui::layout::Rect::new(
+            rect.x + room + 1,
+            rect.y,
+            crate::ui_kit::display_width(&run) as u16,
+            1,
+        );
+        let dismiss_rect = ratatui::layout::Rect::new(
+            run_rect.right() + 1,
+            rect.y,
+            crate::ui_kit::display_width(&dismiss) as u16,
+            1,
+        );
+        frame.render_widget(
+            ratatui::widgets::Paragraph::new(run).style(button),
+            run_rect,
+        );
+        frame.render_widget(
+            ratatui::widgets::Paragraph::new(dismiss).style(button),
+            dismiss_rect,
+        );
+        let mut hits = lock(&BANNER_HITS);
+        hits.push((run_rect, BannerButton::Run));
+        hits.push((dismiss_rect, BannerButton::Dismiss));
+        return;
+    }
     frame.render_widget(
         ratatui::widgets::Paragraph::new(text).style(
             Style::default()
@@ -324,6 +441,40 @@ mod tests {
         let title = dialog_title(" Titre ", &Some("agent".into()));
         let shown: String = title.spans.iter().map(|s| s.content.as_ref()).collect();
         assert!(shown.contains("Proposé par agent"), "{shown}");
+    }
+
+    #[test]
+    fn the_sequence_banner_offers_run_and_dismiss_and_dismiss_settles_it_rejected() {
+        let _guard = lock(&TEST_LOCK);
+        let mut proposed = sample("t-seq", Dialog::Sequence);
+        proposed.what = "run sequence Backup".into();
+        proposed.proposed = "backup".into();
+        record("t-seq", "sequence_run", "agent", ProposalStatus::Open);
+        open(proposed);
+        assert!(sequence_pending());
+        let text = banner().unwrap();
+        assert!(
+            text.contains("Proposed by agent: run sequence Backup") && text.contains("runs"),
+            "{text}"
+        );
+        // Run is the user's go-ahead: the window starts it, so it only marks it.
+        run_sequence();
+        assert!(!sequence_pending(), "answered");
+        assert_eq!(active().unwrap().confirmed.as_deref(), Some("backup"));
+        close();
+        // Dismiss closes it and settles it as rejected: nothing ran.
+        open(sample("t-seq", Dialog::Sequence));
+        dismiss_sequence();
+        assert!(active().is_none());
+        assert_eq!(
+            records().iter().find(|r| r.id == "t-seq").unwrap().status,
+            ProposalStatus::Rejected
+        );
+        // Another dialog's proposal is not a sequence banner's to dismiss.
+        open(sample("t-tag", Dialog::Tag(Oid([1; 20]))));
+        dismiss_sequence();
+        assert!(active().is_some());
+        close();
     }
 
     #[test]

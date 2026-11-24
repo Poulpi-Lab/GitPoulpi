@@ -577,6 +577,17 @@ pub(super) fn handle(
                 commands::run_command(cx, PaletteCommand::OpenActivityLog);
             }
         }
+    } else if let Some(HitTarget::RepoSequences(button)) = &hit {
+        use crate::sequence_run::repo_strip::NoticeButton as B;
+        // Every button is its palette command's twin.
+        commands::run_command(
+            cx,
+            match button {
+                B::Review => PaletteCommand::SequenceRepoReview,
+                B::Trust => PaletteCommand::SequenceRepoTrust,
+                B::Ignore => PaletteCommand::SequenceRepoIgnore,
+            },
+        );
     } else if let Some(HitTarget::ConflictBadge) = &hit {
         commands::run_command(cx, PaletteCommand::ConflictsShow);
     } else if let Some(HitTarget::Toolbar(button)) = &hit {

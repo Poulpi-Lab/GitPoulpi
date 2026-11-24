@@ -58,11 +58,52 @@ Each sequence has a scope, saved with it:
 |---|---|---|
 | **This installation** (default) | `[[sequences]]` in `config.toml`, with this installation as its owner | Only this install of GitPoulpi. |
 | **All installations on this computer** | `[[sequences]]` in `config.toml`, no owner | Every installation that shares the file. |
-| **This repository only** | `.gitpoulpi/sequences.toml` in the current repository | Whoever has the repository. A repository sequence has no shortcut yet, and the repository file is only read once you trust it. |
+| **This repository only** | `.gitpoulpi/sequences.toml` in the current repository | Whoever has the repository. It only counts once you trust it (see below). |
 
 Changing the scope moves the definition: choosing **This repository only**
 writes it to the repository's file and removes it from `config.toml`, and
 the reverse. A repository scope needs a repository to be open.
+
+### Repository sequences and trust
+
+The file `.gitpoulpi/sequences.toml` can be committed, so it can come from
+other people, and a sequence runs commands on your machine. A repository's
+sequences are therefore **not offered until you trust them**, the way the
+commands of a committed workflow file are.
+
+When a repository has such a file nobody trusted yet, a notice appears over
+the Log: *This repository defines 2 sequences* with **Review**, **Trust** and
+**Ignore**. It never blocks anything.
+
+- **Review** lists every sequence with every step, its pause and its options,
+  read-only. **Trust** there trusts what was listed; **Close** (or `Esc`)
+  trusts nothing. If the list is longer than the window, Trust is not offered
+  there (enlarge the window): you never trust what you could not read.
+- **Trust** (the button, or the palette's *Sequence: Trust This Repository's
+  Sequences*) trusts the file exactly as it is now.
+- **Ignore** hides the notice until the file changes.
+- From the keyboard: the palette has *Sequence: Review / Trust / Ignore This
+  Repository's Sequences*.
+
+What is recorded is a digest of the ids, the commands, the pauses and the
+options, kept in the repository's local state (never in the repository). If
+any of those change, for example after a pull, the notice comes back as *The
+sequences of this repository changed* and they leave the palette and the keys
+until you trust them again. Renaming a sequence or editing its description
+changes nothing. A sequence you write yourself in Settings stays trusted when
+the file was already trusted (or empty) before you edited it.
+
+Once trusted, repository sequences appear as `Sequence: <name>` in the
+palette like your own and can be given a shortcut in Settings. A sequence with
+the same id as one of yours is a clash: yours wins and the other is reported
+as a duplicate.
+
+From the command line: `gitpoulpi sequence list` shows the file's sequences
+with `trusted` and a `repo_trust` state (`untrusted`, `changed`, `trusted`);
+`gitpoulpi sequence trust` (and `untrust`, `--repo PATH` for another
+repository) is for a person to run after reading `sequence show`.
+`sequence run` refuses an untrusted repository sequence. AI agents cannot
+trust: there is no MCP tool for it.
 
 ## Steps
 
@@ -222,6 +263,18 @@ While it runs, a strip over the top of the Log shows `<name> k/n`, the step, and
 **When a step fails** the run stops there: the status line names the sequence, the step and the error, the strip turns red with **Details** (the Activity Log entry, which lists the step's options) and a close cross, and the earlier steps stay done.
 
 **Worktrees.** A create worktree step with `open_tab = true` moves the run to the new worktree's tab: the next steps (`tab_dir_terminal`, `tab_open_agent_here`, `tab_open_in`) act there. If another tab is on screen the strip says "waiting for tab <name>" with **Go there**. Closing that tab cancels the run. A run does not survive quitting GitPoulpi.
+
+### An agent proposing a run
+
+With *Let AI agents propose changes for me to confirm* on (`[mcp]
+allow_ui_propose`), an agent can ask your window to run a sequence
+(`gitpoulpi ui sequence run <id>`, MCP `ui_sequence_run`). A banner appears:
+*✦ Proposed by <agent>: run sequence <name>* with **Run** and **Dismiss**.
+Nothing runs until you press Run (click it, or `Ctrl+N` then `Enter`);
+Dismiss, `Esc` (when nothing else wants it) or the palette's *Agent: Dismiss
+Pending View* drops it. The run then goes exactly as if you had started it,
+pausing where the sequence says. The proposal is refused when the sequence
+does not exist, is invalid, or is a repository sequence you have not trusted.
 
 ## Undoing a run
 

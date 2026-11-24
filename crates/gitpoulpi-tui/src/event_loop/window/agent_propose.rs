@@ -170,6 +170,35 @@ impl WindowState {
                 self.open_ref_name(RefNameOp::NewBranchAt(*start_point), name, *start_point);
                 (Dialog::Branch(*start_point), name.clone())
             }
+            Proposal::SequenceRun { id: sequence } => {
+                if crate::sequence_run::active() {
+                    return refused(
+                        id,
+                        kind,
+                        &client,
+                        en(|| {
+                            gitpoulpi_i18n::msg::agent_reason::SEQUENCE_RUNNING
+                                .get()
+                                .to_string()
+                        }),
+                    );
+                }
+                // Only a sequence the user could start from the palette: it
+                // is in the registry (so trusted, when the repository's) and
+                // valid.
+                let runnable = crate::sequence_run::registry::slot_of(sequence)
+                    .and_then(crate::sequence_run::registry::info)
+                    .is_some_and(|info| info.problem.is_none());
+                if !runnable {
+                    return refused(
+                        id,
+                        kind,
+                        &client,
+                        en(|| gitpoulpi_i18n::msg::agent_reason::sequence_gone(sequence)),
+                    );
+                }
+                (Dialog::Sequence, sequence.clone())
+            }
             Proposal::Tag {
                 name,
                 target,
@@ -237,6 +266,7 @@ impl WindowState {
             (Dialog::CommitMessage, _) => {
                 !self.commit_summary.trim().is_empty() || !self.commit_description.trim().is_empty()
             }
+            (Dialog::Sequence, _) => true,
             (Dialog::Branch(oid), InputMode::InlineName { op, .. }) => {
                 matches!(op, RefNameOp::NewBranchAt(at) if *at == oid)
             }
@@ -257,6 +287,24 @@ impl WindowState {
             return;
         };
         let here = self.management.is_none() && active.repo == self.repo_root;
+        // Esc dismisses a proposed sequence when nothing else wants the key.
+        let esc = self.ui_viewer.take_banner_esc();
+        if here
+            && esc
+            && active.dialog == Dialog::Sequence
+            && active.confirmed.is_none()
+            && matches!(self.input_mode, InputMode::Normal)
+            && self.preferences.is_none()
+        {
+            proposal::dismiss_sequence();
+            return;
+        }
+        // Run was pressed: the user's go-ahead starts it, here, now.
+        if here && active.dialog == Dialog::Sequence && active.confirmed.is_some() {
+            if let Some(slot) = crate::sequence_run::registry::slot_of(&active.proposed) {
+                crate::sequence_run::start(slot, &self.repo_root, &mut self.last_message);
+            }
+        }
         if here && active.confirmed.is_none() && self.proposal_dialog_open(active.dialog) {
             return;
         }

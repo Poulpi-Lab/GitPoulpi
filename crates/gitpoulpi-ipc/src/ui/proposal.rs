@@ -53,6 +53,12 @@ pub enum Proposal {
         #[serde(default)]
         message: Option<String>,
     },
+    /// Run the sequence `id` (see `gitpoulpi_config::sequences`) in this
+    /// repository: the window shows "Proposed by <client>: run sequence
+    /// <name>" with Run and Dismiss, and nothing runs until the user presses
+    /// Run. Only a sequence the user can run themselves (valid, and trusted
+    /// when it comes from the repository) is offered.
+    SequenceRun { id: String },
 }
 
 impl Proposal {
@@ -66,6 +72,7 @@ impl Proposal {
             Proposal::CommitMessage { .. } => "commit_message",
             Proposal::Branch { .. } => "branch",
             Proposal::Tag { .. } => "tag",
+            Proposal::SequenceRun { .. } => "sequence_run",
         }
     }
 
@@ -128,6 +135,7 @@ impl Proposal {
                 *body = sanitize_message(body);
             }
             Proposal::Branch { name, .. } => *name = sanitize_name(name),
+            Proposal::SequenceRun { id } => *id = sanitize_name(id),
             Proposal::Tag { name, message, .. } => {
                 *name = sanitize_name(name);
                 if let Some(m) = message {
@@ -161,6 +169,7 @@ impl Proposal {
             Proposal::Rewrite { recipe } => serde_json::to_string(recipe).unwrap_or_default(),
             Proposal::CommitMessage { summary, body } => join(summary, body),
             Proposal::Branch { name, .. } => name.clone(),
+            Proposal::SequenceRun { id } => id.clone(),
             Proposal::Tag { name, message, .. } => join(name, message.as_deref().unwrap_or("")),
         }
     }
@@ -304,6 +313,9 @@ mod tests {
                 picks: Some(vec![ConflictPicks::default()]),
                 content: None,
             },
+            Proposal::SequenceRun {
+                id: "backup".into(),
+            },
         ]
     }
 
@@ -311,7 +323,7 @@ mod tests {
     fn every_proposal_round_trips_inside_a_propose_intent() {
         let all = every_proposal();
         let kinds: std::collections::HashSet<_> = all.iter().map(|p| p.kind()).collect();
-        assert_eq!(kinds.len(), 5);
+        assert_eq!(kinds.len(), 6);
         for proposal in all {
             let intent = UiIntent::Propose {
                 repo: repo(),

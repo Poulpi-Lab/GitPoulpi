@@ -178,6 +178,14 @@ pub const EXCLUDED: &[(&[&str], &str)] = &[
         "removes a sequence from the user's config; the user's macros are theirs to manage",
     ),
     (
+        &["sequence", "trust"],
+        "trusting the sequences a repository commits (they run commands on the user's machine) is a person's decision; an agent can only run sequences a person trusted",
+    ),
+    (
+        &["sequence", "untrust"],
+        "withdrawing the trust of a repository's sequences is a person's decision, like granting it",
+    ),
+    (
         &["flow", "trust-hooks"],
         "trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted",
     ),

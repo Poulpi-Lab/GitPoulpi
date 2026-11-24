@@ -1224,6 +1224,9 @@ Tuşlar varsayılanlardır.
 | Ajan: Geri | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | Tuş Atamaları: Tümünü Sıfırla... |  |
 | Entegrasyonlar: Bağlı Pull Request Aç | `Ctrl+G g` |
 | Entegrasyonlar: Bağlı Pull Request Barındırıcıda Düzenle | `e (satırda)` |

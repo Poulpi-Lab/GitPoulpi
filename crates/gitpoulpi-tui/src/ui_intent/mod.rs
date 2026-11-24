@@ -169,6 +169,11 @@ pub(crate) fn describe_proposal(proposal: &Proposal) -> String {
         Proposal::CommitMessage { .. } => msg::PROP_COMMIT_MESSAGE.get().into(),
         Proposal::Branch { name, start_point } => msg::prop_branch(name, short(start_point)),
         Proposal::Tag { name, target, .. } => msg::prop_tag(name, short(target)),
+        Proposal::SequenceRun { id } => msg::prop_sequence(
+            crate::sequence_run::registry::slot_of(id)
+                .and_then(crate::sequence_run::registry::info)
+                .map_or_else(|| id.clone(), |info| info.name),
+        ),
     }
 }
 

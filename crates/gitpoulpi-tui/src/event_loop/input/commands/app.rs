@@ -592,6 +592,21 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         PaletteCommand::AgentBack => cx.ui_viewer.request_back(),
         PaletteCommand::SequenceCancel => crate::sequence_run::request_cancel(),
         PaletteCommand::SequenceContinue => crate::sequence_run::request_continue(),
+        PaletteCommand::SequenceRepoReview => crate::sequence_run::repo_review::open(),
+        PaletteCommand::SequenceRepoTrust => {
+            *cx.last_message = Some(match crate::sequence_run::repo::trust() {
+                Ok(n) => gitpoulpi_i18n::msg::sequence_run::say_repo_trusted(n as u64),
+                Err(why) => why,
+            });
+        }
+        PaletteCommand::SequenceRepoIgnore => {
+            crate::sequence_run::repo::ignore();
+            *cx.last_message = Some(
+                gitpoulpi_i18n::msg::sequence_run::SAY_REPO_IGNORED
+                    .get()
+                    .to_string(),
+            );
+        }
         PaletteCommand::AiExplainSelectedCommit => {
             if let Some(commit) =
                 selected_log_commit(&*cx.log_result, &*cx.log_state, &*cx.log_order)

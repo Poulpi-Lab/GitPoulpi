@@ -503,6 +503,7 @@ confirm.
 | `ui_propose_rewrite` | `gitpoulpi ui propose rewrite` | propose |
 | `ui_propose_split` | `gitpoulpi ui propose split` | propose |
 | `ui_propose_tag` | `gitpoulpi ui propose tag` | propose |
+| `ui_sequence_run` | `gitpoulpi ui sequence run` | propose |
 | `ui_show_commit` | `gitpoulpi ui show commit` | view |
 | `ui_show_conflict` | `gitpoulpi ui show conflict` | view |
 | `ui_show_diff` | `gitpoulpi ui show diff` | view |
@@ -574,6 +575,8 @@ Not exposed as tools:
 | `gitpoulpi repo-auth clear` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
 | `gitpoulpi sequence add` | a sequence is a list of commands that run later (and can be bound to a key): an agent must not write its own macros, or edit the config that gates it |
 | `gitpoulpi sequence remove` | removes a sequence from the user's config; the user's macros are theirs to manage |
+| `gitpoulpi sequence trust` | trusting the sequences a repository commits (they run commands on the user's machine) is a person's decision; an agent can only run sequences a person trusted |
+| `gitpoulpi sequence untrust` | withdrawing the trust of a repository's sequences is a person's decision, like granting it |
 | `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
@@ -661,6 +664,7 @@ that dialog's own confirm; you can edit first or cancel.
 | `ui_propose_split` (rev, plan file) | the split editor over the commit, filled from the plan | *Split* (`Ctrl+S`); `Esc` rejects |
 | `ui_propose_rewrite` (recipe file) | the history rewrite workbench with the recipe's rules in it; nothing is previewed or applied | your own *Preview* then *Apply* (`Ctrl+Enter`); `Esc` rejects. A recipe with a script is refused, secret values are dropped |
 | `ui_propose_resolution` (path, pick or content file) | the merge editor on a conflicted file, with the picks (or the whole text) already in the Output | *Save & mark resolved* (`Ctrl+S`); closing it rejects |
+| `ui_sequence_run` (id) | a banner "✦ Proposed by <agent>: run sequence <name>" with *Run* and *Dismiss*; nothing runs yet | *Run* (click, or `Ctrl+N` then `Enter`); *Dismiss* or `Esc` rejects. The run then pauses where the sequence says. Refused when the sequence does not exist, is invalid, or is a repository sequence you have not trusted |
 
 One proposal at a time; a commit-message proposal is refused while you have your
 own draft in the composer, and a resolution proposal while the merge editor holds

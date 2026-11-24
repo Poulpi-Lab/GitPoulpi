@@ -1226,6 +1226,9 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Agent: Back | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | Keybindings: Reset All... |  |
 | Integrations: Open Linked Pull Request | `Ctrl+G g` |
 | Integrations: Edit Linked Pull Request on the Host | `e (on a row)` |

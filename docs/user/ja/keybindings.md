@@ -1190,6 +1190,9 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | エージェント: 戻る | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | キー割り当て: すべてリセット... |  |
 | 連携: 関連するPull Requestを開く | `Ctrl+G g` |
 | 連携: 関連するPull Requestをホストで編集 | `e（行の上で）` |

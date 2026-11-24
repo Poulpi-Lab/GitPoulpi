@@ -242,6 +242,26 @@ mod tests {
         assert!(to_argv(&s, &args).is_err(), "flow_start accepted a hash");
     }
 
+    /// Agents cannot trust a repository's own sequences either (the same
+    /// precedent as the workflow hooks), but they can propose running one:
+    /// `ui_sequence_run` is a tool of the propose class.
+    #[test]
+    fn an_agent_cannot_trust_repository_sequences_but_can_propose_a_run() {
+        for leaf in ["trust", "untrust"] {
+            assert!(
+                registry::tools()
+                    .iter()
+                    .all(|s| s.cli_path != ["sequence", leaf]),
+                "`sequence {leaf}` is a tool"
+            );
+            assert!(
+                registry::excluded_reason(&["sequence".to_string(), leaf.to_string()]).is_some()
+            );
+        }
+        let run = spec("ui_sequence_run");
+        assert!(crate::policy::is_propose(&run.cli_path));
+    }
+
     /// `stage` offers `allow_sensitive` only when the operator turned
     /// `[mcp] allow_sensitive_staging` on: otherwise it is neither in the
     /// schema nor accepted, so an agent cannot pass the staging guard.

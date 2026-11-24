@@ -69,7 +69,10 @@ impl PreferencesState {
         // The shortcut: the button opens the capture popup of the Keyboard
         // shortcuts page.
         let chord = self.seq_chord(&cur.id);
-        let repo = cur.scope == Scope::Repo;
+        // A repository sequence has a shortcut once the repository's file is
+        // trusted (only a trusted file is in the registry).
+        let repo =
+            cur.scope == Scope::Repo && crate::sequence_run::registry::slot_of(&cur.id).is_none();
         let mut buttons = vec![Btn {
             enabled: !repo,
             ..Btn::new(
@@ -89,7 +92,7 @@ impl PreferencesState {
         }
         fields.push(
             Field::buttons(t::SHORTCUT.get(), buttons).with_help(if repo {
-                t::SHORTCUT_REPO_HELP.get()
+                t::SHORTCUT_REPO_UNTRUSTED_HELP.get()
             } else {
                 t::SHORTCUT_HELP.get()
             }),

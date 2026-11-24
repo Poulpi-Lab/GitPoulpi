@@ -998,6 +998,30 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
             frame_hits.splice(0..0, front);
         }
     }
+    // The repository's own sequences nobody trusted yet: a question, so it
+    // takes a border row only when every banner above left one free.
+    if central_view == CentralView::Log {
+        let slot = run_slots
+            + usize::from(pending_auto_stash.is_some())
+            + usize::from(group_paused)
+            + usize::from(index_lock.as_ref().is_some_and(|l| l.stale))
+            + usize::from(conflict_prediction.is_some());
+        if let (Some(notice), Some(strip)) = (
+            crate::sequence_run::repo::notice(),
+            crate::operation_banner::strip_rect(log_area, slot),
+        ) {
+            let hovered_button = match &hovered_target {
+                Some(HitTarget::RepoSequences(button)) => Some(*button),
+                _ => None,
+            };
+            let front: Vec<(Rect, HitTarget)> =
+                crate::sequence_run::repo_strip::render(frame, strip, &notice, hovered_button)
+                    .into_iter()
+                    .map(|(rect, button)| (rect, HitTarget::RepoSequences(button)))
+                    .collect();
+            frame_hits.splice(0..0, front);
+        }
+    }
     *ctx.file_insight_area = file_insight_area;
 }
 

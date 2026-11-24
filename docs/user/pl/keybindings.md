@@ -1223,6 +1223,9 @@ zastosowania. Klawisze są domyślne.
 | Agent: Wstecz | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | Skróty: Resetuj wszystkie... |  |
 | Integracje: Otwórz powiązany pull request | `Ctrl+G g` |
 | Integracje: Edytuj powiązany pull request na hoście | `e (na wierszu)` |

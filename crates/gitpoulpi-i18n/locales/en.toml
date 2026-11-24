@@ -4778,6 +4778,14 @@ why_group_not_ready = "resolve and conclude the conflicts first"
 why_nothing_to_retry = "no remote failed in the last grouped {$push}"
 edit_undo_sequence = "Edit: Undo Whole Sequence"
 undo_history_undo_sequence = "Undo History: Undo Whole Sequence"
+# context: palette row: lists the steps of the repository sequences waiting for trust
+sequence_repo_review = "Sequence: Review This Repository's Sequences"
+# context: palette row: trusts the repository sequences as they are
+sequence_repo_trust = "Sequence: Trust This Repository's Sequences"
+# context: palette row: hides the repository sequences notice until the file changes
+sequence_repo_ignore = "Sequence: Ignore This Repository's Sequences"
+# context: why the repository sequence rows are unavailable
+why_no_repo_sequences = "this repository has no sequences waiting for your trust"
 
 [help_section]
 rewrite = "Rewrite history"
@@ -6637,6 +6645,10 @@ kind_unstaged = "unstaged"
 log_commit_timeout = "the Log did not load the commit in time"
 tab_gone = "that tab is gone"
 nothing_to_go_back = "nothing to go back to"
+# context: refusal sent to an agent; {id} is the sequence id
+sequence_gone = "the sequence {id} no longer exists, is invalid, or comes from a repository file the user has not trusted"
+# context: refusal sent to an agent
+sequence_running = "a sequence is already running in this window"
 
 [ai_ui]
 # context: status line while an AI request runs; {label} is "Commit message via <profile>"; the star is added in code
@@ -6726,6 +6738,14 @@ shown = "shown by {client}: {what} · {back} to go back"
 
 # History editing: interactive rebase plan, reword popup, commit
 # composer, AI compose review, built-in editor, LFS, submodules.
+# context: what an agent proposes in the banner; {name} is the sequence's own name
+prop_sequence = "run sequence {name}"
+# context: banner over a proposed sequence run; {client} is the agent, {what} what it proposes, {accept} the chord that runs it
+banner_sequence = "Proposed by {client}: {what} · {accept} runs · Esc dismisses"
+# context: button of the proposal banner that starts the proposed sequence
+button_run = "Run"
+# context: button of the proposal banner that drops the proposal
+button_dismiss = "Dismiss"
 
 [rebase_ui]
 # context: title of the interactive cherry-pick view (git term kept in English)
@@ -13205,6 +13225,44 @@ step_failed_start = "{step} did not start"
 def_gone = "the sequence {name} no longer exists"
 # context: shorter run strip text when a step failed (the error text does not fit)
 strip_stopped = "{name} stopped at step {k}/{n} ({step})"
+# context: notice over the Log when the repository has its own sequences nobody trusted yet; {n} is how many
+repo_notice = { one = "This repository defines {n} sequence", other = "This repository defines {n} sequences" }
+# context: notice when the repository's sequences changed since the user trusted them; {n} is how many it defines now
+repo_notice_changed = { one = "This repository's sequence changed", other = "This repository's {n} sequences changed" }
+# context: button of the repository sequences notice: lists the steps first
+repo_button_review = "Review"
+# context: button of the repository sequences notice: trusts them as they are
+repo_button_trust = "Trust"
+# context: button of the repository sequences notice: hides it until the file changes
+repo_button_ignore = "Ignore"
+# context: title of the dialog that lists the steps of the repository sequences
+repo_review_title = "Sequences of this repository"
+# context: first paragraph of the review dialog
+repo_review_intro = "These sequences come from this repository's .gitpoulpi/sequences.toml. They run commands on your machine when you start them. Trust them only if you trust everyone who can change this repository."
+# context: heading of one sequence in the review; {name} is its name, {id} its id
+repo_review_sequence = "{name} ({id})"
+# context: one step in the review; {n} is its place, {step} the command
+repo_review_step = "{n}. {step}"
+# context: review: the step stops before it runs
+repo_review_pause_always = "pauses before it runs"
+# context: review: the step never stops
+repo_review_pause_never = "never pauses"
+# context: review: the options of a step; {options} is a list like name=v1
+repo_review_options = "options: {options}"
+# context: button of the review dialog that trusts the sequences as listed
+repo_review_trust = "Trust"
+# context: letter that presses Trust in the review dialog
+repo_key_trust = "t"
+# context: button of the review dialog that closes it without trusting
+repo_review_close = "Close"
+# context: letter that presses Close in the review dialog
+repo_key_close = "c"
+# context: status line after the user trusted the repository sequences; {n} is how many
+say_repo_trusted = "Repository sequences trusted: {n}"
+# context: status line after the user ignored the repository sequences notice
+say_repo_ignored = "Repository sequences ignored until the file changes"
+# context: last paragraph of the review dialog when the list does not fit the terminal, so Trust is not offered
+repo_review_too_long = "This list is longer than the window: enlarge the window to see all of it and trust it from here."
 
 [settings_sequences]
 section_title = "Sequences"
@@ -13243,7 +13301,6 @@ shortcut = "Shortcut"
 shortcut_help = "The key that starts this sequence from anywhere in the window. Enter opens the key capture; conflicts are refused like on the Keyboard shortcuts page."
 shortcut_none = "Not set"
 shortcut_clear = "Clear"
-shortcut_repo_help = "A repository sequence has no shortcut yet."
 steps_row = "Steps"
 # context: button that opens a sequence's list of steps; {n} is how many it has
 steps_edit = "Edit steps ({n})"
@@ -13295,3 +13352,5 @@ no_repo = "This folder is not a repository: a repository sequence needs one"
 cannot_run = "Cannot run: {reason}"
 # context: a refused write; {error} is the reason
 write_failed = "Sequences: {error}"
+# context: help of the Shortcut row of a repository sequence nobody trusted yet
+shortcut_repo_untrusted_help = "A repository sequence gets a shortcut once you trust this repository's sequences."

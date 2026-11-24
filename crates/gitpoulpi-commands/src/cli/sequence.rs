@@ -16,9 +16,10 @@ pub enum SequenceAction {
     /// The sequences this installation sees (its own and the machine-wide
     /// ones in `config.toml`), each with its steps, its validation problems
     /// and whether it can run headless. The current repository's
-    /// `.gitpoulpi/sequences.toml` is listed with `trusted: false` and never
-    /// run: repository sequences are somebody else's commands. Needs no
-    /// daemon.
+    /// `.gitpoulpi/sequences.toml` is listed too, with `trusted` as the user
+    /// decided (`sequence trust`) and a `repo_trust` summary: repository
+    /// sequences are somebody else's commands, so they run only while the
+    /// file is trusted exactly as it is now. Needs no daemon.
     List,
     /// One sequence with its steps and, for each step, what it does and
     /// whether it can run headless.
@@ -86,4 +87,15 @@ pub enum SequenceAction {
         #[arg(long, value_enum)]
         scope: Option<SequenceScopeArg>,
     },
+    /// Trust the sequences of the repository's `.gitpoulpi/sequences.toml`
+    /// as they are now (use `--repo PATH` for another repository): they then
+    /// list, bind and run like your own. Any change of an id, a command, a
+    /// pause or an option asks again; a new name does not. Prints the
+    /// sequences and what they do first when run in a terminal is not
+    /// needed: the JSON lists every step. Exit code 2 when the repository
+    /// has no such file.
+    Trust,
+    /// Forget the trust given by `sequence trust`: the repository's
+    /// sequences are listed again but never run.
+    Untrust,
 }

@@ -7,6 +7,7 @@ mod recent;
 mod recipe_file;
 mod remote_reviews;
 mod repo_auth;
+mod repo_sequences;
 mod repo_state;
 mod review_draft;
 mod workflow_file;
@@ -33,10 +34,11 @@ pub use repo_auth::{
     clear_repo_auth, load_repo_auth, repo_auth_key, save_repo_auth, RepoAuthRecord, RepoAuthStore,
     REPO_AUTH_FILE,
 };
+pub use repo_sequences::{inspect_repo_sequences, RepoSequences, SequencesTrust};
 pub use repo_state::{
     conversation_key, resolve_default_remote, ConversationSeen, FoldState, HookLine, IssuesSource,
     LogColumnWidths, PendingAutoStash, PendingAutoStashState, RepoPreferences, RepoState,
-    TrustedHooks, TrustedScript, WatchedIssue,
+    TrustedHooks, TrustedScript, TrustedSequences, WatchedIssue,
 };
 pub use review_draft::{
     AiDraft, AiItem, AiPlace, DraftComment, ResumePos, ReviewDraft, ReviewResume,

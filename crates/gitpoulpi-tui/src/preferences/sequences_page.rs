@@ -413,12 +413,16 @@ impl PreferencesState {
             return;
         };
         let repo = self.seq_repo();
+        let was_trusted = repo
+            .as_deref()
+            .map(crate::sequence_run::repo::trusted_before_edit);
         if let Err(err) = seqs::remove_sequence(def.scope, &def.id, &path, repo.as_deref()) {
             self.message = Some(t::write_failed(err));
             return;
         }
         let _ = reset_keybinding_in_file(&path, KEYBINDINGS_CONTEXT, &def.id);
         self.seq_reload();
+        self.seq_retrust(was_trusted);
         let len = self.seq_entries().len();
         self.seq.index = self.seq.index.min(len.saturating_sub(1));
         self.message = Some(t::SAVED.get().into());
@@ -494,6 +498,17 @@ impl PreferencesState {
     // Writing
     // ---------------------------------------------------------------
 
+    /// The user wrote the repository's file themselves: it stays trusted when
+    /// it was trusted (or empty) before the edit, never when other people's
+    /// untrusted sequences were in it.
+    fn seq_retrust(&mut self, was_trusted: Option<bool>) {
+        if let (Some(root), Some(was)) = (self.seq_repo(), was_trusted) {
+            crate::sequence_run::repo::retrust_after_edit(&root, was);
+            self.seq.repo_cache.replace(None);
+            self.seq_reload();
+        }
+    }
+
     /// Re-reads what the write changed and tells the registry (palette rows,
     /// keymap slots) and the live keymap.
     pub(super) fn seq_reload(&mut self) {
@@ -532,6 +547,9 @@ impl PreferencesState {
         let id_changed = old.is_some_and(|o| o.id != new.id);
         let repo_changed =
             old.is_some_and(|o| (o.scope == Scope::Repo) != (new.scope == Scope::Repo));
+        let was_trusted = repo
+            .as_deref()
+            .map(crate::sequence_run::repo::trusted_before_edit);
         let chords = match old {
             Some(o) if id_changed => chords_in_file(&path, &o.id),
             _ => Vec::new(),
@@ -557,6 +575,7 @@ impl PreferencesState {
             }
         }
         self.seq_reload();
+        self.seq_retrust(was_trusted);
         // The list is grouped by scope and a rename re-files the entry:
         // the selection follows the sequence.
         if let Some(at) = self.seq_entries().iter().position(|d| d.id == new.id) {

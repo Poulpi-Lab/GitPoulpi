@@ -63,6 +63,26 @@ pub enum UiAction {
         #[command(subcommand)]
         what: UiProposeAction,
     },
+    /// Ask the user's window to run a sequence: a banner "Proposed by
+    /// <client>: run sequence <name>" with Run and Dismiss opens, and
+    /// nothing runs until the user presses Run (the run then pauses where
+    /// the sequence says, like one they started). Refused when the sequence
+    /// does not exist, is invalid, or comes from a repository file the user
+    /// has not trusted. Needs `[mcp] allow_ui_propose = true`. Follow the
+    /// answer's `proposal` id in `ui state`'s `proposals`.
+    Sequence {
+        #[command(subcommand)]
+        what: UiSequenceAction,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum UiSequenceAction {
+    /// Propose running the sequence with this id (`gitpoulpi sequence list`).
+    Run {
+        /// The sequence id.
+        id: String,
+    },
 }
 
 #[derive(Debug, Subcommand)]

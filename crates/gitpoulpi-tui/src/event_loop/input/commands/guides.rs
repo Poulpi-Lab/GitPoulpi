@@ -120,6 +120,8 @@ fn apply(cx: &mut CommandCtx<'_>, dialog: GuideDialog, choice: Choice) {
         }
         // Never in the window's input mode: a worker asks it (`ai_limit_dialog`).
         (Kind::Truncation, _) => {}
+        // Never in the window's input mode either (`sequence_run::repo_review`).
+        (Kind::RepoSequences, _) => {}
         (Kind::OffBranch(off), choice) => apply_off_branch(cx, off, choice),
         (Kind::TooLarge(_), Choice::Truncated) => {}
         (Kind::TooLarge(_), Choice::Pick(_) | Choice::Rewrite | Choice::CreateBranch) => {}

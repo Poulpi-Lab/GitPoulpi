@@ -153,6 +153,7 @@ předponou (`Ctrl+G s`).
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Soubory: Cesta nebo strom | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | Soubory: Zobrazit všechny soubory | `a` |
 | `log` | `compare_selection` | Porovnat vybrané řádky | `v` |
 | `log` | `compare_swap` | Prohodit konce porovnání | `x` |
@@ -183,6 +184,7 @@ předponou (`Ctrl+G s`).
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Přejít na zprávu commitu | `c` |
 | `status` | `toggle_file_mode` | Soubory: Cesta nebo strom | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | Soubory: Zobrazit všechny soubory | `a` |
 | `status` | `amend` | Přepnout Amend | `Shift+A` |
 | `status` | `skip_hooks` | Přepnout Přeskočit hooky | `Shift+H` |
@@ -1105,6 +1107,7 @@ Klávesy jsou výchozí.
 | Diff: Přepnout jen hunky (celý soubor / jen změny) | `H` |
 | Soubory: Přepnout cesta/strom | `m` |
 | Soubory: Přepnout zobrazení všech souborů | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit: Přepnout Přeskočit hooky | `H` |
 | Soubory: Otevřít nabídku řádku nebo výběru | `.` |
 | Soubory: Rozbalit všechny složky | `=` |

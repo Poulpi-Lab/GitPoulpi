@@ -576,6 +576,7 @@ actions! {
     RefsScrollRight => (Refs, "refs.scroll_right", PANE_HSCROLL_RIGHT, ["Alt+Right"]),
     // ---- log pane ----
     LogToggleFileMode => (Log, "log.toggle_file_mode", LOG_TOGGLE_FILE_MODE, ["m"]),
+    LogLfsOnly => (Log, "log.lfs_only", LOG_LFS_ONLY, ["o"], @Lfs),
     LogViewAllFiles => (Log, "log.view_all_files", LOG_VIEW_ALL_FILES, ["a"]),
     LogCompareSelection => (Log, "log.compare_selection", KEYMAP_COMPARE_SELECTION, ["v"]),
     LogCompareSwap => (Log, "log.compare_swap", KEYMAP_SWAP, ["x"]),
@@ -609,6 +610,7 @@ actions! {
     // ---- status pane ----
     StatusCompose => (Status, "status.compose", STATUS_COMPOSE, ["c"]),
     StatusToggleFileMode => (Status, "status.toggle_file_mode", STATUS_TOGGLE_FILE_MODE, ["m"]),
+    StatusLfsOnly => (Status, "status.lfs_only", STATUS_LFS_ONLY, ["o"], @Lfs),
     StatusViewAllFiles => (Status, "status.view_all_files", STATUS_VIEW_ALL_FILES, ["a"]),
     StatusAmend => (Status, "status.amend", STATUS_AMEND, ["Shift+A"]),
     StatusSkipHooks => (Status, "status.skip_hooks", STATUS_SKIP_HOOKS, ["Shift+H"]),

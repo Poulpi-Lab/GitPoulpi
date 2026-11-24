@@ -184,6 +184,9 @@ pub(crate) struct PaletteContext {
     pub(crate) radar_row: bool,
     /// The `git.lfs_enabled` preference, resolved for this repository.
     pub(crate) lfs_enabled: bool,
+    /// The repository has files stored with LFS (the `LFS only` filter has
+    /// something to narrow to).
+    pub(crate) lfs_has_files: bool,
     /// `git-lfs` is usable (or not known to be missing): the LFS commands
     /// that run it are grayed out with the install link when it is not.
     pub(crate) lfs_program_ok: bool,
@@ -655,6 +658,8 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         // needs the preference on, and whatever runs the program needs it
         // installed (the reason carries the link, so the grayed row is
         // itself the "how do I fix this").
+        C::FilesToggleLfsOnly => (!ctx.lfs_has_files)
+            .then(|| msg::palette::WHY_THIS_REPOSITORY_HAS_NO_LFS_FILES.get()),
         C::LfsOpenInstallPage => None,
         C::LfsToggleRawPointer => {
             (!ctx.in_diff_view).then_some(msg::palette::WHY_OPEN_A_DIFF_FIRST.get())

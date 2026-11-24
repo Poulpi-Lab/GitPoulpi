@@ -90,6 +90,9 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         PaletteCommand::FilesToggleViewAll => {
             toggle_view_all_files(cx);
         }
+        PaletteCommand::FilesToggleLfsOnly => {
+            toggle_lfs_only(cx);
+        }
         PaletteCommand::CommitToggleSkipHooks => {
             *cx.commit_skip_hooks = !*cx.commit_skip_hooks;
         }

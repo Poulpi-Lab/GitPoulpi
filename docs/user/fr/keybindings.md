@@ -155,6 +155,7 @@ préfixe (`Ctrl+G s`).
 | `refs` | `scroll_left` | Faire défiler le panneau vers la gauche | `Alt+Left` |
 | `refs` | `scroll_right` | Faire défiler le panneau vers la droite | `Alt+Right` |
 | `log` | `toggle_file_mode` | Fichiers : chemin ou arbre | `m` |
+| `log` | `lfs_only` | Fichiers : LFS uniquement | `o` |
 | `log` | `view_all_files` | Fichiers : voir tous les fichiers | `a` |
 | `log` | `compare_selection` | Comparer les lignes sélectionnées | `v` |
 | `log` | `compare_swap` | Inverser les extrémités de la comparaison | `x` |
@@ -185,6 +186,7 @@ préfixe (`Ctrl+G s`).
 | `log_files` | `scroll_right` | Faire défiler le panneau vers la droite | `Alt+Right` |
 | `status` | `compose` | Aller au message de commit | `c` |
 | `status` | `toggle_file_mode` | Fichiers : chemin ou arbre | `m` |
+| `status` | `lfs_only` | Fichiers : LFS uniquement | `o` |
 | `status` | `view_all_files` | Fichiers : voir tous les fichiers | `a` |
 | `status` | `amend` | Basculer l'amendement | `Shift+A` |
 | `status` | `skip_hooks` | Basculer Ignorer les hooks | `Shift+H` |
@@ -1107,6 +1109,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Diff : Hunks seulement ou fichier entier | `H` |
 | Fichiers : Basculer chemin / arborescence | `m` |
 | Fichiers : Basculer l'affichage de tous les fichiers | `a` |
+| Fichiers : Basculer LFS uniquement | `o` |
 | Commit : Basculer Ignorer les hooks | `H` |
 | Fichiers : Ouvrir le menu de la ligne ou de la sélection | `.` |
 | Fichiers : Déplier tous les dossiers | `=` |

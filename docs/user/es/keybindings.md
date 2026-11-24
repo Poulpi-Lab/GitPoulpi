@@ -156,6 +156,7 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Archivos: Ruta o árbol | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | Archivos: Ver todos los archivos | `a` |
 | `log` | `compare_selection` | Comparar las filas seleccionadas | `v` |
 | `log` | `compare_swap` | Intercambiar los extremos de la comparación | `x` |
@@ -186,6 +187,7 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Ir al mensaje del commit | `c` |
 | `status` | `toggle_file_mode` | Archivos: Ruta o árbol | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | Archivos: Ver todos los archivos | `a` |
 | `status` | `amend` | Alternar enmienda | `Shift+A` |
 | `status` | `skip_hooks` | Alternar omitir hooks | `Shift+H` |
@@ -1110,6 +1112,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Diff: Alternar solo hunks (archivo entero / solo los cambios) | `H` |
 | Archivos: Alternar ruta/árbol | `m` |
 | Archivos: Alternar ver todos los archivos | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit: Alternar omitir hooks | `H` |
 | Archivos: Abrir el menú de la fila o de la selección | `.` |
 | Archivos: Expandir todas las carpetas | `=` |

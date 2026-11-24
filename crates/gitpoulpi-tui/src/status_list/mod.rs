@@ -29,6 +29,8 @@ pub(crate) enum StatusPaneLine {
         depth: usize,
         label: String,
         collapsed: bool,
+        /// Files behind a collapsed folder (see `TreeRow::Folder::files`).
+        files: usize,
     },
     File {
         section: StatusSection,
@@ -263,7 +265,7 @@ pub(crate) fn build_status_section_lines(
     for f in &tree.files {
         by_path.entry(f.path.as_path()).or_insert(f);
     }
-    build_tree_rows(&paths, mode, &collapsed_folders, filter)
+    build_tree_rows_lfs(&paths, mode, &collapsed_folders, filter)
         .into_iter()
         .map(|row| match row {
             TreeRow::Folder {
@@ -271,12 +273,14 @@ pub(crate) fn build_status_section_lines(
                 path,
                 label,
                 collapsed,
+                files,
             } => StatusPaneLine::Folder {
                 fold_key: fold_key(section, &path),
                 path,
                 depth,
                 label,
                 collapsed,
+                files,
             },
             TreeRow::File {
                 depth,

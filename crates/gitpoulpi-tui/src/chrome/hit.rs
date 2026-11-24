@@ -331,6 +331,10 @@ pub(crate) enum HitTarget {
     /// The `View all files` checkbox: the commit-detail pane's, and the
     /// working-changes toolbar's - one toggle.
     ViewAllFilesCheckbox,
+    /// The `LFS only` pre-filter checkbox of the file lists (shown only when
+    /// the repository has LFS files): the commit-detail pane's and the
+    /// working-changes toolbar's - one toggle.
+    LfsOnlyCheckbox,
     /// The Confirm/Cancel button in the `InputMode::Confirm` popup
     /// (`true` = confirm/delete, `false` = cancel) - a real modal with
     /// clickable buttons, not just a status-bar line with keyboard-only
@@ -619,6 +623,7 @@ pub(crate) fn desired_cursor_shape(
             | HitTarget::StatusExplainButton
             | HitTarget::CommitButton
             | HitTarget::ViewAllFilesCheckbox
+            | HitTarget::LfsOnlyCheckbox
             | HitTarget::CollapsePane(_)
             | HitTarget::RestorePane(_)
             | HitTarget::CloseApp

@@ -156,6 +156,7 @@ stage_file = "z"
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Файлы: путь или дерево | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | Файлы: показать все файлы | `a` |
 | `log` | `compare_selection` | Сравнить выбранные строки | `v` |
 | `log` | `compare_swap` | Поменять стороны сравнения | `x` |
@@ -186,6 +187,7 @@ stage_file = "z"
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Фокус на сообщении commit'а | `c` |
 | `status` | `toggle_file_mode` | Файлы: путь или дерево | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | Файлы: показать все файлы | `a` |
 | `status` | `amend` | Переключить amend | `Shift+A` |
 | `status` | `skip_hooks` | Переключить пропуск хуков | `Shift+H` |
@@ -1111,6 +1113,7 @@ stage_file = "z"
 | Diff: только hunk'и (весь файл / только изменения) | `H` |
 | Файлы: путь/дерево | `m` |
 | Файлы: показать все файлы | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit: переключить пропуск хуков | `H` |
 | Файлы: открыть меню строки или выделения | `.` |
 | Файлы: развернуть все папки | `=` |

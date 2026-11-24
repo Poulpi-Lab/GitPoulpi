@@ -187,6 +187,23 @@ pub(in crate::event_loop) fn toggle_view_all_files(cx: &mut CommandCtx<'_>) {
     cx.wip_all.follow = true;
 }
 
+/// `LFS only` (commit-detail and WIP toolbars share the toggle): the checkbox
+/// click, the `l` key and the palette command all run this. Selections go
+/// back to the top: the rows under them are a different set now.
+pub(in crate::event_loop) fn toggle_lfs_only(cx: &mut CommandCtx<'_>) {
+    if !cx.lfs.has_files() {
+        return;
+    }
+    cx.lfs.toggle_only();
+    cx.commit_file_state.select(None);
+    *cx.commit_files_follow = true;
+    cx.wip_all.state.select(None);
+    cx.wip_all.follow = true;
+    for section in crate::StatusSection::ORDER {
+        cx.status_states.select(section, None);
+    }
+}
+
 /// `Path`/`Tree` for whichever file list the right pane is showing.
 pub(in crate::event_loop) fn toggle_file_list_mode(cx: &mut CommandCtx<'_>) {
     if *cx.right_panel == RightPanel::CommitDetail {

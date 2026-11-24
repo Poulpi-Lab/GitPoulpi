@@ -153,6 +153,7 @@ prefiksem (`Ctrl+G s`).
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Pliki: Ścieżka lub drzewo | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | Pliki: Pokaż wszystkie pliki | `a` |
 | `log` | `compare_selection` | Porównaj zaznaczone wiersze | `v` |
 | `log` | `compare_swap` | Zamień końce porównania | `x` |
@@ -183,6 +184,7 @@ prefiksem (`Ctrl+G s`).
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Przejdź do opisu commita | `c` |
 | `status` | `toggle_file_mode` | Pliki: Ścieżka lub drzewo | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | Pliki: Pokaż wszystkie pliki | `a` |
 | `status` | `amend` | Przełącz amend | `Shift+A` |
 | `status` | `skip_hooks` | Przełącz pomijanie hooków | `Shift+H` |
@@ -1104,6 +1106,7 @@ zastosowania. Klawisze są domyślne.
 | Diff: Przełącz tylko hunki (cały plik / tylko zmiany) | `H` |
 | Pliki: Przełącz ścieżka/drzewo | `m` |
 | Pliki: Przełącz widok wszystkich plików | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit: Przełącz pomijanie hooków | `H` |
 | Pliki: otwórz menu wiersza lub zaznaczenia | `.` |
 | Pliki: Rozwiń wszystkie foldery | `=` |

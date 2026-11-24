@@ -330,6 +330,11 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         {
             commands::toggle_view_all_files(cx);
         }
+        _ if (*cx.focus == Focus::Status && km.is(Bind::StatusLfsOnly, &key))
+            || (*cx.focus == Focus::Log && km.is(Bind::LogLfsOnly, &key)) =>
+        {
+            commands::toggle_lfs_only(cx);
+        }
         _ if *cx.focus == Focus::Status && km.is(Bind::StatusAmend, &key) => {
             *cx.commit_amend = !*cx.commit_amend;
         }

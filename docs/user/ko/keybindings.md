@@ -150,6 +150,7 @@ stage_file = "z"
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | 파일: 경로 또는 트리 | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | 파일: 모든 파일 보기 | `a` |
 | `log` | `compare_selection` | 선택한 행 비교 | `v` |
 | `log` | `compare_swap` | 비교 양쪽 바꾸기 | `x` |
@@ -180,6 +181,7 @@ stage_file = "z"
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Commit 메시지로 포커스 | `c` |
 | `status` | `toggle_file_mode` | 파일: 경로 또는 트리 | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | 파일: 모든 파일 보기 | `a` |
 | `status` | `amend` | Amend 전환 | `Shift+A` |
 | `status` | `skip_hooks` | 훅 건너뛰기 전환 | `Shift+H` |
@@ -1098,6 +1100,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Diff: 변경 부분만 전환 (전체 파일 / 변경만) | `H` |
 | 파일: 경로/트리 전환 | `m` |
 | 파일: 모든 파일 보기 전환 | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit: 훅 건너뛰기 전환 | `H` |
 | 파일: 행 또는 선택 항목의 메뉴 열기 | `.` |
 | 파일: 모든 폴더 펼치기 | `=` |

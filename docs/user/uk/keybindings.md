@@ -150,6 +150,7 @@ stage_file = "z"
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Файли: шлях чи дерево | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | Файли: усі файли | `a` |
 | `log` | `compare_selection` | Порівняти вибрані рядки | `v` |
 | `log` | `compare_swap` | Поміняти сторони порівняння | `x` |
@@ -180,6 +181,7 @@ stage_file = "z"
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Фокус на повідомленні commit'у | `c` |
 | `status` | `toggle_file_mode` | Файли: шлях чи дерево | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | Файли: усі файли | `a` |
 | `status` | `amend` | Перемкнути amend | `Shift+A` |
 | `status` | `skip_hooks` | Перемкнути пропуск хуків | `Shift+H` |
@@ -1099,6 +1101,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Diff: лише hunks (весь файл / лише зміни) | `H` |
 | Файли: шлях/дерево | `m` |
 | Файли: усі файли | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit: пропуск хуків | `H` |
 | Файли: відкрити меню рядка або виділення | `.` |
 | Файли: розгорнути всі папки | `=` |

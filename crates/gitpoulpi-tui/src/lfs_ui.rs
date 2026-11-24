@@ -17,7 +17,7 @@
 //! never asks about LFS at all.
 
 use gitpoulpi_i18n::msg::lfs_ui as msg;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
@@ -406,15 +406,66 @@ pub(crate) struct LfsUi {
     files: HashMap<PathBuf, LfsFile>,
     /// Locks on the server (filled by the lock actions).
     pub(crate) locks: Vec<LfsLock>,
+    /// The `LFS only` pre-filter of the file lists is switched on. It filters
+    /// only while the repository has LFS files ([`Self::only_active`]).
+    only: bool,
+}
+
+thread_local! {
+    /// The paths the file lists are narrowed to while `LFS only` is active,
+    /// `None` when they are not. The UI thread has one live window (a tab
+    /// switch replaces it), and every list that rebuilds rows (draw, key and
+    /// mouse handlers that resolve a selection) reads it here, so none of
+    /// them can disagree about which rows exist. Rebuilt per refresh and per
+    /// toggle by [`LfsUi::sync_filter`], never per frame.
+    static ONLY_PATHS: std::cell::RefCell<Option<std::rc::Rc<HashSet<PathBuf>>>> =
+        const { std::cell::RefCell::new(None) };
+}
+
+/// The LFS-only path set of the live window, if the filter is active.
+pub(crate) fn only_paths() -> Option<std::rc::Rc<HashSet<PathBuf>>> {
+    ONLY_PATHS.with(|p| p.borrow().clone())
 }
 
 impl LfsUi {
     /// Nothing read yet, with the resolved preference.
     pub(crate) fn new(enabled: bool) -> Self {
-        Self {
+        let ui = Self {
             enabled,
             ..Self::default()
-        }
+        };
+        // A window replaced on this thread must not inherit the old filter.
+        ui.sync_filter();
+        ui
+    }
+
+    /// The repository has files stored with LFS (and the preference is on):
+    /// the `LFS only` filter is worth offering.
+    pub(crate) fn has_files(&self) -> bool {
+        self.enabled && !self.files.is_empty()
+    }
+
+    /// The `LFS only` switch, as the user left it.
+    pub(crate) fn only(&self) -> bool {
+        self.only
+    }
+
+    /// The file lists are narrowed to LFS files right now.
+    pub(crate) fn only_active(&self) -> bool {
+        self.only && self.has_files()
+    }
+
+    pub(crate) fn toggle_only(&mut self) {
+        self.only = !self.only;
+        self.sync_filter();
+    }
+
+    /// Publishes (or clears) the path set the lists read ([`only_paths`]).
+    fn sync_filter(&self) {
+        let set = self
+            .only_active()
+            .then(|| std::rc::Rc::new(self.files.keys().cloned().collect::<HashSet<_>>()));
+        ONLY_PATHS.with(|p| *p.borrow_mut() = set);
     }
 
     /// Takes a fresh snapshot, if the refresh carried one.
@@ -429,6 +480,7 @@ impl LfsUi {
                 .into_iter()
                 .map(|f| (f.path.clone(), f))
                 .collect();
+            self.sync_filter();
         }
     }
 
@@ -796,5 +848,63 @@ mod tests {
         );
         assert_eq!(extension_pattern(Path::new("Makefile")), None);
         assert_eq!(pattern_for_file(Path::new("a\\b\\c.bin")), "a/b/c.bin");
+    }
+
+    fn snapshot_with(paths: &[&str]) -> LfsSnapshot {
+        LfsSnapshot {
+            status: Some(status(LfsBinary::Missing, true)),
+            files: paths.iter().map(|p| file(p, false)).collect(),
+            locks: None,
+        }
+    }
+
+    /// `LFS only` narrows the rows to the LFS files, only while the repository
+    /// has some, and the folder count follows. Falsified by making
+    /// `build_tree_rows_lfs` ignore `only_paths` (every row stays).
+    #[test]
+    fn lfs_only_keeps_the_lfs_rows_and_needs_lfs_files_to_filter() {
+        use crate::status_pane::{build_tree_rows_lfs, FileListMode, TreeRow};
+        let paths: Vec<PathBuf> = ["assets/hero.psd", "assets/logo.txt", "src/main.rs"]
+            .iter()
+            .map(PathBuf::from)
+            .collect();
+        let files_of = |rows: &[TreeRow]| -> Vec<usize> {
+            rows.iter().filter_map(|r| r.file_index()).collect()
+        };
+        let mut ui = LfsUi::new(true);
+        assert!(!ui.has_files(), "no LFS files: nothing to offer");
+        ui.toggle_only();
+        assert!(!ui.only_active(), "switched on but nothing to narrow to");
+        let rows = build_tree_rows_lfs(&paths, FileListMode::Tree, &HashSet::new(), "");
+        assert_eq!(files_of(&rows), vec![0, 1, 2]);
+
+        ui.apply(Some(snapshot_with(&["assets/hero.psd"])));
+        assert!(ui.has_files() && ui.only_active());
+        let rows = build_tree_rows_lfs(&paths, FileListMode::Tree, &HashSet::new(), "");
+        assert_eq!(files_of(&rows), vec![0], "only the LFS file");
+        // A collapsed folder counts the filtered files.
+        let collapsed: HashSet<PathBuf> = [PathBuf::from("assets")].into();
+        let rows = build_tree_rows_lfs(&paths, FileListMode::Tree, &collapsed, "");
+        assert!(matches!(
+            rows.first(),
+            Some(TreeRow::Folder { files: 1, .. })
+        ));
+
+        ui.toggle_only();
+        assert!(!ui.only_active());
+        let rows = build_tree_rows_lfs(&paths, FileListMode::Tree, &HashSet::new(), "");
+        assert_eq!(files_of(&rows), vec![0, 1, 2], "off: every file again");
+
+        // The last LFS file leaving turns the filter off by itself.
+        ui.toggle_only();
+        ui.apply(Some(snapshot_with(&[])));
+        assert!(!ui.only_active());
+        let rows = build_tree_rows_lfs(&paths, FileListMode::Tree, &HashSet::new(), "");
+        assert_eq!(files_of(&rows), vec![0, 1, 2]);
+        // A fresh window on this thread starts unfiltered.
+        ui.apply(Some(snapshot_with(&["src/main.rs"])));
+        assert!(only_paths().is_some());
+        let _fresh = LfsUi::new(true);
+        assert!(only_paths().is_none());
     }
 }

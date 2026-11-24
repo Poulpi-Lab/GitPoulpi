@@ -130,6 +130,7 @@ pub(crate) fn status_toolbar_row(
     mode: FileListMode,
     collapse: Option<bool>,
     view_all: Option<bool>,
+    lfs_only: Option<bool>,
     hovered: Option<&HitTarget>,
     _has_unstaged_changes: bool,
 ) -> (Line<'static>, Vec<(Rect, HitTarget)>, Option<OverflowSlot>) {
@@ -138,6 +139,7 @@ pub(crate) fn status_toolbar_row(
         mode,
         collapse,
         view_all,
+        lfs_only,
         hovered,
         _has_unstaged_changes,
         true,
@@ -150,17 +152,20 @@ pub(crate) fn status_toolbar_row(
         mode,
         collapse,
         view_all,
+        lfs_only,
         hovered,
         _has_unstaged_changes,
         false,
     )
 }
 
+#[allow(clippy::too_many_arguments)]
 fn status_toolbar_row_hinted(
     area: Rect,
     mode: FileListMode,
     collapse: Option<bool>,
     view_all: Option<bool>,
+    lfs_only: Option<bool>,
     hovered: Option<&HitTarget>,
     _has_unstaged_changes: bool,
     hints: bool,
@@ -205,6 +210,19 @@ fn status_toolbar_row_hinted(
             gitpoulpi_i18n::msg::commit_detail::VIEW_ALL_FILES.get()
         )
     };
+    // The `LFS only` pre-filter: offered only for a repository with LFS files.
+    let lfs_only_label = |on: bool| -> String {
+        let hint = if hints {
+            crate::keymap::bracket(&km, crate::keymap::Action::StatusLfsOnly)
+        } else {
+            String::new()
+        };
+        format!(
+            "{} {}{hint}",
+            if on { "[x]" } else { "[ ]" },
+            gitpoulpi_i18n::msg::commit_detail::LFS_ONLY.get()
+        )
+    };
     let mut items: Vec<BarItem<OverflowItem>> = [FileListMode::Path, FileListMode::Tree]
         .iter()
         .enumerate()
@@ -230,6 +248,14 @@ fn status_toolbar_row_hinted(
             width: display_width(&view_all_label(on)) as u16,
             gap_before: 2,
             priority: 3,
+        });
+    }
+    if let Some(on) = lfs_only {
+        items.push(BarItem {
+            key: OverflowItem::LfsOnly,
+            width: display_width(&lfs_only_label(on)) as u16,
+            gap_before: 2,
+            priority: 4,
         });
     }
     let fit = fit_bar(&items, area.width, 1);
@@ -264,6 +290,15 @@ fn status_toolbar_row_hinted(
                     base
                 };
                 (view_all_label(view_all.unwrap_or(false)), style)
+            }
+            OverflowItem::LfsOnly => {
+                let base = Style::default().fg(th().ui.muted);
+                let style = if hovered == Some(&target) {
+                    hover_style(base)
+                } else {
+                    base
+                };
+                (lfs_only_label(lfs_only.unwrap_or(false)), style)
             }
             _ => (String::new(), Style::default()),
         };

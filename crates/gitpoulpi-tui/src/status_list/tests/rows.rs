@@ -71,6 +71,7 @@ fn a_hovered_folder_row_lifts_its_name_spans_background() {
         depth: 0,
         label: "src".to_string(),
         collapsed: false,
+        files: 0,
     };
     let list_area = Rect::new(0, 0, 30, 1);
     for hovered in [false, true] {
@@ -208,4 +209,55 @@ fn a_scrolled_row_keeps_its_hover_button_at_the_right_end() {
     let hovered = text(true, 4);
     assert!(hovered.starts_with("23456789abcdef"), "{hovered}");
     assert!(hovered.trim_end().ends_with("Stage file"), "{hovered}");
+}
+
+/// A collapsed folder row ends with its file count; an open one has none; in a
+/// narrow list the name is shortened and the count stays. Falsified by
+/// dropping the `folder_spans` count span (red on every assertion).
+#[test]
+fn a_collapsed_folder_row_ends_with_its_file_count() {
+    use ratatui::backend::TestBackend;
+
+    let row_text = |collapsed: bool, files: usize, width: u16, h_off: usize| -> String {
+        let line = StatusPaneLine::Folder {
+            path: PathBuf::from("components"),
+            fold_key: PathBuf::from("<unstaged>/components"),
+            depth: 0,
+            label: "components".to_string(),
+            collapsed,
+            files,
+        };
+        let mut hits = Vec::new();
+        let item = status_row_item(
+            &line,
+            StatusSection::Unstaged,
+            false,
+            true,
+            Rect::new(0, 0, width, 1),
+            0,
+            LfsMark::default(),
+            false,
+            h_off,
+            &mut hits,
+        );
+        let mut terminal = Terminal::new(TestBackend::new(width, 1)).unwrap();
+        terminal
+            .draw(|frame| {
+                frame.render_clipped(List::new(vec![item]), Rect::new(0, 0, width, 1));
+            })
+            .unwrap();
+        let buf = terminal.backend().buffer().clone();
+        (0..width)
+            .map(|x| buf[(x, 0)].symbol().to_string())
+            .collect::<String>()
+            .trim_end()
+            .to_string()
+    };
+    assert!(row_text(true, 12, 40, 0).ends_with("components/ (12)"));
+    assert!(!row_text(false, 0, 40, 0).contains('('), "open: no count");
+    let narrow = row_text(true, 12, 14, 0);
+    assert!(narrow.ends_with(" (12)"), "{narrow:?}");
+    assert!(narrow.contains('\u{2026}'), "{narrow:?}");
+    // Scrolled sideways the row is the whole row again: its end carries the count.
+    assert!(row_text(true, 12, 14, 5).ends_with("(12)"));
 }

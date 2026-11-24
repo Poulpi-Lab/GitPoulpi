@@ -2466,11 +2466,13 @@ refs_mark_drop = "Bırakma Kaynağı Olarak İşaretle"
 refs_drop_marked = "İşaretli Ref'i Buraya Bırak"
 log_toggle_file_mode = "Dosyalar: Yol veya Ağaç"
 log_view_all_files = "Dosyalar: Tüm Dosyaları Göster"
+log_lfs_only = "Files: LFS Only"
 log_files_collapse_all = "Tüm Klasörleri Daralt veya Genişlet"
 log_files_filter = "Değişen Dosyaları Filtrele"
 status_compose = "{$Commit} Mesajına Odaklan"
 status_toggle_file_mode = "Dosyalar: Yol veya Ağaç"
 status_view_all_files = "Dosyalar: Tüm Dosyaları Göster"
+status_lfs_only = "Files: LFS Only"
 status_amend = "Amend'i Aç/Kapat"
 status_collapse_all = "Tüm Klasörleri Daralt veya Genişlet"
 status_stage_toggle = { git = "Seçili Satırı Stage'le veya Unstage'le", local = "Seçili Satırı Hazırla veya Hazırlıktan Çıkar" }
@@ -3445,6 +3447,7 @@ diff_layout_split_before_and_after = { git = "Diff: Yerleşim Bölünmüş (önc
 diff_toggle_hunks_only_whole_file_only_the_changes = { git = "Diff: Yalnızca Hunk'ları Aç/Kapat (tüm dosya / yalnızca değişiklikler)", local = "Fark: Yalnızca Hunk'ları Aç/Kapat (tüm dosya / yalnızca değişiklikler)" }
 files_toggle_path_tree = "Dosyalar: Yol/Ağaç Aç/Kapat"
 files_toggle_view_all_files = "Dosyalar: Tüm Dosyaları Göster Aç/Kapat"
+files_toggle_lfs_only = "Files: Toggle LFS Only"
 files_open_menu = "Dosyalar: Satırın veya Seçimin Menüsünü Aç"
 files_select_all = "Dosyalar: Tümünü Seç"
 files_clear_selection = "Dosyalar: Seçimi Temizle"
@@ -3550,6 +3553,7 @@ why_no_uncommitted_changes_the_wip_row_appears_once = "commit'lenmemiş değişi
 why_there_are_no_stashes = { git = "stash yok", local = "saklama yok" }
 why_select_a_changed_file_in_the_commit_detail_pane = "önce commit ayrıntı panelinde değişmiş bir dosya seçin"
 why_this_repository_has_no_remote_add_one_first = "bu depoda uzak depo yok - önce bir tane ekleyin"
+why_this_repository_has_no_lfs_files = "this repository has no LFS files"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a = { git = "{$unstaged_files} panelinden bir dosya açın - bir commit'in diff'inde stage'lenecek indeks yok", local = "{$unstaged_files} panelinden bir dosya açın - bir commit'in farkında hazırlanacak indeks yok" }
 why_this_diff_is_the_staged_half_use_the_unstage = { git = "bu diff {$staged_files} panelinden; Unstage'le komutunu kullanın", local = "bu fark {$staged_files} panelinden; Hazırlıktan çıkarın komutunu kullanın" }
 why_open_a_file_from_the_third_pane_s_unstaged_half_a_2 = { git = "{$unstaged_files} panelinden bir dosya açın - bir commit'in diff'inde atılacak çalışma ağacı değişikliği yok", local = "{$unstaged_files} panelinden bir dosya açın - bir commit'in farkında atılacak çalışma ağacı değişikliği yok" }
@@ -3974,6 +3978,7 @@ status_pane_working_3 = "etkin alt paneli daralt/genişlet"
 status_pane_working_4 = { git = "seçili dosyayı stage'le/unstage'le veya bir klasör satırını daralt (Ağaç kipi)", local = "seçili dosyayı hazırla/hazırlıktan çıkar veya bir klasör satırını daralt (Ağaç kipi)" }
 status_pane_working_5 = "dosya listesini Yol (düz) ile Ağaç (klasörler) arasında değiştir"
 status_pane_working_6 = "Tüm dosyaları göster'i aç/kapat (Durum paneli / WIP satırı veya bir commit'in değişen dosyaları; palet: Dosyalar: Yol/Ağaç Aç/Kapat ve Dosyalar: Tüm Dosyaları Göster Aç/Kapat)"
+status_pane_working_lfs_only = "toggle LFS only: in a repository that has LFS files, the file lists show only those ({{log.lfs_only}} with the Log focused; palette: Files: Toggle LFS Only)"
 status_pane_working_7 = "tüm klasörleri daralt veya bazıları daraltılmışsa yeniden genişlet"
 status_pane_working_8 = { git = "seçili dosyanın menüsü: Stage'le/Unstage'le, Değişiklikleri at (onaylı), Dosya yolunu kopyala gerçekten çalışır; Dosya Geçmişi/Blame dosyayı ortada açar; gerisi gerekenlerle birlikte soluk listelenir", local = "seçili dosyanın menüsü: Hazırla/Hazırlıktan çıkar, Değişiklikleri at (onaylı), Dosya yolunu kopyala gerçekten çalışır; Dosya Geçmişi/Blame dosyayı ortada açar; gerisi gerekenlerle birlikte soluk listelenir" }
 status_pane_working_9 = "bir commit'in değişen dosyalarını ada göre filtrele (yalnızca bir commit'in kendi dosya listesinde, Durum'da değil)"
@@ -4614,6 +4619,7 @@ diff_error = "{$diff} hatası: {error}"
 mode_path = "Yol"
 mode_tree = "Ağaç"
 view_all_files = "Tüm dosyaları göster"
+lfs_only = "LFS only"
 filter_files = "Dosyaları filtrele: "
 all_files = "Tüm dosyalar"
 changed_files = "Değişen dosyalar"
@@ -4630,6 +4636,7 @@ tree_view = "Ağaç görünümü{hint}"
 collapse_all = "Tümünü Daralt"
 expand_all = "Tümünü Genişlet"
 view_all_files = "Tüm dosyaları göster{key}"
+lfs_only = "LFS only{key}"
 
 [autostash]
 reason_checkout = "checkout"

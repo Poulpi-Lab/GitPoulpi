@@ -2464,11 +2464,13 @@ refs_mark_drop = "Oznacz jako źródło upuszczenia"
 refs_drop_marked = "Upuść tutaj oznaczony ref"
 log_toggle_file_mode = "Pliki: Ścieżka lub drzewo"
 log_view_all_files = "Pliki: Pokaż wszystkie pliki"
+log_lfs_only = "Files: LFS Only"
 log_files_collapse_all = "Zwiń lub rozwiń wszystkie foldery"
 log_files_filter = "Filtruj zmienione pliki"
 status_compose = { git = "Przejdź do opisu commita", local = "Przejdź do opisu zatwierdzenia" }
 status_toggle_file_mode = "Pliki: Ścieżka lub drzewo"
 status_view_all_files = "Pliki: Pokaż wszystkie pliki"
+status_lfs_only = "Files: LFS Only"
 status_amend = "Przełącz amend"
 status_collapse_all = "Zwiń lub rozwiń wszystkie foldery"
 status_stage_toggle = { git = "Stage lub unstage zaznaczony wiersz", local = "Dodaj do poczekalni lub usuń z niej zaznaczony wiersz" }
@@ -3443,6 +3445,7 @@ diff_layout_split_before_and_after = { git = "Diff: Układ obok siebie (przed i 
 diff_toggle_hunks_only_whole_file_only_the_changes = { git = "Diff: Przełącz tylko hunki (cały plik / tylko zmiany)", local = "Różnice: Przełącz tylko hunki (cały plik / tylko zmiany)" }
 files_toggle_path_tree = "Pliki: Przełącz ścieżka/drzewo"
 files_toggle_view_all_files = "Pliki: Przełącz widok wszystkich plików"
+files_toggle_lfs_only = "Files: Toggle LFS Only"
 files_open_menu = "Pliki: otwórz menu wiersza lub zaznaczenia"
 files_select_all = "Pliki: zaznacz wszystko"
 files_clear_selection = "Pliki: wyczyść zaznaczenie"
@@ -3548,6 +3551,7 @@ why_no_uncommitted_changes_the_wip_row_appears_once = "brak niezatwierdzonych zm
 why_there_are_no_stashes = { git = "nie ma stashy", local = "nie ma schowków" }
 why_select_a_changed_file_in_the_commit_detail_pane = { git = "najpierw zaznacz zmieniony plik w panelu szczegółów commita", local = "najpierw zaznacz zmieniony plik w panelu szczegółów zatwierdzenia" }
 why_this_repository_has_no_remote_add_one_first = "to repozytorium nie ma zdalnego - najpierw dodaj jedno"
+why_this_repository_has_no_lfs_files = "this repository has no LFS files"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a = { git = "otwórz plik z panelu {$unstaged_files} - diff commita nie ma indeksu, do którego można zrobić stage", local = "otwórz plik z panelu {$unstaged_files} - różnice zatwierdzenia nie mają poczekalni, do której można dodawać pliki" }
 why_this_diff_is_the_staged_half_use_the_unstage = { git = "ten diff to panel {$staged_files}; użyj polecenia Unstage", local = "te różnice to panel {$staged_files}; użyj polecenia usunięcia z poczekalni" }
 why_open_a_file_from_the_third_pane_s_unstaged_half_a_2 = { git = "otwórz plik z panelu {$unstaged_files} - diff commita nie ma zmiany w drzewie roboczym do odrzucenia", local = "otwórz plik z panelu {$unstaged_files} - różnice zatwierdzenia nie mają zmiany w drzewie roboczym do odrzucenia" }
@@ -3972,6 +3976,7 @@ status_pane_working_3 = "zwiń/rozwiń aktywny podpanel"
 status_pane_working_4 = { git = "stage/unstage zaznaczony plik lub zwiń wiersz folderu (tryb Drzewo)", local = "dodaj/usuń z poczekalni zaznaczony plik lub zwiń wiersz folderu (tryb Drzewo)" }
 status_pane_working_5 = "przełącz listę plików między Ścieżka (płaska) a Drzewo (foldery)"
 status_pane_working_6 = { git = "przełącz Pokaż wszystkie pliki (panel Status / wiersz WIP lub zmienione pliki commita; paleta: Pliki: Przełącz ścieżka/drzewo i Pliki: Przełącz widok wszystkich plików)", local = "przełącz Pokaż wszystkie pliki (panel Status / wiersz WIP lub zmienione pliki zatwierdzenia; paleta: Pliki: Przełącz ścieżka/drzewo i Pliki: Przełącz widok wszystkich plików)" }
+status_pane_working_lfs_only = "toggle LFS only: in a repository that has LFS files, the file lists show only those ({{log.lfs_only}} with the Log focused; palette: Files: Toggle LFS Only)"
 status_pane_working_7 = "zwiń wszystkie foldery lub rozwiń je ponownie, jeśli któreś są zwinięte"
 status_pane_working_8 = { git = "menu zaznaczonego pliku: Stage/Unstage, Odrzuć zmiany (z potwierdzeniem), Kopiuj ścieżkę pliku naprawdę działają; Historia pliku/Blame otwierają plik pośrodku; reszta jest wyświetlona przyciemniona z tym, czego wymaga", local = "menu zaznaczonego pliku: Dodaj/Usuń z poczekalni, Odrzuć zmiany (z potwierdzeniem), Kopiuj ścieżkę pliku naprawdę działają; Historia pliku/Blame otwierają plik pośrodku; reszta jest wyświetlona przyciemniona z tym, czego wymaga" }
 status_pane_working_9 = { git = "filtruj zmienione pliki commita po nazwie (tylko wewnątrz listy plików commita, nie w Status)", local = "filtruj zmienione pliki zatwierdzenia po nazwie (tylko wewnątrz listy plików zatwierdzenia, nie w Status)" }
@@ -4612,6 +4617,7 @@ diff_error = { git = "błąd diffa: {error}", local = "błąd różnic: {error}"
 mode_path = "Ścieżka"
 mode_tree = "Drzewo"
 view_all_files = "Wszystkie pliki"
+lfs_only = "LFS only"
 filter_files = "Filtruj pliki: "
 all_files = "Wszystkie pliki"
 changed_files = "Zmienione pliki"
@@ -4628,6 +4634,7 @@ tree_view = "Widok drzewa{hint}"
 collapse_all = "Zwiń wszystko"
 expand_all = "Rozwiń wszystko"
 view_all_files = "Wszystkie pliki{key}"
+lfs_only = "LFS only{key}"
 
 [autostash]
 reason_checkout = "checkoutu"

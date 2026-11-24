@@ -60,9 +60,9 @@ pub(crate) fn status_row_item<'a>(
             depth,
             label,
             collapsed,
+            files,
         } => {
             let chevron = crate::fold_mark::glyph(*collapsed);
-            let head = format!("{}{chevron} {label}/", "  ".repeat(*depth));
             let head_style = Style::default()
                 .fg(th().ui.muted)
                 .add_modifier(Modifier::BOLD);
@@ -75,8 +75,20 @@ pub(crate) fn status_row_item<'a>(
                 head_style
             };
             // Scrolled sideways: the name, never the button below.
-            let mut spans =
-                crate::hscroll::cut_spans(vec![Span::styled(head.clone(), head_style)], h_off);
+            // The name gives way to the count when the row is wider than the
+            // list (only at h_off 0; scrolled sideways it is the whole row).
+            let mut spans = crate::hscroll::cut_spans(
+                crate::status_pane::folder_spans(
+                    *depth,
+                    chevron,
+                    label,
+                    *files,
+                    Some(list_area.width as usize),
+                    h_off,
+                    head_style,
+                ),
+                h_off,
+            );
             if hovered {
                 // A folder stages wholesale -- `StageTarget::Folder` exists
                 // and both backends implement it.
@@ -284,13 +296,19 @@ pub(crate) fn status_row_items<'a>(
 /// the tags after it.
 fn row_width(line: &StatusPaneLine, mark: LfsMark<'_>) -> usize {
     match line {
-        StatusPaneLine::Folder { depth, label, .. } => {
-            // chevron, space, name, slash
+        StatusPaneLine::Folder {
+            depth,
+            label,
+            files,
+            ..
+        } => {
+            // chevron, space, name, slash, count
             depth * 2
                 + crate::cell_text::cells(crate::fold_mark::glyph(false))
                 + 1
                 + crate::cell_text::cells(label)
                 + 1
+                + crate::cell_text::cells(&crate::status_pane::folder_count_text(*files))
         }
         StatusPaneLine::File { depth, label, .. } => {
             let mut w = depth * 2 + 2 + crate::cell_text::cells(label);

@@ -2464,11 +2464,13 @@ refs_mark_drop = "ドロップ元としてマーク"
 refs_drop_marked = "マークした参照をここにドロップ"
 log_toggle_file_mode = "ファイル：パスまたはツリー"
 log_view_all_files = "ファイル：すべてのファイルを表示"
+log_lfs_only = "Files: LFS Only"
 log_files_collapse_all = "すべてのフォルダーを折りたたむ／展開"
 log_files_filter = "変更されたファイルを絞り込み"
 status_compose = { git = "{$Commit}メッセージ欄にフォーカス", local = "{$Commit}メッセージ欄にフォーカス" }
 status_toggle_file_mode = "ファイル：パスまたはツリー"
 status_view_all_files = "ファイル：すべてのファイルを表示"
+status_lfs_only = "Files: LFS Only"
 status_amend = "Amend の切り替え"
 status_collapse_all = "すべてのフォルダーを折りたたむ／展開"
 status_stage_toggle = { git = "選択行の{$stage}／{$unstage}", local = "選択行のステージ／ステージ解除" }
@@ -3436,6 +3438,7 @@ diff_layout_split_before_and_after = "{$Diff}: レイアウトを分割（前後
 diff_toggle_hunks_only_whole_file_only_the_changes = "{$Diff}: ハンクのみを切り替え（ファイル全体／変更のみ）"
 files_toggle_path_tree = "ファイル: パス/ツリーを切り替え"
 files_toggle_view_all_files = "ファイル: すべてのファイルの表示を切り替え"
+files_toggle_lfs_only = "Files: Toggle LFS Only"
 files_open_menu = "ファイル: 行または選択範囲のメニューを開く"
 files_select_all = "ファイル: すべて選択"
 files_clear_selection = "ファイル: 選択を解除"
@@ -3541,6 +3544,7 @@ why_no_uncommitted_changes_the_wip_row_appears_once = "{$commit}されていな�
 why_there_are_no_stashes = { git = "{$stash}はありません", local = "{$stash}はありません" }
 why_select_a_changed_file_in_the_commit_detail_pane = { git = "先に{$commit}詳細ペインで変更されたファイルを選択してください", local = "先に{$commit}詳細ペインで変更されたファイルを選択してください" }
 why_this_repository_has_no_remote_add_one_first = "このリポジトリにはリモートがありません - 先に追加してください"
+why_this_repository_has_no_lfs_files = "this repository has no LFS files"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a = { git = "「{$unstaged_files}」ペインからファイルを開いてください - {$commit}の{$diff}には{$stage}先のインデックスがありません", local = "「{$unstaged_files}」ペインからファイルを開いてください - {$commit}の差分にはステージ先のインデックスがありません" }
 why_this_diff_is_the_staged_half_use_the_unstage = { git = "この{$diff}は「{$staged_files}」ペインです。{$unstage}のコマンドを使ってください", local = "この差分は「{$staged_files}」ペインです。ステージ解除のコマンドを使ってください" }
 why_open_a_file_from_the_third_pane_s_unstaged_half_a_2 = { git = "「{$unstaged_files}」ペインからファイルを開いてください - {$commit}の{$diff}には破棄できる作業ツリーの変更がありません", local = "「{$unstaged_files}」ペインからファイルを開いてください - {$commit}の差分には破棄できる作業ツリーの変更がありません" }
@@ -3974,6 +3978,7 @@ status_pane_working_3 = "現在のサブペインを折りたたむ/展開"
 status_pane_working_4 = { git = "選択中のファイルを{$stage}/{$unstage}、またはフォルダー行を折りたたむ（ツリーモード）", local = "選択中のファイルをステージ/ステージ解除、またはフォルダー行を折りたたむ（ツリーモード）" }
 status_pane_working_5 = "ファイル一覧をパス（フラット）とツリー（フォルダー）で切り替え"
 status_pane_working_6 = { git = "すべてのファイルの表示を切り替え（Status ペイン / WIP 行、または{$commit}の変更ファイル。パレット：ファイル: パス/ツリーを切り替え、ファイル: すべてのファイルの表示を切り替え）", local = "すべてのファイルの表示を切り替え（Status ペイン / WIP 行、または{$commit}の変更ファイル。パレット：ファイル: パス/ツリーを切り替え、ファイル: すべてのファイルの表示を切り替え）" }
+status_pane_working_lfs_only = "toggle LFS only: in a repository that has LFS files, the file lists show only those ({{log.lfs_only}} with the Log focused; palette: Files: Toggle LFS Only)"
 status_pane_working_7 = "すべてのフォルダーを折りたたむ。折りたたまれたものがあれば再び展開"
 status_pane_working_8 = { git = "選択中のファイルのメニュー：{$stage}/{$unstage}、変更を破棄（確認あり）、ファイルパスのコピーは実際に実行されます。ファイル履歴/Blame はファイルを中央に開きます。残りは必要な条件付きで薄く表示されます", local = "選択中のファイルのメニュー：ステージ/ステージ解除、変更を破棄（確認あり）、ファイルパスのコピーは実際に実行されます。ファイル履歴/Blame はファイルを中央に開きます。残りは必要な条件付きで薄く表示されます" }
 status_pane_working_9 = { git = "{$commit}の変更ファイルを名前で絞り込み（{$commit}自身のファイル一覧の中のみ。Status では不可）", local = "{$commit}の変更ファイルを名前で絞り込み（{$commit}自身のファイル一覧の中のみ。Status では不可）" }
@@ -4614,6 +4619,7 @@ diff_error = "{$diff}のエラー：{error}"
 mode_path = "パス"
 mode_tree = "ツリー"
 view_all_files = "すべてのファイルを表示"
+lfs_only = "LFS only"
 filter_files = "ファイルを絞り込み："
 all_files = "すべてのファイル"
 changed_files = "変更されたファイル"
@@ -4630,6 +4636,7 @@ tree_view = "ツリー表示{hint}"
 collapse_all = "すべて折りたたむ"
 expand_all = "すべて展開"
 view_all_files = "すべてのファイルを表示{key}"
+lfs_only = "LFS only{key}"
 
 [autostash]
 reason_checkout = "チェックアウト"

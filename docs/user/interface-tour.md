@@ -339,11 +339,14 @@ The right pane follows the selection in the Log.
 author with avatar and date, the parent hash and the change counts, then the
 message (summary and description; drag its bottom border to resize it). The
 **Changed files** pane below starts with its own controls: the sort toggle,
-**Path** / **Tree**, **View all files** and a **Filter files** box, fixed above
-the list, which is the only part that scrolls. Click a file to open its diff.
+**Path** / **Tree**, **View all files** and a **Filter files** box (with an
+**LFS only** checkbox at its right end in a repository that has LFS files),
+fixed above the list, which is the only part that scrolls. Click a file to open its diff.
 On a short window the message gives way first (down to one row), then the list.
 The working changes view keeps its **Path** / **Tree** / **View all files**
-row at the top of the file lists, above the Unstaged and Staged lists.
+row at the top of the file lists, above the Unstaged and Staged lists. In Tree
+mode a collapsed folder ends with the number of files inside it, subfolders
+included, as a muted `(12)`.
 
 **Links in a message.** A web address typed in the message (`https://...`, or
 the target of a markdown `[text](https://...)`) is underlined, shows the hand

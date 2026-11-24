@@ -434,9 +434,9 @@ use preferences::PreferencesState;
 use refs_tree::{ref_display_rows, CollapsedFolders, RefRowKind, RefTreeRow};
 use scrollbar::ScrollBar;
 use status_pane::{
-    all_folders, build_tree_rows, discard_confirmation_prompt, entry_status, file_context_entries,
-    section_paths, status_marker, unstaged_paths_under, FileContextAction, FileListMode,
-    FolderContextAction, StatusSection, TreeRow,
+    all_folders, build_tree_rows_lfs, discard_confirmation_prompt, entry_status,
+    file_context_entries, section_paths, status_marker, unstaged_paths_under, FileContextAction,
+    FileListMode, FolderContextAction, StatusSection, TreeRow,
 };
 use worktree_dialog::WorktreeSeed;
 

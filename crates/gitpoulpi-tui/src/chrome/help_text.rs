@@ -188,6 +188,7 @@ pub(crate) const HELP_TEXT: &[HelpEntry] = &[
     Item(keys!("{status.stage_toggle}"), msg::help_text::STATUS_PANE_WORKING_4),
     Item(keys!("{status.toggle_file_mode}"), msg::help_text::STATUS_PANE_WORKING_5),
     Item(keys!("{status.view_all_files}"), msg::help_text::STATUS_PANE_WORKING_6),
+    Item(keys!("{status.lfs_only}"), msg::help_text::STATUS_PANE_WORKING_LFS_ONLY),
     Item(keys!("{status.collapse_all}"), msg::help_text::STATUS_PANE_WORKING_7),
     Item(
         keys!("{status.expand_all} / {status.collapse_all_folders} / {status.expand_below} / {status.collapse_below}"),

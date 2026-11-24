@@ -47,10 +47,16 @@ impl FileRows<'_> {
                     label,
                     collapsed,
                     path,
+                    files,
                 } => {
                     let chevron = crate::fold_mark::glyph(*collapsed);
-                    let item = ListItem::new(Line::from(Span::styled(
-                        format!("{}{chevron} {label}/", "  ".repeat(*depth)),
+                    let item = ListItem::new(Line::from(crate::status_pane::folder_spans(
+                        *depth,
+                        chevron,
+                        label,
+                        *files,
+                        None,
+                        0,
                         Style::default()
                             .fg(th().ui.muted)
                             .add_modifier(Modifier::BOLD),
@@ -130,11 +136,17 @@ mod tests {
                     depth,
                     label,
                     collapsed,
+                    files,
                     ..
                 } => {
                     let chevron = crate::fold_mark::glyph(*collapsed);
-                    ListItem::new(Line::from(Span::styled(
-                        format!("{}{chevron} {label}/", "  ".repeat(*depth)),
+                    ListItem::new(Line::from(crate::status_pane::folder_spans(
+                        *depth,
+                        chevron,
+                        label,
+                        *files,
+                        None,
+                        0,
                         Style::default()
                             .fg(th().ui.muted)
                             .add_modifier(Modifier::BOLD),

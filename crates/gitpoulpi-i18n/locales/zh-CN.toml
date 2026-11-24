@@ -2463,11 +2463,13 @@ refs_mark_drop = "标记为拖放来源"
 refs_drop_marked = "将标记的引用放到此处"
 log_toggle_file_mode = "文件：路径或树"
 log_view_all_files = "文件：查看所有文件"
+log_lfs_only = "Files: LFS Only"
 log_files_collapse_all = "折叠或展开所有文件夹"
 log_files_filter = "筛选已更改的文件"
 status_compose = { git = "聚焦 {$Commit} 消息", local = "聚焦{$Commit}消息" }
 status_toggle_file_mode = "文件：路径或树"
 status_view_all_files = "文件：查看所有文件"
+status_lfs_only = "Files: LFS Only"
 status_amend = "切换修订"
 status_collapse_all = "折叠或展开所有文件夹"
 status_stage_toggle = { git = "{$stage} 或 {$unstage} 所选行", local = "暂存或取消暂存所选行" }
@@ -3435,6 +3437,7 @@ diff_layout_split_before_and_after = "{$Diff}：分栏布局（前后并排）"
 diff_toggle_hunks_only_whole_file_only_the_changes = { git = "{$Diff}：切换仅 hunk（整个文件 / 仅更改）", local = "{$Diff}：切换仅代码块（整个文件 / 仅更改）" }
 files_toggle_path_tree = "文件：切换路径/树"
 files_toggle_view_all_files = "文件：切换查看所有文件"
+files_toggle_lfs_only = "Files: Toggle LFS Only"
 files_open_menu = "文件：打开当前行或所选文件的菜单"
 files_select_all = "文件：全选"
 files_clear_selection = "文件：清除选择"
@@ -3540,6 +3543,7 @@ why_no_uncommitted_changes_the_wip_row_appears_once = { git = "没有未 {$commi
 why_there_are_no_stashes = { git = "没有 {$stash}", local = "没有{$stash}" }
 why_select_a_changed_file_in_the_commit_detail_pane = { git = "请先在 {$commit} 详情窗格中选择一个已更改的文件", local = "请先在{$commit}详情窗格中选择一个已更改的文件" }
 why_this_repository_has_no_remote_add_one_first = "此仓库没有远程 - 请先添加一个"
+why_this_repository_has_no_lfs_files = "this repository has no LFS files"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a = { git = "请从“{$unstaged_files}”窗格打开一个文件 - {$commit} 的 {$diff} 没有可供 {$stage} 的索引", local = "请从“{$unstaged_files}”窗格打开一个文件 - {$commit}的{$diff}没有可供暂存的索引" }
 why_this_diff_is_the_staged_half_use_the_unstage = { git = "此 {$diff} 属于“{$staged_files}”窗格；请使用“{$unstage}”命令", local = "此{$diff}属于“{$staged_files}”窗格；请使用“取消暂存”命令" }
 why_open_a_file_from_the_third_pane_s_unstaged_half_a_2 = { git = "请从“{$unstaged_files}”窗格打开一个文件 - {$commit} 的 {$diff} 没有可丢弃的工作区更改", local = "请从“{$unstaged_files}”窗格打开一个文件 - {$commit}的{$diff}没有可丢弃的工作区更改" }
@@ -3973,6 +3977,7 @@ status_pane_working_3 = "折叠/展开活动子窗格"
 status_pane_working_4 = { git = "{$stage}/{$unstage} 所选文件，或折叠文件夹行（树模式）", local = "暂存/取消暂存所选文件，或折叠文件夹行（树模式）" }
 status_pane_working_5 = "在路径（平铺）和树（文件夹）之间切换文件列表"
 status_pane_working_6 = { git = "切换查看所有文件（状态窗格 / WIP 行，或 {$commit} 的已更改文件；命令面板：文件：切换路径/树 和 文件：切换查看所有文件）", local = "切换查看所有文件（状态窗格 / WIP 行，或{$commit}的已更改文件；命令面板：文件：切换路径/树 和 文件：切换查看所有文件）" }
+status_pane_working_lfs_only = "toggle LFS only: in a repository that has LFS files, the file lists show only those ({{log.lfs_only}} with the Log focused; palette: Files: Toggle LFS Only)"
 status_pane_working_7 = "折叠所有文件夹，若有已折叠的则重新展开"
 status_pane_working_8 = { git = "所选文件的菜单：{$stage}/{$unstage}、丢弃更改（需确认）、复制文件路径可以真正执行；文件历史/Blame 会在中间打开该文件；其余项以灰色列出并说明所需条件", local = "所选文件的菜单：暂存/取消暂存、丢弃更改（需确认）、复制文件路径可以真正执行；文件历史/Blame 会在中间打开该文件；其余项以灰色列出并说明所需条件" }
 status_pane_working_9 = { git = "按名称筛选 {$commit} 的已更改文件（仅在 {$commit} 自己的文件列表中，不适用于状态）", local = "按名称筛选{$commit}的已更改文件（仅在{$commit}自己的文件列表中，不适用于状态）" }
@@ -4615,6 +4620,7 @@ diff_error = { git = "{$Diff} 错误：{error}", local = "{$Diff}错误：{error
 mode_path = "路径"
 mode_tree = "树"
 view_all_files = "查看所有文件"
+lfs_only = "LFS only"
 filter_files = "筛选文件："
 all_files = "所有文件"
 changed_files = "已更改的文件"
@@ -4631,6 +4637,7 @@ tree_view = "树视图{hint}"
 collapse_all = "全部折叠"
 expand_all = "全部展开"
 view_all_files = "查看所有文件{key}"
+lfs_only = "LFS only{key}"
 
 [autostash]
 reason_checkout = { git = "checkout", local = "检出" }

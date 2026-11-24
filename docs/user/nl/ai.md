@@ -158,6 +158,22 @@ openen* in het commandopalet) opent de agent één keer, in een zichtbare
 terminal, in de werkmap die hij zal gebruiken. Beantwoord de vraag, sluit de
 agent en probeer het opnieuw; het antwoord wordt door de agent onthouden.
 
+### De agent openen in de map van een tabblad
+
+`Tabblad: AI-agent hier openen` in het commandopalet (herbindbaar als `palette.tab_open_agent_here`,
+geen standaardtoets) opent je terminal in de map van het actieve tabblad en start daar de agent
+van een lokaal agentprofiel, om er met de hand mee te werken. Het is dezelfde terminal als
+**Terminal hier** en dezelfde opdracht als **De agent openen...**, maar in de map van het
+tabblad in plaats van de eigen werkmap van het profiel. Met één lokaal agentprofiel opent hij meteen;
+met meer profielen vraagt een lijst onder de tabbalk welk. Er wordt geen prompt verstuurd en geen
+AI-verzoek gestart: de agent openen is de actie, en wat je erin typt is van jou.
+
+De rij heeft het AI-sterretje, is verborgen zolang de AI uit staat (**Instellingen > AI**) en grijs
+("er is geen lokale AI-agent ingesteld") als geen enkel profiel een lokale agent is. In een reeks
+neemt de stap `tab_open_agent_here` de `id` van het AI-profiel in zijn optie `profile` (leeg: het
+standaardprofiel, anders de eerste lokale agent). Een eigen terminalsjabloon kan de opdracht van de
+agent niet meekrijgen: de terminal opent in de map en de statusregel zegt welke opdracht je moet uitvoeren.
+
 Het antwoord wordt voor Claude Code gelezen uit het sessietranscript van de
 agent (de exacte tekst, daarna verwijderd) en voor Codex en Gemini van het
 scherm tussen twee markeringsregels waar het verzoek om vraagt. Er draaien
@@ -281,6 +297,7 @@ met de muis boven staat of hem markeert.
 | **Een commit splitsen** | Het menu van een commit *Commit splitsen (AI)...*, of palet `AI: Geselecteerde commit splitsen...`. De splitseditor opent met de indeling van het model al ingevuld; zie hieronder. | `ai split-plan <rev>` (drukt af) |
 | **Script voor het herschrijven van de geschiedenis** | In de [werkbank voor het herschrijven van de geschiedenis](history-rewrite.md#een-script-schrijven-met-ai): de knop `✦ Schrijven met AI...` van de scripteditor, of palet `Herschrijven: Een script schrijven met AI...`. Een dialoogvenster toont precies wat er wordt verstuurd; het script komt gemarkeerd in de editor en wordt nooit voor je uitgevoerd of toegepast. | `ai rewrite-script "<instructie>" [--sample N]` (drukt af) |
 | **Regels voor geschiedenis herschrijven** | In de [werkbank voor het herschrijven van de geschiedenis](history-rewrite.md#regels-maken-met-ai): de knop `✦ Regels maken met AI...`, `Alt+I`, of palet `Herschrijven: Regels maken met AI...`. Een dialoogvenster met meerdere regels toont precies wat er wordt verstuurd; de regels en instellingen komen in de werkbank en er wordt niets voor je als voorbeeld getoond of toegepast. | `ai rewrite-rules "<beschrijving>" [--context]` (drukt af) |
+| **Reeksconcept** | Beschrijf een [actiereeks](#reeksconcept) om te maken, of hoe je er een wijzigt (Instellingen > Reeksen, volgende deel van het venster). | `ai sequence-draft "<beschrijving>" [--edit <id>] [--context]` (drukt af) |
 | **Worktree-naam** | In het [dialoogvenster Worktree maken](worktrees.md#een-naam-geven-met-ai): de knop `✦ Naam met AI` of `Alt+A` opent een vak waarin je de functie, bug of taak beschrijft; het model geeft de worktree en zijn branch een naam naar de eigen branchnamen van de repository, en beide komen in de velden van het dialoogvenster om te bewerken. Alleen je beschrijving en de lokale branchnamen worden verstuurd, dus er is geen dialoogvenster "wat wordt verstuurd". | `ai worktree-name --describe "<taak>"` (drukt af) |
 | **Antwoord op een host** en **Issuebeschrijving** | De knop **Schrijven met AI** (`Alt+E`) van elke Markdown-composer die naar een host verstuurt: een opmerking, een antwoord of een bewerking in een gesprek, een reviewopmerking of -samenvatting, de beschrijving van een nieuw issue. Het concept komt in het vak; er wordt niets geplaatst. Zie [Schrijfhulp op een host](#schrijfhulp-op-een-host). | `ai hosting-reply` (drukt een concept af) |
 | **Commit-composer** | Het menu van de WIP-rij *Commits samenstellen (AI)...*, `Ctrl+G C`, palet `AI: Commits samenstellen uit lokale wijzigingen...` | |
@@ -362,6 +379,26 @@ de geldige behouden blijven. Een Script-regel wordt nooit op deze manier gemaakt
 namen van branches en tags en de auteurs van de nieuwste commits mee (een vakje, standaard uit, getoond in het
 paneel "wat wordt verstuurd"). Het profiel en de instructies zijn die van *Regels voor geschiedenis
 herschrijven* in Instellingen > AI.
+
+### Reeksconcept
+
+Je beschrijft een actiereeks in je eigen woorden ("alles stagen, het bericht met de AI schrijven, commit en push", of, voor
+een bestaande, "eerst een fetch toevoegen") en het model stelt een naam, een id, de stappen en, als het dat wil, een sneltoets
+voor. **Het doet alleen een voorstel**: er wordt niets opgeslagen voordat je accepteert en er wordt nooit iets uitgevoerd. Het
+model kent alleen de opdrachten die een reeks mag bevatten (de lijst die het krijgt wordt gegenereerd uit dezelfde tabel die een
+reeks valideert, dus ze kan niet uit de pas lopen); elke stap wordt apart gecontroleerd, en een stap die onbekend of destructief
+is, een andere reeks uitvoert of om een onmogelijke pauze vraagt, wordt weggelaten en met de reden vermeld terwijl de geldige
+behouden blijven. Desgewenst gaan de remotenamen, de id's van de AI-profielen en de labels van Openen in mee (standaard uit; de
+CLI-vlag is `--context`). In de terminal drukt `gitpoulpi ai sequence-draft` het voorstel af als JSON (met `toml`, dat
+`gitpoulpi sequence add --file` leest) en slaat niets op. Het profiel en de instructies zijn die van *Reeksconcept* in
+Instellingen > AI.
+
+In de terminal-UI is dezelfde taak het item **Maken met AI...** van Instellingen > Reeksen > **Toevoegen**
+(palet: `Reeks: Maken met AI...`) en de knop **Bewerken met AI...** van een reeks: een dialoogvenster waarin je
+schrijft wat je wilt, met het contextvak (standaard uit) en de vraag "Wat wordt verstuurd", daarna een voorstel
+dat je kunt **Accepteren**, **Bewerken vóór opslaan**, **Afwijzen** of opnieuw versturen met **Terug**. Een bewerking toont een diff
+tegen de huidige reeks (`+` toegevoegd, `-` verwijderd, `~` gewijzigd) en de voorgestelde sneltoets wordt gecontroleerd tegen je
+toetsenbordindeling maar nooit gebonden. Er wordt niets opgeslagen voordat je accepteert (zie [Reeksen](sequences.md#maken-en-bewerken-met-ai)).
 
 ### Schrijfhulp op een host
 

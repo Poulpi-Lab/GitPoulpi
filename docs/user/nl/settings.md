@@ -440,7 +440,7 @@ de server bevatten; zie [MCP en agents](mcp-and-agents.md).
 | **Invoerkleur**, **Aangepaste invoerkleur** | De achtergrond van tekstvelden: **Thema volgen** (standaard), een vaste donkere kleur of je eigen `#rrggbb`. |
 | **Tekstcursor** | `ui.text_cursor`: **terminal** (standaard) zet de eigen cursor van de terminal op de invoegpositie van het actieve tekstveld, als streepje (de cursorinstellingen van je terminal gelden, en het kandidatenvenster van een invoermethode opent bij de invoegpositie); **drawn** tekent de eigen invoegpositie van GitPoulpi en houdt de terminalcursor verborgen. Geldt meteen. Palet: `Instellingen: Tekstcursor...`. |
 | **Kleurdiepte** | **auto** (standaard), **truecolor**, **256** of **16**. Zie [Thema's](themes.md). |
-| **Kleurthema van de grafiek** | **Thema volgen** (standaard: de eigen baankleuren van het thema) of een willekeurig baanpalet. Elk palet toont enkele van zijn kleuren. Geldt als de Instellingen sluiten. De opdracht **App: Kleurthema van de grafiek wijzigen...** van het palet (`Ctrl+N Shift+T`) toont elk palet live vooraf. |
+| **Kleurthema van de grafiek** | **Thema volgen** (standaard: de eigen baankleuren van het thema) of een willekeurig baanpalet, je eigen themabestanden inbegrepen (na de presets). Elk palet toont enkele van zijn kleuren; een ingestelde naam die niet meer bestaat is gemarkeerd als *niet gevonden* en de grafiek gebruikt de baankleuren van het thema. Geldt als de Instellingen sluiten. De opdracht **App: Kleurthema van de grafiek wijzigen...** van het palet (`Ctrl+N Shift+T`) toont elk palet live vooraf. |
 | **Achtergrond van grafiekbanen** | **Uit** (transparant) of **Rijtint**: een zwakke band in de baankleur achter de grafiekkolom, met een dunne balk aan de rand ervan. |
 | **Sterkte van rijtint** | Hoe vervaagd de band van Rijtint is: **Sterk**, **Gemiddeld** (standaard) of **Subtiel**. De balk aan de rand behoudt zijn volle kleur. |
 | **Positie van de werkbalk** | `ui.toolbar_position`: Waar de werkbalk staat: Boven, Onder (standaard), Links of Rechts. Links en Rechts maken er een kolom naast de panelen van; in een venster smaller dan 80 kolommen staat hij onderaan. Werkt direct. |
@@ -453,6 +453,8 @@ de server bevatten; zie [MCP en agents](mcp-and-agents.md).
 | **Datumformaat**, **Datum-/tijdformaat**, **Uitgebreid datumformaat** | De datumpatronen van de datumkolom van Bestandsgeschiedenis en Blame, van de kolom Datum van de Log en van de commit-details. Elk toont een live voorbeeld. Zie de [configuratiereferentie](config-reference.md#ui) voor de tokens. |
 
 ![De keuzelijst Kleurthema van de grafiek: Thema volgen, daarna elk baanpalet met enkele van zijn kleuren](../images/settings-log-graph-lanes.png)
+
+Het thema en de grafiekkleuren (het Thema, het kleurthema van de grafiek, de kleuring en achtergrond van de banen, de sterkte van de rijtint) horen bij elke installatie: als meerdere installaties één `config.toml` delen, verandert het wijzigen ervan in de ene nooit de andere. Alleen de primaire installatie schrijft ook de gedeelde `ui.*`-sleutels.
 
 ### Toetsenbord & muis
 
@@ -484,6 +486,21 @@ Drie opties staan op het tabblad **Algemeen**.
 | **Kitty-toetsenbordprotocol** | **auto** vraagt de terminal om het kitty-toetsenbordprotocol, zodat `Ctrl+,`, `Ctrl+Enter` en `Ctrl+Shift+N` aankomen. **off** vraagt nooit; gebruik het als een terminal zich misdraagt. Vereist een herstart. |
 | **Muis ingeschakeld** | Uit laat de muis en het selecteren van tekst aan je terminal. Vereist een herstart. |
 | **Regels per muiswielstap** | Hoeveel rijen één wielstap in de Log verplaatst. Vereist een herstart. |
+
+### Reeksen
+
+**Instellingen > Reeksen** bewerkt je benoemde [reeksen](sequences.md): lijsten
+paletopdrachten die na elkaar worden uitgevoerd, elk een paletrij en
+aan een toets te binden. Het is een [lijstpagina](#lijsten) met één gezicht: **+ Toevoegen** biedt
+een lege reeks en de voorinstellingen (**Backup**, **Samenstellen en push**,
+**Worktree en agent**), de rijen zijn de **Naam**, de **Id**, een
+**Beschrijving**, het **Bereik** (deze installatie, alle installaties op deze
+computer, of alleen deze repository), een knop **Sneltoets** die de
+vastleg-popup van **Toetsenbord & muis** opent, **Stappen bewerken** en **Nu uitvoeren**.
+**Stappen bewerken** schakelt de lijst om naar de stappen van de reeks, elk met een
+**Pauze** (**Standaard**, **Altijd**, **Nooit**) en zijn opties; **+ Toevoegen**
+daar opent een filterbare lijst van de opdrachten die een stap kan zijn. Elke wijziging
+wordt meteen toegepast. Zie [Reeksen](sequences.md).
 
 ### Log & grafiek
 
@@ -523,6 +540,7 @@ op de pagina **Weergave**.
 | **Regelnummers** | De kolom met regelnummers van de editor en de diff. |
 | **De selectie volgen in de editor** | Zolang de editor open is, opent het selecteren van een ander bestand in het rechterpaneel dat ook in de editor, nadat is gevraagd of niet-opgeslagen wijzigingen moeten worden opgeslagen. Een bestand dat niet bewerkt kan worden, opent in de gebruikelijke weergave. Alleen voor de werkwijzigingen: een bestand dat uit een commit is gekozen verlaat de editor voor de diff van die commit. |
 | **Regelafbreking** | Breekt lange diffregels af. |
+| **Gewijzigde woorden markeren** | Kleurt in een gewijzigde regel de woorden die verschillen van de verwijderde of toegevoegde regel waarmee hij gepaard is met een sterkere achtergrond, in de Diff-weergave (Inline en Split), de diff van de review en de bestanden van de commit. Standaard aan (`ui.diff_intraline`); ook de paletopdracht **Diff: Markering van gewijzigde woorden omschakelen**. Zie [Gewijzigde woorden](interface-tour.md#gewijzigde-woorden-in-een-diff). |
 | **Standaardlay-out**, **Alleen hunks**, **Alleen-witruimtewijzigingen tonen**, **Minimap** | De beginstaat van de diffweergave. De weergavebalk van de diff wijzigt en bewaart ze. |
 | **Blame-annotaties**, **Breedte van blame-annotaties** | Aan welke kant van de Blame-weergave de annotatiekolom staat (avatar, auteur, leeftijd, samenvatting): **right** (standaard) of **left**, en de breedte in cellen (24 tot 90). Als je in de Blame-weergave de rand van de kolom sleept, of de toetsen `>` / `<` gebruikt, wordt de breedte hier opgeslagen (`ui.blame_side`, `ui.blame_width`). Zie [Blame](log-and-history.md#blame). |
 | **Merge-editor: naast elkaar vanaf (kolommen)** | Vanaf deze breedte toont de merge-editor A en B naast elkaar. Standaard 100, minimaal 40, `0` betekent altijd. Daaronder zijn A en B tabbladen. Zie [Merge-conflicten oplossen](merge-conflicts.md). |

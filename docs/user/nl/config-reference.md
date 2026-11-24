@@ -141,6 +141,7 @@ van auteurs naar Gravatar gestuurd en wordt je verbonden GitHub/GitLab-account g
 | `ui.diff_hunks_only` | `true` | `false` toont het hele bestand met de wijzigingen op hun plaats (`H`). |
 | `ui.diff_show_whitespace` | `true` | Toon wijzigingen die alleen witruimte betreffen (`s`). |
 | `ui.diff_word_wrap` | `false` | Breek lange diff-regels af (`w`; Instellingen > Diff & editor). |
+| `ui.diff_intraline` | `true` | Kleur de gewijzigde woorden van een gewijzigde regel met een sterkere achtergrond (palet `Diff: Markering van gewijzigde woorden omschakelen`; Instellingen > Diff & editor). |
 | `ui.minimap` | `false` | Een minimap naast de schuifbalk van de diff en de editor (`M`). |
 | `ui.mermaid_detail` | `refs` | Detail van Kopiëren als Mermaid gitGraph van de Log: `structure`, `refs`, `subjects`, `full` (onthouden uit de popup; de standaard van `log --format mermaid`). |
 | `ui.mermaid_orientation` | `lr` | Richting van die grafiek: `lr` (van links naar rechts) of `tb` (van boven naar beneden). |
@@ -397,7 +398,7 @@ agents](mcp-and-agents.md#rechten).
 | `ai.enabled` | `false` | De schakelaar. Uit verschijnt nergens iets van AI en wordt niets verstuurd. |
 | `ai.default_profile` | `"default"` | Id van het profiel dat acties gebruiken als ze er geen noemen. |
 | `ai.global_instructions` | `""` | Tekst die aan de prompt van elke actie wordt toegevoegd. Mag `${repo}`, `${uilang}`, ... gebruiken (zie [AI > Promptvariabelen](ai.md#promptvariabelen)); hetzelfde geldt voor de instructies per actie en per repository. |
-| `ai.actions.<actie>.profile` | `""` | Profiel voor één actie; leeg = de standaard. Acties: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`. Een werkruimte (`workspaces.toml`, `[workspace.ai_instructions]` en `[workspace.ai_overrides.<actie>]`) en een repository kunnen deze instructies aanvullen of vervangen: zie [AI](ai.md#instructies). |
+| `ai.actions.<actie>.profile` | `""` | Profiel voor één actie; leeg = de standaard. Acties: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `sequence_draft`. Een werkruimte (`workspaces.toml`, `[workspace.ai_instructions]` en `[workspace.ai_overrides.<actie>]`) en een repository kunnen deze instructies aanvullen of vervangen: zie [AI](ai.md#instructies). |
 | `ai.actions.<actie>.instructions` | `""` | Tekst die alleen voor die actie wordt toegevoegd. |
 | `ai.review.run_in_repository` | `"profile"` | `profile`, `yes` of `no`: of de lokale agent van een codereviewconcept voor die run in de repository werkt, boven de `workdir` van het AI-profiel. Een repository kan een eigen instellen (`gitpoulpi ai review-context --repo`). Zie [AI > Reviewcontext](ai.md#reviewcontext). |
 | `ai.review.include_claude_md` | `true` | Geef een codereviewconcept de `CLAUDE.md` van de repository (wortel, gelezen op de branch waarop het verzoek mikt; ingekort op 8 KB). |
@@ -421,7 +422,7 @@ agents](mcp-and-agents.md#rechten).
 | `ai.hosting_reply.read_repository` | `false` | Of "AI de repository laten lezen" aangevinkt begint. Standaard uit: de repository wordt alleen gelezen als je het voor dat gebruik aanvinkt. Een lokale agent of een API-profiel leest hem dan zoals beschreven in [het hoofdstuk over AI](ai.md#toegang-tot-de-repository). |
 | `ai.hosting_reply.reuse_agent_session` | `true` | De sessie van een lokale agent bewaren tussen twee antwoorden als zijn harnas dat ondersteunt. Werkt zodra de AI de repository mag lezen. |
 | `ai.hosting_reply.context_ttl_minutes` | `30` | Hoe lang een voor een antwoord opgebouwde repositorycontext wordt hergebruikt. Begrensd tussen 1 en 1440. Werkt zodra de AI de repository mag lezen. |
-| `ai.sent_preview.<actie>` | `true` | Eén sleutel per actie (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`): toon "Wat wordt verstuurd" voordat het verzoek weggaat. "Niet meer tonen voor ..." in het dialoogvenster schrijft `false`; Instellingen > AI > *Toon wat wordt verstuurd vóór...* zet ze weer aan. `rewrite_script` en `rewrite_rules` worden geaccepteerd maar hebben geen effect: de dialoogvensters voor het herschrijven van de geschiedenis tonen altijd hun eigen paneel. `worktree_name` wordt geaccepteerd maar heeft ook geen effect: het stuurt alleen mee wat je in het dialoogvenster Worktree maken typte en de lokale branchnamen. |
+| `ai.sent_preview.<actie>` | `true` | Eén sleutel per actie (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`, `sequence_draft`): toon "Wat wordt verstuurd" voordat het verzoek weggaat. "Niet meer tonen voor ..." in het dialoogvenster schrijft `false`; Instellingen > AI > *Toon wat wordt verstuurd vóór...* zet ze weer aan. `rewrite_script` en `rewrite_rules` worden geaccepteerd maar hebben geen effect: de dialoogvensters voor het herschrijven van de geschiedenis tonen altijd hun eigen paneel. `worktree_name` wordt geaccepteerd maar heeft ook geen effect: het stuurt alleen mee wat je in het dialoogvenster Worktree maken typte en de lokale branchnamen. |
 
 De eigen tabel `[preferences.ai_review]` van een repository (in haar `repo-state.toml`, of de vermelding van een niet-gekloonde repository in `remote-reviews.toml`) neemt dezelfde sleutels aan, allemaal optioneel, plus `no_extra_file = true`: geen extra bestand voor die repository, wat `ai.review.extra_file` ook zegt. Een niet ingestelde sleutel, een niet ingestelde `extra_file` en een ontbrekende `no_extra_file` erven de globale waarde; `extra_file` op een bestand zetten wist de schakelaar en andersom.
 
@@ -548,6 +549,48 @@ Meerdere installaties kunnen één `config.toml` delen (een pakket, een dev-chec
 | `installation.primary` | afwezig | De id van de primaire installatie. Afwezig: geen. |
 | `installation.settings.<id>` | geen | Eén tabel per installatie: `path` (haar map, bijgewerkt als ze verhuist), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informatief), `name` (de starternaam, `GitPoulpi (<label>)`, vastgelegd bij het eerste gebruik), `name_with_version` (uit: voeg `<major>.<minor>` aan de naam toe), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (leeg: het item van het bestandsbeheermenu staat op het hoofdniveau), `env` (leeg: haar eigen id; installaties met dezelfde naam delen daemons, sessies en ongedaanmaakgeschiedenis), `mcp_bind` (leeg: `mcp.bind`). Een lege waarde valt terug op `ui.*` voor de primaire, anders op de standaard van de soort (een dev-checkout draagt `sun`). |
 
+## `[[sequences]]`
+
+Benoemde actiereeksen: een lijst paletopdrachten die na elkaar worden uitgevoerd
+(bijvoorbeeld Backup: alles stagen, het bericht met de AI schrijven, commit,
+push). Eén tabel per reeks, zijn stappen als `[[sequences.steps]]`.
+
+```toml
+[[sequences]]
+id = "backup"                    # de slug: zijn sleutel in [keybindings.sequence] en zijn CLI-naam
+name = "Backup"                  # jouw tekst, nooit vertaald
+description = "Stage, commit with an AI message, push"   # optioneel
+scope = "installation"           # installation (standaard) | machine | repo
+owner = "3f9a0c1d2b4e5f60"       # de installatie-id; ingesteld bij scope = "installation"
+
+[[sequences.steps]]
+run = "stage_all"                # een paletopdracht-id
+
+[[sequences.steps]]
+run = "ai_generate_commit_message"
+pause = "always"                 # default | always | never
+
+[[sequences.steps]]
+run = "create_worktree_from_current_branch"
+pause = "never"
+[sequences.steps.options]
+name = "wip-${date}-${n}"        # een sjabloon: ${branch} ${date} (jjjj-mm-dd) ${time} (uu-mm) ${n} (eerste vrije nummer)
+open_tab = true
+```
+
+| Sleutel | Betekenis |
+|---|---|
+| `scope` | `installation`: alleen de installatie met de id `owner` ziet hem. `machine`: elke installatie die deze `config.toml` deelt. `repo`: opgeslagen in de repository op `.gitpoulpi/sequences.toml` (dezelfde vorm `[[sequences]]`), alleen daar zichtbaar, en pas nadat je dat bestand vertrouwt, omdat een gecommit bestand andermans opdrachten zijn. |
+| `steps[].run` | Een paletopdracht-id, de snake_case-naam uit `[keybindings.palette]`. Alleen een vaste toegestane lijst wordt geaccepteerd: stagen, commit, stash push, nieuwe branch / tag, fetch, pull, push (en de varianten push-naar-alle, pull-alles, push-tags), de AI-bericht- en commitcomposer-opdrachten, worktrees maken, een tabblad of terminal openen, en force push met lease. Destructieve opdrachten (verwerpen, reset, verwijderen, worktree verwijderen, stash drop, geschiedenis herschrijven, afsluiten, Instellingen) en andere reeksen kunnen geen stap zijn. Een stap die deze versie niet kent blijft in het bestand staan en wordt gemeld. |
+| `steps[].pause` | `default`: de stap stopt op zijn gebruikelijke dialoogvenster als hij invoer nodig heeft. `always`: stop ervoor en vraag om door te gaan. `never`: nooit stoppen; de stap heeft dan de opties nodig waarom zijn dialoogvenster zou hebben gevraagd (een `name` voor een nieuwe branch of worktree). Force push met lease kan niet `never` zijn. |
+| `steps[].options` | Antwoorden per stap: `name` (nieuwe branch, tag, worktree), `branch` (worktree van een gekozen branch), `open_tab` (de nieuwe worktree in een tabblad openen), `message` (commit), `label` (item van Openen in), `profile` (agentprofiel). |
+| maximaal 32 stappen | Een reeks heeft tussen 1 en 32 stappen. |
+
+Onbekende sleutels op een reeks of een stap blijven behouden wanneer GitPoulpi het
+bestand herschrijft. Dubbele id's onder de reeksen die je kunt zien worden gemeld.
+Bind er een met `[keybindings.sequence] <id> = "<chord>"`, bijvoorbeeld
+`backup = "Ctrl+G b"`.
+
 ## `[keybindings]`
 
 Herbindt de sneltoetsen van de TUI; Instellingen > Toetsenbord & muis bewerkt het.
@@ -567,6 +610,7 @@ stage_file = "z"
 die actie, de regel verwijderen herstelt ze. Toetscombinaties: `Ctrl+Shift+N`, `Alt+n`,
 `F2`, `PageDown`, `Space`, `,`, `P` (= `Shift+p`). Een ongeldige regel blokkeert nooit
 iets: de TUI negeert hem, houdt de standaard en meldt dat op de statusbalk.
+`[keybindings.sequence]` bindt je [`[[sequences]]`](#sequences) op id.
 Contexten, actie-id's, standaarden en de conflictregels: [Sneltoetsen](keybindings.md).
 
 ## Instellingen per repository: `.gitpoulpi/repo-state.toml`

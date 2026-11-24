@@ -15,7 +15,61 @@ een regel **Koppelen...** (zie "Repositories met iets te melden" hieronder).
 ![De Radar boven twee repositories: een vastgepinde aanvraag, dan Wacht op mijn review, Mijn pull requests, Aan mij toegewezen, issues en werk in uitvoering](../images/radar.png)
 
 **Reviewen...** op de rij van een pull- of merge request (of `e`) opent de repository met de review van de aanvraag in de app
-([Een pull request reviewen](review.md)).
+([Een pull request reviewen](review.md)). Bij een aanvraag van een repository die je klonde maar nooit aan de host koppelde, wordt de kloon eerst
+aan het project van de aanvraag gekoppeld (tenzij hij al een eigen pull-requestkoppeling heeft), zodat de review in haar tabblad begint.
+
+### De kolom Acties
+
+Rechts van een rij met een aanvraag of issue doen kleine knoppen wat een toets op de geselecteerde rij doet (een klik selecteert de rij en
+voert de actie uit; laat de aanwijzer op een knop rusten voor zijn naam en toets):
+
+```
+Breed:   #58  Round invoice totals  feature/login → main   alice   2d   Review  [globe]  [talk]  ⊕  ×  ⇣  ⋮
+Smal:    #58  Round invoice totals  feature/login → main                 [rev]  [globe]  [talk]  ⋮
+Issue:   #12  Crash on empty list                         bob     5h   Werk starten  [globe]  [talk]  ×  ⋮
+```
+
+| Knop | Toets | Palet |
+|---|---|---|
+| **Review** (een aanvraag die op jouw review wacht; vraagt hoe als hij niet gekloond is) | `e` | `Radar: Verzoek reviewen...` |
+| **Werk starten** (een gekloond issue) | `n` | `Radar: Werk aan issue starten...` |
+| de globe: de pagina op de host openen | `o` | `Radar: Openen in browser` |
+| het regelsglyph: het gesprek openen | `i` | `Radar: Issuegesprek openen` |
+| `»` **Markeren als klaar** (een conceptaanvraag) | `y` | `Radar: Markeren als klaar` |
+| `⊕` **Merge** (een aanvraag) | `m` | `Radar: Merge...` |
+| `×` **Sluiten** (een aanvraag of een issue) | `x` | `Radar: Sluiten...` |
+| `⇣` **Klonen** (een rij waarvan de repository niet gekloond is) | `g` | `Radar: Repository klonen...` |
+
+Een rij zonder actie laat haar cel leeg, zodat elke knop op elke rij in dezelfde kolom blijft. Als het venster smal is, worden de woorden Review en
+Werk starten glyphs voordat een andere kolom verdwijnt; de knoppen Klaar, Merge, Sluiten en Klonen verlaten de kolom voordat de titel dat doet, maar blijven in
+het rijmenu (`⋮`, rechtsklik, of `Shift+F10`), waar een actie die niet kan draaien grijs is met haar reden. De kolom is automatisch (hij is geen
+van de kolommen waarvan je de breedte kunt aanpassen). Een dubbelklik of `Enter` op een aanvraag die niet gekloond is vraagt hoe hij te reviewen, zoals **Review**.
+
+### De branches van een aanvraag
+
+Een aanvraagrij toont `bron → doel` achter haar titel (`alice:feature/login → main` als de bronbranch in een fork staat).
+Als er weinig ruimte is, wordt eerst het doel afgekapt (een beletselteken), houdt de titel het grootste deel van de ruimte, en worden in een smal venster de
+branches niet getoond; de kolom Acties wordt nooit weggeduwd. Laat de aanwijzer op een afgekapte tekst rusten voor het geheel. Een host die de branches niet
+noemde toont daar niets. Een issuerij noemt haar repository in dezelfde chip als een aanvraagrij (de mapnaam van de kloon, of `owner/name` als hij niet gekloond is).
+
+### Handelen op de host
+
+**Merge**, **Sluiten** en **Markeren als klaar** werken op GitHub, GitLab, Gitea en Forgejo (andere hosts maken ze grijs met "Niet ondersteund door ...";
+issues kunnen op dezelfde hosts worden gesloten).
+
+- **Merge** vraagt eerst: het vak noemt de aanvraag, haar project en branches, en biedt de methode (een merge-commit, squash,
+  en rebase waar de host dat heeft; GitLab merget of squasht). Het wordt met zijn reden geweigerd voor een concept, een aanvraag die
+  conflicteert met haar doel, of mislukkende checks; een weigering door de host (geen toestemming, een regel van de branch) staat op de
+  statusbalk.
+- **Sluiten** vraagt eerst en sluit zonder te mergen.
+- **Markeren als klaar** haalt een concept uit de conceptstatus (GitLab en Gitea: de markering `Draft:` / `WIP:` verdwijnt uit de titel). Het vraagt
+  niets: het is op de host omkeerbaar.
+- **Klonen** opent het gewone dialoogvenster Klonen op het project van de rij (de URL is ingevuld, de mapkiezer is de gebruikelijke). Zodra
+  de kloon bestaat plaatst de Radar de rij erop de volgende keer dat hij de remotes leest (heropen hem of Vernieuwen), en Klonen zegt dan
+  waar de kloon staat.
+
+Merge en Sluiten wijzigen de host en **kunnen niet vanuit GitPoulpi ongedaan worden gemaakt** (het vak zegt het); heropen een gesloten aanvraag op de host.
+Na een geslaagde aanroep worden de lijsten opnieuw opgevraagd, dus een gemergede of gesloten rij verdwijnt en een rij die klaar is verliest haar `draft`-chip.
 
 ## Openen
 
@@ -161,7 +215,7 @@ toets, of het palet (`Radar: ...`). Een muisactie heeft altijd een toets en een 
 
 | Actie | Toets | Palet |
 |---|---|---|
-| Repository openen (haar tabblad opent, of wordt geactiveerd) | `Enter` / dubbelklik | `Radar: Repository openen` |
+| Repository openen (haar tabblad opent, of wordt geactiveerd; een aanvraag die niet gekloond is vraagt hoe hij te reviewen) | `Enter` / dubbelklik | `Radar: Repository openen` |
 | Reviewen... (een aanvraag; bij een niet-gekloonde vraagt het hoe) | `e` | `Radar: Verzoek reviewen...` |
 | Een aanvraag reviewen via de API van de host (geen kloon) | `a` in de vraag | `Radar: Reviewen via de API` |
 | De repository klonen, dan de aanvraag reviewen | `c` in de vraag | `Radar: Klonen en reviewen...` |

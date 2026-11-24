@@ -273,10 +273,13 @@ de auteur met avatar en datum, de hash van de ouder en de aantallen wijzigingen,
 bericht (samenvatting en beschrijving; sleep de onderrand om het van grootte te veranderen).
 Het paneel **Gewijzigde bestanden** eronder begint met zijn eigen bediening: de
 sorteerschakelaar, **Pad** / **Boom**, **Alle bestanden tonen** en een vak **Bestanden
-filteren**, vast boven de lijst, die als enige scrolt. Klik op een bestand om zijn diff te
+filteren** (met een selectievakje **Alleen LFS** aan het rechteruiteinde in een repository met
+LFS-bestanden), vast boven de lijst, die als enige scrolt. Klik op een bestand om zijn diff te
 openen. In een laag venster krimpt eerst het bericht (tot één rij), dan de lijst. De weergave
 van de lokale wijzigingen houdt haar rij **Pad** / **Boom** / **Alle bestanden tonen**
-bovenaan de bestandslijsten, boven de lijsten Unstaged en Staged.
+bovenaan de bestandslijsten, boven de lijsten Unstaged en Staged. In de modus Boom
+eindigt een ingeklapte map met het aantal bestanden erin, submappen inbegrepen, als
+gedempte `(12)`.
 
 **Links in een bericht.** Een webadres in het bericht (`https://...`, of het doel van een
 markdown-link `[tekst](https://...)`) is onderstreept, toont de handaanwijzer en vraagt bij een klik
@@ -310,6 +313,24 @@ Bovenaan loopt een balk met knoppen:
 | **Afbr.** | Lange regels afbreken. |
 | **Kaart** | Een minimap van het hele bestand naast de schuifbalk. |
 | **Codering** | De codering waarin het bestand wordt gelezen (**Auto** bovenaan). |
+
+#### Gewijzigde woorden in een diff
+
+Wijzigt een regel maar gedeeltelijk, dan worden de woorden die verschillen geverfd met een
+sterkere achtergrond in de eigen kleur van de regel (een sterkere rode op de verwijderde regel,
+een sterkere groene op de toegevoegde), en de rest van de regel houdt de egale tint. Binnen een
+hunk wordt elke reeks verwijderde regels gepaard met de reeks toegevoegde regels die erop volgt,
+de eerste met de eerste, de tweede met de tweede, enzovoort; een paar wordt alleen gemarkeerd
+als minstens 40% van zijn niet-lege tekens gelijk is, zodat een regel die van nul is herschreven
+egaal blijft in plaats van één blok nadruk te worden. Woorden, reeksen spaties en losse
+leestekens worden vergeleken, een enkele spatie tussen twee gewijzigde woorden voegt ze samen
+tot één markering, en regels van meer dan 1000 tekens worden niet gemarkeerd. Het werkt in
+Inline en Split, met regelafbreking en zijwaarts scrollen, en in het diffpaneel van de review.
+Zet het uit in **Instellingen > Diff & editor > Gewijzigde woorden markeren**
+(`ui.diff_intraline`) of via het commandopalet (**Diff: Markering van gewijzigde woorden
+omschakelen**, zonder eigen toets). Op een terminal die beperkt is tot 16 kleuren, of met een
+thema zonder diff-achtergrond, worden de gewijzigde woorden in plaats daarvan vet en
+onderstreept getoond.
 
 In een diff van de werkmap heeft elke hunk de knoppen **Hunk stagen** en **Hunk verwerpen**.
 Druk op `v` om regels te selecteren en stage of verwerp dan alleen die regels.

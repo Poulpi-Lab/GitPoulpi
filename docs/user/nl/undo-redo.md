@@ -74,6 +74,8 @@ hintregel onder de knoppen. Voor de geselecteerde rij:
   `restore/<branch>-<sha>` op de oude punt - je huidige branch en bestanden
   verplaatsen nooit. De bevestiging toont precies wat er gaat gebeuren, en het
   herstel is een nieuwe actie: `Ctrl+Z` draait het terug.
+- **Hele reeks ongedaan maken** (`x`): aangeboden zolang de nieuwste items van één
+  reeksuitvoering zijn (zie [Reeksuitvoeringen](#reeksuitvoeringen)).
 - **Opnieuw tot hier** (`n`) op een ongedane rij.
 - **main herstellen naar waar Commit het achterliet** (`h`, of `Alt+Shift+Z` /
   `Bewerken: De branch herstellen naar waar de geblokkeerde actie hem
@@ -82,6 +84,10 @@ hintregel onder de knoppen. Voor de geselecteerde rij:
   achterliet.
 
 Klik met rechts op een rij (of druk op `.`) voor dezelfde acties als menu.
+
+Een rij die door een stap van een [reeks](sequences.md) is gemaakt draagt een badge, `⟳ Backup`,
+en haar detailregel zegt welke stap het was ("Gedaan door de reeks "Backup",
+stap 3/4.").
 
 ![De Geschiedenis van ongedaan maken na het verwijderen van een branch en twee commits: de rij van de verwijderde branch is geselecteerd en kan afzonderlijk worden hersteld](../images/undo-history.png)
 
@@ -178,11 +184,46 @@ Elke rijactie van de drie weergaven is ook een rij in het opdrachtenpalet, zodat
 
 | Weergave | Rijen in het palet |
 |---|---|
-| Geschiedenis van ongedaan maken | `Geschiedenis: Ongedaan maken tot hier...`, `Opnieuw tot hier...`, `Alleen dit herstellen...`, `De branch herstellen naar waar hij was...`, `Vernieuwen`, `Sluiten` |
+| Geschiedenis van ongedaan maken | `Geschiedenis: Ongedaan maken tot hier...`, `Opnieuw tot hier...`, `Hele reeks ongedaan maken`, `Alleen dit herstellen...`, `De branch herstellen naar waar hij was...`, `Vernieuwen`, `Sluiten` |
 | Reflog | `Reflog: Tonen in het Log`, `Branch hier maken...`, `Tag hier maken...`, `Wijzigingen toepassen op de werkmap`, `Wijzigingen bewaren als stash`, `Herstellen naar deze positie...`, `Meer laden`, `Vernieuwen` |
 | Verloren werk | `Verloren werk: Branch hier maken...`, `Tag hier maken...`, `Cherry-pick`, `Wijzigingen toepassen op de werkmap`, `Wijzigingen bewaren als stash`, `Opnieuw zoeken` |
 
 De rijen zijn grijs (met de reden) zolang hun weergave niet open is; de drie openers, `Bewerken: Geschiedenis van ongedaan maken...`, `Bewerken: Reflog...` en `Bewerken: Verloren commits terughalen...`, schakelen een open paneel ook om naar hun weergave. Een rij die de selectie niet kan uitvoeren zegt in de statusbalk waarom, in plaats van niets te doen: "deze actie is al ongedaan gemaakt: gebruik Opnieuw tot hier", de reden waarom een item niet afzonderlijk kan worden hersteld, "alleen een branch of HEAD kan worden teruggezet", enzovoort. De rijen met `...` openen dezelfde bevestiging of naamprompt als de knop.
+
+## Reeksuitvoeringen
+
+Een [reeks](sequences.md) (Backup: alles stagen, AI-commitbericht, commit, push)
+maakt **één gewoon journaalitem per stap die iets wijzigt**: hier de stage
+en de commit, niet het AI-bericht en niet de push (een push wordt nooit
+ongedaan gemaakt, zie hieronder). Het journaal is per repository en strikt nieuwste eerst, dus
+een uitvoering kan geen enkel item zijn: elk houdt zijn eigen controles, en elk is gemarkeerd met
+de uitvoering die het maakte (`sequence:Backup#<run> 3/4`). Oude journalen hebben geen markering
+en laden zoals voorheen.
+
+**Hele reeks ongedaan maken** maakt de items van één uitvoering ongedaan, nieuwste eerst, elk als één
+gewone ongedaanmaking. Het wordt aangeboden als de nieuwste items van het journaal van
+één uitvoering zijn, aaneengesloten: een item van een andere uitvoering, een wijziging die je met de hand deed of
+een die buiten GitPoulpi is gedaan tussendoor beëindigt de groep. Waar het staat:
+
+- de Geschiedenis van ongedaan maken: de knop `Hele reeks ongedaan maken` (`x`), het rechtsklikmenu
+  van de rij, en de paletrij `Geschiedenis: Hele reeks ongedaan maken`;
+- het commandopalet: `Bewerken: Hele reeks ongedaan maken` (de naam van de reeks staat op
+  de rij zolang hij van toepassing is);
+- de opdrachtregel en MCP: `gitpoulpi undo --sequence` (hieronder).
+
+Elk item wordt apart gecontroleerd, precies zoals één enkele ongedaanmaking: een commit die al
+op zijn upstream staat vraagt "toch ongedaan maken?" voordat hij gaat (beantwoord het en de rest
+gaat door), en een branch die verschoof of een lopende merge weigert. De eerste
+weigering (of een "nee" op een vraag) **stopt** en zegt welke stap en waarom: *het ongedaan maken van
+"Backup" stopte bij stap 3/4 (Commit "wip" (a81b9e4)): ... Resterende acties: 2*.
+Wat ongedaan is gemaakt blijft ongedaan, de oudere items blijven in het journaal, en een
+gewone Ongedaan (of de knop opnieuw) gaat vanaf daar verder.
+
+Alleen het journaal van deze repository wordt ongedaan gemaakt. Een uitvoering die ook in een andere
+repository handelde (een worktreestap verplaatste de volgende stappen naar het tabblad van de nieuwe worktree)
+liet items achter in het eigen journaal van die repository; open haar en maak daar ongedaan. **Opnieuw**
+blijft per item: na het ongedaan maken van een hele uitvoering brengt `Ctrl+Y` de nieuwste
+stap terug, dan de volgende, elk met zijn eigen controle.
 
 ## Wat ongedaan kan worden gemaakt
 
@@ -382,6 +423,9 @@ Ongedaan maken vraagt alleen als het riskant is:
   terug naar de server** (zie hierboven), dus het vraagt altijd, en de Opnieuw die hem daar
   weer verwijdert ook.
 
+Een hele reeks ongedaan maken vraagt één keer om de lijst (in het paneel), daarna vraagt elk item
+dat riskant is opnieuw zoals hierboven.
+
 Opnieuw, en elke ongedaanmaking van een alleen-ref-verplaatsing, vraagt nooit:
 de andere richting is één toets verderop.
 
@@ -425,6 +469,7 @@ als ongedaan maken wordt uitgeschakeld. Verder wordt nooit iets verwijderd.
 gitpoulpi undo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi redo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi undo --list [--all]
+gitpoulpi undo --sequence [--dry-run] [--yes]
 gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 ```
 
@@ -435,6 +480,15 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 - `--expect <id>` laat de aanroep als *verouderd* weigeren tenzij dat item nog
   het nieuwste is: een script (of een tweede venster) maakt nooit iets anders
   ongedaan dan waar het naar keek.
+- `--sequence` maakt de sequence-uitvoering bovenaan het journaal ongedaan (zie
+  [Reeksuitvoeringen](#reeksuitvoeringen)): de nieuwste aaneengesloten items die één
+  `sequence run` maakte, nieuwste eerst, één `undo` per stuk met eigen controles.
+  `--dry-run` somt ze op; zonder `--yes` stopt het eerste item dat er een nodig heeft
+  (afsluitcode **3**) het, met de naam van de stap, met wat tot nu toe ongedaan is gemaakt in
+  `undone` en wat er over is in `left`. Een weigering eindigt met **2** met `stopped.refused`;
+  als de bovenkant van het journaal niet van één uitvoering is, is het antwoord
+  `{"no_sequence": {...}}`, afsluitcode 2. Items dragen hun uitvoering in `undo --list`
+  (`summary.origin`: `name`, `run_id`, `step`, `of`). Niet met `--expect`.
 - `undo-forget` laat het geblokkeerde nieuwste item uit het journaal vallen
   (`--redo`: het nieuwste opnieuw-item). Het weigert als dat item niet geblokkeerd
   is, en eindigt met **3** zonder `--yes`. Voor MCP is het een mutatie, maar geen

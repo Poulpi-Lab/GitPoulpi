@@ -296,3 +296,30 @@ impl AiPopup {
         PopupKey::Nothing
     }
 }
+
+/// How a request ended, for a waiter (a sequence step). Without the `ai`
+/// feature no request ever runs, so nothing is ever recorded.
+#[allow(dead_code)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum AiEnd {
+    Ok,
+    Failed(String),
+    Canceled,
+}
+
+/// Mirrors `ai_ui::finished_of`: the stub never sees an answer, so the end
+/// carries nothing a waiter could act on.
+pub(crate) struct Finished;
+
+pub(crate) fn finished_of(_outcome: &AiOutcome) -> Finished {
+    Finished
+}
+
+/// Mirrors `ai_ui::record_finished`; nothing to record without the feature.
+pub(crate) fn record_finished(_finished: Finished) {}
+
+/// Mirrors `ai_ui::take_finished`; no request ever finishes.
+#[allow(dead_code)]
+pub(crate) fn take_finished(_kind: gitpoulpi_config::AiAction) -> Option<AiEnd> {
+    None
+}

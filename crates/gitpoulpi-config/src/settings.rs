@@ -237,6 +237,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "ai.sent_preview.worktree_name",
     "ai.sent_preview.hosting_reply",
     "ai.sent_preview.issue_body",
+    "ai.sent_preview.sequence_draft",
     "privacy.sensitive_patterns",
     "privacy.staging_guard",
     "ai.actions.commit_message.profile",

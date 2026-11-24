@@ -52,6 +52,7 @@ impl AiSection {
             Self::Action(AiAction::SplitCommit) => &[],
             Self::Action(AiAction::RewriteScript) => &[],
             Self::Action(AiAction::RewriteRules) => &[],
+            Self::Action(AiAction::SequenceDraft) => &[],
             Self::Action(AiAction::WorktreeName) => &[],
             Self::Action(AiAction::HostingReply | AiAction::IssueBody) | Self::HostingBase => &[],
             Self::Action(AiAction::CommitComposer) => &[

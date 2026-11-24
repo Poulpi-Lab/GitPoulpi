@@ -63,6 +63,7 @@ impl PreferencesState {
             PrefSection::Ai => self.ai_list_spec(),
             PrefSection::OpenIn => self.open_in_list_spec(),
             PrefSection::Images => self.images_list_spec(),
+            PrefSection::Sequences => self.seq_list_spec(),
             _ => ListSpec::default(),
         }
     }
@@ -82,6 +83,7 @@ impl PreferencesState {
             PrefSection::Ai => self.ai.selected_index(),
             PrefSection::OpenIn => self.open_in_index,
             PrefSection::Images => self.image_index,
+            PrefSection::Sequences => self.seq_selected(),
             _ => 0,
         }
     }
@@ -96,6 +98,7 @@ impl PreferencesState {
             PrefSection::Ai => self.ai.select_index(index),
             PrefSection::OpenIn => self.open_in_index = index,
             PrefSection::Images => self.image_index = index,
+            PrefSection::Sequences => self.seq_select(index),
             _ => {}
         }
     }
@@ -104,6 +107,9 @@ impl PreferencesState {
     pub(super) fn sync_list(&mut self) {
         if self.current_section() == PrefSection::Workflow {
             self.wf_normalise();
+        }
+        if self.current_section() == PrefSection::Sequences {
+            self.seq_normalise();
         }
         let spec = self.list_spec();
         self.list.set_spec(spec);
@@ -123,6 +129,7 @@ impl PreferencesState {
                             | Target::OpenIn(_)
                             | Target::ImageEditor(_)
                             | Target::Workflow(_)
+                            | Target::Sequence(_)
                     )
             })
             .unwrap_or_else(|| self.first_selectable())
@@ -183,6 +190,7 @@ impl PreferencesState {
             _ if self.current_section() == PrefSection::Ai => self.ai_profile_op(op),
             _ if self.current_section() == PrefSection::OpenIn => self.open_in_op(op),
             _ if self.current_section() == PrefSection::Images => self.images_op(op),
+            _ if self.current_section() == PrefSection::Sequences => self.seq_list_op(op),
             _ => {}
         }
         self.sync_list();

@@ -305,6 +305,7 @@ hover or highlight it.
 | **Split a commit** | A commit's menu *Split commit (AI)...*, or palette `AI: Split Selected Commit...`. The split editor opens with the model's grouping filled in; see below. | `ai split-plan <rev>` (prints) |
 | **History rewrite script** | In the [history rewrite workbench](history-rewrite.md#write-a-script-with-ai): the `✦ Write with AI...` button of the Script editor, or palette `Rewrite: Write a Script with AI...`. A dialog shows exactly what will be sent; the script lands in the editor, marked, and is never run or applied for you. | `ai rewrite-script "<instruction>" [--sample N]` (prints) |
 | **History rewrite rules** | In the [history rewrite workbench](history-rewrite.md#create-rules-with-ai): the `✦ Create Rules with AI...` button, `Alt+I`, or palette `Rewrite: Create Rules with AI...`. A multi-line dialog shows exactly what will be sent; the rules and settings land in the workbench and nothing is previewed or applied for you. | `ai rewrite-rules "<description>" [--context]` (prints) |
+| **Sequence draft** | Describe an [action sequence](#sequence-draft) to create, or how to change one (Settings > Sequences, next slice of the window). | `ai sequence-draft "<description>" [--edit <id>] [--context]` (prints) |
 | **Worktree name** | In the [Create worktree dialog](worktrees.md#naming-with-ai): the `✦ Name with AI` button or `Alt+A` opens a box where you describe the feature, bug or task; the model names the worktree and its branch after the repository's own branch names, and both land in the dialog's fields for you to edit. Only your description and the local branch names are sent, so it has no "what is sent" dialog. | `ai worktree-name --describe "<task>"` (prints) |
 | **Reply on a host** and **Issue description** | The **Write with AI** button (`Alt+E`) of every Markdown composer that sends to a host: a comment, a reply or an edit in a conversation, a review comment or summary, a new issue's description. The draft lands in the box; nothing is posted. See [Writing help on a host](#writing-help-on-a-host). | `ai hosting-reply` (prints a draft) |
 | **Commit composer** | The WIP row's menu *Compose commits (AI)...*, `Ctrl+G C`, palette `AI: Compose Commits From Working Changes...` | |
@@ -387,6 +388,18 @@ and an entry that cannot be used is listed with the reason while the valid ones 
 rule is never created this way. Optionally the scope, the branch and tag names and the authors of
 the newest commits go along (a box, off by default, shown in the "what is sent" pane). The profile
 and instructions are the *History rewrite rules* ones in Settings > AI.
+
+### Sequence draft
+
+You describe an action sequence in your own words ("stage everything, write the message with the AI, commit and push", or, for an
+existing one, "add a fetch first") and the model proposes a name, an id, the steps and, if it wants, a shortcut. **It only
+proposes**: nothing is saved before you accept it and nothing is ever run. The model only knows the commands a sequence may
+contain (the list it is given is generated from the same table that validates a sequence, so it cannot drift); each step is
+checked on its own, and a step that is unknown, destructive, runs another sequence or asks for a pause that is not possible
+is left out and listed with the reason while the valid ones are kept. Optionally the remote names, the AI profile ids and the
+Open in labels go along (off by default; the CLI flag is `--context`). In the terminal, `gitpoulpi ai sequence-draft` prints the
+proposal as JSON (with `toml`, which `gitpoulpi sequence add --file` reads) and saves nothing. The profile and instructions are
+the *Sequence draft* ones in Settings > AI.
 
 ### Writing help on a host
 

@@ -15,6 +15,7 @@ const TOOLS: &[(&str, &str, bool)] = &[
     ("ai_split_plan", "read", true),
     ("ai_rewrite_script", "read", true),
     ("ai_rewrite_rules", "read", true),
+    ("ai_sequence_draft", "read", true),
     ("ai_worktree_name", "read", true),
     ("ai_hosting_reply", "read", true),
     ("ai_prompt", "read", false),
@@ -395,6 +396,7 @@ fn the_audited_fixes_hold() {
         "ai_split_plan",
         "ai_rewrite_script",
         "ai_rewrite_rules",
+        "ai_sequence_draft",
         "ai_worktree_name",
         "ai_hosting_reply",
     ] {

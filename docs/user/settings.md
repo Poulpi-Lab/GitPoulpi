@@ -503,6 +503,21 @@ Three options are on the **General** tab.
 | **Mouse enabled** | Off leaves the mouse and text selection to your terminal. Needs a restart. |
 | **Mouse wheel lines** | How many rows one wheel step moves in the Log. Needs a restart. |
 
+### Sequences
+
+**Settings > Sequences** edits your named [sequences](sequences.md): lists of
+palette commands that run one after the other, each a palette row and
+bindable to a key. It is a [list page](#lists) with one face: **+ Add** offers
+an empty sequence and the presets (**Backup**, **Compose and push**,
+**Worktree and agent**), the rows are the **Name**, the **Id**, a
+**Description**, the **Scope** (this installation, all installations on this
+computer, or this repository only), a **Shortcut** button that opens the
+capture popup of **Keyboard & mouse**, **Edit steps** and **Run now**.
+**Edit steps** switches the list to the sequence's steps, each with a
+**Pause** (**Default**, **Always**, **Never**) and its options; **+ Add**
+there opens a filterable list of the commands a step can be. Every change
+applies at once. See [Sequences](sequences.md).
+
 ### Log & graph
 
 How the commit graph is drawn and how many commits the Log loads. The graph

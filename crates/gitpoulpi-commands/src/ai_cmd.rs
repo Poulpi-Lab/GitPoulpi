@@ -600,6 +600,105 @@ async fn rewrite_rules(
     Ok(out)
 }
 
+/// `ai sequence-draft`: the sequence the model proposes, as the definition
+/// `sequence add --file` reads. Data only: this function has no path to a
+/// save or a run, and says `applied: false` so a caller can rely on it.
+async fn sequence_draft(
+    session: &mut Session,
+    ctx: &mut Ctx,
+    description: &str,
+    edit: Option<&str>,
+    context: bool,
+) -> Result<Emitted, String> {
+    use gitpoulpi_ai::assist::SequenceDraftRequest;
+    use gitpoulpi_config::sequences::{self, SequenceDef};
+    let job = ctx.job(session, AiAction::SequenceDraft)?;
+    let settings = gitpoulpi_config::Settings::resolve_ambient().map_err(|e| e.to_string())?;
+    let config = settings.config();
+    let install_id = gitpoulpi_config::installation::current()
+        .identity
+        .id
+        .clone();
+    let mut known: Vec<SequenceDef> = sequences::visible_sequences(config, &install_id, None)
+        .into_iter()
+        .map(|(d, _)| d)
+        .collect();
+    if let Some(root) = session.repo_root() {
+        known.extend(sequences::peek_repo_sequences(root).unwrap_or_default());
+    }
+    let edited = match edit {
+        Some(id) => Some(known.iter().find(|d| d.id == id).cloned().ok_or_else(|| {
+            format!("no sequence with the id \"{id}\" (`gitpoulpi sequence list` shows them)")
+        })?),
+        None => None,
+    };
+    let mut request = SequenceDraftRequest {
+        description: description.to_string(),
+        edit: edited,
+        taken_ids: known.iter().map(|d| d.id.clone()).collect(),
+        context: prompts::SequenceContext::default(),
+    };
+    if context {
+        let remotes: Vec<gitpoulpi_core::domain::Remote> =
+            session.call(OperationKind::Remotes, json!({})).await?;
+        let c = &mut request.context;
+        c.remotes = remotes.into_iter().map(|r| r.name).collect();
+        c.ai_profiles = config.ai.profiles.iter().map(|p| p.id.clone()).collect();
+        c.open_in_labels = config
+            .ui
+            .open_in
+            .iter()
+            .flatten()
+            .map(|e| e.label.clone())
+            .collect();
+    }
+    let outcome = job
+        .draft_sequence(&request)
+        .await
+        .map_err(|e| e.to_string())?;
+    let proposal = &outcome.proposal;
+    let toml_text = toml::to_string_pretty(&proposal.def).map_err(|e| e.to_string())?;
+    let mut human = format!(
+        "{} ({} step(s) proposed)",
+        proposal.def.name,
+        proposal.def.steps.len()
+    );
+    for (i, step) in proposal.def.steps.iter().enumerate() {
+        human.push_str(&format!("\n{:>3}. {}", i + 1, step.run));
+    }
+    for p in &proposal.problems {
+        human.push_str(&format!(
+            "\nleft out (step {}, {}): {}",
+            p.position, p.what, p.reason
+        ));
+    }
+    for n in &proposal.notes {
+        human.push_str(&format!("\nnote: {n}"));
+    }
+    if let Some(k) = &proposal.suggested_shortcut {
+        human.push_str(&format!("\nsuggested shortcut: {k}"));
+    }
+    let mut out = emitted(
+        json!({
+            "sequence": proposal.def,
+            "toml": toml_text,
+            "problems": proposal.problems,
+            "notes": proposal.notes,
+            "suggested_shortcut": proposal.suggested_shortcut,
+            // The keymap is not read here: the Settings dialog checks it.
+            "shortcut_conflict": null,
+            "retried": outcome.retried,
+            "context": !request.context.is_empty(),
+            "applied": false,
+        }),
+        human,
+    );
+    if !proposal.problems.is_empty() {
+        out.exit_code = 2;
+    }
+    Ok(out)
+}
+
 /// `ai worktree-name`: a worktree name and a branch name for a task.
 #[cfg(feature = "worktree")]
 async fn worktree_name(
@@ -963,6 +1062,11 @@ async fn run_action(
             description,
             context,
         } => rewrite_rules(session, ctx, &description, context).await,
+        AiCommand::SequenceDraft {
+            description,
+            edit,
+            context,
+        } => sequence_draft(session, ctx, &description, edit.as_deref(), context).await,
         AiCommand::ResolveConflict { path, conflict } => {
             resolve_conflict(session, ctx, &path, conflict).await
         }

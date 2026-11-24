@@ -28,6 +28,13 @@ pub use rewrite_rules::{
     VocabEntry, MAX_CONTEXT_ITEMS, VOCABULARY as REWRITE_RULES_VOCABULARY,
 };
 
+mod sequence_draft;
+pub use sequence_draft::{
+    base_prompt as sequence_draft_base_prompt, example_step as sequence_draft_example_step,
+    sequence_draft, sequence_draft_retry, sequence_json, SequenceContext,
+    MAX_CONTEXT_ITEMS as SEQUENCE_MAX_CONTEXT_ITEMS,
+};
+
 /// The built-in base prompt of an action.
 pub fn base_prompt(action: AiAction) -> &'static str {
     match action {
@@ -74,6 +81,7 @@ pub fn base_prompt(action: AiAction) -> &'static str {
         AiAction::CodeReview => review::BASE_PROMPT,
         AiAction::RewriteScript => REWRITE_SCRIPT_BASE_PROMPT,
         AiAction::RewriteRules => rewrite_rules::base_prompt_static(),
+        AiAction::SequenceDraft => sequence_draft::base_prompt_static(),
         AiAction::WorktreeName => crate::worktree_name::BASE_PROMPT,
         AiAction::HostingReply | AiAction::IssueBody => crate::hosting_reply::BASE_PROMPT,
         AiAction::SplitCommit => {

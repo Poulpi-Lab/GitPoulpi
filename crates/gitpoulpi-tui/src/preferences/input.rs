@@ -30,6 +30,7 @@ impl PreferencesState {
             && !self.wf_editor_open()
             && !self.rp_editor_open()
             && !self.ra_overlay_open()
+            && !self.seq_overlay_open()
             && !typing_token
             && !(self.keys_active() && self.keys.text_focused())
             && {
@@ -89,6 +90,9 @@ impl PreferencesState {
         if self.rp_editor_open() {
             return self.rp_editor_key(key);
         }
+        if self.seq_overlay_open() {
+            return self.seq_overlay_key(key);
+        }
         if self.opens_search(&key) {
             self.open_search();
             return true;
@@ -115,6 +119,9 @@ impl PreferencesState {
             && !self.strip
         {
             return self.integrations_key(&key);
+        }
+        if self.seq_steps_back_key(&key) {
+            return true;
         }
         if self.focus == PrefFocus::List && self.list_shown() {
             if let Some(stay) = self.list_key(key) {
@@ -435,6 +442,7 @@ impl PreferencesState {
         match target {
             Target::Ai(t) => self.ai_commit_combo(*t, value),
             Target::Workflow(t) => self.wf_commit_combo(*t, value),
+            Target::Sequence(t) => self.seq_commit_combo(*t, value),
             Target::RepoAuth(t) => self.ra_commit_combo(*t, value),
             Target::Global(key) => {
                 self.write_global(key, value);
@@ -623,6 +631,7 @@ impl PreferencesState {
             #[cfg(feature = "mcp")]
             PrefAction::McpSecurity(button) => self.mcp_button(button),
             PrefAction::Workflow(button) => self.wf_button(button),
+            PrefAction::Sequence(button) => self.seq_button(button),
             PrefAction::RepoPage(button) => self.rp_button(button),
             PrefAction::RepoAuth(button) => self.ra_button(button),
             PrefAction::ForgetCredentials => {
@@ -774,6 +783,9 @@ impl PreferencesState {
         if self.rp_editor_open() {
             self.rp_editor_mouse(kind, col, row, self.mouse_shift);
             return true;
+        }
+        if self.seq_overlay_open() {
+            return self.seq_overlay_mouse(kind, col, row);
         }
         // An open dropdown is modal: it takes every mouse event.
         if let Some((_, combo)) = self.choice.as_mut() {

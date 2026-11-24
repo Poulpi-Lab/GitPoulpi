@@ -126,6 +126,7 @@ göründüğü her diğer yer için `▌`. Merge düzenleyicisi her çakışmay�
   kenarlığı sürükleyin** (varsayılan olarak boşluk, başlıktan ya da tablonun herhangi bir yerinden; Ayarlar > Log ve grafik > Sütun yeniden boyutlandırma) (klavyede: sütunu seçmek için `Shift+C`, sonra `]` / `[`).
 - Sütunu solundaki içeriğe sığdırmak için **iki Log başlığı arasındaki kenarlığa çift tıklayın** (klavyede: sütunu seçmek için `Shift+C`, sonra `=`; `+` her sütunu sığdırır). Son sütunun kendi son hücresinde bir tutamacı vardır: o sütunu yeniden boyutlandırmak için sürükleyin, farkı Mesaj sütunu karşılar.
 - **Log'u yana kaydırın** (`scroll` sütun düzeni; Ayarlar > Log ve grafik > Sütun düzeni ya da seçicinin `Yana kaydır` onay kutusu): tabloda yatay tekerlek veya `Shift`+tekerlek, alt kenarlıktaki çubuk (tutamacını sürükleyin, boş yola basın, uç oklarına tıklayın) ya da `Shift+Left` / `Shift+Right`. Varsayılan `fit` düzeninde sütunlar bölmeyi doldurur ve kaydırılacak bir şey yoktur.
+- Bir satır panelden genişse **bir liste panelini yana kaydırın**: bir Refs bölümü (uzun bir dal, tag veya stash adı), Unstaged ve Staged listeleri, commit'in (veya bir karşılaştırmanın) değişen dosyaları ve commit ayrıntılarının bilgi satırları (id, yazar, yazılma tarihi, sayılar). Panelin üzerinde yatay tekerlek veya `Shift`+tekerlek onu kaydırır; panelin alt kenarlığında bir çubuk yalnızca bir şey taştığında görünür (tutamacını sürükleyin, boş yola basın, uç oklarına tıklayın), bu yüzden asla bir satır kaplamaz. Klavyeden `Alt+Left` / `Alt+Right` onu alan paneli kaydırır (Log commit ayrıntılarını kaydırır; değişen dosyaların içindeyken dosyaları); palette `Görünüm: Paneli Sola/Sağa Kaydır` vardır. Satırın tamamı kayar (girinti, durum işareti, ok ve ad birlikte); panelin başlığı, kenarlığı, kaydırma çubukları ve üzerine gelinen bir Durum satırının Stage/Unstage düğmesi yerinde kalır. Bir ad artık üç nokta ile kesilmez: kuyruğu bir kaydırma uzaklığındadır (ek push hedefleri olan bir dal bunun yerine `⇉` rozetini görünür tutar, böylece adı yine yol verir). Uzaklık panel başınadır, görünümdeki en geniş satırda durur ve depoyu değiştirdiğinizde unutulur. Commit mesajı bloğu metnini kaydırır, bu yüzden kaydırılacak bir şeyi yoktur. Bir bölüm yana kaydırılmışken alt kenarlığı çubuğu taşır, bu yüzden o bölümü klavye komutlarıyla ya da sığan bir bölümden yeniden boyutlandırın.
 - Sütunu taşımak için **bir Log başlığını sürükleyin**: adının bir hayaleti imleci izler, ayrıldığı başlık soluklaşır ve bir vurgu çubuğu ineceği yeri işaretler. Sütunlar bıraktığınızda taşınır; `Esc` iptal eder ve onu taşırken imleç açık el olur (klavyede: sütunu seçmek için `Shift+C`, sonra `<` / `>`).
 
 GitPoulpi her boyutu hatırlar. Bkz.
@@ -238,6 +239,7 @@ Bkz. [Barındırma hizmetleri ve issue takipçileri](hosting-integration.md).
   için bir alt menüsü vardır.
 - Ref'in eylemlerini ve commit'in eylemlerini içeren tek bir menü için **bir ref
   hapına sağ tıklayın**.
+- Hangi yazarların commit'lerinin aydınlık kalacağını seçmek için **Yazar başlığındaki huniye tıklayın** (veya Log'da `Shift+A`, ya da paletteki `Log: Yazara Göre Filtrele...`); gerisi aramadaki gibi soluklaşır. `Enter` veya bir satıra tıklamak bir yazarı açıp kapatır, **Filtreyi temizle** satırı (✕) filtreyi bırakır, `Esc` açılır pencereyi kapatır ve filtreyi korur. Temizlemek için **aydınlık huniye sağ tıklayın** (palet: `Log: Yazar Filtresini Temizle`).
 - Sütunları göstermek veya gizlemek için **başlığa sağ tıklayın**: başlığında ✕ bulunan bir onay listesi (`[x]` / `[ ]`); bir satıra tıklayın ya da oklarla `Space` / `Enter` kullanın, sonra ✕, `Esc` ya da dışarı bir tıklamayla kapatın (palet: `Görünüm: Log: Gösterilecek sütunları seç`). Onay kutularının altında: `<column> sütununu içeriğine sığdır` (sağ tıklanan sütun), `Tüm sütunları içeriğe sığdır` ve `Sütun genişliklerini sıfırla`. Sağ tıklamanın klavye karşılığı: bir sütunu seçmek için `Shift+C`, sonra `.` (veya `Shift+F10`) aynı menüyü onun üzerinde açar.
 - **Radar'ın sütunları** aynı şekilde çalışır: boyutlandırmak için depo, `#`, yazar veya yaş sütunundan sonraki ayırıcıyı sürükleyin, sütunu en geniş girdisine sığdırmak için ona **çift tıklayın** (`C` bir sütun seçer, sonra `=`; `+` her sütunu sığdırır) ve `<column> sütununu içeriğine sığdır` ile `Tüm sütunları içeriğe sığdır` için **bir sütun başlığına sağ tıklayın** (veya `C`, sonra `.`).
 - Önceki veya sonraki eşleşmeye gitmek ya da çubuğu kapatmak için arama
@@ -269,20 +271,34 @@ Bölümleri Göster/Gizle...*, her bölüm için bir *Göster/Gizle* komutu ve *
 
 ### Ref'leri sürüklemek
 
-Refs kenar çubuğundaki bir dala ya da Log'daki bir ref hapına basın ve onu
-başka bir dalın üstüne sürükleyin. Durum çubuğu neyi taşıdığınızı söyler.
-Bırakmayı kabul edebilecek bir hedef aydınlanır. Bir menü almak için bırakın.
-`Esc` sürüklemeyi iptal eder.
+Refs kenar çubuğundaki bir dala, uzak dala ya da tag'e veya Log'daki bir ref hapına basın
+ve onu başka bir ref'in üstüne sürükleyin. Durum çubuğu neyi taşıdığınızı söyler.
+Bırakmayı kabul edebilecek bir hedef aydınlanır. Bir menü almak için bırakın. `Esc`
+sürüklemeyi iptal eder. Taşırken Log olduğu yerde kalır: bir ref'e basmak Log'u commit'ine
+yalnızca bunun bir tıklama olduğu anlaşıldığında kaydırır (atlama düğme kalktığında olur),
+böylece önce bırakma hedefine kaydırıp sonra ref'i alabilirsiniz.
 
 | Sürükleme | Menü |
 |---|---|
 | Yerel X dalını yerel Y dalının üstüne | **Merge: X → Y**, **Rebase: X → Y üstüne**, **Etkileşimli rebase: X → Y üstüne...**, **Fast-forward: Y → X** |
 | Bir yerel dalı bir uzak dalın üstüne | O uzak depoya **Push: X** |
 | Bir uzak dalı yerel Y dalının üstüne | **Merge**, **Rebase: Y → onun üstüne**, **Fast-forward: Y → ona** ve Y'nin upstream'i ise **Pull** |
+| T tag'ini herhangi bir dalın, uzak dalın veya tag'in üstüne | **Tag T buraya taşı**; hedef tag'in commit'inin soyundan değilse *(fast-forward değil: T artık bir ata olmayacak)* olarak işaretlenir (seçim sizin); zaten o commit'teyse *zaten orada* diye gri görünür |
+| T tag'ini yerel Y dalının üstüne | ayrıca **Merge: tag T → Y** ve bir çizginin altında daha seyrek olan **Merge: Y → tag T ve tag taşınır** (tag'in commit'i ile Y'nin bir merge commit'i, detached, sonra tag onun üzerine taşınır) |
 
 Eylem, checkout yapılmamış bir dalı değiştirdiğinde GitPoulpi önce onda checkout
-yapar. Git checkout'u reddederse hiçbir şey değişmez. Tag'ler sürüklenemez ve
-bırakma kabul edemez.
+yapar. Git checkout'u reddederse hiçbir şey değişmez. Bir tag'in üstüne yalnızca tag'ler
+bırakılabilir, bir dal bırakılamaz.
+
+Bir tag'i taşımak türünü korur: hafif bir tag hafif kalır, açıklamalı bir tag mesajı ve
+tag'i oluşturan satırı değişmeden taşınarak açıklamalı olarak yeniden oluşturulur (imzalı bir
+tag reddedilir, imzası artık eşleşmezdi). Yalnızca yerel tag'iniz taşınır: tag'i tutan bir
+uzak depo eski konumu korur, tag *differs* olur ve durum satırı bunu söyler; istediğinizde
+kendiniz push edin. Taşıma ve merge-ve-taşıma her biri tek bir geri alma adımıdır (geri alma
+eski tag nesnesini yerine koyar). Bir tag'e yapılan ve çakışan bir merge hiçbir şeyi
+değiştirmez. Palet: `Refs: Seçili Tag Seçili Commit Üzerine Taşı...` Refs panelinin tag'ini
+Log'da seçili commit'e taşır (bu bir fast-forward değilse önce sorar); diğer her hedef aşağıdaki
+işaretle sonra bırak yolundan geçer.
 
 Klavye: "işaretle, sonra bırak" her ref çifti için sürüklemenin yaptığını yapar.
 Refs panelinde bir dalın üzerinde `m` tuşuna basın (palet: `Refs: Bırakma Kaynağı
@@ -471,12 +487,12 @@ Bazı terminaller GitPoulpi'nin fare imlecini değiştirmesine izin verir:
 ayırıcıların üzerinde bir yeniden boyutlandırma imleci, tıklanabilir öğelerin
 üzerinde bir el. Log'un, Radar'ın ve commit sütununun bir sütun sınırının üzerinde de (sürüklerken de) bir yeniden boyutlandırma imleci vardır. Bu kitty, foot, Ghostty, mintty ve upstream PR #8092'li bir WezTerm derlemesinde çalışır (`OSC 22` dizisi). Yalnızca şekil değiştiğinde gönderilir, tmux içinde yalnızca geçiş (passthrough) için sarılarak (`allow-passthrough on`; kitty ve foot gösterir, Ghostty göstermez), screen, zellij veya herdr içinde asla gönderilmez. GitPoulpi'den çıkarken varsayılan imleç geri yüklenir. Diğer terminallerde (Rio, Alacritty, Tabby, iTerm2, Terminal.app, Windows Terminal, xterm) imleç değişmez; bkz. [Terminal seçmek](terminals.md#fare-işaretçisi-şekli-osc-22). İmlecin altındaki ayırıcı veya düğme her terminalde aydınlanır.
 
-Aynı türden bir bileşen uygulamanın her yerinde aynı imleci verir.
+Aynı türden bir bileşen uygulamanın her yerinde aynı imleci verir: Radar üzerinde gösterilen bir incelemenin düğmeleri (sekmeler, kapatma çarpısı, açılır pencere düğmeleri) ve Radar'ın kendi Eylemler düğmeleri, her düğme gibi eli gösterir.
 
 - **Düğmeler gerçek düğmelerdir**: Ayarlar'da (Entegrasyonlar: Düzenle, Bağlantıyı kes, Kaldır, Gözat, Sil, yönergeler düzenleyicisinin parça düğmeleri...) ve iletişim kutularında: dolu bir arka plan üzerinde dolgulu etiketler, imleç üzerindeyken parlar, devre dışıyken soluklaşır, asla `[ ]` içinde metin değildir. Kalan tek köşeli parantezler `[x]` / `[ ]` onay kutusu işaretleridir; onlar birer onay kutusudur ve her denetim gibi eli alır.
 - **İşaret eden el** denetimlerin üzerindedir: düğmeler, onay kutuları ve anahtarlar, açılır listeler (Ayarlar'da, issue ve pull request panellerinde, Radar'da, iletişim kutularında), sekmeler ve çarpıları, `+` düğmeleri, bağlantılar ve referanslar (`#12`, `!45`), genişletme oklu grup ve klasör başlıkları, ref hapları, kaydırma çubukları ve durum çubuğunun Etkinlik, işler ve sürüm düğmeleri. Bir satırın içindeki onay kutusu ya da düğme eli korur.
-- **Ok** satırlardadır. Bir satır, imleç üzerindeyken bütün olarak aydınlanır (her listede aynı ışık) ve kendi başına bir denetim değildir: Refs, Worktree'ler, Stash'ler ve Alt modüller panellerinin satırları, Log ve commit sütunu (yalnızca bir ref hapı eli alır), bir diff'in satırları, değişen dosyalar, pull request, issue ve Radar öğeleri ile iletişim kutularındaki ve panellerdeki listelerin satırları (klonlama, klasör seçici, Çalışma alanları, panonun kartları, İşler paneli, atanan, etiket ve kilometre taşı seçicileri, rebase adımları, inceleme dosyaları ve commit'leri, menü ve açılır liste seçenekleri).
-- **Metin imleci (I-beam)** giriş kutularındadır, kutunun tamamı üzerinde: arama kutuları (genel arama, Ayarlar, komut paleti, Ana sayfa), filtreler (Refs, dosyalar, Radar, Etkinlik günlüğü, issue panelinin araması), Ayarlar'ın metin, sayı ve alan satırları (düzenlerken de), iletişim kutularının alanları, inceleme yorum kutuları, commit besteleyici, dosya düzenleyicinin metni ve merge düzenleyicinin düzenlenebilir sonucu (salt okunur panelleri oku korur). Commit ayrıntılarında mesaj ve açıklama düzenlenebilir olduğundan I-beam onlarda görünür ve bloğun tamamı hafifçe aydınlanır.
+- **Ok** satırlardadır. Bir satır, imleç üzerindeyken bütün olarak aydınlanır (her listede aynı ışık) ve kendi başına bir denetim değildir: Refs, Worktree'ler, Stash'ler ve Alt modüller panellerinin satırları, Log ve commit sütunu (yalnızca bir ref hapı eli alır), bir diff'in olukları, değişen dosyalar, pull request, issue ve Radar öğeleri ile iletişim kutularındaki ve panellerdeki listelerin satırları (klonlama, klasör seçici, Çalışma alanları, panonun kartları, İşler paneli, atanan, etiket ve kilometre taşı seçicileri, rebase adımları, inceleme dosyaları ve commit'leri, menü ve açılır liste seçenekleri).
+- **Metin imleci (I-beam)** giriş kutularındadır, kutunun tamamı üzerinde: arama kutuları (genel arama, Ayarlar, komut paleti, Ana sayfa), filtreler (Refs, dosyalar, Radar, Etkinlik günlüğü, issue panelinin araması), Ayarlar'ın metin, sayı ve alan satırları (düzenlerken de), iletişim kutularının alanları, inceleme yorum kutuları, commit besteleyici, dosya düzenleyicinin metni ve merge düzenleyicinin düzenlenebilir sonucu (salt okunur panelleri oku korur, çünkü orada bir sürükleme hiçbir şey seçmez). Tek bir kural salt okunur metni de kapsar: bir fare sürüklemesinin metin seçebildiği her yerde imleç I-beam'dir. Bunlar bir diff'in kodu (Diff görünümü, Satır İçi ve Bölünmüş, ve incelemenin diff paneli), Dosya Görünümü ve Blame'in kodudur. Satır numaraları, işaretleri ve hunk başlıkları oku korur ve bir satırdaki düğme eli korur. Aynısı bir issue'nun veya isteğin konuşması (ayrıca incelemenin Genel Bakış'ı ve taslak bloğu), commit ayrıntılarının mesajı, Sürüm notları, Etkinlik günlüğü (iki sekme de), yardım açılır penceresi, yorum düzenleyicinin Markdown önizlemesi ve incelemenin diff'i içindeki yorumlar, bekleyen notlar ve öneriler için geçerlidir: bir sürükleme metni seçer (düz bir tıklama anlamını korur: bir bağlantı açılır, bir düğme eylem yapar, bir Etkinlik günlüğü girdisi veya bir konuşma dizisi açılır ya da katlanır), `Ctrl+C` kopyalar, `Esc` ya da bir tık onu bırakır. Bir seçim kaydırdığınızda metnini izler. Commit mesajı ayrıca düzenlenebilirdir (çift tık düzeltir) ve bloğun tamamı hafifçe aydınlanır.
 - **Commit ayrıntılarında** bilgi satırları denetimlerdir: kısa kimliği kopyalamak için `commit: <id>` üzerine tıklayın, düzeltmek için yazar ya da tarih satırına çift tıklayın (el ve hafif bir işaret onları belirtir). İstatistik satırı yalnızca bilgi verir ve oku korur.
 
 Yeniden boyutlandırma imleçleri ayırıcıların ve sütun sınırlarının üzerinde kalır; açık el yalnızca bir ref taşırken görünür.

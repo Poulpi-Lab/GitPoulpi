@@ -21,6 +21,13 @@ komuttur.
   çalıştırır. Palet (`Ctrl+P`): `Sekme: Şurada Aç...` ve `Sekme: Varsayılanda Aç`.
   Başlık çubuğunda düğmeye yer olmasa bile palet komutları çalışır. Her iki tuş da
   yeniden atanabilir; bkz. [Klavye kısayolları](keybindings.md).
+- **Etikete göre**: bir [dizi](config-reference.md#sequences) adımı `tab_open_in`, **etiketini**
+  verdiğiniz girişi çalıştırır (`label = "VS Code"`), bu yüzden listeyi yeniden sıralamak
+  neyin çalışacağını asla değiştirmez. Bilinmeyen bir etiket adımı "“...” etiketli bir Şurada aç girişi yok"
+  iletisiyle durdurur. `Sekme: Burada Terminal` (palet) terminalinizi klasörde açar, sekme
+  çubuğunun eski "Burada terminal" düğmesidir.
+- **Klasörde bir YZ ajanı**: `Sekme: Burada YZ Ajanı Aç` terminalinizi sekmenin klasöründe
+  yerel bir YZ ajanı çalıştırarak açar; bkz. [YZ](ai.md#ajanı-bir-sekmenin-klasöründe-açma).
 - **Bir depo sekmesine sağ tıklayın**: sekme menüsünde aynı girişleri içeren bir
   **Şurada aç** alt menüsü vardır.
 - Liste, bu oturumda en son kullandığınız girişle başlar.

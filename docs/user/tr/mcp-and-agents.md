@@ -255,6 +255,7 @@ onaylayacağınız bir iletişim kutusu açar.
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
 | `ai_rewrite_rules` | `gitpoulpi ai rewrite-rules` | read, network |
 | `ai_rewrite_script` | `gitpoulpi ai rewrite-script` | read, network |
+| `ai_sequence_draft` | `gitpoulpi ai sequence-draft` | read, network |
 | `ai_split_plan` | `gitpoulpi ai split-plan` | read, network |
 | `ai_worktree_name` | `gitpoulpi ai worktree-name` | read, network |
 | `alias_status` | `gitpoulpi alias status` | read |
@@ -452,6 +453,10 @@ onaylayacağınız bir iletişim kutusu açar.
 | `rewrite_tools` | `gitpoulpi rewrite tools` | read |
 | `rm_file` | `gitpoulpi rm-file` | destructive |
 | `search` | `gitpoulpi search` | read |
+| `sequence_list` | `gitpoulpi sequence list` | read |
+| `sequence_run` | `gitpoulpi sequence run` | destructive, network |
+| `sequence_show` | `gitpoulpi sequence show` | read |
+| `sequence_validate` | `gitpoulpi sequence validate` | read |
 | `session_delete` | `gitpoulpi session delete` | destructive |
 | `session_list` | `gitpoulpi session list` | read |
 | `session_new` | `gitpoulpi session new` | write |
@@ -482,8 +487,12 @@ onaylayacağınız bir iletişim kutusu açar.
 | `tag_delete` | `gitpoulpi tag delete` | destructive, network |
 | `tag_delete_remote` | `gitpoulpi tag delete-remote` | destructive, network |
 | `tag_fetch` | `gitpoulpi tag fetch` | write, network |
+| `tag_force_push` | `gitpoulpi tag force-push` | destructive, network |
 | `tag_list` | `gitpoulpi tag list` | read |
+| `tag_merge_branch` | `gitpoulpi tag merge-branch` | write |
+| `tag_move` | `gitpoulpi tag move` | write |
 | `tag_push` | `gitpoulpi tag push` | write, network |
+| `tag_take_remote` | `gitpoulpi tag take-remote` | write |
 | `theme_export` | `gitpoulpi theme export` | read |
 | `theme_list` | `gitpoulpi theme list` | read |
 | `treat` | `gitpoulpi treat` | write |
@@ -497,6 +506,7 @@ onaylayacağınız bir iletişim kutusu açar.
 | `ui_propose_rewrite` | `gitpoulpi ui propose rewrite` | propose |
 | `ui_propose_split` | `gitpoulpi ui propose split` | propose |
 | `ui_propose_tag` | `gitpoulpi ui propose tag` | propose |
+| `ui_sequence_run` | `gitpoulpi ui sequence run` | propose |
 | `ui_show_commit` | `gitpoulpi ui show commit` | view |
 | `ui_show_conflict` | `gitpoulpi ui show conflict` | view |
 | `ui_show_diff` | `gitpoulpi ui show diff` | view |
@@ -563,6 +573,10 @@ Not exposed as tools:
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
 | `gitpoulpi repo-auth set` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
 | `gitpoulpi repo-auth clear` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
+| `gitpoulpi sequence add` | a sequence is a list of commands that run later (and can be bound to a key): an agent must not write its own macros, or edit the config that gates it |
+| `gitpoulpi sequence remove` | removes a sequence from the user's config; the user's macros are theirs to manage |
+| `gitpoulpi sequence trust` | trusting the sequences a repository commits (they run commands on the user's machine) is a person's decision; an agent can only run sequences a person trusted |
+| `gitpoulpi sequence untrust` | withdrawing the trust of a repository's sequences is a person's decision, like granting it |
 | `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
@@ -651,6 +665,7 @@ iptal edebilirsiniz.
 | `ui_propose_split` (rev, plan file) | commit'in üzerinde, plandan doldurulmuş bölme düzenleyicisi | *Böl* (`Ctrl+S`); `Esc` reddeder |
 | `ui_propose_rewrite` (kural seti dosyası) | kural setinin kurallarının içinde olduğu geçmişi yeniden yazma ekranı; hiçbir şey önizlenmez veya uygulanmaz | sizin kendi *Önizle* ve ardından *Uygula* adımlarınız (`Ctrl+Enter`); `Esc` reddeder. Betikli bir kural seti reddedilir, gizli değerler çıkarılır |
 | `ui_propose_resolution` (path, pick or content file) | çakışmalı bir dosyada, seçimler (veya tüm metin) Çıktı'da hazır olarak merge düzenleyicisi | *Kaydet ve Çözüldü İşaretle* (`Ctrl+S`); kapatmak reddeder |
+| `ui_sequence_run` (id) | "✦ <ajan> önerdi: <ad> dizisini çalıştır" bannerı, *Çalıştır* ve *Yok say* düğmeleriyle; henüz hiçbir şey çalışmaz | *Çalıştır* (tık veya `Ctrl+N` sonra `Enter`); *Yok say* veya `Esc` reddeder. Çalıştırma sonra dizinin dediği yerde duraklar. Dizi yoksa, geçersizse veya güvenmediğiniz bir depo dizisiyse reddedilir |
 
 Aynı anda tek öneri; bir commit mesajı önerisi, composer'da kendi taslağınız
 varken, bir çözüm önerisi ise merge düzenleyicisi sizin kaydedilmemiş işinizi

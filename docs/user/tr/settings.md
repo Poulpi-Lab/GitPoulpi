@@ -438,7 +438,7 @@ görünür; bkz. [MCP ve ajanlar](mcp-and-agents.md).
 | **Girdi rengi**, **Özel girdi rengi** | Metin alanlarının arka planı: **Temayı izle** (varsayılan), sabit bir koyu renk ya da kendi `#rrggbb` değeriniz. |
 | **Metin imleci** | `ui.text_cursor`: **terminal** (varsayılan) terminalin kendi imlecini odaktaki metin alanının düzenleme noktasına çubuk olarak koyar (terminalinizin imleç ayarları geçerli olur ve bir giriş yönteminin aday penceresi o noktada açılır); **drawn** GitPoulpi'nin kendi imlecini çizer ve terminal imlecini gizli tutar. Hemen uygulanır. Palet: `Ayarlar: Metin imleci...`. |
 | **Renk derinliği** | **auto** (varsayılan), **truecolor**, **256** ya da **16**. Bkz. [Temalar](themes.md). |
-| **Grafik renk teması** | **Temayı izle** (varsayılan: temanın kendi şerit renkleri) ya da herhangi bir şerit paleti. Her palet renklerinden birkaçını gösterir. Ayarlar kapandığında uygulanır. **Uygulama: Grafik Renk Temasını Değiştir...** palet komutu (`Ctrl+N Shift+T`) her paleti canlı önizler. |
+| **Grafik renk teması** | **Temayı izle** (varsayılan: temanın kendi şerit renkleri) ya da herhangi bir şerit paleti, kendi tema dosyalarınız da dahil (hazır ayarlardan sonra). Her palet renklerinden birkaçını gösterir; yapılandırılmış ama artık var olmayan bir ad *bulunamadı* olarak işaretlenir ve grafik temanın şeritlerini kullanır. Ayarlar kapandığında uygulanır. **Uygulama: Grafik Renk Temasını Değiştir...** palet komutu (`Ctrl+N Shift+T`) her paleti canlı önizler. |
 | **Grafik şerit arka planı** | **Kapalı** (saydam) ya da **Satır tonu**: grafik sütununun arkasında şerit renginin soluk bir bandı ve kenarında ince bir çubuk. |
 | **Satır tonu gücü** | Satır tonu bandının ne kadar soluk olduğu: **Güçlü**, **Orta** (varsayılan) ya da **Hafif**. Kenardaki çubuk tam rengini korur. |
 | **Araç çubuğu konumu** | `ui.toolbar_position`: Araç çubuğunun yeri: Üst, Alt (varsayılan), Sol veya Sağ. Sol ve Sağ onu bölmelerin yanında bir sütun yapar; 80 sütundan dar bir pencerede altta çizilir. Hemen uygulanır. |
@@ -451,6 +451,8 @@ görünür; bkz. [MCP ve ajanlar](mcp-and-agents.md).
 | **Tarih Biçimi**, **Tarih/Saat Biçimi**, **Ayrıntılı Tarih Biçimi** | Dosya Geçmişi ile Blame tarih sütununun, Log'un Tarih sütununun ve commit ayrıntılarının tarih kalıpları. Her biri canlı bir önizleme gösterir. Kalıpta kullanılabilen parçalar için bkz. [Yapılandırma başvurusu](config-reference.md#ui). |
 
 ![Grafik renk teması açılır listesi: Temayı izle, ardından her şerit paleti ve renklerinden birkaçı](../images/settings-log-graph-lanes.png)
+
+Tema ve grafik renkleri (Tema, grafik renk teması, şerit renklendirmesi ve arka planı, satır tonu gücü) her kuruluma aittir: tek bir `config.toml` dosyasını paylaşan birkaç kurulumda birinde değiştirmek diğerlerini asla değiştirmez. Yalnızca birincil kurulum ayrıca paylaşılan `ui.*` anahtarlarını yazar.
 
 ### Klavye ve fare
 
@@ -483,6 +485,19 @@ Aynı ayarlar `config.toml` dosyasının `[keybindings]` tablosunda bulunur; bkz
 | **Kitty klavye protokolü** | **auto**, terminalden kitty klavye protokolünü ister, böylece `Ctrl+,`, `Ctrl+Enter` ve `Ctrl+Shift+N` ulaşır. **off** hiç istemez; bir terminal sorun çıkarırsa kullanın. Yeniden başlatma gerekir. |
 | **Fare açık** | Kapalıyken fare ve metin seçimi terminalinize kalır. Yeniden başlatma gerekir. |
 | **Fare tekerleği satırları** | Tekerleğin bir adımının Log'da kaç satır kaydırdığı. Yeniden başlatma gerekir. |
+
+### Diziler
+
+**Ayarlar > Diziler**, adlandırılmış [dizilerinizi](sequences.md) düzenler: birbiri ardına
+çalışan palet komutlarının listeleri, her biri bir palet satırı ve bir tuşa atanabilir. Tek
+yüzlü bir [liste sayfasıdır](#listeler): **+ Ekle** boş bir dizi ve hazır şablonlar sunar
+(**Yedekleme**, **Oluştur ve Push et**, **Worktree ve ajan**), satırlar **Ad**, **Kimlik**, bir
+**Açıklama**, **Kapsam** (bu kurulum, bu bilgisayardaki tüm kurulumlar ya da yalnızca bu depo),
+**Klavye ve fare** sayfasının yakalama açılır penceresini açan bir **Kısayol** düğmesi,
+**Adımları düzenle** ve **Şimdi çalıştır**dır. **Adımları düzenle** listeyi dizinin adımlarına
+çevirir, her biri bir **Duraklat** (**Varsayılan**, **Her zaman**, **Asla**) ve seçenekleriyle; oradaki
+**+ Ekle**, bir adımın olabileceği komutların süzülebilir bir listesini açar. Her değişiklik
+hemen uygulanır. Bkz. [Diziler](sequences.md).
 
 ### Log ve grafik
 
@@ -522,6 +537,7 @@ Commit grafiğinin nasıl çizildiği ve Log'un kaç commit yüklediği. Grafik 
 | **Satır numaraları** | Düzenleyicinin ve diff'in satır numarası sütunu. |
 | **Düzenleyicide seçimi izle** | Düzenleyici açıkken sağ panelde başka bir dosya seçmek onu düzenleyicide de açar; önce kaydedilmemiş değişiklikler için kaydetmeyi sorar. Düzenlenemeyen bir dosya olağan görünümünde açılır. Yalnızca çalışma değişiklikleri için: bir commit'ten seçilen dosya düzenleyiciden çıkıp o commit'in diff'ini gösterir. Varsayılan olarak açıktır (`editor.follow_selection`). |
 | **Sözcük kaydırma** | Uzun diff satırlarını kaydırır. |
+| **Değişen sözcükleri vurgula** | Değişen bir satırda, eşlendiği silinen veya eklenen satırdan farklı olan sözcükleri Diff görünümünde (Satır İçi ve Bölünmüş), incelemenin diff'inde ve commit'in dosyalarında daha güçlü bir arka planla boyar. Varsayılan olarak açıktır (`ui.diff_intraline`); ayrıca paletteki **Fark: Değişen Sözcük Vurgusunu Aç/Kapat**. Bkz. [Değişen sözcükler](interface-tour.md#bir-difftte-değişen-sözcükler). |
 | **Varsayılan yerleşim**, **Yalnızca hunk'lar**, **Yalnızca boşluk değişikliklerini göster**, **Minimap** | Diff görünümünün ilk durumu. Diff görünüm çubuğu bunları değiştirir ve kaydeder. |
 | **Blame açıklamaları**, **Blame açıklama genişliği** | Blame görünümünde açıklama sütununun (avatar, yazar, yaş, özet) hangi yanda olduğu: **sağ** (varsayılan) ya da **sol**; ve hücre cinsinden genişliği (24 ile 90 arası). Blame görünümünde sütunun kenarını sürüklemek veya `>` / `<` tuşları genişliği buraya kaydeder (`ui.blame_side`, `ui.blame_width`). Bkz. [Blame](log-and-history.md#blame). |
 | **Merge düzenleyici: yan yana (sütun)** | Bu genişlikten itibaren merge düzenleyici A ve B'yi yan yana gösterir. Varsayılan 100, en az 40, `0` her zaman demektir. Altında A ve B sekmeler hâlindedir. Bkz. [Merge çakışmalarını çözmek](merge-conflicts.md). |

@@ -325,7 +325,7 @@ fn a_palette_row_resolves_to_the_command_the_scrolled_window_shows() {
         list: Rect::new(10, 7, 40, 10),
         window_start: 12,
         count: 30,
-        segments: [Rect::ZERO; 4],
+        segments: [Rect::ZERO; 5],
     };
 
     assert_eq!(palette_row_at(&popup, 20, 7), Some(12), "the top row");

@@ -191,7 +191,7 @@ pub(crate) fn render_command_palette(
         list: list_area,
         window_start,
         count: matches.len(),
-        segments: [Rect::ZERO; 4],
+        segments: [Rect::ZERO; 5],
     });
     if let Some(popup) = palette_popup.as_ref() {
         crate::chrome::paint_popup_row_hover(frame.buffer_mut(), popup, selected);

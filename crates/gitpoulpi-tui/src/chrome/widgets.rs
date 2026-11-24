@@ -38,7 +38,7 @@ pub(crate) struct PalettePopup {
     pub(crate) count: usize,
     /// The segmented prefilter's cells (the theme picker's All / Dark /
     /// Light / Colored), `Rect::ZERO` where there is none.
-    pub(crate) segments: [Rect; 4],
+    pub(crate) segments: [Rect; 5],
 }
 
 thread_local! {

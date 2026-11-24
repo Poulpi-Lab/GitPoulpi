@@ -546,7 +546,7 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
             list: list_area,
             window_start,
             count: indices.len(),
-            segments: [Rect::ZERO; 4],
+            segments: [Rect::ZERO; 5],
         });
         if let Some(popup) = tab_picker_popup.as_ref() {
             crate::chrome::paint_popup_row_hover(frame.buffer_mut(), popup, *selected);

@@ -879,6 +879,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 탭: 파일 관리자에서 열기 |  |
 | 탭: 터미널에서 열기 |  |
 | 탭: 열기 위치... | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | 탭: 기본 위치에서 열기 | `Ctrl+Alt+O` |
 | 저장소: 프로필 변경... |  |
 | 도움말: GitPoulpi 정보 | `Ctrl+N a` |

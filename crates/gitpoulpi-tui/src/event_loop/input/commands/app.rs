@@ -89,9 +89,24 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             *cx.last_message = run_tab_menu_command(action, &mut tab_ctx!(cx));
             *cx.should_quit |= cx.switch_to.is_some() || *cx.close_window;
         }
-        PaletteCommand::TabDir(crate::tab_dir::TabDirButton::Terminal) => {
+        PaletteCommand::TabOpenIn => {
             // `Tab: Open in...`: the tab bar's popup, focused.
             crate::open_in_bar::open();
+        }
+        PaletteCommand::TabOpenAgentHere => {
+            let active = cx.repo_tabs.get(*cx.active_tab).map(|t| t.path.clone());
+            match active {
+                None => *cx.last_message = Some(gitpoulpi_i18n::msg::tab_dir::NO_TAB.get().into()),
+                Some(path) => match crate::agent_launch::palette_step(&path) {
+                    crate::agent_launch::PaletteStep::Done(done) => {
+                        *cx.last_message = Some(done.unwrap_or_else(|e| e));
+                    }
+                    // Several agents: the same popup as "Open in", one row each.
+                    crate::agent_launch::PaletteStep::Choose(agents) => {
+                        crate::open_in_bar::open_agents(&agents);
+                    }
+                },
+            }
         }
         PaletteCommand::AboutGitPoulpi => crate::about::open(),
         PaletteCommand::AboutLicenses => crate::about::open_licenses(),

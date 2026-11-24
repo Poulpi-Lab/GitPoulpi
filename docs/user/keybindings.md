@@ -886,6 +886,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Tab: Open in File Manager |  |
 | Tab: Open in Terminal |  |
 | Tab: Open In... | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | Tab: Open in Default | `Ctrl+Alt+O` |
 | Repository: Change Profile... |  |
 | Help: About GitPoulpi | `Ctrl+N a` |

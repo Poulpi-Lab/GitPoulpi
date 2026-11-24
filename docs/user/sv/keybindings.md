@@ -888,6 +888,8 @@ Tangenterna är standardvärdena.
 | Flik: Öppna i filhanteraren |  |
 | Flik: Öppna i terminal |  |
 | Flik: Öppna i... | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | Flik: Öppna i standard | `Ctrl+Alt+O` |
 | Repository: Byt profil... |  |
 | Hjälp: Om GitPoulpi | `Ctrl+N a` |

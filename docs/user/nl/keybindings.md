@@ -890,6 +890,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Tabblad: Openen in bestandsbeheer |  |
 | Tabblad: Openen in terminal |  |
 | Tabblad: Openen in... | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | Tabblad: Openen in standaard | `Ctrl+Alt+O` |
 | Repository: Profiel wijzigen... |  |
 | Help: Over GitPoulpi | `Ctrl+N a` |

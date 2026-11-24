@@ -326,6 +326,12 @@ impl AiUi {
         crate::build_features::AI && self.config.enabled
     }
 
+    /// A profile of kind local agent that can be opened exists ("Tab: Open
+    /// AI Agent Here").
+    pub(crate) fn has_local_agent(&self) -> bool {
+        !crate::agent_launch::local_agents(&self.config).is_empty()
+    }
+
     pub(crate) fn running(&self) -> bool {
         self.run.is_some()
     }

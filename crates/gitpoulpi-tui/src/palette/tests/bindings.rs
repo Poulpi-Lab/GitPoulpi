@@ -65,6 +65,43 @@ fn command_ids_are_pinned() {
         command_id(&PaletteCommand::StashPop(StashTarget::Latest)),
         "stash_pop_latest"
     );
+    // The sequence vocabulary names these steps by these ids.
+    assert_eq!(command_id(&PaletteCommand::TabOpenIn), "tab_open_in");
+    assert_eq!(
+        command_id(&PaletteCommand::TabOpenAgentHere),
+        "tab_open_agent_here"
+    );
+    assert_eq!(
+        command_id(&PaletteCommand::TabOpenInDefault),
+        "tab_open_in_default"
+    );
+    assert_eq!(
+        command_id(&PaletteCommand::TabDir(
+            crate::tab_dir::TabDirButton::Terminal
+        )),
+        "tab_dir_terminal"
+    );
+}
+
+/// Every step of the sequence vocabulary that is a palette command resolves
+/// to a catalogue entry, so a runner can always find what it must run.
+#[test]
+fn every_vocabulary_command_step_resolves_to_a_palette_entry() {
+    let ids: Vec<String> = PALETTE_COMMANDS
+        .iter()
+        .map(|e| command_id(&e.command))
+        .collect();
+    for id in [
+        "tab_dir_terminal",
+        "tab_open_in",
+        "tab_open_in_default",
+        "tab_open_agent_here",
+    ] {
+        assert!(ids.iter().any(|i| i == id), "{id} has no palette entry");
+        let kind = gitpoulpi_config::sequences::step_kind(id)
+            .unwrap_or_else(|| panic!("{id} is not in the vocabulary"));
+        assert!(!kind.pending, "{id} is still pending");
+    }
 }
 
 #[test]

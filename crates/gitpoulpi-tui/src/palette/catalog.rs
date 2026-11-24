@@ -2099,10 +2099,17 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "",
         PaletteCommand::TabMenu(RepoMenuAction::OpenInTerminal),
     ),
+    entry(msg::palette::TAB_OPEN_IN, "", PaletteCommand::TabOpenIn),
+    // Added by the sequence steps slice (S3): keep these rows together.
     entry(
-        msg::palette::TAB_OPEN_IN,
+        msg::palette::TAB_TERMINAL_HERE,
         "",
         PaletteCommand::TabDir(crate::tab_dir::TabDirButton::Terminal),
+    ),
+    entry(
+        msg::palette::TAB_OPEN_AI_AGENT_HERE,
+        "",
+        PaletteCommand::TabOpenAgentHere,
     ),
     entry(
         msg::palette::TAB_OPEN_IN_DEFAULT,

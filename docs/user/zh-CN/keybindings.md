@@ -852,6 +852,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 标签页：在文件管理器中打开 |  |
 | 标签页：在终端中打开 |  |
 | 标签页：打开方式… | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | 标签页：用默认方式打开 | `Ctrl+Alt+O` |
 | 仓库：更改配置文件… |  |
 | 帮助：关于 GitPoulpi | `Ctrl+N a` |

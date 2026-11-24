@@ -890,6 +890,8 @@ applicano. I tasti sono quelli predefiniti.
 | Scheda: Apri nel gestore file |  |
 | Scheda: Apri nel terminale |  |
 | Scheda: Apri in... | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | Scheda: Apri nella voce predefinita | `Ctrl+Alt+O` |
 | Repository: Cambia profilo... |  |
 | Aiuto: Informazioni su GitPoulpi | `Ctrl+N a` |

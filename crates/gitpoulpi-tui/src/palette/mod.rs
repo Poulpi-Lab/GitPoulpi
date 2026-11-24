@@ -510,6 +510,14 @@ pub(crate) enum PaletteCommand {
     /// active tab - also when the bar hides them (auto mode, the launch
     /// folder, a narrow window).
     TabDir(crate::tab_dir::TabDirButton),
+    /// "Tab: Open In...": the tab bar's Open in list, focused (a pick runs
+    /// that entry on the active tab). As a sequence step it runs the entry
+    /// with the step's `label` ([`crate::tab_dir::open_in_by_label`]).
+    TabOpenIn,
+    /// "Tab: Open AI Agent Here": the default (or chosen) local AI agent in a
+    /// terminal in the active tab's folder. It sends no prompt; as a
+    /// sequence step the `profile` option names the AI profile.
+    TabOpenAgentHere,
     /// "Tab: Open in default": runs the default "Open in" entry on the active
     /// tab, no popup.
     TabOpenInDefault,
@@ -972,7 +980,9 @@ pub(crate) const fn command_requires(
         | PaletteCommand::Hosting(HostingCommand::OpenIssueConversation) => {
             Some(crate::build_features::Feature::Conversation)
         }
-        PaletteCommand::Composer(_) => Some(crate::build_features::Feature::Ai),
+        PaletteCommand::Composer(_) | PaletteCommand::TabOpenAgentHere => {
+            Some(crate::build_features::Feature::Ai)
+        }
         PaletteCommand::CopySelectedAsMermaid => Some(crate::build_features::Feature::Mermaid),
         PaletteCommand::WorkspaceSearch => Some(crate::build_features::Feature::GlobalSearch),
         PaletteCommand::Workspace(_) => Some(crate::build_features::Feature::Workspaces),
@@ -1219,7 +1229,7 @@ pub(crate) fn command_action(entry: &PaletteEntry) -> Option<crate::keymap::Acti
         },
         PaletteCommand::Radar(crate::radar::RadarCommand::Open) => Some(A::GlobalRadar),
         PaletteCommand::Radar(crate::radar::RadarCommand::Refresh) => Some(A::GlobalRefreshAll),
-        PaletteCommand::TabDir(crate::tab_dir::TabDirButton::Terminal) => Some(A::TabOpenInPopup),
+        PaletteCommand::TabOpenIn => Some(A::TabOpenInPopup),
         PaletteCommand::TabOpenInDefault => Some(A::TabOpenInDefault),
         PaletteCommand::AgentBack => Some(A::NavAgentBack),
         PaletteCommand::LfsMenu => Some(A::GitLfsMenu),
@@ -1397,6 +1407,7 @@ impl PaletteCommand {
                 | PaletteCommand::AiInsertPromptVariable
                 | PaletteCommand::AiEditProfile
                 | PaletteCommand::AiOpenAgent
+                | PaletteCommand::TabOpenAgentHere
                 | PaletteCommand::AiExplainSelectedCommit
                 | PaletteCommand::AiSplitSelectedCommit
                 | PaletteCommand::AiExplainWip

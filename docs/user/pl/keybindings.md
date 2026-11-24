@@ -885,6 +885,8 @@ zastosowania. Klawisze są domyślne.
 | Karta: Otwórz w menedżerze plików |  |
 | Karta: Otwórz w terminalu |  |
 | Karta: Otwórz w... | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | Karta: Otwórz w domyślnym | `Ctrl+Alt+O` |
 | Repozytorium: Zmień profil... |  |
 | Pomoc: O programie GitPoulpi | `Ctrl+N a` |

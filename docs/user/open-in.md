@@ -20,6 +20,13 @@ entry is a label and a command.
   at once. Palette (`Ctrl+P`): `Tab: Open in...` and `Tab: Open in default`.
   The palette commands work even when the title bar has no room for the button.
   Both keys are rebindable; see [Keybindings](keybindings.md).
+- **By label**: a [sequence](config-reference.md#sequences) step `tab_open_in` runs the entry whose
+  **label** you name (`label = "VS Code"`), so reordering the list never changes what it
+  runs. An unknown label stops the step with "no Open in entry is labelled ...".
+  `Tab: Terminal Here` (palette) opens your terminal in the folder, the tab bar's old
+  "Terminal here" button.
+- **An AI agent in the folder**: `Tab: Open AI Agent Here` opens your terminal in the
+  tab's folder running a local AI agent; see [AI](ai.md#open-the-agent-in-a-tabs-folder).
 - **Right-click a repository tab**: the tab menu has an **Open in** submenu with
   the same entries.
 - The list starts on the entry you used last in this session.

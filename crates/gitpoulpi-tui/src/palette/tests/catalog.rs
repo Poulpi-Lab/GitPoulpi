@@ -621,14 +621,16 @@ fn every_ai_palette_command_carries_the_sparkle() {
         if e.command.is_ai() {
             // "AI: ..." rows, and the Rewrite row that names its action.
             assert!(
-                e.label.get().contains("AI: ") || e.label.get().ends_with("with AI..."),
+                e.label.get().contains("AI: ")
+                    || e.label.get().ends_with("with AI...")
+                    || e.command == PaletteCommand::TabOpenAgentHere,
                 "{}",
                 e.label.get()
             );
             ai += 1;
         }
     }
-    assert_eq!(ai, 12);
+    assert_eq!(ai, 13);
 }
 
 /// Every row action of the Undo history / Reflog / Lost work panel has a

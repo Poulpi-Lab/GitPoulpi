@@ -118,6 +118,9 @@ pub(crate) struct PaletteContext {
     /// `ai.enabled`: every AI command is hidden from the palette while
     /// this is false.
     pub(crate) ai_enabled: bool,
+    /// An AI profile of kind local agent exists ("Tab: Open AI Agent Here"
+    /// needs one).
+    pub(crate) local_agent: bool,
     /// An AI request is already running.
     pub(crate) ai_running: bool,
     /// The repository is mid-merge/rebase/cherry-pick with unresolved
@@ -984,7 +987,18 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
                     .then_some(msg::palette::WHY_NO_REPOSITORY_TAB_IS_OPEN.get())
             }
         }
-        C::TabDir(_) | C::TabOpenInDefault => {
+        C::TabOpenAgentHere => {
+            if !ctx.ai_enabled {
+                Some(msg::palette::WHY_AI_IS_TURNED_OFF_SETTINGS_AI.get())
+            } else if ctx.in_repository_management {
+                Some(msg::palette::WHY_THE_REPOSITORY_MANAGEMENT_TAB_HAS_NO_FOLDER.get())
+            } else if ctx.open_repository_tabs == 0 {
+                Some(msg::palette::WHY_NO_REPOSITORY_TAB_IS_OPEN.get())
+            } else {
+                (!ctx.local_agent).then_some(msg::palette::WHY_NO_LOCAL_AI_AGENT.get())
+            }
+        }
+        C::TabDir(_) | C::TabOpenIn | C::TabOpenInDefault => {
             if ctx.in_repository_management {
                 Some(msg::palette::WHY_THE_REPOSITORY_MANAGEMENT_TAB_HAS_NO_FOLDER.get())
             } else {

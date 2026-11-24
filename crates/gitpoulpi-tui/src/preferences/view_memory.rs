@@ -85,6 +85,7 @@ impl PreferencesState {
             return;
         }
         self.save_view();
+        self.seq.in_steps = false;
         self.section = index;
         self.strip = false;
         self.restore_view();

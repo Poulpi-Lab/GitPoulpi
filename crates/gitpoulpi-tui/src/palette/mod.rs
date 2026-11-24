@@ -1435,7 +1435,6 @@ mod sequences;
 mod settings;
 
 pub(crate) use availability::{unavailable_reason, PaletteContext};
-#[cfg(test)]
 pub(crate) use bindings::command_id;
 pub(crate) use bindings::{palette_action_defs, palette_entry};
 pub(crate) use catalog::PALETTE_COMMANDS;

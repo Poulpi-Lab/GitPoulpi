@@ -163,6 +163,8 @@ pub enum SettingsPage {
     OpenIn,
     Images,
     KeyboardMouse,
+    /// The user's named action sequences.
+    Sequences,
     GitEncoding,
     RepoAi,
     /// The repository's branching workflow (`.gitpoulpi/workflow.toml`).
@@ -192,7 +194,7 @@ pub enum SettingsPage {
 
 impl SettingsPage {
     /// The page ids: the sidebar's order, then the legacy aliases.
-    pub const IDS: [&'static str; 28] = [
+    pub const IDS: [&'static str; 29] = [
         "general",
         "launcher",
         "sync",
@@ -203,6 +205,7 @@ impl SettingsPage {
         "agents-mcp",
         "appearance",
         "keyboard-mouse",
+        "sequences",
         "log-graph",
         "diff-editor",
         "open-in",

@@ -35,6 +35,7 @@ pub(crate) mod render;
 mod repo_pages;
 mod schema_walk;
 mod search;
+mod sequences;
 mod sub_tabs;
 mod theme;
 mod tokens;

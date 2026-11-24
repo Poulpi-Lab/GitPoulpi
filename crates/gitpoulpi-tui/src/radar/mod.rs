@@ -29,6 +29,7 @@ mod item_host;
 mod labels;
 mod model;
 pub(crate) mod pending;
+mod profile;
 mod render;
 mod review_choice;
 mod review_flow;
@@ -59,6 +60,7 @@ use labels::{
 };
 use model::{Board, BoardInput, Group, Heading, Item, ItemKind, Row, View, Who, WipFacts};
 use pending::Pending;
+use profile::ProfileChoice;
 use scope::{ScopeChoice, ScopeRepo, BROWSE_FOLDER, CLONE_FOLDER, OPEN_TABS};
 pub(crate) use vocab::{
     Act, CloneRequest, ColumnCmd, ConversationRequest, Outcome, RadarCommand, ReviewRequest,
@@ -74,6 +76,7 @@ pub(crate) enum Hit {
     Scope,
     View,
     Who,
+    Profile,
     /// The `Not cloned` checkbox.
     NotCloned,
     /// The `Drafts` checkbox.
@@ -422,6 +425,9 @@ pub(crate) struct RadarUi {
 
     view: View,
     who: Who,
+    /// The integration profile the rows are narrowed to (`profile::ALL` = all).
+    profile: String,
+    profiles: Vec<ProfileChoice>,
     query: String,
     filter_focused: bool,
     edit: crate::text_edit::FieldEditor<()>,
@@ -438,6 +444,7 @@ pub(crate) struct RadarUi {
     scope_combo: Combo,
     view_combo: Combo,
     who_combo: Combo,
+    profile_combo: Combo,
     snooze_combo: Combo,
     /// The item (index into `board.items`) the open snooze combo is for.
     snooze_for: Option<usize>,
@@ -519,6 +526,11 @@ impl RadarUi {
             .as_deref()
             .map(|d| scope::radar_scope_saved(d, session, state.scope.as_deref()))
             .unwrap_or_else(|| (OPEN_TABS.to_string(), Vec::new()));
+        let profiles = config_dir
+            .as_deref()
+            .map(profile::choices_in)
+            .unwrap_or_default();
+        let profile = profile::valid_or_all(&profiles, state.profile.as_deref());
         let mut ui = Self {
             session: session.to_string(),
             config_dir,
@@ -547,6 +559,8 @@ impl RadarUi {
             now,
             view: View::All,
             who: Who::Everyone,
+            profile,
+            profiles,
             query: String::new(),
             filter_focused: false,
             edit: Default::default(),
@@ -560,6 +574,7 @@ impl RadarUi {
             scope_combo: Combo::new(""),
             view_combo: Combo::new(""),
             who_combo: Combo::new(""),
+            profile_combo: Combo::new(""),
             snooze_combo: Combo::new(msg::radar::SNOOZE_PLACEHOLDER.get()).with_click_picks(),
             snooze_for: None,
             menu: None,
@@ -807,7 +822,10 @@ impl RadarUi {
         self.rows = model::rows(
             &self.board,
             self.view,
-            self.who,
+            model::Narrow {
+                who: self.who,
+                profile: &self.profile,
+            },
             &self.query,
             &self.folded,
             self.notes.len(),
@@ -890,6 +908,26 @@ impl RadarUi {
                 .collect(),
         );
         self.who_combo.select(Some(self.who.key().to_string()));
+        // The profiles may have changed in Settings since the Radar opened: a
+        // chosen one that is gone falls back to all of them.
+        if let Some(dir) = self.config_dir.as_deref() {
+            self.profiles = profile::choices_in(dir);
+        }
+        if profile::valid_or_all(&self.profiles, Some(&self.profile)) != self.profile {
+            self.profile = profile::ALL.to_string();
+            self.relayout();
+        }
+        let mut profile_options = vec![ComboOption::new(
+            msg::radar::PROFILE_ALL.get(),
+            profile::ALL,
+        )];
+        profile_options.extend(
+            self.profiles
+                .iter()
+                .map(|p| ComboOption::new(p.label.clone(), p.id.clone())),
+        );
+        self.profile_combo.set_options(profile_options);
+        self.profile_combo.select(Some(self.profile.clone()));
         self.snooze_combo.set_options(
             SnoozeFor::ALL
                 .iter()
@@ -907,10 +945,19 @@ impl RadarUi {
             .count() as u64
     }
 
+    /// The Profile combobox's labels, as its popup lists them (tests).
+    #[cfg(test)]
+    fn profile_combo_labels(&self) -> Vec<String> {
+        std::iter::once(msg::radar::PROFILE_ALL.get().to_string())
+            .chain(self.profiles.iter().map(|p| p.label.clone()))
+            .collect()
+    }
+
     fn any_combo_open(&self) -> bool {
         self.scope_combo.is_open()
             || self.view_combo.is_open()
             || self.who_combo.is_open()
+            || self.profile_combo.is_open()
             || self.snooze_combo.is_open()
     }
 
@@ -918,6 +965,7 @@ impl RadarUi {
         self.scope_combo.close();
         self.view_combo.close();
         self.who_combo.close();
+        self.profile_combo.close();
         self.snooze_combo.close();
         self.menu = None;
         self.menu_hover = None;
@@ -970,6 +1018,16 @@ impl RadarUi {
                     self.relayout();
                 }
             }
+            Hit::Profile => {
+                if self.profile != value {
+                    self.profile = value.to_string();
+                    self.state.profile = (!value.is_empty()).then(|| value.to_string());
+                    self.save_state();
+                    self.selected = 0;
+                    self.relayout();
+                }
+                self.profile_combo.select(Some(value.to_string()));
+            }
             _ => {
                 if let (Some(i), Some(how)) = (self.snooze_for.take(), snooze_from_key(value)) {
                     return self.snooze(i, how);
@@ -984,6 +1042,7 @@ impl RadarUi {
             Hit::Scope => &mut self.scope_combo,
             Hit::View => &mut self.view_combo,
             Hit::Who => &mut self.who_combo,
+            Hit::Profile => &mut self.profile_combo,
             _ => &mut self.snooze_combo,
         }
     }

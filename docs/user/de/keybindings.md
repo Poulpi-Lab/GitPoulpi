@@ -870,6 +870,7 @@ die Standardtasten.
 | Radar: Umfang wählen | `w` |
 | Radar: Ansicht wählen | `v` |
 | Radar: Filter wählen | `f` |
+| Radar: Filter by Profile... | `P` |
 | Radar: Nicht geklonte Anfragen zeigen | `a` |
 | Radar: Entwürfe zeigen | `d` |
 | Radar: Kontoweite Prüfanfragen aktivieren... | `T` |

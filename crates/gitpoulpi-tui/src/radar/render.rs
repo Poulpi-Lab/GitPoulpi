@@ -319,7 +319,7 @@ impl RadarUi {
             self.paint_list(buf, body, hover);
             self.paint_footer(buf, body);
             // Popups last: they cover whatever is under them.
-            for which in [Hit::Scope, Hit::View, Hit::Who, Hit::Snooze] {
+            for which in [Hit::Scope, Hit::View, Hit::Who, Hit::Profile, Hit::Snooze] {
                 self.combo_of(which).render_popup(buf, body);
             }
         }
@@ -421,33 +421,44 @@ impl RadarUi {
             self.hits.push((r, Hit::Refresh));
         }
 
-        // The three comboboxes.
+        // The four comboboxes. A narrow window shrinks them (and, below a
+        // readable width, their labels); none ever vanishes.
         let y = body.y + 2;
         let mut x = body.x + 1;
-        let widths = {
-            let free = body.width.saturating_sub(2 + 3 * 7) as usize;
-            [free * 38 / 100, free * 26 / 100, free * 30 / 100].map(|w| w.clamp(10, 30) as u16)
-        };
+        let which_all = [Hit::Scope, Hit::View, Hit::Who, Hit::Profile];
         let labels = [
             msg::radar::LABEL_SCOPE.get(),
             msg::radar::LABEL_VIEW.get(),
             msg::radar::LABEL_SHOW.get(),
-        ];
-        for (i, which) in [Hit::Scope, Hit::View, Hit::Who].into_iter().enumerate() {
-            let label = format!("{} ", labels[i]);
-            let lw = display_width(&label) as u16;
-            if x + lw + widths[i] > right {
+            msg::radar::LABEL_PROFILE.get(),
+        ]
+        .map(|l| format!("{l} "));
+        let label_w = labels.clone().map(|l| display_width(&l) as u16);
+        let room = right.saturating_sub(x + 1) as usize;
+        let gaps = 2 * (which_all.len() - 1);
+        let with_labels =
+            room.saturating_sub(gaps + label_w.iter().map(|w| *w as usize).sum::<usize>());
+        let (shown, total) = if with_labels >= which_all.len() * 9 {
+            (true, with_labels)
+        } else {
+            (false, room.saturating_sub(gaps))
+        };
+        let widths = [32usize, 22, 22, 24].map(|pct| (total * pct / 100).clamp(3, 30) as u16);
+        for (i, which) in which_all.into_iter().enumerate() {
+            if x >= right {
                 break;
             }
-            put(buf, x, y, &label, lw, muted);
-            x += lw;
-            let field = Rect::new(x, y, widths[i], 1);
+            if shown {
+                put(buf, x, y, &labels[i], label_w[i], muted);
+                x += label_w[i];
+            }
+            let field = Rect::new(x, y, widths[i].min(right - x), 1);
             let hovered = hover == Some(which);
             let combo = self.combo_of(which);
             let open = combo.is_open();
             combo.render_field(buf, field, open, hovered);
             self.hits.push((field, which));
-            x += widths[i] + 2;
+            x += field.width + 2;
         }
 
         // The text filter.
@@ -804,6 +815,8 @@ impl RadarUi {
                 Row::Empty => {
                     let text = if self.repos.is_empty() {
                         msg::radar::EMPTY_SCOPE.get()
+                    } else if !self.profile.is_empty() {
+                        msg::radar::EMPTY_PROFILE.get()
                     } else {
                         msg::radar::EMPTY.get()
                     };

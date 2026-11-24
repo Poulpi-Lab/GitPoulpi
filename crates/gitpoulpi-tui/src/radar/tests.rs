@@ -782,6 +782,7 @@ mod columns;
 #[cfg(feature = "conversation")]
 mod conversation;
 mod host_acts;
+mod profile;
 mod resize;
 #[cfg(feature = "review")]
 mod review;

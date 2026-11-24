@@ -841,6 +841,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Radar：选择范围 | `w` |
 | Radar：选择视图 | `v` |
 | Radar：选择筛选 | `f` |
+| Radar: Filter by Profile... | `P` |
 | Radar：显示未克隆的请求 | `a` |
 | Radar：显示草稿 | `d` |
 | Radar：启用账户范围的评审请求… | `T` |

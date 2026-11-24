@@ -879,6 +879,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Radar: Bereik kiezen | `w` |
 | Radar: Weergave kiezen | `v` |
 | Radar: Filter kiezen | `f` |
+| Radar: Filter by Profile... | `P` |
 | Radar: Niet-gekloonde verzoeken tonen | `a` |
 | Radar: Concepten tonen | `d` |
 | Radar: Accountbrede reviewverzoeken inschakelen... | `T` |

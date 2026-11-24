@@ -223,16 +223,24 @@ Closed and merged requests and closed issues are not listed.
 
 ## Views and filters
 
-Three comboboxes and a text field narrow the list. Every choice is a dropdown: click it, or use its key.
+Four comboboxes and a text field narrow the list. Every choice is a dropdown: click it, or use its key.
 
 - **View** (`v`): All, requests, Issues, WIP (work in progress), Snoozed.
 - **Show** (`f`): Everyone, Mine (requests you wrote, issues you created), Assigned to me,
   Review requested, Mentioning me.
 - **Scope** (`w`): see above.
+- **Profile** (`P`): All profiles, or one integration profile of Settings > Integrations (named as
+  Settings names it, with its provider added when two profiles share a name). It narrows every
+  section, the repositories' rows and the account-wide rows alike, to the rows of that profile (a
+  work-in-progress row has no profile, so a chosen profile hides it). One profile at a time. The
+  choice is remembered in `radar.toml`; a profile that no longer exists falls back to All profiles.
+  The combobox is always there, like the other three, and a narrow window shortens it (and then the
+  labels) rather than dropping it. Palette: `Radar: Filter by Profile...`. When the profile hides
+  everything, the empty list says so.
 - **Filter text** (`/` or `Ctrl+F`): fuzzy match on the repository, number, title, author, branch and
   labels. `Enter` gives the keys back to the list and keeps the text, `Esc` clears it.
 
-`Ctrl+N` shows a badge on the filter, each combobox, the Refresh and Back buttons and every
+`Ctrl+N` shows a badge on the filter, each of the four comboboxes, the Refresh and Back buttons and every
 section heading on screen. Press a badge's character: the filter gets the keyboard, a combobox
 opens, a button runs, and a heading gets the selection (`Enter` or `Space` then folds it). `Esc`
 cancels. See [Badges](keybindings.md#badges).

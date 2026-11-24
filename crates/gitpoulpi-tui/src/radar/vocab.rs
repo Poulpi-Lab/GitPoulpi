@@ -76,6 +76,8 @@ pub(crate) enum RadarCommand {
     Scope,
     View,
     Filter,
+    /// Opens the Profile combobox (`P`).
+    Profile,
     /// The `Not cloned` checkbox.
     NotCloned,
     /// The `Drafts` checkbox.
@@ -113,6 +115,7 @@ pub(crate) enum Spot {
     Scope,
     View,
     Who,
+    Profile,
     Refresh,
     Back,
     NotCloned,

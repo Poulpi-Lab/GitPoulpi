@@ -871,6 +871,7 @@ As teclas são as predefinidas.
 | Radar: escolher âmbito | `w` |
 | Radar: escolher vista | `v` |
 | Radar: escolher filtro | `f` |
+| Radar: Filter by Profile... | `P` |
 | Radar: mostrar pedidos não clonados | `a` |
 | Radar: mostrar rascunhos | `d` |
 | Radar: ativar os pedidos de revisão da conta... | `T` |

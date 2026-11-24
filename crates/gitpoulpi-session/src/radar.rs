@@ -165,6 +165,10 @@ pub struct RadarState {
     /// for the open tabs); absent = never picked, the default applies.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub scope: Option<String>,
+    /// The integration profile (its id) the user last filtered the view by;
+    /// absent = all profiles.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub profile: Option<String>,
     /// `[x] Not cloned`: account-wide rows of repositories with no known
     /// local clone are listed. On by default.
     #[serde(default = "default_true")]
@@ -186,6 +190,7 @@ impl Default for RadarState {
             pins: Vec::new(),
             snoozes: Vec::new(),
             scope: None,
+            profile: None,
             show_not_cloned: true,
             show_drafts: false,
         }

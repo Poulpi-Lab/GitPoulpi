@@ -875,6 +875,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Radar: Choose Scope | `w` |
 | Radar: Choose View | `v` |
 | Radar: Choose Filter | `f` |
+| Radar: Filter by Profile... | `P` |
 | Radar: Show Not-Cloned Requests | `a` |
 | Radar: Show Drafts | `d` |
 | Radar: Turn On Account-Wide Review Requests... | `T` |

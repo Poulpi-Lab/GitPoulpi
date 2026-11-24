@@ -877,6 +877,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Radar : Choisir le périmètre | `w` |
 | Radar : Choisir la vue | `v` |
 | Radar : Choisir le filtre | `f` |
+| Radar : Filtrer par profil... | `P` |
 | Radar : Afficher les demandes non clonées | `a` |
 | Radar : Afficher les brouillons | `d` |
 | Radar : Activer les relectures du compte... | `T` |

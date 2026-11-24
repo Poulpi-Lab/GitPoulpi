@@ -163,10 +163,30 @@ maiúsculas: **`V`** layout, **`H`** hunks ou ficheiro todo, **`S`** espaços em
 anterior, **`E`** a codificação, **`M`** o minimapa. Cada um tem uma linha na paleta (*Revisão: alternar layout inline / dividido*,
 ...).
 
+Na **Visão geral**, a conversa e o bloco de rascunho ✦ selecionam-se da mesma forma: arraste sobre o texto,
+**`Ctrl+C`** copia-o (uma ligação ou um botão que prima mantém a sua ação, e um arrasto que começa num deles não seleciona
+nada). Sem seleção, **`Ctrl+C`** (ou *Conversa: copiar o texto*) copia a entrada selecionada tal como o host a guarda. O I-beam
+aparece sobre o texto e a mão fica sobre botões e ligações. Uma seleção acompanha o que está no ecrã: deslocar move-a com o
+seu texto (continua selecionada enquanto está fora de vista), uma atualização que reescreve o texto larga-a, e um parágrafo
+quebrado copia-se como as linhas que mostra.
+
+Os comentários dentro do diff na página **Ficheiros** (uma discussão, as suas notas pendentes, as sugestões ✦) também se
+selecionam: arraste sobre as suas palavras, **`Ctrl+C`** (ou *Revisão: copiar o texto selecionado ou a linha*) copia-as, **`Esc`**
+larga a seleção. Premir um dos seus botões, ou um clique simples no cabeçalho de uma discussão (dobra-a), continua a atuar; um
+arrasto que começa no cabeçalho seleciona as suas palavras e deixa a discussão como está.
+
 ### Commits
 
 Só os commits do pedido (não o histórico por trás dele), dos mais recentes para os mais antigos, e o diff do selecionado
 (as suas alterações face ao pai), com todos os seus ficheiros uns sob os outros e as mesmas opções de apresentação.
+
+## Voltar a uma revisão
+
+Uma revisão fica aberta enquanto trabalha noutro separador. Saia do separador com a revisão aberta (clique noutro separador, `Ctrl+PageDown`, **Repositório: separador seguinte** da paleta) e, ao voltar, a revisão reabre no mesmo pedido, na mesma página (Visão geral, Ficheiros ou Commits), no mesmo ficheiro e na mesma linha, com o teclado do mesmo lado. O mesmo vale para uma revisão pela API sobre o Radar: mostre outra vez o separador Radar e a revisão volta por cima dele.
+
+Uma revisão está **em curso** enquanto a sua página está aberta. Fechá-la (`Esc`, a cruz, **Revisão: fechar**), enviá-la (**Concluir revisão**, ou submeter ou abandonar uma alteração Gerrit) ou fazer checkout da sua branch termina-a, e não é reaberta. Sair do GitPoulpi com uma revisão aberta conta como sair do separador: o arranque seguinte reabre-a da mesma forma.
+
+Se o pedido foi entretanto integrado ou fechado, ou o host não responde, nenhuma página abre: a barra de estado diz porquê e nada é reaberto da próxima vez. Os comentários pendentes, os ficheiros vistos e o rascunho mantêm-se como sempre (veja **Escrever uma revisão**). Uma execução de sugestões ainda em curso quando sai não é transportada.
 
 ## Escrever uma revisão
 

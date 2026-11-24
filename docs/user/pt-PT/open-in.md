@@ -23,6 +23,13 @@ comando.
   `Separador: abrir no predefinido`. Os comandos da paleta funcionam mesmo
   quando a barra de título não tem espaço para o botão. Ambas as teclas podem
   ser reatribuídas; veja [Atalhos de teclado](keybindings.md).
+- **Por etiqueta**: um passo `tab_open_in` de uma [sequência](config-reference.md#sequences) executa a entrada
+  cuja **etiqueta** indicar (`label = "VS Code"`), por isso reordenar a lista nunca muda o que
+  executa. Uma etiqueta desconhecida pára o passo com "nenhuma entrada de Abrir em tem a etiqueta ...".
+  `Separador: terminal aqui` (paleta) abre o seu terminal na pasta, o antigo botão
+  "Terminal aqui" da barra de separadores.
+- **Um agente de IA na pasta**: `Separador: abrir agente de IA aqui` abre o seu terminal na
+  pasta do separador a executar um agente de IA local; veja [IA](ai.md#abrir-o-agente-na-pasta-de-um-separador).
 - **Clique com o botão direito num separador de repositório**: o menu do
   separador tem um submenu **Abrir em** com as mesmas entradas.
 - A lista começa na entrada que usou da última vez nesta sessão.

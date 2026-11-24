@@ -322,11 +322,14 @@ O painel direito segue a seleção no Log.
 autor com avatar e data, o hash do pai e as contagens de alterações, e depois a mensagem
 (resumo e descrição; arraste a sua margem inferior para a redimensionar). O painel
 **Ficheiros alterados** por baixo começa com os seus próprios controlos: o botão de ordenação,
-**Caminho** / **Árvore**, **Ver todos os ficheiros** e uma caixa **Filtrar ficheiros**, fixos por
+**Caminho** / **Árvore**, **Ver todos os ficheiros** e uma caixa **Filtrar ficheiros** (com uma
+caixa **só LFS** na sua ponta direita num repositório que tem ficheiros LFS), fixos por
 cima da lista, que é a única parte que se desloca. Clique num ficheiro para abrir o seu diff.
 Numa janela baixa, a mensagem cede primeiro (até uma linha) e depois a lista.
 A vista das alterações em curso mantém a sua linha **Caminho** / **Árvore** / **Ver todos os
-ficheiros** no topo das listas de ficheiros, por cima das listas Unstaged e Staged.
+ficheiros** no topo das listas de ficheiros, por cima das listas Unstaged e Staged. No modo
+Árvore, uma pasta recolhida termina com o número de ficheiros que contém, subpastas incluídas,
+como um `(12)` esbatido.
 
 **Ligações numa mensagem.** Um endereço web escrito na mensagem (`https://...`, ou
 o destino de um `[texto](https://...)` em markdown) fica sublinhado, mostra o ponteiro de mão e, ao clicar,
@@ -361,6 +364,22 @@ de volta. Uma barra de botões percorre o topo:
 | **Quebra** | Quebrar linhas longas. |
 | **Mapa** | Um minimapa do ficheiro todo ao lado da barra de deslocação. |
 | **Codificação** | A codificação com que o ficheiro é lido (**Auto** primeiro). |
+
+#### Palavras alteradas num diff
+
+Quando uma linha muda só em parte, as palavras que diferem são pintadas com um fundo mais forte da
+cor da própria linha (um vermelho mais forte na linha removida, um verde mais forte na adicionada),
+e o resto da linha mantém a cor uniforme. Dentro de um hunk, cada sequência de linhas removidas é
+emparelhada com a sequência de linhas adicionadas que a segue, a primeira com a primeira, a segunda
+com a segunda, e assim por diante; um par só é marcado quando pelo menos 40% dos seus caracteres não
+brancos são iguais, por isso uma linha reescrita de raiz fica uniforme em vez de se tornar um único
+bloco de ênfase. Comparam-se palavras, sequências de espaços e sinais de pontuação isolados, um espaço
+solitário entre duas palavras alteradas junta-as numa só marca, e as linhas com mais de 1000
+caracteres não são marcadas. Funciona em Inline e Dividido, com quebra de linha e deslocamento
+lateral, e no painel de diff da revisão. Desligue-o em **Definições > Diff e editor > Destacar
+palavras alteradas** (`ui.diff_intraline`) ou na paleta de comandos (**Diff: alternar o destaque das
+palavras alteradas**, sem tecla própria). Num terminal limitado a 16 cores, ou com um tema sem fundo
+de diff, as palavras alteradas aparecem a negrito e sublinhadas.
 
 Num diff da árvore de trabalho, cada hunk tem os botões **Stage hunk** e **Descartar
 hunk**. Prima `v` para selecionar linhas e depois faça stage ou descarte apenas essas

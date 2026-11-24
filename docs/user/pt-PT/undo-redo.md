@@ -72,6 +72,8 @@ ajuda sob os botões. Para a linha selecionada:
   ou commit gera uma branch `restore/<branch>-<sha>` na ponta antiga - a sua
   branch atual e os seus ficheiros nunca se movem. A confirmação mostra
   exatamente o que vai fazer, e o restauro é uma nova ação: `Ctrl+Z` desfaz-o.
+- **Desfazer a sequência inteira** (`x`): oferecido enquanto as entradas mais recentes são
+  as de uma só execução de sequência (veja [Execuções de sequências](#execuções-de-sequências)).
 - **Refazer até aqui** (`r`) numa linha desfeita.
 - **Restaurar main para onde Commit a deixou** (`o`, ou `Alt+Shift+Z` /
   `Editar: restaurar a branch para onde a ação bloqueada a deixou` fora do
@@ -80,6 +82,10 @@ ajuda sob os botões. Para a linha selecionada:
 
 Clique com o botão direito numa linha (ou prima `.`) para as mesmas ações num
 menu.
+
+Uma linha feita por um passo de uma [sequência](sequences.md) leva um emblema, `⟳ Cópia de segurança`,
+e a sua linha de detalhe diz que passo foi ("Feito pela sequência "Cópia de segurança",
+passo 3/4.").
 
 ![O Histórico de desfazer depois de eliminar uma branch e fazer dois commits: a linha da branch eliminada está selecionada e pode ser restaurada sozinha](../images/undo-history.png)
 
@@ -180,7 +186,7 @@ no ecrã.
 
 | Vista | Linhas da paleta |
 |---|---|
-| Histórico de desfazer | `Histórico de desfazer: desfazer até aqui...`, `refazer até aqui...`, `restaurar só esta...`, `restaurar a branch para onde estava...`, `atualizar`, `fechar` |
+| Histórico de desfazer | `Histórico de desfazer: desfazer até aqui...`, `refazer até aqui...`, `desfazer a sequência inteira`, `restaurar só esta...`, `restaurar a branch para onde estava...`, `atualizar`, `fechar` |
 | Reflog | `Reflog: mostrar no Log`, `criar branch aqui...`, `criar tag aqui...`, `aplicar alterações à árvore de trabalho`, `guardar alterações como stash`, `restaurar para esta posição...`, `carregar mais`, `atualizar` |
 | Trabalho perdido | `Trabalho perdido: criar branch aqui...`, `criar tag aqui...`, `Cherry-pick`, `aplicar alterações à árvore de trabalho`, `guardar alterações como stash`, `procurar de novo` |
 
@@ -192,6 +198,41 @@ nada: «esta ação já foi desfeita: use Refazer até aqui», o motivo por que 
 não pode ser restaurada isoladamente, «só uma branch ou HEAD pode ser movida para
 trás», e assim por diante. As linhas com `...` abrem a mesma confirmação ou o mesmo
 pedido de nome que o botão.
+
+## Execuções de sequências
+
+Uma [sequência](sequences.md) (Cópia de segurança: stage de tudo, mensagem de commit da IA, commit, push)
+produz **uma entrada de diário normal por passo que altera alguma coisa**: o stage
+e o commit aqui, não a mensagem da IA nem o push (um push nunca é
+desfeito, veja abaixo). O diário é por repositório e estritamente da mais recente para a mais antiga, por isso
+uma execução não pode ser uma só entrada: cada uma mantém as suas verificações, e cada uma leva a
+marca da execução que a fez (`sequence:Backup#<run> 3/4`). Os diários antigos não têm marca
+e carregam como antes.
+
+**Desfazer a sequência inteira** desfaz as entradas de uma execução, da mais recente para a mais antiga, como um
+Desfazer normal para cada uma. É oferecido quando as entradas mais recentes do diário são
+as de uma só execução, consecutivas: uma entrada de outra execução, uma alteração feita por si à mão ou
+uma feita fora do GitPoulpi pelo meio termina o grupo. Onde está:
+
+- o Histórico de desfazer: o botão `Desfazer a sequência inteira` (`x`), o menu de clique direito da linha,
+  e a linha da paleta `Histórico de desfazer: desfazer a sequência inteira`;
+- a paleta de comandos: `Editar: desfazer a sequência inteira` (o nome da sequência aparece na
+  linha enquanto se aplica);
+- a linha de comandos e o MCP: `gitpoulpi undo --sequence` (abaixo).
+
+Cada entrada é verificada por si, exatamente como um Desfazer simples: um commit que já está
+no seu upstream pergunta "desfazer mesmo assim?" antes de avançar (responda e o resto
+continua), e uma branch que se moveu ou um merge em curso recusa. A primeira
+recusa (ou um "não" a uma pergunta) **pára** e diz que passo e porquê: *desfazer
+"Cópia de segurança" parou no passo 3/4 (Commit "wip" (a81b9e4)): ... Ações em falta: 2*.
+O que foi desfeito continua desfeito, as entradas mais antigas ficam no diário, e um
+Desfazer simples (ou o botão outra vez) continua a partir daí.
+
+Só o diário deste repositório é desfeito. Uma execução que também agiu noutro
+repositório (um passo de worktree moveu os passos seguintes para o separador do novo worktree)
+deixou entradas no diário próprio desse repositório; abra-o e desfaça aí. O **Refazer**
+continua por entrada: depois de desfazer uma execução inteira, `Ctrl+Y` traz de volta o passo
+mais recente, depois o seguinte, cada um com a sua verificação.
 
 ## O que pode ser desfeito
 
@@ -388,6 +429,9 @@ O Desfazer só pergunta quando é arriscado:
   para o servidor** (veja acima), por isso pergunta sempre, tal como o refazer que
   a elimina lá de novo.
 
+Desfazer uma sequência inteira pergunta uma vez pela lista (no painel), e depois cada entrada
+que é arriscada pergunta de novo como acima.
+
 Refazer, e todo o desfazer de um movimento só de refs, nunca pergunta: a outra
 direção está à distância de uma tecla.
 
@@ -429,6 +473,7 @@ vez eliminado.
 gitpoulpi undo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi redo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi undo --list [--all]
+gitpoulpi undo --sequence [--dry-run] [--yes]
 gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 ```
 
@@ -439,6 +484,15 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 - `--expect <id>` faz a chamada recusar como *obsoleta* a menos que essa entrada
   ainda seja a mais recente: um script (ou uma segunda janela) nunca desfaz algo
   diferente do que viu.
+- `--sequence` desfaz a execução de sequência que está no topo do diário (veja
+  [Execuções de sequências](#execuções-de-sequências)): as entradas consecutivas mais recentes que um
+  `sequence run` fez, da mais recente para a mais antiga, um `undo` para cada uma com as suas verificações.
+  `--dry-run` lista-as; sem `--yes`, a primeira entrada que precise de um
+  (saída **3**) pára-o, nomeando o passo, com o que foi desfeito até então em
+  `undone` e o que falta em `left`. Uma recusa sai com **2** e `stopped.refused`;
+  quando o topo do diário não é de uma só execução a resposta é
+  `{"no_sequence": {...}}`, saída 2. As entradas levam a sua execução em `undo --list`
+  (`summary.origin`: `name`, `run_id`, `step`, `of`). Não com `--expect`.
 - `undo-forget` retira do diário a entrada mais recente bloqueada (`--redo`: a
   entrada de refazer mais recente). Recusa quando essa entrada não está
   bloqueada, e sai com **3** sem `--yes`. É uma mutação para o MCP, mas não

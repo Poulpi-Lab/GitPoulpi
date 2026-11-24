@@ -306,6 +306,7 @@ impl LanguagePicker {
         let user = paths
             .map(|p| gitpoulpi_config::theme::load_user_themes(&p.themes_dir()).themes)
             .unwrap_or_default();
+        crate::theme::refresh_user_lanes(&user);
         Self::graph_color_with_parts(current, &user, config_path)
     }
 

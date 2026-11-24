@@ -524,6 +524,7 @@ theme = "Motyw"
 theme_help = "Kolory całego interfejsu. Przesuwanie po liście pokazuje podgląd każdego motywu; Enter go zachowuje, Esc cofa. System podąża za terminalem (jego jasnym lub ciemnym tłem, wykrytym raz przy uruchomieniu; Ciemny, gdy nie da się go ustalić). Własne pliki motywów z katalogu themes/ w folderze konfiguracji są na końcu."
 theme_system = "System (zgodny z terminalem)"
 follow_theme = "Zgodnie z motywem"
+graph_color_missing = "{name} (not found, using the theme's lanes)"
 theme_swatches = "Kolory"
 graph_lane_background = "Tło ścieżek grafu"
 graph_lane_background_help = { git = "Wył.: przezroczyste, nic za ścieżkami (domyślnie). Podbarwienie wiersza: blady pas koloru ścieżki commita w kolumnie Graf oraz cienki pasek tego koloru na prawej krawędzi kolumny. Zapisana wartość lane jest odczytywana jako Podbarwienie wiersza. Działa po zamknięciu Ustawień.", local = "Wył.: przezroczyste, nic za ścieżkami (domyślnie). Podbarwienie wiersza: blady pas koloru ścieżki zatwierdzenia w kolumnie Graf oraz cienki pasek tego koloru na prawej krawędzi kolumny. Zapisana wartość lane jest odczytywana jako Podbarwienie wiersza. Działa po zamknięciu Ustawień." }

@@ -524,6 +524,7 @@ theme = "Tema"
 theme_help = "Colores de toda la interfaz. Al recorrer la lista se previsualiza cada tema; Enter lo conserva, Esc vuelve atrás. Sistema sigue el terminal (su fondo claro u oscuro, detectado una vez al iniciar; Oscuro si no se puede saber). Tus propios archivos de tema en la carpeta themes/ de la configuración aparecen al final."
 theme_system = "Sistema (sigue el terminal)"
 follow_theme = "Seguir el tema"
+graph_color_missing = "{name} (not found, using the theme's lanes)"
 theme_swatches = "Colores"
 graph_lane_background = "Fondo de los carriles del grafo"
 graph_lane_background_help = { git = "Desactivado: transparente, nada detrás de los carriles (por defecto). Tinte de fila: una banda tenue del color del carril del commit dentro de la columna Grafo, más una barra fina de ese color en el borde derecho de la columna. Un carril guardado se lee como Tinte de fila. Se aplica al cerrar Ajustes.", local = "Desactivado: transparente, nada detrás de los carriles (por defecto). Tinte de fila: una banda tenue del color del carril de la confirmación dentro de la columna Grafo, más una barra fina de ese color en el borde derecho de la columna. Un carril guardado se lee como Tinte de fila. Se aplica al cerrar Ajustes." }

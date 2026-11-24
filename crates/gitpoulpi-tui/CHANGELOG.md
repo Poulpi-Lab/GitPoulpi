@@ -22,6 +22,7 @@ IPC surfaces are stable within a major version).
 - The buttons of a review shown over the Radar (and of a conversation) now show the hand pointer like every other button.
 
 ### Fixed
+- A custom (user) theme can now be chosen as the graph colors: it is listed after the presets in Settings > Appearance > Graph color theme and in **App: Change Graph Color Theme...**, picking it recolors the lanes with its own `graph_palette` (a theme file without one uses its base's lanes), a theme file named like a built-in lane palette (for example `gruvbox`) is no longer hidden behind it, an edited or deleted theme file takes effect without a restart (a deleted one falls back to the active theme's lanes, and Settings marks the configured name *not found*).
 - Pressing a ref in the Refs pane to drag it no longer makes the Log jump to that ref's commit: the graph only follows on a click (when the button comes up), so it stays where you scrolled it to drop onto a visible target.
 - Radar: a double-click or `Enter` on a request whose repository is not cloned asks how to review it (through the API, or clone first) instead of saying to clone the repository first.
 - The theme and the graph colors are now per installation: with several installations sharing one `config.toml`, changing them in one no longer changes them in all of them. A running window only recolours for its own installation's change.

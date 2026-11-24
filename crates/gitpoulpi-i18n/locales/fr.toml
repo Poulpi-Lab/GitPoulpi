@@ -524,6 +524,7 @@ theme = "Thème"
 theme_help = "Couleurs de toute l'interface. Parcourir la liste affiche un aperçu de chaque thème ; Enter garde le thème, Esc revient en arrière. Système suit le terminal (son fond clair ou sombre, détecté une fois au démarrage ; Sombre s'il ne peut pas être déterminé). Vos propres fichiers de thème du dossier themes/ de la configuration sont listés en dernier."
 theme_system = "Système (suit le terminal)"
 follow_theme = "Suivre le thème"
+graph_color_missing = "{name} (not found, using the theme's lanes)"
 theme_swatches = "Couleurs"
 graph_lane_background = "Fond des voies du graphe"
 graph_lane_background_help = { git = "Désactivé : transparent, rien derrière les voies (par défaut). Teinte de ligne : une bande légère de la couleur de voie du {$commit} dans la colonne Graphe, plus une fine barre de cette couleur au bord droit de la colonne. Une voie enregistrée est lue comme Teinte de ligne. S'applique à la fermeture des paramètres.", local = "Désactivé : transparent, rien derrière les voies (par défaut). Teinte de ligne : une bande légère de la couleur de voie de la {$commit} dans la colonne Graphe, plus une fine barre de cette couleur au bord droit de la colonne. Une voie enregistrée est lue comme Teinte de ligne. S'applique à la fermeture des paramètres." }

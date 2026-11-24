@@ -160,5 +160,35 @@ fn config_set_accepts_every_preset_user_theme_and_lane_palette_end_to_end() {
     assert!(ok, "{json}");
 }
 
+#[test]
+fn config_set_graph_color_theme_takes_user_themes_with_or_without_their_own_lanes() {
+    let config = tempfile::tempdir().unwrap();
+    write_user_theme(
+        config.path(),
+        "own-lanes",
+        "graph_palette = [\"#102030\"]\n",
+    );
+    write_user_theme(config.path(), "inherits", "base = \"nord\"\n");
+    // Named like a built-in lane-only palette: still one valid name.
+    write_user_theme(config.path(), "gruvbox", "graph_palette = [\"#102030\"]\n");
+    for name in ["own-lanes", "inherits", "gruvbox"] {
+        let (ok, json) = run(
+            config.path(),
+            &["config", "set", "ui.graph_color_theme", name],
+        );
+        assert!(ok, "{name}: {json}");
+        let (ok, got) = run(config.path(), &["config", "get", "ui.graph_color_theme"]);
+        assert!(ok, "{got}");
+        assert_eq!(got["value"], name, "{got}");
+    }
+    // Deleted again: no longer accepted.
+    std::fs::remove_file(config.path().join("themes/own-lanes.toml")).unwrap();
+    let (ok, json) = run(
+        config.path(),
+        &["config", "set", "ui.graph_color_theme", "own-lanes"],
+    );
+    assert!(!ok, "{json}");
+}
+
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();

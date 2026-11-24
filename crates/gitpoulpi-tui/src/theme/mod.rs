@@ -21,7 +21,9 @@ pub(crate) use runtime::override_theme;
 #[allow(unused_imports)]
 pub(crate) use runtime::set_system_is_light;
 #[allow(unused_imports)]
-pub(crate) use runtime::{install_theme, install_theme_from_config, th, theme_generation};
+pub(crate) use runtime::{
+    install_theme, install_theme_from_config, refresh_user_lanes, th, theme_generation,
+};
 
 /// The sparkle every AI control carries (button, menu entry, palette
 /// command), text presentation, one column. Painted in `status.ai`.

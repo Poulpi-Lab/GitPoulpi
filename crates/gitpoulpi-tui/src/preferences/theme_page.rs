@@ -27,6 +27,7 @@ impl PreferencesState {
             .themes_dir()
             .map(|dir| theme::load_user_themes(&dir))
             .unwrap_or_default();
+        crate::theme::refresh_user_lanes(&self.user_themes.themes);
     }
 
     /// The Theme combo's options: System, the presets, then user themes.
@@ -47,12 +48,24 @@ impl PreferencesState {
 
     /// The lane palette combo's options: Follow theme, then every palette
     /// of the registry (built-ins, per theme, user `graph_palette`s).
-    pub(super) fn lane_options(&self) -> Vec<(String, String)> {
+    /// `current` is the configured value: a name that is no palette any more
+    /// (a deleted user theme) gets its own row saying so; the graph then uses
+    /// the active theme's lanes.
+    pub(super) fn lane_options(&self, current: &str) -> Vec<(String, String)> {
         let mut out = vec![(
             msg::settings_ui::FOLLOW_THEME.get().to_string(),
             gitpoulpi_config::GRAPH_COLOR_FOLLOW_THEME.to_string(),
         )];
-        out.extend(self.lane_palettes().into_iter().map(|p| (p.label, p.slug)));
+        let palettes = self.lane_palettes();
+        if current != gitpoulpi_config::GRAPH_COLOR_FOLLOW_THEME
+            && !palettes.iter().any(|p| p.slug == current)
+        {
+            out.push((
+                msg::settings_ui::graph_color_missing(current),
+                current.to_string(),
+            ));
+        }
+        out.extend(palettes.into_iter().map(|p| (p.label, p.slug)));
         out
     }
 

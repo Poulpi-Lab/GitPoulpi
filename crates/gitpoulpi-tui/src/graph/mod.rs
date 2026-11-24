@@ -119,32 +119,55 @@ impl LaneTheme {
     }
 }
 
-/// The ordered lane colors of `theme`: the registry's palette when one is
-/// named (an unknown name, e.g. a deleted user theme, follows the theme),
-/// else the active theme's own.
+/// The lane palettes of the user themes (`<config>/themes/*.toml`), fed by
+/// [`set_user_lane_palettes`] wherever the theme files are (re)read. A user
+/// theme wins over a built-in lane palette of the same name.
+type UserLanes = Vec<(String, Vec<gitpoulpi_config::theme::ThemeColor>)>;
+static USER_LANES: std::sync::Mutex<UserLanes> = std::sync::Mutex::new(Vec::new());
+
+type LaneCache = std::collections::HashMap<&'static str, &'static [Color]>;
+static LANE_CACHE: std::sync::Mutex<Option<LaneCache>> = std::sync::Mutex::new(None);
+
+/// Records the lane colors of `themes` (the user themes as just loaded).
+/// Returns whether anything changed, so the caller can bump the theme
+/// generation that keys the graph caches.
+pub(crate) fn set_user_lane_palettes(themes: &[gitpoulpi_config::theme::ThemeSpec]) -> bool {
+    let next: UserLanes = themes
+        .iter()
+        .filter(|t| !t.graph_palette.is_empty())
+        .map(|t| (t.slug.clone(), t.graph_palette.clone()))
+        .collect();
+    let mut user = USER_LANES.lock().unwrap_or_else(|e| e.into_inner());
+    if *user == next {
+        return false;
+    }
+    *user = next;
+    *LANE_CACHE.lock().unwrap_or_else(|e| e.into_inner()) = None;
+    true
+}
+
+/// The ordered lane colors of `theme`: a user theme's palette, else the
+/// registry's when one is named (an unknown name, e.g. a deleted user theme,
+/// follows the theme), else the active theme's own.
 pub(crate) fn lane_palette(theme: LaneTheme) -> &'static [Color] {
-    use std::collections::HashMap;
-    use std::sync::Mutex;
-    static CACHE: Mutex<Option<HashMap<&'static str, &'static [Color]>>> = Mutex::new(None);
     let Some(slug) = theme.0 else {
         return theme_lane_palette();
     };
-    let mut cache = CACHE.lock().unwrap_or_else(|e| e.into_inner());
-    let map = cache.get_or_insert_with(HashMap::new);
+    let mut cache = LANE_CACHE.lock().unwrap_or_else(|e| e.into_inner());
+    let map = cache.get_or_insert_with(Default::default);
     if let Some(found) = map.get(slug) {
         return found;
     }
-    let palette = gitpoulpi_config::theme::lane_palette(slug).or_else(|| {
-        // A user theme's `graph_palette`.
-        let set = gitpoulpi_config::ConfigPaths::discover()
-            .map(|p| gitpoulpi_config::theme::load_user_themes(&p.themes_dir()))?;
-        gitpoulpi_config::theme::lane_palettes_with(&set.themes)
-            .into_iter()
-            .find(|p| p.slug == slug)
-    });
-    match palette {
-        Some(p) if !p.colors.is_empty() => {
-            let colors: Vec<Color> = p.colors.into_iter().map(crate::theme::color_of).collect();
+    let user = USER_LANES
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .iter()
+        .find(|(s, _)| s == slug)
+        .map(|(_, colors)| colors.clone());
+    let colors = user.or_else(|| gitpoulpi_config::theme::lane_palette(slug).map(|p| p.colors));
+    match colors {
+        Some(colors) if !colors.is_empty() => {
+            let colors: Vec<Color> = colors.into_iter().map(crate::theme::color_of).collect();
             let leaked: &'static [Color] = Box::leak(colors.into_boxed_slice());
             map.insert(slug, leaked);
             leaked
@@ -410,5 +433,41 @@ impl Default for LogLoadSettings {
             page_commits: Self::DEFAULT_PAGE_COMMITS,
             max_commits: Some(Self::DEFAULT_MAX_COMMITS),
         }
+    }
+}
+
+#[cfg(test)]
+mod user_lane_tests {
+    use super::*;
+    use gitpoulpi_config::theme::parse_user_themes;
+
+    fn themes(text: &str) -> Vec<gitpoulpi_config::theme::ThemeSpec> {
+        parse_user_themes(&[("lane-probe-x".to_string(), text.to_string())]).themes
+    }
+
+    #[test]
+    fn a_user_theme_name_resolves_to_its_lane_colors_and_a_removed_one_follows_the_theme() {
+        let probe = LaneTheme::from_slug("lane-probe-x");
+        set_user_lane_palettes(&[]);
+        // Unknown (never defined or deleted): the active theme's lanes.
+        assert_eq!(lane_palette(probe), theme_lane_palette());
+        assert!(set_user_lane_palettes(&themes(
+            "graph_palette = [\"#0a0b0c\", \"#0a0b0d\"]\n"
+        )));
+        assert_eq!(
+            lane_palette(probe),
+            &[Color::Rgb(10, 11, 12), Color::Rgb(10, 11, 13)]
+        );
+        // Edited: the new colors replace the cached ones.
+        assert!(set_user_lane_palettes(&themes(
+            "graph_palette = [\"#0a0b0e\"]\n"
+        )));
+        assert_eq!(lane_palette(probe), &[Color::Rgb(10, 11, 14)]);
+        // No change reported twice; deleted: falls back, no crash.
+        assert!(!set_user_lane_palettes(&themes(
+            "graph_palette = [\"#0a0b0e\"]\n"
+        )));
+        assert!(set_user_lane_palettes(&[]));
+        assert_eq!(lane_palette(probe), theme_lane_palette());
     }
 }

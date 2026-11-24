@@ -20,6 +20,13 @@ entrada es una etiqueta y un comando.
   predeterminada. Paleta (`Ctrl+P`): `Pestaña: Abrir en…` y `Pestaña: Abrir en el predeterminado`.
   Los comandos de la paleta funcionan incluso cuando la barra de título no tiene sitio para el botón.
   Ambas teclas se pueden reasignar; consulta [Atajos de teclado](keybindings.md).
+- **Por etiqueta**: un paso `tab_open_in` de una [secuencia](config-reference.md#sequences) ejecuta la entrada
+  cuya **etiqueta** nombras (`label = "VS Code"`), así que reordenar la lista nunca cambia lo que
+  ejecuta. Una etiqueta desconocida detiene el paso con «ninguna entrada de Abrir en se llama ...».
+  `Pestaña: Terminal aquí` (paleta) abre tu terminal en la carpeta, el antiguo botón
+  «Terminal aquí» de la barra de pestañas.
+- **Un agente de IA en la carpeta**: `Pestaña: Abrir agente de IA aquí` abre tu terminal en la
+  carpeta de la pestaña ejecutando un agente de IA local; consulta [IA](ai.md#abrir-el-agente-en-la-carpeta-de-una-pestaña).
 - **Clic derecho en una pestaña de repositorio**: el menú de la pestaña tiene un submenú
   **Abrir en** con las mismas entradas.
 - La lista empieza en la última entrada que usaste en esta sesión.

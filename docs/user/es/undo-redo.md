@@ -65,6 +65,8 @@ botones. Para la fila seleccionada:
   rama `restore/<rama>-<sha>` en la punta antigua: tu rama actual y tus archivos nunca se
   mueven. La confirmación muestra exactamente lo que hará, y la restauración es una acción
   nueva: `Ctrl+Z` la revierte.
+- **Deshacer toda la secuencia** (`x`): se ofrece mientras las entradas más recientes son las
+  de una misma ejecución de secuencia (consulta [Ejecuciones de secuencias](#ejecuciones-de-secuencias)).
 - **Rehacer hasta aquí** (`r`) en una fila deshecha.
 - **Restaurar main a donde la dejó Commit** (`t`, o `Alt+Shift+Z` /
   `Edición: Restaurar la rama a donde la dejó la acción bloqueada` desde fuera del panel):
@@ -72,6 +74,10 @@ botones. Para la fila seleccionada:
   la acción.
 
 Haz clic derecho en una fila (o pulsa `.`) para ver las mismas acciones como menú.
+
+Una fila hecha por un paso de una [secuencia](sequences.md) lleva una insignia, `⟳ Backup`,
+y su línea de detalle dice qué paso fue («Hecho por la secuencia "Backup",
+paso 3/4.»).
 
 ![El Historial de deshacer tras eliminar una rama y hacer dos commits: la fila de la rama eliminada está seleccionada y se puede restaurar por sí sola](../images/undo-history.png)
 
@@ -165,7 +171,7 @@ abierto: la paleta se abre encima y sus filas **Historial de deshacer:**, **Refl
 
 | Vista | Filas de la paleta |
 |---|---|
-| Historial de deshacer | `Historial de deshacer: Deshacer hasta aquí...`, `Rehacer hasta aquí...`, `Restaurar solo esta...`, `Restaurar la rama a donde estaba...`, `Actualizar`, `Cerrar` |
+| Historial de deshacer | `Historial de deshacer: Deshacer hasta aquí...`, `Rehacer hasta aquí...`, `Deshacer toda la secuencia`, `Restaurar solo esta...`, `Restaurar la rama a donde estaba...`, `Actualizar`, `Cerrar` |
 | Reflog | `Reflog: Mostrar en el Log`, `Crear rama aquí...`, `Crear tag aquí...`, `Aplicar cambios al árbol de trabajo`, `Guardar cambios como stash`, `Restaurar a esta posición...`, `Cargar más`, `Actualizar` |
 | Trabajo perdido | `Trabajo perdido: Crear rama aquí...`, `Crear tag aquí...`, `Cherry-pick`, `Aplicar cambios al árbol de trabajo`, `Guardar cambios como stash`, `Buscar de nuevo` |
 
@@ -177,6 +183,41 @@ nada: «esta acción ya está deshecha: usa Rehacer hasta aquí», el motivo por
 entrada no se puede restaurar por sí sola, «solo se puede devolver una rama o HEAD a una
 posición anterior», etcétera. Las filas con `...` abren la misma confirmación o petición
 de nombre que el botón.
+
+## Ejecuciones de secuencias
+
+Una [secuencia](sequences.md) (Backup: stage de todo, mensaje de commit de la IA, commit, push)
+hace **una entrada normal del diario por cada paso que cambia algo**: aquí el stage
+y el commit, no el mensaje de la IA ni el push (un push nunca se
+deshace, véase más abajo). El diario es por repositorio y estrictamente de lo más reciente a lo más antiguo, así que
+una ejecución no puede ser una sola entrada: cada una conserva sus propias comprobaciones y cada una lleva la etiqueta de
+la ejecución que la hizo (`sequence:Backup#<run> 3/4`). Los diarios antiguos no tienen etiqueta
+y se cargan como antes.
+
+**Deshacer toda la secuencia** deshace las entradas de una ejecución, de la más reciente a la más antigua, como un
+Deshacer normal por cada una. Se ofrece cuando las entradas más recientes del diario son
+de una misma ejecución, consecutivas: una entrada de otra ejecución, un cambio hecho por ti a mano o
+uno hecho fuera de GitPoulpi entre medias termina el grupo. Dónde está:
+
+- el Historial de deshacer: el botón `Deshacer toda la secuencia` (`x`), el menú de clic derecho de la fila
+  y la fila de paleta `Historial de deshacer: Deshacer toda la secuencia`;
+- la paleta de comandos: `Edición: Deshacer toda la secuencia` (el nombre de la secuencia aparece en
+  la fila mientras se aplica);
+- la línea de comandos y el MCP: `gitpoulpi undo --sequence` (más abajo).
+
+Cada entrada se comprueba por separado, exactamente como un Deshacer sencillo: un commit que ya está
+en su upstream pregunta «¿deshacer de todos modos?» antes de hacerlo (respóndela y el resto
+continúa), y una rama que se movió o un merge en curso se rechaza. La primera
+negativa (o un «no» a una pregunta) **detiene** la operación y dice qué paso y por qué: *el deshacer de
+"Backup" se detuvo en el paso 3/4 (Commit "wip" (a81b9e4)): ... Acciones pendientes: 2*.
+Lo que se deshizo se queda deshecho, las entradas más antiguas siguen en el diario, y un
+Deshacer normal (o el botón otra vez) continúa desde ahí.
+
+Solo se deshace el diario de este repositorio. Una ejecución que también actuó en otro
+repositorio (un paso de worktree movió los pasos siguientes a la pestaña del worktree nuevo)
+dejó entradas en el diario propio de ese repositorio; ábrelo y deshaz allí. **Rehacer**
+sigue siendo por entrada: tras deshacer una ejecución entera, `Ctrl+Y` recupera el paso
+más reciente, luego el siguiente, cada uno con su propia comprobación.
 
 ## Qué se puede deshacer
 
@@ -356,6 +397,9 @@ Deshacer solo pregunta cuando es arriesgado:
   servidor** (véase arriba), así que siempre pregunta, y lo mismo el rehacer que la
   elimina allí otra vez.
 
+Deshacer una secuencia entera pregunta una vez por la lista (en el panel), y luego cada entrada
+que sea arriesgada vuelve a preguntar como se ha descrito.
+
 Rehacer, y todo deshacer de un simple movimiento de refs, nunca pregunta: la otra dirección
 está a una tecla de distancia.
 
@@ -396,6 +440,7 @@ entrada sale del historial o cuando se desactiva el deshacer. Nunca se elimina n
 gitpoulpi undo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi redo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi undo --list [--all]
+gitpoulpi undo --sequence [--dry-run] [--yes]
 gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 ```
 
@@ -405,6 +450,15 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 - `--expect <id>` hace que la llamada se rechace por *obsoleta* salvo que esa entrada siga
   siendo la más reciente: un script (o una segunda ventana) nunca deshace algo distinto de lo
   que miró.
+- `--sequence` deshace la ejecución de secuencia que está arriba del diario (consulta
+  [Ejecuciones de secuencias](#ejecuciones-de-secuencias)): las entradas consecutivas más recientes que hizo un
+  `sequence run`, de la más reciente a la más antigua, un `undo` por cada una con sus propias comprobaciones.
+  `--dry-run` las lista; sin `--yes`, la primera entrada que lo necesita
+  (salida **3**) lo detiene, nombrando el paso, con lo deshecho hasta ahora en
+  `undone` y lo que queda en `left`. Una negativa sale con **2** y `stopped.refused`;
+  cuando la parte de arriba del diario no es de una sola ejecución la respuesta es
+  `{"no_sequence": {...}}`, salida 2. Las entradas llevan su ejecución en `undo --list`
+  (`summary.origin`: `name`, `run_id`, `step`, `of`). No con `--expect`.
 - `undo-forget` quita del diario la entrada bloqueada más reciente (`--redo`: la entrada de
   rehacer más reciente). Se niega cuando esa entrada no está bloqueada, y termina con **3** sin
   `--yes`. Para el MCP es una mutación, pero no destructiva: el repositorio no se toca.

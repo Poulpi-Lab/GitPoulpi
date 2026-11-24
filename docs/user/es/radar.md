@@ -17,7 +17,63 @@ Un repositorio que no está vinculado nunca se consulta: muestra una línea
 ![El Radar sobre dos repositorios: una solicitud fijada, luego Pendientes de mi revisión, Mis pull requests, Asignados a mí, issues y trabajo en curso](../images/radar.png)
 
 **Revisar...** en una fila de pull o merge request (o `e`) abre el repositorio con la revisión de la solicitud dentro de la
-aplicación ([Revisar una pull request](review.md)).
+aplicación ([Revisar una pull request](review.md)). Para una solicitud de un repositorio que clonaste pero nunca vinculaste al host, el clon
+se vincula primero al proyecto de la solicitud (salvo que ya tenga su propio vínculo de pull request), de modo que la revisión empieza en su pestaña.
+
+### La columna Acciones
+
+A la derecha de una fila de solicitud o de issue, unos botones pequeños hacen lo que hace una tecla sobre la fila seleccionada (un clic
+selecciona la fila y ejecuta la acción; deja el puntero sobre un botón para ver su nombre y su tecla):
+
+```
+Ancho:   #58  Round invoice totals  feature/login → main   alice   2d   Revisar  [globe]  [talk]  ⊕  ×  ⇣  ⋮
+Estrecho: #58  Round invoice totals  feature/login → main                 [rev]  [globe]  [talk]  ⋮
+Issue:   #12  Crash on empty list                         bob     5h   Empezar  [globe]  [talk]  ×  ⋮
+```
+
+| Botón | Tecla | Paleta |
+|---|---|---|
+| **Revisar** (una solicitud que espera tu revisión; pregunta cómo cuando no está clonada) | `e` | `Radar: Revisar solicitud...` |
+| **Empezar** (un issue clonado) | `n` | `Radar: Empezar a trabajar en issue...` |
+| el globo: abrir la página en el host | `o` | `Radar: Abrir en el navegador` |
+| el glifo de líneas: abrir la conversación | `i` | `Radar: Abrir la conversación del issue` |
+| `»` **Marcar como lista** (una solicitud en borrador) | `y` | `Radar: Marcar como lista` |
+| `⊕` **Merge** (una solicitud) | `m` | `Radar: Merge de un pull request...` |
+| `×` **Cerrar** (una solicitud o un issue) | `x` | `Radar: Cerrar...` |
+| `⇣` **Clonar** (una fila cuyo repositorio no está clonado) | `g` | `Radar: Clonar repositorio...` |
+
+Una fila sin acción deja su celda vacía, así que cada botón queda en la misma columna en todas las filas. Cuando la ventana es
+estrecha, las palabras Revisar y Empezar pasan a ser glifos antes de que desaparezca cualquier otra columna; los botones Lista, Merge,
+Cerrar y Clonar salen de la columna antes que el título, pero siguen en el menú de la fila (`⋮`, clic derecho o `Shift+F10`), donde una acción
+que no se puede ejecutar aparece atenuada con su motivo. La columna es automática (no es
+una de las columnas redimensionables). Un doble clic o `Enter` sobre una solicitud que no está clonada pregunta cómo revisarla, como **Revisar**.
+
+### Las ramas de una solicitud
+
+Una fila de solicitud muestra `origen → destino` tras su título (`alice:feature/login → main` cuando la rama de origen está en un fork).
+Cuando falta espacio se corta primero el destino (puntos suspensivos), el título conserva la mayor parte del espacio, y en una ventana estrecha las
+ramas no se muestran; la columna Acciones nunca se empuja fuera. Deja el puntero sobre un texto cortado para verlo entero. Un host que
+no indicó las ramas no muestra nada ahí. Una fila de issue nombra su repositorio en el mismo chip que una fila de solicitud (el
+nombre de carpeta del clon, o `owner/name` cuando no está clonado).
+
+### Actuar sobre el host
+
+**Merge**, **Cerrar** y **Marcar como lista** funcionan en GitHub, GitLab, Gitea y Forgejo (los demás hosts los atenúan con «{host} no lo
+admite»; los issues se pueden cerrar en los mismos hosts).
+
+- **Merge** pregunta antes: el cuadro nombra la solicitud, su proyecto y sus ramas, y ofrece el método (un commit de merge, squash
+  y rebase donde el host lo tiene; GitLab hace merge o squash). Se rechaza con su motivo para un borrador, una solicitud que
+  tiene conflictos con su destino, o comprobaciones fallidas; un rechazo del host (sin permiso, una regla de la rama) se muestra en la
+  línea de estado.
+- **Cerrar** pregunta antes y cierra sin hacer merge.
+- **Marcar como lista** saca un borrador del estado de borrador (GitLab y Gitea: la marca `Draft:` / `WIP:` sale del título). No pregunta
+  nada: es reversible en el host.
+- **Clonar** abre el diálogo Clonar habitual sobre el proyecto de la fila (la URL ya está rellenada, el selector de carpetas es el de siempre). Cuando
+  el clon existe, el Radar coloca la fila sobre él la próxima vez que lee los remotos (reábrelo o Actualiza), y Clonar entonces
+  dice dónde está el clon.
+
+Merge y Cerrar modifican el host y **no se pueden deshacer desde GitPoulpi** (el cuadro lo dice); reabre una solicitud cerrada en el host.
+Tras una llamada correcta se vuelven a pedir las listas, así que una fila fusionada o cerrada desaparece y una lista pierde su chip `borrador`.
 
 ## Abrirlo
 
@@ -197,7 +253,7 @@ siempre tiene una tecla y un equivalente en la paleta.
 
 | Acción | Tecla | Paleta |
 |---|---|---|
-| Abrir repositorio (su pestaña se abre, o se cambia a ella) | `Enter` / doble clic | `Radar: Abrir repositorio` |
+| Abrir repositorio (su pestaña se abre, o se cambia a ella; una solicitud no clonada pregunta cómo revisarla) | `Enter` / doble clic | `Radar: Abrir repositorio` |
 | Revisar... (una solicitud; una solicitud no clonada pregunta cómo) | `e` | `Radar: Revisar solicitud...` |
 | Revisar una solicitud mediante la API del host (sin clon) | `a` en la pregunta | `Radar: Revisar mediante la API` |
 | Clonar el repositorio y luego revisar la solicitud | `c` en la pregunta | `Radar: Clonar y revisar...` |

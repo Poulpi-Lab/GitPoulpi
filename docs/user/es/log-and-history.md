@@ -88,6 +88,27 @@ Cuando el repositorio tiene un `.mailmap` (el archivo de git que da un solo nomb
   commit, el nombre y el correo del autor, el hash y los nombres de las refs.
   Atenúa lo que no coincide y mantiene la forma del grafo. `Enter` /
   `Shift+Enter` saltan a la siguiente / anterior coincidencia.
+- **Filtro de autor** (el embudo de la cabecera **Autor**, `Shift+A` en el Log,
+  o *Log: Filtrar por autor...* de la paleta): prefiltra el Log según quién
+  escribió los commits. Un popup cuelga bajo la cabecera con un campo de búsqueda, una
+  fila **Quitar el filtro** (✕) y una fila por autor del historial cargado: una
+  insignia con las iniciales (el avatar, cuando `ui.avatars` no está desactivado), el nombre y el
+  correo atenuado detrás, primero los de más commits y luego por nombre. Escribir reduce la
+  lista con la coincidencia aproximada de la paleta; `Enter` o un clic alterna el
+  autor resaltado (una marca de verificación; elige tantos como quieras), `Esc` o un
+  clic fuera cierra el popup y conserva el filtro. El filtro se comporta exactamente
+  como la búsqueda: los commits de los autores elegidos siguen iluminados, las demás filas se
+  atenúan y el grafo conserva su forma, no se quita ni se vuelve a pedir nada. Con la
+  barra de búsqueda también abierta, se aplican ambos (un commit debe ser de un autor elegido **y**
+  coincidir con el texto), y `Enter` / `Shift+Enter` recorren esas coincidencias. Mientras
+  el filtro está activo, el embudo pasa a un `▼` de acento relleno, su tooltip lista
+  los autores elegidos, y cuando la columna Autor está oculta o es demasiado estrecha para
+  el embudo, el borde superior del Log dice *Autores: Alice Example +1* en su lugar (la
+  tecla y la paleta siguen funcionando). Para quitarlo: la fila **Quitar el filtro**, un
+  clic derecho en el embudo iluminado, o *Log: Quitar el filtro de autor* de la paleta.
+  Los autores son los de los commits que el Log ha cargado (con el mailmap aplicado, como
+  en la columna), y el filtro se recuerda por repositorio, entre cambios de pestaña
+  y reinicios. Una búsqueda de texto no se recuerda; el filtro sí.
 - **Filtro de refs** (`/` en la barra lateral): reduce por nombre las listas de
   ramas, tags y remotos.
 - **Solo** (la tecla `o`, o el menú de la ref, sobre una ref, carpeta o remoto):
@@ -117,6 +138,13 @@ entradas más útiles:
 | Renombrar, Eliminar | Eliminar pregunta antes; también se puede eliminar su gemela remota |
 | Copiar nombre de la rama, Copiar enlace de la rama en el remoto | Al portapapeles |
 
+**Mover un tag.** Arrastra un tag sobre otra ref (consulta *Arrastrar refs* en
+[Ratón y gestos](./mouse-and-gestures.md)) o usa `Refs: Mover el Tag seleccionado
+al Commit seleccionado...`. Conserva su tipo y su anotación, solo se mueve tu tag
+local (un remoto conserva la posición anterior hasta que hagas push), y un deshacer
+lo devuelve. CLI: `gitpoulpi tag move <name> <target> [--force-non-ff]`,
+`gitpoulpi tag merge-branch <name> <branch> [-m <message>]`.
+
 **Dónde vive un tag.** Un tag puede estar en este equipo, en un remoto o en ambos, y
 las filas TAGS de la barra lateral (y la píldora del tag en el Log) lo indican con una marca
 tras el nombre. Pasa el puntero sobre un tag para verlo explicado con palabras.
@@ -126,7 +154,7 @@ tras el nombre. Pasa el puntero sobre un tag para verlo explicado con palabras.
 | flecha hacia arriba | Solo aquí: ningún remoto lo tiene. Su menú ofrece *Push* |
 | flecha izquierda-derecha | Aquí y en un remoto, en el mismo commit |
 | flecha hacia abajo (fila atenuada) | Solo en un remoto: no está en este repositorio (nunca se trajo o se eliminó aquí). Su menú ofrece *Fetch de `<tag>` desde `<remote>`* y *Eliminar `<tag>` en `<remote>`...*; `Git: Fetch Selected Tag` en la paleta |
-| flecha arriba-abajo | También está en un remoto, pero en un commit distinto (un push sería rechazado) |
+| flecha arriba-abajo | También está en un remoto, pero en un commit distinto (un push normal sería rechazado). Su menú tiene dos filas por cada remoto así: *Usar `<tag>` de `<remote>`* (el tag local pasa a la versión del remoto, según el último fetch, sin red; un tag anotado pasa a ser ese mismo objeto tag) y, en rojo, *Push de `<tag>` a `<remote>` (forzado)* (pregunta antes; con lease sobre lo que vio el último fetch, así que un remoto que se movió desde entonces se rechaza con "fetch first" y no se sobrescribe nada). Cada una es una entrada de deshacer. `Git: Usar la versión del remoto del Tag seleccionado` y `Git: Push forzado del Tag seleccionado a su remoto` en la paleta (el remoto por defecto cuando difieren varios); CLI: `tag take-remote`, `tag force-push` |
 
 git no guarda refs de seguimiento remoto para los tags, así que GitPoulpi sabe qué tiene cada remoto
 por tu último **fetch** (cualquiera, también el automático) y por sus propios push y eliminaciones de

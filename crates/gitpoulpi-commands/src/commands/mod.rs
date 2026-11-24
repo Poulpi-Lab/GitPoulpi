@@ -48,6 +48,7 @@ mod repo_auth;
 pub(crate) mod rewrite;
 #[cfg(feature = "history-rewrite")]
 mod rewrite_host;
+mod sequence;
 pub(crate) mod split;
 mod stash;
 #[cfg(feature = "submodule")]
@@ -229,6 +230,15 @@ pub async fn execute(ipc: &mut Session, cli: Cli, session: &str) -> Result<Emitt
         #[cfg(feature = "workspaces")]
         Commands::Workspace { action } => crate::workspace_cmd::run_via_daemon(ipc, action).await,
         Commands::Job { action } => crate::job_cmd::run_via_daemon(ipc, action).await,
+        Commands::Sequence { action } => {
+            Box::pin(sequence::run_via_daemon(
+                ipc,
+                session,
+                cli.repo.as_deref(),
+                action,
+            ))
+            .await
+        }
         #[cfg(feature = "global-search")]
         Commands::Search {
             query,
@@ -275,6 +285,7 @@ pub(crate) fn is_local(command: &Commands) -> bool {
         | Commands::Alias { .. }
         | Commands::Installation { .. }
         | Commands::Path { .. } => true,
+        Commands::Sequence { action } => !sequence::needs_daemon(action),
         Commands::Flow {
             action: crate::cli::FlowAction::Templates,
         } => true,
@@ -294,7 +305,7 @@ pub(crate) fn is_local(command: &Commands) -> bool {
 async fn run_local(
     command: Commands,
     session: &str,
-    #[cfg_attr(not(feature = "ai"), allow(unused_variables))] repo: Option<&str>,
+    repo: Option<&str>,
 ) -> Result<Emitted, String> {
     match command {
         Commands::Repo { action } => crate::repo_cmd::run_local(session, action),
@@ -312,6 +323,7 @@ async fn run_local(
         Commands::Installation { action } => crate::installation_cmd::execute(action),
         Commands::Path { action } => crate::alias_cmd::path(action),
         Commands::Flow { .. } => flow::templates(),
+        Commands::Sequence { action } => sequence::run_local(action, repo),
         Commands::Config { action } => {
             crate::config_cmd::execute(action, &gitpoulpi_config::Overrides::default())
         }
@@ -1519,7 +1531,10 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
         // `repo` and `hosting` carry their own state as well as their
         // own IPC calls, so they are routed by `run` rather than
         // dispatched here -- see the two modules.
-        Commands::Repo { .. } | Commands::Ui { .. } | Commands::Job { .. } => {
+        Commands::Repo { .. }
+        | Commands::Ui { .. }
+        | Commands::Job { .. }
+        | Commands::Sequence { .. } => {
             unreachable!("routed before dispatch")
         }
         #[cfg(feature = "workspaces")]

@@ -13,6 +13,7 @@ mod refs_misc;
 mod repo_auth;
 #[cfg(feature = "history-rewrite")]
 mod rewrite;
+mod sequence;
 mod ui;
 mod workspace;
 
@@ -51,6 +52,7 @@ pub use refs_misc::{
 pub use repo_auth::RepoAuthAction;
 #[cfg(feature = "history-rewrite")]
 pub use rewrite::{RewriteAction, RewriteRecipeArgs, RewriteScriptAction};
+pub use sequence::{SequenceAction, SequenceScopeArg};
 pub use ui::{HostingViewArg, UiAction, UiProposeAction, UiShowAction};
 #[cfg(feature = "global-search")]
 pub use workspace::SearchKindArg;
@@ -1292,6 +1294,13 @@ pub enum Commands {
         launch: bool,
         #[command(subcommand)]
         action: UiAction,
+    },
+    /// Named sequences of palette commands (macros) such as "Backup": stage
+    /// everything, write the commit message with the AI, commit, push. List,
+    /// check, add and remove them, or run one headless.
+    Sequence {
+        #[command(subcommand)]
+        action: SequenceAction,
     },
     /// Prints a shell completion script to stdout (bash, zsh, fish,
     /// powershell or elvish), e.g. `gitpoulpi completions bash >

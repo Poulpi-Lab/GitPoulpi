@@ -370,7 +370,7 @@ pub const STEP_VOCABULARY: &[StepKind] = &[
         true,
         &[],
         "Let the AI group the changes into several commits",
-        true,
+        false,
     ),
     kind(
         "ai_generate_stash_message",

@@ -32,6 +32,7 @@ fn is_open_world(name: &str) -> bool {
         "fetch"
             | "pull"
             | "push"
+            | "sequence_run"
             | "remote_group_plan"
             | "remote_group_continue"
             | "remote_group_retry"

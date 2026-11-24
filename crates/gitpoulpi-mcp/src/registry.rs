@@ -170,6 +170,14 @@ pub const EXCLUDED: &[(&[&str], &str)] = &[
         "which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token",
     ),
     (
+        &["sequence", "add"],
+        "a sequence is a list of commands that run later (and can be bound to a key): an agent must not write its own macros, or edit the config that gates it",
+    ),
+    (
+        &["sequence", "remove"],
+        "removes a sequence from the user's config; the user's macros are theirs to manage",
+    ),
+    (
         &["flow", "trust-hooks"],
         "trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted",
     ),

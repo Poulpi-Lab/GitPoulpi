@@ -112,6 +112,9 @@ const READ_ONLY: &[&[&str]] = &[
     &["alias", "status"],
     &["path", "status"],
     &["licenses"],
+    // Sequences: what is saved and what a step would do; no daemon.
+    &["sequence", "show"],
+    &["sequence", "validate"],
     &["theme", "list"],
     &["theme", "export"],
     &["rebase-plan"],
@@ -156,6 +159,9 @@ const DESTRUCTIVE: &[&[&str]] = &[
     &["stash", "drop"],
     &["remote", "remove"],
     &["push"],
+    // Runs the steps of a sequence (commit, push, ...): as destructive as
+    // its most destructive step, which is a push.
+    &["sequence", "run"],
     &["lfs", "push"],
     &["lfs", "unlock"],
     // Deletes local LFS objects that are not referenced by recent commits.
@@ -518,6 +524,7 @@ mod tests {
             "rewrite_run",
             "rewrite_push",
             "rewrite_purge",
+            "sequence_run",
             "session_delete",
             "workspace_delete",
             "worktree_remove",
@@ -532,7 +539,7 @@ mod tests {
             .map(|s| s.name)
             .collect();
         got.sort();
-        assert_eq!(got.len(), 45, "destructive set changed: {got:?}");
+        assert_eq!(got.len(), 46, "destructive set changed: {got:?}");
     }
 
     #[cfg(feature = "full")]

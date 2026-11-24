@@ -94,8 +94,9 @@ Namen und E-Mail-Adressen des Verlaufs und schreibt `.mailmap`-Zeilen für Sie, 
 - **Autorenfilter** (der Trichter in der Kopfzeile **Autor**, `Shift+A` im Log oder
   *Log: Nach Autor filtern...* in der Palette): filtert das Log vorab danach, wer die Commits
   geschrieben hat. Unter der Kopfzeile hängt ein Popup mit einem Suchfeld, einer Zeile
-  **Filter löschen** (✕) und einer Zeile pro Autor des geladenen Verlaufs: ein Initialen-Abzeichen
-  (der Avatar, wenn `ui.avatars` nicht aus ist), der Name und danach abgedunkelt die E-Mail,
+  **Filter löschen** (✕) und einer Zeile pro Autor des geladenen Verlaufs: ein Avatar
+  (wenn `ui.avatars` nicht aus ist: das Bild des Autors, wo das Terminal Bilder zeichnet und das Bild
+  bereit ist, bis dahin und in anderen Terminals das Initialen-Abzeichen), der Name und danach abgedunkelt die E-Mail,
   die meisten Commits zuerst und dann nach Namen. Das Tippen grenzt die Liste mit dem unscharfen
   Abgleich der Palette ein; `Enter` oder ein Klick schaltet den markierten Autor um (ein Häkchen;
   wählen Sie beliebig viele), `Esc` oder ein Klick daneben schließt das Popup und behält den
@@ -107,7 +108,11 @@ Namen und E-Mail-Adressen des Verlaufs und schreibt `.mailmap`-Zeilen für Sie, 
   Tooltip listet die gewählten Autoren, und ist die Spalte Autor ausgeblendet oder zu schmal für
   den Trichter, steht stattdessen *Autor: Alice Example +1* am oberen Rand des Logs (die Taste
   und die Palette funktionieren weiter). Zum Ausschalten: die Zeile **Filter löschen**, ein
-  Rechtsklick auf den hellen Trichter oder *Log: Autorenfilter löschen* in der Palette. Die Autoren
+  Rechtsklick auf den hellen Trichter, *Log: Autorenfilter löschen* in der Palette oder
+  `Esc` im Log (nach einer Auswahl, die `Esc` zuerst aufhebt; im Popup leert `Esc` zuerst das
+  Suchfeld, schließt dann das Popup und behält den Filter). Solange er an ist, bewegen Auf/Ab (und
+  Bild auf/Bild ab, Pos1/Ende) die Auswahl nur zwischen den hellen Commits und überspringen die
+  abgedunkelten; ein Klick wählt weiterhin jede Zeile. Die Autoren
   sind die der Commits, die das Log geladen hat (Mailmap angewendet, wie in der Spalte), und der
   Filter wird pro Repository gemerkt, über Tab-Wechsel und Neustarts hinweg. Eine Textsuche wird
   nicht gemerkt, der Filter schon.

@@ -479,7 +479,7 @@ mod tests {
         assert!(crate::keymap::ACTIONS
             .iter()
             .filter(|d| d.built())
-            .all(|d| !d.id.contains("ai_")));
+            .all(|d| !d.config_id().contains("ai_")));
         // The AI runtime object never turns on.
         let ui = crate::ai_ui::AiUi::new();
         assert!(!ui.enabled());
@@ -545,7 +545,7 @@ mod tests {
             .iter()
             .filter(|d| d.requires == Some(Feature::Hosting))
         {
-            assert!(!def.built(), "{}", def.id);
+            assert!(!def.built(), "{}", def.config_id());
         }
         // ...nor palette entry...
         let all = palette_matches(

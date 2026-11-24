@@ -114,3 +114,93 @@ fn the_diff_and_file_view_text_is_an_i_beam_and_the_bar_buttons_keep_the_hand() 
     );
     term.stop().unwrap();
 }
+
+/// The review's diff pane: the code is selectable text, so the I-beam; the
+/// line-number gutter keeps the arrow.
+#[cfg(all(feature = "radar", feature = "review"))]
+#[test]
+fn the_review_diff_code_is_an_i_beam_and_its_gutter_is_not() {
+    use xtask::mock_host::{self, Options};
+    let session = "pty-pointer-review";
+    let mock = mock_host::start(Options {
+        port: 0,
+        bare_root: None,
+    })
+    .expect("the mock host");
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit_file("a.txt", "a\n", "pointer-review-start-commit")
+        .unwrap()
+        .build();
+    let config = tempfile::tempdir().expect("temp config dir");
+    std::fs::write(
+        config.path().join("config.toml"),
+        format!(
+            "[[integrations]]\nid = \"lab\"\nkind = \"gitlab_self_managed\"\nurl = \"http://127.0.0.1:{port}\"\ntoken_ref = \"integration:lab\"\nname = \"lab\"\nuser = {{ login = \"{login}\" }}\n\n[integrations.radar]\nreview_requests = true\n",
+            port = mock.port,
+            login = mock_host::GITLAB_LOGIN,
+        ),
+    )
+    .expect("seed config.toml");
+    std::fs::create_dir_all(config.path().join("sessions")).unwrap();
+    std::fs::write(
+        config
+            .path()
+            .join("sessions")
+            .join(format!("{session}.toml")),
+        format!(
+            "[[tabs]]\nrepo_path = '{}'\nactive = true\n",
+            repo.root().display()
+        ),
+    )
+    .expect("seed the session");
+    let mut term = common::launch(repo.root())
+        .session(session)
+        .config_dir(config.path())
+        .size(160, 50)
+        .mouse_capture()
+        .env("GITPOULPI_NO_BROWSER", "1")
+        .env("GITPOULPI_TOKEN_LAB", "test-token")
+        .env("GITPOULPI_DESKTOP_NO_HOOKS", "1")
+        .spawn();
+    term.wait_for("the repository loaded", STARTUP, |s| {
+        s.contains("pointer-review-start-commit")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("M-r").expect("Alt+R");
+    let screen = term
+        .wait_for("the far request", STARTUP, |s| {
+            s.contains("Radar") && s.contains("Round invoice totals") && s.contains("Not cloned")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (col, row) = screen.find("Round invoice totals").unwrap();
+    term.click(col + 2, row).expect("select the row");
+    term.send_keys("e").expect("e");
+    term.wait_for("the question", STEP, |s| {
+        s.contains("Review through the API")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("a").expect("a");
+    term.wait_for("the Overview", STEP, |s| {
+        s.contains("Review !58") && s.contains("New comment")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("m").expect("load older");
+    let screen = term
+        .wait_for("the inline thread", STEP, |s| {
+            s.contains("src/planets.rs:12")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (col, row) = screen.find("src/planets.rs:12").unwrap();
+    term.click(col + 3, row).expect("the code link");
+    term.wait_for("the Files page on the line", STEP, |s| {
+        s.contains("Back to Overview") && s.contains("Why a Vec here")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    let screen = term.screen();
+    // The added line `+b`: its marker, then the code.
+    let line = screen.find("+b").expect("the added line");
+    hover(&mut term, "the review code", (line.0 + 2, line.1), "text");
+    hover(&mut term, "the review gutter", (line.0 - 4, line.1), "");
+    term.stop().unwrap();
+}

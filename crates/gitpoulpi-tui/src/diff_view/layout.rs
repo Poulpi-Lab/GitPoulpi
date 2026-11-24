@@ -393,27 +393,6 @@ pub(crate) fn text_viewport(mode: DiffViewMode, width: u16) -> usize {
     }
 }
 
-/// The columns of one diff row that hold the code itself, as `(offset,
-/// width)` from the pane's left edge: the line-number gutter and the marker
-/// column are left out, in Split each side has its own. The part of the row
-/// a text selection can start in, so the one place the pointer is the I-beam.
-pub(crate) fn text_columns(mode: DiffViewMode, width: u16) -> Vec<(u16, u16)> {
-    let fit = |dx: usize, w: usize| {
-        let dx = dx.min(width as usize);
-        (dx as u16, w.min(width as usize - dx) as u16)
-    };
-    match mode {
-        DiffViewMode::Inline => vec![fit(
-            GUTTER_WIDTH + 1,
-            (width as usize).saturating_sub(GUTTER_WIDTH + 1),
-        )],
-        DiffViewMode::Split => {
-            let cw = split_content_width(width);
-            vec![fit(7, cw), fit(cw + 15, cw)]
-        }
-    }
-}
-
 /// The largest useful horizontal offset: 0 while no line overflows the
 /// text column (no scrollbar), else the offset at which the longest
 /// line's last character is drawn. Scrolled rows spend one column on the

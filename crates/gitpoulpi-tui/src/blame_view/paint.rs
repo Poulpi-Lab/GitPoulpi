@@ -185,15 +185,6 @@ pub(crate) fn render(
         }
     }
 
-    // The code can be selected with the mouse: the I-beam over it (the card
-    // and menu painted after take the pointer back).
-    crate::pointer_map::field(Rect::new(
-        lay.text_x,
-        inner.y,
-        lay.text_w,
-        (last - first) as u16,
-    ));
-
     // The border, drawn over the whole height so it reads as a column.
     if lay.ann_w > 0 {
         let hot = view.drag || env.hovered == Some(BlameHit::Handle);

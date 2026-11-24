@@ -442,6 +442,11 @@ impl ReviewView {
         // The mouse text selection, over the code (a buffer pass, like the Diff view's).
         let sel_state = pane.view_state(&self.diff_opts);
         crate::diff_view::paint_text_selection(buf, body, &render, &sel_state);
+        // The code is selectable text: the I-beam (a button registered later answers first).
+        crate::text_select::register_pointer(
+            body,
+            &render.segs[first..last.min(render.segs.len())],
+        );
 
         for n in 0..(last - first) {
             let i = first + n;

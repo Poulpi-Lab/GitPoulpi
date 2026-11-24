@@ -7,6 +7,9 @@ IPC surfaces are stable within a major version).
 
 ## [Unreleased]
 
+### Changed
+- The mouse pointer is the I-beam over the code of the Diff view (Inline and Split), the review's diff pane, the File View and Blame, since that text can be selected even though it is not editable. Line numbers, hunk buttons, scrollbars and menus keep their own pointer. One rule: wherever a drag can select text, the pointer is the I-beam.
+
 ## [1.2.0] - 2026-11-23
 
 ### Added

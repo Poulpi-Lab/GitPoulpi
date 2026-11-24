@@ -231,8 +231,8 @@ impl RadarSlot {
     }
 
     /// The I-beam over the filter box.
-    pub(crate) fn pointer_text_at(&self) -> bool {
-        self.peek().is_some_and(RadarUi::pointer_text_at)
+    pub(crate) fn pointer_text_at(&self, col: u16, row: u16) -> bool {
+        self.peek().is_some_and(|ui| ui.pointer_text_at(col, row))
     }
 
     /// The pointing hand over a control, a row or a popup row.

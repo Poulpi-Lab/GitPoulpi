@@ -498,9 +498,10 @@ pub(crate) fn render_file_panel_in(
     let rows = insight_rows(insight, inner.width as usize, viewport);
     frame.render_clipped(Paragraph::new(rows), inner);
     // The file's text can be selected with the mouse: the I-beam over it.
-    if let Some(text) = crate::file_view::text_rect(insight, inner) {
-        crate::pointer_map::field(text);
-    }
+    crate::text_select::register_pointer(
+        inner,
+        &crate::file_view::insight_segs(insight, inner.width as usize, viewport),
+    );
     // A Git LFS object card: the actions for its real content under it.
     let card_hits = crate::open_with::view::render_file_card(frame, inner, insight);
     // The mouse text selection, painted over the rows

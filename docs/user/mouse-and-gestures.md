@@ -503,10 +503,12 @@ The same kind of component gives the same pointer everywhere in the app.
   files, Radar, Activity Log, the issues pane search), the text, number and
   area rows of Settings (also while you edit them), the fields of dialogs, the
   review comment boxes, the commit composer, the file editor's text and the merge
-  editor's editable result (its read-only panes keep the arrow). It is also on
-  the text you can select with the mouse but not edit: the code of a diff
-  (Inline and Split, not its line numbers or its hunk buttons), the File View
-  and Blame's code. In the commit
+  editor's editable result (its read-only panes keep the arrow, since a drag
+  there selects nothing). One rule covers read-only text too: wherever a mouse
+  drag can select text, the pointer is the I-beam. That is the code of a diff
+  (the Diff view, Inline and Split, and the review's diff pane), the File View
+  and Blame's code. Their line numbers, markers and hunk headers keep the
+  arrow, and a button on a line keeps the hand. In the commit
   details, the message and the description are editable, so the I-beam shows on
   them and the whole block lights lightly.
 - **In the commit details**, the info lines are controls: click `commit: <id>`

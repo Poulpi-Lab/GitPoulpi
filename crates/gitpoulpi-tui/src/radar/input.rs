@@ -437,7 +437,12 @@ impl RadarUi {
     }
 
     /// Whether the pointer is on the filter box (a text field: the I-beam).
-    pub(crate) fn pointer_text_at(&self) -> bool {
+    pub(crate) fn pointer_text_at(&self, col: u16, row: u16) -> bool {
+        // The hosted review paints its own text (the code of its diff, its
+        // comment boxes) and registers it with the pointer map.
+        if self.api_review.is_some() && !self.popup_open() {
+            return crate::pointer_map::at(col, row) == Some(crate::pointer_map::Kind::Field);
+        }
         !self.popup_open() && matches!(self.hover, Some(Hit::Filter))
     }
 

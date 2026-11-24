@@ -444,6 +444,33 @@ pub enum AiCommand {
         #[arg(long)]
         context: bool,
     },
+    /// Print the action sequence the AI drafts from your description
+    /// ("stage everything, write the message with the AI, commit and push"),
+    /// or, with `--edit <id>`, the changed version of an existing sequence:
+    /// `{ sequence, toml, problems, notes, suggested_shortcut,
+    /// shortcut_conflict, retried, context, applied: false }`. Every step is
+    /// checked on its own against the step vocabulary: a step that is
+    /// unknown, destructive, nested or has an impossible pause is left out
+    /// and listed in `problems` (exit code 2). Saves and runs nothing: read
+    /// the sequence, then save it yourself with `sequence add --file`. Sends
+    /// only your description and, with `--edit`, that sequence; with
+    /// `--context` also the remote names, the AI profile ids and the Open in
+    /// labels. Needs `ai.enabled = true`.
+    SequenceDraft {
+        /// What the sequence must do, or with `--edit` how to change it, in
+        /// your own words.
+        description: String,
+        /// Change this sequence (its id, `sequence list`) instead of creating
+        /// one: it is sent along, and the proposal keeps its id and scope.
+        #[arg(long, value_name = "ID")]
+        edit: Option<String>,
+        /// Also send the remote names, the AI profile ids and the Open in
+        /// labels so the model can name them exactly. Off by default:
+        /// without it nothing but your description (and the sequence being
+        /// edited) leaves the machine.
+        #[arg(long)]
+        context: bool,
+    },
     #[cfg(feature = "worktree")]
     /// Print the worktree name and branch name the AI proposes for a task
     /// ("fix the crash when the config is empty"): `{ name, worktree,

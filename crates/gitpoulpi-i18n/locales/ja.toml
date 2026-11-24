@@ -8949,6 +8949,13 @@ res_notes = "AI のコメント:"
 res_close = "閉じる"
 res_filled = "ワークベンチ内のルール: {n} 件。"
 
+[sequence_ai]
+# context: Settings > AI, the page of the action that drafts or changes an action sequence from a description
+title = "Sequence drafts"
+profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
+repo_profile_help = "The profile used in this repository to draft action sequences."
+action = "Sequence draft"
+
 [rewrite_size]
 tab = "サイズ"
 intro = "履歴で容量を使っているものを調べます。最大のファイルとフォルダー、そして HEAD からは削除済みでも履歴が保持しているファイルです。行にチェックを入れると、削除ルールになります。"

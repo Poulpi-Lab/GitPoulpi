@@ -40,6 +40,7 @@ pub(crate) fn action_label(action: AiAction) -> &'static str {
         AiAction::WorktreeName => a::ACTION_WORKTREE_NAME,
         AiAction::HostingReply => a::ACTION_HOSTING_REPLY,
         AiAction::IssueBody => a::ACTION_ISSUE_BODY,
+        AiAction::SequenceDraft => gitpoulpi_i18n::msg::sequence_ai::ACTION,
     }
     .get()
 }

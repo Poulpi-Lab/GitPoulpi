@@ -8,6 +8,9 @@ use crate::{Error, Result};
 
 pub use crate::rules_answer::rewrite_rules;
 
+mod sequence_answer;
+pub use sequence_answer::{sequence_draft, SequenceProposal, StepProblem};
+
 /// A commit message split the way the composer holds it.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CommitMessage {

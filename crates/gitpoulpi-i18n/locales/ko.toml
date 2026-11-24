@@ -8943,6 +8943,13 @@ res_notes = "AI의 답변:"
 res_close = "닫기"
 res_filled = "현재 워크벤치의 규칙: {n}개."
 
+[sequence_ai]
+# context: Settings > AI, the page of the action that drafts or changes an action sequence from a description
+title = "Sequence drafts"
+profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
+repo_profile_help = "The profile used in this repository to draft action sequences."
+action = "Sequence draft"
+
 [rewrite_size]
 tab = "크기"
 intro = "기록에서 공간을 차지하는 것: 가장 큰 파일과 폴더, 그리고 HEAD에서는 삭제됐지만 기록에 아직 저장된 파일입니다. 행을 선택하면 제거 규칙이 됩니다."

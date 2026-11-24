@@ -67,6 +67,7 @@ fn action_label(action: AiAction) -> &'static str {
         AiAction::WorktreeName => action_msg::ACTION_WORKTREE_NAME,
         AiAction::HostingReply => action_msg::ACTION_HOSTING_REPLY,
         AiAction::IssueBody => action_msg::ACTION_ISSUE_BODY,
+        AiAction::SequenceDraft => gitpoulpi_i18n::msg::sequence_ai::ACTION,
     }
     .get()
 }

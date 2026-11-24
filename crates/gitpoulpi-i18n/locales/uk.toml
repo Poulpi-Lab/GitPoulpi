@@ -8951,6 +8951,13 @@ res_notes = "ШІ повідомляє:"
 res_close = "Закрити"
 res_filled = "Правил тепер у майстерні: {n}."
 
+[sequence_ai]
+# context: Settings > AI, the page of the action that drafts or changes an action sequence from a description
+title = "Sequence drafts"
+profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
+repo_profile_help = "The profile used in this repository to draft action sequences."
+action = "Sequence draft"
+
 [rewrite_size]
 tab = "Розмір"
 intro = "Що займає місце в історії: найбільші файли й папки та файли, видалені з HEAD, які історія досі зберігає. Позначте рядки, щоб зробити з них правило видалення."

@@ -8952,6 +8952,13 @@ res_notes = "YZ diyor ki:"
 res_close = "Kapat"
 res_filled = "Yeniden yazma ekranındaki kurallar: {n}."
 
+[sequence_ai]
+# context: Settings > AI, the page of the action that drafts or changes an action sequence from a description
+title = "Sequence drafts"
+profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
+repo_profile_help = "The profile used in this repository to draft action sequences."
+action = "Sequence draft"
+
 [rewrite_size]
 tab = "Boyut"
 intro = "Geçmişte yer kaplayanlar: en büyük dosyalar ve klasörler, bir de HEAD'den silinmiş ama geçmişin hâlâ sakladığı dosyalar. Satırları işaretleyip bir kaldırma kuralına dönüştürün."

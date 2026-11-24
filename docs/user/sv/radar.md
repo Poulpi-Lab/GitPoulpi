@@ -50,10 +50,15 @@ kolumnerna). Ett dubbelklick eller `Enter` på en begäran som inte är klonad f
 
 ### Begärans grenar
 
-En begärans rad visar `källa → mål` efter titeln (`alice:feature/login → main` när källgrenen ligger i en fork).
-När utrymmet är kort kapas målet först (en ellips), titeln behåller det mesta av utrymmet, och i ett smalt fönster visas
-inte grenarna; kolumnen Åtgärder skjuts aldrig ut. Håll pekaren över en kapad text för hela den. En värd som
-inte angav grenarna visar ingenting där. En ärenderad anger sitt repository i samma bricka som en begärans rad (klonens
+En begärans rad visar `källa → mål` i kolumnen **Grenar**, direkt efter repositoryt (`alice:feature/login → main`
+när källgrenen ligger i en fork); en ärenderad lämnar cellen tom, och en Radar utan någon begäran som anger sina grenar
+har ingen sådan kolumn. När cellen är för smal kapas källan först (en ellips) och målet förblir helt så länge det går.
+Kolumnen krymper innan den försvinner: i ett smalt fönster är den den sista av de valfria kolumnerna som lämnar
+(efter tillstånd, författare och ålder, före repositoryt och titeln); när den är borta finns de hela grenarna kvar i
+titelns tooltip och på statusraden för den markerade raden. En bred författarkolumn som du själv har storleksändrat viker sig
+för titeln och grenarna. Kolumnen Åtgärder skjuts aldrig ut. Håll pekaren över en kapad text för
+hela den. GitHub och Gitea listar begäranden utan deras grenar, så Radar läser dem efter listan (en gång per begäran
+tills den ändras). En värd som inte angav grenarna visar ingenting där. En ärenderad anger sitt repository i samma bricka som en begärans rad (klonens
 mappnamn, eller `owner/name` när det inte är klonat).
 
 ### Agera på värden
@@ -159,7 +164,7 @@ visas direkt och ersätts när svaren kommer.
 
 ### Kolumner
 
-Repository-chipet, `#` (nummer och kontrollmarkeringar), författaren och åldern är **kolumner som går att storleksändra**. På automatiskt är repositorykolumnen lika bred
+Repository-chipet, grenarna, `#` (nummer och kontrollmarkeringar), författaren och åldern är **kolumner som går att storleksändra**. På automatiskt är repositorykolumnen lika bred
 som det längsta namnet på skärmen (upp till 40 celler, och högst en tredjedel av fönstret), så `owner/name` och en
 kontolistas `group/sub/project` inte kapas i en vanlig terminal. Titeln får det som blir över. Ett namn som
 inte ryms slutar med en ellips (`group/sub...`), och:
@@ -168,7 +173,7 @@ inte ryms slutar med en ellips (`group/sub...`), och:
   raden så namnger statusraden under filtret också hela projektet och titeln, så tangentbordet ser
   samma sak.
 - **Dra separatorn** (cellen direkt efter repositorynamnet, efter `#`, eller strax före författaren eller åldern) för att ändra kolumnens
-  storlek; **dubbelklicka** på den för att anpassa kolumnen igen. Listan har en **rubrikrad** (repository, `#`,
+  storlek; **dubbelklicka** på den för att anpassa kolumnen igen. Listan har en **rubrikrad** (repository, grenar, `#`,
   titel, författare, ålder) och separatorerna följer `ui.column_resize` som Logs: med `line` (standard) vilar
   ett dämpat `│` i separatorn på rubrikraden, och medan pekaren står på separatorn (på rubriken eller på en rad i listan),
   medan kolumnen är vald med tangenterna, eller medan du drar, ritas en tunn accentlinje nedåt hela listan; en dragning
@@ -182,7 +187,7 @@ inte ryms slutar med en ellips (`group/sub...`), och:
   celler bredare, **`[`** smalare, **`0`** sätter tillbaka alla kolumner till automatiskt, `Esc` lämnar. Paletten har
   samma: `Radar: Välj kolumn`, `Radar: Bredda kolumnen`, `Radar: Smalna av kolumnen`, `Radar: Återställ kolumnbredder`.
 
-Bredderna sparas i `radar.toml` (`[columns]`, `repo`, `number`, `author` och `age`, i celler) och finns kvar efter en omstart. Det är
+Bredderna sparas i `radar.toml` (`[columns]`, `repo`, `branches`, `number`, `author` och `age`, i celler; en fil utan `branches` läses in som förut, och kolumnen anpassas då till sitt innehåll upp till 28 celler) och finns kvar efter en omstart. Det är
 samma storleksgester som för Logs kolumner.
 
 ### Kontroller och konflikter
@@ -221,18 +226,26 @@ Stängda och sammanslagna begäranden och stängda ärenden listas inte.
 
 ## Vyer och filter
 
-Tre listor och ett textfält avgränsar listan. Varje val är en rullgardinslista:
+Fyra listor och ett textfält avgränsar listan. Varje val är en rullgardinslista:
 klicka på den, eller använd dess tangent.
 
 - **Vy** (`v`): Allt, begäranden, Ärenden, WIP (pågående arbete), Snoozade.
 - **Visa** (`f`): Alla, Mina (begäranden du skrev, ärenden du skapade),
   Tilldelade mig, Granskning begärd, Nämner mig.
 - **Omfång** (`w`): se ovan.
+- **Profil** (`P`): Alla profiler, eller en integrationsprofil under Inställningar > Integrationer (med det namn
+  Inställningar ger den, med leverantören tillagd när två profiler har samma namn). Den begränsar varje
+  sektion, både repositoriesens rader och de kontoövergripande raderna, till den profilens rader (en
+  WIP-rad har ingen profil, så en vald profil döljer den). En profil i taget. Valet
+  sparas i `radar.toml`; en profil som inte längre finns faller tillbaka på Alla profiler.
+  Rullgardinslistan finns alltid, som de tre andra, och ett smalt fönster förkortar den (och sedan
+  etiketterna) i stället för att ta bort den. Palett: `Radar: Filtrera efter profil...`. När profilen döljer
+  allt säger den tomma listan det.
 - **Filtertext** (`/` eller `Ctrl+F`): fuzzy-matchning på repository, nummer,
   titel, författare, gren och etiketter. `Enter` ger tillbaka tangenterna till
   listan och behåller texten, `Esc` rensar den.
 
-`Ctrl+N` visar ett märke på filtret, varje rullgardinslista, knapparna Uppdatera och Tillbaka och varje sektionsrubrik på skärmen. Tryck på märkets tecken: filtret får tangentbordet, en rullgardinslista öppnas, en knapp körs och en rubrik får markeringen (`Enter` eller `Space` viker ihop den sedan). `Esc` avbryter. Se [Märken](keybindings.md#märken).
+`Ctrl+N` visar ett märke på filtret, var och en av de fyra rullgardinslistorna, knapparna Uppdatera och Tillbaka och varje sektionsrubrik på skärmen. Tryck på märkets tecken: filtret får tangentbordet, en rullgardinslista öppnas, en knapp körs och en rubrik får markeringen (`Enter` eller `Space` viker ihop den sedan). `Esc` avbryter. Se [Märken](keybindings.md#märken).
 
 ## Åtgärder
 

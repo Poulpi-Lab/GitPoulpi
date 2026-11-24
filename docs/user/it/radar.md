@@ -50,10 +50,15 @@ una delle colonne ridimensionabili). Un doppio clic o `Enter` su una richiesta n
 
 ### I branch di una richiesta
 
-Una riga di richiesta mostra `origine → destinazione` dopo il suo titolo (`alice:feature/login → main` quando il branch di origine è in un fork).
-Quando lo spazio è poco la destinazione viene tagliata per prima (puntini di sospensione), il titolo mantiene la maggior parte dello spazio, e in una finestra stretta i
-branch non vengono mostrati; la colonna Azioni non viene mai spinta fuori. Fermati con il puntatore su un testo tagliato per vederlo per intero. Un host che
-non ha indicato i branch non mostra nulla lì. Una riga di issue indica il suo repository nello stesso chip di una riga di richiesta (il
+Una riga di richiesta mostra `origine → destinazione` nella colonna **Branch**, subito dopo il repository (`alice:feature/login → main`
+quando il branch di origine è in un fork); una riga di issue lascia la cella vuota, e un Radar senza alcuna richiesta che indichi i
+suoi branch non ha questa colonna. Quando la cella è troppo stretta l'origine viene tagliata per prima (puntini di sospensione) e la
+destinazione resta intera finché possibile. La colonna si restringe prima di sparire: in una finestra stretta è l'ultima delle
+colonne facoltative a uscire (dopo lo stato, l'autore e l'età, prima del repository e del titolo); una volta sparita, i branch
+completi restano nel tooltip del titolo e sulla barra di stato della riga selezionata. Una colonna autore larga, dimensionata da te,
+cede il posto al titolo e ai branch. La colonna Azioni non viene mai spinta fuori. Fermati con il puntatore su un testo tagliato per
+vederlo per intero. GitHub e Gitea elencano le richieste senza i loro branch, quindi il Radar li legge dopo l'elenco (una volta per
+richiesta finché non cambia). Un host che non ha indicato i branch non mostra nulla lì. Una riga di issue indica il suo repository nello stesso chip di una riga di richiesta (il
 nome della cartella del clone, o `owner/name` quando non è clonato).
 
 ### Agire sull'host
@@ -171,7 +176,7 @@ risposte.
 
 ### Colonne
 
-Il chip del repository, il `#` (numero e segni di controllo), l'autore e l'età sono **colonne ridimensionabili**. Lasciata in automatico, la colonna del repository è
+Il chip del repository, i branch, il `#` (numero e segni di controllo), l'autore e l'età sono **colonne ridimensionabili**. Lasciata in automatico, la colonna del repository è
 larga quanto il nome più lungo a schermo (fino a 40 celle, e al massimo un terzo della finestra), così `owner/name` e il
 `group/sub/project` di un elenco di account non vengono tagliati su un terminale normale. Il titolo prende ciò che resta.
 Un nome che non entra termina con i puntini (`group/sub...`), e:
@@ -180,7 +185,7 @@ Un nome che non entra termina con i puntini (`group/sub...`), e:
   testo intero. Selezionando la riga, anche la barra di stato sotto il filtro riporta il progetto e il titolo completi,
   così la tastiera vede la stessa cosa.
 - **Trascinando il separatore** (la cella subito dopo il nome del repository, dopo il `#`, o appena prima dell'autore o dell'età) si ridimensiona
-  la colonna; con il **doppio clic** la colonna torna adattata. L'elenco ha una **riga d'intestazione** (repository, `#`,
+  la colonna; con il **doppio clic** la colonna torna adattata. L'elenco ha una **riga d'intestazione** (repository, branch, `#`,
   titolo, autore, età) e i separatori seguono `ui.column_resize` come quelli del Log: con `line` (il valore
   predefinito) un `│` attenuato sta nel separatore sulla riga d'intestazione e, mentre il puntatore è sul separatore
   (sull'intestazione o su una qualsiasi riga dell'elenco), la colonna è scelta con i tasti o stai trascinando, una linea sottile d'accento viene
@@ -194,7 +199,7 @@ Un nome che non entra termina con i puntini (`group/sub...`), e:
   celle, **`[`** la restringe, **`0`** rimette ogni colonna in automatico, `Esc` esce. La palette ha le stesse voci:
   `Radar: Scegli colonna`, `Radar: Allarga colonna`, `Radar: Restringi colonna`, `Radar: Reimposta larghezze colonne`.
 
-Le larghezze sono conservate in `radar.toml` (`[columns]`, `repo`, `number`, `author` e `age`, in celle) e restano dopo un riavvio. Sono
+Le larghezze sono conservate in `radar.toml` (`[columns]`, `repo`, `branches`, `number`, `author` e `age`, in celle; un file senza `branches` si carica come prima, la colonna si adatta allora al contenuto fino a 28 celle) e restano dopo un riavvio. Sono
 gli stessi gesti di ridimensionamento delle colonne del Log.
 
 ### Controlli e conflitti
@@ -238,18 +243,26 @@ Le richieste chiuse e unite e le issue chiuse non sono elencate.
 
 ## Viste e filtri
 
-Tre caselle combinate e un campo di testo restringono l'elenco. Ogni scelta è un menu
+Quattro caselle combinate e un campo di testo restringono l'elenco. Ogni scelta è un menu
 a discesa: cliccalo, oppure usa il suo tasto.
 
 - **Vista** (`v`): Tutto, richieste, Issue, WIP (lavoro in corso), Rimandati.
 - **Mostra** (`f`): Tutti, Miei (richieste che hai scritto, issue che hai create),
   Assegnati a me, Revisione richiesta, Che mi menzionano.
 - **Ambito** (`w`): vedi sopra.
+- **Profilo** (`P`): Tutti i profili, oppure un profilo di integrazione di Impostazioni > Integrazioni
+  (con il nome che gli dà Impostazioni, con il provider aggiunto quando due profili hanno lo stesso nome).
+  Restringe ogni sezione, le righe dei repository e quelle dell'intero account, alle righe di quel profilo
+  (una riga di lavoro in corso non ha profilo, quindi un profilo scelto la nasconde). Un profilo alla volta.
+  La scelta è conservata in `radar.toml`; un profilo che non esiste più torna a Tutti i profili.
+  La casella combinata c'è sempre, come le altre tre, e una finestra stretta la accorcia (e poi le
+  etichette) invece di toglierla. Palette: `Radar: Filtra per profilo...`. Quando il profilo nasconde
+  tutto, l'elenco vuoto lo dice.
 - **Testo del filtro** (`/` o `Ctrl+F`): corrispondenza fuzzy su repository, numero,
   titolo, autore, branch ed etichette. `Enter` ridà i tasti all'elenco e conserva il
   testo, `Esc` lo cancella.
 
-`Ctrl+N` mostra un badge sul filtro, su ogni casella combinata, sui pulsanti
+`Ctrl+N` mostra un badge sul filtro, su ognuna delle quattro caselle combinate, sui pulsanti
 Aggiorna e Indietro e su ogni titolo di sezione sullo schermo. Premi il carattere
 di un badge: il filtro riceve la tastiera, una casella combinata si apre, un
 pulsante viene eseguito e un titolo riceve la selezione (`Enter` o `Space` la

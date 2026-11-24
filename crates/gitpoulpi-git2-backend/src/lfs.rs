@@ -42,12 +42,16 @@ pub fn is_active(repo: &RepoRef) -> bool {
 }
 
 /// See `GitBackend::lfs_files`. Same rules as the system-git twin: an
-/// empty answer unless the root `.gitattributes` / `info/attributes`
-/// mention `filter=lfs` or an LFS object store exists.
+/// empty index answer unless the root `.gitattributes` / `info/attributes`
+/// mention `filter=lfs` or an LFS object store exists; a commit is always
+/// scanned.
 pub fn lfs_files(repo: &RepoRef, at: Option<Oid>) -> Result<Vec<LfsFile>> {
     let git = open(repo)?;
     let common = gitpoulpi_core::paths::common_dir(git.path());
-    if !uses_lfs(repo, &common) {
+    // The gate only spares the index scan: a revision is asked about for
+    // what it holds (its `.gitattributes` may differ from the checked-out
+    // one), and the scan is bounded by the pointer size.
+    if at.is_none() && !uses_lfs(repo, &common) {
         return Ok(Vec::new());
     }
 

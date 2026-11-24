@@ -160,6 +160,7 @@ pub(super) async fn commit_files_worker(
                     files,
                     tree: None,
                     hunks_pending,
+                    lfs: None,
                 });
             });
             continue;
@@ -224,6 +225,34 @@ pub(super) async fn commit_files_worker(
     }
 }
 
+/// The paths that are Git LFS pointers in `commit`'s tree, cached per
+/// revision. `None` when LFS is off, the build has none, or the read failed
+/// (the pane then falls back to the index's set). Needs no `git-lfs`
+/// program: it reads blobs.
+async fn revision_lfs(
+    conn: &LinkConn,
+    cache: &SharedCommitFilesCache,
+    commit: Oid,
+) -> Option<Arc<std::collections::HashSet<PathBuf>>> {
+    if !crate::lfs_ui::resolved_enabled(&conn.repo.root) {
+        return None;
+    }
+    if let Some(held) = cache.lock().unwrap().lfs(commit) {
+        return Some(held);
+    }
+    let files = conn
+        .call::<Vec<gitpoulpi_core::domain::LfsFile>>(
+            OperationKind::LfsFiles,
+            serde_json::json!({ "at": commit }),
+        )
+        .await
+        .ok()?;
+    let set: Arc<std::collections::HashSet<PathBuf>> =
+        Arc::new(files.into_iter().map(|f| f.path).collect());
+    cache.lock().unwrap().insert_lfs(commit, set.clone());
+    Some(set)
+}
+
 /// Answers one fetch someone is waiting on. See [`commit_files_worker`].
 pub(super) async fn serve_commit_files(
     conn: &LinkConn,
@@ -251,11 +280,17 @@ pub(super) async fn serve_commit_files(
     if let Some((files, tree)) = hit {
         log("cache hit");
         let hunks_pending = cache.lock().unwrap().is_lazy(commit);
+        let lfs = if with_tree {
+            revision_lfs(conn, cache, commit).await
+        } else {
+            None
+        };
         let _ = out_tx.send_notify(CommitFilesOutcome {
             commit,
             files: Ok(files),
             tree: tree.map(Ok),
             hunks_pending,
+            lfs,
         });
         return;
     }
@@ -299,6 +334,7 @@ pub(super) async fn serve_commit_files(
                             files: Ok(list.files),
                             tree: None,
                             hunks_pending: true,
+                            lfs: None,
                         });
                         return;
                     }
@@ -309,19 +345,23 @@ pub(super) async fn serve_commit_files(
         }
     };
 
-    let tree = if with_tree {
-        let tree = conn
-            .call::<Vec<PathBuf>>(OperationKind::ListTree, serde_json::json!({ "at": commit }))
-            .await;
+    let (tree, lfs) = if with_tree {
+        // The LFS files of that revision are read beside the listing, never
+        // on the render thread: `View all files` offers `LFS only` for what
+        // the viewed tree holds, not for what the index holds.
+        let (tree, lfs) = tokio::join!(
+            conn.call::<Vec<PathBuf>>(OperationKind::ListTree, serde_json::json!({ "at": commit })),
+            revision_lfs(conn, cache, commit)
+        );
         if let Ok(tree) = &tree {
             cache
                 .lock()
                 .unwrap()
                 .insert(commit, None, Some(tree.clone()));
         }
-        Some(tree)
+        (Some(tree), lfs)
     } else {
-        None
+        (None, None)
     };
     log("full");
     let _ = out_tx.send_notify(CommitFilesOutcome {
@@ -329,5 +369,6 @@ pub(super) async fn serve_commit_files(
         files,
         tree,
         hunks_pending: lazy,
+        lfs,
     });
 }

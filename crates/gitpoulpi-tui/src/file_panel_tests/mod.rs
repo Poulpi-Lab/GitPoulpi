@@ -24,6 +24,7 @@ fn outcome(changed: &[&str]) -> CommitFilesOutcome {
             .collect()),
         tree: None,
         hunks_pending: false,
+        lfs: None,
     }
 }
 

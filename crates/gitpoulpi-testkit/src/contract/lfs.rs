@@ -193,6 +193,29 @@ pub fn check_lfs_files_at_a_commit(backend: &dyn GitBackend) {
     assert_eq!(names, ["a.bin", "b.bin"]);
 }
 
+/// A commit's pointers are listed whatever the checked-out attributes say
+/// and without the `git-lfs` program: the View all files LFS filter asks
+/// about a revision other than the one in the index (another branch, a
+/// file since deleted). The index answer stays empty for a repository that
+/// does not route files through LFS.
+pub fn check_lfs_files_at_a_commit_needs_no_attributes_or_program(backend: &dyn GitBackend) {
+    let oid = "b".repeat(64);
+    let repo = TestRepoBuilder::new()
+        .commit_pointer_text("assets/logo.png", &oid, 777, "add pointer")
+        .build();
+    let repo_ref = repo.repo_ref();
+    let head = head_oid(backend, &repo_ref);
+    let at = backend.lfs_files(&repo_ref, Some(head)).unwrap();
+    assert_eq!(at.len(), 1, "{at:?}");
+    assert_eq!(at[0].path, std::path::Path::new("assets/logo.png"));
+    assert_eq!(at[0].pointer.size, 777);
+    assert!(!at[0].local);
+    assert!(
+        backend.lfs_files(&repo_ref, None).unwrap().is_empty(),
+        "no attributes and no store: the index scan is skipped"
+    );
+}
+
 // -- Git LFS: routing (libgit2 has no smudge filter) ---------------------
 //
 // In a repository that uses LFS, an operation that writes the working

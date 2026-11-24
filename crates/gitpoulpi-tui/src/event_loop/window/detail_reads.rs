@@ -190,6 +190,21 @@ impl WindowState {
                 self.commit_files = Some(outcome);
             }
         }
+        // `LFS only` under `View all files` answers for the viewed revision:
+        // its LFS paths ride with the tree (None until they arrive, then the
+        // index's set stands in).
+        let viewed_lfs = self
+            .commit_files
+            .as_ref()
+            .filter(|o| {
+                self.view_all_files
+                    && self.compare.is_none()
+                    && self.right_panel == RightPanel::CommitDetail
+                    && Some(o.commit) == self.requested_commit_files
+                    && matches!(o.tree, Some(Ok(_)))
+            })
+            .and_then(|o| o.lfs.clone());
+        self.lfs.set_viewed(viewed_lfs);
 
         // The working tree's own diff, for the half the Diff view is
         // showing. Re-asked whenever the open half changes and again on

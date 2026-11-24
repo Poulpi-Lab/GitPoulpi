@@ -3277,6 +3277,12 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::FilesToggleViewAll,
     ),
     entry(
+        msg::palette::FILES_TOGGLE_LFS_ONLY,
+        "o",
+        PaletteCommand::FilesToggleLfsOnly,
+    )
+    .requires(crate::build_features::Feature::Lfs),
+    entry(
         msg::palette::COMMIT_TOGGLE_SKIP_HOOKS,
         "",
         PaletteCommand::CommitToggleSkipHooks,

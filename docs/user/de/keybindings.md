@@ -151,6 +151,7 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Dateien: Pfad oder Baum | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | Dateien: Alle Dateien ansehen | `a` |
 | `log` | `compare_selection` | Ausgewählte Zeilen vergleichen | `v` |
 | `log` | `compare_swap` | Vergleichsenden tauschen | `x` |
@@ -181,6 +182,7 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Auf die Commit-Nachricht fokussieren | `c` |
 | `status` | `toggle_file_mode` | Dateien: Pfad oder Baum | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | Dateien: Alle Dateien ansehen | `a` |
 | `status` | `amend` | Amend umschalten | `Shift+A` |
 | `status` | `skip_hooks` | Hooks überspringen umschalten | `Shift+H` |
@@ -1098,6 +1100,7 @@ die Standardtasten.
 | Diff: Nur Hunks umschalten (ganze Datei / nur die Änderungen) | `H` |
 | Dateien: Pfad/Baum umschalten | `m` |
 | Dateien: Alle Dateien ansehen umschalten | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit: Hooks überspringen umschalten | `H` |
 | Dateien: Menü der Zeile oder Auswahl öffnen | `.` |
 | Dateien: Alle Ordner aufklappen | `=` |

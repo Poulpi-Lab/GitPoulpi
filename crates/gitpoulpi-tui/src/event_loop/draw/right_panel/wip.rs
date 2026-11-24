@@ -124,6 +124,7 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
             status_list_mode,
             collapse,
             Some(view_all_files),
+            lfs.has_files().then(|| lfs.only()),
             hovered_target.as_ref(),
             has_unstaged_changes,
         );

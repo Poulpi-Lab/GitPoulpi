@@ -138,6 +138,7 @@ stage_file = "z"
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | ファイル：パスまたはツリー | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | ファイル：すべてのファイルを表示 | `a` |
 | `log` | `compare_selection` | 選択した行を比較 | `v` |
 | `log` | `compare_swap` | 比較の両端を入れ替え | `x` |
@@ -168,6 +169,7 @@ stage_file = "z"
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Commitメッセージ欄にフォーカス | `c` |
 | `status` | `toggle_file_mode` | ファイル：パスまたはツリー | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | ファイル：すべてのファイルを表示 | `a` |
 | `status` | `amend` | Amend の切り替え | `Shift+A` |
 | `status` | `skip_hooks` | フックのスキップを切り替え | `Shift+H` |
@@ -1069,6 +1071,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Diff: ハンクのみを切り替え（ファイル全体／変更のみ） | `H` |
 | ファイル: パス/ツリーを切り替え | `m` |
 | ファイル: すべてのファイルの表示を切り替え | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit: フックのスキップを切り替え | `H` |
 | ファイル: 行または選択範囲のメニューを開く | `.` |
 | ファイル: すべてのフォルダーを展開 | `=` |

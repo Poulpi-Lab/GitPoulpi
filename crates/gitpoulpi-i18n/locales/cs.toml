@@ -2465,11 +2465,13 @@ refs_mark_drop = "Označit jako zdroj přetažení"
 refs_drop_marked = "Pustit sem označený ref"
 log_toggle_file_mode = "Soubory: Cesta nebo strom"
 log_view_all_files = "Soubory: Zobrazit všechny soubory"
+log_lfs_only = "Files: LFS Only"
 log_files_collapse_all = "Sbalit nebo rozbalit všechny složky"
 log_files_filter = "Filtrovat změněné soubory"
 status_compose = "Přejít na zprávu commitu"
 status_toggle_file_mode = "Soubory: Cesta nebo strom"
 status_view_all_files = "Soubory: Zobrazit všechny soubory"
+status_lfs_only = "Files: LFS Only"
 status_amend = "Přepnout Amend"
 status_collapse_all = "Sbalit nebo rozbalit všechny složky"
 status_stage_toggle = { git = "Stage nebo unstage vybraný řádek", local = "Přidat vybraný řádek do indexu nebo ho odebrat" }
@@ -3444,6 +3446,7 @@ diff_layout_split_before_and_after = { git = "Diff: Rozvržení vedle sebe (pře
 diff_toggle_hunks_only_whole_file_only_the_changes = { git = "Diff: Přepnout jen hunky (celý soubor / jen změny)", local = "Rozdíly: Přepnout jen hunky (celý soubor / jen změny)" }
 files_toggle_path_tree = "Soubory: Přepnout cesta/strom"
 files_toggle_view_all_files = "Soubory: Přepnout zobrazení všech souborů"
+files_toggle_lfs_only = "Files: Toggle LFS Only"
 files_open_menu = "Soubory: Otevřít nabídku řádku nebo výběru"
 files_select_all = "Soubory: Vybrat vše"
 files_clear_selection = "Soubory: Zrušit výběr"
@@ -3549,6 +3552,7 @@ why_no_uncommitted_changes_the_wip_row_appears_once = "žádné necommitnuté zm
 why_there_are_no_stashes = { git = "nejsou žádné stashe", local = "nejsou žádné odložené změny" }
 why_select_a_changed_file_in_the_commit_detail_pane = "nejdřív vyberte změněný soubor v panelu detailu commitu"
 why_this_repository_has_no_remote_add_one_first = "tento repozitář nemá žádný remote - nejdřív ho přidejte"
+why_this_repository_has_no_lfs_files = "this repository has no LFS files"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a = { git = "otevřete soubor z panelu {$unstaged_files} - diff commitu nemá index, do kterého by se přidávalo", local = "otevřete soubor z panelu {$unstaged_files} - rozdíl commitu nemá index, do kterého by se přidávalo" }
 why_this_diff_is_the_staged_half_use_the_unstage = { git = "tento diff je panel {$staged_files}; použijte příkaz Unstage", local = "tento rozdíl je panel {$staged_files}; použijte příkaz Odebrat z indexu" }
 why_open_a_file_from_the_third_pane_s_unstaged_half_a_2 = { git = "otevřete soubor z panelu {$unstaged_files} - diff commitu nemá žádnou změnu pracovního stromu, kterou by šlo zahodit", local = "otevřete soubor z panelu {$unstaged_files} - rozdíl commitu nemá žádnou změnu pracovního stromu, kterou by šlo zahodit" }
@@ -3971,6 +3975,7 @@ status_pane_working_3 = "sbalí/rozbalí aktivní podpanel"
 status_pane_working_4 = { git = "stage/unstage vybraného souboru, nebo sbalí řádek složky (režim Strom)", local = "přidá/odebere vybraný soubor do/z indexu, nebo sbalí řádek složky (režim Strom)" }
 status_pane_working_5 = "přepne seznam souborů mezi Cesta (plochý) a Strom (složky)"
 status_pane_working_6 = "přepne Zobrazit všechny soubory (panel Stav / řádek WIP, nebo změněné soubory commitu; paleta: Soubory: Přepnout cesta/strom a Soubory: Přepnout zobrazení všech souborů)"
+status_pane_working_lfs_only = "toggle LFS only: in a repository that has LFS files, the file lists show only those ({{log.lfs_only}} with the Log focused; palette: Files: Toggle LFS Only)"
 status_pane_working_7 = "sbalí všechny složky, nebo je znovu rozbalí, jsou-li některé sbaleny"
 status_pane_working_8 = { git = "nabídka vybraného souboru: Stage/Unstage, Zahodit změny (s potvrzením), Kopírovat cestu souboru opravdu fungují; Historie souboru/Blame otevřou soubor uprostřed; ostatní jsou zobrazeny ztlumeně s tím, co potřebují", local = "nabídka vybraného souboru: Přidat/Odebrat z indexu, Zahodit změny (s potvrzením), Kopírovat cestu souboru opravdu fungují; Historie souboru/Blame otevřou soubor uprostřed; ostatní jsou zobrazeny ztlumeně s tím, co potřebují" }
 status_pane_working_9 = "filtruje změněné soubory commitu podle názvu (jen uvnitř seznamu souborů commitu, ne ve Stavu)"
@@ -4611,6 +4616,7 @@ diff_error = { git = "chyba diffu: {error}", local = "chyba rozdílu: {error}" }
 mode_path = "Cesta"
 mode_tree = "Strom"
 view_all_files = "Zobrazit všechny soubory"
+lfs_only = "LFS only"
 filter_files = "Filtr souborů: "
 all_files = "Všechny soubory"
 changed_files = "Změněné soubory"
@@ -4627,6 +4633,7 @@ tree_view = "Zobrazení Strom{hint}"
 collapse_all = "Sbalit vše"
 expand_all = "Rozbalit vše"
 view_all_files = "Zobrazit všechny soubory{key}"
+lfs_only = "LFS only{key}"
 
 [autostash]
 reason_checkout = "checkoutem"

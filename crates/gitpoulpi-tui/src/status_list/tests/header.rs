@@ -33,6 +33,7 @@ fn draw_status_toolbar_with(
                 FileListMode::Tree,
                 Some(true),
                 None,
+                None,
                 hovered,
                 has_unstaged_changes,
             );

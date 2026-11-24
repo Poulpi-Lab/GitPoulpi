@@ -2469,11 +2469,13 @@ refs_mark_drop = "Marquer comme source de dépôt"
 refs_drop_marked = "Déposer la ref marquée ici"
 log_toggle_file_mode = "Fichiers : chemin ou arbre"
 log_view_all_files = "Fichiers : voir tous les fichiers"
+log_lfs_only = "Fichiers : LFS uniquement"
 log_files_collapse_all = "Replier ou déplier tous les dossiers"
 log_files_filter = "Filtrer les fichiers modifiés"
 status_compose = "Aller au message de {$commit}"
 status_toggle_file_mode = "Fichiers : chemin ou arbre"
 status_view_all_files = "Fichiers : voir tous les fichiers"
+status_lfs_only = "Fichiers : LFS uniquement"
 status_amend = "Basculer l'amendement"
 status_collapse_all = "Replier ou déplier tous les dossiers"
 status_stage_toggle = { git = "Stage ou unstager la ligne sélectionnée", local = "Indexer ou désindexer la ligne sélectionnée" }
@@ -3448,6 +3450,7 @@ diff_layout_split_before_and_after = "{$Diff} : Disposition côte à côte (ava
 diff_toggle_hunks_only_whole_file_only_the_changes = "{$Diff} : Hunks seulement ou fichier entier"
 files_toggle_path_tree = "Fichiers : Basculer chemin / arborescence"
 files_toggle_view_all_files = "Fichiers : Basculer l'affichage de tous les fichiers"
+files_toggle_lfs_only = "Fichiers : Basculer LFS uniquement"
 files_open_menu = "Fichiers : Ouvrir le menu de la ligne ou de la sélection"
 files_select_all = "Fichiers : Tout sélectionner"
 files_clear_selection = "Fichiers : Effacer la sélection"
@@ -3553,6 +3556,7 @@ why_no_uncommitted_changes_the_wip_row_appears_once = "aucune modification non v
 why_there_are_no_stashes = { git = "il n'y a aucun {$stash}", local = "il n'y a aucune {$stash}" }
 why_select_a_changed_file_in_the_commit_detail_pane = { git = "sélectionnez d'abord un fichier modifié dans le volet de détails du commit", local = "sélectionnez d'abord un fichier modifié dans le volet de détails de la validation" }
 why_this_repository_has_no_remote_add_one_first = "ce dépôt n'a aucun distant - ajoutez-en un d'abord"
+why_this_repository_has_no_lfs_files = "ce dépôt n'a aucun fichier LFS"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a = { git = "ouvrez un fichier depuis le volet {$unstaged_files} - le {$diff} d'un commit n'a pas d'index où stager", local = "ouvrez un fichier depuis le volet {$unstaged_files} - le {$diff} d'une validation n'a pas d'index où indexer" }
 why_this_diff_is_the_staged_half_use_the_unstage = { git = "ce {$diff} vient du volet {$staged_files} ; utilisez la commande Unstage", local = "ce {$diff} vient du volet {$staged_files} ; utilisez la commande Désindexer" }
 why_open_a_file_from_the_third_pane_s_unstaged_half_a_2 = { git = "ouvrez un fichier depuis le volet {$unstaged_files} - le {$diff} d'un commit n'a aucune modification locale à abandonner", local = "ouvrez un fichier depuis le volet {$unstaged_files} - le {$diff} d'une validation n'a aucune modification locale à abandonner" }
@@ -3975,6 +3979,7 @@ status_pane_working_3 = "replie/déplie le sous-volet actif"
 status_pane_working_4 = { git = "{$stage}/{$unstage} du fichier sélectionné, ou replie une ligne de dossier (mode Arbre)", local = "indexe/désindexe le fichier sélectionné, ou replie une ligne de dossier (mode Arbre)" }
 status_pane_working_5 = "bascule la liste de fichiers entre Chemins (à plat) et Arbre (dossiers)"
 status_pane_working_6 = { git = "bascule Tous les fichiers (volet Status / ligne WIP, ou fichiers modifiés d'un {$commit} ; palette : « Fichiers : Basculer chemin / arborescence » et « Fichiers : Basculer l'affichage de tous les fichiers »)", local = "bascule Tous les fichiers (volet Status / ligne WIP, ou fichiers modifiés d'une validation ; palette : « Fichiers : Basculer chemin / arborescence » et « Fichiers : Basculer l'affichage de tous les fichiers »)" }
+status_pane_working_lfs_only = "bascule LFS uniquement : dans un dépôt qui a des fichiers LFS, les listes de fichiers ne montrent que ceux-ci ({{log.lfs_only}} avec le Log au focus ; palette : « Fichiers : Basculer LFS uniquement »)"
 status_pane_working_7 = "replie tous les dossiers, ou les redéplie si certains sont repliés"
 status_pane_working_8 = { git = "le menu du fichier sélectionné : {$Stage}/{$Unstage}, Abandonner les modifications (avec confirmation), Copier le chemin du fichier ; Historique du fichier / Blame du fichier ouvrent le fichier au centre ; le reste est grisé, avec ce qu'il lui manque", local = "le menu du fichier sélectionné : Indexer/Désindexer, Abandonner les modifications (avec confirmation), Copier le chemin du fichier ; Historique du fichier / Blame du fichier ouvrent le fichier au centre ; le reste est grisé, avec ce qu'il lui manque" }
 status_pane_working_9 = { git = "filtre par nom les fichiers modifiés d'un {$commit} (seulement dans la liste de fichiers d'un {$commit}, pas dans Status)", local = "filtre par nom les fichiers modifiés d'une validation (seulement dans la liste de fichiers d'une validation, pas dans Status)" }
@@ -4619,6 +4624,7 @@ diff_error = "erreur de {$diff} : {error}"
 mode_path = "Chemins"
 mode_tree = "Arbre"
 view_all_files = "Tous les fichiers"
+lfs_only = "LFS uniquement"
 filter_files = "Filtrer les fichiers : "
 all_files = "Tous les fichiers"
 changed_files = "Fichiers modifiés"
@@ -4635,6 +4641,7 @@ tree_view = "Vue arbre{hint}"
 collapse_all = "Tout replier"
 expand_all = "Tout déplier"
 view_all_files = "Tous les fichiers{key}"
+lfs_only = "LFS uniquement{key}"
 
 [autostash]
 reason_checkout = "le changement de branche"

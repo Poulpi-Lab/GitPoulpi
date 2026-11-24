@@ -173,6 +173,7 @@ fn hover_style_for(target: &HitTarget) -> HoverKind {
         HitTarget::StatusExplainButton => {
             Required("status_list.rs render_status_header_buttons' hover_style")
         }
+        HitTarget::LfsOnlyCheckbox => Required("the LFS only checkbox label span"),
         HitTarget::ViewAllFilesCheckbox => {
             Required("event_loop.rs hover_style on the checkbox label span")
         }
@@ -525,6 +526,7 @@ fn sample_hit_targets() -> Vec<HitTarget> {
         HitTarget::WipMessageField,
         HitTarget::CommitFilterField,
         HitTarget::ViewAllFilesCheckbox,
+        HitTarget::LfsOnlyCheckbox,
         HitTarget::ConfirmButton(true),
         HitTarget::ConfirmClose,
         HitTarget::RefNameBox(crate::ref_name_box::RefNamePart::Confirm),

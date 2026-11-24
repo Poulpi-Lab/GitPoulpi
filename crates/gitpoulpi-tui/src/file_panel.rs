@@ -902,7 +902,7 @@ impl WipAllFiles {
             .map(|(_, t)| t.as_slice())
             .unwrap_or(&[]);
         self.paths = wip_all_paths(head_tree, status);
-        self.rows = build_tree_rows(&self.paths, mode, collapsed, "");
+        self.rows = build_tree_rows_lfs(&self.paths, mode, collapsed, "");
         let loading = self.head_tree.is_none();
         let title = if loading {
             msg::ALL_FILES_LOADING.get().to_string()
@@ -1034,11 +1034,17 @@ pub(crate) fn wip_row_item(
             depth,
             label,
             collapsed,
+            files,
             ..
         } => {
             let chevron = crate::fold_mark::glyph(*collapsed);
-            ListItem::new(Line::from(Span::styled(
-                format!("{}{chevron} {label}/", "  ".repeat(*depth)),
+            ListItem::new(Line::from(crate::status_pane::folder_spans(
+                *depth,
+                chevron,
+                label,
+                *files,
+                None,
+                0,
                 Style::default()
                     .fg(th().ui.muted)
                     .add_modifier(Modifier::BOLD),

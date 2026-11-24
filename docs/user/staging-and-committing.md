@@ -32,7 +32,14 @@ the working changes:
   report `renamed_from`.
 - **Path** or **Tree** (`m`) lists files flat or in folders. **Collapse all**
   (`z`) folds the folders. **View all files** (`a`) shows the whole tree
-  instead of only the changed files. Right-click the list's empty space for
+  instead of only the changed files. A collapsed folder shows, after its name, a
+  small muted count of the files inside it, subfolders included (`src/ (12)`);
+  an open folder shows none. In a narrow pane the name is shortened first so the
+  count stays in view. In a repository that has files stored with Git LFS an
+  **LFS only** checkbox (`o`, or **Files: Toggle LFS Only**) narrows every file
+  list (Unstaged, Staged, **View all files**, a commit's files) to those files;
+  the folder counts follow, and it is not offered when no file uses LFS.
+  Right-click the list's empty space for
   **Expand all** / **Collapse all**, a folder row for **Expand all subfolders** /
   **Collapse all subfolders**; keys `=`, `-`, `*`, `_` (see
   [Mouse and gestures](mouse-and-gestures.md)).

@@ -155,6 +155,7 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | File: percorso o albero | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | File: vedi tutti i file | `a` |
 | `log` | `compare_selection` | Confronta le righe selezionate | `v` |
 | `log` | `compare_swap` | Inverti gli estremi del confronto | `x` |
@@ -185,6 +186,7 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Porta il focus sul messaggio di commit | `c` |
 | `status` | `toggle_file_mode` | File: percorso o albero | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | File: vedi tutti i file | `a` |
 | `status` | `amend` | Attiva o disattiva amend | `Shift+A` |
 | `status` | `skip_hooks` | Attiva o disattiva «Salta gli hook» | `Shift+H` |
@@ -1107,6 +1109,7 @@ applicano. I tasti sono quelli predefiniti.
 | Diff: Solo hunk (file intero / solo le modifiche) | `H` |
 | File: Percorso/Albero | `m` |
 | File: Vedi tutti i file | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit: Attiva o disattiva «Salta gli hook» | `H` |
 | File: Apri il menu della riga o della selezione | `.` |
 | File: Espandi tutte le cartelle | `=` |

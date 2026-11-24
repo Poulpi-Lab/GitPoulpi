@@ -154,6 +154,7 @@ Varje tangent du kan binda om, med id:t som används i
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Filer: sökväg eller träd | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | Filer: visa alla filer | `a` |
 | `log` | `compare_selection` | Jämför de markerade raderna | `v` |
 | `log` | `compare_swap` | Byt plats på jämförelsens ändar | `x` |
@@ -184,6 +185,7 @@ Varje tangent du kan binda om, med id:t som används i
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Fokusera commit-meddelandet | `c` |
 | `status` | `toggle_file_mode` | Filer: sökväg eller träd | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | Filer: visa alla filer | `a` |
 | `status` | `amend` | Växla amend | `Shift+A` |
 | `status` | `skip_hooks` | Växla att hoppa över hooks | `Shift+H` |
@@ -1105,6 +1107,7 @@ Tangenterna är standardvärdena.
 | Diff: Växla bara hunks (hela filen / bara ändringarna) | `H` |
 | Filer: Växla sökväg/träd | `m` |
 | Filer: Växla visa alla filer | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit: Växla att hoppa över hooks | `H` |
 | Filer: Öppna menyn för raden eller markeringen | `.` |
 | Filer: Fäll ut alla mappar | `=` |

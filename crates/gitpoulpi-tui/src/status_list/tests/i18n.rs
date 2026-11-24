@@ -21,7 +21,8 @@ fn each_french(mut f: impl FnMut(bool)) {
 fn the_toolbar_fits_the_pane_in_french() {
     each_french(|terms| {
         let area = Rect::new(0, 0, PANE, 1);
-        let draw = || status_toolbar_row(area, FileListMode::Tree, Some(true), None, None, true);
+        let draw =
+            || status_toolbar_row(area, FileListMode::Tree, Some(true), None, None, None, true);
         let english_overflow = {
             let _l = override_lang(Lang::En);
             draw().2.is_some()

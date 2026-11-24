@@ -155,6 +155,7 @@ prefix getoond (`Ctrl+G s`).
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Bestanden: pad of boom | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | Bestanden: alle bestanden tonen | `a` |
 | `log` | `compare_selection` | De geselecteerde rijen vergelijken | `v` |
 | `log` | `compare_swap` | Uiteinden van de vergelijking omwisselen | `x` |
@@ -185,6 +186,7 @@ prefix getoond (`Ctrl+G s`).
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Focus op het commit-bericht | `c` |
 | `status` | `toggle_file_mode` | Bestanden: pad of boom | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | Bestanden: alle bestanden tonen | `a` |
 | `status` | `amend` | Amend omschakelen | `Shift+A` |
 | `status` | `skip_hooks` | Hooks overslaan omschakelen | `Shift+H` |
@@ -1107,6 +1109,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Diff: Alleen hunks omschakelen (heel bestand / alleen wijzigingen) | `H` |
 | Bestanden: Pad/boom omschakelen | `m` |
 | Bestanden: Alle bestanden tonen omschakelen | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit: Hooks overslaan omschakelen | `H` |
 | Bestanden: menu van de rij of selectie openen | `.` |
 | Bestanden: Alle mappen uitklappen | `=` |

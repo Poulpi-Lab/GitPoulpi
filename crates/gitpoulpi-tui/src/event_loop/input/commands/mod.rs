@@ -393,6 +393,7 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::DiffMode(..)
         | PaletteCommand::FilesTogglePathTree
         | PaletteCommand::FilesToggleViewAll
+        | PaletteCommand::FilesToggleLfsOnly
         | PaletteCommand::CommitToggleSkipHooks
         | PaletteCommand::CompareSelection
         | PaletteCommand::CompareSwap

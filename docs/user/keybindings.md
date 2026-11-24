@@ -152,6 +152,7 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Files: Path or Tree | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | Files: View All Files | `a` |
 | `log` | `compare_selection` | Compare the Selected Rows | `v` |
 | `log` | `compare_swap` | Swap the Comparison Ends | `x` |
@@ -182,6 +183,7 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Focus the Commit Message | `c` |
 | `status` | `toggle_file_mode` | Files: Path or Tree | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | Files: View All Files | `a` |
 | `status` | `amend` | Toggle Amend | `Shift+A` |
 | `status` | `skip_hooks` | Toggle Skip Hooks | `Shift+H` |
@@ -1105,6 +1107,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Diff: Toggle Hunks Only (whole file / only the changes) | `H` |
 | Files: Toggle Path/Tree | `m` |
 | Files: Toggle View All Files | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit: Toggle Skip Hooks | `H` |
 | Files: Open Menu of the Row or Selection | `.` |
 | Files: Expand All Folders | `=` |

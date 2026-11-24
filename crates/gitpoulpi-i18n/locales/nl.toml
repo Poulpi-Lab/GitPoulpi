@@ -2466,11 +2466,13 @@ refs_mark_drop = "Markeren als dropbron"
 refs_drop_marked = "Gemarkeerde ref hier droppen"
 log_toggle_file_mode = "Bestanden: pad of boom"
 log_view_all_files = "Bestanden: alle bestanden tonen"
+log_lfs_only = "Files: LFS Only"
 log_files_collapse_all = "Alle mappen in-/uitklappen"
 log_files_filter = "Gewijzigde bestanden filteren"
 status_compose = "Focus op het {$commit}-bericht"
 status_toggle_file_mode = "Bestanden: pad of boom"
 status_view_all_files = "Bestanden: alle bestanden tonen"
+status_lfs_only = "Files: LFS Only"
 status_amend = "Amend omschakelen"
 status_collapse_all = "Alle mappen in-/uitklappen"
 status_stage_toggle = "Geselecteerde rij stagen of unstagen"
@@ -3445,6 +3447,7 @@ diff_layout_split_before_and_after = { git = "Diff: Lay-out split (voor en na)",
 diff_toggle_hunks_only_whole_file_only_the_changes = { git = "Diff: Alleen hunks omschakelen (heel bestand / alleen wijzigingen)", local = "Verschil: Alleen hunks omschakelen (heel bestand / alleen wijzigingen)" }
 files_toggle_path_tree = "Bestanden: Pad/boom omschakelen"
 files_toggle_view_all_files = "Bestanden: Alle bestanden tonen omschakelen"
+files_toggle_lfs_only = "Files: Toggle LFS Only"
 files_open_menu = "Bestanden: menu van de rij of selectie openen"
 files_select_all = "Bestanden: alles selecteren"
 files_clear_selection = "Bestanden: selectie wissen"
@@ -3550,6 +3553,7 @@ why_no_uncommitted_changes_the_wip_row_appears_once = "geen niet-gecommitte wijz
 why_there_are_no_stashes = { git = "er zijn geen stashes", local = "er zijn geen bergingen" }
 why_select_a_changed_file_in_the_commit_detail_pane = { git = "selecteer eerst een gewijzigd bestand in het commit-detailpaneel", local = "selecteer eerst een gewijzigd bestand in het commitdetailpaneel" }
 why_this_repository_has_no_remote_add_one_first = "deze repository heeft geen remote - voeg er eerst een toe"
+why_this_repository_has_no_lfs_files = "this repository has no LFS files"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a = { git = "open een bestand uit het paneel {$unstaged_files} - de diff van een commit heeft geen index om in te stagen", local = "open een bestand uit het paneel {$unstaged_files} - het verschil van een commit heeft geen index om in te stagen" }
 why_this_diff_is_the_staged_half_use_the_unstage = { git = "deze diff komt uit het paneel {$staged_files}; gebruik de opdracht Unstage", local = "dit verschil komt uit het paneel {$staged_files}; gebruik de opdracht Unstage" }
 why_open_a_file_from_the_third_pane_s_unstaged_half_a_2 = { git = "open een bestand uit het paneel {$unstaged_files} - de diff van een commit heeft geen werkmapwijziging om te verwerpen", local = "open een bestand uit het paneel {$unstaged_files} - het verschil van een commit heeft geen werkmapwijziging om te verwerpen" }
@@ -3972,6 +3976,7 @@ status_pane_working_3 = "het actieve subpaneel in-/uitklappen"
 status_pane_working_4 = "het geselecteerde bestand stagen/unstagen, of een maprij inklappen (boommodus)"
 status_pane_working_5 = "de bestandslijst wisselen tussen Pad (plat) en Boom (mappen)"
 status_pane_working_6 = "Alle bestanden tonen omschakelen (Statuspaneel / WIP-rij, of de gewijzigde bestanden van een commit; palet: Bestanden: Pad/boom omschakelen en Bestanden: Alle bestanden tonen omschakelen)"
+status_pane_working_lfs_only = "toggle LFS only: in a repository that has LFS files, the file lists show only those ({{log.lfs_only}} with the Log focused; palette: Files: Toggle LFS Only)"
 status_pane_working_7 = "alle mappen inklappen, of ze weer uitklappen als er ingeklapte zijn"
 status_pane_working_8 = "het menu van het geselecteerde bestand: Stage/Unstage, Wijzigingen verwerpen (bevestigd), Bestandspad kopiëren werken echt; Bestandsgeschiedenis/Blame openen het bestand in het midden; de rest staat gedimd met wat ze nodig hebben"
 status_pane_working_9 = "de gewijzigde bestanden van een commit filteren op naam (alleen binnen de eigen bestandslijst van een commit, niet in Status)"
@@ -4612,6 +4617,7 @@ diff_error = { git = "{$diff}-fout: {error}", local = "verschilfout: {error}" }
 mode_path = "Pad"
 mode_tree = "Boom"
 view_all_files = "Alle bestanden tonen"
+lfs_only = "LFS only"
 filter_files = "Bestanden filteren: "
 all_files = "Alle bestanden"
 changed_files = "Gewijzigde bestanden"
@@ -4628,6 +4634,7 @@ tree_view = "Boomweergave{hint}"
 collapse_all = "Alles inklappen"
 expand_all = "Alles uitklappen"
 view_all_files = "Alle bestanden tonen{key}"
+lfs_only = "LFS only{key}"
 
 [autostash]
 reason_checkout = "de checkout"

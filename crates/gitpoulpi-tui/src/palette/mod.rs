@@ -669,6 +669,8 @@ pub(crate) enum PaletteCommand {
     FilesTogglePathTree,
     /// The `View all files` checkbox (`a`).
     FilesToggleViewAll,
+    /// The `LFS only` pre-filter of the file lists (`l`).
+    FilesToggleLfsOnly,
     /// The commit composer's Skip hooks checkbox (`--no-verify` for the next
     /// commit): the palette twin of the click and `Shift+H`.
     CommitToggleSkipHooks,
@@ -1343,6 +1345,7 @@ pub(crate) fn command_action(entry: &PaletteEntry) -> Option<crate::keymap::Acti
         PaletteCommand::OpenWith => Some(A::ImageEditIn),
         PaletteCommand::OpenWithDefault => Some(A::ImageEditDefault),
         PaletteCommand::FilesToggleViewAll => Some(A::StatusViewAllFiles),
+        PaletteCommand::FilesToggleLfsOnly => Some(A::StatusLfsOnly),
         PaletteCommand::CommitToggleSkipHooks => Some(A::StatusSkipHooks),
         PaletteCommand::CompareSelection => Some(A::LogCompareSelection),
         PaletteCommand::CopySelectedAsMermaid => Some(A::LogCopyMermaid),

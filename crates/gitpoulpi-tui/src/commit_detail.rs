@@ -722,6 +722,7 @@ mod tests {
             path: PathBuf::from("crates/gitpoulpi-tui"),
             label: "gitpoulpi-tui".into(),
             collapsed: false,
+            files: 0,
         };
         for double in [false, true] {
             assert_eq!(

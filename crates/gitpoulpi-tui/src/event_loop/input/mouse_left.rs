@@ -874,6 +874,9 @@ pub(super) fn third_pane_controls(
             HitTarget::ViewAllFilesCheckbox => {
                 commands::toggle_view_all_files(cx);
             }
+            HitTarget::LfsOnlyCheckbox => {
+                commands::toggle_lfs_only(cx);
+            }
             HitTarget::CommitSortButton => {
                 commands::toggle_commit_sort(cx);
             }

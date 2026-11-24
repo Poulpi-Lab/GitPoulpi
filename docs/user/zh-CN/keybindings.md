@@ -138,6 +138,7 @@ stage_file = "z"
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | 文件：路径或树 | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | 文件：查看所有文件 | `a` |
 | `log` | `compare_selection` | 比较所选行 | `v` |
 | `log` | `compare_swap` | 交换比较的两端 | `x` |
@@ -168,6 +169,7 @@ stage_file = "z"
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | 聚焦 Commit 消息 | `c` |
 | `status` | `toggle_file_mode` | 文件：路径或树 | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | 文件：查看所有文件 | `a` |
 | `status` | `amend` | 切换修订 | `Shift+A` |
 | `status` | `skip_hooks` | 切换“跳过钩子” | `Shift+H` |
@@ -1069,6 +1071,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Diff：切换仅 hunk（整个文件 / 仅更改） | `H` |
 | 文件：切换路径/树 | `m` |
 | 文件：切换查看所有文件 | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit：切换“跳过钩子” | `H` |
 | 文件：打开当前行或所选文件的菜单 | `.` |
 | 文件：展开所有文件夹 | `=` |

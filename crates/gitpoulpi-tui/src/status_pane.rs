@@ -84,6 +84,11 @@ pub(crate) enum TreeRow {
         path: PathBuf,
         label: String,
         collapsed: bool,
+        /// Files under this folder, subfolders included, counted when the
+        /// rows are built. Only a collapsed folder carries it (its files are
+        /// hidden, the count says what is behind the row); an expanded one
+        /// is 0 and draws nothing extra.
+        files: usize,
     },
     File {
         depth: usize,
@@ -136,12 +141,42 @@ pub(crate) fn build_tree_rows(
     collapsed: &HashSet<PathBuf>,
     filter: &str,
 ) -> Vec<TreeRow> {
-    build_tree_rows_ordered(
+    build_tree_rows_with(paths, mode, collapsed, filter, None)
+}
+
+/// `build_tree_rows` for the lists that honour the `LFS only` pre-filter (the
+/// working-changes lists, View all files, a commit's files); the history
+/// dialogs keep plain `build_tree_rows`.
+pub(crate) fn build_tree_rows_lfs(
+    paths: &[PathBuf],
+    mode: FileListMode,
+    collapsed: &HashSet<PathBuf>,
+    filter: &str,
+) -> Vec<TreeRow> {
+    match crate::lfs_ui::only_paths() {
+        Some(only) => {
+            build_tree_rows_with(paths, mode, collapsed, filter, Some(&|p| only.contains(p)))
+        }
+        None => build_tree_rows(paths, mode, collapsed, filter),
+    }
+}
+
+/// `build_tree_rows` that also drops every path `keep` refuses (the LFS-only
+/// pre-filter). `TreeRow::File::index` still points into `paths`.
+pub(crate) fn build_tree_rows_with(
+    paths: &[PathBuf],
+    mode: FileListMode,
+    collapsed: &HashSet<PathBuf>,
+    filter: &str,
+    keep: Option<&dyn Fn(&Path) -> bool>,
+) -> Vec<TreeRow> {
+    build_tree_rows_kept(
         paths,
         mode,
         collapsed,
         filter,
         crate::live_settings::tree_folders_first(),
+        keep,
     )
 }
 
@@ -171,6 +206,7 @@ fn tree_cmp(a: &Path, b: &Path, folders_first: bool) -> std::cmp::Ordering {
 }
 
 /// `build_tree_rows` with the folder ordering given (tests pin both).
+#[cfg(test)]
 pub(crate) fn build_tree_rows_ordered(
     paths: &[PathBuf],
     mode: FileListMode,
@@ -178,10 +214,22 @@ pub(crate) fn build_tree_rows_ordered(
     filter: &str,
     folders_first: bool,
 ) -> Vec<TreeRow> {
+    build_tree_rows_kept(paths, mode, collapsed, filter, folders_first, None)
+}
+
+fn build_tree_rows_kept(
+    paths: &[PathBuf],
+    mode: FileListMode,
+    collapsed: &HashSet<PathBuf>,
+    filter: &str,
+    folders_first: bool,
+    keep: Option<&dyn Fn(&Path) -> bool>,
+) -> Vec<TreeRow> {
     let needle = filter.to_lowercase();
     let mut kept: Vec<(usize, &PathBuf)> = paths
         .iter()
         .enumerate()
+        .filter(|(_, p)| keep.is_none_or(|k| k(p)))
         .filter(|(_, p)| needle.is_empty() || p.to_string_lossy().to_lowercase().contains(&needle))
         .collect();
 
@@ -201,6 +249,11 @@ pub(crate) fn build_tree_rows_ordered(
     kept.sort_by(|(_, a), (_, b)| tree_cmp(a, b, folders_first));
 
     let mut rows = Vec::new();
+    // Files behind each outermost collapsed folder: counted in this one pass
+    // (the descent already stops at it), so the cost is one map bump per
+    // hidden file and nothing for a tree with no collapsed folder.
+    let mut hidden_files: std::collections::HashMap<PathBuf, usize> =
+        std::collections::HashMap::new();
     // The directory stack currently "open" in the output, as components.
     let mut open: Vec<String> = Vec::new();
 
@@ -228,13 +281,15 @@ pub(crate) fn build_tree_rows_ordered(
             if depth >= shared {
                 rows.push(TreeRow::Folder {
                     depth,
-                    path: folder_path,
+                    path: folder_path.clone(),
                     label: part.clone(),
                     collapsed: is_collapsed,
+                    files: 0,
                 });
                 open.push(part.clone());
             }
             if is_collapsed {
+                *hidden_files.entry(folder_path).or_insert(0) += 1;
                 hidden = true;
                 break;
             }
@@ -249,7 +304,64 @@ pub(crate) fn build_tree_rows_ordered(
         }
     }
 
+    if !hidden_files.is_empty() {
+        for row in &mut rows {
+            if let TreeRow::Folder { path, files, .. } = row {
+                if let Some(n) = hidden_files.get(path) {
+                    *files = *n;
+                }
+            }
+        }
+    }
     rows
+}
+
+/// The muted count after a collapsed folder's name: `(12)`, the files under
+/// it, subfolders included. Empty for an expanded folder (`files == 0`).
+pub(crate) fn folder_count_text(files: usize) -> String {
+    if files == 0 {
+        String::new()
+    } else {
+        format!(" ({files})")
+    }
+}
+
+/// One folder row's spans: indent, chevron and `name/` in the folder style,
+/// then the count dimmer. At `h_off == 0`, when the row does not fit `width`,
+/// the name gives way with a `…` so the count stays on screen; scrolled
+/// sideways the row is the whole row, as the horizontal scroll is for.
+pub(crate) fn folder_spans(
+    depth: usize,
+    chevron: &str,
+    label: &str,
+    files: usize,
+    width: Option<usize>,
+    h_off: usize,
+    name_style: ratatui::style::Style,
+) -> Vec<ratatui::text::Span<'static>> {
+    use crate::cell_text::cells;
+    let count = folder_count_text(files);
+    let indent = "  ".repeat(depth);
+    let fixed = cells(&indent) + cells(chevron) + 1 + 1 + cells(&count);
+    let mut name = label.to_string();
+    if let Some(width) = width.filter(|_| h_off == 0 && files > 0) {
+        let room = width.saturating_sub(fixed);
+        if cells(&name) > room {
+            let keep = room.saturating_sub(1);
+            name = format!("{}\u{2026}", crate::cell_text::slice_cells(&name, 0, keep));
+        }
+    }
+    let mut spans = vec![ratatui::text::Span::styled(
+        format!("{indent}{chevron} {name}/"),
+        name_style,
+    )];
+    if !count.is_empty() {
+        spans.push(ratatui::text::Span::styled(
+            count,
+            ratatui::style::Style::default().fg(crate::th().ui.muted),
+        ));
+    }
+    spans
 }
 
 /// Every folder path appearing in `paths`, for "Collapse All".
@@ -1452,5 +1564,85 @@ mod tests {
                 FolderContextAction::Fold(crate::tree_fold::TreeFold::CollapseAll),
             ]
         );
+    }
+
+    fn folder_files(rows: &[TreeRow]) -> Vec<(String, usize)> {
+        rows.iter()
+            .filter_map(|r| match r {
+                TreeRow::Folder { label, files, .. } => Some((label.clone(), *files)),
+                _ => None,
+            })
+            .collect()
+    }
+
+    /// A collapsed folder carries the number of files under it, subfolders
+    /// included; expanded ones carry 0 (nothing extra is drawn).
+    /// Falsified by dropping the `hidden_files` bump (every count reads 0).
+    #[test]
+    fn a_collapsed_folder_counts_its_files_recursively() {
+        let p = paths(&[
+            "src/a.rs",
+            "src/b.rs",
+            "src/models/c.rs",
+            "src/models/deep/d.rs",
+            "docs/guide.md",
+        ]);
+        let mut collapsed = HashSet::new();
+        collapsed.insert(PathBuf::from("src"));
+        let rows = build_tree_rows(&p, FileListMode::Tree, &collapsed, "");
+        // `src` collapsed: 4 files behind it; `docs` expanded: no count.
+        let counts = folder_files(&rows);
+        assert!(counts.contains(&("src".to_string(), 4)), "{counts:?}");
+        assert!(counts.contains(&("docs".to_string(), 0)), "{counts:?}");
+
+        // Only the inner folder collapsed: it counts its own subtree, the
+        // expanded parent stays 0.
+        let mut inner = HashSet::new();
+        inner.insert(PathBuf::from("src/models"));
+        let rows = build_tree_rows(&p, FileListMode::Tree, &inner, "");
+        let counts = folder_files(&rows);
+        assert!(counts.contains(&("src".to_string(), 0)), "{counts:?}");
+        assert!(counts.contains(&("models".to_string(), 2)), "{counts:?}");
+        // Nothing collapsed: no counts at all.
+        let rows = build_tree_rows(&p, FileListMode::Tree, &HashSet::new(), "");
+        assert!(folder_files(&rows).iter().all(|(_, n)| *n == 0));
+    }
+
+    /// The count follows the filter and the `keep` predicate: it is the
+    /// files the list would show under the folder.
+    #[test]
+    fn the_folder_count_honours_the_filter_and_the_keep_predicate() {
+        let p = paths(&["src/a.rs", "src/b.txt", "src/c.rs"]);
+        let mut collapsed = HashSet::new();
+        collapsed.insert(PathBuf::from("src"));
+        let rows = build_tree_rows(&p, FileListMode::Tree, &collapsed, ".rs");
+        assert_eq!(folder_files(&rows), vec![("src".to_string(), 2)]);
+        let keep = |q: &Path| q.to_string_lossy().ends_with("b.txt");
+        let rows = build_tree_rows_with(&p, FileListMode::Tree, &collapsed, "", Some(&keep));
+        assert_eq!(folder_files(&rows), vec![("src".to_string(), 1)]);
+    }
+
+    fn spans_text(spans: &[ratatui::text::Span<'_>]) -> String {
+        spans.iter().map(|s| s.content.as_ref()).collect()
+    }
+
+    /// The folder row ends with its muted count; in a narrow list the name
+    /// gives way (an ellipsis) and the count stays; scrolled sideways the
+    /// row is whole.
+    #[test]
+    fn the_folder_count_survives_a_narrow_list_and_the_name_gives_way() {
+        let style = ratatui::style::Style::default();
+        let whole = folder_spans(0, "v", "components", 12, Some(40), 0, style);
+        assert_eq!(spans_text(&whole), "v components/ (12)");
+        let narrow = folder_spans(0, "v", "components", 12, Some(14), 0, style);
+        let text = spans_text(&narrow);
+        assert!(text.ends_with(" (12)"), "{text:?}");
+        assert!(text.contains('\u{2026}'), "{text:?}");
+        assert!(crate::cell_text::cells(&text) <= 14, "{text:?}");
+        let scrolled = folder_spans(0, "v", "components", 12, Some(14), 3, style);
+        assert_eq!(spans_text(&scrolled), "v components/ (12)");
+        // An expanded folder (0) is untouched, however narrow.
+        let open = folder_spans(0, "v", "components", 0, Some(8), 0, style);
+        assert_eq!(spans_text(&open), "v components/");
     }
 }

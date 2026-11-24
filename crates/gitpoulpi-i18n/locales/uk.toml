@@ -2465,11 +2465,13 @@ refs_mark_drop = "Позначити як джерело перенесення"
 refs_drop_marked = "Перенести сюди позначене посилання"
 log_toggle_file_mode = "Файли: шлях чи дерево"
 log_view_all_files = "Файли: усі файли"
+log_lfs_only = "Files: LFS Only"
 log_files_collapse_all = "Згорнути чи розгорнути всі папки"
 log_files_filter = "Фільтр змінених файлів"
 status_compose = { git = "Фокус на повідомленні commit'у", local = "Фокус на повідомленні коміту" }
 status_toggle_file_mode = "Файли: шлях чи дерево"
 status_view_all_files = "Файли: усі файли"
+status_lfs_only = "Files: LFS Only"
 status_amend = "Перемкнути amend"
 status_collapse_all = "Згорнути чи розгорнути всі папки"
 status_stage_toggle = { git = "Stage чи unstage вибраного рядка", local = "Додати в індекс чи прибрати з індексу вибраний рядок" }
@@ -3444,6 +3446,7 @@ diff_layout_split_before_and_after = { git = "Diff: розкладка Split (д
 diff_toggle_hunks_only_whole_file_only_the_changes = { git = "Diff: лише hunks (весь файл / лише зміни)", local = "Різниця: лише hunks (весь файл / лише зміни)" }
 files_toggle_path_tree = "Файли: шлях/дерево"
 files_toggle_view_all_files = "Файли: усі файли"
+files_toggle_lfs_only = "Files: Toggle LFS Only"
 files_open_menu = "Файли: відкрити меню рядка або виділення"
 files_select_all = "Файли: виділити все"
 files_clear_selection = "Файли: зняти виділення"
@@ -3549,6 +3552,7 @@ why_no_uncommitted_changes_the_wip_row_appears_once = "немає незаком
 why_there_are_no_stashes = { git = "немає жодного stash'у", local = "немає жодної схованки" }
 why_select_a_changed_file_in_the_commit_detail_pane = { git = "спершу виберіть змінений файл на панелі деталей commit'у", local = "спершу виберіть змінений файл на панелі деталей коміту" }
 why_this_repository_has_no_remote_add_one_first = "у цього репозиторію немає remote - спершу додайте"
+why_this_repository_has_no_lfs_files = "this repository has no LFS files"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a = { git = "відкрийте файл із панелі «{$unstaged_files}» - у diff commit'у немає індексу, куди додавати", local = "відкрийте файл із панелі «{$unstaged_files}» - у різниці коміту немає індексу, куди додавати" }
 why_this_diff_is_the_staged_half_use_the_unstage = { git = "цей diff з панелі «{$staged_files}»; скористайтеся командою Unstage", local = "ця різниця з панелі «{$staged_files}»; скористайтеся командою «Прибрати з індексу»" }
 why_open_a_file_from_the_third_pane_s_unstaged_half_a_2 = { git = "відкрийте файл із панелі «{$unstaged_files}» - у diff commit'у немає змін робочого дерева, які можна відкинути", local = "відкрийте файл із панелі «{$unstaged_files}» - у різниці коміту немає змін робочого дерева, які можна відкинути" }
@@ -3971,6 +3975,7 @@ status_pane_working_3 = "згорнути/розгорнути активну п
 status_pane_working_4 = { git = "stage/unstage вибраний файл з індексу або згорнути рядок папки (режим Tree)", local = "додати/прибрати вибраний файл з індексу або згорнути рядок папки (режим Tree)" }
 status_pane_working_5 = "перемкнути список файлів між виглядом «Шлях» (плоский) і «Дерево» (папки)"
 status_pane_working_6 = { git = "перемкнути «усі файли» (панель Status / рядок WIP чи змінені файли commit'у; палітра: Файли: шлях/дерево і Файли: усі файли)", local = "перемкнути «усі файли» (панель Status / рядок WIP чи змінені файли коміту; палітра: Файли: шлях/дерево і Файли: усі файли)" }
+status_pane_working_lfs_only = "toggle LFS only: in a repository that has LFS files, the file lists show only those ({{log.lfs_only}} with the Log focused; palette: Files: Toggle LFS Only)"
 status_pane_working_7 = "згорнути всі папки або розгорнути знову, якщо якісь згорнуті"
 status_pane_working_8 = { git = "меню вибраного файлу: «Stage»/«Unstage», «Відкинути зміни» (з підтвердженням), «Копіювати шлях до файлу» справді працюють; «Історія файлу»/«Blame» відкривають файл у центрі; решта показані блідо з тим, що їм потрібно", local = "меню вибраного файлу: «Додати»/«Прибрати», «Відкинути зміни» (з підтвердженням), «Копіювати шлях до файлу» справді працюють; «Історія файлу»/«Blame» відкривають файл у центрі; решта показані блідо з тим, що їм потрібно" }
 status_pane_working_9 = { git = "фільтр змінених файлів commit'у за назвою (лише у списку файлів самого commit'у, не Status)", local = "фільтр змінених файлів коміту за назвою (лише у списку файлів самого коміту, не Status)" }
@@ -4611,6 +4616,7 @@ diff_error = { git = "помилка diff: {error}", local = "помилка р�
 mode_path = "Шлях"
 mode_tree = "Дерево"
 view_all_files = "Усі файли"
+lfs_only = "LFS only"
 filter_files = "Фільтр файлів: "
 all_files = "Усі файли"
 changed_files = "Змінені файли"
@@ -4627,6 +4633,7 @@ tree_view = "Вигляд Дерево{hint}"
 collapse_all = "Згорнути все"
 expand_all = "Розгорнути все"
 view_all_files = "Усі файли{key}"
+lfs_only = "LFS only{key}"
 
 [autostash]
 reason_checkout = "checkout"

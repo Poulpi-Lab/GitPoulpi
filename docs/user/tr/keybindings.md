@@ -154,6 +154,7 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
 | `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Dosyalar: Yol veya Ağaç | `m` |
+| `log` | `lfs_only` | Files: LFS Only | `o` |
 | `log` | `view_all_files` | Dosyalar: Tüm Dosyaları Göster | `a` |
 | `log` | `compare_selection` | Seçili satırları karşılaştır | `v` |
 | `log` | `compare_swap` | Karşılaştırma uçlarını değiştir | `x` |
@@ -184,6 +185,7 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Commit Mesajına Odaklan | `c` |
 | `status` | `toggle_file_mode` | Dosyalar: Yol veya Ağaç | `m` |
+| `status` | `lfs_only` | Files: LFS Only | `o` |
 | `status` | `view_all_files` | Dosyalar: Tüm Dosyaları Göster | `a` |
 | `status` | `amend` | Amend'i Aç/Kapat | `Shift+A` |
 | `status` | `skip_hooks` | Hook'ları Atlamayı Aç/Kapat | `Shift+H` |
@@ -1103,6 +1105,7 @@ Tuşlar varsayılanlardır.
 | Diff: Yalnızca Hunk'ları Aç/Kapat (tüm dosya / yalnızca değişiklikler) | `H` |
 | Dosyalar: Yol/Ağaç Aç/Kapat | `m` |
 | Dosyalar: Tüm Dosyaları Göster Aç/Kapat | `a` |
+| Files: Toggle LFS Only | `o` |
 | Commit: Hook'ları Atlamayı Aç/Kapat | `H` |
 | Dosyalar: Satırın veya Seçimin Menüsünü Aç | `.` |
 | Dosyalar: Tüm Klasörleri Genişlet | `=` |

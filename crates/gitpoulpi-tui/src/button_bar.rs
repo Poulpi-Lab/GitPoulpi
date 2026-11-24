@@ -194,6 +194,8 @@ pub(crate) enum OverflowItem {
     StatusBulk(StatusSection),
     /// The working-changes toolbar's View all files checkbox.
     ViewAllFiles,
+    /// The working-changes toolbar's `LFS only` checkbox.
+    LfsOnly,
     /// The composer's AI Generate button, folded into the summary row's `⋯`.
     AiGenerate,
     /// The composer's `#` issue-reference button, folded the same way.
@@ -216,6 +218,7 @@ impl OverflowItem {
             OverflowItem::CollapseAll { collapse } => HitTarget::CollapseAllButton { collapse },
             OverflowItem::StatusBulk(s) => HitTarget::StatusBulkButton(s),
             OverflowItem::ViewAllFiles => HitTarget::ViewAllFilesCheckbox,
+            OverflowItem::LfsOnly => HitTarget::LfsOnlyCheckbox,
             OverflowItem::AiGenerate => HitTarget::AiGenerate,
             OverflowItem::ComposerIssueRef => HitTarget::ComposerIssueRef,
             OverflowItem::HostingChip { linked: true } => {
@@ -300,6 +303,12 @@ impl OverflowItem {
             }
             OverflowItem::HostingChip { linked: false } => {
                 gitpoulpi_i18n::msg::hosting_ui::NEW_PR.get().into()
+            }
+            OverflowItem::LfsOnly => {
+                gitpoulpi_i18n::msg::button_bar::lfs_only(crate::keymap::paren(
+                    &crate::keymap::current(),
+                    crate::keymap::Action::StatusLfsOnly,
+                ))
             }
             OverflowItem::ViewAllFiles => {
                 gitpoulpi_i18n::msg::button_bar::view_all_files(crate::keymap::paren(

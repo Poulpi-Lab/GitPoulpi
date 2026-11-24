@@ -2467,11 +2467,13 @@ refs_mark_drop = "Als Ablagequelle markieren"
 refs_drop_marked = "Markierte Ref hier ablegen"
 log_toggle_file_mode = "Dateien: Pfad oder Baum"
 log_view_all_files = "Dateien: Alle Dateien ansehen"
+log_lfs_only = "Files: LFS Only"
 log_files_collapse_all = "Alle Ordner ein- oder ausklappen"
 log_files_filter = "Geänderte Dateien filtern"
 status_compose = "Auf die {$Commit}-Nachricht fokussieren"
 status_toggle_file_mode = "Dateien: Pfad oder Baum"
 status_view_all_files = "Dateien: Alle Dateien ansehen"
+status_lfs_only = "Files: LFS Only"
 status_amend = "Amend umschalten"
 status_collapse_all = "Alle Ordner ein- oder ausklappen"
 status_stage_toggle = { git = "Ausgewählte Zeile stagen oder unstagen", local = "Ausgewählte Zeile bereitstellen oder Bereitstellung aufheben" }
@@ -3447,6 +3449,7 @@ diff_layout_split_before_and_after = { git = "Diff: Layout Split (vorher und nac
 diff_toggle_hunks_only_whole_file_only_the_changes = { git = "Diff: Nur Hunks umschalten (ganze Datei / nur die Änderungen)", local = "Unterschiede: Nur Hunks umschalten (ganze Datei / nur die Änderungen)" }
 files_toggle_path_tree = "Dateien: Pfad/Baum umschalten"
 files_toggle_view_all_files = "Dateien: Alle Dateien ansehen umschalten"
+files_toggle_lfs_only = "Files: Toggle LFS Only"
 files_open_menu = "Dateien: Menü der Zeile oder Auswahl öffnen"
 files_select_all = "Dateien: Alles auswählen"
 files_clear_selection = "Dateien: Auswahl aufheben"
@@ -3551,6 +3554,7 @@ why_no_uncommitted_changes_the_wip_row_appears_once = "keine nicht committeten �
 why_there_are_no_stashes = { git = "es gibt keine Stashes", local = "es gibt keine Zwischenspeicher" }
 why_select_a_changed_file_in_the_commit_detail_pane = "zuerst im Commit-Detailbereich eine geänderte Datei auswählen"
 why_this_repository_has_no_remote_add_one_first = "dieses Repository hat kein Remote - zuerst eines hinzufügen"
+why_this_repository_has_no_lfs_files = "this repository has no LFS files"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a = { git = "eine Datei aus dem Bereich {$unstaged_files} öffnen - der Diff eines Commits hat keinen Index zum Stagen", local = "eine Datei aus dem Bereich {$unstaged_files} öffnen - die Unterschiede eines Commits haben keinen Index zum Bereitstellen" }
 why_this_diff_is_the_staged_half_use_the_unstage = { git = "dieser Diff stammt aus dem Bereich {$staged_files}; den Befehl Unstagen verwenden", local = "diese Unterschiede stammen aus dem Bereich {$staged_files}; den Befehl zum Aufheben der Bereitstellung verwenden" }
 why_open_a_file_from_the_third_pane_s_unstaged_half_a_2 = { git = "eine Datei aus dem Bereich {$unstaged_files} öffnen - der Diff eines Commits hat keine Änderung im Arbeitsverzeichnis zum Verwerfen", local = "eine Datei aus dem Bereich {$unstaged_files} öffnen - die Unterschiede eines Commits haben keine Änderung im Arbeitsverzeichnis zum Verwerfen" }
@@ -3973,6 +3977,7 @@ status_pane_working_3 = "den aktiven Unterbereich ein-/ausklappen"
 status_pane_working_4 = { git = "die ausgewählte Datei stagen/unstagen oder eine Ordnerzeile zuklappen (Baum-Modus)", local = "die ausgewählte Datei bereitstellen/Bereitstellung aufheben oder eine Ordnerzeile zuklappen (Baum-Modus)" }
 status_pane_working_5 = "die Dateiliste zwischen Pfad (flach) und Baum (Ordner) umschalten"
 status_pane_working_6 = "Alle Dateien ansehen umschalten (Status-Bereich / WIP-Zeile oder die geänderten Dateien eines Commits; Palette: Dateien: Pfad/Baum umschalten und Dateien: Alle Dateien ansehen umschalten)"
+status_pane_working_lfs_only = "toggle LFS only: in a repository that has LFS files, the file lists show only those ({{log.lfs_only}} with the Log focused; palette: Files: Toggle LFS Only)"
 status_pane_working_7 = "alle Ordner zuklappen oder wieder aufklappen, falls welche zugeklappt sind"
 status_pane_working_8 = { git = "das Menü der ausgewählten Datei: Stagen/Unstagen, Änderungen verwerfen (bestätigt), Dateipfad kopieren laufen wirklich; Dateiverlauf/Blame öffnen die Datei in der Mitte; der Rest steht abgedunkelt da, mit dem, was er braucht", local = "das Menü der ausgewählten Datei: Bereitstellen/Bereitstellung aufheben, Änderungen verwerfen (bestätigt), Dateipfad kopieren laufen wirklich; Dateiverlauf/Blame öffnen die Datei in der Mitte; der Rest steht abgedunkelt da, mit dem, was er braucht" }
 status_pane_working_9 = "die geänderten Dateien eines Commits nach Namen filtern (nur in der eigenen Dateiliste eines Commits, nicht im Status)"
@@ -4613,6 +4618,7 @@ diff_error = { git = "Diff-Fehler: {error}", local = "Fehler bei den Unterschied
 mode_path = "Pfad"
 mode_tree = "Baum"
 view_all_files = "Alle Dateien ansehen"
+lfs_only = "LFS only"
 filter_files = "Dateien filtern: "
 all_files = "Alle Dateien"
 changed_files = "Geänderte Dateien"
@@ -4629,6 +4635,7 @@ tree_view = "Baumansicht{hint}"
 collapse_all = "Alle einklappen"
 expand_all = "Alle ausklappen"
 view_all_files = "Alle Dateien ansehen{key}"
+lfs_only = "LFS only{key}"
 
 [autostash]
 reason_checkout = "den Checkout"

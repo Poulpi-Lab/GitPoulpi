@@ -886,6 +886,7 @@ impl WindowState {
                 has_remotes: !self.remote_names.is_empty(),
                 group: crate::push_group_ui::group_state(&self.repo.root),
                 lfs_enabled: self.lfs.enabled,
+                lfs_has_files: self.lfs.has_files(),
                 lfs_program_ok: self.lfs.unavailable_reason().is_none(),
                 in_refs_pane: self.focus == Focus::Refs,
                 in_diff_view: self.central_view == CentralView::Diff,

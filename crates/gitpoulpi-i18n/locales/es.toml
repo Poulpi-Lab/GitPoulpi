@@ -2465,11 +2465,13 @@ refs_mark_drop = "Marcar como origen de arrastre"
 refs_drop_marked = "Soltar aquí la ref marcada"
 log_toggle_file_mode = "Archivos: Ruta o árbol"
 log_view_all_files = "Archivos: Ver todos los archivos"
+log_lfs_only = "Files: LFS Only"
 log_files_collapse_all = "Contraer o expandir todas las carpetas"
 log_files_filter = "Filtrar los archivos cambiados"
 status_compose = { git = "Ir al mensaje del {$commit}", local = "Ir al mensaje de la {$commit}" }
 status_toggle_file_mode = "Archivos: Ruta o árbol"
 status_view_all_files = "Archivos: Ver todos los archivos"
+status_lfs_only = "Files: LFS Only"
 status_amend = "Alternar enmienda"
 status_collapse_all = "Contraer o expandir todas las carpetas"
 status_stage_toggle = { git = "Stage o unstage de la fila seleccionada", local = "Preparar o quitar de la preparación la fila seleccionada" }
@@ -3444,6 +3446,7 @@ diff_layout_split_before_and_after = { git = "Diff: Disposición dividida (antes
 diff_toggle_hunks_only_whole_file_only_the_changes = { git = "Diff: Alternar solo hunks (archivo entero / solo los cambios)", local = "Diferencias: Alternar solo hunks (archivo entero / solo los cambios)" }
 files_toggle_path_tree = "Archivos: Alternar ruta/árbol"
 files_toggle_view_all_files = "Archivos: Alternar ver todos los archivos"
+files_toggle_lfs_only = "Files: Toggle LFS Only"
 files_open_menu = "Archivos: Abrir el menú de la fila o de la selección"
 files_select_all = "Archivos: Seleccionar todo"
 files_clear_selection = "Archivos: Borrar la selección"
@@ -3549,6 +3552,7 @@ why_no_uncommitted_changes_the_wip_row_appears_once = "no hay cambios sin confir
 why_there_are_no_stashes = { git = "no hay stashes", local = "no hay guardados rápidos" }
 why_select_a_changed_file_in_the_commit_detail_pane = { git = "selecciona antes un archivo cambiado en el panel de detalle del commit", local = "selecciona antes un archivo cambiado en el panel de detalle de la confirmación" }
 why_this_repository_has_no_remote_add_one_first = "este repositorio no tiene remoto - añade uno primero"
+why_this_repository_has_no_lfs_files = "this repository has no LFS files"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a = { git = "abre un archivo del panel {$unstaged_files} - el diff de un commit no tiene índice donde stage", local = "abre un archivo del panel {$unstaged_files} - las diferencias de una confirmación no tienen índice donde preparar" }
 why_this_diff_is_the_staged_half_use_the_unstage = { git = "este diff es del panel {$staged_files}; usa el comando Unstage", local = "estas diferencias son del panel {$staged_files}; usa el comando Quitar de la preparación" }
 why_open_a_file_from_the_third_pane_s_unstaged_half_a_2 = { git = "abre un archivo del panel {$unstaged_files} - el diff de un commit no tiene cambios en el árbol de trabajo que descartar", local = "abre un archivo del panel {$unstaged_files} - las diferencias de una confirmación no tienen cambios en el árbol de trabajo que descartar" }
@@ -3971,6 +3975,7 @@ status_pane_working_3 = "contrae/expande el subpanel activo"
 status_pane_working_4 = { git = "stage/unstage del archivo seleccionado, o contrae una fila de carpeta (modo Árbol)", local = "prepara/quita de la preparación el archivo seleccionado, o contrae una fila de carpeta (modo Árbol)" }
 status_pane_working_5 = "cambia la lista de archivos entre Ruta (plana) y Árbol (carpetas)"
 status_pane_working_6 = { git = "alterna Ver todos los archivos (panel Estado / fila WIP, o los archivos cambiados de un commit; paleta: Archivos: Alternar ruta/árbol y Archivos: Alternar ver todos los archivos)", local = "alterna Ver todos los archivos (panel Estado / fila WIP, o los archivos cambiados de una confirmación; paleta: Archivos: Alternar ruta/árbol y Archivos: Alternar ver todos los archivos)" }
+status_pane_working_lfs_only = "toggle LFS only: in a repository that has LFS files, the file lists show only those ({{log.lfs_only}} with the Log focused; palette: Files: Toggle LFS Only)"
 status_pane_working_7 = "contrae todas las carpetas, o las expande de nuevo si alguna está contraída"
 status_pane_working_8 = { git = "el menú del archivo seleccionado: Stage/Unstage, Descartar cambios (con confirmación) y Copiar ruta del archivo se ejecutan de verdad; Historial del archivo y Blame abren el archivo en el centro; el resto aparece atenuado con lo que necesita", local = "el menú del archivo seleccionado: Preparar/Quitar de la preparación, Descartar cambios (con confirmación) y Copiar ruta del archivo se ejecutan de verdad; Historial del archivo y Blame abren el archivo en el centro; el resto aparece atenuado con lo que necesita" }
 status_pane_working_9 = { git = "filtra por nombre los archivos cambiados de un commit (solo dentro de la lista de archivos de un commit, no en Estado)", local = "filtra por nombre los archivos cambiados de una confirmación (solo dentro de la lista de archivos de una confirmación, no en Estado)" }
@@ -4611,6 +4616,7 @@ diff_error = "error de {$diff}: {error}"
 mode_path = "Ruta"
 mode_tree = "Árbol"
 view_all_files = "Ver todos los archivos"
+lfs_only = "LFS only"
 filter_files = "Filtrar archivos: "
 all_files = "Todos los archivos"
 changed_files = "Archivos cambiados"
@@ -4627,6 +4633,7 @@ tree_view = "Vista de árbol{hint}"
 collapse_all = "Contraer todo"
 expand_all = "Expandir todo"
 view_all_files = "Ver todos los archivos{key}"
+lfs_only = "LFS only{key}"
 
 [autostash]
 reason_checkout = { git = "del checkout", local = "del cambio de rama" }

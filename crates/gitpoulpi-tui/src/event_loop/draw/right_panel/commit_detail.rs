@@ -2,6 +2,10 @@
 
 use super::*;
 
+/// The narrowest the filter field may get before the `LFS only` box steps
+/// aside.
+const LFS_BOX_MIN_FIELD: u16 = 8;
+
 pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
     let avatar_capability = ctx.avatar_capability;
     let avatar_live = ctx.avatar_live;
@@ -618,7 +622,41 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
         // off the end of the row.
         let filter_label = gitpoulpi_i18n::msg::commit_detail::FILTER_FILES.get();
         let label_w = display_width(filter_label) as u16;
-        let field_w = layout.filter_row.width.saturating_sub(label_w);
+        // The `LFS only` pre-filter sits at the row's right end, only for a
+        // repository with LFS files, and only while the field keeps room to
+        // type in (the key and the palette command always work).
+        let lfs_box = lfs.has_files().then(|| {
+            format!(
+                "{} {}",
+                if lfs.only() { "[x]" } else { "[ ]" },
+                gitpoulpi_i18n::msg::commit_detail::LFS_ONLY.get()
+            )
+        });
+        let lfs_box_w = lfs_box
+            .as_ref()
+            .map_or(0, |t| display_width(t) as u16 + 1)
+            .min(layout.filter_row.width);
+        let lfs_box = lfs_box.filter(|_| {
+            layout.filter_row.width.saturating_sub(label_w + lfs_box_w) >= LFS_BOX_MIN_FIELD
+        });
+        let lfs_box_w = if lfs_box.is_some() { lfs_box_w } else { 0 };
+        let field_w = layout
+            .filter_row
+            .width
+            .saturating_sub(label_w)
+            .saturating_sub(lfs_box_w);
+        // Registered before the field's own row so the box wins its cells.
+        if lfs_box.is_some() {
+            frame_hits.push((
+                Rect::new(
+                    layout.filter_row.x + layout.filter_row.width - lfs_box_w,
+                    layout.filter_row.y,
+                    lfs_box_w,
+                    1,
+                ),
+                HitTarget::LfsOnlyCheckbox,
+            ));
+        }
         frame_hits.push((layout.filter_row, HitTarget::CommitFilterField));
         field_editor.drawn(
             MainField::CommitFilter,
@@ -664,11 +702,22 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
                 base,
             ));
         }
+        if let Some(text) = lfs_box {
+            let style = if *hovered_target == Some(HitTarget::LfsOnlyCheckbox) {
+                Style::default()
+                    .fg(th().ui.muted)
+                    .patch(plain_button_style(true))
+            } else {
+                Style::default().fg(th().ui.muted)
+            };
+            spans.push(Span::raw(" "));
+            spans.push(Span::styled(text, style));
+        }
         Line::from(spans)
     };
 
     *commit_paths_cache = commit_paths.clone();
-    *commit_file_rows = build_tree_rows(
+    *commit_file_rows = build_tree_rows_lfs(
         &commit_paths,
         commit_list_mode,
         collapsed_commit_folders,

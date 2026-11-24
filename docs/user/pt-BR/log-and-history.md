@@ -100,7 +100,9 @@ veja `history-rewrite.md`; pelo terminal: `gitpoulpi mailmap list|check|add`.
   ou o *Log: filtrar por autor...* da paleta): pré-filtra o Log por quem
   escreveu os commits. Um popup pende sob o cabeçalho com um campo de busca, uma
   linha **Limpar filtro** (✕) e uma linha por autor do histórico carregado: um
-  emblema de iniciais (o avatar, quando `ui.avatars` não está desligado), o nome e o
+  avatar (quando `ui.avatars` não está desligado: a foto do autor nos terminais que
+  desenham imagens e quando a foto está pronta, o emblema de iniciais até lá e em
+  outros terminais), o nome e o
   e-mail esmaecido depois dele, mais commits primeiro e depois por nome. Digitar restringe a
   lista com a busca aproximada da paleta; `Enter` ou um clique alterna o
   autor realçado (uma marca de seleção; escolha quantos quiser), `Esc` ou um
@@ -113,7 +115,10 @@ veja `history-rewrite.md`; pelo terminal: `gitpoulpi mailmap list|check|add`.
   os autores escolhidos e, quando a coluna Autor está oculta ou estreita demais para
   o funil, a borda superior do Log diz *Autores: Alice Example +1* (a
   tecla e a paleta continuam funcionando). Para soltá-lo: a linha **Limpar filtro**, um
-  clique com o botão direito no funil aceso, ou o *Log: limpar o filtro de autor* da paleta.
+  clique com o botão direito no funil aceso, o *Log: limpar o filtro de autor* da paleta, ou
+  `Esc` no Log (depois de uma seleção, que o `Esc` solta primeiro; dentro do popup o
+  `Esc` primeiro esvazia o campo de busca, depois fecha o popup e mantém o filtro).
+  Enquanto ele está ligado, Cima/Baixo (e PageUp/PageDown, Home/End) movem a seleção só entre os commits acesos, pulando os esmaecidos; um clique ainda seleciona qualquer linha.
   Os autores são os dos commits que o Log carregou (mailmap aplicado, como
   na coluna), e o filtro é lembrado por repositório, entre trocas de aba
   e reinícios. Uma busca de texto não é lembrada, o filtro é.

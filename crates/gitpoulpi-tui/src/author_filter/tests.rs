@@ -337,3 +337,124 @@ fn the_tooltip_lists_the_chosen_authors() {
     );
     set_tip(Vec::new());
 }
+
+mod pictures_tests {
+    use super::*;
+    use crate::avatar::{
+        card_avatar_mode, AvatarSlot, LogAvatarImages, LogAvatarMode, PictureKey, RowTint,
+    };
+    use crate::terminal_image::{Bitmap, Capability, CellSize, Protocol};
+    use gitpoulpi_config::AvatarPlacement;
+
+    fn kitty() -> Capability {
+        Capability {
+            protocol: Protocol::Kitty,
+            cell: CellSize::FALLBACK,
+        }
+    }
+
+    fn open() -> AuthorFilterPopup {
+        AuthorFilterPopup::open(&history(), &BTreeSet::new(), true)
+    }
+
+    #[test]
+    fn a_picture_slot_sits_on_each_badge_and_only_with_picture_mode() {
+        set_anchor(Some(ratatui::layout::Rect::new(40, 3, 20, 1)));
+        let popup = open();
+        let (buf, rects) = draw(&popup);
+        let slots = pictures::slots(
+            &popup,
+            rects.list,
+            rects.window_start,
+            LogAvatarMode::Picture,
+        );
+        assert_eq!(slots.len(), 3);
+        // Each slot is exactly the two cells of the initials badge.
+        for (area, e, _) in &slots {
+            let name = &popup.entry(*e).unwrap().name;
+            let badge: String = (area.x..area.right())
+                .map(|x| buf[(x, area.y)].symbol().to_string())
+                .collect();
+            let want: String = name
+                .split_whitespace()
+                .filter_map(|w| w.chars().next())
+                .collect();
+            assert_eq!(badge, want, "{name}");
+        }
+        // Text terminal or avatars off: no picture, the badge stays.
+        for mode in [LogAvatarMode::Glyph, LogAvatarMode::Off] {
+            assert!(pictures::slots(&popup, rects.list, rects.window_start, mode).is_empty());
+        }
+        let off = AuthorFilterPopup::open(&history(), &BTreeSet::new(), false);
+        assert!(
+            pictures::slots(&off, rects.list, rects.window_start, LogAvatarMode::Picture)
+                .is_empty()
+        );
+        set_anchor(None);
+    }
+
+    #[test]
+    fn the_mode_follows_the_log_rules() {
+        let text = Capability {
+            protocol: Protocol::None,
+            cell: CellSize::FALLBACK,
+        };
+        assert_eq!(
+            card_avatar_mode(AvatarPlacement::Author, kitty()),
+            LogAvatarMode::Picture
+        );
+        assert_eq!(
+            card_avatar_mode(AvatarPlacement::Author, text),
+            LogAvatarMode::Glyph
+        );
+        assert_eq!(
+            card_avatar_mode(AvatarPlacement::Off, kitty()),
+            LogAvatarMode::Off
+        );
+    }
+
+    /// Only the author whose picture is ready is drawn as an image; the
+    /// others keep their initials; a frame with no slot withdraws it.
+    #[test]
+    fn a_ready_picture_replaces_the_badge_and_the_rest_keep_initials() {
+        set_anchor(Some(ratatui::layout::Rect::new(40, 3, 20, 1)));
+        let popup = open();
+        let (mut buf, rects) = draw(&popup);
+        let slots = pictures::slots(
+            &popup,
+            rects.list,
+            rects.window_start,
+            LogAvatarMode::Picture,
+        );
+        let face = Bitmap::new(42, 42, (200, 30, 30));
+        let first = slots[0];
+        let draw_slots = [AvatarSlot {
+            area: first.0,
+            key: PictureKey {
+                author: "alice".into(),
+                tint: Some(RowTint::Plain),
+                dimmed: false,
+            },
+            bitmap: &face,
+        }];
+        let mut images = LogAvatarImages::new(kitty());
+        assert_eq!(images.render(&mut buf, &draw_slots), 1);
+        let cell = |x, y| buf[(x, y)].symbol().to_string();
+        assert!(
+            cell(first.0.x, first.0.y).contains('\u{10EEEE}'),
+            "the picture claims its cells"
+        );
+        let second = slots[1].0;
+        assert!(!cell(second.x, second.y).contains('\u{10EEEE}'));
+        images.finish_frame(&buf);
+        let mut out = Vec::new();
+        images.write_pending(&mut out).unwrap();
+        // The popup closed: no slot is drawn, the picture is erased.
+        let gone = Buffer::empty(buf.area);
+        images.finish_frame(&gone);
+        let mut out = Vec::new();
+        images.write_pending(&mut out).unwrap();
+        assert!(!out.is_empty(), "closing sends the erase");
+        set_anchor(None);
+    }
+}

@@ -93,7 +93,9 @@ terminal: `gitpoulpi mailmap list|check|add`.
   or the palette's *Log: Filter by Author...*): pre-filters the Log by who
   wrote the commits. A popup hangs under the header with a search field, a
   **Clear filter** row (✕) and one row per author of the loaded history: an
-  initials badge (the avatar, when `ui.avatars` is not off), the name and the
+  avatar (when `ui.avatars` is not off: the author's picture where the terminal
+  draws images and the picture is ready, the initials badge until then and on
+  other terminals), the name and the
   email muted after it, most commits first and then by name. Typing narrows the
   list with the palette's fuzzy match; `Enter` or a click toggles the
   highlighted author (a check mark; choose as many as you like), `Esc` or a

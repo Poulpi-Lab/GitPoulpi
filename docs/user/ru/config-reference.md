@@ -141,6 +141,7 @@ author_email = "jane@work.example"
 | `ui.diff_hunks_only` | `true` | `false` показывает весь файл с изменениями на своих местах (`H`). |
 | `ui.diff_show_whitespace` | `true` | Показывать изменения только пробелов (`s`). |
 | `ui.diff_word_wrap` | `false` | Переносить длинные строки diff (`w`; Настройки > Diff и редактор). |
+| `ui.diff_intraline` | `true` | Закрашивать изменённые слова изменённой строки более насыщенным фоном (палитра `Diff: подсветка изменённых слов`; Настройки > Diff и редактор). |
 | `ui.minimap` | `false` | Миникарта рядом с полосой прокрутки diff и редактора (`M`). |
 | `ui.mermaid_detail` | `refs` | Детализация окна «Копировать как Mermaid gitGraph» в Log: `structure`, `refs`, `subjects`, `full` (запоминается из окна; значение по умолчанию для `log --format mermaid`). |
 | `ui.mermaid_orientation` | `lr` | Направление этого графа: `lr` (слева направо) или `tb` (сверху вниз). |
@@ -397,7 +398,7 @@ CLI - это ваша собственная оболочка, и они на н
 | `ai.enabled` | `false` | Выключатель. Если выключено, нигде не появляется ничего от ИИ и ничего не отправляется. |
 | `ai.default_profile` | `"default"` | Идентификатор профиля, который используют действия, не назвавшие своего. |
 | `ai.global_instructions` | `""` | Текст, добавляемый в промпт каждого действия. Может использовать `${repo}`, `${uilang}`, ... (см. [ИИ > Переменные запроса](ai.md#переменные-запроса)); то же для инструкций действия и репозитория. |
-| `ai.actions.<action>.profile` | `""` | Профиль для одного действия; пусто = по умолчанию. Действия: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`. Рабочее пространство (`workspaces.toml`, `[workspace.ai_instructions]` и `[workspace.ai_overrides.<action>]`) и репозиторий могут дополнять или заменять эти инструкции: см. [ИИ](ai.md#инструкции). |
+| `ai.actions.<action>.profile` | `""` | Профиль для одного действия; пусто = по умолчанию. Действия: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `sequence_draft`. Рабочее пространство (`workspaces.toml`, `[workspace.ai_instructions]` и `[workspace.ai_overrides.<action>]`) и репозиторий могут дополнять или заменять эти инструкции: см. [ИИ](ai.md#инструкции). |
 | `ai.actions.<action>.instructions` | `""` | Текст, добавляемый только для этого действия. |
 | `ai.review.run_in_repository` | `"profile"` | `profile`, `yes` или `no`: работает ли локальный агент черновика код-ревью внутри репозитория на время запуска, поверх `workdir` профиля ИИ. Репозиторий может задать своё значение (`gitpoulpi ai review-context --repo`). См. [ИИ > Контекст ревью](ai.md#контекст-ревью). |
 | `ai.review.include_claude_md` | `true` | Передавать черновику код-ревью `CLAUDE.md` репозитория (корень, читается в ветке, на которую нацелен запрос; обрезается на 8 КБ). |
@@ -421,7 +422,7 @@ CLI - это ваша собственная оболочка, и они на н
 | `ai.hosting_reply.read_repository` | `false` | Отмечен ли сразу пункт «Разрешить ИИ читать репозиторий». По умолчанию выключено: репозиторий читается только тогда, когда вы отмечаете пункт для этого случая. Локальный агент или профиль API читает его так, как описано в [главе об ИИ](ai.md#доступ-к-репозиторию). |
 | `ai.hosting_reply.reuse_agent_session` | `true` | Сохранять сессию локального агента между двумя ответами, если это поддерживает его оболочка. Действует, когда ИИ разрешено читать репозиторий. |
 | `ai.hosting_reply.context_ttl_minutes` | `30` | Как долго используется повторно контекст репозитория, построенный для ответа. От 1 до 1440. Действует, когда ИИ разрешено читать репозиторий. |
-| `ai.sent_preview.<action>` | `true` | По ключу на действие (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`): показывать «Что отправляется» до отправки запроса. Флажок диалога «Больше не показывать для ...» записывает `false`; Настройки > ИИ > *Показывать, что отправляется, перед...* включает их обратно. `rewrite_script` и `rewrite_rules` допустимы, но не действуют: диалоги переписывания истории всегда показывают собственную панель. `worktree_name` тоже допустим, но не действует: он отправляет только то, что вы ввели в диалоге «Создать worktree», и имена локальных веток. |
+| `ai.sent_preview.<action>` | `true` | По ключу на действие (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`, `sequence_draft`): показывать «Что отправляется» до отправки запроса. Флажок диалога «Больше не показывать для ...» записывает `false`; Настройки > ИИ > *Показывать, что отправляется, перед...* включает их обратно. `rewrite_script` и `rewrite_rules` допустимы, но не действуют: диалоги переписывания истории всегда показывают собственную панель. `worktree_name` тоже допустим, но не действует: он отправляет только то, что вы ввели в диалоге «Создать worktree», и имена локальных веток. |
 
 Собственная таблица репозитория `[preferences.ai_review]` (в его `repo-state.toml` или запись неклонированного репозитория в `remote-reviews.toml`) принимает те же ключи, все необязательные, плюс `no_extra_file = true`: без дополнительного файла для этого репозитория, что бы ни говорил `ai.review.extra_file`. Незаданный ключ, незаданный `extra_file` и отсутствующий `no_extra_file` наследуют глобальное значение; задание `extra_file` файлом сбрасывает переключатель, и наоборот.
 
@@ -548,6 +549,48 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 | `installation.primary` | нет | Id основной установки. Нет: основной нет. |
 | `installation.settings.<id>` | нет | По таблице на установку: `path` (её папка, обновляется при переносе), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (справочно), `name` (имя лаунчера, `GitPoulpi (<label>)`, фиксируется при первом запуске), `name_with_version` (выключено: добавить `<major>.<minor>` к имени), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (пусто: пункт меню папок в корне), `env` (пусто: её собственный id; установки с одинаковым именем делят демоны, сеансы и историю отмены), `mcp_bind` (пусто: `mcp.bind`). Пустое значение для основной установки берётся из `ui.*`, иначе из значения по умолчанию для её типа (dev-сборка носит `sun`). |
 
+## `[[sequences]]`
+
+Именованные последовательности действий: список команд палитры, выполняемых одна за другой
+(например, Backup: добавить всё в индекс, написать сообщение с ИИ, commit, push). Одна таблица
+на последовательность, её шаги - `[[sequences.steps]]`.
+
+```toml
+[[sequences]]
+id = "backup"                    # слаг: её ключ в [keybindings.sequence] и имя в CLI
+name = "Backup"                  # ваш текст, никогда не переводится
+description = "Stage, commit with an AI message, push"   # необязательно
+scope = "installation"           # installation (по умолчанию) | machine | repo
+owner = "3f9a0c1d2b4e5f60"       # id установки; задаётся при scope = "installation"
+
+[[sequences.steps]]
+run = "stage_all"                # id команды палитры
+
+[[sequences.steps]]
+run = "ai_generate_commit_message"
+pause = "always"                 # default | always | never
+
+[[sequences.steps]]
+run = "create_worktree_from_current_branch"
+pause = "never"
+[sequences.steps.options]
+name = "wip-${date}-${n}"        # шаблон: ${branch} ${date} (yyyy-mm-dd) ${time} (hh-mm) ${n} (первый свободный номер)
+open_tab = true
+```
+
+| Ключ | Значение |
+|---|---|
+| `scope` | `installation`: видит только установка, чей id указан в `owner`. `machine`: каждая установка, делящая этот `config.toml`. `repo`: хранится в репозитории в `.gitpoulpi/sequences.toml` (та же форма `[[sequences]]`), видна только там и только после того, как вы доверитесь этому файлу, потому что закоммиченный файл - чужие команды. |
+| `steps[].run` | Id команды палитры, имя в snake_case, как оно показано в `[keybindings.palette]`. Принимается только фиксированный список разрешённых: индексирование, commit, stash push, новая ветка / tag, fetch, pull, push (и варианты push во все, pull всех, push tag'ов), команды сообщения ИИ и композитора commit'ов, создание worktree, открытие вкладки или терминала и force push with lease. Разрушительные команды (отбросить, reset, удаления, удаление worktree, stash drop, переписывание истории, выход, Настройки) и другие последовательности шагами быть не могут. Шаг, которого эта версия не знает, остаётся в файле и выводится в отчёте. |
+| `steps[].pause` | `default`: шаг останавливается на своём обычном диалоге, когда ему нужен ввод. `always`: остановиться перед ним и спросить, продолжать ли. `never`: не останавливаться; тогда шагу нужны параметры, о которых спросил бы его диалог (`name` для новой ветки или worktree). Force push with lease не может быть `never`. |
+| `steps[].options` | Ответы по шагам: `name` (новая ветка, tag, worktree), `branch` (worktree от выбранной ветки), `open_tab` (открыть новый worktree во вкладке), `message` (commit), `label` (запись «Открыть в»), `profile` (профиль агента). |
+| не более 32 шагов | В последовательности от 1 до 32 шагов. |
+
+Неизвестные ключи последовательности или шага сохраняются, когда GitPoulpi переписывает файл.
+Повторяющиеся id среди видимых вам последовательностей выводятся в отчёте. Привяжите
+последовательность так: `[keybindings.sequence] <id> = "<chord>"`, например
+`backup = "Ctrl+G b"`.
+
 ## `[keybindings]`
 
 Переназначает сочетания клавиш TUI; правится в Настройки > Клавиатура и мышь.
@@ -567,6 +610,7 @@ stage_file = "z"
 действия, удаление строки их восстанавливает. Сочетания: `Ctrl+Shift+N`, `Alt+n`,
 `F2`, `PageDown`, `Space`, `,`, `P` (= `Shift+p`). Неверная запись ничего не
 блокирует: TUI игнорирует её, оставляет значение по умолчанию и сообщает об этом в строке состояния.
+`[keybindings.sequence]` привязывает ваши [`[[sequences]]`](#sequences) по id.
 Контексты, идентификаторы действий, умолчания и правила конфликтов: [Сочетания клавиш](keybindings.md).
 
 ## Настройки репозитория: `.gitpoulpi/repo-state.toml`

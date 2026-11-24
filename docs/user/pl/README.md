@@ -40,6 +40,7 @@ przechodź wtedy, gdy będą potrzebne.
 | Trzymać zgłoszenia jako notatki Markdown, bez tokenu | [Zgłoszenia lokalne i Obsidian](local-issues.md) | Sekcja ZGŁOSZENIA, dostawca `Local Markdown - <nazwa>`; paleta **Zgłoszenia lokalne: Otwórz w Obsidian...** |
 | Przepisać autorów, daty, komunikaty lub pliki w wielu commitach | [Przepisywanie historii](history-rewrite.md) | `Ctrl+G Shift+H`; paleta **Przepisanie: Warsztat historii** |
 | Cofnąć (lub ponowić) operację | [Cofnij i ponów](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`; `Alt+Z` otwiera historię cofania; paleta **Edycja: Cofnij** |
+| Uruchomić kilka akcji jednym klawiszem (stage, wiadomość AI, commit, push...) | [Sekwencje](sequences.md) | Ustawienia > Sekwencje; paleta **Sekwencja: <nazwa>** |
 | Śledzić duże pliki przez Git LFS | [Git LFS](lfs.md) | Paleta **LFS: Śledź wzorzec...**, **LFS: Zainicjuj dla tego repozytorium** |
 | Znaleźć gałąź, commit, pull request lub zgłoszenie w wielu repozytoriach | [Wyszukiwanie](search.md) | `Ctrl+Alt+F` albo przycisk Szukaj wszędzie na pasku tytułu; `f` przeszukuje graf commitów bieżącego repozytorium |
 | Zobaczyć wszystko, co na mnie czeka, w jednej liście | [Radar](radar.md) | `Alt+R`; paleta **Radar: Otwórz** |

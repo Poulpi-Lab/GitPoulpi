@@ -41,6 +41,7 @@ di riferimento quando ti servono.
 | Tenere le issue come note Markdown, senza token | [Issue locali e Obsidian](local-issues.md) | La sezione ISSUE, provider `Local Markdown - <nome>`; palette **Issue locali: Apri in Obsidian...** |
 | Riscrivere autori, date, messaggi o file su molti commit | [Riscrittura della cronologia](history-rewrite.md) | `Ctrl+G Shift+H`; palette **Riscrittura: Pannello della cronologia** |
 | Annullare (o ripetere) un'operazione | [Annulla e ripeti](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`; `Alt+Z` apre la cronologia degli annullamenti; palette **Modifica: Annulla** |
+| Eseguire più azioni con un solo tasto (stage, messaggio IA, commit, push...) | [Sequenze](sequences.md) | Impostazioni > Sequenze; palette **Sequenza: <nome>** |
 | Tracciare i file grandi con Git LFS | [Git LFS](lfs.md) | Palette **LFS: Traccia un pattern...**, **LFS: Inizializza per questo repository** |
 | Trovare un branch, un commit, una pull request o una issue tra più repository | [Ricerca](search.md) | `Ctrl+Alt+F`, oppure il pulsante Ricerca globale nella barra del titolo; `f` cerca nel grafo dei commit del repository corrente |
 | Vedere in un unico elenco tutto ciò che mi riguarda | [Il Radar](radar.md) | `Alt+R`; palette **Radar: Apri** |

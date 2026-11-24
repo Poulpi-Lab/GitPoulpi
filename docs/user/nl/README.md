@@ -40,6 +40,7 @@ je ze nodig hebt.
 | Issues als Markdown-notities bijhouden, zonder token | [Lokale issues en Obsidian](local-issues.md) | De sectie ISSUES, provider `Local Markdown - <naam>`; palet **Lokale issues: Openen in Obsidian...** |
 | Auteurs, datums, berichten of bestanden over veel commits herschrijven | [Geschiedenis herschrijven](history-rewrite.md) | `Ctrl+G Shift+H`; palet **Herschrijven: Werkbank voor geschiedenis** |
 | Een bewerking ongedaan maken (of opnieuw doen) | [Ongedaan maken en opnieuw](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`; `Alt+Z` opent de geschiedenis van ongedaan maken; palet **Bewerken: Ongedaan maken** |
+| Meerdere acties met één toets uitvoeren (stage, AI-bericht, commit, push...) | [Reeksen](sequences.md) | Instellingen > Reeksen; palet **Reeks: <naam>** |
 | Grote bestanden volgen met Git LFS | [Git LFS](lfs.md) | Palet **LFS: Patroon volgen...**, **LFS: Initialiseren voor deze repository** |
 | Een branch, commit, pull request of issue vinden in alle repositories | [Zoeken](search.md) | `Ctrl+Alt+F`, of de knop Globaal zoeken in de titelbalk; `f` zoekt in de commit-grafiek van de huidige repository |
 | Alles zien wat mij nodig heeft, in één lijst | [De Radar](radar.md) | `Alt+R`; palet **Radar: Openen** |

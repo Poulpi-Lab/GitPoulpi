@@ -40,6 +40,7 @@ para as páginas de referência quando precisar delas.
 | Guardar issues como notas Markdown, sem token | [Issues locais e Obsidian](local-issues.md) | A secção ISSUES, fornecedor **Markdown local - <nome>**; paleta **Issues locais: abrir no Obsidian...** |
 | Reescrever autores, datas, mensagens ou ficheiros em muitos commits | [Reescrita do histórico](history-rewrite.md) | `Ctrl+G Shift+H`; paleta **Reescrever: painel do histórico** |
 | Desfazer (ou refazer) uma operação | [Desfazer e refazer](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`; `Alt+Z` abre o histórico de desfazer; paleta **Editar: desfazer** |
+| Executar várias ações com uma tecla (stage, mensagem de IA, commit, push...) | [Sequências](sequences.md) | Definições > Sequências; paleta **Sequência: <nome>** |
 | Acompanhar ficheiros grandes com Git LFS | [Git LFS](lfs.md) | Paleta **LFS: acompanhar padrão...**, **LFS: inicializar neste repositório** |
 | Encontrar uma branch, um commit, um pull request ou uma issue em vários repositórios | [Pesquisa](search.md) | `Ctrl+Alt+F`, ou o botão Pesquisa global da barra de título; `f` pesquisa o grafo de commits do repositório atual |
 | Ver tudo o que precisa de mim numa só lista | [O Radar](radar.md) | `Alt+R`; paleta **Radar: abrir** |

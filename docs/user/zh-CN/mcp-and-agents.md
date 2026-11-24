@@ -147,6 +147,7 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
 | `ai_rewrite_rules` | `gitpoulpi ai rewrite-rules` | read, network |
 | `ai_rewrite_script` | `gitpoulpi ai rewrite-script` | read, network |
+| `ai_sequence_draft` | `gitpoulpi ai sequence-draft` | read, network |
 | `ai_split_plan` | `gitpoulpi ai split-plan` | read, network |
 | `ai_worktree_name` | `gitpoulpi ai worktree-name` | read, network |
 | `alias_status` | `gitpoulpi alias status` | read |
@@ -344,6 +345,10 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 | `rewrite_tools` | `gitpoulpi rewrite tools` | read |
 | `rm_file` | `gitpoulpi rm-file` | destructive |
 | `search` | `gitpoulpi search` | read |
+| `sequence_list` | `gitpoulpi sequence list` | read |
+| `sequence_run` | `gitpoulpi sequence run` | destructive, network |
+| `sequence_show` | `gitpoulpi sequence show` | read |
+| `sequence_validate` | `gitpoulpi sequence validate` | read |
 | `session_delete` | `gitpoulpi session delete` | destructive |
 | `session_list` | `gitpoulpi session list` | read |
 | `session_new` | `gitpoulpi session new` | write |
@@ -374,8 +379,12 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 | `tag_delete` | `gitpoulpi tag delete` | destructive, network |
 | `tag_delete_remote` | `gitpoulpi tag delete-remote` | destructive, network |
 | `tag_fetch` | `gitpoulpi tag fetch` | write, network |
+| `tag_force_push` | `gitpoulpi tag force-push` | destructive, network |
 | `tag_list` | `gitpoulpi tag list` | read |
+| `tag_merge_branch` | `gitpoulpi tag merge-branch` | write |
+| `tag_move` | `gitpoulpi tag move` | write |
 | `tag_push` | `gitpoulpi tag push` | write, network |
+| `tag_take_remote` | `gitpoulpi tag take-remote` | write |
 | `theme_export` | `gitpoulpi theme export` | read |
 | `theme_list` | `gitpoulpi theme list` | read |
 | `treat` | `gitpoulpi treat` | write |
@@ -389,6 +398,7 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 | `ui_propose_rewrite` | `gitpoulpi ui propose rewrite` | propose |
 | `ui_propose_split` | `gitpoulpi ui propose split` | propose |
 | `ui_propose_tag` | `gitpoulpi ui propose tag` | propose |
+| `ui_sequence_run` | `gitpoulpi ui sequence run` | propose |
 | `ui_show_commit` | `gitpoulpi ui show commit` | view |
 | `ui_show_conflict` | `gitpoulpi ui show conflict` | view |
 | `ui_show_diff` | `gitpoulpi ui show diff` | view |
@@ -436,6 +446,9 @@ Not exposed as tools:
 | `gitpoulpi desktop shortcut status` | launcher shortcuts are the user's desktop, not a repository; they need the TUI's icon renderer |
 | `gitpoulpi desktop shortcut install` | writes files into the user's launcher, Start menu and Desktop |
 | `gitpoulpi desktop shortcut remove` | deletes files from the user's launcher, Start menu and Desktop |
+| `gitpoulpi desktop folder-menu status` | the file manager menu is the user's desktop, not a repository |
+| `gitpoulpi desktop folder-menu install` | writes entries into the user's file manager menus and registry |
+| `gitpoulpi desktop folder-menu remove` | deletes entries from the user's file manager menus and registry |
 | `gitpoulpi alias create` | writes a command into the user's PATH; an agent never changes the user's shell |
 | `gitpoulpi alias remove` | deletes a command from the user's PATH; an agent never changes the user's shell |
 | `gitpoulpi installation show` | describes this machine's GitPoulpi installations (folders, environments); local, like desktop and alias |
@@ -455,6 +468,10 @@ Not exposed as tools:
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
 | `gitpoulpi repo-auth set` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
 | `gitpoulpi repo-auth clear` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
+| `gitpoulpi sequence add` | a sequence is a list of commands that run later (and can be bound to a key): an agent must not write its own macros, or edit the config that gates it |
+| `gitpoulpi sequence remove` | removes a sequence from the user's config; the user's macros are theirs to manage |
+| `gitpoulpi sequence trust` | trusting the sequences a repository commits (they run commands on the user's machine) is a person's decision; an agent can only run sequences a person trusted |
+| `gitpoulpi sequence untrust` | withdrawing the trust of a repository's sequences is a person's decision, like granting it |
 | `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
@@ -500,6 +517,7 @@ $ gitpoulpi --json ui back
 | `ui_propose_split`（rev、plan file） | 在该 commit 上打开拆分编辑器，内容由计划填入 | *拆分*（`Ctrl+S`）；`Esc` 即拒绝 |
 | `ui_propose_rewrite`（方案文件） | 打开历史重写工作台，列表中已有方案的规则；不会预览或应用任何内容 | 你自己的*预览*，然后*应用*（`Ctrl+Enter`）；`Esc` 即拒绝。带脚本的方案会被拒绝，机密值会被丢弃 |
 | `ui_propose_resolution`（path、pick 或 content file） | 在有冲突文件上打开 merge 编辑器，选择（或整段文本）已放在输出中 | *保存并标记为已解决*（`Ctrl+S`）；关闭即拒绝 |
+| `ui_sequence_run`（id） | 一条横幅“✦ Proposed by <agent>: run sequence <name>”，带 *运行* 和 *忽略*；此时还没有任何内容运行 | *运行*（点击，或按 `Ctrl+N` 再按 `Enter`）；*忽略* 或 `Esc` 即拒绝。之后的运行会在序列指定处暂停。序列不存在、无效，或是你尚未信任的仓库序列时会被拒绝 |
 
 一次只能有一个提案；当你在撰写器中有自己的草稿时，commit 消息提案会被拒绝；当 merge 编辑器中有你未保存的工作、或文件的 stage 阶段自代理读取后已改变时，解决方案提案会被拒绝。你在确认之前修改过的解决方案会被报告为 `accepted_edited`。回答中带有一个 `proposal` id；你的决定可在 `ui_state` 的 `proposals` 中看到（`offered`、`open`、`accepted`、`accepted_edited`、`rejected`、`expired`、`failed`）。
 

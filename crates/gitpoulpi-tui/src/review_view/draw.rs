@@ -190,6 +190,9 @@ impl ReviewView {
         crate::pointer_map::from_hits(&hits, |h| match h {
             // A code line: the I-beam over its text (`register_pointer`), the arrow elsewhere.
             Hit::Row(..) => None,
+            // A thread head: the hand around its words, the I-beam over them
+            // (`diff_pane` registers both).
+            Hit::Fold(_) => None,
             // A row of the Files list lights on hover and keeps the arrow.
             Hit::File(_) | Hit::Commit(_) => Some(crate::pointer_map::Kind::Plain),
             _ => Some(crate::pointer_map::Kind::Hand),

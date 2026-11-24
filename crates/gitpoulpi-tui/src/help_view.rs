@@ -30,6 +30,41 @@ thread_local! {
     /// The popup, the docs link row and the body list as the last frame
     /// painted them (hit rects come from the paint walk).
     static RECTS: Cell<Option<Rects>> = const { Cell::new(None) };
+    /// The popup was painted since `forget` last ran.
+    static DRAWN: Cell<bool> = const { Cell::new(false) };
+    /// The body's painted text, selectable with a drag (`screen_text`).
+    static TEXT: RefCell<crate::screen_text::ScreenText> =
+        const { RefCell::new(crate::screen_text::ScreenText::new()) };
+}
+
+/// A press on the body's text: it may grow into a selection with a drag.
+pub(crate) fn text_press(col: u16, row: u16) {
+    TEXT.with_borrow_mut(|t| t.press(col, row));
+}
+
+/// The button is held and moved: `true` when it is a text selection now.
+pub(crate) fn text_drag(col: u16, row: u16) -> bool {
+    TEXT.with_borrow_mut(|t| t.drag(col, row))
+}
+
+/// The button went up: `true` when it ended a text drag.
+pub(crate) fn text_release() -> bool {
+    TEXT.with_borrow_mut(|t| t.release())
+}
+
+/// Drops the selection; `true` when there was one.
+pub(crate) fn text_clear() -> bool {
+    TEXT.with_borrow_mut(|t| t.clear())
+}
+
+/// The selected text, if any.
+pub(crate) fn selected_text() -> Option<String> {
+    TEXT.with_borrow(|t| t.selected())
+}
+
+/// The cell is over selectable text of the body: the I-beam.
+pub(crate) fn pointer_text(col: u16, row: u16) -> bool {
+    TEXT.with_borrow(|t| t.text_at(col, row))
 }
 
 #[derive(Clone, Copy)]
@@ -238,6 +273,18 @@ pub(crate) fn render(frame: &mut Frame, filter: &str, scroll: &mut u16, inner_he
         ),
         body_area,
     );
+    DRAWN.set(true);
+    TEXT.with_borrow_mut(|t| {
+        let text_area = Rect::new(
+            body_area.x + 1,
+            body_area.y,
+            body_area.width.saturating_sub(2),
+            body_area.height,
+        );
+        let buf = frame.buffer_mut();
+        t.capture(buf, text_area);
+        t.paint(buf);
+    });
     View::set_window(*scroll as usize, rows, total_lines);
     View::paint_bar(frame.buffer_mut(), body_area, total_lines);
 
@@ -295,6 +342,11 @@ const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::resizable("help", 40
 /// popup that is no longer there).
 pub(crate) fn forget() {
     RECTS.set(None);
+    // Painted since the last call: the popup is open and keeps its selection;
+    // otherwise it is closed and nothing of it is kept.
+    if !DRAWN.replace(false) {
+        TEXT.with_borrow_mut(|t| *t = crate::screen_text::ScreenText::new());
+    }
     TAB_RECTS.with_borrow_mut(Vec::clear);
 }
 

@@ -304,15 +304,24 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                     *cx.show_help = false;
                     cx.help_filter.clear();
                     *cx.help_scroll = 0;
+                } else {
+                    // On the text: it may grow into a selection with a drag.
+                    crate::help_view::text_press(col, row);
                 }
             }
             MouseEventKind::Drag(MouseButton::Left) => {
+                if crate::help_view::text_drag(col, row) {
+                    return Ok(None);
+                }
                 crate::popup_list::View::bar_drag(row, scroll);
                 if let Some(to) = crate::popup_list::View::free_offset() {
                     *cx.help_scroll = to as u16;
                 }
             }
-            MouseEventKind::Up(MouseButton::Left) => crate::popup_list::View::bar_release(),
+            MouseEventKind::Up(MouseButton::Left) => {
+                crate::help_view::text_release();
+                crate::popup_list::View::bar_release();
+            }
             // Nothing behind the popup hovers; its tab headers do.
             MouseEventKind::Moved => crate::help_view::hover(col, row),
             _ => {}

@@ -786,6 +786,14 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
             usize::from(page) + 1,
         );
         match key.code {
+            // The dragged text: copied, or dropped first (the popup stays).
+            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => {
+                if let Some(text) = crate::help_view::selected_text() {
+                    *cx.last_message =
+                        Some(cx.clipboard.copy(msg::input::WHAT_SELECTION.get(), &text));
+                }
+            }
+            KeyCode::Esc if crate::help_view::text_clear() => {}
             _ if km.is(Bind::GlobalHelp, &key) => {
                 *cx.show_help = false;
                 cx.help_filter.clear();

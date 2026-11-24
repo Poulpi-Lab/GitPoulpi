@@ -440,6 +440,16 @@ impl ReviewView {
     /// The text selection, or the line (the `v` range) under the cursor, onto
     /// the clipboard: the Diff view's own copy.
     fn copy_text(&mut self) {
+        if let Some(text) = [&self.files_pane, &self.commits_pane]
+            .iter()
+            .find_map(|p| p.notes.selected())
+        {
+            self.message = Some(crate::clipboard::copy_shared(
+                gitpoulpi_i18n::msg::diff_view::WHAT_SELECTION.get(),
+                &text,
+            ));
+            return;
+        }
         let state = self.pane().view_state(&self.diff_opts);
         let Some(render) = self.pane().render.clone() else {
             self.message = Some(
@@ -831,6 +841,10 @@ impl ReviewView {
             if self.cancel_suggest() {
                 return ReviewEffect::None;
             }
+            // So is dragged text of the annotations.
+            if self.files_pane.notes.clear() | self.commits_pane.notes.clear() {
+                return ReviewEffect::None;
+            }
             let tab = self.tab;
             let returning = tab == Tab::Files && self.ov_return.is_some();
             let pane = self.active_pane();
@@ -999,10 +1013,16 @@ impl ReviewView {
             MouseEventKind::Down(MouseButton::Left) => {
                 if let Some(hit) = hit {
                     self.message = None;
+                    if self.note_press(hit, mouse) {
+                        return ReviewEffect::None;
+                    }
                     return self.click(hit, mouse);
                 }
             }
             MouseEventKind::Drag(MouseButton::Left) => {
+                if self.note_drag(mouse) {
+                    return ReviewEffect::None;
+                }
                 if self.drag_text(mouse) {
                     return ReviewEffect::None;
                 }
@@ -1011,14 +1031,66 @@ impl ReviewView {
                 }
             }
             MouseEventKind::Up(MouseButton::Left) => {
+                let fold = self.note_fold.take();
+                let dragged = self.files_pane.notes.release() | self.commits_pane.notes.release();
                 for pane in [&mut self.files_pane, &mut self.commits_pane] {
                     pane.press = None;
                     pane.text_drag = None;
+                }
+                // A thread head's click (fold it) runs once the button is up
+                // without a text drag.
+                if let (false, Some(row)) = (dragged, fold) {
+                    self.files_pane.cursor = row;
+                    return self.run(ReviewCmd::ToggleThread);
                 }
             }
             _ => {}
         }
         ReviewEffect::None
+    }
+
+    /// A left press on a row of the diff: when it lands on the words of an
+    /// annotation it may grow into a text selection, so a thread head's click
+    /// waits for the button to go up. `true`: the press is handled (and the
+    /// click is deferred).
+    fn note_press(&mut self, hit: Hit, mouse: MouseEvent) -> bool {
+        let (col, row) = (mouse.column, mouse.row);
+        let id = match hit {
+            Hit::Row(id, _) => Some(id),
+            Hit::Fold(_) => Some(PaneId::Files),
+            _ => None,
+        };
+        self.note_fold = None;
+        // The press lands in one pane's words, or nowhere: both drop theirs.
+        let mut on_text = false;
+        for pane_id in [PaneId::Files, PaneId::Commits] {
+            let pane = self.pane_of(pane_id);
+            if Some(pane_id) == id {
+                on_text = pane.notes.press(col, row);
+            } else {
+                pane.notes.clear();
+            }
+        }
+        match hit {
+            Hit::Fold(row) if on_text => {
+                self.note_fold = Some(row);
+                true
+            }
+            _ => false,
+        }
+    }
+
+    /// A drag that began on the words of an annotation selects them.
+    fn note_drag(&mut self, mouse: MouseEvent) -> bool {
+        for pane in [&mut self.files_pane, &mut self.commits_pane] {
+            if pane.notes.drag(mouse.column, mouse.row) {
+                // The press that began it is not a line range any more.
+                pane.press = None;
+                pane.anchor = None;
+                return true;
+            }
+        }
+        false
     }
 
     /// The scrollbars' thumb drag, track jump and end arrows.

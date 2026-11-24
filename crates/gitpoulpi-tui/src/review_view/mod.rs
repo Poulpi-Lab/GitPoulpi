@@ -171,6 +171,9 @@ pub(crate) struct ReviewView {
     /// The ✦ block's text (the draft, the suggestions, the description),
     /// selectable with a drag.
     strip_text: crate::screen_text::ScreenText,
+    /// A press on a thread's head that waits for its button to go up (a
+    /// drag there selects text instead of folding): the head's row.
+    note_fold: Option<usize>,
     /// The ✦ block's laid-out Markdown, and the addresses of the links
     /// painted this frame (`Hit::MdLink` indexes it).
     md_cache: crate::md_render::DocCache,
@@ -331,6 +334,7 @@ impl ReviewView {
             ov,
             ov_strip: Rect::default(),
             strip_text: Default::default(),
+            note_fold: None,
             md_cache: Default::default(),
             md_links: Vec::new(),
             ov_rows: 0,

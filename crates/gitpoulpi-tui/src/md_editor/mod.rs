@@ -126,6 +126,8 @@ pub(crate) struct MdEditor {
     /// Rows of the preview pane as last painted, and lines of its text.
     pane_rows: usize,
     pv_len: usize,
+    /// The preview's painted text, selectable with a drag (`screen_text`).
+    pv_text: crate::screen_text::ScreenText,
     draft: Option<Draft>,
     /// The "Write with AI" helper, bound by the owner while AI is on.
     ai: Option<ai::AiHelp>,
@@ -151,6 +153,7 @@ impl MdEditor {
             ai_slot: Rect::default(),
             pane_rows: 1,
             pv_len: 0,
+            pv_text: Default::default(),
             draft: None,
             ai: None,
         };
@@ -413,6 +416,7 @@ impl MdEditor {
             return;
         }
         self.mode = mode;
+        self.pv_text.clear();
     }
 
     /// `Alt+P`: Write and Preview swap; from Split it goes to Preview.
@@ -492,6 +496,19 @@ impl MdEditor {
                 ai::AiKey::Pass => {}
             }
         }
+        // The preview's dragged text: copied, or dropped first.
+        if self.mode != Mode::Write && self.pv_text.has_selection() {
+            let ctrl = key.modifiers == crossterm::event::KeyModifiers::CONTROL;
+            if ctrl && key.code == KeyCode::Char('c') {
+                if let Some(text) = self.pv_text.selected() {
+                    self.note = Some(crate::clipboard::copy_shared(msg_selection(), &text));
+                    return KeyUse::Handled;
+                }
+            } else if key.code == KeyCode::Esc {
+                self.pv_text.clear();
+                return KeyUse::Handled;
+            }
+        }
         if self.mode == Mode::Preview {
             let page = self.pane_rows.max(1) as isize;
             let ctrl = key
@@ -562,6 +579,16 @@ impl MdEditor {
             self.preview.top = top;
             return MouseUse::Inside;
         }
+        // The preview's text drag, and the end of it.
+        match mouse.kind {
+            MouseEventKind::Drag(MouseButton::Left) if self.pv_text.drag(pos.0, pos.1) => {
+                return MouseUse::Inside;
+            }
+            MouseEventKind::Up(MouseButton::Left) if self.pv_text.release() => {
+                return MouseUse::Inside;
+            }
+            _ => {}
+        }
         // A selection drag goes on wherever the pointer is.
         if !matches!(mouse.kind, MouseEventKind::Down(_)) && self.edit.is_dragging() {
             self.edit.area_mouse((), &self.text, mouse.kind, pos, false);
@@ -589,6 +616,9 @@ impl MdEditor {
                 Some(Part::Write) => self.set_mode(Mode::Write),
                 Some(Part::Preview) => self.set_mode(Mode::Preview),
                 Some(Part::Split) => self.set_mode(Mode::Split),
+                Some(Part::Pane) => {
+                    self.pv_text.press(mouse.column, mouse.row);
+                }
                 Some(Part::Text) => {
                     if let Some(ai) = self.ai.as_mut() {
                         ai.focus_text();
@@ -850,6 +880,7 @@ impl MdEditor {
         self.pane_rows = usize::from(rows.max(1));
         let width = usize::from(rect.width.saturating_sub(2));
         if self.text.trim().is_empty() {
+            self.pv_text.capture(buf, Rect::default());
             dialog_kit::put(
                 buf,
                 rect.x + 1,
@@ -860,6 +891,9 @@ impl MdEditor {
             );
         } else {
             let (doc, _) = self.preview.doc(&self.text, width, &self.ctx);
+            if doc.is_none() {
+                self.pv_text.capture(buf, Rect::default());
+            }
             if let Some(doc) = doc {
                 let len = doc.lines.len();
                 self.pv_len = len;
@@ -878,6 +912,10 @@ impl MdEditor {
                         );
                     }
                 }
+                let text_area = Rect::new(rect.x + 1, rect.y, rect.width.saturating_sub(2), rows);
+                self.pv_text.capture(buf, text_area);
+                self.pv_text.paint(buf);
+                self.pv_text.register_pointer();
                 let strip = Rect::new(rect.right() - 1, rect.y, 1, rows);
                 self.preview.bar =
                     crate::scrollbar::Track::column(strip, len, usize::from(rows), top);

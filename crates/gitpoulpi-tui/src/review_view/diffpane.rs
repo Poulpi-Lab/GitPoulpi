@@ -379,6 +379,7 @@ impl ReviewView {
                 );
             }
             pane.bar = None;
+            pane.notes.capture(buf, Rect::default());
             return;
         }
 
@@ -417,6 +418,7 @@ impl ReviewView {
         pane.area = body;
         let Some(render) = pane.render.clone() else {
             pane.bar = None;
+            pane.notes.capture(buf, Rect::default());
             return;
         };
         let len = render.lines.len();
@@ -448,6 +450,10 @@ impl ReviewView {
             &render.segs[first..last.min(render.segs.len())],
         );
 
+        // Where each row holds words of an annotation (a comment, a pending
+        // note, a suggestion): what a drag over them selects.
+        let mut note_spans: Vec<Option<(u16, u16)>> = vec![None; last - first];
+        #[allow(clippy::needless_range_loop)] // `n` also places the row on screen
         for n in 0..(last - first) {
             let i = first + n;
             let y = body.y + n as u16;
@@ -589,6 +595,7 @@ impl ReviewView {
                                 .bg(abg)
                                 .add_modifier(Modifier::BOLD),
                         );
+                        note_spans[n] = Some((x, used.right()));
                         if chip_w > 0 {
                             dialog_kit::put(
                                 buf,
@@ -626,6 +633,7 @@ impl ReviewView {
                             Style::default().fg(th().ui.text).bg(abg)
                         };
                         dialog_kit::put(buf, x0 + 2, y, text, right.saturating_sub(x0 + 2), style);
+                        note_spans[n] = Some((x0 + 2, right));
                     }
                     RowKind::PendingHead { .. } => {
                         let mut right = right;
@@ -650,7 +658,7 @@ impl ReviewView {
                                 right = rect.x.saturating_sub(1);
                             }
                         }
-                        dialog_kit::put(
+                        let used = dialog_kit::put(
                             buf,
                             x0,
                             y,
@@ -661,6 +669,7 @@ impl ReviewView {
                                 .bg(abg)
                                 .add_modifier(Modifier::BOLD),
                         );
+                        note_spans[n] = Some((x0 + 2, used.right()));
                     }
                     RowKind::PendingBody { .. } => {
                         dialog_kit::put(
@@ -679,6 +688,7 @@ impl ReviewView {
                             right.saturating_sub(x0 + 2),
                             Style::default().fg(th().ui.text).bg(abg),
                         );
+                        note_spans[n] = Some((x0 + 2, right));
                     }
                     RowKind::GhostHead { item } => {
                         let sev = ghost_sev.get(item).copied().unwrap_or(Sev::Info);
@@ -705,7 +715,7 @@ impl ReviewView {
                                 right = rect.x.saturating_sub(1);
                             }
                         }
-                        dialog_kit::put(
+                        let used = dialog_kit::put(
                             buf,
                             x0,
                             y,
@@ -716,6 +726,7 @@ impl ReviewView {
                                 .bg(abg)
                                 .add_modifier(Modifier::BOLD),
                         );
+                        note_spans[n] = Some((x0 + 2, used.right()));
                     }
                     RowKind::GhostBody { .. } => {
                         dialog_kit::put(
@@ -737,6 +748,7 @@ impl ReviewView {
                                 .bg(abg)
                                 .add_modifier(Modifier::ITALIC),
                         );
+                        note_spans[n] = Some((x0 + 2, right));
                     }
                     _ => {}
                 }
@@ -765,6 +777,18 @@ impl ReviewView {
             // The whole row is a target, after the buttons it holds.
             hits.push((full, Hit::Row(id, i)));
         }
+
+        // The annotations' words: a drag selects them, the I-beam shows over
+        // them (the buttons and the fold mark are not in the spans).
+        pane.notes
+            .capture_spans(buf, body, |n| note_spans.get(n).copied().flatten());
+        pane.notes.paint(buf);
+        for (rect, hit) in hits.iter() {
+            if matches!(hit, Hit::Fold(_)) {
+                crate::pointer_map::hand(*rect);
+            }
+        }
+        pane.notes.register_pointer();
 
         // The scrollbar, with the overview ruler: the changes (whole file
         // only - in hunks every row is near one), the review's own rows, the cursor.

@@ -76,6 +76,46 @@ fn preview_mode_shows_the_markdown_rendered() {
     assert!(s.contains("\u{2022} first"), "a list becomes bullets:\n{s}");
 }
 
+fn mouse(kind: MouseEventKind, col: u16, row: u16) -> MouseEvent {
+    MouseEvent {
+        kind,
+        column: col,
+        row,
+        modifiers: KeyModifiers::NONE,
+    }
+}
+
+#[test]
+fn a_drag_over_the_preview_selects_its_words_and_a_click_selects_nothing() {
+    let mut ed = editor(SAMPLE);
+    ed.set_mode(Mode::Preview);
+    let buf = paint(&mut ed, 60, 12);
+    let (row, text) = rows(&buf)
+        .into_iter()
+        .enumerate()
+        .find(|(_, r)| r.contains("Some bold and code."))
+        .expect("the rendered paragraph");
+    let col = text.find("bold").expect("the word") as u16;
+    let row = row as u16;
+
+    // A plain click selects nothing.
+    ed.on_mouse(click(col, row));
+    ed.on_mouse(mouse(MouseEventKind::Up(MouseButton::Left), col, row));
+    paint(&mut ed, 60, 12);
+    assert_eq!(ed.pv_text.selected(), None);
+
+    // A drag selects exactly the words it covers, and survives a repaint.
+    ed.on_mouse(click(col, row));
+    ed.on_mouse(mouse(MouseEventKind::Drag(MouseButton::Left), col + 3, row));
+    ed.on_mouse(mouse(MouseEventKind::Up(MouseButton::Left), col + 3, row));
+    paint(&mut ed, 60, 12);
+    assert_eq!(ed.pv_text.selected().as_deref(), Some("bold"));
+
+    // Esc drops it first; the editor stays.
+    assert_eq!(ed.on_key(key(KeyCode::Esc)), KeyUse::Handled);
+    assert_eq!(ed.pv_text.selected(), None);
+}
+
 #[test]
 fn preview_of_an_empty_text_says_so() {
     let mut ed = editor("");

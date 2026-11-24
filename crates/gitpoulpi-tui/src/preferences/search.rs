@@ -249,7 +249,10 @@ impl PreferencesState {
             if wanted.is_some_and(|s| s != PrefSection::Keybindings) {
                 return Err(agent(|| screen::agent_keys_page(id)));
             }
-            let Some(action) = crate::keymap::ACTIONS.iter().position(|d| d.id == id) else {
+            let Some(action) = crate::keymap::ACTIONS
+                .iter()
+                .position(|d| d.config_id() == id)
+            else {
                 return Err(agent(|| screen::agent_no_action(id)));
             };
             self.show_keybindings(false);

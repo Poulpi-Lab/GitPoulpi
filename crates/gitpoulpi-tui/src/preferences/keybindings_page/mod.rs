@@ -480,9 +480,9 @@ pub(super) fn matches_query(
     // still search with the English words (and docs, agents).
     let hay = format!(
         "{} {} {} {}",
-        def.label.get(),
-        def.label.english(),
-        def.id,
+        def.display_label(),
+        def.english_label(),
+        def.config_id(),
         chords.join(" ")
     )
     .to_lowercase();
@@ -560,7 +560,7 @@ impl PreferencesState {
     pub(crate) fn show_keybindings_for(&mut self, action: Bind) {
         self.show_keybindings(false);
         if let Some((index, def)) = ACTIONS.iter().enumerate().find(|(_, d)| d.action == action) {
-            self.keys.query = def.id.to_string();
+            self.keys.query = def.config_id().to_string();
             self.keys.selected = index;
             self.keys.reselect();
         }
@@ -599,7 +599,7 @@ impl PreferencesState {
             .iter()
             .find(|d| d.action == action)
             .expect("registered");
-        let (ctx, name) = split_id(def.id);
+        let (ctx, name) = split_id(def.config_id());
         let defaults: Vec<KeyChord> = def
             .defaults
             .iter()
@@ -611,7 +611,7 @@ impl PreferencesState {
         } else {
             set_keybinding_in_file(&path, ctx, name, &chord_texts(chords))
         };
-        result.map_err(|e| msg::write_failed(def.id, e))?;
+        result.map_err(|e| msg::write_failed(def.config_id(), e))?;
         self.keys_reload(&path);
         Ok(())
     }
@@ -655,7 +655,7 @@ impl PreferencesState {
             Ok(()) => {
                 self.keys.popup = None;
                 let shown = chord_texts(&new).join(", ");
-                self.keys_saved(msg::saved_chords(def.label.get(), shown));
+                self.keys_saved(msg::saved_chords(def.display_label(), shown));
             }
             Err(e) => self.message = Some(e),
         }
@@ -666,7 +666,7 @@ impl PreferencesState {
             return;
         };
         if !self.keys.km.is_modified(def.action) {
-            self.message = Some(msg::already_default(def.label.get()));
+            self.message = Some(msg::already_default(def.display_label()));
             return;
         }
         let defaults: Vec<KeyChord> = def
@@ -675,7 +675,7 @@ impl PreferencesState {
             .filter_map(|t| KeyChord::parse(t).ok())
             .collect();
         match self.keys_write(def.action, &defaults) {
-            Ok(()) => self.keys_saved(msg::reset_one(def.label.get())),
+            Ok(()) => self.keys_saved(msg::reset_one(def.display_label())),
             Err(e) => self.message = Some(e),
         }
     }
@@ -701,7 +701,7 @@ impl PreferencesState {
         };
         let mut chords = self.keys.km.chords_of(def.action).to_vec();
         if chords.is_empty() {
-            self.message = Some(msg::no_key(def.label.get()));
+            self.message = Some(msg::no_key(def.display_label()));
             return;
         }
         if all {
@@ -710,7 +710,7 @@ impl PreferencesState {
             chords.pop();
         }
         match self.keys_write(def.action, &chords) {
-            Ok(()) => self.keys_saved(msg::unbound_done(def.label.get())),
+            Ok(()) => self.keys_saved(msg::unbound_done(def.display_label())),
             Err(e) => self.message = Some(e),
         }
     }

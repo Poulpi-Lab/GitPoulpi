@@ -846,6 +846,9 @@ pub(crate) enum PaletteCommand {
     /// A `Settings: ...` row, generated from the Preferences fields
     /// (`settings.rs`); not in [`PALETTE_COMMANDS`].
     Setting(settings::SettingOp),
+    /// A `Sequence: <name>` row, generated from the user's sequences
+    /// (`sequences.rs`); not in [`PALETTE_COMMANDS`].
+    Sequence(sequences::SeqOp),
 }
 
 /// The Repository Management tab's actions, as palette commands. Each
@@ -1124,6 +1127,10 @@ pub(crate) fn entry_shortcut(km: &crate::keymap::Keymap, entry: &PaletteEntry) -
     if let PaletteCommand::Setting(op) = entry.command {
         return settings::value_text(op);
     }
+    // A `Sequence: ...` row shows the key the user bound to it.
+    if let PaletteCommand::Sequence(op) = entry.command {
+        return km.shown(crate::keymap::Action::Sequence(op.slot()));
+    }
     match command_action(entry) {
         // The tab-switch rows list every binding (joined like the help
         // overlay does): Ctrl+Tab is as much "the" key as Ctrl+PageDown.
@@ -1152,6 +1159,9 @@ pub(crate) fn entry_shortcut(km: &crate::keymap::Keymap, entry: &PaletteEntry) -
 /// "configure the shortcut" button (and Alt+K) opens Settings > Keyboard &
 /// mouse filtered on.
 pub(crate) fn bind_action(entry: &PaletteEntry) -> Option<crate::keymap::Action> {
+    if let PaletteCommand::Sequence(op) = entry.command {
+        return Some(crate::keymap::Action::Sequence(op.slot()));
+    }
     bindings::static_bind_action(entry).or_else(|| bindings::palette_action(entry))
 }
 
@@ -1421,6 +1431,7 @@ mod catalog;
 mod flow;
 mod jobs;
 mod matching;
+mod sequences;
 mod settings;
 
 pub(crate) use availability::{unavailable_reason, PaletteContext};
@@ -1433,6 +1444,7 @@ pub(crate) use flow::entries as flow_entries;
 #[cfg(test)]
 pub(crate) use jobs::entries as jobs_entries;
 pub(crate) use matching::{palette_matches, score};
+pub(crate) use sequences::SeqOp;
 pub(crate) use settings::{
     listed_count as settings_listed_count, run as run_setting, sub_query as setting_sub_query,
     Outcome as SettingOutcome,

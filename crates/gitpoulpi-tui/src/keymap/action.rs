@@ -48,6 +48,9 @@ pub(crate) enum Ctx {
     /// The palette commands that have no key of their own: one bindable
     /// action each (`palette.<command id>`), dispatched like `Global`.
     Palette,
+    /// User-defined sequences: a fixed pool of slots (`Action::Sequence`),
+    /// dispatched like `Global`. Their ids are `sequence.<slug>`.
+    Sequence,
 }
 
 impl Ctx {
@@ -86,6 +89,7 @@ impl Ctx {
         Ctx::Integrations,
         Ctx::ActivityLog,
         Ctx::Palette,
+        Ctx::Sequence,
     ];
 
     /// A focused pane or the Home tab: a child of `global`.
@@ -184,6 +188,7 @@ impl Ctx {
             Ctx::Integrations => t::INTEGRATIONS,
             Ctx::ActivityLog => t::ACTIVITY_LOG,
             Ctx::Palette => t::PALETTE,
+            Ctx::Sequence => t::SEQUENCE,
         }
     }
 
@@ -223,6 +228,7 @@ impl Ctx {
             Ctx::Integrations => "integrations",
             Ctx::ActivityLog => "activity_log",
             Ctx::Palette => "palette",
+            Ctx::Sequence => "sequence",
         }
     }
 
@@ -242,7 +248,7 @@ impl Ctx {
     /// keys, so they clash with `global` and are hidden by a pane's.
     pub(crate) const fn scope(self) -> Ctx {
         match self {
-            Ctx::Palette => Ctx::Global,
+            Ctx::Palette | Ctx::Sequence => Ctx::Global,
             other => other,
         }
     }
@@ -285,14 +291,17 @@ macro_rules! actions {
             /// A palette command without a key of its own: an index into
             /// `PALETTE_COMMANDS` (see [`palette_defs`]).
             Palette(u16),
+            /// A user-defined sequence: its slot in the fixed pool
+            /// (`sequence_run::registry`).
+            Sequence(u16),
         }
 
         pub(crate) const STATIC_ACTIONS: &[ActionDef] = &[
             $(ActionDef {
                 action: Action::$variant,
-                id: $id,
+                static_id: $id,
                 ctx: Ctx::$ctx,
-                label: labels::$label,
+                static_label: labels::$label,
                 defaults: &[$($chord),*],
                 rebindable: true,
                 shadows_parent: false,
@@ -332,19 +341,42 @@ fn all_actions() -> &'static [ActionDef] {
     ALL.get_or_init(|| {
         let mut all = STATIC_ACTIONS.to_vec();
         all.extend(crate::palette::palette_action_defs());
+        // Constants only: the action list is built once and must never read
+        // the config (it would re-enter itself).
+        all.extend(sequence_pool_defs());
         all
     })
+}
+
+/// The pool of sequence slots, appended to the action list once. Each slot
+/// carries a placeholder id and no label until a slug takes it.
+fn sequence_pool_defs() -> Vec<ActionDef> {
+    (0..crate::sequence_run::registry::MAX_SEQUENCE_SLOTS as u16)
+        .map(|slot| ActionDef {
+            action: Action::Sequence(slot),
+            static_id: Box::leak(format!("sequence.#{slot}").into_boxed_str()),
+            ctx: Ctx::Sequence,
+            static_label: gitpoulpi_i18n::msg::keymap_ctx::SEQUENCE,
+            defaults: &[],
+            rebindable: true,
+            shadows_parent: false,
+            hint: None,
+            requires: None,
+        })
+        .collect()
 }
 
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct ActionDef {
     pub(crate) action: Action,
-    /// Stable config key `"<ctx>.<name>"`. Never renamed.
-    pub(crate) id: &'static str,
+    /// Stable config key `"<ctx>.<name>"`. Never renamed. Read through
+    /// [`ActionDef::config_id`]: a sequence slot's id is its slug's.
+    pub(crate) static_id: &'static str,
     pub(crate) ctx: Ctx,
     /// Settings list and conflict messages (display text only: the stable
     /// `id` and the config keys stay English).
-    pub(crate) label: gitpoulpi_i18n::M,
+    /// Read through [`ActionDef::display_label`].
+    pub(crate) static_label: gitpoulpi_i18n::M,
     /// Default chords, parsed by `KeyChord::parse`.
     pub(crate) defaults: &'static [&'static str],
     /// `false` = listed read-only, still part of conflict detection.
@@ -358,9 +390,62 @@ pub(crate) struct ActionDef {
 }
 
 impl ActionDef {
-    /// Whether this build offers the action (its feature, if any, is built).
+    /// The stable config key: `<ctx>.<name>`, or `sequence.<slug>` for a
+    /// pool slot that a sequence holds. Everything outside `keymap/` reads
+    /// the id through this (a source-scan test keeps it so).
+    pub(crate) fn config_id(&self) -> &'static str {
+        match self.action {
+            Action::Sequence(slot) => {
+                crate::sequence_run::registry::config_id(slot).unwrap_or(self.static_id)
+            }
+            _ => self.static_id,
+        }
+    }
+
+    /// The name shown in Settings, help and conflict messages. A sequence
+    /// is `Sequence: <its name>`, in the UI language.
+    pub(crate) fn display_label(&self) -> std::borrow::Cow<'static, str> {
+        match self.action {
+            Action::Sequence(slot) => std::borrow::Cow::Owned(
+                crate::sequence_run::registry::info(slot)
+                    .map(|i| gitpoulpi_i18n::msg::palette::sequence_run(&i.name))
+                    .unwrap_or_default(),
+            ),
+            _ => std::borrow::Cow::Borrowed(self.static_label.get()),
+        }
+    }
+
+    /// [`ActionDef::display_label`] in English, for a search typed in English.
+    pub(crate) fn english_label(&self) -> std::borrow::Cow<'static, str> {
+        match self.action {
+            Action::Sequence(slot) => std::borrow::Cow::Owned(
+                crate::sequence_run::registry::info(slot)
+                    .map(|i| {
+                        gitpoulpi_i18n::with_lang(gitpoulpi_i18n::Lang::En, || {
+                            gitpoulpi_i18n::msg::palette::sequence_run(&i.name)
+                        })
+                    })
+                    .unwrap_or_default(),
+            ),
+            _ => std::borrow::Cow::Borrowed(self.static_label.english()),
+        }
+    }
+
+    /// Whether the action exists right now: always, except a pool slot no
+    /// sequence holds, which Settings, help, conflicts and the docs skip.
+    pub(crate) fn present(&self) -> bool {
+        match self.action {
+            Action::Sequence(slot) => crate::sequence_run::registry::info(slot).is_some(),
+            _ => true,
+        }
+    }
+
+    /// Whether this build offers the action (its feature, if any, is built,
+    /// and a sequence slot is held): the one gate every list (Settings,
+    /// help, conflicts) goes through.
     pub(crate) fn built(&self) -> bool {
-        crate::build_features::offered(self.requires)
+        self.present()
+            && crate::build_features::offered(self.requires)
             // Every action of the rewrite workbench's own keys belongs to the
             // History workbench, whatever else (`@Ai`) it also needs.
             && (!matches!(self.ctx, Ctx::Rewrite)

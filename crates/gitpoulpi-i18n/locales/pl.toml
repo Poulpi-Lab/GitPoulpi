@@ -2639,6 +2639,8 @@ md_editor_ai = "Edytor Markdown: Pisz z AI"
 
 
 [keymap_ctx]
+# context: key group of the user-defined sequences on the Settings keybindings page
+sequence = "User sequences"
 rewrite = "Warsztat przepisywania historii"
 history = "Widok historii pliku"
 commit_column = { git = "Kolumna commitów (gdy ma fokus)", local = "Kolumna zatwierdzeń (gdy ma fokus)" }
@@ -3013,6 +3015,8 @@ action_issue_body = "Opis zgłoszenia"
 title_hosting_base = "Prompt bazowy dla odpowiedzi"
 
 [palette]
+# context: palette row running a user-defined sequence; {name} is the sequence's own name
+sequence_run = "Sequence: {name}"
 git_pull_all_branches = "Git: {$Pull} wszystkie gałęzie"
 git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} wszystkie gałęzie (fast-forward, jeśli się da)"
 git_pull_all_branches_fast_forward_only = "Git: {$Pull} wszystkie gałęzie (tylko fast-forward)"
@@ -5818,6 +5822,10 @@ temp_dir = "katalog tymczasowy: {error}"
 temp_file = "plik tymczasowy: {error}"
 
 [keymap_issue]
+# context: [keybindings.sequence] entry naming a sequence that does not exist; {name} is the slug
+unknown_sequence = "no sequence named '{name}'"
+# context: more sequences than the keymap has slots for; {slug} is the sequence, {max} the limit
+sequence_limit = "sequence '{slug}' ignored: the limit of {max} sequences with a key per session is reached"
 unknown_action = "nieznana akcja „{name}” w [{ctx}]"
 unknown_context = "nieznany kontekst „{ctx}”"
 not_rebindable = "jeszcze nie do zmiany"

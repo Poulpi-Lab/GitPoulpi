@@ -7,5 +7,6 @@ mod catalog;
 mod docs;
 mod french;
 mod matching;
+mod sequences;
 mod settings;
 mod shortcuts;

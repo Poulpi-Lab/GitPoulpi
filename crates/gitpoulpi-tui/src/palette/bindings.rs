@@ -77,9 +77,9 @@ pub(crate) fn palette_action_defs() -> Vec<ActionDef> {
         .filter(|(_, e)| static_bind_action(e).is_none())
         .map(|(i, e)| ActionDef {
             action: Action::Palette(i as u16),
-            id: Box::leak(format!("palette.{}", command_id(&e.command)).into_boxed_str()),
+            static_id: Box::leak(format!("palette.{}", command_id(&e.command)).into_boxed_str()),
             ctx: Ctx::Palette,
-            label: e.label,
+            static_label: e.label,
             defaults: &[],
             rebindable: true,
             shadows_parent: false,

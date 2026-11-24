@@ -50,7 +50,10 @@ fn command_ids_are_unique_and_round_trip() {
     assert!(defs.len() > 100, "{} palette actions", defs.len());
     for d in defs {
         let entry = palette_entry(d.action).expect("an index into the catalogue");
-        assert_eq!(d.id, format!("palette.{}", command_id(&entry.command)));
+        assert_eq!(
+            d.config_id(),
+            format!("palette.{}", command_id(&entry.command))
+        );
         // The entry finds its own action again.
         assert_eq!(bind_action(entry), Some(d.action));
     }

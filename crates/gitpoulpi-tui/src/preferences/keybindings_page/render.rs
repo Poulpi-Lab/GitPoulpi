@@ -156,12 +156,12 @@ impl PreferencesState {
             let label = ACTIONS
                 .iter()
                 .find(|d| d.action == action)
-                .map_or("", |d| d.label.get());
+                .map_or_else(Default::default, |d| d.display_label());
             dialog_kit::put(
                 buf,
                 area.x,
                 y,
-                &msg::conflicts_of(label),
+                &msg::conflicts_of(&label),
                 w,
                 Style::default().fg(th().status.danger),
             );
@@ -249,7 +249,7 @@ impl PreferencesState {
                         buf,
                         area.x + 1,
                         row_y,
-                        def.label.get(),
+                        &def.display_label(),
                         label_w as u16,
                         base,
                     );
@@ -353,7 +353,7 @@ impl PreferencesState {
         {
             let default_text = def.defaults.join(", ");
             let mut first = msg::detail(
-                def.id,
+                def.config_id(),
                 if default_text.is_empty() {
                     msg::NONE.get()
                 } else {
@@ -454,9 +454,9 @@ pub(super) fn render_popup(
             let press = {
                 let esc = dialog_kit::key_name(Key::Esc);
                 if cap.add {
-                    msg::press_extra(def.label.get(), esc)
+                    msg::press_extra(def.display_label(), esc)
                 } else {
-                    msg::press_new(def.label.get(), esc)
+                    msg::press_new(def.display_label(), esc)
                 }
             };
             // Wide enough for the sentence in this language (72 in English).
@@ -579,7 +579,7 @@ pub(super) fn render_popup(
             }
             if let Some(other) = cap.analysis.replace {
                 if let Some(d) = ACTIONS.iter().find(|d| d.action == other) {
-                    dialog_kit::put(buf, x, y, &msg::replace_unbinds(d.label.get()), w, dim);
+                    dialog_kit::put(buf, x, y, &msg::replace_unbinds(d.display_label()), w, dim);
                 }
             }
             let by = rect.bottom().saturating_sub(2);

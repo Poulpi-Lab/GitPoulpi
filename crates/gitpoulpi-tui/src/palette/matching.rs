@@ -54,13 +54,13 @@ thread_local! {
 /// (a switch of language, git vocabulary or host) rather than per keystroke.
 /// The key also holds the resolved language and vocabulary bits, so a test's
 /// thread-local overrides can never reuse another thread state's text.
-fn with_haystacks<R>(f: impl FnOnce(&[Haystack]) -> R) -> R {
+fn with_haystacks<R>(seq: &'static [PaletteEntry], f: impl FnOnce(&[Haystack]) -> R) -> R {
     let key = (
         gitpoulpi_i18n::epoch(),
         gitpoulpi_i18n::current() as u8,
         gitpoulpi_i18n::git_terms_translated(),
         gitpoulpi_i18n::merge_terms(),
-        flow::signature() ^ jobs::signature(),
+        flow::signature() ^ jobs::signature() ^ (seq.as_ptr() as usize as u64).rotate_left(32),
     );
     HAYSTACKS.with(|cell| {
         let mut slot = cell.borrow_mut();
@@ -70,6 +70,7 @@ fn with_haystacks<R>(f: impl FnOnce(&[Haystack]) -> R) -> R {
                 .chain(settings::entries())
                 .chain(flow::entries())
                 .chain(jobs::entries())
+                .chain(seq)
                 .map(|e| {
                     let current = e.display_label().to_lowercase();
                     let en = e.english().to_lowercase();
@@ -94,6 +95,8 @@ fn with_haystacks<R>(f: impl FnOnce(&[Haystack]) -> R) -> R {
 /// filtered out, but they sort after available ones at equal relevance so
 /// the thing you can actually run lands under the cursor first.
 pub(crate) fn palette_matches(query: &str, ctx: PaletteContext) -> Vec<PaletteMatch> {
+    // A sequence added outside the window: before anything is keyed on it.
+    sequences::sync();
     let query = query.trim().to_lowercase();
     let reason_of = |e: &PaletteEntry| {
         // On Home the missing repository is the real reason, whatever
@@ -103,12 +106,15 @@ pub(crate) fn palette_matches(query: &str, ctx: PaletteContext) -> Vec<PaletteMa
             .or_else(|| unavailable_reason(e.command, ctx))
     };
     let prefixes = settings::prefixes();
-    let mut scored: Vec<(i32, bool, usize, &'static PaletteEntry)> = with_haystacks(|rows| {
+    // One snapshot per call: the rows and the haystacks must be the same list.
+    let seq = sequences::entries();
+    let mut scored: Vec<(i32, bool, usize, &'static PaletteEntry)> = with_haystacks(seq, |rows| {
         PALETTE_COMMANDS
             .iter()
             .chain(settings::entries())
             .chain(flow::entries())
             .chain(jobs::entries())
+            .chain(seq)
             .enumerate()
             .filter(|(_, e)| settings::listed(e, &query, prefixes))
             .filter(|(_, e)| ctx.ai_enabled || !e.command.needs_ai())

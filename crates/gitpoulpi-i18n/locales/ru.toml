@@ -2632,6 +2632,8 @@ md_editor_ai = "Редактор Markdown: написать с ИИ"
 
 
 [keymap_ctx]
+# context: key group of the user-defined sequences on the Settings keybindings page
+sequence = "User sequences"
 rewrite = "Переписывание истории"
 history = "Вид истории файла"
 commit_column = { git = "Колонка commit'ов (когда у неё клавиатура)", local = "Колонка коммитов (когда у неё клавиатура)" }
@@ -3007,6 +3009,8 @@ action_issue_body = "Описание задачи"
 title_hosting_base = "Базовый промпт для ответов"
 
 [palette]
+# context: palette row running a user-defined sequence; {name} is the sequence's own name
+sequence_run = "Sequence: {name}"
 git_pull_all_branches = "Git: {$Pull} все ветки"
 git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} все ветки (fast-forward, если возможно)"
 git_pull_all_branches_fast_forward_only = "Git: {$Pull} все ветки (только fast-forward)"
@@ -5810,6 +5814,10 @@ temp_dir = "временная папка: {error}"
 temp_file = "временный файл: {error}"
 
 [keymap_issue]
+# context: [keybindings.sequence] entry naming a sequence that does not exist; {name} is the slug
+unknown_sequence = "no sequence named '{name}'"
+# context: more sequences than the keymap has slots for; {slug} is the sequence, {max} the limit
+sequence_limit = "sequence '{slug}' ignored: the limit of {max} sequences with a key per session is reached"
 unknown_action = "неизвестное действие «{name}» в [{ctx}]"
 unknown_context = "неизвестная область «{ctx}»"
 not_rebindable = "пока нельзя переназначить"

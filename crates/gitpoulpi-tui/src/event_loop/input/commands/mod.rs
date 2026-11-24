@@ -283,6 +283,7 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::AbortOperation
         | PaletteCommand::SkipOperation => conflicts::run(cx, cmd),
         PaletteCommand::Setting(..)
+        | PaletteCommand::Sequence(..)
         | PaletteCommand::OpenRepository
         | PaletteCommand::BrowseRepository
         | PaletteCommand::CreateRepository

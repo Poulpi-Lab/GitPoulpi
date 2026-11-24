@@ -12,18 +12,28 @@ fn every_action_once_and_ids_unique() {
     let mut ids = HashSet::new();
     let mut actions = HashSet::new();
     for def in ACTIONS {
-        assert!(ids.insert(def.id), "duplicate id {}", def.id);
+        assert!(
+            ids.insert(def.config_id()),
+            "duplicate id {}",
+            def.config_id()
+        );
         assert!(
             actions.insert(def.action),
             "duplicate action {:?}",
             def.action
         );
-        let (ctx, name) = def.id.split_once('.').expect("id is <ctx>.<name>");
-        assert_eq!(ctx, def.ctx.name(), "{} sits in the wrong ctx", def.id);
+        let (ctx, name) = def.config_id().split_once('.').expect("id is <ctx>.<name>");
+        assert_eq!(
+            ctx,
+            def.ctx.name(),
+            "{} sits in the wrong ctx",
+            def.config_id()
+        );
+        // A sequence's name is the user's slug (`a-z 0-9 _ -`).
         assert!(
-            name.chars().all(|c| c.is_ascii_lowercase() || c == '_'),
+            def.ctx == Ctx::Sequence || name.chars().all(|c| c.is_ascii_lowercase() || c == '_'),
             "{} is not snake_case",
-            def.id
+            def.config_id()
         );
     }
 }
@@ -31,10 +41,18 @@ fn every_action_once_and_ids_unique() {
 #[test]
 fn every_default_parses() {
     // Palette commands ship unbound.
-    for def in ACTIONS.iter().filter(|d| d.ctx != Ctx::Palette) {
-        assert!(!def.defaults.is_empty(), "{} has no default", def.id);
+    for def in ACTIONS
+        .iter()
+        .filter(|d| !matches!(d.ctx, Ctx::Palette | Ctx::Sequence))
+    {
+        assert!(
+            !def.defaults.is_empty(),
+            "{} has no default",
+            def.config_id()
+        );
         for text in def.defaults {
-            KeyChord::parse(text).unwrap_or_else(|e| panic!("{} default {text:?}: {e}", def.id));
+            KeyChord::parse(text)
+                .unwrap_or_else(|e| panic!("{} default {text:?}: {e}", def.config_id()));
         }
     }
 }
@@ -48,7 +66,7 @@ fn defaults_have_no_same_context_duplicates() {
             assert!(
                 seen.insert((def.ctx, chord)),
                 "{} reuses {text} within {}",
-                def.id,
+                def.config_id(),
                 def.ctx.name()
             );
         }
@@ -217,7 +235,7 @@ fn every_git_prefix_default_resolves_to_its_own_action() {
                 km.action_in_code_mods(def.ctx, code, mods),
                 Some(def.action),
                 "{}",
-                def.id
+                def.config_id()
             );
         }
     }
@@ -691,7 +709,9 @@ fn fixed_keys_and_digits_cannot_be_bound_in_a_pane() {
 #[test]
 fn an_action_without_a_feature_tag_is_built_and_a_tag_follows_the_build() {
     use crate::build_features::{offered_with, Feature};
-    assert!(ACTIONS.iter().all(|d| d.built() || d.requires.is_some()));
+    assert!(ACTIONS
+        .iter()
+        .all(|d| d.built() || d.requires.is_some() || d.ctx == Ctx::Sequence));
     // The registry's filter, against a build with nothing optional.
     let none = |_: Feature| false;
     assert!(ACTIONS
@@ -804,4 +824,138 @@ fn only_alt_is_refused_after_a_prefix() {
     };
     assert!(a("Alt+X").refusal.is_some());
     assert!(a("Ctrl+X").refusal.is_none());
+}
+
+// ---- user-defined sequences (`[keybindings.sequence]`) ----
+
+mod sequences {
+    use super::*;
+    use crate::sequence_run::registry::{self, refresh_defs, test_def};
+
+    fn bound(entries: &[(&str, &str, &[&str])]) -> Keymap {
+        Keymap::from_config(&gitpoulpi_config::KeybindingsConfig::from_entries(
+            entries
+                .iter()
+                .map(|(c, a, v)| (*c, *a, v.iter().map(|s| s.to_string()).collect())),
+        ))
+    }
+
+    fn key(code: KeyCode, mods: KeyModifiers) -> crossterm::event::KeyEvent {
+        crossterm::event::KeyEvent::new(code, mods)
+    }
+
+    #[test]
+    fn a_bound_slug_resolves_through_the_registry() {
+        refresh_defs(&[test_def("km-backup")]);
+        let slot = registry::slot_of("km-backup").unwrap();
+        let km = bound(&[("sequence", "km-backup", &["Ctrl+Shift+F7"])]);
+        assert!(km.issues().is_empty(), "{:?}", km.issues());
+        let ev = key(KeyCode::F(7), KeyModifiers::CONTROL | KeyModifiers::SHIFT);
+        assert_eq!(
+            km.action_in(Ctx::Sequence, &ev),
+            Some(Action::Sequence(slot))
+        );
+        assert_eq!(km.shown(Action::Sequence(slot)), "Ctrl+Shift+F7");
+        // Nobody else sees it: the other contexts do not know the chord.
+        assert_eq!(km.action_in(Ctx::Global, &ev), None);
+        assert_eq!(Keymap::defaults().action_in(Ctx::Sequence, &ev), None);
+    }
+
+    #[test]
+    fn an_unknown_slug_is_a_non_fatal_issue() {
+        refresh_defs(&[test_def("km-known")]);
+        let km = bound(&[
+            ("sequence", "km-ghost", &["Ctrl+Shift+F8"]),
+            ("sequence", "km-known", &["Ctrl+Shift+F9"]),
+        ]);
+        assert_eq!(km.issues().len(), 1, "{:?}", km.issues());
+        assert_eq!(km.issues()[0].id, "sequence.km-ghost");
+        assert_eq!(km.issues()[0].message, "no sequence named 'km-ghost'");
+        let slot = registry::slot_of("km-known").unwrap();
+        assert_eq!(
+            km.label(Action::Sequence(slot)),
+            "Ctrl+Shift+F9",
+            "the rest applies"
+        );
+    }
+
+    #[test]
+    fn a_key_a_global_action_has_is_a_detected_conflict_and_is_refused() {
+        refresh_defs(&[test_def("km-clash")]);
+        let slot = registry::slot_of("km-clash").unwrap();
+        let km = bound(&[("sequence", "km-clash", &["Ctrl+P"])]);
+        assert_eq!(km.issues().len(), 1, "{:?}", km.issues());
+        assert_eq!(km.issues()[0].id, "sequence.km-clash");
+        assert!(
+            km.issues()[0].message.contains("Ctrl+P"),
+            "{:?}",
+            km.issues()
+        );
+        assert!(
+            km.chords_of(Action::Sequence(slot)).is_empty(),
+            "default (none) restored"
+        );
+        // The page's capture popup asks first: the conflict shows up there.
+        let probe = Keymap::defaults().with_chords(
+            Action::Sequence(slot),
+            vec![KeyChord::parse("Ctrl+P").unwrap()],
+        );
+        assert!(
+            probe.conflicts().iter().any(|c| {
+                c.action == Action::Sequence(slot) || c.other == Some(Action::Sequence(slot))
+            }),
+            "the probe keymap reports the clash"
+        );
+    }
+
+    #[test]
+    fn unused_slots_are_nowhere() {
+        refresh_defs(&[]);
+        let pool: Vec<_> = ACTIONS.iter().filter(|d| d.ctx == Ctx::Sequence).collect();
+        assert_eq!(pool.len(), registry::MAX_SEQUENCE_SLOTS);
+        assert!(pool.iter().all(|d| !d.present() && !d.built()));
+        // Not in the conflicts.
+        assert!(Keymap::defaults()
+            .conflicts()
+            .iter()
+            .all(|c| !matches!(c.action, Action::Sequence(_))));
+        // A held slot appears, and only it.
+        refresh_defs(&[test_def("km-shown")]);
+        let shown: Vec<_> = ACTIONS
+            .iter()
+            .filter(|d| d.ctx == Ctx::Sequence && d.built())
+            .collect();
+        assert_eq!(shown.len(), 1);
+        assert_eq!(shown[0].config_id(), "sequence.km-shown");
+        assert_eq!(shown[0].display_label(), "Sequence: Name of km-shown");
+    }
+
+    #[test]
+    fn ids_survive_a_reload_and_a_reorder() {
+        refresh_defs(&[test_def("km-one"), test_def("km-two")]);
+        let id_of = |slug: &str| {
+            let slot = registry::slot_of(slug).unwrap();
+            ACTIONS
+                .iter()
+                .find(|d| d.action == Action::Sequence(slot))
+                .unwrap()
+                .config_id()
+        };
+        let (one, two) = (id_of("km-one"), id_of("km-two"));
+        refresh_defs(&[test_def("km-new"), test_def("km-two"), test_def("km-one")]);
+        assert_eq!((id_of("km-one"), id_of("km-two")), (one, two));
+        assert_eq!(one, "sequence.km-one");
+        // Dropped: its key is refused; back: the same id.
+        refresh_defs(&[test_def("km-two")]);
+        let km = bound(&[("sequence", "km-one", &["Ctrl+Shift+F10"])]);
+        assert_eq!(km.issues().len(), 1, "a dropped sequence has no key");
+        refresh_defs(&[test_def("km-one")]);
+        assert_eq!(id_of("km-one"), one);
+    }
+
+    #[test]
+    fn the_refusal_names_the_slug_and_the_limit() {
+        let line = gitpoulpi_i18n::msg::keymap_issue::sequence_limit("x", 128);
+        assert!(line.contains("128") && line.contains("'x'"), "{line}");
+    }
 }

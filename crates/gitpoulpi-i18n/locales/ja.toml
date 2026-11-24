@@ -2641,6 +2641,8 @@ md_editor_ai = "Markdown エディター: AI で作成"
 
 
 [keymap_ctx]
+# context: key group of the user-defined sequences on the Settings keybindings page
+sequence = "User sequences"
 rewrite = "履歴書き換えワークベンチ"
 history = "ファイル履歴ビュー"
 commit_column = "{$Commit}列（キーボード操作時）"
@@ -3015,6 +3017,8 @@ action_issue_body = "Issue の説明"
 title_hosting_base = "返信のベースプロンプト"
 
 [palette]
+# context: palette row running a user-defined sequence; {name} is the sequence's own name
+sequence_run = "Sequence: {name}"
 git_pull_all_branches = "Git: すべてのブランチを{$Pull}"
 git_pull_all_branches_fast_forward_if_possible = "Git: すべてのブランチを{$Pull}（可能なら早送り）"
 git_pull_all_branches_fast_forward_only = "Git: すべてのブランチを{$Pull}（早送りのみ）"
@@ -5815,6 +5819,10 @@ temp_dir = "一時ディレクトリ：{error}"
 temp_file = "一時ファイル：{error}"
 
 [keymap_issue]
+# context: [keybindings.sequence] entry naming a sequence that does not exist; {name} is the slug
+unknown_sequence = "no sequence named '{name}'"
+# context: more sequences than the keymap has slots for; {slug} is the sequence, {max} the limit
+sequence_limit = "sequence '{slug}' ignored: the limit of {max} sequences with a key per session is reached"
 unknown_action = "[{ctx}] に不明な操作 '{name}' があります"
 unknown_context = "不明な範囲 '{ctx}'"
 not_rebindable = "まだ再割り当てできません"

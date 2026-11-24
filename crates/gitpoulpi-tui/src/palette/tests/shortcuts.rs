@@ -239,7 +239,7 @@ fn every_bindable_action_with_a_palette_row_shows_its_key() {
             "no palette row shows `{}` ({:?}): give its command an entry in \
              `command_action` (or a catalogue shortcut), or list the action in \
              NO_OWN_PALETTE_ROW with a reason",
-            d.id,
+            d.config_id(),
             labels
         );
     }

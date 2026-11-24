@@ -405,6 +405,9 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             crate::event_loop::fetch_policy::note_fetch(cx.repo_root);
         }
         PaletteCommand::ToggleHelp => *cx.show_help = !*cx.show_help,
+        PaletteCommand::Sequence(op) => {
+            crate::sequence_run::start(op.slot(), cx.last_message);
+        }
         PaletteCommand::Setting(op) => match palette::run_setting(op) {
             palette::SettingOutcome::Message(message) => *cx.last_message = Some(message),
             palette::SettingOutcome::EditOnPage(key) => {

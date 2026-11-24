@@ -74,7 +74,7 @@ fn help_placeholders_all_resolve() {
         for line in raw_messages(lang) {
             for id in placeholders(line) {
                 assert!(
-                    keymap::ACTIONS.iter().any(|d| d.id == id),
+                    keymap::ACTIONS.iter().any(|d| d.config_id() == id),
                     "{lang:?} help names unknown action {id} in {line:?}"
                 );
             }
@@ -107,14 +107,17 @@ fn french_help_names_the_same_actions_as_english() {
 #[test]
 fn every_rebindable_action_is_in_help() {
     let all = raw_messages(Lang::En).join("\n").replace("{*", "{");
-    for def in keymap::ACTIONS
-        .iter()
-        .filter(|d| d.live() && !matches!(d.ctx, keymap::Ctx::Prompt | keymap::Ctx::Palette))
-    {
+    for def in keymap::ACTIONS.iter().filter(|d| {
+        d.live()
+            && !matches!(
+                d.ctx,
+                keymap::Ctx::Prompt | keymap::Ctx::Palette | keymap::Ctx::Sequence
+            )
+    }) {
         assert!(
-            all.contains(&format!("{{{}}}", def.id)),
+            all.contains(&format!("{{{}}}", def.config_id())),
             "{} has no help line",
-            def.id
+            def.config_id()
         );
     }
 }

@@ -82,6 +82,8 @@ pub mod protection;
 pub mod redmine;
 pub mod refs;
 #[cfg(feature = "hosting")]
+pub mod request_actions;
+#[cfg(feature = "hosting")]
 pub mod resolve;
 #[cfg(feature = "hosting")]
 pub mod review;
@@ -160,6 +162,8 @@ pub use model::{
 };
 #[cfg(feature = "hosting")]
 pub use project::{HostedProject, HostedSshKey};
+#[cfg(feature = "hosting")]
+pub use request_actions::{request_actions, strip_draft_prefix, MergeMethod, RequestActions};
 #[cfg(feature = "hosting")]
 pub use resolve::{resolve_for_repo, suggest_for_repo, Resolution, ResolveRemote, Suggestion};
 #[cfg(feature = "hosting")]

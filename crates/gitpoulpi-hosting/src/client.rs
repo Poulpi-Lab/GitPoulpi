@@ -594,6 +594,27 @@ pub trait HostingClient: Send + Sync {
         Ok(())
     }
 
+    /// Merges a pull / merge request on the host (GitHub, GitLab, Gitea,
+    /// Forgejo). Not undoable from here: the host owns the result.
+    async fn merge_pull_request(
+        &self,
+        _project: &str,
+        _number: u64,
+        _method: crate::request_actions::MergeMethod,
+    ) -> Result<()> {
+        Err(self.unsupported("merge_pull_request"))
+    }
+
+    /// Takes a draft pull / merge request out of draft.
+    async fn mark_pull_request_ready(&self, _project: &str, _number: u64) -> Result<()> {
+        Err(self.unsupported("mark_pull_request_ready"))
+    }
+
+    /// Closes a pull / merge request without merging it.
+    async fn close_pull_request(&self, _project: &str, _number: u64) -> Result<()> {
+        Err(self.unsupported("close_pull_request"))
+    }
+
     /// Replaces the assignees / reviewers / labels / milestone of a pull /
     /// merge request.
     async fn update_pull_request(

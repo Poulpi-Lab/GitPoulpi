@@ -656,6 +656,23 @@ impl HostingClient for GitHubClient {
         self.meta_update_pull_request(project, number, edit).await
     }
 
+    async fn merge_pull_request(
+        &self,
+        project: &str,
+        number: u64,
+        method: crate::request_actions::MergeMethod,
+    ) -> Result<()> {
+        self.merge_request_now(project, number, method).await
+    }
+
+    async fn close_pull_request(&self, project: &str, number: u64) -> Result<()> {
+        self.close_request_now(project, number).await
+    }
+
+    async fn mark_pull_request_ready(&self, project: &str, number: u64) -> Result<()> {
+        self.ready_request_now(project, number).await
+    }
+
     async fn pull_request_diff(
         &self,
         project: &str,

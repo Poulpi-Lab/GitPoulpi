@@ -10843,3 +10843,5 @@ status_on = "Auteursfilter: {count} gekozen"
 status_cleared = "Auteursfilter gewist"
 status_none = "Geen auteursfilter om te wissen"
 help = "Filter het Log op auteur: dimt de andere auteurs zoals een zoekopdracht"
+# context: help overlay line for Esc in the Log while an author filter is on
+help_esc = "Drop the author filter (when nothing nearer, like a selection, wants Esc)"

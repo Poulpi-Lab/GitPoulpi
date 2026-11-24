@@ -13451,3 +13451,5 @@ status_cleared = "Author filter cleared"
 status_none = "No author filter to clear"
 # context: help overlay line for the key that opens the author filter
 help = "Filter the Log by author: dims the other authors like a search does"
+# context: help overlay line for Esc in the Log while an author filter is on
+help_esc = "Drop the author filter (when nothing nearer, like a selection, wants Esc)"

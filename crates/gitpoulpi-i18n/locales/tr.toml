@@ -10848,3 +10848,5 @@ status_on = "Yazar filtresi: {count} seçili"
 status_cleared = "Yazar filtresi temizlendi"
 status_none = "Temizlenecek yazar filtresi yok"
 help = "Log'u yazara göre filtrele: aramadaki gibi diğer yazarları soluklaştırır"
+# context: help overlay line for Esc in the Log while an author filter is on
+help_esc = "Drop the author filter (when nothing nearer, like a selection, wants Esc)"

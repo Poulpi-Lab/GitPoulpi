@@ -10967,3 +10967,5 @@ status_on = "Filtro de autor: {count} escolhidos"
 status_cleared = "Filtro de autor limpo"
 status_none = "Nenhum filtro de autor para limpar"
 help = "Filtrar o Log por autor: esbate os outros autores como uma pesquisa"
+# context: help overlay line for Esc in the Log while an author filter is on
+help_esc = "Drop the author filter (when nothing nearer, like a selection, wants Esc)"

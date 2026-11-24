@@ -108,7 +108,9 @@ terminal: `gitpoulpi mailmap list|check|add`.
   the chosen authors, and when the Author column is hidden or too narrow for
   the funnel the Log's top border says *Author: Alice Example +1* instead (the
   key and the palette still work). To drop it: the **Clear filter** row, a
-  right-click on the lit funnel, or the palette's *Log: Clear Author Filter*.
+  right-click on the lit funnel, the palette's *Log: Clear Author Filter*, or
+  `Esc` in the Log (after a selection, which `Esc` drops first; inside the popup
+  `Esc` first empties the search field, then closes the popup and keeps the filter).
   While it is on, Up/Down (and PageUp/PageDown, Home/End) move the selection only between the lit commits, skipping the dimmed ones; a click still selects any row.
   The authors are those of the commits the Log has loaded (mailmap applied, as
   in the column), and the filter is remembered per repository, across tab

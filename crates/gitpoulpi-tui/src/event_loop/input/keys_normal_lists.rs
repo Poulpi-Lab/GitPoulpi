@@ -120,6 +120,12 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
             cx.log_multi.clear();
             *cx.last_message = Some(msg::input::SELECTION_CLEARED.get().into());
         }
+        // With nothing nearer to drop (the selection above, a menu, a field, the
+        // file focus), Esc in the Log drops the author filter: the same path as
+        // `Log: Clear Author Filter`.
+        KeyCode::Esc if esc_clears_author_filter(cx) => {
+            commands::clear_author_filter(cx);
+        }
         // The columns scroll sideways (`scroll` layout). Before the bare `Right`
         // arm below, which ignores modifiers and would open the ref popup on
         // `Shift+Right`; `LogFiles` keeps its own `Shift+Left/Right`.
@@ -825,4 +831,39 @@ fn stage_selection(cx: &mut CommandCtx<'_>) -> bool {
     }
     cx.file_sel.clear();
     true
+}
+
+/// Whether a bare `Esc` in the Log drops the author filter: the Log has the
+/// keyboard, a filter is on, and no field, menu, popup or file focus owns the key.
+fn esc_clears_author_filter(cx: &CommandCtx<'_>) -> bool {
+    esc_drops_author_filter(
+        *cx.focus == Focus::Log,
+        !cx.log_author_filter.is_empty(),
+        *cx.commit_file_focus
+            || *cx.commit_filter_focus
+            || cx.composer_focus.is_some()
+            || cx.ref_popup.is_some()
+            || cx.open_menu.is_open(),
+    )
+}
+
+/// The pure rule behind [`esc_clears_author_filter`]; `owned` is "something
+/// nearer already owns Esc". (The Log's own selection clears first, by its arm
+/// sitting above this one; a pending chord, the search bar and a running
+/// sequence are other input modes or later arms.)
+pub(super) fn esc_drops_author_filter(in_log: bool, filter_on: bool, owned: bool) -> bool {
+    in_log && filter_on && !owned
+}
+
+#[cfg(test)]
+mod esc_tests {
+    use super::esc_drops_author_filter;
+
+    #[test]
+    fn esc_drops_the_filter_only_in_the_log_with_nothing_nearer() {
+        assert!(esc_drops_author_filter(true, true, false));
+        assert!(!esc_drops_author_filter(false, true, false), "not the Log");
+        assert!(!esc_drops_author_filter(true, false, false), "no filter");
+        assert!(!esc_drops_author_filter(true, true, true), "a nearer owner");
+    }
 }

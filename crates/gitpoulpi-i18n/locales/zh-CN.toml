@@ -10845,3 +10845,5 @@ status_on = "作者筛选：已选 {count} 位"
 status_cleared = "已清除作者筛选"
 status_none = "没有可清除的作者筛选"
 help = "按作者筛选 Log：像搜索一样淡化其他作者"
+# context: help overlay line for Esc in the Log while an author filter is on
+help_esc = "Drop the author filter (when nothing nearer, like a selection, wants Esc)"

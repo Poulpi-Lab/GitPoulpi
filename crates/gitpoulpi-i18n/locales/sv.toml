@@ -10849,3 +10849,5 @@ status_on = "Författarfilter: {count} valda"
 status_cleared = "Författarfilter rensat"
 status_none = "Inget författarfilter att rensa"
 help = "Filtrera Log efter författare: tonar ned övriga författare som en sökning"
+# context: help overlay line for Esc in the Log while an author filter is on
+help_esc = "Drop the author filter (when nothing nearer, like a selection, wants Esc)"

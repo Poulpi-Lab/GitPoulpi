@@ -10968,3 +10968,5 @@ status_on = "작성자 필터: {count}명 선택됨"
 status_cleared = "작성자 필터를 해제했습니다"
 status_none = "해제할 작성자 필터가 없습니다"
 help = "작성자로 Log를 필터합니다: 검색처럼 다른 작성자는 흐리게 표시됩니다"
+# context: help overlay line for Esc in the Log while an author filter is on
+help_esc = "Drop the author filter (when nothing nearer, like a selection, wants Esc)"

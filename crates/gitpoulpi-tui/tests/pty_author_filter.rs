@@ -203,6 +203,9 @@ fn the_keyboard_and_the_palette_reach_the_whole_filter() {
             .is_some_and(|(_, r)| s.line(r + 1).contains('\u{2713}'))
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The first Esc empties the typed text, the second closes.
+    term.send_keys("Escape").unwrap();
+    term.send_keys("Escape").unwrap();
     term.send_keys("Escape").unwrap();
     let s = term
         .wait_for("the funnel lit and Alice's row dimmed", STEP, |s| {
@@ -381,4 +384,48 @@ fn the_arrows_step_between_lit_commits_while_the_author_filter_is_on() {
         selected_message(s) == Some("delta more")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+}
+
+#[test]
+fn esc_in_the_popup_clears_the_text_then_closes_and_esc_in_the_log_drops_the_filter() {
+    let repo = fixture();
+    let config = tempfile::tempdir().unwrap();
+    let mut term = launch(&repo, config.path(), "author-filter-esc");
+    open_with_funnel(&mut term);
+    // Choose Bob, then type text: the first Esc empties the field and keeps
+    // the popup open, the second closes it with the filter kept.
+    term.send_keys("Down").unwrap();
+    term.send_keys("Enter").unwrap();
+    term.wait_for("Bob ticked", STEP, |s| {
+        s.find("Clear filter")
+            .is_some_and(|(_, r)| s.line(r + 2).contains('\u{2713}'))
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_text("carol").unwrap();
+    term.wait_for("the list narrowed", STEP, |s| {
+        s.find("Clear filter")
+            .is_some_and(|(_, r)| !s.line(r + 1).contains("Alice"))
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Escape").unwrap();
+    term.wait_for("the text cleared, the popup still open", STEP, |s| {
+        s.contains("Clear filter") && s.contains("filter by author")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Escape").unwrap();
+    let s = term
+        .wait_for("the popup closed, the funnel lit", STEP, |s| {
+            !s.contains("Clear filter") && funnel_at(s, FUNNEL_ON).is_some()
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert_eq!(dimmed(&s, "epsilon work", "delta more"), Some(true));
+    // Esc in the Log drops the filter: funnel back to normal, every commit lit.
+    term.send_keys("Escape").unwrap();
+    let s = term
+        .wait_for("the filter dropped by Esc", STEP, |s| {
+            funnel_at(s, FUNNEL).is_some() && dimmed(s, "epsilon work", "delta more") == Some(false)
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert_eq!(dimmed(&s, "gamma add", "beta fix"), Some(false));
+    assert!(s.contains("Author filter cleared"), "{}", s.text());
 }

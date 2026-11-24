@@ -630,7 +630,7 @@ fn every_ai_palette_command_carries_the_sparkle() {
             ai += 1;
         }
     }
-    assert_eq!(ai, 13);
+    assert_eq!(ai, 14);
 }
 
 /// Every row action of the Undo history / Reflog / Lost work panel has a

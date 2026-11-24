@@ -32,6 +32,7 @@ mod refs_update;
 mod reveal;
 pub(in crate::event_loop) mod review_resume;
 mod sequence;
+mod sequence_ai;
 mod sizes;
 mod stage_guard_peek;
 mod tick;

@@ -28,6 +28,8 @@ pub(super) enum CloseIssue {
     Template,
     /// The SSH & credentials page was edited and not saved.
     RepoAuth,
+    /// A sequence proposal of the AI is open (typed description or result).
+    SequenceAi,
     /// The profile at this index has no author email.
     Profile(usize),
 }
@@ -66,6 +68,9 @@ impl PreferencesState {
         if self.ra_dirty() {
             return Some(CloseIssue::RepoAuth);
         }
+        if self.seq_ai_dirty() {
+            return Some(CloseIssue::SequenceAi);
+        }
         self.config
             .profiles
             .iter()
@@ -85,6 +90,10 @@ impl PreferencesState {
             CloseIssue::RepoAuth => (
                 screen::CLOSE_TITLE.get(),
                 gitpoulpi_i18n::msg::repo_auth::CLOSE_BODY.get(),
+            ),
+            CloseIssue::SequenceAi => (
+                screen::CLOSE_TITLE.get(),
+                gitpoulpi_i18n::msg::sequence_ai::CLOSE_BODY.get(),
             ),
             CloseIssue::Profile(_) => (screen::CLOSE_TITLE.get(), screen::CLOSE_PROFILE.get()),
         };
@@ -149,6 +158,7 @@ impl PreferencesState {
             CloseIssue::Workflow => (PrefSection::Workflow, PrefFocus::Fields),
             CloseIssue::Template => (PrefSection::CommitTemplate, PrefFocus::Fields),
             CloseIssue::RepoAuth => (PrefSection::RepoAuth, PrefFocus::Fields),
+            CloseIssue::SequenceAi => (PrefSection::Sequences, PrefFocus::List),
             CloseIssue::Profile(_) => (PrefSection::Profiles, PrefFocus::List),
         };
         self.section = PrefSection::ALL

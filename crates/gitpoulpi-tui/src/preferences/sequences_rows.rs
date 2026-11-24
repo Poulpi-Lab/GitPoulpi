@@ -3,8 +3,7 @@
 //! the writes).
 
 use super::sequences_page::{
-    option_label, pause_label, pause_modes, scope_label, SeqButton, SeqTarget, AI_DRAFTING_VISIBLE,
-    SCOPES,
+    option_label, pause_label, pause_modes, scope_label, SeqButton, SeqTarget, SCOPES,
 };
 use super::sequences_picker::step_label;
 use super::*;
@@ -117,7 +116,7 @@ impl PreferencesState {
             ),
             Btn::new(t::RUN_NOW.get(), PrefAction::Sequence(SeqButton::RunNow)),
         ];
-        if AI_DRAFTING_VISIBLE {
+        if self.seq_ai_offered() {
             run.push(Btn::new(
                 t::EDIT_AI.get(),
                 PrefAction::Sequence(SeqButton::EditWithAi),

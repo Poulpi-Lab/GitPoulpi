@@ -225,6 +225,19 @@ impl Keymap {
         km
     }
 
+    /// The labels of the actions that already hold `chord` anywhere in the
+    /// window (the global scope, where a sequence's shortcut lives).
+    pub(crate) fn global_holders(&self, chord: KeyChord) -> Vec<String> {
+        self.entries
+            .iter()
+            .filter(|e| {
+                e.ctx.scope() == Ctx::Global && e.chords.iter().any(|c| c.class() == chord.class())
+            })
+            .filter_map(|e| ACTIONS.iter().find(|d| d.action == e.action))
+            .map(|d| d.display_label().into_owned())
+            .collect()
+    }
+
     /// Whether `action`'s chords differ from its shipped defaults.
     pub(crate) fn is_modified(&self, action: Action) -> bool {
         let Some(def) = ACTIONS.iter().find(|d| d.action == action) else {

@@ -1213,6 +1213,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Éditeur : Convertir les fins de ligne |  |
 | Éditeur : Changer l'indentation |  |
 | Application : Paramètres... | `Ctrl+, / Ctrl+N ,` |
+| ✦ Séquence : Créer avec l'IA... |  |
 | Application : Rechercher dans les Paramètres... | `/ dans les Paramètres` |
 | Application : Raccourcis clavier... |  |
 | Agent : Afficher la vue en attente | `Ctrl+N Enter` |

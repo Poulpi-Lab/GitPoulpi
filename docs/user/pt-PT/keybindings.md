@@ -1209,6 +1209,7 @@ As teclas são as predefinidas.
 | Editor: converter fins de linha |  |
 | Editor: alterar indentação |  |
 | Aplicação: definições... | `Ctrl+, / Ctrl+N ,` |
+| ✦ Sequence: Create with AI... |  |
 | Aplicação: pesquisar definições... | `/ nas Definições` |
 | Aplicação: atalhos de teclado... |  |
 | Agente: mostrar a vista pendente | `Ctrl+N Enter` |

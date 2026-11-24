@@ -1206,6 +1206,7 @@ die Standardtasten.
 | Editor: Zeilenumbrüche umwandeln |  |
 | Editor: Einrückung ändern |  |
 | App: Einstellungen... | `Ctrl+, / Ctrl+N ,` |
+| ✦ Sequence: Create with AI... |  |
 | App: Einstellungen durchsuchen... | `/ in den Einstellungen` |
 | App: Tastenbelegung... |  |
 | Agent: Ausstehende Ansicht zeigen | `Ctrl+N Enter` |

@@ -8973,6 +8973,94 @@ title = "Sequence drafts"
 profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
 repo_profile_help = "The profile used in this repository to draft action sequences."
 action = "Sequence draft"
+# context: title of the dialog that creates a sequence from a description; the sparkle is added in code
+dlg_title_create = "Create a sequence with AI"
+# context: title of the dialog that changes the selected sequence from a description; the sparkle is added in code
+dlg_title_edit = "Edit a sequence with AI"
+# context: label of the description field
+dlg_label_create = "Describe the sequence you want"
+# context: label of the description field in edit mode; {name} is the sequence's name
+dlg_label_edit = "Describe how to change \"{name}\""
+# context: placeholder of the description field
+dlg_example_create = "For example: {$stage} everything, write the message with the AI, {$commit}, then {$push}."
+# context: placeholder of the description field in edit mode
+dlg_example_edit = "For example: {$fetch} first, and always ask before the {$push}."
+# context: keys of the description field
+dlg_hint = "Enter adds a line. Ctrl+Enter sends. Esc closes."
+# context: checkbox, off by default
+dlg_context = "Send context (remote names, AI profiles, Open in labels)"
+# context: under the unchecked box
+dlg_context_off = "Off: only your description is sent."
+# context: reassurance under the description
+dlg_footer = "The AI only proposes. Nothing is saved before you accept, and nothing is ever run."
+# context: button; the sparkle is added in code
+dlg_send = "Send"
+# context: button
+dlg_cancel = "Cancel"
+# context: why Send is unavailable
+dlg_need_text = "Describe what you want first."
+# context: another AI request is running
+dlg_busy = "Another AI request is running."
+# context: shown when the AI is off
+dlg_off = "Turn the AI on in Settings first."
+# context: the window is too small for the dialog
+dlg_too_small = "Make the window larger to use this dialog."
+# context: the answer came after the dialog was closed
+dlg_closed = "The AI answered after the dialog was closed; nothing was written."
+# context: what a copy from the description field is called in the confirmation
+dlg_copy_what = "the description"
+# context: title of the proposal of a new sequence; the sparkle is added in code
+res_title_create = "Proposed sequence"
+# context: title of the proposed change to a sequence; the sparkle is added in code
+res_title_edit = "Proposed change"
+# context: heading over the steps; {n} is how many
+res_steps = "Steps ({n})"
+# context: heading over what the AI proposed but was refused
+res_left_out = "Left out"
+# context: a refused step; {n} its place, {what} its command, {reason} why
+res_left_step = "step {n} `{what}`: {reason}"
+# context: a refused field; {what} its name, {reason} why
+res_left_item = "{what}: {reason}"
+# context: heading over the AI's remarks
+res_notes = "Notes from the AI"
+# context: heading over the suggested shortcut; {key} is the key as the AI wrote it
+res_shortcut = "Suggested shortcut: {key}"
+# context: the suggested shortcut is not used by anything
+res_shortcut_free = "It is free. It is not set: use the Shortcut button after accepting."
+# context: the suggested shortcut is used; {label} names its action
+res_shortcut_taken = "Already used by {label}. It is not set."
+# context: the suggested shortcut is not a single key
+res_shortcut_unusable = "Not a single key. Set the shortcut yourself with the Shortcut button."
+# context: the proposal equals the sequence
+res_no_change = "No change: the proposal is the same as the sequence."
+# context: legend of the diff
+res_legend = "+ added   - removed   ~ changed"
+# context: a step with no pause and no option, in a change line
+res_defaults = "defaults"
+# context: an empty field, in a change line
+res_none = "(none)"
+# context: a changed field; {field} its name, {old} and {new} its values
+res_field_changed = "{field}: \"{old}\" -> \"{new}\""
+# context: why Accept is unavailable; {reason} says why
+res_blocked = "Cannot accept: {reason}"
+# context: the proposal holds no usable step
+res_no_steps = "the proposal has no usable step"
+# context: button that saves the proposal
+btn_accept = "Accept"
+# context: button that saves the proposal and opens its steps
+btn_edit_first = "Edit before saving"
+# context: button that drops the proposal
+btn_reject = "Reject"
+# context: button back to the description
+btn_back = "Back"
+# context: status line; {name} is the new sequence
+accepted_create = "Sequence \"{name}\" added"
+# context: status line; {name} is the changed sequence
+accepted_edit = "Sequence \"{name}\" updated"
+# context: question when Settings is closed with a proposal open
+close_body = "A sequence proposal from the AI is open. Closing Settings drops it; nothing was written."
+# context: palette row; the sparkle is added in code
+palette_create = "Sequence: Create with AI..."
 
 [rewrite_size]
 tab = "Tamaño"
@@ -10745,4 +10833,3 @@ no_repo = "This folder is not a repository: a repository sequence needs one"
 cannot_run = "Cannot run: {reason}"
 # context: a refused write; {error} is the reason
 write_failed = "Sequences: {error}"
-ai_soon = "Drafting a sequence with the AI comes later."

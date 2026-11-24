@@ -80,6 +80,9 @@ pub(crate) use launcher_alias::ToolsButton;
 pub(crate) use launcher_install::fake_current;
 pub(crate) use launcher_install::InstallButton;
 pub(crate) use repo_pages::SparseRequest;
+#[cfg(feature = "ai")]
+pub(crate) use sequences_ai::SeqProblem;
+pub(crate) use sequences_ai::{SeqAiWish, SeqDraftAnswer, SeqDraftRequest};
 mod images_page;
 mod input;
 mod keybindings_page;
@@ -103,6 +106,7 @@ mod render;
 mod repo_auth_page;
 mod repo_pages;
 mod search;
+mod sequences_ai;
 mod sequences_page;
 mod sequences_picker;
 mod sequences_rows;

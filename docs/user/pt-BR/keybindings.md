@@ -1209,6 +1209,7 @@ As teclas são as padrão.
 | Editor: converter quebras de linha |  |
 | Editor: alterar indentação |  |
 | App: configurações... | `Ctrl+, / Ctrl+N ,` |
+| ✦ Sequence: Create with AI... |  |
 | App: buscar configurações... | `/ nas Configurações` |
 | App: atalhos de teclado... |  |
 | Agente: mostrar a visualização pendente | `Ctrl+N Enter` |

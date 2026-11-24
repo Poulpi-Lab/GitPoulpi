@@ -1215,6 +1215,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Editor: Regeleinden converteren |  |
 | Editor: Inspringing wijzigen |  |
 | App: Instellingen... | `Ctrl+, / Ctrl+N ,` |
+| ✦ Sequence: Create with AI... |  |
 | App: Instellingen zoeken... | `/ in Instellingen` |
 | App: Sneltoetsen... |  |
 | Agent: Openstaande weergave tonen | `Ctrl+N Enter` |

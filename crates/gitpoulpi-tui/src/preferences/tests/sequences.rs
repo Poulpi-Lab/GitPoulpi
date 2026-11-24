@@ -63,7 +63,7 @@ fn add_preset(st: &mut PreferencesState, name: &str) {
 }
 
 #[test]
-fn the_add_menu_offers_an_empty_sequence_and_the_presets_and_no_ai_entry_yet() {
+fn the_add_menu_offers_an_empty_sequence_and_the_presets_and_no_ai_entry_while_ai_is_off() {
     let dir = tempfile::tempdir().unwrap();
     let st = page(dir.path());
     assert_eq!(
@@ -584,12 +584,13 @@ fn the_step_picker_lists_the_vocabulary_filters_it_and_grays_what_cannot_run() {
     let found = picker.visible_ids();
     assert_eq!(found[0], "stage_all", "{found:?}");
     assert!(!found.contains(&"push"));
-    // The agent step (no longer pending) is listed and can be picked.
-    let mut picker = StepPicker::new(true);
-    picker.type_text("agent");
+    // A step this setup cannot run (an AI step with the AI off) is listed
+    // but cannot be picked.
+    let mut picker = StepPicker::new(false);
+    picker.type_text("generate commit message");
     let found = picker.visible_ids();
-    assert!(found.contains(&"tab_open_agent_here"), "{found:?}");
-    assert!(!matches!(
+    assert!(found.contains(&"ai_generate_commit_message"), "{found:?}");
+    assert!(matches!(
         picker.on_key(&KeyEvent::new(KeyCode::Enter, KeyModifiers::NONE)),
         super::super::sequences_picker::PickOutcome::Stay
     ));

@@ -1215,6 +1215,7 @@ applicano. I tasti sono quelli predefiniti.
 | Editor: Converti interruzioni di riga |  |
 | Editor: Cambia rientro |  |
 | App: Impostazioni... | `Ctrl+, / Ctrl+N ,` |
+| ✦ Sequence: Create with AI... |  |
 | App: Cerca nelle impostazioni... | `/ nelle Impostazioni` |
 | App: Scorciatoie da tastiera... |  |
 | Agente: Mostra la vista in sospeso | `Ctrl+N Enter` |

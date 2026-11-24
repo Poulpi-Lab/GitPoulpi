@@ -1211,6 +1211,7 @@ Tuşlar varsayılanlardır.
 | Düzenleyici: Satır Sonlarını Dönüştür |  |
 | Düzenleyici: Girintiyi Değiştir |  |
 | Uygulama: Ayarlar... | `Ctrl+, / Ctrl+N ,` |
+| ✦ Sequence: Create with AI... |  |
 | Uygulama: Ayarlarda Ara... | `Ayarlar'da /` |
 | Uygulama: Tuş Atamaları... |  |
 | Ajan: Bekleyen Görünümü Göster | `Ctrl+N Enter` |

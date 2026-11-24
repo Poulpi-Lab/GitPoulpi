@@ -138,6 +138,23 @@ Jeder Modus behält seine eigenen **Argumente**, **Argument-Optionen** und sein 
 
 **Fragen beim ersten Start beantworten Sie selbst.** Ein Agent, der in einem Ordner noch nie lief, fragt zuerst etwas (diesem Ordner vertrauen, anmelden, ein Farbschema wählen). GitPoulpi antwortet nie für Sie: Die Anfrage endet mit einer Meldung, und **Agent öffnen...** (am Profil, oder *KI: Agent öffnen* in der Befehlspalette) öffnet den Agenten einmal in einem sichtbaren Terminal in dem Arbeitsordner, den er verwenden wird. Beantworten Sie die Frage, schließen Sie den Agenten und versuchen Sie es erneut; die Antwort merkt sich der Agent.
 
+### Den Agenten im Ordner eines Tabs öffnen
+
+`Tab: KI-Agent hier öffnen` in der Befehlspalette (neu belegbar als `palette.tab_open_agent_here`,
+keine Standardtaste) öffnet Ihr Terminal im Ordner des aktiven Tabs und startet darin den Agenten
+eines lokalen Agentenprofils, damit Sie dort von Hand mit ihm arbeiten. Es ist dasselbe Terminal wie
+bei **Terminal hier** und derselbe Befehl wie **Agent öffnen...**, nur im Ordner des Tabs statt im
+eigenen Arbeitsordner des Profils. Bei einem lokalen Agentenprofil öffnet es sofort; bei mehreren
+fragt eine Liste unter der Tab-Leiste, welches. Es sendet keinen Prompt und startet keine KI-Anfrage:
+Das Öffnen des Agenten ist die Aktion, und was Sie darin tippen, gehört Ihnen.
+
+Die Zeile trägt das KI-Funkeln, ist bei ausgeschalteter KI ausgeblendet (**Einstellungen > KI**) und
+abgedunkelt („kein lokaler KI-Agent eingerichtet“), wenn kein Profil ein lokaler Agent ist. In einer
+Sequenz nimmt der Schritt `tab_open_agent_here` die `id` des KI-Profils in seiner Option `profile`
+(leer: das Standardprofil, sonst der erste lokale Agent). Einem eigenen Terminal-Template lässt sich
+der Befehl des Agenten nicht mitgeben: Das Terminal öffnet sich im Ordner, und die Statuszeile nennt
+den Befehl, den Sie ausführen müssen.
+
 Die Antwort wird bei Claude Code aus dem Sitzungsprotokoll des Agenten gelesen (sein genauer Text, danach gelöscht) und bei Codex und Gemini vom Bildschirm zwischen zwei Markierungszeilen, die die Anfrage verlangt. Höchstens zwei Läufe im virtuellen Terminal gleichzeitig, und `Esc` während einer Anfrage beendet den Agenten.
 
 ```toml
@@ -269,6 +286,7 @@ wird, während Sie darüber fahren oder ihn hervorheben.
 | **Regeln zum Umschreiben des Verlaufs** | In der [Werkbank zum Umschreiben des Verlaufs](history-rewrite.md#regeln-mit-ki-erstellen): die Schaltfläche `✦ Regeln mit KI erstellen...`, `Alt+E` oder die Palette `Umschreiben: Regeln mit KI erstellen...`. Ein mehrzeiliger Dialog zeigt genau, was gesendet wird; die Regeln und Einstellungen landen in der Werkbank, und nichts wird für Sie in der Vorschau gezeigt oder angewendet. | `ai rewrite-rules "<Beschreibung>" [--context]` (gibt aus) |
 | **Antwort auf einem Host** und **Issue-Beschreibung** | Die Schaltfläche **Mit KI schreiben** (`Alt+E`) jedes Markdown-Textfelds, das an einen Host sendet: ein Kommentar, eine Antwort oder eine Bearbeitung in einer Unterhaltung, ein Review-Kommentar oder eine Zusammenfassung, die Beschreibung eines neuen Issues. Der Entwurf landet im Feld; nichts wird gesendet. Siehe [Schreibhilfe auf einem Host](#schreibhilfe-auf-einem-host). | `ai hosting-reply` (gibt einen Entwurf aus) |
 | **Commit-Composer** | Das Menü der WIP-Zeile *Commits zusammenstellen (KI)...*, `Ctrl+G C`, die Palette `KI: Commits aus Änderungen im Arbeitsverzeichnis zusammenstellen...` | |
+| **Sequenzentwurf** | Beschreiben Sie eine [Aktionssequenz](#sequenzentwurf), die erstellt werden soll, oder wie eine bestehende zu ändern ist (Einstellungen > Sequenzen, nächster Abschnitt des Fensters). | `ai sequence-draft "<Beschreibung>" [--edit <id>] [--context]` (gibt aus) |
 | **Worktree-Name** | Im [Dialog Worktree erstellen](worktrees.md#mit-ki-benennen): die Schaltfläche `✦ Name per KI` oder `Alt+A` öffnet ein Feld, in dem Sie das Feature, den Bug oder die Aufgabe beschreiben; das Modell benennt den Worktree und seinen Branch nach den eigenen Branch-Namen des Repositorys, und beides landet zum Bearbeiten in den Feldern des Dialogs. Gesendet werden nur Ihre Beschreibung und die Namen der lokalen Branches, daher gibt es keinen Dialog „Was gesendet wird“. | `ai worktree-name --describe "<task>"` (gibt aus) |
 
 `Esc` bricht eine laufende Anfrage ab (der Prozess eines lokalen Agenten wird beendet).
@@ -357,6 +375,12 @@ behalten werden. Eine Skriptregel entsteht auf diesem Weg nie. Auf Wunsch gehen 
 Namen der Branches und Tags und die Autoren der neuesten Commits mit (ein Kästchen, standardmäßig
 aus, im Bereich „Was gesendet wird“ sichtbar). Profil und Anweisungen sind die von *Regeln zum
 Umschreiben des Verlaufs* unter Einstellungen > KI.
+
+### Sequenzentwurf
+
+Sie beschreiben eine Aktionssequenz in eigenen Worten („alles stagen, die Nachricht mit der KI schreiben, committen und pushen“ oder, für eine bestehende, „zuerst ein Fetch ergänzen“), und das Modell schlägt einen Namen, eine ID, die Schritte und, wenn es möchte, ein Tastenkürzel vor. **Es schlägt nur vor**: Vor Ihrer Zustimmung wird nichts gespeichert, und es wird nie etwas ausgeführt. Das Modell kennt nur die Befehle, die eine Sequenz enthalten darf (die Liste, die es erhält, wird aus derselben Tabelle erzeugt, die eine Sequenz validiert, kann also nicht abweichen); jeder Schritt wird einzeln geprüft, und ein Schritt, der unbekannt oder zerstörerisch ist, eine andere Sequenz ausführt oder eine unmögliche Pause verlangt, wird ausgelassen und mit dem Grund aufgelistet, während die gültigen erhalten bleiben. Auf Wunsch gehen die Remote-Namen, die KI-Profil-IDs und die Beschriftungen von „Öffnen in“ mit (standardmäßig aus; das CLI-Flag ist `--context`). Im Terminal gibt `gitpoulpi ai sequence-draft` den Vorschlag als JSON aus (mit `toml`, das `gitpoulpi sequence add --file` liest) und speichert nichts. Profil und Anweisungen sind die von *Sequenzentwurf* unter Einstellungen > KI.
+
+In der Terminal-Oberfläche ist derselbe Job der Eintrag **Mit KI erstellen...** unter Einstellungen > Sequenzen > **Hinzufügen** (Palette: `Sequenz: Mit KI erstellen...`) und die Schaltfläche **Mit KI bearbeiten...** einer Sequenz: ein Dialog, in dem Sie schreiben, was Sie möchten, mit dem Kontextfeld (standardmäßig aus) und der Frage „Was gesendet wird“, dann ein Vorschlag, den Sie **Annehmen**, **Vor dem Speichern bearbeiten**, **Ablehnen** oder mit **Zurück** erneut senden können. Eine Änderung zeigt einen Vergleich mit der aktuellen Sequenz (`+` hinzugefügt, `-` entfernt, `~` geändert), und das vorgeschlagene Tastenkürzel wird gegen Ihre Tastenbelegung geprüft, aber nie gebunden. Vor Ihrer Zustimmung wird nichts gespeichert (siehe [Sequenzen](sequences.md#mit-ki-erstellen-und-bearbeiten)).
 
 ### Schreibhilfe auf einem Host
 

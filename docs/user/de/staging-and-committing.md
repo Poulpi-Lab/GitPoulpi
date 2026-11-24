@@ -32,7 +32,14 @@ der rechte Bereich zeigt die Änderungen:
   melden `renamed_from`.
 - **Pfad** oder **Baum** (`m`) listet Dateien flach oder in Ordnern. **Alle
   einklappen** (`z`) faltet die Ordner. **Alle Dateien ansehen** (`a`) zeigt den
-  ganzen Baum statt nur der geänderten Dateien. Rechtsklick auf den leeren Teil der Liste bietet
+  ganzen Baum statt nur der geänderten Dateien. Ein eingeklappter Ordner zeigt hinter seinem
+  Namen eine kleine abgedunkelte Zahl der darin liegenden Dateien, Unterordner eingeschlossen
+  (`src/ (12)`); ein offener Ordner zeigt keine. In einem schmalen Bereich wird zuerst der Name
+  gekürzt, damit die Zahl sichtbar bleibt. In einem Repository mit Dateien, die in Git LFS
+  gespeichert sind, beschränkt ein Kästchen **Nur LFS** (`o`, oder **Dateien: Nur LFS umschalten**)
+  jede Dateiliste (Unstaged, Staged, **Alle Dateien ansehen**, die Dateien eines Commits) auf
+  diese Dateien; die Ordnerzahlen folgen, und es wird nicht angeboten, wenn keine Datei LFS nutzt.
+  Rechtsklick auf den leeren Teil der Liste bietet
   **Alle aufklappen** / **Alle zuklappen**, eine Ordnerzeile **Alle Unterordner aufklappen** /
   **Alle Unterordner zuklappen**; Tasten `=`, `-`, `*`, `_` (siehe
   [Maus und Gesten](mouse-and-gestures.md)).

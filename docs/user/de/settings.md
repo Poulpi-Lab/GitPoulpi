@@ -449,7 +449,7 @@ den Server enthalten; siehe [MCP und Agenten](mcp-and-agents.md).
 | **Eingabefarbe**, **Benutzerdefinierte Eingabefarbe** | Der Hintergrund von Textfeldern: **Design folgen** (Standard), eine feste dunkle Farbe oder Ihr eigenes `#rrggbb`. |
 | **Textcursor** | `ui.text_cursor`: **terminal** (Standard) setzt den eigenen Cursor des Terminals an die Einfügemarke des fokussierten Textfelds, als Balken (die Cursor-Einstellungen Ihres Terminals gelten, und das Kandidatenfenster einer Eingabemethode öffnet sich an der Einfügemarke); **drawn** zeichnet die eigene Einfügemarke von GitPoulpi und hält den Terminalcursor verborgen. Wirkt sofort. Palette: `Einstellungen: Textcursor...`. |
 | **Farbtiefe** | **auto** (Standard), **truecolor**, **256** oder **16**. Siehe [Designs](themes.md). |
-| **Farbschema des Graphen** | **Design folgen** (Standard: die eigenen Spurfarben des Designs) oder eine beliebige Spurpalette. Jede Palette zeigt einige ihrer Farben. Es gilt beim Schließen der Einstellungen. Der Palettenbefehl **App: Farbschema des Graphen wechseln...** (`Ctrl+N Shift+T`) zeigt jede Palette live in der Vorschau. |
+| **Farbschema des Graphen** | **Design folgen** (Standard: die eigenen Spurfarben des Designs) oder eine beliebige Spurpalette, auch Ihre eigenen Design-Dateien (nach den Voreinstellungen). Jede Palette zeigt einige ihrer Farben; ein konfigurierter Name, den es nicht mehr gibt, wird als *nicht gefunden* markiert, und der Graph verwendet die Spuren des Designs. Es gilt beim Schließen der Einstellungen. Der Palettenbefehl **App: Farbschema des Graphen wechseln...** (`Ctrl+N Shift+T`) zeigt jede Palette live in der Vorschau. |
 | **Hintergrund der Graph-Spuren** | **Aus** (transparent) oder **Zeilentönung**: ein schwaches Band in der Spurfarbe hinter der Graph-Spalte, mit einem dünnen Balken an ihrem Rand. |
 | **Stärke der Zeilentönung** | Wie blass das Band der Zeilentönung ist: **Stark**, **Mittel** (Standard) oder **Dezent**. Der Randbalken behält seine volle Farbe. |
 | **Position der Symbolleiste** | `ui.toolbar_position`: Wo die Symbolleiste sitzt: Oben, Unten (Standard), Links oder Rechts. Links und Rechts machen daraus eine Spalte neben den Bereichen; ein Fenster unter 80 Spalten zeichnet sie unten. Wirkt sofort. |
@@ -462,6 +462,8 @@ den Server enthalten; siehe [MCP und Agenten](mcp-and-agents.md).
 | **Datumsformat**, **Datums-/Zeitformat**, **Ausführliches Datumsformat** | Die Datumsmuster der Datumsspalte von Dateiverlauf und Blame, der Spalte Datum des Logs und der Commit-Details. Jedes zeigt eine Live-Vorschau. Die Platzhalter stehen in der [Konfigurationsreferenz](config-reference.md#ui). |
 
 ![Die Dropdownliste Farbschema des Graphen: Design folgen, dann jede Spurpalette mit einigen ihrer Farben](../images/settings-log-graph-lanes.png)
+
+Das Design und die Graphfarben (das Design, das Farbschema des Graphen, die Einfärbung und der Hintergrund der Spuren, die Stärke der Zeilentönung) gehören zu jeder Installation: Teilen mehrere Installationen eine `config.toml`, ändert eine Änderung in der einen nie die anderen. Nur die primäre Installation schreibt außerdem die gemeinsamen `ui.*`-Schlüssel.
 
 ### Tastatur & Maus
 
@@ -494,6 +496,21 @@ Drei Optionen stehen auf dem Tab **Allgemein**.
 | **Kitty-Tastaturprotokoll** | **auto** fragt das Terminal nach dem Kitty-Tastaturprotokoll, sodass `Ctrl+,`, `Ctrl+Enter` und `Ctrl+Shift+N` ankommen. **off** fragt nie; nutzen Sie es, wenn ein Terminal sich schlecht verhält. Braucht einen Neustart. |
 | **Maus aktiviert** | Aus überlässt Maus und Textauswahl Ihrem Terminal. Braucht einen Neustart. |
 | **Zeilen pro Mausrad-Raste** | Wie viele Zeilen eine Mausrad-Raste im Log bewegt. Braucht einen Neustart. |
+
+### Sequenzen
+
+**Einstellungen > Sequenzen** bearbeitet Ihre benannten [Sequenzen](sequences.md): Listen von
+Palettenbefehlen, die nacheinander laufen, jede eine Palettenzeile und an eine Taste
+bindbar. Es ist eine [Listenseite](#listen) mit einer Ansicht: **+ Hinzufügen** bietet eine
+leere Sequenz und die Vorlagen (**Sicherung**, **Zusammenstellen und Push**,
+**Worktree und Agent**), die Zeilen sind der **Name**, die **ID**, eine
+**Beschreibung**, der **Geltungsbereich** (diese Installation, alle Installationen auf diesem
+Computer oder nur dieses Repository), eine Schaltfläche **Tastenkürzel**, die das
+Erfassungs-Popup von **Tastatur & Maus** öffnet, **Schritte bearbeiten** und **Jetzt ausführen**.
+**Schritte bearbeiten** schaltet die Liste auf die Schritte der Sequenz um, jeder mit einer
+**Pause** (**Standard**, **Immer**, **Nie**) und seinen Optionen; **+ Hinzufügen**
+dort öffnet eine filterbare Liste der Befehle, die ein Schritt sein kann. Jede Änderung
+gilt sofort. Siehe [Sequenzen](sequences.md).
 
 ### Verlauf & Graph
 
@@ -533,6 +550,7 @@ Graph-Farben stehen auf der Seite **Darstellung**.
 | **Zeilennummern** | Die Zeilennummernspalte von Editor und Diff. |
 | **Der Auswahl im Editor folgen** | Solange der Editor offen ist, öffnet die Auswahl einer anderen Datei im rechten Bereich diese ebenfalls im Editor, nachdem gefragt wurde, ob ungespeicherte Änderungen gespeichert werden sollen. Eine Datei, die sich nicht bearbeiten lässt, öffnet sich stattdessen in ihrer gewohnten Ansicht. Nur für die Änderungen der Arbeitskopie: Eine Datei, die aus einem Commit gewählt wird, verlässt den Editor für den Diff dieses Commits. Standardmäßig an (`editor.follow_selection`). |
 | **Zeilenumbruch** | Bricht lange Diff-Zeilen um. |
+| **Geänderte Wörter hervorheben** | Hebt in einer geänderten Zeile die Wörter, die sich von der gepaarten entfernten oder hinzugefügten Zeile unterscheiden, mit einem stärkeren Hintergrund hervor, in der Diff-Ansicht (Inline und Split), im Diff des Reviews und in den Dateien des Commits. Standardmäßig an (`ui.diff_intraline`); auch **Diff: Hervorhebung geänderter Wörter umschalten** in der Palette. Siehe [Geänderte Wörter](interface-tour.md#geänderte-wörter-in-einem-diff). |
 | **Standardlayout**, **Nur Hunks**, **Reine Leerraum-Änderungen anzeigen**, **Minimap** | Der Anfangszustand der Diff-Ansicht. Die Leiste der Diff-Ansicht ändert und speichert sie. |
 | **Blame-Annotationen**, **Breite der Blame-Annotationen** | Auf welcher Seite der Blame-Ansicht die Annotationsspalte steht (Avatar, Autor, Alter, Zusammenfassung): **right** (Standard) oder **left**, und ihre Breite in Zellen (24 bis 90). Den Rand der Spalte in der Blame-Ansicht zu ziehen oder die Tasten `>` / `<` zu drücken speichert die Breite hier (`ui.blame_side`, `ui.blame_width`). Siehe [Blame](log-and-history.md#blame). |
 | **Merge-Editor: nebeneinander ab (Spalten)** | Ab dieser Breite zeigt der Merge-Editor A und B nebeneinander. Standard 100, Minimum 40, `0` heißt immer. Darunter sind A und B Tabs. Siehe [Merge-Konflikte lösen](merge-conflicts.md). |

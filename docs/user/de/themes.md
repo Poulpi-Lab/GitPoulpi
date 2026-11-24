@@ -205,7 +205,17 @@ Jedes Design bringt seine eigenen Spurfarben für den Log-Graphen mit, aber Sie 
 jedes Design mit jeder Palette kombinieren: **Einstellungen > Darstellung > Farbschema des
 Graphen** bietet **Design folgen** (der Standard) plus jede Spurpalette jedes Designs
 (GitPoulpi Dark, GitPoulpi Light, dann Material, Serie, ... und das
-`graph_palette` Ihrer eigenen Design-Dateien). ![Die Dropdownliste Farbschema des Graphen unter Darstellung: Design folgen, dann jede Spurpalette mit einigen ihrer Farben](../images/settings-log-graph-lanes.png)
+`graph_palette` Ihrer eigenen Design-Dateien, nach den Voreinstellungen unter dem
+Namen des Designs aufgelistet). Ein eigenes Design erscheint, wenn die Liste das nächste Mal
+geöffnet wird (die Dateien werden dann neu gelesen), und die Wahl eines Designs speichert
+seinen Dateinamen in `ui.graph_color_theme` (bei der primären Installation in `[ui]`, bei den
+anderen in ihrem eigenen Eintrag `[installation.settings.<id>]`, wie das Design). Eine
+Design-Datei ohne `graph_palette` hat die Spurfarben ihrer `base` (die Standardvoreinstellung,
+wenn sie keine nennt), dieselbe Vererbung wie bei jeder anderen Farbe der Datei. Ein eigenes
+Design mit dem Namen einer eingebauten Spurpalette (zum Beispiel `gruvbox`) ersetzt diese
+Palette in der Liste. Gibt es den konfigurierten Namen nicht mehr (die Datei wurde gelöscht oder
+umbenannt), verwendet der Graph die Spurfarben des aktiven Designs, und die Einstellungen zeigen
+den Namen als *nicht gefunden* markiert, bis Sie einen anderen wählen. ![Die Dropdownliste Farbschema des Graphen unter Darstellung: Design folgen, dann jede Spurpalette mit einigen ihrer Farben](../images/settings-log-graph-lanes.png)
 
 In der `config.toml`:
 
@@ -255,6 +265,18 @@ statusbar_fg = "#eceff4"
 [diff]
 add_bg = "#2f3b2f"
 ```
+
+### Geänderte Wörter in einem Diff (`diff.add_emph_bg`, `diff.del_emph_bg`)
+
+Die stärkeren Hintergründe, die die Diff-Ansicht auf die Wörter malt, die sich innerhalb einer
+geänderten Zeile unterscheiden, über `diff.add_bg` (hinzugefügte Zeilen) und `diff.del_bg`
+(entfernte Zeilen); der Text behält `diff.add_fg` und `diff.del_fg`. Jede Voreinstellung setzt
+beide. Eine Design-Datei, die `diff.add_bg` oder `diff.del_bg` setzt, aber nicht die passende
+Hervorhebung, bekommt eine davon abgeleitete (30 % des Weges zur Textfarbe dieser Seite), sodass
+ein eigener Hintergrund nie mit der Hervorhebung des Basis-Designs endet. Ein Wert `default` (die
+Voreinstellung Terminal) oder ein Terminal, dessen Farbtiefe beide Hintergründe gleich zeichnen
+würde, markiert die Wörter stattdessen fett und unterstrichen. Siehe
+[Geänderte Wörter in einem Diff](interface-tour.md#geänderte-wörter-in-einem-diff).
 
 Farben sind `"#rrggbb"`, `"ansi:N"` (der Paletteneintrag N des Terminals) oder `"default"`
 (die eigene Farbe des Terminals). Gruppen und Schlüssel sind die von
@@ -315,6 +337,8 @@ falschen Farben erscheint. Die Voreinstellung Terminal braucht nichts davon. Tru
 kostet nichts; der Umwandlungsdurchlauf geht nur einmal pro Bild über den Bildschirm und
 nur, wenn er aktiv ist.
 
+Das Design gilt pro Installation: Mehrere GitPoulpi-Installationen, die eine Konfiguration teilen, behalten jeweils ihr eigenes, sodass die Wahl eines Designs in einer Installation die anderen nie umfärbt.
+
 ## Live-Vorschau
 
 Unter Einstellungen > Darstellung listet die Design-Auswahl **System (folgt dem Terminal)**,
@@ -336,13 +360,16 @@ Design sofort in der Vorschau, **Enter** wendet es an und speichert `ui.theme` i
 wieder her und speichert nichts.
 
 Unter dem Filterfeld grenzt ein segmentierter Vorfilter die Liste ein: **Alle**, **Dunkel**,
-**Hell** und **Farbig** (auf ein Segment klicken, `Tab` / `Shift+Tab` oder
-`Alt+1`..`Alt+4`). Dunkel und Hell ergeben sich aus der Helligkeit des `ui.bg` des
+**Hell** und **Farbig**, dazu **Eigene**, wenn Sie eigene Design-Dateien haben (auf ein Segment
+klicken, `Tab` / `Shift+Tab` oder `Alt+1`..`Alt+5`). Dunkel und Hell ergeben sich aus der Helligkeit des `ui.bg` des
 Designs; **Farbig** behält die Designs, deren Hintergrund deutlich getönt ist (Blau,
 Violett, Gelb, Grün...), und lässt weiße, gebrochen weiße, schwarze und fast schwarze Grautöne
 aus, sodass Solarized Dark, Dracula oder Nord farbig sind, GitHub Dark und One Light aber
 nicht. Ein farbiges Design erscheint auch unter Dunkel oder Hell. **System** und
-transparente Designs (ohne eigenen Hintergrund) erscheinen nur unter Alle. Der Vorfilter
+transparente Designs (ohne eigenen Hintergrund) erscheinen nur unter Alle. **Eigene** behält nur
+die Design-Dateien Ihres Ordners `themes/` (ein eigenes Design ist für diese Schaltflächen
+weiterhin Dunkel, Hell oder Farbig); die Schaltfläche wird nicht gezeichnet und ist per Tasten
+nicht erreichbar, solange dieser Ordner kein Design enthält. Der Vorfilter
 kombiniert sich mit dem, was Sie tippen. Die Auswahllisten für Farbschema des Graphen und
 Sprache zeigen ihre Vorschau genauso: Die Spuren des Logs und die ganze Oberfläche ändern
 sich, während sich die Hervorhebung bewegt.

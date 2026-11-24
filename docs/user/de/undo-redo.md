@@ -78,6 +78,8 @@ Hinweiszeile unter den Schaltflächen steht. Für die gewählte Zeile gilt:
   aktueller Branch und Ihre Dateien bewegen sich nie. Die Bestätigung zeigt genau,
   was geschehen wird, und die Wiederherstellung ist eine neue Aktion: `Ctrl+Z`
   nimmt sie zurück.
+- **Ganze Sequenz rückgängig** (`x`): wird angeboten, solange die neuesten Einträge zu einem
+  Sequenzlauf gehören (siehe [Sequenzläufe](#sequenzläufe)).
 - **Bis hierher wiederholen** (`w`) bei einer rückgängig gemachten Zeile.
 - **main auf den Stand nach „Commit“ zurücksetzen** (`z`, oder außerhalb des
   Fensters `Alt+Shift+Z` / `Bearbeiten: Branch dorthin zurücksetzen, wo die
@@ -86,6 +88,9 @@ Hinweiszeile unter den Schaltflächen steht. Für die gewählte Zeile gilt:
   gelassen hat.
 
 Rechtsklick auf eine Zeile (oder `.`) öffnet dieselben Aktionen als Menü.
+
+Eine Zeile, die ein Schritt einer [Sequenz](sequences.md) erzeugt hat, trägt ein Abzeichen, `⟳ Sicherung`,
+und ihre Detailzeile nennt den Schritt („Ausgeführt von der Sequenz „Sicherung“, Schritt 3/4.“).
 
 ![Der Rückgängig-Verlauf nach dem Löschen eines Branches und zwei Commits: Die Zeile des gelöschten Branches ist ausgewählt und lässt sich einzeln wiederherstellen](../images/undo-history.png)
 
@@ -185,7 +190,7 @@ ausgewählte Zeile der Ansicht, die auf dem Bildschirm ist.
 
 | Ansicht | Palettenzeilen |
 |---|---|
-| Rückgängig-Verlauf | `Rückgängig-Verlauf: Bis hierher rückgängig...`, `Bis hierher wiederholen...`, `Nur diese wiederherstellen...`, `Branch dorthin zurücksetzen, wo er war...`, `Aktualisieren`, `Schließen` |
+| Rückgängig-Verlauf | `Rückgängig-Verlauf: Bis hierher rückgängig...`, `Bis hierher wiederholen...`, `Ganze Sequenz rückgängig`, `Nur diese wiederherstellen...`, `Branch dorthin zurücksetzen, wo er war...`, `Aktualisieren`, `Schließen` |
 | Reflog | `Reflog: Im Log zeigen`, `Branch hier erstellen...`, `Tag hier erstellen...`, `Änderungen auf Arbeitsverzeichnis anwenden`, `Änderungen als Stash sichern`, `Auf diese Position zurücksetzen...`, `Mehr laden`, `Aktualisieren` |
 | Verlorene Arbeit | `Verlorene Arbeit: Branch hier erstellen...`, `Tag hier erstellen...`, `Cherry-Pick`, `Änderungen auf Arbeitsverzeichnis anwenden`, `Änderungen als Stash sichern`, `Erneut suchen` |
 
@@ -198,6 +203,42 @@ Bis hierher wiederholen verwenden“, den Grund, warum sich ein Eintrag nicht ei
 wiederherstellen lässt, „nur ein Branch oder HEAD lässt sich zurücksetzen“ und so
 weiter. Die Zeilen mit `...` öffnen dieselbe Bestätigung oder Namensabfrage wie die
 Schaltfläche.
+
+## Sequenzläufe
+
+Eine [Sequenz](sequences.md) (Sicherung: alles stagen, KI-Commit-Nachricht, committen, pushen)
+erzeugt **einen gewöhnlichen Journal-Eintrag pro Schritt, der etwas ändert**: hier das Stagen
+und den Commit, nicht die KI-Nachricht und nicht den Push (ein Push wird nie
+rückgängig gemacht, siehe unten). Das Journal gilt pro Repository und ist strikt nach neuesten
+zuerst geordnet, ein Lauf kann also nicht ein einziger Eintrag sein: Jeder behält seine eigenen
+Prüfungen, und jeder ist mit dem Lauf gekennzeichnet, der ihn erzeugt hat
+(`sequence:Sicherung#<Lauf> 3/4`). Alte Journale haben keine Kennzeichnung und werden wie bisher geladen.
+
+**Ganze Sequenz rückgängig** macht die Einträge eines Laufs rückgängig, den neuesten zuerst, jeweils
+als ein gewöhnliches Rückgängig. Es wird angeboten, wenn die neuesten Einträge des Journals zu
+einem Lauf gehören, lückenlos: Ein Eintrag eines anderen Laufs, eine von Hand gemachte Änderung
+oder eine dazwischen außerhalb von GitPoulpi gemachte beendet die Gruppe. Wo es zu finden ist:
+
+- der Rückgängig-Verlauf: die Schaltfläche `Ganze Sequenz rückgängig` (`x`), das Rechtsklickmenü der
+  Zeile und die Palettenzeile `Rückgängig-Verlauf: Ganze Sequenz rückgängig`;
+- die Befehlspalette: `Bearbeiten: Ganze Sequenz rückgängig` (der Name der Sequenz steht auf der
+  Zeile, solange sie zutrifft);
+- die Kommandozeile und MCP: `gitpoulpi undo --sequence` (unten).
+
+Jeder Eintrag wird für sich geprüft, genau wie ein einzelnes Rückgängig: Ein Commit, der schon
+auf seinem Upstream liegt, fragt „Trotzdem rückgängig machen?“, bevor er ausgeführt wird (beantworten Sie es, und der Rest
+läuft weiter), und ein Branch, der sich bewegt hat, oder ein laufender Merge lehnt ab. Die erste
+Ablehnung (oder ein „Nein“ auf eine Frage) **hält an** und nennt Schritt und Grund: *Rückgängigmachen
+von „Sicherung“ bei Schritt 3/4 (Commit „wip“ (a81b9e4)) angehalten: ... Verbleibende Aktionen: 2*.
+Was rückgängig gemacht wurde, bleibt rückgängig, die älteren Einträge bleiben im Journal, und ein
+gewöhnliches Rückgängig (oder die Schaltfläche erneut) macht von dort aus weiter.
+
+Nur das Journal dieses Repositorys wird zurückgenommen. Ein Lauf, der auch in einem anderen
+Repository gehandelt hat (ein Worktree-Schritt hat die nächsten Schritte in den Tab des neuen
+Worktrees verlegt), hat Einträge im eigenen Journal dieses Repositorys hinterlassen; öffnen Sie
+es und machen Sie sie dort rückgängig. **Wiederholen** bleibt pro Eintrag: Nach dem Rückgängigmachen
+eines ganzen Laufs bringt `Ctrl+Y` den neuesten Schritt zurück, dann den nächsten, jeden mit
+seiner eigenen Prüfung.
 
 ## Was sich rückgängig machen lässt
 
@@ -408,6 +449,9 @@ Rückgängig fragt nur, wenn es riskant ist:
   Rückgängigmachen **schiebt ihn zurück auf den Server** (siehe oben), also fragt es
   immer, und ebenso das Wiederholen, das ihn dort erneut löscht.
 
+Das Rückgängigmachen einer ganzen Sequenz fragt einmal für die Liste (im Panel), dann fragt jeder
+riskante Eintrag wie oben erneut.
+
 Wiederholen und jedes Rückgängig einer reinen Ref-Bewegung fragt nie: Die
 Gegenrichtung ist eine Taste entfernt.
 
@@ -454,6 +498,7 @@ abgeschaltet wird. Sonst wird nie etwas gelöscht.
 gitpoulpi undo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi redo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi undo --list [--all]
+gitpoulpi undo --sequence [--dry-run] [--yes]
 gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 ```
 
@@ -464,6 +509,15 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 - `--expect <id>` lässt den Aufruf als *veraltet* ablehnen, sofern dieser Eintrag
   nicht noch der neueste ist: Ein Skript (oder ein zweites Fenster) macht nie
   etwas anderes rückgängig als das, was es angesehen hat.
+- `--sequence` macht den Sequenzlauf oben im Journal rückgängig (siehe
+  [Sequenzläufe](#sequenzläufe)): die neuesten lückenlosen Einträge, die ein
+  `sequence run` erzeugt hat, der neueste zuerst, je ein `undo` mit eigenen Prüfungen.
+  `--dry-run` listet sie auf; ohne `--yes` hält der erste Eintrag, der eines braucht
+  (Exit-Code **3**), den Lauf an und nennt den Schritt, mit dem bisher Rückgängiggemachten in
+  `undone` und dem Rest in `left`. Eine Ablehnung endet mit Exit-Code **2** und `stopped.refused`;
+  gehört die Spitze des Journals nicht zu einem Lauf, lautet die Antwort
+  `{"no_sequence": {...}}`, Exit-Code 2. Einträge tragen ihren Lauf in `undo --list`
+  (`summary.origin`: `name`, `run_id`, `step`, `of`). Nicht mit `--expect`.
 - `undo-forget` entfernt den blockierten neuesten Eintrag aus dem Journal
   (`--redo`: den neuesten Wiederholen-Eintrag). Es lehnt ab, wenn dieser Eintrag
   nicht blockiert ist, und endet ohne `--yes` mit **3**. Für MCP ist es eine

@@ -468,6 +468,8 @@ Jede Zeile der Palette endet mit einer Tasten-Schaltfläche (`[k]`), und `Alt+K`
 
 In der `config.toml` ist das die Tabelle `[keybindings.palette]`, benannt nach dem Befehl (`toggle_minimap = "Ctrl+Alt+M"`). Eine Taste, die mit einer anderen Aktion kollidiert, erscheint rot, und `c` in ihrer Zeile listet alle Aktionen auf, mit denen sie kollidiert.
 
+Eine von Ihnen definierte Sequenz (eine benannte Kette von Palettenbefehlen) bekommt auf dieselbe Weise eine Taste: `[keybindings.sequence]` nimmt die ID der Sequenz (`backup = "Ctrl+Alt+B"`), eine Taste für eine nicht vorhandene ID wird gemeldet und ignoriert, und die Tabelle folgt `config.toml`, während die App läuft. Jede Sequenz ist außerdem eine Palettenzeile, `Sequenz: <Name>`, die ihre Taste zeigt.
+
 Die Hinweiszeile unter der Liste nennt diese Taste (standardmäßig `Alt+K`). Es ist die Aktion `palette.configure_shortcut` und lässt sich wie jede andere neu belegen.
 
 Die Palette und die Auswahllisten (Theme, Sprache, Tab, Workspace-Suche) lassen sich wie ein Dialog verschieben und in der Größe ändern: Ziehen Sie den oberen Rahmen, drücken Sie `Ctrl+N` und dann `m` (wie über jedem Dialog) oder drücken Sie `Alt+G`. `Alt+G` ist die Aktion `palette.arrange` („Dialog: Vordersten Dialog verschieben/Größe ändern“): ein zusätzlicher Weg, über jedem Dialog und Popup gültig, um den Anordnungsmodus für den vordersten zu starten (die Palettenzeilen `Dialog: Verschieben/Größe ändern` und `Dialog: Position und Größe zurücksetzen` wirken auf die Palette selbst, solange sie offen ist). Pfeile verschieben ihn, `Shift`+Pfeile ändern die Größe, `0` stellt ihn zurück, `Enter` oder `Esc` beenden den Modus, und das Popup bleibt offen. `ui.dialog_geometry` legt fest, ob die Position gemerkt wird.

@@ -166,10 +166,31 @@ Die Tasten `n`, `p`, `m`, `w`, `s` der Diff-Ansicht gehören im Review ihm selbs
 Großbuchstaben: **`V`** Layout, **`H`** Hunks oder ganze Datei, **`S`** Leerraum, **`W`** Umbruch, **`J`** / **`K`** nächster und
 vorheriger Hunk, **`E`** die Codierung, **`M`** die Minimap. Jede hat eine Palettenzeile (*Review: Layout vereint oder nebeneinander*, ...).
 
+In der **Übersicht** werden die Unterhaltung und der ✦-Entwurfsblock genauso ausgewählt: Ziehen Sie über den Text,
+**`Ctrl+C`** kopiert ihn (ein Link oder eine Schaltfläche, die Sie drücken, behält ihre Aktion, und ein Ziehen, das auf
+einer beginnt, wählt nichts aus). Ohne Auswahl kopiert **`Ctrl+C`** (oder *Unterhaltung: Text kopieren*) den ausgewählten
+Eintrag so, wie der Host ihn speichert. Der I-Balken erscheint über dem Text, und die Hand bleibt über Schaltflächen und
+Links. Eine Auswahl folgt dem, was auf dem Bildschirm steht: Scrollen bewegt sie mit ihrem Text (sie bleibt ausgewählt,
+solange sie außerhalb der Sicht ist), eine Aktualisierung, die den Text neu schreibt, verwirft sie, und ein umbrochener
+Absatz wird als die Zeilen kopiert, die er zeigt.
+
+Auch die Kommentare im Diff auf der Seite **Dateien** (ein Thread, Ihre ausstehenden Notizen, die ✦-Vorschläge) lassen sich
+auswählen: Ziehen Sie über ihre Wörter, **`Ctrl+C`** (oder *Review: Markierten Text oder Zeile kopieren*) kopiert sie,
+**`Esc`** verwirft die Auswahl. Ein Druck auf eine ihrer Schaltflächen oder ein einfacher Klick auf den Kopf eines Threads
+(er faltet sich) wirkt weiterhin; ein Ziehen, das auf dem Kopf beginnt, wählt dessen Wörter aus und lässt den Thread, wie er ist.
+
 ### Commits
 
 Nur die Commits der Anfrage (nicht die Historie dahinter), neueste zuerst, und der Diff des ausgewählten (seine
 Änderungen gegenüber seinem Elternteil), mit allen seinen Dateien untereinander und denselben Anzeigeoptionen.
+
+## Zu einem Review zurückkehren
+
+Ein Review bleibt offen, während Sie in einem anderen Tab arbeiten. Verlassen Sie den Tab mit dem offenen Review (klicken Sie auf einen anderen Tab, `Ctrl+PageDown`, **Repository: Nächster Tab** in der Palette), und die Rückkehr öffnet es wieder auf derselben Anfrage, derselben Seite (Übersicht, Dateien oder Commits), derselben Datei und derselben Zeile, mit der Tastatur auf derselben Seite. Dasselbe gilt für ein Review über die API über dem Radar: Zeigen Sie den Radar-Tab wieder, und das Review ist zurück darüber.
+
+Ein Review ist **in Arbeit**, solange seine Seite offen ist. Es zu schließen (`Esc`, das Kreuz, **Review: Schließen**), es zu senden (**Review abschließen**, oder eine Gerrit-Änderung einzureichen oder aufzugeben) oder seinen Branch auszuchecken beendet es, und es wird nicht wieder geöffnet. Das Beenden von GitPoulpi mit einem offenen Review zählt als Verlassen des Tabs: Der nächste Start öffnet es auf dieselbe Weise wieder.
+
+Wurde die Anfrage inzwischen gemergt oder geschlossen oder antwortet der Host nicht, öffnet sich keine Seite: Die Statuszeile nennt den Grund, und beim nächsten Mal wird nichts wieder geöffnet. Ausstehende Kommentare, angesehene Dateien und der Entwurf bleiben wie immer erhalten (siehe **Ein Review schreiben**). Ein noch laufender Vorschlagslauf wird beim Verlassen nicht mitgenommen.
 
 ## Ein Review schreiben
 

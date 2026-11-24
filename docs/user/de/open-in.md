@@ -21,6 +21,13 @@ verdrahtet: Jeder Eintrag besteht aus einer Bezeichnung und einem Befehl.
   `Tab: Im Standardeintrag öffnen`. Die Palettenbefehle funktionieren auch, wenn die
   Titelleiste keinen Platz für die Schaltfläche hat. Beide Tasten lassen sich
   neu belegen; siehe [Tastenkürzel](keybindings.md).
+- **Per Beschriftung**: Ein Schritt `tab_open_in` einer [Sequenz](config-reference.md#sequences) führt den
+  Eintrag aus, dessen **Beschriftung** Sie nennen (`label = "VS Code"`), sodass das Umsortieren der
+  Liste nie ändert, was er ausführt. Eine unbekannte Beschriftung stoppt den Schritt mit der Meldung
+  `kein Eintrag in „Öffnen in“ heißt ...`. `Tab: Terminal hier` (Palette) öffnet Ihr Terminal im Ordner, die frühere
+  Schaltfläche „Terminal hier“ der Tab-Leiste.
+- **Ein KI-Agent im Ordner**: `Tab: KI-Agent hier öffnen` öffnet Ihr Terminal im Ordner des Tabs und
+  startet darin einen lokalen KI-Agenten; siehe [KI](ai.md#den-agenten-im-ordner-eines-tabs-öffnen).
 - **Rechtsklick auf einen Repository-Tab**: Das Tab-Menü hat ein Untermenü
   **Öffnen in** mit denselben Einträgen.
 - Die Liste beginnt bei dem Eintrag, den Sie in dieser Sitzung zuletzt benutzt

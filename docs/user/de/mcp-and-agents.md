@@ -658,6 +658,7 @@ eigene Bestätigung dieses Dialogs drücken; Sie können vorher bearbeiten oder 
 | `ui_propose_split` (rev, plan file) | der Aufteilungseditor über dem Commit, aus dem Plan gefüllt | *In N aufteilen* (`Ctrl+S`); `Esc` lehnt ab |
 | `ui_propose_rewrite` (recipe file) | die Werkbank zum Umschreiben mit den Regeln des Rezepts darin; nichts wird in der Vorschau gezeigt oder angewendet | Ihre eigene *Vorschau*, dann *Anwenden* (`Ctrl+Enter`); `Esc` lehnt ab. Ein Rezept mit einem Skript wird abgelehnt, geheime Werte werden entfernt |
 | `ui_propose_resolution` (path, pick oder content file) | der Merge-Editor auf einer Datei im Konflikt, mit den Auswahlen (oder dem ganzen Text) bereits im Ergebnis | *Speichern & als gelöst markieren* (`Ctrl+S`); Schließen lehnt ab |
+| `ui_sequence_run` (id) | ein Banner „✦ Vorgeschlagen von <Agent>: Sequenz <Name> ausführen“ mit *Ausführen* und *Verwerfen*; noch läuft nichts | *Ausführen* (Klick, oder `Ctrl+N`, dann `Enter`); *Verwerfen* oder `Esc` lehnt ab. Der Lauf hält dann dort an, wo die Sequenz es vorsieht. Abgelehnt, wenn die Sequenz nicht existiert, ungültig ist oder eine Repository-Sequenz ist, der Sie nicht vertraut haben |
 
 Ein Vorschlag nach dem anderen; ein Vorschlag für eine Commit-Nachricht wird abgelehnt,
 solange Sie einen eigenen Entwurf im Composer haben, und ein Lösungsvorschlag, solange der

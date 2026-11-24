@@ -18,8 +18,10 @@ use gitpoulpi_secrets::TokenStore;
 
 mod rewrite_rules;
 mod rewrite_script;
+mod sequence_draft;
 pub use rewrite_rules::{RewriteRulesOutcome, RewriteRulesRequest};
 pub use rewrite_script::{RewriteScriptOutcome, RewriteScriptRequest, ScriptChecker};
+pub use sequence_draft::{SequenceDraftOutcome, SequenceDraftRequest};
 
 use crate::parse::PlannedSplit;
 

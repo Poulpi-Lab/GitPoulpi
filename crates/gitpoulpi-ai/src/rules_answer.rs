@@ -58,7 +58,7 @@ pub struct RulesAnswer {
 }
 
 /// The JSON object of an answer: the fenced block, else the outermost braces.
-fn json_text(answer: &str) -> Option<String> {
+pub(crate) fn json_text(answer: &str) -> Option<String> {
     let mut blocks: Vec<String> = Vec::new();
     let mut open: Option<Vec<&str>> = None;
     for line in answer.lines() {

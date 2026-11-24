@@ -11136,6 +11136,13 @@ res_notes = "The AI says:"
 res_close = "Close"
 res_filled = "Rules now in the workbench: {n}."
 
+[sequence_ai]
+# context: Settings > AI, the page of the action that drafts or changes an action sequence from a description
+title = "Sequence drafts"
+profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
+repo_profile_help = "The profile used in this repository to draft action sequences."
+action = "Sequence draft"
+
 [rewrite_size]
 tab = "Size"
 intro = "What takes room in the history: the largest files and folders, and files deleted from HEAD that the history still stores. Tick rows to turn them into a removal rule."

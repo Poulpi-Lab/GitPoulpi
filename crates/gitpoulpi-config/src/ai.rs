@@ -73,10 +73,14 @@ pub enum AiAction {
     /// Drafts the description of a new issue (the issue form's ✦). Drafts
     /// only.
     IssueBody,
+    /// Drafts or changes an action sequence from a description (Settings >
+    /// Sequences). It only proposes data: nothing is saved before the user
+    /// accepts and nothing is ever run.
+    SequenceDraft,
 }
 
 impl AiAction {
-    pub const ALL: [AiAction; 13] = [
+    pub const ALL: [AiAction; 14] = [
         Self::CommitMessage,
         Self::ExplainChanges,
         Self::StashMessage,
@@ -90,6 +94,7 @@ impl AiAction {
         Self::WorktreeName,
         Self::HostingReply,
         Self::IssueBody,
+        Self::SequenceDraft,
     ];
 
     /// The snake_case key used in `config.toml` and on the CLI.
@@ -108,6 +113,7 @@ impl AiAction {
             Self::WorktreeName => "worktree_name",
             Self::HostingReply => "hosting_reply",
             Self::IssueBody => "issue_body",
+            Self::SequenceDraft => "sequence_draft",
         }
     }
 
@@ -130,6 +136,7 @@ impl AiAction {
             Self::WorktreeName => "Worktree name",
             Self::HostingReply => "Reply on a host",
             Self::IssueBody => "Issue description",
+            Self::SequenceDraft => "Sequence draft",
         }
     }
 }
@@ -959,6 +966,7 @@ pub struct AiActions {
     pub worktree_name: AiActionSettings,
     pub hosting_reply: AiActionSettings,
     pub issue_body: AiActionSettings,
+    pub sequence_draft: AiActionSettings,
 }
 
 impl AiActions {
@@ -977,6 +985,7 @@ impl AiActions {
             AiAction::WorktreeName => &self.worktree_name,
             AiAction::HostingReply => &self.hosting_reply,
             AiAction::IssueBody => &self.issue_body,
+            AiAction::SequenceDraft => &self.sequence_draft,
         }
     }
 
@@ -995,6 +1004,7 @@ impl AiActions {
             AiAction::WorktreeName => &mut self.worktree_name,
             AiAction::HostingReply => &mut self.hosting_reply,
             AiAction::IssueBody => &mut self.issue_body,
+            AiAction::SequenceDraft => &mut self.sequence_draft,
         }
     }
 }

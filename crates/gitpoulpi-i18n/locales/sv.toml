@@ -8958,6 +8958,13 @@ res_notes = "AI:n säger:"
 res_close = "Stäng"
 res_filled = "Regler i omskrivningsvyn nu: {n}."
 
+[sequence_ai]
+# context: Settings > AI, the page of the action that drafts or changes an action sequence from a description
+title = "Sequence drafts"
+profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
+repo_profile_help = "The profile used in this repository to draft action sequences."
+action = "Sequence draft"
+
 [rewrite_size]
 tab = "Storlek"
 intro = "Det som tar plats i historiken: de största filerna och mapparna, samt filer som tagits bort från HEAD men som historiken fortfarande lagrar. Markera rader för att göra dem till en borttagningsregel."

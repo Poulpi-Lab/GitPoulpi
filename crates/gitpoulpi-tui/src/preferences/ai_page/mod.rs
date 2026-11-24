@@ -117,6 +117,7 @@ impl AiSection {
             Self::Action(AiAction::WorktreeName) => msg::TITLE_WORKTREE_NAME,
             Self::Action(AiAction::HostingReply) => msg::TITLE_HOSTING_REPLY,
             Self::Action(AiAction::IssueBody) => msg::TITLE_ISSUE_BODY,
+            Self::Action(AiAction::SequenceDraft) => gitpoulpi_i18n::msg::sequence_ai::TITLE,
             Self::HostingBase => msg::TITLE_HOSTING_BASE,
         }
         .get()
@@ -140,6 +141,8 @@ impl AiSection {
             (AiAction::HostingReply, true) => msg::REPO_PROFILE_HELP_HOSTING_REPLY,
             (AiAction::IssueBody, false) => msg::PROFILE_HELP_ISSUE_BODY,
             (AiAction::IssueBody, true) => msg::REPO_PROFILE_HELP_ISSUE_BODY,
+            (AiAction::SequenceDraft, false) => gitpoulpi_i18n::msg::sequence_ai::PROFILE_HELP,
+            (AiAction::SequenceDraft, true) => gitpoulpi_i18n::msg::sequence_ai::REPO_PROFILE_HELP,
             (AiAction::ConflictResolve, false) => msg::PROFILE_HELP_CONFLICT_RESOLVE,
             (AiAction::CodeReview, false) => {
                 gitpoulpi_i18n::msg::review_ai::PROFILE_HELP_CODE_REVIEW
@@ -433,6 +436,7 @@ fn action_label(action: AiAction) -> &'static str {
         AiAction::WorktreeName => msg::ACTION_WORKTREE_NAME,
         AiAction::HostingReply => msg::ACTION_HOSTING_REPLY,
         AiAction::IssueBody => msg::ACTION_ISSUE_BODY,
+        AiAction::SequenceDraft => gitpoulpi_i18n::msg::sequence_ai::ACTION,
         AiAction::ConflictResolve => msg::ACTION_CONFLICT_RESOLVE,
         AiAction::CodeReview => gitpoulpi_i18n::msg::review_ai::ACTION_CODE_REVIEW,
     }

@@ -8954,6 +8954,13 @@ res_notes = "AI 说："
 res_close = "关闭"
 res_filled = "工作台中现有规则：{n}。"
 
+[sequence_ai]
+# context: Settings > AI, the page of the action that drafts or changes an action sequence from a description
+title = "Sequence drafts"
+profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
+repo_profile_help = "The profile used in this repository to draft action sequences."
+action = "Sequence draft"
+
 [rewrite_size]
 tab = "大小"
 intro = "历史中什么占了空间：最大的文件和文件夹，以及已从 HEAD 删除但历史仍在存储的文件。勾选行即可把它们变成删除规则。"

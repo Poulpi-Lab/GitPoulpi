@@ -226,6 +226,10 @@ instructions = ""
 profile = ""
 instructions = ""
 
+[ai.actions.sequence_draft]
+profile = ""
+instructions = ""
+
 [ai.review]
 run_in_repository = "profile"
 include_claude_md = true
@@ -261,6 +265,7 @@ issue_body = true
 pull_request_description = true
 rewrite_rules = true
 rewrite_script = true
+sequence_draft = true
 split_commit = true
 stash_message = true
 worktree_name = true

@@ -8941,6 +8941,13 @@ res_notes = "AI mówi:"
 res_close = "Zamknij"
 res_filled = "Reguły w warsztacie: {n}."
 
+[sequence_ai]
+# context: Settings > AI, the page of the action that drafts or changes an action sequence from a description
+title = "Sequence drafts"
+profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
+repo_profile_help = "The profile used in this repository to draft action sequences."
+action = "Sequence draft"
+
 [rewrite_size]
 tab = "Rozmiar"
 intro = "Co zajmuje miejsce w historii: największe pliki i foldery oraz pliki usunięte z HEAD, które historia nadal przechowuje. Zaznacz wiersze, aby zamienić je w regułę usuwania."

@@ -40,6 +40,7 @@ macro_rules! config_enum {
         }
     };
 }
+pub(crate) use config_enum;
 
 mod conflict_prevention;
 mod editor;

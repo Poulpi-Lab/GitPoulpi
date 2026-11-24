@@ -18,6 +18,7 @@ pub mod release;
 mod repo_data;
 mod schema;
 pub mod secure_fs;
+pub mod sequences;
 mod session_name;
 mod settings;
 pub mod theme;
@@ -178,6 +179,10 @@ pub struct Config {
     /// file while empty. See [`installation`].
     #[serde(default, skip_serializing_if = "InstallationConfig::is_empty")]
     pub installation: InstallationConfig,
+    /// User-defined named action sequences: `[[sequences]]`. Left out of the
+    /// file while empty. See [`sequences`].
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub sequences: Vec<sequences::SequenceDef>,
 }
 
 /// What [`Config::profile_for`] needs of a workspace: its default profile id

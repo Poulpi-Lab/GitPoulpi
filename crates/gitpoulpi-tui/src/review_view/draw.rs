@@ -188,7 +188,7 @@ impl ReviewView {
         self.status_line(buf, inner.x, status_y, inner.width);
         self.footer(buf, inner.x, hints_y, inner.width);
         crate::pointer_map::from_hits(&hits, |h| match h {
-            // A code line is text to read and comment on.
+            // A code line: the I-beam over its text (`register_pointer`), the arrow elsewhere.
             Hit::Row(..) => None,
             // A row of the Files list lights on hover and keeps the arrow.
             Hit::File(_) | Hit::Commit(_) => Some(crate::pointer_map::Kind::Plain),

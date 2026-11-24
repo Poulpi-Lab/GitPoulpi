@@ -70,8 +70,10 @@ pub(crate) enum CursorShape {
     NwseResize,
     /// A dialog's bottom left corner (`nesw-resize`).
     NeswResize,
-    /// An editable text field (search box, filter, Settings text row, dialog
-    /// input, composer): the I-beam, OSC 22 `text`.
+    /// Text the pointer can act on as text: an editable field (search box,
+    /// filter, Settings text row, dialog input, composer) or selectable
+    /// read-only text (the code of the Diff view, the File View and Blame):
+    /// the I-beam, OSC 22 `text`.
     Text,
 }
 

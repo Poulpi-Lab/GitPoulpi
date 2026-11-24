@@ -1260,7 +1260,7 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                 // off it; written on a change only.
                 let shape = if manager.radar.resize_pointer() {
                     CursorShape::ColResize
-                } else if manager.radar.pointer_text_at() {
+                } else if manager.radar.pointer_text_at(col, row) {
                     CursorShape::Text
                 } else if manager.radar.pointer_hand_at(col, row) {
                     CursorShape::Pointer

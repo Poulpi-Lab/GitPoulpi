@@ -159,6 +159,22 @@ příkazů) jednorázově otevře agenta ve viditelném terminálu v pracovní s
 kterou použije. Odpovězte na otázku, zavřete agenta a zkuste to znovu; odpověď
 si agent pamatuje.
 
+### Otevření agenta ve složce karty
+
+`Karta: Otevřít AI agenta zde` v paletě příkazů (přiřaditelné jako `palette.tab_open_agent_here`,
+bez výchozí klávesy) otevře váš terminál ve složce aktivní karty a spustí v něm agenta lokálního
+profilu agenta, abyste s ním tam pracovali ručně. Je to stejný terminál jako **Terminál zde** a
+stejný příkaz jako **Otevřít agenta...**, ale ve složce karty místo vlastní pracovní složky profilu.
+S jedním lokálním profilem agenta se otevře hned; s několika se zeptá seznam pod lištou karet, který
+z nich. Neodesílá žádný prompt a nespouští žádný požadavek na AI: otevření agenta je akce a to, co v
+něm napíšete, je vaše.
+
+Řádek má jiskru AI, je skrytý, když je AI vypnutá (**Nastavení > AI**), a zašedlý ("není nastaven
+žádný lokální AI agent"), když žádný profil není lokální agent. V sekvenci krok `tab_open_agent_here`
+bere `id` profilu AI ve své volbě `profile` (prázdné: výchozí profil, jinak první lokální agent).
+Vlastní šablona terminálu nemůže dostat příkaz agenta: terminál se otevře ve složce a stavový řádek
+řekne, jaký příkaz spustit.
+
 Odpověď se u Claude Code čte z přepisu relace agenta (přesný text, poté se
 smaže) a u Codexu a Gemini z obrazovky mezi dvěma řádky se značkami, o které
 požadavek žádá. Najednou běží nejvýše dvě spuštění ve virtuálním terminálu a
@@ -283,6 +299,7 @@ najedete nebo ji zvýrazníte.
 | **Kontrola kódu** | V [kontrole pull nebo merge requestu](review.md#-koncept-kontroly-od-ai): tlačítko `✦ Koncept kontroly...`, `s` nebo příkaz z palety `Kontrola: ✦ Koncept kontroly...` (otevře možnosti kontroly, `Enter` spustí). Model čte diff, popis a existující komentáře žádosti (a ve výchozím stavu také `CLAUDE.md` a `AGENTS.md` projektu: viz [Kontext kontroly](#kontext-kontroly)) a navrhuje komentáře; každý přijmete, upravíte nebo odmítnete. Nic nedorazí k hostiteli, dokud kontrolu neodešlete. | `hosting review suggest <n>` (vypíše JSON, nic neodešle), `ai review-context` (výchozí hodnoty) |
 | **Skript pro přepis historie** | V [nástroji pro přepis historie](history-rewrite.md#napsat-skript-pomocí-ai): tlačítko `✦ Napsat pomocí AI...` v editoru skriptu nebo příkaz z palety `Přepis: Napsat skript pomocí AI...`. Dialog ukáže přesně, co se odešle; skript se objeví v editoru, označený, a nikdy se za vás nespustí ani neprovede. | `ai rewrite-script "<instrukce>" [--sample N]` (vypíše) |
 | **Pravidla pro přepis historie** | V [nástroji pro přepis historie](history-rewrite.md#vytvořit-pravidla-pomocí-ai): tlačítko `✦ Vytvořit pravidla pomocí AI...`, `Alt+I` nebo příkaz z palety `Přepis: Vytvořit pravidla pomocí AI...`. Víceřádkový dialog ukáže přesně, co se odešle; pravidla a nastavení se objeví v nástroji a nic se za vás nezobrazí v náhledu ani neprovede. | `ai rewrite-rules "<popis>" [--context]` (vypíše) |
+| **Návrh sekvence** | Popište [sekvenci akcí](#návrh-sekvence), kterou chcete vytvořit, nebo jak nějakou změnit (Nastavení > Sekvence). | `ai sequence-draft "<description>" [--edit <id>] [--context]` (vypíše) |
 | **Název worktree** | V [dialogu Vytvořit worktree](worktrees.md#pojmenování-pomocí-ai): tlačítko `✦ Pojmenovat pomocí AI` nebo `Alt+A` otevře pole, kam popíšete funkci, chybu nebo úkol; model pojmenuje worktree a jeho větev podle názvů větví v samotném repozitáři a oba názvy se objeví v polích dialogu, kde je můžete upravit. Odesílá se jen váš popis a názvy lokálních větví, proto nemá dialog „co se odešle“. | `ai worktree-name --describe "<úkol>"` (vypíše) |
 | **Odpověď na hostiteli** a **Popis issue** | Tlačítko **Napsat pomocí AI** (`Alt+E`) každého Markdown editoru, který odesílá hostiteli: komentář, odpověď nebo úprava v konverzaci, komentář nebo shrnutí kontroly, popis nové issue. Návrh přistane v poli; nic se neodešle. Viz [Pomoc s psaním na hostiteli](#pomoc-s-psaním-na-hostiteli). | `ai hosting-reply` (vypíše návrh) |
 | **Composer commitů** | Nabídka řádku WIP *Sestavit commity (AI)...*, `Ctrl+G C`, příkaz z palety `AI: Sestavit commity z rozpracovaných změn...` | |
@@ -360,6 +377,27 @@ a položka, kterou nelze použít, se vypíše s důvodem, zatímco platné zůs
 takto nikdy nevytvoří. Volitelně se přidá rozsah, názvy větví a tagů a autoři nejnovějších
 commitů (zaškrtávací políčko, ve výchozím stavu vypnuté, viditelné v podokně „co se odešle“). Profil
 a instrukce jsou ty pro *Pravidla pro přepis historie* v Nastavení > AI.
+
+### Návrh sekvence
+
+Vlastními slovy popíšete sekvenci akcí („stage všeho, napsat zprávu pomocí AI, commit a push“ nebo u
+existující „nejdřív přidat fetch“) a model navrhne název, id, kroky a, pokud chce, zkratku. **Jen
+navrhuje**: nic se neuloží, dokud to nepřijmete, a nic se nikdy nespustí. Model zná jen příkazy, které
+sekvence smí obsahovat (seznam, který dostane, se generuje ze stejné tabulky, která sekvenci ověřuje, takže
+se nemůže rozejít); každý krok se kontroluje zvlášť a krok, který je neznámý, destruktivní, spouští jinou
+sekvenci nebo žádá o nemožnou pauzu, se vynechá a vypíše s důvodem, zatímco platné zůstanou. Volitelně se
+přidají názvy remote, id profilů AI a popisky Otevřít v (ve výchozím stavu vypnuto; přepínač CLI je
+`--context`). V terminálu `gitpoulpi ai sequence-draft` vypíše návrh jako JSON (s `toml`, které čte
+`gitpoulpi sequence add --file`) a nic neuloží. Profil a instrukce jsou ty pro *Návrh sekvence* v
+Nastavení > AI.
+
+V terminálovém rozhraní je tentýž úkol položka **Vytvořit pomocí AI...** v Nastavení > Sekvence > **Přidat**
+(paleta: `Sekvence: Vytvořit pomocí AI...`) a tlačítko **Upravit pomocí AI...** u sekvence: dialog, kam
+napíšete, co chcete, s políčkem kontextu (ve výchozím stavu vypnuto) a otázkou "Co se odešle", a pak návrh,
+který můžete **Přijmout**, **Upravit před uložením**, **Zamítnout** nebo poslat znovu přes **Zpět**. Úprava
+ukáže rozdíl proti současné sekvenci (`+` přidáno, `-` odebráno, `~` změněno) a navržená zkratka se
+zkontroluje proti vašemu mapování kláves, ale nikdy se nepřiřadí. Nic se neuloží, dokud to nepřijmete (viz
+[Sekvence](sequences.md#vytvoření-a-úprava-pomocí-ai)).
 
 ### Pomoc s psaním na hostiteli
 

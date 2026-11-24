@@ -17,7 +17,63 @@ Nepropojený repozitář se nikdy nedotazuje: místo toho ukáže řádek
 ![Radar nad dvěma repozitáři: připnutá žádost, pak Čekají na mou kontrolu, Moje pull requesty, Přiřazené mně, issues a rozpracovaná práce](../images/radar.png)
 
 **Zkontrolovat...** na řádku pull nebo merge requestu (nebo `e`) otevře repozitář a v něm
-kontrolu žádosti v aplikaci ([Kontrola pull requestu](review.md)).
+kontrolu žádosti v aplikaci ([Kontrola pull requestu](review.md)). U žádosti repozitáře, který jste naklonovali, ale nikdy
+nepropojili s hostitelem, se klon nejdřív propojí s projektem žádosti (pokud už nemá vlastní propojení pull requestu), takže
+kontrola začne v jeho kartě.
+
+### Sloupec Akce
+
+Vpravo od řádku žádosti nebo issue dělají malá tlačítka to, co klávesa na vybraném řádku (klik řádek vybere a akci
+spustí; ukazatel nechte na tlačítku pro jeho název a klávesu):
+
+```
+Wide:    #58  Round invoice totals  feature/login → main   alice   2d   Review  [globe]  [talk]  ⊕  ×  ⇣  ⋮
+Narrow:  #58  Round invoice totals  feature/login → main                 [rev]  [globe]  [talk]  ⋮
+Issue:   #12  Crash on empty list                         bob     5h   Start work  [globe]  [talk]  ×  ⋮
+```
+
+| Tlačítko | Klávesa | Paleta |
+|---|---|---|
+| **Zkontrolovat** (žádost, která čeká na vaši kontrolu; u nenaklonované se zeptá jak) | `e` | `Radar: Zkontrolovat žádost...` |
+| **Zahájit práci** (naklonovaná issue) | `n` | `Radar: Začít pracovat na issue...` |
+| zeměkoule: otevřít stránku na hostiteli | `o` | `Radar: Otevřít v prohlížeči` |
+| glyf řádků: otevřít konverzaci | `i` | `Radar: Otevřít konverzaci issue` |
+| `»` **Označit jako připravené** (konceptová žádost) | `y` | `Radar: Označit jako připravené` |
+| `⊕` **Merge** (žádost) | `m` | `Radar: Merge pull request...` |
+| `×` **Zavřít** (žádost nebo issue) | `x` | `Radar: Zavřít...` |
+| `⇣` **Klonovat** (řádek, jehož repozitář není naklonovaný) | `g` | `Radar: Klonovat repozitář...` |
+
+Řádek bez akce nechá její buňku prázdnou, takže každé tlačítko zůstává na každém řádku ve stejném sloupci. Když je okno
+úzké, slova Zkontrolovat a Zahájit práci se změní na glyfy dřív, než zmizí jakýkoli jiný sloupec; tlačítka Připraveno, Merge,
+Zavřít a Klonovat opustí sloupec dřív než název, ale zůstanou v nabídce řádku (`⋮`, pravé tlačítko, nebo `Shift+F10`), kde je akce,
+která nelze provést, zašedlá s důvodem. Sloupec je automatický (není to jeden ze sloupců s nastavitelnou šířkou). Dvojklik nebo
+`Enter` na žádosti, která není naklonovaná, se zeptá, jak ji zkontrolovat, stejně jako **Zkontrolovat**.
+
+### Větve žádosti
+
+Řádek žádosti ukazuje za názvem `zdroj → cíl` (`alice:feature/login → main`, když je zdrojová větev ve forku). Když je málo
+místa, ořízne se nejdřív cíl (výpustkou), název si ponechá většinu místa a v úzkém okně se větve neukazují; sloupec Akce se
+nikdy nevytlačí. Ukazatel na oříznutém textu ukáže celý. Hostitel, který větve nepojmenoval, tam nic neukáže. Řádek issue
+pojmenuje svůj repozitář ve stejném čipu jako řádek žádosti (název složky klonu, nebo `owner/name`, když není naklonovaný).
+
+### Jednání na hostiteli
+
+**Merge**, **Zavřít** a **Označit jako připravené** fungují na GitHubu, GitLabu, Gitea a Forgejo (jiní hostitelé je zašedí s „Not supported
+by ...“; issues lze zavřít na týchž hostitelích).
+
+- **Merge** se nejdřív zeptá: okno pojmenuje žádost, její projekt a větve a nabídne metodu (merge commit, squash
+  a rebase, kde ho hostitel má; GitLab provede merge nebo squash). Odmítne se s důvodem u konceptu, žádosti, která je
+  v konfliktu s cílem, nebo selhávajících kontrol; odmítnutí hostitelem (chybí oprávnění, pravidlo větve) se ukáže na
+  stavovém řádku.
+- **Zavřít** se nejdřív zeptá a zavře bez merge.
+- **Označit jako připravené** vyjme koncept z konceptu (GitLab a Gitea: značka `Draft:` / `WIP:` zmizí z názvu). Na nic
+  se neptá: na hostiteli je vratné.
+- **Klonovat** otevře obyčejný dialog Klonovat na projektu řádku (URL je vyplněná, výběr složky je obvyklý). Jakmile
+  klon existuje, Radar řádek na něj umístí při dalším čtení remote (znovu ho otevřete nebo Obnovte) a Klonovat pak
+  řekne, kde klon je.
+
+Merge a Zavřít mění hostitele a **z GitPoulpi je nelze vrátit zpět** (okno to říká); zavřenou žádost znovu otevřete na hostiteli.
+Po úspěšném volání se seznamy načtou znovu, takže sloučený nebo zavřený řádek zmizí a připravený ztratí čip `draft`.
 
 ## Otevření
 
@@ -183,7 +239,7 @@ klávesu a dvojče v paletě.
 
 | Akce | Klávesa | Paleta |
 |---|---|---|
-| Otevřít repozitář (jeho karta se otevře, nebo se na ni přepne) | `Enter` / dvojklik | `Radar: Otevřít repozitář` |
+| Otevřít repozitář (jeho karta se otevře, nebo se na ni přepne; u žádosti, která není naklonovaná, se zeptá, jak ji zkontrolovat) | `Enter` / dvojklik | `Radar: Otevřít repozitář` |
 | Zkontrolovat... (žádost; u nenaklonované se zeptá jak) | `e` | `Radar: Zkontrolovat žádost...` |
 | Zkontrolovat žádost přes API hostitele (bez klonu) | `a` v otázce | `Radar: Zkontrolovat přes API` |
 | Naklonovat repozitář, pak zkontrolovat žádost | `c` v otázce | `Radar: Naklonovat a zkontrolovat...` |

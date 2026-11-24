@@ -302,10 +302,12 @@ Pravý panel sleduje výběr v Logu.
 s avatarem a datem, hash rodiče a počty změn, pak zpráva (souhrn a popis; tažením
 jejího dolního okraje změníte velikost). Podokno **Změněné soubory** pod ní začíná
 vlastními ovládacími prvky: přepínač řazení, **Cesta** / **Strom**, **Zobrazit všechny
-soubory** a pole **Filtr souborů**, pevně nad seznamem, který se jako jediný posouvá.
+soubory** a pole **Filtr souborů** (s políčkem **Jen LFS** na jeho pravém konci v repozitáři,
+který má soubory LFS), pevně nad seznamem, který se jako jediný posouvá.
 Kliknutím na soubor otevřete jeho diff. V nízkém okně ustoupí nejdřív zpráva (až na
 jeden řádek), pak seznam. Zobrazení pracovních změn má řádek **Cesta** / **Strom** /
-**Zobrazit všechny soubory** nahoře u seznamů souborů, nad seznamy Unstaged a Staged.
+**Zobrazit všechny soubory** nahoře u seznamů souborů, nad seznamy Unstaged a Staged. V režimu
+Strom končí sbalená složka počtem souborů v ní, včetně podsložek, jako tlumené `(12)`.
 
 **Odkazy ve zprávě.** Webová adresa napsaná ve zprávě (`https://...` nebo cíl
 markdownového `[text](https://...)`) je podtržená, ukazatel se změní na ruku a
@@ -338,6 +340,23 @@ Log. Nahoře je řada tlačítek:
 | **Zalom.** | Zalomí dlouhé řádky. |
 | **Mapa** | Minimapa celého souboru vedle posuvníku. |
 | **Kódování** | Kódování, ve kterém se soubor čte (první je **Auto**). |
+
+#### Změněná slova v diffu
+
+Když se řádek změní jen zčásti, slova, která se liší, se vykreslí silnějším pozadím
+barvy samotného řádku (sytější červená na odebraném řádku, sytější zelená na přidaném)
+a zbytek řádku si ponechá jednolitý odstín. Uvnitř hunku se každý sled odebraných
+řádků spáruje se sledem přidaných řádků, který po něm následuje, první s prvním,
+druhý s druhým a tak dále; dvojice se označí, jen když je alespoň 40 % jejích
+neprázdných znaků stejných, takže řádek přepsaný od základu zůstane jednolitý a
+nezmění se v jeden blok zvýraznění. Porovnávají se slova, sledy mezer a jednotlivé
+interpunkční znaky, jediná mezera mezi dvěma změněnými slovy je spojí do jedné značky
+a řádky delší než 1000 znaků se neoznačují. Funguje v zobrazení Sjednocené i Vedle sebe,
+se zalamováním řádků i posouváním do stran a v diffovém panelu kontroly. Vypnete to v
+**Nastavení > Diff a editor > Zvýraznit změněná slova** (`ui.diff_intraline`) nebo z
+palety příkazů (**Diff: Přepnout zvýraznění změněných slov**, bez vlastní klávesy). Na
+terminálu omezeném na 16 barev, nebo s motivem bez pozadí diffu, se změněná slova místo
+toho ukážou tučně a podtržená.
 
 V diffu pracovního stromu má každý hunk tlačítka **Stage hunk** a **Zahodit
 hunk**. Klávesou `v` vyberete řádky a pak provedete stage nebo zahodíte jen

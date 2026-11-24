@@ -32,7 +32,12 @@ pracovní změny:
   hlásí `renamed_from`.
 - **Cesta** nebo **Strom** (`m`) zobrazí soubory jako plochý seznam nebo ve
   složkách. **Sbalit vše** (`z`) sbalí složky. **Zobrazit všechny soubory**
-  (`a`) ukáže celý strom místo jen změněných souborů. Pravým tlačítkem na prázdné místo seznamu
+  (`a`) ukáže celý strom místo jen změněných souborů. Sbalená složka ukazuje za svým názvem malý
+  tlumený počet souborů v ní, včetně podsložek (`src/ (12)`); otevřená složka žádný. V úzkém panelu se
+  nejdřív zkrátí název, aby počet zůstal vidět. V repozitáři, který má soubory uložené přes Git LFS,
+  políčko **Jen LFS** (`o`, nebo **Soubory: Přepnout jen LFS**) zúží každý seznam souborů (Unstaged,
+  Staged, **Zobrazit všechny soubory**, soubory commitu) na tyto soubory; počty složek ho následují
+  a nenabízí se, když žádný soubor LFS nepoužívá. Pravým tlačítkem na prázdné místo seznamu
   získáte **Rozbalit vše** / **Sbalit vše**, na řádku složky **Rozbalit všechny podsložky** /
   **Sbalit všechny podsložky**; klávesy `=`, `-`, `*`, `_` (viz
   [Myš a gesta](mouse-and-gestures.md)).

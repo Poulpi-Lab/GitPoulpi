@@ -435,7 +435,7 @@ obsahují; viz [MCP a agenti](mcp-and-agents.md).
 | **Barva vstupů**, **Vlastní barva vstupů** | Pozadí textových polí: **Podle motivu** (výchozí), pevná tmavá barva, nebo vaše vlastní `#rrggbb`. |
 | **Textový kurzor** | `ui.text_cursor`: **terminal** (výchozí) umístí vlastní kurzor terminálu na místo vkládání v aktivním textovém poli, jako svislou čárku (platí nastavení kurzoru vašeho terminálu a okno s návrhy metody zadávání se otevře u kurzoru); **drawn** vykreslí vlastní kurzor GitPoulpi a kurzor terminálu nechá skrytý. Platí okamžitě. Paleta: `Nastavení: Textový kurzor...`. |
 | **Barevná hloubka** | **auto** (výchozí), **truecolor**, **256** nebo **16**. Viz [Motivy](themes.md). |
-| **Barevný motiv grafu** | **Podle motivu** (výchozí: vlastní barvy drah motivu) nebo libovolná paleta drah. Každá paleta ukazuje několik svých barev. Použije se po zavření Nastavení. Příkaz z palety **Aplikace: Změnit barevný motiv grafu...** (`Ctrl+N Shift+T`) ukazuje každou paletu živě. |
+| **Barevný motiv grafu** | **Podle motivu** (výchozí: vlastní barvy drah motivu) nebo libovolná paleta drah, včetně vašich vlastních souborů motivů (za předvolbami). Každá paleta ukazuje několik svých barev; nakonfigurovaný název, který už neexistuje, je označen *nenalezeno* a graf použije dráhy motivu. Použije se po zavření Nastavení. Příkaz z palety **Aplikace: Změnit barevný motiv grafu...** (`Ctrl+N Shift+T`) ukazuje každou paletu živě. |
 | **Pozadí drah grafu** | **Vypnuto** (průhledné) nebo **Podbarvení řádku**: slabý pruh barvy dráhy za sloupcem grafu s tenkou lištou na okraji. |
 | **Síla podbarvení řádku** | Jak vybledlý je pruh podbarvení: **Silné**, **Střední** (výchozí) nebo **Jemné**. Okrajová lišta si ponechá plnou barvu. |
 | **Umístění panelu nástrojů** | `ui.toolbar_position`: Kde je panel nástrojů: Nahoře, Dole (výchozí), Vlevo nebo Vpravo. Vlevo a Vpravo z něj udělají sloupec vedle panelů; v okně užším než 80 sloupců se kreslí dole. Projeví se hned. |
@@ -448,6 +448,8 @@ obsahují; viz [MCP a agenti](mcp-and-agents.md).
 | **Formát data**, **Formát data a času**, **Podrobný formát data** | Vzory data pro sloupec s datem v Historii souboru a Blame, pro sloupec Datum v Logu a pro podrobnosti commitu. Každý ukazuje živý náhled. Tokeny viz [Referenční příručka konfigurace](config-reference.md#ui). |
 
 ![Rozbalený seznam Barevný motiv grafu: Podle motivu, poté každá paleta drah s několika svými barvami](../images/settings-log-graph-lanes.png)
+
+Motiv a barvy grafu (Motiv, barevný motiv grafu, zabarvení a pozadí drah, síla podbarvení řádku) patří každé instalaci: když několik instalací sdílí jeden `config.toml`, změna v jedné nikdy nezmění ostatní. Sdílené klíče `ui.*` zapisuje jen hlavní instalace.
 
 ### Klávesnice a myš
 
@@ -480,6 +482,20 @@ Tři volby jsou na kartě **Obecné**.
 | **Klávesnicový protokol Kitty** | **auto** požádá terminál o klávesnicový protokol kitty, takže dorazí `Ctrl+,`, `Ctrl+Enter` a `Ctrl+Shift+N`. **off** nepožádá nikdy; použijte, pokud se terminál chová nesprávně. Vyžaduje restart. |
 | **Myš zapnuta** | Vypnuto ponechá myš a výběr textu vašemu terminálu. Vyžaduje restart. |
 | **Řádků na kolečko myši** | O kolik řádků se v Logu posune jeden krok kolečka. Vyžaduje restart. |
+
+### Sekvence
+
+**Nastavení > Sekvence** upravuje vaše pojmenované [sekvence](sequences.md): seznamy
+příkazů palety spouštěných jeden po druhém, každá je řádek palety a lze jí
+přiřadit klávesu. Je to [stránka se seznamem](#seznamy) s jednou podobou: **+ Přidat** nabízí
+prázdnou sekvenci a předvolby (**Záloha**, **Sestavit a push**,
+**Worktree a agent**), řádky jsou **Název**, **Id**, **Popis**, **Rozsah** (tato instalace,
+všechny instalace na tomto počítači, nebo jen tento repozitář), tlačítko **Zkratka**, které otevře
+okno zachycení z **Klávesnice a myši**, **Upravit kroky** a **Spustit hned**.
+**Upravit kroky** přepne seznam na kroky sekvence, každý s
+**Pauzou** (**Výchozí**, **Vždy**, **Nikdy**) a jeho volbami; **+ Přidat**
+tam otevře filtrovatelný seznam příkazů, kterými krok může být. Každá změna se
+použije hned. Viz [Sekvence](sequences.md).
 
 ### Log a graf
 
@@ -519,6 +535,7 @@ stránce **Vzhled**.
 | **Čísla řádků** | Sloupec s čísly řádků v editoru a v diffu. |
 | **Sledovat výběr v editoru** | Dokud je editor otevřený, výběr jiného souboru v pravém panelu jej otevře i v editoru, a to po dotazu, zda uložit neuložené změny. Soubor, který nelze upravovat, se otevře v obvyklém zobrazení. Jen pro pracovní změny: soubor vybraný z commitu opustí editor a otevře se v diffu toho commitu. Ve výchozím stavu zapnuto (`editor.follow_selection`). |
 | **Zalamování řádků** | Zalamuje dlouhé řádky diffu. |
+| **Zvýraznit změněná slova** | Ve změněném řádku vykreslí slova, která se liší od odebraného nebo přidaného řádku, s nímž je spárován, silnějším pozadím, v zobrazení Diff (Sjednocené i Vedle sebe), v diffu kontroly a v souborech commitu. Ve výchozím stavu zapnuto (`ui.diff_intraline`); také příkaz z palety **Diff: Přepnout zvýraznění změněných slov**. Viz [Změněná slova](interface-tour.md#změněná-slova-v-diffu). |
 | **Výchozí rozvržení**, **Jen hunky**, **Zobrazit změny jen v bílých znacích**, **Minimapa** | Počáteční stav zobrazení diffu. Lišta zobrazení diffu je mění a ukládá. |
 | **Anotace blame**, **Šířka anotací blame** | Na které straně pohledu Blame je sloupec anotací (avatar, autor, stáří, shrnutí): **right** (výchozí) nebo **left**, a jeho šířka v buňkách (24 až 90). Tažení za okraj sloupce v pohledu Blame nebo klávesy `>` / `<` uloží šířku sem (`ui.blame_side`, `ui.blame_width`). Viz [Blame](log-and-history.md#blame). |
 | **Editor merge: vedle sebe od (sloupců)** | Od této šířky zobrazí editor merge A a B vedle sebe. Výchozí 100, minimum 40, `0` znamená vždy. Pod touto šířkou jsou A a B karty. Viz [Řešení konfliktů merge](merge-conflicts.md). |

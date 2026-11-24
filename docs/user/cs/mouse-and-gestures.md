@@ -113,6 +113,7 @@ tam přejdete.
 - **Táhněte okraj mezi dvěma záhlavími Logu** (ve výchozím stavu mezeru, ze záhlaví nebo odkudkoli z tabulky; Nastavení > Log a graf > Změna velikosti sloupců) pro změnu šířky sloupce (z klávesnice: `Shift+C` vybere sloupec, pak `]` / `[`).
 - **Dvojklik na okraj mezi dvěma záhlavími Logu** přizpůsobí sloupec nalevo jeho obsahu (z klávesnice: `Shift+C` pro výběr sloupce, pak `=`; `+` přizpůsobí všechny sloupce). Poslední sloupec má úchyt na své poslední buňce: tažením změníte jeho šířku, rozdíl převezme sloupec Zpráva.
 - **Posouvání Logu do stran** (rozložení sloupců `scroll`; Nastavení > Log a graf > Rozložení sloupců, nebo zaškrtávátko `Posouvat do stran` ve výběru sloupců): vodorovné kolečko nebo `Shift`+kolečko nad tabulkou, lišta na spodním okraji (tažením jezdce, kliknutím na prázdnou dráhu, kliknutím na koncové šipky), nebo `Shift+Left` / `Shift+Right`. Ve výchozím rozložení `fit` sloupce vyplní panel a není co posouvat.
+- **Posouvejte panel seznamu do stran**, když je řádek širší než panel: sekce Refs (dlouhý název větve, tagu nebo stashe), seznamy Unstaged a Staged, změněné soubory commitu (nebo porovnání) a informační řádky detailů commitu (id, autor, datum vytvoření, počty). Vodorovné kolečko nebo `Shift`+kolečko nad panelem ho posouvá; lišta se na dolním okraji panelu objeví, jen když něco přetéká (táhněte jezdec, klikněte na prázdnou dráhu, klikněte na koncové šipky), takže nikdy nezabere řádek. Z klávesnice `Alt+Left` / `Alt+Right` posouvají panel, který má fokus (Log posouvá detaily commitu; uvnitř změněných souborů soubory); paleta má `Zobrazení: Posunout panel doleva` / `doprava`. Posouvá se celý řádek (odsazení, značka stavu, šipka a název společně); titulek panelu, jeho okraj, posuvníky a tlačítko Stage/Unstage zvýrazněného řádku Stavu zůstávají na místě. Název se už nezkracuje výpustkou: jeho konec je o jedno posunutí dál (větev s dalšími cíli push si místo toho ponechá odznak `⇉` na očích, takže ustoupí její název). Posun je pro každý panel zvlášť, končí u nejširšího viditelného řádku a při přepnutí repozitáře se zapomene. Blok zprávy commitu zalamuje svůj text, takže nemá co posouvat. Dokud je sekce posunutá do stran, nese její dolní okraj lištu, takže velikost té sekce změňte jejími klávesovými příkazy nebo z sekce, která se vejde.
 - **Táhněte záhlaví Logu** pro přesun sloupce: duch jeho názvu sleduje ukazatel, záhlaví, které opustil, je ztlumené a akcentní proužek označuje místo, kam by dopadl. Sloupce se přesunou při pustění; `Esc` to zruší a ukazatel během přenášení ukazuje otevřenou ruku (z klávesnice: `Shift+C` vybere sloupec, pak `<` / `>`).
 
 GitPoulpi si pamatuje každou velikost. Viz
@@ -222,6 +223,7 @@ Viz [Hostingové služby a issue trackery](hosting-integration.md).
   pro každý ref na commitu.
 - **Pravým tlačítkem na pilulku ref** otevřete jednu nabídku s akcemi ref
   a akcemi commitu.
+- **Klikněte na trychtýř v záhlaví Autor** (nebo `Shift+A` v Logu, nebo příkaz z palety `Log: Filtrovat podle autora...`) a vyberte, commity kterých autorů zůstanou svítit; ostatní se ztlumí jako při hledání. `Enter` nebo klik na řádek přepne autora, řádek **Zrušit filtr** (✕) filtr zruší, `Esc` zavře okno a filtr ponechá. **Pravým tlačítkem na rozsvícený trychtýř** filtr zrušíte (paleta: `Log: Zrušit filtr autora`).
 - **Pravým tlačítkem na záhlaví** zobrazíte nebo skryjete sloupce: zaškrtávací seznam (`[x]` / `[ ]`) s ✕ v titulku; klikněte na řádek nebo použijte šipky a `Mezerník` / `Enter`, pak ho zavřete ✕, `Esc` nebo kliknutím mimo (paleta: `Zobrazení: Log: Vybrat zobrazené sloupce`). Pod zaškrtávátky: `Přizpůsobit <sloupec> obsahu` (sloupec, na který jste klikli pravým), `Přizpůsobit všechny sloupce obsahu` a `Obnovit šířky sloupců`. Klávesnicový protějšek pravého kliku: `Shift+C` vybere sloupec, pak `.` (nebo `Shift+F10`) otevře stejnou nabídku na něm.
 - **Sloupce Radaru** fungují stejně: táhněte oddělovač za sloupcem repozitáře, `#`, autora nebo stáří pro změnu šířky, **dvojklikem na něj** sloupec přizpůsobíte jeho nejširší položce (`C` vybere sloupec, pak `=`; `+` přizpůsobí všechny sloupce) a **pravým tlačítkem na název sloupce** (nebo `C`, pak `.`) otevřete `Přizpůsobit <sloupec> obsahu` a `Přizpůsobit všechny sloupce obsahu`.
 - **Klikněte na `↑`, `↓` nebo `✕`** ve vyhledávací liště pro přechod na
@@ -255,19 +257,34 @@ po jednom příkazu *Zobrazit/skrýt* pro každou sekci, *Obnovit výchozí sekc
 
 ### Přetahování refs
 
-Stiskněte tlačítko na větvi v postranním panelu Refs, nebo na pilulce ref v Logu,
-a přetáhněte ji na jinou větev. Stavový řádek říká, co nesete. Cíl, který může drop
-přijmout, se rozsvítí. Uvolněním získáte nabídku. `Esc` přetažení zruší.
+Stiskněte tlačítko na větvi, vzdálené větvi nebo tagu v postranním panelu Refs, nebo na
+pilulce ref v Logu, a přetáhněte ji na jiný ref. Stavový řádek říká, co nesete. Cíl, který
+může drop přijmout, se rozsvítí. Uvolněním získáte nabídku. `Esc` přetažení zruší. Log
+při nesení zůstává na místě: stisknutí refu posune Log na jeho commit, až když se ukáže, že
+šlo o klik (skok nastane při uvolnění tlačítka), takže můžete nejdřív odrolovat na cíl
+pustění a pak ref zvednout.
 
 | Přetažení | Nabídka |
 |---|---|
 | Lokální větev X na lokální větev Y | **Merge X do Y**, **Rebase X na Y**, **Interaktivní rebase X na Y...**, **Fast-forward Y na X** |
 | Lokální větev na vzdálenou větev | **Push X** do tohoto remote |
 | Vzdálená větev na lokální větev Y | **Merge**, **Rebase Y na ni**, **Fast-forward Y na ni** a **Pull**, když je to upstream větve Y |
+| Tag T na libovolnou větev, vzdálenou větev nebo tag | **Přesunout tag T sem**; označeno *(není fast-forward: T by už nebyl předkem)*, když cíl nevychází z commitu tagu (je to vaše volba); zašedlé *už tam je*, když už na tom commitu je |
+| Tag T na lokální větev Y | také **Merge tag T do Y** a pod čarou vzácnější **Merge Y do tagu T a přesunout tag** (merge commit z commitu tagu a Y, detached, pak se tag přesune na něj) |
 
 Když akce mění větev, která není přepnutá, GitPoulpi ji nejdřív přepne (checkout).
-Pokud git checkout odmítne, nic se nezmění. Tagy nelze přetahovat a nemohou
-drop přijmout.
+Pokud git checkout odmítne, nic se nezmění. Na tag lze pustit jen tagy a větev na něj
+pustit nelze.
+
+Přesun tagu zachová jeho druh: lightweight tag zůstane lightweight, anotovaný tag se
+vytvoří znovu anotovaný se zprávou a řádkem autora převzatými beze změny (podepsaný tag
+se odmítne, jeho podpis by už nesouhlasil). Přesune se jen váš lokální tag: remote, který
+tag má, si ponechá starou pozici, tag se začne *lišit* a stavový řádek to řekne; push
+provedete sami, až to budete chtít. Přesun a merge s přesunem jsou každý jeden krok zpět
+(zpět vrátí starý objekt tagu). Merge do tagu, který skončí konfliktem, nic nezmění.
+Paleta: `Refs: Přesunout vybraný Tag na vybraný Commit...` přesune tag z panelu Refs na
+commit vybraný v Logu (zeptá se předem, když to není fast-forward); každý jiný cíl jde
+přes označit a pustit níže.
 
 Klávesnice: „označit a pustit“ udělá totéž co tažení, pro libovolnou dvojici refs.
 V panelu Refs stiskněte `m` na větvi (paleta: `Refs: Označit jako zdroj přetažení`).
@@ -463,7 +480,7 @@ terminálech (Rio, Alacritty, Tabby, iTerm2, Terminal.app, Windows Terminal, xte
 se ukazatel nemění; viz [Výběr terminálu](terminals.md#tvar-ukazatele-myši-osc-22).
 Dělič nebo tlačítko pod ukazatelem se rozsvítí v každém terminálu.
 
-Stejný druh komponenty dává všude v aplikaci stejný ukazatel.
+Stejný druh komponenty dává všude v aplikaci stejný ukazatel: tlačítka kontroly zobrazené nad Radarem (karty, křížek zavření, tlačítka vyskakovacích oken) i vlastní tlačítka Akce Radaru ukazují ruku jako každé jiné tlačítko.
 
 - **Tlačítka jsou skutečná tlačítka**, v Nastavení (Integrace: Upravit, Odpojit,
   Odebrat, Procházet, Smazat, tlačítka úryvků v editoru instrukcí...) stejně jako
@@ -480,7 +497,7 @@ Stejný druh komponenty dává všude v aplikaci stejný ukazatel.
 - **Šipka** je na řádcích. Řádek se rozsvítí celý, když je na něm ukazatel (stejným
   světlem v každém seznamu), a sám o sobě ovládacím prvkem není: řádky panelů Refs,
   Worktrees, Stashes a Submodules, Log a sloupec commitů (ruku bere jen pilulka
-  ref), řádky diffu, změněné soubory, položky pull requestů, issues a Radaru a řádky
+  ref), okraje diffu, změněné soubory, položky pull requestů, issues a Radaru a řádky
   seznamů v dialozích a panelech (klonování, výběr složky, Workspaces, karty
   tabule, panel Jobs, výběry přiřazených osob, štítků a milníků, kroky rebase,
   soubory a commity revize, volby nabídek a comboboxů).
@@ -489,8 +506,18 @@ Stejný druh komponenty dává všude v aplikaci stejný ukazatel.
   Radar, Log aktivity, hledání v panelu issues), textové, číselné a plošné řádky
   Nastavení (i při úpravě), pole dialogů, pole komentářů revize, composer commitů,
   text editoru souborů a upravitelný výsledek editoru sloučení (jeho panely jen pro
-  čtení si ponechávají šipku). V detailech commitu jsou zpráva a popis upravitelné,
-  takže na nich svítí I-beam a celý blok se lehce rozsvítí.
+  čtení si ponechávají šipku, protože tažení v nich nic nevybere). Jedno pravidlo platí
+  i pro text jen pro čtení: všude, kde myšovým tažením lze vybrat text, je ukazatel I-beam.
+  Je to kód diffu (zobrazení Diff, Sjednocené i Vedle sebe, a diffový panel kontroly),
+  kód v zobrazení souboru a v Blame. Jejich čísla řádků, značky a záhlaví hunků si
+  ponechávají šipku a tlačítko na řádku si ponechává ruku. Totéž platí pro konverzaci
+  issue nebo žádosti (také Přehled kontroly a jeho blok konceptu), zprávu v detailech
+  commitu, Poznámky k vydání, Log aktivity (obě karty), okno nápovědy, náhled Markdownu
+  v editoru komentáře a komentáře, čekající poznámky a návrhy uvnitř diffu kontroly:
+  tažení vybere text (prosté kliknutí si ponechává svůj význam: odkaz se otevře,
+  tlačítko jedná, záznam Logu aktivity nebo vlákno se otevře či sbalí), `Ctrl+C` ho
+  zkopíruje, `Esc` nebo klik výběr zruší. Výběr sleduje svůj text při posouvání.
+  Zpráva commitu je také upravitelná (dvojklik ji pozmění) a celý blok se lehce rozsvítí.
 - **V detailech commitu** jsou informační řádky ovládací prvky: klikem na
   `commit: <id>` zkopírujete krátké id, dvojklikem na řádek autora nebo data ho
   upravíte (označí je ruka a lehká značka). Řádek statistik jen informuje a ponechává

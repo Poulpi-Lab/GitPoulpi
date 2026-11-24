@@ -158,10 +158,30 @@ písmeny: **`V`** rozvržení, **`H`** hunky nebo celý soubor, **`S`** bílé z
 předchozí hunk, **`E`** kódování, **`M`** minimapa. Každý má řádek v paletě (*Kontrola: Přepnout sjednocené / vedle sebe*,
 ...).
 
+Na **Přehledu** se konverzace a blok konceptu ✦ vybírají stejně: tažením přes text, **`Ctrl+C`**
+ho zkopíruje (odkaz nebo tlačítko, které stisknete, si ponechá svou akci, a tažení, které na nich začne,
+nevybere nic). Bez výběru **`Ctrl+C`** (nebo *Konverzace: Kopírovat text*) zkopíruje vybraný záznam tak,
+jak ho uložil hostitel. I-beam se ukazuje nad textem a ruka zůstává nad tlačítky a odkazy. Výběr sleduje to, co je
+na obrazovce: posouvání ho přesouvá s jeho textem (zůstává vybraný, i když je mimo záběr), obnovení, které text
+přepíše, ho zahodí, a zalomený odstavec se zkopíruje jako řádky, které ukazuje.
+
+Komentáře uvnitř diffu na stránce **Soubory** (vlákno, vaše čekající poznámky, návrhy ✦) se vybírají také: táhněte
+přes jejich slova, **`Ctrl+C`** (nebo *Kontrola: Kopírovat vybraný text nebo řádek*) je zkopíruje, **`Esc`** výběr zruší.
+Stisknutí jejich tlačítka nebo prosté kliknutí na hlavičku vlákna (sbalí se) dál jedná; tažení, které začne na hlavičce,
+vybere její slova a vlákno nechá, jak je.
+
 ### Commity
 
 Jen commity žádosti (ne historie za ní), od nejnovějšího, a diff vybraného z nich
 (jeho změny proti rodiči), se všemi jeho soubory pod sebou a stejnými možnostmi zobrazení.
+
+## Návrat ke kontrole
+
+Kontrola zůstává otevřená, zatímco pracujete v jiné kartě. Opusťte kartu s otevřenou kontrolou (klik na jinou kartu, `Ctrl+PageDown`, příkaz z palety **Repozitář: Další karta**) a po návratu se kontrola znovu otevře na téže žádosti, téže stránce (Přehled, Soubory nebo Commity), témže souboru a témže řádku, s klávesnicí na téže straně. Totéž platí pro kontrolu přes API nad Radarem: ukažte kartu Radar znovu a kontrola je zpět nad ním.
+
+Kontrola je **rozpracovaná**, dokud je její stránka otevřená. Její zavření (`Esc`, křížek, **Kontrola: Zavřít**), odeslání (**Dokončit kontrolu**, nebo odeslání či opuštění změny Gerrit) nebo checkout její větve ji ukončí a znovu se neotevře. Ukončení GitPoulpi s otevřenou kontrolou se počítá jako opuštění karty: další spuštění ji otevře stejným způsobem.
+
+Pokud byla žádost mezitím sloučena nebo zavřena, nebo hostitel neodpovídá, žádná stránka se neotevře: stavový řádek řekne proč a příště se nic znovu neotevře. Čekající komentáře, zobrazené soubory a koncept se zachovají jako vždy (viz **Psaní kontroly**). Běh návrhů, který ještě probíhá při odchodu, se nepřenáší.
 
 ## Psaní kontroly
 

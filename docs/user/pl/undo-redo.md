@@ -71,6 +71,8 @@ zaznaczonego wiersza:
   commit dostają gałąź `restore/<branch>-<sha>` na dawnym końcu - twoja bieżąca
   gałąź i pliki nigdy się nie przesuwają. Potwierdzenie pokazuje dokładnie, co
   się stanie, a przywrócenie jest nową akcją: `Ctrl+Z` je cofa.
+- **Cofnij całą sekwencję** (`x`): oferowane, gdy najnowsze wpisy należą do jednego
+  uruchomienia sekwencji (zob. [Uruchomienia sekwencji](#uruchomienia-sekwencji)).
 - **Ponów do tego miejsca** (`p`) na cofniętym wierszu.
 - **Przywróć main tam, gdzie zostawiła ją akcja Commit** (`o`, albo
   `Alt+Shift+Z` / `Edycja: Przywróć gałąź tam, gdzie zostawiła ją zablokowana
@@ -79,6 +81,10 @@ zaznaczonego wiersza:
 
 Kliknij wiersz prawym przyciskiem (albo naciśnij `.`), by zobaczyć te same
 akcje jako menu.
+
+Wiersz zrobiony przez krok [sekwencji](sequences.md) nosi plakietkę `⟳ Backup`,
+a jego linia szczegółów mówi, który to był krok („Wykonana przez sekwencję „Backup”,
+krok 3/4.”).
 
 ![Historia cofania po usunięciu gałęzi i zrobieniu dwóch commitów: wiersz usuniętej gałęzi jest zaznaczony i można go przywrócić osobno](../images/undo-history.png)
 
@@ -176,7 +182,7 @@ widoku widocznego na ekranie.
 
 | Widok | Wiersze palety |
 |---|---|
-| Historia cofania | `Historia cofania: Cofnij do tego miejsca...`, `Ponów do tego miejsca...`, `Przywróć tylko tę...`, `Przywróć gałąź tam, gdzie była...`, `Odśwież`, `Zamknij` |
+| Historia cofania | `Historia cofania: Cofnij do tego miejsca...`, `Ponów do tego miejsca...`, `Cofnij całą sekwencję`, `Przywróć tylko tę...`, `Przywróć gałąź tam, gdzie była...`, `Odśwież`, `Zamknij` |
 | Reflog | `Reflog: Pokaż w Log`, `Utwórz gałąź tutaj...`, `Utwórz tag tutaj...`, `Zastosuj zmiany w drzewie roboczym`, `Zapisz zmiany jako stash`, `Przywróć do tej pozycji...`, `Wczytaj więcej`, `Odśwież` |
 | Utracona praca | `Utracona praca: Utwórz gałąź tutaj...`, `Utwórz tag tutaj...`, `Cherry-pick`, `Zastosuj zmiany w drzewie roboczym`, `Zapisz zmiany jako stash`, `Szukaj ponownie` |
 
@@ -189,6 +195,39 @@ miejsca”, powód, dla którego wpisu nie można przywrócić osobno, „można
 tylko gałąź lub HEAD” i tak dalej. Wiersze z `...` otwierają to samo
 potwierdzenie lub pole nazwy co przycisk.
 
+## Uruchomienia sekwencji
+
+[Sekwencja](sequences.md) (Backup: stage wszystkiego, opis commita od AI, commit, push)
+tworzy **jeden zwykły wpis dziennika na każdy krok, który coś zmienia**: tutaj stage
+i commit, nie opis od AI i nie push (push nigdy nie jest cofany, zob. niżej). Dziennik jest per repozytorium i ściśle od najnowszego, więc
+uruchomienie nie może być jednym wpisem: każdy zachowuje własne kontrole i każdy jest oznaczony
+uruchomieniem, które go zrobiło (`sequence:Backup#<run> 3/4`). Stare dzienniki nie mają
+oznaczenia i wczytują się jak dawniej.
+
+**Cofnij całą sekwencję** cofa wpisy jednego uruchomienia, od najnowszego, jako jedno
+zwykłe Cofnij na każdy. Jest oferowane, gdy najnowsze wpisy dziennika należą do
+jednego uruchomienia, kolejno po sobie: wpis innego uruchomienia, zmiana zrobiona przez ciebie ręcznie
+albo zrobiona poza GitPoulpi w międzyczasie kończy grupę. Gdzie to jest:
+
+- Historia cofania: przycisk `Cofnij całą sekwencję` (`x`), menu prawego przycisku wiersza
+  i wiersz palety `Historia cofania: Cofnij całą sekwencję`;
+- paleta poleceń: `Edycja: Cofnij całą sekwencję` (nazwa sekwencji jest na wierszu,
+  gdy ma zastosowanie);
+- wiersz poleceń i MCP: `gitpoulpi undo --sequence` (niżej).
+
+Każdy wpis jest sprawdzany osobno, dokładnie jak pojedyncze Cofnij: commit, który już
+jest na swoim upstreamie, pyta „cofnąć mimo to?” zanim zostanie cofnięty (odpowiedz, a reszta
+idzie dalej), a gałąź, która się przesunęła, albo merge w toku odmawia. Pierwsza
+odmowa (albo „nie” na pytanie) **zatrzymuje** i mówi, który krok i dlaczego: *cofanie
+„Backup” zatrzymane na kroku 3/4 (Commit „wip” (a81b9e4)): ... Pozostałe akcje: 2*.
+To, co cofnięto, zostaje cofnięte, starsze wpisy zostają w dzienniku, a zwykłe
+Cofnij (albo ponownie przycisk) idzie dalej stamtąd.
+
+Cofany jest tylko dziennik tego repozytorium. Uruchomienie, które działało też w innym
+repozytorium (krok worktree przeniósł kolejne kroki do karty nowego worktree),
+zostawiło wpisy w dzienniku tamtego repozytorium; otwórz je i cofnij tam. **Ponów**
+zostaje per wpis: po cofnięciu całego uruchomienia `Ctrl+Y` przywraca najnowszy
+krok, potem następny, każdy z własną kontrolą.
 ## Co można cofnąć
 
 | Obszar | Operacje |
@@ -376,6 +415,9 @@ Cofanie pyta tylko wtedy, gdy jest ryzykowne:
   z powrotem na serwer** (zob. wyżej), więc zawsze pyta, tak samo jak ponowienie,
   które usuwa je tam znowu.
 
+Cofnięcie całej sekwencji pyta raz o listę (w panelu), a potem każdy
+ryzykowny wpis pyta ponownie jak wyżej.
+
 Ponów i każde cofnięcie samego przesunięcia refa nigdy nie pytają: druga strona jest
 o jeden klawisz dalej.
 
@@ -417,6 +459,7 @@ historii lub gdy cofanie zostaje wyłączone. Nic innego nie jest nigdy usuwane.
 gitpoulpi undo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi redo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi undo --list [--all]
+gitpoulpi undo --sequence [--dry-run] [--yes]
 gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 ```
 
@@ -426,6 +469,14 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 - `--expect <id>` sprawia, że wywołanie odmawia jako *stale*, o ile ten wpis nie jest nadal
   najnowszy: skrypt (lub drugie okno) nigdy nie cofnie czegoś innego niż
   to, na co patrzył.
+- `--sequence` cofa uruchomienie sekwencji na szczycie dziennika (zob.
+  [Uruchomienia sekwencji](#uruchomienia-sekwencji)): najnowsze kolejne wpisy, które zrobiło jedno
+  `sequence run`, od najnowszego, po jednym `undo` na każdy z własnymi kontrolami.
+  `--dry-run` je wylicza; bez `--yes` zatrzymuje go pierwszy wpis, który go wymaga
+  (kod **3**), z nazwanym krokiem, tym, co dotąd cofnięto, w `undone` i tym, co zostało, w `left`.
+  Odmowa kończy się kodem **2** z `stopped.refused`; gdy szczyt dziennika nie należy do jednego uruchomienia,
+  odpowiedzią jest `{"no_sequence": {...}}`, kod 2. Wpisy niosą swoje uruchomienie w `undo --list`
+  (`summary.origin`: `name`, `run_id`, `step`, `of`). Nie z `--expect`.
 - `undo-forget` usuwa zablokowany najnowszy wpis z dziennika (`--redo`: najnowszy
   wpis ponawiania). Odmawia, gdy wpis nie jest zablokowany, i kończy się kodem **3**
   bez `--yes`. Dla MCP to mutacja, ale nie destrukcyjna: repozytorium

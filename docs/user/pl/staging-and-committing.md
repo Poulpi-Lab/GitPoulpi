@@ -29,7 +29,14 @@ zmiany robocze:
   To samo dotyczy plików commita, a `gitpoulpi status` / `gitpoulpi diff` zgłaszają `renamed_from`.
 - **Ścieżka** lub **Drzewo** (`m`) pokazuje pliki płasko albo w folderach. **Zwiń wszystko**
   (`z`) zwija foldery. **Wszystkie pliki** (`a`) pokazuje całe drzewo
-  zamiast tylko zmienionych plików. Prawy przycisk na pustym miejscu listy daje
+  zamiast tylko zmienionych plików. Zwinięty folder pokazuje po nazwie mały
+  przygaszony licznik plików w środku, razem z podfolderami (`src/ (12)`);
+  otwarty folder go nie ma. W wąskim panelu najpierw skracana jest nazwa, by
+  licznik został widoczny. W repozytorium z plikami przechowywanymi przez Git LFS
+  pole wyboru **Tylko LFS** (`o` albo **Pliki: Przełącz tylko LFS**) zawęża każdą
+  listę plików (Unstaged, Staged, **Wszystkie pliki**, pliki commita) do tych
+  plików; liczniki folderów za tym podążają, a pole nie jest oferowane, gdy żaden
+  plik nie używa LFS. Prawy przycisk na pustym miejscu listy daje
   **Rozwiń wszystko** / **Zwiń wszystko**, na wierszu folderu **Rozwiń wszystkie podfoldery** /
   **Zwiń wszystkie podfoldery**; klawisze `=`, `-`, `*`, `_` (zob.
   [Mysz i gesty](mouse-and-gestures.md)).

@@ -17,7 +17,63 @@ powiedzenia” niżej).
 ![Radar nad dwoma repozytoriami: przypięty request, potem Czekają na mój przegląd, Moje pull requesty, Przypisane do mnie, zgłoszenia i praca w toku](../images/radar.png)
 
 **Przejrzyj...** w wierszu pull lub merge requesta (albo `e`) otwiera repozytorium z przeglądem tego żądania w aplikacji
-([Przegląd pull lub merge requesta](review.md)).
+([Przegląd pull lub merge requesta](review.md)). Dla żądania z repozytorium, które sklonowałeś, ale nigdy nie powiązałeś z hostem, klon jest najpierw
+powiązany z projektem żądania (chyba że ma już własne powiązanie z pull requestem), więc przegląd zaczyna się w jego karcie.
+
+### Kolumna Akcje
+
+Z prawej strony wiersza żądania lub zgłoszenia małe przyciski robią to, co klawisz na zaznaczonym wierszu (kliknięcie zaznacza wiersz i
+uruchamia akcję; zatrzymaj wskaźnik na przycisku, by zobaczyć jego nazwę i klawisz):
+
+```
+Szeroko: #58  Round invoice totals  feature/login → main   alice   2d   Przejrzyj  [globe]  [talk]  ⊕  ×  ⇣  ⋮
+Wąsko:   #58  Round invoice totals  feature/login → main                 [rev]  [globe]  [talk]  ⋮
+Zgłoszenie: #12  Crash on empty list                       bob     5h   Zacznij pracę  [globe]  [talk]  ×  ⋮
+```
+
+| Przycisk | Klawisz | Paleta |
+|---|---|---|
+| **Przejrzyj** (żądanie czekające na twój przegląd; pyta jak, gdy nie jest sklonowane) | `e` | `Radar: Przejrzyj żądanie...` |
+| **Zacznij pracę** (sklonowane zgłoszenie) | `n` | `Radar: Zacznij pracę nad zgłoszeniem...` |
+| globus: otwórz stronę na hoście | `o` | `Radar: Otwórz w przeglądarce` |
+| glif z liniami: otwórz rozmowę | `i` | `Radar: Otwórz rozmowę zgłoszenia` |
+| `»` **Oznacz jako gotowe** (szkic żądania) | `y` | `Radar: Oznacz jako gotowe` |
+| `⊕` **Merge** (żądanie) | `m` | `Radar: Merge żądania...` |
+| `×` **Zamknij** (żądanie lub zgłoszenie) | `x` | `Radar: Zamknij...` |
+| `⇣` **Klonuj** (wiersz, którego repozytorium nie jest sklonowane) | `g` | `Radar: Klonuj repozytorium...` |
+
+Wiersz bez akcji zostawia swoją komórkę pustą, więc każdy przycisk zostaje w tej samej kolumnie w każdym wierszu. Gdy okno jest
+wąskie, słowa Przejrzyj i Zacznij pracę zamieniają się w glify, zanim zniknie jakakolwiek inna kolumna; przyciski Gotowe, Merge, Zamknij i Klonuj
+opuszczają kolumnę przed tytułem, ale zostają w menu wiersza (`⋮`, prawy przycisk myszy albo `Shift+F10`), gdzie akcja,
+której nie można wykonać, jest wyszarzona z powodem. Kolumna jest automatyczna (nie należy do kolumn, którym
+można zmieniać rozmiar). Podwójne kliknięcie lub `Enter` na żądaniu, które nie jest sklonowane, pyta, jak je przejrzeć, jak **Przejrzyj**.
+
+### Gałęzie żądania
+
+Wiersz żądania pokazuje `źródło → cel` po tytule (`alice:feature/login → main`, gdy gałąź źródłowa jest w forku).
+Gdy miejsca brakuje, najpierw ucinany jest cel (wielokropek), tytuł zachowuje większość miejsca, a w wąskim oknie
+gałęzie nie są pokazywane; kolumna Akcje nigdy nie jest wypychana. Zatrzymaj wskaźnik na uciętym tekście, by zobaczyć go w całości. Host, który
+nie podał gałęzi, nie pokazuje tam nic. Wiersz zgłoszenia nazywa swoje repozytorium w tym samym chipie co wiersz żądania (nazwa
+folderu klonu albo `owner/name`, gdy nie jest sklonowane).
+
+### Działanie na hoście
+
+**Merge**, **Zamknij** i **Oznacz jako gotowe** działają na GitHubie, GitLabie, Gitea i Forgejo (inne hosty wyszarzają je z „Nieobsługiwane przez ...”;
+zgłoszenia można zamykać na tych samych hostach).
+
+- **Merge** pyta najpierw: okno nazywa żądanie, jego projekt i gałęzie oraz oferuje metodę (zatwierdzenie scalające, squash
+  i rebase tam, gdzie host go ma; GitLab scala lub robi squash). Jest odrzucane z powodem dla szkicu, żądania, które
+  ma konflikt ze swoim celem, albo niepowodzących się kontroli; odmowa hosta (brak uprawnień, reguła gałęzi) jest pokazywana
+  na pasku stanu.
+- **Zamknij** pyta najpierw i zamyka bez merge.
+- **Oznacz jako gotowe** zdejmuje szkic ze statusu szkicu (GitLab i Gitea: znacznik `Draft:` / `WIP:` znika z tytułu). Niczego
+  nie pyta: na hoście jest odwracalne.
+- **Klonuj** otwiera zwykłe okno Klonowania na projekcie wiersza (URL jest wypełniony, wybór folderu jest zwykły). Gdy
+  klon istnieje, Radar umieszcza wiersz na nim przy następnym odczycie zdalnych (otwórz go ponownie lub Odśwież), a Klonuj
+  mówi wtedy, gdzie jest klon.
+
+Merge i Zamknij zmieniają hosta i **nie można ich cofnąć z GitPoulpi** (okno tak mówi); otwórz zamknięte żądanie ponownie na hoście.
+Po udanym wywołaniu listy są pobierane ponownie, więc scalony lub zamknięty wiersz znika, a gotowy traci swój chip `draft`.
 
 ## Otwieranie
 
@@ -182,7 +238,7 @@ w palecie.
 
 | Akcja | Klawisz | Paleta |
 |---|---|---|
-| Otwórz repozytorium (jego karta się otwiera albo jest przełączana) | `Enter` / podwójne kliknięcie | `Radar: Otwórz repozytorium` |
+| Otwórz repozytorium (jego karta się otwiera albo jest przełączana; żądanie, które nie jest sklonowane, pyta, jak je przejrzeć) | `Enter` / podwójne kliknięcie | `Radar: Otwórz repozytorium` |
 | Przejrzyj... (żądania; żądanie z niesklonowanego repozytorium pyta, jak) | `e` | `Radar: Przejrzyj żądanie...` |
 | Przejrzyj żądanie przez API hosta (bez klonu) | `a` w pytaniu | `Radar: Przejrzyj przez API` |
 | Sklonuj repozytorium, potem przejrzyj żądanie | `c` w pytaniu | `Radar: Sklonuj i przejrzyj...` |

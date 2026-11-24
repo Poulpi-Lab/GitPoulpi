@@ -448,7 +448,7 @@ punkt końcowy HTTP. Wiersze MCP są widoczne tylko w kompilacjach zawierającyc
 | **Kolor pól tekstowych**, **Własny kolor pól tekstowych** | Tło pól tekstowych: **Zgodnie z motywem** (domyślnie), stały ciemny kolor albo własny `#rrggbb`. |
 | **Kursor tekstowy** | `ui.text_cursor`: **terminal** (domyślnie) ustawia własny kursor terminala w miejscu karetki aktywnego pola tekstowego, jako pionową kreskę (obowiązują ustawienia kursora Twojego terminala, a okno kandydatów metody wprowadzania otwiera się przy karetce); **drawn** rysuje własną karetkę GitPoulpi i zostawia kursor terminala ukryty. Działa od razu. Paleta: `Ustawienia: Kursor tekstowy...`. |
 | **Głębia kolorów** | **auto** (domyślnie), **truecolor**, **256** lub **16**. Zob. [Motywy](themes.md). |
-| **Motyw kolorów grafu** | **Zgodnie z motywem** (domyślnie: własne kolory ścieżek motywu) lub dowolna paleta ścieżek. Każda paleta pokazuje kilka swoich kolorów. Zmiana obowiązuje po zamknięciu Ustawień. Polecenie palety **Aplikacja: Zmień motyw kolorów grafu...** (`Ctrl+N Shift+T`) podgląda każdą paletę na żywo. |
+| **Motyw kolorów grafu** | **Zgodnie z motywem** (domyślnie: własne kolory ścieżek motywu) lub dowolna paleta ścieżek, także twoje własne pliki motywów (po presetach). Każda paleta pokazuje kilka swoich kolorów; skonfigurowana nazwa, która już nie istnieje, jest oznaczona *nie znaleziono*, a graf używa ścieżek motywu. Zmiana obowiązuje po zamknięciu Ustawień. Polecenie palety **Aplikacja: Zmień motyw kolorów grafu...** (`Ctrl+N Shift+T`) podgląda każdą paletę na żywo. |
 | **Tło ścieżek grafu** | **Wył.** (przezroczyste) lub **Podbarwienie wiersza**: delikatny pas koloru ścieżki za kolumną grafu, z cienkim paskiem na brzegu. |
 | **Intensywność podbarwienia** | Jak blady jest pas podbarwienia: **Mocne**, **Średnie** (domyślnie) lub **Subtelne**. Pasek na brzegu zachowuje pełny kolor. |
 | **Położenie paska narzędzi** | `ui.toolbar_position`: Gdzie leży pasek narzędzi: U góry, Na dole (domyślnie), Po lewej lub Po prawej. Po lewej i Po prawej robią z niego kolumnę obok paneli; w oknie węższym niż 80 kolumn jest rysowany na dole. Działa od razu. |
@@ -462,6 +462,7 @@ punkt końcowy HTTP. Wiersze MCP są widoczne tylko w kompilacjach zawierającyc
 
 ![Lista Motyw kolorów grafu: Zgodnie z motywem, a potem każda paleta ścieżek z kilkoma jej kolorami](../images/settings-log-graph-lanes.png)
 
+Motyw i kolory grafu (Motyw, motyw kolorów grafu, kolorowanie i tło ścieżek, siła podkreślenia wierszy) należą do każdej instalacji: gdy kilka instalacji współdzieli jeden `config.toml`, zmiana ich w jednej nigdy nie zmienia pozostałych. Tylko instalacja główna zapisuje też wspólne klucze `ui.*`.
 ### Klawiatura i mysz
 
 ![Strona Klawiatura i mysz: każda akcja według kontekstu z jej klawiszami, pole wyszukiwania i filtry](../images/settings-keyboard.png)
@@ -494,6 +495,19 @@ Trzy opcje są na karcie **Ogólne**.
 | **Mysz włączona** | Wyłączone zostawia mysz i zaznaczanie tekstu terminalowi. Wymaga restartu. |
 | **Linie kółka myszy** | O ile wierszy w Logu przesuwa jeden krok kółka. Wymaga restartu. |
 
+### Sekwencje
+
+**Ustawienia > Sekwencje** edytuje twoje nazwane [sekwencje](sequences.md): listy
+poleceń palety uruchamianych jedno po drugim, każda jest wierszem palety i da się
+ją przypisać do klawisza. To [strona z listą](#listy) z jedną twarzą: **+ Dodaj**
+oferuje pustą sekwencję i szablony (**Kopia zapasowa**, **Skomponuj i push**,
+**Worktree i agent**), wiersze to **Nazwa**, **Id**, **Opis**, **Zakres** (ta
+instalacja, wszystkie instalacje na tym komputerze albo tylko to repozytorium),
+przycisk **Skrót**, który otwiera okienko przechwytywania z **Klawiatura i mysz**,
+**Edytuj kroki** i **Uruchom teraz**. **Edytuj kroki** przełącza listę na kroki
+sekwencji, każdy z **Pauzą** (**Domyślnie**, **Zawsze**, **Nigdy**) i swoimi opcjami;
+**+ Dodaj** tam otwiera filtrowalną listę poleceń, którymi może być krok. Każda
+zmiana działa od razu. Zob. [Sekwencje](sequences.md).
 ### Log i graf
 
 Jak rysowany jest graf commitów i ile commitów wczytuje Log. Kolory grafu są na
@@ -532,6 +546,7 @@ stronie **Wygląd**.
 | **Numery linii** | Kolumna numerów linii w edytorze i w diff. |
 | **Podążaj za zaznaczeniem w edytorze** | Gdy edytor jest otwarty, zaznaczenie innego pliku w prawym panelu otwiera go także w edytorze, po zapytaniu o zapisanie niezapisanych zmian. Plik, którego nie można edytować, otwiera się w zwykłym widoku. Tylko dla zmian roboczych: plik wybrany z commita opuszcza edytor na rzecz diffa tego commita. Domyślnie włączone (`editor.follow_selection`). |
 | **Zawijanie wierszy** | Zawija długie linie diff. |
+| **Podświetlaj zmienione słowa** | W zmienionej linii maluje słowa różniące się od usuniętej lub dodanej linii, z którą jest sparowana, mocniejszym tłem w widoku Diff (W linii i Obok siebie), w diffie przeglądu i w plikach commita. Domyślnie włączone (`ui.diff_intraline`); także **Diff: Przełącz podświetlanie zmienionych słów** w palecie. Zob. [Zmienione słowa](interface-tour.md#zmienione-słowa-w-diffie). |
 | **Domyślny układ**, **Tylko hunki**, **Pokaż zmiany tylko w białych znakach**, **Minimapa** | Początkowy stan widoku diff. Pasek widoku diff zmienia je i zapisuje. |
 | **Adnotacje Blame**, **Szerokość adnotacji Blame** | Po której stronie widoku Blame jest kolumna adnotacji (awatar, autor, wiek, opis): **right** (domyślnie) lub **left**, oraz jej szerokość w komórkach (od 24 do 90). Przeciągnięcie krawędzi kolumny w widoku Blame albo klawisze `>` / `<` zapisują tu szerokość (`ui.blame_side`, `ui.blame_width`). Zob. [Blame](log-and-history.md#blame). |
 | **Edytor merge: obok siebie od (kolumn)** | Od tej szerokości edytor merge pokazuje A i B obok siebie. Domyślnie 100, minimum 40, `0` oznacza zawsze. Poniżej A i B są kartami. Zob. [Rozwiązywanie konfliktów merge](merge-conflicts.md). |

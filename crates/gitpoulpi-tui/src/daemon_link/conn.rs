@@ -107,6 +107,8 @@ pub(super) async fn call_raw(
     command: OperationKind,
     args: serde_json::Value,
 ) -> GitResult<serde_json::Value> {
+    // A sequence run's mutations carry the run (`origin`), for the journal.
+    let args = super::origin::attach(command, args);
     let id = next_id.fetch_add(1, Ordering::Relaxed);
     let (tx, rx) = oneshot::channel();
     {

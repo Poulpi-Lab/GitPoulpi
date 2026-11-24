@@ -14,6 +14,7 @@ use super::{Act, PanelOutcome, SafetyPanel, Tab};
 pub(crate) enum SafetyCmd {
     UndoTo,
     RedoTo,
+    UndoSequence,
     RestoreOnly,
     Offer,
     HistoryRefresh,
@@ -52,6 +53,7 @@ impl SafetyCmd {
         match self {
             Self::UndoTo
             | Self::RedoTo
+            | Self::UndoSequence
             | Self::RestoreOnly
             | Self::Offer
             | Self::HistoryRefresh => Some(Tab::History),
@@ -88,6 +90,7 @@ impl SafetyCmd {
         Some(match self {
             Self::UndoTo => Act::UndoTo,
             Self::RedoTo => Act::RedoTo,
+            Self::UndoSequence => Act::UndoSequence,
             Self::RestoreOnly => Act::RestoreOnly,
             Self::Offer => Act::Offer,
             Self::ReflogShow => Act::ShowInLog,
@@ -230,6 +233,10 @@ impl SafetyPanel {
                 match act {
                     Act::UndoTo => m::WHY_ALREADY_UNDONE.get().to_string(),
                     Act::RedoTo => m::WHY_NOT_UNDONE.get().to_string(),
+                    Act::UndoSequence if row.redo => m::WHY_ALREADY_UNDONE.get().to_string(),
+                    Act::UndoSequence => gitpoulpi_i18n::msg::undo_ui::WHY_NO_SEQUENCE
+                        .get()
+                        .to_string(),
                     Act::RestoreOnly if row.redo => m::WHY_RESTORE_REDO.get().to_string(),
                     Act::RestoreOnly => match row.entry.restore.not_restorable.as_deref() {
                         Some(why) => m::detail_not_restorable(why),

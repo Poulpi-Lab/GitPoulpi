@@ -160,6 +160,30 @@ impl DaemonLink {
         }
     }
 
+    /// "Undo whole sequence" on the newest entries of one run: the status
+    /// text, or why it cannot.
+    pub(crate) fn start_undo_sequence(&self) -> String {
+        let state = self.journal_state();
+        if let Some(why) = crate::undo_ui::sequence_reason(&state, self.undo_busy()) {
+            return why;
+        }
+        let Some(group) = state.sequence else {
+            return gitpoulpi_i18n::msg::undo_ui::WHY_NO_SEQUENCE.get().into();
+        };
+        self.send_undo_sequence(*group, false);
+        gitpoulpi_i18n::msg::undo_ui::UNDOING_SEQUENCE.get().into()
+    }
+
+    /// The same for a group and an answer to a risky entry.
+    pub(crate) fn send_undo_sequence(
+        &self,
+        group: gitpoulpi_core::domain::SequenceGroup,
+        confirmed: bool,
+    ) {
+        self.activity.journal.begin();
+        self.submit_action(Action::UndoSequence { group, confirmed });
+    }
+
     /// The same, after the user agreed to a risky one.
     pub(crate) fn send_undo_redo(
         &self,

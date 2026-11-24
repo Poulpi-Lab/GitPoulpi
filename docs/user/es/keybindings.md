@@ -949,6 +949,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Edición: Reflog... |  |
 | Edición: Recuperar commits perdidos... |  |
 | Edición: Restaurar la rama a donde la dejó la acción bloqueada | `Alt+Shift+Z` |
+| Edit: Undo Whole Sequence |  |
 | Revisión: Mostrar resumen |  |
 | Revisión: Mostrar archivos |  |
 | Revisión: Mostrar Commits |  |
@@ -1042,6 +1043,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Revisión: Descartar el borrador ✦ | `N` |
 | Historial de deshacer: Deshacer hasta aquí... | `u` |
 | Historial de deshacer: Rehacer hasta aquí... | `y` |
+| Undo History: Undo Whole Sequence | `x` |
 | Historial de deshacer: Restaurar solo esta... | `r` |
 | Historial de deshacer: Restaurar la rama a donde estaba... | `o` |
 | Historial de deshacer: Actualizar |  |

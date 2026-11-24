@@ -944,6 +944,7 @@ Tuşlar varsayılanlardır.
 | Düzenle: Reflog... |  |
 | Düzenle: Kaybolan Commit'ler Kurtar... |  |
 | Düzenle: Dalı Engelli Eylemin Bıraktığı Yere Geri Yükle | `Alt+Shift+Z` |
+| Edit: Undo Whole Sequence |  |
 | İnceleme: Genel Bakışı Göster |  |
 | İnceleme: Dosyaları Göster |  |
 | İnceleme: Commit'leri Göster |  |
@@ -1037,6 +1038,7 @@ Tuşlar varsayılanlardır.
 | İnceleme: ✦ Taslağı At | `N` |
 | Geri Alma Geçmişi: Buraya Kadar Geri Al... | `u` |
 | Geri Alma Geçmişi: Buraya Kadar Yinele... | `y` |
+| Undo History: Undo Whole Sequence | `x` |
 | Geri Alma Geçmişi: Yalnızca Bunu Geri Yükle... | `r` |
 | Geri Alma Geçmişi: Dalı Eski Yerine Geri Yükle... | `o` |
 | Geri Alma Geçmişi: Yenile |  |

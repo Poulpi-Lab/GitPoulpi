@@ -61,6 +61,7 @@ mod link_loop;
 mod log_filter;
 mod merge;
 mod messages;
+mod origin;
 mod outcome;
 mod raw;
 mod reader;
@@ -106,3 +107,5 @@ mod takeover_tests;
 mod tests;
 #[cfg(test)]
 pub(crate) mod ticket_tests;
+#[cfg(test)]
+mod undo_sequence_tests;

@@ -27,13 +27,16 @@ pub(super) async fn run_action(
     }
     let original = action.clone();
     let ((result, payload), failed_op) =
-        super::failed_op::capture(super::tickets::capture_payload(dispatch(
-            conn,
-            action,
-            action_error_tx,
-            action_message_tx,
-            push_rejected_tx,
-            activity,
+        super::failed_op::capture(super::tickets::capture_payload(super::origin::scope(
+            super::tickets::origin_of(ticket),
+            dispatch(
+                conn,
+                action,
+                action_error_tx,
+                action_message_tx,
+                push_rejected_tx,
+                activity,
+            ),
         )))
         .await;
     match result {
@@ -274,6 +277,9 @@ async fn dispatch(
                 activity,
             )
             .await
+        }
+        Action::UndoSequence { group, confirmed } => {
+            undo_sequence_now(conn, group, confirmed, action_message_tx, activity).await
         }
         Action::ReflogRestore { refname, oid } => {
             conn.call::<gitpoulpi_core::domain::RestoreOutcome>(
@@ -1510,11 +1516,68 @@ pub(super) async fn undo_redo_now(
                 direction,
                 expect,
                 prompt,
+                sequence: None,
             });
             Ok(())
         }
         Err(e) => Err(e),
     }
+}
+
+/// "Undo whole sequence": one ordinary undo per entry of the run, newest
+/// first, each with its own checks. A risky entry is handed to the render
+/// loop as a question (the entries still to undo travel with it, so the
+/// answer carries on); a refusal stops here and says which step and why, the
+/// older entries stay. The busy mark is cleared on every way out.
+pub(super) async fn undo_sequence_now(
+    conn: &LinkConn,
+    group: gitpoulpi_core::domain::SequenceGroup,
+    confirmed: bool,
+    action_message_tx: &std_mpsc::Sender<String>,
+    activity: &Arc<crate::activity::Activity>,
+) -> GitResult<()> {
+    use gitpoulpi_core::domain::{Direction, SequenceGroup, UndoOutcome};
+    use gitpoulpi_i18n::msg::undo_safety as us;
+    let mut confirmed = confirmed;
+    for (at, member) in group.entries.iter().enumerate() {
+        let answer = conn
+            .call::<UndoOutcome>(
+                OperationKind::Undo,
+                serde_json::json!({ "expect": member.id, "dry_run": false, "confirmed": confirmed }),
+            )
+            .await;
+        confirmed = false;
+        match answer {
+            Ok(_) => {}
+            Err(CoreError::NeedsConfirmation(prompt)) => {
+                activity.journal.end();
+                activity.journal.ask(crate::undo_ui::PendingConfirm {
+                    direction: Direction::Undo,
+                    expect: Some(member.id),
+                    prompt,
+                    sequence: Some(SequenceGroup {
+                        entries: group.entries[at..].to_vec(),
+                        ..group.clone()
+                    }),
+                });
+                return Ok(());
+            }
+            Err(e) => {
+                activity.journal.end();
+                return Err(CoreError::Backend(us::sequence_stopped(
+                    &group.name,
+                    member.step,
+                    group.of,
+                    crate::safety_panel::label_text(member.kind, &member.label),
+                    error_text::error_text(&e),
+                    (group.entries.len() - at) as u64,
+                )));
+            }
+        }
+    }
+    activity.journal.end();
+    let _ = action_message_tx.send_notify(us::done_undo_sequence(&group.name));
+    Ok(())
 }
 
 /// One push, reported the way every push path reports it.

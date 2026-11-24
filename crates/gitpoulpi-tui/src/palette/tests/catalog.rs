@@ -643,6 +643,7 @@ fn every_safety_panel_action_has_a_palette_command() {
         match act {
             Act::UndoTo => vec![SafetyCmd::UndoTo],
             Act::RedoTo => vec![SafetyCmd::RedoTo],
+            Act::UndoSequence => vec![SafetyCmd::UndoSequence],
             Act::RestoreOnly => vec![SafetyCmd::RestoreOnly],
             Act::Offer => vec![SafetyCmd::Offer],
             Act::ShowInLog => vec![SafetyCmd::ReflogShow],
@@ -658,6 +659,7 @@ fn every_safety_panel_action_has_a_palette_command() {
     for act in [
         Act::UndoTo,
         Act::RedoTo,
+        Act::UndoSequence,
         Act::RestoreOnly,
         Act::Offer,
         Act::ShowInLog,

@@ -158,7 +158,8 @@ pub use ui_control::UiControl;
 pub use undo::{
     short, short_opt, Direction, EntrySource, EntryState, EntrySummary, FileHash, HeadState,
     JournalListing, JournalState, ListedEntry, PathHash, RefScope, RefSnapshot, RefUpdate,
-    RemoteRefMoved, Snapshot, UndoOutcome, UndoRefusal, UNDO_DISABLED_MESSAGE, UNDO_PIN_PREFIX,
+    RemoteRefMoved, SequenceGroup, SequenceMember, SequenceOrigin, Snapshot, UndoOutcome,
+    UndoRefusal, UNDO_DISABLED_MESSAGE, UNDO_PIN_PREFIX,
 };
 pub use worktree::{
     is_generated_worktree_name, worktree_generated_name, worktree_id, worktree_name_after_branch,

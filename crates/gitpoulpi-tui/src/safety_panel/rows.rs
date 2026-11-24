@@ -40,9 +40,20 @@ pub(crate) fn tag(row: &HistoryRow, state: &RowState) -> String {
         RowState::Blocked(_) => m::TAG_BLOCKED.get().to_string(),
         RowState::Undone => m::TAG_UNDONE.get().to_string(),
         RowState::Undoable if is_outside(row) => m::TAG_OUTSIDE.get().to_string(),
+        RowState::Undoable if row.entry.summary.origin.is_some() => sequence_badge(row),
         RowState::Undoable if row.entry.restore.restorable() => m::TAG_RESTORABLE.get().to_string(),
         RowState::Undoable => String::new(),
     }
+}
+
+/// `⟳ Backup`: the entry was made by a step of a sequence run.
+pub(crate) fn sequence_badge(row: &HistoryRow) -> String {
+    row.entry
+        .summary
+        .origin
+        .as_ref()
+        .map(|o| format!("\u{27F3} {}", o.name))
+        .unwrap_or_default()
 }
 
 /// The line under the history list for the selected row.
@@ -52,6 +63,9 @@ pub(crate) fn history_detail(row: &HistoryRow, state: &RowState) -> Vec<String> 
         RowState::Blocked(why) => lines.push(m::detail_blocked(why)),
         RowState::Undone => lines.push(m::DETAIL_UNDONE.get().to_string()),
         RowState::Undoable => lines.push(m::DETAIL_UNDOABLE.get().to_string()),
+    }
+    if let Some(o) = &row.entry.summary.origin {
+        lines.push(m::detail_sequence(&o.name, o.step, o.of));
     }
     if is_outside(row) {
         let info = row.entry.outside.as_ref();

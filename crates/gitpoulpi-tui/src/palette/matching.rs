@@ -133,6 +133,7 @@ pub(crate) fn palette_matches(query: &str, ctx: PaletteContext) -> Vec<PaletteMa
                         | PaletteCommand::ReflogHead
                         | PaletteCommand::LostCommits
                         | PaletteCommand::UndoOffer
+                        | PaletteCommand::UndoSequence
                         | PaletteCommand::Safety(_)
                 ) && ctx.undo == crate::undo_ui::Avail::Off)
             })

@@ -946,6 +946,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Édition : Reflog... |  |
 | Édition : Retrouver les commits perdus... |  |
 | Édition : Restaurer la branche là où l'action bloquée l'a laissée | `Alt+Shift+Z` |
+| Édition : Annuler toute la séquence |  |
 | Revue : Afficher l'aperçu |  |
 | Revue : Afficher les fichiers |  |
 | Revue : Afficher les commits |  |
@@ -1039,6 +1040,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Revue : Abandonner le brouillon ✦ | `N` |
 | Historique d'annulation : Annuler jusqu'ici... | `u` |
 | Historique d'annulation : Rétablir jusqu'ici... | `y` |
+| Historique d'annulation : Annuler toute la séquence | `x` |
 | Historique d'annulation : Restaurer seulement celle-ci... | `r` |
 | Historique d'annulation : Restaurer la branche là où elle était... | `o` |
 | Historique d'annulation : Actualiser |  |

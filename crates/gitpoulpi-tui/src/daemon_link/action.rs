@@ -47,6 +47,14 @@ pub enum Action {
         expect: Option<u64>,
         confirmed: bool,
     },
+    /// Undo the entries of one sequence run, newest first, one ordinary
+    /// undo each (`entries` is what is left to undo). Stops at the first
+    /// refusal; a risky entry asks (`confirmed` answers it, for the first
+    /// entry only).
+    UndoSequence {
+        group: gitpoulpi_core::domain::SequenceGroup,
+        confirmed: bool,
+    },
     /// Apply an AI commit-composer plan: unstage everything, then per
     /// commit stage its files and commit. Stops at the first failure and
     /// says how many commits were made.
@@ -997,6 +1005,7 @@ impl Action {
             Action::UndoForget { .. } => plain(gitpoulpi_i18n::msg::undo_journal::FORGETTING),
             Action::ReflogRestore { .. } => plain(gitpoulpi_i18n::msg::undo_safety::RUNNING),
             Action::Undo { .. } => plain(gitpoulpi_i18n::msg::undo_ui::UNDOING),
+            Action::UndoSequence { .. } => plain(gitpoulpi_i18n::msg::undo_ui::UNDOING_SEQUENCE),
             Action::Redo { .. } => plain(gitpoulpi_i18n::msg::undo_ui::REDOING),
             Action::Reword { .. } => plain(l::ACT_REWORDING),
             Action::AmendCommit { .. } => plain(l::ACT_AMENDING),

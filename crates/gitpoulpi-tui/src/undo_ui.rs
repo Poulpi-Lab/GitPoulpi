@@ -52,6 +52,8 @@ pub(crate) struct PendingConfirm {
     /// something else that became the latest in the meantime.
     pub(crate) expect: Option<u64>,
     pub(crate) prompt: String,
+    /// "Undo whole sequence": the entries still to undo, this one first.
+    pub(crate) sequence: Option<gitpoulpi_core::domain::SequenceGroup>,
 }
 
 #[derive(Default)]
@@ -337,6 +339,23 @@ pub(crate) fn reason(state: &JournalState, d: Direction, busy: bool) -> Option<S
     }
 }
 
+/// Why "Undo whole sequence" cannot run now; `None` when it can: the plain
+/// Undo must be possible and the newest entries must be one run's.
+pub(crate) fn sequence_reason(state: &JournalState, busy: bool) -> Option<String> {
+    reason(state, Direction::Undo, busy).or_else(|| {
+        state
+            .sequence
+            .is_none()
+            .then(|| msg::undo_ui::WHY_NO_SEQUENCE.get().to_string())
+    })
+}
+
+/// The name of the sequence the newest entries belong to, quoted for the
+/// palette row (`"Backup"`).
+pub(crate) fn sequence_suffix(state: &JournalState) -> Option<String> {
+    state.sequence.as_ref().map(|g| format!("\"{}\"", g.name))
+}
+
 /// The operation's name to append to the palette row ("Edit: Undo" +
 /// `Commit "x" (abc1234)`), when there is one.
 pub(crate) fn palette_suffix(state: &JournalState, d: Direction) -> Option<String> {
@@ -360,6 +379,7 @@ mod tests {
             label: label.into(),
             at: 0,
             state: EntryState::Done,
+            origin: None,
         }
     }
 
@@ -469,6 +489,7 @@ mod tests {
             direction: Direction::Undo,
             expect: Some(3),
             prompt: "sure?".into(),
+            sequence: None,
         });
         assert_eq!(cell.take_confirm().unwrap().expect, Some(3));
         assert!(cell.take_confirm().is_none());
@@ -487,6 +508,7 @@ mod tests {
                 label: "x".into(),
                 at: 0,
                 state: EntryState::Done,
+                origin: None,
             }),
             ..Default::default()
         }

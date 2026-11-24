@@ -946,6 +946,7 @@ Tangenterna är standardvärdena.
 | Redigera: Reflog... |  |
 | Redigera: Rädda förlorade Commits... |  |
 | Redigera: Återställ grenen till där den blockerade åtgärden lämnade den | `Alt+Shift+Z` |
+| Edit: Undo Whole Sequence |  |
 | Granskning: Visa översikt |  |
 | Granskning: Visa filer |  |
 | Granskning: Visa Commits |  |
@@ -1039,6 +1040,7 @@ Tangenterna är standardvärdena.
 | Granskning: Kassera ✦-utkastet | `N` |
 | Ångrahistorik: Ångra hit... | `u` |
 | Ångrahistorik: Gör om hit... | `y` |
+| Undo History: Undo Whole Sequence | `x` |
 | Ångrahistorik: Återställ bara den här... | `r` |
 | Ångrahistorik: Återställ grenen till där den var... | `o` |
 | Ångrahistorik: Uppdatera |  |

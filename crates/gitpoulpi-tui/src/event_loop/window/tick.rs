@@ -812,9 +812,12 @@ impl WindowState {
             if let Some(c) = self.link.take_undo_confirm() {
                 self.input_mode = InputMode::Confirm {
                     prompt: c.prompt,
-                    action: ConfirmAction::UndoRedo {
-                        direction: c.direction,
-                        expect: c.expect,
+                    action: match c.sequence {
+                        Some(group) => ConfirmAction::UndoSequence { group },
+                        None => ConfirmAction::UndoRedo {
+                            direction: c.direction,
+                            expect: c.expect,
+                        },
                     },
                 };
             }
@@ -838,6 +841,7 @@ impl WindowState {
                 undo: undo_avail,
                 redo: redo_avail,
                 undo_offer: crate::safety_panel::offer_of(&journal_state).is_some(),
+                undo_sequence: journal_state.sequence.is_some(),
                 safety_tab: self.repo_dialogs.safety_tab(),
                 review: self.repo_dialogs.review_avail().or_else(|| {
                     // The review hosted over the Radar (not cloned).

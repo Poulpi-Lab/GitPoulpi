@@ -946,6 +946,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Edit: Reflog... |  |
 | Edit: Recover Lost Commits... |  |
 | Edit: Restore the Branch to Where the Blocked Action Left It | `Alt+Shift+Z` |
+| Edit: Undo Whole Sequence |  |
 | Review: Show Overview |  |
 | Review: Show Files |  |
 | Review: Show Commits |  |
@@ -1039,6 +1040,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Review: Discard the ✦ Draft | `N` |
 | Undo History: Undo Up to Here... | `u` |
 | Undo History: Redo Up to Here... | `y` |
+| Undo History: Undo Whole Sequence | `x` |
 | Undo History: Restore Only This... | `r` |
 | Undo History: Restore the Branch to Where It Was... | `o` |
 | Undo History: Refresh |  |

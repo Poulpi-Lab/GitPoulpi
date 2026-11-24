@@ -323,6 +323,7 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::ReflogHead
         | PaletteCommand::LostCommits
         | PaletteCommand::UndoOffer
+        | PaletteCommand::UndoSequence
         | PaletteCommand::Safety(_)
         | PaletteCommand::Review(_)
         | PaletteCommand::Board(_)

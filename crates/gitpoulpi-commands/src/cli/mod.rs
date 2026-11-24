@@ -776,13 +776,22 @@ pub enum Commands {
         all: bool,
         /// Only undo if this is still the latest entry (its id, as
         /// `--list` shows it); otherwise refused as stale.
-        #[arg(long, conflicts_with = "list")]
+        #[arg(long, conflicts_with_all = ["list", "sequence"])]
         expect: Option<u64>,
         /// Go ahead when the undo is risky (the commit is already on its
         /// upstream, or working-tree files would be overwritten). Without
         /// it such an undo changes nothing and exits with code 3.
         #[arg(long, conflicts_with = "list")]
         yes: bool,
+        /// Undo the whole sequence run at the top of the journal instead of
+        /// one entry: the newest consecutive entries that one `sequence run`
+        /// made, newest first, each an ordinary undo with its own checks.
+        /// Stops at the first refusal (exit 2) or entry that needs `--yes`
+        /// (exit 3), says which step, and leaves the older entries. Only
+        /// this repository's journal is touched: a step done in another
+        /// repository (a worktree) is not undone. Redo stays per entry.
+        #[arg(long, conflicts_with = "list")]
+        sequence: bool,
     },
     /// Drop the blocked top entry of the undo journal (an interrupted
     /// operation, or one the repository moved on from) so the entries

@@ -604,6 +604,7 @@ fn action_letters_are_unique_single_chars_in_every_language_and_view() {
         for msg in [
             m::KEY_UNDO_TO,
             m::KEY_REDO_TO,
+            m::KEY_UNDO_SEQUENCE,
             m::KEY_RESTORE_ONLY,
             m::KEY_OFFER,
             m::KEY_RESTORE_REF,

@@ -948,6 +948,7 @@ applicano. I tasti sono quelli predefiniti.
 | Modifica: Reflog... |  |
 | Modifica: Recupera commit persi... |  |
 | Modifica: Ripristina il branch dove l'aveva lasciato l'azione bloccata | `Alt+Shift+Z` |
+| Edit: Undo Whole Sequence |  |
 | Revisione: Mostra panoramica |  |
 | Revisione: Mostra file |  |
 | Revisione: Mostra Commit |  |
@@ -1041,6 +1042,7 @@ applicano. I tasti sono quelli predefiniti.
 | Revisione: Scarta la ✦ bozza | `N` |
 | Cronologia annullamenti: Annulla fino a qui... | `u` |
 | Cronologia annullamenti: Ripeti fino a qui... | `y` |
+| Undo History: Undo Whole Sequence | `x` |
 | Cronologia annullamenti: Ripristina solo questa... | `r` |
 | Cronologia annullamenti: Ripristina il branch dove si trovava... | `o` |
 | Cronologia annullamenti: Aggiorna |  |

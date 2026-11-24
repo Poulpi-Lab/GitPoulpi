@@ -3814,6 +3814,8 @@ why_group_not_paused = "충돌 때문에 대기 중인 그룹 {$push}가 없습�
 why_group_not_ready = "먼저 충돌을 해결하고 마무리하세요"
 # context: palette: why a command is grayed out
 why_nothing_to_retry = "마지막 그룹 {$push}에서 실패한 리모트가 없습니다"
+edit_undo_sequence = "Edit: Undo Whole Sequence"
+undo_history_undo_sequence = "Undo History: Undo Whole Sequence"
 
 [help_section]
 rewrite = "기록 다시 쓰기"
@@ -4860,6 +4862,10 @@ undo_label_key = "실행 취소: {label} · {key}"
 redo_label_key = "다시 실행: {label} · {key}"
 nothing_to_undo_comment = "되돌릴 것이 없습니다 (호스트에 게시한 댓글은 여기서 되돌릴 수 없습니다. 대신 편집하거나 삭제하세요)"
 tip_nothing_to_undo_comment = "되돌릴 것이 없습니다 (호스트에 게시한 댓글은 여기서 되돌릴 수 없습니다. 대신 편집하거나 삭제하세요)"
+# context: why a palette command is grayed; a sequence is a user-defined list of actions run together
+why_no_sequence = "the newest actions are not one sequence run"
+# context: status line while a sequence run is being undone
+undoing_sequence = "undoing the sequence..."
 
 [status_pane]
 unstaged_title = "{$unstaged_files}"
@@ -6756,6 +6762,20 @@ why_no_more = "reflog 전체입니다. 더 불러올 항목이 없습니다"
 # context: status line after Load more; {n} is how many past positions of the reflog are now listed
 reflog_loaded = "불러온 위치: {n}"
 refreshing = "새로 고치는 중..."
+# context: Undo history: key of the Undo whole sequence button, one letter
+key_undo_sequence = "x"
+# context: Undo history: button; undoes every entry of the sequence run at the top of the history, newest first
+btn_undo_sequence = "Undo whole sequence"
+# context: confirm title; {name} is the name of a user-defined sequence of actions
+confirm_undo_sequence = "Undo the whole sequence \"{name}\"?"
+# context: confirm warning under the list of actions of a sequence run; a sequence can act in a worktree (another repository)
+warning_sequence_scope = "Only this repository's journal is undone: steps done in another repository stay."
+# context: status line; {name} is the name of a user-defined sequence of actions
+done_undo_sequence = "undid the sequence \"{name}\""
+# context: status line; undoing a sequence stopped at one of its actions; {step}/{of} is its position in the sequence, {label} the action, {why} the reason, {left} how many actions stay done
+sequence_stopped = "undoing \"{name}\" stopped at step {step}/{of} ({label}): {why}. Actions left: {left}"
+# context: detail line of a history row made by a sequence; {step}/{of} is its position in the sequence
+detail_sequence = "Made by the sequence \"{name}\", step {step}/{of}."
 
 # 실행 취소 기록의 행 레이블: 항목 종류에서 표시할 때 만들어집니다
 [undo_label]

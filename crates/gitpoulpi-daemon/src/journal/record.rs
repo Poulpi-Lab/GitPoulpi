@@ -59,6 +59,12 @@ pub(super) fn release_pins(backend: &dyn GitBackend, repo: &RepoRef, entries: &[
     }
 }
 
+/// The sequence run that sent `request`, from its `origin` argument (the
+/// TUI's sequence runner sets it; every other request has none).
+pub(crate) fn origin_of(request: &Request) -> Option<gitpoulpi_core::domain::SequenceOrigin> {
+    serde_json::from_value(request.args.get("origin")?.clone()).ok()
+}
+
 /// A write-ahead entry waiting for its operation to finish.
 pub struct Recording {
     repo: RepoRef,
@@ -234,6 +240,7 @@ fn begin_record_with(
     if let Some(entry) = journal.entry_mut(id) {
         entry.pins = pins.clone();
         entry.effect = before.effect;
+        entry.origin = origin_of(request);
     }
     if let Err(e) = save(&path, &journal) {
         tracing::warn!("could not write the undo journal: {e}");
@@ -312,6 +319,11 @@ pub fn finish_record(
     } else {
         id
     };
+    if deferred {
+        if let Some(entry) = journal.entry_mut(id) {
+            entry.origin = origin_of(request);
+        }
+    }
 
     // A merge, rebase or cherry-pick that stopped on a conflict leaves
     // its entry `Pending`; the operation that ends it (continue, skip,

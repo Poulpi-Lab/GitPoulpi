@@ -613,6 +613,9 @@ pub(crate) enum PaletteCommand {
     LostCommits,
     /// Edit: Restore the branch to where the blocked action left it.
     UndoOffer,
+    /// Edit: Undo Whole Sequence - the newest journal entries when one
+    /// sequence run made them, newest first, each checked on its own.
+    UndoSequence,
     /// A row action of the open Undo history / Reflog / Lost work panel,
     /// on its selected row (`safety_panel::SafetyCmd`).
     Safety(crate::safety_panel::SafetyCmd),

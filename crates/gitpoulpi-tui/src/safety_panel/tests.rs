@@ -31,6 +31,7 @@ pub(super) fn entry(id: u64, label: &str) -> ListedEntry {
             label: label.to_string(),
             at: 0,
             state: EntryState::Done,
+            origin: None,
         },
         changes: Vec::new(),
         restore: RestoreOffer::default(),

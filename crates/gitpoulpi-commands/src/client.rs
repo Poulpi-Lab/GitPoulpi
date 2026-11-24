@@ -89,6 +89,10 @@ pub struct Session {
     /// external history rewrite script. Off for everything else (the MCP
     /// server), so an agent cannot grant trust.
     may_trust: bool,
+    /// The sequence run whose step is being executed: its mutating requests
+    /// carry it as `origin`, which the daemon writes into their journal
+    /// entries (`gitpoulpi_core::domain::SequenceOrigin`).
+    origin: Option<gitpoulpi_core::domain::SequenceOrigin>,
 }
 
 impl Session {
@@ -117,6 +121,7 @@ impl Session {
             flush_journal: !publish,
             cancel_on_disconnect: false,
             may_trust: false,
+            origin: None,
         })
     }
 
@@ -141,6 +146,7 @@ impl Session {
             flush_journal: false,
             cancel_on_disconnect: false,
             may_trust: false,
+            origin: None,
         })
     }
 
@@ -253,6 +259,12 @@ impl Session {
         })
     }
 
+    /// Marks (or, with `None`, stops marking) the requests that follow as a
+    /// sequence step's.
+    pub fn set_origin(&mut self, origin: Option<gitpoulpi_core::domain::SequenceOrigin>) {
+        self.origin = origin;
+    }
+
     async fn send<T: DeserializeOwned>(
         &mut self,
         command: OperationKind,
@@ -262,6 +274,13 @@ impl Session {
         let id = self.next_id;
         self.next_id += 1;
         let mut args = args;
+        if let (Some(origin), false, Some(map)) =
+            (&self.origin, command.traits().read, args.as_object_mut())
+        {
+            if let Ok(value) = serde_json::to_value(origin) {
+                map.insert("origin".into(), value);
+            }
+        }
         if self.cancel_on_disconnect && command.traits().network {
             if let Some(map) = args.as_object_mut() {
                 map.insert(

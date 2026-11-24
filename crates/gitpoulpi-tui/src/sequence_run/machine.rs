@@ -218,6 +218,10 @@ pub(crate) enum RunEffect {
 #[derive(Debug, Clone)]
 pub(crate) struct Run {
     pub(crate) name: String,
+    /// Unique per run: what tells the journal entries of this run from the
+    /// ones of another (a daemon outlives a window, so a counter would
+    /// repeat).
+    pub(crate) run_id: u64,
     pub(crate) steps: Vec<Step>,
     pub(crate) step: usize,
     pub(crate) state: StepState,
@@ -266,6 +270,7 @@ impl Run {
             .collect();
         Run {
             name: def.name.clone(),
+            run_id: new_run_id(),
             steps,
             step: 0,
             state: StepState::Ready,
@@ -285,6 +290,16 @@ impl Run {
             waiting_since: None,
             step_started: None,
             floor_set_at: None,
+        }
+    }
+
+    /// The mark the current step's requests carry to the journal.
+    pub(crate) fn origin(&self) -> gitpoulpi_core::domain::SequenceOrigin {
+        gitpoulpi_core::domain::SequenceOrigin {
+            name: self.name.clone(),
+            run_id: self.run_id,
+            step: (self.step + 1) as u32,
+            of: self.steps.len() as u32,
         }
     }
 
@@ -600,6 +615,7 @@ impl Run {
                     return vec![self.show()];
                 }
                 let ticket = crate::daemon_link::issue();
+                crate::daemon_link::set_origin(ticket, self.origin());
                 self.ticket = Some(ticket);
                 self.state = StepState::Submitted(ticket);
                 self.step_started = Some(now);
@@ -615,6 +631,24 @@ impl Run {
                 ]
             }
             _ => Vec::new(),
+        }
+    }
+}
+
+/// A run id no other run of this or an earlier process has: milliseconds
+/// since the epoch, bumped past the last one handed out.
+fn new_run_id() -> u64 {
+    use std::sync::atomic::{AtomicU64, Ordering};
+    static LAST: AtomicU64 = AtomicU64::new(0);
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(1, |d| d.as_millis() as u64);
+    let mut last = LAST.load(Ordering::Relaxed);
+    loop {
+        let next = now.max(last + 1);
+        match LAST.compare_exchange(last, next, Ordering::Relaxed, Ordering::Relaxed) {
+            Ok(_) => return next,
+            Err(seen) => last = seen,
         }
     }
 }

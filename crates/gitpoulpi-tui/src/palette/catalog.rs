@@ -2389,6 +2389,11 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "Alt+Shift+Z",
         PaletteCommand::UndoOffer,
     ),
+    entry(
+        msg::palette::EDIT_UNDO_SEQUENCE,
+        "",
+        PaletteCommand::UndoSequence,
+    ),
     // -- Code review (open) -------------------------------------------
     entry(
         msg::palette::REVIEW_TAB_OVERVIEW,
@@ -2946,6 +2951,11 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         msg::palette::UNDO_HISTORY_REDO_TO,
         "y",
         PaletteCommand::Safety(SafetyCmd::RedoTo),
+    ),
+    entry(
+        msg::palette::UNDO_HISTORY_UNDO_SEQUENCE,
+        "x",
+        PaletteCommand::Safety(SafetyCmd::UndoSequence),
     ),
     entry(
         msg::palette::UNDO_HISTORY_RESTORE_ONLY,

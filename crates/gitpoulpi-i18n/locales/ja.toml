@@ -3816,6 +3816,8 @@ why_group_not_paused = "競合の解決待ちのグループ{$push}はありま�
 why_group_not_ready = "先に競合を解決して完了してください"
 # context: palette: why a command is grayed out
 why_nothing_to_retry = "直近のグループ{$push}で失敗したリモートはありません"
+edit_undo_sequence = "Edit: Undo Whole Sequence"
+undo_history_undo_sequence = "Undo History: Undo Whole Sequence"
 
 [help_section]
 rewrite = "履歴の書き換え"
@@ -4862,6 +4864,10 @@ undo_label_key = "{label} を元に戻す · {key}"
 redo_label_key = "{label} をやり直す · {key}"
 nothing_to_undo_comment = "元に戻すものがありません（ホストに投稿したコメントはここでは取り消せません。編集または削除してください）"
 tip_nothing_to_undo_comment = "元に戻すものがありません（ホストに投稿したコメントはここでは取り消せません。編集または削除してください）"
+# context: why a palette command is grayed; a sequence is a user-defined list of actions run together
+why_no_sequence = "the newest actions are not one sequence run"
+# context: status line while a sequence run is being undone
+undoing_sequence = "undoing the sequence..."
 
 [status_pane]
 unstaged_title = "{$unstaged_files}"
@@ -6758,6 +6764,20 @@ why_no_more = "これが reflog のすべてです。読み込むものはもう
 # context: status line after Load more; {n} is how many past positions of the reflog are now listed
 reflog_loaded = "読み込んだ位置：{n} 件"
 refreshing = "更新中..."
+# context: Undo history: key of the Undo whole sequence button, one letter
+key_undo_sequence = "x"
+# context: Undo history: button; undoes every entry of the sequence run at the top of the history, newest first
+btn_undo_sequence = "Undo whole sequence"
+# context: confirm title; {name} is the name of a user-defined sequence of actions
+confirm_undo_sequence = "Undo the whole sequence \"{name}\"?"
+# context: confirm warning under the list of actions of a sequence run; a sequence can act in a worktree (another repository)
+warning_sequence_scope = "Only this repository's journal is undone: steps done in another repository stay."
+# context: status line; {name} is the name of a user-defined sequence of actions
+done_undo_sequence = "undid the sequence \"{name}\""
+# context: status line; undoing a sequence stopped at one of its actions; {step}/{of} is its position in the sequence, {label} the action, {why} the reason, {left} how many actions stay done
+sequence_stopped = "undoing \"{name}\" stopped at step {step}/{of} ({label}): {why}. Actions left: {left}"
+# context: detail line of a history row made by a sequence; {step}/{of} is its position in the sequence
+detail_sequence = "Made by the sequence \"{name}\", step {step}/{of}."
 
 # END undo-safety
 

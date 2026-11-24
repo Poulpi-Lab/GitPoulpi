@@ -995,6 +995,7 @@ die Standardtasten.
 | Unterhaltung: Diagramm des Eintrags öffnen | `g` |
 | Unterhaltung: Code des Threads öffnen | `G` |
 | Unterhaltung: Link des Eintrags kopieren | `y` |
+| Conversation: Copy Text | `Ctrl+C` |
 | Unterhaltung: Im Browser öffnen | `o` |
 | Unterhaltung: Kommentar bearbeiten | `e` |
 | Unterhaltung: Kommentar löschen | `d` |

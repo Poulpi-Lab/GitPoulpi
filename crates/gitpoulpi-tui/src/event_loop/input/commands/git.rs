@@ -366,7 +366,16 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
                 PaletteCommand::CopyLine => diff_view::DiffCopy::Line,
                 _ => diff_view::DiffCopy::Hunk,
             };
-            if *cx.central_view == CentralView::File {
+            if let Some(text) = cx
+                .commit_text
+                .selected()
+                .filter(|_| what == diff_view::DiffCopy::Selection)
+            {
+                *cx.last_message = Some(
+                    cx.clipboard
+                        .copy(gitpoulpi_i18n::msg::diff_view::WHAT_SELECTION.get(), &text),
+                );
+            } else if *cx.central_view == CentralView::File {
                 if let Some(insight) = cx.file_insight.as_ref() {
                     let text = match what {
                         diff_view::DiffCopy::Line => insight.copy_line(),

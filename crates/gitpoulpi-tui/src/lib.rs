@@ -239,6 +239,7 @@ mod workspace_ui;
 // the iTerm2 encoder and the buffer-cell widget. The commit graph is its
 // first caller; it is a layer rather than part of the graph so author
 // avatars can use the same detection, metrics and encoder.
+mod screen_text;
 mod terminal_bg;
 mod terminal_image;
 mod terminology;

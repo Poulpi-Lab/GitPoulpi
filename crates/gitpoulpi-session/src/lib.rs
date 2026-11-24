@@ -38,7 +38,9 @@ pub use repo_state::{
     LogColumnWidths, PendingAutoStash, PendingAutoStashState, RepoPreferences, RepoState,
     TrustedHooks, TrustedScript, WatchedIssue,
 };
-pub use review_draft::{AiDraft, AiItem, AiPlace, DraftComment, ReviewDraft};
+pub use review_draft::{
+    AiDraft, AiItem, AiPlace, DraftComment, ResumePos, ReviewDraft, ReviewResume,
+};
 
 pub use radar::{
     ItemKey, RadarColumns, RadarState, Snooze, SnoozeFor, KIND_ISSUE, KIND_PR, KIND_WIP,

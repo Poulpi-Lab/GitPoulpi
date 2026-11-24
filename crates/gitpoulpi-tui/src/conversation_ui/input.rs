@@ -27,6 +27,8 @@ pub(crate) enum Act {
     /// Open the code the selected thread is about.
     OpenCode,
     CopyLink,
+    /// `Ctrl+C`: the selected text, else the selected entry's.
+    CopyText,
     OpenBrowser,
     NewComment,
     Refresh,
@@ -59,6 +61,7 @@ impl Conversation {
             KeyCode::Home | KeyCode::End | KeyCode::Enter | KeyCode::Backspace => plain(key),
             KeyCode::Char('k' | 'K' | 'j' | 'J') if ctrl => true,
             KeyCode::F(5) | KeyCode::Esc => true,
+            KeyCode::Char('c') if ctrl => true,
             KeyCode::Left => key.modifiers == KeyModifiers::ALT,
             KeyCode::Char(c) => {
                 plain(key)
@@ -100,6 +103,9 @@ impl Conversation {
             KeyCode::End if plain(&key) => self.select(usize::MAX),
             KeyCode::Enter if plain(&key) => return Some(self.enter()),
             KeyCode::F(5) => return Some(Act::Refresh),
+            KeyCode::Char('c') if ctrl => return Some(Act::CopyText),
+            // A text selection goes first; the view stays.
+            KeyCode::Esc if self.text.clear() => {}
             KeyCode::Left if key.modifiers == KeyModifiers::ALT => return Some(Act::Back),
             KeyCode::Backspace if plain(&key) => return Some(Act::Back),
             KeyCode::Esc => return Some(Act::Close),
@@ -159,6 +165,28 @@ impl Conversation {
             return Some(Act::Handled);
         }
         let hit = self.hit_at(mouse.column, mouse.row);
+        match mouse.kind {
+            MouseEventKind::Drag(MouseButton::Left) if self.text.drag(mouse.column, mouse.row) => {
+                return Some(Act::Handled);
+            }
+            // The end of a selection drag is not a click.
+            MouseEventKind::Up(MouseButton::Left) if self.text.release() => {
+                return Some(Act::Handled);
+            }
+            MouseEventKind::Down(MouseButton::Left) => {
+                // A press on a button or a link is a click on it; elsewhere
+                // it may grow into a selection with the first drag.
+                if matches!(
+                    hit,
+                    Some(Hit::Btn(..) | Hit::Link(_) | Hit::Code(_) | Hit::LoadOlder)
+                ) {
+                    self.text.clear();
+                } else if self.area.contains((mouse.column, mouse.row).into()) {
+                    self.text.press(mouse.column, mouse.row);
+                }
+            }
+            _ => {}
+        }
         match mouse.kind {
             MouseEventKind::Moved => {
                 self.hover = hit;

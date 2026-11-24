@@ -1011,14 +1011,52 @@ impl RepoDialogs {
             ReviewEffect::None => None,
             ReviewEffect::Message(message) => Some(DialogEffect::Message(message)),
             ReviewEffect::Close => {
+                self.forget_review();
                 self.dialog = None;
                 None
             }
+            ReviewEffect::CloseWith(message) => {
+                self.forget_review();
+                self.dialog = None;
+                Some(DialogEffect::Message(message))
+            }
             ReviewEffect::Checkout(number) => {
+                self.forget_review();
                 self.dialog = None;
                 Some(DialogEffect::CheckoutPullRequest(number))
             }
         }
+    }
+
+    /// The review was closed or finished: nothing to reopen with the tab.
+    #[cfg(feature = "hosting")]
+    fn forget_review(&self) {
+        if let Some(RepoDialog::Review(view)) = &self.dialog {
+            view.forget_resume();
+        }
+    }
+
+    /// The window is ending: a review still open is written down, so coming
+    /// back to the tab reopens it (`review_view::resume`).
+    pub(crate) fn save_review_mark(&self) {
+        #[cfg(feature = "hosting")]
+        if let Some(RepoDialog::Review(view)) = &self.dialog {
+            view.save_resume_mark();
+        }
+    }
+
+    /// Puts a reopened review back where the marker says, once it loaded.
+    #[cfg(all(feature = "hosting", feature = "review"))]
+    pub(crate) fn restore_review_position(&mut self, pos: gitpoulpi_session::ResumePos) {
+        if let Some(RepoDialog::Review(view)) = &mut self.dialog {
+            view.restore_position(pos);
+        }
+    }
+
+    /// Whether any dialog is up (a reopened review does not take the screen
+    /// from one the reviewer opened first).
+    pub(crate) fn any_open(&self) -> bool {
+        self.dialog.is_some()
     }
 
     /// What a closed or finished metadata picker leaves behind.

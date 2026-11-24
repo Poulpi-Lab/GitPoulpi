@@ -44,6 +44,7 @@ impl RadarUi {
             return match command {
                 RadarCommand::Open | RadarCommand::CloseTab => Outcome::None,
                 RadarCommand::Back => {
+                    self.forget_api_review();
                     self.api_review = None;
                     Outcome::None
                 }

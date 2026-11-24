@@ -999,6 +999,7 @@ zastosowania. Klawisze są domyślne.
 | Rozmowa: Otwórz diagram wpisu | `g` |
 | Rozmowa: Otwórz kod wątku | `G` |
 | Rozmowa: Kopiuj link wpisu | `y` |
+| Conversation: Copy Text | `Ctrl+C` |
 | Rozmowa: Otwórz w przeglądarce | `o` |
 | Rozmowa: Edytuj komentarz | `e` |
 | Rozmowa: Usuń komentarz | `d` |

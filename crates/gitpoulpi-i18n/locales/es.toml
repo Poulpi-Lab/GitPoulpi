@@ -7436,6 +7436,10 @@ hint_viewed = "visto"
 hint_open_diff = "mostrar {$diff}"
 # context: footer hint after the Esc key
 hint_close = "cerrar"
+# context: status line: the request that was under review is merged or closed; {caption} is like #12 Fix the thing
+resume_gone = "{caption} is no longer open: the review was not reopened"
+# context: status line: the host did not answer when the review was reopened; {why} is the error
+resume_unreachable = "could not reopen {caption}: {why}"
 # >>> local_issues (slice L1)
 [local_issues]
 field_status = "Estado"
@@ -10491,6 +10495,12 @@ palette_quote = "Conversación: Citar la entrada"
 palette_toggle_internal = "Conversación: Alternar nota interna"
 why_unchanged = "aún no ha cambiado nada"
 flavor_plain_text = "Texto plano"
+# context: what was copied, named in the status line
+noun_text = "text"
+# context: status line: nothing selected and no entry
+why_no_text = "there is no text to copy here"
+# context: command palette entry: copies the dragged text, else the selected entry
+palette_copy_text = "Conversation: Copy Text"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch

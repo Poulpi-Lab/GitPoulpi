@@ -7441,6 +7441,10 @@ hint_viewed = "переглянуто"
 hint_open_diff = { git = "показати diff", local = "показати різницю" }
 # context: footer hint after the Esc key
 hint_close = "закрити"
+# context: status line: the request that was under review is merged or closed; {caption} is like #12 Fix the thing
+resume_gone = "{caption} is no longer open: the review was not reopened"
+# context: status line: the host did not answer when the review was reopened; {why} is the error
+resume_unreachable = "could not reopen {caption}: {why}"
 # >>> local_issues (slice L1)
 [local_issues]
 field_status = "Статус"
@@ -10367,6 +10371,12 @@ palette_quote = "Бесіда: цитувати запис"
 palette_toggle_internal = "Бесіда: перемкнути внутрішню нотатку"
 why_unchanged = "поки нічого не змінено"
 flavor_plain_text = "Звичайний текст"
+# context: what was copied, named in the status line
+noun_text = "text"
+# context: status line: nothing selected and no entry
+why_no_text = "there is no text to copy here"
+# context: command palette entry: copies the dragged text, else the selected entry
+palette_copy_text = "Conversation: Copy Text"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch

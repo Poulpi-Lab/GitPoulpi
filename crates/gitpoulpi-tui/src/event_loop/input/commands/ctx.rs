@@ -39,6 +39,7 @@ pub(in crate::event_loop) struct CommandCtx<'a> {
     pub(in crate::event_loop) commit_filter_focus: &'a mut bool,
     pub(in crate::event_loop) commit_list_mode: &'a mut FileListMode,
     pub(in crate::event_loop) commit_message_area: &'a mut Rect,
+    pub(in crate::event_loop) commit_text: &'a mut crate::screen_text::ScreenText,
     pub(in crate::event_loop) commit_message_rows_now: &'a mut u16,
     pub(in crate::event_loop) commit_message_scroll: &'a mut usize,
     pub(in crate::event_loop) commit_message_total: &'a mut usize,

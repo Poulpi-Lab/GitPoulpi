@@ -1004,6 +1004,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Gesprek: Diagram van item openen | `g` |
 | Gesprek: Code van discussie openen | `G` |
 | Gesprek: Link van item kopiëren | `y` |
+| Conversation: Copy Text | `Ctrl+C` |
 | Gesprek: Openen in browser | `o` |
 | Gesprek: Opmerking bewerken | `e` |
 | Gesprek: Opmerking verwijderen | `d` |

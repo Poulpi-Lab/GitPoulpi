@@ -32,6 +32,24 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
     {
         return Ok(Flow::Handled);
     }
+    // The commit message's dragged text: copied, or dropped, first.
+    if cx.commit_text.has_selection() && cx.composer_focus.is_none() && !*cx.commit_filter_focus {
+        let ctrl_c = key.modifiers.contains(KeyModifiers::CONTROL)
+            && !key.modifiers.contains(KeyModifiers::ALT)
+            && key.code == KeyCode::Char('c');
+        if ctrl_c {
+            if let Some(text) = cx.commit_text.selected() {
+                *cx.last_message = Some(
+                    cx.clipboard
+                        .copy(gitpoulpi_i18n::msg::diff_view::WHAT_SELECTION.get(), &text),
+                );
+                return Ok(Flow::Handled);
+            }
+        } else if key.code == KeyCode::Esc {
+            cx.commit_text.clear();
+            return Ok(Flow::Handled);
+        }
+    }
     match key.code {
         // Esc stops a running AI request before it does
         // anything else (leaves a field, closes a view).

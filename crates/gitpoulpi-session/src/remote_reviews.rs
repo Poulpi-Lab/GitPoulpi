@@ -28,6 +28,10 @@ pub struct RemoteReviews {
     /// `host/project` -> AI review defaults.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub ai_review: BTreeMap<String, RepoAiReview>,
+    /// The API review that was open over the Radar when the Home window
+    /// last ended (one at a time); cleared when it is closed or submitted.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub open_review: Option<crate::ReviewResume>,
 }
 
 impl RemoteReviews {

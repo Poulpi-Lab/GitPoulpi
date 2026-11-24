@@ -77,6 +77,8 @@ pub(crate) enum ItemCmd {
     /// Open the code of the selected thread (the review's Files page).
     OpenCode,
     CopyLink,
+    /// The dragged text, else the selected entry's text.
+    CopyText,
     OpenBrowser,
     Edit,
     Delete,
@@ -95,7 +97,7 @@ impl ItemCmd {
             return Some(msg::WHY_NO_VIEW.get());
         };
         match self {
-            Self::Refresh | Self::OpenBrowser | Self::Close => None,
+            Self::Refresh | Self::OpenBrowser | Self::Close | Self::CopyText => None,
             Self::Back => (!a.has_back).then_some(msg::WHY_NO_BACK.get()),
             Self::PrevEntry | Self::NextEntry => (!a.loaded).then_some(msg::WHY_NOT_LOADED.get()),
             Self::LoadOlder => (!a.has_older).then_some(msg::WHY_NO_OLDER.get()),

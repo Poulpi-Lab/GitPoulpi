@@ -799,6 +799,16 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
             }
         }
     }
+    // The message block's text: a drag selects it (the id, author and date
+    // lines above are controls and keep their hand).
+    if selected_summary.is_some() && compare.is_none() {
+        ctx.commit_message_text
+            .capture(frame.buffer_mut(), layout.message_inner);
+        ctx.commit_message_text.paint(frame.buffer_mut());
+    } else {
+        ctx.commit_message_text
+            .capture(frame.buffer_mut(), Rect::default());
+    }
     // The authored-date line (second row of the block) amends the date;
     // inner first, so before the whole block below.
     if selected_summary.is_some() && compare.is_none() && layout.author_area.height > 1 {

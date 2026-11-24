@@ -83,6 +83,8 @@ impl WindowState {
         // `config.toml` or the active user theme file edited from outside.
         crate::theme_watch::poll();
         self.agent_view_tick();
+        // The review the tab was left on (this repository's, or the Radar's).
+        self.review_resume_tick();
         // What the Radar asked of this repository's window.
         #[cfg(feature = "hosting")]
         self.radar_pending_tick();
@@ -905,6 +907,7 @@ impl WindowState {
                 image_diff_shown: self.central_view == CentralView::Diff
                     && crate::image_view::split::active(),
                 binary_shown: crate::open_with::view::shown().is_some(),
+                commit_text_selection: self.commit_text.has_selection(),
                 has_text_selection: match self.central_view {
                     CentralView::Diff => self
                         .diff_view_state

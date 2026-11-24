@@ -9238,6 +9238,10 @@ hint_viewed = "viewed"
 hint_open_diff = "show {$diff}"
 # context: footer hint after the Esc key
 hint_close = "close"
+# context: status line: the request that was under review is merged or closed; {caption} is like #12 Fix the thing
+resume_gone = "{caption} is no longer open: the review was not reopened"
+# context: status line: the host did not answer when the review was reopened; {why} is the error
+resume_unreachable = "could not reopen {caption}: {why}"
 # >>> local_issues
 [local_issues]
 # context: field label: the issue status (todo, doing, done...)
@@ -12924,6 +12928,12 @@ palette_toggle_internal = "Conversation: Toggle Internal Note"
 why_unchanged = "nothing changed yet"
 # context: name of the text format a host takes when it has no markup, shown in the composer footer. Width budget: 20 cells
 flavor_plain_text = "Plain text"
+# context: what was copied, named in the status line
+noun_text = "text"
+# context: status line: nothing selected and no entry
+why_no_text = "there is no text to copy here"
+# context: command palette entry: copies the dragged text, else the selected entry
+palette_copy_text = "Conversation: Copy Text"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch

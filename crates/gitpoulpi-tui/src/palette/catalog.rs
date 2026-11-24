@@ -2784,6 +2784,12 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     )
     .requires(crate::build_features::Feature::Conversation),
     entry(
+        gitpoulpi_i18n::msg::item_view::PALETTE_COPY_TEXT,
+        "Ctrl+C",
+        PaletteCommand::Item(crate::item_cmd::ItemCmd::CopyText),
+    )
+    .requires(crate::build_features::Feature::Conversation),
+    entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_OPEN_BROWSER,
         "o",
         PaletteCommand::Item(crate::item_cmd::ItemCmd::OpenBrowser),

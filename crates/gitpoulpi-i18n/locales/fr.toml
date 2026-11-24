@@ -7455,6 +7455,10 @@ hint_viewed = "vu"
 hint_open_diff = { git = "afficher le diff", local = "afficher la différence" }
 # context: footer hint after the Esc key
 hint_close = "fermer"
+# context: status line: the request that was under review is merged or closed; {caption} is like #12 Fix the thing
+resume_gone = "{caption} is no longer open: the review was not reopened"
+# context: status line: the host did not answer when the review was reopened; {why} is the error
+resume_unreachable = "could not reopen {caption}: {why}"
 # >>> local_issues (slice L1)
 [local_issues]
 field_status = "Statut"
@@ -10381,6 +10385,12 @@ palette_quote = "Conversation : Citer l'entrée"
 palette_toggle_internal = "Conversation : Basculer la note interne"
 why_unchanged = "rien n'a encore changé"
 flavor_plain_text = "Texte brut"
+# context: what was copied, named in the status line
+noun_text = "text"
+# context: status line: nothing selected and no entry
+why_no_text = "there is no text to copy here"
+# context: command palette entry: copies the dragged text, else the selected entry
+palette_copy_text = "Conversation : Copier le texte"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch

@@ -307,6 +307,11 @@ pub struct RepoState {
     /// viewed files), keyed by `ReviewDraft::key`.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub reviews: BTreeMap<String, crate::ReviewDraft>,
+    /// The review that was open when this repository's window last ended
+    /// (coming back to the tab reopens it); cleared when it is closed or
+    /// submitted.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub open_review: Option<crate::ReviewResume>,
     /// The labels that are the columns of this repository's issue board on a
     /// host with no workflow (`status::todo`, `status::doing`), in board
     /// order. Empty: Open / Closed only.

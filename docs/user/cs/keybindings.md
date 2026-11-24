@@ -1000,6 +1000,7 @@ Klávesy jsou výchozí.
 | Konverzace: Otevřít diagram záznamu | `g` |
 | Konverzace: Otevřít kód vlákna | `G` |
 | Konverzace: Kopírovat odkaz záznamu | `y` |
+| Conversation: Copy Text | `Ctrl+C` |
 | Konverzace: Otevřít v prohlížeči | `o` |
 | Konverzace: Upravit komentář | `e` |
 | Konverzace: Smazat komentář | `d` |

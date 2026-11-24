@@ -30,6 +30,7 @@ mod off_branch_edit;
 mod radar_pending;
 mod refs_update;
 mod reveal;
+pub(in crate::event_loop) mod review_resume;
 mod sizes;
 mod stage_guard_peek;
 mod tick;
@@ -76,6 +77,7 @@ impl WindowState {
             commit_filter_focus: &mut self.commit_filter_focus,
             commit_list_mode: &mut self.commit_list_mode,
             commit_message_area: &mut self.commit_message_area,
+            commit_text: &mut self.commit_text,
             commit_message_rows_now: &mut self.commit_message_rows_now,
             commit_message_scroll: &mut self.commit_message_scroll,
             commit_message_total: &mut self.commit_message_total,
@@ -294,6 +296,9 @@ impl WindowState {
 
     /// Leaves the alternate screen and says why the window ended.
     pub(in crate::event_loop) fn finish(&mut self) -> io::Result<NextWindow> {
+        // A review still open is written down: coming back to this tab (or
+        // starting again) reopens it.
+        self.save_review_marks();
         let next = match (self.switch_to.take(), self.show_management.take()) {
             (Some(next), _) => NextWindow::Repository(next),
             (None, Some(entry)) => NextWindow::Management(entry),

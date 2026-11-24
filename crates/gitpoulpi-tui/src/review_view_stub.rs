@@ -21,6 +21,19 @@ pub(crate) fn supports(_kind: gitpoulpi_config::IntegrationKind) -> bool {
     false
 }
 
+/// No marker is ever written in this build.
+pub(crate) fn repo_mark(_root: &std::path::Path) -> Option<gitpoulpi_session::ReviewResume> {
+    None
+}
+
+pub(crate) fn clear_repo_mark(_root: &std::path::Path) {}
+
+pub(crate) fn api_mark(_dir: &std::path::Path) -> Option<gitpoulpi_session::ReviewResume> {
+    None
+}
+
+pub(crate) fn clear_api_mark(_dir: &std::path::Path) {}
+
 /// What the review would open on: never built here.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum ReviewTarget {}
@@ -29,6 +42,7 @@ pub(crate) enum ReviewTarget {}
 pub(crate) enum ReviewEffect {
     None,
     Close,
+    CloseWith(String),
     Message(String),
     Checkout(u64),
 }
@@ -55,6 +69,18 @@ impl ReviewView {
         _config_dir: Option<std::path::PathBuf>,
     ) -> Self {
         match target {}
+    }
+
+    pub(crate) fn forget_resume(&self) {
+        match *self {}
+    }
+
+    pub(crate) fn save_resume_mark(&self) {
+        match *self {}
+    }
+
+    pub(crate) fn restore_position(&mut self, _pos: gitpoulpi_session::ResumePos) {
+        match *self {}
     }
 
     pub(crate) fn busy(&self) -> bool {

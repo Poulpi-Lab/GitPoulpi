@@ -436,6 +436,9 @@ fn handle_mouse_inner(
         InputMode::InteractiveRebase(_) => return mouse_modes::interactive_rebase(cx, mouse),
         _ => {}
     }
+    if let Some(flow) = commit_text_mouse(cx, mouse) {
+        return Ok(flow);
+    }
     let Some(g) = mouse_prelude::prelude(cx, mouse)? else {
         return Ok(Flow::Handled);
     };
@@ -453,5 +456,38 @@ fn handle_mouse_inner(
             mouse_moved::handle(cx, &g, mouse)
         }
         _ => Ok(Flow::Continue),
+    }
+}
+
+/// A drag over the commit message block selects its text; a press that does
+/// not grow into one stays the click it was (the double-click that amends,
+/// a reference link). `None`: not the message's, the event goes on.
+fn commit_text_mouse(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> Option<Flow> {
+    if *cx.right_panel != RightPanel::CommitDetail
+        || cx.commit_message_area.height == 0
+        || !matches!(*cx.input_mode, InputMode::Normal)
+        || cx.repo_dialogs.is_open()
+    {
+        return None;
+    }
+    let (col, row) = (mouse.column, mouse.row);
+    match mouse.kind {
+        MouseEventKind::Drag(MouseButton::Left) => {
+            cx.commit_text.drag(col, row).then_some(Flow::Handled)
+        }
+        MouseEventKind::Up(MouseButton::Left) => cx.commit_text.release().then_some(Flow::Handled),
+        MouseEventKind::Down(MouseButton::Left) => {
+            let on_link = matches!(
+                find_hit_target(&*cx.hit_targets, col, row),
+                Some(HitTarget::CommitReference(_) | HitTarget::CompareCard(_))
+            );
+            if on_link {
+                cx.commit_text.clear();
+            } else {
+                cx.commit_text.press(col, row);
+            }
+            None
+        }
+        _ => None,
     }
 }

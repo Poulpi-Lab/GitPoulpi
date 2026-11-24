@@ -163,7 +163,7 @@ fn serve() -> u16 {
 }
 
 /// The version chip and the update panel's Release notes button: the hand;
-/// the release text: the arrow. The build under test is a marker'd copy (a
+/// the release text: the I-beam (it can be selected). The build under test is a marker'd copy (a
 /// development build does not check for updates).
 #[test]
 fn the_version_chip_and_the_release_notes_buttons_show_the_pointing_hand() {
@@ -235,7 +235,7 @@ fn the_version_chip_and_the_release_notes_buttons_show_the_pointing_hand() {
         (download.0 + 1, download.1),
         "pointer",
     );
-    hover(&mut term, "the release text", (text.0 + 2, text.1), "");
+    hover(&mut term, "the release text", (text.0 + 2, text.1), "text");
     hover(
         &mut term,
         "Skip this version",

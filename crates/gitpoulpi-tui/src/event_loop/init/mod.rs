@@ -720,6 +720,7 @@ pub(super) fn init(
         commit_message_for: None,
         commit_message_user_rows,
         commit_message_area: Rect::default(),
+        commit_text: Default::default(),
         commit_message_total: 0,
         commit_message_rows_now: 1,
         commit_detail_status_height: 0,
@@ -925,6 +926,12 @@ pub(super) fn init(
         #[cfg(feature = "hosting")]
         issue_watch: Default::default(),
         pending_worktree_tab: None,
+        review_resume: if no_repository {
+            None
+        } else {
+            window::review_resume::saved_mark(&repo.root)
+        },
+        review_resume_since: Instant::now(),
         pending_split_proposal: None,
         pending_split_select: None,
         // Start a pull request: the ref menu / palette asks for the dialog through

@@ -13,7 +13,7 @@ use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::style::{Modifier, Style};
 
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent};
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
 
 use super::draw::{block, muted, panel_style, sev_color, Hit};
 use super::{ReviewEffect, ReviewView};
@@ -152,6 +152,18 @@ impl ReviewView {
             self.ov_bar = None;
         } else {
             self.paint_strip(buf, self.ov_strip, &lines, hits);
+            let s = self.ov_strip;
+            self.strip_text.capture(
+                buf,
+                Rect::new(
+                    s.x + 2,
+                    s.y + 1,
+                    s.width.saturating_sub(4),
+                    s.height.saturating_sub(2),
+                ),
+            );
+            self.strip_text.paint(buf);
+            self.strip_text.register_pointer();
         }
         let rest = Rect::new(body.x, body.y + strip_h, body.width, body.height - strip_h);
         self.ov.render_embedded(rest, buf);
@@ -461,6 +473,24 @@ impl ReviewView {
         if alt_page {
             return None;
         }
+        // The ✦ block's dragged text: copied, or dropped, before the
+        // conversation sees the key.
+        if self.strip_text.has_selection() {
+            let ctrl_c =
+                key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c');
+            if ctrl_c {
+                if let Some(text) = self.strip_text.selected() {
+                    self.message = Some(crate::clipboard::copy_shared(
+                        gitpoulpi_i18n::msg::item_view::NOUN_TEXT.get(),
+                        &text,
+                    ));
+                    return Some(ReviewEffect::None);
+                }
+            } else if key.code == KeyCode::Esc {
+                self.strip_text.clear();
+                return Some(ReviewEffect::None);
+            }
+        }
         if self.overview_owns_keys() {
             let effect = self.ov.embedded_key(key)?;
             return Some(self.on_overview_effect(effect));
@@ -504,8 +534,27 @@ impl ReviewView {
     pub(super) fn overview_mouse(&mut self, mouse: MouseEvent) -> Option<ReviewEffect> {
         let at = (mouse.column, mouse.row).into();
         let popup = !self.ov.takes_palette_for_mouse();
-        if !popup && self.ov_strip.contains(at) {
+        if !popup && (self.ov_strip.contains(at) || self.strip_text.selecting()) {
             self.ov.clear_hover();
+            match mouse.kind {
+                MouseEventKind::Drag(MouseButton::Left)
+                    if self.strip_text.drag(mouse.column, mouse.row) =>
+                {
+                    return Some(ReviewEffect::None);
+                }
+                MouseEventKind::Up(MouseButton::Left) if self.strip_text.release() => {
+                    return Some(ReviewEffect::None);
+                }
+                MouseEventKind::Down(MouseButton::Left) => {
+                    let on_control = self.hits.iter().any(|(r, _)| r.contains(at));
+                    if on_control {
+                        self.strip_text.clear();
+                    } else {
+                        self.strip_text.press(mouse.column, mouse.row);
+                    }
+                }
+                _ => {}
+            }
             return None;
         }
         if self.ov.owns_mouse(&mouse) {

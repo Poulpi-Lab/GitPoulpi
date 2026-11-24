@@ -998,6 +998,7 @@ As teclas são as predefinidas.
 | Conversa: abrir o diagrama da entrada | `g` |
 | Conversa: abrir o código da discussão | `G` |
 | Conversa: copiar a ligação da entrada | `y` |
+| Conversation: Copy Text | `Ctrl+C` |
 | Conversa: abrir no navegador | `o` |
 | Conversa: editar comentário | `e` |
 | Conversa: eliminar comentário | `d` |

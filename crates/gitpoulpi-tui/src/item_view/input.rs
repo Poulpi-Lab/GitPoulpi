@@ -109,6 +109,7 @@ impl ItemView {
             || self.delete_ask.is_some()
             || self.menu.is_some()
             || self.conv.drag.held()
+            || self.conv.text.has_selection()
             || self.frame.contains((mouse.column, mouse.row).into())
     }
 
@@ -294,6 +295,12 @@ impl ItemView {
                     ItemEffect::Message(crate::clipboard::copy_shared(m::NOUN_LINK.get(), &url))
                 }
                 None => ItemEffect::Message(m::WHY_NO_URL.get().to_string()),
+            },
+            Act::CopyText => match self.conv.copy_text() {
+                Some(text) => {
+                    ItemEffect::Message(crate::clipboard::copy_shared(m::NOUN_TEXT.get(), &text))
+                }
+                None => ItemEffect::Message(m::WHY_NO_TEXT.get().to_string()),
             },
             Act::OpenBrowser => {
                 let url = self
@@ -571,7 +578,10 @@ impl ItemView {
             }
             return ItemEffect::None;
         }
-        if self.conv.area.contains(pos.into()) || self.conv.drag.held() {
+        if self.conv.area.contains(pos.into())
+            || self.conv.drag.held()
+            || self.conv.text.has_selection()
+        {
             if mouse.kind == MouseEventKind::Down(MouseButton::Left) {
                 self.focus = Focus::Timeline;
             }
@@ -640,6 +650,7 @@ impl ItemView {
             ItemCmd::OpenDiagram => self.act(Act::OpenDiagram),
             ItemCmd::OpenCode => self.act(Act::OpenCode),
             ItemCmd::CopyLink => self.act(Act::CopyLink),
+            ItemCmd::CopyText => self.act(Act::CopyText),
             ItemCmd::OpenBrowser => self.act(Act::OpenBrowser),
             ItemCmd::Edit => self.act(Act::Edit),
             ItemCmd::Delete => self.act(Act::Delete),

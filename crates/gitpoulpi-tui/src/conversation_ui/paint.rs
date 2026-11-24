@@ -202,6 +202,7 @@ impl Conversation {
         let band_w = body.width - 1;
         let content_x = body.x + 1;
         let content_max = body.width.saturating_sub(2);
+        let pointer_mark = crate::pointer_map::mark();
         for line in 0..usize::from(body.height) {
             let index = self.top + line;
             let Some(row) = layout.rows.get(index) else {
@@ -319,6 +320,15 @@ impl Conversation {
                 self.hits
                     .push((Rect::new(body.x, y, band_w, 1), Hit::Item(i)));
             }
+        }
+        self.text
+            .capture(buf, Rect::new(content_x, body.y, content_max, body.height));
+        self.text.paint(buf);
+        // The I-beam over the text, then the links and buttons over it.
+        let controls = crate::pointer_map::controls_since(pointer_mark, body);
+        self.text.register_pointer();
+        for rect in controls {
+            crate::pointer_map::hand(rect);
         }
         // The bar.
         let strip = Rect::new(body.right() - 1, body.y, 1, body.height);

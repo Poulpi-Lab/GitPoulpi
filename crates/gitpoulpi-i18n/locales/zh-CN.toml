@@ -7439,6 +7439,10 @@ hint_viewed = "已查看"
 hint_open_diff = { git = "显示 {$diff}", local = "显示{$diff}" }
 # context: footer hint after the Esc key
 hint_close = "关闭"
+# context: status line: the request that was under review is merged or closed; {caption} is like #12 Fix the thing
+resume_gone = "{caption} is no longer open: the review was not reopened"
+# context: status line: the host did not answer when the review was reopened; {why} is the error
+resume_unreachable = "could not reopen {caption}: {why}"
 # >>> local_issues (slice L1)
 [local_issues]
 field_status = "状态"
@@ -10365,6 +10369,12 @@ palette_quote = "对话：引述条目"
 palette_toggle_internal = "对话：切换内部备注"
 why_unchanged = "尚无更改"
 flavor_plain_text = "纯文本"
+# context: what was copied, named in the status line
+noun_text = "text"
+# context: status line: nothing selected and no entry
+why_no_text = "there is no text to copy here"
+# context: command palette entry: copies the dragged text, else the selected entry
+palette_copy_text = "Conversation: Copy Text"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch

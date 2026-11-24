@@ -156,12 +156,23 @@ impl RadarSlot {
         // Off in the settings: no view, and so no worker thread and no
         // hosting fetch (everything the Radar does starts here).
         if self.0.is_none() && crate::build_features::radar_enabled() {
-            self.0 = Some(Box::new(RadarUi::production(session)));
+            let mut ui = RadarUi::production(session);
+            ui.resume_pending = true;
+            self.0 = Some(Box::new(ui));
         }
     }
 
     pub(crate) fn close(&mut self) {
+        // Leaving the tab with an API review open: it reopens with the tab.
+        self.save_review_mark();
         self.0 = None;
+    }
+
+    /// The window is ending with the API review open: it is written down.
+    pub(crate) fn save_review_mark(&self) {
+        if let Some(ui) = self.0.as_deref() {
+            ui.save_review_mark();
+        }
     }
 
     pub(crate) fn get(&mut self) -> Option<&mut RadarUi> {
@@ -455,6 +466,9 @@ pub(crate) struct RadarUi {
     asking: Option<review_flow::Asking>,
     /// The review through the API, hosted over the Radar (`review_flow`).
     api_review: Option<Box<crate::review_view::ReviewView>>,
+    /// The view was just opened by its tab: the review left open last time
+    /// is reopened once (`take_resume`).
+    resume_pending: bool,
     /// The conversation of a not-cloned item, hosted over the Radar
     /// (`item_host`).
     api_item: Option<Box<crate::item_view::ItemView>>,
@@ -558,6 +572,7 @@ impl RadarUi {
             mode_hint: None,
             asking: None,
             api_review: None,
+            resume_pending: false,
             api_item: None,
             said: None,
         };

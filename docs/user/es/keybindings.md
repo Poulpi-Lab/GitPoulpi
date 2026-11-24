@@ -1216,6 +1216,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Editor: Convertir saltos de línea |  |
 | Editor: Cambiar sangría |  |
 | App: Ajustes... | `Ctrl+, / Ctrl+N ,` |
+| ✦ Sequence: Create with AI... |  |
 | App: Buscar en los ajustes... | `/ en Ajustes` |
 | App: Atajos de teclado... |  |
 | Agente: Mostrar la vista pendiente | `Ctrl+N Enter` |

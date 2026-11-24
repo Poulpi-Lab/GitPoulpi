@@ -1213,6 +1213,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Editor: Convert Line Endings |  |
 | Editor: Change Indentation |  |
 | App: Settings... | `Ctrl+, / Ctrl+N ,` |
+| ✦ Sequence: Create with AI... |  |
 | App: Search Settings... | `/ in Settings` |
 | App: Keybindings... |  |
 | Agent: Show Pending View | `Ctrl+N Enter` |

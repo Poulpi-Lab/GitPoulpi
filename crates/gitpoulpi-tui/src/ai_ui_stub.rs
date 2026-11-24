@@ -78,6 +78,7 @@ pub(crate) enum AiRequest {
         description: String,
         branches: Vec<String>,
     },
+    SequenceDraft(Box<crate::preferences::SeqDraftRequest>),
 }
 
 /// Stands in for the real naming answer.
@@ -148,6 +149,7 @@ pub(crate) enum AiAnswer {
     RewriteScript(Box<RewriteScriptOutcome>),
     RewriteRules(Box<crate::rewrite_view::RulesProposal>),
     WorktreeName(AiNames),
+    SequenceDraft(Box<crate::preferences::SeqDraftAnswer>),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

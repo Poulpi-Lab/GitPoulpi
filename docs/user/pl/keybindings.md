@@ -1210,6 +1210,7 @@ zastosowania. Klawisze są domyślne.
 | Edytor: Konwertuj końce linii |  |
 | Edytor: Zmień wcięcia |  |
 | Aplikacja: Ustawienia... | `Ctrl+, / Ctrl+N ,` |
+| ✦ Sequence: Create with AI... |  |
 | Aplikacja: Szukaj ustawień... | `/ w Ustawieniach` |
 | Aplikacja: Skróty klawiszowe... |  |
 | Agent: Pokaż oczekujący widok | `Ctrl+N Enter` |

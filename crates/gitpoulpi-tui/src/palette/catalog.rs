@@ -3778,6 +3778,11 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "Ctrl+, / Ctrl+N ,",
         PaletteCommand::OpenPreferences,
     ),
+    entry(
+        gitpoulpi_i18n::msg::sequence_ai::PALETTE_CREATE,
+        "",
+        PaletteCommand::SequenceCreateAi,
+    ),
     hint_entry(
         msg::palette::APP_SEARCH_SETTINGS,
         msg::palette::SHORTCUT_SLASH_IN_SETTINGS,

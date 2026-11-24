@@ -40,10 +40,6 @@ use gitpoulpi_config::sequences::{
 use gitpoulpi_config::{reset_keybinding_in_file, set_keybinding_in_file};
 use gitpoulpi_i18n::msg::{settings_profiles as profiles, settings_sequences as t};
 
-/// The "Create with AI" / "Edit with AI" entries are a hook for the AI
-/// drafting slice: hidden until it exists.
-pub(super) const AI_DRAFTING_VISIBLE: bool = false;
-
 /// Rows of the Sequences page that are not plain config keys.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum SeqTarget {
@@ -77,6 +73,8 @@ pub(super) struct SequencesPage {
     /// The steps face is in front.
     pub(super) in_steps: bool,
     pub(super) picker: Option<StepPicker>,
+    /// "Create with AI" / "Edit with AI" (`sequences_ai.rs`).
+    pub(super) ai: super::sequences_ai::SeqAiLink,
     /// The repository's file, read once per change (`fields` runs every frame).
     repo_cache: std::cell::RefCell<Option<Vec<SequenceDef>>>,
     /// The keymap generation `keys.km` was last rebuilt for.
@@ -340,7 +338,7 @@ impl PreferencesState {
                 .into_iter()
                 .map(|p| t::menu_preset(localised(p).name)),
         );
-        if AI_DRAFTING_VISIBLE {
+        if self.seq_ai_offered() {
             menu.push(t::MENU_AI.get().to_string());
         }
         ListSpec {
@@ -378,7 +376,7 @@ impl PreferencesState {
         }
     }
 
-    fn seq_select_id(&mut self, id: &str) {
+    pub(super) fn seq_select_id(&mut self, id: &str) {
         if let Some(at) = self.seq_entries().iter().position(|d| d.id == id) {
             self.seq.index = at;
             self.seq.step = 0;
@@ -396,7 +394,7 @@ impl PreferencesState {
             },
             n if n <= presets.len() => localised(presets[n - 1].clone()),
             _ => {
-                self.message = Some(t::AI_SOON.get().into());
+                self.seq_ai_open_create();
                 return;
             }
         };
@@ -729,7 +727,7 @@ impl PreferencesState {
                     crate::sequence_run::start(slot, &mut self.message);
                 }
             }
-            SeqButton::EditWithAi => self.message = Some(t::AI_SOON.get().into()),
+            SeqButton::EditWithAi => self.seq_ai_open_edit(),
         }
     }
 
@@ -768,11 +766,14 @@ impl PreferencesState {
 
     pub(super) fn seq_overlay_open(&self) -> bool {
         self.seq.picker.is_some()
+            || self.seq.ai.dialog.is_some()
             || (self.current_section() == PrefSection::Sequences && self.keys.popup.is_some())
     }
 
     pub(super) fn seq_overlay_key(&mut self, key: KeyEvent) -> bool {
-        if let Some(picker) = self.seq.picker.as_mut() {
+        if self.seq.ai.dialog.is_some() {
+            self.seq_ai_key(key);
+        } else if let Some(picker) = self.seq.picker.as_mut() {
             match picker.on_key(&key) {
                 PickOutcome::Stay => {}
                 PickOutcome::Close => self.seq.picker = None,
@@ -785,6 +786,10 @@ impl PreferencesState {
     }
 
     pub(super) fn seq_overlay_mouse(&mut self, kind: MouseEventKind, col: u16, row: u16) -> bool {
+        if self.seq.ai.dialog.is_some() {
+            self.seq_ai_mouse(kind, col, row);
+            return true;
+        }
         if let Some(picker) = self.seq.picker.as_mut() {
             match picker.on_mouse(kind, col, row) {
                 PickOutcome::Stay => {}
@@ -797,7 +802,9 @@ impl PreferencesState {
     }
 
     pub(super) fn seq_overlay_paste(&mut self, text: &str) {
-        if let Some(picker) = self.seq.picker.as_mut() {
+        if self.seq.ai.dialog.is_some() {
+            self.seq_ai_paste(text);
+        } else if let Some(picker) = self.seq.picker.as_mut() {
             picker.type_text(text);
         } else {
             self.keys_paste(text);
@@ -809,7 +816,9 @@ impl PreferencesState {
             return;
         }
         let pointer = self.mouse_pos;
-        if let Some(picker) = self.seq.picker.as_mut() {
+        if self.seq.ai.dialog.is_some() {
+            self.seq_ai_render(frame.buffer_mut(), area, pointer);
+        } else if let Some(picker) = self.seq.picker.as_mut() {
             picker.render(frame.buffer_mut(), area, pointer);
         } else if self.keys.popup.is_some() {
             self.keys_render_popup(frame.buffer_mut(), area);

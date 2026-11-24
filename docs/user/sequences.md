@@ -105,6 +105,72 @@ in** entry). Texts accept the variables `${branch}`, `${date}`, `${time}` and
 `${n}` (a number that makes the name unique). Clearing a text removes the
 option.
 
+## Create and edit with AI
+
+With the [AI turned on](ai.md#sequence-draft) (Settings > AI), two entries appear:
+**Add > Create with AI...** (also the palette row `Sequence: Create with AI...`,
+which opens Settings on this page with the dialog) and **Edit with AI...** next
+to **Run now** for the selected sequence. Neither exists while the AI is off.
+
+```
++- Create a sequence with AI ------------------------------- x -+
+| Describe the sequence you want                                |
+| +-----------------------------------------------------------+ |
+| | stage everything, write the commit message with the AI,   | |
+| | commit, then push                                         | |
+| +-----------------------------------------------------------+ |
+| Enter adds a line. Ctrl+Enter sends. Esc closes.              |
+| [ ] Send context (remote names, AI profiles, Open in labels)  |
+|    Off: only your description is sent.                        |
+| The AI only proposes. Nothing is saved before you accept...   |
+| [ Send ] [ Cancel ]                                           |
++---------------------------------------------------------------+
+```
+
+You write what you want in your own words; **Send** (or `Ctrl+Enter`, `Ctrl+S`)
+asks the model, through the same profile, jobs indicator and `Esc` as every
+other AI action (and the same "What is sent" question). The answer is a
+**proposal** you read before anything happens:
+
+* the name, id, description and the steps with their pause and options;
+* for **Edit with AI**, a diff against the current sequence: `+` a step added,
+  `-` a step removed, `~` a step whose pause or options changed, `~ Name: "a"
+  -> "b"` for a field;
+* **Left out**: a step the model proposed that is not allowed (unknown,
+  destructive, a sequence inside a sequence, an impossible pause), with the
+  reason; the valid steps are kept;
+* the model's **notes**, and a **suggested shortcut** that is only shown, with
+  whether the key is already taken. It is never bound: use the **Shortcut**
+  button afterwards.
+
+```
++- Proposed change ----------------------------------------- x -+
+| + added   - removed   ~ changed                               |
+| ~ Name: "Daily" -> "Daily 2"                                  |
+| Steps (3)                                                     |
+| + 1. Git: Fetch All Remotes                                   |
+|   2. Git: Stage All Changes                                   |
+| - Git: Commit...                                              |
+| ~ 3. Git: Push: defaults -> Pause: Always                     |
+| Left out                                                      |
+| step 4 `reset_hard`: destructive steps are not allowed        |
+| [ Accept ] [ Edit before saving ] [ Reject ] [ Back ]         |
++---------------------------------------------------------------+
+```
+
+* **Accept** writes it with one save (a new sequence, or the replacement of the
+  edited one, which keeps its id, scope and key) and selects it in the list.
+* **Edit before saving** does the same and opens its steps so you can tweak
+  the rows (this page saves every edit at once, so the sequence is saved
+  already).
+* **Reject** writes nothing. **Back** returns to the description to send again.
+* **Accept** is unavailable when there is nothing to accept: no usable step, a
+  problem the page would flag, or an edit that changes nothing.
+
+Nothing is written before **Accept**, and a sequence is never run from here.
+Closing the dialog (the cross, `Esc`, a click outside) asks "Discard changes?"
+while a description is typed or a proposal is open; closing Settings asks too.
+
 ## config.toml
 
 ```toml

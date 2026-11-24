@@ -387,12 +387,18 @@ impl WindowState {
                     self.last_message =
                         Some(gitpoulpi_i18n::msg::window::AI_CANCELED.get().to_string());
                 }
+                // The Sequences page's dialog: a proposal to read, never applied.
+                outcome @ (AiOutcome::Done(AiRequest::SequenceDraft(_), _)
+                | AiOutcome::Canceled(AiRequest::SequenceDraft(_))) => {
+                    self.sequence_ai_outcome(outcome)
+                }
                 AiOutcome::Done(
                     _,
                     Ok(
                         AiAnswer::Resolution(_)
                         | AiAnswer::RewriteScript(_)
-                        | AiAnswer::RewriteRules(_),
+                        | AiAnswer::RewriteRules(_)
+                        | AiAnswer::SequenceDraft(_),
                     ),
                 ) => {}
                 AiOutcome::Done(_, Ok(AiAnswer::CommitMessage(message))) => {
@@ -1104,6 +1110,7 @@ impl WindowState {
         if let Some(prefs) = self.preferences.as_mut() {
             prefs.poll_token_presence();
         }
+        self.drive_sequence_ai();
         FrameInputs {
             journal_state,
             undo_busy,

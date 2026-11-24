@@ -401,6 +401,13 @@ Open in labels go along (off by default; the CLI flag is `--context`). In the te
 proposal as JSON (with `toml`, which `gitpoulpi sequence add --file` reads) and saves nothing. The profile and instructions are
 the *Sequence draft* ones in Settings > AI.
 
+In the terminal UI the same job is the **Create with AI...** entry of Settings > Sequences > **Add**
+(palette: `Sequence: Create with AI...`) and the **Edit with AI...** button of a sequence: a dialog where you
+write what you want, with the context box (off by default) and the "What is sent" question, then a proposal
+to **Accept**, **Edit before saving**, **Reject** or send again with **Back**. An edit shows a diff against the
+current sequence (`+` added, `-` removed, `~` changed) and the suggested shortcut is checked against your
+keymap but never bound. Nothing is saved before you accept (see [Sequences](sequences.md#create-and-edit-with-ai)).
+
 ### Writing help on a host
 
 *Reply on a host* drafts a comment, an answer in a thread, a comment on a line of code or the summary of a

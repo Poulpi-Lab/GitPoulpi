@@ -1211,6 +1211,7 @@ Klávesy jsou výchozí.
 | Editor: Převést konce řádků |  |
 | Editor: Změnit odsazení |  |
 | Aplikace: Nastavení... | `Ctrl+, / Ctrl+N ,` |
+| ✦ Sequence: Create with AI... |  |
 | Aplikace: Hledat v nastavení... | `/ v Nastavení` |
 | Aplikace: Klávesové zkratky... |  |
 | Agent: Zobrazit čekající pohled | `Ctrl+N Enter` |

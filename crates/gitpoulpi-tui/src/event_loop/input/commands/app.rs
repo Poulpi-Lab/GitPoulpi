@@ -447,6 +447,11 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         PaletteCommand::OpenPreferences => {
             *cx.preferences = Some(PreferencesState::open(cx.repo_root));
         }
+        PaletteCommand::SequenceCreateAi => {
+            let mut state = PreferencesState::open(cx.repo_root);
+            state.open_sequence_ai_create();
+            *cx.preferences = Some(state);
+        }
         PaletteCommand::RepoAuthOpen => {
             let mut state = PreferencesState::open(cx.repo_root);
             state.open_repo_auth_page();

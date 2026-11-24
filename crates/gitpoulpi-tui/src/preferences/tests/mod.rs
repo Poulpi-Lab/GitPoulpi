@@ -36,6 +36,7 @@ mod repo_pages;
 mod schema_walk;
 mod search;
 mod sequences;
+mod sequences_ai;
 mod sub_tabs;
 mod theme;
 mod tokens;

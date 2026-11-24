@@ -334,6 +334,7 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::RefreshAll
         | PaletteCommand::ToggleHelp
         | PaletteCommand::OpenPreferences
+        | PaletteCommand::SequenceCreateAi
         | PaletteCommand::SearchSettings
         | PaletteCommand::Keybindings
         | PaletteCommand::KeybindingsResetAll

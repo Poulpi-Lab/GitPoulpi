@@ -1159,6 +1159,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::ToggleColumn(_)
         | C::LogColumn(_)
         | C::OpenPreferences
+        | C::SequenceCreateAi
         | C::SearchSettings
         | C::Keybindings
         | C::KeybindingsResetAll

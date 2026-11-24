@@ -172,6 +172,10 @@ pub(crate) enum AiRequest {
         description: String,
         branches: Vec<String>,
     },
+    /// A new action sequence, or a changed one, from a description (the
+    /// Sequences page's "Create with AI" / "Edit with AI"). The answer is a
+    /// proposal the user validates; nothing is saved or run.
+    SequenceDraft(Box<crate::preferences::SeqDraftRequest>),
 }
 
 impl AiRequest {
@@ -187,6 +191,7 @@ impl AiRequest {
             AiRequest::RewriteScript { .. } => AiAction::RewriteScript,
             AiRequest::RewriteRules { .. } => AiAction::RewriteRules,
             AiRequest::WorktreeName { .. } => AiAction::WorktreeName,
+            AiRequest::SequenceDraft(_) => AiAction::SequenceDraft,
         }
     }
 }
@@ -214,6 +219,8 @@ pub(crate) enum AiAnswer {
     RewriteRules(Box<RulesProposal>),
     /// The worktree name (a slug) and the branch name, both valid.
     WorktreeName(AiNames),
+    /// The sequence the model proposed (data only).
+    SequenceDraft(Box<crate::preferences::SeqDraftAnswer>),
 }
 
 /// What the worktree naming answered (see [`gitpoulpi_ai::worktree_name`]).
@@ -886,6 +893,9 @@ async fn execute(
         } => worktree_name(&config, &session, &repo, &description, &branches)
             .await
             .map(AiAnswer::WorktreeName),
+        AiRequest::SequenceDraft(request) => sequence_draft(&config, &session, &repo, &request)
+            .await
+            .map(|a| AiAnswer::SequenceDraft(Box::new(a))),
         AiRequest::PullRequest { source, target } => {
             pull_request(&config, &session, &repo, &source, &target)
                 .await
@@ -1416,6 +1426,44 @@ async fn rewrite_rules(
             })
             .collect(),
         notes: a.notes,
+    })
+}
+
+/// The Sequences page's ✦ "Create / Edit with AI": the model proposes a
+/// sequence; the answer is parsed into data and nothing else happens (no
+/// save, no run).
+async fn sequence_draft(
+    config: &AiConfig,
+    session: &str,
+    repo: &RepoRef,
+    request: &crate::preferences::SeqDraftRequest,
+) -> Result<crate::preferences::SeqDraftAnswer, String> {
+    let job = prepare(config, session, repo, AiAction::SequenceDraft)?;
+    let ask = gitpoulpi_ai::assist::SequenceDraftRequest {
+        description: request.description.clone(),
+        edit: request.edit.clone(),
+        taken_ids: request.taken_ids.clone(),
+        context: prompts::SequenceContext {
+            remotes: request.remotes.clone(),
+            ai_profiles: request.ai_profiles.clone(),
+            open_in_labels: request.open_in_labels.clone(),
+        },
+    };
+    let outcome = job.draft_sequence(&ask).await.map_err(|e| e.to_string())?;
+    let p = outcome.proposal;
+    Ok(crate::preferences::SeqDraftAnswer {
+        def: p.def,
+        problems: p
+            .problems
+            .into_iter()
+            .map(|x| crate::preferences::SeqProblem {
+                position: x.position,
+                what: x.what,
+                reason: x.reason,
+            })
+            .collect(),
+        notes: p.notes,
+        suggested_shortcut: p.suggested_shortcut,
     })
 }
 

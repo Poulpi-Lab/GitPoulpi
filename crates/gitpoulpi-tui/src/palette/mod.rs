@@ -753,6 +753,9 @@ pub(crate) enum PaletteCommand {
     /// architecture principle 5 makes this entry the contract, not the
     /// convenience.
     OpenPreferences,
+    /// `Sequence: Create with AI...`: Settings on the Sequences page with the
+    /// "Create with AI" dialog open. Only offered while AI is on.
+    SequenceCreateAi,
     /// Opens Preferences with the settings search popup (`/` or `Ctrl+F`
     /// inside Preferences, or a click on the sidebar search box).
     SearchSettings,
@@ -1425,6 +1428,7 @@ impl PaletteCommand {
                 | PaletteCommand::Merge(crate::merge_view::MergeCmd::AiSuggest)
                 | PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::ScriptAi)
                 | PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::RulesAi)
+                | PaletteCommand::SequenceCreateAi
         )
     }
 

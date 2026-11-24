@@ -8976,6 +8976,94 @@ title = "Sequence drafts"
 profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
 repo_profile_help = "The profile used in this repository to draft action sequences."
 action = "Sequence draft"
+# context: title of the dialog that creates a sequence from a description; the sparkle is added in code
+dlg_title_create = "Créer une séquence avec l'IA"
+# context: title of the dialog that changes the selected sequence from a description; the sparkle is added in code
+dlg_title_edit = "Modifier une séquence avec l'IA"
+# context: label of the description field
+dlg_label_create = "Décrivez la séquence voulue"
+# context: label of the description field in edit mode; {name} is the sequence's name
+dlg_label_edit = "Décrivez comment changer « {name} »"
+# context: placeholder of the description field
+dlg_example_create = { git = "Par exemple : stage de tout, message écrit par l'IA, commit, puis push.", local = "Par exemple : tout indexer, message écrit par l'IA, validation, puis envoi." }
+# context: placeholder of the description field in edit mode
+dlg_example_edit = { git = "Par exemple : un fetch d'abord, et toujours demander avant le push.", local = "Par exemple : une récupération d'abord, et toujours demander avant l'envoi." }
+# context: keys of the description field
+dlg_hint = "Entrée ajoute une ligne. Ctrl+Entrée envoie. Échap ferme."
+# context: checkbox, off by default
+dlg_context = "Envoyer le contexte (noms des remotes, profils d'IA, libellés « Ouvrir dans »)"
+# context: under the unchecked box
+dlg_context_off = "Désactivé : seule votre description est envoyée."
+# context: reassurance under the description
+dlg_footer = "L'IA ne fait que proposer. Rien n'est enregistré avant votre accord, et rien n'est jamais lancé."
+# context: button; the sparkle is added in code
+dlg_send = "Envoyer"
+# context: button
+dlg_cancel = "Annuler"
+# context: why Send is unavailable
+dlg_need_text = "Décrivez d'abord ce que vous voulez."
+# context: another AI request is running
+dlg_busy = "Une autre requête d'IA est en cours."
+# context: shown when the AI is off
+dlg_off = "Activez d'abord l'IA dans les réglages."
+# context: the window is too small for the dialog
+dlg_too_small = "Agrandissez la fenêtre pour utiliser cette boîte."
+# context: the answer came after the dialog was closed
+dlg_closed = "L'IA a répondu après la fermeture de la boîte : rien n'a été écrit."
+# context: what a copy from the description field is called in the confirmation
+dlg_copy_what = "la description"
+# context: title of the proposal of a new sequence; the sparkle is added in code
+res_title_create = "Séquence proposée"
+# context: title of the proposed change to a sequence; the sparkle is added in code
+res_title_edit = "Modification proposée"
+# context: heading over the steps; {n} is how many
+res_steps = "Étapes ({n})"
+# context: heading over what the AI proposed but was refused
+res_left_out = "Écarté"
+# context: a refused step; {n} its place, {what} its command, {reason} why
+res_left_step = "étape {n} `{what}` : {reason}"
+# context: a refused field; {what} its name, {reason} why
+res_left_item = "{what} : {reason}"
+# context: heading over the AI's remarks
+res_notes = "Remarques de l'IA"
+# context: heading over the suggested shortcut; {key} is the key as the AI wrote it
+res_shortcut = "Raccourci suggéré : {key}"
+# context: the suggested shortcut is not used by anything
+res_shortcut_free = "Il est libre. Il n'est pas appliqué : utilisez le bouton Raccourci après avoir accepté."
+# context: the suggested shortcut is used; {label} names its action
+res_shortcut_taken = "Déjà utilisé par {label}. Il n'est pas appliqué."
+# context: the suggested shortcut is not a single key
+res_shortcut_unusable = "Ce n'est pas une seule touche. Réglez le raccourci vous-même avec le bouton Raccourci."
+# context: the proposal equals the sequence
+res_no_change = "Aucun changement : la proposition est identique à la séquence."
+# context: legend of the diff
+res_legend = "+ ajouté   - retiré   ~ modifié"
+# context: a step with no pause and no option, in a change line
+res_defaults = "valeurs par défaut"
+# context: an empty field, in a change line
+res_none = "(aucun)"
+# context: a changed field; {field} its name, {old} and {new} its values
+res_field_changed = "{field} : « {old} » -> « {new} »"
+# context: why Accept is unavailable; {reason} says why
+res_blocked = "Impossible d'accepter : {reason}"
+# context: the proposal holds no usable step
+res_no_steps = "la proposition n'a aucune étape utilisable"
+# context: button that saves the proposal
+btn_accept = "Accepter"
+# context: button that saves the proposal and opens its steps
+btn_edit_first = "Modifier avant d'enregistrer"
+# context: button that drops the proposal
+btn_reject = "Rejeter"
+# context: button back to the description
+btn_back = "Retour"
+# context: status line; {name} is the new sequence
+accepted_create = "Séquence « {name} » ajoutée"
+# context: status line; {name} is the changed sequence
+accepted_edit = "Séquence « {name} » mise à jour"
+# context: question when Settings is closed with a proposal open
+close_body = "Une proposition de séquence de l'IA est ouverte. Fermer les réglages l'abandonne ; rien n'a été écrit."
+# context: palette row; the sparkle is added in code
+palette_create = "Séquence : Créer avec l'IA..."
 
 [rewrite_size]
 tab = "Taille"
@@ -10559,4 +10647,3 @@ no_repo = "Ce dossier n'est pas un dépôt : une séquence de dépôt en demand
 cannot_run = "Impossible de lancer : {reason}"
 # context: a refused write; {error} is the reason
 write_failed = "Séquences : {error}"
-ai_soon = "La rédaction d'une séquence par l'IA viendra plus tard."

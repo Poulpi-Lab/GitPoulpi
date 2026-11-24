@@ -1213,6 +1213,7 @@ Tangenterna är standardvärdena.
 | Redigerare: Konvertera radbrytningar |  |
 | Redigerare: Ändra indrag |  |
 | App: Inställningar... | `Ctrl+, / Ctrl+N ,` |
+| ✦ Sequence: Create with AI... |  |
 | App: Sök i inställningar... | `/ i Inställningar` |
 | App: Tangentbindningar... |  |
 | Agent: Visa väntande vy | `Ctrl+N Enter` |

@@ -92,7 +92,9 @@ Cuando el repositorio tiene un `.mailmap` (el archivo de git que da un solo nomb
   o *Log: Filtrar por autor...* de la paleta): prefiltra el Log según quién
   escribió los commits. Un popup cuelga bajo la cabecera con un campo de búsqueda, una
   fila **Quitar el filtro** (✕) y una fila por autor del historial cargado: una
-  insignia con las iniciales (el avatar, cuando `ui.avatars` no está desactivado), el nombre y el
+  avatar (cuando `ui.avatars` no está desactivado: la imagen del autor en los terminales que dibujan
+  imágenes y cuando la imagen está lista, la insignia con las iniciales hasta entonces y en los demás
+  terminales), el nombre y el
   correo atenuado detrás, primero los de más commits y luego por nombre. Escribir reduce la
   lista con la coincidencia aproximada de la paleta; `Enter` o un clic alterna el
   autor resaltado (una marca de verificación; elige tantos como quieras), `Esc` o un
@@ -105,7 +107,10 @@ Cuando el repositorio tiene un `.mailmap` (el archivo de git que da un solo nomb
   los autores elegidos, y cuando la columna Autor está oculta o es demasiado estrecha para
   el embudo, el borde superior del Log dice *Autores: Alice Example +1* en su lugar (la
   tecla y la paleta siguen funcionando). Para quitarlo: la fila **Quitar el filtro**, un
-  clic derecho en el embudo iluminado, o *Log: Quitar el filtro de autor* de la paleta.
+  clic derecho en el embudo iluminado, *Log: Quitar el filtro de autor* de la paleta, o
+  `Esc` en el Log (tras una selección, que `Esc` quita primero; dentro del popup `Esc` primero
+  vacía el campo de búsqueda y luego cierra el popup conservando el filtro).
+  Mientras está activo, Arriba/Abajo (y RePág/AvPág, Inicio/Fin) mueven la selección solo entre los commits iluminados, saltándose los atenuados; un clic sigue seleccionando cualquier fila.
   Los autores son los de los commits que el Log ha cargado (con el mailmap aplicado, como
   en la columna), y el filtro se recuerda por repositorio, entre cambios de pestaña
   y reinicios. Una búsqueda de texto no se recuerda; el filtro sí.

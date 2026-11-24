@@ -149,6 +149,8 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `refs` | `collapse_all` | Recolher todas as pastas | `-` |
 | `refs` | `expand_below` | Expandir a pasta e as suas subpastas | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Recolher a pasta e as suas subpastas | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Ficheiros: caminho ou árvore | `m` |
 | `log` | `view_all_files` | Ficheiros: ver todos os ficheiros | `a` |
 | `log` | `compare_selection` | Comparar as linhas selecionadas | `v` |
@@ -157,6 +159,8 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `log` | `pick_column` | Escolher uma coluna para mover ou redimensionar | `Shift+C` |
 | `log` | `scroll_left` | Deslocar as colunas para a esquerda | `Shift+Left` |
 | `log` | `scroll_right` | Deslocar as colunas para a direita | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Copiar commits como Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Escolher a coluna seguinte | `Tab` |
 | `log_columns` | `prev` | Escolher a coluna anterior | `Shift+BackTab` |
@@ -174,6 +178,8 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Recolher todas as pastas | `-` |
 | `log_files` | `expand_below` | Expandir a pasta e as suas subpastas | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Recolher a pasta e as suas subpastas | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Focar a mensagem do commit | `c` |
 | `status` | `toggle_file_mode` | Ficheiros: caminho ou árvore | `m` |
 | `status` | `view_all_files` | Ficheiros: ver todos os ficheiros | `a` |
@@ -186,6 +192,8 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Recolher todas as pastas | `-` |
 | `status` | `expand_below` | Expandir a pasta e as suas subpastas | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Recolher a pasta e as suas subpastas | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | Marcar ou desmarcar o repositório como favorito | `f`, `*` |
 | `home` | `close_repo` | Fechar, remover ou desmarcar a linha | `x`, `Delete` |
 | `home` | `copy_path` | Copiar o caminho do repositório | `y` |
@@ -621,6 +629,8 @@ As teclas são as predefinidas.
 | Refs: recolher todas as pastas | `-` |
 | Refs: expandir a pasta selecionada e as suas subpastas | `*` |
 | Refs: recolher a pasta selecionada e as suas subpastas | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: próxima secção | `l` |
 | Refs: secção anterior | `h` |
 | Refs: expandir ou recolher a secção ativa | `Enter` |

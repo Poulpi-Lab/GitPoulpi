@@ -152,6 +152,8 @@ préfixe (`Ctrl+G s`).
 | `refs` | `collapse_all` | Replier tous les dossiers | `-` |
 | `refs` | `expand_below` | Déplier le dossier et ses sous-dossiers | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Replier le dossier et ses sous-dossiers | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Faire défiler le panneau vers la gauche | `Alt+Left` |
+| `refs` | `scroll_right` | Faire défiler le panneau vers la droite | `Alt+Right` |
 | `log` | `toggle_file_mode` | Fichiers : chemin ou arbre | `m` |
 | `log` | `view_all_files` | Fichiers : voir tous les fichiers | `a` |
 | `log` | `compare_selection` | Comparer les lignes sélectionnées | `v` |
@@ -160,6 +162,8 @@ préfixe (`Ctrl+G s`).
 | `log` | `pick_column` | Choisir une colonne (déplacer, taille) | `Shift+C` |
 | `log` | `scroll_left` | Faire défiler les colonnes vers la gauche | `Shift+Left` |
 | `log` | `scroll_right` | Faire défiler les colonnes vers la droite | `Shift+Right` |
+| `log` | `details_scroll_left` | Faire défiler le panneau vers la gauche | `Alt+Left` |
+| `log` | `details_scroll_right` | Faire défiler le panneau vers la droite | `Alt+Right` |
 | `log` | `copy_mermaid` | Copier les commits en gitGraph Mermaid | `Shift+Y` |
 | `log_columns` | `next` | Choisir la colonne suivante | `Tab` |
 | `log_columns` | `prev` | Choisir la colonne précédente | `Shift+BackTab` |
@@ -177,6 +181,8 @@ préfixe (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Replier tous les dossiers | `-` |
 | `log_files` | `expand_below` | Déplier le dossier et ses sous-dossiers | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Replier le dossier et ses sous-dossiers | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Faire défiler le panneau vers la gauche | `Alt+Left` |
+| `log_files` | `scroll_right` | Faire défiler le panneau vers la droite | `Alt+Right` |
 | `status` | `compose` | Aller au message de commit | `c` |
 | `status` | `toggle_file_mode` | Fichiers : chemin ou arbre | `m` |
 | `status` | `view_all_files` | Fichiers : voir tous les fichiers | `a` |
@@ -189,6 +195,8 @@ préfixe (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Replier tous les dossiers | `-` |
 | `status` | `expand_below` | Déplier le dossier et ses sous-dossiers | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Replier le dossier et ses sous-dossiers | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Faire défiler le panneau vers la gauche | `Alt+Left` |
+| `status` | `scroll_right` | Faire défiler le panneau vers la droite | `Alt+Right` |
 | `home` | `favorite` | Marquer ou démarquer le dépôt (étoile) | `f`, `*` |
 | `home` | `close_repo` | Fermer, retirer ou démarquer la ligne | `x`, `Delete` |
 | `home` | `copy_path` | Copier le chemin du dépôt | `y` |
@@ -625,6 +633,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Refs : Replier tous les dossiers | `-` |
 | Refs : Déplier le dossier sélectionné et ses sous-dossiers | `*` |
 | Refs : Replier le dossier sélectionné et ses sous-dossiers | `_` |
+| Affichage : Faire défiler le panneau vers la gauche | `Alt+Left` |
+| Affichage : Faire défiler le panneau vers la droite | `Alt+Right` |
 | Refs : Section suivante | `l` |
 | Refs : Section précédente | `h` |
 | Refs : Déplier ou replier la section active | `Enter` |

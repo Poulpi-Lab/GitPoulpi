@@ -155,7 +155,11 @@ pub(super) fn handle(
                 // unreliable with a mouse.
                 let gutter_end =
                     area.x + rows_owned.get(i).map(|r| r.depth()).unwrap_or(0) as u16 * 2 + 4;
-                if col < gutter_end {
+                // The row may be scrolled sideways: the gutter is where the
+                // text is, not where the pane starts.
+                let scrolled = usize::from(col)
+                    + crate::hscroll::offset(crate::hscroll::HPane::Refs(*cx.active_ref_section));
+                if scrolled < usize::from(gutter_end) {
                     // The same mode-dependent gutter icon as the render side, for a leaf or a
                     // whole folder/remote: while soloing, the click toggles solo membership
                     // instead of hide-in-graph. A folder bulk-toggles every ref beneath it

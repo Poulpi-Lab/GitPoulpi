@@ -165,6 +165,7 @@ mod history_view;
 mod hosting_notify;
 #[cfg(feature = "hosting")]
 mod hosting_task;
+mod hscroll;
 #[cfg(test)]
 mod i18n_layout_tests;
 mod image_decode;

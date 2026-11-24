@@ -135,6 +135,8 @@ stage_file = "z"
 | `refs` | `collapse_all` | 折叠所有文件夹 | `-` |
 | `refs` | `expand_below` | 展开该文件夹及其子文件夹 | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | 折叠该文件夹及其子文件夹 | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | 文件：路径或树 | `m` |
 | `log` | `view_all_files` | 文件：查看所有文件 | `a` |
 | `log` | `compare_selection` | 比较所选行 | `v` |
@@ -143,6 +145,8 @@ stage_file = "z"
 | `log` | `pick_column` | 选择要移动或调整宽度的列 | `Shift+C` |
 | `log` | `scroll_left` | 向左滚动各列 | `Shift+Left` |
 | `log` | `scroll_right` | 向右滚动各列 | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | 将 Commits 复制为 Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | 选择下一列 | `Tab` |
 | `log_columns` | `prev` | 选择上一列 | `Shift+BackTab` |
@@ -160,6 +164,8 @@ stage_file = "z"
 | `log_files` | `collapse_all_folders` | 折叠所有文件夹 | `-` |
 | `log_files` | `expand_below` | 展开该文件夹及其子文件夹 | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | 折叠该文件夹及其子文件夹 | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | 聚焦 Commit 消息 | `c` |
 | `status` | `toggle_file_mode` | 文件：路径或树 | `m` |
 | `status` | `view_all_files` | 文件：查看所有文件 | `a` |
@@ -172,6 +178,8 @@ stage_file = "z"
 | `status` | `collapse_all_folders` | 折叠所有文件夹 | `-` |
 | `status` | `expand_below` | 展开该文件夹及其子文件夹 | `*`, `Shift+Right` |
 | `status` | `collapse_below` | 折叠该文件夹及其子文件夹 | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | 收藏或取消收藏仓库 | `f`, `*` |
 | `home` | `close_repo` | 关闭、移除或取消收藏该行 | `x`, `Delete` |
 | `home` | `copy_path` | 复制仓库路径 | `y` |
@@ -589,6 +597,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 引用：折叠所有文件夹 | `-` |
 | 引用：展开所选文件夹及其子文件夹 | `*` |
 | 引用：折叠所选文件夹及其子文件夹 | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | 引用：下一个分区 | `l` |
 | 引用：上一个分区 | `h` |
 | 引用：展开或折叠当前分区 | `Enter` |

@@ -819,6 +819,16 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::RefsFold(crate::tree_fold::TreeFold::CollapseBelow),
     ),
     entry(
+        msg::pane_hscroll::PAL_LEFT,
+        "",
+        PaletteCommand::PaneScroll(crate::hscroll::Dir::Left),
+    ),
+    entry(
+        msg::pane_hscroll::PAL_RIGHT,
+        "",
+        PaletteCommand::PaneScroll(crate::hscroll::Dir::Right),
+    ),
+    entry(
         msg::palette::REFS_NEXT_SECTION,
         "l",
         PaletteCommand::NextRefSection,

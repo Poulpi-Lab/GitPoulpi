@@ -91,6 +91,7 @@ impl WindowState {
         // and a stale one is a click landing on a popup that is no
         // longer there.
         crate::scrollbar::begin_frame();
+        crate::hscroll::begin_frame(&self.repo.root);
         crate::context_menu::begin_frame();
         crate::popup_list::View::begin_frame();
         crate::help_view::forget();

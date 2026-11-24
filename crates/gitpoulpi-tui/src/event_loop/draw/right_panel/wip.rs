@@ -285,6 +285,34 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
             .map(|(_, l)| l.as_slice())
             .unwrap_or_default();
 
+        // A new file's name box sits at the unscrolled column.
+        let naming = section == StatusSection::Unstaged
+            && matches!(
+                input_mode,
+                InputMode::InlineName {
+                    op: RefNameOp::CreateFile(_),
+                    ..
+                }
+            );
+        let h_off = if lines.is_empty() {
+            crate::hscroll::claim(crate::hscroll::HPane::Status(section), area, 0)
+        } else {
+            let width = status_list::status_content_width(
+                lines,
+                status_states.state(section),
+                status_states.follow(section),
+                list_area.height as usize,
+                lfs,
+                section,
+                list_area.width as usize,
+            );
+            let off = crate::hscroll::claim(crate::hscroll::HPane::Status(section), area, width);
+            if naming {
+                0
+            } else {
+                off
+            }
+        };
         let items: Vec<ListItem> = if lines.is_empty() {
             vec![ListItem::new(Span::styled(
                 format!("  {}", gitpoulpi_i18n::msg::sidebar::NONE.get()),
@@ -302,6 +330,7 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
                 list_area,
                 lfs,
                 file_sel,
+                h_off,
                 frame_hits,
             )
         };
@@ -342,6 +371,12 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
         {
             scrollbar::render(frame, track, true, false);
         }
+        crate::hscroll::paint_bar(
+            frame,
+            crate::hscroll::HPane::Status(section),
+            frame_hits,
+            None,
+        );
         // A file being named: the box over the row under its folder.
         if section == StatusSection::Unstaged {
             if let InputMode::InlineName {

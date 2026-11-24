@@ -58,14 +58,23 @@ fn title_x(s: &Screen, row: u16, title: &str) -> Option<u16> {
 /// `(left arrow col, right arrow col, row)` of the Log's sideways bar: on the
 /// bottom border, from the `╰` corner's neighbour.
 fn bar(s: &Screen) -> Option<(u16, u16, u16)> {
-    let (left, row) = s.find_all("\u{2190}").into_iter().find(|(c, r)| {
-        *c > 0
-            && s.cell(*c - 1, *r)
-                .is_some_and(|cell| cell.text == "\u{2570}")
+    // The Log's bar starts right of the sidebar; the right pane (a long file
+    // name in the commit's files) has a bar of its own further right.
+    let (left, row) = s
+        .find_all("\u{2190}")
+        .into_iter()
+        .filter(|(c, r)| {
+            (20..60).contains(c)
+                && s.cell(*c - 1, *r)
+                    .is_some_and(|cell| cell.text == "\u{2570}")
+        })
+        .min_by_key(|(c, _)| *c)?;
+    // The first right arrow before a closing corner: the bar's own.
+    let right = (left + 1..s.cols()).find(|c| {
+        s.cell(*c, row).is_some_and(|cell| cell.text == "\u{2192}")
+            && s.cell(*c + 1, row)
+                .is_some_and(|cell| cell.text == "\u{256f}")
     })?;
-    let right = (left + 1..s.cols())
-        .rev()
-        .find(|c| s.cell(*c, row).is_some_and(|cell| cell.text == "\u{2192}"))?;
     Some((left, right, row))
 }
 

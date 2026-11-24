@@ -152,6 +152,8 @@ prefix getoond (`Ctrl+G s`).
 | `refs` | `collapse_all` | Alle mappen inklappen | `-` |
 | `refs` | `expand_below` | De map en zijn submappen uitklappen | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | De map en zijn submappen inklappen | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Bestanden: pad of boom | `m` |
 | `log` | `view_all_files` | Bestanden: alle bestanden tonen | `a` |
 | `log` | `compare_selection` | De geselecteerde rijen vergelijken | `v` |
@@ -160,6 +162,8 @@ prefix getoond (`Ctrl+G s`).
 | `log` | `pick_column` | Kolom kiezen om te verplaatsen of de breedte te wijzigen | `Shift+C` |
 | `log` | `scroll_left` | Kolommen naar links scrollen | `Shift+Left` |
 | `log` | `scroll_right` | Kolommen naar rechts scrollen | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Commits kopiëren als Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Volgende kolom kiezen | `Tab` |
 | `log_columns` | `prev` | Vorige kolom kiezen | `Shift+BackTab` |
@@ -177,6 +181,8 @@ prefix getoond (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Alle mappen inklappen | `-` |
 | `log_files` | `expand_below` | De map en zijn submappen uitklappen | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | De map en zijn submappen inklappen | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Focus op het commit-bericht | `c` |
 | `status` | `toggle_file_mode` | Bestanden: pad of boom | `m` |
 | `status` | `view_all_files` | Bestanden: alle bestanden tonen | `a` |
@@ -189,6 +195,8 @@ prefix getoond (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Alle mappen inklappen | `-` |
 | `status` | `expand_below` | De map en zijn submappen uitklappen | `*`, `Shift+Right` |
 | `status` | `collapse_below` | De map en zijn submappen inklappen | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | Repository als favoriet (de)markeren | `f`, `*` |
 | `home` | `close_repo` | Rij sluiten, verwijderen of favoriet wissen | `x`, `Delete` |
 | `home` | `copy_path` | Het pad van de repository kopiëren | `y` |
@@ -627,6 +635,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Refs: Alle mappen inklappen | `-` |
 | Refs: De geselecteerde map en zijn submappen uitklappen | `*` |
 | Refs: De geselecteerde map en zijn submappen inklappen | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: Volgende sectie | `l` |
 | Refs: Vorige sectie | `h` |
 | Refs: Actieve sectie in-/uitklappen | `Enter` |

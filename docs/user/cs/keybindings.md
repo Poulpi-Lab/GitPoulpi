@@ -150,6 +150,8 @@ předponou (`Ctrl+G s`).
 | `refs` | `collapse_all` | Sbalit všechny složky | `-` |
 | `refs` | `expand_below` | Rozbalit složku a její podsložky | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Sbalit složku a její podsložky | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Soubory: Cesta nebo strom | `m` |
 | `log` | `view_all_files` | Soubory: Zobrazit všechny soubory | `a` |
 | `log` | `compare_selection` | Porovnat vybrané řádky | `v` |
@@ -158,6 +160,8 @@ předponou (`Ctrl+G s`).
 | `log` | `pick_column` | Vybrat sloupec k přesunu nebo změně šířky | `Shift+C` |
 | `log` | `scroll_left` | Posunout sloupce doleva | `Shift+Left` |
 | `log` | `scroll_right` | Posunout sloupce doprava | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Zkopírovat commity jako Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Vybrat další sloupec | `Tab` |
 | `log_columns` | `prev` | Vybrat předchozí sloupec | `Shift+BackTab` |
@@ -175,6 +179,8 @@ předponou (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Sbalit všechny složky | `-` |
 | `log_files` | `expand_below` | Rozbalit složku a její podsložky | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Sbalit složku a její podsložky | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Přejít na zprávu commitu | `c` |
 | `status` | `toggle_file_mode` | Soubory: Cesta nebo strom | `m` |
 | `status` | `view_all_files` | Soubory: Zobrazit všechny soubory | `a` |
@@ -187,6 +193,8 @@ předponou (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Sbalit všechny složky | `-` |
 | `status` | `expand_below` | Rozbalit složku a její podsložky | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Sbalit složku a její podsložky | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | Přidat repozitář k oblíbeným nebo odebrat | `f`, `*` |
 | `home` | `close_repo` | Zavřít, odebrat nebo odznačit řádek | `x`, `Delete` |
 | `home` | `copy_path` | Kopírovat cestu k repozitáři | `y` |
@@ -623,6 +631,8 @@ Klávesy jsou výchozí.
 | Refs: Sbalit všechny složky | `-` |
 | Refs: Rozbalit vybranou složku a její podsložky | `*` |
 | Refs: Sbalit vybranou složku a její podsložky | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: Další sekce | `l` |
 | Refs: Předchozí sekce | `h` |
 | Refs: Rozbalit/sbalit aktivní sekci | `Enter` |

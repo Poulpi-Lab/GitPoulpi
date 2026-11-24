@@ -16,6 +16,7 @@ pub(crate) fn status_row_item<'a>(
     row_y: u16,
     lfs: LfsMark<'_>,
     picked: bool,
+    h_off: usize,
     hits: &mut Vec<(Rect, HitTarget)>,
 ) -> ListItem<'a> {
     // The per-row Stage/Unstage button is a hover affordance, exactly as
@@ -73,7 +74,9 @@ pub(crate) fn status_row_item<'a>(
             } else {
                 head_style
             };
-            let mut spans = vec![Span::styled(head.clone(), head_style)];
+            // Scrolled sideways: the name, never the button below.
+            let mut spans =
+                crate::hscroll::cut_spans(vec![Span::styled(head.clone(), head_style)], h_off);
             if hovered {
                 // A folder stages wholesale -- `StageTarget::Folder` exists
                 // and both backends implement it.
@@ -137,6 +140,7 @@ pub(crate) fn status_row_item<'a>(
                     Style::default().fg(th().status.warning),
                 ));
             }
+            let mut spans = crate::hscroll::cut_spans(spans, h_off);
             if hovered {
                 spans = push_button(
                     hits,
@@ -232,6 +236,7 @@ pub(crate) fn status_row_items<'a>(
     list_area: Rect,
     lfs: &'a crate::lfs_ui::LfsUi,
     sel: &FileSelection,
+    h_off: usize,
     hits: &mut Vec<(Rect, HitTarget)>,
 ) -> Vec<ListItem<'a>> {
     let list = match section {
@@ -268,8 +273,69 @@ pub(crate) fn status_row_items<'a>(
                 row_y,
                 mark,
                 picked,
+                h_off,
                 hits,
             )
         })
         .collect()
+}
+
+/// How wide a row is before it scrolls: the indent, the marker, the name and
+/// the tags after it.
+fn row_width(line: &StatusPaneLine, mark: LfsMark<'_>) -> usize {
+    match line {
+        StatusPaneLine::Folder { depth, label, .. } => {
+            // chevron, space, name, slash
+            depth * 2
+                + crate::cell_text::cells(crate::fold_mark::glyph(false))
+                + 1
+                + crate::cell_text::cells(label)
+                + 1
+        }
+        StatusPaneLine::File { depth, label, .. } => {
+            let mut w = depth * 2 + 2 + crate::cell_text::cells(label);
+            if mark.is_lfs {
+                w += 4;
+            }
+            if let Some(owner) = mark.locked_by {
+                w += crate::cell_text::cells(&gitpoulpi_i18n::msg::status_list::locked_by(owner));
+            }
+            w
+        }
+    }
+}
+
+/// The widest row the sub-pane paints this frame (its paint window), the
+/// width the sideways scroll runs over.
+pub(crate) fn status_content_width(
+    lines: &[StatusPaneLine],
+    state: &ListState,
+    follow: bool,
+    visible: usize,
+    lfs: &crate::lfs_ui::LfsUi,
+    section: StatusSection,
+    width: usize,
+) -> usize {
+    // A row wider than the list (`width`) gets room past its end for the hover
+    // button, which covers it: scrolled to the end, the name's last cell is
+    // still in view. A row that fits needs no bar.
+    let button = crate::cell_text::cells(section.row_label())
+        .max(crate::cell_text::cells(
+            gitpoulpi_i18n::msg::status_pane::STAGE_FOLDER.get(),
+        ))
+        .max(crate::cell_text::cells(
+            gitpoulpi_i18n::msg::status_pane::UNSTAGE_FOLDER.get(),
+        ))
+        + 3;
+    status_paint_window(lines.len(), state, follow, visible)
+        .filter_map(|i| lines.get(i))
+        .map(|line| {
+            let mark = match line {
+                StatusPaneLine::File { path, .. } => LfsMark::of(lfs, path),
+                StatusPaneLine::Folder { .. } => LfsMark::default(),
+            };
+            row_width(line, mark)
+        })
+        .max()
+        .map_or(0, |w| if w > width { w + button } else { w })
 }

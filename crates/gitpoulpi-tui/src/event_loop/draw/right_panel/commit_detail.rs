@@ -387,10 +387,11 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
             } else {
                 0
             };
-            let room = meta_inner_width.saturating_sub(lead + display_width(&parent_label) + 1);
-            let name = truncate_with_ellipsis(&name, room);
+            // Never cut: a name wider than the pane scrolls with the line
+            // (`hscroll`, the commit info), the parent label after it.
             let gap = meta_inner_width
-                .saturating_sub(lead + display_width(&name) + display_width(&parent_label));
+                .saturating_sub(lead + display_width(&name) + display_width(&parent_label))
+                .max(1);
             let mut first: Vec<Span> = Vec::new();
             if with_avatar {
                 // The picture's own place on a terminal that draws images
@@ -729,6 +730,31 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
         )
     };
 
+    // The info lines scroll sideways together; a comparison's header keeps
+    // its Swap button where it is.
+    let info_w = author_lines
+        .iter()
+        .chain([&counts_line])
+        .chain(compare.is_none().then_some(&header_line))
+        .map(Line::width)
+        .max()
+        .unwrap_or(0);
+    let info_off = crate::hscroll::claim(
+        crate::hscroll::HPane::CommitInfo,
+        layout.detail_area,
+        info_w,
+    );
+    let header_line = if compare.is_some() {
+        header_line
+    } else {
+        crate::hscroll::cut_line(header_line, info_off)
+    };
+    let author_lines: Vec<Line> = author_lines
+        .into_iter()
+        .map(|l| crate::hscroll::cut_line(l, info_off))
+        .collect();
+    let counts_line = crate::hscroll::cut_line(counts_line, info_off);
+
     let chrome = CommitDetailChrome {
         title: format!(
             " {} ",
@@ -752,8 +778,14 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
     crate::tooltip::set_author_email(None);
     if let Some((offset, width, email)) = author_name_hit {
         let area = layout.author_area;
-        if width > 0 && area.height > 0 && offset < area.width {
-            let rect = Rect::new(area.x + offset, area.y, width.min(area.width - offset), 1);
+        // The name scrolls with its line: clipped to the block.
+        let start = i32::from(offset) - info_off as i32;
+        let (from, to) = (
+            start.max(0),
+            (start + i32::from(width)).min(i32::from(area.width)),
+        );
+        if to > from && area.height > 0 {
+            let rect = Rect::new(area.x + from as u16, area.y, (to - from) as u16, 1);
             frame_hits.push((rect, HitTarget::CommitAuthorName));
             crate::tooltip::set_author_email(Some(email));
         }
@@ -824,7 +856,7 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
     // module header for why that is safe to call every frame
     // (a `HashMap` lookup on every call after the first).
     if let Some(commit) = selected_summary.filter(|_| compare.is_none()) {
-        if avatar::should_fetch_images(avatar_placement, avatar_capability) {
+        if info_off == 0 && avatar::should_fetch_images(avatar_placement, avatar_capability) {
             let sha = commit.id.to_hex();
             if let avatar::AvatarStatus::Ready(bitmap) =
                 avatar_service.status(avatar::AvatarQuery {
@@ -926,14 +958,17 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
         commit_files_follow,
         commit_files_visible_rows,
     );
-    frame.render_stateful_clipped(
-        List::new(file_items).highlight_style(
-            Style::default()
-                .bg(th().ui.selection)
-                .add_modifier(Modifier::BOLD),
-        ),
+    crate::hscroll::render_list(
+        frame,
+        file_items,
+        Style::default()
+            .bg(th().ui.selection)
+            .add_modifier(Modifier::BOLD),
         layout.files_inner,
         &mut commit_file_render_state,
+        crate::hscroll::HPane::CommitFiles,
+        files_list_body(layout.files_area),
+        false,
     );
     *commit_file_state.offset_mut() = commit_file_render_state.offset();
     // The file row under the pointer lights across its whole width, like a
@@ -959,6 +994,8 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
     ) {
         scrollbar::render(frame, track, true, false);
     }
+    crate::hscroll::paint_bar(frame, crate::hscroll::HPane::CommitFiles, frame_hits, None);
+    crate::hscroll::paint_bar(frame, crate::hscroll::HPane::CommitInfo, frame_hits, None);
     *ctx.commit_detail_status_height = commit_detail_status_height;
     *ctx.commit_files_area = commit_files_area;
     *ctx.commit_files_len = commit_files_len;

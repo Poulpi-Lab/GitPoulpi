@@ -7,6 +7,9 @@ IPC surfaces are stable within a major version).
 
 ## [Unreleased]
 
+### Added
+- **Sideways scroll for the list panes.** A Refs section, the Unstaged and Staged lists, the commit's (and a comparison's) changed files and the commit details' info lines scroll sideways when a row is wider than the pane, instead of cutting it: the horizontal wheel or `Shift`+wheel over the pane, a bar on its bottom border that exists only on overflow (drag, press the track, click the arrows), and `Alt+Left` / `Alt+Right` for the pane that has the keyboard (also in the palette as `View: Scroll the Pane Left/Right`, rebindable per pane). Long names are no longer cut with an ellipsis; a hovered Status row keeps its Stage button at the right edge.
+
 ## [1.2.0] - 2026-11-23
 
 ### Added

@@ -16,6 +16,7 @@ mod folds;
 mod git;
 mod guides;
 pub(in crate::event_loop) mod history;
+mod hscroll;
 pub(in crate::event_loop) mod log_columns;
 mod nav;
 mod pane;
@@ -35,6 +36,7 @@ use gitpoulpi_i18n::msg;
 pub(in crate::event_loop) use guides::{
     block_on_conflicts, guard_off_branch, guide_key, guide_mouse, open_limit_setting, start_ai,
 };
+pub(in crate::event_loop) use hscroll::{hscroll_key, scroll_focused_pane};
 pub(in crate::event_loop) use pane::*;
 pub(in crate::event_loop) use shared::*;
 #[allow(unused_imports)]
@@ -149,6 +151,10 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::ToggleSectionCollapse
         | PaletteCommand::ToggleHierarchy => refs::run(cx, cmd, &sel_ref),
         PaletteCommand::RefsFold(..) | PaletteCommand::FilesFold(..) => folds::run(cx, cmd),
+        PaletteCommand::PaneScroll(dir) => {
+            scroll_focused_pane(cx, dir);
+            true
+        }
         PaletteCommand::WorktreeOpenInSelected
         | PaletteCommand::WorktreeMergeSelected
         | PaletteCommand::WorktreeRemoveSelected

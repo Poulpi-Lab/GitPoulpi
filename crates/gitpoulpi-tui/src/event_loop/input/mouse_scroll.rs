@@ -21,6 +21,20 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, g: &Geo, mouse: MouseEvent) -> io:
     // and down by the wheel, sideways by Shift+wheel or a horizontal wheel
     // (the diff view's gestures).
     let shift = mouse.modifiers.contains(KeyModifiers::SHIFT);
+    // A pane whose rows are wider than it (the Refs sections, the file lists,
+    // the commit info) scrolls sideways under a horizontal wheel or
+    // Shift+wheel; one that is not overflowing leaves the event to the
+    // handlers below, as before.
+    let sideways = match mouse.kind {
+        MouseEventKind::ScrollLeft => Some(-1),
+        MouseEventKind::ScrollRight => Some(1),
+        MouseEventKind::ScrollUp if shift => Some(-1),
+        MouseEventKind::ScrollDown if shift => Some(1),
+        _ => None,
+    };
+    if sideways.is_some_and(|n| crate::hscroll::wheel(col, row, n)) {
+        return Ok(Flow::Handled);
+    }
     match mouse.kind {
         MouseEventKind::ScrollLeft if commands::commit_column::on_hwheel(cx, col, row, -1) => {
             return Ok(Flow::Handled)

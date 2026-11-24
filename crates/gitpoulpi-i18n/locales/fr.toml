@@ -10390,3 +10390,13 @@ detail_cancel = "Rien n'est téléchargé ni modifié."
 dlg_hint = "Haut/Bas ou 1-3 pour choisir  Entrée confirme  Échap annule"
 # context: last line of the list of that dialog when more branches exist than fit; {n} is how many
 more = "et {n} autres"
+
+[pane_hscroll]
+# context: keymap label of the key that scrolls the focused list pane (a Refs section, Unstaged, Staged, the changed files, the commit info lines) sideways
+key_left = "Faire défiler le panneau vers la gauche"
+key_right = "Faire défiler le panneau vers la droite"
+pal_left = "Affichage : Faire défiler le panneau vers la gauche"
+pal_right = "Affichage : Faire défiler le panneau vers la droite"
+nothing = "Rien à faire défiler latéralement ici"
+help = "Faire défiler le panneau latéralement (aussi Maj + molette, molette horizontale ou la barre de son bord inférieur)"
+help_details = "Faire défiler les détails du commit latéralement (lignes id, auteur, date et totaux)"

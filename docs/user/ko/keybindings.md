@@ -147,6 +147,8 @@ stage_file = "z"
 | `refs` | `collapse_all` | 모든 폴더 접기 | `-` |
 | `refs` | `expand_below` | 폴더와 하위 폴더 펼치기 | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | 폴더와 하위 폴더 접기 | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | 파일: 경로 또는 트리 | `m` |
 | `log` | `view_all_files` | 파일: 모든 파일 보기 | `a` |
 | `log` | `compare_selection` | 선택한 행 비교 | `v` |
@@ -155,6 +157,8 @@ stage_file = "z"
 | `log` | `pick_column` | 이동하거나 크기를 바꿀 열 고르기 | `Shift+C` |
 | `log` | `scroll_left` | 열을 왼쪽으로 스크롤 | `Shift+Left` |
 | `log` | `scroll_right` | 열을 오른쪽으로 스크롤 | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Mermaid gitGraph로 Commits 복사 | `Shift+Y` |
 | `log_columns` | `next` | 다음 열 고르기 | `Tab` |
 | `log_columns` | `prev` | 이전 열 고르기 | `Shift+BackTab` |
@@ -172,6 +176,8 @@ stage_file = "z"
 | `log_files` | `collapse_all_folders` | 모든 폴더 접기 | `-` |
 | `log_files` | `expand_below` | 폴더와 하위 폴더 펼치기 | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | 폴더와 하위 폴더 접기 | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Commit 메시지로 포커스 | `c` |
 | `status` | `toggle_file_mode` | 파일: 경로 또는 트리 | `m` |
 | `status` | `view_all_files` | 파일: 모든 파일 보기 | `a` |
@@ -184,6 +190,8 @@ stage_file = "z"
 | `status` | `collapse_all_folders` | 모든 폴더 접기 | `-` |
 | `status` | `expand_below` | 폴더와 하위 폴더 펼치기 | `*`, `Shift+Right` |
 | `status` | `collapse_below` | 폴더와 하위 폴더 접기 | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | 저장소 즐겨찾기 추가 또는 해제 | `f`, `*` |
 | `home` | `close_repo` | 행 닫기, 제거 또는 즐겨찾기 해제 | `x`, `Delete` |
 | `home` | `copy_path` | 저장소 경로 복사 | `y` |
@@ -616,6 +624,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Refs: 모든 폴더 접기 | `-` |
 | Refs: 선택한 폴더와 하위 폴더 펼치기 | `*` |
 | Refs: 선택한 폴더와 하위 폴더 접기 | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: 다음 섹션 | `l` |
 | Refs: 이전 섹션 | `h` |
 | Refs: 활성 섹션 펼치기 또는 접기 | `Enter` |

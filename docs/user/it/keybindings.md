@@ -152,6 +152,8 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `refs` | `collapse_all` | Comprimi tutte le cartelle | `-` |
 | `refs` | `expand_below` | Espandi la cartella e le sue sottocartelle | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Comprimi la cartella e le sue sottocartelle | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | File: percorso o albero | `m` |
 | `log` | `view_all_files` | File: vedi tutti i file | `a` |
 | `log` | `compare_selection` | Confronta le righe selezionate | `v` |
@@ -160,6 +162,8 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `log` | `pick_column` | Scegli una colonna da spostare o ridimensionare | `Shift+C` |
 | `log` | `scroll_left` | Scorri le colonne a sinistra | `Shift+Left` |
 | `log` | `scroll_right` | Scorri le colonne a destra | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Copia i commit come Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Scegli la colonna successiva | `Tab` |
 | `log_columns` | `prev` | Scegli la colonna precedente | `Shift+BackTab` |
@@ -177,6 +181,8 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `log_files` | `collapse_all_folders` | Comprimi tutte le cartelle | `-` |
 | `log_files` | `expand_below` | Espandi la cartella e le sue sottocartelle | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Comprimi la cartella e le sue sottocartelle | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Porta il focus sul messaggio di commit | `c` |
 | `status` | `toggle_file_mode` | File: percorso o albero | `m` |
 | `status` | `view_all_files` | File: vedi tutti i file | `a` |
@@ -189,6 +195,8 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `status` | `collapse_all_folders` | Comprimi tutte le cartelle | `-` |
 | `status` | `expand_below` | Espandi la cartella e le sue sottocartelle | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Comprimi la cartella e le sue sottocartelle | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | Aggiungi o togli il repository dai preferiti | `f`, `*` |
 | `home` | `close_repo` | Chiudi, rimuovi o togli dai preferiti la riga | `x`, `Delete` |
 | `home` | `copy_path` | Copia il percorso del repository | `y` |
@@ -627,6 +635,8 @@ applicano. I tasti sono quelli predefiniti.
 | Refs: Comprimi tutte le cartelle | `-` |
 | Refs: Espandi la cartella selezionata e le sue sottocartelle | `*` |
 | Refs: Comprimi la cartella selezionata e le sue sottocartelle | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: Sezione successiva | `l` |
 | Refs: Sezione precedente | `h` |
 | Refs: Espandi o comprimi la sezione attiva | `Enter` |

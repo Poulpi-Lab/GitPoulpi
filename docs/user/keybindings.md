@@ -149,6 +149,8 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `refs` | `collapse_all` | Collapse All Folders | `-` |
 | `refs` | `expand_below` | Expand the Folder and Its Subfolders | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Collapse the Folder and Its Subfolders | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Files: Path or Tree | `m` |
 | `log` | `view_all_files` | Files: View All Files | `a` |
 | `log` | `compare_selection` | Compare the Selected Rows | `v` |
@@ -157,6 +159,8 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `log` | `pick_column` | Pick a Column to Move or Size | `Shift+C` |
 | `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
 | `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Copy Commits as a Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Pick the Next Column | `Tab` |
 | `log_columns` | `prev` | Pick the Previous Column | `Shift+BackTab` |
@@ -174,6 +178,8 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Collapse All Folders | `-` |
 | `log_files` | `expand_below` | Expand the Folder and Its Subfolders | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Collapse the Folder and Its Subfolders | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Focus the Commit Message | `c` |
 | `status` | `toggle_file_mode` | Files: Path or Tree | `m` |
 | `status` | `view_all_files` | Files: View All Files | `a` |
@@ -186,6 +192,8 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Collapse All Folders | `-` |
 | `status` | `expand_below` | Expand the Folder and Its Subfolders | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Collapse the Folder and Its Subfolders | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | Star or Unstar the Repository | `f`, `*` |
 | `home` | `close_repo` | Close, Remove or Unstar the Row | `x`, `Delete` |
 | `home` | `copy_path` | Copy the Repository Path | `y` |
@@ -623,6 +631,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Refs: Collapse All Folders | `-` |
 | Refs: Expand the Selected Folder and Its Subfolders | `*` |
 | Refs: Collapse the Selected Folder and Its Subfolders | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: Next Section | `l` |
 | Refs: Previous Section | `h` |
 | Refs: Expand or Collapse Active Section | `Enter` |

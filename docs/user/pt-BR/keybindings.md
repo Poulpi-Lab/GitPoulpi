@@ -858,6 +858,10 @@ As teclas são as padrão.
 | Radar: adiar... | `z` |
 | Radar: revisar solicitação... | `e` |
 | Radar: abrir a conversa da issue | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: revisar pela API |  |
 | Radar: clonar e revisar... |  |
 | Radar: editar responsáveis... |  |

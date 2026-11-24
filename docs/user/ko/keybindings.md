@@ -853,6 +853,10 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Radar: 미루기... | `z` |
 | Radar: 요청 리뷰... | `e` |
 | Radar: 이슈 대화 열기 | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: API로 리뷰 |  |
 | Radar: 클론 후 리뷰... |  |
 | Radar: 담당자 편집... |  |

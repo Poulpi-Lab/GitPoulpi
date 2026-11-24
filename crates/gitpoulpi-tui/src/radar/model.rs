@@ -128,9 +128,43 @@ pub(crate) struct Item {
     pub(crate) has_conflicts: Option<bool>,
     /// The item mentions the user (whatever group it is in).
     pub(crate) mentioned: bool,
+    /// The integration the row's host calls go through (scope rows too);
+    /// empty for a WIP row.
+    pub(crate) host_id: String,
+    /// `owner/name` on the host, for every row that has a host.
+    pub(crate) host_project: String,
+    /// The provider's name (`GitLab`), for "not supported by ...".
+    pub(crate) host_label: String,
+    /// What the host lets a request or issue do (merge, close, ready).
+    pub(crate) acts: gitpoulpi_hosting::RequestActions,
+    /// A fork request's source owner (`alice` of `alice/app`); empty when
+    /// the source branch is in the repository itself.
+    pub(crate) fork_owner: String,
 }
 
 impl Item {
+    /// `source → target` for a request, `owner:source` when the source is a
+    /// fork's; empty when the host did not say. A missing target leaves the
+    /// source alone, a missing source leaves nothing.
+    pub(crate) fn branches_text(&self) -> String {
+        if self.kind != ItemKind::Pr {
+            return String::new();
+        }
+        let Some(source) = self.branch.as_deref().filter(|b| !b.is_empty()) else {
+            return String::new();
+        };
+        let source = if self.fork_owner.is_empty() {
+            source.to_string()
+        } else {
+            format!("{}:{source}", self.fork_owner)
+        };
+        if self.target.is_empty() {
+            source
+        } else {
+            format!("{source} \u{2192} {}", self.target)
+        }
+    }
+
     /// What "until it changes" watches: the host's `updated_at`, or the WIP
     /// counters.
     pub(crate) fn stamp(&self) -> String {
@@ -283,6 +317,19 @@ impl Board {
                         checks: pr.checks,
                         has_conflicts: pr.has_conflicts,
                         mentioned,
+                        host_id: snap.profile_id.clone().unwrap_or_default(),
+                        host_project: snap.project.clone(),
+                        host_label: snap.kind.map(|k| k.label().to_string()).unwrap_or_default(),
+                        acts: snap
+                            .kind
+                            .map(gitpoulpi_hosting::request_actions)
+                            .unwrap_or_default(),
+                        fork_owner: pr
+                            .source_project
+                            .as_deref()
+                            .and_then(|p| p.split('/').next())
+                            .unwrap_or_default()
+                            .to_string(),
                     });
                 }
             }
@@ -342,6 +389,11 @@ impl Board {
                         checks: None,
                         has_conflicts: None,
                         mentioned,
+                        host_id: target.profile.id.clone(),
+                        host_project: target.project.clone(),
+                        host_label: target.profile.kind.label().to_string(),
+                        acts: gitpoulpi_hosting::request_actions(target.profile.kind),
+                        fork_owner: String::new(),
                     });
                 }
             }
@@ -385,6 +437,11 @@ impl Board {
                 checks: None,
                 has_conflicts: None,
                 mentioned: false,
+                host_id: String::new(),
+                host_project: String::new(),
+                host_label: String::new(),
+                acts: Default::default(),
+                fork_owner: String::new(),
             });
         }
         // Newest first inside a group (ISO stamps sort chronologically); a

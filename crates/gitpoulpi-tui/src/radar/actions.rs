@@ -7,7 +7,9 @@
 //!
 //! Slots are fixed per frame (a row without a button leaves its cell empty),
 //! so the same button sits in the same column on every row. Narrow, the
-//! primary button's word becomes a glyph before any other column goes.
+//! primary button's word becomes a glyph before any other column goes, and
+//! the host buttons (Ready, Merge, Close, Clone) leave the column before the
+//! title does: they stay in the row menu (`⋮`), which always lists them.
 
 use super::{Act, Item, ItemKind};
 use crate::display_width;
@@ -18,6 +20,10 @@ const BROWSER_GLYPH: &str = crate::theme::REMOTE_ICON;
 const CONVERSATION_GLYPH: &str = "\u{2261}";
 const REVIEW_GLYPH: &str = "\u{25CE}";
 const START_GLYPH: &str = "\u{2192}";
+const READY_GLYPH: &str = "\u{00BB}";
+const MERGE_GLYPH: &str = "\u{2295}";
+const CLOSE_GLYPH: &str = "\u{00D7}";
+const CLONE_GLYPH: &str = "\u{21E3}";
 
 /// Which button of the column.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -25,6 +31,18 @@ pub(crate) enum Slot {
     Primary,
     Browser,
     Conversation,
+    /// The host buttons: they are the first to leave a narrow column.
+    Ready,
+    Merge,
+    Close,
+    Clone,
+}
+
+impl Slot {
+    /// A host button (leaves a narrow column first).
+    pub(super) fn is_host(self) -> bool {
+        matches!(self, Slot::Ready | Slot::Merge | Slot::Close | Slot::Clone)
+    }
 }
 
 /// One button of a row.
@@ -52,13 +70,21 @@ impl Button {
             Act::OpenBrowser => 'o',
             Act::Review => 'e',
             Act::StartWork => 'n',
+            Act::Merge => 'm',
+            Act::CloseItem => 'x',
+            Act::Ready => 'y',
+            Act::CloneRepo => 'g',
             _ => 'i',
         }
     }
 
     /// The tooltip: the action and its key.
-    pub(super) fn tip(&self) -> String {
-        format!("{} ({})", super::act_label(self.act), self.key())
+    pub(super) fn tip(&self, item: &Item) -> String {
+        let base = format!("{} ({})", super::act_label(self.act), self.key());
+        match super::host_acts::why_not(item, self.act) {
+            Some(why) => format!("{base}: {why}"),
+            None => base,
+        }
     }
 }
 
@@ -103,6 +129,44 @@ pub(super) fn buttons(item: &Item) -> Vec<Button> {
             label: "",
         });
     }
+    // The host's writes, after the others.
+    let request = item.kind == ItemKind::Pr;
+    if request && item.draft && item.acts.ready {
+        out.push(Button {
+            slot: Slot::Ready,
+            act: Act::Ready,
+            glyph: READY_GLYPH,
+            label: "",
+        });
+    }
+    if request && item.acts.merge {
+        out.push(Button {
+            slot: Slot::Merge,
+            act: Act::Merge,
+            glyph: MERGE_GLYPH,
+            label: "",
+        });
+    }
+    if matches!(item.kind, ItemKind::Pr | ItemKind::Issue) && item.acts.close {
+        out.push(Button {
+            slot: Slot::Close,
+            act: Act::CloseItem,
+            glyph: CLOSE_GLYPH,
+            label: "",
+        });
+    }
+    if !cloned
+        && matches!(item.kind, ItemKind::Pr | ItemKind::Issue)
+        && !item.clone_url.is_empty()
+        && !item.integration.is_empty()
+    {
+        out.push(Button {
+            slot: Slot::Clone,
+            act: Act::CloneRepo,
+            glyph: CLONE_GLYPH,
+            label: "",
+        });
+    }
     out
 }
 
@@ -114,6 +178,10 @@ pub(super) struct Spec {
     pub(super) primary: bool,
     pub(super) browser: bool,
     pub(super) conversation: bool,
+    pub(super) ready: bool,
+    pub(super) merge: bool,
+    pub(super) close: bool,
+    pub(super) clone: bool,
 }
 
 impl Spec {
@@ -128,6 +196,10 @@ impl Spec {
                     }
                     Slot::Browser => spec.browser = true,
                     Slot::Conversation => spec.conversation = true,
+                    Slot::Ready => spec.ready = true,
+                    Slot::Merge => spec.merge = true,
+                    Slot::Close => spec.close = true,
+                    Slot::Clone => spec.clone = true,
                 }
             }
         }
@@ -135,7 +207,23 @@ impl Spec {
     }
 
     pub(super) fn any(&self) -> bool {
-        self.primary || self.browser || self.conversation
+        self.primary || self.browser || self.conversation || self.has_extras()
+    }
+
+    /// Whether any row has a host button.
+    pub(super) fn has_extras(&self) -> bool {
+        self.ready || self.merge || self.close || self.clone
+    }
+
+    /// The same column without the host buttons (what a narrow window keeps).
+    pub(super) fn core(self) -> Self {
+        Self {
+            ready: false,
+            merge: false,
+            close: false,
+            clone: false,
+            ..self
+        }
     }
 
     /// The width of one slot (a space either side of its text).
@@ -144,7 +232,7 @@ impl Spec {
             Slot::Primary if !icons => self.primary_word + 2,
             Slot::Primary => 3,
             Slot::Browser => display_width(BROWSER_GLYPH) + 2,
-            Slot::Conversation => 3,
+            Slot::Conversation | Slot::Ready | Slot::Merge | Slot::Close | Slot::Clone => 3,
         }
     }
 
@@ -159,6 +247,16 @@ impl Spec {
         }
         if self.conversation {
             out.push(Slot::Conversation);
+        }
+        for (on, slot) in [
+            (self.ready, Slot::Ready),
+            (self.merge, Slot::Merge),
+            (self.close, Slot::Close),
+            (self.clone, Slot::Clone),
+        ] {
+            if on {
+                out.push(slot);
+            }
         }
         out
     }

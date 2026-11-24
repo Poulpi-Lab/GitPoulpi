@@ -24,6 +24,10 @@ pub(crate) fn act_label(act: Act) -> &'static str {
         Act::Conversation => gitpoulpi_i18n::msg::item_view::OPEN_CONVERSATION.get(),
         Act::ReviewApi => msg::radar::CHOICE_API.get(),
         Act::CloneReview => msg::radar::CHOICE_CLONE.get(),
+        Act::Merge => msg::radar::ACT_MERGE.get(),
+        Act::CloseItem => msg::radar::ACT_CLOSE.get(),
+        Act::Ready => msg::radar::ACT_READY.get(),
+        Act::CloneRepo => msg::radar::ACT_CLONE.get(),
         Act::TurnOn => msg::radar::ACT_TURN_ON.get(),
         Act::FitAllColumns => msg::log_draw::COLUMN_MENU_FIT_ALL.get(),
         // The menu row names the column (`column_menu_fit`); this is only the

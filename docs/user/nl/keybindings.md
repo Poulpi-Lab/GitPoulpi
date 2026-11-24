@@ -864,6 +864,10 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Radar: Uitstellen... | `z` |
 | Radar: Verzoek reviewen... | `e` |
 | Radar: Issuegesprek openen | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: Reviewen via de API |  |
 | Radar: Klonen en reviewen... |  |
 | Radar: Toegewezenen bewerken... |  |

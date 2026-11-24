@@ -1946,6 +1946,30 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     )
     .requires(crate::build_features::Feature::Radar),
     entry(
+        msg::palette::RADAR_MERGE,
+        "m",
+        PaletteCommand::Radar(RadarCommand::Act(RadarAct::Merge)),
+    )
+    .requires(crate::build_features::Feature::Radar),
+    entry(
+        msg::palette::RADAR_CLOSE,
+        "x",
+        PaletteCommand::Radar(RadarCommand::Act(RadarAct::CloseItem)),
+    )
+    .requires(crate::build_features::Feature::Radar),
+    entry(
+        msg::palette::RADAR_READY,
+        "y",
+        PaletteCommand::Radar(RadarCommand::Act(RadarAct::Ready)),
+    )
+    .requires(crate::build_features::Feature::Radar),
+    entry(
+        msg::palette::RADAR_CLONE,
+        "g",
+        PaletteCommand::Radar(RadarCommand::Act(RadarAct::CloneRepo)),
+    )
+    .requires(crate::build_features::Feature::Radar),
+    entry(
         msg::palette::RADAR_REVIEW_API,
         "",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::ReviewApi)),

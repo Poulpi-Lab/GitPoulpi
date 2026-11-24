@@ -80,6 +80,8 @@ struct Widths {
 const TITLE_KEEP: usize = 8;
 /// Cells the title keeps to let the Actions column keep its words.
 const TITLE_KEEP_WORDS: usize = 24;
+/// Cells the title keeps to let the Actions column keep its host buttons.
+const TITLE_KEEP_HOST: usize = 30;
 
 impl Geo {
     fn new(body: Rect, w: Widths) -> Self {
@@ -120,16 +122,30 @@ impl Geo {
         let width_of = |t: &[(u8, usize)]| -> usize { t.iter().map(|(_, t)| t + 2).sum() };
         let mut tail = others(room);
         let mut actions = None;
+        let mut spec = w.actions;
         if w.actions.any() {
-            let (full, icons) = (w.actions.width(false), w.actions.width(true));
             let free = room.saturating_sub(width_of(&tail) + 1);
-            if free >= full + 2 + TITLE_KEEP_WORDS {
-                actions = Some((full, false));
-            } else if free >= icons + 2 + TITLE_KEEP {
-                actions = Some((icons, true));
-            } else if room >= icons + 2 + TITLE_KEEP {
+            // From the richest column to the poorest: the host buttons go
+            // before the words do, and the words before the other columns.
+            let core = w.actions.core();
+            let tiers = [
+                (w.actions, false, TITLE_KEEP_WORDS.max(TITLE_KEEP_HOST)),
+                (w.actions, true, TITLE_KEEP_HOST),
+                (core, false, TITLE_KEEP_WORDS),
+                (core, true, TITLE_KEEP),
+            ];
+            for (candidate, icons, keep) in tiers {
+                if candidate.any() && free >= candidate.width(icons) + 2 + keep {
+                    actions = Some((candidate.width(icons), icons));
+                    spec = candidate;
+                    break;
+                }
+            }
+            let icons = w.actions.core().width(true);
+            if actions.is_none() && room >= icons && icons > 0 && room >= icons + 2 + TITLE_KEEP {
                 tail = others(room.saturating_sub(icons + 2));
                 actions = Some((icons, true));
+                spec = core;
             }
         }
         if let Some((aw, _)) = actions {
@@ -149,7 +165,7 @@ impl Geo {
             author: None,
             age: None,
             actions: None,
-            spec: w.actions,
+            spec,
         };
         let mut tx = edge.saturating_sub(tail_w as u16);
         for (kind, width) in tail {
@@ -185,6 +201,22 @@ impl Geo {
         }
         out
     }
+}
+
+/// How the title's room is shared with the branches: `(title cells, branch
+/// cells)`. Both fit whole when they can; else the branches keep up to a
+/// third of the room (at least 12 cells) and the title the rest; a room under
+/// 40 cells is the title's alone.
+pub(super) fn plan_title(room: usize, title: usize, branches: usize) -> (usize, usize) {
+    if branches == 0 || room < 40 {
+        return (room, 0);
+    }
+    if title + 2 + branches <= room {
+        return (title, branches);
+    }
+    let floor = branches.min((room / 3).max(12));
+    let title_cells = title.min(room - floor - 2);
+    (title_cells, (room - title_cells - 2).min(branches))
 }
 
 /// Whether the host said anything about a row's checks or conflicts.
@@ -254,6 +286,7 @@ impl RadarUi {
         self.paint_tooltip(frame, body, hover_blocked);
         // The question, then the hosted review: last, over everything.
         self.paint_choice(frame.buffer_mut(), body);
+        self.paint_confirm(frame.buffer_mut(), body);
         if let Some(view) = self.api_review.as_mut() {
             view.render_all(body, frame.buffer_mut());
         }
@@ -283,7 +316,7 @@ impl RadarUi {
             Hit::Action(_, slot) => super::actions::buttons(item)
                 .into_iter()
                 .find(|b| b.slot == slot)
-                .map(|b| vec![b.tip()])
+                .map(|b| vec![b.tip(item)])
                 .unwrap_or_default(),
             // A cut cell: its full text, wrapped to a readable width.
             Hit::Cut(_, cell) => {
@@ -943,12 +976,31 @@ impl RadarUi {
         let state = state_chip(item);
         let title_w = geo.title_w;
         let title = row_title(item);
-        let shown = put(buf, x, y, &title, title_w as u16, text);
+        let branches = item.branches_text();
+        let (title_cells, branch_cells) =
+            plan_title(title_w, display_width(&title), display_width(&branches));
+        let shown = put(buf, x, y, &title, title_cells as u16, text);
         if display_width(&title) > shown.width as usize {
             self.hits.push((
                 Rect::new(x, y, shown.width, 1),
                 Hit::Cut(offset, Cell::Title),
             ));
+        }
+        // A request's `source → target` after the title, cut with an
+        // ellipsis (the target goes first) before it costs the title or the
+        // columns at the right anything.
+        if branch_cells > 0 {
+            let r = put(
+                buf,
+                shown.right() + 2,
+                y,
+                super::columns::fit_pad(&branches, branch_cells).trim_end(),
+                branch_cells as u16,
+                muted,
+            );
+            if display_width(&branches) > branch_cells {
+                self.hits.push((r, Hit::Cut(offset, Cell::Branches)));
+            }
         }
         // Labels after the title, when there is room.
         if !item.labels.is_empty() {
@@ -1023,14 +1075,15 @@ impl RadarUi {
                 let text = b.text(icons);
                 // Centered in its cell, so a short word sits like the others.
                 let pad = width.saturating_sub(display_width(&text));
-                let r = put(
-                    buf,
-                    x + (pad / 2) as u16,
-                    y,
-                    &text,
-                    width as u16,
-                    button(hover == Some(hit)),
-                );
+                // A host button that cannot run now is grayed (its tooltip and
+                // the status line say why).
+                let style = if b.slot.is_host() && super::host_acts::why_not(item, b.act).is_some()
+                {
+                    Style::default().fg(th().ui.muted)
+                } else {
+                    button(hover == Some(hit))
+                };
+                let r = put(buf, x + (pad / 2) as u16, y, &text, width as u16, style);
                 self.hits.push((r, hit));
             }
             x += width as u16 + 1;

@@ -9,7 +9,7 @@ impl RadarUi {
     }
 
     pub(crate) fn animating(&self) -> bool {
-        self.in_flight || self.api_busy() || self.item_busy()
+        self.in_flight || self.api_busy() || self.item_busy() || self.acting.is_some()
     }
 
     /// When the dwell on the checks glyphs ends, if it is still running.
@@ -96,7 +96,7 @@ impl RadarUi {
     pub(crate) fn nav_targets(&self) -> Vec<(Rect, Spot)> {
         // The hosted review is badged by nobody (like the other review
         // pages); the choice dialog badges its own controls only.
-        if self.api_review.is_some() || self.api_item.is_some() {
+        if self.api_review.is_some() || self.api_item.is_some() || self.confirm.is_some() {
             return Vec::new();
         }
         if let Some(asking) = &self.asking {
@@ -215,6 +215,9 @@ impl RadarUi {
         if self.asking.is_some() {
             return self.choice_key(key);
         }
+        if self.confirm.is_some() {
+            return self.confirm_key(key);
+        }
         // A combobox popup is modal.
         for which in [Hit::Scope, Hit::View, Hit::Who, Hit::Snooze] {
             if self.combo_of(which).is_open() {
@@ -284,6 +287,10 @@ impl RadarUi {
             KeyCode::Char('t') => self.run(Act::Worktree),
             KeyCode::Char('s') => self.run(Act::Show),
             KeyCode::Char('n') => self.run(Act::StartWork),
+            KeyCode::Char('m') => self.run(Act::Merge),
+            KeyCode::Char('x') => self.run(Act::CloseItem),
+            KeyCode::Char('y') => self.run(Act::Ready),
+            KeyCode::Char('g') => self.run(Act::CloneRepo),
             KeyCode::Char('p') => self.run(Act::Pin),
             KeyCode::Char('z') => self.run(Act::Snooze),
             KeyCode::Char('u') => self.run(Act::Unsnooze),
@@ -473,7 +480,10 @@ impl RadarUi {
 
     /// Whether a popup (a combobox list, the row menu) owns the pointer.
     pub(crate) fn popup_open(&self) -> bool {
-        self.any_combo_open() || self.menu.is_some() || self.asking.is_some()
+        self.any_combo_open()
+            || self.menu.is_some()
+            || self.asking.is_some()
+            || self.confirm.is_some()
     }
 
     pub(crate) fn on_mouse(&mut self, mouse: MouseEvent, double: bool) -> Outcome {
@@ -487,6 +497,10 @@ impl RadarUi {
         if self.asking.is_some() {
             self.hover = None;
             return self.choice_mouse(mouse);
+        }
+        if self.confirm.is_some() {
+            self.hover = None;
+            return self.confirm_mouse(mouse);
         }
         // A separator drag owns the pointer until the button comes up.
         if self.col_drag.is_some() {

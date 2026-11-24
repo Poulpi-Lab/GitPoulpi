@@ -826,6 +826,10 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Radar: 保留... | `z` |
 | Radar: リクエストをレビュー... | `e` |
 | Radar: Issue の会話を開く | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: API 経由でレビュー |  |
 | Radar: クローンしてレビュー... |  |
 | Radar: 担当者を編集... |  |

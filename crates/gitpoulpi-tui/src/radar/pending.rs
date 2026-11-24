@@ -36,9 +36,16 @@ pub(crate) enum Pending {
     /// whose window runs it when the action leaves a window that is not that
     /// repository's (the workspace search); the Radar ends its own
     /// window first, so it leaves `None`.
+    ///
+    /// `link` is `(integration, project)` for a request of an account-wide
+    /// row opened through a clone the machine only knew by its remote: that
+    /// repository is not linked to the host yet, so its window would list no
+    /// request and the review would never start. The link is written (when
+    /// the repository has none) before the window starts.
     Review {
         number: u64,
         repo: Option<std::path::PathBuf>,
+        link: Option<(String, String)>,
     },
 }
 

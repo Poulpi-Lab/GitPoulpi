@@ -346,6 +346,20 @@ impl HostingClient for AssignmentGuard {
         self.check(project, some_and_not_empty(&edit.assignees))?;
         self.inner.update_pull_request(project, number, edit).await
     }
+    async fn merge_pull_request(
+        &self,
+        project: &str,
+        number: u64,
+        method: crate::request_actions::MergeMethod,
+    ) -> Result<()> {
+        self.inner.merge_pull_request(project, number, method).await
+    }
+    async fn close_pull_request(&self, project: &str, number: u64) -> Result<()> {
+        self.inner.close_pull_request(project, number).await
+    }
+    async fn mark_pull_request_ready(&self, project: &str, number: u64) -> Result<()> {
+        self.inner.mark_pull_request_ready(project, number).await
+    }
     async fn pull_request_diff(
         &self,
         project: &str,

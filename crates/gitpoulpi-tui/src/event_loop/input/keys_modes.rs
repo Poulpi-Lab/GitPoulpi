@@ -908,6 +908,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                             crate::radar::pending::set(crate::radar::pending::Pending::Review {
                                 number,
                                 repo: Some(repo),
+                                link: None,
                             });
                             cx.ui_viewer.go(intent);
                             *cx.input_mode = InputMode::Normal;

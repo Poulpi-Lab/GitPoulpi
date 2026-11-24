@@ -859,6 +859,10 @@ zastosowania. Klawisze są domyślne.
 | Radar: Odłóż... | `z` |
 | Radar: Przejrzyj żądanie... | `e` |
 | Radar: Otwórz rozmowę zgłoszenia | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: Przejrzyj przez API |  |
 | Radar: Sklonuj i przejrzyj... |  |
 | Radar: Edytuj przypisanych... |  |

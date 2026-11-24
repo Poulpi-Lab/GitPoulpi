@@ -578,6 +578,15 @@ pub(in crate::event_loop) fn apply_radar_outcome(
         // `radar::pending`.
         Outcome::OpenRepo(path, pending) => {
             if let Some(pending) = pending {
+                // A known clone that was never linked to the host: link it so
+                // its window lists the request the review starts from.
+                if let crate::radar::pending::Pending::Review {
+                    link: Some((integration, project)),
+                    ..
+                } = &pending
+                {
+                    crate::after_clone::link_if_unlinked(&path, integration, project);
+                }
                 crate::radar::pending::set(pending);
             }
             let said = tab_ctx!(cx).switcher_action(repo_switcher::SwitcherAction::Open(path));
@@ -597,6 +606,17 @@ pub(in crate::event_loop) fn apply_radar_outcome(
         }
         Outcome::ApiReview(request) => open_api_review(cx, *request),
         Outcome::ApiConversation(request) => open_api_conversation(cx, *request),
+        // The ordinary Clone dialog, prefilled, with no review to carry.
+        Outcome::CloneRepo(request) => {
+            let note = msg::radar::msg_clone_note(&request.project);
+            cx.repo_dialogs.open_clone_for_radar(
+                &request.clone_url,
+                &request.integration,
+                &request.project,
+                note,
+                cx.cwd,
+            );
+        }
         // The ordinary Clone dialog, prefilled; the clone's end carries the
         // review on (`after_clone`).
         Outcome::CloneReview(request) => {

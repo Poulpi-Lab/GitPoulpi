@@ -278,7 +278,8 @@ fn review_is_offered_where_the_review_view_exists() {
             app,
             Some(Pending::Review {
                 number: 2,
-                repo: None
+                repo: None,
+                link: None
             })
         )
     );

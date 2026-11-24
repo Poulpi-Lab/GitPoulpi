@@ -862,6 +862,10 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Radar: Snooze... | `z` |
 | Radar: Review Request... | `e` |
 | Radar: Open Issue Conversation | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: Review Through the API |  |
 | Radar: Clone and Review... |  |
 | Radar: Edit Assignees... |  |

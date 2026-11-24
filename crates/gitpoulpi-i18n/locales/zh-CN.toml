@@ -1839,6 +1839,62 @@ scope_unset = "{name}（请在设置中指定）"
 note_unlinked = "未关联：仅显示其进行中的工作"
 # context: status line of a folder scope: how many of its repositories are not linked to a host
 status_unlinked = { one = "{n} 个未关联（仅显示进行中的工作）", other = "{n} 个未关联（仅显示进行中的工作）" }
+# context: menu label and tooltip of a Radar request: merges it on the host, after a confirmation
+act_merge = "{$Merge}..."
+# context: menu label and tooltip of a Radar request or issue: closes it on the host, after a confirmation
+act_close = "Close..."
+# context: menu label and tooltip of a draft Radar request: takes it out of draft on the host
+act_ready = "Mark as ready"
+# context: menu label and tooltip of a Radar row whose repository is not cloned: opens the Clone dialog
+act_clone = "Clone repository..."
+# context: button of the Radar merge / close confirmation
+confirm_cancel = "Cancel"
+# context: button of the Radar close confirmation
+confirm_close = "Close it"
+# context: button of the Radar merge confirmation: a merge commit
+method_merge = "{$Merge} {$commit}"
+# context: button of the Radar merge confirmation: squash the commits, then merge
+method_squash = "Squash and {$merge}"
+# context: button of the Radar merge confirmation: rebase the commits, then merge
+method_rebase = "{$Rebase} and {$merge}"
+# context: title of the Radar merge confirmation; {label} is `!53` or `#12`
+merge_title = "{$Merge} {label}"
+# context: body of the Radar merge confirmation; {project} is `owner/name`, {branches} is `source → target`
+merge_body = "{title}\n{project}  {branches}\n\nThe host will {$merge} it with the method you pick. This changes the host and cannot be undone from GitPoulpi."
+# context: title of the Radar close confirmation; {label} is `!53` or `#12`
+close_title = "Close {label}"
+# context: body of the Radar close confirmation for a request
+close_body = "{title}\n{project}  {branches}\n\nThe host closes it without a {$merge}. This changes the host and cannot be undone from GitPoulpi (reopen it there)."
+# context: body of the Radar close confirmation for an issue
+close_issue_body = "{title}\n{project}\n\nThe host closes the issue. This changes the host and cannot be undone from GitPoulpi (reopen it there)."
+# context: why a Radar host action is refused
+why_no_host = "This row has no host account to act on"
+# context: why a Radar host action is refused; {host} is the provider name
+why_not_supported = "Not supported by {host}"
+# context: why Radar Merge is refused
+why_merge_draft = "It is a draft: mark it as ready first"
+# context: why Radar Merge is refused; {target} is a branch
+why_merge_conflicts = "It conflicts with {target}"
+# context: why Radar Merge is refused
+why_merge_checks = "Its checks are failing"
+# context: why Radar Mark as ready is refused
+why_not_draft = "It is not a draft"
+# context: why Radar Clone is refused; {path} is a folder
+why_already_cloned = "Already cloned at {path}"
+# context: status line of the Radar
+msg_host_busy = "The host is still answering the last action"
+# context: status line of the Radar while a host action runs
+msg_asking_host = "Asking the host..."
+# context: status line of the Radar after a merge; {label} is `!53`
+msg_merged = "{label} {$merge}d on the host"
+# context: status line of the Radar after a close
+msg_closed = "{label} closed on the host"
+# context: status line of the Radar after Mark as ready
+msg_ready = "{label} is ready for review"
+# context: status line of the Radar when a host action failed
+msg_host_failed = "{label}: the host refused or failed: {why}"
+# context: note under the Clone dialog opened from a Radar row
+msg_clone_note = "Cloning {project}. The Radar finds the clone the next time it opens."
 
 [hosting_task]
 view_open = "打开"
@@ -3742,6 +3798,14 @@ radar_review = "Radar：评审请求…"
 radar_review_api = "Radar：通过 API 评审"
 # context: command palette entry: opens the Clone dialog for the selected Radar request, then its review
 radar_clone_review = "Radar：克隆并评审…"
+# context: command palette entry: merges the selected Radar request on the host
+radar_merge = "Radar: {$Merge} Request..."
+# context: command palette entry: closes the selected Radar request or issue on the host
+radar_close = "Radar: Close..."
+# context: command palette entry: takes the selected Radar draft out of draft
+radar_ready = "Radar: Mark as Ready"
+# context: command palette entry: opens the Clone dialog for the selected Radar row
+radar_clone = "Radar: Clone Repository..."
 # context: command palette entry: toggles the Not cloned checkbox of the Radar
 radar_not_cloned = "Radar：显示未克隆的请求"
 # context: command palette entry: toggles the Drafts checkbox of the Radar

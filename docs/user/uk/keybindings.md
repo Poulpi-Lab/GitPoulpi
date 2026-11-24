@@ -854,6 +854,10 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Radar: відкласти... | `z` |
 | Radar: рев'ю запиту... | `e` |
 | Radar: відкрити бесіду issue | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: рев'ю через API |  |
 | Radar: клонувати й зробити рев'ю... |  |
 | Radar: змінити виконавців... |  |

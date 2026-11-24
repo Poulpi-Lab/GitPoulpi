@@ -23,6 +23,7 @@ mod account_fs;
 mod account_ui;
 mod actions;
 mod columns;
+mod host_acts;
 mod input;
 mod item_host;
 mod labels;
@@ -60,7 +61,8 @@ use model::{Board, BoardInput, Group, Heading, Item, ItemKind, Row, View, Who, W
 use pending::Pending;
 use scope::{ScopeChoice, ScopeRepo, BROWSE_FOLDER, CLONE_FOLDER, OPEN_TABS};
 pub(crate) use vocab::{
-    Act, ColumnCmd, ConversationRequest, Outcome, RadarCommand, ReviewRequest, SizedColumn, Spot,
+    Act, CloneRequest, ColumnCmd, ConversationRequest, Outcome, RadarCommand, ReviewRequest,
+    SizedColumn, Spot,
 };
 use worker::{FsPrepare, Msg, RadarWorker, RepoAnswer, Setup};
 
@@ -112,6 +114,8 @@ pub(crate) enum Cell {
     /// The age column.
     Age,
     Labels,
+    /// A request's `source → target`.
+    Branches,
 }
 
 /// A repository with something to say (an error, a missing link).
@@ -464,6 +468,9 @@ pub(crate) struct RadarUi {
     mode_hint: Option<String>,
     /// The review choice dialog, when a Review asks.
     asking: Option<review_flow::Asking>,
+    /// The confirmation of a Merge or Close, and the host call in flight.
+    confirm: Option<host_acts::Asked>,
+    acting: Option<host_acts::Acting>,
     /// The review through the API, hosted over the Radar (`review_flow`).
     api_review: Option<Box<crate::review_view::ReviewView>>,
     /// The view was just opened by its tab: the review left open last time
@@ -571,6 +578,8 @@ impl RadarUi {
             message: None,
             mode_hint: None,
             asking: None,
+            confirm: None,
+            acting: None,
             api_review: None,
             resume_pending: false,
             api_item: None,
@@ -654,7 +663,7 @@ impl RadarUi {
     /// The worker's answers, the probe's facts, and a snooze that ended by
     /// the clock. True when something on screen changed.
     pub(crate) fn poll(&mut self) -> bool {
-        let mut changed = self.api_poll() | self.item_poll();
+        let mut changed = self.api_poll() | self.item_poll() | self.acting_poll();
         if let Some(Ok((scope, found))) = self.scan.as_ref().map(|rx| rx.try_recv()) {
             self.scan = None;
             if scope == self.scope {
@@ -1168,6 +1177,8 @@ impl RadarUi {
                 ),
             },
             Act::Review | Act::ReviewApi | Act::CloneReview => self.review(item, act),
+            Act::Merge | Act::CloseItem | Act::Ready => self.host_act(&item, act),
+            Act::CloneRepo => self.clone_repo(&item),
             Act::Link | Act::Reconnect | Act::TurnOn | Act::FitColumn(_) | Act::FitAllColumns => {
                 Outcome::None
             }
@@ -1303,6 +1314,31 @@ impl RadarUi {
                 act_label(Act::Conversation),
                 Act::Conversation,
             ));
+        }
+        // The host's own writes: always listed, grayed with the reason.
+        if matches!(item.kind, ItemKind::Pr | ItemKind::Issue) {
+            out.push(Entry::Separator);
+            let mut acts: Vec<Act> = Vec::new();
+            if item.kind == ItemKind::Pr {
+                if item.draft {
+                    acts.push(Act::Ready);
+                }
+                acts.push(Act::Merge);
+            }
+            acts.push(Act::CloseItem);
+            acts.push(Act::CloneRepo);
+            for act in acts {
+                out.push(match host_acts::why_not(item, act) {
+                    Some(why) => Entry::disabled(format!("{} ({why})", act_label(act)), &why),
+                    None if matches!(act, Act::Merge | Act::CloseItem) => Entry::Action {
+                        label: act_label(act).to_string(),
+                        action: act,
+                        destructive: true,
+                        key: None,
+                    },
+                    None => Entry::action(act_label(act), act),
+                });
+            }
         }
         if item.meta && cloned {
             out.push(Entry::Separator);

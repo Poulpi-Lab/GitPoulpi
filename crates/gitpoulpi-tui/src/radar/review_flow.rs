@@ -147,6 +147,8 @@ impl RadarUi {
                 Some(Pending::Review {
                     number: item.number,
                     repo: None,
+                    link: (!item.integration.is_empty())
+                        .then(|| (item.integration.clone(), item.host_project.clone())),
                 }),
             ),
             Pick::Api => Outcome::ApiReview(Box::new(Self::request_of(item))),

@@ -50,9 +50,14 @@ una de las columnas redimensionables). Un doble clic o `Enter` sobre una solicit
 
 ### Las ramas de una solicitud
 
-Una fila de solicitud muestra `origen → destino` tras su título (`alice:feature/login → main` cuando la rama de origen está en un fork).
-Cuando falta espacio se corta primero el destino (puntos suspensivos), el título conserva la mayor parte del espacio, y en una ventana estrecha las
-ramas no se muestran; la columna Acciones nunca se empuja fuera. Deja el puntero sobre un texto cortado para verlo entero. Un host que
+Una fila de solicitud muestra `origen → destino` en la columna **Ramas**, justo después del repositorio (`alice:feature/login → main`
+cuando la rama de origen está en un fork); una fila de issue deja la celda vacía, y un Radar sin ninguna solicitud que indique sus ramas
+no tiene esa columna. Cuando la celda es demasiado estrecha se corta primero el origen (puntos suspensivos) y el destino se conserva entero
+mientras pueda. La columna se encoge antes de desaparecer: en una ventana estrecha es la última de las columnas opcionales en irse
+(después del estado, el autor y la antigüedad, antes del repositorio y el título); cuando ya no está, las ramas completas siguen en el
+tooltip del título y en la línea de estado de la fila seleccionada. Una columna de autor ancha que ajustaste tú cede ante el título
+y las ramas. La columna Acciones nunca se empuja fuera. Deja el puntero sobre un texto cortado para verlo entero. GitHub y Gitea listan las
+solicitudes sin sus ramas, así que el Radar las lee después de la lista (una vez por solicitud hasta que cambia). Un host que
 no indicó las ramas no muestra nada ahí. Una fila de issue nombra su repositorio en el mismo chip que una fila de solicitud (el
 nombre de carpeta del clon, o `owner/name` cuando no está clonado).
 
@@ -166,7 +171,7 @@ las respuestas.
 
 ### Columnas
 
-El chip del repositorio, el `#` (número y marcas de checks), el autor y la antigüedad son **columnas ajustables**. En automático, la columna del repositorio es tan ancha
+El chip del repositorio, las ramas, el `#` (número y marcas de checks), el autor y la antigüedad son **columnas ajustables**. En automático, la columna del repositorio es tan ancha
 como el nombre más largo en pantalla (hasta 40 celdas, y como máximo un tercio de la ventana), así que `owner/name` y el
 `group/sub/project` de una lista de cuenta no se cortan en un terminal normal. El título ocupa lo que queda. Un nombre
 que no cabe termina en puntos suspensivos (`group/sub...`), y:
@@ -175,7 +180,7 @@ que no cabe termina en puntos suspensivos (`group/sub...`), y:
   texto completo. Selecciona la fila y la línea de estado bajo el filtro también nombra el proyecto y el título
   completos, así que el teclado ve lo mismo.
 - **Arrastra el separador** (la celda justo después del nombre del repositorio, después del `#`, o justo antes del autor o de la edad) para ajustar la
-  columna; haz **doble clic** en él para volver a ajustarla automáticamente. La lista tiene una **fila de cabecera** (repositorio, `#`,
+  columna; haz **doble clic** en él para volver a ajustarla automáticamente. La lista tiene una **fila de cabecera** (repositorio, ramas, `#`,
   título, autor, edad) y los separadores siguen `ui.column_resize` como los del Log: con `line` (el
   valor por defecto) un `│` atenuado descansa en el separador en la fila de cabecera, y mientras el puntero está sobre el separador
   (en la cabecera o en cualquier fila de la lista), la columna está elegida con las teclas o arrastras, se dibuja una línea fina de acento
@@ -189,7 +194,7 @@ que no cabe termina en puntos suspensivos (`group/sub...`), y:
   **`[`** la estrecha, **`0`** devuelve todas las columnas a automático, `Esc` sale. La paleta tiene lo mismo:
   `Radar: Elegir columna`, `Radar: Ensanchar columna`, `Radar: Estrechar columna`, `Radar: Restablecer anchos de columna`.
 
-Los anchos se guardan en `radar.toml` (`[columns]`, `repo`, `number`, `author` y `age`, en celdas) y sobreviven a un reinicio. Son los
+Los anchos se guardan en `radar.toml` (`[columns]`, `repo`, `branches`, `number`, `author` y `age`, en celdas; un archivo sin `branches` se carga como antes y la columna se ajusta entonces a su contenido hasta 28 celdas) y sobreviven a un reinicio. Son los
 mismos gestos de ajuste que las columnas del Log.
 
 ### Checks y conflictos
@@ -228,18 +233,26 @@ Las solicitudes cerradas y fusionadas y los issues cerrados no se listan.
 
 ## Vistas y filtros
 
-Tres comboboxes y un campo de texto acotan la lista. Cada elección es un
+Cuatro comboboxes y un campo de texto acotan la lista. Cada elección es un
 desplegable: haz clic en él, o usa su tecla.
 
 - **Vista** (`v`): Todo, solicitudes, Issues, WIP (trabajo en curso), Pospuestos.
 - **Mostrar** (`f`): Todos, Míos (solicitudes que escribiste, issues que
   creaste), Asignados a mí, Revisión solicitada, Me mencionan.
 - **Ámbito** (`w`): ver arriba.
+- **Perfil** (`P`): Todos los perfiles, o un perfil de integración de Ajustes > Integraciones (con el nombre
+  que le da Ajustes, y su proveedor añadido cuando dos perfiles comparten nombre). Reduce todas las
+  secciones, las filas de los repositorios y las de toda la cuenta por igual, a las filas de ese perfil (una
+  fila de trabajo en curso no tiene perfil, así que un perfil elegido la oculta). Un perfil a la vez. La
+  elección se guarda en `radar.toml`; un perfil que ya no existe vuelve a Todos los perfiles.
+  El combobox siempre está, como los otros tres, y una ventana estrecha lo acorta (y luego las
+  etiquetas) en vez de quitarlo. Paleta: `Radar: Filtrar por perfil...`. Cuando el perfil oculta
+  todo, la lista vacía lo dice.
 - **Texto de filtro** (`/` o `Ctrl+F`): coincidencia aproximada con el
   repositorio, el número, el título, el autor, la rama y las etiquetas. `Enter`
   devuelve las teclas a la lista y conserva el texto, `Esc` lo borra.
 
-`Ctrl+N` muestra una insignia en el filtro, cada combobox, los botones
+`Ctrl+N` muestra una insignia en el filtro, cada uno de los cuatro comboboxes, los botones
 Actualizar y Volver y cada encabezado de sección en pantalla. Pulsa el carácter
 de una insignia: el filtro recibe el teclado, un combobox se abre, un botón se
 ejecuta y un encabezado recibe la selección (`Enter` o `Space` lo pliega

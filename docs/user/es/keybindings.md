@@ -1108,6 +1108,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Diff: Alternar el ajuste de línea | `w` |
 | Diff: Elegir codificación... | `C` |
 | Ver: Alternar el minimapa | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Ver: Alternar la columna de commits | `Alt+C` |
 | Ver: Columna de commits: ocultar |  |
 | Ver: Columna de commits: historial del archivo |  |

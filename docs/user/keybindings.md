@@ -1103,6 +1103,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Diff: Toggle Word Wrap | `w` |
 | Diff: Choose Encoding... | `C` |
 | View: Toggle Minimap | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | View: Toggle Commit Column | `Alt+C` |
 | View: Commit Column: Hide |  |
 | View: Commit Column: File History |  |

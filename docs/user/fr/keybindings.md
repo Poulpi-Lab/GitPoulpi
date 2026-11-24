@@ -1105,6 +1105,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Diff : Basculer le retour à la ligne | `w` |
 | Diff : Choisir l'encodage... | `C` |
 | Affichage : Afficher ou masquer la minimap | `M` |
+| Diff : Basculer la mise en évidence des mots modifiés |  |
 | Affichage : Afficher ou masquer la colonne des commits | `Alt+C` |
 | Affichage : Colonne des commits : Masquer |  |
 | Affichage : Colonne des commits : Historique du fichier |  |

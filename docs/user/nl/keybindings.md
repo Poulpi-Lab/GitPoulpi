@@ -1107,6 +1107,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Diff: Regelafbreking omschakelen | `w` |
 | Diff: Codering kiezen... | `C` |
 | Weergave: Minimap omschakelen | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Weergave: commit-kolom tonen of verbergen | `Alt+C` |
 | Weergave: commit-kolom: verbergen |  |
 | Weergave: commit-kolom: bestandsgeschiedenis |  |

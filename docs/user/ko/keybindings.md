@@ -1096,6 +1096,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Diff: 자동 줄바꿈 전환 | `w` |
 | Diff: 인코딩 선택... | `C` |
 | 보기: 미니맵 전환 | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | 보기: Commit 열 전환 | `Alt+C` |
 | 보기: Commit 열: 숨기기 |  |
 | 보기: Commit 열: 파일 기록 |  |

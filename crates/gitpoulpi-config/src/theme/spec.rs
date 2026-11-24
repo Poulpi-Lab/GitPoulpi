@@ -180,7 +180,7 @@ theme_groups! {
     },
     minimap: MinimapColors { bg, view, ink },
     diff: DiffColors {
-        add_fg, del_fg, add_bg, del_bg, hunk_fg, gutter_fg, range_bg, search_hit_bg
+        add_fg, del_fg, add_bg, del_bg, add_emph_bg, del_emph_bg, hunk_fg, gutter_fg, range_bg, search_hit_bg
     },
     merge: MergeColors {
         ours, theirs, base, edit, text, ours_tint, theirs_tint, ours_pick, theirs_pick,
@@ -194,6 +194,20 @@ theme_groups! {
         pill_branch, pill_onto, action_edit, dropdown_bg, dropdown_hit, action_reset, tint_reset, tint_danger, tint_success, toast_bg, proposal_bg, confirm_danger, disabled_button_bg, toolbar_bg, toolbar_bg_hover, toolbar_fg, toolbar_disabled_fg
     },
     graph: GraphColors { wip, stash },
+}
+
+/// The stronger background an intra-line diff highlight paints on the changed
+/// part of a line, derived from the line's own `bg` and its text color `fg`
+/// (30% of the way towards the text color). `default` stays `default`: the
+/// UI then marks the changed part with bold and underline instead.
+pub fn diff_emphasis(bg: ThemeColor, fg: ThemeColor) -> ThemeColor {
+    match (bg.approx_rgb(), fg.approx_rgb()) {
+        (Some(b), Some(f)) if bg != ThemeColor::Default => {
+            let m = |x: u8, y: u8| (f64::from(x) * 0.7 + f64::from(y) * 0.3).round() as u8;
+            ThemeColor::Rgb(m(b.0, f.0), m(b.1, f.1), m(b.2, f.2))
+        }
+        _ => bg,
+    }
 }
 
 impl ThemeSpec {

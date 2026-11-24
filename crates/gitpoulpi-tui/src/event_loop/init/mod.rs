@@ -145,6 +145,7 @@ pub(super) fn init(
     crate::build_features::install_radar_closed(session_store::radar_closed(session));
     crate::build_features::install_workspaces_open(session_store::workspaces_open(session));
     live_settings::install_minimap(settings.config().ui.minimap);
+    live_settings::install_diff_intraline(settings.config().ui.diff_intraline);
     live_settings::install_column_resize(settings.config().ui.column_resize);
     live_settings::install_log_columns_layout(settings.config().ui.log_columns_layout);
     live_settings::install_chrome_layout(&settings.config().ui);

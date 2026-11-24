@@ -111,7 +111,7 @@ role_groups! {
     },
     minimap: MinimapColors { bg, view, ink },
     diff: DiffColors {
-        add_fg, del_fg, add_bg, del_bg, hunk_fg, gutter_fg, range_bg, search_hit_bg
+        add_fg, del_fg, add_bg, del_bg, add_emph_bg, del_emph_bg, hunk_fg, gutter_fg, range_bg, search_hit_bg
     },
     merge: MergeColors {
         ours, theirs, base, edit, text, ours_tint, theirs_tint, ours_pick, theirs_pick,

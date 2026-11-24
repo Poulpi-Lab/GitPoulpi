@@ -565,3 +565,53 @@ fn a_user_theme_can_frame_the_focus_in_its_own_color() {
         ThemeColor::Rgb(255, 215, 0)
     );
 }
+
+/// Every preset defines the stronger backgrounds of the changed words, a
+/// step further from the line's own tint, never the same color (the Terminal
+/// preset has no background of its own: there the UI uses bold and underline).
+#[test]
+fn every_preset_defines_the_diff_emphasis_roles() {
+    for spec in presets() {
+        let d = &spec.diff;
+        if spec.slug == "terminal" {
+            assert_eq!(
+                (d.add_emph_bg, d.del_emph_bg),
+                (d.add_bg, d.del_bg),
+                "terminal"
+            );
+            continue;
+        }
+        assert_ne!(d.add_emph_bg, d.add_bg, "{}: add_emph_bg", spec.slug);
+        assert_ne!(d.del_emph_bg, d.del_bg, "{}: del_emph_bg", spec.slug);
+        assert_ne!(d.add_emph_bg, ThemeColor::Default, "{}", spec.slug);
+        assert_ne!(d.del_emph_bg, ThemeColor::Default, "{}", spec.slug);
+    }
+}
+
+#[test]
+fn a_theme_file_that_sets_a_diff_background_gets_a_matching_emphasis() {
+    let set = parse(&[
+        ("a", "[diff]\nadd_bg = \"#102010\"\n"),
+        (
+            "b",
+            "[diff]\nadd_bg = \"#102010\"\nadd_emph_bg = \"#00ff00\"\n",
+        ),
+        ("c", "[ui]\naccent = \"#ff0000\"\n"),
+    ]);
+    let dark = preset("dark").unwrap();
+    let by = |s: &str| set.themes.iter().find(|t| t.slug == s).unwrap();
+    // Derived from the new background and the line's text color.
+    let want = super::spec::diff_emphasis(ThemeColor::Rgb(16, 32, 16), dark.diff.add_fg);
+    assert_eq!(by("a").diff.add_emph_bg, want);
+    assert_ne!(by("a").diff.add_emph_bg, dark.diff.add_emph_bg);
+    // Set by the file: kept.
+    assert_eq!(by("b").diff.add_emph_bg, ThemeColor::Rgb(0, 255, 0));
+    // Nothing changed about the diff: the base's own.
+    assert_eq!(by("c").diff.add_emph_bg, dark.diff.add_emph_bg);
+    assert_eq!(by("c").diff.del_emph_bg, dark.diff.del_emph_bg);
+    // `default` stays `default`.
+    assert_eq!(
+        super::spec::diff_emphasis(ThemeColor::Default, dark.diff.add_fg),
+        ThemeColor::Default
+    );
+}

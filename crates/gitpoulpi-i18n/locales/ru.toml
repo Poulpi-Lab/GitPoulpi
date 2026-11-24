@@ -518,6 +518,8 @@ merge_side_by_side_min_width = { git = "Редактор merge: рядом от 
 merge_side_by_side_min_width_help = { git = "Редактор конфликтов merge показывает A и B рядом, если его область не уже этого числа столбцов (длинные строки прокручиваются вбок Shift+колесо или Shift+стрелки); при меньшей ширине показывается одна сторона за раз на вкладках. По умолчанию 100; минимум 40, 0 - всегда рядом. Пока редактор открыт, он скрывает панели Refs и Status, так что обычно у него всё окно.", local = "Редактор конфликтов слияния показывает A и B рядом, если его область не уже этого числа столбцов (длинные строки прокручиваются вбок Shift+колесо или Shift+стрелки); при меньшей ширине показывается одна сторона за раз на вкладках. По умолчанию 100; минимум 40, 0 - всегда рядом. Пока редактор открыт, он скрывает панели Refs и Status, так что обычно у него всё окно." }
 diff_word_wrap = "Перенос строк"
 diff_word_wrap_help = { git = "Переносит длинные строки в представлениях diff вместо обрезки с многоточием. Встроенный редактор и blame прокручиваются вбок и не переносят строки. То же переключает кнопка переноса в самом diff.", local = "Переносит длинные строки в представлениях различий вместо обрезки с многоточием. Встроенный редактор и blame прокручиваются вбок и не переносят строки. То же переключает кнопка переноса в самих различиях." }
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Тема"
@@ -3413,6 +3415,7 @@ files_clear_selection = "Файлы: снять выделение"
 files_toggle_selection = "Файлы: переключить выделение текущей строки"
 diff_toggle_word_wrap = { git = "Diff: перенос строк", local = "Различия: перенос строк" }
 view_toggle_minimap = "Вид: показать или скрыть миникарту"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "Редактор: переключить следование за выбором"
 diff_toggle_whitespace_only_changes = { git = "Diff: изменения только пробелов", local = "Различия: изменения только пробелов" }
 ai_generate_commit_message = { git = "ИИ: создать сообщение commit'а", local = "ИИ: создать сообщение коммита" }
@@ -4941,6 +4944,8 @@ staging_lines = { one = { git = "staging {n} строки hunk {hunk}{spill}..."
 unstaging_lines = { one = { git = "unstaging {n} строки hunk {hunk}{spill}...", local = "удаление {n} строки hunk {hunk} из индекса{spill}..." }, few = { git = "unstaging {n} строк hunk {hunk}{spill}...", local = "удаление {n} строк hunk {hunk} из индекса{spill}..." }, many = { git = "unstaging {n} строк hunk {hunk}{spill}...", local = "удаление {n} строк hunk {hunk} из индекса{spill}..." }, other = { git = "unstaging {n} строк hunk {hunk}{spill}...", local = "удаление {n} строк hunk {hunk} из индекса{spill}..." } }
 minimap_on = "миникарта включена"
 minimap_off = "миникарта выключена"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = { git = "staging действует на рабочее дерево - откройте файл из панелей «{$unstaged_files}» или «{$staged_files}», а не из commit'а", local = "индексация действует на рабочее дерево - откройте файл из панелей «{$unstaged_files}» или «{$staged_files}», а не из коммита" }
 not_working_diff_discard = { git = "отбрасывание действует на рабочее дерево - откройте файл из панели «{$unstaged_files}», а не из commit'а", local = "отбрасывание действует на рабочее дерево - откройте файл из панели «{$unstaged_files}», а не из коммита" }
 discard_on_staged = "отбрасывание откатывает неиндексированные изменения - это панель «{$staged_files}»: сначала уберите из индекса, затем отбросьте из панели «{$unstaged_files}»"

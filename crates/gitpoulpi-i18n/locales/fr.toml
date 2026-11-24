@@ -516,6 +516,8 @@ merge_side_by_side_min_width = { git = "Éditeur de merge : côte à côte dès
 merge_side_by_side_min_width_help = { git = "L'éditeur de conflits de merge montre A et B côte à côte quand sa zone fait au moins ce nombre de colonnes (les longues lignes défilent latéralement avec Shift+molette ou Shift+flèches) ; plus étroit, il montre un côté à la fois derrière des onglets. 100 par défaut ; 40 est le minimum, 0 signifie toujours côte à côte. L'éditeur masque les panneaux Refs et Status tant qu'il est ouvert, il a donc le plus souvent toute la fenêtre.", local = "L'éditeur de conflits de fusion montre A et B côte à côte quand sa zone fait au moins ce nombre de colonnes (les longues lignes défilent latéralement avec Shift+molette ou Shift+flèches) ; plus étroit, il montre un côté à la fois derrière des onglets. 100 par défaut ; 40 est le minimum, 0 signifie toujours côte à côte. L'éditeur masque les panneaux Refs et Status tant qu'il est ouvert, il a donc le plus souvent toute la fenêtre." }
 diff_word_wrap = "Retour à la ligne"
 diff_word_wrap_help = "Coupe les longues lignes des vues de {$diff} au lieu de les tronquer avec une ellipse. L'éditeur intégré et la vue blame défilent latéralement sans retour à la ligne. C'est aussi le commutateur propre à la vue de {$diff}."
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Thème"
@@ -3424,6 +3426,7 @@ files_clear_selection = "Fichiers : Effacer la sélection"
 files_toggle_selection = "Fichiers : Basculer la sélection de la ligne courante"
 diff_toggle_word_wrap = "{$Diff} : Basculer le retour à la ligne"
 view_toggle_minimap = "Affichage : Afficher ou masquer la minimap"
+diff_toggle_intraline = "{$Diff} : Basculer la mise en évidence des mots modifiés"
 editor_toggle_follow_selection = "Éditeur : Basculer le suivi de la sélection"
 diff_toggle_whitespace_only_changes = "{$Diff} : Basculer les modifications d'espaces seuls"
 ai_generate_commit_message = { git = "IA : Générer le message de commit", local = "IA : Générer le message de validation" }
@@ -4960,6 +4963,8 @@ staging_lines = { one = { git = "stage de {n} ligne du hunk {hunk}{spill}...", l
 unstaging_lines = { one = { git = "unstage de {n} ligne du hunk {hunk}{spill}...", local = "désindexation de {n} ligne du hunk {hunk}{spill}..." }, other = { git = "unstage de {n} lignes du hunk {hunk}{spill}...", local = "désindexation de {n} lignes du hunk {hunk}{spill}..." } }
 minimap_on = "minimap activée"
 minimap_off = "minimap désactivée"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = { git = "le stage agit sur l'arbre de travail - ouvrez un fichier depuis les volets {$unstaged_files} ou {$staged_files}, pas depuis un commit", local = "l'indexation agit sur l'arbre de travail - ouvrez un fichier depuis les volets {$unstaged_files} ou {$staged_files}, pas depuis une validation" }
 not_working_diff_discard = { git = "l'abandon agit sur l'arbre de travail - ouvrez un fichier depuis le volet {$unstaged_files}, pas depuis un commit", local = "l'abandon agit sur l'arbre de travail - ouvrez un fichier depuis le volet {$unstaged_files}, pas depuis une validation" }
 discard_on_staged = { git = "l'abandon annule des modifications unstaged - c'est le volet {$staged_files} : unstagez d'abord, puis abandonnez depuis le volet {$unstaged_files}", local = "l'abandon annule des modifications non indexées - c'est le volet {$staged_files} : désindexez d'abord, puis abandonnez depuis le volet {$unstaged_files}" }

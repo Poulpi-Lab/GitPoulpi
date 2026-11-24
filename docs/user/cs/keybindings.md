@@ -1103,6 +1103,7 @@ Klávesy jsou výchozí.
 | Diff: Přepnout zalamování řádků | `w` |
 | Diff: Vybrat kódování... | `C` |
 | Zobrazení: Přepnout minimapu | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Zobrazení: Přepnout sloupec commitů | `Alt+C` |
 | Zobrazení: Sloupec commitů: skrýt |  |
 | Zobrazení: Sloupec commitů: historie souboru |  |

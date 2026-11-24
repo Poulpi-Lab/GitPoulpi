@@ -25,6 +25,7 @@ fn the_row_map_has_exactly_one_entry_per_rendered_row() {
                             full_file: Some(&full),
                             lfs_raw: false,
                             lfs_local: None,
+                            intraline: false,
                         },
                     );
                     assert_eq!(

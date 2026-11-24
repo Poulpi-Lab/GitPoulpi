@@ -516,6 +516,8 @@ merge_side_by_side_min_width = { git = "Merge-editor: naast elkaar vanaf (kolomm
 merge_side_by_side_min_width_help = { git = "De merge-conflicteditor toont A en B naast elkaar als zijn gebied minstens zo veel kolommen breed is (lange regels scrollen zijwaarts met Shift+wiel of Shift+pijlen); smaller toont hij één kant tegelijk achter tabbladen. Standaard 100; 40 is de laagste waarde, 0 betekent altijd naast elkaar. De editor verbergt de panelen Refs en Status zolang hij open is, dus hij heeft meestal het hele venster.", local = "De samenvoegconflicteditor toont A en B naast elkaar als zijn gebied minstens zo veel kolommen breed is (lange regels scrollen zijwaarts met Shift+wiel of Shift+pijlen); smaller toont hij één kant tegelijk achter tabbladen. Standaard 100; 40 is de laagste waarde, 0 betekent altijd naast elkaar. De editor verbergt de panelen Refs en Status zolang hij open is, dus hij heeft meestal het hele venster." }
 diff_word_wrap = "Regelafbreking"
 diff_word_wrap_help = { git = "Breekt lange regels in de diff-weergaven af in plaats van ze met een beletselteken af te kappen. De ingebouwde editor en de blame-weergave scrollen zijwaarts en breken niet af. Ook de eigen afbrekingsschakelaar van de diff-weergave.", local = "Breekt lange regels in de verschilweergaven af in plaats van ze met een beletselteken af te kappen. De ingebouwde editor en de blame-weergave scrollen zijwaarts en breken niet af. Ook de eigen afbrekingsschakelaar van de verschilweergave." }
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Thema"
@@ -3421,6 +3423,7 @@ files_clear_selection = "Bestanden: selectie wissen"
 files_toggle_selection = "Bestanden: selectie van de huidige rij omschakelen"
 diff_toggle_word_wrap = { git = "Diff: Regelafbreking omschakelen", local = "Verschil: Regelafbreking omschakelen" }
 view_toggle_minimap = "Weergave: Minimap omschakelen"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "Editor: Selectie volgen in- of uitschakelen"
 diff_toggle_whitespace_only_changes = { git = "Diff: Alleen-witruimtewijzigingen omschakelen", local = "Verschil: Alleen-witruimtewijzigingen omschakelen" }
 ai_generate_commit_message = { git = "AI: Commit-bericht genereren", local = "AI: Commitbericht genereren" }
@@ -4947,6 +4950,8 @@ staging_lines = { one = "{n} regel van hunk {hunk}{spill} stagen...", other = "{
 unstaging_lines = { one = "{n} regel van hunk {hunk}{spill} unstagen...", other = "{n} regels van hunk {hunk}{spill} unstagen..." }
 minimap_on = "minimap aan"
 minimap_off = "minimap uit"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = "stagen werkt op de werkmap - open een bestand uit de panelen {$unstaged_files} of {$staged_files}, niet uit een commit"
 not_working_diff_discard = "verwerpen werkt op de werkmap - open een bestand uit het paneel {$unstaged_files}, niet uit een commit"
 discard_on_staged = "verwerpen draait unstaged wijzigingen terug - dit is het paneel {$staged_files}: unstage eerst en verwerp dan vanuit het paneel {$unstaged_files}"

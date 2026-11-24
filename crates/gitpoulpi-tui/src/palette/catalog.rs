@@ -3313,6 +3313,11 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::ToggleMinimap,
     ),
     entry(
+        msg::palette::DIFF_TOGGLE_INTRALINE,
+        "",
+        PaletteCommand::ToggleDiffIntraline,
+    ),
+    entry(
         msg::palette::VIEW_TOGGLE_COMMIT_COLUMN,
         "Alt+C",
         PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Toggle),

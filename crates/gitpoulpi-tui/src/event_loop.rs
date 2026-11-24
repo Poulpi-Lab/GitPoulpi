@@ -339,6 +339,7 @@ pub(crate) fn apply_live_settings(
             live_settings::install_auto_prune_tags(config.general.auto_prune_tags);
             crate::build_features::install_radar_enabled(config.general.radar_enabled);
             live_settings::install_minimap(config.ui.minimap);
+            live_settings::install_diff_intraline(config.ui.diff_intraline);
             live_settings::install_column_resize(config.ui.column_resize);
             live_settings::install_log_columns_layout(config.ui.log_columns_layout);
             live_settings::install_chrome_layout(&config.ui);

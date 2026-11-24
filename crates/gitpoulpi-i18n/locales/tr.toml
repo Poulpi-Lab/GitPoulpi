@@ -517,6 +517,8 @@ merge_side_by_side_min_width = { git = "Merge düzenleyici: yan yana (sütun)", 
 merge_side_by_side_min_width_help = { git = "Merge çakışma düzenleyicisi, alanı en az bu kadar sütun genişliğindeyse A ve B'yi yan yana gösterir (uzun satırlar Shift+tekerlek veya Shift+oklarla yana kayar); daha darsa sekmelerin ardında her seferinde bir tarafı gösterir. Varsayılan 100; en düşük değer 40, 0 her zaman yan yana demektir. Düzenleyici açıkken Refs ve Durum panellerini gizler, bu yüzden genelde tüm pencereye sahiptir.", local = "Birleştirme çakışma düzenleyicisi, alanı en az bu kadar sütun genişliğindeyse A ve B'yi yan yana gösterir (uzun satırlar Shift+tekerlek veya Shift+oklarla yana kayar); daha darsa sekmelerin ardında her seferinde bir tarafı gösterir. Varsayılan 100; en düşük değer 40, 0 her zaman yan yana demektir. Düzenleyici açıkken Refs ve Durum panellerini gizler, bu yüzden genelde tüm pencereye sahiptir." }
 diff_word_wrap = "Sözcük kaydırma"
 diff_word_wrap_help = { git = "Diff görünümlerinde uzun satırları üç nokta ile kesmek yerine kaydırır. Yerleşik düzenleyici ve blame görünümü yana kayar, kaydırmaz. Diff görünümünün kendi kaydırma anahtarı da budur.", local = "Fark görünümlerinde uzun satırları üç nokta ile kesmek yerine kaydırır. Yerleşik düzenleyici ve blame görünümü yana kayar, kaydırmaz. Fark görünümünün kendi kaydırma anahtarı da budur." }
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Tema"
@@ -3421,6 +3423,7 @@ files_clear_selection = "Dosyalar: Seçimi Temizle"
 files_toggle_selection = "Dosyalar: Geçerli Satırın Seçimini Aç/Kapat"
 diff_toggle_word_wrap = { git = "Diff: Sözcük Kaydırmayı Aç/Kapat", local = "Fark: Sözcük Kaydırmayı Aç/Kapat" }
 view_toggle_minimap = "Görünüm: Minimap'i Aç/Kapat"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "Düzenleyici: Seçimi İzlemeyi Aç/Kapat"
 diff_toggle_whitespace_only_changes = { git = "Diff: Yalnızca Boşluk Değişikliklerini Aç/Kapat", local = "Fark: Yalnızca Boşluk Değişikliklerini Aç/Kapat" }
 ai_generate_commit_message = "YZ: Commit Mesajı Oluştur"
@@ -4951,6 +4954,8 @@ staging_lines = { one = { git = "{hunk}. hunk'ın {n} satırı{spill} stage'leni
 unstaging_lines = { one = { git = "{hunk}. hunk'ın {n} satırı{spill} unstage'leniyor...", local = "{hunk}. hunk'ın {n} satırı{spill} hazırlıktan çıkarılıyor..." }, other = { git = "{hunk}. hunk'ın {n} satırı{spill} unstage'leniyor...", local = "{hunk}. hunk'ın {n} satırı{spill} hazırlıktan çıkarılıyor..." } }
 minimap_on = "minimap açık"
 minimap_off = "minimap kapalı"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = { git = "staging çalışma ağacında işlenir - bir commit'ten değil, {$unstaged_files} veya {$staged_files} panelinden bir dosya açın", local = "hazırlama çalışma ağacında işlenir - bir commit'ten değil, {$unstaged_files} veya {$staged_files} panelinden bir dosya açın" }
 not_working_diff_discard = { git = "atma çalışma ağacında işlenir - bir commit'ten değil, {$unstaged_files} panelinden bir dosya açın", local = "atma çalışma ağacında işlenir - bir commit'ten değil, {$unstaged_files} panelinden bir dosya açın" }
 discard_on_staged = { git = "atma unstaged değişiklikleri geri alır - bu {$staged_files} paneli: önce unstage'leyin, sonra {$unstaged_files} panelinden atın", local = "atma hazırlanmamış değişiklikleri geri alır - bu {$staged_files} paneli: önce hazırlıktan çıkar, sonra {$unstaged_files} panelinden at" }

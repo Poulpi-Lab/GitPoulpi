@@ -155,6 +155,9 @@ impl PreferencesState {
                 if key == "ui.minimap" {
                     install_minimap(self.config.ui.minimap);
                 }
+                if key == "ui.diff_intraline" {
+                    crate::live_settings::install_diff_intraline(self.config.ui.diff_intraline);
+                }
                 if matches!(
                     key,
                     "ui.tab_dir_follow" | "ui.open_in_default" | "ui.launch" | "ui.launch_command"

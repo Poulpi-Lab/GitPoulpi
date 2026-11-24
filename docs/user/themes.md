@@ -256,6 +256,18 @@ statusbar_fg = "#eceff4"
 add_bg = "#2f3b2f"
 ```
 
+### Changed words in a diff (`diff.add_emph_bg`, `diff.del_emph_bg`)
+
+The stronger backgrounds the Diff view paints on the words that differ inside
+a changed line, over `diff.add_bg` (added lines) and `diff.del_bg` (removed
+lines); the text keeps `diff.add_fg` and `diff.del_fg`. Every preset sets both.
+A theme file that sets `diff.add_bg` or `diff.del_bg` but not the matching
+emphasis gets one derived from it (30% of the way towards the text color of
+that side), so a custom background never ends up with the base theme's
+emphasis. A value of `default` (the Terminal preset), or a terminal whose
+color depth would draw both backgrounds alike, marks the words in bold and
+underline instead. See [Changed words in a diff](interface-tour.md#changed-words-in-a-diff).
+
 Colors are `"#rrggbb"`, `"ansi:N"` (the terminal's palette entry N) or
 `"default"` (the terminal's own color). Groups and keys are those of
 `gitpoulpi theme export <slug>`. Nothing is fatal: an unknown key or a bad

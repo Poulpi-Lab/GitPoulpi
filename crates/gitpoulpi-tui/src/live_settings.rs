@@ -336,6 +336,19 @@ pub(crate) fn minimap() -> bool {
     cell!(MINIMAP, |m: &AtomicBool| m.load(Ordering::Relaxed))
 }
 
+// `ui.diff_intraline`: whether the diff views highlight the changed words of
+// a changed line. Published like `MINIMAP`: the render cache key reads it.
+published!(DIFF_INTRALINE: AtomicBool = AtomicBool::new(true));
+
+pub(crate) fn install_diff_intraline(on: bool) {
+    cell!(DIFF_INTRALINE, |m: &AtomicBool| m
+        .store(on, Ordering::Relaxed));
+}
+
+pub(crate) fn diff_intraline() -> bool {
+    cell!(DIFF_INTRALINE, |m: &AtomicBool| m.load(Ordering::Relaxed))
+}
+
 // `ui.column_resize`: how the Log, the Radar and the commit column let a
 // column boundary be grabbed. Published like `MINIMAP` (per test thread in
 // tests); `true` is `header`, the default `line` is `false`.

@@ -516,6 +516,8 @@ merge_side_by_side_min_width = { git = "Editor di merge: affiancato da (colonne)
 merge_side_by_side_min_width_help = { git = "L'editor dei conflitti di merge mostra A e B affiancati quando la sua area è larga almeno questo numero di colonne (le righe lunghe scorrono lateralmente con Shift+rotella o Shift+frecce); più stretto, mostra un lato alla volta dietro delle schede. 100 per impostazione predefinita; 40 è il valore minimo, 0 significa sempre affiancato. L'editor nasconde i pannelli Refs e Stato mentre è aperto, quindi di solito ha tutta la finestra.", local = "L'editor dei conflitti di unione mostra A e B affiancati quando la sua area è larga almeno questo numero di colonne (le righe lunghe scorrono lateralmente con Shift+rotella o Shift+frecce); più stretto, mostra un lato alla volta dietro delle schede. 100 per impostazione predefinita; 40 è il valore minimo, 0 significa sempre affiancato. L'editor nasconde i pannelli Refs e Stato mentre è aperto, quindi di solito ha tutta la finestra." }
 diff_word_wrap = "A capo automatico"
 diff_word_wrap_help = "Manda a capo le righe lunghe nelle viste diff invece di troncarle con i puntini di sospensione. L'editor integrato e la vista blame scorrono lateralmente e non vanno a capo. È anche l'interruttore dell'a capo della vista diff."
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Tema"
@@ -3420,6 +3422,7 @@ files_clear_selection = "File: Annulla la selezione"
 files_toggle_selection = "File: Attiva/disattiva la selezione della riga corrente"
 diff_toggle_word_wrap = "{$Diff}: Attiva o disattiva l'a capo automatico"
 view_toggle_minimap = "Vista: Mostra o nascondi la minimappa"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "Editor: Attiva o disattiva segui la selezione"
 diff_toggle_whitespace_only_changes = "{$Diff}: Mostra o nascondi le modifiche di soli spazi"
 ai_generate_commit_message = "IA: Genera il messaggio di {$commit}"
@@ -4946,6 +4949,8 @@ staging_lines = { one = "stage di {n} riga dell'hunk {hunk}{spill}...", other = 
 unstaging_lines = { one = "unstage di {n} riga dell'hunk {hunk}{spill}...", other = "unstage di {n} righe dell'hunk {hunk}{spill}..." }
 minimap_on = "minimappa attiva"
 minimap_off = "minimappa disattiva"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = "lo stage agisce sulla directory di lavoro - apri un file dai pannelli {$unstaged_files} o {$staged_files}, non da un commit"
 not_working_diff_discard = "lo scarto agisce sulla directory di lavoro - apri un file dal pannello {$unstaged_files}, non da un commit"
 discard_on_staged = "lo scarto annulla le modifiche non in stage - questo è il pannello {$staged_files}: fai prima unstage, poi scarta dal pannello {$unstaged_files}"

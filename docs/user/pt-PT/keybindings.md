@@ -1101,6 +1101,7 @@ As teclas são as predefinidas.
 | Diff: alternar quebra de linha | `w` |
 | Diff: escolher codificação... | `C` |
 | Ver: alternar o minimapa | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Ver: alternar a coluna de commits | `Alt+C` |
 | Ver: coluna de commits: ocultar |  |
 | Ver: coluna de commits: histórico do ficheiro |  |

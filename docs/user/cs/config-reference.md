@@ -142,6 +142,7 @@ GitHub/GitLab)
 | `ui.diff_hunks_only` | `true` | `false` zobrazí celý soubor se změnami na svých místech (`H`). |
 | `ui.diff_show_whitespace` | `true` | Zobrazí změny jen v bílých znacích (`s`). |
 | `ui.diff_word_wrap` | `false` | Zalamuje dlouhé řádky diffu (`w`; Nastavení > Diff a editor). |
+| `ui.diff_intraline` | `true` | Vymaluje změněná slova změněného řádku silnějším pozadím (paleta `Diff: Přepnout zvýraznění změněných slov`; Nastavení > Diff a editor). |
 | `ui.minimap` | `false` | Minimapa vedle posuvníku diffu a editoru (`M`). |
 | `ui.mermaid_detail` | `refs` | Úroveň detailu Log: Zkopírovat jako Mermaid gitGraph: `structure`, `refs`, `subjects`, `full` (pamatuje se z vyskakovacího okna; výchozí hodnota `log --format mermaid`). |
 | `ui.mermaid_orientation` | `lr` | Směr tohoto grafu: `lr` (zleva doprava) nebo `tb` (shora dolů). |
@@ -397,7 +398,7 @@ agenti](mcp-and-agents.md#oprávnění).
 | `ai.enabled` | `false` | Přepínač. Vypnuto: nikde se nic z AI nezobrazuje a nic se neodesílá. |
 | `ai.default_profile` | `"default"` | Id profilu, který akce používají, když žádný nepojmenují. |
 | `ai.global_instructions` | `""` | Text přidaný do promptu každé akce. Může používat `${repo}`, `${uilang}`, ... (viz [AI > Proměnné promptu](ai.md#proměnné-promptu)); totéž platí pro instrukce jednotlivých akcí a repozitáře. |
-| `ai.actions.<action>.profile` | `""` | Profil pro jednu akci; prázdné = výchozí. Akce: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`. Pracovní prostor (`workspaces.toml`, `[workspace.ai_instructions]` a `[workspace.ai_overrides.<action>]`) i repozitář mohou tyto instrukce doplnit nebo nahradit: viz [AI](ai.md#instrukce). |
+| `ai.actions.<action>.profile` | `""` | Profil pro jednu akci; prázdné = výchozí. Akce: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `sequence_draft`. Pracovní prostor (`workspaces.toml`, `[workspace.ai_instructions]` a `[workspace.ai_overrides.<action>]`) i repozitář mohou tyto instrukce doplnit nebo nahradit: viz [AI](ai.md#instrukce). |
 | `ai.actions.<action>.instructions` | `""` | Text přidaný jen pro tuto akci. |
 | `ai.review.run_in_repository` | `"profile"` | `profile`, `yes` nebo `no`: zda místní agent konceptu kontroly kódu pracuje pro daný běh uvnitř repozitáře, což přepíše `workdir` profilu AI. Repozitář může mít vlastní hodnotu (`gitpoulpi ai review-context --repo`). Viz [AI > Kontext kontroly](ai.md#kontext-kontroly). |
 | `ai.review.include_claude_md` | `true` | Předat konceptu kontroly kódu soubor `CLAUDE.md` repozitáře (kořen, čtený ve větvi, na kterou žádost míří; oříznutý na 8 KB). |
@@ -421,7 +422,7 @@ agenti](mcp-and-agents.md#oprávnění).
 | `ai.hosting_reply.read_repository` | `false` | Zda volba „Nechat AI číst repozitář“ začíná zaškrtnutá. Ve výchozím stavu vypnuto: repozitář se čte, jen když ji pro dané použití zaškrtnete. Lokální agent nebo profil API ho pak čte tak, jak popisuje [kapitola o AI](ai.md#přístup-k-repozitáři). |
 | `ai.hosting_reply.reuse_agent_session` | `true` | Zachová relaci lokálního agenta mezi dvěma odpověďmi, když to jeho harness podporuje. Projeví se, jakmile smí AI číst repozitář. |
 | `ai.hosting_reply.context_ttl_minutes` | `30` | Jak dlouho se kontext repozitáře sestavený pro odpověď znovu používá. Drží se mezi 1 a 1440. Projeví se, jakmile smí AI číst repozitář. |
-| `ai.sent_preview.<action>` | `true` | Jeden klíč na akci (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`): před odesláním požadavku ukáže "Co se odešle". "Příště nezobrazovat pro ..." v dialogu zapíše `false`; Nastavení > AI > *Zobrazit, co se odesílá, před...* je znovu zapne. `rewrite_script` a `rewrite_rules` se přijímají, ale nemají účinek: dialogy přepisu historie vždy ukazují vlastní podokno. `worktree_name` se také přijímá, ale nemá účinek: odesílá jen to, co jste napsali v dialogu Vytvořit worktree, a názvy lokálních větví. |
+| `ai.sent_preview.<action>` | `true` | Jeden klíč na akci (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`, `sequence_draft`): před odesláním požadavku ukáže "Co se odešle". "Příště nezobrazovat pro ..." v dialogu zapíše `false`; Nastavení > AI > *Zobrazit, co se odesílá, před...* je znovu zapne. `rewrite_script` a `rewrite_rules` se přijímají, ale nemají účinek: dialogy přepisu historie vždy ukazují vlastní podokno. `worktree_name` se také přijímá, ale nemá účinek: odesílá jen to, co jste napsali v dialogu Vytvořit worktree, a názvy lokálních větví. |
 
 Vlastní tabulka repozitáře `[preferences.ai_review]` (v jeho `repo-state.toml`, nebo záznam repozitáře, který není
 naklonovaný, v `remote-reviews.toml`) má stejné klíče, všechny nepovinné, a navíc `no_extra_file = true`: pro tento
@@ -551,6 +552,48 @@ Jeden `config.toml` může sdílet několik instalací (balíček, vývojová ko
 | `installation.primary` | chybí | Id hlavní instalace. Chybí: žádná. |
 | `installation.settings.<id>` | žádná | Jedna tabulka na instalaci: `path` (její složka, obnoví se při přesunu), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informativní), `name` (název spouštěče, `GitPoulpi (<label>)`, zafixovaný při prvním spuštění), `name_with_version` (vypnuto: přidat k názvu `<major>.<minor>`), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (prázdné: položka nabídky složek je v kořeni), `env` (prázdné: vlastní id; instalace se stejným názvem sdílejí démony, relace a historii vrácení), `mcp_bind` (prázdné: `mcp.bind`). Prázdná hodnota se vrací k `ui.*` u hlavní instalace, jinak k výchozí hodnotě druhu (vývojová kopie nosí `sun`). |
 
+## `[[sequences]]`
+
+Pojmenované sekvence akcí: seznam příkazů palety spouštěných jeden po druhém
+(například Záloha: stage všeho, zpráva od AI, commit, push). Jedna tabulka na sekvenci,
+její kroky jako `[[sequences.steps]]`.
+
+```toml
+[[sequences]]
+id = "backup"                    # the slug: its key in [keybindings.sequence] and its CLI name
+name = "Backup"                  # your text, never translated
+description = "Stage, commit with an AI message, push"   # optional
+scope = "installation"           # installation (default) | machine | repo
+owner = "3f9a0c1d2b4e5f60"       # the installation id; set with scope = "installation"
+
+[[sequences.steps]]
+run = "stage_all"                # a palette command id
+
+[[sequences.steps]]
+run = "ai_generate_commit_message"
+pause = "always"                 # default | always | never
+
+[[sequences.steps]]
+run = "create_worktree_from_current_branch"
+pause = "never"
+[sequences.steps.options]
+name = "wip-${date}-${n}"        # a template: ${branch} ${date} (yyyy-mm-dd) ${time} (hh-mm) ${n} (first free number)
+open_tab = true
+```
+
+| Klíč | Význam |
+|---|---|
+| `scope` | `installation`: vidí ji jen instalace, jejíž id je `owner`. `machine`: každá instalace sdílející tento `config.toml`. `repo`: uložena v repozitáři v `.gitpoulpi/sequences.toml` (stejný tvar `[[sequences]]`), viditelná jen tam a až poté, co tomu souboru začnete důvěřovat, protože commitnutý soubor jsou cizí příkazy. |
+| `steps[].run` | Id příkazu palety, název v snake_case zobrazený v `[keybindings.palette]`. Přijímá se jen pevný seznam povolených: stage, commit, stash push, nová větev / tag, fetch, pull, push (a varianty push na všechny cíle, pull všeho, push tagů), příkazy zprávy od AI a composeru commitů, vytvoření worktree, otevření karty nebo terminálu a force push s lease. Destruktivní příkazy (zahodit, reset, mazání, odebrání worktree, stash drop, přepis historie, ukončení, Nastavení) a jiné sekvence kroky být nemohou. Krok, který tato verze nezná, se v souboru ponechá a nahlásí se. |
+| `steps[].pause` | `default`: krok se zastaví na svém obvyklém dialogu, když potřebuje vstup. `always`: zastavit před ním a zeptat se, zda pokračovat. `never`: nikdy se nezastavit; krok pak potřebuje volby, na které by se jeho dialog zeptal (`name` pro novou větev nebo worktree). Force push s lease nemůže být `never`. |
+| `steps[].options` | Odpovědi pro jednotlivé kroky: `name` (nová větev, tag, worktree), `branch` (worktree z vybrané větve), `open_tab` (otevřít nový worktree v kartě), `message` (commit), `label` (položka Otevřít v), `profile` (profil agenta). |
+| nejvýše 32 kroků | Sekvence má 1 až 32 kroků. |
+
+Neznámé klíče sekvence nebo kroku se při přepisu souboru GitPoulpi ponechají. Duplicitní
+id mezi sekvencemi, které vidíte, se nahlásí. Sekvenci přiřadíte klávesu přes
+`[keybindings.sequence] <id> = "<chord>"`, například
+`backup = "Ctrl+G b"`.
+
 ## `[keybindings]`
 
 Přiřazuje zkratky TUI znovu; upravuje je Nastavení > Klávesnice a myš.
@@ -569,8 +612,9 @@ stage_file = "z"
 `[keybindings.<context>] <action> = "<chord>"`; hodnota nahradí výchozí klávesy
 akce, odstranění řádku je obnoví. Akordy: `Ctrl+Shift+N`, `Alt+n`, `F2`,
 `PageDown`, `Space`, `,`, `P` (= `Shift+p`). Chybný záznam nikdy nic neblokuje:
-TUI ho ignoruje, ponechá výchozí a oznámí to ve stavovém řádku. Kontexty, id
-akcí, výchozí hodnoty a pravidla konfliktů: [Klávesové zkratky](keybindings.md).
+TUI ho ignoruje, ponechá výchozí a oznámí to ve stavovém řádku.
+`[keybindings.sequence]` přiřazuje klávesy vašim [`[[sequences]]`](#sequences) podle id.
+Kontexty, id akcí, výchozí hodnoty a pravidla konfliktů: [Klávesové zkratky](keybindings.md).
 
 ## Nastavení pro jednotlivé repozitáře: `.gitpoulpi/repo-state.toml`
 

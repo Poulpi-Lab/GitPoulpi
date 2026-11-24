@@ -21,6 +21,13 @@ Nic není napevno: každá položka je popisek a příkaz.
   `Karta: Otevřít ve výchozí položce`. Příkazy palety fungují i tehdy, když
   v záhlaví okna není pro tlačítko místo. Obě klávesy lze přemapovat; viz
   [Klávesové zkratky](keybindings.md).
+- **Podle popisku**: krok [sekvence](config-reference.md#sequences) `tab_open_in` spustí položku,
+  jejíž **popisek** uvedete (`label = "VS Code"`), takže přeřazení seznamu nikdy nezmění, co se
+  spustí. Neznámý popisek krok zastaví zprávou „žádná položka „Otevřít v“ nemá popisek ...“.
+  `Karta: Terminál zde` (paleta) otevře váš terminál ve složce, dřívější tlačítko „Terminál zde“
+  na liště karet.
+- **AI agent ve složce**: `Karta: Otevřít AI agenta zde` otevře váš terminál ve složce karty
+  a spustí v něm lokálního AI agenta; viz [AI](ai.md#otevření-agenta-ve-složce-karty).
 - **Klikněte pravým tlačítkem na kartu repozitáře**: nabídka karty má podnabídku
   **Otevřít v** se stejnými položkami.
 - Seznam začíná u položky, kterou jste v této relaci použili naposledy.

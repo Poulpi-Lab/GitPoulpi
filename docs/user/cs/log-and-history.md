@@ -89,6 +89,26 @@ viz `history-rewrite.md`; z terminálu: `gitpoulpi mailmap list|check|add`.
   z palety *Navigace: Hledat commity...*): prohledává celou zprávu commitu,
   jméno a e-mail autora, hash a názvy refs. Co neodpovídá, ztlumí a tvar grafu
   ponechá. `Enter` / `Shift+Enter` přeskočí na další / předchozí shodu.
+- **Filtr autorů** (trychtýř v záhlaví **Autor**, `Shift+A` v Logu, nebo příkaz
+  z palety *Log: Filtrovat podle autora...*): předem filtruje Log podle toho, kdo
+  commity napsal. Pod záhlavím se rozbalí okno s vyhledávacím polem, řádkem
+  **Zrušit filtr** (✕) a jedním řádkem na každého autora načtené historie: odznak s
+  iniciálami (avatar, pokud `ui.avatars` není vypnuto), jméno a za ním tlumený e-mail,
+  nejdřív podle počtu commitů a pak podle jména. Psaním se seznam zúží fuzzy
+  shodou jako v paletě; `Enter` nebo klik přepne zvýrazněného autora (zaškrtnutí;
+  můžete jich zvolit libovolně), `Esc` nebo klik mimo okno zavře a filtr ponechá.
+  Filtr se chová přesně jako hledání: commity vybraných autorů zůstanou
+  svítit, každý jiný řádek se ztlumí a graf si ponechá tvar, nic se neodebírá ani
+  nenačítá znovu. Je-li otevřená i lišta hledání, platí obojí (commit musí být od
+  vybraného autora **a** odpovídat textu) a `Enter` / `Shift+Enter` procházejí
+  tyto shody. Dokud filtr platí, trychtýř se změní na plnou zvýrazněnou `▼`, jeho
+  tooltip vypíše vybrané autory, a když je sloupec Autor skrytý nebo na trychtýř příliš
+  úzký, ukáže horní okraj Logu místo toho *Autor: Alice Example +1* (klávesa
+  i paleta fungují dál). Zrušíte ho řádkem **Zrušit filtr**, pravým tlačítkem na
+  rozsvícený trychtýř, nebo příkazem z palety *Log: Zrušit filtr autora*.
+  Autoři jsou ti z commitů, které Log načetl (s použitím mailmap, jako ve sloupci),
+  a filtr se pamatuje pro každý repozitář, přes přepínání karet i restarty. Textové
+  hledání se nepamatuje, filtr ano.
 - **Filtr Refs** (`/` v postranním panelu): zúží seznamy větví, tagů a remote
   podle názvu.
 - **Solo** (klávesa `o`, nebo nabídka refu, na refu, složce či remote): zobrazí
@@ -118,6 +138,13 @@ v Logu) otevřete jeho nabídku. Nejužitečnější položky:
 | Přejmenovat, Smazat | Smazání se nejdřív zeptá; lze smazat i vzdáleného dvojníka |
 | Kopírovat název větve, Kopírovat odkaz na větev na remote | Do schránky |
 
+**Přesun tagu.** Přetáhněte tag na jiný ref (viz *Přetahování refs* v
+[Myš a gesta](./mouse-and-gestures.md)) nebo použijte `Refs: Přesunout vybraný Tag
+na vybraný Commit...`. Zachová svůj druh i anotaci, přesune se jen váš lokální tag
+(remote má starou pozici, dokud neprovedete push) a jeden krok zpět ho vrátí.
+CLI: `gitpoulpi tag move <name> <target> [--force-non-ff]`,
+`gitpoulpi tag merge-branch <name> <branch> [-m <message>]`.
+
 **Kde tag žije.** Tag může být na tomto počítači, na remote, nebo na obou a řádky
 TAGS v postranním panelu (i pilulka tagu v Logu) to říkají značkou za názvem.
 Najetím na tag získáte totéž slovy.
@@ -127,7 +154,7 @@ Najetím na tag získáte totéž slovy.
 | šipka nahoru | Jen tady: žádný remote ho nemá. Jeho nabídka nabízí *Push* |
 | šipka vlevo-vpravo | Tady i na remote, na stejném commitu |
 | šipka dolů (řádek ztlumený) | Jen na remote: v tomto repozitáři není (nikdy se nestáhl, nebo byl tady smazán). Jeho nabídka nabízí *Fetch `<tag>` z `<remote>`* a *Smazat `<tag>` na `<remote>`...*; v paletě `Git: Fetch vybraného tagu` |
-| šipka nahoru-dolů | Na remote také, ale na jiném commitu (push by byl odmítnut) |
+| šipka nahoru-dolů | Na remote také, ale na jiném commitu (obyčejný push by byl odmítnut). Jeho nabídka má dva řádky pro každý takový remote: *Použít `<tag>` z `<remote>`* (lokální tag se přesune na verzi remote, podle posledního fetche, bez sítě; anotovaný tag se stane týmž objektem tagu) a červeně *Push `<tag>` na `<remote>` (force)* (nejdřív se zeptá; s lease na to, co viděl poslední fetch, takže remote, který se mezitím posunul, je odmítnut s "fetch first" a nic se nepřepíše). Každý je jeden záznam zpět. V paletě `Git: Použít verzi remote pro vybraný Tag` a `Git: Force Push vybraného Tagu na jeho remote` (výchozí remote, když se liší několik); CLI: `tag take-remote`, `tag force-push` |
 
 git pro tagy žádné sledovací refy nevede, takže GitPoulpi zjišťuje, co má který
 remote, z vašeho posledního **fetch** (jakéhokoli, i automatického) a z vlastních

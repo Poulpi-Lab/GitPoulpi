@@ -69,6 +69,8 @@ pod tlačítky. Pro vybraný řádek:
   větev `restore/<větev>-<sha>` na starém vrcholu - vaše aktuální větev a
   soubory se nikdy nepohnou. Potvrzení přesně ukáže, co se stane, a obnovení je
   nová akce: `Ctrl+Z` ji vezme zpět.
+- **Vrátit celou sekvenci** (`s`): nabízí se, dokud jsou nejnovější záznamy z běhu jedné
+  sekvence (viz [Běhy sekvencí](#běhy-sekvencí)).
 - **Zopakovat až sem** (`z`) na vráceném řádku.
 - **Obnovit main tam, kde ji nechala akce commit** (`t`, nebo `Alt+Shift+Z` /
   `Úpravy: Obnovit větev tam, kde ji nechala blokovaná akce` mimo panel): když
@@ -76,6 +78,9 @@ pod tlačítky. Pro vybraný řádek:
   nechala.
 
 Pravé tlačítko na řádek (nebo `.`) nabídne tytéž akce jako nabídku.
+
+Řádek vytvořený krokem [sekvence](sequences.md) nese odznak `⟳ Záloha` a jeho řádek detailu
+říká, který krok to byl („Vytvořila sekvence „Záloha“, krok 3/4.“).
 
 ![Historie vrácení po smazání větve a dvou commitech: řádek smazané větve je vybraný a lze ho obnovit samostatně](../images/undo-history.png)
 
@@ -170,7 +175,7 @@ zobrazení, které je na obrazovce.
 
 | Zobrazení | Řádky palety |
 |---|---|
-| Historie vrácení | `Historie vrácení: Vrátit až sem...`, `Zopakovat až sem...`, `Obnovit jen tuto...`, `Obnovit větev tam, kde byla...`, `Obnovit seznam`, `Zavřít` |
+| Historie vrácení | `Historie vrácení: Vrátit až sem...`, `Zopakovat až sem...`, `Vrátit celou sekvenci`, `Obnovit jen tuto...`, `Obnovit větev tam, kde byla...`, `Obnovit seznam`, `Zavřít` |
 | Reflog | `Reflog: Zobrazit v Logu`, `Vytvořit větev tady...`, `Vytvořit tag tady...`, `Použít změny na pracovní strom`, `Uložit změny jako stash`, `Obnovit na tuto pozici...`, `Načíst další`, `Obnovit seznam` |
 | Ztracená práce | `Ztracená práce: Vytvořit větev tady...`, `Vytvořit tag tady...`, `Cherry-pick`, `Použít změny na pracovní strom`, `Uložit změny jako stash`, `Hledat znovu` |
 
@@ -181,6 +186,38 @@ který výběr nezvládne, to řekne ve stavovém řádku místo toho, aby neud�
 „tato akce je už vrácena: použijte Zopakovat až sem“, důvod, proč nelze položku
 obnovit samostatně, „zpět lze přesunout jen větev nebo HEAD“ a podobně. Řádky s
 `...` otevřou stejné potvrzení nebo dotaz na název jako tlačítko.
+
+## Běhy sekvencí
+
+[Sekvence](sequences.md) (Záloha: stage všeho, zpráva commitu od AI, commit, push)
+vytvoří **jeden obyčejný záznam žurnálu na krok, který něco mění**: tady stage
+a commit, ne zprávu od AI a ne push (push se nikdy nevrací, viz níže). Žurnál je
+pro každý repozitář a přísně od nejnovějšího, takže běh nemůže být jeden záznam:
+každý si drží vlastní kontroly a každý je označen během, který ho vytvořil
+(`sequence:Backup#<run> 3/4`). Staré žurnály značku nemají a načítají se jako dřív.
+
+**Vrátit celou sekvenci** vrátí záznamy jednoho běhu, od nejnovějšího, jako jedno
+obyčejné Zpět pro každý. Nabízí se, když jsou nejnovější záznamy žurnálu z jednoho
+běhu a následují po sobě: záznam jiného běhu, změna, kterou jste udělali ručně, nebo
+změna provedená mezitím mimo GitPoulpi skupinu ukončí. Kde to je:
+
+- Historie vrácení: tlačítko `Vrátit celou sekvenci` (`s`), nabídka řádku na pravé
+  tlačítko a řádek palety `Historie vrácení: Vrátit celou sekvenci`;
+- paleta příkazů: `Úpravy: Vrátit celou sekvenci` (název sekvence je na řádku, dokud
+  platí);
+- příkazová řádka a MCP: `gitpoulpi undo --sequence` (níže).
+
+Každý záznam se kontroluje zvlášť, přesně jako jedno Zpět: commit, který už je na svém
+upstreamu, se před vrácením zeptá „vrátit přesto?“ (odpovězte a zbytek pokračuje) a
+větev, která se posunula, nebo probíhající merge odmítne. První odmítnutí (nebo „ne“ na
+otázku) **zastaví** a řekne, který krok a proč: *vracení „Záloha“ se zastavilo u kroku
+3/4 (Commit „wip“ (a81b9e4)): ... Zbývající akce: 2*. Co se vrátilo, zůstane vráceno, starší
+záznamy zůstanou v žurnálu a obyčejné Zpět (nebo znovu tlačítko) pokračuje odtud.
+
+Vrací se jen žurnál tohoto repozitáře. Běh, který jednal i v jiném repozitáři (krok
+worktree přesunul další kroky do karty nového worktree), zanechal záznamy ve vlastním
+žurnálu toho repozitáře; otevřete ho a vraťte je tam. **Znovu** zůstává po záznamech: po
+vrácení celého běhu `Ctrl+Y` vrátí nejnovější krok, pak další, každý s vlastní kontrolou.
 
 ## Co lze vrátit
 
@@ -364,6 +401,8 @@ Zpět se ptá jen tehdy, když je to riskantní:
 - položka smazala větev nebo tag na remote: vrácení ji **pushne zpět na server**
   (viz výše), takže se vždy zeptá, stejně jako Znovu, které ji tam smaže znovu.
 
+Vrácení celé sekvence se jednou zeptá na seznam (v panelu), pak se každý riskantní záznam zeptá znovu jako výše.
+
 Znovu a každé vrácení pouhého posunu refu se nikdy neptá: opačný směr je na
 jedinou klávesu.
 
@@ -405,6 +444,7 @@ Nic jiného se nikdy nemaže.
 gitpoulpi undo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi redo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi undo --list [--all]
+gitpoulpi undo --sequence [--dry-run] [--yes]
 gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 ```
 
@@ -414,6 +454,14 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 - `--expect <id>` způsobí, že volání odmítne jako *stale*, pokud ta položka už
   není nejnovější: skript (nebo druhé okno) tak nikdy nevrátí něco jiného, než
   na co se díval.
+- `--sequence` vrátí běh sekvence na vrcholu žurnálu (viz
+  [Běhy sekvencí](#běhy-sekvencí)): nejnovější po sobě jdoucí záznamy, které provedl jeden
+  `sequence run`, od nejnovějšího, jedno `undo` na každý s vlastními kontrolami.
+  `--dry-run` je vypíše; bez `--yes` ho zastaví první záznam, který ho potřebuje
+  (kód **3**), s pojmenováním kroku, s tím, co se dosud vrátilo, v `undone` a co zbývá v `left`.
+  Odmítnutí skončí kódem **2** s `stopped.refused`; když vrchol žurnálu není z jednoho běhu,
+  odpověď je `{"no_sequence": {...}}`, kód 2. Záznamy nesou svůj běh v `undo --list`
+  (`summary.origin`: `name`, `run_id`, `step`, `of`). Ne s `--expect`.
 - `undo-forget` odstraní blokovanou nejnovější položku ze žurnálu (`--redo`:
   nejnovější položku pro znovu). Odmítne, když ta položka není blokovaná, a bez
   `--yes` skončí s kódem **3**. Pro MCP je to mutace, ale ne destruktivní:

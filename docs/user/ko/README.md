@@ -38,6 +38,7 @@ GitPoulpi는 클릭할 수 있는 commit 그래프, 명령 팔레트, 호스팅 
 | 토큰 없이 이슈를 Markdown 노트로 관리하기 | [로컬 이슈와 Obsidian](local-issues.md) | 이슈 섹션, 제공자 `Local Markdown - <이름>`, 팔레트 **로컬 이슈: Obsidian에서 열기...** |
 | 여러 commit에 걸쳐 작성자, 날짜, 메시지, 파일 다시 쓰기 | [기록 다시 쓰기](history-rewrite.md) | `Ctrl+G Shift+H`, 팔레트 **다시 쓰기: 기록 워크벤치** |
 | 작업 실행 취소(또는 다시 실행) | [실행 취소와 다시 실행](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`, `Alt+Z`로 실행 취소 기록 열기, 팔레트 **편집: 실행 취소** |
+| 키 하나로 여러 동작 실행(스테이지, AI 메시지, 커밋, 푸시...) | [시퀀스](sequences.md) | 설정 > 시퀀스; 팔레트 **시퀀스: <이름>** |
 | Git LFS로 큰 파일 추적하기 | [Git LFS](lfs.md) | 팔레트 **LFS: 패턴 추적...**, **LFS: 이 저장소에 초기화** |
 | 저장소 전체에서 브랜치, commit, pull request, 이슈 찾기 | [검색](search.md) | `Ctrl+Alt+F` 또는 제목 표시줄의 전체 검색 버튼, `f`는 현재 저장소의 commit 그래프를 검색 |
 | 나를 기다리는 모든 것을 한 목록으로 보기 | [Radar](radar.md) | `Alt+R`, 팔레트 **Radar: 열기** |

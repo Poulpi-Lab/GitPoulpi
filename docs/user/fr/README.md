@@ -42,6 +42,7 @@ vous en avez besoin.
 | Garder des tickets en notes Markdown, sans jeton | [Tickets locaux et Obsidian](local-issues.md) | La section TICKETS, fournisseur `Markdown local - <nom>` ; palette **Tickets locaux : Ouvrir dans Obsidian...** |
 | Réécrire auteurs, dates, messages ou fichiers sur de nombreux commits | [Réécriture de l'historique](history-rewrite.md) | `Ctrl+G Shift+H` ; palette **Réécriture : ouvrir l'atelier** |
 | Annuler (ou rétablir) une opération | [Annuler et rétablir](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y` ; `Alt+Z` ouvre l'historique des annulations ; palette **Édition : Annuler** |
+| Enchaîner plusieurs actions avec une seule touche (stage, message IA, commit, push...) | [Séquences](sequences.md) | Paramètres > Séquences; palette **Séquence : <nom>** |
 | Suivre de gros fichiers avec Git LFS | [Git LFS](lfs.md) | Palette **LFS : Suivre un motif...**, **LFS : Initialiser pour ce dépôt** |
 | Trouver une branche, un commit, une pull request ou un ticket dans plusieurs dépôts | [Recherche](search.md) | `Ctrl+Alt+F`, ou le bouton Recherche globale de la barre de titre ; `f` cherche dans le graphe de commits du dépôt courant |
 | Voir en une liste tout ce qui m'attend | [Le Radar](radar.md) | `Alt+R` ; palette **Radar : Ouvrir** |

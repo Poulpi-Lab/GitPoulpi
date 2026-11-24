@@ -36,6 +36,7 @@ GitPoulpi は、クリックできる commit グラフ、コマンドパレッ�
 | Issue を Markdown ノートで管理する（トークン不要） | [ローカル Issue と Obsidian](local-issues.md) | ISSUES セクションで、プロバイダー `Local Markdown - <name>`。パレットの **ローカル Issue: Obsidian で開く...** |
 | 多数の commit にわたって作者、日付、メッセージ、ファイルを書き換える | [履歴の書き換え](history-rewrite.md) | `Ctrl+G Shift+H`。パレットの **書き換え: 履歴ワークベンチ** |
 | 操作を元に戻す（やり直す） | [元に戻す・やり直す](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`。`Alt+Z` で元に戻す履歴が開きます。パレットの **編集: 元に戻す** |
+| 1 つのキーで複数のアクションを実行する（ステージ、AI メッセージ、コミット、プッシュなど） | [シーケンス](sequences.md) | 設定 > シーケンス; パレットの **シーケンス: <名前>** |
 | Git LFS で大きなファイルを追跡する | [Git LFS](lfs.md) | パレットの **LFS: パターンを追跡...**、**LFS: このリポジトリで初期化** |
 | 複数のリポジトリにまたがってブランチ、commit、pull request、Issue を探す | [検索](search.md) | `Ctrl+Alt+F`、またはタイトルバーの全体検索ボタン。`f` で現在のリポジトリの commit グラフを検索します |
 | 自分に必要なことを 1 つの一覧で見る | [Radar](radar.md) | `Alt+R`。パレットの **Radar: 開く** |

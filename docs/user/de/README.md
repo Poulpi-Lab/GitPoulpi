@@ -40,6 +40,7 @@ springen Sie zu den Referenzseiten, wenn Sie sie brauchen.
 | Issues als Markdown-Notizen führen, ohne Token | [Lokale Issues und Obsidian](local-issues.md) | Der Abschnitt ISSUES, Anbieter `Local Markdown - <Name>`; Palette **Lokale Issues: In Obsidian öffnen...** |
 | Autoren, Daten, Nachrichten oder Dateien über viele Commits umschreiben | [Verlauf umschreiben](history-rewrite.md) | `Ctrl+G Shift+H`; Palette **Umschreiben: Werkbank für den Verlauf** |
 | Einen Vorgang rückgängig machen (oder wiederholen) | [Rückgängig und Wiederholen](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`; `Alt+Z` öffnet den Rückgängig-Verlauf; Palette **Bearbeiten: Rückgängig** |
+| Mehrere Aktionen mit einer Taste ausführen (Stage, KI-Nachricht, Commit, Push...) | [Sequenzen](sequences.md) | Einstellungen > Sequenzen; Palette **Sequenz: <Name>** |
 | Große Dateien mit Git LFS verfolgen | [Git LFS](lfs.md) | Palette **LFS: Muster verfolgen...**, **LFS: Für dieses Repository initialisieren** |
 | Einen Branch, Commit, Pull Request oder ein Issue über Repositories hinweg finden | [Suche](search.md) | `Ctrl+Alt+F` oder die Schaltfläche Globale Suche in der Titelleiste; `f` durchsucht den Commit-Graphen des aktuellen Repositorys |
 | Alles, was mich braucht, in einer Liste sehen | [Das Radar](radar.md) | `Alt+R`; Palette **Radar: Öffnen** |

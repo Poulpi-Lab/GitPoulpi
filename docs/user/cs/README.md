@@ -40,6 +40,7 @@ budete potřebovat.
 | Vést issues jako poznámky v Markdownu, bez tokenu | [Lokální issues a Obsidian](local-issues.md) | Sekce ISSUES, poskytovatel `Local Markdown - <name>`; paleta **Lokální issues: Otevřít v Obsidianu...** |
 | Přepsat autory, data, zprávy nebo soubory v mnoha commitech | [Přepis historie](history-rewrite.md) | `Ctrl+G Shift+H`; paleta **Přepis: Otevřít nástroj pro přepis historie** |
 | Vrátit zpět (nebo znovu) operaci | [Zpět a znovu](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`; `Alt+Z` otevře historii zpět; paleta **Úpravy: Zpět** |
+| Spustit několik akcí jednou klávesou (stage, zpráva od AI, commit, push...) | [Sekvence](sequences.md) | Nastavení > Sekvence; paleta **Sekvence: <název>** |
 | Sledovat velké soubory pomocí Git LFS | [Git LFS](lfs.md) | Paleta **LFS: Sledovat vzor...**, **LFS: Inicializovat pro tento repozitář** |
 | Najít větev, commit, pull request nebo issue napříč repozitáři | [Hledání](search.md) | `Ctrl+Alt+F` nebo tlačítko Globální hledání v záhlaví okna; `f` hledá v grafu commitů aktuálního repozitáře |
 | Vidět vše, co čeká na mě, v jednom seznamu | [Radar](radar.md) | `Alt+R`; paleta **Radar: Otevřít** |

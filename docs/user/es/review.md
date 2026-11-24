@@ -154,10 +154,30 @@ mayúsculas: **`V`** disposición, **`H`** hunks o archivo entero, **`S`** espac
 anterior, **`E`** la codificación, **`M`** el minimapa. Cada una tiene una fila en la paleta (*Revisión: Alternar vista en línea / dividida*,
 ...).
 
+En el **Resumen**, la conversación y el bloque de borrador ✦ se seleccionan igual: arrastra sobre el texto,
+**`Ctrl+C`** lo copia (un enlace o un botón que pulsas conserva su acción, y un arrastre que empieza en uno no selecciona
+nada). Sin selección, **`Ctrl+C`** (o *Conversación: Copiar texto*) copia la entrada seleccionada tal como la guarda el host.
+El I-beam aparece sobre el texto y la mano se queda sobre botones y enlaces. Una selección sigue a lo que hay
+en pantalla: al desplazarte se mueve con su texto (sigue seleccionada mientras está fuera de la vista), una actualización que reescribe
+el texto la descarta, y un párrafo ajustado se copia como las filas que muestra.
+
+Los comentarios dentro del diff de la página **Archivos** (un hilo, tus notas pendientes, las sugerencias ✦) también se seleccionan: arrastra
+sobre sus palabras, **`Ctrl+C`** (o *Revisión: Copiar el texto seleccionado o la línea*) las copia, **`Esc`** descarta la selección. Pulsar uno de
+sus botones, o un clic simple en la cabecera de un hilo (se pliega), sigue actuando; un arrastre que empieza en la cabecera selecciona sus
+palabras y deja el hilo como está.
+
 ### commits
 
 Solo los commits de la solicitud (no el historial que hay detrás), del más reciente al más antiguo, y el diff del seleccionado
 (sus cambios respecto a su padre), con todos sus archivos uno bajo otro y las mismas opciones de visualización.
+
+## Volver a una revisión
+
+Una revisión sigue abierta mientras trabajas en otra pestaña. Sal de la pestaña con la revisión abierta (clic en otra pestaña, `Ctrl+PageDown`, **Repositorio: Pestaña siguiente** de la paleta) y al volver se reabre en la misma solicitud, la misma página (Resumen, Archivos o commits), el mismo archivo y la misma línea, con el teclado en el mismo lado. Lo mismo vale para una revisión mediante la API sobre el Radar: vuelve a mostrar la pestaña Radar y la revisión está de nuevo encima.
+
+Una revisión está **en curso** mientras su página está abierta. Cerrarla (`Esc`, la cruz, **Revisión: Cerrar**), enviarla (**Terminar la revisión**, o enviar o abandonar un cambio de Gerrit) o hacer checkout de su rama la termina, y no se reabre. Salir de GitPoulpi con una revisión abierta cuenta como salir de la pestaña: el próximo arranque la reabre del mismo modo.
+
+Si la solicitud se fusionó o se cerró entretanto, o el host no responde, no se abre ninguna página: la línea de estado dice por qué y la próxima vez no se reabre nada. Los comentarios pendientes, los archivos vistos y el borrador se conservan como siempre (consulta **Escribir una revisión**). Una ejecución de sugerencias que aún siga cuando sales no se traslada.
 
 ## Escribir una revisión
 

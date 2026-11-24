@@ -128,6 +128,7 @@ conflicto en sus barras de desplazamiento. Haz clic en una marca para ir allí.
   columna (con el teclado: `Shift+C` para elegir una columna y luego `]` / `[`).
 - **Haz doble clic en el borde entre dos cabeceras del Log** para ajustar la columna de su izquierda a su contenido (con el teclado: `Shift+C` para elegir una columna y luego `=`; `+` ajusta todas las columnas). La última columna tiene un agarre en su propia última celda: arrástralo para cambiar el tamaño de esa columna, y la columna Mensaje absorbe la diferencia.
 - **Desplaza el Log lateralmente** (la disposición de columnas `scroll`; Ajustes > Log y grafo > Disposición de columnas, o la casilla `Desplazar lateralmente` del selector): la rueda horizontal o `Shift`+rueda sobre la tabla, la barra del borde inferior (arrastra su pulgar, pulsa la pista vacía, haz clic en sus flechas de los extremos), o `Shift+Izquierda` / `Shift+Derecha`. En la disposición `fit` por defecto las columnas llenan el panel y no hay nada que desplazar.
+- **Desplaza lateralmente un panel de lista** cuando una fila es más ancha que el panel: una sección de Refs (un nombre largo de rama, tag o stash), las listas Unstaged y Staged, los archivos modificados del commit (o de una comparación) y las líneas de información de los detalles del commit (id, autor, fecha de autoría, recuentos). La rueda horizontal o `Shift`+rueda sobre el panel lo desplaza; una barra aparece en el borde inferior del panel solo mientras algo desborda (arrastra su tirador, pulsa la pista vacía, haz clic en sus flechas de los extremos), así que nunca ocupa una fila. Con el teclado, `Alt+Left` / `Alt+Right` desplazan el panel que lo tiene (el Log desplaza los detalles del commit; dentro de los archivos modificados, los archivos); la paleta tiene `Ver: Desplazar el panel a la izquierda/derecha`. Se desplaza la fila entera (sangría, marca de estado, chevron y nombre juntos); el título del panel, su borde, las barras de desplazamiento y el botón Stage/Unstage de una fila de Estado bajo el puntero se quedan quietos. Un nombre ya no se corta con puntos suspensivos: su final queda a un desplazamiento (una rama con destinos de push adicionales conserva a la vista su insignia `⇉`, así que su nombre es el que cede). El desplazamiento es por panel, se detiene en la fila más ancha a la vista y se olvida al cambiar de repositorio. El bloque del mensaje del commit ajusta su texto, así que no tiene nada que desplazar. Mientras una sección está desplazada lateralmente, su borde inferior lleva la barra, así que cambia el tamaño de esa sección con sus comandos de teclado o desde una sección que quepa.
 - **Arrastra una cabecera del Log** para mover la columna: un fantasma de su nombre sigue al puntero, la cabecera que dejó se atenúa y una barra de acento marca el hueco donde caería. Las columnas se mueven al soltar; `Esc` cancela, y el puntero muestra la mano abierta mientras la llevas (con el teclado: `Shift+C` para elegir una columna y luego `<` / `>`).
 
 GitPoulpi recuerda cada tamaño. Consulta
@@ -245,6 +246,7 @@ Consulta [Alojamiento y gestores de issues](hosting-integration.md).
   cada ref del commit.
 - **Clic derecho en un chip de ref** para ver un menú con las acciones de la
   ref y las acciones del commit.
+- **Haz clic en el embudo de la cabecera Autor** (o `Shift+A` en el Log, o `Log: Filtrar por autor...` de la paleta) para elegir los commits de qué autores siguen iluminados; el resto se atenúa como hace una búsqueda. `Enter` o un clic en una fila alterna un autor, la fila **Quitar el filtro** (✕) lo quita, `Esc` cierra el popup y lo conserva. **Clic derecho en el embudo iluminado** para quitarlo (la paleta: `Log: Quitar el filtro de autor`).
 - **Clic derecho en la cabecera** para mostrar u ocultar columnas: una lista de casillas (`[x]` / `[ ]`) con una ✕ en su título; haz clic en una fila o usa las flechas y `Espacio` / `Intro`, y ciérrala con la ✕, `Esc` o un clic fuera (la paleta: `Ver: Log: elegir las columnas que se muestran`). Bajo las casillas: `Ajustar <columna> a su contenido` (la columna sobre la que se hizo clic derecho), `Ajustar todas las columnas a su contenido` y `Restablecer los anchos de columna`. El equivalente con el teclado del clic derecho: `Shift+C` para elegir una columna y después `.` (o `Shift+F10`) abre el mismo menú sobre ella.
 - **Las columnas del Radar** funcionan igual: arrastra el separador que sigue a la columna de repositorio, `#`, autor o antigüedad para ajustar su ancho, **haz doble clic en él** para ajustar la columna a su entrada más ancha (`C` elige una columna y luego `=`; `+` ajusta todas), y **haz clic derecho en el título de una columna** (o `C` y luego `.`) para `Ajustar <columna> a su contenido` y `Ajustar todas las columnas a su contenido`.
 - **Haz clic en `↑`, `↓` o `✕`** en la barra de búsqueda para ir a la coincidencia
@@ -278,20 +280,36 @@ sección visible no se puede desmarcar. La elección es por repositorio y se con
 
 ### Arrastrar refs
 
-Pulsa sobre una rama en la barra lateral Refs, o sobre un chip de ref en el Log,
-y arrástrala sobre otra rama. La barra de estado dice lo que llevas. Un destino que puede
-recibir lo soltado se ilumina. Suelta para obtener un menú. `Esc` cancela el
-arrastre.
+Pulsa sobre una rama, una rama remota o un tag en la barra lateral Refs, o sobre un chip
+de ref en el Log, y arrástrala sobre otra ref. La barra de estado dice lo que llevas. Un
+destino que puede recibir lo soltado se ilumina. Suelta para obtener un menú. `Esc`
+cancela el arrastre. El Log se queda donde está mientras llevas algo: pulsar una ref
+solo desplaza el Log hasta su commit cuando resulta ser un clic (el salto ocurre al
+soltar el botón), así que puedes desplazarte primero hasta el destino y luego
+coger la ref.
 
 | Arrastre | Menú |
 |---|---|
 | Rama local X sobre la rama local Y | **Merge X en Y**, **Rebase X sobre Y**, **Rebase interactivo de X sobre Y...**, **Fast-forward de Y a X** |
 | Rama local sobre una rama remota | **Push X a Y** (la rama remota de destino) |
 | Rama remota sobre la rama local Y | **Merge**, **Rebase Y sobre ella**, **Fast-forward de Y a ella**, y **Pull** cuando es el upstream de Y |
+| Tag T sobre cualquier rama, rama remota o tag | **Mover el tag T aquí**; marcado *(no es un fast-forward: T dejaría de ser un ancestro)* cuando el destino no desciende del commit del tag (decides tú); atenuado *ya está ahí* cuando ya está en ese commit |
+| Tag T sobre la rama local Y | además **Merge del tag T en Y** y, bajo una línea, el más raro **Merge de Y en el tag T y mover el tag** (un commit de merge del commit del tag e Y, detached, y luego el tag se mueve a él) |
 
 Cuando la acción cambia una rama que no tiene checkout, GitPoulpi hace primero
-checkout de ella. Si git rechaza el checkout, no cambia nada. Los tags no se pueden
-arrastrar ni pueden recibir un elemento soltado.
+checkout de ella. Si git rechaza el checkout, no cambia nada. Solo se puede soltar
+un tag sobre un tag, y una rama no se puede soltar sobre uno.
+
+Mover un tag conserva su tipo: un tag ligero sigue siendo ligero, un tag anotado se
+vuelve a crear anotado con su mensaje y la línea de su autor trasladados sin cambios
+(un tag firmado se rechaza, su firma ya no coincidiría). Solo se mueve tu tag local:
+un remoto que tiene el tag conserva la posición anterior, el tag pasa a *differs* y
+la barra de estado lo dice; haz tú el push cuando lo quieras. El movimiento y el
+merge con movimiento son cada uno un paso de deshacer (deshacer devuelve el objeto
+tag anterior). Un merge en un tag que da conflictos no cambia nada. Paleta:
+`Refs: Mover el Tag seleccionado al Commit seleccionado...` mueve el tag del panel Refs
+al commit seleccionado en el Log (pregunta antes cuando no es un
+fast-forward); cualquier otro destino pasa por marcar y soltar, más abajo.
 
 Teclado: «marcar y soltar» hace lo mismo que un arrastre, para cualquier par de
 refs. En el panel Refs pulsa `m` sobre una rama (paleta: `Refs: Marcar como origen
@@ -499,7 +517,7 @@ Terminal.app, Windows Terminal, xterm), el puntero no cambia; consulta
 [Elegir un terminal](terminals.md#forma-del-puntero-del-ratón-osc-22). El divisor o el botón bajo el puntero se
 ilumina en todos los terminales.
 
-El mismo tipo de componente da el mismo puntero en toda la aplicación.
+El mismo tipo de componente da el mismo puntero en toda la aplicación: los botones de una revisión mostrada sobre el Radar (pestañas, la cruz de cierre, los botones de los popups) y los botones propios de la columna Acciones del Radar muestran la mano como cualquier otro botón.
 
 - **Los botones son botones de verdad**, en Ajustes (Integraciones: Editar, Desconectar,
   Quitar, Examinar, Eliminar, los botones de fragmentos del editor de instrucciones...)
@@ -517,7 +535,7 @@ El mismo tipo de componente da el mismo puntero en toda la aplicación.
 - **La flecha** está en las filas. Una fila se ilumina entera cuando el puntero está
   sobre ella (la misma luz en todas las listas) y no es un control por sí sola: las
   filas de los paneles Refs, Worktrees, Stashes y Submódulos, el Log y la columna de
-  commits (solo una píldora de ref toma la mano), las líneas de un diff, los archivos
+  commits (solo una píldora de ref toma la mano), los márgenes de un diff, los archivos
   modificados, los elementos de pull requests, issues y Radar, y las filas de las
   listas de diálogos y paneles (clonar, selector de carpetas, Workspaces, las
   tarjetas del tablero, el panel de tareas, los selectores de asignado, etiqueta e hito,
@@ -529,9 +547,21 @@ El mismo tipo de componente da el mismo puntero en toda la aplicación.
   issues), las filas de texto, número y área de Ajustes (también mientras las editas),
   los campos de los diálogos, los cuadros de comentarios de la revisión, el compositor
   de commits, el texto del editor de archivos y el resultado editable del editor de
-  merge (sus paneles de solo lectura conservan la flecha). En los detalles del commit,
-  el mensaje y la descripción son editables, así que el I-beam aparece sobre ellos y
-  todo el bloque se ilumina ligeramente.
+  merge (sus paneles de solo lectura conservan la flecha, porque arrastrar allí no
+  selecciona nada). Una regla cubre también el texto de solo lectura: dondequiera que
+  un arrastre del ratón pueda seleccionar texto, el puntero es el I-beam. Es el caso del
+  código de un diff (la vista Diff, En línea y Dividida, y el panel de diff de la revisión),
+  la Vista de archivo y el código de Blame. Sus números de línea, marcas y cabeceras de
+  hunk conservan la flecha, y un botón en una línea conserva la mano. Lo mismo vale para la
+  conversación de un issue o de una solicitud (también el Resumen de la revisión y su
+  bloque de borrador), el mensaje de los detalles del commit, las notas de versión, el Log
+  de actividad (ambas pestañas), el popup de ayuda, la vista previa de Markdown del editor
+  de comentarios y los comentarios, notas pendientes y sugerencias dentro del diff de la
+  revisión: un arrastre selecciona el texto (un clic simple conserva su significado: un
+  enlace se abre, un botón actúa, una entrada del Log de actividad o un hilo se abre o se
+  pliega), `Ctrl+C` lo copia, `Esc` o un clic lo suelta. Una selección sigue a su texto
+  cuando te desplazas. El mensaje del commit también es editable (el doble clic lo
+  enmienda), y todo el bloque se ilumina ligeramente.
 - **En los detalles del commit**, las líneas de información son controles: haz clic
   en `commit: <id>` para copiar el id corto, doble clic en la línea del autor o de la
   fecha para enmendarla (la mano y una marca ligera lo indican). La línea de

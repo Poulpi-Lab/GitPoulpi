@@ -28,7 +28,14 @@ los cambios de trabajo:
   los archivos de un commit, y `gitpoulpi status` / `gitpoulpi diff` informan `renamed_from`.
 - **Ruta** o **Árbol** (`m`) lista los archivos en plano o por carpetas. **Contraer todo**
   (`z`) pliega las carpetas. **Ver todos los archivos** (`a`) muestra el árbol completo en
-  lugar de solo los archivos modificados. Haz clic derecho en la parte vacía de la lista para ver
+  lugar de solo los archivos modificados. Una carpeta contraída muestra, tras su nombre, un
+  pequeño recuento atenuado de los archivos que contiene, subcarpetas incluidas (`src/ (12)`);
+  una carpeta abierta no muestra ninguno. En un panel estrecho el nombre se acorta primero para que
+  el recuento siga a la vista. En un repositorio con archivos guardados con Git LFS, una casilla
+  **Solo LFS** (`o`, o **Archivos: Alternar solo LFS**) reduce todas las listas de archivos
+  (Unstaged, Staged, **Ver todos los archivos**, los archivos de un commit) a esos archivos;
+  los recuentos de carpeta lo siguen, y no se ofrece cuando ningún archivo usa LFS.
+  Haz clic derecho en la parte vacía de la lista para ver
   **Expandir todo** / **Contraer todo**, y en una fila de carpeta para ver **Expandir todas las subcarpetas** /
   **Contraer todas las subcarpetas**; teclas `=`, `-`, `*`, `_` (véase
   [Ratón y gestos](mouse-and-gestures.md)).

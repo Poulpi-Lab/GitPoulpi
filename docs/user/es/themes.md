@@ -206,7 +206,18 @@ Cada tema trae sus propios colores de carril para el grafo del Log, pero puedes
 combinar cualquier tema con cualquier paleta: **Ajustes > Apariencia > Tema de color del
 grafo** ofrece **Seguir el tema** (el valor por defecto) más todas las paletas de carriles de todos los
 temas (GitPoulpi Dark, GitPoulpi Light, luego Material, Serie, ... y el
-`graph_palette` de tus propios archivos de tema). ![El combo Tema de color del grafo en Apariencia: Seguir el tema, luego cada paleta de carriles con algunos de sus colores](../images/settings-log-graph-lanes.png)
+`graph_palette` de tus propios archivos de tema, listados después de los predefinidos bajo el
+nombre del tema). Un tema propio aparece la próxima vez que se abre la lista (los
+archivos se vuelven a leer entonces), y elegir uno guarda el nombre de su archivo en
+`ui.graph_color_theme` (para la instalación primaria en `[ui]`, para las
+demás en su propia entrada `[installation.settings.<id>]`, como el tema). Un
+archivo de tema sin `graph_palette` tiene los colores de carril de su `base` (el
+preset por defecto cuando no nombra ninguno), la misma herencia que cualquier otro color
+del archivo. Un tema propio con el nombre de una paleta de carriles integrada (por ejemplo
+`gruvbox`) sustituye a esa paleta en la lista. Si el nombre configurado ya no
+existe (el archivo se eliminó o se renombró), el grafo usa los colores de carril del tema
+activo, y Ajustes muestra el nombre marcado como *no encontrado* hasta que
+elijas otro. ![El combo Tema de color del grafo en Apariencia: Seguir el tema, luego cada paleta de carriles con algunos de sus colores](../images/settings-log-graph-lanes.png)
 
 En `config.toml`:
 
@@ -255,6 +266,18 @@ statusbar_fg = "#eceff4"
 [diff]
 add_bg = "#2f3b2f"
 ```
+
+### Palabras cambiadas en un diff (`diff.add_emph_bg`, `diff.del_emph_bg`)
+
+Los fondos más intensos que la vista Diff pinta sobre las palabras que difieren dentro de
+una línea modificada, encima de `diff.add_bg` (líneas añadidas) y `diff.del_bg` (líneas
+eliminadas); el texto conserva `diff.add_fg` y `diff.del_fg`. Todos los presets definen ambos.
+Un archivo de tema que define `diff.add_bg` o `diff.del_bg` pero no el énfasis correspondiente
+recibe uno derivado de él (el 30 % del camino hacia el color del texto de
+ese lado), de modo que un fondo propio nunca acaba con el énfasis del tema base. Un valor
+`default` (el preset Terminal), o un terminal cuya profundidad de color dibujaría ambos fondos
+igual, marca las palabras en negrita y subrayado. Consulta
+[Palabras cambiadas en un diff](interface-tour.md#palabras-cambiadas-en-un-diff).
 
 Los colores son `"#rrggbb"`, `"ansi:N"` (la entrada N de la paleta del terminal) o
 `"default"` (el color propio del terminal). Los grupos y claves son los de
@@ -317,6 +340,8 @@ Usa `256` o `16` si un tema se ve con colores erróneos por ssh o en un multiple
 antiguo. El preset Terminal no necesita nada de esto. Truecolor no cuesta nada;
 la pasada de conversión recorre la pantalla una vez por fotograma solo cuando está activa.
 
+El tema es por instalación: varias instalaciones de GitPoulpi que comparten una misma configuración conservan cada una el suyo, así que elegir uno en una instalación nunca recolorea las demás.
+
 ## Vista previa en vivo
 
 En Ajustes > Apariencia, el combo Tema lista **Sistema (sigue el terminal)**,
@@ -337,14 +362,17 @@ Escribe para filtrar la lista; al mover el resaltado se previsualiza el tema al 
 fuera de la lista) devuelve el tema anterior y no guarda nada.
 
 Bajo el campo de filtro, un prefiltro segmentado acota la lista: **Todos**,
-**Oscuros**, **Claros** y **Con color** (haz clic en un segmento, `Tab` / `Shift+Tab`, o
-`Alt+1`..`Alt+4`). Oscuros y Claros salen del brillo del `ui.bg` del tema;
+**Oscuros**, **Claros** y **Con color**, más **Propios** cuando tienes archivos de tema propios
+(haz clic en un segmento, `Tab` / `Shift+Tab`, o `Alt+1`..`Alt+5`). Oscuros y Claros salen del brillo del `ui.bg` del tema;
 **Con color** conserva los temas cuyo fondo está claramente teñido (azul,
 violeta, amarillo, verde...) y deja fuera los grises blancos, casi blancos, negros y
 casi negros, así que Solarized Dark, Dracula o Nord tienen color mientras que GitHub
 Dark y One Light no. Un tema con color también aparece en Oscuros o Claros.
 **Sistema** y los temas transparentes (sin fondo propio) aparecen solo en
-Todos. El prefiltro se combina con lo que escribes. Los selectores de tema de color
+Todos. **Propios** conserva solo los archivos de tema de tu carpeta `themes/` (un tema propio
+sigue siendo Oscuro, Claro o Con color para esos botones); el botón no se dibuja y no
+se alcanza con teclas mientras esa carpeta no tenga ningún tema. El prefiltro se combina
+con lo que escribes. Los selectores de tema de color
 del grafo y de idioma se previsualizan igual: los carriles del Log y toda la interfaz
 cambian al mover el resaltado.
 

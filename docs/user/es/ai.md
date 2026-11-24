@@ -170,6 +170,22 @@ el agente* en la paleta de comandos) abre el agente una vez, en un terminal
 visible, en la carpeta de trabajo que usará. Responde a la pregunta, cierra el
 agente y vuelve a intentarlo; el agente recuerda la respuesta.
 
+### Abrir el agente en la carpeta de una pestaña
+
+`Pestaña: Abrir agente de IA aquí` en la paleta de comandos (reasignable como `palette.tab_open_agent_here`,
+sin tecla por defecto) abre tu terminal en la carpeta de la pestaña activa ejecutando el agente de un
+perfil de agente local, para trabajar con él a mano allí. Es el mismo terminal que **Terminal aquí**
+y el mismo comando que **Abrir el agente...**, pero en la carpeta de la pestaña en lugar de la
+carpeta de trabajo propia del perfil. Con un solo perfil de agente local se abre al instante; con
+varios, una lista bajo la barra de pestañas pregunta cuál. No envía ningún prompt ni inicia ninguna
+petición a la IA: abrir el agente es la acción, y lo que escribas en él es cosa tuya.
+
+La fila lleva la chispa de la IA, se oculta mientras la IA está desactivada (**Ajustes > IA**) y se atenúa
+("no hay ningún agente de IA local configurado") cuando ningún perfil es un agente local. En una secuencia,
+el paso `tab_open_agent_here` toma el `id` del perfil de IA en su opción `profile` (vacío: el perfil por
+defecto y, si no, el primer agente local). A una plantilla de terminal propia no se le puede pasar el
+comando del agente: el terminal se abre en la carpeta y la línea de estado indica qué comando ejecutar.
+
 La respuesta se lee de la transcripción de sesión del agente en Claude Code (su
 texto exacto, borrado después) y de la pantalla entre dos líneas marcadoras que
 la petición pide, en Codex y Gemini. Como máximo se ejecutan dos ejecuciones de
@@ -305,6 +321,7 @@ sobre los botones mientras pasas el puntero o la resaltas.
 | **Revisión de código** | En la [revisión de un pull o merge request](review.md#borrador-de-revisión-con-ia): el botón `✦ Redactar revisión...`, `s`, o el comando de la paleta `Revisión: ✦ Redactar revisión...` (abre las opciones de la revisión, `Enter` la ejecuta). El modelo lee el diff, la descripción y los comentarios existentes de la solicitud (y, por defecto, el `CLAUDE.md` y el `AGENTS.md` del proyecto: ver [Contexto de la revisión](#contexto-de-la-revisión)) y propone comentarios; aceptas, editas o descartas cada uno. Nada llega al host antes de que envíes la revisión. | `hosting review suggest <n>` (imprime JSON, no publica nada), `ai review-context` (los valores por defecto) |
 | **Dividir un commit** | El menú de un commit *Dividir commit (IA)...*, o el comando de la paleta `IA: Dividir el commit seleccionado...`. El editor de división se abre con la agrupación del modelo ya rellenada; véase más abajo. | `ai split-plan <rev>` (imprime) |
 | **Script de reescritura del historial** | En el [editor de reescritura del historial](history-rewrite.md#escribir-un-script-con-ia): el botón `✦ Escribir con IA...` del editor de scripts, o el comando de la paleta `Reescritura: Escribir un script con IA...`. Un diálogo muestra exactamente qué se enviará; el script llega al editor, marcado, y nunca se ejecuta ni se aplica por ti. | `ai rewrite-script "<instrucción>" [--sample N]` (imprime) |
+| **Borrador de secuencia** | Describe una [secuencia de acciones](#borrador-de-secuencia) para crearla, o cómo cambiar una (Ajustes > Secuencias, siguiente porción de la ventana). | `ai sequence-draft "<descripción>" [--edit <id>] [--context]` (imprime) |
 | **Nombre de worktree** | En el [diálogo Crear worktree](worktrees.md#poner-nombre-con-ia): el botón `✦ Nombrar con IA` o `Alt+A` abre un cuadro donde describes la función, el error o la tarea; el modelo nombra el worktree y su rama siguiendo los nombres de rama del propio repositorio, y ambos llegan a los campos del diálogo para que los edites. Solo se envían tu descripción y los nombres de las ramas locales, así que no tiene diálogo de «lo que se envía». | `ai worktree-name --describe "<tarea>"` (imprime) |
 | **Responder en un host** y **Descripción de issue** | El botón **Escribir con IA** (`Alt+E`) de cada editor de Markdown que envía a un host: un comentario, una respuesta o una edición en una conversación, un comentario o resumen de revisión, la descripción de un issue nuevo. El borrador queda en el cuadro; no se publica nada. Ver [Ayuda para escribir en un host](#ayuda-para-escribir-en-un-host). | `ai hosting-reply` (imprime un borrador) |
 | **Reglas de reescritura del historial** | En el [editor de reescritura del historial](history-rewrite.md#crear-reglas-con-ia): el botón `✦ Crear reglas con IA...`, `Alt+E`, o el comando de la paleta `Reescritura: Crear reglas con IA...`. Un diálogo de varias líneas muestra exactamente qué se enviará; las reglas y los ajustes llegan al editor y no se previsualiza ni se aplica nada por ti. | `ai rewrite-rules "<descripción>" [--context]` (imprime) |
@@ -388,6 +405,26 @@ crea una regla Script de esta manera. Opcionalmente se envían también el alcan
 etiquetas y los autores de los commits más recientes (una casilla, desactivada por defecto, que se refleja en
 el panel «qué se envía»). El perfil y las instrucciones son los de *Reglas de reescritura del historial* en
 Ajustes > IA.
+
+### Borrador de secuencia
+
+Describes con tus palabras una secuencia de acciones («stage de todo, escribir el mensaje con la IA, commit y push» o, para una
+existente, «añade primero un fetch») y el modelo propone un nombre, un id, los pasos y, si quiere, un atajo. **Solo
+propone**: nada se guarda antes de que lo aceptes y nunca se ejecuta nada. El modelo solo conoce los comandos que puede
+contener una secuencia (la lista que recibe se genera a partir de la misma tabla que valida una secuencia, así que no puede
+desviarse); cada paso se comprueba por separado, y un paso desconocido, destructivo, que ejecuta otra secuencia o que pide una
+pausa imposible se deja fuera y aparece con el motivo, mientras que los válidos se conservan. Opcionalmente se envían también
+los nombres de los remotos, los ids de los perfiles de IA y las etiquetas de Abrir en (desactivado por defecto; el flag de la
+CLI es `--context`). En el terminal, `gitpoulpi ai sequence-draft` imprime la propuesta como JSON (con `toml`, que lee
+`gitpoulpi sequence add --file`) y no guarda nada. El perfil y las instrucciones son los de *Borrador de secuencia* en
+Ajustes > IA.
+
+En la interfaz de terminal el mismo trabajo es la entrada **Crear con IA...** de Ajustes > Secuencias > **Añadir**
+(paleta: `Secuencia: Crear con IA...`) y el botón **Editar con IA...** de una secuencia: un diálogo donde
+escribes lo que quieres, con la casilla de contexto (desactivada por defecto) y la pregunta «Qué se envía», y después una propuesta
+que puedes **Aceptar**, **Editar antes de guardar**, **Rechazar** o volver a enviar con **Volver**. Una edición muestra un diff
+frente a la secuencia actual (`+` añadido, `-` eliminado, `~` cambiado) y el atajo sugerido se comprueba con tu
+mapa de teclas pero nunca se asigna. Nada se guarda antes de que aceptes (consulta [Secuencias](sequences.md#crear-y-editar-con-ia)).
 
 ### Ayuda para escribir en un host
 

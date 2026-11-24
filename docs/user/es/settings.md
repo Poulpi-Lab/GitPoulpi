@@ -446,7 +446,7 @@ las compilaciones que incluyen el servidor; consulta [MCP y agentes](mcp-and-age
 | **Color de entrada**, **Color de entrada personalizado** | El fondo de los campos de texto: **Seguir el tema** (por defecto), un color oscuro fijo o tu propio `#rrggbb`. |
 | **Cursor de texto** | `ui.text_cursor`: **terminal** (por defecto) coloca el cursor del propio terminal en el punto de inserción del campo de texto con foco, como una barra (se aplican los ajustes de cursor de tu terminal y la ventana de candidatos de un método de entrada se abre junto al cursor); **drawn** dibuja el cursor propio de GitPoulpi y mantiene oculto el del terminal. Se aplica al instante. Paleta: `Ajustes: Cursor de texto...`. |
 | **Profundidad de color** | **auto** (por defecto), **truecolor**, **256** o **16**. Consulta [Temas](themes.md). |
-| **Tema de color del grafo** | **Seguir el tema** (por defecto: los colores de carril del propio tema) o cualquier paleta de carriles. Cada paleta muestra algunos de sus colores. Se aplica al cerrar los Ajustes. El comando de la paleta **App: Cambiar tema de color del grafo...** (`Ctrl+N Shift+T`) previsualiza cada paleta en directo. |
+| **Tema de color del grafo** | **Seguir el tema** (por defecto: los colores de carril del propio tema) o cualquier paleta de carriles, incluidos tus propios archivos de tema (después de las predefinidas). Cada paleta muestra algunos de sus colores; un nombre configurado que ya no existe se marca como *no encontrado* y el grafo usa los carriles del tema. Se aplica al cerrar los Ajustes. El comando de la paleta **App: Cambiar tema de color del grafo...** (`Ctrl+N Shift+T`) previsualiza cada paleta en directo. |
 | **Fondo de los carriles del grafo** | **Desactivado** (transparente) o **Tinte de fila**: una banda tenue del color del carril detrás de la columna del grafo, con una barra fina en su borde. |
 | **Intensidad del tinte de fila** | Cuánto se atenúa la banda del tinte de fila: **Fuerte**, **Media** (por defecto) o **Sutil**. La barra del borde conserva su color completo. |
 | **Posición de la barra de herramientas** | `ui.toolbar_position`: Dónde va la barra de herramientas: Arriba, Abajo (por defecto), Izquierda o Derecha. Izquierda y Derecha forman una columna junto a los paneles; una ventana de menos de 80 columnas la dibuja abajo. Se aplica al instante. |
@@ -459,6 +459,8 @@ las compilaciones que incluyen el servidor; consulta [MCP y agentes](mcp-and-age
 | **Formato de fecha**, **Formato de fecha/hora**, **Formato de fecha detallado** | Los patrones de fecha de la columna de fecha del Historial de archivo y del Blame, de la columna Fecha del Log y de los detalles del commit. Cada uno muestra una vista previa en directo. Consulta la [referencia de configuración](config-reference.md#ui) para ver los tokens. |
 
 ![El combo Tema de color del grafo: Seguir el tema y luego todas las paletas de carriles con algunos de sus colores](../images/settings-log-graph-lanes.png)
+
+El tema y los colores del grafo (el Tema, el tema de color del grafo, la colorización y el fondo de los carriles, la intensidad del tinte de fila) pertenecen a cada instalación: con varias instalaciones que comparten un mismo `config.toml`, cambiarlos en una nunca cambia las demás. Solo la instalación primaria escribe además las claves `ui.*` compartidas.
 
 ### Teclado y ratón
 
@@ -491,6 +493,21 @@ Hay tres opciones en la pestaña **General**.
 | **Protocolo de teclado de Kitty** | **auto** pide al terminal el protocolo de teclado de kitty, de modo que llegan `Ctrl+,`, `Ctrl+Enter` y `Ctrl+Shift+N`. **off** nunca lo pide; úsalo si un terminal se porta mal. Requiere reiniciar. |
 | **Ratón activado** | Desactivado deja el ratón y la selección de texto a tu terminal. Requiere reiniciar. |
 | **Líneas de la rueda del ratón** | Cuántas filas mueve un paso de rueda en el Log. Requiere reiniciar. |
+
+### Secuencias
+
+**Ajustes > Secuencias** edita tus [secuencias](sequences.md) con nombre: listas de
+comandos de la paleta que se ejecutan uno tras otro, cada una una fila de la paleta y
+enlazable a una tecla. Es una [página de lista](#listas) con una sola cara: **+ Añadir** ofrece
+una secuencia vacía y los modelos (**Copia de seguridad**, **Componer y push**,
+**Worktree y agente**), las filas son el **Nombre**, el **Id**, una
+**Descripción**, el **Ámbito** (esta instalación, todas las instalaciones de este
+equipo, o solo este repositorio), un botón **Atajo** que abre el popup de
+captura de **Teclado y ratón**, **Editar pasos** y **Ejecutar ahora**.
+**Editar pasos** cambia la lista a los pasos de la secuencia, cada uno con una
+**Pausa** (**Por defecto**, **Siempre**, **Nunca**) y sus opciones; **+ Añadir**
+ahí abre una lista filtrable de los comandos que puede ser un paso. Cada cambio se
+aplica al instante. Consulta [Secuencias](sequences.md).
 
 ### Historial y grafo
 
@@ -530,6 +547,7 @@ del grafo están en la página **Apariencia**.
 | **Números de línea** | La columna de números de línea del editor y del diff. |
 | **Seguir la selección en el editor** | Mientras el editor está abierto, seleccionar otro archivo en el panel derecho lo abre también en el editor, tras preguntar si se guardan los cambios pendientes. Un archivo que no se puede editar se abre en su vista habitual. Solo para los cambios de trabajo: un archivo elegido de un commit sale del editor hacia el diff de ese commit. Activado por defecto (`editor.follow_selection`). |
 | **Ajuste de línea** | Ajusta las líneas largas del diff. |
+| **Resaltar las palabras cambiadas** | En una línea modificada, pinta con un fondo más intenso las palabras que difieren de la línea eliminada o añadida con la que se empareja, en la vista Diff (En línea y Dividida), el diff de la revisión y los archivos del commit. Activado por defecto (`ui.diff_intraline`); también **Diff: Alternar el resaltado de palabras cambiadas** de la paleta. Consulta [Palabras cambiadas](interface-tour.md#palabras-cambiadas-en-un-diff). |
 | **Disposición por defecto**, **Solo hunks**, **Mostrar cambios solo de espacios en blanco**, **Minimapa** | El estado inicial de la vista Diff. La barra de la vista Diff los cambia y los guarda. |
 | **Anotaciones del blame**, **Ancho de las anotaciones del blame** | Qué lado de la vista Blame lleva la columna de anotaciones (avatar, autor, antigüedad, resumen): **right** (por defecto) o **left**, y su ancho en celdas (24 a 90). Arrastrar el borde de la columna en la vista Blame, o las teclas `>` / `<`, guarda aquí el ancho (`ui.blame_side`, `ui.blame_width`). Consulta [Blame](log-and-history.md#blame). |
 | **Editor de merge: lado a lado desde (columnas)** | A partir de este ancho, el editor de merge muestra A y B lado a lado. Por defecto 100, mínimo 40, `0` significa siempre. Por debajo, A y B son pestañas. Consulta [Resolver conflictos de merge](merge-conflicts.md). |

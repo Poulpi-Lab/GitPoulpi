@@ -265,6 +265,7 @@ ventana; *propose* abre un diálogo que tú confirmas.
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
 | `ai_rewrite_rules` | `gitpoulpi ai rewrite-rules` | read, network |
 | `ai_rewrite_script` | `gitpoulpi ai rewrite-script` | read, network |
+| `ai_sequence_draft` | `gitpoulpi ai sequence-draft` | read, network |
 | `ai_split_plan` | `gitpoulpi ai split-plan` | read, network |
 | `ai_worktree_name` | `gitpoulpi ai worktree-name` | read, network |
 | `alias_status` | `gitpoulpi alias status` | read |
@@ -462,6 +463,10 @@ ventana; *propose* abre un diálogo que tú confirmas.
 | `rewrite_tools` | `gitpoulpi rewrite tools` | read |
 | `rm_file` | `gitpoulpi rm-file` | destructive |
 | `search` | `gitpoulpi search` | read |
+| `sequence_list` | `gitpoulpi sequence list` | read |
+| `sequence_run` | `gitpoulpi sequence run` | destructive, network |
+| `sequence_show` | `gitpoulpi sequence show` | read |
+| `sequence_validate` | `gitpoulpi sequence validate` | read |
 | `session_delete` | `gitpoulpi session delete` | destructive |
 | `session_list` | `gitpoulpi session list` | read |
 | `session_new` | `gitpoulpi session new` | write |
@@ -492,8 +497,12 @@ ventana; *propose* abre un diálogo que tú confirmas.
 | `tag_delete` | `gitpoulpi tag delete` | destructive, network |
 | `tag_delete_remote` | `gitpoulpi tag delete-remote` | destructive, network |
 | `tag_fetch` | `gitpoulpi tag fetch` | write, network |
+| `tag_force_push` | `gitpoulpi tag force-push` | destructive, network |
 | `tag_list` | `gitpoulpi tag list` | read |
+| `tag_merge_branch` | `gitpoulpi tag merge-branch` | write |
+| `tag_move` | `gitpoulpi tag move` | write |
 | `tag_push` | `gitpoulpi tag push` | write, network |
+| `tag_take_remote` | `gitpoulpi tag take-remote` | write |
 | `theme_export` | `gitpoulpi theme export` | read |
 | `theme_list` | `gitpoulpi theme list` | read |
 | `treat` | `gitpoulpi treat` | write |
@@ -507,6 +516,7 @@ ventana; *propose* abre un diálogo que tú confirmas.
 | `ui_propose_rewrite` | `gitpoulpi ui propose rewrite` | propose |
 | `ui_propose_split` | `gitpoulpi ui propose split` | propose |
 | `ui_propose_tag` | `gitpoulpi ui propose tag` | propose |
+| `ui_sequence_run` | `gitpoulpi ui sequence run` | propose |
 | `ui_show_commit` | `gitpoulpi ui show commit` | view |
 | `ui_show_conflict` | `gitpoulpi ui show conflict` | view |
 | `ui_show_diff` | `gitpoulpi ui show diff` | view |
@@ -573,6 +583,10 @@ Not exposed as tools:
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
 | `gitpoulpi repo-auth set` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
 | `gitpoulpi repo-auth clear` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
+| `gitpoulpi sequence add` | una secuencia es una lista de comandos que se ejecutan más tarde (y se pueden enlazar a una tecla): un agente no debe escribir sus propias macros ni editar la configuración que lo controla |
+| `gitpoulpi sequence remove` | elimina una secuencia de la configuración del usuario; las macros del usuario las gestiona él |
+| `gitpoulpi sequence trust` | confiar en las secuencias que un repositorio incluye (ejecutan comandos en la máquina del usuario) es una decisión de una persona; un agente solo puede ejecutar secuencias en las que una persona confió |
+| `gitpoulpi sequence untrust` | retirar la confianza en las secuencias de un repositorio es una decisión de una persona, igual que concederla |
 | `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
@@ -665,6 +679,7 @@ cancelar.
 | `ui_propose_split` (rev, plan file) | el editor de división sobre el commit, rellenado a partir del plan | *Dividir* (`Ctrl+S`); `Esc` lo rechaza |
 | `ui_propose_rewrite` (recipe file) | el editor de reescritura del historial con las reglas de la receta ya puestas; no se previsualiza ni se aplica nada | tu propio *Vista previa* y luego *Aplicar* (`Ctrl+Enter`); `Esc` la rechaza. Una receta con un script se rechaza y los valores secretos se descartan |
 | `ui_propose_resolution` (path, pick or content file) | el editor de merge sobre un archivo en conflicto, con las elecciones (o el texto entero) ya en el Resultado | *Guardar y marcar resuelto* (`Ctrl+S`); cerrarlo la rechaza |
+| `ui_sequence_run` (id) | un aviso "✦ Propuesto por <agente>: ejecutar la secuencia <nombre>" con *Ejecutar* y *Descartar*; todavía no se ejecuta nada | *Ejecutar* (clic, o `Ctrl+N` y luego `Enter`); *Descartar* o `Esc` lo rechaza. La ejecución se pausa después donde lo indique la secuencia. Se rechaza cuando la secuencia no existe, no es válida o es una secuencia de repositorio en la que no has confiado |
 
 Una propuesta a la vez; una propuesta de mensaje de commit se rechaza mientras
 tengas tu propio borrador en el compositor, y una propuesta de resolución

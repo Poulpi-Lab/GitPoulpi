@@ -1024,9 +1024,89 @@ pub fn remove_sequence(
     }
 }
 
+/// Puts the sequences named in `order` into that relative order, each in a
+/// slot one of them already held; every other entry of the file keeps its
+/// place (another installation's sequences are not ours to move). The
+/// storage is the one `scope` names, like [`remove_sequence`]. `false` when
+/// nothing moved.
+pub fn reorder_sequences(
+    scope: Scope,
+    order: &[String],
+    config_path: &Path,
+    repo: Option<&Path>,
+) -> Result<bool> {
+    fn apply(doc: &mut toml::Table, order: &[String]) -> bool {
+        let Some(toml::Value::Array(items)) = doc.get_mut("sequences") else {
+            return false;
+        };
+        let slots: Vec<usize> = items
+            .iter()
+            .enumerate()
+            .filter(|(_, v)| id_of(v).is_some_and(|id| order.iter().any(|o| o == id)))
+            .map(|(i, _)| i)
+            .collect();
+        let wanted: Vec<toml::Value> = order
+            .iter()
+            .filter_map(|id| items.iter().find(|v| id_of(v) == Some(id.as_str())))
+            .cloned()
+            .collect();
+        if wanted.len() != slots.len() {
+            return false;
+        }
+        let mut moved = false;
+        for (slot, value) in slots.into_iter().zip(wanted) {
+            if items[slot] != value {
+                items[slot] = value;
+                moved = true;
+            }
+        }
+        moved
+    }
+    match scope {
+        Scope::Repo => {
+            let Some(root) = repo else { return Ok(false) };
+            let path = repo_file(root);
+            if !path.exists() {
+                return Ok(false);
+            }
+            let mut doc = read_doc(&path)?;
+            let moved = apply(&mut doc, order);
+            if moved {
+                std::fs::write(path, toml::to_string_pretty(&doc)?)?;
+            }
+            Ok(moved)
+        }
+        _ => {
+            let mut doc = read_doc(config_path)?;
+            let moved = apply(&mut doc, order);
+            if moved {
+                write_config_doc(config_path, doc)?;
+            }
+            Ok(moved)
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn reordering_moves_only_the_named_sequences_into_their_own_slots() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("config.toml");
+        for id in ["a", "foreign", "b", "c"] {
+            let mut d = def(id, vec![StepSpec::new("push")]);
+            d.owner = Some(if id == "foreign" { "other" } else { "me" }.into());
+            save_sequence(&d, &path, "me", None).unwrap();
+        }
+        let order: Vec<String> = ["c", "a", "b"].iter().map(|s| s.to_string()).collect();
+        assert!(reorder_sequences(Scope::Installation, &order, &path, None).unwrap());
+        let (config, _) = Config::from_toml_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        let ids: Vec<&str> = config.sequences.iter().map(|d| d.id.as_str()).collect();
+        assert_eq!(ids, ["c", "foreign", "a", "b"]);
+        assert!(!reorder_sequences(Scope::Installation, &order, &path, None).unwrap());
+    }
 
     fn def(id: &str, steps: Vec<StepSpec>) -> SequenceDef {
         SequenceDef {

@@ -38,7 +38,7 @@ pub(super) static LAST_TABS: std::sync::atomic::AtomicU32 = std::sync::atomic::A
 impl PrefSection {
     /// Whether the page is split into a General tab and a list tab.
     pub(crate) fn has_sub_tabs(self) -> bool {
-        self.has_list() || self == PrefSection::Keybindings
+        (self.has_list() && self != PrefSection::Sequences) || self == PrefSection::Keybindings
     }
 
     /// The list tab's label: the items' name, as the list titles it.
@@ -183,10 +183,15 @@ impl PreferencesState {
         let y = area.y + 1;
         let mut x = area.x + 1;
         let right = area.right().saturating_sub(1);
-        let labels = [
-            (SubTab::General, screen::SECTION_GENERAL.get().to_string()),
-            (SubTab::List, section.list_tab_title()),
-        ];
+        // A page with a single face (Sequences) has nothing to switch.
+        let labels: Vec<(SubTab, String)> = if section.has_sub_tabs() {
+            vec![
+                (SubTab::General, screen::SECTION_GENERAL.get().to_string()),
+                (SubTab::List, section.list_tab_title()),
+            ]
+        } else {
+            Vec::new()
+        };
         for (tab, label) in labels {
             let text = format!(" {label} ");
             let w = display_width(&text) as u16;
@@ -219,7 +224,7 @@ impl PreferencesState {
             km.label(Action::PreferencesPrevTab),
             km.label(Action::PreferencesNextTab)
         );
-        if x + 1 + display_width(&hint) as u16 <= right {
+        if section.has_sub_tabs() && x + 1 + display_width(&hint) as u16 <= right {
             dialog_kit::put(
                 buf,
                 x + 1,

@@ -20,10 +20,10 @@ expression: "dump(&theme, &buf)"
 15 |│  Agents & MCP             │   theme files in the config    │                  │✐ Amend...                 Ctrl+G E│|
 16 |│  Appearance               │   folder's themes/ directory   │                  │◑ Split commit...                  │|
 17 |│  Keyboard & mouse         │   are listed last.             │                  │◈ Interactively rebase from here...│|
-18 |│  Log & graph              │                                │                  │↻ Rewrite history ›                │|
-19 |│  Diff & editor            │ Colors                         │                  │───────────────────────────────────│|
-20 |│  Open in                  │                                │                  │↳ Create branch here...            │|
-21 |│  Images                   │                               ↓│                  │◇ Create tag here...               │|
+18 |│  Sequences                │                                │                  │↻ Rewrite history ›                │|
+19 |│  Log & graph              │ Colors                         │                  │───────────────────────────────────│|
+20 |│  Diff & editor            │                                │                  │↳ Create branch here...            │|
+21 |│  Open in                  │                               ↓│                  │◇ Create tag here...               │|
 22 |╰────────────────────────────────────────────────────────────╯                  │◇ Create annotated tag here...     │|
 23 |                                                                                │✓ Check out this commit            │|
 24 |                                                                                │⊞ Create worktree here...          │|

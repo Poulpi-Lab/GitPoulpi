@@ -20,6 +20,8 @@ pub(crate) enum PrefSection {
     AgentsMcp,
     Appearance,
     Keybindings,
+    /// The user's named action sequences (`sequences_page`).
+    Sequences,
     LogGraph,
     DiffEditor,
     OpenIn,
@@ -49,6 +51,7 @@ impl PrefSection {
                 | PrefSection::OpenIn
                 | PrefSection::Images
                 | PrefSection::Workflow
+                | PrefSection::Sequences
         )
     }
 
@@ -64,6 +67,7 @@ impl PrefSection {
         PrefSection::Appearance,
         // Right after the first core pages: it is read by everyone.
         PrefSection::Keybindings,
+        PrefSection::Sequences,
         PrefSection::LogGraph,
         PrefSection::DiffEditor,
         PrefSection::OpenIn,
@@ -98,6 +102,7 @@ impl PrefSection {
             PrefSection::Appearance => screen::SECTION_UI.get(),
             PrefSection::LogGraph => screen::SECTION_LOG.get(),
             PrefSection::Keybindings => screen::SECTION_KEYBINDINGS.get(),
+            PrefSection::Sequences => gitpoulpi_i18n::msg::settings_sequences::SECTION_TITLE.get(),
             PrefSection::DiffEditor => screen::SECTION_EDITOR.get(),
             PrefSection::OpenIn => settings_open_in::SECTION_TITLE.get(),
             PrefSection::Images => gitpoulpi_i18n::msg::settings_images::SECTION_TITLE.get(),
@@ -137,6 +142,7 @@ impl PrefSection {
             PrefSection::OpenIn => "open-in",
             PrefSection::Images => "images",
             PrefSection::Keybindings => "keyboard-mouse",
+            PrefSection::Sequences => "sequences",
             PrefSection::GitAndEncoding => "git-encoding",
             PrefSection::RepoAi => "repo-ai",
             PrefSection::Workflow => "workflow",
@@ -169,6 +175,7 @@ impl PrefSection {
             P::OpenIn => PrefSection::OpenIn,
             P::Images => PrefSection::Images,
             P::KeyboardMouse | P::KeyboardShortcuts => PrefSection::Keybindings,
+            P::Sequences => PrefSection::Sequences,
             P::GitEncoding => PrefSection::GitAndEncoding,
             P::RepoAi => PrefSection::RepoAi,
             P::Workflow => PrefSection::Workflow,
@@ -365,6 +372,8 @@ pub(super) enum Target {
     ImageEditor(OpenInTarget),
     /// A row of the Workflow page (`workflow_page.rs`).
     Workflow(WfTarget),
+    /// A row of the Sequences page (`sequences_page.rs`).
+    Sequence(super::sequences_page::SeqTarget),
     /// A row of the Sparse checkout page (`repo_pages.rs`).
     RepoPage(RpTarget),
     /// A row of the SSH & credentials page (`repo_auth_page`).
@@ -458,6 +467,8 @@ pub(super) enum PrefAction {
     FolderMenu(super::launcher_folder_menu::FolderMenuButton),
     /// A button of the Workflow page.
     Workflow(WfButton),
+    /// A button of the Sequences page.
+    Sequence(super::sequences_page::SeqButton),
     /// A button of the access token row on Agents & MCP.
     #[cfg(feature = "mcp")]
     McpSecurity(super::mcp_security::McpButton),

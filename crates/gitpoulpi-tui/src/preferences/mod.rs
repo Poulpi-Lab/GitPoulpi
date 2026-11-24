@@ -103,6 +103,9 @@ mod render;
 mod repo_auth_page;
 mod repo_pages;
 mod search;
+mod sequences_page;
+mod sequences_picker;
+mod sequences_rows;
 mod sub_tabs;
 mod theme_page;
 mod updates_rows;
@@ -335,6 +338,8 @@ pub(crate) struct PreferencesState {
     repo_auth: repo_auth_page::RepoAuthPage,
     /// The Keyboard Shortcuts page's own state (`keybindings_page`).
     keys: keybindings_page::KeybindingsPage,
+    /// The Sequences page's own state (`sequences_page`).
+    seq: sequences_page::SequencesPage,
     /// Where the edited value sits in its row, as (column offset, width),
     /// recorded by `field_lines` for `render_body` to place on screen.
     edit_value_at: std::cell::Cell<Option<(u16, u16, u16)>>,
@@ -615,6 +620,7 @@ impl PreferencesState {
             keys: keybindings_page::KeybindingsPage::new(crate::keymap::Keymap::from_config(
                 &keybindings,
             )),
+            seq: Default::default(),
             edit_value_at: std::cell::Cell::new(None),
             label_col: std::cell::Cell::new((0, false)),
             chip_cells: Default::default(),
@@ -852,6 +858,10 @@ impl PreferencesState {
             self.rp_editor_paste(text);
             return;
         }
+        if self.seq_overlay_open() {
+            self.seq_overlay_paste(text);
+            return;
+        }
         if self.ra_overlay_open() {
             return;
         }
@@ -898,6 +908,7 @@ impl PreferencesState {
             (PrefSection::Images, SubTab::List) => self.images_item_fields(),
             (PrefSection::Workflow, SubTab::General) => self.workflow_general_fields(),
             (PrefSection::Workflow, SubTab::List) => self.workflow_item_fields(),
+            (PrefSection::Sequences, _) => self.sequences_fields(),
             (PrefSection::Keybindings, SubTab::General) => self.picked(pages::KEYBOARD),
             (PrefSection::Keybindings, SubTab::List) => Vec::new(),
             _ => self.fields_of_plain(section),
@@ -913,7 +924,7 @@ impl PreferencesState {
             PrefSection::Profiles => Vec::new(),
             PrefSection::Ssh => self.ssh_fields(),
             PrefSection::Integrations => self.strip_fields(section),
-            PrefSection::Keybindings => Vec::new(),
+            PrefSection::Keybindings | PrefSection::Sequences => Vec::new(),
             PrefSection::Ai => Vec::new(),
             PrefSection::AgentsMcp => self.agents_fields(),
             PrefSection::Appearance => self.appearance_fields(),

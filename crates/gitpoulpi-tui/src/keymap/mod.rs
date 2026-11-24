@@ -458,7 +458,7 @@ pub(crate) fn install_from_config(config: &gitpoulpi_config::Config) -> Vec<Keym
 
 /// The installation id `installation`-scope sequences are matched against.
 /// Tests use none (reading the identity seeds the real `config.toml`).
-fn install_id() -> String {
+pub(crate) fn install_id() -> String {
     #[cfg(test)]
     {
         String::new()

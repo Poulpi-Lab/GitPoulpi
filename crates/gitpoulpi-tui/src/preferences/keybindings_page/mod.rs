@@ -591,7 +591,7 @@ impl PreferencesState {
 
     /// Writes `chords` for `action` (resetting instead when they are the
     /// defaults), and says so.
-    fn keys_write(&mut self, action: Bind, chords: &[KeyChord]) -> Result<(), String> {
+    pub(super) fn keys_write(&mut self, action: Bind, chords: &[KeyChord]) -> Result<(), String> {
         let Some(path) = self.config_file() else {
             return Err(msg::NO_CONFIG_DIR.get().to_string());
         };
@@ -867,7 +867,7 @@ impl PreferencesState {
         }
     }
 
-    fn keys_popup_key(&mut self, key: &KeyEvent) {
+    pub(super) fn keys_popup_key(&mut self, key: &KeyEvent) {
         match self.keys.popup.clone() {
             Some(Popup::ConfirmReset { focus }) => match key.code {
                 KeyCode::Esc | KeyCode::Char('n' | 'N') => self.keys.popup = None,
@@ -1107,5 +1107,33 @@ impl KeybindingsPage {
             .on_mouse(self.bar, event, content, self.scroll)?;
         self.scroll = top;
         Some(top)
+    }
+}
+
+impl PreferencesState {
+    /// Opens the capture popup for `action` from another page (the Sequences
+    /// page's Shortcut button): the very popup, conflict analysis and save
+    /// path of the Keyboard shortcuts page, over a fresh view of the keymap.
+    pub(super) fn keys_open_capture_for(&mut self, action: Bind) -> bool {
+        let Some(index) = ACTIONS.iter().position(|d| d.action == action) else {
+            return false;
+        };
+        self.keys = KeybindingsPage::new(Keymap::from_config(&self.config.keybindings));
+        self.keys.popup = Some(Popup::Capture(Capture {
+            action: index,
+            add: false,
+            chord: None,
+            typing: None,
+            error: None,
+            analysis: Analysis::default(),
+            focus: 0,
+        }));
+        true
+    }
+
+    /// Paints the open capture popup (the page that opened it calls this).
+    pub(super) fn keys_render_popup(&mut self, buf: &mut Buffer, screen: Rect) {
+        let pointer = self.mouse_pos;
+        render::render_popup(&mut self.keys, buf, screen, pointer);
     }
 }

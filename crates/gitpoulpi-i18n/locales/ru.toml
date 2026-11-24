@@ -6843,7 +6843,7 @@ why_no_more = "это весь reflog, загружать больше нече�
 reflog_loaded = "загружено позиций: {n}"
 refreshing = "обновление..."
 # context: Undo history: key of the Undo whole sequence button, one letter
-key_undo_sequence = "x"
+key_undo_sequence = "п"
 # context: Undo history: button; undoes every entry of the sequence run at the top of the history, newest first
 btn_undo_sequence = "Отменить всю последовательность"
 # context: confirm title; {name} is the name of a user-defined sequence of actions

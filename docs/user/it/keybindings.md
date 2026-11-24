@@ -152,20 +152,20 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `refs` | `collapse_all` | Comprimi tutte le cartelle | `-` |
 | `refs` | `expand_below` | Espandi la cartella e le sue sottocartelle | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Comprimi la cartella e le sue sottocartelle | `_`, `Shift+Left` |
-| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `refs` | `scroll_left` | Scorri il pannello a sinistra | `Alt+Left` |
+| `refs` | `scroll_right` | Scorri il pannello a destra | `Alt+Right` |
 | `log` | `toggle_file_mode` | File: percorso o albero | `m` |
-| `log` | `lfs_only` | Files: LFS Only | `o` |
+| `log` | `lfs_only` | File: solo LFS | `o` |
 | `log` | `view_all_files` | File: vedi tutti i file | `a` |
 | `log` | `compare_selection` | Confronta le righe selezionate | `v` |
 | `log` | `compare_swap` | Inverti gli estremi del confronto | `x` |
 | `log` | `compare_next` | Vai alla riga confrontata successiva | `n` |
-| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
+| `log` | `filter_author` | Filtra il Log per autore | `Shift+A` |
 | `log` | `pick_column` | Scegli una colonna da spostare o ridimensionare | `Shift+C` |
 | `log` | `scroll_left` | Scorri le colonne a sinistra | `Shift+Left` |
 | `log` | `scroll_right` | Scorri le colonne a destra | `Shift+Right` |
-| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log` | `details_scroll_left` | Scorri il pannello a sinistra | `Alt+Left` |
+| `log` | `details_scroll_right` | Scorri il pannello a destra | `Alt+Right` |
 | `log` | `copy_mermaid` | Copia i commit come Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Scegli la colonna successiva | `Tab` |
 | `log_columns` | `prev` | Scegli la colonna precedente | `Shift+BackTab` |
@@ -183,11 +183,11 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `log_files` | `collapse_all_folders` | Comprimi tutte le cartelle | `-` |
 | `log_files` | `expand_below` | Espandi la cartella e le sue sottocartelle | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Comprimi la cartella e le sue sottocartelle | `_`, `Shift+Left` |
-| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log_files` | `scroll_left` | Scorri il pannello a sinistra | `Alt+Left` |
+| `log_files` | `scroll_right` | Scorri il pannello a destra | `Alt+Right` |
 | `status` | `compose` | Porta il focus sul messaggio di commit | `c` |
 | `status` | `toggle_file_mode` | File: percorso o albero | `m` |
-| `status` | `lfs_only` | Files: LFS Only | `o` |
+| `status` | `lfs_only` | File: solo LFS | `o` |
 | `status` | `view_all_files` | File: vedi tutti i file | `a` |
 | `status` | `amend` | Attiva o disattiva amend | `Shift+A` |
 | `status` | `skip_hooks` | Attiva o disattiva «Salta gli hook» | `Shift+H` |
@@ -198,8 +198,8 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `status` | `collapse_all_folders` | Comprimi tutte le cartelle | `-` |
 | `status` | `expand_below` | Espandi la cartella e le sue sottocartelle | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Comprimi la cartella e le sue sottocartelle | `_`, `Shift+Left` |
-| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `status` | `scroll_left` | Scorri il pannello a sinistra | `Alt+Left` |
+| `status` | `scroll_right` | Scorri il pannello a destra | `Alt+Right` |
 | `home` | `favorite` | Aggiungi o togli il repository dai preferiti | `f`, `*` |
 | `home` | `close_repo` | Chiudi, rimuovi o togli dai preferiti la riga | `x`, `Delete` |
 | `home` | `copy_path` | Copia il percorso del repository | `y` |
@@ -521,8 +521,8 @@ applicano. I tasti sono quelli predefiniti.
 | Navigazione: Sposta il focus sul pannello successivo | `Tab` |
 | Navigazione: Sposta il focus sul pannello precedente | `Shift+Tab` |
 | Navigazione: Cerca commit... | `f` |
-| Log: Filter by Author... | `A` |
-| Log: Clear Author Filter |  |
+| Log: Filtra per autore... | `A` |
+| Log: Rimuovi il filtro per autore |  |
 | Navigazione: Comprimi o ripristina il pannello Refs | `Ctrl+N H` |
 | Navigazione: Allarga il pannello Refs | `Ctrl+N Right` |
 | Navigazione: Restringi il pannello Refs | `Ctrl+N Left` |
@@ -628,10 +628,10 @@ applicano. I tasti sono quelli predefiniti.
 | Refs: Push del tag selezionato verso il remoto predefinito |  |
 | Refs: Elimina il tag selezionato dal suo remoto... |  |
 | Git: Fetch del tag selezionato |  |
-| Git: Use the Remote's Version of the Selected Tag |  |
-| Git: Force Push the Selected Tag to Its Remote |  |
+| Git: Usa la versione remota del Tag selezionato |  |
+| Git: Push forzato del Tag selezionato sul suo remote |  |
 | Refs: Annota il tag selezionato... |  |
-| Refs: Move Selected Tag to Selected Commit... |  |
+| Refs: Sposta il Tag selezionato sul Commit selezionato... |  |
 | Refs: Mostra o nascondi nel grafo |  |
 | Refs: Mostra nel grafo | `g` |
 | Refs: Attiva o disattiva il solo sul ref selezionato | `o` |
@@ -645,8 +645,8 @@ applicano. I tasti sono quelli predefiniti.
 | Refs: Comprimi tutte le cartelle | `-` |
 | Refs: Espandi la cartella selezionata e le sue sottocartelle | `*` |
 | Refs: Comprimi la cartella selezionata e le sue sottocartelle | `_` |
-| View: Scroll the Pane Left | `Alt+Left` |
-| View: Scroll the Pane Right | `Alt+Right` |
+| Vista: Scorri il pannello a sinistra | `Alt+Left` |
+| Vista: Scorri il pannello a destra | `Alt+Right` |
 | Refs: Sezione successiva | `l` |
 | Refs: Sezione precedente | `h` |
 | Refs: Espandi o comprimi la sezione attiva | `Enter` |
@@ -866,10 +866,10 @@ applicano. I tasti sono quelli predefiniti.
 | Radar: Rimanda... | `z` |
 | Radar: Rivedi la richiesta... | `e` |
 | Radar: Apri la conversazione della issue | `i` |
-| Radar: Merge Request... | `m` |
-| Radar: Close... | `x` |
-| Radar: Mark as Ready | `y` |
-| Radar: Clone Repository... | `g` |
+| Radar: Merge della richiesta... | `m` |
+| Radar: Chiudi... | `x` |
+| Radar: Segna come pronta | `y` |
+| Radar: Clona il repository... | `g` |
 | Radar: Rivedi tramite l'API |  |
 | Radar: Clona e rivedi... |  |
 | Radar: Modifica assegnatari... |  |
@@ -901,8 +901,8 @@ applicano. I tasti sono quelli predefiniti.
 | Scheda: Apri nel gestore file |  |
 | Scheda: Apri nel terminale |  |
 | Scheda: Apri in... | `Alt+O` |
-| Tab: Terminal Here |  |
-| ✦ Tab: Open AI Agent Here |  |
+| Scheda: Terminale qui |  |
+| ✦ Scheda: Apri l'agente IA qui |  |
 | Scheda: Apri nella voce predefinita | `Ctrl+Alt+O` |
 | Repository: Cambia profilo... |  |
 | Aiuto: Informazioni su GitPoulpi | `Ctrl+N a` |
@@ -959,7 +959,7 @@ applicano. I tasti sono quelli predefiniti.
 | Modifica: Reflog... |  |
 | Modifica: Recupera commit persi... |  |
 | Modifica: Ripristina il branch dove l'aveva lasciato l'azione bloccata | `Alt+Shift+Z` |
-| Edit: Undo Whole Sequence |  |
+| Modifica: Annulla l'intera sequenza |  |
 | Revisione: Mostra panoramica |  |
 | Revisione: Mostra file |  |
 | Revisione: Mostra Commit |  |
@@ -1028,7 +1028,7 @@ applicano. I tasti sono quelli predefiniti.
 | Conversazione: Apri il diagramma della voce | `g` |
 | Conversazione: Apri il codice della discussione | `G` |
 | Conversazione: Copia il link della voce | `y` |
-| Conversation: Copy Text | `Ctrl+C` |
+| Conversazione: Copia il testo | `Ctrl+C` |
 | Conversazione: Apri nel browser | `o` |
 | Conversazione: Modifica il commento | `e` |
 | Conversazione: Elimina il commento | `d` |
@@ -1053,7 +1053,7 @@ applicano. I tasti sono quelli predefiniti.
 | Revisione: Scarta la ✦ bozza | `N` |
 | Cronologia annullamenti: Annulla fino a qui... | `u` |
 | Cronologia annullamenti: Ripeti fino a qui... | `y` |
-| Undo History: Undo Whole Sequence | `x` |
+| Cronologia annullamenti: Annulla l'intera sequenza | `x` |
 | Cronologia annullamenti: Ripristina solo questa... | `r` |
 | Cronologia annullamenti: Ripristina il branch dove si trovava... | `o` |
 | Cronologia annullamenti: Aggiorna |  |
@@ -1120,7 +1120,7 @@ applicano. I tasti sono quelli predefiniti.
 | Diff: Solo hunk (file intero / solo le modifiche) | `H` |
 | File: Percorso/Albero | `m` |
 | File: Vedi tutti i file | `a` |
-| Files: Toggle LFS Only | `o` |
+| File: Attiva/disattiva solo LFS | `o` |
 | Commit: Attiva o disattiva «Salta gli hook» | `H` |
 | File: Apri il menu della riga o della selezione | `.` |
 | File: Espandi tutte le cartelle | `=` |
@@ -1137,7 +1137,7 @@ applicano. I tasti sono quelli predefiniti.
 | Diff: Attiva o disattiva l'a capo automatico | `w` |
 | Diff: Scegli la codifica... | `C` |
 | Vista: Mostra o nascondi la minimappa | `M` |
-| Diff: Toggle Changed Words Highlight |  |
+| Diff: Attiva/disattiva l'evidenziazione delle parole modificate |  |
 | Vista: Mostra o nascondi la colonna dei commit | `Alt+C` |
 | Vista: Colonna dei commit: nascondi |  |
 | Vista: Colonna dei commit: cronologia del file |  |
@@ -1229,17 +1229,17 @@ applicano. I tasti sono quelli predefiniti.
 | Editor: Converti interruzioni di riga |  |
 | Editor: Cambia rientro |  |
 | App: Impostazioni... | `Ctrl+, / Ctrl+N ,` |
-| ✦ Sequence: Create with AI... |  |
+| ✦ Sequenza: Crea con l'IA... |  |
 | App: Cerca nelle impostazioni... | `/ nelle Impostazioni` |
 | App: Scorciatoie da tastiera... |  |
 | Agente: Mostra la vista in sospeso | `Ctrl+N Enter` |
 | Agente: Chiudi la vista in sospeso |  |
 | Agente: Indietro | `Ctrl+N Backspace` |
-| Sequence: Cancel |  |
-| Sequence: Continue |  |
-| Sequence: Review This Repository's Sequences |  |
-| Sequence: Trust This Repository's Sequences |  |
-| Sequence: Ignore This Repository's Sequences |  |
+| Sequenza: Annulla |  |
+| Sequenza: Continua |  |
+| Sequenza: Rivedi le sequenze di questo repository |  |
+| Sequenza: Considera attendibili le sequenze di questo repository |  |
+| Sequenza: Ignora le sequenze di questo repository |  |
 | Scorciatoie: Reimposta tutto... |  |
 | Integrazioni: Apri la pull request collegata | `Ctrl+G g` |
 | Integrazioni: Modifica la pull request collegata sull'host | `e (su una riga)` |

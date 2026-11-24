@@ -150,20 +150,20 @@ předponou (`Ctrl+G s`).
 | `refs` | `collapse_all` | Sbalit všechny složky | `-` |
 | `refs` | `expand_below` | Rozbalit složku a její podsložky | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Sbalit složku a její podsložky | `_`, `Shift+Left` |
-| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `refs` | `scroll_left` | Posunout panel doleva | `Alt+Left` |
+| `refs` | `scroll_right` | Posunout panel doprava | `Alt+Right` |
 | `log` | `toggle_file_mode` | Soubory: Cesta nebo strom | `m` |
-| `log` | `lfs_only` | Files: LFS Only | `o` |
+| `log` | `lfs_only` | Soubory: Jen LFS | `o` |
 | `log` | `view_all_files` | Soubory: Zobrazit všechny soubory | `a` |
 | `log` | `compare_selection` | Porovnat vybrané řádky | `v` |
 | `log` | `compare_swap` | Prohodit konce porovnání | `x` |
 | `log` | `compare_next` | Přejít na další porovnávaný řádek | `n` |
-| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
+| `log` | `filter_author` | Filtrovat Log podle autora | `Shift+A` |
 | `log` | `pick_column` | Vybrat sloupec k přesunu nebo změně šířky | `Shift+C` |
 | `log` | `scroll_left` | Posunout sloupce doleva | `Shift+Left` |
 | `log` | `scroll_right` | Posunout sloupce doprava | `Shift+Right` |
-| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log` | `details_scroll_left` | Posunout panel doleva | `Alt+Left` |
+| `log` | `details_scroll_right` | Posunout panel doprava | `Alt+Right` |
 | `log` | `copy_mermaid` | Zkopírovat commity jako Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Vybrat další sloupec | `Tab` |
 | `log_columns` | `prev` | Vybrat předchozí sloupec | `Shift+BackTab` |
@@ -181,11 +181,11 @@ předponou (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Sbalit všechny složky | `-` |
 | `log_files` | `expand_below` | Rozbalit složku a její podsložky | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Sbalit složku a její podsložky | `_`, `Shift+Left` |
-| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log_files` | `scroll_left` | Posunout panel doleva | `Alt+Left` |
+| `log_files` | `scroll_right` | Posunout panel doprava | `Alt+Right` |
 | `status` | `compose` | Přejít na zprávu commitu | `c` |
 | `status` | `toggle_file_mode` | Soubory: Cesta nebo strom | `m` |
-| `status` | `lfs_only` | Files: LFS Only | `o` |
+| `status` | `lfs_only` | Soubory: Jen LFS | `o` |
 | `status` | `view_all_files` | Soubory: Zobrazit všechny soubory | `a` |
 | `status` | `amend` | Přepnout Amend | `Shift+A` |
 | `status` | `skip_hooks` | Přepnout Přeskočit hooky | `Shift+H` |
@@ -196,8 +196,8 @@ předponou (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Sbalit všechny složky | `-` |
 | `status` | `expand_below` | Rozbalit složku a její podsložky | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Sbalit složku a její podsložky | `_`, `Shift+Left` |
-| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `status` | `scroll_left` | Posunout panel doleva | `Alt+Left` |
+| `status` | `scroll_right` | Posunout panel doprava | `Alt+Right` |
 | `home` | `favorite` | Přidat repozitář k oblíbeným nebo odebrat | `f`, `*` |
 | `home` | `close_repo` | Zavřít, odebrat nebo odznačit řádek | `x`, `Delete` |
 | `home` | `copy_path` | Kopírovat cestu k repozitáři | `y` |
@@ -515,8 +515,8 @@ Klávesy jsou výchozí.
 | Navigace: Fokus na další panel | `Tab` |
 | Navigace: Fokus na předchozí panel | `Shift+Tab` |
 | Navigace: Hledat commity... | `f` |
-| Log: Filter by Author... | `A` |
-| Log: Clear Author Filter |  |
+| Log: Filtrovat podle autora... | `A` |
+| Log: Zrušit filtr autora |  |
 | Navigace: Sbalit/rozbalit panel Refs | `Ctrl+N H` |
 | Navigace: Rozšířit panel Refs | `Ctrl+N Right` |
 | Navigace: Zúžit panel Refs | `Ctrl+N Left` |
@@ -622,10 +622,10 @@ Klávesy jsou výchozí.
 | Refs: Push vybraného tagu do výchozího remote |  |
 | Refs: Smazat vybraný tag z jeho remote... |  |
 | Git: Fetch vybraného tagu |  |
-| Git: Use the Remote's Version of the Selected Tag |  |
-| Git: Force Push the Selected Tag to Its Remote |  |
+| Git: Použít verzi remote pro vybraný Tag |  |
+| Git: Force Push vybraného Tagu na jeho remote |  |
 | Refs: Anotovat vybraný tag... |  |
-| Refs: Move Selected Tag to Selected Commit... |  |
+| Refs: Přesunout vybraný Tag na vybraný Commit... |  |
 | Refs: Přepnout skrytí v grafu |  |
 | Refs: Ukázat v grafu | `g` |
 | Refs: Přepnout solo na vybraném refu | `o` |
@@ -639,8 +639,8 @@ Klávesy jsou výchozí.
 | Refs: Sbalit všechny složky | `-` |
 | Refs: Rozbalit vybranou složku a její podsložky | `*` |
 | Refs: Sbalit vybranou složku a její podsložky | `_` |
-| View: Scroll the Pane Left | `Alt+Left` |
-| View: Scroll the Pane Right | `Alt+Right` |
+| Zobrazení: Posunout panel doleva | `Alt+Left` |
+| Zobrazení: Posunout panel doprava | `Alt+Right` |
 | Refs: Další sekce | `l` |
 | Refs: Předchozí sekce | `h` |
 | Refs: Rozbalit/sbalit aktivní sekci | `Enter` |
@@ -860,10 +860,10 @@ Klávesy jsou výchozí.
 | Radar: Odložit... | `z` |
 | Radar: Zkontrolovat žádost... | `e` |
 | Radar: Otevřít konverzaci issue | `i` |
-| Radar: Merge Request... | `m` |
-| Radar: Close... | `x` |
-| Radar: Mark as Ready | `y` |
-| Radar: Clone Repository... | `g` |
+| Radar: Merge pull request... | `m` |
+| Radar: Zavřít... | `x` |
+| Radar: Označit jako připravené | `y` |
+| Radar: Klonovat repozitář... | `g` |
 | Radar: Zkontrolovat přes API |  |
 | Radar: Naklonovat a zkontrolovat... |  |
 | Radar: Upravit řešitele... |  |
@@ -895,8 +895,8 @@ Klávesy jsou výchozí.
 | Karta: Otevřít ve správci souborů |  |
 | Karta: Otevřít v terminálu |  |
 | Karta: Otevřít v... | `Alt+O` |
-| Tab: Terminal Here |  |
-| ✦ Tab: Open AI Agent Here |  |
+| Karta: Terminál zde |  |
+| ✦ Karta: Otevřít AI agenta zde |  |
 | Karta: Otevřít ve výchozí položce | `Ctrl+Alt+O` |
 | Repozitář: Změnit profil... |  |
 | Nápověda: O aplikaci GitPoulpi | `Ctrl+N a` |
@@ -953,7 +953,7 @@ Klávesy jsou výchozí.
 | Úpravy: Reflog... |  |
 | Úpravy: Zachránit ztracené commity... |  |
 | Úpravy: Obnovit větev tam, kde ji nechala blokovaná akce | `Alt+Shift+Z` |
-| Edit: Undo Whole Sequence |  |
+| Úpravy: Vrátit celou sekvenci |  |
 | Kontrola: Zobrazit přehled |  |
 | Kontrola: Zobrazit soubory |  |
 | Kontrola: Zobrazit Commity |  |
@@ -1022,7 +1022,7 @@ Klávesy jsou výchozí.
 | Konverzace: Otevřít diagram záznamu | `g` |
 | Konverzace: Otevřít kód vlákna | `G` |
 | Konverzace: Kopírovat odkaz záznamu | `y` |
-| Conversation: Copy Text | `Ctrl+C` |
+| Konverzace: Kopírovat text | `Ctrl+C` |
 | Konverzace: Otevřít v prohlížeči | `o` |
 | Konverzace: Upravit komentář | `e` |
 | Konverzace: Smazat komentář | `d` |
@@ -1047,7 +1047,7 @@ Klávesy jsou výchozí.
 | Kontrola: Zahodit koncept ✦ | `N` |
 | Historie vrácení: Vrátit až sem... | `u` |
 | Historie vrácení: Zopakovat až sem... | `y` |
-| Undo History: Undo Whole Sequence | `x` |
+| Historie vrácení: Vrátit celou sekvenci | `x` |
 | Historie vrácení: Obnovit jen tuto... | `r` |
 | Historie vrácení: Obnovit větev tam, kde byla... | `o` |
 | Historie vrácení: Obnovit seznam |  |
@@ -1114,7 +1114,7 @@ Klávesy jsou výchozí.
 | Diff: Přepnout jen hunky (celý soubor / jen změny) | `H` |
 | Soubory: Přepnout cesta/strom | `m` |
 | Soubory: Přepnout zobrazení všech souborů | `a` |
-| Files: Toggle LFS Only | `o` |
+| Soubory: Přepnout jen LFS | `o` |
 | Commit: Přepnout Přeskočit hooky | `H` |
 | Soubory: Otevřít nabídku řádku nebo výběru | `.` |
 | Soubory: Rozbalit všechny složky | `=` |
@@ -1131,7 +1131,7 @@ Klávesy jsou výchozí.
 | Diff: Přepnout zalamování řádků | `w` |
 | Diff: Vybrat kódování... | `C` |
 | Zobrazení: Přepnout minimapu | `M` |
-| Diff: Toggle Changed Words Highlight |  |
+| Diff: Přepnout zvýraznění změněných slov |  |
 | Zobrazení: Přepnout sloupec commitů | `Alt+C` |
 | Zobrazení: Sloupec commitů: skrýt |  |
 | Zobrazení: Sloupec commitů: historie souboru |  |
@@ -1223,17 +1223,17 @@ Klávesy jsou výchozí.
 | Editor: Převést konce řádků |  |
 | Editor: Změnit odsazení |  |
 | Aplikace: Nastavení... | `Ctrl+, / Ctrl+N ,` |
-| ✦ Sequence: Create with AI... |  |
+| ✦ Sekvence: Vytvořit pomocí AI... |  |
 | Aplikace: Hledat v nastavení... | `/ v Nastavení` |
 | Aplikace: Klávesové zkratky... |  |
 | Agent: Zobrazit čekající pohled | `Ctrl+N Enter` |
 | Agent: Zavřít čekající pohled |  |
 | Agent: Zpět | `Ctrl+N Backspace` |
-| Sequence: Cancel |  |
-| Sequence: Continue |  |
-| Sequence: Review This Repository's Sequences |  |
-| Sequence: Trust This Repository's Sequences |  |
-| Sequence: Ignore This Repository's Sequences |  |
+| Sekvence: Zrušit |  |
+| Sekvence: Pokračovat |  |
+| Sekvence: Zkontrolovat sekvence tohoto repozitáře |  |
+| Sekvence: Důvěřovat sekvencím tohoto repozitáře |  |
+| Sekvence: Ignorovat sekvence tohoto repozitáře |  |
 | Zkratky: Obnovit vše... |  |
 | Integrace: Otevřít propojený pull request | `Ctrl+G g` |
 | Integrace: Upravit propojený pull request u hostitele | `e (na řádku)` |

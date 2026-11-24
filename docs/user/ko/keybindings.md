@@ -147,20 +147,20 @@ stage_file = "z"
 | `refs` | `collapse_all` | 모든 폴더 접기 | `-` |
 | `refs` | `expand_below` | 폴더와 하위 폴더 펼치기 | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | 폴더와 하위 폴더 접기 | `_`, `Shift+Left` |
-| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `refs` | `scroll_left` | 창을 왼쪽으로 스크롤 | `Alt+Left` |
+| `refs` | `scroll_right` | 창을 오른쪽으로 스크롤 | `Alt+Right` |
 | `log` | `toggle_file_mode` | 파일: 경로 또는 트리 | `m` |
-| `log` | `lfs_only` | Files: LFS Only | `o` |
+| `log` | `lfs_only` | 파일: LFS만 | `o` |
 | `log` | `view_all_files` | 파일: 모든 파일 보기 | `a` |
 | `log` | `compare_selection` | 선택한 행 비교 | `v` |
 | `log` | `compare_swap` | 비교 양쪽 바꾸기 | `x` |
 | `log` | `compare_next` | 다음 비교 행으로 이동 | `n` |
-| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
+| `log` | `filter_author` | 작성자로 Log 필터 | `Shift+A` |
 | `log` | `pick_column` | 이동하거나 크기를 바꿀 열 고르기 | `Shift+C` |
 | `log` | `scroll_left` | 열을 왼쪽으로 스크롤 | `Shift+Left` |
 | `log` | `scroll_right` | 열을 오른쪽으로 스크롤 | `Shift+Right` |
-| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log` | `details_scroll_left` | 창을 왼쪽으로 스크롤 | `Alt+Left` |
+| `log` | `details_scroll_right` | 창을 오른쪽으로 스크롤 | `Alt+Right` |
 | `log` | `copy_mermaid` | Mermaid gitGraph로 Commits 복사 | `Shift+Y` |
 | `log_columns` | `next` | 다음 열 고르기 | `Tab` |
 | `log_columns` | `prev` | 이전 열 고르기 | `Shift+BackTab` |
@@ -178,11 +178,11 @@ stage_file = "z"
 | `log_files` | `collapse_all_folders` | 모든 폴더 접기 | `-` |
 | `log_files` | `expand_below` | 폴더와 하위 폴더 펼치기 | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | 폴더와 하위 폴더 접기 | `_`, `Shift+Left` |
-| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log_files` | `scroll_left` | 창을 왼쪽으로 스크롤 | `Alt+Left` |
+| `log_files` | `scroll_right` | 창을 오른쪽으로 스크롤 | `Alt+Right` |
 | `status` | `compose` | Commit 메시지로 포커스 | `c` |
 | `status` | `toggle_file_mode` | 파일: 경로 또는 트리 | `m` |
-| `status` | `lfs_only` | Files: LFS Only | `o` |
+| `status` | `lfs_only` | 파일: LFS만 | `o` |
 | `status` | `view_all_files` | 파일: 모든 파일 보기 | `a` |
 | `status` | `amend` | Amend 전환 | `Shift+A` |
 | `status` | `skip_hooks` | 훅 건너뛰기 전환 | `Shift+H` |
@@ -193,8 +193,8 @@ stage_file = "z"
 | `status` | `collapse_all_folders` | 모든 폴더 접기 | `-` |
 | `status` | `expand_below` | 폴더와 하위 폴더 펼치기 | `*`, `Shift+Right` |
 | `status` | `collapse_below` | 폴더와 하위 폴더 접기 | `_`, `Shift+Left` |
-| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `status` | `scroll_left` | 창을 왼쪽으로 스크롤 | `Alt+Left` |
+| `status` | `scroll_right` | 창을 오른쪽으로 스크롤 | `Alt+Right` |
 | `home` | `favorite` | 저장소 즐겨찾기 추가 또는 해제 | `f`, `*` |
 | `home` | `close_repo` | 행 닫기, 제거 또는 즐겨찾기 해제 | `x`, `Delete` |
 | `home` | `copy_path` | 저장소 경로 복사 | `y` |
@@ -508,8 +508,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 탐색: 다음 창으로 포커스 이동 | `Tab` |
 | 탐색: 이전 창으로 포커스 이동 | `Shift+Tab` |
 | 탐색: Commit 검색... | `f` |
-| Log: Filter by Author... | `A` |
-| Log: Clear Author Filter |  |
+| Log: 작성자로 필터... | `A` |
+| Log: 작성자 필터 해제 |  |
 | 탐색: Refs 창 접기 전환 | `Ctrl+N H` |
 | 탐색: Refs 창 넓히기 | `Ctrl+N Right` |
 | 탐색: Refs 창 좁히기 | `Ctrl+N Left` |
@@ -615,10 +615,10 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Refs: 선택한 Tag를 기본 리모트로 Push |  |
 | Refs: 선택한 Tag를 리모트에서 삭제... |  |
 | Git: 선택한 Tag Fetch |  |
-| Git: Use the Remote's Version of the Selected Tag |  |
-| Git: Force Push the Selected Tag to Its Remote |  |
+| Git: 선택한 Tag에 리모트 버전 사용 |  |
+| Git: 선택한 Tag을(를) 리모트로 강제 Push |  |
 | Refs: 선택한 Tag 주석 달기... |  |
-| Refs: Move Selected Tag to Selected Commit... |  |
+| Refs: 선택한 Tag을(를) 선택한 Commit(으)로 이동... |  |
 | Refs: 그래프에서 숨기기 전환 |  |
 | Refs: 그래프에서 보기 | `g` |
 | Refs: 선택한 Ref 솔로 전환 | `o` |
@@ -632,8 +632,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Refs: 모든 폴더 접기 | `-` |
 | Refs: 선택한 폴더와 하위 폴더 펼치기 | `*` |
 | Refs: 선택한 폴더와 하위 폴더 접기 | `_` |
-| View: Scroll the Pane Left | `Alt+Left` |
-| View: Scroll the Pane Right | `Alt+Right` |
+| 보기: 창을 왼쪽으로 스크롤 | `Alt+Left` |
+| 보기: 창을 오른쪽으로 스크롤 | `Alt+Right` |
 | Refs: 다음 섹션 | `l` |
 | Refs: 이전 섹션 | `h` |
 | Refs: 활성 섹션 펼치기 또는 접기 | `Enter` |
@@ -853,10 +853,10 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Radar: 미루기... | `z` |
 | Radar: 요청 리뷰... | `e` |
 | Radar: 이슈 대화 열기 | `i` |
-| Radar: Merge Request... | `m` |
-| Radar: Close... | `x` |
-| Radar: Mark as Ready | `y` |
-| Radar: Clone Repository... | `g` |
+| Radar: 요청 merge... | `m` |
+| Radar: 닫기... | `x` |
+| Radar: 준비됨으로 표시 | `y` |
+| Radar: 저장소 클론... | `g` |
 | Radar: API로 리뷰 |  |
 | Radar: 클론 후 리뷰... |  |
 | Radar: 담당자 편집... |  |
@@ -888,8 +888,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 탭: 파일 관리자에서 열기 |  |
 | 탭: 터미널에서 열기 |  |
 | 탭: 열기 위치... | `Alt+O` |
-| Tab: Terminal Here |  |
-| ✦ Tab: Open AI Agent Here |  |
+| 탭: 여기서 터미널 열기 |  |
+| ✦ 탭: 여기서 AI 에이전트 열기 |  |
 | 탭: 기본 위치에서 열기 | `Ctrl+Alt+O` |
 | 저장소: 프로필 변경... |  |
 | 도움말: GitPoulpi 정보 | `Ctrl+N a` |
@@ -946,7 +946,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 편집: Reflog... |  |
 | 편집: 잃어버린 Commits 복구... |  |
 | 편집: 브랜치를 차단된 작업이 남긴 위치로 복원 | `Alt+Shift+Z` |
-| Edit: Undo Whole Sequence |  |
+| 편집: 시퀀스 전체 실행 취소 |  |
 | 리뷰: 개요 표시 |  |
 | 리뷰: 파일 표시 |  |
 | 리뷰: Commits 표시 |  |
@@ -1015,7 +1015,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 대화: 항목의 다이어그램 열기 | `g` |
 | 대화: 스레드의 코드 열기 | `G` |
 | 대화: 항목의 링크 복사 | `y` |
-| Conversation: Copy Text | `Ctrl+C` |
+| 대화: 텍스트 복사 | `Ctrl+C` |
 | 대화: 브라우저에서 열기 | `o` |
 | 대화: 댓글 편집 | `e` |
 | 대화: 댓글 삭제 | `d` |
@@ -1040,7 +1040,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 리뷰: ✦ 초안 폐기 | `N` |
 | 실행 취소 기록: 여기까지 실행 취소... | `u` |
 | 실행 취소 기록: 여기까지 다시 실행... | `y` |
-| Undo History: Undo Whole Sequence | `x` |
+| 실행 취소 기록: 시퀀스 전체 실행 취소 | `x` |
 | 실행 취소 기록: 이것만 복원... | `r` |
 | 실행 취소 기록: 브랜치를 원래 위치로 복원... | `o` |
 | 실행 취소 기록: 새로 고침 |  |
@@ -1107,7 +1107,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Diff: 변경 부분만 전환 (전체 파일 / 변경만) | `H` |
 | 파일: 경로/트리 전환 | `m` |
 | 파일: 모든 파일 보기 전환 | `a` |
-| Files: Toggle LFS Only | `o` |
+| 파일: LFS만 보기 전환 | `o` |
 | Commit: 훅 건너뛰기 전환 | `H` |
 | 파일: 행 또는 선택 항목의 메뉴 열기 | `.` |
 | 파일: 모든 폴더 펼치기 | `=` |
@@ -1124,7 +1124,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Diff: 자동 줄바꿈 전환 | `w` |
 | Diff: 인코딩 선택... | `C` |
 | 보기: 미니맵 전환 | `M` |
-| Diff: Toggle Changed Words Highlight |  |
+| Diff: 변경된 단어 강조 전환 |  |
 | 보기: Commit 열 전환 | `Alt+C` |
 | 보기: Commit 열: 숨기기 |  |
 | 보기: Commit 열: 파일 기록 |  |
@@ -1216,17 +1216,17 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 편집기: 줄바꿈 변환 |  |
 | 편집기: 들여쓰기 변경 |  |
 | 앱: 설정... | `Ctrl+, / Ctrl+N ,` |
-| ✦ Sequence: Create with AI... |  |
+| ✦ 시퀀스: AI로 만들기... |  |
 | 앱: 설정 검색... | `설정에서 /` |
 | 앱: 단축키... |  |
 | 에이전트: 대기 중인 보기 표시 | `Ctrl+N Enter` |
 | 에이전트: 대기 중인 보기 닫기 |  |
 | 에이전트: 뒤로 | `Ctrl+N Backspace` |
-| Sequence: Cancel |  |
-| Sequence: Continue |  |
-| Sequence: Review This Repository's Sequences |  |
-| Sequence: Trust This Repository's Sequences |  |
-| Sequence: Ignore This Repository's Sequences |  |
+| 시퀀스: 취소 |  |
+| 시퀀스: 계속 |  |
+| 시퀀스: 이 저장소의 시퀀스 검토 |  |
+| 시퀀스: 이 저장소의 시퀀스 신뢰 |  |
+| 시퀀스: 이 저장소의 시퀀스 무시 |  |
 | 단축키: 모두 초기화... |  |
 | 연동: 연결된 Pull request 열기 | `Ctrl+G g` |
 | 연동: 연결된 Pull request를 호스트에서 편집 | `e (행에서)` |

@@ -626,8 +626,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Refs : Push du tag sélectionné vers le distant par défaut |  |
 | Refs : Supprimer le tag sélectionné de son distant... |  |
 | Git : Fetch le tag sélectionné |  |
-| Git : Version distante du tag sélectionné |  |
-| Git : Push forcé du tag sélectionné |  |
+| Git : Utiliser la version distante du tag sélectionné |  |
+| Git : Push forcé du tag sélectionné vers son distant |  |
 | Refs : Annoter le tag sélectionné... |  |
 | Refs : Déplacer le tag sélectionné vers le commit sélectionné... |  |
 | Refs : Masquer ou afficher dans le graphe |  |
@@ -1233,11 +1233,11 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Agent : Afficher la vue en attente | `Ctrl+N Enter` |
 | Agent : Ignorer la vue en attente |  |
 | Agent : Retour | `Ctrl+N Backspace` |
-| Séquence : annuler |  |
-| Séquence : continuer |  |
-| Séquence : examiner les séquences de ce dépôt |  |
-| Séquence : approuver les séquences de ce dépôt |  |
-| Séquence : ignorer les séquences de ce dépôt |  |
+| Séquence : Annuler |  |
+| Séquence : Continuer |  |
+| Séquence : Examiner les séquences de ce dépôt |  |
+| Séquence : Approuver les séquences de ce dépôt |  |
+| Séquence : Ignorer les séquences de ce dépôt |  |
 | Raccourcis : Tout réinitialiser... |  |
 | Intégrations : Ouvrir la pull request liée | `Ctrl+G g` |
 | Intégrations : Modifier la pull request liée sur l'hébergeur | `e (sur une ligne)` |

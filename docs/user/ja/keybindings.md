@@ -135,20 +135,20 @@ stage_file = "z"
 | `refs` | `collapse_all` | すべてのフォルダーを折りたたむ | `-` |
 | `refs` | `expand_below` | フォルダーとそのサブフォルダーを展開 | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | フォルダーとそのサブフォルダーを折りたたむ | `_`, `Shift+Left` |
-| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `refs` | `scroll_left` | ペインを左へスクロール | `Alt+Left` |
+| `refs` | `scroll_right` | ペインを右へスクロール | `Alt+Right` |
 | `log` | `toggle_file_mode` | ファイル：パスまたはツリー | `m` |
-| `log` | `lfs_only` | Files: LFS Only | `o` |
+| `log` | `lfs_only` | ファイル: LFS のみ表示 | `o` |
 | `log` | `view_all_files` | ファイル：すべてのファイルを表示 | `a` |
 | `log` | `compare_selection` | 選択した行を比較 | `v` |
 | `log` | `compare_swap` | 比較の両端を入れ替え | `x` |
 | `log` | `compare_next` | 次の比較対象の行へ移動 | `n` |
-| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
+| `log` | `filter_author` | Log を作成者で絞り込み | `Shift+A` |
 | `log` | `pick_column` | 移動・幅変更する列を選ぶ | `Shift+C` |
 | `log` | `scroll_left` | 列を左へスクロール | `Shift+Left` |
 | `log` | `scroll_right` | 列を右へスクロール | `Shift+Right` |
-| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log` | `details_scroll_left` | ペインを左へスクロール | `Alt+Left` |
+| `log` | `details_scroll_right` | ペインを右へスクロール | `Alt+Right` |
 | `log` | `copy_mermaid` | Commitsを Mermaid gitGraph としてコピー | `Shift+Y` |
 | `log_columns` | `next` | 次の列を選ぶ | `Tab` |
 | `log_columns` | `prev` | 前の列を選ぶ | `Shift+BackTab` |
@@ -166,11 +166,11 @@ stage_file = "z"
 | `log_files` | `collapse_all_folders` | すべてのフォルダーを折りたたむ | `-` |
 | `log_files` | `expand_below` | フォルダーとそのサブフォルダーを展開 | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | フォルダーとそのサブフォルダーを折りたたむ | `_`, `Shift+Left` |
-| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log_files` | `scroll_left` | ペインを左へスクロール | `Alt+Left` |
+| `log_files` | `scroll_right` | ペインを右へスクロール | `Alt+Right` |
 | `status` | `compose` | Commitメッセージ欄にフォーカス | `c` |
 | `status` | `toggle_file_mode` | ファイル：パスまたはツリー | `m` |
-| `status` | `lfs_only` | Files: LFS Only | `o` |
+| `status` | `lfs_only` | ファイル: LFS のみ表示 | `o` |
 | `status` | `view_all_files` | ファイル：すべてのファイルを表示 | `a` |
 | `status` | `amend` | Amend の切り替え | `Shift+A` |
 | `status` | `skip_hooks` | フックのスキップを切り替え | `Shift+H` |
@@ -181,8 +181,8 @@ stage_file = "z"
 | `status` | `collapse_all_folders` | すべてのフォルダーを折りたたむ | `-` |
 | `status` | `expand_below` | フォルダーとそのサブフォルダーを展開 | `*`, `Shift+Right` |
 | `status` | `collapse_below` | フォルダーとそのサブフォルダーを折りたたむ | `_`, `Shift+Left` |
-| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `status` | `scroll_left` | ペインを左へスクロール | `Alt+Left` |
+| `status` | `scroll_right` | ペインを右へスクロール | `Alt+Right` |
 | `home` | `favorite` | リポジトリのお気に入りを切り替え | `f`, `*` |
 | `home` | `close_repo` | 行を閉じる、削除、またはお気に入り解除 | `x`, `Delete` |
 | `home` | `copy_path` | リポジトリのパスをコピー | `y` |
@@ -483,8 +483,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | ナビゲーション: 次のペインにフォーカスを移動 | `Tab` |
 | ナビゲーション: 前のペインにフォーカスを移動 | `Shift+Tab` |
 | ナビゲーション: Commitを検索... | `f` |
-| Log: Filter by Author... | `A` |
-| Log: Clear Author Filter |  |
+| Log: 作成者で絞り込み... | `A` |
+| Log: 作成者の絞り込みを解除 |  |
 | ナビゲーション: Refs ペインの折りたたみを切り替え | `Ctrl+N H` |
 | ナビゲーション: Refs ペインを広げる | `Ctrl+N Right` |
 | ナビゲーション: Refs ペインを狭める | `Ctrl+N Left` |
@@ -590,10 +590,10 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Refs: 選択中のTagを既定のリモートへPush |  |
 | Refs: 選択中のTagをリモートから削除... |  |
 | Git: 選択中のtagをfetch |  |
-| Git: Use the Remote's Version of the Selected Tag |  |
-| Git: Force Push the Selected Tag to Its Remote |  |
+| Git: 選択中のTagをリモートのものにする |  |
+| Git: 選択中のTagをリモートへ強制Push |  |
 | Refs: 選択中のTagに注釈を付ける... |  |
-| Refs: Move Selected Tag to Selected Commit... |  |
+| Refs: 選択中のTagを選択中のCommitへ移動... |  |
 | Refs: グラフでの非表示を切り替え |  |
 | Refs: グラフで表示 | `g` |
 | Refs: 選択中の参照のソロ表示を切り替え | `o` |
@@ -607,8 +607,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Refs: すべてのフォルダーを折りたたむ | `-` |
 | Refs: 選択中のフォルダーとそのサブフォルダーを展開 | `*` |
 | Refs: 選択中のフォルダーとそのサブフォルダーを折りたたむ | `_` |
-| View: Scroll the Pane Left | `Alt+Left` |
-| View: Scroll the Pane Right | `Alt+Right` |
+| 表示: ペインを左へスクロール | `Alt+Left` |
+| 表示: ペインを右へスクロール | `Alt+Right` |
 | Refs: 次のセクション | `l` |
 | Refs: 前のセクション | `h` |
 | Refs: 現在のセクションを展開／折りたたみ | `Enter` |
@@ -828,10 +828,10 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Radar: 保留... | `z` |
 | Radar: リクエストをレビュー... | `e` |
 | Radar: Issue の会話を開く | `i` |
-| Radar: Merge Request... | `m` |
-| Radar: Close... | `x` |
-| Radar: Mark as Ready | `y` |
-| Radar: Clone Repository... | `g` |
+| Radar: リクエストをMerge... | `m` |
+| Radar: 閉じる... | `x` |
+| Radar: レビュー可能にする | `y` |
+| Radar: リポジトリをクローン... | `g` |
 | Radar: API 経由でレビュー |  |
 | Radar: クローンしてレビュー... |  |
 | Radar: 担当者を編集... |  |
@@ -863,8 +863,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | タブ: ファイルマネージャーで開く |  |
 | タブ: ターミナルで開く |  |
 | タブ: 開く先... | `Alt+O` |
-| Tab: Terminal Here |  |
-| ✦ Tab: Open AI Agent Here |  |
+| タブ: ここでターミナルを開く |  |
+| ✦ タブ: ここで AI エージェントを開く |  |
 | タブ: 既定の開く先で開く | `Ctrl+Alt+O` |
 | リポジトリ: プロファイルを変更... |  |
 | ヘルプ: GitPoulpi について | `Ctrl+N a` |
@@ -921,7 +921,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 編集: Reflog... |  |
 | 編集: 失われたCommitsを復旧... |  |
 | 編集: ブランチをブロックされた操作が残した位置に復元 | `Alt+Shift+Z` |
-| Edit: Undo Whole Sequence |  |
+| 編集: シーケンス全体を元に戻す |  |
 | レビュー: 概要を表示 |  |
 | レビュー: ファイルを表示 |  |
 | レビュー: Commitsを表示 |  |
@@ -990,7 +990,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 会話: 項目の図を開く | `g` |
 | 会話: スレッドのコードを開く | `G` |
 | 会話: 項目のリンクをコピー | `y` |
-| Conversation: Copy Text | `Ctrl+C` |
+| 会話: テキストをコピー | `Ctrl+C` |
 | 会話: ブラウザーで開く | `o` |
 | 会話: コメントを編集 | `e` |
 | 会話: コメントを削除 | `d` |
@@ -1015,7 +1015,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | レビュー: ✦ ドラフトを破棄 | `N` |
 | 元に戻す履歴: ここまで元に戻す... | `u` |
 | 元に戻す履歴: ここまでやり直す... | `y` |
-| Undo History: Undo Whole Sequence | `x` |
+| 元に戻す履歴: シーケンス全体を元に戻す | `x` |
 | 元に戻す履歴: これだけ復元... | `r` |
 | 元に戻す履歴: ブランチを元の位置に復元... | `o` |
 | 元に戻す履歴: 更新 |  |
@@ -1082,7 +1082,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Diff: ハンクのみを切り替え（ファイル全体／変更のみ） | `H` |
 | ファイル: パス/ツリーを切り替え | `m` |
 | ファイル: すべてのファイルの表示を切り替え | `a` |
-| Files: Toggle LFS Only | `o` |
+| ファイル: LFS のみ表示を切り替え | `o` |
 | Commit: フックのスキップを切り替え | `H` |
 | ファイル: 行または選択範囲のメニューを開く | `.` |
 | ファイル: すべてのフォルダーを展開 | `=` |
@@ -1099,7 +1099,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Diff: 折り返しを切り替え | `w` |
 | Diff: 文字コードを選択... | `C` |
 | 表示: ミニマップを切り替え | `M` |
-| Diff: Toggle Changed Words Highlight |  |
+| Diff: 変更された単語のハイライトを切り替え |  |
 | 表示: Commit列を切り替え | `Alt+C` |
 | 表示: Commit列: 非表示 |  |
 | 表示: Commit列: ファイル履歴 |  |
@@ -1191,17 +1191,17 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | エディター: 改行コードを変換 |  |
 | エディター: インデントを変更 |  |
 | アプリ: 設定... | `Ctrl+, / Ctrl+N ,` |
-| ✦ Sequence: Create with AI... |  |
+| ✦ シーケンス: AI で作成... |  |
 | アプリ: 設定を検索... | `設定内で /` |
 | アプリ: キー割り当て... |  |
 | エージェント: 保留中のビューを表示 | `Ctrl+N Enter` |
 | エージェント: 保留中のビューを閉じる |  |
 | エージェント: 戻る | `Ctrl+N Backspace` |
-| Sequence: Cancel |  |
-| Sequence: Continue |  |
-| Sequence: Review This Repository's Sequences |  |
-| Sequence: Trust This Repository's Sequences |  |
-| Sequence: Ignore This Repository's Sequences |  |
+| シーケンス: キャンセル |  |
+| シーケンス: 続行 |  |
+| シーケンス: このリポジトリのシーケンスを確認 |  |
+| シーケンス: このリポジトリのシーケンスを信頼 |  |
+| シーケンス: このリポジトリのシーケンスを無視 |  |
 | キー割り当て: すべてリセット... |  |
 | 連携: 関連するPull Requestを開く | `Ctrl+G g` |
 | 連携: 関連するPull Requestをホストで編集 | `e（行の上で）` |

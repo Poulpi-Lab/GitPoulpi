@@ -148,20 +148,20 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `refs` | `collapse_all` | Alle Ordner zuklappen | `-` |
 | `refs` | `expand_below` | Ordner und seine Unterordner aufklappen | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Ordner und seine Unterordner zuklappen | `_`, `Shift+Left` |
-| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `refs` | `scroll_left` | Bereich nach links scrollen | `Alt+Left` |
+| `refs` | `scroll_right` | Bereich nach rechts scrollen | `Alt+Right` |
 | `log` | `toggle_file_mode` | Dateien: Pfad oder Baum | `m` |
-| `log` | `lfs_only` | Files: LFS Only | `o` |
+| `log` | `lfs_only` | Dateien: Nur LFS | `o` |
 | `log` | `view_all_files` | Dateien: Alle Dateien ansehen | `a` |
 | `log` | `compare_selection` | Ausgewählte Zeilen vergleichen | `v` |
 | `log` | `compare_swap` | Vergleichsenden tauschen | `x` |
 | `log` | `compare_next` | Zur nächsten verglichenen Zeile springen | `n` |
-| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
+| `log` | `filter_author` | Log nach Autor filtern | `Shift+A` |
 | `log` | `pick_column` | Spalte zum Verschieben oder Anpassen wählen | `Shift+C` |
 | `log` | `scroll_left` | Spalten nach links scrollen | `Shift+Left` |
 | `log` | `scroll_right` | Spalten nach rechts scrollen | `Shift+Right` |
-| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log` | `details_scroll_left` | Bereich nach links scrollen | `Alt+Left` |
+| `log` | `details_scroll_right` | Bereich nach rechts scrollen | `Alt+Right` |
 | `log` | `copy_mermaid` | Commits als Mermaid gitGraph kopieren | `Shift+Y` |
 | `log_columns` | `next` | Nächste Spalte wählen | `Tab` |
 | `log_columns` | `prev` | Vorherige Spalte wählen | `Shift+BackTab` |
@@ -179,11 +179,11 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Alle Ordner zuklappen | `-` |
 | `log_files` | `expand_below` | Ordner und seine Unterordner aufklappen | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Ordner und seine Unterordner zuklappen | `_`, `Shift+Left` |
-| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log_files` | `scroll_left` | Bereich nach links scrollen | `Alt+Left` |
+| `log_files` | `scroll_right` | Bereich nach rechts scrollen | `Alt+Right` |
 | `status` | `compose` | Auf die Commit-Nachricht fokussieren | `c` |
 | `status` | `toggle_file_mode` | Dateien: Pfad oder Baum | `m` |
-| `status` | `lfs_only` | Files: LFS Only | `o` |
+| `status` | `lfs_only` | Dateien: Nur LFS | `o` |
 | `status` | `view_all_files` | Dateien: Alle Dateien ansehen | `a` |
 | `status` | `amend` | Amend umschalten | `Shift+A` |
 | `status` | `skip_hooks` | Hooks überspringen umschalten | `Shift+H` |
@@ -194,8 +194,8 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Alle Ordner zuklappen | `-` |
 | `status` | `expand_below` | Ordner und seine Unterordner aufklappen | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Ordner und seine Unterordner zuklappen | `_`, `Shift+Left` |
-| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `status` | `scroll_left` | Bereich nach links scrollen | `Alt+Left` |
+| `status` | `scroll_right` | Bereich nach rechts scrollen | `Alt+Right` |
 | `home` | `favorite` | Repository mit Stern markieren oder Stern entfernen | `f`, `*` |
 | `home` | `close_repo` | Zeile schließen, entfernen oder Stern entfernen | `x`, `Delete` |
 | `home` | `copy_path` | Repository-Pfad kopieren | `y` |
@@ -512,8 +512,8 @@ die Standardtasten.
 | Navigation: Fokus zum nächsten Bereich wechseln | `Tab` |
 | Navigation: Fokus zum vorherigen Bereich wechseln | `Shift+Tab` |
 | Navigation: Commits suchen... | `f` |
-| Log: Filter by Author... | `A` |
-| Log: Clear Author Filter |  |
+| Log: Nach Autor filtern... | `A` |
+| Log: Autorenfilter löschen |  |
 | Navigation: Refs-Bereich ein-/ausklappen | `Ctrl+N H` |
 | Navigation: Refs-Bereich verbreitern | `Ctrl+N Right` |
 | Navigation: Refs-Bereich verschmälern | `Ctrl+N Left` |
@@ -619,10 +619,10 @@ die Standardtasten.
 | Refs: Ausgewählten Tag an das Standard-Remote pushen |  |
 | Refs: Ausgewählten Tag von seinem Remote löschen... |  |
 | Git: Fetch für den ausgewählten Tag |  |
-| Git: Use the Remote's Version of the Selected Tag |  |
-| Git: Force Push the Selected Tag to Its Remote |  |
+| Git: Version des Remotes für den ausgewählten Tag übernehmen |  |
+| Git: Ausgewählten Tag erzwungen per Push zu seinem Remote senden |  |
 | Refs: Ausgewählten Tag annotieren... |  |
-| Refs: Move Selected Tag to Selected Commit... |  |
+| Refs: Ausgewählten Tag auf den ausgewählten Commit verschieben... |  |
 | Refs: Ausblenden im Graph umschalten |  |
 | Refs: Im Graph anzeigen | `g` |
 | Refs: Solo für ausgewählte Ref umschalten | `o` |
@@ -636,8 +636,8 @@ die Standardtasten.
 | Refs: Alle Ordner zuklappen | `-` |
 | Refs: Gewählten Ordner und seine Unterordner aufklappen | `*` |
 | Refs: Gewählten Ordner und seine Unterordner zuklappen | `_` |
-| View: Scroll the Pane Left | `Alt+Left` |
-| View: Scroll the Pane Right | `Alt+Right` |
+| Ansicht: Bereich nach links scrollen | `Alt+Left` |
+| Ansicht: Bereich nach rechts scrollen | `Alt+Right` |
 | Refs: Nächster Abschnitt | `l` |
 | Refs: Vorheriger Abschnitt | `h` |
 | Refs: Aktiven Abschnitt ein- oder ausklappen | `Enter` |
@@ -857,10 +857,10 @@ die Standardtasten.
 | Radar: Zurückstellen... | `z` |
 | Radar: Anfrage prüfen... | `e` |
 | Radar: Issue-Unterhaltung öffnen | `i` |
-| Radar: Merge Request... | `m` |
-| Radar: Close... | `x` |
-| Radar: Mark as Ready | `y` |
-| Radar: Clone Repository... | `g` |
+| Radar: Merge-Anfrage... | `m` |
+| Radar: Schließen... | `x` |
+| Radar: Als bereit markieren | `y` |
+| Radar: Repository klonen... | `g` |
 | Radar: Über die API prüfen |  |
 | Radar: Klonen und prüfen... |  |
 | Radar: Zugewiesene bearbeiten... |  |
@@ -892,8 +892,8 @@ die Standardtasten.
 | Tab: Im Dateimanager öffnen |  |
 | Tab: Im Terminal öffnen |  |
 | Tab: Öffnen in... | `Alt+O` |
-| Tab: Terminal Here |  |
-| ✦ Tab: Open AI Agent Here |  |
+| Tab: Terminal hier |  |
+| ✦ Tab: KI-Agent hier öffnen |  |
 | Tab: Im Standardeintrag öffnen | `Ctrl+Alt+O` |
 | Repository: Profil wechseln... |  |
 | Hilfe: Über GitPoulpi | `Ctrl+N a` |
@@ -950,7 +950,7 @@ die Standardtasten.
 | Bearbeiten: Reflog... |  |
 | Bearbeiten: Verlorene Commits wiederfinden... |  |
 | Bearbeiten: Branch dorthin zurücksetzen, wo die blockierte Aktion ihn gelassen hat | `Alt+Shift+Z` |
-| Edit: Undo Whole Sequence |  |
+| Bearbeiten: Ganze Sequenz rückgängig |  |
 | Review: Übersicht zeigen |  |
 | Review: Dateien zeigen |  |
 | Review: Commits zeigen |  |
@@ -1019,7 +1019,7 @@ die Standardtasten.
 | Unterhaltung: Diagramm des Eintrags öffnen | `g` |
 | Unterhaltung: Code des Threads öffnen | `G` |
 | Unterhaltung: Link des Eintrags kopieren | `y` |
-| Conversation: Copy Text | `Ctrl+C` |
+| Unterhaltung: Text kopieren | `Ctrl+C` |
 | Unterhaltung: Im Browser öffnen | `o` |
 | Unterhaltung: Kommentar bearbeiten | `e` |
 | Unterhaltung: Kommentar löschen | `d` |
@@ -1044,7 +1044,7 @@ die Standardtasten.
 | Review: ✦ Entwurf verwerfen | `N` |
 | Rückgängig-Verlauf: Bis hierher rückgängig... | `u` |
 | Rückgängig-Verlauf: Bis hierher wiederholen... | `y` |
-| Undo History: Undo Whole Sequence | `x` |
+| Rückgängig-Verlauf: Ganze Sequenz rückgängig | `x` |
 | Rückgängig-Verlauf: Nur diese wiederherstellen... | `r` |
 | Rückgängig-Verlauf: Branch dorthin zurücksetzen, wo er war... | `o` |
 | Rückgängig-Verlauf: Aktualisieren |  |
@@ -1111,7 +1111,7 @@ die Standardtasten.
 | Diff: Nur Hunks umschalten (ganze Datei / nur die Änderungen) | `H` |
 | Dateien: Pfad/Baum umschalten | `m` |
 | Dateien: Alle Dateien ansehen umschalten | `a` |
-| Files: Toggle LFS Only | `o` |
+| Dateien: Nur LFS umschalten | `o` |
 | Commit: Hooks überspringen umschalten | `H` |
 | Dateien: Menü der Zeile oder Auswahl öffnen | `.` |
 | Dateien: Alle Ordner aufklappen | `=` |
@@ -1128,7 +1128,7 @@ die Standardtasten.
 | Diff: Zeilenumbruch umschalten | `w` |
 | Diff: Kodierung wählen... | `C` |
 | Ansicht: Minimap umschalten | `M` |
-| Diff: Toggle Changed Words Highlight |  |
+| Diff: Hervorhebung geänderter Wörter umschalten |  |
 | Ansicht: Commit-Spalte umschalten | `Alt+C` |
 | Ansicht: Commit-Spalte: ausblenden |  |
 | Ansicht: Commit-Spalte: Dateiverlauf |  |
@@ -1220,17 +1220,17 @@ die Standardtasten.
 | Editor: Zeilenumbrüche umwandeln |  |
 | Editor: Einrückung ändern |  |
 | App: Einstellungen... | `Ctrl+, / Ctrl+N ,` |
-| ✦ Sequence: Create with AI... |  |
+| ✦ Sequenz: Mit KI erstellen... |  |
 | App: Einstellungen durchsuchen... | `/ in den Einstellungen` |
 | App: Tastenbelegung... |  |
 | Agent: Ausstehende Ansicht zeigen | `Ctrl+N Enter` |
 | Agent: Ausstehende Ansicht verwerfen |  |
 | Agent: Zurück | `Ctrl+N Backspace` |
-| Sequence: Cancel |  |
-| Sequence: Continue |  |
-| Sequence: Review This Repository's Sequences |  |
-| Sequence: Trust This Repository's Sequences |  |
-| Sequence: Ignore This Repository's Sequences |  |
+| Sequenz: Abbrechen |  |
+| Sequenz: Fortsetzen |  |
+| Sequenz: Sequenzen dieses Repositorys prüfen |  |
+| Sequenz: Sequenzen dieses Repositorys vertrauen |  |
+| Sequenz: Sequenzen dieses Repositorys ignorieren |  |
 | Tastenbelegung: Alle zurücksetzen... |  |
 | Integrationen: Verknüpften Pull Request öffnen | `Ctrl+G g` |
 | Integrationen: Verknüpften Pull Request auf dem Host bearbeiten | `e (auf einer Zeile)` |

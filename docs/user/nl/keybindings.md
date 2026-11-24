@@ -152,20 +152,20 @@ prefix getoond (`Ctrl+G s`).
 | `refs` | `collapse_all` | Alle mappen inklappen | `-` |
 | `refs` | `expand_below` | De map en zijn submappen uitklappen | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | De map en zijn submappen inklappen | `_`, `Shift+Left` |
-| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `refs` | `scroll_left` | Het paneel naar links scrollen | `Alt+Left` |
+| `refs` | `scroll_right` | Het paneel naar rechts scrollen | `Alt+Right` |
 | `log` | `toggle_file_mode` | Bestanden: pad of boom | `m` |
-| `log` | `lfs_only` | Files: LFS Only | `o` |
+| `log` | `lfs_only` | Bestanden: alleen LFS | `o` |
 | `log` | `view_all_files` | Bestanden: alle bestanden tonen | `a` |
 | `log` | `compare_selection` | De geselecteerde rijen vergelijken | `v` |
 | `log` | `compare_swap` | Uiteinden van de vergelijking omwisselen | `x` |
 | `log` | `compare_next` | Naar de volgende vergeleken rij | `n` |
-| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
+| `log` | `filter_author` | Het Log filteren op auteur | `Shift+A` |
 | `log` | `pick_column` | Kolom kiezen om te verplaatsen of de breedte te wijzigen | `Shift+C` |
 | `log` | `scroll_left` | Kolommen naar links scrollen | `Shift+Left` |
 | `log` | `scroll_right` | Kolommen naar rechts scrollen | `Shift+Right` |
-| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log` | `details_scroll_left` | Het paneel naar links scrollen | `Alt+Left` |
+| `log` | `details_scroll_right` | Het paneel naar rechts scrollen | `Alt+Right` |
 | `log` | `copy_mermaid` | Commits kopiëren als Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Volgende kolom kiezen | `Tab` |
 | `log_columns` | `prev` | Vorige kolom kiezen | `Shift+BackTab` |
@@ -183,11 +183,11 @@ prefix getoond (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Alle mappen inklappen | `-` |
 | `log_files` | `expand_below` | De map en zijn submappen uitklappen | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | De map en zijn submappen inklappen | `_`, `Shift+Left` |
-| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log_files` | `scroll_left` | Het paneel naar links scrollen | `Alt+Left` |
+| `log_files` | `scroll_right` | Het paneel naar rechts scrollen | `Alt+Right` |
 | `status` | `compose` | Focus op het commit-bericht | `c` |
 | `status` | `toggle_file_mode` | Bestanden: pad of boom | `m` |
-| `status` | `lfs_only` | Files: LFS Only | `o` |
+| `status` | `lfs_only` | Bestanden: alleen LFS | `o` |
 | `status` | `view_all_files` | Bestanden: alle bestanden tonen | `a` |
 | `status` | `amend` | Amend omschakelen | `Shift+A` |
 | `status` | `skip_hooks` | Hooks overslaan omschakelen | `Shift+H` |
@@ -198,8 +198,8 @@ prefix getoond (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Alle mappen inklappen | `-` |
 | `status` | `expand_below` | De map en zijn submappen uitklappen | `*`, `Shift+Right` |
 | `status` | `collapse_below` | De map en zijn submappen inklappen | `_`, `Shift+Left` |
-| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `status` | `scroll_left` | Het paneel naar links scrollen | `Alt+Left` |
+| `status` | `scroll_right` | Het paneel naar rechts scrollen | `Alt+Right` |
 | `home` | `favorite` | Repository als favoriet (de)markeren | `f`, `*` |
 | `home` | `close_repo` | Rij sluiten, verwijderen of favoriet wissen | `x`, `Delete` |
 | `home` | `copy_path` | Het pad van de repository kopiëren | `y` |
@@ -521,8 +521,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Navigatie: Focus naar volgend paneel | `Tab` |
 | Navigatie: Focus naar vorig paneel | `Shift+Tab` |
 | Navigatie: Commits zoeken... | `f` |
-| Log: Filter by Author... | `A` |
-| Log: Clear Author Filter |  |
+| Log: Filteren op auteur... | `A` |
+| Log: Auteursfilter wissen |  |
 | Navigatie: Refs-paneel in-/uitklappen | `Ctrl+N H` |
 | Navigatie: Refs-paneel verbreden | `Ctrl+N Right` |
 | Navigatie: Refs-paneel versmallen | `Ctrl+N Left` |
@@ -628,10 +628,10 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Refs: Geselecteerde tag pushen naar standaardremote |  |
 | Refs: Geselecteerde tag van zijn remote verwijderen... |  |
 | Git: Geselecteerde tag fetchen |  |
-| Git: Use the Remote's Version of the Selected Tag |  |
-| Git: Force Push the Selected Tag to Its Remote |  |
+| Git: De versie van de remote van de geselecteerde tag gebruiken |  |
+| Git: Force push van de geselecteerde tag naar de remote |  |
 | Refs: Geselecteerde tag annoteren... |  |
-| Refs: Move Selected Tag to Selected Commit... |  |
+| Refs: Geselecteerde tag verplaatsen naar geselecteerde commit... |  |
 | Refs: Verbergen in grafiek omschakelen |  |
 | Refs: In grafiek tonen | `g` |
 | Refs: Solo op geselecteerde ref omschakelen | `o` |
@@ -645,8 +645,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Refs: Alle mappen inklappen | `-` |
 | Refs: De geselecteerde map en zijn submappen uitklappen | `*` |
 | Refs: De geselecteerde map en zijn submappen inklappen | `_` |
-| View: Scroll the Pane Left | `Alt+Left` |
-| View: Scroll the Pane Right | `Alt+Right` |
+| Weergave: Het paneel naar links scrollen | `Alt+Left` |
+| Weergave: Het paneel naar rechts scrollen | `Alt+Right` |
 | Refs: Volgende sectie | `l` |
 | Refs: Vorige sectie | `h` |
 | Refs: Actieve sectie in-/uitklappen | `Enter` |
@@ -866,10 +866,10 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Radar: Uitstellen... | `z` |
 | Radar: Verzoek reviewen... | `e` |
 | Radar: Issuegesprek openen | `i` |
-| Radar: Merge Request... | `m` |
-| Radar: Close... | `x` |
-| Radar: Mark as Ready | `y` |
-| Radar: Clone Repository... | `g` |
+| Radar: Merge... | `m` |
+| Radar: Sluiten... | `x` |
+| Radar: Markeren als klaar | `y` |
+| Radar: Repository klonen... | `g` |
 | Radar: Reviewen via de API |  |
 | Radar: Klonen en reviewen... |  |
 | Radar: Toegewezenen bewerken... |  |
@@ -901,8 +901,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Tabblad: Openen in bestandsbeheer |  |
 | Tabblad: Openen in terminal |  |
 | Tabblad: Openen in... | `Alt+O` |
-| Tab: Terminal Here |  |
-| ✦ Tab: Open AI Agent Here |  |
+| Tabblad: Terminal hier |  |
+| ✦ Tabblad: AI-agent hier openen |  |
 | Tabblad: Openen in standaard | `Ctrl+Alt+O` |
 | Repository: Profiel wijzigen... |  |
 | Help: Over GitPoulpi | `Ctrl+N a` |
@@ -959,7 +959,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Bewerken: Reflog... |  |
 | Bewerken: Verloren commits terughalen... |  |
 | Bewerken: De branch herstellen naar waar de geblokkeerde actie hem achterliet | `Alt+Shift+Z` |
-| Edit: Undo Whole Sequence |  |
+| Bewerken: Hele reeks ongedaan maken |  |
 | Review: Overzicht tonen |  |
 | Review: Bestanden tonen |  |
 | Review: Commits tonen |  |
@@ -1028,7 +1028,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Gesprek: Diagram van item openen | `g` |
 | Gesprek: Code van discussie openen | `G` |
 | Gesprek: Link van item kopiëren | `y` |
-| Conversation: Copy Text | `Ctrl+C` |
+| Gesprek: Tekst kopiëren | `Ctrl+C` |
 | Gesprek: Openen in browser | `o` |
 | Gesprek: Opmerking bewerken | `e` |
 | Gesprek: Opmerking verwijderen | `d` |
@@ -1053,7 +1053,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Review: Het ✦ concept verwerpen | `N` |
 | Geschiedenis: Ongedaan maken tot hier... | `u` |
 | Geschiedenis: Opnieuw tot hier... | `y` |
-| Undo History: Undo Whole Sequence | `x` |
+| Geschiedenis: Hele reeks ongedaan maken | `x` |
 | Geschiedenis: Alleen dit herstellen... | `r` |
 | Geschiedenis: De branch herstellen naar waar hij was... | `o` |
 | Geschiedenis: Vernieuwen |  |
@@ -1120,7 +1120,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Diff: Alleen hunks omschakelen (heel bestand / alleen wijzigingen) | `H` |
 | Bestanden: Pad/boom omschakelen | `m` |
 | Bestanden: Alle bestanden tonen omschakelen | `a` |
-| Files: Toggle LFS Only | `o` |
+| Bestanden: Alleen LFS in-/uitschakelen | `o` |
 | Commit: Hooks overslaan omschakelen | `H` |
 | Bestanden: menu van de rij of selectie openen | `.` |
 | Bestanden: Alle mappen uitklappen | `=` |
@@ -1137,7 +1137,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Diff: Regelafbreking omschakelen | `w` |
 | Diff: Codering kiezen... | `C` |
 | Weergave: Minimap omschakelen | `M` |
-| Diff: Toggle Changed Words Highlight |  |
+| Diff: Markering van gewijzigde woorden omschakelen |  |
 | Weergave: commit-kolom tonen of verbergen | `Alt+C` |
 | Weergave: commit-kolom: verbergen |  |
 | Weergave: commit-kolom: bestandsgeschiedenis |  |
@@ -1229,17 +1229,17 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Editor: Regeleinden converteren |  |
 | Editor: Inspringing wijzigen |  |
 | App: Instellingen... | `Ctrl+, / Ctrl+N ,` |
-| ✦ Sequence: Create with AI... |  |
+| ✦ Reeks: Maken met AI... |  |
 | App: Instellingen zoeken... | `/ in Instellingen` |
 | App: Sneltoetsen... |  |
 | Agent: Openstaande weergave tonen | `Ctrl+N Enter` |
 | Agent: Openstaande weergave sluiten |  |
 | Agent: Terug | `Ctrl+N Backspace` |
-| Sequence: Cancel |  |
-| Sequence: Continue |  |
-| Sequence: Review This Repository's Sequences |  |
-| Sequence: Trust This Repository's Sequences |  |
-| Sequence: Ignore This Repository's Sequences |  |
+| Reeks: Annuleren |  |
+| Reeks: Doorgaan |  |
+| Reeks: De reeksen van deze repository bekijken |  |
+| Reeks: De reeksen van deze repository vertrouwen |  |
+| Reeks: De reeksen van deze repository negeren |  |
 | Sneltoetsen: Alles resetten... |  |
 | Integraties: Gekoppelde pull request openen | `Ctrl+G g` |
 | Integraties: Gekoppelde pull request bewerken op de host | `e (op een rij)` |

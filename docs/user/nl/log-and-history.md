@@ -89,7 +89,9 @@ geschiedenis op en schrijft `.mailmap`-regels voor je, zie `history-rewrite.md`;
   paletopdracht *Log: Filteren op auteur...*): filtert het Log vooraf op wie de
   commits schreef. Onder de kop hangt een popup met een zoekveld, een rij
   **Filter wissen** (✕) en één rij per auteur van de geladen geschiedenis: een
-  initialenbadge (de avatar, als `ui.avatars` niet uit staat), de naam en daarachter
+  avatar (als `ui.avatars` niet uit staat: de foto van de auteur waar de terminal
+  afbeeldingen tekent en de foto klaar is, tot dan en op andere terminals de
+  initialenbadge), de naam en daarachter
   gedempt het e-mailadres, de meeste commits eerst en dan op naam. Typen verkleint
   de lijst met de fuzzy matching van het palet; `Enter` of een klik wisselt de
   gemarkeerde auteur (een vinkje; kies er zoveel je wilt), `Esc` of een klik
@@ -102,8 +104,13 @@ geschiedenis op en schrijft `.mailmap`-regels voor je, zie `history-rewrite.md`;
   noemt zijn tooltip de gekozen auteurs, en als de kolom Auteur verborgen of te
   smal is voor de trechter, staat in plaats daarvan *Auteur: Alice Example +1* op
   de bovenrand van het Log (de toets en het palet werken nog). Om het te laten
-  vallen: de rij **Filter wissen**, een rechtsklik op de verlichte trechter, of de
-  paletopdracht *Log: Auteursfilter wissen*. De auteurs zijn die van de commits die
+  vallen: de rij **Filter wissen**, een rechtsklik op de verlichte trechter, de
+  paletopdracht *Log: Auteursfilter wissen*, of `Esc` in het Log (na een selectie,
+  die `Esc` eerst laat vallen; in de popup maakt `Esc` eerst het zoekveld leeg en
+  sluit dan de popup en houdt het filter). Zolang het aan staat, verplaatsen
+  Omhoog/Omlaag (en PageUp/PageDown, Home/End) de selectie alleen tussen de
+  verlichte commits en slaan de gedimde over; een klik selecteert nog elke rij.
+  De auteurs zijn die van de commits die
   het Log heeft geladen (mailmap toegepast, zoals in de kolom), en het filter wordt
   per repository onthouden, over tabbladwisselingen en herstarts heen. Een
   tekstzoekopdracht wordt niet onthouden, het filter wel.

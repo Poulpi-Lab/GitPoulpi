@@ -49,9 +49,9 @@ biri değildir). Klonlanmamış bir request'e çift tık ya da `Enter`, **İncel
 
 ### Bir request'in dalları
 
-Bir request satırı başlığından sonra `kaynak → hedef` gösterir (kaynak dal bir fork'taysa `alice:feature/login → main`).
-Yer kısa olduğunda önce hedef kesilir (üç nokta), başlık yerin çoğunu korur ve dar bir pencerede
-dallar gösterilmez; Eylemler sütunu asla dışarı itilmez. Kesilmiş bir metnin tamamı için işaretçiyi üzerinde bekletin. Dalları
+Bir request satırı `kaynak → hedef` bilgisini, depodan hemen sonra gelen **Dallar** sütununda gösterir (kaynak dal bir fork'taysa `alice:feature/login → main`); issue satırı hücreyi boş bırakır ve dallarını adlandıran hiç request'i olmayan bir Radar'da bu sütun yoktur.
+Hücre dar olduğunda önce kaynak kesilir (üç nokta), hedef mümkün olduğunca bütün kalır. Sütun kaybolmadan önce daralır: dar bir pencerede isteğe bağlı sütunların en son ayrılanıdır
+(durum, yazar ve yaştan sonra, depo ve başlıktan önce); kaybolduğunda dalların tamamı başlığın ipucunda ve seçili satırın durum çubuğunda kalır. Kendiniz boyutlandırdığınız geniş bir yazar sütunu başlığa ve dallara yer verir. Eylemler sütunu asla dışarı itilmez. Kesilmiş bir metnin tamamı için işaretçiyi üzerinde bekletin. GitHub ve Gitea request'leri dalları olmadan listeler; bu yüzden Radar onları listeden sonra okur (değişene kadar request başına bir kez). Dalları
 adlandırmayan bir barındırıcı orada hiçbir şey göstermez. Bir issue satırı, deposunu bir request satırıyla aynı hapta adlandırır
 (klonun klasör adı veya klonlanmamışsa `owner/name`).
 
@@ -154,7 +154,7 @@ kullandığı önbellek) hemen görünür ve yanıtlar geldikçe değiştirilir.
 
 ### Sütunlar
 
-Depo çipi, `#` (numara ve onay işaretleri), yazar ve yaş **boyutlandırılabilir sütunlardır**. Otomatikte bırakılırsa depo sütunu ekrandaki en uzun ad
+Depo çipi, dallar, `#` (numara ve onay işaretleri), yazar ve yaş **boyutlandırılabilir sütunlardır**. Otomatikte bırakılırsa depo sütunu ekrandaki en uzun ad
 kadar geniştir (en çok 40 hücre ve pencerenin en çok üçte biri), böylece `owner/name` ve bir hesap listesinin
 `group/sub/project` adı normal bir terminalde kesilmez. Başlık kalanı alır. Sığmayan bir ad üç noktayla biter
 (`group/sub...`) ve:
@@ -162,7 +162,7 @@ kadar geniştir (en çok 40 hücre ve pencerenin en çok üçte biri), böylece 
 - Kesilmiş bir depo, başlık, yazar veya etiket listesinin **üzerinde bekleyin**, bir ipucu metnin tamamını gösterir.
   Satırı seçin, filtrenin altındaki durum çubuğu da tam projeyi ve başlığı söyler; klavye de aynısını görür.
 - Sütunu boyutlandırmak için **ayırıcıyı sürükleyin** (depo adından, `#`'den sonraki hücre ya da yazardan veya yaştan hemen önceki);
-  sütunu yeniden sığdırmak için ona **çift tıklayın**. Listenin bir **başlık satırı** vardır (depo, `#`,
+  sütunu yeniden sığdırmak için ona **çift tıklayın**. Listenin bir **başlık satırı** vardır (depo, dallar, `#`,
   başlık, yazar, yaş) ve ayırıcılar Log'unkiler gibi `ui.column_resize` ayarını izler: `line` ile (varsayılan)
   başlık satırında ayırıcıda soluk bir `│` durur; imleç ayırıcının üzerindeyken (başlıkta ya da listenin herhangi bir satırında),
   sütun tuşlarla seçiliyken ya da sürüklerken tüm liste boyunca ince bir vurgu çizgisi çizilir; boyunca herhangi bir yerden
@@ -175,7 +175,7 @@ kadar geniştir (en çok 40 hücre ve pencerenin en çok üçte biri), böylece 
   **`[`** daraltır, **`0`** her sütunu otomatiğe döndürür, `Esc` çıkar. Palette de aynısı var: `Radar: Sütun Seç`,
   `Radar: Sütunu Genişlet`, `Radar: Sütunu Daralt`, `Radar: Sütun Genişliklerini Sıfırla`.
 
-Genişlikler `radar.toml` içinde (`[columns]`, `repo`, `number`, `author` ve `age`, hücre olarak) saklanır ve yeniden başlatmada
+Genişlikler `radar.toml` içinde (`[columns]`, `repo`, `branches`, `number`, `author` ve `age`, hücre olarak; `branches` içermeyen bir dosya eskisi gibi yüklenir, sütun o zaman içeriğine göre en çok 28 hücreye sığar) saklanır ve yeniden başlatmada
 korunur. Log'un sütunlarıyla aynı boyutlandırma hareketleridir.
 
 ### Denetimler ve çakışmalar
@@ -214,18 +214,19 @@ Kapalı ve merge edilmiş request'ler ile kapalı issue'lar listelenmez.
 
 ## Görünümler ve filtreler
 
-Üç açılır liste ve bir metin alanı listeyi daraltır. Her seçim bir açılır listedir:
+Dört açılır liste ve bir metin alanı listeyi daraltır. Her seçim bir açılır listedir:
 tıklayın veya tuşunu kullanın.
 
 - **Görünüm** (`v`): Tümü, request'ler, Issue'lar, WIP (süren işler), Ertelenenler.
 - **Göster** (`f`): Herkes, Benimkiler (yazdığınız request'ler, açtığınız
   issue'lar), Bana atananlar, İnceleme istenenler, Benden bahsedenler.
 - **Kapsam** (`w`): yukarıya bakın.
+- **Profil** (`P`): Tüm profiller ya da Ayarlar > Entegrasyonlar'daki tek bir entegrasyon profili (Ayarlar'ın adlandırdığı gibi adlandırılır; iki profil aynı adı taşıyorsa sağlayıcısı eklenir). Her bölümü, depoların satırlarını ve hesap genelindeki satırları, o profilin satırlarına daraltır (süren iş satırının profili yoktur, bu yüzden seçili bir profil onu gizler). Aynı anda tek profil. Seçim `radar.toml` içinde hatırlanır; artık var olmayan bir profil Tüm profillere döner. Açılır liste diğer üçü gibi her zaman oradadır ve dar bir pencere onu bırakmak yerine kısaltır (ardından etiketleri). Palet: `Radar: Profile Göre Filtrele...`. Profil her şeyi gizlediğinde boş liste bunu söyler.
 - **Filtre metni** (`/` veya `Ctrl+F`): depoda, numarada, başlıkta, yazarda, dalda
   ve etiketlerde bulanık eşleşme. `Enter` tuşları listeye geri verir ve metni
   korur, `Esc` onu temizler.
 
-`Ctrl+N` süzgecin, her açılır listenin, Yenile ve Geri düğmelerinin ve ekrandaki her bölüm başlığının üzerinde bir rozet gösterir. Bir rozetin karakterine basın: süzgeç klavyeyi alır, açılır liste açılır, düğme çalışır ve başlık seçimi alır (ardından `Enter` veya `Space` onu daraltır). `Esc` iptal eder. Bkz. [Rozetler](keybindings.md#rozetler).
+`Ctrl+N` süzgecin, dört açılır listenin her birinin, Yenile ve Geri düğmelerinin ve ekrandaki her bölüm başlığının üzerinde bir rozet gösterir. Bir rozetin karakterine basın: süzgeç klavyeyi alır, açılır liste açılır, düğme çalışır ve başlık seçimi alır (ardından `Enter` veya `Space` onu daraltır). `Esc` iptal eder. Bkz. [Rozetler](keybindings.md#rozetler).
 
 ## Eylemler
 

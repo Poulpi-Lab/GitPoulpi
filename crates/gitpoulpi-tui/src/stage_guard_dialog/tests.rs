@@ -71,7 +71,7 @@ fn files(n: usize) -> Vec<Sensitive> {
 
 fn open(n: usize) {
     reset();
-    ask(PathBuf::from("/repo"), Action::StageAll, files(n));
+    ask(PathBuf::from("/repo"), Action::StageAll, files(n), None);
 }
 
 /// Where the answer rows sit, read from the paint like a click would.
@@ -236,8 +236,9 @@ fn a_file_name_cannot_repaint_the_screen_and_refusals_queue() {
             reason: Reason::Pattern("*.pem".into()),
             line: None,
         }],
+        None,
     );
-    ask(PathBuf::from("/b"), Action::StageAll, files(0));
+    ask(PathBuf::from("/b"), Action::StageAll, files(0), None);
     let text = screen();
     assert!(
         !text.contains('\u{1b}'),
@@ -344,10 +345,80 @@ fn a_waiting_refusal_does_not_lose_the_peek_round_trip() {
     screen();
     on_key(key(KeyCode::Char('s')));
     // A second refusal arrives while the File View is up.
-    ask(PathBuf::from("/b"), Action::StageAll, files(0));
+    ask(PathBuf::from("/b"), Action::StageAll, files(0), None);
     assert_eq!(WAITING.lock().unwrap().len(), 1);
     peek_request(std::path::Path::new("/repo"));
     peek_closed();
     assert!(is_open());
+    reset();
+}
+
+/// A tracked stage the guard refuses reports "waiting for you", and the
+/// dialog's answer resubmits it under the same ticket.
+fn guarded_stage(
+    name: &str,
+) -> (
+    crate::daemon_link::ticket_tests::Harness,
+    gitpoulpi_testkit::FixtureRepo,
+    crate::daemon_link::Ticket,
+) {
+    use crate::daemon_link::{StepOutcome, UserWait};
+    let fixture = gitpoulpi_testkit::FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("initial")
+        .unwrap()
+        .write_worktree(".env", b"TOKEN=1\n")
+        .unwrap()
+        .build();
+    let h = crate::daemon_link::ticket_tests::harness(name, &fixture);
+    let ticket = h.link.submit_tracked(Action::StageAll);
+    assert_eq!(
+        crate::daemon_link::ticket_tests::wait_needs_user(ticket),
+        vec![StepOutcome::NeedsUser(UserWait::SensitiveStage)]
+    );
+    for _ in 0..200 {
+        if POPUP.lock().unwrap().is_some() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+    assert!(
+        POPUP.lock().unwrap().is_some(),
+        "the guard's question is open"
+    );
+    (h, fixture, ticket)
+}
+
+#[test]
+fn stage_anyway_reports_ok_under_the_same_ticket() {
+    use crate::daemon_link::StepOutcome;
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    reset();
+    let (h, fixture, ticket) = guarded_stage("ticket-sensitive-ok");
+    let staged = on_key(key(KeyCode::Char('1'))).expect("answer 1 is Stage anyway");
+    assert_eq!(staged.ticket, Some(ticket));
+    apply(staged, &h.link, fixture.root());
+    assert_eq!(
+        crate::daemon_link::ticket_tests::wait_final(ticket),
+        vec![StepOutcome::Ok(None)]
+    );
+    assert!(fixture.git(&["status", "--porcelain"]).contains("A  .env"));
+    reset();
+}
+
+#[test]
+fn every_way_of_closing_the_question_cancels_the_ticket() {
+    use crate::daemon_link::{take_for, StepOutcome};
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    reset();
+    // Answer 2 ("Cancel, stage nothing").
+    let (_h, fixture, ticket) = guarded_stage("ticket-sensitive-cancel");
+    assert!(on_key(key(KeyCode::Char('2'))).is_none());
+    assert_eq!(take_for(ticket), vec![StepOutcome::Canceled]);
+    assert!(!fixture.git(&["status", "--porcelain"]).contains("A  .env"));
+    // Esc.
+    let (_h, _fixture, ticket) = guarded_stage("ticket-sensitive-esc");
+    assert!(on_key(key(KeyCode::Esc)).is_none());
+    assert_eq!(take_for(ticket), vec![StepOutcome::Canceled]);
     reset();
 }

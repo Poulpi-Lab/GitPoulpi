@@ -1,13 +1,16 @@
+use super::tickets::report_ticket as tell;
 use super::*;
 use crate::redraw::NotifySend as _;
 use gitpoulpi_i18n::msg::link as l;
 
+#[allow(clippy::too_many_arguments)]
 pub(super) async fn run_action(
     conn: &LinkConn,
     action: Action,
+    ticket: Option<Ticket>,
     action_error_tx: &std_mpsc::Sender<String>,
     action_message_tx: &std_mpsc::Sender<String>,
-    push_rejected_tx: &std_mpsc::Sender<PushRejection>,
+    push_rejected_tx: &std_mpsc::Sender<PushRejectedNotice>,
     autostash_tx: &std_mpsc::Sender<AutoStashNeeded>,
     activity: &Arc<crate::activity::Activity>,
 ) -> bool {
@@ -23,15 +26,16 @@ pub(super) async fn run_action(
         tokio::time::sleep(Duration::from_millis(ms)).await;
     }
     let original = action.clone();
-    let (result, failed_op) = super::failed_op::capture(dispatch(
-        conn,
-        action,
-        action_error_tx,
-        action_message_tx,
-        push_rejected_tx,
-        activity,
-    ))
-    .await;
+    let ((result, payload), failed_op) =
+        super::failed_op::capture(super::tickets::capture_payload(dispatch(
+            conn,
+            action,
+            action_error_tx,
+            action_message_tx,
+            push_rejected_tx,
+            activity,
+        )))
+        .await;
     match result {
         Err(CoreError::PushRejected(rejection)) => {
             crate::activity_log::report_rejection(
@@ -40,16 +44,19 @@ pub(super) async fn run_action(
                 &conn.repo.root,
                 started.elapsed(),
             );
-            let _ = push_rejected_tx.send_notify(rejection);
+            tell(ticket, StepOutcome::NeedsUser(UserWait::PushRejected));
+            let _ = push_rejected_tx.send_notify(PushRejectedNotice { rejection, ticket });
             false
         }
         // `general.auto_stash = ask`: nothing changed, the render loop asks.
         Err(CoreError::NeedsAutoStash { operation })
             if !matches!(original, Action::AutoStashed(_)) =>
         {
+            tell(ticket, StepOutcome::NeedsUser(UserWait::AutoStash));
             let _ = autostash_tx.send_notify(AutoStashNeeded {
                 operation,
                 action: original,
+                ticket,
             });
             false
         }
@@ -58,14 +65,17 @@ pub(super) async fn run_action(
         Err(CoreError::SensitiveStage { files })
             if !matches!(original, Action::AllowSensitive(_)) =>
         {
-            crate::stage_guard_dialog::ask(conn.repo.root.clone(), original, files);
+            tell(ticket, StepOutcome::NeedsUser(UserWait::SensitiveStage));
+            crate::stage_guard_dialog::ask(conn.repo.root.clone(), original, files, ticket);
             false
         }
         // A pending auto-stash: point at the banner, not at CLI commands.
         Err(CoreError::PendingAutoStash {
             operation, stash, ..
         }) => {
-            let _ = action_error_tx.send_notify(error_text::pending_autostash(&operation, stash.0));
+            let text = error_text::pending_autostash(&operation, stash.0);
+            tell(ticket, StepOutcome::Failed { text: text.clone() });
+            let _ = action_error_tx.send_notify(text);
             false
         }
         // The window's own fetch met a git lock (another installation or a
@@ -79,6 +89,12 @@ pub(super) async fn run_action(
             ) =>
         {
             crate::activity_log::background_fetch_skipped(&conn.repo.root);
+            tell(
+                ticket,
+                StepOutcome::Failed {
+                    text: error_text::error_text(&e),
+                },
+            );
             false
         }
         Err(e) => {
@@ -90,10 +106,13 @@ pub(super) async fn run_action(
                 started.elapsed(),
                 context,
             );
-            let _ = action_error_tx.send_notify(error_text::error_text(&e));
+            let text = error_text::error_text(&e);
+            tell(ticket, super::tickets::outcome_of_error(&e, &text));
+            let _ = action_error_tx.send_notify(text);
             false
         }
         Ok(()) => {
+            tell(ticket, StepOutcome::Ok(payload));
             crate::activity_log::report_success(&original, &conn.repo.root, started.elapsed());
             // Say, every time, that it can be taken back.
             if let Some(done) = original.undoable_done_text() {
@@ -135,7 +154,7 @@ async fn dispatch(
     action: Action,
     action_error_tx: &std_mpsc::Sender<String>,
     action_message_tx: &std_mpsc::Sender<String>,
-    push_rejected_tx: &std_mpsc::Sender<PushRejection>,
+    push_rejected_tx: &std_mpsc::Sender<PushRejectedNotice>,
     activity: &Arc<crate::activity::Activity>,
 ) -> GitResult<()> {
     if let Action::AutoStashed(inner) = action {
@@ -542,6 +561,7 @@ async fn dispatch(
                     let _ = Box::pin(run_action(
                         conn,
                         *then,
+                        None,
                         action_error_tx,
                         action_message_tx,
                         push_rejected_tx,
@@ -1202,6 +1222,7 @@ async fn dispatch(
                 OperationKind::WorktreeAdd,
                 serde_json::json!({ "path": path, "opts": opts }),
                 |added| {
+                    super::tickets::note_payload(StepPayload::Worktree(added.path.clone()));
                     l::worktree_added(
                         added.path.display(),
                         added

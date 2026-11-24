@@ -252,7 +252,9 @@ impl WindowState {
                 s::outside_recorded(key)
             });
         }
-        while let Ok(rejection) = self.link.push_rejected_rx.try_recv() {
+        while let Ok(crate::daemon_link::PushRejectedNotice { rejection, ticket }) =
+            self.link.push_rejected_rx.try_recv()
+        {
             // A branch with extra targets answers a refused push in the push
             // group dialog (every remote at once, one decision each); the
             // single-remote menu stays for a branch without targets.
@@ -270,14 +272,24 @@ impl WindowState {
                     &rejection.branch,
                     None,
                 );
-                self.last_message = Some(gitpoulpi_i18n::msg::remotes::diverged_title(
+                let line = gitpoulpi_i18n::msg::remotes::diverged_title(
                     &rejection.remote,
                     &rejection.branch,
-                ));
+                );
+                // The group dialog decides per remote, outside any one
+                // ticket: a tracked push ends here as refused.
+                crate::daemon_link::report_ticket(
+                    ticket,
+                    crate::daemon_link::StepOutcome::Failed { text: line.clone() },
+                );
+                self.last_message = Some(line);
                 continue;
             }
             let (col, row) = self.remote_ui.push_anchor();
-            self.last_message = Some(self.remote_ui.on_push_rejected(&rejection, col, row));
+            self.last_message = Some(
+                self.remote_ui
+                    .on_push_rejected(&rejection, ticket, col, row),
+            );
         }
 
         // A checkout/merge/rebase/pull blocked by local changes while
@@ -286,5 +298,17 @@ impl WindowState {
             let (col, row) = self.remote_ui.push_anchor();
             self.last_message = Some(self.remote_ui.on_autostash_needed(needed, col, row));
         }
+        // A held ticket whose dialog was closed without an answer ends here.
+        let confirming = match &self.input_mode {
+            InputMode::Confirm {
+                action:
+                    crate::modes::ConfirmAction::Destructive(
+                        crate::modes::PendingDestructive::ForcePush { ticket, .. },
+                    ),
+                ..
+            } => *ticket,
+            _ => None,
+        };
+        self.remote_ui.reap_ticket(confirming);
     }
 }

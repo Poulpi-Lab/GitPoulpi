@@ -317,6 +317,7 @@ impl WindowState {
         self.repo_dialogs
             .sync_composer_ai(self.ai_ui.enabled(), &self.repo.root);
         if let Some(outcome) = self.ai_ui.poll() {
+            let finished = crate::ai_ui::finished_of(&outcome);
             // A failed job is a card (the status line is cleared below).
             if let AiOutcome::Done(_, Err(why)) = &outcome {
                 crate::activity_log::report_problem(
@@ -507,6 +508,9 @@ impl WindowState {
                         Some(gitpoulpi_i18n::msg::window::AI_CANCELED.get().to_string());
                 }
             }
+            // After the answer is applied: a sequence waiting on it then
+            // finds the commit message in the field.
+            crate::ai_ui::record_finished(finished);
         } else if let Some((conflict, via, secs)) = self.ai_ui.running_conflict_info() {
             let line = format!(
                 "{} {}",

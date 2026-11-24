@@ -16,6 +16,17 @@ pub struct AutoStashNeeded {
     /// `checkout`, `merge`, `rebase` or `pull`.
     pub operation: String,
     pub action: Action,
+    /// The ticket the refused action was submitted under; the dialog's
+    /// "stash and continue" resubmits under it.
+    pub ticket: Option<Ticket>,
+}
+
+/// A push the remote refused, with the ticket it ran under (the diverged
+/// dialog's choices continue under it).
+#[derive(Debug, Clone, PartialEq)]
+pub struct PushRejectedNotice {
+    pub rejection: PushRejection,
+    pub ticket: Option<Ticket>,
 }
 
 /// A mutation the render loop wants performed against the repo. Submitted

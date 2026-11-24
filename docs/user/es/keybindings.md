@@ -878,7 +878,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Radar: Elegir ámbito | `w` |
 | Radar: Elegir vista | `v` |
 | Radar: Elegir filtro | `f` |
-| Radar: Filter by Profile... | `P` |
+| Radar: Filtrar por perfil... | `P` |
 | Radar: Mostrar solicitudes no clonadas | `a` |
 | Radar: Mostrar borradores | `d` |
 | Radar: Activar las solicitudes de revisión de toda la cuenta... | `T` |

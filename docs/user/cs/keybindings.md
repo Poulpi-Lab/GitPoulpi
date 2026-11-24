@@ -873,7 +873,7 @@ Klávesy jsou výchozí.
 | Radar: Vybrat rozsah | `w` |
 | Radar: Vybrat zobrazení | `v` |
 | Radar: Vybrat filtr | `f` |
-| Radar: Filter by Profile... | `P` |
+| Radar: Filtrovat podle profilu... | `P` |
 | Radar: Zobrazit nenaklonované žádosti | `a` |
 | Radar: Zobrazit koncepty | `d` |
 | Radar: Zapnout žádosti o kontrolu za celý účet... | `T` |

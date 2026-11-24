@@ -873,7 +873,7 @@ As teclas são as padrão.
 | Radar: escolher escopo | `w` |
 | Radar: escolher visão | `v` |
 | Radar: escolher filtro | `f` |
-| Radar: Filter by Profile... | `P` |
+| Radar: filtrar por perfil... | `P` |
 | Radar: exibir solicitações não clonadas | `a` |
 | Radar: exibir rascunhos | `d` |
 | Radar: ativar as solicitações de revisão da conta... | `T` |

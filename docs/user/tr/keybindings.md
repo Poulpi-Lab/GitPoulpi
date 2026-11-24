@@ -873,7 +873,7 @@ Tuşlar varsayılanlardır.
 | Radar: Kapsam Seç | `w` |
 | Radar: Görünüm Seç | `v` |
 | Radar: Filtre Seç | `f` |
-| Radar: Filter by Profile... | `P` |
+| Radar: Profile Göre Filtrele... | `P` |
 | Radar: Klonlanmamış İstekleri Göster | `a` |
 | Radar: Taslakları Göster | `d` |
 | Radar: Hesap Geneli İnceleme İsteklerini Etkinleştir... | `T` |

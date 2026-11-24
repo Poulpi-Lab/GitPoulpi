@@ -879,7 +879,7 @@ applicano. I tasti sono quelli predefiniti.
 | Radar: Scegli ambito | `w` |
 | Radar: Scegli vista | `v` |
 | Radar: Scegli filtro | `f` |
-| Radar: Filter by Profile... | `P` |
+| Radar: Filtra per profilo... | `P` |
 | Radar: Mostra le richieste non clonate | `a` |
 | Radar: Mostra le bozze | `d` |
 | Radar: Attiva le richieste di revisione dell'account... | `T` |

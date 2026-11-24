@@ -872,7 +872,7 @@ zastosowania. Klawisze są domyślne.
 | Radar: Wybierz zakres | `w` |
 | Radar: Wybierz widok | `v` |
 | Radar: Wybierz filtr | `f` |
-| Radar: Filter by Profile... | `P` |
+| Radar: Filtruj według profilu... | `P` |
 | Radar: Pokaż niesklonowane żądania | `a` |
 | Radar: Pokaż szkice | `d` |
 | Radar: Włącz żądania do przeglądu z całego konta... | `T` |

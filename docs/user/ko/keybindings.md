@@ -866,7 +866,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Radar: 범위 선택 | `w` |
 | Radar: 보기 선택 | `v` |
 | Radar: 필터 선택 | `f` |
-| Radar: Filter by Profile... | `P` |
+| Radar: 프로필로 필터... | `P` |
 | Radar: 클론하지 않은 요청 표시 | `a` |
 | Radar: 초안 표시 | `d` |
 | Radar: 계정 전체 리뷰 요청 켜기... | `T` |

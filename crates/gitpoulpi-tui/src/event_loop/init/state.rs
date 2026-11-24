@@ -299,6 +299,8 @@ pub(in crate::event_loop) struct WindowState {
     pub(in crate::event_loop) sparse: gitpoulpi_core::domain::SparseState,
     pub(in crate::event_loop) hidden_from_graph: HashSet<String>,
     pub(in crate::event_loop) solo_refs: HashSet<String>,
+    /// The author filter's keys (`author_filter`): per repository, saved with it.
+    pub(in crate::event_loop) log_author_filter: std::collections::BTreeSet<String>,
     pub(in crate::event_loop) log_menu_refs: pill_menu::RefTable,
     pub(in crate::event_loop) open_menu: OpenMenu,
     pub(in crate::event_loop) clipboard: clipboard::Clipboard,

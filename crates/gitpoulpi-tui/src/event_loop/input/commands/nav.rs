@@ -3,6 +3,35 @@
 use crate::event_loop::*;
 
 use super::{shared::*, CommandCtx};
+use gitpoulpi_i18n::msg;
+
+/// Opens the author filter popup over the Log (the funnel, `Shift+A`, the
+/// palette): the authors of the commits the Log shows, the chosen ones ticked.
+pub(in crate::event_loop) fn open_author_filter(cx: &mut CommandCtx<'_>) {
+    *cx.central_view = CentralView::Log;
+    *cx.focus = Focus::Log;
+    let nodes = match &*cx.log_result {
+        Ok(graph) => {
+            crate::log_table::apply_solo_filter(&graph.nodes, &*cx.solo_refs, &*cx.refs_result)
+        }
+        Err(_) => Vec::new(),
+    };
+    *cx.input_mode = InputMode::AuthorFilter(Box::new(crate::author_filter::open_popup(
+        &nodes,
+        &*cx.log_author_filter,
+        *cx.avatar_placement,
+    )));
+}
+
+/// Drops the author filter (the Clear row's twin: the palette, a right-click on
+/// the funnel). Says so, also when there was none.
+pub(in crate::event_loop) fn clear_author_filter(cx: &mut CommandCtx<'_>) {
+    *cx.last_message = Some(if cx.log_author_filter.is_empty() {
+        msg::author_filter::STATUS_NONE.get().to_string()
+    } else {
+        crate::author_filter::clear(cx.repo_root, &mut *cx.log_author_filter)
+    });
+}
 
 pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
     if matches!(
@@ -84,6 +113,8 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             *cx.focus = Focus::Log;
             *cx.input_mode = InputMode::SearchingLog(LogSearch::new());
         }
+        PaletteCommand::FilterLogByAuthor => open_author_filter(cx),
+        PaletteCommand::ClearAuthorFilter => clear_author_filter(cx),
         PaletteCommand::ToggleRefsPaneCollapsed => {
             *cx.left_pane_collapsed = !*cx.left_pane_collapsed;
             if *cx.left_pane_collapsed && *cx.focus == Focus::Refs {

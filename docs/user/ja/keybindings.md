@@ -142,6 +142,7 @@ stage_file = "z"
 | `log` | `compare_selection` | 選択した行を比較 | `v` |
 | `log` | `compare_swap` | 比較の両端を入れ替え | `x` |
 | `log` | `compare_next` | 次の比較対象の行へ移動 | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | 移動・幅変更する列を選ぶ | `Shift+C` |
 | `log` | `scroll_left` | 列を左へスクロール | `Shift+Left` |
 | `log` | `scroll_right` | 列を右へスクロール | `Shift+Right` |
@@ -478,6 +479,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | ナビゲーション: 次のペインにフォーカスを移動 | `Tab` |
 | ナビゲーション: 前のペインにフォーカスを移動 | `Shift+Tab` |
 | ナビゲーション: Commitを検索... | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | ナビゲーション: Refs ペインの折りたたみを切り替え | `Ctrl+N H` |
 | ナビゲーション: Refs ペインを広げる | `Ctrl+N Right` |
 | ナビゲーション: Refs ペインを狭める | `Ctrl+N Left` |

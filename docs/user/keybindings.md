@@ -156,6 +156,7 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `log` | `compare_selection` | Compare the Selected Rows | `v` |
 | `log` | `compare_swap` | Swap the Comparison Ends | `x` |
 | `log` | `compare_next` | Go to the Next Compared Row | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | Pick a Column to Move or Size | `Shift+C` |
 | `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
 | `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
@@ -514,6 +515,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Navigation: Cycle Focus to Next Pane | `Tab` |
 | Navigation: Cycle Focus to Previous Pane | `Shift+Tab` |
 | Navigation: Search Commits... | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | Navigation: Toggle Refs Pane Collapsed | `Ctrl+N H` |
 | Navigation: Widen Refs Pane | `Ctrl+N Right` |
 | Navigation: Narrow Refs Pane | `Ctrl+N Left` |

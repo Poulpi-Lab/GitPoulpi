@@ -319,7 +319,13 @@ impl WindowState {
         self.central_view = CentralView::Log;
         self.focus = Focus::Log;
         // Opened with the query in it, like the palette: Enter is the user's.
-        let hits = log_search_hits(&self.log_result, &self.refs_result, &self.solo_refs, &query);
+        let hits = log_search_hits(
+            &self.log_result,
+            &self.refs_result,
+            &self.solo_refs,
+            &query,
+            &self.log_author_filter,
+        );
         if let Some(&node) = hits.first() {
             self.log_state
                 .select(Some(self.log_order.commit_display_index(node)));

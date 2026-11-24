@@ -160,6 +160,7 @@ stage_file = "z"
 | `log` | `compare_selection` | Сравнить выбранные строки | `v` |
 | `log` | `compare_swap` | Поменять стороны сравнения | `x` |
 | `log` | `compare_next` | Перейти к следующей сравниваемой строке | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | Выбрать колонку для сдвига или изменения ширины | `Shift+C` |
 | `log` | `scroll_left` | Прокрутить колонки влево | `Shift+Left` |
 | `log` | `scroll_right` | Прокрутить колонки вправо | `Shift+Right` |
@@ -518,6 +519,8 @@ stage_file = "z"
 | Навигация: фокус на следующую панель | `Tab` |
 | Навигация: фокус на предыдущую панель | `Shift+Tab` |
 | Навигация: поиск commit'ов... | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | Навигация: свернуть/развернуть панель Refs | `Ctrl+N H` |
 | Навигация: расширить панель Refs | `Ctrl+N Right` |
 | Навигация: сузить панель Refs | `Ctrl+N Left` |

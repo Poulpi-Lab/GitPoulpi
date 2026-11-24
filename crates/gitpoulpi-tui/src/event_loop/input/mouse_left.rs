@@ -384,6 +384,7 @@ pub(super) fn diff_targets(
                         &*cx.refs_result,
                         &*cx.solo_refs,
                         &search.query,
+                        &*cx.log_author_filter,
                     );
                     search.current = log_search::step(
                         search.current,

@@ -95,7 +95,11 @@ fn redraws_with_unchanged_inputs_build_the_layout_once() {
     let w = World::new(200);
     let mut cache = LogLayoutCache::default();
     for _ in 0..50 {
-        cache.update(&w.inputs(GraphSettings::default()), None);
+        cache.update(
+            &w.inputs(GraphSettings::default()),
+            None,
+            &Default::default(),
+        );
     }
     assert_eq!(cache.layout_builds, 1);
     assert_eq!(cache.layout().rows.len(), 200);
@@ -106,45 +110,45 @@ fn each_input_that_matters_rebuilds_once() {
     let mut w = World::new(50);
     let mut cache = LogLayoutCache::default();
     let s = GraphSettings::default();
-    cache.update(&w.inputs(s), None);
+    cache.update(&w.inputs(s), None, &Default::default());
     // A new log (a daemon refresh or a page).
     w.log = Ok(history(60));
     w.log_gen += 1;
-    cache.update(&w.inputs(s), None);
-    cache.update(&w.inputs(s), None);
+    cache.update(&w.inputs(s), None, &Default::default());
+    cache.update(&w.inputs(s), None, &Default::default());
     assert_eq!(cache.layout_builds, 2);
     assert_eq!(cache.layout().rows.len(), 60);
     // Hide, render mode and lane background.
     w.hidden.insert("main".into());
-    cache.update(&w.inputs(s), None);
+    cache.update(&w.inputs(s), None, &Default::default());
     assert_eq!(cache.layout_builds, 3);
     assert!(cache.layout().refs_for_pills.is_empty());
     let image = GraphSettings {
         render: GraphRender::Image,
         ..s
     };
-    cache.update(&w.inputs(image), None);
+    cache.update(&w.inputs(image), None, &Default::default());
     assert_eq!(cache.layout_builds, 4);
     let tinted = GraphSettings {
         lane_background: LaneBackground::RowTint,
         ..image
     };
-    cache.update(&w.inputs(tinted), None);
+    cache.update(&w.inputs(tinted), None, &Default::default());
     assert_eq!(cache.layout_builds, 5);
-    cache.update(&w.inputs(tinted), None);
+    cache.update(&w.inputs(tinted), None, &Default::default());
     assert_eq!(cache.layout_builds, 5);
     // The row tint strength is part of the key.
     let faded = GraphSettings {
         tint_strength: gitpoulpi_config::GraphRowTintStrength::Subtle,
         ..tinted
     };
-    cache.update(&w.inputs(faded), None);
+    cache.update(&w.inputs(faded), None, &Default::default());
     assert_eq!(cache.layout_builds, 6);
-    cache.update(&w.inputs(faded), None);
+    cache.update(&w.inputs(faded), None, &Default::default());
     assert_eq!(cache.layout_builds, 6);
     // Solo.
     w.solo.insert("main".into());
-    cache.update(&w.inputs(faded), None);
+    cache.update(&w.inputs(faded), None, &Default::default());
     assert_eq!(cache.layout_builds, 7);
 }
 
@@ -154,22 +158,22 @@ fn search_rescans_only_when_the_query_or_the_layout_changes() {
     let mut cache = LogLayoutCache::default();
     let s = GraphSettings::default();
     for _ in 0..20 {
-        cache.update(&w.inputs(s), Some("bob"));
+        cache.update(&w.inputs(s), Some("bob"), &Default::default());
     }
     assert_eq!(cache.search_scans, 1);
     assert_eq!(cache.matches().len(), 50);
     assert!(cache.match_set().contains(&1));
-    cache.update(&w.inputs(s), Some("commit 42"));
+    cache.update(&w.inputs(s), Some("commit 42"), &Default::default());
     assert_eq!(cache.search_scans, 2);
     assert_eq!(cache.matches(), &[42]);
     // A new log under the same query: the answer must follow it.
     w.log = Ok(history(40));
     w.log_gen += 1;
-    cache.update(&w.inputs(s), Some("commit 42"));
+    cache.update(&w.inputs(s), Some("commit 42"), &Default::default());
     assert_eq!(cache.search_scans, 3);
     assert!(cache.matches().is_empty());
     // Closing the bar clears the matches (no stale dimming).
-    cache.update(&w.inputs(s), None);
+    cache.update(&w.inputs(s), None, &Default::default());
     assert!(cache.matches().is_empty());
     assert_eq!(cache.layout_builds, 2);
 }
@@ -218,7 +222,7 @@ fn perf_probe() {
     let mut cache = LogLayoutCache::default();
     let t = Instant::now();
     for _ in 0..frames {
-        cache.update(&w.inputs(s), Some("bob"));
+        cache.update(&w.inputs(s), Some("bob"), &Default::default());
     }
     let after = t.elapsed() / frames;
     println!(
@@ -264,7 +268,7 @@ fn each_graph_color_theme_yields_its_own_palette() {
             theme,
             ..GraphSettings::default()
         };
-        cache.update(&w.inputs(settings), None);
+        cache.update(&w.inputs(settings), None, &Default::default());
         let palette = super::lane_palette(theme);
         for (_, color) in &cache.layout().rows {
             assert!(
@@ -299,16 +303,16 @@ fn changing_the_graph_color_theme_rebuilds_the_layout() {
     let w = World::new(5);
     let mut cache = LogLayoutCache::default();
     let base = GraphSettings::default();
-    cache.update(&w.inputs(base), None);
+    cache.update(&w.inputs(base), None, &Default::default());
     let before = cache.layout().rows[0].1;
     let inspired = GraphSettings {
         theme: named("material"),
         ..base
     };
-    cache.update(&w.inputs(inspired), None);
+    cache.update(&w.inputs(inspired), None, &Default::default());
     assert_eq!(cache.layout_builds, 2);
     assert_ne!(cache.layout().rows[0].1, before);
-    cache.update(&w.inputs(inspired), None);
+    cache.update(&w.inputs(inspired), None, &Default::default());
     assert_eq!(cache.layout_builds, 2);
 }
 
@@ -355,7 +359,7 @@ fn the_layout_deduces_a_ghost_ref_for_commits_without_one_and_follows_hide() {
     let mut w = World::new(20);
     let mut cache = LogLayoutCache::default();
     let s = GraphSettings::default();
-    cache.update(&w.inputs(s), None);
+    cache.update(&w.inputs(s), None, &Default::default());
     let layout = cache.layout();
     // `main` points at commit 0 and walks first parents down the whole log.
     assert_eq!(
@@ -369,6 +373,35 @@ fn the_layout_deduces_a_ghost_ref_for_commits_without_one_and_follows_hide() {
     assert!(layout.ghost_for(10_000).is_none());
     // Hidden refs name nothing.
     w.hidden.insert("main".into());
-    cache.update(&w.inputs(s), None);
+    cache.update(&w.inputs(s), None, &Default::default());
     assert!(cache.layout().ghost_for(5).is_none());
+}
+
+#[test]
+fn an_author_filter_makes_the_layout_answer_as_a_search_and_combines_with_a_query() {
+    let w = World::new(100);
+    let mut cache = LogLayoutCache::default();
+    let s = GraphSettings::default();
+    let author = |k: &str| -> std::collections::BTreeSet<String> { [k.to_string()].into() };
+    // No search bar at all: the filter alone gives the hits (and so the dimming).
+    cache.update(&w.inputs(s), None, &author("a@example.com"));
+    assert_eq!(cache.matches().len(), 100);
+    // An author nobody wrote as: no hits.
+    cache.update(&w.inputs(s), None, &author("nobody@example.com"));
+    assert!(cache.matches().is_empty());
+    // Both apply (AND).
+    cache.update(&w.inputs(s), Some("commit 42"), &author("a@example.com"));
+    assert_eq!(cache.matches(), &[42]);
+    cache.update(
+        &w.inputs(s),
+        Some("commit 42"),
+        &author("nobody@example.com"),
+    );
+    assert!(cache.matches().is_empty());
+    // The filter off and the bar closed: nothing stale is left.
+    cache.update(&w.inputs(s), None, &Default::default());
+    assert!(cache.matches().is_empty());
+    // The names of the chosen authors are memoized per layout.
+    let names = cache.author_names(&author("a@example.com"));
+    assert_eq!(names, ["Alice"]);
 }

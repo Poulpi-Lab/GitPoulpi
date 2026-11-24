@@ -153,6 +153,16 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::SearchLog,
     ),
     entry(
+        msg::palette::LOG_FILTER_BY_AUTHOR,
+        "Shift+A",
+        PaletteCommand::FilterLogByAuthor,
+    ),
+    entry(
+        msg::palette::LOG_CLEAR_AUTHOR_FILTER,
+        "",
+        PaletteCommand::ClearAuthorFilter,
+    ),
+    entry(
         msg::palette::NAVIGATION_TOGGLE_REFS_PANE_COLLAPSED,
         "Ctrl+N H",
         PaletteCommand::ToggleRefsPaneCollapsed,

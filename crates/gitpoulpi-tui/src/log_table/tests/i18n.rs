@@ -127,7 +127,7 @@ fn narrow_header(widths: &LogColumnWidths, order: &[LogColumn]) -> Vec<String> {
     let mut terminal = Terminal::new(TestBackend::new(total, 4)).unwrap();
     terminal
         .draw(|frame| {
-            let header = log_header_cells(order, widths, None);
+            let header = log_header_cells(order, widths, None, false);
             frame.render_stateful_clipped(
                 log_table(Vec::new(), header, order, widths, Style::default()),
                 Rect::new(0, 0, total, 4),
@@ -169,7 +169,12 @@ fn a_narrow_column_ellipsises_its_header_in_every_language_and_keeps_the_gap() {
             let cells = narrow_header(&widths, &order);
             let author = LogColumn::Author.title();
             let date = LogColumn::Date.title();
-            let a = cells[0].trim_end();
+            // The Author header also carries the author filter's funnel when
+            // the title and the funnel both fit.
+            let a = cells[0]
+                .trim_end()
+                .trim_end_matches(crate::author_filter::FUNNEL)
+                .trim_end();
             let d = cells[1].trim_end();
             assert!(
                 display_width(&cells[0]) <= narrow as usize,

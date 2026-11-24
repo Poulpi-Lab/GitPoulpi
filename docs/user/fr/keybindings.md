@@ -159,6 +159,7 @@ préfixe (`Ctrl+G s`).
 | `log` | `compare_selection` | Comparer les lignes sélectionnées | `v` |
 | `log` | `compare_swap` | Inverser les extrémités de la comparaison | `x` |
 | `log` | `compare_next` | Aller à la ligne comparée suivante | `n` |
+| `log` | `filter_author` | Filtrer le journal par auteur | `Shift+A` |
 | `log` | `pick_column` | Choisir une colonne (déplacer, taille) | `Shift+C` |
 | `log` | `scroll_left` | Faire défiler les colonnes vers la gauche | `Shift+Left` |
 | `log` | `scroll_right` | Faire défiler les colonnes vers la droite | `Shift+Right` |
@@ -514,6 +515,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Navigation : Passer au volet suivant | `Tab` |
 | Navigation : Passer au volet précédent | `Shift+Tab` |
 | Navigation : Rechercher des commits... | `f` |
+| Journal : Filtrer par auteur... | `A` |
+| Journal : Effacer le filtre d'auteur |  |
 | Navigation : Replier ou déplier le volet Refs | `Ctrl+N H` |
 | Navigation : Élargir le volet Refs | `Ctrl+N Right` |
 | Navigation : Rétrécir le volet Refs | `Ctrl+N Left` |

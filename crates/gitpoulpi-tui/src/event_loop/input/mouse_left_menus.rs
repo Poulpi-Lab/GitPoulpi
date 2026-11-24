@@ -357,6 +357,8 @@ pub(super) fn handle(
                 last: geo.order.last() == Some(&c),
             });
         }
+    } else if let Some(HitTarget::LogAuthorFilter) = &hit {
+        commands::run_command(cx, PaletteCommand::FilterLogByAuthor);
     } else if let Some(HitTarget::LogColumnHeader(header)) = &hit {
         *cx.dragging_log_header = Some(LogHeaderDrag::armed(*header, (col, row)));
     } else if let Some(HitTarget::TooltipRefPill { name, kind }) = &hit {

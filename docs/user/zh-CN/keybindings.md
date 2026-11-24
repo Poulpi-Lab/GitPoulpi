@@ -142,6 +142,7 @@ stage_file = "z"
 | `log` | `compare_selection` | 比较所选行 | `v` |
 | `log` | `compare_swap` | 交换比较的两端 | `x` |
 | `log` | `compare_next` | 转到下一个比较行 | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | 选择要移动或调整宽度的列 | `Shift+C` |
 | `log` | `scroll_left` | 向左滚动各列 | `Shift+Left` |
 | `log` | `scroll_right` | 向右滚动各列 | `Shift+Right` |
@@ -478,6 +479,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 导航：焦点切换到下一个窗格 | `Tab` |
 | 导航：焦点切换到上一个窗格 | `Shift+Tab` |
 | 导航：搜索 Commit… | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | 导航：折叠/展开引用窗格 | `Ctrl+N H` |
 | 导航：加宽引用窗格 | `Ctrl+N Right` |
 | 导航：收窄引用窗格 | `Ctrl+N Left` |

@@ -154,6 +154,7 @@ stage_file = "z"
 | `log` | `compare_selection` | 선택한 행 비교 | `v` |
 | `log` | `compare_swap` | 비교 양쪽 바꾸기 | `x` |
 | `log` | `compare_next` | 다음 비교 행으로 이동 | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | 이동하거나 크기를 바꿀 열 고르기 | `Shift+C` |
 | `log` | `scroll_left` | 열을 왼쪽으로 스크롤 | `Shift+Left` |
 | `log` | `scroll_right` | 열을 오른쪽으로 스크롤 | `Shift+Right` |
@@ -505,6 +506,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 탐색: 다음 창으로 포커스 이동 | `Tab` |
 | 탐색: 이전 창으로 포커스 이동 | `Shift+Tab` |
 | 탐색: Commit 검색... | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | 탐색: Refs 창 접기 전환 | `Ctrl+N H` |
 | 탐색: Refs 창 넓히기 | `Ctrl+N Right` |
 | 탐색: Refs 창 좁히기 | `Ctrl+N Left` |

@@ -15,6 +15,11 @@ pub(in crate::event_loop) struct LogDrawCtx<'a> {
     pub(in crate::event_loop) reveal_flash: Option<usize>,
     pub(in crate::event_loop) ref_connector: bool,
     pub(in crate::event_loop) searching: bool,
+    /// The author filter has authors chosen (the Author header's funnel lights).
+    pub(in crate::event_loop) author_filter_on: bool,
+    /// The Log's top-border note for an active author filter, drawn only when
+    /// the funnel is not (the Author column hidden or too narrow).
+    pub(in crate::event_loop) author_filter_note: Option<String>,
     pub(in crate::event_loop) hovered_wip_row: bool,
     pub(in crate::event_loop) hovered_search_button: Option<SearchBarButton>,
     pub(in crate::event_loop) hovered_commit: Option<(Oid, LogColumn, u16, u16)>,
@@ -472,10 +477,22 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
     // would advertise a button that isn't there. Only the resize
     // handle's own highlight (`hovered_resize_strip`, applied in
     // `log_table`) lights up.
-    let header_cells: Vec<Cell> =
-        crate::log_table::log_header_cells(log_visible_order, log_widths, ctx.log_col_pick);
+    let header_cells: Vec<Cell> = crate::log_table::log_header_cells(
+        log_visible_order,
+        log_widths,
+        ctx.log_col_pick,
+        ctx.author_filter_on,
+    );
     if central_view == CentralView::Log {
         frame_hits.extend(log_header_hit_targets(log_area, log_geo));
+        // The author popup hangs under the Author header cell.
+        crate::author_filter::set_anchor(
+            log_geo
+                .offsets
+                .iter()
+                .find(|(c, ..)| *c == LogColumn::Author)
+                .map(|&(_, x, w)| Rect::new(x, log_area.y + 1, w, 1)),
+        );
         // render through a throwaway clone so a
         // wheel-scrolled offset can't be dragged back to the
         // selection by ratatui's own `Table::render` -- see
@@ -827,6 +844,29 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
                         note_area,
                     );
                 }
+            }
+        }
+
+        // An active author filter whose funnel is not on screen (the Author
+        // column hidden, too narrow or scrolled out) says so on the top border.
+        if let Some(note) = ctx.author_filter_note.as_deref() {
+            let funnel_drawn = frame_hits
+                .iter()
+                .any(|(_, t)| *t == HitTarget::LogAuthorFilter);
+            let text = format!(" {} {note} ", crate::author_filter::FUNNEL_ACTIVE);
+            let room = log_area.width.saturating_sub(4) as usize;
+            if !funnel_drawn && room > 8 {
+                let text = crate::ui_kit::truncate_with_ellipsis(&text, room);
+                let w = display_width(&text) as u16;
+                frame.render_clipped(
+                    Paragraph::new(Span::styled(
+                        text,
+                        Style::default()
+                            .fg(th().ui.accent)
+                            .add_modifier(Modifier::BOLD),
+                    )),
+                    Rect::new(log_area.x + 2, log_area.y, w, 1),
+                );
             }
         }
 

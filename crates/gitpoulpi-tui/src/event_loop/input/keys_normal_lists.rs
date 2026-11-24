@@ -316,6 +316,9 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 *cx.last_message = Some(msg::input::SELECT_LOG_COMMIT_NOT_WIP.get().into());
             }
         }
+        _ if *cx.focus == Focus::Log && km.is(Bind::LogFilterAuthor, &key) => {
+            commands::run_command(cx, PaletteCommand::FilterLogByAuthor);
+        }
         _ if *cx.focus == Focus::Log && km.is(Bind::LogPickColumn, &key) => {
             commands::log_columns::run(cx, crate::log_table::LogColumnCmd::Pick);
         }

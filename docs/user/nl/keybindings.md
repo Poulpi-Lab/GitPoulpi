@@ -159,6 +159,7 @@ prefix getoond (`Ctrl+G s`).
 | `log` | `compare_selection` | De geselecteerde rijen vergelijken | `v` |
 | `log` | `compare_swap` | Uiteinden van de vergelijking omwisselen | `x` |
 | `log` | `compare_next` | Naar de volgende vergeleken rij | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | Kolom kiezen om te verplaatsen of de breedte te wijzigen | `Shift+C` |
 | `log` | `scroll_left` | Kolommen naar links scrollen | `Shift+Left` |
 | `log` | `scroll_right` | Kolommen naar rechts scrollen | `Shift+Right` |
@@ -516,6 +517,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Navigatie: Focus naar volgend paneel | `Tab` |
 | Navigatie: Focus naar vorig paneel | `Shift+Tab` |
 | Navigatie: Commits zoeken... | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | Navigatie: Refs-paneel in-/uitklappen | `Ctrl+N H` |
 | Navigatie: Refs-paneel verbreden | `Ctrl+N Right` |
 | Navigatie: Refs-paneel versmallen | `Ctrl+N Left` |

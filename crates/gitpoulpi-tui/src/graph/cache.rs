@@ -12,7 +12,7 @@
 //! `stashes_result`, never by hashing the 5000-node log each frame; the
 //! small inputs (solo set, hidden set, settings) are compared by value.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 use gitpoulpi_core::domain::{CommitGraph, CommitNode, Oid, Ref, Stash};
 use ratatui::style::Color;
@@ -113,9 +113,11 @@ pub(crate) struct LogLayoutCache {
     layout: Option<LogLayout>,
     /// Lazily built once per layout, only once a search is open.
     index: Option<SearchIndex>,
-    search_for: Option<(u64, String)>,
+    search_for: Option<(u64, String, BTreeSet<String>)>,
     matches: Vec<usize>,
     match_set: HashSet<usize>,
+    /// The chosen authors' names for one layout (`author_names`).
+    author_names: Option<(u64, BTreeSet<String>, Vec<String>)>,
     /// Bumped on every layout rebuild.
     build_id: u64,
     /// Rebuild counters, read by the tests that prove an unchanged redraw
@@ -127,7 +129,16 @@ pub(crate) struct LogLayoutCache {
 impl LogLayoutCache {
     /// Brings the layout (and, with `query`, the search matches) up to
     /// date, rebuilding only what the inputs changed.
-    pub(crate) fn update(&mut self, inputs: &LayoutInputs<'_>, query: Option<&str>) {
+    ///
+    /// `authors` is the Log's author filter: with it on the layout answers
+    /// as if searching (the chosen authors' commits are the hits), and with a
+    /// query too the two apply together.
+    pub(crate) fn update(
+        &mut self,
+        inputs: &LayoutInputs<'_>,
+        query: Option<&str>,
+        authors: &BTreeSet<String>,
+    ) {
         let key = Key::of(inputs);
         if self.key.as_ref() != Some(&key) {
             self.layout = Some(build(inputs));
@@ -137,6 +148,10 @@ impl LogLayoutCache {
             self.index = None;
             self.search_for = None;
         }
+        let query = match query {
+            None if !authors.is_empty() => Some(""),
+            other => other,
+        };
         let Some(query) = query else {
             // Search closed: drop the haystacks, keep nothing stale.
             self.index = None;
@@ -148,23 +163,47 @@ impl LogLayoutCache {
         if self
             .search_for
             .as_ref()
-            .is_some_and(|(id, q)| *id == self.build_id && q == query)
+            .is_some_and(|(id, q, a)| *id == self.build_id && q == query && a == authors)
         {
             return;
         }
         let layout = self.layout.as_ref().expect("layout was just built");
         self.matches = match &layout.nodes {
-            Some(nodes) if !query.trim().is_empty() => {
-                let index = self
-                    .index
-                    .get_or_insert_with(|| SearchIndex::new(nodes, &layout.refs_for_pills));
-                index.find(query)
+            Some(nodes) => {
+                let text = (!query.trim().is_empty()).then(|| {
+                    self.index
+                        .get_or_insert_with(|| SearchIndex::new(nodes, &layout.refs_for_pills))
+                        .find(query)
+                });
+                crate::log_search::combine_hits(nodes, text, authors)
             }
-            _ => Vec::new(),
+            None => Vec::new(),
         };
         self.match_set = self.matches.iter().copied().collect();
-        self.search_for = Some((self.build_id, query.to_owned()));
+        self.search_for = Some((self.build_id, query.to_owned(), authors.clone()));
         self.search_scans += 1;
+    }
+
+    /// The display names of the chosen `authors`, memoized per layout and
+    /// choice (an author with no loaded commit would otherwise make every
+    /// frame scan the whole history for a name).
+    pub(crate) fn author_names(&mut self, authors: &BTreeSet<String>) -> Vec<String> {
+        if authors.is_empty() {
+            return Vec::new();
+        }
+        if let Some((id, a, names)) = &self.author_names {
+            if *id == self.build_id && a == authors {
+                return names.clone();
+            }
+        }
+        let nodes = self
+            .layout
+            .as_ref()
+            .and_then(|l| l.nodes.as_deref())
+            .unwrap_or(&[]);
+        let names = crate::author_filter::chosen_names(nodes, authors);
+        self.author_names = Some((self.build_id, authors.clone(), names.clone()));
+        names
     }
 
     pub(crate) fn layout(&self) -> &LogLayout {

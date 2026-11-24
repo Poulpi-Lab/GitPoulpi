@@ -99,6 +99,11 @@ pub(crate) enum PaletteCommand {
     /// Opens the Log's incremental search bar. Same path as `f` and the
     /// toolbar's magnifier button.
     SearchLog,
+    /// Opens the Log's author filter popup (the funnel in the Author header,
+    /// `Shift+A` in the Log).
+    FilterLogByAuthor,
+    /// Drops the Log's author filter.
+    ClearAuthorFilter,
     /// Collapses the Refs pane to a thin restore strip, or restores it --
     /// same action as `Ctrl+N Shift+H`, the chevron on the pane's own border,
     /// and the strip left behind once it's collapsed. Used to be a bare
@@ -1217,6 +1222,7 @@ pub(crate) fn command_action(entry: &PaletteEntry) -> Option<crate::keymap::Acti
         PaletteCommand::RefreshAll => Some(A::GlobalRefreshAll),
         PaletteCommand::Quit => Some(A::GlobalQuit),
         PaletteCommand::SearchLog => Some(A::GlobalFindInLog),
+        PaletteCommand::FilterLogByAuthor => Some(A::LogFilterAuthor),
         PaletteCommand::SelectTab => Some(A::GlobalSelectTab),
         PaletteCommand::WorkspaceSearch => Some(A::GlobalWorkspaceSearch),
         PaletteCommand::ChangeTheme => Some(A::NavChangeTheme),

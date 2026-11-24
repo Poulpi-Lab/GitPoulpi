@@ -93,6 +93,42 @@ pub fn find_matches(nodes: &[CommitNode], refs: &[Ref], query: &str) -> Vec<usiz
         .collect()
 }
 
+/// The hits when an author filter may be on: the text hits (`None`: no text
+/// search, a blank query) narrowed to the chosen authors' commits; with no text
+/// search the author filter's own commits are the hits. No filter and no text
+/// is no hits, as ever. This is the one place the two combine (AND), used by
+/// the paint's cache and by the key handlers, so the counter, the stepping and
+/// the dimming can never disagree.
+pub fn combine_hits(
+    nodes: &[CommitNode],
+    text: Option<Vec<usize>>,
+    authors: &std::collections::BTreeSet<String>,
+) -> Vec<usize> {
+    if authors.is_empty() {
+        return text.unwrap_or_default();
+    }
+    let by_author = |i: &usize| {
+        nodes
+            .get(*i)
+            .is_some_and(|c| crate::author_filter::commit_by(c, authors))
+    };
+    match text {
+        Some(t) => t.into_iter().filter(by_author).collect(),
+        None => (0..nodes.len()).filter(by_author).collect(),
+    }
+}
+
+/// [`find_matches`] with the author filter applied ([`combine_hits`]).
+pub fn find_matches_with_authors(
+    nodes: &[CommitNode],
+    refs: &[Ref],
+    query: &str,
+    authors: &std::collections::BTreeSet<String>,
+) -> Vec<usize> {
+    let text = (!query.trim().is_empty()).then(|| find_matches(nodes, refs, query));
+    combine_hits(nodes, text, authors)
+}
+
 /// Lowercased haystacks for a node list, built once so each keystroke is
 /// a `contains` scan rather than five `to_lowercase` allocations per
 /// commit. Matches exactly what [`commit_matches`] matches (message,

@@ -112,6 +112,7 @@ mod ai_limit_dialog;
 mod ai_sent_dialog;
 #[cfg_attr(not(feature = "ai"), path = "ai_ui_stub.rs")]
 mod ai_ui;
+mod author_filter;
 mod avatar;
 mod blame_view;
 mod branch_remotes_dialog;

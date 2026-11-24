@@ -67,6 +67,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                         &*cx.refs_result,
                         &*cx.solo_refs,
                         &search.query,
+                        &*cx.log_author_filter,
                     );
                     let forward = !key.modifiers.contains(KeyModifiers::SHIFT);
                     search.current = log_search::step(search.current, hits.len(), forward);
@@ -77,6 +78,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                         &*cx.refs_result,
                         &*cx.solo_refs,
                         &search.query,
+                        &*cx.log_author_filter,
                     );
                     search.current = log_search::step(search.current, hits.len(), false);
                 }
@@ -96,6 +98,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                     &*cx.refs_result,
                     &*cx.solo_refs,
                     &search.query,
+                    &*cx.log_author_filter,
                 );
                 search.current = log_search::clamp_current(search.current, hits.len());
                 if let Some(&node_index) = hits.get(search.current) {
@@ -824,6 +827,48 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
             }
             if let InputMode::LanguagePicker(picker) = &mut *cx.input_mode {
                 picker.sync_preview(&mut *cx.ui_graph_theme);
+            }
+        }
+        // The Log's author filter: the pickers' list keys and field; Enter
+        // toggles the highlighted author (the Clear row drops the filter and
+        // closes), Esc closes and keeps the filter.
+        InputMode::AuthorFilter(popup) => {
+            let nav_to = crate::popup_list::nav(
+                &key,
+                popup.selected,
+                popup.rows().len(),
+                crate::popup_list::View::page(),
+            );
+            match key.code {
+                _ if nav_to.is_some() => popup.selected = nav_to.unwrap_or(0),
+                _ if MainField::AuthorFilter.claims(&*cx.field_editor, &popup.draft, &key) => {
+                    if edit_main_field(
+                        &mut *cx.field_editor,
+                        MainField::AuthorFilter,
+                        &mut popup.draft,
+                        &key,
+                        &mut *cx.clipboard,
+                        &mut *cx.last_message,
+                    ) == text_edit::KeyEdit::Edited
+                    {
+                        popup.field_edited();
+                    }
+                }
+                KeyCode::Esc => *cx.input_mode = InputMode::Normal,
+                KeyCode::Enter => {
+                    let (message, close) = crate::author_filter::activate(
+                        popup,
+                        cx.repo_root,
+                        &mut *cx.log_author_filter,
+                    );
+                    if message.is_some() {
+                        *cx.last_message = message;
+                    }
+                    if close {
+                        *cx.input_mode = InputMode::Normal;
+                    }
+                }
+                _ => {}
             }
         }
         // The workspace search: the pickers' list keys (headings are skipped),

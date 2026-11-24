@@ -367,6 +367,30 @@ pub(in crate::event_loop) fn draw_overlay_menus(
             }
         }
     }
+    // The funnel of the Log's Author header: the chosen authors, one per line.
+    if let Some(HitTarget::LogAuthorFilter) = hovered_target.as_ref() {
+        if tooltip.visible(
+            crate::tooltip::TooltipKey::AuthorFilter,
+            now,
+            tooltip_blocked,
+        ) {
+            if let Some((rect, _)) = frame_hits
+                .iter()
+                .find(|(_, t)| *t == HitTarget::LogAuthorFilter)
+            {
+                tooltip_painted = Some(crate::tooltip::paint_box(
+                    frame,
+                    frame.area(),
+                    rect.x,
+                    rect.y + 1,
+                    crate::author_filter::tip_lines()
+                        .into_iter()
+                        .map(Line::from)
+                        .collect(),
+                ));
+            }
+        }
+    }
     // The commit-detail author name: the author's email.
     if let Some(HitTarget::CommitAuthorName) = hovered_target.as_ref() {
         if let Some(email) = crate::tooltip::author_email() {

@@ -3218,6 +3218,7 @@ commit_column_reset_widths = "Reset the Part Widths"
 commit_column_fit = "Fit the Part to Its Content"
 commit_column_fit_all = "Fit All Parts to Content"
 log_pick_column = "Pick a Column to Move or Size"
+log_filter_author = "Filter the Log by Author"
 log_columns_next = "Pick the Next Column"
 log_columns_prev = "Pick the Previous Column"
 log_columns_move_left = "Move the Column Left"
@@ -4069,6 +4070,8 @@ navigation_focus_status_staged = "Navigation: Focus Status > Staged"
 navigation_cycle_focus_to_next_pane = "Navigation: Cycle Focus to Next Pane"
 navigation_cycle_focus_to_previous_pane = "Navigation: Cycle Focus to Previous Pane"
 navigation_search_commits = "Navigation: Search Commits..."
+log_filter_by_author = "Log: Filter by Author..."
+log_clear_author_filter = "Log: Clear Author Filter"
 navigation_toggle_refs_pane_collapsed = "Navigation: Toggle Refs Pane Collapsed"
 navigation_toggle_status_pane_collapsed = "Navigation: Toggle Status Pane Collapsed"
 navigation_refs_pane_wider = "Navigation: Widen Refs Pane"
@@ -13268,3 +13271,32 @@ no_repo = "This folder is not a repository: a repository sequence needs one"
 cannot_run = "Cannot run: {reason}"
 # context: a refused write; {error} is the reason
 write_failed = "Sequences: {error}"
+
+# The Log's author filter: the funnel in the Author header and its popup.
+[author_filter]
+# context: title of the author filter popup's search field, over the Log header (lowercase hint style)
+title = "Filter by author"
+# context: placeholder of the author filter popup's search field (lowercase)
+placeholder = "filter by author"
+# context: first row of the author filter list: drops the whole filter
+clear = "Clear filter"
+# context: shown in the author filter list when the search field matches no author
+empty = "No author matches"
+# context: hint band under the author filter list. Width budget: 50 cells
+hint = "Enter toggle  Up/Down move  Esc close"
+# context: tooltip of the funnel in the Log's Author header while no author is chosen
+tip_off = "Filter the Log by author"
+# context: first line of the funnel's tooltip while a filter is on; the chosen authors follow, one per line; {count} is how many
+tip_on = "Author filter ({count}):"
+# context: note on the Log's top border when the author filter is on and the Author column cannot show it; {name} is the author. Width budget: 30 cells
+note_one = "Author: {name}"
+# context: same with several authors: {name} is the first, {more} how many others
+note_many = "Authors: {name} +{more}"
+# context: status line after choosing an author; {count} is how many are chosen
+status_on = "Author filter: {count} chosen"
+# context: status line after the author filter was dropped
+status_cleared = "Author filter cleared"
+# context: status line when there is no author filter to clear
+status_none = "No author filter to clear"
+# context: help overlay line for the key that opens the author filter
+help = "Filter the Log by author: dims the other authors like a search does"

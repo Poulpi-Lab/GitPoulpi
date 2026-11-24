@@ -172,6 +172,9 @@ pub(crate) enum HitTarget {
     /// by checking the header row directly, not through this hit target,
     /// since right-click is a different `MouseEventKind` variant).
     LogColumnHeader(LogColumn),
+    /// The funnel in the Author column's header: opens the author filter
+    /// popup; a right-click clears the filter.
+    LogAuthorFilter,
     /// One row of the column show/hide menu (opened by right-clicking the
     /// Log header) - a click toggles that column's visibility and leaves
     /// the menu open, the usual column-picker convention.
@@ -593,6 +596,7 @@ pub(crate) fn desired_cursor_shape(
             | HitTarget::ShowAllHiddenRefs
             | HitTarget::TooltipRefPill { .. }
             | HitTarget::LogColumnHeader(_)
+            | HitTarget::LogAuthorFilter
             | HitTarget::ColumnMenuItem(_)
             | HitTarget::ColumnMenuAction(_)
             | HitTarget::ColumnMenuClose

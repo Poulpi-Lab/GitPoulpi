@@ -129,6 +129,7 @@ impl WindowState {
             help_popup_inner_height: &mut self.help_popup_inner_height,
             help_scroll: &mut self.help_scroll,
             hidden_from_graph: &mut self.hidden_from_graph,
+            log_author_filter: &mut self.log_author_filter,
             hierarchical_refs: &mut self.hierarchical_refs,
             hit_targets: &mut self.hit_targets,
             hosting: &mut self.hosting,

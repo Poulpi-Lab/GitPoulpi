@@ -185,6 +185,7 @@ pub(in crate::event_loop) struct CommandCtx<'a> {
     pub(in crate::event_loop) sidebar_section_areas: &'a mut Vec<(SidebarSection, Rect)>,
     pub(in crate::event_loop) sidebar_states: &'a mut SidebarStates,
     pub(in crate::event_loop) solo_refs: &'a mut HashSet<String>,
+    pub(in crate::event_loop) log_author_filter: &'a mut std::collections::BTreeSet<String>,
     pub(in crate::event_loop) stashes_result:
         &'a mut gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Stash>>,
     pub(in crate::event_loop) status_area: &'a mut Rect,

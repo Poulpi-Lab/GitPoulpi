@@ -158,6 +158,7 @@ Varje tangent du kan binda om, med id:t som används i
 | `log` | `compare_selection` | Jämför de markerade raderna | `v` |
 | `log` | `compare_swap` | Byt plats på jämförelsens ändar | `x` |
 | `log` | `compare_next` | Gå till nästa jämförda rad | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | Välj en kolumn att flytta eller ändra bredd på | `Shift+C` |
 | `log` | `scroll_left` | Rulla kolumnerna åt vänster | `Shift+Left` |
 | `log` | `scroll_right` | Rulla kolumnerna åt höger | `Shift+Right` |
@@ -514,6 +515,8 @@ Tangenterna är standardvärdena.
 | Navigering: Flytta fokus till nästa ruta | `Tab` |
 | Navigering: Flytta fokus till föregående ruta | `Shift+Tab` |
 | Navigering: Sök commits... | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | Navigering: Fäll ihop/ut Refs-rutan | `Ctrl+N H` |
 | Navigering: Bredda Refs-rutan | `Ctrl+N Right` |
 | Navigering: Smalna av Refs-rutan | `Ctrl+N Left` |

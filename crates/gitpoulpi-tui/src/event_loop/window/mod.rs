@@ -31,6 +31,7 @@ mod radar_pending;
 mod refs_update;
 mod reveal;
 pub(in crate::event_loop) mod review_resume;
+mod sequence;
 mod sizes;
 mod stage_guard_peek;
 mod tick;

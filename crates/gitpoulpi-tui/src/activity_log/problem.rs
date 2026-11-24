@@ -28,6 +28,8 @@ pub(crate) enum Source {
     Ai,
     /// A file that could not be written.
     Save,
+    /// A step of a user-defined sequence.
+    Sequence,
 }
 
 impl Source {
@@ -39,6 +41,7 @@ impl Source {
             Source::Tool => f::TITLE_TOOL,
             Source::Ai => f::TITLE_AI,
             Source::Save => f::TITLE_SAVE,
+            Source::Sequence => f::TITLE_SEQUENCE,
         }
         .get()
         .to_string()
@@ -53,7 +56,8 @@ impl Source {
             Source::Hosting => "Hosting request",  // i18n-english
             Source::Tool => "External program",    // i18n-english
             Source::Ai => "AI request",
-            Source::Save => "Save file", // i18n-english
+            Source::Save => "Save file",         // i18n-english
+            Source::Sequence => "Sequence step", // i18n-english
         }
     }
 
@@ -65,6 +69,7 @@ impl Source {
             Source::Tool => (f::SUMMARY_TOOL, f::HINT_TOOL),
             Source::Ai => (f::SUMMARY_AI, f::HINT_AI),
             Source::Save => (f::SUMMARY_SAVE, f::HINT_SAVE),
+            Source::Sequence => (f::SUMMARY_SEQUENCE, f::HINT_SEQUENCE),
         };
         (summary.get().to_string(), hint.get().to_string())
     }

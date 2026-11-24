@@ -375,6 +375,7 @@ impl WindowState {
             // the real one (a status we do not have yet is still taken).
             if outcome.generation == self.link.generation() || self.status_result.is_err() {
                 self.status_result = outcome.status_result;
+                crate::sequence_run::note_status_refresh();
                 if let Ok(tree) = &self.status_result {
                     self.link.set_rename_pairs(tree);
                 }

@@ -149,6 +149,17 @@ impl RemoteUi {
         }
         let default = self.default_remote(refs);
         let group = branch_group(refs, &head.name);
+        // A sequence's push step waits on this chooser: its answer is the
+        // step's push.
+        if let Some(ticket) = crate::daemon_link::take_armed_for_dialog() {
+            self.hold_ticket(Some(ticket));
+            crate::daemon_link::report_ticket(
+                Some(ticket),
+                crate::daemon_link::StepOutcome::NeedsUser(
+                    crate::daemon_link::UserWait::PushChooser,
+                ),
+            );
+        }
         let mut entries = push_menu_entries(&head.name, group.as_ref(), &names, default.as_deref());
         // Who the push signs in as, when the repository's profile is not
         // all default: a row that opens the page that chose it.
@@ -260,7 +271,7 @@ impl RemoteUi {
 
     /// Holds `ticket` for the dialog being opened (a ticket the previous
     /// dialog still held is canceled).
-    fn hold_ticket(&mut self, ticket: Option<crate::daemon_link::Ticket>) {
+    pub(super) fn hold_ticket(&mut self, ticket: Option<crate::daemon_link::Ticket>) {
         self.drop_dialog_ticket();
         self.dialog_ticket = ticket;
     }
@@ -272,13 +283,24 @@ impl RemoteUi {
         }
     }
 
-    /// Whether the open menu is the diverged or the auto-stash dialog.
+    /// Whether `ticket` is the one a dialog of this UI holds (a push chooser
+    /// opened for a sequence step).
+    pub(crate) fn holds_ticket(&self, ticket: crate::daemon_link::Ticket) -> bool {
+        self.dialog_ticket == Some(ticket)
+    }
+
+    /// Whether the open menu is the diverged, auto-stash or push chooser dialog.
     fn dialog_menu_open(&self) -> bool {
         self.menu.as_ref().is_some_and(|menu| {
             (0..menu.row_count()).any(|row| {
                 matches!(
                     menu.row_action(row),
-                    Some(RemoteUiAction::PullThenPush { .. } | RemoteUiAction::AutoStashContinue)
+                    Some(
+                        RemoteUiAction::PullThenPush { .. }
+                            | RemoteUiAction::AutoStashContinue
+                            | RemoteUiAction::PushTo(_)
+                            | RemoteUiAction::PushOne { .. }
+                    )
                 )
             })
         })

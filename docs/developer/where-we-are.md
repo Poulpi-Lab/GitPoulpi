@@ -111,7 +111,9 @@ directory or `*_tests.rs` for the big ones); shared fixtures in
   state in `FileInsight::blame`, actions in `event_loop/input/commands/blame.rs`), `editor/` + `editor_buffer.rs` + `editor_highlight.rs`,
   `image_view/` + `image_editor.rs`, `merge_view/` + `merge_flow.rs`.
 - Banners over the Log's top row: `rebase_banner.rs`, `operation_banner.rs`,
-  `autostash_banner.rs`, `stuck_banner.rs`. `rebase_ui/` (interactive rebase and
+  `autostash_banner.rs`, `stuck_banner.rs`, and the running sequence's strip
+  (`sequence_run/strip.rs`; the run itself: pure `sequence_run/machine.rs`, window glue
+  `event_loop/window/sequence.rs`, see "Sequences: runner" in `session-and-state.md`). `rebase_ui/` (interactive rebase and
   cherry-pick plan), `reword_ui.rs`, `undo_ui.rs`, `safety_panel/` (Undo history, Reflog and Lost work panel: an IPC client over the `Requester`/`Reply` of `daemon_link/raw.rs`, a `RepoDialog::Safety` in `repo_dialogs.rs`; menu rows open it through `safety_panel::ask_to_open`).
 
 **Repositories, tabs, dialogs**

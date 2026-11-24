@@ -42,6 +42,9 @@ pub enum UserWait {
     /// The push was refused; the diverged dialog (pull then push, force with
     /// lease, cancel) decides how the ticket ends.
     PushRejected,
+    /// The push has no single place to go (`git.push_behavior = ask`): the
+    /// "Push to..." chooser decides, and its answer is the ticket's push.
+    PushChooser,
 }
 
 /// What a finished action produced besides "it worked".
@@ -125,6 +128,58 @@ fn push(done: StepDone) {
     queue.push_back(done);
     drop(queue);
     crate::redraw::poke();
+}
+
+/// The ticket the sequence runner has armed for the next action a command
+/// submits, and what that action must look like for it to count. Process-wide
+/// like everything here. Empty outside a run, so an untracked action behaves
+/// exactly as before.
+type Accepts = fn(&crate::daemon_link::Action) -> bool;
+
+static ARMED: Mutex<Option<(Ticket, Accepts)>> = Mutex::new(None);
+
+/// Arms `ticket` for the next submitted action `accepts` says yes to (a
+/// stage, say): the runner runs a palette command and its `submit_action`
+/// adopts the ticket, so the command layer needs no ticket parameter. Replaces
+/// an earlier arming.
+pub(crate) fn arm(ticket: Ticket, accepts: fn(&crate::daemon_link::Action) -> bool) {
+    *ARMED.lock().unwrap_or_else(|e| e.into_inner()) = Some((ticket, accepts));
+}
+
+/// Takes the armed ticket for `action` (`None` when nothing is armed or the
+/// action is not the one waited for).
+pub(crate) fn take_armed(action: &crate::daemon_link::Action) -> Option<Ticket> {
+    let mut slot = ARMED.lock().unwrap_or_else(|e| e.into_inner());
+    match *slot {
+        Some((ticket, accepts)) if accepts(action) => {
+            *slot = None;
+            Some(ticket)
+        }
+        _ => None,
+    }
+}
+
+/// Takes the armed ticket for a dialog the command opens (the push chooser,
+/// the force-push confirmation): the dialog then holds it.
+pub(crate) fn take_armed_for_dialog() -> Option<Ticket> {
+    ARMED
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .take()
+        .map(|(ticket, _)| ticket)
+}
+
+/// The armed ticket, left in place.
+pub(crate) fn armed() -> Option<Ticket> {
+    ARMED
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .map(|(ticket, _)| ticket)
+}
+
+/// Drops the arming (the command did not submit, the run ended).
+pub(crate) fn disarm() {
+    *ARMED.lock().unwrap_or_else(|e| e.into_inner()) = None;
 }
 
 /// A new ticket.

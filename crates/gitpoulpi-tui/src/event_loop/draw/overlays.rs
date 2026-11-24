@@ -897,12 +897,32 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
         }
     }
     let top_taken = rebase_state.is_some() || operation_banner.is_some() || am_banner.is_some();
+    // The running sequence's strip: the next free border row, before the
+    // quieter banners (it is what the person is waiting on).
+    let run_strip = central_view == CentralView::Log && crate::sequence_run::visible();
+    if run_strip {
+        if let Some(strip) = crate::operation_banner::strip_rect(log_area, usize::from(top_taken)) {
+            let hovered_button = match &hovered_target {
+                Some(HitTarget::SequenceStrip(button)) => Some(*button),
+                _ => None,
+            };
+            let front: Vec<(Rect, HitTarget)> = crate::sequence_run::peek(|run| {
+                crate::sequence_run::strip::render(frame, strip, run, hovered_button)
+            })
+            .unwrap_or_default()
+            .into_iter()
+            .map(|(rect, button)| (rect, HitTarget::SequenceStrip(button)))
+            .collect();
+            frame_hits.splice(0..0, front);
+        }
+    }
+    let run_slots = usize::from(top_taken) + usize::from(run_strip);
     // The pending auto-stash strip: the same kind of overlay, on the Log's
     // bottom border row when another banner has the top one.
     if central_view == CentralView::Log {
         // The top border row, or the bottom one when another banner has
         // the top: never the column-title row under it.
-        let slot = usize::from(top_taken);
+        let slot = run_slots;
         if let (Some(pending), Some(strip)) = (
             &pending_auto_stash,
             crate::operation_banner::strip_rect(log_area, slot),
@@ -923,7 +943,7 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
     // free border row.
     let group_paused = crate::push_group_ui::strip_visible(repo_root);
     if central_view == CentralView::Log && group_paused {
-        let slot = usize::from(top_taken) + usize::from(pending_auto_stash.is_some());
+        let slot = run_slots + usize::from(pending_auto_stash.is_some());
         if let Some(strip) = crate::operation_banner::strip_rect(log_area, slot) {
             let hovered_button = match &hovered_target {
                 Some(HitTarget::PushGroupStrip(button)) => Some(*button),
@@ -940,9 +960,8 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
     // The stale `index.lock` strip takes the next free row (a second banner
     // is the last one the Log's borders have room for).
     if central_view == CentralView::Log {
-        let slot = usize::from(top_taken)
-            + usize::from(pending_auto_stash.is_some())
-            + usize::from(group_paused);
+        let slot =
+            run_slots + usize::from(pending_auto_stash.is_some()) + usize::from(group_paused);
         if let (Some(lock), Some(strip)) = (
             index_lock.as_ref().filter(|l| l.stale),
             crate::operation_banner::strip_rect(log_area, slot),
@@ -962,7 +981,7 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
     // The proactive conflict badge takes the next free row, after every
     // banner above: it is a warning, and the others are in-progress operations.
     if central_view == CentralView::Log {
-        let slot = usize::from(top_taken)
+        let slot = run_slots
             + usize::from(pending_auto_stash.is_some())
             + usize::from(group_paused)
             + usize::from(index_lock.as_ref().is_some_and(|l| l.stale));

@@ -1209,6 +1209,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 에이전트: 대기 중인 보기 표시 | `Ctrl+N Enter` |
 | 에이전트: 대기 중인 보기 닫기 |  |
 | 에이전트: 뒤로 | `Ctrl+N Backspace` |
+| Sequence: Cancel |  |
+| Sequence: Continue |  |
 | 단축키: 모두 초기화... |  |
 | 연동: 연결된 Pull request 열기 | `Ctrl+G g` |
 | 연동: 연결된 Pull request를 호스트에서 편집 | `e (행에서)` |

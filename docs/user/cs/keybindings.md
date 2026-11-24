@@ -1216,6 +1216,8 @@ Klávesy jsou výchozí.
 | Agent: Zobrazit čekající pohled | `Ctrl+N Enter` |
 | Agent: Zavřít čekající pohled |  |
 | Agent: Zpět | `Ctrl+N Backspace` |
+| Sequence: Cancel |  |
+| Sequence: Continue |  |
 | Zkratky: Obnovit vše... |  |
 | Integrace: Otevřít propojený pull request | `Ctrl+G g` |
 | Integrace: Upravit propojený pull request u hostitele | `e (na řádku)` |

@@ -1218,6 +1218,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Agent: Show Pending View | `Ctrl+N Enter` |
 | Agent: Dismiss Pending View |  |
 | Agent: Back | `Ctrl+N Backspace` |
+| Sequence: Cancel |  |
+| Sequence: Continue |  |
 | Keybindings: Reset All... |  |
 | Integrations: Open Linked Pull Request | `Ctrl+G g` |
 | Integrations: Edit Linked Pull Request on the Host | `e (on a row)` |

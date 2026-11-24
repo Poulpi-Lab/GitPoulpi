@@ -2302,6 +2302,8 @@ pulling_from_all = { git = "a fazer pull de {branch} a partir de {remotes}...", 
 no_pull_remote = "{branch} não tem nenhum remoto para fazer {$pull_noun}"
 
 [keymap_action]
+sequence_cancel = "Sequence: Cancel"
+sequence_continue = "Sequence: Continue"
 git_prefix_pull_all_branches = "{$Pull} de todas as branches"
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
 global_commit_column = "Mostrar ou ocultar a coluna de {$commits}"
@@ -3018,6 +3020,14 @@ action_issue_body = "Descrição da issue"
 title_hosting_base = "Prompt base das respostas"
 
 [palette]
+# context: palette row: cancel the running sequence
+sequence_cancel = "Sequence: Cancel"
+# context: palette row: continue the paused sequence
+sequence_continue = "Sequence: Continue"
+# context: why Sequence: Cancel is unavailable
+why_no_sequence_running = "no sequence is running"
+# context: why Sequence: Continue is unavailable
+why_sequence_not_waiting = "the sequence is not waiting for you"
 # context: palette row running a user-defined sequence; {name} is the sequence's own name
 sequence_run = "Sequence: {name}"
 git_pull_all_branches = "Git: {$Pull} de todas as branches"
@@ -6464,6 +6474,12 @@ action_repo_auth = "SSH e credenciais..."
 hint_repo_auth = "Escolha outra forma de iniciar sessão neste repositório em SSH e credenciais e tente de novo."
 
 [failure_card]
+# context: title of the failure notification when a step of a user-defined sequence fails
+title_sequence = "Sequence stopped"
+# context: reason line of the failure notification when a sequence stopped
+summary_sequence = "A step of the sequence did not succeed, so the sequence stopped there. Earlier steps are kept."
+# context: next-step line of the failure notification when a sequence stopped
+hint_sequence = "Fix the cause, then run the sequence again; the steps that worked are not undone."
 title_clone = "O clone falhou"
 title_create = "Não foi possível criar o repositório"
 title_hosting = "O pedido ao serviço de alojamento falhou"
@@ -10575,6 +10591,66 @@ pal_right = "View: Scroll the Pane Right"
 nothing = "Nothing to scroll sideways here"
 help = "Scroll the pane sideways (also Shift+wheel, a horizontal wheel or the bar on its bottom border)"
 help_details = "Scroll the {$commit} details sideways (id, author, date and counts lines)"
+
+[sequence_run]
+# context: the label of the run in the Jobs panel: sequence name, step number, step count, step name
+job_label = "Sequence {name} {k}/{n}: {step}"
+# context: run strip text: sequence name, step k of n, step name
+strip_running = "{name} {k}/{n} \u00b7 {step}"
+# context: run strip while a step waits to be started
+strip_next = "{name} {k}/{n} \u00b7 Next: {step}"
+# context: run strip after the AI wrote the commit message
+strip_review = "{name} {k}/{n} \u00b7 Review the message, then Continue"
+# context: run strip when the commit has no message yet
+strip_commit_message = "{name} {k}/{n} \u00b7 Write the message, then commit or Continue"
+# context: run strip while a dialog of the step is open
+strip_dialog = "{name} {k}/{n} \u00b7 Answer the dialog"
+# context: run strip when the push was rejected and its dialog is open
+strip_push_rejected = "{name} {k}/{n} \u00b7 Push rejected: choose in the dialog"
+# context: run strip while a dialog of the action waits for the person
+strip_user = "{name} {k}/{n} \u00b7 Choose in the dialog"
+# context: run strip when the window on screen is not the tab the step acts on; {tab} is a folder
+strip_waiting_tab = "{name} {k}/{n} \u00b7 waiting for tab {tab}"
+# context: run strip when a step failed
+strip_failed = "{name} stopped at step {k}/{n} ({step}): {error}"
+# context: button of the run strip
+button_continue = "Continue"
+# context: button of the run strip that switches to the tab the step acts on
+button_go_there = "Go there"
+# context: button of the run strip that shows the failure
+button_details = "Details"
+# context: status line after a sequence was canceled
+say_canceled = "{name} canceled after step {k}/{n} ({step}); earlier steps are kept"
+# context: status line when the step in flight cannot be stopped
+say_stopping = "Stopping after this step"
+# context: status line when a step failed
+say_stopped = "Sequence {name} stopped at step {k}/{n} ({step}): {error}"
+# context: status line when every step ran
+say_finished = "{name} finished"
+# context: status line when a second sequence is started
+say_running = "{name} is running (step {k}/{n})"
+# context: Activity Log entry for a failed step; {options} lists the step options
+log_failure = "Sequence {name}, step {k}/{n} {step} (options: {options}) failed: {error}"
+# context: Activity Log entry for a run cut short by quitting
+log_interrupted = "Sequence {name} was interrupted at step {k}/{n} ({step}) when GitPoulpi closed"
+# context: why a run was canceled; {tab} is a folder
+reason_tab_closed = "the tab {tab} was closed"
+# context: why a run failed; {tab} is a folder
+reason_tab_never = "the tab {tab} did not open"
+# context: why a run was canceled
+reason_dialog_closed = "the dialog was closed"
+# context: a step cannot run now; {step} is its name, {reason} the palette's reason
+step_unavailable = "{step} is not available: {reason}"
+# context: a step names a command this build does not have
+step_unknown = "{step} is not a command of this build"
+# context: a step with pause never lacks an option; {option} is its name
+step_needs_option = "{step} needs the option {option}"
+# context: a step could not start
+step_failed_start = "{step} did not start"
+# context: the sequence was removed or changed before it started
+def_gone = "the sequence {name} no longer exists"
+# context: shorter run strip text when a step failed (the error text does not fit)
+strip_stopped = "{name} stopped at step {k}/{n} ({step})"
 
 [settings_sequences]
 section_title = "Sequences"

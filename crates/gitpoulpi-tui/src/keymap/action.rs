@@ -556,6 +556,9 @@ actions! {
     NavAgentShow => (NavPrefix, "nav_prefix.agent_show", NAV_PREFIX_AGENT_SHOW, ["Enter"]),
     NavAgentBack => (NavPrefix, "nav_prefix.agent_back", NAV_PREFIX_AGENT_BACK, ["Backspace"]),
     NavArrangeDialog => (NavPrefix, "nav_prefix.arrange_dialog", NAV_PREFIX_ARRANGE_DIALOG, ["m"]),
+    // ---- the running sequence ----
+    SequenceCancel => (Sequence, "sequence.cancel", SEQUENCE_CANCEL, []),
+    SequenceContinue => (Sequence, "sequence.continue", SEQUENCE_CONTINUE, []),
     // ---- refs pane ----
     RefsFilter => (Refs, "refs.filter", REFS_FILTER, ["/"]),
     RefsSolo => (Refs, "refs.solo", REFS_SOLO, ["o"]),

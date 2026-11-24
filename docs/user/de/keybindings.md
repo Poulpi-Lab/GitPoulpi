@@ -1211,6 +1211,8 @@ die Standardtasten.
 | Agent: Ausstehende Ansicht zeigen | `Ctrl+N Enter` |
 | Agent: Ausstehende Ansicht verwerfen |  |
 | Agent: Zurück | `Ctrl+N Backspace` |
+| Sequence: Cancel |  |
+| Sequence: Continue |  |
 | Tastenbelegung: Alle zurücksetzen... |  |
 | Integrationen: Verknüpften Pull Request öffnen | `Ctrl+G g` |
 | Integrationen: Verknüpften Pull Request auf dem Host bearbeiten | `e (auf einer Zeile)` |

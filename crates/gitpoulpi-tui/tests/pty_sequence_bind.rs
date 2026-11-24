@@ -1,6 +1,7 @@
 //! A user-defined sequence (`[[sequences]]`) is a palette row and a bindable
-//! key (`[keybindings.sequence]`), end to end. The run itself is a stub for
-//! now: pressing the key reaches it and says so on the status line.
+//! key (`[keybindings.sequence]`), end to end. Pressing the key (or choosing
+//! the row) starts the run: its strip shows over the Log (the runner's own
+//! behaviour is in `pty_sequence_backup.rs` and its siblings).
 //!
 //! A temp `GITPOULPI_CONFIG_DIR` per test; nothing is located by a
 //! hard-coded coordinate.
@@ -75,14 +76,14 @@ fn the_palette_lists_a_sequence_with_its_key() {
     .unwrap_or_else(|e| panic!("{e}"));
 }
 
-/// The key reaches the run (a stub for now) from the main window.
+/// The key starts the run from the main window.
 #[test]
 fn the_bound_key_starts_the_sequence() {
     let repo = fixture();
     let (mut term, _c) = launch(repo.root(), "pty-sequence-key");
     term.send_keys("M-b").unwrap();
-    term.wait_for("the stub's status line", STEP, |s| {
-        s.contains("Nightly Backup: sequences are not wired yet")
+    term.wait_for("the run strip", STEP, |s| {
+        s.contains("\u{25b6} Nightly Backup")
     })
     .unwrap_or_else(|e| panic!("{e}"));
 }
@@ -97,8 +98,8 @@ fn choosing_the_row_starts_the_sequence() {
     term.wait_for("the row", STEP, |s| s.contains("Sequence: Nightly Backup"))
         .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Enter").unwrap();
-    term.wait_for("the stub's status line", STEP, |s| {
-        s.contains("Nightly Backup: sequences are not wired yet")
+    term.wait_for("the run strip", STEP, |s| {
+        s.contains("\u{25b6} Nightly Backup")
     })
     .unwrap_or_else(|e| panic!("{e}"));
 }

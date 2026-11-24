@@ -1216,6 +1216,8 @@ Tuşlar varsayılanlardır.
 | Ajan: Bekleyen Görünümü Göster | `Ctrl+N Enter` |
 | Ajan: Bekleyen Görünümü Kapat |  |
 | Ajan: Geri | `Ctrl+N Backspace` |
+| Sequence: Cancel |  |
+| Sequence: Continue |  |
 | Tuş Atamaları: Tümünü Sıfırla... |  |
 | Entegrasyonlar: Bağlı Pull Request Aç | `Ctrl+G g` |
 | Entegrasyonlar: Bağlı Pull Request Barındırıcıda Düzenle | `e (satırda)` |

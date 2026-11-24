@@ -143,6 +143,7 @@ impl WindowState {
                 .as_ref()
                 .and_then(|m| m.radar.next_deadline()),
             crate::jobs_ui::next_deadline(),
+            crate::sequence_run::next_deadline(),
             self.repo_dialogs.next_deadline(),
         ]
         .into_iter()

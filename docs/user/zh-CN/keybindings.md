@@ -1182,6 +1182,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 代理：显示待处理的视图 | `Ctrl+N Enter` |
 | 代理：关闭待处理的视图 |  |
 | 代理：返回 | `Ctrl+N Backspace` |
+| Sequence: Cancel |  |
+| Sequence: Continue |  |
 | 键位绑定：全部重置… |  |
 | 集成：打开关联的 pull request | `Ctrl+G g` |
 | 集成：在托管平台上编辑关联的 pull request | `e（在某一行上）` |

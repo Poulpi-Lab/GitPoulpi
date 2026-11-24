@@ -487,7 +487,7 @@ fn the_sequence_pool_shows_only_the_slots_a_sequence_holds() {
         s.keys
             .visible()
             .iter()
-            .all(|i| ACTIONS[*i].ctx != Ctx::Sequence),
+            .all(|i| !matches!(ACTIONS[*i].action, crate::keymap::Action::Sequence(_))),
         "an unused slot is not listed"
     );
     refresh_defs(&[test_def("page-seq")]);
@@ -496,7 +496,7 @@ fn the_sequence_pool_shows_only_the_slots_a_sequence_holds() {
         .keys
         .visible()
         .into_iter()
-        .filter(|i| ACTIONS[*i].ctx == Ctx::Sequence)
+        .filter(|i| matches!(ACTIONS[*i].action, crate::keymap::Action::Sequence(_)))
         .map(|i| {
             (
                 ACTIONS[i].config_id(),

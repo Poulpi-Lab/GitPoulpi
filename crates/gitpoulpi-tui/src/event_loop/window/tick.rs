@@ -1104,6 +1104,7 @@ impl WindowState {
         if let Some(prefs) = self.preferences.as_mut() {
             prefs.poll_token_presence();
         }
+        self.sequence_tick(palette_ctx);
         FrameInputs {
             journal_state,
             undo_busy,

@@ -317,7 +317,9 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
         }
         RemoteUiAction::PushTo(remote) => match head_branch(refs) {
             Some(head) => {
-                link.submit_action(push_action(&remote, &head, false));
+                // A chooser opened for a sequence's push answers under its
+                // ticket.
+                link.submit_as(ui.dialog_ticket.take(), push_action(&remote, &head, false));
                 Some(msg::pushing_to(&head.name, &remote))
             }
             None => Some(msg::DETACHED_PUSH.get().into()),
@@ -327,7 +329,10 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
             branch,
             remote,
             remote_branch,
-        } => Some(ui.push_one(&branch, &remote, &remote_branch, refs, link)),
+        } => {
+            let ticket = ui.dialog_ticket.take();
+            Some(ui.push_one(&branch, &remote, &remote_branch, refs, link, ticket))
+        }
         RemoteUiAction::PushSelected { branch } => {
             ui.push_selected(&branch);
             None
@@ -360,6 +365,10 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
             branch,
             after_fetch,
         } => {
+            // A sequence's force push waits on this confirmation.
+            if let Some(armed) = crate::daemon_link::take_armed_for_dialog() {
+                ui.hold_ticket(Some(armed));
+            }
             let prompt = if after_fetch {
                 msg::force_confirm_fetch(&branch, &remote)
             } else {

@@ -3800,6 +3800,16 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     ),
     entry(msg::palette::AGENT_BACK, "", PaletteCommand::AgentBack),
     entry(
+        msg::palette::SEQUENCE_CANCEL,
+        "",
+        PaletteCommand::SequenceCancel,
+    ),
+    entry(
+        msg::palette::SEQUENCE_CONTINUE,
+        "",
+        PaletteCommand::SequenceContinue,
+    ),
+    entry(
         msg::palette::KEYBINDINGS_RESET_ALL,
         "",
         PaletteCommand::KeybindingsResetAll,

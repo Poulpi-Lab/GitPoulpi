@@ -183,6 +183,9 @@ const NO_OWN_PALETTE_ROW: &[crate::keymap::Action] = {
         A::GlobalGitPrefix,
         A::GlobalNavPrefix,
         A::GlobalPalette,
+        // Ship unbound: their rows show a key once the user gives one.
+        A::SequenceCancel,
+        A::SequenceContinue,
         // Second spellings of an action whose row shows the first.
         A::NavToggleHelp,
         A::NavSelectTab,

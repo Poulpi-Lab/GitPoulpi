@@ -1218,6 +1218,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Agent : Afficher la vue en attente | `Ctrl+N Enter` |
 | Agent : Ignorer la vue en attente |  |
 | Agent : Retour | `Ctrl+N Backspace` |
+| Séquence : annuler |  |
+| Séquence : continuer |  |
 | Raccourcis : Tout réinitialiser... |  |
 | Intégrations : Ouvrir la pull request liée | `Ctrl+G g` |
 | Intégrations : Modifier la pull request liée sur l'hébergeur | `e (sur une ligne)` |

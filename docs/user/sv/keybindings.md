@@ -1218,6 +1218,8 @@ Tangenterna är standardvärdena.
 | Agent: Visa väntande vy | `Ctrl+N Enter` |
 | Agent: Avfärda väntande vy |  |
 | Agent: Tillbaka | `Ctrl+N Backspace` |
+| Sequence: Cancel |  |
+| Sequence: Continue |  |
 | Tangentbindningar: Återställ alla... |  |
 | Integrationer: Öppna länkad pull request | `Ctrl+G g` |
 | Integrationer: Redigera länkad pull request på värden | `e (på en rad)` |

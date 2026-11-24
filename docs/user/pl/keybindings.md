@@ -1215,6 +1215,8 @@ zastosowania. Klawisze są domyślne.
 | Agent: Pokaż oczekujący widok | `Ctrl+N Enter` |
 | Agent: Odrzuć oczekujący widok |  |
 | Agent: Wstecz | `Ctrl+N Backspace` |
+| Sequence: Cancel |  |
+| Sequence: Continue |  |
 | Skróty: Resetuj wszystkie... |  |
 | Integracje: Otwórz powiązany pull request | `Ctrl+G g` |
 | Integracje: Edytuj powiązany pull request na hoście | `e (na wierszu)` |

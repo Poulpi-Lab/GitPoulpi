@@ -562,6 +562,21 @@ pub(super) fn handle(
     } else if let Some(HitTarget::PushGroupStrip(button)) = &hit {
         let effect = crate::push_group_ui::strip_click(cx.repo_root, *button);
         crate::push_group_ui::apply(effect, cx.link, &mut *cx.input_mode);
+    } else if let Some(HitTarget::SequenceStrip(button)) = &hit {
+        use crate::sequence_run::strip::StripButton as B;
+        // Every button is its palette command's twin.
+        match button {
+            B::Continue => {
+                commands::run_command(cx, PaletteCommand::SequenceContinue);
+            }
+            B::Close => {
+                commands::run_command(cx, PaletteCommand::SequenceCancel);
+            }
+            B::GoThere => crate::sequence_run::request_go_there(),
+            B::Details => {
+                commands::run_command(cx, PaletteCommand::OpenActivityLog);
+            }
+        }
     } else if let Some(HitTarget::ConflictBadge) = &hit {
         commands::run_command(cx, PaletteCommand::ConflictsShow);
     } else if let Some(HitTarget::Toolbar(button)) = &hit {

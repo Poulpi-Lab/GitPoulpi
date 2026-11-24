@@ -1210,6 +1210,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Агент: показати відкладений вигляд | `Ctrl+N Enter` |
 | Агент: відхилити відкладений вигляд |  |
 | Агент: назад | `Ctrl+N Backspace` |
+| Sequence: Cancel |  |
+| Sequence: Continue |  |
 | Скорочення: скинути все... |  |
 | Інтеграції: відкрити пов'язаний pull request | `Ctrl+G g` |
 | Інтеграції: змінити пов'язаний pull request на хостингу | `e (на рядку)` |

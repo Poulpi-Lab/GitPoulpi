@@ -78,6 +78,20 @@ impl WorktreeDialog {
         Self::new(seed, repo_root)
     }
 
+    pub(crate) fn apply_run_seed(&mut self, _run: &crate::repo_dialogs::WorktreeRunSeed) {}
+
+    pub(crate) fn plan(
+        &self,
+    ) -> Result<
+        (
+            std::path::PathBuf,
+            gitpoulpi_core::domain::WorktreeAddOptions,
+        ),
+        String,
+    > {
+        Err(String::new())
+    }
+
     pub(crate) fn take_pick_ref() -> bool {
         false
     }
@@ -120,4 +134,22 @@ impl crate::dialog_kit::Dismiss for WorktreeDialog {
     fn close_hit_mut(&mut self) -> &mut crate::dialog_kit::CloseHit {
         &mut self.close
     }
+}
+
+pub(crate) fn default_worktree_path(repo_root: &Path, label: &str) -> std::path::PathBuf {
+    repo_root.join(label)
+}
+
+pub(crate) fn seed_from_head(
+    _refs: &[gitpoulpi_core::domain::Ref],
+    _worktrees: &[gitpoulpi_core::domain::Worktree],
+) -> Option<WorktreeSeed> {
+    None
+}
+
+pub(crate) fn seed_to_choose(
+    refs: &[gitpoulpi_core::domain::Ref],
+    worktrees: &[gitpoulpi_core::domain::Worktree],
+) -> Option<WorktreeSeed> {
+    seed_from_head(refs, worktrees)
 }

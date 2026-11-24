@@ -476,7 +476,7 @@ Terminal.app, Windows Terminal, xterm), the pointer does not change; see
 [Choosing a terminal](terminals.md#mouse-pointer-shape-osc-22). The divider or the button
 under the pointer lights up in every terminal.
 
-The same kind of component gives the same pointer everywhere in the app.
+The same kind of component gives the same pointer everywhere in the app: the buttons of a review shown over the Radar (tabs, the close cross, popup buttons) and the Radar's own Actions buttons show the hand like any other button.
 
 - **Buttons are real buttons**, in Settings (Integrations: Edit, Disconnect,
   Remove, Browse, Delete, the snippet buttons of the instructions editor...)

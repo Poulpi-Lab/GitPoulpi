@@ -1720,6 +1720,12 @@ column_repository = "Repositório"
 column_author = "Autor"
 column_title = "Título"
 column_age = "Idade"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "Coluna {name} ({width} células): [ estreita, ] alarga, 0 redefine, Tab próxima, Esc conclui"
 # context: {name} is a column name, {width} its width in terminal cells

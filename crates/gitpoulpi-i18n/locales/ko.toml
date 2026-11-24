@@ -1719,6 +1719,12 @@ column_repository = "저장소"
 column_author = "작성자"
 column_title = "제목"
 column_age = "경과"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "{name} 열 ({width}칸): [ 좁게, ] 넓게, 0 초기화, Tab 다음, Esc 완료"
 # context: {name} is a column name, {width} its width in terminal cells

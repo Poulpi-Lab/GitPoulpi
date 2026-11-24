@@ -9,6 +9,11 @@ IPC surfaces are stable within a major version).
 
 ### Changed
 - The mouse pointer is the I-beam over the code of the Diff view (Inline and Split), the review's diff pane, the File View and Blame, since that text can be selected even though it is not editable. Line numbers, hunk buttons, scrollbars and menus keep their own pointer. One rule: wherever a drag can select text, the pointer is the I-beam.
+- **Radar: an Actions column** replaces the "review" text of a request row: a **Review** button (or **Start work** on a cloned issue), a globe button that opens the page in the browser and a button that opens the conversation, each with a hand pointer, a hover highlight and a tooltip with its key. When narrow, the words become glyphs before any other column goes. Every button keeps its key (`e`, `n`, `o`, `i`) and palette command.
+- The buttons of a review shown over the Radar (and of a conversation) now show the hand pointer like every other button.
+
+### Fixed
+- Radar: a double-click or `Enter` on a request whose repository is not cloned asks how to review it (through the API, or clone first) instead of saying to clone the repository first.
 
 ## [1.2.0] - 2026-11-23
 

@@ -1721,6 +1721,12 @@ column_repository = "リポジトリ"
 column_author = "作成者"
 column_title = "タイトル"
 column_age = "経過"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "{name}列（{width} セル）: [ 狭く、] 広く、0 リセット、Tab 次へ、Esc 完了"
 # context: {name} is a column name, {width} its width in terminal cells

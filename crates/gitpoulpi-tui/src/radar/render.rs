@@ -12,7 +12,7 @@ use ratatui::Frame;
 use gitpoulpi_i18n::msg;
 
 use super::labels::status_words;
-use super::model::{iso_to_unix, Group, Heading, Item, ItemKind, Row};
+use super::model::{iso_to_unix, Heading, Item, ItemKind, Row};
 use super::scope;
 use super::{heading_title, Cell, Hit, RadarUi};
 use crate::dialog_kit::{fill, put};
@@ -56,6 +56,10 @@ struct Geo {
     state: Option<(u16, usize)>,
     author: Option<(u16, usize)>,
     age: Option<(u16, usize)>,
+    /// The Actions column: where it starts, how wide, and whether it shows
+    /// glyphs only (narrow).
+    actions: Option<(u16, usize, bool)>,
+    spec: super::actions::Spec,
 }
 
 /// The widths one frame measures over every item.
@@ -69,7 +73,13 @@ struct Widths {
     author: usize,
     state: usize,
     age: usize,
+    actions: super::actions::Spec,
 }
+
+/// Cells the title keeps before the Actions column takes any.
+const TITLE_KEEP: usize = 8;
+/// Cells the title keeps to let the Actions column keep its words.
+const TITLE_KEEP_WORDS: usize = 24;
 
 impl Geo {
     fn new(body: Rect, w: Widths) -> Self {
@@ -90,15 +100,40 @@ impl Geo {
         // author, the state chip; dropped in that order when narrow.
         let edge = body.right().saturating_sub(1).saturating_sub(2);
         let room = edge.saturating_sub(x) as usize;
-        let mut tail: Vec<(u8, usize)> = Vec::new();
-        if room >= 48 && w.state > 0 {
-            tail.push((0, w.state));
+        // The columns after the title, each when there is room.
+        let others = |room: usize| -> Vec<(u8, usize)> {
+            let mut tail: Vec<(u8, usize)> = Vec::new();
+            if room >= 48 && w.state > 0 {
+                tail.push((0, w.state));
+            }
+            if room >= 60 && w.author > 0 {
+                tail.push((1, w.author));
+            }
+            if room >= 40 && w.age > 0 {
+                tail.push((2, w.age));
+            }
+            tail
+        };
+        // The Actions column goes last. The other columns keep what they had;
+        // it takes its words only from a roomy title, else shows glyphs, and
+        // only when even those do not fit does it cost the others their room.
+        let width_of = |t: &[(u8, usize)]| -> usize { t.iter().map(|(_, t)| t + 2).sum() };
+        let mut tail = others(room);
+        let mut actions = None;
+        if w.actions.any() {
+            let (full, icons) = (w.actions.width(false), w.actions.width(true));
+            let free = room.saturating_sub(width_of(&tail) + 1);
+            if free >= full + 2 + TITLE_KEEP_WORDS {
+                actions = Some((full, false));
+            } else if free >= icons + 2 + TITLE_KEEP {
+                actions = Some((icons, true));
+            } else if room >= icons + 2 + TITLE_KEEP {
+                tail = others(room.saturating_sub(icons + 2));
+                actions = Some((icons, true));
+            }
         }
-        if room >= 60 && w.author > 0 {
-            tail.push((1, w.author));
-        }
-        if room >= 40 && w.age > 0 {
-            tail.push((2, w.age));
+        if let Some((aw, _)) = actions {
+            tail.push((3, aw));
         }
         let tail_w: usize = tail.iter().map(|(_, t)| t + 2).sum();
         let mut geo = Geo {
@@ -113,6 +148,8 @@ impl Geo {
             state: None,
             author: None,
             age: None,
+            actions: None,
+            spec: w.actions,
         };
         let mut tx = edge.saturating_sub(tail_w as u16);
         for (kind, width) in tail {
@@ -120,7 +157,8 @@ impl Geo {
             match kind {
                 0 => geo.state = slot,
                 1 => geo.author = slot,
-                _ => geo.age = slot,
+                2 => geo.age = slot,
+                _ => geo.actions = actions.map(|(_, icons)| (tx, width, icons)),
             }
             tx += width as u16 + 2;
         }
@@ -228,7 +266,7 @@ impl RadarUi {
         let (Some(hit), Some(since)) = (self.hover, self.hover_since) else {
             return;
         };
-        let (Hit::Status(offset) | Hit::Cut(offset, _)) = hit else {
+        let (Hit::Status(offset) | Hit::Cut(offset, _) | Hit::Action(offset, _)) = hit else {
             return;
         };
         if blocked || since.elapsed() < crate::tooltip::DWELL {
@@ -241,6 +279,12 @@ impl RadarUi {
             return;
         };
         let words = match hit {
+            // A button: what it does and its key.
+            Hit::Action(_, slot) => super::actions::buttons(item)
+                .into_iter()
+                .find(|b| b.slot == slot)
+                .map(|b| vec![b.tip()])
+                .unwrap_or_default(),
             // A cut cell: its full text, wrapped to a readable width.
             Hit::Cut(_, cell) => {
                 let full = Self::cut_text(item, cell);
@@ -566,6 +610,7 @@ impl RadarUi {
             author: author_w,
             state: state_w,
             age: age_w,
+            actions: super::actions::Spec::of(self.board.items.iter()),
         };
         let geo = Geo::new(body, widths);
         let header_y = top - 1;
@@ -711,6 +756,9 @@ impl RadarUi {
         }
         if let Some((x, width)) = geo.age {
             title(buf, x, width, msg::radar::COLUMN_AGE.get());
+        }
+        if let Some((x, width, _)) = geo.actions {
+            title(buf, x, width, msg::radar::COLUMN_ACTIONS.get());
         }
     }
 
@@ -950,7 +998,43 @@ impl RadarUi {
                 self.hits.push((r, Hit::Cut(offset, Cell::Age)));
             }
         }
+        if let Some((ax, _, icons)) = geo.actions {
+            self.paint_actions(buf, y, (ax, icons, geo.spec), item, offset, hover);
+        }
         self.hits.push((band, Hit::Row(offset)));
+    }
+
+    /// The row's Actions buttons, each in its fixed cell of the column.
+    fn paint_actions(
+        &mut self,
+        buf: &mut Buffer,
+        y: u16,
+        (x, icons, spec): (u16, bool, super::actions::Spec),
+        item: &Item,
+        offset: usize,
+        hover: Option<Hit>,
+    ) {
+        let mine = super::actions::buttons(item);
+        let mut x = x;
+        for slot in spec.slots() {
+            let width = spec.slot_width(slot, icons);
+            if let Some(b) = mine.iter().find(|b| b.slot == slot) {
+                let hit = Hit::Action(offset, slot);
+                let text = b.text(icons);
+                // Centered in its cell, so a short word sits like the others.
+                let pad = width.saturating_sub(display_width(&text));
+                let r = put(
+                    buf,
+                    x + (pad / 2) as u16,
+                    y,
+                    &text,
+                    width as u16,
+                    button(hover == Some(hit)),
+                );
+                self.hits.push((r, hit));
+            }
+            x += width as u16 + 1;
+        }
     }
 
     fn paint_note(
@@ -1109,9 +1193,8 @@ fn state_chip(item: &Item) -> String {
     if item.kind != ItemKind::Pr {
         return String::new();
     }
-    if item.group == Group::NeedsReview {
-        msg::radar::STATE_REVIEW.get().to_string()
-    } else if item.draft {
+    // "review" is the Actions column's Review button now.
+    if item.draft {
         msg::radar::STATE_DRAFT.get().to_string()
     } else {
         String::new()

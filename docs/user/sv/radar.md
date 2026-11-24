@@ -17,7 +17,63 @@ stället (se ”Repositories med något att säga” nedan).
 ![Radar över två repositories: en fäst begäran, sedan Väntar på min granskning, Mina pull requests, Tilldelade mig, ärenden och pågående arbete](../images/radar.png)
 
 **Granska...** på en rad för en pull eller merge request (eller `e`) öppnar repositoryt med begärans granskning
-i appen ([Granska en pull request](review.md)).
+i appen ([Granska en pull request](review.md)). För en begäran i ett repository du klonat men aldrig länkat till värden
+länkas klonen först till begärans projekt (om den inte redan har en egen pull request-länk), så att granskningen startar i dess flik.
+
+### Kolumnen Åtgärder
+
+Längst till höger på en rad för en begäran eller ett ärende gör små knappar det en tangent gör på den valda raden (ett
+klick markerar raden och kör åtgärden; håll pekaren över en knapp för dess namn och tangent):
+
+```
+Bred:    #58  Round invoice totals  feature/login → main   alice   2d   Granska  [glob]  [prat]  ⊕  ×  ⇣  ⋮
+Smal:    #58  Round invoice totals  feature/login → main                 [gran]  [glob]  [prat]  ⋮
+Ärende:  #12  Crash on empty list                         bob     5h   Börja arbeta  [glob]  [prat]  ×  ⋮
+```
+
+| Knapp | Tangent | Palett |
+|---|---|---|
+| **Granska** (en begäran som väntar på din granskning; frågar hur när den inte är klonad) | `e` | `Radar: Granska begäran...` |
+| **Börja arbeta** (ett klonat ärende) | `n` | `Radar: Börja arbeta med ett ärende...` |
+| globen: öppna sidan på värden | `o` | `Radar: Öppna i webbläsaren` |
+| radsymbolen: öppna konversationen | `i` | `Radar: Öppna ärendekonversation` |
+| `»` **Markera som klar** (en begäran i utkast) | `y` | `Radar: Markera som klar` |
+| `⊕` **Merge** (en begäran) | `m` | `Radar: Merge begäran...` |
+| `×` **Stäng** (en begäran eller ett ärende) | `x` | `Radar: Stäng...` |
+| `⇣` **Klona** (en rad vars repository inte är klonat) | `g` | `Radar: Klona repository...` |
+
+En rad utan åtgärd lämnar sin cell tom, så att varje knapp stannar i samma kolumn på varje rad. När fönstret är
+smalt blir orden Granska och Börja arbeta symboler innan någon annan kolumn försvinner; knapparna Klar, Merge, Stäng och Klona
+lämnar kolumnen före titeln, men finns kvar i radmenyn (`⋮`, högerklick eller `Shift+F10`), där en åtgärd som
+inte kan köras är nedtonad med sitt skäl. Kolumnen är automatisk (den är inte en av de storleksändringsbara
+kolumnerna). Ett dubbelklick eller `Enter` på en begäran som inte är klonad frågar hur den ska granskas, som **Granska**.
+
+### Begärans grenar
+
+En begärans rad visar `källa → mål` efter titeln (`alice:feature/login → main` när källgrenen ligger i en fork).
+När utrymmet är kort kapas målet först (en ellips), titeln behåller det mesta av utrymmet, och i ett smalt fönster visas
+inte grenarna; kolumnen Åtgärder skjuts aldrig ut. Håll pekaren över en kapad text för hela den. En värd som
+inte angav grenarna visar ingenting där. En ärenderad anger sitt repository i samma bricka som en begärans rad (klonens
+mappnamn, eller `owner/name` när det inte är klonat).
+
+### Agera på värden
+
+**Merge**, **Stäng** och **Markera som klar** fungerar på GitHub, GitLab, Gitea och Forgejo (andra värdar gråar ut dem med ”Stöds inte
+av ...”; ärenden kan stängas på samma värdar).
+
+- **Merge** frågar först: rutan anger begäran, dess projekt och grenar, och erbjuder metoden (en merge-commit, squash
+  och rebase där värden har det; GitLab mergar eller squashar). Den avvisas med sitt skäl för ett utkast, en begäran som
+  har konflikter med sitt mål, eller kontroller som misslyckas; ett avslag från värden (ingen behörighet, en regel för grenen) visas på
+  statusraden.
+- **Stäng** frågar först och stänger utan att merga.
+- **Markera som klar** tar ett utkast ur utkaststatus (GitLab och Gitea: markören `Draft:` / `WIP:` försvinner ur titeln). Den frågar
+  inte: det går att ångra på värden.
+- **Klona** öppnar den vanliga Klona-dialogen på radens projekt (adressen är ifylld, mappväljaren är den vanliga). När
+  klonen finns placerar Radar raden på den nästa gång den läser remotes (öppna den igen eller Uppdatera), och Klona
+  säger sedan var klonen finns.
+
+Merge och Stäng ändrar värden och **kan inte ångras från GitPoulpi** (rutan säger det); öppna en stängd begäran igen på värden.
+Efter ett lyckat anrop efterfrågas listorna igen, så en mergad eller stängd rad försvinner och en klar förlorar sin `draft`-bricka.
 
 ## Öppna den
 
@@ -186,7 +242,7 @@ tangent och en palettmotsvarighet.
 
 | Åtgärd | Tangent | Palett |
 |---|---|---|
-| Öppna repository (dess flik öppnas, eller växlas till) | `Enter` / dubbelklick | `Radar: Öppna repository` |
+| Öppna repository (dess flik öppnas, eller växlas till; en begäran som inte är klonad frågar hur den ska granskas) | `Enter` / dubbelklick | `Radar: Öppna repository` |
 | Granska... (en begäran; en begäran som inte är klonad frågar hur) | `e` | `Radar: Granska begäran...` |
 | Granska en begäran via värdens API (ingen klon) | `a` i frågan | `Radar: Granska via API:et` |
 | Klona repositoryt, granska sedan begäran | `c` i frågan | `Radar: Klona och granska...` |

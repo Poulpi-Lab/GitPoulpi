@@ -518,15 +518,15 @@ merge_side_by_side_min_width = { git = "Merge-redigerare: sida vid sida från (k
 merge_side_by_side_min_width_help = { git = "Merge-redigeraren visar A och B sida vid sida när dess yta är minst så många kolumner bred (långa rader rullas i sidled med Shift+hjul eller Shift+piltangenter); smalare visas en sida i taget bakom flikar. 100 som standard; 40 är lägsta värde, 0 betyder alltid sida vid sida. Redigeraren döljer panelerna Refs och Status medan den är öppen, så den har oftast hela fönstret.", local = "Konfliktredigeraren visar A och B sida vid sida när dess yta är minst så många kolumner bred (långa rader rullas i sidled med Shift+hjul eller Shift+piltangenter); smalare visas en sida i taget bakom flikar. 100 som standard; 40 är lägsta värde, 0 betyder alltid sida vid sida. Redigeraren döljer panelerna Refs och Status medan den är öppen, så den har oftast hela fönstret." }
 diff_word_wrap = "Radbrytning"
 diff_word_wrap_help = "Bryter långa rader i diff-vyerna i stället för att kapa dem med ellips. Den inbyggda redigeraren och blame-vyn rullar i sidled och bryter inte. Även diff-vyns egen brytningsknapp."
-diff_intraline = "Highlight changed words"
-diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
+diff_intraline = "Markera ändrade ord"
+diff_intraline_help = "I en ändrad rad målas orden som skiljer sig från motsvarande borttagna eller tillagda rad med en starkare bakgrund, i alla {$diff}-vyer. Av ger en enda jämn nyans per rad. Finns också i kommandopaletten."
 
 [settings_ui]
 theme = "Tema"
 theme_help = "Färger för hela gränssnittet. När du går i listan förhandsvisas varje tema; Enter behåller det, Esc går tillbaka. System följer terminalen (dess ljusa eller mörka bakgrund, avläst en gång vid start; Mörkt om den inte går att avgöra). Dina egna temafiler i mappen themes/ i konfigurationen står sist."
 theme_system = "System (följer terminalen)"
 follow_theme = "Följ temat"
-graph_color_missing = "{name} (not found, using the theme's lanes)"
+graph_color_missing = "{name} (hittades inte, använder temats banor)"
 theme_swatches = "Färger"
 graph_lane_background = "Bakgrund för grafspår"
 graph_lane_background_help = { git = "Av: transparent, inget bakom spåren (standard). Row tint: ett svagt band i commitens spårfärg inom grafkolumnen, plus en tunn stapel i samma färg vid kolumnens högra kant. Ett lagrat spår läses som Row tint. Gäller när Inställningar stängs.", local = "Av: transparent, inget bakom spåren (standard). Row tint: ett svagt band i incheckningens spårfärg inom grafkolumnen, plus en tunn stapel i samma färg vid kolumnens högra kant. Ett lagrat spår läses som Row tint. Gäller när Inställningar stängs." }
@@ -1018,14 +1018,14 @@ cannot_drop = "{source} kan inte släppas på {target} på det sättet"
 history_scrolled = "historiken mellan dit och hit har rullat ut ur den laddade sidan"
 shares_no_history = "{source} delar ingen historik med målet"
 nothing_to_replay = "{source} har inget som målet saknar: inget att spela upp"
-move_tag_here = "Move {$tag} {name} here"
-move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
-merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
-merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
-moving_tag = "moving {$tag} {name} to {target}..."
-moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
-merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
-confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
+move_tag_here = "Flytta {$tag} {name} hit"
+move_tag_not_ff = "Flytta {$tag} {name} hit (inte en fast-forward: {name} skulle inte längre vara en förfader)"
+merge_tag_into = "{$Merge} {$tag} {name} i {branch}"
+merge_into_tag = "{$Merge} {branch} i {$tag} {name} och flytta {$tag} (sällsynt: lägger till en {$merge}-{$commit})"
+moving_tag = "flyttar {$tag} {name} till {target}..."
+moving_tag_remote = "flyttar {$tag} {name} till {target}... ({remotes} behåller den gamla positionen tills du {$push}ar)"
+merging_into_tag = "{$Merge} {branch} i {$tag} {name}..."
+confirm_move_not_ff = "Flytta {$tag} {name} till {target}? Inte en fast-forward: {name} skulle inte längre vara en förfader."
 
 [menu_inline]
 placeholder_branch = "ange grennamn"
@@ -1401,7 +1401,7 @@ stopped = "{label} stoppades innan det var klart"
 folder_gone = "{label}: mappen {path} finns inte längre på disken"
 unknown_variable = "{label}: okänd variabel {var} i kommandot"
 bad_command = "{label}: kommandot kan inte läsas: {error}"
-no_label = "no Open in entry is labelled \"{label}\""
+no_label = "ingen post för ”Öppna i” heter ”{label}”"
 program_not_found = "{label}: programmet {program} hittades inte (PATH kontrollerad)"
 could_not_start = "{label}: kunde inte starta {program}: {error}"
 no_entry = "ingen ”Öppna i”-post nummer {n}"
@@ -1734,11 +1734,11 @@ column_author = "Författare"
 column_title = "Titel"
 column_age = "Ålder"
 # context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
-column_actions = "Actions"
+column_actions = "Åtgärder"
 # context: short button on a Radar row: starts the review of the request; keep it to one word
-action_review = "Review"
+action_review = "Granska"
 # context: short button on a Radar row: starts work on the issue (creates its branch)
-action_start_work = "Start work"
+action_start_work = "Börja arbeta"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "Kolumnen {name} ({width} celler): [ smalare, ] bredare, 0 återställ, Tab nästa, Esc klart"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -1844,59 +1844,59 @@ status_unlinked = { one = "{n} inte länkat (bara pågående arbete)", other = "
 # context: menu label and tooltip of a Radar request: merges it on the host, after a confirmation
 act_merge = "{$Merge}..."
 # context: menu label and tooltip of a Radar request or issue: closes it on the host, after a confirmation
-act_close = "Close..."
+act_close = "Stäng..."
 # context: menu label and tooltip of a draft Radar request: takes it out of draft on the host
-act_ready = "Mark as ready"
+act_ready = "Markera som klar"
 # context: menu label and tooltip of a Radar row whose repository is not cloned: opens the Clone dialog
-act_clone = "Clone repository..."
+act_clone = "Klona repository..."
 # context: button of the Radar merge / close confirmation
-confirm_cancel = "Cancel"
+confirm_cancel = "Avbryt"
 # context: button of the Radar close confirmation
-confirm_close = "Close it"
+confirm_close = "Stäng den"
 # context: button of the Radar merge confirmation: a merge commit
-method_merge = "{$Merge} {$commit}"
+method_merge = "{$Merge}-{$commit}"
 # context: button of the Radar merge confirmation: squash the commits, then merge
-method_squash = "Squash and {$merge}"
+method_squash = "Squash och {$merge}"
 # context: button of the Radar merge confirmation: rebase the commits, then merge
-method_rebase = "{$Rebase} and {$merge}"
+method_rebase = "{$Rebase} och {$merge}"
 # context: title of the Radar merge confirmation; {label} is `!53` or `#12`
 merge_title = "{$Merge} {label}"
 # context: body of the Radar merge confirmation; {project} is `owner/name`, {branches} is `source → target`
-merge_body = "{title}\n{project}  {branches}\n\nThe host will {$merge} it with the method you pick. This changes the host and cannot be undone from GitPoulpi."
+merge_body = "{title}\n{project}  {branches}\n\nVärden gör en {$merge} med den metod du väljer. Det ändrar värden och kan inte ångras från GitPoulpi."
 # context: title of the Radar close confirmation; {label} is `!53` or `#12`
-close_title = "Close {label}"
+close_title = "Stäng {label}"
 # context: body of the Radar close confirmation for a request
-close_body = "{title}\n{project}  {branches}\n\nThe host closes it without a {$merge}. This changes the host and cannot be undone from GitPoulpi (reopen it there)."
+close_body = "{title}\n{project}  {branches}\n\nVärden stänger den utan {$merge}. Det ändrar värden och kan inte ångras från GitPoulpi (öppna den igen där)."
 # context: body of the Radar close confirmation for an issue
-close_issue_body = "{title}\n{project}\n\nThe host closes the issue. This changes the host and cannot be undone from GitPoulpi (reopen it there)."
+close_issue_body = "{title}\n{project}\n\nVärden stänger ärendet. Det ändrar värden och kan inte ångras från GitPoulpi (öppna det igen där)."
 # context: why a Radar host action is refused
-why_no_host = "This row has no host account to act on"
+why_no_host = "Raden har inget värdkonto att agera med"
 # context: why a Radar host action is refused; {host} is the provider name
-why_not_supported = "Not supported by {host}"
+why_not_supported = "Stöds inte av {host}"
 # context: why Radar Merge is refused
-why_merge_draft = "It is a draft: mark it as ready first"
+why_merge_draft = "Den är ett utkast: markera den som klar först"
 # context: why Radar Merge is refused; {target} is a branch
-why_merge_conflicts = "It conflicts with {target}"
+why_merge_conflicts = "Den har konflikter med {target}"
 # context: why Radar Merge is refused
-why_merge_checks = "Its checks are failing"
+why_merge_checks = "Dess kontroller misslyckas"
 # context: why Radar Mark as ready is refused
-why_not_draft = "It is not a draft"
+why_not_draft = "Den är inte ett utkast"
 # context: why Radar Clone is refused; {path} is a folder
-why_already_cloned = "Already cloned at {path}"
+why_already_cloned = "Redan klonad i {path}"
 # context: status line of the Radar
-msg_host_busy = "The host is still answering the last action"
+msg_host_busy = "Värden svarar fortfarande på den senaste åtgärden"
 # context: status line of the Radar while a host action runs
-msg_asking_host = "Asking the host..."
+msg_asking_host = "Frågar värden..."
 # context: status line of the Radar after a merge; {label} is `!53`
-msg_merged = "{label} {$merge}d on the host"
+msg_merged = "{$Merge} av {label} klar på värden"
 # context: status line of the Radar after a close
-msg_closed = "{label} closed on the host"
+msg_closed = "{label} stängd på värden"
 # context: status line of the Radar after Mark as ready
-msg_ready = "{label} is ready for review"
+msg_ready = "{label} är redo för granskning"
 # context: status line of the Radar when a host action failed
-msg_host_failed = "{label}: the host refused or failed: {why}"
+msg_host_failed = "{label}: värden vägrade eller misslyckades: {why}"
 # context: note under the Clone dialog opened from a Radar row
-msg_clone_note = "Cloning {project}. The Radar finds the clone the next time it opens."
+msg_clone_note = "Klonar {project}. Radar hittar klonen nästa gång den öppnas."
 
 [hosting_task]
 view_open = "Öppna"
@@ -2361,8 +2361,8 @@ pulling_from_all = { git = "pullar {branch} från {remotes}...", local = "pullar
 no_pull_remote = "{branch} har ingen remote att {$pull} från"
 
 [keymap_action]
-sequence_cancel = "Sequence: Cancel"
-sequence_continue = "Sequence: Continue"
+sequence_cancel = "Sekvens: Avbryt"
+sequence_continue = "Sekvens: Fortsätt"
 git_prefix_pull_all_branches = "{$Pull} alla grenar"
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
 global_commit_column = { git = "Visa eller dölj commit-kolumnen", local = "Visa eller dölj kolumnen med incheckningar" }
@@ -2414,7 +2414,7 @@ commit_column_reset_widths = "Återställ delarnas bredder"
 commit_column_fit = "Anpassa kolumnen efter innehållet"
 commit_column_fit_all = "Anpassa alla kolumner efter innehållet"
 log_pick_column = "Välj en kolumn att flytta eller ändra bredd på"
-log_filter_author = "Filter the Log by Author"
+log_filter_author = "Filtrera Log efter författare"
 log_columns_next = "Välj nästa kolumn"
 log_columns_prev = "Välj föregående kolumn"
 log_columns_move_left = "Flytta kolumnen åt vänster"
@@ -2524,13 +2524,13 @@ refs_mark_drop = "Markera som släppkälla"
 refs_drop_marked = "Släpp markerad ref här"
 log_toggle_file_mode = "Filer: sökväg eller träd"
 log_view_all_files = "Filer: visa alla filer"
-log_lfs_only = "Files: LFS Only"
+log_lfs_only = "Filer: Bara LFS"
 log_files_collapse_all = "Fäll ihop eller ut alla mappar"
 log_files_filter = "Filtrera de ändrade filerna"
 status_compose = { git = "Fokusera {$commit}-meddelandet", local = "Fokusera incheckningsmeddelandet" }
 status_toggle_file_mode = "Filer: sökväg eller träd"
 status_view_all_files = "Filer: visa alla filer"
-status_lfs_only = "Files: LFS Only"
+status_lfs_only = "Filer: Bara LFS"
 status_amend = "Växla amend"
 status_collapse_all = "Fäll ihop eller ut alla mappar"
 status_stage_toggle = "Stage eller unstage vald rad"
@@ -2706,7 +2706,7 @@ md_editor_ai = "Markdown-redigerare: Skriv med AI"
 
 [keymap_ctx]
 # context: key group of the user-defined sequences on the Settings keybindings page
-sequence = "User sequences"
+sequence = "Användarsekvenser"
 rewrite = "Omskrivningsvyn"
 history = "Vy Filhistorik"
 commit_column = { git = "Commit-kolumnen (när den har tangentbordet)", local = "Kolumnen med incheckningar (när den har tangentbordet)" }
@@ -2853,7 +2853,7 @@ open_agent_no_agent = "Den här profilen har ingen lokal agent att öppna."
 opened_agent = "öppnade agenten i {folder}: besvara dess frågor en gång, stäng den och försök sedan igen"
 opened_terminal_for_agent = "öppnade en terminal i {folder}: kör {command} där, besvara dess frågor en gång och stäng den sedan"
 open_agent_failed = "kunde inte öppna agenten: {why}"
-open_agent_unknown_profile = "no AI profile with the id {id}"
+open_agent_unknown_profile = "ingen AI-profil med id {id}"
 arg_inline_screen = "Ritar i den vanliga skärmen, så hela svaret förblir läsbart"
 model_default_no_flag = "(standard - ingen flagga)"
 agent_model_help = "Skriver rätt modellflagga för den här agenten i argumenten (till exempel --model haiku för Claude Code). Valfritt modellnamn kan skrivas."
@@ -3084,15 +3084,15 @@ title_hosting_base = "Grundprompt för svar"
 
 [palette]
 # context: palette row: cancel the running sequence
-sequence_cancel = "Sequence: Cancel"
+sequence_cancel = "Sekvens: Avbryt"
 # context: palette row: continue the paused sequence
-sequence_continue = "Sequence: Continue"
+sequence_continue = "Sekvens: Fortsätt"
 # context: why Sequence: Cancel is unavailable
-why_no_sequence_running = "no sequence is running"
+why_no_sequence_running = "ingen sekvens körs"
 # context: why Sequence: Continue is unavailable
-why_sequence_not_waiting = "the sequence is not waiting for you"
+why_sequence_not_waiting = "sekvensen väntar inte på dig"
 # context: palette row running a user-defined sequence; {name} is the sequence's own name
-sequence_run = "Sequence: {name}"
+sequence_run = "Sekvens: {name}"
 git_pull_all_branches = "Git: {$Pull} alla grenar"
 git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} alla grenar (fast-forward om möjligt)"
 git_pull_all_branches_fast_forward_only = "Git: {$Pull} alla grenar (bara fast-forward)"
@@ -3217,8 +3217,8 @@ navigation_focus_status_staged = "Navigering: Fokusera Status > Staged"
 navigation_cycle_focus_to_next_pane = "Navigering: Flytta fokus till nästa ruta"
 navigation_cycle_focus_to_previous_pane = "Navigering: Flytta fokus till föregående ruta"
 navigation_search_commits = { git = "Navigering: Sök commits...", local = "Navigering: Sök incheckningar..." }
-log_filter_by_author = "Log: Filter by Author..."
-log_clear_author_filter = "Log: Clear Author Filter"
+log_filter_by_author = "Log: Filtrera efter författare..."
+log_clear_author_filter = "Log: Rensa författarfilter"
 navigation_toggle_refs_pane_collapsed = "Navigering: Fäll ihop/ut Refs-rutan"
 navigation_toggle_status_pane_collapsed = "Navigering: Fäll ihop/ut Status-rutan"
 navigation_refs_pane_wider = "Navigering: Bredda Refs-rutan"
@@ -3282,7 +3282,7 @@ git_annotated_tag_at_selected_commit = { git = "Git: Annoterad tag vid vald comm
 refs_push_selected_tag_to_default_remote = { git = "Refs: Pusha vald tag till standard-remote", local = "Refs: Pusha vald tagg till standard-remote" }
 refs_delete_selected_tag_from_its_remote = { git = "Refs: Ta bort vald tag från dess remote...", local = "Refs: Ta bort vald tagg från dess remote..." }
 refs_annotate_selected_tag = { git = "Refs: Annotera vald tag...", local = "Refs: Annotera vald tagg..." }
-refs_move_selected_tag_to_selected_commit = "Refs: Move Selected {$Tag} to Selected {$Commit}..."
+refs_move_selected_tag_to_selected_commit = "Refs: Flytta vald {$Tag} till vald {$Commit}..."
 refs_toggle_hide_in_graph = "Refs: Växla dölj i grafen"
 refs_toggle_solo_on_selected_ref = "Refs: Växla solo för vald ref"
 refs_stop_soloing_clear_every_soloed_ref = "Refs: Sluta solo (rensa alla solo-refs)"
@@ -3463,8 +3463,8 @@ tab_open_in_file_manager = "Flik: Öppna i filhanteraren"
 tab_open_in_terminal = "Flik: Öppna i terminal"
 tab_open_in = "Flik: Öppna i..."
 tab_open_in_default = "Flik: Öppna i standard"
-tab_terminal_here = "Tab: Terminal Here"
-tab_open_ai_agent_here = "Tab: Open AI Agent Here"
+tab_terminal_here = "Flik: Terminal här"
+tab_open_ai_agent_here = "Flik: Öppna AI-agent här"
 tab_quit_and_cd_here = "Flik: Avsluta och cd hit"
 repository_clone = "Repository: Klona..."
 repository_next_tab = "Repository: Nästa flik"
@@ -3508,14 +3508,14 @@ diff_layout_split_before_and_after = "Diff: Layout Split (före och efter)"
 diff_toggle_hunks_only_whole_file_only_the_changes = "Diff: Växla bara hunks (hela filen / bara ändringarna)"
 files_toggle_path_tree = "Filer: Växla sökväg/träd"
 files_toggle_view_all_files = "Filer: Växla visa alla filer"
-files_toggle_lfs_only = "Files: Toggle LFS Only"
+files_toggle_lfs_only = "Filer: Växla bara LFS"
 files_open_menu = "Filer: Öppna menyn för raden eller markeringen"
 files_select_all = "Filer: Markera allt"
 files_clear_selection = "Filer: Rensa markeringen"
 files_toggle_selection = "Filer: Växla markeringen av aktuell rad"
 diff_toggle_word_wrap = "Diff: Växla radbrytning"
 view_toggle_minimap = "Vy: Växla minikarta"
-diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
+diff_toggle_intraline = "{$Diff}: Växla markering av ändrade ord"
 editor_toggle_follow_selection = "Redigerare: Växla följ markeringen"
 diff_toggle_whitespace_only_changes = "Diff: Växla ändringar som bara rör blanksteg"
 ai_generate_commit_message = { git = "AI: Generera commit-meddelande", local = "AI: Generera incheckningsmeddelande" }
@@ -3614,7 +3614,7 @@ why_no_uncommitted_changes_the_wip_row_appears_once = { git = "inga ocommittade 
 why_there_are_no_stashes = "det finns inga stashes"
 why_select_a_changed_file_in_the_commit_detail_pane = { git = "välj först en ändrad fil i commit-detaljrutan", local = "välj först en ändrad fil i incheckningsdetaljrutan" }
 why_this_repository_has_no_remote_add_one_first = "det här repositoryt har ingen remote - lägg till en först"
-why_this_repository_has_no_lfs_files = "this repository has no LFS files"
+why_this_repository_has_no_lfs_files = "repositoryt har inga LFS-filer"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a = { git = "öppna en fil från rutan {$unstaged_files} - en commits diff har inget index att stagea i", local = "öppna en fil från rutan {$unstaged_files} - en inchecknings diff har inget index att stagea i" }
 why_this_diff_is_the_staged_half_use_the_unstage = "den här diffen kommer från rutan {$staged_files}; använd kommandot Unstage"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a_2 = { git = "öppna en fil från rutan {$unstaged_files} - en commits diff har ingen ändring i arbetskatalogen att förkasta", local = "öppna en fil från rutan {$unstaged_files} - en inchecknings diff har ingen ändring i arbetskatalogen att förkasta" }
@@ -3631,7 +3631,7 @@ why_select_a_repository_in_the_list_first = "välj först ett repository i lista
 why_the_repository_management_tab_has_no_tab_menu_use = "fliken Repositoryhantering har ingen flikmeny - använd radmenyn (.)"
 why_the_repository_management_tab_has_no_folder = "fliken Repositoryhantering har ingen mapp - växla till en repositoryflik"
 why_ai_is_turned_off_settings_ai = "AI är avstängd (Inställningar > AI)"
-why_no_local_ai_agent = "no local AI agent is set up (Settings > AI)"
+why_no_local_ai_agent = "ingen lokal AI-agent är inställd (Inställningar > AI)"
 why_an_ai_request_is_already_running_esc_cancels_it = "en AI-förfrågan pågår redan - Esc avbryter den"
 why_no_uncommitted_changes = { git = "inga ocommittade ändringar", local = "inga oincheckade ändringar" }
 why_open_the_commit_composer_review_first_ai_split = { git = "öppna först commit-composerns granskning (AI: Dela upp ändringar i commits)", local = "öppna först incheckningscomposerns granskning (AI: Dela upp ändringar i incheckningar)" }
@@ -3802,13 +3802,13 @@ radar_review_api = "Radar: Granska via API:et"
 # context: command palette entry: opens the Clone dialog for the selected Radar request, then its review
 radar_clone_review = "Radar: Klona och granska..."
 # context: command palette entry: merges the selected Radar request on the host
-radar_merge = "Radar: {$Merge} Request..."
+radar_merge = "Radar: {$Merge} begäran..."
 # context: command palette entry: closes the selected Radar request or issue on the host
-radar_close = "Radar: Close..."
+radar_close = "Radar: Stäng..."
 # context: command palette entry: takes the selected Radar draft out of draft
-radar_ready = "Radar: Mark as Ready"
+radar_ready = "Radar: Markera som klar"
 # context: command palette entry: opens the Clone dialog for the selected Radar row
-radar_clone = "Radar: Clone Repository..."
+radar_clone = "Radar: Klona repository..."
 # context: command palette entry: toggles the Not cloned checkbox of the Radar
 radar_not_cloned = "Radar: Visa ej klonade begäranden"
 # context: command palette entry: toggles the Drafts checkbox of the Radar
@@ -3857,8 +3857,8 @@ rewrite_strip_exec = "Omskrivning: Ta bort körbehörigheten..."
 rewrite_file_encoding = "Omskrivning: Konvertera filernas teckenkodning..."
 # s22:end
 git_fetch_selected_tag = { git = "Git: Fetch vald tag", local = "Git: Hämta vald tagg" }
-git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
-git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
+git_use_remote_version_of_selected_tag = "Git: Använd remotens version av vald {$Tag}"
+git_force_push_selected_tag = "Git: Force-{$Push}a vald {$Tag} till dess remote"
 # s24:begin
 rewrite_fix_message_encoding = "Omskrivning: Rätta meddelandenas teckenkodning..."
 # s24:end
@@ -3889,12 +3889,12 @@ why_group_not_paused = "ingen gruppens {$push} väntar på konflikter"
 why_group_not_ready = "lös och avsluta konflikterna först"
 # context: palette: why a command is grayed out
 why_nothing_to_retry = "ingen remote misslyckades i den senaste gruppens {$push}"
-edit_undo_sequence = "Edit: Undo Whole Sequence"
-undo_history_undo_sequence = "Undo History: Undo Whole Sequence"
-sequence_repo_review = "Sequence: Review This Repository's Sequences"
-sequence_repo_trust = "Sequence: Trust This Repository's Sequences"
-sequence_repo_ignore = "Sequence: Ignore This Repository's Sequences"
-why_no_repo_sequences = "this repository has no sequences waiting for your trust"
+edit_undo_sequence = "Redigera: Ångra hela sekvensen"
+undo_history_undo_sequence = "Ångrahistorik: Ångra hela sekvensen"
+sequence_repo_review = "Sekvens: Granska detta repositorys sekvenser"
+sequence_repo_trust = "Sekvens: Lita på detta repositorys sekvenser"
+sequence_repo_ignore = "Sekvens: Ignorera detta repositorys sekvenser"
+why_no_repo_sequences = "repositoryt har inga sekvenser som väntar på ditt förtroende"
 
 [help_section]
 rewrite = "Skriv om historiken"
@@ -4051,7 +4051,7 @@ status_pane_working_3 = "fäll ihop/ut den aktiva delrutan"
 status_pane_working_4 = "stage/unstage vald fil, eller fäll ihop en mapprad (trädläge)"
 status_pane_working_5 = "växla fillistan mellan Sökväg (platt) och Träd (mappar)"
 status_pane_working_6 = { git = "växla Visa alla filer (Status-rutan / WIP-raden, eller en commits ändrade filer; palett: Filer: Växla sökväg/träd och Filer: Växla visa alla filer)", local = "växla Visa alla filer (Status-rutan / WIP-raden, eller en inchecknings ändrade filer; palett: Filer: Växla sökväg/träd och Filer: Växla visa alla filer)" }
-status_pane_working_lfs_only = "toggle LFS only: in a repository that has LFS files, the file lists show only those ({{log.lfs_only}} with the Log focused; palette: Files: Toggle LFS Only)"
+status_pane_working_lfs_only = "växla bara LFS: i ett repository med LFS-filer visar fillistorna bara dem ({{log.lfs_only}} med Log i fokus; palett: Filer: Växla bara LFS)"
 status_pane_working_7 = "fäll ihop alla mappar, eller fäll ut dem igen om några är hopfällda"
 status_pane_working_8 = "vald fils meny: Stage/Unstage, Förkasta ändringar (bekräftas), Kopiera filsökväg körs på riktigt; Filhistorik/Blame öppnar filen i mitten; resten listas nedtonade med vad de kräver"
 status_pane_working_9 = { git = "filtrera en commits ändrade filer efter namn (bara i en commits egen fillista, inte Status)", local = "filtrera en inchecknings ändrade filer efter namn (bara i en inchecknings egen fillista, inte Status)" }
@@ -4658,7 +4658,7 @@ theme_filter_all = "Alla"
 theme_filter_dark = "Mörka"
 theme_filter_light = "Ljusa"
 theme_filter_colored = "Färgade"
-theme_filter_custom = "Custom"
+theme_filter_custom = "Egna"
 change_language_title = "Byt språk ({shown}/{total})"
 no_matching_language = "(inget matchande språk)"
 change_graph_color_theme_title = "Byt färgtema för grafen ({shown}/{total})"
@@ -4692,7 +4692,7 @@ diff_error = "{$diff}-fel: {error}"
 mode_path = "Sökväg"
 mode_tree = "Träd"
 view_all_files = "Visa alla filer"
-lfs_only = "LFS only"
+lfs_only = "Bara LFS"
 filter_files = "Filtrera filer: "
 all_files = "Alla filer"
 changed_files = "Ändrade filer"
@@ -4709,7 +4709,7 @@ tree_view = "Trädvy{hint}"
 collapse_all = "Fäll ihop alla"
 expand_all = "Fäll ut alla"
 view_all_files = "Visa alla filer{key}"
-lfs_only = "LFS only{key}"
+lfs_only = "Bara LFS{key}"
 
 [autostash]
 reason_checkout = "checkouten"
@@ -4948,9 +4948,9 @@ redo_label_key = "Gör om {label} · {key}"
 nothing_to_undo_comment = "inget att ångra (en kommentar som publicerats på en värd kan inte ångras här: redigera eller ta bort den i stället)"
 tip_nothing_to_undo_comment = "Inget att ångra (en kommentar som publicerats på en värd kan inte ångras här: redigera eller ta bort den i stället)"
 # context: why a palette command is grayed; a sequence is a user-defined list of actions run together
-why_no_sequence = "the newest actions are not one sequence run"
+why_no_sequence = "de senaste åtgärderna är inte en sekvenskörning"
 # context: status line while a sequence run is being undone
-undoing_sequence = "undoing the sequence..."
+undoing_sequence = "ångrar sekvensen..."
 
 [status_pane]
 unstaged_title = "{$unstaged_files}"
@@ -5071,8 +5071,8 @@ staging_lines = { one = "stagear {n} rad i hunk {hunk}{spill}...", other = "stag
 unstaging_lines = { one = "unstagear {n} rad i hunk {hunk}{spill}...", other = "unstagear {n} rader i hunk {hunk}{spill}..." }
 minimap_on = "minikarta på"
 minimap_off = "minikarta av"
-intraline_on = "changed words highlighted"
-intraline_off = "changed words not highlighted"
+intraline_on = "ändrade ord markeras"
+intraline_off = "ändrade ord markeras inte"
 not_working_diff = { git = "staging gäller arbetskatalogen - öppna en fil från rutorna {$unstaged_files} eller {$staged_files}, inte från en commit", local = "staging gäller arbetskatalogen - öppna en fil från rutorna {$unstaged_files} eller {$staged_files}, inte från en incheckning" }
 not_working_diff_discard = { git = "förkastande gäller arbetskatalogen - öppna en fil från rutan {$unstaged_files}, inte från en commit", local = "förkastande gäller arbetskatalogen - öppna en fil från rutan {$unstaged_files}, inte från en incheckning" }
 discard_on_staged = "förkastande återställer unstaged ändringar - det här är rutan {$staged_files}: gör först unstage och förkasta sedan från rutan {$unstaged_files}"
@@ -5345,9 +5345,9 @@ fetched = { one = "hämtade {remote}: {n} ref uppdaterad", other = "hämtade {re
 fetched_all = { one = "hämtade alla remotes: {n} ref uppdaterad", other = "hämtade alla remotes: {n} refs uppdaterade" }
 branch_created_checkout_failed = "grenen {name} skapades men att checka ut den misslyckades: {error}"
 tag_annotated = "annoterade {$tag} {name}"
-tag_moved = "moved {$tag} {name} to {target}"
-tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
-tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
+tag_moved = "flyttade {$tag} {name} till {target}"
+tag_moved_remote = "flyttade {$tag} {name} till {target}; {remotes} har fortfarande den gamla positionen ({$push} för att uppdatera)"
+tag_merged = "{$merge} av {branch} i {$tag} {name} klar, nu vid {target}"
 tags_all_pushed = "varje {$tag} finns redan på {remote}"
 nothing_to_push = "inget att pusha till {remote}"
 pushed_refs = "pushade {refs} till {remote}"
@@ -5429,7 +5429,7 @@ reword_invalid_date = "ett datum är varken i råformat eller ISO 8601"
 rewrite_refused = "kan inte skriva om historiken: {reason}{detail}"
 push_rejected = "{remote} avvisade {$push} av {branch}: {reason}"
 push_non_fast_forward = { git = "remoten har commits som den här grenen saknar ({$pull} först, eller force {$push})", local = "remoten har incheckningar som den här grenen saknar ({$pull} först, eller force {$push})" }
-push_stale_lease = "remote-grenen har flyttats sedan senaste {$fetch}, så force {$push} avvisades"
+push_stale_lease = "grenen eller taggen på remote har flyttats sedan senaste {$fetch}, så force {$push} avvisades"
 not_fast_forward = "kan inte göra fast-forward: de har divergerat"
 reword_refused = { git = "kan inte ändra den här commiten: {reason}", local = "kan inte ändra den här incheckningen: {reason}" }
 reword_not_on_branch = { git = "commiten finns inte på aktuell gren (den är inte {$head} eller en förfader till {$head})", local = "incheckningen finns inte på aktuell gren (den är inte {$head} eller en förfader till {$head})" }
@@ -5579,10 +5579,10 @@ proposed_by = "Föreslagen av {client}"
 chip_propose = "{client} föreslår {what} - {accept} eller klicka: öppna, Esc: avfärda"
 chip_show = "{client} vill visa {what} - {accept} eller klicka: visa, Esc: avfärda"
 shown = "visat av {client}: {what} · {back} för att gå tillbaka"
-prop_sequence = "run sequence {name}"
-banner_sequence = "Proposed by {client}: {what} · {accept} runs · Esc dismisses"
-button_run = "Run"
-button_dismiss = "Dismiss"
+prop_sequence = "kör sekvensen {name}"
+banner_sequence = "Föreslagen av {client}: {what} · {accept} kör · Esc avvisar"
+button_run = "Kör"
+button_dismiss = "Avvisa"
 
 [rebase_ui]
 title_cherry_pick = "Interaktiv cherry-pick"
@@ -5882,7 +5882,7 @@ open_install_page = "Öppna installationssidan"
 undo_anyway = "Ångra ändå"
 start_over = "Börja om"
 redo_anyway = "Gör om ändå"
-move_tag = "Move"
+move_tag = "Flytta"
 
 [rebase_banner]
 skip = "Hoppa över"
@@ -5931,9 +5931,9 @@ temp_file = "temp-fil: {error}"
 
 [keymap_issue]
 # context: [keybindings.sequence] entry naming a sequence that does not exist; {name} is the slug
-unknown_sequence = "no sequence named '{name}'"
+unknown_sequence = "ingen sekvens heter ”{name}”"
 # context: more sequences than the keymap has slots for; {slug} is the sequence, {max} the limit
-sequence_limit = "sequence '{slug}' ignored: the limit of {max} sequences with a key per session is reached"
+sequence_limit = "sekvensen ”{slug}” ignoreras: gränsen på {max} sekvenser med tangent per session är nådd"
 unknown_action = "okänd åtgärd '{name}' i [{ctx}]"
 unknown_context = "okänd kontext '{ctx}'"
 not_rebindable = "kan inte ändras ännu"
@@ -6571,11 +6571,11 @@ hint_repo_auth = "Välj ett annat sätt att logga in för det här repositoryt u
 
 [failure_card]
 # context: title of the failure notification when a step of a user-defined sequence fails
-title_sequence = "Sequence stopped"
+title_sequence = "Sekvensen stoppades"
 # context: reason line of the failure notification when a sequence stopped
-summary_sequence = "A step of the sequence did not succeed, so the sequence stopped there. Earlier steps are kept."
+summary_sequence = "Ett steg i sekvensen lyckades inte, så sekvensen stannade där. Tidigare steg finns kvar."
 # context: next-step line of the failure notification when a sequence stopped
-hint_sequence = "Fix the cause, then run the sequence again; the steps that worked are not undone."
+hint_sequence = "Åtgärda orsaken och kör sedan sekvensen igen; de steg som fungerade ångras inte."
 title_clone = "Kloningen misslyckades"
 title_create = "Det gick inte att skapa repositoryt"
 title_hosting = "Begäran till värdtjänsten misslyckades"
@@ -6855,17 +6855,17 @@ refreshing = "uppdaterar..."
 # context: Undo history: key of the Undo whole sequence button, one letter
 key_undo_sequence = "x"
 # context: Undo history: button; undoes every entry of the sequence run at the top of the history, newest first
-btn_undo_sequence = "Undo whole sequence"
+btn_undo_sequence = "Ångra hela sekvensen"
 # context: confirm title; {name} is the name of a user-defined sequence of actions
-confirm_undo_sequence = "Undo the whole sequence \"{name}\"?"
+confirm_undo_sequence = "Ångra hela sekvensen ”{name}”?"
 # context: confirm warning under the list of actions of a sequence run; a sequence can act in a worktree (another repository)
-warning_sequence_scope = "Only this repository's journal is undone: steps done in another repository stay."
+warning_sequence_scope = "Bara detta repositorys journal ångras: steg som gjorts i ett annat repository finns kvar."
 # context: status line; {name} is the name of a user-defined sequence of actions
-done_undo_sequence = "undid the sequence \"{name}\""
+done_undo_sequence = "ångrade sekvensen ”{name}”"
 # context: status line; undoing a sequence stopped at one of its actions; {step}/{of} is its position in the sequence, {label} the action, {why} the reason, {left} how many actions stay done
-sequence_stopped = "undoing \"{name}\" stopped at step {step}/{of} ({label}): {why}. Actions left: {left}"
+sequence_stopped = "ångrandet av ”{name}” stannade vid steg {step}/{of} ({label}): {why}. Kvarvarande åtgärder: {left}"
 # context: detail line of a history row made by a sequence; {step}/{of} is its position in the sequence
-detail_sequence = "Made by the sequence \"{name}\", step {step}/{of}."
+detail_sequence = "Gjord av sekvensen ”{name}”, steg {step}/{of}."
 
 # Åtgärdsetiketter i ångrahistoriken (rader i en lista: korta, imperativ).
 [undo_label]
@@ -6918,8 +6918,8 @@ sparse_disable = "Stäng av delvis utcheckning"
 tag_create = "Skapa {$tag} {name}"
 tag_delete = "Ta bort {$tag} {name}"
 tag_annotate = "Annotera {$tag} {name}"
-tag_move = { git = "Move {$tag} {name}", local = "Move {$tag} {name}" }
-tag_merge_branch = "{$Merge} {branch} into {$tag} {name}"
+tag_move = { git = "Flytta {$tag} {name}", local = "Flytta {$tag} {name}" }
+tag_merge_branch = "{$Merge} {branch} i {$tag} {name}"
 fast_forward = { git = "Fast-forward {branch} till {target}", local = "Fast-forward {branch} till {target}" }
 reword = "{$Reword} {id}"
 fetch_as_branch = { git = "Fetch {remote_ref} som gren {branch}", local = "Hämta {remote_ref} som gren {branch}" }
@@ -7577,9 +7577,9 @@ hint_open_diff = "visa {$diff}"
 # context: footer hint after the Esc key
 hint_close = "stäng"
 # context: status line: the request that was under review is merged or closed; {caption} is like #12 Fix the thing
-resume_gone = "{caption} is no longer open: the review was not reopened"
+resume_gone = "{caption} är inte längre öppen: granskningen öppnades inte igen"
 # context: status line: the host did not answer when the review was reopened; {why} is the error
-resume_unreachable = "could not reopen {caption}: {why}"
+resume_unreachable = "kunde inte öppna {caption} igen: {why}"
 # >>> local_issues (slice L1)
 [local_issues]
 field_status = "Status"
@@ -9078,98 +9078,98 @@ res_filled = "Regler i omskrivningsvyn nu: {n}."
 
 [sequence_ai]
 # context: Settings > AI, the page of the action that drafts or changes an action sequence from a description
-title = "Sequence drafts"
-profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
-repo_profile_help = "The profile used in this repository to draft action sequences."
-action = "Sequence draft"
+title = "Sekvensutkast"
+profile_help = "Profilen GitPoulpi använder för att skriva ett utkast till en ny åtgärdssekvens, eller en ändring av en, utifrån din beskrivning. Den föreslår bara: du läser och sparar själv, och inget körs någonsin."
+repo_profile_help = "Profilen som används i detta repository för att skriva utkast till åtgärdssekvenser."
+action = "Sekvensutkast"
 # context: title of the dialog that creates a sequence from a description; the sparkle is added in code
-dlg_title_create = "Create a sequence with AI"
+dlg_title_create = "Skapa en sekvens med AI"
 # context: title of the dialog that changes the selected sequence from a description; the sparkle is added in code
-dlg_title_edit = "Edit a sequence with AI"
+dlg_title_edit = "Redigera en sekvens med AI"
 # context: label of the description field
-dlg_label_create = "Describe the sequence you want"
+dlg_label_create = "Beskriv sekvensen du vill ha"
 # context: label of the description field in edit mode; {name} is the sequence's name
-dlg_label_edit = "Describe how to change \"{name}\""
+dlg_label_edit = "Beskriv hur ”{name}” ska ändras"
 # context: placeholder of the description field
-dlg_example_create = "For example: {$stage} everything, write the message with the AI, {$commit}, then {$push}."
+dlg_example_create = "Till exempel: {$stage} allt, skriv meddelandet med AI, {$commit} och sedan {$push}."
 # context: placeholder of the description field in edit mode
-dlg_example_edit = "For example: {$fetch} first, and always ask before the {$push}."
+dlg_example_edit = "Till exempel: {$fetch} först, och fråga alltid före {$push}."
 # context: keys of the description field
-dlg_hint = "Enter adds a line. Ctrl+Enter sends. Esc closes."
+dlg_hint = "Enter lägger till en rad. Ctrl+Enter skickar. Esc stänger."
 # context: checkbox, off by default
-dlg_context = "Send context (remote names, AI profiles, Open in labels)"
+dlg_context = "Skicka sammanhang (remotenamn, AI-profiler, Öppna i-etiketter)"
 # context: under the unchecked box
-dlg_context_off = "Off: only your description is sent."
+dlg_context_off = "Av: bara din beskrivning skickas."
 # context: reassurance under the description
-dlg_footer = "The AI only proposes. Nothing is saved before you accept, and nothing is ever run."
+dlg_footer = "AI:n föreslår bara. Inget sparas innan du godkänner, och inget körs någonsin."
 # context: button; the sparkle is added in code
-dlg_send = "Send"
+dlg_send = "Skicka"
 # context: button
-dlg_cancel = "Cancel"
+dlg_cancel = "Avbryt"
 # context: why Send is unavailable
-dlg_need_text = "Describe what you want first."
+dlg_need_text = "Beskriv först vad du vill ha."
 # context: another AI request is running
-dlg_busy = "Another AI request is running."
+dlg_busy = "En annan AI-förfrågan pågår."
 # context: shown when the AI is off
-dlg_off = "Turn the AI on in Settings first."
+dlg_off = "Slå på AI i Inställningar först."
 # context: the window is too small for the dialog
-dlg_too_small = "Make the window larger to use this dialog."
+dlg_too_small = "Förstora fönstret för att använda den här dialogen."
 # context: the answer came after the dialog was closed
-dlg_closed = "The AI answered after the dialog was closed; nothing was written."
+dlg_closed = "AI:n svarade efter att dialogen stängts; inget skrevs."
 # context: what a copy from the description field is called in the confirmation
-dlg_copy_what = "the description"
+dlg_copy_what = "beskrivningen"
 # context: title of the proposal of a new sequence; the sparkle is added in code
-res_title_create = "Proposed sequence"
+res_title_create = "Föreslagen sekvens"
 # context: title of the proposed change to a sequence; the sparkle is added in code
-res_title_edit = "Proposed change"
+res_title_edit = "Föreslagen ändring"
 # context: heading over the steps; {n} is how many
-res_steps = "Steps ({n})"
+res_steps = "Steg ({n})"
 # context: heading over what the AI proposed but was refused
-res_left_out = "Left out"
+res_left_out = "Utelämnat"
 # context: a refused step; {n} its place, {what} its command, {reason} why
-res_left_step = "step {n} `{what}`: {reason}"
+res_left_step = "steg {n} `{what}`: {reason}"
 # context: a refused field; {what} its name, {reason} why
 res_left_item = "{what}: {reason}"
 # context: heading over the AI's remarks
-res_notes = "Notes from the AI"
+res_notes = "Anmärkningar från AI:n"
 # context: heading over the suggested shortcut; {key} is the key as the AI wrote it
-res_shortcut = "Suggested shortcut: {key}"
+res_shortcut = "Föreslagen genväg: {key}"
 # context: the suggested shortcut is not used by anything
-res_shortcut_free = "It is free. It is not set: use the Shortcut button after accepting."
+res_shortcut_free = "Den är ledig. Den är inte satt: använd knappen Genväg efter att du godkänt."
 # context: the suggested shortcut is used; {label} names its action
-res_shortcut_taken = "Already used by {label}. It is not set."
+res_shortcut_taken = "Används redan av {label}. Den är inte satt."
 # context: the suggested shortcut is not a single key
-res_shortcut_unusable = "Not a single key. Set the shortcut yourself with the Shortcut button."
+res_shortcut_unusable = "Inte en enda tangent. Ställ in genvägen själv med knappen Genväg."
 # context: the proposal equals the sequence
-res_no_change = "No change: the proposal is the same as the sequence."
+res_no_change = "Ingen ändring: förslaget är detsamma som sekvensen."
 # context: legend of the diff
-res_legend = "+ added   - removed   ~ changed"
+res_legend = "+ tillagt   - borttaget   ~ ändrat"
 # context: a step with no pause and no option, in a change line
-res_defaults = "defaults"
+res_defaults = "standard"
 # context: an empty field, in a change line
-res_none = "(none)"
+res_none = "(ingen)"
 # context: a changed field; {field} its name, {old} and {new} its values
-res_field_changed = "{field}: \"{old}\" -> \"{new}\""
+res_field_changed = "{field}: ”{old}” -> ”{new}”"
 # context: why Accept is unavailable; {reason} says why
-res_blocked = "Cannot accept: {reason}"
+res_blocked = "Kan inte godkänna: {reason}"
 # context: the proposal holds no usable step
-res_no_steps = "the proposal has no usable step"
+res_no_steps = "förslaget har inget användbart steg"
 # context: button that saves the proposal
-btn_accept = "Accept"
+btn_accept = "Godkänn"
 # context: button that saves the proposal and opens its steps
-btn_edit_first = "Edit before saving"
+btn_edit_first = "Redigera före sparande"
 # context: button that drops the proposal
-btn_reject = "Reject"
+btn_reject = "Avvisa"
 # context: button back to the description
-btn_back = "Back"
+btn_back = "Tillbaka"
 # context: status line; {name} is the new sequence
-accepted_create = "Sequence \"{name}\" added"
+accepted_create = "Sekvensen ”{name}” tillagd"
 # context: status line; {name} is the changed sequence
-accepted_edit = "Sequence \"{name}\" updated"
+accepted_edit = "Sekvensen ”{name}” uppdaterad"
 # context: question when Settings is closed with a proposal open
-close_body = "A sequence proposal from the AI is open. Closing Settings drops it; nothing was written."
+close_body = "Ett sekvensförslag från AI:n är öppet. Om du stänger Inställningar förkastas det; inget skrevs."
 # context: palette row; the sparkle is added in code
-palette_create = "Sequence: Create with AI..."
+palette_create = "Sekvens: Skapa med AI..."
 
 [rewrite_size]
 tab = "Storlek"
@@ -9221,15 +9221,15 @@ tip_both = "Här och på {remotes}, vid samma {$commit}."
 tip_differs = "Här och på {remotes}, men vid olika {$commits}: en {$push_noun} skulle avvisas."
 tip_fetch_note = "En {$fetch} tar tillbaka en {$tag} som bara har tagits bort här medan en remote fortfarande har den. En {$tag} som har tagits bort på remoten försvinner härifrån först med Auto-prune {$tags} (Inställningar)."
 fetch_tag = { git = "Fetch {name} från {remote}", local = "Hämta {name} från {remote}" }
-tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
-take_remote = "Use {name} from {remote}"
-force_push_tag = "{$Push} {name} to {remote} (force)"
-confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
-msg_taking_remote = "Using the remote's version of {name}..."
-msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
-msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
-msg_not_differing = "{name} does not differ from a remote"
-why_not_differing = "This {$tag} does not differ from a remote"
+tip_differs_actions = "Från menyn: använd remotens version här, eller force-{$push}a din (den frågar först)."
+take_remote = "Använd {name} från {remote}"
+force_push_tag = "{$Push} {name} till {remote} (force)"
+confirm_force_push = "Force-{$push}a {$tag} ”{name}” till {remote}? Den ersätter {$tag} på {remote} för alla som använder den. Avvisas om {remote} har flyttats sedan senaste {$fetch}. Ångra sätter tillbaka den gamla."
+msg_taking_remote = "Använder remotens version av {name}..."
+msg_took_remote = "{name} är nu {remote}s version. Ångra sätter tillbaka din."
+msg_force_pushed = "Force-pushade {name} till {remote}. Ångra sätter tillbaka den gamla."
+msg_not_differing = "{name} skiljer sig inte från någon remote"
+why_not_differing = "Denna {$tag} skiljer sig inte från någon remote"
 delete_tag_scope = "Ta bort {name}..."
 delete_tag_on_remote = "Ta bort {name} på {remote}..."
 dlg_title = "Ta bort {$tag}"
@@ -10604,9 +10604,9 @@ flavor_plain_text = "Ren text"
 # context: what was copied, named in the status line
 noun_text = "text"
 # context: status line: nothing selected and no entry
-why_no_text = "there is no text to copy here"
+why_no_text = "det finns ingen text att kopiera här"
 # context: command palette entry: copies the dragged text, else the selected entry
-palette_copy_text = "Conversation: Copy Text"
+palette_copy_text = "Konversation: Kopiera text"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
@@ -10656,195 +10656,195 @@ more = "och {n} till"
 
 [pane_hscroll]
 # context: keymap label of the key that scrolls the focused list pane (a Refs section, Unstaged, Staged, the changed files, the commit info lines) sideways
-key_left = "Scroll the Pane Left"
-key_right = "Scroll the Pane Right"
-pal_left = "View: Scroll the Pane Left"
-pal_right = "View: Scroll the Pane Right"
-nothing = "Nothing to scroll sideways here"
-help = "Scroll the pane sideways (also Shift+wheel, a horizontal wheel or the bar on its bottom border)"
-help_details = "Scroll the {$commit} details sideways (id, author, date and counts lines)"
+key_left = "Rulla panelen åt vänster"
+key_right = "Rulla panelen åt höger"
+pal_left = "Vy: Rulla panelen åt vänster"
+pal_right = "Vy: Rulla panelen åt höger"
+nothing = "Inget att rulla i sidled här"
+help = "Rulla panelen i sidled (även Shift+hjul, ett horisontellt hjul eller fältet på dess nedre kant)"
+help_details = "Rulla {$commit}-detaljerna i sidled (rader med id, författare, datum och antal)"
 
 [sequence_run]
 # context: the label of the run in the Jobs panel: sequence name, step number, step count, step name
-job_label = "Sequence {name} {k}/{n}: {step}"
+job_label = "Sekvens {name} {k}/{n}: {step}"
 # context: run strip text: sequence name, step k of n, step name
-strip_running = "{name} {k}/{n} \u00b7 {step}"
+strip_running = "{name} {k}/{n} · {step}"
 # context: run strip while a step waits to be started
-strip_next = "{name} {k}/{n} \u00b7 Next: {step}"
+strip_next = "{name} {k}/{n} · Nästa: {step}"
 # context: run strip after the AI wrote the commit message
-strip_review = "{name} {k}/{n} \u00b7 Review the message, then Continue"
+strip_review = "{name} {k}/{n} · Granska meddelandet och välj sedan Fortsätt"
 # context: run strip when the commit has no message yet
-strip_commit_message = "{name} {k}/{n} \u00b7 Write the message, then {$commit} or Continue"
+strip_commit_message = "{name} {k}/{n} · Skriv meddelandet och välj sedan {$commit} eller Fortsätt"
 # context: run strip while a dialog of the step is open
-strip_dialog = "{name} {k}/{n} \u00b7 Answer the dialog"
+strip_dialog = "{name} {k}/{n} · Svara i dialogen"
 # context: run strip when the push was rejected and its dialog is open
-strip_push_rejected = "{name} {k}/{n} \u00b7 {$Push} rejected: choose in the dialog"
+strip_push_rejected = "{name} {k}/{n} · {$Push} avvisades: välj i dialogen"
 # context: run strip while a dialog of the action waits for the person
-strip_user = "{name} {k}/{n} \u00b7 Choose in the dialog"
+strip_user = "{name} {k}/{n} · Välj i dialogen"
 # context: run strip when the window on screen is not the tab the step acts on; {tab} is a folder
-strip_waiting_tab = "{name} {k}/{n} \u00b7 waiting for tab {tab}"
+strip_waiting_tab = "{name} {k}/{n} · väntar på fliken {tab}"
 # context: run strip when a step failed
-strip_failed = "{name} stopped at step {k}/{n} ({step}): {error}"
+strip_failed = "{name} stannade vid steg {k}/{n} ({step}): {error}"
 # context: button of the run strip
-button_continue = "Continue"
+button_continue = "Fortsätt"
 # context: button of the run strip that switches to the tab the step acts on
-button_go_there = "Go there"
+button_go_there = "Gå dit"
 # context: button of the run strip that shows the failure
-button_details = "Details"
+button_details = "Detaljer"
 # context: status line after a sequence was canceled
-say_canceled = "{name} canceled after step {k}/{n} ({step}); earlier steps are kept"
+say_canceled = "{name} avbröts efter steg {k}/{n} ({step}); tidigare steg finns kvar"
 # context: status line when the step in flight cannot be stopped
-say_stopping = "Stopping after this step"
+say_stopping = "Stoppar efter detta steg"
 # context: status line when a step failed
-say_stopped = "Sequence {name} stopped at step {k}/{n} ({step}): {error}"
+say_stopped = "Sekvensen {name} stannade vid steg {k}/{n} ({step}): {error}"
 # context: status line when every step ran
-say_finished = "{name} finished"
+say_finished = "{name} är klar"
 # context: status line when a second sequence is started
-say_running = "{name} is running (step {k}/{n})"
+say_running = "{name} körs (steg {k}/{n})"
 # context: Activity Log entry for a failed step; {options} lists the step options
-log_failure = "Sequence {name}, step {k}/{n} {step} (options: {options}) failed: {error}"
+log_failure = "Sekvensen {name}, steg {k}/{n} {step} (alternativ: {options}) misslyckades: {error}"
 # context: Activity Log entry for a run cut short by quitting
-log_interrupted = "Sequence {name} was interrupted at step {k}/{n} ({step}) when GitPoulpi closed"
+log_interrupted = "Sekvensen {name} avbröts vid steg {k}/{n} ({step}) när GitPoulpi stängdes"
 # context: why a run was canceled; {tab} is a folder
-reason_tab_closed = "the tab {tab} was closed"
+reason_tab_closed = "fliken {tab} stängdes"
 # context: why a run failed; {tab} is a folder
-reason_tab_never = "the tab {tab} did not open"
+reason_tab_never = "fliken {tab} öppnades inte"
 # context: why a run was canceled
-reason_dialog_closed = "the dialog was closed"
+reason_dialog_closed = "dialogen stängdes"
 # context: a step cannot run now; {step} is its name, {reason} the palette's reason
-step_unavailable = "{step} is not available: {reason}"
+step_unavailable = "{step} är inte tillgängligt: {reason}"
 # context: a step names a command this build does not have
-step_unknown = "{step} is not a command of this build"
+step_unknown = "{step} är inget kommando i denna version"
 # context: a step with pause never lacks an option; {option} is its name
-step_needs_option = "{step} needs the option {option}"
+step_needs_option = "{step} behöver alternativet {option}"
 # context: a step could not start
-step_failed_start = "{step} did not start"
+step_failed_start = "{step} startade inte"
 # context: the sequence was removed or changed before it started
-def_gone = "the sequence {name} no longer exists"
+def_gone = "sekvensen {name} finns inte längre"
 # context: shorter run strip text when a step failed (the error text does not fit)
-strip_stopped = "{name} stopped at step {k}/{n} ({step})"
-repo_notice = { one = "This repository defines {n} sequence", other = "This repository defines {n} sequences" }
-repo_notice_changed = { one = "This repository's sequence changed", other = "This repository's {n} sequences changed" }
-repo_button_review = "Review"
-repo_button_trust = "Trust"
-repo_button_ignore = "Ignore"
-repo_review_title = "Sequences of this repository"
-repo_review_intro = "These sequences come from this repository's .gitpoulpi/sequences.toml. They run commands on your machine when you start them. Trust them only if you trust everyone who can change this repository."
+strip_stopped = "{name} stannade vid steg {k}/{n} ({step})"
+repo_notice = { one = "Detta repository definierar {n} sekvens", other = "Detta repository definierar {n} sekvenser" }
+repo_notice_changed = { one = "Detta repositorys sekvens har ändrats", other = "Detta repositorys {n} sekvenser har ändrats" }
+repo_button_review = "Granska"
+repo_button_trust = "Lita på"
+repo_button_ignore = "Ignorera"
+repo_review_title = "Sekvenser i detta repository"
+repo_review_intro = "Dessa sekvenser kommer från detta repositorys .gitpoulpi/sequences.toml. De kör kommandon på din dator när du startar dem. Lita bara på dem om du litar på alla som kan ändra detta repository."
 repo_review_sequence = "{name} ({id})"
 repo_review_step = "{n}. {step}"
-repo_review_pause_always = "pauses before it runs"
-repo_review_pause_never = "never pauses"
-repo_review_options = "options: {options}"
-repo_review_trust = "Trust"
+repo_review_pause_always = "pausar innan den körs"
+repo_review_pause_never = "pausar aldrig"
+repo_review_options = "alternativ: {options}"
+repo_review_trust = "Lita på"
 repo_key_trust = "t"
-repo_review_close = "Close"
+repo_review_close = "Stäng"
 repo_key_close = "c"
-say_repo_trusted = "Repository sequences trusted: {n}"
-say_repo_ignored = "Repository sequences ignored until the file changes"
-repo_review_too_long = "This list is longer than the window: enlarge the window to see all of it and trust it from here."
+say_repo_trusted = "Repositoryts sekvenser betrodda: {n}"
+say_repo_ignored = "Repositoryts sekvenser ignoreras tills filen ändras"
+repo_review_too_long = "Listan är längre än fönstret: förstora fönstret för att se allt och lita på den härifrån."
 
 [settings_sequences]
-section_title = "Sequences"
-list_title = "Sequences"
+section_title = "Sekvenser"
+list_title = "Sekvenser"
 # context: title of the list of one sequence's steps; {name} is the sequence's own name
-steps_title = "Steps of {name}"
-new_name = "New sequence"
-menu_empty = "Empty sequence"
+steps_title = "Steg i {name}"
+new_name = "Ny sekvens"
+menu_empty = "Tom sekvens"
 # context: Add menu row that inserts a preset; {name} is the preset's name
-menu_preset = "From preset ▸ {name}"
-menu_ai = "✦ Create with AI..."
-preset_backup = "Backup"
-preset_backup_desc = "{$Stage} everything, write the message with the AI, {$commit} and {$push}"
-preset_compose = "Compose and {$push}"
-preset_compose_desc = "Let the AI split the changes into {$commits}, then {$push}"
-preset_worktree = "Worktree and agent"
-preset_worktree_desc = "Create a worktree for the current branch and open the AI agent in it"
-group_installation = "This installation"
-group_machine = "All installations"
-group_repo = "This repository"
-no_sequences = "No sequences yet. Use Add to create one or to start from a preset."
+menu_preset = "Från förinställning ▸ {name}"
+menu_ai = "✦ Skapa med AI..."
+preset_backup = "Säkerhetskopia"
+preset_backup_desc = "{$Stage} allt, skriv meddelandet med AI, {$commit} och {$push}"
+preset_compose = "Komponera och {$push}"
+preset_compose_desc = "Låt AI dela upp ändringarna i {$commits} och {$push}a sedan"
+preset_worktree = "Worktree och agent"
+preset_worktree_desc = "Skapa en worktree för aktuell gren och öppna AI-agenten i den"
+group_installation = "Denna installation"
+group_machine = "Alla installationer"
+group_repo = "Detta repository"
+no_sequences = "Inga sekvenser än. Använd Lägg till för att skapa en eller börja från en förinställning."
 # context: heading over a sequence's rows; {i} is its place in the list, {n} the number of sequences
-editing = "Editing sequence {i}/{n}"
-name = "Name"
-name_help = "Shown in the command palette as \"Sequence: <name>\"."
+editing = "Redigerar sekvens {i}/{n}"
+name = "Namn"
+name_help = "Visas i kommandopaletten som ”Sekvens: <namn>”."
 id = "Id"
-id_help = "The short name used in config.toml, on the command line and as the shortcut's key: a-z, 0-9, _ and -. Renaming it moves the shortcut with it."
-description = "Description"
-description_help = "Optional, for yourself."
-scope = "Scope"
-scope_help = "Where the sequence is saved and who sees it. This installation: only this install of GitPoulpi. All installations: every install on this computer. This repository only: saved in .gitpoulpi/sequences.toml of the current repository, shared with whoever has it."
-scope_installation = "This installation"
-scope_machine = "All installations on this computer"
-scope_repo = "This repository only"
-shortcut = "Shortcut"
-shortcut_help = "The key that starts this sequence from anywhere in the window. Enter opens the key capture; conflicts are refused like on the Keyboard shortcuts page."
-shortcut_none = "Not set"
-shortcut_clear = "Clear"
-steps_row = "Steps"
+id_help = "Det korta namnet som används i config.toml, på kommandoraden och som genvägens nyckel: a-z, 0-9, _ och -. Om du byter namn flyttas genvägen med."
+description = "Beskrivning"
+description_help = "Valfri, för dig själv."
+scope = "Omfång"
+scope_help = "Var sekvensen sparas och vem som ser den. Denna installation: bara den här installationen av GitPoulpi. Alla installationer: varje installation på den här datorn. Bara detta repository: sparas i .gitpoulpi/sequences.toml i aktuellt repository och delas med alla som har det."
+scope_installation = "Denna installation"
+scope_machine = "Alla installationer på den här datorn"
+scope_repo = "Bara detta repository"
+shortcut = "Genväg"
+shortcut_help = "Tangenten som startar sekvensen var som helst i fönstret. Enter öppnar tangentinspelningen; konflikter avvisas som på sidan Tangentbord & mus."
+shortcut_none = "Inte satt"
+shortcut_clear = "Rensa"
+steps_row = "Steg"
 # context: button that opens a sequence's list of steps; {n} is how many it has
-steps_edit = "Edit steps ({n})"
-steps_none = "No steps yet"
-run_now = "Run now"
-run_now_help = "Runs the sequence in the current window."
-edit_ai = "✦ Edit with AI..."
-close_steps = "✕ Back to sequences"
+steps_edit = "Redigera steg ({n})"
+steps_none = "Inga steg än"
+run_now = "Kör nu"
+run_now_help = "Kör sekvensen i aktuellt fönster."
+edit_ai = "✦ Redigera med AI..."
+close_steps = "✕ Tillbaka till sekvenser"
 # context: heading over one step's rows; {i} its place, {n} the number of steps, {label} the command's palette name
-step_heading = "Step {i}/{n}: {label}"
-step_does = "What it does"
-pause = "Pause"
-pause_default = "Default"
-pause_always = "Always"
-pause_never = "Never"
-pause_help = "Default: the step stops only when it needs an answer, on its usual dialog. Always: stop before this step and ask to continue. Never: do not stop; the step's options must then give it everything it needs."
-pause_forced_help = "This step always asks before it runs, so Never is not offered."
-pause_unneeded_help = "This step never needs an answer; Always still stops before it."
-opt_name = "Name"
-opt_message = "Message"
-opt_branch = "Branch"
-opt_open_tab = "Open in a new tab"
-opt_label = "Open in entry"
-opt_profile = "AI profile"
+step_heading = "Steg {i}/{n}: {label}"
+step_does = "Vad det gör"
+pause = "Paus"
+pause_default = "Standard"
+pause_always = "Alltid"
+pause_never = "Aldrig"
+pause_help = "Standard: steget stannar bara när det behöver ett svar, i sin vanliga dialog. Alltid: stanna före detta steg och fråga om det ska fortsätta. Aldrig: stanna inte; stegets alternativ måste då ge det allt det behöver."
+pause_forced_help = "Detta steg frågar alltid före körning, så Aldrig erbjuds inte."
+pause_unneeded_help = "Detta steg behöver aldrig ett svar; Alltid stannar ändå före det."
+opt_name = "Namn"
+opt_message = "Meddelande"
+opt_branch = "Gren"
+opt_open_tab = "Öppna i en ny flik"
+opt_label = "Öppna i-post"
+opt_profile = "AI-profil"
 opt_remote = "Remote"
-opt_template_help = "Variables: ${{branch}} ${{date}} ${{time}} ${{n}}"
-opt_required_help = "Needed when Pause is Never."
-opt_unset = "(not set)"
+opt_template_help = "Variabler: ${{branch}} ${{date}} ${{time}} ${{n}}"
+opt_required_help = "Behövs när Paus är Aldrig."
+opt_unset = "(inte satt)"
 # context: shown for a step this version does not know; {run} is its command id
-unknown_step = "Unknown step \"{run}\": kept as it is"
-problems = "Problems"
+unknown_step = "Okänt steg ”{run}”: lämnas som det är"
+problems = "Problem"
 # context: a problem on a step; {n} is its place, {reason} says what is wrong
-step_problem = "Step {n}: {reason}"
-picker_title = "Add a step"
-picker_empty = "No step matches."
-picker_hint = "Type to filter, Enter adds, Esc closes"
-picker_unavailable_pending = "not available yet"
-picker_unavailable_build = "not built in this version"
-picker_unavailable_ai = "turn the AI on first"
-picker_unknown = "not offered by this version"
-saved = "Sequences saved"
-no_config_dir = "No configuration folder: nothing can be saved"
+step_problem = "Steg {n}: {reason}"
+picker_title = "Lägg till ett steg"
+picker_empty = "Inget steg matchar."
+picker_hint = "Skriv för att filtrera, Enter lägger till, Esc stänger"
+picker_unavailable_pending = "inte tillgängligt än"
+picker_unavailable_build = "inte inbyggt i den här versionen"
+picker_unavailable_ai = "slå på AI först"
+picker_unknown = "erbjuds inte av den här versionen"
+saved = "Sekvenser sparade"
+no_config_dir = "Ingen konfigurationsmapp: inget kan sparas"
 # context: refused edit of the id; {id} is what was typed
-id_invalid = "\"{id}\" is not a usable id: use a-z, 0-9, _ and -, starting with a letter or digit"
+id_invalid = "”{id}” är inte ett användbart id: använd a-z, 0-9, _ och -, och börja med en bokstav eller siffra"
 # context: refused edit of the id; {id} is the id already in use
-id_taken = "Another sequence already uses the id \"{id}\""
-no_repo = "This folder is not a repository: a repository sequence needs one"
+id_taken = "En annan sekvens använder redan id:t ”{id}”"
+no_repo = "Den här mappen är inte ett repository: en repositorysekvens kräver ett"
 # context: shown when a sequence cannot run; {reason} says why
-cannot_run = "Cannot run: {reason}"
+cannot_run = "Kan inte köra: {reason}"
 # context: a refused write; {error} is the reason
-write_failed = "Sequences: {error}"
-shortcut_repo_untrusted_help = "A repository sequence gets a shortcut once you trust this repository's sequences."
+write_failed = "Sekvenser: {error}"
+shortcut_repo_untrusted_help = "En repositorysekvens får en genväg när du litar på detta repositorys sekvenser."
 
 # The Log's author filter: the funnel in the Author header and its popup.
 [author_filter]
-title = "Filter by author"
-placeholder = "filter by author"
-clear = "Clear filter"
-empty = "No author matches"
-hint = "Enter toggle  Up/Down move  Esc close"
-tip_off = "Filter the Log by author"
-tip_on = "Author filter ({count}):"
-note_one = "Author: {name}"
-note_many = "Authors: {name} +{more}"
-status_on = "Author filter: {count} chosen"
-status_cleared = "Author filter cleared"
-status_none = "No author filter to clear"
-help = "Filter the Log by author: dims the other authors like a search does"
+title = "Filtrera efter författare"
+placeholder = "filtrera efter författare"
+clear = "Rensa filter"
+empty = "Ingen författare matchar"
+hint = "Enter växla  Upp/Ned flytta  Esc stäng"
+tip_off = "Filtrera Log efter författare"
+tip_on = "Författarfilter ({count}):"
+note_one = "Författare: {name}"
+note_many = "Författare: {name} +{more}"
+status_on = "Författarfilter: {count} valda"
+status_cleared = "Författarfilter rensat"
+status_none = "Inget författarfilter att rensa"
+help = "Filtrera Log efter författare: tonar ned övriga författare som en sökning"

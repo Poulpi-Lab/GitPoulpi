@@ -90,6 +90,28 @@ namn och e-postadresser och skriver `.mailmap`-rader åt dig, se
   commits...*): matchar hela commit-meddelandet, författarens namn och e-post,
   hashen och refnamnen. Det tonar ned det som inte matchar och behåller grafens
   form. `Enter` / `Shift+Enter` hoppar till nästa / föregående träff.
+- **Författarfilter** (tratten i rubriken **Författare**, `Shift+A` i Log,
+  eller palettens *Log: Filtrera efter författare...*): förfiltrerar Log efter
+  vem som skrivit commits. En popup hänger under rubriken med ett sökfält, en
+  rad **Rensa filter** (✕) och en rad per författare i den inlästa historiken:
+  en bricka med initialer (avataren, när `ui.avatars` inte är av), namnet och
+  e-postadressen nedtonad efter det, flest commits först och sedan efter namn.
+  Att skriva snävar in listan med palettens fuzzy-matchning; `Enter` eller ett
+  klick växlar den markerade författaren (en bock; välj så många du vill),
+  `Esc` eller ett klick utanför stänger popupen och behåller filtret. Filtret
+  beter sig precis som sökningen: de valda författarnas commits förblir
+  upplysta, varje annan rad tonas ned och grafen behåller sin form, inget tas
+  bort eller läses in igen. När sökfältet också är öppet gäller båda (en commit
+  måste vara av en vald författare **och** matcha texten), och `Enter` /
+  `Shift+Enter` stegar genom de träffarna. Medan filtret är på blir tratten ett
+  fyllt accent-`▼`, dess tooltip listar de valda författarna, och när
+  kolumnen Författare är dold eller för smal för tratten säger Logs övre kant
+  *Författare: Alice Example +1* i stället (tangenten och paletten fungerar
+  fortfarande). För att ta bort det: raden **Rensa filter**, ett högerklick på
+  den upplysta tratten eller palettens *Log: Rensa författarfilter*.
+  Författarna är de som hör till commits Log har läst in (mailmap tillämpad,
+  som i kolumnen), och filtret kommer ihåg per repository, över flikbyten och
+  omstarter. En textsökning kommer inte ihåg, filtret gör det.
 - **Refs-filter** (`/` i sidofältet): begränsar listorna över grenar, tags och
   remotes efter namn.
 - **Solo** (tangenten `o`, eller refens meny, på en ref, mapp eller remote):
@@ -118,6 +140,12 @@ posterna:
 | Byt namn på, Ta bort | Ta bort frågar först; en remote-tvilling kan också tas bort |
 | Kopiera grennamn, Kopiera länk till grenen på remote | Till urklipp |
 
+**Flytta en tag.** Dra en tag till en annan ref (se *Dra refs* i
+[Mus och gester](./mouse-and-gestures.md)) eller använd `Refs: Flytta vald Tag
+till vald Commit...`. Den behåller sin typ och annotering, bara din lokala tag
+flyttas (en remote behåller den gamla positionen tills du pushar), och ett
+ångrasteg sätter tillbaka den. CLI: `gitpoulpi tag move <namn> <mål> [--force-non-ff]`,
+`gitpoulpi tag merge-branch <namn> <gren> [-m <meddelande>]`.
 **Var en tag finns.** En tag kan finnas på den här datorn, på en remote eller på
 båda, och sidopanelens rader under TAGS (och tagens pill i Log) visar vilket med
 en markör efter namnet. Håll pekaren över en tag för samma sak i ord.
@@ -127,7 +155,7 @@ en markör efter namnet. Håll pekaren över en tag för samma sak i ord.
 | uppåtpil | Bara här: ingen remote har den. Dess meny erbjuder *Push* |
 | vänster-högerpil | Här och på en remote, på samma commit |
 | nedåtpil (raden dämpad) | Bara på en remote: finns inte i det här repositoryt (aldrig hämtad, eller borttagen här). Dess meny erbjuder *Fetch `<tag>` från `<remote>`* och *Ta bort `<tag>` på `<remote>`...*; `Git: Fetch vald tag` i paletten |
-| upp-ned-pil | Finns också på en remote, men på en annan commit (en push skulle avvisas) |
+| upp-ned-pil | Finns också på en remote, men på en annan commit (en vanlig push skulle avvisas). Dess meny har två rader per sådan remote: *Använd `<tag>` från `<remote>`* (den lokala taggen flyttas till remotens version, enligt senaste fetch, inget nätverk; en annoterad tag blir samma tagobjekt) och, i rött, *Push `<tag>` till `<remote>` (force)* (frågar först; med lease på det senaste fetch såg, så en remote som flyttats sedan dess avvisas med ”fetch first” och inget skrivs över). Var och en är en ångrapost. `Git: Använd remotens version av vald Tag` och `Git: Force-Push vald Tag till dess remote` i paletten (standardremoten när flera skiljer sig); CLI: `tag take-remote`, `tag force-push` |
 
 git sparar inga remote-spårande refs för tags, så GitPoulpi får veta vad varje
 remote har från din senaste **fetch** (vilken som helst, även den automatiska)

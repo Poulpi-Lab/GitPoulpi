@@ -20,6 +20,13 @@ hårdkodat: varje post är en etikett och ett kommando.
   direkt. Palett (`Ctrl+P`): `Flik: Öppna i...` och `Flik: Öppna i standard`.
   Palettkommandona fungerar även när titelraden inte har plats för knappen.
   Båda tangenterna går att binda om; se [Kortkommandon](keybindings.md).
+- **Via etikett**: ett steg `tab_open_in` i en [sekvens](config-reference.md#sequences) kör posten vars
+  **etikett** du anger (`label = "VS Code"`), så att en ändrad ordning i listan aldrig ändrar
+  vad som körs. En okänd etikett stoppar steget med ”ingen post för ”Öppna i” heter ...”.
+  `Flik: Terminal här` (paletten) öppnar din terminal i mappen, flikradens gamla
+  knapp ”Terminal här”.
+- **En AI-agent i mappen**: `Flik: Öppna AI-agent här` öppnar din terminal i
+  flikens mapp med en lokal AI-agent igång; se [AI](ai.md#öppna-agenten-i-en-flikens-mapp).
 - **Högerklicka på en repositoryflik**: flikmenyn har en undermeny **Öppna i**
   med samma poster.
 - Listan börjar på posten du använde senast i den här sessionen.

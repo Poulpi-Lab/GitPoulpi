@@ -29,7 +29,14 @@ de lokala ändringarna:
   `gitpoulpi diff` rapporterar `renamed_from`.
 - **Sökväg** eller **Träd** (`m`) listar filer platt eller i mappar. **Fäll
   ihop alla** (`z`) fäller ihop mapparna. **Visa alla filer** (`a`) visar hela
-  trädet i stället för bara de ändrade filerna. Högerklicka på listans tomma yta för
+  trädet i stället för bara de ändrade filerna. En hopfälld mapp visar efter sitt
+  namn en liten nedtonad siffra med antalet filer i den, undermappar inräknade
+  (`src/ (12)`); en öppen mapp visar ingen. I en smal ruta kortas namnet först så
+  att siffran förblir synlig. I ett repository med filer lagrade med Git LFS
+  begränsar en kryssruta **Bara LFS** (`o`, eller **Filer: Växla bara LFS**) varje
+  fillista (Unstaged, Staged, **Visa alla filer**, en commits filer) till de
+  filerna; mappsiffrorna följer med, och den erbjuds inte när ingen fil använder LFS.
+  Högerklicka på listans tomma yta för
   **Fäll ut alla** / **Fäll ihop alla**, på en mapprad för **Fäll ut alla undermappar** /
   **Fäll ihop alla undermappar**; tangenterna `=`, `-`, `*`, `_` (se
   [Mus och gester](mouse-and-gestures.md)).

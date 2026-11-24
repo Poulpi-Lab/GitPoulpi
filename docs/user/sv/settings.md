@@ -442,7 +442,7 @@ servern; se [MCP och agenter](mcp-and-agents.md).
 | **Inmatningsfärg**, **Egen inmatningsfärg** | Bakgrunden på textfält: **Följ temat** (standard), en fast mörk färg eller din egen `#rrggbb`. |
 | **Textmarkör** | `ui.text_cursor`: **terminal** (standard) placerar terminalens egen markör vid skrivpositionen i det fokuserade textfältet, som ett streck (din terminals markörinställningar gäller, och en inmatningsmetods kandidatfönster öppnas vid skrivpositionen); **drawn** ritar GitPoulpis egen markör och håller terminalmarkören dold. Gäller direkt. Paletten: `Inställningar: Textmarkör...`. |
 | **Färgdjup** | **auto** (standard), **truecolor**, **256** eller **16**. Se [Teman](themes.md). |
-| **Färgtema för grafen** | **Följ temat** (standard: temats egna spårfärger) eller valfri spårpalett. Varje palett visar några av sina färger. Det gäller när Inställningar stängs. Palettkommandot **App: Byt färgtema för grafen...** (`Ctrl+N Shift+T`) förhandsvisar varje palett live. |
+| **Färgtema för grafen** | **Följ temat** (standard: temats egna spårfärger) eller valfri spårpalett, även dina egna temafiler (efter förinställningarna). Varje palett visar några av sina färger; ett konfigurerat namn som inte längre finns markeras *hittades inte* och grafen använder temats banor. Det gäller när Inställningar stängs. Palettkommandot **App: Byt färgtema för grafen...** (`Ctrl+N Shift+T`) förhandsvisar varje palett live. |
 | **Bakgrund för grafspår** | **Av** (transparent) eller **Radfärg**: ett svagt band av spårfärgen bakom grafkolumnen, med en tunn list i kanten. |
 | **Styrka på radfärgning** | Hur blekt Radfärg-bandet är: **Stark**, **Medel** (standard) eller **Svag**. Kantlisten behåller sin fulla färg. |
 | **Verktygsfältets position** | `ui.toolbar_position`: Var verktygsfältet sitter: Överst, Nederst (standard), Vänster eller Höger. Vänster och Höger gör det till en kolumn bredvid panelerna; i ett fönster smalare än 80 kolumner ritas det nederst. Gäller direkt. |
@@ -456,6 +456,7 @@ servern; se [MCP och agenter](mcp-and-agents.md).
 
 ![Kombinationsrutan Färgtema för grafen: Följ temat, sedan varje spårpalett med några av sina färger](../images/settings-log-graph-lanes.png)
 
+Temat och grafens färger (temat, grafens färgtema, banornas färgläggning och bakgrund, radnyansens styrka) hör till varje installation: när flera installationer delar en `config.toml` ändrar en ändring i en av dem aldrig de andra. Bara den primära installationen skriver också de delade `ui.*`-nycklarna.
 ### Tangentbord & mus
 
 ![Sidan Tangentbord & mus: varje åtgärd per kontext med sina tangenter, en sökruta och filter](../images/settings-keyboard.png)
@@ -488,6 +489,21 @@ Tre alternativ finns på fliken **Allmänt**.
 | **Mus aktiverad** | Av lämnar musen och textmarkeringen åt din terminal. Kräver omstart. |
 | **Rader per musskroll** | Hur många rader ett hjulsteg flyttar i Log. Kräver omstart. |
 
+### Sekvenser
+
+**Inställningar > Sekvenser** redigerar dina namngivna [sekvenser](sequences.md):
+listor med palettkommandon som körs efter varandra, var och en en palettrad och
+bindbar till en tangent. Det är en [listsida](#listor) med ett enda ansikte:
+**+ Lägg till** erbjuder en tom sekvens och förinställningarna
+(**Säkerhetskopia**, **Komponera och push**, **Worktree och agent**), raderna är
+**Namn**, **Id**, en **Beskrivning**, **Omfång** (denna installation, alla
+installationer på den här datorn eller bara detta repository), en
+**Genväg**-knapp som öppnar inspelningspopupen från **Tangentbord & mus**,
+**Redigera steg** och **Kör nu**. **Redigera steg** växlar listan till
+sekvensens steg, vart och ett med en **Paus** (**Standard**, **Alltid**,
+**Aldrig**) och sina alternativ; **+ Lägg till** där öppnar en filtrerbar lista
+över kommandona ett steg kan vara. Varje ändring tillämpas direkt. Se
+[Sekvenser](sequences.md).
 ### Log & graf
 
 Hur commit-grafen ritas och hur många commits Log läser in. Grafens färger
@@ -526,6 +542,7 @@ finns på sidan **Utseende**.
 | **Radnummer** | Radnummerkolumnen i redigeraren och diffen. |
 | **Följ markeringen i redigeraren** | Medan redigeraren är öppen öppnas en annan fil som markeras i högerpanelen även i redigeraren, efter att du fått frågan om osparade ändringar ska sparas. En fil som inte kan redigeras öppnas i sin vanliga vy. Gäller bara arbetskatalogens ändringar: en fil som väljs från en commit lämnar redigeraren för den commitens diff. |
 | **Radbrytning** | Bryter långa diffrader. |
+| **Markera ändrade ord** | I en ändrad rad målas orden som skiljer sig från den borttagna eller tillagda rad den paras med i en starkare bakgrund, i Diff-vyn (Inline och Split), granskningens diff och commitens filer. På som standard (`ui.diff_intraline`); finns också som paletten **Diff: Växla markering av ändrade ord**. Se [Ändrade ord](interface-tour.md#ändrade-ord-i-en-diff). |
 | **Standardlayout**, **Bara hunks**, **Visa ändringar som bara rör blanksteg**, **Minikarta** | Diffvyns begynnelsetillstånd. Diffvyns fält ändrar och sparar dem. |
 | **Blame-annoteringar**, **Bredd på blame-annoteringar** | Vilken sida av Blame-vyn som har annoteringskolumnen (avatar, författare, ålder, sammanfattning): **right** (standard) eller **left**, och dess bredd i celler (24 till 90). Att dra kolumnens kant i Blame-vyn, eller tangenterna `>` / `<`, sparar bredden här (`ui.blame_side`, `ui.blame_width`). Se [Blame](log-and-history.md#blame). |
 | **Merge-redigerare: sida vid sida från (kolumner)** | Från den här bredden visar merge-redigeraren A och B sida vid sida. Standard 100, minst 40, `0` betyder alltid. Under den är A och B flikar. Se [Lösa merge-konflikter](merge-conflicts.md). |

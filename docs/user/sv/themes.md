@@ -207,7 +207,17 @@ Varje tema har sina egna spårfärger för Log-grafen, men du kan kombinera vilk
 tema som helst med vilken palett som helst: **Inställningar > Utseende >
 Färgtema för grafen** erbjuder **Följ temat** (standard) plus varje spårpalett
 från varje tema (GitPoulpi Dark, GitPoulpi Light, sedan Material,
-Serie, ... och `graph_palette` i dina egna temafiler).
+Serie, ... och `graph_palette` i dina egna temafiler, listade efter
+förinställningarna under temats namn). Ett eget tema visas nästa gång listan
+öppnas (filerna läses om då), och att välja ett lagrar dess filnamn i
+`ui.graph_color_theme` (för den primära installationen i `[ui]`, för de andra i
+deras egen post `[installation.settings.<id>]`, som temat). En temafil utan
+`graph_palette` har spårfärgerna från sin `base` (standardförinställningen när
+den inte anger någon), samma arv som för varje annan färg i filen. Ett eget tema
+med samma namn som en inbyggd spårpalett (till exempel `gruvbox`) ersätter den
+paletten i listan. Om det konfigurerade namnet inte längre finns (filen
+raderades eller bytte namn) använder grafen det aktiva temats spårfärger, och
+Inställningar visar namnet markerat *hittades inte* tills du väljer ett annat.
 
 ![Kombolistan Färgtema för grafen under Utseende: Följ temat, sedan varje spårpalett med några av sina färger](../images/settings-log-graph-lanes.png)
 
@@ -260,6 +270,17 @@ statusbar_fg = "#eceff4"
 add_bg = "#2f3b2f"
 ```
 
+### Ändrade ord i en diff (`diff.add_emph_bg`, `diff.del_emph_bg`)
+
+De starkare bakgrunder som Diff-vyn målar på orden som skiljer sig inuti en
+ändrad rad, över `diff.add_bg` (tillagda rader) och `diff.del_bg` (borttagna
+rader); texten behåller `diff.add_fg` och `diff.del_fg`. Varje förinställning
+sätter båda. En temafil som sätter `diff.add_bg` eller `diff.del_bg` men inte
+motsvarande betoning får en härledd från den (30 % av vägen mot textfärgen för
+den sidan), så en egen bakgrund aldrig hamnar med bastemats betoning. Värdet
+`default` (förinställningen Terminal), eller en terminal vars färgdjup skulle
+rita båda bakgrunderna lika, markerar i stället orden med fetstil och
+understrykning. Se [Ändrade ord i en diff](interface-tour.md#ändrade-ord-i-en-diff).
 Färger är `"#rrggbb"`, `"ansi:N"` (terminalens palettpost N) eller
 `"default"` (terminalens egen färg). Grupper och nycklar är de som
 `gitpoulpi theme export <slug>` ger. Inget är ödesdigert: en okänd nyckel eller
@@ -320,6 +341,7 @@ gammal multiplexer. Förinställningen Terminal behöver inget av detta. Truecol
 kostar ingenting; mappningspasset körs över skärmen en gång per bildruta, och
 bara när det är aktivt.
 
+Temat gäller per installation: flera GitPoulpi-installationer som delar en konfiguration behåller var sitt, så att välja ett i en installation aldrig färgar om de andra.
 ## Live-förhandsvisning
 
 Under Inställningar > Utseende listar kombolistan Tema **System (följer
@@ -341,14 +363,17 @@ temat direkt, **Enter** tillämpar det och sparar `ui.theme` i `config.toml`,
 sparar ingenting.
 
 Under filterfältet snävar ett segmenterat förfilter in listan: **Alla**,
-**Mörka**, **Ljusa** och **Färgade** (klicka på ett segment, `Tab` /
-`Shift+Tab`, eller `Alt+1`..`Alt+4`). Mörka och Ljusa kommer från ljusstyrkan i
+**Mörka**, **Ljusa** och **Färgade**, plus **Egna** när du har egna temafiler
+(klicka på ett segment, `Tab` / `Shift+Tab`, eller `Alt+1`..`Alt+5`). Mörka och Ljusa kommer från ljusstyrkan i
 temats `ui.bg`; **Färgade** behåller teman vars bakgrund är tydligt tintad
 (blå, violett, gul, grön...) och utelämnar vitt, benvitt, svart och nästan
 svarta gråtoner, så Solarized Dark, Dracula eller Nord är färgade medan GitHub
 Dark och One Light inte är det. Ett färgat tema visas också under Mörka eller
 Ljusa. **System** och transparenta teman (utan egen bakgrund) visas bara under
-Alla. Förfiltret kombineras med det du skriver. Väljarna för färgtema för grafen
+Alla. **Egna** behåller bara temafilerna i din mapp `themes/` (ett eget tema
+är fortfarande Mörkt, Ljust eller Färgat för de knapparna); knappen ritas inte
+och går inte att nå med tangenter medan den mappen inte innehåller något tema.
+Förfiltret kombineras med det du skriver. Väljarna för färgtema för grafen
 och språk förhandsvisar på samma sätt: Logs spår och hela gränssnittet ändras
 när markeringen flyttas.
 

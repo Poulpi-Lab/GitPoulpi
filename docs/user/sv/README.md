@@ -39,6 +39,7 @@ läsordning: börja överst och hoppa till referenssidorna när du behöver dem.
 | Ha ärenden som Markdown-anteckningar, utan token | [Lokala ärenden och Obsidian](local-issues.md) | Avsnittet ÄRENDEN, leverantören `Local Markdown - <namn>`; paletten **Lokala ärenden: Öppna i Obsidian...** |
 | Skriva om författare, datum, meddelanden eller filer över många commits | [Skriva om historiken](history-rewrite.md) | `Ctrl+G Shift+H`; paletten **Omskrivning: Öppna omskrivningsvyn** |
 | Ångra (eller göra om) en åtgärd | [Ångra och gör om](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`; `Alt+Z` öppnar ångrahistoriken; paletten **Redigera: Ångra** |
+| Köra flera åtgärder med en tangent (stage, AI-meddelande, commit, push...) | [Sekvenser](sequences.md) | Inställningar > Sekvenser; paletten **Sekvens: <namn>** |
 | Spåra stora filer med Git LFS | [Git LFS](lfs.md) | Paletten **LFS: Spåra mönster...**, **LFS: Initiera för det här repositoryt** |
 | Hitta en gren, commit, pull request eller ett ärende över flera repositories | [Sökning](search.md) | `Ctrl+Alt+F`, eller knappen Global sökning i titelraden; `f` söker i commit-grafen för det aktuella repositoryt |
 | Se allt som behöver mig i en enda lista | [Radar](radar.md) | `Alt+R`; paletten **Radar: Öppna** |

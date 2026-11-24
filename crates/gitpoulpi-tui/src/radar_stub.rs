@@ -12,7 +12,7 @@ use crossterm::event::{KeyEvent, MouseEvent};
 use ratatui::layout::Rect;
 
 pub(crate) use vocab::{
-    Act, CloneRequest, ColumnCmd, ConversationRequest, Outcome, RadarCommand, ReviewRequest, Spot,
+    Act, ColumnCmd, ConversationRequest, Outcome, RadarCommand, ReviewRequest, Spot,
 };
 
 /// Never open in this build.

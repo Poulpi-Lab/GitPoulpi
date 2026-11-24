@@ -255,10 +255,11 @@ fn mark_as_ready_takes_a_draft_out_of_draft() {
     s.term.send_keys("y").expect("y");
     s.term
         .wait_for("the chip gone", STEP, |s| {
-            s.contains(RUNBOOK)
-                && !s
-                    .find(RUNBOOK)
-                    .is_some_and(|(_, row)| s.line(row).contains("draft"))
+            // The list row (the status line names the request too).
+            s.find_all(RUNBOOK)
+                .into_iter()
+                .map(|(_, row)| s.line(row))
+                .any(|l| l.contains('\u{21C4}') && !l.contains("draft"))
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(s.mock.saw("PUT", "/merge_requests/6"));

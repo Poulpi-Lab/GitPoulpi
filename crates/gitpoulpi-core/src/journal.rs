@@ -16,8 +16,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::{
     short, short_opt, ConflictEntry, Direction, EntrySource, EntryState, EntrySummary, HeadState,
-    JournalState, ListedEntry, Oid, OperationKind, PathHash, RefSnapshot, RefUpdate, Snapshot,
-    UndoRefusal, UNDO_PIN_PREFIX,
+    JournalState, ListedEntry, Oid, OperationKind, PathHash, RefSnapshot, RefUpdate, SequenceGroup,
+    SequenceMember, SequenceOrigin, Snapshot, UndoRefusal, UNDO_PIN_PREFIX,
 };
 
 /// The undo depth when nothing is configured (`general.undo_depth`).
@@ -222,6 +222,10 @@ pub struct JournalEntry {
     /// delete, alone or together with its local twin).
     #[serde(default)]
     pub remote_refs: Vec<RemoteRefChange>,
+    /// Set when a sequence run made the operation (the request's `origin`
+    /// argument). Old journals have none.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<SequenceOrigin>,
 }
 
 impl JournalEntry {
@@ -232,6 +236,7 @@ impl JournalEntry {
             label: self.label.clone(),
             at: self.at,
             state: self.state,
+            origin: self.origin.clone().map(Box::new),
         }
     }
 
@@ -720,6 +725,7 @@ impl Journal {
             opstate: None,
             outside: None,
             remote_refs: Vec::new(),
+            origin: None,
         });
         id
     }
@@ -768,6 +774,7 @@ impl Journal {
                 committer: change.committer.clone(),
             }),
             remote_refs: Vec::new(),
+            origin: None,
         });
         self.retired.append(&mut self.redo);
         let mut dropped = Vec::new();
@@ -1214,7 +1221,35 @@ impl Journal {
             disabled: false,
             undo_count: self.undo.len(),
             redo_count: self.redo.len(),
+            sequence: self.sequence_group().map(Box::new),
         }
+    }
+
+    /// The consecutive newest undo entries of one sequence run, or `None`
+    /// when the newest entry is not part of one. A change made outside, a
+    /// manual operation or another run between two entries ends the group.
+    pub fn sequence_group(&self) -> Option<SequenceGroup> {
+        let top = self.undo.last()?.origin.as_ref()?;
+        let entries: Vec<SequenceMember> = self
+            .undo
+            .iter()
+            .rev()
+            .map_while(|e| {
+                let o = e.origin.as_ref().filter(|o| o.run_id == top.run_id)?;
+                Some(SequenceMember {
+                    id: e.id,
+                    kind: e.kind,
+                    step: o.step,
+                    label: e.label.clone(),
+                })
+            })
+            .collect();
+        Some(SequenceGroup {
+            name: top.name.clone(),
+            run_id: top.run_id,
+            of: top.of,
+            entries,
+        })
     }
 }
 

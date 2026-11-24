@@ -939,6 +939,7 @@ die Standardtasten.
 | Bearbeiten: Reflog... |  |
 | Bearbeiten: Verlorene Commits wiederfinden... |  |
 | Bearbeiten: Branch dorthin zurücksetzen, wo die blockierte Aktion ihn gelassen hat | `Alt+Shift+Z` |
+| Edit: Undo Whole Sequence |  |
 | Review: Übersicht zeigen |  |
 | Review: Dateien zeigen |  |
 | Review: Commits zeigen |  |
@@ -1032,6 +1033,7 @@ die Standardtasten.
 | Review: ✦ Entwurf verwerfen | `N` |
 | Rückgängig-Verlauf: Bis hierher rückgängig... | `u` |
 | Rückgängig-Verlauf: Bis hierher wiederholen... | `y` |
+| Undo History: Undo Whole Sequence | `x` |
 | Rückgängig-Verlauf: Nur diese wiederherstellen... | `r` |
 | Rückgängig-Verlauf: Branch dorthin zurücksetzen, wo er war... | `o` |
 | Rückgängig-Verlauf: Aktualisieren |  |

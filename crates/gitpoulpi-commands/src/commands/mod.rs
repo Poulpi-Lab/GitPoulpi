@@ -1244,9 +1244,12 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
             all,
             expect,
             yes,
+            sequence,
         } => {
             if list {
                 journal_listing(session, all).await
+            } else if sequence {
+                undo::undo_sequence(session, dry_run, yes).await
             } else {
                 undo_or_redo(session, OperationKind::Undo, dry_run, expect, yes).await
             }

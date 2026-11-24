@@ -942,6 +942,7 @@ As teclas são as predefinidas.
 | Editar: Reflog... |  |
 | Editar: recuperar commits perdidos... |  |
 | Editar: restaurar a branch para onde a ação bloqueada a deixou | `Alt+Shift+Z` |
+| Edit: Undo Whole Sequence |  |
 | Revisão: mostrar resumo |  |
 | Revisão: mostrar ficheiros |  |
 | Revisão: mostrar commits |  |
@@ -1035,6 +1036,7 @@ As teclas são as predefinidas.
 | Revisão: descartar o rascunho ✦ | `N` |
 | Histórico de desfazer: desfazer até aqui... | `u` |
 | Histórico de desfazer: refazer até aqui... | `y` |
+| Undo History: Undo Whole Sequence | `x` |
 | Histórico de desfazer: restaurar só esta... | `r` |
 | Histórico de desfazer: restaurar a branch para onde estava... | `o` |
 | Histórico de desfazer: atualizar |  |

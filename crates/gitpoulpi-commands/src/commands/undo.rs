@@ -101,6 +101,120 @@ async fn run(
     }
 }
 
+/// `undo --sequence`: the newest entries of one sequence run, undone newest
+/// first with one ordinary `Undo` each (`expect` pins the entry, so another
+/// client's operation in between is refused as stale, never undone). The
+/// first refusal (exit 2) or entry that needs `--yes` (exit 3) stops it and
+/// says which step; what was undone stays undone, the rest stays in the
+/// journal. A run that also acted in another repository (a worktree) is
+/// undone here only as far as this repository's journal goes.
+pub(super) async fn undo_sequence(
+    session: &mut Session,
+    dry_run: bool,
+    confirmed: bool,
+) -> Result<Emitted, String> {
+    let state: gitpoulpi_core::domain::JournalState =
+        session.call(OperationKind::JournalState, json!({})).await?;
+    let Some(group) = state.sequence.map(|g| *g) else {
+        let message = "the newest journal entries are not one sequence run".to_string();
+        return Ok(Emitted {
+            json: json!({ "no_sequence": { "message": message } }),
+            human: message,
+            exit_code: 2,
+        });
+    };
+    let sequence = json!({ "name": group.name, "run_id": group.run_id, "of": group.of });
+    let scope = "Only this repository's journal is undone: steps done in another repository \
+                 (a worktree) stay.";
+    if dry_run {
+        let mut human = format!(
+            "would undo the sequence \"{}\" ({} entries, newest first):",
+            group.name,
+            group.entries.len()
+        );
+        for e in &group.entries {
+            human.push_str(&format!("\n  - step {}/{}: {}", e.step, group.of, e.label));
+        }
+        human.push_str(&format!("\n{scope}"));
+        return Ok(emitted(
+            json!({ "sequence": sequence, "applied": false, "entries": group.entries, "note": scope }),
+            human,
+        ));
+    }
+    let mut undone: Vec<UndoOutcome> = Vec::new();
+    for (at, member) in group.entries.iter().enumerate() {
+        let left = &group.entries[at..];
+        let answer = session
+            .call_typed::<UndoOutcome>(
+                OperationKind::Undo,
+                json!({ "expect": member.id, "dry_run": false, "confirmed": confirmed }),
+            )
+            .await?;
+        let e = match answer {
+            Ok(outcome) => {
+                undone.push(outcome);
+                continue;
+            }
+            Err(e) => e,
+        };
+        let at_step = format!(
+            "step {}/{} ({}) of \"{}\"",
+            member.step, group.of, member.label, group.name
+        );
+        let (key, detail, exit_code) = match e.kind {
+            Some(TypedError::UndoRefused(reason)) => {
+                let message = reason.message();
+                (
+                    "refused",
+                    json!({ "reason": reason, "message": message }),
+                    2,
+                )
+            }
+            Some(TypedError::NeedsConfirmation(prompt)) => {
+                ("needs_confirmation", json!({ "prompt": prompt }), 3)
+            }
+            _ => ("error", json!({ "message": e.message }), 1),
+        };
+        let why = detail["message"]
+            .as_str()
+            .or_else(|| detail["prompt"].as_str())
+            .unwrap_or_default()
+            .to_string();
+        let mut human = format!("stopped at {at_step}: {why}");
+        if exit_code == 3 {
+            human.push_str("\nNothing more was changed; repeat with --yes to go ahead.");
+        }
+        human.push_str(&format!(
+            "\nundone so far: {}; left in the journal: {}",
+            undone.len(),
+            left.len()
+        ));
+        let mut stopped = json!({ "id": member.id, "step": member.step, "label": member.label });
+        stopped[key] = detail;
+        return Ok(Emitted {
+            json: json!({
+                "sequence": sequence, "applied": !undone.is_empty(), "undone": undone,
+                "stopped": stopped, "left": left, "note": scope,
+            }),
+            human,
+            exit_code,
+        });
+    }
+    let mut human = format!(
+        "undid the sequence \"{}\" ({} entries)",
+        group.name,
+        undone.len()
+    );
+    for outcome in &undone {
+        human.push_str(&format!("\n  - {}", outcome.entry.label));
+    }
+    human.push_str(&format!("\n{scope}"));
+    Ok(emitted(
+        json!({ "sequence": sequence, "applied": true, "undone": undone, "note": scope }),
+        human,
+    ))
+}
+
 pub(super) async fn journal_listing(session: &mut Session, all: bool) -> Result<Emitted, String> {
     let listing: JournalListing = session
         .call(OperationKind::JournalList, json!({ "all": all }))

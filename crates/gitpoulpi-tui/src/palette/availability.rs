@@ -20,6 +20,8 @@ pub(crate) struct PaletteContext {
     pub(crate) redo: crate::undo_ui::Avail,
     /// A blocked undo entry offers a reflog position to restore.
     pub(crate) undo_offer: bool,
+    /// The newest journal entries are one sequence run's.
+    pub(crate) undo_sequence: bool,
     /// The view the Undo history / Reflog / Lost work panel is open on.
     pub(crate) safety_tab: Option<crate::safety_panel::Tab>,
     /// What the open code review allows (`None`: no review is open).
@@ -386,6 +388,10 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         C::Item(cmd) => cmd.unavailable(ctx.item),
         C::Composer(cmd) => cmd.unavailable(ctx.composer),
         C::Flow(cmd) => cmd.unavailable(),
+        C::UndoSequence => match undo_reason(ctx.undo, "undo") {
+            Some(why) => Some(why),
+            None => (!ctx.undo_sequence).then_some(msg::undo_ui::WHY_NO_SEQUENCE.get()),
+        },
         C::UndoOffer => (!ctx.undo_offer).then_some(msg::undo_safety::WHY_NO_OFFER.get()),
 
         // The pending auto-stash banner's actions.

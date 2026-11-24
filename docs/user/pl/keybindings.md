@@ -943,6 +943,7 @@ zastosowania. Klawisze są domyślne.
 | Edycja: Reflog... |  |
 | Edycja: Odzyskaj utracone commity... |  |
 | Edycja: Przywróć gałąź tam, gdzie zostawiła ją zablokowana akcja | `Alt+Shift+Z` |
+| Edit: Undo Whole Sequence |  |
 | Przegląd: Pokaż podsumowanie |  |
 | Przegląd: Pokaż pliki |  |
 | Przegląd: Pokaż commity |  |
@@ -1036,6 +1037,7 @@ zastosowania. Klawisze są domyślne.
 | Przegląd: Odrzuć ✦ szkic | `N` |
 | Historia cofania: Cofnij do tego miejsca... | `u` |
 | Historia cofania: Ponów do tego miejsca... | `y` |
+| Undo History: Undo Whole Sequence | `x` |
 | Historia cofania: Przywróć tylko tę... | `r` |
 | Historia cofania: Przywróć gałąź tam, gdzie była... | `o` |
 | Historia cofania: Odśwież |  |

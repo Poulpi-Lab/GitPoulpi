@@ -30,14 +30,20 @@ run = "push"
 
 /// `(exit code, parsed stdout)` of `gitpoulpi --json sequence ...`.
 fn seq(config: &Path, root: &Path, session: &str, args: &[&str]) -> (i32, Value) {
+    cli(config, root, session, &[&["sequence"], args].concat())
+}
+
+/// `(exit code, parsed stdout)` of `gitpoulpi --json <args>`.
+fn cli(config: &Path, root: &Path, session: &str, args: &[&str]) -> (i32, Value) {
     let output = Command::cargo_bin("gitpoulpi")
         .unwrap()
         .env("GITPOULPI_CONFIG_DIR", config)
         .env("GITPOULPI_INSTALL_ID", "tester")
+        .env("GITPOULPI_GENERAL_UNDO_DEPTH", "0")
+        .env("GITPOULPI_GENERAL_JOURNAL_OUTSIDE", "false")
         .arg("--json")
         .args(["--session", session])
         .args(["--repo", &root.to_string_lossy()])
-        .arg("sequence")
         .args(args)
         .current_dir(root)
         .output()
@@ -99,6 +105,14 @@ fn world(session: &str, sequences_toml: &str) -> World {
 impl World {
     fn run(&self, args: &[&str]) -> (i32, Value) {
         seq(self.config.path(), self.repo.root(), &self.session, args)
+    }
+    fn undo(&self, args: &[&str]) -> (i32, Value) {
+        cli(
+            self.config.path(),
+            self.repo.root(),
+            &self.session,
+            &[&["undo"], args].concat(),
+        )
     }
     fn head(&self) -> String {
         self.repo.git(&["rev-parse", "HEAD"]).trim().to_string()
@@ -370,4 +384,93 @@ fn a_repository_sequence_is_never_run() {
     assert_eq!(code, 2, "{v}");
     assert_eq!(v["problems"][0]["what"], "untrusted");
     assert!(!w.status().contains("A  "), "{}", w.status());
+}
+
+/// A run of `sequence run` marks its journal entries; `undo --sequence` then
+/// undoes them newest first. The Backup commit is already on its upstream, so
+/// the undo needs `--yes` (exit 3, nothing changed) before it goes through.
+#[test]
+fn undo_sequence_undoes_a_backup_run_and_asks_for_the_pushed_commit() {
+    let w = world("seq-undo", BACKUP);
+    let before = w.head();
+    let (code, v) = w.run(&["run", "backup", "--yes"]);
+    assert_eq!(code, 0, "{v}");
+    let pushed = w.head();
+
+    // The entries carry the run: a name, one run id, the step of each.
+    let (code, v) = w.undo(&["--list"]);
+    assert_eq!(code, 0, "{v}");
+    let entries = v["undo"].as_array().unwrap();
+    assert_eq!(entries.len(), 2, "{v}");
+    let origin = |i: usize| &entries[i]["summary"]["origin"];
+    assert_eq!(origin(0)["name"], "Backup");
+    assert_eq!(origin(0)["run_id"], origin(1)["run_id"]);
+    assert_eq!(origin(0)["step"], 1);
+    assert_eq!(origin(1)["step"], 3);
+    assert_eq!(origin(1)["of"], 4);
+
+    let (code, v) = w.undo(&["--sequence", "--dry-run"]);
+    assert_eq!(code, 0, "{v}");
+    assert_eq!(v["applied"], false);
+    assert_eq!(v["entries"].as_array().unwrap().len(), 2);
+    assert_eq!(w.head(), pushed);
+
+    // The commit is on the remote: asks, changes nothing.
+    let (code, v) = w.undo(&["--sequence"]);
+    assert_eq!(code, 3, "{v}");
+    assert_eq!(v["applied"], false);
+    assert_eq!(v["stopped"]["step"], 3);
+    assert!(
+        v["stopped"]["needs_confirmation"]["prompt"].is_string(),
+        "{v}"
+    );
+    assert_eq!(v["undone"], serde_json::json!([]));
+    assert_eq!(w.head(), pushed);
+
+    let (code, v) = w.undo(&["--sequence", "--yes"]);
+    assert_eq!(code, 0, "{v}");
+    assert_eq!(v["applied"], true);
+    assert_eq!(v["undone"].as_array().unwrap().len(), 2);
+    assert!(
+        v["note"].as_str().unwrap().contains("this repository"),
+        "{v}"
+    );
+    assert_eq!(w.head(), before, "the commit is undone");
+    assert_eq!(w.status().trim(), "?? new.txt", "and so is the stage");
+
+    // Nothing of the run is left at the top.
+    let (code, v) = w.undo(&["--sequence"]);
+    assert_eq!(code, 2, "{v}");
+    assert!(v["no_sequence"]["message"].is_string(), "{v}");
+}
+
+/// A refusal in the middle stops the undo, says which step, and leaves the
+/// older entries of the run in the journal.
+#[test]
+fn undo_sequence_stops_at_the_first_refusal_and_leaves_the_rest() {
+    let w = world(
+        "seq-undo-stop",
+        "[[sequences]]\nid = \"tagged\"\nname = \"Tagged\"\n\n[[sequences.steps]]\nrun = \"stage_all\"\n\n[[sequences.steps]]\nrun = \"new_tag\"\npause = \"never\"\n[sequences.steps.options]\nname = \"v1\"\n\n[[sequences.steps]]\nrun = \"commit\"\npause = \"never\"\n[sequences.steps.options]\nmessage = \"add the file\"\n",
+    );
+    let before = w.head();
+    let (code, v) = w.run(&["run", "tagged", "--yes"]);
+    assert_eq!(code, 0, "{v}");
+    // Someone moves the tag behind the run's back.
+    w.repo.git(&["tag", "-f", "v1", "HEAD"]);
+
+    let (code, v) = w.undo(&["--sequence"]);
+    assert_eq!(code, 2, "{v}");
+    assert_eq!(v["applied"], true, "the commit was undone first: {v}");
+    assert_eq!(v["undone"].as_array().unwrap().len(), 1);
+    assert_eq!(v["stopped"]["step"], 2, "the tag is step 2: {v}");
+    assert!(v["stopped"]["refused"]["message"].is_string(), "{v}");
+    assert_eq!(
+        v["left"].as_array().unwrap().len(),
+        2,
+        "tag and stage stay: {v}"
+    );
+    assert_eq!(w.head(), before);
+    // The stage entry is still in the journal.
+    let (_, v) = w.undo(&["--list"]);
+    assert_eq!(v["undo"].as_array().unwrap().len(), 2, "{v}");
 }

@@ -182,6 +182,39 @@ pub(crate) fn disarm() {
     *ARMED.lock().unwrap_or_else(|e| e.into_inner()) = None;
 }
 
+static ORIGINS: Mutex<Option<HashMap<u64, gitpoulpi_core::domain::SequenceOrigin>>> =
+    Mutex::new(None);
+
+/// Marks `ticket`'s requests as made by a sequence run: they carry `origin`
+/// to the daemon, which writes it into the journal entries they make. The
+/// mark is dropped when the ticket ends.
+pub(crate) fn set_origin(ticket: Ticket, origin: gitpoulpi_core::domain::SequenceOrigin) {
+    let mut slot = ORIGINS.lock().unwrap_or_else(|e| e.into_inner());
+    let map = slot.get_or_insert_with(HashMap::new);
+    // Nobody ends a ticket nobody reads: bounded like the queue.
+    if map.len() >= QUEUE_CAP {
+        map.clear();
+    }
+    map.insert(ticket.0, origin);
+}
+
+/// The sequence run `ticket` belongs to (`None`: untracked, or not a run's).
+pub(crate) fn origin_of(ticket: Option<Ticket>) -> Option<gitpoulpi_core::domain::SequenceOrigin> {
+    let ticket = ticket?;
+    ORIGINS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .as_ref()?
+        .get(&ticket.0)
+        .cloned()
+}
+
+fn forget_origin(ticket: Ticket) {
+    if let Some(map) = ORIGINS.lock().unwrap_or_else(|e| e.into_inner()).as_mut() {
+        map.remove(&ticket.0);
+    }
+}
+
 /// A new ticket.
 pub(crate) fn issue() -> Ticket {
     Ticket(NEXT.fetch_add(1, Ordering::Relaxed))
@@ -291,6 +324,9 @@ pub(crate) fn report_ticket(ticket: Option<Ticket>, outcome: StepOutcome) {
         }
     });
     if let Some(outcome) = emit {
+        if outcome.is_final() {
+            forget_origin(ticket);
+        }
         push(StepDone { ticket, outcome });
     }
 }
@@ -300,6 +336,7 @@ pub(crate) fn cancel_ticket(ticket: Ticket) {
     live(|map| {
         map.remove(&ticket.0);
     });
+    forget_origin(ticket);
     push(StepDone {
         ticket,
         outcome: StepOutcome::Canceled,

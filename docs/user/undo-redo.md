@@ -68,6 +68,8 @@ line under the buttons. For the selected row:
   at the old tip - your current branch and files never move. The confirmation
   shows exactly what it will do, and the restore is a new action: `Ctrl+Z`
   takes it back.
+- **Undo whole sequence** (`x`): offered while the newest entries are one
+  sequence run's (see [Sequence runs](#sequence-runs)).
 - **Redo up to here** (`y`) on an undone row.
 - **Restore main to where Commit left it** (`o`, or `Alt+Shift+Z` /
   `Edit: Restore the Branch to Where the Blocked Action Left It` from outside
@@ -75,6 +77,10 @@ line under the buttons. For the selected row:
   reflog still knows where the action left it.
 
 Right-click a row (or press `.`) for the same actions as a menu.
+
+A row made by a step of a [sequence](sequences.md) wears a badge, `⟳ Backup`,
+and its detail line says which step it was ("Made by the sequence "Backup",
+step 3/4.").
 
 ![The Undo history after deleting a branch and making two commits: the deleted branch's row is selected and can be restored on its own](images/undo-history.png)
 
@@ -170,7 +176,7 @@ is open: the palette opens over it and its **Undo History:**, **Reflog:** and
 
 | View | Palette rows |
 |---|---|
-| Undo history | `Undo History: Undo Up to Here...`, `Redo Up to Here...`, `Restore Only This...`, `Restore the Branch to Where It Was...`, `Refresh`, `Close` |
+| Undo history | `Undo History: Undo Up to Here...`, `Redo Up to Here...`, `Undo Whole Sequence`, `Restore Only This...`, `Restore the Branch to Where It Was...`, `Refresh`, `Close` |
 | Reflog | `Reflog: Show in Log`, `Create Branch Here...`, `Create Tag Here...`, `Apply Changes to Working Tree`, `Save Changes as Stash`, `Restore to This Position...`, `Load More`, `Refresh` |
 | Lost work | `Lost Work: Create Branch Here...`, `Create Tag Here...`, `Cherry-pick`, `Apply Changes to Working Tree`, `Save Changes as Stash`, `Scan Again` |
 
@@ -181,6 +187,41 @@ cannot do says why in the status line instead of doing nothing: "this action is
 already undone: use Redo up to here", the reason an entry cannot be restored on
 its own, "only a branch or HEAD can be moved back", and so on. The `...` rows
 open the same confirmation or name prompt as the button.
+
+## Sequence runs
+
+A [sequence](sequences.md) (Backup: stage all, AI commit message, commit, push)
+makes **one ordinary journal entry per step that changes something**: the stage
+and the commit here, not the AI message and not the push (a push is never
+undone, see below). The journal is per repository and strictly newest first, so
+a run cannot be one entry: each keeps its own checks, and each is tagged with
+the run that made it (`sequence:Backup#<run> 3/4`). Old journals have no tag
+and load as before.
+
+**Undo whole sequence** undoes the entries of one run, newest first, as one
+ordinary Undo each. It is offered when the newest entries of the journal are
+one run's, consecutive: an entry of another run, a change you made by hand or
+one made outside GitPoulpi in between ends the group. Where it is:
+
+- the Undo history: the button `Undo whole sequence` (`x`), the row's right-click
+  menu, and the palette row `Undo History: Undo Whole Sequence`;
+- the command palette: `Edit: Undo Whole Sequence` (the sequence's name is on
+  the row while it applies);
+- the command line and MCP: `gitpoulpi undo --sequence` (below).
+
+Each entry is checked on its own, exactly as a single Undo is: a commit already
+on its upstream asks "undo anyway?" before it goes (answer it and the rest
+carries on), and a branch that moved or a merge in progress refuses. The first
+refusal (or a "no" to a question) **stops** and says which step and why: *undoing
+"Backup" stopped at step 3/4 (Commit "wip" (a81b9e4)): ... Actions left: 2*.
+What was undone stays undone, the older entries stay in the journal, and a
+plain Undo (or the button again) goes on from there.
+
+Only this repository's journal is undone. A run that also acted in another
+repository (a worktree step moved the next steps to the new worktree's tab)
+left entries in that repository's own journal; open it and undo there. **Redo**
+stays per entry: after undoing a whole run, `Ctrl+Y` brings back the newest
+step, then the next, each with its own check.
 
 ## What can be undone
 
@@ -366,6 +407,9 @@ Undo asks only when it is risky:
   the server** (see above), so it always asks, and so does the redo that deletes
   it there again.
 
+Undoing a whole sequence asks once for the list (in the panel), then each entry
+that is risky asks again as above.
+
 Redo, and every undo of a ref-only move, never asks: the other direction is one
 key away.
 
@@ -407,6 +451,7 @@ history or when undo is turned off. Nothing else is ever deleted.
 gitpoulpi undo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi redo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi undo --list [--all]
+gitpoulpi undo --sequence [--dry-run] [--yes]
 gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 ```
 
@@ -416,6 +461,15 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 - `--expect <id>` makes the call refuse as *stale* unless that entry is still
   the newest: a script (or a second window) never undoes something other than
   what it looked at.
+- `--sequence` undoes the sequence run at the top of the journal (see
+  [Sequence runs](#sequence-runs)): the newest consecutive entries one
+  `sequence run` made, newest first, one `undo` each with its own checks.
+  `--dry-run` lists them; without `--yes` the first entry that needs one
+  (exit **3**) stops it, naming the step, with what was undone so far in
+  `undone` and what is left in `left`. A refusal exits **2** with `stopped.refused`;
+  when the top of the journal is not one run's the answer is
+  `{"no_sequence": {...}}`, exit 2. Entries carry their run in `undo --list`
+  (`summary.origin`: `name`, `run_id`, `step`, `of`). Not with `--expect`.
 - `undo-forget` drops the blocked newest entry from the journal (`--redo`: the
   newest redo entry). It refuses when that entry is not blocked, and exits **3**
   without `--yes`. It is a mutation for MCP, but not a destructive one: the

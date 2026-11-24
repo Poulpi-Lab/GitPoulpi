@@ -264,6 +264,11 @@ pub(crate) enum ConfirmAction {
         direction: gitpoulpi_core::domain::Direction,
         expect: Option<u64>,
     },
+    /// A risky entry of "Undo whole sequence": confirming sends the entries
+    /// still to undo again, the first one `confirmed`.
+    UndoSequence {
+        group: gitpoulpi_core::domain::SequenceGroup,
+    },
     /// *Start over* for the pending auto-stash; confirming submits it
     /// with `confirmed`.
     AutoStashStartOver,
@@ -315,6 +320,7 @@ impl ConfirmAction {
                 direction: gitpoulpi_core::domain::Direction::Undo,
                 ..
             } => b::UNDO_ANYWAY,
+            ConfirmAction::UndoSequence { .. } => b::UNDO_ANYWAY,
             ConfirmAction::UndoRedo { .. } => b::REDO_ANYWAY,
             ConfirmAction::AutoStashStartOver => b::START_OVER,
             ConfirmAction::UndoForget { .. } => gitpoulpi_i18n::msg::undo_journal::FORGET_BUTTON,

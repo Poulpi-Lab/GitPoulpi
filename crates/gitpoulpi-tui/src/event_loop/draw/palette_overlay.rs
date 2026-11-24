@@ -128,6 +128,7 @@ pub(crate) fn render_command_palette(
                         journal_state,
                         gitpoulpi_core::domain::Direction::Redo,
                     ),
+                    PaletteCommand::UndoSequence => crate::undo_ui::sequence_suffix(journal_state),
                     _ => None,
                 };
                 if let Some(op) = suffix {

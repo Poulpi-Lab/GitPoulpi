@@ -404,6 +404,52 @@ pub struct EntrySummary {
     /// Unix seconds.
     pub at: i64,
     pub state: EntryState,
+    /// Set when a sequence run made the operation (see [`SequenceOrigin`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<Box<SequenceOrigin>>,
+}
+
+/// Which sequence run an operation belongs to. Carried by a request as its
+/// `origin` argument and copied into the journal entry the daemon writes for
+/// it. `run_id` is unique per run (it is what makes entries "of one run"),
+/// `step` is 1-based and `of` the number of steps of the sequence.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SequenceOrigin {
+    pub name: String,
+    pub run_id: u64,
+    pub step: u32,
+    pub of: u32,
+}
+
+impl SequenceOrigin {
+    /// The tag shown in the journal listing: `sequence:Backup#17 2/4`.
+    pub fn tag(&self) -> String {
+        format!(
+            "sequence:{}#{} {}/{}",
+            self.name, self.run_id, self.step, self.of
+        )
+    }
+}
+
+/// One entry of a [`SequenceGroup`].
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SequenceMember {
+    pub id: u64,
+    pub kind: OperationKind,
+    pub step: u32,
+    pub label: String,
+}
+
+/// The newest consecutive journal entries (top of the undo stack) that
+/// belong to one sequence run: what "Undo whole sequence" undoes.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SequenceGroup {
+    pub name: String,
+    pub run_id: u64,
+    /// The number of steps of the sequence.
+    pub of: u32,
+    /// Newest first, the order they are undone in.
+    pub entries: Vec<SequenceMember>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -439,6 +485,9 @@ pub struct JournalState {
     /// How many undone entries a redo can bring back.
     #[serde(default)]
     pub redo_count: usize,
+    /// The newest entries when they are one sequence run's.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<Box<SequenceGroup>>,
 }
 
 /// What an undo or redo did, or would do (`dry_run`).

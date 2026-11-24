@@ -21,7 +21,13 @@ enum Bar {
 /// catalog key in the views that share it.
 pub(super) fn acts_in(tab: Tab) -> &'static [Act] {
     match tab {
-        Tab::History => &[Act::UndoTo, Act::RedoTo, Act::RestoreOnly, Act::Offer],
+        Tab::History => &[
+            Act::UndoTo,
+            Act::RedoTo,
+            Act::UndoSequence,
+            Act::RestoreOnly,
+            Act::Offer,
+        ],
         Tab::Reflog => &[
             Act::RestoreRef,
             Act::ShowInLog,
@@ -47,6 +53,7 @@ fn key_msg(act: Act) -> gitpoulpi_i18n::M {
     match act {
         Act::UndoTo => m::KEY_UNDO_TO,
         Act::RedoTo => m::KEY_REDO_TO,
+        Act::UndoSequence => m::KEY_UNDO_SEQUENCE,
         Act::RestoreOnly => m::KEY_RESTORE_ONLY,
         Act::Offer => m::KEY_OFFER,
         Act::RestoreRef => m::KEY_RESTORE_REF,

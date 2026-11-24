@@ -240,6 +240,10 @@ pub(crate) fn confirm_now(
             link.submit_action(Action::UndoForget { expect });
             Some(gitpoulpi_i18n::msg::undo_journal::FORGETTING.get().into())
         }
+        ConfirmAction::UndoSequence { group } => {
+            link.send_undo_sequence(group, true);
+            Some(gitpoulpi_i18n::msg::undo_ui::UNDOING_SEQUENCE.get().into())
+        }
         ConfirmAction::UndoRedo { direction, expect } => {
             link.send_undo_redo(direction, expect, true);
             Some(match direction {

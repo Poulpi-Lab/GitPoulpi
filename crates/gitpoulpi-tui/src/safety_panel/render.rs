@@ -80,6 +80,7 @@ fn act_label(act: Act, panel: &SafetyPanel, state: &JournalState) -> String {
     match act {
         Act::UndoTo => m::BTN_UNDO_TO.get().to_string(),
         Act::RedoTo => m::BTN_REDO_TO.get().to_string(),
+        Act::UndoSequence => m::BTN_UNDO_SEQUENCE.get().to_string(),
         Act::RestoreOnly => m::BTN_RESTORE_ONLY.get().to_string(),
         Act::Offer => panel
             .offer(state)
@@ -674,6 +675,7 @@ fn act_label_static(act: Act) -> String {
     match act {
         Act::UndoTo => m::BTN_UNDO_TO.get().to_string(),
         Act::RedoTo => m::BTN_REDO_TO.get().to_string(),
+        Act::UndoSequence => m::BTN_UNDO_SEQUENCE.get().to_string(),
         Act::RestoreOnly => m::BTN_RESTORE_ONLY.get().to_string(),
         Act::Offer => m::MENU_OFFER.get().to_string(),
         Act::ShowInLog => m::BTN_SHOW_IN_LOG.get().to_string(),

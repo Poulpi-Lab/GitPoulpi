@@ -958,11 +958,23 @@ pub(crate) async fn run_via_daemon(
 
     let mut steps: Vec<Value> = Vec::new();
     let mut stopped_at: Option<usize> = None;
+    // Unique per run (a journal outlives the process): milliseconds since
+    // the epoch.
+    let run_id = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(1, |d| d.as_millis() as u64);
     for (i, step) in def.steps.iter().enumerate() {
         if stopped_at.is_some() {
             steps.push(json!({ "index": i, "run": step.run, "status": "skipped" }));
             continue;
         }
+        // The step's mutations are marked as this run's, for the journal.
+        ipc.set_origin(Some(gitpoulpi_core::domain::SequenceOrigin {
+            name: def.name.clone(),
+            run_id,
+            step: (i + 1) as u32,
+            of: def.steps.len() as u32,
+        }));
         let build = mapping(&step.run).ok_or_else(|| format!("no mapping for {}", step.run))?;
         let outcome: Result<Value, Value> = match build(step, &mut env) {
             Err(e) => Err(json!(e)),
@@ -1004,6 +1016,7 @@ pub(crate) async fn run_via_daemon(
             }
         }
     }
+    ipc.set_origin(None);
     let human = steps
         .iter()
         .map(|s| {

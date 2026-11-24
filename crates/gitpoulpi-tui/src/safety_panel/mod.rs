@@ -39,7 +39,7 @@ use std::time::Instant;
 
 use gitpoulpi_core::domain::{
     short, Direction, ListedEntry, LostCommit, LostCommitsPage, Oid, OperationKind, ReflogEntry,
-    ReflogPage, RestoreOutcome, UndoOutcome, UndoRefusal,
+    ReflogPage, RestoreOutcome, SequenceGroup, UndoOutcome, UndoRefusal,
 };
 use gitpoulpi_core::Error as CoreError;
 use gitpoulpi_i18n::msg::undo_safety as m;
@@ -49,7 +49,7 @@ use crate::combo::Combo;
 use crate::daemon_link::{error_text, Reply, Requester};
 use detail::Detail;
 
-pub(crate) use label::summary_text;
+pub(crate) use label::{summary_text, text as label_text};
 pub(crate) use palette::SafetyCmd;
 use panes::Panes;
 #[cfg(test)]
@@ -83,6 +83,9 @@ pub(crate) enum Tab {
 pub(crate) enum Act {
     UndoTo,
     RedoTo,
+    /// `Undo whole sequence` (`x`): the newest entries when one sequence run
+    /// made them.
+    UndoSequence,
     RestoreOnly,
     Offer,
     ShowInLog,
@@ -267,6 +270,9 @@ pub(crate) enum Next {
         dir: Direction,
         ids: Vec<u64>,
         confirmed: bool,
+        /// "Undo whole sequence": the run these entries belong to (words
+        /// the end and the stop by the sequence, not by a count).
+        sequence: Option<SequenceGroup>,
     },
     Restore {
         id: u64,
@@ -346,6 +352,7 @@ pub(crate) enum Job {
         ids: Vec<u64>,
         done: usize,
         confirmed: bool,
+        sequence: Option<SequenceGroup>,
         pending: Reply<UndoOutcome>,
     },
     /// A restore, planned (`dry`) or real.
@@ -723,6 +730,9 @@ impl SafetyPanel {
                     acts.push(Act::RedoTo);
                 } else {
                     acts.push(Act::UndoTo);
+                    if state.sequence.is_some() {
+                        acts.push(Act::UndoSequence);
+                    }
                     if row.entry.restore.restorable() {
                         acts.push(Act::RestoreOnly);
                     }
@@ -787,6 +797,7 @@ impl SafetyPanel {
         }
         match act {
             Act::UndoTo => self.ask_steps(Direction::Undo),
+            Act::UndoSequence => self.ask_sequence(state),
             Act::RedoTo => self.ask_steps(Direction::Redo),
             Act::RestoreOnly => {
                 if let Some(id) = self.selected_history().map(|r| r.entry.summary.id) {
@@ -918,6 +929,33 @@ impl SafetyPanel {
                 dir,
                 ids,
                 confirmed: false,
+                sequence: None,
+            },
+        }));
+    }
+
+    /// "Undo whole sequence": the newest entries when one run made them, in
+    /// the order they are undone.
+    fn ask_sequence(&mut self, state: &gitpoulpi_core::domain::JournalState) {
+        let Some(group) = state.sequence.clone().map(|g| *g) else {
+            return;
+        };
+        let lines: Vec<String> = group
+            .entries
+            .iter()
+            .map(|e| label::text(e.kind, &e.label))
+            .collect();
+        self.overlay = Some(Overlay::Confirm(Confirm {
+            title: m::confirm_undo_sequence(&group.name),
+            lines,
+            warning: Some(m::WARNING_SEQUENCE_SCOPE.get().to_string()),
+            button: m::BTN_UNDO_SEQUENCE.get().to_string(),
+            red: true,
+            next: Next::Steps {
+                dir: Direction::Undo,
+                ids: group.entries.iter().map(|e| e.id).collect(),
+                confirmed: false,
+                sequence: Some(group),
             },
         }));
     }
@@ -928,6 +966,7 @@ impl SafetyPanel {
         ids: Vec<u64>,
         done: usize,
         confirmed: bool,
+        sequence: Option<SequenceGroup>,
     ) {
         let Some(id) = ids.get(done).copied() else {
             return;
@@ -945,6 +984,7 @@ impl SafetyPanel {
             ids,
             done,
             confirmed,
+            sequence,
             pending,
         });
     }
@@ -984,7 +1024,8 @@ impl SafetyPanel {
                 dir,
                 ids,
                 confirmed,
-            } => self.start_steps(dir, ids, 0, confirmed),
+                sequence,
+            } => self.start_steps(dir, ids, 0, confirmed, sequence),
             Next::Restore { id, name } => {
                 let pending = self.requester.call(
                     OperationKind::JournalRestore,
@@ -1066,6 +1107,7 @@ impl SafetyPanel {
                 ids,
                 done,
                 confirmed,
+                sequence,
                 pending,
             } => match pending.take() {
                 None => {
@@ -1074,17 +1116,19 @@ impl SafetyPanel {
                         ids,
                         done,
                         confirmed,
+                        sequence,
                         pending,
                     })
                 }
                 Some(Ok(_)) => {
                     if done + 1 < ids.len() {
-                        self.start_steps(dir, ids, done + 1, false);
+                        self.start_steps(dir, ids, done + 1, false, sequence);
                     } else {
                         let n = ids.len() as u64;
-                        let text = match dir {
-                            Direction::Undo => m::done_undo_to(n),
-                            Direction::Redo => m::done_redo_to(n),
+                        let text = match (&sequence, dir) {
+                            (Some(group), _) => m::done_undo_sequence(&group.name),
+                            (None, Direction::Undo) => m::done_undo_to(n),
+                            (None, Direction::Redo) => m::done_redo_to(n),
                         };
                         effects.push(PanelEffect::Message(text.clone()));
                         self.say(text);
@@ -1115,11 +1159,25 @@ impl SafetyPanel {
                             dir,
                             ids: ids[done..].to_vec(),
                             confirmed: true,
+                            sequence,
                         },
                     }));
                 }
                 Some(Err(e)) => {
-                    let text = if done > 0 {
+                    let stopped_at = sequence.as_ref().and_then(|g| {
+                        let member = g.entries.iter().find(|x| Some(&x.id) == ids.get(done))?;
+                        Some(m::sequence_stopped(
+                            &g.name,
+                            member.step,
+                            g.of,
+                            label::text(member.kind, &member.label),
+                            error_text::error_text(&e),
+                            (ids.len() - done) as u64,
+                        ))
+                    });
+                    let text = if let Some(text) = stopped_at {
+                        text
+                    } else if done > 0 {
                         m::stopped(done as u64, ids.len() as u64, error_text::error_text(&e))
                     } else {
                         error_text::error_text(&e)

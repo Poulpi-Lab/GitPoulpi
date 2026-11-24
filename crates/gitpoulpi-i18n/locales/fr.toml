@@ -3819,6 +3819,8 @@ why_group_not_paused = "aucun {$push} groupé n'attend la résolution de conflit
 why_group_not_ready = "résolvez et concluez d'abord les conflits"
 # context: palette: why a command is grayed out
 why_nothing_to_retry = "aucun distant n'a échoué lors du dernier {$push} groupé"
+edit_undo_sequence = "Édition : Annuler toute la séquence"
+undo_history_undo_sequence = "Historique d'annulation : Annuler toute la séquence"
 
 [help_section]
 rewrite = "Réécrire l'historique"
@@ -4874,6 +4876,10 @@ undo_label_key = "Annuler {label} · {key}"
 redo_label_key = "Rétablir {label} · {key}"
 nothing_to_undo_comment = "rien à annuler (un commentaire publié sur un hébergeur ne s'annule pas ici : modifiez-le ou supprimez-le)"
 tip_nothing_to_undo_comment = "Rien à annuler (un commentaire publié sur un hébergeur ne s'annule pas ici : modifiez-le ou supprimez-le)"
+# context: why a palette command is grayed; a sequence is a user-defined list of actions run together
+why_no_sequence = "les actions les plus récentes ne sont pas celles d'une même séquence"
+# context: status line while a sequence run is being undone
+undoing_sequence = "annulation de la séquence..."
 
 # Status + diffs (I5b).
 [status_pane]
@@ -6775,6 +6781,20 @@ why_no_more = "c'est tout le reflog, il n'y a plus rien à charger"
 # context: status line after Load more; {n} is how many past positions of the reflog are now listed
 reflog_loaded = "positions chargées : {n}"
 refreshing = "actualisation..."
+# context: Undo history: key of the Undo whole sequence button, one letter
+key_undo_sequence = "x"
+# context: Undo history: button; undoes every entry of the sequence run at the top of the history, newest first
+btn_undo_sequence = "Annuler toute la séquence"
+# context: confirm title; {name} is the name of a user-defined sequence of actions
+confirm_undo_sequence = "Annuler toute la séquence « {name} » ?"
+# context: confirm warning under the list of actions of a sequence run; a sequence can act in a worktree (another repository)
+warning_sequence_scope = "Seul le journal de ce dépôt est annulé : les étapes faites dans un autre dépôt restent."
+# context: status line; {name} is the name of a user-defined sequence of actions
+done_undo_sequence = "séquence « {name} » annulée"
+# context: status line; undoing a sequence stopped at one of its actions; {step}/{of} is its position in the sequence, {label} the action, {why} the reason, {left} how many actions stay done
+sequence_stopped = "l'annulation de « {name} » s'est arrêtée à l'étape {step}/{of} ({label}) : {why}. Actions restantes : {left}"
+# context: detail line of a history row made by a sequence; {step}/{of} is its position in the sequence
+detail_sequence = "Faite par la séquence « {name} », étape {step}/{of}."
 
 # Undo history row labels, built at display time from the entry's kind
 [undo_label]

@@ -944,6 +944,7 @@ Klávesy jsou výchozí.
 | Úpravy: Reflog... |  |
 | Úpravy: Zachránit ztracené commity... |  |
 | Úpravy: Obnovit větev tam, kde ji nechala blokovaná akce | `Alt+Shift+Z` |
+| Edit: Undo Whole Sequence |  |
 | Kontrola: Zobrazit přehled |  |
 | Kontrola: Zobrazit soubory |  |
 | Kontrola: Zobrazit Commity |  |
@@ -1037,6 +1038,7 @@ Klávesy jsou výchozí.
 | Kontrola: Zahodit koncept ✦ | `N` |
 | Historie vrácení: Vrátit až sem... | `u` |
 | Historie vrácení: Zopakovat až sem... | `y` |
+| Undo History: Undo Whole Sequence | `x` |
 | Historie vrácení: Obnovit jen tuto... | `r` |
 | Historie vrácení: Obnovit větev tam, kde byla... | `o` |
 | Historie vrácení: Obnovit seznam |  |

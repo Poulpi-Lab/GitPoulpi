@@ -374,6 +374,9 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
                 let _ = cmd;
             }
         }
+        PaletteCommand::UndoSequence => {
+            *cx.last_message = Some(cx.link.start_undo_sequence());
+        }
         PaletteCommand::UndoOffer => {
             let state = cx.link.journal_state();
             match crate::safety_panel::offer_of(&state) {

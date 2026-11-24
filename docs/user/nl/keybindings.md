@@ -948,6 +948,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Bewerken: Reflog... |  |
 | Bewerken: Verloren commits terughalen... |  |
 | Bewerken: De branch herstellen naar waar de geblokkeerde actie hem achterliet | `Alt+Shift+Z` |
+| Edit: Undo Whole Sequence |  |
 | Review: Overzicht tonen |  |
 | Review: Bestanden tonen |  |
 | Review: Commits tonen |  |
@@ -1041,6 +1042,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Review: Het ✦ concept verwerpen | `N` |
 | Geschiedenis: Ongedaan maken tot hier... | `u` |
 | Geschiedenis: Opnieuw tot hier... | `y` |
+| Undo History: Undo Whole Sequence | `x` |
 | Geschiedenis: Alleen dit herstellen... | `r` |
 | Geschiedenis: De branch herstellen naar waar hij was... | `o` |
 | Geschiedenis: Vernieuwen |  |

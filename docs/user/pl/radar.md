@@ -50,9 +50,14 @@ można zmieniać rozmiar). Podwójne kliknięcie lub `Enter` na żądaniu, któr
 
 ### Gałęzie żądania
 
-Wiersz żądania pokazuje `źródło → cel` po tytule (`alice:feature/login → main`, gdy gałąź źródłowa jest w forku).
-Gdy miejsca brakuje, najpierw ucinany jest cel (wielokropek), tytuł zachowuje większość miejsca, a w wąskim oknie
-gałęzie nie są pokazywane; kolumna Akcje nigdy nie jest wypychana. Zatrzymaj wskaźnik na uciętym tekście, by zobaczyć go w całości. Host, który
+Wiersz żądania pokazuje `źródło → cel` w kolumnie **Gałęzie**, zaraz po repozytorium (`alice:feature/login → main`,
+gdy gałąź źródłowa jest w forku); wiersz zgłoszenia zostawia tę komórkę pustą, a Radar bez żądania, które podaje gałęzie,
+nie ma takiej kolumny. Gdy komórka jest za wąska, najpierw ucinane jest źródło (wielokropek), a cel zostaje w całości, dopóki się da.
+Kolumna kurczy się, zanim zniknie: w wąskim oknie jako ostatnia z kolumn opcjonalnych odchodzi
+(po stanie, autorze i wieku, przed repozytorium i tytułem); gdy jej nie ma, pełne gałęzie zostają
+w podpowiedzi tytułu i na pasku stanu zaznaczonego wiersza. Szeroka kolumna autora, którą sam ustawiłeś, ustępuje
+tytułowi i gałęziom. Kolumna Akcje nigdy nie jest wypychana. Zatrzymaj wskaźnik na uciętym tekście, by zobaczyć go w całości.
+GitHub i Gitea wypisują żądania bez gałęzi, więc Radar czyta je po liście (raz na żądanie, dopóki się nie zmieni). Host, który
 nie podał gałęzi, nie pokazuje tam nic. Wiersz zgłoszenia nazywa swoje repozytorium w tym samym chipie co wiersz żądania (nazwa
 folderu klonu albo `owner/name`, gdy nie jest sklonowane).
 
@@ -155,7 +160,7 @@ i wymieniane w miarę nadchodzenia odpowiedzi.
 
 ### Kolumny
 
-Znacznik repozytorium, `#` (numer i znaczniki kontroli), autor i wiek to **kolumny o regulowanej szerokości**. Na automatycznej kolumna repozytorium jest
+Znacznik repozytorium, gałęzie, `#` (numer i znaczniki kontroli), autor i wiek to **kolumny o regulowanej szerokości**. Na automatycznej kolumna repozytorium jest
 tak szeroka jak najdłuższa nazwa na ekranie (do 40 komórek i najwyżej jedna trzecia okna), więc `owner/name` oraz
 `group/sub/project` z listy konta nie są ucinane na zwykłym terminalu. Tytuł dostaje resztę. Nazwa, która się
 nie mieści, kończy się wielokropkiem (`group/sub...`), a ponadto:
@@ -164,7 +169,7 @@ nie mieści, kończy się wielokropkiem (`group/sub...`), a ponadto:
   tekst. Zaznacz wiersz, a pasek stanu pod filtrem poda też pełny projekt i tytuł, więc widzi to też
   klawiatura.
 - **Przeciągnij separator** (komórka tuż za nazwą repozytorium, za `#` albo tuż przed autorem lub wiekiem), by ustawić szerokość
-  kolumny; **kliknij go dwukrotnie**, by znów dopasować kolumnę. Lista ma **wiersz nagłówka** (repozytorium, `#`,
+  kolumny; **kliknij go dwukrotnie**, by znów dopasować kolumnę. Lista ma **wiersz nagłówka** (repozytorium, gałęzie, `#`,
   tytuł, autor, wiek), a separatory podążają za `ui.column_resize` jak w Logu: przy `line` (domyślnie) przygaszony `│`
   spoczywa w separatorze w wierszu nagłówka, a gdy wskaźnik jest na separatorze (w nagłówku lub w dowolnym wierszu listy),
   gdy kolumna jest wybrana klawiszami albo gdy przeciągasz, cienka linia akcentu rysuje się w dół całej listy; przeciągnięcie
@@ -178,7 +183,7 @@ nie mieści, kończy się wielokropkiem (`group/sub...`), a ponadto:
   komórki, **`[`** zwęża, **`0`** przywraca wszystkim kolumnom tryb automatyczny, `Esc` kończy. Paleta ma to
   samo: `Radar: Wybierz kolumnę`, `Radar: Poszerz kolumnę`, `Radar: Zwęź kolumnę`, `Radar: Resetuj szerokości kolumn`.
 
-Szerokości są zapisane w `radar.toml` (`[columns]`, `repo`, `number`, `author` i `age`, w komórkach) i przetrwają restart. To te
+Szerokości są zapisane w `radar.toml` (`[columns]`, `repo`, `branches`, `number`, `author` i `age`, w komórkach; plik bez `branches` wczytuje się jak dawniej, kolumna dopasowuje się wtedy do zawartości do 28 komórek) i przetrwają restart. To te
 same gesty zmiany rozmiaru co w kolumnach Log.
 
 ### Kontrole i konflikty
@@ -217,18 +222,24 @@ Zamknięte i scalone requesty oraz zamknięte zgłoszenia nie są wymieniane.
 
 ## Widoki i filtry
 
-Trzy listy rozwijane i pole tekstowe zawężają listę. Każdy wybór to lista rozwijana:
+Cztery listy rozwijane i pole tekstowe zawężają listę. Każdy wybór to lista rozwijana:
 kliknij ją albo użyj jej klawisza.
 
 - **Widok** (`v`): Wszystko, requesty, Zgłoszenia, WIP (praca w toku), Odłożone.
 - **Pokaż** (`f`): Wszyscy, Moje (requesty, które napisałeś, zgłoszenia, które utworzyłeś),
   Przypisane do mnie, Poproszono o przegląd, Wspominają o mnie.
 - **Zakres** (`w`): zob. wyżej.
+- **Profil** (`P`): Wszystkie profile albo jeden profil integracji z Ustawienia > Integracje (nazwany tak jak w
+  Ustawieniach, z dopisanym dostawcą, gdy dwa profile mają tę samą nazwę). Zawęża każdą sekcję, wiersze repozytoriów
+  i wiersze obejmujące całe konto, do wierszy tego profilu (wiersz pracy w toku nie ma profilu, więc wybrany profil go
+  ukrywa). Jeden profil naraz. Wybór jest zapamiętywany w `radar.toml`; profil, który już nie istnieje, wraca do Wszystkie profile.
+  Lista rozwijana jest zawsze, jak pozostałe trzy, a wąskie okno skraca ją (a potem etykiety), zamiast ją pomijać.
+  Paleta: `Radar: Filtruj według profilu...`. Gdy profil ukrywa wszystko, pusta lista to mówi.
 - **Tekst filtra** (`/` albo `Ctrl+F`): przybliżone dopasowanie do repozytorium, numeru,
   tytułu, autora, gałęzi i etykiet. `Enter` oddaje klawisze liście i zachowuje tekst,
   `Esc` go czyści.
 
-`Ctrl+N` pokazuje plakietkę na filtrze, każdej liście rozwijanej, przyciskach Odśwież i Wstecz oraz każdym nagłówku sekcji widocznym na ekranie. Naciśnij znak plakietki: filtr dostaje klawiaturę, lista rozwijana się otwiera, przycisk jest wykonywany, a nagłówek dostaje zaznaczenie (`Enter` lub `Space` zwija go potem). `Esc` anuluje. Zob. [Plakietki](keybindings.md#plakietki).
+`Ctrl+N` pokazuje plakietkę na filtrze, każdej z czterech list rozwijanych, przyciskach Odśwież i Wstecz oraz każdym nagłówku sekcji widocznym na ekranie. Naciśnij znak plakietki: filtr dostaje klawiaturę, lista rozwijana się otwiera, przycisk jest wykonywany, a nagłówek dostaje zaznaczenie (`Enter` lub `Space` zwija go potem). `Esc` anuluje. Zob. [Plakietki](keybindings.md#plakietki).
 
 ## Akcje
 

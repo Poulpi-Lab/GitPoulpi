@@ -174,10 +174,12 @@ fn docs_table(lang: gitpoulpi_i18n::Lang, header: Option<&str>) -> String {
     // The palette commands (`palette.<id>`, all unbound) are listed in
     // Settings, not here: one row each would bury the table.
     gitpoulpi_i18n::with_lang(lang, || {
-        for def in crate::keymap::ACTIONS
-            .iter()
-            .filter(|d| d.ctx != crate::keymap::Ctx::Palette)
-        {
+        for def in crate::keymap::ACTIONS.iter().filter(|d| {
+            !matches!(
+                d.ctx,
+                crate::keymap::Ctx::Palette | crate::keymap::Ctx::Sequence
+            )
+        }) {
             let keys = km
                 .labels(def.action)
                 .iter()
@@ -187,8 +189,10 @@ fn docs_table(lang: gitpoulpi_i18n::Lang, header: Option<&str>) -> String {
             out.push_str(&format!(
                 "| `{}` | `{}` | {} | {} |\n",
                 def.ctx.name(),
-                def.id.split_once('.').map_or(def.id, |(_, a)| a),
-                def.label.get(),
+                def.config_id()
+                    .split_once('.')
+                    .map_or(def.config_id(), |(_, a)| a),
+                def.display_label(),
                 match (keys.is_empty(), english) {
                     (false, _) => keys,
                     (true, true) => "(none)".to_string(),
@@ -207,5 +211,32 @@ fn docs_table_is_current() {
         "<!-- keymap:begin -->\n",
         "<!-- keymap:end -->",
         &docs_table,
+    );
+}
+
+/// An action's id and label are read through `ActionDef::config_id` and
+/// `display_label`/`english_label` everywhere outside `keymap/`: a sequence
+/// slot's are the user's, which the raw fields do not know.
+#[test]
+fn nothing_outside_the_keymap_reads_the_raw_id_or_label() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+    let mut hits = Vec::new();
+    for file in production_source_files(true) {
+        let name = file
+            .strip_prefix(&root)
+            .unwrap()
+            .to_string_lossy()
+            .to_string();
+        let text = std::fs::read_to_string(&file).unwrap();
+        for (n, line) in production_lines(&text) {
+            if line.contains(".static_id") || line.contains(".static_label") {
+                hits.push(format!("{name}:{n}: {}", line.trim()));
+            }
+        }
+    }
+    assert!(
+        hits.is_empty(),
+        "read `config_id()` / `display_label()` / `english_label()` instead:\n{}",
+        hits.join("\n")
     );
 }

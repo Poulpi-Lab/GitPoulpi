@@ -46,7 +46,11 @@ fn default_chords(def: &action::ActionDef) -> Vec<KeyChord> {
         .iter()
         .filter_map(|text| {
             let parsed = KeyChord::parse(text);
-            debug_assert!(parsed.is_ok(), "bad default chord {text:?} for {}", def.id);
+            debug_assert!(
+                parsed.is_ok(),
+                "bad default chord {text:?} for {}", // i18n-english
+                def.config_id()
+            );
             parsed.ok()
         })
         .collect()
@@ -89,7 +93,18 @@ impl Keymap {
                 id: id.clone(),
                 message,
             };
-            let Some(def) = ACTIONS.iter().find(|d| d.id == id) else {
+            // `[keybindings.sequence]`: a slug resolves through the registry
+            // of the sequences this installation sees.
+            if ctx == gitpoulpi_config::sequences::KEYBINDINGS_CONTEXT
+                && crate::sequence_run::registry::slot_of(name).is_none()
+            {
+                km.issues
+                    .push(issue(gitpoulpi_i18n::msg::keymap_issue::unknown_sequence(
+                        name,
+                    )));
+                continue;
+            }
+            let Some(def) = ACTIONS.iter().find(|d| d.config_id() == id) else {
                 let known = Ctx::ALL.iter().any(|c| c.name() == ctx);
                 km.issues.push(issue(if known {
                     gitpoulpi_i18n::msg::keymap_issue::unknown_action(name, ctx)
@@ -169,7 +184,7 @@ impl Keymap {
                 entry.overridden = false;
             }
             self.issues.push(KeymapIssue {
-                id: def.id.to_string(),
+                id: def.config_id().to_string(),
                 message,
             });
         }
@@ -425,10 +440,36 @@ pub(crate) fn install(keymap: Keymap) {
 
 /// Builds the keymap from `config` and installs it; returns the issues.
 pub(crate) fn install_from_config(config: &gitpoulpi_config::Config) -> Vec<KeymapIssue> {
+    // The sequences first: their keys resolve through the registry.
+    let refused = crate::sequence_run::registry::refresh(config, &install_id());
+    crate::sequence_run::registry::note_config_loaded();
     let km = Keymap::from_config(&config.keybindings);
-    let issues = km.issues.clone();
+    let mut issues = km.issues.clone();
+    issues.extend(refused.slugs.iter().map(|slug| KeymapIssue {
+        id: format!("sequence.{slug}"),
+        message: gitpoulpi_i18n::msg::keymap_issue::sequence_limit(
+            slug,
+            crate::sequence_run::registry::MAX_SEQUENCE_SLOTS,
+        ),
+    }));
     install(km);
     issues
+}
+
+/// The installation id `installation`-scope sequences are matched against.
+/// Tests use none (reading the identity seeds the real `config.toml`).
+fn install_id() -> String {
+    #[cfg(test)]
+    {
+        String::new()
+    }
+    #[cfg(not(test))]
+    {
+        gitpoulpi_config::installation::current()
+            .identity
+            .id
+            .clone()
+    }
 }
 
 /// The status line for startup / live reload: `None` when nothing was ignored.

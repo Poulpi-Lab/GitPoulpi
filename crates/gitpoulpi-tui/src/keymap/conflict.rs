@@ -69,7 +69,7 @@ const SHADOWING_DEFAULTS: &[&str] = &[
 
 fn deliberate_shadow(d: &super::action::ActionDef, chord: KeyChord) -> bool {
     d.shadows_parent
-        || (SHADOWING_DEFAULTS.contains(&d.id)
+        || (SHADOWING_DEFAULTS.contains(&d.config_id())
             && d.defaults
                 .iter()
                 .filter_map(|t| KeyChord::parse(t).ok())
@@ -113,7 +113,7 @@ pub(crate) fn detect_with(
         .collect();
 
     for (i, (a, ctx_a, chord_a)) in flat.iter().enumerate() {
-        let label_a = def(*a).label.get();
+        let label_a = def(*a).display_label();
         // Rule 1: same context, same chord. Reported once, on the action
         // with the later id (the one a config file loses).
         for (b, ctx_b, chord_b) in &flat[i + 1..] {
@@ -121,7 +121,7 @@ pub(crate) fn detect_with(
                 continue;
             }
             if ctx_a == ctx_b {
-                let (later, earlier) = if def(*a).id > def(*b).id {
+                let (later, earlier) = if def(*a).config_id() > def(*b).config_id() {
                     (*a, *b)
                 } else {
                     (*b, *a)
@@ -132,7 +132,11 @@ pub(crate) fn detect_with(
                     action: later,
                     other: Some(earlier),
                     chord: *chord_a,
-                    message: msg::already_bound(chord_a, def(earlier).label.get(), ctx_a.name()),
+                    message: msg::already_bound(
+                        chord_a,
+                        def(earlier).display_label(),
+                        ctx_a.name(),
+                    ),
                 });
             } else {
                 // Rule 3: a child chord hiding a parent's.
@@ -154,7 +158,7 @@ pub(crate) fn detect_with(
                     chord: *chord_a,
                     message: msg::hides(
                         chord_a,
-                        def(parent_action).label.get(),
+                        def(parent_action).display_label(),
                         def(child).ctx.name(),
                     ),
                 });

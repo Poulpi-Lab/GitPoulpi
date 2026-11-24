@@ -468,6 +468,8 @@ Every palette row ends with a key button (`[k]`), and `Alt+K` does the same on t
 
 In `config.toml` these are the `[keybindings.palette]` table, named after the command (`toggle_minimap = "Ctrl+Alt+M"`). A key that clashes with another action is shown in red, and `c` on its row lists every action it clashes with.
 
+A sequence you defined (a named chain of palette commands) gets a key the same way: `[keybindings.sequence]` takes the sequence's id (`backup = "Ctrl+Alt+B"`), a key for an id that does not exist is reported and ignored, and the table follows `config.toml` while the app runs. Each sequence is also a palette row, `Sequence: <name>`, showing its key.
+
 The hint band under the list names this key (`Alt+K` by default). It is the action `palette.configure_shortcut`, so it can be rebound like any other.
 
 The palette and the pickers (theme, language, tab, workspace search) move and resize like a dialog: drag the top border, press `Ctrl+N` then `m` (as over every dialog), or press `Alt+G`. `Alt+G` is the action `palette.arrange` ("Dialog: Move or Resize the Dialog in Front"): an extra way, valid over every dialog and popup, to start the arrange mode on the one in front (the palette rows `Dialog: Move or Resize` and `Dialog: Reset Position and Size` act on the palette itself while it is open). Arrows move it, `Shift`+arrows resize it, `0` resets it, `Enter` or `Esc` leave the mode and the popup stays open. `ui.dialog_geometry` decides whether the place is kept.

@@ -2643,6 +2643,8 @@ md_editor_ai = "Markdown-redigerare: Skriv med AI"
 
 
 [keymap_ctx]
+# context: key group of the user-defined sequences on the Settings keybindings page
+sequence = "User sequences"
 rewrite = "Omskrivningsvyn"
 history = "Vy Filhistorik"
 commit_column = { git = "Commit-kolumnen (när den har tangentbordet)", local = "Kolumnen med incheckningar (när den har tangentbordet)" }
@@ -3018,6 +3020,8 @@ action_issue_body = "Ärendebeskrivning"
 title_hosting_base = "Grundprompt för svar"
 
 [palette]
+# context: palette row running a user-defined sequence; {name} is the sequence's own name
+sequence_run = "Sequence: {name}"
 git_pull_all_branches = "Git: {$Pull} alla grenar"
 git_pull_all_branches_fast_forward_if_possible = "Git: {$Pull} alla grenar (fast-forward om möjligt)"
 git_pull_all_branches_fast_forward_only = "Git: {$Pull} alla grenar (bara fast-forward)"
@@ -5823,6 +5827,10 @@ temp_dir = "temp-katalog: {error}"
 temp_file = "temp-fil: {error}"
 
 [keymap_issue]
+# context: [keybindings.sequence] entry naming a sequence that does not exist; {name} is the slug
+unknown_sequence = "no sequence named '{name}'"
+# context: more sequences than the keymap has slots for; {slug} is the sequence, {max} the limit
+sequence_limit = "sequence '{slug}' ignored: the limit of {max} sequences with a key per session is reached"
 unknown_action = "okänd åtgärd '{name}' i [{ctx}]"
 unknown_context = "okänd kontext '{ctx}'"
 not_rebindable = "kan inte ändras ännu"

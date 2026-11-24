@@ -2640,6 +2640,8 @@ md_editor_ai = "Markdown 편집기: AI로 쓰기"
 
 
 [keymap_ctx]
+# context: key group of the user-defined sequences on the Settings keybindings page
+sequence = "User sequences"
 rewrite = "기록 다시 쓰기 워크벤치"
 history = "파일 기록 보기"
 commit_column = "{$Commit} 열 (키보드 포커스가 있을 때)"
@@ -3014,6 +3016,8 @@ action_issue_body = "이슈 설명"
 title_hosting_base = "답글 기본 프롬프트"
 
 [palette]
+# context: palette row running a user-defined sequence; {name} is the sequence's own name
+sequence_run = "Sequence: {name}"
 git_pull_all_branches = "Git: 모든 브랜치 {$Pull}"
 git_pull_all_branches_fast_forward_if_possible = "Git: 모든 브랜치 {$Pull} (가능하면 fast-forward)"
 git_pull_all_branches_fast_forward_only = "Git: 모든 브랜치 {$Pull} (fast-forward만)"
@@ -5815,6 +5819,10 @@ temp_dir = "임시 디렉터리: {error}"
 temp_file = "임시 파일: {error}"
 
 [keymap_issue]
+# context: [keybindings.sequence] entry naming a sequence that does not exist; {name} is the slug
+unknown_sequence = "no sequence named '{name}'"
+# context: more sequences than the keymap has slots for; {slug} is the sequence, {max} the limit
+sequence_limit = "sequence '{slug}' ignored: the limit of {max} sequences with a key per session is reached"
 unknown_action = "[{ctx}]에 알 수 없는 동작 '{name}'이(가) 있습니다"
 unknown_context = "알 수 없는 범위 '{ctx}'"
 not_rebindable = "아직 다시 지정할 수 없습니다"

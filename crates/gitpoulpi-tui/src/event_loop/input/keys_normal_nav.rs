@@ -10,6 +10,20 @@ use gitpoulpi_i18n::msg;
 pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -> io::Result<Flow> {
     let km = env.km;
     let count = env.count;
+    // A key the user gave a sequence (`[keybindings.sequence]`): the same
+    // availability check as its palette row, then the run.
+    if let Some(keymap::Action::Sequence(slot)) = km.action_in(keymap::Ctx::Sequence, &key) {
+        let command = PaletteCommand::Sequence(palette::SeqOp::Run(slot));
+        match palette::unavailable_reason(command, env.palette_ctx) {
+            Some(reason) => {
+                let name =
+                    crate::sequence_run::registry::info(slot).map_or_else(String::new, |i| i.name);
+                *cx.last_message = Some(msg::input::command_unavailable(&name, reason));
+            }
+            None => crate::sequence_run::start(slot, cx.last_message),
+        }
+        return Ok(Flow::Handled);
+    }
     // A key the user gave a palette command (`[keybindings.palette]`): the
     // same availability check and the same `run_command` as the palette.
     if let Some(entry) = km

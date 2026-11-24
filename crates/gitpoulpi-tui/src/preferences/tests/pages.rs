@@ -375,7 +375,7 @@ fn the_keybindings_tab_is_reached_by_the_palette_the_agent_and_the_search() {
     assert!(st.keys_active());
 
     let mut st = state(dir.path());
-    let id = crate::keymap::ACTIONS[0].id;
+    let id = crate::keymap::ACTIONS[0].config_id();
     st.show_page(None, Some(&format!("keys.{id}"))).unwrap();
     assert_eq!(st.sub_tab(), SubTab::List);
     let mut st = state(dir.path());

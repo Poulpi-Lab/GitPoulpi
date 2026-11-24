@@ -583,7 +583,7 @@ mod tests {
             .collect();
         assert!(!tagged.is_empty(), "{feature:?} tags no keymap action");
         for def in tagged {
-            assert!(!def.built(), "{}", def.id);
+            assert!(!def.built(), "{}", def.config_id());
         }
     }
 
@@ -664,7 +664,7 @@ mod tests {
             .collect();
         assert!(!tagged.is_empty(), "{feature:?} tags no keymap action");
         for def in tagged {
-            assert_eq!(def.built(), feature.built(), "{}", def.id);
+            assert_eq!(def.built(), feature.built(), "{}", def.config_id());
         }
     }
 
@@ -682,7 +682,12 @@ mod tests {
             .iter()
             .filter(|d| matches!(d.ctx, crate::keymap::Ctx::Rewrite))
         {
-            assert_eq!(def.built(), on && offered(def.requires), "{}", def.id);
+            assert_eq!(
+                def.built(),
+                on && offered(def.requires),
+                "{}",
+                def.config_id()
+            );
         }
         assert_eq!(
             listed_commands()

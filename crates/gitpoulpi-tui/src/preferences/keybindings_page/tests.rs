@@ -25,7 +25,7 @@ fn typed(state: &mut PreferencesState, text: &str) {
 }
 
 fn select(state: &mut PreferencesState, id: &str) {
-    state.keys.selected = ACTIONS.iter().position(|d| d.id == id).expect(id);
+    state.keys.selected = ACTIONS.iter().position(|d| d.config_id() == id).expect(id);
 }
 
 fn file(dir: &Path) -> String {
@@ -56,7 +56,7 @@ fn search_matches_label_id_and_chord_text() {
         ACTIONS
             .iter()
             .filter(|d| matches_query(q, d, &km))
-            .map(|d| d.id)
+            .map(|d| d.config_id())
             .collect()
     };
     assert!(find("stage selected").contains(&"git_prefix.stage_file"));
@@ -410,7 +410,7 @@ fn french_search_matches_the_english_label_too() {
         ACTIONS
             .iter()
             .filter(|d| matches_query(q, d, &km))
-            .map(|d| d.id)
+            .map(|d| d.config_id())
             .collect()
     };
     {
@@ -429,16 +429,19 @@ fn every_french_action_label_and_context_fits_the_list_column() {
     for vocabulary in [false, true] {
         let _t = gitpoulpi_i18n::override_git_terms(vocabulary);
         // Palette commands' labels are the palette's own; the list ellipsizes.
-        for def in ACTIONS.iter().filter(|d| d.ctx != Ctx::Palette) {
-            let fr = def.label.get();
-            let en = def.label.english();
-            assert!(!fr.is_empty(), "{}", def.id);
+        for def in ACTIONS
+            .iter()
+            .filter(|d| d.ctx != Ctx::Palette && d.present())
+        {
+            let (fr, en) = (def.display_label(), def.english_label());
+            let (fr, en) = (&*fr, &*en);
+            assert!(!fr.is_empty(), "{}", def.config_id());
             // The list column is at most 42 cells: stay near the English width.
             assert!(
                 crate::display_width(fr) <= crate::display_width(en).max(40) + 12
                     && crate::display_width(fr) <= 46,
                 "{}: {fr:?} is much longer than {en:?}",
-                def.id
+                def.config_id()
             );
         }
         for ctx in Ctx::ALL {
@@ -450,14 +453,19 @@ fn every_french_action_label_and_context_fits_the_list_column() {
 #[test]
 fn the_docs_table_stays_english_in_any_language() {
     let _l = gitpoulpi_i18n::override_lang(gitpoulpi_i18n::Lang::Fr);
-    for def in ACTIONS {
-        assert_ne!(def.label.english(), "", "{}", def.id);
+    for def in ACTIONS.iter().filter(|d| d.present()) {
+        assert_ne!(def.english_label(), "", "{}", def.config_id());
     }
     assert!(def_label_english("global.palette").contains("Command Palette"));
 }
 
-fn def_label_english(id: &str) -> &'static str {
-    ACTIONS.iter().find(|d| d.id == id).unwrap().label.english()
+fn def_label_english(id: &str) -> String {
+    ACTIONS
+        .iter()
+        .find(|d| d.config_id() == id)
+        .unwrap()
+        .english_label()
+        .into_owned()
 }
 
 /// The selected action row is shown by its highlight alone: no arrow glyph.
@@ -467,4 +475,48 @@ fn the_selected_action_row_has_no_arrow_marker() {
     let mut st = state(tmp.path());
     let screen = draw(&mut st);
     assert!(!screen.contains('\u{25B8}'), "{screen}");
+}
+
+#[test]
+fn the_sequence_pool_shows_only_the_slots_a_sequence_holds() {
+    use crate::sequence_run::registry::{refresh_defs, test_def};
+    let dir = tempfile::tempdir().unwrap();
+    refresh_defs(&[]);
+    let s = state(dir.path());
+    assert!(
+        s.keys
+            .visible()
+            .iter()
+            .all(|i| ACTIONS[*i].ctx != Ctx::Sequence),
+        "an unused slot is not listed"
+    );
+    refresh_defs(&[test_def("page-seq")]);
+    let s = state(dir.path());
+    let listed: Vec<_> = s
+        .keys
+        .visible()
+        .into_iter()
+        .filter(|i| ACTIONS[*i].ctx == Ctx::Sequence)
+        .map(|i| {
+            (
+                ACTIONS[i].config_id(),
+                ACTIONS[i].display_label().into_owned(),
+            )
+        })
+        .collect();
+    assert_eq!(
+        listed,
+        vec![(
+            "sequence.page-seq",
+            "Sequence: Name of page-seq".to_string()
+        )]
+    );
+    // Searchable by its slug and by its name.
+    let km = Keymap::defaults();
+    let def = ACTIONS
+        .iter()
+        .find(|d| d.config_id() == "sequence.page-seq")
+        .unwrap();
+    assert!(matches_query("page-seq", def, &km));
+    assert!(matches_query("name of page", def, &km));
 }

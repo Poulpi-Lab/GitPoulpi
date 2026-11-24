@@ -214,6 +214,7 @@ mod scrollbar;
 mod scrollbar_guard_tests;
 mod scrollbar_repeat;
 mod sections_scope;
+mod sequence_run;
 mod session_store;
 mod sidebar_layout;
 #[cfg(test)]

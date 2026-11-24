@@ -2641,6 +2641,8 @@ md_editor_ai = "Markdown 编辑器：AI 写作"
 
 
 [keymap_ctx]
+# context: key group of the user-defined sequences on the Settings keybindings page
+sequence = "User sequences"
 rewrite = "重写历史工作台"
 history = "文件历史视图"
 commit_column = { git = "{$Commit} 列（获得键盘焦点时）", local = "{$Commit}列（获得键盘焦点时）" }
@@ -3015,6 +3017,8 @@ action_issue_body = "议题描述"
 title_hosting_base = "回复的基础提示词"
 
 [palette]
+# context: palette row running a user-defined sequence; {name} is the sequence's own name
+sequence_run = "Sequence: {name}"
 git_pull_all_branches = { git = "Git：{$Pull} 所有分支", local = "Git：{$Pull}所有分支" }
 git_pull_all_branches_fast_forward_if_possible = { git = "Git：{$Pull} 所有分支（可能时快进）", local = "Git：{$Pull}所有分支（可能时快进）" }
 git_pull_all_branches_fast_forward_only = { git = "Git：{$Pull} 所有分支（仅快进）", local = "Git：{$Pull}所有分支（仅快进）" }
@@ -5819,6 +5823,10 @@ temp_dir = "临时目录：{error}"
 temp_file = "临时文件：{error}"
 
 [keymap_issue]
+# context: [keybindings.sequence] entry naming a sequence that does not exist; {name} is the slug
+unknown_sequence = "no sequence named '{name}'"
+# context: more sequences than the keymap has slots for; {slug} is the sequence, {max} the limit
+sequence_limit = "sequence '{slug}' ignored: the limit of {max} sequences with a key per session is reached"
 unknown_action = "[{ctx}] 中有未知操作“{name}”"
 unknown_context = "未知范围“{ctx}”"
 not_rebindable = "暂不可重新绑定"

@@ -1195,5 +1195,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::Quit
         // A setting is editable from anywhere (a Home tab included).
         | C::Setting(..) => None,
+        // A sequence is gated by its own validation only.
+        C::Sequence(op) => sequences::unavailable(op),
     }
 }

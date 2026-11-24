@@ -571,7 +571,7 @@ pub(crate) fn resolve_keys(km: &keymap::Keymap, s: &str) -> String {
             None => (false, id),
         };
         out.push_str(&rest[..open]);
-        match keymap::ACTIONS.iter().find(|d| d.id == id) {
+        match keymap::ACTIONS.iter().find(|d| d.config_id() == id) {
             Some(def) => {
                 let label = if all {
                     km.shown_labels(def.action).join(" / ")
@@ -709,7 +709,7 @@ fn built_parts(s: &str) -> Vec<&str> {
         let id = id.strip_prefix('*').unwrap_or(id);
         keymap::ACTIONS
             .iter()
-            .find(|d| d.id == id)
+            .find(|d| d.config_id() == id)
             .map(|d| !d.built())
     };
     s.split(" / ")

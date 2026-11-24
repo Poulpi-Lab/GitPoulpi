@@ -87,10 +87,14 @@ fn enter_commits_the_highlighted_theme() {
     state.on_key(key_of(KeyCode::Down));
     state.on_key(key_of(KeyCode::Down));
     state.on_key(key_of(KeyCode::Enter));
-    assert_eq!(state.config.ui.theme_slug(), "light");
+    // This (non-primary) installation keeps the pick in its own entry and
+    // leaves the shared `ui.theme` alone.
+    assert_eq!(state.own_config().ui.theme_slug(), "light");
+    assert_eq!(state.config.ui.theme_slug(), "system");
     assert_eq!(state.theme_preview, None);
     let raw = std::fs::read_to_string(dir.path().join("config.toml")).unwrap();
     assert!(raw.contains("theme = \"light\""), "{raw}");
+    assert!(!raw.contains("[ui]"), "{raw}");
 }
 
 #[test]

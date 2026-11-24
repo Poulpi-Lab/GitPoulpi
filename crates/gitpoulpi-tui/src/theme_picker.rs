@@ -6,7 +6,7 @@
 //! `ui.theme`, Esc puts the previous theme back.
 
 use gitpoulpi_config::theme::{self, ThemeSpec};
-use gitpoulpi_config::{Config, ConfigPaths};
+use gitpoulpi_config::ConfigPaths;
 use gitpoulpi_i18n::msg;
 use ratatui::style::Color;
 
@@ -151,7 +151,7 @@ impl ThemePicker {
         let config_path = paths.as_ref().map(|p| p.config_file());
         let previous = config_path
             .as_deref()
-            .and_then(|p| Config::load(p).ok())
+            .and_then(crate::launcher_sync::load_own)
             .map(|c| c.ui.theme_slug().to_string())
             .unwrap_or_else(|| gitpoulpi_config::THEME_SYSTEM.to_string());
         let user = paths
@@ -237,7 +237,12 @@ impl ThemePicker {
             self.restore();
             return msg::settings_screen::NO_CONFIG_DIR.get().to_string();
         };
-        match gitpoulpi_config::set_in_file(&path, "ui.theme", &choice.slug) {
+        match crate::launcher_sync::write_ui_key(
+            &path,
+            "ui.theme",
+            &choice.slug,
+            &crate::launcher_sync::running().0,
+        ) {
             Ok(_) => {
                 crate::install_theme(&choice.slug, &self.user);
                 self.shown = choice.slug.clone();

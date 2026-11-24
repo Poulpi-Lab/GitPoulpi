@@ -330,7 +330,8 @@ pub(crate) fn apply_live_settings(
 ) -> Option<graph::LogLoadSettings> {
     match gitpoulpi_config::Settings::resolve_ambient() {
         Ok(settings) => {
-            let config = settings.config();
+            let own = crate::launcher_sync::own_config(settings.config());
+            let config = &own;
             daemon_link::set_log_page_limit(config.general.initial_commits_in_graph_clamped());
             live_settings::install_language(&config.ui);
             live_settings::install_date_patterns(&config.ui);

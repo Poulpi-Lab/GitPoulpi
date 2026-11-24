@@ -469,6 +469,8 @@ the server; see [MCP and agents](mcp-and-agents.md).
 
 ![The Graph color theme combo: Follow theme, then every lane palette with a few of its colors](images/settings-log-graph-lanes.png)
 
+The theme and the graph colors (the Theme, the graph color theme, the lane colorization and background, the row tint strength) belong to each installation: with several installations sharing one `config.toml`, changing them in one never changes the others. Only the primary installation also writes the shared `ui.*` keys.
+
 ### Keyboard & mouse
 
 ![The Keyboard & mouse page: every action by context with its keys, a search box and filters](images/settings-keyboard.png)

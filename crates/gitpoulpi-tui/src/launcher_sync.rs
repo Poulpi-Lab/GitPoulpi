@@ -96,8 +96,55 @@ pub(crate) fn effective_in(
 /// the exe and may seed its entry on disk (`installation::current`): the
 /// startup publish does it before the loop, never the render thread.
 pub(crate) fn effective_of(config: &gitpoulpi_config::Config) -> Effective {
-    let cur = installation::current();
-    effective_in(config, &cur.identity, &cur.config)
+    let (identity, seeded) = running();
+    effective_in(config, &identity, &seeded)
+}
+
+/// The running installation and its seeded config. Tests never identify the
+/// machine's own installation (that would read and seed the real config).
+pub(crate) fn running() -> (Identity, gitpoulpi_config::Config) {
+    #[cfg(test)]
+    {
+        let cur = crate::preferences::fake_current(false);
+        (cur.identity, cur.config)
+    }
+    #[cfg(not(test))]
+    {
+        let cur = installation::current();
+        (cur.identity.clone(), cur.config.clone())
+    }
+}
+
+/// `config` as this installation shows it: its own colour keys (theme and
+/// graph colours) in `ui.*`, never what another installation stored there.
+pub(crate) fn own_config(config: &gitpoulpi_config::Config) -> gitpoulpi_config::Config {
+    installation::overlay_look(config, &effective_of(config))
+}
+
+/// [`own_config`] of the file at `path`.
+pub(crate) fn load_own(path: &std::path::Path) -> Option<gitpoulpi_config::Config> {
+    gitpoulpi_config::Config::load(path)
+        .ok()
+        .map(|c| own_config(&c))
+}
+
+/// Writes one `ui.*` key the way this installation owns it: a colour key
+/// (theme, graph colours) goes to its own entry unless it is the primary,
+/// everything else is the shared key. Returns the stored value as JSON.
+pub(crate) fn write_ui_key(
+    path: &std::path::Path,
+    key: &str,
+    value: &str,
+    identity: &Identity,
+) -> gitpoulpi_config::Result<serde_json::Value> {
+    match key
+        .strip_prefix("ui.")
+        .filter(|_| installation::is_look_key(key))
+    {
+        Some(short) => installation::set_look_in_file(path, identity, short, value)
+            .map(serde_json::Value::String),
+        None => gitpoulpi_config::set_in_file(path, key, value),
+    }
 }
 
 /// The colour this installation wears in `config`.

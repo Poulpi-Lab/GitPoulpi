@@ -300,7 +300,7 @@ impl LanguagePicker {
         let config_path = paths.as_ref().map(|p| p.config_file());
         let current = config_path
             .as_deref()
-            .and_then(|p| Config::load(p).ok())
+            .and_then(crate::launcher_sync::load_own)
             .map(|c| c.ui.graph_color_slug().to_string())
             .unwrap_or_else(|| gitpoulpi_config::GRAPH_COLOR_FOLLOW_THEME.to_string());
         let user = paths
@@ -425,7 +425,12 @@ impl LanguagePicker {
             return msg::settings_screen::NO_CONFIG_DIR.get().to_string();
         };
         let key = self.kind.key();
-        match gitpoulpi_config::set_in_file(&path, key, &choice.value) {
+        match crate::launcher_sync::write_ui_key(
+            &path,
+            key,
+            &choice.value,
+            &crate::launcher_sync::running().0,
+        ) {
             Ok(_) => {
                 if self.kind == PickerKind::Language {
                     let ui = Config::load(&path).map(|c| c.ui).unwrap_or_default();
@@ -451,11 +456,16 @@ pub(crate) fn toggle_row_tints(live: &mut crate::graph::LaneBackground) -> Strin
     let Some(path) = ConfigPaths::discover().map(|p| p.config_file()) else {
         return msg::settings_screen::NO_CONFIG_DIR.get().to_string();
     };
-    let now = Config::load(&path)
+    let now = crate::launcher_sync::load_own(&path)
         .map(|c| c.ui.graph_lane_background)
         .unwrap_or_default();
     let next = if now == B::Off { B::RowTint } else { B::Off };
-    match gitpoulpi_config::set_in_file(&path, "ui.graph_lane_background", next.as_str()) {
+    match crate::launcher_sync::write_ui_key(
+        &path,
+        "ui.graph_lane_background",
+        next.as_str(),
+        &crate::launcher_sync::running().0,
+    ) {
         Ok(_) => {
             *live = next.into();
             format!("ui.graph_lane_background = {}", next.as_str())

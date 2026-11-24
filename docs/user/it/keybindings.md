@@ -1107,6 +1107,7 @@ applicano. I tasti sono quelli predefiniti.
 | Diff: Attiva o disattiva l'a capo automatico | `w` |
 | Diff: Scegli la codifica... | `C` |
 | Vista: Mostra o nascondi la minimappa | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Vista: Mostra o nascondi la colonna dei commit | `Alt+C` |
 | Vista: Colonna dei commit: nascondi |  |
 | Vista: Colonna dei commit: cronologia del file |  |

@@ -827,6 +827,10 @@ pub struct UiConfig {
     pub diff_view_mode: Option<LegacyDiffViewMode>,
     pub diff_show_whitespace: bool,
     pub diff_word_wrap: bool,
+    /// Live: highlight the changed words of a changed line (a removed line
+    /// and the added line it became) with a stronger background, in every
+    /// diff view. On by default.
+    pub diff_intraline: bool,
     /// Live: a minimap of the whole file beside the vertical scrollbar of
     /// the Diff view and the editor (a pixel picture where the terminal
     /// draws images, braille cells elsewhere). Off by default.
@@ -1229,6 +1233,7 @@ impl Default for UiConfig {
             diff_view_mode: None,
             diff_show_whitespace: true,
             diff_word_wrap: false,
+            diff_intraline: true,
             minimap: false,
             mermaid_detail: gitpoulpi_core::domain::MermaidDetail::default(),
             mermaid_orientation: gitpoulpi_core::domain::MermaidOrientation::default(),

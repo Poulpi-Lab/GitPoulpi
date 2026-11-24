@@ -1161,6 +1161,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::CompareSwap
         | C::CompareGotoNext
         | C::ToggleMinimap
+        | C::ToggleDiffIntraline
         | C::EditorToggleFollowSelection
         | C::CommitColumn(_)
         | C::Quit

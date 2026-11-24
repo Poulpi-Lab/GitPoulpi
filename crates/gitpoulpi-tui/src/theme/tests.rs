@@ -112,6 +112,16 @@ fn dark_theme_is_exactly_the_old_palette() {
         ("diff.del_fg", t.diff.del_fg, Color::Rgb(240, 138, 138)),
         ("diff.add_bg", t.diff.add_bg, Color::Rgb(24, 52, 38)),
         ("diff.del_bg", t.diff.del_bg, Color::Rgb(58, 30, 34)),
+        (
+            "diff.add_emph_bg",
+            t.diff.add_emph_bg,
+            Color::Rgb(36, 88, 60),
+        ),
+        (
+            "diff.del_emph_bg",
+            t.diff.del_emph_bg,
+            Color::Rgb(104, 40, 48),
+        ),
         ("diff.hunk_fg", t.diff.hunk_fg, Color::Rgb(140, 160, 210)),
         (
             "diff.gutter_fg",
@@ -296,7 +306,7 @@ fn dark_theme_is_exactly_the_old_palette() {
     for (name, actual, expected) in table {
         assert_eq!(actual, expected, "{name}");
     }
-    assert_eq!(table.len(), 112, "every role is in the table");
+    assert_eq!(table.len(), 114, "every role is in the table");
     let lanes: Vec<Color> = [
         (64, 156, 255),
         (54, 179, 126),

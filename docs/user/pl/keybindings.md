@@ -1102,6 +1102,7 @@ zastosowania. Klawisze są domyślne.
 | Diff: Przełącz zawijanie linii | `w` |
 | Diff: Wybierz kodowanie... | `C` |
 | Widok: Przełącz minimapę | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Widok: Przełącz kolumnę commitów | `Alt+C` |
 | Widok: Kolumna commitów: Ukryj |  |
 | Widok: Kolumna commitów: Historia pliku |  |

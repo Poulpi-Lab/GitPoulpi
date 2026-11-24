@@ -478,6 +478,8 @@ pub(crate) struct DiffRenderOpts<'a> {
     pub(crate) lfs_raw: bool,
     /// See `DiffViewState::lfs_local`.
     pub(crate) lfs_local: Option<bool>,
+    /// Paint the changed words of a changed line stronger (`ui.diff_intraline`).
+    pub(crate) intraline: bool,
 }
 
 impl<'a> DiffRenderOpts<'a> {
@@ -497,6 +499,7 @@ impl<'a> DiffRenderOpts<'a> {
             full_file,
             lfs_raw: state.lfs_raw,
             lfs_local: state.lfs_local,
+            intraline: crate::live_settings::diff_intraline(),
         }
     }
 }
@@ -536,6 +539,7 @@ pub(crate) fn render_diff_scrolled(
             full_file: None,
             lfs_raw: false,
             lfs_local: None,
+            intraline: false,
         },
     )
 }
@@ -550,6 +554,18 @@ fn hunk_first_line(start: u32, count: u32) -> u32 {
     } else {
         start.max(1)
     }
+}
+
+/// The most changed lines (removed plus added) a file may have and still get
+/// changed-word emphasis (`diff_view/intraline.rs`).
+const MAX_EMPHASIS_LINES: usize = 20_000;
+
+fn changed_lines(hunks: &[super::layout::EffectiveHunk]) -> usize {
+    hunks
+        .iter()
+        .flat_map(|eh| &eh.hunk.lines)
+        .filter(|l| l.origin != LineOrigin::Context)
+        .count()
 }
 
 /// Turns a `FileDiff` into display rows: the hunks alone (`hunks_only`),
@@ -599,6 +615,9 @@ pub(crate) fn render_diff_annotated(
         width: opts.width,
         h_offset,
         mode: opts.mode,
+        // Past this many changed lines in one file the emphasis is dropped
+        // wholesale: the render runs on the UI thread.
+        intraline: opts.intraline && changed_lines(&hunks) <= MAX_EMPHASIS_LINES,
         annot: annotator,
     };
     // The next unchanged line on each side, 1-based.
@@ -790,6 +809,7 @@ fn emit_gap(
                     (&LineOrigin::Context, text),
                     (Some(old), Some(new)),
                     DiffRow::default(),
+                    &[],
                     layout,
                 );
                 annotate(sink, Some(old), Some(new), layout);
@@ -800,6 +820,7 @@ fn emit_gap(
                         origin: &LineOrigin::Context,
                         content: text,
                         number,
+                        marked: &[],
                     })
                 };
                 push_split_row(sink, side(old), side(new), DiffRow::default(), layout);

@@ -1098,6 +1098,7 @@ die Standardtasten.
 | Diff: Zeilenumbruch umschalten | `w` |
 | Diff: Kodierung wählen... | `C` |
 | Ansicht: Minimap umschalten | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Ansicht: Commit-Spalte umschalten | `Alt+C` |
 | Ansicht: Commit-Spalte: ausblenden |  |
 | Ansicht: Commit-Spalte: Dateiverlauf |  |

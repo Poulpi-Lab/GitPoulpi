@@ -154,6 +154,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "ui.diff_hunks_only",
     "ui.diff_show_whitespace",
     "ui.diff_word_wrap",
+    "ui.diff_intraline",
     "ui.minimap",
     "ui.mermaid_detail",
     "ui.mermaid_orientation",

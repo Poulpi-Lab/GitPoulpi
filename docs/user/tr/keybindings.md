@@ -1103,6 +1103,7 @@ Tuşlar varsayılanlardır.
 | Diff: Sözcük Kaydırmayı Aç/Kapat | `w` |
 | Diff: Kodlamayı Seç... | `C` |
 | Görünüm: Minimap'i Aç/Kapat | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Görünüm: Commit sütununu aç/kapat | `Alt+C` |
 | Görünüm: Commit sütunu: gizle |  |
 | Görünüm: Commit sütunu: dosya geçmişi |  |

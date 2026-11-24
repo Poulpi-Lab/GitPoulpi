@@ -1105,6 +1105,7 @@ Tangenterna är standardvärdena.
 | Diff: Växla radbrytning | `w` |
 | Diff: Välj teckenkodning... | `C` |
 | Vy: Växla minikarta | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Vy: Växla commit-kolumnen | `Alt+C` |
 | Vy: Commit-kolumnen: dölj |  |
 | Vy: Commit-kolumnen: filens historik |  |

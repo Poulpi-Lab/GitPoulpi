@@ -7,6 +7,9 @@ IPC surfaces are stable within a major version).
 
 ## [Unreleased]
 
+### Added
+- **Changed words in a diff:** when only part of a line changes, the words that differ get a stronger background of the added or removed color, in the Diff view (Inline and Split), the review's diff and the other diff panes. Removed and added lines are paired by order inside a hunk and marked only when they are alike enough, so a rewritten line stays flat. New theme roles `diff.add_emph_bg` and `diff.del_emph_bg` (every preset sets them; a theme file that changes `diff.add_bg` or `diff.del_bg` gets a derived emphasis), the setting `ui.diff_intraline` (on by default; Settings > Diff & editor) and the palette entry **Diff: Toggle Changed Words Highlight**.
+
 ## [1.2.0] - 2026-11-23
 
 ### Added

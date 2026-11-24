@@ -385,6 +385,26 @@ pub(crate) fn toggle_minimap(config_path: &Option<PathBuf>) -> String {
     }
 }
 
+/// Flips `ui.diff_intraline` (the palette's Toggle Changed Words Highlight),
+/// publishes it (the render cache key reads it, so the open diff redraws) and
+/// writes it back to `config.toml`. Returns the status-line message.
+pub(crate) fn toggle_diff_intraline(config_path: &Option<PathBuf>) -> String {
+    let on = !live_settings::diff_intraline();
+    live_settings::install_diff_intraline(on);
+    if let Some(path) = config_path {
+        let _ = gitpoulpi_config::set_in_file(
+            path,
+            "ui.diff_intraline",
+            if on { "true" } else { "false" },
+        );
+    }
+    if on {
+        msg::INTRALINE_ON.get().to_string()
+    } else {
+        msg::INTRALINE_OFF.get().to_string()
+    }
+}
+
 /// Why a staging action is refused on a commit's diff: one constant, since
 /// the keyboard, the palette and the mouse ask the same question.
 pub(crate) const NOT_A_WORKING_DIFF: gitpoulpi_i18n::M = msg::NOT_WORKING_DIFF;
@@ -1226,6 +1246,7 @@ mod tests {
                     full_file: Some(&content),
                     lfs_raw: false,
                     lfs_local: None,
+                    intraline: false,
                 },
             );
             // Gap rows are there: line 4..=16 between the hunks.
@@ -1560,6 +1581,7 @@ mod tests {
                         full_file: (!hunks_only).then_some(&content),
                         lfs_raw: false,
                         lfs_local: None,
+                        intraline: false,
                     },
                 );
                 let label = format!("{mode:?} hunks_only={hunks_only}");

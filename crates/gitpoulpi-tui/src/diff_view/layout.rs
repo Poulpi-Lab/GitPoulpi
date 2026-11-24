@@ -1,3 +1,4 @@
+use super::intraline::{emph_for, emph_spans, hunk_emphasis, CellRange};
 use super::model::{
     AnnotBlock, AnnotRow, AnnotSide, Annotator, DiffRender, DiffRow, DiffText, RowChange,
 };
@@ -172,6 +173,8 @@ pub(super) struct LayoutOpts<'a> {
     pub(super) width: u16,
     pub(super) h_offset: usize,
     pub(super) mode: DiffViewMode,
+    /// Paint the changed words of paired removed/added lines stronger.
+    pub(super) intraline: bool,
     /// Rows another view wants under the code lines (the review's threads).
     pub(super) annot: Option<&'a dyn Annotator>,
 }
@@ -179,6 +182,7 @@ pub(super) struct LayoutOpts<'a> {
 /// One hunk in the one-column layout, every line of it.
 pub(super) fn emit_unified(sink: &mut Sink, eh: &EffectiveHunk, opts: LayoutOpts<'_>) {
     let numbers = line_numbers(&eh.hunk);
+    let emph = opts.intraline.then(|| hunk_emphasis(&eh.hunk.lines));
     for (i, line) in eh.hunk.lines.iter().enumerate() {
         let carries = line.origin != LineOrigin::Context;
         push_unified_line(
@@ -187,6 +191,7 @@ pub(super) fn emit_unified(sink: &mut Sink, eh: &EffectiveHunk, opts: LayoutOpts
             numbers[i],
             DiffRow::body(eh.hunk.id, [carries.then(|| eh.origin[i]), None])
                 .with_change(RowChange::of(&line.origin)),
+            emph.as_ref().map_or(&[][..], |e| &e[i]),
             opts,
         );
         annotate(sink, numbers[i].0, numbers[i].1, opts);
@@ -202,6 +207,7 @@ pub(super) fn push_unified_line(
     (origin, text): (&LineOrigin, &str),
     (old, new): (Option<u32>, Option<u32>),
     first: DiffRow,
+    marked: &[CellRange],
     opts: LayoutOpts<'_>,
 ) {
     let first = DiffRow {
@@ -221,11 +227,15 @@ pub(super) fn push_unified_line(
         let m = if n == 0 { mark } else { " " };
         let seg = span.seg(line, (GUTTER_WIDTH + 1) as u16, content_width);
         sink.push(
-            Line::from(vec![
-                Span::styled(g, Style::default().fg(th().diff.gutter_fg)),
-                Span::styled(m.to_string(), style),
-                Span::styled(piece, style),
-            ]),
+            Line::from(
+                vec![
+                    Span::styled(g, Style::default().fg(th().diff.gutter_fg)),
+                    Span::styled(m.to_string(), style),
+                ]
+                .into_iter()
+                .chain(content_spans(&piece, span, marked, origin, style))
+                .collect::<Vec<_>>(),
+            ),
             if n == 0 {
                 first
             } else {
@@ -248,6 +258,8 @@ pub(super) struct SideLine<'a> {
     pub(super) origin: &'a LineOrigin,
     pub(super) content: &'a str,
     pub(super) number: u32,
+    /// The cells of `content` (tab-expanded) to paint stronger.
+    pub(super) marked: &'a [CellRange],
 }
 
 /// Side-by-side rows. Deletes are paired positionally with the adds that
@@ -256,6 +268,7 @@ pub(super) struct SideLine<'a> {
 pub(super) fn emit_split(sink: &mut Sink, eh: &EffectiveHunk, opts: LayoutOpts<'_>) {
     let hunk = &eh.hunk;
     let numbers = line_numbers(hunk);
+    let emph = opts.intraline.then(|| hunk_emphasis(&hunk.lines));
     // A side as (index into the hunk, number to print).
     type SplitSide = Option<(usize, u32)>;
     let mut split_rows: Vec<(SplitSide, SplitSide)> = Vec::new();
@@ -300,6 +313,7 @@ pub(super) fn emit_split(sink: &mut Sink, eh: &EffectiveHunk, opts: LayoutOpts<'
                 origin: &hunk.lines[idx].origin,
                 content: &hunk.lines[idx].content,
                 number,
+                marked: emph.as_ref().map_or(&[][..], |e| &e[idx]),
             })
         };
         push_split_row(
@@ -350,7 +364,7 @@ pub(super) fn push_split_row(
             let x = if side == 0 { 7 } else { content_width + 15 };
             row_pieces(l.content, content_width, opts)
                 .into_iter()
-                .map(|(piece, span)| (piece, span.seg(id, x as u16, content_width)))
+                .map(|(piece, span)| (piece, span.seg(id, x as u16, content_width), span))
                 .collect::<Vec<_>>()
         }
         None => Vec::new(),
@@ -362,12 +376,24 @@ pub(super) fn push_split_row(
         let mut spans: Vec<Span<'static>> = Vec::new();
         let l = l_rows.get(n);
         let r = r_rows.get(n);
-        push_side(&mut spans, left, l.map(|(p, _)| p), n, content_width);
+        push_side(
+            &mut spans,
+            left,
+            l.map(|(p, _, s)| (p, *s)),
+            n,
+            content_width,
+        );
         spans.push(Span::styled(
             "\u{2502}",
             Style::default().fg(th().diff.gutter_fg),
         ));
-        push_side(&mut spans, right, r.map(|(p, _)| p), n, content_width);
+        push_side(
+            &mut spans,
+            right,
+            r.map(|(p, _, s)| (p, *s)),
+            n,
+            content_width,
+        );
         sink.push(
             Line::from(spans),
             if n == 0 {
@@ -379,7 +405,7 @@ pub(super) fn push_split_row(
                     ..first
                 }
             },
-            [l.map(|(_, s)| *s), r.map(|(_, s)| *s)],
+            [l.map(|(_, s, _)| *s), r.map(|(_, s, _)| *s)],
         );
     }
 }
@@ -603,6 +629,11 @@ struct PieceSpan {
     /// Leading cells of the row that map to no char (the `\u{ab}` marker
     /// standing for a wide char cut by the scroll edge).
     shift: u16,
+    /// The cell of the line's tab-expanded text at the row's first
+    /// non-marker column, and how many leading marker columns precede it:
+    /// what the changed-word ranges are mapped through.
+    cell_base: usize,
+    lead: usize,
 }
 
 impl PieceSpan {
@@ -634,6 +665,8 @@ fn row_pieces(raw: &str, width: usize, opts: LayoutOpts<'_>) -> Vec<(String, Pie
                 len: len.saturating_sub(start),
                 last: true,
                 shift,
+                cell_base: opts.h_offset,
+                lead: usize::from(opts.h_offset > 0),
             },
         )];
     }
@@ -648,6 +681,8 @@ fn row_pieces(raw: &str, width: usize, opts: LayoutOpts<'_>) -> Vec<(String, Pie
                     len: next - start,
                     last: next >= len,
                     shift: 0,
+                    cell_base: cells_before(&chars, start),
+                    lead: 0,
                 },
             )
         })
@@ -751,12 +786,17 @@ fn scroll_content(s: &str, h_offset: usize) -> (String, usize, u16) {
 fn push_side(
     spans: &mut Vec<Span<'static>>,
     side: Option<SideLine>,
-    piece: Option<&String>,
+    piece: Option<(&String, PieceSpan)>,
     n: usize,
     content_width: usize,
 ) {
     match side {
-        Some(SideLine { origin, number, .. }) => {
+        Some(SideLine {
+            origin,
+            number,
+            marked,
+            ..
+        }) => {
             let (mark, style) = marker(origin);
             let num = if n == 0 && crate::editor_prefs::line_numbers() {
                 format!("{number:>5} ")
@@ -764,14 +804,45 @@ fn push_side(
                 " ".repeat(6)
             };
             let m = if n == 0 { mark } else { " " };
-            let body = piece.cloned().unwrap_or_default();
+            let body = piece.map(|(p, _)| p.clone()).unwrap_or_default();
             spans.push(Span::styled(num, Style::default().fg(th().diff.gutter_fg)));
             spans.push(Span::styled(m.to_string(), style));
-            spans.push(Span::styled(pad_to(&body, content_width), style));
+            match piece {
+                Some((p, span)) if !marked.is_empty() => {
+                    spans.extend(content_spans(p, span, marked, origin, style));
+                    let pad = content_width.saturating_sub(cells(p));
+                    if pad > 0 {
+                        spans.push(Span::styled(" ".repeat(pad), style));
+                    }
+                }
+                _ => spans.push(Span::styled(pad_to(&body, content_width), style)),
+            }
         }
         None => {
             spans.push(Span::raw(" ".repeat(content_width + 7)));
         }
+    }
+}
+
+/// The cells the first `n` chars take.
+fn cells_before(chars: &[char], n: usize) -> usize {
+    chars[..n].iter().map(|&c| char_cells(c)).sum()
+}
+
+/// The spans of one drawn row's text: one span in the line's style, or, where
+/// the line has changed words, the stronger background on exactly those.
+fn content_spans(
+    piece: &str,
+    span: PieceSpan,
+    marked: &[CellRange],
+    origin: &LineOrigin,
+    style: Style,
+) -> Vec<Span<'static>> {
+    match emph_for(origin, style) {
+        Some(emph) if !marked.is_empty() => {
+            emph_spans(piece, (span.cell_base, span.lead), marked, style, emph)
+        }
+        _ => vec![Span::styled(piece.to_string(), style)],
     }
 }
 

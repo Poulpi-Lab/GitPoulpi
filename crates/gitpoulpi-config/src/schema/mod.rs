@@ -831,6 +831,7 @@ mod tests {
         let empty: UiConfig = toml::from_str("").unwrap();
         assert!(empty.diff_show_whitespace);
         assert!(!empty.diff_word_wrap);
+        assert!(empty.diff_intraline, "changed-word highlighting is on");
         assert!(!empty.minimap, "the minimap is opt-in");
     }
 

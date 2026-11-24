@@ -140,6 +140,7 @@ emails to Gravatar, and asks your connected GitHub/GitLab account)
 | `ui.diff_hunks_only` | `true` | `false` shows the whole file with the changes in place (`H`). |
 | `ui.diff_show_whitespace` | `true` | Show whitespace-only changes (`s`). |
 | `ui.diff_word_wrap` | `false` | Wrap long diff lines (`w`; Settings > Diff & editor). |
+| `ui.diff_intraline` | `true` | Paint the changed words of a changed line with a stronger background (palette `Diff: Toggle Changed Words Highlight`; Settings > Diff & editor). |
 | `ui.minimap` | `false` | A minimap beside the scrollbar of the diff and the editor (`M`). |
 | `ui.mermaid_detail` | `refs` | Detail of the Log's Copy as Mermaid gitGraph: `structure`, `refs`, `subjects`, `full` (remembered from the popup; the default of `log --format mermaid`). |
 | `ui.mermaid_orientation` | `lr` | Direction of that graph: `lr` (left to right) or `tb` (top to bottom). |

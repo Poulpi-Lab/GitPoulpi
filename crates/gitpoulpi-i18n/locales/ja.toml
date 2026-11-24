@@ -516,6 +516,8 @@ merge_side_by_side_min_width = { git = "{$merge}エディター：左右表示�
 merge_side_by_side_min_width_help = { git = "{$merge}競合エディターは、領域の幅がこの桁数以上のとき A と B を左右に並べて表示します（長い行は Shift+ホイールまたは Shift+矢印キーで横スクロール）。これより狭い場合は、タブで片側ずつ表示します。既定は 100、最小値は 40、0 は常に左右表示です。エディターを開いている間は Refs と Status のパネルが隠れるため、通常はウィンドウ全体を使えます。", local = "マージ競合エディターは、領域の幅がこの桁数以上のとき A と B を左右に並べて表示します（長い行は Shift+ホイールまたは Shift+矢印キーで横スクロール）。これより狭い場合は、タブで片側ずつ表示します。既定は 100、最小値は 40、0 は常に左右表示です。エディターを開いている間は Refs と Status のパネルが隠れるため、通常はウィンドウ全体を使えます。" }
 diff_word_wrap = "折り返し"
 diff_word_wrap_help = { git = "{$diff}ビューで長い行を省略記号で切らずに折り返します。内蔵エディターと Blame ビューは横スクロールで、折り返しません。{$diff}ビュー自身の折り返し切り替えでもあります。", local = "差分ビューで長い行を省略記号で切らずに折り返します。内蔵エディターと Blame ビューは横スクロールで、折り返しません。差分ビュー自身の折り返し切り替えでもあります。" }
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "テーマ"
@@ -3406,6 +3408,7 @@ files_clear_selection = "ファイル: 選択を解除"
 files_toggle_selection = "ファイル: 現在の行の選択を切り替える"
 diff_toggle_word_wrap = "{$Diff}: 折り返しを切り替え"
 view_toggle_minimap = "表示: ミニマップを切り替え"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "エディター: 選択に追従を切り替え"
 diff_toggle_whitespace_only_changes = "{$Diff}: 空白のみの変更を切り替え"
 ai_generate_commit_message = { git = "AI: {$Commit}メッセージを生成", local = "AI: {$Commit}メッセージを生成" }
@@ -4941,6 +4944,8 @@ staging_lines = { one = { git = "ハンク {hunk} の {n} 行を{$stage}中{spil
 unstaging_lines = { one = { git = "ハンク {hunk} の {n} 行を{$unstage}中{spill}...", local = "ハンク {hunk} の {n} 行をステージ解除中{spill}..." }, other = { git = "ハンク {hunk} の {n} 行を{$unstage}中{spill}...", local = "ハンク {hunk} の {n} 行をステージ解除中{spill}..." } }
 minimap_on = "ミニマップをオンにしました"
 minimap_off = "ミニマップをオフにしました"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = { git = "{$stage}は作業ツリーに対して行われます - {$commit}ではなく、「{$unstaged_files}」ペインまたは「{$staged_files}」ペインからファイルを開いてください", local = "ステージは作業ツリーに対して行われます - {$commit}ではなく、「{$unstaged_files}」ペインまたは「{$staged_files}」ペインからファイルを開いてください" }
 not_working_diff_discard = { git = "破棄は作業ツリーに対して行われます - {$commit}ではなく、「{$unstaged_files}」ペインからファイルを開いてください", local = "破棄は作業ツリーに対して行われます - {$commit}ではなく、「{$unstaged_files}」ペインからファイルを開いてください" }
 discard_on_staged = { git = "破棄は{$unstaged}の変更を元に戻します - これは「{$staged_files}」ペインです：先に{$unstage}してから、「{$unstaged_files}」ペインで破棄してください", local = "破棄は未ステージの変更を元に戻します - これは「{$staged_files}」ペインです：先にステージ解除してから、「{$unstaged_files}」ペインで破棄してください" }

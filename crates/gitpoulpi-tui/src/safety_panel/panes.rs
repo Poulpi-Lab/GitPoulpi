@@ -242,6 +242,7 @@ impl DiffPane {
             full_file: None,
             lfs_raw: false,
             lfs_local: None,
+            intraline: crate::live_settings::diff_intraline(),
         };
         let lines: Rc<[Line<'static>]> = render_diff_with(file, &opts).lines.into();
         self.laid = Some((key.clone(), width, Rc::clone(&lines)));

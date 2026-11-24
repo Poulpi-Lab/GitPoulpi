@@ -1069,6 +1069,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Diff：切换自动换行 | `w` |
 | Diff：选择编码… | `C` |
 | 视图：切换缩略图 | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | 视图：切换 Commit 列 | `Alt+C` |
 | 视图：Commit 列：隐藏 |  |
 | 视图：Commit 列：文件历史 |  |

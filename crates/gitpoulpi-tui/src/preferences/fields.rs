@@ -665,6 +665,12 @@ impl PreferencesState {
                 Control::Toggle(self.config.ui.diff_word_wrap),
             )
             .with_help(msg::settings_editor::DIFF_WORD_WRAP_HELP.get()),
+            Field::global(
+                msg::settings_editor::DIFF_INTRALINE.get(),
+                "ui.diff_intraline",
+                Control::Toggle(self.config.ui.diff_intraline),
+            )
+            .with_help(msg::settings_editor::DIFF_INTRALINE_HELP.get()),
             // The merge editor's settings come last, so the editor and
             // diff rows above stay together.
             Field::global(

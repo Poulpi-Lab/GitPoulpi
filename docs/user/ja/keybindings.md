@@ -1069,6 +1069,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Diff: 折り返しを切り替え | `w` |
 | Diff: 文字コードを選択... | `C` |
 | 表示: ミニマップを切り替え | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | 表示: Commit列を切り替え | `Alt+C` |
 | 表示: Commit列: 非表示 |  |
 | 表示: Commit列: ファイル履歴 |  |

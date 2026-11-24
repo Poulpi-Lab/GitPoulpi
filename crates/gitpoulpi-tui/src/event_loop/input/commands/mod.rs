@@ -387,6 +387,7 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::ToggleWordWrap
         | PaletteCommand::DiffChooseEncoding
         | PaletteCommand::ToggleMinimap
+        | PaletteCommand::ToggleDiffIntraline
         | PaletteCommand::EditorToggleFollowSelection
         | PaletteCommand::ImageZoomIn
         | PaletteCommand::ImageZoomOut

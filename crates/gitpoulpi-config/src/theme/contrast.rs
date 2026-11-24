@@ -82,7 +82,7 @@ impl ThemeSpec {
         };
         let u = &self.ui;
         let ch = &self.chrome;
-        let rules: [(&str, ThemeColor, ThemeColor, f64); 43] = [
+        let rules: [(&str, ThemeColor, ThemeColor, f64); 45] = [
             ("text/bg", u.text, bg, 4.5),
             ("text/panel", u.text, u.panel, 4.5),
             ("text/selection", u.text, u.selection, 4.5),
@@ -169,6 +169,18 @@ impl ThemeSpec {
                 "diff.del_fg/del_bg",
                 self.diff.del_fg,
                 self.diff.del_bg,
+                3.0,
+            ),
+            (
+                "diff.add_fg/add_emph_bg",
+                self.diff.add_fg,
+                self.diff.add_emph_bg,
+                3.0,
+            ),
+            (
+                "diff.del_fg/del_emph_bg",
+                self.diff.del_fg,
+                self.diff.del_emph_bg,
                 3.0,
             ),
             ("on_button/pill_branch", u.on_button, ch.pill_branch, 3.0),

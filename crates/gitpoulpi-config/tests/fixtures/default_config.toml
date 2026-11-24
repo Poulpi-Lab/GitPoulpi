@@ -105,6 +105,7 @@ hide_finished_pr_chip = true
 diff_hunks_only = true
 diff_show_whitespace = true
 diff_word_wrap = false
+diff_intraline = true
 minimap = false
 mermaid_detail = "refs"
 mermaid_orientation = "lr"

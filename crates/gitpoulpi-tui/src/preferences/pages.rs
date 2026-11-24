@@ -178,6 +178,7 @@ pub(super) const DIFF_EDITOR: &[Row] = &[
     Key("editor.line_numbers"),
     Key("editor.follow_selection"),
     Key("ui.diff_word_wrap"),
+    Key("ui.diff_intraline"),
     Key("ui.diff_layout"),
     Key("ui.diff_hunks_only"),
     Key("ui.diff_show_whitespace"),

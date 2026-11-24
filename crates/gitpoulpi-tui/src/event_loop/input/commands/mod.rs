@@ -133,6 +133,8 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::PushSelectedTag
         | PaletteCommand::DeleteSelectedTagFromRemote
         | PaletteCommand::FetchSelectedTag
+        | PaletteCommand::TakeRemoteSelectedTag
+        | PaletteCommand::ForcePushSelectedTag
         | PaletteCommand::AnnotateSelectedTag
         | PaletteCommand::PushAllUnpushedTags
         | PaletteCommand::ToggleHideInGraph

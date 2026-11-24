@@ -308,3 +308,81 @@ fn a_tag_mirrored_only_for_a_removed_remote_is_not_shown_on_it() {
 fn remote_tags(repo: &FixtureRepo) -> String {
     repo.git_in_remote(&["tag", "--list"])
 }
+
+const DIFFERS: &str = "\u{21C5}";
+
+/// `v1` is on origin at the base commit (the fetch taught the mirror); here
+/// it is re-made at a second commit, so it differs.
+fn make_v1_differ(repo: &FixtureRepo, term: &Terminal) -> (u16, u16) {
+    wait_marked(term, "v1", BOTH);
+    repo.git(&["commit", "--allow-empty", "-m", "second commit"]);
+    repo.git(&["tag", "-f", "v1"]);
+    wait_marked(term, "v1", DIFFERS)
+}
+
+/// A tag that differs: its menu offers the remote's version, which moves the
+/// local tag there (no network) and turns the marker into the both-arrow.
+#[test]
+fn a_differing_tag_can_take_the_remotes_version_from_its_menu() {
+    let repo = fixture();
+    let (mut term, _config) = launch_fetched(repo.root(), "pty-tag-differs-take");
+    let (col, row) = make_v1_differ(&repo, &term);
+    let theirs = repo.git_in_remote(&["rev-parse", "refs/tags/v1"]);
+    assert_ne!(repo.git(&["rev-parse", "refs/tags/v1"]), theirs);
+
+    term.right_click(col + 1, row).unwrap();
+    let menu = term
+        .wait_for("the differing tag's menu", STEP, |s| {
+            s.contains("Use v1 from origin") && s.contains("Push v1 to origin (force)")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let (c, r) = menu.find("Use v1 from origin").unwrap();
+    term.click(c + 1, r).unwrap();
+
+    wait_marked(&term, "v1", BOTH);
+    assert_eq!(repo.git(&["rev-parse", "refs/tags/v1"]), theirs);
+    assert_eq!(
+        repo.git_in_remote(&["rev-parse", "refs/tags/v1"]),
+        theirs,
+        "the remote is untouched"
+    );
+}
+
+/// The force push row asks first (the remote's tag is replaced for everyone);
+/// nothing changes before the confirm, and after it the remote has ours.
+#[test]
+fn a_differing_tags_force_push_asks_before_it_replaces_the_remote_tag() {
+    let repo = fixture();
+    let (mut term, _config) = launch_fetched(repo.root(), "pty-tag-differs-force");
+    let (col, row) = make_v1_differ(&repo, &term);
+    let theirs = repo.git_in_remote(&["rev-parse", "refs/tags/v1"]);
+
+    term.right_click(col + 1, row).unwrap();
+    let menu = term
+        .wait_for("the differing tag's menu", STEP, |s| {
+            s.contains("Push v1 to origin (force)")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let (c, r) = menu.find("Push v1 to origin (force)").unwrap();
+    term.click(c + 1, r).unwrap();
+    term.wait_for("the confirm naming origin", STEP, |s| {
+        s.contains("Force push tag 'v1' to origin")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert_eq!(
+        repo.git_in_remote(&["rev-parse", "refs/tags/v1"]),
+        theirs,
+        "nothing is pushed before the confirm"
+    );
+
+    term.send_keys("y").unwrap();
+    term.wait_for("the result line", STEP, |s| {
+        s.contains("Force pushed v1 to origin")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert_eq!(
+        repo.git_in_remote(&["rev-parse", "refs/tags/v1"]),
+        repo.git(&["rev-parse", "refs/tags/v1"])
+    );
+    wait_marked(&term, "v1", BOTH);
+}

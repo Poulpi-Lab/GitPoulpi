@@ -615,6 +615,8 @@ stage_file = "z"
 | Refs: push tag на remote по умолчанию |  |
 | Refs: удалить выбранный tag с его remote... |  |
 | Git: Fetch выбранный tag |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: аннотировать выбранный tag... |  |
 | Refs: скрыть/показать в графе |  |
 | Refs: показать в графе | `g` |

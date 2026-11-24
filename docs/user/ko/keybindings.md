@@ -602,6 +602,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Refs: 선택한 Tag를 기본 리모트로 Push |  |
 | Refs: 선택한 Tag를 리모트에서 삭제... |  |
 | Git: 선택한 Tag Fetch |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: 선택한 Tag 주석 달기... |  |
 | Refs: 그래프에서 숨기기 전환 |  |
 | Refs: 그래프에서 보기 | `g` |

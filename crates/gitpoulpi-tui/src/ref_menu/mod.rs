@@ -52,6 +52,12 @@ pub(crate) enum RefContextAction {
     /// Fetch this tag from the remote that has it: the row of a tag that
     /// lives only on a remote (`tag_where_ui`).
     FetchTag,
+    /// Move the local tag to the `n`th remote's version of it (a tag that
+    /// differs there): no network, undoable.
+    TagTakeRemote(u8),
+    /// Force-push the local tag to the `n`th remote that has it at another
+    /// commit. Confirmed.
+    TagForcePush(u8),
     /// Re-make this tag as an annotated one, where it already is.
     AnnotateTag,
     /// The bulk twin of `PushTag`: every unpushed tag, not just this
@@ -816,8 +822,33 @@ pub(crate) fn ref_menu_entries(
                         RefContextAction::FetchTag,
                     ));
                 }
-                // Both / differs: nothing to push or fetch; the Delete row
-                // below carries the remote side.
+                // A tag that differs: per remote, take its version or force
+                // push ours (`tag_where_ui::begin_take_remote`/`begin_force_push`).
+                Some(TagWhere::Differs) => {
+                    for (i, remote) in info
+                        .iter()
+                        .flat_map(|i| i.differs_on.iter())
+                        .enumerate()
+                        .take(usize::from(u8::MAX))
+                    {
+                        entries.push(Entry::action(
+                            glyph_label(
+                                "\u{2B07}",
+                                gitpoulpi_i18n::msg::tag_where::take_remote(full_name, remote),
+                            ),
+                            RefContextAction::TagTakeRemote(i as u8),
+                        ));
+                        entries.push(Entry::danger(
+                            glyph_label(
+                                "\u{2B06}",
+                                gitpoulpi_i18n::msg::tag_where::force_push_tag(full_name, remote),
+                            ),
+                            RefContextAction::TagForcePush(i as u8),
+                        ));
+                    }
+                }
+                // Both: nothing to push or fetch; the Delete row below
+                // carries the remote side.
                 _ => {}
             }
             // Not tied to this tag specifically -- reachable from any

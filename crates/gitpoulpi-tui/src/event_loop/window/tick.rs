@@ -937,6 +937,11 @@ impl WindowState {
                         crate::tag_where_ui::lookup(n)
                             .is_some_and(|i| i.place == gitpoulpi_core::domain::TagWhere::Remote)
                     }),
+                selected_tag_differs: ref_kind == Some(RefRowKind::Tag)
+                    && selected_ref.as_deref().is_some_and(|n| {
+                        crate::tag_where_ui::lookup(n)
+                            .is_some_and(|i| i.place == gitpoulpi_core::domain::TagWhere::Differs)
+                    }),
                 soloing: !self.solo_refs.is_empty(),
                 has_hidden_refs: !self.hidden_from_graph.is_empty(),
                 selected_folder: selected_ref_folder(

@@ -345,6 +345,30 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
                 });
             }
         }
+        PaletteCommand::TakeRemoteSelectedTag => {
+            if let Some(n) = sel_ref {
+                let refs = cx.refs_result.as_deref().unwrap_or(&[]);
+                *cx.last_message = Some(crate::tag_where_ui::begin_take_remote(
+                    &n,
+                    None,
+                    cx.remote_ui.default_remote(refs),
+                    cx.link,
+                ));
+            }
+        }
+        PaletteCommand::ForcePushSelectedTag => {
+            if let Some(n) = sel_ref {
+                let refs = cx.refs_result.as_deref().unwrap_or(&[]);
+                let default = cx.remote_ui.default_remote(refs);
+                crate::tag_where_ui::begin_force_push(
+                    &n,
+                    None,
+                    default,
+                    &mut *cx.input_mode,
+                    &mut *cx.last_message,
+                );
+            }
+        }
         PaletteCommand::AnnotateSelectedTag => {
             if let Some(n) = sel_ref {
                 *cx.input_mode = InputMode::Prompt(Box::new(

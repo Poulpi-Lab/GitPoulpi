@@ -49,6 +49,7 @@ mod split;
 mod staging;
 mod stash;
 mod stuck_states;
+mod tag_differs;
 mod tag_where;
 mod workflow;
 
@@ -95,6 +96,7 @@ pub use split::*;
 pub use staging::*;
 pub use stash::*;
 pub use stuck_states::*;
+pub use tag_differs::*;
 pub use tag_where::*;
 pub use workflow::*;
 
@@ -384,6 +386,12 @@ macro_rules! for_each_contract_check {
             check_a_fetch_brings_a_tag_back_unless_deleted_on_the_remote,
             check_tag_fetch_brings_one_remote_only_tag,
             check_a_fetch_notices_a_tag_deleted_on_the_remote,
+            check_take_remote_moves_a_lightweight_tag,
+            check_take_remote_keeps_an_annotated_tag_object,
+            check_take_remote_refuses_what_it_cannot_take,
+            check_tag_force_push_moves_the_remote_tag,
+            check_tag_force_push_refuses_a_stale_lease,
+            check_tag_force_push_refuses_what_is_not_differing,
             check_branch_delete_remote_removes_it_from_the_remote,
             check_branch_delete_remote_drops_a_tracking_ref_outside_the_refspec,
             check_remote_ref_value_reads_the_server,
@@ -761,6 +769,7 @@ mod meta_tests {
             include_str!("stash.rs"),
             include_str!("remotes_network.rs"),
             include_str!("tag_where.rs"),
+            include_str!("tag_differs.rs"),
             include_str!("sparse.rs"),
             include_str!("lfs.rs"),
             include_str!("journal_plumbing.rs"),

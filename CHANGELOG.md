@@ -7,6 +7,9 @@ IPC surfaces are stable within a major version).
 
 ## [Unreleased]
 
+### Added
+- **Tags that differ:** a tag here and on a remote at different commits (the up-down arrow) now has two actions per such remote, in its menu (sidebar and Log pill) and the palette: *Use `<tag>` from `<remote>`* moves the local tag to the remote's version from the last fetch (no network; an annotated tag stays the same tag object), and *Push `<tag>` to `<remote>` (force)* force-pushes yours, confirmed first and leased on what the last fetch saw (a remote that moved since is refused: fetch first). Each is one undo entry. CLI: `gitpoulpi tag take-remote` and `gitpoulpi tag force-push [--yes]`.
+
 ## [1.2.0] - 2026-11-23
 
 ### Added

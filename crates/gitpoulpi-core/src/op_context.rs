@@ -250,6 +250,8 @@ pub fn operation_label(kind: OperationKind) -> String {
         K::TagDeleteRemote => "Delete remote tag",
         K::TagPush => "Push tags",
         K::TagFetch => "Fetch tag",
+        K::TagTakeRemote => "Use the remote's tag",
+        K::TagForcePush => "Force push tag",
         K::Checkout => "Checkout",
         K::Commit => "Commit",
         K::Merge => "Merge",

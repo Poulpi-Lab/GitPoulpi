@@ -267,6 +267,12 @@ pub(crate) enum PaletteCommand {
     /// Fetch the selected tag from the remote that has it: for a tag that
     /// lives only on a remote (`tag_where_ui`).
     FetchSelectedTag,
+    /// Use the remote's version of the selected tag that differs: the local
+    /// tag moves to it (no network, undoable).
+    TakeRemoteSelectedTag,
+    /// Force-push the selected tag that differs to the remote that has it at
+    /// another commit (confirmed, leased, undoable).
+    ForcePushSelectedTag,
     /// Re-make the selected tag as an annotated one, where it is.
     AnnotateSelectedTag,
     ToggleHideInGraph,

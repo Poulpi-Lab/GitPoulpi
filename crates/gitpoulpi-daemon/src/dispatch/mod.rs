@@ -444,6 +444,9 @@ async fn dispatch_network_authed(
     ) {
         return dispatch_remote_delete(backend, request, events).await;
     }
+    if request.command == OperationKind::TagForcePush {
+        return dispatch_tag_force_push(backend, request, events).await;
+    }
     if !matches!(
         request.command,
         OperationKind::FetchRefAsBranch
@@ -543,6 +546,94 @@ async fn dispatch_remote_delete(
     let mut dispatched = dispatch_network_plain(backend, &leased, events).await;
     if let Some(recording) = recording.as_mut().and_then(AbandonedRecording::finished) {
         crate::journal::finish_record(backend, request, recording, &mut dispatched);
+    }
+    dispatched
+}
+
+/// Force-pushing a tag whose remote copy differs, journaled. Outward-facing,
+/// so it is asked about first: without `confirmed` the answer is
+/// `NeedsConfirmation` and nothing runs (the TUI dialog, CLI exit 3 / `--yes`
+/// and MCP all speak it).
+///
+/// The push is leased on the tag mirror's value, so that value is what the
+/// remote is known to hold: it is recorded as the change's `old` (undo pushes
+/// it back, with a lease on `new`, and a remote that moved since is
+/// `UndoRefusal::RemoteRefMoved`). A stale lease is refused by the backend
+/// (`StaleLease`, nothing overwritten) and the entry is dropped with it.
+async fn dispatch_tag_force_push(
+    backend: &dyn GitBackend,
+    request: &Request,
+    events: &broadcast::Sender<Event>,
+) -> Dispatched {
+    let text = |key: &str| request.args.get(key).and_then(|v| v.as_str());
+    let (Ok(repo), Some(remote), Some(name)) = (repo_ref(request), text("remote"), text("name"))
+    else {
+        return dispatch_network_plain(backend, request, events).await;
+    };
+    if !request
+        .args
+        .get("confirmed")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        let error = gitpoulpi_core::Error::NeedsConfirmation(format!(
+            "Force pushing tag {name} to {remote} replaces the tag there with yours. \
+             Anyone who fetched the remote's tag keeps a different one; undo pushes \
+             the old one back (refused if {remote} moved again)."
+        ));
+        return err_kind(request.id, error.to_string(), false, error.typed());
+    }
+    let full_ref = format!("refs/tags/{name}");
+    let mirror = gitpoulpi_core::domain::remote_tag_mirror_ref(remote, name);
+    let (old, new) = (
+        crate::journal::read_ref(backend, &repo, &mirror)
+            .ok()
+            .flatten(),
+        crate::journal::read_ref(backend, &repo, &full_ref)
+            .ok()
+            .flatten(),
+    );
+    let (Some(old), Some(new)) = (old, new) else {
+        // Not known on that remote, or no local tag: the backend says so.
+        return dispatch_network_plain(backend, request, events).await;
+    };
+    let change = gitpoulpi_core::journal::RemoteRefChange {
+        remote: remote.to_string(),
+        name: full_ref,
+        old: Some(old),
+        new: Some(new),
+    };
+    let mut recording = crate::journal::begin_record_remote(
+        backend,
+        request,
+        crate::journal::RemoteDelete {
+            change,
+            local_request: None,
+        },
+    )
+    .map(|recording| AbandonedRecording {
+        backend,
+        request,
+        recording: Some(recording),
+    });
+    let mut dispatched = dispatch_network_plain(backend, request, events).await;
+    if let Some(recording) = recording.as_mut().and_then(AbandonedRecording::finished) {
+        crate::journal::finish_record(backend, request, recording, &mut dispatched);
+    }
+    // A stale lease says what to do about it (the typed half is unchanged, so
+    // a frontend with its own words keeps using them).
+    if let Err(error) = &mut dispatched.response.result {
+        if matches!(
+            &error.kind,
+            Some(gitpoulpi_core::TypedError::PushRejected(r))
+                if r.reason == gitpoulpi_core::domain::PushRejectReason::StaleLease
+        ) {
+            error.message = format!(
+                "{remote} rejected the push of tag {name}: the remote tag moved since the last \
+                 fetch, so the force push was refused (nothing was overwritten): fetch first, \
+                 check, then decide"
+            );
+        }
     }
     dispatched
 }

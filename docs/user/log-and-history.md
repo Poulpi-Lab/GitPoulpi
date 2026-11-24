@@ -126,7 +126,7 @@ after the name. Hover a tag for the same in words.
 | up arrow | Only here: no remote has it. Its menu offers *Push* |
 | left-right arrow | Here and on a remote, at the same commit |
 | down arrow (row dimmed) | Only on a remote: not in this repository (never fetched, or deleted here). Its menu offers *Fetch `<tag>` from `<remote>`* and *Delete `<tag>` on `<remote>`...*; `Git: Fetch Selected Tag` in the palette |
-| up-down arrow | On a remote too, but at a different commit (a push would be refused) |
+| up-down arrow | On a remote too, but at a different commit (a plain push would be refused). Its menu has two rows per such remote: *Use `<tag>` from `<remote>`* (the local tag moves to the remote's version, from the last fetch, no network; an annotated tag becomes that same tag object) and, in red, *Push `<tag>` to `<remote>` (force)* (asks first; leased on what the last fetch saw, so a remote that moved since is refused with "fetch first" and nothing is overwritten). Each is one undo entry. `Git: Use the Remote's Version of the Selected Tag` and `Git: Force Push the Selected Tag to Its Remote` in the palette (the default remote when several differ); CLI: `tag take-remote`, `tag force-push` |
 
 git keeps no remote-tracking refs for tags, so GitPoulpi learns what each remote
 has from your last **fetch** (any fetch, including the automatic one) and from

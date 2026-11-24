@@ -3746,6 +3746,8 @@ rewrite_strip_exec = "Herschrijven: Het uitvoerbaarheidsbit verwijderen..."
 rewrite_file_encoding = "Herschrijven: Tekencodering van bestanden omzetten..."
 # s22:end
 git_fetch_selected_tag = { git = "Git: Geselecteerde {$tag} fetchen", local = "Git: Geselecteerd {$tag} ophalen" }
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "Herschrijven: Tekencodering van berichten herstellen..."
 # s24:end
@@ -8955,6 +8957,15 @@ tip_both = "Hier en op {remotes}, op dezelfde {$commit}."
 tip_differs = "Hier en op {remotes}, maar op verschillende {$commits}: een {$push} zou worden geweigerd."
 tip_fetch_note = { git = "Een {$fetch_noun} brengt een {$tag} terug die alleen hier is verwijderd terwijl een remote hem nog heeft. Een op de remote verwijderde {$tag} verdwijnt hier alleen met {$Tags} automatisch opschonen (Instellingen).", local = "Opnieuw ophalen brengt een {$tag} terug dat alleen hier is verwijderd terwijl een remote het nog heeft. Een op de remote verwijderd {$tag} verdwijnt hier alleen met {$Tags} automatisch opschonen (Instellingen)." }
 fetch_tag = { git = "{name} fetchen van {remote}", local = "{name} ophalen van {remote}" }
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "{name} verwijderen..."
 delete_tag_on_remote = "{name} verwijderen op {remote}..."
 dlg_title = "{$Tag} verwijderen"

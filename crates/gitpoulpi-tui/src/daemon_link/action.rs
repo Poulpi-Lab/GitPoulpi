@@ -338,6 +338,18 @@ pub enum Action {
         remote: String,
         name: String,
     },
+    /// Move the local tag to what `remote` has (a tag that differs), from the
+    /// tag mirror: no network. One undo entry.
+    TagTakeRemote {
+        remote: String,
+        name: String,
+    },
+    /// Force-push the local tag to `remote`, leased on the mirror's value (a
+    /// tag that differs). Confirmed first; one undo entry.
+    TagForcePush {
+        remote: String,
+        name: String,
+    },
     /// Check `branch` out and *then* run `then` - only if the checkout
     /// succeeded, so a refused checkout (a dirty tree in the way) can
     /// never leave a merge or rebase landing on the wrong branch. What a
@@ -1008,6 +1020,7 @@ impl Action {
                 | Action::TagDeleteRemote { .. }
                 | Action::TagDeleteBoth { .. }
                 | Action::TagFetch { .. }
+                | Action::TagForcePush { .. }
                 | Action::LfsFetch(_)
                 | Action::LfsPull(_)
                 | Action::LfsPush(_)

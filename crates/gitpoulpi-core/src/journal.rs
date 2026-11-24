@@ -551,6 +551,18 @@ impl Step {
                 "put {path} back in conflict (its three versions return to the index)"
             )],
             Step::RemoteRef {
+                remote,
+                name,
+                to: Some(to),
+                from: Some(from),
+            } => vec![format!(
+                "move {} on {remote} from {} to {} (pushed to the remote, leased on {})",
+                display_ref(name),
+                short(*from),
+                short(*to),
+                short(*from)
+            )],
+            Step::RemoteRef {
                 remote, name, to, ..
             } => vec![match to {
                 Some(oid) => format!(

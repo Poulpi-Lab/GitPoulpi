@@ -3745,6 +3745,8 @@ rewrite_strip_exec = "重写：移除可执行位…"
 rewrite_file_encoding = "重写：转换文件编码…"
 # s22:end
 git_fetch_selected_tag = { git = "Git：{$Fetch} 所选 {$Tag}", local = "Git：{$Fetch}所选{$Tag}" }
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "重写：修复消息编码…"
 # s24:end
@@ -8957,6 +8959,15 @@ tip_both = { git = "本地和 {remotes} 上都有，位于同一个 {$commit}。
 tip_differs = { git = "本地和 {remotes} 上都有，但指向不同的 {$commits}：{$push} 会被拒绝。", local = "本地和 {remotes} 上都有，但指向不同的{$commits}：{$push}会被拒绝。" }
 tip_fetch_note = { git = "{$Fetch} 会把只在本地删除、而远程仍有的 {$tag} 找回来。在远程被删除的 {$tag}，只有开启“自动清理 {$tags}”（设置）后才会从本仓库消失。", local = "{$Fetch}会把只在本地删除、而远程仍有的{$tag}找回来。在远程被删除的{$tag}，只有开启“自动清理{$tags}”（设置）后才会从本仓库消失。" }
 fetch_tag = "从 {remote} {$Fetch} {name}"
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "删除 {name}…"
 delete_tag_on_remote = "在 {remote} 上删除 {name}…"
 dlg_title = { git = "删除 {$tag}", local = "删除{$tag}" }

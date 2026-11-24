@@ -308,6 +308,23 @@ pub(crate) fn apply_ref_context_action(
                 None => msg::no_remote_has(&full_name),
             });
         }
+        RefContextAction::TagTakeRemote(i) => {
+            *last_message = Some(crate::tag_where_ui::begin_take_remote(
+                &full_name,
+                Some(usize::from(i)),
+                remote_ui.default_remote(refs_result.as_deref().unwrap_or(&[])),
+                link,
+            ));
+        }
+        RefContextAction::TagForcePush(i) => {
+            crate::tag_where_ui::begin_force_push(
+                &full_name,
+                Some(usize::from(i)),
+                remote_ui.default_remote(refs_result.as_deref().unwrap_or(&[])),
+                input_mode,
+                last_message,
+            );
+        }
         // Network, so it goes through `submit_action` like fetch/pull/
         // push and narrates through `last_message` -- the input loop
         // never waits on it.

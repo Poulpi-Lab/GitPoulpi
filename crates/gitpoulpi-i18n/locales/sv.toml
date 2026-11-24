@@ -3748,6 +3748,8 @@ rewrite_strip_exec = "Omskrivning: Ta bort körbehörigheten..."
 rewrite_file_encoding = "Omskrivning: Konvertera filernas teckenkodning..."
 # s22:end
 git_fetch_selected_tag = { git = "Git: Fetch vald tag", local = "Git: Hämta vald tagg" }
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "Omskrivning: Rätta meddelandenas teckenkodning..."
 # s24:end
@@ -8961,6 +8963,15 @@ tip_both = "Här och på {remotes}, vid samma {$commit}."
 tip_differs = "Här och på {remotes}, men vid olika {$commits}: en {$push_noun} skulle avvisas."
 tip_fetch_note = "En {$fetch} tar tillbaka en {$tag} som bara har tagits bort här medan en remote fortfarande har den. En {$tag} som har tagits bort på remoten försvinner härifrån först med Auto-prune {$tags} (Inställningar)."
 fetch_tag = { git = "Fetch {name} från {remote}", local = "Hämta {name} från {remote}" }
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "Ta bort {name}..."
 delete_tag_on_remote = "Ta bort {name} på {remote}..."
 dlg_title = "Ta bort {$tag}"

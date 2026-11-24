@@ -656,6 +656,28 @@ async fn dispatch(
                 gitpoulpi_i18n::msg::tag_where::msg_deleted_local_still(&name, remotes.join(", "))
             })
         }
+        Action::TagTakeRemote { remote, name } => {
+            reported::<()>(
+                conn,
+                action_message_tx,
+                OperationKind::TagTakeRemote,
+                serde_json::json!({ "remote": remote, "name": name }),
+                move |_| gitpoulpi_i18n::msg::tag_where::msg_took_remote(&name, &remote),
+            )
+            .await
+        }
+        // `confirmed`: the dialog that led here was the confirmation (the
+        // daemon asks for it with `NeedsConfirmation` otherwise).
+        Action::TagForcePush { remote, name } => {
+            reported::<()>(
+                conn,
+                action_message_tx,
+                OperationKind::TagForcePush,
+                serde_json::json!({ "remote": remote, "name": name, "confirmed": true }),
+                move |_| gitpoulpi_i18n::msg::tag_where::msg_force_pushed(&name, &remote),
+            )
+            .await
+        }
         Action::TagFetch { remote, name } => {
             reported::<()>(
                 conn,

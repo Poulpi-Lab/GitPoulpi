@@ -25,6 +25,7 @@ mod store;
 
 pub use after::settle;
 pub use capture::is_journaled;
+pub(crate) use capture::read_ref;
 pub use housekeeping::{flush_pending, housekeeping};
 pub use outside::{
     adopt as outside_adopt, sync as outside_sync, transfer_finished, transfer_started, Busy, Caller,

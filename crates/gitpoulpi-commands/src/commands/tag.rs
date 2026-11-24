@@ -3,6 +3,7 @@
 use gitpoulpi_core::domain::{
     short, OperationKind, PushOutcome, Ref, RefKind, TagSelection, TagWhere,
 };
+use gitpoulpi_core::TypedError;
 use serde_json::json;
 
 use crate::cli::TagAction;
@@ -36,6 +37,45 @@ pub(super) async fn tag(session: &mut Session, action: TagAction) -> Result<Emit
                 json!({ "annotated": name }),
                 format!("annotated tag {name}"),
             ))
+        }
+        TagAction::TakeRemote { name, remote } => {
+            let remote = differing_remote(session, &name, remote).await?;
+            session
+                .call::<()>(
+                    OperationKind::TagTakeRemote,
+                    json!({ "remote": remote, "name": name }),
+                )
+                .await?;
+            Ok(emitted(
+                json!({ "took": name, "remote": remote }),
+                format!("tag {name} now is {remote}'s version (`undo` puts yours back)"),
+            ))
+        }
+        TagAction::ForcePush { name, remote, yes } => {
+            let remote = differing_remote(session, &name, remote).await?;
+            let answer = session
+                .call_typed::<()>(
+                    OperationKind::TagForcePush,
+                    json!({ "remote": remote, "name": name, "confirmed": yes }),
+                )
+                .await?;
+            match answer {
+                Ok(()) => Ok(emitted(
+                    json!({ "force_pushed": name, "remote": remote }),
+                    format!("force pushed tag {name} to {remote} (`undo` pushes the old one back)"),
+                )),
+                Err(e) => match e.kind {
+                    Some(TypedError::NeedsConfirmation(prompt)) => Ok(Emitted {
+                        json: json!({ "needs_confirmation": { "prompt": prompt } }),
+                        human: format!(
+                            "{prompt}
+Nothing was changed; repeat with --yes to go ahead."
+                        ),
+                        exit_code: 3,
+                    }),
+                    _ => Err(e.message),
+                },
+            }
         }
         // Empty `names` means `AllUnpushed`, resolved in the backend at
         // push time -- not a list this command built by filtering
@@ -150,6 +190,36 @@ pub(super) async fn tag(session: &mut Session, action: TagAction) -> Result<Emit
                 .join("\n");
             Ok(emitted(serde_json::Value::Array(rows), human))
         }
+    }
+}
+
+/// The remote a `differs` tag is acted on: the one given, else the only
+/// remote holding it at another commit.
+async fn differing_remote(
+    session: &mut Session,
+    name: &str,
+    remote: Option<String>,
+) -> Result<String, String> {
+    if let Some(remote) = remote {
+        return Ok(remote);
+    }
+    let refs = all_refs(session).await?;
+    let found = refs.iter().find(|r| r.tag_name() == Some(name));
+    let Some(found) = found else {
+        return Err(format!("no tag named `{name}`"));
+    };
+    let on = found
+        .tag_sync
+        .as_ref()
+        .map(|s| s.differs_on.clone())
+        .unwrap_or_default();
+    match on.as_slice() {
+        [only] => Ok(only.clone()),
+        [] => Err(format!("tag `{name}` does not differ from any remote")),
+        many => Err(format!(
+            "tag `{name}` differs on {}: pick one with --remote",
+            many.join(", ")
+        )),
     }
 }
 

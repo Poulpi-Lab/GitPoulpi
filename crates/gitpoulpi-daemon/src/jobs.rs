@@ -145,6 +145,7 @@ fn label_for(request: &Request) -> String {
         K::TagPush => format!("Pushing tags to {remote}"),
         K::TagDeleteRemote | K::BranchDeleteRemote => format!("Deleting on {remote}"),
         K::TagFetch => format!("Fetching a tag from {remote}"),
+        K::TagForcePush => format!("Force pushing a tag to {remote}"),
         K::LfsFetch => "Fetching LFS objects".into(),
         K::LfsPull => "Pulling LFS objects".into(),
         K::LfsPush => "Pushing LFS objects".into(),

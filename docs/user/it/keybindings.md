@@ -613,6 +613,8 @@ applicano. I tasti sono quelli predefiniti.
 | Refs: Push del tag selezionato verso il remoto predefinito |  |
 | Refs: Elimina il tag selezionato dal suo remoto... |  |
 | Git: Fetch del tag selezionato |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Annota il tag selezionato... |  |
 | Refs: Mostra o nascondi nel grafo |  |
 | Refs: Mostra nel grafo | `g` |

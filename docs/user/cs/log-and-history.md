@@ -93,7 +93,9 @@ viz `history-rewrite.md`; z terminálu: `gitpoulpi mailmap list|check|add`.
   z palety *Log: Filtrovat podle autora...*): předem filtruje Log podle toho, kdo
   commity napsal. Pod záhlavím se rozbalí okno s vyhledávacím polem, řádkem
   **Zrušit filtr** (✕) a jedním řádkem na každého autora načtené historie: odznak s
-  iniciálami (avatar, pokud `ui.avatars` není vypnuto), jméno a za ním tlumený e-mail,
+  avatar (pokud `ui.avatars` není vypnuto: obrázek autora na terminálech, které kreslí
+  obrázky, jakmile je hotový, do té doby a na ostatních terminálech odznak s iniciálami),
+  jméno a za ním tlumený e-mail,
   nejdřív podle počtu commitů a pak podle jména. Psaním se seznam zúží fuzzy
   shodou jako v paletě; `Enter` nebo klik přepne zvýrazněného autora (zaškrtnutí;
   můžete jich zvolit libovolně), `Esc` nebo klik mimo okno zavře a filtr ponechá.
@@ -105,7 +107,11 @@ viz `history-rewrite.md`; z terminálu: `gitpoulpi mailmap list|check|add`.
   tooltip vypíše vybrané autory, a když je sloupec Autor skrytý nebo na trychtýř příliš
   úzký, ukáže horní okraj Logu místo toho *Autor: Alice Example +1* (klávesa
   i paleta fungují dál). Zrušíte ho řádkem **Zrušit filtr**, pravým tlačítkem na
-  rozsvícený trychtýř, nebo příkazem z palety *Log: Zrušit filtr autora*.
+  rozsvícený trychtýř, příkazem z palety *Log: Zrušit filtr autora*, nebo klávesou
+  `Esc` v Logu (po výběru, který `Esc` zruší jako první; v okně `Esc` nejdřív vyprázdní
+  vyhledávací pole, pak okno zavře a filtr ponechá).
+  Dokud platí, šipky nahoru/dolů (i PageUp/PageDown, Home/End) přesouvají výběr jen mezi
+  rozsvícenými commity a ztlumené přeskakují; klik stále vybere kterýkoli řádek.
   Autoři jsou ti z commitů, které Log načetl (s použitím mailmap, jako ve sloupci),
   a filtr se pamatuje pro každý repozitář, přes přepínání karet i restarty. Textové
   hledání se nepamatuje, filtr ano.

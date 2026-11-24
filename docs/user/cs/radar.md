@@ -51,9 +51,13 @@ která nelze provést, zašedlá s důvodem. Sloupec je automatický (není to j
 
 ### Větve žádosti
 
-Řádek žádosti ukazuje za názvem `zdroj → cíl` (`alice:feature/login → main`, když je zdrojová větev ve forku). Když je málo
-místa, ořízne se nejdřív cíl (výpustkou), název si ponechá většinu místa a v úzkém okně se větve neukazují; sloupec Akce se
-nikdy nevytlačí. Ukazatel na oříznutém textu ukáže celý. Hostitel, který větve nepojmenoval, tam nic neukáže. Řádek issue
+Řádek žádosti ukazuje `zdroj → cíl` ve sloupci **Větve** hned za repozitářem (`alice:feature/login → main`, když je zdrojová větev
+ve forku); řádek issue nechá buňku prázdnou a Radar bez žádosti, která své větve pojmenovává, takový sloupec nemá. Když je buňka
+příliš úzká, ořízne se nejdřív zdroj (výpustkou) a cíl zůstane celý, dokud to jde. Sloupec se nejdřív zužuje, než zmizí: v úzkém
+okně odchází jako poslední z volitelných sloupců (po stavu, autorovi a stáří, před repozitářem a názvem); když zmizí, celé větve
+zůstanou v tooltipu názvu a na stavovém řádku vybraného řádku. Široký sloupec autora, který jste si nastavili, ustoupí názvu
+a větvím. Sloupec Akce se nikdy nevytlačí. Ukazatel na oříznutém textu ukáže celý. GitHub a Gitea vypisují žádosti bez větví, takže je Radar
+čte po načtení seznamu (jednou pro každou žádost, dokud se nezmění). Hostitel, který větve nepojmenoval, tam nic neukáže. Řádek issue
 pojmenuje svůj repozitář ve stejném čipu jako řádek žádosti (název složky klonu, nebo `owner/name`, když není naklonovaný).
 
 ### Jednání na hostiteli
@@ -157,7 +161,7 @@ ukážou hned a nahradí se, jakmile dorazí odpovědi.
 
 ### Sloupce
 
-Čip repozitáře, `#` (číslo a značky kontrol), autor a stáří jsou **sloupce s nastavitelnou šířkou**. Ponechaný na automatice je sloupec repozitáře
+Čip repozitáře, větve, `#` (číslo a značky kontrol), autor a stáří jsou **sloupce s nastavitelnou šířkou**. Ponechaný na automatice je sloupec repozitáře
 tak široký jako nejdelší název na obrazovce (nejvýše 40 buněk a nejvýše třetina okna), takže `owner/name`
 i `group/sub/project` z účtového seznamu se na běžném terminálu neořežou. Název dostane zbytek. Název, který se
 nevejde, končí třemi tečkami (`group/sub...`), a:
@@ -165,7 +169,7 @@ nevejde, končí třemi tečkami (`group/sub...`), a:
 - **Zastavte ukazatel** na uříznutém repozitáři, názvu, autorovi nebo seznamu štítků a tooltip ukáže celý text.
   Vyberte řádek a stavový řádek pod filtrem také pojmenuje celý projekt i název, takže klávesnice vidí totéž.
 - **Přetáhněte oddělovač** (buňku hned za názvem repozitáře, za `#` nebo těsně před autorem či stářím) a sloupec změní šířku;
-  **dvojklikem** na něj sloupec znovu přizpůsobíte. Seznam má **řádek záhlaví** (repozitář, `#`,
+  **dvojklikem** na něj sloupec znovu přizpůsobíte. Seznam má **řádek záhlaví** (repozitář, větve, `#`,
   název, autor, stáří) a oddělovače se řídí volbou `ui.column_resize` jako v Logu: s `line` (výchozí)
   v oddělovači na řádku záhlaví leží tlumené `│` a dokud je ukazatel na oddělovači (v záhlaví nebo na
   kterémkoli řádku seznamu), dokud je sloupec vybrán klávesami nebo dokud táhnete, kreslí se přes celý
@@ -179,7 +183,7 @@ nevejde, končí třemi tečkami (`group/sub...`), a:
   buňky, **`[`** ho zúží, **`0`** vrátí všechny sloupce na automatiku, `Esc` skončí. Paleta má totéž:
   `Radar: Vybrat sloupec`, `Radar: Rozšířit sloupec`, `Radar: Zúžit sloupec`, `Radar: Obnovit šířky sloupců`.
 
-Šířky se uchovávají v `radar.toml` (`[columns]`, `repo`, `number`, `author` a `age`, v buňkách) a přežijí restart. Jsou to stejná
+Šířky se uchovávají v `radar.toml` (`[columns]`, `repo`, `branches`, `number`, `author` a `age`, v buňkách; soubor bez `branches` se načte jako dřív, sloupec se pak přizpůsobí obsahu do 28 buněk) a přežijí restart. Jsou to stejná
 gesta pro změnu velikosti jako u sloupců Logu.
 
 ### Kontroly a konflikty
@@ -218,18 +222,24 @@ Uzavřené a sloučené žádosti a uzavřené issues se nevypisují.
 
 ## Zobrazení a filtry
 
-Seznam zužují tři comboboxy a textové pole. Každá volba je rozbalovací
+Seznam zužují čtyři comboboxy a textové pole. Každá volba je rozbalovací
 nabídka: klikněte na ni, nebo použijte její klávesu.
 
 - **Zobrazení** (`v`): Vše, žádosti, Issues, WIP (rozpracovaná práce), Odložené.
 - **Zobrazit** (`f`): Všichni, Moje (žádosti, které jste napsali, issues, které
   jste vytvořili), Přiřazené mně, Vyžádaná kontrola, Zmiňující mě.
 - **Rozsah** (`w`): viz výše.
+- **Profil** (`P`): Všechny profily, nebo jeden profil integrace z Nastavení > Integrace (pojmenovaný tak, jak
+  ho pojmenovává Nastavení, s přidaným poskytovatelem, když si dva profily dělí název). Zúží každou sekci, řádky
+  repozitářů i řádky celého účtu, na řádky tohoto profilu (řádek rozpracované práce profil nemá, takže zvolený profil
+  ho skryje). Vždy jen jeden profil. Volba se pamatuje v `radar.toml`; profil, který už neexistuje, se vrátí na
+  Všechny profily. Combobox je vždy přítomen jako ostatní tři a úzké okno ho (a pak popisky) zkrátí, místo aby ho
+  vynechalo. Paleta: `Radar: Filtrovat podle profilu...`. Když profil skryje všechno, prázdný seznam to řekne.
 - **Text filtru** (`/` nebo `Ctrl+F`): fuzzy shoda v repozitáři, čísle, názvu,
   autorovi, větvi a štítcích. `Enter` vrátí klávesy seznamu a text ponechá,
   `Esc` ho smaže.
 
-`Ctrl+N` zobrazí odznak u filtru, každého rozbalovacího seznamu, tlačítek Obnovit a Zpět a každého nadpisu sekce na obrazovce. Stiskněte znak odznaku: filtr dostane klávesnici, rozbalovací seznam se otevře, tlačítko se provede a nadpis dostane výběr (`Enter` nebo `Space` ho pak sbalí). `Esc` zruší. Viz [Odznaky](keybindings.md#odznaky).
+`Ctrl+N` zobrazí odznak u filtru, každého ze čtyř rozbalovacích seznamů, tlačítek Obnovit a Zpět a každého nadpisu sekce na obrazovce. Stiskněte znak odznaku: filtr dostane klávesnici, rozbalovací seznam se otevře, tlačítko se provede a nadpis dostane výběr (`Enter` nebo `Space` ho pak sbalí). `Esc` zruší. Viz [Odznaky](keybindings.md#odznaky).
 
 ## Akce
 

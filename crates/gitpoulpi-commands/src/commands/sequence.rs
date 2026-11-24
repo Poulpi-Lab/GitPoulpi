@@ -350,6 +350,11 @@ fn pause_reason(kind: &StepKind, step: &StepSpec, has_message: bool) -> Option<S
             if matches!(kind.id, "commit" | "commit_now") && has_message {
                 return None;
             }
+            // The push pause is the TUI's remote chooser (`git.push_behavior
+            // = "ask"`); headless, `push` goes where `gitpoulpi push` goes.
+            if kind.id == "push" {
+                return None;
+            }
             Some(format!(
                 "{} pauses by default ({})",
                 kind.id, kind.meaning_en

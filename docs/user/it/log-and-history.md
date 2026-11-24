@@ -99,7 +99,7 @@ scrive per te le righe del `.mailmap`, vedi `history-rewrite.md`; da terminale:
   o il comando della palette *Log: Filtra per autore...*): prefiltra il Log in base a chi
   ha scritto i commit. Un popup pende sotto l'intestazione con un campo di ricerca, una
   riga **Rimuovi il filtro** (✕) e una riga per ogni autore della cronologia caricata: un
-  badge con le iniziali (l'avatar, quando `ui.avatars` non è disattivato), il nome e l'e-mail
+  avatar (quando `ui.avatars` non è disattivato: l'immagine dell'autore nei terminali che disegnano immagini e quando è pronta, il badge con le iniziali fino ad allora e negli altri terminali), il nome e l'e-mail
   attenuata dopo di esso, prima chi ha più commit e poi in ordine di nome. Scrivere restringe
   l'elenco con la ricerca fuzzy della palette; `Enter` o un clic attiva/disattiva l'autore
   evidenziato (un segno di spunta; scegline quanti vuoi), `Esc` o un clic fuori
@@ -112,7 +112,10 @@ scrive per te le righe del `.mailmap`, vedi `history-rewrite.md`; da terminale:
   gli autori scelti, e quando la colonna Autore è nascosta o troppo stretta per
   l'imbuto il bordo superiore del Log dice *Autore: Alice Example +1* (il
   tasto e la palette funzionano comunque). Per toglierlo: la riga **Rimuovi il filtro**, un
-  clic destro sull'imbuto acceso, o il comando della palette *Log: Rimuovi il filtro per autore*.
+  clic destro sull'imbuto acceso, il comando della palette *Log: Rimuovi il filtro per autore*, o
+  `Esc` nel Log (dopo una selezione, che `Esc` toglie per prima; dentro il popup `Esc` svuota prima il
+  campo di ricerca, poi chiude il popup e mantiene il filtro).
+  Finché è attivo, Su/Giù (e PagSu/PagGiù, Home/Fine) spostano la selezione solo tra i commit accesi, saltando quelli attenuati; un clic seleziona comunque qualsiasi riga.
   Gli autori sono quelli dei commit che il Log ha caricato (con il mailmap applicato, come
   nella colonna), e il filtro viene ricordato per repository, tra un cambio di scheda e l'altro
   e tra un riavvio e l'altro. Una ricerca testuale non viene ricordata, il filtro sì.

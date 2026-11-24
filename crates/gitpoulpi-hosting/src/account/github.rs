@@ -48,6 +48,9 @@ struct Milestone {
 #[derive(Deserialize)]
 struct Row {
     number: u64,
+    /// The GraphQL id, which `nodes(ids:)` reads the branches by.
+    #[serde(default)]
+    node_id: String,
     title: String,
     #[serde(default)]
     draft: bool,
@@ -196,9 +199,80 @@ fn scope_qualifiers(query: &AccountQuery) -> String {
         .collect()
 }
 
+const NODES_QUERY: &str = "query($ids:[ID!]!){nodes(ids:$ids){... on PullRequest{number \
+     repository{nameWithOwner} headRefName baseRefName headRepository{nameWithOwner}}}}";
+/// GraphQL calls spent on branches in one round (100 requests each).
+const MAX_BRANCH_CALLS: usize = 5;
+
+/// Search rows carry no head or base ref: reads them in batches, by node id.
+async fn fill_branches(
+    client: &GitHubClient,
+    items: &mut AccountItems,
+    ids: &std::collections::HashMap<(String, u64), String>,
+) {
+    use super::branches::{apply, fill_known, key, remember, Known};
+    let api = client.integration.api_base();
+    let todo: Vec<String> = fill_known(&api, items)
+        .into_iter()
+        .filter_map(|i| {
+            let r = &items.prs[i];
+            ids.get(&(r.project.to_lowercase(), r.pr.number)).cloned()
+        })
+        .collect();
+    for chunk in todo.chunks(PAGE_SIZE).take(MAX_BRANCH_CALLS) {
+        let Ok(data) = client
+            .graphql(
+                "reading the branches of GitHub pull requests",
+                NODES_QUERY,
+                serde_json::json!({ "ids": chunk }),
+            )
+            .await
+        else {
+            return;
+        };
+        for node in data["nodes"].as_array().into_iter().flatten() {
+            let (Some(project), Some(number)) = (
+                node["repository"]["nameWithOwner"].as_str(),
+                node["number"].as_u64(),
+            ) else {
+                continue;
+            };
+            let text = |v: &serde_json::Value| v.as_str().unwrap_or_default().to_string();
+            let fork = node["headRepository"]["nameWithOwner"]
+                .as_str()
+                .filter(|h| !h.eq_ignore_ascii_case(project))
+                .map(str::to_string);
+            let known = Known {
+                source: text(&node["headRefName"]),
+                target: text(&node["baseRefName"]),
+                fork,
+            };
+            if let Some(row) = items
+                .prs
+                .iter_mut()
+                .find(|r| r.project.eq_ignore_ascii_case(project) && r.pr.number == number)
+            {
+                remember(
+                    key(&api, &row.project, number, &row.pr.updated_at),
+                    known.clone(),
+                );
+                apply(row, &known);
+            }
+        }
+    }
+}
+
 pub(crate) async fn fetch(client: &GitHubClient, query: &AccountQuery) -> Result<AccountItems> {
     let me = client.login().await?;
     let mut out = Collector::default();
+    let mut ids = std::collections::HashMap::new();
+    let mut note_ids = |rows: &[Row]| {
+        for r in rows.iter().filter(|r| !r.node_id.is_empty()) {
+            if let Some(p) = project_of(&r.repository_url) {
+                ids.insert((p.to_lowercase(), r.number), r.node_id.clone());
+            }
+        }
+    };
     let max_rows = query.row_limit() + 1;
     let drafts = if query.include_drafts {
         ""
@@ -212,10 +286,12 @@ pub(crate) async fn fetch(client: &GitHubClient, query: &AccountQuery) -> Result
             scope_qualifiers(query)
         );
         match search(client, &q, max_rows, "searching review requests on GitHub").await {
-            Ok(rows) => rows
-                .into_iter()
-                .filter_map(|r| r.into_pr(client, &me, true))
-                .for_each(|p| out.add_pr(p)),
+            Ok(rows) => {
+                note_ids(&rows);
+                rows.into_iter()
+                    .filter_map(|r| r.into_pr(client, &me, true))
+                    .for_each(|p| out.add_pr(p))
+            }
             Err(e) => out.failed("review requests", e)?,
         }
     }
@@ -258,10 +334,12 @@ pub(crate) async fn fetch(client: &GitHubClient, query: &AccountQuery) -> Result
             )
             .await
             {
-                Ok(rows) => rows
-                    .into_iter()
-                    .filter_map(|r| r.into_pr(client, &me, false))
-                    .for_each(|p| out.add_pr(p)),
+                Ok(rows) => {
+                    note_ids(&rows);
+                    rows.into_iter()
+                        .filter_map(|r| r.into_pr(client, &me, false))
+                        .for_each(|p| out.add_pr(p))
+                }
                 Err(e) => out.failed("open pull requests", e)?,
             }
         }
@@ -280,5 +358,7 @@ pub(crate) async fn fetch(client: &GitHubClient, query: &AccountQuery) -> Result
             Err(e) => out.failed("assigned issues", e)?,
         }
     }
-    Ok(out.finish(query))
+    let mut items = out.finish(query);
+    fill_branches(client, &mut items, &ids).await;
+    Ok(items)
 }

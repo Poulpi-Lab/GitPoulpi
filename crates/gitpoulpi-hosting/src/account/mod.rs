@@ -35,6 +35,7 @@ use crate::http::{HttpRequest, HttpResponse, HttpTransport};
 use crate::model::{IssueSummary, PullRequestState, PullRequestSummary};
 use crate::{Error, Result};
 
+mod branches;
 mod cache;
 #[cfg(feature = "gitea")]
 pub(crate) mod gitea;
@@ -45,6 +46,8 @@ pub(crate) mod gitlab;
 mod namespace;
 #[cfg(all(test, feature = "github", feature = "gitlab", feature = "gitea"))]
 mod tests;
+#[cfg(all(test, feature = "github", feature = "gitlab", feature = "gitea"))]
+mod tests_branches;
 #[cfg(all(test, feature = "github", feature = "gitlab", feature = "gitea"))]
 mod tests_namespaces;
 #[cfg(all(
@@ -120,7 +123,7 @@ impl AccountQuery {
         let mut spaces: Vec<String> = self.namespaces.iter().map(|n| n.to_lowercase()).collect();
         spaces.sort();
         let text = format!(
-            "r{}o{}i{}d{}l{}x{}|{}",
+            "v2r{}o{}i{}d{}l{}x{}|{}",
             self.review_requests as u8,
             self.open_requests as u8,
             self.assigned_issues as u8,

@@ -379,7 +379,10 @@ impl RadarUi {
         match cell {
             Cell::Repo if !item.project.is_empty() => item.project.clone(),
             Cell::Repo => item.repo_name.clone(),
-            Cell::Title => super::render::row_title(item),
+            Cell::Title => match item.branches_text() {
+                b if b.is_empty() => super::render::row_title(item),
+                b => format!("{} ({b})", super::render::row_title(item)),
+            },
             Cell::Author => item.author.clone(),
             Cell::Num => item.label.clone(),
             Cell::Age => item.updated_at.clone(),

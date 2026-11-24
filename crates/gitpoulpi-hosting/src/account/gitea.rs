@@ -188,6 +188,41 @@ async fn organizations(client: &GiteaClient) -> Result<Vec<String>> {
         .collect())
 }
 
+/// Requests read one by one for their branches in a round; the others wait
+/// for the next (what was read is remembered).
+const MAX_BRANCH_READS: usize = 40;
+
+/// The search rows carry no head or base ref: reads each request's detail.
+async fn fill_branches(client: &GiteaClient, items: &mut AccountItems) {
+    use super::branches::{apply, fill_known, key, remember, Known};
+    let api = client.integration.api_base();
+    for i in fill_known(&api, items).into_iter().take(MAX_BRANCH_READS) {
+        let (project, number) = (items.prs[i].project.clone(), items.prs[i].pr.number);
+        let url = client.repo_url(&project, &format!("pulls/{number}"));
+        let Ok(response) = client.transport.send(client.get(url)).await else {
+            return;
+        };
+        if response.error_for_status("reading a pull request").is_err() {
+            continue;
+        }
+        let Ok(row) = response.json::<crate::gitea::PullRow>() else {
+            continue;
+        };
+        let pr = row.into_summary(None);
+        let known = Known {
+            source: pr.source_branch,
+            target: pr.target_branch,
+            fork: pr.source_project,
+        };
+        let row = &mut items.prs[i];
+        remember(
+            key(&api, &project, number, &row.pr.updated_at),
+            known.clone(),
+        );
+        apply(row, &known);
+    }
+}
+
 pub(crate) async fn fetch(client: &GiteaClient, query: &AccountQuery) -> Result<AccountItems> {
     let me = client.login().await?;
     let mut out = Collector::default();
@@ -256,5 +291,7 @@ pub(crate) async fn fetch(client: &GiteaClient, query: &AccountQuery) -> Result<
             Err(e) => out.failed("assigned issues", e)?,
         }
     }
-    Ok(out.finish(query))
+    let mut items = out.finish(query);
+    fill_branches(client, &mut items).await;
+    Ok(items)
 }

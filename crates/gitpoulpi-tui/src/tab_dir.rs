@@ -903,7 +903,6 @@ pub(crate) fn index_of_label(label: &str) -> Result<usize, String> {
 
 /// "Tab: Open In" with an entry's label (a sequence's `label` option): runs
 /// that entry on the tab at `path`. An unknown label is an error naming it.
-#[allow(dead_code)] // the sequence runner calls it
 pub(crate) fn open_in_by_label(label: &str, path: &Path) -> Result<String, String> {
     run_open_in(index_of_label(label)?, path)
 }

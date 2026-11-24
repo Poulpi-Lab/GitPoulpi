@@ -486,6 +486,45 @@ pub(crate) fn cancel(id: u64) {
     });
 }
 
+/// What [`cancel_daemon_since`] found.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum DaemonCancel {
+    /// No daemon job of the run's step is going.
+    None,
+    /// `JobCancel` was sent.
+    Sent,
+    /// A job is going that cannot be stopped (it already reached the
+    /// remote): the step ends by itself.
+    NotCancellable,
+}
+
+/// A sequence was canceled: stops the daemon jobs that started since `since`
+/// (the step in flight). Only jobs this window first heard of after `since`
+/// count, so a background fetch that was already running is left alone.
+pub(crate) fn cancel_daemon_since(since: Instant) -> DaemonCancel {
+    let mine: Vec<JobInfo> = with(|c| {
+        c.jobs
+            .iter()
+            .filter(|(id, t)| {
+                !is_local(**id) && !t.info.state.is_finished() && t.first_seen >= since
+            })
+            .map(|(_, t)| t.info.clone())
+            .collect()
+    });
+    let mut out = DaemonCancel::None;
+    for job in mine {
+        if wording::refusal(&job).is_some() {
+            if out == DaemonCancel::None {
+                out = DaemonCancel::NotCancellable;
+            }
+        } else {
+            cancel(job.id);
+            out = DaemonCancel::Sent;
+        }
+    }
+    out
+}
+
 /// Cancels every job that can be.
 pub(crate) fn cancel_all() {
     for job in cancellable() {

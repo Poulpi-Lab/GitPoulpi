@@ -194,7 +194,8 @@ impl DaemonLink {
     }
 
     pub fn submit_action(&self, action: Action) {
-        self.submit_as(None, action);
+        // A sequence step armed a ticket for this very action (`tickets::arm`).
+        self.submit_as(tickets::take_armed(&action), action);
     }
 
     /// [`DaemonLink::submit_action`] that can be waited for: the returned

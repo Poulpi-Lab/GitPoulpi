@@ -20,7 +20,25 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                     crate::sequence_run::registry::info(slot).map_or_else(String::new, |i| i.name);
                 *cx.last_message = Some(msg::input::command_unavailable(&name, reason));
             }
-            None => crate::sequence_run::start(slot, cx.last_message),
+            None => crate::sequence_run::start(slot, cx.repo_root, cx.last_message),
+        }
+        return Ok(Flow::Handled);
+    }
+    // The runner's own two keys (`sequence.cancel`, `sequence.continue`).
+    if let Some(
+        action @ (keymap::Action::SequenceCancel | keymap::Action::SequenceContinue),
+    ) = km.action_in(keymap::Ctx::Sequence, &key)
+    {
+        let command = if action == keymap::Action::SequenceCancel {
+            PaletteCommand::SequenceCancel
+        } else {
+            PaletteCommand::SequenceContinue
+        };
+        match palette::unavailable_reason(command, env.palette_ctx) {
+            Some(reason) => *cx.last_message = Some(reason.to_string()),
+            None => {
+                commands::run_command(cx, command);
+            }
         }
         return Ok(Flow::Handled);
     }
@@ -671,6 +689,9 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 *cx.last_message = Some(message);
             }
         }
+        // Last Esc owner of all: a running sequence stops only when nothing
+        // above wanted the key (a dialog, a field, a menu, a view).
+        KeyCode::Esc if crate::sequence_run::active() => crate::sequence_run::request_cancel(),
         _ => {}
     }
     Ok(Flow::Handled)

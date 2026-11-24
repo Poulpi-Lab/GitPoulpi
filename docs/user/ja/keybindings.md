@@ -1182,6 +1182,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | エージェント: 保留中のビューを表示 | `Ctrl+N Enter` |
 | エージェント: 保留中のビューを閉じる |  |
 | エージェント: 戻る | `Ctrl+N Backspace` |
+| Sequence: Cancel |  |
+| Sequence: Continue |  |
 | キー割り当て: すべてリセット... |  |
 | 連携: 関連するPull Requestを開く | `Ctrl+G g` |
 | 連携: 関連するPull Requestをホストで編集 | `e（行の上で）` |

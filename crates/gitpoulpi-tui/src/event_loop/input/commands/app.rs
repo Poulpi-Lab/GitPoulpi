@@ -421,7 +421,7 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         }
         PaletteCommand::ToggleHelp => *cx.show_help = !*cx.show_help,
         PaletteCommand::Sequence(op) => {
-            crate::sequence_run::start(op.slot(), cx.last_message);
+            crate::sequence_run::start(op.slot(), cx.repo_root, cx.last_message);
         }
         PaletteCommand::Setting(op) => match palette::run_setting(op) {
             palette::SettingOutcome::Message(message) => *cx.last_message = Some(message),
@@ -582,6 +582,8 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         PaletteCommand::AgentShowPending => cx.ui_viewer.accept_pending(),
         PaletteCommand::AgentDismissPending => cx.ui_viewer.dismiss_pending(),
         PaletteCommand::AgentBack => cx.ui_viewer.request_back(),
+        PaletteCommand::SequenceCancel => crate::sequence_run::request_cancel(),
+        PaletteCommand::SequenceContinue => crate::sequence_run::request_continue(),
         PaletteCommand::AiExplainSelectedCommit => {
             if let Some(commit) =
                 selected_log_commit(&*cx.log_result, &*cx.log_state, &*cx.log_order)

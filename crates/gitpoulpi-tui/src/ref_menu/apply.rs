@@ -354,7 +354,7 @@ pub(crate) fn apply_ref_context_action(
             let target = remotes_ui::branch_group(refs, &full_name)
                 .and_then(|g| g.push.get(usize::from(i)).cloned());
             *last_message = Some(match target {
-                Some((remote, dest)) => remote_ui.push_one(&full_name, &remote, &dest, refs, link),
+                Some((remote, dest)) => remote_ui.push_one(&full_name, &remote, &dest, refs, link, None),
                 None => NO_SUCH_LOCAL_BRANCH.get().to_string(),
             });
         }

@@ -450,6 +450,25 @@ impl WorktreeDialog {
         }
     }
 
+    /// A sequence step's options: the Name (and so the Folder), where the
+    /// worktree starts, the branch it gets and whether it opens as a tab.
+    pub(crate) fn apply_run_seed(&mut self, run: &crate::repo_dialogs::WorktreeRunSeed) {
+        self.name = run.name.clone();
+        self.name_typed = true;
+        self.derive_path();
+        if let Some(reference) = &run.reference {
+            self.pick_ref(&format!("b:{reference}"));
+        }
+        // A start that is checked out elsewhere needs a branch of its own,
+        // named like the worktree; one that is free is checked out as it is.
+        match (&run.reference, self.branch_busy) {
+            (Some(reference), false) => self.set_branch(reference.clone(), true),
+            _ => self.set_branch(run.name.clone(), true),
+        }
+        self.open_tab = run.open_tab;
+        self.pristine = self.signature();
+    }
+
     /// Sets the branch field (and the list's selection).
     fn set_branch(&mut self, branch: String, typed: bool) {
         self.branch_combo.select(Some(branch.clone()));

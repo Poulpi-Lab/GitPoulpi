@@ -564,6 +564,8 @@ pub fn run_with(session: &str, options: RunOptions) -> io::Result<()> {
         .stack_size(UI_THREAD_STACK)
         .spawn(move || run_windows(&owned, repo_flag, launcher))?
         .join();
+    // A sequence still running when the process ends is not resumed: say so.
+    sequence_run::note_interrupted();
     // The embedded daemon dies with this process: take its discovery files
     // down on every way out (quit, error, panic of the UI thread), before a
     // restart into the new binary could find them.

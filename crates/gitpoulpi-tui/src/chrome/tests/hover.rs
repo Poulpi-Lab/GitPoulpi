@@ -264,6 +264,9 @@ fn hover_style_for(target: &HitTarget) -> HoverKind {
         HitTarget::PushGroupStrip(_) => Required(
             "push_group_ui::strip::render(hovered) - Continue/Abort group light with plain_button_style(true); the strip's render test",
         ),
+        HitTarget::SequenceStrip(_) => Required(
+            "sequence_run::strip::render(hovered) - Continue/Go there/Details light with plain_button_style(true) and the cross through close_cross; the strip's render test",
+        ),
         HitTarget::ConflictBadge => Required(
             "conflict_badge::render(hovered) - the button lights with plain_button_style(true); conflict_badge's render test",
         ),
@@ -511,6 +514,7 @@ fn sample_hit_targets() -> Vec<HitTarget> {
         HitTarget::RebaseBanner(crate::rebase_banner::RebaseBannerButton::Abort),
         HitTarget::AutoStashBanner(crate::autostash_banner::AutoStashBannerButton::Drop),
         HitTarget::PushGroupStrip(crate::push_group_ui::StripButton::Abort),
+        HitTarget::SequenceStrip(crate::sequence_run::strip::StripButton::Close),
         HitTarget::ConflictBadge,
         HitTarget::OperationBanner(crate::operation_banner::OperationBannerButton::Abort),
         HitTarget::StuckBanner(crate::stuck_banner::StuckBannerButton::AmAbort),

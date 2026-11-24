@@ -285,9 +285,36 @@ static WORKTREE_TICKET: Mutex<Option<crate::daemon_link::Ticket>> = Mutex::new(N
 
 /// Marks the next Create worktree dialog as the answer to `ticket`: Create
 /// reports the new worktree's path under it, closing the dialog cancels it.
-#[allow(dead_code)]
 pub(crate) fn arm_worktree_ticket(ticket: crate::daemon_link::Ticket) {
     *WORKTREE_TICKET.lock().unwrap_or_else(|e| e.into_inner()) = Some(ticket);
+}
+
+/// What a sequence step prefilled into the next Create worktree dialog.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct WorktreeRunSeed {
+    /// The expanded `options.name`.
+    pub(crate) name: String,
+    /// `options.branch`: where the worktree starts (the choose-branch step).
+    pub(crate) reference: Option<String>,
+    pub(crate) open_tab: bool,
+}
+
+static WORKTREE_RUN: Mutex<Option<WorktreeRunSeed>> = Mutex::new(None);
+
+/// Prefills the next Create worktree dialog (a sequence step's options): the
+/// dialog still shows, the person confirms.
+pub(crate) fn arm_worktree_run(seed: WorktreeRunSeed) {
+    *WORKTREE_RUN.lock().unwrap_or_else(|e| e.into_inner()) = Some(seed);
+}
+
+fn take_worktree_run() -> Option<WorktreeRunSeed> {
+    WORKTREE_RUN.lock().unwrap_or_else(|e| e.into_inner()).take()
+}
+
+/// Drops what a sequence step armed for a dialog that did not open.
+pub(crate) fn clear_worktree_arming() {
+    take_worktree_ticket();
+    take_worktree_run();
 }
 
 fn take_worktree_ticket() -> Option<crate::daemon_link::Ticket> {
@@ -732,6 +759,11 @@ impl RepoDialogs {
         pick_ref: bool,
     ) {
         self.open_worktree_for(take_worktree_ticket(), seed, repo_root, branches, pick_ref);
+        if let Some(run) = take_worktree_run() {
+            if let Some(RepoDialog::Worktree { form, .. }) = self.dialog.as_mut() {
+                form.apply_run_seed(&run);
+            }
+        }
     }
 
     /// [`Self::open_worktree_with`] for the sequence step `ticket` (or none).

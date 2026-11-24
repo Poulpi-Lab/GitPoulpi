@@ -45,6 +45,8 @@ pub const MAX_STEPS: usize = 32;
 pub const MAX_ID_LEN: usize = 48;
 /// The `[keybindings.<context>]` that holds a sequence's key by its id.
 pub const KEYBINDINGS_CONTEXT: &str = "sequence";
+/// Slugs a sequence cannot take: the runner's own key actions.
+pub const RESERVED_IDS: [&str; 2] = ["cancel", "continue"];
 /// A repository's sequences, relative to its root.
 pub const REPO_FILE: &str = ".gitpoulpi/sequences.toml";
 
@@ -327,8 +329,10 @@ pub const STEP_VOCABULARY: &[StepKind] = &[
     kind(
         "push",
         StepClass::Network,
-        false,
-        &[],
+        // With `git.push_behavior = ask` the "Push to..." chooser pauses the
+        // run; `never` pushes to the `remote` option instead.
+        true,
+        &[opt("remote", OptionKind::Text, true)],
         "Push the current branch",
         true,
     ),
@@ -552,7 +556,10 @@ fn problem(step: Option<usize>, what: &str, reason: impl Into<String>) -> Sequen
 /// Whether `id` is a usable slug: `a-z 0-9 _ -`, not starting with `_` or
 /// `-`, at most [`MAX_ID_LEN`] long (it is a TOML bare key and a CLI name).
 pub fn is_valid_id(id: &str) -> bool {
-    !id.is_empty()
+    // `cancel` and `continue` are the runner's own key actions
+    // (`sequence.cancel`, `sequence.continue`).
+    !RESERVED_IDS.contains(&id)
+        && !id.is_empty()
         && id.len() <= MAX_ID_LEN
         && id
             .chars()

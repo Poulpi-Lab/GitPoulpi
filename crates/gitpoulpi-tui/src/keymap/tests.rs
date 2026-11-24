@@ -911,7 +911,10 @@ mod sequences {
     #[test]
     fn unused_slots_are_nowhere() {
         refresh_defs(&[]);
-        let pool: Vec<_> = ACTIONS.iter().filter(|d| d.ctx == Ctx::Sequence).collect();
+        let pool: Vec<_> = ACTIONS
+            .iter()
+            .filter(|d| matches!(d.action, Action::Sequence(_)))
+            .collect();
         assert_eq!(pool.len(), registry::MAX_SEQUENCE_SLOTS);
         assert!(pool.iter().all(|d| !d.present() && !d.built()));
         // Not in the conflicts.
@@ -923,7 +926,7 @@ mod sequences {
         refresh_defs(&[test_def("km-shown")]);
         let shown: Vec<_> = ACTIONS
             .iter()
-            .filter(|d| d.ctx == Ctx::Sequence && d.built())
+            .filter(|d| matches!(d.action, Action::Sequence(_)) && d.built())
             .collect();
         assert_eq!(shown.len(), 1);
         assert_eq!(shown[0].config_id(), "sequence.km-shown");

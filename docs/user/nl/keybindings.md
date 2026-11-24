@@ -1220,6 +1220,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Agent: Openstaande weergave tonen | `Ctrl+N Enter` |
 | Agent: Openstaande weergave sluiten |  |
 | Agent: Terug | `Ctrl+N Backspace` |
+| Sequence: Cancel |  |
+| Sequence: Continue |  |
 | Sneltoetsen: Alles resetten... |  |
 | Integraties: Gekoppelde pull request openen | `Ctrl+G g` |
 | Integraties: Gekoppelde pull request bewerken op de host | `e (op een rij)` |

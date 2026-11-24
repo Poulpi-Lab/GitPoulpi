@@ -1214,6 +1214,8 @@ As teclas são as predefinidas.
 | Agente: mostrar a vista pendente | `Ctrl+N Enter` |
 | Agente: dispensar a vista pendente |  |
 | Agente: voltar | `Ctrl+N Backspace` |
+| Sequence: Cancel |  |
+| Sequence: Continue |  |
 | Atalhos: repor tudo... |  |
 | Integrações: abrir pull request associado | `Ctrl+G g` |
 | Integrações: editar pull request associado no host | `e (numa linha)` |

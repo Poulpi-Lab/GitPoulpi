@@ -210,9 +210,12 @@ impl RemoteUi {
         remote_branch: &str,
         refs: &[Ref],
         link: &DaemonLink,
+        ticket: Option<crate::daemon_link::Ticket>,
     ) -> String {
         let has_upstream = local_branch(refs, branch).is_some_and(|b| b.upstream.is_some());
-        link.submit_action(Action::Push {
+        link.submit_as(
+            ticket,
+            Action::Push {
             remote: remote.to_string(),
             opts: PushOptions {
                 set_upstream: !has_upstream,
@@ -220,7 +223,8 @@ impl RemoteUi {
                 remote_branch: (remote_branch != branch).then(|| remote_branch.to_string()),
                 ..PushOptions::default()
             },
-        });
+            },
+        );
         msg::pushing_to(branch, remote)
     }
 

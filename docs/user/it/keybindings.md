@@ -1220,6 +1220,8 @@ applicano. I tasti sono quelli predefiniti.
 | Agente: Mostra la vista in sospeso | `Ctrl+N Enter` |
 | Agente: Chiudi la vista in sospeso |  |
 | Agente: Indietro | `Ctrl+N Backspace` |
+| Sequence: Cancel |  |
+| Sequence: Continue |  |
 | Scorciatoie: Reimposta tutto... |  |
 | Integrazioni: Apri la pull request collegata | `Ctrl+G g` |
 | Integrazioni: Modifica la pull request collegata sull'host | `e (su una riga)` |

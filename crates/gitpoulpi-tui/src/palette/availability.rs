@@ -857,6 +857,10 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         C::AgentShowPending | C::AgentDismissPending => {
             (!ctx.agent_pending).then_some(msg::palette::WHY_NO_AGENT_VIEW_IS_WAITING.get())
         }
+        C::SequenceCancel => (!crate::sequence_run::visible())
+            .then_some(msg::palette::WHY_NO_SEQUENCE_RUNNING.get()),
+        C::SequenceContinue => (!crate::sequence_run::can_continue())
+            .then_some(msg::palette::WHY_SEQUENCE_NOT_WAITING.get()),
         C::AgentBack => (!ctx.agent_back).then_some(msg::palette::WHY_NOTHING_TO_GO_BACK_TO.get()),
         C::CloseRepositoryTab | C::SelectTab => (ctx.open_repository_tabs == 0)
             .then_some(msg::palette::WHY_NO_REPOSITORY_TAB_IS_OPEN.get()),

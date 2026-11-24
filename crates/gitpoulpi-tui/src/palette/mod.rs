@@ -857,6 +857,10 @@ pub(crate) enum PaletteCommand {
     /// A `Sequence: <name>` row, generated from the user's sequences
     /// (`sequences.rs`); not in [`PALETTE_COMMANDS`].
     Sequence(sequences::SeqOp),
+    /// `Sequence: Cancel`: stops the running sequence (earlier steps stay).
+    SequenceCancel,
+    /// `Sequence: Continue`: the go-ahead a paused sequence waits for.
+    SequenceContinue,
 }
 
 /// The Repository Management tab's actions, as palette commands. Each
@@ -1199,6 +1203,8 @@ pub(crate) fn command_action(entry: &PaletteEntry) -> Option<crate::keymap::Acti
         }
         PaletteCommand::AboutGitPoulpi => Some(A::NavOpenAbout),
         PaletteCommand::OpenActivityLog => Some(A::NavOpenActivityLog),
+        PaletteCommand::SequenceCancel => Some(A::SequenceCancel),
+        PaletteCommand::SequenceContinue => Some(A::SequenceContinue),
         PaletteCommand::OpenGlobalLog => Some(A::NavOpenGlobalLog),
         PaletteCommand::Jobs(crate::jobs_ui::JobsCmd::Show) => Some(A::NavShowJobs),
         PaletteCommand::Updates(crate::updates::UpdatesCommand::ShowPanel) => {
@@ -1446,7 +1452,6 @@ mod sequences;
 mod settings;
 
 pub(crate) use availability::{unavailable_reason, PaletteContext};
-#[cfg(test)]
 pub(crate) use bindings::command_id;
 pub(crate) use bindings::{palette_action_defs, palette_entry};
 pub(crate) use catalog::PALETTE_COMMANDS;

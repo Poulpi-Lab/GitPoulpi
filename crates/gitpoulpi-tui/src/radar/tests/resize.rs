@@ -397,9 +397,9 @@ fn the_age_column_is_sizable() {
         true,
     );
     assert_eq!(ui.state.columns.age, None);
-    // The keys: Tab walks Repo, #, Author, Age.
+    // The keys: Tab walks Repo, Branches, #, Author, Age.
     ui.on_key(key(KeyCode::Char('C')));
-    for _ in 0..3 {
+    for _ in 0..4 {
         ui.on_key(key(KeyCode::Tab));
     }
     assert_eq!(ui.col_pick, Some(Cell::Age));

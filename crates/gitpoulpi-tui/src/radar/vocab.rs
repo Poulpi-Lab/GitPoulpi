@@ -12,6 +12,7 @@ use super::pending::Pending;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum SizedColumn {
     Repo,
+    Branches,
     Num,
     Author,
     Age,

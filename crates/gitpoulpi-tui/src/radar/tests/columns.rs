@@ -150,8 +150,10 @@ fn the_keys_pick_size_and_reset_a_column_and_the_width_is_saved() {
     assert_eq!(ui.state.columns.repo, Some(6));
     let saved = RadarState::load(&RadarState::file_in(&dir.path().join("cfg")));
     assert_eq!(saved.columns.repo, Some(6));
-    // Tab moves to the number column, then to the author column; each width
-    // is its own.
+    // Tab moves to the branches, the number column, then to the author
+    // column; each width is its own.
+    ui.on_key(key(KeyCode::Tab));
+    assert_eq!(ui.col_pick, Some(Cell::Branches));
     ui.on_key(key(KeyCode::Tab));
     assert_eq!(ui.col_pick, Some(Cell::Num));
     screen(&mut ui, 120, 30);
@@ -467,7 +469,7 @@ fn every_sizable_column_goes_down_to_one_cell() {
     ui.state.columns.number = Some(1);
     ui.state.columns.age = Some(1);
     screen(&mut ui, 150, 30);
-    assert_eq!(ui.col_eff, [1, 1, 1, 1], "stored widths of 1 are kept");
+    assert_eq!(ui.col_eff[..4], [1, 1, 1, 1], "stored widths of 1 are kept");
     for cell in [Cell::Repo, Cell::Num, Cell::Author, Cell::Age] {
         let sep = rect_of(&ui, |h| h == Hit::Divider(cell));
         assert_eq!(sep.width, 1, "{cell:?}");

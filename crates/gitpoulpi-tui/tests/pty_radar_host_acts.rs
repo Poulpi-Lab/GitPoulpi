@@ -164,25 +164,34 @@ fn read(path: &Path) -> String {
     std::fs::read_to_string(path).unwrap_or_default()
 }
 
-/// A request row says `source -> target` after its title and an issue row
-/// names its repository, like the request rows do.
+/// A request row says `source -> target` in the Branches column right after
+/// the repository and an issue row names its repository, like the request
+/// rows do (its Branches cell stays empty).
 #[test]
 fn a_request_row_shows_its_branches_and_an_issue_row_its_repository() {
     let mut s = setup("pty-acts-rows", OPEN, None, COLS);
     let screen = open_radar(&mut s.term, ISSUE);
+    let header = line_of(&screen, "Branches");
+    let repo = header.find("Repository").expect(&header);
+    let branches = header.find("Branches").unwrap();
+    let title = header.find("Title").expect(&header);
+    assert!(repo < branches && branches < title, "{header}");
     let request = line_of(&screen, GRID);
     assert!(
         request.contains("feature/52 \u{2192} main"),
-        "branches after the title: {request}"
+        "branches in their column: {request}"
     );
     assert!(request.contains("northwind/ledger-ui"), "{request}");
     let issue = line_of(&screen, ISSUE);
     assert!(issue.contains("northwind/ledger-ui"), "{issue}");
-    // The title stays whole, the branches follow it.
-    assert!(
-        request.find(GRID).unwrap() < request.find("feature/52").unwrap(),
-        "{request}"
+    // The branches sit under their header, before the title.
+    let at = request.find("feature/52").unwrap();
+    assert_eq!(
+        request[..at].chars().count(),
+        header[..branches].chars().count(),
+        "under the header: {request}\n{header}"
     );
+    assert!(at < request.find(GRID).unwrap(), "{request}");
 }
 
 /// The owner's sizes (`repo = 34, number = 4, author = 60, age = 9`) used to
@@ -200,6 +209,8 @@ fn wide_sized_columns_still_leave_the_title_and_its_branches() {
     let screen = open_radar(&mut s.term, "Keyboard");
     let line = line_of(&screen, "Keyboard");
     assert!(line.contains("feature/"), "branches survive: {line}");
+    let header = line_of(&screen, "Branches");
+    assert!(header.contains("Title"), "the title survives: {header}");
 }
 
 /// Narrow, the branches are cut (never the Actions column), and the title's

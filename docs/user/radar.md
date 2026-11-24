@@ -47,10 +47,13 @@ one of the sizable columns). A double-click or `Enter` on a request that is not 
 
 ### The branches of a request
 
-A request row shows `source → target` after its title (`alice:feature/login → main` when the source branch is in a fork).
-When the room is short the target is cut first (an ellipsis), the title keeps most of the room, and the branches shrink
-rather than vanish; only a window too narrow for even a cut version leaves them to the title's tooltip. A wide author column
-you sized yourself gives way to the title. The Actions column is never pushed out. Rest the pointer on a cut text for the
+A request row shows `source → target` in the **Branches** column, right after the repository (`alice:feature/login → main`
+when the source branch is in a fork); an issue row leaves the cell empty, and a Radar with no request that names its branches
+has no such column. When the cell is too narrow the source is cut first (an ellipsis) and the target stays whole as long as
+it can. The column shrinks before it disappears: in a narrow window it is the last of the optional columns to leave
+(after the state, author and age, before the repository and the title); once it is gone the whole branches stay in the
+title's tooltip and on the status line of the selected row. A wide author column you sized yourself gives way to the title
+and the branches. The Actions column is never pushed out. Rest the pointer on a cut text for the
 whole of it. GitHub and Gitea list requests without their branches, so the Radar reads them after the list (once per request
 until it changes). A host that did not name the branches shows nothing there. An issue row names its repository in the same chip as a request row (the
 folder name of the clone, or `owner/name` when it is not cloned).
@@ -158,7 +161,7 @@ The cached lists (the same cache the sidebar uses) show at once and are replaced
 
 ### Columns
 
-The repository chip, the `#` (number and check marks), the author and the age are **sizable columns**. Left on automatic, the repository column is as wide
+The repository chip, the branches, the `#` (number and check marks), the author and the age are **sizable columns**. Left on automatic, the repository column is as wide
 as the longest name on screen (up to 40 cells, and at most a third of the window), so `owner/name` and an
 account list's `group/sub/project` are not cut on a normal terminal. The title takes what is left. A name that
 does not fit ends in an ellipsis (`group/sub...`), and:
@@ -167,7 +170,7 @@ does not fit ends in an ellipsis (`group/sub...`), and:
   the row and the status line under the filter names the full project and title too, so the keyboard sees
   the same.
 - **Drag the separator** (the cell right after the repository name, after the `#`, or just before the author or the age) to size the
-  column; **double-click** it to fit the column again. The list has a **header row** (repository, `#`,
+  column; **double-click** it to fit the column again. The list has a **header row** (repository, branches, `#`,
   title, author, age) and the separators follow `ui.column_resize` like the Log's: with `line` (the
   default) a muted `│` rests in the separator on the header row, and while the pointer is on the separator
   (on the header or on any row of the list), while the column is picked with the keys, or while you drag, a thin
@@ -181,7 +184,7 @@ does not fit ends in an ellipsis (`group/sub...`), and:
   cells, **`[`** narrows it, **`0`** puts every column back to automatic, `Esc` leaves. The palette has the
   same: `Radar: Pick Column`, `Radar: Widen Column`, `Radar: Narrow Column`, `Radar: Reset Column Widths`.
 
-The widths are kept in `radar.toml` (`[columns]`, `repo`, `number`, `author` and `age`, in cells) and survive a restart. They
+The widths are kept in `radar.toml` (`[columns]`, `repo`, `branches`, `number`, `author` and `age`, in cells; a file without `branches` loads as before, the column then fits its content up to 28 cells) and survive a restart. They
 are the same sizing gestures as the Log's columns.
 
 ### Checks and conflicts

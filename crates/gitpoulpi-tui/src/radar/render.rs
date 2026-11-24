@@ -43,6 +43,9 @@ const CONFLICT: &str = "!";
 struct Geo {
     repo_x: u16,
     chip_w: usize,
+    /// The Branches column right after the repository: where it starts and
+    /// how wide; `None` when no request has branches or the window is too narrow.
+    branch: Option<(u16, usize)>,
     label_x: Option<u16>,
     /// The `#` column's width (label and check marks), 0 = no such column.
     num_w: usize,
@@ -70,6 +73,11 @@ struct Widths {
     /// The `#` column's content width (label and check marks, see `Geo`).
     num: usize,
     status: usize,
+    /// The Branches column's width (0 = no request names its branches).
+    branches: usize,
+    /// The widest row title: the Branches column leaves it at least this
+    /// much (up to `BRANCH_TITLE_KEEP`).
+    title: usize,
     author: usize,
     state: usize,
     age: usize,
@@ -112,7 +120,9 @@ impl Geo {
                 // A wide sized author column gives way to the title.
                 let others: usize = tail.iter().map(|(_, t)| t + 2).sum::<usize>()
                     + if w.age > 0 { w.age + 2 } else { 0 };
-                let spare = room.saturating_sub(others + 1 + TITLE_FLOOR);
+                // ... and so does the Branches column's share of it.
+                let reserve = w.branches.min(BRANCH_RESERVE);
+                let spare = room.saturating_sub(others + 1 + TITLE_FLOOR + reserve);
                 tail.push((1, w.author.min(spare.max(AUTHOR_FLOOR))));
             }
             if room >= 40 && w.age > 0 {
@@ -159,6 +169,7 @@ impl Geo {
         let mut geo = Geo {
             repo_x,
             chip_w: w.chip,
+            branch: None,
             label_x,
             num_w,
             status_w,
@@ -171,6 +182,26 @@ impl Geo {
             actions: None,
             spec,
         };
+        // The Branches column is the last to give way: it takes its room from
+        // the title (which keeps `BRANCH_TITLE_KEEP` cells), shrinks to
+        // `BRANCH_FLOOR` before it leaves, and only then is dropped.
+        if w.branches > 0 {
+            let keep = w.title.clamp(BRANCH_TITLE_MIN, BRANCH_TITLE_KEEP);
+            let spare = geo.title_w.saturating_sub(keep + 1);
+            let mut bw = w.branches.min(spare);
+            // Not enough for a readable cut: the title gives a little more.
+            if bw < w.branches.min(BRANCH_COMFORT) {
+                let keep = w.title.clamp(BRANCH_TITLE_MIN, BRANCH_TITLE_LEAST);
+                bw = w.branches.min(geo.title_w.saturating_sub(keep + 1));
+            }
+            if bw > 0 && bw >= w.branches.min(BRANCH_FLOOR) {
+                let shift = bw as u16 + 1;
+                geo.branch = Some((repo_x + w.chip as u16 + 1, bw));
+                geo.label_x = geo.label_x.map(|l| l + shift);
+                geo.title_x += shift;
+                geo.title_w -= bw + 1;
+            }
+        }
         let mut tx = edge.saturating_sub(tail_w as u16);
         for (kind, width) in tail {
             let slot = Some((tx, width));
@@ -185,12 +216,18 @@ impl Geo {
         geo
     }
 
-    /// The sizable columns' boundaries: the repository's, then the number's, the author's and the age's.
+    /// The sizable columns' boundaries: the repository's, then the branches', the number's, the author's and the age's.
     fn edges(&self) -> Vec<(Cell, crate::column_resize::Edge)> {
         let mut out = vec![(
             Cell::Repo,
             crate::column_resize::Edge::before(self.repo_x + self.chip_w as u16 + 1),
         )];
+        if let Some((x, w)) = self.branch {
+            out.push((
+                Cell::Branches,
+                crate::column_resize::Edge::before(x + w as u16 + 1),
+            ));
+        }
         if let Some(x) = self.label_x {
             out.push((
                 Cell::Num,
@@ -212,33 +249,18 @@ impl Geo {
 const TITLE_FLOOR: usize = 40;
 /// The narrowest a sized author column is made to give the title its room.
 const AUTHOR_FLOOR: usize = 8;
-/// The fewest cells worth painting for the branches (`a -> b` cut).
+/// The fewest cells the Branches column is shrunk to before it is dropped.
 const BRANCH_FLOOR: usize = 8;
-
-/// How the title's room is shared with the branches: `(title cells, branch
-/// cells)`. Both fit whole when they can; else the branches keep up to a
-/// third of the room (at least 12 cells) and the title the rest. The branches
-/// are cut, never dropped, down to [`BRANCH_FLOOR`] cells; only a room too
-/// small for both leaves them to the hover tooltip of the title.
-pub(super) fn plan_title(room: usize, title: usize, branches: usize) -> (usize, usize) {
-    if branches == 0 {
-        return (room, 0);
-    }
-    if title + 2 + branches <= room {
-        return (title, branches);
-    }
-    // The title keeps a few cells (half the room when it is short) before
-    // the branches take theirs.
-    let title_min = title.min((room / 2).max(4));
-    let floor = branches
-        .min((room / 3).max(12))
-        .min(room.saturating_sub(title_min + 2));
-    if floor < BRANCH_FLOOR.min(branches) {
-        return (room, 0);
-    }
-    let title_cells = title.min(room - floor - 2);
-    (title_cells, (room - title_cells - 2).min(branches))
-}
+/// The most cells the title keeps before the Branches column takes any, and
+/// the least (a short title is not made to keep more than it needs).
+const BRANCH_TITLE_KEEP: usize = 24;
+const BRANCH_TITLE_MIN: usize = 8;
+/// What the title is cut to, at most, to give the branches `BRANCH_COMFORT`.
+const BRANCH_TITLE_LEAST: usize = 16;
+/// A width at which the branches read (`feat... -> main`).
+const BRANCH_COMFORT: usize = 16;
+/// What a wide sized author column leaves the Branches column.
+const BRANCH_RESERVE: usize = 24;
 
 /// Whether the host said anything about a row's checks or conflicts.
 fn has_status(item: &Item) -> bool {
@@ -541,8 +563,14 @@ impl RadarUi {
                         item.label,
                         row_title(item)
                     ));
+
                     if !words.is_empty() {
                         line.push_str(&format!(": {}", words.join(", ")));
+                    }
+                    // Whatever the Branches column cut or left out.
+                    let branches = item.branches_text();
+                    if !branches.is_empty() {
+                        line.push_str(&format!(" ({branches})"));
                     }
                 }
                 line
@@ -607,6 +635,18 @@ impl RadarUi {
             .map_or(0, |w| w.max(display_width(msg::radar::COLUMN_AUTHOR.get())));
         let author_w = super::columns::author_width(author_content, self.state.columns.author);
         self.repo_max = repo_max;
+        let branches_content = self
+            .board
+            .items
+            .iter()
+            .map(|i| display_width(&i.branches_text()))
+            .max()
+            .filter(|w| *w > 0)
+            .map_or(0, |w| {
+                w.max(display_width(msg::radar::COLUMN_BRANCHES.get()))
+            });
+        let branches_w =
+            super::columns::branches_width(branches_content, self.state.columns.branches);
         let label_w = self
             .board
             .items
@@ -643,30 +683,48 @@ impl RadarUi {
             .filter(|w| *w > 0)
             .map_or(0, |w| w.max(display_width(msg::radar::COLUMN_AGE.get())));
         let age_w = super::columns::age_width(age_content, self.state.columns.age);
-        self.col_eff = [chip_w, author_w, if label_w > 0 { num_w } else { 0 }, age_w];
+        self.col_eff = [
+            chip_w,
+            author_w,
+            if label_w > 0 { num_w } else { 0 },
+            age_w,
+            0,
+        ];
         self.col_auto = [
             super::columns::repo_width(content, None, body.width).0,
             super::columns::author_width(author_content, None),
             super::columns::num_width(label_w, status_w, None),
             super::columns::age_width(age_content, None),
+            super::columns::branches_width(branches_content, None),
         ];
         self.col_content = [
             content,
             author_content,
             super::columns::num_width(label_w, status_w, None),
             age_content,
+            branches_content,
         ];
         let widths = Widths {
             chip: chip_w,
             label: label_w,
             num: num_w,
             status: status_w,
+            branches: branches_w,
+            title: self
+                .board
+                .items
+                .iter()
+                .filter(|i| !i.branches_text().is_empty())
+                .map(|i| display_width(&row_title(i)))
+                .max()
+                .unwrap_or(0),
             author: author_w,
             state: state_w,
             age: age_w,
             actions: super::actions::Spec::of(self.board.items.iter()),
         };
         let geo = Geo::new(body, widths);
+        self.col_eff[4] = geo.branch.map_or(0, |(_, w)| w);
         let header_y = top - 1;
         let mode = crate::column_resize::mode();
         // The separators first: a hit rect registered before the rows wins
@@ -691,6 +749,7 @@ impl RadarUi {
         // menu. After the separators, which keep their cells.
         let titles = [
             Some((Cell::Repo, geo.repo_x, geo.chip_w)),
+            geo.branch.map(|(x, w)| (Cell::Branches, x, w)),
             geo.label_x.map(|x| (Cell::Num, x, geo.num_w)),
             geo.author.map(|(x, w)| (Cell::Author, x, w)),
             geo.age.map(|(x, w)| (Cell::Age, x, w)),
@@ -796,6 +855,9 @@ impl RadarUi {
             geo.chip_w,
             msg::radar::COLUMN_REPOSITORY.get(),
         );
+        if let Some((x, width)) = geo.branch {
+            title(buf, x, width, msg::radar::COLUMN_BRANCHES.get());
+        }
         if let Some(x) = geo.label_x {
             title(buf, x, geo.num_w, "#");
         }
@@ -938,6 +1000,17 @@ impl RadarUi {
         }
         // The separator after the chip is the Radar's own (`paint_list`).
         x += chip_w as u16 + 1;
+        if let Some((bx, bw)) = geo.branch {
+            // A request's `source -> target`; an issue's cell stays empty.
+            if let Some((source, target)) = item.branches_parts() {
+                let cut = super::columns::fit_branches(&source, target.as_deref(), bw);
+                let r = put(buf, bx, y, cut.trim_end(), bw as u16, muted);
+                if display_width(&item.branches_text()) > bw {
+                    self.hits.push((r, Hit::Cut(offset, Cell::Branches)));
+                }
+            }
+            x = bx + bw as u16 + 1;
+        }
         if let Some(lx) = geo.label_x {
             let label_area = geo.num_w - geo.status_w;
             let r = put(buf, lx, y, &item.label, label_area as u16, muted);
@@ -998,33 +1071,16 @@ impl RadarUi {
         let title_w = geo.title_w;
         let title = row_title(item);
         let branches = item.branches_text();
-        let (title_cells, branch_cells) =
-            plan_title(title_w, display_width(&title), display_width(&branches));
-        let shown = put(buf, x, y, &title, title_cells as u16, text);
-        // Branches that found no room are in the title's hover tooltip.
+        let shown = put(buf, x, y, &title, title_w as u16, text);
+        // Branches with no column of their own (a narrow window) are in the
+        // title's hover tooltip, with the title when it is cut too.
         if display_width(&title) > shown.width as usize
-            || (branch_cells == 0 && !branches.is_empty())
+            || (geo.branch.is_none() && !branches.is_empty())
         {
             self.hits.push((
                 Rect::new(x, y, shown.width, 1),
                 Hit::Cut(offset, Cell::Title),
             ));
-        }
-        // A request's `source → target` after the title, cut with an
-        // ellipsis (the target goes first) before it costs the title or the
-        // columns at the right anything.
-        if branch_cells > 0 {
-            let r = put(
-                buf,
-                shown.right() + 2,
-                y,
-                super::columns::fit_pad(&branches, branch_cells).trim_end(),
-                branch_cells as u16,
-                muted,
-            );
-            if display_width(&branches) > branch_cells {
-                self.hits.push((r, Hit::Cut(offset, Cell::Branches)));
-            }
         }
         // Labels after the title, when there is room.
         if !item.labels.is_empty() {

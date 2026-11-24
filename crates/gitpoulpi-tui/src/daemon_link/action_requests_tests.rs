@@ -598,6 +598,7 @@ async fn every_action_sends_the_requests_the_golden_file_records() {
         let ok = run_action(
             &conn,
             action,
+            None,
             &action_error_tx,
             &action_message_tx,
             &push_rejected_tx,

@@ -7,7 +7,7 @@ pub(super) const AUTO_REFRESH_INTERVAL: Duration = Duration::from_secs(2);
 /// state it shares with the handle.
 pub(super) struct LinkChannels {
     pub(super) manual_refresh_rx: tokio::sync::mpsc::UnboundedReceiver<()>,
-    pub(super) action_rx: tokio::sync::mpsc::UnboundedReceiver<Action>,
+    pub(super) action_rx: tokio::sync::mpsc::UnboundedReceiver<(Option<Ticket>, Action)>,
     pub(super) commit_files_task_rx: tokio::sync::mpsc::UnboundedReceiver<CommitFilesRequest>,
     pub(super) working_diff_task_rx: tokio::sync::mpsc::UnboundedReceiver<FileDiffRequest>,
     pub(super) file_insight_task_rx: tokio::sync::mpsc::UnboundedReceiver<FileInsightRequest>,
@@ -16,7 +16,7 @@ pub(super) struct LinkChannels {
     pub(super) outcome_tx: std_mpsc::Sender<RefreshOutcome>,
     pub(super) action_error_tx: std_mpsc::Sender<String>,
     pub(super) action_message_tx: std_mpsc::Sender<String>,
-    pub(super) push_rejected_tx: std_mpsc::Sender<PushRejection>,
+    pub(super) push_rejected_tx: std_mpsc::Sender<PushRejectedNotice>,
     pub(super) autostash_tx: std_mpsc::Sender<AutoStashNeeded>,
     pub(super) commit_files_out_tx: std_mpsc::Sender<CommitFilesOutcome>,
     pub(super) working_diff_out_tx: std_mpsc::Sender<WorkingDiffOutcome>,
@@ -321,7 +321,7 @@ pub(super) async fn link_loop_with_port(
                 }
             }
             action = action_rx.recv() => {
-                let Some(action) = action else {
+                let Some((ticket, action)) = action else {
                     return None; // DaemonLink dropped.
                 };
                 // Locks: from now on this remote's list is kept fresh. A
@@ -360,6 +360,7 @@ pub(super) async fn link_loop_with_port(
                         let ok = run_action(
                             &conn,
                             action,
+                            ticket,
                             &action_error_tx,
                             &action_message_tx,
                             &push_rejected_tx,
@@ -380,6 +381,7 @@ pub(super) async fn link_loop_with_port(
                     let ok = run_action(
                         &conn,
                         action,
+                        ticket,
                         &action_error_tx,
                         &action_message_tx,
                         &push_rejected_tx,

@@ -180,7 +180,8 @@ pub(crate) fn confirm_now(
 ) -> Option<String> {
     match action {
         ConfirmAction::Destructive(pending) => {
-            link.submit_action(pending.into_action());
+            let ticket = pending.ticket();
+            link.submit_as(ticket, pending.into_action());
             Some(gitpoulpi_i18n::msg::git_actions::CONFIRMED.get().into())
         }
         ConfirmAction::CreateTrackingBranch { local, upstream } => {

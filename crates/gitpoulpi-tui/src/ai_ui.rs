@@ -230,6 +230,46 @@ pub(crate) enum AiOutcome {
     Canceled(AiRequest),
 }
 
+/// How a finished request ended, for whoever waits on it (a sequence step).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum AiEnd {
+    Ok,
+    Failed(String),
+    Canceled,
+}
+
+/// The ends nobody has taken yet, by kind of request. Process-wide: the
+/// window that polled the answer may not be the one that asked, and a tab
+/// switch rebuilds it.
+static FINISHED: std::sync::Mutex<Vec<(AiAction, AiEnd)>> = std::sync::Mutex::new(Vec::new());
+
+/// What `outcome` means to a waiter; read from the outcome the window
+/// applies (`event_loop::window::tick`), never from a second poll.
+pub(crate) fn finished_of(outcome: &AiOutcome) -> (AiAction, AiEnd) {
+    match outcome {
+        AiOutcome::Done(request, Ok(_)) => (request.action(), AiEnd::Ok),
+        AiOutcome::Done(request, Err(why)) => (request.action(), AiEnd::Failed(why.clone())),
+        AiOutcome::Canceled(request) => (request.action(), AiEnd::Canceled),
+    }
+}
+
+/// Makes the end of a request visible to [`take_finished`]; called once the
+/// window has applied the answer. Only the newest end of a kind is kept.
+pub(crate) fn record_finished((kind, end): (AiAction, AiEnd)) {
+    let mut ends = FINISHED.lock().unwrap_or_else(|e| e.into_inner());
+    ends.retain(|(k, _)| *k != kind);
+    ends.push((kind, end));
+}
+
+/// The end of the last finished request of `kind`, once. `None` while it
+/// runs (or nothing of that kind finished since the last call).
+#[allow(dead_code)] // the sequence runner (a later slice) is the reader
+pub(crate) fn take_finished(kind: AiAction) -> Option<AiEnd> {
+    let mut ends = FINISHED.lock().unwrap_or_else(|e| e.into_inner());
+    let at = ends.iter().position(|(k, _)| *k == kind)?;
+    Some(ends.remove(at).1)
+}
+
 /// Shared by the run and the jobs list's Cancel, so a request that outlives
 /// its window (the tab was left) still stops from the indicator.
 type CancelSlot = std::sync::Arc<std::sync::Mutex<Option<tokio::sync::oneshot::Sender<()>>>>;
@@ -1779,5 +1819,44 @@ mod tests {
         // The wheel brings it back up; a key too.
         popup.on_mouse(mouse(MouseEventKind::ScrollUp, x - 5, track.rect.y + 2));
         assert_eq!(popup.scroll, max - 3);
+    }
+}
+
+#[cfg(test)]
+mod finished_tests {
+    use super::*;
+
+    /// What a waiter reads comes from the outcome the window applied: `Ok`,
+    /// the failure's text, or a cancel, once per kind of request.
+    #[test]
+    fn the_applied_outcome_is_what_a_waiter_takes_once() {
+        assert_eq!(take_finished(AiAction::StashMessage), None);
+
+        let done = AiOutcome::Done(
+            AiRequest::StashMessage,
+            Ok(AiAnswer::StashMessage("wip".into())),
+        );
+        record_finished(finished_of(&done));
+        assert_eq!(take_finished(AiAction::StashMessage), Some(AiEnd::Ok));
+        assert_eq!(take_finished(AiAction::StashMessage), None, "taken once");
+
+        let failed = AiOutcome::Done(AiRequest::StashMessage, Err("no profile".into()));
+        record_finished(finished_of(&failed));
+        assert_eq!(
+            take_finished(AiAction::StashMessage),
+            Some(AiEnd::Failed("no profile".into()))
+        );
+
+        let canceled = AiOutcome::Canceled(AiRequest::StashMessage);
+        record_finished(finished_of(&canceled));
+        assert_eq!(take_finished(AiAction::StashMessage), Some(AiEnd::Canceled));
+    }
+
+    #[test]
+    fn kinds_do_not_see_each_other() {
+        let done = AiOutcome::Done(AiRequest::Compose, Ok(AiAnswer::Plan(Vec::new())));
+        record_finished(finished_of(&done));
+        assert_eq!(take_finished(AiAction::CommitMessage), None);
+        assert_eq!(take_finished(AiAction::CommitComposer), Some(AiEnd::Ok));
     }
 }

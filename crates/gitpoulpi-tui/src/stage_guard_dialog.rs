@@ -42,7 +42,7 @@ use ratatui::layout::Rect;
 use ratatui::style::{Modifier, Style};
 use ratatui::Frame;
 
-use crate::daemon_link::{Action, DaemonLink};
+use crate::daemon_link::{Action, DaemonLink, Ticket, TicketGuard};
 use crate::dialog_kit;
 
 const WIN: dialog_kit::Win = dialog_kit::Win::movable("stage_guard");
@@ -62,6 +62,9 @@ pub(crate) struct Staged {
     /// The repository the refusal came from.
     pub(crate) root: PathBuf,
     pub(crate) action: Action,
+    /// The ticket the refused stage ran under: "Stage anyway" resubmits
+    /// under it.
+    pub(crate) ticket: Option<Ticket>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -88,6 +91,9 @@ struct Row {
 struct Open {
     root: PathBuf,
     action: Action,
+    /// Cancels the ticket when the dialog is dropped unanswered (Cancel, Esc,
+    /// the close cross, a click away); the "Stage anyway" answer takes it.
+    ticket: Option<TicketGuard>,
     /// What the list is about, in list order.
     findings: Vec<Finding>,
     /// The focused finding (what "Show in file" opens).
@@ -222,11 +228,12 @@ fn lines_of(files: &[Sensitive]) -> (Vec<Finding>, Vec<Row>) {
 /// A stage `action` of the repository at `root` was refused for `files`:
 /// opens the question (or queues it behind the one that is open). Callable
 /// from any thread.
-pub(crate) fn ask(root: PathBuf, action: Action, files: Vec<Sensitive>) {
+pub(crate) fn ask(root: PathBuf, action: Action, files: Vec<Sensitive>, ticket: Option<Ticket>) {
     let (findings, lines) = lines_of(&files);
     let open = Open {
         root,
         action,
+        ticket: TicketGuard::new(ticket),
         findings,
         focus: 0,
         reveal: false,
@@ -381,10 +388,11 @@ impl Open {
         crate::redraw::poke();
     }
 
-    fn staged(&self) -> Staged {
+    fn staged(&mut self) -> Staged {
         Staged {
             root: self.root.clone(),
             action: self.action.clone(),
+            ticket: self.ticket.take().map(TicketGuard::take),
         }
     }
 }
@@ -545,7 +553,13 @@ pub(crate) fn on_mouse(mouse: MouseEvent) -> Option<Staged> {
 /// this window's repository.
 pub(crate) fn apply(staged: Staged, link: &DaemonLink, repo_root: &std::path::Path) {
     if staged.root == repo_root {
-        link.submit_action(Action::AllowSensitive(Box::new(staged.action)));
+        link.submit_as(
+            staged.ticket,
+            Action::AllowSensitive(Box::new(staged.action)),
+        );
+    } else if let Some(ticket) = staged.ticket {
+        // Answered from another repository's window: nothing was staged.
+        crate::daemon_link::cancel_ticket(ticket);
     }
 }
 

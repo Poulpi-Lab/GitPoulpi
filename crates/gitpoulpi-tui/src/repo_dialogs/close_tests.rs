@@ -191,3 +191,96 @@ fn a_picker_over_a_dialog_closes_on_its_cross_and_leaves_the_dialog() {
     assert!(dialogs.is_open(), "the Init form is still there");
     assert!(dialogs.picker_mut().is_none(), "the picker is gone");
 }
+
+/// A Create worktree dialog opened for a sequence step: Create hands the
+/// ticket to the effect (so the daemon's answer, with the new path, reports
+/// under it); closing the dialog any other way cancels the ticket.
+#[cfg(feature = "worktree")]
+mod worktree_tickets {
+    use super::*;
+    use crate::daemon_link::{issue, take_for, StepOutcome};
+
+    fn seed() -> WorktreeSeed {
+        WorktreeSeed {
+            start: gitpoulpi_core::domain::WorktreeStart::Branch("feature".into()),
+            label: "feature".into(),
+            new_branch: String::new(),
+            branch_busy: false,
+        }
+    }
+
+    fn key(code: KeyCode) -> KeyEvent {
+        KeyEvent::new(code, KeyModifiers::NONE)
+    }
+
+    #[test]
+    fn create_hands_the_ticket_to_the_effect() {
+        let tmp = tempfile::tempdir().unwrap();
+        let ticket = issue();
+        let mut dialogs = RepoDialogs::new("t");
+        dialogs.open_worktree_for(
+            Some(ticket),
+            seed(),
+            &tmp.path().join("repo"),
+            Vec::new(),
+            false,
+        );
+        if let Some(RepoDialog::Worktree { form, .. }) = dialogs.dialog.as_mut() {
+            form.focus = crate::worktree_dialog::WtFocus::Create;
+        }
+        match dialogs.on_key(key(KeyCode::Enter)) {
+            Some(DialogEffect::AddWorktree {
+                ticket: carried, ..
+            }) => {
+                assert_eq!(carried, Some(ticket));
+            }
+            other => panic!("expected AddWorktree, got {other:?}"),
+        }
+        assert!(
+            take_for(ticket).is_empty(),
+            "submitting is not canceling: the ticket reports with the daemon's answer"
+        );
+    }
+
+    #[test]
+    fn closing_the_dialog_cancels_the_ticket() {
+        let tmp = tempfile::tempdir().unwrap();
+        let ticket = issue();
+        let mut dialogs = RepoDialogs::new("t");
+        dialogs.open_worktree_for(
+            Some(ticket),
+            seed(),
+            &tmp.path().join("repo"),
+            Vec::new(),
+            false,
+        );
+        dialogs.on_key(key(KeyCode::Esc));
+        assert!(!dialogs.is_open());
+        assert_eq!(take_for(ticket), vec![StepOutcome::Canceled]);
+    }
+
+    #[test]
+    fn a_window_rebuild_with_the_dialog_open_cancels_the_ticket() {
+        let tmp = tempfile::tempdir().unwrap();
+        let ticket = issue();
+        let mut dialogs = RepoDialogs::new("t");
+        dialogs.open_worktree_for(
+            Some(ticket),
+            seed(),
+            &tmp.path().join("repo"),
+            Vec::new(),
+            false,
+        );
+        drop(dialogs);
+        assert_eq!(take_for(ticket), vec![StepOutcome::Canceled]);
+    }
+
+    #[test]
+    fn an_untracked_dialog_reports_nothing() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dialogs = RepoDialogs::new("t");
+        dialogs.open_worktree_for(None, seed(), &tmp.path().join("repo"), Vec::new(), false);
+        dialogs.on_key(key(KeyCode::Esc));
+        assert!(!dialogs.is_open());
+    }
+}

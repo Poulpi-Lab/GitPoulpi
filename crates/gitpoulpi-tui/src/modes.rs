@@ -480,6 +480,9 @@ pub(crate) enum PendingDestructive {
         /// Fetch first, then lease against what was fetched (the
         /// diverged dialog, see `RemoteUiAction::ForcePush`).
         after_fetch: bool,
+        /// The ticket of the push this answers (a sequence step): the
+        /// confirmed force push reports under it.
+        ticket: Option<crate::daemon_link::Ticket>,
     },
     /// A grouped push with at least one force push (with lease): confirmed
     /// naming the remotes and the commits they lose, then run as written.
@@ -506,6 +509,14 @@ pub(crate) enum PendingDestructive {
 }
 
 impl PendingDestructive {
+    /// The ticket the confirmed action reports under, when it has one.
+    pub(crate) fn ticket(&self) -> Option<crate::daemon_link::Ticket> {
+        match self {
+            PendingDestructive::ForcePush { ticket, .. } => *ticket,
+            _ => None,
+        }
+    }
+
     pub(crate) fn into_action(self) -> Action {
         match self {
             PendingDestructive::DeleteBranch(name) => Action::BranchDelete(name),
@@ -567,11 +578,13 @@ impl PendingDestructive {
                 remote,
                 branch,
                 after_fetch: true,
+                ..
             } => Action::FetchThenForcePush { remote, branch },
             PendingDestructive::ForcePush {
                 remote,
                 branch,
                 after_fetch: false,
+                ..
             } => Action::Push {
                 remote,
                 opts: gitpoulpi_core::domain::PushOptions {

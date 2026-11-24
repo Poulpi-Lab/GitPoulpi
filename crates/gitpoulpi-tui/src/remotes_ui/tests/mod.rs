@@ -7,4 +7,5 @@ mod i18n;
 mod identity;
 mod leftover;
 mod sync;
+mod tickets;
 mod urls;

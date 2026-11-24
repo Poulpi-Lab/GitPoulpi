@@ -346,10 +346,13 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
             remote_branch,
         } => Some(ui.pull_one(&remote, &remote_branch, link)),
         RemoteUiAction::PullThenPush { remote, branch } => {
-            link.submit_action(Action::PullThenPush {
-                remote: remote.clone(),
-                branch: branch.clone(),
-            });
+            link.submit_as(
+                ui.dialog_ticket.take(),
+                Action::PullThenPush {
+                    remote: remote.clone(),
+                    branch: branch.clone(),
+                },
+            );
             Some(msg::pulling_then_pushing(&remote, &branch))
         }
         RemoteUiAction::ForcePush {
@@ -368,6 +371,9 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
                     remote,
                     branch,
                     after_fetch,
+                    // Stays held by the dialog's owner too: dismissing the
+                    // confirmation cancels it (`RemoteUi::reap_ticket`).
+                    ticket: ui.dialog_ticket,
                 }),
             };
             None
@@ -390,7 +396,10 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
         }
         RemoteUiAction::AutoStashContinue => match ui.pending_autostash.take() {
             Some(action) => {
-                link.submit_action(Action::AutoStashed(Box::new(action)));
+                link.submit_as(
+                    ui.dialog_ticket.take(),
+                    Action::AutoStashed(Box::new(action)),
+                );
                 Some(msg::STASHING_CONTINUING.get().to_string())
             }
             None => None,
@@ -412,7 +421,10 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
                         .get()
                         .to_string()),
                 };
-                link.submit_action(Action::AutoStashed(Box::new(action)));
+                link.submit_as(
+                    ui.dialog_ticket.take(),
+                    Action::AutoStashed(Box::new(action)),
+                );
                 Some(match saved {
                     Ok(()) => msg::AUTOSTASH_ALWAYS_SAVED.get().to_string(),
                     Err(err) => crate::activity_log::report_problem_clear(
@@ -425,6 +437,7 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
         },
         RemoteUiAction::Cancel => {
             ui.pending_autostash = None;
+            ui.drop_dialog_ticket();
             None
         }
     };

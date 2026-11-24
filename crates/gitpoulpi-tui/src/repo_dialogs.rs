@@ -82,6 +82,9 @@ pub(crate) enum RepoDialog {
     Worktree {
         form: Box<WorktreeDialog>,
         picker: Option<FolderPicker>,
+        /// The sequence step that asked for the dialog: canceled when the
+        /// dialog goes away unsubmitted, handed to the effect on Create.
+        ticket: Option<crate::daemon_link::TicketGuard>,
     },
     /// Remove a worktree, or choose where to merge its branch.
     #[cfg(feature = "worktree")]
@@ -164,6 +167,8 @@ pub(crate) enum DialogEffect {
         path: PathBuf,
         opts: gitpoulpi_core::domain::WorktreeAddOptions,
         open_tab: bool,
+        /// The ticket the creation reports under (a sequence step).
+        ticket: Option<crate::daemon_link::Ticket>,
     },
     /// Remove worktree was confirmed (with whatever saves its changes).
     #[cfg(feature = "worktree")]
@@ -270,6 +275,26 @@ pub(crate) struct RepoDialogs {
     /// Where the composers' "Write with AI" help reads its settings from;
     /// `None` while AI is off (no composer shows the help).
     ai_scope: Option<crate::md_editor::ai::AiScope>,
+}
+
+/// The ticket the next Create worktree dialog belongs to (a sequence step
+/// that asked for it): armed by the runner next to the seed it hands the
+/// window, taken when the window opens the dialog (the same shape as
+/// `worktree_dialog::ask_to_pick_ref`).
+static WORKTREE_TICKET: Mutex<Option<crate::daemon_link::Ticket>> = Mutex::new(None);
+
+/// Marks the next Create worktree dialog as the answer to `ticket`: Create
+/// reports the new worktree's path under it, closing the dialog cancels it.
+#[allow(dead_code)]
+pub(crate) fn arm_worktree_ticket(ticket: crate::daemon_link::Ticket) {
+    *WORKTREE_TICKET.lock().unwrap_or_else(|e| e.into_inner()) = Some(ticket);
+}
+
+fn take_worktree_ticket() -> Option<crate::daemon_link::Ticket> {
+    WORKTREE_TICKET
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .take()
 }
 
 /// Workspace walks whose window went away (a tab switch): they keep running,
@@ -706,11 +731,24 @@ impl RepoDialogs {
         branches: Vec<crate::worktree_dialog::BranchChoice>,
         pick_ref: bool,
     ) {
+        self.open_worktree_for(take_worktree_ticket(), seed, repo_root, branches, pick_ref);
+    }
+
+    /// [`Self::open_worktree_with`] for the sequence step `ticket` (or none).
+    pub(crate) fn open_worktree_for(
+        &mut self,
+        ticket: Option<crate::daemon_link::Ticket>,
+        seed: WorktreeSeed,
+        repo_root: &Path,
+        branches: Vec<crate::worktree_dialog::BranchChoice>,
+        pick_ref: bool,
+    ) {
         self.dialog = Some(RepoDialog::Worktree {
             form: Box::new(WorktreeDialog::with_choices(
                 seed, repo_root, branches, pick_ref,
             )),
             picker: None,
+            ticket: crate::daemon_link::TicketGuard::new(ticket),
         });
     }
 
@@ -1453,7 +1491,7 @@ impl RepoDialogs {
                     (form.as_mut(), rect)
                 }
             },
-            RepoDialog::Worktree { form, picker } => match picker {
+            RepoDialog::Worktree { form, picker, .. } => match picker {
                 Some(p) => (p, picker_rect(area)),
                 None => {
                     let rect = form.rect(area);
@@ -1647,7 +1685,7 @@ impl RepoDialogs {
                         form.set_where(&dir);
                         *picker = None;
                     }
-                    Some(RepoDialog::Worktree { form, picker }) => {
+                    Some(RepoDialog::Worktree { form, picker, .. }) => {
                         form.set_parent(&dir);
                         *picker = None;
                     }
@@ -1919,11 +1957,18 @@ impl RepoDialogs {
                 opts,
                 open_tab,
             } => {
+                let ticket = match self.dialog.as_mut() {
+                    Some(RepoDialog::Worktree { ticket, .. }) => {
+                        ticket.take().map(crate::daemon_link::TicketGuard::take)
+                    }
+                    _ => None,
+                };
                 self.dialog = None;
                 Some(DialogEffect::AddWorktree {
                     path,
                     opts,
                     open_tab,
+                    ticket,
                 })
             }
         }
@@ -2537,7 +2582,7 @@ impl RepoDialogs {
                     picker.render(picker_rect(area), buf);
                 }
             }
-            Some(RepoDialog::Worktree { form, picker }) => {
+            Some(RepoDialog::Worktree { form, picker, .. }) => {
                 form.render(form.rect(area), buf);
                 if let Some(picker) = picker {
                     picker.render(picker_rect(area), buf);
@@ -2674,10 +2719,12 @@ pub(crate) fn apply_dialog_effect(effect: DialogEffect, ctx: &mut TabCtx) -> Opt
             path,
             opts,
             open_tab,
+            ticket,
         } => {
             *ctx.pending_worktree_tab = open_tab.then(|| path.clone());
             let shown = path.display().to_string();
-            ctx.link.submit_action(Action::WorktreeAdd { path, opts });
+            ctx.link
+                .submit_as(ticket, Action::WorktreeAdd { path, opts });
             Some(msg::repo_dialogs::creating_worktree(shown))
         }
         #[cfg(feature = "worktree")]
@@ -2893,6 +2940,7 @@ mod tests {
                 path,
                 opts,
                 open_tab,
+                ..
             }) => {
                 // The folder is named after the generated `worktree-<id>`.
                 assert_eq!(path.parent(), Some(tmp.path()));

@@ -68,6 +68,7 @@ mod refresh;
 mod refresher;
 mod run_action;
 mod takeover;
+mod tickets;
 mod workers;
 
 pub use self::action::*;
@@ -86,6 +87,7 @@ pub(crate) use self::refresh::*;
 use self::refresher::*;
 use self::run_action::*;
 use self::takeover::*;
+pub use self::tickets::*;
 use self::workers::*;
 
 #[cfg(test)]
@@ -102,3 +104,5 @@ mod outcome_tests;
 mod takeover_tests;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+pub(crate) mod ticket_tests;

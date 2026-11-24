@@ -232,10 +232,13 @@ async fn staging_one_hunk_through_the_link_leaves_the_other_unstaged() {
 
     // Exactly what the view's `Stage hunk` button submits.
     action_tx
-        .send(Action::StageHunk {
-            path: "multi.txt".into(),
-            hunk: first,
-        })
+        .send((
+            None,
+            Action::StageHunk {
+                path: "multi.txt".into(),
+                hunk: first,
+            },
+        ))
         .unwrap();
     // The daemon broadcasts RepoChanged on success, which is what
     // makes the refresh below arrive at all.
@@ -628,7 +631,7 @@ async fn a_stage_file_event_refreshes_status_without_log_or_lfs() {
     let mark = commands.lock().unwrap().len();
 
     action_tx
-        .send(Action::StageFile(PathBuf::from("a.txt")))
+        .send((None, Action::StageFile(PathBuf::from("a.txt"))))
         .unwrap();
     let scoped = recv_polled(&outcome_rx, "the scoped refresh").await;
     assert_ne!(scoped.scope, ChangeScope::ALL, "not the 2 s poll");
@@ -795,7 +798,7 @@ async fn a_stage_all_is_sent_at_once_while_a_slow_refresh_is_in_flight() {
     // ...and a StageAll submitted while it runs.
     activity.submitted(&Action::StageAll);
     let submitted_at = std::time::Instant::now();
-    action_tx.send(Action::StageAll).unwrap();
+    action_tx.send((None, Action::StageAll)).unwrap();
     let mut waited = Duration::ZERO;
     let seen = loop {
         if let Some(at) = *stage_all_seen_at.lock().unwrap() {
@@ -1056,7 +1059,7 @@ async fn stashing_through_the_link_leaves_a_clean_working_tree() {
         "precondition: two edits and one new file"
     );
 
-    action_tx.send(Action::StashPush).unwrap();
+    action_tx.send((None, Action::StashPush)).unwrap();
     // Refreshes until the one that sees the stash -- the event
     // refresh can race a periodic one, so do not assume it is next.
     let after = loop {
@@ -1150,6 +1153,7 @@ fn cleanup_orig_files_removes_every_orig_file_but_leaves_git_and_lookalikes_alon
 /// answering yes must finish the checkout, the merge and the pop.
 #[tokio::test]
 async fn a_merge_blocked_after_a_dropped_checkout_asks_instead_of_vanishing() {
+    let _env = super::ticket_tests::AUTOSTASH_ENV.lock().await;
     std::env::set_var("GITPOULPI_GENERAL_AUTO_STASH", "ask");
     let fixture = gitpoulpi_testkit::FixtureRepoBuilder::new()
         .unwrap()
@@ -1233,7 +1237,7 @@ async fn a_merge_blocked_after_a_dropped_checkout_asks_instead_of_vanishing() {
         branch: "target".to_string(),
         then: Box::new(Action::Merge(side)),
     };
-    action_tx.send(drop_merge.clone()).unwrap();
+    action_tx.send((None, drop_merge.clone())).unwrap();
     let needed = recv_polled(&autostash_rx, "the auto-stash dialog's request").await;
     assert_eq!(needed.operation, "merge");
     assert!(matches!(needed.action, Action::CheckoutThen { .. }));
@@ -1241,7 +1245,7 @@ async fn a_merge_blocked_after_a_dropped_checkout_asks_instead_of_vanishing() {
 
     // Yes: stash, (re)check out, merge, pop.
     action_tx
-        .send(Action::AutoStashed(Box::new(needed.action)))
+        .send((None, Action::AutoStashed(Box::new(needed.action))))
         .unwrap();
     let file = fixture.root().join("a.txt");
     for _ in 0..poll_budget() {

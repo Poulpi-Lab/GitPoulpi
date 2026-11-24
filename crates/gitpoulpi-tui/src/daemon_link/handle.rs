@@ -8,8 +8,10 @@ use crate::redraw::NotifySend as _;
 /// `action_error_rx`; a selected commit's changed files arrive on
 /// `commit_files_rx`).
 pub struct DaemonLink {
+    /// Which link thread this is, for the tickets it carries.
+    pub(super) link_id: u64,
     pub(super) manual_refresh_tx: tokio::sync::mpsc::UnboundedSender<()>,
-    pub(super) action_tx: tokio::sync::mpsc::UnboundedSender<Action>,
+    pub(super) action_tx: tokio::sync::mpsc::UnboundedSender<(Option<Ticket>, Action)>,
     pub(super) commit_files_tx: tokio::sync::mpsc::UnboundedSender<CommitFilesRequest>,
     pub(super) working_diff_tx: tokio::sync::mpsc::UnboundedSender<FileDiffRequest>,
     pub(super) file_insight_tx: tokio::sync::mpsc::UnboundedSender<FileInsightRequest>,
@@ -40,7 +42,7 @@ pub struct DaemonLink {
     /// A push the remote refused because it moved on (or a lease that
     /// found it moved) - typed, so the render loop can offer "pull
     /// first / force push / cancel" rather than print a sentence.
-    pub push_rejected_rx: std_mpsc::Receiver<PushRejection>,
+    pub push_rejected_rx: std_mpsc::Receiver<PushRejectedNotice>,
     /// A checkout/merge/rebase/pull the daemon refused because local
     /// changes are in the way while `general.auto_stash` is `ask`: the
     /// render loop opens its "stash and continue?" dialog.
@@ -192,9 +194,30 @@ impl DaemonLink {
     }
 
     pub fn submit_action(&self, action: Action) {
+        self.submit_as(None, action);
+    }
+
+    /// [`DaemonLink::submit_action`] that can be waited for: the returned
+    /// ticket is reported on [`take_done`] when the action ended (see
+    /// `tickets`).
+    #[allow(dead_code)]
+    pub fn submit_tracked(&self, action: Action) -> Ticket {
+        let ticket = tickets::issue();
+        self.submit_as(Some(ticket), action);
+        ticket
+    }
+
+    /// Submits `action` under `ticket`, or untracked: what a dialog calls to
+    /// continue the action it held (auto-stash, sensitive files, a diverged
+    /// push) so the continuation reports under the original ticket.
+    pub fn submit_as(&self, ticket: Option<Ticket>, action: Action) {
         // A renamed file is two paths for git: the row acts on both.
-        for action in self.activity.expand_renames(action) {
-            self.submit_one(action);
+        let actions = self.activity.expand_renames(action);
+        if let Some(ticket) = ticket {
+            tickets::begin(ticket, actions.len(), self.link_id);
+        }
+        for action in actions {
+            self.submit_one(ticket, action);
         }
     }
 
@@ -204,16 +227,24 @@ impl DaemonLink {
         self.activity.set_rename_pairs(tree);
     }
 
-    fn submit_one(&self, action: Action) {
+    fn submit_one(&self, ticket: Option<Ticket>, action: Action) {
         // A transfer identical to one still running joins it: nothing is
         // sent, and the press says so (the daemon's join is the backstop for
         // the other clients).
         if let Some(kind) = self.activity.claim_transfer(&action) {
             crate::jobs_ui::say(kind.already());
+            // A tracked one has nothing of its own to wait for: the one it
+            // joined belongs to someone else.
+            tickets::report_ticket(
+                ticket,
+                StepOutcome::Failed {
+                    text: kind.already().to_string(),
+                },
+            );
             return;
         }
         self.activity.submitted(&action);
-        let _ = self.action_tx.send(action);
+        let _ = self.action_tx.send((ticket, action));
     }
 
     /// The window's own fetch (auto-fetch, fetch on open): silent when a
@@ -226,7 +257,7 @@ impl DaemonLink {
         }
         crate::activity_log::expect_background_fetch();
         self.activity.submitted(&action);
-        let _ = self.action_tx.send(action);
+        let _ = self.action_tx.send((None, action));
     }
 
     /// The generation counter: it moves whenever a mutation is submitted,
@@ -428,6 +459,7 @@ pub(crate) fn start_at(session: String, repo: RepoRef, port_file: Option<PathBuf
     let activity = Arc::new(crate::activity::Activity::with_undo_enabled(undo_enabled));
     let link_activity = Arc::clone(&activity);
     let (failure_tx, failure_rx) = std_mpsc::channel();
+    let link_id = tickets::new_link_id();
     let channels = LinkChannels {
         manual_refresh_rx,
         action_rx,
@@ -471,9 +503,13 @@ pub(crate) fn start_at(session: String, repo: RepoRef, port_file: Option<PathBuf
             }
         };
         report.reason = rt.block_on(link_loop(port_file, session, repo, channels));
+        // Its window is gone or its daemon: nothing in flight will be
+        // answered to this link any more (before the runtime drops its tasks).
+        tickets::abandon_link(link_id);
     });
 
     DaemonLink {
+        link_id,
         failure_rx,
         manual_refresh_tx,
         action_tx,

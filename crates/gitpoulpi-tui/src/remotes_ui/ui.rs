@@ -31,6 +31,10 @@ pub(crate) struct RemoteUi {
     /// changes are in the way (`general.auto_stash = ask`), while its
     /// dialog is open: what "Stash changes and continue" resends.
     pub(super) pending_autostash: Option<Action>,
+    /// The ticket of the action a dialog here (diverged push, auto-stash)
+    /// waits to continue. Taken by the answer that resubmits; while it is
+    /// held and no dialog shows it, it is canceled (`reap_ticket`, `Drop`).
+    pub(super) dialog_ticket: Option<crate::daemon_link::Ticket>,
     pub(super) repo_root: PathBuf,
     push_anchor: (u16, u16),
     pull_anchor: (u16, u16),
@@ -49,6 +53,7 @@ impl RemoteUi {
             menu: None,
             form: None,
             pending_autostash: None,
+            dialog_ticket: None,
             repo_root: repo_root.to_path_buf(),
             push_anchor: (0, 1),
             pull_anchor: (0, 1),
@@ -222,18 +227,20 @@ impl RemoteUi {
     pub(crate) fn on_push_rejected(
         &mut self,
         rejection: &PushRejection,
+        ticket: Option<crate::daemon_link::Ticket>,
         col: u16,
         row: u16,
     ) -> String {
-        match rejection.reason {
+        let line = match rejection.reason {
             PushRejectReason::NonFastForward => {
+                self.hold_ticket(ticket);
                 self.menu = Some(ContextMenu::new(
                     msg::diverged_title(&rejection.remote, &rejection.branch),
                     diverged_entries(rejection),
                     col,
                     row,
                 ));
-                msg::diverged_message(&rejection.remote, &rejection.branch)
+                return msg::diverged_message(&rejection.remote, &rejection.branch);
             }
             PushRejectReason::StaleLease => msg::stale_lease(&rejection.remote, &rejection.branch),
             // English until the catalogs get words for it.
@@ -242,6 +249,53 @@ impl RemoteUi {
             | PushRejectReason::Unknown => {
                 gitpoulpi_core::Error::PushRejected(rejection.clone()).to_string()
             }
+        };
+        // No dialog to wait on: the refusal is the answer.
+        crate::daemon_link::report_ticket(
+            ticket,
+            crate::daemon_link::StepOutcome::Failed { text: line.clone() },
+        );
+        line
+    }
+
+    /// Holds `ticket` for the dialog being opened (a ticket the previous
+    /// dialog still held is canceled).
+    fn hold_ticket(&mut self, ticket: Option<crate::daemon_link::Ticket>) {
+        self.drop_dialog_ticket();
+        self.dialog_ticket = ticket;
+    }
+
+    /// The dialog's owner gave up on the held ticket: `Canceled`.
+    pub(super) fn drop_dialog_ticket(&mut self) {
+        if let Some(ticket) = self.dialog_ticket.take() {
+            crate::daemon_link::cancel_ticket(ticket);
+        }
+    }
+
+    /// Whether the open menu is the diverged or the auto-stash dialog.
+    fn dialog_menu_open(&self) -> bool {
+        self.menu.as_ref().is_some_and(|menu| {
+            (0..menu.row_count()).any(|row| {
+                matches!(
+                    menu.row_action(row),
+                    Some(RemoteUiAction::PullThenPush { .. } | RemoteUiAction::AutoStashContinue)
+                )
+            })
+        })
+    }
+
+    /// Once a pass: a held ticket whose dialog is gone (Esc, a click away,
+    /// another menu) without having been resubmitted is `Canceled`.
+    /// `confirm` is the ticket of the force-push confirmation on screen, if
+    /// any.
+    pub(crate) fn reap_ticket(&mut self, confirm: Option<crate::daemon_link::Ticket>) {
+        let Some(ticket) = self.dialog_ticket else {
+            return;
+        };
+        if crate::daemon_link::ticket_running(ticket) {
+            self.dialog_ticket = None;
+        } else if !self.dialog_menu_open() && confirm != Some(ticket) {
+            self.drop_dialog_ticket();
         }
     }
 }
@@ -383,8 +437,12 @@ impl RemoteUi {
         // A double-click can send the same refused request twice: one
         // dialog is enough.
         if self.menu.is_some() && self.pending_autostash.as_ref() == Some(&needed.action) {
+            if let Some(ticket) = needed.ticket {
+                crate::daemon_link::cancel_ticket(ticket);
+            }
             return msg::autostash_message(&operation);
         }
+        self.hold_ticket(needed.ticket);
         self.pending_autostash = Some(needed.action);
         self.menu = Some(ContextMenu::new(
             msg::autostash_title(&operation),
@@ -456,4 +514,12 @@ pub(crate) fn selected_sidebar_remote(
         remotes,
     );
     remote_of_row(rows.get(selected?)?, remotes)
+}
+
+impl Drop for RemoteUi {
+    /// The window went away (a tab switch) with a dialog still waiting: the
+    /// dialog is gone with it.
+    fn drop(&mut self) {
+        self.drop_dialog_ticket();
+    }
 }

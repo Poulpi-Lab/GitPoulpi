@@ -96,8 +96,9 @@ adlarını ve e-postalarını listeler ve sizin için `.mailmap` satırları yaz
 - **Yazar filtresi** (**Yazar** başlığındaki huni, Log'da `Shift+A` ya da paletteki
   *Log: Yazara Göre Filtrele...*): Log'u commit'leri kimin yazdığına göre önceden süzer.
   Başlığın altında, bir arama alanı, bir **Filtreyi temizle** satırı (✕) ve yüklenen geçmişin
-  her yazarı için bir satır içeren bir açılır pencere asılı durur: bir baş harf rozeti
-  (`ui.avatars` kapalı değilse avatar), ad ve ardından soluk e-posta, önce en çok commit'i
+  her yazarı için bir satır içeren bir açılır pencere asılı durur: bir avatar
+  (`ui.avatars` kapalı değilse: terminal görüntü çiziyorsa ve resim hazırsa yazarın resmi, o zamana kadar ve
+  diğer terminallerde baş harf rozeti), ad ve ardından soluk e-posta, önce en çok commit'i
   olanlar, sonra ada göre. Yazmak listeyi paletin bulanık eşleşmesiyle daraltır; `Enter` ya da
   bir tık vurgulanan yazarı açıp kapatır (bir onay işareti; istediğiniz kadar seçin), `Esc` ya da
   dışarı tıklamak açılır pencereyi kapatır ve filtreyi korur. Filtre tam olarak aramanın
@@ -108,7 +109,10 @@ adlarını ve e-postalarını listeler ve sizin için `.mailmap` satırları yaz
   bir vurgu rengi `▼` olur, ipucu seçilen yazarları listeler ve Yazar sütunu gizliyse ya da huni
   için çok darsa Log'un üst kenarlığı bunun yerine *Yazar: Alice Example +1* der (tuş ve palet yine
   çalışır). Kaldırmak için: **Filtreyi temizle** satırı, aydınlık huniye sağ tık ya da paletteki
-  *Log: Yazar Filtresini Temizle*. Yazarlar, Log'un yüklediği commit'lerin yazarlarıdır (mailmap
+  *Log: Yazar Filtresini Temizle* ya da Log'da `Esc` (önce bir seçimi bırakır; açılır pencerenin
+  içinde `Esc` önce arama alanını boşaltır, sonra pencereyi kapatır ve filtreyi korur).
+  Filtre açıkken Yukarı/Aşağı (ve PageUp/PageDown, Home/End) seçimi yalnızca aydınlık commit'ler arasında
+  taşır, soluk olanları atlar; bir tık yine de her satırı seçer. Yazarlar, Log'un yüklediği commit'lerin yazarlarıdır (mailmap
   uygulanmış, sütundaki gibi) ve filtre depo başına, sekme geçişleri ve yeniden başlatmalar
   boyunca hatırlanır. Bir metin araması hatırlanmaz, filtre hatırlanır.
 - **Refs filtresi** (kenar çubuğunda `/`): dal, tag ve uzak depo listelerini

@@ -315,6 +315,8 @@ Use `256` or `16` if a theme shows as wrong colors over ssh or in an old
 multiplexer. The Terminal preset needs none of this. Truecolor costs nothing;
 the mapping pass runs over the screen once per frame only when active.
 
+The theme is per installation: several GitPoulpi installations sharing one config each keep their own, so picking one in an installation never recolours the others.
+
 ## Live preview
 
 In Settings > Appearance, the Theme combo lists **System (follows terminal)**,

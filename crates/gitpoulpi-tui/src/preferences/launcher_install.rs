@@ -127,7 +127,7 @@ impl InstallState {
 
 /// A stand-in installation for tests: never the machine's real one.
 #[cfg(test)]
-pub(super) fn fake_current(primary: bool) -> Current {
+pub(crate) fn fake_current(primary: bool) -> Current {
     let identity = installation::Identity {
         id: "aaaa000000000001".to_string(),
         kind: gitpoulpi_config::Kind::Portable,
@@ -206,6 +206,12 @@ impl PreferencesState {
     pub(super) fn this_effective(&self) -> Effective {
         let this = self.this();
         crate::launcher_sync::effective_in(&self.config, &this.identity, &this.config)
+    }
+
+    /// The config as this installation shows it: its own colour keys
+    /// (theme, graph colours) over the shared `ui.*`.
+    pub(super) fn own_config(&self) -> Config {
+        installation::overlay_look(&self.config, &self.this_effective())
     }
 
     /// The colour this installation wears (never another one's).

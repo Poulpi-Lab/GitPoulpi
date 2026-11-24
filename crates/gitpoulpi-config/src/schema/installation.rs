@@ -51,6 +51,12 @@ pub struct InstallationEntry {
     pub name_with_version: bool,
     #[serde(skip_serializing_if = "String::is_empty")]
     pub logo_color: String,
+    /// Per-installation colour keys, by their `ui.*` name without the prefix
+    /// (`theme`, `graph_color_theme`, see `crate::installation::LOOK_KEYS`).
+    /// A key that is absent is not set: the primary then follows `ui.*`,
+    /// everyone else the default.
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub look: BTreeMap<String, String>,
     #[serde(skip_serializing_if = "String::is_empty")]
     pub command_alias: String,
     #[serde(skip_serializing_if = "String::is_empty")]
@@ -96,6 +102,10 @@ pub struct InstallationConfig {
 pub struct UiBefore {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub logo_color: Option<String>,
+    /// The colour keys (see [`InstallationEntry::look`]) the file held; a key
+    /// left out was not in the file.
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub look: BTreeMap<String, String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub command_alias: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]

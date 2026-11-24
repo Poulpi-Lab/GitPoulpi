@@ -132,7 +132,7 @@ impl PreferencesState {
         }
         let slug = wanted
             .clone()
-            .unwrap_or_else(|| self.config.ui.theme_slug().to_string());
+            .unwrap_or_else(|| self.own_config().ui.theme_slug().to_string());
         crate::install_theme(&slug, &self.user_themes.themes);
         self.theme_preview = wanted;
     }
@@ -140,6 +140,6 @@ impl PreferencesState {
     /// Installs the stored theme (after a commit, with the freshest user
     /// theme list).
     pub(super) fn install_stored_theme(&mut self) {
-        crate::install_theme(self.config.ui.theme_slug(), &self.user_themes.themes);
+        crate::install_theme(self.own_config().ui.theme_slug(), &self.user_themes.themes);
     }
 }

@@ -1039,3 +1039,139 @@ fn alias_claims_prefer_the_entries_over_the_primarys_ui_fallback() {
     config.ui.command_alias = "gp".into();
     assert!(alias_claims(&config).contains(&("gp".to_string(), choco.id.clone())));
 }
+
+// ------------------------------------------------- per-installation colours
+
+fn look_entry(id: &Identity, pairs: &[(&str, &str)]) -> InstallationEntry {
+    let mut e = new_entry(id, String::new());
+    for (k, v) in pairs {
+        e.look.insert(k.to_string(), v.to_string());
+    }
+    e
+}
+
+#[test]
+fn a_non_primary_never_follows_the_shared_ui_colours() {
+    let (a, b) = (pinned("a"), pinned("b"));
+    let mut config = Config::default();
+    config.ui.theme = "nord".into();
+    config.ui.graph_color_theme = "solarized".into();
+    config.installation.primary = Some(a.id.clone());
+    with(&mut config, &a, new_entry(&a, String::new()));
+    with(&mut config, &b, new_entry(&b, String::new()));
+    let pa = effective(&config, &a);
+    assert_eq!(pa.look["theme"], "nord");
+    assert_eq!(pa.look["graph_color_theme"], "solarized");
+    let pb = effective(&config, &b);
+    assert_eq!(pb.look["theme"], "system", "default, not ui.theme");
+    assert_eq!(pb.look["graph_color_theme"], "theme");
+    // Its own entry wins, and nothing else moves.
+    with(&mut config, &b, look_entry(&b, &[("theme", "light")]));
+    assert_eq!(effective(&config, &b).look["theme"], "light");
+    assert_eq!(effective(&config, &a).look["theme"], "nord");
+    // With nobody primary, ui.* is nobody's either.
+    config.installation.primary = None;
+    assert_eq!(effective(&config, &a).look["theme"], "system");
+}
+
+#[test]
+fn seeding_freezes_todays_colours_into_every_non_primary_entry_once() {
+    let mut config = Config::default();
+    config.ui.theme = "nord".into();
+    config.ui.graph_lane_background = crate::GraphLaneBackground::RowTint;
+    let fs = FakeFs::new(false);
+    let e = env(&fs);
+    let x = pinned("x");
+    let entry = seed(&config, &x, &e, &NoAliases, &live).unwrap();
+    assert_eq!(entry.look["theme"], "nord");
+    assert_eq!(entry.look["graph_lane_background"], "row_tint");
+    // An entry from an older build gets them at its next look, once.
+    with(&mut config, &x, new_entry(&x, String::new()));
+    let frozen = seed(&config, &x, &e, &NoAliases, &live).unwrap();
+    assert_eq!(frozen.look["theme"], "nord");
+    with(&mut config, &x, frozen);
+    config.ui.theme = "light".into();
+    assert!(seed(&config, &x, &e, &NoAliases, &live).is_none());
+    assert_eq!(effective(&config, &x).look["theme"], "nord");
+    // The primary keeps following ui.*: nothing is frozen into its entry.
+    let p = pinned("p");
+    config.installation.primary = Some(p.id.clone());
+    with(&mut config, &p, new_entry(&p, String::new()));
+    assert!(seed(&config, &p, &e, &NoAliases, &live).is_none());
+}
+
+#[test]
+fn a_non_primary_writes_its_own_entry_and_the_primary_ui() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("config.toml");
+    let (a, b) = (pinned("a"), pinned("b"));
+    std::fs::write(&path, "[ui]\ntheme = \"nord\"\n").unwrap();
+    become_primary_in_file(&path, &a).unwrap().unwrap();
+    assert_eq!(
+        set_look_in_file(&path, &b, "theme", "light").unwrap(),
+        "light"
+    );
+    let config = Config::load(&path).unwrap();
+    assert_eq!(config.ui.theme, "nord", "ui.theme is the primary's");
+    assert_eq!(effective(&config, &b).look["theme"], "light");
+    assert_eq!(effective(&config, &a).look["theme"], "nord");
+    set_look_in_file(&path, &a, "theme", "dark").unwrap();
+    let config = Config::load(&path).unwrap();
+    assert_eq!(config.ui.theme, "dark");
+    assert_eq!(effective(&config, &b).look["theme"], "light");
+    assert!(set_look_in_file(&path, &a, "logo_color", "x").is_err());
+}
+
+#[test]
+fn colours_follow_the_primary_handover_and_come_back_on_resign() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("config.toml");
+    let (a, b) = (pinned("a"), pinned("b"));
+    std::fs::write(&path, "[ui]\ntheme = \"nord\"\n").unwrap();
+    become_primary_in_file(&path, &a).unwrap().unwrap();
+    set_look_in_file(&path, &b, "theme", "light").unwrap();
+    become_primary_in_file(&path, &b).unwrap().unwrap();
+    let config = Config::load(&path).unwrap();
+    assert_eq!(config.ui.theme, "light", "the new primary owns ui.theme");
+    assert_eq!(effective(&config, &b).look["theme"], "light");
+    assert_eq!(
+        effective(&config, &a).look["theme"],
+        "nord",
+        "the old primary kept its own"
+    );
+    assert!(config.installation.settings[&b.id].look.is_empty());
+    resign_primary_in_file(&path, &b.id).unwrap().unwrap();
+    let config = Config::load(&path).unwrap();
+    assert_eq!(config.ui.theme, "nord", "ui.* is what it was before");
+    assert_eq!(effective(&config, &b).look["theme"], "light");
+    assert!(config.installation.ui_before.is_none());
+}
+
+#[test]
+fn the_overlay_shows_this_installations_colours() {
+    let b = pinned("b");
+    let mut config = Config::default();
+    config.ui.theme = "nord".into();
+    with(&mut config, &b, look_entry(&b, &[("theme", "light")]));
+    let shown = overlay_look(&config, &effective(&config, &b));
+    assert_eq!(shown.ui.theme_slug(), "light");
+    assert_eq!(config.ui.theme_slug(), "nord");
+}
+
+#[test]
+fn the_first_colour_write_keeps_the_other_colours_as_they_were() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("config.toml");
+    std::fs::write(
+        &path,
+        "[ui]\ntheme = \"nord\"\ngraph_lane_background = \"row_tint\"\n",
+    )
+    .unwrap();
+    let b = pinned("b");
+    set_look_in_file(&path, &b, "graph_row_tint_strength", "subtle").unwrap();
+    let config = Config::load(&path).unwrap();
+    let eff = effective(&config, &b);
+    assert_eq!(eff.look["graph_row_tint_strength"], "subtle");
+    assert_eq!(eff.look["theme"], "nord", "not the default");
+    assert_eq!(eff.look["graph_lane_background"], "row_tint");
+}

@@ -98,8 +98,15 @@ pub(crate) fn poll() {
     if changed {
         std::thread::spawn(|| {
             if let Ok(settings) = gitpoulpi_config::Settings::resolve_ambient() {
-                crate::install_theme_from_config(settings.config().ui.theme_slug());
-                crate::redraw::poke();
+                // Another installation changing ITS theme in the shared file
+                // moves nothing here: only this installation's own theme
+                // (or its theme file's content) counts.
+                let own = crate::launcher_sync::own_config(settings.config());
+                let before = crate::theme_generation();
+                crate::install_theme_from_config(own.ui.theme_slug());
+                if crate::theme_generation() != before {
+                    crate::redraw::poke();
+                }
             }
         });
     }

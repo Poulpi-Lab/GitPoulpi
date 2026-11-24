@@ -14,6 +14,7 @@ IPC surfaces are stable within a major version).
 
 ### Fixed
 - Radar: a double-click or `Enter` on a request whose repository is not cloned asks how to review it (through the API, or clone first) instead of saying to clone the repository first.
+- The theme and the graph colors are now per installation: with several installations sharing one `config.toml`, changing them in one no longer changes them in all of them. A running window only recolours for its own installation's change.
 
 ## [1.2.0] - 2026-11-23
 

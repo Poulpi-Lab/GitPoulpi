@@ -98,7 +98,9 @@ impl PreferencesState {
     }
 
     pub(super) fn ui_rows(&self) -> Vec<Field> {
-        let ui = &self.config.ui;
+        // The colour keys show this installation's own values.
+        let own = self.own_config();
+        let ui = &own.ui;
         let mut fields = vec![
             self.language_field(),
             Field::global(

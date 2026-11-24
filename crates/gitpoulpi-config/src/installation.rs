@@ -15,7 +15,7 @@
 //! names and the legacy `ui.*` keys (old builds only know those); every other
 //! installation keeps its look in its entry. See [`effective`].
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
 use crate::release::{InstallChannel, Marker, MARKER_FILE};
@@ -493,6 +493,51 @@ pub fn launcher_name(base: &str, with_version: bool, version: &str) -> String {
 
 // -------------------------------------------------------- effective values
 
+/// The `ui.*` keys that are purely about colour and therefore belong to one
+/// installation each (the primary keeps them in `ui.*`, see
+/// [`InstallationEntry::look`]).
+pub const LOOK_KEYS: [&str; 5] = [
+    "theme",
+    "graph_color_theme",
+    "graph_colorization",
+    "graph_lane_background",
+    "graph_row_tint_strength",
+];
+
+/// Whether a dotted config key (`ui.theme`) is one of [`LOOK_KEYS`].
+pub fn is_look_key(key: &str) -> bool {
+    key.strip_prefix("ui.")
+        .is_some_and(|k| LOOK_KEYS.contains(&k))
+}
+
+/// The value `ui` holds for a look key, as the text stored in the file.
+pub fn look_value(ui: &crate::UiConfig, key: &str) -> String {
+    match key {
+        "theme" => ui.theme_slug().to_string(),
+        "graph_color_theme" => ui.graph_color_slug().to_string(),
+        _ => serde_json::to_value(ui)
+            .ok()
+            .and_then(|v| v.get(key).and_then(|s| s.as_str().map(str::to_string)))
+            .unwrap_or_default(),
+    }
+}
+
+/// `config` with the look keys of `eff` written into `ui`: what this
+/// installation shows, whatever another installation stored.
+pub fn overlay_look(config: &Config, eff: &Effective) -> Config {
+    let mut value = serde_json::to_value(&config.ui).unwrap_or_default();
+    if let Some(map) = value.as_object_mut() {
+        for (k, v) in &eff.look {
+            map.insert(k.clone(), serde_json::Value::String(v.clone()));
+        }
+    }
+    let mut out = config.clone();
+    if let Ok(ui) = serde_json::from_value(value) {
+        out.ui = ui;
+    }
+    out
+}
+
 /// What an installation actually uses, after the fallbacks.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Effective {
@@ -501,6 +546,8 @@ pub struct Effective {
     pub name: String,
     pub name_with_version: bool,
     pub logo_color: String,
+    /// The colour keys in force, by [`LOOK_KEYS`] name.
+    pub look: BTreeMap<String, String>,
     pub command_alias: String,
     pub command_alias_add: String,
     pub folder_menu_submenu: String,
@@ -558,6 +605,19 @@ fn effective_from(
         },
         name_with_version: e.name_with_version,
         logo_color: pick(&e.logo_color, &config.ui.logo_color, kind_color),
+        look: LOOK_KEYS
+            .iter()
+            .map(|k| {
+                let own = e.look.get(*k).map(String::as_str).unwrap_or("");
+                let legacy = if primary {
+                    look_value(&config.ui, k)
+                } else {
+                    String::new()
+                };
+                let default = look_value(&crate::UiConfig::default(), k);
+                (k.to_string(), pick(own, &legacy, &default))
+            })
+            .collect(),
         command_alias: pick(&e.command_alias, &ui_alias(&config.ui.command_alias), ""),
         command_alias_add: pick(
             &e.command_alias_add,
@@ -687,6 +747,17 @@ pub fn seed(
             updated.channel = c.as_str().to_string();
         }
         updated.kind = identity.kind;
+        // An entry from before the colours were per installation follows
+        // today's `ui.*` once, so nothing changes on screen; from then on it
+        // keeps its own. The primary keeps following `ui.*`.
+        if config.installation.primary.as_deref() != Some(&identity.id) {
+            for k in LOOK_KEYS {
+                updated
+                    .look
+                    .entry(k.to_string())
+                    .or_insert_with(|| look_value(&config.ui, k));
+            }
+        }
         return (updated != *existing).then_some(updated);
     }
 
@@ -722,6 +793,11 @@ pub fn seed(
             .unwrap_or(&SEED_COLORS[0])
             .to_string()
     };
+    if config.installation.primary.as_deref() != Some(&identity.id) {
+        for k in LOOK_KEYS {
+            entry.look.insert(k.to_string(), look_value(&config.ui, k));
+        }
+    }
     let mine = |alias: &str| {
         !alias.is_empty()
             && aliases
@@ -743,6 +819,8 @@ pub fn seed(
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UiLook {
     pub logo_color: String,
+    /// The look keys' new `ui.*` values.
+    pub look: BTreeMap<String, String>,
     pub command_alias: String,
     pub command_alias_add: String,
 }
@@ -784,6 +862,7 @@ fn freeze_own_values(config: &Config, inst: &mut InstallationConfig, id: &str) {
         .unwrap_or_else(|| effective_from(config, id, Kind::default(), None));
     let entry = inst.settings.entry(id.to_string()).or_default();
     entry.logo_color = eff.logo_color;
+    entry.look = eff.look;
     entry.command_alias = eff.command_alias;
     entry.command_alias_add = eff.command_alias_add;
     if entry.name.is_empty() {
@@ -840,6 +919,7 @@ pub fn plan_primary(config: &Config, new: &Identity) -> Option<PrimaryHandover> 
         .entry(new.id.clone())
         .or_insert_with(|| new_entry(new, name));
     entry.logo_color.clear();
+    entry.look.clear();
     entry.command_alias.clear();
     entry.command_alias_add.clear();
     inst.primary = Some(new.id.clone());
@@ -848,6 +928,10 @@ pub fn plan_primary(config: &Config, new: &Identity) -> Option<PrimaryHandover> 
     if demoted.is_none() && inst.ui_before.is_none() {
         inst.ui_before = Some(UiBefore {
             logo_color: Some(config.ui.logo_color.clone()),
+            look: LOOK_KEYS
+                .iter()
+                .map(|k| (k.to_string(), look_value(&config.ui, k)))
+                .collect(),
             command_alias: Some(config.ui.command_alias.clone()),
             command_alias_add: Some(config.ui.command_alias_add.clone()),
         });
@@ -861,6 +945,15 @@ pub fn plan_primary(config: &Config, new: &Identity) -> Option<PrimaryHandover> 
                 wanted.logo_color,
                 &config.ui.logo_color,
             ),
+            look: LOOK_KEYS
+                .iter()
+                .map(|k| {
+                    let own = own.and_then(|e| e.look.get(*k)).map(String::as_str);
+                    let now = look_value(&config.ui, k);
+                    let want = wanted.look.get(*k).cloned().unwrap_or_default();
+                    (k.to_string(), inherit(own, want, &now))
+                })
+                .collect(),
             command_alias: inherit_alias(
                 own.map(|e| e.command_alias.as_str()),
                 wanted.command_alias,
@@ -1018,6 +1111,59 @@ pub fn set_installation_in_file(
     write_text(path, &raw, &text)
 }
 
+/// Stores the colour key `key` (`theme`, `graph_color_theme`, ...) `identity`
+/// picked. The primary writes the shared `ui.<key>` (older builds read it) and
+/// drops a stale entry value, which would outrank it; every other installation
+/// writes only its own entry, so one installation's pick never recolours
+/// another. Returns the stored text.
+pub fn set_look_in_file(
+    path: &Path,
+    identity: &Identity,
+    key: &str,
+    value: &str,
+) -> Result<String> {
+    if !LOOK_KEYS.contains(&key) {
+        return Err(Error::UnknownKey(format!("ui.{key}")));
+    }
+    let config = Config::load(path).unwrap_or_default();
+    let id = identity.id.clone();
+    if config.installation.primary.as_deref() == Some(id.as_str()) {
+        let stored = crate::set_in_file(path, &format!("ui.{key}"), value)?;
+        if config
+            .installation
+            .settings
+            .get(&id)
+            .is_some_and(|e| e.look.contains_key(key))
+        {
+            set_installation_in_file(path, |i| {
+                if let Some(e) = i.settings.get_mut(&id) {
+                    e.look.remove(key);
+                }
+            })?;
+        }
+        return Ok(stored.as_str().unwrap_or(value).to_string());
+    }
+    let ident = identity.clone();
+    let (k, v) = (key.to_string(), value.to_string());
+    set_installation_in_file(path, |i| {
+        let entry = i.settings.entry(id).or_insert_with(|| InstallationEntry {
+            path: ident.root.clone(),
+            kind: ident.kind,
+            ..Default::default()
+        });
+        // The other colours keep what this installation showed (today's
+        // `ui.*`), which an entry not seeded on disk (a pinned id) lacks.
+        for key in LOOK_KEYS {
+            entry
+                .look
+                .entry(key.to_string())
+                .or_insert_with(|| look_value(&config.ui, key));
+        }
+        entry.look.insert(k, v);
+    })?;
+    Ok(value.to_string())
+}
+
 fn apply_handover(
     path: &Path,
     plan: impl FnOnce(&Config) -> Option<PrimaryHandover>,
@@ -1041,6 +1187,7 @@ fn apply_handover(
                     *slot = None;
                 }
             }
+            before.look.retain(|key, _| present(key));
         }
     }
     // Only what changes is touched, so a key keeps its line and comment.
@@ -1057,6 +1204,13 @@ fn apply_handover(
                 actions.push((key, Some(want.clone())));
             }
         }
+        for key in LOOK_KEYS {
+            if let Some(want) = ui.look.get(key) {
+                if *want != look_value(&config.ui, key) {
+                    actions.push((key, Some(want.clone())));
+                }
+            }
+        }
     }
     if let Some(before) = &handover.ui_restore {
         let old = [
@@ -1067,6 +1221,15 @@ fn apply_handover(
         for ((key, now), old) in current.iter().zip(old) {
             match old {
                 Some(v) if v != *now || !present(key) => actions.push((key, Some(v.clone()))),
+                None if present(key) => actions.push((key, None)),
+                _ => {}
+            }
+        }
+        for key in LOOK_KEYS {
+            match before.look.get(key) {
+                Some(v) if *v != look_value(&config.ui, key) || !present(key) => {
+                    actions.push((key, Some(v.clone())));
+                }
                 None if present(key) => actions.push((key, None)),
                 _ => {}
             }

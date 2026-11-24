@@ -297,7 +297,7 @@ fn reject_reason(rejection: &PushRejection) -> &'static str {
             "the remote has commits this branch does not (pull first, or force push)"
         }
         crate::domain::PushRejectReason::StaleLease => {
-            "the remote branch moved since the last fetch, so the force push was refused"
+            "the branch or tag on the remote moved since the last fetch, so the force push was refused"
         }
         crate::domain::PushRejectReason::ProtectedByHost => {
             "the host's branch protection refused the push"

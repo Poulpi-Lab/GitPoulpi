@@ -50,10 +50,15 @@ uma das colunas redimensionáveis). Um clique duplo ou `Enter` num pedido que n�
 
 ### As branches de um pedido
 
-Uma linha de pedido mostra `origem → destino` a seguir ao título (`alice:feature/login → main` quando a branch de origem está num fork).
-Quando falta espaço, o destino é cortado primeiro (reticências), o título fica com a maior parte do espaço, e numa janela estreita as
-branches não são mostradas; a coluna Ações nunca é empurrada para fora. Pouse o ponteiro num texto cortado para o ver por inteiro. Um host que
-não indicou as branches não mostra nada aí. Uma linha de issue nomeia o seu repositório no mesmo chip de uma linha de pedido (o
+Uma linha de pedido mostra `origem → destino` na coluna **Branches**, logo a seguir ao repositório (`alice:feature/login → main`
+quando a branch de origem está num fork); uma linha de issue deixa a célula vazia, e um Radar sem nenhum pedido que nomeie as suas branches
+não tem essa coluna. Quando a célula é demasiado estreita, a origem é cortada primeiro (reticências) e o destino fica inteiro enquanto
+puder. A coluna encolhe antes de desaparecer: numa janela estreita é a última das colunas opcionais a sair
+(depois do estado, do autor e da idade, antes do repositório e do título); quando sai, as branches inteiras continuam na
+dica do título e na linha de estado da linha selecionada. Uma coluna de autor larga que dimensionou você dá lugar ao título
+e às branches. A coluna Ações nunca é empurrada para fora. Pouse o ponteiro num texto cortado para o ver por
+inteiro. O GitHub e o Gitea listam pedidos sem as suas branches, por isso o Radar lê-as depois da lista (uma vez por pedido
+até este mudar). Um host que não indicou as branches não mostra nada aí. Uma linha de issue nomeia o seu repositório no mesmo chip de uma linha de pedido (o
 nome da pasta do clone, ou `owner/name` quando não está clonado).
 
 ### Agir no host
@@ -161,7 +166,7 @@ chegam.
 
 ### Colunas
 
-A etiqueta do repositório, o `#` (número e marcas de verificação), o autor e a idade são **colunas redimensionáveis**. Em automático, a coluna do repositório tem a
+A etiqueta do repositório, as branches, o `#` (número e marcas de verificação), o autor e a idade são **colunas redimensionáveis**. Em automático, a coluna do repositório tem a
 largura do nome mais comprido no ecrã (até 40 células, e no máximo um terço da janela), pelo que `owner/name` e o
 `group/sub/project` de uma lista de conta não são cortados num terminal normal. O título fica com o que sobra. Um
 nome que não cabe termina em reticências (`group/sub...`), e:
@@ -170,7 +175,7 @@ nome que não cabe termina em reticências (`group/sub...`), e:
   inteiro. Selecione a linha e a linha de estado por baixo do filtro nomeia também o projeto e o título completos,
   pelo que o teclado vê o mesmo.
 - **Arraste o separador** (a célula logo a seguir ao nome do repositório, ao `#`, ou mesmo antes do autor ou da idade) para dimensionar
-  a coluna; **duplo clique** nele para a ajustar de novo. A lista tem uma **linha de cabeçalho** (repositório, `#`,
+  a coluna; **duplo clique** nele para a ajustar de novo. A lista tem uma **linha de cabeçalho** (repositório, branches, `#`,
   título, autor, idade) e os separadores seguem `ui.column_resize` como os do Log: com `line` (a
   predefinição) um `│` esbatido fica no separador na linha do cabeçalho e, enquanto o ponteiro está no separador
   (no cabeçalho ou em qualquer linha da lista), enquanto a coluna está escolhida com as teclas, ou enquanto arrasta, é desenhada uma linha fina
@@ -184,7 +189,7 @@ nome que não cabe termina em reticências (`group/sub...`), e:
   células, **`[`** estreita-a, **`0`** repõe todas as colunas em automático, `Esc` sai. A paleta tem o
   mesmo: `Radar: escolher coluna`, `Radar: alargar coluna`, `Radar: estreitar coluna`, `Radar: repor larguras das colunas`.
 
-As larguras ficam guardadas em `radar.toml` (`[columns]`, `repo`, `number`, `author` e `age`, em células) e sobrevivem a um reinício.
+As larguras ficam guardadas em `radar.toml` (`[columns]`, `repo`, `branches`, `number`, `author` e `age`, em células; um ficheiro sem `branches` carrega como antes, e a coluna ajusta-se então ao seu conteúdo até 28 células) e sobrevivem a um reinício.
 São os mesmos gestos de dimensionamento das colunas do Log.
 
 ### Verificações e conflitos
@@ -223,18 +228,26 @@ Os pedidos fechados e integrados e as issues fechadas não são listados.
 
 ## Vistas e filtros
 
-Três listas e um campo de texto restringem a lista. Cada escolha é uma lista
+Quatro listas e um campo de texto restringem a lista. Cada escolha é uma lista
 pendente: clique nela ou use a sua tecla.
 
 - **Vista** (`v`): Tudo, pedidos, Issues, WIP (trabalho em curso), Adiados.
 - **Mostrar** (`f`): Todos, Meus (pedidos que escreveu, issues que criou),
   Atribuídos a mim, Revisão pedida, Mencionam-me.
 - **Âmbito** (`w`): ver acima.
+- **Perfil** (`P`): Todos os perfis, ou um perfil de integração de Definições > Integrações (com o nome que
+  as Definições lhe dão, com o seu fornecedor acrescentado quando dois perfis têm o mesmo nome). Restringe cada
+  secção, as linhas dos repositórios e as de toda a conta, às linhas desse perfil (uma linha de
+  trabalho em curso não tem perfil, por isso um perfil escolhido oculta-a). Um perfil de cada vez. A
+  escolha fica guardada em `radar.toml`; um perfil que já não existe volta a Todos os perfis.
+  A lista pendente está sempre lá, como as outras três, e uma janela estreita encurta-a (e depois as
+  etiquetas) em vez de a retirar. Paleta: `Radar: filtrar por perfil...`. Quando o perfil oculta
+  tudo, a lista vazia di-lo.
 - **Texto do filtro** (`/` ou `Ctrl+F`): correspondência aproximada no repositório,
   número, título, autor, branch e etiquetas. `Enter` devolve as teclas à lista e
   mantém o texto, `Esc` limpa-o.
 
-`Ctrl+N` mostra um selo no filtro, em cada lista pendente, nos botões Atualizar e Voltar e em cada título de secção no ecrã. Prima o carácter de um selo: o filtro recebe o teclado, uma lista pendente abre-se, um botão é executado e um título recebe a seleção (`Enter` ou `Space` recolhe-o depois). `Esc` cancela. Veja [Selos](keybindings.md#selos).
+`Ctrl+N` mostra um selo no filtro, em cada uma das quatro listas pendentes, nos botões Atualizar e Voltar e em cada título de secção no ecrã. Prima o carácter de um selo: o filtro recebe o teclado, uma lista pendente abre-se, um botão é executado e um título recebe a seleção (`Enter` ou `Space` recolhe-o depois). `Esc` cancela. Veja [Selos](keybindings.md#selos).
 
 ## Ações
 

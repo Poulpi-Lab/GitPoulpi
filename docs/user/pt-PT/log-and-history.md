@@ -100,8 +100,8 @@ as linhas do `.mailmap`, veja `history-rewrite.md`; a partir de um terminal:
 - **Filtro de autor** (o funil no cabeçalho **Autor**, `Shift+A` no Log, ou
   *Log: filtrar por autor...* da paleta): pré-filtra o Log por quem escreveu os commits.
   Um popup pende por baixo do cabeçalho com um campo de pesquisa, uma linha
-  **Limpar o filtro** (✕) e uma linha por autor do histórico carregado: um emblema com
-  iniciais (o avatar, quando `ui.avatars` não está desligado), o nome e o e-mail
+  **Limpar o filtro** (✕) e uma linha por autor do histórico carregado: um avatar
+  (quando `ui.avatars` não está desligado: a imagem do autor nos terminais que desenham imagens e quando a imagem está pronta, o emblema de iniciais até lá e nos outros terminais), o nome e o e-mail
   esbatido a seguir, primeiro quem tem mais commits e depois por nome. Escrever restringe
   a lista com a correspondência aproximada da paleta; `Enter` ou um clique alterna o autor
   realçado (uma marca de verificação; escolha quantos quiser), `Esc` ou um
@@ -114,7 +114,10 @@ as linhas do `.mailmap`, veja `history-rewrite.md`; a partir de um terminal:
   os autores escolhidos, e quando a coluna Autor está oculta ou demasiado estreita para
   o funil a margem superior do Log diz antes *Autor: Alice Exemplo +1* (a tecla
   e a paleta continuam a funcionar). Para o retirar: a linha **Limpar o filtro**, um
-  clique com o botão direito no funil aceso, ou *Log: limpar o filtro de autor* da paleta.
+  clique com o botão direito no funil aceso, *Log: limpar o filtro de autor* da paleta, ou
+  `Esc` no Log (depois de uma seleção, que o `Esc` larga primeiro; dentro do popup
+  o `Esc` esvazia primeiro o campo de pesquisa e depois fecha o popup e mantém o filtro).
+  Enquanto está ligado, Cima/Baixo (e PageUp/PageDown, Home/End) movem a seleção só entre os commits acesos, saltando os esbatidos; um clique continua a selecionar qualquer linha.
   Os autores são os dos commits que o Log carregou (com o mailmap aplicado, como
   na coluna), e o filtro é memorizado por repositório, entre mudanças de separador
   e reinícios. Uma pesquisa de texto não é memorizada, o filtro é.

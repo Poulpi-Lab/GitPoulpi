@@ -58,10 +58,15 @@ fn open(repo: &FixtureRepo, session: &str, cols: u16) -> Terminal {
             .unwrap();
         term.click(c + 1, r).unwrap();
     } else {
-        // The narrow pane clips the toolbar's own label: the key it is.
-        term.wait_for("the commit's files", STEP, |s| s.contains("Changed files"))
-            .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-        term.send_text("a").unwrap();
+        // The narrow pane shows the short label, whole and clickable.
+        let (c, r) = term
+            .wait_for("the short View all files label", STEP, |s| {
+                s.contains("[ ] All")
+            })
+            .unwrap_or_else(|e| panic!("{e}\n{}", term.text()))
+            .find("[ ] All")
+            .unwrap();
+        term.click(c + 1, r).unwrap();
     }
     term.wait_for("the whole tree listed", STEP, |s| s.contains("seed.txt"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));

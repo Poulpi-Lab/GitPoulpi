@@ -400,6 +400,9 @@ impl LogAvatarImages {
             } else {
                 Vec::new()
             };
+            // A slot drawn over another at the same place (a popup's row over
+            // the Log's) replaces it.
+            self.drawn.retain(|d| d.area != area);
             self.drawn.push(Drawn {
                 area,
                 key,

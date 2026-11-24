@@ -788,6 +788,22 @@ impl WindowState {
                     crate::tab_drag::paint(frame.buffer_mut(), drag);
                 }
 
+                // The author popup's real avatars, over the badges it just
+                // drew; `finish_frame` below clears or re-sends them as the
+                // list scrolls, filters or closes.
+                if let (InputMode::AuthorFilter(popup), Some(rects)) =
+                    (&self.input_mode, self.tab_picker_popup.as_ref())
+                {
+                    crate::author_filter::paint_pictures(
+                        frame.buffer_mut(),
+                        popup,
+                        rects,
+                        &mut self.avatar_service,
+                        &mut self.log_avatar_images,
+                        avatar::card_avatar_mode(self.avatar_placement, self.avatar_capability),
+                    );
+                }
+
                 // **Last, after every popup and screen above.** It decides
                 // whether the Graph column's picture has to be sent again by
                 // looking at what ended up drawn over it -- a tooltip that has

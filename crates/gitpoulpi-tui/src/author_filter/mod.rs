@@ -15,11 +15,13 @@
 //! window opens), so the filter is per repository and survives a tab switch,
 //! which rebuilds the window.
 
+mod pictures;
 mod popup;
 mod render;
 #[cfg(test)]
 mod tests;
 
+pub(crate) use pictures::paint as paint_pictures;
 pub(crate) use popup::{AuthorFilterPopup, AuthorRow};
 pub(crate) use render::render;
 
@@ -42,6 +44,9 @@ pub(crate) struct AuthorEntry {
     pub(crate) email: String,
     /// Loaded commits by this author (0: chosen earlier, none loaded now).
     pub(crate) commits: usize,
+    /// A commit by this author (the newest loaded one), hex: the avatar
+    /// lookup's hint for hosts that answer per commit. Empty when none loaded.
+    pub(crate) sha: String,
 }
 
 /// What identifies an author: the lower-cased email, else the lower-cased
@@ -71,6 +76,7 @@ pub(crate) fn build_authors(nodes: &[CommitNode], chosen: &BTreeSet<String>) -> 
                 name: c.author_name.clone(),
                 email: c.author_email.clone(),
                 commits: 1,
+                sha: c.id.to_hex(),
             });
     }
     for key in chosen {
@@ -79,6 +85,7 @@ pub(crate) fn build_authors(nodes: &[CommitNode], chosen: &BTreeSet<String>) -> 
             name: key.clone(),
             email: String::new(),
             commits: 0,
+            sha: String::new(),
         });
     }
     let mut out: Vec<AuthorEntry> = by_key.into_values().collect();

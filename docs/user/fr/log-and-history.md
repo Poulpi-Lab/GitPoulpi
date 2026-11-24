@@ -103,8 +103,9 @@ l'historique et écrit les lignes de `.mailmap` à votre place, voir
   ou *Journal : Filtrer par auteur...* dans la palette) : préfiltre le Log selon
   l'auteur des commits. Une fenêtre contextuelle s'accroche sous l'en-tête avec un
   champ de recherche, une ligne **Effacer le filtre** (✕) et une ligne par auteur de
-  l'historique chargé : un badge d'initiales (l'avatar, quand `ui.avatars` n'est pas
-  désactivé), le nom puis l'e-mail en sourdine, les plus gros contributeurs d'abord
+  l'historique chargé : un avatar (quand `ui.avatars` n'est pas désactivé : la photo de l'auteur sur les
+  terminaux qui affichent des images, une fois la photo prête, le badge d'initiales
+  d'ici là et sur les autres terminaux), le nom puis l'e-mail en sourdine, les plus gros contributeurs d'abord
   puis par nom. Taper restreint la liste avec la correspondance floue de la
   palette ; `Enter` ou un clic coche l'auteur en surbrillance (une coche ; choisissez-en
   autant que vous voulez), `Esc` ou un clic à côté ferme la fenêtre et garde le
@@ -118,7 +119,10 @@ l'historique et écrit les lignes de `.mailmap` à votre place, voir
   trop étroite pour l'entonnoir, la bordure supérieure du Log affiche plutôt
   *Auteur : Alice Example +1* (la touche et la palette fonctionnent toujours). Pour
   l'enlever : la ligne **Effacer le filtre**, un clic droit sur l'entonnoir allumé,
-  ou *Journal : Effacer le filtre d'auteur* dans la palette.
+  *Journal : Effacer le filtre d'auteur* dans la palette, ou `Esc` dans le Log (après une
+  sélection, que `Esc` abandonne en premier ; dans la fenêtre, `Esc` vide d'abord le champ de
+  recherche, puis ferme la fenêtre et garde le filtre).
+  Tant qu'il est actif, Haut/Bas (et PageUp/PageDown, Début/Fin) déplacent la sélection uniquement entre les commits éclairés, en sautant les estompés ; un clic sélectionne toujours n'importe quelle ligne.
   Les auteurs sont ceux des commits que le Log a chargés (mailmap appliqué, comme
   dans la colonne), et le filtre est mémorisé par dépôt, d'un changement d'onglet à
   l'autre et d'un redémarrage à l'autre. Une recherche de texte n'est pas mémorisée,

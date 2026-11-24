@@ -115,6 +115,7 @@ Bildlaufleisten. Klicken Sie auf eine Markierung, um dorthin zu gehen.
   ändern (per Tastatur: `Shift+C`, um eine Spalte zu wählen, dann `]` / `[`).
 - **Doppelklicken Sie auf den Rand zwischen zwei Log-Kopfzellen**, um die Spalte links davon an ihren Inhalt anzupassen (per Tastatur: `Shift+C`, um eine Spalte zu wählen, dann `=`; `+` passt alle Spalten an). Die letzte Spalte hat einen Griff auf ihrer eigenen letzten Zelle: Ziehen Sie ihn, um diese Spalte in der Größe zu ändern, wobei die Spalte Nachricht den Unterschied aufnimmt.
 - **Das Log seitlich scrollen** (das Spaltenlayout `scroll`; Einstellungen > Verlauf & Graph > Spaltenlayout oder das Kontrollkästchen `Seitlich scrollen` der Auswahl): das horizontale Mausrad oder `Shift`+Rad über der Tabelle, die Leiste am unteren Rand (Griff ziehen, auf die leere Schiene klicken, Endpfeile anklicken) oder `Shift+Links` / `Shift+Rechts`. Im Standardlayout `fit` füllen die Spalten den Bereich, und es gibt nichts zu scrollen.
+- **Einen Listenbereich seitlich scrollen**, wenn eine Zeile breiter ist als der Bereich: ein Abschnitt der Refs (ein langer Branch-, Tag- oder Stash-Name), die Listen Unstaged und Staged, die geänderten Dateien des Commits (oder eines Vergleichs) und die Infozeilen der Commit-Details (ID, Autor, Autorendatum, Zähler). Das horizontale Mausrad oder `Shift`+Mausrad über dem Bereich scrollt ihn; eine Leiste erscheint am unteren Rand des Bereichs nur, solange etwas überläuft (ziehen Sie ihren Griff, drücken Sie auf die freie Bahn, klicken Sie auf ihre Endpfeile), sie nimmt also nie eine Zeile weg. Über die Tastatur scrollen `Alt+Links` / `Alt+Rechts` den Bereich, der den Fokus hat (das Log scrollt die Commit-Details; in den geänderten Dateien die Dateien); die Palette hat `Ansicht: Bereich nach links/rechts scrollen`. Die ganze Zeile scrollt (Einrückung, Statusmarkierung, Pfeil und Name zusammen); der Titel des Bereichs, sein Rand, die Bildlaufleisten und die Schaltfläche Stagen/Unstagen einer überfahrenen Status-Zeile bleiben stehen. Ein Name wird nicht mehr mit einer Ellipse abgeschnitten: Sein Ende ist einen Scroll entfernt (ein Branch mit zusätzlichen Push-Zielen behält stattdessen sein Abzeichen `⇉` im Blick, sodass sein Name weiter nachgibt). Der Versatz gilt pro Bereich, endet an der breitesten sichtbaren Zeile und wird beim Wechsel des Repositorys vergessen. Der Block der Commit-Nachricht bricht seinen Text um, hat also nichts zu scrollen. Solange ein Abschnitt seitlich gescrollt ist, trägt sein unterer Rand die Leiste; ändern Sie die Größe dieses Abschnitts daher mit seinen Tastaturbefehlen oder von einem Abschnitt aus, der passt.
 - **Ziehen Sie eine Log-Kopfzelle**, um die Spalte zu verschieben: Ein Schatten ihres Namens folgt dem Zeiger, die verlassene Kopfzelle wird abgedunkelt, und ein Akzentbalken markiert den Platz, an dem sie landen würde. Die Spalten wandern beim Loslassen; `Esc` bricht ab, und der Zeiger zeigt die offene Hand, solange Sie sie tragen (per Tastatur: `Shift+C`, um eine Spalte zu wählen, dann `<` / `>`).
 
 GitPoulpi merkt sich jede Größe. Siehe
@@ -231,6 +232,7 @@ Siehe [Hosting und Issue-Tracker](hosting-integration.md).
   Ref am Commit.
 - **Rechtsklick auf eine Ref-Pille** öffnet ein Menü mit den Aktionen der Ref und des
   Commits.
+- **Klicken Sie auf den Trichter in der Kopfzeile Autor** (oder `Shift+A` im Log oder `Log: Nach Autor filtern...` in der Palette), um zu wählen, von welchen Autoren die Commits hell bleiben; der Rest wird wie bei einer Suche abgedunkelt. `Enter` oder ein Klick auf eine Zeile schaltet einen Autor um, die Zeile **Filter löschen** (✕) verwirft den Filter, `Esc` schließt das Popup und behält ihn. **Rechtsklick auf den hellen Trichter** löscht ihn (die Palette: `Log: Autorenfilter löschen`).
 - **Rechtsklick auf die Kopfzeile** blendet Spalten ein oder aus: eine Checkliste (`[x]` / `[ ]`) mit einem ✕ im Titel; klicken Sie auf eine Zeile oder nutzen Sie die Pfeiltasten und `Space` / `Enter`, und schließen Sie sie mit dem ✕, `Esc` oder einem Klick daneben (die Palette: `Ansicht: Log: Anzuzeigende Spalten wählen`). Unter den Kontrollkästchen: `<Spalte> an Inhalt anpassen` (die angeklickte Spalte), `Alle Spalten an Inhalt anpassen` und `Spaltenbreiten zurücksetzen`. Das Tastaturgegenstück zum Rechtsklick: `Shift+C` wählt eine Spalte, dann öffnet `.` (oder `Shift+F10`) dasselbe Menü darauf.
 - **Die Spalten des Radars** funktionieren genauso: Ziehen Sie den Trenner nach der Repository-, `#`-, Autor- oder Alterspalte, um sie einzustellen, **doppelklicken Sie darauf**, um die Spalte an ihren breitesten Eintrag anzupassen (`C` wählt eine Spalte, dann `=`; `+` passt jede Spalte an), und **klicken Sie mit rechts auf einen Spaltentitel** (oder `C`, dann `.`) für `<Spalte> an Inhalt anpassen` und `Alle Spalten an Inhalt anpassen`.
 - **Klicken Sie auf `↑`, `↓` oder `✕`** in der Suchleiste, um zum vorherigen oder nächsten
@@ -264,20 +266,36 @@ ein-/ausblenden...*, je ein Befehl *ein-/ausblenden* pro Abschnitt, *Seitenleist
 
 ### Refs ziehen
 
-Drücken Sie auf einen Branch in der Refs-Seitenleiste oder auf eine Ref-Pille im Log und
-ziehen Sie ihn auf einen anderen Branch. Die Statuszeile sagt, was Sie tragen. Ein Ziel, das
-das Ablegen annehmen kann, leuchtet auf. Lassen Sie los, um ein Menü zu erhalten. `Esc`
-bricht das Ziehen ab.
+Drücken Sie auf einen Branch, einen Remote-Branch oder einen Tag in der Refs-Seitenleiste oder
+auf eine Ref-Pille im Log und ziehen Sie ihn auf eine andere Ref. Die Statuszeile sagt, was Sie
+tragen. Ein Ziel, das das Ablegen annehmen kann, leuchtet auf. Lassen Sie los, um ein Menü zu
+erhalten. `Esc` bricht das Ziehen ab. Das Log bleibt, wo es ist, während Sie tragen: Das Drücken
+auf eine Ref scrollt das Log nur dann zu ihrem Commit, wenn sich herausstellt, dass es ein Klick
+ist (der Sprung geschieht, wenn die Taste losgelassen wird), sodass Sie zuerst zum Ziel scrollen
+und dann die Ref aufnehmen können.
 
 | Ziehen | Menü |
 |---|---|
 | Lokaler Branch X auf lokalen Branch Y | **Merge von X in Y**, **Rebase von X auf Y**, **Interaktiver Rebase von X auf Y...**, **Fast-Forward von Y auf X** |
 | Lokaler Branch auf einen Remote-Branch | **Push X** zu diesem Remote |
 | Remote-Branch auf lokalen Branch Y | **Merge**, **Rebase von Y darauf**, **Fast-Forward von Y darauf** und **Pull**, wenn er der Upstream von Y ist |
+| Tag T auf einen beliebigen Branch, Remote-Branch oder Tag | **Tag T hierher verschieben**; markiert mit *(kein Fast-Forward: T wäre dann kein Vorfahre mehr)*, wenn das Ziel nicht vom Commit des Tags abstammt (Ihre Entscheidung); abgedunkelt *bereits dort*, wenn er schon auf diesem Commit liegt |
+| Tag T auf lokalen Branch Y | zusätzlich **Tag T in Y mergen** und, unter einer Linie, das seltenere **Y in Tag T mergen und den Tag verschieben** (ein Merge-Commit aus dem Commit des Tags und Y, detached, dann wandert der Tag darauf) |
 
 Ändert die Aktion einen Branch, der nicht ausgecheckt ist, checkt GitPoulpi ihn zuerst
-aus. Lehnt git den Checkout ab, ändert sich nichts. Tags lassen sich nicht ziehen und
-nehmen kein Ablegen an.
+aus. Lehnt git den Checkout ab, ändert sich nichts. Nur Tags lassen sich auf einem Tag
+ablegen, ein Branch nicht.
+
+Das Verschieben eines Tags behält seine Art: Ein leichtgewichtiger Tag bleibt leichtgewichtig,
+ein annotierter Tag wird annotiert neu erstellt, wobei Nachricht und Tagger-Zeile unverändert
+übernommen werden (ein signierter Tag wird abgelehnt, seine Signatur würde nicht mehr passen).
+Nur Ihr lokaler Tag bewegt sich: Ein Remote, das den Tag hat, behält die alte Position, der Tag
+wird *differs*, und die Statuszeile sagt es; pushen Sie ihn selbst, wenn Sie es wollen. Das
+Verschieben und das Mergen-und-Verschieben sind je ein Rückgängig-Schritt (Rückgängig stellt das
+alte Tag-Objekt wieder her). Ein Merge in einen Tag, der Konflikte hat, ändert nichts. Palette:
+`Refs: Ausgewählten Tag auf den ausgewählten Commit verschieben...` verschiebt den Tag des
+Refs-Bereichs auf den im Log ausgewählten Commit (es fragt vorher, wenn das kein Fast-Forward
+ist); jedes andere Ziel geht über Markieren, dann Ablegen unten.
 
 Tastatur: „Markieren, dann ablegen“ tut dasselbe wie das Ziehen, für jedes Paar von Refs.
 Drücken Sie im Refs-Bereich `m` auf einem Branch (Palette: `Refs: Als Ablagequelle markieren`).
@@ -480,7 +498,7 @@ xterm) ändert sich der Zeiger nicht; siehe
 [Ein Terminal wählen](terminals.md#form-des-mauszeigers-osc-22). Der Teiler oder die Schaltfläche unter
 dem Zeiger leuchtet in jedem Terminal auf.
 
-Dieselbe Art von Komponente hat überall in der App denselben Zeiger.
+Dieselbe Art von Komponente hat überall in der App denselben Zeiger: Die Schaltflächen eines über dem Radar gezeigten Reviews (Tabs, das Schließkreuz, Popup-Schaltflächen) und die eigenen Aktionsschaltflächen des Radars zeigen die Hand wie jede andere Schaltfläche.
 
 - **Schaltflächen sind echte Schaltflächen**, in den Einstellungen (Integrationen:
   Bearbeiten, Trennen, Entfernen, Durchsuchen, Löschen, die Snippet-Schaltflächen des
@@ -497,7 +515,7 @@ Dieselbe Art von Komponente hat überall in der App denselben Zeiger.
 - **Der Pfeil** steht auf Zeilen. Eine Zeile leuchtet als Ganzes auf, wenn der Zeiger darauf
   steht (dasselbe Licht in jeder Liste), und ist für sich kein Bedienelement: die Zeilen der
   Bereiche Refs, Worktrees, Stashes und Submodule, des Logs und der Commit-Spalte (nur eine
-  Ref-Pille bekommt die Hand), die Zeilen eines Diffs, die geänderten Dateien, die Einträge
+  Ref-Pille bekommt die Hand), die Zeilenränder eines Diffs, die geänderten Dateien, die Einträge
   für Pull Requests, Issues und das Radar sowie die Zeilen der Listen in Dialogen und
   Bereichen (Klonen, Ordnerauswahl, Workspaces, die Karten des Boards, das Jobs-Panel, die
   Auswahlen für Zuständige, Labels und Meilensteine, Rebase-Schritte, Review-Dateien und
@@ -507,9 +525,20 @@ Dieselbe Art von Komponente hat überall in der App denselben Zeiger.
   Dateien, Radar, Aktivitätslog, die Suche im Issues-Bereich), die Text-, Zahlen- und
   Bereichszeilen der Einstellungen (auch beim Bearbeiten), die Felder der Dialoge, die
   Review-Kommentarfelder, der Commit-Composer, der Text des Dateieditors und das bearbeitbare
-  Ergebnis des Merge-Editors (seine schreibgeschützten Bereiche behalten den Pfeil). In den
-  Commit-Details sind Nachricht und Beschreibung bearbeitbar, der I-Balken steht also darauf,
-  und der ganze Block leuchtet leicht auf.
+  Ergebnis des Merge-Editors (seine schreibgeschützten Bereiche behalten den Pfeil, da ein
+  Ziehen dort nichts auswählt). Eine Regel gilt auch für schreibgeschützten Text: Wo immer ein
+  Ziehen mit der Maus Text auswählen kann, ist der Zeiger der I-Balken. Das ist der Code eines
+  Diffs (die Diff-Ansicht, Inline und Split, und der Diff-Bereich des Reviews), die Dateiansicht
+  und der Code von Blame. Ihre Zeilennummern, Markierungen und Hunk-Kopfzeilen behalten den
+  Pfeil, und eine Schaltfläche auf einer Zeile behält die Hand. Dasselbe gilt für die
+  Unterhaltung eines Issues oder Requests (auch die Übersicht des Reviews und sein Entwurfsblock),
+  die Nachricht der Commit-Details, die Versionshinweise, das Aktivitätslog (beide Tabs), das
+  Hilfe-Popup, die Markdown-Vorschau des Kommentareditors und die Kommentare, ausstehenden
+  Notizen und Vorschläge im Diff des Reviews: Ein Ziehen wählt den Text aus (ein einfacher
+  Klick behält seine Bedeutung: Ein Link öffnet sich, eine Schaltfläche handelt, ein Eintrag
+  des Aktivitätslogs oder ein Thread öffnet oder faltet sich), `Ctrl+C` kopiert ihn, `Esc` oder
+  ein Klick verwirft ihn. Eine Auswahl folgt ihrem Text beim Scrollen. Die Commit-Nachricht ist
+  außerdem bearbeitbar (ein Doppelklick ändert sie), und der ganze Block leuchtet leicht auf.
 - **In den Commit-Details** sind die Infozeilen Bedienelemente: Klicken Sie auf
   `commit: <id>`, um die kurze ID zu kopieren, doppelklicken Sie auf die Zeile von Autor
   oder Datum, um sie zu ändern (die Hand und eine leichte Markierung zeigen es). Die

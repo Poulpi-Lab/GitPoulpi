@@ -91,6 +91,26 @@ Namen und E-Mail-Adressen des Verlaufs und schreibt `.mailmap`-Zeilen für Sie, 
   Commit-Nachricht, Name und E-Mail des Autors, den Hash und die Ref-Namen. Was
   nicht passt, wird abgedunkelt, und die Form des Graphen bleibt. `Enter` /
   `Shift+Enter` springen zum nächsten / vorherigen Treffer.
+- **Autorenfilter** (der Trichter in der Kopfzeile **Autor**, `Shift+A` im Log oder
+  *Log: Nach Autor filtern...* in der Palette): filtert das Log vorab danach, wer die Commits
+  geschrieben hat. Unter der Kopfzeile hängt ein Popup mit einem Suchfeld, einer Zeile
+  **Filter löschen** (✕) und einer Zeile pro Autor des geladenen Verlaufs: ein Initialen-Abzeichen
+  (der Avatar, wenn `ui.avatars` nicht aus ist), der Name und danach abgedunkelt die E-Mail,
+  die meisten Commits zuerst und dann nach Namen. Das Tippen grenzt die Liste mit dem unscharfen
+  Abgleich der Palette ein; `Enter` oder ein Klick schaltet den markierten Autor um (ein Häkchen;
+  wählen Sie beliebig viele), `Esc` oder ein Klick daneben schließt das Popup und behält den
+  Filter. Der Filter verhält sich genau wie die Suche: Die Commits der gewählten Autoren bleiben
+  hell, jede andere Zeile wird abgedunkelt, und der Graph behält seine Form, nichts wird entfernt
+  oder neu geladen. Ist auch die Suchleiste offen, gelten beide (ein Commit muss von einem
+  gewählten Autor sein **und** zum Text passen), und `Enter` / `Shift+Enter` gehen durch diese
+  Treffer. Solange der Filter an ist, wird der Trichter zu einem gefüllten Akzent-`▼`, sein
+  Tooltip listet die gewählten Autoren, und ist die Spalte Autor ausgeblendet oder zu schmal für
+  den Trichter, steht stattdessen *Autor: Alice Example +1* am oberen Rand des Logs (die Taste
+  und die Palette funktionieren weiter). Zum Ausschalten: die Zeile **Filter löschen**, ein
+  Rechtsklick auf den hellen Trichter oder *Log: Autorenfilter löschen* in der Palette. Die Autoren
+  sind die der Commits, die das Log geladen hat (Mailmap angewendet, wie in der Spalte), und der
+  Filter wird pro Repository gemerkt, über Tab-Wechsel und Neustarts hinweg. Eine Textsuche wird
+  nicht gemerkt, der Filter schon.
 - **Refs-Filter** (`/` in der Seitenleiste): grenzt die Listen der Branches, Tags
   und Remotes nach Namen ein.
 - **Solo** (die Taste `o` oder das Menü der Ref, auf einer Ref, einem Ordner oder
@@ -119,6 +139,13 @@ Einträge:
 | Umbenennen, Löschen | Löschen fragt vorher; ein Remote-Zwilling kann ebenfalls gelöscht werden |
 | Branch-Namen kopieren, Link zum Branch auf dem Remote kopieren | In die Zwischenablage |
 
+**Einen Tag verschieben.** Ziehen Sie einen Tag auf eine andere Ref (siehe *Refs ziehen* in
+[Maus und Gesten](./mouse-and-gestures.md)) oder nutzen Sie `Refs: Ausgewählten Tag auf den
+ausgewählten Commit verschieben...`. Er behält seine Art und Annotation, nur Ihr lokaler Tag
+bewegt sich (ein Remote behält die alte Position, bis Sie pushen), und ein Rückgängig stellt ihn
+wieder her. CLI: `gitpoulpi tag move <name> <target> [--force-non-ff]`,
+`gitpoulpi tag merge-branch <name> <branch> [-m <message>]`.
+
 **Wo ein Tag liegt.** Ein Tag kann auf diesem Computer sein, auf einem Remote oder auf beidem,
 und die Zeilen TAGS der Seitenleiste (und die Pille des Tags im Log) zeigen es mit einer Markierung
 hinter dem Namen. Wer einen Tag überfährt, bekommt dasselbe in Worten.
@@ -128,7 +155,7 @@ hinter dem Namen. Wer einen Tag überfährt, bekommt dasselbe in Worten.
 | Pfeil nach oben | Nur hier: Kein Remote hat ihn. Sein Menü bietet *Push* |
 | Pfeil nach links und rechts | Hier und auf einem Remote, am selben Commit |
 | Pfeil nach unten (Zeile abgedunkelt) | Nur auf einem Remote: nicht in diesem Repository (nie gefetcht, oder hier gelöscht). Sein Menü bietet *Fetch `<tag>` von `<remote>`* und *`<tag>` auf `<remote>` löschen...*; `Git: Fetch für den ausgewählten Tag` in der Palette |
-| Pfeil nach oben und unten | Auch auf einem Remote, aber an einem anderen Commit (ein Push würde abgelehnt) |
+| Pfeil nach oben und unten | Auch auf einem Remote, aber an einem anderen Commit (ein einfacher Push würde abgelehnt). Sein Menü hat zwei Zeilen pro solchem Remote: *`<tag>` von `<remote>` übernehmen* (der lokale Tag wandert auf die Version des Remotes, aus dem letzten Fetch, ohne Netzwerk; ein annotierter Tag wird zu genau diesem Tag-Objekt) und, in Rot, *`<tag>` per Push zu `<remote>` senden (erzwungen)* (fragt vorher; mit Lease auf das, was der letzte Fetch gesehen hat, ein Remote, das sich seitdem bewegt hat, wird also mit „fetch first“ abgelehnt, und nichts wird überschrieben). Jede ist ein Rückgängig-Eintrag. `Git: Version des Remotes für den ausgewählten Tag übernehmen` und `Git: Ausgewählten Tag erzwungen per Push zu seinem Remote senden` in der Palette (das Standard-Remote, wenn sich mehrere unterscheiden); CLI: `tag take-remote`, `tag force-push` |
 
 Git führt für Tags keine Remote-Tracking-Refs, darum erfährt GitPoulpi, was jedes Remote hat, aus
 Ihrem letzten **Fetch** (jedem Fetch, auch dem automatischen) und aus den eigenen Tag-Pushes und

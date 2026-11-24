@@ -286,10 +286,13 @@ Autor mit Avatar und Datum, der Hash des Elternteils und die Zahl der Änderunge
 Nachricht (Zusammenfassung und Beschreibung; ziehen Sie ihren unteren Rand, um sie in der Größe zu
 ändern). Der Bereich **Geänderte Dateien** darunter beginnt mit seinen eigenen Bedienelementen:
 dem Schalter für die Sortierung, **Pfad** / **Baum**, **Alle Dateien ansehen** und einem Feld
-**Dateien filtern**, fest über der Liste, die als einziger Teil scrollt. Klicken Sie auf eine
+**Dateien filtern** (in einem Repository mit LFS-Dateien mit einem Kästchen **Nur LFS** an
+seinem rechten Ende), fest über der Liste, die als einziger Teil scrollt. Klicken Sie auf eine
 Datei, um ihren Diff zu öffnen. In einem niedrigen Fenster gibt zuerst die Nachricht Platz ab (bis
 auf eine Zeile), dann die Liste. Die Ansicht der Änderungen behält ihre Zeile **Pfad** / **Baum** /
-**Alle Dateien ansehen** oben über den Dateilisten, über den Listen Unstaged und Staged.
+**Alle Dateien ansehen** oben über den Dateilisten, über den Listen Unstaged und Staged. Im
+Baummodus endet ein eingeklappter Ordner mit der Zahl der darin liegenden Dateien,
+Unterordner eingeschlossen, als abgedunkeltes `(12)`.
 
 **Links in einer Nachricht.** Eine in die Nachricht geschriebene Webadresse (`https://...` oder das Ziel eines Markdown-Links `[Text](https://...)`) ist unterstrichen, zeigt den Hand-Zeiger und fragt bei einem Klick mit der ganzen Adresse **Diesen Link öffnen?**, bevor irgendetwas geöffnet wird: Der Text einer Nachricht ist nicht vertrauenswürdig. **Öffnen** (`F`) startet den Browser, **Abbrechen** (`B`, `Esc`, das Kreuz) tut nichts. Angeboten werden nur `http`- und `https`-Adressen. Das Tastatur-Gegenstück ist der Palettenbefehl `Commit-Details: Link in Nachricht öffnen...`, der nach der ersten Adresse der Nachricht fragt und mit **Weiter** (`W`) durch die weiteren geht. Manche Terminals zeichnen selbst einen Unterstrich unter eine Adresse unter dem Zeiger und öffnen sie bei einem Klick mit Zusatztaste (oft Umschalt+Klick) von sich aus; das ist eine Funktion des Terminals, nicht von GitPoulpi.
 
@@ -314,6 +317,24 @@ bringt das Log zurück. Oben läuft eine Schaltflächenleiste:
 | **Umbr.** | Lange Zeilen umbrechen. |
 | **Map** | Eine Minimap der ganzen Datei neben der Bildlaufleiste. |
 | **Kodierung** | Die Kodierung, in der die Datei gelesen wird (zuerst **Auto**). |
+
+#### Geänderte Wörter in einem Diff
+
+Ändert sich eine Zeile nur teilweise, werden die Wörter, die sich unterscheiden, mit einem
+stärkeren Hintergrund in der eigenen Farbe der Zeile hervorgehoben (ein stärkeres Rot auf der
+entfernten, ein stärkeres Grün auf der hinzugefügten Zeile), und der Rest der Zeile behält die
+einheitliche Tönung. Innerhalb eines Hunks wird jeder Block entfernter Zeilen mit dem darauf
+folgenden Block hinzugefügter Zeilen gepaart, die erste mit der ersten, die zweite mit der zweiten
+und so weiter; ein Paar wird nur markiert, wenn mindestens 40 % seiner nicht leeren Zeichen
+gleich sind, damit eine von Grund auf neu geschriebene Zeile einheitlich getönt bleibt, statt zu
+einem einzigen Block der Hervorhebung zu werden. Verglichen werden Wörter, Folgen von Leerzeichen
+und einzelne Satzzeichen, ein einzelnes Leerzeichen zwischen zwei geänderten Wörtern verbindet
+sie zu einer Markierung, und Zeilen über 1000 Zeichen werden nicht markiert. Es funktioniert
+in Inline und Split, mit Zeilenumbruch und seitlichem Scrollen sowie im Diff-Bereich des Reviews.
+Ausschalten lässt es sich unter **Einstellungen > Diff & Editor > Geänderte Wörter hervorheben**
+(`ui.diff_intraline`) oder über die Befehlspalette (**Diff: Hervorhebung geänderter Wörter
+umschalten**, ohne eigene Taste). Auf einem Terminal mit nur 16 Farben oder bei einem Design ohne
+Diff-Hintergrund werden die geänderten Wörter stattdessen fett und unterstrichen dargestellt.
 
 In einem Diff des Arbeitsverzeichnisses hat jeder Hunk die Schaltflächen **Hunk
 stagen** und **Hunk verwerfen**. Drücken Sie `v`, um Zeilen auszuwählen, und stagen

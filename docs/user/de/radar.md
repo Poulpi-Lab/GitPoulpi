@@ -18,7 +18,45 @@ verknüpftes Repository wird nie abgefragt: Es zeigt stattdessen eine Zeile
 ![Das Radar über zwei Repositories: ein angehefteter Request, dann Wartet auf mein Review, Meine Pull Requests, Mir zugewiesen, Issues und laufende Arbeit](../images/radar.png)
 
 **Review...** in einer Zeile eines Pull oder Merge Requests (oder `e`) öffnet das Repository mit dem Review der Anfrage in GitPoulpi
-([Einen Pull Request prüfen](review.md)).
+([Einen Pull Request prüfen](review.md)). Bei einer Anfrage eines Repositorys, das Sie geklont, aber nie mit dem Host verknüpft haben, wird der Klon zuerst mit dem Projekt der Anfrage verknüpft (sofern er nicht schon eine eigene Pull-Request-Verknüpfung hat), sodass das Review in seinem Tab beginnt.
+
+### Die Spalte Aktionen
+
+Rechts in der Zeile einer Anfrage oder eines Issues tun kleine Schaltflächen, was eine Taste in der ausgewählten Zeile tut (ein Klick wählt die Zeile aus und führt die Aktion aus; ruhen Sie den Zeiger auf einer Schaltfläche, um ihren Namen und ihre Taste zu sehen):
+
+```
+Breit:   #58  Rechnungssummen runden  feature/login → main   alice   2d   Review  [Globus]  [Gespräch]  ⊕  ×  ⇣  ⋮
+Schmal:  #58  Rechnungssummen runden  feature/login → main                 [rev]  [Globus]  [Gespräch]  ⋮
+Issue:   #12  Absturz bei leerer Liste                     bob     5h   Arbeit beginnen  [Globus]  [Gespräch]  ×  ⋮
+```
+
+| Schaltfläche | Taste | Palette |
+|---|---|---|
+| **Review** (eine Anfrage, die auf Ihr Review wartet; fragt, wie, wenn sie nicht geklont ist) | `e` | `Radar: Anfrage prüfen...` |
+| **Arbeit beginnen** (ein geklontes Issue) | `n` | `Radar: Arbeit am Issue beginnen...` |
+| der Globus: die Seite auf dem Host öffnen | `o` | `Radar: Im Browser öffnen` |
+| das Zeilensymbol: die Unterhaltung öffnen | `i` | `Radar: Issue-Unterhaltung öffnen` |
+| `»` **Als bereit markieren** (eine Entwurfsanfrage) | `y` | `Radar: Als bereit markieren` |
+| `⊕` **Merge** (eine Anfrage) | `m` | `Radar: Merge-Anfrage...` |
+| `×` **Schließen** (eine Anfrage oder ein Issue) | `x` | `Radar: Schließen...` |
+| `⇣` **Klonen** (eine Zeile, deren Repository nicht geklont ist) | `g` | `Radar: Repository klonen...` |
+
+Eine Zeile ohne Aktion lässt ihre Zelle leer, sodass jede Schaltfläche in jeder Zeile in derselben Spalte bleibt. Wird das Fenster schmal, werden die Wörter Review und Arbeit beginnen zu Symbolen, bevor eine andere Spalte verschwindet; die Schaltflächen Als bereit markieren, Merge, Schließen und Klonen verlassen die Spalte, bevor der Titel es tut, bleiben aber im Zeilenmenü (`⋮`, Rechtsklick oder `Shift+F10`), wo eine Aktion, die nicht laufen kann, mit ihrem Grund abgedunkelt ist. Die Spalte ist automatisch (sie gehört nicht zu den in der Größe veränderbaren Spalten). Ein Doppelklick oder `Enter` auf einer nicht geklonten Anfrage fragt, wie sie geprüft werden soll, wie **Review**.
+
+### Die Branches einer Anfrage
+
+Eine Zeile einer Anfrage zeigt `Quelle → Ziel` hinter ihrem Titel (`alice:feature/login → main`, wenn der Quell-Branch in einem Fork liegt). Wird der Platz knapp, wird zuerst das Ziel gekürzt (eine Ellipse), der Titel behält den größten Teil des Platzes, und in einem schmalen Fenster werden die Branches nicht gezeigt; die Spalte Aktionen wird nie hinausgeschoben. Ruhen Sie den Zeiger auf einem gekürzten Text, um ihn ganz zu sehen. Hat ein Host die Branches nicht genannt, steht dort nichts. Die Zeile eines Issues nennt ihr Repository im selben Chip wie die Zeile einer Anfrage (der Ordnername des Klons oder `owner/name`, wenn es nicht geklont ist).
+
+### Auf dem Host handeln
+
+**Merge**, **Schließen** und **Als bereit markieren** funktionieren auf GitHub, GitLab, Gitea und Forgejo (andere Hosts dunkeln sie mit „Von ... nicht unterstützt“ ab; Issues lassen sich auf denselben Hosts schließen).
+
+- **Merge** fragt zuerst: Das Feld nennt die Anfrage, ihr Projekt und ihre Branches und bietet die Methode an (ein Merge-Commit, Squash und Rebase, wo der Host es hat; GitLab mergt oder squasht). Bei einem Entwurf, einer Anfrage mit Konflikten mit ihrem Ziel oder fehlschlagenden Checks wird es mit seinem Grund abgelehnt; eine Ablehnung durch den Host (keine Berechtigung, eine Regel des Branches) erscheint in der Statuszeile.
+- **Schließen** fragt zuerst und schließt ohne Merge.
+- **Als bereit markieren** nimmt einen Entwurf aus dem Entwurfsstatus (GitLab und Gitea: Die Markierung `Draft:` / `WIP:` verlässt den Titel). Es fragt nichts: Es lässt sich auf dem Host rückgängig machen.
+- **Klonen** öffnet den gewöhnlichen Klon-Dialog für das Projekt der Zeile (die URL ist ausgefüllt, die Ordnerauswahl ist die übliche). Sobald der Klon existiert, ordnet das Radar die Zeile ihm zu, wenn es das nächste Mal die Remotes liest (öffnen Sie es neu oder aktualisieren Sie), und Klonen sagt dann, wo der Klon liegt.
+
+Merge und Schließen ändern den Host und **lassen sich aus GitPoulpi nicht rückgängig machen** (das Feld sagt es); öffnen Sie eine geschlossene Anfrage auf dem Host wieder. Nach einem erfolgreichen Aufruf werden die Listen neu abgefragt, sodass eine gemergte oder geschlossene Zeile verschwindet und eine bereite ihren Chip `draft` verliert.
 
 ## Öffnen
 
@@ -197,7 +235,7 @@ Mausaktion gibt es eine Taste und einen Palettenzwilling.
 
 | Aktion | Taste | Palette |
 |---|---|---|
-| Repository öffnen (sein Tab öffnet sich oder wird gewechselt) | `Enter` / Doppelklick | `Radar: Repository öffnen` |
+| Repository öffnen (sein Tab öffnet sich oder wird gewechselt; bei einer Anfrage ohne Klon fragt es, wie sie geprüft werden soll) | `Enter` / Doppelklick | `Radar: Repository öffnen` |
 | Review... (ein Request; bei einem Request ohne Klon fragt es, wie) | `e` | `Radar: Anfrage prüfen...` |
 | Einen Request über die API des Hosts prüfen (kein Klon) | `a` in der Frage | `Radar: Über die API prüfen` |
 | Das Repository klonen, dann den Request prüfen | `c` in der Frage | `Radar: Klonen und prüfen...` |

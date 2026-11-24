@@ -516,15 +516,15 @@ merge_side_by_side_min_width = { git = "Éditeur de merge : côte à côte dès
 merge_side_by_side_min_width_help = { git = "L'éditeur de conflits de merge montre A et B côte à côte quand sa zone fait au moins ce nombre de colonnes (les longues lignes défilent latéralement avec Shift+molette ou Shift+flèches) ; plus étroit, il montre un côté à la fois derrière des onglets. 100 par défaut ; 40 est le minimum, 0 signifie toujours côte à côte. L'éditeur masque les panneaux Refs et Status tant qu'il est ouvert, il a donc le plus souvent toute la fenêtre.", local = "L'éditeur de conflits de fusion montre A et B côte à côte quand sa zone fait au moins ce nombre de colonnes (les longues lignes défilent latéralement avec Shift+molette ou Shift+flèches) ; plus étroit, il montre un côté à la fois derrière des onglets. 100 par défaut ; 40 est le minimum, 0 signifie toujours côte à côte. L'éditeur masque les panneaux Refs et Status tant qu'il est ouvert, il a donc le plus souvent toute la fenêtre." }
 diff_word_wrap = "Retour à la ligne"
 diff_word_wrap_help = "Coupe les longues lignes des vues de {$diff} au lieu de les tronquer avec une ellipse. L'éditeur intégré et la vue blame défilent latéralement sans retour à la ligne. C'est aussi le commutateur propre à la vue de {$diff}."
-diff_intraline = "Highlight changed words"
-diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
+diff_intraline = "Surligner les mots modifiés"
+diff_intraline_help = "Dans une ligne modifiée, peint les mots qui diffèrent de la ligne supprimée ou ajoutée correspondante avec un fond plus marqué, dans toutes les vues de {$diff}. Désactivé garde une seule teinte par ligne. Aussi dans la palette de commandes."
 
 [settings_ui]
 theme = "Thème"
 theme_help = "Couleurs de toute l'interface. Parcourir la liste affiche un aperçu de chaque thème ; Enter garde le thème, Esc revient en arrière. Système suit le terminal (son fond clair ou sombre, détecté une fois au démarrage ; Sombre s'il ne peut pas être déterminé). Vos propres fichiers de thème du dossier themes/ de la configuration sont listés en dernier."
 theme_system = "Système (suit le terminal)"
 follow_theme = "Suivre le thème"
-graph_color_missing = "{name} (not found, using the theme's lanes)"
+graph_color_missing = "{name} (introuvable, les voies du thème sont utilisées)"
 theme_swatches = "Couleurs"
 graph_lane_background = "Fond des voies du graphe"
 graph_lane_background_help = { git = "Désactivé : transparent, rien derrière les voies (par défaut). Teinte de ligne : une bande légère de la couleur de voie du {$commit} dans la colonne Graphe, plus une fine barre de cette couleur au bord droit de la colonne. Une voie enregistrée est lue comme Teinte de ligne. S'applique à la fermeture des paramètres.", local = "Désactivé : transparent, rien derrière les voies (par défaut). Teinte de ligne : une bande légère de la couleur de voie de la {$commit} dans la colonne Graphe, plus une fine barre de cette couleur au bord droit de la colonne. Une voie enregistrée est lue comme Teinte de ligne. S'applique à la fermeture des paramètres." }
@@ -1021,14 +1021,14 @@ cannot_drop = "{source} ne peut pas être déposé sur {target} ainsi"
 history_scrolled = "l'historique entre ici et là est sorti de la page chargée"
 shares_no_history = "{source} ne partage aucun historique avec la cible"
 nothing_to_replay = "{source} n'a rien que la cible n'ait déjà : rien à rejouer"
-move_tag_here = "Move {$tag} {name} here"
-move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
-merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
-merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
-moving_tag = "moving {$tag} {name} to {target}..."
-moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
-merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
-confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
+move_tag_here = { git = "Déplacer le {$tag} {name} ici", local = "Déplacer l'{$tag} {name} ici" }
+move_tag_not_ff = { git = "Déplacer le {$tag} {name} ici (pas un fast-forward : {name} ne serait plus un ancêtre)", local = "Déplacer l'{$tag} {name} ici (pas une avance rapide : {name} ne serait plus un ancêtre)" }
+merge_tag_into = { git = "{$Merge} le {$tag} {name} dans {branch}", local = "{$Merge} l'{$tag} {name} dans {branch}" }
+merge_into_tag = { git = "{$Merge} {branch} dans le {$tag} {name} et déplacer le {$tag} (rare : ajoute un {$commit} de {$merge_noun})", local = "{$Merge} {branch} dans l'{$tag} {name} et déplacer l'{$tag} (rare : ajoute une {$commit} de {$merge_noun})" }
+moving_tag = { git = "déplacement du {$tag} {name} vers {target}...", local = "déplacement de l'{$tag} {name} vers {target}..." }
+moving_tag_remote = { git = "déplacement du {$tag} {name} vers {target}... ({remotes} garde l'ancienne position jusqu'à votre prochain {$push_noun})", local = "déplacement de l'{$tag} {name} vers {target}... ({remotes} garde l'ancienne position jusqu'à votre prochain {$push_noun})" }
+merging_into_tag = { git = "{$Merge} {branch} dans le {$tag} {name}...", local = "{$Merge} {branch} dans l'{$tag} {name}..." }
+confirm_move_not_ff = { git = "Déplacer le {$tag} {name} vers {target} ? Ce n'est pas un fast-forward : {name} ne serait plus un ancêtre.", local = "Déplacer l'{$tag} {name} vers {target} ? Ce n'est pas une avance rapide : {name} ne serait plus un ancêtre." }
 
 [menu_inline]
 placeholder_branch = "nom de la branche"
@@ -1739,9 +1739,9 @@ column_age = "Âge"
 # context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
 column_actions = "Actions"
 # context: short button on a Radar row: starts the review of the request; keep it to one word
-action_review = "Review"
+action_review = "Relire"
 # context: short button on a Radar row: starts work on the issue (creates its branch)
-action_start_work = "Start work"
+action_start_work = "Démarrer"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "Colonne {name} ({width} cellules) : [ réduit, ] élargit, 0 réinitialise, Tab suivante, Échap termine"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -1855,21 +1855,21 @@ act_clone = "Cloner le dépôt..."
 # context: button of the Radar merge / close confirmation
 confirm_cancel = "Annuler"
 # context: button of the Radar close confirmation
-confirm_close = "La fermer"
+confirm_close = "Fermer"
 # context: button of the Radar merge confirmation: a merge commit
-method_merge = "{$Commit} de {$merge}"
+method_merge = "{$Commit} de {$merge_noun}"
 # context: button of the Radar merge confirmation: squash the commits, then merge
-method_squash = "Squash puis {$merge}"
+method_squash = "{$Squash} puis {$merge}"
 # context: button of the Radar merge confirmation: rebase the commits, then merge
 method_rebase = "{$Rebase} puis {$merge}"
 # context: title of the Radar merge confirmation; {label} is `!53` or `#12`
 merge_title = "{$Merge} {label}"
 # context: body of the Radar merge confirmation; {project} is `owner/name`, {branches} is `source → target`
-merge_body = "{title}\n{project}  {branches}\n\nL'hébergeur va la {$merge} avec la méthode choisie. Cela modifie l'hébergeur et ne peut pas être annulé depuis GitPoulpi."
+merge_body = { git = "{title}\n{project}  {branches}\n\nL'hébergeur la merge avec la méthode choisie. Cela modifie l'hébergeur et ne peut pas être annulé depuis GitPoulpi.", local = "{title}\n{project}  {branches}\n\nL'hébergeur la fusionne avec la méthode choisie. Cela modifie l'hébergeur et ne peut pas être annulé depuis GitPoulpi." }
 # context: title of the Radar close confirmation; {label} is `!53` or `#12`
 close_title = "Fermer {label}"
 # context: body of the Radar close confirmation for a request
-close_body = "{title}\n{project}  {branches}\n\nL'hébergeur la ferme sans {$merge}. Cela modifie l'hébergeur et ne peut pas être annulé depuis GitPoulpi (rouvrez-la sur l'hébergeur)."
+close_body = "{title}\n{project}  {branches}\n\nL'hébergeur la ferme sans {$merge_noun}. Cela modifie l'hébergeur et ne peut pas être annulé depuis GitPoulpi (rouvrez-la sur l'hébergeur)."
 # context: body of the Radar close confirmation for an issue
 close_issue_body = "{title}\n{project}\n\nL'hébergeur ferme le ticket. Cela modifie l'hébergeur et ne peut pas être annulé depuis GitPoulpi (rouvrez-le sur l'hébergeur)."
 # context: why a Radar host action is refused
@@ -1891,7 +1891,7 @@ msg_host_busy = "L'hébergeur répond encore à la dernière action"
 # context: status line of the Radar while a host action runs
 msg_asking_host = "Demande à l'hébergeur..."
 # context: status line of the Radar after a merge; {label} is `!53`
-msg_merged = "{label} : {$merge} effectué sur l'hébergeur"
+msg_merged = { git = "{label} : merge effectué sur l'hébergeur", local = "{label} : fusion effectuée sur l'hébergeur" }
 # context: status line of the Radar after a close
 msg_closed = "{label} fermé sur l'hébergeur"
 # context: status line of the Radar after Mark as ready
@@ -2363,8 +2363,8 @@ pulling_from_all = { git = "pull de {remotes} dans {branch}...", local = "tirage
 no_pull_remote = "{branch} n'a aucun distant où faire un {$pull}"
 
 [keymap_action]
-sequence_cancel = "Séquence\u00a0: annuler"
-sequence_continue = "Séquence\u00a0: continuer"
+sequence_cancel = "Séquence : annuler"
+sequence_continue = "Séquence : continuer"
 git_prefix_pull_all_branches = "{$Pull} de toutes les branches"
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
 global_commit_column = "Afficher ou masquer la colonne des {$commits}"
@@ -3085,9 +3085,9 @@ title_hosting_base = "Prompt de base des réponses"
 
 [palette]
 # context: palette row: cancel the running sequence
-sequence_cancel = "Séquence\u00a0: annuler"
+sequence_cancel = "Séquence : Annuler"
 # context: palette row: continue the paused sequence
-sequence_continue = "Séquence\u00a0: continuer"
+sequence_continue = "Séquence : Continuer"
 # context: why Sequence: Cancel is unavailable
 why_no_sequence_running = "aucune séquence en cours"
 # context: why Sequence: Continue is unavailable
@@ -3283,7 +3283,7 @@ git_annotated_tag_at_selected_commit = { git = "Git : {$Tag} annoté sur le com
 refs_push_selected_tag_to_default_remote = { git = "Refs : Push du {$tag} sélectionné vers le distant par défaut", local = "Refs : Envoyer l'{$tag} sélectionnée vers le distant par défaut" }
 refs_delete_selected_tag_from_its_remote = { git = "Refs : Supprimer le {$tag} sélectionné de son distant...", local = "Refs : Supprimer l'{$tag} sélectionnée de son distant..." }
 refs_annotate_selected_tag = { git = "Refs : Annoter le {$tag} sélectionné...", local = "Refs : Annoter l'{$tag} sélectionnée..." }
-refs_move_selected_tag_to_selected_commit = { git = "Refs : Déplacer le {$tag} sélectionné vers le commit sélectionné...", local = "Refs : Déplacer l'{$tag} sélectionnée vers la validation sélectionnée..." }
+refs_move_selected_tag_to_selected_commit = { git = "Refs : Déplacer le {$tag} sélectionné vers le {$commit} sélectionné...", local = "Refs : Déplacer l'{$tag} sélectionnée vers la {$commit} sélectionnée..." }
 refs_toggle_hide_in_graph = "Refs : Masquer ou afficher dans le graphe"
 refs_toggle_solo_on_selected_ref = "Refs : Activer ou désactiver le solo sur la ref sélectionnée"
 refs_stop_soloing_clear_every_soloed_ref = "Refs : Arrêter le solo (retire toutes les refs en solo)"
@@ -3858,8 +3858,8 @@ rewrite_strip_exec = "Réécriture : retirer le bit exécutable..."
 rewrite_file_encoding = "Réécriture : convertir l'encodage des fichiers..."
 # s22:end
 git_fetch_selected_tag = { git = "Git : {$Fetch} le tag sélectionné", local = "Git : {$Fetch} l'étiquette sélectionnée" }
-git_use_remote_version_of_selected_tag = { git = "Git : Version distante du tag sélectionné", local = "Git : Version distante de l'étiquette sélectionnée" }
-git_force_push_selected_tag = { git = "Git : Push forcé du tag sélectionné", local = "Git : Envoi forcé de l'étiquette sélectionnée" }
+git_use_remote_version_of_selected_tag = { git = "Git : Utiliser la version distante du {$tag} sélectionné", local = "Git : Utiliser la version distante de l'{$tag} sélectionnée" }
+git_force_push_selected_tag = { git = "Git : {$Push} forcé du {$tag} sélectionné vers son distant", local = "Git : Forcer l'envoi de l'{$tag} sélectionnée vers son distant" }
 # s24:begin
 rewrite_fix_message_encoding = "Réécriture : corriger l'encodage des messages..."
 # s24:end
@@ -3892,9 +3892,9 @@ why_group_not_ready = "résolvez et concluez d'abord les conflits"
 why_nothing_to_retry = "aucun distant n'a échoué lors du dernier {$push} groupé"
 edit_undo_sequence = "Édition : Annuler toute la séquence"
 undo_history_undo_sequence = "Historique d'annulation : Annuler toute la séquence"
-sequence_repo_review = "Séquence\u00a0: examiner les séquences de ce dépôt"
-sequence_repo_trust = "Séquence\u00a0: approuver les séquences de ce dépôt"
-sequence_repo_ignore = "Séquence\u00a0: ignorer les séquences de ce dépôt"
+sequence_repo_review = "Séquence : Examiner les séquences de ce dépôt"
+sequence_repo_trust = "Séquence : Approuver les séquences de ce dépôt"
+sequence_repo_ignore = "Séquence : Ignorer les séquences de ce dépôt"
 why_no_repo_sequences = "ce dépôt n'a aucune séquence en attente de votre approbation"
 
 [help_section]
@@ -5079,8 +5079,8 @@ staging_lines = { one = { git = "stage de {n} ligne du hunk {hunk}{spill}...", l
 unstaging_lines = { one = { git = "unstage de {n} ligne du hunk {hunk}{spill}...", local = "désindexation de {n} ligne du hunk {hunk}{spill}..." }, other = { git = "unstage de {n} lignes du hunk {hunk}{spill}...", local = "désindexation de {n} lignes du hunk {hunk}{spill}..." } }
 minimap_on = "minimap activée"
 minimap_off = "minimap désactivée"
-intraline_on = "changed words highlighted"
-intraline_off = "changed words not highlighted"
+intraline_on = "mots modifiés surlignés"
+intraline_off = "mots modifiés non surlignés"
 not_working_diff = { git = "le stage agit sur l'arbre de travail - ouvrez un fichier depuis les volets {$unstaged_files} ou {$staged_files}, pas depuis un commit", local = "l'indexation agit sur l'arbre de travail - ouvrez un fichier depuis les volets {$unstaged_files} ou {$staged_files}, pas depuis une validation" }
 not_working_diff_discard = { git = "l'abandon agit sur l'arbre de travail - ouvrez un fichier depuis le volet {$unstaged_files}, pas depuis un commit", local = "l'abandon agit sur l'arbre de travail - ouvrez un fichier depuis le volet {$unstaged_files}, pas depuis une validation" }
 discard_on_staged = { git = "l'abandon annule des modifications unstaged - c'est le volet {$staged_files} : unstagez d'abord, puis abandonnez depuis le volet {$unstaged_files}", local = "l'abandon annule des modifications non indexées - c'est le volet {$staged_files} : désindexez d'abord, puis abandonnez depuis le volet {$unstaged_files}" }
@@ -5353,9 +5353,9 @@ fetched = { one = { git = "fetch de {remote} : {n} référence mise à jour", l
 fetched_all = { one = { git = "fetch de chaque distant : {n} référence mise à jour", local = "récupération de chaque distant : {n} référence mise à jour" }, other = { git = "fetch de chaque distant : {n} références mises à jour", local = "récupération de chaque distant : {n} références mises à jour" } }
 branch_created_checkout_failed = "la branche {name} a été créée, mais son basculement a échoué : {error}"
 tag_annotated = { git = "tag annoté {name}", local = "étiquette annotée {name}" }
-tag_moved = "moved {$tag} {name} to {target}"
-tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
-tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
+tag_moved = { git = "{$tag} {name} déplacé vers {target}", local = "{$tag} {name} déplacée vers {target}" }
+tag_moved_remote = { git = "{$tag} {name} déplacé vers {target} ; {remotes} a encore l'ancienne position (faites un {$push_noun} pour la mettre à jour)", local = "{$tag} {name} déplacée vers {target} ; {remotes} a encore l'ancienne position (faites un {$push_noun} pour la mettre à jour)" }
+tag_merged = { git = "{$merge_noun} de {branch} dans le {$tag} {name} faite, maintenant sur {target}", local = "{$merge_noun} de {branch} dans l'{$tag} {name} faite, maintenant sur {target}" }
 tags_all_pushed = { git = "tous les tags sont déjà sur {remote}", local = "toutes les étiquettes sont déjà sur {remote}" }
 nothing_to_push = { git = "rien à push vers {remote}", local = "rien à envoyer vers {remote}" }
 pushed_refs = { git = "push de {refs} vers {remote} terminé", local = "envoi de {refs} vers {remote} terminé" }
@@ -5437,7 +5437,7 @@ reword_invalid_date = "une date n'est ni au format brut ni au format ISO 8601"
 rewrite_refused = "impossible de réécrire l'historique : {reason}{detail}"
 push_rejected = { git = "{remote} a rejeté le push de {branch} : {reason}", local = "{remote} a rejeté l'envoi de {branch} : {reason}" }
 push_non_fast_forward = { git = "le distant a des commits que cette branche n'a pas (faites d'abord un pull, ou un push forcé)", local = "le distant a des validations que cette branche n'a pas (tirez d'abord, ou forcez l'envoi)" }
-push_stale_lease = { git = "la branche distante a bougé depuis le dernier fetch, le push forcé a donc été refusé", local = "la branche distante a bougé depuis la dernière récupération, l'envoi forcé a donc été refusé" }
+push_stale_lease = { git = "la branche ou le tag distant a bougé depuis le dernier fetch, le push forcé a donc été refusé", local = "la branche ou l'étiquette distante a bougé depuis la dernière récupération, l'envoi forcé a donc été refusé" }
 not_fast_forward = "avance rapide impossible : les deux ont divergé"
 reword_refused = { git = "impossible de modifier ce commit : {reason}", local = "impossible de modifier cette validation : {reason}" }
 reword_not_on_branch = { git = "le commit n'est pas sur la branche courante (ce n'est ni HEAD ni un ancêtre de HEAD)", local = "la validation n'est pas sur la branche courante (ce n'est ni HEAD ni un ancêtre de HEAD)" }
@@ -5893,7 +5893,7 @@ open_install_page = "Ouvrir la page d'installation"
 undo_anyway = "Annuler quand même"
 start_over = "Repartir de zéro"
 redo_anyway = "Rétablir quand même"
-move_tag = "Move"
+move_tag = "Déplacer"
 
 [rebase_banner]
 skip = "Passer"
@@ -6582,11 +6582,11 @@ hint_repo_auth = "Choisissez une autre façon de vous connecter pour ce dépôt 
 
 [failure_card]
 # context: title of the failure notification when a step of a user-defined sequence fails
-title_sequence = "Sequence stopped"
+title_sequence = "Séquence arrêtée"
 # context: reason line of the failure notification when a sequence stopped
-summary_sequence = "A step of the sequence did not succeed, so the sequence stopped there. Earlier steps are kept."
+summary_sequence = "Une étape de la séquence a échoué, la séquence s'est donc arrêtée là. Les étapes précédentes sont conservées."
 # context: next-step line of the failure notification when a sequence stopped
-hint_sequence = "Fix the cause, then run the sequence again; the steps that worked are not undone."
+hint_sequence = "Corrigez la cause, puis relancez la séquence ; les étapes qui ont réussi ne sont pas annulées."
 title_clone = "Échec du clonage"
 title_create = "Impossible de créer le dépôt"
 title_hosting = "Échec de la requête à l'hébergeur"
@@ -7589,9 +7589,9 @@ hint_open_diff = { git = "afficher le diff", local = "afficher la différence" }
 # context: footer hint after the Esc key
 hint_close = "fermer"
 # context: status line: the request that was under review is merged or closed; {caption} is like #12 Fix the thing
-resume_gone = "{caption} is no longer open: the review was not reopened"
+resume_gone = "{caption} n'est plus ouverte : la revue n'a pas été rouverte"
 # context: status line: the host did not answer when the review was reopened; {why} is the error
-resume_unreachable = "could not reopen {caption}: {why}"
+resume_unreachable = "impossible de rouvrir {caption} : {why}"
 # >>> local_issues (slice L1)
 [local_issues]
 field_status = "Statut"
@@ -9090,10 +9090,10 @@ res_filled = "Règles maintenant dans l'atelier : {n}."
 
 [sequence_ai]
 # context: Settings > AI, the page of the action that drafts or changes an action sequence from a description
-title = "Sequence drafts"
-profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
-repo_profile_help = "The profile used in this repository to draft action sequences."
-action = "Sequence draft"
+title = "Brouillons de séquence"
+profile_help = "Le profil que GitPoulpi utilisera pour rédiger une nouvelle séquence d'actions, ou une modification de l'une d'elles, à partir de votre description. Il ne fait que proposer : vous la relisez et l'enregistrez vous-même, et rien n'est jamais lancé."
+repo_profile_help = "Le profil utilisé dans ce dépôt pour rédiger des séquences d'actions."
+action = "Brouillon de séquence"
 # context: title of the dialog that creates a sequence from a description; the sparkle is added in code
 dlg_title_create = "Créer une séquence avec l'IA"
 # context: title of the dialog that changes the selected sequence from a description; the sparkle is added in code
@@ -9109,7 +9109,7 @@ dlg_example_edit = { git = "Par exemple : un fetch d'abord, et toujours demander
 # context: keys of the description field
 dlg_hint = "Entrée ajoute une ligne. Ctrl+Entrée envoie. Échap ferme."
 # context: checkbox, off by default
-dlg_context = "Envoyer le contexte (noms des remotes, profils d'IA, libellés « Ouvrir dans »)"
+dlg_context = "Envoyer le contexte (noms des distants, profils d'IA, libellés « Ouvrir dans »)"
 # context: under the unchecked box
 dlg_context_off = "Désactivé : seule votre description est envoyée."
 # context: reassurance under the description
@@ -9123,7 +9123,7 @@ dlg_need_text = "Décrivez d'abord ce que vous voulez."
 # context: another AI request is running
 dlg_busy = "Une autre requête d'IA est en cours."
 # context: shown when the AI is off
-dlg_off = "Activez d'abord l'IA dans les réglages."
+dlg_off = "Activez d'abord l'IA dans les Paramètres."
 # context: the window is too small for the dialog
 dlg_too_small = "Agrandissez la fenêtre pour utiliser cette boîte."
 # context: the answer came after the dialog was closed
@@ -9179,7 +9179,7 @@ accepted_create = "Séquence « {name} » ajoutée"
 # context: status line; {name} is the changed sequence
 accepted_edit = "Séquence « {name} » mise à jour"
 # context: question when Settings is closed with a proposal open
-close_body = "Une proposition de séquence de l'IA est ouverte. Fermer les réglages l'abandonne ; rien n'a été écrit."
+close_body = "Une proposition de séquence de l'IA est ouverte. Fermer les Paramètres l'abandonne ; rien n'a été écrit."
 # context: palette row; the sparkle is added in code
 palette_create = "Séquence : Créer avec l'IA..."
 
@@ -9233,15 +9233,15 @@ tip_both = { git = "Ici et sur {remotes}, sur le même {$commit}.", local = "Ici
 tip_differs = { git = "Ici et sur {remotes}, mais à des commits différents : un push serait refusé.", local = "Ici et sur {remotes}, mais à des validations différentes : un envoi serait refusé." }
 tip_fetch_note = { git = "Un fetch rapporte un tag supprimé seulement ici tant qu'un distant l'a encore. Un tag supprimé sur le distant ne quitte ce dépôt qu'avec « Élagage automatique des tags » (Paramètres).", local = "Une récupération rapporte une étiquette supprimée seulement ici tant qu'un distant l'a encore. Une étiquette supprimée sur le distant ne quitte ce dépôt qu'avec « Élagage automatique des étiquettes » (Paramètres)." }
 fetch_tag = { git = "{$Fetch} {name} depuis {remote}", local = "Récupérer {name} depuis {remote}" }
-tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
-take_remote = "Use {name} from {remote}"
-force_push_tag = "{$Push} {name} to {remote} (force)"
-confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
-msg_taking_remote = "Using the remote's version of {name}..."
-msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
-msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
-msg_not_differing = "{name} does not differ from a remote"
-why_not_differing = "This {$tag} does not differ from a remote"
+tip_differs_actions = "Depuis son menu : utiliser la version du distant ici, ou forcer le {$push_noun} de la vôtre (une confirmation est demandée)."
+take_remote = "Utiliser {name} de {remote}"
+force_push_tag = "{$Push} {name} vers {remote} (forcé)"
+confirm_force_push = { git = "Forcer le push du tag « {name} » vers {remote} ? Cela remplace le tag sur {remote} pour tous ceux qui l'utilisent. Refusé si {remote} a bougé depuis le dernier fetch. L'annulation remet l'ancien.", local = "Forcer l'envoi de l'étiquette « {name} » vers {remote} ? Cela remplace l'étiquette sur {remote} pour tous ceux qui l'utilisent. Refusé si {remote} a bougé depuis la dernière récupération. L'annulation remet l'ancienne." }
+msg_taking_remote = "Utilisation de la version distante de {name}..."
+msg_took_remote = "{name} est maintenant la version de {remote}. L'annulation remet la vôtre."
+msg_force_pushed = { git = "{name} poussé de force vers {remote}. L'annulation remet l'ancien.", local = "{name} envoyée de force vers {remote}. L'annulation remet l'ancienne." }
+msg_not_differing = "{name} ne diffère d'aucun distant"
+why_not_differing = { git = "Ce tag ne diffère d'aucun distant", local = "Cette étiquette ne diffère d'aucun distant" }
 delete_tag_scope = "Supprimer {name}..."
 delete_tag_on_remote = "Supprimer {name} sur {remote}..."
 dlg_title = { git = "Supprimer un tag", local = "Supprimer une étiquette" }
@@ -10614,9 +10614,9 @@ palette_toggle_internal = "Conversation : Basculer la note interne"
 why_unchanged = "rien n'a encore changé"
 flavor_plain_text = "Texte brut"
 # context: what was copied, named in the status line
-noun_text = "text"
+noun_text = "texte"
 # context: status line: nothing selected and no entry
-why_no_text = "there is no text to copy here"
+why_no_text = "il n'y a pas de texte à copier ici"
 # context: command palette entry: copies the dragged text, else the selected entry
 palette_copy_text = "Conversation : Copier le texte"
 
@@ -10673,68 +10673,68 @@ key_right = "Faire défiler le panneau vers la droite"
 pal_left = "Affichage : Faire défiler le panneau vers la gauche"
 pal_right = "Affichage : Faire défiler le panneau vers la droite"
 nothing = "Rien à faire défiler latéralement ici"
-help = "Faire défiler le panneau latéralement (aussi Maj + molette, molette horizontale ou la barre de son bord inférieur)"
+help = "Faire défiler le panneau latéralement (aussi Shift+molette, molette horizontale ou la barre de son bord inférieur)"
 help_details = "Faire défiler les détails du {$commit} latéralement (lignes id, auteur, date et totaux)"
 
 [sequence_run]
 # context: the label of the run in the Jobs panel: sequence name, step number, step count, step name
-job_label = "Sequence {name} {k}/{n}: {step}"
+job_label = "Séquence {name} {k}/{n} : {step}"
 # context: run strip text: sequence name, step k of n, step name
 strip_running = "{name} {k}/{n} \u00b7 {step}"
 # context: run strip while a step waits to be started
-strip_next = "{name} {k}/{n} \u00b7 Next: {step}"
+strip_next = "{name} {k}/{n} · Suite : {step}"
 # context: run strip after the AI wrote the commit message
-strip_review = "{name} {k}/{n} \u00b7 Review the message, then Continue"
+strip_review = "{name} {k}/{n} · Relisez le message, puis Continuer"
 # context: run strip when the commit has no message yet
-strip_commit_message = "{name} {k}/{n} \u00b7 Write the message, then {$commit} or Continue"
+strip_commit_message = { git = "{name} {k}/{n} · Écrivez le message, puis faites le commit ou Continuer", local = "{name} {k}/{n} · Écrivez le message, puis validez ou Continuer" }
 # context: run strip while a dialog of the step is open
-strip_dialog = "{name} {k}/{n} \u00b7 Answer the dialog"
+strip_dialog = "{name} {k}/{n} · Répondez à la boîte de dialogue"
 # context: run strip when the push was rejected and its dialog is open
-strip_push_rejected = "{name} {k}/{n} \u00b7 {$Push} rejected: choose in the dialog"
+strip_push_rejected = "{name} {k}/{n} · {$Push_noun} refusé : choisissez dans la boîte de dialogue"
 # context: run strip while a dialog of the action waits for the person
-strip_user = "{name} {k}/{n} \u00b7 Choose in the dialog"
+strip_user = "{name} {k}/{n} · Choisissez dans la boîte de dialogue"
 # context: run strip when the window on screen is not the tab the step acts on; {tab} is a folder
-strip_waiting_tab = "{name} {k}/{n} \u00b7 waiting for tab {tab}"
+strip_waiting_tab = "{name} {k}/{n} · en attente de l'onglet {tab}"
 # context: run strip when a step failed
-strip_failed = "{name} stopped at step {k}/{n} ({step}): {error}"
+strip_failed = "{name} arrêtée à l'étape {k}/{n} ({step}) : {error}"
 # context: button of the run strip
-button_continue = "Continue"
+button_continue = "Continuer"
 # context: button of the run strip that switches to the tab the step acts on
-button_go_there = "Go there"
+button_go_there = "Y aller"
 # context: button of the run strip that shows the failure
-button_details = "Details"
+button_details = "Détails"
 # context: status line after a sequence was canceled
-say_canceled = "{name} canceled after step {k}/{n} ({step}); earlier steps are kept"
+say_canceled = "{name} annulée après l'étape {k}/{n} ({step}) ; les étapes précédentes sont conservées"
 # context: status line when the step in flight cannot be stopped
-say_stopping = "Stopping after this step"
+say_stopping = "Arrêt après cette étape"
 # context: status line when a step failed
-say_stopped = "Sequence {name} stopped at step {k}/{n} ({step}): {error}"
+say_stopped = "Séquence {name} arrêtée à l'étape {k}/{n} ({step}) : {error}"
 # context: status line when every step ran
-say_finished = "{name} finished"
+say_finished = "{name} terminée"
 # context: status line when a second sequence is started
-say_running = "{name} is running (step {k}/{n})"
+say_running = "{name} est en cours (étape {k}/{n})"
 # context: Activity Log entry for a failed step; {options} lists the step options
-log_failure = "Sequence {name}, step {k}/{n} {step} (options: {options}) failed: {error}"
+log_failure = "La séquence {name} a échoué à l'étape {k}/{n} {step} (options : {options}) : {error}"
 # context: Activity Log entry for a run cut short by quitting
-log_interrupted = "Sequence {name} was interrupted at step {k}/{n} ({step}) when GitPoulpi closed"
+log_interrupted = "La séquence {name} a été interrompue à l'étape {k}/{n} ({step}) à la fermeture de GitPoulpi"
 # context: why a run was canceled; {tab} is a folder
-reason_tab_closed = "the tab {tab} was closed"
+reason_tab_closed = "l'onglet {tab} a été fermé"
 # context: why a run failed; {tab} is a folder
-reason_tab_never = "the tab {tab} did not open"
+reason_tab_never = "l'onglet {tab} ne s'est pas ouvert"
 # context: why a run was canceled
-reason_dialog_closed = "the dialog was closed"
+reason_dialog_closed = "la boîte de dialogue a été fermée"
 # context: a step cannot run now; {step} is its name, {reason} the palette's reason
-step_unavailable = "{step} is not available: {reason}"
+step_unavailable = "{step} n'est pas disponible : {reason}"
 # context: a step names a command this build does not have
-step_unknown = "{step} is not a command of this build"
+step_unknown = "{step} n'est pas une commande de cette version"
 # context: a step with pause never lacks an option; {option} is its name
-step_needs_option = "{step} needs the option {option}"
+step_needs_option = "{step} a besoin de l'option {option}"
 # context: a step could not start
-step_failed_start = "{step} did not start"
+step_failed_start = "{step} n'a pas démarré"
 # context: the sequence was removed or changed before it started
-def_gone = "the sequence {name} no longer exists"
+def_gone = "la séquence {name} n'existe plus"
 # context: shorter run strip text when a step failed (the error text does not fit)
-strip_stopped = "{name} stopped at step {k}/{n} ({step})"
+strip_stopped = "{name} arrêtée à l'étape {k}/{n} ({step})"
 repo_notice = { one = "Ce dépôt définit {n} séquence", other = "Ce dépôt définit {n} séquences" }
 repo_notice_changed = { one = "La séquence de ce dépôt a changé", other = "Les {n} séquences de ce dépôt ont changé" }
 repo_button_review = "Examiner"
@@ -10816,7 +10816,7 @@ opt_branch = "Branche"
 opt_open_tab = "Ouvrir dans un nouvel onglet"
 opt_label = "Entrée Ouvrir dans"
 opt_profile = "Profil IA"
-opt_remote = "Remote"
+opt_remote = "Distant"
 opt_template_help = "Variables : ${{branch}} ${{date}} ${{time}} ${{n}}"
 opt_required_help = "Nécessaire quand la pause est Jamais."
 opt_unset = "(non défini)"

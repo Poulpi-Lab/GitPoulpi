@@ -142,6 +142,7 @@ d'auteurs à Gravatar, et interroge votre compte GitHub/GitLab connecté)
 | `ui.diff_hunks_only` | `true` | `false` montre tout le fichier avec les modifications en place (`H`). |
 | `ui.diff_show_whitespace` | `true` | Montrer les modifications d'espaces seuls (`s`). |
 | `ui.diff_word_wrap` | `false` | Replie les longues lignes du diff (`w` ; Paramètres > Diff et éditeur). |
+| `ui.diff_intraline` | `true` | Peint les mots modifiés d'une ligne modifiée avec un fond plus marqué (palette *Diff : Basculer la mise en évidence des mots modifiés* ; Paramètres > Diff et éditeur). |
 | `ui.minimap` | `false` | Une minimap à côté de la barre de défilement du diff et de l'éditeur (`M`). |
 | `ui.mermaid_detail` | `refs` | Détail du Copier en gitGraph Mermaid du Log : `structure`, `refs`, `subjects`, `full` (mémorisé depuis la fenêtre ; la valeur par défaut de `log --format mermaid`). |
 | `ui.mermaid_orientation` | `lr` | Direction de ce graphe : `lr` (de gauche à droite) ou `tb` (de haut en bas). |
@@ -398,7 +399,7 @@ la CLI est votre propre shell et n'est pas contrôlée par eux. Voir
 | `ai.enabled` | `false` | L'interrupteur. Désactivé, rien d'IA ne s'affiche nulle part et rien n'est envoyé. |
 | `ai.default_profile` | `"default"` | Identifiant du profil que les actions utilisent quand elles n'en nomment aucun. |
 | `ai.global_instructions` | `""` | Texte ajouté au prompt de chaque action. Peut utiliser `${repo}`, `${uilang}`, ... (voir [IA > Variables de prompt](ai.md#variables-de-prompt)) ; idem pour les instructions par action et du dépôt. |
-| `ai.actions.<action>.profile` | `""` | Profil pour une action ; vide = le défaut. Actions : `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`. Un espace de travail (`workspaces.toml`, `[workspace.ai_instructions]` et `[workspace.ai_overrides.<action>]`) et un dépôt peuvent ajouter à ces instructions ou les remplacer : voir [IA](ai.md#instructions). |
+| `ai.actions.<action>.profile` | `""` | Profil pour une action ; vide = le défaut. Actions : `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `sequence_draft`. Un espace de travail (`workspaces.toml`, `[workspace.ai_instructions]` et `[workspace.ai_overrides.<action>]`) et un dépôt peuvent ajouter à ces instructions ou les remplacer : voir [IA](ai.md#instructions). |
 | `ai.actions.<action>.instructions` | `""` | Texte ajouté pour cette action seulement. |
 | `ai.review.run_in_repository` | `"profile"` | `profile`, `yes` ou `no` : si l'agent local d'un brouillon de revue de code travaille dans le dépôt pour cette exécution, en passant outre le `workdir` du profil IA. Un dépôt peut avoir le sien (`gitpoulpi ai review-context --repo`). Voir [IA > Contexte de la revue](ai.md#contexte-de-la-revue). |
 | `ai.review.include_claude_md` | `true` | Donne à un brouillon de revue de code le `CLAUDE.md` du dépôt (à la racine, lu sur la branche visée par la demande ; coupé à 8 Ko). |
@@ -422,7 +423,7 @@ la CLI est votre propre shell et n'est pas contrôlée par eux. Voir
 | `ai.hosting_reply.read_repository` | `false` | Si « Laisser l'IA lire le dépôt » démarre coché. Désactivé par défaut : le dépôt n'est lu que si vous le cochez pour cet usage. Un agent local ou un profil API le lit alors comme le décrit [le chapitre IA](ai.md#accès-au-dépôt). |
 | `ai.hosting_reply.reuse_agent_session` | `true` | Garder la session d'un agent local entre deux réponses quand son harnais le permet. Prend effet dès que l'IA peut lire le dépôt. |
 | `ai.hosting_reply.context_ttl_minutes` | `30` | Durée de réutilisation d'un contexte de dépôt construit pour une réponse. Borné entre 1 et 1440. Prend effet dès que l'IA peut lire le dépôt. |
-| `ai.sent_preview.<action>` | `true` | Une clé par action (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`) : affiche « Ce qui est envoyé » avant le départ de la requête. « Ne plus afficher pour ... » de la boîte écrit `false` ; Paramètres > IA > *Afficher ce qui est envoyé avant...* les réactive. `rewrite_script` et `rewrite_rules` sont acceptées mais sans effet : les boîtes de réécriture d'historique montrent toujours leur propre volet. `worktree_name` est acceptée mais sans effet non plus : elle n'envoie que ce que vous avez tapé dans la boîte Créer un worktree et les noms des branches locales. |
+| `ai.sent_preview.<action>` | `true` | Une clé par action (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`, `sequence_draft`) : affiche « Ce qui est envoyé » avant le départ de la requête. « Ne plus afficher pour ... » de la boîte écrit `false` ; Paramètres > IA > *Afficher ce qui est envoyé avant...* les réactive. `rewrite_script` et `rewrite_rules` sont acceptées mais sans effet : les boîtes de réécriture d'historique montrent toujours leur propre volet. `worktree_name` est acceptée mais sans effet non plus : elle n'envoie que ce que vous avez tapé dans la boîte Créer un worktree et les noms des branches locales. |
 
 La table `[preferences.ai_review]` propre à un dépôt (dans son `repo-state.toml`, ou l'entrée d'un dépôt non cloné dans
 `remote-reviews.toml`) accepte les mêmes clés, toutes facultatives, plus `no_extra_file = true` : aucun fichier
@@ -554,6 +555,49 @@ Plusieurs installations peuvent partager un même `config.toml` (un paquet, un d
 | `installation.primary` | absente | L'identifiant de l'installation principale. Absente : aucune. |
 | `installation.settings.<id>` | aucune | Une table par installation : `path` (son dossier, rafraîchi quand il est déplacé), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informatif), `name` (le nom du lanceur, `GitPoulpi (<label>)`, figé au premier lancement), `name_with_version` (désactivé : ajoute `<majeure>.<mineure>` au nom), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (vide : l'entrée du menu de dossier est à la racine), `env` (vide : son propre identifiant ; les installations qui partagent un nom partagent démons, sessions et historique d'annulation), `mcp_bind` (vide : `mcp.bind`). Une valeur vide se replie sur `ui.*` pour l'installation principale, sinon sur le défaut de son type (un dépôt de développement porte `sun`). |
 
+## `[[sequences]]`
+
+Séquences d'actions nommées : une liste de commandes de la palette exécutées l'une après l'autre
+(par exemple Backup : stage de tout, message écrit par l'IA, commit,
+push). Une table par séquence, ses étapes sous forme de `[[sequences.steps]]`.
+
+```toml
+[[sequences]]
+id = "backup"                    # le slug : sa clé dans [keybindings.sequence] et son nom en ligne de commande
+name = "Backup"                  # votre texte, jamais traduit
+description = "Stage, commit with an AI message, push"   # facultatif
+scope = "installation"           # installation (défaut) | machine | repo
+owner = "3f9a0c1d2b4e5f60"       # l'id de l'installation ; défini avec scope = "installation"
+
+[[sequences.steps]]
+run = "stage_all"                # un id de commande de la palette
+
+[[sequences.steps]]
+run = "ai_generate_commit_message"
+pause = "always"                 # default | always | never
+
+[[sequences.steps]]
+run = "create_worktree_from_current_branch"
+pause = "never"
+[sequences.steps.options]
+name = "wip-${date}-${n}"        # un modèle : ${branch} ${date} (aaaa-mm-jj) ${time} (hh-mm) ${n} (premier numéro libre)
+open_tab = true
+```
+
+| Clé | Signification |
+|---|---|
+| `scope` | `installation` : seule l'installation dont l'id est `owner` la voit. `machine` : toutes les installations qui partagent ce `config.toml`. `repo` : stockée dans le dépôt, dans `.gitpoulpi/sequences.toml` (même forme `[[sequences]]`), visible là seulement, et seulement après que vous avez approuvé ce fichier, car un fichier versionné contient les commandes de quelqu'un d'autre. |
+| `steps[].run` | Un id de commande de la palette, le nom en snake_case affiché dans `[keybindings.palette]`. Seule une liste autorisée fixe est acceptée : stage, commit, stash push, nouvelle branche / nouveau tag, fetch, pull, push (et les variantes push vers toutes les cibles, pull de tout, push des tags), les commandes de message IA et de compositeur de commits, la création de worktree, l'ouverture d'un onglet ou d'un terminal, et le force push avec bail. Les commandes destructrices (abandon, reset, suppressions, retrait de worktree, stash drop, réécriture d'historique, quitter, Paramètres) et les autres séquences ne peuvent pas être des étapes. Une étape que cette version ne connaît pas est conservée dans le fichier et signalée. |
+| `steps[].pause` | `default` : l'étape s'arrête sur sa boîte de dialogue habituelle quand elle a besoin d'une réponse. `always` : s'arrêter avant elle et demander de continuer. `never` : ne jamais s'arrêter ; l'étape a alors besoin des options que sa boîte de dialogue aurait demandées (un `name` pour une nouvelle branche ou un nouveau worktree). Le force push avec bail ne peut pas être `never`. |
+| `steps[].options` | Réponses par étape : `name` (nouvelle branche, nouveau tag, nouveau worktree), `branch` (worktree depuis une branche choisie), `open_tab` (ouvrir le nouveau worktree dans un onglet), `message` (commit), `label` (entrée Ouvrir dans), `profile` (profil d'agent). |
+| au plus 32 étapes | Une séquence a entre 1 et 32 étapes. |
+
+Les clés inconnues d'une séquence ou d'une étape sont conservées quand GitPoulpi réécrit le
+fichier. Les ids en double parmi les séquences que vous voyez sont signalés. Liez-en une avec
+`[keybindings.sequence] <id> = "<enchaînement>"`, par exemple
+`backup = "Ctrl+G b"`.
+
+
 ## `[keybindings]`
 
 Réaffecte les raccourcis de la TUI ; Paramètres > Clavier et souris la modifie.
@@ -574,6 +618,7 @@ de cette action, supprimer la ligne les restaure. Enchaînements : `Ctrl+Shift+
 `F2`, `PageDown`, `Space`, `,`, `P` (= `Shift+p`). Une mauvaise entrée ne bloque jamais
 rien : la TUI l'ignore, garde le défaut et le dit sur la ligne d'état. Contextes,
 identifiants d'actions, défauts et règles de conflit : [Raccourcis clavier](keybindings.md).
+`[keybindings.sequence]` lie vos [`[[sequences]]`](#sequences) par id.
 
 ## Paramètres par dépôt : `.gitpoulpi/repo-state.toml`
 

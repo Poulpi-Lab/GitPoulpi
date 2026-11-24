@@ -112,6 +112,7 @@ chaque conflit sur ses barres de défilement. Cliquez sur une marque pour y alle
 - **Glissez la bordure entre deux en-têtes du Log** (par défaut l'espace, depuis l'en-tête ou n'importe où le long du tableau ; Paramètres > Journal et graphe > Redimensionnement des colonnes) pour redimensionner une colonne (au clavier : `Shift+C` pour choisir une colonne, puis `]` / `[`).
 - **Double-cliquez la bordure entre deux en-têtes du Log** pour ajuster la colonne à sa gauche à son contenu (au clavier : `Shift+C` pour choisir une colonne, puis `=` ; `+` ajuste toutes les colonnes). La dernière colonne a une poignée sur sa propre dernière cellule : glissez-la pour la redimensionner, la colonne Message absorbant la différence.
 - **Faites défiler le Log latéralement** (la disposition de colonnes `scroll` ; Paramètres > Journal et graphe > Disposition des colonnes, ou la case `Défilement latéral` du sélecteur) : la molette horizontale ou `Shift`+molette sur le tableau, la barre de la bordure inférieure (glissez son curseur, appuyez sur la piste vide, cliquez ses flèches d'extrémité), ou `Shift+Left` / `Shift+Right`. Dans la disposition `fit` par défaut, les colonnes remplissent le volet et il n'y a rien à faire défiler.
+- **Faites défiler un volet de liste latéralement** quand une ligne est plus large que le volet : une section Refs (un long nom de branche, de tag ou de stash), les listes Unstaged et Staged, les fichiers modifiés du commit (ou d'une comparaison) et les lignes d'information des détails du commit (id, auteur, date de création, totaux). La molette horizontale ou `Shift` + molette au-dessus du volet le fait défiler ; une barre apparaît sur la bordure inférieure du volet seulement tant que quelque chose dépasse (glissez sa poignée, appuyez sur la piste nue, cliquez sur ses flèches d'extrémité), elle ne prend donc jamais une ligne. Au clavier, `Alt+Left` / `Alt+Right` font défiler le volet qui a le focus (le Log fait défiler les détails du commit ; dans les fichiers modifiés, les fichiers) ; la palette a *Affichage : Faire défiler le panneau vers la gauche/droite*. La ligne entière défile (indentation, marqueur d'état, chevron et nom ensemble) ; le titre du volet, sa bordure, les barres de défilement et le bouton Stage/Unstage d'une ligne Status survolée restent en place. Un nom n'est plus coupé par une ellipse : sa fin est à un défilement de distance (une branche avec des cibles de push supplémentaires garde plutôt son badge `⇉` en vue, c'est donc son nom qui cède). Le décalage est propre à chaque volet, s'arrête à la ligne la plus large visible et est oublié quand vous changez de dépôt. Le bloc du message de commit renvoie son texte à la ligne, il n'a donc rien à faire défiler. Tant qu'une section défile latéralement, sa bordure inférieure porte la barre : redimensionnez cette section par ses commandes clavier ou depuis une section qui tient en entier.
 - **Glissez un en-tête du Log** pour déplacer la colonne : un fantôme de son nom suit le pointeur, l'en-tête quitté est estompé et une barre d'accent marque l'emplacement où elle atterrirait. Les colonnes bougent au relâchement ; `Échap` annule, et le pointeur montre la main ouverte pendant que vous la portez (au clavier : `Shift+C` pour choisir une colonne, puis `<` / `>`).
 
 GitPoulpi mémorise chaque taille. Voir
@@ -226,6 +227,7 @@ Voir [Hébergeurs et suivi de tickets](hosting-integration.md).
   ref du commit.
 - **Clic droit sur une pastille de ref** pour un menu avec les actions de la ref et
   celles du commit.
+- **Cliquez sur l'entonnoir de l'en-tête Auteur** (ou `Shift+A` dans le Log, ou *Journal : Filtrer par auteur...* dans la palette) pour choisir les auteurs dont les commits restent éclairés ; les autres sont estompés comme avec une recherche. `Enter` ou un clic sur une ligne coche un auteur, la ligne **Effacer le filtre** (✕) l'abandonne, `Esc` ferme la fenêtre et le garde. **Clic droit sur l'entonnoir allumé** pour l'effacer (palette : *Journal : Effacer le filtre d'auteur*).
 - **Clic droit sur l'en-tête** pour afficher ou masquer des colonnes : une liste de cases (`[x]` / `[ ]`) avec un ✕ dans son titre ; cliquez sur une ligne ou utilisez les flèches et `Space` / `Enter`, puis fermez avec le ✕, `Échap` ou un clic ailleurs (la palette : `Affichage : Log : Choisir les colonnes à afficher`). Sous les cases : `Ajuster <colonne> à son contenu` (la colonne cliquée), `Ajuster toutes les colonnes à leur contenu` et `Réinitialiser les largeurs des colonnes`. L'équivalent clavier du clic droit : `Shift+C` pour choisir une colonne, puis `.` (ou `Shift+F10`) ouvre le même menu sur elle.
 - **Les colonnes du Radar** fonctionnent de la même façon : glissez le séparateur après la colonne du dépôt, `#`, de l'auteur ou de l'âge pour la dimensionner, **double-cliquez dessus** pour ajuster la colonne à son entrée la plus large (`C` choisit une colonne, puis `=` ; `+` ajuste toutes les colonnes), et **clic droit sur le titre d'une colonne** (ou `C`, puis `.`) pour `Ajuster <colonne> à son contenu` et `Ajuster toutes les colonnes à leur contenu`.
 - **Cliquez sur `↑`, `↓` ou `✕`** dans la barre de recherche pour aller à la
@@ -255,20 +257,35 @@ La dernière section visible ne peut pas être décochée. Le choix est propre �
 
 ### Glisser des refs
 
-Appuyez sur une branche dans le panneau Refs, ou sur une pastille de ref dans le Log,
-et glissez-la sur une autre branche. La ligne d'état dit ce que vous portez. Une cible
-qui peut recevoir le dépôt s'allume. Relâchez pour obtenir un menu. `Esc` annule le
-glissement.
+Appuyez sur une branche, une branche distante ou un tag dans le panneau Refs, ou sur une
+pastille de ref dans le Log, et glissez-la sur une autre ref. La ligne d'état dit ce que
+vous portez. Une cible qui peut recevoir le dépôt s'allume. Relâchez pour obtenir un menu.
+`Esc` annule le glissement. Le Log reste en place pendant que vous portez : appuyer sur une
+ref ne fait défiler le Log jusqu'à son commit que lorsque c'était un clic (le saut a lieu
+quand le bouton remonte), vous pouvez donc d'abord défiler jusqu'à la cible puis saisir la ref.
 
 | Glissement | Menu |
 |---|---|
 | Branche locale X sur la branche locale Y | **Merge X dans Y**, **Rebase X sur Y**, **Rebase interactif X sur Y...**, **Fast-forward Y vers X** |
 | Branche locale sur une branche distante | **Push X** vers ce distant |
 | Branche distante sur la branche locale Y | **Merge**, **Rebase Y sur elle**, **Fast-forward Y vers elle**, et **Pull** quand c'est l'amont de Y |
+| Tag T sur n'importe quelle branche, branche distante ou tag | **Déplacer le tag T ici** ; marqué *(pas un fast-forward : T ne serait plus un ancêtre)* quand la cible ne descend pas du commit du tag (à vous de choisir) ; grisé *déjà là* quand il est déjà sur ce commit |
+| Tag T sur la branche locale Y | aussi **Merge du tag T dans Y** et, sous un trait, le plus rare **Merge de Y dans le tag T et déplacer le tag** (un commit de merge du commit du tag et de Y, en HEAD détaché, puis le tag se déplace dessus) |
 
 Quand l'action change une branche qui n'est pas extraite, GitPoulpi l'extrait
-d'abord. Si git refuse le checkout, rien ne change. Les tags ne peuvent être ni
-glissés ni recevoir un dépôt.
+d'abord. Si git refuse le checkout, rien ne change. Seuls les tags peuvent être
+déposés sur un tag, et une branche ne peut pas l'être.
+
+Déplacer un tag garde son type : un tag léger reste léger, un tag annoté est recréé annoté
+avec son message et sa ligne d'auteur repris tels quels (un tag signé est refusé, sa
+signature ne correspondrait plus). Seul votre tag local bouge : un distant qui a le tag
+garde l'ancienne position, le tag passe à *differs* et la ligne d'état le dit ; poussez-le
+vous-même quand vous le voulez. Le déplacement et le merge suivi du déplacement sont chacun
+une étape d'annulation (l'annulation remet l'ancien objet tag). Un merge dans un tag qui
+entre en conflit ne change rien. Palette : *Refs : Déplacer le tag sélectionné vers le commit
+sélectionné...* déplace le tag du volet Refs vers le commit sélectionné dans le Log (elle
+demande d'abord quand ce n'est pas un fast-forward) ; toute autre cible passe par marquer
+puis déposer ci-dessous.
 
 Clavier : « marquer puis déposer » fait ce que fait un glissement, pour n'importe quelle paire de
 refs. Dans le volet Refs, appuyez sur `m` sur une branche (palette : `Refs : Marquer comme source de dépôt`).
@@ -466,7 +483,7 @@ Terminal, xterm), le pointeur ne change pas ; voir
 [Choisir un terminal](terminals.md#forme-du-pointeur-de-la-souris-osc-22). Le séparateur
 ou le bouton sous le pointeur s'allume dans tous les terminaux.
 
-Le même type de composant donne le même pointeur partout dans l'application.
+Le même type de composant donne le même pointeur partout dans l'application : les boutons d'une revue affichée au-dessus du Radar (onglets, croix de fermeture, boutons des fenêtres contextuelles) et les boutons Actions propres au Radar affichent la main comme tout autre bouton.
 
 - **Les boutons sont de vrais boutons**, dans les Paramètres (Intégrations : Modifier,
   Déconnecter, Supprimer, Parcourir, Effacer, les boutons de modèles de l'éditeur
@@ -484,7 +501,7 @@ Le même type de composant donne le même pointeur partout dans l'application.
 - **La flèche** est sur les lignes. Une ligne s'éclaire en entier quand le pointeur est
   dessus (la même lumière dans toutes les listes) et n'est pas un contrôle en elle-même :
   les lignes des volets Refs, Worktrees, Stashes et Submodules, le Log et la colonne des
-  commits (seule une pastille de ref prend la main), les lignes d'un diff, les fichiers
+  commits (seule une pastille de ref prend la main), les gouttières d'un diff, les fichiers
   modifiés, les éléments de pull request, de ticket et du Radar, et les lignes des listes
   des fenêtres et des panneaux (cloner, sélecteur de dossiers, Workspaces, cartes du
   tableau, panneau des tâches, sélecteurs d'assigné, d'étiquette et de jalon, étapes de
@@ -495,9 +512,21 @@ Le même type de composant donne le même pointeur partout dans l'application.
   les lignes de texte, de nombre et de zone des Paramètres (aussi pendant que vous les
   modifiez), les champs des fenêtres, les zones de commentaire de revue, le compositeur
   de commits, le texte de l'éditeur de fichier et le résultat modifiable de l'éditeur de
-  merge (ses volets en lecture seule gardent la flèche). Dans les détails du commit, le
-  message et la description sont modifiables : l'I-beam s'y affiche et tout le bloc
-  s'éclaire légèrement.
+  merge (ses volets en lecture seule gardent la flèche, puisqu'un glissement n'y
+  sélectionne rien). Une seule règle couvre aussi le texte en lecture seule : partout où un
+  glissement de la souris peut sélectionner du texte, le pointeur est l'I-beam. C'est le code
+  d'un diff (la vue Diff, Inline et Split, et le volet de diff de la revue), le code de la vue
+  Fichier et du Blame. Leurs numéros de ligne, marqueurs et en-têtes de hunk gardent la
+  flèche, et un bouton sur une ligne garde la main. Il en va de même pour la conversation
+  d'un ticket ou d'une demande (aussi l'Aperçu de la revue et son bloc de brouillon), le
+  message des détails du commit, les notes de version, le Journal d'activité (les deux
+  onglets), la fenêtre d'aide, l'aperçu Markdown de l'éditeur de commentaire et les
+  commentaires, notes en attente et suggestions dans le diff de la revue : un glissement
+  sélectionne le texte (un simple clic garde son sens : un lien s'ouvre, un bouton agit, une
+  entrée du Journal d'activité ou un fil s'ouvre ou se replie), `Ctrl+C` le copie, `Esc` ou
+  un clic l'abandonne. Une sélection suit son texte quand vous défilez. Le message de
+  commit est aussi modifiable (un double-clic l'amende), et tout le bloc s'éclaire
+  légèrement.
 - **Dans les détails du commit**, les lignes d'information sont des contrôles : cliquez
   sur `commit: <id>` pour copier l'id court, double-cliquez sur la ligne de l'auteur ou de
   la date pour la modifier (la main et une légère marque les signalent). La ligne de

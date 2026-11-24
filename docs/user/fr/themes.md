@@ -205,7 +205,18 @@ Chaque thème apporte ses propres couleurs de voies pour le graphe du Log, mais 
 pouvez combiner n'importe quel thème avec n'importe quelle palette : **Paramètres > Apparence >
 Thème de couleurs du graphe** propose **Suivre le thème** (le défaut) plus chaque
 palette de voies de chaque thème (GitPoulpi Dark, GitPoulpi Light, puis Material,
-Serie, ... et le `graph_palette` de vos propres fichiers de thème). ![La liste Thème de couleurs du graphe dans Apparence : Suivre le thème, puis chaque palette de voies avec quelques-unes de ses couleurs](../images/settings-log-graph-lanes.png)
+Serie, ... et le `graph_palette` de vos propres fichiers de thème, listés après les préréglages sous
+le nom du thème). Un thème personnalisé apparaît à la prochaine ouverture de la liste (les
+fichiers sont alors relus), et en choisir un enregistre son nom de fichier dans
+`ui.graph_color_theme` (pour l'installation principale dans `[ui]`, pour les
+autres dans leur propre entrée `[installation.settings.<id>]`, comme le thème). Un
+fichier de thème sans `graph_palette` a les couleurs de voies de sa `base` (le
+préréglage par défaut quand il n'en nomme aucune), le même héritage que toutes les autres couleurs
+du fichier. Un thème personnalisé nommé comme une palette de voies intégrée (par exemple
+`gruvbox`) remplace cette palette dans la liste. Si le nom configuré n'existe
+plus (le fichier a été supprimé ou renommé), le graphe utilise les couleurs de voies du
+thème actif, et les Paramètres montrent le nom marqué *introuvable* jusqu'à ce que vous
+en choisissiez un autre. ![La liste Thème de couleurs du graphe dans Apparence : Suivre le thème, puis chaque palette de voies avec quelques-unes de ses couleurs](../images/settings-log-graph-lanes.png)
 
 Dans `config.toml` :
 
@@ -255,6 +266,18 @@ statusbar_fg = "#eceff4"
 [diff]
 add_bg = "#2f3b2f"
 ```
+
+### Mots modifiés dans un diff (`diff.add_emph_bg`, `diff.del_emph_bg`)
+
+Les fonds plus marqués que la vue Diff peint sur les mots qui diffèrent à l'intérieur
+d'une ligne modifiée, par-dessus `diff.add_bg` (lignes ajoutées) et `diff.del_bg` (lignes
+supprimées) ; le texte garde `diff.add_fg` et `diff.del_fg`. Chaque préréglage définit les deux.
+Un fichier de thème qui définit `diff.add_bg` ou `diff.del_bg` mais pas l'accentuation
+correspondante en reçoit une dérivée (à 30 % du chemin vers la couleur de texte de ce
+côté), si bien qu'un fond personnalisé ne se retrouve jamais avec l'accentuation du thème
+de base. Une valeur `default` (le préréglage Terminal), ou un terminal dont la profondeur de
+couleur dessinerait les deux fonds à l'identique, marque plutôt les mots en gras et
+soulignés. Voir [Mots modifiés dans un diff](interface-tour.md#mots-modifiés-dans-un-diff).
 
 Les couleurs sont `"#rrggbb"`, `"ansi:N"` (l'entrée N de la palette du terminal) ou
 `"default"` (la couleur propre du terminal). Les groupes et les clés sont ceux de
@@ -316,6 +339,8 @@ un vieux multiplexeur. Le préréglage Terminal n'a besoin de rien de tout cela.
 truecolor ne coûte rien ; la passe de conversion ne parcourt l'écran qu'une fois par
 image et seulement quand elle est active.
 
+Le thème est propre à chaque installation : plusieurs installations de GitPoulpi qui partagent une même configuration gardent chacune le leur, donc en choisir un dans une installation ne recolore jamais les autres.
+
 ## Aperçu en direct
 
 Dans Paramètres > Apparence, la liste Thème contient **Système (suit le terminal)**, les
@@ -336,13 +361,16 @@ aussitôt, **Enter** l'applique et enregistre `ui.theme` dans `config.toml`, **E
 clic hors de la liste) remet le thème précédent et n'enregistre rien.
 
 Sous le champ de filtre, un préfiltre segmenté restreint la liste : **Tous**,
-**Sombres**, **Clairs** et **Colorés** (cliquez sur un segment, `Tab` / `Shift+Tab`, ou
-`Alt+1`..`Alt+4`). Sombre et Clair viennent de la luminosité du `ui.bg` du thème ;
+**Sombres**, **Clairs** et **Colorés**, plus **Personnalisés** quand vous avez vos propres fichiers de thème
+(cliquez sur un segment, `Tab` / `Shift+Tab`, ou `Alt+1`..`Alt+5`). Sombre et Clair viennent de la luminosité du `ui.bg` du thème ;
 **Colorés** garde les thèmes dont le fond est nettement teinté (bleu, violet, jaune,
 vert...) et exclut les gris blancs, blanc cassé, noirs et presque noirs, si bien que
 Solarized Dark, Dracula ou Nord sont colorés alors que GitHub Dark et One Light ne le sont
 pas. Un thème coloré apparaît aussi sous Sombre ou Clair. **Système** et les thèmes
-transparents (sans fond propre) n'apparaissent que sous Tous. Le préfiltre se combine avec
+transparents (sans fond propre) n'apparaissent que sous Tous. **Personnalisés** ne garde que les
+fichiers de thème de votre dossier `themes/` (un thème personnalisé reste Sombre, Clair ou Coloré
+pour ces boutons) ; le bouton n'est pas dessiné et n'est pas atteignable au clavier tant que ce
+dossier ne contient aucun thème. Le préfiltre se combine avec
 ce que vous tapez. Les sélecteurs du thème de couleurs du graphe et de la langue
 prévisualisent de la même façon : les voies du Log et toute l'interface changent pendant
 que la surbrillance se déplace.

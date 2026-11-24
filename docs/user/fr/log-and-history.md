@@ -99,6 +99,30 @@ l'historique et écrit les lignes de `.mailmap` à votre place, voir
   nom et l'e-mail de l'auteur, le hash et les noms de refs. Elle estompe ce qui
   ne correspond pas et garde la forme du graphe. `Enter` / `Shift+Enter` sautent à
   la correspondance suivante / précédente.
+- **Filtre d'auteur** (l'entonnoir dans l'en-tête **Auteur**, `Shift+A` dans le Log,
+  ou *Journal : Filtrer par auteur...* dans la palette) : préfiltre le Log selon
+  l'auteur des commits. Une fenêtre contextuelle s'accroche sous l'en-tête avec un
+  champ de recherche, une ligne **Effacer le filtre** (✕) et une ligne par auteur de
+  l'historique chargé : un badge d'initiales (l'avatar, quand `ui.avatars` n'est pas
+  désactivé), le nom puis l'e-mail en sourdine, les plus gros contributeurs d'abord
+  puis par nom. Taper restreint la liste avec la correspondance floue de la
+  palette ; `Enter` ou un clic coche l'auteur en surbrillance (une coche ; choisissez-en
+  autant que vous voulez), `Esc` ou un clic à côté ferme la fenêtre et garde le
+  filtre. Le filtre se comporte exactement comme la recherche : les commits des
+  auteurs choisis restent éclairés, toutes les autres lignes sont estompées
+  et le graphe garde sa forme, rien n'est retiré ni rechargé. Avec la barre de
+  recherche ouverte aussi, les deux s'appliquent (un commit doit être d'un auteur choisi
+  **et** correspondre au texte), et `Enter` / `Shift+Enter` parcourent ces résultats.
+  Tant que le filtre est actif, l'entonnoir devient un `▼` plein de la couleur d'accent,
+  son infobulle liste les auteurs choisis, et quand la colonne Auteur est masquée ou
+  trop étroite pour l'entonnoir, la bordure supérieure du Log affiche plutôt
+  *Auteur : Alice Example +1* (la touche et la palette fonctionnent toujours). Pour
+  l'enlever : la ligne **Effacer le filtre**, un clic droit sur l'entonnoir allumé,
+  ou *Journal : Effacer le filtre d'auteur* dans la palette.
+  Les auteurs sont ceux des commits que le Log a chargés (mailmap appliqué, comme
+  dans la colonne), et le filtre est mémorisé par dépôt, d'un changement d'onglet à
+  l'autre et d'un redémarrage à l'autre. Une recherche de texte n'est pas mémorisée,
+  le filtre l'est.
 - **Filtre des refs** (`/` dans le panneau latéral) : restreint les listes de
   branches, de tags et de distants par nom.
 - **Solo** (la touche `o`, ou le menu de la ref, sur une ref, un dossier ou un
@@ -128,6 +152,13 @@ menu. Les entrées les plus utiles :
 | Renommer, Supprimer | Supprimer demande d'abord ; son jumeau distant peut aussi être supprimé |
 | Copier le nom de la branche, Copier le lien de la branche sur le distant | Vers le presse-papiers |
 
+**Déplacer un tag.** Glissez un tag sur une autre ref (voir *Glisser des refs* dans
+[Souris et gestes](./mouse-and-gestures.md)) ou utilisez *Refs : Déplacer le tag
+sélectionné vers le commit sélectionné...*. Il garde son type et son annotation,
+seul votre tag local bouge (un distant garde l'ancienne position jusqu'à un push), et
+une annulation le remet en place. En ligne de commande : `gitpoulpi tag move <name> <target> [--force-non-ff]`,
+`gitpoulpi tag merge-branch <name> <branch> [-m <message>]`.
+
 **Où se trouve un tag.** Un tag peut être sur cet ordinateur, sur un distant, ou les deux, et
 les lignes TAGS du panneau latéral (et la pastille du tag dans le Log) l'indiquent par un marqueur
 après le nom. Survolez un tag pour le même renseignement en toutes lettres.
@@ -137,7 +168,7 @@ après le nom. Survolez un tag pour le même renseignement en toutes lettres.
 | flèche vers le haut | Ici seulement : aucun distant ne l'a. Son menu propose *Push* |
 | flèche gauche-droite | Ici et sur un distant, au même commit |
 | flèche vers le bas (ligne estompée) | Sur un distant seulement : pas dans ce dépôt (jamais récupéré, ou supprimé ici). Son menu propose *Fetch `<tag>` depuis `<remote>`* et *Supprimer `<tag>` sur `<remote>`...* ; `Git : Fetch le tag sélectionné` dans la palette |
-| flèche haut-bas | Aussi sur un distant, mais à un autre commit (un push serait refusé) |
+| flèche haut-bas | Aussi sur un distant, mais à un autre commit (un push simple serait refusé). Son menu a deux lignes par distant de ce type : *Utiliser `<tag>` de `<remote>`* (le tag local se déplace vers la version du distant, d'après le dernier fetch, sans réseau ; un tag annoté devient ce même objet tag) et, en rouge, *Push `<tag>` vers `<remote>` (forcé)* (demande confirmation ; avec un bail sur ce que le dernier fetch a vu, donc un distant qui a bougé depuis est refusé avec « fetch first » et rien n'est écrasé). Chacune est une entrée d'annulation. *Git : Utiliser la version distante du tag sélectionné* et *Git : Push forcé du tag sélectionné vers son distant* dans la palette (le distant par défaut quand plusieurs diffèrent) ; en ligne de commande : `tag take-remote`, `tag force-push` |
 
 git ne garde aucune ref de suivi distant pour les tags : GitPoulpi apprend ce que chaque distant
 possède par votre dernier **fetch** (n'importe lequel, l'automatique compris) et par ses propres

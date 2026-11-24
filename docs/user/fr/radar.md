@@ -17,7 +17,67 @@ Un dépôt qui n'est pas lié n'est jamais interrogé : il affiche à la place 
 ![Le Radar sur deux dépôts : une demande épinglée, puis À relire par moi, Mes pull requests, Qui me sont assignées, des tickets et du travail en cours](../images/radar.png)
 
 **Relire...** sur une ligne de pull ou merge request (ou `e`) ouvre le dépôt avec la revue intégrée de la demande
-([Relire une pull request](review.md)).
+([Relire une pull request](review.md)). Pour une demande d'un dépôt que vous avez cloné mais jamais lié à l'hébergeur, le clone est
+d'abord lié au projet de la demande (sauf s'il a déjà son propre lien de pull request), si bien que la revue démarre dans son onglet.
+
+### La colonne Actions
+
+À droite d'une ligne de demande ou de ticket, de petits boutons font ce que fait une touche sur la ligne
+sélectionnée (un clic sélectionne la ligne et lance l'action ; posez le pointeur sur un bouton pour voir son nom
+et sa touche) :
+
+```
+Large :   #58  Round invoice totals  feature/login → main   alice   2d   Relire  [globe]  [talk]  ⊕  ×  ⇣  ⋮
+Étroit :  #58  Round invoice totals  feature/login → main                 [rev]  [globe]  [talk]  ⋮
+Ticket :  #12  Crash on empty list                         bob     5h   Démarrer  [globe]  [talk]  ×  ⋮
+```
+
+| Bouton | Touche | Palette |
+|---|---|---|
+| **Relire** (une demande qui attend votre revue ; demande comment quand elle n'est pas clonée) | `e` | `Radar : Relire la pull request...` |
+| **Démarrer** (un ticket cloné) | `n` | `Radar : Commencer à travailler sur un ticket...` |
+| le globe : ouvrir la page sur l'hébergeur | `o` | `Radar : Ouvrir dans le navigateur` |
+| le glyphe à lignes : ouvrir la conversation | `i` | `Radar : Ouvrir la conversation du ticket` |
+| `»` **Marquer comme prête** (une demande en brouillon) | `y` | `Radar : Marquer comme prête` |
+| `⊕` **Merge** (une demande) | `m` | `Radar : Merge la pull request...` |
+| `×` **Fermer** (une demande ou un ticket) | `x` | `Radar : Fermer...` |
+| `⇣` **Cloner** (une ligne dont le dépôt n'est pas cloné) | `g` | `Radar : Cloner le dépôt...` |
+
+Une ligne sans action laisse sa cellule vide, de sorte que chaque bouton reste dans la même colonne sur toutes les
+lignes. Quand la fenêtre est étroite, les mots Relire et Démarrer deviennent des glyphes avant qu'aucune autre
+colonne disparaisse ; les boutons Marquer comme prête, Merge, Fermer et Cloner quittent la colonne avant le titre,
+mais restent dans le menu de la ligne (`⋮`, clic droit, ou `Shift+F10`), où une action qui ne peut pas s'exécuter est
+grisée avec sa raison. La colonne est automatique (ce n'est pas une des colonnes dimensionnables). Un double-clic ou
+`Enter` sur une demande qui n'est pas clonée demande comment la relire, comme **Relire**.
+
+### Les branches d'une demande
+
+Une ligne de demande affiche `source → cible` après son titre (`alice:feature/login → main` quand la branche source est
+dans un fork). Quand la place manque, la cible est coupée en premier (une ellipse), le titre garde l'essentiel de la
+place, et dans une fenêtre étroite les branches ne sont pas affichées ; la colonne Actions n'est jamais poussée dehors.
+Posez le pointeur sur un texte coupé pour le voir en entier. Un hébergeur qui n'a pas nommé les branches n'affiche rien
+là. Une ligne de ticket nomme son dépôt dans la même pastille qu'une ligne de demande (le nom de dossier du clone, ou
+`owner/name` quand il n'est pas cloné).
+
+### Agir sur l'hébergeur
+
+**Merge**, **Fermer** et **Marquer comme prête** fonctionnent sur GitHub, GitLab, Gitea et Forgejo (les autres hébergeurs
+les grisent avec « Non pris en charge par ... » ; les tickets peuvent être fermés sur les mêmes hébergeurs).
+
+- **Merge** demande d'abord : la boîte nomme la demande, son projet et ses branches, et propose la méthode (un commit de
+  merge, squash, et rebase là où l'hébergeur l'a ; GitLab fait un merge ou un squash). Il est refusé avec sa raison pour un
+  brouillon, une demande en conflit avec sa cible, ou des vérifications en échec ; un refus de l'hébergeur (pas de
+  permission, une règle de la branche) s'affiche sur la ligne d'état.
+- **Fermer** demande d'abord et ferme sans merge.
+- **Marquer comme prête** sort un brouillon de l'état de brouillon (GitLab et Gitea : le marqueur `Draft:` / `WIP:` quitte
+  le titre). Il ne demande rien : c'est réversible sur l'hébergeur.
+- **Cloner** ouvre la boîte Cloner ordinaire sur le projet de la ligne (l'URL est remplie, le sélecteur de dossier est le
+  sélecteur habituel). Une fois le clone créé, le Radar place la ligne dessus à la prochaine lecture des distants (rouvrez-le ou
+  Actualisez), et Cloner indique alors où se trouve le clone.
+
+Merge et Fermer modifient l'hébergeur et **ne peuvent pas être annulés depuis GitPoulpi** (la boîte le dit) ; rouvrez une
+demande fermée sur l'hébergeur. Après un appel réussi, les listes sont redemandées : une ligne mergée ou fermée disparaît et
+une ligne prête perd sa pastille `brouillon`.
 
 ## L'ouvrir
 
@@ -193,7 +253,7 @@ a toujours une touche et une jumelle dans la palette.
 
 | Action | Touche | Palette |
 |---|---|---|
-| Ouvrir le dépôt (son onglet s'ouvre, ou est activé) | `Enter` / double-clic | `Radar : Ouvrir le dépôt` |
+| Ouvrir le dépôt (son onglet s'ouvre, ou est activé ; une demande non clonée demande comment la relire) | `Enter` / double-clic | `Radar : Ouvrir le dépôt` |
 | Relire... (une demande ; une demande non clonée demande comment) | `e` | `Radar : Relire la pull request...` |
 | Relire une demande via l'API de l'hébergeur (sans clone) | `a` dans la question | `Radar : Relire via l'API` |
 | Cloner le dépôt, puis relire la demande | `c` dans la question | `Radar : Cloner et relire...` |

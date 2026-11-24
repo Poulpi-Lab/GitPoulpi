@@ -496,6 +496,29 @@ impl FileInsight {
 }
 
 /// The indices actually on screen, given the current offset.
+/// Where the file's own text sits in `inner` once the rows are drawn: right
+/// of the line-number column, on the rows that exist. `None` while the view
+/// shows a notice (loading, binary, too large) instead of text.
+pub(crate) fn text_rect(
+    insight: &FileInsight,
+    inner: ratatui::layout::Rect,
+) -> Option<ratatui::layout::Rect> {
+    let FileInsightData::Content(blob) = &insight.data else {
+        return None;
+    };
+    let BlobContent::Text { lines, .. } = &blob.content else {
+        return None;
+    };
+    let gutter = (digits(lines.len()) + 1) as u16;
+    let rows = windowed(insight, lines.len(), inner.height as usize).len() as u16;
+    Some(ratatui::layout::Rect::new(
+        inner.x + gutter.min(inner.width),
+        inner.y,
+        inner.width.saturating_sub(gutter),
+        rows,
+    ))
+}
+
 fn windowed(insight: &FileInsight, len: usize, height: usize) -> std::ops::Range<usize> {
     let start = insight.offset.min(len);
     let end = (start + height.max(1)).min(len);

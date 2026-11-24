@@ -49,7 +49,7 @@ pub(crate) use interaction::{
     text_side_at, visible_window, yank, DiffBodyButton, DiffCopy,
 };
 pub(crate) use layout::marker as line_marker;
-pub(crate) use layout::{h_scroll_max, h_track_content, minimap_row};
+pub(crate) use layout::{h_scroll_max, h_track_content, minimap_row, text_columns};
 pub(crate) use model::{
     diff_bar, hunk_at, render_diff_with, selected_lines, DiffBarRender, DiffRender, DiffRenderOpts,
     DiffRow,

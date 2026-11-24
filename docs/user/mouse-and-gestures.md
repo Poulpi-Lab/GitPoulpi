@@ -493,7 +493,7 @@ The same kind of component gives the same pointer everywhere in the app.
 - **The arrow** is on rows. A row lights as a whole when the pointer is on it
   (the same light in every list) and is not a control by itself: the rows of
   the Refs, Worktrees, Stashes and Submodules panes, the Log and the commit
-  column (only a ref pill takes the hand), the lines of a diff, the changed
+  column (only a ref pill takes the hand), the gutters of a diff, the changed
   files, the pull request, issue and Radar items, and the rows of the lists in
   dialogs and panels (clone, folder picker, Workspaces, the board's cards, the
   Jobs panel, assignee, label and milestone pickers, rebase steps, review files
@@ -503,7 +503,10 @@ The same kind of component gives the same pointer everywhere in the app.
   files, Radar, Activity Log, the issues pane search), the text, number and
   area rows of Settings (also while you edit them), the fields of dialogs, the
   review comment boxes, the commit composer, the file editor's text and the merge
-  editor's editable result (its read-only panes keep the arrow). In the commit
+  editor's editable result (its read-only panes keep the arrow). It is also on
+  the text you can select with the mouse but not edit: the code of a diff
+  (Inline and Split, not its line numbers or its hunk buttons), the File View
+  and Blame's code. In the commit
   details, the message and the description are editable, so the I-beam shows on
   them and the whole block lights lightly.
 - **In the commit details**, the info lines are controls: click `commit: <id>`

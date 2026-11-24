@@ -353,6 +353,10 @@ fn draw_central_in(frame: &mut Frame, ctx: &mut CentralDrawCtx<'_>) {
             };
             let out = crate::blame_view::render(frame.buffer_mut(), inner, insight, &mut env);
             frame_hits.extend(out.hits.into_iter().map(|(r, h)| (r, HitTarget::Blame(h))));
+            // The card and the menu swallow the pointer: the arrow over their body.
+            for (rect, _) in &out.popup_hits {
+                crate::pointer_map::plain(*rect);
+            }
             frame_hits.splice(
                 0..0,
                 out.popup_hits
@@ -773,6 +777,11 @@ fn draw_central_in(frame: &mut Frame, ctx: &mut CentralDrawCtx<'_>) {
             visible.len(),
             buttons,
         );
+        // The code of each row is text to read and select: the I-beam (the gutters, the hunk
+        // button and the scrollbars painted or registered after answer first).
+        for (dx, w) in diff_view::text_columns(diff_state.mode, inner.width) {
+            crate::pointer_map::field(Rect::new(inner.x + dx, inner.y, w, visible.len() as u16));
+        }
         *diff_rows = std::rc::Rc::clone(&rendered.rows);
         frame.render_clipped(Paragraph::new(visible), inner);
         // A Git LFS object card: "Open in default program" and the "Open in"

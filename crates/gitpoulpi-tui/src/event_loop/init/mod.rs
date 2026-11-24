@@ -908,6 +908,7 @@ pub(super) fn init(
         sparse: Default::default(),
         hidden_from_graph,
         solo_refs,
+        log_author_filter: crate::author_filter::load(&repo.root),
         // The refs the open Log menu's `LogContextAction::Ref(_, i)` rows point
         // into (`pill_menu`): a ref pill's merged menu and a commit's per-ref
         // submenus both carry ref rows. Replaced every time the menu opens.

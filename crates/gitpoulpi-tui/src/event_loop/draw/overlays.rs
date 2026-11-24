@@ -1071,6 +1071,11 @@ pub(in crate::event_loop) fn draw_picker_popups(
         *tab_picker_popup = Some(crate::language_picker::render(frame, picker, field_editor));
     }
 
+    // The Log's author filter, under the Author header.
+    if let InputMode::AuthorFilter(popup) = input_mode {
+        *tab_picker_popup = Some(crate::author_filter::render(frame, popup, field_editor));
+    }
+
     // The workspace search (`Ctrl+Alt+F`).
     if let InputMode::WorkspaceSearch(search) = input_mode {
         *tab_picker_popup = Some(crate::workspace_search::render(frame, search, field_editor));

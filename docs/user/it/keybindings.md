@@ -160,6 +160,7 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `log` | `compare_selection` | Confronta le righe selezionate | `v` |
 | `log` | `compare_swap` | Inverti gli estremi del confronto | `x` |
 | `log` | `compare_next` | Vai alla riga confrontata successiva | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | Scegli una colonna da spostare o ridimensionare | `Shift+C` |
 | `log` | `scroll_left` | Scorri le colonne a sinistra | `Shift+Left` |
 | `log` | `scroll_right` | Scorri le colonne a destra | `Shift+Right` |
@@ -518,6 +519,8 @@ applicano. I tasti sono quelli predefiniti.
 | Navigazione: Sposta il focus sul pannello successivo | `Tab` |
 | Navigazione: Sposta il focus sul pannello precedente | `Shift+Tab` |
 | Navigazione: Cerca commit... | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | Navigazione: Comprimi o ripristina il pannello Refs | `Ctrl+N H` |
 | Navigazione: Allarga il pannello Refs | `Ctrl+N Right` |
 | Navigazione: Restringi il pannello Refs | `Ctrl+N Left` |

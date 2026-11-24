@@ -60,6 +60,8 @@ pub(crate) enum TooltipKey {
     TagWhere(u64),
     /// The author's name in the commit-detail pane: its email.
     CommitAuthor,
+    /// The funnel of the Log's Author header: what it does, or the chosen authors.
+    AuthorFilter,
     /// The remotes badge of a Refs row (`multi_remote_badge::hover_key`).
     RefRemotes(u64),
 }

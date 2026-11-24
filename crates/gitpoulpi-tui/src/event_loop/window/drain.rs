@@ -129,6 +129,7 @@ impl WindowState {
                     InputMode::CommandPalette { .. }
                         | InputMode::ThemePicker(_)
                         | InputMode::LanguagePicker(_)
+                        | InputMode::AuthorFilter(_)
                         | InputMode::WorkspaceSearch(_)
                 ))
                 && !self.repo_dialogs.is_open()

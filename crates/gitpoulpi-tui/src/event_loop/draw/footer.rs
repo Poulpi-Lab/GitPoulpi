@@ -84,6 +84,7 @@ pub(in crate::event_loop) fn draw_footer(
         // Its own popup too (`theme_picker::render`).
         InputMode::ThemePicker(_)
         | InputMode::LanguagePicker(_)
+        | InputMode::AuthorFilter(_)
         | InputMode::WorkspaceSearch(_) => String::new(),
         // The find bar carries its own query, counter and buttons
         // in the overlay -- repeating it in the footer would be

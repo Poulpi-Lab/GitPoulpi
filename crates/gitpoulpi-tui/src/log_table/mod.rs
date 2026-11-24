@@ -317,6 +317,7 @@ pub(crate) fn log_search_hits(
     refs_result: &gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Ref>>,
     solo_refs: &std::collections::HashSet<String>,
     query: &str,
+    authors: &std::collections::BTreeSet<String>,
 ) -> Vec<usize> {
     let Ok(commit_graph) = log_result else {
         return Vec::new();
@@ -327,7 +328,7 @@ pub(crate) fn log_search_hits(
     let nodes = apply_solo_filter(&commit_graph.nodes, solo_refs, refs_result);
     let empty = Vec::new();
     let refs = refs_result.as_ref().unwrap_or(&empty);
-    log_search::find_matches(&nodes, refs, query)
+    log_search::find_matches_with_authors(&nodes, refs, query, authors)
 }
 
 /// The node list actually shown in the Log/graph for this frame: the full

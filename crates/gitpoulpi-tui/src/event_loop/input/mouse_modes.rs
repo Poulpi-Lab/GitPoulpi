@@ -80,6 +80,7 @@ fn list_selected(mode: &mut InputMode) -> Option<&mut usize> {
         }
         InputMode::ThemePicker(picker) => Some(&mut picker.selected),
         InputMode::LanguagePicker(picker) => Some(&mut picker.selected),
+        InputMode::AuthorFilter(popup) => Some(&mut popup.selected),
         InputMode::WorkspaceSearch(search) => Some(&mut search.selected),
         _ => None,
     }
@@ -108,6 +109,7 @@ pub(in crate::event_loop) fn popup_list_mouse(
         InputMode::TabPicker { .. }
         | InputMode::ThemePicker(_)
         | InputMode::LanguagePicker(_)
+        | InputMode::AuthorFilter(_)
         | InputMode::WorkspaceSearch(_) => picker,
         _ => None,
     };
@@ -190,6 +192,26 @@ pub(in crate::event_loop) fn popup_list_mouse(
                 crate::workspace_search::chip_at(mcol, mrow),
             ) {
                 search.toggle_chip(slot);
+            }
+        }
+        // The author filter: a click on a row toggles it at once (the popup
+        // stays open for the next one), the Clear row drops the filter.
+        MouseEventKind::Down(MouseButton::Left)
+            if matches!(&*cx.input_mode, InputMode::AuthorFilter(_))
+                && palette_row_at(&popup, mcol, mrow).is_some() =>
+        {
+            if let (InputMode::AuthorFilter(p), Some(index)) =
+                (&mut *cx.input_mode, palette_row_at(&popup, mcol, mrow))
+            {
+                p.selected = index;
+                let (message, close) =
+                    crate::author_filter::activate(p, cx.repo_root, &mut *cx.log_author_filter);
+                if message.is_some() {
+                    *cx.last_message = message;
+                }
+                if close {
+                    *cx.input_mode = InputMode::Normal;
+                }
             }
         }
         // A group heading is not a result: nothing to select or open.

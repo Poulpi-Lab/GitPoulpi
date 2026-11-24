@@ -161,6 +161,7 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `log` | `compare_selection` | Comparar las filas seleccionadas | `v` |
 | `log` | `compare_swap` | Intercambiar los extremos de la comparación | `x` |
 | `log` | `compare_next` | Ir a la siguiente fila comparada | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | Elegir una columna para moverla o ajustarla | `Shift+C` |
 | `log` | `scroll_left` | Desplazar las columnas a la izquierda | `Shift+Left` |
 | `log` | `scroll_right` | Desplazar las columnas a la derecha | `Shift+Right` |
@@ -519,6 +520,8 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Navegación: Pasar el foco al panel siguiente | `Tab` |
 | Navegación: Pasar el foco al panel anterior | `Shift+Tab` |
 | Navegación: Buscar commits... | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | Navegación: Contraer o expandir el panel Refs | `Ctrl+N H` |
 | Navegación: Ensanchar el panel Refs | `Ctrl+N Right` |
 | Navegación: Estrechar el panel Refs | `Ctrl+N Left` |

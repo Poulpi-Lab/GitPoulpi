@@ -89,6 +89,27 @@ terminal: `gitpoulpi mailmap list|check|add`.
   *Navigation: Search Commits...*): matches the whole commit message, the author name and email, the
   hash and the ref names. It dims what does not match and keeps the
   graph's shape. `Enter` / `Shift+Enter` jump to the next / previous match.
+- **Author filter** (the funnel in the **Author** header, `Shift+A` in the Log,
+  or the palette's *Log: Filter by Author...*): pre-filters the Log by who
+  wrote the commits. A popup hangs under the header with a search field, a
+  **Clear filter** row (✕) and one row per author of the loaded history: an
+  initials badge (the avatar, when `ui.avatars` is not off), the name and the
+  email muted after it, most commits first and then by name. Typing narrows the
+  list with the palette's fuzzy match; `Enter` or a click toggles the
+  highlighted author (a check mark; choose as many as you like), `Esc` or a
+  click away closes the popup and keeps the filter. The filter behaves exactly
+  like the search: the chosen authors' commits stay lit, every other row dims
+  and the graph keeps its shape, nothing is removed or re-fetched. With the
+  search bar open too, both apply (a commit must be by a chosen author **and**
+  match the text), and `Enter` / `Shift+Enter` step through those hits. While
+  the filter is on the funnel turns into a filled accent `▼`, its tooltip lists
+  the chosen authors, and when the Author column is hidden or too narrow for
+  the funnel the Log's top border says *Author: Alice Example +1* instead (the
+  key and the palette still work). To drop it: the **Clear filter** row, a
+  right-click on the lit funnel, or the palette's *Log: Clear Author Filter*.
+  The authors are those of the commits the Log has loaded (mailmap applied, as
+  in the column), and the filter is remembered per repository, across tab
+  switches and restarts. A text search is not remembered, the filter is.
 - **Refs filter** (`/` in the sidebar): narrows the branch, tag and remote
   lists by name.
 - **Solo** (the `o` key, or the ref's menu, on a ref, folder or remote):

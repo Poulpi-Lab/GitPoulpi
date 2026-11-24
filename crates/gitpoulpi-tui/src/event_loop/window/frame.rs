@@ -19,6 +19,7 @@ impl WindowState {
             input_mode,
             InputMode::ThemePicker(_)
                 | InputMode::LanguagePicker(_)
+                | InputMode::AuthorFilter(_)
                 | InputMode::WorkspaceSearch(_)
                 | InputMode::TabPicker { .. }
                 | InputMode::CommandPalette { .. }
@@ -427,12 +428,17 @@ impl WindowState {
                         settings: graph_settings,
                     },
                     search_query,
+                    &self.log_author_filter,
                 );
+                let author_names = self.log_layout.author_names(&self.log_author_filter);
+                let author_filter_note = (!author_names.is_empty())
+                    .then(|| crate::author_filter::note_text(&author_names));
+                crate::author_filter::set_tip(author_names);
                 let layout = self.log_layout.layout();
                 let refs_for_pills = &layout.refs_for_pills;
                 let search_matches = self.log_layout.matches();
                 let search_match_set = self.log_layout.match_set();
-                let searching = search_query.is_some();
+                let searching = search_query.is_some() || !self.log_author_filter.is_empty();
 
                 // Looked up again later when rendering the ref-reveal popup
                 // (`ref_popup`), so its pills get the same lane-colored
@@ -454,6 +460,8 @@ impl WindowState {
                         reveal_flash: self.reveal.flash_row(),
                         ref_connector: self.ref_connector,
                         searching,
+                        author_filter_on: !self.log_author_filter.is_empty(),
+                        author_filter_note,
                         hovered_wip_row: self.hovered_wip_row,
                         hovered_search_button: match &self.hovered_target {
                             Some(HitTarget::SearchBarButton(b)) => Some(*b),
@@ -882,6 +890,8 @@ impl WindowState {
                     Some("theme_picker")
                 } else if matches!(self.input_mode, InputMode::LanguagePicker(_)) {
                     Some("language_picker")
+                } else if matches!(self.input_mode, InputMode::AuthorFilter(_)) {
+                    Some("author_filter")
                 } else if matches!(self.input_mode, InputMode::WorkspaceSearch(_)) {
                     Some("workspace_search")
                 } else if self.repo_dialogs.is_open()

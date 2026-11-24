@@ -303,6 +303,13 @@ pub struct RepoState {
     /// reset) is restored as it is.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub log_columns: Option<LogColumnWidths>,
+    /// The authors the Log is pre-filtered to (the funnel in the Author
+    /// column's header): each one's key (lower-cased email, else lower-cased
+    /// name), sorted. Empty: no author filter. Non-matching commits dim, like
+    /// the graph search; the filter is per repository and survives a tab
+    /// switch and a restart.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub log_author_filter: Vec<String>,
     /// The in-app code review's local state per request (pending comments,
     /// viewed files), keyed by `ReviewDraft::key`.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]

@@ -210,6 +210,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io
                 Some(crate::tooltip::TooltipKey::LinkedPrChip)
             }
             (Some(HitTarget::DiffBarButton(b)), _) => Some(crate::tooltip::TooltipKey::DiffBar(*b)),
+            (Some(HitTarget::LogAuthorFilter), _) => Some(crate::tooltip::TooltipKey::AuthorFilter),
             (Some(HitTarget::CommitAuthorName), _) => {
                 Some(crate::tooltip::TooltipKey::CommitAuthor)
             }

@@ -37,6 +37,7 @@ pub(in crate::event_loop) use guides::{
     block_on_conflicts, guard_off_branch, guide_key, guide_mouse, open_limit_setting, start_ai,
 };
 pub(in crate::event_loop) use hscroll::{hscroll_key, scroll_focused_pane};
+pub(in crate::event_loop) use nav::clear_author_filter;
 pub(in crate::event_loop) use pane::*;
 pub(in crate::event_loop) use shared::*;
 #[allow(unused_imports)]
@@ -94,6 +95,8 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::FocusRefsSection(..)
         | PaletteCommand::FocusStatusSection(..)
         | PaletteCommand::SearchLog
+        | PaletteCommand::FilterLogByAuthor
+        | PaletteCommand::ClearAuthorFilter
         | PaletteCommand::ToggleRefsPaneCollapsed
         | PaletteCommand::GrowCommitMessage
         | PaletteCommand::ShrinkCommitMessage

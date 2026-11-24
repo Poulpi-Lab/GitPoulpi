@@ -581,6 +581,7 @@ actions! {
     LogCompareSelection => (Log, "log.compare_selection", KEYMAP_COMPARE_SELECTION, ["v"]),
     LogCompareSwap => (Log, "log.compare_swap", KEYMAP_SWAP, ["x"]),
     LogCompareNext => (Log, "log.compare_next", KEYMAP_NEXT_CARD, ["n"]),
+    LogFilterAuthor => (Log, "log.filter_author", LOG_FILTER_AUTHOR, ["Shift+A"]),
     LogPickColumn => (Log, "log.pick_column", LOG_PICK_COLUMN, ["Shift+C"]),
     LogScrollLeft => (Log, "log.scroll_left", LOG_SCROLL_LEFT, ["Shift+Left"]),
     LogScrollRight => (Log, "log.scroll_right", LOG_SCROLL_RIGHT, ["Shift+Right"]),

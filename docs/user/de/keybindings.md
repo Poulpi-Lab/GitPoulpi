@@ -156,6 +156,7 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `log` | `compare_selection` | Ausgewählte Zeilen vergleichen | `v` |
 | `log` | `compare_swap` | Vergleichsenden tauschen | `x` |
 | `log` | `compare_next` | Zur nächsten verglichenen Zeile springen | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | Spalte zum Verschieben oder Anpassen wählen | `Shift+C` |
 | `log` | `scroll_left` | Spalten nach links scrollen | `Shift+Left` |
 | `log` | `scroll_right` | Spalten nach rechts scrollen | `Shift+Right` |
@@ -509,6 +510,8 @@ die Standardtasten.
 | Navigation: Fokus zum nächsten Bereich wechseln | `Tab` |
 | Navigation: Fokus zum vorherigen Bereich wechseln | `Shift+Tab` |
 | Navigation: Commits suchen... | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | Navigation: Refs-Bereich ein-/ausklappen | `Ctrl+N H` |
 | Navigation: Refs-Bereich verbreitern | `Ctrl+N Right` |
 | Navigation: Refs-Bereich verschmälern | `Ctrl+N Left` |

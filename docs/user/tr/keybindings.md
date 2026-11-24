@@ -159,6 +159,7 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `log` | `compare_selection` | Seçili satırları karşılaştır | `v` |
 | `log` | `compare_swap` | Karşılaştırma uçlarını değiştir | `x` |
 | `log` | `compare_next` | Sonraki karşılaştırılan satıra git | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | Taşımak veya boyutlandırmak için bir sütun seç | `Shift+C` |
 | `log` | `scroll_left` | Sütunları Sola Kaydır | `Shift+Left` |
 | `log` | `scroll_right` | Sütunları Sağa Kaydır | `Shift+Right` |
@@ -514,6 +515,8 @@ Tuşlar varsayılanlardır.
 | Gezinme: Odağı Sonraki Panele Geçir | `Tab` |
 | Gezinme: Odağı Önceki Panele Geçir | `Shift+Tab` |
 | Gezinme: Commit'lerde Ara... | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | Gezinme: Refs Panelini Daralt/Genişlet | `Ctrl+N H` |
 | Gezinme: Refs Panelini Genişlet | `Ctrl+N Right` |
 | Gezinme: Refs Panelini Daralt | `Ctrl+N Left` |

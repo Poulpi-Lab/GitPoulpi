@@ -1138,6 +1138,8 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::CycleFocus
         | C::CycleFocusBack
         | C::SearchLog
+        | C::FilterLogByAuthor
+        | C::ClearAuthorFilter
         | C::ToggleRefsPaneCollapsed
         | C::ToggleStatusPaneCollapsed
         | C::ResizePane(_)

@@ -1393,6 +1393,7 @@ async fn two_polls_with_no_change_cause_no_layout_rebuild() {
                 settings: Default::default(),
             },
             None,
+            &Default::default(),
         );
     }
     assert_eq!(log.as_ref().expect("the log read").nodes.len(), 4);

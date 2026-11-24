@@ -439,18 +439,48 @@ pub(crate) fn log_table<'a>(
 /// cells, never half a wide glyph), so a long translation cannot run into
 /// the next column's header. `picked` is the column the keyboard picked: its
 /// cell is inverted.
+///
+/// The Author cell carries the author filter's funnel (`author_filter`) when
+/// it is wide enough: outline while no author is chosen, filled and in the
+/// accent color while the filter is on (`author_filter_on`).
 pub(crate) fn log_header_cells(
     order: &[LogColumn],
     widths: &LogColumnWidths,
     picked: Option<LogColumn>,
+    author_filter_on: bool,
 ) -> Vec<Cell<'static>> {
     order
         .iter()
         .map(|&c| {
-            let cell = Cell::from(crate::ui_kit::fit(
-                c.title(),
-                usize::from(widths.width_of(c)),
-            ));
+            let width = usize::from(widths.width_of(c));
+            let funnel = (c == LogColumn::Author)
+                .then(|| {
+                    let title_w = crate::display_width(c.title()) as u16;
+                    crate::author_filter::funnel_layout(width as u16, title_w)
+                })
+                .flatten();
+            let cell = match funnel {
+                Some((title_cells, dx)) => {
+                    let title = crate::ui_kit::fit(c.title(), usize::from(title_cells));
+                    let pad = usize::from(dx).saturating_sub(crate::display_width(&title));
+                    let glyph = if author_filter_on {
+                        Span::styled(
+                            crate::author_filter::FUNNEL_ACTIVE,
+                            Style::default()
+                                .fg(th().ui.accent)
+                                .add_modifier(Modifier::BOLD),
+                        )
+                    } else {
+                        Span::raw(crate::author_filter::FUNNEL)
+                    };
+                    Cell::from(Line::from(vec![
+                        Span::raw(title),
+                        Span::raw(" ".repeat(pad)),
+                        glyph,
+                    ]))
+                }
+                None => Cell::from(crate::ui_kit::fit(c.title(), width)),
+            };
             if picked == Some(c) {
                 cell.style(Style::default().add_modifier(Modifier::REVERSED))
             } else {
@@ -549,6 +579,19 @@ pub(crate) fn log_header_hit_targets(
         // viewport is not registered: no glyph under it, no target.
         if let Some(rect) = geo.grip_rect(log_area, col) {
             hits.push((rect, HitTarget::LogColumnBoundary(col)));
+        }
+    }
+    // The author funnel is inside the Author header cell: first, so it wins.
+    // Only while the whole cell is on screen (the scroll layout can clip it).
+    if let Some(&(_, x, w)) = geo
+        .offsets
+        .iter()
+        .find(|(c, ..)| *c == LogColumn::Author)
+        .filter(|(c, ..)| geo.fully_visible(*c))
+    {
+        let title_w = crate::display_width(LogColumn::Author.title()) as u16;
+        if let Some(rect) = crate::author_filter::funnel_rect(x, w, title_w, log_area.y + 1) {
+            hits.push((rect, HitTarget::LogAuthorFilter));
         }
     }
     for &(col, x, w) in &geo.offsets {

@@ -158,6 +158,7 @@ prefiksem (`Ctrl+G s`).
 | `log` | `compare_selection` | Porównaj zaznaczone wiersze | `v` |
 | `log` | `compare_swap` | Zamień końce porównania | `x` |
 | `log` | `compare_next` | Przejdź do następnego porównywanego wiersza | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | Wybierz kolumnę do przesunięcia lub zmiany szerokości | `Shift+C` |
 | `log` | `scroll_left` | Przewiń kolumny w lewo | `Shift+Left` |
 | `log` | `scroll_right` | Przewiń kolumny w prawo | `Shift+Right` |
@@ -513,6 +514,8 @@ zastosowania. Klawisze są domyślne.
 | Nawigacja: Przejdź do następnego panelu | `Tab` |
 | Nawigacja: Przejdź do poprzedniego panelu | `Shift+Tab` |
 | Nawigacja: Szukaj commitów... | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | Nawigacja: Zwiń/rozwiń panel Refs | `Ctrl+N H` |
 | Nawigacja: Poszerz panel Refs | `Ctrl+N Right` |
 | Nawigacja: Zwęź panel Refs | `Ctrl+N Left` |

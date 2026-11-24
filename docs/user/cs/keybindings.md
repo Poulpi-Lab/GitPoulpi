@@ -158,6 +158,7 @@ předponou (`Ctrl+G s`).
 | `log` | `compare_selection` | Porovnat vybrané řádky | `v` |
 | `log` | `compare_swap` | Prohodit konce porovnání | `x` |
 | `log` | `compare_next` | Přejít na další porovnávaný řádek | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | Vybrat sloupec k přesunu nebo změně šířky | `Shift+C` |
 | `log` | `scroll_left` | Posunout sloupce doleva | `Shift+Left` |
 | `log` | `scroll_right` | Posunout sloupce doprava | `Shift+Right` |
@@ -514,6 +515,8 @@ Klávesy jsou výchozí.
 | Navigace: Fokus na další panel | `Tab` |
 | Navigace: Fokus na předchozí panel | `Shift+Tab` |
 | Navigace: Hledat commity... | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | Navigace: Sbalit/rozbalit panel Refs | `Ctrl+N H` |
 | Navigace: Rozšířit panel Refs | `Ctrl+N Right` |
 | Navigace: Zúžit panel Refs | `Ctrl+N Left` |

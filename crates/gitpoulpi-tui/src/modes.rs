@@ -20,6 +20,8 @@ pub(crate) enum MainField {
     ThemePicker,
     /// The language picker's filter field (`Ctrl+N l`, `App: Change Language...`).
     LanguagePicker,
+    /// The Log's author filter popup's search field (the funnel in the Author header).
+    AuthorFilter,
     /// The workspace search's query field (`Ctrl+Alt+F`, `Search: Workspace`).
     WorkspaceSearch,
     /// The commit summary, in the composer or in the WIP row (one
@@ -44,6 +46,7 @@ impl MainField {
             InputMode::TabPicker { .. } => Some(MainField::TabPicker),
             InputMode::ThemePicker(_) => Some(MainField::ThemePicker),
             InputMode::LanguagePicker(_) => Some(MainField::LanguagePicker),
+            InputMode::AuthorFilter(_) => Some(MainField::AuthorFilter),
             InputMode::WorkspaceSearch(_) => Some(MainField::WorkspaceSearch),
             InputMode::Normal => match composer_focus {
                 Some(field) if field.edits_summary() => Some(MainField::Summary),
@@ -98,6 +101,7 @@ pub(crate) fn main_field_edited(id: MainField, input_mode: &mut InputMode) {
         (MainField::Palette, InputMode::CommandPalette { selected, .. }) => *selected = 0,
         (MainField::TabPicker, InputMode::TabPicker { selected, .. }) => *selected = 0,
         (MainField::LanguagePicker, InputMode::LanguagePicker(picker)) => picker.selected = 0,
+        (MainField::AuthorFilter, InputMode::AuthorFilter(popup)) => popup.field_edited(),
         (MainField::WorkspaceSearch, InputMode::WorkspaceSearch(search)) => search.edited(),
         (MainField::ThemePicker, InputMode::ThemePicker(picker)) => {
             picker.selected = 0;
@@ -129,6 +133,7 @@ impl MainField {
             (MainField::WorkspaceSearch, InputMode::WorkspaceSearch(search)) => {
                 Some(&mut search.draft)
             }
+            (MainField::AuthorFilter, InputMode::AuthorFilter(popup)) => Some(&mut popup.draft),
             (MainField::LogFind, InputMode::SearchingLog(search)) => Some(&mut search.query),
             (MainField::Summary, _) => Some(commit_summary),
             (MainField::Description, _) => Some(commit_description),
@@ -220,6 +225,10 @@ pub(crate) enum InputMode {
     /// The language picker (`Ctrl+N l`, `App: Change Language...`): Enter
     /// applies the highlighted language and writes `ui.language`.
     LanguagePicker(Box<crate::language_picker::LanguagePicker>),
+    /// The Log's author filter (the funnel in the Author header, `Log: Filter
+    /// by Author...`): a popup under the header; Enter or a click toggles the
+    /// highlighted author, Esc closes and keeps the filter.
+    AuthorFilter(Box<crate::author_filter::AuthorFilterPopup>),
     /// The workspace search (`Ctrl+Alt+F`, `Search: Workspace`): a fuzzy
     /// finder over every repository of the active workspace (else the open
     /// tabs), its popup owns the keyboard and the mouse like the pickers.

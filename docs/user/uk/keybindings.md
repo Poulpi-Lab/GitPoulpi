@@ -155,6 +155,7 @@ stage_file = "z"
 | `log` | `compare_selection` | Порівняти вибрані рядки | `v` |
 | `log` | `compare_swap` | Поміняти сторони порівняння | `x` |
 | `log` | `compare_next` | Перейти до наступного порівнюваного рядка | `n` |
+| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
 | `log` | `pick_column` | Вибрати стовпець для пересування або зміни ширини | `Shift+C` |
 | `log` | `scroll_left` | Прокрутити стовпці ліворуч | `Shift+Left` |
 | `log` | `scroll_right` | Прокрутити стовпці праворуч | `Shift+Right` |
@@ -508,6 +509,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Навігація: фокус на наступну панель | `Tab` |
 | Навігація: фокус на попередню панель | `Shift+Tab` |
 | Навігація: пошук commit'ів... | `f` |
+| Log: Filter by Author... | `A` |
+| Log: Clear Author Filter |  |
 | Навігація: згорнути/розгорнути Refs | `Ctrl+N H` |
 | Навігація: Розширити панель Refs | `Ctrl+N Right` |
 | Навігація: Звузити панель Refs | `Ctrl+N Left` |

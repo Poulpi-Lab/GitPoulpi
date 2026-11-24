@@ -93,6 +93,24 @@ adlarını ve e-postalarını listeler ve sizin için `.mailmap` satırları yaz
   Commit'lerde Ara...*): commit mesajının tamamını, yazar adını ve e-postasını,
   hash'i ve ref adlarını eşleştirir. Eşleşmeyenleri soluklaştırır ve grafiğin
   biçimini korur. `Enter` / `Shift+Enter` sonraki / önceki eşleşmeye atlar.
+- **Yazar filtresi** (**Yazar** başlığındaki huni, Log'da `Shift+A` ya da paletteki
+  *Log: Yazara Göre Filtrele...*): Log'u commit'leri kimin yazdığına göre önceden süzer.
+  Başlığın altında, bir arama alanı, bir **Filtreyi temizle** satırı (✕) ve yüklenen geçmişin
+  her yazarı için bir satır içeren bir açılır pencere asılı durur: bir baş harf rozeti
+  (`ui.avatars` kapalı değilse avatar), ad ve ardından soluk e-posta, önce en çok commit'i
+  olanlar, sonra ada göre. Yazmak listeyi paletin bulanık eşleşmesiyle daraltır; `Enter` ya da
+  bir tık vurgulanan yazarı açıp kapatır (bir onay işareti; istediğiniz kadar seçin), `Esc` ya da
+  dışarı tıklamak açılır pencereyi kapatır ve filtreyi korur. Filtre tam olarak aramanın
+  davrandığı gibi davranır: seçilen yazarların commit'leri aydınlık kalır, diğer her satır
+  soluklaşır ve grafik biçimini korur, hiçbir şey kaldırılmaz veya yeniden getirilmez. Arama
+  çubuğu da açıksa ikisi birden uygulanır (bir commit seçilen bir yazara ait **ve** metinle
+  eşleşmiş olmalıdır) ve `Enter` / `Shift+Enter` bu eşleşmelerde gezinir. Filtre açıkken huni dolu
+  bir vurgu rengi `▼` olur, ipucu seçilen yazarları listeler ve Yazar sütunu gizliyse ya da huni
+  için çok darsa Log'un üst kenarlığı bunun yerine *Yazar: Alice Example +1* der (tuş ve palet yine
+  çalışır). Kaldırmak için: **Filtreyi temizle** satırı, aydınlık huniye sağ tık ya da paletteki
+  *Log: Yazar Filtresini Temizle*. Yazarlar, Log'un yüklediği commit'lerin yazarlarıdır (mailmap
+  uygulanmış, sütundaki gibi) ve filtre depo başına, sekme geçişleri ve yeniden başlatmalar
+  boyunca hatırlanır. Bir metin araması hatırlanmaz, filtre hatırlanır.
 - **Refs filtresi** (kenar çubuğunda `/`): dal, tag ve uzak depo listelerini
   ada göre daraltır.
 - **Solo** (`o` tuşu veya bir ref, klasör ya da uzak depo üzerindeki ref'in
@@ -121,6 +139,13 @@ girdiler:
 | Adını değiştir, Sil | Sil önce sorar; uzak karşılığı da silinebilir |
 | Dal adını kopyala, Uzak depodaki dal bağlantısını kopyala | Panoya |
 
+**Bir tag'i taşımak.** Bir tag'i başka bir ref'in üzerine sürükleyin (bkz. [Fare ve hareketler](./mouse-and-gestures.md)
+içindeki *Ref'leri sürüklemek*) ya da `Refs: Seçili Tag Seçili Commit Üzerine Taşı...` komutunu
+kullanın. Türünü ve açıklamasını korur, yalnızca yerel tag'iniz taşınır (uzak depo, siz push
+edene kadar eski konumu tutar) ve tek bir geri alma onu yerine koyar. CLI:
+`gitpoulpi tag move <name> <target> [--force-non-ff]`,
+`gitpoulpi tag merge-branch <name> <branch> [-m <message>]`.
+
 **Bir tag nerede durur.** Bir tag bu bilgisayarda, bir uzak depoda ya da ikisinde birden olabilir;
 kenar çubuğunun TAG'LER satırları (ve Log'daki tag hapı) hangisi olduğunu addan sonraki bir işaretle
 söyler. Aynısını sözcüklerle görmek için bir tag'in üzerine gelin.
@@ -130,7 +155,7 @@ söyler. Aynısını sözcüklerle görmek için bir tag'in üzerine gelin.
 | yukarı ok | Yalnızca burada: hiçbir uzak depoda yok. Menüsü *Push* sunar |
 | sol-sağ ok | Burada ve bir uzak depoda, aynı commit'te |
 | aşağı ok (satır soluk) | Yalnızca bir uzak depoda: bu depoda yok (hiç fetch edilmemiş ya da burada silinmiş). Menüsü *`<tag>` tag'ini `<remote>` deposundan fetch et* ve *`<tag>` tag'ini `<remote>` üzerinde sil...* sunar; paletteki karşılığı `Git: Fetch Selected Tag` |
-| yukarı-aşağı ok | Bir uzak depoda da var, ama farklı bir commit'te (push reddedilirdi) |
+| yukarı-aşağı ok | Bir uzak depoda da var, ama farklı bir commit'te (düz bir push reddedilirdi). Menüsünde böyle her uzak depo için iki satır vardır: *`<tag>` değerini `<remote>` üzerinden kullan* (yerel tag, son fetch'ten bilinen uzak deponun sürümüne taşınır, ağ kullanılmaz; açıklamalı bir tag aynı tag nesnesi olur) ve kırmızıyla *`<tag>` değerini `<remote>` üzerine push et (force)* (önce sorar; son fetch'in gördüğüne kiralanır, bu yüzden o zamandan beri ilerlemiş bir uzak depo "fetch first" ile reddedilir ve hiçbir şeyin üzerine yazılmaz). Her biri bir geri alma girdisidir. Paletteki `Git: Seçili Tag İçin Uzak Deponun Sürümünü Kullan` ve `Git: Seçili Tag Uzak Depoya Zorla Push Et` (birkaçı farklıysa varsayılan uzak depo); CLI: `tag take-remote`, `tag force-push` |
 
 git tag'ler için uzak izleme ref'i tutmaz, bu yüzden GitPoulpi her uzak deponun neye sahip olduğunu son
 **fetch** işleminizden (otomatik olan dahil, her fetch) ve kendi tag push ile silmelerinden öğrenir. Gezinirken

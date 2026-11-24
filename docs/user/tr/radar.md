@@ -17,7 +17,61 @@ depoya hiç sorulmaz; onun yerine bir **Bağla...** satırı gösterir (aşağı
 ![İki depo üzerinde Radar: sabitlenmiş bir request, ardından İncelememi bekleyenler, Benim pull request'lerim, Bana atananlar, issue'lar ve süren işler](../images/radar.png)
 
 Bir pull veya merge request satırındaki **İncele...** (veya `e`), depoyu isteğin uygulama içi incelemesiyle açar
-([Bir pull veya merge request'i incelemek](review.md)).
+([Bir pull veya merge request'i incelemek](review.md)). Klonladığınız ama barındırıcıya hiç bağlamadığınız bir deponun request'i için, klon önce request'in projesine bağlanır (zaten kendi pull request bağlantısı yoksa), böylece inceleme kendi sekmesinde başlar.
+
+### Eylemler sütunu
+
+Bir request veya issue satırının sağında, küçük düğmeler seçili satırda bir tuşun yaptığını yapar (bir tık satırı seçer ve
+eylemi çalıştırır; adı ve tuşu için işaretçiyi bir düğmenin üzerinde bekletin):
+
+```
+Geniş:   #58  Round invoice totals  feature/login → main   alice   2d   İncele  [globe]  [talk]  ⊕  ×  ⇣  ⋮
+Dar:     #58  Round invoice totals  feature/login → main                 [rev]  [globe]  [talk]  ⋮
+Issue:   #12  Crash on empty list                         bob     5h   Başla  [globe]  [talk]  ×  ⋮
+```
+
+| Düğme | Tuş | Palet |
+|---|---|---|
+| **İncele** (incelemenizi bekleyen bir request; klonlanmamışsa nasıl yapılacağını sorar) | `e` | `Radar: İsteği İncele...` |
+| **Başla** (klonlanmış bir issue) | `n` | `Radar: Issue Üzerinde Çalışmaya Başla...` |
+| küre: sayfayı barındırıcıda aç | `o` | `Radar: Tarayıcıda Aç` |
+| satırlar simgesi: konuşmayı aç | `i` | `Radar: Issue Konuşmasını Aç` |
+| `»` **Hazır olarak işaretle** (bir taslak request) | `y` | `Radar: Hazır Olarak İşaretle` |
+| `⊕` **Merge** (bir request) | `m` | `Radar: İsteği Merge Et...` |
+| `×` **Kapat** (bir request veya bir issue) | `x` | `Radar: Kapat...` |
+| `⇣` **Depoyu klonla...** (deposu klonlanmamış bir satır) | `g` | `Radar: Depoyu Klonla...` |
+
+Eylemi olmayan bir satır hücresini boş bırakır, böylece her düğme her satırda aynı sütunda kalır. Pencere
+dar olduğunda İncele ve Başla sözcükleri, başka herhangi bir sütun kaybolmadan önce simgeye dönüşür; Hazır, Merge, Kapat ve Klonla
+düğmeleri başlıktan önce sütundan çıkar, ama satır menüsünde (`⋮`, sağ tık veya `Shift+F10`) kalır; orada
+çalışamayan bir eylem nedeniyle birlikte gri görünür. Sütun otomatiktir (boyutlandırılabilir sütunlardan
+biri değildir). Klonlanmamış bir request'e çift tık ya da `Enter`, **İncele** gibi nasıl inceleneceğini sorar.
+
+### Bir request'in dalları
+
+Bir request satırı başlığından sonra `kaynak → hedef` gösterir (kaynak dal bir fork'taysa `alice:feature/login → main`).
+Yer kısa olduğunda önce hedef kesilir (üç nokta), başlık yerin çoğunu korur ve dar bir pencerede
+dallar gösterilmez; Eylemler sütunu asla dışarı itilmez. Kesilmiş bir metnin tamamı için işaretçiyi üzerinde bekletin. Dalları
+adlandırmayan bir barındırıcı orada hiçbir şey göstermez. Bir issue satırı, deposunu bir request satırıyla aynı hapta adlandırır
+(klonun klasör adı veya klonlanmamışsa `owner/name`).
+
+### Barındırıcıda işlem yapmak
+
+**Merge**, **Kapat** ve **Hazır olarak işaretle** GitHub, GitLab, Gitea ve Forgejo üzerinde çalışır (diğer barındırıcılar bunları
+"... desteklemiyor" ile gri yapar; issue'lar aynı barındırıcılarda kapatılabilir).
+
+- **Merge** önce sorar: kutu request'i, projesini ve dallarını adlandırır ve yöntemi sunar (bir merge commit, squash ve
+  barındırıcıda varsa rebase; GitLab merge eder veya squash yapar). Bir taslak, hedefiyle çakışan bir request veya başarısız
+  denetimler için nedeniyle reddedilir; barındırıcının bir reddi (izin yok, dalın bir kuralı) durum satırında gösterilir.
+- **Kapat** önce sorar ve merge etmeden kapatır.
+- **Hazır olarak işaretle** bir taslağı taslaktan çıkarır (GitLab ve Gitea: `Draft:` / `WIP:` işareti başlıktan kalkar). Hiçbir
+  şey sormaz: barındırıcıda geri alınabilir.
+- **Depoyu klonla...** satırın projesinde olağan Klonla iletişim kutusunu açar (URL doldurulur, klasör seçici olağan olandır). Klon
+  oluştuktan sonra Radar, uzak depoları bir sonraki okuyuşunda satırı onun üzerine yerleştirir (yeniden açın veya Yenile) ve Klonla
+  bundan sonra klonun nerede olduğunu söyler.
+
+Merge ve Kapat barındırıcıyı değiştirir ve **GitPoulpi'den geri alınamaz** (kutu bunu söyler); kapatılmış bir request'i barındırıcıda yeniden açın.
+Başarılı bir çağrıdan sonra listeler yeniden istenir, böylece merge edilmiş veya kapatılmış bir satır kaybolur ve hazır olan `draft` hapını kaybeder.
 
 ## Açmak
 
@@ -181,7 +235,7 @@ tuşu ve bir palet karşılığı vardır.
 
 | Eylem | Tuş | Palet |
 |---|---|---|
-| Depoyu aç (sekmesi açılır veya ona geçilir) | `Enter` / çift tık | `Radar: Depoyu Aç` |
+| Depoyu aç (sekmesi açılır veya ona geçilir; klonlanmamış bir request nasıl inceleneceğini sorar) | `Enter` / çift tık | `Radar: Depoyu Aç` |
 | İncele... (bir request; klonlanmamış bir request nasıl yapılacağını sorar) | `e` | `Radar: İsteği İncele...` |
 | Bir request'i sunucunun API'si üzerinden incele (klon yok) | sorudaki `a` | `Radar: API Üzerinden İncele` |
 | Depoyu klonla, sonra request'i incele | sorudaki `c` | `Radar: Klonla ve İncele...` |

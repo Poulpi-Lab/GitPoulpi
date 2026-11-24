@@ -142,6 +142,7 @@ Gravatar'a gönderir ve bağlı GitHub/GitLab hesabınıza sorar)
 | `ui.diff_hunks_only` | `true` | `false` tüm dosyayı değişiklikler yerinde olarak gösterir (`H`). |
 | `ui.diff_show_whitespace` | `true` | Yalnızca boşluk değişikliklerini gösterir (`s`). |
 | `ui.diff_word_wrap` | `false` | Uzun diff satırlarını kaydırır (`w`; Ayarlar > Diff ve düzenleyici). |
+| `ui.diff_intraline` | `true` | Değişen bir satırın değişen sözcüklerini daha güçlü bir arka planla boyar (palet `Fark: Değişen Sözcük Vurgusunu Aç/Kapat`; Ayarlar > Diff ve düzenleyici). |
 | `ui.minimap` | `false` | Diff'in ve düzenleyicinin kaydırma çubuğunun yanında bir minimap (`M`). |
 | `ui.mermaid_detail` | `refs` | Log'un Mermaid gitGraph olarak kopyala özelliğinin ayrıntı düzeyi: `structure`, `refs`, `subjects`, `full` (pencereden hatırlanır; `log --format mermaid` komutunun varsayılanı). |
 | `ui.mermaid_orientation` | `lr` | O grafiğin yönü: `lr` (soldan sağa) veya `tb` (yukarıdan aşağıya). |
@@ -396,7 +397,7 @@ ajanlar](mcp-and-agents.md#i̇zinler).
 | `ai.enabled` | `false` | Anahtar. Kapalıyken hiçbir yerde YZ ile ilgili bir şey görünmez ve hiçbir şey gönderilmez. |
 | `ai.default_profile` | `"default"` | Eylemler hiçbirini belirtmediğinde kullandıkları profilin id'si. |
 | `ai.global_instructions` | `""` | Her eylemin istemine eklenen metin. `${repo}`, `${uilang}`, ... kullanabilir ([YZ > İstem değişkenleri](ai.md#i̇stem-değişkenleri) bölümüne bakın); eylem başına ve depo talimatları için de aynıdır. |
-| `ai.actions.<action>.profile` | `""` | Tek bir eylem için profil; boş = varsayılan. Eylemler: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`. Bir çalışma alanı (`workspaces.toml`, `[workspace.ai_instructions]` ve `[workspace.ai_overrides.<action>]`) ve bir depo bu talimatlara ekleme yapabilir veya onları değiştirebilir: bkz. [YZ](ai.md#talimatlar). |
+| `ai.actions.<action>.profile` | `""` | Tek bir eylem için profil; boş = varsayılan. Eylemler: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `sequence_draft`. Bir çalışma alanı (`workspaces.toml`, `[workspace.ai_instructions]` ve `[workspace.ai_overrides.<action>]`) ve bir depo bu talimatlara ekleme yapabilir veya onları değiştirebilir: bkz. [YZ](ai.md#talimatlar). |
 | `ai.actions.<action>.instructions` | `""` | Yalnızca o eylem için eklenen metin. |
 | `ai.review.run_in_repository` | `"profile"` | `profile`, `yes` veya `no`: bir kod inceleme taslağının yerel ajanının o çalıştırma için depo içinde çalışıp çalışmayacağı; YZ profilinin `workdir` değerini geçersiz kılar. Bir depo kendi değerini ayarlayabilir (`gitpoulpi ai review-context --repo`). Bkz. [YZ > İnceleme bağlamı](ai.md#i̇nceleme-bağlamı). |
 | `ai.review.include_claude_md` | `true` | Bir kod inceleme taslağına deponun `CLAUDE.md` dosyasını ver (kök, isteğin hedeflediği dalda okunur; 8 KB'ta kesilir). |
@@ -420,7 +421,7 @@ ajanlar](mcp-and-agents.md#i̇zinler).
 | `ai.hosting_reply.read_repository` | `false` | "YZ depoyu okuyabilsin" seçeneğinin işaretli başlayıp başlamayacağı. Varsayılan olarak kapalı: depo yalnızca o kullanım için siz işaretlediğinizde okunur. Bir yerel ajan veya bir API profili onu o zaman [YZ bölümünde](ai.md#depo-erişimi) anlatıldığı gibi okur. |
 | `ai.hosting_reply.reuse_agent_session` | `true` | Harness'i destekliyorsa, bir yerel ajanın oturumunu iki yanıt arasında korur. YZ depoyu okuyabildiğinde etkili olur. |
 | `ai.hosting_reply.context_ttl_minutes` | `30` | Bir yanıt için depodan oluşturulan bağlamın ne kadar süre yeniden kullanılacağı. 1 ile 1440 arasında tutulur. YZ depoyu okuyabildiğinde etkili olur. |
-| `ai.sent_preview.<action>` | `true` | Eylem başına bir anahtar (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`): istek çıkmadan önce "Gönderilenler"i gösterir. İletişim kutusundaki "<eylem> için bir daha gösterme" `false` yazar; Ayarlar > YZ > *Göndermeden önce gönderileni göster...* onları yeniden açar. `rewrite_script` ve `rewrite_rules` kabul edilir ama etkisi yoktur: geçmişi yeniden yazma pencereleri her zaman kendi bölmesini gösterir. `worktree_name` de kabul edilir ama etkisi yoktur: yalnızca Worktree oluştur penceresine yazdığınızı ve yerel dal adlarını gönderir. |
+| `ai.sent_preview.<action>` | `true` | Eylem başına bir anahtar (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`, `sequence_draft`): istek çıkmadan önce "Gönderilenler"i gösterir. İletişim kutusundaki "<eylem> için bir daha gösterme" `false` yazar; Ayarlar > YZ > *Göndermeden önce gönderileni göster...* onları yeniden açar. `rewrite_script` ve `rewrite_rules` kabul edilir ama etkisi yoktur: geçmişi yeniden yazma pencereleri her zaman kendi bölmesini gösterir. `worktree_name` de kabul edilir ama etkisi yoktur: yalnızca Worktree oluştur penceresine yazdığınızı ve yerel dal adlarını gönderir. |
 
 Bir deponun kendi `[preferences.ai_review]` tablosu (`repo-state.toml` içinde, ya da klonlanmamış bir deponun girdisi
 `remote-reviews.toml` içinde) aynı anahtarları alır, hepsi isteğe bağlıdır, ayrıca `no_extra_file = true`: o depo için
@@ -551,6 +552,48 @@ Birkaç kurulum tek bir `config.toml` dosyasını paylaşabilir (bir paket, bir 
 | `installation.primary` | yok | Birincil kurulumun kimliği. Yoksa: hiçbiri. |
 | `installation.settings.<id>` | yok | Kurulum başına bir tablo: `path` (klasörü, taşındığında yenilenir), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (bilgilendirici), `name` (başlatıcı adı, `GitPoulpi (<label>)`, ilk çalıştırmada dondurulur), `name_with_version` (kapalı: ada `<major>.<minor>` ekle), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (boş: klasör menüsü girdisi kökte durur), `env` (boş: kendi kimliği; aynı adı paylaşan kurulumlar daemon'ları, oturumları ve geri alma geçmişini paylaşır), `mcp_bind` (boş: `mcp.bind`). Boş bir değer, birincil kurulum için `ui.*` değerine, aksi halde türün varsayılanına döner (bir geliştirme çalışma kopyası `sun` giyer). |
 
+## `[[sequences]]`
+
+Adlandırılmış eylem dizileri: birbiri ardına çalıştırılan palet komutlarının listesi
+(örneğin Yedekleme: her şeyi stage'le, mesajı YZ ile yaz, commit et, push et). Dizi başına bir
+tablo, adımları `[[sequences.steps]]` olarak.
+
+```toml
+[[sequences]]
+id = "backup"                    # kısa ad: [keybindings.sequence] içindeki anahtarı ve CLI adı
+name = "Backup"                  # sizin metniniz, asla çevrilmez
+description = "Stage, commit with an AI message, push"   # isteğe bağlı
+scope = "installation"           # installation (varsayılan) | machine | repo
+owner = "3f9a0c1d2b4e5f60"       # kurulum kimliği; scope = "installation" ile ayarlanır
+
+[[sequences.steps]]
+run = "stage_all"                # bir palet komutu kimliği
+
+[[sequences.steps]]
+run = "ai_generate_commit_message"
+pause = "always"                 # default | always | never
+
+[[sequences.steps]]
+run = "create_worktree_from_current_branch"
+pause = "never"
+[sequences.steps.options]
+name = "wip-${date}-${n}"        # bir şablon: ${branch} ${date} (yyyy-mm-dd) ${time} (hh-mm) ${n} (ilk boş numara)
+open_tab = true
+```
+
+| Anahtar | Anlamı |
+|---|---|
+| `scope` | `installation`: yalnızca kimliği `owner` olan kurulum görür. `machine`: bu `config.toml` dosyasını paylaşan her kurulum. `repo`: depoda `.gitpoulpi/sequences.toml` içinde saklanır (aynı `[[sequences]]` biçimi), yalnızca orada görünür ve yalnızca o dosyaya güvendikten sonra, çünkü işlenmiş bir dosya başkasının komutlarıdır. |
+| `steps[].run` | Bir palet komutu kimliği, `[keybindings.palette]` içinde gösterilen snake_case ad. Yalnızca sabit bir izin listesi kabul edilir: stage'leme, commit, stash push, yeni dal / tag, fetch, pull, push (ve hepsine push, hepsini pull, tag'leri push varyantları), YZ mesajı ve commit composer komutları, worktree oluşturma, bir sekme veya terminal açma ve lease ile force push. Yıkıcı komutlar (at, reset, silmeler, worktree kaldırma, stash drop, geçmiş yeniden yazma, çıkış, Ayarlar) ve diğer diziler adım olamaz. Bu sürümün bilmediği bir adım dosyada korunur ve bildirilir. |
+| `steps[].pause` | `default`: adım girdi gerektirdiğinde olağan iletişim kutusunda durur. `always`: öncesinde durur ve devam etmeyi sorar. `never`: asla durmaz; adım bu durumda iletişim kutusunun soracağı seçenekleri ister (yeni bir dal veya worktree için bir `name`). Lease ile force push `never` olamaz. |
+| `steps[].options` | Adım başına yanıtlar: `name` (yeni dal, tag, worktree), `branch` (seçilen daldan worktree), `open_tab` (yeni worktree'yi bir sekmede aç), `message` (commit), `label` (Şurada aç girişi), `profile` (ajan profili). |
+| en çok 32 adım | Bir dizinin 1 ile 32 arasında adımı vardır. |
+
+Bir dizideki veya adımdaki bilinmeyen anahtarlar, GitPoulpi dosyayı yeniden yazarken korunur.
+Görebildiğiniz diziler arasındaki yinelenen kimlikler bildirilir. Birini
+`[keybindings.sequence] <id> = "<chord>"` ile bağlayın, örneğin
+`backup = "Ctrl+G b"`.
+
 ## `[keybindings]`
 
 TUI'nin kısayollarını yeniden atar; Ayarlar > Klavye ve fare bunu düzenler.
@@ -570,6 +613,7 @@ stage_file = "z"
 yerini alır, satırı kaldırmak onları geri getirir. Tuş dizileri: `Ctrl+Shift+N`, `Alt+n`,
 `F2`, `PageDown`, `Space`, `,`, `P` (= `Shift+p`). Hatalı bir girdi hiçbir şeyi engellemez:
 TUI onu yok sayar, varsayılanı korur ve durum çubuğunda bunu söyler.
+`[keybindings.sequence]`, [`[[sequences]]`](#sequences) dizilerinizi kimliğe göre bağlar.
 Bağlamlar, eylem kimlikleri, varsayılanlar ve çakışma kuralları: [Klavye kısayolları](keybindings.md).
 
 ## Depo başına ayarlar: `.gitpoulpi/repo-state.toml`

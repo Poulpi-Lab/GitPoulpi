@@ -69,6 +69,8 @@ satırında gösterilen kendi harfi vardır. Seçili satır için:
   adlı bir dal alır - geçerli dalınız ve dosyalarınız asla hareket etmez. Onay,
   tam olarak ne yapacağını gösterir ve geri yükleme yeni bir eylemdir: `Ctrl+Z`
   onu geri alır.
+- **Tüm diziyi geri al** (`x`): en yeni girdiler tek bir dizi çalıştırmasının olduğu sürece sunulur
+  (bkz. [Dizi çalıştırmaları](#dizi-çalıştırmaları)).
 - Geri alınmış bir satırda **Buraya kadar yinele** (`y`).
 - **main dalını Commit eyleminin bıraktığı yere geri yükle** (`o` veya panelin dışından
   `Alt+Shift+Z` / `Düzenle: Dalı Engelli Eylemin Bıraktığı Yere Geri Yükle`): başka
@@ -77,6 +79,9 @@ satırında gösterilen kendi harfi vardır. Seçili satır için:
 
 Aynı eylemler için bir satıra sağ tıklayın (veya `.` tuşuna basın): menü olarak
 açılır.
+
+Bir [dizinin](sequences.md) bir adımının yaptığı bir satır `⟳ Backup` rozetini taşır ve ayrıntı satırı
+hangi adım olduğunu söyler ("\"Backup\" dizisi yaptı, adım 3/4.").
 
 ![Bir dalı silip iki commit yaptıktan sonra Geri alma geçmişi: silinmiş dalın satırı seçili ve tek başına geri yüklenebilir](../images/undo-history.png)
 
@@ -172,7 +177,7 @@ basın: palet üstünde açılır ve **Geri Alma Geçmişi:**, **Reflog:** ve **
 
 | Görünüm | Palet satırları |
 |---|---|
-| Geri alma geçmişi | `Geri Alma Geçmişi: Buraya Kadar Geri Al...`, `Buraya Kadar Yinele...`, `Yalnızca Bunu Geri Yükle...`, `Dalı Eski Yerine Geri Yükle...`, `Yenile`, `Kapat` |
+| Geri alma geçmişi | `Geri Alma Geçmişi: Buraya Kadar Geri Al...`, `Buraya Kadar Yinele...`, `Tüm Diziyi Geri Al`, `Yalnızca Bunu Geri Yükle...`, `Dalı Eski Yerine Geri Yükle...`, `Yenile`, `Kapat` |
 | Reflog | `Reflog: Log'da Göster`, `Burada Dal Oluştur...`, `Burada Tag Oluştur...`, `Değişiklikleri Çalışma Ağacına Uygula`, `Değişiklikleri Stash Olarak Kaydet`, `Bu Konuma Geri Yükle...`, `Daha Fazla Yükle`, `Yenile` |
 | Kaybolan çalışma | `Kaybolan Çalışma: Burada Dal Oluştur...`, `Burada Tag Oluştur...`, `Cherry-pick`, `Değişiklikleri Çalışma Ağacına Uygula`, `Değişiklikleri Stash Olarak Kaydet`, `Yeniden Tara` |
 
@@ -183,6 +188,34 @@ satır, hiçbir şey yapmamak yerine durum çubuğunda nedenini söyler: "bu eyl
 alındı: Buraya kadar yinele'yi kullanın", bir girdinin tek başına neden geri
 yüklenemediği, "yalnızca bir dal veya HEAD geri taşınabilir" ve benzerleri. `...`
 satırları düğmeyle aynı onayı ya da ad istemini açar.
+
+## Dizi çalıştırmaları
+
+Bir [dizi](sequences.md) (Yedekleme: hepsini stage'le, YZ commit mesajı, commit, push) bir şeyi değiştiren
+**her adım için tek bir olağan günlük girdisi** oluşturur: buradaki stage ve commit, YZ mesajı ve push değil
+(bir push asla geri alınmaz, aşağıya bakın). Günlük depo başınadır ve kesinlikle en yeni başta olacak biçimdedir,
+bu yüzden bir çalıştırma tek bir girdi olamaz: her biri kendi denetimlerini korur ve her biri onu yapan
+çalıştırmayla etiketlenir (`sequence:Backup#<run> 3/4`). Eski günlüklerde etiket yoktur ve eskisi gibi yüklenir.
+
+**Tüm diziyi geri al**, bir çalıştırmanın girdilerini en yeniden başlayarak, her biri olağan bir Geri al olarak geri alır.
+Günlüğün en yeni girdileri tek bir çalıştırmanınsa, ardışıksa sunulur: başka bir çalıştırmanın bir girdisi, elle
+yaptığınız bir değişiklik ya da araya giren GitPoulpi dışında yapılmış bir değişiklik grubu bitirir. Nerede olduğu:
+
+- Geri alma geçmişi: `Tüm diziyi geri al` düğmesi (`x`), satırın sağ tık menüsü ve
+  `Geri Alma Geçmişi: Tüm Diziyi Geri Al` palet satırı;
+- komut paleti: `Düzenle: Tüm Diziyi Geri Al` (uygulanırken satırda dizinin adı bulunur);
+- komut satırı ve MCP: `gitpoulpi undo --sequence` (aşağıda).
+
+Her girdi, tek bir Geri al'ın yapıldığı gibi tek başına denetlenir: upstream'inde zaten olan bir commit
+gitmeden önce "yine de geri alınsın mı?" diye sorar (yanıtlayın, gerisi devam eder) ve ilerlemiş bir dal ya da
+sürmekte olan bir merge reddeder. İlk ret (veya bir soruya "hayır") **durdurur** ve hangi adım olduğunu ve nedenini
+söyler: *"Backup" geri alma 3/4. adımda durdu (Commit "wip" (a81b9e4)): ... Kalan eylem: 2*.
+Geri alınan geri alınmış kalır, daha eski girdiler günlükte durur ve düz bir Geri al (ya da düğme yeniden) oradan devam eder.
+
+Yalnızca bu deponun günlüğü geri alınır. Başka bir depoda da işlem yapan bir çalıştırma (bir worktree adımı
+sonraki adımları yeni worktree'nin sekmesine taşıdı) o deponun kendi günlüğünde girdiler bıraktı; onu açın ve orada
+geri alın. **Yinele** girdi başınadır: bütün bir çalıştırmayı geri aldıktan sonra `Ctrl+Y` en yeni adımı geri getirir,
+sonra bir sonrakini, her biri kendi denetimiyle.
 
 ## Nelerin geri alınabildiği
 
@@ -373,6 +406,8 @@ Geri al yalnızca riskli olduğunda sorar:
   push'lar** (yukarıya bakın), bu yüzden her zaman sorar; onu orada yeniden silen
   yinele de öyle.
 
+Tüm bir diziyi geri almak listeyi bir kez sorar (panelde), sonra riskli her girdi yukarıdaki gibi yeniden sorar.
+
 Yinele ve yalnızca ref taşıyan her geri alma asla sormaz: diğer yön bir
 tuş uzağınızdadır.
 
@@ -415,6 +450,7 @@ hiçbir şey asla silinmez.
 gitpoulpi undo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi redo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi undo --list [--all]
+gitpoulpi undo --sequence [--dry-run] [--yes]
 gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 ```
 
@@ -424,6 +460,14 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 - `--expect <id>`, o girdi hâlâ en yeni olmadıkça çağrının *eski* diye reddetmesini
   sağlar: bir betik (veya ikinci bir pencere) baktığından başka bir şeyi asla
   geri almaz.
+- `--sequence`, günlüğün en üstündeki dizi çalıştırmasını geri alır (bkz.
+  [Dizi çalıştırmaları](#dizi-çalıştırmaları)): tek bir `sequence run` çalıştırmasının yaptığı en yeni
+  ardışık girdiler, en yeniden başlayarak, her biri kendi denetimleriyle bir `undo`. `--dry-run` onları
+  listeler; `--yes` olmadan bir tane isteyen ilk girdi (çıkış **3**) onu durdurur, adımı adlandırır, o ana kadar
+  geri alınanlar `undone` içinde ve kalanlar `left` içinde. Bir ret `stopped.refused` ile **2** ile çıkar;
+  günlüğün üstü tek bir çalıştırmanın değilse yanıt `{"no_sequence": {...}}`, çıkış 2'dir. Girdiler
+  çalıştırmalarını `undo --list` içinde taşır (`summary.origin`: `name`, `run_id`, `step`, `of`).
+  `--expect` ile birlikte kullanılmaz.
 - `undo-forget`, engelli en yeni girdiyi günlükten düşürür (`--redo`: en yeni
   yineleme girdisi). O girdi engelli değilse reddeder ve `--yes` olmadan **3** ile
   çıkar. MCP için bir değişiklik işlemidir, ama yıkıcı değildir: depoya

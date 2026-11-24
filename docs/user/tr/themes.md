@@ -205,7 +205,15 @@ Her tema, Log grafiği için kendi şerit renklerini getirir; ancak herhangi bir
 herhangi bir paletle birleştirebilirsiniz: **Ayarlar > Görünüm > Grafik renk teması**,
 **Temayı izle** seçeneğini (varsayılan) ve her temanın her şerit paletini sunar
 (GitPoulpi Dark, GitPoulpi Light, ardından Material, Serie, ... ve kendi tema
-dosyalarınızın `graph_palette` değeri). ![Görünüm sayfasındaki Grafik renk teması açılır listesi: Temayı izle, ardından her şerit paleti ve renklerinden birkaçı](../images/settings-log-graph-lanes.png)
+dosyalarınızın `graph_palette` değeri, hazır ayarlardan sonra temanın adı altında listelenir).
+Özel bir tema, listenin bir sonraki açılışında görünür (dosyalar o zaman yeniden okunur) ve birini
+seçmek dosya adını `ui.graph_color_theme` içinde saklar (birincil kurulum için `[ui]` içinde,
+diğerleri için tema gibi kendi `[installation.settings.<id>]` girdilerinde). `graph_palette`
+içermeyen bir tema dosyası, `base` değerinin şerit renklerini alır (hiçbirini adlandırmıyorsa
+varsayılan hazır ayar), dosyanın diğer tüm renkleriyle aynı kalıtım. Yerleşik bir şerit paletiyle
+aynı adlı bir özel tema (örneğin `gruvbox`) o paleti listede değiştirir. Yapılandırılmış ad artık
+yoksa (dosya silindi veya yeniden adlandırıldı), grafik etkin temanın şerit renklerini kullanır
+ve Ayarlar, siz başka birini seçene kadar adı *bulunamadı* olarak işaretli gösterir. ![Görünüm sayfasındaki Grafik renk teması açılır listesi: Temayı izle, ardından her şerit paleti ve renklerinden birkaçı](../images/settings-log-graph-lanes.png)
 
 `config.toml` içinde:
 
@@ -254,6 +262,17 @@ statusbar_fg = "#eceff4"
 [diff]
 add_bg = "#2f3b2f"
 ```
+
+### Bir diff'te değişen sözcükler (`diff.add_emph_bg`, `diff.del_emph_bg`)
+
+Diff görünümünün, değişen bir satırın içinde farklı olan sözcüklere, `diff.add_bg` (eklenen
+satırlar) ve `diff.del_bg` (silinen satırlar) üzerine boyadığı daha güçlü arka planlar; metin
+`diff.add_fg` ve `diff.del_fg` değerlerini korur. Her hazır ayar ikisini de ayarlar. `diff.add_bg`
+veya `diff.del_bg` ayarlayıp eşleşen vurguyu ayarlamayan bir tema dosyası, ondan türetilmiş bir vurgu
+alır (o tarafın metin rengine doğru yolun %30'u), böylece özel bir arka plan asla temel temanın
+vurgusuyla bitmez. `default` değeri (Terminal hazır ayarı) ya da renk derinliği iki arka planı
+aynı çizecek bir terminal, sözcükleri bunun yerine kalın ve altı çizili işaretler. Bkz.
+[Bir diff'te değişen sözcükler](interface-tour.md#bir-difftte-değişen-sözcükler).
 
 Renkler `"#rrggbb"`, `"ansi:N"` (terminal paletinin N. girdisi) ya da `"default"`
 (terminalin kendi rengi) olarak yazılır. Grup ve anahtarlar `gitpoulpi theme export <slug>`
@@ -312,6 +331,8 @@ Bir tema ssh üzerinden ya da eski bir çoklayıcıda yanlış renklerle görün
 maliyeti yoktur; eşleme geçişi yalnızca etkinken, kare başına bir kez ekranın üzerinden
 geçer.
 
+Tema kuruluma özeldir: aynı yapılandırmayı paylaşan birkaç GitPoulpi kurulumu kendi temasını korur, bu yüzden birinde tema seçmek diğerlerini asla yeniden renklendirmez.
+
 ## Canlı önizleme
 
 Ayarlar > Görünüm içinde Tema açılır listesi **Sistem (terminali izler)** seçeneğini,
@@ -332,13 +353,15 @@ uygular ve `ui.theme` değerini `config.toml` dosyasına kaydeder, **Esc** (ya d
 dışına tıklamak) önceki temayı geri koyar ve hiçbir şey kaydetmez.
 
 Filtre alanının altında bölümlü bir ön filtre listeyi daraltır: **Tümü**, **Koyu**,
-**Açık** ve **Renkli** (bir bölüme tıklayın, `Tab` / `Shift+Tab` ya da
-`Alt+1`..`Alt+4`). Koyu ve Açık, temanın `ui.bg` parlaklığından gelir; **Renkli**, arka
+**Açık** ve **Renkli**, ayrıca kendi tema dosyalarınız varsa **Özel** (bir bölüme tıklayın, `Tab` / `Shift+Tab` ya da
+`Alt+1`..`Alt+5`). Koyu ve Açık, temanın `ui.bg` parlaklığından gelir; **Renkli**, arka
 planı belirgin biçimde renk tonlu (mavi, mor, sarı, yeşil...) olan temaları tutar ve beyaz,
 kırık beyaz, siyah ve siyaha yakın grileri dışarıda bırakır; bu yüzden Solarized Dark,
 Dracula ya da Nord renklidir, GitHub Dark ve One Light değildir. Renkli bir tema ayrıca
 Koyu ya da Açık altında da görünür. **Sistem** ve saydam temalar (kendi arka planı
-olmayanlar) yalnızca Tümü altında görünür. Ön filtre yazdıklarınızla birleşir. Grafik
+olmayanlar) yalnızca Tümü altında görünür. **Özel**, yalnızca `themes/` klasörünüzdeki tema
+dosyalarını tutar (özel bir tema bu düğmeler için yine Koyu, Açık veya Renklidir); klasörde hiç tema
+yoksa düğme çizilmez ve tuşlarla erişilemez. Ön filtre yazdıklarınızla birleşir. Grafik
 renk teması ve dil seçicileri de aynı biçimde önizler: vurgu hareket ettikçe Log'un
 şeritleri ve arayüzün tamamı değişir.
 

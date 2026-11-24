@@ -31,7 +31,13 @@ panel çalışma değişikliklerini gösterir:
   `gitpoulpi diff` `renamed_from` bildirir.
 - **Yol** veya **Ağaç** (`m`) dosyaları düz ya da klasörler halinde listeler.
   **Tümünü Daralt** (`z`) klasörleri kapatır. **Tüm dosyaları göster** (`a`)
-  yalnızca değişen dosyalar yerine tüm ağacı gösterir. Listenin boş kısmına sağ
+  yalnızca değişen dosyalar yerine tüm ağacı gösterir. Daraltılmış bir klasör, adından sonra
+  içindeki dosyaların (alt klasörler dahil) küçük, soluk bir sayısını gösterir (`src/ (12)`);
+  açık bir klasör göstermez. Dar bir panelde sayı görünür kalsın diye önce ad kısaltılır.
+  Git LFS ile saklanan dosyaları olan bir depoda bir **Yalnızca LFS** onay kutusu (`o` ya da
+  **Dosyalar: Yalnızca LFS'yi Aç/Kapat**) her dosya listesini (Unstaged, Staged, **Tüm dosyaları göster**,
+  bir commit'in dosyaları) bu dosyalara daraltır; klasör sayıları buna uyar ve hiçbir dosya LFS
+  kullanmıyorsa sunulmaz. Listenin boş kısmına sağ
   tıklamak **Tümünü genişlet** / **Tümünü daralt**, bir klasör satırına sağ
   tıklamak **Tüm alt klasörleri genişlet** / **Tüm alt klasörleri daralt** sunar;
   tuşlar `=`, `-`, `*`, `_` (bkz. [Fare ve hareketler](mouse-and-gestures.md)).

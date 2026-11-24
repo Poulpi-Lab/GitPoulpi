@@ -319,11 +319,14 @@ Sağ panel, Log'daki seçimi izler.
 avatarlı ve tarihli yazar, üst commit'in hash'i ve değişiklik sayıları, ardından
 mesaj (özet ve açıklama; yeniden boyutlandırmak için alt kenarlığını sürükleyin).
 Alttaki **Değişen dosyalar** paneli kendi denetimleriyle başlar: sıralama düğmesi,
-**Yol** / **Ağaç**, **Tüm dosyaları göster** ve bir **Dosyaları filtrele** kutusu;
+**Yol** / **Ağaç**, **Tüm dosyaları göster** ve bir **Dosyaları filtrele** kutusu (LFS
+dosyaları olan bir depoda sağ ucunda bir **Yalnızca LFS** onay kutusuyla);
 bunlar listenin üstünde sabit durur ve yalnızca liste kayar. Diff'ini açmak için bir
 dosyaya tıklayın. Kısa bir pencerede önce mesaj (bir satıra kadar), sonra liste yer
 bırakır. Çalışma değişiklikleri görünümü **Yol** / **Ağaç** / **Tüm dosyaları göster**
-satırını dosya listelerinin en üstünde, Unstaged ve Staged listelerinin üstünde tutar.
+satırını dosya listelerinin en üstünde, Unstaged ve Staged listelerinin üstünde tutar. Ağaç
+modunda daraltılmış bir klasör, içindeki dosyaların sayısıyla (alt klasörler dahil) biter,
+soluk bir `(12)` olarak.
 
 **Mesajdaki bağlantılar.** Mesaja yazılmış bir web adresi (`https://...` veya bir
 markdown `[metin](https://...)` bağlantısının hedefi) altı çizili görünür, el
@@ -359,6 +362,23 @@ getirir. Üst kenar boyunca bir düğme çubuğu uzanır:
 | **Kaydır** | Uzun satırları kaydırır. |
 | **Harita** | Kaydırma çubuğunun yanında tüm dosyanın bir mini haritası. |
 | **Kodlama** | Dosyanın okunduğu kodlama (önce **Otomatik**). |
+
+#### Bir diff'te değişen sözcükler
+
+Bir satır yalnızca kısmen değiştiğinde, farklı olan sözcükler satırın kendi renginin daha
+güçlü bir arka planıyla boyanır (silinen satırda daha güçlü bir kırmızı, eklenen satırda
+daha güçlü bir yeşil) ve satırın geri kalanı düz tonunu korur. Bir hunk içinde silinen
+satırların her dizisi, onu izleyen eklenen satırlar dizisiyle eşlenir: birincisi birinciyle,
+ikincisi ikinciyle ve böyle sürer; bir çift yalnızca boş olmayan karakterlerinin en az %40'ı
+aynıysa işaretlenir, bu yüzden sıfırdan yeniden yazılmış bir satır tek bir vurgu bloğuna
+dönüşmek yerine düz kalır. Sözcükler, boşluk dizileri ve tek noktalama karakterleri
+karşılaştırılır, iki değişen sözcük arasındaki tek bir boşluk onları tek bir işarette
+birleştirir ve 1000 karakterden uzun satırlar işaretlenmez. Satır İçi ve Bölünmüşte,
+sözcük kaydırma ve yana kaydırma ile ve incelemenin diff panelinde çalışır. **Ayarlar > Diff
+ve düzenleyici > Değişen sözcükleri vurgula** (`ui.diff_intraline`) ile ya da komut
+paletinden (**Fark: Değişen Sözcük Vurgusunu Aç/Kapat**, kendi tuşu yok) kapatın. 16 renkle
+sınırlı bir terminalde veya diff arka planı olmayan bir temayla, değişen sözcükler bunun
+yerine kalın ve altı çizili gösterilir.
 
 Çalışma ağacının bir diff'inde her hunk'ın **Hunk'ı Stage'le** ve **Hunk'ı At**
 düğmeleri vardır. Satır seçmek için `v` tuşuna basın, ardından yalnızca o

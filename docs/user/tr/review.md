@@ -159,10 +159,30 @@ harftir: **`V`** yerleşim, **`H`** hunk'lar veya tüm dosya, **`S`** boşluk, *
 önceki hunk, **`E`** kodlama, **`M`** minimap. Her birinin bir palet satırı vardır (*İnceleme: Satır İçi veya Bölünmüş
 Yerleşim*, ...).
 
+**Genel Bakış**'ta konuşma ve ✦ taslak bloğu aynı biçimde seçilir: metnin üzerinde sürükleyin,
+**`Ctrl+C`** kopyalar (bastığınız bir bağlantı ya da düğme eylemini korur ve birinde başlayan bir sürükleme
+hiçbir şey seçmez). Seçim yokken **`Ctrl+C`** (ya da *Konuşma: Metni Kopyala*) seçili girdiyi sunucunun sakladığı
+haliyle kopyalar. Metnin üzerinde I-beam, düğmelerin ve bağlantıların üzerinde el görünür. Bir seçim ekranda
+olanı izler: kaydırmak onu metniyle birlikte taşır (görünümün dışındayken seçili kalır), metni yeniden yazan bir
+yenileme onu bırakır ve kaydırılmış bir paragraf gösterdiği satırlar olarak kopyalanır.
+
+**Dosyalar** sayfasındaki diff'in içindeki yorumlar (bir konuşma dizisi, bekleyen notlarınız, ✦ öneriler) de
+seçilir: sözcüklerinin üzerinde sürükleyin, **`Ctrl+C`** (ya da *İnceleme: Seçili Metni veya Satırı Kopyala*)
+kopyalar, **`Esc`** seçimi bırakır. Düğmelerinden birine basmak ya da bir konuşma dizisinin başlığına düz tıklamak
+(katlar) yine eylemini yapar; başlıkta başlayan bir sürükleme sözcüklerini seçer ve diziyi olduğu gibi bırakır.
+
 ### Commit'ler
 
 Yalnızca isteğin commit'leri (arkasındaki geçmiş değil), en yeniden başlayarak ve seçili olanın diff'i (ebeveynine
 karşı değişiklikleri), tüm dosyaları alt alta ve aynı görüntü seçenekleriyle.
+
+## Bir incelemeye geri dönmek
+
+Başka bir sekmede çalışırken bir inceleme açık kalır. İnceleme açıkken sekmeden ayrılın (başka bir sekmeye tıklayın, `Ctrl+PageDown`, paletteki **Depo: Sonraki Sekme**) ve geri dönmek onu aynı istekte, aynı sayfada (Genel Bakış, Dosyalar ya da Commit'ler), aynı dosyada ve aynı satırda, klavye aynı tarafta olacak biçimde yeniden açar. Radar üzerinden API ile yapılan bir inceleme için de aynısı geçerlidir: Radar sekmesini yeniden gösterin ve inceleme üzerinde geri gelir.
+
+Bir inceleme, sayfası açık olduğu sürece **sürmektedir**. Onu kapatmak (`Esc`, çarpı, **İnceleme: Kapat**), göndermek (**İncelemeyi bitir** ya da bir Gerrit değişikliğini göndermek veya bırakmak) ya da dalını checkout etmek onu bitirir ve yeniden açılmaz. İnceleme açıkken GitPoulpi'den çıkmak sekmeden ayrılmak sayılır: sonraki başlangıç onu aynı biçimde yeniden açar.
+
+İstek bu arada merge edildiyse veya kapatıldıysa ya da sunucu yanıt vermiyorsa hiçbir sayfa açılmaz: durum satırı nedenini söyler ve bir sonraki sefer hiçbir şey yeniden açılmaz. Bekleyen yorumlar, görüldü işaretli dosyalar ve taslak her zamanki gibi korunur (bkz. **Bir inceleme yazmak**). Ayrıldığınızda hâlâ süren bir öneri çalıştırması taşınmaz.
 
 ## Bir inceleme yazmak
 

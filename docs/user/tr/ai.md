@@ -162,6 +162,22 @@ GitPoulpi sizin yerinize asla yanıtlamaz: istek bir iletiyle durur ve
 görünür bir terminalde, kullanacağı çalışma klasöründe açar. Soruyu yanıtlayın,
 ajanı kapatın ve yeniden deneyin; yanıtı ajan hatırlar.
 
+### Ajanı bir sekmenin klasöründe açma
+
+Komut paletindeki `Sekme: Burada YZ Ajanı Aç` (`palette.tab_open_agent_here` olarak yeniden
+atanabilir, varsayılan tuşu yok) terminalinizi etkin sekmenin klasöründe, yerel bir ajan
+profilinin ajanını çalıştırarak açar; orada onunla elle çalışmak için. **Burada terminal**
+ile aynı terminal ve **Ajanı aç...** ile aynı komuttur, ama profilin kendi çalışma klasörü
+yerine sekmenin klasöründe. Tek bir yerel ajan profili varsa hemen açılır; birkaç tane varsa
+sekme çubuğunun altındaki bir liste hangisini istediğinizi sorar. Hiçbir istem göndermez ve
+hiçbir YZ isteği başlatmaz: ajanı açmak eylemdir ve içine yazdıklarınız sizindir.
+
+Satırda YZ parıltısı bulunur, YZ kapalıyken (**Ayarlar > YZ**) gizlenir ve hiçbir profil yerel
+bir ajan değilse gri görünür ("ayarlı bir yerel YZ ajanı yok"). Bir dizide `tab_open_agent_here`
+adımı, YZ profilinin `id` değerini `profile` seçeneğinde alır (boş: varsayılan profil, yoksa ilk
+yerel ajan). Kendi terminal şablonunuza ajanın komutu verilemez: terminal klasörde açılır ve
+durum satırı hangi komutu çalıştıracağınızı söyler.
+
 Yanıt, Claude Code için ajanın oturum dökümünden okunur (tam metni, sonradan
 silinir); Codex ve Gemini için ise isteğin istediği iki işaret satırı arasındaki
 ekrandan okunur. Aynı anda en fazla iki sanal terminal çalıştırması olur ve bir
@@ -292,6 +308,7 @@ listede ve düğmelerin üstündeki satırda gösterilir.
 | **Commit bölme** | Bir commit'in menüsündeki *Bu commit'i böl (YZ)...* ya da palette `YZ: Seçili Commit'i Böl...`. Bölme düzenleyicisi modelin gruplamasıyla dolu olarak açılır; aşağıya bakın. | `ai split-plan <rev>` (yazdırır) |
 | **Geçmiş yeniden yazma betiği** | [Geçmişi yeniden yazma ekranında](history-rewrite.md#yz-ile-betik-yazma): Betik düzenleyicisinin `✦ YZ ile yaz...` düğmesi ya da palette `Yeniden Yaz: YZ ile Betik Yaz...`. Bir iletişim kutusu tam olarak neyin gönderileceğini gösterir; betik işaretlenmiş olarak düzenleyiciye düşer ve sizin yerinize asla çalıştırılmaz veya uygulanmaz. | `ai rewrite-script "<yönerge>" [--sample N]` (yazdırır) |
 | **Geçmiş yeniden yazma kuralları** | [Geçmişi yeniden yazma ekranında](history-rewrite.md#yz-ile-kural-oluşturma): `✦ YZ ile kural oluştur...` düğmesi, `Alt+I` ya da palette `Yeniden Yaz: YZ ile Kural Oluştur...`. Çok satırlı bir iletişim kutusu tam olarak neyin gönderileceğini gösterir; kurallar ve ayarlar ekrana yerleşir, sizin yerinize hiçbir şey önizlenmez veya uygulanmaz. | `ai rewrite-rules "<açıklama>" [--context]` (yazdırır) |
+| **Dizi taslağı** | Oluşturulacak bir [eylem dizisini](#dizi-taslağı) ya da birinin nasıl değişeceğini anlatın (Ayarlar > Diziler, pencerenin sonraki dilimi). | `ai sequence-draft "<description>" [--edit <id>] [--context]` (yazdırır) |
 | **Worktree adı** | [Worktree oluştur penceresinde](worktrees.md#yz-ile-adlandırma): `✦ YZ ile adlandır` düğmesi veya `Alt+A`, özelliği, hatayı ya da görevi açıkladığınız bir kutu açar; model worktree'yi ve dalını deponun kendi dal adlarına göre adlandırır ve ikisi de düzenlemeniz için pencerenin alanlarına yerleşir. Yalnızca açıklamanız ve yerel dal adları gönderilir, bu yüzden "Gönderilenler" penceresi yoktur. | `ai worktree-name --describe "<görev>"` (yazdırır) |
 | **Sunucuda yanıt** ve **Issue açıklaması** | Bir sunucuya metin gönderen her Markdown yazma kutusunun **YZ ile Yaz** düğmesi (`Alt+E`): bir konuşmadaki yorum, yanıt veya düzenleme, bir inceleme yorumu veya özeti, yeni bir issue'nun açıklaması. Taslak kutuya düşer; hiçbir şey gönderilmez. Bkz. [Sunucuda yazma yardımı](#sunucuda-yazma-yardımı). | `ai hosting-reply` (bir taslak yazdırır) |
 | **Commit composer** | WIP satırının menüsündeki *Commit'leri oluştur (YZ)...*, `Ctrl+G C`, palette `YZ: Çalışma Değişikliklerinden Commit'ler Oluştur...` | |
@@ -374,6 +391,14 @@ kullanılamayan bir girdi nedeniyle listelenir, geçerli olanlar korunur. Bu yol
 oluşturulmaz. İsterseniz kapsam, dal ve tag adları ve en yeni commit'lerin yazarları da gönderilir
 (varsayılan olarak kapalı bir kutu, "ne gönderilir" bölmesinde görünür). Profil ve talimatlar,
 Ayarlar > YZ içindeki *Geçmiş yeniden yazma kuralları* olanlardır.
+
+### Dizi taslağı
+
+Bir eylem dizisini kendi sözlerinizle anlatırsınız ("her şeyi stage'le, mesajı YZ ile yaz, commit et ve push et" ya da var olan biri için "önce bir fetch ekle") ve model bir ad, bir kimlik, adımlar ve isterse bir kısayol önerir. **Yalnızca önerir**:
+siz kabul etmeden hiçbir şey kaydedilmez ve hiçbir şey çalıştırılmaz. Model yalnızca bir dizinin içerebileceği komutları bilir (kendisine verilen liste, bir diziyi doğrulayan tablodan üretilir, bu yüzden ondan ayrışamaz); her adım tek tek denetlenir ve bilinmeyen, yıkıcı, başka bir diziyi çalıştıran veya mümkün olmayan bir duraklama isteyen adım nedeniyle listelenerek dışarıda bırakılır, geçerli olanlar korunur. İsterseniz uzak depo adları, YZ profili kimlikleri ve Şurada aç etiketleri de gönderilir (varsayılan olarak kapalı; CLI bayrağı `--context`). Terminalde `gitpoulpi ai sequence-draft` öneriyi JSON olarak yazdırır (`gitpoulpi sequence add --file` komutunun okuduğu `toml` ile) ve hiçbir şey kaydetmez. Profil ve talimatlar, Ayarlar > YZ içindeki *Dizi taslağı* olanlardır.
+
+Terminal arayüzünde aynı iş, Ayarlar > Diziler > **Ekle** içindeki **YZ ile oluştur...** girişi
+(palet: `Dizi: YZ ile Oluştur...`) ve bir dizinin **YZ ile düzenle...** düğmesidir: ne istediğinizi yazdığınız, bağlam kutusu (varsayılan olarak kapalı) ve "Ne gönderilir" sorusu bulunan bir iletişim kutusu, sonra **Kabul et**, **Kaydetmeden önce düzenle**, **Reddet** ya da **Geri** ile yeniden göndermek için bir öneri. Bir düzenleme, geçerli diziye karşı bir fark gösterir (`+` eklendi, `-` kaldırıldı, `~` değişti) ve önerilen kısayol tuş haritanıza karşı denetlenir ama asla bağlanmaz. Siz kabul etmeden hiçbir şey kaydedilmez (bkz. [Diziler](sequences.md#yz-ile-oluşturma-ve-düzenleme)).
 
 ### Sunucuda yazma yardımı
 

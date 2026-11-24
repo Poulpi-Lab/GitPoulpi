@@ -40,6 +40,7 @@ başvuru sayfalarına atlayın.
 | Issue'ları Markdown notları olarak tutmak, token olmadan | [Yerel issue'lar ve Obsidian](local-issues.md) | ISSUE'LAR bölümü, `Local Markdown - <ad>` sağlayıcısı; palet **Yerel Issue'lar: Obsidian'da Aç...** |
 | Birçok commit boyunca yazarları, tarihleri, mesajları veya dosyaları yeniden yazmak | [Geçmişi yeniden yazma](history-rewrite.md) | `Ctrl+G Shift+H`; palet **Yeniden Yaz: Geçmiş Ekranı** |
 | Bir işlemi geri almak (veya yinelemek) | [Geri al ve yinele](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`; `Alt+Z` geri alma geçmişini açar; palet **Düzenle: Geri Al** |
+| Tek bir tuşla birkaç eylem çalıştırmak (stage, YZ mesajı, commit, push...) | [Diziler](sequences.md) | Ayarlar > Diziler; palet **Dizi: <ad>** |
 | Büyük dosyaları Git LFS ile izlemek | [Git LFS](lfs.md) | Palet **LFS: Deseni İzle...**, **LFS: Bu Depo İçin Başlat** |
 | Depolar arasında bir dalı, commit'i, pull request'i veya issue'yu bulmak | [Arama](search.md) | `Ctrl+Alt+F` veya başlık çubuğundaki Genel arama düğmesi; `f` geçerli deponun commit grafiğinde arar |
 | Beni bekleyen her şeyi tek listede görmek | [Radar](radar.md) | `Alt+R`; palet **Radar: Aç** |

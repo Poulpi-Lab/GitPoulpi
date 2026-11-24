@@ -151,20 +151,20 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `refs` | `collapse_all` | Tüm Klasörleri Daralt | `-` |
 | `refs` | `expand_below` | Klasörü ve Alt Klasörlerini Genişlet | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Klasörü ve Alt Klasörlerini Daralt | `_`, `Shift+Left` |
-| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `refs` | `scroll_left` | Paneli sola kaydır | `Alt+Left` |
+| `refs` | `scroll_right` | Paneli sağa kaydır | `Alt+Right` |
 | `log` | `toggle_file_mode` | Dosyalar: Yol veya Ağaç | `m` |
-| `log` | `lfs_only` | Files: LFS Only | `o` |
+| `log` | `lfs_only` | Dosyalar: Yalnızca LFS | `o` |
 | `log` | `view_all_files` | Dosyalar: Tüm Dosyaları Göster | `a` |
 | `log` | `compare_selection` | Seçili satırları karşılaştır | `v` |
 | `log` | `compare_swap` | Karşılaştırma uçlarını değiştir | `x` |
 | `log` | `compare_next` | Sonraki karşılaştırılan satıra git | `n` |
-| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
+| `log` | `filter_author` | Log'u yazara göre filtrele | `Shift+A` |
 | `log` | `pick_column` | Taşımak veya boyutlandırmak için bir sütun seç | `Shift+C` |
 | `log` | `scroll_left` | Sütunları Sola Kaydır | `Shift+Left` |
 | `log` | `scroll_right` | Sütunları Sağa Kaydır | `Shift+Right` |
-| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log` | `details_scroll_left` | Paneli sola kaydır | `Alt+Left` |
+| `log` | `details_scroll_right` | Paneli sağa kaydır | `Alt+Right` |
 | `log` | `copy_mermaid` | Commit'ler Mermaid gitGraph Olarak Kopyala | `Shift+Y` |
 | `log_columns` | `next` | Sonraki sütunu seç | `Tab` |
 | `log_columns` | `prev` | Önceki sütunu seç | `Shift+BackTab` |
@@ -182,11 +182,11 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Tüm Klasörleri Daralt | `-` |
 | `log_files` | `expand_below` | Klasörü ve Alt Klasörlerini Genişlet | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Klasörü ve Alt Klasörlerini Daralt | `_`, `Shift+Left` |
-| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log_files` | `scroll_left` | Paneli sola kaydır | `Alt+Left` |
+| `log_files` | `scroll_right` | Paneli sağa kaydır | `Alt+Right` |
 | `status` | `compose` | Commit Mesajına Odaklan | `c` |
 | `status` | `toggle_file_mode` | Dosyalar: Yol veya Ağaç | `m` |
-| `status` | `lfs_only` | Files: LFS Only | `o` |
+| `status` | `lfs_only` | Dosyalar: Yalnızca LFS | `o` |
 | `status` | `view_all_files` | Dosyalar: Tüm Dosyaları Göster | `a` |
 | `status` | `amend` | Amend'i Aç/Kapat | `Shift+A` |
 | `status` | `skip_hooks` | Hook'ları Atlamayı Aç/Kapat | `Shift+H` |
@@ -197,8 +197,8 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Tüm Klasörleri Daralt | `-` |
 | `status` | `expand_below` | Klasörü ve Alt Klasörlerini Genişlet | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Klasörü ve Alt Klasörlerini Daralt | `_`, `Shift+Left` |
-| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `status` | `scroll_left` | Paneli sola kaydır | `Alt+Left` |
+| `status` | `scroll_right` | Paneli sağa kaydır | `Alt+Right` |
 | `home` | `favorite` | Depoyu Yıldızla veya Yıldızı Kaldır | `f`, `*` |
 | `home` | `close_repo` | Satırı Kapat, Kaldır veya Yıldızını Kaldır | `x`, `Delete` |
 | `home` | `copy_path` | Depo Yolunu Kopyala | `y` |
@@ -515,8 +515,8 @@ Tuşlar varsayılanlardır.
 | Gezinme: Odağı Sonraki Panele Geçir | `Tab` |
 | Gezinme: Odağı Önceki Panele Geçir | `Shift+Tab` |
 | Gezinme: Commit'lerde Ara... | `f` |
-| Log: Filter by Author... | `A` |
-| Log: Clear Author Filter |  |
+| Log: Yazara Göre Filtrele... | `A` |
+| Log: Yazar Filtresini Temizle |  |
 | Gezinme: Refs Panelini Daralt/Genişlet | `Ctrl+N H` |
 | Gezinme: Refs Panelini Genişlet | `Ctrl+N Right` |
 | Gezinme: Refs Panelini Daralt | `Ctrl+N Left` |
@@ -622,10 +622,10 @@ Tuşlar varsayılanlardır.
 | Refs: Seçili Tag'i Varsayılan Uzak Depoya Push Et |  |
 | Refs: Seçili Tag'i Uzak Deposundan Sil... |  |
 | Git: Seçili Tag için Fetch |  |
-| Git: Use the Remote's Version of the Selected Tag |  |
-| Git: Force Push the Selected Tag to Its Remote |  |
+| Git: Seçili Tag İçin Uzak Deponun Sürümünü Kullan |  |
+| Git: Seçili Tag Uzak Depoya Zorla Push Et |  |
 | Refs: Seçili Tag'e Not Ekle... |  |
-| Refs: Move Selected Tag to Selected Commit... |  |
+| Refs: Seçili Tag Seçili Commit Üzerine Taşı... |  |
 | Refs: Grafikte Gizle/Göster |  |
 | Refs: Grafikte Göster | `g` |
 | Refs: Seçili Ref'te Solo'yu Aç/Kapat | `o` |
@@ -639,8 +639,8 @@ Tuşlar varsayılanlardır.
 | Refs: Tüm Klasörleri Daralt | `-` |
 | Refs: Seçili Klasörü ve Alt Klasörlerini Genişlet | `*` |
 | Refs: Seçili Klasörü ve Alt Klasörlerini Daralt | `_` |
-| View: Scroll the Pane Left | `Alt+Left` |
-| View: Scroll the Pane Right | `Alt+Right` |
+| Görünüm: Paneli Sola Kaydır | `Alt+Left` |
+| Görünüm: Paneli Sağa Kaydır | `Alt+Right` |
 | Refs: Sonraki Bölüm | `l` |
 | Refs: Önceki Bölüm | `h` |
 | Refs: Etkin Bölümü Genişlet veya Daralt | `Enter` |
@@ -860,10 +860,10 @@ Tuşlar varsayılanlardır.
 | Radar: Ertele... | `z` |
 | Radar: İsteği İncele... | `e` |
 | Radar: Issue Konuşmasını Aç | `i` |
-| Radar: Merge Request... | `m` |
-| Radar: Close... | `x` |
-| Radar: Mark as Ready | `y` |
-| Radar: Clone Repository... | `g` |
+| Radar: İsteği Merge Et... | `m` |
+| Radar: Kapat... | `x` |
+| Radar: Hazır Olarak İşaretle | `y` |
+| Radar: Depoyu Klonla... | `g` |
 | Radar: API Üzerinden İncele |  |
 | Radar: Klonla ve İncele... |  |
 | Radar: Atananları Düzenle... |  |
@@ -895,8 +895,8 @@ Tuşlar varsayılanlardır.
 | Sekme: Dosya Yöneticisinde Aç |  |
 | Sekme: Terminalde Aç |  |
 | Sekme: Şurada Aç... | `Alt+O` |
-| Tab: Terminal Here |  |
-| ✦ Tab: Open AI Agent Here |  |
+| Sekme: Burada Terminal |  |
+| ✦ Sekme: Burada YZ Ajanı Aç |  |
 | Sekme: Varsayılanda Aç | `Ctrl+Alt+O` |
 | Depo: Profili Değiştir... |  |
 | Yardım: GitPoulpi Hakkında | `Ctrl+N a` |
@@ -953,7 +953,7 @@ Tuşlar varsayılanlardır.
 | Düzenle: Reflog... |  |
 | Düzenle: Kaybolan Commit'ler Kurtar... |  |
 | Düzenle: Dalı Engelli Eylemin Bıraktığı Yere Geri Yükle | `Alt+Shift+Z` |
-| Edit: Undo Whole Sequence |  |
+| Düzenle: Tüm Diziyi Geri Al |  |
 | İnceleme: Genel Bakışı Göster |  |
 | İnceleme: Dosyaları Göster |  |
 | İnceleme: Commit'leri Göster |  |
@@ -1022,7 +1022,7 @@ Tuşlar varsayılanlardır.
 | Konuşma: Kaydın Diyagramını Aç | `g` |
 | Konuşma: Dizinin Kodunu Aç | `G` |
 | Konuşma: Kaydın Bağlantısını Kopyala | `y` |
-| Conversation: Copy Text | `Ctrl+C` |
+| Konuşma: Metni Kopyala | `Ctrl+C` |
 | Konuşma: Tarayıcıda Aç | `o` |
 | Konuşma: Yorumu Düzenle | `e` |
 | Konuşma: Yorumu Sil | `d` |
@@ -1047,7 +1047,7 @@ Tuşlar varsayılanlardır.
 | İnceleme: ✦ Taslağı At | `N` |
 | Geri Alma Geçmişi: Buraya Kadar Geri Al... | `u` |
 | Geri Alma Geçmişi: Buraya Kadar Yinele... | `y` |
-| Undo History: Undo Whole Sequence | `x` |
+| Geri Alma Geçmişi: Tüm Diziyi Geri Al | `x` |
 | Geri Alma Geçmişi: Yalnızca Bunu Geri Yükle... | `r` |
 | Geri Alma Geçmişi: Dalı Eski Yerine Geri Yükle... | `o` |
 | Geri Alma Geçmişi: Yenile |  |
@@ -1114,7 +1114,7 @@ Tuşlar varsayılanlardır.
 | Diff: Yalnızca Hunk'ları Aç/Kapat (tüm dosya / yalnızca değişiklikler) | `H` |
 | Dosyalar: Yol/Ağaç Aç/Kapat | `m` |
 | Dosyalar: Tüm Dosyaları Göster Aç/Kapat | `a` |
-| Files: Toggle LFS Only | `o` |
+| Dosyalar: Yalnızca LFS'yi Aç/Kapat | `o` |
 | Commit: Hook'ları Atlamayı Aç/Kapat | `H` |
 | Dosyalar: Satırın veya Seçimin Menüsünü Aç | `.` |
 | Dosyalar: Tüm Klasörleri Genişlet | `=` |
@@ -1131,7 +1131,7 @@ Tuşlar varsayılanlardır.
 | Diff: Sözcük Kaydırmayı Aç/Kapat | `w` |
 | Diff: Kodlamayı Seç... | `C` |
 | Görünüm: Minimap'i Aç/Kapat | `M` |
-| Diff: Toggle Changed Words Highlight |  |
+| Diff: Değişen Sözcük Vurgusunu Aç/Kapat |  |
 | Görünüm: Commit sütununu aç/kapat | `Alt+C` |
 | Görünüm: Commit sütunu: gizle |  |
 | Görünüm: Commit sütunu: dosya geçmişi |  |
@@ -1223,17 +1223,17 @@ Tuşlar varsayılanlardır.
 | Düzenleyici: Satır Sonlarını Dönüştür |  |
 | Düzenleyici: Girintiyi Değiştir |  |
 | Uygulama: Ayarlar... | `Ctrl+, / Ctrl+N ,` |
-| ✦ Sequence: Create with AI... |  |
+| ✦ Dizi: YZ ile Oluştur... |  |
 | Uygulama: Ayarlarda Ara... | `Ayarlar'da /` |
 | Uygulama: Tuş Atamaları... |  |
 | Ajan: Bekleyen Görünümü Göster | `Ctrl+N Enter` |
 | Ajan: Bekleyen Görünümü Kapat |  |
 | Ajan: Geri | `Ctrl+N Backspace` |
-| Sequence: Cancel |  |
-| Sequence: Continue |  |
-| Sequence: Review This Repository's Sequences |  |
-| Sequence: Trust This Repository's Sequences |  |
-| Sequence: Ignore This Repository's Sequences |  |
+| Dizi: İptal |  |
+| Dizi: Devam |  |
+| Dizi: Bu Deponun Dizilerini İncele |  |
+| Dizi: Bu Deponun Dizilerine Güven |  |
+| Dizi: Bu Deponun Dizilerini Yok Say |  |
 | Tuş Atamaları: Tümünü Sıfırla... |  |
 | Entegrasyonlar: Bağlı Pull Request Aç | `Ctrl+G g` |
 | Entegrasyonlar: Bağlı Pull Request Barındırıcıda Düzenle | `e (satırda)` |

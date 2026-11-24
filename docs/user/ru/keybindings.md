@@ -153,20 +153,20 @@ stage_file = "z"
 | `refs` | `collapse_all` | Свернуть все папки | `-` |
 | `refs` | `expand_below` | Развернуть папку и её вложенные папки | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Свернуть папку и её вложенные папки | `_`, `Shift+Left` |
-| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `refs` | `scroll_left` | Прокрутить панель влево | `Alt+Left` |
+| `refs` | `scroll_right` | Прокрутить панель вправо | `Alt+Right` |
 | `log` | `toggle_file_mode` | Файлы: путь или дерево | `m` |
-| `log` | `lfs_only` | Files: LFS Only | `o` |
+| `log` | `lfs_only` | Файлы: только LFS | `o` |
 | `log` | `view_all_files` | Файлы: показать все файлы | `a` |
 | `log` | `compare_selection` | Сравнить выбранные строки | `v` |
 | `log` | `compare_swap` | Поменять стороны сравнения | `x` |
 | `log` | `compare_next` | Перейти к следующей сравниваемой строке | `n` |
-| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
+| `log` | `filter_author` | Фильтр Log по автору | `Shift+A` |
 | `log` | `pick_column` | Выбрать колонку для сдвига или изменения ширины | `Shift+C` |
 | `log` | `scroll_left` | Прокрутить колонки влево | `Shift+Left` |
 | `log` | `scroll_right` | Прокрутить колонки вправо | `Shift+Right` |
-| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log` | `details_scroll_left` | Прокрутить панель влево | `Alt+Left` |
+| `log` | `details_scroll_right` | Прокрутить панель вправо | `Alt+Right` |
 | `log` | `copy_mermaid` | Копировать commit'ы как Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Выбрать следующую колонку | `Tab` |
 | `log_columns` | `prev` | Выбрать предыдущую колонку | `Shift+BackTab` |
@@ -184,11 +184,11 @@ stage_file = "z"
 | `log_files` | `collapse_all_folders` | Свернуть все папки | `-` |
 | `log_files` | `expand_below` | Развернуть папку и её вложенные папки | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Свернуть папку и её вложенные папки | `_`, `Shift+Left` |
-| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log_files` | `scroll_left` | Прокрутить панель влево | `Alt+Left` |
+| `log_files` | `scroll_right` | Прокрутить панель вправо | `Alt+Right` |
 | `status` | `compose` | Фокус на сообщении commit'а | `c` |
 | `status` | `toggle_file_mode` | Файлы: путь или дерево | `m` |
-| `status` | `lfs_only` | Files: LFS Only | `o` |
+| `status` | `lfs_only` | Файлы: только LFS | `o` |
 | `status` | `view_all_files` | Файлы: показать все файлы | `a` |
 | `status` | `amend` | Переключить amend | `Shift+A` |
 | `status` | `skip_hooks` | Переключить пропуск хуков | `Shift+H` |
@@ -199,8 +199,8 @@ stage_file = "z"
 | `status` | `collapse_all_folders` | Свернуть все папки | `-` |
 | `status` | `expand_below` | Развернуть папку и её вложенные папки | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Свернуть папку и её вложенные папки | `_`, `Shift+Left` |
-| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `status` | `scroll_left` | Прокрутить панель влево | `Alt+Left` |
+| `status` | `scroll_right` | Прокрутить панель вправо | `Alt+Right` |
 | `home` | `favorite` | Добавить репозиторий в избранное или убрать | `f`, `*` |
 | `home` | `close_repo` | Закрыть, убрать или снять звезду со строки | `x`, `Delete` |
 | `home` | `copy_path` | Копировать путь репозитория | `y` |
@@ -521,8 +521,8 @@ stage_file = "z"
 | Навигация: фокус на следующую панель | `Tab` |
 | Навигация: фокус на предыдущую панель | `Shift+Tab` |
 | Навигация: поиск commit'ов... | `f` |
-| Log: Filter by Author... | `A` |
-| Log: Clear Author Filter |  |
+| Log: фильтр по автору... | `A` |
+| Log: сбросить фильтр по автору |  |
 | Навигация: свернуть/развернуть панель Refs | `Ctrl+N H` |
 | Навигация: расширить панель Refs | `Ctrl+N Right` |
 | Навигация: сузить панель Refs | `Ctrl+N Left` |
@@ -628,10 +628,10 @@ stage_file = "z"
 | Refs: push tag на remote по умолчанию |  |
 | Refs: удалить выбранный tag с его remote... |  |
 | Git: Fetch выбранный tag |  |
-| Git: Use the Remote's Version of the Selected Tag |  |
-| Git: Force Push the Selected Tag to Its Remote |  |
+| Git: взять версию выбранного tag с remote |  |
+| Git: force Push выбранного tag в его remote |  |
 | Refs: аннотировать выбранный tag... |  |
-| Refs: Move Selected Tag to Selected Commit... |  |
+| Refs: переместить выбранный Tag в выбранный Commit... |  |
 | Refs: скрыть/показать в графе |  |
 | Refs: показать в графе | `g` |
 | Refs: solo для выбранной ссылки | `o` |
@@ -645,8 +645,8 @@ stage_file = "z"
 | Refs: свернуть все папки | `-` |
 | Refs: развернуть выбранную папку и её вложенные папки | `*` |
 | Refs: свернуть выбранную папку и её вложенные папки | `_` |
-| View: Scroll the Pane Left | `Alt+Left` |
-| View: Scroll the Pane Right | `Alt+Right` |
+| Вид: прокрутить панель влево | `Alt+Left` |
+| Вид: прокрутить панель вправо | `Alt+Right` |
 | Refs: следующий раздел | `l` |
 | Refs: предыдущий раздел | `h` |
 | Refs: развернуть/свернуть активный раздел | `Enter` |
@@ -866,10 +866,10 @@ stage_file = "z"
 | Radar: отложить... | `z` |
 | Radar: ревью запроса... | `e` |
 | Radar: открыть беседу задачи | `i` |
-| Radar: Merge Request... | `m` |
-| Radar: Close... | `x` |
-| Radar: Mark as Ready | `y` |
-| Radar: Clone Repository... | `g` |
+| Radar: Merge запроса... | `m` |
+| Radar: закрыть... | `x` |
+| Radar: отметить готовым к ревью | `y` |
+| Radar: клонировать репозиторий... | `g` |
 | Radar: ревью через API |  |
 | Radar: клонировать и сделать ревью... |  |
 | Radar: изменить исполнителей... |  |
@@ -901,8 +901,8 @@ stage_file = "z"
 | Вкладка: открыть в файловом менеджере |  |
 | Вкладка: открыть в терминале |  |
 | Вкладка: открыть в... | `Alt+O` |
-| Tab: Terminal Here |  |
-| ✦ Tab: Open AI Agent Here |  |
+| Вкладка: терминал здесь |  |
+| ✦ Вкладка: открыть ИИ-агента здесь |  |
 | Вкладка: открыть в записи по умолчанию | `Ctrl+Alt+O` |
 | Репозиторий: сменить профиль... |  |
 | Справка: о программе GitPoulpi | `Ctrl+N a` |
@@ -959,7 +959,7 @@ stage_file = "z"
 | Правка: Reflog... |  |
 | Правка: найти потерянные commit'ы... |  |
 | Правка: восстановить ветку туда, где её оставило заблокированное действие | `Alt+Shift+Z` |
-| Edit: Undo Whole Sequence |  |
+| Правка: отменить всю последовательность |  |
 | Ревью: показать обзор |  |
 | Ревью: показать файлы |  |
 | Ревью: показать commits |  |
@@ -1028,7 +1028,7 @@ stage_file = "z"
 | Беседа: открыть диаграмму записи | `g` |
 | Беседа: открыть код обсуждения | `G` |
 | Беседа: копировать ссылку записи | `y` |
-| Conversation: Copy Text | `Ctrl+C` |
+| Обсуждение: копировать текст | `Ctrl+C` |
 | Беседа: открыть в браузере | `o` |
 | Беседа: изменить комментарий | `e` |
 | Беседа: удалить комментарий | `d` |
@@ -1053,7 +1053,7 @@ stage_file = "z"
 | Ревью: отбросить черновик ✦ | `N` |
 | История отмен: отменить до этого места... | `u` |
 | История отмен: повторить до этого места... | `y` |
-| Undo History: Undo Whole Sequence | `x` |
+| История отмен: отменить всю последовательность | `x` |
 | История отмен: восстановить только это... | `r` |
 | История отмен: восстановить ветку туда, где она была... | `o` |
 | История отмен: обновить |  |
@@ -1120,7 +1120,7 @@ stage_file = "z"
 | Diff: только hunk'и (весь файл / только изменения) | `H` |
 | Файлы: путь/дерево | `m` |
 | Файлы: показать все файлы | `a` |
-| Files: Toggle LFS Only | `o` |
+| Файлы: только LFS | `o` |
 | Commit: переключить пропуск хуков | `H` |
 | Файлы: открыть меню строки или выделения | `.` |
 | Файлы: развернуть все папки | `=` |
@@ -1137,7 +1137,7 @@ stage_file = "z"
 | Diff: перенос строк | `w` |
 | Diff: выбрать кодировку... | `C` |
 | Вид: показать или скрыть миникарту | `M` |
-| Diff: Toggle Changed Words Highlight |  |
+| Diff: подсветка изменённых слов |  |
 | Вид: показать или скрыть колонку commit'ов | `Alt+C` |
 | Вид: колонка commit'ов: скрыть |  |
 | Вид: колонка commit'ов: история файла |  |
@@ -1229,17 +1229,17 @@ stage_file = "z"
 | Редактор: преобразовать переводы строк |  |
 | Редактор: изменить отступы |  |
 | Приложение: настройки... | `Ctrl+, / Ctrl+N ,` |
-| ✦ Sequence: Create with AI... |  |
+| ✦ Последовательность: создать с ИИ... |  |
 | Приложение: поиск настроек... | `/ в настройках` |
 | Приложение: сочетания клавиш... |  |
 | Агент: показать ожидающий вид | `Ctrl+N Enter` |
 | Агент: закрыть ожидающий вид |  |
 | Агент: назад | `Ctrl+N Backspace` |
-| Sequence: Cancel |  |
-| Sequence: Continue |  |
-| Sequence: Review This Repository's Sequences |  |
-| Sequence: Trust This Repository's Sequences |  |
-| Sequence: Ignore This Repository's Sequences |  |
+| Последовательность: отменить |  |
+| Последовательность: продолжить |  |
+| Последовательность: просмотреть последовательности этого репозитория |  |
+| Последовательность: доверять последовательностям этого репозитория |  |
+| Последовательность: игнорировать последовательности этого репозитория |  |
 | Сочетания клавиш: сбросить все... |  |
 | Интеграции: открыть связанный pull request | `Ctrl+G g` |
 | Интеграции: править связанный pull request на хостинге | `e (на строке)` |

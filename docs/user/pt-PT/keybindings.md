@@ -149,20 +149,20 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `refs` | `collapse_all` | Recolher todas as pastas | `-` |
 | `refs` | `expand_below` | Expandir a pasta e as suas subpastas | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Recolher a pasta e as suas subpastas | `_`, `Shift+Left` |
-| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `refs` | `scroll_left` | Deslocar o painel para a esquerda | `Alt+Left` |
+| `refs` | `scroll_right` | Deslocar o painel para a direita | `Alt+Right` |
 | `log` | `toggle_file_mode` | Ficheiros: caminho ou árvore | `m` |
-| `log` | `lfs_only` | Files: LFS Only | `o` |
+| `log` | `lfs_only` | Ficheiros: só LFS | `o` |
 | `log` | `view_all_files` | Ficheiros: ver todos os ficheiros | `a` |
 | `log` | `compare_selection` | Comparar as linhas selecionadas | `v` |
 | `log` | `compare_swap` | Trocar as extremidades da comparação | `x` |
 | `log` | `compare_next` | Ir para a próxima linha comparada | `n` |
-| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
+| `log` | `filter_author` | Filtrar o Log por autor | `Shift+A` |
 | `log` | `pick_column` | Escolher uma coluna para mover ou redimensionar | `Shift+C` |
 | `log` | `scroll_left` | Deslocar as colunas para a esquerda | `Shift+Left` |
 | `log` | `scroll_right` | Deslocar as colunas para a direita | `Shift+Right` |
-| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log` | `details_scroll_left` | Deslocar o painel para a esquerda | `Alt+Left` |
+| `log` | `details_scroll_right` | Deslocar o painel para a direita | `Alt+Right` |
 | `log` | `copy_mermaid` | Copiar commits como Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Escolher a coluna seguinte | `Tab` |
 | `log_columns` | `prev` | Escolher a coluna anterior | `Shift+BackTab` |
@@ -180,11 +180,11 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Recolher todas as pastas | `-` |
 | `log_files` | `expand_below` | Expandir a pasta e as suas subpastas | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Recolher a pasta e as suas subpastas | `_`, `Shift+Left` |
-| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log_files` | `scroll_left` | Deslocar o painel para a esquerda | `Alt+Left` |
+| `log_files` | `scroll_right` | Deslocar o painel para a direita | `Alt+Right` |
 | `status` | `compose` | Focar a mensagem do commit | `c` |
 | `status` | `toggle_file_mode` | Ficheiros: caminho ou árvore | `m` |
-| `status` | `lfs_only` | Files: LFS Only | `o` |
+| `status` | `lfs_only` | Ficheiros: só LFS | `o` |
 | `status` | `view_all_files` | Ficheiros: ver todos os ficheiros | `a` |
 | `status` | `amend` | Alternar amend | `Shift+A` |
 | `status` | `skip_hooks` | Alternar ignorar hooks | `Shift+H` |
@@ -195,8 +195,8 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Recolher todas as pastas | `-` |
 | `status` | `expand_below` | Expandir a pasta e as suas subpastas | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Recolher a pasta e as suas subpastas | `_`, `Shift+Left` |
-| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `status` | `scroll_left` | Deslocar o painel para a esquerda | `Alt+Left` |
+| `status` | `scroll_right` | Deslocar o painel para a direita | `Alt+Right` |
 | `home` | `favorite` | Marcar ou desmarcar o repositório como favorito | `f`, `*` |
 | `home` | `close_repo` | Fechar, remover ou desmarcar a linha | `x`, `Delete` |
 | `home` | `copy_path` | Copiar o caminho do repositório | `y` |
@@ -513,8 +513,8 @@ As teclas são as predefinidas.
 | Navegação: levar o foco ao próximo painel | `Tab` |
 | Navegação: levar o foco ao painel anterior | `Shift+Tab` |
 | Navegação: pesquisar commits... | `f` |
-| Log: Filter by Author... | `A` |
-| Log: Clear Author Filter |  |
+| Log: filtrar por autor... | `A` |
+| Log: limpar o filtro de autor |  |
 | Navegação: recolher/expandir o painel Refs | `Ctrl+N H` |
 | Navegação: Alargar o painel Refs | `Ctrl+N Right` |
 | Navegação: Estreitar o painel Refs | `Ctrl+N Left` |
@@ -620,10 +620,10 @@ As teclas são as predefinidas.
 | Refs: push da tag selecionada para o remoto predefinido |  |
 | Refs: eliminar a tag selecionada do seu remoto... |  |
 | Git: Fetch da Tag selecionada |  |
-| Git: Use the Remote's Version of the Selected Tag |  |
-| Git: Force Push the Selected Tag to Its Remote |  |
+| Git: usar a versão do remoto da tag selecionada |  |
+| Git: push forçado da tag selecionada para o seu remoto |  |
 | Refs: anotar a tag selecionada... |  |
-| Refs: Move Selected Tag to Selected Commit... |  |
+| Refs: mover a tag selecionada para o commit selecionado... |  |
 | Refs: alternar ocultar no grafo |  |
 | Refs: mostrar no grafo | `g` |
 | Refs: alternar solo na ref selecionada | `o` |
@@ -637,8 +637,8 @@ As teclas são as predefinidas.
 | Refs: recolher todas as pastas | `-` |
 | Refs: expandir a pasta selecionada e as suas subpastas | `*` |
 | Refs: recolher a pasta selecionada e as suas subpastas | `_` |
-| View: Scroll the Pane Left | `Alt+Left` |
-| View: Scroll the Pane Right | `Alt+Right` |
+| Ver: deslocar o painel para a esquerda | `Alt+Left` |
+| Ver: deslocar o painel para a direita | `Alt+Right` |
 | Refs: próxima secção | `l` |
 | Refs: secção anterior | `h` |
 | Refs: expandir ou recolher a secção ativa | `Enter` |
@@ -858,10 +858,10 @@ As teclas são as predefinidas.
 | Radar: adiar... | `z` |
 | Radar: rever pedido... | `e` |
 | Radar: abrir a conversa da issue | `i` |
-| Radar: Merge Request... | `m` |
-| Radar: Close... | `x` |
-| Radar: Mark as Ready | `y` |
-| Radar: Clone Repository... | `g` |
+| Radar: merge do pedido... | `m` |
+| Radar: fechar... | `x` |
+| Radar: marcar como pronto | `y` |
+| Radar: clonar repositório... | `g` |
 | Radar: rever através da API |  |
 | Radar: clonar e rever... |  |
 | Radar: editar responsáveis... |  |
@@ -893,8 +893,8 @@ As teclas são as predefinidas.
 | Separador: abrir no gestor de ficheiros |  |
 | Separador: abrir no terminal |  |
 | Separador: abrir em... | `Alt+O` |
-| Tab: Terminal Here |  |
-| ✦ Tab: Open AI Agent Here |  |
+| Separador: terminal aqui |  |
+| ✦ Separador: abrir agente de IA aqui |  |
 | Separador: abrir no predefinido | `Ctrl+Alt+O` |
 | Repositório: alterar perfil... |  |
 | Ajuda: acerca do GitPoulpi | `Ctrl+N a` |
@@ -951,7 +951,7 @@ As teclas são as predefinidas.
 | Editar: Reflog... |  |
 | Editar: recuperar commits perdidos... |  |
 | Editar: restaurar a branch para onde a ação bloqueada a deixou | `Alt+Shift+Z` |
-| Edit: Undo Whole Sequence |  |
+| Editar: desfazer a sequência inteira |  |
 | Revisão: mostrar resumo |  |
 | Revisão: mostrar ficheiros |  |
 | Revisão: mostrar commits |  |
@@ -1020,7 +1020,7 @@ As teclas são as predefinidas.
 | Conversa: abrir o diagrama da entrada | `g` |
 | Conversa: abrir o código da discussão | `G` |
 | Conversa: copiar a ligação da entrada | `y` |
-| Conversation: Copy Text | `Ctrl+C` |
+| Conversa: copiar o texto | `Ctrl+C` |
 | Conversa: abrir no navegador | `o` |
 | Conversa: editar comentário | `e` |
 | Conversa: eliminar comentário | `d` |
@@ -1045,7 +1045,7 @@ As teclas são as predefinidas.
 | Revisão: descartar o rascunho ✦ | `N` |
 | Histórico de desfazer: desfazer até aqui... | `u` |
 | Histórico de desfazer: refazer até aqui... | `y` |
-| Undo History: Undo Whole Sequence | `x` |
+| Histórico de desfazer: desfazer a sequência inteira | `x` |
 | Histórico de desfazer: restaurar só esta... | `r` |
 | Histórico de desfazer: restaurar a branch para onde estava... | `o` |
 | Histórico de desfazer: atualizar |  |
@@ -1112,7 +1112,7 @@ As teclas são as predefinidas.
 | Diff: alternar só hunks (ficheiro todo / só as alterações) | `H` |
 | Ficheiros: alternar caminho/árvore | `m` |
 | Ficheiros: alternar ver todos os ficheiros | `a` |
-| Files: Toggle LFS Only | `o` |
+| Ficheiros: alternar só LFS | `o` |
 | Commit: alternar ignorar hooks | `H` |
 | Ficheiros: abrir o menu da linha ou da seleção | `.` |
 | Ficheiros: expandir todas as pastas | `=` |
@@ -1129,7 +1129,7 @@ As teclas são as predefinidas.
 | Diff: alternar quebra de linha | `w` |
 | Diff: escolher codificação... | `C` |
 | Ver: alternar o minimapa | `M` |
-| Diff: Toggle Changed Words Highlight |  |
+| Diff: alternar o destaque das palavras alteradas |  |
 | Ver: alternar a coluna de commits | `Alt+C` |
 | Ver: coluna de commits: ocultar |  |
 | Ver: coluna de commits: histórico do ficheiro |  |
@@ -1221,17 +1221,17 @@ As teclas são as predefinidas.
 | Editor: converter fins de linha |  |
 | Editor: alterar indentação |  |
 | Aplicação: definições... | `Ctrl+, / Ctrl+N ,` |
-| ✦ Sequence: Create with AI... |  |
+| ✦ Sequência: criar com IA... |  |
 | Aplicação: pesquisar definições... | `/ nas Definições` |
 | Aplicação: atalhos de teclado... |  |
 | Agente: mostrar a vista pendente | `Ctrl+N Enter` |
 | Agente: dispensar a vista pendente |  |
 | Agente: voltar | `Ctrl+N Backspace` |
-| Sequence: Cancel |  |
-| Sequence: Continue |  |
-| Sequence: Review This Repository's Sequences |  |
-| Sequence: Trust This Repository's Sequences |  |
-| Sequence: Ignore This Repository's Sequences |  |
+| Sequência: cancelar |  |
+| Sequência: continuar |  |
+| Sequência: rever as sequências deste repositório |  |
+| Sequência: confiar nas sequências deste repositório |  |
+| Sequência: ignorar as sequências deste repositório |  |
 | Atalhos: repor tudo... |  |
 | Integrações: abrir pull request associado | `Ctrl+G g` |
 | Integrações: editar pull request associado no host | `e (numa linha)` |

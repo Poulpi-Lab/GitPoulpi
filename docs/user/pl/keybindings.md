@@ -150,20 +150,20 @@ prefiksem (`Ctrl+G s`).
 | `refs` | `collapse_all` | Zwiń wszystkie foldery | `-` |
 | `refs` | `expand_below` | Rozwiń folder i jego podfoldery | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Zwiń folder i jego podfoldery | `_`, `Shift+Left` |
-| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `refs` | `scroll_left` | Przewiń panel w lewo | `Alt+Left` |
+| `refs` | `scroll_right` | Przewiń panel w prawo | `Alt+Right` |
 | `log` | `toggle_file_mode` | Pliki: Ścieżka lub drzewo | `m` |
-| `log` | `lfs_only` | Files: LFS Only | `o` |
+| `log` | `lfs_only` | Pliki: tylko LFS | `o` |
 | `log` | `view_all_files` | Pliki: Pokaż wszystkie pliki | `a` |
 | `log` | `compare_selection` | Porównaj zaznaczone wiersze | `v` |
 | `log` | `compare_swap` | Zamień końce porównania | `x` |
 | `log` | `compare_next` | Przejdź do następnego porównywanego wiersza | `n` |
-| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
+| `log` | `filter_author` | Filtruj Log według autora | `Shift+A` |
 | `log` | `pick_column` | Wybierz kolumnę do przesunięcia lub zmiany szerokości | `Shift+C` |
 | `log` | `scroll_left` | Przewiń kolumny w lewo | `Shift+Left` |
 | `log` | `scroll_right` | Przewiń kolumny w prawo | `Shift+Right` |
-| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log` | `details_scroll_left` | Przewiń panel w lewo | `Alt+Left` |
+| `log` | `details_scroll_right` | Przewiń panel w prawo | `Alt+Right` |
 | `log` | `copy_mermaid` | Kopiuj commity jako gitGraph Mermaid | `Shift+Y` |
 | `log_columns` | `next` | Wybierz następną kolumnę | `Tab` |
 | `log_columns` | `prev` | Wybierz poprzednią kolumnę | `Shift+BackTab` |
@@ -181,11 +181,11 @@ prefiksem (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Zwiń wszystkie foldery | `-` |
 | `log_files` | `expand_below` | Rozwiń folder i jego podfoldery | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Zwiń folder i jego podfoldery | `_`, `Shift+Left` |
-| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log_files` | `scroll_left` | Przewiń panel w lewo | `Alt+Left` |
+| `log_files` | `scroll_right` | Przewiń panel w prawo | `Alt+Right` |
 | `status` | `compose` | Przejdź do opisu commita | `c` |
 | `status` | `toggle_file_mode` | Pliki: Ścieżka lub drzewo | `m` |
-| `status` | `lfs_only` | Files: LFS Only | `o` |
+| `status` | `lfs_only` | Pliki: tylko LFS | `o` |
 | `status` | `view_all_files` | Pliki: Pokaż wszystkie pliki | `a` |
 | `status` | `amend` | Przełącz amend | `Shift+A` |
 | `status` | `skip_hooks` | Przełącz pomijanie hooków | `Shift+H` |
@@ -196,8 +196,8 @@ prefiksem (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Zwiń wszystkie foldery | `-` |
 | `status` | `expand_below` | Rozwiń folder i jego podfoldery | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Zwiń folder i jego podfoldery | `_`, `Shift+Left` |
-| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `status` | `scroll_left` | Przewiń panel w lewo | `Alt+Left` |
+| `status` | `scroll_right` | Przewiń panel w prawo | `Alt+Right` |
 | `home` | `favorite` | Dodaj repozytorium do ulubionych lub usuń | `f`, `*` |
 | `home` | `close_repo` | Zamknij, usuń lub zdejmij gwiazdkę z wiersza | `x`, `Delete` |
 | `home` | `copy_path` | Skopiuj ścieżkę repozytorium | `y` |
@@ -514,8 +514,8 @@ zastosowania. Klawisze są domyślne.
 | Nawigacja: Przejdź do następnego panelu | `Tab` |
 | Nawigacja: Przejdź do poprzedniego panelu | `Shift+Tab` |
 | Nawigacja: Szukaj commitów... | `f` |
-| Log: Filter by Author... | `A` |
-| Log: Clear Author Filter |  |
+| Log: Filtruj według autora... | `A` |
+| Log: Wyczyść filtr autora |  |
 | Nawigacja: Zwiń/rozwiń panel Refs | `Ctrl+N H` |
 | Nawigacja: Poszerz panel Refs | `Ctrl+N Right` |
 | Nawigacja: Zwęź panel Refs | `Ctrl+N Left` |
@@ -621,10 +621,10 @@ zastosowania. Klawisze są domyślne.
 | Refs: Push zaznaczonego tagu do domyślnego zdalnego |  |
 | Refs: Usuń zaznaczony tag z jego zdalnego... |  |
 | Git: Fetch zaznaczony tag |  |
-| Git: Use the Remote's Version of the Selected Tag |  |
-| Git: Force Push the Selected Tag to Its Remote |  |
+| Git: Użyj wersji zdalnej zaznaczonego Tag |  |
+| Git: Force Push zaznaczonego Tag do jego zdalnego |  |
 | Refs: Opisz zaznaczony tag... |  |
-| Refs: Move Selected Tag to Selected Commit... |  |
+| Refs: Przenieś zaznaczony Tag na zaznaczony Commit... |  |
 | Refs: Przełącz ukrycie w grafie |  |
 | Refs: Pokaż w grafie | `g` |
 | Refs: Przełącz solo dla zaznaczonego refu | `o` |
@@ -638,8 +638,8 @@ zastosowania. Klawisze są domyślne.
 | Refs: Zwiń wszystkie foldery | `-` |
 | Refs: Rozwiń zaznaczony folder i jego podfoldery | `*` |
 | Refs: Zwiń zaznaczony folder i jego podfoldery | `_` |
-| View: Scroll the Pane Left | `Alt+Left` |
-| View: Scroll the Pane Right | `Alt+Right` |
+| Widok: Przewiń panel w lewo | `Alt+Left` |
+| Widok: Przewiń panel w prawo | `Alt+Right` |
 | Refs: Następna sekcja | `l` |
 | Refs: Poprzednia sekcja | `h` |
 | Refs: Rozwiń lub zwiń aktywną sekcję | `Enter` |
@@ -859,10 +859,10 @@ zastosowania. Klawisze są domyślne.
 | Radar: Odłóż... | `z` |
 | Radar: Przejrzyj żądanie... | `e` |
 | Radar: Otwórz rozmowę zgłoszenia | `i` |
-| Radar: Merge Request... | `m` |
-| Radar: Close... | `x` |
-| Radar: Mark as Ready | `y` |
-| Radar: Clone Repository... | `g` |
+| Radar: Merge żądania... | `m` |
+| Radar: Zamknij... | `x` |
+| Radar: Oznacz jako gotowe | `y` |
+| Radar: Klonuj repozytorium... | `g` |
 | Radar: Przejrzyj przez API |  |
 | Radar: Sklonuj i przejrzyj... |  |
 | Radar: Edytuj przypisanych... |  |
@@ -894,8 +894,8 @@ zastosowania. Klawisze są domyślne.
 | Karta: Otwórz w menedżerze plików |  |
 | Karta: Otwórz w terminalu |  |
 | Karta: Otwórz w... | `Alt+O` |
-| Tab: Terminal Here |  |
-| ✦ Tab: Open AI Agent Here |  |
+| Karta: Terminal tutaj |  |
+| ✦ Karta: Otwórz agenta AI tutaj |  |
 | Karta: Otwórz w domyślnym | `Ctrl+Alt+O` |
 | Repozytorium: Zmień profil... |  |
 | Pomoc: O programie GitPoulpi | `Ctrl+N a` |
@@ -952,7 +952,7 @@ zastosowania. Klawisze są domyślne.
 | Edycja: Reflog... |  |
 | Edycja: Odzyskaj utracone commity... |  |
 | Edycja: Przywróć gałąź tam, gdzie zostawiła ją zablokowana akcja | `Alt+Shift+Z` |
-| Edit: Undo Whole Sequence |  |
+| Edycja: Cofnij całą sekwencję |  |
 | Przegląd: Pokaż podsumowanie |  |
 | Przegląd: Pokaż pliki |  |
 | Przegląd: Pokaż commity |  |
@@ -1021,7 +1021,7 @@ zastosowania. Klawisze są domyślne.
 | Rozmowa: Otwórz diagram wpisu | `g` |
 | Rozmowa: Otwórz kod wątku | `G` |
 | Rozmowa: Kopiuj link wpisu | `y` |
-| Conversation: Copy Text | `Ctrl+C` |
+| Rozmowa: Kopiuj tekst | `Ctrl+C` |
 | Rozmowa: Otwórz w przeglądarce | `o` |
 | Rozmowa: Edytuj komentarz | `e` |
 | Rozmowa: Usuń komentarz | `d` |
@@ -1046,7 +1046,7 @@ zastosowania. Klawisze są domyślne.
 | Przegląd: Odrzuć ✦ szkic | `N` |
 | Historia cofania: Cofnij do tego miejsca... | `u` |
 | Historia cofania: Ponów do tego miejsca... | `y` |
-| Undo History: Undo Whole Sequence | `x` |
+| Historia cofania: Cofnij całą sekwencję | `x` |
 | Historia cofania: Przywróć tylko tę... | `r` |
 | Historia cofania: Przywróć gałąź tam, gdzie była... | `o` |
 | Historia cofania: Odśwież |  |
@@ -1113,7 +1113,7 @@ zastosowania. Klawisze są domyślne.
 | Diff: Przełącz tylko hunki (cały plik / tylko zmiany) | `H` |
 | Pliki: Przełącz ścieżka/drzewo | `m` |
 | Pliki: Przełącz widok wszystkich plików | `a` |
-| Files: Toggle LFS Only | `o` |
+| Pliki: Przełącz tylko LFS | `o` |
 | Commit: Przełącz pomijanie hooków | `H` |
 | Pliki: otwórz menu wiersza lub zaznaczenia | `.` |
 | Pliki: Rozwiń wszystkie foldery | `=` |
@@ -1130,7 +1130,7 @@ zastosowania. Klawisze są domyślne.
 | Diff: Przełącz zawijanie linii | `w` |
 | Diff: Wybierz kodowanie... | `C` |
 | Widok: Przełącz minimapę | `M` |
-| Diff: Toggle Changed Words Highlight |  |
+| Diff: Przełącz podświetlanie zmienionych słów |  |
 | Widok: Przełącz kolumnę commitów | `Alt+C` |
 | Widok: Kolumna commitów: Ukryj |  |
 | Widok: Kolumna commitów: Historia pliku |  |
@@ -1222,17 +1222,17 @@ zastosowania. Klawisze są domyślne.
 | Edytor: Konwertuj końce linii |  |
 | Edytor: Zmień wcięcia |  |
 | Aplikacja: Ustawienia... | `Ctrl+, / Ctrl+N ,` |
-| ✦ Sequence: Create with AI... |  |
+| ✦ Sekwencja: Utwórz z AI... |  |
 | Aplikacja: Szukaj ustawień... | `/ w Ustawieniach` |
 | Aplikacja: Skróty klawiszowe... |  |
 | Agent: Pokaż oczekujący widok | `Ctrl+N Enter` |
 | Agent: Odrzuć oczekujący widok |  |
 | Agent: Wstecz | `Ctrl+N Backspace` |
-| Sequence: Cancel |  |
-| Sequence: Continue |  |
-| Sequence: Review This Repository's Sequences |  |
-| Sequence: Trust This Repository's Sequences |  |
-| Sequence: Ignore This Repository's Sequences |  |
+| Sekwencja: Anuluj |  |
+| Sekwencja: Kontynuuj |  |
+| Sekwencja: Przejrzyj sekwencje tego repozytorium |  |
+| Sekwencja: Zaufaj sekwencjom tego repozytorium |  |
+| Sekwencja: Ignoruj sekwencje tego repozytorium |  |
 | Skróty: Resetuj wszystkie... |  |
 | Integracje: Otwórz powiązany pull request | `Ctrl+G g` |
 | Integracje: Edytuj powiązany pull request na hoście | `e (na wierszu)` |

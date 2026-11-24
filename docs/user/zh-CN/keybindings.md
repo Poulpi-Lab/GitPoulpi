@@ -135,20 +135,20 @@ stage_file = "z"
 | `refs` | `collapse_all` | 折叠所有文件夹 | `-` |
 | `refs` | `expand_below` | 展开该文件夹及其子文件夹 | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | 折叠该文件夹及其子文件夹 | `_`, `Shift+Left` |
-| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `refs` | `scroll_left` | 将窗格向左滚动 | `Alt+Left` |
+| `refs` | `scroll_right` | 将窗格向右滚动 | `Alt+Right` |
 | `log` | `toggle_file_mode` | 文件：路径或树 | `m` |
-| `log` | `lfs_only` | Files: LFS Only | `o` |
+| `log` | `lfs_only` | 文件：仅 LFS | `o` |
 | `log` | `view_all_files` | 文件：查看所有文件 | `a` |
 | `log` | `compare_selection` | 比较所选行 | `v` |
 | `log` | `compare_swap` | 交换比较的两端 | `x` |
 | `log` | `compare_next` | 转到下一个比较行 | `n` |
-| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
+| `log` | `filter_author` | 按作者筛选 Log | `Shift+A` |
 | `log` | `pick_column` | 选择要移动或调整宽度的列 | `Shift+C` |
 | `log` | `scroll_left` | 向左滚动各列 | `Shift+Left` |
 | `log` | `scroll_right` | 向右滚动各列 | `Shift+Right` |
-| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log` | `details_scroll_left` | 将窗格向左滚动 | `Alt+Left` |
+| `log` | `details_scroll_right` | 将窗格向右滚动 | `Alt+Right` |
 | `log` | `copy_mermaid` | 将 Commits 复制为 Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | 选择下一列 | `Tab` |
 | `log_columns` | `prev` | 选择上一列 | `Shift+BackTab` |
@@ -166,11 +166,11 @@ stage_file = "z"
 | `log_files` | `collapse_all_folders` | 折叠所有文件夹 | `-` |
 | `log_files` | `expand_below` | 展开该文件夹及其子文件夹 | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | 折叠该文件夹及其子文件夹 | `_`, `Shift+Left` |
-| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log_files` | `scroll_left` | 将窗格向左滚动 | `Alt+Left` |
+| `log_files` | `scroll_right` | 将窗格向右滚动 | `Alt+Right` |
 | `status` | `compose` | 聚焦 Commit 消息 | `c` |
 | `status` | `toggle_file_mode` | 文件：路径或树 | `m` |
-| `status` | `lfs_only` | Files: LFS Only | `o` |
+| `status` | `lfs_only` | 文件：仅 LFS | `o` |
 | `status` | `view_all_files` | 文件：查看所有文件 | `a` |
 | `status` | `amend` | 切换修订 | `Shift+A` |
 | `status` | `skip_hooks` | 切换“跳过钩子” | `Shift+H` |
@@ -181,8 +181,8 @@ stage_file = "z"
 | `status` | `collapse_all_folders` | 折叠所有文件夹 | `-` |
 | `status` | `expand_below` | 展开该文件夹及其子文件夹 | `*`, `Shift+Right` |
 | `status` | `collapse_below` | 折叠该文件夹及其子文件夹 | `_`, `Shift+Left` |
-| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `status` | `scroll_left` | 将窗格向左滚动 | `Alt+Left` |
+| `status` | `scroll_right` | 将窗格向右滚动 | `Alt+Right` |
 | `home` | `favorite` | 收藏或取消收藏仓库 | `f`, `*` |
 | `home` | `close_repo` | 关闭、移除或取消收藏该行 | `x`, `Delete` |
 | `home` | `copy_path` | 复制仓库路径 | `y` |
@@ -483,8 +483,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 导航：焦点切换到下一个窗格 | `Tab` |
 | 导航：焦点切换到上一个窗格 | `Shift+Tab` |
 | 导航：搜索 Commit… | `f` |
-| Log: Filter by Author... | `A` |
-| Log: Clear Author Filter |  |
+| Log：按作者筛选… | `A` |
+| Log：清除作者筛选 |  |
 | 导航：折叠/展开引用窗格 | `Ctrl+N H` |
 | 导航：加宽引用窗格 | `Ctrl+N Right` |
 | 导航：收窄引用窗格 | `Ctrl+N Left` |
@@ -590,10 +590,10 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 引用：将所选 Tag Push 到默认远程 |  |
 | 引用：从远程删除所选 Tag… |  |
 | Git：Fetch 所选 Tag |  |
-| Git: Use the Remote's Version of the Selected Tag |  |
-| Git: Force Push the Selected Tag to Its Remote |  |
+| Git：采用所选 Tag 的远程版本 |  |
+| Git：将所选 Tag 强制 Push 到其远程 |  |
 | 引用：为所选 Tag 添加注释… |  |
-| Refs: Move Selected Tag to Selected Commit... |  |
+| 引用：将所选 Tag 移到所选 Commit… |  |
 | 引用：切换在图中隐藏 |  |
 | 引用：在图中定位 | `g` |
 | 引用：切换所选引用的单独显示 | `o` |
@@ -607,8 +607,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 引用：折叠所有文件夹 | `-` |
 | 引用：展开所选文件夹及其子文件夹 | `*` |
 | 引用：折叠所选文件夹及其子文件夹 | `_` |
-| View: Scroll the Pane Left | `Alt+Left` |
-| View: Scroll the Pane Right | `Alt+Right` |
+| 视图：将窗格向左滚动 | `Alt+Left` |
+| 视图：将窗格向右滚动 | `Alt+Right` |
 | 引用：下一个分区 | `l` |
 | 引用：上一个分区 | `h` |
 | 引用：展开或折叠当前分区 | `Enter` |
@@ -828,10 +828,10 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Radar：延后… | `z` |
 | Radar：评审请求… | `e` |
 | Radar：打开议题对话 | `i` |
-| Radar: Merge Request... | `m` |
-| Radar: Close... | `x` |
-| Radar: Mark as Ready | `y` |
-| Radar: Clone Repository... | `g` |
+| Radar：Merge 请求… | `m` |
+| Radar：关闭… | `x` |
+| Radar：标记为就绪 | `y` |
+| Radar：克隆仓库… | `g` |
 | Radar：通过 API 评审 |  |
 | Radar：克隆并评审… |  |
 | Radar：编辑指派人… |  |
@@ -863,8 +863,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 标签页：在文件管理器中打开 |  |
 | 标签页：在终端中打开 |  |
 | 标签页：打开方式… | `Alt+O` |
-| Tab: Terminal Here |  |
-| ✦ Tab: Open AI Agent Here |  |
+| 标签页：在此打开终端 |  |
+| ✦ 标签页：在此打开 AI 代理 |  |
 | 标签页：用默认方式打开 | `Ctrl+Alt+O` |
 | 仓库：更改配置文件… |  |
 | 帮助：关于 GitPoulpi | `Ctrl+N a` |
@@ -921,7 +921,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 编辑：Reflog… |  |
 | 编辑：找回丢失的 Commits… |  |
 | 编辑：将分支恢复到被阻止操作完成后的位置 | `Alt+Shift+Z` |
-| Edit: Undo Whole Sequence |  |
+| 编辑：撤销整个序列 |  |
 | 评审：显示概览 |  |
 | 评审：显示文件 |  |
 | 评审：显示 Commits |  |
@@ -990,7 +990,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 对话：打开条目的图表 | `g` |
 | 对话：打开讨论的代码 | `G` |
 | 对话：复制条目链接 | `y` |
-| Conversation: Copy Text | `Ctrl+C` |
+| 对话：复制文本 | `Ctrl+C` |
 | 对话：在浏览器中打开 | `o` |
 | 对话：编辑评论 | `e` |
 | 对话：删除评论 | `d` |
@@ -1015,7 +1015,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 评审：丢弃 ✦ 草稿 | `N` |
 | 撤销历史：撤销到这里… | `u` |
 | 撤销历史：重做到这里… | `y` |
-| Undo History: Undo Whole Sequence | `x` |
+| 撤销历史：撤销整个序列 | `x` |
 | 撤销历史：仅恢复此项… | `r` |
 | 撤销历史：将分支恢复到原来的位置… | `o` |
 | 撤销历史：刷新 |  |
@@ -1082,7 +1082,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Diff：切换仅 hunk（整个文件 / 仅更改） | `H` |
 | 文件：切换路径/树 | `m` |
 | 文件：切换查看所有文件 | `a` |
-| Files: Toggle LFS Only | `o` |
+| 文件：切换仅 LFS | `o` |
 | Commit：切换“跳过钩子” | `H` |
 | 文件：打开当前行或所选文件的菜单 | `.` |
 | 文件：展开所有文件夹 | `=` |
@@ -1099,7 +1099,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Diff：切换自动换行 | `w` |
 | Diff：选择编码… | `C` |
 | 视图：切换缩略图 | `M` |
-| Diff: Toggle Changed Words Highlight |  |
+| Diff：切换变更词高亮 |  |
 | 视图：切换 Commit 列 | `Alt+C` |
 | 视图：Commit 列：隐藏 |  |
 | 视图：Commit 列：文件历史 |  |
@@ -1191,17 +1191,17 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 编辑器：转换换行符 |  |
 | 编辑器：更改缩进 |  |
 | 应用：设置… | `Ctrl+, / Ctrl+N ,` |
-| ✦ Sequence: Create with AI... |  |
+| ✦ 序列：用 AI 创建… |  |
 | 应用：搜索设置… | `设置中按 /` |
 | 应用：键位绑定… |  |
 | 代理：显示待处理的视图 | `Ctrl+N Enter` |
 | 代理：关闭待处理的视图 |  |
 | 代理：返回 | `Ctrl+N Backspace` |
-| Sequence: Cancel |  |
-| Sequence: Continue |  |
-| Sequence: Review This Repository's Sequences |  |
-| Sequence: Trust This Repository's Sequences |  |
-| Sequence: Ignore This Repository's Sequences |  |
+| 序列：取消 |  |
+| 序列：继续 |  |
+| 序列：查看此仓库的序列 |  |
+| 序列：信任此仓库的序列 |  |
+| 序列：忽略此仓库的序列 |  |
 | 键位绑定：全部重置… |  |
 | 集成：打开关联的 pull request | `Ctrl+G g` |
 | 集成：在托管平台上编辑关联的 pull request | `e（在某一行上）` |

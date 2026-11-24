@@ -151,20 +151,20 @@ Varje tangent du kan binda om, med id:t som används i
 | `refs` | `collapse_all` | Fäll ihop alla mappar | `-` |
 | `refs` | `expand_below` | Fäll ut mappen och dess undermappar | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Fäll ihop mappen och dess undermappar | `_`, `Shift+Left` |
-| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `refs` | `scroll_left` | Rulla panelen åt vänster | `Alt+Left` |
+| `refs` | `scroll_right` | Rulla panelen åt höger | `Alt+Right` |
 | `log` | `toggle_file_mode` | Filer: sökväg eller träd | `m` |
-| `log` | `lfs_only` | Files: LFS Only | `o` |
+| `log` | `lfs_only` | Filer: Bara LFS | `o` |
 | `log` | `view_all_files` | Filer: visa alla filer | `a` |
 | `log` | `compare_selection` | Jämför de markerade raderna | `v` |
 | `log` | `compare_swap` | Byt plats på jämförelsens ändar | `x` |
 | `log` | `compare_next` | Gå till nästa jämförda rad | `n` |
-| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
+| `log` | `filter_author` | Filtrera Log efter författare | `Shift+A` |
 | `log` | `pick_column` | Välj en kolumn att flytta eller ändra bredd på | `Shift+C` |
 | `log` | `scroll_left` | Rulla kolumnerna åt vänster | `Shift+Left` |
 | `log` | `scroll_right` | Rulla kolumnerna åt höger | `Shift+Right` |
-| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log` | `details_scroll_left` | Rulla panelen åt vänster | `Alt+Left` |
+| `log` | `details_scroll_right` | Rulla panelen åt höger | `Alt+Right` |
 | `log` | `copy_mermaid` | Kopiera commits som Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Välj nästa kolumn | `Tab` |
 | `log_columns` | `prev` | Välj föregående kolumn | `Shift+BackTab` |
@@ -182,11 +182,11 @@ Varje tangent du kan binda om, med id:t som används i
 | `log_files` | `collapse_all_folders` | Fäll ihop alla mappar | `-` |
 | `log_files` | `expand_below` | Fäll ut mappen och dess undermappar | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Fäll ihop mappen och dess undermappar | `_`, `Shift+Left` |
-| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log_files` | `scroll_left` | Rulla panelen åt vänster | `Alt+Left` |
+| `log_files` | `scroll_right` | Rulla panelen åt höger | `Alt+Right` |
 | `status` | `compose` | Fokusera commit-meddelandet | `c` |
 | `status` | `toggle_file_mode` | Filer: sökväg eller träd | `m` |
-| `status` | `lfs_only` | Files: LFS Only | `o` |
+| `status` | `lfs_only` | Filer: Bara LFS | `o` |
 | `status` | `view_all_files` | Filer: visa alla filer | `a` |
 | `status` | `amend` | Växla amend | `Shift+A` |
 | `status` | `skip_hooks` | Växla att hoppa över hooks | `Shift+H` |
@@ -197,8 +197,8 @@ Varje tangent du kan binda om, med id:t som används i
 | `status` | `collapse_all_folders` | Fäll ihop alla mappar | `-` |
 | `status` | `expand_below` | Fäll ut mappen och dess undermappar | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Fäll ihop mappen och dess undermappar | `_`, `Shift+Left` |
-| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `status` | `scroll_left` | Rulla panelen åt vänster | `Alt+Left` |
+| `status` | `scroll_right` | Rulla panelen åt höger | `Alt+Right` |
 | `home` | `favorite` | Stjärnmarkera repositoryt | `f`, `*` |
 | `home` | `close_repo` | Stäng, ta bort eller ta bort stjärnan på raden | `x`, `Delete` |
 | `home` | `copy_path` | Kopiera repositoryts sökväg | `y` |
@@ -517,8 +517,8 @@ Tangenterna är standardvärdena.
 | Navigering: Flytta fokus till nästa ruta | `Tab` |
 | Navigering: Flytta fokus till föregående ruta | `Shift+Tab` |
 | Navigering: Sök commits... | `f` |
-| Log: Filter by Author... | `A` |
-| Log: Clear Author Filter |  |
+| Log: Filtrera efter författare... | `A` |
+| Log: Rensa författarfilter |  |
 | Navigering: Fäll ihop/ut Refs-rutan | `Ctrl+N H` |
 | Navigering: Bredda Refs-rutan | `Ctrl+N Right` |
 | Navigering: Smalna av Refs-rutan | `Ctrl+N Left` |
@@ -624,10 +624,10 @@ Tangenterna är standardvärdena.
 | Refs: Pusha vald tag till standard-remote |  |
 | Refs: Ta bort vald tag från dess remote... |  |
 | Git: Fetch vald tag |  |
-| Git: Use the Remote's Version of the Selected Tag |  |
-| Git: Force Push the Selected Tag to Its Remote |  |
+| Git: Använd remotens version av vald Tag |  |
+| Git: Force-Pusha vald Tag till dess remote |  |
 | Refs: Annotera vald tag... |  |
-| Refs: Move Selected Tag to Selected Commit... |  |
+| Refs: Flytta vald Tag till vald Commit... |  |
 | Refs: Växla dölj i grafen |  |
 | Refs: Visa i grafen | `g` |
 | Refs: Växla solo för vald ref | `o` |
@@ -641,8 +641,8 @@ Tangenterna är standardvärdena.
 | Refs: Fäll ihop alla mappar | `-` |
 | Refs: Fäll ut vald mapp och dess undermappar | `*` |
 | Refs: Fäll ihop vald mapp och dess undermappar | `_` |
-| View: Scroll the Pane Left | `Alt+Left` |
-| View: Scroll the Pane Right | `Alt+Right` |
+| Vy: Rulla panelen åt vänster | `Alt+Left` |
+| Vy: Rulla panelen åt höger | `Alt+Right` |
 | Refs: Nästa avsnitt | `l` |
 | Refs: Föregående avsnitt | `h` |
 | Refs: Fäll ut/ihop aktivt avsnitt | `Enter` |
@@ -862,10 +862,10 @@ Tangenterna är standardvärdena.
 | Radar: Snooza... | `z` |
 | Radar: Granska begäran... | `e` |
 | Radar: Öppna ärendekonversation | `i` |
-| Radar: Merge Request... | `m` |
-| Radar: Close... | `x` |
-| Radar: Mark as Ready | `y` |
-| Radar: Clone Repository... | `g` |
+| Radar: Merge begäran... | `m` |
+| Radar: Stäng... | `x` |
+| Radar: Markera som klar | `y` |
+| Radar: Klona repository... | `g` |
 | Radar: Granska via API:et |  |
 | Radar: Klona och granska... |  |
 | Radar: Redigera tilldelade... |  |
@@ -897,8 +897,8 @@ Tangenterna är standardvärdena.
 | Flik: Öppna i filhanteraren |  |
 | Flik: Öppna i terminal |  |
 | Flik: Öppna i... | `Alt+O` |
-| Tab: Terminal Here |  |
-| ✦ Tab: Open AI Agent Here |  |
+| Flik: Terminal här |  |
+| ✦ Flik: Öppna AI-agent här |  |
 | Flik: Öppna i standard | `Ctrl+Alt+O` |
 | Repository: Byt profil... |  |
 | Hjälp: Om GitPoulpi | `Ctrl+N a` |
@@ -955,7 +955,7 @@ Tangenterna är standardvärdena.
 | Redigera: Reflog... |  |
 | Redigera: Rädda förlorade Commits... |  |
 | Redigera: Återställ grenen till där den blockerade åtgärden lämnade den | `Alt+Shift+Z` |
-| Edit: Undo Whole Sequence |  |
+| Redigera: Ångra hela sekvensen |  |
 | Granskning: Visa översikt |  |
 | Granskning: Visa filer |  |
 | Granskning: Visa Commits |  |
@@ -1024,7 +1024,7 @@ Tangenterna är standardvärdena.
 | Konversation: Öppna postens diagram | `g` |
 | Konversation: Öppna trådens kod | `G` |
 | Konversation: Kopiera postens länk | `y` |
-| Conversation: Copy Text | `Ctrl+C` |
+| Konversation: Kopiera text | `Ctrl+C` |
 | Konversation: Öppna i webbläsare | `o` |
 | Konversation: Redigera kommentar | `e` |
 | Konversation: Ta bort kommentar | `d` |
@@ -1049,7 +1049,7 @@ Tangenterna är standardvärdena.
 | Granskning: Kassera ✦-utkastet | `N` |
 | Ångrahistorik: Ångra hit... | `u` |
 | Ångrahistorik: Gör om hit... | `y` |
-| Undo History: Undo Whole Sequence | `x` |
+| Ångrahistorik: Ångra hela sekvensen | `x` |
 | Ångrahistorik: Återställ bara den här... | `r` |
 | Ångrahistorik: Återställ grenen till där den var... | `o` |
 | Ångrahistorik: Uppdatera |  |
@@ -1116,7 +1116,7 @@ Tangenterna är standardvärdena.
 | Diff: Växla bara hunks (hela filen / bara ändringarna) | `H` |
 | Filer: Växla sökväg/träd | `m` |
 | Filer: Växla visa alla filer | `a` |
-| Files: Toggle LFS Only | `o` |
+| Filer: Växla bara LFS | `o` |
 | Commit: Växla att hoppa över hooks | `H` |
 | Filer: Öppna menyn för raden eller markeringen | `.` |
 | Filer: Fäll ut alla mappar | `=` |
@@ -1133,7 +1133,7 @@ Tangenterna är standardvärdena.
 | Diff: Växla radbrytning | `w` |
 | Diff: Välj teckenkodning... | `C` |
 | Vy: Växla minikarta | `M` |
-| Diff: Toggle Changed Words Highlight |  |
+| Diff: Växla markering av ändrade ord |  |
 | Vy: Växla commit-kolumnen | `Alt+C` |
 | Vy: Commit-kolumnen: dölj |  |
 | Vy: Commit-kolumnen: filens historik |  |
@@ -1225,17 +1225,17 @@ Tangenterna är standardvärdena.
 | Redigerare: Konvertera radbrytningar |  |
 | Redigerare: Ändra indrag |  |
 | App: Inställningar... | `Ctrl+, / Ctrl+N ,` |
-| ✦ Sequence: Create with AI... |  |
+| ✦ Sekvens: Skapa med AI... |  |
 | App: Sök i inställningar... | `/ i Inställningar` |
 | App: Tangentbindningar... |  |
 | Agent: Visa väntande vy | `Ctrl+N Enter` |
 | Agent: Avfärda väntande vy |  |
 | Agent: Tillbaka | `Ctrl+N Backspace` |
-| Sequence: Cancel |  |
-| Sequence: Continue |  |
-| Sequence: Review This Repository's Sequences |  |
-| Sequence: Trust This Repository's Sequences |  |
-| Sequence: Ignore This Repository's Sequences |  |
+| Sekvens: Avbryt |  |
+| Sekvens: Fortsätt |  |
+| Sekvens: Granska detta repositorys sekvenser |  |
+| Sekvens: Lita på detta repositorys sekvenser |  |
+| Sekvens: Ignorera detta repositorys sekvenser |  |
 | Tangentbindningar: Återställ alla... |  |
 | Integrationer: Öppna länkad pull request | `Ctrl+G g` |
 | Integrationer: Redigera länkad pull request på värden | `e (på en rad)` |

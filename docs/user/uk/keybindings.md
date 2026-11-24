@@ -147,20 +147,20 @@ stage_file = "z"
 | `refs` | `collapse_all` | Згорнути всі папки | `-` |
 | `refs` | `expand_below` | Розгорнути папку з підпапками | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Згорнути папку з підпапками | `_`, `Shift+Left` |
-| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `refs` | `scroll_left` | Прокрутити панель ліворуч | `Alt+Left` |
+| `refs` | `scroll_right` | Прокрутити панель праворуч | `Alt+Right` |
 | `log` | `toggle_file_mode` | Файли: шлях чи дерево | `m` |
-| `log` | `lfs_only` | Files: LFS Only | `o` |
+| `log` | `lfs_only` | Файли: лише LFS | `o` |
 | `log` | `view_all_files` | Файли: усі файли | `a` |
 | `log` | `compare_selection` | Порівняти вибрані рядки | `v` |
 | `log` | `compare_swap` | Поміняти сторони порівняння | `x` |
 | `log` | `compare_next` | Перейти до наступного порівнюваного рядка | `n` |
-| `log` | `filter_author` | Filter the Log by Author | `Shift+A` |
+| `log` | `filter_author` | Фільтрувати Log за автором | `Shift+A` |
 | `log` | `pick_column` | Вибрати стовпець для пересування або зміни ширини | `Shift+C` |
 | `log` | `scroll_left` | Прокрутити стовпці ліворуч | `Shift+Left` |
 | `log` | `scroll_right` | Прокрутити стовпці праворуч | `Shift+Right` |
-| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log` | `details_scroll_left` | Прокрутити панель ліворуч | `Alt+Left` |
+| `log` | `details_scroll_right` | Прокрутити панель праворуч | `Alt+Right` |
 | `log` | `copy_mermaid` | Копіювати commits як Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Вибрати наступний стовпець | `Tab` |
 | `log_columns` | `prev` | Вибрати попередній стовпець | `Shift+BackTab` |
@@ -178,11 +178,11 @@ stage_file = "z"
 | `log_files` | `collapse_all_folders` | Згорнути всі папки | `-` |
 | `log_files` | `expand_below` | Розгорнути папку з підпапками | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Згорнути папку з підпапками | `_`, `Shift+Left` |
-| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `log_files` | `scroll_left` | Прокрутити панель ліворуч | `Alt+Left` |
+| `log_files` | `scroll_right` | Прокрутити панель праворуч | `Alt+Right` |
 | `status` | `compose` | Фокус на повідомленні commit'у | `c` |
 | `status` | `toggle_file_mode` | Файли: шлях чи дерево | `m` |
-| `status` | `lfs_only` | Files: LFS Only | `o` |
+| `status` | `lfs_only` | Файли: лише LFS | `o` |
 | `status` | `view_all_files` | Файли: усі файли | `a` |
 | `status` | `amend` | Перемкнути amend | `Shift+A` |
 | `status` | `skip_hooks` | Перемкнути пропуск хуків | `Shift+H` |
@@ -193,8 +193,8 @@ stage_file = "z"
 | `status` | `collapse_all_folders` | Згорнути всі папки | `-` |
 | `status` | `expand_below` | Розгорнути папку з підпапками | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Згорнути папку з підпапками | `_`, `Shift+Left` |
-| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
-| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
+| `status` | `scroll_left` | Прокрутити панель ліворуч | `Alt+Left` |
+| `status` | `scroll_right` | Прокрутити панель праворуч | `Alt+Right` |
 | `home` | `favorite` | Додати репозиторій в обране чи прибрати | `f`, `*` |
 | `home` | `close_repo` | Закрити, прибрати чи зняти обране з рядка | `x`, `Delete` |
 | `home` | `copy_path` | Скопіювати шлях до репозиторію | `y` |
@@ -509,8 +509,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Навігація: фокус на наступну панель | `Tab` |
 | Навігація: фокус на попередню панель | `Shift+Tab` |
 | Навігація: пошук commit'ів... | `f` |
-| Log: Filter by Author... | `A` |
-| Log: Clear Author Filter |  |
+| Log: фільтрувати за автором... | `A` |
+| Log: скинути фільтр авторів |  |
 | Навігація: згорнути/розгорнути Refs | `Ctrl+N H` |
 | Навігація: Розширити панель Refs | `Ctrl+N Right` |
 | Навігація: Звузити панель Refs | `Ctrl+N Left` |
@@ -616,10 +616,10 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Refs: push вибраного tag'а на типовий remote |  |
 | Refs: видалити вибраний tag з його remote... |  |
 | Git: Fetch вибраного tag'а |  |
-| Git: Use the Remote's Version of the Selected Tag |  |
-| Git: Force Push the Selected Tag to Its Remote |  |
+| Git: взяти версію Tag з віддаленого репозиторію |  |
+| Git: force Push вибраного Tag у його віддалений репозиторій |  |
 | Refs: анотувати вибраний tag... |  |
-| Refs: Move Selected Tag to Selected Commit... |  |
+| Refs: перенести вибраний Tag на вибраний Commit... |  |
 | Refs: сховати/показати в графі |  |
 | Refs: показати в графі | `g` |
 | Refs: solo для вибраного ref | `o` |
@@ -633,8 +633,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Refs: згорнути всі папки | `-` |
 | Refs: розгорнути вибрану папку з підпапками | `*` |
 | Refs: згорнути вибрану папку з підпапками | `_` |
-| View: Scroll the Pane Left | `Alt+Left` |
-| View: Scroll the Pane Right | `Alt+Right` |
+| Вигляд: прокрутити панель ліворуч | `Alt+Left` |
+| Вигляд: прокрутити панель праворуч | `Alt+Right` |
 | Refs: наступний розділ | `l` |
 | Refs: попередній розділ | `h` |
 | Refs: згорнути/розгорнути активний розділ | `Enter` |
@@ -854,10 +854,10 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Radar: відкласти... | `z` |
 | Radar: рев'ю запиту... | `e` |
 | Radar: відкрити бесіду issue | `i` |
-| Radar: Merge Request... | `m` |
-| Radar: Close... | `x` |
-| Radar: Mark as Ready | `y` |
-| Radar: Clone Repository... | `g` |
+| Radar: Merge запиту... | `m` |
+| Radar: закрити... | `x` |
+| Radar: позначити як готовий | `y` |
+| Radar: клонувати репозиторій... | `g` |
 | Radar: рев'ю через API |  |
 | Radar: клонувати й зробити рев'ю... |  |
 | Radar: змінити виконавців... |  |
@@ -889,8 +889,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Вкладка: відкрити у файловому менеджері |  |
 | Вкладка: відкрити в терміналі |  |
 | Вкладка: відкрити в... | `Alt+O` |
-| Tab: Terminal Here |  |
-| ✦ Tab: Open AI Agent Here |  |
+| Вкладка: термінал тут |  |
+| ✦ Вкладка: відкрити агента ШІ тут |  |
 | Вкладка: відкрити в типовому | `Ctrl+Alt+O` |
 | Репозиторій: змінити профіль... |  |
 | Довідка: про GitPoulpi | `Ctrl+N a` |
@@ -947,7 +947,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Правка: Reflog... |  |
 | Правка: відновити втрачені commit'и... |  |
 | Правка: відновити гілку туди, де її залишила заблокована дія | `Alt+Shift+Z` |
-| Edit: Undo Whole Sequence |  |
+| Правка: скасувати всю послідовність |  |
 | Рев'ю: показати огляд |  |
 | Рев'ю: показати файли |  |
 | Рев'ю: показати commits |  |
@@ -1016,7 +1016,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Бесіда: відкрити діаграму запису | `g` |
 | Бесіда: відкрити код обговорення | `G` |
 | Бесіда: копіювати посилання запису | `y` |
-| Conversation: Copy Text | `Ctrl+C` |
+| Бесіда: копіювати текст | `Ctrl+C` |
 | Бесіда: відкрити в браузері | `o` |
 | Бесіда: змінити коментар | `e` |
 | Бесіда: видалити коментар | `d` |
@@ -1041,7 +1041,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Рев'ю: відкинути ✦ чернетку | `N` |
 | Історія скасувань: скасувати до цього місця... | `u` |
 | Історія скасувань: повторити до цього місця... | `y` |
-| Undo History: Undo Whole Sequence | `x` |
+| Історія скасувань: скасувати всю послідовність | `x` |
 | Історія скасувань: відновити лише це... | `r` |
 | Історія скасувань: відновити гілку туди, де вона була... | `o` |
 | Історія скасувань: оновити |  |
@@ -1108,7 +1108,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Diff: лише hunks (весь файл / лише зміни) | `H` |
 | Файли: шлях/дерево | `m` |
 | Файли: усі файли | `a` |
-| Files: Toggle LFS Only | `o` |
+| Файли: перемкнути лише LFS | `o` |
 | Commit: пропуск хуків | `H` |
 | Файли: відкрити меню рядка або виділення | `.` |
 | Файли: розгорнути всі папки | `=` |
@@ -1125,7 +1125,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Diff: перенесення слів | `w` |
 | Diff: вибрати кодування... | `C` |
 | Вигляд: показати чи сховати мінікарту | `M` |
-| Diff: Toggle Changed Words Highlight |  |
+| Diff: перемкнути підсвітку змінених слів |  |
 | Вигляд: показати чи сховати стовпець commit'ів | `Alt+C` |
 | Вигляд: стовпець commit'ів: сховати |  |
 | Вигляд: стовпець commit'ів: історія файлу |  |
@@ -1217,17 +1217,17 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Редактор: перетворити розриви рядків |  |
 | Редактор: змінити відступи |  |
 | Застосунок: налаштування... | `Ctrl+, / Ctrl+N ,` |
-| ✦ Sequence: Create with AI... |  |
+| ✦ Послідовність: створити за допомогою ШІ... |  |
 | Застосунок: пошук налаштувань... | `/ у налаштуваннях` |
 | Застосунок: скорочення... |  |
 | Агент: показати відкладений вигляд | `Ctrl+N Enter` |
 | Агент: відхилити відкладений вигляд |  |
 | Агент: назад | `Ctrl+N Backspace` |
-| Sequence: Cancel |  |
-| Sequence: Continue |  |
-| Sequence: Review This Repository's Sequences |  |
-| Sequence: Trust This Repository's Sequences |  |
-| Sequence: Ignore This Repository's Sequences |  |
+| Послідовність: скасувати |  |
+| Послідовність: продовжити |  |
+| Послідовність: переглянути послідовності цього репозиторію |  |
+| Послідовність: довіряти послідовностям цього репозиторію |  |
+| Послідовність: ігнорувати послідовності цього репозиторію |  |
 | Скорочення: скинути все... |  |
 | Інтеграції: відкрити пов'язаний pull request | `Ctrl+G g` |
 | Інтеграції: змінити пов'язаний pull request на хостингу | `e (на рядку)` |

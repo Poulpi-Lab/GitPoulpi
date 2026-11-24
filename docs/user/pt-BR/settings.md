@@ -454,7 +454,7 @@ o servidor; veja [MCP e agentes](mcp-and-agents.md).
 | **Cor dos campos**, **Cor personalizada dos campos** | O fundo dos campos de texto: **Seguir o tema** (padrão), uma cor escura fixa, ou o seu próprio `#rrggbb`. |
 | **Cursor de texto** | `ui.text_cursor`: **terminal** (padrão) coloca o cursor do próprio terminal no ponto de inserção do campo de texto em foco, como uma barra (valem as configurações de cursor do seu terminal, e a janela de candidatos de um método de entrada abre no ponto de inserção); **drawn** desenha o cursor do próprio GitPoulpi e mantém o cursor do terminal oculto. Vale na hora. Paleta: `Configurações: Cursor de texto...`. |
 | **Profundidade de cor** | **auto** (padrão), **truecolor**, **256** ou **16**. Veja [Temas](themes.md). |
-| **Tema de cores do grafo** | **Seguir o tema** (padrão: as cores de faixa do próprio tema) ou qualquer paleta de faixas. Cada paleta mostra algumas de suas cores. Aplica-se quando as Configurações se fecham. O comando da paleta **App: Mudar tema de cores do grafo...** (`Ctrl+N Shift+T`) pré-visualiza cada paleta ao vivo. |
+| **Tema de cores do grafo** | **Seguir o tema** (padrão: as cores de faixa do próprio tema) ou qualquer paleta de faixas, inclusive os seus próprios arquivos de tema (depois das predefinidas). Cada paleta mostra algumas de suas cores; um nome configurado que não existe mais é marcado como *não encontrado* e o grafo usa as faixas do tema. Aplica-se quando as Configurações se fecham. O comando da paleta **App: Mudar tema de cores do grafo...** (`Ctrl+N Shift+T`) pré-visualiza cada paleta ao vivo. |
 | **Fundo das faixas do grafo** | **Desativado** (transparente) ou **Tom da linha**: uma faixa suave na cor da faixa atrás da coluna do grafo, com uma barra fina na sua borda. |
 | **Intensidade do tom da linha** | Quão esmaecida é a faixa de Tom da linha: **Forte**, **Média** (padrão) ou **Sutil**. A barra da borda mantém sua cor plena. |
 | **Posição da barra de ferramentas** | `ui.toolbar_position`: Onde fica a barra de ferramentas: Topo, Base (padrão), Esquerda ou Direita. Esquerda e Direita formam uma coluna ao lado dos painéis; uma janela com menos de 80 colunas a desenha na base. Aplicado imediatamente. |
@@ -467,6 +467,8 @@ o servidor; veja [MCP e agentes](mcp-and-agents.md).
 | **Formato de data**, **Formato de data/hora**, **Formato de data detalhado** | Os padrões de data do Histórico do arquivo e da coluna de data do Blame, da coluna Data do Log, e dos detalhes do commit. Cada um mostra uma prévia ao vivo. Veja a [Referência de configuração](config-reference.md#ui) para os tokens. |
 
 ![A lista suspensa Tema de cores do grafo: Seguir o tema, depois cada paleta de faixas com algumas de suas cores](../images/settings-log-graph-lanes.png)
+
+O tema e as cores do grafo (o Tema, o tema de cores do grafo, a colorização e o fundo das faixas, a intensidade do tom da linha) pertencem a cada instalação: com várias instalações compartilhando um `config.toml`, mudá-los em uma nunca muda as outras. Só a instalação primária também grava as chaves `ui.*` compartilhadas.
 
 ### Teclado e mouse
 
@@ -499,6 +501,21 @@ Três opções ficam na aba **Geral**.
 | **Protocolo de teclado do Kitty** | **auto** pede ao terminal o protocolo de teclado do kitty, então `Ctrl+,`, `Ctrl+Enter` e `Ctrl+Shift+N` chegam. **off** nunca pede; use se um terminal se comportar mal. Exige reiniciar. |
 | **Mouse ativado** | Desativado deixa o mouse e a seleção de texto para o seu terminal. Exige reiniciar. |
 | **Linhas da roda do mouse** | Quantas linhas um passo da roda move no Log. Exige reiniciar. |
+
+### Sequências
+
+**Configurações > Sequências** edita as suas [sequências](sequences.md) nomeadas: listas de
+comandos da paleta executados um após o outro, cada uma uma linha da paleta e
+vinculável a uma tecla. É uma [página de lista](#listas) com uma só face: **+ Adicionar** oferece
+uma sequência vazia e os modelos (**Backup**, **Compor e push**,
+**Worktree e agente**), as linhas são o **Nome**, o **Id**, uma
+**Descrição**, o **Escopo** (esta instalação, todas as instalações deste
+computador ou só este repositório), um botão **Atalho** que abre o
+popup de captura de **Teclado e mouse**, **Editar passos** e **Executar agora**.
+**Editar passos** troca a lista pelos passos da sequência, cada um com uma
+**Pausa** (**Padrão**, **Sempre**, **Nunca**) e as suas opções; **+ Adicionar**
+ali abre uma lista filtrável dos comandos que um passo pode ser. Toda alteração
+vale na hora. Veja [Sequências](sequences.md).
 
 ### Log e grafo
 
@@ -538,6 +555,7 @@ grafo ficam na página **Aparência**.
 | **Números de linha** | A coluna de números de linha do editor e do diff. |
 | **Seguir a seleção no editor** | Com o editor aberto, selecionar outro arquivo no painel direito também o abre no editor, depois de perguntar se as alterações não salvas devem ser salvas. Um arquivo que não pode ser editado abre na visualização habitual. Só para as alterações de trabalho: um arquivo escolhido em um commit sai do editor para o diff desse commit. Ativada por padrão (`editor.follow_selection`). |
 | **Quebra de linha** | Quebra linhas longas do diff. |
+| **Destacar palavras alteradas** | Em uma linha alterada, pinta as palavras que diferem da linha removida ou adicionada com a qual ela é pareada com um fundo mais forte, na visualização de Diff (Inline e Dividido), no diff da revisão e nos arquivos do commit. Ligado por padrão (`ui.diff_intraline`); também o **Diff: alternar destaque das palavras alteradas** da paleta. Veja [Palavras alteradas](interface-tour.md#palavras-alteradas-em-um-diff). |
 | **Anotações do blame**, **Largura das anotações do blame** | Em qual lado da visão Blame fica a coluna de anotações (avatar, autor, idade, resumo): **right** (o padrão) ou **left**, e a largura dela em células (24 a 90). Arrastar a borda da coluna na visão Blame, ou as teclas `>` / `<`, salva a largura aqui (`ui.blame_side`, `ui.blame_width`). Veja [Blame](log-and-history.md#blame). |
 | **Layout padrão**, **Só hunks**, **Mostrar alterações só de espaços em branco**, **Minimapa** | O estado inicial da visualização de diff. A barra da visualização de diff os altera e os salva. |
 | **Editor de merge: lado a lado a partir de (colunas)** | A partir desta largura, o editor de merge mostra A e B lado a lado. Padrão 100, mínimo 40, `0` significa sempre. Abaixo dela, A e B são abas. Veja [Resolvendo conflitos de merge](merge-conflicts.md). |

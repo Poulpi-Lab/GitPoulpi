@@ -33,6 +33,8 @@ const FIXED_KEYS: &[&str] = &[
     "Shift+(any move)",
     "Shift+Up",
     "Shift+Down",
+    // The theme picker's fixed filter digits (Alt+1..Alt+5, theme_picker.rs).
+    "Alt+1-",
     // Fixed folder-picker moves.
     "Alt+Up",
     "Alt+Left",

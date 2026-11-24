@@ -230,7 +230,7 @@ impl ThemePicker {
     /// The hint band, with the real Alt+digit range: one key per visible
     /// filter button (Custom adds the fifth).
     pub(crate) fn hint(&self) -> String {
-        let keys = format!("Alt+1-{}", self.visible_filters().len());
+        let keys = format!("Alt+1-{}", self.visible_filters().len()); // i18n-english: a key range
         msg::overlays::theme_picker_hint(&keys)
     }
 

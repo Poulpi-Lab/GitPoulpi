@@ -584,12 +584,12 @@ fn the_step_picker_lists_the_vocabulary_filters_it_and_grays_what_cannot_run() {
     let found = picker.visible_ids();
     assert_eq!(found[0], "stage_all", "{found:?}");
     assert!(!found.contains(&"push"));
-    // A step a later slice adds is listed but cannot be picked.
+    // The agent step (no longer pending) is listed and can be picked.
     let mut picker = StepPicker::new(true);
     picker.type_text("agent");
     let found = picker.visible_ids();
     assert!(found.contains(&"tab_open_agent_here"), "{found:?}");
-    assert!(matches!(
+    assert!(!matches!(
         picker.on_key(&KeyEvent::new(KeyCode::Enter, KeyModifiers::NONE)),
         super::super::sequences_picker::PickOutcome::Stay
     ));

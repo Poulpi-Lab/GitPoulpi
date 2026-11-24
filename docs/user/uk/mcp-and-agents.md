@@ -255,6 +255,7 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
 | `ai_rewrite_rules` | `gitpoulpi ai rewrite-rules` | read, network |
 | `ai_rewrite_script` | `gitpoulpi ai rewrite-script` | read, network |
+| `ai_sequence_draft` | `gitpoulpi ai sequence-draft` | read, network |
 | `ai_split_plan` | `gitpoulpi ai split-plan` | read, network |
 | `ai_worktree_name` | `gitpoulpi ai worktree-name` | read, network |
 | `alias_status` | `gitpoulpi alias status` | read |
@@ -452,6 +453,10 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 | `rewrite_tools` | `gitpoulpi rewrite tools` | read |
 | `rm_file` | `gitpoulpi rm-file` | destructive |
 | `search` | `gitpoulpi search` | read |
+| `sequence_list` | `gitpoulpi sequence list` | read |
+| `sequence_run` | `gitpoulpi sequence run` | destructive, network |
+| `sequence_show` | `gitpoulpi sequence show` | read |
+| `sequence_validate` | `gitpoulpi sequence validate` | read |
 | `session_delete` | `gitpoulpi session delete` | destructive |
 | `session_list` | `gitpoulpi session list` | read |
 | `session_new` | `gitpoulpi session new` | write |
@@ -482,8 +487,12 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 | `tag_delete` | `gitpoulpi tag delete` | destructive, network |
 | `tag_delete_remote` | `gitpoulpi tag delete-remote` | destructive, network |
 | `tag_fetch` | `gitpoulpi tag fetch` | write, network |
+| `tag_force_push` | `gitpoulpi tag force-push` | destructive, network |
 | `tag_list` | `gitpoulpi tag list` | read |
+| `tag_merge_branch` | `gitpoulpi tag merge-branch` | write |
+| `tag_move` | `gitpoulpi tag move` | write |
 | `tag_push` | `gitpoulpi tag push` | write, network |
+| `tag_take_remote` | `gitpoulpi tag take-remote` | write |
 | `theme_export` | `gitpoulpi theme export` | read |
 | `theme_list` | `gitpoulpi theme list` | read |
 | `treat` | `gitpoulpi treat` | write |
@@ -497,6 +506,7 @@ allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old
 | `ui_propose_rewrite` | `gitpoulpi ui propose rewrite` | propose |
 | `ui_propose_split` | `gitpoulpi ui propose split` | propose |
 | `ui_propose_tag` | `gitpoulpi ui propose tag` | propose |
+| `ui_sequence_run` | `gitpoulpi ui sequence run` | propose |
 | `ui_show_commit` | `gitpoulpi ui show commit` | view |
 | `ui_show_conflict` | `gitpoulpi ui show conflict` | view |
 | `ui_show_diff` | `gitpoulpi ui show diff` | view |
@@ -563,6 +573,10 @@ Not exposed as tools:
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
 | `gitpoulpi repo-auth set` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
 | `gitpoulpi repo-auth clear` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
+| `gitpoulpi sequence add` | a sequence is a list of commands that run later (and can be bound to a key): an agent must not write its own macros, or edit the config that gates it |
+| `gitpoulpi sequence remove` | removes a sequence from the user's config; the user's macros are theirs to manage |
+| `gitpoulpi sequence trust` | trusting the sequences a repository commits (they run commands on the user's machine) is a person's decision; an agent can only run sequences a person trusted |
+| `gitpoulpi sequence untrust` | withdrawing the trust of a repository's sequences is a person's decision, like granting it |
 | `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
@@ -652,6 +666,7 @@ $ gitpoulpi --json ui back
 | `ui_propose_rewrite` (файл рецепта) | майстерня переписування історії з правилами рецепта; нічого не переглядається й не застосовується | ваші власні *Перегляд*, а потім *Застосувати* (`Ctrl+Enter`); `Esc` відхиляє. Рецепт зі скриптом відхиляється, секретні значення відкидаються |
 | `ui_propose_tag` (name, target, message) | inline-поле нового tag (анотований, коли є повідомлення) | `Enter` |
 | `ui_propose_resolution` (path, pick або content file) | редактор merge на файлі з конфліктом, з уже вибраними варіантами (або всім текстом) у Результаті | *Зберегти й позначити вирішеним* (`Ctrl+S`); закриття відхиляє |
+| `ui_sequence_run` (id) | банер «✦ Пропонує <агент>: запустити послідовність <назва>» з кнопками *Запустити* і *Відхилити*; поки нічого не запускається | *Запустити* (клацання або `Ctrl+N`, потім `Enter`); *Відхилити* чи `Esc` відхиляє. Далі запуск робить паузи там, де каже послідовність. Відмова, коли послідовності не існує, вона некоректна або це недовірена вами послідовність репозиторію |
 
 Одна пропозиція за раз; пропозицію повідомлення commit'у відхиляють, доки у вашому
 композері є ваша власна чернетка, а пропозицію вирішення - доки редактор merge

@@ -77,6 +77,7 @@ impl WindowState {
             commit_filter_focus: &mut self.commit_filter_focus,
             commit_list_mode: &mut self.commit_list_mode,
             commit_message_area: &mut self.commit_message_area,
+            commit_text: &mut self.commit_text,
             commit_message_rows_now: &mut self.commit_message_rows_now,
             commit_message_scroll: &mut self.commit_message_scroll,
             commit_message_total: &mut self.commit_message_total,

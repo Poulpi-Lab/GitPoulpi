@@ -999,6 +999,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Conversation : Ouvrir le diagramme de l'entrée | `g` |
 | Conversation : Ouvrir le code du fil de discussion | `G` |
 | Conversation : Copier le lien de l'entrée | `y` |
+| Conversation : Copier le texte | `Ctrl+C` |
 | Conversation : Ouvrir dans le navigateur | `o` |
 | Conversation : Modifier le commentaire | `e` |
 | Conversation : Supprimer le commentaire | `d` |

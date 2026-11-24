@@ -1002,6 +1002,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Conversación: Abrir el diagrama de la entrada | `g` |
 | Conversación: Abrir el código del hilo | `G` |
 | Conversación: Copiar el enlace de la entrada | `y` |
+| Conversation: Copy Text | `Ctrl+C` |
 | Conversación: Abrir en el navegador | `o` |
 | Conversación: Editar comentario | `e` |
 | Conversación: Eliminar comentario | `d` |

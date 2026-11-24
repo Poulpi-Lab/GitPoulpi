@@ -997,6 +997,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Conversation: Open Diagram of Entry | `g` |
 | Conversation: Open Code of Thread | `G` |
 | Conversation: Copy Link of Entry | `y` |
+| Conversation: Copy Text | `Ctrl+C` |
 | Conversation: Open in Browser | `o` |
 | Conversation: Edit Comment | `e` |
 | Conversation: Delete Comment | `d` |

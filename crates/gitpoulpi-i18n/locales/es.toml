@@ -10469,6 +10469,12 @@ palette_quote = "Conversación: Citar la entrada"
 palette_toggle_internal = "Conversación: Alternar nota interna"
 why_unchanged = "aún no ha cambiado nada"
 flavor_plain_text = "Texto plano"
+# context: what was copied, named in the status line
+noun_text = "text"
+# context: status line: nothing selected and no entry
+why_no_text = "there is no text to copy here"
+# context: command palette entry: copies the dragged text, else the selected entry
+palette_copy_text = "Conversation: Copy Text"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch

@@ -1001,6 +1001,7 @@ applicano. I tasti sono quelli predefiniti.
 | Conversazione: Apri il diagramma della voce | `g` |
 | Conversazione: Apri il codice della discussione | `G` |
 | Conversazione: Copia il link della voce | `y` |
+| Conversation: Copy Text | `Ctrl+C` |
 | Conversazione: Apri nel browser | `o` |
 | Conversazione: Modifica il commento | `e` |
 | Conversazione: Elimina il commento | `d` |

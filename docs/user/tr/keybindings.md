@@ -997,6 +997,7 @@ Tuşlar varsayılanlardır.
 | Konuşma: Kaydın Diyagramını Aç | `g` |
 | Konuşma: Dizinin Kodunu Aç | `G` |
 | Konuşma: Kaydın Bağlantısını Kopyala | `y` |
+| Conversation: Copy Text | `Ctrl+C` |
 | Konuşma: Tarayıcıda Aç | `o` |
 | Konuşma: Yorumu Düzenle | `e` |
 | Konuşma: Yorumu Sil | `d` |

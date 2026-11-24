@@ -720,6 +720,7 @@ pub(super) fn init(
         commit_message_for: None,
         commit_message_user_rows,
         commit_message_area: Rect::default(),
+        commit_text: Default::default(),
         commit_message_total: 0,
         commit_message_rows_now: 1,
         commit_detail_status_height: 0,

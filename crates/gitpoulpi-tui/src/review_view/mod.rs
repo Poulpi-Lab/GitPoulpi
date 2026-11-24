@@ -168,6 +168,9 @@ pub(crate) struct ReviewView {
     /// Where the Overview painted the ✦ block (the draft card and the
     /// suggestions); the conversation has the rest.
     ov_strip: Rect,
+    /// The ✦ block's text (the draft, the suggestions, the description),
+    /// selectable with a drag.
+    strip_text: crate::screen_text::ScreenText,
     /// The ✦ block's laid-out Markdown, and the addresses of the links
     /// painted this frame (`Hit::MdLink` indexes it).
     md_cache: crate::md_render::DocCache,
@@ -327,6 +330,7 @@ impl ReviewView {
             ov_len: 0,
             ov,
             ov_strip: Rect::default(),
+            strip_text: Default::default(),
             md_cache: Default::default(),
             md_links: Vec::new(),
             ov_rows: 0,

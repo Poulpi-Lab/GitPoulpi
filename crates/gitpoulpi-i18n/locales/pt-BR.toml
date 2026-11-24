@@ -10603,6 +10603,12 @@ palette_toggle_internal = "Conversa: alternar nota interna"
 why_unchanged = "nada mudou ainda"
 # context: name of the text format a host takes when it has no markup, shown in the composer footer. Width budget: 20 cells
 flavor_plain_text = "Texto simples"
+# context: what was copied, named in the status line
+noun_text = "text"
+# context: status line: nothing selected and no entry
+why_no_text = "there is no text to copy here"
+# context: command palette entry: copies the dragged text, else the selected entry
+palette_copy_text = "Conversation: Copy Text"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch

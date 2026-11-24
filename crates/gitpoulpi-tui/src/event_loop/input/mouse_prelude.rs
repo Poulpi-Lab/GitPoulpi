@@ -1230,6 +1230,15 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
         if let (Some(body), Some(manager)) = (body, cx.management.as_mut()) {
             if manager.notes.is_open() && body.contains((col, row).into()) {
                 let event = manager.notes.on_mouse(mouse);
+                // The I-beam over the notes' text (selectable), the hand
+                // over its buttons, the arrow elsewhere.
+                let shape = match crate::pointer_map::at(col, row) {
+                    Some(crate::pointer_map::Kind::Field) => CursorShape::Text,
+                    Some(crate::pointer_map::Kind::Hand) => CursorShape::Pointer,
+                    _ => CursorShape::Default,
+                };
+                cursor::set_pointer_shape(cx.terminal.backend_mut(), cx.last_cursor_shape, shape)
+                    .map_err(exit_log::io_context("setting the pointer shape"))?;
                 commands::apply_notes_event(cx, event);
                 return Ok(None);
             }

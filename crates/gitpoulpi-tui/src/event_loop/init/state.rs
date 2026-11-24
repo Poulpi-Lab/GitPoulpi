@@ -163,6 +163,8 @@ pub(in crate::event_loop) struct WindowState {
     pub(in crate::event_loop) commit_message_for: Option<Oid>,
     pub(in crate::event_loop) commit_message_user_rows: u16,
     pub(in crate::event_loop) commit_message_area: Rect,
+    /// The commit message block's text, selectable with a drag.
+    pub(in crate::event_loop) commit_text: crate::screen_text::ScreenText,
     pub(in crate::event_loop) commit_message_total: usize,
     pub(in crate::event_loop) commit_message_rows_now: u16,
     pub(in crate::event_loop) commit_detail_status_height: u16,

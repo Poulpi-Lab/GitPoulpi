@@ -161,6 +161,12 @@ letters: **`V`** layout, **`H`** hunks or whole file, **`S`** whitespace, **`W`*
 previous hunk, **`E`** the encoding, **`M`** the minimap. Every one has a palette row (*Review: Toggle Inline / Split
 Layout*, ...).
 
+On the **Overview**, the conversation and the ✦ draft block select the same way: drag over the text,
+**`Ctrl+C`** copies it (a link or a button you press keeps its action, and a drag that starts on one selects
+nothing). Without a selection, **`Ctrl+C`** (or *Conversation: Copy Text*) copies the selected entry as the host
+stores it. The I-beam shows over the text and the hand stays over buttons and links. A selection follows what is
+on screen: scrolling or a refresh drops it, and a wrapped paragraph copies as the rows it shows.
+
 ### Commits
 
 The commits of the request only (not the history behind it), newest first, and the diff of the selected one

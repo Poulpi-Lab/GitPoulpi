@@ -34,6 +34,7 @@ pub(in crate::event_loop) struct RightPanelDrawCtx<'a> {
     pub(in crate::event_loop) commit_filter_focus: bool,
     pub(in crate::event_loop) commit_list_mode: FileListMode,
     pub(in crate::event_loop) commit_message_area: &'a mut Rect,
+    pub(in crate::event_loop) commit_message_text: &'a mut crate::screen_text::ScreenText,
     pub(in crate::event_loop) commit_message_for: &'a mut Option<Oid>,
     pub(in crate::event_loop) commit_message_rows_now: &'a mut u16,
     pub(in crate::event_loop) commit_message_scroll: &'a mut usize,

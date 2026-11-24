@@ -907,6 +907,7 @@ impl WindowState {
                 image_diff_shown: self.central_view == CentralView::Diff
                     && crate::image_view::split::active(),
                 binary_shown: crate::open_with::view::shown().is_some(),
+                commit_text_selection: self.commit_text.has_selection(),
                 has_text_selection: match self.central_view {
                     CentralView::Diff => self
                         .diff_view_state

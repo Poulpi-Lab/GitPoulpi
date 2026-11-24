@@ -48,6 +48,8 @@ pub(crate) struct PaletteContext {
     pub(crate) binary_shown: bool,
     /// The open diff or File View has a mouse text selection.
     pub(crate) has_text_selection: bool,
+    /// Text dragged over in the commit message block.
+    pub(crate) commit_text_selection: bool,
     /// The open diff is the Unstaged half of the working tree, so its
     /// hunks and lines can be staged. `false` for the Staged half *and*
     /// for a commit's diff -- `in_stageable_diff` tells those two apart.
@@ -390,7 +392,9 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
 
         // Copying text.
         C::CopySelectedText => {
-            if !(ctx.in_diff_view || ctx.in_file_view) {
+            if ctx.commit_text_selection {
+                None
+            } else if !(ctx.in_diff_view || ctx.in_file_view) {
                 Some(msg::palette::WHY_OPEN_A_DIFF_FILE_VIEW_BLAME_OR_HISTORY_FIRST.get())
             } else if !ctx.has_text_selection {
                 Some(msg::palette::WHY_NO_TEXT_SELECTED_DRAG_OVER_THE_TEXT_FIRST.get())

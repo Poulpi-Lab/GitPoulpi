@@ -999,6 +999,7 @@ Tangenterna är standardvärdena.
 | Konversation: Öppna postens diagram | `g` |
 | Konversation: Öppna trådens kod | `G` |
 | Konversation: Kopiera postens länk | `y` |
+| Conversation: Copy Text | `Ctrl+C` |
 | Konversation: Öppna i webbläsare | `o` |
 | Konversation: Redigera kommentar | `e` |
 | Konversation: Ta bort kommentar | `d` |

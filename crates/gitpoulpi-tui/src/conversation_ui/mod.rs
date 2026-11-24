@@ -131,6 +131,8 @@ pub(crate) struct Conversation {
     pub(crate) view_rows: usize,
     pub(crate) bar: Option<crate::scrollbar::Track>,
     pub(crate) drag: crate::scrollbar::BarDrag,
+    /// The timeline's text, selectable with a drag and copied with `Ctrl+C`.
+    pub(crate) text: crate::screen_text::ScreenText,
     pub(crate) hits: Vec<(Rect, Hit)>,
     pub(crate) links: Vec<LinkTarget>,
     pub(crate) hover: Option<Hit>,
@@ -206,6 +208,7 @@ impl Conversation {
             view_rows: 0,
             bar: None,
             drag: Default::default(),
+            text: Default::default(),
             hits: Vec::new(),
             links: Vec::new(),
             hover: None,
@@ -828,6 +831,28 @@ impl Conversation {
         }
         out.push('\n');
         Some(out)
+    }
+
+    /// What `Ctrl+C` copies: the dragged selection, else the selected entry
+    /// (the description, a comment, a whole thread) as the host stores it.
+    pub(crate) fn copy_text(&self) -> Option<String> {
+        if let Some(text) = self.text.selected() {
+            return Some(text);
+        }
+        let body = |m: &gitpoulpi_hosting::conversation::Markup| rows::markdown_of(m);
+        let text = match self.selected_entry() {
+            None => self.header.as_ref().map(|h| body(&h.body)),
+            Some(TimelineEntry::Comment(c)) => Some(body(&c.body)),
+            Some(TimelineEntry::Thread(t)) => Some(
+                t.comments
+                    .iter()
+                    .map(|c| body(&c.body))
+                    .collect::<Vec<_>>()
+                    .join("\n\n"),
+            ),
+            _ => None,
+        };
+        text.filter(|t| !t.trim().is_empty())
     }
 
     /// The address of the selected item on the host.

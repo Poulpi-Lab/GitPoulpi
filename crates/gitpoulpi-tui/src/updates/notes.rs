@@ -148,6 +148,8 @@ struct NotesUi {
     body: Rect,
     bar_body: Rect,
     bar: BarDrag,
+    /// The notes' text, selectable with a drag and copied with `Ctrl+C`.
+    text: crate::screen_text::ScreenText,
 }
 
 /// Where the section for `running` starts in `changelog` (byte offset): its
@@ -446,6 +448,9 @@ impl NotesUi {
                 }
             }
         }
+        self.text.capture(buf, body);
+        self.text.paint(buf);
+        self.text.register_pointer();
         // The bar takes the right edge; the track lives in the border of a
         // bordered box, so hand it a stand-in two cells wide (its right column is the bar) and one cell taller on each side.
         self.bar_body = Rect::new(
@@ -480,6 +485,20 @@ impl NotesUi {
     }
 
     fn on_key(&mut self, key: KeyEvent) -> NotesEvent {
+        // The dragged text: copied, or dropped, before the page's keys.
+        if self.text.has_selection() {
+            if key.code == KeyCode::Char('c') && key.modifiers == KeyModifiers::CONTROL {
+                if let Some(text) = self.text.selected() {
+                    return NotesEvent::Message(crate::clipboard::copy_shared(
+                        gitpoulpi_i18n::msg::diff_view::WHAT_SELECTION.get(),
+                        &text,
+                    ));
+                }
+            } else if key.code == KeyCode::Esc {
+                self.text.clear();
+                return NotesEvent::None;
+            }
+        }
         if key
             .modifiers
             .intersects(KeyModifiers::CONTROL | KeyModifiers::ALT)
@@ -516,6 +535,22 @@ impl NotesUi {
         {
             self.offset = top.min(self.max_offset());
             return NotesEvent::None;
+        }
+        match mouse.kind {
+            MouseEventKind::Drag(MouseButton::Left) if self.text.drag(col, row) => {
+                return NotesEvent::None;
+            }
+            MouseEventKind::Up(MouseButton::Left) if self.text.release() => {
+                return NotesEvent::None;
+            }
+            MouseEventKind::Down(MouseButton::Left) => {
+                if self.hit_at(col, row).is_some() {
+                    self.text.clear();
+                } else {
+                    self.text.press(col, row);
+                }
+            }
+            _ => {}
         }
         match mouse.kind {
             MouseEventKind::Moved => {

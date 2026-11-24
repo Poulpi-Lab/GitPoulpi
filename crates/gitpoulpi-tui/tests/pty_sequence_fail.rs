@@ -82,7 +82,10 @@ fn a_failing_push_stops_the_run_at_its_step_with_an_activity_log_entry() {
         .find(|&r| screen.line(r).contains("\u{25b6} Backup stopped"))
         .expect("the strip");
     let line = screen.line(row);
-    assert!(line.contains("Details") && line.contains('\u{2715}'), "{line}");
+    assert!(
+        line.contains("Details") && line.contains('\u{2715}'),
+        "{line}"
+    );
     let at = line.rfind("Details").unwrap();
     let col = line[..at].chars().count() as u16;
     term.click(col + 1, row).unwrap();

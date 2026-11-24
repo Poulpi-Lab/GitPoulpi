@@ -25,7 +25,10 @@ fn a_second_start_is_refused_with_the_running_one_and_its_step() {
     begin(run("Backup", &["stage_all", "push"])).unwrap();
     assert!(active());
     let why = begin(run("Other", &["fetch"])).unwrap_err();
-    assert!(why.contains("Backup") && why.contains("running") && why.contains("1/2"), "{why}");
+    assert!(
+        why.contains("Backup") && why.contains("running") && why.contains("1/2"),
+        "{why}"
+    );
     // Also while the glue has the run out for a frame.
     let taken = take().expect("the run");
     assert!(active());
@@ -67,7 +70,11 @@ fn requests_are_taken_once() {
     assert_eq!(take_requests(), Requests::default());
 }
 
-fn paint(run: &Run, width: u16, hovered: Option<StripButton>) -> (Vec<(Rect, StripButton)>, String) {
+fn paint(
+    run: &Run,
+    width: u16,
+    hovered: Option<StripButton>,
+) -> (Vec<(Rect, StripButton)>, String) {
     let mut terminal = Terminal::new(TestBackend::new(width, 1)).unwrap();
     let mut hits = Vec::new();
     terminal
@@ -119,7 +126,10 @@ fn the_strip_offers_go_there_and_details_where_they_apply() {
     let (hits, text) = paint(&r, 100, None);
     assert!(hits.iter().any(|(_, b)| *b == StripButton::Details));
     assert!(hits.iter().any(|(_, b)| *b == StripButton::Close));
-    assert!(text.contains("stopped at step 1/1") && text.contains("no remote"), "{text:?}");
+    assert!(
+        text.contains("stopped at step 1/1") && text.contains("no remote"),
+        "{text:?}"
+    );
 }
 
 #[test]
@@ -128,8 +138,14 @@ fn the_strip_stays_on_one_row_at_narrow_widths() {
     r.state = StepState::Paused(PauseKind::BeforeStep);
     for width in [40u16, 60, 80] {
         let (hits, _) = paint(&r, width, None);
-        assert!(hits.iter().any(|(_, b)| *b == StripButton::Close), "{width}");
-        assert!(hits.iter().all(|(rect, _)| rect.right() <= width), "{width}");
+        assert!(
+            hits.iter().any(|(_, b)| *b == StripButton::Close),
+            "{width}"
+        );
+        assert!(
+            hits.iter().all(|(rect, _)| rect.right() <= width),
+            "{width}"
+        );
     }
 }
 

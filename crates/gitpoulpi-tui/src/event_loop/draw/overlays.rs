@@ -901,8 +901,7 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
     // quieter banners (it is what the person is waiting on).
     let run_strip = central_view == CentralView::Log && crate::sequence_run::visible();
     if run_strip {
-        if let Some(strip) = crate::operation_banner::strip_rect(log_area, usize::from(top_taken))
-        {
+        if let Some(strip) = crate::operation_banner::strip_rect(log_area, usize::from(top_taken)) {
             let hovered_button = match &hovered_target {
                 Some(HitTarget::SequenceStrip(button)) => Some(*button),
                 _ => None,
@@ -961,9 +960,8 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
     // The stale `index.lock` strip takes the next free row (a second banner
     // is the last one the Log's borders have room for).
     if central_view == CentralView::Log {
-        let slot = run_slots
-            + usize::from(pending_auto_stash.is_some())
-            + usize::from(group_paused);
+        let slot =
+            run_slots + usize::from(pending_auto_stash.is_some()) + usize::from(group_paused);
         if let (Some(lock), Some(strip)) = (
             index_lock.as_ref().filter(|l| l.stale),
             crate::operation_banner::strip_rect(log_area, slot),

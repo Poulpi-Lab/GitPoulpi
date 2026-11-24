@@ -308,7 +308,10 @@ pub(crate) fn arm_worktree_run(seed: WorktreeRunSeed) {
 }
 
 fn take_worktree_run() -> Option<WorktreeRunSeed> {
-    WORKTREE_RUN.lock().unwrap_or_else(|e| e.into_inner()).take()
+    WORKTREE_RUN
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .take()
 }
 
 /// Drops what a sequence step armed for a dialog that did not open.

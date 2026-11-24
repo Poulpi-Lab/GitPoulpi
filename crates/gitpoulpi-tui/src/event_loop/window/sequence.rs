@@ -114,9 +114,7 @@ impl WindowState {
         // A dialog nobody holds a ticket for closed without an answer.
         if matches!(
             run.state,
-            StepState::Paused(
-                PauseKind::ComposeReview | PauseKind::Dialog(DialogKind::Other)
-            )
+            StepState::Paused(PauseKind::ComposeReview | PauseKind::Dialog(DialogKind::Other))
         ) {
             let waiting = run.ticket.is_some_and(|t| tickets::armed() == Some(t));
             if waiting
@@ -130,12 +128,13 @@ impl WindowState {
         queue.push_back(RunEvent::Tick {
             now: Instant::now(),
             active_root: self.repo.root.clone(),
-            input_idle: matches!(self.input_mode, InputMode::Normal)
-                && self.preferences.is_none(),
+            input_idle: matches!(self.input_mode, InputMode::Normal) && self.preferences.is_none(),
             refreshes: crate::sequence_run::refreshes(),
-            target_open: self.repo_tabs.iter().any(|t| {
-                crate::sequence_run::machine::same_dir(&t.path, &target)
-            }) || crate::sequence_run::machine::same_dir(&self.repo.root, &target),
+            target_open: self
+                .repo_tabs
+                .iter()
+                .any(|t| crate::sequence_run::machine::same_dir(&t.path, &target))
+                || crate::sequence_run::machine::same_dir(&self.repo.root, &target),
         });
     }
 
@@ -225,7 +224,12 @@ impl WindowState {
 
     /// Runs `command` with `ticket` armed for the action it submits.
     /// `true`: the ticket was used.
-    fn run_armed(&mut self, command: PaletteCommand, ticket: crate::daemon_link::Ticket, plan: Plan) -> bool {
+    fn run_armed(
+        &mut self,
+        command: PaletteCommand,
+        ticket: crate::daemon_link::Ticket,
+        plan: Plan,
+    ) -> bool {
         tickets::arm(ticket, exec::accepts(plan));
         self.last_message = None;
         let cx = &mut self.command_ctx();
@@ -398,11 +402,15 @@ impl WindowState {
                 .and_then(crate::remotes_ui::head_branch);
             return match head {
                 Some(head) => {
-                    self.link
-                        .submit_as(Some(ticket), crate::remotes_ui::push_action(remote, &head, false));
+                    self.link.submit_as(
+                        Some(ticket),
+                        crate::remotes_ui::push_action(remote, &head, false),
+                    );
                     ExecResult::Submitted
                 }
-                None => ExecResult::Refused(gitpoulpi_i18n::msg::remotes::DETACHED_PUSH.get().into()),
+                None => {
+                    ExecResult::Refused(gitpoulpi_i18n::msg::remotes::DETACHED_PUSH.get().into())
+                }
             };
         }
         let used = self.run_armed(command, ticket, Plan::Push);
@@ -440,7 +448,9 @@ impl WindowState {
             } else {
                 crate::worktree_dialog::seed_from_head(refs, worktrees)
             }) else {
-                return ExecResult::Refused(gitpoulpi_i18n::msg::worktree_manage::NO_HEAD.get().into());
+                return ExecResult::Refused(
+                    gitpoulpi_i18n::msg::worktree_manage::NO_HEAD.get().into(),
+                );
             };
             let mut dialog = crate::worktree_dialog::WorktreeDialog::with_choices(
                 seed,

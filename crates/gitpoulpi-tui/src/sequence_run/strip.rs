@@ -43,9 +43,7 @@ pub(crate) fn texts(run: &Run) -> Vec<String> {
         StepState::Paused(PauseKind::ComposeReview | PauseKind::Dialog(_)) => {
             m::strip_dialog(name, k, n)
         }
-        StepState::WaitingForUser(UserWait::PushRejected) => {
-            m::strip_push_rejected(name, k, n)
-        }
+        StepState::WaitingForUser(UserWait::PushRejected) => m::strip_push_rejected(name, k, n),
         StepState::WaitingForUser(_) => m::strip_user(name, k, n),
         StepState::WaitingForWindow => {
             let tab = run
@@ -106,11 +104,10 @@ pub(crate) fn render(
         })
         .collect();
     let body = Rect::new(row.x, row.y, row.width - CROSS_ROOM, 1);
-    let mut hits: Vec<(Rect, StripButton)> =
-        paint_strip(frame, body, &texts(run), &drawn)
-            .into_iter()
-            .map(|(rect, i)| (rect, list[i].0))
-            .collect();
+    let mut hits: Vec<(Rect, StripButton)> = paint_strip(frame, body, &texts(run), &drawn)
+        .into_iter()
+        .map(|(rect, i)| (rect, list[i].0))
+        .collect();
     // The cross's room: the strip's own background, red after a failure.
     let bg = if failed {
         th().chrome.banner_danger_bg

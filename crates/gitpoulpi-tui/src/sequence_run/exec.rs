@@ -78,12 +78,9 @@ pub(crate) fn accepts(plan: Plan) -> fn(&Action) -> bool {
     match plan {
         Plan::Stage => |a| matches!(a, Action::StageAll),
         Plan::Commit => |a| matches!(a, Action::Commit { .. }),
-        Plan::Push | Plan::ForcePush => |a| {
-            matches!(
-                a,
-                Action::Push { .. } | Action::PullThenPush { .. }
-            )
-        },
+        Plan::Push | Plan::ForcePush => {
+            |a| matches!(a, Action::Push { .. } | Action::PullThenPush { .. })
+        }
         Plan::Compose => |a| matches!(a, Action::ComposeCommits { .. }),
         _ => |_| true,
     }

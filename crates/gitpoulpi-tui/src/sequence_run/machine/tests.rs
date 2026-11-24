@@ -12,12 +12,9 @@ fn def(steps: Vec<StepSpec>) -> SequenceDef {
 }
 
 fn run_of(steps: Vec<StepSpec>) -> Run {
-    Run::new(
-        &def(steps),
-        Path::new("/repo"),
-        Instant::now(),
-        |id| (None, id.to_string()),
-    )
+    Run::new(&def(steps), Path::new("/repo"), Instant::now(), |id| {
+        (None, id.to_string())
+    })
 }
 
 fn tick_at(run: &mut Run, root: &str, refreshes: u64) -> Vec<RunEffect> {
@@ -102,13 +99,19 @@ fn a_failure_names_the_step_and_stops() {
     assert!(matches!(run.state, StepState::Failed { step: 1, .. }));
     let said = says(&effects);
     assert!(said.contains("Backup") && said.contains("2/2"), "{said}");
-    assert!(said.contains("push") && said.contains("no such remote"), "{said}");
+    assert!(
+        said.contains("push") && said.contains("no such remote"),
+        "{said}"
+    );
     let logged = effects.iter().find_map(|e| match e {
         RunEffect::LogFailure(t) => Some(t.clone()),
         _ => None,
     });
     let logged = logged.expect("an Activity Log entry");
-    assert!(logged.contains("push") && logged.contains("remote"), "{logged}");
+    assert!(
+        logged.contains("push") && logged.contains("remote"),
+        "{logged}"
+    );
     assert!(effects.contains(&RunEffect::Finish));
     // A failed run is dismissed with Cancel and runs nothing more.
     assert!(tick(&mut run).is_empty());
@@ -188,7 +191,9 @@ fn an_ai_failure_stops_at_its_step() {
 
 #[test]
 fn compose_review_never_applies_as_proposed() {
-    let mut run = run_of(vec![StepSpec::new("ai_compose_commits").with_pause(PauseMode::Never)]);
+    let mut run = run_of(vec![
+        StepSpec::new("ai_compose_commits").with_pause(PauseMode::Never)
+    ]);
     let _ = start_step(&mut run);
     run.on(RunEvent::Executed(ExecResult::AiStarted));
     let effects = run.on(RunEvent::AiDone(AiEnd::Ok));
@@ -227,10 +232,14 @@ fn continue_on_an_empty_commit_runs_the_step_again() {
 
 #[test]
 fn always_shows_the_next_step_before_running_it() {
-    let mut run = run_of(vec![StepSpec::new("stage_all").with_pause(PauseMode::Always)]);
+    let mut run = run_of(vec![
+        StepSpec::new("stage_all").with_pause(PauseMode::Always)
+    ]);
     let effects = tick(&mut run);
     assert_eq!(run.state, StepState::Paused(PauseKind::BeforeStep));
-    assert!(!effects.iter().any(|e| matches!(e, RunEffect::Execute { .. })));
+    assert!(!effects
+        .iter()
+        .any(|e| matches!(e, RunEffect::Execute { .. })));
     run.on(RunEvent::Continue);
     let _ = start_step(&mut run);
 }
@@ -281,7 +290,9 @@ fn a_window_that_is_not_the_target_waits_and_runs_nothing() {
     let mut run = run_of(vec![StepSpec::new("fetch")]);
     let effects = tick_at(&mut run, "/elsewhere", 0);
     assert_eq!(run.state, StepState::WaitingForWindow);
-    assert!(!effects.iter().any(|e| matches!(e, RunEffect::Execute { .. })));
+    assert!(!effects
+        .iter()
+        .any(|e| matches!(e, RunEffect::Execute { .. })));
     // Still elsewhere: still nothing.
     assert!(tick_at(&mut run, "/elsewhere", 0).is_empty());
     // The target window comes up: back to Ready, the next tick runs it.
@@ -391,7 +402,9 @@ fn the_step_after_a_mutation_waits_for_a_later_status_refresh() {
     assert_eq!(run.state, StepState::Ready);
     // A refresh landed: now the AI step runs.
     let effects = tick_at(&mut run, "/repo", 6);
-    assert!(effects.iter().any(|e| matches!(e, RunEffect::Execute { .. })));
+    assert!(effects
+        .iter()
+        .any(|e| matches!(e, RunEffect::Execute { .. })));
 }
 
 fn start_step_with(run: &mut Run, refreshes: u64) -> Ticket {
@@ -408,7 +421,9 @@ fn start_step_with(run: &mut Run, refreshes: u64) -> Ticket {
 fn a_step_that_cannot_start_fails_with_its_reason() {
     let mut run = run_of(vec![StepSpec::new("push")]);
     let _ = start_step(&mut run);
-    let effects = run.on(RunEvent::Executed(ExecResult::Refused("detached HEAD".into())));
+    let effects = run.on(RunEvent::Executed(ExecResult::Refused(
+        "detached HEAD".into(),
+    )));
     assert!(matches!(run.state, StepState::Failed { .. }));
     assert!(says(&effects).contains("detached HEAD"));
 }
@@ -418,7 +433,10 @@ fn a_dialog_of_the_step_pauses_and_closing_it_cancels() {
     let mut run = run_of(vec![StepSpec::new("new_branch")]);
     let _ = start_step(&mut run);
     run.on(RunEvent::Executed(ExecResult::Dialog(DialogKind::Other)));
-    assert_eq!(run.state, StepState::Paused(PauseKind::Dialog(DialogKind::Other)));
+    assert_eq!(
+        run.state,
+        StepState::Paused(PauseKind::Dialog(DialogKind::Other))
+    );
     run.on(RunEvent::DialogClosed);
     assert_eq!(run.state, StepState::Canceled);
 }

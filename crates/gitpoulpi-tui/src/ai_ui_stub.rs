@@ -156,24 +156,6 @@ pub(crate) enum AiOutcome {
     Canceled(AiRequest),
 }
 
-/// How a finished request ended (never produced without the `ai` feature).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum AiEnd {
-    Ok,
-    Failed(String),
-    Canceled,
-}
-
-pub(crate) fn finished_of(_: &AiOutcome) -> (gitpoulpi_config::AiAction, AiEnd) {
-    (gitpoulpi_config::AiAction::CommitMessage, AiEnd::Canceled)
-}
-
-pub(crate) fn record_finished(_: (gitpoulpi_config::AiAction, AiEnd)) {}
-
-pub(crate) fn take_finished(_: gitpoulpi_config::AiAction) -> Option<AiEnd> {
-    None
-}
-
 pub(crate) struct AiUi;
 
 impl AiUi {

@@ -726,7 +726,8 @@ impl PreferencesState {
                 if let Some(problem) = seqs::validate(&cur).into_iter().next() {
                     self.message = Some(t::cannot_run(problem.reason));
                 } else if let Some(slot) = registry::slot_of(&cur.id) {
-                    crate::sequence_run::start(slot, &mut self.message);
+                    let root = self.repo_root.clone();
+                    crate::sequence_run::start(slot, &root, &mut self.message);
                 }
             }
             SeqButton::EditWithAi => self.message = Some(t::AI_SOON.get().into()),

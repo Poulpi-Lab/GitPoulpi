@@ -25,9 +25,9 @@ mod tests;
 
 use machine::Run;
 use std::path::Path;
+use std::sync::Arc;
 #[cfg(not(test))]
 use std::sync::Mutex;
-use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 /// The run, or a mark that the window has it out for a frame.
@@ -262,7 +262,10 @@ fn start_slot(slot: u16, origin_root: &Path) -> Result<(), String> {
 fn load_def(slug: &str) -> Option<gitpoulpi_config::sequences::SequenceDef> {
     let paths = gitpoulpi_config::ConfigPaths::discover()?;
     let config = gitpoulpi_config::Config::load(&paths.config_file()).ok()?;
-    let install = gitpoulpi_config::installation::current().identity.id.clone();
+    let install = gitpoulpi_config::installation::current()
+        .identity
+        .id
+        .clone();
     gitpoulpi_config::sequences::visible_sequences(&config, &install, None)
         .into_iter()
         .map(|(d, _)| d)

@@ -128,8 +128,7 @@ fn the_default_pause_lands_the_message_then_continue_commits_and_pushes() {
     let b = branch(&repo);
     eventually(&term, "the commit and the push", || {
         repo.git(&["log", "-1", "--format=%s"]).trim() == "feat: sequence backup"
-            && remote_subject(&repo, &b)
-                == "feat: sequence backup"
+            && remote_subject(&repo, &b) == "feat: sequence backup"
     });
     term.wait_for("the strip gone", STEP, |s| !s.contains("\u{25b6} Backup"))
         .unwrap_or_else(|e| panic!("{e}"));
@@ -150,8 +149,7 @@ fn pause_never_runs_straight_through() {
     let b = branch(&repo);
     eventually(&term, "the commit and the push without a Continue", || {
         repo.git(&["log", "-1", "--format=%s"]).trim() == "feat: straight through"
-            && remote_subject(&repo, &b)
-                == "feat: straight through"
+            && remote_subject(&repo, &b) == "feat: straight through"
     });
     assert!(
         !term.text().contains("Review the message"),

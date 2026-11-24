@@ -25,9 +25,8 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         return Ok(Flow::Handled);
     }
     // The runner's own two keys (`sequence.cancel`, `sequence.continue`).
-    if let Some(
-        action @ (keymap::Action::SequenceCancel | keymap::Action::SequenceContinue),
-    ) = km.action_in(keymap::Ctx::Sequence, &key)
+    if let Some(action @ (keymap::Action::SequenceCancel | keymap::Action::SequenceContinue)) =
+        km.action_in(keymap::Ctx::Sequence, &key)
     {
         let command = if action == keymap::Action::SequenceCancel {
             PaletteCommand::SequenceCancel

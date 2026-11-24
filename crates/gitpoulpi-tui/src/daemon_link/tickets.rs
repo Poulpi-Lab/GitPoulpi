@@ -134,7 +134,9 @@ fn push(done: StepDone) {
 /// submits, and what that action must look like for it to count. Process-wide
 /// like everything here. Empty outside a run, so an untracked action behaves
 /// exactly as before.
-static ARMED: Mutex<Option<(Ticket, fn(&crate::daemon_link::Action) -> bool)>> = Mutex::new(None);
+type Accepts = fn(&crate::daemon_link::Action) -> bool;
+
+static ARMED: Mutex<Option<(Ticket, Accepts)>> = Mutex::new(None);
 
 /// Arms `ticket` for the next submitted action `accepts` says yes to (a
 /// stage, say): the runner runs a palette command and its `submit_action`

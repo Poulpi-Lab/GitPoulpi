@@ -47,7 +47,12 @@ fn the_name_template_makes_the_worktree_and_the_terminal_opens_in_its_tab() {
     term.send_keys("Enter").unwrap();
 
     // The name template's first free number: `<repo>-seq-wip-1`.
-    let name = repo.root().file_name().unwrap().to_string_lossy().into_owned();
+    let name = repo
+        .root()
+        .file_name()
+        .unwrap()
+        .to_string_lossy()
+        .into_owned();
     let worktree = repo
         .root()
         .parent()
@@ -67,7 +72,12 @@ fn the_name_template_makes_the_worktree_and_the_terminal_opens_in_its_tab() {
         std::thread::sleep(Duration::from_millis(200));
     };
     assert!(worktree.join(".git").exists(), "the worktree was created");
-    let opened_in = launched.trim().rsplit(' ').next().unwrap_or_default().to_string();
+    let opened_in = launched
+        .trim()
+        .rsplit(' ')
+        .next()
+        .unwrap_or_default()
+        .to_string();
     assert_eq!(
         std::fs::canonicalize(&opened_in).unwrap(),
         std::fs::canonicalize(&worktree).unwrap(),

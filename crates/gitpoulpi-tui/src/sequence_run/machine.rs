@@ -173,7 +173,10 @@ pub(crate) enum RunEvent {
         target_open: bool,
     },
     /// The ticket of the step ended.
-    StepDone { ticket: Ticket, outcome: StepOutcome },
+    StepDone {
+        ticket: Ticket,
+        outcome: StepOutcome,
+    },
     /// The AI request of the step ended.
     AiDone(crate::ai_ui::AiEnd),
     /// The step was executed: what came of it.
@@ -395,7 +398,10 @@ impl Run {
     /// What a successful step leaves behind.
     fn remember(&mut self, payload: Option<StepPayload>) {
         // Opening the worktree the run made as a tab: the next steps act there.
-        if self.current().is_some_and(|s| s.id == "open_worktree_in_tab") {
+        if self
+            .current()
+            .is_some_and(|s| s.id == "open_worktree_in_tab")
+        {
             if let Some(path) = self.ctx.last_worktree.clone() {
                 self.ctx.target_root = path;
                 self.ctx.target_seen = false;

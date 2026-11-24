@@ -216,13 +216,13 @@ impl RemoteUi {
         link.submit_as(
             ticket,
             Action::Push {
-            remote: remote.to_string(),
-            opts: PushOptions {
-                set_upstream: !has_upstream,
-                branch: Some(branch.to_string()),
-                remote_branch: (remote_branch != branch).then(|| remote_branch.to_string()),
-                ..PushOptions::default()
-            },
+                remote: remote.to_string(),
+                opts: PushOptions {
+                    set_upstream: !has_upstream,
+                    branch: Some(branch.to_string()),
+                    remote_branch: (remote_branch != branch).then(|| remote_branch.to_string()),
+                    ..PushOptions::default()
+                },
             },
         );
         msg::pushing_to(branch, remote)

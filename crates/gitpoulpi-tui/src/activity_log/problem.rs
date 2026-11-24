@@ -56,7 +56,7 @@ impl Source {
             Source::Hosting => "Hosting request",  // i18n-english
             Source::Tool => "External program",    // i18n-english
             Source::Ai => "AI request",
-            Source::Save => "Save file", // i18n-english
+            Source::Save => "Save file",         // i18n-english
             Source::Sequence => "Sequence step", // i18n-english
         }
     }

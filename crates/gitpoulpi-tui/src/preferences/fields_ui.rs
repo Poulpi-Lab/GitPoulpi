@@ -260,7 +260,7 @@ impl PreferencesState {
                 msg::settings_ui::GRAPH_COLOR_THEME.get(),
                 "ui.graph_color_theme",
                 Control::Combo {
-                    options: self.lane_options(),
+                    options: self.lane_options(ui.graph_color_slug()),
                     value: ui.graph_color_slug().to_string(),
                     custom: false,
                 },

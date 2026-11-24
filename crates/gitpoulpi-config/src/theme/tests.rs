@@ -102,6 +102,25 @@ fn lane_palettes_hold_the_four_originals_and_user_palettes() {
 }
 
 #[test]
+fn a_user_theme_named_like_a_lane_only_palette_is_listed_with_its_own_colors() {
+    // `gruvbox` is a lane palette of the registry but not a preset theme.
+    assert!(preset("gruvbox").is_none());
+    let user = parse(&[("gruvbox", "graph_palette = [\"#010203\"]\n")]);
+    assert_eq!(user.themes.len(), 1, "{:?}", user.warnings);
+    let mut specs = presets();
+    specs.extend(user.themes.iter().cloned());
+    let with = lane_palettes_with(&specs);
+    let found: Vec<_> = with.iter().filter(|p| p.slug == "gruvbox").collect();
+    assert_eq!(found.len(), 1);
+    assert_eq!(found[0].colors, user.themes[0].graph_palette);
+    assert_eq!(with.last().unwrap().slug, "gruvbox");
+    // A theme without a palette of its own inherits its base's.
+    let plain = parse(&[("plain", "base = \"nord\"\n")]);
+    let with = lane_palettes_with(&plain.themes);
+    assert_eq!(with.last().unwrap().slug, "plain");
+}
+
+#[test]
 fn export_round_trips_through_the_parser() {
     let mut light = preset("light").unwrap();
     light.name = "Round".into();

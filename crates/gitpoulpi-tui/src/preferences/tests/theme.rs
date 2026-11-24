@@ -129,3 +129,55 @@ fn the_swatch_row_sits_under_the_theme_row() {
     assert_eq!(chips.len(), 8 + 6);
     assert!(!fields[state.field + 1].selectable());
 }
+
+#[test]
+fn the_lane_combo_lists_user_themes_after_the_palettes_and_rescans_on_open() {
+    let dir = tempfile::tempdir().unwrap();
+    let (mut state, _g) = on_row(dir.path(), PrefSection::Appearance, "ui.graph_color_theme");
+    // Dropped in while Settings is already open.
+    std::fs::create_dir_all(dir.path().join("themes")).unwrap();
+    std::fs::write(
+        dir.path().join("themes/mine.toml"),
+        "name = \"My Lanes\"\ngraph_palette = [\"#112233\", \"#445566\"]\n",
+    )
+    .unwrap();
+    std::fs::write(
+        dir.path().join("themes/plain.toml"),
+        "name = \"Plain\"\nbase = \"nord\"\n",
+    )
+    .unwrap();
+    state.on_key(key_of(KeyCode::Enter));
+    let values = options(&state);
+    let opts = &state.choice.as_ref().unwrap().1.options;
+    let at = values
+        .iter()
+        .position(|v| v == "mine")
+        .expect("custom listed");
+    assert_eq!(opts[at].label, "My Lanes");
+    assert_eq!(opts[at].swatch.len(), 2);
+    let last_preset = values.iter().position(|v| v == "vscode-light").unwrap();
+    assert!(at > last_preset, "custom themes come after the presets");
+    // No lane colors of its own: it inherits its base's, like the main theme.
+    let plain = values
+        .iter()
+        .position(|v| v == "plain")
+        .expect("plain listed");
+    assert!(!opts[plain].swatch.is_empty());
+}
+
+#[test]
+fn a_configured_lane_theme_that_no_longer_exists_is_shown_as_missing() {
+    let dir = tempfile::tempdir().unwrap();
+    let state = state(dir.path());
+    let options = state.lane_options("gone-theme");
+    assert_eq!(options[0].1, "theme");
+    assert_eq!(options[1].1, "gone-theme");
+    assert!(options[1].0.contains("not found"), "{:?}", options[1]);
+    // A known name or Follow theme adds no such row.
+    for known in ["theme", "nord"] {
+        assert!(state
+            .lane_options(known)
+            .iter()
+            .all(|(l, _)| !l.contains("not found")));
+    }
+}

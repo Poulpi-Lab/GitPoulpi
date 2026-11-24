@@ -668,7 +668,15 @@ fn build_lane_palettes() -> Vec<LanePalette> {
 pub fn lane_palettes_with(themes: &[ThemeSpec]) -> Vec<LanePalette> {
     let mut out = lane_palettes();
     for t in themes {
-        if t.graph_palette.is_empty() || out.iter().any(|p| p.slug == t.slug) {
+        if t.graph_palette.is_empty() {
+            continue;
+        }
+        // A user theme wins over a lane-only registry entry of the same name
+        // (`gruvbox`, `material`...): it is listed after the presets, with
+        // its own colors. A preset's own entry is kept.
+        if preset(&t.slug).is_none() {
+            out.retain(|p| p.slug != t.slug);
+        } else if out.iter().any(|p| p.slug == t.slug) {
             continue;
         }
         out.push(LanePalette {

@@ -524,6 +524,7 @@ theme = "主题"
 theme_help = "整个界面的配色。在列表中移动即可实时预览各主题；按 Enter 保留，按 Esc 返回。“系统”跟随终端（启动时检测一次终端的浅色或深色背景；无法判断时为深色）。配置文件夹 themes/ 目录中你自己的主题文件列在最后。"
 theme_system = "系统（跟随终端）"
 follow_theme = "跟随主题"
+graph_color_missing = "{name} (not found, using the theme's lanes)"
 theme_swatches = "颜色"
 graph_lane_background = "图泳道背景"
 graph_lane_background_help = { git = "关闭：透明，泳道后面没有任何东西（默认）。行着色：在图列内用 {$commit} 泳道的颜色绘制一条淡色带，并在列右边缘画一条同色细条。已存储的泳道值按行着色处理。关闭设置时生效。", local = "关闭：透明，泳道后面没有任何东西（默认）。行着色：在图列内用提交泳道的颜色绘制一条淡色带，并在列右边缘画一条同色细条。已存储的泳道值按行着色处理。关闭设置时生效。" }

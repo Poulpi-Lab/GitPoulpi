@@ -206,7 +206,18 @@ Every theme brings its own lane colors for the Log graph, but you can
 combine any theme with any palette: **Settings > Appearance > Graph color
 theme** offers **Follow theme** (the default) plus every lane palette of every
 theme (GitPoulpi Dark, GitPoulpi Light, then Material, Serie, ... and the
-`graph_palette` of your own theme files). ![The Graph color theme combo on Appearance: Follow theme, then every lane palette with a few of its colors](images/settings-log-graph-lanes.png)
+`graph_palette` of your own theme files, listed after the presets under the
+theme's name). A custom theme appears the next time the list opens (the
+files are re-read then), and picking one stores its file name in
+`ui.graph_color_theme` (for the primary installation in `[ui]`, for the
+others in their own `[installation.settings.<id>]` entry, like the theme). A
+theme file without a `graph_palette` has the lane colors of its `base` (the
+default preset when it names none), the same inheritance as every other color
+of the file. A custom theme named like a built-in lane palette (for example
+`gruvbox`) replaces that palette in the list. If the configured name no
+longer exists (the file was deleted or renamed), the graph uses the active
+theme's lane colors, and Settings shows the name marked *not found* until you
+pick another. ![The Graph color theme combo on Appearance: Follow theme, then every lane palette with a few of its colors](images/settings-log-graph-lanes.png)
 
 In `config.toml`:
 

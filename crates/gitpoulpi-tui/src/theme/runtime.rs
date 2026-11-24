@@ -91,6 +91,15 @@ pub(super) fn resolve_theme(slug: &str, user_themes: &[ThemeSpec]) -> &'static T
     intern(Theme::from(&spec))
 }
 
+/// Hands the user themes' lane palettes to the graph (`ui.graph_color_theme`
+/// can name a user theme) and, when they moved, bumps the generation so the
+/// graph caches rebuild.
+pub(crate) fn refresh_user_lanes(user_themes: &[ThemeSpec]) {
+    if crate::graph::set_user_lane_palettes(user_themes) {
+        GENERATION.fetch_add(1, Ordering::AcqRel);
+    }
+}
+
 /// Makes the theme for `slug` current (see [`resolve_theme`]).
 pub(crate) fn install_theme(slug: &str, user_themes: &[ThemeSpec]) {
     // A test that pinned its thread's theme must not move the global one
@@ -99,6 +108,7 @@ pub(crate) fn install_theme(slug: &str, user_themes: &[ThemeSpec]) {
     if OVERRIDE.with(std::cell::Cell::get).is_some() {
         return;
     }
+    refresh_user_lanes(user_themes);
     let theme = resolve_theme(slug, user_themes);
     let ptr = theme as *const Theme as *mut Theme;
     if CURRENT.swap(ptr, Ordering::AcqRel) != ptr {

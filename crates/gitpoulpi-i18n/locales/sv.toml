@@ -526,6 +526,7 @@ theme = "Tema"
 theme_help = "Färger för hela gränssnittet. När du går i listan förhandsvisas varje tema; Enter behåller det, Esc går tillbaka. System följer terminalen (dess ljusa eller mörka bakgrund, avläst en gång vid start; Mörkt om den inte går att avgöra). Dina egna temafiler i mappen themes/ i konfigurationen står sist."
 theme_system = "System (följer terminalen)"
 follow_theme = "Följ temat"
+graph_color_missing = "{name} (not found, using the theme's lanes)"
 theme_swatches = "Färger"
 graph_lane_background = "Bakgrund för grafspår"
 graph_lane_background_help = { git = "Av: transparent, inget bakom spåren (standard). Row tint: ett svagt band i commitens spårfärg inom grafkolumnen, plus en tunn stapel i samma färg vid kolumnens högra kant. Ett lagrat spår läses som Row tint. Gäller när Inställningar stängs.", local = "Av: transparent, inget bakom spåren (standard). Row tint: ett svagt band i incheckningens spårfärg inom grafkolumnen, plus en tunn stapel i samma färg vid kolumnens högra kant. Ett lagrat spår läses som Row tint. Gäller när Inställningar stängs." }

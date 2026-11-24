@@ -47,10 +47,15 @@ van de kolommen waarvan je de breedte kunt aanpassen). Een dubbelklik of `Enter`
 
 ### De branches van een aanvraag
 
-Een aanvraagrij toont `bron → doel` achter haar titel (`alice:feature/login → main` als de bronbranch in een fork staat).
-Als er weinig ruimte is, wordt eerst het doel afgekapt (een beletselteken), houdt de titel het grootste deel van de ruimte, en worden in een smal venster de
-branches niet getoond; de kolom Acties wordt nooit weggeduwd. Laat de aanwijzer op een afgekapte tekst rusten voor het geheel. Een host die de branches niet
-noemde toont daar niets. Een issuerij noemt haar repository in dezelfde chip als een aanvraagrij (de mapnaam van de kloon, of `owner/name` als hij niet gekloond is).
+Een aanvraagrij toont `bron → doel` in de kolom **Branches**, direct na de repository (`alice:feature/login → main`
+als de bronbranch in een fork staat); een issuerij laat de cel leeg, en een Radar zonder aanvraag die haar branches noemt
+heeft die kolom niet. Is de cel te smal, dan wordt eerst de bron afgekapt (een beletselteken) en blijft het doel heel zolang
+dat kan. De kolom krimpt voordat ze verdwijnt: in een smal venster is ze de laatste van de optionele kolommen die vertrekt
+(na de status, de auteur en de leeftijd, vóór de repository en de titel); als ze weg is, staan de volledige branches nog in
+de tooltip van de titel en op de statusregel van de geselecteerde rij. Een brede auteurskolom die je zelf hebt geschaald
+maakt plaats voor de titel en de branches. De kolom Acties wordt nooit weggeduwd. Laat de aanwijzer op een afgekapte tekst
+rusten voor het geheel. GitHub en Gitea geven aanvragen zonder hun branches terug, dus de Radar leest ze na de lijst (één
+keer per aanvraag tot ze verandert). Een host die de branches niet noemde toont daar niets. Een issuerij noemt haar repository in dezelfde chip als een aanvraagrij (de mapnaam van de kloon, of `owner/name` als hij niet gekloond is).
 
 ### Handelen op de host
 

@@ -165,7 +165,13 @@ On the **Overview**, the conversation and the ✦ draft block select the same wa
 **`Ctrl+C`** copies it (a link or a button you press keeps its action, and a drag that starts on one selects
 nothing). Without a selection, **`Ctrl+C`** (or *Conversation: Copy Text*) copies the selected entry as the host
 stores it. The I-beam shows over the text and the hand stays over buttons and links. A selection follows what is
-on screen: scrolling or a refresh drops it, and a wrapped paragraph copies as the rows it shows.
+on screen: scrolling moves it with its text (it stays selected while it is out of view), a refresh that rewrites
+the text drops it, and a wrapped paragraph copies as the rows it shows.
+
+The comments inside the diff on the **Files** page (a thread, your pending notes, the ✦ suggestions) select too: drag
+over their words, **`Ctrl+C`** (or *Review: Copy Selected Text or Line*) copies them, **`Esc`** drops the selection. A press on one of
+their buttons, or a plain click on a thread's head (it folds), still acts; a drag that starts on the head selects its
+words and leaves the thread as it is.
 
 ### Commits
 

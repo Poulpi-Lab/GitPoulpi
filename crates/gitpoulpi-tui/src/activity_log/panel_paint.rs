@@ -352,10 +352,28 @@ pub(crate) fn render(frame: &mut Frame) {
     let row_w = usize::from(list.width.saturating_sub(1));
     let page = usize::from(list.height);
 
+    let pointer_mark = crate::pointer_map::mark();
     let (lines_len, offset) = match tab {
         Tab::Git => paint_activity(buf, &mut hits, list, row_w, page, &over),
         Tab::Application => paint_app(buf, &mut hits, list, row_w, page),
     };
+    // The list's text: selectable with a drag, the I-beam over it, the hand
+    // over the buttons painted on it. Not while a box's list or the
+    // confirmation covers it.
+    let text_area = Rect::new(list.x, list.y, list.width.saturating_sub(1), list.height);
+    with(|s| {
+        if level_open {
+            s.text.capture(buf, Rect::default());
+        } else {
+            let controls = crate::pointer_map::controls_since(pointer_mark, list);
+            s.text.capture(buf, text_area);
+            s.text.paint(buf);
+            s.text.register_pointer();
+            for rect in controls {
+                crate::pointer_map::hand(rect);
+            }
+        }
+    });
     with(|s| {
         s.window = rect;
         s.close = close;

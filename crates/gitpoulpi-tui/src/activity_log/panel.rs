@@ -196,6 +196,13 @@ struct State {
     /// The workspaces and their repositories, read when the window opens (a
     /// file read on the user's action, never on a frame).
     ws_cache: Vec<(String, Vec<std::path::PathBuf>)>,
+    /// The list's painted text, selectable with a drag and copied with
+    /// `Ctrl+C` (rows read back from the frame, `screen_text`).
+    text: crate::screen_text::ScreenText,
+    /// A press on a header or a line that may still become a text drag: its
+    /// click (open the details, select the line) runs when the button goes
+    /// up without one.
+    pending: Option<Hit>,
 }
 
 static STATE: Mutex<State> = Mutex::new(State {
@@ -235,6 +242,8 @@ static STATE: Mutex<State> = Mutex::new(State {
     scope: Scope::All,
     remembered: [None, None],
     ws_cache: Vec::new(),
+    text: crate::screen_text::ScreenText::new(),
+    pending: None,
 });
 
 static OPEN: AtomicBool = AtomicBool::new(false);
@@ -1143,8 +1152,14 @@ pub(crate) fn pointer_hand(col: u16, row: u16) -> bool {
         s.hits
             .iter()
             .find(|(r, _)| r.contains(at))
-            .is_some_and(|(_, h)| !matches!(h, Hit::Filter))
+            .is_some_and(|(_, h)| !matches!(h, Hit::Filter) && !text_row(s, col, row, h))
     })
+}
+
+/// The cell holds selectable text of a clickable row: the I-beam, not the
+/// hand (a plain click there still acts, a drag selects).
+fn text_row(s: &State, col: u16, row: u16, hit: &Hit) -> bool {
+    matches!(hit, Hit::Header(_) | Hit::AppLine(_)) && s.text.text_at(col, row)
 }
 
 /// Whether the point is on the window's filter box (a text field: the
@@ -1154,9 +1169,15 @@ pub(crate) fn pointer_text(col: u16, row: u16) -> bool {
     is_open()
         && with(|s| {
             !s.clear_open
-                && s.hits
+                && (s
+                    .hits
                     .iter()
                     .any(|(r, h)| matches!(h, Hit::Filter) && r.contains(at))
+                    || s.hits
+                        .iter()
+                        .find(|(r, _)| r.contains(at))
+                        .is_none_or(|(_, h)| matches!(h, Hit::Header(_) | Hit::AppLine(_)))
+                        && s.text.text_at(col, row))
         })
 }
 
@@ -1191,6 +1212,22 @@ pub(crate) fn on_key(key: KeyEvent) {
             if let Some(ComboOutcome::Picked(value)) = outcome {
                 box_picked(which, &value);
             }
+            return;
+        }
+    }
+    // The dragged text: copied, or dropped first (the window stays).
+    if !with(|s| s.filter_focus) && with(|s| s.text.has_selection()) {
+        if key.code == KeyCode::Char('c') && key.modifiers == KeyModifiers::CONTROL {
+            if let Some(text) = with(|s| s.text.selected()) {
+                let note = crate::clipboard::copy_shared(
+                    gitpoulpi_i18n::msg::diff_view::WHAT_SELECTION.get(),
+                    &text,
+                );
+                with(|s| s.notice = Some(note));
+                return;
+            }
+        } else if key.code == KeyCode::Esc {
+            with(|s| s.text.clear());
             return;
         }
     }
@@ -1644,6 +1681,9 @@ pub(crate) fn on_mouse(mouse: MouseEvent) {
         }
         MouseEventKind::Down(MouseButton::Left) => press(at, mouse),
         MouseEventKind::Drag(MouseButton::Left) => {
+            if with(|s| s.text.drag(mouse.column, mouse.row)) {
+                return;
+            }
             with(|s| {
                 if let (Some(grab), Some(track)) = (s.hgrab, hbar(s)) {
                     s.hoffset = hdrag(s, &track, grab, mouse.column);
@@ -1654,10 +1694,17 @@ pub(crate) fn on_mouse(mouse: MouseEvent) {
                 }
             });
         }
-        MouseEventKind::Up(MouseButton::Left) => with(|s| {
-            s.grab = None;
-            s.hgrab = None;
-        }),
+        MouseEventKind::Up(MouseButton::Left) => {
+            let (dragged, pending) = with(|s| {
+                s.grab = None;
+                s.hgrab = None;
+                (s.text.release(), s.pending.take())
+            });
+            // The end of a text drag is not a click.
+            if let (false, Some(hit)) = (dragged, pending) {
+                activate(hit);
+            }
+        }
         _ => {}
     }
 }
@@ -1707,15 +1754,22 @@ fn press(at: ratatui::layout::Position, mouse: MouseEvent) {
         return;
     }
     with(|s| s.filter_focus = false);
+    // A press on text may grow into a selection with the first drag; the
+    // click of a header or a line then waits for the button to go up.
+    let on_text = if matches!(hit, None | Some(Hit::Header(_) | Hit::AppLine(_))) {
+        with(|s| s.text.press(mouse.column, mouse.row))
+    } else {
+        with(|s| s.text.clear());
+        false
+    };
+    with(|s| s.pending = None);
+    if let (true, Some(hit @ (Hit::Header(_) | Hit::AppLine(_)))) = (on_text, hit) {
+        with(|s| s.pending = Some(hit));
+        return;
+    }
     match hit {
         Some(Hit::Tab(tab)) => switch_tab(tab),
-        Some(Hit::Header(i)) => {
-            if let Some(entry) = entries().get(i) {
-                with(|s| s.selected = i);
-                toggle_expanded(entry.id);
-            }
-        }
-        Some(Hit::AppLine(i)) => click_app_line(i),
+        Some(hit @ (Hit::Header(_) | Hit::AppLine(_))) => activate(hit),
         Some(Hit::CopyEntry(i)) => copy_entry(i),
         Some(Hit::Remedy(i, nth)) => run_remedy(i, nth),
         Some(Hit::CopyDiagnostics) => copy_diagnostics(),
@@ -1728,6 +1782,20 @@ fn press(at: ratatui::layout::Position, mouse: MouseEvent) {
         Some(Hit::ShowAll) => level_cmd(LevelCmd::All),
         Some(Hit::ShowNone) => level_cmd(LevelCmd::Clear),
         None => {}
+    }
+}
+
+/// What a click on an entry's header or on a line of the Application tab does.
+fn activate(hit: Hit) {
+    match hit {
+        Hit::Header(i) => {
+            if let Some(entry) = entries().get(i) {
+                with(|s| s.selected = i);
+                toggle_expanded(entry.id);
+            }
+        }
+        Hit::AppLine(i) => click_app_line(i),
+        _ => {}
     }
 }
 

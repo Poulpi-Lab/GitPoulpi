@@ -15,9 +15,12 @@
 //! its rows), so the area handed to `capture` must be the *content*: no
 //! border, no scrollbar column.
 //!
-//! A selection lives as long as what it was made on: when the painted rows or
-//! the area change (a scroll, a refresh, a resize) it is dropped, the way a
-//! terminal drops its own selection when the screen scrolls.
+//! A selection lives as long as what it was made on. A scroll is followed:
+//! when the new rows are the old ones moved up or down (the same rows, shifted
+//! by some lines), the selection moves with the text and keeps what has
+//! scrolled out of view (the rows it covered are remembered), so a wheel turn
+//! does not lose it. Any other change of the painted rows or of the area (a
+//! refresh that rewrites text, a resize) drops it.
 //!
 //! # One rule for the pointer
 //!
@@ -43,7 +46,13 @@ use crate::text_select::{self, LineSource, RowSegs, Seg, Tabs, TextPos, TextSele
 #[derive(Default)]
 pub(crate) struct ScreenText {
     area: Rect,
+    /// What the area shows now.
     rows: Vec<String>,
+    /// The rows a selection or a press lives in: what the area showed, plus
+    /// what a scroll took out of view while it was held. Row `top` of it is
+    /// the first row shown.
+    doc: Vec<String>,
+    top: usize,
     segs: Vec<RowSegs>,
     sel: Option<TextSelection>,
     /// Where the left button went down, in the text, while it is held.
@@ -91,12 +100,107 @@ fn row_text(buf: &Buffer, area: Rect, y: u16) -> String {
     out
 }
 
+/// By how many rows `new` is `old` scrolled: `new[i] == old[i + k]` over the
+/// rows both show. `None` when no shift explains the change (or only a blank
+/// overlap does), the smallest one when several do.
+fn scrolled_by(old: &[String], new: &[String]) -> Option<isize> {
+    let h = old.len();
+    if h != new.len() || h < 3 {
+        return None;
+    }
+    let need = (h / 3).max(2);
+    (1..h as isize).flat_map(|d| [d, -d]).find(|&k| {
+        let (mut overlap, mut text) = (0usize, false);
+        for (i, row) in new.iter().enumerate() {
+            let Some(j) = usize::try_from(i as isize + k).ok().filter(|&j| j < h) else {
+                continue;
+            };
+            if *row != old[j] {
+                return false;
+            }
+            overlap += 1;
+            text |= !row.is_empty();
+        }
+        overlap >= need && text
+    })
+}
+
 impl ScreenText {
+    /// An empty one, for a `static`.
+    pub(crate) const fn new() -> Self {
+        Self {
+            area: Rect::new(0, 0, 0, 0),
+            rows: Vec::new(),
+            doc: Vec::new(),
+            top: 0,
+            segs: Vec::new(),
+            sel: None,
+            press: None,
+            dragged: false,
+            rebase: false,
+        }
+    }
+
+    /// The rows moved by `k`: what is selected or pressed moves with its
+    /// text, and the remembered rows grow to hold what came into view.
+    fn follow_scroll(&mut self, k: isize, rows: &[String]) {
+        let first = self.top as isize + k;
+        if first < 0 {
+            let add = (-first) as usize;
+            self.doc
+                .splice(0..0, std::iter::repeat_n(String::new(), add));
+            for p in self
+                .sel
+                .iter_mut()
+                .flat_map(|s| [&mut s.anchor, &mut s.head])
+                .chain(self.press.as_mut())
+            {
+                p.line += add;
+            }
+            self.top = 0;
+        } else {
+            self.top = first as usize;
+        }
+        let end = self.top + rows.len();
+        if self.doc.len() < end {
+            self.doc.resize(end, String::new());
+        }
+        self.doc[self.top..end].clone_from_slice(rows);
+    }
+
     /// Reads the rows `area` shows from the frame `buf`, after the surface
     /// painted them. A different area or different rows drop the selection.
     pub(crate) fn capture(&mut self, buf: &Buffer, area: Rect) {
+        self.capture_spans(buf, area, |_| Some((area.x, area.right())));
+    }
+
+    /// Like [`capture`](Self::capture), for a surface where only some rows
+    /// (and only part of them) are text: `span(i)` is the absolute columns
+    /// `[from, to)` of row `i` of `area` that hold selectable text, `None`
+    /// for a row that holds none (code, a gutter, a header).
+    pub(crate) fn capture_spans(
+        &mut self,
+        buf: &Buffer,
+        area: Rect,
+        span: impl Fn(usize) -> Option<(u16, u16)>,
+    ) {
+        let cols: Vec<(u16, u16)> = (0..usize::from(area.height))
+            .map(|i| {
+                span(i).map_or((0, 0), |(from, to)| {
+                    let from = from.max(area.x);
+                    (from - area.x, to.min(area.right()).saturating_sub(from))
+                })
+            })
+            .collect();
         let rows: Vec<String> = (area.y..area.bottom())
-            .map(|y| row_text(buf, area, y))
+            .zip(&cols)
+            .map(|(y, &(x, width))| {
+                if width == 0 {
+                    String::new()
+                } else {
+                    row_text(buf, Rect::new(area.x + x, y, width, 1), y)
+                }
+            })
             .collect();
         // A press survives the repaint it causes (a click that selects an
         // entry paints its buttons); a finished selection does not survive
@@ -105,19 +209,36 @@ impl ScreenText {
             self.press = None;
             self.dragged = false;
             self.sel = None;
-        } else if rows != self.rows && !self.dragged && !self.rebase {
-            self.sel = None;
+        } else if rows != self.rows {
+            let live = self.sel.is_some() || self.press.is_some();
+            match live.then(|| scrolled_by(&self.rows, &rows)).flatten() {
+                Some(k) => self.follow_scroll(k, &rows),
+                None if !self.dragged && !self.rebase => self.sel = None,
+                None => {}
+            }
         }
+        if self.sel.is_some() || self.press.is_some() {
+            let end = self.top + rows.len();
+            if self.doc.len() < end {
+                self.doc.resize(end, String::new());
+            }
+            self.doc[self.top..end].clone_from_slice(&rows);
+        } else {
+            self.doc = rows.clone();
+            self.top = 0;
+        }
+        let top = self.top;
         self.segs = rows
             .iter()
-            .map(|row| {
+            .zip(&cols)
+            .map(|(row, &(x, width))| {
                 let len = row.chars().count();
                 let seg = (len > 0).then_some(Seg {
                     line: 0,
                     start: 0,
                     len,
-                    x: 0,
-                    width: area.width,
+                    x,
+                    width,
                     last: true,
                 });
                 [seg, None]
@@ -125,7 +246,7 @@ impl ScreenText {
             .enumerate()
             .map(|(i, mut segs)| {
                 if let Some(seg) = segs[0].as_mut() {
-                    seg.line = i;
+                    seg.line = top + i;
                 }
                 segs
             })
@@ -138,7 +259,7 @@ impl ScreenText {
     /// Paints the selection over the rows already drawn.
     pub(crate) fn paint(&self, buf: &mut Buffer) {
         if let Some(sel) = &self.sel {
-            text_select::paint(buf, self.area, &self.segs, sel, &Rows(&self.rows));
+            text_select::paint(buf, self.area, &self.segs, sel, &Rows(&self.doc));
         }
     }
 
@@ -155,7 +276,7 @@ impl ScreenText {
             return None;
         }
         let r = usize::from(row - self.area.y);
-        text_select::pos_at(&self.segs, r, 0, col - self.area.x, &Rows(&self.rows))
+        text_select::pos_at(&self.segs, r, 0, col - self.area.x, &Rows(&self.doc))
     }
 
     /// The text lies under this cell (a press there can start a selection).
@@ -164,7 +285,9 @@ impl ScreenText {
             && self
                 .segs
                 .get(usize::from(row.saturating_sub(self.area.y)))
-                .is_some_and(|s| s[0].is_some_and(|s| col - self.area.x < s.len as u16))
+                .is_some_and(|s| {
+                    s[0].is_some_and(|s| (s.x..s.x + s.len as u16).contains(&(col - self.area.x)))
+                })
     }
 
     /// The left button went down at the cell. Returns whether it landed on
@@ -231,7 +354,7 @@ impl ScreenText {
     /// The selected text, as painted.
     pub(crate) fn selected(&self) -> Option<String> {
         let sel = self.sel.as_ref()?;
-        let text = text_select::selected_text(sel, &Rows(&self.rows));
+        let text = text_select::selected_text(sel, &Rows(&self.doc));
         (!text.is_empty()).then_some(text)
     }
 
@@ -305,6 +428,59 @@ mod tests {
         st.drag(6, 1);
         st.capture(&same, area);
         assert!(st.has_selection(), "the same rows keep it");
+    }
+
+    #[test]
+    fn a_scroll_keeps_the_selection_with_its_text_even_out_of_view() {
+        let all = ["aa", "bb", "cc", "dd", "ee", "ff", "gg", "hh"];
+        let mut st = ScreenText::default();
+        let (buf, area) = painted(&all[0..5], 20);
+        st.capture(&buf, area);
+        st.press(2, 2);
+        st.drag(3, 3);
+        st.release();
+        assert_eq!(st.selected().as_deref(), Some("bb\ncc"));
+        // Three rows down: the selection is above the view now.
+        let (buf, area) = painted(&all[3..8], 20);
+        st.capture(&buf, area);
+        assert_eq!(st.selected().as_deref(), Some("bb\ncc"), "survives");
+        // And back up past where it began, then to where it is on screen.
+        let (buf, area) = painted(&all[0..5], 20);
+        st.capture(&buf, area);
+        assert_eq!(st.selected().as_deref(), Some("bb\ncc"));
+        let (buf, area) = painted(&all[1..6], 20);
+        st.capture(&buf, area);
+        assert_eq!(st.selected().as_deref(), Some("bb\ncc"));
+    }
+
+    #[test]
+    fn a_scroll_up_past_the_start_keeps_the_selection() {
+        let all = ["aa", "bb", "cc", "dd", "ee", "ff", "gg", "hh"];
+        let mut st = ScreenText::default();
+        let (buf, area) = painted(&all[3..8], 20);
+        st.capture(&buf, area);
+        st.press(2, 1);
+        st.drag(3, 1);
+        st.release();
+        assert_eq!(st.selected().as_deref(), Some("dd"));
+        let (buf, area) = painted(&all[0..5], 20);
+        st.capture(&buf, area);
+        assert_eq!(st.selected().as_deref(), Some("dd"));
+    }
+
+    #[test]
+    fn rewritten_rows_are_not_a_scroll() {
+        let mut st = ScreenText::default();
+        let (buf, area) = painted(&["aa", "bb", "cc", "dd"], 20);
+        st.capture(&buf, area);
+        st.press(2, 1);
+        st.drag(3, 1);
+        st.release();
+        st.capture(&buf, area);
+        assert!(st.has_selection());
+        let (buf, area) = painted(&["xx", "yy", "zz", "ww"], 20);
+        st.capture(&buf, area);
+        assert!(!st.has_selection());
     }
 
     #[test]

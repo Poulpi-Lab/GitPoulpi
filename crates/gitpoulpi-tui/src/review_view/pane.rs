@@ -43,6 +43,9 @@ pub(super) struct DiffPane {
     /// the press that may still grow into one.
     pub(super) text_sel: Option<crate::text_select::TextSelection>,
     pub(super) text_drag: Option<crate::text_select::TextDrag>,
+    /// The words of the inline thread, pending and suggestion rows, read
+    /// back from the frame: selectable with a drag like the code is.
+    pub(super) notes: crate::screen_text::ScreenText,
     /// The minimap's rect as last painted, and whether a press on it is held.
     pub(super) map: Option<Rect>,
     pub(super) map_drag: bool,

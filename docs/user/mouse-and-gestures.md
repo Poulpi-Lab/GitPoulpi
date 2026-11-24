@@ -527,10 +527,13 @@ The same kind of component gives the same pointer everywhere in the app: the but
   and Blame's code. Their line numbers, markers and hunk headers keep the
   arrow, and a button on a line keeps the hand. The same goes for the
   conversation of an issue or a request (also the review's Overview and its
-  draft block), the commit details' message and the Release notes: a drag selects
-  the text (a plain click keeps its meaning: a link opens, a button acts), `Ctrl+C`
-  copies it, `Esc` or a click drops it. The commit message is also editable
-  (double-click amends it), and the whole block lights lightly.
+  draft block), the commit details' message, the Release notes, the Activity Log
+  (both tabs), the help popup, the Markdown preview of the comment editor and the
+  comments, pending notes and suggestions inside the review's diff: a drag selects
+  the text (a plain click keeps its meaning: a link opens, a button acts, an Activity
+  Log entry or a thread opens or folds), `Ctrl+C` copies it, `Esc` or a click drops
+  it. A selection follows its text when you scroll. The commit message is also
+  editable (double-click amends it), and the whole block lights lightly.
 - **In the commit details**, the info lines are controls: click `commit: <id>`
   to copy the short id, double-click the author or the date line to amend it
   (the hand and a light mark them). The stats line only informs and keeps the

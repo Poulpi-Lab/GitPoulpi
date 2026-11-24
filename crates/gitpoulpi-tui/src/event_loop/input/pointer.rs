@@ -70,11 +70,13 @@ fn shape_over_owned_surface(cx: &mut CommandCtx<'_>, col: u16, row: u16) -> Curs
         return hand_or_text(registered_hand(col, row), col, row);
     }
     if *cx.show_help {
-        return hand(
-            crate::help_view::on_cross(col, row)
-                || crate::help_view::tab_at(col, row).is_some()
-                || crate::help_view::on_link(col, row),
-        );
+        let control = crate::help_view::on_cross(col, row)
+            || crate::help_view::tab_at(col, row).is_some()
+            || crate::help_view::on_link(col, row);
+        if !control && crate::help_view::pointer_text(col, row) {
+            return CursorShape::Text;
+        }
+        return hand(control);
     }
     if crate::activity_log::is_open() {
         if crate::activity_log::pointer_text(col, row) {

@@ -45,7 +45,7 @@ Eine Zeile ohne Aktion lässt ihre Zelle leer, sodass jede Schaltfläche in jede
 
 ### Die Branches einer Anfrage
 
-Eine Zeile einer Anfrage zeigt `Quelle → Ziel` hinter ihrem Titel (`alice:feature/login → main`, wenn der Quell-Branch in einem Fork liegt). Wird der Platz knapp, wird zuerst das Ziel gekürzt (eine Ellipse), der Titel behält den größten Teil des Platzes, und in einem schmalen Fenster werden die Branches nicht gezeigt; die Spalte Aktionen wird nie hinausgeschoben. Ruhen Sie den Zeiger auf einem gekürzten Text, um ihn ganz zu sehen. Hat ein Host die Branches nicht genannt, steht dort nichts. Die Zeile eines Issues nennt ihr Repository im selben Chip wie die Zeile einer Anfrage (der Ordnername des Klons oder `owner/name`, wenn es nicht geklont ist).
+Eine Zeile einer Anfrage zeigt `Quelle → Ziel` in der Spalte **Branches**, direkt hinter dem Repository (`alice:feature/login → main`, wenn der Quell-Branch in einem Fork liegt); die Zeile eines Issues lässt die Zelle leer, und ein Radar ohne Anfrage, die ihre Branches nennt, hat diese Spalte nicht. Ist die Zelle zu schmal, wird zuerst die Quelle gekürzt (eine Ellipse), und das Ziel bleibt, solange es geht, ganz. Die Spalte schrumpft, bevor sie verschwindet: In einem schmalen Fenster verlässt sie als letzte der optionalen Spalten das Bild (nach Status, Autor und Alter, vor Repository und Titel); ist sie weg, stehen die ganzen Branches im Tooltip des Titels und in der Statuszeile der gewählten Zeile. Eine breite Autorenspalte, deren Größe Sie selbst gesetzt haben, weicht dem Titel und den Branches. Die Spalte Aktionen wird nie hinausgeschoben. Ruhen Sie den Zeiger auf einem gekürzten Text, um ihn ganz zu sehen. GitHub und Gitea listen Anfragen ohne ihre Branches, daher liest das Radar sie nach der Liste (einmal pro Anfrage, bis sie sich ändert). Hat ein Host die Branches nicht genannt, steht dort nichts. Die Zeile eines Issues nennt ihr Repository im selben Chip wie die Zeile einer Anfrage (der Ordnername des Klons oder `owner/name`, wenn es nicht geklont ist).
 
 ### Auf dem Host handeln
 
@@ -151,7 +151,7 @@ eintreffen.
 
 ### Spalten
 
-Der Repository-Chip, das `#` (Nummer und Häkchen), der Autor und das Alter sind **größenveränderbare Spalten**. Auf automatisch ist die Repository-Spalte so breit
+Der Repository-Chip, die Branches, das `#` (Nummer und Häkchen), der Autor und das Alter sind **größenveränderbare Spalten**. Auf automatisch ist die Repository-Spalte so breit
 wie der längste Name auf dem Bildschirm (bis zu 40 Zellen und höchstens ein Drittel des Fensters), sodass `owner/name`
 und das `group/sub/project` einer Kontoliste in einem normalen Terminal nicht abgeschnitten werden. Der Titel
 bekommt, was übrig bleibt. Ein Name, der nicht passt, endet mit einer Ellipse (`group/sub...`), und:
@@ -160,7 +160,7 @@ bekommt, was übrig bleibt. Ein Name, der nicht passt, endet mit einer Ellipse (
   zeigt den ganzen Text. Wählen Sie die Zeile aus, und die Statuszeile unter dem Filter nennt ebenfalls das vollständige
   Projekt und den Titel, sodass es auch die Tastatur sieht.
 - **Ziehen Sie den Trenner** (die Zelle direkt nach dem Repository-Namen, nach dem `#` oder kurz vor dem Autor oder dem Alter), um die Spalte zu
-  dimensionieren; **Doppelklick** darauf passt die Spalte wieder an. Die Liste hat eine **Kopfzeile** (Repository, `#`,
+  dimensionieren; **Doppelklick** darauf passt die Spalte wieder an. Die Liste hat eine **Kopfzeile** (Repository, Branches, `#`,
   Titel, Autor, Alter), und die Trenner folgen wie im Log `ui.column_resize`: Mit `line` (dem
   Standard) ruht ein gedämpftes `│` im Trenner der Kopfzeile, und solange der Zeiger auf dem Trenner steht
   (in der Kopfzeile oder auf einer Zeile der Liste), die Spalte mit den Tasten gewählt ist oder Sie ziehen, wird eine dünne Akzentlinie
@@ -175,7 +175,7 @@ bekommt, was übrig bleibt. Ein Name, der nicht passt, endet mit einer Ellipse (
   Palette hat dasselbe: `Radar: Spalte wählen`, `Radar: Spalte verbreitern`, `Radar: Spalte verschmälern`,
   `Radar: Spaltenbreiten zurücksetzen`.
 
-Die Breiten stehen in `radar.toml` (`[columns]`, `repo`, `number`, `author` und `age`, in Zellen) und überstehen einen Neustart. Es sind
+Die Breiten stehen in `radar.toml` (`[columns]`, `repo`, `branches`, `number`, `author` und `age`, in Zellen; eine Datei ohne `branches` lädt wie bisher, die Spalte passt sich dann bis zu 28 Zellen ihrem Inhalt an) und überstehen einen Neustart. Es sind
 dieselben Gesten zum Ändern der Größe wie bei den Spalten des Logs.
 
 ### Checks und Konflikte
@@ -214,18 +214,27 @@ Geschlossene und gemergte Requests und geschlossene Issues werden nicht aufgelis
 
 ## Ansichten und Filter
 
-Drei Auswahlfelder und ein Textfeld grenzen die Liste ein. Jede Wahl ist eine
+Vier Auswahlfelder und ein Textfeld grenzen die Liste ein. Jede Wahl ist eine
 Auswahl: Klicken Sie darauf oder nutzen Sie ihre Taste.
 
 - **Ansicht** (`v`): Alle, Requests, Issues, WIP (laufende Arbeit), Zurückgestellt.
 - **Anzeigen** (`f`): Alle, Meine (Requests, die Sie geschrieben, Issues, die Sie
   erstellt haben), Mir zugewiesen, Review angefragt, Erwähnt mich.
 - **Umfang** (`w`): siehe oben.
+- **Profil** (`P`): Alle Profile oder ein Integrationsprofil aus Einstellungen > Integrationen (so
+  benannt, wie die Einstellungen es nennen, mit seinem Anbieter dahinter, wenn zwei Profile
+  denselben Namen tragen). Es grenzt jeden Abschnitt, die Zeilen der Repositories wie die
+  kontoweiten Zeilen, auf die Zeilen dieses Profils ein (eine Zeile mit laufender Arbeit hat kein
+  Profil, ein gewähltes Profil blendet sie also aus). Immer nur ein Profil. Die Wahl wird in
+  `radar.toml` gemerkt; ein Profil, das es nicht mehr gibt, fällt auf Alle Profile zurück. Die
+  Auswahlliste ist immer da wie die anderen drei, und ein schmales Fenster kürzt sie (und danach die
+  Beschriftungen), statt sie wegzulassen. Palette: `Radar: Nach Profil filtern...`. Blendet das
+  Profil alles aus, sagt es die leere Liste.
 - **Filtertext** (`/` oder `Ctrl+F`): Fuzzy-Treffer auf Repository, Nummer, Titel,
   Autor, Branch und Labels. `Enter` gibt die Tasten an die Liste zurück und behält
   den Text, `Esc` löscht ihn.
 
-`Ctrl+N` zeigt ein Badge am Filter, an jeder Auswahlliste, an den Schaltflächen Aktualisieren und Zurück und an jeder Abschnittsüberschrift auf dem Bildschirm. Drücken Sie das Zeichen eines Badges: Der Filter erhält die Tastatur, eine Auswahlliste öffnet sich, eine Schaltfläche wird ausgelöst und eine Überschrift erhält die Auswahl (`Enter` oder `Space` klappt sie dann zu). `Esc` bricht ab. Siehe [Badges](keybindings.md#badges).
+`Ctrl+N` zeigt ein Badge am Filter, an jeder der vier Auswahllisten, an den Schaltflächen Aktualisieren und Zurück und an jeder Abschnittsüberschrift auf dem Bildschirm. Drücken Sie das Zeichen eines Badges: Der Filter erhält die Tastatur, eine Auswahlliste öffnet sich, eine Schaltfläche wird ausgelöst und eine Überschrift erhält die Auswahl (`Enter` oder `Space` klappt sie dann zu). `Esc` bricht ab. Siehe [Badges](keybindings.md#badges).
 
 ## Aktionen
 

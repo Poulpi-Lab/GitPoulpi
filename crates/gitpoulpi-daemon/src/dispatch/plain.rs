@@ -583,6 +583,24 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
             let message: String = arg_or_err!(args, "message", request.id);
             to_json!(backend.tag_annotate(&repo, &name, &message))
         }
+        OperationKind::TagMove => {
+            let name: String = arg_or_err!(args, "name", request.id);
+            let target: Oid = arg_or_err!(args, "target", request.id);
+            let force: bool = args
+                .get("force")
+                .and_then(serde_json::Value::as_bool)
+                .unwrap_or(false);
+            to_json!(backend.tag_move(&repo, &name, target, force))
+        }
+        OperationKind::TagMergeBranch => {
+            let name: String = arg_or_err!(args, "name", request.id);
+            let branch: String = arg_or_err!(args, "branch", request.id);
+            let message: Option<String> = args
+                .get("message")
+                .and_then(serde_json::Value::as_str)
+                .map(str::to_string);
+            to_json!(backend.tag_merge_branch(&repo, &name, &branch, message.as_deref()))
+        }
         // TagPush / TagDeleteRemote are network operations and live in
         // `dispatch_network`, not here.
         OperationKind::Reset => {

@@ -1015,6 +1015,14 @@ cannot_drop = "{source} kan inte släppas på {target} på det sättet"
 history_scrolled = "historiken mellan dit och hit har rullat ut ur den laddade sidan"
 shares_no_history = "{source} delar ingen historik med målet"
 nothing_to_replay = "{source} har inget som målet saknar: inget att spela upp"
+move_tag_here = "Move {$tag} {name} here"
+move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
+merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
+merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
+moving_tag = "moving {$tag} {name} to {target}..."
+moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
+merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
+confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
 
 [menu_inline]
 placeholder_branch = "ange grennamn"
@@ -3188,6 +3196,7 @@ git_annotated_tag_at_selected_commit = { git = "Git: Annoterad tag vid vald comm
 refs_push_selected_tag_to_default_remote = { git = "Refs: Pusha vald tag till standard-remote", local = "Refs: Pusha vald tagg till standard-remote" }
 refs_delete_selected_tag_from_its_remote = { git = "Refs: Ta bort vald tag från dess remote...", local = "Refs: Ta bort vald tagg från dess remote..." }
 refs_annotate_selected_tag = { git = "Refs: Annotera vald tag...", local = "Refs: Annotera vald tagg..." }
+refs_move_selected_tag_to_selected_commit = "Refs: Move Selected {$Tag} to Selected {$Commit}..."
 refs_toggle_hide_in_graph = "Refs: Växla dölj i grafen"
 refs_toggle_solo_on_selected_ref = "Refs: Växla solo för vald ref"
 refs_stop_soloing_clear_every_soloed_ref = "Refs: Sluta solo (rensa alla solo-refs)"
@@ -5218,6 +5227,9 @@ fetched = { one = "hämtade {remote}: {n} ref uppdaterad", other = "hämtade {re
 fetched_all = { one = "hämtade alla remotes: {n} ref uppdaterad", other = "hämtade alla remotes: {n} refs uppdaterade" }
 branch_created_checkout_failed = "grenen {name} skapades men att checka ut den misslyckades: {error}"
 tag_annotated = "annoterade {$tag} {name}"
+tag_moved = "moved {$tag} {name} to {target}"
+tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
+tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
 tags_all_pushed = "varje {$tag} finns redan på {remote}"
 nothing_to_push = "inget att pusha till {remote}"
 pushed_refs = "pushade {refs} till {remote}"
@@ -5748,6 +5760,7 @@ open_install_page = "Öppna installationssidan"
 undo_anyway = "Ångra ändå"
 start_over = "Börja om"
 redo_anyway = "Gör om ändå"
+move_tag = "Move"
 
 [rebase_banner]
 skip = "Hoppa över"
@@ -6759,6 +6772,8 @@ sparse_disable = "Stäng av delvis utcheckning"
 tag_create = "Skapa {$tag} {name}"
 tag_delete = "Ta bort {$tag} {name}"
 tag_annotate = "Annotera {$tag} {name}"
+tag_move = { git = "Move {$tag} {name}", local = "Move {$tag} {name}" }
+tag_merge_branch = "{$Merge} {branch} into {$tag} {name}"
 fast_forward = { git = "Fast-forward {branch} till {target}", local = "Fast-forward {branch} till {target}" }
 reword = "{$Reword} {id}"
 fetch_as_branch = { git = "Fetch {remote_ref} som gren {branch}", local = "Hämta {remote_ref} som gren {branch}" }

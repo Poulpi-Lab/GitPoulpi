@@ -610,6 +610,7 @@ Klávesy jsou výchozí.
 | Refs: Smazat vybraný tag z jeho remote... |  |
 | Git: Fetch vybraného tagu |  |
 | Refs: Anotovat vybraný tag... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Přepnout skrytí v grafu |  |
 | Refs: Ukázat v grafu | `g` |
 | Refs: Přepnout solo na vybraném refu | `o` |

@@ -519,3 +519,101 @@ pub fn tag_annotate(repo: &RepoRef, name: &str, message: &str) -> Result<()> {
         .map_err(map_err)?;
     Ok(())
 }
+
+/// Moves tag `name` to the commit `to` (`GitBackend::tag_move`): an
+/// annotated tag is re-written byte for byte but for its `object` line
+/// (`retarget_tag_object`, the same function `SystemGitBackend` uses), and
+/// the ref is swapped only if it still holds the value read first.
+pub fn tag_move(repo: &RepoRef, name: &str, to: Oid, force: bool) -> Result<()> {
+    let git_repo = open(repo)?;
+    let full = format!("refs/tags/{name}");
+    let reference = git_repo
+        .find_reference(&full)
+        .map_err(|_| Error::Backend(format!("no tag named `{name}`")))?;
+    let old = reference
+        .target()
+        .ok_or_else(|| Error::Backend(format!("`{name}` is not a direct tag")))?;
+    let old_commit = reference.peel_to_commit().map_err(map_err)?.id();
+    let to_oid = to_git2_oid(to)?;
+    git_repo
+        .find_commit(to_oid)
+        .map_err(|_| Error::Backend(format!("{} is not a commit", to.to_hex())))?;
+    if old_commit == to_oid {
+        return Ok(());
+    }
+    if !force
+        && !git_repo
+            .graph_descendant_of(to_oid, old_commit)
+            .map_err(map_err)?
+    {
+        return Err(Error::NotFastForward);
+    }
+    let new = if old == old_commit {
+        to_oid
+    } else {
+        let odb = git_repo.odb().map_err(map_err)?;
+        let raw = odb.read(old).map_err(map_err)?;
+        let moved = gitpoulpi_core::domain::retarget_tag_object(raw.data(), &to.to_hex())?;
+        odb.write(git2::ObjectType::Tag, &moved).map_err(map_err)?
+    };
+    git_repo
+        .reference_matching(
+            &full,
+            new,
+            true,
+            old,
+            &format!("tag: move {name} to {}", &to.to_hex()[..7]),
+        )
+        .map_err(map_err)?;
+    Ok(())
+}
+
+/// Merges `branch` into the commit of tag `name` in memory, commits the
+/// result detached and moves the tag onto it (`GitBackend::tag_merge_branch`).
+pub fn tag_merge_branch(
+    repo: &RepoRef,
+    name: &str,
+    branch: &str,
+    message: Option<&str>,
+) -> Result<Oid> {
+    let git_repo = open(repo)?;
+    let ours = git_repo
+        .find_reference(&format!("refs/tags/{name}"))
+        .map_err(|_| Error::Backend(format!("no tag named `{name}`")))?
+        .peel_to_commit()
+        .map_err(map_err)?;
+    let theirs = git_repo
+        .revparse_single(branch)
+        .and_then(|o| o.peel_to_commit())
+        .map_err(|_| Error::Backend(format!("no revision named `{branch}`")))?;
+    if ours.id() == theirs.id()
+        || git_repo
+            .graph_descendant_of(ours.id(), theirs.id())
+            .map_err(map_err)?
+    {
+        return Err(Error::Backend(format!(
+            "{name} already contains {branch}: nothing to merge"
+        )));
+    }
+    let mut index = git_repo
+        .merge_commits(&ours, &theirs, None)
+        .map_err(map_err)?;
+    if index.has_conflicts() {
+        return Err(Error::Conflict {
+            operation: "merge into tag",
+        });
+    }
+    let tree = git_repo
+        .find_tree(index.write_tree_to(&git_repo).map_err(map_err)?)
+        .map_err(map_err)?;
+    let sig = git_repo.signature().map_err(map_err)?;
+    let message = message
+        .map(str::to_string)
+        .unwrap_or_else(|| format!("Merge branch '{branch}' into tag '{name}'"));
+    let merged = git_repo
+        .commit(None, &sig, &sig, &message, &tree, &[&ours, &theirs])
+        .map_err(map_err)?;
+    let merged = to_domain_oid(merged)?;
+    tag_move(repo, name, merged, false)?;
+    Ok(merged)
+}

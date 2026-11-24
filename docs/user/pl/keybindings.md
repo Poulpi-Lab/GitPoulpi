@@ -609,6 +609,7 @@ zastosowania. Klawisze są domyślne.
 | Refs: Usuń zaznaczony tag z jego zdalnego... |  |
 | Git: Fetch zaznaczony tag |  |
 | Refs: Opisz zaznaczony tag... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Przełącz ukrycie w grafie |  |
 | Refs: Pokaż w grafie | `g` |
 | Refs: Przełącz solo dla zaznaczonego refu | `o` |

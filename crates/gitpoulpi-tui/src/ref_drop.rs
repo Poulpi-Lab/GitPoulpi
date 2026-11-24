@@ -17,6 +17,8 @@
 //! | local X -> local Y | Merge X into Y, Rebase X onto Y, Interactive rebase X onto Y, Fast-forward Y to X |
 //! | local X -> remote R | Push X to R's remote |
 //! | remote R -> local Y | Merge R into Y, Rebase Y onto R, Fast-forward Y to R, Pull (when R is Y's upstream) |
+//! | tag T -> any ref | Move T here (or the same row marked "not a fast-forward") |
+//! | tag T -> local Y | also Merge T into Y, and (rarer, below a rule) Merge Y into T and move T |
 //!
 //! Anything that changes a branch other than the checked-out one first
 //! checks it out (`Action::CheckoutThen`, which stops if the checkout is
@@ -26,6 +28,7 @@ use gitpoulpi_config::PullButtonMode;
 use gitpoulpi_core::domain::{CommitGraph, PullOptions, Ref};
 
 use super::*;
+use crate::log_menu::FfVerdict;
 use context_menu::glyph_label;
 use gitpoulpi_i18n::msg::{menu_drop as msg, menu_log, menu_ref};
 
@@ -49,6 +52,16 @@ pub(crate) enum DropOp {
     Push,
     /// Pull the dragged remote branch into the (local) target.
     Pull,
+    /// Move the dragged tag to the target's commit (a fast-forward of the
+    /// tag: the target descends from the tag's commit).
+    MoveTag,
+    /// The same move when it is not a fast-forward, offered with a warning.
+    MoveTagForced,
+    /// `git merge <tag>` on the target branch.
+    MergeTagIntoBranch,
+    /// Merge the target branch into the tag's commit, detached, then move
+    /// the tag onto the merge commit.
+    MergeBranchIntoTag,
 }
 
 /// What a chosen `DropOp` turns into.
@@ -81,6 +94,20 @@ fn after_checkout(branch: &str, head: Option<&HeadBranch>, then: Action) -> Acti
             then: Box::new(then),
         }
     }
+}
+
+/// The remotes that have `tag`: moving it leaves them at the old position.
+pub(crate) fn tag_remotes(tag: &Ref) -> Vec<String> {
+    tag.tag_sync
+        .as_ref()
+        .map(|s| {
+            s.pushed_to
+                .iter()
+                .chain(s.differs_on.iter())
+                .cloned()
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 /// The rows a drop of `source` on `target` offers. Empty when the pair
@@ -128,6 +155,42 @@ pub(crate) fn drop_menu_entries(
         None => row(label, DropOp::FastForward),
     };
     match (source_kind, target_kind) {
+        (RefRowKind::Tag, _) => {
+            // Is the tag's commit an ancestor of the target? Then moving it
+            // is a fast-forward and the row is plain; otherwise the row is
+            // still there, flagged, because moving it anyway is the owner's
+            // call. A tag already on the target's commit has nothing to move.
+            let move_verdict = match (graph, tgt, src) {
+                (Some(g), Some(t), Some(s)) => ff_verdict(g, s.target, t.target),
+                _ => FfVerdict::Unknown,
+            };
+            let move_label = |text: String| glyph_label("\u{21A0}", text);
+            let mut rows = vec![match move_verdict {
+                FfVerdict::AlreadyThere => Entry::disabled(
+                    move_label(msg::move_tag_here(source)),
+                    &move_verdict.refusal(target).unwrap_or_default(),
+                ),
+                FfVerdict::Ahead | FfVerdict::Diverged => row(
+                    move_label(msg::move_tag_not_ff(source)),
+                    DropOp::MoveTagForced,
+                ),
+                FfVerdict::Possible | FfVerdict::Unknown => {
+                    row(move_label(msg::move_tag_here(source)), DropOp::MoveTag)
+                }
+            }];
+            if target_kind == RefRowKind::Local {
+                rows.push(row(
+                    glyph_label("\u{21C6}", msg::merge_tag_into(source, target)),
+                    DropOp::MergeTagIntoBranch,
+                ));
+                rows.push(Entry::Separator);
+                rows.push(row(
+                    glyph_label("\u{21C6}", msg::merge_into_tag(target, source)),
+                    DropOp::MergeBranchIntoTag,
+                ));
+            }
+            rows
+        }
         (RefRowKind::Local, RefRowKind::Local) => vec![
             merge_row(),
             row(
@@ -217,6 +280,37 @@ pub(crate) fn plan_drop(
                 DropPlan::Rebase(Box::new(form))
             })
         }
+        (DropOp::MoveTag | DropOp::MoveTagForced, RefRowKind::Tag, _) => {
+            // Where the tag lives besides here: the remote keeps its old
+            // position until the owner pushes (the tag turns `differs`).
+            let remotes = tag_remotes(src);
+            let said = if remotes.is_empty() {
+                msg::moving_tag(source, target)
+            } else {
+                msg::moving_tag_remote(source, target, remotes.join(", "))
+            };
+            Ok(DropPlan::Submit(
+                Action::TagMove {
+                    name: source.to_string(),
+                    target: tgt.target,
+                    force: op == DropOp::MoveTagForced,
+                    target_label: target.to_string(),
+                    remotes,
+                },
+                said,
+            ))
+        }
+        (DropOp::MergeTagIntoBranch, RefRowKind::Tag, RefRowKind::Local) => Ok(DropPlan::Submit(
+            after_checkout(target, head.as_ref(), Action::Merge(src.clone())),
+            msg::merging(source, target),
+        )),
+        (DropOp::MergeBranchIntoTag, RefRowKind::Tag, RefRowKind::Local) => Ok(DropPlan::Submit(
+            Action::TagMergeBranch {
+                name: source.to_string(),
+                branch: target.to_string(),
+            },
+            msg::merging_into_tag(target, source),
+        )),
         (DropOp::FastForward, _, RefRowKind::Local) => Ok(DropPlan::Submit(
             Action::FastForward {
                 branch: target.to_string(),
@@ -686,6 +780,152 @@ mod tests {
             matches!(&err, Err(e) if e.contains("merge commit")),
             "{err:?}"
         );
+    }
+
+    fn tag_at(name: &str, target: Oid) -> Ref {
+        Ref {
+            kind: RefKind::Tag { name: name.into() },
+            target,
+            visibility: gitpoulpi_core::domain::RefVisibility::Shown,
+            is_head: false,
+            upstream: None,
+            tag_sync: None,
+            multi_remote: None,
+        }
+    }
+
+    /// `fixture()` plus `old` (a tag on commit 1) and `new` (on commit 3).
+    fn with_tags() -> (Vec<Ref>, CommitGraph) {
+        let (mut refs, graph) = fixture();
+        refs.push(tag_at("old", oid(1)));
+        refs.push(tag_at("new", oid(3)));
+        (refs, graph)
+    }
+
+    fn tag_rows(source: &str, target: &str, kind: RefRowKind) -> Vec<String> {
+        let (refs, graph) = with_tags();
+        labels(&drop_menu_entries(
+            source,
+            RefRowKind::Tag,
+            target,
+            kind,
+            &refs,
+            Some(&graph),
+            Default::default(),
+        ))
+    }
+
+    #[test]
+    fn a_tag_on_a_descendant_branch_offers_a_plain_move_and_both_merges() {
+        // `feature` (3) descends from `old` (1): a fast-forward of the tag.
+        let rows = tag_rows("old", "feature", RefRowKind::Local);
+        assert_eq!(
+            rows,
+            vec![
+                "\u{21A0} Move tag old here",
+                "\u{21C6} Merge tag old into feature",
+                "\u{21C6} Merge feature into tag old and move the tag (rare: adds a merge commit)",
+            ]
+        );
+    }
+
+    #[test]
+    fn a_move_that_is_not_a_fast_forward_is_offered_with_the_warning() {
+        // `new` (3) is not an ancestor of `side` (4).
+        let rows = tag_rows("new", "side", RefRowKind::Local);
+        assert!(
+            rows[0].ends_with(
+                "Move tag new here (not a fast-forward: new would no longer be an ancestor)"
+            ),
+            "{rows:?}"
+        );
+        // Moving back to an ancestor is not a fast-forward either.
+        let back = tag_rows("new", "main", RefRowKind::Local);
+        assert!(back[0].contains("not a fast-forward"), "{back:?}");
+    }
+
+    #[test]
+    fn a_tag_dropped_on_a_remote_branch_or_a_tag_only_moves_and_never_merges() {
+        let remote = tag_rows("new", "origin/main", RefRowKind::Remote);
+        assert_eq!(remote.len(), 1, "{remote:?}");
+        assert!(remote[0].contains("not a fast-forward"), "{remote:?}");
+        let onto_tag = tag_rows("old", "new", RefRowKind::Tag);
+        assert_eq!(onto_tag, vec!["\u{21A0} Move tag old here"]);
+        // Already on the target's commit: grayed out, not offered.
+        let (mut refs, graph) = with_tags();
+        refs.push(tag_at("twin", oid(1)));
+        let entries = drop_menu_entries(
+            "old",
+            RefRowKind::Tag,
+            "twin",
+            RefRowKind::Tag,
+            &refs,
+            Some(&graph),
+            Default::default(),
+        );
+        assert!(labels(&entries).is_empty(), "{}", entries_text(&entries));
+        assert!(entries_text(&entries).contains("already there"));
+    }
+
+    #[test]
+    fn moving_a_tag_plans_a_move_to_the_targets_commit_and_names_remotes_that_keep_the_old_one() {
+        use RefRowKind::{Local, Tag};
+        let (mut refs, graph) = with_tags();
+        if let Some(t) = refs.iter_mut().find(|r| r.tag_name() == Some("old")) {
+            t.tag_sync = Some(gitpoulpi_core::domain::TagSync {
+                pushed_to: vec!["origin".into()],
+                differs_on: vec![],
+                local: true,
+            });
+        }
+        let plan = |op| {
+            plan_drop(
+                op,
+                "old",
+                Tag,
+                "feature",
+                Local,
+                &refs,
+                Some(&graph),
+                &["origin".to_string()],
+                PullButtonMode::Merge,
+            )
+        };
+        match plan(DropOp::MoveTag) {
+            Ok(DropPlan::Submit(
+                Action::TagMove {
+                    name,
+                    target,
+                    force,
+                    remotes,
+                    ..
+                },
+                said,
+            )) => {
+                assert_eq!((name.as_str(), target, force), ("old", oid(3), false));
+                assert_eq!(remotes, vec!["origin".to_string()]);
+                assert!(said.contains("origin keeps the old position"), "{said}");
+            }
+            other => panic!("{other:?}"),
+        }
+        assert!(matches!(
+            plan(DropOp::MoveTagForced),
+            Ok(DropPlan::Submit(Action::TagMove { force: true, .. }, _))
+        ));
+        // The classic merge checks the branch out first (`feature` is not HEAD).
+        match plan(DropOp::MergeTagIntoBranch) {
+            Ok(DropPlan::Submit(Action::CheckoutThen { branch, then }, _)) => {
+                assert_eq!(branch, "feature");
+                assert!(matches!(*then, Action::Merge(r) if r.tag_name() == Some("old")));
+            }
+            other => panic!("{other:?}"),
+        }
+        // The detached merge touches no branch: no checkout.
+        assert!(matches!(
+            plan(DropOp::MergeBranchIntoTag),
+            Ok(DropPlan::Submit(Action::TagMergeBranch { name, branch }, _))
+                if name == "old" && branch == "feature"
+        ));
     }
 
     #[test]

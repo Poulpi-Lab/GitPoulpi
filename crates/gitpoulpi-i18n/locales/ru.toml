@@ -1015,6 +1015,14 @@ cannot_drop = "{source} нельзя так перетащить на {target}"
 history_scrolled = "история между этими двумя точками выпала из загруженной страницы"
 shares_no_history = "у {source} нет общей истории с целью"
 nothing_to_replay = "в {source} нет ничего, чего нет в цели: нечего воспроизводить"
+move_tag_here = "Move {$tag} {name} here"
+move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
+merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
+merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
+moving_tag = "moving {$tag} {name} to {target}..."
+moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
+merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
+confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
 
 [menu_inline]
 placeholder_branch = "имя ветки"
@@ -3178,6 +3186,7 @@ git_annotated_tag_at_selected_commit = { git = "Git: аннотированны�
 refs_push_selected_tag_to_default_remote = { git = "Refs: push tag на remote по умолчанию", local = "Refs: отправить тег на remote по умолчанию" }
 refs_delete_selected_tag_from_its_remote = { git = "Refs: удалить выбранный tag с его remote...", local = "Refs: удалить выбранный тег с его remote..." }
 refs_annotate_selected_tag = { git = "Refs: аннотировать выбранный tag...", local = "Refs: аннотировать выбранный тег..." }
+refs_move_selected_tag_to_selected_commit = "Refs: Move Selected {$Tag} to Selected {$Commit}..."
 refs_toggle_hide_in_graph = "Refs: скрыть/показать в графе"
 refs_toggle_solo_on_selected_ref = "Refs: solo для выбранной ссылки"
 refs_stop_soloing_clear_every_soloed_ref = "Refs: снять solo (со всех ссылок)"
@@ -5206,6 +5215,9 @@ fetched = { one = "fetch {remote}: обновлена {n} ссылка", few = "
 fetched_all = { one = "fetch всех remote: обновлена {n} ссылка", few = "fetch всех remote: обновлено {n} ссылки", many = "fetch всех remote: обновлено {n} ссылок", other = "fetch всех remote: обновлено {n} ссылок" }
 branch_created_checkout_failed = "ветка {name} создана, но checkout не удался: {error}"
 tag_annotated = "аннотирован {$tag} {name}"
+tag_moved = "moved {$tag} {name} to {target}"
+tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
+tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
 tags_all_pushed = { git = "все tag'и уже на {remote}", local = "все теги уже на {remote}" }
 nothing_to_push = { git = "нечего делать push в {remote}", local = "нечего отправлять в {remote}" }
 pushed_refs = "push {refs} в {remote}"
@@ -5737,6 +5749,7 @@ open_install_page = "Открыть страницу установки"
 undo_anyway = "Всё равно отменить"
 start_over = "Начать заново"
 redo_anyway = "Всё равно повторить"
+move_tag = "Move"
 
 [rebase_banner]
 skip = "Пропустить"
@@ -6760,6 +6773,8 @@ sparse_disable = "Отключить sparse checkout"
 tag_create = { git = "Создать {$tag} {name}", local = "Создать {$tag} {name}" }
 tag_delete = { git = "Удалить {$tag} {name}", local = "Удалить {$tag} {name}" }
 tag_annotate = { git = "Аннотировать {$tag} {name}", local = "Аннотировать {$tag} {name}" }
+tag_move = { git = "Move {$tag} {name}", local = "Move {$tag} {name}" }
+tag_merge_branch = "{$Merge} {branch} into {$tag} {name}"
 fast_forward = { git = "Fast-forward {branch} до {target}", local = "Fast-forward {branch} до {target}" }
 reword = "{$Reword} {id}"
 fetch_as_branch = "{$Fetch} {remote_ref} как ветку {branch}"

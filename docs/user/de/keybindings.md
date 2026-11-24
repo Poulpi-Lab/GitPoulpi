@@ -605,6 +605,7 @@ die Standardtasten.
 | Refs: Ausgewählten Tag von seinem Remote löschen... |  |
 | Git: Fetch für den ausgewählten Tag |  |
 | Refs: Ausgewählten Tag annotieren... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Ausblenden im Graph umschalten |  |
 | Refs: Im Graph anzeigen | `g` |
 | Refs: Solo für ausgewählte Ref umschalten | `o` |

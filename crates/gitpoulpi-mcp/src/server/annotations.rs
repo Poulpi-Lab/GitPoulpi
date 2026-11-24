@@ -234,6 +234,8 @@ const TOOLS: &[(&str, &str, bool)] = &[
     ("submodule_list", "read", false),
     ("submodule_update", "write", true),
     ("tag_annotate", "write", false),
+    ("tag_move", "write", false),
+    ("tag_merge_branch", "write", false),
     ("tag_create", "write", false),
     ("tag_delete", "destructive", true),
     ("tag_fetch", "write", true),

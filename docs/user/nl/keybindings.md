@@ -614,6 +614,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Refs: Geselecteerde tag van zijn remote verwijderen... |  |
 | Git: Geselecteerde tag fetchen |  |
 | Refs: Geselecteerde tag annoteren... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Verbergen in grafiek omschakelen |  |
 | Refs: In grafiek tonen | `g` |
 | Refs: Solo op geselecteerde ref omschakelen | `o` |

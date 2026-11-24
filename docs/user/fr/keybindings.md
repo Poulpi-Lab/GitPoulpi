@@ -612,6 +612,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Refs : Supprimer le tag sélectionné de son distant... |  |
 | Git : Fetch le tag sélectionné |  |
 | Refs : Annoter le tag sélectionné... |  |
+| Refs : Déplacer le tag sélectionné vers le commit sélectionné... |  |
 | Refs : Masquer ou afficher dans le graphe |  |
 | Refs : Révéler dans le graphe | `g` |
 | Refs : Activer ou désactiver le solo sur la ref sélectionnée | `o` |

@@ -612,6 +612,7 @@ Tangenterna är standardvärdena.
 | Refs: Ta bort vald tag från dess remote... |  |
 | Git: Fetch vald tag |  |
 | Refs: Annotera vald tag... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Växla dölj i grafen |  |
 | Refs: Visa i grafen | `g` |
 | Refs: Växla solo för vald ref | `o` |

@@ -576,6 +576,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Refs: 選択中のTagをリモートから削除... |  |
 | Git: 選択中のtagをfetch |  |
 | Refs: 選択中のTagに注釈を付ける... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: グラフでの非表示を切り替え |  |
 | Refs: グラフで表示 | `g` |
 | Refs: 選択中の参照のソロ表示を切り替え | `o` |

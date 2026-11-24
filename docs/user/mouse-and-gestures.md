@@ -264,19 +264,36 @@ Sections...*, one *Show/Hide* command per section, *Reset Sections to Default*.
 
 ### Dragging refs
 
-Press on a branch in the Refs sidebar, or on a ref pill in the Log, and drag
-it onto another branch. The status line says what you carry. A target that can
-take the drop lights up. Release to get a menu. `Esc` cancels the drag.
+Press on a branch, a remote branch or a tag in the Refs sidebar, or on a ref
+pill in the Log, and drag it onto another ref. The status line says what you
+carry. A target that can take the drop lights up. Release to get a menu. `Esc`
+cancels the drag. The Log stays where it is while you carry: pressing a ref
+only scrolls the Log to its commit when it turns out to be a click (the jump
+happens when the button comes up), so you can scroll to the drop target first
+and then pick the ref up.
 
 | Drag | Menu |
 |---|---|
 | Local branch X onto local branch Y | **Merge X into Y**, **Rebase X onto Y**, **Interactive rebase X onto Y...**, **Fast-forward Y to X** |
 | Local branch onto a remote branch | **Push X** to that remote |
 | Remote branch onto local branch Y | **Merge**, **Rebase Y onto it**, **Fast-forward Y to it**, and **Pull** when it is the upstream of Y |
+| Tag T onto any branch, remote branch or tag | **Move tag T here**; marked *(not a fast-forward: T would no longer be an ancestor)* when the target does not descend from the tag's commit (your choice); grayed *already there* when it is already on that commit |
+| Tag T onto local branch Y | also **Merge tag T into Y**, and below a rule the rarer **Merge Y into tag T and move the tag** (a merge commit of the tag's commit and Y, detached, then the tag moves onto it) |
 
 When the action changes a branch that is not checked out, GitPoulpi checks it
-out first. If git refuses the checkout, nothing changes. Tags cannot be
-dragged and cannot receive a drop.
+out first. If git refuses the checkout, nothing changes. Only tags can be
+dropped on a tag, and a branch cannot be dropped on one.
+
+Moving a tag keeps its kind: a lightweight tag stays lightweight, an annotated
+tag is re-created annotated with its message and tagger line carried over
+unchanged (a signed tag is refused, its signature would no longer match). Only
+your local tag moves: a remote that has the tag keeps the old position, the tag
+turns *differs* and the status line says so; push it yourself when you mean
+it. The move and the merge-and-move are each one undo step (undo puts the old
+tag object back). A merge into a tag that conflicts changes nothing. Palette:
+`Refs: Move Selected Tag to Selected Commit...` moves the Refs pane's tag to
+the commit selected in the Log (it asks first when that is not a
+fast-forward); every other target goes through mark then drop below.
 
 Keyboard: "mark then drop" does what a drag does, for any pair of refs. In
 the Refs pane press `m` on a branch (palette: `Refs: Mark as Drop Source`).

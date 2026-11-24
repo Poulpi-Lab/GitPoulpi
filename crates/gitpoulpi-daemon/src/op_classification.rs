@@ -77,6 +77,8 @@ const GOLDEN: &[(OperationKind, &str, &str)] = &[
     (K::TagCreate, "J", "REFS|LOG"),
     (K::TagDelete, "J", "REFS|LOG"),
     (K::TagAnnotate, "J", "REFS|LOG"),
+    (K::TagMove, "J", "REFS|LOG"),
+    (K::TagMergeBranch, "J", "REFS|LOG"),
     (K::TagPush, "NS", "REFS|LOG"),
     (K::TagDeleteRemote, "N", "REFS|LOG"),
     (K::TagFetch, "N", "REFS|LOG"),

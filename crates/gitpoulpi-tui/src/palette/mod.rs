@@ -269,6 +269,10 @@ pub(crate) enum PaletteCommand {
     FetchSelectedTag,
     /// Re-make the selected tag as an annotated one, where it is.
     AnnotateSelectedTag,
+    /// Move the Refs pane's selected tag to the commit selected in the Log:
+    /// the keyboard twin of dropping the tag on a commit. A fast-forward runs
+    /// at once; a move that is not one asks first.
+    MoveSelectedTagToSelectedCommit,
     ToggleHideInGraph,
     /// Scroll the Log to the selected ref's (or stash's) commit.
     RevealSelectedRefInGraph,

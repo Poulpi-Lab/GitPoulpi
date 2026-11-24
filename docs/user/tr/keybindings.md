@@ -610,6 +610,7 @@ Tuşlar varsayılanlardır.
 | Refs: Seçili Tag'i Uzak Deposundan Sil... |  |
 | Git: Seçili Tag için Fetch |  |
 | Refs: Seçili Tag'e Not Ekle... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Grafikte Gizle/Göster |  |
 | Refs: Grafikte Göster | `g` |
 | Refs: Seçili Ref'te Solo'yu Aç/Kapat | `o` |

@@ -88,6 +88,8 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         K::TagCreate
         | K::TagDelete
         | K::TagAnnotate
+        | K::TagMove
+        | K::TagMergeBranch
         | K::TagPush
         | K::TagDeleteRemote
         | K::TagFetch => Family::Tag,
@@ -407,6 +409,11 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         K::TagCreate => rest("Create tag ").map(l::tag_create),
         K::TagDelete => rest("Delete tag ").map(l::tag_delete),
         K::TagAnnotate => rest("Annotate tag ").map(l::tag_annotate),
+        K::TagMove => rest("Move tag ").map(l::tag_move),
+        K::TagMergeBranch => {
+            let (branch, name) = rest("Merge ")?.split_once(" into tag ")?;
+            Some(l::tag_merge_branch(branch, name))
+        }
         K::FastForward => {
             let (branch, target) = rest("Fast-forward ")?.rsplit_once(" to ")?;
             Some(l::fast_forward(branch, target))

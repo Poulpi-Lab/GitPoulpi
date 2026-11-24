@@ -494,6 +494,18 @@ impl GitBackend for Git2Backend {
     fn tag_annotate(&self, repo: &RepoRef, name: &str, message: &str) -> Result<()> {
         mutate::tag_annotate(repo, name, message)
     }
+    fn tag_move(&self, repo: &RepoRef, name: &str, to: Oid, force: bool) -> Result<()> {
+        mutate::tag_move(repo, name, to, force)
+    }
+    fn tag_merge_branch(
+        &self,
+        repo: &RepoRef,
+        name: &str,
+        branch: &str,
+        message: Option<&str>,
+    ) -> Result<Oid> {
+        mutate::tag_merge_branch(repo, name, branch, message)
+    }
     /// Forwarded, like every other network operation here.
     ///
     /// Pushing a tag also has to *record* the push in the remote-tag

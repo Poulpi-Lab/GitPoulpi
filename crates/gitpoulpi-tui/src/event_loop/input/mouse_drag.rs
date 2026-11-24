@@ -398,7 +398,22 @@ pub(super) fn up(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::Re
     if let Some(drag) = cx.ref_drag.take() {
         // A press that never moved is a click, and
         // the click handlers already did their
-        // work on the way down -- say nothing.
+        // work on the way down -- say nothing. The
+        // exception is the sidebar's reveal-in-graph,
+        // held back until here so a drag never moves
+        // the Log (`RefDrag::reveal_on_release`).
+        if !drag.started {
+            if let Some((section, name)) = &drag.reveal_on_release {
+                let sources = crate::ref_reveal::RevealSources {
+                    refs: &*cx.refs_result,
+                    stashes: &*cx.stashes_result,
+                    hidden: &*cx.hidden_from_graph,
+                };
+                if let Some(note) = cx.reveal.request_ref(*section, name, &sources) {
+                    *cx.last_message = Some(note);
+                }
+            }
+        }
         if drag.started {
             match &drag.over {
                 // The drop

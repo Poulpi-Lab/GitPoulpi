@@ -474,8 +474,10 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
                 None
             }
         }
-        C::DropSelectedRefOnCurrent => (!(ctx.selected_local_branch || ctx.selected_remote_branch))
-            .then_some(msg::palette::WHY_SELECT_A_LOCAL_OR_REMOTE_BRANCH_IN_THE_REFS_PANE.get()),
+        C::DropSelectedRefOnCurrent => (!(ctx.selected_local_branch
+            || ctx.selected_remote_branch
+            || ctx.selected_tag))
+            .then_some(msg::palette::WHY_SELECT_A_REF_IN_THE_REFS_PANE_FIRST.get()),
         C::FastForwardCurrentToSelected => (!(ctx.selected_local_branch
             || ctx.selected_remote_branch))
             .then_some(msg::palette::WHY_SELECT_A_LOCAL_OR_REMOTE_BRANCH_IN_THE_REFS_PANE.get()),
@@ -543,6 +545,15 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         }
         C::AnnotateSelectedTag => (!ctx.selected_tag)
             .then_some(msg::palette::WHY_SELECT_A_TAG_IN_THE_REFS_PANE_FIRST.get()),
+        C::MoveSelectedTagToSelectedCommit => {
+            if !ctx.selected_tag {
+                Some(msg::palette::WHY_SELECT_A_TAG_IN_THE_REFS_PANE_FIRST.get())
+            } else if !ctx.selected_commit {
+                Some(msg::palette::WHY_SELECT_A_COMMIT_IN_THE_LOG_FIRST_THE_WIP_ROW_ISN.get())
+            } else {
+                None
+            }
+        }
         C::RevealSelectedRefInGraph => (!ctx.selected_any_ref() && !ctx.selected_stash)
             .then_some(msg::palette::WHY_SELECT_A_REF_IN_THE_REFS_PANE_FIRST.get()),
         C::ToggleHideInGraph | C::ToggleSolo => (!ctx.selected_any_ref())

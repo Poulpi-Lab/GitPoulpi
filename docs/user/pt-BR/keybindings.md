@@ -608,6 +608,7 @@ As teclas são as padrão.
 | Refs: excluir a tag selecionada do seu remoto... |  |
 | Git: Fetch da tag selecionada |  |
 | Refs: anotar a tag selecionada... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: alternar ocultar no grafo |  |
 | Refs: mostrar no grafo | `g` |
 | Refs: alternar solo na ref selecionada | `o` |

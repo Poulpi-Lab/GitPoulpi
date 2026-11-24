@@ -281,6 +281,15 @@ pub(crate) enum ConfirmAction {
     /// session file). Handled in this process; the repositories are never
     /// touched.
     DeleteWorkspace(String),
+    /// Move a tag although the target does not descend from its commit
+    /// (the palette's *Move Selected Tag to Selected Commit*; the drop menu
+    /// carries the same choice in its own row). Submitted forced.
+    MoveTag {
+        name: String,
+        target: gitpoulpi_core::domain::Oid,
+        target_label: String,
+        remotes: Vec<String>,
+    },
 }
 
 impl ConfirmAction {
@@ -314,6 +323,7 @@ impl ConfirmAction {
                 gitpoulpi_i18n::msg::profile_bar::WRITE_BUTTON
             }
             ConfirmAction::DeleteWorkspace(_) => b::DELETE,
+            ConfirmAction::MoveTag { .. } => b::MOVE_TAG,
         };
         format!(" {} ", word.get())
     }

@@ -610,6 +610,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Refs: Delete Selected Tag from Its Remote... |  |
 | Git: Fetch Selected Tag |  |
 | Refs: Annotate Selected Tag... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Toggle Hide in Graph |  |
 | Refs: Reveal in Graph | `g` |
 | Refs: Toggle Solo on Selected Ref | `o` |

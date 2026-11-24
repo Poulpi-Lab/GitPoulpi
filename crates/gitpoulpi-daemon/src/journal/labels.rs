@@ -67,6 +67,10 @@ pub(super) fn label_for(request: &Request) -> String {
             format!("Delete tag {} on {}", arg("name"), arg("remote"))
         }
         OperationKind::TagAnnotate => format!("Annotate tag {}", arg("name")),
+        OperationKind::TagMove => format!("Move tag {}", arg("name")),
+        OperationKind::TagMergeBranch => {
+            format!("Merge {} into tag {}", arg("branch"), arg("name"))
+        }
         OperationKind::FastForward => format!(
             "Fast-forward {} to {}",
             arg("branch"),

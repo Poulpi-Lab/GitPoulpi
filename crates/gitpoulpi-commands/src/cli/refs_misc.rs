@@ -676,6 +676,28 @@ pub enum TagAction {
         #[arg(short, long)]
         message: String,
     },
+    /// Move an existing tag to another commit, keeping its kind (an
+    /// annotated tag keeps its message and tagger). Local only: a remote
+    /// keeps the old position until you push.
+    Move {
+        name: String,
+        /// The commit, branch or tag to move it to.
+        target: String,
+        /// Allow a move that is not a fast-forward (the tag's current
+        /// commit is not an ancestor of the target).
+        #[arg(long)]
+        force_non_ff: bool,
+    },
+    /// Merge a branch into the commit a tag points at (detached, no
+    /// branch moves), then move the tag onto the merge commit.
+    MergeBranch {
+        name: String,
+        /// The branch (or any revision) to merge into the tag.
+        branch: String,
+        /// Message of the merge commit.
+        #[arg(short, long)]
+        message: Option<String>,
+    },
     /// Send tags to a remote. With no names, sends every tag no remote
     /// is known to have - one push, not one per tag.
     Push {

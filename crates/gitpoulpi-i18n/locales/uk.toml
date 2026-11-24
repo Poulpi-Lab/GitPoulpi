@@ -1014,6 +1014,14 @@ cannot_drop = "{source} так не можна перенести на {target}"
 history_scrolled = "історія між тим і цим місцем вийшла за межі завантаженої сторінки"
 shares_no_history = "{source} не має спільної історії з ціллю"
 nothing_to_replay = "у {source} немає нічого, чого не має ціль: нічого відтворювати"
+move_tag_here = "Move {$tag} {name} here"
+move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
+merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
+merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
+moving_tag = "moving {$tag} {name} to {target}..."
+moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
+merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
+confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
 
 [menu_inline]
 placeholder_branch = "введіть назву гілки"
@@ -3185,6 +3193,7 @@ git_annotated_tag_at_selected_commit = { git = "Git: анотований tag н
 refs_push_selected_tag_to_default_remote = { git = "Refs: push вибраного tag'а на типовий remote", local = "Refs: надіслати вибраний тег на типовий remote" }
 refs_delete_selected_tag_from_its_remote = { git = "Refs: видалити вибраний tag з його remote...", local = "Refs: видалити вибраний тег з його remote..." }
 refs_annotate_selected_tag = { git = "Refs: анотувати вибраний tag...", local = "Refs: анотувати вибраний тег..." }
+refs_move_selected_tag_to_selected_commit = "Refs: Move Selected {$Tag} to Selected {$Commit}..."
 refs_toggle_hide_in_graph = "Refs: сховати/показати в графі"
 refs_toggle_solo_on_selected_ref = "Refs: solo для вибраного ref"
 refs_stop_soloing_clear_every_soloed_ref = "Refs: припинити solo (скинути всі)"
@@ -5216,6 +5225,9 @@ fetched = { one = "fetch {remote}: оновлено {n} ref", few = "fetch {remo
 fetched_all = { one = "fetch усіх remote: оновлено {n} ref", few = "fetch усіх remote: оновлено {n} ref", many = "fetch усіх remote: оновлено {n} ref", other = "fetch усіх remote: оновлено {n} ref" }
 branch_created_checkout_failed = "гілку {name} створено, але checkout не вдався: {error}"
 tag_annotated = "анотовано {$tag} {name}"
+tag_moved = "moved {$tag} {name} to {target}"
+tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
+tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
 tags_all_pushed = "кожен {$tag} уже на {remote}"
 nothing_to_push = { git = "нічого робити push на {remote}", local = "нічого надсилати на {remote}" }
 pushed_refs = "надіслано {refs} на {remote}"
@@ -5746,6 +5758,7 @@ open_install_page = "Відкрити сторінку встановлення"
 undo_anyway = "Все одно скасувати"
 start_over = "Почати спочатку"
 redo_anyway = "Все одно повторити"
+move_tag = "Move"
 
 [rebase_banner]
 skip = "Пропустити"
@@ -6757,6 +6770,8 @@ sparse_disable = "Вимкнути розріджений checkout"
 tag_create = { git = "Створити {$tag} {name}", local = "Створити {$tag} {name}" }
 tag_delete = { git = "Видалити {$tag} {name}", local = "Видалити {$tag} {name}" }
 tag_annotate = { git = "Анотувати {$tag} {name}", local = "Анотувати {$tag} {name}" }
+tag_move = { git = "Move {$tag} {name}", local = "Move {$tag} {name}" }
+tag_merge_branch = "{$Merge} {branch} into {$tag} {name}"
 fast_forward = { git = "Fast-forward {branch} до {target}", local = "Перемотати {branch} до {target}" }
 reword = "{$Reword} {id}"
 fetch_as_branch = { git = "Fetch {remote_ref} як гілку {branch}", local = "Завантажити {remote_ref} як гілку {branch}" }

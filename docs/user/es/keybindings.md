@@ -615,6 +615,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Refs: Eliminar el tag seleccionado de su remoto... |  |
 | Git: Fetch del Tag seleccionado |  |
 | Refs: Anotar el tag seleccionado... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Alternar ocultar en el grafo |  |
 | Refs: Mostrar en el grafo | `g` |
 | Refs: Alternar solo en la ref seleccionada | `o` |

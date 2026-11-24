@@ -614,6 +614,7 @@ applicano. I tasti sono quelli predefiniti.
 | Refs: Elimina il tag selezionato dal suo remoto... |  |
 | Git: Fetch del tag selezionato |  |
 | Refs: Annota il tag selezionato... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Mostra o nascondi nel grafo |  |
 | Refs: Mostra nel grafo | `g` |
 | Refs: Attiva o disattiva il solo sul ref selezionato | `o` |

@@ -616,6 +616,7 @@ stage_file = "z"
 | Refs: удалить выбранный tag с его remote... |  |
 | Git: Fetch выбранный tag |  |
 | Refs: аннотировать выбранный tag... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: скрыть/показать в графе |  |
 | Refs: показать в графе | `g` |
 | Refs: solo для выбранной ссылки | `o` |

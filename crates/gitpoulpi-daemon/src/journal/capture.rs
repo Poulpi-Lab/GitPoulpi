@@ -204,7 +204,11 @@ pub(super) fn capture_before(
             let branch = arg_str(request, "branch").unwrap_or_default();
             capture_sections(backend, repo, &mut before, &[branch_section(&branch)])?;
         }
-        OperationKind::TagCreate | OperationKind::TagDelete | OperationKind::TagAnnotate => {
+        OperationKind::TagCreate
+        | OperationKind::TagDelete
+        | OperationKind::TagAnnotate
+        | OperationKind::TagMove
+        | OperationKind::TagMergeBranch => {
             let name = arg_str(request, "name").unwrap_or_default();
             let full = format!("refs/tags/{name}");
             if request.command == OperationKind::TagCreate {

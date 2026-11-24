@@ -253,3 +253,207 @@ pub fn check_a_fetch_notices_a_tag_deleted_on_the_remote(backend: &dyn GitBacken
         "already unpublished before this fetch: not a candidate"
     );
 }
+
+// -- moving a tag, and merging a branch into one --
+
+fn tag_object_type(repo: &crate::FixtureRepo, name: &str) -> String {
+    repo.git(&["cat-file", "-t", &format!("refs/tags/{name}")])
+}
+
+fn write_commit(repo: &crate::FixtureRepo, file: &str, body: &str, message: &str) {
+    std::fs::write(repo.root().join(file), body).unwrap();
+    repo.git(&["add", file]);
+    repo.git(&["commit", "-q", "-m", message]);
+}
+
+/// A lightweight tag moves forward to a descendant commit, and stays
+/// lightweight. Moving it onto the commit it already names is a no-op.
+pub fn check_tag_move_fast_forwards_a_lightweight_tag(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .with_initial()
+        .commit("second")
+        .build();
+    let r = repo.repo_ref();
+    let tip = head_oid(backend, &r);
+    let first = backend
+        .resolve(&r, "HEAD~1")
+        .expect("the first commit resolves");
+    backend.tag_create(&r, "v1", first, None).unwrap();
+
+    backend.tag_move(&r, "v1", first, false).expect("no-op");
+    backend
+        .tag_move(&r, "v1", tip, false)
+        .expect("fast-forward");
+
+    assert_eq!(tag(backend, &r, "v1").unwrap().target, tip);
+    assert_eq!(tag_object_type(&repo, "v1"), "commit", "still lightweight");
+    assert!(backend.tag_move(&r, "nope", tip, false).is_err());
+}
+
+/// Moving to a commit that is not a descendant is refused with the typed
+/// error and changes nothing, unless `force` says the owner chose it.
+pub fn check_tag_move_refuses_a_non_fast_forward_unless_forced(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .with_initial()
+        .commit("second")
+        .build();
+    let r = repo.repo_ref();
+    let tip = head_oid(backend, &r);
+    let first = backend.resolve(&r, "HEAD~1").unwrap();
+    backend.tag_create(&r, "v1", tip, None).unwrap();
+
+    // Backwards: `first` is an ancestor of the tag's commit, not a descendant.
+    let refused = backend.tag_move(&r, "v1", first, false);
+    assert!(
+        matches!(refused, Err(gitpoulpi_core::Error::NotFastForward)),
+        "{refused:?}"
+    );
+    assert_eq!(tag(backend, &r, "v1").unwrap().target, tip, "unchanged");
+
+    backend.tag_move(&r, "v1", first, true).expect("forced");
+    assert_eq!(tag(backend, &r, "v1").unwrap().target, first);
+}
+
+/// An annotated tag is re-created annotated with its message and tagger
+/// line verbatim; only the commit it points at changes. The old tag object
+/// stays in the repository (an undo restores it).
+pub fn check_tag_move_keeps_an_annotated_tag_annotated(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .with_initial()
+        .annotated_tag("v1")
+        .commit("second")
+        .build();
+    let r = repo.repo_ref();
+    let tip = head_oid(backend, &r);
+    let old_object = repo.git(&["rev-parse", "refs/tags/v1"]);
+    let old_raw = repo.git(&["cat-file", "tag", "refs/tags/v1"]);
+
+    backend.tag_move(&r, "v1", tip, false).expect("move");
+
+    assert_eq!(tag_object_type(&repo, "v1"), "tag", "still annotated");
+    assert_ne!(repo.git(&["rev-parse", "refs/tags/v1"]), old_object);
+    assert_eq!(tag(backend, &r, "v1").unwrap().target, tip);
+    let new_raw = repo.git(&["cat-file", "tag", "refs/tags/v1"]);
+    let after_object = |raw: &str| raw.split_once('\n').unwrap().1.to_string();
+    assert_eq!(
+        after_object(&new_raw),
+        after_object(&old_raw),
+        "type, name, tagger and message are carried over verbatim"
+    );
+    assert!(new_raw.starts_with(&format!("object {}", tip.to_hex())));
+    assert_eq!(repo.git(&["cat-file", "-t", &old_object]), "tag");
+}
+
+/// Moving a pushed tag leaves the remote at the old commit: the tag now
+/// reports `differs`, and nothing was pushed on its own.
+pub fn check_tag_move_leaves_the_remote_copy_and_reports_differs(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new().with_initial().with_origin().build();
+    let r = repo.repo_ref();
+    let first = head_oid(backend, &r);
+    backend.tag_create(&r, "v1", first, None).unwrap();
+    push(backend, &r, "v1");
+    repo.git(&["commit", "-q", "--allow-empty", "-m", "second"]);
+    let tip = head_oid(backend, &r);
+    assert_eq!(where_of(backend, &r, "v1"), Some(TagWhere::Both));
+
+    backend.tag_move(&r, "v1", tip, false).unwrap();
+
+    assert_eq!(where_of(backend, &r, "v1"), Some(TagWhere::Differs));
+    assert_eq!(
+        repo.git_in_remote(&["rev-parse", "refs/tags/v1"]),
+        first.to_hex(),
+        "the remote still holds the old position"
+    );
+}
+
+/// Merging a branch into a tag makes a merge commit whose parents are the
+/// tag's old commit and the branch tip, moves the tag onto it, and moves
+/// nothing else: no branch, not HEAD, not the working tree.
+pub fn check_tag_merge_branch_makes_a_merge_and_moves_only_the_tag(backend: &dyn GitBackend) {
+    for annotated in [false, true] {
+        let repo = TestRepoBuilder::new().with_initial().build();
+        let r = repo.repo_ref();
+        let default_branch = repo.git(&["symbolic-ref", "--short", "HEAD"]);
+        repo.git(&["checkout", "-q", "-b", "side"]);
+        write_commit(&repo, "side.txt", "side\n", "side work");
+        repo.git(&["checkout", "-q", &default_branch]);
+        write_commit(&repo, "main.txt", "main\n", "main work");
+        let main_tip = head_oid(backend, &r);
+        let side_tip = backend.resolve(&r, "side").unwrap();
+        backend
+            .tag_create(&r, "v1", main_tip, annotated.then_some("release"))
+            .unwrap();
+
+        let merged = backend
+            .tag_merge_branch(&r, "v1", "side", None)
+            .expect("merge into tag");
+
+        assert_eq!(tag(backend, &r, "v1").unwrap().target, merged);
+        assert_eq!(
+            repo.git(&["rev-list", "--parents", "-n1", &merged.to_hex()]),
+            format!(
+                "{} {} {}",
+                merged.to_hex(),
+                main_tip.to_hex(),
+                side_tip.to_hex()
+            ),
+            "parents: the tag's old commit, then the branch tip"
+        );
+        assert_eq!(
+            tag_object_type(&repo, "v1"),
+            if annotated { "tag" } else { "commit" },
+            "the tag keeps its kind"
+        );
+        assert_eq!(
+            head_oid(backend, &r),
+            main_tip,
+            "HEAD's branch did not move"
+        );
+        assert_eq!(
+            repo.git(&["symbolic-ref", "--short", "HEAD"]),
+            default_branch
+        );
+        assert_eq!(backend.resolve(&r, "side").unwrap(), side_tip);
+        assert!(repo.git(&["status", "--porcelain"]).is_empty());
+        assert_eq!(
+            repo.git(&["show", &format!("{}:side.txt", merged.to_hex())]),
+            "side"
+        );
+        assert_eq!(
+            repo.git(&["show", &format!("{}:main.txt", merged.to_hex())]),
+            "main",
+            "both sides' files are in the merge"
+        );
+        // Merging again has nothing left to merge.
+        assert!(backend.tag_merge_branch(&r, "v1", "side", None).is_err());
+    }
+}
+
+/// A conflicting merge is refused and nothing at all changes: the tag, the
+/// branches, the index and the working tree.
+pub fn check_tag_merge_branch_conflict_changes_nothing(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .commit_file("a.txt", "base\n", "base")
+        .build();
+    let r = repo.repo_ref();
+    let default_branch = repo.git(&["symbolic-ref", "--short", "HEAD"]);
+    repo.git(&["checkout", "-q", "-b", "side"]);
+    write_commit(&repo, "a.txt", "two\n", "side edit");
+    repo.git(&["checkout", "-q", &default_branch]);
+    write_commit(&repo, "a.txt", "one\n", "main edit");
+    let main_tip = head_oid(backend, &r);
+    backend.tag_create(&r, "v1", main_tip, None).unwrap();
+    let side_tip = backend.resolve(&r, "side").unwrap();
+
+    let refused = backend.tag_merge_branch(&r, "v1", "side", None);
+
+    assert!(
+        matches!(refused, Err(gitpoulpi_core::Error::Conflict { .. })),
+        "{refused:?}"
+    );
+    assert_eq!(tag(backend, &r, "v1").unwrap().target, main_tip);
+    assert_eq!(head_oid(backend, &r), main_tip);
+    assert_eq!(backend.resolve(&r, "side").unwrap(), side_tip);
+    assert!(repo.git(&["status", "--porcelain"]).is_empty());
+    assert!(!repo.root().join(".git/MERGE_HEAD").exists());
+}

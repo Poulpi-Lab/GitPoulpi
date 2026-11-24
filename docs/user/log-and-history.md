@@ -117,6 +117,13 @@ sidebar, or its pill in the Log) for its menu. The most useful entries:
 | Rename, Delete | Delete asks first; a remote twin can be deleted too |
 | Copy branch name, Copy link to branch on remote | To the clipboard |
 
+**Moving a tag.** Drag a tag onto another ref (see *Dragging refs* in
+[Mouse and gestures](./mouse-and-gestures.md)) or use `Refs: Move Selected Tag
+to Selected Commit...`. It keeps its kind and annotation, only your local tag
+moves (a remote keeps the old position until you push), and one undo puts it
+back. CLI: `gitpoulpi tag move <name> <target> [--force-non-ff]`,
+`gitpoulpi tag merge-branch <name> <branch> [-m <message>]`.
+
 **Where a tag lives.** A tag can be on this computer, on a remote, or both, and
 the sidebar's TAGS rows (and the tag's pill in the Log) say which with a marker
 after the name. Hover a tag for the same in words.

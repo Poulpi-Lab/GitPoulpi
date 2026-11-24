@@ -7,6 +7,12 @@ IPC surfaces are stable within a major version).
 
 ## [Unreleased]
 
+### Added
+- **Drop a tag on another ref:** drag a tag onto a branch, a remote branch or another tag for **Move tag here** (flagged *not a fast-forward* when the target does not descend from the tag's commit; an annotated tag keeps its message and tagger, only your local tag moves and a remote keeps the old position until you push). On a local branch the menu also offers **Merge tag into branch** and, as the rarer row, **Merge branch into tag and move the tag** (a detached merge commit, nothing else moves, a conflict changes nothing). One undo step each. Keyboard: `Refs: Move Selected Tag to Selected Commit...`, and mark then drop for any ref. CLI/MCP: `gitpoulpi tag move <name> <target> [--force-non-ff]`, `gitpoulpi tag merge-branch <name> <branch>`.
+
+### Fixed
+- Pressing a ref in the Refs pane to drag it no longer makes the Log jump to that ref's commit: the graph only follows on a click (when the button comes up), so it stays where you scrolled it to drop onto a visible target.
+
 ## [1.2.0] - 2026-11-23
 
 ### Added

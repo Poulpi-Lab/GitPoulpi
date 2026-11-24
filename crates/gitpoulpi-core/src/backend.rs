@@ -678,6 +678,43 @@ pub trait GitBackend: Send + Sync {
     /// one replaces its message.
     fn tag_annotate(&self, repo: &RepoRef, name: &str, message: &str) -> Result<()>;
 
+    /// Moves the existing local tag `name` to the commit `to`, keeping its
+    /// kind: a lightweight tag stays a ref to the commit, an annotated one
+    /// is re-created with the **same message and tagger line verbatim** (see
+    /// [`crate::domain::retarget_tag_object`]), so only the object it points
+    /// at changes. A signed tag is refused (its signature would no longer
+    /// match), as is a tag of anything but a commit.
+    ///
+    /// Without `force` the move must be a fast-forward (the tag's commit is
+    /// an ancestor of `to`): otherwise [`crate::Error::NotFastForward`] and
+    /// nothing changes. Moving a tag onto the commit it already names is a
+    /// no-op. The update is checked against the tag's old value, so a tag
+    /// that moved meanwhile is an error, not a lost update.
+    ///
+    /// Local only. A remote's copy and the tag mirror are not touched, so a
+    /// tag the remote has becomes `differs`; the caller decides about a push.
+    fn tag_move(&self, repo: &RepoRef, name: &str, to: Oid, force: bool) -> Result<()>;
+
+    /// Merges the branch (or any revision) `branch` into the commit tag
+    /// `name` points at, then moves the tag onto the merge commit, whose
+    /// parents are the tag's old commit and `branch`'s tip. Returns the merge
+    /// commit.
+    ///
+    /// Detached: no branch moves, HEAD, the index and the working tree are
+    /// never touched. A merge that conflicts is
+    /// [`crate::Error::Conflict`] with nothing changed (the tag stays put);
+    /// a `branch` the tag's commit already contains is an error, since there
+    /// is nothing to merge. `message` defaults to
+    /// `Merge branch '<branch>' into tag '<name>'`. The tag keeps its kind
+    /// exactly as [`GitBackend::tag_move`] does.
+    fn tag_merge_branch(
+        &self,
+        repo: &RepoRef,
+        name: &str,
+        branch: &str,
+        message: Option<&str>,
+    ) -> Result<Oid>;
+
     /// Sends tags to `remote` - one named tag, several, or every tag no
     /// remote is known to have (see [`crate::domain::TagSelection`]).
     ///

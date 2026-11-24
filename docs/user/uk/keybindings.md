@@ -604,6 +604,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Refs: видалити вибраний tag з його remote... |  |
 | Git: Fetch вибраного tag'а |  |
 | Refs: анотувати вибраний tag... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: сховати/показати в графі |  |
 | Refs: показати в графі | `g` |
 | Refs: solo для вибраного ref | `o` |

@@ -267,6 +267,12 @@ pub(crate) enum PaletteCommand {
     /// Fetch the selected tag from the remote that has it: for a tag that
     /// lives only on a remote (`tag_where_ui`).
     FetchSelectedTag,
+    /// Use the remote's version of the selected tag that differs: the local
+    /// tag moves to it (no network, undoable).
+    TakeRemoteSelectedTag,
+    /// Force-push the selected tag that differs to the remote that has it at
+    /// another commit (confirmed, leased, undoable).
+    ForcePushSelectedTag,
     /// Re-make the selected tag as an annotated one, where it is.
     AnnotateSelectedTag,
     /// Move the Refs pane's selected tag to the commit selected in the Log:
@@ -679,6 +685,10 @@ pub(crate) enum PaletteCommand {
     /// The minimap beside the vertical scrollbar of the diff and the editor
     /// (`ui.minimap`). Global: it flips a setting, whichever view is open.
     ToggleMinimap,
+    /// Highlight the changed words of a changed line in the diff views
+    /// (`ui.diff_intraline`). Global: it flips a setting, whichever view is
+    /// open. Palette only: no key, the Diff view's keys are all taken.
+    ToggleDiffIntraline,
     /// `editor.follow_selection`: with the editor open, selecting another
     /// file in the right pane opens it in the editor.
     EditorToggleFollowSelection,

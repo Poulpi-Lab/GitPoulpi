@@ -46,6 +46,11 @@ struct Setup {
 /// `profile` as its extra lines, and the TUI on a fixture repository (the
 /// only tab).
 fn setup(session: &str, kind: &str, profile: &str) -> Setup {
+    setup_at(session, kind, profile, COLS)
+}
+
+/// [`setup`] in a window `cols` wide.
+fn setup_at(session: &str, kind: &str, profile: &str, cols: u16) -> Setup {
     let bare = tempfile::tempdir().unwrap();
     mock_host::seed_bare_repos(bare.path()).unwrap();
     // The request's head, where the review of a clone fetches it from.
@@ -97,14 +102,15 @@ fn setup(session: &str, kind: &str, profile: &str) -> Setup {
     let term = common::launch(repo.root())
         .session(session)
         .config_dir(config.path())
-        .size(COLS, ROWS)
+        .size(cols, ROWS)
+        .mouse_capture()
         .env("GITPOULPI_NO_BROWSER", "1")
         .env("GITPOULPI_OPEN_LOG", config.path().join("opened.log"))
         .env("GITPOULPI_TOKEN_LAB", "test-token")
         .env("GITPOULPI_DESKTOP_NO_HOOKS", "1")
         .spawn();
     term.wait_for("the repository loaded", STARTUP, |s| {
-        s.contains("radar-review-start-commit")
+        s.contains("radar-revi")
     })
     .unwrap_or_else(|e| panic!("{e}"));
     Setup {
@@ -495,4 +501,189 @@ fn the_review_question_closes_on_a_right_click_outside() {
             !s.contains("Review request") && s.contains(ROW) && !s.contains("Pin to top")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+}
+
+/// Every `OSC 22` pointer shape the program asked for, in order ("" is the
+/// reset).
+fn pointer_shapes(term: &Terminal) -> Vec<String> {
+    let raw = String::from_utf8_lossy(&term.raw_output()).to_string();
+    raw.split("\x1b]22;")
+        .skip(1)
+        .map(|s| s.split("\x1b\\").next().unwrap_or("").to_string())
+        .collect()
+}
+
+/// Moves onto `(col, row)` and waits for `want` to be the last shape asked.
+fn hover_shape(term: &mut Terminal, what: &str, (col, row): (u16, u16), want: &str) {
+    term.move_to(col, row).unwrap();
+    wait_until(what, || {
+        pointer_shapes(term).last().map(String::as_str) == Some(want)
+    });
+}
+
+/// Where `needle` is on the request's own row.
+fn on_row(screen: &Screen, needle: &str) -> (u16, u16) {
+    let (_, row) = screen.find(ROW).expect("the request's row");
+    screen
+        .find_all(needle)
+        .into_iter()
+        .find(|&(_, r)| r == row)
+        .unwrap_or_else(|| panic!("{needle:?} on the row:\n{}", screen.text()))
+}
+
+const GLOBE: &str = "\u{1F310}";
+const TALK: &str = "\u{2261}";
+
+/// The Actions column of a request not cloned: Review, the globe and the
+/// conversation. Each is a hand; Review asks how, the globe opens the page
+/// (the stubbed browser logs it), the conversation opens over the Radar.
+#[test]
+fn the_actions_buttons_review_open_the_page_and_open_the_conversation() {
+    let mut s = setup("pty-radar-actions", GITLAB, LISTS);
+    let screen = select_request(&mut s.term);
+    assert!(screen.contains("Actions"), "{}", screen.text());
+    let screen = s.term.screen();
+    let review = on_row(&screen, "Review");
+    let globe = on_row(&screen, GLOBE);
+    let talk = on_row(&screen, TALK);
+    // The hand over each button, the arrow back on the title.
+    hover_shape(&mut s.term, "a hand over Review", review, "pointer");
+    hover_shape(
+        &mut s.term,
+        "the arrow on the title",
+        (review.0 - 40, review.1),
+        "",
+    );
+    hover_shape(&mut s.term, "a hand over the globe", globe, "pointer");
+    hover_shape(&mut s.term, "a hand over the conversation", talk, "pointer");
+
+    // The globe: the page of the request is opened (never a real browser).
+    s.term.click(globe.0, globe.1).unwrap();
+    let log = s.config.path().join("opened.log");
+    wait_until("the page was opened", || read(&log).contains("58"));
+
+    // Review: the question.
+    s.term.click(review.0, review.1).unwrap();
+    s.term
+        .wait_for("the review question", STEP, |s| {
+            s.contains("Review request")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    s.term.send_keys("Escape").unwrap();
+    s.term
+        .wait_for("the Radar again", STEP, |s| {
+            !s.contains("Review request") && s.contains("Scope")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+
+    // The conversation takes the window over.
+    s.term.click(talk.0, talk.1).unwrap();
+    s.term
+        .wait_for("the conversation over the Radar", STEP, |s| {
+            !s.contains("Scope")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+}
+
+/// Narrow, the column stays: its word becomes a glyph, the globe and the
+/// conversation stay, and the buttons still work.
+#[test]
+fn the_actions_column_keeps_its_buttons_as_glyphs_when_narrow() {
+    let mut s = setup_at("pty-radar-actions-narrow", GITLAB, LISTS, 70);
+    select_request(&mut s.term);
+    let screen = s.term.screen();
+    let globe = on_row(&screen, GLOBE);
+    on_row(&screen, TALK);
+    let (rev_col, rev_row) = on_row(&screen, "\u{25CE}");
+    assert!(
+        !screen.line(rev_row).contains("Review"),
+        "the word is a glyph:\n{}",
+        screen.text()
+    );
+    s.term.click(globe.0, globe.1).unwrap();
+    let log = s.config.path().join("opened.log");
+    wait_until("the page was opened", || read(&log).contains("58"));
+    s.term.click(rev_col, rev_row).unwrap();
+    s.term
+        .wait_for("the review question", STEP, |s| {
+            s.contains("Review request")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+}
+
+/// A double click on a request not cloned asks how to review it (the menu's
+/// and the button's question) instead of saying to clone first; so does
+/// Enter on the row.
+#[test]
+fn a_double_click_or_enter_on_a_request_not_cloned_asks_how_to_review_it() {
+    let mut s = setup("pty-radar-double-click", GITLAB, LISTS);
+    let screen = select_request(&mut s.term);
+    let (col, row) = screen.find(ROW).unwrap();
+    // Past the double-click window of the click that selected the row.
+    std::thread::sleep(Duration::from_millis(900));
+    s.term.double_click(col + 2, row).unwrap();
+    let screen = s
+        .term
+        .wait_for("the review question", STEP, |s| {
+            s.contains("Review request")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    assert!(
+        !screen.contains("clone the repository first"),
+        "{}",
+        screen.text()
+    );
+    s.term.send_keys("Escape").unwrap();
+    s.term
+        .wait_for("the question closed", STEP, |s| {
+            !s.contains("Review request")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    s.term.send_keys("Enter").unwrap();
+    let screen = s
+        .term
+        .wait_for("the review question from Enter", STEP, |s| {
+            s.contains("Review request")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    assert!(
+        !screen.contains("clone the repository first"),
+        "{}",
+        screen.text()
+    );
+}
+
+/// The buttons of a review hosted over the Radar are hands, like the buttons
+/// of every other surface: its tabs and its close cross.
+#[test]
+fn the_buttons_of_a_review_over_the_radar_show_the_pointing_hand() {
+    let mut s = setup("pty-radar-review-pointer", GITLAB, LISTS);
+    select_request(&mut s.term);
+    s.term.send_keys("e").unwrap();
+    s.term
+        .wait_for("the question", STEP, |s| {
+            s.contains("Review through the API")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    s.term.send_keys("a").unwrap();
+    let screen = s
+        .term
+        .wait_for("the review over the Radar", STEP, |s| {
+            s.contains("Review !58") && s.contains("Files")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    // The tab bar sits in the top border of the review's frame.
+    let tab = screen
+        .find_all("Files")
+        .into_iter()
+        .min_by_key(|&(_, r)| r)
+        .expect("the Files tab");
+    hover_shape(
+        &mut s.term,
+        "a hand over the Files tab",
+        (tab.0 + 1, tab.1),
+        "pointer",
+    );
+    // Off any button: the arrow again.
+    hover_shape(&mut s.term, "the arrow on the page", (tab.0, tab.1 + 3), "");
 }

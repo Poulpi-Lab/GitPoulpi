@@ -516,6 +516,8 @@ merge_side_by_side_min_width = "Editor de {$merge}: lado a lado a partir de (col
 merge_side_by_side_min_width_help = "O editor de conflitos de {$merge} mostra A e B lado a lado quando sua área tem pelo menos esta largura em colunas (linhas longas rolam para o lado com Shift+roda ou Shift+setas); mais estreito, mostra um lado por vez em abas. 100 por padrão; 40 é o menor valor, 0 significa sempre lado a lado. O editor oculta os painéis Refs e Status enquanto está aberto, então normalmente tem a janela inteira."
 diff_word_wrap = "Quebra de linha"
 diff_word_wrap_help = "Quebra linhas longas nas visualizações de {$diff} em vez de cortá-las com reticências. O editor integrado e a visualização de blame rolam para o lado e não quebram. Também é o alternador de quebra da própria visualização de {$diff}."
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Tema"
@@ -1728,6 +1730,12 @@ column_repository = "Repositório"
 column_author = "Autor"
 column_title = "Título"
 column_age = "Idade"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "Coluna {name} ({width} células): [ estreita, ] alarga, 0 redefine, Tab próxima, Esc conclui"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -3439,6 +3447,7 @@ files_clear_selection = "Arquivos: limpar a seleção"
 files_toggle_selection = "Arquivos: alternar a seleção da linha atual"
 diff_toggle_word_wrap = "{$Diff}: alternar quebra de linha"
 view_toggle_minimap = "Exibir: alternar o minimapa"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "Editor: alternar seguir a seleção"
 diff_toggle_whitespace_only_changes = "{$Diff}: alternar alterações só de espaços em branco"
 ai_generate_commit_message = "IA: gerar mensagem de commit"
@@ -3770,6 +3779,8 @@ rewrite_strip_exec = "Reescrita: remover o bit de execução..."
 rewrite_file_encoding = "Reescrita: converter a codificação dos arquivos..."
 # s22:end
 git_fetch_selected_tag = "Git: {$Fetch} da {$tag} selecionada"
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "Reescrita: corrigir a codificação das mensagens..."
 # s24:end
@@ -4972,6 +4983,8 @@ staging_lines = { one = { git = "fazendo stage de {n} linha(s) do hunk {hunk}{sp
 unstaging_lines = { one = { git = "fazendo unstage de {n} linha(s) do hunk {hunk}{spill}...", local = "removendo da preparação {n} linha(s) do hunk {hunk}{spill}..." }, other = { git = "fazendo unstage de {n} linha(s) do hunk {hunk}{spill}...", local = "removendo da preparação {n} linha(s) do hunk {hunk}{spill}..." } }
 minimap_on = "minimapa ativado"
 minimap_off = "minimapa desativado"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = { git = "stage age sobre a árvore de trabalho - abra um arquivo dos painéis {$unstaged_files} ou {$staged_files}, não de um commit", local = "preparar age sobre a árvore de trabalho - abra um arquivo dos painéis {$unstaged_files} ou {$staged_files}, não de um commit" }
 not_working_diff_discard = { git = "descartar age sobre a árvore de trabalho - abra um arquivo do painel {$unstaged_files}, não de um commit", local = "descartar age sobre a árvore de trabalho - abra um arquivo do painel {$unstaged_files}, não de um commit" }
 discard_on_staged = { git = "descartar reverte alterações unstaged - este é o painel {$staged_files}: unstage primeiro e depois descarte pelo painel {$unstaged_files}", local = "descartar reverte alterações não preparadas - este é o painel {$staged_files}: remova da preparação primeiro e depois descarte pelo painel {$unstaged_files}" }
@@ -8993,6 +9006,15 @@ tip_both = "Aqui e em {remotes}, no mesmo {$commit}."
 tip_differs = "Aqui e em {remotes}, mas em {$commits} diferentes: um {$push_noun} seria recusado."
 tip_fetch_note = { git = "Um {$fetch_noun} traz de volta uma {$tag} excluída só aqui enquanto algum remoto ainda a tiver. Uma {$tag} excluída no remoto só sai deste repositório com Auto-prune de {$tags} (Configurações).", local = "Uma {$fetch_noun} traz de volta uma {$tag} excluída só aqui enquanto algum remoto ainda a tiver. Uma {$tag} excluída no remoto só sai deste repositório com Poda automática de {$tags} (Configurações)." }
 fetch_tag = "{$Fetch} {name} de {remote}"
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "Excluir {name}..."
 delete_tag_on_remote = "Excluir {name} em {remote}..."
 dlg_title = "Excluir {$tag}"

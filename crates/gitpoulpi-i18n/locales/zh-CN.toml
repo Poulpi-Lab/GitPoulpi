@@ -516,6 +516,8 @@ merge_side_by_side_min_width = { git = "{$merge} 编辑器：并排显示起始�
 merge_side_by_side_min_width_help = { git = "{$merge} 冲突编辑器在其区域宽度至少达到此列数时并排显示 A 和 B（长行可用 Shift+滚轮或 Shift+方向键横向滚动）；更窄时，用标签页一次显示一侧。默认 100；最小值 40，0 表示始终并排。编辑器打开时会隐藏引用和状态面板，因此通常拥有整个窗口。", local = "合并冲突编辑器在其区域宽度至少达到此列数时并排显示 A 和 B（长行可用 Shift+滚轮或 Shift+方向键横向滚动）；更窄时，用标签页一次显示一侧。默认 100；最小值 40，0 表示始终并排。编辑器打开时会隐藏引用和状态面板，因此通常拥有整个窗口。" }
 diff_word_wrap = "自动换行"
 diff_word_wrap_help = { git = "在 {$diff} 视图中对长行换行，而不是用省略号截断。内置编辑器和 blame 视图横向滚动，不换行。也是 {$diff} 视图自带的换行开关。", local = "在{$diff}视图中对长行换行，而不是用省略号截断。内置编辑器和追溯视图横向滚动，不换行。也是{$diff}视图自带的换行开关。" }
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "主题"
@@ -1727,6 +1729,12 @@ column_repository = "仓库"
 column_author = "作者"
 column_title = "标题"
 column_age = "时长"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "{name}列（{width} 格）：[ 变窄，] 变宽，0 重置，Tab 下一列，Esc 完成"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -3414,6 +3422,7 @@ files_clear_selection = "文件：清除选择"
 files_toggle_selection = "文件：切换当前行的选择"
 diff_toggle_word_wrap = "{$Diff}：切换自动换行"
 view_toggle_minimap = "视图：切换缩略图"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "编辑器：切换跟随选择"
 diff_toggle_whitespace_only_changes = "{$Diff}：切换仅空白字符的更改"
 ai_generate_commit_message = { git = "AI：生成 {$Commit} 消息", local = "AI：生成{$Commit}消息" }
@@ -3754,6 +3763,8 @@ rewrite_strip_exec = "重写：移除可执行位…"
 rewrite_file_encoding = "重写：转换文件编码…"
 # s22:end
 git_fetch_selected_tag = { git = "Git：{$Fetch} 所选 {$Tag}", local = "Git：{$Fetch}所选{$Tag}" }
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "重写：修复消息编码…"
 # s24:end
@@ -4951,6 +4962,8 @@ staging_lines = { one = { git = "正在 {$stage} hunk {hunk} 的 {n} 行{spill}�
 unstaging_lines = { one = { git = "正在 {$unstage} hunk {hunk} 的 {n} 行{spill}…", local = "正在取消暂存代码块 {hunk} 的 {n} 行{spill}…" }, other = { git = "正在 {$unstage} hunk {hunk} 的 {n} 行{spill}…", local = "正在取消暂存代码块 {hunk} 的 {n} 行{spill}…" } }
 minimap_on = "缩略图已开启"
 minimap_off = "缩略图已关闭"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = { git = "{$stage} 作用于工作区 - 请从“{$unstaged_files}”或“{$staged_files}”窗格打开文件，而不是从某个 {$commit}", local = "暂存作用于工作区 - 请从“{$unstaged_files}”或“{$staged_files}”窗格打开文件，而不是从某个提交" }
 not_working_diff_discard = { git = "丢弃作用于工作区 - 请从“{$unstaged_files}”窗格打开文件，而不是从某个 {$commit}", local = "丢弃作用于工作区 - 请从“{$unstaged_files}”窗格打开文件，而不是从某个提交" }
 discard_on_staged = { git = "丢弃会撤回 {$unstaged} 的更改 - 这里是“{$staged_files}”窗格：请先 {$unstage}，再从“{$unstaged_files}”窗格丢弃", local = "丢弃会撤回未暂存的更改 - 这里是“{$staged_files}”窗格：请先取消暂存，再从“{$unstaged_files}”窗格丢弃" }
@@ -8972,6 +8985,15 @@ tip_both = { git = "本地和 {remotes} 上都有，位于同一个 {$commit}。
 tip_differs = { git = "本地和 {remotes} 上都有，但指向不同的 {$commits}：{$push} 会被拒绝。", local = "本地和 {remotes} 上都有，但指向不同的{$commits}：{$push}会被拒绝。" }
 tip_fetch_note = { git = "{$Fetch} 会把只在本地删除、而远程仍有的 {$tag} 找回来。在远程被删除的 {$tag}，只有开启“自动清理 {$tags}”（设置）后才会从本仓库消失。", local = "{$Fetch}会把只在本地删除、而远程仍有的{$tag}找回来。在远程被删除的{$tag}，只有开启“自动清理{$tags}”（设置）后才会从本仓库消失。" }
 fetch_tag = "从 {remote} {$Fetch} {name}"
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "删除 {name}…"
 delete_tag_on_remote = "在 {remote} 上删除 {name}…"
 dlg_title = { git = "删除 {$tag}", local = "删除{$tag}" }

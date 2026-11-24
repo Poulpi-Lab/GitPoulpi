@@ -542,6 +542,12 @@ impl GitBackend for SystemGitBackend {
     ) -> Result<PushOutcome> {
         tags::tag_push(repo, remote, selection).await
     }
+    fn tag_take_remote(&self, repo: &RepoRef, remote: &str, name: &str) -> Result<()> {
+        tags::tag_take_remote(repo, remote, name)
+    }
+    async fn tag_force_push(&self, repo: &RepoRef, remote: &str, name: &str) -> Result<()> {
+        tags::tag_force_push(repo, remote, name).await
+    }
     async fn tag_delete_remote(&self, repo: &RepoRef, remote: &str, name: &str) -> Result<()> {
         tags::tag_delete_remote(repo, remote, name).await
     }

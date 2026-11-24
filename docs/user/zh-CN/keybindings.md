@@ -575,6 +575,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 引用：将所选 Tag Push 到默认远程 |  |
 | 引用：从远程删除所选 Tag… |  |
 | Git：Fetch 所选 Tag |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | 引用：为所选 Tag 添加注释… |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | 引用：切换在图中隐藏 |  |
@@ -1070,6 +1072,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Diff：切换自动换行 | `w` |
 | Diff：选择编码… | `C` |
 | 视图：切换缩略图 | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | 视图：切换 Commit 列 | `Alt+C` |
 | 视图：Commit 列：隐藏 |  |
 | 视图：Commit 列：文件历史 |  |

@@ -611,6 +611,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Refs : Push du tag sélectionné vers le distant par défaut |  |
 | Refs : Supprimer le tag sélectionné de son distant... |  |
 | Git : Fetch le tag sélectionné |  |
+| Git : Version distante du tag sélectionné |  |
+| Git : Push forcé du tag sélectionné |  |
 | Refs : Annoter le tag sélectionné... |  |
 | Refs : Déplacer le tag sélectionné vers le commit sélectionné... |  |
 | Refs : Masquer ou afficher dans le graphe |  |
@@ -1106,6 +1108,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Diff : Basculer le retour à la ligne | `w` |
 | Diff : Choisir l'encodage... | `C` |
 | Affichage : Afficher ou masquer la minimap | `M` |
+| Diff : Basculer la mise en évidence des mots modifiés |  |
 | Affichage : Afficher ou masquer la colonne des commits | `Alt+C` |
 | Affichage : Colonne des commits : Masquer |  |
 | Affichage : Colonne des commits : Historique du fichier |  |

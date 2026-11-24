@@ -61,7 +61,7 @@ impl PreferencesState {
         } else {
             (key, value)
         };
-        match set_in_file(&path, key, value) {
+        match crate::launcher_sync::write_ui_key(&path, key, value, &self.this().identity) {
             Ok(stored) => {
                 self.config = Config::load(&path).unwrap_or_else(|_| self.config.clone());
                 if matches!(
@@ -154,6 +154,9 @@ impl PreferencesState {
                 }
                 if key == "ui.minimap" {
                     install_minimap(self.config.ui.minimap);
+                }
+                if key == "ui.diff_intraline" {
+                    crate::live_settings::install_diff_intraline(self.config.ui.diff_intraline);
                 }
                 if matches!(
                     key,

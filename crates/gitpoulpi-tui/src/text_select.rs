@@ -153,6 +153,22 @@ impl TextSelection {
     }
 }
 
+/// Tells the pointer map that the text `rows` paint inside `inner` is text:
+/// the I-beam over exactly the cells a press there can start a selection in.
+/// The one rule, fed by the same segments the selection and the copy use, so
+/// the pointer and the selectability cannot drift apart. Gutters, markers,
+/// hunk headers and annotation rows carry no segment and keep their shape;
+/// a button registered after answers first.
+pub(crate) fn register_pointer(inner: Rect, rows: &[RowSegs]) {
+    for (i, segs) in rows.iter().enumerate().take(inner.height as usize) {
+        for seg in segs.iter().flatten() {
+            let x = inner.x.saturating_add(seg.x);
+            let width = seg.width.min(inner.right().saturating_sub(x));
+            crate::pointer_map::field(Rect::new(x, inner.y + i as u16, width, 1));
+        }
+    }
+}
+
 /// What one screen row shows of one logical line.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Seg {

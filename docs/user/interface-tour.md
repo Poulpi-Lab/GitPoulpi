@@ -379,6 +379,25 @@ back. A bar of buttons runs along the top:
 | **Map** | A minimap of the whole file beside the scrollbar. |
 | **Encoding** | The encoding the file is read in (**Auto** first). |
 
+#### Changed words in a diff
+
+When a line changes only in part, the words that differ are painted with a
+stronger background of the line's own color (a stronger red on the removed line,
+a stronger green on the added one), and the rest of the line keeps the flat
+tint. Inside a hunk, each run of removed lines is paired with the run of added
+lines that follows it, the first with the first, the second with the second,
+and so on; a pair is marked only when at least 40% of its non-blank characters
+are the same, so a line that was rewritten from scratch stays flat instead of
+turning into one block of emphasis. Words, runs of blanks and single
+punctuation characters are compared, a lone blank between two changed words
+joins them into one mark, and lines longer than 1000 characters are not
+marked. It works in Inline and Split, with word wrap and sideways scrolling,
+and in the review's diff pane. Turn it off in **Settings > Diff & editor >
+Highlight changed words** (`ui.diff_intraline`) or from the command palette
+(**Diff: Toggle Changed Words Highlight**, no key of its own). On a terminal
+limited to 16 colors, or with a theme that has no diff background, the changed
+words are shown in bold and underlined instead.
+
 In a diff of the working tree, each hunk has **Stage hunk** and **Discard
 hunk** buttons. Press `v` to select lines, then stage or discard only those
 lines.

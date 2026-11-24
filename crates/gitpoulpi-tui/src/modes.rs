@@ -298,7 +298,9 @@ impl ConfirmAction {
         use gitpoulpi_i18n::msg::confirm_button as b;
         let word = match self {
             ConfirmAction::Destructive(
-                PendingDestructive::ForcePush { .. } | PendingDestructive::GroupForcePush { .. },
+                PendingDestructive::ForcePush { .. }
+                | PendingDestructive::GroupForcePush { .. }
+                | PendingDestructive::ForcePushTag { .. },
             ) => b::FORCE_PUSH,
             ConfirmAction::Destructive(PendingDestructive::GroupAbort { .. }) => {
                 gitpoulpi_i18n::msg::push_group::STRIP_ABORT
@@ -484,6 +486,12 @@ pub(crate) enum PendingDestructive {
     GroupForcePush {
         request: Box<gitpoulpi_core::domain::RemoteGroupRunRequest>,
     },
+    /// Force-push a tag that differs to `remote` (leased on the last fetch):
+    /// the remote's tag is replaced for everyone.
+    ForcePushTag {
+        remote: String,
+        name: String,
+    },
     /// Abort the merge or rebase of a paused grouped push (the strip's
     /// "Abort group"); pushes already done stay.
     GroupAbort {
@@ -549,6 +557,9 @@ impl PendingDestructive {
                 force: true,
             },
             PendingDestructive::GroupForcePush { request } => Action::RemoteGroupRun(request),
+            PendingDestructive::ForcePushTag { remote, name } => {
+                Action::TagForcePush { remote, name }
+            }
             PendingDestructive::GroupAbort { run_id } => Action::RemoteGroupAbort {
                 expect_run_id: Some(run_id),
             },

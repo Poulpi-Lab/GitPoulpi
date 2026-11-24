@@ -71,6 +71,12 @@ pub(super) fn label_for(request: &Request) -> String {
         OperationKind::TagMergeBranch => {
             format!("Merge {} into tag {}", arg("branch"), arg("name"))
         }
+        OperationKind::TagTakeRemote => {
+            format!("Use tag {} from {}", arg("name"), arg("remote"))
+        }
+        OperationKind::TagForcePush => {
+            format!("Force push tag {} to {}", arg("name"), arg("remote"))
+        }
         OperationKind::FastForward => format!(
             "Fast-forward {} to {}",
             arg("branch"),

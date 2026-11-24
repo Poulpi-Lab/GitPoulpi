@@ -740,6 +740,18 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     )
     .requires(crate::build_features::Feature::Lfs),
     entry(
+        msg::palette::GIT_USE_REMOTE_VERSION_OF_SELECTED_TAG,
+        "",
+        PaletteCommand::TakeRemoteSelectedTag,
+    )
+    .requires(crate::build_features::Feature::Lfs),
+    entry(
+        msg::palette::GIT_FORCE_PUSH_SELECTED_TAG,
+        "",
+        PaletteCommand::ForcePushSelectedTag,
+    )
+    .requires(crate::build_features::Feature::Lfs),
+    entry(
         msg::palette::REFS_ANNOTATE_SELECTED_TAG,
         "",
         PaletteCommand::AnnotateSelectedTag,
@@ -3317,6 +3329,11 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         msg::palette::VIEW_TOGGLE_MINIMAP,
         "M",
         PaletteCommand::ToggleMinimap,
+    ),
+    entry(
+        msg::palette::DIFF_TOGGLE_INTRALINE,
+        "",
+        PaletteCommand::ToggleDiffIntraline,
     ),
     entry(
         msg::palette::VIEW_TOGGLE_COMMIT_COLUMN,

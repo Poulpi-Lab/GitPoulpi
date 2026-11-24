@@ -516,6 +516,7 @@ mod tests {
                 full_file: full,
                 lfs_raw: false,
                 lfs_local: None,
+                intraline: false,
             },
             Some(&annotator),
         )
@@ -660,6 +661,7 @@ mod tests {
                 full_file: None,
                 lfs_raw: false,
                 lfs_local: None,
+                intraline: false,
             },
             Some(&annotator),
         );

@@ -49,6 +49,7 @@ fn an_lfs_file_diff_is_a_card_with_sizes_not_pointer_text_and_has_no_hunk_button
             full_file: None,
             lfs_raw: true,
             lfs_local: None,
+            intraline: false,
         },
     );
     assert!(plain(&raw.lines).join("\n").contains("oid sha256"));

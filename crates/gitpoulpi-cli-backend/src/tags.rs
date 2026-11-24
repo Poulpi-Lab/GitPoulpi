@@ -197,6 +197,51 @@ pub fn tag_merge_branch(
     Ok(merged)
 }
 
+/// What the tag mirror holds for `name` on `remote`: the object the remote
+/// had at the last fetch or push (the tag object of an annotated tag).
+fn mirror_value(repo: &RepoRef, remote: &str, name: &str) -> Result<Oid> {
+    gitpoulpi_core::guard::check_remote_arg("remote", remote)?;
+    let mirror = remote_tag_mirror_ref(remote, name);
+    resolve_ref(repo, &mirror)
+        .ok_or_else(|| Error::Backend(format!("`{remote}` is not known to have a tag `{name}`")))
+}
+
+fn resolve_ref(repo: &RepoRef, full: &str) -> Option<Oid> {
+    run(&repo.root, &["rev-parse", "--verify", "--quiet", full])
+        .ok()
+        .and_then(|out| Oid::from_hex(out.trim()))
+}
+
+/// Moves the local tag `name` to the object the mirror holds for `remote`:
+/// the remote's version, with no network. The object is taken as is, so an
+/// annotated tag becomes that very tag object. The local tag must exist
+/// (this resolves a tag that *differs*; a remote-only tag is `tag_fetch`).
+pub fn tag_take_remote(repo: &RepoRef, remote: &str, name: &str) -> Result<()> {
+    let theirs = mirror_value(repo, remote, name)?;
+    let tag_ref = format!("refs/tags/{name}");
+    if resolve_ref(repo, &tag_ref).is_none() {
+        return Err(Error::Backend(format!("no tag named `{name}`")));
+    }
+    run(&repo.root, &["update-ref", &tag_ref, &theirs.to_hex()])?;
+    Ok(())
+}
+
+/// Force-pushes the local tag `name` to `remote`, leased on the mirror's
+/// value (see [`crate::remote_ref::remote_ref_update`]): a remote that moved
+/// since the last fetch is refused (`StaleLease`) and nothing is overwritten.
+pub async fn tag_force_push(repo: &RepoRef, remote: &str, name: &str) -> Result<()> {
+    let theirs = mirror_value(repo, remote, name)?;
+    let tag_ref = format!("refs/tags/{name}");
+    let mine = resolve_ref(repo, &tag_ref)
+        .ok_or_else(|| Error::Backend(format!("no tag named `{name}`")))?;
+    if mine == theirs {
+        return Err(Error::Backend(format!(
+            "`{name}` is already the same on `{remote}`"
+        )));
+    }
+    crate::remote_ref::remote_ref_update(repo, remote, &tag_ref, Some(mine), Some(theirs)).await
+}
+
 /// Sends `selection`'s tags to `remote` in a single `git push`, then
 /// records them in the mirror.
 ///
@@ -368,11 +413,15 @@ fn resolve(repo: &RepoRef, selection: &TagSelection) -> Result<Vec<String>> {
 /// a fetch, so both spellings answer the same question, and storing the
 /// peeled one means there is exactly one thing to compare.
 fn record_pushed(repo: &RepoRef, remote: &str, names: &[String]) -> Result<()> {
+    // The ref's own object, not the commit it peels to: for an annotated tag
+    // the mirror must hold the tag object the remote now has, or a lease or a
+    // "take the remote's version" built on it would name the wrong object.
     let by_name: Vec<(String, Oid)> = refs(repo)?
         .into_iter()
         .filter(|r| !r.is_remote_only_tag())
-        .filter_map(|r| r.tag_name().map(|n| (n.to_string(), r.target)))
-        .filter(|(n, _)| names.contains(n))
+        .filter_map(|r| r.tag_name().map(str::to_string))
+        .filter(|n| names.contains(n))
+        .filter_map(|n| resolve_ref(repo, &format!("refs/tags/{n}")).map(|oid| (n, oid)))
         .collect();
     let mut script = String::new();
     for (name, target) in by_name {

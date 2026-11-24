@@ -165,6 +165,10 @@ Measured over a 10 s idle window with the Log open, then a held Down x300 at 100
 
 **Idle is 0 bytes.** `quiet_backend::QuietBackend` (the TUI's ratatui backend) drops an empty frame diff and cursor commands that restate the known state, so a poll tick that changes nothing writes nothing (before: a 24-byte `ESC[39m ESC[49m ESC[59m ESC[0m ESC[?25l` about every 2 s). The Kitty synchronized-update bracket is held back until a frame writes something. "Settled" in the measurement means no byte for 6 s: a status message lives at least 3 s and its removal is one legitimate repaint, which would otherwise land in the window.
 
+## Diff changed-word emphasis (`diff_view/intraline.rs`)
+
+Computed while the diff rows are built (`DiffContent` caches them), never per frame, on the UI thread, so every step is bounded: a line over 1000 chars gets none; one removed/added pair fills at most a 250,000-cell LCS table (past it the whole differing middle is marked); one hunk fills at most 2,000,000 cells in all; a file with more than 20,000 changed lines gets no emphasis at all. Shared head and tail tokens are trimmed before the table, so the common one-word edit costs a few tokens. Measured by `diff_view::tests::intraline::a_large_hunk_is_emphasised_within_budget` (3,000 removed + 3,000 added lines of about 40 chars, the whole render, debug build): about 190 ms, so about 0.06 ms a pair.
+
 ## Merge conflict editor budgets (`perf --tui`, `xtask/src/perf_merge.rs`, slice SP)
 
 `perf --tui` also opens the merge editor, in the real release TUI at 200x60, on two generated fixtures (`target/perf/merge-10000-50`, `target/perf/merge-100000-3`; built by `merge_fixture::build_big`, the same generator as `xtask merge-fixture --kind big --lines N --conflicts K`): a 10,000-line Rust file with about 50 conflicts and a 100,000-line one with 3. `--merge-only` runs just these, `--no-merge` skips them. Held keys run at 100 Hz (typing at 50 Hz); the figure is UI-thread CPU per key, so it is the frame cost, whatever the machine's key rate.

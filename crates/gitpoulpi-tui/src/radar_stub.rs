@@ -64,7 +64,7 @@ impl RadarSlot {
         false
     }
 
-    pub(crate) fn pointer_text_at(&self) -> bool {
+    pub(crate) fn pointer_text_at(&self, _col: u16, _row: u16) -> bool {
         false
     }
 

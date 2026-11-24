@@ -611,6 +611,8 @@ Tangenterna är standardvärdena.
 | Refs: Pusha vald tag till standard-remote |  |
 | Refs: Ta bort vald tag från dess remote... |  |
 | Git: Fetch vald tag |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Annotera vald tag... |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Växla dölj i grafen |  |
@@ -1106,6 +1108,7 @@ Tangenterna är standardvärdena.
 | Diff: Växla radbrytning | `w` |
 | Diff: Välj teckenkodning... | `C` |
 | Vy: Växla minikarta | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Vy: Växla commit-kolumnen | `Alt+C` |
 | Vy: Commit-kolumnen: dölj |  |
 | Vy: Commit-kolumnen: filens historik |  |

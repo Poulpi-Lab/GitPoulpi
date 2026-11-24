@@ -82,6 +82,8 @@ const GOLDEN: &[(OperationKind, &str, &str)] = &[
     (K::TagPush, "NS", "REFS|LOG"),
     (K::TagDeleteRemote, "N", "REFS|LOG"),
     (K::TagFetch, "N", "REFS|LOG"),
+    (K::TagTakeRemote, "J", "REFS|LOG"),
+    (K::TagForcePush, "N", "REFS|LOG"),
     (K::Merge, "CJPH", "ALL"),
     (K::Rebase, "CJPH", "ALL"),
     (K::RebaseInteractive, "CJPH", "ALL"),

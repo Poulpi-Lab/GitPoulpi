@@ -9,6 +9,7 @@
 //! actually reads that key, so an ignored key can be told from a
 //! misspelled one.
 
+use gitpoulpi_config::installation::{self, is_look_key};
 use gitpoulpi_config::{ConfigPaths, Overrides, Settings};
 use serde_json::json;
 
@@ -36,8 +37,21 @@ pub fn execute(action: ConfigAction, overrides: &Overrides) -> Result<Emitted, S
 
         ConfigAction::Get { key } => {
             let settings = Settings::resolve(Some(&paths), overrides).map_err(|e| e.to_string())?;
-            let value = settings.config().get(&key).map_err(|e| e.to_string())?;
-            let source = settings.source_of(&key);
+            let mut value = settings.config().get(&key).map_err(|e| e.to_string())?;
+            let mut source = settings.source_of(&key);
+            // The colours are this installation's own: `get` answers what it
+            // shows, not what another installation stored in `ui.*`.
+            if let Some(short) = key.strip_prefix("ui.").filter(|_| is_look_key(&key)) {
+                let cur = installation::current();
+                let own = installation::effective(settings.config(), &cur.identity);
+                if let Some(v) = own.look.get(short) {
+                    value = json!(v);
+                    let own_entry = cur.config.installation.settings.get(&cur.identity.id);
+                    if own_entry.is_some_and(|e| e.look.contains_key(short)) {
+                        source = gitpoulpi_config::Source::File;
+                    }
+                }
+            }
             let implemented = Settings::key_is_implemented(&key);
             let mut human = format!("{key} = {value}  (source: {})", source.as_str());
             if !implemented {
@@ -64,8 +78,17 @@ pub fn execute(action: ConfigAction, overrides: &Overrides) -> Result<Emitted, S
             // back a `Settings` would bake whatever `GITPOULPI_*` variable
             // or `--backend` flag happened to be in force into config.toml,
             // so a one-off override would silently become permanent.
-            let stored =
-                gitpoulpi_config::set_in_file(&file, &key, &value).map_err(|e| e.to_string())?;
+            // The colour keys are one installation's own: its entry, or
+            // `ui.*` only when it is the primary.
+            let stored = if let Some(short) = key.strip_prefix("ui.").filter(|_| is_look_key(&key))
+            {
+                let cur = installation::current();
+                installation::set_look_in_file(&file, &cur.identity, short, &value)
+                    .map(serde_json::Value::String)
+            } else {
+                gitpoulpi_config::set_in_file(&file, &key, &value)
+            }
+            .map_err(|e| e.to_string())?;
             let mut human = format!("{key} = {stored}  ->  {}", file.display());
             if let Some(note) = not_built_note(&key) {
                 human.push_str(&format!("\nnote: {note}"));

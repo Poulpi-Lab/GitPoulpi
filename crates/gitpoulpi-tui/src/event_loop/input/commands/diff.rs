@@ -119,6 +119,11 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         PaletteCommand::ToggleMinimap => {
             *cx.last_message = Some(toggle_minimap(cx.diff_config_path));
         }
+        PaletteCommand::ToggleDiffIntraline => {
+            *cx.last_message = Some(crate::diff_actions::toggle_diff_intraline(
+                cx.diff_config_path,
+            ));
+        }
         PaletteCommand::ImageZoomIn
         | PaletteCommand::ImageZoomOut
         | PaletteCommand::ImageFit

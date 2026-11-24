@@ -115,6 +115,8 @@ const WITHOUT_WORDS: &[K] = &[
     K::WorktreeRemove,
     K::TagPush,
     K::TagDeleteRemote,
+    K::TagTakeRemote,
+    K::TagForcePush,
     K::TagFetch,
     K::AutoStashStartOver,
     K::Undo,

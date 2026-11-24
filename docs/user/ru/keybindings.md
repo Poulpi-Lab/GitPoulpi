@@ -615,6 +615,8 @@ stage_file = "z"
 | Refs: push tag на remote по умолчанию |  |
 | Refs: удалить выбранный tag с его remote... |  |
 | Git: Fetch выбранный tag |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: аннотировать выбранный tag... |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: скрыть/показать в графе |  |
@@ -1110,6 +1112,7 @@ stage_file = "z"
 | Diff: перенос строк | `w` |
 | Diff: выбрать кодировку... | `C` |
 | Вид: показать или скрыть миникарту | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Вид: показать или скрыть колонку commit'ов | `Alt+C` |
 | Вид: колонка commit'ов: скрыть |  |
 | Вид: колонка commit'ов: история файла |  |

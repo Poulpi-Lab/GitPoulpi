@@ -613,6 +613,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Refs: Geselecteerde tag pushen naar standaardremote |  |
 | Refs: Geselecteerde tag van zijn remote verwijderen... |  |
 | Git: Geselecteerde tag fetchen |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Geselecteerde tag annoteren... |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Verbergen in grafiek omschakelen |  |
@@ -1108,6 +1110,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Diff: Regelafbreking omschakelen | `w` |
 | Diff: Codering kiezen... | `C` |
 | Weergave: Minimap omschakelen | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Weergave: commit-kolom tonen of verbergen | `Alt+C` |
 | Weergave: commit-kolom: verbergen |  |
 | Weergave: commit-kolom: bestandsgeschiedenis |  |

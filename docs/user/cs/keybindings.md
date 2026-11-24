@@ -609,6 +609,8 @@ Klávesy jsou výchozí.
 | Refs: Push vybraného tagu do výchozího remote |  |
 | Refs: Smazat vybraný tag z jeho remote... |  |
 | Git: Fetch vybraného tagu |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Anotovat vybraný tag... |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Přepnout skrytí v grafu |  |
@@ -1104,6 +1106,7 @@ Klávesy jsou výchozí.
 | Diff: Přepnout zalamování řádků | `w` |
 | Diff: Vybrat kódování... | `C` |
 | Zobrazení: Přepnout minimapu | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Zobrazení: Přepnout sloupec commitů | `Alt+C` |
 | Zobrazení: Sloupec commitů: skrýt |  |
 | Zobrazení: Sloupec commitů: historie souboru |  |

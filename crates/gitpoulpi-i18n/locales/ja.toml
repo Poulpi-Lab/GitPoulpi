@@ -516,6 +516,8 @@ merge_side_by_side_min_width = { git = "{$merge}エディター：左右表示�
 merge_side_by_side_min_width_help = { git = "{$merge}競合エディターは、領域の幅がこの桁数以上のとき A と B を左右に並べて表示します（長い行は Shift+ホイールまたは Shift+矢印キーで横スクロール）。これより狭い場合は、タブで片側ずつ表示します。既定は 100、最小値は 40、0 は常に左右表示です。エディターを開いている間は Refs と Status のパネルが隠れるため、通常はウィンドウ全体を使えます。", local = "マージ競合エディターは、領域の幅がこの桁数以上のとき A と B を左右に並べて表示します（長い行は Shift+ホイールまたは Shift+矢印キーで横スクロール）。これより狭い場合は、タブで片側ずつ表示します。既定は 100、最小値は 40、0 は常に左右表示です。エディターを開いている間は Refs と Status のパネルが隠れるため、通常はウィンドウ全体を使えます。" }
 diff_word_wrap = "折り返し"
 diff_word_wrap_help = { git = "{$diff}ビューで長い行を省略記号で切らずに折り返します。内蔵エディターと Blame ビューは横スクロールで、折り返しません。{$diff}ビュー自身の折り返し切り替えでもあります。", local = "差分ビューで長い行を省略記号で切らずに折り返します。内蔵エディターと Blame ビューは横スクロールで、折り返しません。差分ビュー自身の折り返し切り替えでもあります。" }
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "テーマ"
@@ -1729,6 +1731,12 @@ column_repository = "リポジトリ"
 column_author = "作成者"
 column_title = "タイトル"
 column_age = "経過"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "{name}列（{width} セル）: [ 狭く、] 広く、0 リセット、Tab 次へ、Esc 完了"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -3415,6 +3423,7 @@ files_clear_selection = "ファイル: 選択を解除"
 files_toggle_selection = "ファイル: 現在の行の選択を切り替える"
 diff_toggle_word_wrap = "{$Diff}: 折り返しを切り替え"
 view_toggle_minimap = "表示: ミニマップを切り替え"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "エディター: 選択に追従を切り替え"
 diff_toggle_whitespace_only_changes = "{$Diff}: 空白のみの変更を切り替え"
 ai_generate_commit_message = { git = "AI: {$Commit}メッセージを生成", local = "AI: {$Commit}メッセージを生成" }
@@ -3755,6 +3764,8 @@ rewrite_strip_exec = "書き換え: 実行ビットを削除..."
 rewrite_file_encoding = "書き換え: ファイルのエンコーディングを変換..."
 # s22:end
 git_fetch_selected_tag = "Git: 選択中の{$tag}を{$fetch}"
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "書き換え: メッセージのエンコーディングを修正..."
 # s24:end
@@ -4950,6 +4961,8 @@ staging_lines = { one = { git = "ハンク {hunk} の {n} 行を{$stage}中{spil
 unstaging_lines = { one = { git = "ハンク {hunk} の {n} 行を{$unstage}中{spill}...", local = "ハンク {hunk} の {n} 行をステージ解除中{spill}..." }, other = { git = "ハンク {hunk} の {n} 行を{$unstage}中{spill}...", local = "ハンク {hunk} の {n} 行をステージ解除中{spill}..." } }
 minimap_on = "ミニマップをオンにしました"
 minimap_off = "ミニマップをオフにしました"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = { git = "{$stage}は作業ツリーに対して行われます - {$commit}ではなく、「{$unstaged_files}」ペインまたは「{$staged_files}」ペインからファイルを開いてください", local = "ステージは作業ツリーに対して行われます - {$commit}ではなく、「{$unstaged_files}」ペインまたは「{$staged_files}」ペインからファイルを開いてください" }
 not_working_diff_discard = { git = "破棄は作業ツリーに対して行われます - {$commit}ではなく、「{$unstaged_files}」ペインからファイルを開いてください", local = "破棄は作業ツリーに対して行われます - {$commit}ではなく、「{$unstaged_files}」ペインからファイルを開いてください" }
 discard_on_staged = { git = "破棄は{$unstaged}の変更を元に戻します - これは「{$staged_files}」ペインです：先に{$unstage}してから、「{$unstaged_files}」ペインで破棄してください", local = "破棄は未ステージの変更を元に戻します - これは「{$staged_files}」ペインです：先にステージ解除してから、「{$unstaged_files}」ペインで破棄してください" }
@@ -8972,6 +8985,15 @@ tip_both = "ここと {remotes} に、同じ{$commit}を指して存在します
 tip_differs = "ここと {remotes} にありますが、指す{$commits}が異なります。{$push}すると拒否されます。"
 tip_fetch_note = "{$fetch}すると、ここだけで削除した{$tag}も、リモートに残っていれば戻ってきます。リモートで削除された{$tag}がこのリポジトリから消えるのは、設定の「{$tags}の自動プルーン」を使うときだけです。"
 fetch_tag = "{remote} から {name} を{$fetch}"
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "{name} を削除..."
 delete_tag_on_remote = "{remote} 上の {name} を削除..."
 dlg_title = "{$tag}を削除"

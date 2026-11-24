@@ -100,6 +100,7 @@ mod copy_select;
 mod cursor;
 mod h_scroll;
 mod i18n;
+mod intraline;
 mod layout;
 mod lfs;
 mod paint;

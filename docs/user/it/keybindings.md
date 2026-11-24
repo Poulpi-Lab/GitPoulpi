@@ -613,6 +613,8 @@ applicano. I tasti sono quelli predefiniti.
 | Refs: Push del tag selezionato verso il remoto predefinito |  |
 | Refs: Elimina il tag selezionato dal suo remoto... |  |
 | Git: Fetch del tag selezionato |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Annota il tag selezionato... |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Mostra o nascondi nel grafo |  |
@@ -1108,6 +1110,7 @@ applicano. I tasti sono quelli predefiniti.
 | Diff: Attiva o disattiva l'a capo automatico | `w` |
 | Diff: Scegli la codifica... | `C` |
 | Vista: Mostra o nascondi la minimappa | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Vista: Mostra o nascondi la colonna dei commit | `Alt+C` |
 | Vista: Colonna dei commit: nascondi |  |
 | Vista: Colonna dei commit: cronologia del file |  |

@@ -151,7 +151,8 @@ pub(super) fn after_state(
         | OperationKind::TagDelete
         | OperationKind::TagAnnotate
         | OperationKind::TagMove
-        | OperationKind::TagMergeBranch => {
+        | OperationKind::TagMergeBranch
+        | OperationKind::TagTakeRemote => {
             let (name, old) = before.refs.first().cloned()?;
             let new = match request.command {
                 OperationKind::TagDelete => None,

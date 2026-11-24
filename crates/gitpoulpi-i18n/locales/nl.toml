@@ -516,6 +516,8 @@ merge_side_by_side_min_width = { git = "Merge-editor: naast elkaar vanaf (kolomm
 merge_side_by_side_min_width_help = { git = "De merge-conflicteditor toont A en B naast elkaar als zijn gebied minstens zo veel kolommen breed is (lange regels scrollen zijwaarts met Shift+wiel of Shift+pijlen); smaller toont hij één kant tegelijk achter tabbladen. Standaard 100; 40 is de laagste waarde, 0 betekent altijd naast elkaar. De editor verbergt de panelen Refs en Status zolang hij open is, dus hij heeft meestal het hele venster.", local = "De samenvoegconflicteditor toont A en B naast elkaar als zijn gebied minstens zo veel kolommen breed is (lange regels scrollen zijwaarts met Shift+wiel of Shift+pijlen); smaller toont hij één kant tegelijk achter tabbladen. Standaard 100; 40 is de laagste waarde, 0 betekent altijd naast elkaar. De editor verbergt de panelen Refs en Status zolang hij open is, dus hij heeft meestal het hele venster." }
 diff_word_wrap = "Regelafbreking"
 diff_word_wrap_help = { git = "Breekt lange regels in de diff-weergaven af in plaats van ze met een beletselteken af te kappen. De ingebouwde editor en de blame-weergave scrollen zijwaarts en breken niet af. Ook de eigen afbrekingsschakelaar van de diff-weergave.", local = "Breekt lange regels in de verschilweergaven af in plaats van ze met een beletselteken af te kappen. De ingebouwde editor en de blame-weergave scrollen zijwaarts en breken niet af. Ook de eigen afbrekingsschakelaar van de verschilweergave." }
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Thema"
@@ -1729,6 +1731,12 @@ column_repository = "Repository"
 column_author = "Auteur"
 column_title = "Titel"
 column_age = "Leeftijd"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "Kolom {name} ({width} cellen): [ smaller, ] breder, 0 herstellen, Tab volgende, Esc klaar"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -3424,6 +3432,7 @@ files_clear_selection = "Bestanden: selectie wissen"
 files_toggle_selection = "Bestanden: selectie van de huidige rij omschakelen"
 diff_toggle_word_wrap = { git = "Diff: Regelafbreking omschakelen", local = "Verschil: Regelafbreking omschakelen" }
 view_toggle_minimap = "Weergave: Minimap omschakelen"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "Editor: Selectie volgen in- of uitschakelen"
 diff_toggle_whitespace_only_changes = { git = "Diff: Alleen-witruimtewijzigingen omschakelen", local = "Verschil: Alleen-witruimtewijzigingen omschakelen" }
 ai_generate_commit_message = { git = "AI: Commit-bericht genereren", local = "AI: Commitbericht genereren" }
@@ -3755,6 +3764,8 @@ rewrite_strip_exec = "Herschrijven: Het uitvoerbaarheidsbit verwijderen..."
 rewrite_file_encoding = "Herschrijven: Tekencodering van bestanden omzetten..."
 # s22:end
 git_fetch_selected_tag = { git = "Git: Geselecteerde {$tag} fetchen", local = "Git: Geselecteerd {$tag} ophalen" }
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "Herschrijven: Tekencodering van berichten herstellen..."
 # s24:end
@@ -4950,6 +4961,8 @@ staging_lines = { one = "{n} regel van hunk {hunk}{spill} stagen...", other = "{
 unstaging_lines = { one = "{n} regel van hunk {hunk}{spill} unstagen...", other = "{n} regels van hunk {hunk}{spill} unstagen..." }
 minimap_on = "minimap aan"
 minimap_off = "minimap uit"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = "stagen werkt op de werkmap - open een bestand uit de panelen {$unstaged_files} of {$staged_files}, niet uit een commit"
 not_working_diff_discard = "verwerpen werkt op de werkmap - open een bestand uit het paneel {$unstaged_files}, niet uit een commit"
 discard_on_staged = "verwerpen draait unstaged wijzigingen terug - dit is het paneel {$staged_files}: unstage eerst en verwerp dan vanuit het paneel {$unstaged_files}"
@@ -8970,6 +8983,15 @@ tip_both = "Hier en op {remotes}, op dezelfde {$commit}."
 tip_differs = "Hier en op {remotes}, maar op verschillende {$commits}: een {$push} zou worden geweigerd."
 tip_fetch_note = { git = "Een {$fetch_noun} brengt een {$tag} terug die alleen hier is verwijderd terwijl een remote hem nog heeft. Een op de remote verwijderde {$tag} verdwijnt hier alleen met {$Tags} automatisch opschonen (Instellingen).", local = "Opnieuw ophalen brengt een {$tag} terug dat alleen hier is verwijderd terwijl een remote het nog heeft. Een op de remote verwijderd {$tag} verdwijnt hier alleen met {$Tags} automatisch opschonen (Instellingen)." }
 fetch_tag = { git = "{name} fetchen van {remote}", local = "{name} ophalen van {remote}" }
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "{name} verwijderen..."
 delete_tag_on_remote = "{name} verwijderen op {remote}..."
 dlg_title = "{$Tag} verwijderen"

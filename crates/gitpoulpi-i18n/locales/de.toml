@@ -517,6 +517,8 @@ merge_side_by_side_min_width = { git = "Merge-Editor: nebeneinander ab (Spalten)
 merge_side_by_side_min_width_help = { git = "Der Merge-Konflikteditor zeigt A und B nebeneinander, wenn sein Bereich mindestens so viele Spalten breit ist (lange Zeilen scrollen seitwärts mit Shift+Mausrad oder Shift+Pfeiltasten); schmaler zeigt er jeweils eine Seite hinter Tabs. Standard 100; 40 ist der niedrigste Wert, 0 heißt immer nebeneinander. Der Editor blendet die Panels Refs und Status aus, solange er offen ist, hat also meist das ganze Fenster.", local = "Der Zusammenführungs-Konflikteditor zeigt A und B nebeneinander, wenn sein Bereich mindestens so viele Spalten breit ist (lange Zeilen scrollen seitwärts mit Shift+Mausrad oder Shift+Pfeiltasten); schmaler zeigt er jeweils eine Seite hinter Tabs. Standard 100; 40 ist der niedrigste Wert, 0 heißt immer nebeneinander. Der Editor blendet die Panels Refs und Status aus, solange er offen ist, hat also meist das ganze Fenster." }
 diff_word_wrap = "Zeilenumbruch"
 diff_word_wrap_help = { git = "Bricht lange Zeilen in den Diff-Ansichten um, statt sie mit einer Ellipse abzuschneiden. Der eingebaute Editor und die Blame-Ansicht scrollen seitwärts und brechen nicht um. Auch der eigene Umbruch-Schalter der Diff-Ansicht.", local = "Bricht lange Zeilen in den Unterschiedsansichten um, statt sie mit einer Ellipse abzuschneiden. Der eingebaute Editor und die Blame-Ansicht scrollen seitwärts und brechen nicht um. Auch der eigene Umbruch-Schalter der Unterschiedsansicht." }
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Design"
@@ -1728,6 +1730,12 @@ column_repository = "Repository"
 column_author = "Autor"
 column_title = "Titel"
 column_age = "Alter"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "Spalte {name} ({width} Zellen): [ schmaler, ] breiter, 0 zurücksetzen, Tab nächste, Esc fertig"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -3426,6 +3434,7 @@ files_clear_selection = "Dateien: Auswahl aufheben"
 files_toggle_selection = "Dateien: Auswahl der aktuellen Zeile umschalten"
 diff_toggle_word_wrap = { git = "Diff: Zeilenumbruch umschalten", local = "Unterschiede: Zeilenumbruch umschalten" }
 view_toggle_minimap = "Ansicht: Minimap umschalten"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "Editor: Auswahl folgen umschalten"
 diff_toggle_whitespace_only_changes = { git = "Diff: Reine Leerraum-Änderungen umschalten", local = "Unterschiede: Reine Leerraum-Änderungen umschalten" }
 ai_generate_commit_message = "KI: Commit-Nachricht erzeugen"
@@ -3756,6 +3765,8 @@ rewrite_strip_exec = "Umschreiben: Ausführbar-Bit entfernen..."
 rewrite_file_encoding = "Umschreiben: Dateikodierung umwandeln..."
 # s22:end
 git_fetch_selected_tag = "Git: {$Fetch} für den ausgewählten {$Tag}"
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "Umschreiben: Kodierung der Nachrichten korrigieren..."
 # s24:end
@@ -4955,6 +4966,8 @@ staging_lines = { one = { git = "{n} Zeile von Hunk {hunk}{spill} wird gestaged.
 unstaging_lines = { one = { git = "{n} Zeile von Hunk {hunk}{spill} wird unstaged...", local = "Bereitstellung von {n} Zeile von Hunk {hunk}{spill} wird aufgehoben..." }, other = { git = "{n} Zeilen von Hunk {hunk}{spill} werden unstaged...", local = "Bereitstellung von {n} Zeilen von Hunk {hunk}{spill} wird aufgehoben..." } }
 minimap_on = "Minimap an"
 minimap_off = "Minimap aus"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = { git = "das Stagen wirkt auf das Arbeitsverzeichnis - eine Datei aus den Bereichen {$unstaged_files} oder {$staged_files} öffnen, nicht aus einem Commit", local = "das Bereitstellen wirkt auf das Arbeitsverzeichnis - eine Datei aus den Bereichen {$unstaged_files} oder {$staged_files} öffnen, nicht aus einem Commit" }
 not_working_diff_discard = { git = "das Verwerfen wirkt auf das Arbeitsverzeichnis - eine Datei aus dem Bereich {$unstaged_files} öffnen, nicht aus einem Commit", local = "das Verwerfen wirkt auf das Arbeitsverzeichnis - eine Datei aus dem Bereich {$unstaged_files} öffnen, nicht aus einem Commit" }
 discard_on_staged = { git = "Verwerfen macht unstaged Änderungen rückgängig - dies ist der Bereich {$staged_files}: zuerst unstagen, dann aus dem Bereich {$unstaged_files} verwerfen", local = "Verwerfen macht nicht bereitgestellte Änderungen rückgängig - dies ist der Bereich {$staged_files}: zuerst die Bereitstellung aufheben, dann aus dem Bereich {$unstaged_files} verwerfen" }
@@ -8973,6 +8986,15 @@ tip_both = "Hier und auf {remotes}, am selben {$commit}."
 tip_differs = "Hier und auf {remotes}, aber an verschiedenen {$commits}: Ein {$Push} würde abgelehnt."
 tip_fetch_note = "Ein {$fetch_noun} bringt einen {$tag} zurück, der nur hier gelöscht wurde, während ein Remote ihn noch hat. Ein auf dem Remote gelöschter {$tag} verschwindet aus diesem Repository nur mit Auto-Prune {$tags} (Einstellungen)."
 fetch_tag = "{$Fetch} {name} von {remote}"
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "{name} löschen..."
 delete_tag_on_remote = "{name} auf {remote} löschen..."
 dlg_title = "{$Tag} löschen"

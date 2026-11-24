@@ -237,6 +237,10 @@ pub(in crate::event_loop) fn draw_overlay_menus(
     // drawn over the panes, and `find_hit_target` returns the
     // first match.
     let menu_rows = open_menu.render(frame, hover(hovered_target).menu_row());
+    // Over the panes, so over any text field painted beneath: the arrow.
+    for (rect, _) in &menu_rows {
+        crate::pointer_map::plain(*rect);
+    }
     frame_hits.splice(0..0, menu_rows);
 
     // Suppressed while any context menu is open: this tooltip follows the

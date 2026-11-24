@@ -603,6 +603,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Refs: push вибраного tag'а на типовий remote |  |
 | Refs: видалити вибраний tag з його remote... |  |
 | Git: Fetch вибраного tag'а |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: анотувати вибраний tag... |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: сховати/показати в графі |  |
@@ -1098,6 +1100,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Diff: перенесення слів | `w` |
 | Diff: вибрати кодування... | `C` |
 | Вигляд: показати чи сховати мінікарту | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Вигляд: показати чи сховати стовпець commit'ів | `Alt+C` |
 | Вигляд: стовпець commit'ів: сховати |  |
 | Вигляд: стовпець commit'ів: історія файлу |  |

@@ -609,6 +609,8 @@ Tuşlar varsayılanlardır.
 | Refs: Seçili Tag'i Varsayılan Uzak Depoya Push Et |  |
 | Refs: Seçili Tag'i Uzak Deposundan Sil... |  |
 | Git: Seçili Tag için Fetch |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Seçili Tag'e Not Ekle... |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Grafikte Gizle/Göster |  |
@@ -1104,6 +1106,7 @@ Tuşlar varsayılanlardır.
 | Diff: Sözcük Kaydırmayı Aç/Kapat | `w` |
 | Diff: Kodlamayı Seç... | `C` |
 | Görünüm: Minimap'i Aç/Kapat | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Görünüm: Commit sütununu aç/kapat | `Alt+C` |
 | Görünüm: Commit sütunu: gizle |  |
 | Görünüm: Commit sütunu: dosya geçmişi |  |

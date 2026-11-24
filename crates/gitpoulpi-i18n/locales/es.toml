@@ -516,6 +516,8 @@ merge_side_by_side_min_width = { git = "Editor de merge: lado a lado desde (colu
 merge_side_by_side_min_width_help = { git = "El editor de conflictos de merge muestra A y B lado a lado cuando su área tiene al menos este número de columnas (las líneas largas se desplazan en horizontal con Shift+rueda o Shift+flechas); más estrecho, muestra un lado a la vez en pestañas. 100 por defecto; 40 es el valor mínimo, 0 significa siempre lado a lado. El editor oculta los paneles Refs y Estado mientras está abierto, así que suele tener toda la ventana.", local = "El editor de conflictos de fusión muestra A y B lado a lado cuando su área tiene al menos este número de columnas (las líneas largas se desplazan en horizontal con Shift+rueda o Shift+flechas); más estrecho, muestra un lado a la vez en pestañas. 100 por defecto; 40 es el valor mínimo, 0 significa siempre lado a lado. El editor oculta los paneles Refs y Estado mientras está abierto, así que suele tener toda la ventana." }
 diff_word_wrap = "Ajuste de línea"
 diff_word_wrap_help = { git = "Ajusta las líneas largas en las vistas de diff en vez de cortarlas con puntos suspensivos. El editor integrado y la vista de blame se desplazan en horizontal y no ajustan. Es también el interruptor de ajuste de la propia vista de diff.", local = "Ajusta las líneas largas en las vistas de diferencias en vez de cortarlas con puntos suspensivos. El editor integrado y la vista de blame se desplazan en horizontal y no ajustan. Es también el interruptor de ajuste de la propia vista de diferencias." }
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Tema"
@@ -1728,6 +1730,12 @@ column_repository = "Repositorio"
 column_author = "Autor"
 column_title = "Título"
 column_age = "Antigüedad"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "Columna {name} ({width} celdas): [ estrecha, ] ensancha, 0 restablece, Tab siguiente, Esc termina"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -3423,6 +3431,7 @@ files_clear_selection = "Archivos: Borrar la selección"
 files_toggle_selection = "Archivos: Alternar la selección de la fila actual"
 diff_toggle_word_wrap = { git = "Diff: Alternar el ajuste de línea", local = "Diferencias: Alternar el ajuste de línea" }
 view_toggle_minimap = "Ver: Alternar el minimapa"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "Editor: Alternar seguir la selección"
 diff_toggle_whitespace_only_changes = { git = "Diff: Alternar los cambios solo de espacios en blanco", local = "Diferencias: Alternar los cambios solo de espacios en blanco" }
 ai_generate_commit_message = "IA: Generar mensaje de {$commit}"
@@ -3754,6 +3763,8 @@ rewrite_strip_exec = "Reescritura: Quitar el bit de ejecución..."
 rewrite_file_encoding = "Reescritura: Convertir la codificación de archivos..."
 # s22:end
 git_fetch_selected_tag = { git = "Git: {$Fetch} del {$Tag} seleccionado", local = "Git: {$Fetch} la {$tag} seleccionada" }
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "Reescritura: Corregir la codificación de mensajes..."
 # s24:end
@@ -4949,6 +4960,8 @@ staging_lines = { one = { git = "haciendo stage de {n} línea del hunk {hunk}{sp
 unstaging_lines = { one = { git = "haciendo unstage de {n} línea del hunk {hunk}{spill}...", local = "quitando de la preparación {n} línea del hunk {hunk}{spill}..." }, other = { git = "haciendo unstage de {n} líneas del hunk {hunk}{spill}...", local = "quitando de la preparación {n} líneas del hunk {hunk}{spill}..." } }
 minimap_on = "minimapa activado"
 minimap_off = "minimapa desactivado"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = { git = "stage actúa sobre el árbol de trabajo - abre un archivo de los paneles {$unstaged_files} o {$staged_files}, no de un commit", local = "preparar actúa sobre el árbol de trabajo - abre un archivo de los paneles {$unstaged_files} o {$staged_files}, no de una confirmación" }
 not_working_diff_discard = { git = "descartar actúa sobre el árbol de trabajo - abre un archivo del panel {$unstaged_files}, no de un commit", local = "descartar actúa sobre el árbol de trabajo - abre un archivo del panel {$unstaged_files}, no de una confirmación" }
 discard_on_staged = { git = "descartar revierte cambios unstaged - este es el panel {$staged_files}: unstage de antes y luego descarta desde el panel {$unstaged_files}", local = "descartar revierte cambios sin preparar - este es el panel {$staged_files}: quita antes de la preparación y luego descarta desde el panel {$unstaged_files}" }
@@ -8969,6 +8982,15 @@ tip_both = { git = "Aquí y en {remotes}, en el mismo {$commit}.", local = "Aqu�
 tip_differs = { git = "Aquí y en {remotes}, pero en {$commits} distintos: un {$push_noun} sería rechazado.", local = "Aquí y en {remotes}, pero en {$commits} distintas: un {$push_noun} sería rechazado." }
 tip_fetch_note = { git = "Un {$fetch_noun} recupera un {$tag} eliminado solo aquí mientras un remoto aún lo tiene. Un {$tag} eliminado en el remoto solo sale de este repositorio con «Auto-prune de {$tags}» (Ajustes).", local = "Una {$fetch_noun} recupera una {$tag} eliminada solo aquí mientras un remoto aún la tiene. Una {$tag} eliminada en el remoto solo sale de este repositorio con «Poda automática de {$tags}» (Ajustes)." }
 fetch_tag = "{$Fetch} {name} desde {remote}"
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "Eliminar {name}..."
 delete_tag_on_remote = "Eliminar {name} en {remote}..."
 dlg_title = "Eliminar {$tag}"

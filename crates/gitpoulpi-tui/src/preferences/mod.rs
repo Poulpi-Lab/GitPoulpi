@@ -45,12 +45,12 @@ use std::path::{Path, PathBuf};
 use crate::wide_edge::Clear;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEventKind};
 use gitpoulpi_config::{
-    set_in_file, set_list_in_file, AvatarFallback, AvatarPlacement, AvatarSources, ColorDepth,
-    ComposerFiles, Config, ConfigPaths, DefaultBackend, DialogGeometry, DiffLayout,
-    GraphLaneBackground, GraphRenderer, GraphRowTintStrength, ImageProtocol, KittyKeyboard,
-    Profile, PullButtonMode, PushBehavior, StatusbarPosition, TabDirFollow, TabsPosition,
-    TextCursor, ToolbarAlign, ToolbarPosition, UiLanguage, MAX_MOUSE_SCROLL_LINES,
-    MIN_COMMITS_PER_LAZY_PAGE, MIN_INITIAL_COMMITS_IN_GRAPH, MIN_MOUSE_SCROLL_LINES,
+    set_list_in_file, AvatarFallback, AvatarPlacement, AvatarSources, ColorDepth, ComposerFiles,
+    Config, ConfigPaths, DefaultBackend, DialogGeometry, DiffLayout, GraphLaneBackground,
+    GraphRenderer, GraphRowTintStrength, ImageProtocol, KittyKeyboard, Profile, PullButtonMode,
+    PushBehavior, StatusbarPosition, TabDirFollow, TabsPosition, TextCursor, ToolbarAlign,
+    ToolbarPosition, UiLanguage, MAX_MOUSE_SCROLL_LINES, MIN_COMMITS_PER_LAZY_PAGE,
+    MIN_INITIAL_COMMITS_IN_GRAPH, MIN_MOUSE_SCROLL_LINES,
 };
 use gitpoulpi_core::domain::MergeFastForward;
 use gitpoulpi_secrets::{CredentialHelperTokens, TokenStore};
@@ -76,6 +76,8 @@ mod fields;
 mod fields_ui;
 pub(crate) use fields_ui::{language_choices, language_options};
 pub(crate) use launcher_alias::ToolsButton;
+#[cfg(test)]
+pub(crate) use launcher_install::fake_current;
 pub(crate) use launcher_install::InstallButton;
 pub(crate) use repo_pages::SparseRequest;
 mod images_page;

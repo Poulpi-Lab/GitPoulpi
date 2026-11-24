@@ -240,6 +240,8 @@ const TOOLS: &[(&str, &str, bool)] = &[
     ("tag_delete", "destructive", true),
     ("tag_fetch", "write", true),
     ("tag_delete_remote", "destructive", true),
+    ("tag_take_remote", "write", false),
+    ("tag_force_push", "destructive", true),
     ("tag_list", "read", false),
     ("tag_push", "write", true),
     ("licenses", "read", false),
@@ -377,6 +379,7 @@ fn the_audited_fixes_hold() {
     for name in [
         "tag_push",
         "tag_delete_remote",
+        "tag_force_push",
         "tag_fetch",
         "branch_delete_remote",
         "lfs_fetch",

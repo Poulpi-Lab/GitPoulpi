@@ -607,6 +607,8 @@ As teclas são as predefinidas.
 | Refs: push da tag selecionada para o remoto predefinido |  |
 | Refs: eliminar a tag selecionada do seu remoto... |  |
 | Git: Fetch da Tag selecionada |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: anotar a tag selecionada... |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: alternar ocultar no grafo |  |
@@ -1102,6 +1104,7 @@ As teclas são as predefinidas.
 | Diff: alternar quebra de linha | `w` |
 | Diff: escolher codificação... | `C` |
 | Ver: alternar o minimapa | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Ver: alternar a coluna de commits | `Alt+C` |
 | Ver: coluna de commits: ocultar |  |
 | Ver: coluna de commits: histórico do ficheiro |  |

@@ -698,6 +698,30 @@ pub enum TagAction {
         #[arg(short, long)]
         message: Option<String>,
     },
+    /// Use the remote's version of a tag that `differs` (here and on a
+    /// remote at another commit): the local tag moves to what the remote
+    /// has, as known from the last fetch or push (no network). An annotated
+    /// tag becomes that same tag object. Undoable.
+    TakeRemote {
+        name: String,
+        /// Omitted: the one remote the tag differs on.
+        #[arg(long)]
+        remote: Option<String>,
+    },
+    /// Force-push the local tag to a remote that has it at another commit
+    /// (a tag that `differs`), leased on the value the last fetch saw: a
+    /// remote that moved since is refused ("fetch first") and nothing is
+    /// overwritten. Outward-facing: without `--yes` nothing changes and the
+    /// exit code is 3. Undoable (the old value is pushed back, with a lease).
+    ForcePush {
+        name: String,
+        /// Omitted: the one remote the tag differs on.
+        #[arg(long)]
+        remote: Option<String>,
+        /// Go ahead; without it nothing changes and the exit code is 3.
+        #[arg(long)]
+        yes: bool,
+    },
     /// Send tags to a remote. With no names, sends every tag no remote
     /// is known to have - one push, not one per tag.
     Push {

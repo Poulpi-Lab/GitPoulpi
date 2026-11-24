@@ -752,6 +752,23 @@ pub trait GitBackend: Send + Sync {
     /// not rewritten.
     async fn tag_fetch(&self, repo: &RepoRef, remote: &str, name: &str) -> Result<()>;
 
+    /// Moves the local tag `name` to what `remote` has under that name, as
+    /// the tag mirror knows it (the last fetch or push): no network. The
+    /// mirror's object is taken as is, so an annotated tag becomes that very
+    /// tag object, never a lightweight tag at its commit. The "Use the
+    /// remote's version" of a tag that differs. An error when no mirror ref
+    /// names that tag on that remote, or when there is no local tag to move.
+    fn tag_take_remote(&self, repo: &RepoRef, remote: &str, name: &str) -> Result<()>;
+
+    /// Force-pushes the local tag `name` to `remote`, leased on the value the
+    /// tag mirror says the remote has (`--force-with-lease=<ref>:<mirror>`):
+    /// a remote that moved since the last fetch is refused, typed
+    /// ([`crate::Error::PushRejected`] with `StaleLease`), and nothing is
+    /// overwritten. The mirror follows on success. An error when the mirror
+    /// has no such tag on that remote (use `tag_push` for a tag the remote
+    /// lacks) or there is no local tag. Network.
+    async fn tag_force_push(&self, repo: &RepoRef, remote: &str, name: &str) -> Result<()>;
+
     /// Deletes branch `name` from `remote` (`push --delete`), leaving
     /// any local branch of that name alone; the remote-tracking ref goes
     /// with it. The remote twin of [`GitBackend::branch_delete`], which

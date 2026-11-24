@@ -39,6 +39,7 @@ fn is_open_world(name: &str) -> bool {
             | "clone"
             | "tag_push"
             | "tag_delete_remote"
+            | "tag_force_push"
             | "tag_delete"
             | "tag_fetch"
             | "branch_delete_remote"

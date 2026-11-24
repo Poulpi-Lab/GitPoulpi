@@ -516,6 +516,8 @@ merge_side_by_side_min_width = { git = "Éditeur de merge : côte à côte dès
 merge_side_by_side_min_width_help = { git = "L'éditeur de conflits de merge montre A et B côte à côte quand sa zone fait au moins ce nombre de colonnes (les longues lignes défilent latéralement avec Shift+molette ou Shift+flèches) ; plus étroit, il montre un côté à la fois derrière des onglets. 100 par défaut ; 40 est le minimum, 0 signifie toujours côte à côte. L'éditeur masque les panneaux Refs et Status tant qu'il est ouvert, il a donc le plus souvent toute la fenêtre.", local = "L'éditeur de conflits de fusion montre A et B côte à côte quand sa zone fait au moins ce nombre de colonnes (les longues lignes défilent latéralement avec Shift+molette ou Shift+flèches) ; plus étroit, il montre un côté à la fois derrière des onglets. 100 par défaut ; 40 est le minimum, 0 signifie toujours côte à côte. L'éditeur masque les panneaux Refs et Status tant qu'il est ouvert, il a donc le plus souvent toute la fenêtre." }
 diff_word_wrap = "Retour à la ligne"
 diff_word_wrap_help = "Coupe les longues lignes des vues de {$diff} au lieu de les tronquer avec une ellipse. L'éditeur intégré et la vue blame défilent latéralement sans retour à la ligne. C'est aussi le commutateur propre à la vue de {$diff}."
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Thème"
@@ -1732,6 +1734,12 @@ column_repository = "Dépôt"
 column_author = "Auteur"
 column_title = "Titre"
 column_age = "Âge"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "Colonne {name} ({width} cellules) : [ réduit, ] élargit, 0 réinitialise, Tab suivante, Échap termine"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -3427,6 +3435,7 @@ files_clear_selection = "Fichiers : Effacer la sélection"
 files_toggle_selection = "Fichiers : Basculer la sélection de la ligne courante"
 diff_toggle_word_wrap = "{$Diff} : Basculer le retour à la ligne"
 view_toggle_minimap = "Affichage : Afficher ou masquer la minimap"
+diff_toggle_intraline = "{$Diff} : Basculer la mise en évidence des mots modifiés"
 editor_toggle_follow_selection = "Éditeur : Basculer le suivi de la sélection"
 diff_toggle_whitespace_only_changes = "{$Diff} : Basculer les modifications d'espaces seuls"
 ai_generate_commit_message = { git = "IA : Générer le message de commit", local = "IA : Générer le message de validation" }
@@ -3758,6 +3767,8 @@ rewrite_strip_exec = "Réécriture : retirer le bit exécutable..."
 rewrite_file_encoding = "Réécriture : convertir l'encodage des fichiers..."
 # s22:end
 git_fetch_selected_tag = { git = "Git : {$Fetch} le tag sélectionné", local = "Git : {$Fetch} l'étiquette sélectionnée" }
+git_use_remote_version_of_selected_tag = { git = "Git : Version distante du tag sélectionné", local = "Git : Version distante de l'étiquette sélectionnée" }
+git_force_push_selected_tag = { git = "Git : Push forcé du tag sélectionné", local = "Git : Envoi forcé de l'étiquette sélectionnée" }
 # s24:begin
 rewrite_fix_message_encoding = "Réécriture : corriger l'encodage des messages..."
 # s24:end
@@ -4963,6 +4974,8 @@ staging_lines = { one = { git = "stage de {n} ligne du hunk {hunk}{spill}...", l
 unstaging_lines = { one = { git = "unstage de {n} ligne du hunk {hunk}{spill}...", local = "désindexation de {n} ligne du hunk {hunk}{spill}..." }, other = { git = "unstage de {n} lignes du hunk {hunk}{spill}...", local = "désindexation de {n} lignes du hunk {hunk}{spill}..." } }
 minimap_on = "minimap activée"
 minimap_off = "minimap désactivée"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = { git = "le stage agit sur l'arbre de travail - ouvrez un fichier depuis les volets {$unstaged_files} ou {$staged_files}, pas depuis un commit", local = "l'indexation agit sur l'arbre de travail - ouvrez un fichier depuis les volets {$unstaged_files} ou {$staged_files}, pas depuis une validation" }
 not_working_diff_discard = { git = "l'abandon agit sur l'arbre de travail - ouvrez un fichier depuis le volet {$unstaged_files}, pas depuis un commit", local = "l'abandon agit sur l'arbre de travail - ouvrez un fichier depuis le volet {$unstaged_files}, pas depuis une validation" }
 discard_on_staged = { git = "l'abandon annule des modifications unstaged - c'est le volet {$staged_files} : unstagez d'abord, puis abandonnez depuis le volet {$unstaged_files}", local = "l'abandon annule des modifications non indexées - c'est le volet {$staged_files} : désindexez d'abord, puis abandonnez depuis le volet {$unstaged_files}" }
@@ -8988,6 +9001,15 @@ tip_both = { git = "Ici et sur {remotes}, sur le même {$commit}.", local = "Ici
 tip_differs = { git = "Ici et sur {remotes}, mais à des commits différents : un push serait refusé.", local = "Ici et sur {remotes}, mais à des validations différentes : un envoi serait refusé." }
 tip_fetch_note = { git = "Un fetch rapporte un tag supprimé seulement ici tant qu'un distant l'a encore. Un tag supprimé sur le distant ne quitte ce dépôt qu'avec « Élagage automatique des tags » (Paramètres).", local = "Une récupération rapporte une étiquette supprimée seulement ici tant qu'un distant l'a encore. Une étiquette supprimée sur le distant ne quitte ce dépôt qu'avec « Élagage automatique des étiquettes » (Paramètres)." }
 fetch_tag = { git = "{$Fetch} {name} depuis {remote}", local = "Récupérer {name} depuis {remote}" }
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "Supprimer {name}..."
 delete_tag_on_remote = "Supprimer {name} sur {remote}..."
 dlg_title = { git = "Supprimer un tag", local = "Supprimer une étiquette" }
@@ -10124,7 +10146,7 @@ merge_run = { git = "Merge", local = "Fusionner" }
 # context: button
 merge_remove_run = { git = "Merge puis retirer", local = "Fusionner puis retirer" }
 merge_pick = { git = "Merge de {branch} dans :", local = "Fusionner {branch} dans :" }
-merge_checked_out = { git = "{target} est checked out dans {path} : le merge s'y fait.", local = "{target} est extraite dans {path} : la fusion s'y fait." }
+merge_checked_out = { git = "{target} est checkout dans {path} : le merge s'y fait.", local = "{target} est extraite dans {path} : la fusion s'y fait." }
 merge_not_checked_out = "{target} n'est extraite dans aucun worktree : extrayez-la d'abord."
 merge_gone = "la branche {branch} n'existe plus"
 merge_none = { git = "Il n'y a pas d'autre branch locale où merger.", local = "Il n'y a pas d'autre branche locale où fusionner." }

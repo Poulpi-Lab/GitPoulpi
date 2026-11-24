@@ -24,6 +24,9 @@ pub(super) fn init(
     open_trace(&format!("window opening: {}", repo.root.display()), open_t0);
     let settings = gitpoulpi_config::Settings::resolve_ambient()
         .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err.to_string()))?;
+    // This installation's own colours (theme, graph colours), not the shared
+    // `ui.*` another installation may have written.
+    let own = crate::launcher_sync::own_config(settings.config());
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen)?;
@@ -35,7 +38,7 @@ pub(super) fn init(
     crate::startup_probe::run();
     // `ui.theme = system`: the terminal's own background decides Light or
     // Dark (OSC 11, then COLORFGBG, then Dark).
-    if settings.config().ui.theme_slug() == gitpoulpi_config::THEME_SYSTEM {
+    if own.ui.theme_slug() == gitpoulpi_config::THEME_SYSTEM {
         crate::theme::set_system_is_light(crate::terminal_bg::detect_is_light().unwrap_or(false));
     }
     crate::color_depth::install(settings.config().ui.color_depth);
@@ -68,11 +71,9 @@ pub(super) fn init(
     // status line (and again by Settings > Keybindings).
     let startup_keymap_message =
         keymap::issues_message(&keymap::install_from_config(settings.config()));
-    let ui_lane_background: graph::LaneBackground =
-        settings.config().ui.graph_lane_background.into();
-    let ui_graph_theme =
-        crate::graph::LaneTheme::from_slug(settings.config().ui.graph_color_slug());
-    let ui_tint_strength = settings.config().ui.graph_row_tint_strength;
+    let ui_lane_background: graph::LaneBackground = own.ui.graph_lane_background.into();
+    let ui_graph_theme = crate::graph::LaneTheme::from_slug(own.ui.graph_color_slug());
+    let ui_tint_strength = own.ui.graph_row_tint_strength;
     // `ui.graph_show_stashes`: a row per stash in the Log, on by default.
     // Re-read when the Preferences screen closes (`apply_live_settings`).
     let graph_show_stashes = settings.config().ui.graph_show_stashes;
@@ -144,6 +145,7 @@ pub(super) fn init(
     crate::build_features::install_radar_closed(session_store::radar_closed(session));
     crate::build_features::install_workspaces_open(session_store::workspaces_open(session));
     live_settings::install_minimap(settings.config().ui.minimap);
+    live_settings::install_diff_intraline(settings.config().ui.diff_intraline);
     live_settings::install_column_resize(settings.config().ui.column_resize);
     live_settings::install_log_columns_layout(settings.config().ui.log_columns_layout);
     live_settings::install_chrome_layout(&settings.config().ui);
@@ -173,7 +175,7 @@ pub(super) fn init(
         &settings.config().ui.input_color,
         &settings.config().ui.input_color_custom,
     );
-    crate::install_theme_from_config(settings.config().ui.theme_slug());
+    crate::install_theme_from_config(own.ui.theme_slug());
     lfs_ui::install_default(settings.config().git.lfs_enabled);
     live_settings::install_delete_orig_after_merge(
         settings.config().general.delete_orig_files_after_merge,

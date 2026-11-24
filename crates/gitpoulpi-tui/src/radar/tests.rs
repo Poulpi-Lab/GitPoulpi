@@ -426,7 +426,10 @@ fn the_row_menu_offers_the_actions_of_its_kind() {
     ] {
         assert!(text.contains(want), "{want}: {text}");
     }
-    assert!(!text.contains("Start work"), "a PR does not start work");
+    assert!(
+        !text.contains("Start work on issue"),
+        "a PR does not start work"
+    );
     // Esc closes the menu, not the Radar.
     assert_eq!(ui.on_key(key(KeyCode::Esc)), Outcome::None);
     assert!(ui.menu.is_none());

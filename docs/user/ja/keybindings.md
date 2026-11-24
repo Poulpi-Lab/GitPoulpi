@@ -575,6 +575,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Refs: 選択中のTagを既定のリモートへPush |  |
 | Refs: 選択中のTagをリモートから削除... |  |
 | Git: 選択中のtagをfetch |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: 選択中のTagに注釈を付ける... |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: グラフでの非表示を切り替え |  |
@@ -1070,6 +1072,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Diff: 折り返しを切り替え | `w` |
 | Diff: 文字コードを選択... | `C` |
 | 表示: ミニマップを切り替え | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | 表示: Commit列を切り替え | `Alt+C` |
 | 表示: Commit列: 非表示 |  |
 | 表示: Commit列: ファイル履歴 |  |

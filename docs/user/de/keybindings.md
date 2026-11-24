@@ -604,6 +604,8 @@ die Standardtasten.
 | Refs: Ausgewählten Tag an das Standard-Remote pushen |  |
 | Refs: Ausgewählten Tag von seinem Remote löschen... |  |
 | Git: Fetch für den ausgewählten Tag |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Ausgewählten Tag annotieren... |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Ausblenden im Graph umschalten |  |
@@ -1099,6 +1101,7 @@ die Standardtasten.
 | Diff: Zeilenumbruch umschalten | `w` |
 | Diff: Kodierung wählen... | `C` |
 | Ansicht: Minimap umschalten | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Ansicht: Commit-Spalte umschalten | `Alt+C` |
 | Ansicht: Commit-Spalte: ausblenden |  |
 | Ansicht: Commit-Spalte: Dateiverlauf |  |

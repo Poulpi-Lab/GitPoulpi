@@ -235,6 +235,14 @@ fn every_action() -> Vec<Action> {
             remote: s("origin"),
             name: s("v1"),
         },
+        Action::TagTakeRemote {
+            remote: s("origin"),
+            name: s("v1"),
+        },
+        Action::TagForcePush {
+            remote: s("origin"),
+            name: s("v1"),
+        },
         Action::CheckoutThen {
             branch: s("topic"),
             then: Box::new(Action::StageAll),

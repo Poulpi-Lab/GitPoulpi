@@ -517,6 +517,8 @@ merge_side_by_side_min_width = { git = "Редактор merge: поруч ві�
 merge_side_by_side_min_width_help = { git = "Редактор конфліктів merge показує A і B поруч, коли його область має щонайменше стільки стовпців (довгі рядки прокручуються вбік Shift+колесо або Shift+стрілки); вужче - одна сторона за раз на вкладках. Типово 100; мінімум 40, 0 - завжди поруч. Редактор ховає панелі Refs і Status, поки відкритий, тож зазвичай має все вікно.", local = "Редактор конфліктів злиття показує A і B поруч, коли його область має щонайменше стільки стовпців (довгі рядки прокручуються вбік Shift+колесо або Shift+стрілки); вужче - одна сторона за раз на вкладках. Типово 100; мінімум 40, 0 - завжди поруч. Редактор ховає панелі Refs і Status, поки відкритий, тож зазвичай має все вікно." }
 diff_word_wrap = "Перенесення слів"
 diff_word_wrap_help = { git = "Переносить довгі рядки в поданнях diff замість обрізання з трьома крапками. Вбудований редактор і blame прокручуються вбік і не переносять. Це також власний перемикач переносу подання diff.", local = "Переносить довгі рядки в поданнях різниці замість обрізання з трьома крапками. Вбудований редактор і blame прокручуються вбік і не переносять. Це також власний перемикач переносу подання різниці." }
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Тема"
@@ -1728,6 +1730,12 @@ column_repository = "Репозиторій"
 column_author = "Автор"
 column_title = "Заголовок"
 column_age = "Вік"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "Стовпець {name} ({width} клітинок): [ вужче, ] ширше, 0 скинути, Tab наступний, Esc готово"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -3423,6 +3431,7 @@ files_clear_selection = "Файли: зняти виділення"
 files_toggle_selection = "Файли: перемкнути виділення поточного рядка"
 diff_toggle_word_wrap = { git = "Diff: перенесення слів", local = "Різниця: перенесення слів" }
 view_toggle_minimap = "Вигляд: показати чи сховати мінікарту"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "Редактор: перемкнути стеження за вибором"
 diff_toggle_whitespace_only_changes = { git = "Diff: зміни лише пробілів", local = "Різниця: зміни лише пробілів" }
 ai_generate_commit_message = { git = "ШІ: згенерувати повідомлення commit'у", local = "ШІ: згенерувати повідомлення коміту" }
@@ -3754,6 +3763,8 @@ rewrite_strip_exec = "Переписування: прибрати біт вик
 rewrite_file_encoding = "Переписування: перетворити кодування файлів..."
 # s22:end
 git_fetch_selected_tag = { git = "Git: Fetch вибраного tag'а", local = "Git: завантажити вибраний тег" }
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "Переписування: виправити кодування повідомлень..."
 # s24:end
@@ -4953,6 +4964,8 @@ staging_lines = { one = { git = "staging {n} рядок hunk {hunk}{spill}...", 
 unstaging_lines = { one = { git = "unstaging {n} рядок hunk {hunk}{spill}...", local = "прибирання {n} рядка hunk {hunk} з індексу{spill}..." }, few = { git = "unstaging {n} рядки hunk {hunk}{spill}...", local = "прибирання {n} рядків hunk {hunk} з індексу{spill}..." }, many = { git = "unstaging {n} рядків hunk {hunk}{spill}...", local = "прибирання {n} рядків hunk {hunk} з індексу{spill}..." }, other = { git = "unstaging {n} рядків hunk {hunk}{spill}...", local = "прибирання {n} рядків hunk {hunk} з індексу{spill}..." } }
 minimap_on = "мінікарту ввімкнено"
 minimap_off = "мінікарту вимкнено"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = { git = "додавання в індекс діє на робоче дерево - відкрийте файл із панелей «{$unstaged_files}» чи «{$staged_files}», а не з commit'у", local = "додавання в індекс діє на робоче дерево - відкрийте файл із панелей «{$unstaged_files}» чи «{$staged_files}», а не з коміту" }
 not_working_diff_discard = { git = "відкидання діє на робоче дерево - відкрийте файл із панелі «{$unstaged_files}», а не з commit'у", local = "відкидання діє на робоче дерево - відкрийте файл із панелі «{$unstaged_files}», а не з коміту" }
 discard_on_staged = "відкидання скасовує зміни без індексу - це панель «{$staged_files}»: спершу приберіть з індексу, потім відкиньте з панелі «{$unstaged_files}»"
@@ -8974,6 +8987,15 @@ tip_both = { git = "Тут і в {remotes}, на тому самому commit'і
 tip_differs = { git = "Тут і в {remotes}, але на різних commit'ах: {$push_noun} було б відхилено.", local = "Тут і в {remotes}, але на різних комітах: {$push_noun} було б відхилено." }
 tip_fetch_note = "Після {$fetch_noun} {$tag}, видалений лише тут, повертається, поки його ще має remote. {$Tag}, видалений на remote, зникає з цього репозиторію лише за ввімкненого «Автоочищення {$tags}» (Налаштування)."
 fetch_tag = "{$Fetch} {name} з {remote}"
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "Видалити {name}..."
 delete_tag_on_remote = "Видалити {name} на {remote}..."
 dlg_title = "Видалити {$tag}"

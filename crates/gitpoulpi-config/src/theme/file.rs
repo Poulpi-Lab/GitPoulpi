@@ -167,6 +167,19 @@ pub fn parse_user_themes(sources: &[(String, String)]) -> ThemeSet {
         for link in chain.iter().rev() {
             link.apply(&mut spec);
         }
+        // A diff background the file changed without its emphasis follows
+        // that background (see `diff_emphasis`), not the base preset's.
+        let sets = |key: &str| {
+            chain
+                .iter()
+                .any(|r| r.colors.iter().any(|(g, k, _)| g == "diff" && k == key))
+        };
+        if sets("add_bg") && !sets("add_emph_bg") {
+            spec.diff.add_emph_bg = super::spec::diff_emphasis(spec.diff.add_bg, spec.diff.add_fg);
+        }
+        if sets("del_bg") && !sets("del_emph_bg") {
+            spec.diff.del_emph_bg = super::spec::diff_emphasis(spec.diff.del_bg, spec.diff.del_fg);
+        }
         // `ui.border_focused` nobody in the chain set follows the accent the
         // file chose, not the base preset's.
         let sets_focus = chain.iter().any(|r| {

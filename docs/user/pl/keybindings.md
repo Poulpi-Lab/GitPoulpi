@@ -608,6 +608,8 @@ zastosowania. Klawisze są domyślne.
 | Refs: Push zaznaczonego tagu do domyślnego zdalnego |  |
 | Refs: Usuń zaznaczony tag z jego zdalnego... |  |
 | Git: Fetch zaznaczony tag |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Opisz zaznaczony tag... |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Przełącz ukrycie w grafie |  |
@@ -1103,6 +1105,7 @@ zastosowania. Klawisze są domyślne.
 | Diff: Przełącz zawijanie linii | `w` |
 | Diff: Wybierz kodowanie... | `C` |
 | Widok: Przełącz minimapę | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Widok: Przełącz kolumnę commitów | `Alt+C` |
 | Widok: Kolumna commitów: Ukryj |  |
 | Widok: Kolumna commitów: Historia pliku |  |

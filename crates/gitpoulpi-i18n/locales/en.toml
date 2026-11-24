@@ -727,6 +727,8 @@ merge_side_by_side_min_width = "Merge editor: side by side from (columns)"
 merge_side_by_side_min_width_help = "The merge conflict editor shows A and B side by side when its area is at least this many columns wide (long lines scroll sideways with Shift+wheel or Shift+arrows); narrower, it shows one side at a time behind tabs. 100 by default; 40 is the lowest value, 0 means always side by side. The editor hides the Refs and Status panels while it is open, so it usually has the whole window."
 diff_word_wrap = "Word wrap"
 diff_word_wrap_help = "Wraps long lines in the diff views instead of cutting them with an ellipsis. The built-in editor and the blame view scroll sideways and do not wrap. Also the diff view's own wrap toggle."
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every diff view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Theme"
@@ -2306,6 +2308,12 @@ column_repository = "Repository"
 column_author = "Author"
 column_title = "Title"
 column_age = "Age"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "{name} column ({width} cells): [ narrower, ] wider, 0 reset, Tab next, Esc done"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -4340,6 +4348,7 @@ files_clear_selection = "Files: Clear Selection"
 files_toggle_selection = "Files: Toggle Selection of the Current Row"
 diff_toggle_word_wrap = "Diff: Toggle Word Wrap"
 view_toggle_minimap = "View: Toggle Minimap"
+diff_toggle_intraline = "Diff: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "Editor: Toggle Follow Selection"
 diff_toggle_whitespace_only_changes = "Diff: Toggle Whitespace-Only Changes"
 ai_generate_commit_message = "AI: Generate Commit Message"
@@ -4709,6 +4718,8 @@ rewrite_strip_exec = "Rewrite: Remove the Executable Bit..."
 rewrite_file_encoding = "Rewrite: Convert File Encoding..."
 # s22:end
 git_fetch_selected_tag = "Git: {$Fetch} Selected {$Tag}"
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "Rewrite: Fix Message Encoding..."
 # s24:end
@@ -6026,6 +6037,8 @@ staging_lines = { one = "staging {n} line of hunk {hunk}{spill}...", other = "st
 unstaging_lines = { one = "unstaging {n} line of hunk {hunk}{spill}...", other = "unstaging {n} lines of hunk {hunk}{spill}..." }
 minimap_on = "minimap on"
 minimap_off = "minimap off"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = "staging acts on the working tree - open a file from the {$unstaged_files} or {$staged_files} pane, not from a commit"
 not_working_diff_discard = "discarding acts on the working tree - open a file from the {$unstaged_files} pane, not from a commit"
 discard_on_staged = "discarding reverts unstaged changes - this is the {$staged_files} pane: unstage first, then discard from the {$unstaged_files} pane"
@@ -11152,6 +11165,15 @@ tip_both = "Here and on {remotes}, at the same {$commit}."
 tip_differs = "Here and on {remotes}, but at different {$commits}: a {$push} would be refused."
 tip_fetch_note = "A {$fetch} brings back a {$tag} deleted only here while a remote still has it. A {$tag} deleted on the remote leaves this repository only with Auto-prune {$tags} (Settings)."
 fetch_tag = "{$Fetch} {name} from {remote}"
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "Delete {name}..."
 delete_tag_on_remote = "Delete {name} on {remote}..."
 dlg_title = "Delete {$tag}"

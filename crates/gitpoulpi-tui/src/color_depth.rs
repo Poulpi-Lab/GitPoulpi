@@ -102,6 +102,13 @@ pub(crate) fn apply_depth(buf: &mut Buffer, depth: Depth) {
     }
 }
 
+/// Whether the terminal draws `a` and `b` as two different colors at the
+/// active depth: two close truecolor tints can collapse into one entry of the
+/// 256 or 16 color palette, and then only a modifier can tell them apart.
+pub(crate) fn distinct_at(a: Color, b: Color, depth: Depth) -> bool {
+    reduce(a, depth) != reduce(b, depth)
+}
+
 fn reduce(color: Color, depth: Depth) -> Color {
     match (color, depth) {
         (Color::Rgb(r, g, b), Depth::X256) => Color::Indexed(nearest_256(r, g, b)),

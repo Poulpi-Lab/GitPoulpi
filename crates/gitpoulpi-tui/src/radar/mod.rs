@@ -21,6 +21,7 @@
 mod account;
 mod account_fs;
 mod account_ui;
+mod actions;
 mod columns;
 mod input;
 mod item_host;
@@ -96,6 +97,8 @@ pub(crate) enum Hit {
     Header(Cell),
     /// A cell whose text is cut: hovering it shows the full text.
     Cut(usize, Cell),
+    /// A button of the Actions column of an item row.
+    Action(usize, actions::Slot),
 }
 
 /// The cells of an item row that can be cut (tooltip) or sized (divider).
@@ -231,8 +234,8 @@ impl RadarSlot {
     }
 
     /// The I-beam over the filter box.
-    pub(crate) fn pointer_text_at(&self) -> bool {
-        self.peek().is_some_and(RadarUi::pointer_text_at)
+    pub(crate) fn pointer_text_at(&self, col: u16, row: u16) -> bool {
+        self.peek().is_some_and(|ui| ui.pointer_text_at(col, row))
     }
 
     /// The pointing hand over a control, a row or a popup row.

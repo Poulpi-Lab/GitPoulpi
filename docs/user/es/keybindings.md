@@ -614,6 +614,8 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Refs: Push del tag seleccionado al remoto por defecto |  |
 | Refs: Eliminar el tag seleccionado de su remoto... |  |
 | Git: Fetch del Tag seleccionado |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Anotar el tag seleccionado... |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Alternar ocultar en el grafo |  |
@@ -1109,6 +1111,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Diff: Alternar el ajuste de línea | `w` |
 | Diff: Elegir codificación... | `C` |
 | Ver: Alternar el minimapa | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | Ver: Alternar la columna de commits | `Alt+C` |
 | Ver: Columna de commits: ocultar |  |
 | Ver: Columna de commits: historial del archivo |  |

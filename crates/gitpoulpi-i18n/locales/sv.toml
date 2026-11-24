@@ -518,6 +518,8 @@ merge_side_by_side_min_width = { git = "Merge-redigerare: sida vid sida från (k
 merge_side_by_side_min_width_help = { git = "Merge-redigeraren visar A och B sida vid sida när dess yta är minst så många kolumner bred (långa rader rullas i sidled med Shift+hjul eller Shift+piltangenter); smalare visas en sida i taget bakom flikar. 100 som standard; 40 är lägsta värde, 0 betyder alltid sida vid sida. Redigeraren döljer panelerna Refs och Status medan den är öppen, så den har oftast hela fönstret.", local = "Konfliktredigeraren visar A och B sida vid sida när dess yta är minst så många kolumner bred (långa rader rullas i sidled med Shift+hjul eller Shift+piltangenter); smalare visas en sida i taget bakom flikar. 100 som standard; 40 är lägsta värde, 0 betyder alltid sida vid sida. Redigeraren döljer panelerna Refs och Status medan den är öppen, så den har oftast hela fönstret." }
 diff_word_wrap = "Radbrytning"
 diff_word_wrap_help = "Bryter långa rader i diff-vyerna i stället för att kapa dem med ellips. Den inbyggda redigeraren och blame-vyn rullar i sidled och bryter inte. Även diff-vyns egen brytningsknapp."
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Tema"
@@ -1729,6 +1731,12 @@ column_repository = "Repository"
 column_author = "Författare"
 column_title = "Titel"
 column_age = "Ålder"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "Kolumnen {name} ({width} celler): [ smalare, ] bredare, 0 återställ, Tab nästa, Esc klart"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -3426,6 +3434,7 @@ files_clear_selection = "Filer: Rensa markeringen"
 files_toggle_selection = "Filer: Växla markeringen av aktuell rad"
 diff_toggle_word_wrap = "Diff: Växla radbrytning"
 view_toggle_minimap = "Vy: Växla minikarta"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "Redigerare: Växla följ markeringen"
 diff_toggle_whitespace_only_changes = "Diff: Växla ändringar som bara rör blanksteg"
 ai_generate_commit_message = { git = "AI: Generera commit-meddelande", local = "AI: Generera incheckningsmeddelande" }
@@ -3757,6 +3766,8 @@ rewrite_strip_exec = "Omskrivning: Ta bort körbehörigheten..."
 rewrite_file_encoding = "Omskrivning: Konvertera filernas teckenkodning..."
 # s22:end
 git_fetch_selected_tag = { git = "Git: Fetch vald tag", local = "Git: Hämta vald tagg" }
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "Omskrivning: Rätta meddelandenas teckenkodning..."
 # s24:end
@@ -4955,6 +4966,8 @@ staging_lines = { one = "stagear {n} rad i hunk {hunk}{spill}...", other = "stag
 unstaging_lines = { one = "unstagear {n} rad i hunk {hunk}{spill}...", other = "unstagear {n} rader i hunk {hunk}{spill}..." }
 minimap_on = "minikarta på"
 minimap_off = "minikarta av"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = { git = "staging gäller arbetskatalogen - öppna en fil från rutorna {$unstaged_files} eller {$staged_files}, inte från en commit", local = "staging gäller arbetskatalogen - öppna en fil från rutorna {$unstaged_files} eller {$staged_files}, inte från en incheckning" }
 not_working_diff_discard = { git = "förkastande gäller arbetskatalogen - öppna en fil från rutan {$unstaged_files}, inte från en commit", local = "förkastande gäller arbetskatalogen - öppna en fil från rutan {$unstaged_files}, inte från en incheckning" }
 discard_on_staged = "förkastande återställer unstaged ändringar - det här är rutan {$staged_files}: gör först unstage och förkasta sedan från rutan {$unstaged_files}"
@@ -8976,6 +8989,15 @@ tip_both = "Här och på {remotes}, vid samma {$commit}."
 tip_differs = "Här och på {remotes}, men vid olika {$commits}: en {$push_noun} skulle avvisas."
 tip_fetch_note = "En {$fetch} tar tillbaka en {$tag} som bara har tagits bort här medan en remote fortfarande har den. En {$tag} som har tagits bort på remoten försvinner härifrån först med Auto-prune {$tags} (Inställningar)."
 fetch_tag = { git = "Fetch {name} från {remote}", local = "Hämta {name} från {remote}" }
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "Ta bort {name}..."
 delete_tag_on_remote = "Ta bort {name} på {remote}..."
 dlg_title = "Ta bort {$tag}"

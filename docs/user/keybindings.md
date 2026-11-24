@@ -609,6 +609,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Refs: Push Selected Tag to Default Remote |  |
 | Refs: Delete Selected Tag from Its Remote... |  |
 | Git: Fetch Selected Tag |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Annotate Selected Tag... |  |
 | Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Toggle Hide in Graph |  |
@@ -1104,6 +1106,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Diff: Toggle Word Wrap | `w` |
 | Diff: Choose Encoding... | `C` |
 | View: Toggle Minimap | `M` |
+| Diff: Toggle Changed Words Highlight |  |
 | View: Toggle Commit Column | `Alt+C` |
 | View: Commit Column: Hide |  |
 | View: Commit Column: File History |  |

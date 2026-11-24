@@ -232,6 +232,11 @@ pub(super) async fn dispatch_network_plain(
             };
             to_json!(deleted)
         }
+        OperationKind::TagForcePush => {
+            let remote: String = arg_or_err!(args, "remote", request.id);
+            let name: String = arg_or_err!(args, "name", request.id);
+            to_json!(backend.tag_force_push(&repo, &remote, &name).await)
+        }
         OperationKind::TagFetch => {
             let remote: String = arg_or_err!(args, "remote", request.id);
             let name: String = arg_or_err!(args, "name", request.id);

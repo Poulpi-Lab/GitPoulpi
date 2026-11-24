@@ -9,9 +9,18 @@ IPC surfaces are stable within a major version).
 
 ### Added
 - **Drop a tag on another ref:** drag a tag onto a branch, a remote branch or another tag for **Move tag here** (flagged *not a fast-forward* when the target does not descend from the tag's commit; an annotated tag keeps its message and tagger, only your local tag moves and a remote keeps the old position until you push). On a local branch the menu also offers **Merge tag into branch** and, as the rarer row, **Merge branch into tag and move the tag** (a detached merge commit, nothing else moves, a conflict changes nothing). One undo step each. Keyboard: `Refs: Move Selected Tag to Selected Commit...`, and mark then drop for any ref. CLI/MCP: `gitpoulpi tag move <name> <target> [--force-non-ff]`, `gitpoulpi tag merge-branch <name> <branch>`.
+- **Changed words in a diff:** when only part of a line changes, the words that differ get a stronger background of the added or removed color, in the Diff view (Inline and Split), the review's diff and the other diff panes. Removed and added lines are paired by order inside a hunk and marked only when they are alike enough, so a rewritten line stays flat. New theme roles `diff.add_emph_bg` and `diff.del_emph_bg` (every preset sets them; a theme file that changes `diff.add_bg` or `diff.del_bg` gets a derived emphasis), the setting `ui.diff_intraline` (on by default; Settings > Diff & editor) and the palette entry **Diff: Toggle Changed Words Highlight**.
+- **Tags that differ:** a tag here and on a remote at different commits (the up-down arrow) now has two actions per such remote, in its menu (sidebar and Log pill) and the palette: *Use `<tag>` from `<remote>`* moves the local tag to the remote's version from the last fetch (no network; an annotated tag stays the same tag object), and *Push `<tag>` to `<remote>` (force)* force-pushes yours, confirmed first and leased on what the last fetch saw (a remote that moved since is refused: fetch first). Each is one undo entry. CLI: `gitpoulpi tag take-remote` and `gitpoulpi tag force-push [--yes]`.
+
+### Changed
+- The mouse pointer is the I-beam over the code of the Diff view (Inline and Split), the review's diff pane, the File View and Blame, since that text can be selected even though it is not editable. Line numbers, hunk buttons, scrollbars and menus keep their own pointer. One rule: wherever a drag can select text, the pointer is the I-beam.
+- **Radar: an Actions column** replaces the "review" text of a request row: a **Review** button (or **Start work** on a cloned issue), a globe button that opens the page in the browser and a button that opens the conversation, each with a hand pointer, a hover highlight and a tooltip with its key. When narrow, the words become glyphs before any other column goes. Every button keeps its key (`e`, `n`, `o`, `i`) and palette command.
+- The buttons of a review shown over the Radar (and of a conversation) now show the hand pointer like every other button.
 
 ### Fixed
 - Pressing a ref in the Refs pane to drag it no longer makes the Log jump to that ref's commit: the graph only follows on a click (when the button comes up), so it stays where you scrolled it to drop onto a visible target.
+- Radar: a double-click or `Enter` on a request whose repository is not cloned asks how to review it (through the API, or clone first) instead of saying to clone the repository first.
+- The theme and the graph colors are now per installation: with several installations sharing one `config.toml`, changing them in one no longer changes them in all of them. A running window only recolours for its own installation's change.
 
 ## [1.2.0] - 2026-11-23
 

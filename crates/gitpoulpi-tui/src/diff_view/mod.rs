@@ -34,6 +34,7 @@ use gitpoulpi_core::domain::{FileDiff, Oid};
 use ratatui::prelude::*;
 
 mod interaction;
+mod intraline;
 mod layout;
 mod model;
 

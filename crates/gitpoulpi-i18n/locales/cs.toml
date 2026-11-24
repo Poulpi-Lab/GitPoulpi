@@ -516,6 +516,8 @@ merge_side_by_side_min_width = { git = "Editor merge: vedle sebe od (sloupců)",
 merge_side_by_side_min_width_help = { git = "Editor konfliktů merge ukazuje A a B vedle sebe, má-li jeho plocha alespoň tolik sloupců (dlouhé řádky se posouvají do stran Shift+kolečkem nebo Shift+šipkami); užší ukazuje vždy jednu stranu za záložkami. Výchozí 100; nejnižší hodnota je 40, 0 znamená vždy vedle sebe. Editor při otevření skrývá panely Refs a Stav, takže má obvykle celé okno.", local = "Editor konfliktů při sloučení ukazuje A a B vedle sebe, má-li jeho plocha alespoň tolik sloupců (dlouhé řádky se posouvají do stran Shift+kolečkem nebo Shift+šipkami); užší ukazuje vždy jednu stranu za záložkami. Výchozí 100; nejnižší hodnota je 40, 0 znamená vždy vedle sebe. Editor při otevření skrývá panely Refs a Stav, takže má obvykle celé okno." }
 diff_word_wrap = "Zalamování řádků"
 diff_word_wrap_help = { git = "Zalomí dlouhé řádky v zobrazeních diff místo oříznutí třemi tečkami. Vestavěný editor a zobrazení blame se posouvají do stran a nezalamují. Je to i vlastní přepínač zalamování diffu.", local = "Zalomí dlouhé řádky v zobrazeních rozdílů místo oříznutí třemi tečkami. Vestavěný editor a zobrazení blame se posouvají do stran a nezalamují. Je to i vlastní přepínač zalamování rozdílu." }
+diff_intraline = "Highlight changed words"
+diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
 
 [settings_ui]
 theme = "Motiv"
@@ -1728,6 +1730,12 @@ column_repository = "Repozitář"
 column_author = "Autor"
 column_title = "Název"
 column_age = "Stáří"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "Sloupec {name} ({width} buněk): [ užší, ] širší, 0 obnovit, Tab další, Esc hotovo"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -3423,6 +3431,7 @@ files_clear_selection = "Soubory: Zrušit výběr"
 files_toggle_selection = "Soubory: Přepnout výběr aktuálního řádku"
 diff_toggle_word_wrap = { git = "Diff: Přepnout zalamování řádků", local = "Rozdíly: Přepnout zalamování řádků" }
 view_toggle_minimap = "Zobrazení: Přepnout minimapu"
+diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
 editor_toggle_follow_selection = "Editor: Přepnout sledování výběru"
 diff_toggle_whitespace_only_changes = { git = "Diff: Přepnout změny jen v bílých znacích", local = "Rozdíly: Přepnout změny jen v bílých znacích" }
 ai_generate_commit_message = "AI: Vygenerovat zprávu commitu"
@@ -3754,6 +3763,8 @@ rewrite_strip_exec = "Přepis: Odebrat příznak spustitelnosti..."
 rewrite_file_encoding = "Přepis: Převést kódování souborů..."
 # s22:end
 git_fetch_selected_tag = { git = "Git: Fetch vybraného tagu", local = "Git: Načíst vybranou značku" }
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "Přepis: Opravit kódování zpráv..."
 # s24:end
@@ -4949,6 +4960,8 @@ staging_lines = { one = { git = "stage {n} řádku hunku {hunk}{spill}...", loca
 unstaging_lines = { one = { git = "unstage {n} řádku hunku {hunk}{spill}...", local = "odebírání {n} řádku hunku {hunk} z indexu{spill}..." }, few = { git = "unstage {n} řádků hunku {hunk}{spill}...", local = "odebírání {n} řádků hunku {hunk} z indexu{spill}..." }, other = { git = "unstage {n} řádků hunku {hunk}{spill}...", local = "odebírání {n} řádků hunku {hunk} z indexu{spill}..." } }
 minimap_on = "minimapa zapnuta"
 minimap_off = "minimapa vypnuta"
+intraline_on = "changed words highlighted"
+intraline_off = "changed words not highlighted"
 not_working_diff = { git = "staging působí na pracovní strom - otevřete soubor z panelů {$unstaged_files} nebo {$staged_files}, ne z commitu", local = "přidávání do indexu působí na pracovní strom - otevřete soubor z panelů {$unstaged_files} nebo {$staged_files}, ne z commitu" }
 not_working_diff_discard = { git = "zahazování působí na pracovní strom - otevřete soubor z panelu {$unstaged_files}, ne z commitu", local = "zahazování působí na pracovní strom - otevřete soubor z panelu {$unstaged_files}, ne z commitu" }
 discard_on_staged = { git = "zahazování vrací změny unstaged - toto je panel {$staged_files}: nejdřív unstage, pak zahoďte z panelu {$unstaged_files}", local = "zahazování vrací změny mimo index - toto je panel {$staged_files}: nejdřív odeberte z indexu, pak zahoďte z panelu {$unstaged_files}" }
@@ -8966,6 +8979,15 @@ tip_both = "Tady i na {remotes}, na stejném {$commit}u."
 tip_differs = { git = "Tady i na {remotes}, ale na různých {$commit}ech: push by byl odmítnut.", local = "Tady i na {remotes}, ale na různých {$commit}ech: odeslání by bylo odmítnuto." }
 tip_fetch_note = { git = "Fetch vrátí tag smazaný jen tady, pokud ho některý remote ještě má. Tag smazaný na remote z tohoto repozitáře zmizí jen s volbou „Automaticky mazat tagy“ (Nastavení).", local = "Načtení vrátí značku smazanou jen tady, pokud ji některý remote ještě má. Značka smazaná na remote z tohoto repozitáře zmizí jen s volbou „Automaticky mazat značky“ (Nastavení)." }
 fetch_tag = "{$Fetch} {name} z {remote}"
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "Smazat {name}..."
 delete_tag_on_remote = "Smazat {name} na {remote}..."
 dlg_title = { git = "Smazat tag", local = "Smazat značku" }

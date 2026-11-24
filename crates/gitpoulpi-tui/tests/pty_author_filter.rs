@@ -324,3 +324,61 @@ fn a_narrow_log_still_says_the_filter_is_on_and_the_key_still_opens_it() {
     term.wait_for("the popup by key", STEP, |s| s.contains("Clear filter"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
+
+/// The Log row whose message cell carries the selection background: the only
+/// row of the four whose background differs from the others.
+fn selected_message(s: &Screen) -> Option<&'static str> {
+    let names = [
+        "epsilon work",
+        "delta more",
+        "gamma add",
+        "beta fix",
+        "alpha init",
+    ];
+    let bgs: Vec<_> = names
+        .iter()
+        .map(|n| cell_of(s, n).map(|c| c.bg))
+        .collect::<Option<_>>()?;
+    let odd: Vec<_> = (0..names.len())
+        .filter(|&i| bgs.iter().filter(|b| **b == bgs[i]).count() == 1)
+        .collect();
+    (odd.len() == 1).then(|| names[odd[0]])
+}
+
+#[test]
+fn the_arrows_step_between_lit_commits_while_the_author_filter_is_on() {
+    let repo = fixture();
+    let config = tempfile::tempdir().unwrap();
+    let mut term = launch(&repo, config.path(), "author-filter-arrows");
+    open_with_funnel(&mut term);
+    // Choose Alice: delta and alpha stay lit, with Carol's and Bob's rows between.
+    term.send_keys("Enter").unwrap();
+    term.wait_for("Alice ticked", STEP, |s| {
+        s.find("Clear filter")
+            .is_some_and(|(_, r)| s.line(r + 1).contains('\u{2713}'))
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Escape").unwrap();
+    term.wait_for("the funnel lit", STEP, |s| {
+        !s.contains("Clear filter") && dimmed(s, "delta more", "gamma add") == Some(true)
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The selection sits on the dimmed HEAD row (epsilon): Down goes to the
+    // nearest lit commit, the next Down skips gamma and beta, the last stays.
+    term.send_keys("Down").unwrap();
+    term.wait_for("delta selected", STEP, |s| {
+        selected_message(s) == Some("delta more")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Down").unwrap();
+    term.wait_for("alpha selected, skipping the dimmed rows", STEP, |s| {
+        selected_message(s) == Some("alpha init")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Down").unwrap();
+    term.send_keys("Up").unwrap();
+    term.wait_for("Up goes back to delta", STEP, |s| {
+        selected_message(s) == Some("delta more")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+}

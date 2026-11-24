@@ -40,6 +40,8 @@ mod pane;
 mod patchset;
 mod popups;
 mod recode;
+mod resume;
+pub(crate) use resume::{api_mark, clear_api_mark, clear_repo_mark, repo_mark};
 mod source;
 #[cfg(test)]
 mod tests;
@@ -89,6 +91,8 @@ pub(crate) enum ReviewEffect {
     None,
     /// Leave the view.
     Close,
+    /// Leave the view and say why (a reopened review that cannot be shown).
+    CloseWith(String),
     Message(String),
     /// Leave the view and check out the request's branch (the existing
     /// flow, which knows whether the branch is here or must be fetched).
@@ -140,6 +144,11 @@ pub(crate) struct ReviewView {
     git_err: Option<String>,
 
     // the local review
+    /// The review was sent (or the change submitted): nothing to come back to.
+    submitted: bool,
+    /// Where a reopened review must land once its data is in (`resume.rs`).
+    resume: Option<gitpoulpi_session::ResumePos>,
+    resume_placed: bool,
     pub(super) pending: Vec<PendingComment>,
     pub(super) viewed: BTreeSet<String>,
     collapsed: HashSet<String>,
@@ -303,6 +312,9 @@ impl ReviewView {
             git: None,
             git_rx: None,
             git_err: None,
+            submitted: false,
+            resume: None,
+            resume_placed: false,
             pending: draft.comments.iter().map(pending_of).collect(),
             viewed: draft.viewed.into_iter().collect(),
             collapsed: HashSet::new(),
@@ -644,6 +656,9 @@ impl ReviewView {
         if let Some(e) = self.poll_call() {
             effect = e;
         }
+        if let Some(e) = self.poll_resume() {
+            effect = e;
+        }
         if let Some(edit) = self.meta.as_mut() {
             if let Some(outcome) = edit.poll() {
                 if let Some(e) = self.on_meta(outcome) {
@@ -899,17 +914,20 @@ impl ReviewView {
                 self.save_draft();
                 self.message = Some(msg::review_submitted(sent as u64));
                 let _ = outcome;
+                self.over();
                 // The submitted comments are threads now: read them back.
                 self.refresh();
                 crate::hosting_ui::request_issues_refresh();
             }
             Done::ChangeSubmitted => {
                 self.message = Some(msg::change_submitted(&self.target.iid_label));
+                self.over();
                 self.refresh();
                 crate::hosting_ui::request_issues_refresh();
             }
             Done::ChangeAbandoned => {
                 self.message = Some(msg::change_abandoned(&self.target.iid_label));
+                self.over();
                 self.refresh();
                 crate::hosting_ui::request_issues_refresh();
             }

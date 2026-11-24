@@ -30,6 +30,7 @@ mod off_branch_edit;
 mod radar_pending;
 mod refs_update;
 mod reveal;
+pub(in crate::event_loop) mod review_resume;
 mod sizes;
 mod stage_guard_peek;
 mod tick;
@@ -294,6 +295,9 @@ impl WindowState {
 
     /// Leaves the alternate screen and says why the window ended.
     pub(in crate::event_loop) fn finish(&mut self) -> io::Result<NextWindow> {
+        // A review still open is written down: coming back to this tab (or
+        // starting again) reopens it.
+        self.save_review_marks();
         let next = match (self.switch_to.take(), self.show_management.take()) {
             (Some(next), _) => NextWindow::Repository(next),
             (None, Some(entry)) => NextWindow::Management(entry),

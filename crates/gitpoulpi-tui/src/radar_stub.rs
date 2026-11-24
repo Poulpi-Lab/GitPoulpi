@@ -28,6 +28,8 @@ impl RadarSlot {
 
     pub(crate) fn close(&mut self) {}
 
+    pub(crate) fn save_review_mark(&self) {}
+
     pub(crate) fn typing(&self) -> bool {
         false
     }

@@ -75,6 +75,53 @@ pub struct AiDraft {
     pub head_sha: String,
 }
 
+/// Where the reviewer stood in the view when the window ended with the
+/// review open (`ReviewResume`). Row numbers are of the rendered diff, which
+/// is rebuilt the same for the same request.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ResumePos {
+    /// `overview`, `files` or `commits`.
+    #[serde(default)]
+    pub tab: String,
+    /// The keyboard was on the diff, not the list.
+    #[serde(default)]
+    pub diff_focus: bool,
+    /// The Files list's file (by path).
+    #[serde(default)]
+    pub file: String,
+    /// The Commits list's commit index.
+    #[serde(default)]
+    pub commit: usize,
+    #[serde(default)]
+    pub cursor: usize,
+    #[serde(default)]
+    pub offset: usize,
+}
+
+/// A review that was in progress (the view open, not closed by the user and
+/// not submitted) when its window ended: the tab is reopened on it.
+/// `RepoState::open_review` for a cloned repository, `RemoteReviews::open_review`
+/// for one reviewed through the host's API (which needs the request's
+/// own fields to build the view with no repository list).
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReviewResume {
+    pub integration: String,
+    pub project: String,
+    pub number: u64,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub label: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub title: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub web_url: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub source_branch: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub target_branch: String,
+    #[serde(default)]
+    pub pos: ResumePos,
+}
+
 /// One request's local review state.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ReviewDraft {

@@ -128,6 +128,11 @@ impl DiffPane {
         self.area.height.max(1) as usize
     }
 
+    /// `clamp` for a position restored from a marker.
+    pub(super) fn clamp_to_rows(&mut self) {
+        self.clamp();
+    }
+
     fn clamp(&mut self) {
         let last = self.len().saturating_sub(1);
         self.cursor = self.cursor.min(last);

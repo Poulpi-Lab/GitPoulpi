@@ -596,7 +596,10 @@ pub(in crate::event_loop) fn apply_radar_outcome(
 /// The review of a request of a repository that is not cloned, through the
 /// host's API, hosted by the Radar over the Home window.
 #[cfg(all(feature = "hosting", feature = "review"))]
-fn open_api_review(cx: &mut CommandCtx<'_>, request: crate::radar::ReviewRequest) {
+pub(in crate::event_loop) fn open_api_review(
+    cx: &mut CommandCtx<'_>,
+    request: crate::radar::ReviewRequest,
+) {
     let all = crate::pull_request::load_integrations();
     let Some(integration) = all.iter().find(|i| i.id == request.integration).cloned() else {
         *cx.last_message = Some(msg::radar::why_no_integration(&request.integration));
@@ -632,7 +635,10 @@ fn open_api_review(cx: &mut CommandCtx<'_>, request: crate::radar::ReviewRequest
 }
 
 #[cfg(not(all(feature = "hosting", feature = "review")))]
-fn open_api_review(cx: &mut CommandCtx<'_>, _request: crate::radar::ReviewRequest) {
+pub(in crate::event_loop) fn open_api_review(
+    cx: &mut CommandCtx<'_>,
+    _request: crate::radar::ReviewRequest,
+) {
     *cx.last_message = Some(msg::meta_picker::UNSUPPORTED.get().to_string());
 }
 

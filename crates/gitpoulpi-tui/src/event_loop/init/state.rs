@@ -307,6 +307,10 @@ pub(in crate::event_loop) struct WindowState {
     #[cfg(feature = "hosting")]
     pub(in crate::event_loop) issue_watch: crate::flow::issue_watch::IssueWatch,
     pub(in crate::event_loop) pending_worktree_tab: Option<PathBuf>,
+    /// The review this repository's tab was left on, reopened once the
+    /// request list knows it (`window::review_resume`), and since when it waits.
+    pub(in crate::event_loop) review_resume: Option<gitpoulpi_session::ReviewResume>,
+    pub(in crate::event_loop) review_resume_since: Instant,
     /// The newest commit a split created, selected in the Log as soon as a
     /// refresh lists it (given up after a few seconds).
     /// An agent's split proposal waiting for the commit's numbered changes:

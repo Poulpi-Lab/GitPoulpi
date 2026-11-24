@@ -925,6 +925,12 @@ pub(super) fn init(
         #[cfg(feature = "hosting")]
         issue_watch: Default::default(),
         pending_worktree_tab: None,
+        review_resume: if no_repository {
+            None
+        } else {
+            window::review_resume::saved_mark(&repo.root)
+        },
+        review_resume_since: Instant::now(),
         pending_split_proposal: None,
         pending_split_select: None,
         // Start a pull request: the ref menu / palette asks for the dialog through

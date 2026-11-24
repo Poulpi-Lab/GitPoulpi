@@ -295,8 +295,8 @@ pub(crate) fn apply_switcher_action(
             }
             *tabs = session_store::tabs(session);
             *active_tab = tabs.iter().position(|t| t.path == next.root).unwrap_or(0);
-            dialogs.close();
             if next.id == current.id {
+                dialogs.close();
                 // Already showing it. Focusing the tab is the whole
                 // effect, and restarting the loop for the repository we
                 // are already on would flash the screen for nothing.
@@ -304,6 +304,8 @@ pub(crate) fn apply_switcher_action(
                 return Some(msg::tabs::already_on(next.root.display()));
             }
             session_store::activate_tab(session, *active_tab);
+            // The window ends here, with a review left open: it is written
+            // down on the way out and reopens with the tab.
             *switch_to = Some(next);
             None
         }
@@ -313,10 +315,12 @@ pub(crate) fn apply_switcher_action(
             let tab = tabs.get(index).cloned()?;
             *active_tab = index;
             session_store::activate_tab(session, index);
-            dialogs.close();
             let next = repo_ref_for(tab.path);
             if next.id != current.id {
+                // An open review stays: `finish` writes it down.
                 *switch_to = Some(next);
+            } else {
+                dialogs.close();
             }
             None
         }

@@ -235,6 +235,34 @@ impl RadarUi {
         self.api_review = Some(view);
     }
 
+    /// The API review is over (closed or finished): not reopened with the tab.
+    pub(super) fn forget_api_review(&self) {
+        if let Some(view) = &self.api_review {
+            view.forget_resume();
+        }
+    }
+
+    /// The Radar is being left with the API review open: it is written down,
+    /// and reopens when the Radar tab is shown again.
+    pub(crate) fn save_review_mark(&self) {
+        if let Some(view) = &self.api_review {
+            view.save_resume_mark();
+        }
+    }
+
+    /// Once per opening of the Radar: whether a review left open should be
+    /// looked for.
+    pub(crate) fn take_resume(&mut self) -> bool {
+        std::mem::take(&mut self.resume_pending)
+    }
+
+    /// Puts a reopened API review back where the marker says.
+    pub(crate) fn restore_review_position(&mut self, pos: gitpoulpi_session::ResumePos) {
+        if let Some(view) = self.api_review.as_mut() {
+            view.restore_position(pos);
+        }
+    }
+
     pub(crate) fn hosts_review(&self) -> bool {
         self.api_review.is_some()
     }
@@ -313,8 +341,14 @@ impl RadarUi {
             ReviewEffect::None => Outcome::None,
             ReviewEffect::Message(text) => self.say(text),
             ReviewEffect::Close => {
+                self.forget_api_review();
                 self.api_review = None;
                 Outcome::None
+            }
+            ReviewEffect::CloseWith(text) => {
+                self.forget_api_review();
+                self.api_review = None;
+                self.say(text)
             }
             // A checkout needs the repository on disk.
             ReviewEffect::Checkout(_) => self.say(msg::radar::MSG_CLONE_FIRST.get().to_string()),

@@ -166,6 +166,14 @@ Layout*, ...).
 The commits of the request only (not the history behind it), newest first, and the diff of the selected one
 (its changes against its parent), with all of its files one under the other and the same display options.
 
+## Coming back to a review
+
+A review stays open while you work in another tab. Leave the tab with the review open (click another tab, `Ctrl+PageDown`, the palette's **Repository: Next Tab**) and coming back reopens it on the same request, the same page (Overview, Files or Commits), the same file and the same line, with the keyboard on the same side. The same goes for a review through the API over the Radar: show the Radar tab again and the review is back over it.
+
+A review is **in progress** while its page is open. Closing it (`Esc`, the cross, **Review: Close**), sending it (**Finish review**, or submitting or abandoning a Gerrit change) or checking out its branch ends it, and it is not reopened. Quitting GitPoulpi with a review open counts as leaving the tab: the next start reopens it the same way.
+
+If the request was merged or closed in the meantime, or the host does not answer, no page opens: the status line says why and nothing is reopened next time. Pending comments, viewed files and the draft are kept as ever (see **Writing a review**). A suggestion run still going when you leave is not carried over.
+
 ## Writing a review
 
 A comment on code is **pending**: it is kept on your machine (in the repository's state file, so it survives a

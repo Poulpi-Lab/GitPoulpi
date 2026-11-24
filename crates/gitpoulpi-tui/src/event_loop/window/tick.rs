@@ -83,6 +83,8 @@ impl WindowState {
         // `config.toml` or the active user theme file edited from outside.
         crate::theme_watch::poll();
         self.agent_view_tick();
+        // The review the tab was left on (this repository's, or the Radar's).
+        self.review_resume_tick();
         // What the Radar asked of this repository's window.
         #[cfg(feature = "hosting")]
         self.radar_pending_tick();

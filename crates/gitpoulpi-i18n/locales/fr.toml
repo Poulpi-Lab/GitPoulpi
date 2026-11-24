@@ -7438,6 +7438,10 @@ hint_viewed = "vu"
 hint_open_diff = { git = "afficher le diff", local = "afficher la différence" }
 # context: footer hint after the Esc key
 hint_close = "fermer"
+# context: status line: the request that was under review is merged or closed; {caption} is like #12 Fix the thing
+resume_gone = "{caption} is no longer open: the review was not reopened"
+# context: status line: the host did not answer when the review was reopened; {why} is the error
+resume_unreachable = "could not reopen {caption}: {why}"
 # >>> local_issues (slice L1)
 [local_issues]
 field_status = "Statut"

@@ -287,7 +287,7 @@ fn a_failing_step_stops_the_run_and_the_rest_is_skipped() {
         "seq-stop",
         "[[sequences]]\nid = \"tags\"\nname = \"Tags\"\n\n[[sequences.steps]]\nrun = \"new_tag\"\npause = \"never\"\n[sequences.steps.options]\nname = \"v1\"\n\n[[sequences.steps]]\nrun = \"new_tag\"\npause = \"never\"\n[sequences.steps.options]\nname = \"v1\"\n\n[[sequences.steps]]\nrun = \"push\"\n",
     );
-    let (code, v) = w.run(&["run", "tags"]);
+    let (code, v) = w.run(&["run", "tags", "--yes"]);
     assert_eq!(code, 2, "{v}");
     assert_eq!(v["applied"], true);
     assert_eq!(v["stopped_at"], 1);
@@ -370,4 +370,74 @@ fn a_repository_sequence_is_never_run() {
     assert_eq!(code, 2, "{v}");
     assert_eq!(v["problems"][0]["what"], "untrusted");
     assert!(!w.status().contains("A  "), "{}", w.status());
+}
+
+const SHARED: &str = "[[sequences]]\nid = \"shared\"\nname = \"Shared\"\n\n[[sequences.steps]]\nrun = \"stage_all\"\n";
+
+fn write_repo_file(w: &World, text: &str) {
+    let dir = w.repo.root().join(".gitpoulpi");
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(dir.join("sequences.toml"), text).unwrap();
+}
+
+#[test]
+fn trusting_a_repository_sequence_lets_it_run_and_a_change_asks_again() {
+    let w = world("seq-repo-trust", "");
+    write_repo_file(&w, SHARED);
+    let (_, v) = w.run(&["list"]);
+    assert_eq!(v["repo_trust"]["state"], "untrusted", "{v}");
+
+    // Refused before the trust, nothing staged.
+    let (code, v) = w.run(&["run", "shared", "--yes"]);
+    assert_eq!(code, 2, "{v}");
+    assert_eq!(v["problems"][0]["what"], "untrusted");
+    assert!(!w.status().contains("A  "), "{}", w.status());
+
+    let (code, v) = w.run(&["trust"]);
+    assert_eq!(code, 0, "{v}");
+    assert_eq!(v["trusted"], true);
+    assert_eq!(v["sequences"], serde_json::json!(["shared"]));
+    let (_, v) = w.run(&["list"]);
+    assert_eq!(v["repo_trust"]["state"], "trusted", "{v}");
+    let shared = v["sequences"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|s| s["id"] == "shared")
+        .unwrap()
+        .clone();
+    assert_eq!(shared["trusted"], true);
+
+    let (code, v) = w.run(&["run", "shared", "--yes"]);
+    assert_eq!(code, 0, "{v}");
+    assert!(w.status().contains("A  new.txt"), "{}", w.status());
+
+    // A renamed sequence is still trusted; a changed step is not.
+    write_repo_file(&w, &SHARED.replace("Shared", "Renamed"));
+    let (_, v) = w.run(&["list"]);
+    assert_eq!(v["repo_trust"]["state"], "trusted", "{v}");
+    write_repo_file(&w, &SHARED.replace("stage_all", "push"));
+    let (_, v) = w.run(&["list"]);
+    assert_eq!(v["repo_trust"]["state"], "changed", "{v}");
+    let (code, v) = w.run(&["run", "shared", "--yes"]);
+    assert_eq!(code, 2, "{v}");
+    assert_eq!(v["problems"][0]["what"], "untrusted");
+
+    // Untrust forgets it for good.
+    write_repo_file(&w, SHARED);
+    let (_, v) = w.run(&["list"]);
+    assert_eq!(v["repo_trust"]["state"], "trusted", "same file as trusted");
+    let (code, v) = w.run(&["untrust"]);
+    assert_eq!(code, 0, "{v}");
+    assert_eq!(v["forgot"], true);
+    let (_, v) = w.run(&["list"]);
+    assert_eq!(v["repo_trust"]["state"], "untrusted", "{v}");
+}
+
+#[test]
+fn trust_without_a_repository_file_is_refused() {
+    let w = world("seq-repo-trust-none", "");
+    let (code, v) = w.run(&["trust"]);
+    assert_eq!(code, 2, "{v}");
+    assert_eq!(v["trusted"], false);
 }

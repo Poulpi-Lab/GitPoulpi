@@ -22,7 +22,7 @@ use std::time::{Duration, Instant};
 use gitpoulpi_core::domain::UiControl;
 use serde_json::{json, Value};
 
-use crate::cli::{UiAction, UiProposeAction, UiShowAction};
+use crate::cli::{UiAction, UiProposeAction, UiSequenceAction, UiShowAction};
 use crate::client::{discover_repo, Session};
 use crate::repo_cmd::Emitted;
 use crate::ui_launch::{self, pick, scan_sessions, Pick};
@@ -64,16 +64,52 @@ pub(crate) async fn run(
         UiAction::Propose { what } => {
             let id = proposal_id();
             let built = build_propose(ipc, &id, what).await?;
-            let mut emitted = send(ipc, viewer, launch, built).await?;
-            // Every answer names the proposal, `Deferred` included: the
-            // agent follows it in `ui state`'s `proposals`.
-            if let Value::Object(map) = &mut emitted.json {
-                map.entry("proposal").or_insert_with(|| json!(id));
-            }
-            emitted.human = format!("{} [proposal {id}]", emitted.human);
-            Ok(emitted)
+            send_proposal(ipc, viewer, launch, &id, built).await
+        }
+        UiAction::Sequence {
+            what: UiSequenceAction::Run { id: sequence },
+        } => {
+            let id = proposal_id();
+            let built = build_sequence_run(ipc, &id, &sequence);
+            send_proposal(ipc, viewer, launch, &id, built).await
         }
     }
+}
+
+async fn send_proposal(
+    ipc: &mut Session,
+    viewer: Option<ViewerId>,
+    launch: bool,
+    id: &str,
+    built: Built,
+) -> Result<Emitted, String> {
+    let mut emitted = send(ipc, viewer, launch, built).await?;
+    // Every answer names the proposal, `Deferred` included: the
+    // agent follows it in `ui state`'s `proposals`.
+    if let Value::Object(map) = &mut emitted.json {
+        map.entry("proposal").or_insert_with(|| json!(id));
+    }
+    emitted.human = format!("{} [proposal {id}]", emitted.human);
+    Ok(emitted)
+}
+
+/// `ui sequence run <id>`: only a sequence the user could run themselves
+/// (it exists, is valid, and is trusted when the repository's) is offered.
+#[allow(clippy::result_large_err)]
+fn build_sequence_run(ipc: &Session, id: &str, sequence: &str) -> Built {
+    let repo = default_repo(ipc).map_err(not_found)?;
+    let root = ipc
+        .repo_ref()
+        .map(|r| r.root.to_string_lossy().into_owned());
+    crate::commands::sequence::runnable_in_ui(sequence, root.as_deref())
+        .map_err(UiOutcome::refused)?;
+    Ok(UiIntent::Propose {
+        repo,
+        id: id.to_string(),
+        proposal: Proposal::SequenceRun {
+            id: sequence.to_string(),
+        },
+    })
 }
 
 fn not_found(what: String) -> UiOutcome {

@@ -3819,6 +3819,10 @@ why_group_not_paused = "aucun {$push} groupé n'attend la résolution de conflit
 why_group_not_ready = "résolvez et concluez d'abord les conflits"
 # context: palette: why a command is grayed out
 why_nothing_to_retry = "aucun distant n'a échoué lors du dernier {$push} groupé"
+sequence_repo_review = "Séquence\u00a0: examiner les séquences de ce dépôt"
+sequence_repo_trust = "Séquence\u00a0: approuver les séquences de ce dépôt"
+sequence_repo_ignore = "Séquence\u00a0: ignorer les séquences de ce dépôt"
+why_no_repo_sequences = "ce dépôt n'a aucune séquence en attente de votre approbation"
 
 [help_section]
 rewrite = "Réécrire l'historique"
@@ -5505,6 +5509,10 @@ chip_show = "{client} veut afficher {what} - {accept} ou clic : afficher, Esc 
 shown = "affiché par {client} : {what} · {back} pour revenir"
 
 # Historique : rebase interactif, reword, compositeur, revue IA, éditeur, LFS, sous-modules (I8b).
+prop_sequence = "lancer la séquence {name}"
+banner_sequence = "Proposé par {client}\u00a0: {what} · {accept} lance · Esc ignore"
+button_run = "Lancer"
+button_dismiss = "Ignorer"
 
 [rebase_ui]
 title_cherry_pick = "{$Cherry_pick} interactif"
@@ -10545,6 +10553,25 @@ step_failed_start = "{step} did not start"
 def_gone = "the sequence {name} no longer exists"
 # context: shorter run strip text when a step failed (the error text does not fit)
 strip_stopped = "{name} stopped at step {k}/{n} ({step})"
+repo_notice = { one = "Ce dépôt définit {n} séquence", other = "Ce dépôt définit {n} séquences" }
+repo_notice_changed = { one = "La séquence de ce dépôt a changé", other = "Les {n} séquences de ce dépôt ont changé" }
+repo_button_review = "Examiner"
+repo_button_trust = "Approuver"
+repo_button_ignore = "Ignorer"
+repo_review_title = "Séquences de ce dépôt"
+repo_review_intro = "Ces séquences viennent du fichier .gitpoulpi/sequences.toml de ce dépôt. Elles lancent des commandes sur votre machine quand vous les démarrez. Ne les approuvez que si vous faites confiance à tous ceux qui peuvent modifier ce dépôt."
+repo_review_sequence = "{name} ({id})"
+repo_review_step = "{n}. {step}"
+repo_review_pause_always = "s'arrête avant de s'exécuter"
+repo_review_pause_never = "ne s'arrête jamais"
+repo_review_options = "options\u00a0: {options}"
+repo_review_trust = "Approuver"
+repo_key_trust = "a"
+repo_review_close = "Fermer"
+repo_key_close = "f"
+say_repo_trusted = "Séquences du dépôt approuvées\u00a0: {n}"
+say_repo_ignored = "Séquences du dépôt ignorées jusqu'à la modification du fichier"
+repo_review_too_long = "Cette liste dépasse la fenêtre\u00a0: agrandissez la fenêtre pour la voir en entier et l'approuver d'ici."
 
 [settings_sequences]
 section_title = "Séquences"
@@ -10583,7 +10610,6 @@ shortcut = "Raccourci"
 shortcut_help = "La touche qui lance cette séquence depuis n'importe où dans la fenêtre. Entrée ouvre la capture de touche ; les conflits sont refusés comme sur la page Raccourcis clavier."
 shortcut_none = "Aucun"
 shortcut_clear = "Effacer"
-shortcut_repo_help = "Une séquence de dépôt n'a pas encore de raccourci."
 steps_row = "Étapes"
 # context: button that opens a sequence's list of steps; {n} is how many it has
 steps_edit = "Modifier les étapes ({n})"
@@ -10636,3 +10662,4 @@ cannot_run = "Impossible de lancer : {reason}"
 # context: a refused write; {error} is the reason
 write_failed = "Séquences : {error}"
 ai_soon = "La rédaction d'une séquence par l'IA viendra plus tard."
+shortcut_repo_untrusted_help = "Une séquence de dépôt reçoit un raccourci une fois les séquences de ce dépôt approuvées."

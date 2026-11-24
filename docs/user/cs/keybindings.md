@@ -1218,6 +1218,9 @@ Klávesy jsou výchozí.
 | Agent: Zpět | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | Zkratky: Obnovit vše... |  |
 | Integrace: Otevřít propojený pull request | `Ctrl+G g` |
 | Integrace: Upravit propojený pull request u hostitele | `e (na řádku)` |

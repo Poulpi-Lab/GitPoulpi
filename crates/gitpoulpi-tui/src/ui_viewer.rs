@@ -379,6 +379,9 @@ pub(crate) struct UiViewer {
     /// band goes when the user moves it away (or presses Esc).
     tint_cursor: Option<usize>,
     esc_pressed: bool,
+    /// Esc pressed since the window last looked: dismisses a proposed
+    /// sequence when nothing else owned the key.
+    banner_esc: bool,
 }
 
 impl UiViewer {
@@ -400,6 +403,7 @@ impl UiViewer {
             reveal: None,
             tint_cursor: None,
             esc_pressed: false,
+            banner_esc: false,
         }
     }
 
@@ -416,6 +420,7 @@ impl UiViewer {
                 crate::ui_intent::clear_marked_tab();
                 if key.code == KeyCode::Esc {
                     self.esc_pressed = true;
+                    self.banner_esc = true;
                 }
                 if self.chip.is_some() && !self.busy && key.code == KeyCode::Esc {
                     self.drop_chip(ProposalStatus::Rejected);
@@ -426,6 +431,17 @@ impl UiViewer {
                 self.last_input = Some(Instant::now());
                 crate::ui_intent::clear_marked_tab();
                 if m.kind == MouseEventKind::Down(MouseButton::Left) {
+                    match crate::ui_intent::proposal::banner_hit(m.column, m.row) {
+                        Some(crate::ui_intent::proposal::BannerButton::Run) => {
+                            crate::ui_intent::proposal::run_sequence();
+                            return true;
+                        }
+                        Some(crate::ui_intent::proposal::BannerButton::Dismiss) => {
+                            crate::ui_intent::proposal::dismiss_sequence();
+                            return true;
+                        }
+                        None => {}
+                    }
                     let hit = self.chip.as_ref().is_some_and(|c| {
                         c.rect
                             .contains(ratatui::layout::Position::new(m.column, m.row))
@@ -453,6 +469,10 @@ impl UiViewer {
     }
 
     pub(crate) fn accept_pending(&mut self) {
+        if crate::ui_intent::proposal::sequence_pending() {
+            crate::ui_intent::proposal::run_sequence();
+            return;
+        }
         if self.chip.is_some() {
             self.wishes.accept = true;
             crate::redraw::poke();
@@ -461,6 +481,7 @@ impl UiViewer {
 
     /// The user dropped the offered view.
     pub(crate) fn dismiss_pending(&mut self) {
+        crate::ui_intent::proposal::dismiss_sequence();
         self.drop_chip(ProposalStatus::Rejected);
     }
 
@@ -477,7 +498,12 @@ impl UiViewer {
 
     /// Whether a deferred intent waits behind the chip.
     pub(crate) fn has_pending(&self) -> bool {
-        self.chip.is_some()
+        self.chip.is_some() || crate::ui_intent::proposal::sequence_pending()
+    }
+
+    /// Whether Esc was pressed since the last call (once).
+    pub(crate) fn take_banner_esc(&mut self) -> bool {
+        std::mem::take(&mut self.banner_esc)
     }
 
     /// The user chose to go to `intent`'s view (the workspace search): the

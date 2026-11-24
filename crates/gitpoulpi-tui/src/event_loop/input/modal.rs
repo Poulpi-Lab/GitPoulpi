@@ -67,6 +67,15 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         return Ok(Flow::Handled);
     }
 
+    // The steps of the repository's own sequences, before they are trusted.
+    if key.kind == KeyEventKind::Press && crate::sequence_run::repo_review::is_open() {
+        crate::sequence_run::repo_review::on_key(key);
+        if let Some(said) = crate::sequence_run::repo_review::take_result() {
+            *cx.last_message = Some(said);
+        }
+        return Ok(Flow::Handled);
+    }
+
     // "Open this link?" (an address of a commit message): the same.
     if key.kind == KeyEventKind::Press && crate::link_confirm::is_open() {
         crate::link_confirm::on_key(key);

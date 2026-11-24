@@ -1224,6 +1224,9 @@ stage_file = "z"
 | Агент: назад | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | Сочетания клавиш: сбросить все... |  |
 | Интеграции: открыть связанный pull request | `Ctrl+G g` |
 | Интеграции: править связанный pull request на хостинге | `e (на строке)` |

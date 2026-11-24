@@ -3815,6 +3815,10 @@ why_group_not_paused = { git = "没有正在等待冲突解决的分组 {$push}"
 why_group_not_ready = "请先解决并完成冲突"
 # context: palette: why a command is grayed out
 why_nothing_to_retry = { git = "上一次分组 {$push} 中没有失败的远程", local = "上一次分组{$push}中没有失败的远程" }
+sequence_repo_review = "Sequence: Review This Repository's Sequences"
+sequence_repo_trust = "Sequence: Trust This Repository's Sequences"
+sequence_repo_ignore = "Sequence: Ignore This Repository's Sequences"
+why_no_repo_sequences = "this repository has no sequences waiting for your trust"
 
 [help_section]
 rewrite = "重写历史"
@@ -5490,6 +5494,10 @@ proposed_by = "{client} 提议"
 chip_propose = "{client} 提议{what} - {accept} 或点击：打开，Esc：忽略"
 chip_show = "{client} 想显示{what} - {accept} 或点击：显示，Esc：忽略"
 shown = "{client} 已显示：{what} · {back} 返回"
+prop_sequence = "run sequence {name}"
+banner_sequence = "Proposed by {client}: {what} · {accept} runs · Esc dismisses"
+button_run = "Run"
+button_dismiss = "Dismiss"
 
 [rebase_ui]
 title_cherry_pick = { git = "交互式 {$Cherry_pick}", local = "交互式{$Cherry_pick}" }
@@ -10529,6 +10537,25 @@ step_failed_start = "{step} did not start"
 def_gone = "the sequence {name} no longer exists"
 # context: shorter run strip text when a step failed (the error text does not fit)
 strip_stopped = "{name} stopped at step {k}/{n} ({step})"
+repo_notice = { one = "This repository defines {n} sequence", other = "This repository defines {n} sequences" }
+repo_notice_changed = { one = "This repository's sequence changed", other = "This repository's {n} sequences changed" }
+repo_button_review = "Review"
+repo_button_trust = "Trust"
+repo_button_ignore = "Ignore"
+repo_review_title = "Sequences of this repository"
+repo_review_intro = "These sequences come from this repository's .gitpoulpi/sequences.toml. They run commands on your machine when you start them. Trust them only if you trust everyone who can change this repository."
+repo_review_sequence = "{name} ({id})"
+repo_review_step = "{n}. {step}"
+repo_review_pause_always = "pauses before it runs"
+repo_review_pause_never = "never pauses"
+repo_review_options = "options: {options}"
+repo_review_trust = "Trust"
+repo_key_trust = "t"
+repo_review_close = "Close"
+repo_key_close = "c"
+say_repo_trusted = "Repository sequences trusted: {n}"
+say_repo_ignored = "Repository sequences ignored until the file changes"
+repo_review_too_long = "This list is longer than the window: enlarge the window to see all of it and trust it from here."
 
 [settings_sequences]
 section_title = "Sequences"
@@ -10567,7 +10594,6 @@ shortcut = "Shortcut"
 shortcut_help = "The key that starts this sequence from anywhere in the window. Enter opens the key capture; conflicts are refused like on the Keyboard shortcuts page."
 shortcut_none = "Not set"
 shortcut_clear = "Clear"
-shortcut_repo_help = "A repository sequence has no shortcut yet."
 steps_row = "Steps"
 # context: button that opens a sequence's list of steps; {n} is how many it has
 steps_edit = "Edit steps ({n})"
@@ -10620,3 +10646,4 @@ cannot_run = "Cannot run: {reason}"
 # context: a refused write; {error} is the reason
 write_failed = "Sequences: {error}"
 ai_soon = "Drafting a sequence with the AI comes later."
+shortcut_repo_untrusted_help = "A repository sequence gets a shortcut once you trust this repository's sequences."

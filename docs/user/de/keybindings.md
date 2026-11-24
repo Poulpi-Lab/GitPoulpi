@@ -1213,6 +1213,9 @@ die Standardtasten.
 | Agent: Zurück | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | Tastenbelegung: Alle zurücksetzen... |  |
 | Integrationen: Verknüpften Pull Request öffnen | `Ctrl+G g` |
 | Integrationen: Verknüpften Pull Request auf dem Host bearbeiten | `e (auf einer Zeile)` |

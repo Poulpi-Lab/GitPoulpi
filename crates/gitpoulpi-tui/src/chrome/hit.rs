@@ -414,6 +414,9 @@ pub(crate) enum HitTarget {
     /// A button or the close cross of the running sequence's strip over the
     /// Log (`sequence_run/strip.rs`).
     SequenceStrip(crate::sequence_run::strip::StripButton),
+    /// Review / Trust / Ignore on the notice that the repository defines its
+    /// own sequences (`sequence_run/repo_strip.rs`).
+    RepoSequences(crate::sequence_run::repo_strip::NoticeButton),
     /// The proactive conflict badge's button (`conflict_badge.rs`): opens the
     /// predicted conflicts, like the palette's Conflicts: Show predicted
     /// conflicts.
@@ -634,6 +637,7 @@ pub(crate) fn desired_cursor_shape(
             | HitTarget::AutoStashBanner(_)
             | HitTarget::PushGroupStrip(_)
             | HitTarget::SequenceStrip(_)
+            | HitTarget::RepoSequences(_)
             | HitTarget::ConflictBadge
             | HitTarget::RepoTab(_)
             | HitTarget::VirtualHand,

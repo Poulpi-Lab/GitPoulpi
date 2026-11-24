@@ -1220,6 +1220,9 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Agent : Retour | `Ctrl+N Backspace` |
 | Séquence : annuler |  |
 | Séquence : continuer |  |
+| Séquence : examiner les séquences de ce dépôt |  |
+| Séquence : approuver les séquences de ce dépôt |  |
+| Séquence : ignorer les séquences de ce dépôt |  |
 | Raccourcis : Tout réinitialiser... |  |
 | Intégrations : Ouvrir la pull request liée | `Ctrl+G g` |
 | Intégrations : Modifier la pull request liée sur l'hébergeur | `e (sur une ligne)` |

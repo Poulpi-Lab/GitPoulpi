@@ -1223,6 +1223,9 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Agente: Volver | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | Atajos: Restablecer todos... |  |
 | Integraciones: Abrir pull request vinculada | `Ctrl+G g` |
 | Integraciones: Editar pull request vinculada en el host | `e (sobre una fila)` |

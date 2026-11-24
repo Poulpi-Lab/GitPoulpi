@@ -1222,6 +1222,9 @@ applicano. I tasti sono quelli predefiniti.
 | Agente: Indietro | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | Scorciatoie: Reimposta tutto... |  |
 | Integrazioni: Apri la pull request collegata | `Ctrl+G g` |
 | Integrazioni: Modifica la pull request collegata sull'host | `e (su una riga)` |

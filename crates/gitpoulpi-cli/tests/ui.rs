@@ -1122,3 +1122,94 @@ fn propose_resolution_composes_picks_checks_the_stages_and_is_gated() {
 
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();
+
+/// `gitpoulpi sequence <args>` on the harness's repository (a person's own
+/// command: only a person trusts a repository's sequences).
+fn sequence_cmd(h: &Harness, args: &[&str]) -> (i32, Value) {
+    let output = Command::cargo_bin("gitpoulpi")
+        .unwrap()
+        .env("GITPOULPI_CONFIG_DIR", h.config.path())
+        .arg("--json")
+        .args(["--session", &h.session])
+        .args(["--repo", &h.repo.root().to_string_lossy()])
+        .arg("sequence")
+        .args(args)
+        .current_dir(h.repo.root())
+        .output()
+        .unwrap();
+    let value = serde_json::from_slice(&output.stdout).unwrap();
+    (output.status.code().unwrap_or(-1), value)
+}
+
+#[test]
+fn ui_sequence_run_proposes_only_what_the_user_could_run_themselves() {
+    let deferred = UiOutcome::Deferred {
+        reason: gitpoulpi_ipc::ui::DeferReason::Ask,
+    };
+    let h = harness(
+        "cli-ui-sequence-run",
+        true,
+        deferred,
+        "[mcp]\nallow_ui_propose = false\n\n[[sequences]]\nid = \"mine\"\nname = \"Mine\"\nscope = \"machine\"\n\n[[sequences.steps]]\nrun = \"stage_all\"\n",
+    );
+    // The gate: proposals are off.
+    let (code, out) = h.json(&["sequence", "run", "mine"]);
+    assert_eq!(code, 1, "{out}");
+    assert!(out["reason"].as_str().unwrap().contains("allow_ui_propose"));
+    assert!(h.received().is_empty());
+
+    // Gate on.
+    std::fs::write(
+        h.config.path().join("config.toml"),
+        "[mcp]\nallow_ui_propose = true\n\n[[sequences]]\nid = \"mine\"\nname = \"Mine\"\nscope = \"machine\"\n\n[[sequences.steps]]\nrun = \"stage_all\"\n",
+    )
+    .unwrap();
+    // Unknown: refused before routing.
+    let (code, out) = h.json(&["sequence", "run", "ghost"]);
+    assert_eq!(code, 1, "{out}");
+    assert_eq!(out["outcome"], "refused");
+    assert!(h.received().is_empty(), "nothing reached the window");
+
+    // A sequence of the user's: proposed, nothing runs from here.
+    let (code, out) = h.json(&["sequence", "run", "mine"]);
+    assert_eq!(code, 3, "deferred: {out}");
+    assert!(out["proposal"].as_str().unwrap().starts_with("p-"), "{out}");
+    let seen = h.received();
+    let UiIntent::Propose { proposal, .. } = &seen[0].0 else {
+        panic!("{:?}", seen[0])
+    };
+    assert_eq!(
+        proposal,
+        &gitpoulpi_ipc::ui::Proposal::SequenceRun { id: "mine".into() }
+    );
+
+    // The repository's own file: refused until a person trusts it.
+    let dir = h.repo.root().join(".gitpoulpi");
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(
+        dir.join("sequences.toml"),
+        "[[sequences]]\nid = \"shared\"\nname = \"Shared\"\n\n[[sequences.steps]]\nrun = \"stage_all\"\n",
+    )
+    .unwrap();
+    let (code, out) = h.json(&["sequence", "run", "shared"]);
+    assert_eq!(code, 1, "{out}");
+    assert!(
+        out["reason"].as_str().unwrap().contains("not trusted"),
+        "{out}"
+    );
+    assert_eq!(h.received().len(), 1);
+    let (code, _) = sequence_cmd(&h, &["trust"]);
+    assert_eq!(code, 0);
+    let (code, out) = h.json(&["sequence", "run", "shared"]);
+    assert_eq!(code, 3, "{out}");
+    assert_eq!(h.received().len(), 2);
+    // A change after the trust asks again.
+    std::fs::write(
+        dir.join("sequences.toml"),
+        "[[sequences]]\nid = \"shared\"\nname = \"Shared\"\n\n[[sequences.steps]]\nrun = \"push\"\n",
+    )
+    .unwrap();
+    let (code, out) = h.json(&["sequence", "run", "shared"]);
+    assert_eq!(code, 1, "{out}");
+    assert_eq!(h.received().len(), 2, "nothing reached the window");
+}

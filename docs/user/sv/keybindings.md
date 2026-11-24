@@ -1220,6 +1220,9 @@ Tangenterna är standardvärdena.
 | Agent: Tillbaka | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | Tangentbindningar: Återställ alla... |  |
 | Integrationer: Öppna länkad pull request | `Ctrl+G g` |
 | Integrationer: Redigera länkad pull request på värden | `e (på en rad)` |

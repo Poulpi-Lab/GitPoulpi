@@ -365,6 +365,9 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::AgentBack
         | PaletteCommand::SequenceCancel
         | PaletteCommand::SequenceContinue
+        | PaletteCommand::SequenceRepoReview
+        | PaletteCommand::SequenceRepoTrust
+        | PaletteCommand::SequenceRepoIgnore
         | PaletteCommand::AiExplainSelectedCommit
         | PaletteCommand::AiSplitSelectedCommit
         | PaletteCommand::AiExplainWip

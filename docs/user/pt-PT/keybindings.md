@@ -1216,6 +1216,9 @@ As teclas são as predefinidas.
 | Agente: voltar | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | Atalhos: repor tudo... |  |
 | Integrações: abrir pull request associado | `Ctrl+G g` |
 | Integrações: editar pull request associado no host | `e (numa linha)` |

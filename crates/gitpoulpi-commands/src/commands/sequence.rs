@@ -23,6 +23,7 @@ use gitpoulpi_config::sequences::{
 };
 use gitpoulpi_config::{Config, ConfigPaths};
 use gitpoulpi_core::domain::{OperationKind, Ref, RefKind};
+use gitpoulpi_session::{inspect_repo_sequences, RepoSequences, RepoState, SequencesTrust};
 use serde_json::{json, Value};
 
 use super::emitted;
@@ -490,15 +491,101 @@ fn visible(config: &Config, install_id: &str) -> Vec<SequenceDef> {
         .collect()
 }
 
-/// Repository sequences, read without trust (never run).
-fn peeked(repo: Option<&str>) -> (Vec<SequenceDef>, Option<String>) {
-    let Some(root) = repo_root(repo) else {
-        return (Vec::new(), None);
-    };
-    match sequences::peek_repo_sequences(&root) {
-        Ok(defs) => (defs, None),
-        Err(e) => (Vec::new(), Some(e.to_string())),
+/// The repository's sequences file with the trust the user gave it.
+fn repo_view(repo: Option<&str>) -> Option<(PathBuf, RepoSequences)> {
+    let root = repo_root(repo)?;
+    let state = RepoState::load(&crate::commands::repo_state_path(&root)).unwrap_or_default();
+    let seen = inspect_repo_sequences(&root, &state);
+    Some((root, seen))
+}
+
+/// Repository sequences with whether they may run, and a read error.
+fn peeked(
+    repo: Option<&str>,
+) -> (
+    Vec<SequenceDef>,
+    bool,
+    Option<String>,
+    Option<RepoSequences>,
+) {
+    match repo_view(repo) {
+        Some((_, seen)) => (
+            seen.defs.clone(),
+            seen.trust == SequencesTrust::Trusted,
+            seen.error.clone(),
+            Some(seen),
+        ),
+        None => (Vec::new(), false, None, None),
     }
+}
+
+fn trust_name(t: SequencesTrust) -> &'static str {
+    match t {
+        SequencesTrust::None => "none",
+        SequencesTrust::Trusted => "trusted",
+        SequencesTrust::Untrusted => "untrusted",
+        SequencesTrust::Changed => "changed",
+    }
+}
+
+/// Why the sequence `id` cannot be proposed to the terminal UI, if it cannot:
+/// unknown, invalid, or the repository's file not trusted as it is now. Steps
+/// that only the UI can do are fine here (the UI runs them).
+pub(crate) fn runnable_in_ui(id: &str, repo: Option<&str>) -> Result<(), String> {
+    let (def, trusted, extra) = find(id, repo)?;
+    if !trusted {
+        return Err(format!(
+            "the sequence \"{id}\" comes from the repository's .gitpoulpi/sequences.toml, which \
+             the user has not trusted as it is now (a person runs `gitpoulpi sequence trust`)"
+        ));
+    }
+    let mut problems = sequences::validate(&def);
+    problems.extend(extra);
+    match problems.first() {
+        None => Ok(()),
+        Some(p) => Err(format!("the sequence \"{id}\" is invalid: {}", p.reason)),
+    }
+}
+
+/// `sequence trust` / `untrust`.
+fn set_trust(repo: Option<&str>, trust: bool) -> Res {
+    let (root, seen) = repo_view(repo)
+        .ok_or_else(|| "not inside a git repository (pass --repo PATH)".to_string())?;
+    let path = crate::commands::repo_state_path(&root);
+    let mut state = RepoState::load(&path).map_err(|e| e.to_string())?;
+    let ids: Vec<&str> = seen.defs.iter().map(|d| d.id.as_str()).collect();
+    if trust {
+        if seen.defs.is_empty() {
+            let why = seen.error.unwrap_or_else(|| {
+                "this repository has no .gitpoulpi/sequences.toml with sequences".to_string()
+            });
+            return Ok(Emitted {
+                json: json!({ "trusted": false, "reason": why }),
+                human: why,
+                exit_code: 2,
+            });
+        }
+        let now = gitpoulpi_session::now_seconds();
+        state.trust_sequences(&seen.hash, ids.iter().map(|s| s.to_string()).collect(), now);
+        state.save(&path).map_err(|e| e.to_string())?;
+        let human = format!("trusted {} sequence(s): {}", ids.len(), ids.join(", "));
+        return Ok(emitted(
+            json!({ "trusted": true, "hash": seen.hash, "sequences": ids }),
+            human,
+        ));
+    }
+    let had = state.untrust_sequences();
+    if had {
+        state.save(&path).map_err(|e| e.to_string())?;
+    }
+    Ok(emitted(
+        json!({ "trusted": false, "forgot": had }),
+        if had {
+            "forgot the trust of this repository's sequences".to_string()
+        } else {
+            "this repository's sequences were not trusted".to_string()
+        },
+    ))
 }
 
 /// Duplicate-id problems of `defs`, per index.
@@ -525,6 +612,8 @@ pub(crate) fn run_local(action: SequenceAction, repo: Option<&str>) -> Res {
             scope,
         } => add(&file, replace, scope, repo),
         SequenceAction::Remove { id, scope } => remove(&id, scope, repo),
+        SequenceAction::Trust => set_trust(repo, true),
+        SequenceAction::Untrust => set_trust(repo, false),
         SequenceAction::Run { .. } => unreachable!("`sequence run` goes through the daemon"),
     }
 }
@@ -534,7 +623,9 @@ pub(crate) fn needs_daemon(action: &SequenceAction) -> bool {
     matches!(action, SequenceAction::Run { .. })
 }
 
-fn all_entries(repo: Option<&str>) -> Result<(Vec<Value>, Option<String>), String> {
+type Entries = (Vec<Value>, Option<String>, Option<RepoSequences>);
+
+fn all_entries(repo: Option<&str>) -> Result<Entries, String> {
     let config = load_config(&config_file()?)?;
     let defs = visible(&config, &installation::current().identity.id);
     let dups = duplicates(&defs);
@@ -543,13 +634,13 @@ fn all_entries(repo: Option<&str>) -> Result<(Vec<Value>, Option<String>), Strin
         .zip(&dups)
         .map(|(d, extra)| entry(d, true, extra))
         .collect();
-    let (repo_defs, error) = peeked(repo);
-    out.extend(repo_defs.iter().map(|d| entry(d, false, &[])));
-    Ok((out, error))
+    let (repo_defs, trusted, error, seen) = peeked(repo);
+    out.extend(repo_defs.iter().map(|d| entry(d, trusted, &[])));
+    Ok((out, error, seen))
 }
 
 fn list(repo: Option<&str>) -> Res {
-    let (entries, error) = all_entries(repo)?;
+    let (entries, error, seen) = all_entries(repo)?;
     let human = if entries.is_empty() {
         "no sequences".to_string()
     } else {
@@ -562,7 +653,7 @@ fn list(repo: Option<&str>) -> Res {
                     e["scope"].as_str().unwrap_or(""),
                     e["steps"].as_array().map_or(0, Vec::len),
                     if e["trusted"] == json!(false) {
-                        "  (repository file, not trusted)"
+                        "  (repository file, not trusted: `gitpoulpi sequence trust`)"
                     } else {
                         ""
                     }
@@ -575,6 +666,9 @@ fn list(repo: Option<&str>) -> Res {
     if let Some(error) = error {
         value["repo_error"] = json!(error);
     }
+    if let Some(seen) = seen.filter(|s| s.trust != SequencesTrust::None) {
+        value["repo_trust"] = json!({ "state": trust_name(seen.trust), "hash": seen.hash });
+    }
     Ok(emitted(value, human))
 }
 
@@ -585,9 +679,9 @@ fn find(id: &str, repo: Option<&str>) -> Result<(SequenceDef, bool, Vec<Sequence
     if let Some(i) = defs.iter().position(|d| d.id == id) {
         return Ok((defs[i].clone(), true, dups[i].clone()));
     }
-    let (repo_defs, _) = peeked(repo);
+    let (repo_defs, trusted, _, _) = peeked(repo);
     if let Some(d) = repo_defs.into_iter().find(|d| d.id == id) {
-        return Ok((d, false, Vec::new()));
+        return Ok((d, trusted, Vec::new()));
     }
     Err(format!(
         "no sequence with the id \"{id}\" (`gitpoulpi sequence list` shows them)"
@@ -911,7 +1005,7 @@ pub(crate) async fn run_via_daemon(
             &[problem(
                 None,
                 "untrusted",
-                "this sequence comes from the repository's .gitpoulpi/sequences.toml, which is not trusted: a repository file is somebody else's commands and never runs headless",
+                "this sequence comes from the repository's .gitpoulpi/sequences.toml, which is not trusted as it is now (never, or it changed since): a repository file is somebody else's commands. Read it with `gitpoulpi sequence show`, then a person runs `gitpoulpi sequence trust`",
             )],
         ));
     }

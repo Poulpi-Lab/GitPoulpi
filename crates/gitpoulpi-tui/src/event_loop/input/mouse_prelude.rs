@@ -228,6 +228,18 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
         super::commands::open_limit_setting(cx);
         return Ok(None);
     }
+    // The repository sequences' review is modal the same way.
+    if crate::sequence_run::repo_review::is_open() {
+        *cx.hovered_target = None;
+        *cx.hovered_tab_index = None;
+        *cx.hovered_close_tab = None;
+        *cx.hovered_status_row = None;
+        crate::sequence_run::repo_review::on_mouse(mouse);
+        if let Some(said) = crate::sequence_run::repo_review::take_result() {
+            *cx.last_message = Some(said);
+        }
+        return Ok(None);
+    }
     // "Open this link?" is modal the same way.
     if crate::link_confirm::is_open() {
         *cx.hovered_target = None;

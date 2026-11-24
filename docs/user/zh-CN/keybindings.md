@@ -1184,6 +1184,9 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 代理：返回 | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | 键位绑定：全部重置… |  |
 | 集成：打开关联的 pull request | `Ctrl+G g` |
 | 集成：在托管平台上编辑关联的 pull request | `e（在某一行上）` |

@@ -92,6 +92,9 @@ pub(crate) enum Kind {
     Truncation,
     /// An edit of a commit that is not on the checked-out branch.
     OffBranch(OffBranch),
+    /// The steps of the repository's own sequences, shown before they are
+    /// trusted (`sequence_run::repo_review`).
+    RepoSequences,
 }
 
 #[derive(Debug, Clone)]

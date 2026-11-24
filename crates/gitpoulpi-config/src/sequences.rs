@@ -873,7 +873,10 @@ pub fn parse_repo_sequences(text: &str) -> Result<Vec<SequenceDef>> {
 pub fn repo_sequences_hash(defs: &[SequenceDef]) -> String {
     use sha2::{Digest, Sha256};
     let mut h = Sha256::new();
-    for d in defs {
+    // The order of the sequences in the file does not matter.
+    let mut sorted: Vec<&SequenceDef> = defs.iter().collect();
+    sorted.sort_by(|a, b| a.id.cmp(&b.id));
+    for d in sorted {
         h.update(d.id.as_bytes());
         h.update([0]);
         for s in &d.steps {

@@ -1212,6 +1212,9 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Агент: назад | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | Скорочення: скинути все... |  |
 | Інтеграції: відкрити пов'язаний pull request | `Ctrl+G g` |
 | Інтеграції: змінити пов'язаний pull request на хостингу | `e (на рядку)` |

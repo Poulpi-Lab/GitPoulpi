@@ -18,6 +18,9 @@
 pub(crate) mod exec;
 pub(crate) mod machine;
 pub(crate) mod registry;
+pub(crate) mod repo;
+pub(crate) mod repo_review;
+pub(crate) mod repo_strip;
 pub(crate) mod strip;
 
 #[cfg(test)]
@@ -253,13 +256,17 @@ pub(crate) fn start(slot: u16, origin_root: &Path, last_message: &mut Option<Str
 
 fn start_slot(slot: u16, origin_root: &Path) -> Result<(), String> {
     let info = registry::info(slot).ok_or_else(|| format!("#{slot}"))?;
-    let def = load_def(info.slug)
+    let def = load_def(info.slug, origin_root)
         .ok_or_else(|| gitpoulpi_i18n::msg::sequence_run::def_gone(&info.name))?;
     begin(Run::new(&def, origin_root, Instant::now(), exec::resolve))
 }
 
 /// The definition of `slug` among the sequences this installation sees.
-fn load_def(slug: &str) -> Option<gitpoulpi_config::sequences::SequenceDef> {
+///
+/// One of the repository's own is read from the file again right now and
+/// used only while that file is trusted exactly as it is: what runs is what
+/// was trusted, whatever happened since the last frame.
+fn load_def(slug: &str, root: &Path) -> Option<gitpoulpi_config::sequences::SequenceDef> {
     let paths = gitpoulpi_config::ConfigPaths::discover()?;
     let config = gitpoulpi_config::Config::load(&paths.config_file()).ok()?;
     let install = gitpoulpi_config::installation::current()
@@ -270,4 +277,5 @@ fn load_def(slug: &str) -> Option<gitpoulpi_config::sequences::SequenceDef> {
         .into_iter()
         .map(|(d, _)| d)
         .find(|d| d.id == slug)
+        .or_else(|| repo::fresh_trusted(root).into_iter().find(|d| d.id == slug))
 }

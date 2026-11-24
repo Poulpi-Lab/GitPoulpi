@@ -1211,6 +1211,9 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 에이전트: 뒤로 | `Ctrl+N Backspace` |
 | Sequence: Cancel |  |
 | Sequence: Continue |  |
+| Sequence: Review This Repository's Sequences |  |
+| Sequence: Trust This Repository's Sequences |  |
+| Sequence: Ignore This Repository's Sequences |  |
 | 단축키: 모두 초기화... |  |
 | 연동: 연결된 Pull request 열기 | `Ctrl+G g` |
 | 연동: 연결된 Pull request를 호스트에서 편집 | `e (행에서)` |

@@ -249,11 +249,15 @@ pub fn is_view(cli_path: &[String]) -> bool {
     cli_path.first().map(String::as_str) == Some("ui")
 }
 
-/// The propose tools (`gitpoulpi ui propose ...`): a dialog opened
-/// pre-filled for the user to confirm. Their own gate is
+/// The propose tools (`gitpoulpi ui propose ...`, `ui sequence run`): a
+/// dialog or banner opened for the user to confirm. Their own gate is
 /// `allow_ui_propose`, on top of `allow_ui` / `ui_control`.
 pub fn is_propose(cli_path: &[String]) -> bool {
-    is_view(cli_path) && cli_path.get(1).map(String::as_str) == Some("propose")
+    is_view(cli_path)
+        && matches!(
+            cli_path.get(1).map(String::as_str),
+            Some("propose") | Some("sequence")
+        )
 }
 
 /// `ui state` and `ui viewers` only *read* what the window shows, so

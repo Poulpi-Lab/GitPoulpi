@@ -53,7 +53,7 @@ pub use repo_auth::RepoAuthAction;
 #[cfg(feature = "history-rewrite")]
 pub use rewrite::{RewriteAction, RewriteRecipeArgs, RewriteScriptAction};
 pub use sequence::{SequenceAction, SequenceScopeArg};
-pub use ui::{HostingViewArg, UiAction, UiProposeAction, UiShowAction};
+pub use ui::{HostingViewArg, UiAction, UiProposeAction, UiSequenceAction, UiShowAction};
 #[cfg(feature = "global-search")]
 pub use workspace::SearchKindArg;
 #[cfg(feature = "workspaces")]

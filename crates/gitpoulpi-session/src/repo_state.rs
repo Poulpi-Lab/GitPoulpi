@@ -355,6 +355,14 @@ pub struct RepoState {
     /// (`FlowTrustHooks`; the MCP server cannot). Capped at 50.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub trusted_hooks: Vec<TrustedHooks>,
+    /// The repository's own sequences (`.gitpoulpi/sequences.toml`) the user
+    /// trusted, by `gitpoulpi_config::sequences::repo_sequences_hash`: they
+    /// are listed, bound and run only while the file's hash is here, so any
+    /// change of an id, a command, a pause or an option asks again (names do
+    /// not count). Only a human adds to it (the TUI's notice, `sequence
+    /// trust`); the MCP server cannot. Capped at 50.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub trusted_sequences: Vec<TrustedSequences>,
     /// Keys this build does not know, kept as they are: the file is shared by
     /// every installation of the repository (the installations design, 1.5),
     /// and a newer build's key must survive an older build saving it.
@@ -399,6 +407,19 @@ pub struct TrustedHooks {
     /// `hooks_hash` of the list.
     pub hash: String,
     pub hooks: Vec<HookLine>,
+    /// Unix seconds.
+    pub trusted_at: i64,
+}
+
+/// A repository's sequences the user trusted (see
+/// `RepoState::trusted_sequences`).
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct TrustedSequences {
+    /// `repo_sequences_hash` of the file's sequences.
+    pub hash: String,
+    /// Their ids, for humans.
+    pub ids: Vec<String>,
     /// Unix seconds.
     pub trusted_at: i64,
 }
@@ -523,6 +544,31 @@ impl RepoState {
                 .iter()
                 .any(|h| h.phase == phase && h.command == command)
         })
+    }
+
+    /// Trusts the repository sequences whose hash is `hash` (the same hash
+    /// again only refreshes it); capped at 50, forgetting the oldest.
+    pub fn trust_sequences(&mut self, hash: &str, ids: Vec<String>, now: i64) {
+        self.trusted_sequences.retain(|t| t.hash != hash);
+        self.trusted_sequences.push(TrustedSequences {
+            hash: hash.to_string(),
+            ids,
+            trusted_at: now,
+        });
+        let extra = self.trusted_sequences.len().saturating_sub(50);
+        self.trusted_sequences.drain(..extra);
+    }
+
+    /// Whether the repository sequences with this hash were trusted.
+    pub fn trusts_sequences(&self, hash: &str) -> bool {
+        self.trusted_sequences.iter().any(|t| t.hash == hash)
+    }
+
+    /// Forgets every trusted sequences record; returns whether there was one.
+    pub fn untrust_sequences(&mut self) -> bool {
+        let had = !self.trusted_sequences.is_empty();
+        self.trusted_sequences.clear();
+        had
     }
 
     /// Whether the user trusted the script with this hash.
@@ -794,6 +840,29 @@ mod tests {
             RepoState::load(&path).unwrap().trusted_hooks,
             state.trusted_hooks
         );
+    }
+
+    #[test]
+    fn trusted_sequences_are_keyed_by_hash_and_forgotten_together() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = RepoState::path_for(dir.path(), ".gitpoulpi");
+        let mut state = RepoState::default();
+        state.trust_sequences("aa", vec!["backup".into()], 1);
+        state.trust_sequences("aa", vec!["backup".into()], 2);
+        assert_eq!(state.trusted_sequences.len(), 1);
+        assert!(state.trusts_sequences("aa"));
+        assert!(!state.trusts_sequences("bb"), "a changed file asks again");
+        for i in 0..60 {
+            state.trust_sequences(&format!("h{i}"), vec![], 3);
+        }
+        assert_eq!(state.trusted_sequences.len(), 50);
+        assert!(!state.trusts_sequences("aa"), "the oldest is forgotten");
+        state.save(&path).unwrap();
+        let mut back = RepoState::load(&path).unwrap();
+        assert_eq!(back.trusted_sequences, state.trusted_sequences);
+        assert!(back.untrust_sequences());
+        assert!(!back.untrust_sequences());
+        assert!(!back.trusts_sequences("h59"));
     }
 
     #[test]

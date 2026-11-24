@@ -165,6 +165,22 @@ agente* na paleta de comandos) abre o agente uma vez, num terminal visível, na
 pasta de trabalho que ele vai usar. Responda à pergunta, feche o agente e tente
 de novo; a resposta fica memorizada pelo agente.
 
+### Abrir o agente na pasta de um separador
+
+`Separador: abrir agente de IA aqui` na paleta de comandos (reatribuível como `palette.tab_open_agent_here`,
+sem tecla predefinida) abre o seu terminal na pasta do separador ativo a executar o agente de um perfil de
+agente local, para trabalhar com ele à mão aí. É o mesmo terminal que **Terminal aqui** e o mesmo comando
+que **Abrir o agente...**, mas na pasta do separador em vez da pasta de trabalho do próprio perfil. Com um
+só perfil de agente local abre logo; com vários, uma lista por baixo da barra de separadores pergunta qual.
+Não envia nenhum prompt e não inicia nenhum pedido à IA: abrir o agente é a ação, e o que escrever nele é
+seu.
+
+A linha leva a faísca da IA, fica oculta com a IA desligada (**Definições > IA**) e a cinzento
+("nenhum agente de IA local está configurado") quando nenhum perfil é um agente local. Numa sequência, o
+passo `tab_open_agent_here` recebe o `id` do perfil de IA na sua opção `profile` (vazio: o perfil
+predefinido, senão o primeiro agente local). Um modelo de terminal seu não pode receber o comando do
+agente: o terminal abre na pasta e a linha de estado diz que comando executar.
+
 A resposta é lida da transcrição da sessão do agente no Claude Code (o seu texto
 exato, apagada depois) e do ecrã entre duas linhas de marcação que o pedido
 solicita, no Codex e no Gemini. No máximo duas execuções em terminal virtual
@@ -296,6 +312,7 @@ enquanto passa o rato ou a realça.
 | **Dividir um commit** | O menu de um commit, *Dividir commit (IA)...*, ou na paleta `IA: dividir o commit selecionado...`. O editor de divisão abre com o agrupamento do modelo já preenchido; veja abaixo. | `ai split-plan <rev>` (imprime) |
 | **Script de reescrita do histórico** | No [painel de reescrita do histórico](history-rewrite.md#escrever-um-script-com-ia): o botão `✦ Escrever com IA...` do editor de scripts, ou na paleta `Reescrever: escrever um script com IA...`. Um diálogo mostra exatamente o que será enviado; o script chega ao editor, assinalado, e nunca é executado nem aplicado por si. | `ai rewrite-script "<instrução>" [--sample N]` (imprime) |
 | **Regras de reescrita do histórico** | No [painel de reescrita do histórico](history-rewrite.md#criar-regras-com-ia): o botão `✦ Criar regras com IA...`, `Alt+I`, ou na paleta `Reescrever: criar regras com IA...`. Um diálogo de várias linhas mostra exatamente o que será enviado; as regras e as definições chegam ao painel e nada é pré-visualizado nem aplicado por si. | `ai rewrite-rules "<descrição>" [--context]` (imprime) |
+| **Rascunho de sequência** | Descreva uma [sequência de ações](#rascunho-de-sequência) a criar, ou como alterar uma (Definições > Sequências, ao lado, na janela). | `ai sequence-draft "<descrição>" [--edit <id>] [--context]` (imprime) |
 | **Nome do worktree** | No [diálogo Criar worktree](worktrees.md#nomear-com-ia): o botão `✦ Nomear com IA` ou `Alt+A` abre uma caixa onde descreve a funcionalidade, o erro ou a tarefa; o modelo dá nome ao worktree e à sua branch segundo os nomes de branches do próprio repositório, e ambos ficam nos campos do diálogo para os editar. Só são enviados a sua descrição e os nomes das branches locais, por isso não tem diálogo "o que é enviado". | `ai worktree-name --describe "<tarefa>"` (imprime) |
 | **Responder num host** e **Descrição da issue** | O botão **Escrever com IA** (`Alt+E`) de cada caixa de texto Markdown que envia para um host: um comentário, uma resposta ou uma edição numa conversa, um comentário ou resumo de revisão, a descrição de uma nova issue. O rascunho fica na caixa; nada é publicado. Veja [Ajuda de escrita num host](#ajuda-de-escrita-num-host). | `ai hosting-reply` (imprime um rascunho) |
 | **Compositor de commits** | O menu da linha WIP *Compor commits (IA)...*, `Ctrl+G C`, na paleta `IA: compor commits a partir das alterações em curso...` | |
@@ -382,6 +399,27 @@ as válidas são mantidas. Nunca é criada assim uma regra Script. Opcionalmente
 das branches e das tags e os autores dos commits mais recentes vão junto (uma caixa, desmarcada
 por predefinição, mostrada no painel "o que é enviado"). O perfil e as instruções são os de
 *Regras de reescrita do histórico* em Definições > IA.
+
+### Rascunho de sequência
+
+Descreve por palavras suas uma sequência de ações ("fazer stage de tudo, escrever a mensagem com a IA, commit
+e push", ou, para uma existente, "acrescentar primeiro um fetch") e o modelo propõe um nome, um id, os passos
+e, se quiser, um atalho. **Só propõe**: nada é guardado antes de aceitar e nada é alguma vez executado. O
+modelo só conhece os comandos que uma sequência pode conter (a lista que recebe é gerada a partir da mesma
+tabela que valida uma sequência, por isso não pode divergir); cada passo é verificado por si, e um passo que
+é desconhecido, destrutivo, executa outra sequência ou pede uma pausa impossível fica de fora e é listado
+com o motivo, enquanto os válidos são mantidos. Opcionalmente os nomes dos remotos, os ids dos perfis de IA
+e as etiquetas de Abrir em vão junto (desligado por predefinição; a opção da CLI é `--context`). No
+terminal, `gitpoulpi ai sequence-draft` imprime a proposta em JSON (com `toml`, que `gitpoulpi sequence add
+--file` lê) e não guarda nada. O perfil e as instruções são os de *Rascunho de sequência* em Definições > IA.
+
+Na interface de terminal, a mesma tarefa é a entrada **Criar com IA...** de Definições > Sequências >
+**Adicionar** (paleta: `Sequência: criar com IA...`) e o botão **Editar com IA...** de uma sequência: um
+diálogo onde escreve o que quer, com a caixa de contexto (desligada por predefinição) e a pergunta "O que é
+enviado", e depois uma proposta para **Aceitar**, **Editar antes de guardar**, **Rejeitar** ou enviar de novo
+com **Voltar**. Uma edição mostra um diff em relação à sequência atual (`+` adicionado, `-` removido, `~`
+alterado) e o atalho sugerido é verificado contra o seu mapa de teclas mas nunca é atribuído. Nada é
+guardado antes de aceitar (veja [Sequências](sequences.md#criar-e-editar-com-ia)).
 
 ### Ajuda de escrita num host
 

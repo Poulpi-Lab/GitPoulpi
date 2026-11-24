@@ -17,7 +17,63 @@ Um repositório que não está ligado nunca é consultado: mostra antes uma linh
 ![O Radar sobre dois repositórios: um pedido afixado, depois Aguardam a minha revisão, Os meus pull requests, Atribuídos a mim, issues e trabalho em curso](../images/radar.png)
 
 **Rever...** numa linha de pull ou merge request (ou `e`) abre o repositório com a revisão do pedido na própria aplicação
-([Rever um pull request](review.md)).
+([Rever um pull request](review.md)). Para um pedido de um repositório que clonou mas nunca ligou ao host, o clone é
+ligado primeiro ao projeto do pedido (a menos que já tenha a sua própria ligação de pull request), para a revisão começar no seu separador.
+
+### A coluna Ações
+
+À direita de uma linha de pedido ou de issue, pequenos botões fazem o que uma tecla faz na linha selecionada (um clique
+seleciona a linha e executa a ação; pouse o ponteiro num botão para ver o seu nome e a sua tecla):
+
+```
+Larga:    #58  Arredondar totais    feature/login → main   alice   2d   Rever  [globo]  [conversa]  ⊕  ×  ⇣  ⋮
+Estreita: #58  Arredondar totais    feature/login → main                 [rev]  [globo]  [conversa]  ⋮
+Issue:    #12  Falha com lista vazia                       bob     5h   Iniciar trabalho  [globo]  [conversa]  ×  ⋮
+```
+
+| Botão | Tecla | Paleta |
+|---|---|---|
+| **Rever** (um pedido que aguarda a sua revisão; pergunta como quando não está clonado) | `e` | `Radar: rever pedido...` |
+| **Iniciar trabalho** (uma issue clonada) | `n` | `Radar: iniciar trabalho na issue...` |
+| o globo: abrir a página no host | `o` | `Radar: abrir no navegador` |
+| o glifo de linhas: abrir a conversa | `i` | `Radar: abrir a conversa da issue` |
+| `»` **Marcar como pronto** (um pedido em rascunho) | `y` | `Radar: marcar como pronto` |
+| `⊕` **Merge** (um pedido) | `m` | `Radar: merge do pedido...` |
+| `×` **Fechar** (um pedido ou uma issue) | `x` | `Radar: fechar...` |
+| `⇣` **Clonar** (uma linha cujo repositório não está clonado) | `g` | `Radar: clonar repositório...` |
+
+Uma linha sem ação deixa a sua célula vazia, por isso cada botão fica na mesma coluna em todas as linhas. Quando a janela é
+estreita, as palavras Rever e Iniciar trabalho passam a glifos antes de qualquer outra coluna desaparecer; os botões Pronto, Merge,
+Fechar e Clonar saem da coluna antes do título, mas ficam no menu da linha (`⋮`, clique com o botão direito, ou `Shift+F10`), onde uma ação
+que não pode correr aparece a cinzento com o seu motivo. A coluna é automática (não é
+uma das colunas redimensionáveis). Um clique duplo ou `Enter` num pedido que não está clonado pergunta como o rever, como **Rever**.
+
+### As branches de um pedido
+
+Uma linha de pedido mostra `origem → destino` a seguir ao título (`alice:feature/login → main` quando a branch de origem está num fork).
+Quando falta espaço, o destino é cortado primeiro (reticências), o título fica com a maior parte do espaço, e numa janela estreita as
+branches não são mostradas; a coluna Ações nunca é empurrada para fora. Pouse o ponteiro num texto cortado para o ver por inteiro. Um host que
+não indicou as branches não mostra nada aí. Uma linha de issue nomeia o seu repositório no mesmo chip de uma linha de pedido (o
+nome da pasta do clone, ou `owner/name` quando não está clonado).
+
+### Agir no host
+
+**Merge**, **Fechar** e **Marcar como pronto** funcionam no GitHub, GitLab, Gitea e Forgejo (os outros hosts apresentam-nos a cinzento com "Não suportado
+por ..."; as issues podem ser fechadas nos mesmos hosts).
+
+- **Merge** pergunta primeiro: a caixa nomeia o pedido, o seu projeto e as branches, e oferece o método (um commit de merge, squash,
+  e rebase onde o host o tem; o GitLab faz merge ou squash). É recusado com o seu motivo para um rascunho, um pedido que
+  tem conflitos com o destino, ou verificações a falhar; uma recusa do host (sem permissão, uma regra da branch) aparece na
+  linha de estado.
+- **Fechar** pergunta primeiro e fecha sem fazer merge.
+- **Marcar como pronto** tira um rascunho do estado de rascunho (GitLab e Gitea: a marca `Draft:` / `WIP:` sai do título). Não pergunta
+  nada: é reversível no host.
+- **Clonar** abre a caixa Clonar habitual sobre o projeto da linha (o URL vem preenchido, o seletor de pastas é o habitual). Quando
+  o clone existe, o Radar coloca a linha nele da próxima vez que ler os remotos (reabra-o ou Atualizar), e Clonar passa então a
+  dizer onde está o clone.
+
+O Merge e o Fechar alteram o host e **não podem ser desfeitos a partir do GitPoulpi** (a caixa di-lo); reabra um pedido fechado no host.
+Depois de uma chamada bem-sucedida as listas são pedidas de novo, por isso uma linha integrada ou fechada sai e uma pronta perde o seu chip `draft`.
 
 ## Abri-lo
 
@@ -188,7 +244,7 @@ tem sempre uma tecla e um equivalente na paleta.
 
 | Ação | Tecla | Paleta |
 |---|---|---|
-| Abrir repositório (o seu separador abre, ou é ativado) | `Enter` / clique duplo | `Radar: abrir repositório` |
+| Abrir repositório (o seu separador abre, ou é ativado; um pedido que não está clonado pergunta como o rever) | `Enter` / clique duplo | `Radar: abrir repositório` |
 | Rever... (um pedido; um pedido não clonado pergunta como) | `e` | `Radar: rever pedido...` |
 | Rever um pedido através da API do host (sem clone) | `a` na pergunta | `Radar: rever através da API` |
 | Clonar o repositório e depois rever o pedido | `c` na pergunta | `Radar: clonar e rever...` |

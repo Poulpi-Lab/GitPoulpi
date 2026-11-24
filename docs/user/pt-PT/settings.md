@@ -459,7 +459,7 @@ servidor; veja [MCP e agentes](mcp-and-agents.md).
 | **Cor dos campos**, **Cor personalizada dos campos** | O fundo dos campos de texto: **Seguir o tema** (predefinição), uma cor escura fixa, ou o seu próprio `#rrggbb`. |
 | **Cursor de texto** | `ui.text_cursor`: **terminal** (predefinição) põe o cursor do próprio terminal na posição do cursor de texto do campo em foco, como uma barra (aplicam-se as definições de cursor do seu terminal, e a janela de candidatos de um método de entrada abre nessa posição); **drawn** desenha o cursor próprio do GitPoulpi e mantém o cursor do terminal oculto. Aplica-se de imediato. Paleta: `Definições: Cursor de texto...`. |
 | **Profundidade de cor** | **auto** (predefinição), **truecolor**, **256** ou **16**. Veja [Temas](themes.md). |
-| **Tema de cores do grafo** | **Seguir o tema** (predefinição: as cores de faixa do próprio tema) ou qualquer paleta de faixas. Cada paleta mostra algumas das suas cores. Aplica-se quando as Definições se fecham. O comando da paleta **Aplicação: mudar tema de cores do grafo...** (`Ctrl+N Shift+T`) pré-visualiza cada paleta em direto. |
+| **Tema de cores do grafo** | **Seguir o tema** (predefinição: as cores de faixa do próprio tema) ou qualquer paleta de faixas, incluindo os seus próprios ficheiros de tema (depois das predefinições). Cada paleta mostra algumas das suas cores; um nome configurado que já não existe é marcado *não encontrado* e o grafo usa as faixas do tema. Aplica-se quando as Definições se fecham. O comando da paleta **Aplicação: mudar tema de cores do grafo...** (`Ctrl+N Shift+T`) pré-visualiza cada paleta em direto. |
 | **Fundo das faixas do grafo** | **Desativado** (transparente) ou **Tom da linha**: uma banda ténue da cor da faixa por trás da coluna do grafo, com uma barra fina na sua margem. |
 | **Intensidade do tom da linha** | Quão esbatida fica a banda do Tom da linha: **Forte**, **Média** (predefinição) ou **Subtil**. A barra da margem mantém a sua cor total. |
 | **Posição da barra de ferramentas** | `ui.toolbar_position`: Onde fica a barra de ferramentas: Topo, Fundo (predefinição), Esquerda ou Direita. Esquerda e Direita formam uma coluna junto aos painéis; uma janela com menos de 80 colunas desenha-a no fundo. Aplica-se de imediato. |
@@ -472,6 +472,8 @@ servidor; veja [MCP e agentes](mcp-and-agents.md).
 | **Formato de data**, **Formato de data/hora**, **Formato de data detalhado** | Os padrões de data da coluna de data do Histórico do ficheiro e do Blame, da coluna Data do Log, e dos detalhes do commit. Cada um mostra uma pré-visualização em direto. Veja a [Referência de configuração](config-reference.md#ui) para os tokens. |
 
 ![A lista Tema de cores do grafo: Seguir o tema, depois todas as paletas de faixas com algumas das suas cores](../images/settings-log-graph-lanes.png)
+
+O tema e as cores do grafo (o Tema, o tema de cores do grafo, a colorização e o fundo das faixas, a intensidade da cor das linhas) pertencem a cada instalação: com várias instalações a partilhar um `config.toml`, alterá-los numa nunca altera as outras. Só a instalação principal escreve também as chaves `ui.*` partilhadas.
 
 ### Teclado e rato
 
@@ -504,6 +506,21 @@ Três opções estão no separador **Geral**.
 | **Protocolo de teclado do Kitty** | **auto** pede ao terminal o protocolo de teclado do kitty, para que `Ctrl+,`, `Ctrl+Enter` e `Ctrl+Shift+N` cheguem. **off** nunca pede; use-o se um terminal se portar mal. Precisa de reinício. |
 | **Rato ativado** | Desligado deixa o rato e a seleção de texto ao seu terminal. Precisa de reinício. |
 | **Linhas da roda do rato** | Quantas linhas um passo da roda move no Log. Precisa de reinício. |
+
+### Sequências
+
+**Definições > Sequências** edita as suas [sequências](sequences.md) nomeadas: listas de
+comandos da paleta executados um a seguir ao outro, cada uma uma linha da paleta e
+associável a uma tecla. É uma [página de lista](#listas) com uma só face: **+ Adicionar** oferece
+uma sequência vazia e as predefinições (**Cópia de segurança**, **Compor e push**,
+**Worktree e agente**), as linhas são o **Nome**, o **Id**, uma
+**Descrição**, o **Âmbito** (esta instalação, todas as instalações neste
+computador, ou só este repositório), um botão **Atalho** que abre o popup de
+captura de **Teclado e rato**, **Editar passos** e **Executar agora**.
+**Editar passos** passa a lista para os passos da sequência, cada um com uma
+**Pausa** (**Predefinida**, **Sempre**, **Nunca**) e as suas opções; **+ Adicionar**
+aí abre uma lista filtrável dos comandos que um passo pode ser. Cada alteração
+aplica-se logo. Veja [Sequências](sequences.md).
 
 ### Log e grafo
 
@@ -543,6 +560,7 @@ grafo estão na página **Aspeto**.
 | **Números de linha** | A coluna de números de linha do editor e do diff. |
 | **Seguir a seleção no editor** | Com o editor aberto, selecionar outro ficheiro no painel direito também o abre no editor, depois de perguntar se as alterações por guardar devem ser guardadas. Um ficheiro que não pode ser editado abre na vista habitual. Só para as alterações de trabalho: um ficheiro escolhido num commit sai do editor para o diff desse commit. |
 | **Quebra de linha** | Quebra as linhas compridas do diff. |
+| **Destacar palavras alteradas** | Numa linha alterada, pinta as palavras que diferem da linha removida ou adicionada com que forma par com um fundo mais forte, na vista Diff (Inline e Dividido), no diff da revisão e nos ficheiros do commit. Ligado por predefinição (`ui.diff_intraline`); também **Diff: alternar o destaque das palavras alteradas** da paleta. Veja [Palavras alteradas](interface-tour.md#palavras-alteradas-num-diff). |
 | **Layout predefinido**, **Só hunks**, **Mostrar alterações só de espaços em branco**, **Minimapa** | O estado inicial da vista diff. A barra da vista diff altera-os e guarda-os. |
 | **Anotações do blame**, **Largura das anotações do blame** | Que lado da vista Blame tem a coluna de anotações (avatar, autor, idade, resumo): **right** (a predefinição) ou **left**, e a sua largura em células (24 a 90). Arrastar a margem da coluna na vista Blame, ou as teclas `>` / `<`, guarda a largura aqui (`ui.blame_side`, `ui.blame_width`). Veja [Blame](log-and-history.md#blame). |
 | **Editor de merge: lado a lado a partir de (colunas)** | A partir desta largura, o editor de merge mostra A e B lado a lado. Predefinição 100, mínimo 40, `0` significa sempre. Abaixo dela, A e B são separadores. Veja [Resolver conflitos de merge](merge-conflicts.md). |

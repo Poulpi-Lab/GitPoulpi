@@ -97,6 +97,27 @@ as linhas do `.mailmap`, veja `history-rewrite.md`; a partir de um terminal:
   commit, ao nome e e-mail do autor, ao hash e aos nomes das refs. Esbate o que
   não corresponde e mantém a forma do grafo. `Enter` / `Shift+Enter` saltam para
   a correspondência seguinte / anterior.
+- **Filtro de autor** (o funil no cabeçalho **Autor**, `Shift+A` no Log, ou
+  *Log: filtrar por autor...* da paleta): pré-filtra o Log por quem escreveu os commits.
+  Um popup pende por baixo do cabeçalho com um campo de pesquisa, uma linha
+  **Limpar o filtro** (✕) e uma linha por autor do histórico carregado: um emblema com
+  iniciais (o avatar, quando `ui.avatars` não está desligado), o nome e o e-mail
+  esbatido a seguir, primeiro quem tem mais commits e depois por nome. Escrever restringe
+  a lista com a correspondência aproximada da paleta; `Enter` ou um clique alterna o autor
+  realçado (uma marca de verificação; escolha quantos quiser), `Esc` ou um
+  clique fora fecha o popup e mantém o filtro. O filtro comporta-se exatamente como a
+  pesquisa: os commits dos autores escolhidos ficam acesos, todas as outras linhas esbatem
+  e o grafo mantém a forma, nada é removido nem obtido de novo. Com a barra de pesquisa
+  também aberta, ambos se aplicam (um commit tem de ser de um autor escolhido **e**
+  corresponder ao texto), e `Enter` / `Shift+Enter` percorrem esses resultados. Enquanto
+  o filtro está ligado o funil passa a um `▼` cheio na cor de destaque, a sua dica lista
+  os autores escolhidos, e quando a coluna Autor está oculta ou demasiado estreita para
+  o funil a margem superior do Log diz antes *Autor: Alice Exemplo +1* (a tecla
+  e a paleta continuam a funcionar). Para o retirar: a linha **Limpar o filtro**, um
+  clique com o botão direito no funil aceso, ou *Log: limpar o filtro de autor* da paleta.
+  Os autores são os dos commits que o Log carregou (com o mailmap aplicado, como
+  na coluna), e o filtro é memorizado por repositório, entre mudanças de separador
+  e reinícios. Uma pesquisa de texto não é memorizada, o filtro é.
 - **Filtro de refs** (`/` na barra lateral): restringe por nome as listas de
   branches, tags e remotos.
 - **Solo** (a tecla `o`, ou o menu da ref, numa ref, pasta ou remoto): mostra
@@ -126,6 +147,13 @@ seu menu. As entradas mais úteis:
 | Renomear, Eliminar | Eliminar pergunta primeiro; a gémea remota também pode ser eliminada |
 | Copiar nome da branch, Copiar ligação da branch no remoto | Para a área de transferência |
 
+**Mover uma tag.** Arraste uma tag para outra ref (veja *Arrastar refs* em
+[Rato e gestos](./mouse-and-gestures.md#arrastar-refs)) ou use `Refs: mover a tag selecionada
+para o commit selecionado...`. Mantém o seu tipo e a anotação, só a sua tag local
+se move (um remoto mantém a posição antiga até fazer push), e um desfazer
+repõe-na. CLI: `gitpoulpi tag move <name> <target> [--force-non-ff]`,
+`gitpoulpi tag merge-branch <name> <branch> [-m <message>]`.
+
 **Onde vive uma tag.** Uma tag pode estar neste computador, num remoto, ou em ambos, e
 as linhas TAGS da barra lateral (e a pílula da tag no Log) dizem qual com um marcador
 a seguir ao nome. Passe o ponteiro por uma tag para o ler por extenso.
@@ -135,7 +163,7 @@ a seguir ao nome. Passe o ponteiro por uma tag para o ler por extenso.
 | seta para cima | Só aqui: nenhum remoto a tem. O seu menu oferece *Push* |
 | seta esquerda-direita | Aqui e num remoto, no mesmo commit |
 | seta para baixo (linha esbatida) | Só num remoto: não está neste repositório (nunca obtida, ou eliminada aqui). O seu menu oferece *Fetch `<tag>` de `<remote>`* e *Eliminar `<tag>` em `<remote>`...*; `Git: Fetch da Tag selecionada` na paleta |
-| seta cima-baixo | Também num remoto, mas noutro commit (um push seria recusado) |
+| seta cima-baixo | Também num remoto, mas noutro commit (um push simples seria recusado). O seu menu tem duas linhas por cada remoto assim: *Usar `<tag>` de `<remote>`* (a tag local passa para a versão do remoto, do último fetch, sem rede; uma tag anotada passa a ser esse mesmo objeto de tag) e, a vermelho, *Push de `<tag>` para `<remote>` (forçado)* (pergunta primeiro; com lease sobre o que o último fetch viu, por isso um remoto que mudou entretanto é recusado com "fetch first" e nada é substituído). Cada uma é uma entrada de desfazer. `Git: usar a versão do remoto da tag selecionada` e `Git: push forçado da tag selecionada para o seu remoto` na paleta (o remoto predefinido quando vários diferem); CLI: `tag take-remote`, `tag force-push` |
 
 O git não guarda refs de acompanhamento remoto para tags, por isso o GitPoulpi fica a saber o que cada remoto
 tem pelo seu último **fetch** (qualquer fetch, incluindo o automático) e pelos

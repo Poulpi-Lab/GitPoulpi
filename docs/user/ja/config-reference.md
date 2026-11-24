@@ -132,6 +132,7 @@ author_email = "jane@work.example"
 | `ui.diff_hunks_only` | `true` | `false` にすると、ファイル全体を変更箇所付きで表示します（`H`）。 |
 | `ui.diff_show_whitespace` | `true` | 空白のみの変更を表示します（`s`）。 |
 | `ui.diff_word_wrap` | `false` | 長い diff の行を折り返します（`w`。設定 > diffとエディター）。 |
+| `ui.diff_intraline` | `true` | 変更された行の変更された単語を、より濃い背景色で塗ります（パレットの `Diff: 変更された単語のハイライトを切り替え`。設定 > diffとエディター）。 |
 | `ui.minimap` | `false` | diffとエディターのスクロールバーの横にミニマップを表示します（`M`）。 |
 | `ui.mermaid_detail` | `refs` | ログの Mermaid gitGraph としてコピーの詳細度：`structure`、`refs`、`subjects`、`full`（ポップアップでの選択が保存され、`log --format mermaid` の既定になります）。 |
 | `ui.mermaid_orientation` | `lr` | そのグラフの方向：`lr`（左から右）または `tb`（上から下）。 |
@@ -337,7 +338,7 @@ review_mode = "ask"       # ask | clone | api
 | `ai.enabled` | `false` | スイッチです。オフの場合、AI に関するものはどこにも表示されず、何も送信されません。 |
 | `ai.default_profile` | `"default"` | アクションがプロファイルを指定しないときに使うプロファイルの ID です。 |
 | `ai.global_instructions` | `""` | すべてのアクションのプロンプトに追加されるテキストです。`${repo}`、`${uilang}` などを使えます（[AI > プロンプト変数](ai.md#プロンプト変数)を参照）。アクションごとの指示とリポジトリの指示も同様です。 |
-| `ai.actions.<action>.profile` | `""` | 1 つのアクションのプロファイルです。空は既定を使います。アクション：`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`。ワークスペース（`workspaces.toml` の `[workspace.ai_instructions]` と `[workspace.ai_overrides.<action>]`）とリポジトリは、これらの指示に追加したり置き換えたりできます：[AI](ai.md#指示)を参照してください。 |
+| `ai.actions.<action>.profile` | `""` | 1 つのアクションのプロファイルです。空は既定を使います。アクション：`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`、`sequence_draft`。ワークスペース（`workspaces.toml` の `[workspace.ai_instructions]` と `[workspace.ai_overrides.<action>]`）とリポジトリは、これらの指示に追加したり置き換えたりできます：[AI](ai.md#指示)を参照してください。 |
 | `ai.actions.<action>.instructions` | `""` | そのアクションだけに追加されるテキストです。 |
 | `ai.review.run_in_repository` | `"profile"` | `profile`、`yes`、`no`：コードレビューのドラフトのローカルエージェントが、その実行でリポジトリ内で作業するかどうか（AI プロファイルの `workdir` より優先）。リポジトリ固有の値も設定できます（`gitpoulpi ai review-context --repo`）。[AI > レビューのコンテキスト](ai.md#レビューのコンテキスト)を参照してください。 |
 | `ai.review.include_claude_md` | `true` | コードレビューのドラフトにリポジトリの `CLAUDE.md` を渡します（ルート、リクエストの対象ブランチで読み取り。8 KB で切り詰め）。 |
@@ -361,7 +362,7 @@ review_mode = "ask"       # ask | clone | api
 | `ai.hosting_reply.read_repository` | `false` | 「AI にリポジトリを読ませる」にチェックが入った状態で始めるかどうかです。既定はオフで、その用途でチェックを入れたときにだけリポジトリを読みます。ローカルエージェントまたは API プロファイルは、[AI の章](ai.md#リポジトリへのアクセス)の説明どおりに読みます。 |
 | `ai.hosting_reply.reuse_agent_session` | `true` | ハーネスが対応していれば、2 回の返信の間ローカルエージェントのセッションを保持します。AI がリポジトリを読める場合に有効です。 |
 | `ai.hosting_reply.context_ttl_minutes` | `30` | 返信のために作ったリポジトリのコンテキストを再利用する時間です。1〜1440 に収められます。AI がリポジトリを読める場合に有効です。 |
-| `ai.sent_preview.<action>` | `true` | アクションごとに 1 つのキー（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`、`hosting_reply`、`issue_body`）：リクエストを送る前に「送信する内容」を表示します。ダイアログの「今後表示しない」が `false` を書き込み、設定 > AI > *送信前に内容を表示...* でオンに戻せます。 |
+| `ai.sent_preview.<action>` | `true` | アクションごとに 1 つのキー（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`、`hosting_reply`、`issue_body`、`sequence_draft`）：リクエストを送る前に「送信する内容」を表示します。ダイアログの「今後表示しない」が `false` を書き込み、設定 > AI > *送信前に内容を表示...* でオンに戻せます。 |
 
 リポジトリ固有の `[preferences.ai_review]` テーブル（`repo-state.toml` 内、またはクローンしていないリポジトリでは `remote-reviews.toml` のエントリ）にも同じキーを指定でき（すべて省略可能）、加えて `no_extra_file = true` があります。これは `ai.review.extra_file` の内容にかかわらず、そのリポジトリでは追加ファイルを使いません。未設定のキー、未設定の `extra_file`、存在しない `no_extra_file` は全体の値を継承します。`extra_file` にファイルを設定するとスイッチが解除され、逆の場合も同様です。
 
@@ -481,6 +482,48 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 | `installation.primary` | なし | プライマリのインストールの ID。なしの場合、プライマリはありません。 |
 | `installation.settings.<id>` | なし | インストールごとに1つのテーブル：`path`（フォルダー。移動すると更新されます）、`kind`（`dev`、`install`、`cargo`、`portable`、`pinned`）、`channel`（参考情報）、`name`（ランチャー名、`GitPoulpi (<label>)`。初回起動時に固定されます）、`name_with_version`（オフ：名前に `<major>.<minor>` を加えます）、`logo_color`、`command_alias`、`command_alias_add`、`folder_menu_submenu`（空：フォルダーメニューの項目は最上位に置かれます）、`env`（空：自分の ID。名前を共有するインストールは、デーモン、セッション、取り消し履歴を共有します）、`mcp_bind`（空：`mcp.bind`）。空の値は、プライマリでは `ui.*` に、それ以外ではその種類の既定値にフォールバックします（開発用のチェックアウトは `sun` を使います）。 |
 
+## `[[sequences]]`
+
+名前付きのアクションシーケンス：パレットのコマンドを順に実行する一覧です
+（たとえばバックアップ：すべてステージし、メッセージを AI に書かせ、commit し、
+push する）。シーケンスごとに 1 つのテーブルで、ステップは `[[sequences.steps]]` です。
+
+```toml
+[[sequences]]
+id = "backup"                    # the slug: its key in [keybindings.sequence] and its CLI name
+name = "Backup"                  # your text, never translated
+description = "Stage, commit with an AI message, push"   # optional
+scope = "installation"           # installation (default) | machine | repo
+owner = "3f9a0c1d2b4e5f60"       # the installation id; set with scope = "installation"
+
+[[sequences.steps]]
+run = "stage_all"                # a palette command id
+
+[[sequences.steps]]
+run = "ai_generate_commit_message"
+pause = "always"                 # default | always | never
+
+[[sequences.steps]]
+run = "create_worktree_from_current_branch"
+pause = "never"
+[sequences.steps.options]
+name = "wip-${date}-${n}"        # a template: ${branch} ${date} (yyyy-mm-dd) ${time} (hh-mm) ${n} (first free number)
+open_tab = true
+```
+
+| キー | 内容 |
+|---|---|
+| `scope` | `installation`：`owner` の id を持つインストールにだけ見えます。`machine`：この `config.toml` を共有するすべてのインストール。`repo`：リポジトリの `.gitpoulpi/sequences.toml` に保存され（`[[sequences]]` の形は同じ）、そのリポジトリでだけ見え、そのファイルを信頼した後にのみ有効になります。コミットされたファイルは他人のコマンドだからです。 |
+| `steps[].run` | パレットのコマンド id で、`[keybindings.palette]` に表示されるスネークケースの名前です。受け付けるのは固定の許可リストだけです：ステージ、commit、stash push、新しいブランチ / tag、fetch、pull、push（および push-to-all、pull-all、push-tags の各種）、AI メッセージと commit コンポーザーのコマンド、worktree の作成、タブやターミナルを開く操作、リース付き強制 push。破壊的なコマンド（破棄、reset、削除、worktree の削除、stash の drop、履歴の書き換え、終了、設定）と、ほかのシーケンスはステップにできません。このバージョンが知らないステップはファイルに残され、報告されます。 |
+| `steps[].pause` | `default`：入力が必要なとき、ステップは通常のダイアログで停止します。`always`：その前で停止し、続行するか確認します。`never`：停止しません。その場合、ステップにはダイアログが尋ねるはずのオプション（新しいブランチや worktree の `name`）が必要です。リース付き強制 push は `never` にできません。 |
+| `steps[].options` | ステップごとの答え：`name`（新しいブランチ、tag、worktree）、`branch`（選んだブランチからの worktree）、`open_tab`（新しい worktree をタブで開く）、`message`（commit）、`label`（「開く場所」の項目）、`profile`（エージェントのプロファイル）。 |
+| ステップは最大 32 個 | シーケンスのステップは 1 〜 32 個です。 |
+
+シーケンスやステップの未知のキーは、GitPoulpi がファイルを書き直すときも保たれます。
+見えているシーケンスの間で id が重複していると報告されます。
+`[keybindings.sequence] <id> = "<chord>"` で割り当てます。たとえば
+`backup = "Ctrl+G b"` です。
+
 ## `[keybindings]`
 
 TUI のショートカットを割り当て直します。設定 > キーボードとマウスで編集できます。
@@ -496,7 +539,7 @@ tab_menu   = []                  # unbound
 stage_file = "z"
 ```
 
-`[keybindings.<context>] <action> = "<chord>"`：値はそのアクションの既定値を置き換え、行を削除すると既定値に戻ります。キー入力の書き方：`Ctrl+Shift+N`、`Alt+n`、`F2`、`PageDown`、`Space`、`,`、`P`（= `Shift+p`）。不正なエントリが何かを妨げることはありません。TUI はそれを無視して既定値を保ち、ステータスバーでそのことを知らせます。コンテキスト、アクション ID、既定値、競合のルール：[キー割り当て](keybindings.md)。
+`[keybindings.<context>] <action> = "<chord>"`：値はそのアクションの既定値を置き換え、行を削除すると既定値に戻ります。キー入力の書き方：`Ctrl+Shift+N`、`Alt+n`、`F2`、`PageDown`、`Space`、`,`、`P`（= `Shift+p`）。不正なエントリが何かを妨げることはありません。TUI はそれを無視して既定値を保ち、ステータスバーでそのことを知らせます。`[keybindings.sequence]` は、[`[[sequences]]`](#sequences) を id で割り当てます。コンテキスト、アクション ID、既定値、競合のルール：[キー割り当て](keybindings.md)。
 
 ## リポジトリごとの設定：`.gitpoulpi/repo-state.toml`
 

@@ -50,6 +50,9 @@ pub(crate) struct CommitFilesCache {
     bytes: usize,
     max_entries: usize,
     max_bytes: usize,
+    /// The LFS paths of a revision's tree (`View all files`); small, and
+    /// bounded by `max_entries` like the rest.
+    lfs: std::collections::HashMap<Oid, std::sync::Arc<std::collections::HashSet<PathBuf>>>,
 }
 
 impl Default for CommitFilesCache {
@@ -84,7 +87,27 @@ impl CommitFilesCache {
             bytes: 0,
             max_entries,
             max_bytes,
+            lfs: Default::default(),
         }
+    }
+
+    /// The LFS paths held for `commit`'s tree.
+    pub(crate) fn lfs(
+        &self,
+        commit: Oid,
+    ) -> Option<std::sync::Arc<std::collections::HashSet<PathBuf>>> {
+        self.lfs.get(&commit).cloned()
+    }
+
+    pub(crate) fn insert_lfs(
+        &mut self,
+        commit: Oid,
+        set: std::sync::Arc<std::collections::HashSet<PathBuf>>,
+    ) {
+        if self.lfs.len() >= self.max_entries.max(1) {
+            self.lfs.clear();
+        }
+        self.lfs.insert(commit, set);
     }
 
     /// The changed files of `commit` (and its tree when `with_tree`), if

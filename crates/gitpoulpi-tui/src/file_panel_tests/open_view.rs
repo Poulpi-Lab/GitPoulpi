@@ -122,6 +122,7 @@ fn the_head_tree_is_asked_for_once_per_head_and_only_when_wanted() {
         files: Ok(Vec::new()),
         tree: Some(Ok(paths(&["a"]))),
         hunks_pending: false,
+        lfs: None,
     };
     wip.accept(&answer);
     assert!(

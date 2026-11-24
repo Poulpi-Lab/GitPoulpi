@@ -4689,6 +4689,7 @@ diff_error = { git = "chyba diffu: {error}", local = "chyba rozdílu: {error}" }
 mode_path = "Cesta"
 mode_tree = "Strom"
 view_all_files = "Zobrazit všechny soubory"
+view_all_files_short = "All"
 lfs_only = "Jen LFS"
 filter_files = "Filtr souborů: "
 all_files = "Všechny soubory"

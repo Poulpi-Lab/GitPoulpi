@@ -2,9 +2,86 @@
 
 use super::*;
 
-/// The narrowest the filter field may get before the `LFS only` box steps
-/// aside.
+/// The narrowest the filter field may get before the `LFS only` box shrinks
+/// to its short form.
 const LFS_BOX_MIN_FIELD: u16 = 8;
+
+/// The `View all files` checkbox for `avail` columns: the full label (with
+/// its key hint when it fits), then the short label, then the short label
+/// with a one-column gap. It never loses its text.
+pub(super) fn view_all_label(
+    avail: u16,
+    on: bool,
+    full: &str,
+    short: &str,
+    hint: Option<String>,
+) -> String {
+    let mark = if on { "[x]" } else { "[ ]" };
+    let mut options = Vec::new();
+    if let Some(hint) = hint {
+        options.push(format!("  {mark} {full}{hint}"));
+    }
+    options.push(format!("  {mark} {full}"));
+    options.push(format!("  {mark} {short}"));
+    options.push(format!(" {mark} {short}"));
+    options.push(format!("{mark} {short}"));
+    let last = options.len() - 1;
+    options
+        .into_iter()
+        .enumerate()
+        .find(|(i, o)| *i == last || display_width(o) as u16 <= avail)
+        .map(|(_, o)| o)
+        .unwrap_or_default()
+}
+
+/// How the filter row is shared between the label, the field and the `LFS
+/// only` box.
+#[derive(Debug, PartialEq, Eq)]
+pub(super) struct LfsBoxLayout {
+    /// The box text, `None` only when the repository has no LFS files.
+    pub(super) text: Option<String>,
+    /// Columns the box takes at the row's right end, its leading space
+    /// included.
+    pub(super) box_w: u16,
+    /// What is left of the row for the label.
+    pub(super) label_w: u16,
+    /// What is left for the typed filter.
+    pub(super) field_w: u16,
+}
+
+/// Nothing vanishes when the pane is narrow: the box keeps the full `[x] LFS
+/// only` while the field keeps `LFS_BOX_MIN_FIELD` columns, then shrinks to
+/// `[x] LFS`, and the field gives way before the box does (the key and the
+/// palette command work at any width).
+pub(super) fn lfs_box_layout(
+    row_w: u16,
+    label_w: u16,
+    offered: bool,
+    on: bool,
+    full_name: &str,
+) -> LfsBoxLayout {
+    let mark = if on { "[x]" } else { "[ ]" };
+    let text = offered.then(|| {
+        let full = format!("{mark} {full_name}");
+        let room = row_w.saturating_sub(label_w + display_width(&full) as u16 + 1);
+        if room >= LFS_BOX_MIN_FIELD {
+            full
+        } else {
+            format!("{mark} LFS")
+        }
+    });
+    let box_w = text
+        .as_ref()
+        .map_or(0, |t| display_width(t) as u16 + 1)
+        .min(row_w);
+    let label_w = label_w.min(row_w - box_w);
+    LfsBoxLayout {
+        text,
+        box_w,
+        label_w,
+        field_w: row_w - box_w - label_w,
+    }
+}
 
 pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
     let avatar_capability = ctx.avatar_capability;
@@ -551,8 +628,22 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
             Rect::new(bar.x, bar.y, display_width(sort_label) as u16, 1),
             HitTarget::CommitSortButton,
         ));
-        spans.push(Span::raw("  "));
-        let mut x = bar.x + display_width(sort_label) as u16 + 2;
+        // On the narrowest pane the gap after the sort toggle goes first, so
+        // the `View all files` checkbox keeps its (short) text.
+        let modes_w = (display_width(gitpoulpi_i18n::msg::commit_detail::MODE_PATH.get())
+            + display_width(gitpoulpi_i18n::msg::commit_detail::MODE_TREE.get())
+            + 4) as u16;
+        let all_short_w =
+            display_width(gitpoulpi_i18n::msg::commit_detail::VIEW_ALL_FILES_SHORT.get()) as u16
+                + 6;
+        let sort_gap: u16 =
+            if bar.width < display_width(sort_label) as u16 + 2 + modes_w + all_short_w {
+                0
+            } else {
+                2
+            };
+        spans.push(Span::raw(" ".repeat(sort_gap as usize)));
+        let mut x = bar.x + display_width(sort_label) as u16 + sort_gap;
         let km_now = keymap::current();
         for mode in [FileListMode::Path, FileListMode::Tree] {
             let label = match mode {
@@ -584,15 +675,12 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
         }
         // The whole tree at this revision (`list_tree`); the WIP row's toolbar
         // has the same toggle.
-        let vaf = format!(
-            "  {} {}{}",
-            if view_all_files { "[x]" } else { "[ ]" },
+        let vaf = view_all_label(
+            bar.width.saturating_sub(x - bar.x),
+            view_all_files,
             gitpoulpi_i18n::msg::commit_detail::VIEW_ALL_FILES.get(),
-            if hints {
-                keymap::bracket(&km_now, keymap::Action::LogViewAllFiles)
-            } else {
-                String::new()
-            }
+            gitpoulpi_i18n::msg::commit_detail::VIEW_ALL_FILES_SHORT.get(),
+            hints.then(|| keymap::bracket(&km_now, keymap::Action::LogViewAllFiles)),
         );
         let vaf_len = display_width(&vaf) as u16;
         let vaf_style = if *hovered_target == Some(HitTarget::ViewAllFilesCheckbox) {
@@ -622,29 +710,20 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
         // off the end of the row.
         let filter_label = gitpoulpi_i18n::msg::commit_detail::FILTER_FILES.get();
         let label_w = display_width(filter_label) as u16;
-        // The `LFS only` pre-filter sits at the row's right end, only for a
-        // repository with LFS files, and only while the field keeps room to
-        // type in (the key and the palette command always work).
-        let lfs_box = lfs.has_files().then(|| {
-            format!(
-                "{} {}",
-                if lfs.only() { "[x]" } else { "[ ]" },
-                gitpoulpi_i18n::msg::commit_detail::LFS_ONLY.get()
-            )
-        });
-        let lfs_box_w = lfs_box
-            .as_ref()
-            .map_or(0, |t| display_width(t) as u16 + 1)
-            .min(layout.filter_row.width);
-        let lfs_box = lfs_box.filter(|_| {
-            layout.filter_row.width.saturating_sub(label_w + lfs_box_w) >= LFS_BOX_MIN_FIELD
-        });
-        let lfs_box_w = if lfs_box.is_some() { lfs_box_w } else { 0 };
-        let field_w = layout
-            .filter_row
-            .width
-            .saturating_sub(label_w)
-            .saturating_sub(lfs_box_w);
+        // The `LFS only` pre-filter sits at the row's right end, for a
+        // repository (or a viewed tree) with LFS files. It shrinks to
+        // `[ ] LFS` on a narrow pane and never disappears.
+        let box_layout = lfs_box_layout(
+            layout.filter_row.width,
+            label_w,
+            lfs.has_files(),
+            lfs.only(),
+            gitpoulpi_i18n::msg::commit_detail::LFS_ONLY.get(),
+        );
+        let label_w = box_layout.label_w;
+        let lfs_box_w = box_layout.box_w;
+        let field_w = box_layout.field_w;
+        let lfs_box = box_layout.text;
         // Registered before the field's own row so the box wins its cells.
         if lfs_box.is_some() {
             frame_hits.push((
@@ -669,7 +748,7 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
             false,
         );
         let mut spans = vec![Span::styled(
-            filter_label,
+            take_width(filter_label, label_w as usize),
             Style::default().fg(th().ui.muted),
         )];
         if focused {
@@ -1078,5 +1157,50 @@ pub(super) fn light(buf: &mut ratatui::buffer::Buffer, rect: Rect) {
                 cell.set_bg(th().ui.hover);
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod lfs_box_tests {
+    use super::*;
+
+    const FULL: &str = "LFS only";
+
+    #[test]
+    fn view_all_files_shrinks_in_steps_and_keeps_its_text() {
+        let l = |w| view_all_label(w, false, "View all files", "All", Some("[a]".into()));
+        assert_eq!(l(40), "  [ ] View all files[a]");
+        assert_eq!(l(20), "  [ ] View all files");
+        assert_eq!(l(9), "  [ ] All");
+        assert_eq!(l(8), " [ ] All");
+        assert_eq!(l(0), "[ ] All");
+    }
+
+    /// Wide: the full box and a roomy field.
+    #[test]
+    fn a_wide_row_gets_the_full_box() {
+        let l = lfs_box_layout(60, 8, true, false, FULL);
+        assert_eq!(l.text.as_deref(), Some("[ ] LFS only"));
+        assert_eq!(l.box_w, 13);
+        assert_eq!(l.label_w + l.field_w + l.box_w, 60);
+    }
+
+    /// Narrow: the box shrinks, it does not disappear, at any width.
+    #[test]
+    fn a_narrow_row_shrinks_the_box_and_never_drops_it() {
+        let l = lfs_box_layout(24, 8, true, true, FULL);
+        assert_eq!(l.text.as_deref(), Some("[x] LFS"));
+        for w in 1..60u16 {
+            let l = lfs_box_layout(w, 8, true, false, FULL);
+            assert!(l.text.is_some(), "width {w}");
+            assert!(l.box_w > 0, "width {w}");
+            assert_eq!(l.label_w + l.field_w + l.box_w, w, "width {w}");
+        }
+    }
+
+    #[test]
+    fn no_lfs_files_no_box() {
+        let l = lfs_box_layout(40, 8, false, false, FULL);
+        assert_eq!((l.text, l.box_w, l.field_w), (None, 0, 32));
     }
 }

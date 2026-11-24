@@ -4691,6 +4691,7 @@ diff_error = { git = "Diff-Fehler: {error}", local = "Fehler bei den Unterschied
 mode_path = "Pfad"
 mode_tree = "Baum"
 view_all_files = "Alle Dateien ansehen"
+view_all_files_short = "All"
 lfs_only = "Nur LFS"
 filter_files = "Dateien filtern: "
 all_files = "Alle Dateien"

@@ -1403,8 +1403,9 @@ pub trait GitBackend: Send + Sync {
         -> Result<crate::domain::rewrite::SigningCheck>;
     /// The LFS pointer files at a commit (`Some`) or in the index
     /// (`None`), each with whether its real object is in the local LFS
-    /// store. Needs no `git-lfs` program. Empty for a repository that does
-    /// not use LFS.
+    /// store. Needs no `git-lfs` program. The index answer is empty for a
+    /// repository that does not use LFS; a commit is scanned whatever the
+    /// checked-out attributes say.
     fn lfs_files(&self, repo: &RepoRef, at: Option<Oid>) -> Result<Vec<LfsFile>>;
 
     /// `git lfs install`: the clean / smudge filters and the LFS hooks,

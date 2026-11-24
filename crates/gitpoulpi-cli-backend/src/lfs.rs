@@ -504,7 +504,11 @@ struct Candidate {
 pub fn lfs_files(repo: &RepoRef, at: Option<Oid>) -> Result<Vec<LfsFile>> {
     let paths = git_paths(repo)?;
     let patterns = read_patterns(repo, &paths);
-    if patterns.is_empty() && !paths.common_dir.join("lfs").is_dir() {
+    // The gate (the working tree's attributes, an LFS store) only spares
+    // the index scan. A revision is asked about for what it holds: its own
+    // `.gitattributes` may differ from the checked-out one (another branch,
+    // a file since deleted), and the scan is bounded by the pointer size.
+    if at.is_none() && patterns.is_empty() && !paths.common_dir.join("lfs").is_dir() {
         return Ok(Vec::new());
     }
     let storage = storage_dir(repo, &paths);

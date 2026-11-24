@@ -4684,6 +4684,7 @@ diff_error = { git = "ошибка diff: {error}", local = "ошибка раз�
 mode_path = "Путь"
 mode_tree = "Дерево"
 view_all_files = "Показать все файлы"
+view_all_files_short = "All"
 lfs_only = "Только LFS"
 filter_files = "Фильтр файлов: "
 all_files = "Все файлы"

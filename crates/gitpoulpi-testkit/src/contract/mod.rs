@@ -626,6 +626,7 @@ macro_rules! for_each_lfs_check {
             check_lfs_status_reports_patterns_hooks_and_binary,
             check_lfs_files_lists_pointers_with_local_flag,
             check_lfs_files_at_a_commit,
+            check_lfs_files_at_a_commit_needs_no_attributes_or_program,
             check_checkout_in_an_lfs_repo_writes_content_not_pointers,
             check_reset_hard_in_an_lfs_repo_writes_content,
             check_fast_forward_of_the_checked_out_branch_in_an_lfs_repo,

@@ -162,6 +162,11 @@ pub struct CommitFilesOutcome {
     /// hunks follows. The list is shown at once; the Diff view waits for the
     /// second answer (it shows "loading" rather than an empty diff).
     pub hunks_pending: bool,
+    /// The paths that are Git LFS pointers *in this commit's tree* (read
+    /// with the tree, so `LFS only` under `View all files` answers for the
+    /// viewed revision, not the index). `None`: not asked, LFS off, or the
+    /// read failed.
+    pub lfs: Option<std::sync::Arc<std::collections::HashSet<std::path::PathBuf>>>,
 }
 
 /// What travels from `DaemonLink` to the link's commit-files worker

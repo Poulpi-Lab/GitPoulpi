@@ -4690,6 +4690,7 @@ diff_error = { git = "{$diff}-fout: {error}", local = "verschilfout: {error}" }
 mode_path = "Pad"
 mode_tree = "Boom"
 view_all_files = "Alle bestanden tonen"
+view_all_files_short = "All"
 lfs_only = "Alleen LFS"
 filter_files = "Bestanden filteren: "
 all_files = "Alle bestanden"

@@ -409,6 +409,11 @@ pub(crate) struct LfsUi {
     /// The `LFS only` pre-filter of the file lists is switched on. It filters
     /// only while the repository has LFS files ([`Self::only_active`]).
     only: bool,
+    /// The LFS paths of the tree the commit pane lists under `View all
+    /// files` (read for that revision, see `CommitFilesOutcome::lfs`). While
+    /// set it stands in for the index's set: the viewed tree can hold LFS
+    /// files the index does not (another branch, a file since deleted).
+    viewed: Option<std::sync::Arc<HashSet<PathBuf>>>,
 }
 
 thread_local! {
@@ -418,12 +423,12 @@ thread_local! {
     /// mouse handlers that resolve a selection) reads it here, so none of
     /// them can disagree about which rows exist. Rebuilt per refresh and per
     /// toggle by [`LfsUi::sync_filter`], never per frame.
-    static ONLY_PATHS: std::cell::RefCell<Option<std::rc::Rc<HashSet<PathBuf>>>> =
+    static ONLY_PATHS: std::cell::RefCell<Option<std::sync::Arc<HashSet<PathBuf>>>> =
         const { std::cell::RefCell::new(None) };
 }
 
 /// The LFS-only path set of the live window, if the filter is active.
-pub(crate) fn only_paths() -> Option<std::rc::Rc<HashSet<PathBuf>>> {
+pub(crate) fn only_paths() -> Option<std::sync::Arc<HashSet<PathBuf>>> {
     ONLY_PATHS.with(|p| p.borrow().clone())
 }
 
@@ -442,7 +447,25 @@ impl LfsUi {
     /// The repository has files stored with LFS (and the preference is on):
     /// the `LFS only` filter is worth offering.
     pub(crate) fn has_files(&self) -> bool {
-        self.enabled && !self.files.is_empty()
+        self.enabled
+            && match &self.viewed {
+                Some(viewed) => !viewed.is_empty(),
+                None => !self.files.is_empty(),
+            }
+    }
+
+    /// Sets (or clears) the viewed revision's LFS paths. Cheap when nothing
+    /// changed: called every loop turn.
+    pub(crate) fn set_viewed(&mut self, viewed: Option<std::sync::Arc<HashSet<PathBuf>>>) {
+        let same = match (&self.viewed, &viewed) {
+            (None, None) => true,
+            (Some(a), Some(b)) => std::sync::Arc::ptr_eq(a, b),
+            _ => false,
+        };
+        if !same {
+            self.viewed = viewed;
+            self.sync_filter();
+        }
     }
 
     /// The `LFS only` switch, as the user left it.
@@ -462,9 +485,10 @@ impl LfsUi {
 
     /// Publishes (or clears) the path set the lists read ([`only_paths`]).
     fn sync_filter(&self) {
-        let set = self
-            .only_active()
-            .then(|| std::rc::Rc::new(self.files.keys().cloned().collect::<HashSet<_>>()));
+        let set = self.only_active().then(|| match &self.viewed {
+            Some(viewed) => viewed.clone(),
+            None => std::sync::Arc::new(self.files.keys().cloned().collect::<HashSet<_>>()),
+        });
         ONLY_PATHS.with(|p| *p.borrow_mut() = set);
     }
 
@@ -506,7 +530,10 @@ impl LfsUi {
     }
 
     pub(crate) fn is_lfs(&self, path: &Path) -> bool {
-        self.file(path).is_some()
+        match &self.viewed {
+            Some(viewed) => self.enabled && viewed.contains(path),
+            None => self.file(path).is_some(),
+        }
     }
 
     /// Whether the repository uses LFS but the program cannot be used --
@@ -608,6 +635,31 @@ mod tests {
         assert!(initialized(&repo_status(true, false)));
         ui.enabled = false;
         assert!(ui.toolbar_hidden(), "turned off: hidden");
+    }
+
+    /// Under View all files the viewed revision's set decides: a file that is
+    /// LFS there but not in the index is tagged, passes the filter and makes
+    /// the box offered; an empty index set no longer hides it.
+    #[test]
+    fn the_viewed_revisions_set_stands_in_for_the_index() {
+        let mut ui = LfsUi::new(true);
+        assert!(!ui.has_files(), "index empty, nothing viewed");
+        let viewed: std::sync::Arc<HashSet<PathBuf>> =
+            std::sync::Arc::new([PathBuf::from("assets/logo.png")].into());
+        ui.set_viewed(Some(viewed.clone()));
+        assert!(ui.has_files());
+        assert!(ui.is_lfs(Path::new("assets/logo.png")));
+        assert!(!ui.is_lfs(Path::new("src/a.rs")));
+        ui.toggle_only();
+        let only = only_paths().expect("filter active");
+        assert!(only.contains(Path::new("assets/logo.png")));
+        assert!(!only.contains(Path::new("src/a.rs")));
+        ui.set_viewed(None);
+        assert!(!ui.has_files(), "back to the (empty) index set");
+        assert!(only_paths().is_none());
+        ui.enabled = false;
+        ui.set_viewed(Some(viewed));
+        assert!(!ui.has_files() && !ui.is_lfs(Path::new("assets/logo.png")));
     }
 
     fn file(path: &str, local: bool) -> LfsFile {

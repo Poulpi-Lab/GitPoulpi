@@ -477,6 +477,8 @@ Elke rij van het palet eindigt met een toetsknop (`[k]`), en `Alt+K` doet hetzel
 
 In `config.toml` is dit de tabel `[keybindings.palette]`, genoemd naar de opdracht (`toggle_minimap = "Ctrl+Alt+M"`). Een toets die botst met een andere actie wordt rood getoond, en `c` op de rij toont alle acties waarmee hij botst.
 
+Een reeks die je definieerde (een benoemde keten paletopdrachten) krijgt op dezelfde manier een toets: `[keybindings.sequence]` neemt de id van de reeks (`backup = "Ctrl+Alt+B"`), een toets voor een id die niet bestaat wordt gemeld en genegeerd, en de tabel volgt `config.toml` terwijl de app draait. Elke reeks is ook een paletrij, `Reeks: <naam>`, die haar toets toont.
+
 De hintbalk onder de lijst noemt deze toets (standaard `Alt+K`). Het is de actie `palette.configure_shortcut`, dus hij is net als elke andere opnieuw toe te wijzen.
 
 Het palet en de kiezers (thema, taal, tab, werkruimtezoeker) verplaatsen en schalen als een dialoog: sleep de bovenrand, druk op `Ctrl+N` en dan `m` (zoals boven elk dialoog), of druk op `Alt+G`. `Alt+G` is de actie `palette.arrange` ("Dialoog: het voorste dialoog verplaatsen of schalen"): een extra manier, geldig boven elk dialoog en elke popup, om de schikmodus te starten voor het dialoog vooraan (de paletrijen `Dialoog: Verplaatsen of schalen` en `Dialoog: Positie en grootte herstellen` werken op het palet zelf zolang het open is). Pijlen verplaatsen het, `Shift`+pijlen schalen het, `0` herstelt het, `Enter` of `Esc` verlaat de modus en de popup blijft open. `ui.dialog_geometry` bepaalt of de plaats wordt bewaard.

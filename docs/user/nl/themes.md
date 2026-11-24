@@ -209,7 +209,18 @@ Elk thema brengt zijn eigen baankleuren voor de Log-grafiek mee, maar je kunt
 elk thema met elk palet combineren: **Instellingen > Weergave > Kleurthema van de
 grafiek** biedt **Thema volgen** (de standaard) plus elk baanpalet van elk
 thema (GitPoulpi Dark, GitPoulpi Light, daarna Material, Serie, ... en de
-`graph_palette` van je eigen themabestanden). ![Het keuzelijst Kleurthema van de grafiek bij Weergave: Thema volgen, daarna elk baanpalet met een paar van zijn kleuren](../images/settings-log-graph-lanes.png)
+`graph_palette` van je eigen themabestanden, na de presets getoond onder de
+naam van het thema). Een eigen thema verschijnt de volgende keer dat de lijst opent (de
+bestanden worden dan opnieuw gelezen), en er een kiezen bewaart zijn bestandsnaam in
+`ui.graph_color_theme` (voor de primaire installatie in `[ui]`, voor de
+andere in hun eigen item `[installation.settings.<id>]`, zoals het thema). Een
+themabestand zonder `graph_palette` heeft de baankleuren van zijn `base` (de
+standaardpreset als hij er geen noemt), dezelfde overerving als bij elke andere kleur
+van het bestand. Een eigen thema met dezelfde naam als een ingebouwd baanpalet (bijvoorbeeld
+`gruvbox`) vervangt dat palet in de lijst. Bestaat de ingestelde naam
+niet meer (het bestand is verwijderd of hernoemd), dan gebruikt de grafiek de baankleuren van het
+actieve thema, en toont Instellingen de naam gemarkeerd als *niet gevonden* tot je
+een ander kiest. ![Het keuzelijst Kleurthema van de grafiek bij Weergave: Thema volgen, daarna elk baanpalet met een paar van zijn kleuren](../images/settings-log-graph-lanes.png)
 
 In `config.toml`:
 
@@ -260,6 +271,18 @@ statusbar_fg = "#eceff4"
 [diff]
 add_bg = "#2f3b2f"
 ```
+
+### Gewijzigde woorden in een diff (`diff.add_emph_bg`, `diff.del_emph_bg`)
+
+De sterkere achtergronden die de Diff-weergave schildert op de woorden die verschillen binnen
+een gewijzigde regel, over `diff.add_bg` (toegevoegde regels) en `diff.del_bg` (verwijderde
+regels); de tekst houdt `diff.add_fg` en `diff.del_fg`. Elke preset stelt beide in.
+Een themabestand dat `diff.add_bg` of `diff.del_bg` instelt maar niet de bijbehorende
+nadruk, krijgt er een afgeleid van (30% op weg naar de tekstkleur van
+die kant), zodat een eigen achtergrond nooit eindigt met de nadruk van het basisthema.
+Een waarde `default` (de Terminal-preset), of een terminal waarvan de kleurdiepte beide achtergronden
+gelijk zou tekenen, markeert de woorden in plaats daarvan vet en onderstreept. Zie
+[Gewijzigde woorden in een diff](interface-tour.md#gewijzigde-woorden-in-een-diff).
 
 Kleuren zijn `"#rrggbb"`, `"ansi:N"` (item N van het palet van de terminal) of
 `"default"` (de eigen kleur van de terminal). Groepen en sleutels zijn die van
@@ -323,6 +346,8 @@ in een oude multiplexer. De Terminal-preset heeft dit allemaal niet nodig.
 Truecolor kost niets; de mappingstap loopt alleen als hij actief is, één keer
 per frame over het scherm.
 
+Het thema geldt per installatie: meerdere GitPoulpi-installaties die één configuratie delen houden elk hun eigen thema, dus er een kiezen in één installatie kleurt de andere nooit om.
+
 ## Live voorbeeld
 
 In Instellingen > Weergave toont het keuzelijst Thema **Systeem (volgt de terminal)**,
@@ -343,14 +368,17 @@ thema meteen, **Enter** past toe en bewaart `ui.theme` in `config.toml`,
 **Esc** (of een klik buiten de lijst) zet het vorige thema terug en bewaart niets.
 
 Onder het filterveld versmalt een gesegmenteerd voorfilter de lijst: **Alle**,
-**Donker**, **Licht** en **Gekleurd** (klik op een segment, `Tab` / `Shift+Tab`
-of `Alt+1`..`Alt+4`). Donker en Licht komen van de helderheid van de `ui.bg` van
+**Donker**, **Licht** en **Gekleurd**, plus **Eigen** als je eigen themabestanden hebt
+(klik op een segment, `Tab` / `Shift+Tab` of `Alt+1`..`Alt+5`). Donker en Licht komen van de helderheid van de `ui.bg` van
 het thema; **Gekleurd** houdt de thema's met een duidelijk getinte achtergrond
 (blauw, violet, geel, groen...) en laat wit, gebroken wit, zwart en bijna zwarte
 grijstinten weg, dus Solarized Dark, Dracula of Nord zijn gekleurd terwijl GitHub
 Dark en One Light dat niet zijn. Een gekleurd thema staat ook onder Donker of
 Licht. **Systeem** en transparante thema's (zonder eigen achtergrond) staan
-alleen onder Alle. Het voorfilter combineert met wat je typt. De keuzelijsten
+alleen onder Alle. **Eigen** houdt alleen de themabestanden van je map `themes/` (een eigen thema
+is voor die knoppen nog steeds Donker, Licht of Gekleurd); de knop wordt niet getekend en is
+niet met toetsen bereikbaar zolang die map geen thema bevat. Het voorfilter combineert
+met wat je typt. De keuzelijsten
 voor het kleurthema van de grafiek en voor de taal tonen op dezelfde manier een
 voorbeeld: de banen van de Log en de hele UI veranderen terwijl de markering
 beweegt.

@@ -29,7 +29,14 @@ de lokale wijzigingen:
   voor de bestanden van een commit, en `gitpoulpi status` / `gitpoulpi diff` melden `renamed_from`.
 - **Pad** of **Boom** (`m`) toont bestanden plat of in mappen. **Alles inklappen**
   (`z`) klapt de mappen in. **Alle bestanden tonen** (`a`) toont de hele boom
-  in plaats van alleen de gewijzigde bestanden. Klik met rechts op de lege ruimte
+  in plaats van alleen de gewijzigde bestanden. Een ingeklapte map toont achter zijn naam een
+  klein gedempt aantal van de bestanden erin, submappen inbegrepen (`src/ (12)`);
+  een open map toont er geen. In een smal paneel wordt eerst de naam ingekort zodat het
+  aantal in beeld blijft. In een repository met bestanden die met Git LFS zijn opgeslagen
+  beperkt een selectievakje **Alleen LFS** (`o`, of **Bestanden: Alleen LFS in-/uitschakelen**) elke
+  bestandslijst (Unstaged, Staged, **Alle bestanden tonen**, de bestanden van een commit) tot die bestanden;
+  de maptellingen volgen, en het wordt niet aangeboden als geen bestand LFS gebruikt.
+  Klik met rechts op de lege ruimte
   van de lijst voor **Alles uitklappen** / **Alles inklappen**, op een maprij voor
   **Alle submappen uitklappen** / **Alle submappen inklappen**; toetsen `=`, `-`,
   `*`, `_` (zie [Muis en gebaren](mouse-and-gestures.md)).

@@ -85,6 +85,28 @@ geschiedenis op en schrijft `.mailmap`-regels voor je, zie `history-rewrite.md`;
   zoeken...* van het palet): zoekt in het hele commit-bericht, de naam en het e-mailadres van de auteur,
   de hash en de refnamen. Wat niet overeenkomt wordt gedimd en de vorm van de grafiek blijft
   behouden. `Enter` / `Shift+Enter` springen naar de volgende / vorige treffer.
+- **Auteursfilter** (de trechter in de kop **Auteur**, `Shift+A` in het Log, of de
+  paletopdracht *Log: Filteren op auteur...*): filtert het Log vooraf op wie de
+  commits schreef. Onder de kop hangt een popup met een zoekveld, een rij
+  **Filter wissen** (✕) en één rij per auteur van de geladen geschiedenis: een
+  initialenbadge (de avatar, als `ui.avatars` niet uit staat), de naam en daarachter
+  gedempt het e-mailadres, de meeste commits eerst en dan op naam. Typen verkleint
+  de lijst met de fuzzy matching van het palet; `Enter` of een klik wisselt de
+  gemarkeerde auteur (een vinkje; kies er zoveel je wilt), `Esc` of een klik
+  ernaast sluit de popup en houdt het filter. Het filter gedraagt zich precies
+  als het zoeken: de commits van de gekozen auteurs blijven verlicht, elke andere
+  rij dimt en de grafiek behoudt zijn vorm, er wordt niets verwijderd of opnieuw
+  opgehaald. Met ook de zoekbalk open gelden beide (een commit moet van een gekozen
+  auteur zijn **en** bij de tekst passen), en `Enter` / `Shift+Enter` lopen door die
+  treffers. Zolang het filter aan staat wordt de trechter een gevulde accent-`▼`,
+  noemt zijn tooltip de gekozen auteurs, en als de kolom Auteur verborgen of te
+  smal is voor de trechter, staat in plaats daarvan *Auteur: Alice Example +1* op
+  de bovenrand van het Log (de toets en het palet werken nog). Om het te laten
+  vallen: de rij **Filter wissen**, een rechtsklik op de verlichte trechter, of de
+  paletopdracht *Log: Auteursfilter wissen*. De auteurs zijn die van de commits die
+  het Log heeft geladen (mailmap toegepast, zoals in de kolom), en het filter wordt
+  per repository onthouden, over tabbladwisselingen en herstarts heen. Een
+  tekstzoekopdracht wordt niet onthouden, het filter wel.
 - **Reffilter** (`/` in de zijbalk): beperkt de lijsten van branches, tags en remotes op naam.
 - **Solo** (de toets `o`, of het menu van de ref, op een ref, map of remote): toont alleen de
   commits van de gesoloede refs; solo er meerdere om hun vereniging te zien. `Shift+O`
@@ -111,6 +133,13 @@ de zijbalk, of zijn pil in de Log) voor zijn menu. De nuttigste items:
 | Hernoemen, Verwijderen | Verwijderen vraagt eerst bevestiging; de bijbehorende remote branch kan ook worden verwijderd |
 | Branchnaam kopiëren, Link naar branch op remote kopiëren | Naar het klembord |
 
+**Een tag verplaatsen.** Sleep een tag op een andere ref (zie *Refs slepen* in
+[Muis en gebaren](./mouse-and-gestures.md)) of gebruik `Refs: Geselecteerde tag verplaatsen naar
+geselecteerde commit...`. Hij behoudt zijn soort en annotatie, alleen je lokale tag
+verplaatst (een remote houdt de oude positie tot je pusht), en één ongedaan-stap zet hem
+terug. CLI: `gitpoulpi tag move <name> <target> [--force-non-ff]`,
+`gitpoulpi tag merge-branch <name> <branch> [-m <message>]`.
+
 **Waar een tag staat.** Een tag kan op deze computer staan, op een remote, of op beide, en de
 TAGS-rijen van de zijbalk (en de pil van de tag in de Log) zeggen welke met een markering achter de
 naam. Houd de aanwijzer boven een tag voor hetzelfde in woorden.
@@ -120,7 +149,7 @@ naam. Houd de aanwijzer boven een tag voor hetzelfde in woorden.
 | pijl omhoog | Alleen hier: geen enkele remote heeft hem. Zijn menu biedt *Push* |
 | pijl links-rechts | Hier en op een remote, op dezelfde commit |
 | pijl omlaag (rij gedimd) | Alleen op een remote: niet in deze repository (nooit gefetcht, of hier verwijderd). Zijn menu biedt *`<tag>` fetchen van `<remote>`* en *`<tag>` verwijderen op `<remote>`...*; `Git: Geselecteerde tag fetchen` in het palet |
-| pijl omhoog-omlaag | Ook op een remote, maar op een andere commit (een push zou worden geweigerd) |
+| pijl omhoog-omlaag | Ook op een remote, maar op een andere commit (een gewone push zou worden geweigerd). Zijn menu heeft twee rijen per zo'n remote: *`<tag>` van `<remote>` gebruiken* (de lokale tag verplaatst naar de versie van de remote, uit de laatste fetch, geen netwerk; een geannoteerde tag wordt hetzelfde tagobject) en, in rood, *`<tag>` naar `<remote>` pushen (force)* (vraagt eerst; met een lease op wat de laatste fetch zag, dus een remote die sindsdien is verschoven wordt geweigerd met "fetch first" en er wordt niets overschreven). Elk is één ongedaan-item. `Git: De versie van de remote van de geselecteerde tag gebruiken` en `Git: Force push van de geselecteerde tag naar de remote` in het palet (de standaardremote als er meer verschillen); CLI: `tag take-remote`, `tag force-push` |
 
 git bewaart geen remote-tracking refs voor tags, dus GitPoulpi leert wat elke remote heeft uit je
 laatste **fetch** (elke fetch, ook de automatische) en uit zijn eigen tagpushes en -verwijderingen.

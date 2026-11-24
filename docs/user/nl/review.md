@@ -162,10 +162,30 @@ De toetsen `n`, `p`, `m`, `w`, `s` van de Diff-weergave zijn die van de review z
 vorige hunk, **`E`** de codering, **`M`** de minimap. Elk heeft een paletrij (*Review: Lay-out inline / split
 omschakelen*, ...).
 
+Op het **Overzicht** worden het gesprek en het ✦ conceptblok op dezelfde manier geselecteerd: sleep over de tekst,
+**`Ctrl+C`** kopieert hem (een link of een knop waarop je drukt houdt zijn actie, en een sleepbeweging die op een van beide begint
+selecteert niets). Zonder selectie kopieert **`Ctrl+C`** (of *Gesprek: Tekst kopiëren*) het geselecteerde item zoals de host het
+opslaat. De I-beam staat boven de tekst en de hand blijft boven knoppen en links. Een selectie volgt wat op het scherm staat:
+scrollen verplaatst haar met haar tekst (ze blijft geselecteerd terwijl ze buiten beeld is), een verversing die de tekst herschrijft
+laat haar vallen, en een afgebroken alinea kopieert als de rijen die hij toont.
+
+De opmerkingen in de diff op de pagina **Bestanden** (een thread, je openstaande notities, de ✦ suggesties) worden ook geselecteerd: sleep
+over hun woorden, **`Ctrl+C`** (of *Review: Geselecteerde tekst of regel kopiëren*) kopieert ze, **`Esc`** laat de selectie vallen. Een druk op een van
+hun knoppen, of een gewone klik op de kop van een thread (hij vouwt), doet nog steeds iets; een sleepbeweging die op de kop begint selecteert zijn
+woorden en laat de thread zoals hij is.
+
 ### Commits
 
 Alleen de commits van het verzoek (niet de geschiedenis erachter), nieuwste eerst, en het verschil van de geselecteerde
 (zijn wijzigingen ten opzichte van zijn parent), met al zijn bestanden onder elkaar en dezelfde weergaveopties.
+
+## Terugkomen bij een review
+
+Een review blijft open terwijl je in een ander tabblad werkt. Verlaat het tabblad met de review open (klik op een ander tabblad, `Ctrl+PageDown`, de paletopdracht **Repository: Volgend tabblad**) en terugkomen heropent haar op dezelfde aanvraag, dezelfde pagina (Overzicht, Bestanden of Commits), hetzelfde bestand en dezelfde regel, met het toetsenbord aan dezelfde kant. Hetzelfde geldt voor een review via de API over de Radar: toon het tabblad Radar opnieuw en de review is er weer overheen.
+
+Een review is **in uitvoering** zolang haar pagina open is. Haar sluiten (`Esc`, het kruisje, **Review: Sluiten**), haar versturen (**Review afronden**, of een Gerrit-wijziging indienen of verlaten) of haar branch uitchecken beëindigt haar, en ze wordt niet heropend. GitPoulpi afsluiten met een open review telt als het tabblad verlaten: de volgende start heropent haar op dezelfde manier.
+
+Is de aanvraag intussen gemerged of gesloten, of antwoordt de host niet, dan opent er geen pagina: de statusbalk zegt waarom en er wordt de volgende keer niets heropend. Openstaande opmerkingen, bekeken bestanden en het concept blijven bewaard zoals altijd (zie **Een review schrijven**). Een suggestierun die nog loopt als je vertrekt wordt niet overgenomen.
 
 ## Een review schrijven
 

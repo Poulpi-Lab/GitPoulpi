@@ -97,6 +97,7 @@ Klik op een markering om erheen te gaan.
 - **Sleep de rand tussen twee Log-koppen** (standaard de tussenruimte, vanaf de kop of vanaf overal in de tabel; Instellingen > Log & grafiek > Kolombreedte aanpassen) om een kolom van grootte te veranderen (toetsenbord: `Shift+C` om een kolom te kiezen, daarna `]` / `[`).
 - **Dubbelklik op de rand tussen twee Log-koppen** om de kolom links ervan aan zijn inhoud aan te passen (het toetsenbord: `Shift+C` om een kolom te kiezen, dan `=`; `+` past elke kolom aan). De laatste kolom heeft een greep op zijn eigen laatste cel: sleep om die kolom van grootte te veranderen, waarbij de kolom Bericht het verschil opvangt.
 - **Scroll de Log zijwaarts** (de kolomindeling `scroll`; Instellingen > Log & grafiek > Kolomindeling, of het selectievakje `Zijwaarts scrollen` in de keuzelijst): het horizontale wiel of `Shift`+wiel boven de tabel, de balk op de onderrand (sleep de schuif, druk op het kale spoor, klik op de pijlen aan de uiteinden), of `Shift+Links` / `Shift+Rechts`. In de standaardindeling `fit` vullen de kolommen het paneel en valt er niets te scrollen.
+- **Scroll een lijstpaneel zijwaarts** als een rij breder is dan het paneel: een sectie van Refs (een lange branch-, tag- of stashnaam), de lijsten Unstaged en Staged, de gewijzigde bestanden van een commit (of van een vergelijking) en de inforegels van de commitdetails (id, auteur, datum van schrijven, aantallen). Het horizontale wiel of `Shift`+wiel boven het paneel scrolt het; een balk verschijnt op de onderrand van het paneel alleen zolang er iets overloopt (sleep de schuif, druk op het kale spoor, klik op de pijlen aan de uiteinden), dus hij neemt nooit een rij in. Via het toetsenbord scrollen `Alt+Links` / `Alt+Rechts` het paneel dat de focus heeft (het Log scrolt de commitdetails; binnen de gewijzigde bestanden de bestanden); het palet heeft `Weergave: Het paneel naar links/rechts scrollen`. De hele rij scrolt (inspringing, statusmarkering, pijltje en naam samen); de titel van het paneel, zijn rand, de schuifbalken en de knop Stage/Unstage van een Statusrij waar de aanwijzer op staat blijven staan. Een naam wordt niet meer afgekapt met een beletselteken: zijn staart is één scrolbeweging weg (een branch met extra pushdoelen houdt in plaats daarvan zijn `⇉`-badge in beeld, dus zijn naam wijkt nog wel). De verschuiving geldt per paneel, stopt bij de breedste rij in beeld en wordt vergeten als je van repository wisselt. Het commitberichtblok breekt zijn tekst af, dus daar valt niets te scrollen. Zolang een sectie zijwaarts gescrold is draagt haar onderrand de balk, dus pas die sectie aan met haar toetsenbordopdrachten of vanuit een sectie die past.
 - **Sleep een Log-kop** om de kolom te verplaatsen: een spook van zijn naam volgt de aanwijzer, de kop die hij verliet wordt gedimd en een accentbalk markeert de plek waar hij zou landen. De kolommen verplaatsen als je loslaat; `Esc` annuleert en de aanwijzer toont de open hand zolang je hem draagt (toetsenbord: `Shift+C` om een kolom te kiezen, daarna `<` / `>`).
 
 GitPoulpi onthoudt elke grootte. Zie
@@ -202,6 +203,7 @@ Zie [Hosting en issuetrackers](hosting-integration.md).
   ref op de commit.
 - **Klik met rechts op een refpil** voor één menu met de acties van de ref en de acties van
   de commit.
+- **Klik op de trechter in de kop Auteur** (of `Shift+A` in het Log, of de paletopdracht `Log: Filteren op auteur...`) om te kiezen van welke auteurs de commits verlicht blijven; de rest dimt zoals bij een zoekopdracht. `Enter` of een klik op een rij wisselt een auteur, de rij **Filter wissen** (✕) laat het filter vallen, `Esc` sluit de popup en houdt het. **Klik met rechts op de verlichte trechter** om het te wissen (het palet: `Log: Auteursfilter wissen`).
 - **Klik met rechts op de kop** om kolommen te tonen of te verbergen: een checklist (`[x]` / `[ ]`) met een ✕ in de titel; klik op een rij of gebruik de pijltoetsen en `Spatie` / `Enter`, en sluit hem met de ✕, `Esc` of een klik ernaast (het palet: `Weergave: Log: Kolommen kiezen om te tonen`). Onder de selectievakjes: `<kolom> aan inhoud aanpassen` (de kolom waarop met rechts is geklikt), `Alle kolommen aan inhoud aanpassen` en `Kolombreedtes herstellen`. Het toetsenbordequivalent van de rechtsklik: `Shift+C` om een kolom te kiezen, daarna `.` (of `Shift+F10`) opent hetzelfde menu erop.
 - **De kolommen van de Radar** werken hetzelfde: sleep de scheiding na de kolom Repository, `#`, Auteur of Leeftijd om hem te schalen, **dubbelklik erop** om de kolom aan zijn breedste item aan te passen (`C` kiest een kolom, daarna `=`; `+` past elke kolom aan), en **klik met rechts op een kolomtitel** (of `C`, daarna `.`) voor `<kolom> aan inhoud aanpassen` en `Alle kolommen aan inhoud aanpassen`.
 - **Klik op `↑`, `↓` of `✕`** in de zoekbalk om naar de vorige of volgende treffer te gaan,
@@ -237,19 +239,35 @@ standaard*.
 
 ### Refs slepen
 
-Druk op een branch in de zijbalk Refs, of op een refpil in de Log, en sleep hem op een
-andere branch. De statusbalk zegt wat je draagt. Een doel dat de drop kan ontvangen licht op.
-Laat los voor een menu. `Esc` annuleert de sleepactie.
+Druk op een branch, een remote branch of een tag in de zijbalk Refs, of op een refpil in
+de Log, en sleep hem op een andere ref. De statusbalk zegt wat je draagt. Een doel dat de
+drop kan ontvangen licht op. Laat los voor een menu. `Esc` annuleert de sleepactie. De Log
+blijft staan terwijl je draagt: een ref indrukken scrolt de Log pas naar zijn commit als het
+een klik blijkt te zijn (de sprong gebeurt als de knop omhoog komt), dus je kunt eerst naar
+het doel scrollen en dan de ref oppakken.
 
 | Slepen | Menu |
 |---|---|
 | Lokale branch X op lokale branch Y | **Merge X in Y**, **Rebase X op Y**, **Interactief rebasen X op Y...**, **Fast-forward Y naar X** |
 | Lokale branch op een remote branch | **Push X naar** die remote |
 | Remote branch op lokale branch Y | **Merge**, **Rebase Y op** die branch, **Fast-forward Y naar** die branch, en **Pull** als hij de upstream van Y is |
+| Tag T op een willekeurige branch, remote branch of tag | **Tag T hierheen verplaatsen**; gemarkeerd *(geen fast-forward: T zou geen voorouder meer zijn)* als het doel niet afstamt van de commit van de tag (jouw keuze); grijs *staat er al* als hij al op die commit staat |
+| Tag T op lokale branch Y | ook **Tag T mergen in Y**, en onder een lijn de zeldzamere **Y mergen in tag T en de tag verplaatsen** (een merge-commit van de commit van de tag en Y, detached, waarna de tag erheen verplaatst) |
 
 Wijzigt de actie een branch die niet is uitgecheckt, dan checkt GitPoulpi hem eerst uit.
-Weigert git de checkout, dan verandert er niets. Tags kunnen niet worden gesleept en kunnen
-geen drop ontvangen.
+Weigert git de checkout, dan verandert er niets. Alleen tags kunnen op een tag worden
+gedropt, en een branch kan er niet op.
+
+Een tag verplaatsen behoudt zijn soort: een lichte tag blijft licht, een geannoteerde tag
+wordt geannoteerd opnieuw gemaakt met zijn bericht en tagger-regel ongewijzigd overgenomen
+(een ondertekende tag wordt geweigerd, zijn handtekening zou niet meer kloppen). Alleen je
+lokale tag verplaatst: een remote die de tag heeft houdt de oude positie, de tag wordt
+*differs* en de statusbalk zegt het; push hem zelf als je dat bedoelt. De verplaatsing en de
+merge-en-verplaats zijn elk één ongedaan-stap (ongedaan maken zet het oude tagobject terug).
+Een merge in een tag die conflicteert wijzigt niets. Palet: `Refs: Geselecteerde tag
+verplaatsen naar geselecteerde commit...` verplaatst de tag van het Refs-paneel naar de commit
+die in het Log is geselecteerd (het vraagt eerst als dat geen fast-forward is); elk ander doel
+gaat via markeren en dan droppen hieronder.
 
 Toetsenbord: "markeren en dan droppen" doet wat slepen doet, voor elk paar refs. Druk in het
 Refs-paneel op `m` op een branch (palet: `Refs: Markeren als dropbron`). De ref toont een `◆` en is
@@ -443,7 +461,7 @@ Terminal, xterm) verandert de aanwijzer niet; zie
 [Een terminal kiezen](terminals.md#vorm-van-de-muisaanwijzer-osc-22). De scheidingslijn of de knop onder de aanwijzer
 licht in elke terminal op.
 
-Hetzelfde soort component geeft overal in de app dezelfde aanwijzer.
+Hetzelfde soort component geeft overal in de app dezelfde aanwijzer: de knoppen van een review die over de Radar wordt getoond (tabs, het sluitkruisje, popupknoppen) en de eigen Acties-knoppen van de Radar tonen de hand zoals elke andere knop.
 
 - **Knoppen zijn echte knoppen**, in Instellingen (Integraties: Bewerken, Verbinding verbreken,
   Verwijderen, Bladeren, Wissen, de fragmentknoppen van de instructie-editor...)
@@ -460,7 +478,7 @@ Hetzelfde soort component geeft overal in de app dezelfde aanwijzer.
 - **De pijl** staat op rijen. Een rij licht als geheel op als de aanwijzer erop staat (hetzelfde
   licht in elke lijst) en is zelf geen bedieningselement: de rijen van de panelen Refs,
   Worktrees, Stashes en Submodules, de Log en de commitkolom (alleen een ref-pil krijgt de
-  hand), de regels van een diff, de gewijzigde bestanden, de items van pull requests, issues en
+  hand), de goten van een diff, de gewijzigde bestanden, de items van pull requests, issues en
   de Radar, en de rijen van de lijsten in dialogen en panelen (klonen, mapkiezer, Workspaces,
   de kaarten van het bord, het paneel Taken, kiezers voor toegewezenen, labels en milestones,
   rebase-stappen, reviewbestanden en -commits, keuzes in menu's en keuzelijsten).
@@ -469,8 +487,19 @@ Hetzelfde soort component geeft overal in de app dezelfde aanwijzer.
   Activiteitenlog, de zoekbalk van het issuespaneel), de tekst-, getal- en gebiedsrijen van
   Instellingen (ook tijdens het bewerken), de velden van dialogen, de reviewopmerkingsvakken,
   de commit-composer, de tekst van de bestandseditor en het bewerkbare resultaat van de
-  mergeeditor (de alleen-lezen panelen houden de pijl). In de commitdetails zijn het bericht
-  en de beschrijving bewerkbaar, dus de I-beam staat erop en het hele blok licht licht op.
+  mergeeditor (de alleen-lezen panelen houden de pijl, want slepen selecteert daar niets). Eén
+  regel geldt ook voor alleen-lezen tekst: overal waar slepen met de muis tekst kan selecteren,
+  is de aanwijzer de I-beam. Dat is de code van een diff (de Diff-weergave, Inline en Split, en
+  het diffpaneel van de review), de Bestandsweergave en de code van Blame. Hun regelnummers,
+  markeringen en hunkkoppen houden de pijl, en een knop op een regel houdt de hand. Hetzelfde
+  geldt voor het gesprek van een issue of een verzoek (ook het Overzicht van de review en zijn
+  conceptblok), het bericht van de commitdetails, de Releasenotes, het Activiteitenlog (beide
+  tabbladen), de helppopup, de Markdown-voorvertoning van de commentaareditor en de
+  opmerkingen, openstaande notities en suggesties in het diffpaneel van de review: slepen
+  selecteert de tekst (een gewone klik houdt zijn betekenis: een link opent, een knop doet
+  iets, een item van het Activiteitenlog of een thread opent of vouwt), `Ctrl+C` kopieert hem,
+  `Esc` of een klik laat hem vallen. Een selectie volgt zijn tekst bij het scrollen. Het
+  commitbericht is ook bewerkbaar (dubbelklik amendt het), en het hele blok licht licht op.
 - **In de commitdetails** zijn de inforegels bedieningselementen: klik op `commit: <id>` om de
   korte id te kopiëren, dubbelklik op de auteur- of datumregel om te amenden (de hand en een
   licht merkteken wijzen erop). De statistiekregel informeert alleen en houdt de pijl.

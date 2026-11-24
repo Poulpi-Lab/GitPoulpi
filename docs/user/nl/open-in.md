@@ -20,6 +20,13 @@ Niets is vastgelegd: elk item is een label en een opdracht.
   uit. Palet (`Ctrl+P`): `Tabblad: Openen in...` en `Tabblad: Openen in standaard`. De
   opdrachten van het palet werken ook als er in de titelbalk geen plek is voor de knop. Beide
   toetsen zijn opnieuw toe te wijzen; zie [Sneltoetsen](keybindings.md).
+- **Op label**: een stap `tab_open_in` van een [reeks](config-reference.md#sequences) voert het
+  item uit waarvan je het **label** noemt (`label = "VS Code"`), zodat de lijst herordenen nooit
+  verandert wat hij uitvoert. Een onbekend label stopt de stap met "geen item van Openen in heet ...".
+  `Tabblad: Terminal hier` (palet) opent je terminal in de map, de oude knop "Terminal hier" van de
+  tabbalk.
+- **Een AI-agent in de map**: `Tabblad: AI-agent hier openen` opent je terminal in de map van het
+  tabblad met een lokale AI-agent; zie [AI](ai.md#de-agent-openen-in-de-map-van-een-tabblad).
 - **Rechtsklik op een repositorytabblad**: het tabbladmenu heeft een submenu
   **Openen in** met dezelfde items.
 - De lijst begint bij het item dat je in deze sessie het laatst gebruikte.

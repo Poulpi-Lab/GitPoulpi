@@ -59,7 +59,7 @@ fn reverting_a_merge_commit_asks_for_the_mainline_parent() {
     term.click(col + 2, row).unwrap();
 
     term.send_keys("C-p").unwrap();
-    term.send_text("Revert Selected").unwrap();
+    term.send_text("Revert Selected Commit").unwrap();
     term.wait_for("the palette entry", STEP, |s| {
         s.contains("Command Palette (1/")
     })

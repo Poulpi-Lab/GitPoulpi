@@ -21,6 +21,13 @@ n'est câblé en dur : chaque entrée est un libellé et une commande.
   `Onglet : Ouvrir dans l'entrée par défaut`. Les commandes de la palette fonctionnent même
   quand la barre de titre n'a pas de place pour le bouton. Les deux touches sont
   réaffectables ; voir [Raccourcis clavier](keybindings.md).
+- **Par libellé** : une étape `tab_open_in` d'une [séquence](config-reference.md#sequences) lance l'entrée dont vous
+  nommez le **libellé** (`label = "VS Code"`), si bien que réordonner la liste ne change jamais
+  ce qui est lancé. Un libellé inconnu arrête l'étape avec « aucune entrée Ouvrir dans ne porte le nom ... ».
+  *Onglet : Terminal ici* (palette) ouvre votre terminal dans le dossier, l'ancien bouton
+  « Terminal ici » de la barre d'onglets.
+- **Un agent IA dans le dossier** : *Onglet : Ouvrir l'agent IA ici* ouvre votre terminal dans le
+  dossier de l'onglet en y lançant un agent IA local ; voir [IA](ai.md#ouvrir-lagent-dans-le-dossier-dun-onglet).
 - **Clic droit sur un onglet de dépôt** : le menu de l'onglet a un sous-menu
   **Ouvrir dans** avec les mêmes entrées.
 - La liste démarre sur l'entrée que vous avez utilisée en dernier dans cette

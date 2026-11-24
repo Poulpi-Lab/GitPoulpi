@@ -307,12 +307,14 @@ complet, l'auteur avec avatar et date, le hash du parent et les nombres de
 modifications, puis le message (résumé et description ; glissez sa bordure
 inférieure pour le redimensionner). Le volet **Fichiers modifiés** en dessous
 commence par ses propres contrôles : le tri, **Chemins** / **Arbre**, **Tous les
-fichiers** et une zone **Filtrer les fichiers**, fixes au-dessus de la liste, qui
+fichiers** et une zone **Filtrer les fichiers** (avec une case **LFS uniquement** à son
+extrémité droite dans un dépôt qui a des fichiers LFS), fixes au-dessus de la liste, qui
 est la seule partie qui défile. Cliquez sur un fichier pour ouvrir son diff.
 Sur une fenêtre basse, le message cède d'abord (jusqu'à une ligne), puis la liste.
 La vue des modifications en cours garde sa ligne **Chemins** / **Arbre** /
 **Tous les fichiers** en haut des listes de fichiers, au-dessus des listes
-Non indexés et Indexés.
+Non indexés et Indexés. En mode Arbre, un dossier replié se termine par le nombre de
+fichiers qu'il contient, sous-dossiers compris, en sourdine, par exemple `(12)`.
 
 **Liens dans un message.** Une adresse web saisie dans le message (`https://...`, ou la
 cible d'un `[texte](https://...)` markdown) est soulignée, affiche le pointeur en main
@@ -347,6 +349,25 @@ barre de boutons court en haut :
 | **Retour** | Replier les longues lignes. |
 | **Carte** | Une minimap de tout le fichier à côté de la barre de défilement. |
 | **Encodage** | L'encodage dans lequel le fichier est lu (**Auto** en premier). |
+
+#### Mots modifiés dans un diff
+
+Quand une ligne ne change qu'en partie, les mots qui diffèrent sont peints avec un
+fond plus marqué, de la couleur propre à la ligne (un rouge plus fort sur la ligne
+supprimée, un vert plus fort sur la ligne ajoutée), et le reste de la ligne garde la
+teinte unie. Dans un hunk, chaque série de lignes supprimées est appariée à la série de
+lignes ajoutées qui la suit, la première avec la première, la deuxième avec la deuxième,
+et ainsi de suite ; une paire n'est marquée que lorsqu'au moins 40 % de ses caractères
+non blancs sont identiques, de sorte qu'une ligne réécrite de zéro reste unie au lieu de
+devenir un seul bloc de surbrillance. Sont comparés les mots, les suites de blancs et
+les signes de ponctuation isolés ; un blanc seul entre deux mots modifiés les réunit en
+une seule marque, et les lignes de plus de 1000 caractères ne sont pas marquées. Cela
+fonctionne en Inline et en Split, avec le retour à la ligne et le défilement latéral, et
+dans le volet de diff de la revue. Désactivez-le dans **Paramètres > Diff et éditeur >
+Surligner les mots modifiés** (`ui.diff_intraline`) ou depuis la palette de commandes
+(**Diff : Basculer la mise en évidence des mots modifiés**, sans touche propre). Sur un
+terminal limité à 16 couleurs, ou avec un thème sans fond de diff, les mots modifiés
+sont affichés en gras et soulignés à la place.
 
 Dans un diff de l'arbre de travail, chaque hunk a des boutons **Stage du hunk** et
 **Abandonner le hunk**. Appuyez sur `v` pour sélectionner des lignes, puis stagez ou

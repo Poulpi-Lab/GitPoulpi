@@ -166,6 +166,22 @@ une fois, dans un terminal visible, dans le dossier de travail qu'il utilisera.
 Répondez à la question, fermez l'agent, puis réessayez ; la réponse est
 mémorisée par l'agent.
 
+### Ouvrir l'agent dans le dossier d'un onglet
+
+*Onglet : Ouvrir l'agent IA ici* dans la palette de commandes (réaffectable via `palette.tab_open_agent_here`,
+sans touche par défaut) ouvre votre terminal dans le dossier de l'onglet actif en y lançant l'agent d'un profil
+d'agent local, pour y travailler à la main. C'est le même terminal que **Terminal ici** et la même commande que
+**Ouvrir l'agent...**, mais dans le dossier de l'onglet au lieu du dossier de travail du profil. Avec un seul
+profil d'agent local, il s'ouvre aussitôt ; avec plusieurs, une liste sous la barre d'onglets demande lequel. Il
+n'envoie aucun prompt et ne lance aucune requête IA : ouvrir l'agent est l'action, et ce que vous y tapez vous
+appartient.
+
+La ligne porte l'étincelle IA, elle est masquée quand l'IA est désactivée (**Paramètres > IA**) et grisée
+(« aucun agent IA local n'est configuré ») quand aucun profil n'est un agent local. Dans une séquence, l'étape
+`tab_open_agent_here` prend l'`id` du profil IA dans son option `profile` (vide : le profil par défaut, sinon le
+premier agent local). Un modèle de terminal à vous ne peut pas recevoir la commande de l'agent : le terminal
+s'ouvre dans le dossier et la ligne d'état indique quelle commande lancer.
+
 La réponse est lue dans la transcription de session de l'agent pour Claude Code
 (son texte exact, supprimée ensuite), et sur l'écran entre deux lignes
 repères que la demande réclame, pour Codex et Gemini. Au plus deux exécutions
@@ -298,6 +314,7 @@ boutons pendant que vous la survolez ou la mettez en surbrillance.
 | **Revue de code** | Dans la [revue d'une pull ou merge request](review.md#-brouillon-de-revue-ia) : le bouton `✦ Rédiger une revue...`, `s`, ou la palette `Revue : ✦ Rédiger une revue...` (elle ouvre les options de la revue, `Enter` lance). Le modèle lit le diff de la demande, sa description et ses commentaires existants (et, par défaut, les fichiers `CLAUDE.md` et `AGENTS.md` du projet : voir [Contexte de la revue](#contexte-de-la-revue)) et propose des commentaires ; vous acceptez, modifiez ou écartez chacun. Rien n'atteint l'hébergeur avant l'envoi de la revue. | `hosting review suggest <n>` (affiche du JSON, ne publie rien), `ai review-context` (les valeurs par défaut) |
 | **Scinder un commit** | Le menu d'un commit *Scinder le commit (IA)...*, ou la palette `IA : Scinder le commit sélectionné...`. L'éditeur de scission s'ouvre avec le regroupement du modèle déjà rempli ; voir plus bas. | `ai split-plan <rev>` (affiche) |
 | **Script de réécriture d'historique** | Dans l'[atelier de réécriture](history-rewrite.md#écrire-un-script-avec-lia) : le bouton `✦ Écrire avec l'IA...` de l'éditeur de script, ou la palette `Réécriture : écrire un script avec l'IA...`. Une boîte de dialogue montre exactement ce qui sera envoyé ; le script arrive dans l'éditeur, signalé, et n'est jamais exécuté ni appliqué à votre place. | `ai rewrite-script "<consigne>" [--sample N]` (affiche) |
+| **Brouillon de séquence** | Décrivez une [séquence d'actions](#brouillon-de-séquence) à créer, ou comment en changer une (Paramètres > Séquences, volet suivant de la fenêtre). | `ai sequence-draft "<description>" [--edit <id>] [--context]` (affiche) |
 | **Règles de réécriture d'historique** | Dans l'[atelier de réécriture](history-rewrite.md#créer-des-règles-avec-lia) : le bouton `✦ Créer des règles avec l'IA...`, `Alt+E`, ou la palette `Réécriture : créer des règles avec l'IA...`. Une boîte de dialogue multiligne montre exactement ce qui sera envoyé ; les règles et les réglages arrivent dans l'atelier et rien n'est prévisualisé ni appliqué à votre place. | `ai rewrite-rules "<description>" [--context]` (affiche) |
 | **Nom de worktree** | Dans la [boîte Créer un worktree](worktrees.md#nommer-avec-lia) : le bouton `✦ Nommer avec l'IA` ou `Alt+A` ouvre une zone où vous décrivez la fonctionnalité, le bug ou la tâche ; le modèle nomme le worktree et sa branche d'après les noms de branches du dépôt, et les deux arrivent dans les champs de la boîte, à modifier. Seuls votre description et les noms des branches locales sont envoyés : pas de boîte « ce qui est envoyé ». | `ai worktree-name --describe "<tâche>"` (affiche) |
 | **Réponse sur un hébergeur** et **Description de ticket** | Le bouton **Écrire avec l'IA** (`Alt+E`) de chaque éditeur Markdown qui envoie vers un hébergeur : un commentaire, une réponse ou une modification dans une conversation, un commentaire ou un résumé de revue, la description d'un nouveau ticket. Le brouillon arrive dans la zone ; rien n'est publié. Voir [Aide à la rédaction sur un hébergeur](#aide-à-la-rédaction-sur-un-hébergeur). | `ai hosting-reply` (affiche un brouillon) |
@@ -387,6 +404,26 @@ que les règles valides sont gardées. Une règle Script n'est jamais créée ai
 périmètre, les noms des branches et des tags et les auteurs des derniers commits accompagnent la
 demande (une case, désactivée par défaut, visible dans le volet « ce qui est envoyé »). Le profil
 et les instructions sont ceux de *Règles de réécriture d'historique* dans Paramètres > IA.
+
+### Brouillon de séquence
+
+Vous décrivez une séquence d'actions avec vos mots (« stage de tout, message écrit par l'IA, commit et push » ou, pour une
+séquence existante, « ajoute d'abord un fetch ») et le modèle propose un nom, un id, les étapes et, s'il le souhaite, un
+raccourci. **Il ne fait que proposer** : rien n'est enregistré avant votre accord et rien n'est jamais lancé. Le modèle ne
+connaît que les commandes qu'une séquence peut contenir (la liste qui lui est donnée est générée depuis la même table qui
+valide une séquence, elle ne peut donc pas diverger) ; chaque étape est vérifiée seule, et une étape inconnue, destructrice,
+qui lance une autre séquence ou demande une pause impossible est écartée et listée avec sa raison, tandis que les étapes
+valides sont gardées. Facultativement, les noms des distants, les ids des profils IA et les libellés Ouvrir dans accompagnent
+la demande (désactivé par défaut ; l'option en ligne de commande est `--context`). Dans le terminal, `gitpoulpi ai sequence-draft`
+affiche la proposition en JSON (avec `toml`, que lit `gitpoulpi sequence add --file`) et n'enregistre rien. Le profil et les
+instructions sont ceux de *Brouillon de séquence* dans Paramètres > IA.
+
+Dans l'interface terminal, la même tâche est l'entrée **Créer avec l'IA...** de Paramètres > Séquences > **Ajouter**
+(palette : *Séquence : Créer avec l'IA...*) et le bouton **Modifier avec l'IA...** d'une séquence : une boîte de dialogue où vous
+écrivez ce que vous voulez, avec la case de contexte (désactivée par défaut) et la question « Ce qui est envoyé », puis une
+proposition à **Accepter**, **Modifier avant d'enregistrer**, **Rejeter** ou à renvoyer avec **Retour**. Une modification montre un
+diff par rapport à la séquence actuelle (`+` ajouté, `-` retiré, `~` modifié) et le raccourci suggéré est comparé à votre
+keymap mais jamais attribué. Rien n'est enregistré avant votre accord (voir [Séquences](sequences.md#créer-et-modifier-avec-lia)).
 
 ### Aide à la rédaction sur un hébergeur
 

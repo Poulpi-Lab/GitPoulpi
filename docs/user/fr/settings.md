@@ -443,7 +443,7 @@ que dans les builds qui incluent le serveur ; voir [MCP et agents](mcp-and-agen
 | **Couleur des champs**, **Couleur de champ personnalisée** | Le fond des champs de texte : **Suivre le thème** (par défaut), une couleur sombre fixe, ou votre propre `#rrggbb`. |
 | **Curseur de texte** | `ui.text_cursor` : **terminal** (par défaut) place le curseur du terminal lui-même au point d'insertion du champ de texte actif, en barre (les réglages de curseur de votre terminal s'appliquent, et la fenêtre de candidats d'une méthode de saisie s'ouvre à cet endroit) ; **drawn** dessine le curseur propre à GitPoulpi et garde le curseur du terminal masqué. S'applique immédiatement. Palette : `Paramètres : Curseur de texte...`. |
 | **Profondeur de couleur** | **auto** (par défaut), **truecolor**, **256** ou **16**. Voir [Thèmes](themes.md). |
-| **Thème de couleurs du graphe** | **Suivre le thème** (par défaut : les couleurs de voies propres au thème) ou n'importe quelle palette de voies. Chaque palette montre quelques-unes de ses couleurs. S'applique à la fermeture des Paramètres. La commande de palette **Application : Changer le thème de couleurs du graphe...** (`Ctrl+N Shift+T`) prévisualise chaque palette en direct. |
+| **Thème de couleurs du graphe** | **Suivre le thème** (par défaut : les couleurs de voies propres au thème) ou n'importe quelle palette de voies, vos propres fichiers de thème compris (après les préréglages). Chaque palette montre quelques-unes de ses couleurs ; un nom configuré qui n'existe plus est marqué *introuvable* et le graphe utilise les voies du thème. S'applique à la fermeture des Paramètres. La commande de palette **Application : Changer le thème de couleurs du graphe...** (`Ctrl+N Shift+T`) prévisualise chaque palette en direct. |
 | **Fond des voies du graphe** | **Désactivé** (transparent) ou **Teinte de ligne** : une bande légère de la couleur de la voie derrière la colonne du graphe, avec une fine barre à son bord. |
 | **Force de la teinte** | À quel point la bande de Teinte de ligne est estompée : **Forte**, **Moyenne** (par défaut) ou **Subtile**. La barre du bord garde sa couleur pleine. |
 | **Position de la barre d'outils** | `ui.toolbar_position` : où se place la barre d'outils : **Haut**, **Bas** (par défaut), **Gauche** ou **Droite**. Gauche et Droite en font une colonne à côté des volets ; une fenêtre de moins de 80 colonnes la dessine en bas. S'applique immédiatement. |
@@ -456,6 +456,8 @@ que dans les builds qui incluent le serveur ; voir [MCP et agents](mcp-and-agen
 | **Format de date**, **Format de date/heure**, **Format de date détaillé** | Les motifs de date de la colonne de date de l'Historique du fichier et du Blame, de la colonne Date du Log, et des détails du commit. Chacun montre un aperçu en direct. Voir la [référence de configuration](config-reference.md#ui) pour les jetons. |
 
 ![La liste Thème de couleurs du graphe : Suivre le thème, puis chaque palette de voies avec quelques-unes de ses couleurs](../images/settings-log-graph-lanes.png)
+
+Le thème et les couleurs du graphe (le Thème, le thème de couleurs du graphe, la colorisation et le fond des voies, l'intensité de la teinte de ligne) appartiennent à chaque installation : quand plusieurs installations partagent un même `config.toml`, en modifier une ne change jamais les autres. Seule l'installation principale écrit aussi les clés `ui.*` partagées.
 
 ### Clavier et souris
 
@@ -488,6 +490,21 @@ Trois options se trouvent sur l'onglet **Général**.
 | **Protocole clavier kitty** | **auto** demande au terminal le protocole clavier kitty, de sorte que `Ctrl+,`, `Ctrl+Enter` et `Ctrl+Shift+N` arrivent. **off** ne demande jamais ; utilisez-le si un terminal se comporte mal. Demande un redémarrage. |
 | **Souris activée** | Désactivé laisse la souris et la sélection de texte à votre terminal. Demande un redémarrage. |
 | **Lignes par cran de molette** | Combien de lignes un cran de molette déplace dans le Log. Demande un redémarrage. |
+
+### Séquences
+
+**Paramètres > Séquences** modifie vos [séquences](sequences.md) nommées : des listes de
+commandes de la palette exécutées l'une après l'autre, chacune étant une ligne de la palette et
+pouvant être liée à une touche. C'est une [liste](#listes) à une seule face : **+ Ajouter** propose
+une séquence vide et les modèles (**Sauvegarde**, **Composer et push**,
+**Worktree et agent**), les lignes sont le **Nom**, l'**Identifiant**, une
+**Description**, la **Portée** (cette installation, toutes les installations de cet
+ordinateur, ou ce dépôt uniquement), un bouton **Raccourci** qui ouvre la
+fenêtre de capture de **Clavier et souris**, **Modifier les étapes** et **Lancer maintenant**.
+**Modifier les étapes** bascule la liste sur les étapes de la séquence, chacune avec une
+**Pause** (**Par défaut**, **Toujours**, **Jamais**) et ses options ; **+ Ajouter**
+y ouvre une liste filtrable des commandes qu'une étape peut être. Chaque modification
+s'applique aussitôt. Voir [Séquences](sequences.md).
 
 ### Journal et graphe
 
@@ -527,6 +544,7 @@ couleurs du graphe sont sur la page **Apparence**.
 | **Numéros de ligne** | La colonne des numéros de ligne de l'éditeur et du diff. |
 | **Suivre la sélection dans l'éditeur** | Tant que l'éditeur est ouvert, sélectionner un autre fichier dans le volet de droite l'ouvre aussi dans l'éditeur, après avoir proposé d'enregistrer les modifications non sauvegardées. Un fichier qui ne peut pas être édité s'ouvre dans sa vue habituelle. Seulement pour les modifications de travail : un fichier choisi dans un commit quitte l'éditeur pour le diff de ce commit. |
 | **Retour à la ligne** | Replie les longues lignes du diff. |
+| **Surligner les mots modifiés** | Dans une ligne modifiée, peint les mots qui diffèrent de la ligne supprimée ou ajoutée avec laquelle elle est appariée avec un fond plus marqué, dans la vue Diff (Inline et Split), le diff de la revue et les fichiers du commit. Activé par défaut (`ui.diff_intraline`) ; aussi *Diff : Basculer la mise en évidence des mots modifiés* dans la palette. Voir [Mots modifiés](interface-tour.md#mots-modifiés-dans-un-diff). |
 | **Disposition par défaut**, **Hunks seulement**, **Montrer les modifications d'espaces seuls**, **Minimap** | L'état initial de la vue diff. La barre de la vue diff les change et les enregistre. |
 | **Annotations du blame**, **Largeur des annotations du blame** | Côté de la vue Blame qui porte la colonne d'annotation (avatar, auteur, ancienneté, résumé) : **right** (par défaut) ou **left**, et sa largeur en cellules (24 à 90). Tirer la bordure de la colonne dans la vue Blame, ou les touches `>` / `<`, enregistre la largeur ici (`ui.blame_side`, `ui.blame_width`). Voir [Blame](log-and-history.md#blame). |
 | **Éditeur de merge : côte à côte dès (colonnes)** | À partir de cette largeur, l'éditeur de merge montre A et B côte à côte. Défaut 100, minimum 40, `0` signifie toujours. En dessous, A et B sont des onglets. Voir [Résoudre les conflits de merge](merge-conflicts.md). |

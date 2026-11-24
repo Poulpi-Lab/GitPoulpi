@@ -160,10 +160,30 @@ majuscules : **`V`** disposition, **`H`** hunks ou fichier entier, **`S`** espa
 précédent, **`E`** l'encodage, **`M`** la minimap. Chacune a une ligne de palette (*Revue : Disposition unifiée ou côte à côte*,
 ...).
 
+Dans l'**Aperçu**, la conversation et le bloc de brouillon ✦ se sélectionnent de la même façon : glissez sur le texte,
+**`Ctrl+C`** le copie (un lien ou un bouton sur lequel vous appuyez garde son action, et un glissement qui commence sur l'un d'eux ne
+sélectionne rien). Sans sélection, **`Ctrl+C`** (ou *Conversation : Copier le texte*) copie l'entrée sélectionnée telle que l'hébergeur
+la stocke. L'I-beam s'affiche sur le texte et la main reste sur les boutons et les liens. Une sélection suit ce qui est
+à l'écran : défiler la déplace avec son texte (elle reste sélectionnée tant qu'elle est hors de vue), un rafraîchissement qui réécrit
+le texte l'abandonne, et un paragraphe replié se copie comme les lignes qu'il affiche.
+
+Les commentaires à l'intérieur du diff de la page **Fichiers** (un fil, vos notes en attente, les suggestions ✦) se sélectionnent aussi : glissez
+sur leurs mots, **`Ctrl+C`** (ou *Revue : Copier le texte sélectionné ou la ligne*) les copie, **`Esc`** abandonne la sélection. Un appui sur l'un de
+leurs boutons, ou un simple clic sur l'en-tête d'un fil (il se replie), agit toujours ; un glissement qui commence sur l'en-tête sélectionne ses
+mots et laisse le fil tel quel.
+
 ### Commits
 
 Seulement les commits de la demande (pas l'historique derrière), les plus récents d'abord, et le diff de celui qui est sélectionné
 (ses modifications par rapport à son parent), avec tous ses fichiers les uns sous les autres et les mêmes options d'affichage.
+
+## Revenir à une revue
+
+Une revue reste ouverte pendant que vous travaillez dans un autre onglet. Quittez l'onglet dont la revue est ouverte (cliquez sur un autre onglet, `Ctrl+PageDown`, *Dépôt : Onglet suivant* dans la palette) et y revenir rouvre la revue sur la même demande, la même page (Aperçu, Fichiers ou Commits), le même fichier et la même ligne, avec le clavier du même côté. Il en va de même pour une revue via l'API au-dessus du Radar : affichez de nouveau l'onglet Radar et la revue est de retour par-dessus.
+
+Une revue est **en cours** tant que sa page est ouverte. La fermer (`Esc`, la croix, *Revue : Fermer*), l'envoyer (**Terminer la revue**, ou soumettre ou abandonner un change Gerrit) ou extraire sa branche y met fin, et elle n'est pas rouverte. Quitter GitPoulpi avec une revue ouverte compte comme quitter l'onglet : le prochain démarrage la rouvre de la même façon.
+
+Si la demande a été mergée ou fermée entre-temps, ou si l'hébergeur ne répond pas, aucune page ne s'ouvre : la ligne d'état dit pourquoi et rien n'est rouvert la fois suivante. Les commentaires en attente, les fichiers vus et le brouillon sont conservés comme toujours (voir **Écrire une revue**). Une génération de suggestions encore en cours quand vous partez n'est pas reportée.
 
 ## Écrire une revue
 

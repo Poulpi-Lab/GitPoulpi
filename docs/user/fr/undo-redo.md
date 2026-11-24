@@ -74,6 +74,8 @@ ligne d'aide sous les boutons. Pour la ligne sélectionnée :
   `restore/<branche>-<sha>` à l'ancien sommet : votre branche courante et vos
   fichiers ne bougent jamais. La confirmation montre exactement ce qui va être
   fait, et la restauration est une nouvelle action : `Ctrl+Z` la reprend.
+- **Annuler toute la séquence** (`x`) : proposé tant que les entrées les plus récentes sont celles
+  d'une même exécution de séquence (voir [Exécutions de séquences](#exécutions-de-séquences)).
 - **Rétablir jusqu'ici** (`t`) sur une ligne annulée.
 - **Restaurer main là où Commit l'a laissée** (`r`, ou `Alt+Shift+Z` /
   `Édition : Restaurer la branche là où l'action bloquée l'a laissée` depuis
@@ -81,6 +83,10 @@ ligne d'aide sous les boutons. Pour la ligne sélectionnée :
   bloqué Annuler, le reflog sait encore où l'action l'avait laissée.
 
 Un clic droit sur une ligne (ou `.`) donne les mêmes actions sous forme de menu.
+
+Une ligne faite par une étape d'une [séquence](sequences.md) porte un badge, `⟳ Backup`,
+et sa ligne de détail dit de quelle étape il s'agit (« Faite par la séquence « Backup »,
+étape 3/4. »).
 
 ![L'Historique d'annulation après la suppression d'une branche et deux commits : la ligne de la branche supprimée est sélectionnée et peut être restaurée seule](../images/undo-history.png)
 
@@ -184,7 +190,7 @@ agissent sur la ligne sélectionnée de la vue affichée.
 
 | Vue | Lignes de la palette |
 |---|---|
-| Historique d'annulation | `Historique d'annulation : Annuler jusqu'ici...`, `Rétablir jusqu'ici...`, `Restaurer seulement celle-ci...`, `Restaurer la branche là où elle était...`, `Actualiser`, `Fermer` |
+| Historique d'annulation | `Historique d'annulation : Annuler jusqu'ici...`, `Rétablir jusqu'ici...`, `Annuler toute la séquence`, `Restaurer seulement celle-ci...`, `Restaurer la branche là où elle était...`, `Actualiser`, `Fermer` |
 | Reflog | `Reflog : Afficher dans le Log`, `Créer une branche ici...`, `Créer un tag ici...`, `Appliquer les changements à l'arbre de travail`, `Enregistrer en stash`, `Restaurer à cette position...`, `Charger la suite`, `Actualiser` |
 | Travail perdu | `Travail perdu : Créer une branche ici...`, `Créer un tag ici...`, `Cherry-pick`, `Appliquer les changements à l'arbre de travail`, `Enregistrer en stash`, `Relancer la recherche` |
 
@@ -197,6 +203,42 @@ annulée : utilisez Rétablir jusqu'ici », la raison pour laquelle une entré
 peut pas être restaurée seule, « seuls une branche ou HEAD peuvent être ramenés
 en arrière », etc. Les lignes en `...` ouvrent la même confirmation ou la même
 saisie de nom que le bouton.
+
+## Exécutions de séquences
+
+Une [séquence](sequences.md) (Backup : stage de tout, message de commit de l'IA, commit, push)
+fait **une entrée de journal ordinaire par étape qui change quelque chose** : ici le stage
+et le commit, pas le message de l'IA et pas le push (un push n'est jamais
+annulé, voir plus bas). Le journal est par dépôt et strictement de la plus récente à la plus ancienne, donc
+une exécution ne peut pas être une seule entrée : chacune garde ses propres vérifications, et chacune est marquée de
+l'exécution qui l'a faite (`sequence:Backup#<run> 3/4`). Les anciens journaux n'ont pas de marque
+et se chargent comme avant.
+
+**Annuler toute la séquence** annule les entrées d'une exécution, de la plus récente à la plus ancienne, comme un
+Annuler ordinaire chacune. Elle est proposée quand les entrées les plus récentes du journal sont
+celles d'une même exécution, consécutives : une entrée d'une autre exécution, une modification que vous avez faite à la main ou
+une modification faite hors de GitPoulpi entre les deux met fin au groupe. Où la trouver :
+
+- l'Historique d'annulation : le bouton `Annuler toute la séquence` (`x`), le menu du clic droit sur la ligne,
+  et la ligne de palette `Historique d'annulation : Annuler toute la séquence` ;
+- la palette de commandes : `Édition : Annuler toute la séquence` (le nom de la séquence figure sur
+  la ligne tant qu'elle s'applique) ;
+- la ligne de commande et MCP : `gitpoulpi undo --sequence` (plus bas).
+
+Chaque entrée est vérifiée seule, exactement comme un Annuler simple : un commit déjà
+sur son amont demande « annuler quand même ? » avant de partir (répondez et le reste
+continue), et une branche qui a bougé ou un merge en cours refuse. Le premier
+refus (ou un « non » à une question) **arrête** et dit quelle étape et pourquoi : *l'annulation de
+« Backup » s'est arrêtée à l'étape 3/4 (Commit « wip » (a81b9e4)) : ... Actions restantes : 2*.
+Ce qui a été annulé reste annulé, les entrées plus anciennes restent dans le journal, et un
+Annuler simple (ou le bouton de nouveau) continue à partir de là.
+
+Seul le journal de ce dépôt est annulé. Une exécution qui a aussi agi dans un autre
+dépôt (une étape worktree a déplacé les étapes suivantes dans l'onglet du nouveau worktree)
+a laissé des entrées dans le journal propre à ce dépôt ; ouvrez-le et annulez là. **Rétablir**
+reste entrée par entrée : après avoir annulé toute une exécution, `Ctrl+Y` ramène l'étape la plus
+récente, puis la suivante, chacune avec sa propre vérification.
+
 
 ## Ce qui peut être annulé
 
@@ -400,6 +442,9 @@ Annuler ne demande confirmation que lorsque c'est risqué :
   sur le serveur** (voir plus haut), donc il demande toujours, tout comme le
   rétablissement qui la supprime de nouveau là-bas.
 
+Annuler toute une séquence demande une seule fois pour la liste (dans le panneau), puis chaque entrée
+risquée demande encore comme ci-dessus.
+
 Rétablir, et toute annulation d'un simple déplacement de ref, ne demande
 jamais : l'autre sens est à une touche.
 
@@ -443,6 +488,7 @@ l'annulation est désactivée. Rien d'autre n'est jamais supprimé.
 gitpoulpi undo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi redo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi undo --list [--all]
+gitpoulpi undo --sequence [--dry-run] [--yes]
 gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 ```
 
@@ -453,6 +499,15 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 - `--expect <id>` fait refuser l'appel comme *périmé* sauf si cette entrée est
   toujours la plus récente : un script (ou une seconde fenêtre) n'annule jamais
   autre chose que ce qu'il a regardé.
+- `--sequence` annule l'exécution de séquence au sommet du journal (voir
+  [Exécutions de séquences](#exécutions-de-séquences)) : les entrées consécutives les plus récentes qu'un seul
+  `sequence run` a faites, de la plus récente à la plus ancienne, un `undo` chacune avec ses propres vérifications.
+  `--dry-run` les liste ; sans `--yes`, la première entrée qui en demande un
+  (code de sortie **3**) l'arrête, en nommant l'étape, avec ce qui a été annulé jusque-là dans
+  `undone` et ce qui reste dans `left`. Un refus sort avec le code **2** et `stopped.refused` ;
+  quand le sommet du journal n'est pas celui d'une même exécution, la réponse est
+  `{"no_sequence": {...}}`, code 2. Les entrées portent leur exécution dans `undo --list`
+  (`summary.origin` : `name`, `run_id`, `step`, `of`). Pas avec `--expect`.
 - `undo-forget` retire du journal l'entrée la plus récente bloquée (`--redo` :
   l'entrée de rétablissement la plus récente). Il refuse quand cette entrée
   n'est pas bloquée, et sort avec le code **3** sans `--yes`. C'est une mutation

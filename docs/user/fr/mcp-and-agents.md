@@ -259,6 +259,7 @@ vous confirmez.
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
 | `ai_rewrite_rules` | `gitpoulpi ai rewrite-rules` | read, network |
 | `ai_rewrite_script` | `gitpoulpi ai rewrite-script` | read, network |
+| `ai_sequence_draft` | `gitpoulpi ai sequence-draft` | read, network |
 | `ai_split_plan` | `gitpoulpi ai split-plan` | read, network |
 | `ai_worktree_name` | `gitpoulpi ai worktree-name` | read, network |
 | `alias_status` | `gitpoulpi alias status` | read |
@@ -456,6 +457,10 @@ vous confirmez.
 | `rewrite_tools` | `gitpoulpi rewrite tools` | read |
 | `rm_file` | `gitpoulpi rm-file` | destructive |
 | `search` | `gitpoulpi search` | read |
+| `sequence_list` | `gitpoulpi sequence list` | read |
+| `sequence_run` | `gitpoulpi sequence run` | destructive, network |
+| `sequence_show` | `gitpoulpi sequence show` | read |
+| `sequence_validate` | `gitpoulpi sequence validate` | read |
 | `session_delete` | `gitpoulpi session delete` | destructive |
 | `session_list` | `gitpoulpi session list` | read |
 | `session_new` | `gitpoulpi session new` | write |
@@ -486,8 +491,12 @@ vous confirmez.
 | `tag_delete` | `gitpoulpi tag delete` | destructive, network |
 | `tag_delete_remote` | `gitpoulpi tag delete-remote` | destructive, network |
 | `tag_fetch` | `gitpoulpi tag fetch` | write, network |
+| `tag_force_push` | `gitpoulpi tag force-push` | destructive, network |
 | `tag_list` | `gitpoulpi tag list` | read |
+| `tag_merge_branch` | `gitpoulpi tag merge-branch` | write |
+| `tag_move` | `gitpoulpi tag move` | write |
 | `tag_push` | `gitpoulpi tag push` | write, network |
+| `tag_take_remote` | `gitpoulpi tag take-remote` | write |
 | `theme_export` | `gitpoulpi theme export` | read |
 | `theme_list` | `gitpoulpi theme list` | read |
 | `treat` | `gitpoulpi treat` | write |
@@ -501,6 +510,7 @@ vous confirmez.
 | `ui_propose_rewrite` | `gitpoulpi ui propose rewrite` | propose |
 | `ui_propose_split` | `gitpoulpi ui propose split` | propose |
 | `ui_propose_tag` | `gitpoulpi ui propose tag` | propose |
+| `ui_sequence_run` | `gitpoulpi ui sequence run` | propose |
 | `ui_show_commit` | `gitpoulpi ui show commit` | view |
 | `ui_show_conflict` | `gitpoulpi ui show conflict` | view |
 | `ui_show_diff` | `gitpoulpi ui show diff` | view |
@@ -567,6 +577,10 @@ Not exposed as tools:
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
 | `gitpoulpi repo-auth set` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
 | `gitpoulpi repo-auth clear` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
+| `gitpoulpi sequence add` | a sequence is a list of commands that run later (and can be bound to a key): an agent must not write its own macros, or edit the config that gates it |
+| `gitpoulpi sequence remove` | removes a sequence from the user's config; the user's macros are theirs to manage |
+| `gitpoulpi sequence trust` | trusting the sequences a repository commits (they run commands on the user's machine) is a person's decision; an agent can only run sequences a person trusted |
+| `gitpoulpi sequence untrust` | withdrawing the trust of a repository's sequences is a person's decision, like granting it |
 | `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
@@ -656,6 +670,7 @@ ou annuler.
 | `ui_propose_rewrite` (recipe file) | l'atelier de réécriture d'historique avec les règles de la recette ; rien n'est prévisualisé ni appliqué | votre propre *Aperçu* puis *Appliquer* (`Ctrl+S`) ; `Esc` rejette. Une recette avec un script est refusée, les valeurs secrètes sont retirées |
 | `ui_propose_split` (rev, plan file) | l'éditeur de scission sur le commit, rempli d'après le plan | *Scinder* (`Ctrl+S`) ; `Esc` rejette |
 | `ui_propose_resolution` (path, pick ou content file) | l'éditeur de merge sur un fichier en conflit, avec les choix (ou tout le texte) déjà dans le Résultat | *Enregistrer et marquer résolu* (`Ctrl+S`) ; le fermer rejette |
+| `ui_sequence_run` (id) | un bandeau « ✦ Proposé par <agent> : lancer la séquence <nom> » avec *Lancer* et *Ignorer* ; rien ne s'exécute encore | *Lancer* (clic, ou `Ctrl+N` puis `Enter`) ; *Ignorer* ou `Esc` rejette. L'exécution s'arrête ensuite où la séquence le prévoit. Refusé quand la séquence n'existe pas, est invalide, ou est une séquence de dépôt que vous n'avez pas approuvée |
 
 Une proposition à la fois ; une proposition de message de commit est refusée tant que
 vous avez votre propre brouillon dans le compositeur, et une proposition de résolution

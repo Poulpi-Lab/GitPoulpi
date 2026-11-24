@@ -28,7 +28,14 @@ le volet de droite montre les modifications locales :
   `gitpoulpi status` / `gitpoulpi diff` rapportent `renamed_from`.
 - **Chemins** ou **Arbre** (`m`) liste les fichiers à plat ou en dossiers. **Tout
   replier** (`z`) replie les dossiers. **Tous les fichiers** (`a`) montre tout
-  l'arbre au lieu des seuls fichiers modifiés. Faites un clic droit sur l'espace vide de la liste pour
+  l'arbre au lieu des seuls fichiers modifiés. Un dossier replié affiche, après son nom, un
+  petit compte en sourdine des fichiers qu'il contient, sous-dossiers compris (`src/ (12)`) ;
+  un dossier ouvert n'en affiche aucun. Dans un volet étroit, le nom est raccourci en premier
+  pour que le compte reste visible. Dans un dépôt qui a des fichiers stockés avec Git LFS, une
+  case **LFS uniquement** (`o`, ou *Fichiers : Basculer LFS uniquement*) restreint toutes les
+  listes de fichiers (Non indexés, Indexés, **Tous les fichiers**, les fichiers d'un commit) à ces
+  fichiers ; les comptes des dossiers suivent, et elle n'est pas proposée quand aucun fichier n'utilise LFS.
+  Faites un clic droit sur l'espace vide de la liste pour
   **Tout déplier** / **Tout replier**, sur une ligne de dossier pour **Déplier tous les sous-dossiers** /
   **Replier tous les sous-dossiers** ; touches `=`, `-`, `*`, `_` (voir
   [Souris et gestes](mouse-and-gestures.md)).

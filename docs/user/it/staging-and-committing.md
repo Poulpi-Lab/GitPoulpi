@@ -32,7 +32,14 @@ le modifiche in corso:
   riportano `renamed_from`.
 - **Percorso** o **Albero** (`m`) elenca i file in piano o in cartelle. **Comprimi tutto**
   (`z`) chiude le cartelle. **Vedi tutti i file** (`a`) mostra l'intero albero
-  invece dei soli file modificati. Clic destro sullo spazio vuoto dell'elenco per
+  invece dei soli file modificati. Una cartella compressa mostra, dopo il suo nome, un
+  piccolo conteggio attenuato dei file che contiene, sottocartelle incluse (`src/ (12)`);
+  una cartella aperta non ne mostra. In un pannello stretto il nome viene accorciato per
+  primo, così il conteggio resta in vista. In un repository che ha file memorizzati con Git LFS una
+  casella **Solo LFS** (`o`, o **File: Attiva/disattiva solo LFS**) limita ogni elenco di file
+  (File non in stage, File in stage, **Vedi tutti i file**, i file di un commit) a quei file;
+  i conteggi delle cartelle li seguono, e non viene offerta quando nessun file usa LFS.
+  Clic destro sullo spazio vuoto dell'elenco per
   **Espandi tutto** / **Comprimi tutto**, su una riga di cartella per **Espandi tutte le sottocartelle** /
   **Comprimi tutte le sottocartelle**; tasti `=`, `-`, `*`, `_` (vedi
   [Mouse e gesti](mouse-and-gestures.md)).

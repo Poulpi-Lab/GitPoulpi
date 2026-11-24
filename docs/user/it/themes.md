@@ -208,7 +208,18 @@ Ogni tema porta i propri colori delle corsie per il grafo del Log, ma puoi
 combinare qualsiasi tema con qualsiasi palette: **Impostazioni > Aspetto > Tema
 colori del grafo** offre **Segui il tema** (il predefinito) più ogni palette di
 corsie di ogni tema (GitPoulpi Dark, GitPoulpi Light, poi Material,
-Serie, ... e il `graph_palette` dei tuoi file di tema). ![Il combo Tema colori del grafo in Aspetto: Segui il tema, poi ogni palette di corsie con alcuni dei suoi colori](../images/settings-log-graph-lanes.png)
+Serie, ... e il `graph_palette` dei tuoi file di tema, elencati dopo i preset sotto il
+nome del tema). Un tema personalizzato compare alla successiva apertura dell'elenco (i
+file vengono riletti allora), e sceglierne uno memorizza il nome del suo file in
+`ui.graph_color_theme` (per l'installazione principale in `[ui]`, per le
+altre nella loro voce `[installation.settings.<id>]`, come il tema). Un
+file di tema senza `graph_palette` ha i colori delle corsie della sua `base` (il
+preset predefinito quando non ne indica nessuna), la stessa ereditarietà di ogni altro colore
+del file. Un tema personalizzato che ha il nome di una palette di corsie integrata (per esempio
+`gruvbox`) sostituisce quella palette nell'elenco. Se il nome configurato non
+esiste più (il file è stato eliminato o rinominato), il grafo usa i colori delle corsie
+del tema attivo, e le Impostazioni mostrano il nome segnato *non trovato* finché non
+ne scegli un altro. ![Il combo Tema colori del grafo in Aspetto: Segui il tema, poi ogni palette di corsie con alcuni dei suoi colori](../images/settings-log-graph-lanes.png)
 
 In `config.toml`:
 
@@ -258,6 +269,18 @@ statusbar_fg = "#eceff4"
 [diff]
 add_bg = "#2f3b2f"
 ```
+
+### Parole modificate in un diff (`diff.add_emph_bg`, `diff.del_emph_bg`)
+
+Gli sfondi più marcati che la vista Diff dipinge sulle parole che differiscono all'interno di
+una riga modificata, sopra `diff.add_bg` (righe aggiunte) e `diff.del_bg` (righe
+rimosse); il testo mantiene `diff.add_fg` e `diff.del_fg`. Ogni preset imposta entrambi.
+Un file di tema che imposta `diff.add_bg` o `diff.del_bg` ma non l'enfasi corrispondente
+ne riceve una derivata da esso (il 30% del cammino verso il colore del testo di
+quel lato), così uno sfondo personalizzato non finisce mai con l'enfasi del tema di base.
+Un valore `default` (il preset Terminal), o un terminale la cui
+profondità di colore disegnerebbe i due sfondi uguali, segna invece le parole in grassetto e
+sottolineate. Vedi [Parole modificate in un diff](interface-tour.md#parole-modificate-in-un-diff).
 
 I colori sono `"#rrggbb"`, `"ansi:N"` (la voce N della palette del terminale) o
 `"default"` (il colore del terminale stesso). Gruppi e chiavi sono quelli di
@@ -322,6 +345,8 @@ datato. Il preset Terminal non ne ha bisogno. Il truecolor non costa nulla; il
 passaggio di conversione scorre lo schermo una volta per frame solo quando è
 attivo.
 
+Il tema è per installazione: più installazioni di GitPoulpi che condividono una configurazione tengono ognuna il proprio, quindi sceglierne uno in un'installazione non ricolora mai le altre.
+
 ## Anteprima dal vivo
 
 In Impostazioni > Aspetto, il combo Tema elenca **Sistema (segue il terminale)**,
@@ -342,14 +367,16 @@ tema, **Enter** lo applica e salva `ui.theme` in `config.toml`, **Esc** (o un cl
 fuori dall'elenco) rimette il tema precedente e non salva nulla.
 
 Sotto il campo del filtro un prefiltro a segmenti restringe l'elenco: **Tutti**,
-**Scuri**, **Chiari** e **Colorati** (clicca un segmento, `Tab` / `Shift+Tab`, o
-`Alt+1`..`Alt+4`). Scuri e Chiari derivano dalla luminosità di `ui.bg` del tema;
+**Scuri**, **Chiari** e **Colorati**, più **Personalizzati** quando hai file di tema
+tuoi (clicca un segmento, `Tab` / `Shift+Tab`, o `Alt+1`..`Alt+5`). Scuri e Chiari derivano dalla luminosità di `ui.bg` del tema;
 **Colorati** mantiene i temi il cui sfondo è chiaramente tinto (blu, viola,
 giallo, verde...) ed esclude bianco, bianco sporco, nero e grigi quasi neri, quindi
 Solarized Dark, Dracula o Nord sono colorati mentre GitHub Dark e One Light no. Un
 tema colorato compare anche sotto Scuri o Chiari. **Sistema** e i temi trasparenti
-(senza sfondo proprio) compaiono solo sotto Tutti. Il prefiltro si combina con ciò
-che scrivi. I selettori del tema colori del grafo e della lingua mostrano
+(senza sfondo proprio) compaiono solo sotto Tutti. **Personalizzati** mantiene solo i file di tema della tua cartella `themes/` (un tema personalizzato
+resta comunque Scuro, Chiaro o Colorato per quei pulsanti); il pulsante non viene disegnato e
+non è raggiungibile da tastiera finché quella cartella non contiene alcun tema. Il prefiltro si combina
+con ciò che scrivi. I selettori del tema colori del grafo e della lingua mostrano
 l'anteprima allo stesso modo: le corsie del Log e l'intera interfaccia cambiano
 mentre sposti l'evidenziazione.
 

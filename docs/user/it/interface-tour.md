@@ -323,11 +323,14 @@ completo, l'autore con avatar e data, l'hash del genitore e i conteggi delle
 modifiche, poi il messaggio (riepilogo e descrizione; trascina il suo bordo inferiore
 per ridimensionarlo). Il riquadro **File modificati** sotto inizia con i propri
 controlli: l'interruttore dell'ordinamento, **Percorso** / **Albero**, **Vedi tutti i
-file** e una casella **Filtra i file**, fissi sopra l'elenco, che è l'unica parte che
+file** e una casella **Filtra i file** (con una casella **Solo LFS** alla sua
+estremità destra in un repository che ha file LFS), fissi sopra l'elenco, che è l'unica parte che
 scorre. Clicca un file per aprirne il diff. In una finestra bassa cede prima il
 messaggio (fino a una riga), poi l'elenco. La vista delle modifiche in corso tiene la
 sua riga **Percorso** / **Albero** / **Vedi tutti i file** in cima agli elenchi dei
-file, sopra gli elenchi File non in stage e File in stage.
+file, sopra gli elenchi File non in stage e File in stage. In modalità Albero
+una cartella compressa termina con il numero di file che contiene, sottocartelle
+incluse, come un `(12)` attenuato.
 
 **Collegamenti in un messaggio.** Un indirizzo web scritto nel messaggio (`https://...`, o la destinazione di un `[testo](https://...)` markdown) è sottolineato, mostra il puntatore a mano e, al clic, chiede **Aprire questo collegamento?** mostrando l'indirizzo intero prima di aprire qualsiasi cosa: il testo di un messaggio non è fidato. **Apri** (`A`) avvia il browser, **Annulla** (`N`, `Esc`, la croce) non fa nulla. Vengono proposti solo indirizzi `http` e `https`. Il gemello da tastiera è il comando della palette `Dettagli commit: Apri collegamento nel messaggio...`, che chiede del primo indirizzo del messaggio e passa agli altri con **Avanti** (`V`). Alcuni terminali disegnano una propria sottolineatura su un indirizzo sotto il puntatore e lo aprono da soli con un clic con modificatore (spesso Shift+clic): è una funzione del terminale, non di GitPoulpi.
 
@@ -352,6 +355,25 @@ In alto corre una barra di pulsanti:
 | **A capo** | Manda a capo le righe lunghe. |
 | **Mappa** | Una minimappa dell'intero file accanto alla barra di scorrimento. |
 | **Codifica** | La codifica con cui viene letto il file (prima **Auto**). |
+
+#### Parole modificate in un diff
+
+Quando una riga cambia solo in parte, le parole che differiscono vengono colorate con uno
+sfondo più marcato del colore della riga stessa (un rosso più marcato sulla riga rimossa,
+un verde più marcato su quella aggiunta), e il resto della riga mantiene la tinta
+uniforme. All'interno di un hunk, ogni serie di righe rimosse viene accoppiata alla serie di righe
+aggiunte che la segue, la prima con la prima, la seconda con la seconda,
+e così via; una coppia viene marcata solo quando almeno il 40% dei suoi caratteri non vuoti
+è uguale, così una riga riscritta da zero resta uniforme invece di
+trasformarsi in un unico blocco di enfasi. Vengono confrontate parole, serie di spazi e singoli
+segni di punteggiatura, uno spazio isolato tra due parole modificate
+le unisce in un unico segno, e le righe più lunghe di 1000 caratteri non vengono
+marcate. Funziona in Inline e Split, con l'a capo automatico e lo scorrimento laterale,
+e nel pannello diff della revisione. Disattivalo in **Impostazioni > Diff ed editor >
+Evidenzia le parole modificate** (`ui.diff_intraline`) o dalla palette dei comandi
+(**Diff: Attiva/disattiva l'evidenziazione delle parole modificate**, senza un tasto proprio). Su un terminale
+limitato a 16 colori, o con un tema senza sfondo per il diff, le parole modificate
+vengono mostrate invece in grassetto e sottolineate.
 
 In un diff della directory di lavoro, ogni hunk ha i pulsanti **Stage dell'hunk** e
 **Scarta l'hunk**. Premi `v` per selezionare righe, poi fai stage o scarta solo

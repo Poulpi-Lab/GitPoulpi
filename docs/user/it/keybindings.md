@@ -477,6 +477,8 @@ Ogni riga della palette termina con un pulsante tasto (`[k]`), e `Alt+K` fa lo s
 
 In `config.toml` è la tabella `[keybindings.palette]`, con il nome del comando (`toggle_minimap = "Ctrl+Alt+M"`). Un tasto in conflitto con un'altra azione è mostrato in rosso, e `c` sulla sua riga elenca tutte le azioni con cui è in conflitto.
 
+Una sequenza che hai definito (una catena con nome di comandi della palette) riceve un tasto allo stesso modo: `[keybindings.sequence]` accetta l'id della sequenza (`backup = "Ctrl+Alt+B"`), un tasto per un id che non esiste viene segnalato e ignorato, e la tabella segue `config.toml` mentre l'app è in esecuzione. Ogni sequenza è anche una riga della palette, `Sequenza: <nome>`, che mostra il suo tasto.
+
 La riga di aiuto sotto l'elenco indica questo tasto (`Alt+K` di default). È l'azione `palette.configure_shortcut`, quindi si riassegna come le altre.
 
 La palette e i selettori (tema, lingua, schede, ricerca nei workspace) si spostano e ridimensionano come un dialogo: trascina il bordo superiore, premi `Ctrl+N` poi `m` (come su ogni dialogo), oppure premi `Alt+G`. `Alt+G` è l'azione `palette.arrange` ("Finestra: Sposta o ridimensiona la finestra in primo piano"): un modo in più, valido su ogni dialogo e popup, per avviare la modalità di disposizione su quello in primo piano (le righe della palette `Finestra: Sposta o ridimensiona` e `Finestra: Reimposta posizione e dimensione` agiscono sulla palette stessa mentre è aperta). Le frecce lo spostano, `Maiusc`+frecce lo ridimensionano, `0` lo reimposta, `Invio` o `Esc` escono dalla modalità e il popup resta aperto. `ui.dialog_geometry` decide se la posizione viene conservata.

@@ -125,6 +125,7 @@ sulle sue barre di scorrimento. Clicca un segno per andarci.
 - **Doppio clic sul bordo tra due intestazioni del Log** per adattare la colonna alla sua sinistra al contenuto (da tastiera: `Shift+C` per scegliere una colonna, poi `=`; `+` adatta ogni colonna). L'ultima colonna ha una maniglia sulla sua ultima cella: trascinala per ridimensionare quella colonna, e la colonna Messaggio prende la differenza.
 - **Scorri il Log lateralmente** (la disposizione `scroll` delle colonne; Impostazioni > Log e grafo > Disposizione delle colonne, o la casella `Scorri lateralmente` del selettore): la rotella orizzontale o `Shift`+rotella sopra la tabella, la barra sul bordo inferiore (trascina il cursore, premi la traccia libera, clicca le frecce alle estremità), oppure `Shift+Sinistra` / `Shift+Destra`. Nella disposizione `fit` predefinita le colonne riempiono il pannello e non c'è nulla da scorrere.
 - **Trascina un'intestazione del Log** per spostare la colonna: un fantasma del suo nome segue il puntatore, l'intestazione che ha lasciato è attenuata e una barra d'accento segna lo slot in cui finirebbe. Le colonne si spostano al rilascio; `Esc` annulla e il puntatore mostra la mano aperta mentre la porti (da tastiera: `Shift+C` per scegliere una colonna, poi `<` / `>`).
+- **Scorri lateralmente un pannello a elenco** quando una riga è più larga del pannello: una sezione Refs (il nome lungo di un branch, di un tag o di uno stash), gli elenchi File non in stage e File in stage, i file modificati del commit (o di un confronto) e le righe di informazione dei dettagli del commit (id, autore, data di creazione, conteggi). La rotella orizzontale o `Shift`+rotella sopra il pannello lo fa scorrere; una barra compare sul bordo inferiore del pannello solo finché qualcosa trabocca (trascina il suo cursore, premi la guida vuota, clicca le frecce alle estremità), quindi non occupa mai una riga. Da tastiera, `Alt+Left` / `Alt+Right` fanno scorrere il pannello che ha il focus (il Log fa scorrere i dettagli del commit; dentro i file modificati, i file); la palette ha `Vista: Scorri il pannello a sinistra/destra`. Scorre l'intera riga (rientro, segno di stato, freccia e nome insieme); il titolo del pannello, il suo bordo, le barre di scorrimento e il pulsante Stage/Unstage di una riga di Stato sotto il puntatore restano fermi. Un nome non viene più tagliato con i puntini di sospensione: la sua coda è a uno scorrimento di distanza (un branch con altre destinazioni di push mantiene invece in vista il suo badge `⇉`, quindi è il suo nome a cedere). L'offset è per pannello, si ferma alla riga più larga in vista e viene dimenticato quando cambi repository. Il blocco del messaggio di commit manda a capo il testo, quindi non ha nulla da scorrere. Mentre una sezione è scorsa lateralmente il suo bordo inferiore porta la barra, quindi ridimensiona quella sezione con i suoi comandi da tastiera o da una sezione che ci sta tutta.
 
 GitPoulpi ricorda ogni dimensione. Vedi
 [Le dimensioni vengono ricordate](interface-tour.md#le-dimensioni-vengono-ricordate).
@@ -237,6 +238,7 @@ Vedi [Hosting e issue tracker](hosting-integration.md).
   quelle del commit.
 - **Clic destro sull'intestazione** per mostrare o nascondere le colonne: un elenco di caselle (`[x]` / `[ ]`) con una ✕ nel titolo; clicca una riga o usa le frecce e `Spazio` / `Enter`, poi chiudilo con la ✕, `Esc` o un clic fuori (la palette: `Vista: Log: Scegli le colonne da mostrare`). Sotto le caselle: `Adatta <colonna> al contenuto` (la colonna cliccata), `Adatta tutte le colonne al contenuto` e `Reimposta le larghezze delle colonne`. L'equivalente da tastiera del clic destro: `Shift+C` per scegliere una colonna, poi `.` (o `Shift+F10`) apre lo stesso menu su di essa.
 - **Le colonne del Radar** funzionano allo stesso modo: trascina il separatore dopo la colonna del repository, `#`, autore o età per dimensionarla, **fai doppio clic su di esso** per adattare la colonna alla sua voce più larga (`C` sceglie una colonna, poi `=`; `+` adatta ogni colonna), e **clic destro sul titolo di una colonna** (o `C`, poi `.`) per `Adatta <colonna> al contenuto` e `Adatta tutte le colonne al contenuto`.
+- **Clicca l'imbuto nell'intestazione Autore** (o `Shift+A` nel Log, o il comando della palette `Log: Filtra per autore...`) per scegliere i commit di quali autori restano accesi; gli altri si attenuano come con una ricerca. `Enter` o un clic su una riga attiva/disattiva un autore, la riga **Rimuovi il filtro** (✕) toglie il filtro, `Esc` chiude il popup e lo mantiene. **Clic destro sull'imbuto acceso** per toglierlo (la palette: `Log: Rimuovi il filtro per autore`).
 - **Clicca `↑`, `↓` o `✕`** nella barra di ricerca per andare al risultato
   precedente o successivo, o per chiudere la barra.
 - **Clicca `#12`, `ABC-12` o `AB#12`** in un messaggio di commit, nel pannello
@@ -267,20 +269,36 @@ non viene disegnata e la tastiera la salta. L'ultima sezione visibile non può e
 
 ### Trascinare i ref
 
-Premi su un branch nella barra laterale Refs, o su una pillola di ref nel Log, e
-trascinalo su un altro branch. La barra di stato dice cosa stai portando. Un
-bersaglio che può accettare il rilascio si illumina. Rilascia per ottenere un
-menu. `Esc` annulla il trascinamento.
+Premi su un branch, un branch remoto o un tag nella barra laterale Refs, o su una
+pillola di ref nel Log, e trascinalo su un altro ref. La barra di stato dice cosa
+stai portando. Un bersaglio che può accettare il rilascio si illumina. Rilascia per
+ottenere un menu. `Esc` annulla il trascinamento. Il Log resta dov'è mentre porti:
+premere un ref fa scorrere il Log al suo commit solo quando si rivela un clic (il
+salto avviene quando il pulsante viene rilasciato), così puoi prima scorrere fino al
+bersaglio del rilascio e poi prendere il ref.
 
 | Trascinamento | Menu |
 |---|---|
 | Branch locale X su branch locale Y | **Merge di X in Y**, **Rebase di X su Y**, **Rebase interattivo di X su Y...**, **Fast-forward di Y a X** |
 | Branch locale su un branch remoto | **Push di X** verso quel remoto |
 | Branch remoto su branch locale Y | **Merge**, **Rebase di Y su di esso**, **Fast-forward di Y a esso**, e **Pull** quando è l'upstream di Y |
+| Tag T su qualsiasi branch, branch remoto o tag | **Sposta il tag T qui**; marcato *(non è un fast-forward: T non sarebbe più un antenato)* quando la destinazione non discende dal commit del tag (a tua scelta); disattivato *già lì* quando è già su quel commit |
+| Tag T su un branch locale Y | anche **Merge del tag T in Y**, e sotto una linea il più raro **Merge di Y nel tag T e sposta il tag** (un commit di merge del commit del tag e di Y, detached, poi il tag si sposta su di esso) |
 
 Quando l'azione cambia un branch di cui non è stato fatto il checkout, GitPoulpi ne
-fa prima il checkout. Se git rifiuta il checkout, non cambia nulla. I tag non si
-possono trascinare e non possono ricevere un rilascio.
+fa prima il checkout. Se git rifiuta il checkout, non cambia nulla. Solo i tag
+possono essere rilasciati su un tag, e un branch non può essere rilasciato su uno.
+
+Spostare un tag ne mantiene il tipo: un tag leggero resta leggero, un tag annotato
+viene ricreato annotato con il suo messaggio e la riga dell'autore del tag riportati
+invariati (un tag firmato viene rifiutato, la sua firma non corrisponderebbe più). Si sposta solo
+il tuo tag locale: un remote che ha il tag mantiene la vecchia posizione, il tag
+diventa *differs* e la barra di stato lo dice; fai tu il push quando lo vuoi. Lo spostamento e
+il merge con spostamento sono ciascuno un passo di annullamento (l'annullamento rimette il vecchio
+oggetto tag). Un merge in un tag che va in conflitto non cambia nulla. Palette:
+`Refs: Sposta il Tag selezionato sul Commit selezionato...` sposta il tag del pannello Refs sul
+commit selezionato nel Log (chiede prima quando non è un
+fast-forward); ogni altra destinazione passa da segna poi rilascia, più sotto.
 
 Da tastiera: «segna poi rilascia» fa ciò che fa un trascinamento, per qualsiasi
 coppia di ref. Nel pannello Refs premi `m` su un branch (palette: `Refs: Segna come
@@ -479,7 +497,7 @@ Negli altri terminali (Rio, Alacritty, Tabby, iTerm2, Terminal.app, Windows Term
 [Scegliere un terminale](terminals.md#forma-del-puntatore-del-mouse-osc-22). Il divisore o il pulsante
 sotto il puntatore si illumina in ogni terminale.
 
-Lo stesso tipo di componente dà lo stesso puntatore in tutta l'app.
+Lo stesso tipo di componente dà lo stesso puntatore in tutta l'app: i pulsanti di una revisione mostrata sopra il Radar (schede, la croce di chiusura, i pulsanti dei popup) e i pulsanti Azioni del Radar prendono la mano come ogni altro pulsante.
 
 - **I pulsanti sono veri pulsanti**, in Impostazioni (Integrazioni: Modifica, Disconnetti,
   Rimuovi, Sfoglia, Elimina, i pulsanti dei frammenti dell'editor delle istruzioni...)
@@ -489,8 +507,8 @@ Lo stesso tipo di componente dà lo stesso puntatore in tutta l'app.
   come ogni altro controllo.
 
 - **La mano che indica** è sui controlli: pulsanti, caselle di controllo e interruttori, caselle combinate (in Impostazioni, nei pannelli delle issue e delle pull request, nel Radar, nelle finestre di dialogo), schede e le loro croci, i pulsanti `+`, link e riferimenti (`#12`, `!45`), intestazioni di gruppo e di cartella con la loro freccia di espansione, pillole dei ref, barre di scorrimento e i pulsanti Attività, job e versione della barra di stato. Una casella di controllo o un pulsante dentro una riga mantiene la mano.
-- **La freccia** è sulle righe. Una riga si illumina per intero quando il puntatore è su di essa (la stessa luce in ogni elenco) e non è di per sé un controllo: le righe dei pannelli Refs, Worktree, Stash e Sottomoduli, il Log e la colonna dei commit (solo una pillola di ref prende la mano), le righe di un diff, i file modificati, gli elementi delle pull request, delle issue e del Radar, e le righe degli elenchi nelle finestre di dialogo e nei pannelli (clone, selettore di cartelle, Workspace, le schede della bacheca, il pannello Job, i selettori di assegnatario, etichetta e milestone, passaggi del rebase, file e commit della revisione, scelte dei menu e delle caselle combinate).
-- **Il cursore di testo (I-beam)** è sulle caselle di input, su tutta la casella: le caselle di ricerca (ricerca globale, Impostazioni, palette dei comandi, Home), i filtri (Refs, file, Radar, Log delle attività, ricerca del pannello delle issue), le righe di testo, numero e area di Impostazioni (anche mentre le modifichi), i campi delle finestre di dialogo, le caselle dei commenti di revisione, il compositore di commit, il testo dell'editor di file e il risultato modificabile dell'editor di merge (i suoi pannelli di sola lettura mantengono la freccia). Nei dettagli del commit il messaggio e la descrizione sono modificabili, quindi l'I-beam compare su di essi e l'intero blocco si illumina leggermente.
+- **La freccia** è sulle righe. Una riga si illumina per intero quando il puntatore è su di essa (la stessa luce in ogni elenco) e non è di per sé un controllo: le righe dei pannelli Refs, Worktree, Stash e Sottomoduli, il Log e la colonna dei commit (solo una pillola di ref prende la mano), i margini di un diff, i file modificati, gli elementi delle pull request, delle issue e del Radar, e le righe degli elenchi nelle finestre di dialogo e nei pannelli (clone, selettore di cartelle, Workspace, le schede della bacheca, il pannello Job, i selettori di assegnatario, etichetta e milestone, passaggi del rebase, file e commit della revisione, scelte dei menu e delle caselle combinate).
+- **Il cursore di testo (I-beam)** è sulle caselle di input, su tutta la casella: le caselle di ricerca (ricerca globale, Impostazioni, palette dei comandi, Home), i filtri (Refs, file, Radar, Log delle attività, ricerca del pannello delle issue), le righe di testo, numero e area di Impostazioni (anche mentre le modifichi), i campi delle finestre di dialogo, le caselle dei commenti di revisione, il compositore di commit, il testo dell'editor di file e il risultato modificabile dell'editor di merge (i suoi pannelli di sola lettura mantengono la freccia, perché un trascinamento lì non seleziona nulla). Una regola copre anche il testo di sola lettura: dovunque un trascinamento del mouse possa selezionare del testo, il puntatore è l'I-beam. Sono il codice di un diff (la vista Diff, Inline e Split, e il pannello diff della revisione), la Vista file e il codice del Blame. I loro numeri di riga, segni e intestazioni degli hunk mantengono la freccia, e un pulsante su una riga mantiene la mano. Lo stesso vale per la conversazione di una issue o di una richiesta (anche la Panoramica della revisione e il suo blocco della bozza), il messaggio dei dettagli del commit, le Note di rilascio, il Log delle attività (entrambe le schede), il popup di aiuto, l'anteprima Markdown dell'editor dei commenti e i commenti, le note in sospeso e i suggerimenti dentro il diff della revisione: un trascinamento seleziona il testo (un semplice clic mantiene il suo significato: un link si apre, un pulsante agisce, una voce del Log delle attività o una discussione si apre o si chiude), `Ctrl+C` lo copia, `Esc` o un clic lo scarta. Una selezione segue il suo testo quando scorri. Anche il messaggio del commit è modificabile (il doppio clic lo corregge), e l'intero blocco si illumina leggermente.
 - **Nei dettagli del commit** le righe di informazione sono controlli: clicca `commit: <id>` per copiare l'id breve, doppio clic sulla riga dell'autore o della data per correggerla (la mano e un lieve segno le indicano). La riga delle statistiche informa soltanto e mantiene la freccia.
 
 I puntatori di ridimensionamento restano sui divisori e sui bordi di colonna, e la mano aperta compare solo mentre trasporti un ref.

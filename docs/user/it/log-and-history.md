@@ -95,6 +95,27 @@ scrive per te le righe del `.mailmap`, vedi `history-rewrite.md`; da terminale:
   `Shift+Enter` saltano al risultato successivo / precedente.
 - **Filtro dei Refs** (`/` nella barra laterale): restringe per nome gli elenchi
   di branch, tag e remoti.
+- **Filtro per autore** (l'imbuto nell'intestazione **Autore**, `Shift+A` nel Log,
+  o il comando della palette *Log: Filtra per autore...*): prefiltra il Log in base a chi
+  ha scritto i commit. Un popup pende sotto l'intestazione con un campo di ricerca, una
+  riga **Rimuovi il filtro** (✕) e una riga per ogni autore della cronologia caricata: un
+  badge con le iniziali (l'avatar, quando `ui.avatars` non è disattivato), il nome e l'e-mail
+  attenuata dopo di esso, prima chi ha più commit e poi in ordine di nome. Scrivere restringe
+  l'elenco con la ricerca fuzzy della palette; `Enter` o un clic attiva/disattiva l'autore
+  evidenziato (un segno di spunta; scegline quanti vuoi), `Esc` o un clic fuori
+  chiude il popup e mantiene il filtro. Il filtro si comporta esattamente come la ricerca:
+  i commit degli autori scelti restano accesi, ogni altra riga si attenua
+  e il grafo mantiene la sua forma, nulla viene rimosso o recuperato di nuovo. Con la
+  barra di ricerca aperta, valgono entrambi (un commit deve essere di un autore scelto **e**
+  corrispondere al testo), e `Enter` / `Shift+Enter` scorrono quei risultati. Finché
+  il filtro è attivo l'imbuto diventa un `▼` pieno con il colore d'accento, il suo tooltip elenca
+  gli autori scelti, e quando la colonna Autore è nascosta o troppo stretta per
+  l'imbuto il bordo superiore del Log dice *Autore: Alice Example +1* (il
+  tasto e la palette funzionano comunque). Per toglierlo: la riga **Rimuovi il filtro**, un
+  clic destro sull'imbuto acceso, o il comando della palette *Log: Rimuovi il filtro per autore*.
+  Gli autori sono quelli dei commit che il Log ha caricato (con il mailmap applicato, come
+  nella colonna), e il filtro viene ricordato per repository, tra un cambio di scheda e l'altro
+  e tra un riavvio e l'altro. Una ricerca testuale non viene ricordata, il filtro sì.
 - **Solo** (il tasto `o`, o il menu del ref, su un ref, una cartella o un remoto):
   mostra solo i commit dei ref in solo; metti in solo più ref per vederne l'unione.
   `Shift+O` termina il solo.
@@ -122,6 +143,12 @@ più utili:
 | Rinomina, Elimina | Elimina chiede prima; si può eliminare anche il gemello remoto |
 | Copia il nome del branch, Copia il link del branch sul remoto | Negli appunti |
 
+**Spostare un tag.** Trascina un tag su un altro ref (vedi *Trascinare i ref* in
+[Mouse e gesti](./mouse-and-gestures.md)) oppure usa `Refs: Sposta il Tag selezionato sul Commit selezionato...`. Mantiene il tipo e l'annotazione, si sposta
+solo il tuo tag locale (un remote mantiene la vecchia posizione finché non fai il push), e un annullamento lo
+rimette a posto. CLI: `gitpoulpi tag move <name> <target> [--force-non-ff]`,
+`gitpoulpi tag merge-branch <name> <branch> [-m <message>]`.
+
 **Dove si trova un tag.** Un tag può stare su questo computer, su un remote, o su entrambi, e le righe TAG della barra
 laterale (e la pillola del tag nel Log) lo dicono con un indicatore dopo il nome. Passa il mouse su un tag per
 leggerlo a parole.
@@ -131,7 +158,7 @@ leggerlo a parole.
 | freccia in su | Solo qui: nessun remote lo ha. Il suo menu offre *Push* |
 | freccia sinistra-destra | Qui e su un remote, allo stesso commit |
 | freccia in giù (riga attenuata) | Solo su un remote: non è in questo repository (mai scaricato, oppure eliminato qui). Il suo menu offre *Fetch di `<tag>` da `<remote>`* ed *Elimina `<tag>` su `<remote>`...*; nella palette `Git: Fetch del tag selezionato` |
-| freccia su-giù | Anche su un remote, ma a un commit diverso (un push verrebbe rifiutato) |
+| freccia su-giù | Anche su un remote, ma a un commit diverso (un push semplice verrebbe rifiutato). Il suo menu ha due righe per ogni remote di questo tipo: *Usa `<tag>` da `<remote>`* (il tag locale passa alla versione del remote, dall'ultimo fetch, nessuna rete; un tag annotato diventa lo stesso oggetto tag) e, in rosso, *Push di `<tag>` su `<remote>` (forzato)* (chiede prima; con lease su ciò che ha visto l'ultimo fetch, quindi un remote che nel frattempo si è spostato viene rifiutato con "fetch first" e nulla viene sovrascritto). Ognuna è una voce di annullamento. `Git: Usa la versione remota del Tag selezionato` e `Git: Push forzato del Tag selezionato sul suo remote` nella palette (il remote predefinito quando differiscono più d'uno); CLI: `tag take-remote`, `tag force-push` |
 
 Git non tiene ref di tracciamento remoto per i tag, quindi GitPoulpi viene a sapere cosa ha ogni remote dal tuo ultimo
 **fetch** (qualsiasi fetch, anche quello automatico) e dai propri push ed eliminazioni di tag. Mentre navighi non si

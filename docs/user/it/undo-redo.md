@@ -71,6 +71,8 @@ riga di suggerimenti sotto i pulsanti. Per la riga selezionata:
   un branch `restore/<branch>-<sha>` sulla vecchia punta: il tuo branch corrente e i
   tuoi file non si muovono mai. La conferma mostra esattamente cosa farà, e il
   ripristino è una nuova azione: `Ctrl+Z` lo annulla.
+- **Annulla l'intera sequenza** (`x`): offerto mentre le voci più recenti sono quelle
+  di una sola esecuzione di sequenza (vedi [Esecuzioni di sequenze](#esecuzioni-di-sequenze)).
 - **Ripeti fino a qui** (`p`) su una riga annullata.
 - **Ripristina main dove l'aveva lasciato Commit** (`d`, oppure `Alt+Shift+Z` /
   `Modifica: Ripristina il branch dove l'aveva lasciato l'azione bloccata` da fuori
@@ -78,6 +80,10 @@ riga di suggerimenti sotto i pulsanti. Per la riga selezionata:
   Annulla, il reflog sa ancora dove l'azione lo aveva lasciato.
 
 Clic destro su una riga (o `.`) per le stesse azioni come menu.
+
+Una riga prodotta da un passo di una [sequenza](sequences.md) porta un badge, `⟳ Backup`,
+e la sua riga di dettaglio dice di quale passo si trattava («Creata dalla sequenza «Backup»,
+passo 3/4.»).
 
 ![La Cronologia annullamenti dopo aver eliminato un branch e fatto due commit: la riga del branch eliminato è selezionata e può essere ripristinata da sola](../images/undo-history.png)
 
@@ -173,7 +179,7 @@ aperto: la palette si apre sopra di esso e le sue righe **Cronologia annullament
 
 | Vista | Righe della palette |
 |---|---|
-| Cronologia annullamenti | `Cronologia annullamenti: Annulla fino a qui...`, `Ripeti fino a qui...`, `Ripristina solo questa...`, `Ripristina il branch dove si trovava...`, `Aggiorna`, `Chiudi` |
+| Cronologia annullamenti | `Cronologia annullamenti: Annulla fino a qui...`, `Ripeti fino a qui...`, `Annulla l'intera sequenza`, `Ripristina solo questa...`, `Ripristina il branch dove si trovava...`, `Aggiorna`, `Chiudi` |
 | Reflog | `Reflog: Mostra nel Log`, `Crea branch qui...`, `Crea tag qui...`, `Applica le modifiche alla directory di lavoro`, `Salva le modifiche come stash`, `Ripristina a questa posizione...`, `Carica altro`, `Aggiorna` |
 | Lavoro perso | `Lavoro perso: Crea branch qui...`, `Crea tag qui...`, `Cherry-pick`, `Applica le modifiche alla directory di lavoro`, `Salva le modifiche come stash`, `Cerca di nuovo` |
 
@@ -184,6 +190,44 @@ selezione non può eseguire ne spiega il motivo nella barra di stato invece di n
 "questa azione è già annullata: usa Ripeti fino a qui", il motivo per cui una voce non può
 essere ripristinata da sola, "si può riportare indietro solo un branch o HEAD", e così via. Le
 righe con `...` aprono la stessa conferma o lo stesso prompt del nome del pulsante.
+
+## Esecuzioni di sequenze
+
+Una [sequenza](sequences.md) (Backup: stage di tutto, messaggio di commit dell'IA, commit, push)
+produce **una normale voce del journal per ogni passo che cambia qualcosa**: lo stage
+e il commit qui, non il messaggio dell'IA e non il push (un push non viene mai
+annullato, vedi sotto). Il journal è per repository e rigorosamente dal più recente, quindi
+un'esecuzione non può essere una sola voce: ognuna mantiene i propri controlli, e ognuna è marcata con
+l'esecuzione che l'ha prodotta (`sequence:Backup#<run> 3/4`). I vecchi journal non hanno marcatura
+e si caricano come prima.
+
+**Annulla l'intera sequenza** annulla le voci di una esecuzione, dalla più recente, come un
+normale Annulla ciascuna. Viene offerto quando le voci più recenti del journal sono
+di una sola esecuzione, consecutive: una voce di un'altra esecuzione, una modifica fatta da te a mano o
+una fatta fuori da GitPoulpi nel frattempo chiude il gruppo. Dove si trova:
+
+- la Cronologia annullamenti: il pulsante `Annulla l'intera sequenza` (`x`), il menu
+  del clic destro sulla riga, e la riga della palette `Cronologia annullamenti: Annulla l'intera sequenza`;
+- la palette dei comandi: `Modifica: Annulla l'intera sequenza` (il nome della sequenza è sulla
+  riga finché si applica);
+- la riga di comando e MCP: `gitpoulpi undo --sequence` (sotto).
+
+Ogni voce viene verificata da sola, esattamente come un singolo Annulla: un commit già
+sul suo upstream chiede «annullare comunque?» prima di partire (rispondi e il resto
+prosegue), e un branch che si è spostato o un merge in corso rifiuta. Il primo
+rifiuto (o un «no» a una domanda) **si ferma** e dice quale passo e perché: *l'annullamento di
+«Backup» si è fermato al passo 3/4 (Commit «wip» (a81b9e4)): ... Azioni rimaste: 2*.
+Ciò che è stato annullato resta annullato, le voci più vecchie restano nel journal, e un
+normale Annulla (o di nuovo il pulsante) prosegue da lì.
+
+Viene annullato solo il journal di questo repository. Un'esecuzione che ha agito anche in un altro
+repository (un passo di worktree ha portato i passi successivi nella scheda del nuovo worktree)
+ha lasciato voci nel journal di quel repository; aprilo e annulla lì. **Ripeti**
+resta per singola voce: dopo aver annullato un'intera esecuzione, `Ctrl+Y` riporta indietro il
+passo più recente, poi il successivo, ciascuno con il suo controllo.
+
+Annullare un'intera sequenza chiede una volta l'elenco (nel pannello), poi ogni voce
+rischiosa chiede di nuovo come sopra.
 
 ## Cosa si può annullare
 
@@ -415,6 +459,7 @@ cronologia o quando Annulla viene disattivato. Nient'altro viene mai eliminato.
 gitpoulpi undo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi redo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi undo --list [--all]
+gitpoulpi undo --sequence [--dry-run] [--yes]
 gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 ```
 
@@ -424,6 +469,15 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 - `--expect <id>` fa rifiutare la chiamata come *obsoleta* a meno che quella voce sia ancora
   la più recente: uno script (o una seconda finestra) non annulla mai qualcosa di diverso
   da ciò che ha guardato.
+- `--sequence` annulla l'esecuzione di sequenza in cima al journal (vedi
+  [Esecuzioni di sequenze](#esecuzioni-di-sequenze)): le voci consecutive più recenti prodotte da un
+  `sequence run`, dalla più recente, un `undo` ciascuna con i suoi controlli.
+  `--dry-run` le elenca; senza `--yes` la prima voce che ne ha bisogno
+  (codice **3**) lo ferma, indicando il passo, con ciò che è stato annullato finora in
+  `undone` e ciò che resta in `left`. Un rifiuto esce con **2** e `stopped.refused`;
+  quando la cima del journal non è di una sola esecuzione la risposta è
+  `{"no_sequence": {...}}`, codice 2. Le voci portano la loro esecuzione in `undo --list`
+  (`summary.origin`: `name`, `run_id`, `step`, `of`). Non con `--expect`.
 - `undo-forget` elimina dal journal la voce più recente bloccata (`--redo`: la voce
   di ripetizione più recente). Rifiuta quando quella voce non è bloccata, e termina con codice **3**
   senza `--yes`. Per MCP è una mutazione, ma non distruttiva: il

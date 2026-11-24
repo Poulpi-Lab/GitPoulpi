@@ -20,6 +20,13 @@ cablato: ogni voce è un'etichetta e un comando.
   Palette (`Ctrl+P`): `Scheda: Apri in...` e `Scheda: Apri nella voce predefinita`.
   I comandi della palette funzionano anche quando nella barra del titolo non c'è spazio per il pulsante.
   Entrambi i tasti sono riassegnabili; vedi [Scorciatoie da tastiera](keybindings.md).
+- **Per etichetta**: un passo `tab_open_in` di una [sequenza](config-reference.md#sequences) esegue la voce la cui
+  **etichetta** indichi (`label = "VS Code"`), così riordinare l'elenco non cambia mai ciò che
+  esegue. Un'etichetta sconosciuta ferma il passo con "nessuna voce di Apri in ha l'etichetta ...".
+  `Scheda: Terminale qui` (palette) apre il tuo terminale nella cartella, il vecchio pulsante
+  "Terminale qui" della barra delle schede.
+- **Un agente IA nella cartella**: `Scheda: Apri l'agente IA qui` apre il tuo terminale nella
+  cartella della scheda eseguendo un agente IA locale; vedi [IA](ai.md#aprire-lagente-nella-cartella-di-una-scheda).
 - **Clic destro su una scheda di repository**: il menu della scheda ha un sottomenu **Apri in** con
   le stesse voci.
 - L'elenco parte dalla voce che hai usato per ultima in questa sessione.

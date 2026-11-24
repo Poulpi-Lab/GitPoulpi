@@ -539,6 +539,7 @@ undo = "Deshace la última operación registrada en el journal (commit, amend, c
 "undo --dry_run" = "Muestra lo que ocurriría y no cambia nada"
 "undo --expect" = "Deshace solo si esta sigue siendo la última entrada (su id, como lo muestra `--list`); si no, se rechaza por obsoleta"
 "undo --list" = "Lista el journal en lugar de deshacer (la más reciente al final); `--all` añade las entradas que ya no se pueden rehacer pero siguen ancladas"
+"undo --sequence" = "Undo the whole sequence run at the top of the journal instead of one entry: the newest consecutive entries that one `sequence run` made, newest first, each an ordinary undo with its own checks. Stops at the first refusal (exit 2) or entry that needs `--yes` (exit 3), says which step, and leaves the older entries. Only this repository's journal is touched: a step done in another repository (a worktree) is not undone. Redo stays per entry"
 "undo --yes" = "Continúa cuando el undo es arriesgado (el commit ya está en su upstream, o se sobrescribirían archivos del árbol de trabajo). Sin esto, un undo así no cambia nada y sale con código 3"
 worktree = "Worktrees enlazados: lístalos, añade uno en una rama o en un commit"
 "worktree add" = "Añade un worktree enlazado en `<path>`. Si `<start>` nombra una rama local, activa esa rama allí (o inicia `--branch` en ella); cualquier otra revisión da un HEAD desacoplado (o inicia `--branch` allí)"

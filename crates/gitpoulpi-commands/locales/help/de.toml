@@ -539,6 +539,7 @@ undo = "Macht die letzte protokollierte Operation rückgängig (Commit, Amend, C
 "undo --dry_run" = "Zeigt, was passieren würde, und ändert nichts"
 "undo --expect" = "Nur rückgängig machen, wenn dies noch der letzte Eintrag ist (seine ID, wie `--list` sie zeigt); sonst als veraltet abgelehnt"
 "undo --list" = "Listet stattdessen das Journal auf (neueste zuletzt); `--all` ergänzt die Einträge, die nicht mehr wiederholbar, aber noch angeheftet sind"
+"undo --sequence" = "Undo the whole sequence run at the top of the journal instead of one entry: the newest consecutive entries that one `sequence run` made, newest first, each an ordinary undo with its own checks. Stops at the first refusal (exit 2) or entry that needs `--yes` (exit 3), says which step, and leaves the older entries. Only this repository's journal is touched: a step done in another repository (a worktree) is not undone. Redo stays per entry"
 "undo --yes" = "Fortfahren, wenn das Undo riskant ist (der Commit liegt bereits auf seinem Upstream, oder Dateien im Arbeitsverzeichnis würden überschrieben). Ohne dies ändert ein solches Undo nichts und endet mit Exit-Code 3"
 worktree = "Verknüpfte Worktrees: auflisten, einen auf einem Branch oder Commit hinzufügen"
 "worktree add" = "Fügt einen verknüpften Worktree unter `<path>` hinzu. Nennt `<start>` einen lokalen Branch, wird dieser Branch dort ausgecheckt (oder `--branch` startet darauf); jede andere Revision ergibt einen losgelösten HEAD (oder `--branch` startet dort)"

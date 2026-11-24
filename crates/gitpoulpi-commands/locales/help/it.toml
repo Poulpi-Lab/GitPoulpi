@@ -539,6 +539,7 @@ undo = "Annulla l'ultima operazione registrata nel journal (commit, amend, check
 "undo --dry_run" = "Mostra cosa succederebbe senza cambiare nulla"
 "undo --expect" = "Annulla solo se questa è ancora l'ultima voce (il suo id, come lo mostra `--list`); altrimenti rifiutato come obsoleto"
 "undo --list" = "Elenca il journal invece (la più recente per ultima); `--all` aggiunge le voci non più ripristinabili con redo ma ancora fissate"
+"undo --sequence" = "Undo the whole sequence run at the top of the journal instead of one entry: the newest consecutive entries that one `sequence run` made, newest first, each an ordinary undo with its own checks. Stops at the first refusal (exit 2) or entry that needs `--yes` (exit 3), says which step, and leaves the older entries. Only this repository's journal is touched: a step done in another repository (a worktree) is not undone. Redo stays per entry"
 "undo --yes" = "Procede quando l'undo è rischioso (il commit è già sul suo upstream, o dei file della working tree verrebbero sovrascritti). Senza, un undo del genere non cambia nulla ed esce con codice 3"
 worktree = "Worktree collegati: li elenca, ne aggiunge uno su un branch o su un commit"
 "worktree add" = "Aggiunge un worktree collegato in `<path>`. Se `<start>` indica un branch locale, ne fa il checkout lì (o fa partire `--branch` da esso); qualsiasi altra revisione dà un HEAD scollegato (o fa partire `--branch` da lì)"

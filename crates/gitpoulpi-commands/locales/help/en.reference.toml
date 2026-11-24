@@ -543,6 +543,7 @@ undo = "Undo the latest journaled operation (commit, amend, checkout, branch cre
 "undo --dry_run" = "Show what would happen and change nothing"
 "undo --expect" = "Only undo if this is still the latest entry (its id, as `--list` shows it); otherwise refused as stale"
 "undo --list" = "List the journal instead (newest last); `--all` adds the entries that are no longer redoable but still pinned"
+"undo --sequence" = "Undo the whole sequence run at the top of the journal instead of one entry: the newest consecutive entries that one `sequence run` made, newest first, each an ordinary undo with its own checks. Stops at the first refusal (exit 2) or entry that needs `--yes` (exit 3), says which step, and leaves the older entries. Only this repository's journal is touched: a step done in another repository (a worktree) is not undone. Redo stays per entry"
 "undo --yes" = "Go ahead when the undo is risky (the commit is already on its upstream, or working-tree files would be overwritten). Without it such an undo changes nothing and exits with code 3"
 worktree = "Linked worktrees: list them, add one on a branch or a commit"
 "worktree add" = "Add a linked worktree at `<path>`. `<start>` naming a local branch checks that branch out there (or starts `--branch` at it); any other revision gives a detached HEAD (or starts `--branch` there)"

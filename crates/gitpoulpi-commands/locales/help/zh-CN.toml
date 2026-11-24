@@ -539,6 +539,7 @@ undo = "撤销最近一次已记入日志的操作（提交、amend、checkout�
 "undo --dry_run" = "显示将会发生什么，但不做任何更改"
 "undo --expect" = "仅当这仍是最新条目（其 id，如 `--list` 所示）时才撤销；否则以 stale 被拒绝"
 "undo --list" = "改为列出日志（最新的在最后）；`--all` 会加上已不可重做但仍被保留的条目"
+"undo --sequence" = "Undo the whole sequence run at the top of the journal instead of one entry: the newest consecutive entries that one `sequence run` made, newest first, each an ordinary undo with its own checks. Stops at the first refusal (exit 2) or entry that needs `--yes` (exit 3), says which step, and leaves the older entries. Only this repository's journal is touched: a step done in another repository (a worktree) is not undone. Redo stays per entry"
 "undo --yes" = "撤销有风险时继续执行（该提交已在其 upstream 上，或工作区文件会被覆盖）。不带它时，这样的撤销不会改变任何内容，并以退出码 3 退出"
 worktree = "链接的 worktree：列出它们，在某个分支或提交上添加一个"
 "worktree add" = "在 `<path>` 添加一个链接的 worktree。若 `<start>` 是某个本地分支，则在那里检出该分支（或让 `--branch` 从它开始）；其他任何版本会得到 detached HEAD（或让 `--branch` 从那里开始）"

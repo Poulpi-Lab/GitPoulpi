@@ -539,6 +539,7 @@ undo = "Скасовує останню записану в журнал опе�
 "undo --dry_run" = "Показати, що станеться, і нічого не змінювати"
 "undo --expect" = "Скасувати, лише якщо це все ще останній запис (його id, як показує `--list`); інакше відхиляється як stale"
 "undo --list" = "Перелічити журнал замість цього (найновіші останніми); `--all` додає записи, що вже не можуть бути повторені, але ще закріплені"
+"undo --sequence" = "Undo the whole sequence run at the top of the journal instead of one entry: the newest consecutive entries that one `sequence run` made, newest first, each an ordinary undo with its own checks. Stops at the first refusal (exit 2) or entry that needs `--yes` (exit 3), says which step, and leaves the older entries. Only this repository's journal is touched: a step done in another repository (a worktree) is not undone. Redo stays per entry"
 "undo --yes" = "Виконати, коли скасування ризиковане (коміт уже на своєму upstream або файли робочого дерева було б перезаписано). Без нього таке скасування нічого не змінює й завершується з кодом 3"
 worktree = "Прив'язані worktrees: перелічує їх, додає один на гілці чи коміті"
 "worktree add" = "Додає прив'язаний worktree в `<path>`. Якщо `<start>` називає локальну гілку, на ній там і роблять checkout (або `--branch` починається з неї); будь-яка інша ревізія дає відокремлений HEAD (або `--branch` починається там)"

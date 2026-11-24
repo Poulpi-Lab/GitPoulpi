@@ -539,6 +539,7 @@ undo = "기록된 가장 최근 작업(커밋, amend, 체크아웃, 브랜치 �
 "undo --dry_run" = "무슨 일이 일어날지 표시하고 아무것도 변경하지 않습니다"
 "undo --expect" = "이것이 여전히 가장 최근 항목일 때만 되돌립니다 (`--list`가 보여주는 id). 아니면 오래된 것으로 거부됩니다"
 "undo --list" = "대신 저널을 나열합니다 (최신이 마지막). `--all`은 더 이상 다시 실행할 수 없지만 아직 고정된 항목을 추가합니다"
+"undo --sequence" = "Undo the whole sequence run at the top of the journal instead of one entry: the newest consecutive entries that one `sequence run` made, newest first, each an ordinary undo with its own checks. Stops at the first refusal (exit 2) or entry that needs `--yes` (exit 3), says which step, and leaves the older entries. Only this repository's journal is touched: a step done in another repository (a worktree) is not undone. Redo stays per entry"
 "undo --yes" = "되돌리기가 위험할 때 진행합니다 (커밋이 이미 업스트림에 있거나 작업 트리 파일을 덮어쓰게 되는 경우). 없으면 그런 되돌리기는 아무것도 변경하지 않고 종료 코드 3으로 끝납니다"
 worktree = "연결된 워크트리: 나열하거나 브랜치 또는 커밋에 하나를 추가합니다"
 "worktree add" = "`<path>`에 연결된 워크트리를 추가합니다. `<start>`가 로컬 브랜치 이름이면 거기서 그 브랜치를 체크아웃하고 (또는 `--branch`를 그 위치에서 시작), 다른 리비전이면 분리된 HEAD가 됩니다 (또는 `--branch`를 거기서 시작)"

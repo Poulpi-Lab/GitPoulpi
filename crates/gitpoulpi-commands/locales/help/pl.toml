@@ -539,6 +539,7 @@ undo = "Cofa ostatnią zapisaną w dzienniku operację (commit, amend, checkout,
 "undo --dry_run" = "Pokazuje, co by się stało, i niczego nie zmienia"
 "undo --expect" = "Cofa tylko, jeśli to nadal ostatni wpis (jego id, jak pokazuje `--list`); inaczej odrzucane jako stale"
 "undo --list" = "Wylicza dziennik zamiast cofać (najnowszy na końcu); `--all` dodaje wpisy, których nie da się już ponowić, ale są nadal przypięte"
+"undo --sequence" = "Undo the whole sequence run at the top of the journal instead of one entry: the newest consecutive entries that one `sequence run` made, newest first, each an ordinary undo with its own checks. Stops at the first refusal (exit 2) or entry that needs `--yes` (exit 3), says which step, and leaves the older entries. Only this repository's journal is touched: a step done in another repository (a worktree) is not undone. Redo stays per entry"
 "undo --yes" = "Kontynuuje, gdy cofnięcie jest ryzykowne (commit jest już na swoim upstreamie lub pliki drzewa roboczego zostałyby nadpisane). Bez tego takie cofnięcie niczego nie zmienia i kończy się kodem 3"
 worktree = "Powiązane worktree: wylistuj je, dodaj jedno na gałęzi lub commicie"
 "worktree add" = "Dodaje powiązany worktree w `<path>`. Gdy `<start>` wskazuje lokalną gałąź, robi tam jej checkout (lub zaczyna `--branch` od niej); każda inna rewizja daje odłączony HEAD (lub zaczyna `--branch` tam)"

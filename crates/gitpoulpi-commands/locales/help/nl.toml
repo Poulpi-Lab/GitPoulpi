@@ -539,6 +539,7 @@ undo = "Maak de laatste gejournaliseerde bewerking ongedaan (commit, amend, chec
 "undo --dry_run" = "Toon wat er zou gebeuren en wijzig niets"
 "undo --expect" = "Maak alleen ongedaan als dit nog het laatste item is (zijn id, zoals `--list` het toont); anders als stale geweigerd"
 "undo --list" = "Toon het journaal in plaats daarvan (nieuwste laatst); `--all` voegt de items toe die niet meer opnieuw te doen zijn maar nog vastgepind"
+"undo --sequence" = "Undo the whole sequence run at the top of the journal instead of one entry: the newest consecutive entries that one `sequence run` made, newest first, each an ordinary undo with its own checks. Stops at the first refusal (exit 2) or entry that needs `--yes` (exit 3), says which step, and leaves the older entries. Only this repository's journal is touched: a step done in another repository (a worktree) is not undone. Redo stays per entry"
 "undo --yes" = "Ga door als de ongedaanmaking riskant is (de commit staat al op zijn upstream, of bestanden in de werkmap zouden worden overschreven). Zonder wijzigt zo'n ongedaanmaking niets en sluit af met code 3"
 worktree = "Gekoppelde worktrees: toon ze, voeg er een toe op een branch of een commit"
 "worktree add" = "Voeg een gekoppelde worktree toe op `<path>`. `<start>` die een lokale branch noemt checkt die branch daar uit (of start `--branch` erop); elke andere revisie geeft een losgekoppelde HEAD (of start `--branch` daar)"

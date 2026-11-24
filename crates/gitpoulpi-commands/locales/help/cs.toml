@@ -533,6 +533,7 @@ convert = "Přepíše kódování, konce řádků nebo odsazení souborů v prac
 "undo --dry_run" = "Ukáže, co by se stalo, a nic nezmění"
 "undo --expect" = "Vrátí, jen pokud je to stále poslední položka (její id, jak ho ukazuje `--list`); jinak se odmítne jako zastaralé"
 "undo --list" = "Vypíše žurnál místo toho (nejnovější poslední); `--all` přidá položky, které už nelze zopakovat, ale jsou stále připnuty"
+"undo --sequence" = "Undo the whole sequence run at the top of the journal instead of one entry: the newest consecutive entries that one `sequence run` made, newest first, each an ordinary undo with its own checks. Stops at the first refusal (exit 2) or entry that needs `--yes` (exit 3), says which step, and leaves the older entries. Only this repository's journal is touched: a step done in another repository (a worktree) is not undone. Redo stays per entry"
 "undo --yes" = "Pokračuje, je-li vrácení riskantní (commit už je na svém upstreamu, nebo by se přepsaly soubory pracovního stromu). Bez něj takové vrácení nic nezmění a skončí kódem 3"
 "worktree" = "Propojené worktrees: vypíše je, přidá nový na větvi nebo commitu"
 "worktree add" = "Přidá propojený worktree v `<path>`. Je-li `<start>` lokální větev, přepne tam na tuto větev (nebo na ní začne `--branch`); jakákoli jiná revize dá odpojený HEAD (nebo na ní začne `--branch`)"

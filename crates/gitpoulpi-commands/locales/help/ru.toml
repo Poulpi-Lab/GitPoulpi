@@ -539,6 +539,7 @@ undo = "Отменяет последнюю операцию из журнала
 "undo --dry_run" = "Показать, что произойдёт, ничего не меняя"
 "undo --expect" = "Отменять, только если это всё ещё последняя запись (её id, как показывает `--list`); иначе отказ как `stale`"
 "undo --list" = "Вывести журнал вместо отмены (новейшая последней); `--all` добавляет записи, которые уже нельзя повторить, но ещё закреплены"
+"undo --sequence" = "Undo the whole sequence run at the top of the journal instead of one entry: the newest consecutive entries that one `sequence run` made, newest first, each an ordinary undo with its own checks. Stops at the first refusal (exit 2) or entry that needs `--yes` (exit 3), says which step, and leaves the older entries. Only this repository's journal is touched: a step done in another repository (a worktree) is not undone. Redo stays per entry"
 "undo --yes" = "Продолжить, когда отмена рискованная (коммит уже в его upstream или файлы рабочего дерева были бы перезаписаны). Без этого такая отмена ничего не меняет и завершается с кодом 3"
 worktree = "Связанные worktree: показывает их, добавляет на ветке или коммите"
 "worktree add" = "Добавляет связанный worktree по пути `<path>`. Если `<start>` называет локальную ветку, она там переключается (или `--branch` начинается с неё); любая другая ревизия даёт detached HEAD (или `--branch` начинается там)"

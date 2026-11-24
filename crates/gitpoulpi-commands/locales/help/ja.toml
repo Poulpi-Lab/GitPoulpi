@@ -539,6 +539,7 @@ undo = "ジャーナルに記録された最新の操作（コミット、amend�
 "undo --dry_run" = "何が起きるかを表示し、何も変更しません"
 "undo --expect" = "これが最新のエントリ（`--list` に表示される id）のままである場合のみ元に戻します。そうでなければ stale として拒否されます"
 "undo --list" = "代わりにジャーナルを一覧表示します（新しいものが最後）。`--all` は、もうやり直せないがまだ固定されているエントリも追加します"
+"undo --sequence" = "Undo the whole sequence run at the top of the journal instead of one entry: the newest consecutive entries that one `sequence run` made, newest first, each an ordinary undo with its own checks. Stops at the first refusal (exit 2) or entry that needs `--yes` (exit 3), says which step, and leaves the older entries. Only this repository's journal is touched: a step done in another repository (a worktree) is not undone. Redo stays per entry"
 "undo --yes" = "元に戻すのが危険な場合（コミットがすでにアップストリームにある、または作業ツリーのファイルが上書きされる）でも実行します。付けない場合、そのような取り消しは何も変更せず、終了コード 3 で終了します"
 worktree = "リンクされた worktree：一覧表示、ブランチまたはコミットに追加します"
 "worktree add" = "`<path>` にリンクされた worktree を追加します。`<start>` がローカルブランチ名ならそのブランチをそこでチェックアウトします（または `--branch` をそこから開始）。それ以外のリビジョンは、切り離された HEAD になります（または `--branch` をそこから開始）"

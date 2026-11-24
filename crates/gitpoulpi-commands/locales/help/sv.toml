@@ -539,6 +539,7 @@ undo = "Ångra den senaste journalförda operationen (commit, amend, checkout, s
 "undo --dry_run" = "Visa vad som skulle hända och ändra ingenting"
 "undo --expect" = "Ångra bara om detta fortfarande är den senaste posten (dess id, som `--list` visar det); annars avvisas den som inaktuell"
 "undo --list" = "Lista journalen i stället (nyast sist); `--all` lägger till posterna som inte längre går att göra om men fortfarande är fastsatta"
+"undo --sequence" = "Undo the whole sequence run at the top of the journal instead of one entry: the newest consecutive entries that one `sequence run` made, newest first, each an ordinary undo with its own checks. Stops at the first refusal (exit 2) or entry that needs `--yes` (exit 3), says which step, and leaves the older entries. Only this repository's journal is touched: a step done in another repository (a worktree) is not undone. Redo stays per entry"
 "undo --yes" = "Fortsätt när ångringen är riskabel (commiten finns redan på sin upstream, eller filer i arbetskatalogen skulle skrivas över). Utan den ändrar en sådan ångring ingenting och avslutas med slutkod 3"
 worktree = "Länkade worktrees: lista dem, lägg till en på en gren eller en commit"
 "worktree add" = "Lägg till en länkad worktree vid `<path>`. `<start>` som anger en lokal gren checkar ut den grenen där (eller startar `--branch` vid den); varje annan revision ger en frånkopplad HEAD (eller startar `--branch` där)"

@@ -131,6 +131,7 @@ author_email = "jane@work.example"
 | `ui.diff_hunks_only` | `true` | `false` 会显示整个文件并在原位显示更改（`H`）。 |
 | `ui.diff_show_whitespace` | `true` | 显示仅空白字符的更改（`s`）。 |
 | `ui.diff_word_wrap` | `false` | 对过长的 diff 行自动换行（`w`；设置 > Diff 与编辑器）。 |
+| `ui.diff_intraline` | `true` | 用更深的背景色标出变更行中变更的词（命令面板 `Diff：切换变更词高亮`；设置 > Diff 与编辑器）。 |
 | `ui.minimap` | `false` | 在 diff 和编辑器的滚动条旁显示缩略图（`M`）。 |
 | `ui.mermaid_detail` | `refs` | Log 的“复制为 Mermaid gitGraph”的详细程度：`structure`、`refs`、`subjects`、`full`（会从弹窗中记住；也是 `log --format mermaid` 的默认值）。 |
 | `ui.mermaid_orientation` | `lr` | 该图的方向：`lr`（从左到右）或 `tb`（从上到下）。 |
@@ -335,7 +336,7 @@ review_mode = "ask"       # ask | clone | api
 | `ai.enabled` | `false` | 总开关。关闭时，任何地方都不会显示 AI 内容，也不会发送任何内容。 |
 | `ai.default_profile` | `"default"` | 操作未指定配置时所使用的配置 id。 |
 | `ai.global_instructions` | `""` | 添加到每个操作提示词中的文本。可以使用 `${repo}`、`${uilang}` 等（参见 [AI > 提示词变量](ai.md#提示词变量)）；按操作的指令和仓库指令同理。 |
-| `ai.actions.<action>.profile` | `""` | 某个操作使用的配置；留空 = 默认配置。操作：`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`。工作空间（`workspaces.toml`，`[workspace.ai_instructions]` 和 `[workspace.ai_overrides.<action>]`）和仓库都可以追加或替换这些指令：见 [AI 辅助](ai.md#指令)。 |
+| `ai.actions.<action>.profile` | `""` | 某个操作使用的配置；留空 = 默认配置。操作：`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`、`sequence_draft`。工作空间（`workspaces.toml`，`[workspace.ai_instructions]` 和 `[workspace.ai_overrides.<action>]`）和仓库都可以追加或替换这些指令：见 [AI 辅助](ai.md#指令)。 |
 | `ai.actions.<action>.instructions` | `""` | 仅为该操作添加的文本。 |
 | `ai.review.run_in_repository` | `"profile"` | `profile`、`yes` 或 `no`：代码评审草稿的本地代理本次运行是否在仓库内工作，覆盖 AI 配置的 `workdir`。仓库可以设置自己的值（`gitpoulpi ai review-context --repo`）。见 [AI > 评审上下文](ai.md#评审上下文)。 |
 | `ai.review.include_claude_md` | `true` | 将仓库的 `CLAUDE.md` 提供给代码评审草稿（根目录，在请求所针对的分支上读取；在 8 KB 处截断）。 |
@@ -359,7 +360,7 @@ review_mode = "ask"       # ask | clone | api
 | `ai.hosting_reply.read_repository` | `false` | “允许 AI 读取仓库”是否默认处于勾选状态。默认关闭：只有在你为那次使用勾选时才会读取仓库。之后本地代理或 API 配置按 [AI 一章](ai.md#仓库访问) 所述读取。 |
 | `ai.hosting_reply.reuse_agent_session` | `true` | 在其运行框架支持时，于两次回复之间保留本地代理的会话。在 AI 获准读取仓库后生效。 |
 | `ai.hosting_reply.context_ttl_minutes` | `30` | 为回复构建的仓库上下文复用多久。限制在 1 到 1440 之间。在 AI 获准读取仓库后生效。 |
-| `ai.sent_preview.<action>` | `true` | 每个操作一个键（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`、`hosting_reply`、`issue_body`）：在请求发出之前显示“发送的内容”。对话框中的“不再为……显示”会写入 `false`；设置 > AI > *发送前显示所发内容…* 会把它们重新打开。`worktree_name` 会被接受，但同样没有效果：它只发送你在“创建 worktree”对话框中输入的内容和本地分支名称。 |
+| `ai.sent_preview.<action>` | `true` | 每个操作一个键（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`、`hosting_reply`、`issue_body`、`sequence_draft`）：在请求发出之前显示“发送的内容”。对话框中的“不再为……显示”会写入 `false`；设置 > AI > *发送前显示所发内容…* 会把它们重新打开。`worktree_name` 会被接受，但同样没有效果：它只发送你在“创建 worktree”对话框中输入的内容和本地分支名称。 |
 
 仓库自己的 `[preferences.ai_review]` 表（在其 `repo-state.toml` 中；未克隆仓库的条目在 `remote-reviews.toml` 中）接受相同的键，全部可选，另加 `no_extra_file = true`：此仓库不使用额外文件，不论 `ai.review.extra_file` 是什么。未设置的键、未设置的 `extra_file` 和缺失的 `no_extra_file` 都继承全局值；把 `extra_file` 设为某个文件会清除该开关，反之亦然。
 
@@ -479,6 +480,43 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 | `installation.primary` | 不存在 | 主安装的 id。不存在表示没有主安装。 |
 | `installation.settings.<id>` | 无 | 每个安装一张表：`path`（它的文件夹，移动后会刷新）、`kind`（`dev`、`install`、`cargo`、`portable`、`pinned`）、`channel`（仅供参考）、`name`（启动器名称，`GitPoulpi (<label>)`，首次运行时固定）、`name_with_version`（关闭：在名称中加入 `<major>.<minor>`）、`logo_color`、`command_alias`、`command_alias_add`、`folder_menu_submenu`（为空：文件夹菜单项位于根菜单）、`env`（为空：使用它自己的 id；名称相同的安装共享守护进程、会话和撤销历史）、`mcp_bind`（为空：使用 `mcp.bind`）。空值对主安装回退到 `ui.*`，否则回退到该类型的默认值（开发版检出使用 `sun`）。 |
 
+## `[[sequences]]`
+
+具名的动作序列：由命令面板命令组成的列表，依次运行（例如 Backup：stage 全部更改、用 AI 写消息、commit、push）。每个序列一张表，它的步骤写成 `[[sequences.steps]]`。
+
+```toml
+[[sequences]]
+id = "backup"                    # the slug: its key in [keybindings.sequence] and its CLI name
+name = "Backup"                  # your text, never translated
+description = "Stage, commit with an AI message, push"   # optional
+scope = "installation"           # installation (default) | machine | repo
+owner = "3f9a0c1d2b4e5f60"       # the installation id; set with scope = "installation"
+
+[[sequences.steps]]
+run = "stage_all"                # a palette command id
+
+[[sequences.steps]]
+run = "ai_generate_commit_message"
+pause = "always"                 # default | always | never
+
+[[sequences.steps]]
+run = "create_worktree_from_current_branch"
+pause = "never"
+[sequences.steps.options]
+name = "wip-${date}-${n}"        # a template: ${branch} ${date} (yyyy-mm-dd) ${time} (hh-mm) ${n} (first free number)
+open_tab = true
+```
+
+| 键 | 含义 |
+|---|---|
+| `scope` | `installation`：只有 id 为 `owner` 的那个安装能看到它。`machine`：共用此 `config.toml` 的每个安装。`repo`：存放在仓库的 `.gitpoulpi/sequences.toml` 中（同样的 `[[sequences]]` 结构），只在该仓库中可见，并且只有在你信任该文件之后才生效，因为已提交的文件是别人的命令。 |
+| `steps[].run` | 一个命令面板命令的 id，即 `[keybindings.palette]` 中显示的蛇形命名。只接受固定的允许列表：stage、commit、stash push、新建分支 / tag、fetch、pull、push（以及 push 到全部、pull 全部、push tag 等变体）、AI 消息和 commit 撰写器命令、创建 worktree、打开标签页或终端，以及带租约的强制 push。具有破坏性的命令（丢弃、reset、删除、移除 worktree、stash drop、历史重写、退出、设置）和其他序列都不能作为步骤。此版本不认识的步骤会保留在文件中并被报告。 |
+| `steps[].pause` | `default`：步骤需要输入时，停在它通常的对话框上。`always`：在它之前停下并询问是否继续。`never`：从不停下；此时步骤需要它的对话框原本会询问的选项（新建分支或 worktree 的 `name`）。带租约的强制 push 不能是 `never`。 |
+| `steps[].options` | 每步的回答：`name`（新建分支、tag、worktree）、`branch`（基于所选分支创建 worktree）、`open_tab`（在标签页中打开新 worktree）、`message`（commit）、`label`（“打开方式”条目）、`profile`（代理配置）。 |
+| 最多 32 个步骤 | 一个序列有 1 到 32 个步骤。 |
+
+序列或步骤上的未知键，在 GitPoulpi 重写文件时会保留。你能看到的序列之间如果有重复的 id，会被报告。用 `[keybindings.sequence] <id> = "<chord>"` 绑定一个序列，例如 `backup = "Ctrl+G b"`。
+
 ## `[keybindings]`
 
 重新绑定 TUI 的快捷键；设置 > 键盘与鼠标可编辑它。
@@ -494,7 +532,7 @@ tab_menu   = []                  # unbound
 stage_file = "z"
 ```
 
-`[keybindings.<context>] <action> = "<chord>"`；设置的值会替换该操作的默认值，删除该行即可恢复默认值。组合键写法：`Ctrl+Shift+N`、`Alt+n`、`F2`、`PageDown`、`Space`、`,`、`P`（= `Shift+p`）。错误的条目绝不会阻塞任何东西：TUI 会忽略它，保留默认值，并在状态栏上说明。上下文、操作 id、默认值和冲突规则：[键盘快捷键](keybindings.md)。
+`[keybindings.<context>] <action> = "<chord>"`；设置的值会替换该操作的默认值，删除该行即可恢复默认值。组合键写法：`Ctrl+Shift+N`、`Alt+n`、`F2`、`PageDown`、`Space`、`,`、`P`（= `Shift+p`）。错误的条目绝不会阻塞任何东西：TUI 会忽略它，保留默认值，并在状态栏上说明。`[keybindings.sequence]` 按 id 绑定你的 [`[[sequences]]`](#sequences)。上下文、操作 id、默认值和冲突规则：[键盘快捷键](keybindings.md)。
 
 ## 按仓库的设置：`.gitpoulpi/repo-state.toml`
 

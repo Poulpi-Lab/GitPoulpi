@@ -516,15 +516,15 @@ merge_side_by_side_min_width = { git = "{$merge} 编辑器：并排显示起始�
 merge_side_by_side_min_width_help = { git = "{$merge} 冲突编辑器在其区域宽度至少达到此列数时并排显示 A 和 B（长行可用 Shift+滚轮或 Shift+方向键横向滚动）；更窄时，用标签页一次显示一侧。默认 100；最小值 40，0 表示始终并排。编辑器打开时会隐藏引用和状态面板，因此通常拥有整个窗口。", local = "合并冲突编辑器在其区域宽度至少达到此列数时并排显示 A 和 B（长行可用 Shift+滚轮或 Shift+方向键横向滚动）；更窄时，用标签页一次显示一侧。默认 100；最小值 40，0 表示始终并排。编辑器打开时会隐藏引用和状态面板，因此通常拥有整个窗口。" }
 diff_word_wrap = "自动换行"
 diff_word_wrap_help = { git = "在 {$diff} 视图中对长行换行，而不是用省略号截断。内置编辑器和 blame 视图横向滚动，不换行。也是 {$diff} 视图自带的换行开关。", local = "在{$diff}视图中对长行换行，而不是用省略号截断。内置编辑器和追溯视图横向滚动，不换行。也是{$diff}视图自带的换行开关。" }
-diff_intraline = "Highlight changed words"
-diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
+diff_intraline = "高亮变更的词"
+diff_intraline_help = { git = "在变更的行中，用更深的背景色标出与对应的删除行或新增行不同的词，所有 {$diff} 视图都适用。关闭后每行只保留一种底色。命令面板中也可切换。", local = "在变更的行中，用更深的背景色标出与对应的删除行或新增行不同的词，所有{$diff}视图都适用。关闭后每行只保留一种底色。命令面板中也可切换。" }
 
 [settings_ui]
 theme = "主题"
 theme_help = "整个界面的配色。在列表中移动即可实时预览各主题；按 Enter 保留，按 Esc 返回。“系统”跟随终端（启动时检测一次终端的浅色或深色背景；无法判断时为深色）。配置文件夹 themes/ 目录中你自己的主题文件列在最后。"
 theme_system = "系统（跟随终端）"
 follow_theme = "跟随主题"
-graph_color_missing = "{name} (not found, using the theme's lanes)"
+graph_color_missing = "{name}（未找到，改用主题的泳道颜色）"
 theme_swatches = "颜色"
 graph_lane_background = "图泳道背景"
 graph_lane_background_help = { git = "关闭：透明，泳道后面没有任何东西（默认）。行着色：在图列内用 {$commit} 泳道的颜色绘制一条淡色带，并在列右边缘画一条同色细条。已存储的泳道值按行着色处理。关闭设置时生效。", local = "关闭：透明，泳道后面没有任何东西（默认）。行着色：在图列内用提交泳道的颜色绘制一条淡色带，并在列右边缘画一条同色细条。已存储的泳道值按行着色处理。关闭设置时生效。" }
@@ -1016,14 +1016,14 @@ cannot_drop = "不能这样将 {source} 放到 {target} 上"
 history_scrolled = "从那里到这里之间的历史已滚出已加载的页面"
 shares_no_history = "{source} 与目标没有共同历史"
 nothing_to_replay = "{source} 没有目标所缺少的内容：无需重放"
-move_tag_here = "Move {$tag} {name} here"
-move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
-merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
-merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
-moving_tag = "moving {$tag} {name} to {target}..."
-moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
-merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
-confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
+move_tag_here = { git = "将 {$tag} {name} 移到此处", local = "将{$tag} {name} 移到此处" }
+move_tag_not_ff = { git = "将 {$tag} {name} 移到此处（不是快进：{name} 将不再是祖先）", local = "将{$tag} {name} 移到此处（不是快进：{name} 将不再是祖先）" }
+merge_tag_into = { git = "将 {$tag} {name} {$merge} 到 {branch}", local = "将{$tag} {name} {$merge}到 {branch}" }
+merge_into_tag = { git = "将 {branch} {$merge} 到 {$tag} {name} 并移动该 {$tag}（少见：会新增一个 {$merge} {$commit}）", local = "将 {branch} {$merge}到{$tag} {name} 并移动该{$tag}（少见：会新增一个{$merge} {$commit}）" }
+moving_tag = { git = "正在将 {$tag} {name} 移到 {target}…", local = "正在将{$tag} {name} 移到 {target}…" }
+moving_tag_remote = { git = "正在将 {$tag} {name} 移到 {target}…（在你 {$push} 之前，{remotes} 仍保留旧位置）", local = "正在将{$tag} {name} 移到 {target}…（在你{$push}之前，{remotes} 仍保留旧位置）" }
+merging_into_tag = { git = "正在将 {branch} {$merge} 到 {$tag} {name}…", local = "正在将 {branch} {$merge}到{$tag} {name}…" }
+confirm_move_not_ff = { git = "将 {$tag} {name} 移到 {target}？不是快进：{name} 将不再是祖先。", local = "将{$tag} {name} 移到 {target}？不是快进：{name} 将不再是祖先。" }
 
 [menu_inline]
 placeholder_branch = "输入分支名"
@@ -1399,7 +1399,7 @@ stopped = "{label} 在完成前被停止"
 folder_gone = "{label}：文件夹 {path} 已不在磁盘上"
 unknown_variable = "{label}：命令中有未知变量 {var}"
 bad_command = "{label}：无法解析命令：{error}"
-no_label = "no Open in entry is labelled \"{label}\""
+no_label = "没有标签为“{label}”的“打开方式”条目"
 program_not_found = "{label}：找不到程序 {program}（已检查 PATH）"
 could_not_start = "{label}：无法启动 {program}：{error}"
 no_entry = "没有第 {n} 个“打开方式”条目"
@@ -1732,11 +1732,11 @@ column_author = "作者"
 column_title = "标题"
 column_age = "时长"
 # context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
-column_actions = "Actions"
+column_actions = "操作"
 # context: short button on a Radar row: starts the review of the request; keep it to one word
-action_review = "Review"
+action_review = "评审"
 # context: short button on a Radar row: starts work on the issue (creates its branch)
-action_start_work = "Start work"
+action_start_work = "开始处理"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "{name}列（{width} 格）：[ 变窄，] 变宽，0 重置，Tab 下一列，Esc 完成"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -1840,61 +1840,61 @@ note_unlinked = "未关联：仅显示其进行中的工作"
 # context: status line of a folder scope: how many of its repositories are not linked to a host
 status_unlinked = { one = "{n} 个未关联（仅显示进行中的工作）", other = "{n} 个未关联（仅显示进行中的工作）" }
 # context: menu label and tooltip of a Radar request: merges it on the host, after a confirmation
-act_merge = "{$Merge}..."
+act_merge = "{$Merge}…"
 # context: menu label and tooltip of a Radar request or issue: closes it on the host, after a confirmation
-act_close = "Close..."
+act_close = "关闭…"
 # context: menu label and tooltip of a draft Radar request: takes it out of draft on the host
-act_ready = "Mark as ready"
+act_ready = "标记为就绪"
 # context: menu label and tooltip of a Radar row whose repository is not cloned: opens the Clone dialog
-act_clone = "Clone repository..."
+act_clone = "克隆仓库…"
 # context: button of the Radar merge / close confirmation
-confirm_cancel = "Cancel"
+confirm_cancel = "取消"
 # context: button of the Radar close confirmation
-confirm_close = "Close it"
+confirm_close = "关闭它"
 # context: button of the Radar merge confirmation: a merge commit
 method_merge = "{$Merge} {$commit}"
 # context: button of the Radar merge confirmation: squash the commits, then merge
-method_squash = "Squash and {$merge}"
+method_squash = { git = "Squash 后 {$merge}", local = "Squash 后{$merge}" }
 # context: button of the Radar merge confirmation: rebase the commits, then merge
-method_rebase = "{$Rebase} and {$merge}"
+method_rebase = { git = "{$Rebase} 后 {$merge}", local = "{$Rebase}后{$merge}" }
 # context: title of the Radar merge confirmation; {label} is `!53` or `#12`
 merge_title = "{$Merge} {label}"
 # context: body of the Radar merge confirmation; {project} is `owner/name`, {branches} is `source → target`
-merge_body = "{title}\n{project}  {branches}\n\nThe host will {$merge} it with the method you pick. This changes the host and cannot be undone from GitPoulpi."
+merge_body = { git = "{title}\n{project}  {branches}\n\n托管平台将按你选择的方式 {$merge} 它。这会更改托管平台上的内容，无法在 GitPoulpi 中撤销。", local = "{title}\n{project}  {branches}\n\n托管平台将按你选择的方式{$merge}它。这会更改托管平台上的内容，无法在 GitPoulpi 中撤销。" }
 # context: title of the Radar close confirmation; {label} is `!53` or `#12`
-close_title = "Close {label}"
+close_title = "关闭 {label}"
 # context: body of the Radar close confirmation for a request
-close_body = "{title}\n{project}  {branches}\n\nThe host closes it without a {$merge}. This changes the host and cannot be undone from GitPoulpi (reopen it there)."
+close_body = { git = "{title}\n{project}  {branches}\n\n托管平台会关闭它，不进行 {$merge}。这会更改托管平台上的内容，无法在 GitPoulpi 中撤销（请到托管平台上重新打开）。", local = "{title}\n{project}  {branches}\n\n托管平台会关闭它，不进行{$merge}。这会更改托管平台上的内容，无法在 GitPoulpi 中撤销（请到托管平台上重新打开）。" }
 # context: body of the Radar close confirmation for an issue
-close_issue_body = "{title}\n{project}\n\nThe host closes the issue. This changes the host and cannot be undone from GitPoulpi (reopen it there)."
+close_issue_body = "{title}\n{project}\n\n托管平台会关闭该议题。这会更改托管平台上的内容，无法在 GitPoulpi 中撤销（请到托管平台上重新打开）。"
 # context: why a Radar host action is refused
-why_no_host = "This row has no host account to act on"
+why_no_host = "此行没有可用于操作的托管平台账户"
 # context: why a Radar host action is refused; {host} is the provider name
-why_not_supported = "Not supported by {host}"
+why_not_supported = "{host} 不支持"
 # context: why Radar Merge is refused
-why_merge_draft = "It is a draft: mark it as ready first"
+why_merge_draft = "它是草稿：请先将其标记为就绪"
 # context: why Radar Merge is refused; {target} is a branch
-why_merge_conflicts = "It conflicts with {target}"
+why_merge_conflicts = "它与 {target} 有冲突"
 # context: why Radar Merge is refused
-why_merge_checks = "Its checks are failing"
+why_merge_checks = "它的检查未通过"
 # context: why Radar Mark as ready is refused
-why_not_draft = "It is not a draft"
+why_not_draft = "它不是草稿"
 # context: why Radar Clone is refused; {path} is a folder
-why_already_cloned = "Already cloned at {path}"
+why_already_cloned = "已克隆在 {path}"
 # context: status line of the Radar
-msg_host_busy = "The host is still answering the last action"
+msg_host_busy = "托管平台仍在处理上一个操作"
 # context: status line of the Radar while a host action runs
-msg_asking_host = "Asking the host..."
+msg_asking_host = "正在询问托管平台…"
 # context: status line of the Radar after a merge; {label} is `!53`
-msg_merged = "{label} {$merge}d on the host"
+msg_merged = { git = "{label} 已在托管平台上 {$merge}", local = "{label} 已在托管平台上{$merge}" }
 # context: status line of the Radar after a close
-msg_closed = "{label} closed on the host"
+msg_closed = "{label} 已在托管平台上关闭"
 # context: status line of the Radar after Mark as ready
-msg_ready = "{label} is ready for review"
+msg_ready = "{label} 已可供评审"
 # context: status line of the Radar when a host action failed
-msg_host_failed = "{label}: the host refused or failed: {why}"
+msg_host_failed = "{label}：托管平台拒绝或失败：{why}"
 # context: note under the Clone dialog opened from a Radar row
-msg_clone_note = "Cloning {project}. The Radar finds the clone the next time it opens."
+msg_clone_note = "正在克隆 {project}。Radar 会在下次打开时找到该克隆。"
 
 [hosting_task]
 view_open = "打开"
@@ -2359,8 +2359,8 @@ pulling_from_all = "正在从 {remotes} {$pull} {branch}…"
 no_pull_remote = { git = "{branch} 没有可 {$pull} 的远程", local = "{branch} 没有可{$pull}的远程" }
 
 [keymap_action]
-sequence_cancel = "Sequence: Cancel"
-sequence_continue = "Sequence: Continue"
+sequence_cancel = "序列：取消"
+sequence_continue = "序列：继续"
 git_prefix_pull_all_branches = { git = "{$Pull} 所有分支", local = "{$Pull}所有分支" }
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
 global_commit_column = { git = "显示或隐藏 {$Commit} 列", local = "显示或隐藏{$Commit}列" }
@@ -2412,7 +2412,7 @@ commit_column_reset_widths = "重置各栏宽度"
 commit_column_fit = "按内容调整该列宽度"
 commit_column_fit_all = "按内容调整所有列宽度"
 log_pick_column = "选择要移动或调整宽度的列"
-log_filter_author = "Filter the Log by Author"
+log_filter_author = "按作者筛选 Log"
 log_columns_next = "选择下一列"
 log_columns_prev = "选择上一列"
 log_columns_move_left = "将该列左移"
@@ -2520,13 +2520,13 @@ refs_mark_drop = "标记为拖放来源"
 refs_drop_marked = "将标记的引用放到此处"
 log_toggle_file_mode = "文件：路径或树"
 log_view_all_files = "文件：查看所有文件"
-log_lfs_only = "Files: LFS Only"
+log_lfs_only = "文件：仅 LFS"
 log_files_collapse_all = "折叠或展开所有文件夹"
 log_files_filter = "筛选已更改的文件"
 status_compose = { git = "聚焦 {$Commit} 消息", local = "聚焦{$Commit}消息" }
 status_toggle_file_mode = "文件：路径或树"
 status_view_all_files = "文件：查看所有文件"
-status_lfs_only = "Files: LFS Only"
+status_lfs_only = "文件：仅 LFS"
 status_amend = "切换修订"
 status_collapse_all = "折叠或展开所有文件夹"
 status_stage_toggle = { git = "{$stage} 或 {$unstage} 所选行", local = "暂存或取消暂存所选行" }
@@ -2704,7 +2704,7 @@ md_editor_ai = "Markdown 编辑器：AI 写作"
 
 [keymap_ctx]
 # context: key group of the user-defined sequences on the Settings keybindings page
-sequence = "User sequences"
+sequence = "用户序列"
 rewrite = "重写历史工作台"
 history = "文件历史视图"
 commit_column = { git = "{$Commit} 列（获得键盘焦点时）", local = "{$Commit}列（获得键盘焦点时）" }
@@ -3022,7 +3022,7 @@ open_agent_no_agent = "此配置没有可打开的本地代理。"
 opened_agent = "已在 {folder} 中打开代理：请回答它的问题一次，关闭它，然后重试"
 opened_terminal_for_agent = "已在 {folder} 中打开终端：请在其中运行 {command}，回答它的问题一次，然后关闭它"
 open_agent_failed = "无法打开代理：{why}"
-open_agent_unknown_profile = "no AI profile with the id {id}"
+open_agent_unknown_profile = "没有 id 为 {id} 的 AI 配置"
 arg_inline_screen = "在普通屏幕中绘制，因此完整答案保持可读"
 preset_custom = "（自定义）"
 provider_preset = "提供商预设"
@@ -3081,15 +3081,15 @@ title_hosting_base = "回复的基础提示词"
 
 [palette]
 # context: palette row: cancel the running sequence
-sequence_cancel = "Sequence: Cancel"
+sequence_cancel = "序列：取消"
 # context: palette row: continue the paused sequence
-sequence_continue = "Sequence: Continue"
+sequence_continue = "序列：继续"
 # context: why Sequence: Cancel is unavailable
-why_no_sequence_running = "no sequence is running"
+why_no_sequence_running = "没有正在运行的序列"
 # context: why Sequence: Continue is unavailable
-why_sequence_not_waiting = "the sequence is not waiting for you"
+why_sequence_not_waiting = "该序列没有在等待你"
 # context: palette row running a user-defined sequence; {name} is the sequence's own name
-sequence_run = "Sequence: {name}"
+sequence_run = "序列：{name}"
 git_pull_all_branches = { git = "Git：{$Pull} 所有分支", local = "Git：{$Pull}所有分支" }
 git_pull_all_branches_fast_forward_if_possible = { git = "Git：{$Pull} 所有分支（可能时快进）", local = "Git：{$Pull}所有分支（可能时快进）" }
 git_pull_all_branches_fast_forward_only = { git = "Git：{$Pull} 所有分支（仅快进）", local = "Git：{$Pull}所有分支（仅快进）" }
@@ -3212,8 +3212,8 @@ navigation_focus_status_staged = { git = "导航：聚焦状态 > {$staged}", lo
 navigation_cycle_focus_to_next_pane = "导航：焦点切换到下一个窗格"
 navigation_cycle_focus_to_previous_pane = "导航：焦点切换到上一个窗格"
 navigation_search_commits = { git = "导航：搜索 {$Commit}…", local = "导航：搜索{$Commit}…" }
-log_filter_by_author = "Log: Filter by Author..."
-log_clear_author_filter = "Log: Clear Author Filter"
+log_filter_by_author = "Log：按作者筛选…"
+log_clear_author_filter = "Log：清除作者筛选"
 navigation_toggle_refs_pane_collapsed = "导航：折叠/展开引用窗格"
 navigation_toggle_status_pane_collapsed = "导航：折叠/展开状态窗格"
 navigation_refs_pane_wider = "导航：加宽引用窗格"
@@ -3277,7 +3277,7 @@ git_annotated_tag_at_selected_commit = { git = "Git：在所选 {$Commit} 处创
 refs_push_selected_tag_to_default_remote = { git = "引用：将所选 {$Tag} {$Push} 到默认远程", local = "引用：将所选{$Tag}{$Push}到默认远程" }
 refs_delete_selected_tag_from_its_remote = { git = "引用：从远程删除所选 {$Tag}…", local = "引用：从远程删除所选{$Tag}…" }
 refs_annotate_selected_tag = { git = "引用：为所选 {$Tag} 添加注释…", local = "引用：为所选{$Tag}添加注释…" }
-refs_move_selected_tag_to_selected_commit = "Refs: Move Selected {$Tag} to Selected {$Commit}..."
+refs_move_selected_tag_to_selected_commit = { git = "引用：将所选 {$Tag} 移到所选 {$Commit}…", local = "引用：将所选{$Tag}移到所选{$Commit}…" }
 refs_toggle_hide_in_graph = "引用：切换在图中隐藏"
 refs_toggle_solo_on_selected_ref = "引用：切换所选引用的单独显示"
 refs_stop_soloing_clear_every_soloed_ref = "引用：停止单独显示（清除所有单独显示的引用）"
@@ -3451,8 +3451,8 @@ tab_open_in_file_manager = "标签页：在文件管理器中打开"
 tab_open_in_terminal = "标签页：在终端中打开"
 tab_open_in = "标签页：打开方式…"
 tab_open_in_default = "标签页：用默认方式打开"
-tab_terminal_here = "Tab: Terminal Here"
-tab_open_ai_agent_here = "Tab: Open AI Agent Here"
+tab_terminal_here = "标签页：在此打开终端"
+tab_open_ai_agent_here = "标签页：在此打开 AI 代理"
 tab_quit_and_cd_here = "标签页：退出并 cd 到此处"
 repository_clone = "仓库：克隆…"
 repository_next_tab = "仓库：下一个标签页"
@@ -3496,14 +3496,14 @@ diff_layout_split_before_and_after = "{$Diff}：分栏布局（前后并排）"
 diff_toggle_hunks_only_whole_file_only_the_changes = { git = "{$Diff}：切换仅 hunk（整个文件 / 仅更改）", local = "{$Diff}：切换仅代码块（整个文件 / 仅更改）" }
 files_toggle_path_tree = "文件：切换路径/树"
 files_toggle_view_all_files = "文件：切换查看所有文件"
-files_toggle_lfs_only = "Files: Toggle LFS Only"
+files_toggle_lfs_only = "文件：切换仅 LFS"
 files_open_menu = "文件：打开当前行或所选文件的菜单"
 files_select_all = "文件：全选"
 files_clear_selection = "文件：清除选择"
 files_toggle_selection = "文件：切换当前行的选择"
 diff_toggle_word_wrap = "{$Diff}：切换自动换行"
 view_toggle_minimap = "视图：切换缩略图"
-diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
+diff_toggle_intraline = "{$Diff}：切换变更词高亮"
 editor_toggle_follow_selection = "编辑器：切换跟随选择"
 diff_toggle_whitespace_only_changes = "{$Diff}：切换仅空白字符的更改"
 ai_generate_commit_message = { git = "AI：生成 {$Commit} 消息", local = "AI：生成{$Commit}消息" }
@@ -3602,7 +3602,7 @@ why_no_uncommitted_changes_the_wip_row_appears_once = { git = "没有未 {$commi
 why_there_are_no_stashes = { git = "没有 {$stash}", local = "没有{$stash}" }
 why_select_a_changed_file_in_the_commit_detail_pane = { git = "请先在 {$commit} 详情窗格中选择一个已更改的文件", local = "请先在{$commit}详情窗格中选择一个已更改的文件" }
 why_this_repository_has_no_remote_add_one_first = "此仓库没有远程 - 请先添加一个"
-why_this_repository_has_no_lfs_files = "this repository has no LFS files"
+why_this_repository_has_no_lfs_files = "此仓库没有 LFS 文件"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a = { git = "请从“{$unstaged_files}”窗格打开一个文件 - {$commit} 的 {$diff} 没有可供 {$stage} 的索引", local = "请从“{$unstaged_files}”窗格打开一个文件 - {$commit}的{$diff}没有可供暂存的索引" }
 why_this_diff_is_the_staged_half_use_the_unstage = { git = "此 {$diff} 属于“{$staged_files}”窗格；请使用“{$unstage}”命令", local = "此{$diff}属于“{$staged_files}”窗格；请使用“取消暂存”命令" }
 why_open_a_file_from_the_third_pane_s_unstaged_half_a_2 = { git = "请从“{$unstaged_files}”窗格打开一个文件 - {$commit} 的 {$diff} 没有可丢弃的工作区更改", local = "请从“{$unstaged_files}”窗格打开一个文件 - {$commit}的{$diff}没有可丢弃的工作区更改" }
@@ -3619,7 +3619,7 @@ why_select_a_repository_in_the_list_first = "请先在列表中选择一个仓�
 why_the_repository_management_tab_has_no_tab_menu_use = "仓库管理标签页没有标签页菜单 - 请使用行菜单（.）"
 why_the_repository_management_tab_has_no_folder = "仓库管理标签页没有文件夹 - 请切换到仓库标签页"
 why_ai_is_turned_off_settings_ai = "AI 已关闭（设置 > AI）"
-why_no_local_ai_agent = "no local AI agent is set up (Settings > AI)"
+why_no_local_ai_agent = "尚未设置本地 AI 代理（设置 > AI）"
 why_an_ai_request_is_already_running_esc_cancels_it = "已有 AI 请求正在运行 - 按 Esc 取消"
 why_no_uncommitted_changes = { git = "没有未 {$commit} 的更改", local = "没有未提交的更改" }
 why_open_the_commit_composer_review_first_ai_split = { git = "请先打开 {$commit} 撰写器评审界面（AI：将更改拆分为 {$commit}）", local = "请先打开{$commit}撰写器评审界面（AI：将更改拆分为{$commit}）" }
@@ -3799,13 +3799,13 @@ radar_review_api = "Radar：通过 API 评审"
 # context: command palette entry: opens the Clone dialog for the selected Radar request, then its review
 radar_clone_review = "Radar：克隆并评审…"
 # context: command palette entry: merges the selected Radar request on the host
-radar_merge = "Radar: {$Merge} Request..."
+radar_merge = { git = "Radar：{$Merge} 请求…", local = "Radar：{$Merge}请求…" }
 # context: command palette entry: closes the selected Radar request or issue on the host
-radar_close = "Radar: Close..."
+radar_close = "Radar：关闭…"
 # context: command palette entry: takes the selected Radar draft out of draft
-radar_ready = "Radar: Mark as Ready"
+radar_ready = "Radar：标记为就绪"
 # context: command palette entry: opens the Clone dialog for the selected Radar row
-radar_clone = "Radar: Clone Repository..."
+radar_clone = "Radar：克隆仓库…"
 # context: command palette entry: toggles the Not cloned checkbox of the Radar
 radar_not_cloned = "Radar：显示未克隆的请求"
 # context: command palette entry: toggles the Drafts checkbox of the Radar
@@ -3854,8 +3854,8 @@ rewrite_strip_exec = "重写：移除可执行位…"
 rewrite_file_encoding = "重写：转换文件编码…"
 # s22:end
 git_fetch_selected_tag = { git = "Git：{$Fetch} 所选 {$Tag}", local = "Git：{$Fetch}所选{$Tag}" }
-git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
-git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
+git_use_remote_version_of_selected_tag = { git = "Git：采用所选 {$Tag} 的远程版本", local = "Git：采用所选{$Tag}的远程版本" }
+git_force_push_selected_tag = { git = "Git：将所选 {$Tag} 强制 {$Push} 到其远程", local = "Git：将所选{$Tag}强制{$Push}到其远程" }
 # s24:begin
 rewrite_fix_message_encoding = "重写：修复消息编码…"
 # s24:end
@@ -3886,12 +3886,12 @@ why_group_not_paused = { git = "没有正在等待冲突解决的分组 {$push}"
 why_group_not_ready = "请先解决并完成冲突"
 # context: palette: why a command is grayed out
 why_nothing_to_retry = { git = "上一次分组 {$push} 中没有失败的远程", local = "上一次分组{$push}中没有失败的远程" }
-edit_undo_sequence = "Edit: Undo Whole Sequence"
-undo_history_undo_sequence = "Undo History: Undo Whole Sequence"
-sequence_repo_review = "Sequence: Review This Repository's Sequences"
-sequence_repo_trust = "Sequence: Trust This Repository's Sequences"
-sequence_repo_ignore = "Sequence: Ignore This Repository's Sequences"
-why_no_repo_sequences = "this repository has no sequences waiting for your trust"
+edit_undo_sequence = "编辑：撤销整个序列"
+undo_history_undo_sequence = "撤销历史：撤销整个序列"
+sequence_repo_review = "序列：查看此仓库的序列"
+sequence_repo_trust = "序列：信任此仓库的序列"
+sequence_repo_ignore = "序列：忽略此仓库的序列"
+why_no_repo_sequences = "此仓库没有等待你信任的序列"
 
 [help_section]
 rewrite = "重写历史"
@@ -4048,7 +4048,7 @@ status_pane_working_3 = "折叠/展开活动子窗格"
 status_pane_working_4 = { git = "{$stage}/{$unstage} 所选文件，或折叠文件夹行（树模式）", local = "暂存/取消暂存所选文件，或折叠文件夹行（树模式）" }
 status_pane_working_5 = "在路径（平铺）和树（文件夹）之间切换文件列表"
 status_pane_working_6 = { git = "切换查看所有文件（状态窗格 / WIP 行，或 {$commit} 的已更改文件；命令面板：文件：切换路径/树 和 文件：切换查看所有文件）", local = "切换查看所有文件（状态窗格 / WIP 行，或{$commit}的已更改文件；命令面板：文件：切换路径/树 和 文件：切换查看所有文件）" }
-status_pane_working_lfs_only = "toggle LFS only: in a repository that has LFS files, the file lists show only those ({{log.lfs_only}} with the Log focused; palette: Files: Toggle LFS Only)"
+status_pane_working_lfs_only = "切换仅 LFS：在有 LFS 文件的仓库中，文件列表只显示这些文件（Log 获得焦点时用 {{log.lfs_only}}；命令面板：文件：切换仅 LFS）"
 status_pane_working_7 = "折叠所有文件夹，若有已折叠的则重新展开"
 status_pane_working_8 = { git = "所选文件的菜单：{$stage}/{$unstage}、丢弃更改（需确认）、复制文件路径可以真正执行；文件历史/Blame 会在中间打开该文件；其余项以灰色列出并说明所需条件", local = "所选文件的菜单：暂存/取消暂存、丢弃更改（需确认）、复制文件路径可以真正执行；文件历史/Blame 会在中间打开该文件；其余项以灰色列出并说明所需条件" }
 status_pane_working_9 = { git = "按名称筛选 {$commit} 的已更改文件（仅在 {$commit} 自己的文件列表中，不适用于状态）", local = "按名称筛选{$commit}的已更改文件（仅在{$commit}自己的文件列表中，不适用于状态）" }
@@ -4657,7 +4657,7 @@ theme_filter_all = "全部"
 theme_filter_dark = "深色"
 theme_filter_light = "浅色"
 theme_filter_colored = "彩色"
-theme_filter_custom = "Custom"
+theme_filter_custom = "自定义"
 change_language_title = "更改语言（{shown}/{total}）"
 no_matching_language = "（没有匹配的语言）"
 change_graph_color_theme_title = "更改图配色主题（{shown}/{total}）"
@@ -4691,7 +4691,7 @@ diff_error = { git = "{$Diff} 错误：{error}", local = "{$Diff}错误：{error
 mode_path = "路径"
 mode_tree = "树"
 view_all_files = "查看所有文件"
-lfs_only = "LFS only"
+lfs_only = "仅 LFS"
 filter_files = "筛选文件："
 all_files = "所有文件"
 changed_files = "已更改的文件"
@@ -4708,7 +4708,7 @@ tree_view = "树视图{hint}"
 collapse_all = "全部折叠"
 expand_all = "全部展开"
 view_all_files = "查看所有文件{key}"
-lfs_only = "LFS only{key}"
+lfs_only = "仅 LFS{key}"
 
 [autostash]
 reason_checkout = { git = "checkout", local = "检出" }
@@ -4944,9 +4944,9 @@ redo_label_key = "重做 {label} · {key}"
 nothing_to_undo_comment = "没有可撤销的操作（发布到托管平台的评论无法在此撤销：请改为编辑或删除它）"
 tip_nothing_to_undo_comment = "没有可撤销的操作（发布到托管平台的评论无法在此撤销：请改为编辑或删除它）"
 # context: why a palette command is grayed; a sequence is a user-defined list of actions run together
-why_no_sequence = "the newest actions are not one sequence run"
+why_no_sequence = "最新的操作不属于同一次序列运行"
 # context: status line while a sequence run is being undone
-undoing_sequence = "undoing the sequence..."
+undoing_sequence = "正在撤销序列…"
 
 [status_pane]
 unstaged_title = "{$unstaged_files}"
@@ -5067,8 +5067,8 @@ staging_lines = { one = { git = "正在 {$stage} hunk {hunk} 的 {n} 行{spill}�
 unstaging_lines = { one = { git = "正在 {$unstage} hunk {hunk} 的 {n} 行{spill}…", local = "正在取消暂存代码块 {hunk} 的 {n} 行{spill}…" }, other = { git = "正在 {$unstage} hunk {hunk} 的 {n} 行{spill}…", local = "正在取消暂存代码块 {hunk} 的 {n} 行{spill}…" } }
 minimap_on = "缩略图已开启"
 minimap_off = "缩略图已关闭"
-intraline_on = "changed words highlighted"
-intraline_off = "changed words not highlighted"
+intraline_on = "已高亮变更的词"
+intraline_off = "未高亮变更的词"
 not_working_diff = { git = "{$stage} 作用于工作区 - 请从“{$unstaged_files}”或“{$staged_files}”窗格打开文件，而不是从某个 {$commit}", local = "暂存作用于工作区 - 请从“{$unstaged_files}”或“{$staged_files}”窗格打开文件，而不是从某个提交" }
 not_working_diff_discard = { git = "丢弃作用于工作区 - 请从“{$unstaged_files}”窗格打开文件，而不是从某个 {$commit}", local = "丢弃作用于工作区 - 请从“{$unstaged_files}”窗格打开文件，而不是从某个提交" }
 discard_on_staged = { git = "丢弃会撤回 {$unstaged} 的更改 - 这里是“{$staged_files}”窗格：请先 {$unstage}，再从“{$unstaged_files}”窗格丢弃", local = "丢弃会撤回未暂存的更改 - 这里是“{$staged_files}”窗格：请先取消暂存，再从“{$unstaged_files}”窗格丢弃" }
@@ -5340,9 +5340,9 @@ fetched = { one = { git = "已 {$fetch} {remote}：更新了 {n} 个引用", loc
 fetched_all = { one = { git = "已 {$fetch} 所有远程：更新了 {n} 个引用", local = "已{$fetch}所有远程：更新了 {n} 个引用" }, other = { git = "已 {$fetch} 所有远程：更新了 {n} 个引用", local = "已{$fetch}所有远程：更新了 {n} 个引用" } }
 branch_created_checkout_failed = "分支 {name} 已创建，但检出失败：{error}"
 tag_annotated = { git = "已为 {$tag} {name} 添加注释", local = "已为{$tag} {name} 添加注释" }
-tag_moved = "moved {$tag} {name} to {target}"
-tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
-tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
+tag_moved = { git = "已将 {$tag} {name} 移到 {target}", local = "已将{$tag} {name} 移到 {target}" }
+tag_moved_remote = { git = "已将 {$tag} {name} 移到 {target}；{remotes} 上仍是旧位置（{$push} 以更新）", local = "已将{$tag} {name} 移到 {target}；{remotes} 上仍是旧位置（{$push}以更新）" }
+tag_merged = { git = "已将 {branch} {$merge} 到 {$tag} {name}，现位于 {target}", local = "已将 {branch} {$merge}到{$tag} {name}，现位于 {target}" }
 tags_all_pushed = { git = "所有 {$tag} 都已在 {remote} 上", local = "所有{$tag}都已在 {remote} 上" }
 nothing_to_push = { git = "没有可 {$push} 到 {remote} 的内容", local = "没有可{$push}到 {remote} 的内容" }
 pushed_refs = { git = "已将 {refs} {$push} 到 {remote}", local = "已将 {refs} {$push}到 {remote}" }
@@ -5424,7 +5424,7 @@ reword_invalid_date = "日期既不是原始格式，也不是 ISO 8601"
 rewrite_refused = "无法重写历史：{reason}{detail}"
 push_rejected = { git = "{remote} 拒绝了 {branch} 的 {$push}：{reason}", local = "{remote} 拒绝了 {branch} 的{$push}：{reason}" }
 push_non_fast_forward = { git = "远程有此分支所没有的 {$commit}（请先 {$pull}，或强制 {$push}）", local = "远程有此分支所没有的{$commit}（请先{$pull}，或强制{$push}）" }
-push_stale_lease = { git = "远程分支自上次 {$fetch} 后已移动，因此强制 {$push} 被拒绝", local = "远程分支自上次{$fetch}后已移动，因此强制{$push}被拒绝" }
+push_stale_lease = { git = "自上次 {$fetch} 以来，远程上的分支或 {$tag} 已移动，因此强制 {$push} 被拒绝", local = "自上次{$fetch}以来，远程上的分支或{$tag}已移动，因此强制{$push}被拒绝" }
 not_fast_forward = "无法快进：两者已分叉"
 reword_refused = { git = "无法修改该 {$commit}：{reason}", local = "无法修改该{$commit}：{reason}" }
 reword_not_on_branch = { git = "该 {$commit} 不在当前分支上（它不是 {$head}，也不是 {$head} 的祖先）", local = "该{$commit}不在当前分支上（它不是{$head}，也不是{$head}的祖先）" }
@@ -5574,10 +5574,10 @@ proposed_by = "{client} 提议"
 chip_propose = "{client} 提议{what} - {accept} 或点击：打开，Esc：忽略"
 chip_show = "{client} 想显示{what} - {accept} 或点击：显示，Esc：忽略"
 shown = "{client} 已显示：{what} · {back} 返回"
-prop_sequence = "run sequence {name}"
-banner_sequence = "Proposed by {client}: {what} · {accept} runs · Esc dismisses"
-button_run = "Run"
-button_dismiss = "Dismiss"
+prop_sequence = "运行序列 {name}"
+banner_sequence = "{client} 提议：{what} · {accept} 运行 · Esc 忽略"
+button_run = "运行"
+button_dismiss = "忽略"
 
 [rebase_ui]
 title_cherry_pick = { git = "交互式 {$Cherry_pick}", local = "交互式{$Cherry_pick}" }
@@ -5878,7 +5878,7 @@ open_install_page = "打开安装页面"
 undo_anyway = "仍要撤销"
 start_over = "重新开始"
 redo_anyway = "仍要重做"
-move_tag = "Move"
+move_tag = "移动"
 
 [rebase_banner]
 skip = "跳过"
@@ -5927,9 +5927,9 @@ temp_file = "临时文件：{error}"
 
 [keymap_issue]
 # context: [keybindings.sequence] entry naming a sequence that does not exist; {name} is the slug
-unknown_sequence = "no sequence named '{name}'"
+unknown_sequence = "没有名为“{name}”的序列"
 # context: more sequences than the keymap has slots for; {slug} is the sequence, {max} the limit
-sequence_limit = "sequence '{slug}' ignored: the limit of {max} sequences with a key per session is reached"
+sequence_limit = "序列“{slug}”已忽略：每个会话中带快捷键的序列已达上限 {max} 个"
 unknown_action = "[{ctx}] 中有未知操作“{name}”"
 unknown_context = "未知范围“{ctx}”"
 not_rebindable = "暂不可重新绑定"
@@ -6567,11 +6567,11 @@ hint_repo_auth = "请在“SSH 与凭据”中为此仓库选择另一种登录�
 
 [failure_card]
 # context: title of the failure notification when a step of a user-defined sequence fails
-title_sequence = "Sequence stopped"
+title_sequence = "序列已停止"
 # context: reason line of the failure notification when a sequence stopped
-summary_sequence = "A step of the sequence did not succeed, so the sequence stopped there. Earlier steps are kept."
+summary_sequence = "序列中的某一步没有成功，序列因此停在那里。之前的步骤会保留。"
 # context: next-step line of the failure notification when a sequence stopped
-hint_sequence = "Fix the cause, then run the sequence again; the steps that worked are not undone."
+hint_sequence = "排除原因后再次运行该序列；已成功的步骤不会被撤销。"
 title_clone = "克隆失败"
 title_create = "无法创建仓库"
 title_hosting = "托管服务请求失败"
@@ -6851,17 +6851,17 @@ help_offer = "当 GitPoulpi 之外的程序移动了某个分支并阻止了撤�
 # context: Undo history: key of the Undo whole sequence button, one letter
 key_undo_sequence = "x"
 # context: Undo history: button; undoes every entry of the sequence run at the top of the history, newest first
-btn_undo_sequence = "Undo whole sequence"
+btn_undo_sequence = "撤销整个序列"
 # context: confirm title; {name} is the name of a user-defined sequence of actions
-confirm_undo_sequence = "Undo the whole sequence \"{name}\"?"
+confirm_undo_sequence = "撤销整个序列“{name}”？"
 # context: confirm warning under the list of actions of a sequence run; a sequence can act in a worktree (another repository)
-warning_sequence_scope = "Only this repository's journal is undone: steps done in another repository stay."
+warning_sequence_scope = "只会撤销此仓库的历史：在其他仓库完成的步骤会保留。"
 # context: status line; {name} is the name of a user-defined sequence of actions
-done_undo_sequence = "undid the sequence \"{name}\""
+done_undo_sequence = "已撤销序列“{name}”"
 # context: status line; undoing a sequence stopped at one of its actions; {step}/{of} is its position in the sequence, {label} the action, {why} the reason, {left} how many actions stay done
-sequence_stopped = "undoing \"{name}\" stopped at step {step}/{of} ({label}): {why}. Actions left: {left}"
+sequence_stopped = "撤销“{name}”在第 {step}/{of} 步（{label}）停止：{why}。剩余操作：{left}"
 # context: detail line of a history row made by a sequence; {step}/{of} is its position in the sequence
-detail_sequence = "Made by the sequence \"{name}\", step {step}/{of}."
+detail_sequence = "由序列“{name}”完成，第 {step}/{of} 步。"
 
 # Undo history row labels, built at display time from the entry's kind
 [undo_label]
@@ -6914,8 +6914,8 @@ sparse_disable = "禁用稀疏检出"
 tag_create = { git = "创建 {$tag} {name}", local = "创建{$tag} {name}" }
 tag_delete = { git = "删除 {$tag} {name}", local = "删除{$tag} {name}" }
 tag_annotate = { git = "为 {$tag} {name} 添加注释", local = "为{$tag} {name} 添加注释" }
-tag_move = { git = "Move {$tag} {name}", local = "Move {$tag} {name}" }
-tag_merge_branch = "{$Merge} {branch} into {$tag} {name}"
+tag_move = { git = "移动 {$tag} {name}", local = "移动{$tag} {name}" }
+tag_merge_branch = { git = "将 {branch} {$merge} 到 {$tag} {name}", local = "将 {branch} {$merge}到{$tag} {name}" }
 fast_forward = { git = "Fast-forward {branch} 到 {target}", local = "快进 {branch} 到 {target}" }
 reword = "{$Reword} {id}"
 fetch_as_branch = "{$Fetch} {remote_ref} 为分支 {branch}"
@@ -7573,9 +7573,9 @@ hint_open_diff = { git = "显示 {$diff}", local = "显示{$diff}" }
 # context: footer hint after the Esc key
 hint_close = "关闭"
 # context: status line: the request that was under review is merged or closed; {caption} is like #12 Fix the thing
-resume_gone = "{caption} is no longer open: the review was not reopened"
+resume_gone = "{caption} 已不再打开：未重新打开该评审"
 # context: status line: the host did not answer when the review was reopened; {why} is the error
-resume_unreachable = "could not reopen {caption}: {why}"
+resume_unreachable = "无法重新打开 {caption}：{why}"
 # >>> local_issues (slice L1)
 [local_issues]
 field_status = "状态"
@@ -9074,98 +9074,98 @@ res_filled = "工作台中现有规则：{n}。"
 
 [sequence_ai]
 # context: Settings > AI, the page of the action that drafts or changes an action sequence from a description
-title = "Sequence drafts"
-profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
-repo_profile_help = "The profile used in this repository to draft action sequences."
-action = "Sequence draft"
+title = "序列草稿"
+profile_help = "GitPoulpi 根据你的描述起草新动作序列（或修改现有序列）时使用的配置。它只提出建议：由你阅读并自己保存，绝不会运行任何内容。"
+repo_profile_help = "此仓库中用于起草动作序列的配置。"
+action = "序列草稿"
 # context: title of the dialog that creates a sequence from a description; the sparkle is added in code
-dlg_title_create = "Create a sequence with AI"
+dlg_title_create = "用 AI 创建序列"
 # context: title of the dialog that changes the selected sequence from a description; the sparkle is added in code
-dlg_title_edit = "Edit a sequence with AI"
+dlg_title_edit = "用 AI 编辑序列"
 # context: label of the description field
-dlg_label_create = "Describe the sequence you want"
+dlg_label_create = "描述你想要的序列"
 # context: label of the description field in edit mode; {name} is the sequence's name
-dlg_label_edit = "Describe how to change \"{name}\""
+dlg_label_edit = "描述如何修改“{name}”"
 # context: placeholder of the description field
-dlg_example_create = "For example: {$stage} everything, write the message with the AI, {$commit}, then {$push}."
+dlg_example_create = { git = "例如：{$stage}全部更改，用 AI 写消息，{$commit}，然后 {$push}。", local = "例如：{$stage}全部更改，用 AI 写消息，{$commit}，然后{$push}。" }
 # context: placeholder of the description field in edit mode
-dlg_example_edit = "For example: {$fetch} first, and always ask before the {$push}."
+dlg_example_edit = { git = "例如：先 {$fetch}，并且在 {$push} 之前总是询问。", local = "例如：先{$fetch}，并且在{$push}之前总是询问。" }
 # context: keys of the description field
-dlg_hint = "Enter adds a line. Ctrl+Enter sends. Esc closes."
+dlg_hint = "Enter 换行。Ctrl+Enter 发送。Esc 关闭。"
 # context: checkbox, off by default
-dlg_context = "Send context (remote names, AI profiles, Open in labels)"
+dlg_context = "发送上下文（远程名称、AI 配置、“打开方式”标签）"
 # context: under the unchecked box
-dlg_context_off = "Off: only your description is sent."
+dlg_context_off = "关闭：只发送你的描述。"
 # context: reassurance under the description
-dlg_footer = "The AI only proposes. Nothing is saved before you accept, and nothing is ever run."
+dlg_footer = "AI 只提出建议。在你接受之前不会保存任何内容，也绝不会运行任何内容。"
 # context: button; the sparkle is added in code
-dlg_send = "Send"
+dlg_send = "发送"
 # context: button
-dlg_cancel = "Cancel"
+dlg_cancel = "取消"
 # context: why Send is unavailable
-dlg_need_text = "Describe what you want first."
+dlg_need_text = "请先描述你想要什么。"
 # context: another AI request is running
-dlg_busy = "Another AI request is running."
+dlg_busy = "另一个 AI 请求正在运行。"
 # context: shown when the AI is off
-dlg_off = "Turn the AI on in Settings first."
+dlg_off = "请先在设置中开启 AI。"
 # context: the window is too small for the dialog
-dlg_too_small = "Make the window larger to use this dialog."
+dlg_too_small = "请将窗口调大后再使用此对话框。"
 # context: the answer came after the dialog was closed
-dlg_closed = "The AI answered after the dialog was closed; nothing was written."
+dlg_closed = "AI 在对话框关闭后才回答；未写入任何内容。"
 # context: what a copy from the description field is called in the confirmation
-dlg_copy_what = "the description"
+dlg_copy_what = "描述"
 # context: title of the proposal of a new sequence; the sparkle is added in code
-res_title_create = "Proposed sequence"
+res_title_create = "建议的序列"
 # context: title of the proposed change to a sequence; the sparkle is added in code
-res_title_edit = "Proposed change"
+res_title_edit = "建议的更改"
 # context: heading over the steps; {n} is how many
-res_steps = "Steps ({n})"
+res_steps = "步骤（{n}）"
 # context: heading over what the AI proposed but was refused
-res_left_out = "Left out"
+res_left_out = "已舍弃"
 # context: a refused step; {n} its place, {what} its command, {reason} why
-res_left_step = "step {n} `{what}`: {reason}"
+res_left_step = "第 {n} 步 `{what}`：{reason}"
 # context: a refused field; {what} its name, {reason} why
-res_left_item = "{what}: {reason}"
+res_left_item = "{what}：{reason}"
 # context: heading over the AI's remarks
-res_notes = "Notes from the AI"
+res_notes = "AI 的备注"
 # context: heading over the suggested shortcut; {key} is the key as the AI wrote it
-res_shortcut = "Suggested shortcut: {key}"
+res_shortcut = "建议的快捷键：{key}"
 # context: the suggested shortcut is not used by anything
-res_shortcut_free = "It is free. It is not set: use the Shortcut button after accepting."
+res_shortcut_free = "该键未被占用。尚未设置：接受后请用“快捷键”按钮设置。"
 # context: the suggested shortcut is used; {label} names its action
-res_shortcut_taken = "Already used by {label}. It is not set."
+res_shortcut_taken = "已被 {label} 使用。未设置。"
 # context: the suggested shortcut is not a single key
-res_shortcut_unusable = "Not a single key. Set the shortcut yourself with the Shortcut button."
+res_shortcut_unusable = "不是单个按键。请用“快捷键”按钮自行设置。"
 # context: the proposal equals the sequence
-res_no_change = "No change: the proposal is the same as the sequence."
+res_no_change = "无更改：建议与该序列相同。"
 # context: legend of the diff
-res_legend = "+ added   - removed   ~ changed"
+res_legend = "+ 新增   - 删除   ~ 更改"
 # context: a step with no pause and no option, in a change line
-res_defaults = "defaults"
+res_defaults = "默认值"
 # context: an empty field, in a change line
-res_none = "(none)"
+res_none = "（无）"
 # context: a changed field; {field} its name, {old} and {new} its values
-res_field_changed = "{field}: \"{old}\" -> \"{new}\""
+res_field_changed = "{field}：\"{old}\" -> \"{new}\""
 # context: why Accept is unavailable; {reason} says why
-res_blocked = "Cannot accept: {reason}"
+res_blocked = "无法接受：{reason}"
 # context: the proposal holds no usable step
-res_no_steps = "the proposal has no usable step"
+res_no_steps = "该建议没有可用的步骤"
 # context: button that saves the proposal
-btn_accept = "Accept"
+btn_accept = "接受"
 # context: button that saves the proposal and opens its steps
-btn_edit_first = "Edit before saving"
+btn_edit_first = "保存前编辑"
 # context: button that drops the proposal
-btn_reject = "Reject"
+btn_reject = "拒绝"
 # context: button back to the description
-btn_back = "Back"
+btn_back = "返回"
 # context: status line; {name} is the new sequence
-accepted_create = "Sequence \"{name}\" added"
+accepted_create = "已添加序列“{name}”"
 # context: status line; {name} is the changed sequence
-accepted_edit = "Sequence \"{name}\" updated"
+accepted_edit = "已更新序列“{name}”"
 # context: question when Settings is closed with a proposal open
-close_body = "A sequence proposal from the AI is open. Closing Settings drops it; nothing was written."
+close_body = "AI 的序列建议正打开着。关闭设置会丢弃它；未写入任何内容。"
 # context: palette row; the sparkle is added in code
-palette_create = "Sequence: Create with AI..."
+palette_create = "序列：用 AI 创建…"
 
 [rewrite_size]
 tab = "大小"
@@ -9217,15 +9217,15 @@ tip_both = { git = "本地和 {remotes} 上都有，位于同一个 {$commit}。
 tip_differs = { git = "本地和 {remotes} 上都有，但指向不同的 {$commits}：{$push} 会被拒绝。", local = "本地和 {remotes} 上都有，但指向不同的{$commits}：{$push}会被拒绝。" }
 tip_fetch_note = { git = "{$Fetch} 会把只在本地删除、而远程仍有的 {$tag} 找回来。在远程被删除的 {$tag}，只有开启“自动清理 {$tags}”（设置）后才会从本仓库消失。", local = "{$Fetch}会把只在本地删除、而远程仍有的{$tag}找回来。在远程被删除的{$tag}，只有开启“自动清理{$tags}”（设置）后才会从本仓库消失。" }
 fetch_tag = "从 {remote} {$Fetch} {name}"
-tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
-take_remote = "Use {name} from {remote}"
-force_push_tag = "{$Push} {name} to {remote} (force)"
-confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
-msg_taking_remote = "Using the remote's version of {name}..."
-msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
-msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
-msg_not_differing = "{name} does not differ from a remote"
-why_not_differing = "This {$tag} does not differ from a remote"
+tip_differs_actions = { git = "在其菜单中：可在此采用远程的版本，或强制 {$push} 你的版本（会先询问）。", local = "在其菜单中：可在此采用远程的版本，或强制{$push}你的版本（会先询问）。" }
+take_remote = "采用 {remote} 的 {name}"
+force_push_tag = { git = "将 {name} 强制 {$Push} 到 {remote}", local = "将 {name} 强制{$Push}到 {remote}" }
+confirm_force_push = { git = "将 {$tag} “{name}”强制 {$push} 到 {remote}？它会替换 {remote} 上的该 {$tag}，所有使用它的人都会受影响。如果自上次 {$fetch} 以来 {remote} 已移动，则会被拒绝。撤销会放回旧的那个。", local = "将{$tag} “{name}”强制{$push}到 {remote}？它会替换 {remote} 上的该{$tag}，所有使用它的人都会受影响。如果自上次{$fetch}以来 {remote} 已移动，则会被拒绝。撤销会放回旧的那个。" }
+msg_taking_remote = "正在采用 {name} 的远程版本…"
+msg_took_remote = "{name} 现在是 {remote} 的版本。撤销会还原你的版本。"
+msg_force_pushed = { git = "已将 {name} 强制 {$push} 到 {remote}。撤销会放回旧的那个。", local = "已将 {name} 强制{$push}到 {remote}。撤销会放回旧的那个。" }
+msg_not_differing = "{name} 与任何远程都没有差别"
+why_not_differing = { git = "此 {$tag} 与任何远程都没有差别", local = "此{$tag}与任何远程都没有差别" }
 delete_tag_scope = "删除 {name}…"
 delete_tag_on_remote = "在 {remote} 上删除 {name}…"
 dlg_title = { git = "删除 {$tag}", local = "删除{$tag}" }
@@ -10598,11 +10598,11 @@ palette_toggle_internal = "对话：切换内部备注"
 why_unchanged = "尚无更改"
 flavor_plain_text = "纯文本"
 # context: what was copied, named in the status line
-noun_text = "text"
+noun_text = "文本"
 # context: status line: nothing selected and no entry
-why_no_text = "there is no text to copy here"
+why_no_text = "此处没有可复制的文本"
 # context: command palette entry: copies the dragged text, else the selected entry
-palette_copy_text = "Conversation: Copy Text"
+palette_copy_text = "对话：复制文本"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
@@ -10652,195 +10652,195 @@ more = "另有 {n} 个"
 
 [pane_hscroll]
 # context: keymap label of the key that scrolls the focused list pane (a Refs section, Unstaged, Staged, the changed files, the commit info lines) sideways
-key_left = "Scroll the Pane Left"
-key_right = "Scroll the Pane Right"
-pal_left = "View: Scroll the Pane Left"
-pal_right = "View: Scroll the Pane Right"
-nothing = "Nothing to scroll sideways here"
-help = "Scroll the pane sideways (also Shift+wheel, a horizontal wheel or the bar on its bottom border)"
-help_details = "Scroll the {$commit} details sideways (id, author, date and counts lines)"
+key_left = "将窗格向左滚动"
+key_right = "将窗格向右滚动"
+pal_left = "视图：将窗格向左滚动"
+pal_right = "视图：将窗格向右滚动"
+nothing = "此处没有可横向滚动的内容"
+help = "横向滚动窗格（也可用 Shift+滚轮、横向滚轮或其底边框上的滚动条）"
+help_details = { git = "横向滚动 {$commit} 详情（id、作者、日期和计数行）", local = "横向滚动{$commit}详情（id、作者、日期和计数行）" }
 
 [sequence_run]
 # context: the label of the run in the Jobs panel: sequence name, step number, step count, step name
-job_label = "Sequence {name} {k}/{n}: {step}"
+job_label = "序列 {name} {k}/{n}：{step}"
 # context: run strip text: sequence name, step k of n, step name
-strip_running = "{name} {k}/{n} \u00b7 {step}"
+strip_running = "{name} {k}/{n} · {step}"
 # context: run strip while a step waits to be started
-strip_next = "{name} {k}/{n} \u00b7 Next: {step}"
+strip_next = "{name} {k}/{n} · 下一步：{step}"
 # context: run strip after the AI wrote the commit message
-strip_review = "{name} {k}/{n} \u00b7 Review the message, then Continue"
+strip_review = "{name} {k}/{n} · 检查消息，然后继续"
 # context: run strip when the commit has no message yet
-strip_commit_message = "{name} {k}/{n} \u00b7 Write the message, then {$commit} or Continue"
+strip_commit_message = { git = "{name} {k}/{n} · 写好消息，然后 {$commit} 或继续", local = "{name} {k}/{n} · 写好消息，然后{$commit}或继续" }
 # context: run strip while a dialog of the step is open
-strip_dialog = "{name} {k}/{n} \u00b7 Answer the dialog"
+strip_dialog = "{name} {k}/{n} · 请回答对话框"
 # context: run strip when the push was rejected and its dialog is open
-strip_push_rejected = "{name} {k}/{n} \u00b7 {$Push} rejected: choose in the dialog"
+strip_push_rejected = { git = "{name} {k}/{n} · {$Push} 被拒绝：请在对话框中选择", local = "{name} {k}/{n} · {$Push}被拒绝：请在对话框中选择" }
 # context: run strip while a dialog of the action waits for the person
-strip_user = "{name} {k}/{n} \u00b7 Choose in the dialog"
+strip_user = "{name} {k}/{n} · 请在对话框中选择"
 # context: run strip when the window on screen is not the tab the step acts on; {tab} is a folder
-strip_waiting_tab = "{name} {k}/{n} \u00b7 waiting for tab {tab}"
+strip_waiting_tab = "{name} {k}/{n} · 正在等待标签页 {tab}"
 # context: run strip when a step failed
-strip_failed = "{name} stopped at step {k}/{n} ({step}): {error}"
+strip_failed = "{name} 在第 {k}/{n} 步（{step}）停止：{error}"
 # context: button of the run strip
-button_continue = "Continue"
+button_continue = "继续"
 # context: button of the run strip that switches to the tab the step acts on
-button_go_there = "Go there"
+button_go_there = "前往"
 # context: button of the run strip that shows the failure
-button_details = "Details"
+button_details = "详情"
 # context: status line after a sequence was canceled
-say_canceled = "{name} canceled after step {k}/{n} ({step}); earlier steps are kept"
+say_canceled = "{name} 在第 {k}/{n} 步（{step}）之后已取消；之前的步骤会保留"
 # context: status line when the step in flight cannot be stopped
-say_stopping = "Stopping after this step"
+say_stopping = "将在这一步之后停止"
 # context: status line when a step failed
-say_stopped = "Sequence {name} stopped at step {k}/{n} ({step}): {error}"
+say_stopped = "序列 {name} 在第 {k}/{n} 步（{step}）停止：{error}"
 # context: status line when every step ran
-say_finished = "{name} finished"
+say_finished = "{name} 已完成"
 # context: status line when a second sequence is started
-say_running = "{name} is running (step {k}/{n})"
+say_running = "{name} 正在运行（第 {k}/{n} 步）"
 # context: Activity Log entry for a failed step; {options} lists the step options
-log_failure = "Sequence {name}, step {k}/{n} {step} (options: {options}) failed: {error}"
+log_failure = "序列 {name}，第 {k}/{n} 步 {step}（选项：{options}）失败：{error}"
 # context: Activity Log entry for a run cut short by quitting
-log_interrupted = "Sequence {name} was interrupted at step {k}/{n} ({step}) when GitPoulpi closed"
+log_interrupted = "序列 {name} 在 GitPoulpi 关闭时被中断于第 {k}/{n} 步（{step}）"
 # context: why a run was canceled; {tab} is a folder
-reason_tab_closed = "the tab {tab} was closed"
+reason_tab_closed = "标签页 {tab} 已关闭"
 # context: why a run failed; {tab} is a folder
-reason_tab_never = "the tab {tab} did not open"
+reason_tab_never = "标签页 {tab} 没有打开"
 # context: why a run was canceled
-reason_dialog_closed = "the dialog was closed"
+reason_dialog_closed = "对话框已关闭"
 # context: a step cannot run now; {step} is its name, {reason} the palette's reason
-step_unavailable = "{step} is not available: {reason}"
+step_unavailable = "{step} 不可用：{reason}"
 # context: a step names a command this build does not have
-step_unknown = "{step} is not a command of this build"
+step_unknown = "{step} 不是此版本的命令"
 # context: a step with pause never lacks an option; {option} is its name
-step_needs_option = "{step} needs the option {option}"
+step_needs_option = "{step} 需要选项 {option}"
 # context: a step could not start
-step_failed_start = "{step} did not start"
+step_failed_start = "{step} 未能开始"
 # context: the sequence was removed or changed before it started
-def_gone = "the sequence {name} no longer exists"
+def_gone = "序列 {name} 已不存在"
 # context: shorter run strip text when a step failed (the error text does not fit)
-strip_stopped = "{name} stopped at step {k}/{n} ({step})"
-repo_notice = { one = "This repository defines {n} sequence", other = "This repository defines {n} sequences" }
-repo_notice_changed = { one = "This repository's sequence changed", other = "This repository's {n} sequences changed" }
-repo_button_review = "Review"
-repo_button_trust = "Trust"
-repo_button_ignore = "Ignore"
-repo_review_title = "Sequences of this repository"
-repo_review_intro = "These sequences come from this repository's .gitpoulpi/sequences.toml. They run commands on your machine when you start them. Trust them only if you trust everyone who can change this repository."
-repo_review_sequence = "{name} ({id})"
+strip_stopped = "{name} 在第 {k}/{n} 步（{step}）停止"
+repo_notice = { one = "此仓库定义了 {n} 个序列", other = "此仓库定义了 {n} 个序列" }
+repo_notice_changed = { one = "此仓库的序列已更改", other = "此仓库的 {n} 个序列已更改" }
+repo_button_review = "查看"
+repo_button_trust = "信任"
+repo_button_ignore = "忽略"
+repo_review_title = "此仓库的序列"
+repo_review_intro = "这些序列来自此仓库的 .gitpoulpi/sequences.toml。你启动它们时，它们会在你的电脑上运行命令。只有信任所有能修改此仓库的人时，才信任它们。"
+repo_review_sequence = "{name}（{id}）"
 repo_review_step = "{n}. {step}"
-repo_review_pause_always = "pauses before it runs"
-repo_review_pause_never = "never pauses"
-repo_review_options = "options: {options}"
-repo_review_trust = "Trust"
+repo_review_pause_always = "运行前暂停"
+repo_review_pause_never = "从不暂停"
+repo_review_options = "选项：{options}"
+repo_review_trust = "信任"
 repo_key_trust = "t"
-repo_review_close = "Close"
+repo_review_close = "关闭"
 repo_key_close = "c"
-say_repo_trusted = "Repository sequences trusted: {n}"
-say_repo_ignored = "Repository sequences ignored until the file changes"
-repo_review_too_long = "This list is longer than the window: enlarge the window to see all of it and trust it from here."
+say_repo_trusted = "已信任的仓库序列：{n}"
+say_repo_ignored = "仓库序列已忽略，直到该文件更改"
+repo_review_too_long = "此列表比窗口长：请将窗口调大以查看全部内容，并在此处信任它们。"
 
 [settings_sequences]
-section_title = "Sequences"
-list_title = "Sequences"
+section_title = "序列"
+list_title = "序列"
 # context: title of the list of one sequence's steps; {name} is the sequence's own name
-steps_title = "Steps of {name}"
-new_name = "New sequence"
-menu_empty = "Empty sequence"
+steps_title = "{name} 的步骤"
+new_name = "新序列"
+menu_empty = "空序列"
 # context: Add menu row that inserts a preset; {name} is the preset's name
-menu_preset = "From preset ▸ {name}"
-menu_ai = "✦ Create with AI..."
-preset_backup = "Backup"
-preset_backup_desc = "{$Stage} everything, write the message with the AI, {$commit} and {$push}"
-preset_compose = "Compose and {$push}"
-preset_compose_desc = "Let the AI split the changes into {$commits}, then {$push}"
-preset_worktree = "Worktree and agent"
-preset_worktree_desc = "Create a worktree for the current branch and open the AI agent in it"
-group_installation = "This installation"
-group_machine = "All installations"
-group_repo = "This repository"
-no_sequences = "No sequences yet. Use Add to create one or to start from a preset."
+menu_preset = "从预设 ▸ {name}"
+menu_ai = "✦ 用 AI 创建…"
+preset_backup = "备份"
+preset_backup_desc = { git = "{$Stage}全部更改，用 AI 写消息，{$commit} 并 {$push}", local = "{$Stage}全部更改，用 AI 写消息，{$commit}并{$push}" }
+preset_compose = { git = "撰写并 {$push}", local = "撰写并{$push}" }
+preset_compose_desc = { git = "让 AI 把更改拆分为多个 {$commits}，然后 {$push}", local = "让 AI 把更改拆分为多个{$commits}，然后{$push}" }
+preset_worktree = { git = "Worktree 与代理", local = "工作树与代理" }
+preset_worktree_desc = { git = "为当前分支创建 worktree，并在其中打开 AI 代理", local = "为当前分支创建工作树，并在其中打开 AI 代理" }
+group_installation = "此安装"
+group_machine = "所有安装"
+group_repo = "此仓库"
+no_sequences = "还没有序列。用“添加”创建一个，或从预设开始。"
 # context: heading over a sequence's rows; {i} is its place in the list, {n} the number of sequences
-editing = "Editing sequence {i}/{n}"
-name = "Name"
-name_help = "Shown in the command palette as \"Sequence: <name>\"."
+editing = "正在编辑第 {i}/{n} 个序列"
+name = "名称"
+name_help = "在命令面板中显示为“序列：<名称>”。"
 id = "Id"
-id_help = "The short name used in config.toml, on the command line and as the shortcut's key: a-z, 0-9, _ and -. Renaming it moves the shortcut with it."
-description = "Description"
-description_help = "Optional, for yourself."
-scope = "Scope"
-scope_help = "Where the sequence is saved and who sees it. This installation: only this install of GitPoulpi. All installations: every install on this computer. This repository only: saved in .gitpoulpi/sequences.toml of the current repository, shared with whoever has it."
-scope_installation = "This installation"
-scope_machine = "All installations on this computer"
-scope_repo = "This repository only"
-shortcut = "Shortcut"
-shortcut_help = "The key that starts this sequence from anywhere in the window. Enter opens the key capture; conflicts are refused like on the Keyboard shortcuts page."
-shortcut_none = "Not set"
-shortcut_clear = "Clear"
-steps_row = "Steps"
+id_help = "在 config.toml、命令行中使用的短名称，也是快捷键的键名：a-z、0-9、_ 和 -。重命名时快捷键会随之移动。"
+description = "描述"
+description_help = "可选，写给你自己。"
+scope = "范围"
+scope_help = "序列保存在哪里、谁能看到。此安装：仅此 GitPoulpi 安装。所有安装：这台电脑上的每个安装。仅此仓库：保存在当前仓库的 .gitpoulpi/sequences.toml 中，与拥有该仓库的人共享。"
+scope_installation = "此安装"
+scope_machine = "这台电脑上的所有安装"
+scope_repo = "仅此仓库"
+shortcut = "快捷键"
+shortcut_help = "在窗口任意位置启动此序列的按键。按 Enter 打开按键捕获；冲突会像在“键盘快捷键”页面一样被拒绝。"
+shortcut_none = "未设置"
+shortcut_clear = "清除"
+steps_row = "步骤"
 # context: button that opens a sequence's list of steps; {n} is how many it has
-steps_edit = "Edit steps ({n})"
-steps_none = "No steps yet"
-run_now = "Run now"
-run_now_help = "Runs the sequence in the current window."
-edit_ai = "✦ Edit with AI..."
-close_steps = "✕ Back to sequences"
+steps_edit = "编辑步骤（{n}）"
+steps_none = "还没有步骤"
+run_now = "立即运行"
+run_now_help = "在当前窗口中运行该序列。"
+edit_ai = "✦ 用 AI 编辑…"
+close_steps = "✕ 返回序列"
 # context: heading over one step's rows; {i} its place, {n} the number of steps, {label} the command's palette name
-step_heading = "Step {i}/{n}: {label}"
-step_does = "What it does"
-pause = "Pause"
-pause_default = "Default"
-pause_always = "Always"
-pause_never = "Never"
-pause_help = "Default: the step stops only when it needs an answer, on its usual dialog. Always: stop before this step and ask to continue. Never: do not stop; the step's options must then give it everything it needs."
-pause_forced_help = "This step always asks before it runs, so Never is not offered."
-pause_unneeded_help = "This step never needs an answer; Always still stops before it."
-opt_name = "Name"
-opt_message = "Message"
-opt_branch = "Branch"
-opt_open_tab = "Open in a new tab"
-opt_label = "Open in entry"
-opt_profile = "AI profile"
-opt_remote = "Remote"
-opt_template_help = "Variables: ${{branch}} ${{date}} ${{time}} ${{n}}"
-opt_required_help = "Needed when Pause is Never."
-opt_unset = "(not set)"
+step_heading = "第 {i}/{n} 步：{label}"
+step_does = "作用"
+pause = "暂停"
+pause_default = "默认"
+pause_always = "总是"
+pause_never = "从不"
+pause_help = "默认：该步骤只在需要回答时才停下，使用它通常的对话框。总是：在此步骤之前停下并询问是否继续。从不：不停下；此时步骤的选项必须提供它所需的一切。"
+pause_forced_help = "此步骤运行前总会询问，因此不提供“从不”。"
+pause_unneeded_help = "此步骤从不需要回答；“总是”仍会在它之前停下。"
+opt_name = "名称"
+opt_message = "消息"
+opt_branch = "分支"
+opt_open_tab = "在新标签页中打开"
+opt_label = "“打开方式”条目"
+opt_profile = "AI 配置"
+opt_remote = "远程"
+opt_template_help = "变量：${{branch}} ${{date}} ${{time}} ${{n}}"
+opt_required_help = "“暂停”为“从不”时必填。"
+opt_unset = "（未设置）"
 # context: shown for a step this version does not know; {run} is its command id
-unknown_step = "Unknown step \"{run}\": kept as it is"
-problems = "Problems"
+unknown_step = "未知步骤“{run}”：保持原样"
+problems = "问题"
 # context: a problem on a step; {n} is its place, {reason} says what is wrong
-step_problem = "Step {n}: {reason}"
-picker_title = "Add a step"
-picker_empty = "No step matches."
-picker_hint = "Type to filter, Enter adds, Esc closes"
-picker_unavailable_pending = "not available yet"
-picker_unavailable_build = "not built in this version"
-picker_unavailable_ai = "turn the AI on first"
-picker_unknown = "not offered by this version"
-saved = "Sequences saved"
-no_config_dir = "No configuration folder: nothing can be saved"
+step_problem = "第 {n} 步：{reason}"
+picker_title = "添加步骤"
+picker_empty = "没有匹配的步骤。"
+picker_hint = "输入以筛选，Enter 添加，Esc 关闭"
+picker_unavailable_pending = "暂不可用"
+picker_unavailable_build = "此版本未内置"
+picker_unavailable_ai = "请先开启 AI"
+picker_unknown = "此版本不提供"
+saved = "序列已保存"
+no_config_dir = "没有配置文件夹：无法保存任何内容"
 # context: refused edit of the id; {id} is what was typed
-id_invalid = "\"{id}\" is not a usable id: use a-z, 0-9, _ and -, starting with a letter or digit"
+id_invalid = "“{id}”不是可用的 id：请使用 a-z、0-9、_ 和 -，并以字母或数字开头"
 # context: refused edit of the id; {id} is the id already in use
-id_taken = "Another sequence already uses the id \"{id}\""
-no_repo = "This folder is not a repository: a repository sequence needs one"
+id_taken = "另一个序列已经使用 id “{id}”"
+no_repo = "此文件夹不是仓库：仓库序列需要一个仓库"
 # context: shown when a sequence cannot run; {reason} says why
-cannot_run = "Cannot run: {reason}"
+cannot_run = "无法运行：{reason}"
 # context: a refused write; {error} is the reason
-write_failed = "Sequences: {error}"
-shortcut_repo_untrusted_help = "A repository sequence gets a shortcut once you trust this repository's sequences."
+write_failed = "序列：{error}"
+shortcut_repo_untrusted_help = "信任此仓库的序列后，仓库序列才能拥有快捷键。"
 
 # The Log's author filter: the funnel in the Author header and its popup.
 [author_filter]
-title = "Filter by author"
-placeholder = "filter by author"
-clear = "Clear filter"
-empty = "No author matches"
-hint = "Enter toggle  Up/Down move  Esc close"
-tip_off = "Filter the Log by author"
-tip_on = "Author filter ({count}):"
-note_one = "Author: {name}"
-note_many = "Authors: {name} +{more}"
-status_on = "Author filter: {count} chosen"
-status_cleared = "Author filter cleared"
-status_none = "No author filter to clear"
-help = "Filter the Log by author: dims the other authors like a search does"
+title = "按作者筛选"
+placeholder = "按作者筛选"
+clear = "清除筛选"
+empty = "没有匹配的作者"
+hint = "Enter 切换  Up/Down 移动  Esc 关闭"
+tip_off = "按作者筛选 Log"
+tip_on = "作者筛选（{count}）："
+note_one = "作者：{name}"
+note_many = "作者：{name} +{more}"
+status_on = "作者筛选：已选 {count} 位"
+status_cleared = "已清除作者筛选"
+status_none = "没有可清除的作者筛选"
+help = "按作者筛选 Log：像搜索一样淡化其他作者"

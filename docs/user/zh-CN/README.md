@@ -28,6 +28,7 @@ GitPoulpi 是一个终端 Git 客户端，拥有可点击的 commit 图、命令
 | 以 Markdown 笔记保存议题，无需令牌 | [本地议题与 Obsidian](local-issues.md) | ISSUES 分区，提供方为 `本地 Markdown - <名称>`；命令面板 **本地议题：在 Obsidian 中打开…** |
 | 跨多个 commit 重写作者、日期、消息或文件 | [重写历史](history-rewrite.md) | `Ctrl+G Shift+H`；命令面板 **重写：历史工作台** |
 | 撤销（或重做）一次操作 | [撤销与重做](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`；`Alt+Z` 打开撤销历史；命令面板 **编辑：撤销** |
+| 用一个键运行多个操作（stage、AI 消息、commit、push 等） | [序列](sequences.md) | 设置 > 序列；命令面板 **序列：<名称>** |
 | 用 Git LFS 跟踪大文件 | [Git LFS](lfs.md) | 命令面板 **LFS：跟踪模式…**、**LFS：为此仓库初始化** |
 | 跨仓库查找分支、commit、pull request 或议题 | [搜索](search.md) | `Ctrl+Alt+F`，或标题栏中的全局搜索按钮；`f` 搜索当前仓库的 commit 图 |
 | 在一个列表中看到所有需要我处理的事 | [Radar](radar.md) | `Alt+R`；命令面板 **Radar：打开** |

@@ -178,6 +178,7 @@ fn the_custom_filter_lists_only_the_users_themes_by_click_and_by_key() {
         .wait_for("the Custom button", STEP, |s| s.find(" Custom ").is_some())
         .unwrap_or_else(|e| panic!("{e}"));
     let (col, row) = screen.find(" Custom ").unwrap();
+    assert!(term.text().contains("Alt+1-5"), "{}", term.text());
     // The mouse: only the custom theme is left.
     term.click(col + 2, row).unwrap();
     term.wait_for("only My Own", STEP, |s| {
@@ -211,6 +212,7 @@ fn without_custom_themes_there_is_no_custom_button_or_key() {
     term.wait_for("the Colored button", STEP, |s| s.contains(" Colored "))
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(!term.text().contains(" Custom "), "{}", term.text());
+    assert!(term.text().contains("Alt+1-4"), "{}", term.text());
     term.send_keys("M-5").unwrap();
     std::thread::sleep(Duration::from_millis(500));
     assert!(

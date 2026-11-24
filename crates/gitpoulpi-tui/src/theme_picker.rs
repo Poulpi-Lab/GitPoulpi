@@ -227,6 +227,13 @@ impl ThemePicker {
             .collect()
     }
 
+    /// The hint band, with the real Alt+digit range: one key per visible
+    /// filter button (Custom adds the fifth).
+    pub(crate) fn hint(&self) -> String {
+        let keys = format!("Alt+1-{}", self.visible_filters().len());
+        msg::overlays::theme_picker_hint(&keys)
+    }
+
     /// The filter in force: Custom falls back to All once no custom theme
     /// is left.
     pub(crate) fn active_filter(&self) -> ThemeFilter {
@@ -321,6 +328,7 @@ pub(crate) fn render(
             chips: &c.chips,
         })
         .collect();
+    let hint = picker.hint();
     let view = PickerView {
         field: crate::modes::MainField::ThemePicker,
         win: "picker_theme",
@@ -328,7 +336,7 @@ pub(crate) fn render(
         draft: &picker.draft,
         selected: picker.selected,
         empty: msg::overlays::NO_MATCHING_THEME.get(),
-        hint: msg::overlays::THEME_PICKER_HINT.get(),
+        hint: &hint,
         segments: Some((
             visible.iter().map(|f| f.label()).collect(),
             visible
@@ -468,6 +476,18 @@ mod tests {
             ThemeFilter::Colored.next_in(&visible, false),
             ThemeFilter::All
         );
+    }
+
+    #[test]
+    fn hint_shows_the_real_alt_digit_range() {
+        let mut picker = ThemePicker::with_parts("dark".into(), Vec::new(), None);
+        assert!(picker.hint().contains("Alt+1-4"), "{}", picker.hint());
+        picker.all.push(ThemeChoice {
+            custom: true,
+            ..picker.all[0].clone()
+        });
+        assert!(picker.hint().contains("Alt+1-5"), "{}", picker.hint());
+        assert!(!picker.hint().contains("{keys}"));
     }
 
     #[test]

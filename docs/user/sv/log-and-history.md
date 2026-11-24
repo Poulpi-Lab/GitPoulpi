@@ -94,7 +94,8 @@ namn och e-postadresser och skriver `.mailmap`-rader åt dig, se
   eller palettens *Log: Filtrera efter författare...*): förfiltrerar Log efter
   vem som skrivit commits. En popup hänger under rubriken med ett sökfält, en
   rad **Rensa filter** (✕) och en rad per författare i den inlästa historiken:
-  en bricka med initialer (avataren, när `ui.avatars` inte är av), namnet och
+  en avatar (när `ui.avatars` inte är av: författarens bild där terminalen ritar bilder och bilden är klar,
+  initialbrickan tills dess och på andra terminaler), namnet och
   e-postadressen nedtonad efter det, flest commits först och sedan efter namn.
   Att skriva snävar in listan med palettens fuzzy-matchning; `Enter` eller ett
   klick växlar den markerade författaren (en bock; välj så många du vill),
@@ -108,7 +109,10 @@ namn och e-postadresser och skriver `.mailmap`-rader åt dig, se
   kolumnen Författare är dold eller för smal för tratten säger Logs övre kant
   *Författare: Alice Example +1* i stället (tangenten och paletten fungerar
   fortfarande). För att ta bort det: raden **Rensa filter**, ett högerklick på
-  den upplysta tratten eller palettens *Log: Rensa författarfilter*.
+  den upplysta tratten, palettens *Log: Rensa författarfilter* eller
+  `Esc` i Log (efter en markering, som `Esc` tar bort först; i popupen tömmer `Esc` först
+  sökfältet, stänger sedan popupen och behåller filtret).
+  Medan det är på flyttar Upp/Ned (och PageUp/PageDown, Home/End) markeringen bara mellan de upplysta commits och hoppar över de nedtonade; ett klick markerar fortfarande vilken rad som helst.
   Författarna är de som hör till commits Log har läst in (mailmap tillämpad,
   som i kolumnen), och filtret kommer ihåg per repository, över flikbyten och
   omstarter. En textsökning kommer inte ihåg, filtret gör det.

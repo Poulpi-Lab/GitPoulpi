@@ -135,6 +135,9 @@ impl Snooze {
 pub struct RadarColumns {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub repo: Option<u16>,
+    /// The branches column (`source -> target`) right after the repository.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub branches: Option<u16>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub number: Option<u16>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -393,5 +396,19 @@ mod tests {
         let off: RadarState =
             toml::from_str("show_not_cloned = false\nshow_drafts = true\n").unwrap();
         assert!(!off.show_not_cloned && off.show_drafts);
+    }
+
+    #[test]
+    fn the_branches_width_loads_when_present_and_old_files_load_unchanged() {
+        let old: RadarState =
+            toml::from_str("[columns]\nrepo = 20\nnumber = 5\nauthor = 9\nage = 4\n").unwrap();
+        assert_eq!(old.columns.branches, None);
+        assert_eq!(old.columns.repo, Some(20));
+        let new: RadarState = toml::from_str("[columns]\nbranches = 31\n").unwrap();
+        assert_eq!(new.columns.branches, Some(31));
+        assert!(!new.columns.is_auto());
+        let text = toml::to_string(&new).unwrap();
+        assert!(text.contains("branches = 31"), "{text}");
+        assert!(!toml::to_string(&old).unwrap().contains("branches"));
     }
 }

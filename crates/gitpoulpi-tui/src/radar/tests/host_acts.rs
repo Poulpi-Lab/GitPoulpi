@@ -6,8 +6,8 @@
 use super::*;
 use crate::radar::account::{AccountAnswer, CloneIndex};
 use crate::radar::host_acts::why_not;
-use crate::radar::render::plan_title;
 use crate::radar::worker::Setup;
+use crate::radar::Cell;
 use gitpoulpi_hosting::account::{AccountIssue, AccountItems, AccountPr};
 
 fn far(n: u64, title: &str) -> AccountPr {
@@ -119,33 +119,108 @@ fn a_request_names_its_branches_and_a_fork_its_owner() {
     assert_eq!(bare.branches_text(), "", "missing data shows nothing");
 }
 
+/// The column of `needle` in `line`, in cells (the screen has no wide glyphs here).
+fn col(line: &str, needle: &str) -> usize {
+    let at = line
+        .find(needle)
+        .unwrap_or_else(|| panic!("{needle} in {line}"));
+    line[..at].chars().count()
+}
+
 #[test]
-fn the_branches_share_the_title_room_and_leave_a_narrow_row_alone() {
-    // Everything fits.
-    assert_eq!(plan_title(60, 20, 18), (20, 18));
-    // The branches are cut before the title is: a third of the room, at
-    // least twelve cells.
-    let (title, branches) = plan_title(60, 50, 40);
-    assert_eq!(branches, 20.min(60 - title - 2));
+fn the_branches_column_follows_the_repository_and_holds_the_branches_at_every_width() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut ui = ui_with(dir.path(), vec![far(20, "Add login")], None, github());
+    for width in 70u16..=200 {
+        let text = screen(&mut ui, width, 30);
+        let header = text.lines().find(|l| l.contains("Repository")).unwrap();
+        assert!(
+            col(header, "Repository") < col(header, "Branches")
+                && col(header, "Branches") < col(header, "Title"),
+            "{width}: {header}"
+        );
+        let row = text.lines().find(|l| l.contains("Add")).unwrap();
+        // Under its header, before the title, never after it.
+        let cell = col(header, "Branches");
+        let under: String = row.chars().skip(cell).take(8).collect();
+        assert!(
+            under.starts_with("feat"),
+            "{width}: {under:?}\n{header}\n{row}"
+        );
+        assert!(cell < col(row, "Add"), "{width}: {row}");
+        // The issue's cell stays empty.
+        let issue = text.lines().find(|l| l.contains("Crash on")).unwrap();
+        let blank: String = issue.chars().skip(cell).take(8).collect();
+        assert!(blank.trim().is_empty(), "{width}: {blank:?}");
+    }
+}
+
+#[test]
+fn the_branches_are_whole_when_wide_and_cut_with_the_target_kept_when_narrower() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut ui = ui_with(dir.path(), vec![far(20, "Add login")], None, github());
+    let wide = screen(&mut ui, 200, 30);
+    assert!(wide.contains("feature/login \u{2192} main"), "{wide}");
+    ui.state.columns.branches = Some(12);
+    let text = screen(&mut ui, 200, 30);
+    let row = text.lines().find(|l| l.contains("Add login")).unwrap();
     assert!(
-        title + 2 + branches <= 60 && branches >= 12,
-        "{title} {branches}"
+        row.contains("\u{2026} \u{2192} main") || row.contains("\u{2192} main"),
+        "{row}"
     );
-    // A short title leaves the branches what it does not use.
-    let (title, branches) = plan_title(60, 10, 70);
-    assert_eq!(title, 10);
-    assert_eq!(branches, 48);
-    // Narrow: the branches are cut, never dropped.
-    let (title, branches) = plan_title(39, 20, 18);
-    assert!(
-        branches >= 8 && title + 2 + branches <= 39,
-        "{title} {branches}"
-    );
-    let (title, branches) = plan_title(24, 30, 18);
-    assert!(branches >= 8 && title >= 4, "{title} {branches}");
-    // Only a room too small for both is the title's alone. None: the title only.
-    assert_eq!(plan_title(12, 20, 18), (12, 0));
-    assert_eq!(plan_title(80, 20, 0), (80, 0));
+    assert!(!row.contains("feature/login"), "{row}");
+    assert_eq!(ui.col_eff[4], 12);
+    assert!(ui
+        .hits
+        .iter()
+        .any(|(_, h)| matches!(h, Hit::Cut(_, Cell::Branches))));
+}
+
+#[test]
+fn a_window_too_narrow_for_the_column_keeps_the_branches_in_the_title_tooltip() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut ui = ui_with(dir.path(), vec![far(20, "Add login")], None, github());
+    let mut hidden_seen = false;
+    for width in 40u16..=120 {
+        let text = screen(&mut ui, width, 30);
+        let header = text.lines().find(|l| l.contains("Repository")).unwrap();
+        if !header.contains("Branches") && !text.contains("feature") {
+            hidden_seen = true;
+            assert!(
+                ui.hits
+                    .iter()
+                    .any(|(_, h)| matches!(h, Hit::Cut(_, Cell::Title))),
+                "{width}: no tooltip for the hidden branches"
+            );
+        }
+    }
+    assert!(hidden_seen, "a very narrow window drops the column");
+    // The tooltip text carries them.
+    let item = ui.board.items.iter().find(|i| i.number == 20).unwrap();
+    assert!(RadarUi::cut_text(item, Cell::Title).contains("feature/login \u{2192} main"));
+}
+
+#[test]
+fn the_branches_column_is_picked_after_the_repository_and_sized_by_keys() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut ui = ui_with(dir.path(), vec![far(20, "Add login")], None, github());
+    screen(&mut ui, 160, 30);
+    ui.column_command(ColumnCmd::Pick);
+    assert_eq!(ui.col_pick, Some(Cell::Repo));
+    ui.column_command(ColumnCmd::Pick);
+    assert_eq!(ui.col_pick, Some(Cell::Branches));
+    screen(&mut ui, 160, 30);
+    let before = ui.col_eff[4];
+    ui.column_command(ColumnCmd::Narrower);
+    assert!(ui.state.columns.branches.is_some());
+    assert_eq!(ui.col_eff[4], before - 2);
+    screen(&mut ui, 160, 30);
+    assert!(ui
+        .hits
+        .iter()
+        .any(|(_, h)| *h == Hit::Divider(Cell::Branches)));
+    ui.column_command(ColumnCmd::Reset);
+    assert_eq!(ui.state.columns.branches, None);
 }
 
 #[test]
@@ -308,7 +383,21 @@ fn wide_sized_columns_do_not_push_the_branches_off_the_row() {
             .lines()
             .find(|l| l.contains("Add login"))
             .unwrap_or_else(|| panic!("title gone at {width}\n{text}"));
-        assert!(row.contains("feature/"), "branches gone at {width}: {row}");
+        assert!(
+            row.contains("\u{2192} main"),
+            "branches gone at {width}: {row}"
+        );
+        let header = text.lines().find(|l| l.contains("Repository")).unwrap();
+        assert!(
+            header.contains("Branches") && header.contains("Title"),
+            "{header}"
+        );
+        if width >= 140 {
+            assert!(
+                row.contains("feature/login \u{2192} main"),
+                "{width}: {row}"
+            );
+        }
     }
 }
 

@@ -456,12 +456,12 @@ pub(crate) struct RadarUi {
     col_drag: Option<columns::Drag>,
     /// The last paint's repository / author widths and the repository
     /// column's limit.
-    col_eff: [usize; 4],
+    col_eff: [usize; 5],
     /// What each sizable column needs to show every row whole (same slots as
     /// `col_eff`), measured by the last paint: what a fit reads.
-    col_content: [usize; 4],
+    col_content: [usize; 5],
     /// What each sizable column measures when the user has not sized it.
-    col_auto: [usize; 4],
+    col_auto: [usize; 5],
     repo_max: usize,
     message: Option<String>,
     /// The `Ctrl+N` prefix hint, set each frame by the event loop.
@@ -571,9 +571,9 @@ impl RadarUi {
             hover_pos: (0, 0),
             col_pick: None,
             col_drag: None,
-            col_eff: [0; 4],
-            col_content: [0; 4],
-            col_auto: [0; 4],
+            col_eff: [0; 5],
+            col_content: [0; 5],
+            col_auto: [0; 5],
             repo_max: columns::MAX_WIDTH,
             message: None,
             mode_hint: None,

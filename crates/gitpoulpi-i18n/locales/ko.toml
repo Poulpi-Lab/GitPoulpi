@@ -1731,6 +1731,8 @@ column_repository = "저장소"
 column_author = "작성자"
 column_title = "제목"
 column_age = "경과"
+# context: name of a Radar list column the keys can size: the source and target branches of a request (source to target)
+column_branches = "Branches"
 # context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
 column_actions = "동작"
 # context: short button on a Radar row: starts the review of the request; keep it to one word

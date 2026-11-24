@@ -1,4 +1,4 @@
-//! The Radar's sizable columns: the repository chip, the `#`, the author and the age. Widths
+//! The Radar's sizable columns: the repository chip, the branches, the `#`, the author and the age. Widths
 //! are automatic (fitted to the content, within a cap) until the user sizes a
 //! column: by dragging its separator (double-click fits it again) or by key
 //! (`C` picks, `[` / `]` size by the Log's own `KEY_STEP`, `0` resets), and
@@ -20,6 +20,8 @@ const AUTO_REPO_CAP: usize = 40;
 const MAX_NUM_WIDTH: usize = 24;
 /// What the automatic author width stops at.
 const AUTO_AUTHOR_CAP: usize = 14;
+/// What the automatic branches width stops at.
+const AUTO_BRANCHES_CAP: usize = 28;
 /// Cells kept for the number, title and age beside a sized repository column.
 const KEEP_FOR_TITLE: usize = 36;
 
@@ -61,6 +63,40 @@ pub(crate) fn author_width(content: usize, set: Option<u16>) -> usize {
         Some(w) => (w as usize).clamp(MIN_WIDTH, MAX_WIDTH),
         None => content.min(AUTO_AUTHOR_CAP),
     }
+}
+
+/// The branches column's width (0 = no request names its branches).
+pub(crate) fn branches_width(content: usize, set: Option<u16>) -> usize {
+    match set {
+        Some(w) if content > 0 => (w as usize).clamp(MIN_WIDTH, MAX_WIDTH),
+        _ => content.min(AUTO_BRANCHES_CAP),
+    }
+}
+
+/// A request's `source -> target` cut to `width` cells: the target stays whole
+/// while the source gives way (an ellipsis), the target is cut only when the
+/// source cannot keep three cells. Padded to `width`.
+pub(crate) fn fit_branches(source: &str, target: Option<&str>, width: usize) -> String {
+    const ARROW: &str = " \u{2192} ";
+    let Some(target) = target else {
+        return fit_pad(source, width);
+    };
+    let whole = format!("{source}{ARROW}{target}");
+    if crate::display_width(&whole) <= width {
+        return fit_pad(&whole, width);
+    }
+    let arrow = crate::display_width(ARROW);
+    let target_w = crate::display_width(target);
+    if width >= target_w + arrow + 3 {
+        let cut = crate::fit(source, width - target_w - arrow);
+        return fit_pad(&format!("{cut}{ARROW}{target}"), width);
+    }
+    // No room for a source worth reading: a lone ellipsis, then the target.
+    if width >= arrow + 2 {
+        let cut = crate::fit(target, width - arrow - 1);
+        return fit_pad(&format!("\u{2026}{ARROW}{cut}"), width);
+    }
+    fit_pad(&whole, width)
 }
 
 /// The age column's width (0 = no age on any row).
@@ -115,6 +151,7 @@ impl SizedColumn {
     pub(super) fn of(cell: Cell) -> Self {
         match cell {
             Cell::Num => SizedColumn::Num,
+            Cell::Branches => SizedColumn::Branches,
             Cell::Author => SizedColumn::Author,
             Cell::Age => SizedColumn::Age,
             _ => SizedColumn::Repo,
@@ -124,6 +161,7 @@ impl SizedColumn {
     pub(super) fn cell(self) -> Cell {
         match self {
             SizedColumn::Repo => Cell::Repo,
+            SizedColumn::Branches => Cell::Branches,
             SizedColumn::Num => Cell::Num,
             SizedColumn::Author => Cell::Author,
             SizedColumn::Age => Cell::Age,
@@ -138,6 +176,7 @@ impl RadarUi {
             Cell::Author => Some(1),
             Cell::Num => Some(2),
             Cell::Age => Some(3),
+            Cell::Branches => Some(4),
             _ => None,
         }
     }
@@ -147,6 +186,7 @@ impl RadarUi {
             Cell::Author => msg::radar::COLUMN_AUTHOR.get(),
             Cell::Num => "#",
             Cell::Age => msg::radar::COLUMN_AGE.get(),
+            Cell::Branches => msg::radar::COLUMN_BRANCHES.get(),
             _ => msg::radar::COLUMN_REPOSITORY.get(),
         }
     }
@@ -168,6 +208,7 @@ impl RadarUi {
             Cell::Author => self.state.columns.author = value,
             Cell::Age => self.state.columns.age = value,
             Cell::Num => self.state.columns.number = value,
+            Cell::Branches => self.state.columns.branches = value,
             _ => {}
         }
     }
@@ -180,7 +221,13 @@ impl RadarUi {
     pub(super) fn column_command(&mut self, cmd: ColumnCmd) -> Outcome {
         let step = usize::from(KEY_STEP);
         // Left to right on screen; a column with no width (no `#`, no author) is skipped.
-        let order = [Cell::Repo, Cell::Num, Cell::Author, Cell::Age];
+        let order = [
+            Cell::Repo,
+            Cell::Branches,
+            Cell::Num,
+            Cell::Author,
+            Cell::Age,
+        ];
         let picked = self.col_pick.filter(|c| Self::slot(*c).is_some());
         match cmd {
             ColumnCmd::Pick => {
@@ -258,7 +305,13 @@ impl RadarUi {
 
     /// Fits every sizable column to its content.
     pub(super) fn fit_all_columns(&mut self) -> Outcome {
-        for cell in [Cell::Repo, Cell::Num, Cell::Author, Cell::Age] {
+        for cell in [
+            Cell::Repo,
+            Cell::Branches,
+            Cell::Num,
+            Cell::Author,
+            Cell::Age,
+        ] {
             let Some(slot) = Self::slot(cell) else {
                 continue;
             };
@@ -379,6 +432,7 @@ impl RadarUi {
         match cell {
             Cell::Repo if !item.project.is_empty() => item.project.clone(),
             Cell::Repo => item.repo_name.clone(),
+            // A title whose Branches column is hidden or cut still has them.
             Cell::Title => match item.branches_text() {
                 b if b.is_empty() => super::render::row_title(item),
                 b => format!("{} ({b})", super::render::row_title(item)),
@@ -395,6 +449,39 @@ impl RadarUi {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn branches_are_cut_target_first_kept_then_source_then_target() {
+        let cut = |w| fit_branches("feature/login-form", Some("main"), w);
+        assert_eq!(cut(40).trim_end(), "feature/login-form \u{2192} main");
+        assert_eq!(crate::display_width(&cut(40)), 40);
+        let c = cut(15);
+        assert!(c.ends_with("\u{2192} main"), "{c}");
+        assert!(c.contains('\u{2026}'), "{c}");
+        assert_eq!(crate::display_width(&c), 15);
+        // No room for a source: an ellipsis and the target.
+        let c = cut(8);
+        assert!(c.starts_with('\u{2026}') && c.contains("\u{2192}"), "{c}");
+        assert_eq!(crate::display_width(&c), 8);
+        assert_eq!(
+            fit_branches("alice:feature/x", None, 6).trim_end(),
+            "alice\u{2026}"
+        );
+        for w in 1..30 {
+            assert_eq!(crate::display_width(&cut(w)), w, "{w}");
+        }
+    }
+
+    #[test]
+    fn the_branches_width_is_automatic_capped_or_sized_and_absent_without_content() {
+        assert_eq!(branches_width(0, Some(20)), 0);
+        assert_eq!(branches_width(0, None), 0);
+        assert_eq!(branches_width(50, None), AUTO_BRANCHES_CAP);
+        assert_eq!(branches_width(12, None), 12);
+        assert_eq!(branches_width(12, Some(30)), 30);
+        assert_eq!(branches_width(12, Some(0)), 1);
+        assert_eq!(branches_width(12, Some(500)), MAX_WIDTH);
+    }
 
     #[test]
     fn the_repository_column_fits_its_content_within_a_cap() {

@@ -147,22 +147,26 @@ impl Item {
     /// fork's; empty when the host did not say. A missing target leaves the
     /// source alone, a missing source leaves nothing.
     pub(crate) fn branches_text(&self) -> String {
-        if self.kind != ItemKind::Pr {
-            return String::new();
+        match self.branches_parts() {
+            Some((source, Some(target))) => format!("{source} \u{2192} {target}"),
+            Some((source, None)) => source,
+            None => String::new(),
         }
-        let Some(source) = self.branch.as_deref().filter(|b| !b.is_empty()) else {
-            return String::new();
-        };
+    }
+
+    /// The branches as `(source, target)` (the source is `owner:branch` for a
+    /// fork's); `None` for anything but a request that names its source.
+    pub(crate) fn branches_parts(&self) -> Option<(String, Option<String>)> {
+        if self.kind != ItemKind::Pr {
+            return None;
+        }
+        let source = self.branch.as_deref().filter(|b| !b.is_empty())?;
         let source = if self.fork_owner.is_empty() {
             source.to_string()
         } else {
             format!("{}:{source}", self.fork_owner)
         };
-        if self.target.is_empty() {
-            source
-        } else {
-            format!("{source} \u{2192} {}", self.target)
-        }
+        Some((source, Some(self.target.clone()).filter(|t| !t.is_empty())))
     }
 
     /// What "until it changes" watches: the host's `updated_at`, or the WIP

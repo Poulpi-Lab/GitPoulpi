@@ -821,6 +821,10 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Radar：延后… | `z` |
 | Radar：评审请求… | `e` |
 | Radar：打开议题对话 | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar：通过 API 评审 |  |
 | Radar：克隆并评审… |  |
 | Radar：编辑指派人… |  |

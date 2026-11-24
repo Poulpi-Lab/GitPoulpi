@@ -1844,6 +1844,62 @@ scope_unset = "{name} (à définir dans les Paramètres)"
 note_unlinked = "non lié : seul son travail en cours est affiché"
 # context: status line of a folder scope: how many of its repositories are not linked to a host
 status_unlinked = { one = "{n} non lié (travail en cours seulement)", other = "{n} non liés (travail en cours seulement)" }
+# context: menu label and tooltip of a Radar request: merges it on the host, after a confirmation
+act_merge = "{$Merge}..."
+# context: menu label and tooltip of a Radar request or issue: closes it on the host, after a confirmation
+act_close = "Fermer..."
+# context: menu label and tooltip of a draft Radar request: takes it out of draft on the host
+act_ready = "Marquer comme prête"
+# context: menu label and tooltip of a Radar row whose repository is not cloned: opens the Clone dialog
+act_clone = "Cloner le dépôt..."
+# context: button of the Radar merge / close confirmation
+confirm_cancel = "Annuler"
+# context: button of the Radar close confirmation
+confirm_close = "La fermer"
+# context: button of the Radar merge confirmation: a merge commit
+method_merge = "{$Commit} de {$merge}"
+# context: button of the Radar merge confirmation: squash the commits, then merge
+method_squash = "Squash puis {$merge}"
+# context: button of the Radar merge confirmation: rebase the commits, then merge
+method_rebase = "{$Rebase} puis {$merge}"
+# context: title of the Radar merge confirmation; {label} is `!53` or `#12`
+merge_title = "{$Merge} {label}"
+# context: body of the Radar merge confirmation; {project} is `owner/name`, {branches} is `source → target`
+merge_body = "{title}\n{project}  {branches}\n\nL'hébergeur va la {$merge} avec la méthode choisie. Cela modifie l'hébergeur et ne peut pas être annulé depuis GitPoulpi."
+# context: title of the Radar close confirmation; {label} is `!53` or `#12`
+close_title = "Fermer {label}"
+# context: body of the Radar close confirmation for a request
+close_body = "{title}\n{project}  {branches}\n\nL'hébergeur la ferme sans {$merge}. Cela modifie l'hébergeur et ne peut pas être annulé depuis GitPoulpi (rouvrez-la sur l'hébergeur)."
+# context: body of the Radar close confirmation for an issue
+close_issue_body = "{title}\n{project}\n\nL'hébergeur ferme le ticket. Cela modifie l'hébergeur et ne peut pas être annulé depuis GitPoulpi (rouvrez-le sur l'hébergeur)."
+# context: why a Radar host action is refused
+why_no_host = "Cette ligne n'a pas de compte d'hébergeur sur lequel agir"
+# context: why a Radar host action is refused; {host} is the provider name
+why_not_supported = "Non pris en charge par {host}"
+# context: why Radar Merge is refused
+why_merge_draft = "C'est un brouillon : marquez-la d'abord comme prête"
+# context: why Radar Merge is refused; {target} is a branch
+why_merge_conflicts = "Elle est en conflit avec {target}"
+# context: why Radar Merge is refused
+why_merge_checks = "Ses vérifications échouent"
+# context: why Radar Mark as ready is refused
+why_not_draft = "Ce n'est pas un brouillon"
+# context: why Radar Clone is refused; {path} is a folder
+why_already_cloned = "Déjà cloné dans {path}"
+# context: status line of the Radar
+msg_host_busy = "L'hébergeur répond encore à la dernière action"
+# context: status line of the Radar while a host action runs
+msg_asking_host = "Demande à l'hébergeur..."
+# context: status line of the Radar after a merge; {label} is `!53`
+msg_merged = "{label} : {$merge} effectué sur l'hébergeur"
+# context: status line of the Radar after a close
+msg_closed = "{label} fermé sur l'hébergeur"
+# context: status line of the Radar after Mark as ready
+msg_ready = "{label} est prête pour la relecture"
+# context: status line of the Radar when a host action failed
+msg_host_failed = "{label} : l'hébergeur a refusé ou échoué : {why}"
+# context: note under the Clone dialog opened from a Radar row
+msg_clone_note = "Clone de {project}. Le Radar le retrouve à sa prochaine ouverture."
 
 [hosting_task]
 view_open = "Ouvertes"
@@ -3739,6 +3795,14 @@ radar_review = "Radar : Relire la {$pr}..."
 radar_review_api = "Radar : Relire via l'API"
 # context: command palette entry: opens the Clone dialog for the selected Radar request, then its review
 radar_clone_review = "Radar : Cloner et relire..."
+# context: command palette entry: merges the selected Radar request on the host
+radar_merge = "Radar : {$Merge} la {$pr}..."
+# context: command palette entry: closes the selected Radar request or issue on the host
+radar_close = "Radar : Fermer..."
+# context: command palette entry: takes the selected Radar draft out of draft
+radar_ready = "Radar : Marquer comme prête"
+# context: command palette entry: opens the Clone dialog for the selected Radar row
+radar_clone = "Radar : Cloner le dépôt..."
 # context: command palette entry: toggles the Not cloned checkbox of the Radar
 radar_not_cloned = "Radar : Afficher les demandes non clonées"
 # context: command palette entry: toggles the Drafts checkbox of the Radar

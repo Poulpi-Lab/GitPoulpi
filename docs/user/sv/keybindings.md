@@ -857,6 +857,10 @@ Tangenterna är standardvärdena.
 | Radar: Snooza... | `z` |
 | Radar: Granska begäran... | `e` |
 | Radar: Öppna ärendekonversation | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: Granska via API:et |  |
 | Radar: Klona och granska... |  |
 | Radar: Redigera tilldelade... |  |

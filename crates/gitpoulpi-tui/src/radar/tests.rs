@@ -386,7 +386,8 @@ fn review_opens_the_repository_and_carries_the_request_where_the_host_takes_revi
             tool,
             Some(Pending::Review {
                 number: 3,
-                repo: None
+                repo: None,
+                link: None
             })
         )
     );
@@ -780,6 +781,7 @@ mod account;
 mod columns;
 #[cfg(feature = "conversation")]
 mod conversation;
+mod host_acts;
 mod resize;
 #[cfg(feature = "review")]
 mod review;

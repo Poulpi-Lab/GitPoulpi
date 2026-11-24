@@ -192,7 +192,8 @@ fn the_mode_answers_for_a_known_clone_too() {
             clone.clone(),
             Some(Pending::Review {
                 number: 20,
-                repo: None
+                repo: None,
+                link: Some(("gh".into(), "acme/far".into()))
             })
         )
     );
@@ -210,7 +211,8 @@ fn the_mode_answers_for_a_known_clone_too() {
             clone,
             Some(Pending::Review {
                 number: 20,
-                repo: None
+                repo: None,
+                link: Some(("gh".into(), "acme/far".into()))
             })
         )
     );

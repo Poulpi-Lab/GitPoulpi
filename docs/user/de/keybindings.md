@@ -850,6 +850,10 @@ die Standardtasten.
 | Radar: Zurückstellen... | `z` |
 | Radar: Anfrage prüfen... | `e` |
 | Radar: Issue-Unterhaltung öffnen | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: Über die API prüfen |  |
 | Radar: Klonen und prüfen... |  |
 | Radar: Zugewiesene bearbeiten... |  |

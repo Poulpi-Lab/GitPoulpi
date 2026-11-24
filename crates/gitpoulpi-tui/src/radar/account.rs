@@ -219,6 +219,16 @@ pub(crate) fn items(input: &AccountInput, scope_items: &[Item]) -> Vec<Item> {
                 checks: pr.checks,
                 has_conflicts: pr.has_conflicts,
                 mentioned: false,
+                host_id: answer.id.clone(),
+                host_project: row.project.clone(),
+                host_label: answer.kind.label().to_string(),
+                acts: gitpoulpi_hosting::request_actions(answer.kind),
+                fork_owner: pr
+                    .source_project
+                    .as_deref()
+                    .and_then(|p| p.split('/').next())
+                    .unwrap_or_default()
+                    .to_string(),
             });
         }
         for row in &answer.items.issues {
@@ -267,6 +277,11 @@ pub(crate) fn items(input: &AccountInput, scope_items: &[Item]) -> Vec<Item> {
                 checks: None,
                 has_conflicts: None,
                 mentioned: false,
+                host_id: answer.id.clone(),
+                host_project: row.project.clone(),
+                host_label: answer.kind.label().to_string(),
+                acts: gitpoulpi_hosting::request_actions(answer.kind),
+                fork_owner: String::new(),
             });
         }
     }

@@ -14,7 +14,8 @@ A repository that is not linked is never asked: it shows a **Link...** line inst
 ![The Radar over two repositories: a pinned request, then Needs my review, My pull requests, Assigned to me, issues and work in progress](images/radar.png)
 
 **Review...** on a pull or merge request row (or `e`) opens the repository with the request's in-app review
-([Reviewing a pull request](review.md)).
+([Reviewing a pull request](review.md)). For a request of a repository you cloned but never linked to the host, the clone is
+linked to the request's project first (unless it already has its own pull request link), so the review starts in its tab.
 
 ### The Actions column
 
@@ -22,9 +23,9 @@ At the right of a request or issue row, small buttons do what a key does on the 
 runs the action; rest the pointer on a button for its name and key):
 
 ```
-Wide:    #58  Round invoice totals            alice   2d   Review  [globe]  [talk]  ⋮
-Narrow:  #58  Round invoice totals                         [rev]  [globe]  [talk]  ⋮
-Issue:   #12  Crash on empty list             bob     5h   Start work  [globe]  [talk]  ⋮
+Wide:    #58  Round invoice totals  feature/login → main   alice   2d   Review  [globe]  [talk]  ⊕  ×  ⇣  ⋮
+Narrow:  #58  Round invoice totals  feature/login → main                 [rev]  [globe]  [talk]  ⋮
+Issue:   #12  Crash on empty list                         bob     5h   Start work  [globe]  [talk]  ×  ⋮
 ```
 
 | Button | Key | Palette |
@@ -33,10 +34,43 @@ Issue:   #12  Crash on empty list             bob     5h   Start work  [globe]  
 | **Start work** (a cloned issue) | `n` | `Radar: Start Work on Issue...` |
 | the globe: open the page on the host | `o` | `Radar: Open in Browser` |
 | the lines glyph: open the conversation | `i` | `Radar: Open Issue Conversation` |
+| `»` **Mark as ready** (a draft request) | `y` | `Radar: Mark as Ready` |
+| `⊕` **Merge** (a request) | `m` | `Radar: Merge Request...` |
+| `×` **Close** (a request or an issue) | `x` | `Radar: Close...` |
+| `⇣` **Clone** (a row whose repository is not cloned) | `g` | `Radar: Clone Repository...` |
 
 A row without an action leaves its cell empty, so each button stays in the same column on every row. When the window is
-narrow the Review and Start work words become glyphs before any other column disappears. The column is automatic (it is not
+narrow the Review and Start work words become glyphs before any other column disappears; the Ready, Merge, Close and Clone
+buttons leave the column before the title does, but stay in the row menu (`⋮`, right-click, or `Shift+F10`), where an action
+that cannot run is grayed with its reason. The column is automatic (it is not
 one of the sizable columns). A double-click or `Enter` on a request that is not cloned asks how to review it, like **Review**.
+
+### The branches of a request
+
+A request row shows `source → target` after its title (`alice:feature/login → main` when the source branch is in a fork).
+When the room is short the target is cut first (an ellipsis), the title keeps most of the room, and in a narrow window the
+branches are not shown; the Actions column is never pushed out. Rest the pointer on a cut text for the whole of it. A host that
+did not name the branches shows nothing there. An issue row names its repository in the same chip as a request row (the
+folder name of the clone, or `owner/name` when it is not cloned).
+
+### Acting on the host
+
+**Merge**, **Close** and **Mark as ready** work on GitHub, GitLab, Gitea and Forgejo (other hosts gray them with "Not supported
+by ..."; issues can be closed on the same hosts).
+
+- **Merge** asks first: the box names the request, its project and branches, and offers the method (a merge commit, squash,
+  and rebase where the host has it; GitLab merges or squashes). It is refused with its reason for a draft, a request that
+  conflicts with its target, or failing checks; a refusal by the host (no permission, a rule of the branch) is shown on the
+  status line.
+- **Close** asks first and closes without merging.
+- **Mark as ready** takes a draft out of draft (GitLab and Gitea: the `Draft:` / `WIP:` marker leaves the title). It asks
+  nothing: it is reversible on the host.
+- **Clone** opens the ordinary Clone dialog on the row's project (the URL is filled, the folder picker is the usual one). Once
+  the clone exists the Radar places the row on it the next time it reads the remotes (reopen it or Refresh), and Clone then
+  says where the clone is.
+
+Merge and Close change the host and **cannot be undone from GitPoulpi** (the box says so); reopen a closed request on the host.
+After a successful call the lists are asked again, so a merged or closed row leaves and a ready one loses its `draft` chip.
 
 ## Opening it
 

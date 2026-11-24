@@ -45,6 +45,7 @@ pub mod conversation;
 pub mod flow;
 pub mod gerrit;
 mod gitea;
+mod host_actions;
 mod meta;
 
 use std::net::TcpListener;
@@ -435,6 +436,10 @@ fn route(
         .unwrap_or((request.target.as_str(), ""));
     if request.headers.to_lowercase().contains("revoked") {
         return (401, r#"{"message":"401 Unauthorized"}"#.into());
+    }
+    // Merge, close and mark ready on a merge request.
+    if let Some(reply) = host_actions::route(request, path, port) {
+        return reply;
     }
     // Conversations: timelines, comments and the token's identity.
     if let Some(reply) = conversation::route(request, path, port) {

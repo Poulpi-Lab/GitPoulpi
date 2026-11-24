@@ -861,6 +861,10 @@ stage_file = "z"
 | Radar: отложить... | `z` |
 | Radar: ревью запроса... | `e` |
 | Radar: открыть беседу задачи | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: ревью через API |  |
 | Radar: клонировать и сделать ревью... |  |
 | Radar: изменить исполнителей... |  |

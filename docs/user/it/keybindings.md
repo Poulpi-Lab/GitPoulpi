@@ -859,6 +859,10 @@ applicano. I tasti sono quelli predefiniti.
 | Radar: Rimanda... | `z` |
 | Radar: Rivedi la richiesta... | `e` |
 | Radar: Apri la conversazione della issue | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: Rivedi tramite l'API |  |
 | Radar: Clona e rivedi... |  |
 | Radar: Modifica assegnatari... |  |

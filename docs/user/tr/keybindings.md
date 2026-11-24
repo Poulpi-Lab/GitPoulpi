@@ -855,6 +855,10 @@ Tuşlar varsayılanlardır.
 | Radar: Ertele... | `z` |
 | Radar: İsteği İncele... | `e` |
 | Radar: Issue Konuşmasını Aç | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: API Üzerinden İncele |  |
 | Radar: Klonla ve İncele... |  |
 | Radar: Atananları Düzenle... |  |

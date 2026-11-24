@@ -98,6 +98,26 @@ pub(crate) fn write_sources(
     repo.save(state).map_err(|e| e.to_string())
 }
 
+/// Links the existing clone at `root` to `project` of `integration` when it
+/// is not linked to any host for its pull requests yet (the Radar's review
+/// through a clone it only knew by its remote). A repository with a link of
+/// its own is left alone. Best effort: a failure leaves it unlinked and the
+/// review says why it cannot start.
+pub(crate) fn link_if_unlinked(root: &Path, integration: &str, project: &str) {
+    let state = crate::remotes_ui::repo_state_path(root);
+    if RepoState::load(&state).is_ok_and(|s| s.pulls_source.is_some()) {
+        return;
+    }
+    let carry = Carry {
+        number: 0,
+        label: String::new(),
+        integration: integration.to_string(),
+        project: project.to_string(),
+    };
+    let all = crate::pull_request::load_integrations();
+    let _ = write_sources(&state, &carry, &all);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

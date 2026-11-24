@@ -855,6 +855,10 @@ Klávesy jsou výchozí.
 | Radar: Odložit... | `z` |
 | Radar: Zkontrolovat žádost... | `e` |
 | Radar: Otevřít konverzaci issue | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: Zkontrolovat přes API |  |
 | Radar: Naklonovat a zkontrolovat... |  |
 | Radar: Upravit řešitele... |  |

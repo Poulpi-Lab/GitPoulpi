@@ -745,6 +745,40 @@ impl RepoDialogs {
         self.pump();
     }
 
+    /// The Radar's Clone: [`Self::open_clone_for_review`] with nothing to
+    /// carry on afterwards (the clone lands like any other, and the Radar
+    /// finds it in the recents the next time it opens).
+    pub(crate) fn open_clone_for_radar(
+        &mut self,
+        url: &str,
+        integration: &str,
+        project: &str,
+        note: String,
+        cwd: &Path,
+    ) {
+        let settings = gitpoulpi_config::Settings::resolve_ambient().ok();
+        let root = settings
+            .as_ref()
+            .and_then(|s| s.config().repos.clone_root_or_default())
+            .or_else(|| gitpoulpi_config::default_clone_root(Some(cwd)));
+        let hosted = hosted_sources(&crate::pull_request::load_integrations());
+        let mut form = CloneDialog::new(root.as_deref())
+            .with_hosted(hosted)
+            .with_url(url)
+            .with_target(integration, project, note.clone());
+        if form.message.is_none() {
+            form.message = Some(note);
+        }
+        #[cfg(feature = "hosting")]
+        self.projects_rx.clear();
+        self.dialog = Some(RepoDialog::Clone {
+            form: Box::new(form),
+            picker: None,
+        });
+        self.review_clone = None;
+        self.pump();
+    }
+
     /// Opens Create worktree for `seed`, proposing a folder beside
     /// `repo_root`.
     #[cfg(all(test, feature = "worktree"))]
@@ -2691,6 +2725,7 @@ fn finish_review_clone(root: &Path, carry: crate::after_clone::Carry, message: S
             crate::radar::pending::set(crate::radar::pending::Pending::Review {
                 number: carry.number,
                 repo: Some(root.to_path_buf()),
+                link: None,
             });
             msg::radar::msg_cloned_review(message, carry.label)
         }

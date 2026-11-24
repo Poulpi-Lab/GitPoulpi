@@ -384,6 +384,7 @@ impl RadarUi {
             Cell::Num => item.label.clone(),
             Cell::Age => item.updated_at.clone(),
             Cell::Labels => item.labels.join(" \u{00B7} "),
+            Cell::Branches => item.branches_text(),
         }
     }
 }

@@ -857,6 +857,10 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Radar : Reporter... | `z` |
 | Radar : Relire la pull request... | `e` |
 | Radar : Ouvrir la conversation du ticket | `i` |
+| Radar : Merge la pull request... | `m` |
+| Radar : Fermer... | `x` |
+| Radar : Marquer comme prête | `y` |
+| Radar : Cloner le dépôt... | `g` |
 | Radar : Relire via l'API |  |
 | Radar : Cloner et relire... |  |
 | Radar : Modifier les assignés... |  |

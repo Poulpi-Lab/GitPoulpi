@@ -960,7 +960,11 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
                     | Act::Review
                     | Act::Conversation
                     | Act::ReviewApi
-                    | Act::CloneReview,
+                    | Act::CloneReview
+                    | Act::Merge
+                    | Act::CloseItem
+                    | Act::Ready
+                    | Act::CloneRepo,
                 )
                 | L::Menu
                     if !ctx.radar_row =>

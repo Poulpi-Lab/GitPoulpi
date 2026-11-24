@@ -44,10 +44,12 @@ pub(super) fn route(request: &http::Request, path: &str, query: &str, port: u16)
         "/api/v3/user/orgs" => ok(json!([
             {"login": "harbor-guild"}, {"login": "lumen-labs"}, {"login": "orion-labs"}
         ])),
-        "/api/v4/merge_requests" => ok(gitlab_review(&web)),
+        "/api/v4/merge_requests" => ok(super::host_actions::apply(port, gitlab_review(&web))),
         "/api/v4/issues" => ok(gitlab_issues(&web)),
         "/api/v4/groups" => ok(json!([{"id": 31, "full_path": "northwind"}])),
-        "/api/v4/groups/31/merge_requests" => ok(gitlab_group(&web)),
+        "/api/v4/groups/31/merge_requests" => {
+            ok(super::host_actions::apply(port, gitlab_group(&web)))
+        }
         "/api/v1/repos/issues/search" => ok(gitea_search(&decode(query), &web)),
         "/api/v1/user/orgs" => ok(json!([{"username": "tide-works"}])),
         _ => None,

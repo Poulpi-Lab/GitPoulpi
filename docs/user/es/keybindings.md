@@ -860,6 +860,10 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Radar: Posponer... | `z` |
 | Radar: Revisar solicitud... | `e` |
 | Radar: Abrir la conversación del issue | `i` |
+| Radar: Merge Request... | `m` |
+| Radar: Close... | `x` |
+| Radar: Mark as Ready | `y` |
+| Radar: Clone Repository... | `g` |
 | Radar: Revisar mediante la API |  |
 | Radar: Clonar y revisar... |  |
 | Radar: Editar asignados... |  |

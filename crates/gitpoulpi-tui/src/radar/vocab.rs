@@ -48,6 +48,14 @@ pub(crate) enum Act {
     CloneReview,
     /// The conversation of an issue, read in the repository's own window.
     Conversation,
+    /// Merges the request on the host (asks first, and how).
+    Merge,
+    /// Closes the request or issue on the host (asks first).
+    CloseItem,
+    /// Takes a draft request out of draft on the host.
+    Ready,
+    /// The Clone dialog on the row's repository (not cloned yet).
+    CloneRepo,
     /// Turns on the account-wide review requests of a code host (the hint
     /// row's `[Turn on]`).
     TurnOn,
@@ -143,6 +151,20 @@ pub(crate) enum Outcome {
     /// the Home window: the event loop builds the view and hands it back to
     /// the Radar, which hosts it (`item_host`).
     ApiConversation(Box<ConversationRequest>),
+    /// Open the ordinary Clone dialog on the row's project; the clone lands
+    /// like any other and the Radar finds it the next time it opens.
+    CloneRepo(Box<CloneRequest>),
+}
+
+/// What the Clone action starts from.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct CloneRequest {
+    /// The profile the row came from.
+    pub(crate) integration: String,
+    /// `owner/name` on the host.
+    pub(crate) project: String,
+    /// Where to clone from (the URL prefill).
+    pub(crate) clone_url: String,
 }
 
 /// What a conversation opened from a Radar row starts from (plain text, so

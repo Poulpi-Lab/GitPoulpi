@@ -52,11 +52,15 @@ grisée avec sa raison. La colonne est automatique (ce n'est pas une des colonne
 
 ### Les branches d'une demande
 
-Une ligne de demande affiche `source → cible` après son titre (`alice:feature/login → main` quand la branche source est
-dans un fork). Quand la place manque, la cible est coupée en premier (une ellipse), le titre garde l'essentiel de la
-place, et dans une fenêtre étroite les branches ne sont pas affichées ; la colonne Actions n'est jamais poussée dehors.
-Posez le pointeur sur un texte coupé pour le voir en entier. Un hébergeur qui n'a pas nommé les branches n'affiche rien
-là. Une ligne de ticket nomme son dépôt dans la même pastille qu'une ligne de demande (le nom de dossier du clone, ou
+Une ligne de demande affiche `source → cible` dans la colonne **Branches**, juste après le dépôt (`alice:feature/login → main`
+quand la branche source est dans un fork) ; une ligne de ticket laisse la cellule vide, et un Radar sans aucune demande qui nomme
+ses branches n'a pas cette colonne. Quand la cellule est trop étroite, la source est coupée en premier (une ellipse) et la cible
+reste entière tant que possible. La colonne rétrécit avant de disparaître : dans une fenêtre étroite, c'est la dernière des colonnes
+facultatives à partir (après l'état, l'auteur et l'âge, avant le dépôt et le titre) ; une fois partie, les branches complètes restent
+dans l'infobulle du titre et sur la ligne d'état de la ligne sélectionnée. Une colonne d'auteur large que vous avez dimensionnée
+cède la place au titre et aux branches. La colonne Actions n'est jamais poussée dehors. Posez le pointeur sur un texte coupé pour
+le voir en entier. GitHub et Gitea listent les demandes sans leurs branches, donc le Radar les lit après la liste (une fois par
+demande, jusqu'à ce qu'elle change). Un hébergeur qui n'a pas nommé les branches n'affiche rien là. Une ligne de ticket nomme son dépôt dans la même pastille qu'une ligne de demande (le nom de dossier du clone, ou
 `owner/name` quand il n'est pas cloné).
 
 ### Agir sur l'hébergeur
@@ -170,7 +174,7 @@ mesure que les réponses arrivent.
 
 ### Colonnes
 
-La pastille du dépôt, le `#` (numéro et marques de vérification), l'auteur et l'âge sont des **colonnes dimensionnables**. Laissée en automatique, la colonne du dépôt est
+La pastille du dépôt, les branches, le `#` (numéro et marques de vérification), l'auteur et l'âge sont des **colonnes dimensionnables**. Laissée en automatique, la colonne du dépôt est
 aussi large que le nom le plus long à l'écran (jusqu'à 40 cellules, et au plus un tiers de la fenêtre), si bien que
 `owner/name` et le `group/sub/project` d'une liste de compte ne sont pas coupés sur un terminal normal. Le titre prend
 le reste. Un nom qui ne tient pas se termine par une ellipse (`group/sub...`), et :
@@ -179,7 +183,7 @@ le reste. Un nom qui ne tient pas se termine par une ellipse (`group/sub...`), e
   texte entier. Sélectionnez la ligne et la ligne d'état sous le filtre nomme aussi le projet et le titre en entier, si
   bien que le clavier voit la même chose.
 - **Faites glisser le séparateur** (la cellule juste après le nom du dépôt, après le `#`, ou juste avant l'auteur ou l'âge) pour dimensionner la
-  colonne ; **double-cliquez** dessus pour l'ajuster de nouveau. La liste a une **ligne d'en-tête** (dépôt, `#`,
+  colonne ; **double-cliquez** dessus pour l'ajuster de nouveau. La liste a une **ligne d'en-tête** (dépôt, branches, `#`,
   titre, auteur, âge) et les séparateurs suivent `ui.column_resize` comme ceux du Log : avec `line` (la
   valeur par défaut) un `│` estompé repose dans le séparateur sur la ligne d'en-tête, et tant que le pointeur est sur le séparateur
   (sur l'en-tête ou sur n'importe quelle ligne de la liste), que la colonne est choisie avec les touches ou que vous la glissez, un trait fin d'accent est
@@ -193,7 +197,7 @@ le reste. Un nom qui ne tient pas se termine par une ellipse (`group/sub...`), e
   cellules, **`[`** la réduit, **`0`** remet toutes les colonnes en automatique, `Esc` quitte. La palette a les mêmes
   commandes : `Radar : Choisir une colonne`, `Radar : Élargir la colonne`, `Radar : Réduire la colonne`, `Radar : Réinitialiser les colonnes`.
 
-Les largeurs sont gardées dans `radar.toml` (`[columns]`, `repo`, `number`, `author` et `age`, en cellules) et survivent à un redémarrage.
+Les largeurs sont gardées dans `radar.toml` (`[columns]`, `repo`, `branches`, `number`, `author` et `age`, en cellules ; un fichier sans `branches` se charge comme avant, la colonne s'ajuste alors à son contenu jusqu'à 28 cellules) et survivent à un redémarrage.
 Ce sont les mêmes gestes de dimensionnement que pour les colonnes du Log.
 
 ### Vérifications et conflits
@@ -232,18 +236,26 @@ Les demandes fermées et mergées et les tickets fermés ne sont pas listés.
 
 ## Vues et filtres
 
-Trois listes déroulantes et une zone de texte restreignent la liste. Chaque choix
+Quatre listes déroulantes et une zone de texte restreignent la liste. Chaque choix
 est une liste déroulante : cliquez dessus, ou utilisez sa touche.
 
 - **Vue** (`v`) : Tout, demandes, Tickets, WIP, Reportés.
 - **Afficher** (`f`) : Tout le monde, Les miens (demandes que vous avez écrites,
   tickets que vous avez créés), Qui me sont assignés, Revue demandée, Qui me mentionnent.
 - **Périmètre** (`w`) : voir plus haut.
+- **Profil** (`P`) : Tous les profils, ou un profil d'intégration de Paramètres > Intégrations (nommé comme
+  Paramètres le nomme, avec son fournisseur ajouté quand deux profils portent le même nom). Il restreint
+  chaque section, les lignes des dépôts comme celles de tout le compte, aux lignes de ce profil (une ligne
+  de travail en cours n'a pas de profil, donc un profil choisi la masque). Un seul profil à la fois. Le
+  choix est gardé dans `radar.toml` ; un profil qui n'existe plus retombe sur Tous les profils. La liste
+  déroulante est toujours là, comme les trois autres, et une fenêtre étroite la raccourcit (puis ses
+  libellés) au lieu de la retirer. Palette : *Radar : Filtrer par profil...*. Quand le profil masque
+  tout, la liste vide le dit.
 - **Texte du filtre** (`/` ou `Ctrl+F`) : correspondance approximative sur le dépôt,
   le numéro, le titre, l'auteur, la branche et les étiquettes. `Enter` rend les
   touches à la liste et garde le texte, `Esc` l'efface.
 
-`Ctrl+N` affiche un badge sur le filtre, chaque liste déroulante, les boutons Actualiser et Retour et chaque titre de section à l'écran. Appuyez sur le caractère d'un badge : le filtre reçoit le clavier, une liste déroulante s'ouvre, un bouton s'exécute et un titre reçoit la sélection (`Enter` ou `Space` le replie ensuite). `Esc` annule. Voir [Raccourcis clavier](keybindings.md).
+`Ctrl+N` affiche un badge sur le filtre, chacune des quatre listes déroulantes, les boutons Actualiser et Retour et chaque titre de section à l'écran. Appuyez sur le caractère d'un badge : le filtre reçoit le clavier, une liste déroulante s'ouvre, un bouton s'exécute et un titre reçoit la sélection (`Enter` ou `Space` le replie ensuite). `Esc` annule. Voir [Raccourcis clavier](keybindings.md).
 
 ## Actions
 

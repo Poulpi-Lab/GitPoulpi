@@ -305,11 +305,14 @@ Prawy panel podąża za zaznaczeniem w Logu.
 autor z awatarem i datą, hash rodzica i liczby zmian, potem opis (podsumowanie
 i treść; przeciągnij jego dolną krawędź, aby zmienić rozmiar). Panel
 **Zmienione pliki** poniżej zaczyna się od własnych kontrolek: przełącznika
-sortowania, **Ścieżka** / **Drzewo**, **Wszystkie pliki** i pola **Filtruj pliki**,
-przytwierdzonych nad listą, która jako jedyna się przewija. Kliknij plik, aby
+sortowania, **Ścieżka** / **Drzewo**, **Wszystkie pliki** i pola **Filtruj pliki** (z polem wyboru **Tylko LFS** na jego
+prawym końcu w repozytorium z plikami LFS), przytwierdzonych nad listą, która
+jako jedyna się przewija. Kliknij plik, aby
 otworzyć jego diff. W niskim oknie najpierw ustępuje opis (do jednego wiersza),
 potem lista. Widok zmian roboczych zachowuje rząd **Ścieżka** / **Drzewo** /
-**Wszystkie pliki** na górze list plików, nad listami unstaged i staged.
+**Wszystkie pliki** na górze list plików, nad listami unstaged i staged. W trybie
+Drzewo zwinięty folder kończy się liczbą plików w środku, razem z podfolderami,
+jako przygaszone `(12)`.
 
 **Linki w opisie.** Adres internetowy wpisany w opisie (`https://...` albo cel
 markdownowego `[tekst](https://...)`) jest podkreślony, pokazuje wskaźnik w
@@ -344,6 +347,25 @@ góry biegnie pasek przycisków:
 | **Zawij** | Zawija długie linie. |
 | **Mapa** | Minimapa całego pliku obok paska przewijania. |
 | **Kodowanie** | Kodowanie, w którym plik jest czytany (najpierw **Auto**). |
+
+#### Zmienione słowa w diffie
+
+Gdy linia zmienia się tylko częściowo, słowa, które się różnią, są malowane
+mocniejszym tłem w kolorze samej linii (mocniejszy czerwony na usuniętej linii,
+mocniejszy zielony na dodanej), a reszta linii zachowuje płaski odcień. W obrębie
+hunka każdy ciąg usuniętych linii jest łączony w pary z następującym po nim
+ciągiem dodanych: pierwsza z pierwszą, druga z drugą i tak dalej; para jest
+oznaczana tylko wtedy, gdy co najmniej 40% jej znaków niebiałych jest takich
+samych, więc linia napisana od zera zostaje płaska, zamiast zamienić się w jeden
+blok wyróżnienia. Porównywane są słowa, ciągi białych znaków i pojedyncze znaki
+interpunkcyjne, pojedynczy odstęp między dwoma zmienionymi słowami łączy je w jedno
+oznaczenie, a linie dłuższe niż 1000 znaków nie są oznaczane. Działa w widokach
+W linii i Obok siebie, z zawijaniem i przewijaniem w bok oraz w panelu diffa
+recenzji. Wyłączysz to w **Ustawienia > Diff i edytor > Podświetlaj zmienione
+słowa** (`ui.diff_intraline`) albo z palety poleceń (**Diff: Przełącz podświetlanie
+zmienionych słów**, bez własnego klawisza). W terminalu ograniczonym do 16 kolorów
+albo z motywem bez tła diffa zmienione słowa są zamiast tego pogrubione i
+podkreślone.
 
 W diffie drzewa roboczego każdy hunk ma przyciski **Stage hunk** i **Odrzuć
 hunk**. Naciśnij `v`, aby zaznaczyć linie, a potem zrób stage lub odrzuć

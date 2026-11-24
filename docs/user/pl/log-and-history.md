@@ -92,6 +92,29 @@ z terminala: `gitpoulpi mailmap list|check|add`.
   imię i e-mail autora, hash oraz nazwy refów. Przyciemnia to, co nie pasuje,
   i zachowuje kształt grafu. `Enter` / `Shift+Enter` przeskakują do
   następnego / poprzedniego dopasowania.
+- **Filtr autora** (lejek w nagłówku **Autor**, `Shift+A` w Logu albo polecenie
+  palety *Log: Filtruj według autora...*): wstępnie filtruje Log według tego,
+  kto napisał commity. Pod nagłówkiem wisi okienko z polem wyszukiwania, wierszem
+  **Wyczyść filtr** (✕) i jednym wierszem na autora wczytanej historii: plakietka
+  z inicjałami (awatar, gdy `ui.avatars` nie jest wyłączone), imię i nazwisko, a
+  po nim przygaszony e-mail, najpierw ci z największą liczbą commitów, potem
+  według nazwy. Pisanie zawęża listę rozmytym dopasowaniem palety; `Enter` albo
+  kliknięcie przełącza podświetlonego autora (znacznik wyboru; możesz wybrać
+  ilu chcesz), `Esc` albo kliknięcie obok zamyka okienko i zachowuje filtr. Filtr
+  działa dokładnie jak wyszukiwanie: commity wybranych autorów zostają
+  podświetlone, każdy inny wiersz jest przyciemniony, a graf zachowuje kształt,
+  nic nie jest usuwane ani pobierane ponownie. Gdy pasek wyszukiwania jest też
+  otwarty, działają oba (commit musi być autorstwa wybranego autora **i**
+  pasować do tekstu), a `Enter` / `Shift+Enter` przechodzą po tych trafieniach.
+  Gdy filtr jest włączony, lejek zmienia się w wypełniony akcentowy `▼`, jego
+  podpowiedź wylicza wybranych autorów, a gdy kolumna Autor jest ukryta albo za
+  wąska na lejek, górna krawędź Logu pokazuje zamiast tego *Autor: Alice
+  Example +1* (klawisz i paleta nadal działają). Aby go wyłączyć: wiersz
+  **Wyczyść filtr**, prawy przycisk myszy na podświetlonym lejku albo polecenie
+  palety *Log: Wyczyść filtr autora*. Autorzy pochodzą z commitów wczytanych w
+  Logu (z zastosowanym mailmap, jak w kolumnie), a filtr jest zapamiętywany per
+  repozytorium, między przełączeniami kart i restartami. Wyszukiwany tekst nie
+  jest zapamiętywany, filtr tak.
 - **Filtr refów** (`/` w panelu bocznym): zawęża listy gałęzi, tagów i
   zdalnych repozytoriów według nazwy.
 - **Solo** (klawisz `o` albo menu refa, na refie, folderze lub zdalnym):
@@ -121,6 +144,13 @@ menu. Najprzydatniejsze pozycje:
 | Zmień nazwę, Usuń | Usuń najpierw pyta; można usunąć także zdalny odpowiednik |
 | Kopiuj nazwę gałęzi, Kopiuj link do gałęzi na zdalnym | Do schowka systemowego |
 
+**Przenoszenie taga.** Przeciągnij tag na inny ref (zob. *Przeciąganie refów* w
+[Mysz i gesty](./mouse-and-gestures.md)) albo użyj `Refs: Przenieś zaznaczony Tag
+na zaznaczony Commit...`. Tag zachowuje swój rodzaj i opis, przenosi się tylko
+twój lokalny tag (zdalne zachowuje starą pozycję, dopóki nie zrobisz push), a
+jedno cofnięcie przywraca go z powrotem. CLI: `gitpoulpi tag move <nazwa> <cel>
+[--force-non-ff]`, `gitpoulpi tag merge-branch <nazwa> <gałąź> [-m <opis>]`.
+
 **Gdzie jest tag.** Tag może być na tym komputerze, na zdalnym albo w obu miejscach, a wiersze TAGS w panelu
 bocznym (i plakietka taga w Logu) pokazują to znacznikiem po nazwie. Najedź na tag, aby przeczytać to samo
 słowami.
@@ -130,7 +160,7 @@ słowami.
 | strzałka w górę | Tylko tutaj: żadne zdalne go nie ma. Jego menu oferuje *Push* |
 | strzałka w lewo i w prawo | Tutaj i na zdalnym, na tym samym commicie |
 | strzałka w dół (wiersz przyciemniony) | Tylko na zdalnym: nie ma go w tym repozytorium (nigdy nie był pobrany albo został tu usunięty). Jego menu oferuje *Fetch `<tag>` z `<remote>`* i *Usuń `<tag>` w `<remote>`...*; w palecie `Git: Fetch zaznaczony tag` |
-| strzałka w górę i w dół | Jest też na zdalnym, ale na innym commicie (push zostałby odrzucony) |
+| strzałka w górę i w dół | Jest też na zdalnym, ale na innym commicie (zwykły push zostałby odrzucony). Jego menu ma dwa wiersze na każde takie zdalne: *Użyj `<tag>` z `<remote>`* (lokalny tag przechodzi na wersję zdalnego, według ostatniego fetch, bez sieci; tag opisany staje się tym samym obiektem taga) oraz, na czerwono, *Push `<tag>` do `<remote>` (force)* (najpierw pyta; z lease na to, co widział ostatni fetch, więc zdalne, które zmieniło się od tego czasu, jest odrzucane z „fetch first” i nic nie jest nadpisywane). Każde to jeden wpis cofania. W palecie `Git: Użyj wersji zdalnej zaznaczonego Tag` i `Git: Force Push zaznaczonego Tag do jego zdalnego` (domyślne zdalne, gdy różni się kilka); CLI: `tag take-remote`, `tag force-push` |
 
 git nie trzyma refów śledzących zdalne dla tagów, więc GitPoulpi dowiaduje się, co ma każde zdalne, z twojego
 ostatniego **fetcha** (każdego, także automatycznego) oraz z własnych pushy i usunięć tagów. Podczas

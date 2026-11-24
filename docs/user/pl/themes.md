@@ -205,7 +205,17 @@ Każdy motyw ma własne kolory ścieżek grafu Log, ale można połączyć dowol
 z dowolną paletą: **Ustawienia > Wygląd > Motyw kolorów grafu** oferuje
 **Zgodnie z motywem** (domyślnie) oraz każdą paletę ścieżek każdego motywu
 (GitPoulpi Dark, GitPoulpi Light, potem Material, Serie, ... i
-`graph_palette` własnych plików motywów). ![Lista Motyw kolorów grafu na stronie Wygląd: Zgodnie z motywem, potem każda paleta ścieżek z kilkoma jej kolorami](../images/settings-log-graph-lanes.png)
+`graph_palette` własnych plików motywów, wypisywane po presetach pod nazwą
+motywu). Własny motyw pojawia się przy następnym otwarciu listy (pliki są
+wtedy wczytywane ponownie), a wybranie go zapisuje nazwę jego pliku w
+`ui.graph_color_theme` (dla instalacji głównej w `[ui]`, dla pozostałych w ich
+własnym wpisie `[installation.settings.<id>]`, tak jak motyw). Plik motywu bez
+`graph_palette` ma kolory ścieżek swojej bazy (`base`, domyślny preset, gdy
+żadnej nie wskazuje), to samo dziedziczenie co każdy inny kolor pliku. Własny
+motyw nazwany jak wbudowana paleta ścieżek (na przykład `gruvbox`) zastępuje tę
+paletę na liście. Jeśli skonfigurowana nazwa już nie istnieje (plik usunięto lub
+zmieniono mu nazwę), graf używa kolorów ścieżek aktywnego motywu, a Ustawienia
+pokazują nazwę oznaczoną *nie znaleziono*, dopóki nie wybierzesz innej. ![Lista Motyw kolorów grafu na stronie Wygląd: Zgodnie z motywem, potem każda paleta ścieżek z kilkoma jej kolorami](../images/settings-log-graph-lanes.png)
 
 W `config.toml`:
 
@@ -256,6 +266,17 @@ statusbar_fg = "#eceff4"
 add_bg = "#2f3b2f"
 ```
 
+### Zmienione słowa w diffie (`diff.add_emph_bg`, `diff.del_emph_bg`)
+
+Mocniejsze tła, które widok Diff maluje na słowach różniących się wewnątrz
+zmienionej linii, nad `diff.add_bg` (dodane linie) i `diff.del_bg` (usunięte
+linie); tekst zachowuje `diff.add_fg` i `diff.del_fg`. Każdy preset ustawia oba.
+Plik motywu, który ustawia `diff.add_bg` lub `diff.del_bg`, ale nie odpowiadające
+im wyróżnienie, dostaje wyróżnienie wyprowadzone z tła (30% drogi w stronę koloru
+tekstu tej strony), więc własne tło nigdy nie kończy z wyróżnieniem motywu bazowego.
+Wartość `default` (preset Terminal) albo terminal, którego głębia kolorów
+narysowałaby oba tła tak samo, oznacza słowa pogrubieniem i podkreśleniem.
+Zob. [Zmienione słowa w diffie](interface-tour.md#zmienione-słowa-w-diffie).
 Kolory to `"#rrggbb"`, `"ansi:N"` (pozycja N palety terminala) lub `"default"`
 (własny kolor terminala). Grupy i klucze są takie jak w
 `gitpoulpi theme export <slug>`. Nic nie jest krytyczne: nieznany klucz albo
@@ -317,6 +338,7 @@ multiplekserze. Motyw Terminal nie potrzebuje żadnego z tego. Truecolor nic nie
 kosztuje; przebieg mapowania działa na ekranie raz na klatkę i tylko wtedy,
 gdy jest aktywny.
 
+Motyw jest per instalacja: kilka instalacji GitPoulpi współdzielących jedną konfigurację zachowuje każda własny, więc wybranie go w jednej instalacji nigdy nie przekolorowuje pozostałych.
 ## Podgląd na żywo
 
 W Ustawienia > Wygląd lista Motyw pokazuje **System (zgodny z terminalem)**,
@@ -338,14 +360,17 @@ podświetlenia od razu pokazuje podgląd motywu, **Enter** go stosuje i zapisuje
 poprzedni motyw i niczego nie zapisuje.
 
 Pod polem filtra segmentowy filtr wstępny zawęża listę: **Wszystkie**,
-**Ciemne**, **Jasne** i **Kolorowe** (kliknij segment, `Tab` / `Shift+Tab` albo
-`Alt+1`..`Alt+4`). Ciemne i Jasne wynikają z jasności `ui.bg` motywu;
+**Ciemne**, **Jasne** i **Kolorowe**, a także **Własne**, gdy masz własne pliki motywów
+(kliknij segment, `Tab` / `Shift+Tab` albo `Alt+1`..`Alt+5`). Ciemne i Jasne wynikają z jasności `ui.bg` motywu;
 **Kolorowe** zostawia motywy, których tło jest wyraźnie zabarwione (niebieskie,
 fioletowe, żółte, zielone...), i pomija biele, złamane biele, czernie i
 prawie czarne szarości, więc Solarized Dark, Dracula czy Nord są kolorowe, a
 GitHub Dark i One Light nie. Motyw kolorowy pokazuje się też w Ciemnych lub
 Jasnych. **System** i motywy przezroczyste (bez własnego tła) pojawiają się
-tylko we Wszystkich. Filtr wstępny łączy się z tym, co wpiszesz. Listy motywu
+tylko we Wszystkich. **Własne** zostawia tylko pliki motywów z twojego folderu `themes/` (własny
+motyw nadal jest Ciemny, Jasny lub Kolorowy dla tych przycisków); przycisk nie jest rysowany
+i nie da się do niego dojść klawiszami, dopóki ten folder nie zawiera żadnego motywu. Filtr
+wstępny łączy się z tym, co wpiszesz. Listy motywu
 kolorów grafu i języka pokazują podgląd tak samo: ścieżki Logu i cały interfejs
 zmieniają się, gdy przesuwa się podświetlenie.
 

@@ -20,6 +20,13 @@ wpis to etykieta i polecenie.
   domyślny. Paleta (`Ctrl+P`): `Karta: Otwórz w...` i `Karta: Otwórz w domyślnym`.
   Polecenia palety działają, nawet gdy na pasku tytułu nie ma miejsca na przycisk.
   Oba klawisze można przypisać na nowo; zob. [Skróty klawiszowe](keybindings.md).
+- **Według etykiety**: krok `tab_open_in` [sekwencji](config-reference.md#sequences) uruchamia wpis, którego
+  **etykietę** podasz (`label = "VS Code"`), więc zmiana kolejności listy nigdy nie zmienia tego,
+  co się uruchamia. Nieznana etykieta zatrzymuje krok z komunikatem „żaden wpis Otwórz w nie nazywa się ...”.
+  `Karta: Terminal tutaj` (paleta) otwiera twój terminal w folderze, dawny przycisk
+  „Terminal tutaj” paska kart.
+- **Agent AI w folderze**: `Karta: Otwórz agenta AI tutaj` otwiera twój terminal w folderze
+  karty z uruchomionym lokalnym agentem AI; zob. [AI](ai.md#otwórz-agenta-w-folderze-karty).
 - **Kliknij prawym przyciskiem kartę repozytorium**: menu karty ma podmenu **Otwórz w** z
   tymi samymi wpisami.
 - Lista zaczyna się od wpisu, którego użyto ostatnio w tej sesji.

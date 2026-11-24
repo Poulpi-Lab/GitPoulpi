@@ -158,6 +158,21 @@ palecie poleceń) otwiera agenta jednorazowo, w widocznym terminalu, w folderze
 roboczym, którego użyje. Odpowiedz na pytanie, zamknij agenta i spróbuj ponownie;
 odpowiedź zapamiętuje agent.
 
+### Otwórz agenta w folderze karty
+
+`Karta: Otwórz agenta AI tutaj` w palecie poleceń (do przypisania jako `palette.tab_open_agent_here`,
+bez domyślnego klawisza) otwiera twój terminal w folderze aktywnej karty z uruchomionym agentem
+profilu lokalnego agenta, by pracować z nim tam ręcznie. To ten sam terminal co **Terminal tutaj**
+i to samo polecenie co **Otwórz agenta...**, ale w folderze karty zamiast w folderze roboczym
+profilu. Przy jednym profilu lokalnego agenta otwiera się od razu; przy kilku pyta lista pod paskiem
+kart, który wybrać. Nie wysyła promptu i nie zaczyna żadnego żądania AI: akcją jest otwarcie
+agenta, a to, co w nim wpiszesz, należy do ciebie.
+
+Wiersz ma iskrę AI, jest ukryty, gdy AI jest wyłączone (**Ustawienia > AI**), i wyszarzony
+(„nie skonfigurowano lokalnego agenta AI”), gdy żaden profil nie jest lokalnym agentem. W sekwencji
+krok `tab_open_agent_here` przyjmuje `id` profilu AI w opcji `profile` (puste: profil domyślny,
+w przeciwnym razie pierwszy lokalny agent). Własny szablon terminala nie może dostać polecenia
+agenta: terminal otwiera się w folderze, a pasek stanu mówi, które polecenie uruchomić.
 Odpowiedź jest czytana z transkryptu sesji agenta w przypadku Claude Code (jego
 dokładny tekst, usuwany potem) oraz z ekranu między dwiema liniami znaczników,
 o które prosi żądanie, w przypadku Codex i Gemini. Naraz działają co najwyżej
@@ -289,6 +304,7 @@ wyróżnisz.
 | **Podział commita** | Menu commita *Podziel commit (AI)...* albo polecenie palety `AI: Podziel zaznaczony commit...`. Edytor podziału otwiera się z podziałem zaproponowanym przez model; zob. niżej. | `ai split-plan <rev>` (wypisuje) |
 | **Skrypt przepisania historii** | W [warsztacie przepisywania historii](history-rewrite.md#napisz-skrypt-z-ai): przycisk `✦ Napisz z AI...` edytora skryptu albo polecenie palety `Przepisanie: Napisz skrypt z AI...`. Okno pokazuje dokładnie, co zostanie wysłane; skrypt ląduje w edytorze, oznaczony, i nigdy nie jest uruchamiany ani stosowany za ciebie. | `ai rewrite-script "<instruction>" [--sample N]` (wypisuje) |
 | **Reguły przepisania historii** | W [warsztacie przepisywania historii](history-rewrite.md#utwórz-reguły-z-ai): przycisk `✦ Utwórz reguły z AI...`, `Alt+I` albo polecenie palety `Przepisanie: Utwórz reguły z AI...`. Wielowierszowe okno pokazuje dokładnie, co zostanie wysłane; reguły i ustawienia trafiają do warsztatu, a nic nie jest podglądane ani stosowane za ciebie. | `ai rewrite-rules "<description>" [--context]` (wypisuje) |
+| **Szkic sekwencji** | Opisz [sekwencję akcji](#szkic-sekwencji) do utworzenia albo jak zmienić istniejącą (Ustawienia > Sekwencje). | `ai sequence-draft "<description>" [--edit <id>] [--context]` (wypisuje) |
 | **Nazwa worktree** | W [oknie Utwórz worktree](worktrees.md#nazywanie-z-ai): przycisk `✦ Nazwij z AI` lub `Alt+A` otwiera pole, w którym opisujesz funkcję, błąd lub zadanie; model nazywa worktree i jego gałąź zgodnie z nazewnictwem gałęzi w repozytorium, a obie nazwy trafiają do pól okna, do poprawienia. Wysyłany jest tylko twój opis i nazwy lokalnych gałęzi, więc nie ma okna „co zostanie wysłane”. | `ai worktree-name --describe "<task>"` (wypisuje) |
 | **Odpowiedź na hoście** i **Opis zgłoszenia** | Przycisk **Pisz z AI** (`Alt+E`) każdego edytora Markdown, który wysyła na hosta: komentarz, odpowiedź lub edycja w rozmowie, komentarz albo podsumowanie przeglądu, opis nowego zgłoszenia. Szkic trafia do pola; nic nie jest publikowane. Zob. [Pomoc w pisaniu na hoście](#pomoc-w-pisaniu-na-hoście). | `ai hosting-reply` (wypisuje szkic) |
 | **Kompozytor commitów** | Menu wiersza WIP *Skomponuj commity (AI)...*, `Ctrl+G C`, polecenie palety `AI: Skomponuj commity ze zmian roboczych...` | |
@@ -377,6 +393,23 @@ nazwy gałęzi i tagów oraz autorzy najnowszych commitów (pole wyboru, domyśl
 widoczne w panelu „co zostanie wysłane”). Profil i instrukcje to te z pozycji *Reguły
 przepisania historii* w Ustawieniach > AI.
 
+### Szkic sekwencji
+
+Opisujesz sekwencję akcji własnymi słowami („stage wszystkiego, opis napisany przez AI, commit i push” albo, dla istniejącej,
+„dodaj najpierw fetch”), a model proponuje nazwę, id, kroki i, jeśli chce, skrót. **Tylko proponuje**: nic nie jest zapisywane,
+dopóki go nie zaakceptujesz, i nic nie jest nigdy uruchamiane. Model zna tylko polecenia, które sekwencja może zawierać (lista, którą
+dostaje, jest generowana z tej samej tabeli, która waliduje sekwencję, więc nie może się rozjechać); każdy krok jest sprawdzany
+osobno, a krok nieznany, destrukcyjny, uruchamiający inną sekwencję albo żądający niemożliwej pauzy jest pomijany i wypisany
+z powodem, podczas gdy poprawne zostają. Opcjonalnie dołączane są nazwy zdalnych, id profili AI i etykiety Otwórz w (domyślnie
+wyłączone; flaga CLI to `--context`). W terminalu `gitpoulpi ai sequence-draft` wypisuje propozycję jako JSON (z `toml`, który
+czyta `gitpoulpi sequence add --file`) i niczego nie zapisuje. Profil i instrukcje to te z pozycji *Szkic sekwencji* w Ustawieniach > AI.
+
+W interfejsie terminalowym to samo zadanie to wpis **Utwórz z AI...** w Ustawienia > Sekwencje > **Dodaj**
+(paleta: `Sekwencja: Utwórz z AI...`) oraz przycisk **Edytuj z AI...** sekwencji: okno dialogowe, w którym
+piszesz, czego chcesz, z polem kontekstu (domyślnie wyłączone) i pytaniem „Co zostanie wysłane”, potem propozycja,
+którą możesz **Akceptuj**, **Edytuj przed zapisem**, **Odrzuć** albo wysłać ponownie przez **Wstecz**. Edycja pokazuje diff względem
+bieżącej sekwencji (`+` dodano, `-` usunięto, `~` zmieniono), a sugerowany skrót jest sprawdzany względem
+twojej mapy klawiszy, ale nigdy nie jest przypisywany. Nic nie jest zapisywane przed akceptacją (zob. [Sekwencje](sequences.md#tworzenie-i-edycja-z-ai)).
 ### Pomoc w pisaniu na hoście
 
 *Odpowiedź na hoście* przygotowuje komentarz, odpowiedź w wątku, komentarz do linii kodu lub podsumowanie

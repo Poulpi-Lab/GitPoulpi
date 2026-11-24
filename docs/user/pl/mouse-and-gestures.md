@@ -113,6 +113,7 @@ paskach przewijania. Kliknij znacznik, by tam przejść.
 - **Przeciągnij krawędź między dwoma nagłówkami Log** (domyślnie odstęp, z nagłówka lub z dowolnego miejsca w dół tabeli; Ustawienia > Log i graf > Zmiana szerokości kolumn), by zmienić rozmiar kolumny (klawiatura: `Shift+C`, by wybrać kolumnę, potem `]` / `[`).
 - **Kliknij dwukrotnie granicę między dwoma nagłówkami Log**, by dopasować kolumnę po jej lewej do jej zawartości (klawiatura: `Shift+C`, by wybrać kolumnę, potem `=`; `+` dopasowuje każdą kolumnę). Ostatnia kolumna ma uchwyt na swojej ostatniej komórce: przeciągnij go, by zmienić jej szerokość, a kolumna Opis przejmie różnicę.
 - **Przewijaj Log w poziomie** (układ kolumn `scroll`; Ustawienia > Log i graf > Układ kolumn albo pole `Przewijaj w poziomie` w oknie wyboru): pozioma rolka lub `Shift`+rolka nad tabelą, pasek na dolnej krawędzi (przeciągnij suwak, naciśnij puste tło paska, kliknij strzałki na jego końcach) albo `Shift+Left` / `Shift+Right`. W domyślnym układzie `fit` kolumny wypełniają panel i nie ma czego przewijać.
+- **Przewijaj panel listy w poziomie**, gdy wiersz jest szerszy niż panel: sekcja Refs (długa nazwa gałęzi, taga lub stasha), listy Unstaged i Staged, zmienione pliki commita (lub porównania) oraz linie informacyjne szczegółów commita (id, autor, data autorstwa, liczniki). Przewija go pozioma rolka lub `Shift`+rolka nad panelem; pasek pojawia się na dolnej krawędzi panelu tylko wtedy, gdy coś się nie mieści (przeciągnij jego suwak, naciśnij gołą ścieżkę, kliknij strzałki na końcach), więc nigdy nie zabiera wiersza. Z klawiatury `Alt+Left` / `Alt+Right` przewijają panel, który go ma (Log przewija szczegóły commita; wewnątrz zmienionych plików, pliki); paleta ma `Widok: Przewiń panel w lewo/w prawo`. Przewija się cały wiersz (wcięcie, znacznik stanu, szewron i nazwa razem); tytuł panelu, jego krawędź, paski przewijania i przycisk Stage/Unstage najechanego wiersza Status zostają na miejscu. Nazwa nie jest już ucinana wielokropkiem: jej koniec jest o jedno przewinięcie dalej (gałąź z dodatkowymi celami push zachowuje za to w widoku swoją plakietkę `⇉`, więc to jej nazwa ustępuje). Przesunięcie jest per panel, kończy się na najszerszym widocznym wierszu i jest zapominane przy zmianie repozytorium. Blok opisu commita zawija tekst, więc nie ma czego przewijać. Gdy sekcja jest przewinięta w bok, jej dolna krawędź niesie pasek, więc zmieniaj jej rozmiar jej poleceniami z klawiatury albo z sekcji, która się mieści.
 - **Przeciągnij nagłówek Log**, by przenieść kolumnę: duszek jego nazwy podąża za wskaźnikiem, nagłówek, który opuścił, jest przyciemniony, a pasek akcentu wskazuje miejsce, w którym wyląduje. Kolumny przesuwają się po puszczeniu; `Esc` anuluje, a wskaźnik pokazuje otwartą dłoń, dopóki ją niesiesz (klawiatura: `Shift+C`, by wybrać kolumnę, potem `<` / `>`).
 
 GitPoulpi zapamiętuje każdy rozmiar. Zob.
@@ -219,6 +220,7 @@ Zob. [Hosting i trackery zgłoszeń](hosting-integration.md).
   na commicie.
 - **Kliknij plakietkę refa prawym przyciskiem**, by zobaczyć jedno menu z akcjami refa i
   akcjami commita.
+- **Kliknij lejek w nagłówku Autor** (albo `Shift+A` w Logu, albo polecenie palety `Log: Filtruj według autora...`), by wybrać, których autorów commity zostają podświetlone; reszta jest przyciemniona jak przy wyszukiwaniu. `Enter` lub kliknięcie wiersza przełącza autora, wiersz **Wyczyść filtr** (✕) wyłącza filtr, `Esc` zamyka okienko i go zachowuje. **Kliknij prawym przyciskiem podświetlony lejek**, by go wyczyścić (paleta: `Log: Wyczyść filtr autora`).
 - **Kliknij nagłówek prawym przyciskiem**, by pokazać lub ukryć kolumny: lista kontrolna (`[x]` / `[ ]`) z ✕ w tytule; kliknij wiersz albo użyj strzałek i `Spacji` / `Enter`, potem zamknij ją przez ✕, `Esc` lub kliknięcie poza nią (paleta: `Widok: Log: Wybierz kolumny do pokazania`). Pod polami wyboru: `Dopasuj <kolumna> do zawartości` (kolumna kliknięta prawym przyciskiem), `Dopasuj wszystkie kolumny do zawartości` i `Zresetuj szerokości kolumn`. Klawiaturowy odpowiednik prawego kliknięcia: `Shift+C`, by wybrać kolumnę, potem `.` (lub `Shift+F10`) otwiera to samo menu na niej.
 - **Kolumny Radaru** działają tak samo: przeciągnij separator za kolumną repozytorium, `#`, autora lub wieku, by ustawić jej szerokość, **kliknij go dwukrotnie**, by dopasować kolumnę do jej najszerszego wpisu (`C` wybiera kolumnę, potem `=`; `+` dopasowuje każdą kolumnę), i **kliknij prawym przyciskiem tytuł kolumny** (albo `C`, potem `.`), by dostać `Dopasuj <kolumna> do zawartości` i `Dopasuj wszystkie kolumny do zawartości`.
 - **Kliknij `↑`, `↓` lub `✕`** na pasku wyszukiwania, by przejść do poprzedniego lub następnego
@@ -253,19 +255,37 @@ odznaczyć. Wybór jest zapamiętywany osobno dla każdego repozytorium, także 
 
 ### Przeciąganie refów
 
-Naciśnij gałąź w panelu bocznym Refs albo plakietkę refa w Logu i przeciągnij
-ją na inną gałąź. Stopka mówi, co niesiesz. Cel, który może
-przyjąć upuszczenie, się podświetla. Puść, by zobaczyć menu. `Esc` anuluje przeciąganie.
+Naciśnij gałąź, zdalną gałąź lub tag w panelu bocznym Refs albo plakietkę refa
+w Logu i przeciągnij ją na inny ref. Stopka mówi, co niesiesz. Cel, który może
+przyjąć upuszczenie, się podświetla. Puść, by zobaczyć menu. `Esc` anuluje
+przeciąganie. Log zostaje na miejscu, gdy niesiesz: naciśnięcie refa przewija
+Log do jego commita tylko wtedy, gdy okaże się kliknięciem (skok następuje, gdy
+przycisk wraca w górę), więc możesz najpierw przewinąć do celu upuszczenia, a
+dopiero potem podnieść ref.
 
 | Przeciągnięcie | Menu |
 |---|---|
 | Lokalna gałąź X na lokalną gałąź Y | **Merge X do Y**, **Rebase X na Y**, **Interaktywny rebase X na Y...**, **Fast-forward Y do X** |
 | Lokalna gałąź na zdalną gałąź | **Push X** do tego zdalnego repozytorium |
 | Zdalna gałąź na lokalną gałąź Y | **Merge**, **Rebase Y na nią**, **Fast-forward Y do niej** oraz **Pull**, gdy jest upstreamem Y |
+| Tag T na dowolną gałąź, zdalną gałąź lub tag | **Przenieś tag T tutaj**; oznaczone *(to nie fast-forward: T przestałby być przodkiem)*, gdy cel nie wywodzi się z commita taga (twój wybór); wyszarzone *już tam jest*, gdy jest już na tym commicie |
+| Tag T na lokalną gałąź Y | także **Merge tag T do Y** oraz, pod kreską, rzadsze **Merge Y do tag T i przenieś tag** (merge commit z commita taga i Y, detached, potem tag przechodzi na niego) |
 
 Gdy akcja zmienia gałąź, która nie jest wybrana, GitPoulpi najpierw robi jej
-checkout. Jeśli git odmówi checkoutu, nic się nie zmienia. Tagów nie można
-przeciągać i nie mogą przyjmować upuszczenia.
+checkout. Jeśli git odmówi checkoutu, nic się nie zmienia. Na tag można upuścić tylko tagi, a gałęzi
+upuścić na niego nie można.
+
+Przeniesienie taga zachowuje jego rodzaj: lekki tag zostaje lekki, tag opisany
+jest tworzony ponownie jako opisany, z opisem i linią autora przeniesionymi bez
+zmian (tag podpisany jest odrzucany, bo jego podpis przestałby pasować).
+Przenosi się tylko twój lokalny tag: zdalne, które ma tag, zachowuje starą
+pozycję, tag zmienia się w *differs*, a pasek stanu to mówi; zrób push sam, gdy
+tego chcesz. Przeniesienie oraz merge z przeniesieniem to po jednym kroku
+cofania (cofnięcie przywraca stary obiekt taga). Merge do taga z konfliktem
+niczego nie zmienia. Paleta: `Refs: Przenieś zaznaczony Tag na zaznaczony
+Commit...` przenosi tag z panelu Refs na commit zaznaczony w Logu (pyta
+najpierw, gdy to nie fast-forward); każdy inny cel przechodzi przez oznacz, potem
+upuść, poniżej.
 
 Klawiatura: „oznacz, potem upuść” działa jak przeciągnięcie, dla dowolnej pary
 refów. W panelu Refs naciśnij `m` na gałęzi (paleta: `Refs: Oznacz jako źródło
@@ -463,7 +483,7 @@ Terminal.app, Windows Terminal, xterm) wskaźnik się nie zmienia; zob.
 [Wybór terminala](terminals.md#kształt-wskaźnika-myszy-osc-22). Separator lub przycisk
 pod wskaźnikiem podświetla się w każdym terminalu.
 
-Ten sam rodzaj komponentu daje wszędzie w aplikacji ten sam wskaźnik.
+Ten sam rodzaj komponentu daje wszędzie w aplikacji ten sam wskaźnik: przyciski przeglądu pokazanego nad Radarem (karty, krzyżyk zamknięcia, przyciski okienek) i własne przyciski Akcje Radaru pokazują rękę jak każdy inny przycisk.
 
 - **Przyciski są prawdziwymi przyciskami**, w Ustawieniach (Integracje: Edytuj,
   Rozłącz, Usuń, Przeglądaj, Usuń, przyciski fragmentów w edytorze instrukcji...)
@@ -481,7 +501,7 @@ Ten sam rodzaj komponentu daje wszędzie w aplikacji ten sam wskaźnik.
 - **Strzałka** jest na wierszach. Wiersz podświetla się w całości, gdy wskaźnik
   jest na nim (tym samym światłem w każdej liście), i sam nie jest kontrolką:
   wiersze paneli Refs, Worktrees, Stashes i Submodules, Log i kolumna commitów
-  (rękę bierze tylko pigułka ref), linie diffa, zmienione pliki, elementy pull
+  (rękę bierze tylko pigułka ref), rynny diffa, zmienione pliki, elementy pull
   requestów, zgłoszeń i Radaru oraz wiersze list w oknach dialogowych i panelach
   (klonowanie, selektor folderów, Workspaces, karty tablicy, panel Jobs, selektory
   osoby przypisanej, etykiet i kamieni milowych, kroki rebase, pliki i commity
@@ -492,8 +512,20 @@ Ten sam rodzaj komponentu daje wszędzie w aplikacji ten sam wskaźnik.
   liczbowe i obszarów tekstowych w Ustawieniach (także podczas edycji), pola
   okien dialogowych, pola komentarzy przeglądu, kompozytor commitów, tekst edytora
   plików i edytowalny wynik edytora merge (jego panele tylko do odczytu zachowują
-  strzałkę). W szczegółach commita opis i treść są edytowalne, więc I-beam
-  pokazuje się na nich, a cały blok lekko się podświetla.
+  strzałkę, bo przeciągnięcie tam niczego nie zaznacza). Jedna zasada obejmuje też
+  tekst tylko do odczytu: wszędzie tam, gdzie przeciągnięcie myszą może zaznaczyć
+  tekst, wskaźnik to I-beam. Dotyczy to kodu diffa (widok Diff, W linii i Obok
+  siebie, oraz panel diffa przeglądu), Widoku pliku i kodu Blame. Ich numery linii,
+  znaczniki i nagłówki hunków zachowują strzałkę, a przycisk w linii zachowuje
+  rękę. To samo dotyczy rozmowy zgłoszenia lub żądania (także Przeglądu w
+  recenzji i jego bloku szkicu), opisu w szczegółach commita, Informacji o
+  wersji, Dziennika aktywności (obu kart), okna pomocy, podglądu Markdown edytora
+  komentarza oraz komentarzy, oczekujących notatek i sugestii wewnątrz diffa
+  przeglądu: przeciągnięcie zaznacza tekst (zwykłe kliknięcie zachowuje swoje
+  znaczenie: link się otwiera, przycisk działa, wpis Dziennika aktywności lub wątek
+  się otwiera albo zwija), `Ctrl+C` go kopiuje, `Esc` lub kliknięcie go porzuca.
+  Zaznaczenie podąża za swoim tekstem przy przewijaniu. Opis commita jest też
+  edytowalny (dwukrotne kliknięcie go poprawia), a cały blok lekko się podświetla.
 - **W szczegółach commita** linie informacyjne są kontrolkami: kliknij
   `commit: <id>`, by skopiować krótki identyfikator, kliknij dwukrotnie linię
   autora lub daty, by ją poprawić (ręka i lekki znacznik je oznaczają). Linia

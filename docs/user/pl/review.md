@@ -164,11 +164,30 @@ litery: **`V`** układ, **`H`** hunki albo cały plik, **`S`** białe znaki, **`
 poprzedni hunk, **`E`** kodowanie, **`M`** minimapa. Każdy ma wiersz w palecie (*Przegląd: Przełącz układ w linii / obok siebie*,
 ...).
 
+Na **Przeglądzie** rozmowa i blok szkicu ✦ zaznaczają się tak samo: przeciągnij po tekście,
+**`Ctrl+C`** go kopiuje (link lub przycisk, który naciskasz, zachowuje swoje działanie, a przeciągnięcie
+zaczęte na nim niczego nie zaznacza). Bez zaznaczenia **`Ctrl+C`** (albo *Rozmowa: Kopiuj tekst*) kopiuje
+zaznaczony wpis tak, jak przechowuje go host. Nad tekstem pokazuje się I-beam, a nad przyciskami i linkami
+zostaje ręka. Zaznaczenie podąża za tym, co jest na ekranie: przewijanie przesuwa je razem z tekstem
+(zostaje zaznaczone, gdy jest poza widokiem), odświeżenie, które przepisuje tekst, je porzuca, a zawinięty
+akapit kopiuje się jako pokazywane wiersze.
+
+Komentarze wewnątrz diffa na stronie **Pliki** (wątek, twoje oczekujące notatki, sugestie ✦) też się zaznaczają:
+przeciągnij po ich słowach, **`Ctrl+C`** (albo *Przegląd: Kopiuj zaznaczony tekst lub linię*) je kopiuje, **`Esc`**
+porzuca zaznaczenie. Naciśnięcie ich przycisku albo zwykłe kliknięcie nagłówka wątku (zwija go) nadal działa;
+przeciągnięcie zaczęte na nagłówku zaznacza jego słowa i zostawia wątek bez zmian.
 ### Commity
 
 Tylko commity żądania (nie historia za nim), od najnowszego, i diff zaznaczonego z nich
 (jego zmiany względem rodzica), ze wszystkimi plikami jeden pod drugim i tymi samymi opcjami wyświetlania.
 
+## Powrót do przeglądu
+
+Przegląd zostaje otwarty, gdy pracujesz w innej karcie. Opuść kartę z otwartym przeglądem (kliknij inną kartę, `Ctrl+PageDown`, polecenie palety **Repozytorium: Następna karta**), a powrót otwiera go ponownie na tym samym żądaniu, tej samej stronie (Przegląd, Pliki lub Commity), tym samym pliku i tej samej linii, z klawiaturą po tej samej stronie. To samo dotyczy przeglądu przez API nad Radarem: pokaż kartę Radar ponownie, a przegląd wraca nad nią.
+
+Przegląd jest **w toku**, dopóki jego strona jest otwarta. Zamknięcie go (`Esc`, krzyżyk, **Przegląd: Zamknij**), wysłanie (**Zakończ przegląd** albo wysłanie lub porzucenie zmiany Gerrit) albo checkout jego gałęzi kończy go i nie jest on otwierany ponownie. Zamknięcie GitPoulpi z otwartym przeglądem liczy się jako opuszczenie karty: następny start otwiera go tak samo.
+
+Jeśli żądanie zostało w międzyczasie scalone lub zamknięte albo host nie odpowiada, żadna strona się nie otwiera: pasek stanu mówi dlaczego, a przy następnym razie nic nie jest otwierane. Oczekujące komentarze, obejrzane pliki i szkic zostają jak zawsze (zob. **Pisanie przeglądu**). Uruchomienie sugestii, które jeszcze trwa przy opuszczeniu karty, nie jest przenoszone.
 ## Pisanie przeglądu
 
 Komentarz do kodu jest **oczekujący**: jest przechowywany na twoim komputerze (w pliku stanu repozytorium, więc przetrwa

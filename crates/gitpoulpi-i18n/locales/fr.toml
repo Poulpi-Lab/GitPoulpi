@@ -10115,7 +10115,7 @@ merge_run = { git = "Merge", local = "Fusionner" }
 # context: button
 merge_remove_run = { git = "Merge puis retirer", local = "Fusionner puis retirer" }
 merge_pick = { git = "Merge de {branch} dans :", local = "Fusionner {branch} dans :" }
-merge_checked_out = { git = "{target} est checked out dans {path} : le merge s'y fait.", local = "{target} est extraite dans {path} : la fusion s'y fait." }
+merge_checked_out = { git = "{target} est checkout dans {path} : le merge s'y fait.", local = "{target} est extraite dans {path} : la fusion s'y fait." }
 merge_not_checked_out = "{target} n'est extraite dans aucun worktree : extrayez-la d'abord."
 merge_gone = "la branche {branch} n'existe plus"
 merge_none = { git = "Il n'y a pas d'autre branch locale où merger.", local = "Il n'y a pas d'autre branche locale où fusionner." }

@@ -516,15 +516,15 @@ merge_side_by_side_min_width = "{$merge} 편집기: 나란히 보기 기준(열)
 merge_side_by_side_min_width_help = "{$merge} 충돌 편집기는 영역 너비가 이 열 수 이상일 때 A와 B를 나란히 표시합니다 (긴 줄은 Shift+휠 또는 Shift+화살표로 가로 스크롤). 그보다 좁으면 탭 뒤에 한 번에 한쪽만 표시합니다. 기본값 100, 최솟값 40, 0이면 항상 나란히 표시합니다. 편집기는 열려 있는 동안 Refs와 Status 패널을 숨기므로 보통 창 전체를 쓸 수 있습니다."
 diff_word_wrap = "자동 줄바꿈"
 diff_word_wrap_help = "{$Diff} 보기에서 긴 줄을 말줄임표로 자르는 대신 줄바꿈합니다. 내장 편집기와 blame 보기는 가로로 스크롤하며 줄바꿈하지 않습니다. {$Diff} 보기 자체의 줄바꿈 전환도 같습니다."
-diff_intraline = "Highlight changed words"
-diff_intraline_help = "In a changed line, paints the words that differ from the matching removed or added line with a stronger background, in every {$diff} view. Off keeps one flat tint per line. Also in the command palette."
+diff_intraline = "변경된 단어 강조"
+diff_intraline_help = "변경된 줄에서 대응하는 삭제 줄이나 추가 줄과 다른 단어를 더 진한 배경으로 칠합니다. 모든 {$diff} 보기에 적용됩니다. 끄면 줄 전체에 한 가지 색조만 칠합니다. 명령 팔레트에서도 전환할 수 있습니다."
 
 [settings_ui]
 theme = "테마"
 theme_help = "전체 인터페이스의 색상입니다. 목록을 이동하면 각 테마가 바로 미리보기되며, Enter로 확정하고 Esc로 되돌립니다. 시스템은 터미널을 따릅니다(시작할 때 한 번 감지한 밝은/어두운 배경, 알 수 없으면 어둡게). 설정 폴더의 themes/ 에 있는 직접 만든 테마 파일은 맨 끝에 나옵니다."
 theme_system = "시스템(터미널을 따름)"
 follow_theme = "테마 따르기"
-graph_color_missing = "{name} (not found, using the theme's lanes)"
+graph_color_missing = "{name} (찾을 수 없음, 테마의 레인 색 사용)"
 theme_swatches = "색상"
 graph_lane_background = "그래프 레인 배경"
 graph_lane_background_help = "꺼짐: 투명, 레인 뒤에 아무것도 없음 (기본값). 행 색조: 그래프 열 안에 {$commit} 레인 색상의 옅은 띠와 열의 오른쪽 가장자리에 같은 색의 가는 막대를 표시합니다. 저장된 레인 값은 행 색조로 읽습니다. 설정을 닫을 때 적용됩니다."
@@ -1016,14 +1016,14 @@ cannot_drop = "{source}을(를) {target}에 그렇게 놓을 수 없습니다"
 history_scrolled = "그곳과 여기 사이의 기록이 불러온 페이지 밖으로 스크롤되었습니다"
 shares_no_history = "{source}은(는) 대상과 공유하는 기록이 없습니다"
 nothing_to_replay = "{source}에는 대상에 없는 것이 없으므로 재적용할 것이 없습니다"
-move_tag_here = "Move {$tag} {name} here"
-move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
-merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
-merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
-moving_tag = "moving {$tag} {name} to {target}..."
-moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
-merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
-confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
+move_tag_here = "{$tag} {name}을(를) 여기로 이동"
+move_tag_not_ff = "{$tag} {name}을(를) 여기로 이동 (fast-forward가 아님: {name}이(가) 더 이상 조상이 아니게 됨)"
+merge_tag_into = "{$tag} {name}을(를) {branch}에 {$merge}"
+merge_into_tag = "{branch}을(를) {$tag} {name}에 {$merge}하고 {$tag} 이동 (드묾: {$merge} {$commit}이(가) 추가됨)"
+moving_tag = "{$tag} {name}을(를) {target}(으)로 이동하는 중..."
+moving_tag_remote = "{$tag} {name}을(를) {target}(으)로 이동하는 중... ({remotes}은(는) {$push}할 때까지 이전 위치를 유지함)"
+merging_into_tag = "{branch}을(를) {$tag} {name}에 {$merge}하는 중..."
+confirm_move_not_ff = "{$tag} {name}을(를) {target}(으)로 이동할까요? fast-forward가 아닙니다: {name}이(가) 더 이상 조상이 아니게 됩니다."
 
 [menu_inline]
 placeholder_branch = "브랜치 이름 입력"
@@ -1399,7 +1399,7 @@ stopped = "{label}이(가) 끝나기 전에 중지되었습니다"
 folder_gone = "{label}: 폴더 {path}이(가) 디스크에 더 이상 없습니다"
 unknown_variable = "{label}: 명령에 알 수 없는 변수 {var}이(가) 있습니다"
 bad_command = "{label}: 명령을 해석할 수 없습니다: {error}"
-no_label = "no Open in entry is labelled \"{label}\""
+no_label = "레이블이 \"{label}\"인 열기 위치 항목이 없습니다"
 program_not_found = "{label}: 프로그램 {program}을(를) 찾을 수 없습니다(PATH 확인함)"
 could_not_start = "{label}: {program}을(를) 시작할 수 없습니다: {error}"
 no_entry = "{n}번 \"열기 위치\" 항목이 없습니다"
@@ -1732,11 +1732,11 @@ column_author = "작성자"
 column_title = "제목"
 column_age = "경과"
 # context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
-column_actions = "Actions"
+column_actions = "동작"
 # context: short button on a Radar row: starts the review of the request; keep it to one word
-action_review = "Review"
+action_review = "리뷰"
 # context: short button on a Radar row: starts work on the issue (creates its branch)
-action_start_work = "Start work"
+action_start_work = "작업 시작"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "{name} 열 ({width}칸): [ 좁게, ] 넓게, 0 초기화, Tab 다음, Esc 완료"
 # context: {name} is a column name, {width} its width in terminal cells
@@ -1842,59 +1842,59 @@ status_unlinked = { one = "연결되지 않은 저장소 {n}개 (작업 중인 �
 # context: menu label and tooltip of a Radar request: merges it on the host, after a confirmation
 act_merge = "{$Merge}..."
 # context: menu label and tooltip of a Radar request or issue: closes it on the host, after a confirmation
-act_close = "Close..."
+act_close = "닫기..."
 # context: menu label and tooltip of a draft Radar request: takes it out of draft on the host
-act_ready = "Mark as ready"
+act_ready = "준비됨으로 표시"
 # context: menu label and tooltip of a Radar row whose repository is not cloned: opens the Clone dialog
-act_clone = "Clone repository..."
+act_clone = "저장소 클론..."
 # context: button of the Radar merge / close confirmation
-confirm_cancel = "Cancel"
+confirm_cancel = "취소"
 # context: button of the Radar close confirmation
-confirm_close = "Close it"
+confirm_close = "닫기 실행"
 # context: button of the Radar merge confirmation: a merge commit
 method_merge = "{$Merge} {$commit}"
 # context: button of the Radar merge confirmation: squash the commits, then merge
-method_squash = "Squash and {$merge}"
+method_squash = "{$Squash} 후 {$merge}"
 # context: button of the Radar merge confirmation: rebase the commits, then merge
-method_rebase = "{$Rebase} and {$merge}"
+method_rebase = "{$Rebase} 후 {$merge}"
 # context: title of the Radar merge confirmation; {label} is `!53` or `#12`
-merge_title = "{$Merge} {label}"
+merge_title = "{label} {$merge}"
 # context: body of the Radar merge confirmation; {project} is `owner/name`, {branches} is `source → target`
-merge_body = "{title}\n{project}  {branches}\n\nThe host will {$merge} it with the method you pick. This changes the host and cannot be undone from GitPoulpi."
+merge_body = "{title}\n{project}  {branches}\n\n선택한 방식으로 호스트가 {$merge}합니다. 호스트가 바뀌며 GitPoulpi에서 실행 취소할 수 없습니다."
 # context: title of the Radar close confirmation; {label} is `!53` or `#12`
-close_title = "Close {label}"
+close_title = "{label} 닫기"
 # context: body of the Radar close confirmation for a request
-close_body = "{title}\n{project}  {branches}\n\nThe host closes it without a {$merge}. This changes the host and cannot be undone from GitPoulpi (reopen it there)."
+close_body = "{title}\n{project}  {branches}\n\n호스트가 {$merge} 없이 닫습니다. 호스트가 바뀌며 GitPoulpi에서 실행 취소할 수 없습니다 (호스트에서 다시 여세요)."
 # context: body of the Radar close confirmation for an issue
-close_issue_body = "{title}\n{project}\n\nThe host closes the issue. This changes the host and cannot be undone from GitPoulpi (reopen it there)."
+close_issue_body = "{title}\n{project}\n\n호스트가 이슈를 닫습니다. 호스트가 바뀌며 GitPoulpi에서 실행 취소할 수 없습니다 (호스트에서 다시 여세요)."
 # context: why a Radar host action is refused
-why_no_host = "This row has no host account to act on"
+why_no_host = "이 행에는 작업할 호스트 계정이 없습니다"
 # context: why a Radar host action is refused; {host} is the provider name
-why_not_supported = "Not supported by {host}"
+why_not_supported = "{host}에서 지원하지 않습니다"
 # context: why Radar Merge is refused
-why_merge_draft = "It is a draft: mark it as ready first"
+why_merge_draft = "초안입니다: 먼저 준비됨으로 표시하세요"
 # context: why Radar Merge is refused; {target} is a branch
-why_merge_conflicts = "It conflicts with {target}"
+why_merge_conflicts = "{target}과(와) 충돌합니다"
 # context: why Radar Merge is refused
-why_merge_checks = "Its checks are failing"
+why_merge_checks = "검사가 실패하고 있습니다"
 # context: why Radar Mark as ready is refused
-why_not_draft = "It is not a draft"
+why_not_draft = "초안이 아닙니다"
 # context: why Radar Clone is refused; {path} is a folder
-why_already_cloned = "Already cloned at {path}"
+why_already_cloned = "이미 {path}에 클론되어 있습니다"
 # context: status line of the Radar
-msg_host_busy = "The host is still answering the last action"
+msg_host_busy = "호스트가 지난 동작에 아직 응답하는 중입니다"
 # context: status line of the Radar while a host action runs
-msg_asking_host = "Asking the host..."
+msg_asking_host = "호스트에 요청하는 중..."
 # context: status line of the Radar after a merge; {label} is `!53`
-msg_merged = "{label} {$merge}d on the host"
+msg_merged = "호스트에서 {label} {$merge} 완료"
 # context: status line of the Radar after a close
-msg_closed = "{label} closed on the host"
+msg_closed = "호스트에서 {label}을(를) 닫았습니다"
 # context: status line of the Radar after Mark as ready
-msg_ready = "{label} is ready for review"
+msg_ready = "{label}을(를) 리뷰할 준비가 되었습니다"
 # context: status line of the Radar when a host action failed
-msg_host_failed = "{label}: the host refused or failed: {why}"
+msg_host_failed = "{label}: 호스트가 거부했거나 실패했습니다: {why}"
 # context: note under the Clone dialog opened from a Radar row
-msg_clone_note = "Cloning {project}. The Radar finds the clone the next time it opens."
+msg_clone_note = "{project}을(를) 클론합니다. Radar는 다음에 열릴 때 클론을 찾습니다."
 
 [hosting_task]
 view_open = "열림"
@@ -2358,8 +2358,8 @@ pulling_from_all = { git = "{remotes}에서 {branch}을(를) pull하는 중...",
 no_pull_remote = "{branch}에는 {$pull}할 리모트가 없습니다"
 
 [keymap_action]
-sequence_cancel = "Sequence: Cancel"
-sequence_continue = "Sequence: Continue"
+sequence_cancel = "시퀀스: 취소"
+sequence_continue = "시퀀스: 계속"
 git_prefix_pull_all_branches = "모든 브랜치 {$Pull}"
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
 global_commit_column = "{$Commit} 열 표시 또는 숨기기"
@@ -2411,7 +2411,7 @@ commit_column_reset_widths = "부분 너비 초기화"
 commit_column_fit = "열을 내용에 맞추기"
 commit_column_fit_all = "모든 열을 내용에 맞추기"
 log_pick_column = "이동하거나 크기를 바꿀 열 고르기"
-log_filter_author = "Filter the Log by Author"
+log_filter_author = "작성자로 Log 필터"
 log_columns_next = "다음 열 고르기"
 log_columns_prev = "이전 열 고르기"
 log_columns_move_left = "열을 왼쪽으로 이동"
@@ -2519,13 +2519,13 @@ refs_mark_drop = "드롭 소스로 표시"
 refs_drop_marked = "표시한 ref를 여기에 놓기"
 log_toggle_file_mode = "파일: 경로 또는 트리"
 log_view_all_files = "파일: 모든 파일 보기"
-log_lfs_only = "Files: LFS Only"
+log_lfs_only = "파일: LFS만"
 log_files_collapse_all = "모든 폴더 접기 또는 펼치기"
 log_files_filter = "변경된 파일 필터"
 status_compose = "{$Commit} 메시지로 포커스"
 status_toggle_file_mode = "파일: 경로 또는 트리"
 status_view_all_files = "파일: 모든 파일 보기"
-status_lfs_only = "Files: LFS Only"
+status_lfs_only = "파일: LFS만"
 status_amend = "Amend 전환"
 status_collapse_all = "모든 폴더 접기 또는 펼치기"
 status_stage_toggle = "선택한 행 {$stage} 또는 해제"
@@ -2703,7 +2703,7 @@ md_editor_ai = "Markdown 편집기: AI로 쓰기"
 
 [keymap_ctx]
 # context: key group of the user-defined sequences on the Settings keybindings page
-sequence = "User sequences"
+sequence = "사용자 시퀀스"
 rewrite = "기록 다시 쓰기 워크벤치"
 history = "파일 기록 보기"
 commit_column = "{$Commit} 열 (키보드 포커스가 있을 때)"
@@ -3021,7 +3021,7 @@ open_agent_no_agent = "이 프로필에는 열 로컬 에이전트가 없습니�
 opened_agent = "{folder}에서 에이전트를 열었습니다: 질문에 한 번 답하고 닫은 뒤 다시 시도하세요"
 opened_terminal_for_agent = "{folder}에서 터미널을 열었습니다: 그곳에서 {command}을(를) 실행하고 질문에 한 번 답한 뒤 닫으세요"
 open_agent_failed = "에이전트를 열 수 없습니다: {why}"
-open_agent_unknown_profile = "no AI profile with the id {id}"
+open_agent_unknown_profile = "ID가 {id}인 AI 프로필이 없습니다"
 arg_inline_screen = "일반 화면에 그려서 답변 전체를 읽을 수 있게 합니다"
 preset_custom = "(사용자 지정)"
 provider_preset = "제공자 프리셋"
@@ -3080,15 +3080,15 @@ title_hosting_base = "답글 기본 프롬프트"
 
 [palette]
 # context: palette row: cancel the running sequence
-sequence_cancel = "Sequence: Cancel"
+sequence_cancel = "시퀀스: 취소"
 # context: palette row: continue the paused sequence
-sequence_continue = "Sequence: Continue"
+sequence_continue = "시퀀스: 계속"
 # context: why Sequence: Cancel is unavailable
-why_no_sequence_running = "no sequence is running"
+why_no_sequence_running = "실행 중인 시퀀스가 없습니다"
 # context: why Sequence: Continue is unavailable
-why_sequence_not_waiting = "the sequence is not waiting for you"
+why_sequence_not_waiting = "시퀀스가 사용자를 기다리고 있지 않습니다"
 # context: palette row running a user-defined sequence; {name} is the sequence's own name
-sequence_run = "Sequence: {name}"
+sequence_run = "시퀀스: {name}"
 git_pull_all_branches = "Git: 모든 브랜치 {$Pull}"
 git_pull_all_branches_fast_forward_if_possible = "Git: 모든 브랜치 {$Pull} (가능하면 fast-forward)"
 git_pull_all_branches_fast_forward_only = "Git: 모든 브랜치 {$Pull} (fast-forward만)"
@@ -3211,8 +3211,8 @@ navigation_focus_status_staged = { git = "탐색: Status > {$staged}으로 포�
 navigation_cycle_focus_to_next_pane = "탐색: 다음 창으로 포커스 이동"
 navigation_cycle_focus_to_previous_pane = "탐색: 이전 창으로 포커스 이동"
 navigation_search_commits = "탐색: {$Commit} 검색..."
-log_filter_by_author = "Log: Filter by Author..."
-log_clear_author_filter = "Log: Clear Author Filter"
+log_filter_by_author = "Log: 작성자로 필터..."
+log_clear_author_filter = "Log: 작성자 필터 해제"
 navigation_toggle_refs_pane_collapsed = "탐색: Refs 창 접기 전환"
 navigation_toggle_status_pane_collapsed = "탐색: Status 창 접기 전환"
 navigation_refs_pane_wider = "탐색: Refs 창 넓히기"
@@ -3276,7 +3276,7 @@ git_annotated_tag_at_selected_commit = "Git: 선택한 {$Commit}에 주석 {$Tag
 refs_push_selected_tag_to_default_remote = "Refs: 선택한 {$Tag}를 기본 리모트로 {$Push}"
 refs_delete_selected_tag_from_its_remote = "Refs: 선택한 {$Tag}를 리모트에서 삭제..."
 refs_annotate_selected_tag = "Refs: 선택한 {$Tag} 주석 달기..."
-refs_move_selected_tag_to_selected_commit = "Refs: Move Selected {$Tag} to Selected {$Commit}..."
+refs_move_selected_tag_to_selected_commit = "Refs: 선택한 {$Tag}을(를) 선택한 {$Commit}(으)로 이동..."
 refs_toggle_hide_in_graph = "Refs: 그래프에서 숨기기 전환"
 refs_toggle_solo_on_selected_ref = "Refs: 선택한 Ref 솔로 전환"
 refs_stop_soloing_clear_every_soloed_ref = "Refs: 솔로 해제 (모든 솔로 Ref 해제)"
@@ -3450,8 +3450,8 @@ tab_open_in_file_manager = "탭: 파일 관리자에서 열기"
 tab_open_in_terminal = "탭: 터미널에서 열기"
 tab_open_in = "탭: 열기 위치..."
 tab_open_in_default = "탭: 기본 위치에서 열기"
-tab_terminal_here = "Tab: Terminal Here"
-tab_open_ai_agent_here = "Tab: Open AI Agent Here"
+tab_terminal_here = "탭: 여기서 터미널 열기"
+tab_open_ai_agent_here = "탭: 여기서 AI 에이전트 열기"
 tab_quit_and_cd_here = "탭: 종료 후 여기로 cd"
 repository_clone = "저장소: 클론..."
 repository_next_tab = "저장소: 다음 탭"
@@ -3495,14 +3495,14 @@ diff_layout_split_before_and_after = "{$Diff}: 분할 레이아웃 (변경 전�
 diff_toggle_hunks_only_whole_file_only_the_changes = "{$Diff}: 변경 부분만 전환 (전체 파일 / 변경만)"
 files_toggle_path_tree = "파일: 경로/트리 전환"
 files_toggle_view_all_files = "파일: 모든 파일 보기 전환"
-files_toggle_lfs_only = "Files: Toggle LFS Only"
+files_toggle_lfs_only = "파일: LFS만 보기 전환"
 files_open_menu = "파일: 행 또는 선택 항목의 메뉴 열기"
 files_select_all = "파일: 모두 선택"
 files_clear_selection = "파일: 선택 해제"
 files_toggle_selection = "파일: 현재 행 선택 전환"
 diff_toggle_word_wrap = "{$Diff}: 자동 줄바꿈 전환"
 view_toggle_minimap = "보기: 미니맵 전환"
-diff_toggle_intraline = "{$Diff}: Toggle Changed Words Highlight"
+diff_toggle_intraline = "{$Diff}: 변경된 단어 강조 전환"
 editor_toggle_follow_selection = "편집기: 선택 따라가기 전환"
 diff_toggle_whitespace_only_changes = "{$Diff}: 공백만 바뀐 변경 전환"
 ai_generate_commit_message = "AI: {$Commit} 메시지 생성"
@@ -3601,7 +3601,7 @@ why_no_uncommitted_changes_the_wip_row_appears_once = "{$commit}하지 않은 �
 why_there_are_no_stashes = "{$stash}가 없습니다"
 why_select_a_changed_file_in_the_commit_detail_pane = "먼저 {$commit} 상세 창에서 변경된 파일을 선택하세요"
 why_this_repository_has_no_remote_add_one_first = "이 저장소에는 리모트가 없습니다 - 먼저 추가하세요"
-why_this_repository_has_no_lfs_files = "this repository has no LFS files"
+why_this_repository_has_no_lfs_files = "이 저장소에는 LFS 파일이 없습니다"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a = "\"{$unstaged_files}\" 창에서 파일을 여세요 - {$commit}의 {$diff}에는 {$stage}할 인덱스가 없습니다"
 why_this_diff_is_the_staged_half_use_the_unstage = "이 {$diff}는 \"{$staged_files}\" 창입니다. {$Unstage} 명령을 사용하세요"
 why_open_a_file_from_the_third_pane_s_unstaged_half_a_2 = "\"{$unstaged_files}\" 창에서 파일을 여세요 - {$commit}의 {$diff}에는 버릴 작업 트리 변경이 없습니다"
@@ -3618,7 +3618,7 @@ why_select_a_repository_in_the_list_first = "먼저 목록에서 저장소를 �
 why_the_repository_management_tab_has_no_tab_menu_use = "저장소 관리 탭에는 탭 메뉴가 없습니다 - 행 메뉴(.)를 사용하세요"
 why_the_repository_management_tab_has_no_folder = "저장소 관리 탭에는 폴더가 없습니다 - 저장소 탭으로 전환하세요"
 why_ai_is_turned_off_settings_ai = "AI가 꺼져 있습니다 (설정 > AI)"
-why_no_local_ai_agent = "no local AI agent is set up (Settings > AI)"
+why_no_local_ai_agent = "설정된 로컬 AI 에이전트가 없습니다 (설정 > AI)"
 why_an_ai_request_is_already_running_esc_cancels_it = "AI 요청이 이미 실행 중입니다 - Esc로 취소"
 why_no_uncommitted_changes = "{$commit}하지 않은 변경 사항이 없습니다"
 why_open_the_commit_composer_review_first_ai_split = "먼저 {$commit} 작성기 검토 화면을 여세요 (AI: 변경 사항을 {$commit}으로 나누기)"
@@ -3798,13 +3798,13 @@ radar_review_api = "Radar: API로 리뷰"
 # context: command palette entry: opens the Clone dialog for the selected Radar request, then its review
 radar_clone_review = "Radar: 클론 후 리뷰..."
 # context: command palette entry: merges the selected Radar request on the host
-radar_merge = "Radar: {$Merge} Request..."
+radar_merge = "Radar: 요청 {$merge}..."
 # context: command palette entry: closes the selected Radar request or issue on the host
-radar_close = "Radar: Close..."
+radar_close = "Radar: 닫기..."
 # context: command palette entry: takes the selected Radar draft out of draft
-radar_ready = "Radar: Mark as Ready"
+radar_ready = "Radar: 준비됨으로 표시"
 # context: command palette entry: opens the Clone dialog for the selected Radar row
-radar_clone = "Radar: Clone Repository..."
+radar_clone = "Radar: 저장소 클론..."
 # context: command palette entry: toggles the Not cloned checkbox of the Radar
 radar_not_cloned = "Radar: 클론하지 않은 요청 표시"
 # context: command palette entry: toggles the Drafts checkbox of the Radar
@@ -3853,8 +3853,8 @@ rewrite_strip_exec = "다시 쓰기: 실행 비트 제거..."
 rewrite_file_encoding = "다시 쓰기: 파일 인코딩 변환..."
 # s22:end
 git_fetch_selected_tag = "Git: 선택한 {$Tag} {$Fetch}"
-git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
-git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
+git_use_remote_version_of_selected_tag = "Git: 선택한 {$Tag}에 리모트 버전 사용"
+git_force_push_selected_tag = "Git: 선택한 {$Tag}을(를) 리모트로 강제 {$Push}"
 # s24:begin
 rewrite_fix_message_encoding = "다시 쓰기: 메시지 인코딩 수정..."
 # s24:end
@@ -3885,12 +3885,12 @@ why_group_not_paused = "충돌 때문에 대기 중인 그룹 {$push}가 없습�
 why_group_not_ready = "먼저 충돌을 해결하고 마무리하세요"
 # context: palette: why a command is grayed out
 why_nothing_to_retry = "마지막 그룹 {$push}에서 실패한 리모트가 없습니다"
-edit_undo_sequence = "Edit: Undo Whole Sequence"
-undo_history_undo_sequence = "Undo History: Undo Whole Sequence"
-sequence_repo_review = "Sequence: Review This Repository's Sequences"
-sequence_repo_trust = "Sequence: Trust This Repository's Sequences"
-sequence_repo_ignore = "Sequence: Ignore This Repository's Sequences"
-why_no_repo_sequences = "this repository has no sequences waiting for your trust"
+edit_undo_sequence = "편집: 시퀀스 전체 실행 취소"
+undo_history_undo_sequence = "실행 취소 기록: 시퀀스 전체 실행 취소"
+sequence_repo_review = "시퀀스: 이 저장소의 시퀀스 검토"
+sequence_repo_trust = "시퀀스: 이 저장소의 시퀀스 신뢰"
+sequence_repo_ignore = "시퀀스: 이 저장소의 시퀀스 무시"
+why_no_repo_sequences = "이 저장소에는 신뢰 여부를 기다리는 시퀀스가 없습니다"
 
 [help_section]
 rewrite = "기록 다시 쓰기"
@@ -4047,7 +4047,7 @@ status_pane_working_3 = "활성 하위 창 접기/펼치기"
 status_pane_working_4 = "선택한 파일 {$stage}/해제, 또는 폴더 행 접기 (트리 모드)"
 status_pane_working_5 = "파일 목록을 Path(평면)와 Tree(폴더) 사이에서 전환"
 status_pane_working_6 = "모든 파일 보기 전환 (Status 창 / WIP 행, 또는 {$commit}의 변경된 파일. 팔레트: 파일: 경로/트리 전환, 파일: 모든 파일 보기 전환)"
-status_pane_working_lfs_only = "toggle LFS only: in a repository that has LFS files, the file lists show only those ({{log.lfs_only}} with the Log focused; palette: Files: Toggle LFS Only)"
+status_pane_working_lfs_only = "LFS만 보기 전환: LFS 파일이 있는 저장소에서 파일 목록에 해당 파일만 표시합니다 (Log에 포커스가 있을 때는 {{log.lfs_only}}, 팔레트: 파일: LFS만 보기 전환)"
 status_pane_working_7 = "모든 폴더 접기, 접힌 폴더가 있으면 다시 펼치기"
 status_pane_working_8 = "선택한 파일의 메뉴: {$Stage}/{$Unstage}, 변경 사항 버리기 (확인 후), 파일 경로 복사는 실제로 실행됩니다. 파일 기록/Blame은 파일을 가운데에 엽니다. 나머지는 필요한 조건과 함께 흐리게 표시됩니다"
 status_pane_working_9 = "{$commit}의 변경된 파일을 이름으로 필터 ({$commit} 자체의 파일 목록 안에서만, Status에서는 불가)"
@@ -4654,7 +4654,7 @@ theme_filter_all = "전체"
 theme_filter_dark = "다크"
 theme_filter_light = "라이트"
 theme_filter_colored = "컬러"
-theme_filter_custom = "Custom"
+theme_filter_custom = "사용자 지정"
 change_language_title = "언어 변경 ({shown}/{total})"
 no_matching_language = "(일치하는 언어 없음)"
 change_graph_color_theme_title = "그래프 색상 테마 변경 ({shown}/{total})"
@@ -4688,7 +4688,7 @@ diff_error = "{$diff} 오류: {error}"
 mode_path = "경로"
 mode_tree = "트리"
 view_all_files = "모든 파일 보기"
-lfs_only = "LFS only"
+lfs_only = "LFS만"
 filter_files = "파일 필터: "
 all_files = "모든 파일"
 changed_files = "변경된 파일"
@@ -4705,7 +4705,7 @@ tree_view = "트리 보기{hint}"
 collapse_all = "모두 접기"
 expand_all = "모두 펼치기"
 view_all_files = "모든 파일 보기{key}"
-lfs_only = "LFS only{key}"
+lfs_only = "LFS만{key}"
 
 [autostash]
 reason_checkout = "체크아웃"
@@ -4941,9 +4941,9 @@ redo_label_key = "다시 실행: {label} · {key}"
 nothing_to_undo_comment = "되돌릴 것이 없습니다 (호스트에 게시한 댓글은 여기서 되돌릴 수 없습니다. 대신 편집하거나 삭제하세요)"
 tip_nothing_to_undo_comment = "되돌릴 것이 없습니다 (호스트에 게시한 댓글은 여기서 되돌릴 수 없습니다. 대신 편집하거나 삭제하세요)"
 # context: why a palette command is grayed; a sequence is a user-defined list of actions run together
-why_no_sequence = "the newest actions are not one sequence run"
+why_no_sequence = "가장 최근 동작이 하나의 시퀀스 실행이 아닙니다"
 # context: status line while a sequence run is being undone
-undoing_sequence = "undoing the sequence..."
+undoing_sequence = "시퀀스를 실행 취소하는 중..."
 
 [status_pane]
 unstaged_title = "{$unstaged_files}"
@@ -5064,8 +5064,8 @@ staging_lines = { one = { git = "hunk {hunk}의 줄 {n}개 {$stage} 중{spill}..
 unstaging_lines = { one = { git = "hunk {hunk}의 줄 {n}개 {$unstage} 중{spill}...", local = "hunk {hunk}의 줄 {n}개 스테이징 해제 중{spill}..." }, other = { git = "hunk {hunk}의 줄 {n}개 {$unstage} 중{spill}...", local = "hunk {hunk}의 줄 {n}개 스테이징 해제 중{spill}..." } }
 minimap_on = "미니맵 켬"
 minimap_off = "미니맵 끔"
-intraline_on = "changed words highlighted"
-intraline_off = "changed words not highlighted"
+intraline_on = "변경된 단어를 강조합니다"
+intraline_off = "변경된 단어를 강조하지 않습니다"
 not_working_diff = "{$stage}은 작업 트리에 적용됩니다 - {$commit}이 아니라 \"{$unstaged_files}\" 또는 \"{$staged_files}\" 창에서 파일을 여세요"
 not_working_diff_discard = "버리기는 작업 트리에 적용됩니다 - {$commit}이 아니라 \"{$unstaged_files}\" 창에서 파일을 여세요"
 discard_on_staged = "버리기는 스테이징되지 않은 변경 사항을 되돌립니다 - 여기는 \"{$staged_files}\" 창입니다. 먼저 스테이징을 해제한 뒤 \"{$unstaged_files}\" 창에서 버리세요"
@@ -5337,9 +5337,9 @@ fetched = { one = "{remote} {$fetch} 완료: ref {n}개 업데이트", other = "
 fetched_all = { one = "모든 리모트 {$fetch} 완료: ref {n}개 업데이트", other = "모든 리모트 {$fetch} 완료: ref {n}개 업데이트" }
 branch_created_checkout_failed = "브랜치 {name}을(를) 만들었지만 체크아웃하지 못했습니다: {error}"
 tag_annotated = "{$tag} {name}에 주석을 달았습니다"
-tag_moved = "moved {$tag} {name} to {target}"
-tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
-tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
+tag_moved = "{$tag} {name}을(를) {target}(으)로 이동했습니다"
+tag_moved_remote = "{$tag} {name}을(를) {target}(으)로 이동했습니다. {remotes}에는 아직 이전 위치가 남아 있습니다 (갱신하려면 {$push})"
+tag_merged = "{branch}을(를) {$tag} {name}에 {$merge}했습니다. 이제 {target}에 있습니다"
 tags_all_pushed = "모든 {$tag}가 이미 {remote}에 있습니다"
 nothing_to_push = "{remote}(으)로 {$push}할 것이 없습니다"
 pushed_refs = "{refs}을(를) {remote}(으)로 {$push}했습니다"
@@ -5421,7 +5421,7 @@ reword_invalid_date = "날짜가 git 원시 형식도 ISO 8601 형식도 아닙�
 rewrite_refused = "기록을 다시 쓸 수 없습니다: {reason}{detail}"
 push_rejected = "{remote}이(가) {branch}의 {$push}를 거부했습니다: {reason}"
 push_non_fast_forward = "리모트에 이 브랜치에 없는 {$commit}이 있습니다 (먼저 {$pull}하거나 강제 {$push})"
-push_stale_lease = "마지막 {$fetch} 이후 리모트 브랜치가 이동하여 강제 {$push}가 거부되었습니다"
+push_stale_lease = "마지막 {$fetch} 이후 리모트의 브랜치나 {$tag}이(가) 이동하여 강제 {$push}가 거부되었습니다"
 not_fast_forward = "fast-forward할 수 없습니다: 둘이 갈라졌습니다"
 reword_refused = "그 {$commit}을 변경할 수 없습니다: {reason}"
 reword_not_on_branch = "그 {$commit}은 현재 브랜치에 없습니다 ({$head}가 아니며 {$head}의 조상도 아님)"
@@ -5571,10 +5571,10 @@ proposed_by = "{client}의 제안"
 chip_propose = "{client}이(가) {what}을(를) 제안 - {accept} 또는 클릭: 열기, Esc: 닫기"
 chip_show = "{client}이(가) {what}을(를) 표시하려 함 - {accept} 또는 클릭: 표시, Esc: 닫기"
 shown = "{client}이(가) 표시: {what} · {back}로 돌아가기"
-prop_sequence = "run sequence {name}"
-banner_sequence = "Proposed by {client}: {what} · {accept} runs · Esc dismisses"
-button_run = "Run"
-button_dismiss = "Dismiss"
+prop_sequence = "시퀀스 {name} 실행"
+banner_sequence = "{client}의 제안: {what} · {accept}로 실행 · Esc로 닫기"
+button_run = "실행"
+button_dismiss = "닫기"
 
 [rebase_ui]
 title_cherry_pick = "대화형 {$Cherry_pick}"
@@ -5874,7 +5874,7 @@ open_install_page = "설치 페이지 열기"
 undo_anyway = "그래도 실행 취소"
 start_over = "처음부터 다시"
 redo_anyway = "그래도 다시 실행"
-move_tag = "Move"
+move_tag = "이동"
 
 [rebase_banner]
 skip = "건너뛰기"
@@ -5923,9 +5923,9 @@ temp_file = "임시 파일: {error}"
 
 [keymap_issue]
 # context: [keybindings.sequence] entry naming a sequence that does not exist; {name} is the slug
-unknown_sequence = "no sequence named '{name}'"
+unknown_sequence = "이름이 '{name}'인 시퀀스가 없습니다"
 # context: more sequences than the keymap has slots for; {slug} is the sequence, {max} the limit
-sequence_limit = "sequence '{slug}' ignored: the limit of {max} sequences with a key per session is reached"
+sequence_limit = "시퀀스 '{slug}'을(를) 무시했습니다: 세션당 키를 지정할 수 있는 시퀀스 {max}개 한도에 도달했습니다"
 unknown_action = "[{ctx}]에 알 수 없는 동작 '{name}'이(가) 있습니다"
 unknown_context = "알 수 없는 범위 '{ctx}'"
 not_rebindable = "아직 다시 지정할 수 없습니다"
@@ -6563,11 +6563,11 @@ hint_repo_auth = "SSH 및 자격 증명에서 이 저장소의 다른 로그인 
 
 [failure_card]
 # context: title of the failure notification when a step of a user-defined sequence fails
-title_sequence = "Sequence stopped"
+title_sequence = "시퀀스가 중단되었습니다"
 # context: reason line of the failure notification when a sequence stopped
-summary_sequence = "A step of the sequence did not succeed, so the sequence stopped there. Earlier steps are kept."
+summary_sequence = "시퀀스의 한 단계가 성공하지 못해 거기서 중단되었습니다. 이전 단계는 그대로 유지됩니다."
 # context: next-step line of the failure notification when a sequence stopped
-hint_sequence = "Fix the cause, then run the sequence again; the steps that worked are not undone."
+hint_sequence = "원인을 해결한 뒤 시퀀스를 다시 실행하세요. 성공한 단계는 되돌려지지 않습니다."
 title_clone = "클론에 실패했습니다"
 title_create = "저장소를 만들지 못했습니다"
 title_hosting = "호스팅 서비스 요청에 실패했습니다"
@@ -6847,17 +6847,17 @@ refreshing = "새로 고치는 중..."
 # context: Undo history: key of the Undo whole sequence button, one letter
 key_undo_sequence = "x"
 # context: Undo history: button; undoes every entry of the sequence run at the top of the history, newest first
-btn_undo_sequence = "Undo whole sequence"
+btn_undo_sequence = "시퀀스 전체 실행 취소"
 # context: confirm title; {name} is the name of a user-defined sequence of actions
-confirm_undo_sequence = "Undo the whole sequence \"{name}\"?"
+confirm_undo_sequence = "시퀀스 \"{name}\" 전체를 실행 취소할까요?"
 # context: confirm warning under the list of actions of a sequence run; a sequence can act in a worktree (another repository)
-warning_sequence_scope = "Only this repository's journal is undone: steps done in another repository stay."
+warning_sequence_scope = "이 저장소의 저널만 실행 취소됩니다. 다른 저장소에서 한 단계는 그대로 남습니다."
 # context: status line; {name} is the name of a user-defined sequence of actions
-done_undo_sequence = "undid the sequence \"{name}\""
+done_undo_sequence = "시퀀스 \"{name}\"을(를) 실행 취소했습니다"
 # context: status line; undoing a sequence stopped at one of its actions; {step}/{of} is its position in the sequence, {label} the action, {why} the reason, {left} how many actions stay done
-sequence_stopped = "undoing \"{name}\" stopped at step {step}/{of} ({label}): {why}. Actions left: {left}"
+sequence_stopped = "\"{name}\" 실행 취소가 {step}/{of}단계({label})에서 중단되었습니다: {why}. 남은 동작: {left}"
 # context: detail line of a history row made by a sequence; {step}/{of} is its position in the sequence
-detail_sequence = "Made by the sequence \"{name}\", step {step}/{of}."
+detail_sequence = "시퀀스 \"{name}\"의 {step}/{of}단계에서 만들어졌습니다."
 
 # 실행 취소 기록의 행 레이블: 항목 종류에서 표시할 때 만들어집니다
 [undo_label]
@@ -6910,8 +6910,8 @@ sparse_disable = "스파스 체크아웃 해제"
 tag_create = "{$tag} {name} 만들기"
 tag_delete = "{$tag} {name} 삭제"
 tag_annotate = "{$tag} {name} 주석 달기"
-tag_move = { git = "Move {$tag} {name}", local = "Move {$tag} {name}" }
-tag_merge_branch = "{$Merge} {branch} into {$tag} {name}"
+tag_move = { git = "{$tag} {name} 이동", local = "{$tag} {name} 이동" }
+tag_merge_branch = "{branch}을(를) {$tag} {name}에 {$merge}"
 fast_forward = "{branch}을(를) {target}(으)로 fast-forward"
 reword = "{id} {$Reword}"
 fetch_as_branch = "{remote_ref}을(를) 브랜치 {branch}(으)로 {$Fetch}"
@@ -7567,9 +7567,9 @@ hint_open_diff = "{$diff} 보기"
 # context: footer hint after the Esc key
 hint_close = "닫기"
 # context: status line: the request that was under review is merged or closed; {caption} is like #12 Fix the thing
-resume_gone = "{caption} is no longer open: the review was not reopened"
+resume_gone = "{caption}은(는) 더 이상 열려 있지 않습니다: 리뷰를 다시 열지 않았습니다"
 # context: status line: the host did not answer when the review was reopened; {why} is the error
-resume_unreachable = "could not reopen {caption}: {why}"
+resume_unreachable = "{caption}을(를) 다시 열 수 없습니다: {why}"
 # >>> local_issues (slice L1)
 [local_issues]
 field_status = "상태"
@@ -9068,98 +9068,98 @@ res_filled = "현재 워크벤치의 규칙: {n}개."
 
 [sequence_ai]
 # context: Settings > AI, the page of the action that drafts or changes an action sequence from a description
-title = "Sequence drafts"
-profile_help = "The profile GitPoulpi will use to draft a new action sequence, or a change to one, from your description. It only proposes: you read it and save it yourself, and nothing is ever run."
-repo_profile_help = "The profile used in this repository to draft action sequences."
-action = "Sequence draft"
+title = "시퀀스 초안"
+profile_help = "설명을 바탕으로 새 동작 시퀀스나 기존 시퀀스의 변경안을 작성할 때 GitPoulpi가 사용할 프로필입니다. 제안만 하며, 직접 읽고 저장하고, 아무것도 실행되지 않습니다."
+repo_profile_help = "이 저장소에서 동작 시퀀스 초안을 작성하는 데 쓰는 프로필입니다."
+action = "시퀀스 초안"
 # context: title of the dialog that creates a sequence from a description; the sparkle is added in code
-dlg_title_create = "Create a sequence with AI"
+dlg_title_create = "AI로 시퀀스 만들기"
 # context: title of the dialog that changes the selected sequence from a description; the sparkle is added in code
-dlg_title_edit = "Edit a sequence with AI"
+dlg_title_edit = "AI로 시퀀스 편집"
 # context: label of the description field
-dlg_label_create = "Describe the sequence you want"
+dlg_label_create = "원하는 시퀀스를 설명하세요"
 # context: label of the description field in edit mode; {name} is the sequence's name
-dlg_label_edit = "Describe how to change \"{name}\""
+dlg_label_edit = "\"{name}\"을(를) 어떻게 바꿀지 설명하세요"
 # context: placeholder of the description field
-dlg_example_create = "For example: {$stage} everything, write the message with the AI, {$commit}, then {$push}."
+dlg_example_create = "예: 모두 {$stage}하고, AI로 메시지를 작성하고, {$commit}한 다음 {$push}."
 # context: placeholder of the description field in edit mode
-dlg_example_edit = "For example: {$fetch} first, and always ask before the {$push}."
+dlg_example_edit = "예: 먼저 {$fetch}하고, {$push} 전에는 항상 확인."
 # context: keys of the description field
-dlg_hint = "Enter adds a line. Ctrl+Enter sends. Esc closes."
+dlg_hint = "Enter는 줄 추가. Ctrl+Enter는 보내기. Esc는 닫기."
 # context: checkbox, off by default
-dlg_context = "Send context (remote names, AI profiles, Open in labels)"
+dlg_context = "컨텍스트 보내기 (리모트 이름, AI 프로필, 열기 위치 레이블)"
 # context: under the unchecked box
-dlg_context_off = "Off: only your description is sent."
+dlg_context_off = "꺼짐: 설명만 전송됩니다."
 # context: reassurance under the description
-dlg_footer = "The AI only proposes. Nothing is saved before you accept, and nothing is ever run."
+dlg_footer = "AI는 제안만 합니다. 수락하기 전에는 아무것도 저장되지 않으며, 아무것도 실행되지 않습니다."
 # context: button; the sparkle is added in code
-dlg_send = "Send"
+dlg_send = "보내기"
 # context: button
-dlg_cancel = "Cancel"
+dlg_cancel = "취소"
 # context: why Send is unavailable
-dlg_need_text = "Describe what you want first."
+dlg_need_text = "먼저 원하는 내용을 설명하세요."
 # context: another AI request is running
-dlg_busy = "Another AI request is running."
+dlg_busy = "다른 AI 요청이 실행 중입니다."
 # context: shown when the AI is off
-dlg_off = "Turn the AI on in Settings first."
+dlg_off = "먼저 설정에서 AI를 켜세요."
 # context: the window is too small for the dialog
-dlg_too_small = "Make the window larger to use this dialog."
+dlg_too_small = "이 대화상자를 사용하려면 창을 더 크게 하세요."
 # context: the answer came after the dialog was closed
-dlg_closed = "The AI answered after the dialog was closed; nothing was written."
+dlg_closed = "대화상자가 닫힌 뒤에 AI가 응답했습니다. 아무것도 기록되지 않았습니다."
 # context: what a copy from the description field is called in the confirmation
-dlg_copy_what = "the description"
+dlg_copy_what = "설명"
 # context: title of the proposal of a new sequence; the sparkle is added in code
-res_title_create = "Proposed sequence"
+res_title_create = "제안된 시퀀스"
 # context: title of the proposed change to a sequence; the sparkle is added in code
-res_title_edit = "Proposed change"
+res_title_edit = "제안된 변경"
 # context: heading over the steps; {n} is how many
-res_steps = "Steps ({n})"
+res_steps = "단계 ({n})"
 # context: heading over what the AI proposed but was refused
-res_left_out = "Left out"
+res_left_out = "제외됨"
 # context: a refused step; {n} its place, {what} its command, {reason} why
-res_left_step = "step {n} `{what}`: {reason}"
+res_left_step = "{n}단계 `{what}`: {reason}"
 # context: a refused field; {what} its name, {reason} why
 res_left_item = "{what}: {reason}"
 # context: heading over the AI's remarks
-res_notes = "Notes from the AI"
+res_notes = "AI의 메모"
 # context: heading over the suggested shortcut; {key} is the key as the AI wrote it
-res_shortcut = "Suggested shortcut: {key}"
+res_shortcut = "제안된 단축키: {key}"
 # context: the suggested shortcut is not used by anything
-res_shortcut_free = "It is free. It is not set: use the Shortcut button after accepting."
+res_shortcut_free = "사용 가능한 키입니다. 설정되지는 않았습니다: 수락한 뒤 단축키 버튼으로 지정하세요."
 # context: the suggested shortcut is used; {label} names its action
-res_shortcut_taken = "Already used by {label}. It is not set."
+res_shortcut_taken = "이미 {label}에서 사용 중입니다. 설정되지 않았습니다."
 # context: the suggested shortcut is not a single key
-res_shortcut_unusable = "Not a single key. Set the shortcut yourself with the Shortcut button."
+res_shortcut_unusable = "단일 키가 아닙니다. 단축키 버튼으로 직접 지정하세요."
 # context: the proposal equals the sequence
-res_no_change = "No change: the proposal is the same as the sequence."
+res_no_change = "변경 없음: 제안이 시퀀스와 같습니다."
 # context: legend of the diff
-res_legend = "+ added   - removed   ~ changed"
+res_legend = "+ 추가   - 삭제   ~ 변경"
 # context: a step with no pause and no option, in a change line
-res_defaults = "defaults"
+res_defaults = "기본값"
 # context: an empty field, in a change line
-res_none = "(none)"
+res_none = "(없음)"
 # context: a changed field; {field} its name, {old} and {new} its values
 res_field_changed = "{field}: \"{old}\" -> \"{new}\""
 # context: why Accept is unavailable; {reason} says why
-res_blocked = "Cannot accept: {reason}"
+res_blocked = "수락할 수 없음: {reason}"
 # context: the proposal holds no usable step
-res_no_steps = "the proposal has no usable step"
+res_no_steps = "제안에 사용할 수 있는 단계가 없습니다"
 # context: button that saves the proposal
-btn_accept = "Accept"
+btn_accept = "수락"
 # context: button that saves the proposal and opens its steps
-btn_edit_first = "Edit before saving"
+btn_edit_first = "저장 전에 편집"
 # context: button that drops the proposal
-btn_reject = "Reject"
+btn_reject = "거부"
 # context: button back to the description
-btn_back = "Back"
+btn_back = "뒤로"
 # context: status line; {name} is the new sequence
-accepted_create = "Sequence \"{name}\" added"
+accepted_create = "시퀀스 \"{name}\"을(를) 추가했습니다"
 # context: status line; {name} is the changed sequence
-accepted_edit = "Sequence \"{name}\" updated"
+accepted_edit = "시퀀스 \"{name}\"을(를) 갱신했습니다"
 # context: question when Settings is closed with a proposal open
-close_body = "A sequence proposal from the AI is open. Closing Settings drops it; nothing was written."
+close_body = "AI의 시퀀스 제안이 열려 있습니다. 설정을 닫으면 제안이 버려지며, 아무것도 기록되지 않았습니다."
 # context: palette row; the sparkle is added in code
-palette_create = "Sequence: Create with AI..."
+palette_create = "시퀀스: AI로 만들기..."
 
 [rewrite_size]
 tab = "크기"
@@ -9211,15 +9211,15 @@ tip_both = "여기와 {remotes}에 있으며 같은 {$commit}을 가리킵니다
 tip_differs = "여기와 {remotes}에 있지만 서로 다른 {$commit}을 가리킵니다: {$push}하면 거부됩니다."
 tip_fetch_note = "여기서만 삭제한 {$tag}는 리모트에 남아 있으면 {$fetch}할 때 되살아납니다. 리모트에서 삭제된 {$tag}는 설정의 {$tags} 자동 정리를 켜야 이 저장소에서도 사라집니다."
 fetch_tag = "{remote}에서 {name} {$fetch}"
-tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
-take_remote = "Use {name} from {remote}"
-force_push_tag = "{$Push} {name} to {remote} (force)"
-confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
-msg_taking_remote = "Using the remote's version of {name}..."
-msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
-msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
-msg_not_differing = "{name} does not differ from a remote"
-why_not_differing = "This {$tag} does not differ from a remote"
+tip_differs_actions = "메뉴에서: 여기에 리모트 버전을 사용하거나 내 버전을 강제 {$push}할 수 있습니다 (먼저 확인함)."
+take_remote = "{remote}의 {name} 사용"
+force_push_tag = "{name}을(를) {remote}로 강제 {$Push}"
+confirm_force_push = "{$tag} '{name}'을(를) {remote}로 강제 {$push}할까요? {remote}의 {$tag}이(가) 교체되어 그것을 쓰는 모든 사람에게 영향을 줍니다. 마지막 {$fetch} 이후 {remote}이(가) 이동했다면 거부됩니다. 실행 취소하면 이전 것을 되돌립니다."
+msg_taking_remote = "{name}의 리모트 버전을 사용하는 중..."
+msg_took_remote = "{name}이(가) 이제 {remote}의 버전입니다. 실행 취소하면 내 버전을 되돌립니다."
+msg_force_pushed = "{name}을(를) {remote}로 강제 {$push}했습니다. 실행 취소하면 이전 것을 되돌립니다."
+msg_not_differing = "{name}은(는) 리모트와 다르지 않습니다"
+why_not_differing = "이 {$tag}은(는) 리모트와 다르지 않습니다"
 delete_tag_scope = "{name} 삭제..."
 delete_tag_on_remote = "{remote}의 {name} 삭제..."
 dlg_title = "{$tag} 삭제"
@@ -10721,11 +10721,11 @@ palette_toggle_internal = "대화: 내부 메모 전환"
 why_unchanged = "아직 바뀐 것이 없습니다"
 flavor_plain_text = "일반 텍스트"
 # context: what was copied, named in the status line
-noun_text = "text"
+noun_text = "텍스트"
 # context: status line: nothing selected and no entry
-why_no_text = "there is no text to copy here"
+why_no_text = "여기에는 복사할 텍스트가 없습니다"
 # context: command palette entry: copies the dragged text, else the selected entry
-palette_copy_text = "Conversation: Copy Text"
+palette_copy_text = "대화: 텍스트 복사"
 
 [edit_off_branch]
 # context: title of the dialog offered when the commit to edit is not on the checked-out branch
@@ -10775,195 +10775,195 @@ more = "외 {n}개"
 
 [pane_hscroll]
 # context: keymap label of the key that scrolls the focused list pane (a Refs section, Unstaged, Staged, the changed files, the commit info lines) sideways
-key_left = "Scroll the Pane Left"
-key_right = "Scroll the Pane Right"
-pal_left = "View: Scroll the Pane Left"
-pal_right = "View: Scroll the Pane Right"
-nothing = "Nothing to scroll sideways here"
-help = "Scroll the pane sideways (also Shift+wheel, a horizontal wheel or the bar on its bottom border)"
-help_details = "Scroll the {$commit} details sideways (id, author, date and counts lines)"
+key_left = "창을 왼쪽으로 스크롤"
+key_right = "창을 오른쪽으로 스크롤"
+pal_left = "보기: 창을 왼쪽으로 스크롤"
+pal_right = "보기: 창을 오른쪽으로 스크롤"
+nothing = "여기에는 옆으로 스크롤할 내용이 없습니다"
+help = "창을 옆으로 스크롤합니다 (Shift+휠, 가로 휠 또는 아래쪽 테두리의 막대로도 가능)"
+help_details = "{$commit} 세부 정보를 옆으로 스크롤합니다 (ID, 작성자, 날짜, 개수 줄)"
 
 [sequence_run]
 # context: the label of the run in the Jobs panel: sequence name, step number, step count, step name
-job_label = "Sequence {name} {k}/{n}: {step}"
+job_label = "시퀀스 {name} {k}/{n}: {step}"
 # context: run strip text: sequence name, step k of n, step name
-strip_running = "{name} {k}/{n} \u00b7 {step}"
+strip_running = "{name} {k}/{n} · {step}"
 # context: run strip while a step waits to be started
-strip_next = "{name} {k}/{n} \u00b7 Next: {step}"
+strip_next = "{name} {k}/{n} · 다음: {step}"
 # context: run strip after the AI wrote the commit message
-strip_review = "{name} {k}/{n} \u00b7 Review the message, then Continue"
+strip_review = "{name} {k}/{n} · 메시지를 검토한 뒤 계속"
 # context: run strip when the commit has no message yet
-strip_commit_message = "{name} {k}/{n} \u00b7 Write the message, then {$commit} or Continue"
+strip_commit_message = "{name} {k}/{n} · 메시지를 작성한 뒤 {$commit} 또는 계속"
 # context: run strip while a dialog of the step is open
-strip_dialog = "{name} {k}/{n} \u00b7 Answer the dialog"
+strip_dialog = "{name} {k}/{n} · 대화상자에 응답하세요"
 # context: run strip when the push was rejected and its dialog is open
-strip_push_rejected = "{name} {k}/{n} \u00b7 {$Push} rejected: choose in the dialog"
+strip_push_rejected = "{name} {k}/{n} · {$Push} 거부됨: 대화상자에서 선택하세요"
 # context: run strip while a dialog of the action waits for the person
-strip_user = "{name} {k}/{n} \u00b7 Choose in the dialog"
+strip_user = "{name} {k}/{n} · 대화상자에서 선택하세요"
 # context: run strip when the window on screen is not the tab the step acts on; {tab} is a folder
-strip_waiting_tab = "{name} {k}/{n} \u00b7 waiting for tab {tab}"
+strip_waiting_tab = "{name} {k}/{n} · 탭 {tab}을(를) 기다리는 중"
 # context: run strip when a step failed
-strip_failed = "{name} stopped at step {k}/{n} ({step}): {error}"
+strip_failed = "{name}이(가) {k}/{n}단계({step})에서 중단됨: {error}"
 # context: button of the run strip
-button_continue = "Continue"
+button_continue = "계속"
 # context: button of the run strip that switches to the tab the step acts on
-button_go_there = "Go there"
+button_go_there = "이동"
 # context: button of the run strip that shows the failure
-button_details = "Details"
+button_details = "자세히"
 # context: status line after a sequence was canceled
-say_canceled = "{name} canceled after step {k}/{n} ({step}); earlier steps are kept"
+say_canceled = "{name}을(를) {k}/{n}단계({step}) 이후 취소했습니다. 이전 단계는 유지됩니다"
 # context: status line when the step in flight cannot be stopped
-say_stopping = "Stopping after this step"
+say_stopping = "이 단계가 끝나면 중지합니다"
 # context: status line when a step failed
-say_stopped = "Sequence {name} stopped at step {k}/{n} ({step}): {error}"
+say_stopped = "시퀀스 {name}이(가) {k}/{n}단계({step})에서 중단되었습니다: {error}"
 # context: status line when every step ran
-say_finished = "{name} finished"
+say_finished = "{name} 완료"
 # context: status line when a second sequence is started
-say_running = "{name} is running (step {k}/{n})"
+say_running = "{name}을(를) 실행 중입니다 ({k}/{n}단계)"
 # context: Activity Log entry for a failed step; {options} lists the step options
-log_failure = "Sequence {name}, step {k}/{n} {step} (options: {options}) failed: {error}"
+log_failure = "시퀀스 {name}, {k}/{n}단계 {step} (옵션: {options}) 실패: {error}"
 # context: Activity Log entry for a run cut short by quitting
-log_interrupted = "Sequence {name} was interrupted at step {k}/{n} ({step}) when GitPoulpi closed"
+log_interrupted = "GitPoulpi가 종료되면서 시퀀스 {name}이(가) {k}/{n}단계({step})에서 중단되었습니다"
 # context: why a run was canceled; {tab} is a folder
-reason_tab_closed = "the tab {tab} was closed"
+reason_tab_closed = "탭 {tab}이(가) 닫혔습니다"
 # context: why a run failed; {tab} is a folder
-reason_tab_never = "the tab {tab} did not open"
+reason_tab_never = "탭 {tab}이(가) 열리지 않았습니다"
 # context: why a run was canceled
-reason_dialog_closed = "the dialog was closed"
+reason_dialog_closed = "대화상자가 닫혔습니다"
 # context: a step cannot run now; {step} is its name, {reason} the palette's reason
-step_unavailable = "{step} is not available: {reason}"
+step_unavailable = "{step}을(를) 사용할 수 없습니다: {reason}"
 # context: a step names a command this build does not have
-step_unknown = "{step} is not a command of this build"
+step_unknown = "{step}은(는) 이 빌드의 명령이 아닙니다"
 # context: a step with pause never lacks an option; {option} is its name
-step_needs_option = "{step} needs the option {option}"
+step_needs_option = "{step}에는 옵션 {option}이(가) 필요합니다"
 # context: a step could not start
-step_failed_start = "{step} did not start"
+step_failed_start = "{step}을(를) 시작하지 못했습니다"
 # context: the sequence was removed or changed before it started
-def_gone = "the sequence {name} no longer exists"
+def_gone = "시퀀스 {name}이(가) 더 이상 없습니다"
 # context: shorter run strip text when a step failed (the error text does not fit)
-strip_stopped = "{name} stopped at step {k}/{n} ({step})"
-repo_notice = { one = "This repository defines {n} sequence", other = "This repository defines {n} sequences" }
-repo_notice_changed = { one = "This repository's sequence changed", other = "This repository's {n} sequences changed" }
-repo_button_review = "Review"
-repo_button_trust = "Trust"
-repo_button_ignore = "Ignore"
-repo_review_title = "Sequences of this repository"
-repo_review_intro = "These sequences come from this repository's .gitpoulpi/sequences.toml. They run commands on your machine when you start them. Trust them only if you trust everyone who can change this repository."
+strip_stopped = "{name}이(가) {k}/{n}단계({step})에서 중단됨"
+repo_notice = { one = "이 저장소에 시퀀스 {n}개가 정의되어 있습니다", other = "이 저장소에 시퀀스 {n}개가 정의되어 있습니다" }
+repo_notice_changed = { one = "이 저장소의 시퀀스가 변경되었습니다", other = "이 저장소의 시퀀스 {n}개가 변경되었습니다" }
+repo_button_review = "검토"
+repo_button_trust = "신뢰"
+repo_button_ignore = "무시"
+repo_review_title = "이 저장소의 시퀀스"
+repo_review_intro = "이 시퀀스들은 이 저장소의 .gitpoulpi/sequences.toml에서 가져온 것입니다. 시작하면 내 컴퓨터에서 명령이 실행됩니다. 이 저장소를 변경할 수 있는 모든 사람을 신뢰할 때만 신뢰하세요."
 repo_review_sequence = "{name} ({id})"
 repo_review_step = "{n}. {step}"
-repo_review_pause_always = "pauses before it runs"
-repo_review_pause_never = "never pauses"
-repo_review_options = "options: {options}"
-repo_review_trust = "Trust"
+repo_review_pause_always = "실행 전에 일시 중지"
+repo_review_pause_never = "일시 중지하지 않음"
+repo_review_options = "옵션: {options}"
+repo_review_trust = "신뢰"
 repo_key_trust = "t"
-repo_review_close = "Close"
+repo_review_close = "닫기"
 repo_key_close = "c"
-say_repo_trusted = "Repository sequences trusted: {n}"
-say_repo_ignored = "Repository sequences ignored until the file changes"
-repo_review_too_long = "This list is longer than the window: enlarge the window to see all of it and trust it from here."
+say_repo_trusted = "저장소 시퀀스를 신뢰했습니다: {n}개"
+say_repo_ignored = "파일이 바뀔 때까지 저장소 시퀀스를 무시합니다"
+repo_review_too_long = "이 목록이 창보다 깁니다: 창을 넓혀 전체를 보고 여기서 신뢰하세요."
 
 [settings_sequences]
-section_title = "Sequences"
-list_title = "Sequences"
+section_title = "시퀀스"
+list_title = "시퀀스"
 # context: title of the list of one sequence's steps; {name} is the sequence's own name
-steps_title = "Steps of {name}"
-new_name = "New sequence"
-menu_empty = "Empty sequence"
+steps_title = "{name}의 단계"
+new_name = "새 시퀀스"
+menu_empty = "빈 시퀀스"
 # context: Add menu row that inserts a preset; {name} is the preset's name
-menu_preset = "From preset ▸ {name}"
-menu_ai = "✦ Create with AI..."
-preset_backup = "Backup"
-preset_backup_desc = "{$Stage} everything, write the message with the AI, {$commit} and {$push}"
-preset_compose = "Compose and {$push}"
-preset_compose_desc = "Let the AI split the changes into {$commits}, then {$push}"
-preset_worktree = "Worktree and agent"
-preset_worktree_desc = "Create a worktree for the current branch and open the AI agent in it"
-group_installation = "This installation"
-group_machine = "All installations"
-group_repo = "This repository"
-no_sequences = "No sequences yet. Use Add to create one or to start from a preset."
+menu_preset = "프리셋에서 ▸ {name}"
+menu_ai = "✦ AI로 만들기..."
+preset_backup = "백업"
+preset_backup_desc = "모두 {$stage}하고, AI로 메시지를 작성하고, {$commit}한 뒤 {$push}"
+preset_compose = "작성 후 {$push}"
+preset_compose_desc = "AI가 변경 사항을 {$commits}(으)로 나눈 뒤 {$push}"
+preset_worktree = "워크트리와 에이전트"
+preset_worktree_desc = "현재 브랜치의 워크트리를 만들고 그 안에서 AI 에이전트 열기"
+group_installation = "이 설치"
+group_machine = "모든 설치"
+group_repo = "이 저장소"
+no_sequences = "아직 시퀀스가 없습니다. 추가를 눌러 새로 만들거나 프리셋에서 시작하세요."
 # context: heading over a sequence's rows; {i} is its place in the list, {n} the number of sequences
-editing = "Editing sequence {i}/{n}"
-name = "Name"
-name_help = "Shown in the command palette as \"Sequence: <name>\"."
-id = "Id"
-id_help = "The short name used in config.toml, on the command line and as the shortcut's key: a-z, 0-9, _ and -. Renaming it moves the shortcut with it."
-description = "Description"
-description_help = "Optional, for yourself."
-scope = "Scope"
-scope_help = "Where the sequence is saved and who sees it. This installation: only this install of GitPoulpi. All installations: every install on this computer. This repository only: saved in .gitpoulpi/sequences.toml of the current repository, shared with whoever has it."
-scope_installation = "This installation"
-scope_machine = "All installations on this computer"
-scope_repo = "This repository only"
-shortcut = "Shortcut"
-shortcut_help = "The key that starts this sequence from anywhere in the window. Enter opens the key capture; conflicts are refused like on the Keyboard shortcuts page."
-shortcut_none = "Not set"
-shortcut_clear = "Clear"
-steps_row = "Steps"
+editing = "시퀀스 편집 중 {i}/{n}"
+name = "이름"
+name_help = "명령 팔레트에 \"시퀀스: <이름>\"으로 표시됩니다."
+id = "ID"
+id_help = "config.toml, 명령줄, 단축키의 키에 쓰는 짧은 이름입니다: a-z, 0-9, _ 및 -. 이름을 바꾸면 단축키도 함께 옮겨집니다."
+description = "설명"
+description_help = "선택 사항, 본인용입니다."
+scope = "범위"
+scope_help = "시퀀스가 저장되는 위치와 볼 수 있는 사람입니다. 이 설치: 이 GitPoulpi 설치에서만. 모든 설치: 이 컴퓨터의 모든 설치. 이 저장소만: 현재 저장소의 .gitpoulpi/sequences.toml에 저장되어 그 저장소를 가진 모든 사람과 공유됩니다."
+scope_installation = "이 설치"
+scope_machine = "이 컴퓨터의 모든 설치"
+scope_repo = "이 저장소만"
+shortcut = "단축키"
+shortcut_help = "창 어디에서나 이 시퀀스를 시작하는 키입니다. Enter를 누르면 키 입력 대기가 열리며, 충돌은 단축키 페이지처럼 거부됩니다."
+shortcut_none = "설정 안 됨"
+shortcut_clear = "지우기"
+steps_row = "단계"
 # context: button that opens a sequence's list of steps; {n} is how many it has
-steps_edit = "Edit steps ({n})"
-steps_none = "No steps yet"
-run_now = "Run now"
-run_now_help = "Runs the sequence in the current window."
-edit_ai = "✦ Edit with AI..."
-close_steps = "✕ Back to sequences"
+steps_edit = "단계 편집 ({n})"
+steps_none = "아직 단계가 없습니다"
+run_now = "지금 실행"
+run_now_help = "현재 창에서 시퀀스를 실행합니다."
+edit_ai = "✦ AI로 편집..."
+close_steps = "✕ 시퀀스로 돌아가기"
 # context: heading over one step's rows; {i} its place, {n} the number of steps, {label} the command's palette name
-step_heading = "Step {i}/{n}: {label}"
-step_does = "What it does"
-pause = "Pause"
-pause_default = "Default"
-pause_always = "Always"
-pause_never = "Never"
-pause_help = "Default: the step stops only when it needs an answer, on its usual dialog. Always: stop before this step and ask to continue. Never: do not stop; the step's options must then give it everything it needs."
-pause_forced_help = "This step always asks before it runs, so Never is not offered."
-pause_unneeded_help = "This step never needs an answer; Always still stops before it."
-opt_name = "Name"
-opt_message = "Message"
-opt_branch = "Branch"
-opt_open_tab = "Open in a new tab"
-opt_label = "Open in entry"
-opt_profile = "AI profile"
-opt_remote = "Remote"
-opt_template_help = "Variables: ${{branch}} ${{date}} ${{time}} ${{n}}"
-opt_required_help = "Needed when Pause is Never."
-opt_unset = "(not set)"
+step_heading = "{i}/{n}단계: {label}"
+step_does = "하는 일"
+pause = "일시 중지"
+pause_default = "기본값"
+pause_always = "항상"
+pause_never = "안 함"
+pause_help = "기본값: 응답이 필요할 때만, 평소 대화상자에서 단계가 멈춥니다. 항상: 이 단계 전에 멈추고 계속할지 묻습니다. 안 함: 멈추지 않으며, 이때는 단계의 옵션이 필요한 모든 것을 제공해야 합니다."
+pause_forced_help = "이 단계는 실행 전에 항상 묻기 때문에 안 함을 선택할 수 없습니다."
+pause_unneeded_help = "이 단계는 응답이 필요 없지만, 항상을 고르면 그 전에 멈춥니다."
+opt_name = "이름"
+opt_message = "메시지"
+opt_branch = "브랜치"
+opt_open_tab = "새 탭에서 열기"
+opt_label = "열기 위치 항목"
+opt_profile = "AI 프로필"
+opt_remote = "리모트"
+opt_template_help = "변수: ${{branch}} ${{date}} ${{time}} ${{n}}"
+opt_required_help = "일시 중지가 안 함일 때 필요합니다."
+opt_unset = "(설정 안 됨)"
 # context: shown for a step this version does not know; {run} is its command id
-unknown_step = "Unknown step \"{run}\": kept as it is"
-problems = "Problems"
+unknown_step = "알 수 없는 단계 \"{run}\": 그대로 유지됩니다"
+problems = "문제"
 # context: a problem on a step; {n} is its place, {reason} says what is wrong
-step_problem = "Step {n}: {reason}"
-picker_title = "Add a step"
-picker_empty = "No step matches."
-picker_hint = "Type to filter, Enter adds, Esc closes"
-picker_unavailable_pending = "not available yet"
-picker_unavailable_build = "not built in this version"
-picker_unavailable_ai = "turn the AI on first"
-picker_unknown = "not offered by this version"
-saved = "Sequences saved"
-no_config_dir = "No configuration folder: nothing can be saved"
+step_problem = "{n}단계: {reason}"
+picker_title = "단계 추가"
+picker_empty = "일치하는 단계가 없습니다."
+picker_hint = "입력하여 필터, Enter로 추가, Esc로 닫기"
+picker_unavailable_pending = "아직 사용할 수 없음"
+picker_unavailable_build = "이 버전에 포함되지 않음"
+picker_unavailable_ai = "먼저 AI를 켜세요"
+picker_unknown = "이 버전에서 제공하지 않음"
+saved = "시퀀스를 저장했습니다"
+no_config_dir = "설정 폴더가 없습니다: 아무것도 저장할 수 없습니다"
 # context: refused edit of the id; {id} is what was typed
-id_invalid = "\"{id}\" is not a usable id: use a-z, 0-9, _ and -, starting with a letter or digit"
+id_invalid = "\"{id}\"은(는) 사용할 수 없는 ID입니다: a-z, 0-9, _ 및 -를 사용하고 문자나 숫자로 시작하세요"
 # context: refused edit of the id; {id} is the id already in use
-id_taken = "Another sequence already uses the id \"{id}\""
-no_repo = "This folder is not a repository: a repository sequence needs one"
+id_taken = "다른 시퀀스가 이미 ID \"{id}\"를 사용하고 있습니다"
+no_repo = "이 폴더는 저장소가 아닙니다: 저장소 시퀀스에는 저장소가 필요합니다"
 # context: shown when a sequence cannot run; {reason} says why
-cannot_run = "Cannot run: {reason}"
+cannot_run = "실행할 수 없음: {reason}"
 # context: a refused write; {error} is the reason
-write_failed = "Sequences: {error}"
-shortcut_repo_untrusted_help = "A repository sequence gets a shortcut once you trust this repository's sequences."
+write_failed = "시퀀스: {error}"
+shortcut_repo_untrusted_help = "이 저장소의 시퀀스를 신뢰하면 저장소 시퀀스에 단축키를 지정할 수 있습니다."
 
 # The Log's author filter: the funnel in the Author header and its popup.
 [author_filter]
-title = "Filter by author"
-placeholder = "filter by author"
-clear = "Clear filter"
-empty = "No author matches"
-hint = "Enter toggle  Up/Down move  Esc close"
-tip_off = "Filter the Log by author"
-tip_on = "Author filter ({count}):"
-note_one = "Author: {name}"
-note_many = "Authors: {name} +{more}"
-status_on = "Author filter: {count} chosen"
-status_cleared = "Author filter cleared"
-status_none = "No author filter to clear"
-help = "Filter the Log by author: dims the other authors like a search does"
+title = "작성자로 필터"
+placeholder = "작성자로 필터"
+clear = "필터 해제"
+empty = "일치하는 작성자가 없습니다"
+hint = "Enter 전환  Up/Down 이동  Esc 닫기"
+tip_off = "작성자로 Log 필터"
+tip_on = "작성자 필터 ({count}):"
+note_one = "작성자: {name}"
+note_many = "작성자: {name} 외 {more}명"
+status_on = "작성자 필터: {count}명 선택됨"
+status_cleared = "작성자 필터를 해제했습니다"
+status_none = "해제할 작성자 필터가 없습니다"
+help = "작성자로 Log를 필터합니다: 검색처럼 다른 작성자는 흐리게 표시됩니다"

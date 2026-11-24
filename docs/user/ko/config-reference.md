@@ -139,6 +139,7 @@ GitHub/GitLab 계정에도 질의합니다)
 | `ui.diff_hunks_only` | `true` | `false`이면 변경 사항이 제자리에 표시된 전체 파일을 보여 줍니다(`H`). |
 | `ui.diff_show_whitespace` | `true` | 공백만 바뀐 변경 사항을 표시합니다(`s`). |
 | `ui.diff_word_wrap` | `false` | 긴 diff 줄을 줄 바꿈합니다(`w`. 설정 > Diff 및 편집기). |
+| `ui.diff_intraline` | `true` | 변경된 줄에서 바뀐 단어를 더 진한 배경으로 칠합니다(팔레트 `Diff: 변경된 단어 강조 전환`. 설정 > Diff 및 편집기). |
 | `ui.minimap` | `false` | diff와 편집기의 스크롤바 옆에 미니맵을 표시합니다(`M`). |
 | `ui.mermaid_detail` | `refs` | Log의 Mermaid gitGraph로 복사의 상세 수준: `structure`, `refs`, `subjects`, `full`(팝업에서 기억되며 `log --format mermaid`의 기본값). |
 | `ui.mermaid_orientation` | `lr` | 그 그래프의 방향: `lr`(왼쪽에서 오른쪽) 또는 `tb`(위에서 아래). |
@@ -375,7 +376,7 @@ review_mode = "ask"       # ask | clone | api
 | `ai.enabled` | `false` | 스위치입니다. 꺼져 있으면 AI 관련 항목이 어디에도 표시되지 않고 아무것도 전송되지 않습니다. |
 | `ai.default_profile` | `"default"` | 동작이 프로필을 지정하지 않을 때 사용하는 프로필의 ID. |
 | `ai.global_instructions` | `""` | 모든 동작의 프롬프트에 추가되는 텍스트. `${repo}`, `${uilang}`, ... 를 사용할 수 있습니다([AI > 프롬프트 변수](ai.md#프롬프트-변수) 참고). 동작별 지침과 저장소 지침도 같습니다. |
-| `ai.actions.<action>.profile` | `""` | 한 동작의 프로필. 비어 있으면 기본값. 동작: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`. 워크스페이스(`workspaces.toml`, `[workspace.ai_instructions]`와 `[workspace.ai_overrides.<action>]`)와 저장소는 이 지침에 추가하거나 이를 대체할 수 있습니다: [AI](ai.md#지침)를 참조하세요. |
+| `ai.actions.<action>.profile` | `""` | 한 동작의 프로필. 비어 있으면 기본값. 동작: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `sequence_draft`. 워크스페이스(`workspaces.toml`, `[workspace.ai_instructions]`와 `[workspace.ai_overrides.<action>]`)와 저장소는 이 지침에 추가하거나 이를 대체할 수 있습니다: [AI](ai.md#지침)를 참조하세요. |
 | `ai.actions.<action>.instructions` | `""` | 해당 동작에만 추가되는 텍스트. |
 | `ai.review.run_in_repository` | `"profile"` | `profile`, `yes` 또는 `no`: 코드 리뷰 초안의 로컬 에이전트가 해당 실행에서 AI 프로필의 `workdir`을 무시하고 저장소 안에서 작업할지 여부. 저장소가 고유 값을 가질 수 있습니다(`gitpoulpi ai review-context --repo`). [AI > 리뷰 컨텍스트](ai.md#리뷰-컨텍스트)를 참고하세요. |
 | `ai.review.include_claude_md` | `true` | 코드 리뷰 초안에 저장소의 `CLAUDE.md`를 전달합니다(루트, 요청이 대상으로 하는 브랜치에서 읽음, 8 KB에서 잘림). |
@@ -399,7 +400,7 @@ review_mode = "ask"       # ask | clone | api
 | `ai.hosting_reply.context_ttl_minutes` | `30` | 답글을 위해 만든 저장소 컨텍스트를 재사용하는 시간. 1에서 1440 사이로 유지됩니다. AI가 저장소를 읽을 수 있을 때 적용됩니다. |
 | `ai.privacy.redact_secrets` | `true` | 스캐너가 인식하는 모든 비밀 정보(토큰, 개인 키 블록, URL 안의 비밀번호, 값이 무작위로 보이는 `password = ...`)를 요청이 나가기 전에 `[REDACTED:<rule>]`로 대체합니다. 꺼져 있는 동안 설정 > AI에 빨간 경고가 표시됩니다. |
 | `ai.privacy.exclude_sensitive_files` | `true` | `privacy.sensitive_patterns`에 일치하는 모든 파일의 diff를 전송 내용에서 제외합니다. 저장소 폴더에서 작업하는 로컬 에이전트는 여전히 파일을 직접 읽을 수 있습니다: [AI > 개인정보](ai.md#개인정보)를 참고하세요. |
-| `ai.sent_preview.<action>` | `true` | 동작마다 키 하나(`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`): 요청이 나가기 전에 "보내는 내용"을 표시합니다. 대화상자의 "다시 표시하지 않기"는 `false`를 기록하고, 설정 > AI > *보내기 전에 전송 내용 표시...*가 다시 켭니다. `worktree_name`도 받아들여지지만 효과가 없습니다: 워크트리 만들기 대화상자에 입력한 내용과 로컬 브랜치 이름만 보내기 때문입니다. |
+| `ai.sent_preview.<action>` | `true` | 동작마다 키 하나(`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`, `sequence_draft`): 요청이 나가기 전에 "보내는 내용"을 표시합니다. 대화상자의 "다시 표시하지 않기"는 `false`를 기록하고, 설정 > AI > *보내기 전에 전송 내용 표시...*가 다시 켭니다. `worktree_name`도 받아들여지지만 효과가 없습니다: 워크트리 만들기 대화상자에 입력한 내용과 로컬 브랜치 이름만 보내기 때문입니다. |
 
 저장소 고유의 `[preferences.ai_review]` 테이블(`repo-state.toml`에 있으며, 클론되지 않은 저장소의 항목은 `remote-reviews.toml`에 있음)은 같은 키를 모두 선택 사항으로 받고, 추가로 `no_extra_file = true`를 받습니다. 이는 `ai.review.extra_file`이 무엇이든 그 저장소에는 추가 파일이 없다는 뜻입니다. 설정하지 않은 키, 설정하지 않은 `extra_file`, 없는 `no_extra_file`은 전역 값을 상속하며, `extra_file`을 파일로 설정하면 스위치가 지워지고 그 반대도 마찬가지입니다.
 
@@ -525,6 +526,46 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 | `installation.primary` | 없음 | 주 설치의 id. 없으면 주 설치가 없습니다. |
 | `installation.settings.<id>` | 없음 | 설치마다 테이블 하나: `path`(설치 폴더, 이동하면 갱신됨), `kind`(`dev`, `install`, `cargo`, `portable`, `pinned`), `channel`(참고용), `name`(런처 이름, `GitPoulpi (<label>)`, 첫 실행 때 고정됨), `name_with_version`(꺼짐: 이름에 `<major>.<minor>`를 붙임), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu`(비어 있으면 폴더 메뉴 항목이 최상위에 놓임), `env`(비어 있으면 자기 id. 이름이 같은 설치끼리 데몬, 세션, 실행 취소 기록을 공유함), `mcp_bind`(비어 있으면 `mcp.bind`). 빈 값은 주 설치라면 `ui.*`로, 아니면 종류별 기본값으로 대체됩니다(개발 체크아웃은 `sun`). |
 
+## `[[sequences]]`
+
+이름 있는 동작 시퀀스: 팔레트 명령을 차례로 실행하는 목록입니다(예: 백업: 모두 스테이징하고, AI로 메시지를
+작성하고, commit하고, push). 시퀀스마다 테이블 하나이며 단계는 `[[sequences.steps]]`입니다.
+
+```toml
+[[sequences]]
+id = "backup"                    # the slug: its key in [keybindings.sequence] and its CLI name
+name = "Backup"                  # your text, never translated
+description = "Stage, commit with an AI message, push"   # optional
+scope = "installation"           # installation (default) | machine | repo
+owner = "3f9a0c1d2b4e5f60"       # the installation id; set with scope = "installation"
+
+[[sequences.steps]]
+run = "stage_all"                # a palette command id
+
+[[sequences.steps]]
+run = "ai_generate_commit_message"
+pause = "always"                 # default | always | never
+
+[[sequences.steps]]
+run = "create_worktree_from_current_branch"
+pause = "never"
+[sequences.steps.options]
+name = "wip-${date}-${n}"        # a template: ${branch} ${date} (yyyy-mm-dd) ${time} (hh-mm) ${n} (first free number)
+open_tab = true
+```
+
+| 키 | 의미 |
+|---|---|
+| `scope` | `installation`: id가 `owner`인 설치에만 보입니다. `machine`: 이 `config.toml`을 공유하는 모든 설치. `repo`: 저장소의 `.gitpoulpi/sequences.toml`(같은 `[[sequences]]` 형식)에 저장되며 그 저장소에서만 보이고, 그 파일을 신뢰한 뒤에만 쓸 수 있습니다. 커밋된 파일은 남이 만든 명령이기 때문입니다. |
+| `steps[].run` | 팔레트 명령 ID로, `[keybindings.palette]`에 표시되는 스네이크 케이스 이름입니다. 고정된 허용 목록만 받아들입니다: 스테이징, commit, stash push, 새 브랜치 / tag, fetch, pull, push(와 모든 대상에 push, 모두 pull, tag push 변형), AI 메시지와 commit 구성 명령, 워크트리 만들기, 탭이나 터미널 열기, lease를 사용한 강제 push. 위험한 명령(버리기, reset, 삭제, 워크트리 제거, stash drop, 기록 다시 쓰기, 종료, 설정)과 다른 시퀀스는 단계가 될 수 없습니다. 이 버전이 모르는 단계는 파일에 그대로 남고 보고됩니다. |
+| `steps[].pause` | `default`: 입력이 필요하면 단계가 평소 대화상자에서 멈춥니다. `always`: 그 전에 멈추고 계속할지 묻습니다. `never`: 멈추지 않으며, 이때 단계에는 대화상자가 물었을 옵션(새 브랜치나 워크트리의 `name`)이 필요합니다. lease를 사용한 강제 push는 `never`일 수 없습니다. |
+| `steps[].options` | 단계별 답: `name`(새 브랜치, tag, 워크트리), `branch`(고른 브랜치에서 워크트리), `open_tab`(새 워크트리를 탭에서 열기), `message`(commit), `label`(열기 위치 항목), `profile`(에이전트 프로필). |
+| 단계 최대 32개 | 시퀀스는 단계가 1개에서 32개 사이입니다. |
+
+시퀀스나 단계의 알 수 없는 키는 GitPoulpi가 파일을 다시 쓸 때 유지됩니다. 볼 수 있는 시퀀스 사이의 중복 ID는
+보고됩니다. `[keybindings.sequence] <id> = "<chord>"`로 하나를 바인딩합니다. 예:
+`backup = "Ctrl+G b"`.
+
 ## `[keybindings]`
 
 TUI의 단축키를 다시 할당합니다. 설정 > 키보드 및 마우스에서 편집합니다.
@@ -545,6 +586,7 @@ stage_file = "z"
 `,`, `P`(= `Shift+p`). 잘못된 항목은 아무것도 막지 않습니다. TUI가 이를 무시하고 기본값을
 유지하며 상태 표시줄에 알려 줍니다. 컨텍스트, 동작 ID, 기본값, 충돌 규칙은
 [키보드 단축키](keybindings.md)에 있습니다.
+`[keybindings.sequence]`는 [`[[sequences]]`](#sequences)를 ID로 바인딩합니다.
 
 ## 저장소별 설정: `.gitpoulpi/repo-state.toml`
 

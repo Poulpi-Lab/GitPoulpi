@@ -150,6 +150,7 @@ CLI コマンド 1 つにつき 1 つのツールがあり、名前はコマン�
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
 | `ai_rewrite_rules` | `gitpoulpi ai rewrite-rules` | read, network |
 | `ai_rewrite_script` | `gitpoulpi ai rewrite-script` | read, network |
+| `ai_sequence_draft` | `gitpoulpi ai sequence-draft` | read, network |
 | `ai_split_plan` | `gitpoulpi ai split-plan` | read, network |
 | `ai_worktree_name` | `gitpoulpi ai worktree-name` | read, network |
 | `alias_status` | `gitpoulpi alias status` | read |
@@ -347,6 +348,10 @@ CLI コマンド 1 つにつき 1 つのツールがあり、名前はコマン�
 | `rewrite_tools` | `gitpoulpi rewrite tools` | read |
 | `rm_file` | `gitpoulpi rm-file` | destructive |
 | `search` | `gitpoulpi search` | read |
+| `sequence_list` | `gitpoulpi sequence list` | read |
+| `sequence_run` | `gitpoulpi sequence run` | destructive, network |
+| `sequence_show` | `gitpoulpi sequence show` | read |
+| `sequence_validate` | `gitpoulpi sequence validate` | read |
 | `session_delete` | `gitpoulpi session delete` | destructive |
 | `session_list` | `gitpoulpi session list` | read |
 | `session_new` | `gitpoulpi session new` | write |
@@ -377,8 +382,12 @@ CLI コマンド 1 つにつき 1 つのツールがあり、名前はコマン�
 | `tag_delete` | `gitpoulpi tag delete` | destructive, network |
 | `tag_delete_remote` | `gitpoulpi tag delete-remote` | destructive, network |
 | `tag_fetch` | `gitpoulpi tag fetch` | write, network |
+| `tag_force_push` | `gitpoulpi tag force-push` | destructive, network |
 | `tag_list` | `gitpoulpi tag list` | read |
+| `tag_merge_branch` | `gitpoulpi tag merge-branch` | write |
+| `tag_move` | `gitpoulpi tag move` | write |
 | `tag_push` | `gitpoulpi tag push` | write, network |
+| `tag_take_remote` | `gitpoulpi tag take-remote` | write |
 | `theme_export` | `gitpoulpi theme export` | read |
 | `theme_list` | `gitpoulpi theme list` | read |
 | `treat` | `gitpoulpi treat` | write |
@@ -392,6 +401,7 @@ CLI コマンド 1 つにつき 1 つのツールがあり、名前はコマン�
 | `ui_propose_rewrite` | `gitpoulpi ui propose rewrite` | propose |
 | `ui_propose_split` | `gitpoulpi ui propose split` | propose |
 | `ui_propose_tag` | `gitpoulpi ui propose tag` | propose |
+| `ui_sequence_run` | `gitpoulpi ui sequence run` | propose |
 | `ui_show_commit` | `gitpoulpi ui show commit` | view |
 | `ui_show_conflict` | `gitpoulpi ui show conflict` | view |
 | `ui_show_diff` | `gitpoulpi ui show diff` | view |
@@ -458,6 +468,10 @@ Not exposed as tools:
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
 | `gitpoulpi repo-auth set` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
 | `gitpoulpi repo-auth clear` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
+| `gitpoulpi sequence add` | a sequence is a list of commands that run later (and can be bound to a key): an agent must not write its own macros, or edit the config that gates it |
+| `gitpoulpi sequence remove` | removes a sequence from the user's config; the user's macros are theirs to manage |
+| `gitpoulpi sequence trust` | trusting the sequences a repository commits (they run commands on the user's machine) is a person's decision; an agent can only run sequences a person trusted |
+| `gitpoulpi sequence untrust` | withdrawing the trust of a repository's sequences is a person's decision, like granting it |
 | `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
@@ -518,6 +532,7 @@ $ gitpoulpi --json ui back
 | `ui_propose_rewrite`（レシピファイル） | レシピのルールが入った履歴書き換えワークベンチ。プレビューも適用もされません | ご自身での *プレビュー* と *適用*（`Ctrl+Enter`）。`Esc` で却下。スクリプトを含むレシピは拒否され、シークレット値は取り除かれます |
 | `ui_propose_split`（rev、計画ファイル） | commit の上に開く分割エディター（計画が入力済み） | *分割*（`Ctrl+S`）。`Esc` で却下 |
 | `ui_propose_resolution`（path、pick または content file） | 競合中のファイルで merge エディターを開き、選択（またはテキスト全体）が出力にすでに入った状態にする | *保存して解決済みにする*（`Ctrl+S`）。閉じると却下になります |
+| `ui_sequence_run`（id） | 「✦ <agent> からの提案：シーケンス <name> を実行」というバナーが*実行*と*却下*付きで開く。まだ何も実行されない | *実行*（クリック、または `Ctrl+N` の後に `Enter`）。*却下*または `Esc` で却下します。実行はその後、シーケンスが指定した箇所で一時停止します。シーケンスが存在しない、無効、または信頼していないリポジトリのシーケンスの場合は拒否されます |
 
 同時に出せる提案は 1 つです。コンポーザーにユーザー自身の下書きがあるときは commit メッセージの提案は拒否され、merge エディターにユーザーの未保存の作業があるとき、またはエージェントが読み取った後にファイルのステージが変わったときは、解決案の提案が拒否されます。確定する前にユーザーが変更した解決案は、`accepted_edited` として報告されます。応答には `proposal` ID が含まれます。ユーザーの判断は、`ui_state` の `proposals`（`offered`、`open`、`accepted`、`accepted_edited`、`rejected`、`expired`、`failed`）に残ります。
 

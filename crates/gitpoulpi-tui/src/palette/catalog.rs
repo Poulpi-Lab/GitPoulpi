@@ -2024,6 +2024,12 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     )
     .requires(crate::build_features::Feature::Radar),
     entry(
+        msg::palette::RADAR_PROFILE,
+        "P",
+        PaletteCommand::Radar(RadarCommand::Profile),
+    )
+    .requires(crate::build_features::Feature::Radar),
+    entry(
         msg::palette::RADAR_NOT_CLONED,
         "a",
         PaletteCommand::Radar(RadarCommand::NotCloned),

@@ -875,6 +875,7 @@ Tangenterna är standardvärdena.
 | Radar: Välj omfång | `w` |
 | Radar: Välj vy | `v` |
 | Radar: Välj filter | `f` |
+| Radar: Filter by Profile... | `P` |
 | Radar: Visa ej klonade begäranden | `a` |
 | Radar: Visa utkast | `d` |
 | Radar: Slå på kontoövergripande granskningsbegäranden... | `T` |

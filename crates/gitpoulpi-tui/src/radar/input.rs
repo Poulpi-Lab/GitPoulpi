@@ -75,6 +75,10 @@ impl RadarUi {
                 self.open_combo(Hit::Who);
                 Outcome::None
             }
+            RadarCommand::Profile => {
+                self.open_combo(Hit::Profile);
+                Outcome::None
+            }
             RadarCommand::NotCloned => self.toggle_not_cloned(),
             RadarCommand::Drafts => self.toggle_drafts(),
             RadarCommand::Menu => {
@@ -112,6 +116,7 @@ impl RadarUi {
             Hit::Scope => Some(Spot::Scope),
             Hit::View => Some(Spot::View),
             Hit::Who => Some(Spot::Who),
+            Hit::Profile => Some(Spot::Profile),
             Hit::NotCloned => Some(Spot::NotCloned),
             Hit::Drafts => Some(Spot::Drafts),
             Hit::TurnOn(_) => Some(Spot::TurnOn),
@@ -126,6 +131,7 @@ impl RadarUi {
             Spot::Scope,
             Spot::View,
             Spot::Who,
+            Spot::Profile,
             Spot::Refresh,
             Spot::Back,
             Spot::NotCloned,
@@ -177,6 +183,7 @@ impl RadarUi {
             Spot::Scope => self.command(RadarCommand::Scope),
             Spot::View => self.command(RadarCommand::View),
             Spot::Who => self.command(RadarCommand::Filter),
+            Spot::Profile => self.command(RadarCommand::Profile),
             Spot::NotCloned => self.command(RadarCommand::NotCloned),
             Spot::Drafts => self.command(RadarCommand::Drafts),
             Spot::TurnOn => self.run(Act::TurnOn),
@@ -219,7 +226,7 @@ impl RadarUi {
             return self.confirm_key(key);
         }
         // A combobox popup is modal.
-        for which in [Hit::Scope, Hit::View, Hit::Who, Hit::Snooze] {
+        for which in [Hit::Scope, Hit::View, Hit::Who, Hit::Profile, Hit::Snooze] {
             if self.combo_of(which).is_open() {
                 return match self.combo_of(which).on_key(key) {
                     ComboOutcome::Picked(value) => self.picked(which, &value),
@@ -298,6 +305,7 @@ impl RadarUi {
             KeyCode::Char('w') => self.command(RadarCommand::Scope),
             KeyCode::Char('v') => self.command(RadarCommand::View),
             KeyCode::Char('f') => self.command(RadarCommand::Filter),
+            KeyCode::Char('P') => self.command(RadarCommand::Profile),
             KeyCode::Char('/') => self.command(RadarCommand::Search),
             KeyCode::Char('q') => Outcome::Quit,
             _ => Outcome::None,
@@ -439,6 +447,7 @@ impl RadarUi {
                 &self.scope_combo,
                 &self.view_combo,
                 &self.who_combo,
+                &self.profile_combo,
                 &self.snooze_combo,
             ]
             .iter()
@@ -525,6 +534,7 @@ impl RadarUi {
         if !(self.combo_of(Hit::Scope).is_open()
             || self.combo_of(Hit::View).is_open()
             || self.combo_of(Hit::Who).is_open()
+            || self.combo_of(Hit::Profile).is_open()
             || self.combo_of(Hit::Snooze).is_open()
             || self.menu.is_some())
         {
@@ -538,7 +548,7 @@ impl RadarUi {
             }
         }
         // Popups own the pointer: first, and nothing behind one hovers.
-        for which in [Hit::Scope, Hit::View, Hit::Who, Hit::Snooze] {
+        for which in [Hit::Scope, Hit::View, Hit::Who, Hit::Profile, Hit::Snooze] {
             if self.combo_of(which).is_open() {
                 self.hover = None;
                 return match self.combo_of(which).on_mouse(mouse) {
@@ -556,7 +566,7 @@ impl RadarUi {
             return self.menu_mouse(mouse);
         }
         // Moved: the hover. Clicking a closed combobox's field opens it.
-        for which in [Hit::Scope, Hit::View, Hit::Who] {
+        for which in [Hit::Scope, Hit::View, Hit::Who, Hit::Profile] {
             if matches!(mouse.kind, MouseEventKind::Down(MouseButton::Left))
                 && self.hit_at(col, row) == Some(which)
             {

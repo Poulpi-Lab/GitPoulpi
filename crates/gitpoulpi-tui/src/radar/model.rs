@@ -598,13 +598,31 @@ pub(crate) enum Row {
     Blank,
 }
 
-/// The rows of `board` for the view, the filter, the folds and the text.
+/// The two item filters besides the view: whose items, and which integration
+/// profile's (`""` = every profile).
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct Narrow<'a> {
+    pub(crate) who: Who,
+    pub(crate) profile: &'a str,
+}
+
+impl Narrow<'_> {
+    /// Everyone's items, whatever the profile.
+    #[cfg(test)]
+    pub(crate) fn of(who: Who) -> Narrow<'static> {
+        Narrow { who, profile: "" }
+    }
+}
+
+/// The rows of `board` for the view, the filter, the integration profile
+/// (`""` = every profile; a WIP row has no profile, so a chosen one hides it),
+/// the folds and the text.
 /// `notes` says how many repository notes there are (they end the list);
 /// `hints` how many hosts offer their account-wide lists (they open it).
 pub(crate) fn rows(
     board: &Board,
     view: View,
-    who: Who,
+    narrow: Narrow,
     text: &str,
     folded: &HashSet<Heading>,
     notes: usize,
@@ -614,7 +632,8 @@ pub(crate) fn rows(
     let admit = |i: usize| {
         let item = &board.items[i];
         view.shows(item.kind)
-            && who.admits(item)
+            && narrow.who.admits(item)
+            && (narrow.profile.is_empty() || item.host_id == narrow.profile)
             && (query.is_empty() || fuzzy::score(&item.haystack(), &query, Anchor::Whole).is_some())
     };
     let mut out: Vec<Row> = Vec::new();
@@ -850,7 +869,15 @@ mod tests {
             .map(|&i| board.items[i].number)
             .collect();
         assert_eq!(numbers, vec![3, 2]);
-        let rows = rows(&board, View::All, Who::Everyone, "", &HashSet::new(), 0, 0);
+        let rows = rows(
+            &board,
+            View::All,
+            Narrow::of(Who::Everyone),
+            "",
+            &HashSet::new(),
+            0,
+            0,
+        );
         assert!(matches!(rows[0], Row::Heading(Heading::Pinned, 2)));
         let in_groups: usize = board.groups.iter().map(|(_, l)| l.len()).sum();
         assert_eq!(in_groups, 1);
@@ -898,7 +925,7 @@ mod tests {
         let board = build(&[a], &RadarState::default(), 0);
         let none = HashSet::new();
         let count = |view, who, text: &str| {
-            rows(&board, view, who, text, &none, 0, 0)
+            rows(&board, view, Narrow::of(who), text, &none, 0, 0)
                 .iter()
                 .filter(|r| matches!(r, Row::Item(_)))
                 .count()
@@ -918,7 +945,15 @@ mod tests {
         let a = answer("app", vec![pr(1, "bob", "2026-10-05T00:00:00Z")], vec![]);
         let board = build(&[a], &RadarState::default(), 0);
         let folded = HashSet::from([Heading::Group(Group::OtherPrs)]);
-        let r = rows(&board, View::All, Who::Everyone, "", &folded, 0, 0);
+        let r = rows(
+            &board,
+            View::All,
+            Narrow::of(Who::Everyone),
+            "",
+            &folded,
+            0,
+            0,
+        );
         assert_eq!(r, vec![Row::Heading(Heading::Group(Group::OtherPrs), 1)]);
     }
 
@@ -968,7 +1003,15 @@ mod tests {
             now: 0,
         });
         let none = HashSet::new();
-        let r = rows(&with_wip, View::All, Who::Everyone, "", &none, 1, 0);
+        let r = rows(
+            &with_wip,
+            View::All,
+            Narrow::of(Who::Everyone),
+            "",
+            &none,
+            1,
+            0,
+        );
         assert_eq!(
             r,
             vec![
@@ -980,7 +1023,15 @@ mod tests {
             ]
         );
         // Nothing above REPOSITORIES (here: the filter hides the WIP row).
-        let r = rows(&with_wip, View::All, Who::Everyone, "zzzz", &none, 1, 0);
+        let r = rows(
+            &with_wip,
+            View::All,
+            Narrow::of(Who::Everyone),
+            "zzzz",
+            &none,
+            1,
+            0,
+        );
         assert_eq!(
             r,
             vec![Row::Heading(Heading::Repos, 1), Row::Note(0)],
@@ -988,7 +1039,15 @@ mod tests {
         );
         // Folded REPOSITORIES keeps the gap too.
         let folded = HashSet::from([Heading::Repos]);
-        let r = rows(&with_wip, View::All, Who::Everyone, "", &folded, 1, 0);
+        let r = rows(
+            &with_wip,
+            View::All,
+            Narrow::of(Who::Everyone),
+            "",
+            &folded,
+            1,
+            0,
+        );
         assert_eq!(r[2], Row::Blank);
     }
 

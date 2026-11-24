@@ -2236,6 +2236,8 @@ label_scope = "Scope"
 label_view = "View"
 # context: label of the combobox filtering whose items are listed (everyone, mine, assigned, review requested)
 label_show = "Show"
+# context: label of the combobox narrowing the list to one integration profile (a code host or tracker account of Settings)
+label_profile = "Profile"
 # context: scope choice: the repositories open as tabs
 scope_tabs = "Open tabs"
 view_all = "All"
@@ -2301,6 +2303,9 @@ act_link = "Link..."
 act_reconnect = "Reconnect"
 empty = "Nothing to show. Link a repository to GitHub or GitLab, or widen the filters."
 empty_scope = "No repositories in this scope."
+empty_profile = "Nothing to show for this profile. Choose All profiles, or widen the filters."
+# context: profile choice: no profile filter
+profile_all = "All profiles"
 # context: {frame} is the spinner glyph
 status_loading = "{frame} asking GitHub and GitLab..."
 status_items = { one = "{n} item", other = "{n} items" }
@@ -4638,6 +4643,7 @@ radar_snooze = "Radar: Snooze..."
 radar_scope = "Radar: Choose Scope"
 radar_view = "Radar: Choose View"
 radar_filter = "Radar: Choose Filter"
+radar_profile = "Radar: Filter by Profile..."
 radar_menu = "Radar: Row Menu..."
 radar_back = "Radar: Back to Home"
 radar_close_tab = "Radar: Close Tab"

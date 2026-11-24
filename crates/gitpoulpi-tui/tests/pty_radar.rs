@@ -413,19 +413,19 @@ fn ctrl_n_badge_opens_a_radar_combobox() {
         .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
 }
 
-/// The Back badge (`6`) acts like its button: back to the Home tab.
+/// The Back badge (`7`) acts like its button: back to the Home tab.
 #[test]
 fn ctrl_n_badge_presses_the_radar_back_button() {
     let mut s = setup("pty-radar-nav-back");
     open_radar(&mut s.term);
     open_badges(&mut s.term);
-    s.term.send_text("6").unwrap();
+    s.term.send_text("7").unwrap();
     s.term
         .wait_for("Home", STEP, |s| s.contains("Repository Management"))
         .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
 }
 
-/// A heading badge (`7` is the first heading on screen, `8` the second)
+/// A heading badge (`8` is the first heading on screen, `9` the second)
 /// lands the selection on that heading: `Enter` then folds exactly it.
 #[test]
 fn ctrl_n_badge_selects_a_radar_section() {
@@ -438,7 +438,7 @@ fn ctrl_n_badge_selects_a_radar_section() {
     assert!(mine < assigned, "{}", screen.text());
     let key = "Docs for the parser".to_string();
     open_badges(&mut s.term);
-    s.term.send_text("8").unwrap();
+    s.term.send_text("9").unwrap();
     s.term
         .wait_for("the prefix hint gone", STEP, |s| {
             !s.contains("<badge>=focus")
@@ -464,7 +464,7 @@ fn ctrl_n_escape_cancels_the_radar_badges() {
     s.term
         .wait_for("the hint gone", STEP, |s| !s.contains("<badge>=focus"))
         .unwrap_or_else(|e| panic!("{e}"));
-    s.term.send_text("6").unwrap();
+    s.term.send_text("7").unwrap();
     std::thread::sleep(std::time::Duration::from_millis(400));
     let screen = s.term.screen();
     assert!(

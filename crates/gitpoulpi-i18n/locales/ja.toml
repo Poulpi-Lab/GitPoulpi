@@ -10845,3 +10845,5 @@ status_on = "作成者の絞り込み：{count} 人を選択中"
 status_cleared = "作成者の絞り込みを解除しました"
 status_none = "解除する作成者の絞り込みはありません"
 help = "Log を作成者で絞り込みます：検索と同じく、ほかの作成者の行を薄く表示します"
+# context: help overlay line for Esc in the Log while an author filter is on
+help_esc = "Drop the author filter (when nothing nearer, like a selection, wants Esc)"

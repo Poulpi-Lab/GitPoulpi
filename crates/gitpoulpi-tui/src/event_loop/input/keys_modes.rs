@@ -854,6 +854,11 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                         popup.field_edited();
                     }
                 }
+                // Typed text goes first; an empty field closes (the filter stays).
+                KeyCode::Esc if !popup.draft.is_empty() => {
+                    popup.draft.clear();
+                    popup.field_edited();
+                }
                 KeyCode::Esc => *cx.input_mode = InputMode::Normal,
                 KeyCode::Enter => {
                     let (message, close) = crate::author_filter::activate(

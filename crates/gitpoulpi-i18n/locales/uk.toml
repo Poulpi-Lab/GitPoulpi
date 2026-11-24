@@ -10847,3 +10847,5 @@ status_on = "Фільтр авторів: вибрано {count}"
 status_cleared = "Фільтр авторів скинуто"
 status_none = "Немає фільтра авторів, який можна скинути"
 help = "Фільтрувати Log за автором: приглушує інших авторів, як пошук"
+# context: help overlay line for Esc in the Log while an author filter is on
+help_esc = "Drop the author filter (when nothing nearer, like a selection, wants Esc)"

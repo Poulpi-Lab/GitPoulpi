@@ -10968,3 +10968,5 @@ status_on = "Filtr autora: vybráno {count}"
 status_cleared = "Filtr autora zrušen"
 status_none = "Žádný filtr autora ke zrušení"
 help = "Filtruje Log podle autora: ostatní autory ztlumí jako hledání"
+# context: help overlay line for Esc in the Log while an author filter is on
+help_esc = "Drop the author filter (when nothing nearer, like a selection, wants Esc)"

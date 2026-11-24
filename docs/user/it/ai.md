@@ -168,6 +168,22 @@ richiesta si ferma con un messaggio, e **Apri l'agente...** (sul profilo, o
 terminale visibile, nella cartella di lavoro che userà. Rispondi alla domanda,
 chiudi l'agente e riprova; la risposta viene ricordata dall'agente.
 
+### Aprire l'agente nella cartella di una scheda
+
+*Scheda: Apri l'agente IA qui* nella palette dei comandi (riassegnabile come `palette.tab_open_agent_here`,
+nessun tasto predefinito) apre il tuo terminale nella cartella della scheda attiva eseguendo l'agente di un
+profilo di agente locale, per lavorarci a mano lì. È lo stesso terminale di **Terminale qui** e lo stesso
+comando di **Apri l'agente...**, ma nella cartella della scheda invece che nella cartella di lavoro del
+profilo. Con un solo profilo di agente locale si apre subito; con più profili, un elenco sotto la barra delle
+schede chiede quale. Non invia alcun prompt e non avvia alcuna richiesta all'IA: aprire l'agente è l'azione, e
+ciò che scrivi al suo interno è tuo.
+
+La riga porta la scintilla dell'IA, è nascosta mentre l'IA è disattivata (**Impostazioni > IA**) e
+disattivata ("nessun agente IA locale è configurato") quando nessun profilo è un agente locale. In una
+sequenza, il passo `tab_open_agent_here` accetta nell'opzione `profile` l'`id` del profilo IA (vuoto: il
+profilo predefinito, altrimenti il primo agente locale). A un modello di terminale tuo non si può passare il
+comando dell'agente: il terminale si apre nella cartella e la riga di stato dice quale comando eseguire.
+
 La risposta viene letta dalla trascrizione della sessione dell'agente per
 Claude Code (il suo testo esatto, cancellata poi) e dalla schermata tra due
 righe marcatore richieste nella richiesta, per Codex e Gemini. Al massimo due
@@ -306,6 +322,7 @@ sopra i pulsanti mentre ci passi sopra o la evidenzi.
 | **Dividere un commit** | La voce *Dividi commit (IA)...* del menu di un commit, o il comando della palette `IA: Dividi il commit selezionato...`. L'editor di divisione si apre con il raggruppamento del modello già compilato; vedi sotto. | `ai split-plan <rev>` (stampa) |
 | **Script di riscrittura della cronologia** | Nel [pannello di riscrittura della cronologia](history-rewrite.md#scrivere-uno-script-con-lia): il pulsante `✦ Scrivi con l'IA...` dell'editor degli script, o il comando della palette `Riscrittura: Scrivi uno script con l'IA...`. Una finestra mostra esattamente cosa verrà inviato; lo script arriva nell'editor, contrassegnato, e non viene mai eseguito né applicato al posto tuo. | `ai rewrite-script "<istruzione>" [--sample N]` (stampa) |
 | **Regole di riscrittura della cronologia** | Nel [pannello di riscrittura della cronologia](history-rewrite.md#creare-regole-con-lia): il pulsante `✦ Crea regole con l'IA...`, `Alt+E`, o il comando della palette `Riscrittura: Crea regole con l'IA...`. Una finestra su più righe mostra esattamente cosa verrà inviato; le regole e le impostazioni arrivano nel pannello e nulla viene mostrato in anteprima né applicato al posto tuo. | `ai rewrite-rules "<descrizione>" [--context]` (stampa) |
+| **Bozza di sequenza** | Descrivi una [sequenza di azioni](#bozza-di-sequenza) da creare, o come cambiarne una (Impostazioni > Sequenze, sezione successiva della finestra). | `ai sequence-draft "<description>" [--edit <id>] [--context]` (stampa) |
 | **Nome del worktree** | Nella [finestra Crea un worktree](worktrees.md#dare-un-nome-con-lia): il pulsante `✦ Nome con l'IA` o `Alt+A` apre una casella dove descrivi la funzionalità, il bug o l'attività; il modello dà un nome al worktree e al suo branch seguendo i nomi dei branch del repository, ed entrambi finiscono nei campi della finestra, da modificare. Vengono inviati solo la tua descrizione e i nomi dei branch locali, quindi non c'è una finestra «Cosa viene inviato». | `ai worktree-name --describe "<task>"` (stampa) |
 | **Risposta su un host** e **Descrizione della issue** | Il pulsante **Scrivi con l'IA** (`Alt+E`) di ogni compositore Markdown che invia a un host: un commento, una risposta o una modifica in una conversazione, un commento o un riepilogo di revisione, la descrizione di una nuova issue. La bozza finisce nella casella; nulla viene pubblicato. Vedi [Aiuto alla scrittura su un host](#aiuto-alla-scrittura-su-un-host). | `ai hosting-reply` (stampa una bozza) |
 | **Compositore di commit** | La voce *Componi i commit (IA)...* del menu della riga WIP, `Ctrl+G C`, il comando della palette `IA: Componi commits dalle modifiche in corso...` | |
@@ -394,6 +411,26 @@ vengono inviati anche l'ambito, i nomi dei branch e dei tag e gli autori dei com
 (una casella, disattivata per impostazione predefinita, visibile nel riquadro di ciò che viene
 inviato). Il profilo e le istruzioni sono quelli di *Regole di riscrittura della cronologia* in
 Impostazioni > IA.
+
+### Bozza di sequenza
+
+Descrivi con parole tue una sequenza di azioni («fai lo stage di tutto, scrivi il messaggio con l'IA, commit e push», o, per
+una esistente, «aggiungi prima un fetch») e il modello propone un nome, un id, i passi e, se vuole, una scorciatoia. **Si limita a
+proporre**: nulla viene salvato prima che tu accetti e non viene mai eseguito nulla. Il modello conosce solo i comandi che una
+sequenza può contenere (l'elenco che riceve è generato dalla stessa tabella che valida una sequenza, quindi non può divergere);
+ogni passo viene verificato da solo, e un passo sconosciuto, distruttivo, che esegue un'altra sequenza o che chiede una pausa non
+possibile viene escluso ed elencato con il motivo, mentre quelli validi vengono mantenuti. Se vuoi, vengono inviati anche i nomi
+dei remote, gli id dei profili IA e le etichette di Apri in (disattivato per impostazione predefinita; il flag della CLI è
+`--context`). Nel terminale, `gitpoulpi ai sequence-draft` stampa la proposta come JSON (con `toml`, che `gitpoulpi sequence add --file`
+legge) e non salva nulla. Il profilo e le istruzioni sono quelli di *Bozza di sequenza* in Impostazioni > IA.
+
+Nell'interfaccia del terminale lo stesso lavoro è la voce **Crea con l'IA...** di Impostazioni > Sequenze > **Aggiungi**
+(palette: `Sequenza: Crea con l'IA...`) e il pulsante **Modifica con l'IA...** di una sequenza: una finestra in cui scrivi
+cosa vuoi, con la casella del contesto (disattivata per impostazione predefinita) e la domanda «Cosa viene inviato», poi una
+proposta da accettare (**Accetta**), modificare prima di salvare (**Modifica prima di salvare**), rifiutare (**Rifiuta**) o inviare
+di nuovo con **Indietro**. Una modifica mostra un diff rispetto alla sequenza attuale (`+` aggiunto, `-` rimosso, `~` modificato)
+e la scorciatoia suggerita viene confrontata con la tua mappa dei tasti ma non viene mai associata. Nulla viene salvato prima che
+tu accetti (vedi [Sequenze](sequences.md#creare-e-modificare-con-lia)).
 
 ### Aiuto alla scrittura su un host
 

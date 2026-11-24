@@ -17,7 +17,63 @@ collegato non viene mai interrogato: mostra invece una riga **Collega...** (vedi
 ![Il Radar su due repository: una richiesta fissata, poi In attesa della mia revisione, Le mie pull request, Assegnate a me, issue e lavoro in corso](../images/radar.png)
 
 **Rivedi...** su una riga di pull o merge request (o `e`) apre il repository con la
-revisione nell'app della richiesta ([Rivedere una pull request](review.md)).
+revisione nell'app della richiesta ([Rivedere una pull request](review.md)). Per una richiesta di un repository che hai clonato ma mai collegato all'host, il clone viene prima
+collegato al progetto della richiesta (a meno che non abbia già il proprio collegamento a una pull request), così la revisione parte nella sua scheda.
+
+### La colonna Azioni
+
+All'estremità destra di una riga di richiesta o issue, piccoli pulsanti fanno ciò che fa un tasto sulla riga selezionata (un clic seleziona la riga e
+esegue l'azione; fermati con il puntatore su un pulsante per vederne il nome e il tasto):
+
+```
+Largo:   #58  Round invoice totals  feature/login → main   alice   2d   Rivedi  [globe]  [talk]  ⊕  ×  ⇣  ⋮
+Stretto: #58  Round invoice totals  feature/login → main                 [rev]  [globe]  [talk]  ⋮
+Issue:   #12  Crash on empty list                         bob     5h   Inizia  [globe]  [talk]  ×  ⋮
+```
+
+| Pulsante | Tasto | Palette |
+|---|---|---|
+| **Rivedi** (una richiesta che attende la tua revisione; chiede come quando non è clonata) | `e` | `Radar: Rivedi la richiesta...` |
+| **Inizia** (una issue clonata) | `n` | `Radar: Inizia a lavorare su una issue...` |
+| il globo: apre la pagina sull'host | `o` | `Radar: Apri nel browser` |
+| il glifo a righe: apre la conversazione | `i` | `Radar: Apri la conversazione della issue` |
+| `»` **Segna come pronta** (una richiesta in bozza) | `y` | `Radar: Segna come pronta` |
+| `⊕` **Merge** (una richiesta) | `m` | `Radar: Merge della richiesta...` |
+| `×` **Chiudi** (una richiesta o una issue) | `x` | `Radar: Chiudi...` |
+| `⇣` **Clona** (una riga il cui repository non è clonato) | `g` | `Radar: Clona il repository...` |
+
+Una riga senza un'azione lascia vuota la sua cella, così ogni pulsante resta nella stessa colonna su ogni riga. Quando la finestra è
+stretta, le parole Rivedi e Inizia diventano glifi prima che sparisca qualsiasi altra colonna; i pulsanti Pronta, Merge, Chiudi e Clona
+lasciano la colonna prima del titolo, ma restano nel menu della riga (`⋮`, clic destro, o `Shift+F10`), dove un'azione
+che non può essere eseguita è disattivata con il suo motivo. La colonna è automatica (non è
+una delle colonne ridimensionabili). Un doppio clic o `Enter` su una richiesta non clonata chiede come rivederla, come **Rivedi**.
+
+### I branch di una richiesta
+
+Una riga di richiesta mostra `origine → destinazione` dopo il suo titolo (`alice:feature/login → main` quando il branch di origine è in un fork).
+Quando lo spazio è poco la destinazione viene tagliata per prima (puntini di sospensione), il titolo mantiene la maggior parte dello spazio, e in una finestra stretta i
+branch non vengono mostrati; la colonna Azioni non viene mai spinta fuori. Fermati con il puntatore su un testo tagliato per vederlo per intero. Un host che
+non ha indicato i branch non mostra nulla lì. Una riga di issue indica il suo repository nello stesso chip di una riga di richiesta (il
+nome della cartella del clone, o `owner/name` quando non è clonato).
+
+### Agire sull'host
+
+**Merge**, **Chiudi** e **Segna come pronta** funzionano su GitHub, GitLab, Gitea e Forgejo (gli altri host li disattivano con "Non supportato da ...";
+le issue si possono chiudere sugli stessi host).
+
+- **Merge** chiede prima: la finestra indica la richiesta, il suo progetto e i suoi branch, e offre il metodo (un commit di merge, squash,
+  e rebase dove l'host lo ha; GitLab fa merge o squash). Viene rifiutato con il suo motivo per una bozza, una richiesta che
+  va in conflitto con la sua destinazione, o controlli che falliscono; un rifiuto dell'host (nessun permesso, una regola del branch) viene mostrato nella
+  riga di stato.
+- **Chiudi** chiede prima e chiude senza fare il merge.
+- **Segna come pronta** toglie una bozza dallo stato di bozza (GitLab e Gitea: il marcatore `Draft:` / `WIP:` lascia il titolo). Non chiede
+  nulla: è reversibile sull'host.
+- **Clona** apre la normale finestra Clona sul progetto della riga (l'URL è compilato, il selettore di cartelle è quello consueto). Una volta
+  che il clone esiste il Radar colloca la riga su di esso alla successiva lettura dei remote (riaprilo o Aggiorna), e Clona
+  dice poi dov'è il clone.
+
+Merge e Chiudi cambiano l'host e **non si possono annullare da GitPoulpi** (la finestra lo dice); riapri una richiesta chiusa sull'host.
+Dopo una chiamata riuscita gli elenchi vengono richiesti di nuovo, così una riga unita o chiusa se ne va e una pronta perde il suo chip `draft`.
 
 ## Aprirlo
 
@@ -207,7 +263,7 @@ gemello nella palette.
 
 | Azione | Tasto | Palette |
 |---|---|---|
-| Apri repository (la sua scheda si apre, o viene attivata) | `Enter` / doppio clic | `Radar: Apri repository` |
+| Apri repository (la sua scheda si apre, o viene attivata; una richiesta non clonata chiede come rivederla) | `Enter` / doppio clic | `Radar: Apri repository` |
 | Rivedi... (una richiesta; una richiesta non clonata chiede come) | `e` | `Radar: Rivedi la richiesta...` |
 | Rivedi una richiesta tramite l'API dell'host (senza clone) | `a` nella domanda | `Radar: Rivedi tramite l'API` |
 | Clona il repository, poi rivedi la richiesta | `c` nella domanda | `Radar: Clona e rivedi...` |

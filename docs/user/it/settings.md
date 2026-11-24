@@ -453,7 +453,7 @@ build che includono il server; vedi [MCP e agenti](mcp-and-agents.md).
 | **Colore dei campi di input**, **Colore personalizzato dei campi di input** | Lo sfondo dei campi di testo: **Segui il tema** (predefinito), un colore scuro fisso o un tuo `#rrggbb`. |
 | **Cursore di testo** | `ui.text_cursor`: **terminal** (predefinito) mette il cursore del terminale stesso sul punto di inserimento del campo di testo attivo, come barra (valgono le impostazioni del cursore del tuo terminale e la finestra dei candidati di un metodo di input si apre lì); **drawn** disegna il cursore di GitPoulpi e tiene nascosto il cursore del terminale. Si applica subito. Palette: `Impostazioni: Cursore di testo...`. |
 | **Profondità colore** | **auto** (predefinito), **truecolor**, **256** o **16**. Vedi [Temi](themes.md). |
-| **Tema colori del grafo** | **Segui il tema** (predefinito: i colori delle corsie del tema stesso) o una qualsiasi tavolozza di corsie. Ogni tavolozza mostra alcuni suoi colori. Si applica alla chiusura delle Impostazioni. Il comando della palette **App: Cambia tema colori del grafo...** (`Ctrl+N Shift+T`) mostra l'anteprima dal vivo di ogni tavolozza. |
+| **Tema colori del grafo** | **Segui il tema** (predefinito: i colori delle corsie del tema stesso) o una qualsiasi tavolozza di corsie, compresi i tuoi file di tema (dopo i preset). Ogni tavolozza mostra alcuni suoi colori; un nome configurato che non esiste più è segnato *non trovato* e il grafo usa le corsie del tema. Si applica alla chiusura delle Impostazioni. Il comando della palette **App: Cambia tema colori del grafo...** (`Ctrl+N Shift+T`) mostra l'anteprima dal vivo di ogni tavolozza. |
 | **Sfondo delle corsie del grafo** | **Disattivato** (trasparente) o **Tinta di riga**: una tenue fascia del colore della corsia dietro la colonna del grafo, con una sottile barra sul bordo. |
 | **Intensità della tinta di riga** | Quanto è sbiadita la fascia Tinta di riga: **Forte**, **Media** (predefinita) o **Sottile**. La barra sul bordo mantiene il colore pieno. |
 | **Posizione della barra degli strumenti** | `ui.toolbar_position`: Dove sta la barra degli strumenti: In alto, In basso (predefinito), A sinistra o A destra. A sinistra e A destra ne fanno una colonna accanto ai pannelli; una finestra sotto le 80 colonne la disegna in basso. Si applica subito. |
@@ -466,6 +466,8 @@ build che includono il server; vedi [MCP e agenti](mcp-and-agents.md).
 | **Formato della data**, **Formato di data/ora**, **Formato della data esteso** | I modelli di data della colonna data di Cronologia del file e Blame, della colonna Data del Log e dei dettagli del commit. Ognuno mostra un'anteprima dal vivo. Per i token vedi il [riferimento della configurazione](config-reference.md#ui). |
 
 ![Il menu Tema colori del grafo: Segui il tema, poi ogni tavolozza di corsie con alcuni suoi colori](../images/settings-log-graph-lanes.png)
+
+Il tema e i colori del grafo (il Tema, il tema colori del grafo, la colorazione e lo sfondo delle corsie, l'intensità della tinta della riga) appartengono a ogni installazione: con più installazioni che condividono un solo `config.toml`, cambiarli in una non cambia mai le altre. Solo l'installazione principale scrive anche le chiavi `ui.*` condivise.
 
 ### Tastiera e mouse
 
@@ -498,6 +500,21 @@ Tre opzioni si trovano nella scheda **Generali**.
 | **Protocollo tastiera Kitty** | **auto** chiede al terminale il protocollo tastiera di kitty, così arrivano `Ctrl+,`, `Ctrl+Enter` e `Ctrl+Shift+N`. **off** non lo chiede mai; usalo se un terminale si comporta male. Richiede un riavvio. |
 | **Mouse attivo** | Disattivato lascia il mouse e la selezione del testo al tuo terminale. Richiede un riavvio. |
 | **Righe della rotella del mouse** | Di quante righe si sposta uno scatto della rotella nel Log. Richiede un riavvio. |
+
+### Sequenze
+
+**Impostazioni > Sequenze** modifica le tue [sequenze](sequences.md) con nome: elenchi di
+comandi della palette che vengono eseguiti uno dopo l'altro, ciascuno una riga della palette e
+associabile a un tasto. È una [pagina a elenco](#elenchi) con una sola faccia: **+ Aggiungi** offre
+una sequenza vuota e le preimpostazioni (**Backup**, **Componi e push**,
+**Worktree e agente**), le righe sono il **Nome**, l'**Id**, una
+**Descrizione**, l'**Ambito** (questa installazione, tutte le installazioni su questo
+computer, o solo questo repository), un pulsante **Scorciatoia** che apre il
+popup di cattura di **Tastiera e mouse**, **Modifica i passi** e **Esegui ora**.
+**Modifica i passi** porta l'elenco ai passi della sequenza, ciascuno con una
+**Pausa** (**Predefinita**, **Sempre**, **Mai**) e le sue opzioni; **+ Aggiungi**
+lì apre un elenco filtrabile dei comandi che un passo può essere. Ogni modifica
+si applica subito. Vedi [Sequenze](sequences.md).
 
 ### Log e grafo
 
@@ -537,6 +554,7 @@ del grafo si trovano nella pagina **Aspetto**.
 | **Numeri di riga** | La colonna dei numeri di riga dell'editor e del diff. |
 | **Segui la selezione nell'editor** | Con l'editor aperto, selezionare un altro file nel pannello destro lo apre anche nell'editor, dopo aver chiesto se salvare le modifiche non salvate. Un file che non può essere modificato si apre invece nella vista abituale. Solo per le modifiche di lavoro: un file scelto da un commit esce dall'editor e si apre nel diff di quel commit. Attivo di base (`editor.follow_selection`). |
 | **A capo automatico** | Manda a capo le righe lunghe del diff. |
+| **Evidenzia le parole modificate** | In una riga modificata, colora con uno sfondo più marcato le parole che differiscono dalla riga rimossa o aggiunta con cui è accoppiata, nella vista Diff (Inline e Split), nel diff della revisione e nei file del commit. Attivo per impostazione predefinita (`ui.diff_intraline`); anche **Diff: Attiva/disattiva l'evidenziazione delle parole modificate** nella palette. Vedi [Parole modificate](interface-tour.md#parole-modificate-in-un-diff). |
 | **Layout predefinito**, **Solo hunk**, **Mostra le modifiche di soli spazi**, **Minimappa** | Lo stato iniziale della vista diff. La barra della vista diff li cambia e li salva. |
 | **Annotazioni del blame**, **Larghezza delle annotazioni del blame** | Quale lato della vista Blame ospita la colonna delle annotazioni (avatar, autore, età, riepilogo): **right** (a destra, predefinito) o **left** (a sinistra), e la sua larghezza in celle (da 24 a 90). Trascinare il bordo della colonna nella vista Blame, o premere i tasti `>` / `<`, salva qui la larghezza (`ui.blame_side`, `ui.blame_width`). Vedi [Blame](log-and-history.md#blame). |
 | **Editor di merge: affiancato da (colonne)** | Da questa larghezza, l'editor di merge mostra A e B affiancati. Predefinito 100, minimo 40, `0` significa sempre. Sotto, A e B sono schede. Vedi [Risolvere i conflitti di merge](merge-conflicts.md). |

@@ -161,10 +161,30 @@ maiuscole: **`V`** layout, **`H`** hunk o file intero, **`S`** spazi, **`W`** a 
 precedente, **`E`** la codifica, **`M`** la minimappa. Ognuno ha una riga della palette (*Revisione: Layout unificato o affiancato*,
 ...).
 
+Nella **Panoramica**, la conversazione e il blocco della bozza ✦ si selezionano allo stesso modo: trascina sul testo,
+**`Ctrl+C`** lo copia (un link o un pulsante che premi mantiene la sua azione, e un trascinamento che inizia su uno non
+seleziona nulla). Senza una selezione, **`Ctrl+C`** (o *Conversazione: Copia il testo*) copia la voce selezionata come la
+memorizza l'host. L'I-beam compare sopra il testo e la mano resta sopra pulsanti e link. Una selezione segue ciò che
+è sullo schermo: scorrere la sposta con il suo testo (resta selezionata mentre è fuori vista), un aggiornamento che riscrive
+il testo la scarta, e un paragrafo mandato a capo viene copiato come le righe che mostra.
+
+Anche i commenti dentro il diff nella pagina **File** (una discussione, le tue note in sospeso, i suggerimenti ✦) si selezionano: trascina
+sulle loro parole, **`Ctrl+C`** (o *Revisione: Copia il testo selezionato o la riga*) li copia, **`Esc`** scarta la selezione. Una pressione su uno dei
+loro pulsanti, o un semplice clic sull'intestazione di una discussione (si chiude), agisce ancora; un trascinamento che inizia sull'intestazione seleziona le sue
+parole e lascia la discussione com'è.
+
 ### Commit
 
 Solo i commit della richiesta (non la cronologia che c'è dietro), dal più recente, e il diff di quello selezionato
 (le sue modifiche rispetto al suo genitore), con tutti i suoi file uno sotto l'altro e le stesse opzioni di visualizzazione.
+
+## Tornare a una revisione
+
+Una revisione resta aperta mentre lavori in un'altra scheda. Lascia la scheda con la revisione aperta (clicca un'altra scheda, `Ctrl+PageDown`, il comando della palette **Repository: Scheda successiva**) e tornarci riapre la revisione sulla stessa richiesta, la stessa pagina (Panoramica, File o Commit), lo stesso file e la stessa riga, con la tastiera dalla stessa parte. Lo stesso vale per una revisione tramite l'API sopra il Radar: mostra di nuovo la scheda Radar e la revisione è di nuovo lì.
+
+Una revisione è **in corso** finché la sua pagina è aperta. Chiuderla (`Esc`, la croce, **Revisione: Chiudi**), inviarla (**Termina la revisione**, oppure inviare o abbandonare una modifica Gerrit) o fare il checkout del suo branch la termina, e non viene riaperta. Chiudere GitPoulpi con una revisione aperta conta come lasciare la scheda: al prossimo avvio viene riaperta nello stesso modo.
+
+Se nel frattempo la richiesta è stata unita o chiusa, o l'host non risponde, non si apre alcuna pagina: la riga di stato dice perché e al prossimo avvio non viene riaperto nulla. I commenti in sospeso, i file visti e la bozza restano come sempre (vedi **Scrivere una revisione**). Una generazione di suggerimenti ancora in corso quando te ne vai non viene riportata.
 
 ## Scrivere una revisione
 

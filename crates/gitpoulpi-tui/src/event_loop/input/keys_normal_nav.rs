@@ -530,7 +530,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 *cx.commit_files_follow = true;
             }
             Focus::Log => {
-                if !land_unselected_log(cx) {
+                if !land_unselected_log(cx) && !step_lit_rows(cx, -count, false) {
                     move_table_selection(&mut *cx.log_state, *cx.log_len, -count);
                 }
                 *cx.log_follow = true;
@@ -586,7 +586,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 *cx.commit_files_follow = true;
             }
             Focus::Log => {
-                if !land_unselected_log(cx) {
+                if !land_unselected_log(cx) && !step_lit_rows(cx, count, false) {
                     move_table_selection(&mut *cx.log_state, *cx.log_len, count);
                 }
                 *cx.log_follow = true;
@@ -619,11 +619,10 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
             // A count on PageUp/PageDown means that many
             // *screens*, not that many rows -- `4 PageDown`
             // scrolls four screens down.
-            move_table_selection(
-                &mut *cx.log_state,
-                *cx.log_len,
-                -log_page_delta(*cx.log_area).saturating_mul(count),
-            );
+            let delta = -log_page_delta(*cx.log_area).saturating_mul(count);
+            if !step_lit_rows(cx, delta, true) {
+                move_table_selection(&mut *cx.log_state, *cx.log_len, delta);
+            }
             *cx.right_panel = RightPanel::CommitDetail;
         }
         KeyCode::PageDown
@@ -632,11 +631,10 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 && *cx.central_view == CentralView::Log
                 && !key.modifiers.contains(KeyModifiers::CONTROL) =>
         {
-            move_table_selection(
-                &mut *cx.log_state,
-                *cx.log_len,
-                log_page_delta(*cx.log_area).saturating_mul(count),
-            );
+            let delta = log_page_delta(*cx.log_area).saturating_mul(count);
+            if !step_lit_rows(cx, delta, true) {
+                move_table_selection(&mut *cx.log_state, *cx.log_len, delta);
+            }
             *cx.right_panel = RightPanel::CommitDetail;
         }
         // The first/last *loaded* commit -- not the
@@ -654,7 +652,10 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 && *cx.central_view == CentralView::Log
                 && *cx.log_len > 0 =>
         {
-            cx.log_state.select(Some(0));
+            let first = lit_rows(cx).map_or(Some(0), |h| h.first().copied());
+            if first.is_some() {
+                cx.log_state.select(first);
+            }
             *cx.log_follow = true;
             *cx.right_panel = RightPanel::CommitDetail;
         }
@@ -664,7 +665,10 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 && *cx.central_view == CentralView::Log
                 && *cx.log_len > 0 =>
         {
-            cx.log_state.select(Some(*cx.log_len - 1));
+            let last = lit_rows(cx).map_or(Some(*cx.log_len - 1), |h| h.last().copied());
+            if last.is_some() {
+                cx.log_state.select(last);
+            }
             *cx.log_follow = true;
             *cx.right_panel = RightPanel::CommitDetail;
         }
@@ -711,6 +715,46 @@ fn land_unselected_log(cx: &mut CommandCtx<'_>) -> bool {
     if !on_head {
         let first = cx.log_state.offset().min(*cx.log_len - 1);
         cx.log_state.select(Some(first));
+    }
+    true
+}
+
+/// The display rows that stay lit while the author filter is on, ascending;
+/// `None` with no filter, so plain navigation is untouched. (A text search
+/// steps through its hits itself, in `InputMode::SearchingLog`.) The WIP and
+/// stash rows are never hits, exactly as the paint dims them.
+fn lit_rows(cx: &CommandCtx<'_>) -> Option<Vec<usize>> {
+    if cx.log_author_filter.is_empty() {
+        return None;
+    }
+    let hits = crate::log_table::log_search_hits(
+        &*cx.log_result,
+        &*cx.refs_result,
+        &*cx.solo_refs,
+        "",
+        &*cx.log_author_filter,
+    );
+    Some(
+        hits.into_iter()
+            .map(|i| cx.log_order.shown_display_index(i))
+            .collect(),
+    )
+}
+
+/// Moves the Log selection between lit rows when a filter is on. Returns
+/// whether a filter handled the key (the selection may stay put).
+fn step_lit_rows(cx: &mut CommandCtx<'_>, delta: i32, page: bool) -> bool {
+    let Some(rows) = lit_rows(cx) else {
+        return false;
+    };
+    let selected = cx.log_state.selected();
+    let to = if page {
+        crate::log_search::page_among_hits(&rows, selected, delta)
+    } else {
+        crate::log_search::step_among_hits(&rows, selected, delta)
+    };
+    if let Some(row) = to {
+        cx.log_state.select(Some(row));
     }
     true
 }

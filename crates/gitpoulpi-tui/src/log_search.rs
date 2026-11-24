@@ -129,6 +129,61 @@ pub fn find_matches_with_authors(
     combine_hits(nodes, text, authors)
 }
 
+/// Where an arrow key lands while hits are lit: the display row of the
+/// `count`-th hit from `selected` in the direction of `delta`'s sign, never a
+/// dimmed row in between. `hits` are display rows, ascending. A selection on a
+/// dimmed row goes to the nearest hit that way; fewer hits than `count` stop at
+/// the last one; none that way (or no hits) is `None`, the selection stays.
+pub(crate) fn step_among_hits(
+    hits: &[usize],
+    selected: Option<usize>,
+    delta: i32,
+) -> Option<usize> {
+    let n = delta.unsigned_abs() as usize;
+    if n == 0 || hits.is_empty() {
+        return None;
+    }
+    let Some(sel) = selected else {
+        return if delta > 0 { hits.first() } else { hits.last() }.copied();
+    };
+    if delta > 0 {
+        let first = hits.partition_point(|&h| h <= sel);
+        hits.get((first + n - 1).min(hits.len() - 1))
+            .copied()
+            .filter(|_| first < hits.len())
+    } else {
+        let before = hits.partition_point(|&h| h < sel);
+        before
+            .checked_sub(1)
+            .map(|last| hits[last.saturating_sub(n - 1)])
+    }
+}
+
+/// PageUp/PageDown over hits: the first hit at or past the row a plain page
+/// would reach (the last hit when that is beyond them all), strictly beyond
+/// the selection. `None` keeps the selection.
+pub(crate) fn page_among_hits(
+    hits: &[usize],
+    selected: Option<usize>,
+    delta: i32,
+) -> Option<usize> {
+    let sel = selected.unwrap_or(0);
+    if delta > 0 {
+        let target = sel.saturating_add(delta as usize);
+        let at = hits.partition_point(|&h| h < target);
+        let pick = hits.get(at).or(hits.last()).copied()?;
+        (pick > sel || selected.is_none()).then_some(pick)
+    } else {
+        let target = sel.saturating_sub(delta.unsigned_abs() as usize);
+        let at = hits.partition_point(|&h| h <= target);
+        let pick = at
+            .checked_sub(1)
+            .map(|i| hits[i])
+            .or(hits.first().copied())?;
+        (pick < sel || selected.is_none()).then_some(pick)
+    }
+}
+
 /// Lowercased haystacks for a node list, built once so each keystroke is
 /// a `contains` scan rather than five `to_lowercase` allocations per
 /// commit. Matches exactly what [`commit_matches`] matches (message,
@@ -365,6 +420,37 @@ pub(crate) fn search_bar_edit(
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn arrows_skip_dimmed_rows_between_hits() {
+        let hits = [2, 5, 9];
+        assert_eq!(step_among_hits(&hits, Some(2), 1), Some(5));
+        assert_eq!(step_among_hits(&hits, Some(5), -1), Some(2));
+        // On a dimmed row: nearest hit that way.
+        assert_eq!(step_among_hits(&hits, Some(3), 1), Some(5));
+        assert_eq!(step_among_hits(&hits, Some(3), -1), Some(2));
+        // Nothing that way: stay.
+        assert_eq!(step_among_hits(&hits, Some(9), 1), None);
+        assert_eq!(step_among_hits(&hits, Some(2), -1), None);
+        assert_eq!(step_among_hits(&hits, Some(1), -1), None);
+        // A count stops at the last hit.
+        assert_eq!(step_among_hits(&hits, Some(2), 5), Some(9));
+        assert_eq!(step_among_hits(&hits, Some(9), -2), Some(2));
+        assert_eq!(step_among_hits(&[], Some(1), 1), None);
+        assert_eq!(step_among_hits(&hits, None, 1), Some(2));
+    }
+
+    #[test]
+    fn pages_land_on_a_hit() {
+        let hits = [2, 5, 9];
+        assert_eq!(page_among_hits(&hits, Some(2), 4), Some(9));
+        assert_eq!(page_among_hits(&hits, Some(2), 3), Some(5));
+        assert_eq!(page_among_hits(&hits, Some(5), 40), Some(9));
+        assert_eq!(page_among_hits(&hits, Some(9), 4), None);
+        assert_eq!(page_among_hits(&hits, Some(9), -4), Some(5));
+        assert_eq!(page_among_hits(&hits, Some(5), -40), Some(2));
+        assert_eq!(page_among_hits(&hits, Some(2), -4), None);
+    }
     use super::*;
     use gitpoulpi_core::domain::Oid;
 

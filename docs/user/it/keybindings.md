@@ -616,6 +616,7 @@ applicano. I tasti sono quelli predefiniti.
 | Git: Use the Remote's Version of the Selected Tag |  |
 | Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Annota il tag selezionato... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Mostra o nascondi nel grafo |  |
 | Refs: Mostra nel grafo | `g` |
 | Refs: Attiva o disattiva il solo sul ref selezionato | `o` |

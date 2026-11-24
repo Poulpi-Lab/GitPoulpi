@@ -32,6 +32,7 @@ mod split;
 mod stash;
 mod stuck;
 mod submodule;
+mod tag_move;
 mod ui_control;
 mod undo;
 mod worktree;
@@ -152,6 +153,7 @@ pub use split::{
 pub use stash::{Stash, StashId};
 pub use stuck::{AmOutcome, IndexLock, STALE_INDEX_LOCK_SECS};
 pub use submodule::{Submodule, SubmoduleState, SubmoduleUpdateOptions};
+pub use tag_move::retarget_tag_object;
 pub use ui_control::UiControl;
 pub use undo::{
     short, short_opt, Direction, EntrySource, EntryState, EntrySummary, FileHash, HeadState,

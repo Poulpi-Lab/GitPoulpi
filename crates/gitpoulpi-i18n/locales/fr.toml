@@ -1020,6 +1020,14 @@ cannot_drop = "{source} ne peut pas être déposé sur {target} ainsi"
 history_scrolled = "l'historique entre ici et là est sorti de la page chargée"
 shares_no_history = "{source} ne partage aucun historique avec la cible"
 nothing_to_replay = "{source} n'a rien que la cible n'ait déjà : rien à rejouer"
+move_tag_here = "Move {$tag} {name} here"
+move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
+merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
+merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
+moving_tag = "moving {$tag} {name} to {target}..."
+moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
+merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
+confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
 
 [menu_inline]
 placeholder_branch = "nom de la branche"
@@ -3197,6 +3205,7 @@ git_annotated_tag_at_selected_commit = { git = "Git : {$Tag} annoté sur le com
 refs_push_selected_tag_to_default_remote = { git = "Refs : Push du {$tag} sélectionné vers le distant par défaut", local = "Refs : Envoyer l'{$tag} sélectionnée vers le distant par défaut" }
 refs_delete_selected_tag_from_its_remote = { git = "Refs : Supprimer le {$tag} sélectionné de son distant...", local = "Refs : Supprimer l'{$tag} sélectionnée de son distant..." }
 refs_annotate_selected_tag = { git = "Refs : Annoter le {$tag} sélectionné...", local = "Refs : Annoter l'{$tag} sélectionnée..." }
+refs_move_selected_tag_to_selected_commit = { git = "Refs : Déplacer le {$tag} sélectionné vers le commit sélectionné...", local = "Refs : Déplacer l'{$tag} sélectionnée vers la validation sélectionnée..." }
 refs_toggle_hide_in_graph = "Refs : Masquer ou afficher dans le graphe"
 refs_toggle_solo_on_selected_ref = "Refs : Activer ou désactiver le solo sur la ref sélectionnée"
 refs_stop_soloing_clear_every_soloed_ref = "Refs : Arrêter le solo (retire toutes les refs en solo)"
@@ -5239,6 +5248,9 @@ fetched = { one = { git = "fetch de {remote} : {n} référence mise à jour", l
 fetched_all = { one = { git = "fetch de chaque distant : {n} référence mise à jour", local = "récupération de chaque distant : {n} référence mise à jour" }, other = { git = "fetch de chaque distant : {n} références mises à jour", local = "récupération de chaque distant : {n} références mises à jour" } }
 branch_created_checkout_failed = "la branche {name} a été créée, mais son basculement a échoué : {error}"
 tag_annotated = { git = "tag annoté {name}", local = "étiquette annotée {name}" }
+tag_moved = "moved {$tag} {name} to {target}"
+tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
+tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
 tags_all_pushed = { git = "tous les tags sont déjà sur {remote}", local = "toutes les étiquettes sont déjà sur {remote}" }
 nothing_to_push = { git = "rien à push vers {remote}", local = "rien à envoyer vers {remote}" }
 pushed_refs = { git = "push de {refs} vers {remote} terminé", local = "envoi de {refs} vers {remote} terminé" }
@@ -5772,6 +5784,7 @@ open_install_page = "Ouvrir la page d'installation"
 undo_anyway = "Annuler quand même"
 start_over = "Repartir de zéro"
 redo_anyway = "Rétablir quand même"
+move_tag = "Move"
 
 [rebase_banner]
 skip = "Passer"
@@ -6783,6 +6796,8 @@ sparse_disable = "Désactiver l'extraction partielle"
 tag_create = { git = "Créer le {$tag} {name}", local = "Créer l'{$tag} {name}" }
 tag_delete = { git = "Supprimer le {$tag} {name}", local = "Supprimer l'{$tag} {name}" }
 tag_annotate = { git = "Annoter le {$tag} {name}", local = "Annoter l'{$tag} {name}" }
+tag_move = { git = "Déplacer le {$tag} {name}", local = "Déplacer l'{$tag} {name}" }
+tag_merge_branch = { git = "{$Merge} {branch} dans le {$tag} {name}", local = "{$Merge} {branch} dans l'{$tag} {name}" }
 fast_forward = { git = "Fast-forward de {branch} vers {target}", local = "Avance rapide de {branch} vers {target}" }
 reword = "{$Reword} {id}"
 fetch_as_branch = "{$Fetch} {remote_ref} comme branche {branch}"

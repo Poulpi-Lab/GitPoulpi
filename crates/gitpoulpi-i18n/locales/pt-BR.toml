@@ -1015,6 +1015,14 @@ cannot_drop = "{source} não pode ser solto em {target} dessa forma"
 history_scrolled = "o histórico entre lá e aqui saiu da página carregada"
 shares_no_history = "{source} não compartilha histórico com o destino"
 nothing_to_replay = "{source} não tem nada que falte ao destino: nada a reaplicar"
+move_tag_here = "Move {$tag} {name} here"
+move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
+merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
+merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
+moving_tag = "moving {$tag} {name} to {target}..."
+moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
+merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
+confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
 
 [menu_inline]
 placeholder_branch = "nome da branch"
@@ -3209,6 +3217,7 @@ git_annotated_tag_at_selected_commit = "Git: {$tag} anotada no commit selecionad
 refs_push_selected_tag_to_default_remote = { git = "Refs: {$push} da {$tag} selecionada para o remoto padrão", local = "Refs: {$push} a {$tag} selecionada para o remoto padrão" }
 refs_delete_selected_tag_from_its_remote = "Refs: excluir a {$tag} selecionada do seu remoto..."
 refs_annotate_selected_tag = "Refs: anotar a {$tag} selecionada..."
+refs_move_selected_tag_to_selected_commit = "Refs: Move Selected {$Tag} to Selected {$Commit}..."
 refs_toggle_hide_in_graph = "Refs: alternar ocultar no grafo"
 refs_toggle_solo_on_selected_ref = "Refs: alternar solo na ref selecionada"
 refs_stop_soloing_clear_every_soloed_ref = "Refs: parar o solo (limpa toda ref em solo)"
@@ -5247,6 +5256,9 @@ fetched = { one = "fetch de {remote}: {n} ref atualizada", other = "fetch de {re
 fetched_all = { one = "fetch de todos os remotos: {n} ref atualizada", other = "fetch de todos os remotos: {n} refs atualizadas" }
 branch_created_checkout_failed = "a branch {name} foi criada, mas o checkout dela falhou: {error}"
 tag_annotated = "{$tag} {name} anotada"
+tag_moved = "moved {$tag} {name} to {target}"
+tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
+tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
 tags_all_pushed = "toda {$tag} já está em {remote}"
 nothing_to_push = { git = "nada para fazer push a {remote}", local = "nada para enviar a {remote}" }
 pushed_refs = "{refs} enviado(s) a {remote}"
@@ -5779,6 +5791,7 @@ open_install_page = "Abrir página de instalação"
 undo_anyway = "Desfazer mesmo assim"
 start_over = "Recomeçar"
 redo_anyway = "Refazer mesmo assim"
+move_tag = "Move"
 
 [rebase_banner]
 skip = "Pular"
@@ -6791,6 +6804,8 @@ sparse_disable = "Desativar sparse checkout"
 tag_create = { git = "Criar {$tag} {name}", local = "Criar {$tag} {name}" }
 tag_delete = { git = "Excluir {$tag} {name}", local = "Excluir {$tag} {name}" }
 tag_annotate = { git = "Anotar {$tag} {name}", local = "Anotar {$tag} {name}" }
+tag_move = { git = "Move {$tag} {name}", local = "Move {$tag} {name}" }
+tag_merge_branch = "{$Merge} {branch} into {$tag} {name}"
 fast_forward = { git = "Fast-forward de {branch} para {target}", local = "Fast-forward de {branch} para {target}" }
 reword = "{$Reword} {id}"
 fetch_as_branch = "{$Fetch} {remote_ref} como branch {branch}"

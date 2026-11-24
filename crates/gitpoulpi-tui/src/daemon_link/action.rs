@@ -307,6 +307,23 @@ pub enum Action {
         name: String,
         message: String,
     },
+    /// Move a tag to another commit, keeping its kind (see
+    /// `GitBackend::tag_move`). `force` allows a move that is not a
+    /// fast-forward. `remotes` are the remotes that have the tag: they keep
+    /// the old position, which the status line says.
+    TagMove {
+        name: String,
+        target: Oid,
+        force: bool,
+        target_label: String,
+        remotes: Vec<String>,
+    },
+    /// Merge a branch into the tag's commit (detached) and move the tag
+    /// onto the merge commit (see `GitBackend::tag_merge_branch`).
+    TagMergeBranch {
+        name: String,
+        branch: String,
+    },
     /// Send tags to a remote. `selection` carries the whole
     /// `Named`/`AllUnpushed` choice, so "push every unpushed tag" is one
     /// action, one round trip and one result message - the UI never

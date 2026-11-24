@@ -610,6 +610,7 @@ As teclas são as predefinidas.
 | Git: Use the Remote's Version of the Selected Tag |  |
 | Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: anotar a tag selecionada... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: alternar ocultar no grafo |  |
 | Refs: mostrar no grafo | `g` |
 | Refs: alternar solo na ref selecionada | `o` |

@@ -191,6 +191,14 @@ pub enum OperationKind {
     /// Re-make an existing tag as an annotated one, in place (see
     /// `GitBackend::tag_annotate`).
     TagAnnotate,
+    /// Move an existing tag to another commit, keeping its kind (see
+    /// `GitBackend::tag_move`). Local only: a remote's copy is left alone
+    /// and shows as `differs`.
+    TagMove,
+    /// Merge a branch into a tag's commit, detached, and move the tag onto
+    /// the merge commit (see `GitBackend::tag_merge_branch`). No branch
+    /// moves, the working tree and index are untouched.
+    TagMergeBranch,
     /// Send one, several or every unpushed tag to a remote (see
     /// `GitBackend::tag_push`). Network, and a mutation of the *remote*
     /// as well as of the local mirror refs.
@@ -776,6 +784,8 @@ impl OperationKind {
             | K::TagCreate
             | K::TagDelete
             | K::TagAnnotate
+            | K::TagMove
+            | K::TagMergeBranch
             | K::TagTakeRemote => OpTraits::NONE
                 .journaled()
                 .scope(ChangeScope::REFS | ChangeScope::LOG),
@@ -914,7 +924,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 190] = [
+    pub const ALL: [OperationKind; 192] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -984,6 +994,8 @@ impl OperationKind {
         OperationKind::TagCreate,
         OperationKind::TagDelete,
         OperationKind::TagAnnotate,
+        OperationKind::TagMove,
+        OperationKind::TagMergeBranch,
         OperationKind::TagPush,
         OperationKind::TagDeleteRemote,
         OperationKind::TagFetch,

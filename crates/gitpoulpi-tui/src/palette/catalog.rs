@@ -758,6 +758,12 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     )
     .requires(crate::build_features::Feature::Lfs),
     entry(
+        msg::palette::REFS_MOVE_SELECTED_TAG_TO_SELECTED_COMMIT,
+        "",
+        PaletteCommand::MoveSelectedTagToSelectedCommit,
+    )
+    .requires(crate::build_features::Feature::Lfs),
+    entry(
         msg::palette::REFS_TOGGLE_HIDE_IN_GRAPH,
         "",
         PaletteCommand::ToggleHideInGraph,

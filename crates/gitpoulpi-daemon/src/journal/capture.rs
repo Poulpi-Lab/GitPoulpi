@@ -207,6 +207,8 @@ pub(super) fn capture_before(
         OperationKind::TagCreate
         | OperationKind::TagDelete
         | OperationKind::TagAnnotate
+        | OperationKind::TagMove
+        | OperationKind::TagMergeBranch
         | OperationKind::TagTakeRemote => {
             let name = arg_str(request, "name").unwrap_or_default();
             let full = format!("refs/tags/{name}");

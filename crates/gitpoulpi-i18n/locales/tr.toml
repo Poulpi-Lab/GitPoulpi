@@ -1016,6 +1016,14 @@ cannot_drop = "{source}, {target} üzerine bu şekilde bırakılamaz"
 history_scrolled = "orası ile burası arasındaki geçmiş yüklü sayfanın dışına kaydı"
 shares_no_history = "{source} hedefle ortak geçmişe sahip değil"
 nothing_to_replay = "{source} içinde hedefte olmayan bir şey yok: yeniden oynatılacak bir şey yok"
+move_tag_here = "Move {$tag} {name} here"
+move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
+merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
+merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
+moving_tag = "moving {$tag} {name} to {target}..."
+moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
+merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
+confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
 
 [menu_inline]
 placeholder_branch = "dal adını girin"
@@ -3194,6 +3202,7 @@ git_annotated_tag_at_selected_commit = { git = "Git: Seçili Commit'te Açıklam
 refs_push_selected_tag_to_default_remote = { git = "Refs: Seçili Tag'i Varsayılan Uzak Depoya Push Et", local = "Refs: Seçili Etiketi Varsayılan Uzak Depoya Gönder" }
 refs_delete_selected_tag_from_its_remote = { git = "Refs: Seçili Tag'i Uzak Deposundan Sil...", local = "Refs: Seçili Etiketi Uzak Deposundan Sil..." }
 refs_annotate_selected_tag = { git = "Refs: Seçili Tag'e Not Ekle...", local = "Refs: Seçili Etikete Not Ekle..." }
+refs_move_selected_tag_to_selected_commit = "Refs: Move Selected {$Tag} to Selected {$Commit}..."
 refs_toggle_hide_in_graph = "Refs: Grafikte Gizle/Göster"
 refs_toggle_solo_on_selected_ref = "Refs: Seçili Ref'te Solo'yu Aç/Kapat"
 refs_stop_soloing_clear_every_soloed_ref = "Refs: Solo'yu Durdur (tüm solo ref'leri temizle)"
@@ -5230,6 +5239,9 @@ fetched = { one = "{remote} fetch edildi: {n} ref güncellendi", other = "{remot
 fetched_all = { one = "her uzak depo fetch edildi: {n} ref güncellendi", other = "her uzak depo fetch edildi: {n} ref güncellendi" }
 branch_created_checkout_failed = "{name} dalı oluşturuldu ama checkout başarısız oldu: {error}"
 tag_annotated = "açıklamalı {$tag} {name}"
+tag_moved = "moved {$tag} {name} to {target}"
+tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
+tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
 tags_all_pushed = "her {$tag} zaten {remote} üzerinde"
 nothing_to_push = { git = "{remote} deposuna push edilecek bir şey yok", local = "{remote} deposuna gönderilecek bir şey yok" }
 pushed_refs = { git = "{refs}, {remote} deposuna push edildi", local = "{refs}, {remote} deposuna gönderildi" }
@@ -5760,6 +5772,7 @@ open_install_page = "Kurulum sayfasını aç"
 undo_anyway = "Yine de geri al"
 start_over = "Baştan başla"
 redo_anyway = "Yine de yinele"
+move_tag = "Move"
 
 [rebase_banner]
 skip = "Atla"
@@ -6771,6 +6784,8 @@ sparse_disable = "Kısmi checkout'u kapat"
 tag_create = { git = "{$Tag} oluştur: {name}", local = "{$Tag} oluştur: {name}" }
 tag_delete = { git = "{$Tag} sil: {name}", local = "{$Tag} sil: {name}" }
 tag_annotate = { git = "{$Tag} açıklamalı yap: {name}", local = "{$Tag} açıklamalı yap: {name}" }
+tag_move = { git = "Move {$tag} {name}", local = "Move {$tag} {name}" }
+tag_merge_branch = "{$Merge} {branch} into {$tag} {name}"
 fast_forward = { git = "{branch} dalını {target} noktasına fast-forward et", local = "{branch} dalını {target} noktasına fast-forward et" }
 reword = "{$Reword}: {id}"
 fetch_as_branch = "{$Fetch}: {remote_ref}, {branch} dalı olarak"

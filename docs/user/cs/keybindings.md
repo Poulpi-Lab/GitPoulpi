@@ -612,6 +612,7 @@ Klávesy jsou výchozí.
 | Git: Use the Remote's Version of the Selected Tag |  |
 | Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Anotovat vybraný tag... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Přepnout skrytí v grafu |  |
 | Refs: Ukázat v grafu | `g` |
 | Refs: Přepnout solo na vybraném refu | `o` |

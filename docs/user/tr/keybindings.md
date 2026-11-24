@@ -612,6 +612,7 @@ Tuşlar varsayılanlardır.
 | Git: Use the Remote's Version of the Selected Tag |  |
 | Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Seçili Tag'e Not Ekle... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Grafikte Gizle/Göster |  |
 | Refs: Grafikte Göster | `g` |
 | Refs: Seçili Ref'te Solo'yu Aç/Kapat | `o` |

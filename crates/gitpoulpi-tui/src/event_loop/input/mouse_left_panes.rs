@@ -311,21 +311,17 @@ pub(super) fn handle(
                         // `ui.reveal_on_ref_click`: a single click also
                         // brings the ref's commit into view in the Log
                         // (the selection stays; a diff or file open in the
-                        // center is left alone).
+                        // center is left alone). Deferred to the release
+                        // (`mouse_drag::up`) and skipped when the press
+                        // became a drag: the graph must stay where the user
+                        // scrolled it to drop onto a visible target.
                         Some(RefTreeRow::Leaf { full_name, .. })
                             if live_settings::reveal_on_ref_click()
                                 && *cx.central_view == CentralView::Log =>
                         {
-                            let sources = crate::ref_reveal::RevealSources {
-                                refs: &*cx.refs_result,
-                                stashes: &*cx.stashes_result,
-                                hidden: &*cx.hidden_from_graph,
-                            };
-                            if let Some(note) =
-                                cx.reveal
-                                    .request_ref(*cx.active_ref_section, full_name, &sources)
-                            {
-                                *cx.last_message = Some(note);
+                            if let Some(drag) = cx.ref_drag.as_mut() {
+                                drag.reveal_on_release =
+                                    Some((*cx.active_ref_section, full_name.clone()));
                             }
                         }
                         _ => {}

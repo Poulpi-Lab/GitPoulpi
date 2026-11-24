@@ -881,8 +881,10 @@ pub(crate) fn sidebar_folder_at(
 /// built on: a **local branch** can be dropped on another local branch
 /// (merge / rebase / interactive rebase / fast-forward) or on a remote branch
 /// (push); a **remote branch** can be dropped on a local branch (merge /
-/// fast-forward / rebase / pull). A tag carries nothing, nothing receives a
-/// drop on a tag, and nothing can be dropped on itself. Both the lit drop
+/// fast-forward / rebase / pull); a **tag** can be dropped on a local
+/// branch, a remote branch or another tag (move the tag there, and for a
+/// local branch the two merges). Nothing but a tag receives a drop on a
+/// tag, and nothing can be dropped on itself. Both the lit drop
 /// target and the footer banner read this predicate, so "valid" means the
 /// same thing on screen as in the message.
 pub(crate) fn ref_drop_is_valid(
@@ -898,6 +900,7 @@ pub(crate) fn ref_drop_is_valid(
         (source_kind, kind),
         (RefRowKind::Local, RefRowKind::Local | RefRowKind::Remote)
             | (RefRowKind::Remote, RefRowKind::Local)
+            | (RefRowKind::Tag, _)
     )
 }
 
@@ -934,6 +937,11 @@ pub(crate) struct RefDrag {
     /// The cells of the row/pill the ref was picked up from, captured on
     /// the first move so it can be dimmed for as long as the drag lasts.
     pub(crate) source_rect: Option<Rect>,
+    /// A sidebar press that should bring the ref's commit into the Log
+    /// (`ui.reveal_on_ref_click`): done on the *release*, and only when the
+    /// press never turned into a drag, so carrying a ref never moves the
+    /// graph away from the row it is about to be dropped on.
+    pub(crate) reveal_on_release: Option<(SidebarSection, String)>,
 }
 
 impl RefDrag {
@@ -946,6 +954,7 @@ impl RefDrag {
             at: (col, row),
             over: None,
             source_rect: None,
+            reveal_on_release: None,
         }
     }
 
@@ -1281,7 +1290,12 @@ mod tests {
         // ...but remote onto remote, and anything with a tag, is nothing.
         assert!(!ref_drop_is_valid("origin/a", Remote, "origin/b", Remote));
         assert!(!ref_drop_is_valid("feature/x", Local, "v1.0", Tag));
-        assert!(!ref_drop_is_valid("v1.0", Tag, "main", Local));
+        assert!(!ref_drop_is_valid("origin/main", Remote, "v1.0", Tag));
+        // A tag goes onto any ref kind, but not onto itself.
+        assert!(ref_drop_is_valid("v1.0", Tag, "main", Local));
+        assert!(ref_drop_is_valid("v1.0", Tag, "origin/main", Remote));
+        assert!(ref_drop_is_valid("v1.0", Tag, "v2.0", Tag));
+        assert!(!ref_drop_is_valid("v1.0", Tag, "v1.0", Tag));
         // The same name and kind is the ref itself.
         assert!(!ref_drop_is_valid("main", Remote, "main", Remote));
     }

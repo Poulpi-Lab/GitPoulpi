@@ -611,6 +611,7 @@ zastosowania. Klawisze są domyślne.
 | Git: Use the Remote's Version of the Selected Tag |  |
 | Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Opisz zaznaczony tag... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Przełącz ukrycie w grafie |  |
 | Refs: Pokaż w grafie | `g` |
 | Refs: Przełącz solo dla zaznaczonego refu | `o` |

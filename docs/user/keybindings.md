@@ -612,6 +612,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Git: Use the Remote's Version of the Selected Tag |  |
 | Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Annotate Selected Tag... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Toggle Hide in Graph |  |
 | Refs: Reveal in Graph | `g` |
 | Refs: Toggle Solo on Selected Ref | `o` |

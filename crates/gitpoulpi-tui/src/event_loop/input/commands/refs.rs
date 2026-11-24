@@ -345,6 +345,54 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
                 });
             }
         }
+        PaletteCommand::MoveSelectedTagToSelectedCommit => {
+            let Some(name) = sel_ref else {
+                return true;
+            };
+            let Some(commit) = selected_log_commit(&*cx.log_result, &*cx.log_state, &*cx.log_order)
+            else {
+                *cx.last_message = Some(msg::input::SELECT_COMMIT_NOT_WIP.get().into());
+                return true;
+            };
+            let refs = cx.refs_result.as_deref().unwrap_or(&[]);
+            let Some(tag) = refs.iter().find(|r| r.tag_name() == Some(name.as_str())) else {
+                *cx.last_message = Some(crate::git_actions::gone(&name));
+                return true;
+            };
+            let verdict = match cx.log_result.as_ref().ok() {
+                Some(g) => crate::log_menu::ff_verdict(g, tag.target, commit),
+                None => crate::log_menu::FfVerdict::Unknown,
+            };
+            let label = gitpoulpi_core::domain::short(commit);
+            let remotes = crate::ref_drop::tag_remotes(tag);
+            let target = commit;
+            match verdict {
+                crate::log_menu::FfVerdict::AlreadyThere => {
+                    *cx.last_message = Some(msg::input::nothing_to_do(&name, &label));
+                }
+                crate::log_menu::FfVerdict::Ahead | crate::log_menu::FfVerdict::Diverged => {
+                    *cx.input_mode = InputMode::Confirm {
+                        prompt: msg::menu_drop::confirm_move_not_ff(&name, &label),
+                        action: ConfirmAction::MoveTag {
+                            name,
+                            target,
+                            target_label: label,
+                            remotes,
+                        },
+                    };
+                }
+                crate::log_menu::FfVerdict::Possible | crate::log_menu::FfVerdict::Unknown => {
+                    *cx.last_message = Some(msg::menu_drop::moving_tag(&name, &label));
+                    cx.link.submit_action(Action::TagMove {
+                        name,
+                        target,
+                        force: false,
+                        target_label: label,
+                        remotes,
+                    });
+                }
+            }
+        }
         PaletteCommand::TakeRemoteSelectedTag => {
             if let Some(n) = sel_ref {
                 let refs = cx.refs_result.as_deref().unwrap_or(&[]);

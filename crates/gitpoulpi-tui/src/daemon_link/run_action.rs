@@ -595,6 +595,38 @@ async fn dispatch(
             )
             .await
         }
+        Action::TagMove {
+            name,
+            target,
+            force,
+            target_label,
+            remotes,
+        } => {
+            reported::<()>(
+                conn,
+                action_message_tx,
+                OperationKind::TagMove,
+                serde_json::json!({ "name": name, "target": target, "force": force }),
+                |_| {
+                    if remotes.is_empty() {
+                        l::tag_moved(&name, &target_label)
+                    } else {
+                        l::tag_moved_remote(&name, &target_label, remotes.join(", "))
+                    }
+                },
+            )
+            .await
+        }
+        Action::TagMergeBranch { name, branch } => {
+            reported::<Oid>(
+                conn,
+                action_message_tx,
+                OperationKind::TagMergeBranch,
+                serde_json::json!({ "name": name, "branch": branch, "message": null }),
+                |merged| l::tag_merged(&branch, &name, short(merged)),
+            )
+            .await
+        }
         // Network, so this arm runs on a spawned task (see
         // `Action::is_network`) and the input loop keeps drawing while
         // it is in flight. The final message is what the user reads --

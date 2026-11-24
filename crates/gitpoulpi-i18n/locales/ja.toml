@@ -1016,6 +1016,14 @@ cannot_drop = "{source} を {target} にその方法でドロップすること�
 history_scrolled = "そこからここまでの履歴は、読み込み済みのページの外にスクロールされています"
 shares_no_history = "{source} は対象と履歴を共有していません"
 nothing_to_replay = "{source} には対象にない変更がありません：再適用するものはありません"
+move_tag_here = "Move {$tag} {name} here"
+move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
+merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
+merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
+moving_tag = "moving {$tag} {name} to {target}..."
+moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
+merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
+confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
 
 [menu_inline]
 placeholder_branch = "ブランチ名を入力"
@@ -3192,6 +3200,7 @@ git_annotated_tag_at_selected_commit = { git = "Git: 選択中の{$Commit}に注
 refs_push_selected_tag_to_default_remote = { git = "Refs: 選択中の{$Tag}を既定のリモートへ{$Push}", local = "Refs: 選択中の{$Tag}を既定のリモートへ{$Push}" }
 refs_delete_selected_tag_from_its_remote = { git = "Refs: 選択中の{$Tag}をリモートから削除...", local = "Refs: 選択中の{$Tag}をリモートから削除..." }
 refs_annotate_selected_tag = { git = "Refs: 選択中の{$Tag}に注釈を付ける...", local = "Refs: 選択中の{$Tag}に注釈を付ける..." }
+refs_move_selected_tag_to_selected_commit = "Refs: Move Selected {$Tag} to Selected {$Commit}..."
 refs_toggle_hide_in_graph = "Refs: グラフでの非表示を切り替え"
 refs_toggle_solo_on_selected_ref = "Refs: 選択中の参照のソロ表示を切り替え"
 refs_stop_soloing_clear_every_soloed_ref = "Refs: ソロ表示を解除（ソロ表示中の参照をすべて解除）"
@@ -5225,6 +5234,9 @@ fetched = { one = "{remote} を{$fetch}しました：{n} 件の参照を更新"
 fetched_all = { one = "すべてのリモートを{$fetch}しました：{n} 件の参照を更新", other = "すべてのリモートを{$fetch}しました：{n} 件の参照を更新" }
 branch_created_checkout_failed = "ブランチ {name} は作成されましたが、チェックアウトに失敗しました：{error}"
 tag_annotated = "{$tag} {name} に注釈を付けました"
+tag_moved = "moved {$tag} {name} to {target}"
+tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
+tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
 tags_all_pushed = { git = "すべての{$tag}はすでに {remote} にあります", local = "すべての{$tag}はすでに {remote} にあります" }
 nothing_to_push = { git = "{remote} へ{$push}するものはありません", local = "{remote} へ{$push}するものはありません" }
 pushed_refs = "{refs} を {remote} へ{$push}しました"
@@ -5755,6 +5767,7 @@ open_install_page = "インストールページを開く"
 undo_anyway = "それでも元に戻す"
 start_over = "やり直す"
 redo_anyway = "それでもやり直す"
+move_tag = "Move"
 
 [rebase_banner]
 skip = "スキップ"
@@ -6768,6 +6781,8 @@ sparse_disable = "スパースチェックアウトを無効化"
 tag_create = "{$tag} {name} を作成"
 tag_delete = "{$tag} {name} を削除"
 tag_annotate = "{$tag} {name} に注釈を追加"
+tag_move = { git = "Move {$tag} {name}", local = "Move {$tag} {name}" }
+tag_merge_branch = "{$Merge} {branch} into {$tag} {name}"
 fast_forward = "{branch} を {target} に早送り"
 reword = "{id} を{$reword}"
 fetch_as_branch = "{remote_ref} をブランチ {branch} として{$fetch}"

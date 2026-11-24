@@ -578,6 +578,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Git: Use the Remote's Version of the Selected Tag |  |
 | Git: Force Push the Selected Tag to Its Remote |  |
 | 引用：为所选 Tag 添加注释… |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | 引用：切换在图中隐藏 |  |
 | 引用：在图中定位 | `g` |
 | 引用：切换所选引用的单独显示 | `o` |

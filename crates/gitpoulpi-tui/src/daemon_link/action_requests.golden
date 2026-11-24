@@ -170,6 +170,14 @@
   TagAnnotate {"message":"notes","name":"v1"}
   message: annotated tag v1
   ok: true
+== TagMove { name: "v1", target: Oid([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]), force: true, target_label: "main", remotes: ["origin"] }
+  TagMove {"force":true,"name":"v1","target":"0909090909090909090909090909090909090909"}
+  message: moved tag v1 to main; origin still has the old position (push to update it)
+  ok: true
+== TagMergeBranch { name: "v1", branch: "main" }
+  TagMergeBranch {"branch":"main","message":null,"name":"v1"}
+  message: merge of main into tag v1 done, now at 0101010
+  ok: true
 == TagPush { remote: "origin", selection: AllUnpushed }
   TagPush {"remote":"origin","selection":"AllUnpushed"}
   message: pushed main to origin

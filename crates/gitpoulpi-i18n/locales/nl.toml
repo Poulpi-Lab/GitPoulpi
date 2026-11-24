@@ -1015,6 +1015,14 @@ cannot_drop = "{source} kan zo niet op {target} worden gedropt"
 history_scrolled = "de geschiedenis tussen daar en hier is uit de geladen pagina gescrold"
 shares_no_history = "{source} deelt geen geschiedenis met het doel"
 nothing_to_replay = "{source} heeft niets wat het doel mist: niets om opnieuw af te spelen"
+move_tag_here = "Move {$tag} {name} here"
+move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
+merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
+merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
+moving_tag = "moving {$tag} {name} to {target}..."
+moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
+merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
+confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
 
 [menu_inline]
 placeholder_branch = "voer branchnaam in"
@@ -3194,6 +3202,7 @@ git_annotated_tag_at_selected_commit = { git = "Git: Geannoteerde tag op geselec
 refs_push_selected_tag_to_default_remote = { git = "Refs: Geselecteerde tag pushen naar standaardremote", local = "Refs: Geselecteerd label pushen naar standaardremote" }
 refs_delete_selected_tag_from_its_remote = { git = "Refs: Geselecteerde tag van zijn remote verwijderen...", local = "Refs: Geselecteerd label van zijn remote verwijderen..." }
 refs_annotate_selected_tag = { git = "Refs: Geselecteerde tag annoteren...", local = "Refs: Geselecteerd label annoteren..." }
+refs_move_selected_tag_to_selected_commit = "Refs: Move Selected {$Tag} to Selected {$Commit}..."
 refs_toggle_hide_in_graph = "Refs: Verbergen in grafiek omschakelen"
 refs_toggle_solo_on_selected_ref = "Refs: Solo op geselecteerde ref omschakelen"
 refs_stop_soloing_clear_every_soloed_ref = "Refs: Solo stoppen (elke solo-ref wissen)"
@@ -5225,6 +5234,9 @@ fetched = { one = "{remote} opgehaald: {n} ref bijgewerkt", other = "{remote} op
 fetched_all = { one = "elke remote opgehaald: {n} ref bijgewerkt", other = "elke remote opgehaald: {n} refs bijgewerkt" }
 branch_created_checkout_failed = "branch {name} is gemaakt maar uitchecken mislukte: {error}"
 tag_annotated = "{$tag} {name} geannoteerd"
+tag_moved = "moved {$tag} {name} to {target}"
+tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
+tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
 tags_all_pushed = { git = "elke {$tag} staat al op {remote}", local = "elk {$tag} staat al op {remote}" }
 nothing_to_push = "niets om naar {remote} te pushen"
 pushed_refs = "{refs} naar {remote} gepusht"
@@ -5755,6 +5767,7 @@ open_install_page = "Installatiepagina openen"
 undo_anyway = "Toch ongedaan maken"
 start_over = "Opnieuw beginnen"
 redo_anyway = "Toch opnieuw doen"
+move_tag = "Move"
 
 [rebase_banner]
 skip = "Overslaan"
@@ -6766,6 +6779,8 @@ sparse_disable = "Gedeeltelijke checkout uitschakelen"
 tag_create = { git = "{$Tag} {name} maken", local = "{$Tag} {name} maken" }
 tag_delete = { git = "{$Tag} {name} verwijderen", local = "{$Tag} {name} verwijderen" }
 tag_annotate = { git = "{$Tag} {name} annoteren", local = "{$Tag} {name} annoteren" }
+tag_move = { git = "Move {$tag} {name}", local = "Move {$tag} {name}" }
+tag_merge_branch = "{$Merge} {branch} into {$tag} {name}"
 fast_forward = { git = "Fast-forward {branch} naar {target}", local = "Fast-forward {branch} naar {target}" }
 reword = "{$Reword} {id}"
 fetch_as_branch = "{$Fetch} {remote_ref} als branch {branch}"

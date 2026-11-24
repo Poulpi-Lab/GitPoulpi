@@ -618,6 +618,7 @@ stage_file = "z"
 | Git: Use the Remote's Version of the Selected Tag |  |
 | Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: аннотировать выбранный tag... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: скрыть/показать в графе |  |
 | Refs: показать в графе | `g` |
 | Refs: solo для выбранной ссылки | `o` |

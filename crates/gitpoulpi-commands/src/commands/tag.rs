@@ -38,6 +38,39 @@ pub(super) async fn tag(session: &mut Session, action: TagAction) -> Result<Emit
                 format!("annotated tag {name}"),
             ))
         }
+        TagAction::Move {
+            name,
+            target,
+            force_non_ff,
+        } => {
+            let to = resolve(session, &target).await?;
+            session
+                .call::<()>(
+                    OperationKind::TagMove,
+                    json!({ "name": name, "target": to, "force": force_non_ff }),
+                )
+                .await?;
+            Ok(emitted(
+                json!({ "moved": name, "to": to, "forced": force_non_ff }),
+                format!("moved tag {name} to {}", short(to)),
+            ))
+        }
+        TagAction::MergeBranch {
+            name,
+            branch,
+            message,
+        } => {
+            let merged = session
+                .call::<gitpoulpi_core::domain::Oid>(
+                    OperationKind::TagMergeBranch,
+                    json!({ "name": name, "branch": branch, "message": message }),
+                )
+                .await?;
+            Ok(emitted(
+                json!({ "merged": branch, "tag": name, "commit": merged }),
+                format!("merged {branch} into tag {name} at {}", short(merged)),
+            ))
+        }
         TagAction::TakeRemote { name, remote } => {
             let remote = differing_remote(session, &name, remote).await?;
             session

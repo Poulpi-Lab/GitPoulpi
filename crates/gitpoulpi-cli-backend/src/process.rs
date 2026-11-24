@@ -698,6 +698,14 @@ pub fn run_with_stdin(repo_root: &Path, args: &[&str], stdin: &str) -> Result<St
     run_with_env_and_stdin(repo_root, args, &[], stdin)
 }
 
+/// [`run_with_stdin`] for input that is not text (a raw tag object).
+pub fn run_with_stdin_bytes(repo_root: &Path, args: &[&str], stdin: &[u8]) -> Result<String> {
+    let (output, writer) = run_piped_stdin(git(repo_root, args), stdin.to_vec())?;
+    let output = checked(args, output)?;
+    join_writer(writer)?;
+    utf8_stdout(output.stdout)
+}
+
 /// [`run_with_stdin`] with extra environment variables - for
 /// `git commit-tree`, whose author identity and date can only be given
 /// through `GIT_AUTHOR_*`.

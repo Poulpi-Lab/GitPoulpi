@@ -1376,6 +1376,22 @@ cannot_drop = "{source} can't be dropped on {target} that way"
 history_scrolled = "the history between there and here has scrolled out of the loaded page"
 shares_no_history = "{source} shares no history with the target"
 nothing_to_replay = "{source} has nothing the target lacks: nothing to replay"
+# context: drag-and-drop menu row for a tag dropped on another ref; {name} is the tag. The tag is moved to the target's commit
+move_tag_here = "Move {$tag} {name} here"
+# context: same row when the move is not a fast-forward (the target does not descend from the tag's commit): the owner may still choose it; keep the warning
+move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
+# context: drag-and-drop menu row: the classic merge of a dropped tag into the local branch {branch}
+merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
+# context: drag-and-drop menu row, the rarer and riskier one: merge {branch} into the tag's commit (detached) and move the tag onto the merge commit
+merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
+# context: status message while a tag moves; {target} is the ref or commit it moves to
+moving_tag = "moving {$tag} {name} to {target}..."
+# context: same, when {remotes} has the tag too and keeps the old position until the owner pushes
+moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
+# context: status message while a branch is merged into a tag's commit
+merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
+# context: confirmation prompt before moving {name} (a tag) to {target} when the target does not descend from the tag's commit
+confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
 
 [menu_inline]
 # context: placeholder of the inline name box in the Log; it is narrow, so keep it short
@@ -4097,6 +4113,8 @@ git_annotated_tag_at_selected_commit = "Git: Annotated Tag at Selected Commit...
 refs_push_selected_tag_to_default_remote = "Refs: Push Selected Tag to Default Remote"
 refs_delete_selected_tag_from_its_remote = "Refs: Delete Selected Tag from Its Remote..."
 refs_annotate_selected_tag = "Refs: Annotate Selected Tag..."
+# context: palette command; opens a menu to move the selected tag to the commit selected in the Log
+refs_move_selected_tag_to_selected_commit = "Refs: Move Selected {$Tag} to Selected {$Commit}..."
 refs_toggle_hide_in_graph = "Refs: Toggle Hide in Graph"
 refs_toggle_solo_on_selected_ref = "Refs: Toggle Solo on Selected Ref"
 refs_stop_soloing_clear_every_soloed_ref = "Refs: Stop Soloing (clear every soloed ref)"
@@ -6345,6 +6363,12 @@ fetched = { one = "fetched {remote}: {n} ref updated", other = "fetched {remote}
 fetched_all = { one = "fetched every remote: {n} ref updated", other = "fetched every remote: {n} refs updated" }
 branch_created_checkout_failed = "branch {name} was created but checking it out failed: {error}"
 tag_annotated = "annotated {$tag} {name}"
+# context: status message after a tag was moved; {target} is the ref or commit it now points at
+tag_moved = "moved {$tag} {name} to {target}"
+# context: same, when {remotes} still has the tag at the old position
+tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
+# context: status message after a branch was merged into a tag's commit; {target} is the short id of the new merge commit
+tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
 tags_all_pushed = "every {$tag} is already on {remote}"
 nothing_to_push = "nothing to push to {remote}"
 pushed_refs = "pushed {refs} to {remote}"
@@ -7057,6 +7081,8 @@ undo_anyway = "Undo anyway"
 start_over = "Start over"
 # context: button of the confirmation
 redo_anyway = "Redo anyway"
+# context: button of the confirmation that moves a tag although it is not a fast-forward
+move_tag = "Move"
 
 [rebase_banner]
 # context: banner button: skip the commit that stopped the rebase
@@ -8396,6 +8422,10 @@ sparse_disable = "Disable sparse checkout"
 tag_create = { git = "Create {$tag} {name}", local = "Create {$tag} {name}" }
 tag_delete = { git = "Delete {$tag} {name}", local = "Delete {$tag} {name}" }
 tag_annotate = { git = "Annotate {$tag} {name}", local = "Annotate {$tag} {name}" }
+# context: undo/redo entry label, a tag moved to another commit
+tag_move = { git = "Move {$tag} {name}", local = "Move {$tag} {name}" }
+# context: undo/redo entry label, a branch merged into a tag's commit and the tag moved onto the merge commit
+tag_merge_branch = "{$Merge} {branch} into {$tag} {name}"
 fast_forward = { git = "Fast-forward {branch} to {target}", local = "Fast-forward {branch} to {target}" }
 # context: {id} is a short commit id
 reword = "{$Reword} {id}"

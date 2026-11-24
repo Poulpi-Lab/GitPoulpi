@@ -522,6 +522,18 @@ impl GitBackend for SystemGitBackend {
     fn tag_annotate(&self, repo: &RepoRef, name: &str, message: &str) -> Result<()> {
         tags::tag_annotate(repo, name, message)
     }
+    fn tag_move(&self, repo: &RepoRef, name: &str, to: Oid, force: bool) -> Result<()> {
+        tags::tag_move(repo, name, to, force)
+    }
+    fn tag_merge_branch(
+        &self,
+        repo: &RepoRef,
+        name: &str,
+        branch: &str,
+        message: Option<&str>,
+    ) -> Result<Oid> {
+        tags::tag_merge_branch(repo, name, branch, message)
+    }
     async fn tag_push(
         &self,
         repo: &RepoRef,

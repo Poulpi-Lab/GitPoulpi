@@ -1016,6 +1016,14 @@ cannot_drop = "{source} kann so nicht auf {target} abgelegt werden"
 history_scrolled = "die Historie zwischen dort und hier ist aus der geladenen Seite herausgescrollt"
 shares_no_history = "{source} hat keine gemeinsame Historie mit dem Ziel"
 nothing_to_replay = "{source} hat nichts, was dem Ziel fehlt: nichts zu übertragen"
+move_tag_here = "Move {$tag} {name} here"
+move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
+merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
+merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
+moving_tag = "moving {$tag} {name} to {target}..."
+moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
+merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
+confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
 
 [menu_inline]
 placeholder_branch = "Branch-Name eingeben"
@@ -3196,6 +3204,7 @@ git_annotated_tag_at_selected_commit = "Git: Annotierter Tag am ausgewählten Co
 refs_push_selected_tag_to_default_remote = { git = "Refs: Ausgewählten Tag an das Standard-Remote pushen", local = "Refs: Ausgewählten Tag an das Standard-Remote hochladen" }
 refs_delete_selected_tag_from_its_remote = "Refs: Ausgewählten Tag von seinem Remote löschen..."
 refs_annotate_selected_tag = "Refs: Ausgewählten Tag annotieren..."
+refs_move_selected_tag_to_selected_commit = "Refs: Move Selected {$Tag} to Selected {$Commit}..."
 refs_toggle_hide_in_graph = "Refs: Ausblenden im Graph umschalten"
 refs_toggle_solo_on_selected_ref = "Refs: Solo für ausgewählte Ref umschalten"
 refs_stop_soloing_clear_every_soloed_ref = "Refs: Solo beenden (alle Solo-Refs aufheben)"
@@ -5231,6 +5240,9 @@ fetched = { one = "{remote} abgerufen: {n} Ref aktualisiert", other = "{remote} 
 fetched_all = { one = "alle Remotes abgerufen: {n} Ref aktualisiert", other = "alle Remotes abgerufen: {n} Refs aktualisiert" }
 branch_created_checkout_failed = "Branch {name} wurde erstellt, aber das Auschecken ist fehlgeschlagen: {error}"
 tag_annotated = "{$Tag} {name} annotiert"
+tag_moved = "moved {$tag} {name} to {target}"
+tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
+tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
 tags_all_pushed = "jeder {$Tag} ist bereits auf {remote}"
 nothing_to_push = { git = "nichts an {remote} zu pushen", local = "nichts an {remote} hochzuladen" }
 pushed_refs = "{refs} an {remote} gepusht"
@@ -5761,6 +5773,7 @@ open_install_page = "Installationsseite öffnen"
 undo_anyway = "Trotzdem rückgängig"
 start_over = "Neu beginnen"
 redo_anyway = "Trotzdem wiederholen"
+move_tag = "Move"
 
 [rebase_banner]
 skip = "Überspringen"
@@ -6771,6 +6784,8 @@ sparse_disable = "Sparse Checkout deaktivieren"
 tag_create = "{$Tag} {name} erstellen"
 tag_delete = "{$Tag} {name} löschen"
 tag_annotate = "{$Tag} {name} annotieren"
+tag_move = { git = "Move {$tag} {name}", local = "Move {$tag} {name}" }
+tag_merge_branch = "{$Merge} {branch} into {$tag} {name}"
 fast_forward = { git = "Fast-Forward von {branch} auf {target}", local = "{branch} auf {target} vorspulen" }
 reword = "{$Reword} {id}"
 fetch_as_branch = "{$Fetch} von {remote_ref} als Branch {branch}"

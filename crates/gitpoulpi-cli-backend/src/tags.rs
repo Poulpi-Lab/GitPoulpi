@@ -21,7 +21,7 @@ use gitpoulpi_core::domain::{
 };
 use gitpoulpi_core::{Error, Result};
 
-use crate::process::{run, run_async, run_with_stdin};
+use crate::process::{run, run_async, run_bytes, run_with_stdin, run_with_stdin_bytes};
 use crate::refs::refs;
 
 /// The refspec that mirrors `remote`'s tags into our namespace. Added to
@@ -51,6 +51,150 @@ pub fn tag_annotate(repo: &RepoRef, name: &str, message: &str) -> Result<()> {
     let at = format!("{tag_ref}^{{commit}}");
     run(&repo.root, &["tag", "-f", "-a", name, "-m", message, &at])?;
     Ok(())
+}
+
+/// Moves tag `name` to the commit `to` (`GitBackend::tag_move`).
+///
+/// An annotated tag is re-written with the same bytes but a new `object`
+/// line (`retarget_tag_object`), hashed in and swapped with a compare-and-swap
+/// `update-ref`, so the backends write the same object.
+pub fn tag_move(repo: &RepoRef, name: &str, to: Oid, force: bool) -> Result<()> {
+    let full = format!("refs/tags/{name}");
+    let no_tag = |_| Error::Backend(format!("no tag named `{name}`"));
+    let old = run(&repo.root, &["rev-parse", "--verify", "--quiet", &full])
+        .map_err(no_tag)?
+        .trim()
+        .to_string();
+    let old_commit = run(
+        &repo.root,
+        &["rev-parse", "--verify", &format!("{full}^{{commit}}")],
+    )?
+    .trim()
+    .to_string();
+    let to_hex = to.to_hex();
+    let target = format!("{to_hex}^{{commit}}");
+    run(&repo.root, &["rev-parse", "--verify", "--quiet", &target])
+        .map_err(|_| Error::Backend(format!("{to_hex} is not a commit")))?;
+    if old_commit == to_hex {
+        return Ok(());
+    }
+    if !force && !crate::branch::is_ancestor(repo, &old_commit, &to_hex)? {
+        return Err(Error::NotFastForward);
+    }
+    let new = if run(&repo.root, &["cat-file", "-t", &full])?.trim() == "commit" {
+        to_hex.clone()
+    } else {
+        let raw = run_bytes(&repo.root, &["cat-file", "tag", &full])?;
+        let moved = gitpoulpi_core::domain::retarget_tag_object(&raw, &to_hex)?;
+        run_with_stdin_bytes(
+            &repo.root,
+            &["hash-object", "-t", "tag", "-w", "--stdin"],
+            &moved,
+        )?
+        .trim()
+        .to_string()
+    };
+    let message = format!("tag: move {name} to {}", &to_hex[..7]);
+    run(
+        &repo.root,
+        &["update-ref", "-m", &message, &full, &new, &old],
+    )?;
+    Ok(())
+}
+
+/// Merges `branch` into the commit of tag `name` with `merge-tree`, commits
+/// the result detached with `commit-tree` and moves the tag
+/// (`GitBackend::tag_merge_branch`).
+pub fn tag_merge_branch(
+    repo: &RepoRef,
+    name: &str,
+    branch: &str,
+    message: Option<&str>,
+) -> Result<Oid> {
+    let tag_commit = run(
+        &repo.root,
+        &[
+            "rev-parse",
+            "--verify",
+            "--quiet",
+            &format!("refs/tags/{name}^{{commit}}"),
+        ],
+    )
+    .map_err(|_| Error::Backend(format!("no tag named `{name}`")))?
+    .trim()
+    .to_string();
+    let tip = run(
+        &repo.root,
+        &[
+            "rev-parse",
+            "--verify",
+            "--quiet",
+            &format!("{branch}^{{commit}}"),
+        ],
+    )
+    .map_err(|_| Error::Backend(format!("no revision named `{branch}`")))?
+    .trim()
+    .to_string();
+    if crate::branch::is_ancestor(repo, &tip, &tag_commit)? {
+        return Err(Error::Backend(format!(
+            "{name} already contains {branch}: nothing to merge"
+        )));
+    }
+    if !crate::process::git_at_least(2, 38) {
+        return Err(Error::Unsupported {
+            operation: "tag_merge_branch (needs git 2.38 or later)",
+        });
+    }
+    let args = [
+        "merge-tree",
+        "--write-tree",
+        tag_commit.as_str(),
+        tip.as_str(),
+    ];
+    let out = crate::process::git(&repo.root, &args)
+        .output()
+        .map_err(crate::process::spawn_failed)?;
+    let tree = match out.status.code() {
+        Some(0) => String::from_utf8_lossy(&out.stdout)
+            .lines()
+            .next()
+            .unwrap_or_default()
+            .trim()
+            .to_string(),
+        Some(1) => {
+            return Err(Error::Conflict {
+                operation: "merge into tag",
+            })
+        }
+        _ => {
+            return Err(Error::Backend(format!(
+                "could not merge {branch} into {name}: {}",
+                String::from_utf8_lossy(&out.stderr).trim()
+            )))
+        }
+    };
+    let message = message
+        .map(str::to_string)
+        .unwrap_or_else(|| format!("Merge branch '{branch}' into tag '{name}'"));
+    let merged = run_with_stdin(
+        &repo.root,
+        &[
+            "commit-tree",
+            "--no-gpg-sign",
+            &tree,
+            "-p",
+            &tag_commit,
+            "-p",
+            &tip,
+        ],
+        &message,
+    )?
+    .trim()
+    .to_string();
+    let merged =
+        Oid::from_hex(&merged).ok_or_else(|| Error::Backend(format!("odd commit id {merged}")))?;
+    tag_move(repo, name, merged, false)?;
+    Ok(merged)
 }
 
 /// What the tag mirror holds for `name` on `remote`: the object the remote

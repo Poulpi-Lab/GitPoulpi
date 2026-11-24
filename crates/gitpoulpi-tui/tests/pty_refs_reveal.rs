@@ -502,3 +502,59 @@ fn a_remote_ahead_of_its_local_namesake_flashes_its_own_row() {
     click_and_see_flash(&mut term, "LOCAL (", "main", "commit-1195", "commit-1200");
     click_and_see_flash(&mut term, "REMOTE (", "main", "commit-1200", "commit-1195");
 }
+
+/// Where the Log's pill `label` is drawn on the row of `commit` (not the
+/// sidebar): the cell a drag is dropped on.
+fn log_pill(screen: &Screen, commit: &str, label: &str) -> Option<(u16, u16)> {
+    let (_, row) = log_row(screen, commit)?;
+    screen
+        .find_all(label)
+        .into_iter()
+        .find(|(col, r)| *r == row && *col > SIDEBAR_RIGHT)
+}
+
+/// Pressing a sidebar ref to carry it must not make the Log follow it: the
+/// reveal belongs to the release of a click, so the graph stays where the
+/// user scrolled it and the drop lands on the pill they can see. `side`'s
+/// commit (`commit-0600`) is far outside the first screen, `main`'s pill is
+/// on the top row.
+#[test]
+fn dragging_a_ref_from_the_sidebar_leaves_the_log_where_it_is() {
+    let repo = deep_repo();
+    let config = tempfile::tempdir().unwrap();
+    let mut term = launch_deep(repo.path(), "reveal-drag-no-jump", config.path(), "");
+    let target = log_pill(&term.screen(), "commit-1200", "main")
+        .unwrap_or_else(|| panic!("no main pill on the top row\n{}", term.text()));
+    let (col, row) = wait_label(&term, "LOCAL (", "side");
+
+    term.press(col + 1, row).unwrap();
+    term.drag_to(col + 3, row).unwrap();
+    term.drag_to(target.0, target.1).unwrap();
+    term.wait_for("the drag banner naming the target", STEP, |s| {
+        s.contains("main - release to drop")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // A reveal pages a deep history in; give a wrongly started one the time.
+    std::thread::sleep(Duration::from_millis(2500));
+    let mid = term.screen();
+    assert!(
+        log_row(&mid, "commit-1200").is_some() && log_row(&mid, "commit-0600").is_none(),
+        "the Log scrolled while the ref was being carried:\n{}",
+        term.text()
+    );
+
+    term.release(target.0, target.1).unwrap();
+    let screen = term
+        .wait_for("the drop menu for side on main", STEP, |s| {
+            s.contains("Merge side into main")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    std::thread::sleep(Duration::from_millis(1500));
+    let after = term.screen();
+    assert!(
+        log_row(&after, "commit-1200").is_some() && log_row(&after, "commit-0600").is_none(),
+        "the Log scrolled on the drop:\n{}",
+        term.text()
+    );
+    assert!(screen.contains("Rebase side onto main"), "{}", term.text());
+}

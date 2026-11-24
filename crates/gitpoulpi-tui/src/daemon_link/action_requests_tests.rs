@@ -200,6 +200,17 @@ fn every_action() -> Vec<Action> {
             name: s("v1"),
             message: s("notes"),
         },
+        Action::TagMove {
+            name: s("v1"),
+            target: Oid([9; 20]),
+            force: true,
+            target_label: s("main"),
+            remotes: vec![s("origin")],
+        },
+        Action::TagMergeBranch {
+            name: s("v1"),
+            branch: s("main"),
+        },
         Action::TagPush {
             remote: s("origin"),
             selection: TagSelection::AllUnpushed,
@@ -461,7 +472,7 @@ fn answer(command: OperationKind) -> serde_json::Value {
         | OperationKind::AmSkip => json!("Completed"),
         OperationKind::CherryPick => json!({ "Completed": [Oid([7; 20])] }),
         OperationKind::Revert => json!("Conflicted"),
-        OperationKind::Commit => json!(Oid([1; 20])),
+        OperationKind::Commit | OperationKind::TagMergeBranch => json!(Oid([1; 20])),
         OperationKind::RemoteGroupRun => json!({
             "run_id": "run-1",
             "branch": "topic",

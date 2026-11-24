@@ -136,6 +136,7 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::TakeRemoteSelectedTag
         | PaletteCommand::ForcePushSelectedTag
         | PaletteCommand::AnnotateSelectedTag
+        | PaletteCommand::MoveSelectedTagToSelectedCommit
         | PaletteCommand::PushAllUnpushedTags
         | PaletteCommand::ToggleHideInGraph
         | PaletteCommand::RevealSelectedRefInGraph

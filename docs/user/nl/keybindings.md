@@ -616,6 +616,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Git: Use the Remote's Version of the Selected Tag |  |
 | Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Geselecteerde tag annoteren... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Verbergen in grafiek omschakelen |  |
 | Refs: In grafiek tonen | `g` |
 | Refs: Solo op geselecteerde ref omschakelen | `o` |

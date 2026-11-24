@@ -606,6 +606,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Git: Use the Remote's Version of the Selected Tag |  |
 | Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: анотувати вибраний tag... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: сховати/показати в графі |  |
 | Refs: показати в графі | `g` |
 | Refs: solo для вибраного ref | `o` |

@@ -1015,6 +1015,14 @@ cannot_drop = "不能这样将 {source} 放到 {target} 上"
 history_scrolled = "从那里到这里之间的历史已滚出已加载的页面"
 shares_no_history = "{source} 与目标没有共同历史"
 nothing_to_replay = "{source} 没有目标所缺少的内容：无需重放"
+move_tag_here = "Move {$tag} {name} here"
+move_tag_not_ff = "Move {$tag} {name} here (not a fast-forward: {name} would no longer be an ancestor)"
+merge_tag_into = "{$Merge} {$tag} {name} into {branch}"
+merge_into_tag = "{$Merge} {branch} into {$tag} {name} and move the {$tag} (rare: adds a {$merge} {$commit})"
+moving_tag = "moving {$tag} {name} to {target}..."
+moving_tag_remote = "moving {$tag} {name} to {target}... ({remotes} keeps the old position until you {$push})"
+merging_into_tag = "{$Merge} {branch} into {$tag} {name}..."
+confirm_move_not_ff = "Move {$tag} {name} to {target}? Not a fast-forward: {name} would no longer be an ancestor."
 
 [menu_inline]
 placeholder_branch = "输入分支名"
@@ -3191,6 +3199,7 @@ git_annotated_tag_at_selected_commit = { git = "Git：在所选 {$Commit} 处创
 refs_push_selected_tag_to_default_remote = { git = "引用：将所选 {$Tag} {$Push} 到默认远程", local = "引用：将所选{$Tag}{$Push}到默认远程" }
 refs_delete_selected_tag_from_its_remote = { git = "引用：从远程删除所选 {$Tag}…", local = "引用：从远程删除所选{$Tag}…" }
 refs_annotate_selected_tag = { git = "引用：为所选 {$Tag} 添加注释…", local = "引用：为所选{$Tag}添加注释…" }
+refs_move_selected_tag_to_selected_commit = "Refs: Move Selected {$Tag} to Selected {$Commit}..."
 refs_toggle_hide_in_graph = "引用：切换在图中隐藏"
 refs_toggle_solo_on_selected_ref = "引用：切换所选引用的单独显示"
 refs_stop_soloing_clear_every_soloed_ref = "引用：停止单独显示（清除所有单独显示的引用）"
@@ -5226,6 +5235,9 @@ fetched = { one = { git = "已 {$fetch} {remote}：更新了 {n} 个引用", loc
 fetched_all = { one = { git = "已 {$fetch} 所有远程：更新了 {n} 个引用", local = "已{$fetch}所有远程：更新了 {n} 个引用" }, other = { git = "已 {$fetch} 所有远程：更新了 {n} 个引用", local = "已{$fetch}所有远程：更新了 {n} 个引用" } }
 branch_created_checkout_failed = "分支 {name} 已创建，但检出失败：{error}"
 tag_annotated = { git = "已为 {$tag} {name} 添加注释", local = "已为{$tag} {name} 添加注释" }
+tag_moved = "moved {$tag} {name} to {target}"
+tag_moved_remote = "moved {$tag} {name} to {target}; {remotes} still has the old position ({$push} to update it)"
+tag_merged = "{$merge} of {branch} into {$tag} {name} done, now at {target}"
 tags_all_pushed = { git = "所有 {$tag} 都已在 {remote} 上", local = "所有{$tag}都已在 {remote} 上" }
 nothing_to_push = { git = "没有可 {$push} 到 {remote} 的内容", local = "没有可{$push}到 {remote} 的内容" }
 pushed_refs = { git = "已将 {refs} {$push} 到 {remote}", local = "已将 {refs} {$push}到 {remote}" }
@@ -5757,6 +5769,7 @@ open_install_page = "打开安装页面"
 undo_anyway = "仍要撤销"
 start_over = "重新开始"
 redo_anyway = "仍要重做"
+move_tag = "Move"
 
 [rebase_banner]
 skip = "跳过"
@@ -6768,6 +6781,8 @@ sparse_disable = "禁用稀疏检出"
 tag_create = { git = "创建 {$tag} {name}", local = "创建{$tag} {name}" }
 tag_delete = { git = "删除 {$tag} {name}", local = "删除{$tag} {name}" }
 tag_annotate = { git = "为 {$tag} {name} 添加注释", local = "为{$tag} {name} 添加注释" }
+tag_move = { git = "Move {$tag} {name}", local = "Move {$tag} {name}" }
+tag_merge_branch = "{$Merge} {branch} into {$tag} {name}"
 fast_forward = { git = "Fast-forward {branch} 到 {target}", local = "快进 {branch} 到 {target}" }
 reword = "{$Reword} {id}"
 fetch_as_branch = "{$Fetch} {remote_ref} 为分支 {branch}"

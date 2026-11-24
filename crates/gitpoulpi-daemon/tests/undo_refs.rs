@@ -650,6 +650,82 @@ async fn annotating_a_tag_is_undone_to_the_lightweight_tag_and_redone_to_the_sam
     }
 }
 
+#[tokio::test]
+async fn moving_an_annotated_tag_is_undone_to_the_old_tag_object_and_redone_to_the_new_one() {
+    for (name, backend) in backends() {
+        let repo = FixtureRepoBuilder::new()
+            .unwrap()
+            .commit("initial")
+            .unwrap()
+            .annotated_tag("v1")
+            .unwrap()
+            .commit("second")
+            .unwrap()
+            .build();
+        let mut rig = Rig::on(backend, repo).await;
+        let tip = rig.rev("HEAD");
+        let old = rig.rev("refs/tags/v1");
+
+        rig.ok(
+            OperationKind::TagMove,
+            json!({ "name": "v1", "target": tip, "force": false }),
+        )
+        .await;
+        let moved = rig.rev("refs/tags/v1");
+        assert_ne!(moved, old, "{name}: a new tag object");
+        assert_eq!(rig.rev("v1^{commit}"), tip, "{name}");
+
+        // One entry: a single undo is back where it was, tag object included.
+        rig.undo().await;
+        assert_eq!(rig.rev("refs/tags/v1"), old, "{name}");
+        rig.repo.git(&["gc", "-q", "--prune=now"]);
+        rig.redo().await;
+        assert_eq!(rig.rev("refs/tags/v1"), moved, "{name}: the same object");
+        rig.stop().await;
+    }
+}
+
+#[tokio::test]
+async fn merging_a_branch_into_a_tag_is_one_undo_entry() {
+    for (name, backend) in backends() {
+        let repo = FixtureRepoBuilder::new()
+            .unwrap()
+            .commit("initial")
+            .unwrap()
+            .branch("side")
+            .unwrap()
+            .commit_file("side.txt", "side\n", "side work")
+            .unwrap()
+            .checkout("main")
+            .unwrap()
+            .commit_file("main.txt", "main\n", "main work")
+            .unwrap()
+            .tag("v1")
+            .unwrap()
+            .build();
+        let mut rig = Rig::on(backend, repo).await;
+        let old = rig.rev("refs/tags/v1");
+
+        rig.ok(
+            OperationKind::TagMergeBranch,
+            json!({ "name": "v1", "branch": "side", "message": null }),
+        )
+        .await;
+        let merged = rig.rev("refs/tags/v1");
+        assert_ne!(merged, old, "{name}");
+
+        rig.undo().await;
+        assert_eq!(
+            rig.rev("refs/tags/v1"),
+            old,
+            "{name}: one undo undoes the whole thing"
+        );
+        rig.redo().await;
+        assert_eq!(rig.rev("refs/tags/v1"), merged, "{name}");
+        rig.stop().await;
+    }
+}
+
 // ------------------------------------------------------- fast-forward
 
 fn ff_repo() -> FixtureRepo {

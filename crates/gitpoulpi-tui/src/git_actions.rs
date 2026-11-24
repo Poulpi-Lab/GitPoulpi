@@ -192,6 +192,22 @@ pub(crate) fn confirm_now(
                 &local, &upstream,
             ))
         }
+        ConfirmAction::MoveTag {
+            name,
+            target,
+            target_label,
+            remotes,
+        } => {
+            let said = gitpoulpi_i18n::msg::menu_drop::moving_tag(&name, &target_label);
+            link.submit_action(Action::TagMove {
+                name,
+                target,
+                force: true,
+                target_label,
+                remotes,
+            });
+            Some(said)
+        }
         ConfirmAction::OpenLfsInstallPage => Some(open_lfs_install_page()),
         ConfirmAction::AutoStashStartOver => {
             link.submit_action(Action::AutoStashStartOver { confirmed: true });

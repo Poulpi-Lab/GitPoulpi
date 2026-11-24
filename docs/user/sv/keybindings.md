@@ -614,6 +614,7 @@ Tangenterna är standardvärdena.
 | Git: Use the Remote's Version of the Selected Tag |  |
 | Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Annotera vald tag... |  |
+| Refs: Move Selected Tag to Selected Commit... |  |
 | Refs: Växla dölj i grafen |  |
 | Refs: Visa i grafen | `g` |
 | Refs: Växla solo för vald ref | `o` |

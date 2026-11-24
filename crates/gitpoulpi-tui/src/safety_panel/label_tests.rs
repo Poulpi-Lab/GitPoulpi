@@ -44,6 +44,8 @@ fn sample(kind: K) -> Option<&'static str> {
         K::TagCreate => "Create tag v1",
         K::TagDelete => "Delete tag v1",
         K::TagAnnotate => "Annotate tag v1",
+        K::TagMove => "Move tag v1",
+        K::TagMergeBranch => "Merge side into tag v1",
         K::FastForward => "Fast-forward main to abc1234",
         K::Reword => "Reword abc1234",
         K::AmendCommit => "Amend abc1234",

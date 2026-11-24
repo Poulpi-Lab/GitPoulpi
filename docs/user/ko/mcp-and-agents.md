@@ -226,6 +226,7 @@ CLI 명령마다 도구가 하나씩 있으며, 이름은 경로를 `_`로 이�
 | `ai_review_context` | `gitpoulpi ai review-context` | write |
 | `ai_rewrite_rules` | `gitpoulpi ai rewrite-rules` | read, network |
 | `ai_rewrite_script` | `gitpoulpi ai rewrite-script` | read, network |
+| `ai_sequence_draft` | `gitpoulpi ai sequence-draft` | read, network |
 | `ai_split_plan` | `gitpoulpi ai split-plan` | read, network |
 | `ai_worktree_name` | `gitpoulpi ai worktree-name` | read, network |
 | `alias_status` | `gitpoulpi alias status` | read |
@@ -423,6 +424,10 @@ CLI 명령마다 도구가 하나씩 있으며, 이름은 경로를 `_`로 이�
 | `rewrite_tools` | `gitpoulpi rewrite tools` | read |
 | `rm_file` | `gitpoulpi rm-file` | destructive |
 | `search` | `gitpoulpi search` | read |
+| `sequence_list` | `gitpoulpi sequence list` | read |
+| `sequence_run` | `gitpoulpi sequence run` | destructive, network |
+| `sequence_show` | `gitpoulpi sequence show` | read |
+| `sequence_validate` | `gitpoulpi sequence validate` | read |
 | `session_delete` | `gitpoulpi session delete` | destructive |
 | `session_list` | `gitpoulpi session list` | read |
 | `session_new` | `gitpoulpi session new` | write |
@@ -453,8 +458,12 @@ CLI 명령마다 도구가 하나씩 있으며, 이름은 경로를 `_`로 이�
 | `tag_delete` | `gitpoulpi tag delete` | destructive, network |
 | `tag_delete_remote` | `gitpoulpi tag delete-remote` | destructive, network |
 | `tag_fetch` | `gitpoulpi tag fetch` | write, network |
+| `tag_force_push` | `gitpoulpi tag force-push` | destructive, network |
 | `tag_list` | `gitpoulpi tag list` | read |
+| `tag_merge_branch` | `gitpoulpi tag merge-branch` | write |
+| `tag_move` | `gitpoulpi tag move` | write |
 | `tag_push` | `gitpoulpi tag push` | write, network |
+| `tag_take_remote` | `gitpoulpi tag take-remote` | write |
 | `theme_export` | `gitpoulpi theme export` | read |
 | `theme_list` | `gitpoulpi theme list` | read |
 | `treat` | `gitpoulpi treat` | write |
@@ -468,6 +477,7 @@ CLI 명령마다 도구가 하나씩 있으며, 이름은 경로를 `_`로 이�
 | `ui_propose_rewrite` | `gitpoulpi ui propose rewrite` | propose |
 | `ui_propose_split` | `gitpoulpi ui propose split` | propose |
 | `ui_propose_tag` | `gitpoulpi ui propose tag` | propose |
+| `ui_sequence_run` | `gitpoulpi ui sequence run` | propose |
 | `ui_show_commit` | `gitpoulpi ui show commit` | view |
 | `ui_show_conflict` | `gitpoulpi ui show conflict` | view |
 | `ui_show_diff` | `gitpoulpi ui show diff` | view |
@@ -534,6 +544,10 @@ Not exposed as tools:
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
 | `gitpoulpi repo-auth set` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
 | `gitpoulpi repo-auth clear` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
+| `gitpoulpi sequence add` | a sequence is a list of commands that run later (and can be bound to a key): an agent must not write its own macros, or edit the config that gates it |
+| `gitpoulpi sequence remove` | removes a sequence from the user's config; the user's macros are theirs to manage |
+| `gitpoulpi sequence trust` | trusting the sequences a repository commits (they run commands on the user's machine) is a person's decision; an agent can only run sequences a person trusted |
+| `gitpoulpi sequence untrust` | withdrawing the trust of a repository's sequences is a person's decision, like granting it |
 | `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
@@ -610,6 +624,7 @@ $ gitpoulpi --json ui back
 | `ui_propose_split` (rev, plan file) | commit 위에 열리는 분할 편집기. 계획이 미리 채워져 있음 | *분할* (`Ctrl+S`). `Esc`는 거부 |
 | `ui_propose_rewrite` (recipe file) | 레시피의 규칙이 들어 있는 기록 다시 쓰기 워크벤치. 아무것도 미리 보거나 적용되지 않음 | 내가 직접 *미리보기*한 뒤 *적용*(`Ctrl+Enter`). `Esc`는 거부. 스크립트가 있는 레시피는 거부되고 비밀 값은 제거됨 |
 | `ui_propose_resolution` (path, pick or content file) | 충돌한 파일의 merge 편집기. 선택(또는 전체 텍스트)이 이미 출력에 들어 있음 | *저장 및 해결됨으로 표시* (`Ctrl+S`). 닫으면 거부 |
+| `ui_sequence_run` (id) | "✦ Proposed by <agent>: run sequence <name>" 배너와 *실행*, *닫기* 버튼. 아직 아무것도 실행되지 않음 | *실행*(클릭, 또는 `Ctrl+N` 다음 `Enter`). *닫기*나 `Esc`는 거부. 이후 실행은 시퀀스가 정한 곳에서 멈춥니다. 시퀀스가 없거나, 올바르지 않거나, 신뢰하지 않은 저장소 시퀀스이면 거부됩니다 |
 
 한 번에 제안 하나만 가능합니다. commit 메시지 제안은 작성기에 내 초안이 있는 동안 거부되고,
 해결 제안은 merge 편집기에 내 저장되지 않은 작업이 있거나 에이전트가 읽은 뒤 파일의

@@ -95,8 +95,8 @@ z terminala: `gitpoulpi mailmap list|check|add`.
 - **Filtr autora** (lejek w nagłówku **Autor**, `Shift+A` w Logu albo polecenie
   palety *Log: Filtruj według autora...*): wstępnie filtruje Log według tego,
   kto napisał commity. Pod nagłówkiem wisi okienko z polem wyszukiwania, wierszem
-  **Wyczyść filtr** (✕) i jednym wierszem na autora wczytanej historii: plakietka
-  z inicjałami (awatar, gdy `ui.avatars` nie jest wyłączone), imię i nazwisko, a
+  **Wyczyść filtr** (✕) i jednym wierszem na autora wczytanej historii: awatar
+  (gdy `ui.avatars` nie jest wyłączone: zdjęcie autora tam, gdzie terminal rysuje obrazy i zdjęcie jest gotowe, do tego czasu i na innych terminalach plakietka z inicjałami), imię i nazwisko, a
   po nim przygaszony e-mail, najpierw ci z największą liczbą commitów, potem
   według nazwy. Pisanie zawęża listę rozmytym dopasowaniem palety; `Enter` albo
   kliknięcie przełącza podświetlonego autora (znacznik wyboru; możesz wybrać
@@ -110,8 +110,11 @@ z terminala: `gitpoulpi mailmap list|check|add`.
   podpowiedź wylicza wybranych autorów, a gdy kolumna Autor jest ukryta albo za
   wąska na lejek, górna krawędź Logu pokazuje zamiast tego *Autor: Alice
   Example +1* (klawisz i paleta nadal działają). Aby go wyłączyć: wiersz
-  **Wyczyść filtr**, prawy przycisk myszy na podświetlonym lejku albo polecenie
-  palety *Log: Wyczyść filtr autora*. Autorzy pochodzą z commitów wczytanych w
+  **Wyczyść filtr**, prawy przycisk myszy na podświetlonym lejku, polecenie
+  palety *Log: Wyczyść filtr autora* albo `Esc` w Logu (po zaznaczeniu, które `Esc` porzuca najpierw; w okienku
+  `Esc` najpierw czyści pole wyszukiwania, potem zamyka okienko i zachowuje filtr).
+  Gdy jest włączony, Up/Down (oraz PageUp/PageDown, Home/End) przesuwają zaznaczenie tylko między podświetlonymi commitami, pomijając przyciemnione; kliknięcie nadal zaznacza dowolny wiersz.
+  Autorzy pochodzą z commitów wczytanych w
   Logu (z zastosowanym mailmap, jak w kolumnie), a filtr jest zapamiętywany per
   repozytorium, między przełączeniami kart i restartami. Wyszukiwany tekst nie
   jest zapamiętywany, filtr tak.

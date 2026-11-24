@@ -109,7 +109,11 @@ impl Geo {
                 tail.push((0, w.state));
             }
             if room >= 60 && w.author > 0 {
-                tail.push((1, w.author));
+                // A wide sized author column gives way to the title.
+                let others: usize = tail.iter().map(|(_, t)| t + 2).sum::<usize>()
+                    + if w.age > 0 { w.age + 2 } else { 0 };
+                let spare = room.saturating_sub(others + 1 + TITLE_FLOOR);
+                tail.push((1, w.author.min(spare.max(AUTHOR_FLOOR))));
             }
             if room >= 40 && w.age > 0 {
                 tail.push((2, w.age));
@@ -203,18 +207,35 @@ impl Geo {
     }
 }
 
+/// The least room the title keeps once the author column has been narrowed
+/// to make it (a wide sized column never eats the title).
+const TITLE_FLOOR: usize = 40;
+/// The narrowest a sized author column is made to give the title its room.
+const AUTHOR_FLOOR: usize = 8;
+/// The fewest cells worth painting for the branches (`a -> b` cut).
+const BRANCH_FLOOR: usize = 8;
+
 /// How the title's room is shared with the branches: `(title cells, branch
 /// cells)`. Both fit whole when they can; else the branches keep up to a
-/// third of the room (at least 12 cells) and the title the rest; a room under
-/// 40 cells is the title's alone.
+/// third of the room (at least 12 cells) and the title the rest. The branches
+/// are cut, never dropped, down to [`BRANCH_FLOOR`] cells; only a room too
+/// small for both leaves them to the hover tooltip of the title.
 pub(super) fn plan_title(room: usize, title: usize, branches: usize) -> (usize, usize) {
-    if branches == 0 || room < 40 {
+    if branches == 0 {
         return (room, 0);
     }
     if title + 2 + branches <= room {
         return (title, branches);
     }
-    let floor = branches.min((room / 3).max(12));
+    // The title keeps a few cells (half the room when it is short) before
+    // the branches take theirs.
+    let title_min = title.min((room / 2).max(4));
+    let floor = branches
+        .min((room / 3).max(12))
+        .min(room.saturating_sub(title_min + 2));
+    if floor < BRANCH_FLOOR.min(branches) {
+        return (room, 0);
+    }
     let title_cells = title.min(room - floor - 2);
     (title_cells, (room - title_cells - 2).min(branches))
 }
@@ -980,7 +1001,10 @@ impl RadarUi {
         let (title_cells, branch_cells) =
             plan_title(title_w, display_width(&title), display_width(&branches));
         let shown = put(buf, x, y, &title, title_cells as u16, text);
-        if display_width(&title) > shown.width as usize {
+        // Branches that found no room are in the title's hover tooltip.
+        if display_width(&title) > shown.width as usize
+            || (branch_cells == 0 && !branches.is_empty())
+        {
             self.hits.push((
                 Rect::new(x, y, shown.width, 1),
                 Hit::Cut(offset, Cell::Title),

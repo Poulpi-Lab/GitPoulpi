@@ -48,9 +48,11 @@ one of the sizable columns). A double-click or `Enter` on a request that is not 
 ### The branches of a request
 
 A request row shows `source → target` after its title (`alice:feature/login → main` when the source branch is in a fork).
-When the room is short the target is cut first (an ellipsis), the title keeps most of the room, and in a narrow window the
-branches are not shown; the Actions column is never pushed out. Rest the pointer on a cut text for the whole of it. A host that
-did not name the branches shows nothing there. An issue row names its repository in the same chip as a request row (the
+When the room is short the target is cut first (an ellipsis), the title keeps most of the room, and the branches shrink
+rather than vanish; only a window too narrow for even a cut version leaves them to the title's tooltip. A wide author column
+you sized yourself gives way to the title. The Actions column is never pushed out. Rest the pointer on a cut text for the
+whole of it. GitHub and Gitea list requests without their branches, so the Radar reads them after the list (once per request
+until it changes). A host that did not name the branches shows nothing there. An issue row names its repository in the same chip as a request row (the
 folder name of the clone, or `owner/name` when it is not cloned).
 
 ### Acting on the host

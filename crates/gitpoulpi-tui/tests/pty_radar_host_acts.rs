@@ -46,6 +46,17 @@ struct Setup {
 /// a fixture repository (the only tab). `origin` is the project the fixture's
 /// `origin` remote names, when it is a clone of one.
 fn setup(session: &str, radar: &str, origin: Option<&str>, cols: u16) -> Setup {
+    setup_with(session, radar, origin, cols, "")
+}
+
+/// [`setup`] with `radar_toml` seeded as `radar.toml` (column widths).
+fn setup_with(
+    session: &str,
+    radar: &str,
+    origin: Option<&str>,
+    cols: u16,
+    radar_toml: &str,
+) -> Setup {
     let bare = tempfile::tempdir().unwrap();
     mock_host::seed_bare_repos(bare.path()).unwrap();
     let mock = mock_host::start(Options {
@@ -78,6 +89,9 @@ fn setup(session: &str, radar: &str, origin: Option<&str>, cols: u16) -> Setup {
         ),
     )
     .expect("seed config.toml");
+    if !radar_toml.is_empty() {
+        std::fs::write(config.path().join("radar.toml"), radar_toml).unwrap();
+    }
     std::fs::create_dir_all(config.path().join("sessions")).unwrap();
     std::fs::write(
         config
@@ -171,8 +185,25 @@ fn a_request_row_shows_its_branches_and_an_issue_row_its_repository() {
     );
 }
 
-/// Narrow, the branches are cut (never the Actions column), and below the
-/// room they need they are not painted at all.
+/// The owner's sizes (`repo = 34, number = 4, author = 60, age = 9`) used to
+/// leave the title no room and the branches nowhere to go; the author column
+/// gives way instead and the branches are still painted.
+#[test]
+fn wide_sized_columns_still_leave_the_title_and_its_branches() {
+    let mut s = setup_with(
+        "pty-acts-wide-cols",
+        OPEN,
+        None,
+        125,
+        "[columns]\nrepo = 34\nnumber = 4\nauthor = 60\nage = 9\n",
+    );
+    let screen = open_radar(&mut s.term, "Keyboard");
+    let line = line_of(&screen, "Keyboard");
+    assert!(line.contains("feature/"), "branches survive: {line}");
+}
+
+/// Narrow, the branches are cut (never the Actions column), and the title's
+/// tooltip carries them when even a cut one does not fit.
 #[test]
 fn the_branches_give_way_when_the_window_narrows() {
     let mut s = setup("pty-acts-narrow", OPEN, None, 100);

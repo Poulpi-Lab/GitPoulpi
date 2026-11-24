@@ -135,8 +135,16 @@ fn the_branches_share_the_title_room_and_leave_a_narrow_row_alone() {
     let (title, branches) = plan_title(60, 10, 70);
     assert_eq!(title, 10);
     assert_eq!(branches, 48);
-    // Narrow: the title only. None: the title only.
-    assert_eq!(plan_title(39, 20, 18), (39, 0));
+    // Narrow: the branches are cut, never dropped.
+    let (title, branches) = plan_title(39, 20, 18);
+    assert!(
+        branches >= 8 && title + 2 + branches <= 39,
+        "{title} {branches}"
+    );
+    let (title, branches) = plan_title(24, 30, 18);
+    assert!(branches >= 8 && title >= 4, "{title} {branches}");
+    // Only a room too small for both is the title's alone. None: the title only.
+    assert_eq!(plan_title(12, 20, 18), (12, 0));
     assert_eq!(plan_title(80, 20, 0), (80, 0));
 }
 
@@ -281,5 +289,39 @@ fn clone_hands_the_event_loop_the_project_and_refuses_for_a_clone_that_is_there(
     match press(&mut ui, 'g') {
         Outcome::Message(text) => assert!(text.contains("Already cloned at"), "{text}"),
         other => panic!("{other:?}"),
+    }
+}
+
+/// The sizes of the owner's `radar.toml` (`repo = 34, number = 4, author = 60,
+/// age = 9`) leave the title little room; the branches must still show.
+#[test]
+fn wide_sized_columns_do_not_push_the_branches_off_the_row() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut ui = ui_with(dir.path(), vec![far(20, "Add login")], None, github());
+    ui.state.columns.repo = Some(34);
+    ui.state.columns.number = Some(4);
+    ui.state.columns.author = Some(60);
+    ui.state.columns.age = Some(9);
+    for width in [100u16, 120, 140, 160, 200] {
+        let text = screen(&mut ui, width, 30);
+        let row = text
+            .lines()
+            .find(|l| l.contains("Add login"))
+            .unwrap_or_else(|| panic!("title gone at {width}\n{text}"));
+        assert!(row.contains("feature/"), "branches gone at {width}: {row}");
+    }
+}
+
+#[test]
+fn a_request_row_keeps_its_branches_at_every_width_from_seventy() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut ui = ui_with(dir.path(), vec![far(20, "Add login")], None, github());
+    for width in 70u16..=140 {
+        let text = screen(&mut ui, width, 30);
+        let row = text.lines().find(|l| l.contains("Add")).unwrap();
+        assert!(
+            row.contains("feat") || row.contains("\u{2192}"),
+            "{width}: {row}"
+        );
     }
 }

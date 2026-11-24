@@ -160,11 +160,29 @@ Diff-vyns tangenter `n`, `p`, `m`, `w`, `s` är granskningens egna, så i gransk
 föregående hunk, **`E`** teckenkodningen, **`M`** minikartan. Var och en har en palettrad (*Granskning: Växla mellan inline och delad vy*,
 ...).
 
+I **Översikt** markeras konversationen och ✦-utkastblocket på samma sätt: dra över texten,
+**`Ctrl+C`** kopierar den (en länk eller en knapp du trycker på behåller sin åtgärd, och en dragning som börjar på
+en av dem markerar ingenting). Utan markering kopierar **`Ctrl+C`** (eller *Konversation: Kopiera text*) den valda
+posten som värden lagrar den. I-markören visas över texten och handen stannar över knappar och länkar. En markering
+följer det som syns på skärmen: när du rullar flyttas den med sin text (den förblir markerad medan den är utanför
+bild), en uppdatering som skriver om texten släpper den, och ett radbrutet stycke kopieras som raderna det visar.
+
+Kommentarerna i diffen på sidan **Filer** (en tråd, dina väntande anteckningar, ✦-förslagen) markeras också: dra
+över deras ord, **`Ctrl+C`** (eller *Granskning: Kopiera markerad text eller rad*) kopierar dem, **`Esc`** släpper
+markeringen. Ett tryck på en av deras knappar, eller ett vanligt klick på en tråds huvud (den viks ihop), gör
+fortfarande sitt; en dragning som börjar på huvudet markerar dess ord och lämnar tråden som den är.
 ### Commits
 
 Bara begärans commits (inte historiken bakom den), nyaste först, och diffen för den valda
 (dess ändringar mot sin förälder), med alla dess filer under varandra och samma visningsalternativ.
 
+## Komma tillbaka till en granskning
+
+En granskning förblir öppen medan du arbetar i en annan flik. Lämna fliken med granskningen öppen (klicka på en annan flik, `Ctrl+PageDown`, paletten **Repository: Nästa flik**) och när du kommer tillbaka öppnas den igen på samma begäran, samma sida (Översikt, Filer eller Commits), samma fil och samma rad, med tangentbordet på samma sida. Detsamma gäller en granskning via API:et över Radar: visa fliken Radar igen så är granskningen tillbaka över den.
+
+En granskning är **pågående** medan dess sida är öppen. Att stänga den (`Esc`, korset, **Granskning: Stäng**), skicka den (**Slutför granskning**, eller skicka in eller överge en Gerrit-ändring) eller checka ut dess gren avslutar den, och den öppnas inte igen. Att avsluta GitPoulpi med en granskning öppen räknas som att lämna fliken: nästa start öppnar den på samma sätt.
+
+Om begäran under tiden har mergats eller stängts, eller värden inte svarar, öppnas ingen sida: statusraden säger varför och inget öppnas igen nästa gång. Väntande kommentarer, sedda filer och utkastet bevaras som alltid (se **Skriva en granskning**). En förslagskörning som fortfarande pågår när du lämnar fliken tas inte med.
 ## Skriva en granskning
 
 En kommentar på kod är **väntande**: den sparas på din maskin (i repositoryts tillståndsfil, så den överlever en

@@ -310,11 +310,13 @@ författaren med avatar och datum, föräldrahashen och ändringsantalen, sedan
 meddelandet (sammanfattning och beskrivning; dra i dess nedre kant för att ändra
 storlek). Rutan **Ändrade filer** nedanför börjar med sina egna reglage:
 sorteringsväxeln, **Sökväg** / **Träd**, **Visa alla filer** och en ruta
-**Filtrera filer**, fasta ovanför listan, som är den enda delen som rullar.
-Klicka på en fil för att öppna dess diff. I ett lågt fönster viker meddelandet
+**Filtrera filer** (med en kryssruta **Bara LFS** i dess högra ände i ett
+repository som har LFS-filer), fasta ovanför listan, som är den enda delen som
+rullar. Klicka på en fil för att öppna dess diff. I ett lågt fönster viker meddelandet
 undan först (ned till en rad), sedan listan. Vyn för lokala ändringar behåller
 sin rad **Sökväg** / **Träd** / **Visa alla filer** överst i fillistorna,
-ovanför listorna Unstaged och Staged.
+ovanför listorna Unstaged och Staged. I trädläget slutar en hopfälld mapp med
+antalet filer i den, undermappar inräknade, som ett nedtonat `(12)`.
 
 **Länkar i ett meddelande.** En webbadress som skrivits i meddelandet (`https://...`,
 eller målet i en markdown-länk `[text](https://...)`) är understruken, visar handpekaren
@@ -349,6 +351,24 @@ med knappar löper längs överkanten:
 | **Karta** | En minikarta över hela filen bredvid rullningslisten. |
 | **Teckenkodning** | Teckenkodningen som filen läses i (**Auto** först). |
 
+#### Ändrade ord i en diff
+
+När en rad bara ändras till en del målas orden som skiljer sig med en
+starkare bakgrund i radens egen färg (ett starkare rött på den borttagna raden,
+ett starkare grönt på den tillagda), och resten av raden behåller den jämna
+nyansen. Inuti en hunk paras varje följd av borttagna rader ihop med följden av
+tillagda rader som kommer efter den, den första med den första, den andra med
+den andra och så vidare; ett par markeras bara när minst 40 % av dess
+icke-blanka tecken är lika, så att en rad som skrivits om från grunden förblir
+jämn i stället för att bli ett enda block av betoning. Ord, följder av blanksteg
+och enstaka skiljetecken jämförs, ett ensamt blanksteg mellan två ändrade ord
+slår ihop dem till en markering, och rader längre än 1000 tecken markeras inte.
+Det fungerar i Inline och Split, med radbrytning och sidledsrullning, och i
+granskningens diffruta. Stäng av det under **Inställningar > Diff & redigerare >
+Markera ändrade ord** (`ui.diff_intraline`) eller från kommandopaletten
+(**Diff: Växla markering av ändrade ord**, utan egen tangent). I en terminal
+begränsad till 16 färger, eller med ett tema utan diffbakgrund, visas de ändrade
+orden i stället med fetstil och understrykning.
 I en diff av arbetskatalogen har varje hunk knapparna **Stage hunk** och **Förkasta
 hunk**. Tryck `v` för att markera rader, och stagea eller förkasta sedan bara de
 raderna.

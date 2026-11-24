@@ -141,6 +141,7 @@ e-postadresser till Gravatar, och frågar ditt anslutna GitHub-/GitLab-konto)
 | `ui.diff_hunks_only` | `true` | `false` visar hela filen med ändringarna på plats (`H`). |
 | `ui.diff_show_whitespace` | `true` | Visa ändringar som bara rör blanksteg (`s`). |
 | `ui.diff_word_wrap` | `false` | Bryt långa diff-rader (`w`; Inställningar > Diff & redigerare). |
+| `ui.diff_intraline` | `true` | Måla de ändrade orden i en ändrad rad med en starkare bakgrund (paletten `Diff: Växla markering av ändrade ord`; Inställningar > Diff & redigerare). |
 | `ui.minimap` | `false` | En minikarta bredvid rullningslisten i diffen och redigeraren (`M`). |
 | `ui.mermaid_detail` | `refs` | Detaljnivå för Logs Kopiera som Mermaid gitGraph: `structure`, `refs`, `subjects`, `full` (kommer ihåg från popupen; standard för `log --format mermaid`). |
 | `ui.mermaid_orientation` | `lr` | Den grafens riktning: `lr` (vänster till höger) eller `tb` (uppifrån och ned). |
@@ -398,7 +399,7 @@ agenter](mcp-and-agents.md#behörigheter).
 | `ai.enabled` | `false` | Strömbrytaren. Av, visas ingen AI någonstans och ingenting skickas. |
 | `ai.default_profile` | `"default"` | Id för profilen som åtgärder använder när de inte namnger någon. |
 | `ai.global_instructions` | `""` | Text som läggs till i varje åtgärds prompt. Får använda `${repo}`, `${uilang}`, ... (se [AI > Promptvariabler](ai.md#promptvariabler)); detsamma gäller instruktionerna per åtgärd och per repository. |
-| `ai.actions.<action>.profile` | `""` | Profil för en åtgärd; tomt = standardprofilen. Åtgärder: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`. En arbetsyta (`workspaces.toml`, `[workspace.ai_instructions]` och `[workspace.ai_overrides.<action>]`) och ett repository kan lägga till i eller ersätta de här instruktionerna: se [AI](ai.md#instruktioner). |
+| `ai.actions.<action>.profile` | `""` | Profil för en åtgärd; tomt = standardprofilen. Åtgärder: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `sequence_draft`. En arbetsyta (`workspaces.toml`, `[workspace.ai_instructions]` och `[workspace.ai_overrides.<action>]`) och ett repository kan lägga till i eller ersätta de här instruktionerna: se [AI](ai.md#instruktioner). |
 | `ai.actions.<action>.instructions` | `""` | Text som läggs till bara för den åtgärden. |
 | `ai.review.run_in_repository` | `"profile"` | `profile`, `yes` eller `no`: om den lokala agenten för ett kodgranskningsutkast arbetar inuti repositoryt för den körningen, vilket åsidosätter AI-profilens `workdir`. Ett repository kan ange sitt eget (`gitpoulpi ai review-context --repo`). Se [AI > Granskningskontext](ai.md#granskningskontext). |
 | `ai.review.include_claude_md` | `true` | Ge ett kodgranskningsutkast repositoryts `CLAUDE.md` (roten, läst på den gren begäran riktar sig mot; kapas vid 8 KB). |
@@ -422,7 +423,7 @@ agenter](mcp-and-agents.md#behörigheter).
 | `ai.hosting_reply.read_repository` | `false` | Om ”Låt AI:n läsa repositoryt” börjar ikryssat. Av som standard: repositoryt läses bara när du kryssar i det för den användningen. En lokal agent eller en API-profil läser det sedan som beskrivs i [AI-kapitlet](ai.md#åtkomst-till-repositoryt). |
 | `ai.hosting_reply.reuse_agent_session` | `true` | Behåll en lokal agents session mellan två svar när dess harness stöder det. Gäller när AI:n får läsa repositoryt. |
 | `ai.hosting_reply.context_ttl_minutes` | `30` | Hur länge en repositorykontext som byggts för ett svar återanvänds. Hålls mellan 1 och 1440. Gäller när AI:n får läsa repositoryt. |
-| `ai.sent_preview.<action>` | `true` | En nyckel per åtgärd (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`): visa ”Det som skickas” innan begäran går iväg. Dialogens ”Visa inte igen för ...” skriver `false`; Inställningar > AI > *Visa vad som skickas före...* slår på dem igen. `worktree_name` godtas men har ingen verkan: den skickar bara det du skrev i dialogrutan Skapa worktree och de lokala grennamnen. |
+| `ai.sent_preview.<action>` | `true` | En nyckel per åtgärd (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`, `worktree_name`, `hosting_reply`, `issue_body`, `sequence_draft`): visa ”Det som skickas” innan begäran går iväg. Dialogens ”Visa inte igen för ...” skriver `false`; Inställningar > AI > *Visa vad som skickas före...* slår på dem igen. `worktree_name` godtas men har ingen verkan: den skickar bara det du skrev i dialogrutan Skapa worktree och de lokala grennamnen. |
 
 Ett repositorys egen tabell `[preferences.ai_review]` (i dess `repo-state.toml`, eller posten för ett repository som inte är
 klonat i `remote-reviews.toml`) tar samma nycklar, alla valfria, plus `no_extra_file = true`: ingen extra fil för
@@ -553,6 +554,47 @@ Flera installationer kan dela en `config.toml` (ett paket, en dev-utcheckning, e
 | `installation.primary` | saknas | Id:t för den primära installationen. Saknas: ingen. |
 | `installation.settings.<id>` | ingen | En tabell per installation: `path` (dess mapp, uppdateras när den flyttas), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (upplysande), `name` (startarnamnet, `GitPoulpi (<etikett>)`, fryst vid första körningen), `name_with_version` (av: lägg `<major>.<minor>` till namnet), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (tomt: filhanterarposten ligger i roten), `env` (tomt: det egna id:t; installationer med samma namn delar bakgrundsprocesser, sessioner och ångrahistorik), `mcp_bind` (tomt: `mcp.bind`). Ett tomt värde faller tillbaka på `ui.*` för den primära, annars på standarden för sorten (en dev-utcheckning bär `sun`). |
 
+## `[[sequences]]`
+
+Namngivna åtgärdssekvenser: en lista med palettkommandon som körs efter varandra
+(till exempel Backup: stage allt, skriv meddelandet med AI, commit, push). En
+tabell per sekvens, dess steg som `[[sequences.steps]]`.
+
+```toml
+[[sequences]]
+id = "backup"                    # sluggen: dess nyckel i [keybindings.sequence] och dess namn i CLI
+name = "Backup"                  # din text, översätts aldrig
+description = "Stage, commit with an AI message, push"   # valfri
+scope = "installation"           # installation (standard) | machine | repo
+owner = "3f9a0c1d2b4e5f60"       # installationens id; sätts med scope = "installation"
+
+[[sequences.steps]]
+run = "stage_all"                # ett palettkommandos id
+
+[[sequences.steps]]
+run = "ai_generate_commit_message"
+pause = "always"                 # default | always | never
+
+[[sequences.steps]]
+run = "create_worktree_from_current_branch"
+pause = "never"
+[sequences.steps.options]
+name = "wip-${date}-${n}"        # en mall: ${branch} ${date} (åååå-mm-dd) ${time} (tt-mm) ${n} (första lediga numret)
+open_tab = true
+```
+
+| Nyckel | Betydelse |
+|---|---|
+| `scope` | `installation`: bara installationen vars id är `owner` ser den. `machine`: varje installation som delar den här `config.toml`. `repo`: lagras i repositoryt i `.gitpoulpi/sequences.toml` (samma `[[sequences]]`-form), syns bara där, och först efter att du litat på den filen, eftersom en incheckad fil är någon annans kommandon. |
+| `steps[].run` | Ett palettkommandos id, det snake-case-skrivna namnet som visas i `[keybindings.palette]`. Bara en fast tillåtelselista godtas: stage, commit, stash push, ny gren / tag, fetch, pull, push (och varianterna push till alla, pull alla, push av tags), AI-meddelande- och commit-composer-kommandona, skapa worktree, öppna en flik eller terminal, och force push med lease. Destruktiva kommandon (förkasta, reset, borttagningar, ta bort worktree, stash drop, historikomskrivning, avsluta, Inställningar) och andra sekvenser kan inte vara steg. Ett steg som den här versionen inte känner till behålls i filen och rapporteras. |
+| `steps[].pause` | `default`: steget stannar på sin vanliga dialog när det behöver inmatning. `always`: stanna före det och fråga om det ska fortsätta. `never`: stanna aldrig; steget behöver då de alternativ dess dialog skulle ha frågat efter (ett `name` för en ny gren eller worktree). Force push med lease kan inte vara `never`. |
+| `steps[].options` | Svar per steg: `name` (ny gren, tag, worktree), `branch` (worktree från en vald gren), `open_tab` (öppna den nya worktreen i en flik), `message` (commit), `label` (Öppna i-post), `profile` (agentprofil). |
+| högst 32 steg | En sekvens har mellan 1 och 32 steg. |
+
+Okända nycklar på en sekvens eller ett steg behålls när GitPoulpi skriver om
+filen. Dubblett-id:n bland de sekvenser du kan se rapporteras. Bind en med
+`[keybindings.sequence] <id> = "<chord>"`, till exempel
+`backup = "Ctrl+G b"`.
 ## `[keybindings]`
 
 Binder om TUI:ts genvägar; Inställningar > Tangentbord & mus redigerar den.
@@ -572,7 +614,7 @@ stage_file = "z"
 standardvärden, och att ta bort raden återställer dem. Tangentkombinationer:
 `Ctrl+Shift+N`, `Alt+n`, `F2`, `PageDown`, `Space`, `,`, `P` (= `Shift+p`). En dålig post
 blockerar aldrig något: TUI:t ignorerar den, behåller standardvärdet och säger det på
-statusraden. Områden, åtgärds-id:n, standardvärden och konfliktreglerna:
+statusraden. `[keybindings.sequence]` binder dina [`[[sequences]]`](#sequences) via id. Områden, åtgärds-id:n, standardvärden och konfliktreglerna:
 [Kortkommandon](keybindings.md).
 
 ## Inställningar per repository: `.gitpoulpi/repo-state.toml`

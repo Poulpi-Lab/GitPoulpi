@@ -114,6 +114,7 @@ rullningslister. Klicka på ett märke för att gå dit.
 - **Dra i gränsen mellan två Log-rubriker** (som standard mellanrummet, från rubriken eller från var som helst nedåt i tabellen; Inställningar > Log & graf > Kolumnstorlek) för att ändra storlek på en kolumn (tangentbordet: `Shift+C` för att välja en kolumn, sedan `]` / `[`).
 - **Dubbelklicka på gränsen mellan två Log-rubriker** för att anpassa kolumnen till vänster om den efter dess innehåll (tangentbordet: `Shift+C` för att välja en kolumn, sedan `=`; `+` anpassar alla kolumner). Sista kolumnen har ett grepp på sin egen sista cell: dra i det för att ändra storlek på den kolumnen, så tar kolumnen Meddelande mellanskillnaden.
 - **Rulla Log i sidled** (kolumnlayouten `scroll`; Inställningar > Log & graf > Kolumnlayout, eller väljarens ruta `Rulla i sidled`): det horisontella hjulet eller `Shift`+hjul över tabellen, stapeln på nedre kanten (dra i dess handtag, tryck på det bara spåret, klicka på dess ändpilar) eller `Shift+Vänster` / `Shift+Höger`. I standardlayouten `fit` fyller kolumnerna rutan och det finns inget att rulla.
+- **Rulla en listruta i sidled** när en rad är bredare än rutan: ett Refs-avsnitt (ett långt namn på en gren, tag eller stash), listorna Unstaged och Staged, commitens (eller en jämförelses) ändrade filer och commit-detaljernas infrarader (id, författare, författardatum, antal). Det horisontella hjulet eller `Shift`+hjul över rutan rullar den; ett fält visas på rutans nedre kant bara medan något flödar över (dra i dess tumme, tryck på det bara spåret, klicka på dess ändpilar), så det tar aldrig en rad. Från tangentbordet rullar `Alt+Left` / `Alt+Right` rutan som har fokus (Log rullar commit-detaljerna; inne i de ändrade filerna, filerna); paletten har `Vy: Rulla panelen åt vänster/höger`. Hela raden rullar (indrag, statusmarkör, vinkel och namn tillsammans); rutans titel, dess kant, rullningslisterna och en markerad Status-rads Stage/Unstage-knapp stannar kvar. Ett namn kapas inte längre med en ellips: dess slut är en rullning bort (en gren med extra push-mål behåller i stället sitt `⇉`-märke i bild, så dess namn viker sig fortfarande). Förskjutningen gäller per ruta, stannar vid den bredaste raden i bild och glöms när du byter repository. Commit-meddelandeblocket radbryter sin text, så det har inget att rulla. Medan ett avsnitt är rullat i sidled bär dess nedre kant fältet, så ändra storlek på avsnittet med dess tangentbordskommandon eller från ett avsnitt som får plats.
 - **Dra en Log-rubrik** för att flytta kolumnen: ett spöke av dess namn följer pekaren, rubriken den lämnade dämpas och en accentstapel markerar platsen där den skulle hamna. Kolumnerna flyttas när du släpper; `Esc` avbryter, och pekaren visar den öppna handen medan du bär den (tangentbordet: `Shift+C` för att välja en kolumn, sedan `<` / `>`).
 
 GitPoulpi kommer ihåg varje storlek. Se
@@ -224,6 +225,7 @@ Se [Värdtjänster och ärendehantering](hosting-integration.md).
   på commiten.
 - **Högerklicka på en ref-pill** för en meny med refens åtgärder och commitens
   åtgärder.
+- **Klicka på tratten i rubriken Författare** (eller `Shift+A` i Log, eller palettens `Log: Filtrera efter författare...`) för att välja vilka författares commits som förblir upplysta; resten tonas ned som vid en sökning. `Enter` eller ett klick på en rad växlar en författare, raden **Rensa filter** (✕) tar bort filtret, `Esc` stänger popupen och behåller det. **Högerklicka på den upplysta tratten** för att rensa det (paletten: `Log: Rensa författarfilter`).
 - **Högerklicka på rubriken** för att visa eller dölja kolumner: en checklista (`[x]` / `[ ]`) med ett ✕ i titeln; klicka på en rad eller använd piltangenterna och `Space` / `Enter`, stäng den sedan med ✕, `Esc` eller ett klick utanför (paletten: `Vy: Log: välj vilka kolumner som visas`). Under kryssrutorna: `Anpassa <column> efter innehållet` (kolumnen du högerklickade på), `Anpassa alla kolumner efter innehållet` och `Återställ kolumnbredder`. Tangentbordstvillingen till högerklicket: `Shift+C` för att välja en kolumn, sedan öppnar `.` (eller `Shift+F10`) samma meny på den.
 - **Radarns kolumner** fungerar på samma sätt: dra avgränsaren efter kolumnen för repository, `#`, författare eller ålder för att ändra storlek, **dubbelklicka på den** för att anpassa kolumnen till dess bredaste post (`C` väljer en kolumn, sedan `=`; `+` anpassar alla kolumner), och **högerklicka på en kolumntitel** (eller `C`, sedan `.`) för `Anpassa <column> efter innehållet` och `Anpassa alla kolumner efter innehållet`.
 - **Klicka på `↑`, `↓` eller `✕`** i sökfältet för att gå till föregående eller
@@ -254,19 +256,36 @@ sparas inte: rensa filtret så kommer de tillbaka. En veckning du gör medan fil
 
 ### Dra refs
 
-Tryck på en gren i Refs-sidofältet, eller på en ref-pill i Log, och dra den till
-en annan gren. Statusraden säger vad du bär. Ett mål som kan ta emot släppet
-tänds. Släpp för att få en meny. `Esc` avbryter dragningen.
+Tryck på en gren, en remote-gren eller en tag i Refs-sidofältet, eller på en
+ref-pill i Log, och dra den till en annan ref. Statusraden säger vad du bär. Ett
+mål som kan ta emot släppet tänds. Släpp för att få en meny. `Esc` avbryter
+dragningen. Log stannar där den är medan du bär: att trycka på en ref rullar
+bara Log till dess commit när det visar sig vara ett klick (hoppet sker när
+knappen släpps), så du kan rulla till släppmålet först och sedan plocka upp
+refen.
 
 | Dra | Meny |
 |---|---|
 | Lokal gren X till lokal gren Y | **Merge X i Y**, **Rebase X på Y**, **Interaktiv rebase av X på Y...**, **Fast-forward Y till X** |
 | Lokal gren till en remote-gren | **Push X** till den remoten |
 | Remote-gren till lokal gren Y | **Merge**, **Rebase Y på den**, **Fast-forward Y till den**, och **Pull** när den är upstream för Y |
+| Tag T till valfri gren, remote-gren eller tag | **Flytta tag T hit**; markerad *(inte en fast-forward: T skulle inte längre vara en förfader)* när målet inte härstammar från taggens commit (ditt val); nedtonad *redan där* när den redan ligger på den commiten |
+| Tag T till lokal gren Y | även **Merge tag T i Y**, och längre ned den mer sällsynta **Merge Y i tag T och flytta taggen** (en merge-commit av taggens commit och Y, frånkopplad, sedan flyttas taggen till den) |
 
 När åtgärden ändrar en gren som inte är utcheckad checkar GitPoulpi ut den
-först. Om git vägrar checkouten ändras ingenting. Taggar kan inte dras och kan
-inte ta emot ett släpp.
+först. Om git vägrar checkouten ändras ingenting. Bara taggar kan släppas på en
+tag, och en gren kan inte släppas på en.
+
+Att flytta en tag behåller dess typ: en lättviktig tag förblir lättviktig, en
+annoterad tag skapas på nytt annoterad med sitt meddelande och sin taggarrad
+oförändrade (en signerad tag avvisas, dess signatur skulle inte längre stämma).
+Bara din lokala tag flyttas: en remote som har taggen behåller den gamla
+positionen, taggen blir *differs* och statusraden säger det; pusha den själv när
+du menar det. Flytten och merge-och-flytt är vardera ett ångrasteg (ångra sätter
+tillbaka det gamla tagobjektet). En merge i en tag som ger konflikter ändrar
+ingenting. Palett: `Refs: Flytta vald Tag till vald Commit...` flyttar Refs-rutans
+tag till commiten som är vald i Log (den frågar först när det inte är en
+fast-forward); varje annat mål går via markera och släpp nedan.
 
 Tangentbord: ”markera, sedan släpp” gör samma sak som en dragning, för vilket
 par av refs som helst. Tryck `m` på en gren i Refs-rutan (paletten: `Refs:
@@ -468,7 +487,7 @@ Terminal, xterm) ändras inte pekaren; se
 [Välja terminal](terminals.md#muspekarens-form-osc-22). Avdelaren eller
 knappen under pekaren tänds i varje terminal.
 
-Samma sorts komponent ger samma pekare överallt i programmet.
+Samma sorts komponent ger samma pekare överallt i programmet: knapparna i en granskning som visas över Radar (flikar, stängkorset, popupknappar) och Radars egna Åtgärder-knappar visar handen som varje annan knapp.
 
 - **Knappar är riktiga knappar**, i Inställningar (Integrationer: Redigera, Koppla från,
   Ta bort, Bläddra, Radera, snippet-knapparna i instruktionsredigeraren ...)
@@ -485,7 +504,7 @@ Samma sorts komponent ger samma pekare överallt i programmet.
 - **Pilen** visas på rader. En rad lyses upp som helhet när pekaren är på den
   (samma ljus i varje lista) och är inte en kontroll i sig: raderna i panelerna
   Refs, Worktrees, Stashes och Submodules, Log och commit-kolumnen (bara ett
-  ref-piller får handen), raderna i en diff, de ändrade filerna, pull
+  ref-piller får handen), marginalerna i en diff, de ändrade filerna, pull
   request-, ärende- och Radar-posterna samt raderna i listorna i dialoger och
   paneler (klona, mappväljaren, Workspaces, tavlans kort, Jobs-panelen, väljarna
   för ansvarig, etikett och milstolpe, rebase-steg, granskningens filer och
@@ -496,8 +515,21 @@ Samma sorts komponent ger samma pekare överallt i programmet.
   och områdesraderna i Inställningar (också medan du redigerar dem), dialogernas
   fält, granskningens kommentarsrutor, commit-kompositören, filredigerarens text
   och merge-redigerarens redigerbara resultat (dess skrivskyddade paneler behåller
-  pilen). I commit-detaljerna är meddelandet och beskrivningen redigerbara, så
-  I-balken visas på dem och hela blocket lyses upp lätt.
+  pilen, eftersom en dragning där inte markerar något). En regel gäller även
+  skrivskyddad text: överallt där en musdragning kan markera text är pekaren
+  I-balken. Det är koden i en diff (Diff-vyn, Inline och Split, och
+  granskningens diffruta), Filvyn och Blames kod. Deras radnummer, markörer och
+  hunkrubriker behåller pilen, och en knapp på en rad behåller handen. Detsamma
+  gäller konversationen i ett ärende eller en begäran (även granskningens
+  Översikt och dess utkastblock), commit-detaljernas meddelande, Release notes,
+  Aktivitetsloggen (båda flikarna), hjälppopupen, Markdown-förhandsvisningen i
+  kommentarsredigeraren och kommentarerna, de väntande anteckningarna och
+  förslagen inuti granskningens diff: en dragning markerar texten (ett vanligt
+  klick behåller sin betydelse: en länk öppnas, en knapp agerar, en post i
+  Aktivitetsloggen eller en tråd öppnas eller viks), `Ctrl+C` kopierar den, `Esc`
+  eller ett klick släpper den. En markering följer sin text när du rullar.
+  Commit-meddelandet är också redigerbart (dubbelklick ändrar det), och hela
+  blocket lyses upp lätt.
 - **I commit-detaljerna** är inforaderna kontroller: klicka på `commit: <id>`
   för att kopiera det korta id:t, dubbelklicka på författar- eller datumraden för
   att ändra den (handen och en lätt markering visar det). Statusraden bara

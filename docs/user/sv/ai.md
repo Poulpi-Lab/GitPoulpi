@@ -159,6 +159,21 @@ kommandopaletten) öppnar agenten en gång, i en synlig terminal, i den
 arbetsmapp den kommer att använda. Besvara frågan, stäng agenten och försök
 igen; svaret kommer agenten ihåg.
 
+### Öppna agenten i en flikens mapp
+
+`Flik: Öppna AI-agent här` i kommandopaletten (kan bindas om som `palette.tab_open_agent_here`,
+ingen standardtangent) öppnar din terminal i den aktiva flikens mapp med agenten i en lokal
+agentprofil igång, för att arbeta med den för hand där. Det är samma terminal som **Terminal här**
+och samma kommando som **Öppna agenten...**, men i flikens mapp i stället för
+profilens egen arbetsmapp. Med en lokal agentprofil öppnas den direkt; med flera frågar en
+lista under flikraden vilken. Den skickar ingen prompt och startar ingen AI-förfrågan: att öppna
+agenten är åtgärden, och det du skriver i den är ditt.
+
+Raden bär AI-gnistan, är dold medan AI är av (**Inställningar > AI**) och nedtonad
+(”ingen lokal AI-agent är inställd”) när ingen profil är en lokal agent. I en sekvens tar steget
+`tab_open_agent_here` AI-profilens `id` i sitt alternativ `profile` (tomt: standardprofilen,
+annars den första lokala agenten). En egen terminalmall kan inte ges agentens kommando:
+terminalen öppnas i mappen och statusraden säger vilket kommando som ska köras.
 Svaret läses från agentens sessionstranskript för Claude Code (dess exakta
 text, raderad efteråt) och från skärmen mellan två markeringsrader som
 förfrågan ber om, för Codex och Gemini. Högst två körningar i virtuell
@@ -292,6 +307,7 @@ hovrar eller markerar den.
 | **Dela upp en commit** | En commits meny *Dela upp commit (AI)...*, eller palettens `AI: Dela upp vald commit...`. Uppdelningsredigeraren öppnas med modellens gruppering ifylld; se nedan. | `ai split-plan <rev>` (skriver ut) |
 | **Skript för historikomskrivning** | I [omskrivningsvyn](history-rewrite.md#skriv-ett-skript-med-ai): knappen `✦ Skriv med AI...` i skriptredigeraren, eller palettens `Omskrivning: Skriv ett skript med AI...`. En dialog visar exakt vad som skickas; skriptet hamnar i redigeraren, markerat, och körs eller tillämpas aldrig åt dig. | `ai rewrite-script "<instruktion>" [--sample N]` (skriver ut) |
 | **Regler för historikomskrivning** | I [omskrivningsvyn](history-rewrite.md#skapa-regler-med-ai): knappen `✦ Skapa regler med AI...`, `Alt+I`, eller palettens `Omskrivning: Skapa regler med AI...`. En dialog med flera rader visar exakt vad som skickas; reglerna och inställningarna hamnar i omskrivningsvyn, och ingenting förhandsgranskas eller tillämpas åt dig. | `ai rewrite-rules "<beskrivning>" [--context]` (skriver ut) |
+| **Sekvensutkast** | Beskriv en [åtgärdssekvens](#sekvensutkast) som ska skapas, eller hur en ska ändras (Inställningar > Sekvenser, nästa skiva av fönstret). | `ai sequence-draft "<beskrivning>" [--edit <id>] [--context]` (skriver ut) |
 | **Worktree-namn** | I [dialogrutan Skapa worktree](worktrees.md#namnge-med-ai): knappen `✦ Namnge med AI` eller `Alt+A` öppnar en ruta där du beskriver funktionen, felet eller uppgiften; modellen namnger worktreen och dess gren efter repositoryts egna grennamn, och båda hamnar i dialogrutans fält så att du kan ändra dem. Bara din beskrivning och de lokala grennamnen skickas, så det finns ingen dialogruta för ”det som skickas”. | `ai worktree-name --describe "<uppgift>"` (skriver ut) |
 | **Svar på en värd** och **Ärendebeskrivning** | Knappen **Skriv med AI** (`Alt+E`) i varje Markdown-redigerare som skickar till en värd: en kommentar, ett svar eller en redigering i en konversation, en granskningskommentar eller sammanfattning, ett nytt ärendes beskrivning. Utkastet hamnar i rutan; inget publiceras. Se [Skrivhjälp på en värd](#skrivhjälp-på-en-värd). | `ai hosting-reply` (skriver ut ett utkast) |
 | **Commit-composer** | WIP-radens menyval *Komponera commits (AI)...*, `Ctrl+G C`, palettens `AI: Komponera commits från ändringar...` | |
@@ -380,6 +396,24 @@ nyaste commits med (en ruta, av som standard, som syns i rutan ”det som
 skickas”). Profilen och instruktionerna är de för *Regler för historikomskrivning*
 under Inställningar > AI.
 
+### Sekvensutkast
+
+Du beskriver en åtgärdssekvens med egna ord (”stage allt, skriv meddelandet med AI, commit och push”, eller, för en
+befintlig, ”lägg till en fetch först”) och modellen föreslår ett namn, ett id, stegen och, om den vill, en genväg. **Den föreslår
+bara**: inget sparas innan du godkänner det och inget körs någonsin. Modellen känner bara till de kommandon en sekvens får
+innehålla (listan den får genereras ur samma tabell som validerar en sekvens, så den kan inte glida isär); varje steg
+kontrolleras för sig, och ett steg som är okänt, destruktivt, kör en annan sekvens eller ber om en paus som inte är möjlig
+utelämnas och listas med skälet medan de giltiga behålls. Valfritt följer remotenamnen, AI-profilernas id och
+Öppna i-etiketterna med (av som standard; CLI-flaggan är `--context`). I terminalen skriver `gitpoulpi ai sequence-draft` ut
+förslaget som JSON (med `toml`, som `gitpoulpi sequence add --file` läser) och sparar ingenting. Profilen och instruktionerna är
+de för *Sekvensutkast* under Inställningar > AI.
+
+I terminalgränssnittet är samma jobb posten **Skapa med AI...** i Inställningar > Sekvenser > **Lägg till**
+(paletten: `Sekvens: Skapa med AI...`) och knappen **Redigera med AI...** på en sekvens: en dialog där du
+skriver vad du vill, med kontextrutan (av som standard) och frågan ”Det som skickas”, sedan ett förslag
+att **Godkänn**, **Redigera före sparande**, **Avvisa** eller skicka igen med **Tillbaka**. En redigering visar en diff mot
+aktuell sekvens (`+` tillagt, `-` borttaget, `~` ändrat) och den föreslagna genvägen kontrolleras mot
+din tangentkarta men binds aldrig. Inget sparas innan du godkänner (se [Sekvenser](sequences.md#skapa-och-redigera-med-ai)).
 ### Skrivhjälp på en värd
 
 *Svar på en värd* skriver ett utkast till en kommentar, ett svar i en tråd, en kommentar på en kodrad eller sammanfattningen av en

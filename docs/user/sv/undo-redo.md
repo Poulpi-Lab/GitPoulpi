@@ -70,6 +70,8 @@ tipsraden under knapparna. För den markerade raden:
   en gren `restore/<gren>-<sha>` vid den gamla spetsen - din nuvarande gren och
   dina filer flyttas aldrig. Bekräftelsen visar exakt vad som kommer att göras,
   och återställningen är en ny åtgärd: `Ctrl+Z` tar tillbaka den.
+- **Ångra hela sekvensen** (`x`): erbjuds medan de nyaste posterna hör till en
+  sekvenskörning (se [Sekvenskörningar](#sekvenskörningar)).
 - **Gör om hit** (`o`) på en ångrad rad.
 - **Återställ main till där Commit lämnade den** (`e`, eller `Alt+Shift+Z` /
   `Redigera: Återställ grenen till där den blockerade åtgärden lämnade den`
@@ -77,6 +79,10 @@ tipsraden under knapparna. För den markerade raden:
   vet reflog fortfarande var åtgärden lämnade den.
 
 Högerklicka på en rad (eller tryck `.`) för samma åtgärder som en meny.
+
+En rad som gjorts av ett steg i en [sekvens](sequences.md) bär ett märke, `⟳ Backup`,
+och dess detaljrad säger vilket steg det var (”Gjord av sekvensen ”Backup”,
+steg 3/4.”).
 
 ![Ångrahistoriken efter att en gren tagits bort och två commits gjorts: den borttagna grenens rad är markerad och kan återställas för sig](../images/undo-history.png)
 
@@ -174,7 +180,7 @@ och **Förlorat arbete:** verkar på den valda raden i den vy som syns.
 
 | Vy | Palettrader |
 |---|---|
-| Ångrahistorik | `Ångrahistorik: Ångra hit...`, `Gör om hit...`, `Återställ bara den här...`, `Återställ grenen till där den var...`, `Uppdatera`, `Stäng` |
+| Ångrahistorik | `Ångrahistorik: Ångra hit...`, `Gör om hit...`, `Ångra hela sekvensen`, `Återställ bara den här...`, `Återställ grenen till där den var...`, `Uppdatera`, `Stäng` |
 | Reflog | `Reflog: Visa i Log`, `Skapa gren här...`, `Skapa tag här...`, `Tillämpa ändringarna på arbetskatalogen`, `Spara ändringarna som stash`, `Återställ till den här positionen...`, `Ladda fler`, `Uppdatera` |
 | Förlorat arbete | `Förlorat arbete: Skapa gren här...`, `Skapa tag här...`, `Cherry-pick`, `Tillämpa ändringarna på arbetskatalogen`, `Spara ändringarna som stash`, `Sök igen` |
 
@@ -186,6 +192,42 @@ kan utföra anger skälet i statusraden i stället för att inte göra något: "
 återställas för sig, "bara en gren eller HEAD kan flyttas tillbaka" och så
 vidare. Raderna med `...` öppnar samma bekräftelse eller namnfråga som knappen.
 
+## Sekvenskörningar
+
+En [sekvens](sequences.md) (Backup: stage allt, AI-commit-meddelande, commit, push)
+gör **en vanlig journalpost per steg som ändrar något**: stage och commit här,
+inte AI-meddelandet och inte pushen (en push ångras aldrig, se nedan). Journalen
+gäller per repository och är strikt nyaste först, så en körning kan inte vara en
+post: var och en behåller sina egna kontroller, och var och en märks med
+körningen som gjorde den (`sequence:Backup#<run> 3/4`). Gamla journaler har
+ingen märkning och läses in som förut.
+
+**Ångra hela sekvensen** ångrar en körnings poster, nyaste först, som en vanlig
+Ångra vardera. Det erbjuds när journalens nyaste poster hör till en körning,
+sammanhängande: en post från en annan körning, en ändring du gjort för hand eller
+en som gjorts utanför GitPoulpi emellan avslutar gruppen. Var den finns:
+
+- Ångrahistoriken: knappen `Ångra hela sekvensen` (`x`), radens högerklicksmeny
+  och palettraden `Ångrahistorik: Ångra hela sekvensen`;
+- kommandopaletten: `Redigera: Ångra hela sekvensen` (sekvensens namn står på
+  raden medan den gäller);
+- kommandoraden och MCP: `gitpoulpi undo --sequence` (nedan).
+
+Varje post kontrolleras för sig, precis som en enskild Ångra: en commit som
+redan finns på sin upstream frågar ”ångra ändå?” innan den ångras (svara så
+fortsätter resten), och en gren som flyttats eller en pågående merge avvisar.
+Det första avslaget (eller ett ”nej” på en fråga) **stoppar** och säger vilket
+steg och varför: *ångrandet av ”Backup” stannade vid steg 3/4 (Commit ”wip”
+(a81b9e4)): ... Kvarvarande åtgärder: 2*. Det som ångrats förblir ångrat, de
+äldre posterna finns kvar i journalen, och en vanlig Ångra (eller knappen igen)
+går vidare därifrån.
+
+Bara detta repositorys journal ångras. En körning som också agerade i ett annat
+repository (ett worktree-steg flyttade de följande stegen till den nya
+worktreens flik) lämnade poster i det repositoryts egen journal; öppna det och
+ångra där. **Gör om** förblir per post: efter att en hel körning ångrats tar
+`Ctrl+Y` tillbaka det nyaste steget, sedan nästa, var och ett med sin egen
+kontroll.
 ## Vad som kan ångras
 
 | Område | Operationer |
@@ -374,6 +416,8 @@ Två fall löser sig av sig självt:
   den till servern** (se ovan), så den frågar alltid, och det gör även gör om som
   tar bort den där igen.
 
+Att ångra en hel sekvens frågar en gång om listan (i panelen), sedan frågar varje
+post som är riskabel igen som ovan.
 Gör om, och varje ångring av en ren ref-flytt, frågar aldrig: andra riktningen
 är en tangent bort.
 
@@ -416,6 +460,7 @@ eller när ångra stängs av. Inget annat tas någonsin bort.
 gitpoulpi undo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi redo [--dry-run] [--expect <id>] [--yes]
 gitpoulpi undo --list [--all]
+gitpoulpi undo --sequence [--dry-run] [--yes]
 gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 ```
 
@@ -425,6 +470,15 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 - `--expect <id>` får anropet att vägra som *inaktuellt* om inte den posten
   fortfarande är den nyaste: ett skript (eller ett andra fönster) ångrar aldrig
   något annat än det som det tittade på.
+- `--sequence` ångrar sekvenskörningen överst i journalen (se
+  [Sekvenskörningar](#sekvenskörningar)): de nyaste sammanhängande posterna ett
+  `sequence run` gjorde, nyaste först, en `undo` vardera med egna kontroller.
+  `--dry-run` listar dem; utan `--yes` stoppar den första posten som kräver en
+  (slutkod **3**) det, med angivet steg, det som ångrats hittills i `undone`
+  och det som återstår i `left`. Ett avslag ger slutkod **2** med `stopped.refused`;
+  när journalens topp inte är en körning är svaret
+  `{"no_sequence": {...}}`, slutkod 2. Posterna bär sin körning i `undo --list`
+  (`summary.origin`: `name`, `run_id`, `step`, `of`). Inte med `--expect`.
 - `undo-forget` släpper den blockerade nyaste posten från journalen (`--redo`: den
   nyaste gör-om-posten). Den vägrar när posten inte är blockerad, och avslutas
   med **3** utan `--yes`. För MCP ändrar det något, men det är inte destruktivt:

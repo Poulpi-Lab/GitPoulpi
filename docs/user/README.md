@@ -39,6 +39,7 @@ start at the top, and jump to the reference pages when you need them.
 | Keep issues as Markdown notes, no token | [Local issues and Obsidian](local-issues.md) | The ISSUES section, provider `Local Markdown - <name>`; palette **Local Issues: Open in Obsidian...** |
 | Rewrite authors, dates, messages or files across many commits | [History rewrite](history-rewrite.md) | `Ctrl+G Shift+H`; palette **Rewrite: History Workbench** |
 | Undo (or redo) an operation | [Undo and redo](undo-redo.md) | `Ctrl+Z` / `Ctrl+Y`; `Alt+Z` opens the undo history; palette **Edit: Undo** |
+| Run several actions with one key (stage, AI message, commit, push...) | [Sequences](sequences.md) | Settings > Sequences; palette **Sequence: <name>** |
 | Track large files with Git LFS | [Git LFS](lfs.md) | Palette **LFS: Track Pattern...**, **LFS: Initialize for This Repository** |
 | Find a branch, commit, pull request or issue across repositories | [Search](search.md) | `Ctrl+Alt+F`, or the Global search button in the title bar; `f` searches the commit graph of the current repository |
 | See everything that needs me in one list | [The Radar](radar.md) | `Alt+R`; palette **Radar: Open** |

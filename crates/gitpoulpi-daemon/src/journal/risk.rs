@@ -44,6 +44,22 @@ pub(super) fn risk(
                     .unwrap_or(&change.name)
             ),
         };
+        if let (Some(old), Some(new)) = (change.old, change.new) {
+            // A tag moved on the remote (a force push), not created or deleted.
+            let (verb, to) = match d {
+                Direction::Undo => ("moves", old),
+                Direction::Redo => ("force pushes", new),
+            };
+            reasons.push(format!(
+                "{} this {verb} {what} on {} to {} (the remote server, leased on what it \
+                 holds now: refused if {} moved again).",
+                capitalized(d.verb()),
+                change.remote,
+                gitpoulpi_core::domain::short(to),
+                change.remote
+            ));
+            continue;
+        }
         reasons.push(match (d, change.old) {
             (Direction::Undo, Some(old)) => format!(
                 "Undoing this re-creates {what} on {} at {}: it is pushed to the remote \

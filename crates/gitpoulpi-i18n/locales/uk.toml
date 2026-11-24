@@ -3754,6 +3754,8 @@ rewrite_strip_exec = "Переписування: прибрати біт вик
 rewrite_file_encoding = "Переписування: перетворити кодування файлів..."
 # s22:end
 git_fetch_selected_tag = { git = "Git: Fetch вибраного tag'а", local = "Git: завантажити вибраний тег" }
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "Переписування: виправити кодування повідомлень..."
 # s24:end
@@ -8970,6 +8972,15 @@ tip_both = { git = "Тут і в {remotes}, на тому самому commit'і
 tip_differs = { git = "Тут і в {remotes}, але на різних commit'ах: {$push_noun} було б відхилено.", local = "Тут і в {remotes}, але на різних комітах: {$push_noun} було б відхилено." }
 tip_fetch_note = "Після {$fetch_noun} {$tag}, видалений лише тут, повертається, поки його ще має remote. {$Tag}, видалений на remote, зникає з цього репозиторію лише за ввімкненого «Автоочищення {$tags}» (Налаштування)."
 fetch_tag = "{$Fetch} {name} з {remote}"
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "Видалити {name}..."
 delete_tag_on_remote = "Видалити {name} на {remote}..."
 dlg_title = "Видалити {$tag}"

@@ -609,6 +609,8 @@ Tuşlar varsayılanlardır.
 | Refs: Seçili Tag'i Varsayılan Uzak Depoya Push Et |  |
 | Refs: Seçili Tag'i Uzak Deposundan Sil... |  |
 | Git: Seçili Tag için Fetch |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Seçili Tag'e Not Ekle... |  |
 | Refs: Grafikte Gizle/Göster |  |
 | Refs: Grafikte Göster | `g` |

@@ -3754,6 +3754,8 @@ rewrite_strip_exec = "Reescritura: Quitar el bit de ejecución..."
 rewrite_file_encoding = "Reescritura: Convertir la codificación de archivos..."
 # s22:end
 git_fetch_selected_tag = { git = "Git: {$Fetch} del {$Tag} seleccionado", local = "Git: {$Fetch} la {$tag} seleccionada" }
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "Reescritura: Corregir la codificación de mensajes..."
 # s24:end
@@ -8965,6 +8967,15 @@ tip_both = { git = "Aquí y en {remotes}, en el mismo {$commit}.", local = "Aqu�
 tip_differs = { git = "Aquí y en {remotes}, pero en {$commits} distintos: un {$push_noun} sería rechazado.", local = "Aquí y en {remotes}, pero en {$commits} distintas: un {$push_noun} sería rechazado." }
 tip_fetch_note = { git = "Un {$fetch_noun} recupera un {$tag} eliminado solo aquí mientras un remoto aún lo tiene. Un {$tag} eliminado en el remoto solo sale de este repositorio con «Auto-prune de {$tags}» (Ajustes).", local = "Una {$fetch_noun} recupera una {$tag} eliminada solo aquí mientras un remoto aún la tiene. Una {$tag} eliminada en el remoto solo sale de este repositorio con «Poda automática de {$tags}» (Ajustes)." }
 fetch_tag = "{$Fetch} {name} desde {remote}"
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "Eliminar {name}..."
 delete_tag_on_remote = "Eliminar {name} en {remote}..."
 dlg_title = "Eliminar {$tag}"

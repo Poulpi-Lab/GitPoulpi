@@ -194,6 +194,14 @@
   TagFetch {"name":"v1","remote":"origin"}
   message: Downloaded v1 from origin
   ok: true
+== TagTakeRemote { remote: "origin", name: "v1" }
+  TagTakeRemote {"name":"v1","remote":"origin"}
+  message: v1 now is origin's version. Undo puts yours back.
+  ok: true
+== TagForcePush { remote: "origin", name: "v1" }
+  TagForcePush {"confirmed":true,"name":"v1","remote":"origin"}
+  message: Force pushed v1 to origin. Undo puts the old one back.
+  ok: true
 == CheckoutThen { branch: "topic", then: StageAll }
   Checkout {"target":{"Branch":"topic"}}
   StageAll {"target":"All"}

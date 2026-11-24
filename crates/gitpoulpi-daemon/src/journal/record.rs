@@ -155,6 +155,8 @@ fn begin_record_with(
         // The object the remote held must outlive the deletion: undo pushes
         // it back from here.
         before.pins.extend(remote.change.old);
+        // ... and, for a force push, the object it replaces it with (redo).
+        before.pins.extend(remote.change.new);
         before.remote_ref = Some(remote.change);
         before.local_request = remote.local_request;
     }
@@ -388,10 +390,7 @@ pub fn finish_record(
             if let Some(entry) = journal.entry_mut(id) {
                 entry.label = after.label.clone().unwrap_or_else(|| entry.label.clone());
                 if let (true, Some(change)) = (remote_done, &before.remote_ref) {
-                    entry.remote_refs = vec![RemoteRefChange {
-                        new: None,
-                        ..change.clone()
-                    }];
+                    entry.remote_refs = vec![change.clone()];
                 }
                 if !flow_remote.is_empty() {
                     // Pinned now (the delete already dropped the tracking

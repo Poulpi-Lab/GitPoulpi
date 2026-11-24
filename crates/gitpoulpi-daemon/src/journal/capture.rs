@@ -204,7 +204,10 @@ pub(super) fn capture_before(
             let branch = arg_str(request, "branch").unwrap_or_default();
             capture_sections(backend, repo, &mut before, &[branch_section(&branch)])?;
         }
-        OperationKind::TagCreate | OperationKind::TagDelete | OperationKind::TagAnnotate => {
+        OperationKind::TagCreate
+        | OperationKind::TagDelete
+        | OperationKind::TagAnnotate
+        | OperationKind::TagTakeRemote => {
             let name = arg_str(request, "name").unwrap_or_default();
             let full = format!("refs/tags/{name}");
             if request.command == OperationKind::TagCreate {
@@ -360,7 +363,7 @@ pub(super) fn capture_scoped(
 
 /// The raw value of one ref, in one spawn (the `refs/heads/` in the
 /// scope makes git name HEAD for free, so no second spawn resolves it).
-pub(super) fn read_ref(
+pub(crate) fn read_ref(
     backend: &dyn GitBackend,
     repo: &RepoRef,
     name: &str,

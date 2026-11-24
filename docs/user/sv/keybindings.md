@@ -611,6 +611,8 @@ Tangenterna är standardvärdena.
 | Refs: Pusha vald tag till standard-remote |  |
 | Refs: Ta bort vald tag från dess remote... |  |
 | Git: Fetch vald tag |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Annotera vald tag... |  |
 | Refs: Växla dölj i grafen |  |
 | Refs: Visa i grafen | `g` |

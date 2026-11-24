@@ -68,6 +68,9 @@ pub(crate) struct PaletteContext {
     /// The selected tag is on a remote only (not in this repository): the
     /// one state `Fetch Selected Tag` applies to.
     pub(crate) selected_tag_remote_only: bool,
+    /// The selected tag is here and on a remote at another commit: the one
+    /// state `Use the Remote's Version` and `Force Push` apply to.
+    pub(crate) selected_tag_differs: bool,
     pub(crate) soloing: bool,
     /// At least one ref is hidden from the graph - gates
     /// `ShowAllHiddenRefs`, the same way `soloing` gates `StopSoloing`.
@@ -537,6 +540,15 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
                 Some(msg::palette::WHY_SELECT_A_TAG_IN_THE_REFS_PANE_FIRST.get())
             } else if !ctx.selected_tag_remote_only {
                 Some(msg::tag_where::WHY_NOT_REMOTE_ONLY.get())
+            } else {
+                None
+            }
+        }
+        C::TakeRemoteSelectedTag | C::ForcePushSelectedTag => {
+            if !ctx.selected_tag {
+                Some(msg::palette::WHY_SELECT_A_TAG_IN_THE_REFS_PANE_FIRST.get())
+            } else if !ctx.selected_tag_differs {
+                Some(msg::tag_where::WHY_NOT_DIFFERING.get())
             } else {
                 None
             }

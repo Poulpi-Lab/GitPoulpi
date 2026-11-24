@@ -3758,6 +3758,8 @@ rewrite_strip_exec = "Réécriture : retirer le bit exécutable..."
 rewrite_file_encoding = "Réécriture : convertir l'encodage des fichiers..."
 # s22:end
 git_fetch_selected_tag = { git = "Git : {$Fetch} le tag sélectionné", local = "Git : {$Fetch} l'étiquette sélectionnée" }
+git_use_remote_version_of_selected_tag = { git = "Git : Version distante du tag sélectionné", local = "Git : Version distante de l'étiquette sélectionnée" }
+git_force_push_selected_tag = { git = "Git : Push forcé du tag sélectionné", local = "Git : Envoi forcé de l'étiquette sélectionnée" }
 # s24:begin
 rewrite_fix_message_encoding = "Réécriture : corriger l'encodage des messages..."
 # s24:end
@@ -8984,6 +8986,15 @@ tip_both = { git = "Ici et sur {remotes}, sur le même {$commit}.", local = "Ici
 tip_differs = { git = "Ici et sur {remotes}, mais à des commits différents : un push serait refusé.", local = "Ici et sur {remotes}, mais à des validations différentes : un envoi serait refusé." }
 tip_fetch_note = { git = "Un fetch rapporte un tag supprimé seulement ici tant qu'un distant l'a encore. Un tag supprimé sur le distant ne quitte ce dépôt qu'avec « Élagage automatique des tags » (Paramètres).", local = "Une récupération rapporte une étiquette supprimée seulement ici tant qu'un distant l'a encore. Une étiquette supprimée sur le distant ne quitte ce dépôt qu'avec « Élagage automatique des étiquettes » (Paramètres)." }
 fetch_tag = { git = "{$Fetch} {name} depuis {remote}", local = "Récupérer {name} depuis {remote}" }
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "Supprimer {name}..."
 delete_tag_on_remote = "Supprimer {name} sur {remote}..."
 dlg_title = { git = "Supprimer un tag", local = "Supprimer une étiquette" }

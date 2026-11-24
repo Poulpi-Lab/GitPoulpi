@@ -608,6 +608,8 @@ zastosowania. Klawisze są domyślne.
 | Refs: Push zaznaczonego tagu do domyślnego zdalnego |  |
 | Refs: Usuń zaznaczony tag z jego zdalnego... |  |
 | Git: Fetch zaznaczony tag |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Opisz zaznaczony tag... |  |
 | Refs: Przełącz ukrycie w grafie |  |
 | Refs: Pokaż w grafie | `g` |

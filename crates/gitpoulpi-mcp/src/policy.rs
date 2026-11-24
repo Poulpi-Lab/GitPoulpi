@@ -150,6 +150,9 @@ const DESTRUCTIVE: &[&[&str]] = &[
     &["branch", "delete-remote"],
     &["tag", "delete"],
     &["tag", "delete-remote"],
+    // Replaces a remote tag with ours (leased on the last fetch; `undo` pushes
+    // the old value back): server-side, so gated like `push`.
+    &["tag", "force-push"],
     &["stash", "drop"],
     &["remote", "remove"],
     &["push"],
@@ -488,6 +491,7 @@ mod tests {
             "branch_delete_remote",
             "tag_delete",
             "tag_delete_remote",
+            "tag_force_push",
             "lfs_prune",
             "lfs_push",
             "lfs_unlock",
@@ -528,7 +532,7 @@ mod tests {
             .map(|s| s.name)
             .collect();
         got.sort();
-        assert_eq!(got.len(), 44, "destructive set changed: {got:?}");
+        assert_eq!(got.len(), 45, "destructive set changed: {got:?}");
     }
 
     #[cfg(feature = "full")]

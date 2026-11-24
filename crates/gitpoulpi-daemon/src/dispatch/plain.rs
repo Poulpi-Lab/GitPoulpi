@@ -583,6 +583,11 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
             let message: String = arg_or_err!(args, "message", request.id);
             to_json!(backend.tag_annotate(&repo, &name, &message))
         }
+        OperationKind::TagTakeRemote => {
+            let remote: String = arg_or_err!(args, "remote", request.id);
+            let name: String = arg_or_err!(args, "name", request.id);
+            to_json!(backend.tag_take_remote(&repo, &remote, &name))
+        }
         // TagPush / TagDeleteRemote are network operations and live in
         // `dispatch_network`, not here.
         OperationKind::Reset => {

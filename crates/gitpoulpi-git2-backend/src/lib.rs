@@ -509,6 +509,12 @@ impl GitBackend for Git2Backend {
     ) -> Result<PushOutcome> {
         self.fallback.tag_push(repo, remote, selection).await
     }
+    fn tag_take_remote(&self, repo: &RepoRef, remote: &str, name: &str) -> Result<()> {
+        self.fallback.tag_take_remote(repo, remote, name)
+    }
+    async fn tag_force_push(&self, repo: &RepoRef, remote: &str, name: &str) -> Result<()> {
+        self.fallback.tag_force_push(repo, remote, name).await
+    }
     async fn tag_delete_remote(&self, repo: &RepoRef, remote: &str, name: &str) -> Result<()> {
         self.fallback.tag_delete_remote(repo, remote, name).await
     }

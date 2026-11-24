@@ -609,6 +609,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Refs: Push Selected Tag to Default Remote |  |
 | Refs: Delete Selected Tag from Its Remote... |  |
 | Git: Fetch Selected Tag |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Annotate Selected Tag... |  |
 | Refs: Toggle Hide in Graph |  |
 | Refs: Reveal in Graph | `g` |

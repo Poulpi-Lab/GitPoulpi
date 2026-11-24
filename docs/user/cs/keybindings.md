@@ -609,6 +609,8 @@ Klávesy jsou výchozí.
 | Refs: Push vybraného tagu do výchozího remote |  |
 | Refs: Smazat vybraný tag z jeho remote... |  |
 | Git: Fetch vybraného tagu |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Anotovat vybraný tag... |  |
 | Refs: Přepnout skrytí v grafu |  |
 | Refs: Ukázat v grafu | `g` |

@@ -575,6 +575,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 引用：将所选 Tag Push 到默认远程 |  |
 | 引用：从远程删除所选 Tag… |  |
 | Git：Fetch 所选 Tag |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | 引用：为所选 Tag 添加注释… |  |
 | 引用：切换在图中隐藏 |  |
 | 引用：在图中定位 | `g` |

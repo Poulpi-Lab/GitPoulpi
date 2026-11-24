@@ -140,11 +140,77 @@ pub(crate) fn tooltip_lines(name: &str) -> Option<Vec<String>> {
         TagWhere::Both => msg::tip_both(&remotes),
         TagWhere::Differs => msg::tip_differs(&remotes),
     });
+    if info.place == TagWhere::Differs {
+        lines.push(msg::TIP_DIFFERS_ACTIONS.get().to_string());
+    }
     // What a fetch does with it matters exactly when a remote has it.
     if info.place != TagWhere::Local {
         lines.push(msg::TIP_FETCH_NOTE.get().to_string());
     }
     Some(lines)
+}
+
+// ---------------------------------------------------------------------
+// The two ways out of a tag that differs
+// ---------------------------------------------------------------------
+
+/// The remote a "tag that differs" action runs against: the `index`th of the
+/// remotes it differs on (a menu row), else the default remote when it is one
+/// of them, else the first (the palette, which has no row to name one).
+fn differing_remote(name: &str, index: Option<usize>, default: Option<String>) -> Option<String> {
+    let on = lookup(name)?.differs_on;
+    match index {
+        Some(i) => on.get(i).cloned(),
+        None => match default {
+            Some(d) if on.contains(&d) => Some(d),
+            _ => on.into_iter().next(),
+        },
+    }
+}
+
+/// "Use `name` from `remote`": submits the action (local, no network) and
+/// returns the message to show.
+pub(crate) fn begin_take_remote(
+    name: &str,
+    index: Option<usize>,
+    default: Option<String>,
+    link: &crate::daemon_link::DaemonLink,
+) -> String {
+    match differing_remote(name, index, default) {
+        Some(remote) => {
+            link.submit_action(crate::daemon_link::Action::TagTakeRemote {
+                remote,
+                name: name.to_string(),
+            });
+            msg::msg_taking_remote(name)
+        }
+        None => msg::msg_not_differing(name),
+    }
+}
+
+/// "Push `name` to `remote` (force)": asks first (the remote's tag is
+/// replaced for everyone), the red button runs it.
+pub(crate) fn begin_force_push(
+    name: &str,
+    index: Option<usize>,
+    default: Option<String>,
+    input_mode: &mut crate::modes::InputMode,
+    last_message: &mut Option<String>,
+) {
+    match differing_remote(name, index, default) {
+        Some(remote) => {
+            *input_mode = crate::modes::InputMode::Confirm {
+                prompt: msg::confirm_force_push(name, &remote),
+                action: crate::modes::ConfirmAction::Destructive(
+                    crate::modes::PendingDestructive::ForcePushTag {
+                        remote,
+                        name: name.to_string(),
+                    },
+                ),
+            };
+        }
+        None => *last_message = Some(msg::msg_not_differing(name)),
+    }
 }
 
 // ---------------------------------------------------------------------

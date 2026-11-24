@@ -147,7 +147,10 @@ pub(super) fn after_state(
                 label: Some(format!("Fast-forward {branch} to {}", short(to))),
             })
         }
-        OperationKind::TagCreate | OperationKind::TagDelete | OperationKind::TagAnnotate => {
+        OperationKind::TagCreate
+        | OperationKind::TagDelete
+        | OperationKind::TagAnnotate
+        | OperationKind::TagTakeRemote => {
             let (name, old) = before.refs.first().cloned()?;
             let new = match request.command {
                 OperationKind::TagDelete => None,

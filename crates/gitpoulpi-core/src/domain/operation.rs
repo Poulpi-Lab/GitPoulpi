@@ -202,6 +202,14 @@ pub enum OperationKind {
     TagDeleteRemote,
     /// Fetch one tag from a remote (see `GitBackend::tag_fetch`). Network.
     TagFetch,
+    /// Move the local tag to what a remote has, as the tag mirror knows it
+    /// (see `GitBackend::tag_take_remote`). Local; journaled like
+    /// [`OperationKind::TagAnnotate`] (undo puts the old object back).
+    TagTakeRemote,
+    /// Force-push the local tag to a remote, leased on the mirror's value
+    /// (see `GitBackend::tag_force_push`). Network, outward-facing; journaled
+    /// with a [`crate::journal::RemoteRefChange`] like a remote deletion.
+    TagForcePush,
     Merge,
     Rebase,
     RebaseInteractive,
@@ -767,13 +775,16 @@ impl OperationKind {
             | K::BranchSetRemotes
             | K::TagCreate
             | K::TagDelete
-            | K::TagAnnotate => OpTraits::NONE
+            | K::TagAnnotate
+            | K::TagTakeRemote => OpTraits::NONE
                 .journaled()
                 .scope(ChangeScope::REFS | ChangeScope::LOG),
             K::BranchCreateTracking | K::FastForward | K::Reset => OpTraits::NONE.journaled(),
-            K::BranchDeleteRemote | K::TagDeleteRemote | K::TagFetch => OpTraits::NONE
-                .network()
-                .scope(ChangeScope::REFS | ChangeScope::LOG),
+            K::BranchDeleteRemote | K::TagDeleteRemote | K::TagFetch | K::TagForcePush => {
+                OpTraits::NONE
+                    .network()
+                    .scope(ChangeScope::REFS | ChangeScope::LOG)
+            }
             // A mutation that can move any submodule's checkout (and, through
             // them, what status shows): the default scope, everything.
             K::SubmoduleInit | K::SubmoduleUpdate => OpTraits::NONE,
@@ -903,7 +914,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 188] = [
+    pub const ALL: [OperationKind; 190] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -976,6 +987,8 @@ impl OperationKind {
         OperationKind::TagPush,
         OperationKind::TagDeleteRemote,
         OperationKind::TagFetch,
+        OperationKind::TagTakeRemote,
+        OperationKind::TagForcePush,
         OperationKind::Merge,
         OperationKind::Rebase,
         OperationKind::RebaseInteractive,

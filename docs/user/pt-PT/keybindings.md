@@ -607,6 +607,8 @@ As teclas são as predefinidas.
 | Refs: push da tag selecionada para o remoto predefinido |  |
 | Refs: eliminar a tag selecionada do seu remoto... |  |
 | Git: Fetch da Tag selecionada |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: anotar a tag selecionada... |  |
 | Refs: alternar ocultar no grafo |  |
 | Refs: mostrar no grafo | `g` |

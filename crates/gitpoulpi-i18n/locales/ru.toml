@@ -3747,6 +3747,8 @@ rewrite_strip_exec = "Переписывание: убрать бит испол
 rewrite_file_encoding = "Переписывание: преобразовать кодировку файлов..."
 # s22:end
 git_fetch_selected_tag = "Git: {$Fetch} выбранный {$tag}"
+git_use_remote_version_of_selected_tag = "Git: Use the Remote's Version of the Selected {$Tag}"
+git_force_push_selected_tag = "Git: Force {$Push} the Selected {$Tag} to Its Remote"
 # s24:begin
 rewrite_fix_message_encoding = "Переписывание: исправить кодировку сообщений..."
 # s24:end
@@ -8973,6 +8975,15 @@ tip_both = { git = "Здесь и на {remotes}, на том же commit'е.", 
 tip_differs = { git = "Здесь и на {remotes}, но на разных commit'ах: push будет отклонён.", local = "Здесь и на {remotes}, но на разных коммитах: отправка будет отклонена." }
 tip_fetch_note = { git = "Fetch возвращает tag, удалённый только здесь, пока он есть на remote. Tag, удалённый на remote, пропадает из этого репозитория только при включённой автоочистке tag'ов (Настройки).", local = "Загрузка возвращает тег, удалённый только здесь, пока он есть на remote. Тег, удалённый на remote, пропадает из этого репозитория только при включённой автоочистке тегов (Настройки)." }
 fetch_tag = "{$Fetch} {name} с {remote}"
+tip_differs_actions = "From its menu: use the remote's version here, or force {$push} yours (it asks first)."
+take_remote = "Use {name} from {remote}"
+force_push_tag = "{$Push} {name} to {remote} (force)"
+confirm_force_push = "Force {$push} {$tag} '{name}' to {remote}? It replaces the {$tag} on {remote} for everyone who uses it. Refused if {remote} moved since the last {$fetch}. Undo puts the old one back."
+msg_taking_remote = "Using the remote's version of {name}..."
+msg_took_remote = "{name} now is {remote}'s version. Undo puts yours back."
+msg_force_pushed = "Force pushed {name} to {remote}. Undo puts the old one back."
+msg_not_differing = "{name} does not differ from a remote"
+why_not_differing = "This {$tag} does not differ from a remote"
 delete_tag_scope = "Удалить {name}..."
 delete_tag_on_remote = "Удалить {name} на {remote}..."
 dlg_title = { git = "Удаление tag'а", local = "Удаление тега" }

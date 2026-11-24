@@ -611,6 +611,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Refs : Push du tag sélectionné vers le distant par défaut |  |
 | Refs : Supprimer le tag sélectionné de son distant... |  |
 | Git : Fetch le tag sélectionné |  |
+| Git : Version distante du tag sélectionné |  |
+| Git : Push forcé du tag sélectionné |  |
 | Refs : Annoter le tag sélectionné... |  |
 | Refs : Masquer ou afficher dans le graphe |  |
 | Refs : Révéler dans le graphe | `g` |

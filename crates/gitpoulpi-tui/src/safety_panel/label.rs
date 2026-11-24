@@ -90,6 +90,8 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::TagAnnotate
         | K::TagPush
         | K::TagDeleteRemote
+        | K::TagTakeRemote
+        | K::TagForcePush
         | K::TagFetch => Family::Tag,
         K::StashPush
         | K::StashFromCommit
@@ -529,6 +531,8 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         | K::WorktreeRemove
         | K::TagPush
         | K::TagDeleteRemote
+        | K::TagTakeRemote
+        | K::TagForcePush
         | K::TagFetch
         | K::AutoStashStartOver
         | K::Undo

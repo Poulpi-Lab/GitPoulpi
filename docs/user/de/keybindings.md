@@ -604,6 +604,8 @@ die Standardtasten.
 | Refs: Ausgewählten Tag an das Standard-Remote pushen |  |
 | Refs: Ausgewählten Tag von seinem Remote löschen... |  |
 | Git: Fetch für den ausgewählten Tag |  |
+| Git: Use the Remote's Version of the Selected Tag |  |
+| Git: Force Push the Selected Tag to Its Remote |  |
 | Refs: Ausgewählten Tag annotieren... |  |
 | Refs: Ausblenden im Graph umschalten |  |
 | Refs: Im Graph anzeigen | `g` |

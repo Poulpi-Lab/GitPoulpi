@@ -161,7 +161,7 @@ fn check(golden: &str, name: &str, cols: u16) {
 }
 
 const GOLDEN_WIDE: &str = "\
-Ref                  │Graph  │Message            │Author     │Date            │SHA
+Ref                  │Graph  │Message            │Author ▽   │Date            │SHA
                       ◌       // WIP          ✎ 1
                       ┊ □     On main: parked     stash@{0}   DDDDDDDDDDDDDDDD SSSSSSS
  ✓ main 💻  ───────────◎─┴─╮   merge side          GitPoulpi … DDDDDDDDDDDDDDDD SSSSSSS

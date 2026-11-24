@@ -1719,6 +1719,12 @@ column_repository = "仓库"
 column_author = "作者"
 column_title = "标题"
 column_age = "时长"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "{name}列（{width} 格）：[ 变窄，] 变宽，0 重置，Tab 下一列，Esc 完成"
 # context: {name} is a column name, {width} its width in terminal cells

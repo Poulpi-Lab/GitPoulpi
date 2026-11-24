@@ -16,6 +16,28 @@ A repository that is not linked is never asked: it shows a **Link...** line inst
 **Review...** on a pull or merge request row (or `e`) opens the repository with the request's in-app review
 ([Reviewing a pull request](review.md)).
 
+### The Actions column
+
+At the right of a request or issue row, small buttons do what a key does on the selected row (a click selects the row and
+runs the action; rest the pointer on a button for its name and key):
+
+```
+Wide:    #58  Round invoice totals            alice   2d   Review  [globe]  [talk]  ⋮
+Narrow:  #58  Round invoice totals                         [rev]  [globe]  [talk]  ⋮
+Issue:   #12  Crash on empty list             bob     5h   Start work  [globe]  [talk]  ⋮
+```
+
+| Button | Key | Palette |
+|---|---|---|
+| **Review** (a request that waits for your review; asks how when it is not cloned) | `e` | `Radar: Review Request...` |
+| **Start work** (a cloned issue) | `n` | `Radar: Start Work on Issue...` |
+| the globe: open the page on the host | `o` | `Radar: Open in Browser` |
+| the lines glyph: open the conversation | `i` | `Radar: Open Issue Conversation` |
+
+A row without an action leaves its cell empty, so each button stays in the same column on every row. When the window is
+narrow the Review and Start work words become glyphs before any other column disappears. The column is automatic (it is not
+one of the sizable columns). A double-click or `Enter` on a request that is not cloned asks how to review it, like **Review**.
+
 ## Opening it
 
 - **`Alt+R`** (rebindable: `global.radar`), from anywhere.
@@ -183,7 +205,7 @@ palette (`Radar: ...`). A mouse action always has a key and a palette twin.
 
 | Action | Key | Palette |
 |---|---|---|
-| Open repository (its tab opens, or is switched to) | `Enter` / double-click | `Radar: Open Repository` |
+| Open repository (its tab opens, or is switched to; a request that is not cloned asks how to review it) | `Enter` / double-click | `Radar: Open Repository` |
 | Review... (a request; a request that is not cloned asks how) | `e` | `Radar: Review Request...` |
 | Review a request through the host's API (no clone) | `a` in the question | `Radar: Review Through the API` |
 | Clone the repository, then review the request | `c` in the question | `Radar: Clone and Review...` |

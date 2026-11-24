@@ -14,7 +14,12 @@ impl RadarUi {
 
     /// When the dwell on the checks glyphs ends, if it is still running.
     pub(crate) fn tooltip_due(&self) -> Option<Instant> {
-        if self.popup_open() || !matches!(self.hover, Some(Hit::Status(_) | Hit::Cut(..))) {
+        if self.popup_open()
+            || !matches!(
+                self.hover,
+                Some(Hit::Status(_) | Hit::Cut(..) | Hit::Action(..))
+            )
+        {
             return None;
         }
         let due = self.hover_since? + crate::tooltip::DWELL;
@@ -351,7 +356,21 @@ impl RadarUi {
             Some(Row::Heading(..)) => self.toggle_fold(),
             Some(Row::Note(_)) => self.run(Act::Link),
             Some(Row::Hint(_)) => self.run(Act::TurnOn),
-            Some(Row::Item(_)) => self.run(Act::OpenRepo),
+            // A request not cloned asks how to review it (the menu's and the
+            // button's Review): there is no repository to open yet.
+            Some(Row::Item(i)) => {
+                let review_far = self.board.items.get(*i).is_some_and(|item| {
+                    item.repo.is_none()
+                        && item.kind == ItemKind::Pr
+                        && item.review
+                        && crate::build_features::REVIEW
+                });
+                self.run(if review_far {
+                    Act::Review
+                } else {
+                    Act::OpenRepo
+                })
+            }
             _ => Outcome::None,
         }
     }
@@ -394,6 +413,11 @@ impl RadarUi {
     /// resize shape and the item rows (and their cut cells and status glyphs)
     /// keep the arrow, lit as a whole: none of them takes it.
     pub(crate) fn pointer_hand_at(&self, col: u16, row: u16) -> bool {
+        // A review or a conversation hosted over the Radar: its buttons are
+        // the ones its own paint registered (the hand, like everywhere).
+        if self.api_review.is_some() || self.api_item.is_some() {
+            return crate::pointer_map::at(col, row) == Some(crate::pointer_map::Kind::Hand);
+        }
         let at = ratatui::layout::Position::new(col, row);
         if let Some(asking) = &self.asking {
             return asking
@@ -536,7 +560,8 @@ impl RadarUi {
             MouseEventKind::Moved => {
                 if hit != self.hover {
                     self.hover_since =
-                        matches!(hit, Some(Hit::Status(_) | Hit::Cut(..))).then(Instant::now);
+                        matches!(hit, Some(Hit::Status(_) | Hit::Cut(..) | Hit::Action(..)))
+                            .then(Instant::now);
                 }
                 self.hover = hit;
                 self.hover_pos = (col, row);
@@ -551,7 +576,12 @@ impl RadarUi {
                     return Outcome::None;
                 }
                 if let Some(
-                    Hit::Row(i) | Hit::Star(i) | Hit::Menu(i) | Hit::NoteAction(i) | Hit::TurnOn(i),
+                    Hit::Row(i)
+                    | Hit::Star(i)
+                    | Hit::Menu(i)
+                    | Hit::Action(i, _)
+                    | Hit::NoteAction(i)
+                    | Hit::TurnOn(i),
                 ) = hit
                 {
                     self.selected = i;
@@ -611,6 +641,11 @@ impl RadarUi {
                 self.open_menu(mouse.column, mouse.row + 1);
                 Outcome::None
             }
+            Some(Hit::Action(i, slot)) => {
+                self.selected = i;
+                self.follow = false;
+                self.run_action(i, slot)
+            }
             Some(Hit::NoteAction(i)) => {
                 self.selected = i;
                 self.run(Act::Link)
@@ -633,6 +668,21 @@ impl RadarUi {
             }
             _ => Outcome::None,
         }
+    }
+
+    /// A click on a button of the Actions column: what its key does on the
+    /// row.
+    fn run_action(&mut self, offset: usize, slot: actions::Slot) -> Outcome {
+        let act = match self.rows.get(offset) {
+            Some(Row::Item(i)) => self
+                .board
+                .items
+                .get(*i)
+                .and_then(|item| actions::buttons(item).into_iter().find(|b| b.slot == slot))
+                .map(|b| b.act),
+            _ => None,
+        };
+        act.map_or(Outcome::None, |act| self.run(act))
     }
 
     fn menu_mouse(&mut self, mouse: MouseEvent) -> Outcome {

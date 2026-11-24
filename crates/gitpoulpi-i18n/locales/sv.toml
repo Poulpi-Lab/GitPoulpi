@@ -1721,6 +1721,12 @@ column_repository = "Repository"
 column_author = "Författare"
 column_title = "Titel"
 column_age = "Ålder"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "Kolumnen {name} ({width} celler): [ smalare, ] bredare, 0 återställ, Tab nästa, Esc klart"
 # context: {name} is a column name, {width} its width in terminal cells

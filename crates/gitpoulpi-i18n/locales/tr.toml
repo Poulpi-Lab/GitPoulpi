@@ -1721,6 +1721,12 @@ column_repository = "Depo"
 column_author = "Yazar"
 column_title = "Başlık"
 column_age = "Yaş"
+# context: title of the Radar list column holding the small buttons of a row (Review, open in browser, open conversation)
+column_actions = "Actions"
+# context: short button on a Radar row: starts the review of the request; keep it to one word
+action_review = "Review"
+# context: short button on a Radar row: starts work on the issue (creates its branch)
+action_start_work = "Start work"
 # context: {name} is a column name, {width} its width in terminal cells
 column_picked = "{name} sütunu ({width} hücre): [ daraltır, ] genişletir, 0 sıfırlar, Tab sonraki, Esc bitirir"
 # context: {name} is a column name, {width} its width in terminal cells

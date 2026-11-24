@@ -137,6 +137,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "ui.image_editor_default",
     "ui.logo_color",
     "installation.primary",
+    "sequences",
     "ui.mouse_scroll_lines",
     "ui.show_avatars",
     "ui.avatars",

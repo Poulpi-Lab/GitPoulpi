@@ -551,6 +551,48 @@ Several installations can share one `config.toml` (a package, a dev checkout, a 
 | `installation.primary` | absent | The id of the primary installation. Absent: none. |
 | `installation.settings.<id>` | none | One table per installation: `path` (its folder, refreshed when it moves), `kind` (`dev`, `install`, `cargo`, `portable`, `pinned`), `channel` (informative), `name` (the launcher name, `GitPoulpi (<label>)`, frozen at first run), `name_with_version` (off: add `<major>.<minor>` to the name), `logo_color`, `command_alias`, `command_alias_add`, `folder_menu_submenu` (empty: the folder-menu entry sits at the root), `env` (empty: its own id; installations that share a name share daemons, sessions and undo history), `mcp_bind` (empty: `mcp.bind`). An empty value falls back to `ui.*` for the primary, else to the kind's default (a dev checkout wears `sun`). |
 
+## `[[sequences]]`
+
+Named action sequences: a list of palette commands run one after the other
+(for example Backup: stage everything, write the message with the AI, commit,
+push). One table per sequence, its steps as `[[sequences.steps]]`.
+
+```toml
+[[sequences]]
+id = "backup"                    # the slug: its key in [keybindings.sequence] and its CLI name
+name = "Backup"                  # your text, never translated
+description = "Stage, commit with an AI message, push"   # optional
+scope = "installation"           # installation (default) | machine | repo
+owner = "3f9a0c1d2b4e5f60"       # the installation id; set with scope = "installation"
+
+[[sequences.steps]]
+run = "stage_all"                # a palette command id
+
+[[sequences.steps]]
+run = "ai_generate_commit_message"
+pause = "always"                 # default | always | never
+
+[[sequences.steps]]
+run = "create_worktree_from_current_branch"
+pause = "never"
+[sequences.steps.options]
+name = "wip-${date}-${n}"        # a template: ${branch} ${date} (yyyy-mm-dd) ${time} (hh-mm) ${n} (first free number)
+open_tab = true
+```
+
+| Key | Meaning |
+|---|---|
+| `scope` | `installation`: only the installation whose id is `owner` sees it. `machine`: every installation sharing this `config.toml`. `repo`: stored in the repository at `.gitpoulpi/sequences.toml` (same `[[sequences]]` shape), visible only there, and only after you trust that file, because a committed file is someone else's commands. |
+| `steps[].run` | A palette command id, the snake-cased name shown in `[keybindings.palette]`. Only a fixed allowlist is accepted: staging, commit, stash push, new branch / tag, fetch, pull, push (and the push-to-all, pull-all, push-tags variants), the AI message and commit-composer commands, worktree creation, opening a tab or terminal, and force push with lease. Destructive commands (discard, reset, deletes, worktree remove, stash drop, history rewrite, quit, Settings) and other sequences cannot be steps. A step this version does not know is kept in the file and reported. |
+| `steps[].pause` | `default`: the step stops on its usual dialog when it needs input. `always`: stop before it and ask to continue. `never`: never stop; the step then needs the options its dialog would have asked for (a `name` for a new branch or worktree). Force push with lease cannot be `never`. |
+| `steps[].options` | Per-step answers: `name` (new branch, tag, worktree), `branch` (worktree from a chosen branch), `open_tab` (open the new worktree in a tab), `message` (commit), `label` (Open in entry), `profile` (agent profile). |
+| at most 32 steps | A sequence has between 1 and 32 steps. |
+
+Unknown keys on a sequence or a step are kept when GitPoulpi rewrites the
+file. Duplicate ids among the sequences you can see are reported. Bind one with
+`[keybindings.sequence] <id> = "<chord>"`, for example
+`backup = "Ctrl+G b"`.
+
 ## `[keybindings]`
 
 Rebinds the TUI's shortcuts; Settings > Keyboard & mouse edits it.
@@ -570,6 +612,7 @@ stage_file = "z"
 defaults, removing the line restores them. Chords: `Ctrl+Shift+N`, `Alt+n`,
 `F2`, `PageDown`, `Space`, `,`, `P` (= `Shift+p`). A bad entry never blocks
 anything: the TUI ignores it, keeps the default and says so on the status line.
+`[keybindings.sequence]` binds your [`[[sequences]]`](#sequences) by id.
 Contexts, action ids, defaults and the conflict rules: [Keybindings](keybindings.md).
 
 ## Per-repository settings: `.gitpoulpi/repo-state.toml`

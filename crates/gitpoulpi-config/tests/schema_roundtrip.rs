@@ -2,6 +2,7 @@
 //! byte-identical to `fixtures/default_config.toml`, and every closed-set
 //! enum round-trips through TOML under the name `as_str` reports.
 
+use gitpoulpi_config::sequences::{PauseMode, Scope};
 use gitpoulpi_config::*;
 use serde::{Deserialize, Serialize};
 
@@ -109,6 +110,8 @@ fn every_enum_value_round_trips_through_toml_under_its_as_str_name() {
         PullButtonMode,
         PushBehavior,
         RetentionUnit,
+        Scope,
+        PauseMode,
     );
 }
 
@@ -145,6 +148,8 @@ fn the_all_lists_have_the_pinned_lengths() {
     assert_eq!(PullButtonMode::ALL.len(), 3);
     assert_eq!(PushBehavior::ALL.len(), 2);
     assert_eq!(RetentionUnit::ALL.len(), 5);
+    assert_eq!(Scope::ALL.len(), 3);
+    assert_eq!(PauseMode::ALL.len(), 3);
 }
 
 #[test]
@@ -385,4 +390,25 @@ fn the_tab_bar_defaults_to_the_top_and_every_position_round_trips() {
         assert_eq!(again.tabs_position, *pos);
     }
     assert!(toml::from_str::<UiConfig>("tabs_position = \"right\"").is_err());
+}
+
+#[test]
+fn sequences_are_left_out_while_empty_and_round_trip_when_present() {
+    use gitpoulpi_config::sequences::{SequenceDef, StepSpec};
+    let text = toml::to_string(&Config::default()).unwrap();
+    assert!(!text.contains("sequences"), "{text}");
+    let config = Config {
+        sequences: vec![SequenceDef {
+            id: "backup".into(),
+            name: "Backup".into(),
+            steps: vec![StepSpec::new("stage_all"), StepSpec::new("push")],
+            ..SequenceDef::default()
+        }],
+        ..Config::default()
+    };
+    let text = toml::to_string(&config).unwrap();
+    let (again, _) = Config::from_toml_str(&text).unwrap();
+    assert_eq!(again.sequences, config.sequences);
+    assert_eq!(toml::to_string(&again).unwrap(), text);
+    assert!(LIVE_KEYS.contains(&"sequences"));
 }

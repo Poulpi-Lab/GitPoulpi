@@ -881,6 +881,8 @@ die Standardtasten.
 | Tab: Im Dateimanager öffnen |  |
 | Tab: Im Terminal öffnen |  |
 | Tab: Öffnen in... | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | Tab: Im Standardeintrag öffnen | `Ctrl+Alt+O` |
 | Repository: Profil wechseln... |  |
 | Hilfe: Über GitPoulpi | `Ctrl+N a` |

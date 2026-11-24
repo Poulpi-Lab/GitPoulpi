@@ -884,6 +884,8 @@ As teclas são as padrão.
 | Aba: abrir no gerenciador de arquivos |  |
 | Aba: abrir no terminal |  |
 | Aba: abrir em... | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | Aba: abrir no padrão | `Ctrl+Alt+O` |
 | Repositório: alterar perfil... |  |
 | Ajuda: sobre o GitPoulpi | `Ctrl+N a` |

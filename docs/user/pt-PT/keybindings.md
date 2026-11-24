@@ -884,6 +884,8 @@ As teclas são as predefinidas.
 | Separador: abrir no gestor de ficheiros |  |
 | Separador: abrir no terminal |  |
 | Separador: abrir em... | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | Separador: abrir no predefinido | `Ctrl+Alt+O` |
 | Repositório: alterar perfil... |  |
 | Ajuda: acerca do GitPoulpi | `Ctrl+N a` |

@@ -861,6 +861,7 @@ impl WindowState {
                 agent_back: self.ui_viewer.can_go_back(),
                 stage_guard_open: crate::stage_guard_dialog::is_open(),
                 ai_enabled: self.ai_ui.enabled(),
+                local_agent: self.ai_ui.has_local_agent(),
                 ai_running: self.ai_ui.running(),
                 hosting: self.hosting.availability(),
                 open_repository_tabs: self.repo_tabs.len(),

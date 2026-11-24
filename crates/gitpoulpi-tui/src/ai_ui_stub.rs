@@ -175,6 +175,11 @@ impl AiUi {
         usize::MAX
     }
 
+    /// Never: this binary has no AI.
+    pub(crate) fn has_local_agent(&self) -> bool {
+        false
+    }
+
     pub(crate) fn running(&self) -> bool {
         false
     }

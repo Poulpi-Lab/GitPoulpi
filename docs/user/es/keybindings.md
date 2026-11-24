@@ -891,6 +891,8 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Pestaña: Abrir en el gestor de archivos |  |
 | Pestaña: Abrir en el terminal |  |
 | Pestaña: Abrir en... | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | Pestaña: Abrir en el predeterminado | `Ctrl+Alt+O` |
 | Repositorio: Cambiar perfil... |  |
 | Ayuda: Acerca de GitPoulpi | `Ctrl+N a` |

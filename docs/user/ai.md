@@ -158,6 +158,22 @@ opens the agent once, in a visible terminal, in the working folder it will use.
 Answer the question, close the agent, and try again; the answer is remembered
 by the agent.
 
+### Open the agent in a tab's folder
+
+`Tab: Open AI Agent Here` in the command palette (rebindable as `palette.tab_open_agent_here`,
+no default key) opens your terminal in the active tab's folder running the agent of a local
+agent profile, to work with it by hand there. It is the same terminal as **Terminal here**
+and the same command as **Open the agent...**, but in the tab's folder instead of the
+profile's own working folder. With one local agent profile it opens at once; with several, a
+list under the tab bar asks which. It sends no prompt and starts no AI request: opening the
+agent is the action, and what you type in it is yours.
+
+The row carries the AI sparkle, is hidden while AI is off (**Settings > AI**) and grayed
+("no local AI agent is set up") when no profile is a local agent. In a sequence, the step
+`tab_open_agent_here` takes the AI profile `id` in its `profile` option (empty: the default
+profile, else the first local agent). A terminal template of your own cannot be given the
+agent's command: the terminal opens in the folder and the status line says which command to run.
+
 The answer is read from the agent's session transcript for Claude Code (its
 exact text, deleted afterwards) and from the screen between two marker lines
 the request asks for, for Codex and Gemini. At most two virtual-terminal runs

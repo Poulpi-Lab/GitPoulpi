@@ -412,30 +412,22 @@ pub const STEP_VOCABULARY: &[StepKind] = &[
         "Open the tab's folder in the default application",
         false,
     ),
-    // Added by S3.
-    StepKind {
-        pending: true,
-        ..kind(
-            "tab_open_in",
-            StepClass::Dialog,
-            true,
-            &[opt("label", OptionKind::Text, true)],
-            "Open the tab's folder in the Open in entry with this label",
-            false,
-        )
-    },
-    // Added by S3.
-    StepKind {
-        pending: true,
-        ..kind(
-            "tab_open_agent_here",
-            StepClass::Instant,
-            true,
-            &[opt("profile", OptionKind::Text, true)],
-            "Open the AI agent in a terminal in the tab's folder",
-            false,
-        )
-    },
+    kind(
+        "tab_open_in",
+        StepClass::Dialog,
+        true,
+        &[opt("label", OptionKind::Text, true)],
+        "Open the tab's folder in the Open in entry with this label",
+        false,
+    ),
+    kind(
+        "tab_open_agent_here",
+        StepClass::Instant,
+        true,
+        &[opt("profile", OptionKind::Text, true)],
+        "Open the AI agent in a terminal in the tab's folder",
+        false,
+    ),
     kind(
         "open_worktree_in_tab",
         StepClass::Instant,
@@ -1209,9 +1201,10 @@ whatever = [1, 2]
             assert!(validate(&d).is_empty(), "{}: {:?}", d.id, validate(&d));
         }
         assert!(validate_all(&presets()).is_empty());
-        // `tab_open_agent_here` is pending (S3) yet known; a truly unknown id is flagged.
-        assert!(step_kind("tab_open_agent_here").unwrap().pending);
-        assert!(step_kind("tab_open_in").unwrap().pending);
+        // S3 added both palette commands: no step is pending any more (the
+        // flag stays for a later slice); a truly unknown id is flagged.
+        assert!(!step_kind("tab_open_agent_here").unwrap().pending);
+        assert!(!step_kind("tab_open_in").unwrap().pending);
         assert!(!step_kind("push").unwrap().pending);
         let mut d = presets().remove(0);
         d.steps.push(StepSpec::new("tab_open_agent_hear"));

@@ -250,9 +250,7 @@ fn every_bindable_action_with_a_palette_row_shows_its_key() {
 #[test]
 fn open_in_rows_follow_the_keymap() {
     let row = |c: PaletteCommand| PALETTE_COMMANDS.iter().find(|e| e.command == c).unwrap();
-    let popup = row(PaletteCommand::TabDir(
-        crate::tab_dir::TabDirButton::Terminal,
-    ));
+    let popup = row(PaletteCommand::TabOpenIn);
     let default = row(PaletteCommand::TabOpenInDefault);
     let km = crate::keymap::Keymap::defaults();
     assert_eq!(entry_shortcut(&km, popup), "Alt+O");

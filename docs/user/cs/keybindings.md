@@ -886,6 +886,8 @@ Klávesy jsou výchozí.
 | Karta: Otevřít ve správci souborů |  |
 | Karta: Otevřít v terminálu |  |
 | Karta: Otevřít v... | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | Karta: Otevřít ve výchozí položce | `Ctrl+Alt+O` |
 | Repozitář: Změnit profil... |  |
 | Nápověda: O aplikaci GitPoulpi | `Ctrl+N a` |

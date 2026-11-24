@@ -889,6 +889,25 @@ fn run_open_in_with(index: usize, path: &Path, report: fn(String)) -> Result<Str
     Ok(msg::open_in_run::opening(&run.label))
 }
 
+/// The position of the entry labelled `label` (trimmed, exact, first match):
+/// the label is the stable name, the position changes when the user
+/// reorders the list.
+pub(crate) fn index_of_label(label: &str) -> Result<usize, String> {
+    let wanted = label.trim();
+    open_in_state()
+        .entries
+        .iter()
+        .position(|e| e.label.trim() == wanted)
+        .ok_or_else(|| msg::open_in_run::no_label(wanted))
+}
+
+/// "Tab: Open In" with an entry's label (a sequence's `label` option): runs
+/// that entry on the tab at `path`. An unknown label is an error naming it.
+#[allow(dead_code)] // the sequence runner calls it
+pub(crate) fn open_in_by_label(label: &str, path: &Path) -> Result<String, String> {
+    run_open_in(index_of_label(label)?, path)
+}
+
 /// `ui.tab_dir_follow = "auto"`: the entry a brand-new tab runs, if any.
 pub(crate) fn auto_target() -> Option<usize> {
     (auto() && !open_in_state().entries.is_empty()).then(default_index)
@@ -1194,6 +1213,35 @@ mod tests {
     }
 
     #[test]
+    fn an_open_in_entry_is_found_by_its_label_whatever_its_position() {
+        let _g = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+        reset_for_tests();
+        install(&open_in_config(
+            &[("First", "tool ${cwd}"), ("Second", "tool2 ${cwd}")],
+            TabDirFollow::Buttons,
+        ));
+        assert_eq!(index_of_label("Second"), Ok(1));
+        assert_eq!(index_of_label("  First "), Ok(0));
+        // Reordered: the label still finds its entry.
+        install(&open_in_config(
+            &[("Second", "tool2 ${cwd}"), ("First", "tool ${cwd}")],
+            TabDirFollow::Buttons,
+        ));
+        assert_eq!(index_of_label("Second"), Ok(0));
+        let err = index_of_label("Nope").unwrap_err();
+        assert!(err.contains("Nope") && err.contains("Open in"), "{err}");
+        let dir = tempfile::tempdir().unwrap();
+        assert_eq!(open_in_by_label("Nope", dir.path()).unwrap_err(), err);
+        // A known label runs through the same runner (a bad command is its error).
+        install(&open_in_config(
+            &[("Typo", "tool ${nope}")],
+            TabDirFollow::Buttons,
+        ));
+        let err = open_in_by_label("Typo", dir.path()).unwrap_err();
+        assert!(err.contains("unknown variable ${nope}"), "{err}");
+    }
+
+    #[test]
     fn unknown_variables_bad_quotes_and_missing_things_are_named_at_once() {
         let _g = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
         reset_for_tests();
@@ -1342,6 +1390,44 @@ mod tests {
             std::thread::sleep(Duration::from_millis(20));
         }
         panic!("{} never written", file.display());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn open_in_by_label_runs_the_labelled_entry_on_the_folder() {
+        let _g = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+        reset_for_tests();
+        let tools = tempfile::tempdir().unwrap();
+        let log = tools.path().join("by-label.log");
+        let rec = |name: &str, tag: &str| {
+            script(
+                tools.path(),
+                name,
+                &format!("echo \"{tag}|$1\" > '{}'", log.display()),
+            )
+        };
+        let first = rec("first-tool", "first");
+        let second = rec("second-tool", "second");
+        install(&open_in_config(
+            &[
+                ("Editor", &format!("{} ${{cwd}}", first.display())),
+                ("Files", &format!("{} ${{cwd}}", second.display())),
+            ],
+            TabDirFollow::Buttons,
+        ));
+        let repo = tempfile::tempdir().unwrap();
+        git_dir_with_head(repo.path(), "ref: refs/heads/main\n");
+        assert_eq!(
+            open_in_by_label("Files", repo.path()).unwrap(),
+            "opening in Files..."
+        );
+        let text = wait_for(&log);
+        assert_eq!(
+            text.trim(),
+            format!("second|{}", repo.path().display()),
+            "the entry labelled Files ran, not the one at position 0"
+        );
+        reset_for_tests();
     }
 
     #[cfg(unix)]

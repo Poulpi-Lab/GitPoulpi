@@ -886,6 +886,8 @@ Tuşlar varsayılanlardır.
 | Sekme: Dosya Yöneticisinde Aç |  |
 | Sekme: Terminalde Aç |  |
 | Sekme: Şurada Aç... | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | Sekme: Varsayılanda Aç | `Ctrl+Alt+O` |
 | Depo: Profili Değiştir... |  |
 | Yardım: GitPoulpi Hakkında | `Ctrl+N a` |

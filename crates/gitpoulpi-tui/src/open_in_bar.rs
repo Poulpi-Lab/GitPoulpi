@@ -41,13 +41,19 @@ static LAST_USED: AtomicUsize = AtomicUsize::new(NONE);
 static TIP: Mutex<Option<(String, &'static str)>> = Mutex::new(None);
 
 /// What a pick in the popup chose.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum Pick {
     /// Run entry `n` of `tab_dir::entries()`.
     Entry(usize),
     /// "Configure…": the Settings screen.
     Configure,
+    /// A row of the agent chooser ("Tab: Open AI Agent Here" with several
+    /// local agents): the AI profile id.
+    Agent(String),
 }
+
+/// The value prefix of the agent chooser's rows.
+const AGENT_PREFIX: &str = "agent:";
 
 /// Cells the button takes: ` Open in ▾ `, the label plus the field's padding
 /// and arrow, the width every other combobox field gives them.
@@ -126,7 +132,28 @@ pub(crate) fn open() {
     }
 }
 
+/// Opens the agent chooser: the same popup over the tab bar, one row per
+/// local AI agent profile (`id`, name), no "Configure..." row.
+pub(crate) fn open_agents(agents: &[(String, String)]) {
+    let rows = agents
+        .iter()
+        .map(|(id, name)| ComboOption::new(format!("  {name}"), format!("{AGENT_PREFIX}{id}")))
+        .collect();
+    let mut combo = Combo::new("").with_click_picks();
+    combo.set_options(rows);
+    if let Some((id, _)) = agents.first() {
+        combo.select(Some(format!("{AGENT_PREFIX}{id}")));
+    }
+    combo.open();
+    if let Ok(mut p) = POPUP.lock() {
+        *p = Some(combo);
+    }
+}
+
 fn pick_of(value: &str) -> Option<Pick> {
+    if let Some(id) = value.strip_prefix(AGENT_PREFIX) {
+        return Some(Pick::Agent(id.to_string()));
+    }
     if value == CONFIGURE {
         Some(Pick::Configure)
     } else {

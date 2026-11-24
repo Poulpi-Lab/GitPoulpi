@@ -506,6 +506,13 @@ pub(in crate::event_loop) fn apply_open_in_pick(
                 None => gitpoulpi_i18n::msg::tab_dir::NO_TAB.get().into(),
             });
         }
+        Pick::Agent(id) => {
+            let active = cx.repo_tabs.get(*cx.active_tab).map(|t| t.path.clone());
+            *cx.last_message = Some(match active {
+                Some(path) => crate::agent_launch::open_here(&id, &path).unwrap_or_else(|e| e),
+                None => gitpoulpi_i18n::msg::tab_dir::NO_TAB.get().into(),
+            });
+        }
         // Lands on the Settings "Open in" page, on its Default row.
         Pick::Configure => {
             let mut state = PreferencesState::open(cx.repo_root);

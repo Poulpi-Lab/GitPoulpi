@@ -852,6 +852,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | タブ: ファイルマネージャーで開く |  |
 | タブ: ターミナルで開く |  |
 | タブ: 開く先... | `Alt+O` |
+| Tab: Terminal Here |  |
+| ✦ Tab: Open AI Agent Here |  |
 | タブ: 既定の開く先で開く | `Ctrl+Alt+O` |
 | リポジトリ: プロファイルを変更... |  |
 | ヘルプ: GitPoulpi について | `Ctrl+N a` |

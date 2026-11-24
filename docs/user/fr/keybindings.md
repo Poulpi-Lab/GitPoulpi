@@ -888,6 +888,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Onglet : Ouvrir dans le gestionnaire de fichiers |  |
 | Onglet : Ouvrir dans un terminal |  |
 | Onglet : Ouvrir dans... | `Alt+O` |
+| Onglet : Terminal ici |  |
+| ✦ Onglet : Ouvrir l'agent IA ici |  |
 | Onglet : Ouvrir dans l'entrée par défaut | `Ctrl+Alt+O` |
 | Dépôt : Changer de profil... |  |
 | Aide : À propos de GitPoulpi | `Ctrl+N a` |

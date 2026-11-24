@@ -10565,11 +10565,11 @@ strip_next = "{name} {k}/{n} \u00b7 Next: {step}"
 # context: run strip after the AI wrote the commit message
 strip_review = "{name} {k}/{n} \u00b7 Review the message, then Continue"
 # context: run strip when the commit has no message yet
-strip_commit_message = "{name} {k}/{n} \u00b7 Write the message, then commit or Continue"
+strip_commit_message = "{name} {k}/{n} \u00b7 Write the message, then {$commit} or Continue"
 # context: run strip while a dialog of the step is open
 strip_dialog = "{name} {k}/{n} \u00b7 Answer the dialog"
 # context: run strip when the push was rejected and its dialog is open
-strip_push_rejected = "{name} {k}/{n} \u00b7 Push rejected: choose in the dialog"
+strip_push_rejected = "{name} {k}/{n} \u00b7 {$Push} rejected: choose in the dialog"
 # context: run strip while a dialog of the action waits for the person
 strip_user = "{name} {k}/{n} \u00b7 Choose in the dialog"
 # context: run strip when the window on screen is not the tab the step acts on; {tab} is a folder

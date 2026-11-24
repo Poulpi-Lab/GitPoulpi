@@ -18,14 +18,17 @@ pub(crate) enum ThemeFilter {
     Dark,
     Light,
     Colored,
+    /// Only the user's own theme files; offered only when there is one.
+    Custom,
 }
 
 impl ThemeFilter {
-    pub(crate) const ALL: [ThemeFilter; 4] = [
+    pub(crate) const ALL: [ThemeFilter; 5] = [
         ThemeFilter::All,
         ThemeFilter::Dark,
         ThemeFilter::Light,
         ThemeFilter::Colored,
+        ThemeFilter::Custom,
     ];
 
     pub(crate) fn label(self) -> &'static str {
@@ -34,12 +37,18 @@ impl ThemeFilter {
             ThemeFilter::Dark => msg::overlays::THEME_FILTER_DARK.get(),
             ThemeFilter::Light => msg::overlays::THEME_FILTER_LIGHT.get(),
             ThemeFilter::Colored => msg::overlays::THEME_FILTER_COLORED.get(),
+            ThemeFilter::Custom => msg::overlays::THEME_FILTER_CUSTOM.get(),
         }
     }
 
-    pub(crate) fn next(self, back: bool) -> Self {
-        let i = Self::ALL.iter().position(|f| *f == self).unwrap_or(0);
-        Self::ALL[(i + if back { 3 } else { 1 }) % 4]
+    /// The neighbour of `self` among the `visible` buttons (wrapping).
+    pub(crate) fn next_in(self, visible: &[ThemeFilter], back: bool) -> Self {
+        let n = visible.len().max(1);
+        let i = visible.iter().position(|f| *f == self).unwrap_or(0);
+        visible
+            .get((i + if back { n - 1 } else { 1 }) % n)
+            .copied()
+            .unwrap_or(ThemeFilter::All)
     }
 }
 
@@ -81,9 +90,11 @@ pub(crate) fn tone_of(spec: &ThemeSpec) -> Option<Tone> {
 }
 
 impl ThemeFilter {
-    fn admits(self, tone: Option<Tone>) -> bool {
+    fn admits(self, choice: &ThemeChoice) -> bool {
+        let tone = choice.tone;
         match (self, tone) {
             (ThemeFilter::All, _) => true,
+            (ThemeFilter::Custom, _) => choice.custom,
             (_, None) => false,
             (ThemeFilter::Dark, Some(t)) => !t.light,
             (ThemeFilter::Light, Some(t)) => t.light,
@@ -101,6 +112,8 @@ pub(crate) struct ThemeChoice {
     pub(crate) chips: Vec<Color>,
     /// Dark / light / colored (none for System and transparent themes).
     pub(crate) tone: Option<Tone>,
+    /// A theme file of the user's `themes/` folder.
+    pub(crate) custom: bool,
 }
 
 fn chips_of(spec: &ThemeSpec) -> Vec<Color> {
@@ -117,13 +130,23 @@ pub(crate) fn choices(user: &[ThemeSpec]) -> Vec<ThemeChoice> {
         slug: gitpoulpi_config::THEME_SYSTEM.to_string(),
         chips: Vec::new(),
         tone: None,
+        custom: false,
     }];
-    out.extend(theme::presets().iter().chain(user).map(|t| ThemeChoice {
-        name: t.name.clone(),
-        slug: t.slug.clone(),
-        chips: chips_of(t),
-        tone: tone_of(t),
-    }));
+    let presets = theme::presets();
+    let n_presets = presets.len();
+    out.extend(
+        presets
+            .iter()
+            .chain(user)
+            .enumerate()
+            .map(|(i, t)| ThemeChoice {
+                name: t.name.clone(),
+                slug: t.slug.clone(),
+                chips: chips_of(t),
+                tone: tone_of(t),
+                custom: i >= n_presets,
+            }),
+    );
     out
 }
 
@@ -187,16 +210,40 @@ impl ThemePicker {
             .all
             .iter()
             .enumerate()
-            .filter(|(_, c)| self.filter.admits(c.tone))
+            .filter(|(_, c)| self.active_filter().admits(c))
             .filter_map(|(i, c)| crate::palette::score(&c.name, &query).map(|s| (s, i, c)))
             .collect();
         scored.sort_by_key(|(s, i, _)| (-*s, *i));
         scored.into_iter().map(|(_, _, c)| c).collect()
     }
 
-    /// Switches the prefilter; the highlight goes back to the top.
+    /// The filter buttons drawn and reachable: Custom only when a custom
+    /// theme exists.
+    pub(crate) fn visible_filters(&self) -> Vec<ThemeFilter> {
+        let custom = self.all.iter().any(|c| c.custom);
+        ThemeFilter::ALL
+            .into_iter()
+            .filter(|f| custom || *f != ThemeFilter::Custom)
+            .collect()
+    }
+
+    /// The filter in force: Custom falls back to All once no custom theme
+    /// is left.
+    pub(crate) fn active_filter(&self) -> ThemeFilter {
+        if self.visible_filters().contains(&self.filter) {
+            self.filter
+        } else {
+            ThemeFilter::default()
+        }
+    }
+
+    /// Switches the prefilter; the highlight goes back to the top. A hidden
+    /// button is not reachable.
     pub(crate) fn set_filter(&mut self, filter: ThemeFilter) {
-        if filter != self.filter {
+        if !self.visible_filters().contains(&filter) {
+            return;
+        }
+        if filter != self.active_filter() {
             self.filter = filter;
             self.selected = 0;
         }
@@ -265,6 +312,7 @@ pub(crate) fn render(
 ) -> crate::chrome::PalettePopup {
     use crate::picker_view::{render, PickerRow, PickerView};
     let found = picker.filtered();
+    let visible = picker.visible_filters();
     let rows: Vec<PickerRow> = found
         .iter()
         .map(|c| PickerRow {
@@ -282,10 +330,10 @@ pub(crate) fn render(
         empty: msg::overlays::NO_MATCHING_THEME.get(),
         hint: msg::overlays::THEME_PICKER_HINT.get(),
         segments: Some((
-            ThemeFilter::ALL.iter().map(|f| f.label()).collect(),
-            ThemeFilter::ALL
+            visible.iter().map(|f| f.label()).collect(),
+            visible
                 .iter()
-                .position(|f| *f == picker.filter)
+                .position(|f| *f == picker.active_filter())
                 .unwrap_or(0),
         )),
     };
@@ -411,8 +459,56 @@ mod tests {
         assert!(names.contains(&"Solarized Dark".to_string()), "{names:?}");
         picker.draft = "github dark".into();
         assert!(picker.filtered().iter().all(|c| c.name != "GitHub Dark"));
-        assert_eq!(ThemeFilter::All.next(true), ThemeFilter::Colored);
-        assert_eq!(ThemeFilter::Colored.next(false), ThemeFilter::All);
+        let visible = picker.visible_filters();
+        assert_eq!(
+            ThemeFilter::All.next_in(&visible, true),
+            ThemeFilter::Colored
+        );
+        assert_eq!(
+            ThemeFilter::Colored.next_in(&visible, false),
+            ThemeFilter::All
+        );
+    }
+
+    #[test]
+    fn custom_lists_only_user_themes_and_is_hidden_without_any() {
+        let mut none = ThemePicker::with_parts("dark".into(), Vec::new(), None);
+        assert!(!none.visible_filters().contains(&ThemeFilter::Custom));
+        none.set_filter(ThemeFilter::Custom);
+        assert_eq!(none.active_filter(), ThemeFilter::All);
+
+        let mut picker = ThemePicker::with_parts("dark".into(), vec![user("mine", "Mine")], None);
+        let visible = picker.visible_filters();
+        assert_eq!(visible.last(), Some(&ThemeFilter::Custom));
+        picker.set_filter(ThemeFilter::Custom);
+        let slugs: Vec<_> = picker.filtered().iter().map(|c| c.slug.clone()).collect();
+        assert_eq!(slugs, ["mine"]);
+        // The cycle includes it.
+        assert_eq!(
+            ThemeFilter::Colored.next_in(&visible, false),
+            ThemeFilter::Custom
+        );
+        assert_eq!(
+            ThemeFilter::Custom.next_in(&visible, false),
+            ThemeFilter::All
+        );
+        assert_eq!(
+            ThemeFilter::All.next_in(&visible, true),
+            ThemeFilter::Custom
+        );
+        // A custom theme still answers to Dark / Light.
+        let mut dark = user("dim", "Dim");
+        dark.ui.bg = theme::ThemeColor::Rgb(10, 10, 12);
+        let mut picker = ThemePicker::with_parts("dark".into(), vec![dark], None);
+        picker.set_filter(ThemeFilter::Dark);
+        assert!(picker.filtered().iter().any(|c| c.slug == "dim"));
+        picker.set_filter(ThemeFilter::Custom);
+        // The last custom theme vanishes: back to the default filter.
+        picker.set_filter(ThemeFilter::Custom);
+        picker.all.retain(|c| !c.custom);
+        assert_eq!(picker.active_filter(), ThemeFilter::All);
+        assert!(!picker.visible_filters().contains(&ThemeFilter::Custom));
+        assert!(picker.filtered().len() > 1);
     }
 
     #[test]

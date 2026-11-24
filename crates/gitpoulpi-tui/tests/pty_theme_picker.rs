@@ -148,3 +148,75 @@ fn ctrl_n_t_opens_the_picker_and_escape_closes_it() {
         .unwrap_or_else(|e| panic!("{e}"));
     let _ = term.stop();
 }
+
+fn launch_with_themes(session: &str, custom: bool) -> (Terminal, tempfile::TempDir, FixtureRepo) {
+    let repo = fixture();
+    let config = tempfile::tempdir().unwrap();
+    if custom {
+        std::fs::create_dir_all(config.path().join("themes")).unwrap();
+        std::fs::write(
+            config.path().join("themes/mine.toml"),
+            "name = \"My Own\"\nbase = \"nord\"\n",
+        )
+        .unwrap();
+    }
+    let term = common::launch(repo.root())
+        .session(session)
+        .config_dir(config.path())
+        .size(200, 70)
+        .spawn();
+    term.wait_for("the fixture loaded", STARTUP, |s| s.contains(MESSAGE))
+        .unwrap_or_else(|e| panic!("{e}"));
+    (term, config, repo)
+}
+
+#[test]
+fn the_custom_filter_lists_only_the_users_themes_by_click_and_by_key() {
+    let (mut term, _config, _repo) = launch_with_themes("theme-picker-custom", true);
+    open_picker(&mut term);
+    let screen = term
+        .wait_for("the Custom button", STEP, |s| s.find(" Custom ").is_some())
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (col, row) = screen.find(" Custom ").unwrap();
+    // The mouse: only the custom theme is left.
+    term.click(col + 2, row).unwrap();
+    term.wait_for("only My Own", STEP, |s| {
+        s.contains("My Own") && !s.contains("System (follows terminal)")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The keyboard: Alt+1 is All again, Alt+5 is Custom.
+    term.send_keys("M-1").unwrap();
+    term.wait_for("All again", STEP, |s| {
+        s.contains("System (follows terminal)")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("M-5").unwrap();
+    term.wait_for("only My Own by Alt+5", STEP, |s| {
+        s.contains("My Own") && !s.contains("System (follows terminal)")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    // Tab from Custom wraps to All.
+    term.send_keys("Tab").unwrap();
+    term.wait_for("Tab wraps to All", STEP, |s| {
+        s.contains("System (follows terminal)")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    let _ = term.stop();
+}
+
+#[test]
+fn without_custom_themes_there_is_no_custom_button_or_key() {
+    let (mut term, _config, _repo) = launch_with_themes("theme-picker-no-custom", false);
+    open_picker(&mut term);
+    term.wait_for("the Colored button", STEP, |s| s.contains(" Colored "))
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert!(!term.text().contains(" Custom "), "{}", term.text());
+    term.send_keys("M-5").unwrap();
+    std::thread::sleep(Duration::from_millis(500));
+    assert!(
+        term.text().contains("System (follows terminal)"),
+        "{}",
+        term.text()
+    );
+    let _ = term.stop();
+}

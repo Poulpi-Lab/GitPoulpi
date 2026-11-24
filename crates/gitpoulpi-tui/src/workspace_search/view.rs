@@ -372,7 +372,7 @@ pub(crate) fn render(
         list: list_area,
         window_start,
         count: rows.len(),
-        segments: [Rect::ZERO; 4],
+        segments: [Rect::ZERO; 5],
     };
     crate::chrome::paint_popup_row_hover(frame.buffer_mut(), &rects, search.selected);
     frame.render_clipped(

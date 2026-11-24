@@ -52,12 +52,12 @@ pub(crate) fn render(
         Constraint::Length(2),
     ])
     .areas(popup);
-    let mut segments = [Rect::ZERO; 4];
+    let mut segments = [Rect::ZERO; 5];
     if let Some((labels, active)) = &view.segments {
         let border = Style::default().fg(th().ui.accent);
         let mut spans = vec![Span::styled("\u{2502} ", border)];
         let mut x = seg_area.x + 2;
-        for (i, label) in labels.iter().enumerate().take(4) {
+        for (i, label) in labels.iter().enumerate().take(5) {
             let text = format!(" {label} ");
             let w = crate::ui_kit::display_width(&text) as u16;
             let style = if i == *active {
@@ -69,6 +69,7 @@ pub(crate) fn render(
                 Style::default().fg(th().ui.muted)
             };
             segments[i] = Rect::new(x, seg_area.y, w, 1);
+            crate::pointer_map::hand(segments[i]);
             spans.push(Span::styled(text, style));
             spans.push(Span::raw(" "));
             x += w + 1;

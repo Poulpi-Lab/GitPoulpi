@@ -349,14 +349,17 @@ Type to narrow the list; moving the highlight previews the theme at once,
 outside the list) puts the previous theme back and saves nothing.
 
 Under the filter field a segmented prefilter narrows the list: **All**,
-**Dark**, **Light** and **Colored** (click a segment, `Tab` / `Shift+Tab`, or
-`Alt+1`..`Alt+4`). Dark and Light come from the brightness of the theme's
+**Dark**, **Light** and **Colored**, plus **Custom** when you have theme files of
+your own (click a segment, `Tab` / `Shift+Tab`, or `Alt+1`..`Alt+5`). Dark and Light come from the brightness of the theme's
 `ui.bg`; **Colored** keeps the themes whose background is clearly tinted (blue,
 violet, yellow, green...) and leaves out white, off-white, black and
 near-black grays, so Solarized Dark, Dracula or Nord are colored while GitHub
 Dark and One Light are not. A colored theme also shows under Dark or Light.
 **System** and transparent themes (no background of their own) appear under
-All only. The prefilter combines with what you type. The graph color theme
+All only. **Custom** keeps only the theme files of your `themes/` folder (a custom theme
+is still Dark, Light or Colored for those buttons); the button is not drawn and
+not reachable by keys while that folder holds no theme. The prefilter combines
+with what you type. The graph color theme
 and language pickers preview the same way: the Log's lanes and the whole UI
 change as the highlight moves.
 

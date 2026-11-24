@@ -139,7 +139,7 @@ pub(in crate::event_loop) fn popup_list_mouse(
         // The scrollbar first: its column is the list's right border.
         MouseEventKind::Down(MouseButton::Left)
             if crate::popup_list::View::bar_press(mcol, mrow, current) => {}
-        // The theme picker's All / Dark / Light / Colored segments.
+        // The theme picker's All / Dark / Light / Colored / Custom segments.
         MouseEventKind::Down(MouseButton::Left)
             if matches!(&*cx.input_mode, InputMode::ThemePicker(_))
                 && popup
@@ -153,7 +153,10 @@ pub(in crate::event_loop) fn popup_list_mouse(
                     .iter()
                     .position(|r| r.contains((mcol, mrow).into()))
                 {
-                    picker.set_filter(crate::theme_picker::ThemeFilter::ALL[i]);
+                    if let Some(f) = picker.visible_filters().get(i) {
+                        let f = *f;
+                        picker.set_filter(f);
+                    }
                 }
             }
         }

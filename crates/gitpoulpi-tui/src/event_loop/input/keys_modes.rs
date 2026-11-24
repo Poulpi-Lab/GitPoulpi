@@ -702,11 +702,21 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
             match key.code {
                 _ if nav_to.is_some() => picker.selected = nav_to.unwrap_or(0),
                 // The prefilter's keyboard twin: Tab / Shift+Tab cycle it,
-                // Alt+1..4 pick All / Dark / Light / Colored.
-                KeyCode::Tab => picker.set_filter(picker.filter.next(false)),
-                KeyCode::BackTab => picker.set_filter(picker.filter.next(true)),
-                KeyCode::Char(c @ '1'..='4') if alt => picker
-                    .set_filter(crate::theme_picker::ThemeFilter::ALL[(c as u8 - b'1') as usize]),
+                // Alt+1..5 pick All / Dark / Light / Colored / Custom (the
+                // last only when there is a custom theme).
+                KeyCode::Tab | KeyCode::BackTab => {
+                    let visible = picker.visible_filters();
+                    let next = picker
+                        .active_filter()
+                        .next_in(&visible, key.code == KeyCode::BackTab);
+                    picker.set_filter(next);
+                }
+                KeyCode::Char(c @ '1'..='5') if alt => {
+                    if let Some(f) = picker.visible_filters().get((c as u8 - b'1') as usize) {
+                        let f = *f;
+                        picker.set_filter(f);
+                    }
+                }
                 _ if MainField::ThemePicker.claims(&*cx.field_editor, &picker.draft, &key) => {
                     if edit_main_field(
                         &mut *cx.field_editor,

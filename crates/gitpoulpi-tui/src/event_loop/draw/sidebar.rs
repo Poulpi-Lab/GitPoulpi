@@ -60,6 +60,11 @@ thread_local! {
 /// is resolved the way ratatui will (offset moved just far enough to
 /// show it; rows are one line high), so a first frame with a deep
 /// selection builds one screenful, not everything up to the selection.
+/// The room a row is laid out in: far wider than any sidebar, so a long name
+/// is never cut with an ellipsis. The section scrolls sideways over it
+/// (`hscroll`), and the part that does not fit is simply not shown.
+const ROW_ROOM: usize = 1000;
+
 fn ref_paint_window(
     len: usize,
     state: &ListState,
@@ -376,6 +381,10 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
         .collect();
 
     for (section, area) in sidebar_section_areas.clone() {
+        // Where this section's hit targets start: its sideways bar, drawn
+        // last, goes in here so it wins the bottom border over the resize
+        // handle below (`hscroll::paint_bar`).
+        let hits_mark = frame_hits.len();
         // The resize handle: the section's bottom border row, minus
         // its corners, for an expanded section that has a bottom
         // border of its own. Registered ahead of everything else
@@ -470,14 +479,14 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
                         Span::raw("  "),
                         Span::raw(lock),
                         Span::styled(
-                            truncate_with_ellipsis(&label, area.width.saturating_sub(4) as usize),
+                            truncate_with_ellipsis(&label, ROW_ROOM.saturating_sub(4)),
                             style,
                         ),
                     ]))
                 })
                 .collect()
         } else if section == SidebarSection::Submodules {
-            submodule_items(submodules_result, area.width)
+            submodule_items(submodules_result, ROW_ROOM as u16)
         } else if section == SidebarSection::Stashes {
             stashes
                 .iter()
@@ -489,7 +498,7 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
                     ListItem::new(Line::from(vec![
                         Span::raw("  "),
                         Span::styled(
-                            truncate_with_ellipsis(&label, area.width.saturating_sub(4) as usize),
+                            truncate_with_ellipsis(&label, ROW_ROOM.saturating_sub(4)),
                             Style::default().fg(th().status.warning),
                         ),
                     ]))
@@ -677,10 +686,16 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
                                 .then(|| multi_by_name.get(full_name.as_str()).copied())
                                 .flatten();
                             let prefix = 4 + row.depth() as usize * 2;
-                            let inner_room =
-                                (area.width.saturating_sub(2) as usize).saturating_sub(prefix);
-                            let name_room =
-                                area.width.saturating_sub(4 + row.depth() as u16 * 2) as usize;
+                            // A row with a badge lays out in the pane's own width
+                            // (the name gives way, the badge stays in view); any
+                            // other row in the wide room, to scroll over.
+                            let room_w = if multi.is_some() {
+                                usize::from(area.width)
+                            } else {
+                                ROW_ROOM
+                            };
+                            let inner_room = room_w.saturating_sub(2).saturating_sub(prefix);
+                            let name_room = room_w.saturating_sub(4 + row.depth() as usize * 2);
                             let name = match multi {
                                 Some(t) => truncate_with_ellipsis(
                                     display_name,
@@ -851,31 +866,37 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
         // The rows the list really has after the folders are folded: the
         // scrollbar measures these, never the section's ref count in the title.
         let visible_len = items.len();
-        frame.render_stateful_clipped(
-            List::new(items)
-                .block(
-                    Block::default()
-                        .title(Span::styled(section_title, header_title_style))
-                        .border_type(BorderType::Rounded)
-                        .borders(Borders::ALL)
-                        .border_style(header_style),
-                )
-                // Only the focused sub-pane paints its selection highlight: each keeps
-                // its own `ListState`, but three highlights at once read as three
-                // selected rows.
-                //
-                // No BOLD in a ref section's highlight: it would patch the gutter's eye
-                // too and flip it to its color presentation (`HIDE_IN_GRAPH_ICON`); the
-                // selected leaf bolds its own name instead.
-                .highlight_style(match (is_active, kind_opt) {
-                    (false, _) => Style::default(),
-                    (true, Some(_)) => Style::default().bg(th().ui.selection),
-                    (true, None) => Style::default()
-                        .bg(th().ui.selection)
-                        .add_modifier(Modifier::BOLD),
-                }),
-            area,
+        let block = Block::default()
+            .title(Span::styled(section_title, header_title_style))
+            .border_type(BorderType::Rounded)
+            .borders(Borders::ALL)
+            .border_style(header_style);
+        let list_inner = block.inner(area);
+        frame.render_clipped(block, area);
+        // Only the focused sub-pane paints its selection highlight: each keeps
+        // its own `ListState`, but three highlights at once read as three
+        // selected rows.
+        //
+        // No BOLD in a ref section's highlight: it would patch the gutter's eye
+        // too and flip it to its color presentation (`HIDE_IN_GRAPH_ICON`); the
+        // selected leaf bolds its own name instead.
+        let highlight = match (is_active, kind_opt) {
+            (false, _) => Style::default(),
+            (true, Some(_)) => Style::default().bg(th().ui.selection),
+            (true, None) => Style::default()
+                .bg(th().ui.selection)
+                .add_modifier(Modifier::BOLD),
+        };
+        // A name box over a row (a rename) sits at the unscrolled column.
+        let h_off = crate::hscroll::render_list(
+            frame,
+            items,
+            highlight,
+            list_inner,
             &mut sidebar_render_state,
+            crate::hscroll::HPane::Refs(section),
+            area,
+            matches!(input_mode, InputMode::InlineName { .. }),
         );
         *sidebar_states.state_mut(section).offset_mut() = sidebar_render_state.offset();
         // The row under the pointer lights across its whole width, in every
@@ -898,6 +919,14 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
         {
             scrollbar::render(frame, track, true, false);
         }
+        // The sideways bar, on the bottom border, while a row is wider than
+        // the section.
+        crate::hscroll::paint_bar(
+            frame,
+            crate::hscroll::HPane::Refs(section),
+            frame_hits,
+            Some(hits_mark),
+        );
         // A branch rename from the Refs row (or the palette): the name box
         // over the branch's own row, from its label to the row's end, with
         // the refusal on the row below (above on the last visible row).
@@ -950,10 +979,23 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
             let offset = sidebar_render_state.offset();
             for (index, dx, width, branch) in badge_hits.drain(..) {
                 if index >= offset && index < offset + sidebar_visible {
-                    frame_hits.push((
-                        Rect::new(area.x + dx, area.y + 1 + (index - offset) as u16, width, 1),
-                        HitTarget::RefRemotesBadge(branch),
-                    ));
+                    // Scrolled sideways with the row, clipped to the list.
+                    let lo = i32::from(area.x + 1);
+                    let hi = i32::from(area.x + area.width.saturating_sub(1));
+                    let x0 = (i32::from(area.x) + i32::from(dx) - h_off as i32).max(lo);
+                    let x1 = (i32::from(area.x) + i32::from(dx) + i32::from(width) - h_off as i32)
+                        .min(hi);
+                    if x1 > x0 {
+                        frame_hits.push((
+                            Rect::new(
+                                x0 as u16,
+                                area.y + 1 + (index - offset) as u16,
+                                (x1 - x0) as u16,
+                                1,
+                            ),
+                            HitTarget::RefRemotesBadge(branch),
+                        ));
+                    }
                 }
             }
         }

@@ -153,6 +153,8 @@ stage_file = "z"
 | `refs` | `collapse_all` | Свернуть все папки | `-` |
 | `refs` | `expand_below` | Развернуть папку и её вложенные папки | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Свернуть папку и её вложенные папки | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Файлы: путь или дерево | `m` |
 | `log` | `view_all_files` | Файлы: показать все файлы | `a` |
 | `log` | `compare_selection` | Сравнить выбранные строки | `v` |
@@ -161,6 +163,8 @@ stage_file = "z"
 | `log` | `pick_column` | Выбрать колонку для сдвига или изменения ширины | `Shift+C` |
 | `log` | `scroll_left` | Прокрутить колонки влево | `Shift+Left` |
 | `log` | `scroll_right` | Прокрутить колонки вправо | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Копировать commit'ы как Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Выбрать следующую колонку | `Tab` |
 | `log_columns` | `prev` | Выбрать предыдущую колонку | `Shift+BackTab` |
@@ -178,6 +182,8 @@ stage_file = "z"
 | `log_files` | `collapse_all_folders` | Свернуть все папки | `-` |
 | `log_files` | `expand_below` | Развернуть папку и её вложенные папки | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Свернуть папку и её вложенные папки | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Фокус на сообщении commit'а | `c` |
 | `status` | `toggle_file_mode` | Файлы: путь или дерево | `m` |
 | `status` | `view_all_files` | Файлы: показать все файлы | `a` |
@@ -190,6 +196,8 @@ stage_file = "z"
 | `status` | `collapse_all_folders` | Свернуть все папки | `-` |
 | `status` | `expand_below` | Развернуть папку и её вложенные папки | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Свернуть папку и её вложенные папки | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | Добавить репозиторий в избранное или убрать | `f`, `*` |
 | `home` | `close_repo` | Закрыть, убрать или снять звезду со строки | `x`, `Delete` |
 | `home` | `copy_path` | Копировать путь репозитория | `y` |
@@ -632,6 +640,8 @@ stage_file = "z"
 | Refs: свернуть все папки | `-` |
 | Refs: развернуть выбранную папку и её вложенные папки | `*` |
 | Refs: свернуть выбранную папку и её вложенные папки | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: следующий раздел | `l` |
 | Refs: предыдущий раздел | `h` |
 | Refs: развернуть/свернуть активный раздел | `Enter` |

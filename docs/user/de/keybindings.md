@@ -148,6 +148,8 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `refs` | `collapse_all` | Alle Ordner zuklappen | `-` |
 | `refs` | `expand_below` | Ordner und seine Unterordner aufklappen | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Ordner und seine Unterordner zuklappen | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Dateien: Pfad oder Baum | `m` |
 | `log` | `view_all_files` | Dateien: Alle Dateien ansehen | `a` |
 | `log` | `compare_selection` | Ausgewählte Zeilen vergleichen | `v` |
@@ -156,6 +158,8 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `log` | `pick_column` | Spalte zum Verschieben oder Anpassen wählen | `Shift+C` |
 | `log` | `scroll_left` | Spalten nach links scrollen | `Shift+Left` |
 | `log` | `scroll_right` | Spalten nach rechts scrollen | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Commits als Mermaid gitGraph kopieren | `Shift+Y` |
 | `log_columns` | `next` | Nächste Spalte wählen | `Tab` |
 | `log_columns` | `prev` | Vorherige Spalte wählen | `Shift+BackTab` |
@@ -173,6 +177,8 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Alle Ordner zuklappen | `-` |
 | `log_files` | `expand_below` | Ordner und seine Unterordner aufklappen | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Ordner und seine Unterordner zuklappen | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Auf die Commit-Nachricht fokussieren | `c` |
 | `status` | `toggle_file_mode` | Dateien: Pfad oder Baum | `m` |
 | `status` | `view_all_files` | Dateien: Alle Dateien ansehen | `a` |
@@ -185,6 +191,8 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Alle Ordner zuklappen | `-` |
 | `status` | `expand_below` | Ordner und seine Unterordner aufklappen | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Ordner und seine Unterordner zuklappen | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | Repository mit Stern markieren oder Stern entfernen | `f`, `*` |
 | `home` | `close_repo` | Zeile schließen, entfernen oder Stern entfernen | `x`, `Delete` |
 | `home` | `copy_path` | Repository-Pfad kopieren | `y` |
@@ -621,6 +629,8 @@ die Standardtasten.
 | Refs: Alle Ordner zuklappen | `-` |
 | Refs: Gewählten Ordner und seine Unterordner aufklappen | `*` |
 | Refs: Gewählten Ordner und seine Unterordner zuklappen | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: Nächster Abschnitt | `l` |
 | Refs: Vorheriger Abschnitt | `h` |
 | Refs: Aktiven Abschnitt ein- oder ausklappen | `Enter` |

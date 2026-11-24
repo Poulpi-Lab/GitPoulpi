@@ -135,6 +135,8 @@ stage_file = "z"
 | `refs` | `collapse_all` | すべてのフォルダーを折りたたむ | `-` |
 | `refs` | `expand_below` | フォルダーとそのサブフォルダーを展開 | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | フォルダーとそのサブフォルダーを折りたたむ | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | ファイル：パスまたはツリー | `m` |
 | `log` | `view_all_files` | ファイル：すべてのファイルを表示 | `a` |
 | `log` | `compare_selection` | 選択した行を比較 | `v` |
@@ -143,6 +145,8 @@ stage_file = "z"
 | `log` | `pick_column` | 移動・幅変更する列を選ぶ | `Shift+C` |
 | `log` | `scroll_left` | 列を左へスクロール | `Shift+Left` |
 | `log` | `scroll_right` | 列を右へスクロール | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Commitsを Mermaid gitGraph としてコピー | `Shift+Y` |
 | `log_columns` | `next` | 次の列を選ぶ | `Tab` |
 | `log_columns` | `prev` | 前の列を選ぶ | `Shift+BackTab` |
@@ -160,6 +164,8 @@ stage_file = "z"
 | `log_files` | `collapse_all_folders` | すべてのフォルダーを折りたたむ | `-` |
 | `log_files` | `expand_below` | フォルダーとそのサブフォルダーを展開 | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | フォルダーとそのサブフォルダーを折りたたむ | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Commitメッセージ欄にフォーカス | `c` |
 | `status` | `toggle_file_mode` | ファイル：パスまたはツリー | `m` |
 | `status` | `view_all_files` | ファイル：すべてのファイルを表示 | `a` |
@@ -172,6 +178,8 @@ stage_file = "z"
 | `status` | `collapse_all_folders` | すべてのフォルダーを折りたたむ | `-` |
 | `status` | `expand_below` | フォルダーとそのサブフォルダーを展開 | `*`, `Shift+Right` |
 | `status` | `collapse_below` | フォルダーとそのサブフォルダーを折りたたむ | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | リポジトリのお気に入りを切り替え | `f`, `*` |
 | `home` | `close_repo` | 行を閉じる、削除、またはお気に入り解除 | `x`, `Delete` |
 | `home` | `copy_path` | リポジトリのパスをコピー | `y` |
@@ -592,6 +600,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Refs: すべてのフォルダーを折りたたむ | `-` |
 | Refs: 選択中のフォルダーとそのサブフォルダーを展開 | `*` |
 | Refs: 選択中のフォルダーとそのサブフォルダーを折りたたむ | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: 次のセクション | `l` |
 | Refs: 前のセクション | `h` |
 | Refs: 現在のセクションを展開／折りたたみ | `Enter` |

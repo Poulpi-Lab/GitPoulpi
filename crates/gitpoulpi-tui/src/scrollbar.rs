@@ -45,6 +45,8 @@ pub(crate) enum ScrollBar {
     /// The commit composer's Description box while it is focused (a
     /// `ui_kit::ListBar` drag).
     CommitDescription,
+    /// The sideways bar on a list pane's bottom border (`hscroll`).
+    Pane(crate::hscroll::HPane),
 }
 
 /// A scrollbar's track plus its thumb's position within it, both already

@@ -151,6 +151,8 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `refs` | `collapse_all` | Tüm Klasörleri Daralt | `-` |
 | `refs` | `expand_below` | Klasörü ve Alt Klasörlerini Genişlet | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Klasörü ve Alt Klasörlerini Daralt | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Dosyalar: Yol veya Ağaç | `m` |
 | `log` | `view_all_files` | Dosyalar: Tüm Dosyaları Göster | `a` |
 | `log` | `compare_selection` | Seçili satırları karşılaştır | `v` |
@@ -159,6 +161,8 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `log` | `pick_column` | Taşımak veya boyutlandırmak için bir sütun seç | `Shift+C` |
 | `log` | `scroll_left` | Sütunları Sola Kaydır | `Shift+Left` |
 | `log` | `scroll_right` | Sütunları Sağa Kaydır | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Commit'ler Mermaid gitGraph Olarak Kopyala | `Shift+Y` |
 | `log_columns` | `next` | Sonraki sütunu seç | `Tab` |
 | `log_columns` | `prev` | Önceki sütunu seç | `Shift+BackTab` |
@@ -176,6 +180,8 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Tüm Klasörleri Daralt | `-` |
 | `log_files` | `expand_below` | Klasörü ve Alt Klasörlerini Genişlet | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Klasörü ve Alt Klasörlerini Daralt | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Commit Mesajına Odaklan | `c` |
 | `status` | `toggle_file_mode` | Dosyalar: Yol veya Ağaç | `m` |
 | `status` | `view_all_files` | Dosyalar: Tüm Dosyaları Göster | `a` |
@@ -188,6 +194,8 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Tüm Klasörleri Daralt | `-` |
 | `status` | `expand_below` | Klasörü ve Alt Klasörlerini Genişlet | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Klasörü ve Alt Klasörlerini Daralt | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | Depoyu Yıldızla veya Yıldızı Kaldır | `f`, `*` |
 | `home` | `close_repo` | Satırı Kapat, Kaldır veya Yıldızını Kaldır | `x`, `Delete` |
 | `home` | `copy_path` | Depo Yolunu Kopyala | `y` |
@@ -626,6 +634,8 @@ Tuşlar varsayılanlardır.
 | Refs: Tüm Klasörleri Daralt | `-` |
 | Refs: Seçili Klasörü ve Alt Klasörlerini Genişlet | `*` |
 | Refs: Seçili Klasörü ve Alt Klasörlerini Daralt | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: Sonraki Bölüm | `l` |
 | Refs: Önceki Bölüm | `h` |
 | Refs: Etkin Bölümü Genişlet veya Daralt | `Enter` |

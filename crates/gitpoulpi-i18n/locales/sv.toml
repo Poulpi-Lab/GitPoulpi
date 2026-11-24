@@ -10425,3 +10425,13 @@ detail_cancel = "Inget hämtas eller ändras."
 dlg_hint = "Upp/Ned eller 1-3 väljer  Enter bekräftar  Esc avbryter"
 # context: last line of the list of that dialog when more branches exist than fit; {n} is how many
 more = "och {n} till"
+
+[pane_hscroll]
+# context: keymap label of the key that scrolls the focused list pane (a Refs section, Unstaged, Staged, the changed files, the commit info lines) sideways
+key_left = "Scroll the Pane Left"
+key_right = "Scroll the Pane Right"
+pal_left = "View: Scroll the Pane Left"
+pal_right = "View: Scroll the Pane Right"
+nothing = "Nothing to scroll sideways here"
+help = "Scroll the pane sideways (also Shift+wheel, a horizontal wheel or the bar on its bottom border)"
+help_details = "Scroll the commit details sideways (id, author, date and counts lines)"

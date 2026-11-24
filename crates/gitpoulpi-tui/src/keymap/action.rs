@@ -265,6 +265,9 @@ mod labels {
     };
     pub(super) use gitpoulpi_i18n::msg::keymap_action::*;
     pub(super) use gitpoulpi_i18n::msg::mermaid::KEYMAP_COPY as KEYMAP_COPY_MERMAID;
+    pub(super) use gitpoulpi_i18n::msg::pane_hscroll::{
+        KEY_LEFT as PANE_HSCROLL_LEFT, KEY_RIGHT as PANE_HSCROLL_RIGHT,
+    };
     pub(super) use gitpoulpi_i18n::msg::tree_fold::{
         KEY_COLLAPSE_ALL as TREE_COLLAPSE_ALL, KEY_COLLAPSE_BELOW as TREE_COLLAPSE_BELOW,
         KEY_EXPAND_ALL as TREE_EXPAND_ALL, KEY_EXPAND_BELOW as TREE_EXPAND_BELOW,
@@ -481,6 +484,8 @@ actions! {
     RefsCollapseAll => (Refs, "refs.collapse_all", TREE_COLLAPSE_ALL, ["-"]),
     RefsExpandBelow => (Refs, "refs.expand_below", TREE_EXPAND_BELOW, ["*", "Shift+Right"]),
     RefsCollapseBelow => (Refs, "refs.collapse_below", TREE_COLLAPSE_BELOW, ["_", "Shift+Left"]),
+    RefsScrollLeft => (Refs, "refs.scroll_left", PANE_HSCROLL_LEFT, ["Alt+Left"]),
+    RefsScrollRight => (Refs, "refs.scroll_right", PANE_HSCROLL_RIGHT, ["Alt+Right"]),
     // ---- log pane ----
     LogToggleFileMode => (Log, "log.toggle_file_mode", LOG_TOGGLE_FILE_MODE, ["m"]),
     LogViewAllFiles => (Log, "log.view_all_files", LOG_VIEW_ALL_FILES, ["a"]),
@@ -490,6 +495,8 @@ actions! {
     LogPickColumn => (Log, "log.pick_column", LOG_PICK_COLUMN, ["Shift+C"]),
     LogScrollLeft => (Log, "log.scroll_left", LOG_SCROLL_LEFT, ["Shift+Left"]),
     LogScrollRight => (Log, "log.scroll_right", LOG_SCROLL_RIGHT, ["Shift+Right"]),
+    LogDetailsScrollLeft => (Log, "log.details_scroll_left", PANE_HSCROLL_LEFT, ["Alt+Left"]),
+    LogDetailsScrollRight => (Log, "log.details_scroll_right", PANE_HSCROLL_RIGHT, ["Alt+Right"]),
     LogCopyMermaid => (Log, "log.copy_mermaid", KEYMAP_COPY_MERMAID, ["Shift+Y"], @Mermaid),
     // ---- the Log's column header, while a column is picked ----
     LogColumnsNext => (LogColumns, "log_columns.next", LOG_COLUMNS_NEXT, ["Tab"]),
@@ -509,6 +516,8 @@ actions! {
     LogFilesCollapseAllFolders => (LogFiles, "log_files.collapse_all_folders", TREE_COLLAPSE_ALL, ["-"]),
     LogFilesExpandBelow => (LogFiles, "log_files.expand_below", TREE_EXPAND_BELOW, ["*", "Shift+Right"]),
     LogFilesCollapseBelow => (LogFiles, "log_files.collapse_below", TREE_COLLAPSE_BELOW, ["_", "Shift+Left"]),
+    LogFilesScrollLeft => (LogFiles, "log_files.scroll_left", PANE_HSCROLL_LEFT, ["Alt+Left"]),
+    LogFilesScrollRight => (LogFiles, "log_files.scroll_right", PANE_HSCROLL_RIGHT, ["Alt+Right"]),
     // ---- status pane ----
     StatusCompose => (Status, "status.compose", STATUS_COMPOSE, ["c"]),
     StatusToggleFileMode => (Status, "status.toggle_file_mode", STATUS_TOGGLE_FILE_MODE, ["m"]),
@@ -522,6 +531,8 @@ actions! {
     StatusCollapseAllFolders => (Status, "status.collapse_all_folders", TREE_COLLAPSE_ALL, ["-"]),
     StatusExpandBelow => (Status, "status.expand_below", TREE_EXPAND_BELOW, ["*", "Shift+Right"]),
     StatusCollapseBelow => (Status, "status.collapse_below", TREE_COLLAPSE_BELOW, ["_", "Shift+Left"]),
+    StatusScrollLeft => (Status, "status.scroll_left", PANE_HSCROLL_LEFT, ["Alt+Left"]),
+    StatusScrollRight => (Status, "status.scroll_right", PANE_HSCROLL_RIGHT, ["Alt+Right"]),
     // ---- home tab ----
     HomeFavorite => (Home, "home.favorite", HOME_FAVORITE, ["f", "*"]),
     HomeCloseRepo => (Home, "home.close_repo", HOME_CLOSE_REPO, ["x", "Delete"]),

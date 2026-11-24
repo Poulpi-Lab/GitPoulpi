@@ -434,6 +434,7 @@ pub(super) fn diff_targets(
                 scrollbar::Track::horizontal(*cx.diff_body_area, *cx.diff_longest_line, s.h_offset)
                     .map(|t| col as i32 - t.rect.x as i32 - t.thumb_start as i32)
             }
+            (ScrollBar::Pane(pane), _) => crate::hscroll::thumb_grab(pane, col),
             _ => None,
         };
         if let Some(grab) = grab {
@@ -533,6 +534,11 @@ pub(super) fn diff_targets(
                     // Dragging along it keeps
                     // scrubbing.
                     *cx.dragging_scrollbar = Some((ScrollBar::DiffMinimap, 0));
+                }
+            }
+            ScrollBar::Pane(pane) => {
+                if let Some(grab) = crate::hscroll::press_track(pane, col) {
+                    *cx.dragging_scrollbar = Some((ScrollBar::Pane(pane), grab));
                 }
             }
             ScrollBar::FileInsightVertical

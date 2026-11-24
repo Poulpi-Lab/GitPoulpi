@@ -147,6 +147,8 @@ stage_file = "z"
 | `refs` | `collapse_all` | Згорнути всі папки | `-` |
 | `refs` | `expand_below` | Розгорнути папку з підпапками | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Згорнути папку з підпапками | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Файли: шлях чи дерево | `m` |
 | `log` | `view_all_files` | Файли: усі файли | `a` |
 | `log` | `compare_selection` | Порівняти вибрані рядки | `v` |
@@ -155,6 +157,8 @@ stage_file = "z"
 | `log` | `pick_column` | Вибрати стовпець для пересування або зміни ширини | `Shift+C` |
 | `log` | `scroll_left` | Прокрутити стовпці ліворуч | `Shift+Left` |
 | `log` | `scroll_right` | Прокрутити стовпці праворуч | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Копіювати commits як Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Вибрати наступний стовпець | `Tab` |
 | `log_columns` | `prev` | Вибрати попередній стовпець | `Shift+BackTab` |
@@ -172,6 +176,8 @@ stage_file = "z"
 | `log_files` | `collapse_all_folders` | Згорнути всі папки | `-` |
 | `log_files` | `expand_below` | Розгорнути папку з підпапками | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Згорнути папку з підпапками | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Фокус на повідомленні commit'у | `c` |
 | `status` | `toggle_file_mode` | Файли: шлях чи дерево | `m` |
 | `status` | `view_all_files` | Файли: усі файли | `a` |
@@ -184,6 +190,8 @@ stage_file = "z"
 | `status` | `collapse_all_folders` | Згорнути всі папки | `-` |
 | `status` | `expand_below` | Розгорнути папку з підпапками | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Згорнути папку з підпапками | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | Додати репозиторій в обране чи прибрати | `f`, `*` |
 | `home` | `close_repo` | Закрити, прибрати чи зняти обране з рядка | `x`, `Delete` |
 | `home` | `copy_path` | Скопіювати шлях до репозиторію | `y` |
@@ -620,6 +628,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Refs: згорнути всі папки | `-` |
 | Refs: розгорнути вибрану папку з підпапками | `*` |
 | Refs: згорнути вибрану папку з підпапками | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: наступний розділ | `l` |
 | Refs: попередній розділ | `h` |
 | Refs: згорнути/розгорнути активний розділ | `Enter` |

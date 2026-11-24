@@ -40,6 +40,7 @@ fn status_rows_built_equal_the_visible_rows_not_the_file_count() {
             area,
             &lfs,
             &FileSelection::default(),
+            0,
             &mut hits,
         );
         assert_eq!(items.len(), lines.len(), "the list keeps one item per row");
@@ -83,6 +84,7 @@ fn a_hovered_folder_row_lifts_its_name_spans_background() {
             0,
             LfsMark::default(),
             false,
+            0,
             &mut hits,
         );
         let mut terminal = Terminal::new(TestBackend::new(30, 1)).unwrap();
@@ -129,6 +131,7 @@ fn an_lfs_file_row_carries_an_lfs_tag_and_a_plain_row_does_not() {
                 locked_by: lock,
             },
             false,
+            0,
             &mut hits,
         );
         let mut terminal = Terminal::new(TestBackend::new(40, 1)).unwrap();
@@ -154,4 +157,55 @@ fn an_lfs_file_row_carries_an_lfs_tag_and_a_plain_row_does_not() {
     let locked = row_text(true, Some("bob"));
     assert!(locked.contains("LFS locked by bob"), "{locked:?}");
     assert!(!row_text(true, None).contains("locked"));
+}
+
+/// A row scrolled sideways shows its name from the offset, and the hover
+/// button stays whole at the row's right end whatever the offset.
+///
+/// Falsified: pushing the button before `cut_spans` scrolls it out (red at
+/// the button), and ignoring `h_off` leaves the head (red at the text).
+#[test]
+fn a_scrolled_row_keeps_its_hover_button_at_the_right_end() {
+    use ratatui::backend::TestBackend;
+
+    let line = StatusPaneLine::File {
+        path: PathBuf::from("0123456789abcdefghij.rs"),
+        depth: 0,
+        section: StatusSection::Unstaged,
+        label: "0123456789abcdefghij.rs".to_string(),
+        status: Some(gitpoulpi_core::domain::FileStatus::Modified),
+    };
+    let list_area = Rect::new(0, 0, 30, 1);
+    let text = |hovered: bool, h_off: usize| -> String {
+        let mut hits = Vec::new();
+        let item = status_row_item(
+            &line,
+            StatusSection::Unstaged,
+            hovered,
+            true,
+            list_area,
+            0,
+            LfsMark::default(),
+            false,
+            h_off,
+            &mut hits,
+        );
+        let mut terminal = Terminal::new(TestBackend::new(30, 1)).unwrap();
+        terminal
+            .draw(|frame| {
+                frame.render_clipped(List::new(vec![item]), list_area);
+            })
+            .unwrap();
+        let buf = terminal.backend().buffer().clone();
+        (0..30).map(|x| buf[(x, 0)].symbol().to_string()).collect()
+    };
+    // The 2-cell marker is scrolled off by 4, with two cells of the name.
+    assert!(
+        text(false, 4).starts_with("23456789abcdefghij.rs"),
+        "{}",
+        text(false, 4)
+    );
+    let hovered = text(true, 4);
+    assert!(hovered.starts_with("23456789abcdef"), "{hovered}");
+    assert!(hovered.trim_end().ends_with("Stage file"), "{hovered}");
 }

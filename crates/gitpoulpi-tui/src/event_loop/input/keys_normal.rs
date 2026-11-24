@@ -50,6 +50,14 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
             return Ok(Flow::Handled);
         }
     }
+    // Alt+Left / Alt+Right: the pane under the keyboard sideways.
+    if cx.composer_focus.is_none()
+        && !*cx.commit_filter_focus
+        && !cx.open_menu.is_open()
+        && commands::hscroll_key(cx, km, &key)
+    {
+        return Ok(Flow::Handled);
+    }
     match key.code {
         // Esc stops a running AI request before it does
         // anything else (leaves a field, closes a view).

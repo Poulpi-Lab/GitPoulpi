@@ -1181,6 +1181,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::ConflictsShow
         | C::FilesOpenMenu
         | C::FilesFold(_)
+        | C::PaneScroll(_)
         | C::FilesSelectAll
         | C::FilesClearSelection
         | C::FilesToggleSelection

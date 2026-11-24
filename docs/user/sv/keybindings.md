@@ -151,6 +151,8 @@ Varje tangent du kan binda om, med id:t som används i
 | `refs` | `collapse_all` | Fäll ihop alla mappar | `-` |
 | `refs` | `expand_below` | Fäll ut mappen och dess undermappar | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Fäll ihop mappen och dess undermappar | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Filer: sökväg eller träd | `m` |
 | `log` | `view_all_files` | Filer: visa alla filer | `a` |
 | `log` | `compare_selection` | Jämför de markerade raderna | `v` |
@@ -159,6 +161,8 @@ Varje tangent du kan binda om, med id:t som används i
 | `log` | `pick_column` | Välj en kolumn att flytta eller ändra bredd på | `Shift+C` |
 | `log` | `scroll_left` | Rulla kolumnerna åt vänster | `Shift+Left` |
 | `log` | `scroll_right` | Rulla kolumnerna åt höger | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Kopiera commits som Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Välj nästa kolumn | `Tab` |
 | `log_columns` | `prev` | Välj föregående kolumn | `Shift+BackTab` |
@@ -176,6 +180,8 @@ Varje tangent du kan binda om, med id:t som används i
 | `log_files` | `collapse_all_folders` | Fäll ihop alla mappar | `-` |
 | `log_files` | `expand_below` | Fäll ut mappen och dess undermappar | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Fäll ihop mappen och dess undermappar | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Fokusera commit-meddelandet | `c` |
 | `status` | `toggle_file_mode` | Filer: sökväg eller träd | `m` |
 | `status` | `view_all_files` | Filer: visa alla filer | `a` |
@@ -188,6 +194,8 @@ Varje tangent du kan binda om, med id:t som används i
 | `status` | `collapse_all_folders` | Fäll ihop alla mappar | `-` |
 | `status` | `expand_below` | Fäll ut mappen och dess undermappar | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Fäll ihop mappen och dess undermappar | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | Stjärnmarkera repositoryt | `f`, `*` |
 | `home` | `close_repo` | Stäng, ta bort eller ta bort stjärnan på raden | `x`, `Delete` |
 | `home` | `copy_path` | Kopiera repositoryts sökväg | `y` |
@@ -628,6 +636,8 @@ Tangenterna är standardvärdena.
 | Refs: Fäll ihop alla mappar | `-` |
 | Refs: Fäll ut vald mapp och dess undermappar | `*` |
 | Refs: Fäll ihop vald mapp och dess undermappar | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: Nästa avsnitt | `l` |
 | Refs: Föregående avsnitt | `h` |
 | Refs: Fäll ut/ihop aktivt avsnitt | `Enter` |

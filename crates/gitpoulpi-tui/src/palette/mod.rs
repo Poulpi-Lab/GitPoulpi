@@ -303,6 +303,8 @@ pub(crate) enum PaletteCommand {
     /// The same for the focused file list (Unstaged, Staged, the commit's
     /// files, View all files).
     FilesFold(crate::tree_fold::TreeFold),
+    /// Scrolls the pane that has the keyboard sideways (`hscroll`).
+    PaneScroll(crate::hscroll::Dir),
     /// Opens the left pane's show/hide checklist of sections.
     SidebarSectionsMenu,
     /// Shows or hides one left-pane section (the last visible one stays).
@@ -1198,6 +1200,8 @@ pub(crate) fn command_action(entry: &PaletteEntry) -> Option<crate::keymap::Acti
         PaletteCommand::MarkRefAsDropSource => Some(A::RefsMarkDrop),
         PaletteCommand::DropMarkedRefHere => Some(A::RefsDropMarked),
         PaletteCommand::ToggleHierarchy => Some(A::RefsToggleHierarchy),
+        PaletteCommand::PaneScroll(crate::hscroll::Dir::Left) => Some(A::RefsScrollLeft),
+        PaletteCommand::PaneScroll(crate::hscroll::Dir::Right) => Some(A::RefsScrollRight),
         PaletteCommand::RefsFold(op) => Some(op.key(crate::tree_fold::FoldCtx::Refs)),
         PaletteCommand::FilesFold(op) => Some(op.key(crate::tree_fold::FoldCtx::Status)),
         PaletteCommand::NewTab => Some(A::GlobalNewTab),

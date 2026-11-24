@@ -43,6 +43,10 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
         }
         return Ok(Flow::Handled);
     }
+    if let Some((ScrollBar::Pane(pane), grab)) = *cx.dragging_scrollbar {
+        crate::hscroll::drag_to(pane, grab, col);
+        return Ok(Flow::Handled);
+    }
     if let Some((kind, grab)) = *cx.dragging_scrollbar {
         match (kind, cx.diff_view_state.as_mut()) {
             (ScrollBar::DiffVertical, Some(s)) => {
@@ -80,6 +84,7 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
                 ScrollBar::FileInsightVertical
                 | ScrollBar::FileInsightHorizontal
                 | ScrollBar::LogHorizontal
+                | ScrollBar::Pane(_)
                 | ScrollBar::BlameMinimap,
                 _,
             )

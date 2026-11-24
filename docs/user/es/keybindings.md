@@ -153,6 +153,8 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `refs` | `collapse_all` | Contraer todas las carpetas | `-` |
 | `refs` | `expand_below` | Expandir la carpeta y sus subcarpetas | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Contraer la carpeta y sus subcarpetas | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Archivos: Ruta o árbol | `m` |
 | `log` | `view_all_files` | Archivos: Ver todos los archivos | `a` |
 | `log` | `compare_selection` | Comparar las filas seleccionadas | `v` |
@@ -161,6 +163,8 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `log` | `pick_column` | Elegir una columna para moverla o ajustarla | `Shift+C` |
 | `log` | `scroll_left` | Desplazar las columnas a la izquierda | `Shift+Left` |
 | `log` | `scroll_right` | Desplazar las columnas a la derecha | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Copiar Commits como gitGraph de Mermaid | `Shift+Y` |
 | `log_columns` | `next` | Elegir la columna siguiente | `Tab` |
 | `log_columns` | `prev` | Elegir la columna anterior | `Shift+BackTab` |
@@ -178,6 +182,8 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Contraer todas las carpetas | `-` |
 | `log_files` | `expand_below` | Expandir la carpeta y sus subcarpetas | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Contraer la carpeta y sus subcarpetas | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Ir al mensaje del commit | `c` |
 | `status` | `toggle_file_mode` | Archivos: Ruta o árbol | `m` |
 | `status` | `view_all_files` | Archivos: Ver todos los archivos | `a` |
@@ -190,6 +196,8 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Contraer todas las carpetas | `-` |
 | `status` | `expand_below` | Expandir la carpeta y sus subcarpetas | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Contraer la carpeta y sus subcarpetas | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | Marcar o desmarcar el repositorio como favorito | `f`, `*` |
 | `home` | `close_repo` | Cerrar, quitar o desmarcar la fila | `x`, `Delete` |
 | `home` | `copy_path` | Copiar la ruta del repositorio | `y` |
@@ -631,6 +639,8 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Refs: Contraer todas las carpetas | `-` |
 | Refs: Expandir la carpeta seleccionada y sus subcarpetas | `*` |
 | Refs: Contraer la carpeta seleccionada y sus subcarpetas | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: Sección siguiente | `l` |
 | Refs: Sección anterior | `h` |
 | Refs: Expandir o contraer la sección activa | `Enter` |

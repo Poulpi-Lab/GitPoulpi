@@ -972,6 +972,7 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                         ScrollBar::DiffVertical
                         | ScrollBar::DiffHorizontal
                         | ScrollBar::LogHorizontal
+                        | ScrollBar::Pane(_)
                         | ScrollBar::DiffMinimap
                         | ScrollBar::CommitDescription => {}
                     }

@@ -150,6 +150,8 @@ prefiksem (`Ctrl+G s`).
 | `refs` | `collapse_all` | Zwiń wszystkie foldery | `-` |
 | `refs` | `expand_below` | Rozwiń folder i jego podfoldery | `*`, `Shift+Right` |
 | `refs` | `collapse_below` | Zwiń folder i jego podfoldery | `_`, `Shift+Left` |
+| `refs` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `refs` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `toggle_file_mode` | Pliki: Ścieżka lub drzewo | `m` |
 | `log` | `view_all_files` | Pliki: Pokaż wszystkie pliki | `a` |
 | `log` | `compare_selection` | Porównaj zaznaczone wiersze | `v` |
@@ -158,6 +160,8 @@ prefiksem (`Ctrl+G s`).
 | `log` | `pick_column` | Wybierz kolumnę do przesunięcia lub zmiany szerokości | `Shift+C` |
 | `log` | `scroll_left` | Przewiń kolumny w lewo | `Shift+Left` |
 | `log` | `scroll_right` | Przewiń kolumny w prawo | `Shift+Right` |
+| `log` | `details_scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log` | `details_scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `log` | `copy_mermaid` | Kopiuj commity jako gitGraph Mermaid | `Shift+Y` |
 | `log_columns` | `next` | Wybierz następną kolumnę | `Tab` |
 | `log_columns` | `prev` | Wybierz poprzednią kolumnę | `Shift+BackTab` |
@@ -175,6 +179,8 @@ prefiksem (`Ctrl+G s`).
 | `log_files` | `collapse_all_folders` | Zwiń wszystkie foldery | `-` |
 | `log_files` | `expand_below` | Rozwiń folder i jego podfoldery | `*`, `Shift+Right` |
 | `log_files` | `collapse_below` | Zwiń folder i jego podfoldery | `_`, `Shift+Left` |
+| `log_files` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `log_files` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `status` | `compose` | Przejdź do opisu commita | `c` |
 | `status` | `toggle_file_mode` | Pliki: Ścieżka lub drzewo | `m` |
 | `status` | `view_all_files` | Pliki: Pokaż wszystkie pliki | `a` |
@@ -187,6 +193,8 @@ prefiksem (`Ctrl+G s`).
 | `status` | `collapse_all_folders` | Zwiń wszystkie foldery | `-` |
 | `status` | `expand_below` | Rozwiń folder i jego podfoldery | `*`, `Shift+Right` |
 | `status` | `collapse_below` | Zwiń folder i jego podfoldery | `_`, `Shift+Left` |
+| `status` | `scroll_left` | Scroll the Pane Left | `Alt+Left` |
+| `status` | `scroll_right` | Scroll the Pane Right | `Alt+Right` |
 | `home` | `favorite` | Dodaj repozytorium do ulubionych lub usuń | `f`, `*` |
 | `home` | `close_repo` | Zamknij, usuń lub zdejmij gwiazdkę z wiersza | `x`, `Delete` |
 | `home` | `copy_path` | Skopiuj ścieżkę repozytorium | `y` |
@@ -625,6 +633,8 @@ zastosowania. Klawisze są domyślne.
 | Refs: Zwiń wszystkie foldery | `-` |
 | Refs: Rozwiń zaznaczony folder i jego podfoldery | `*` |
 | Refs: Zwiń zaznaczony folder i jego podfoldery | `_` |
+| View: Scroll the Pane Left | `Alt+Left` |
+| View: Scroll the Pane Right | `Alt+Right` |
 | Refs: Następna sekcja | `l` |
 | Refs: Poprzednia sekcja | `h` |
 | Refs: Rozwiń lub zwiń aktywną sekcję | `Enter` |

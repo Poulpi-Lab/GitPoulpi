@@ -546,3 +546,50 @@ fn mcp_serve_allow_remote_names_what_is_missing() {
     assert!(stderr.contains("unencrypted"), "{stderr}");
     assert!(stderr.contains("mcp.tls"), "{stderr}");
 }
+
+/// The sequence tools: the reads are read-only, `sequence_run` is destructive
+/// and open-world (it may push), and the config-writing `add` / `remove` are
+/// not tools at all (like `config set`). `sequence_list` runs without a
+/// daemon.
+#[test]
+fn mcp_lists_the_sequence_tools_with_their_classes() {
+    let config = tempfile::tempdir().unwrap();
+    let responses = mcp_conversation(
+        config.path(),
+        vec![
+            serde_json::json!({"jsonrpc":"2.0","id":2,"method":"tools/list"}),
+            serde_json::json!({"jsonrpc":"2.0","id":3,"method":"tools/call",
+                "params":{"name":"sequence_list","arguments":{}}}),
+        ],
+    );
+    let by_id = |id: u64| {
+        responses
+            .iter()
+            .find(|r| r["id"] == id)
+            .expect("no response")
+    };
+    let tools = by_id(2)["result"]["tools"].as_array().unwrap().clone();
+    let annotations = |name: &str| {
+        tools
+            .iter()
+            .find(|t| t["name"] == name)
+            .unwrap_or_else(|| panic!("no tool {name}"))["annotations"]
+            .clone()
+    };
+    for name in ["sequence_list", "sequence_show", "sequence_validate"] {
+        let a = annotations(name);
+        assert_eq!(a["readOnlyHint"], true, "{name}");
+        assert_eq!(a["destructiveHint"], false, "{name}");
+        assert_eq!(a["openWorldHint"], false, "{name}");
+    }
+    let run = annotations("sequence_run");
+    assert_eq!(run["readOnlyHint"], false);
+    assert_eq!(run["destructiveHint"], true);
+    assert_eq!(run["openWorldHint"], true);
+    assert!(tools.iter().all(|t| t["name"] != "sequence_add"));
+    assert!(tools.iter().all(|t| t["name"] != "sequence_remove"));
+    assert_eq!(
+        by_id(3)["result"]["structuredContent"]["sequences"],
+        serde_json::json!([])
+    );
+}

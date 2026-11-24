@@ -82,6 +82,10 @@ gitpoulpi --json conflicts check            # would merging into the base branch
 gitpoulpi --json hosting pr-for-branch     # the current branch's PR/MR, or null
 gitpoulpi --json hosting pr --title "..." --body "..." [--draft]
 gitpoulpi --json lfs status                # works even without git-lfs installed
+gitpoulpi --json sequence list             # the user's saved macros (e.g. Backup); `runnable_headless` says which you may run
+gitpoulpi --json sequence run backup --dry-run   # the resolved plan, changes nothing
+gitpoulpi --json sequence run backup       # exit 3 = a step pauses (AI message review, name dialog): nothing changed, ask the user, then --yes
+                                            # exit 2 + {problems} = refused before anything ran; exit 2 + stopped_at = a step failed, the earlier ones stay done
 ```
 
 - **Resolving a conflict** (merge, rebase, cherry-pick, revert stopped on it).
@@ -116,6 +120,14 @@ gitpoulpi --json lfs status                # works even without git-lfs installe
   `--autostash` only when moving their uncommitted work aside is what they want.
   If putting it back conflicts, the stash stays in the list and the error says
   so: report it, never retry or drop the stash yourself.
+- **Sequences** (`sequence_list`, `sequence_show`, `sequence_validate`,
+  `sequence_run`): the user's named macros. You can read and run them, never
+  add or remove one. `sequence_run` pushes, so it is a destructive tool: run it
+  only when the user asked for that sequence. A step that would pause exits 3
+  with `needs_confirmation`; `--yes` accepts the proposal as is (the AI writes
+  the commit message). A force push step is never accepted headless, and a
+  sequence from the repository's own file is never run (not trusted). Each
+  mutating step is undoable on its own with `undo`.
 - **AI helpers** (`ai_commit_message`, `ai_explain`) only work when the user
   turned GitPoulpi's own AI on; you can usually write the message yourself.
 - **Hosting**: `hosting prs` / `issues` need the repository linked

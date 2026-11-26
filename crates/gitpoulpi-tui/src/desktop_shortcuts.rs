@@ -54,7 +54,8 @@ pub fn status() -> Report {
 }
 
 fn report(env: &Env, terminal: &str, logo: &str) -> Report {
-    let snap = launcher::snapshot(env, terminal, logo);
+    // A read: an icon that does not match the colour is reported, not healed.
+    let snap = launcher::snapshot_with(env, terminal, logo, false);
     Report {
         terminal: snap.resolved,
         terminals: snap.terminals.iter().map(|(id, _)| *id).collect(),
@@ -144,6 +145,16 @@ pub fn launcher_name_changed(before: &gitpoulpi_config::Config, after: &gitpoulp
     let env = Env::real();
     let fe = launcher::folder_menu_env(&env, Some(&logo));
     launcher::rename_launchers(&env, &fe, &after.ui.launch_terminal, &logo, &old, &new);
+}
+
+/// The colour of this installation changed (`gitpoulpi installation set
+/// logo_color`): its shortcuts and folder-menu entries get the new icon (the
+/// `.desktop` `Icon=` name follows). Never creates a shortcut. Blocking, best
+/// effort.
+pub fn logo_color_changed(after: &gitpoulpi_config::Config) {
+    let cur = gitpoulpi_config::installation::current();
+    let logo = crate::launcher_sync::effective_in(after, &cur.identity, &cur.config).logo_color;
+    launcher::sync_shortcuts(&Env::real(), &after.ui.launch_terminal, &logo);
 }
 
 /// The terminal command that opens `folder` (or only GitPoulpi, with `None`),

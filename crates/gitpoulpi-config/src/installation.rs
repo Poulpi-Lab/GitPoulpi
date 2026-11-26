@@ -369,9 +369,11 @@ pub fn label(kind: Kind, channel: Option<InstallChannel>) -> &'static str {
         Kind::Cargo => "cargo",
         Kind::Pinned => "pinned",
         Kind::Portable => "portable",
-        // A legacy marker has no channel and is an archive in practice.
+        // A legacy marker has no channel and is an archive in practice. An
+        // archive release put in place by the install script is installed,
+        // not a movable portable copy.
         Kind::Install => match channel {
-            None | Some(InstallChannel::Archive) => "portable",
+            None | Some(InstallChannel::Archive) => "release",
             Some(InstallChannel::InnoUser) => "per-user",
             Some(InstallChannel::InnoMachine) => "all users",
             Some(InstallChannel::Choco | InstallChannel::ChocoInternal) => "Chocolatey",

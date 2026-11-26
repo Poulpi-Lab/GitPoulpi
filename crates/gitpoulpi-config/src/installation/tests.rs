@@ -527,7 +527,8 @@ fn names_always_carry_a_suffix_unless_primary() {
         (Kind::Dev, None, "dev"),
         (Kind::Cargo, None, "cargo"),
         (Kind::Portable, None, "portable"),
-        (Kind::Install, None, "portable"),
+        (Kind::Install, None, "release"),
+        (Kind::Install, Some(InstallChannel::Archive), "release"),
         (Kind::Install, Some(InstallChannel::InnoUser), "per-user"),
         (
             Kind::Install,
@@ -1174,4 +1175,33 @@ fn the_first_colour_write_keeps_the_other_colours_as_they_were() {
     assert_eq!(eff.look["graph_row_tint_strength"], "subtle");
     assert_eq!(eff.look["theme"], "nord", "not the default");
     assert_eq!(eff.look["graph_lane_background"], "row_tint");
+}
+
+#[test]
+fn a_release_install_is_not_named_portable_nor_numbered_by_other_kinds() {
+    let mut config = Config::default();
+    let fs = FakeFs::new(false);
+    let e = env(&fs);
+    // A live portable copy and a gone dev checkout exist.
+    let portable = pinned("a");
+    let first = seed(&config, &portable, &e, &NoAliases, &live).unwrap();
+    assert_eq!(first.name, "GitPoulpi (portable)");
+    with(&mut config, &portable, first);
+    let dev = Identity {
+        id: "d-gone".into(),
+        kind: Kind::Dev,
+        root: "/gone/dev".into(),
+        channel: None,
+    };
+    let stale = seed(&config, &dev, &e, &NoAliases, &live).unwrap();
+    with(&mut config, &dev, stale);
+    let release = Identity {
+        id: "i-rel".into(),
+        kind: Kind::Install,
+        root: "/home/u/.local/opt/gitpoulpi".into(),
+        channel: Some(InstallChannel::Archive),
+    };
+    let only_portable = |en: &InstallationEntry| en.kind != Kind::Dev;
+    let entry = seed(&config, &release, &e, &NoAliases, &only_portable).unwrap();
+    assert_eq!(entry.name, "GitPoulpi (release)");
 }

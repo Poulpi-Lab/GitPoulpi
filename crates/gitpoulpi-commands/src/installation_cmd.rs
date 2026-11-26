@@ -26,6 +26,18 @@ pub fn on_launcher_name_change(hook: NameChangeHook) {
     let _ = NAME_CHANGE.set(hook);
 }
 
+/// What follows when the installation's colour changes: given the config
+/// after, it rewrites the shortcut and folder-menu icons in place.
+pub type ColorChangeHook = fn(&Config);
+
+static COLOR_CHANGE: OnceLock<ColorChangeHook> = OnceLock::new();
+
+/// Registers the icon refresh run after `installation set logo_color`. The
+/// first registration wins.
+pub fn on_logo_color_change(hook: ColorChangeHook) {
+    let _ = COLOR_CHANGE.set(hook);
+}
+
 /// The settings of one installation as JSON.
 fn settings_json(e: &installation::Effective) -> Value {
     json!({
@@ -187,6 +199,12 @@ fn set(cur: &Current, field: &str, value: &str) -> Result<Emitted, String> {
     if matches!(field, "name" | "name_with_version") {
         if let (Some(hook), Ok(after)) = (NAME_CHANGE.get(), Config::load(file)) {
             hook(&before, &after);
+        }
+    }
+    // Likewise the icon of the shortcuts: it wears the colour.
+    if field == "logo_color" {
+        if let (Some(hook), Ok(after)) = (COLOR_CHANGE.get(), Config::load(file)) {
+            hook(&after);
         }
     }
     Ok(emitted(

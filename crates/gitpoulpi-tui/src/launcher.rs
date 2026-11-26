@@ -257,6 +257,12 @@ pub(crate) fn icon_set(slug: &str) -> IconSet {
 /// Reads the state of every shortcut here; icons that are stale (the logo
 /// color changed) are rewritten on the way, which is cheap and spawns nothing.
 pub(crate) fn snapshot(env: &Env, setting: &str, logo: &str) -> Snapshot {
+    snapshot_with(env, setting, logo, true)
+}
+
+/// [`snapshot`]; with `heal` false a stale icon is only reported
+/// (`icon_stale`), nothing is written.
+pub(crate) fn snapshot_with(env: &Env, setting: &str, logo: &str, heal: bool) -> Snapshot {
     let terminals = env.terminals();
     let resolved = env.resolve(setting);
     let icons = icon_set(logo);
@@ -267,7 +273,8 @@ pub(crate) fn snapshot(env: &Env, setting: &str, logo: &str) -> Snapshot {
                 let terminal_exe = terminal_exe(env, terminal);
                 let req = request(env, terminal, terminal_exe.as_deref(), &icons);
                 let mut status = desktop::status(place, &env.dirs, &req);
-                if status.icon_stale
+                if heal
+                    && status.icon_stale
                     && status.state != desktop::State::Foreign
                     && desktop::refresh_icon(&env.dirs, &req).is_ok()
                 {
@@ -831,6 +838,65 @@ mod sync_tests {
                 .status
                 .state,
             State::Installed
+        );
+    }
+}
+
+#[cfg(test)]
+mod color_change_tests {
+    use super::*;
+    use gitpoulpi_config::desktop::State;
+
+    fn env(root: &std::path::Path) -> Env {
+        Env {
+            os: Os::Linux,
+            dirs: Dirs {
+                applications: root.join("data/applications"),
+                icon_root: root.join("data/icons/hicolor"),
+                desktop: None,
+                ..Dirs::default()
+            },
+            exe: PathBuf::from("/opt/gp/gitpoulpi"),
+            launch_exe: None,
+            newest: false,
+            has: Arc::new(|p| p == "kitty"),
+            which: Arc::new(|_| None),
+            refresh_icon_cache: false,
+            ctx: InstallCtx::legacy(),
+            submenu: String::new(),
+        }
+    }
+
+    fn icon_line(e: &Env) -> String {
+        let text = std::fs::read_to_string(e.dirs.applications.join("gitpoulpi.desktop")).unwrap();
+        text.lines()
+            .find(|l| l.starts_with("Icon="))
+            .unwrap()
+            .to_string()
+    }
+
+    #[test]
+    fn status_reports_a_stale_icon_without_healing_and_sync_repaints_it() {
+        let ways = crate::logo_colors::ways();
+        if ways.len() < 2 {
+            return;
+        }
+        let tmp = tempfile::tempdir().unwrap();
+        let e = env(tmp.path());
+        run(&e, "auto", &ways[0].slug, Op::Install(Place::Launcher));
+        let old = icon_line(&e);
+        // The colour changed: a read says so and writes nothing.
+        let snap = snapshot_with(&e, "auto", &ways[1].slug, false);
+        assert!(snap.rows[0].status.icon_stale);
+        assert_eq!(snap.rows[0].status.state, State::Installed);
+        assert_eq!(icon_line(&e), old);
+        // What `installation set logo_color` runs: the Icon= name follows.
+        assert!(sync_shortcuts(&e, "auto", &ways[1].slug));
+        assert_ne!(icon_line(&e), old);
+        assert!(
+            !snapshot_with(&e, "auto", &ways[1].slug, false).rows[0]
+                .status
+                .icon_stale
         );
     }
 }

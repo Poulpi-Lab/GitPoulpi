@@ -36,6 +36,10 @@ fn main() -> std::process::ExitCode {
     gitpoulpi_commands::installation_cmd::on_launcher_name_change(
         gitpoulpi_tui::desktop_shortcuts::launcher_name_changed,
     );
+    // `installation set logo_color` repaints this installation's shortcut icons.
+    gitpoulpi_commands::installation_cmd::on_logo_color_change(
+        gitpoulpi_tui::desktop_shortcuts::logo_color_changed,
+    );
     let args: Vec<String> = std::env::args_os()
         .skip(1)
         .map(|a| a.to_string_lossy().into_owned())

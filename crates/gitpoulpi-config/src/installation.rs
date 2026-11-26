@@ -1286,12 +1286,23 @@ impl AliasEvidence for DiskAliases {
     }
 }
 
+/// True for `<...>/target/<profile>/deps`, where cargo puts test binaries. A
+/// test binary is not an installation: `identify` reads it as a `portable` one
+/// (it is not `target/<profile>/<file>`), and seeding it would add a bogus
+/// entry to the developer's real `config.toml` whenever a test reaches
+/// [`current`] without `GITPOULPI_CONFIG_DIR`.
+fn is_cargo_test_root(root: &str) -> bool {
+    let parts: Vec<&str> = root.split(['/', '\\']).filter(|p| !p.is_empty()).collect();
+    let n = parts.len();
+    n >= 3 && parts[n - 1] == "deps" && parts[n - 3] == "target"
+}
+
 /// Writes a freshly seeded `entry` into the file; true when the caller may
 /// use it. A pinned id (`GITPOULPI_INSTALL_ID`) is an explicit override, not a
 /// discovered installation: its entry stays in memory only (still true) until
 /// the user changes a per-installation setting, which writes it.
 fn persist_seed(file: &Path, identity: &Identity, entry: &InstallationEntry) -> bool {
-    if identity.kind == Kind::Pinned {
+    if identity.kind == Kind::Pinned || is_cargo_test_root(&identity.root) {
         return true;
     }
     let id = identity.id.clone();

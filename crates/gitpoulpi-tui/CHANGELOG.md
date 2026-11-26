@@ -7,6 +7,9 @@ IPC surfaces are stable within a major version).
 
 ## [Unreleased]
 
+### Fixed
+- **Installations: default name of a release, and the shortcut icon after a colour change.** A release put in place by `install.sh` (an archive install with its `.gitpoulpi-dist` marker) is no longer called `GitPoulpi (portable)` but `GitPoulpi (release)`; a name already stored is left as it is. `gitpoulpi installation set logo_color` now repaints this installation's shortcut and folder-menu icons at once (the `.desktop` `Icon=` follows), like `installation set name` renames them, and `gitpoulpi desktop shortcut status` reports `icon_stale: true` for an icon that no longer matches the colour instead of silently rewriting it.
+
 ## [1.3.0] - 2026-11-25
 
 ### Added

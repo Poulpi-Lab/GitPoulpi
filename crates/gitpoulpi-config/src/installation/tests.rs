@@ -934,6 +934,29 @@ fn a_pinned_id_is_not_seeded_into_the_file_but_a_discovered_one_is() {
     assert!(config.installation.settings.contains_key("p-found"));
 }
 
+/// Regression: test binaries (`target/<profile>/deps`) once registered
+/// themselves as "portable" installations in the developer's real config.
+#[test]
+fn a_cargo_test_binary_is_never_seeded_into_the_file() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("config.toml");
+    for root in [
+        "/home/u/work/target/debug/deps",
+        "C:\\work\\target\\release\\deps",
+    ] {
+        let mut id = pinned("t");
+        id.kind = Kind::Portable;
+        id.root = root.to_string();
+        assert!(persist_seed(&path, &id, &InstallationEntry::default()));
+        assert!(!path.exists(), "{root} must write nothing");
+    }
+    let mut real = pinned("t");
+    real.kind = Kind::Portable;
+    real.root = "/opt/gitpoulpi/deps-tool".to_string();
+    assert!(persist_seed(&path, &real, &InstallationEntry::default()));
+    assert!(path.exists());
+}
+
 #[test]
 fn seed_returns_nothing_for_an_unchanged_entry() {
     let id = pinned("same");

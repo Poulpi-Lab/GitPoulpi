@@ -76,8 +76,14 @@ pub struct LogPageRequest {
 #[derive(Debug, Clone)]
 pub struct LazyLog {
     settings: LogLoadSettings,
-    /// Commits currently held by the client, i.e. the next page's `skip`.
+    /// Commits currently held by the client. The next page's `skip` is this
+    /// minus [`front`](LazyLog::set_front).
     loaded: usize,
+    /// How many of the held commits come *before* the paged walk and are not
+    /// part of it (commits reachable only from a detached HEAD that is on no
+    /// ref, which the ref walk never visits). They do not count towards
+    /// `skip`, the refresh depth or the ceiling.
+    front: usize,
     /// The `skip` of the request currently in flight, if any. At most one is
     /// ever outstanding: a second would duplicate the first's range or open
     /// a hole between them.
@@ -91,9 +97,29 @@ impl LazyLog {
         LazyLog {
             settings,
             loaded: 0,
+            front: 0,
             in_flight: None,
             exhausted: false,
         }
+    }
+
+    /// Declares that the first `front` held commits are outside the paged
+    /// walk. Call it before [`on_refresh`](LazyLog::on_refresh) /
+    /// [`on_refresh_asked`](LazyLog::on_refresh_asked) with the refresh's
+    /// total (front rows included). The terminal UI never calls it (its
+    /// walk is the ref walk alone, front is 0). The frontend must not let a
+    /// front commit also appear in the walk.
+    pub fn set_front(&mut self, front: usize) {
+        self.front = front;
+    }
+
+    pub fn front(&self) -> usize {
+        self.front
+    }
+
+    /// Commits held that belong to the paged walk: the next page's `skip`.
+    pub fn walk_loaded(&self) -> usize {
+        self.loaded.saturating_sub(self.front)
     }
 
     /// How deep the *full* refresh should read. It grows as pages are
@@ -107,7 +133,7 @@ impl LazyLog {
         // it, and `GeneralConfig::max_commits_in_graph_effective` refuses a
         // ceiling below the initial load), so a `min` here would be
         // unreachable code that looks like a safeguard.
-        self.loaded.max(self.settings.initial_commits)
+        self.walk_loaded().max(self.settings.initial_commits)
     }
 
     /// Adopts settings changed in Preferences **without discarding what is
@@ -128,6 +154,7 @@ impl LazyLog {
     /// lands starts it again.
     pub fn restart(&mut self) {
         self.loaded = 0;
+        self.front = 0;
         self.in_flight = None;
         self.exhausted = false;
     }
@@ -148,7 +175,7 @@ impl LazyLog {
     /// user has to be able to see that more history exists but the client
     /// declines to hold it, or the graph just looks truncated.
     pub fn is_at_ceiling(&self) -> bool {
-        matches!(self.settings.max_commits, Some(max) if self.loaded >= max)
+        matches!(self.settings.max_commits, Some(max) if self.walk_loaded() >= max)
     }
 
     pub fn loaded(&self) -> usize {
@@ -173,7 +200,7 @@ impl LazyLog {
     /// next refresh).
     pub fn on_refresh_asked(&mut self, loaded: usize, asked: usize) {
         self.loaded = loaded;
-        self.exhausted = loaded < asked;
+        self.exhausted = loaded.saturating_sub(self.front) < asked;
     }
 
     /// Should the next page be fetched?
@@ -197,7 +224,7 @@ impl LazyLog {
         if !self.settings.lazy_load
             || self.exhausted
             || self.in_flight.is_some()
-            || self.loaded == 0
+            || self.walk_loaded() == 0
         {
             return None;
         }
@@ -211,14 +238,14 @@ impl LazyLog {
         // since "commits per lazy page" promised a fixed step.
         let page = self.settings.page_commits;
         let limit = match self.settings.max_commits {
-            Some(max) => page.min(max.saturating_sub(self.loaded)),
+            Some(max) => page.min(max.saturating_sub(self.walk_loaded())),
             None => page,
         };
         if limit == 0 {
             return None;
         }
         Some(LogPageRequest {
-            skip: self.loaded,
+            skip: self.walk_loaded(),
             limit,
         })
     }
@@ -252,7 +279,7 @@ impl LazyLog {
         if self.in_flight == Some(request.skip) {
             self.in_flight = None;
         }
-        if request.skip != nodes.len() {
+        if request.skip + self.front != nodes.len() {
             return false;
         }
         // A short page (the root commit is in it) ends the walk. Latched from
@@ -632,5 +659,62 @@ mod tests {
         // A really short answer still ends the walk.
         lazy.on_refresh_asked(3, 4);
         assert!(lazy.is_exhausted());
+    }
+
+    #[test]
+    fn front_rows_do_not_count_towards_skip() {
+        let mut lazy = LazyLog::new(settings(4, 2));
+        // One detached-HEAD commit in front of a 4-commit walk.
+        let mut nodes: Vec<CommitNode> = (0..5).map(node).collect();
+        lazy.set_front(1);
+        lazy.on_refresh_asked(5, 4);
+        assert_eq!(lazy.loaded(), 5);
+        assert_eq!(lazy.walk_loaded(), 4);
+        assert!(!lazy.is_exhausted(), "a full walk page is not the end");
+        assert_eq!(lazy.refresh_depth(), 4);
+        let request = lazy.next_page(0, 10).unwrap();
+        assert_eq!(request, LogPageRequest { skip: 4, limit: 2 });
+        lazy.mark_requested(request);
+        assert!(lazy.on_page(request, vec![node(5), node(6)], &mut nodes));
+        assert_eq!(nodes.len(), 7);
+        assert_eq!(lazy.walk_loaded(), 6);
+        assert_eq!(lazy.refresh_depth(), 6);
+        // The terminal's behaviour (front 0) is untouched: skip == held.
+        let mut plain = LazyLog::new(settings(4, 2));
+        let _ = loaded(&mut plain, 4);
+        assert_eq!(plain.next_page(0, 10).unwrap().skip, 4);
+    }
+
+    #[test]
+    fn front_rows_do_not_count_towards_the_ceiling_or_the_end() {
+        let mut lazy = LazyLog::new(LogLoadSettings {
+            initial_commits: 4,
+            lazy_load: true,
+            page_commits: 4,
+            max_commits: Some(6),
+        });
+        lazy.set_front(2);
+        lazy.on_refresh_asked(6, 4);
+        assert!(!lazy.is_at_ceiling());
+        assert_eq!(
+            lazy.next_page(0, 10),
+            Some(LogPageRequest { skip: 4, limit: 2 })
+        );
+        // A walk shorter than asked is the end even with front rows held.
+        lazy.on_refresh_asked(5, 4);
+        assert!(lazy.is_exhausted());
+        assert_eq!(lazy.next_page(0, 10), None);
+    }
+
+    #[test]
+    fn a_page_at_a_stale_offset_is_dropped_with_front_rows() {
+        let mut lazy = LazyLog::new(settings(4, 2));
+        let mut nodes: Vec<CommitNode> = (0..5).map(node).collect();
+        lazy.set_front(1);
+        lazy.on_refresh_asked(5, 4);
+        // Asked at skip 5 (front counted by mistake): refused.
+        let stale = LogPageRequest { skip: 5, limit: 2 };
+        assert!(!lazy.on_page(stale, vec![node(9), node(10)], &mut nodes));
+        assert_eq!(nodes.len(), 5);
     }
 }

@@ -31,6 +31,7 @@
 
 pub(crate) mod thumbs;
 
+use crate::keymap::term::TermKeymap;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::time::Instant;

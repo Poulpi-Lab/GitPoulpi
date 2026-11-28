@@ -24,6 +24,7 @@ pub(crate) use render::{split_hit_at, SplitHit};
 
 use super::*;
 use crate::combo::{Combo, ComboOption, ComboOutcome};
+use crate::keymap::term::TermKeymap;
 use crate::keymap::Action as Bind;
 use crate::reword_ui::{RewordForm, RewordFormOutcome};
 use gitpoulpi_core::domain::{

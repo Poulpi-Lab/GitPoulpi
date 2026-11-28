@@ -4,6 +4,7 @@
 use super::commands::{CommandCtx, Flow};
 use super::KeyEnv;
 use crate::event_loop::*;
+use crate::keymap::term::TermKeymap;
 use gitpoulpi_i18n::msg;
 
 /// Handles the keys no earlier part claimed.

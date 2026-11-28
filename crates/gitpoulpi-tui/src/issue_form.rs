@@ -10,6 +10,7 @@
 //! link already did.
 
 use super::*;
+use crate::keymap::term::TermKeymap;
 use crate::keymap::Action as Bind;
 use gitpoulpi_i18n::msg;
 

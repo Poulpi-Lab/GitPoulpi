@@ -14,6 +14,7 @@
 //! visible tree and are forgotten with it; the saved state is never touched.
 
 use crate::context_menu::Entry;
+use crate::keymap::term::TermKeymap;
 use crate::keymap::Action;
 use gitpoulpi_i18n::msg::tree_fold as msg;
 use std::collections::HashSet;

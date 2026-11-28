@@ -4,6 +4,7 @@
 //! and its mouse while open, and registers its hit rects in the walk that
 //! paints it.
 
+use crate::keymap::term::TermKeymap;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
 use gitpoulpi_hosting::{DiffSide, ReviewCapabilities, ReviewEvent, VoteLabel};
 use gitpoulpi_i18n::msg::review_ai as ai_msg;

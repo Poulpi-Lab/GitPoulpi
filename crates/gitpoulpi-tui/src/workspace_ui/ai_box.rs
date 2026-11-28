@@ -9,6 +9,7 @@
 //! workspace. The same reading as the repository's AI settings: empty text
 //! means "nothing here".
 
+use crate::keymap::term::TermKeymap;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
 use gitpoulpi_config::{AiAction, RepoAiInstructions, RepoInstructionsMode, WorkspaceAi};
 use gitpoulpi_i18n::msg::workspace_ai as m;

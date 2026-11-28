@@ -13,6 +13,7 @@
 //! dropdown and the remove confirmation own the pointer while open. Hit rects
 //! are recorded by the walk that paints them.
 
+use crate::keymap::term::TermKeymap;
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, MouseButton, MouseEvent, MouseEventKind};
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;

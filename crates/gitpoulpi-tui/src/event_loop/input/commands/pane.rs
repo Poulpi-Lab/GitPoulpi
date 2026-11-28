@@ -7,6 +7,7 @@ use super::CommandCtx;
 use crate::clipboard_route::Delivery;
 use crate::event_loop::*;
 use crate::file_panel::{open_wip_file, WipFileOpen};
+use crate::keymap::term::TermKeymap;
 use gitpoulpi_core::domain::{RuleKind, RuleScope, Treat};
 use gitpoulpi_i18n::msg;
 

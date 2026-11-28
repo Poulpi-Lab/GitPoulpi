@@ -48,6 +48,7 @@ mod pointer;
 mod prompt_host;
 
 use crate::event_loop::*;
+use crate::keymap::term::TermKeymap;
 use commands::CommandCtx;
 pub(in crate::event_loop) use commands::Flow;
 use crossterm::event::MouseEvent;

@@ -11,11 +11,12 @@
 pub(crate) mod action;
 pub(crate) mod chord;
 pub(crate) mod conflict;
+pub(crate) mod term;
 
 pub(crate) use action::{Action, Ctx, ACTIONS, STATIC_ACTIONS};
 pub(crate) use chord::KeyChord;
+pub(crate) use term::normalize_event;
 
-use crossterm::event::{KeyCode, KeyEvent};
 use std::sync::{Arc, RwLock};
 
 #[derive(Clone)]
@@ -157,7 +158,7 @@ impl Keymap {
     /// is left.
     fn revert_error_conflicts(&mut self) {
         loop {
-            let errors = conflict::detect(self, conflict::Platform::current())
+            let errors = conflict::detect(self, term::current_transport())
                 .into_iter()
                 .filter(|c| c.level == conflict::Level::Error);
             let culprit =
@@ -197,7 +198,7 @@ impl Keymap {
 
     /// Conflicts, warnings and hints for the effective bindings.
     pub(crate) fn conflicts(&self) -> Vec<conflict::Conflict> {
-        conflict::detect(self, conflict::Platform::current())
+        conflict::detect(self, term::current_transport())
     }
 
     /// Every plain character some `nav_prefix` binding uses: those are
@@ -260,55 +261,41 @@ impl Keymap {
             .unwrap_or(&[])
     }
 
-    /// Whether `ev` triggers `action` (any of its chords). Lenient about
-    /// extra modifiers, like the hand-written guards this replaced.
-    pub(crate) fn is(&self, action: Action, ev: &KeyEvent) -> bool {
-        self.chords(action).iter().any(|c| c.matches(ev))
+    /// Whether `chord` (already normalized) triggers `action`, any of its
+    /// chords. Lenient about extra modifiers, like the hand-written guards
+    /// this replaced.
+    pub(crate) fn chord_is(&self, action: Action, chord: KeyChord) -> bool {
+        self.chords(action).iter().any(|c| c.matches_chord(chord))
     }
 
-    /// The action `ev` triggers in `ctx`, if any. An exact chord match
+    /// The action `chord` triggers in `ctx`, if any. An exact chord match
     /// wins over a lenient one, so a `Ctrl+Shift+N` binding beats a
-    /// `Ctrl+N` one for the event that spells both.
-    pub(crate) fn action_in(&self, ctx: Ctx, ev: &KeyEvent) -> Option<Action> {
+    /// `Ctrl+N` one for the chord that spells both. A prefix context looks
+    /// at the key alone: a Ctrl chord bound after the prefix (`Ctrl+G
+    /// Ctrl+P`) matches exactly first, an unbound one falls back to the
+    /// bare key, so holding Ctrl through the second key still works.
+    pub(crate) fn action_for(&self, ctx: Ctx, chord: KeyChord) -> Option<Action> {
         if ctx.ignores_modifiers() {
-            // A prefix table looks at the key code, but a Ctrl chord bound
-            // after the prefix (`Ctrl+G Ctrl+P`) matches exactly first; an
-            // unbound Ctrl+<key> falls back to the bare key, so holding Ctrl
-            // through the second key still works.
-            if ev
-                .modifiers
-                .contains(crossterm::event::KeyModifiers::CONTROL)
-            {
-                let exact =
-                    self.action_in_code_mods(ctx, ev.code, crossterm::event::KeyModifiers::CONTROL);
+            if chord.mods.ctrl {
+                let exact = self.action_exact(ctx, chord);
                 if exact.is_some() {
                     return exact;
                 }
             }
-            return self.action_in_code(ctx, ev.code);
+            return self.action_exact(ctx, chord.bare());
         }
-        let in_ctx = || self.entries.iter().filter(|e| e.ctx == ctx);
-        in_ctx()
-            .find(|e| e.chords.iter().any(|c| c.matches_exact(ev)))
-            .or_else(|| in_ctx().find(|e| e.chords.iter().any(|c| c.matches(ev))))
-            .map(|e| e.action)
+        self.action_exact(ctx, chord).or_else(|| {
+            self.entries
+                .iter()
+                .filter(|e| e.ctx == ctx)
+                .find(|e| e.chords.iter().any(|c| c.matches_chord(chord)))
+                .map(|e| e.action)
+        })
     }
 
-    /// [`Keymap::action_in`] for a bare key code, the form the prefix
-    /// tables (and `chrome::navigation_key_action`) are called with.
-    pub(crate) fn action_in_code(&self, ctx: Ctx, code: KeyCode) -> Option<Action> {
-        self.action_in_code_mods(ctx, code, crossterm::event::KeyModifiers::NONE)
-    }
-
-    /// [`Keymap::action_in_code`] with the modifiers kept (`Shift+Left`
-    /// after the navigation prefix).
-    pub(crate) fn action_in_code_mods(
-        &self,
-        ctx: Ctx,
-        code: KeyCode,
-        modifiers: crossterm::event::KeyModifiers,
-    ) -> Option<Action> {
-        let chord = KeyChord::from_parts(code, modifiers)?;
+    /// The action in `ctx` with a chord of exactly `chord`'s spelling class.
+    fn action_exact(&self, ctx: Ctx, chord: KeyChord) -> Option<Action> {
+        let chord = chord.class();
         self.entries
             .iter()
             .filter(|e| e.ctx == ctx)
@@ -376,37 +363,6 @@ impl Keymap {
             .map(KeyChord::short)
             .unwrap_or_default()
     }
-}
-
-/// The one place AltGr is undone: every terminal event goes through here
-/// right after it is read, before keymap resolution and before any handler
-/// or text field sees it. No configured chord can be `Ctrl+Alt+<non-letter>`
-/// (`ChordError::AltGr` rejects it), so there is no binding for this to
-/// shadow; `Ctrl+Alt+<letter or digit>` chords are left alone.
-pub(crate) fn normalize_event(event: crossterm::event::Event) -> crossterm::event::Event {
-    match event {
-        crossterm::event::Event::Key(key) => crossterm::event::Event::Key(drop_altgr(key)),
-        other => other,
-    }
-}
-
-/// A key typed with AltGr, as the plain character it types.
-///
-/// A Windows console reports AltGr as `CONTROL | ALT`, and on the Swiss and
-/// German layouts `[` `]` `{` `}` `\` `@` need it. A column's own keys
-/// (`[` `]` `0`) would otherwise never reach a keyboard that types `[` that
-/// way. A letter or digit stays a chord: only a real `Ctrl+Alt` makes one.
-pub(crate) fn drop_altgr(mut key: KeyEvent) -> KeyEvent {
-    use crossterm::event::KeyModifiers;
-    let altgr = KeyModifiers::CONTROL | KeyModifiers::ALT;
-    if key.modifiers.contains(altgr) {
-        if let KeyCode::Char(c) = key.code {
-            if !c.is_ascii_alphanumeric() && !c.is_control() {
-                key.modifiers.remove(altgr);
-            }
-        }
-    }
-    key
 }
 
 /// `" (Ctrl+G f)"` for the effective binding of `action`, or `""` when it
@@ -517,57 +473,6 @@ pub(crate) fn current() -> Arc<Keymap> {
         slot.get_or_insert_with(|| km.clone()).clone()
     } else {
         km
-    }
-}
-
-#[cfg(test)]
-mod altgr_tests {
-    use super::drop_altgr;
-    use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
-
-    #[test]
-    fn altgr_brackets_are_plain_but_ctrl_alt_letters_stay_chords() {
-        let altgr = KeyModifiers::CONTROL | KeyModifiers::ALT;
-        let k = drop_altgr(KeyEvent::new(KeyCode::Char(']'), altgr));
-        assert_eq!(k.modifiers, KeyModifiers::NONE);
-        let k = drop_altgr(KeyEvent::new(KeyCode::Char('u'), altgr));
-        assert_eq!(k.modifiers, altgr);
-        let k = drop_altgr(KeyEvent::new(KeyCode::Char(']'), KeyModifiers::ALT));
-        assert_eq!(k.modifiers, KeyModifiers::ALT);
-    }
-
-    #[test]
-    fn normalize_event_only_touches_keys() {
-        use crossterm::event::Event;
-        let altgr = KeyModifiers::CONTROL | KeyModifiers::ALT;
-        for c in ['@', '{', '\\', '[', '~', '|'] {
-            let Event::Key(k) =
-                super::normalize_event(Event::Key(KeyEvent::new(KeyCode::Char(c), altgr)))
-            else {
-                panic!("key stays a key")
-            };
-            assert_eq!(
-                (k.code, k.modifiers),
-                (KeyCode::Char(c), KeyModifiers::NONE)
-            );
-        }
-        let Event::Key(k) =
-            super::normalize_event(Event::Key(KeyEvent::new(KeyCode::Char('o'), altgr)))
-        else {
-            panic!()
-        };
-        assert_eq!(k.modifiers, altgr);
-        assert!(matches!(
-            super::normalize_event(Event::Paste("x".into())),
-            Event::Paste(_)
-        ));
-    }
-
-    #[test]
-    fn no_chord_can_be_ctrl_alt_punctuation_so_none_is_shadowed() {
-        assert!(super::KeyChord::parse("Ctrl+Alt+[").is_err());
-        assert!(super::KeyChord::parse("Ctrl+Alt+@").is_err());
-        assert!(super::KeyChord::parse("Ctrl+Alt+O").is_ok());
     }
 }
 

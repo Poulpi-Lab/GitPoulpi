@@ -15,6 +15,7 @@
 
 use super::*;
 use crate::dialog_kit;
+use crate::keymap::term::TermKeymap;
 use crate::keymap::Action;
 use crate::th;
 use gitpoulpi_i18n::msg::settings_screen as screen;

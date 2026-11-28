@@ -1,9 +1,8 @@
 //! `KeyChord`: one key plus modifiers, parsed from and printed to the
 //! text form used by config files and labels (`Ctrl+Shift+N`, `F2`,
-//! `PageDown`), and built from a crossterm event with the terminal's
-//! spelling quirks normalized away. Pure: no event-loop state.
+//! `PageDown`). Pure and frontend-neutral: the terminal's event types and
+//! their spelling quirks live in `term.rs`.
 
-use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use std::fmt;
 
 /// Modifier set. Only the three that terminals report reliably.
@@ -25,14 +24,6 @@ impl Mods {
         alt: false,
         shift: false,
     };
-
-    fn from_crossterm(m: KeyModifiers) -> Mods {
-        Mods {
-            ctrl: m.contains(KeyModifiers::CONTROL),
-            alt: m.contains(KeyModifiers::ALT),
-            shift: m.contains(KeyModifiers::SHIFT),
-        }
-    }
 
     /// Whether every modifier of `self` is also set in `other`.
     fn subset_of(self, other: Mods) -> bool {
@@ -175,71 +166,9 @@ impl KeyChord {
         Ok(KeyChord { mods, key })
     }
 
-    /// The chord a bare key code spells with no modifier information: an
-    /// uppercase letter is `Shift+<lower>`. Used by the prefix tables, which
-    /// look at `key.code` alone.
-    pub(crate) fn from_code(code: KeyCode) -> Option<KeyChord> {
-        Self::from_parts(code, KeyModifiers::NONE)
-    }
-
-    /// The chord a crossterm event spells, normalized. `None` for a release
-    /// event or a key with no chord form.
-    pub(crate) fn from_event(ev: &KeyEvent) -> Option<KeyChord> {
-        if ev.kind == KeyEventKind::Release {
-            return None;
-        }
-        Self::from_parts(ev.code, ev.modifiers)
-    }
-
-    pub(super) fn from_parts(code: KeyCode, modifiers: KeyModifiers) -> Option<KeyChord> {
-        let mut mods = Mods::from_crossterm(modifiers);
-        let key = match code {
-            KeyCode::Char('\n') => {
-                return Some(KeyChord::new(Mods::CTRL, Key::Enter));
-            }
-            KeyCode::Char('\r') => Key::Enter,
-            KeyCode::Char('\t') => Key::Tab,
-            // Raw control characters: what some terminals hand over
-            // instead of Ctrl+<letter>.
-            KeyCode::Char(c @ '\u{1}'..='\u{1a}') => {
-                mods.ctrl = true;
-                Key::Char((b'a' + (c as u8 - 1)) as char)
-            }
-            KeyCode::Char(' ') => Key::Space,
-            KeyCode::Char(c) => {
-                if c.is_uppercase() {
-                    // Under Ctrl/Alt only the Shift bit says Shift.
-                    if !mods.ctrl && !mods.alt {
-                        mods.shift = true;
-                    }
-                } else if !c.is_alphabetic() {
-                    mods.shift = false;
-                }
-                Key::Char(c.to_lowercase().next().unwrap_or(c))
-            }
-            KeyCode::Enter => Key::Enter,
-            KeyCode::Esc => Key::Esc,
-            KeyCode::Tab => Key::Tab,
-            KeyCode::BackTab => {
-                mods.shift = true;
-                Key::BackTab
-            }
-            KeyCode::Backspace => Key::Backspace,
-            KeyCode::Delete => Key::Delete,
-            KeyCode::Insert => Key::Insert,
-            KeyCode::Home => Key::Home,
-            KeyCode::End => Key::End,
-            KeyCode::PageUp => Key::PageUp,
-            KeyCode::PageDown => Key::PageDown,
-            KeyCode::Up => Key::Up,
-            KeyCode::Down => Key::Down,
-            KeyCode::Left => Key::Left,
-            KeyCode::Right => Key::Right,
-            KeyCode::F(n) => Key::F(n),
-            KeyCode::Menu => Key::Menu,
-            _ => return None,
-        };
-        Some(KeyChord { mods, key }.class())
+    /// The same key with no modifier: what a prefix table looks up.
+    pub(crate) fn bare(self) -> KeyChord {
+        KeyChord::new(Mods::NONE, self.key)
     }
 
     /// The spelling class this chord belongs to: the canonical
@@ -256,26 +185,17 @@ impl KeyChord {
         }
     }
 
-    /// Whether `ev` triggers this binding. Deliberately lenient: the
-    /// binding's modifiers must all be present, extra ones are tolerated
-    /// (`Ctrl+O` still fires for `Ctrl+Shift+O`), and a letter under
-    /// Ctrl/Alt ignores case. Callers with a Shift twin (`Ctrl+Shift+N` over
-    /// `Ctrl+N`) keep the twin's arm first.
-    pub(crate) fn matches(&self, ev: &KeyEvent) -> bool {
-        if ev.kind != KeyEventKind::Press {
-            return false;
-        }
-        self.matches_parts(ev.code, ev.modifiers)
-    }
-
-    pub(crate) fn matches_parts(&self, code: KeyCode, modifiers: KeyModifiers) -> bool {
-        let Some(actual) = Self::from_parts(code, modifiers) else {
-            return false;
-        };
+    /// Whether the chord `actual` (already normalized) triggers this
+    /// binding. Deliberately lenient: the binding's modifiers must all be
+    /// present, extra ones are tolerated (`Ctrl+O` still fires for
+    /// `Ctrl+Shift+O`), and a letter under Ctrl/Alt ignores case. Callers
+    /// with a Shift twin (`Ctrl+Shift+N` over `Ctrl+N`) keep the twin's arm
+    /// first.
+    pub(crate) fn matches_chord(&self, actual: KeyChord) -> bool {
         let want = self.class();
-        // `Shift+Tab` spells itself two ways: `BackTab` (legacy, and
-        // crossterm's decoding of most kitty reports) or `Tab` with Shift.
-        // A `Tab` binding with Shift accepts both.
+        // `Shift+Tab` spells itself two ways: `BackTab` (legacy, and most
+        // kitty-protocol decodings) or `Tab` with Shift. A `Tab` binding
+        // with Shift accepts both.
         let actual = if want.key == Key::Tab && want.mods.shift && actual.key == Key::BackTab {
             KeyChord::new(actual.mods, Key::Tab)
         } else {
@@ -291,11 +211,6 @@ impl KeyChord {
             return want.mods.shift == actual.mods.shift;
         }
         want.mods.subset_of(actual.mods)
-    }
-
-    /// Exact (class-wise) equality with the event's own chord.
-    pub(crate) fn matches_exact(&self, ev: &KeyEvent) -> bool {
-        Self::from_event(ev).is_some_and(|c| c == self.class())
     }
 }
 
@@ -423,18 +338,4 @@ pub(crate) fn commonly_taken_by(chord: KeyChord) -> Option<gitpoulpi_i18n::M> {
         "Ctrl+Tab" | "Ctrl+Shift+Tab" => msg::TAKEN_TERMINAL_TABS,
         _ => return None,
     })
-}
-
-/// The Ctrl+Enter spelling class on a raw event: `Ctrl+Enter`, `Ctrl+J`
-/// (what most Unix terminals send for it) or a bare `'\n'` character.
-pub(crate) fn is_ctrl_enter_class(ev: &KeyEvent) -> bool {
-    match ev.code {
-        KeyCode::Enter => ev.modifiers.contains(KeyModifiers::CONTROL),
-        KeyCode::Char('j') | KeyCode::Char('J') => {
-            ev.modifiers.contains(KeyModifiers::CONTROL)
-                && !ev.modifiers.contains(KeyModifiers::ALT)
-        }
-        KeyCode::Char('\n') => true,
-        _ => false,
-    }
 }

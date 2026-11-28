@@ -35,6 +35,7 @@ pub(crate) mod preview;
 #[cfg(test)]
 mod tests;
 
+use crate::keymap::term::TermKeymap;
 use std::time::Instant;
 
 use crossterm::event::{KeyCode, KeyEvent, MouseButton, MouseEvent, MouseEventKind};

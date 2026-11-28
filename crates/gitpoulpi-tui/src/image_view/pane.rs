@@ -22,6 +22,7 @@
 //! Nothing here mutates the repository, so there is no Undo story: viewing a
 //! file is not a mutation.
 
+use crate::keymap::term::TermKeymap;
 use std::cell::RefCell;
 use std::hash::{Hash, Hasher};
 use std::sync::Arc;

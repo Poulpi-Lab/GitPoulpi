@@ -12,6 +12,7 @@
 //! the walk that paints. It does not depend on the `ai` feature (the ✦
 //! controls never show without it), so it only uses config and session types.
 
+use crate::keymap::term::TermKeymap;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
 use gitpoulpi_config::{AiReviewContext, RepoAiReview, RunInRepo};
 use gitpoulpi_i18n::msg::review_options as msg;

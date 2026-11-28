@@ -52,6 +52,7 @@ mod tools;
 #[cfg(test)]
 mod tests;
 
+use crate::keymap::term::TermKeymap;
 use std::path::PathBuf;
 use std::time::Instant;
 

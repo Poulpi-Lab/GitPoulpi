@@ -4,6 +4,7 @@
 use crate::commit_column::ColumnState;
 use crate::event_loop::*;
 use crate::history_view::{HistoryAction, HistoryHit, HistoryView, Pane, ViewMode, SPLIT_STEP};
+use crate::keymap::term::TermKeymap;
 use gitpoulpi_core::domain::short;
 use gitpoulpi_i18n::msg::history_view as hmsg;
 

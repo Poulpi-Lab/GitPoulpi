@@ -7,6 +7,7 @@
 
 use crate::commit_column::Side;
 use crate::event_loop::*;
+use crate::keymap::term::TermKeymap;
 use crate::keymap::Action as Bind;
 use crate::log_table::{
     move_column, resize_widths, step_pick, visible_in_order, LogColumnCmd, KEY_STEP,

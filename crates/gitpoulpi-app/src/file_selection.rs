@@ -16,7 +16,7 @@ use std::path::{Path, PathBuf};
 
 /// Which file list a selection belongs to.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum FileList {
+pub enum FileList {
     Unstaged,
     Staged,
     /// The selected commit's changed files (and its View all files tree).
@@ -27,17 +27,17 @@ pub(crate) enum FileList {
 
 /// One row of a list as the selection sees it.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct SelRow {
-    pub(crate) path: PathBuf,
-    pub(crate) folder: bool,
+pub struct SelRow {
+    pub path: PathBuf,
+    pub folder: bool,
 }
 
 /// What the selection reads from a list: its rows in display order and
 /// every file it holds (folders select files that are not on screen).
 #[derive(Debug, Clone, Default)]
-pub(crate) struct ListRows {
-    pub(crate) rows: Vec<SelRow>,
-    pub(crate) files: Vec<PathBuf>,
+pub struct ListRows {
+    pub rows: Vec<SelRow>,
+    pub files: Vec<PathBuf>,
 }
 
 impl ListRows {
@@ -47,7 +47,7 @@ impl ListRows {
 }
 
 #[derive(Debug, Default, Clone)]
-pub(crate) struct FileSelection {
+pub struct FileSelection {
     list: Option<FileList>,
     files: HashSet<PathBuf>,
     folders: HashSet<PathBuf>,
@@ -56,21 +56,21 @@ pub(crate) struct FileSelection {
 
 impl FileSelection {
     /// How many files are selected (folders count their files).
-    pub(crate) fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.files.len()
     }
 
-    pub(crate) fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.files.is_empty() && self.folders.is_empty()
     }
 
     /// The list the selection belongs to, when there is one.
-    pub(crate) fn list(&self) -> Option<FileList> {
+    pub fn list(&self) -> Option<FileList> {
         self.list.filter(|_| !self.is_empty())
     }
 
     /// Whether the row `path` of `list` is highlighted as selected.
-    pub(crate) fn contains(&self, list: FileList, path: &Path, folder: bool) -> bool {
+    pub fn contains(&self, list: FileList, path: &Path, folder: bool) -> bool {
         self.list == Some(list)
             && if folder {
                 self.folders.contains(path)
@@ -79,7 +79,7 @@ impl FileSelection {
             }
     }
 
-    pub(crate) fn clear(&mut self) {
+    pub fn clear(&mut self) {
         self.files.clear();
         self.folders.clear();
         self.anchor = None;
@@ -120,7 +120,7 @@ impl FileSelection {
 
     /// A plain click: forget the selection, remember where a following
     /// Shift+click should start from.
-    pub(crate) fn reset_to(&mut self, list: FileList, anchor: Option<PathBuf>) {
+    pub fn reset_to(&mut self, list: FileList, anchor: Option<PathBuf>) {
         self.clear();
         self.list = Some(list);
         self.anchor = anchor;
@@ -129,7 +129,7 @@ impl FileSelection {
     /// Ctrl+click / Space: flips row `at`. The row the cursor was on joins
     /// the selection the moment a second one is added, the way Ctrl+click
     /// extends what is already highlighted.
-    pub(crate) fn toggle(
+    pub fn toggle(
         &mut self,
         list: FileList,
         rows: &ListRows,
@@ -153,7 +153,7 @@ impl FileSelection {
 
     /// Shift+click / Shift+Up/Down: every row between the anchor (or the
     /// cursor when there is none yet) and `target`.
-    pub(crate) fn extend_to(
+    pub fn extend_to(
         &mut self,
         list: FileList,
         rows: &ListRows,
@@ -185,7 +185,7 @@ impl FileSelection {
     }
 
     /// Selects every file of the list.
-    pub(crate) fn select_all(&mut self, list: FileList, rows: &ListRows) {
+    pub fn select_all(&mut self, list: FileList, rows: &ListRows) {
         self.clear();
         self.list = Some(list);
         for row in &rows.rows {
@@ -196,7 +196,7 @@ impl FileSelection {
 
     /// The selected files, in the list's own order (the files the list
     /// holds first, so a path that left the list is dropped).
-    pub(crate) fn files_in_order(&self, rows: &ListRows) -> Vec<PathBuf> {
+    pub fn files_in_order(&self, rows: &ListRows) -> Vec<PathBuf> {
         rows.files
             .iter()
             .filter(|f| self.files.contains(*f))

@@ -153,7 +153,7 @@ mod editor_prefs;
 mod external_tools;
 #[cfg(any(all(feature = "hosting", feature = "review"), feature = "ai"))]
 mod file_browse;
-mod file_selection;
+pub(crate) use gitpoulpi_app::file_selection;
 mod file_view;
 mod flow;
 mod fold_mark;

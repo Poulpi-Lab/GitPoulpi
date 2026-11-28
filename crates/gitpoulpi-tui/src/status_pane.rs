@@ -12,7 +12,7 @@ use gitpoulpi_i18n::msg::status_pane as msg;
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
-use gitpoulpi_core::domain::{ConflictSide, FileStatus, StatusEntry, WorkingTree};
+use gitpoulpi_core::domain::{ConflictSide, FileStatus, WorkingTree};
 
 use crate::context_menu::Entry;
 
@@ -340,54 +340,18 @@ pub(crate) fn all_folders(paths: &[PathBuf]) -> HashSet<PathBuf> {
     out
 }
 
-/// Whether this row is an unmerged path: a file git holds at stages 1/2/3
-/// rather than stage 0.
-///
-/// Porcelain v2 reports an unmerged path with BOTH columns set (`u` records
-/// become `index: Conflicted, worktree: Conflicted`, see the cli backend's
-/// `status.rs`), so the naive per-column split below would list the same
-/// conflicted file in Unstaged *and* Staged at once.
-pub(crate) fn entry_is_conflicted(entry: &StatusEntry) -> bool {
-    entry.index == Some(FileStatus::Conflicted) || entry.worktree == Some(FileStatus::Conflicted)
-}
+pub(crate) use gitpoulpi_app::status_rows::entry_status;
 
-/// Splits the working tree into the two sections. A file that is
-/// both staged and further modified appears in both, which is why this
-/// returns paths per section instead of partitioning.
-///
-/// A *conflicted* file is the exception: it is pinned to the Unstaged half
-/// alone. It has work left to do, "unstage this conflict" is not a
-/// `GitBackend` operation, and listing it twice would show Take Ours / Take
-/// Theirs rows in a section where they read as already-resolved.
+/// Splits the working tree into the two sections (the rule is
+/// `gitpoulpi_app::status_rows::section_paths_hiding`); an unstaged move is
+/// one row, at the new path, so its old path is hidden (`rename_pairs`).
 pub(crate) fn section_paths(tree: &WorkingTree, section: StatusSection) -> Vec<PathBuf> {
-    // An unstaged move is one row, at the new path: the deleted file it
-    // came from is not listed on its own (`rename_pairs`).
     let pairs = crate::rename_pairs::RenamePairs::of(tree);
-    let hidden: std::collections::HashSet<&Path> = match section {
+    let hidden: HashSet<&Path> = match section {
         StatusSection::Unstaged => pairs.hidden_unstaged_sources(),
         StatusSection::Staged => Default::default(),
     };
-    tree.files
-        .iter()
-        .filter(|f| match section {
-            StatusSection::Staged => f.index.is_some() && !entry_is_conflicted(f),
-            StatusSection::Unstaged => f.worktree.is_some() && !hidden.contains(f.path.as_path()),
-        })
-        .map(|f| f.path.clone())
-        .collect()
-}
-
-/// The status a row should show: the index status in the staged section,
-/// the worktree status in the unstaged one.
-pub(crate) fn entry_status(entry: &StatusEntry, section: StatusSection) -> Option<FileStatus> {
-    match section {
-        StatusSection::Staged => entry.index,
-        // The new side of an unstaged move reads as a rename, not as a new file.
-        StatusSection::Unstaged if entry.renamed_from.is_some() && entry.index.is_none() => {
-            Some(FileStatus::Renamed)
-        }
-        StatusSection::Unstaged => entry.worktree,
-    }
+    gitpoulpi_app::status_rows::section_paths_hiding(tree, section, &hidden)
 }
 
 /// Single-character marker per status, for the gutter: a small
@@ -759,31 +723,12 @@ pub(crate) fn unstaged_paths_under(tree: &WorkingTree, folder: &Path) -> Vec<Pat
         .collect()
 }
 
-/// The confirm modal's prompt for discarding `paths`: the total count and,
-/// when any are untracked, how many ("Discard 12 files (3 untracked)?").
-/// Untracked is read from each path's Unstaged status in `tree`, not
-/// assumed, since a caller could be asked to discard a path this working
-/// tree no longer has an entry for (a race with another client).
-pub(crate) fn discard_confirmation_prompt(tree: &WorkingTree, paths: &[PathBuf]) -> String {
-    let untracked = paths
-        .iter()
-        .filter(|p| {
-            tree.files
-                .iter()
-                .any(|f| &f.path == *p && matches!(f.worktree, Some(FileStatus::Untracked)))
-        })
-        .count();
-    let n = paths.len() as u64;
-    if untracked == 0 {
-        msg::discard_prompt(n)
-    } else {
-        msg::discard_prompt_untracked(n, untracked)
-    }
-}
+pub(crate) use gitpoulpi_app::status_rows::discard_confirmation_prompt;
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use gitpoulpi_core::domain::StatusEntry;
 
     fn paths(list: &[&str]) -> Vec<PathBuf> {
         list.iter().map(PathBuf::from).collect()

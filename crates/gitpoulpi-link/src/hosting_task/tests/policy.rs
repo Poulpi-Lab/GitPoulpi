@@ -102,7 +102,29 @@ fn a_burst_of_ref_changes_is_debounced_then_retried() {
 
 #[test]
 fn the_signature_follows_head_and_remote_tracking_refs_only() {
-    use crate::test_support::{local_branch_at, oid, remote_branch_at};
+    use gitpoulpi_core::domain::Oid;
+    use gitpoulpi_core::domain::{RefKind, RefVisibility};
+    let oid = |n: u8| Oid([n; 20]);
+    let branch = |kind: RefKind, target: Oid| Ref {
+        kind,
+        target,
+        visibility: RefVisibility::Shown,
+        is_head: false,
+        upstream: None,
+        tag_sync: None,
+        multi_remote: None,
+    };
+    let local_branch_at =
+        |name: &str, target: Oid| branch(RefKind::LocalBranch { name: name.into() }, target);
+    let remote_branch_at = |remote: &str, name: &str, target: Oid| {
+        branch(
+            RefKind::RemoteBranch {
+                remote: remote.into(),
+                name: name.into(),
+            },
+            target,
+        )
+    };
     let local = |name: &str, head: bool, n: u8| {
         let mut r = local_branch_at(name, oid(n));
         r.is_head = head;

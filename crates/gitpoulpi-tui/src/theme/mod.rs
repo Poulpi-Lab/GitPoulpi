@@ -31,7 +31,8 @@ pub(crate) const AI_SPARK: &str = "\u{2726}";
 /// The named presets of `ui.input_color`, in the order the Settings
 /// combo lists them. `theme` (the default) follows the active theme;
 /// `custom` is the last: it reads `ui.input_color_custom`.
-pub(crate) const INPUT_PRESETS: &[&str] = &["theme", "gray", "blue", "slate", "dark", "custom"];
+#[cfg(test)]
+pub(crate) use gitpoulpi_app::settings::INPUT_PRESETS;
 
 /// Resting input background of a preset (the `custom` entry has none).
 pub(crate) fn input_preset_rgb(name: &str) -> Option<(u8, u8, u8)> {

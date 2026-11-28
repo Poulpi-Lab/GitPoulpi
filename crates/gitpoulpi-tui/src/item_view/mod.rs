@@ -32,9 +32,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
 
-use gitpoulpi_config::Integration;
 use gitpoulpi_hosting::conversation::{ItemKey, ItemKind};
-use gitpoulpi_hosting::refs::RefContext;
 use ratatui::layout::Rect;
 
 use crate::combo::Combo;
@@ -51,29 +49,21 @@ use crate::md_render;
 /// conditional request cheaply (GitHub, GitLab, Gitea).
 pub(crate) const AUTO_REFRESH: Duration = Duration::from_secs(60);
 
-/// What the view opens on.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct ItemTarget {
-    pub(crate) integration: Integration,
-    /// Every profile (the token source reads them all).
-    pub(crate) all: Vec<Integration>,
-    pub(crate) project: String,
-    pub(crate) key: ItemKey,
-    /// What a human types for it (`#142`, `ABC-12`): the title until the
-    /// header arrives.
-    pub(crate) reference: String,
-    pub(crate) title: String,
-    pub(crate) web_url: String,
-    /// The repository the work tree belongs to; `None`: no clone (a commit
-    /// link then opens on the host).
-    pub(crate) repo_root: Option<PathBuf>,
-    /// The repository's linked ISSUES and PULLS sources: what `#N` means.
-    pub(crate) bases: RefContext,
+pub(crate) use gitpoulpi_link::item_target::ItemTarget;
+
+/// The terminal view's half of an [`ItemTarget`]: what needs the terminal
+/// UI's markdown context, conversation worker or editor drafts.
+pub(crate) trait ItemTargetExt {
+    fn md_context(&self) -> md_render::Context;
+    fn source(&self) -> Source;
+    /// The state file of the repository, when there is one.
+    fn state_path(&self) -> Option<PathBuf>;
+    fn draft_key(&self) -> String;
+    fn reply_draft_key(&self, discussion: &str) -> String;
 }
 
-impl ItemTarget {
-    /// What `#N`, `!N`, mentions and commit ids in the item's text mean.
-    pub(crate) fn md_context(&self) -> md_render::Context {
+impl ItemTargetExt for ItemTarget {
+    fn md_context(&self) -> md_render::Context {
         md_render::Context {
             xrefs: gitpoulpi_hosting::xrefs::XrefContext {
                 family: Some(self.integration.kind.family()),
@@ -111,18 +101,6 @@ impl ItemTarget {
         })
     }
 
-    fn seen_key(&self) -> String {
-        gitpoulpi_session::conversation_key(
-            &self.integration.id,
-            &self.project,
-            match self.key.kind {
-                ItemKind::Issue => "issue",
-                ItemKind::PullRequest => "request",
-            },
-            self.key.number,
-        )
-    }
-
     fn draft_key(&self) -> String {
         crate::md_editor::draft::key(&[
             &self.integration.id,
@@ -140,19 +118,6 @@ impl ItemTarget {
             "reply",
             discussion,
         ])
-    }
-
-    /// Whether a change the host announced is about this item.
-    fn is(&self, change: &gitpoulpi_ipc::HostingChangeArgs) -> bool {
-        use gitpoulpi_ipc::HostingItemKind as K;
-        change.integration_id == self.integration.id
-            && change.project == self.project
-            && change.number == self.key.number
-            && matches!(
-                (change.kind, self.key.kind),
-                (K::Issue, ItemKind::Issue) | (K::PullRequest, ItemKind::PullRequest)
-            )
-            && (change.id.is_empty() || self.key.id.is_empty() || change.id == self.key.id)
     }
 }
 

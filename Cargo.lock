@@ -1513,11 +1513,13 @@ dependencies = [
 name = "gitpoulpi-link"
 version = "1.3.0"
 dependencies = [
+ "async-trait",
  "gitpoulpi-app",
  "gitpoulpi-cli-backend",
  "gitpoulpi-config",
  "gitpoulpi-core",
  "gitpoulpi-daemon",
+ "gitpoulpi-hosting",
  "gitpoulpi-i18n",
  "gitpoulpi-ipc",
  "gitpoulpi-link",

@@ -158,26 +158,6 @@ struct Other {
     effective: Effective,
 }
 
-fn is_template_match(reason: &str, template: &str) -> bool {
-    // `template` has `\0` where the name goes.
-    match template.split_once('\0') {
-        Some((pre, post)) => {
-            reason.len() >= pre.len() + post.len()
-                && reason.starts_with(pre)
-                && reason.ends_with(post)
-        }
-        None => reason == template,
-    }
-}
-
-/// Whether `reason` is one of these rows' own notes (shown as is).
-pub(super) fn is_note(reason: &str) -> bool {
-    [t::NAME_PRIMARY, t::SUBMENU_UNAVAILABLE]
-        .iter()
-        .any(|m| m.get() == reason)
-        || is_template_match(reason, &t::alias_used_by("\0"))
-}
-
 /// The row of the installation's path, which gives way in its middle.
 const INFO: &str = "installation.info";
 

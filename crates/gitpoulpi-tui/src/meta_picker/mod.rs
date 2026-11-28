@@ -51,16 +51,7 @@ pub(crate) const SPIN_AFTER: Duration = Duration::from_millis(150);
 /// the local Markdown source: nothing about metadata shows for any other
 /// provider.
 pub(crate) fn supports(kind: gitpoulpi_config::IntegrationKind) -> bool {
-    matches!(
-        kind.family(),
-        gitpoulpi_config::ApiFamily::Github
-            | gitpoulpi_config::ApiFamily::Gitlab
-            | gitpoulpi_config::ApiFamily::Gitea
-            | gitpoulpi_config::ApiFamily::Linear
-            | gitpoulpi_config::ApiFamily::YouTrack
-            | gitpoulpi_config::ApiFamily::Redmine
-            | gitpoulpi_config::ApiFamily::LocalMarkdown
-    )
+    gitpoulpi_app::provider_caps::supports_metadata(kind)
 }
 
 /// Whether `field` can be edited on this provider: everything that takes

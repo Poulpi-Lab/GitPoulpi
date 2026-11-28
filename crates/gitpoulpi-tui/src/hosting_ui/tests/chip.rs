@@ -68,7 +68,7 @@ fn a_chip_from_another_branch_is_hidden_until_the_refresh_lands() {
 
 #[test]
 fn the_chip_decision_by_state_and_setting() {
-    use crate::hosting_ui::rows::chip_visible;
+    use crate::hosting_ui::chip_visible;
     for (state, hidden_when_on) in [
         (PullRequestState::Open, false),
         (PullRequestState::Draft, false),

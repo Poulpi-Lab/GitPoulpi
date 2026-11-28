@@ -41,7 +41,7 @@ use serde::{Deserialize, Serialize};
 /// "Awaiting my review") is the sidebar's four groups, sorted client-side.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub(crate) enum PrView {
+pub enum PrView {
     // Older caches said `mine` / `review_requested`: those are groups now.
     #[default]
     #[serde(alias = "mine", alias = "review_requested")]
@@ -52,9 +52,9 @@ pub(crate) enum PrView {
 }
 
 impl PrView {
-    pub(crate) const ALL: [PrView; 3] = [PrView::Open, PrView::Closed, PrView::All];
+    pub const ALL: [PrView; 3] = [PrView::Open, PrView::Closed, PrView::All];
 
-    pub(crate) fn label(self) -> &'static str {
+    pub fn label(self) -> &'static str {
         match self {
             PrView::Open => msg::hosting_task::VIEW_OPEN.get(),
             PrView::Closed => msg::hosting_task::VIEW_MERGED_CLOSED.get(),
@@ -62,7 +62,7 @@ impl PrView {
         }
     }
 
-    pub(crate) fn filter(self) -> PrFilter {
+    pub fn filter(self) -> PrFilter {
         PrFilter {
             state: match self {
                 PrView::Open => StateFilter::Open,
@@ -77,7 +77,7 @@ impl PrView {
 /// Which issues the sidebar list shows.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub(crate) enum IssueView {
+pub enum IssueView {
     #[default]
     Open,
     Assigned,
@@ -86,14 +86,14 @@ pub(crate) enum IssueView {
 }
 
 impl IssueView {
-    pub(crate) const ALL: [IssueView; 4] = [
+    pub const ALL: [IssueView; 4] = [
         IssueView::Open,
         IssueView::Assigned,
         IssueView::Closed,
         IssueView::All,
     ];
 
-    pub(crate) fn label(self) -> &'static str {
+    pub fn label(self) -> &'static str {
         match self {
             IssueView::Open => msg::hosting_task::VIEW_ISSUE_OPEN.get(),
             IssueView::Assigned => msg::hosting_task::VIEW_ASSIGNED.get(),
@@ -102,7 +102,7 @@ impl IssueView {
         }
     }
 
-    pub(crate) fn filter(self) -> IssueFilter {
+    pub fn filter(self) -> IssueFilter {
         match self {
             IssueView::Open => IssueFilter::default(),
             IssueView::Assigned => IssueFilter {
@@ -123,7 +123,7 @@ impl IssueView {
 
 /// Why the last fetch did not (fully) work.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub(crate) enum Problem {
+pub enum Problem {
     /// The profile has no usable token.
     NoToken,
     /// The host rejected the token (401) or the token lacks a scope (403):
@@ -139,7 +139,7 @@ pub(crate) enum Problem {
 }
 
 impl Problem {
-    pub(crate) fn from_error(err: &HostingError) -> Self {
+    pub fn from_error(err: &HostingError) -> Self {
         match err {
             HostingError::NoToken { .. } => Problem::NoToken,
             HostingError::Unauthorized { .. } | HostingError::Forbidden { .. } => {
@@ -152,20 +152,34 @@ impl Problem {
     }
 
     /// The problems a reconnect fixes.
-    pub(crate) fn wants_reconnect(&self) -> bool {
+    pub fn wants_reconnect(&self) -> bool {
         matches!(self, Problem::NoToken | Problem::Reconnect(_))
     }
 }
 
 /// "could not start the request task", for the worker threads' runtimes.
-pub(crate) fn request_task_failed(err: impl std::fmt::Display) -> String {
+pub fn request_task_failed(err: impl std::fmt::Display) -> String {
     msg::hosting_task::request_task_failed(err)
+}
+
+/// Where [`error_text`] reports the kind of failure behind a text, so the
+/// frontend's failure card can still tell a rejected token from a network
+/// error once the text went through a string channel.
+static FAILURE_KIND_HOOK: std::sync::OnceLock<fn(&str, gitpoulpi_core::FailureKind)> =
+    std::sync::OnceLock::new();
+
+/// Installs the sink [`error_text`] calls with `(text, kind)` for an
+/// authentication or network failure. A frontend installs it once at start up
+/// (the terminal UI forwards it to its Activity log); without one the kind is
+/// simply not remembered.
+pub fn install_failure_kind_hook(hook: fn(&str, gitpoulpi_core::FailureKind)) {
+    let _ = FAILURE_KIND_HOOK.set(hook);
 }
 
 /// A hosting error as the user reads it, in the display language. The host's
 /// own `detail` text stays as the host wrote it. Anything without a message of
 /// its own keeps the (English) text of the shared hosting crate.
-pub(crate) fn error_text(err: &HostingError) -> String {
+pub fn error_text(err: &HostingError) -> String {
     let text = error_words(err);
     // The text goes through string channels: keep how it reads for the
     // failure card (a rejected token offers Open Integrations).
@@ -177,7 +191,10 @@ pub(crate) fn error_text(err: &HostingError) -> String {
         _ => None,
     };
     if let Some(kind) = kind {
-        crate::activity_log::remember_kind(&text, kind);
+        let hook = FAILURE_KIND_HOOK.get().copied();
+        if let Some(remember) = hook {
+            remember(&text, kind);
+        }
     }
     text
 }
@@ -218,113 +235,113 @@ fn wait_text(secs: u64) -> String {
 
 /// What the worker needs to answer for one repository.
 #[derive(Debug, Clone)]
-pub(crate) struct HostingRequest {
-    pub(crate) remotes: Vec<ResolveRemote>,
-    pub(crate) integrations: Vec<Integration>,
+pub struct HostingRequest {
+    pub remotes: Vec<ResolveRemote>,
+    pub integrations: Vec<Integration>,
     /// `RepoState::hosting_integration`.
-    pub(crate) override_id: Option<String>,
+    pub override_id: Option<String>,
     /// The checked-out local branch, for the linked-PR chip.
-    pub(crate) head_branch: Option<String>,
-    pub(crate) pr_view: PrView,
-    pub(crate) issue_view: IssueView,
+    pub head_branch: Option<String>,
+    pub pr_view: PrView,
+    pub issue_view: IssueView,
     /// `RepoState::issues_source`: the provider and project the ISSUES
     /// section was pointed at, if the user chose one.
-    pub(crate) issues_source: Option<gitpoulpi_session::IssuesSource>,
+    pub issues_source: Option<gitpoulpi_session::IssuesSource>,
     /// `RepoState::pulls_source`: the same choice for PULL REQUESTS. With
     /// neither this nor `override_id` the section is unlinked.
-    pub(crate) pulls_source: Option<gitpoulpi_session::IssuesSource>,
+    pub pulls_source: Option<gitpoulpi_session::IssuesSource>,
     /// The repository's folder: its stored hosting settings (a token command
     /// for the host calls, blocked assignment) apply to its project. Empty
     /// when the request is not about one repository.
-    pub(crate) repo_root: PathBuf,
+    pub repo_root: PathBuf,
 }
 
 /// A remote's proposal to link the repository (never applied on its own).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub(crate) struct SuggestionRef {
-    pub(crate) profile: ProfileRef,
-    pub(crate) remote: String,
-    pub(crate) project: String,
+pub struct SuggestionRef {
+    pub profile: ProfileRef,
+    pub remote: String,
+    pub project: String,
 }
 
 /// A profile as the sidebar's dropdowns name it.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub(crate) struct ProfileRef {
-    pub(crate) id: String,
-    pub(crate) label: String,
-    pub(crate) kind: IntegrationKind,
+pub struct ProfileRef {
+    pub id: String,
+    pub label: String,
+    pub kind: IntegrationKind,
 }
 
 /// Where the ISSUES section reads from.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub(crate) struct IssuesTarget {
-    pub(crate) profile: ProfileRef,
+pub struct IssuesTarget {
+    pub profile: ProfileRef,
     /// The provider's repository/project; empty until one is chosen.
-    pub(crate) project: String,
+    pub project: String,
     /// Chosen by the user (kept in the repo state), not derived from the
     /// remote.
-    pub(crate) chosen: bool,
+    pub chosen: bool,
 }
 
 /// The worker's answer, and what is cached on disk between sessions.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(crate) struct HostingSnapshot {
+pub struct HostingSnapshot {
     /// The profile that answered; `None` when no profile matches the
     /// repository's remotes (then nothing is shown at all).
-    pub(crate) profile_id: Option<String>,
-    pub(crate) profile_label: String,
-    pub(crate) kind: Option<IntegrationKind>,
+    pub profile_id: Option<String>,
+    pub profile_label: String,
+    pub kind: Option<IntegrationKind>,
     /// The remote the project path was read from.
-    pub(crate) remote: String,
-    pub(crate) project: String,
-    pub(crate) can_pulls: bool,
-    pub(crate) can_issues: bool,
-    pub(crate) prs: Vec<PullRequestSummary>,
-    pub(crate) issues: Vec<IssueSummary>,
+    pub remote: String,
+    pub project: String,
+    pub can_pulls: bool,
+    pub can_issues: bool,
+    pub prs: Vec<PullRequestSummary>,
+    pub issues: Vec<IssueSummary>,
     /// The open requests that mention the signed-in user, and the issues
     /// (the Radar's "Mentioning me" group); empty unless it asked.
     #[serde(default)]
-    pub(crate) prs_mentioned: Vec<PullRequestSummary>,
+    pub prs_mentioned: Vec<PullRequestSummary>,
     #[serde(default)]
-    pub(crate) issues_mentioned: Vec<IssueSummary>,
+    pub issues_mentioned: Vec<IssueSummary>,
     /// The request that represents `head_branch`.
-    pub(crate) head_pr: Option<PullRequestSummary>,
-    pub(crate) head_branch: Option<String>,
-    pub(crate) pr_view: PrView,
-    pub(crate) issue_view: IssueView,
+    pub head_pr: Option<PullRequestSummary>,
+    pub head_branch: Option<String>,
+    pub pr_view: PrView,
+    pub issue_view: IssueView,
     /// The signed-in user's login on the linked profile (for the "My" and
     /// "Assigned to me" groups); empty when unknown.
     #[serde(default)]
-    pub(crate) me: String,
+    pub me: String,
     /// Every profile an issue tracker can be picked from.
     #[serde(default)]
-    pub(crate) issue_profiles: Vec<ProfileRef>,
+    pub issue_profiles: Vec<ProfileRef>,
     #[serde(default)]
-    pub(crate) issues_target: Option<IssuesTarget>,
+    pub issues_target: Option<IssuesTarget>,
     /// Every profile a pull-request source can be picked from.
     #[serde(default)]
-    pub(crate) pull_profiles: Vec<ProfileRef>,
+    pub pull_profiles: Vec<ProfileRef>,
     /// Where the PULL REQUESTS section reads from, once the user picked it;
     /// the project is empty until the repository is chosen.
     #[serde(default)]
-    pub(crate) pulls_target: Option<IssuesTarget>,
+    pub pulls_target: Option<IssuesTarget>,
     /// The providers matching the repository's remotes, `origin` first:
     /// offered in the provider dropdowns, never linked automatically.
     #[serde(default)]
-    pub(crate) suggestions: Vec<SuggestionRef>,
+    pub suggestions: Vec<SuggestionRef>,
     /// Why the issues could not be read (separate from the pull requests':
     /// they may come from another profile).
     #[serde(default)]
-    pub(crate) issues_problem: Option<Problem>,
+    pub issues_problem: Option<Problem>,
     /// Several profiles matched and none is pinned for this repository.
-    pub(crate) ambiguous: bool,
+    pub ambiguous: bool,
     /// Unix seconds.
-    pub(crate) fetched_at: i64,
-    pub(crate) problem: Option<Problem>,
+    pub fetched_at: i64,
+    pub problem: Option<Problem>,
 }
 
 impl HostingSnapshot {
-    pub(crate) fn empty(now: i64, req: &HostingRequest) -> Self {
+    pub fn empty(now: i64, req: &HostingRequest) -> Self {
         Self {
             profile_id: None,
             profile_label: String::new(),
@@ -355,14 +372,14 @@ impl HostingSnapshot {
     }
 
     /// True when a profile answers for this repository.
-    pub(crate) fn linked(&self) -> bool {
+    pub fn linked(&self) -> bool {
         self.profile_id.is_some()
     }
 }
 
 /// Builds a client for a profile. Production reads the token through the
 /// credential helper and talks over `reqwest`; tests hand back a fake.
-pub(crate) trait ClientFactory: Send + Sync {
+pub trait ClientFactory: Send + Sync {
     fn client(
         &self,
         integration: &Integration,
@@ -371,12 +388,11 @@ pub(crate) trait ClientFactory: Send + Sync {
 
     /// A new round of fetches begins: whatever the factory kept between
     /// two clients (a token read once) is read again.
-    #[cfg_attr(not(feature = "radar"), allow(dead_code))]
     fn new_round(&self) {}
 }
 
 /// The real thing.
-pub(crate) struct DefaultFactory;
+pub struct DefaultFactory;
 
 impl ClientFactory for DefaultFactory {
     fn client(
@@ -418,15 +434,13 @@ fn build_client(
 /// Radar round builds up to four clients per repository for the same few
 /// profiles: the lookups are made once per profile and round, one at a time.
 /// A failed lookup is not remembered.
-#[cfg_attr(not(feature = "radar"), allow(dead_code))]
 #[derive(Default)]
-pub(crate) struct TokenMemo {
+pub struct TokenMemo {
     tokens: Mutex<HashMap<String, String>>,
 }
 
-#[cfg_attr(not(feature = "radar"), allow(dead_code))]
 impl TokenMemo {
-    pub(crate) fn get(
+    pub fn get(
         &self,
         id: &str,
         load: impl FnOnce() -> gitpoulpi_hosting::Result<String>,
@@ -440,7 +454,7 @@ impl TokenMemo {
         Ok(token)
     }
 
-    pub(crate) fn clear(&self) {
+    pub fn clear(&self) {
         self.tokens
             .lock()
             .unwrap_or_else(|e| e.into_inner())
@@ -450,9 +464,8 @@ impl TokenMemo {
 
 /// The Radar's factory: [`DefaultFactory`] with the tokens remembered for
 /// the length of a round.
-#[cfg_attr(not(feature = "radar"), allow(dead_code))]
 #[derive(Default)]
-pub(crate) struct RadarFactory {
+pub struct RadarFactory {
     tokens: TokenMemo,
 }
 
@@ -474,7 +487,7 @@ impl ClientFactory for RadarFactory {
 }
 
 /// Seconds since the Unix epoch.
-pub(crate) fn unix_now() -> i64 {
+pub fn unix_now() -> i64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.as_secs() as i64)
@@ -482,7 +495,7 @@ pub(crate) fn unix_now() -> i64 {
 }
 
 /// `"just now"`, `"5m"`, `"3h"`, `"2d"` - how stale a cached list is.
-pub(crate) fn age_label(now: i64, then: i64) -> String {
+pub fn age_label(now: i64, then: i64) -> String {
     let secs = (now - then).max(0);
     match secs {
         0..=59 => msg::reltime::JUST_NOW.get().to_string(),
@@ -495,7 +508,7 @@ pub(crate) fn age_label(now: i64, then: i64) -> String {
 /// An issue source that is a folder of notes (relative to the repository)
 /// read against `repo_root`, so the worker and every call after it see an
 /// absolute path. Other sources pass through.
-pub(crate) fn resolve_local_source(
+pub fn resolve_local_source(
     repo_root: &Path,
     integrations: &[Integration],
     source: Option<gitpoulpi_session::IssuesSource>,
@@ -533,7 +546,7 @@ fn profile_label(integration: &Integration) -> String {
 /// section, the issues from the ones picked in ISSUES (both kept per
 /// repository). Unpicked means unlinked and nothing is fetched: the
 /// remotes only *suggest* providers (`snap.suggestions`), they never link.
-pub(crate) fn fetch_snapshot(
+pub fn fetch_snapshot(
     req: &HostingRequest,
     factory: &dyn ClientFactory,
     runtime: &tokio::runtime::Runtime,
@@ -547,7 +560,7 @@ pub(crate) fn fetch_snapshot(
             let caps = i.kind.capabilities();
             i.enabled
                 && caps.implemented
-                && crate::build_features::kind_built(i.kind)
+                && gitpoulpi_app::features::kind_built(i.kind)
                 && caps.issues
         })
         .map(|i| ProfileRef {
@@ -563,7 +576,7 @@ pub(crate) fn fetch_snapshot(
             let caps = i.kind.capabilities();
             i.enabled
                 && caps.implemented
-                && crate::build_features::kind_built(i.kind)
+                && gitpoulpi_app::features::kind_built(i.kind)
                 && caps.pull_requests
         })
         .map(|i| ProfileRef {
@@ -672,10 +685,10 @@ pub(crate) fn fetch_snapshot(
                 .map(|u| u.login.clone())
                 .unwrap_or_default();
             snap.can_pulls = caps.implemented
-                && crate::build_features::kind_built(integration.kind)
+                && gitpoulpi_app::features::kind_built(integration.kind)
                 && caps.pull_requests;
             snap.can_issues = caps.implemented
-                && crate::build_features::kind_built(integration.kind)
+                && gitpoulpi_app::features::kind_built(integration.kind)
                 && caps.issues;
             if snap.can_pulls {
                 pulls_job = pulls_job_of(&mut snap, req, integration, factory);
@@ -899,13 +912,13 @@ async fn issues_part(job: &IssuesJob) -> IssuesOut {
 }
 
 /// The thread and its two channels.
-pub(crate) struct HostingWorker {
+pub struct HostingWorker {
     tx: mpsc::Sender<HostingRequest>,
     rx: mpsc::Receiver<HostingSnapshot>,
 }
 
 impl HostingWorker {
-    pub(crate) fn spawn(factory: Arc<dyn ClientFactory>) -> Self {
+    pub fn spawn(factory: Arc<dyn ClientFactory>) -> Self {
         let (tx, req_rx) = mpsc::channel::<HostingRequest>();
         let (snap_tx, rx) = mpsc::channel::<HostingSnapshot>();
         std::thread::spawn(move || {
@@ -929,11 +942,11 @@ impl HostingWorker {
         Self { tx, rx }
     }
 
-    pub(crate) fn request(&self, req: HostingRequest) {
+    pub fn request(&self, req: HostingRequest) {
         let _ = self.tx.send(req);
     }
 
-    pub(crate) fn try_recv(&self) -> Option<HostingSnapshot> {
+    pub fn try_recv(&self) -> Option<HostingSnapshot> {
         self.rx.try_recv().ok()
     }
 }
@@ -942,7 +955,7 @@ impl HostingWorker {
 
 /// Which answer of a project-list fetch this is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum ListPhase {
+pub enum ListPhase {
     /// The saved copy, sent first when there is one.
     Cached,
     /// The host's answer (or failure): the last message of a fetch.
@@ -952,36 +965,36 @@ pub(crate) enum ListPhase {
 /// What a project-list fetch reports: the repositories the profile's token
 /// can see (the Clone dialog's hosted sources, the ISSUES repository
 /// dropdown, the pull-request form's repository dropdowns).
-pub(crate) struct ProjectsAnswer {
-    pub(crate) profile_id: String,
-    pub(crate) result: Result<Vec<gitpoulpi_hosting::HostedProject>, String>,
-    pub(crate) phase: ListPhase,
+pub struct ProjectsAnswer {
+    pub profile_id: String,
+    pub result: Result<Vec<gitpoulpi_hosting::HostedProject>, String>,
+    pub phase: ListPhase,
     /// The host rejected the token: a saved list must not stand in for it.
-    pub(crate) unauthorized: bool,
+    pub unauthorized: bool,
 }
 
 /// A provider's project list, as far as it got.
 #[derive(Debug, Clone)]
-pub(crate) enum ProjectsState {
+pub enum ProjectsState {
     Loading,
     Ready(Vec<gitpoulpi_hosting::HostedProject>),
     Failed(String),
 }
 
 /// Where a fetch keeps the saved copy of its list.
-pub(crate) struct ListCacheJob {
-    pub(crate) dir: PathBuf,
-    pub(crate) key: gitpoulpi_hosting::list_cache::ListKey,
+pub struct ListCacheJob {
+    pub dir: PathBuf,
+    pub key: gitpoulpi_hosting::list_cache::ListKey,
 }
 
-pub(crate) struct ProjectsReceiver {
+pub struct ProjectsReceiver {
     rx: mpsc::Receiver<ProjectsAnswer>,
     /// Set when the receiver is dropped: the worker stops and stores nothing.
     cancelled: Arc<std::sync::atomic::AtomicBool>,
 }
 
 impl ProjectsReceiver {
-    pub(crate) fn try_recv(&self) -> Option<ProjectsAnswer> {
+    pub fn try_recv(&self) -> Option<ProjectsAnswer> {
         self.rx.try_recv().ok()
     }
 }
@@ -1002,7 +1015,7 @@ const CANCEL_POLL: Duration = Duration::from_millis(100);
 /// the fresh list is saved when it lands, and the stale files are pruned; the
 /// host's answer is always one [`ListPhase::Final`] message. A dropped
 /// receiver cancels the fetch.
-pub(crate) fn start_projects(
+pub fn start_projects(
     factory: Arc<dyn ClientFactory>,
     integration: Integration,
     all: Vec<Integration>,
@@ -1100,14 +1113,14 @@ pub(crate) fn start_projects(
 
 /// What a create-options fetch reports: the issue types (Jira, Azure) or
 /// lists (Trello) a project offers.
-pub(crate) type OptionsResult = Result<gitpoulpi_hosting::IssueCreateOptions, String>;
+pub type OptionsResult = Result<gitpoulpi_hosting::IssueCreateOptions, String>;
 
-pub(crate) struct OptionsReceiver {
+pub struct OptionsReceiver {
     rx: mpsc::Receiver<OptionsResult>,
 }
 
 impl OptionsReceiver {
-    pub(crate) fn try_recv(&self) -> Option<OptionsResult> {
+    pub fn try_recv(&self) -> Option<OptionsResult> {
         self.rx.try_recv().ok()
     }
 }
@@ -1115,7 +1128,7 @@ impl OptionsReceiver {
 /// Asks `integration` what `project` lets a new issue choose (a Jira issue
 /// type, an Azure work item type, a Trello list) on its own thread: a token
 /// lookup is a subprocess and the call is HTTP, never on the input thread.
-pub(crate) fn start_issue_options(
+pub fn start_issue_options(
     factory: Arc<dyn ClientFactory>,
     integration: Integration,
     all: Vec<Integration>,
@@ -1144,7 +1157,7 @@ pub(crate) fn start_issue_options(
 
 /// Why a refresh was requested (shown nowhere; kept for tests and logs).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Reason {
+pub enum Reason {
     Opened,
     HeadChanged,
     RemotesChanged,
@@ -1157,7 +1170,7 @@ pub(crate) enum Reason {
 /// target. A push or a fetch moves remote-tracking refs, so this notices
 /// them without hooking every submit site; local commits (which move the
 /// local branch tip constantly) deliberately do not count.
-pub(crate) fn refs_signature(refs: &[Ref]) -> u64 {
+pub fn refs_signature(refs: &[Ref]) -> u64 {
     use std::hash::{Hash, Hasher};
     let mut entries: Vec<(String, [u8; 20])> = Vec::new();
     for r in refs {
@@ -1179,7 +1192,7 @@ pub(crate) fn refs_signature(refs: &[Ref]) -> u64 {
 
 /// Decides when the next request goes out. Pure: `now` is passed in.
 #[derive(Debug)]
-pub(crate) struct RefreshPolicy {
+pub struct RefreshPolicy {
     interval: Option<Duration>,
     last_sent: Option<Instant>,
     last_head: Option<Option<String>>,
@@ -1191,7 +1204,7 @@ pub(crate) struct RefreshPolicy {
 const MIN_GAP: Duration = Duration::from_secs(2);
 
 impl RefreshPolicy {
-    pub(crate) fn new(interval: Option<Duration>) -> Self {
+    pub fn new(interval: Option<Duration>) -> Self {
         Self {
             interval,
             last_sent: None,
@@ -1203,21 +1216,21 @@ impl RefreshPolicy {
 
     /// The user asked (palette, `Ctrl+G g`-adjacent keys, a changed
     /// filter, Preferences closing).
-    pub(crate) fn demand(&mut self) {
+    pub fn demand(&mut self) {
         self.demanded = true;
     }
 
-    pub(crate) fn set_interval(&mut self, interval: Option<Duration>) {
+    pub fn set_interval(&mut self, interval: Option<Duration>) {
         self.interval = interval;
     }
 
     /// When the periodic refresh falls due, if it is on.
-    pub(crate) fn next_due(&self) -> Option<Instant> {
+    pub fn next_due(&self) -> Option<Instant> {
         self.interval.zip(self.last_sent).map(|(i, at)| at + i)
     }
 
     /// Called whenever a repository refresh landed, with what it says.
-    pub(crate) fn observe(&mut self, head: Option<&str>, signature: u64) -> Option<Reason> {
+    pub fn observe(&mut self, head: Option<&str>, signature: u64) -> Option<Reason> {
         let head_owned = head.map(str::to_string);
         let reason = if self.last_head.is_none() {
             Some(Reason::Opened)
@@ -1235,7 +1248,7 @@ impl RefreshPolicy {
 
     /// Whether to send now, given the reason `observe` found (if any).
     /// Records the send when it says yes.
-    pub(crate) fn should_send(&mut self, now: Instant, observed: Option<Reason>) -> Option<Reason> {
+    pub fn should_send(&mut self, now: Instant, observed: Option<Reason>) -> Option<Reason> {
         let demanded = std::mem::take(&mut self.demanded);
         let due = self
             .interval
@@ -1272,11 +1285,11 @@ impl RefreshPolicy {
 
 /// Where a repository's last snapshot lives: beside its
 /// `repo-state.toml`.
-pub(crate) fn cache_path(repo_root: &Path, state_dir: &str) -> PathBuf {
+pub fn cache_path(repo_root: &Path, state_dir: &str) -> PathBuf {
     gitpoulpi_session::RepoState::hosting_cache_path_for(repo_root, state_dir)
 }
 
-pub(crate) fn load_cache(path: &Path) -> Option<HostingSnapshot> {
+pub fn load_cache(path: &Path) -> Option<HostingSnapshot> {
     let raw = std::fs::read_to_string(path).ok()?;
     serde_json::from_str(&raw).ok()
 }
@@ -1286,7 +1299,7 @@ pub(crate) fn load_cache(path: &Path) -> Option<HostingSnapshot> {
 /// the directory ignores itself exactly like `RepoState::save` makes it:
 /// the cache sits in the working tree, and a file git can see turns the
 /// repository "dirty".
-pub(crate) fn save_cache(path: &Path, snapshot: &HostingSnapshot) {
+pub fn save_cache(path: &Path, snapshot: &HostingSnapshot) {
     if !snapshot.linked() && snapshot.issues_target.is_none() {
         return;
     }
@@ -1302,8 +1315,12 @@ pub(crate) fn save_cache(path: &Path, snapshot: &HostingSnapshot) {
     }
 }
 
-#[cfg(all(test, feature = "github", feature = "gitlab"))]
-pub(crate) mod fake;
+#[cfg(all(
+    any(test, feature = "test-support"),
+    feature = "github",
+    feature = "gitlab"
+))]
+pub mod fake;
 
 #[cfg(test)]
 #[cfg(all(feature = "github", feature = "gitlab"))]

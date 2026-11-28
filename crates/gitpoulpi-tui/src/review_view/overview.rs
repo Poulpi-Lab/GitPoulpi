@@ -10,6 +10,8 @@
 use gitpoulpi_i18n::msg::review_ai as ai_msg;
 use gitpoulpi_i18n::msg::review_view as msg;
 use ratatui::buffer::Buffer;
+
+use super::model::ReviewTargetExt as _;
 use ratatui::layout::Rect;
 use ratatui::style::{Modifier, Style};
 

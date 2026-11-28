@@ -2,44 +2,17 @@
 //! the repository answered, and the small enums the view and its palette
 //! twins share.
 
-use std::path::PathBuf;
+pub(crate) use gitpoulpi_link::review_model::{DraftStore, Focus, GitData, HostData, ReviewTarget};
 
-use gitpoulpi_core::domain::{CommitNode, Oid};
-use gitpoulpi_hosting::{
-    Integration, ItemMeta, PullRequestDetail, ReviewComment, ReviewFile, ReviewThread,
-};
-
-/// The request under review and where it lives.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct ReviewTarget {
-    pub(crate) integration: Integration,
-    /// Every configured profile (the token source reads them all).
-    pub(crate) all: Vec<Integration>,
-    /// `owner/name`, `group/sub/proj`.
-    pub(crate) project: String,
-    pub(crate) number: u64,
-    /// `#12` / `!53`.
-    pub(crate) iid_label: String,
-    pub(crate) title: String,
-    /// The git remote the request's refs are fetched from.
-    pub(crate) remote: String,
-    pub(crate) web_url: String,
-    pub(crate) source_branch: String,
-    pub(crate) target_branch: String,
-    /// The patch set the reviewer picked (Gerrit); `None`: the newest.
-    pub(crate) patch_set: Option<u32>,
-    /// The older patch set the diff starts from (Gerrit "compare with");
-    /// `None`: the target branch.
-    pub(crate) compare_patch_set: Option<u32>,
-    /// The repository the work tree belongs to (the draft file lives there);
-    /// `None`: reviewed through the host's API, no clone.
-    pub(crate) repo_root: Option<PathBuf>,
-}
-
-impl ReviewTarget {
+/// The terminal view's half of a [`ReviewTarget`].
+pub(crate) trait ReviewTargetExt {
     /// What `#N`, `!N`, mentions and commit ids in the request's text mean:
     /// the host the request lives on (the Overview, the composers' previews).
-    pub(crate) fn md_context(&self) -> crate::md_render::Context {
+    fn md_context(&self) -> crate::md_render::Context;
+}
+
+impl ReviewTargetExt for ReviewTarget {
+    fn md_context(&self) -> crate::md_render::Context {
         crate::md_render::Context {
             xrefs: gitpoulpi_hosting::xrefs::XrefContext {
                 family: Some(self.integration.kind.family()),
@@ -51,123 +24,6 @@ impl ReviewTarget {
             ..Default::default()
         }
     }
-
-    /// The request as the conversation widget names it: the Overview shows
-    /// the same timeline an issue has.
-    pub(crate) fn item_target(&self) -> crate::item_view::ItemTarget {
-        crate::item_view::ItemTarget {
-            integration: self.integration.clone(),
-            all: self.all.clone(),
-            project: self.project.clone(),
-            key: gitpoulpi_hosting::conversation::ItemKey::pull_request(self.number),
-            reference: self.iid_label.clone(),
-            title: self.title.clone(),
-            web_url: self.web_url.clone(),
-            repo_root: self.repo_root.clone(),
-            bases: Default::default(),
-        }
-    }
-
-    /// `#12 Fix the thing`, what pickers and the status line call it.
-    pub(crate) fn caption(&self) -> String {
-        format!("{} {}", self.iid_label, self.title)
-    }
-
-    /// `host/project`: what `remote-reviews.toml` files a request under.
-    pub(crate) fn remote_key(&self) -> String {
-        gitpoulpi_session::RemoteReviews::project_key(&self.integration.url, &self.project)
-    }
-
-    /// The key the local draft is stored under.
-    pub(crate) fn draft_key(&self) -> String {
-        gitpoulpi_session::ReviewDraft::key(&self.integration.id, &self.project, self.number)
-    }
-}
-
-/// Where the pending review of a request is kept between runs.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum DraftStore {
-    /// The repository's own state file.
-    Repo(PathBuf),
-    /// `remote-reviews.toml`, for a request of a repository that is not
-    /// cloned (`None`: no config directory, nothing is kept).
-    Remote(Option<PathBuf>),
-}
-
-impl DraftStore {
-    pub(crate) fn load(&self, target: &ReviewTarget) -> gitpoulpi_session::ReviewDraft {
-        let key = target.draft_key();
-        match self {
-            Self::Repo(root) => {
-                let path = crate::remotes_ui::repo_state_path(root);
-                gitpoulpi_session::RepoState::load(&path)
-                    .ok()
-                    .and_then(|mut s| s.reviews.remove(&key))
-                    .unwrap_or_default()
-            }
-            Self::Remote(Some(path)) => gitpoulpi_session::RemoteReviews::load(path)
-                .drafts
-                .remove(&target.remote_key())
-                .and_then(|mut of_project| of_project.remove(&key))
-                .unwrap_or_default(),
-            Self::Remote(None) => Default::default(),
-        }
-    }
-
-    /// Writes `draft` (an empty one removes the request's entry): a small
-    /// file, the same load-edit-save the other per-repository choices use.
-    pub(crate) fn save(&self, target: &ReviewTarget, draft: gitpoulpi_session::ReviewDraft) {
-        let key = target.draft_key();
-        match self {
-            Self::Repo(root) => {
-                let path = crate::remotes_ui::repo_state_path(root);
-                let mut state = gitpoulpi_session::RepoState::load(&path).unwrap_or_default();
-                if draft.is_empty() {
-                    state.reviews.remove(&key);
-                } else {
-                    state.reviews.insert(key, draft);
-                }
-                let _ = state.save(&path);
-            }
-            Self::Remote(Some(path)) => {
-                let mut file = gitpoulpi_session::RemoteReviews::load(path);
-                file.set_draft(&target.remote_key(), &key, draft);
-                let _ = file.save(path);
-            }
-            Self::Remote(None) => {}
-        }
-    }
-}
-
-/// The host's half of the request.
-#[derive(Debug, Clone)]
-pub(crate) struct HostData {
-    pub(crate) detail: PullRequestDetail,
-    pub(crate) files: Vec<ReviewFile>,
-    pub(crate) threads: Vec<ReviewThread>,
-    pub(crate) conversation: Vec<ReviewComment>,
-    pub(crate) meta: Option<ItemMeta>,
-}
-
-/// The repository's half: the fetched refs and the request's commits.
-#[derive(Debug, Clone)]
-pub(crate) struct GitData {
-    pub(crate) head: Oid,
-    /// What the Files diff starts from: the merge base, or the older patch
-    /// set picked in "compare with".
-    pub(crate) diff_base: Oid,
-    /// `diff_base` is a patch set: the commit list is the head patch set
-    /// alone, whose "parent" is that patch set.
-    pub(crate) comparing: bool,
-    /// The request's commits, newest first.
-    pub(crate) commits: Vec<CommitNode>,
-}
-
-/// Which side of a page has the keyboard.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Focus {
-    List,
-    Diff,
 }
 
 // -- AI suggestions ----------------------------------------------------------------

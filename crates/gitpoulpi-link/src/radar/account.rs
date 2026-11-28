@@ -24,68 +24,68 @@ use gitpoulpi_i18n::msg;
 use gitpoulpi_session::{ItemKey, KIND_ISSUE, KIND_PR};
 
 use super::model::{Group, Item, ItemKind};
-use super::vocab::Act;
 use super::Note;
 use crate::hosting_task::{age_label, Problem};
+use gitpoulpi_app::palette::vocab::radar::Act;
 
 /// One integration to ask, with the question.
 #[derive(Debug, Clone)]
-pub(crate) struct AccountJob {
-    pub(crate) integration: Integration,
-    pub(crate) query: AccountQuery,
+pub struct AccountJob {
+    pub integration: Integration,
+    pub query: AccountQuery,
     /// How the integration is named in the Radar.
-    pub(crate) label: String,
+    pub label: String,
 }
 
 /// A connected code host whose account-wide lists are all off: the Radar
 /// offers a `[Turn on]` for it.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct Offer {
-    pub(crate) id: String,
+pub struct Offer {
+    pub id: String,
     /// `GitHub`, or `GitHub - host` when two profiles share a name.
-    pub(crate) label: String,
+    pub label: String,
 }
 
 /// What a round asks on top of the scope's repositories.
 #[derive(Debug, Clone, Default)]
-pub(crate) struct AccountPlan {
+pub struct AccountPlan {
     /// Every configured integration (a client resolves its token from them).
-    pub(crate) all: Vec<Integration>,
-    pub(crate) jobs: Vec<AccountJob>,
-    pub(crate) offers: Vec<Offer>,
+    pub all: Vec<Integration>,
+    pub jobs: Vec<AccountJob>,
+    pub offers: Vec<Offer>,
     /// `<config>/radar-account.json`.
-    pub(crate) cache: Option<PathBuf>,
+    pub cache: Option<PathBuf>,
 }
 
 /// What the worker says about one integration's account-wide lists.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) struct AccountAnswer {
-    pub(crate) round: u64,
-    pub(crate) id: String,
-    pub(crate) label: String,
-    pub(crate) kind: IntegrationKind,
+pub struct AccountAnswer {
+    pub round: u64,
+    pub id: String,
+    pub label: String,
+    pub kind: IntegrationKind,
     /// The integration's host (the first part of an item's key).
-    pub(crate) host: String,
+    pub host: String,
     /// The signed-in login on the host; empty when unknown.
-    pub(crate) me: String,
-    pub(crate) items: AccountItems,
+    pub me: String,
+    pub items: AccountItems,
     /// Unix seconds the rows were fetched at.
-    pub(crate) fetched_at: u64,
+    pub fetched_at: u64,
     /// Read from the disk cache, not (yet) from the host.
-    pub(crate) cached: bool,
-    pub(crate) problem: Option<Problem>,
+    pub cached: bool,
+    pub problem: Option<Problem>,
     /// The host was paused for this round: the reason, as the user reads it.
-    pub(crate) paused: Option<String>,
+    pub paused: Option<String>,
 }
 
 /// Clones the machine knows about, by `(host, project)`, lowercase.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub(crate) struct CloneIndex(HashMap<(String, String), PathBuf>);
+pub struct CloneIndex(HashMap<(String, String), PathBuf>);
 
 impl CloneIndex {
     /// Records the clone at `path` whose remote is `url`. The first clone of
     /// a project wins (the scope's repositories are offered first).
-    pub(crate) fn add_remote(&mut self, url: &str, path: &Path) {
+    pub fn add_remote(&mut self, url: &str, path: &Path) {
         if let Some((base, project)) = gitpoulpi_hosting::remote_web_base(url) {
             self.0
                 .entry((host_key(&base), project_key(&project)))
@@ -93,12 +93,13 @@ impl CloneIndex {
         }
     }
 
-    pub(crate) fn find(&self, host: &str, project: &str) -> Option<&PathBuf> {
+    pub fn find(&self, host: &str, project: &str) -> Option<&PathBuf> {
         self.0.get(&(host_key(host), project_key(project)))
     }
 
-    #[cfg(test)]
-    pub(crate) fn of(entries: &[(&str, &str, &Path)]) -> Self {
+    /// An index of known clones, for a frontend's tests.
+    #[cfg(any(test, feature = "test-support"))]
+    pub fn of(entries: &[(&str, &str, &Path)]) -> Self {
         let mut index = Self::default();
         for (host, project, path) in entries {
             index
@@ -135,16 +136,16 @@ fn identity(key: &ItemKey) -> (String, String, String, u64) {
 }
 
 /// Everything [`items`] reads.
-pub(crate) struct AccountInput<'a> {
-    pub(crate) answers: &'a [AccountAnswer],
-    pub(crate) clones: &'a CloneIndex,
-    pub(crate) show_not_cloned: bool,
-    pub(crate) show_drafts: bool,
+pub struct AccountInput<'a> {
+    pub answers: &'a [AccountAnswer],
+    pub clones: &'a CloneIndex,
+    pub show_not_cloned: bool,
+    pub show_drafts: bool,
 }
 
 /// The account-wide rows to add to `scope_items`: none that the scope already
 /// lists, none hidden by the two checkboxes.
-pub(crate) fn items(input: &AccountInput, scope_items: &[Item]) -> Vec<Item> {
+pub fn items(input: &AccountInput, scope_items: &[Item]) -> Vec<Item> {
     let mut seen: HashSet<(String, String, String, u64)> = scope_items
         .iter()
         .filter(|i| i.kind != ItemKind::Wip)
@@ -155,12 +156,12 @@ pub(crate) fn items(input: &AccountInput, scope_items: &[Item]) -> Vec<Item> {
         let me = answer.me.as_str();
         let is_me = |login: &str| !me.is_empty() && login.eq_ignore_ascii_case(me);
         let gitlab = answer.kind.family() == ApiFamily::Gitlab;
-        let meta = crate::meta_picker::supports(answer.kind);
-        let review = crate::review_view::supports(answer.kind);
+        let meta = gitpoulpi_app::provider_caps::supports_metadata(answer.kind);
+        let review = gitpoulpi_app::provider_caps::supports_review(answer.kind);
         // The clone a row belongs to, else the "not cloned" marker.
         let place = |project: &str| -> Option<(Option<PathBuf>, String)> {
             match input.clones.find(&answer.host, project) {
-                Some(path) => Some((Some(path.clone()), super::scope::name_of(path))),
+                Some(path) => Some((Some(path.clone()), super::name_of(path))),
                 None if input.show_not_cloned => Some((None, project.to_string())),
                 None => None,
             }
@@ -291,7 +292,7 @@ pub(crate) fn items(input: &AccountInput, scope_items: &[Item]) -> Vec<Item> {
 /// What each integration says about its account-wide lists, as note rows
 /// (under REPOSITORIES): a failure, the host's pause, and the lines the
 /// query itself left (rows cut by the limit, a group it could not read).
-pub(crate) fn notes(answers: &[AccountAnswer], now: i64) -> Vec<Note> {
+pub fn notes(answers: &[AccountAnswer], now: i64) -> Vec<Note> {
     let mut out = Vec::new();
     for answer in answers {
         let plain = |text: String, act| Note {

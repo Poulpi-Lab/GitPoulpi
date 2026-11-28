@@ -73,7 +73,7 @@ fn with_haystacks<R>(seq: &'static [PaletteEntry], f: impl FnOnce(&[Haystack]) -
         if slot.as_ref().is_none_or(|c| c.key != key) {
             let rows = PALETTE_COMMANDS
                 .iter()
-                .chain((families().settings_entries)())
+                .chain(crate::settings::palette_rows::entries())
                 .chain((families().flow_entries)())
                 .chain((families().jobs_entries)())
                 .chain(seq)
@@ -111,13 +111,13 @@ pub fn palette_matches(query: &str, ctx: PaletteContext) -> Vec<PaletteMatch> {
             .then_some(msg::palette::WHY_NEEDS_REPOSITORY.get())
             .or_else(|| unavailable_reason(e.command, ctx))
     };
-    let prefixes = (families().settings_prefixes)();
+    let prefixes = crate::settings::palette_rows::prefixes();
     // One snapshot per call: the rows and the haystacks must be the same list.
     let seq = sequences::entries();
     let mut scored: Vec<(i32, bool, usize, &'static PaletteEntry)> = with_haystacks(seq, |rows| {
         PALETTE_COMMANDS
             .iter()
-            .chain((families().settings_entries)())
+            .chain(crate::settings::palette_rows::entries())
             .chain((families().flow_entries)())
             .chain((families().jobs_entries)())
             .chain(seq)

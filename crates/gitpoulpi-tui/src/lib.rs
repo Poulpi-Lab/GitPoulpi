@@ -170,7 +170,7 @@ mod history_view;
 mod hosting_command;
 mod hosting_notify;
 #[cfg(feature = "hosting")]
-mod hosting_task;
+pub(crate) use gitpoulpi_link::hosting_task;
 mod hscroll;
 #[cfg(test)]
 mod i18n_layout_tests;
@@ -405,6 +405,8 @@ use event_loop::*;
 use file_panel::*;
 use file_selection::*;
 use git_actions::*;
+#[cfg(feature = "hosting")]
+use hosting_ui::HostingListSection as _;
 use hosting_ui::{HostingCommand, HostingEffect, HostingHit, HostingList, HostingUi, ToolbarChip};
 use log_inline_ref::*;
 use log_menu::*;
@@ -540,6 +542,10 @@ pub fn explorer_folder() -> Option<std::path::PathBuf> {
 pub fn run_with(session: &str, options: RunOptions) -> io::Result<()> {
     // Every request this process sends says it comes from the window.
     gitpoulpi_ipc::auth::set_client_name("TUI");
+    // A hosting failure read through a string channel keeps its kind for the
+    // failure card.
+    #[cfg(feature = "hosting")]
+    hosting_task::install_failure_kind_hook(activity_log::remember_kind);
     // User-only app directories (best effort, once per start).
     if let Some(paths) = gitpoulpi_config::ConfigPaths::discover() {
         gitpoulpi_config::secure_fs::harden_app_dirs(&paths);

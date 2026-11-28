@@ -123,6 +123,31 @@ pub const REWRITE_SCRIPTS: bool = cfg!(all(
     feature = "rewrite-scripts"
 ));
 
+/// Whether this build has the client of an API family.
+pub const fn family_built(family: gitpoulpi_config::ApiFamily) -> bool {
+    use gitpoulpi_config::ApiFamily as F;
+    match family {
+        F::Github => GITHUB,
+        F::Gitlab => GITLAB,
+        F::AzureDevops => AZURE_DEVOPS,
+        F::Bitbucket => BITBUCKET,
+        F::Jira => JIRA,
+        F::Trello => TRELLO,
+        F::Gitea => GITEA,
+        F::Linear => LINEAR,
+        F::YouTrack => YOUTRACK,
+        F::Redmine => REDMINE,
+        F::Gerrit => GERRIT,
+        F::LocalMarkdown => LOCAL_ISSUES,
+    }
+}
+
+/// Whether this build has a client for `kind` (a profile of a kind that is
+/// not built stays in the config but is never used).
+pub fn kind_built(kind: gitpoulpi_config::IntegrationKind) -> bool {
+    gitpoulpi_config::IntegrationKind::IMPLEMENTED.contains(&kind) && family_built(kind.family())
+}
+
 /// The user-facing feature table, in `--version` order.
 pub const FLAGS: [(&str, bool); 27] = [
     ("ai", AI),

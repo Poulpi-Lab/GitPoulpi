@@ -272,7 +272,10 @@ impl PreferencesState {
                 if n > 0 {
                     spans.push(Span::raw(" "));
                 }
-                spans.push(Span::styled("  ", Style::default().bg(*color)));
+                spans.push(Span::styled(
+                    "  ",
+                    Style::default().bg(swatch_color(*color)),
+                ));
             }
             spans
         } else {

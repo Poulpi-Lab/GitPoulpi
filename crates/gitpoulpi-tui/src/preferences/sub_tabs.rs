@@ -36,27 +36,6 @@ pub(crate) enum SubTab {
 /// `PreferencesState::open` reads it, so unit tests stay independent.
 pub(super) static LAST_TABS: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
 
-impl PrefSection {
-    /// Whether the page is split into a General tab and a list tab.
-    pub(crate) fn has_sub_tabs(self) -> bool {
-        (self.has_list() && self != PrefSection::Sequences) || self == PrefSection::Keybindings
-    }
-
-    /// The list tab's label: the items' name, as the list titles it.
-    pub(super) fn list_tab_title(self) -> String {
-        use gitpoulpi_i18n::msg as m;
-        match self {
-            PrefSection::Profiles => m::settings_profiles::LIST_TITLE.get().to_string(),
-            PrefSection::Ai => m::ai_page::PROFILES_HEADING.get().to_string(),
-            PrefSection::OpenIn => m::settings_open_in::LIST_TITLE.get().to_string(),
-            PrefSection::Images => m::settings_images::LIST_TITLE.get().to_string(),
-            PrefSection::Workflow => m::settings_workflow::TAB_RULES.get().to_string(),
-            PrefSection::Keybindings => screen::TAB_KEYBINDINGS.get().to_string(),
-            _ => String::new(),
-        }
-    }
-}
-
 impl PreferencesState {
     /// The tab of `section` (the list tab for a page without tabs).
     pub(super) fn sub_tab_of(&self, section: PrefSection) -> SubTab {

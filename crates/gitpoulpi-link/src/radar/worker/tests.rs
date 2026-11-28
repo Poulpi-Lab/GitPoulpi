@@ -3,7 +3,7 @@
 use super::*;
 use crate::hosting_task::fake::{issue, pr, FakeFactory};
 use gitpoulpi_config::IntegrationKind;
-use gitpoulpi_hosting::{Error as HostingError, PullRequestState};
+use gitpoulpi_hosting::{Error as HostingError, PullRequestState, ResolveRemote};
 use std::sync::atomic::AtomicUsize;
 use std::time::Duration;
 
@@ -321,7 +321,7 @@ fn the_per_repository_lists_cover_the_code_hosts_that_are_built() {
     for kind in [K::AzureDevops, K::Bitbucket, K::Gerrit] {
         assert_eq!(
             lists_requests(kind),
-            crate::build_features::kind_built(kind),
+            gitpoulpi_app::features::kind_built(kind),
             "{kind:?}"
         );
     }

@@ -18,7 +18,7 @@
 //! "Link..." line when its remotes suggest one. Only GitHub, GitLab, Gitea and Forgejo are
 //! named in the UI.
 
-mod account;
+pub(crate) use gitpoulpi_link::radar::account;
 mod account_fs;
 mod account_ui;
 mod actions;
@@ -29,7 +29,7 @@ mod host_acts;
 mod input;
 mod item_host;
 mod labels;
-mod model;
+pub(crate) use gitpoulpi_link::radar::model;
 pub(crate) mod pending;
 mod profile;
 mod render;
@@ -37,7 +37,8 @@ mod review_choice;
 mod review_flow;
 pub(crate) mod scope;
 mod vocab;
-mod worker;
+pub(crate) use gitpoulpi_link::radar::worker;
+mod worker_fs;
 
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
@@ -56,6 +57,7 @@ use crate::hosting_task::{unix_now, RadarFactory};
 use crate::repo_switcher::RepoFacts;
 
 use account::{AccountAnswer, CloneIndex, Offer};
+pub(crate) use gitpoulpi_link::radar::Note;
 use labels::{
     act_label, heading_title, note_of, snooze_from_key, snooze_key, snooze_label, view_label,
     who_label,
@@ -68,7 +70,8 @@ pub(crate) use vocab::{
     Act, CloneRequest, ColumnCmd, ConversationRequest, Outcome, RadarCommand, ReviewRequest,
     SizedColumn, Spot,
 };
-use worker::{FsPrepare, Msg, RadarWorker, RepoAnswer, Setup};
+use worker::{Msg, RadarWorker, RepoAnswer, Setup};
+use worker_fs::FsPrepare;
 
 /// Where a click landed. Row indices index the view's rows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -121,15 +124,6 @@ pub(crate) enum Cell {
     Labels,
     /// A request's `source → target`.
     Branches,
-}
-
-/// A repository with something to say (an error, a missing link).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct Note {
-    pub(crate) path: PathBuf,
-    pub(crate) name: String,
-    pub(crate) text: String,
-    pub(crate) act: Option<(Act, Option<String>)>,
 }
 
 /// The slot `RepoManager` holds: the Radar when it is showing. Not

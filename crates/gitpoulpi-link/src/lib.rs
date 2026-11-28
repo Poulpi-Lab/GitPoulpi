@@ -108,6 +108,7 @@ pub mod ui_viewer;
 pub mod undo_label;
 pub mod undo_ui;
 pub mod wip_view;
+pub mod workspace_search;
 
 pub(crate) mod commit_files_cache;
 pub(crate) mod fetch_lock;
